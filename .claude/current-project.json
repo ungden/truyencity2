@@ -1,0 +1,22 @@
+{
+  "projectId": "sample-project-id",
+  "novelTitle": "Thiên Đạo Vô Song",
+  "genre": "tien-hiep",
+  "mainCharacter": {
+    "name": "Lâm Phong",
+    "description": "Thiếu niên bị gia tộc bỏ rơi, nhờ cơ duyên kỳ ngộ đạt được công pháp thượng cổ"
+  },
+  "currentChapter": 1,
+  "totalPlannedChapters": 100,
+  "targetChapterLength": 2500,
+  "cultivationSystem": "Luyện Khí (9 tầng) -> Trúc Cơ (3 tầng) -> Kim Đan -> Nguyên Anh -> Hóa Thần -> Đại Thừa -> Độ Kiếp",
+  "worldDescription": "Huyền Thiên Đại Lục - Thế giới tu tiên rộng lớn với vô số tông phái. Cường giả vi tôn, yếu thì bị ức hiếp. Thiên Đạo vô tình, chỉ có mạnh mới có thể sinh tồn.",
+  "writingStyle": "Hành động mãnh liệt, tình tiết gay cấn, nhân vật lạnh lùng nhưng có tình nghĩa",
+  "plotPoints": [
+    "Chương 1-10: Lâm Phong bị trục xuất khỏi gia tộc, được lão nhân bí ẩn truyền công pháp",
+    "Chương 11-20: Gia nhập Vân Thiên Tông, gặp nữ chính",
+    "Chương 21-30: Đại hội tông môn, đánh bại thiên tài các phái"
+  ],
+  "createdAt": "2024-01-01T00:00:00Z",
+  "updatedAt": "2024-01-01T00:00:00Z"
+}

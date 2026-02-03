@@ -1,0 +1,34 @@
+{
+  "name": "TruyenCity AI Writer",
+  "version": "2.0.0",
+  "description": "Kết nối Claude Code với TruyenCity để viết truyện tự động",
+  "api": {
+    "baseUrl": "https://your-domain.vercel.app",
+    "externalEndpoint": "/api/external/claude-code",
+    "token": "tc_YOUR_TOKEN_HERE"
+  },
+  "instructions": {
+    "setup": [
+      "1. Đăng nhập vào website TruyenCity",
+      "2. Vào Cài đặt → API Tokens",
+      "3. Tạo token mới và copy token",
+      "4. Thay thế 'tc_YOUR_TOKEN_HERE' bằng token của bạn",
+      "5. Thay thế 'your-domain.vercel.app' bằng domain thực tế"
+    ],
+    "usage": [
+      "Chạy: claude",
+      "Sau đó sử dụng: /project write-chapter",
+      "Hoặc: /project batch-write 5"
+    ]
+  },
+  "writing": {
+    "targetLength": 2500,
+    "maxLength": 3500,
+    "minLength": 2000,
+    "language": "vi"
+  },
+  "storage": {
+    "chaptersDir": "./chapters",
+    "outputFormat": "txt"
+  }
+}
