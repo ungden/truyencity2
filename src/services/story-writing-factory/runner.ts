@@ -33,6 +33,14 @@ import {
 } from './types';
 import { getStyleByGenre, getPowerSystemByGenre } from './templates';
 
+// Sprint 1/2/3 Quality Systems
+import { FullQCGating, FullGateResult } from './qc-gating';
+import { CharacterDepthTracker } from './character-depth';
+import { BattleVarietyTracker, BattleType, TacticalApproach, CombatElement, BattleOutcome } from './battle-variety';
+import { PowerTracker } from './power-tracker';
+import { WritingStyleAnalyzer, writingStyleAnalyzer } from './writing-style-analyzer';
+import { dialogueAnalyzer } from './dialogue-analyzer';
+
 // ============================================================================
 // DEFAULT RUNNER CONFIG
 // ============================================================================
@@ -64,6 +72,12 @@ export class StoryRunner {
   private memoryManager: MemoryManager | null = null;
   private costOptimizer: CostOptimizer;
 
+  // Sprint 1/2/3 Quality Systems
+  private fullQCGating: FullQCGating | null = null;
+  private characterTracker: CharacterDepthTracker | null = null;
+  private battleTracker: BattleVarietyTracker | null = null;
+  private powerTracker: PowerTracker | null = null;
+
   // State
   private state: RunnerState | null = null;
   private storyOutline: StoryOutline | null = null;
@@ -72,6 +86,7 @@ export class StoryRunner {
   private styleBible: StyleBible | null = null;
   private writtenChapters: Map<number, ChapterContent> = new Map();
   private lastQualityScore: number = 7;
+  private lastQCResult: FullGateResult | null = null;
 
   // Control flags
   private isRunning = false;
@@ -143,10 +158,28 @@ export class StoryRunner {
     // Initialize memory manager
     this.memoryManager = new MemoryManager(this.state.projectId);
 
+    // Initialize Sprint 1/2/3 Quality Systems
+    this.characterTracker = new CharacterDepthTracker(this.state.projectId);
+    this.battleTracker = new BattleVarietyTracker(this.state.projectId);
+    this.powerTracker = new PowerTracker(this.state.projectId);
+    this.fullQCGating = new FullQCGating(this.state.projectId, undefined, {
+      battleTracker: this.battleTracker,
+      characterTracker: this.characterTracker,
+    });
+
     // Try to load existing state (for crash recovery)
     const loaded = await this.memoryManager.load();
     if (loaded) {
       this.callbacks.onStatusChange?.('idle', 'Đã khôi phục từ lần chạy trước');
+      // Also try to load quality system state
+      try {
+        await this.characterTracker.initialize();
+        await this.battleTracker.initialize();
+        await this.powerTracker.initialize();
+        await this.fullQCGating.initialize();
+      } catch (e) {
+        // Non-fatal: quality systems can work without prior data
+      }
     }
 
     try {
@@ -358,6 +391,19 @@ export class StoryRunner {
   }
 
   /**
+   * Get quality systems
+   */
+  getQualitySystems() {
+    return {
+      qcGating: this.fullQCGating,
+      characterTracker: this.characterTracker,
+      battleTracker: this.battleTracker,
+      powerTracker: this.powerTracker,
+      lastQCResult: this.lastQCResult,
+    };
+  }
+
+  /**
    * Estimate cost for remaining chapters
    */
   estimateRemainingCost(): { estimatedCost: number; breakdown: Record<string, number> } {
@@ -403,6 +449,28 @@ export class StoryRunner {
         if (restrictions.length > 0) {
           previousSummary += `\n\n⚠️ AVOID: ${restrictions.join(', ')}`;
         }
+
+        // Add character depth context (Sprint 2)
+        if (this.characterTracker) {
+          const needsDev = this.characterTracker.getCharactersNeedingDevelopment(chapterNumber);
+          if (needsDev.length > 0) {
+            const highPriority = needsDev.filter(d => d.priority === 'high').slice(0, 2);
+            if (highPriority.length > 0) {
+              previousSummary += `\n\n📌 CHARACTER DEVELOPMENT NEEDED:`;
+              for (const dev of highPriority) {
+                previousSummary += `\n- ${dev.character.name}: ${dev.reason}`;
+              }
+            }
+          }
+        }
+
+        // Add last QC feedback for improvement (Sprint 1/2/3)
+        if (this.lastQCResult && this.lastQCResult.scores.overall < 65) {
+          previousSummary += `\n\n⚠️ QUALITY NOTE (từ chương trước):`;
+          for (const warning of this.lastQCResult.warnings.slice(0, 3)) {
+            previousSummary += `\n- ${warning}`;
+          }
+        }
       } else {
         previousSummary = this.getPreviousSummary(chapterNumber);
       }
@@ -446,8 +514,48 @@ export class StoryRunner {
       );
 
       if (result.success && result.data) {
+        // ========== QC EVALUATION (Sprint 1/2/3) ==========
+        let qcPassed = true;
+        if (this.fullQCGating) {
+          try {
+            const qcResult = await this.fullQCGating.evaluateFull(
+              chapterNumber,
+              result.data.content,
+              {
+                protagonistPowerLevel: this.powerTracker ? {
+                  realm: this.powerTracker.getPowerState(this.worldBible!.protagonist.name)?.realm || '',
+                  realmIndex: 0,
+                } : undefined,
+                charactersInvolved: [this.worldBible!.protagonist.name],
+              }
+            );
+
+            this.lastQCResult = qcResult;
+
+            // Run writing style analysis (lightweight, always runs)
+            const styleResult = writingStyleAnalyzer.analyzeStyle(result.data.content);
+
+            // Log quality metrics
+            this.callbacks.onStatusChange?.('writing',
+              `Ch.${chapterNumber} QC: ${qcResult.scores.overall}/100 | ` +
+              `Style: ${styleResult.overallScore} | ` +
+              `Action: ${qcResult.action}`
+            );
+
+            // If QC says auto_rewrite, log warning but still accept
+            // (full auto-rewrite integration is handled by AutoRewriter)
+            if (qcResult.action === 'auto_rewrite') {
+              this.callbacks.onError?.(`Ch.${chapterNumber} QC low (${qcResult.scores.overall}): ${qcResult.failures.join(', ')}`);
+            }
+          } catch (e) {
+            // QC failure is non-fatal
+          }
+        }
+
         // Store chapter
         this.writtenChapters.set(chapterNumber, result.data);
+
+        // ========== UPDATE TRACKING SYSTEMS ==========
 
         // Update memory manager
         if (this.memoryManager) {
