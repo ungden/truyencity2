@@ -277,8 +277,27 @@ export class StoryRunner {
       this.updateStatus('planning_arcs', 'Đang lên dàn ý tất cả các arc...');
 
       if (input.currentChapter && input.currentChapter > 0) {
+        // Resume mode: use dummy arcs starting from currentChapter+1
         this.arcOutlines = this.createDummyArcs(this.storyOutline, targetChapters, chaptersPerArc, input.currentChapter || 0);
+      } else if (this.chaptersToWriteLimit && this.chaptersToWriteLimit <= chaptersPerArc) {
+        // Limited run (e.g. cron writing 1 chapter): only plan 1 arc, not all
+        // This avoids planning 25+ arcs when we only need to write 1 chapter
+        const firstArcResult = await this.planner.planSingleArc({
+          storyOutline: this.storyOutline,
+          worldBible: this.worldBible!,
+          arcNumber: 1,
+          startChapter: 1,
+          endChapter: Math.min(chaptersPerArc, targetChapters),
+          plotPoints: this.storyOutline.majorPlotPoints.filter(pp => pp.targetArc === 1),
+        });
+
+        if (!firstArcResult.success || !firstArcResult.data) {
+          throw new Error(`Arc planning failed: ${firstArcResult.error}`);
+        }
+
+        this.arcOutlines = [firstArcResult.data];
       } else {
+        // Full planning: plan ALL arcs
         const arcsResult = await this.planner.planAllArcs(
           this.storyOutline,
           this.worldBible

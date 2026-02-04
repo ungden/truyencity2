@@ -121,7 +121,7 @@ Trả về JSON:
           { role: 'user', content: prompt },
         ],
         temperature: 0.7,
-        maxTokens: 3000,
+        maxTokens: this.config.maxTokens || 8192,
       });
 
       if (!response.success || !response.content) {
@@ -236,37 +236,57 @@ Trả về JSON:
   "status": "planned"
 }`;
 
-    try {
-      const response = await this.aiService.chat({
-        provider: this.config.provider,
-        model: this.config.model,
-        messages: [
-          { role: 'system', content: ARC_PLANNER_PROMPT },
-          { role: 'user', content: prompt },
-        ],
-        temperature: 0.7,
-        maxTokens: 4000,
-      });
+    const maxRetries = this.config.maxRetries || 3;
+    const baseMaxTokens = this.config.maxTokens || 8192;
+    let lastError = '';
 
-      if (!response.success || !response.content) {
-        return { success: false, error: response.error || 'Empty response' };
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        // Escalate maxTokens on retry (1x, 1.5x, 2x)
+        const currentMaxTokens = Math.round(baseMaxTokens * (1 + attempt * 0.5));
+
+        const response = await this.aiService.chat({
+          provider: this.config.provider,
+          model: this.config.model,
+          messages: [
+            { role: 'system', content: ARC_PLANNER_PROMPT },
+            { role: 'user', content: prompt },
+          ],
+          temperature: 0.7,
+          maxTokens: currentMaxTokens,
+        });
+
+        if (!response.success || !response.content) {
+          lastError = response.error || 'Empty response';
+          console.warn(`[Planner] Arc ${input.arcNumber} attempt ${attempt + 1} failed: ${lastError}`);
+          continue; // Retry
+        }
+
+        // Check for truncated response
+        if (response.finishReason && response.finishReason !== 'STOP' && response.finishReason !== 'stop') {
+          console.warn(`[Planner] Arc ${input.arcNumber} attempt ${attempt + 1} truncated (finishReason=${response.finishReason}), maxTokens=${currentMaxTokens}`);
+        }
+
+        const parsed = this.parseJSON<ArcOutline>(response.content);
+
+        // Validate and fix chapter outlines if needed
+        if (!parsed.chapterOutlines || parsed.chapterOutlines.length !== chapterCount) {
+          parsed.chapterOutlines = this.generateDefaultChapterPlans(
+            input.startChapter,
+            chapterCount,
+            parsed
+          );
+        }
+
+        return { success: true, data: parsed };
+      } catch (error) {
+        lastError = error instanceof Error ? error.message : 'Unknown error';
+        console.warn(`[Planner] Arc ${input.arcNumber} attempt ${attempt + 1}/${maxRetries} failed: ${lastError}`);
+        // Continue to next attempt
       }
-
-      const parsed = this.parseJSON<ArcOutline>(response.content);
-
-      // Validate and fix chapter outlines if needed
-      if (!parsed.chapterOutlines || parsed.chapterOutlines.length !== chapterCount) {
-        parsed.chapterOutlines = this.generateDefaultChapterPlans(
-          input.startChapter,
-          chapterCount,
-          parsed
-        );
-      }
-
-      return { success: true, data: parsed };
-    } catch (error) {
-      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
+
+    return { success: false, error: `All ${maxRetries} attempts failed. Last error: ${lastError}` };
   }
 
   // ============================================================================
@@ -403,7 +423,76 @@ Trả về JSON:
     // Fix trailing commas
     cleaned = cleaned.replace(/,\s*}/g, '}').replace(/,\s*]/g, ']');
 
-    return JSON.parse(cleaned);
+    // Try parsing directly first
+    try {
+      return JSON.parse(cleaned);
+    } catch {
+      // JSON parse failed — attempt to repair truncated JSON
+      cleaned = this.repairTruncatedJSON(cleaned);
+      return JSON.parse(cleaned);
+    }
+  }
+
+  /**
+   * Attempt to repair truncated JSON by closing unclosed brackets/braces.
+   * Handles cases where Gemini response was cut off mid-JSON due to token limits.
+   */
+  private repairTruncatedJSON(input: string): string {
+    let repaired = input;
+
+    // If we're stuck inside an unclosed string, close it
+    let inStr = false;
+    let esc = false;
+    for (let i = 0; i < repaired.length; i++) {
+      const ch = repaired[i];
+      if (esc) { esc = false; continue; }
+      if (ch === '\\' && inStr) { esc = true; continue; }
+      if (ch === '"') { inStr = !inStr; }
+    }
+    if (inStr) {
+      repaired += '"';
+    }
+
+    // Remove trailing partial key-value pairs
+    // e.g., ..."title": "Tiêu đề chươ  (truncated mid-value)
+    // After closing the string above, we might have: ..."title": "Tiêu đề chươ"
+    // That's actually valid. But if we have a trailing comma + partial key:
+    // e.g., , "chapterNum  → remove this
+    repaired = repaired.replace(/,\s*"[^"]*"\s*:\s*"[^"]*$/, '');  // partial string value
+    repaired = repaired.replace(/,\s*"[^"]*"\s*:\s*$/, '');          // key with no value
+    repaired = repaired.replace(/,\s*"[^"]*$/, '');                  // partial key only
+    repaired = repaired.replace(/,\s*$/, '');                        // trailing comma
+
+    // Fix trailing commas (again after trimming)
+    repaired = repaired.replace(/,\s*}/g, '}').replace(/,\s*]/g, ']');
+
+    // Count open brackets/braces and close them
+    let openBraces = 0;
+    let openBrackets = 0;
+    inStr = false;
+    esc = false;
+    for (let i = 0; i < repaired.length; i++) {
+      const ch = repaired[i];
+      if (esc) { esc = false; continue; }
+      if (ch === '\\' && inStr) { esc = true; continue; }
+      if (ch === '"') { inStr = !inStr; continue; }
+      if (!inStr) {
+        if (ch === '{') openBraces++;
+        else if (ch === '}') openBraces--;
+        else if (ch === '[') openBrackets++;
+        else if (ch === ']') openBrackets--;
+      }
+    }
+
+    // Close unclosed brackets then braces (innermost first)
+    while (openBrackets > 0) { repaired += ']'; openBrackets--; }
+    while (openBraces > 0) { repaired += '}'; openBraces--; }
+
+    // Final trailing comma cleanup
+    repaired = repaired.replace(/,\s*}/g, '}').replace(/,\s*]/g, ']');
+
+    console.warn(`[Planner] Repaired truncated JSON (added closing brackets/braces)`);
+    return repaired;
   }
 }
 

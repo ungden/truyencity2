@@ -2,15 +2,18 @@
  * Supabase pg_cron Target: Write Chapters
  * 
  * Called by Supabase pg_cron + pg_net every 5 minutes.
- * - Finds 15 active projects (Round-Robin via updated_at)
- * - Writes 1 chapter for each project in PARALLEL
- * - Designed for high throughput (approx 4,320 chapters/day)
  * 
- * Flow:
- * 1. Auth check (CRON_SECRET)
- * 2. Select 15 projects
- * 3. Promise.all([Runner1, Runner2, ...])
- * 4. Return results
+ * Two-tier processing:
+ *   Tier 1 (RESUME): Projects with current_chapter > 0
+ *     - Pick up to 15 projects, write 1 chapter each in PARALLEL
+ *     - Fast: ~30-60s per project (uses dummy arcs, skips planning)
+ *   
+ *   Tier 2 (INIT): Projects with current_chapter = 0
+ *     - Pick only 1 new project, plan story + arcs + write Ch.1
+ *     - Slow: ~2-5 minutes (full Gemini planning pipeline)
+ * 
+ * Both tiers run in parallel via Promise.allSettled.
+ * Designed for ~4,000+ chapters/day throughput.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -18,15 +21,12 @@ import { createClient } from '@supabase/supabase-js';
 import { AIProviderService } from '@/services/ai-provider';
 import { StoryRunner } from '@/services/story-writing-factory/runner';
 import type { FactoryConfig, RunnerConfig, GenreType } from '@/services/story-writing-factory/types';
-import { randomUUID } from 'crypto';
 
 // CONFIGURATION
-const PROJECTS_PER_BATCH = 15; // 15 projects in parallel
-const CHAPTERS_PER_PROJECT = 1; // 1 chapter per run
-const TIMEOUT_MS = 250000; // 250s (leave buffer for Vercel 300s limit)
+const RESUME_BATCH_SIZE = 15;  // Tier 1: resume projects (fast)
+const INIT_BATCH_SIZE = 1;     // Tier 2: new projects needing full plan (slow)
 
-// Do not use Edge Runtime, need Node.js for heavier parallel processing
-export const maxDuration = 300; // 5 minutes (Pro plan)
+export const maxDuration = 300; // 5 minutes (Vercel Pro)
 export const dynamic = 'force-dynamic';
 
 function getSupabaseAdmin() {
@@ -43,10 +43,119 @@ function verifyCronAuth(request: NextRequest): boolean {
   return authHeader === `Bearer ${cronSecret}`;
 }
 
+// Shared type for project row
+type ProjectRow = {
+  id: string;
+  main_character: string | null;
+  genre: string | null;
+  status: string;
+  current_chapter: number | null;
+  total_planned_chapters: number | null;
+  world_description: string | null;
+  writing_style: string | null;
+  temperature: number | null;
+  target_chapter_length: number | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  novels: any;
+};
+
+type RunResult = {
+  id: string;
+  title: string;
+  tier: 'resume' | 'init';
+  success: boolean;
+  error?: string;
+};
+
+/**
+ * Create a runner, set callbacks, execute 1 chapter.
+ */
+async function writeOneChapter(
+  project: ProjectRow,
+  geminiKey: string,
+  supabase: ReturnType<typeof getSupabaseAdmin>,
+  tier: 'resume' | 'init'
+): Promise<RunResult> {
+  const novel = Array.isArray(project.novels) ? project.novels[0] : project.novels;
+  if (!novel?.id) throw new Error('No novel linked');
+
+  const aiService = new AIProviderService({ gemini: geminiKey });
+  const currentCh = project.current_chapter || 0;
+
+  const factoryConfig: Partial<FactoryConfig> = {
+    provider: 'gemini',
+    model: 'gemini-3-flash-preview',
+    temperature: project.temperature || 1.0,
+    maxTokens: 8192,
+    targetWordCount: project.target_chapter_length || 2500,
+    genre: (project.genre || 'tien-hiep') as GenreType,
+    minQualityScore: 5,
+    maxRetries: tier === 'init' ? 3 : 1, // More retries for init (planning is flaky)
+    use3AgentWorkflow: true,
+  };
+
+  const runnerConfig: Partial<RunnerConfig> = {
+    delayBetweenChapters: 100,
+    delayBetweenArcs: 100,
+    maxChapterRetries: tier === 'init' ? 2 : 1,
+    autoSaveEnabled: false,
+    minQualityToProgress: 4,
+    pauseOnError: false,
+  };
+
+  const runner = new StoryRunner(factoryConfig, runnerConfig, aiService);
+
+  runner.setCallbacks({
+    onChapterCompleted: async (chNum, result) => {
+      if (result.data) {
+        await supabase.from('chapters').upsert({
+          novel_id: novel.id,
+          chapter_number: chNum,
+          title: result.data.title,
+          content: result.data.content,
+        }, { onConflict: 'novel_id,chapter_number' });
+
+        await supabase.from('ai_story_projects').update({
+          current_chapter: chNum,
+          updated_at: new Date().toISOString(),
+        }).eq('id', project.id);
+      }
+    },
+    onError: (e) => console.error(`[${tier}][${project.id.slice(0, 8)}] Error: ${e}`),
+  });
+
+  const result = await runner.run({
+    title: novel.title,
+    protagonistName: project.main_character || 'MC',
+    genre: (project.genre || 'tien-hiep') as GenreType,
+    premise: project.world_description || novel.title,
+    targetChapters: project.total_planned_chapters || 200,
+    chaptersPerArc: 20,
+    projectId: project.id,
+    chaptersToWrite: 1,
+    currentChapter: currentCh,  // 0 for init (full plan), >0 for resume (dummy arcs)
+  });
+
+  // Check completion
+  const nextCh = currentCh + 1;
+  if (nextCh >= (project.total_planned_chapters || 200)) {
+    await supabase.from('ai_story_projects')
+      .update({ status: 'completed', updated_at: new Date().toISOString() })
+      .eq('id', project.id);
+  }
+
+  return {
+    id: project.id,
+    title: novel.title,
+    tier,
+    success: result.success,
+    error: result.error,
+  };
+}
+
 export async function GET(request: NextRequest) {
   const startTime = Date.now();
 
-  // 1. Auth Check
   if (!verifyCronAuth(request)) {
     return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
   }
@@ -59,150 +168,116 @@ export async function GET(request: NextRequest) {
   const supabase = getSupabaseAdmin();
 
   try {
-    // 2. Select Batch of Projects (Round Robin)
-    // We order by updated_at ASC to pick the ones that haven't been touched in a while
-    const { data: activeProjects, error: fetchError } = await supabase
-      .from('ai_story_projects')
-      .select(`
-        id, main_character, genre, status,
-        current_chapter, total_planned_chapters,
-        world_description, writing_style, temperature,
-        target_chapter_length,
-        novels!ai_story_projects_novel_id_fkey (id, title)
-      `)
-      .eq('status', 'active')
-      .lt('current_chapter', 2000) // Safety limit, though status should handle this
-      .order('updated_at', { ascending: true }) // Oldest first
-      .limit(PROJECTS_PER_BATCH);
+    // ====== QUERY TWO TIERS IN PARALLEL ======
 
-    if (fetchError) throw fetchError;
+    const [resumeQuery, initQuery] = await Promise.all([
+      // Tier 1: Resume projects (current_chapter > 0)
+      supabase
+        .from('ai_story_projects')
+        .select(`
+          id, main_character, genre, status,
+          current_chapter, total_planned_chapters,
+          world_description, writing_style, temperature,
+          target_chapter_length,
+          novels!ai_story_projects_novel_id_fkey (id, title)
+        `)
+        .eq('status', 'active')
+        .gt('current_chapter', 0)
+        .order('updated_at', { ascending: true })
+        .limit(RESUME_BATCH_SIZE),
 
-    if (!activeProjects || activeProjects.length === 0) {
-      return NextResponse.json({ success: true, message: 'No active projects found' });
-    }
+      // Tier 2: Init projects (current_chapter = 0)
+      supabase
+        .from('ai_story_projects')
+        .select(`
+          id, main_character, genre, status,
+          current_chapter, total_planned_chapters,
+          world_description, writing_style, temperature,
+          target_chapter_length,
+          novels!ai_story_projects_novel_id_fkey (id, title)
+        `)
+        .eq('status', 'active')
+        .eq('current_chapter', 0)
+        .order('created_at', { ascending: true }) // Oldest new project first
+        .limit(INIT_BATCH_SIZE),
+    ]);
 
-    // Filter valid projects
-    const validProjects = activeProjects.filter(p => {
+    if (resumeQuery.error) throw resumeQuery.error;
+    if (initQuery.error) throw initQuery.error;
+
+    const resumeProjects = (resumeQuery.data || []).filter(p => {
       const total = p.total_planned_chapters || 200;
       const current = p.current_chapter || 0;
-      return current < total && p.novels; // Must have linked novel
-    });
+      return current < total && p.novels;
+    }) as ProjectRow[];
 
-    if (validProjects.length === 0) {
-      return NextResponse.json({ success: true, message: 'No valid projects to process' });
+    const initProjects = (initQuery.data || []).filter(p => p.novels) as ProjectRow[];
+
+    const totalProjects = resumeProjects.length + initProjects.length;
+
+    if (totalProjects === 0) {
+      return NextResponse.json({ success: true, message: 'No projects to process' });
     }
 
-    // 3. Mark them as "processing" by updating updated_at immediately
-    // This prevents them from being picked up again if another cron fires overlappingly
-    const projectIds = validProjects.map(p => p.id);
+    // Mark all as "processing"
+    const allIds = [...resumeProjects, ...initProjects].map(p => p.id);
     await supabase
       .from('ai_story_projects')
       .update({ updated_at: new Date().toISOString() })
-      .in('id', projectIds);
+      .in('id', allIds);
 
-    console.log(`[Cron] Processing batch of ${validProjects.length} projects...`);
+    console.log(`[Cron] Processing ${resumeProjects.length} resume + ${initProjects.length} init projects...`);
 
-    // 4. Run Writers in PARALLEL
-    const results = await Promise.allSettled(validProjects.map(async (project) => {
-      try {
-        const novel = Array.isArray(project.novels) ? project.novels[0] : project.novels;
-        if (!novel?.id) throw new Error("No novel linked");
+    // ====== EXECUTE BOTH TIERS IN PARALLEL ======
 
-        const aiService = new AIProviderService({ gemini: geminiKey });
+    const allPromises = [
+      // Tier 1: All resume projects in parallel
+      ...resumeProjects.map(p =>
+        writeOneChapter(p, geminiKey, supabase, 'resume')
+          .catch(err => ({
+            id: p.id,
+            title: '?',
+            tier: 'resume' as const,
+            success: false,
+            error: err instanceof Error ? err.message : String(err),
+          }))
+      ),
+      // Tier 2: Init projects (usually just 1)
+      ...initProjects.map(p =>
+        writeOneChapter(p, geminiKey, supabase, 'init')
+          .catch(err => ({
+            id: p.id,
+            title: '?',
+            tier: 'init' as const,
+            success: false,
+            error: err instanceof Error ? err.message : String(err),
+          }))
+      ),
+    ];
 
-        // Config tailored for speed/throughput
-        const factoryConfig: Partial<FactoryConfig> = {
-          provider: 'gemini',
-          model: 'gemini-3-flash-preview',
-          temperature: project.temperature || 1.0,
-          maxTokens: 8192,
-          targetWordCount: project.target_chapter_length || 2500,
-          genre: (project.genre || 'tien-hiep') as GenreType,
-          minQualityScore: 5,
-          maxRetries: 1, // Minimize retries to save time
-          use3AgentWorkflow: true,
-        };
+    const results = await Promise.allSettled(allPromises);
 
-        const runnerConfig: Partial<RunnerConfig> = {
-          delayBetweenChapters: 100, // Minimal delay
-          delayBetweenArcs: 100,
-          maxChapterRetries: 1,
-          autoSaveEnabled: false, // We handle saving manually
-          minQualityToProgress: 4, // Slightly looser quality for mass production
-          pauseOnError: false,
-        };
-
-        const runner = new StoryRunner(factoryConfig, runnerConfig, aiService);
-        
-        // Setup Save Callback
-        runner.setCallbacks({
-          onChapterCompleted: async (chNum, result) => {
-            if (result.data) {
-              await supabase.from('chapters').upsert({
-                novel_id: novel.id,
-                chapter_number: chNum,
-                title: result.data.title,
-                content: result.data.content,
-              }, { onConflict: 'novel_id,chapter_number' });
-              
-              // Update progress
-              await supabase.from('ai_story_projects').update({
-                current_chapter: chNum,
-                updated_at: new Date().toISOString()
-              }).eq('id', project.id);
-            }
-          },
-          onError: (e) => console.error(`[Project ${project.id}] Error: ${e}`)
-        });
-
-        // Execute Run (1 Chapter)
-        const result = await runner.run({
-          title: novel.title,
-          protagonistName: project.main_character || 'MC',
-          genre: (project.genre || 'tien-hiep') as GenreType,
-          premise: project.world_description || novel.title,
-          targetChapters: project.total_planned_chapters || 200,
-          chaptersPerArc: 20,
-          projectId: project.id,
-          chaptersToWrite: 1, // Explicitly just 1
-          currentChapter: project.current_chapter || 0 // Resume from DB state
-        });
-
-        // Check completion status
-        const nextCh = (project.current_chapter || 0) + 1;
-        if (nextCh >= (project.total_planned_chapters || 200)) {
-           await supabase.from('ai_story_projects')
-             .update({ status: 'completed' })
-             .eq('id', project.id);
-        }
-
-        return { 
-          id: project.id, 
-          title: novel.title, 
-          success: result.success, 
-          error: result.error 
-        };
-
-      } catch (err) {
-        throw new Error(`Project ${project.id} failed: ${err instanceof Error ? err.message : String(err)}`);
-      }
-    }));
-
-    const summary = results.map(r => 
-      r.status === 'fulfilled' ? r.value : { success: false, error: r.reason.message }
+    const summary: RunResult[] = results.map(r =>
+      r.status === 'fulfilled'
+        ? r.value
+        : { id: '?', title: '?', tier: 'resume' as const, success: false, error: r.reason?.message || 'Unknown' }
     );
 
-    const successCount = summary.filter(r => r.success).length;
+    const resumeSuccess = summary.filter(r => r.tier === 'resume' && r.success).length;
+    const initSuccess = summary.filter(r => r.tier === 'init' && r.success).length;
     const duration = (Date.now() - startTime) / 1000;
 
-    console.log(`[Cron] Batch completed in ${duration}s. Success: ${successCount}/${validProjects.length}`);
+    console.log(`[Cron] Done in ${duration.toFixed(1)}s. Resume: ${resumeSuccess}/${resumeProjects.length}, Init: ${initSuccess}/${initProjects.length}`);
 
     return NextResponse.json({
       success: true,
-      processed: validProjects.length,
-      successCount,
-      durationSeconds: duration,
-      results: summary
+      processed: totalProjects,
+      resumeCount: resumeProjects.length,
+      resumeSuccess,
+      initCount: initProjects.length,
+      initSuccess,
+      durationSeconds: Math.round(duration),
+      results: summary,
     });
 
   } catch (error) {
