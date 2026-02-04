@@ -61,6 +61,7 @@ export interface SeedConfig {
   activatePerAuthor: number;
   minChapters: number;
   maxChapters: number;
+  useGemini: boolean;
 }
 
 export interface SeedResult {
@@ -161,6 +162,100 @@ export class ContentSeeder {
   }
 
   // ============================================================================
+  // STEP-BY-STEP METHODS (for avoiding timeouts)
+  // ============================================================================
+
+  /**
+   * Step 1 only: Generate authors. Skips if authors already exist.
+   */
+  async seedAuthorsOnly(count: number = 200): Promise<SeedResult> {
+    const startTime = Date.now();
+    const errors: string[] = [];
+
+    // Check existing
+    const { data: existing } = await this.supabase.from('ai_authors').select('count');
+    const existingCount = existing?.[0]?.count || 0;
+    if (existingCount >= count) {
+      return { authors: existingCount, novels: 0, activated: 0, errors: [`Already have ${existingCount} authors, skipping`], durationMs: Date.now() - startTime };
+    }
+
+    const needed = count - existingCount;
+    console.log(`[Seeder] Step 1: Have ${existingCount}, need ${needed} more authors`);
+    const authorIds = await this.seedAuthors(needed, errors);
+
+    return { authors: existingCount + authorIds.length, novels: 0, activated: 0, errors, durationMs: Date.now() - startTime };
+  }
+
+  /**
+   * Step 2 only: Generate novels for existing authors. Uses fallback templates if useGemini=false.
+   */
+  async seedNovelsOnly(config: Partial<SeedConfig> = {}): Promise<SeedResult> {
+    const startTime = Date.now();
+    const errors: string[] = [];
+    const { novelsPerAuthor = 20, minChapters = 1000, maxChapters = 2000, useGemini = true } = config;
+
+    this.userId = await this.getSystemUserId();
+    if (!this.userId) {
+      return { authors: 0, novels: 0, activated: 0, errors: ['No user found in profiles table'], durationMs: Date.now() - startTime };
+    }
+
+    // Get all author IDs
+    const { data: authors } = await this.supabase.from('ai_authors').select('id').eq('status', 'active');
+    if (!authors || authors.length === 0) {
+      return { authors: 0, novels: 0, activated: 0, errors: ['No authors found. Run step 1 first.'], durationMs: Date.now() - startTime };
+    }
+    const authorIds = authors.map(a => a.id);
+
+    // Check how many novels already exist
+    const { data: novelCount } = await this.supabase.from('novels').select('count');
+    const existingNovels = novelCount?.[0]?.count || 0;
+    const targetNovels = authorIds.length * novelsPerAuthor;
+    if (existingNovels >= targetNovels) {
+      return { authors: authorIds.length, novels: existingNovels, activated: 0, errors: [`Already have ${existingNovels} novels`], durationMs: Date.now() - startTime };
+    }
+
+    console.log(`[Seeder] Step 2: ${authorIds.length} authors, generating ${targetNovels} novels (useGemini=${useGemini})`);
+
+    let novelIdeas: Map<string, NovelIdea[]>;
+    if (useGemini) {
+      novelIdeas = await this.generateAllNovelIdeas(targetNovels, errors);
+    } else {
+      // Fallback only — fast, no AI calls
+      novelIdeas = new Map();
+      const perGenre = Math.ceil(targetNovels / ALL_GENRES.length);
+      for (const genre of ALL_GENRES) {
+        const ideas: NovelIdea[] = [];
+        for (let i = 0; i < perGenre; i++) {
+          ideas.push(this.generateFallbackNovel(genre, i));
+        }
+        novelIdeas.set(genre, ideas);
+      }
+    }
+
+    const totalInserted = await this.seedNovels(authorIds, novelIdeas, novelsPerAuthor, minChapters, maxChapters, errors);
+
+    return { authors: authorIds.length, novels: totalInserted, activated: 0, errors, durationMs: Date.now() - startTime };
+  }
+
+  /**
+   * Step 3 only: Activate paused novels for existing authors.
+   */
+  async activateOnly(perAuthor: number = 5): Promise<SeedResult> {
+    const startTime = Date.now();
+    const errors: string[] = [];
+
+    const { data: authors } = await this.supabase.from('ai_authors').select('id').eq('status', 'active');
+    if (!authors || authors.length === 0) {
+      return { authors: 0, novels: 0, activated: 0, errors: ['No authors found'], durationMs: Date.now() - startTime };
+    }
+    const authorIds = authors.map(a => a.id);
+
+    const activated = await this.activateInitialBatch(authorIds, perAuthor, errors);
+
+    return { authors: authorIds.length, novels: 0, activated, errors, durationMs: Date.now() - startTime };
+  }
+
+  // ============================================================================
   // STEP 0: GET SYSTEM USER
   // ============================================================================
 
@@ -201,10 +296,12 @@ export class ContentSeeder {
         const genre = ALL_GENRES[i % ALL_GENRES.length];
         const author = generateQuickAuthor(genre);
         const id = randomUUID();
+        // Append short hash to ensure unique name
+        const uniqueName = `${author.name} ${id.slice(0, 4)}`;
 
         rows.push({
           id,
-          name: author.name,
+          name: uniqueName,
           bio: author.bio,
           writing_style_description: author.writing_style_description,
           ai_prompt_persona: author.ai_prompt_persona,
@@ -385,18 +482,20 @@ CHÚ Ý:
   private generateFallbackNovel(genre: string, index: number): NovelIdea {
     const genreLabel = GENRE_LABELS[genre] || genre;
     const mc = this.randomMCName();
+    // Use UUID suffix to guarantee unique titles
+    const uid = randomUUID().slice(0, 6);
 
     const templates = [
       { title: `${mc} ${genreLabel} Ký`, premise: `${mc} bước vào con đường ${genreLabel.toLowerCase()}, từ kẻ vô danh trở thành tuyệt thế cường giả.` },
-      { title: `Thiên Đạo ${genreLabel}`, premise: `Trong thế giới ${genreLabel.toLowerCase()}, ${mc} phát hiện bí mật kinh thiên, bắt đầu hành trình nghịch thiên.` },
-      { title: `${genreLabel} Chi Vương`, premise: `${mc} mang theo ký ức tiền kiếp, quyết tâm đứng trên đỉnh thế giới ${genreLabel.toLowerCase()}.` },
-      { title: `Vô Thượng ${genreLabel}`, premise: `Cả thế giới đều nói ${mc} là phế vật, nhưng hắn lại có bí mật mà không ai biết.` },
+      { title: `Thiên Đạo ${genreLabel}: ${mc}`, premise: `Trong thế giới ${genreLabel.toLowerCase()}, ${mc} phát hiện bí mật kinh thiên, bắt đầu hành trình nghịch thiên.` },
+      { title: `${genreLabel} Chi Vương: ${mc}`, premise: `${mc} mang theo ký ức tiền kiếp, quyết tâm đứng trên đỉnh thế giới ${genreLabel.toLowerCase()}.` },
+      { title: `Vô Thượng ${genreLabel}: ${mc}`, premise: `Cả thế giới đều nói ${mc} là phế vật, nhưng hắn lại có bí mật mà không ai biết.` },
       { title: `${mc} Truyền Kỳ`, premise: `Câu chuyện về ${mc} - từ thiếu niên bình thường đến bá chủ ${genreLabel.toLowerCase()}.` },
     ];
 
     const template = templates[index % templates.length];
     return {
-      title: template.title,
+      title: `${template.title} [${uid}]`,
       premise: template.premise,
       mainCharacter: mc,
     };
