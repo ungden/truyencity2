@@ -8,20 +8,8 @@
  * 4. Model routing (small for QC, large for writing)
  */
 
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
-
-// Lazy initialization to avoid build-time errors
-let _supabase: SupabaseClient | null = null;
-function getSupabase(): SupabaseClient {
-  if (!_supabase) {
-    _supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
-  }
-  return _supabase;
-}
+import { getSupabase } from './supabase-helper';
 
 // Model tiers for different tasks
 export interface ModelTier {

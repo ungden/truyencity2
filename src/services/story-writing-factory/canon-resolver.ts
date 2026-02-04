@@ -286,7 +286,7 @@ export class CanonResolver {
         // Log serious conflicts
         if (report.resolution === 'manual_review') {
           const issue: ContinuityIssue = {
-            id: `issue_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            id: `issue_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
             projectId: this.projectId,
             chapterNumber: fact.sourceChapter || 0,
             issueType: 'conflict',

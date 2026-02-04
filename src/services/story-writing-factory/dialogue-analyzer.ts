@@ -207,17 +207,21 @@ export class DialogueAnalyzer {
       /"([^"]+)"/g,           // "dialogue"
       /「([^」]+)」/g,         // 「dialogue」
       /『([^』]+)』/g,         // 『dialogue』
-      /"([^"]+)"/g,           // "dialogue" (curly quotes)
+      /\u201c([^\u201d]+)\u201d/g,  // "dialogue" (curly quotes)
       /[-–—]\s*([^\n]+)/gm,   // — dialogue (dash style)
     ];
     
+    // Dùng Set để dedup (tránh double-counting khi content có mixed quote styles)
+    const seen = new Set<string>();
     const dialogues: string[] = [];
     
     for (const pattern of patterns) {
       let match;
       while ((match = pattern.exec(content)) !== null) {
-        if (match[1] && match[1].trim().length > 5) {
-          dialogues.push(match[1].trim());
+        const text = match[1]?.trim();
+        if (text && text.length > 5 && !seen.has(text)) {
+          seen.add(text);
+          dialogues.push(text);
         }
       }
     }
@@ -570,16 +574,6 @@ export interface AttributedDialogue {
  */
 export function attributeDialogues(content: string, knownCharacters: string[]): AttributedDialogue[] {
   const results: AttributedDialogue[] = [];
-  
-  // Patterns for dialogue with speaker attribution
-  const attributionPatterns = [
-    // "dialogue" speaker said
-    /"([^"]+)"\s*[-,]?\s*(\w+)\s*(nói|hỏi|trả lời|cười|đáp|gầm|quát|thét)/gi,
-    // speaker said "dialogue"
-    /(\w+)\s*(nói|hỏi|trả lời|cười|đáp|gầm|quát|thét)[^"]*"([^"]+)"/gi,
-    // 「dialogue」speaker
-    /「([^」]+)」\s*[-,]?\s*(\w+)/gi,
-  ];
 
   // Extract dialogues with patterns
   const dialogueMatches = [
@@ -678,8 +672,8 @@ export function getQuickDialogueScore(content: string): {
     subtextBonus: number;
   };
 } {
-  const analyzer = new DialogueAnalyzer();
-  const analysis = analyzer.analyzeDialogues(content);
+  // Dùng singleton thay vì tạo instance mới mỗi lần
+  const analysis = dialogueAnalyzer.analyzeDialogues(content);
   const subtext = analyzeSubtext(content);
 
   // Start with 100
@@ -733,7 +727,7 @@ export async function saveCharacterVoice(
   profile: CharacterVoiceProfile
 ): Promise<void> {
   const supabase = getSupabase();
-  await supabase
+  const { error } = await supabase
     .from('character_voices')
     .upsert({
       project_id: projectId,
@@ -747,6 +741,9 @@ export async function saveCharacterVoice(
     }, {
       onConflict: 'project_id,character_name',
     });
+  if (error) {
+    console.warn('[DB] saveCharacterVoice failed:', error.message);
+  }
 }
 
 /**
@@ -754,11 +751,15 @@ export async function saveCharacterVoice(
  */
 export async function loadCharacterVoices(projectId: string): Promise<CharacterVoiceProfile[]> {
   const supabase = getSupabase();
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('character_voices')
     .select('*')
     .eq('project_id', projectId);
 
+  if (error) {
+    console.warn('[DB] loadCharacterVoices failed:', error.message);
+    return [];
+  }
   if (!data) return [];
 
   return data.map((row: Record<string, unknown>) => ({
@@ -772,18 +773,7 @@ export async function loadCharacterVoices(projectId: string): Promise<CharacterV
   }));
 }
 
-// Lazy Supabase initialization
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-let _supabase: SupabaseClient | null = null;
-function getSupabase(): SupabaseClient {
-  if (!_supabase) {
-    _supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
-  }
-  return _supabase;
-}
+import { getSupabase } from './supabase-helper';
 
 // Export singleton
 export const dialogueAnalyzer = new DialogueAnalyzer();

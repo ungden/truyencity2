@@ -316,7 +316,7 @@ Trả về JSON:
 
     for (let i = 0; i < count; i++) {
       const localNum = i + 1;
-      const position = i / (count - 1);
+      const position = count <= 1 ? 0 : i / (count - 1);
 
       let purpose = 'Phát triển tình tiết';
       if (position < 0.25) purpose = 'Setup: ' + (arc.setup || 'Giới thiệu');
@@ -370,8 +370,38 @@ Trả về JSON:
 
     const jsonStr = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : content;
 
-    // Clean up comments (// ...) which are not valid JSON
-    const cleaned = jsonStr.replace(/\/\/[^\n]*/g, '').replace(/,\s*}/g, '}').replace(/,\s*]/g, ']');
+    // Strip // comments only outside of string literals
+    // Walk char by char to avoid destroying URLs like "https://..."
+    let cleaned = '';
+    let inString = false;
+    let escape = false;
+    for (let i = 0; i < jsonStr.length; i++) {
+      const ch = jsonStr[i];
+      if (escape) {
+        cleaned += ch;
+        escape = false;
+        continue;
+      }
+      if (ch === '\\' && inString) {
+        cleaned += ch;
+        escape = true;
+        continue;
+      }
+      if (ch === '"') {
+        inString = !inString;
+        cleaned += ch;
+        continue;
+      }
+      if (!inString && ch === '/' && jsonStr[i + 1] === '/') {
+        // Skip until end of line
+        while (i < jsonStr.length && jsonStr[i] !== '\n') i++;
+        continue;
+      }
+      cleaned += ch;
+    }
+
+    // Fix trailing commas
+    cleaned = cleaned.replace(/,\s*}/g, '}').replace(/,\s*]/g, ']');
 
     return JSON.parse(cleaned);
   }

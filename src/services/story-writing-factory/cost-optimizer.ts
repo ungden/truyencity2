@@ -147,12 +147,7 @@ export class CostOptimizer {
   getModelForTask(taskType: string, chapterNumber?: number): ModelTier {
     const complexity = TASK_COMPLEXITY[taskType] || 'medium';
 
-    // Special case: Golden chapters (1-3) always use premium
-    if (chapterNumber && chapterNumber <= 3 && taskType === 'write_chapter') {
-      return MODEL_TIERS.premium;
-    }
-
-    // Special case: First arc chapters use premium for better hook
+    // Special case: First arc chapters (including golden 1-3) use premium for better hook
     if (chapterNumber && chapterNumber <= 20 && taskType === 'write_chapter') {
       return MODEL_TIERS.premium;
     }
@@ -191,14 +186,12 @@ export class CostOptimizer {
   // ============================================================================
 
   /**
-   * Generate cache key from prompt
+   * Generate cache key from prompt using crypto hash
    */
   private generateCacheKey(prompt: string, taskType: string): string {
-    // Simple hash - in production use proper hash
-    const hash = prompt.split('').reduce((acc, char) => {
-      return ((acc << 5) - acc) + char.charCodeAt(0);
-    }, 0);
-    return `${taskType}_${Math.abs(hash).toString(36)}`;
+    const crypto = require('crypto');
+    const hash = crypto.createHash('sha256').update(prompt).digest('hex').substring(0, 16);
+    return `${taskType}_${hash}`;
   }
 
   /**

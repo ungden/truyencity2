@@ -9,20 +9,8 @@
  * 5. Validates progression is logical
  */
 
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { PowerSystem, PowerRealm } from './types';
-
-// Lazy initialization to avoid build-time errors
-let _supabase: SupabaseClient | null = null;
-function getSupabase(): SupabaseClient {
-  if (!_supabase) {
-    _supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
-  }
-  return _supabase;
-}
+import { getSupabase } from './supabase-helper';
 
 // ============================================================================
 // TYPES
@@ -109,11 +97,14 @@ export class PowerTracker {
    */
   async initialize(): Promise<void> {
     // Load character power states
-    const { data: characters } = await this.supabase
+    const { data: characters, error: charsError } = await this.supabase
       .from('character_tracker')
       .select('character_name, current_state')
       .eq('project_id', this.projectId);
 
+    if (charsError) {
+      console.warn('[DB] Load character power states failed:', charsError.message);
+    }
     if (characters) {
       for (const char of characters) {
         const state = char.current_state || {};
@@ -130,12 +121,15 @@ export class PowerTracker {
     }
 
     // Load progression history
-    const { data: progressions } = await this.supabase
+    const { data: progressions, error: progsError } = await this.supabase
       .from('power_progression')
       .select('*')
       .eq('project_id', this.projectId)
       .order('chapter_number', { ascending: true });
 
+    if (progsError) {
+      console.warn('[DB] Load progression history failed:', progsError.message);
+    }
     if (progressions) {
       for (const prog of progressions) {
         const charHistory = this.progressionHistory.get(prog.character_name) || [];
@@ -191,7 +185,7 @@ export class PowerTracker {
     this.characterPowers.set(characterName, state);
 
     // Save to database
-    await this.supabase
+    const { error } = await this.supabase
       .from('character_tracker')
       .upsert({
         project_id: this.projectId,
@@ -207,6 +201,9 @@ export class PowerTracker {
       }, {
         onConflict: 'project_id,character_name',
       });
+    if (error) {
+      console.warn('[DB] initializeCharacter failed:', error.message);
+    }
 
     return state;
   }
@@ -458,7 +455,7 @@ export class PowerTracker {
    * Save progression event to database
    */
   private async saveProgression(event: ProgressionEvent): Promise<void> {
-    await this.supabase.from('power_progression').insert({
+    const { error } = await this.supabase.from('power_progression').insert({
       project_id: this.projectId,
       character_name: event.characterName,
       chapter_number: event.chapterNumber,
@@ -471,13 +468,16 @@ export class PowerTracker {
       catalyst: event.catalyst,
       consequences: event.consequences,
     });
+    if (error) {
+      console.warn('[DB] saveProgression failed:', error.message);
+    }
   }
 
   /**
    * Update character power state in database
    */
   private async updateCharacterPowerState(name: string, state: PowerState): Promise<void> {
-    await this.supabase
+    const { error } = await this.supabase
       .from('character_tracker')
       .update({
         current_state: {
@@ -491,6 +491,9 @@ export class PowerTracker {
       })
       .eq('project_id', this.projectId)
       .eq('character_name', name);
+    if (error) {
+      console.warn('[DB] updateCharacterPowerState failed:', error.message);
+    }
   }
 
   /**
@@ -501,7 +504,6 @@ export class PowerTracker {
     if (!state) return `${characterName}: Chưa có thông tin`;
 
     const history = this.progressionHistory.get(characterName) || [];
-    const breakthroughs = history.filter(h => h.eventType === 'breakthrough');
 
     return `${characterName}: ${state.realm} ${state.level} tầng
     - Tổng đột phá: ${state.totalBreakthroughs}

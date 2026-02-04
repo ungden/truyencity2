@@ -13,21 +13,9 @@ import { QCGating, GateResult, FullQCGating, FullGateResult } from './qc-gating'
 import { CanonResolver } from './canon-resolver';
 import { BeatLedger } from './beat-ledger';
 import { GenreType, WorldBible, StyleBible, StoryArc, ChapterResult } from './types';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { getSupabase } from './supabase-helper';
 import { BattleVarietyTracker } from './battle-variety';
 import { CharacterDepthTracker } from './character-depth';
-
-// Lazy initialization to avoid build-time errors
-let _supabase: SupabaseClient | null = null;
-function getSupabase(): SupabaseClient {
-  if (!_supabase) {
-    _supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
-  }
-  return _supabase;
-}
 
 export interface RewriteConfig {
   maxAttempts: number;           // Max rewrite attempts (default: 3)
@@ -216,13 +204,14 @@ export class AutoRewriter {
         };
       }
 
-      // Update for next iteration
+      // Update for next iteration - only update lastQCResult if score improved
+      // to avoid generating rewrite instructions based on a worse version
       if (newScore > currentScore) {
         currentContent = rewriteResult.data.content;
         currentTitle = rewriteResult.data.title;
         currentScore = newScore;
+        lastQCResult = newQCResult;
       }
-      lastQCResult = newQCResult;
     }
 
     // Max attempts reached
@@ -345,7 +334,7 @@ ${currentContent}
 ---
 
 Hãy viết lại chương này, giữ nguyên cốt truyện nhưng khắc phục các vấn đề đã nêu.
-Đảm bảo độ dài 2500-3000 từ.
+Đảm bảo giữ nguyên hoặc tăng độ dài so với bản gốc.
 `;
 
     // Use the chapter writer with rewrite context

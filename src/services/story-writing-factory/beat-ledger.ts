@@ -462,7 +462,7 @@ export class BeatLedger {
     const cooldownUntil = chapterNumber + cooldown;
 
     const entry: BeatEntry = {
-      id: `beat_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: `beat_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
       projectId: this.projectId,
       chapterNumber,
       arcNumber: this.currentArc,

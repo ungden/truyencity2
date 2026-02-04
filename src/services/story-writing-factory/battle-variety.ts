@@ -8,19 +8,7 @@
  * 4. Combat scene pacing
  */
 
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-
-// Lazy initialization
-let _supabase: SupabaseClient | null = null;
-function getSupabase(): SupabaseClient {
-  if (!_supabase) {
-    _supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
-  }
-  return _supabase;
-}
+import { getSupabase } from './supabase-helper';
 
 // ============================================================================
 // BATTLE TEMPLATES & PATTERNS
@@ -215,12 +203,15 @@ export class BattleVarietyTracker {
    * Initialize from database
    */
   async initialize(): Promise<void> {
-    const { data: battles } = await this.supabase
+    const { data: battles, error: battlesError } = await this.supabase
       .from('battle_records')
       .select('*')
       .eq('project_id', this.projectId)
       .order('chapter_number', { ascending: true });
     
+    if (battlesError) {
+      console.warn('[DB] Load battle records failed:', battlesError.message);
+    }
     if (battles) {
       this.battles = battles.map(b => ({
         id: b.id,
@@ -240,11 +231,14 @@ export class BattleVarietyTracker {
       }));
     }
     
-    const { data: scaling } = await this.supabase
+    const { data: scaling, error: scalingError } = await this.supabase
       .from('enemy_scaling')
       .select('*')
       .eq('project_id', this.projectId);
     
+    if (scalingError) {
+      console.warn('[DB] Load enemy scaling failed:', scalingError.message);
+    }
     if (scaling) {
       this.enemyScaling = scaling;
     }
@@ -455,7 +449,7 @@ export class BattleVarietyTracker {
   async recordBattle(battle: Omit<BattleRecord, 'id' | 'projectId'>): Promise<void> {
     const record: BattleRecord = {
       ...battle,
-      id: `battle_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: `battle_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
       projectId: this.projectId,
     };
     
@@ -473,7 +467,7 @@ export class BattleVarietyTracker {
     });
     
     // Save to database
-    await this.supabase.from('battle_records').insert({
+    const { error: insertError } = await this.supabase.from('battle_records').insert({
       id: record.id,
       project_id: record.projectId,
       chapter_number: record.chapterNumber,
@@ -489,15 +483,18 @@ export class BattleVarietyTracker {
       variety_score: record.varietyScore,
       issues: record.issues,
     });
+    if (insertError) {
+      console.warn('[DB] Insert battle record failed:', insertError.message);
+    }
   }
   
   /**
    * Get variety report
    */
   getVarietyReport(): BattleVarietyReport {
-    const typeDistribution: Record<BattleType, number> = {} as any;
-    const approachDistribution: Record<TacticalApproach, number> = {} as any;
-    const outcomeDistribution: Record<BattleOutcome, number> = {} as any;
+    const typeDistribution = {} as Record<BattleType, number>;
+    const approachDistribution = {} as Record<TacticalApproach, number>;
+    const outcomeDistribution = {} as Record<BattleOutcome, number>;
     
     for (const battle of this.battles) {
       typeDistribution[battle.battleType] = (typeDistribution[battle.battleType] || 0) + 1;
@@ -517,7 +514,7 @@ export class BattleVarietyTracker {
       'skill_clash', 'weapon_exchange', 'formation_break', 'power_reveal',
       'technique_counter', 'environmental_use', 'item_usage',
       'reinforcement_arrival', 'betrayal', 'breakthrough_during_battle',
-      'hidden_card', 'sacrifice',
+      'hidden_card', 'sacrifice', 'teamwork', 'trap', 'overwhelming',
     ];
     const underusedElements = allPossibleElements.filter(e =>
       allUsedElements.filter(ae => ae === e).length < totalBattles * 0.1

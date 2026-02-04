@@ -73,10 +73,10 @@ const PURPLE_PROSE_PATTERNS = [
 ];
 
 // Passive voice indicators (Vietnamese)
+// Removed 'là...bởi' and 'được...bởi' - literal '...' never matches real text
 const PASSIVE_INDICATORS = [
   'được', 'bị',
-  'bởi', 'do', // when followed by agent
-  'là...bởi', 'được...bởi',
+  'bởi', 'do',
 ];
 
 // ============================================================================
@@ -266,7 +266,8 @@ export class WritingStyleAnalyzer {
     const allWeakVerbs = [...WEAK_VERBS.vietnamese, ...WEAK_VERBS.english];
     
     for (const verb of allWeakVerbs) {
-      const regex = new RegExp(`\\b${verb}\\b`, 'gi');
+      // Dùng (?<!\p{L}) và (?!\p{L}) thay vì \b cho tiếng Việt (Unicode-aware word boundary)
+      const regex = new RegExp(`(?<!\\p{L})${verb}(?!\\p{L})`, 'giu');
       const matches = lowerContent.match(regex);
       if (matches && matches.length > 3) {
         totalWeak += matches.length;
@@ -302,7 +303,8 @@ export class WritingStyleAnalyzer {
     let total = 0;
     
     for (const adverb of OVERUSED_ADVERBS) {
-      const regex = new RegExp(`\\b${adverb}\\b`, 'gi');
+      // Unicode-aware matching cho tiếng Việt multi-word adverbs
+      const regex = new RegExp(`(?<!\\p{L})${adverb}(?!\\p{L})`, 'giu');
       const matches = lowerContent.match(regex);
       if (matches) {
         total += matches.length;
@@ -580,14 +582,31 @@ export class WritingStyleAnalyzer {
   }
   
   /**
-   * Quick quality check
+   * Quick quality check - lightweight, chỉ check các metric quan trọng nhất
    */
   quickCheck(content: string): { pass: boolean; mainIssue?: string } {
-    const analysis = this.analyzeStyle(content);
+    // Lightweight checks thay vì chạy full analysis
+    const totalWords = content.split(/\s+/).length;
     
-    if (analysis.overallScore < 50) {
-      const worstIssue = analysis.issues.find(i => i.severity === 'major') || analysis.issues[0];
-      return { pass: false, mainIssue: worstIssue?.description };
+    // Quick weak verb ratio check
+    const weakMatches = content.toLowerCase().match(/(?<!\p{L})(là|có|được|bị|làm|đi|đến|nói|nhìn|thấy)(?!\p{L})/giu);
+    const weakRatio = (weakMatches?.length || 0) / totalWords;
+    if (weakRatio > 0.15) {
+      return { pass: false, mainIssue: 'Quá nhiều động từ yếu' };
+    }
+    
+    // Quick adverb check
+    const adverbMatches = content.toLowerCase().match(/(?<!\p{L})(rất|quá|cực kỳ|vô cùng|thật sự|đột nhiên)(?!\p{L})/giu);
+    const adverbRatio = (adverbMatches?.length || 0) / totalWords;
+    if (adverbRatio > 0.08) {
+      return { pass: false, mainIssue: 'Lạm dụng trạng từ' };
+    }
+    
+    // Quick tell-not-show check
+    const tellMatches = content.toLowerCase().match(/cảm thấy|biết rằng|nhận ra rằng|nghĩ rằng/gi);
+    const tellRatio = (tellMatches?.length || 0) / Math.max(1, content.split(/[.!?。！？]+/).length);
+    if (tellRatio > 0.3) {
+      return { pass: false, mainIssue: 'Quá nhiều "tell" không "show"' };
     }
     
     return { pass: true };

@@ -62,8 +62,9 @@ export { BeatLedger, createBeatLedger } from './beat-ledger';
 export type { BeatEntry, BeatCategory, PlotBeat, EmotionalBeat, SettingBeat, BeatRecommendation } from './beat-ledger';
 export { getEnhancedStyleBible, buildStyleContext, QIDIAN_VOCABULARY, QIDIAN_EXEMPLARS, PACING_RULES, CLIFFHANGER_TECHNIQUES } from './style-bible';
 export type { SceneType, PacingRule, VocabularyGuide, StyleExemplar } from './style-bible';
-export { CostCache, BatchSummarizer, createCostCache, createBatchSummarizer, MODEL_TIERS } from './cost-cache';
-export type { ModelTier } from './cost-cache';
+export { CostCache, BatchSummarizer, createCostCache, createBatchSummarizer, MODEL_TIERS as COST_CACHE_TIERS } from './cost-cache';
+export type { ModelTier as CostCacheModelTier } from './cost-cache';
+export { MODEL_TIERS, type ModelTier } from './cost-optimizer';
 
 // Auto-Rewriter
 export { AutoRewriter, createAutoRewriter, createFullAutoRewriter, DEFAULT_REWRITE_CONFIG } from './auto-rewriter';
@@ -90,6 +91,9 @@ export type {
   BattleRecord, BattleVarietyReport, EnemyScaling,
   BattleType, TacticalApproach, BattleOutcome, CombatElement 
 } from './battle-variety';
+
+// Shared Supabase helper
+export { getSupabase, safeSelect, safeUpsert, safeInsert, safeUpdate, resetSupabase } from './supabase-helper';
 
 // Sprint 3 Writing Style Analysis
 export { WritingStyleAnalyzer, writingStyleAnalyzer } from './writing-style-analyzer';
@@ -578,12 +582,15 @@ export class StoryWritingFactory {
 
 let defaultFactory: StoryWritingFactory | null = null;
 
+/**
+ * Get singleton factory. Config is only applied on first creation.
+ * Use createStoryWritingFactory() if you need different configs.
+ */
 export function getStoryWritingFactory(config?: Partial<FactoryConfig>): StoryWritingFactory {
   if (!defaultFactory) {
     defaultFactory = new StoryWritingFactory(config);
-  } else if (config) {
-    defaultFactory.configure(config);
   }
+  // Note: không mutate config nếu singleton đã tồn tại để tránh shared state bug
   return defaultFactory;
 }
 

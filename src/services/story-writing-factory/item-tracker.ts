@@ -8,19 +8,7 @@
  * 4. Item power scaling
  */
 
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-
-// Lazy initialization
-let _supabase: SupabaseClient | null = null;
-function getSupabase(): SupabaseClient {
-  if (!_supabase) {
-    _supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
-  }
-  return _supabase;
-}
+import { getSupabase } from './supabase-helper';
 
 // ============================================================================
 // TYPES
@@ -129,11 +117,14 @@ export class ItemTracker {
    * Initialize from database
    */
   async initialize(): Promise<void> {
-    const { data: items } = await this.supabase
+    const { data: items, error: itemsError } = await this.supabase
       .from('tracked_items')
       .select('*')
       .eq('project_id', this.projectId);
     
+    if (itemsError) {
+      console.warn('[DB] Load tracked items failed:', itemsError.message);
+    }
     if (items) {
       for (const item of items) {
         const tracked: TrackedItem = {
@@ -289,7 +280,7 @@ export class ItemTracker {
     }
     
     // Create item
-    const id = `item_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const id = `item_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
     const item: TrackedItem = {
       id,
       projectId: this.projectId,
@@ -329,17 +320,22 @@ export class ItemTracker {
     const itemId = this.nameIndex.get(name.toLowerCase());
     if (!itemId) return;
     
-    const item = this.items.get(itemId)!;
+    const item = this.items.get(itemId);
+    if (!item) return; // Guard against stale nameIndex
+    
     item.lastMentionChapter = chapterNumber;
     item.mentionCount++;
     
-    await this.supabase
+    const { error } = await this.supabase
       .from('tracked_items')
       .update({
         last_mention_chapter: chapterNumber,
         mention_count: item.mentionCount,
       })
       .eq('id', itemId);
+    if (error) {
+      console.warn('[DB] recordMention failed:', error.message);
+    }
   }
   
   /**
@@ -596,7 +592,7 @@ export class ItemTracker {
    * Save item to database
    */
   private async saveItem(item: TrackedItem): Promise<void> {
-    await this.supabase
+    const { error } = await this.supabase
       .from('tracked_items')
       .upsert({
         id: item.id,
@@ -619,6 +615,9 @@ export class ItemTracker {
         status: item.status,
         status_change_chapter: item.statusChangeChapter,
       }, { onConflict: 'id' });
+    if (error) {
+      console.warn('[DB] saveItem failed:', error.message);
+    }
   }
 }
 

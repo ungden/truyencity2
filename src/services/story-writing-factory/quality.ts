@@ -21,6 +21,7 @@ import {
   DopamineType,
 } from './types';
 import { GENRE_STYLES } from './templates';
+import { dialogueAnalyzer, getQuickDialogueScore } from './dialogue-analyzer';
 
 // ============================================================================
 // QUALITY THRESHOLDS
@@ -348,8 +349,6 @@ export const qualityGate = new QualityGate();
 // ============================================================================
 // ENHANCED QUALITY CHECK - Integrating Sprint 1 Features
 // ============================================================================
-
-import { dialogueAnalyzer, getQuickDialogueScore } from './dialogue-analyzer';
 
 export interface EnhancedQualityReport extends QualityReport {
   dialogueQuality: number;

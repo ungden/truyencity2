@@ -10,19 +10,7 @@
  * 6. Character arc milestones
  */
 
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-
-// Lazy initialization
-let _supabase: SupabaseClient | null = null;
-function getSupabase(): SupabaseClient {
-  if (!_supabase) {
-    _supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
-  }
-  return _supabase;
-}
+import { getSupabase } from './supabase-helper';
 
 // ============================================================================
 // TYPES
@@ -175,11 +163,14 @@ export class CharacterDepthTracker {
    */
   async initialize(): Promise<void> {
     // Load character profiles
-    const { data: profiles } = await this.supabase
+    const { data: profiles, error: profilesError } = await this.supabase
       .from('character_depth_profiles')
       .select('*')
       .eq('project_id', this.projectId);
     
+    if (profilesError) {
+      console.warn('[DB] Load character profiles failed:', profilesError.message);
+    }
     if (profiles) {
       for (const p of profiles) {
         const profile: CharacterDepthProfile = {
@@ -210,11 +201,14 @@ export class CharacterDepthTracker {
     }
     
     // Load romance progressions
-    const { data: romances } = await this.supabase
+    const { data: romances, error: romancesError } = await this.supabase
       .from('romance_progressions')
       .select('*')
       .eq('project_id', this.projectId);
     
+    if (romancesError) {
+      console.warn('[DB] Load romance progressions failed:', romancesError.message);
+    }
     if (romances) {
       for (const r of romances) {
         const romance: RomanceProgression = {
@@ -270,7 +264,7 @@ export class CharacterDepthTracker {
       warning = `Cảnh báo: ${name} quá giống với ${uniquenessCheck.similarTo[0]?.character}`;
     }
     
-    const id = `char_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const id = `char_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
     const now = Date.now();
     
     const profile: CharacterDepthProfile = {
@@ -382,12 +376,13 @@ export class CharacterDepthTracker {
       // Calculate role similarity
       const roleSimilarity = profile.role === this.guessRole(traits) ? 0.2 : 0;
       
-      // Calculate speech similarity
-      const speechSimilarity = features?.appearance && profile.distinctiveFeatures.appearance.some(a =>
-        features.appearance.includes(a)
-      ) ? 0.1 : 0;
+      // Calculate speech/feature similarity
+      const featureSimilarity = (
+        (features?.mannerisms?.some(m => profile.distinctiveFeatures.mannerisms.includes(m)) ? 0.05 : 0) +
+        (features?.appearance?.some(a => profile.distinctiveFeatures.appearance.includes(a)) ? 0.05 : 0)
+      );
       
-      const totalSimilarity = (traitSimilarity * 0.6 + roleSimilarity + speechSimilarity) * 100;
+      const totalSimilarity = (traitSimilarity * 0.6 + roleSimilarity + featureSimilarity) * 100;
       
       if (totalSimilarity > 30) {
         similarTo.push({
@@ -746,7 +741,7 @@ export class CharacterDepthTracker {
   // ============================================================================
   
   private async saveCharacter(profile: CharacterDepthProfile): Promise<void> {
-    await this.supabase
+    const { error } = await this.supabase
       .from('character_depth_profiles')
       .upsert({
         id: profile.id,
@@ -771,10 +766,13 @@ export class CharacterDepthTracker {
         created_at: profile.createdAt,
         updated_at: profile.updatedAt,
       }, { onConflict: 'id' });
+    if (error) {
+      console.warn('[DB] saveCharacter failed:', error.message);
+    }
   }
   
   private async saveRomance(romance: RomanceProgression): Promise<void> {
-    await this.supabase
+    const { error } = await this.supabase
       .from('romance_progressions')
       .upsert({
         id: romance.id,
@@ -795,15 +793,60 @@ export class CharacterDepthTracker {
         chapters_in_current_stage: romance.chaptersInCurrentStage,
         status: romance.status,
       }, { onConflict: 'id' });
+    if (error) {
+      console.warn('[DB] saveRomance failed:', error.message);
+    }
   }
   
   private guessRole(traits: PersonalityTrait[]): CharacterRole {
-    if (traits.includes('arrogant') && traits.includes('greedy')) return 'antagonist';
-    if (traits.includes('loyal') && traits.includes('brave')) return 'ally';
-    if (traits.includes('romantic') || traits.includes('compassionate')) return 'love_interest';
+    const villainTraits: PersonalityTrait[] = ['arrogant', 'greedy', 'vengeful'];
+    const allyTraits: PersonalityTrait[] = ['loyal', 'brave', 'honest', 'compassionate'];
+    const rivalTraits: PersonalityTrait[] = ['ambitious', 'cunning', 'stubborn'];
+    const loveTraits: PersonalityTrait[] = ['romantic', 'playful'];
+    
+    const villainScore = traits.filter(t => villainTraits.includes(t)).length;
+    const allyScore = traits.filter(t => allyTraits.includes(t)).length;
+    const rivalScore = traits.filter(t => rivalTraits.includes(t)).length;
+    const loveScore = traits.filter(t => loveTraits.includes(t)).length;
+    
+    const maxScore = Math.max(villainScore, allyScore, rivalScore, loveScore);
+    if (maxScore === 0) return 'minor';
+    
+    if (villainScore === maxScore) return 'antagonist';
+    if (allyScore === maxScore) return 'ally';
+    if (rivalScore === maxScore) return 'rival';
+    if (loveScore === maxScore) return 'love_interest';
     return 'minor';
   }
   
+  /**
+   * Record character appearing in a chapter (updates lastAppearance, chapterAppearances, sceneTime)
+   */
+  async recordAppearance(characterName: string, chapterNumber: number, sceneTimePercent: number = 5): Promise<void> {
+    const profile = this.characters.get(characterName.toLowerCase());
+    if (!profile) return;
+    
+    profile.lastAppearance = chapterNumber;
+    if (!profile.chapterAppearances.includes(chapterNumber)) {
+      profile.chapterAppearances.push(chapterNumber);
+    }
+    profile.totalSceneTime += sceneTimePercent;
+    profile.updatedAt = Date.now();
+    
+    await this.saveCharacter(profile);
+  }
+
+  /**
+   * Increment chaptersInCurrentStage for all active romances (call once per chapter)
+   */
+  incrementRomanceChapters(): void {
+    for (const romance of this.romances.values()) {
+      if (romance.status === 'developing' || romance.status === 'established') {
+        romance.chaptersInCurrentStage++;
+      }
+    }
+  }
+
   // Getters
   getCharacter(name: string): CharacterDepthProfile | undefined {
     return this.characters.get(name.toLowerCase());
