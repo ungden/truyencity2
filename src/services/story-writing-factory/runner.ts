@@ -94,6 +94,8 @@ export class StoryRunner {
   private lastQualityScore: number = 5;
   private lastQCResult: FullGateResult | null = null;
   private totalTokensUsed: number = 0;
+  private chaptersToWriteLimit?: number; // Limit chapters per run
+  private sessionChaptersWritten: number = 0; // Track chapters written in current run session
 
   // Control flags
   private isRunning = false;
@@ -144,6 +146,8 @@ export class StoryRunner {
     targetChapters?: number;
     chaptersPerArc?: number;
     projectId?: string; // Optional: reuse existing ai_story_projects UUID
+    chaptersToWrite?: number; // Optional: limit how many chapters to write in this run
+    currentChapter?: number; // Optional: resume from this chapter
   }): Promise<{ success: boolean; state: RunnerState; error?: string }> {
     if (this.isRunning) {
       return {
@@ -157,6 +161,9 @@ export class StoryRunner {
     const targetChapters = input.targetChapters || 200;
     const chaptersPerArc = input.chaptersPerArc || 20;
     const targetArcs = Math.ceil(targetChapters / chaptersPerArc);
+
+    this.chaptersToWriteLimit = input.chaptersToWrite;
+    this.sessionChaptersWritten = 0;
 
     // Initialize state
     this.state = this.createInitialState(targetChapters, targetArcs, input.projectId);
@@ -219,21 +226,27 @@ export class StoryRunner {
       // ========== PHASE 1: PLAN STORY ==========
       this.updateStatus('planning_story', 'Đang lên cốt truyện...');
 
-      const storyResult = await this.planner.planStory({
-        title: input.title,
-        protagonistName: input.protagonistName,
-        genre,
-        premise: input.premise,
-        targetChapters,
-        chaptersPerArc,
-      });
-
-      if (!storyResult.success || !storyResult.data) {
-        throw new Error(`Story planning failed: ${storyResult.error}`);
+      if (input.currentChapter && input.currentChapter > 0) {
+        // Resume mode: Create dummy/reconstruct
+        this.storyOutline = this.createDummyOutline(input.title, input.protagonistName, genre, input.premise);
+        this.callbacks.onStoryPlanned?.(this.storyOutline);
+      } else {
+        const storyResult = await this.planner.planStory({
+          title: input.title,
+          protagonistName: input.protagonistName,
+          genre,
+          premise: input.premise,
+          targetChapters,
+          chaptersPerArc,
+        });
+  
+        if (!storyResult.success || !storyResult.data) {
+          throw new Error(`Story planning failed: ${storyResult.error}`);
+        }
+        
+        this.storyOutline = storyResult.data;
+        this.callbacks.onStoryPlanned?.(this.storyOutline);
       }
-
-      this.storyOutline = storyResult.data;
-      this.callbacks.onStoryPlanned?.(this.storyOutline);
 
       // Create world and style bibles
       this.worldBible = this.createWorldBible(
@@ -256,16 +269,20 @@ export class StoryRunner {
       // ========== PHASE 2: PLAN ALL ARCS ==========
       this.updateStatus('planning_arcs', 'Đang lên dàn ý tất cả các arc...');
 
-      const arcsResult = await this.planner.planAllArcs(
-        this.storyOutline,
-        this.worldBible
-      );
-
-      if (!arcsResult.success || !arcsResult.data) {
-        throw new Error(`Arc planning failed: ${arcsResult.error}`);
+      if (input.currentChapter && input.currentChapter > 0) {
+        this.arcOutlines = this.createDummyArcs(this.storyOutline, targetChapters, chaptersPerArc);
+      } else {
+        const arcsResult = await this.planner.planAllArcs(
+          this.storyOutline,
+          this.worldBible
+        );
+  
+        if (!arcsResult.success || !arcsResult.data) {
+          throw new Error(`Arc planning failed: ${arcsResult.error}`);
+        }
+        
+        this.arcOutlines = arcsResult.data;
       }
-
-      this.arcOutlines = arcsResult.data;
 
       for (const arc of this.arcOutlines) {
         this.callbacks.onArcPlanned?.(arc);
@@ -455,6 +472,14 @@ export class StoryRunner {
 
     for (let i = 0; i < arc.chapterOutlines.length; i++) {
       if (this.shouldStop) return { success: false, error: 'Stopped by user' };
+      
+      // Check session limit
+      if (this.chaptersToWriteLimit && this.sessionChaptersWritten >= this.chaptersToWriteLimit) {
+        this.updateStatus('completed', `Đã đạt giới hạn ${this.chaptersToWriteLimit} chương trong phiên chạy này.`);
+        this.shouldStop = true;
+        return { success: true };
+      }
+
       if (this.isPaused) await this.waitForResume();
 
       const chapterPlan = arc.chapterOutlines[i];
@@ -709,6 +734,7 @@ export class StoryRunner {
 
         // Update stats
         this.state!.chaptersWritten++;
+        this.sessionChaptersWritten++; // Increment session counter
         this.state!.totalWords += result.data.wordCount;
         this.state!.averageWordsPerChapter = Math.round(
           this.state!.totalWords / this.state!.chaptersWritten
@@ -854,6 +880,81 @@ export class StoryRunner {
 
   private delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  // ============================================================================
+  // PRIVATE: DUMMY DATA FOR RESUMING
+  // ============================================================================
+
+  private createDummyOutline(title: string, protagonistName: string, genre: GenreType, premise?: string): StoryOutline {
+    return {
+      id: randomUUID(),
+      title,
+      genre,
+      premise: premise || title,
+      themes: ['growth', 'adventure'],
+      mainConflict: 'Rise to power',
+      targetChapters: 200,
+      targetArcs: 10,
+      protagonist: {
+        name: protagonistName,
+        startingState: 'Newbie',
+        endGoal: 'Supreme',
+        characterArc: 'From zero to hero'
+      },
+      majorPlotPoints: [],
+      endingVision: 'Conquer the world',
+      uniqueHooks: []
+    };
+  }
+
+  private createDummyArcs(storyOutline: StoryOutline | null, targetChapters: number, chaptersPerArc: number): ArcOutline[] {
+    const arcs: ArcOutline[] = [];
+    const arcCount = Math.ceil(targetChapters / chaptersPerArc);
+    
+    for (let i = 1; i <= arcCount; i++) {
+        const startCh = (i - 1) * chaptersPerArc + 1;
+        const endCh = Math.min(i * chaptersPerArc, targetChapters);
+        
+        // Basic chapter outlines for this arc
+        const chapterOutlines = Array.from({ length: endCh - startCh + 1 }, (_, idx) => ({
+            chapterNumber: startCh + idx,
+            localNumber: idx + 1,
+            title: `Chương ${startCh + idx}`,
+            purpose: 'Story progression',
+            keyEvents: [],
+            tensionLevel: 5,
+            cliffhangerHint: ''
+        }));
+
+        arcs.push({
+            id: randomUUID(),
+            arcNumber: i,
+            title: `Arc ${i}`,
+            theme: 'growth',
+            premise: `Arc ${i} premise`,
+            startChapter: startCh,
+            endChapter: endCh,
+            chapterCount: endCh - startCh + 1,
+            setup: 'Setup',
+            confrontation: 'Confrontation',
+            resolution: 'Resolution',
+            incitingIncident: 'Incident',
+            midpoint: 'Midpoint',
+            climax: 'Climax',
+            cliffhanger: 'Cliffhanger',
+            protagonistGrowth: 'Growth',
+            newCharacters: [],
+            enemyOrObstacle: 'Enemy',
+            startingRealm: 'Realm Start',
+            endingRealm: 'Realm End',
+            breakthroughs: [],
+            chapterOutlines,
+            tensionCurve: [],
+            status: 'planned'
+        });
+    }
+    return arcs;
   }
 
   // ============================================================================
