@@ -167,6 +167,13 @@ export class StoryRunner {
 
     // Initialize state
     this.state = this.createInitialState(targetChapters, targetArcs, input.projectId);
+    
+    // If resuming, set state to reflect progress
+    if (input.currentChapter && input.currentChapter > 0) {
+      this.state.currentChapter = input.currentChapter;
+      this.state.chaptersWritten = input.currentChapter;
+    }
+
     this.isRunning = true;
     this.isPaused = false;
     this.shouldStop = false;
@@ -270,7 +277,7 @@ export class StoryRunner {
       this.updateStatus('planning_arcs', 'Đang lên dàn ý tất cả các arc...');
 
       if (input.currentChapter && input.currentChapter > 0) {
-        this.arcOutlines = this.createDummyArcs(this.storyOutline, targetChapters, chaptersPerArc);
+        this.arcOutlines = this.createDummyArcs(this.storyOutline, targetChapters, chaptersPerArc, input.currentChapter || 0);
       } else {
         const arcsResult = await this.planner.planAllArcs(
           this.storyOutline,
@@ -908,13 +915,17 @@ export class StoryRunner {
     };
   }
 
-  private createDummyArcs(storyOutline: StoryOutline | null, targetChapters: number, chaptersPerArc: number): ArcOutline[] {
+  private createDummyArcs(storyOutline: StoryOutline | null, targetChapters: number, chaptersPerArc: number, startFromChapter: number = 0): ArcOutline[] {
     const arcs: ArcOutline[] = [];
-    const arcCount = Math.ceil(targetChapters / chaptersPerArc);
+    // Only create arcs for remaining chapters
+    const actualStart = startFromChapter + 1; // Next chapter to write
+    const remaining = targetChapters - startFromChapter;
+    if (remaining <= 0) return arcs;
+    const arcCount = Math.ceil(remaining / chaptersPerArc);
     
     for (let i = 1; i <= arcCount; i++) {
-        const startCh = (i - 1) * chaptersPerArc + 1;
-        const endCh = Math.min(i * chaptersPerArc, targetChapters);
+        const startCh = actualStart + (i - 1) * chaptersPerArc;
+        const endCh = Math.min(actualStart + i * chaptersPerArc - 1, targetChapters);
         
         // Basic chapter outlines for this arc
         const chapterOutlines = Array.from({ length: endCh - startCh + 1 }, (_, idx) => ({
