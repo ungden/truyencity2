@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS character_depth_profiles (
 -- Indexes for character depth
 CREATE INDEX IF NOT EXISTS idx_character_depth_project ON character_depth_profiles(project_id);
 CREATE INDEX IF NOT EXISTS idx_character_depth_role ON character_depth_profiles(project_id, role);
-CREATE INDEX IF NOT EXISTS idx_character_depth_growth ON character_depth_profiles(project_id, (character_arc->>'growthScore')::integer);
+CREATE INDEX IF NOT EXISTS idx_character_depth_growth ON character_depth_profiles(project_id, ((character_arc->>'growthScore')::integer));
 
 -- =============================================
 -- 2. ROMANCE PROGRESSIONS
@@ -430,6 +430,15 @@ CREATE POLICY "Admins have full access to writing_style_analytics" ON writing_st
 -- =============================================
 -- TRIGGERS
 -- =============================================
+
+-- Ensure updated_at trigger function exists
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
 -- Update timestamps
 CREATE TRIGGER update_character_depth_updated_at
