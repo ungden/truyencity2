@@ -36,6 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# generated story output
+/chapters/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

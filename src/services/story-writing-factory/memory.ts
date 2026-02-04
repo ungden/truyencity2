@@ -9,6 +9,7 @@
  */
 
 import * as fs from 'fs';
+import { promises as fsp } from 'fs';
 import * as path from 'path';
 import {
   WorldBible,
@@ -421,13 +422,11 @@ LAST CHAPTER: ${lastChapter?.summary || 'Chương đầu tiên'}`;
       savedAt: Date.now(),
     };
 
-    // Ensure directory exists
-    if (!fs.existsSync(this.savePath)) {
-      fs.mkdirSync(this.savePath, { recursive: true });
-    }
+    // Ensure directory exists (async)
+    await fsp.mkdir(this.savePath, { recursive: true });
 
     const filePath = path.join(this.savePath, 'memory.json');
-    fs.writeFileSync(filePath, JSON.stringify(state, null, 2));
+    await fsp.writeFile(filePath, JSON.stringify(state, null, 2));
   }
 
   /**
@@ -436,12 +435,15 @@ LAST CHAPTER: ${lastChapter?.summary || 'Chương đầu tiên'}`;
   async load(): Promise<boolean> {
     const filePath = path.join(this.savePath, 'memory.json');
 
-    if (!fs.existsSync(filePath)) {
+    try {
+      await fsp.access(filePath);
+    } catch {
       return false;
     }
 
     try {
-      const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+      const raw = await fsp.readFile(filePath, 'utf-8');
+      const data = JSON.parse(raw);
       this.memory = data.memory;
       this.beatLedger = data.beatLedger;
       this.characterTracker = data.characterTracker;
@@ -457,15 +459,13 @@ LAST CHAPTER: ${lastChapter?.summary || 'Chương đầu tiên'}`;
    * Export chapter content to file
    */
   async saveChapter(chapterNumber: number, content: string, title: string): Promise<string> {
-    if (!fs.existsSync(this.savePath)) {
-      fs.mkdirSync(this.savePath, { recursive: true });
-    }
+    await fsp.mkdir(this.savePath, { recursive: true });
 
     const fileName = `chapter_${String(chapterNumber).padStart(4, '0')}.txt`;
     const filePath = path.join(this.savePath, fileName);
 
     const fullContent = `Chương ${chapterNumber}: ${title}\n\n${content}`;
-    fs.writeFileSync(filePath, fullContent);
+    await fsp.writeFile(filePath, fullContent);
 
     return filePath;
   }

@@ -76,63 +76,64 @@ export interface GateResult {
 }
 
 // Beat patterns for repetition detection
+// NOTE: Using /i only (not /gi) because RegExp.test() with /g flag is stateful (lastIndex bug)
 const BEAT_PATTERNS = {
   humiliation: [
-    /bị sỉ nhục/gi, /bị khinh thường/gi, /cười nhạo/gi, /khinh bỉ/gi,
-    /xem thường/gi, /coi thường/gi, /không coi .* ra gì/gi
+    /bị sỉ nhục/i, /bị khinh thường/i, /cười nhạo/i, /khinh bỉ/i,
+    /xem thường/i, /coi thường/i, /không coi .* ra gì/i
   ],
   revenge: [
-    /báo thù/gi, /trả thù/gi, /rửa hận/gi, /thanh toán/gi, /đền tội/gi
+    /báo thù/i, /trả thù/i, /rửa hận/i, /thanh toán/i, /đền tội/i
   ],
   tournament: [
-    /thi đấu/gi, /đại hội/gi, /tranh đoạt/gi, /võ đài/gi, /so tài/gi,
-    /tỷ thí/gi, /đấu trường/gi
+    /thi đấu/i, /đại hội/i, /tranh đoạt/i, /võ đài/i, /so tài/i,
+    /tỷ thí/i, /đấu trường/i
   ],
   auction: [
-    /đấu giá/gi, /phiên đấu/gi, /ra giá/gi, /trả giá/gi, /giao dịch/gi
+    /đấu giá/i, /phiên đấu/i, /ra giá/i, /trả giá/i, /giao dịch/i
   ],
   secret_realm: [
-    /bí cảnh/gi, /di tích/gi, /thám hiểm/gi, /hang động/gi, /cổ mộ/gi,
-    /phế tích/gi, /bảo tàng/gi
+    /bí cảnh/i, /di tích/i, /thám hiểm/i, /hang động/i, /cổ mộ/i,
+    /phế tích/i, /bảo tàng/i
   ],
   sect_conflict: [
-    /tông môn/gi, /môn phái/gi, /tranh chấp/gi, /xung đột/gi, /thù địch/gi
+    /tông môn/i, /môn phái/i, /tranh chấp/i, /xung đột/i, /thù địch/i
   ],
   treasure: [
-    /bảo vật/gi, /linh dược/gi, /thần khí/gi, /pháp bảo/gi, /linh thạch/gi,
-    /đan dược/gi, /thiên tài địa bảo/gi
+    /bảo vật/i, /linh dược/i, /thần khí/i, /pháp bảo/i, /linh thạch/i,
+    /đan dược/i, /thiên tài địa bảo/i
   ],
   breakthrough: [
-    /đột phá/gi, /thăng cấp/gi, /tiến nhập/gi, /lĩnh ngộ/gi, /khai sáng/gi
+    /đột phá/i, /thăng cấp/i, /tiến nhập/i, /lĩnh ngộ/i, /khai sáng/i
   ],
   rescue: [
-    /cứu người/gi, /giải cứu/gi, /ra tay/gi, /bảo vệ/gi, /che chở/gi
+    /cứu người/i, /giải cứu/i, /ra tay/i, /bảo vệ/i, /che chở/i
   ],
   hidden_identity: [
-    /ẩn dấu thân phận/gi, /giả dạng/gi, /ngụy trang/gi, /bí mật/gi, /tiết lộ/gi
+    /ẩn dấu thân phận/i, /giả dạng/i, /ngụy trang/i, /bí mật/i, /tiết lộ/i
   ],
 };
 
-// New info patterns
+// New info patterns (using /i only, not /gi — see note above)
 const NEW_INFO_PATTERNS = {
   plot_advancement: [
-    /phát hiện ra/gi, /nhận ra rằng/gi, /bí mật là/gi, /hóa ra/gi,
-    /thì ra/gi, /đã hiểu/gi, /manh mối/gi
+    /phát hiện ra/i, /nhận ra rằng/i, /bí mật là/i, /hóa ra/i,
+    /thì ra/i, /đã hiểu/i, /manh mối/i
   ],
   character_development: [
-    /quyết định/gi, /thay đổi/gi, /nhận thức/gi, /trưởng thành/gi,
-    /hiểu được/gi, /học được bài học/gi
+    /quyết định/i, /thay đổi/i, /nhận thức/i, /trưởng thành/i,
+    /hiểu được/i, /học được bài học/i
   ],
   relationship_change: [
-    /kết giao/gi, /trở thành bạn/gi, /kẻ thù mới/gi, /đồng minh/gi,
-    /phản bội/gi, /tin tưởng/gi
+    /kết giao/i, /trở thành bạn/i, /kẻ thù mới/i, /đồng minh/i,
+    /phản bội/i, /tin tưởng/i
   ],
   world_reveal: [
-    /truyền thuyết/gi, /lịch sử/gi, /bí mật của/gi, /nguồn gốc/gi,
-    /chân tướng/gi
+    /truyền thuyết/i, /lịch sử/i, /bí mật của/i, /nguồn gốc/i,
+    /chân tướng/i
   ],
   power_gain: [
-    /học được/gi, /lĩnh ngộ/gi, /đột phá/gi, /có được/gi, /thu hoạch/gi
+    /học được/i, /lĩnh ngộ/i, /đột phá/i, /có được/i, /thu hoạch/i
   ],
 };
 

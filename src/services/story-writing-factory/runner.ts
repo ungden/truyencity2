@@ -36,10 +36,11 @@ import { getStyleByGenre, getPowerSystemByGenre } from './templates';
 // Sprint 1/2/3 Quality Systems
 import { FullQCGating, FullGateResult } from './qc-gating';
 import { CharacterDepthTracker } from './character-depth';
-import { BattleVarietyTracker, BattleType, TacticalApproach, CombatElement, BattleOutcome } from './battle-variety';
+import { BattleVarietyTracker } from './battle-variety';
 import { PowerTracker } from './power-tracker';
-import { WritingStyleAnalyzer, writingStyleAnalyzer } from './writing-style-analyzer';
-import { dialogueAnalyzer } from './dialogue-analyzer';
+import { AutoRewriter, RewriteResult } from './auto-rewriter';
+import { CanonResolver } from './canon-resolver';
+import { BeatLedger } from './beat-ledger';
 
 // ============================================================================
 // DEFAULT RUNNER CONFIG
@@ -77,6 +78,9 @@ export class StoryRunner {
   private characterTracker: CharacterDepthTracker | null = null;
   private battleTracker: BattleVarietyTracker | null = null;
   private powerTracker: PowerTracker | null = null;
+  private autoRewriter: AutoRewriter | null = null;
+  private canonResolver: CanonResolver | null = null;
+  private beatLedger: BeatLedger | null = null;
 
   // State
   private state: RunnerState | null = null;
@@ -85,8 +89,9 @@ export class StoryRunner {
   private worldBible: WorldBible | null = null;
   private styleBible: StyleBible | null = null;
   private writtenChapters: Map<number, ChapterContent> = new Map();
-  private lastQualityScore: number = 7;
+  private lastQualityScore: number = 5;
   private lastQCResult: FullGateResult | null = null;
+  private totalTokensUsed: number = 0;
 
   // Control flags
   private isRunning = false;
@@ -98,12 +103,13 @@ export class StoryRunner {
 
   constructor(
     factoryConfig?: Partial<FactoryConfig>,
-    runnerConfig?: Partial<RunnerConfig>
+    runnerConfig?: Partial<RunnerConfig>,
+    aiService?: AIProviderService
   ) {
     this.config = { ...DEFAULT_CONFIG, ...factoryConfig };
     this.runnerConfig = { ...DEFAULT_RUNNER_CONFIG, ...runnerConfig };
 
-    this.aiService = new AIProviderService();
+    this.aiService = aiService || new AIProviderService();
     this.planner = new StoryPlanner(this.config, this.aiService);
     this.chapterWriter = new ChapterWriter(this.config, this.aiService);
     this.costOptimizer = new CostOptimizer({ cacheEnabled: true });
@@ -162,24 +168,40 @@ export class StoryRunner {
     this.characterTracker = new CharacterDepthTracker(this.state.projectId);
     this.battleTracker = new BattleVarietyTracker(this.state.projectId);
     this.powerTracker = new PowerTracker(this.state.projectId);
+    this.canonResolver = new CanonResolver(this.state.projectId);
+    this.beatLedger = new BeatLedger(this.state.projectId);
     this.fullQCGating = new FullQCGating(this.state.projectId, undefined, {
       battleTracker: this.battleTracker,
       characterTracker: this.characterTracker,
     });
 
+    // Initialize AutoRewriter for quality recovery
+    this.autoRewriter = new AutoRewriter(
+      this.state.projectId,
+      this.chapterWriter,
+      this.fullQCGating,
+      this.canonResolver,
+      this.beatLedger,
+      { maxAttempts: 2, targetScore: 65 }
+    );
+
     // Try to load existing state (for crash recovery)
     const loaded = await this.memoryManager.load();
     if (loaded) {
       this.callbacks.onStatusChange?.('idle', 'Đã khôi phục từ lần chạy trước');
-      // Also try to load quality system state
-      try {
-        await this.characterTracker.initialize();
-        await this.battleTracker.initialize();
-        await this.powerTracker.initialize();
-        await this.fullQCGating.initialize();
-      } catch (e) {
-        // Non-fatal: quality systems can work without prior data
-      }
+    }
+    // Try to load quality system state (non-fatal if fails)
+    try {
+      await Promise.all([
+        this.characterTracker.initialize(),
+        this.battleTracker.initialize(),
+        this.powerTracker.initialize(),
+        this.fullQCGating.initialize(),
+        this.canonResolver.initialize(),
+        this.beatLedger.initialize(),
+      ]);
+    } catch (e) {
+      // Non-fatal: quality systems can work without prior data
     }
 
     try {
@@ -507,44 +529,107 @@ export class StoryRunner {
         });
       }
 
-      // Track cost
-      this.costOptimizer.recordCall(
-        use3Agent ? 'write_chapter_3agent' : 'write_chapter_simple',
-        result.data?.wordCount ? result.data.wordCount * 2 : 4000
-      );
+      // Track cost (estimate based on word count for 3-agent: architect + writer + critic)
+      if (result.data?.wordCount) {
+        const outputTokens = result.data.wordCount * 2; // Approx: Vietnamese ~2 tokens/word
+        const inputTokens = use3Agent ? 3000 : 1500; // Approx prompt sizes
+        this.costOptimizer.recordCall(
+          use3Agent ? 'write_chapter_3agent' : 'write_chapter_simple',
+          outputTokens + inputTokens
+        );
+      } else {
+        this.costOptimizer.recordCall(
+          use3Agent ? 'write_chapter_3agent' : 'write_chapter_simple',
+          4000
+        );
+      }
 
       if (result.success && result.data) {
         // ========== QC EVALUATION (Sprint 1/2/3) ==========
-        let qcPassed = true;
         if (this.fullQCGating) {
           try {
+            // Extract characters from outline if available
+            const outlineCharacters = result.outline?.scenes
+              ?.flatMap(s => s.characters)
+              .filter((c, i, arr) => arr.indexOf(c) === i) || [];
+            const allCharacters = [
+              this.worldBible!.protagonist.name,
+              ...outlineCharacters.filter(c => c !== this.worldBible!.protagonist.name),
+            ];
+
+            const qcMetadata = {
+              protagonistPowerLevel: this.powerTracker ? {
+                realm: this.powerTracker.getPowerState(this.worldBible!.protagonist.name)?.realm || '',
+                realmIndex: 0,
+              } : undefined,
+              charactersInvolved: allCharacters,
+            };
+
             const qcResult = await this.fullQCGating.evaluateFull(
               chapterNumber,
               result.data.content,
-              {
-                protagonistPowerLevel: this.powerTracker ? {
-                  realm: this.powerTracker.getPowerState(this.worldBible!.protagonist.name)?.realm || '',
-                  realmIndex: 0,
-                } : undefined,
-                charactersInvolved: [this.worldBible!.protagonist.name],
-              }
+              qcMetadata
             );
 
             this.lastQCResult = qcResult;
 
-            // Run writing style analysis (lightweight, always runs)
-            const styleResult = writingStyleAnalyzer.analyzeStyle(result.data.content);
+            // Use style score from QC result (already computed inside evaluateFull)
+            const styleScore = qcResult.styleAnalysis?.overallScore ?? qcResult.scores.writingStyle ?? 0;
 
             // Log quality metrics
             this.callbacks.onStatusChange?.('writing',
               `Ch.${chapterNumber} QC: ${qcResult.scores.overall}/100 | ` +
-              `Style: ${styleResult.overallScore} | ` +
+              `Style: ${styleScore} | ` +
               `Action: ${qcResult.action}`
             );
 
-            // If QC says auto_rewrite, log warning but still accept
-            // (full auto-rewrite integration is handled by AutoRewriter)
-            if (qcResult.action === 'auto_rewrite') {
+            // ========== AUTO-REWRITE if QC says so ==========
+            if (qcResult.action === 'auto_rewrite' && this.autoRewriter) {
+              this.callbacks.onError?.(`Ch.${chapterNumber} QC low (${qcResult.scores.overall}). Auto-rewriting...`);
+
+              try {
+                const rewriteResult = await this.autoRewriter.rewriteUntilPass(
+                  chapterNumber,
+                  result.data.content,
+                  result.data.title,
+                  qcResult,
+                  {
+                    worldBible: this.worldBible!,
+                    styleBible: this.styleBible!,
+                    currentArc: use3Agent ? {
+                      id: arc.id,
+                      projectId: this.state!.projectId,
+                      arcNumber: arc.arcNumber,
+                      title: arc.title,
+                      theme: arc.theme,
+                      startChapter: arc.startChapter,
+                      endChapter: arc.endChapter,
+                      tensionCurve: arc.tensionCurve,
+                      climaxChapter: arc.startChapter + Math.floor(arc.chapterCount * 0.75),
+                      status: arc.status,
+                    } : undefined,
+                    previousSummary,
+                    protagonistName: this.worldBible!.protagonist.name,
+                  }
+                );
+
+                if (rewriteResult.success) {
+                  // Replace chapter with rewritten version
+                  result.data.content = rewriteResult.finalContent;
+                  result.data.title = rewriteResult.finalTitle;
+                  result.data.wordCount = rewriteResult.finalContent.trim().split(/\s+/).length;
+                  result.data.qualityScore = Math.round(rewriteResult.finalScore / 10);
+                  this.callbacks.onStatusChange?.('writing',
+                    `Ch.${chapterNumber} rewritten: ${rewriteResult.finalScore}/100 (${rewriteResult.attempts} attempts)`
+                  );
+                } else if (rewriteResult.needsHumanReview) {
+                  this.callbacks.onError?.(`Ch.${chapterNumber} needs human review: ${rewriteResult.reviewReason}`);
+                }
+              } catch (rewriteErr) {
+                // Rewrite failure is non-fatal, keep original
+                this.callbacks.onError?.(`Ch.${chapterNumber} auto-rewrite failed: ${rewriteErr instanceof Error ? rewriteErr.message : 'Unknown'}`);
+              }
+            } else if (qcResult.action === 'auto_rewrite') {
               this.callbacks.onError?.(`Ch.${chapterNumber} QC low (${qcResult.scores.overall}): ${qcResult.failures.join(', ')}`);
             }
           } catch (e) {
@@ -559,16 +644,36 @@ export class StoryRunner {
 
         // Update memory manager
         if (this.memoryManager) {
+          // Build meaningful summary from outline + critic feedback
+          const outlineSummary = result.outline?.summary || '';
+          const criticNotes = result.criticReport?.issues
+            ?.filter(i => i.severity === 'major')
+            .map(i => i.description)
+            .join('; ') || '';
+          const dopamineTypes = result.data.dopamineDelivered
+            ?.map(d => d.type).join(', ') || '';
+          const summary = outlineSummary
+            ? `${result.data.title}: ${outlineSummary}${dopamineTypes ? ` [Dopamine: ${dopamineTypes}]` : ''}`
+            : `${result.data.title}: ${result.data.content.substring(0, 300)}...`;
+
+          // Extract characters from outline
+          const outlineCharacters = result.outline?.scenes
+            ?.flatMap(s => s.characters)
+            .filter((c, i, arr) => arr.indexOf(c) === i) || [];
+
           const chapterMemory: ChapterMemory = {
             chapterNumber,
             title: result.data.title,
-            summary: `${result.data.title}: ${result.data.content.substring(0, 200)}...`,
-            keyEvents: [],
-            charactersInvolved: [this.worldBible!.protagonist.name],
-            locationUsed: '',
+            summary,
+            keyEvents: result.outline?.dopaminePoints?.map(d => `${d.type}: ${d.description}`) || [],
+            charactersInvolved: [
+              this.worldBible!.protagonist.name,
+              ...outlineCharacters.filter(c => c !== this.worldBible!.protagonist.name),
+            ],
+            locationUsed: result.outline?.location || '',
             plotThreadsAdvanced: [],
-            emotionalBeat: '',
-            cliffhanger: result.data.content.slice(-200),
+            emotionalBeat: result.outline?.dopaminePoints?.[0]?.type || '',
+            cliffhanger: result.outline?.cliffhanger || result.data.content.slice(-300),
             wordCount: result.data.wordCount,
           };
           this.memoryManager.addChapter(chapterMemory);
@@ -586,7 +691,7 @@ export class StoryRunner {
         }
 
         // Update quality tracking
-        this.lastQualityScore = result.data.qualityScore || 7;
+        this.lastQualityScore = result.data.qualityScore || 5;
 
         // Update stats
         this.state!.chaptersWritten++;
@@ -616,9 +721,10 @@ export class StoryRunner {
         }
       }
 
-      // Delay between chapters
+      // Adaptive delay: skip long delay if chapter took > 5s (rate limit unlikely)
       if (i < arc.chapterOutlines.length - 1) {
-        await this.delay(this.runnerConfig.delayBetweenChapters);
+        const adaptiveDelay = (result.duration || 0) > 5000 ? 500 : this.runnerConfig.delayBetweenChapters;
+        await this.delay(adaptiveDelay);
       }
     }
 
@@ -743,9 +849,10 @@ export class StoryRunner {
 
 export function createStoryRunner(
   factoryConfig?: Partial<FactoryConfig>,
-  runnerConfig?: Partial<RunnerConfig>
+  runnerConfig?: Partial<RunnerConfig>,
+  aiService?: AIProviderService
 ): StoryRunner {
-  return new StoryRunner(factoryConfig, runnerConfig);
+  return new StoryRunner(factoryConfig, runnerConfig, aiService);
 }
 
 // Export singleton
@@ -753,10 +860,11 @@ let defaultRunner: StoryRunner | null = null;
 
 export function getStoryRunner(
   factoryConfig?: Partial<FactoryConfig>,
-  runnerConfig?: Partial<RunnerConfig>
+  runnerConfig?: Partial<RunnerConfig>,
+  aiService?: AIProviderService
 ): StoryRunner {
   if (!defaultRunner) {
-    defaultRunner = new StoryRunner(factoryConfig, runnerConfig);
+    defaultRunner = new StoryRunner(factoryConfig, runnerConfig, aiService);
   }
   return defaultRunner;
 }
