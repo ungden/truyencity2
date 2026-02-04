@@ -10,6 +10,7 @@
  * 6. Character arc milestones
  */
 
+import { randomUUID } from 'crypto';
 import { getSupabase } from './supabase-helper';
 
 // ============================================================================
@@ -264,7 +265,7 @@ export class CharacterDepthTracker {
       warning = `Cảnh báo: ${name} quá giống với ${uniquenessCheck.similarTo[0]?.character}`;
     }
     
-    const id = `char_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+    const id = randomUUID();
     const now = Date.now();
     
     const profile: CharacterDepthProfile = {
@@ -315,7 +316,7 @@ export class CharacterDepthTracker {
     
     const newMilestone: CharacterMilestone = {
       ...milestone,
-      id: `ms_${Date.now()}`,
+      id: randomUUID(),
       completed: false,
     };
     
@@ -499,7 +500,7 @@ export class CharacterDepthTracker {
     }
     
     const romance: RomanceProgression = {
-      id: `romance_${Date.now()}`,
+      id: randomUUID(),
       projectId: this.projectId,
       character1,
       character2,
@@ -763,8 +764,8 @@ export class CharacterDepthTracker {
         last_appearance: profile.lastAppearance,
         chapter_appearances: profile.chapterAppearances,
         total_scene_time: profile.totalSceneTime,
-        created_at: profile.createdAt,
-        updated_at: profile.updatedAt,
+        created_at: new Date(profile.createdAt).toISOString(),
+        updated_at: new Date(profile.updatedAt).toISOString(),
       }, { onConflict: 'id' });
     if (error) {
       console.warn('[DB] saveCharacter failed:', error.message);

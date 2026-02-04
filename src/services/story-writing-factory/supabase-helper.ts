@@ -7,6 +7,7 @@
  * 3. Non-null assertion trên env vars
  */
 
+import { randomUUID } from 'crypto';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 // ============================================================================
@@ -174,5 +175,96 @@ export async function safeUpdate(
     const msg = e instanceof Error ? e.message : 'Unknown DB error';
     console.warn(`[DB] Update ${table} error:`, msg);
     return { data: null, error: msg };
+  }
+}
+
+// ============================================================================
+// PROJECT RECORD HELPER
+// ============================================================================
+
+/**
+ * Ensure ai_story_projects record exists for this projectId.
+ * 
+ * Sprint 2/3 tables have FK `project_id -> ai_story_projects(id)`.
+ * Without a valid project record, all tracker DB writes fail.
+ * 
+ * Strategy:
+ * 1. Check if project already exists → skip if yes
+ * 2. Find an existing user_id (required FK to auth.users)
+ * 3. Insert minimal project record
+ * 4. If anything fails → log warning, trackers work in-memory only
+ */
+export async function ensureProjectRecord(
+  projectId: string,
+  meta?: {
+    title?: string;
+    genre?: string;
+    mainCharacter?: string;
+    targetChapters?: number;
+  }
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = getSupabase();
+
+    // 1. Check if project already exists
+    const { data: existing, error: checkError } = await supabase
+      .from('ai_story_projects')
+      .select('id')
+      .eq('id', projectId)
+      .maybeSingle();
+
+    if (checkError) {
+      console.warn(`[DB] Check project failed: ${checkError.message}`);
+      return { success: false, error: checkError.message };
+    }
+
+    if (existing) {
+      console.log(`[DB] Project ${projectId.substring(0, 8)}... already exists`);
+      return { success: true };
+    }
+
+    // 2. Find an existing user_id to satisfy FK constraint
+    //    (In production, this comes from auth context)
+    const { data: users, error: userError } = await supabase
+      .from('profiles')
+      .select('id')
+      .limit(1);
+
+    if (userError || !users?.length) {
+      console.warn(`[DB] No users found for project record. DB persistence disabled.`);
+      return { success: false, error: 'No users available for FK constraint' };
+    }
+
+    const userId = users[0].id;
+
+    // 3. Insert minimal project record
+    const { error: insertError } = await supabase
+      .from('ai_story_projects')
+      .insert({
+        id: projectId,
+        user_id: userId,
+        main_character: meta?.mainCharacter || 'Unknown',
+        genre: meta?.genre || 'tien-hiep',
+        total_planned_chapters: meta?.targetChapters || 200,
+        status: 'active',
+        writing_style: 'webnovel_chinese',
+        target_chapter_length: 2500,
+        ai_model: 'gemini-3-flash-preview',
+        temperature: 1.0,
+        current_chapter: 0,
+        world_description: meta?.title || 'Story Writing Factory Project',
+      });
+
+    if (insertError) {
+      console.warn(`[DB] Insert project failed: ${insertError.message}`);
+      return { success: false, error: insertError.message };
+    }
+
+    console.log(`[DB] Created project record: ${projectId.substring(0, 8)}...`);
+    return { success: true };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : 'Unknown error';
+    console.warn(`[DB] ensureProjectRecord error: ${msg}`);
+    return { success: false, error: msg };
   }
 }

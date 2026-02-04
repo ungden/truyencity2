@@ -93,7 +93,7 @@ export type {
 } from './battle-variety';
 
 // Shared Supabase helper
-export { getSupabase, safeSelect, safeUpsert, safeInsert, safeUpdate, resetSupabase } from './supabase-helper';
+export { getSupabase, safeSelect, safeUpsert, safeInsert, safeUpdate, resetSupabase, ensureProjectRecord } from './supabase-helper';
 
 // Sprint 3 Writing Style Analysis
 export { WritingStyleAnalyzer, writingStyleAnalyzer } from './writing-style-analyzer';
@@ -103,6 +103,7 @@ export type { StyleAnalysisResult, StyleIssue } from './writing-style-analyzer';
 // Import functions directly from './author-assigner' when needed
 export type { AuthorAssignmentResult, AssignAuthorOptions } from './author-assigner';
 
+import { randomUUID } from 'crypto';
 import { AIProviderService } from '../ai-provider';
 import { ChapterWriter } from './chapter';
 import { QualityGate, ContentAnalyzer } from './quality';
@@ -196,7 +197,7 @@ export class StoryWritingFactory {
       chaptersPerArc?: number;
     }
   ): Promise<{ success: boolean; projectId: string; error?: string }> {
-    const projectId = `project_${Date.now()}`;
+    const projectId = randomUUID();
     const totalChapters = options?.totalChapters || 200;
     const chaptersPerArc = options?.chaptersPerArc || 20;
 

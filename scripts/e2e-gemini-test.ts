@@ -26,7 +26,7 @@ import type { FactoryConfig, RunnerConfig } from '@/services/story-writing-facto
 // CONFIG
 // ============================================================================
 
-const GEMINI_MODEL = 'gemini-2.0-flash';
+const GEMINI_MODEL = 'gemini-3-flash-preview';
 const TARGET_CHAPTERS = 2;
 const CHAPTERS_PER_ARC = 2;
 

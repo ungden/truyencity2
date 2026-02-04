@@ -8,6 +8,7 @@
  * 4. Combat scene pacing
  */
 
+import { randomUUID } from 'crypto';
 import { getSupabase } from './supabase-helper';
 
 // ============================================================================
@@ -449,7 +450,7 @@ export class BattleVarietyTracker {
   async recordBattle(battle: Omit<BattleRecord, 'id' | 'projectId'>): Promise<void> {
     const record: BattleRecord = {
       ...battle,
-      id: `battle_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
+      id: randomUUID(),
       projectId: this.projectId,
     };
     

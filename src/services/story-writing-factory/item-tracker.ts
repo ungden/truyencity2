@@ -8,6 +8,7 @@
  * 4. Item power scaling
  */
 
+import { randomUUID } from 'crypto';
 import { getSupabase } from './supabase-helper';
 
 // ============================================================================
@@ -280,7 +281,7 @@ export class ItemTracker {
     }
     
     // Create item
-    const id = `item_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+    const id = randomUUID();
     const item: TrackedItem = {
       id,
       projectId: this.projectId,

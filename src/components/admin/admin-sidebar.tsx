@@ -16,7 +16,8 @@ import {
   ChevronDown,
   ListTree,
   Upload,
-  Factory
+  Factory,
+  Pen
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -30,6 +31,12 @@ import {
 
 // AI Tools submenu items
 const aiToolsSubmenu = [
+  {
+    title: 'Story Runner',
+    href: '/admin/story-runner',
+    icon: Pen,
+    description: 'Viết truyện AI tự động'
+  },
   {
     title: 'Story Factory',
     href: '/admin/factory',

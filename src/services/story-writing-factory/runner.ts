@@ -11,11 +11,13 @@
  * - Auto-save for crash recovery
  */
 
+import { randomUUID } from 'crypto';
 import { AIProviderService } from '../ai-provider';
 import { StoryPlanner } from './planner';
 import { ChapterWriter } from './chapter';
 import { MemoryManager, ChapterMemory } from './memory';
 import { CostOptimizer, WorkflowOptimizer } from './cost-optimizer';
+import { ensureProjectRecord } from './supabase-helper';
 import {
   StoryOutline,
   ArcOutline,
@@ -35,8 +37,8 @@ import { getStyleByGenre, getPowerSystemByGenre } from './templates';
 
 // Sprint 1/2/3 Quality Systems
 import { FullQCGating, FullGateResult } from './qc-gating';
-import { CharacterDepthTracker } from './character-depth';
-import { BattleVarietyTracker } from './battle-variety';
+import { CharacterDepthTracker, CharacterRole, MotivationType, PersonalityTrait } from './character-depth';
+import { BattleVarietyTracker, BattleType, TacticalApproach, BattleOutcome, CombatElement } from './battle-variety';
 import { PowerTracker } from './power-tracker';
 import { AutoRewriter, RewriteResult } from './auto-rewriter';
 import { CanonResolver } from './canon-resolver';
@@ -134,13 +136,14 @@ export class StoryRunner {
   /**
    * Setup and run the entire story from start to finish
    */
-  async run(input: {
+   async run(input: {
     title: string;
     protagonistName: string;
     genre?: GenreType;
     premise?: string;
     targetChapters?: number;
     chaptersPerArc?: number;
+    projectId?: string; // Optional: reuse existing ai_story_projects UUID
   }): Promise<{ success: boolean; state: RunnerState; error?: string }> {
     if (this.isRunning) {
       return {
@@ -156,10 +159,18 @@ export class StoryRunner {
     const targetArcs = Math.ceil(targetChapters / chaptersPerArc);
 
     // Initialize state
-    this.state = this.createInitialState(targetChapters, targetArcs);
+    this.state = this.createInitialState(targetChapters, targetArcs, input.projectId);
     this.isRunning = true;
     this.isPaused = false;
     this.shouldStop = false;
+
+    // Ensure ai_story_projects record exists for DB persistence
+    await ensureProjectRecord(this.state.projectId, {
+      title: input.title,
+      genre: genre,
+      mainCharacter: input.protagonistName,
+      targetChapters,
+    });
 
     // Initialize memory manager
     this.memoryManager = new MemoryManager(this.state.projectId);
@@ -642,6 +653,9 @@ export class StoryRunner {
 
         // ========== UPDATE TRACKING SYSTEMS ==========
 
+        // Extract & record data to Sprint 2/3 trackers (DB persistence)
+        await this.extractAndRecordFromChapter(chapterNumber, result, result.data.content);
+
         // Update memory manager
         if (this.memoryManager) {
           // Build meaningful summary from outline + critic feedback
@@ -735,9 +749,9 @@ export class StoryRunner {
   // PRIVATE: HELPERS
   // ============================================================================
 
-  private createInitialState(totalChapters: number, totalArcs: number): RunnerState {
+  private createInitialState(totalChapters: number, totalArcs: number, projectId?: string): RunnerState {
     return {
-      projectId: `runner_${Date.now()}`,
+      projectId: projectId || randomUUID(),
       status: 'idle',
       currentArc: 0,
       currentChapter: 0,
@@ -840,6 +854,145 @@ export class StoryRunner {
 
   private delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  // ============================================================================
+  // PRIVATE: EXTRACT & RECORD DATA FROM CHAPTER OUTPUT
+  // ============================================================================
+
+  /**
+   * Extract characters, battles, power events from chapter output
+   * and feed to Sprint 2/3 trackers for DB persistence.
+   */
+  private async extractAndRecordFromChapter(
+    chapterNumber: number,
+    result: ChapterResult,
+    content: string,
+  ): Promise<void> {
+    try {
+      // 1. Register characters from outline
+      if (this.characterTracker && result.outline?.scenes) {
+        const allCharacters = result.outline.scenes
+          .flatMap(s => s.characters)
+          .filter((c, i, arr) => arr.indexOf(c) === i);
+
+        const protagonistName = this.worldBible!.protagonist.name;
+        const existingChars = this.characterTracker.getAllCharacters();
+        const existingNames = new Set(existingChars.map(c => c.name.toLowerCase()));
+
+        // Register protagonist on first chapter
+        if (chapterNumber === 1 && !existingNames.has(protagonistName.toLowerCase())) {
+          await this.characterTracker.createCharacter(protagonistName, 'protagonist', {
+            primaryMotivation: 'power' as MotivationType,
+            backstory: this.storyOutline?.protagonist.characterArc || 'Nhân vật chính',
+            flaw: 'kinh mạch bị phế',
+            strength: 'ý chí kiên cường',
+            personalityTraits: ['brave', 'stubborn'] as PersonalityTrait[],
+            firstAppearance: 1,
+          });
+        }
+
+        // Register new NPCs as minor characters
+        for (const charName of allCharacters) {
+          if (charName === protagonistName) continue;
+          if (existingNames.has(charName.toLowerCase())) continue;
+
+          const guessedRole = this.guessCharacterRole(charName, content);
+          await this.characterTracker.createCharacter(charName, guessedRole, {
+            primaryMotivation: guessedRole === 'antagonist' ? 'power' as MotivationType : 'survival' as MotivationType,
+            backstory: `Xuất hiện lần đầu ở chương ${chapterNumber}`,
+            flaw: 'chưa rõ',
+            strength: 'chưa rõ',
+            personalityTraits: ['serious'] as PersonalityTrait[],
+            firstAppearance: chapterNumber,
+          });
+          existingNames.add(charName.toLowerCase());
+        }
+      }
+
+      // 2. Detect and record battles from QC result
+      if (this.battleTracker && this.lastQCResult) {
+        const hasBattle = this.lastQCResult.warnings?.some(w => 
+          w.toLowerCase().includes('battle') || w.toLowerCase().includes('combat')
+        ) || content.match(/chiến đấu|giao đấu|tấn công|xuất kiếm|đánh nhau|đại chiến/i);
+
+        if (hasBattle) {
+          const protagonistRealm = this.powerTracker?.getPowerState(
+            this.worldBible!.protagonist.name
+          )?.realm || 'luyện khí 1';
+
+          await this.battleTracker.recordBattle({
+            chapterNumber,
+            battleType: 'one_on_one' as BattleType,
+            tacticalApproach: 'balanced' as TacticalApproach,
+            outcome: 'victory' as BattleOutcome,
+            protagonistPowerLevel: protagonistRealm,
+            enemyPowerLevel: protagonistRealm, // Approximate
+            enemyType: 'unknown opponent',
+            elementsUsed: ['skill_clash', 'power_reveal'] as CombatElement[],
+            wordCount: result.data?.wordCount || 0,
+            duration: 'medium' as const,
+            varietyScore: 70,
+            issues: [],
+          });
+        }
+      }
+
+      // 3. Record writing style analysis from QC
+      if (this.lastQCResult?.styleAnalysis) {
+        const style = this.lastQCResult.styleAnalysis;
+        try {
+          const { getSupabase } = await import('./supabase-helper');
+          const supabase = getSupabase();
+          await supabase.from('writing_style_analytics').insert({
+            project_id: this.state!.projectId,
+            chapter_number: chapterNumber,
+            overall_score: style.overallScore,
+            show_dont_tell_score: style.showDontTellScore,
+            weak_verb_score: style.weakVerbScore,
+            adverb_score: style.adverbScore,
+            purple_prose_score: style.purpleProse?.score ?? 0,
+            passive_voice_score: style.passiveVoice?.score ?? 0,
+            sentence_variety_score: style.sentenceVariety?.score ?? 0,
+            issues: style.issues,
+            suggestions: style.suggestions,
+            weak_verbs: style.weakVerbs,
+            adverb_overuse: style.adverbOveruse,
+            tell_instances: style.tellInstances,
+            exposition_dumps: style.expositionDumps,
+          });
+        } catch {
+          // Non-fatal: style analytics is optional
+        }
+      }
+    } catch (e) {
+      // Non-fatal: tracker recording should never crash the pipeline
+      const msg = e instanceof Error ? e.message : 'Unknown';
+      this.callbacks.onError?.(`[TRACKER] Extract/record failed for Ch.${chapterNumber}: ${msg}`);
+    }
+  }
+
+  /**
+   * Guess a character's role from context clues in the content.
+   */
+  private guessCharacterRole(name: string, content: string): CharacterRole {
+    const lower = content.toLowerCase();
+    const nameLower = name.toLowerCase();
+    
+    // Find sentences containing the character name
+    const sentences = content.split(/[。.!！？?]/).filter(s => 
+      s.toLowerCase().includes(nameLower)
+    );
+    const context = sentences.join(' ').toLowerCase();
+    
+    if (context.match(/kẻ thù|đối thủ|ác|tà|hung ác|tàn nhẫn|giết|hắc ám|phản bội/)) return 'antagonist';
+    if (context.match(/sư phụ|sư tôn|dạy|truyền thụ|chỉ dẫn/)) return 'mentor';
+    if (context.match(/nàng|mỹ nhân|xinh đẹp|hồng nhan|yêu/)) return 'love_interest';
+    if (context.match(/huynh đệ|đồng hành|chiến hữu|bạn/)) return 'ally';
+    if (context.match(/đấu|thách thức|ganh đua|cạnh tranh/)) return 'rival';
+    if (context.match(/trưởng lão|tộc trưởng|chưởng môn|đại nhân/)) return 'minor';
+    
+    return 'minor';
   }
 }
 
