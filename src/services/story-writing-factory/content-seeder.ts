@@ -76,6 +76,9 @@ interface NovelIdea {
   title: string;
   premise: string;
   mainCharacter: string;
+  description?: string;     // rich 200-400 word description
+  worldSystem?: string;     // cultivation/magic system details
+  coverPrompt?: string;     // English cover scene prompt
 }
 
 // ============================================================================
@@ -379,21 +382,23 @@ export class ContentSeeder {
   ): Promise<NovelIdea[]> {
     const genreLabel = GENRE_LABELS[genre] || genre;
 
-    const prompt = `Bạn là chuyên gia webnovel Trung Quốc/Việt Nam. Hãy tạo ${count} ý tưởng tiểu thuyết thể loại ${genreLabel}.
+    const prompt = `Bạn là tác giả webnovel chuyên nghiệp. Hãy tạo ${count} tiểu thuyết thể loại ${genreLabel} với NỘI DUNG ĐẦY ĐỦ.
 
 Mỗi tiểu thuyết cần:
-1. Tên truyện (hấp dẫn, kiểu webnovel, 2-8 chữ)
-2. Mô tả ngắn 1-2 câu (giới thiệu premise, hook người đọc)
-3. Tên nhân vật chính (tên Trung/Việt, 2-3 chữ)
+1. "title": Tên truyện (hấp dẫn, kiểu webnovel, 2-8 chữ)
+2. "premise": Hook 1-2 câu ngắn gọn
+3. "mainCharacter": Tên nhân vật chính (Trung/Việt, 2-3 chữ)
+4. "description": Giới thiệu truyện 200-400 chữ tiếng Việt. Bao gồm: bối cảnh thế giới, nhân vật chính (xuất thân, tính cách, năng lực), xung đột chính, điểm hấp dẫn. Câu đầu phải HOOK. KHÔNG spoil kết.
+5. "worldSystem": Mô tả hệ thống thế giới 100-200 chữ. Nếu tu luyện: liệt kê 7+ cấp bậc. Nếu game: level system. Nếu đô thị: hệ thống xã hội/quyền lực. Phải chi tiết, cụ thể.
+6. "coverPrompt": 2-3 câu tiếng ANH mô tả cảnh bìa: nhân vật đang làm gì, bối cảnh, mood, màu sắc.
 
 Trả về JSON array:
-[{"title":"...","premise":"...","mainCharacter":"..."},...]
+[{"title":"...","premise":"...","mainCharacter":"...","description":"...","worldSystem":"...","coverPrompt":"..."},...]
 
 CHÚ Ý:
-- Mỗi tiểu thuyết phải có ý tưởng ĐỘC ĐÁO, không lặp lại
-- Tên truyện phải CUỐN HÚT, gây tò mò
-- Premise phải tạo HOOK, khiến người đọc muốn đọc
-- Batch ${Math.floor(offset / count) + 1}: hãy sáng tạo theo hướng khác batch trước
+- Mỗi truyện PHẢI có description dài 200+ chữ, worldSystem 100+ chữ
+- Ý tưởng ĐỘC ĐÁO, không lặp lại
+- Batch ${Math.floor(offset / count) + 1}: sáng tạo theo hướng khác batch trước
 - CHỈ trả về JSON array, không thêm text khác`;
 
     try {
@@ -451,6 +456,9 @@ CHÚ Ý:
         title: String(item.title).trim(),
         premise: String(item.premise).trim(),
         mainCharacter: String(item.mainCharacter || this.randomMCName()).trim(),
+        description: item.description ? String(item.description).trim() : undefined,
+        worldSystem: item.worldSystem ? String(item.worldSystem).trim() : undefined,
+        coverPrompt: item.coverPrompt ? String(item.coverPrompt).trim() : undefined,
       }));
   }
 
@@ -559,7 +567,7 @@ CHÚ Ý:
           title: idea.title,
           author: '', // Will be filled separately via updateNovelAuthorNames
           ai_author_id: authorId,
-          description: idea.premise,
+          description: idea.description || idea.premise,
           status: 'Đang ra',
           genres: [genre],
         });
@@ -570,7 +578,7 @@ CHÚ Ý:
           novel_id: novelId,
           genre,
           main_character: idea.mainCharacter,
-          world_description: idea.premise,
+          world_description: idea.worldSystem || idea.premise,
           writing_style: 'webnovel_chinese',
           target_chapter_length: 2500,
           ai_model: 'gemini-3-flash-preview',
