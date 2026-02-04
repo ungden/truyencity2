@@ -9,11 +9,13 @@
  */
 
 import { ChapterWriter } from './chapter';
-import { QCGating, GateResult } from './qc-gating';
+import { QCGating, GateResult, FullQCGating, FullGateResult } from './qc-gating';
 import { CanonResolver } from './canon-resolver';
 import { BeatLedger } from './beat-ledger';
 import { GenreType, WorldBible, StyleBible, StoryArc, ChapterResult } from './types';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { BattleVarietyTracker } from './battle-variety';
+import { CharacterDepthTracker } from './character-depth';
 
 // Lazy initialization to avoid build-time errors
 let _supabase: SupabaseClient | null = null;
@@ -451,4 +453,33 @@ export function createAutoRewriter(
   config?: Partial<RewriteConfig>
 ): AutoRewriter {
   return new AutoRewriter(projectId, chapterWriter, qcGating, canonResolver, beatLedger, config);
+}
+
+/**
+ * Create an AutoRewriter with FullQCGating (includes writing style, battle variety, character depth)
+ */
+export function createFullAutoRewriter(
+  projectId: string,
+  chapterWriter: ChapterWriter,
+  canonResolver: CanonResolver,
+  beatLedger: BeatLedger,
+  options?: {
+    battleTracker?: BattleVarietyTracker;
+    characterTracker?: CharacterDepthTracker;
+    config?: Partial<RewriteConfig>;
+  }
+): AutoRewriter {
+  const fullQCGating = new FullQCGating(projectId, undefined, {
+    battleTracker: options?.battleTracker,
+    characterTracker: options?.characterTracker,
+  });
+  
+  return new AutoRewriter(
+    projectId,
+    chapterWriter,
+    fullQCGating,
+    canonResolver,
+    beatLedger,
+    options?.config
+  );
 }

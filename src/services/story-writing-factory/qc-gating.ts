@@ -574,3 +574,598 @@ export class QCGating {
 export function createQCGating(projectId: string, thresholds?: Partial<GatingThresholds>): QCGating {
   return new QCGating(projectId, thresholds);
 }
+
+// ============================================================================
+// ENHANCED QC GATING - Integration with Sprint 1 features
+// ============================================================================
+
+import { getQuickDialogueScore, DialogueAnalysisResult, dialogueAnalyzer } from './dialogue-analyzer';
+
+export interface EnhancedGatingThresholds extends GatingThresholds {
+  dialogueQualityMin: number;    // Default: 60
+  clicheScoreMax: number;        // Default: 30 (lower is better)
+  infoDumpMax: number;           // Default: 25 (percentage)
+}
+
+export const ENHANCED_DEFAULT_THRESHOLDS: EnhancedGatingThresholds = {
+  ...DEFAULT_THRESHOLDS,
+  dialogueQualityMin: 60,
+  clicheScoreMax: 30,
+  infoDumpMax: 25,
+};
+
+export interface EnhancedQCScores extends QCScores {
+  dialogueQuality: number;  // 0-100
+  clicheAvoidance: number;  // 0-100 (higher is better)
+  expositionControl: number; // 0-100 (higher is better = less info dump)
+}
+
+export interface EnhancedGateResult extends GateResult {
+  scores: EnhancedQCScores;
+  dialogueAnalysis: {
+    clicheCount: number;
+    infoDumpScore: number;
+    exclamationRatio: number;
+    youngMasterPatterns: number;
+    breakdown: ReturnType<typeof getQuickDialogueScore>['breakdown'];
+  };
+}
+
+/**
+ * Enhanced QC Gating with dialogue quality checks
+ */
+export class EnhancedQCGating extends QCGating {
+  private enhancedThresholds: EnhancedGatingThresholds;
+
+  constructor(projectId: string, thresholds?: Partial<EnhancedGatingThresholds>) {
+    super(projectId, thresholds);
+    this.enhancedThresholds = { ...ENHANCED_DEFAULT_THRESHOLDS, ...thresholds };
+  }
+
+  /**
+   * Enhanced evaluation including dialogue quality
+   */
+  async evaluateEnhanced(
+    chapterNumber: number,
+    content: string,
+    metadata: {
+      protagonistPowerLevel?: { realm: string; realmIndex: number };
+      arcStartPowerLevel?: { realm: string; realmIndex: number };
+      charactersInvolved?: string[];
+      deadCharactersMentioned?: string[];
+    }
+  ): Promise<EnhancedGateResult> {
+    // Get base evaluation
+    const baseResult = await this.evaluate(chapterNumber, content, metadata);
+
+    // Get dialogue analysis
+    const dialogueResult = dialogueAnalyzer.analyzeDialogues(content);
+    const dialogueScore = getQuickDialogueScore(content);
+
+    // Calculate enhanced scores
+    const dialogueQuality = dialogueScore.score;
+    const clicheAvoidance = Math.max(0, 100 - dialogueResult.clicheUsage.totalClicheScore);
+    const expositionControl = Math.max(0, 100 - dialogueResult.expositionScore);
+
+    // Add to overall score calculation
+    const enhancedOverall = Math.round(
+      baseResult.scores.continuity * 0.25 +
+      (100 - baseResult.scores.repetition) * 0.15 +
+      baseResult.scores.powerSanity * 0.15 +
+      baseResult.scores.newInfo * 0.10 +
+      baseResult.scores.pacing * 0.10 +
+      dialogueQuality * 0.15 +
+      clicheAvoidance * 0.05 +
+      expositionControl * 0.05
+    );
+
+    // Add dialogue-specific failures
+    const enhancedFailures = [...baseResult.failures];
+    const enhancedWarnings = [...baseResult.warnings];
+
+    if (dialogueQuality < this.enhancedThresholds.dialogueQualityMin) {
+      enhancedFailures.push(`Dialogue quality ${dialogueQuality} below minimum ${this.enhancedThresholds.dialogueQualityMin}`);
+    }
+
+    if (dialogueResult.clicheUsage.totalClicheScore > this.enhancedThresholds.clicheScoreMax) {
+      enhancedWarnings.push(`Cliché score ${dialogueResult.clicheUsage.totalClicheScore} exceeds threshold`);
+    }
+
+    if (dialogueResult.expositionScore > this.enhancedThresholds.infoDumpMax) {
+      enhancedWarnings.push(`Info-dump score ${dialogueResult.expositionScore}% exceeds threshold`);
+    }
+
+    if (dialogueResult.youngMasterCount > 3) {
+      enhancedWarnings.push(`Too many young master patterns (${dialogueResult.youngMasterCount})`);
+    }
+
+    // Determine action
+    let action: EnhancedGateResult['action'] = 'pass';
+    let passed = true;
+
+    if (enhancedOverall < this.enhancedThresholds.autoRewriteBelow || enhancedFailures.length >= 2) {
+      action = 'auto_rewrite';
+      passed = false;
+    } else if (enhancedOverall < this.enhancedThresholds.humanReviewBelow || enhancedFailures.length > 0) {
+      action = 'human_review';
+      passed = false;
+    }
+
+    return {
+      ...baseResult,
+      passed,
+      action,
+      failures: enhancedFailures,
+      warnings: enhancedWarnings,
+      scores: {
+        ...baseResult.scores,
+        overall: enhancedOverall,
+        dialogueQuality,
+        clicheAvoidance,
+        expositionControl,
+      },
+      dialogueAnalysis: {
+        clicheCount: dialogueResult.clicheUsage.extreme.reduce((sum, c) => sum + c.count, 0),
+        infoDumpScore: dialogueResult.expositionScore,
+        exclamationRatio: dialogueResult.exclamationRatio,
+        youngMasterPatterns: dialogueResult.youngMasterCount,
+        breakdown: dialogueScore.breakdown,
+      },
+    };
+  }
+
+  /**
+   * Generate enhanced rewrite instructions
+   */
+  generateEnhancedRewriteInstructions(result: EnhancedGateResult): string {
+    const baseInstructions = this.generateRewriteInstructions(result);
+    const additionalInstructions: string[] = [];
+
+    // Dialogue-specific instructions
+    if (result.scores.dialogueQuality < this.enhancedThresholds.dialogueQualityMin) {
+      additionalInstructions.push('\n### Dialogue Quality Improvements:');
+      
+      if (result.dialogueAnalysis.clicheCount > 0) {
+        additionalInstructions.push('- Replace cliché phrases like "Ngươi dám!", "Tìm chết!" with unique dialogue');
+        additionalInstructions.push('- Give each character a distinctive voice');
+      }
+
+      if (result.dialogueAnalysis.infoDumpScore > 20) {
+        additionalInstructions.push('- Reduce exposition in dialogue');
+        additionalInstructions.push('- Show information through action, not "As you know" dialogue');
+      }
+
+      if (result.dialogueAnalysis.exclamationRatio > 40) {
+        additionalInstructions.push('- Reduce exclamation marks (!)');
+        additionalInstructions.push('- Use description to convey emotion instead');
+      }
+
+      if (result.dialogueAnalysis.youngMasterPatterns > 2) {
+        additionalInstructions.push('- Diversify antagonist characterization');
+        additionalInstructions.push('- Give villains unique motivations beyond "arrogant young master"');
+      }
+    }
+
+    return baseInstructions + additionalInstructions.join('\n');
+  }
+}
+
+export function createEnhancedQCGating(
+  projectId: string,
+  thresholds?: Partial<EnhancedGatingThresholds>
+): EnhancedQCGating {
+  return new EnhancedQCGating(projectId, thresholds);
+}
+
+// ============================================================================
+// FULL QC GATING - Integration with Sprint 2/3 features
+// ============================================================================
+
+import { WritingStyleAnalyzer, writingStyleAnalyzer, StyleAnalysisResult } from './writing-style-analyzer';
+import { BattleVarietyTracker, BattleType, TacticalApproach, CombatElement, BattleOutcome } from './battle-variety';
+import { CharacterDepthTracker, CharacterDepthProfile } from './character-depth';
+
+export interface FullGatingThresholds extends EnhancedGatingThresholds {
+  // Writing Style
+  writingStyleMin: number;        // Default: 55
+  showDontTellMin: number;        // Default: 50
+  
+  // Battle Variety
+  battleVarietyMin: number;       // Default: 60
+  
+  // Character Depth
+  characterDepthMin: number;      // Default: 50 (for main characters appearing)
+  villainDepthRequired: boolean;  // Default: true
+}
+
+export const FULL_DEFAULT_THRESHOLDS: FullGatingThresholds = {
+  ...ENHANCED_DEFAULT_THRESHOLDS,
+  writingStyleMin: 55,
+  showDontTellMin: 50,
+  battleVarietyMin: 60,
+  characterDepthMin: 50,
+  villainDepthRequired: true,
+};
+
+export interface FullQCScores extends EnhancedQCScores {
+  writingStyle: number;     // 0-100
+  showDontTell: number;     // 0-100
+  battleVariety: number;    // 0-100 (if battle present)
+  characterDepth: number;   // 0-100 (for main characters in chapter)
+}
+
+export interface FullGateResult extends EnhancedGateResult {
+  scores: FullQCScores;
+  styleAnalysis?: StyleAnalysisResult;
+  battleAnalysis?: {
+    battleType?: BattleType;
+    varietyScore: number;
+    issues: string[];
+    suggestions: string[];
+  };
+  characterAnalysis?: {
+    charactersEvaluated: string[];
+    avgDepthScore: number;
+    villainsLackingDepth: string[];
+    charactersNeedingDevelopment: string[];
+  };
+}
+
+/**
+ * Full QC Gating with all Sprint 1/2/3 integrations
+ */
+export class FullQCGating extends EnhancedQCGating {
+  private fullThresholds: FullGatingThresholds;
+  private battleTracker?: BattleVarietyTracker;
+  private characterTracker?: CharacterDepthTracker;
+
+  constructor(
+    projectId: string,
+    thresholds?: Partial<FullGatingThresholds>,
+    options?: {
+      battleTracker?: BattleVarietyTracker;
+      characterTracker?: CharacterDepthTracker;
+    }
+  ) {
+    super(projectId, thresholds);
+    this.fullThresholds = { ...FULL_DEFAULT_THRESHOLDS, ...thresholds };
+    this.battleTracker = options?.battleTracker;
+    this.characterTracker = options?.characterTracker;
+  }
+
+  /**
+   * Set trackers after initialization
+   */
+  setTrackers(options: {
+    battleTracker?: BattleVarietyTracker;
+    characterTracker?: CharacterDepthTracker;
+  }): void {
+    if (options.battleTracker) this.battleTracker = options.battleTracker;
+    if (options.characterTracker) this.characterTracker = options.characterTracker;
+  }
+
+  /**
+   * Full evaluation with all quality systems
+   */
+  async evaluateFull(
+    chapterNumber: number,
+    content: string,
+    metadata: {
+      protagonistPowerLevel?: { realm: string; realmIndex: number };
+      arcStartPowerLevel?: { realm: string; realmIndex: number };
+      charactersInvolved?: string[];
+      deadCharactersMentioned?: string[];
+      // Battle metadata (optional)
+      battleInfo?: {
+        type: BattleType;
+        approach: TacticalApproach;
+        elements: CombatElement[];
+        outcome: BattleOutcome;
+        enemyPowerLevel: string;
+      };
+    }
+  ): Promise<FullGateResult> {
+    // Get enhanced evaluation (includes dialogue)
+    const enhancedResult = await this.evaluateEnhanced(chapterNumber, content, metadata);
+
+    // Initialize full scores
+    const fullScores: FullQCScores = {
+      ...enhancedResult.scores,
+      writingStyle: 70,
+      showDontTell: 70,
+      battleVariety: 70,
+      characterDepth: 70,
+    };
+
+    const additionalFailures: string[] = [];
+    const additionalWarnings: string[] = [];
+
+    // ========================================
+    // 1. WRITING STYLE ANALYSIS
+    // ========================================
+    const styleAnalysis = writingStyleAnalyzer.analyzeStyle(content);
+    fullScores.writingStyle = styleAnalysis.overallScore;
+    fullScores.showDontTell = styleAnalysis.showDontTellScore;
+
+    if (styleAnalysis.overallScore < this.fullThresholds.writingStyleMin) {
+      additionalWarnings.push(`Writing style score ${styleAnalysis.overallScore} below threshold ${this.fullThresholds.writingStyleMin}`);
+    }
+
+    if (styleAnalysis.showDontTellScore < this.fullThresholds.showDontTellMin) {
+      additionalWarnings.push(`Show-don't-tell score ${styleAnalysis.showDontTellScore} below threshold ${this.fullThresholds.showDontTellMin}`);
+    }
+
+    // Check for major style issues
+    const majorStyleIssues = styleAnalysis.issues.filter(i => i.severity === 'major');
+    if (majorStyleIssues.length >= 2) {
+      additionalFailures.push(`Multiple major writing style issues: ${majorStyleIssues.map(i => i.type).join(', ')}`);
+    }
+
+    // ========================================
+    // 2. BATTLE VARIETY ANALYSIS (if battle present)
+    // ========================================
+    let battleAnalysis: FullGateResult['battleAnalysis'] | undefined;
+    
+    if (metadata.battleInfo && this.battleTracker) {
+      const battleResult = this.battleTracker.analyzeBattle(
+        metadata.battleInfo.type,
+        metadata.battleInfo.approach,
+        metadata.battleInfo.elements,
+        chapterNumber
+      );
+
+      fullScores.battleVariety = battleResult.varietyScore;
+      battleAnalysis = {
+        battleType: metadata.battleInfo.type,
+        varietyScore: battleResult.varietyScore,
+        issues: battleResult.issues,
+        suggestions: battleResult.suggestions,
+      };
+
+      if (battleResult.varietyScore < this.fullThresholds.battleVarietyMin) {
+        additionalWarnings.push(`Battle variety score ${battleResult.varietyScore} below threshold ${this.fullThresholds.battleVarietyMin}`);
+      }
+
+      // Check enemy scaling
+      const scalingResult = this.battleTracker.validateEnemyScaling(
+        metadata.protagonistPowerLevel?.realm || 'unknown',
+        metadata.battleInfo.enemyPowerLevel,
+        metadata.battleInfo.outcome,
+        chapterNumber
+      );
+
+      if (!scalingResult.valid) {
+        additionalWarnings.push(...scalingResult.issues);
+      }
+    } else if (this.detectBattleInContent(content)) {
+      // Battle detected but no metadata provided
+      additionalWarnings.push('Battle scene detected but no battle metadata provided for variety tracking');
+    }
+
+    // ========================================
+    // 3. CHARACTER DEPTH ANALYSIS
+    // ========================================
+    let characterAnalysis: FullGateResult['characterAnalysis'] | undefined;
+
+    if (this.characterTracker && metadata.charactersInvolved && metadata.charactersInvolved.length > 0) {
+      const charactersEvaluated: string[] = [];
+      const depthScores: number[] = [];
+      const villainsLackingDepth: string[] = [];
+      const charactersNeedingDevelopment: string[] = [];
+
+      for (const charName of metadata.charactersInvolved) {
+        const profile = this.characterTracker.getCharacter(charName);
+        if (profile) {
+          charactersEvaluated.push(charName);
+          
+          // Calculate depth score based on profile completeness
+          const depthScore = this.calculateCharacterDepthScore(profile);
+          depthScores.push(depthScore);
+
+          // Check villain depth
+          if (profile.role === 'antagonist' && this.fullThresholds.villainDepthRequired) {
+            if (!profile.villainProfile || profile.villainProfile.sympatheticElements.length < 2) {
+              villainsLackingDepth.push(charName);
+            }
+          }
+
+          // Check if character needs development
+          if (profile.characterArc.growthScore < 30 && profile.role !== 'minor' && profile.role !== 'extra') {
+            charactersNeedingDevelopment.push(charName);
+          }
+        }
+      }
+
+      const avgDepthScore = depthScores.length > 0 
+        ? Math.round(depthScores.reduce((a, b) => a + b, 0) / depthScores.length)
+        : 70;
+
+      fullScores.characterDepth = avgDepthScore;
+
+      characterAnalysis = {
+        charactersEvaluated,
+        avgDepthScore,
+        villainsLackingDepth,
+        charactersNeedingDevelopment,
+      };
+
+      if (avgDepthScore < this.fullThresholds.characterDepthMin) {
+        additionalWarnings.push(`Character depth score ${avgDepthScore} below threshold ${this.fullThresholds.characterDepthMin}`);
+      }
+
+      if (villainsLackingDepth.length > 0) {
+        additionalWarnings.push(`Villains lacking depth: ${villainsLackingDepth.join(', ')}`);
+      }
+    }
+
+    // ========================================
+    // CALCULATE FINAL SCORE
+    // ========================================
+    const hasBattle = !!battleAnalysis;
+    const hasCharacters = !!characterAnalysis;
+
+    // Weights adjust based on what's present
+    let finalOverall: number;
+    if (hasBattle && hasCharacters) {
+      finalOverall = Math.round(
+        enhancedResult.scores.overall * 0.50 +
+        fullScores.writingStyle * 0.20 +
+        fullScores.battleVariety * 0.15 +
+        fullScores.characterDepth * 0.15
+      );
+    } else if (hasBattle) {
+      finalOverall = Math.round(
+        enhancedResult.scores.overall * 0.60 +
+        fullScores.writingStyle * 0.25 +
+        fullScores.battleVariety * 0.15
+      );
+    } else if (hasCharacters) {
+      finalOverall = Math.round(
+        enhancedResult.scores.overall * 0.60 +
+        fullScores.writingStyle * 0.25 +
+        fullScores.characterDepth * 0.15
+      );
+    } else {
+      finalOverall = Math.round(
+        enhancedResult.scores.overall * 0.70 +
+        fullScores.writingStyle * 0.30
+      );
+    }
+
+    fullScores.overall = finalOverall;
+
+    // Combine failures and warnings
+    const allFailures = [...enhancedResult.failures, ...additionalFailures];
+    const allWarnings = [...enhancedResult.warnings, ...additionalWarnings];
+
+    // Determine final action
+    let action: FullGateResult['action'] = 'pass';
+    let passed = true;
+
+    if (finalOverall < this.fullThresholds.autoRewriteBelow || allFailures.length >= 2) {
+      action = 'auto_rewrite';
+      passed = false;
+    } else if (finalOverall < this.fullThresholds.humanReviewBelow || allFailures.length > 0) {
+      action = 'human_review';
+      passed = false;
+    }
+
+    return {
+      ...enhancedResult,
+      passed,
+      action,
+      failures: allFailures,
+      warnings: allWarnings,
+      scores: fullScores,
+      styleAnalysis,
+      battleAnalysis,
+      characterAnalysis,
+    };
+  }
+
+  /**
+   * Calculate character depth score from profile
+   */
+  private calculateCharacterDepthScore(profile: CharacterDepthProfile): number {
+    let score = 50; // Base score
+
+    // Motivation (+15)
+    if (profile.primaryMotivation) score += 5;
+    if (profile.secondaryMotivations.length > 0) score += 5;
+    if (profile.backstory && profile.backstory.length > 50) score += 5;
+
+    // Personality (+15)
+    if (profile.personalityTraits.length >= 3) score += 5;
+    if (profile.speechPattern.quirks.length > 0) score += 5;
+    if (profile.flaw && profile.strength) score += 5;
+
+    // Distinctiveness (+10)
+    if (profile.distinctiveFeatures.mannerisms.length > 0) score += 5;
+    if (profile.distinctiveFeatures.habits.length > 0) score += 5;
+
+    // Growth (+10)
+    score += Math.min(10, profile.characterArc.growthScore / 10);
+
+    return Math.min(100, score);
+  }
+
+  /**
+   * Detect if content contains battle scene
+   */
+  private detectBattleInContent(content: string): boolean {
+    const battlePatterns = [
+      /chiến đấu/gi, /giao đấu/gi, /đánh nhau/gi, /tấn công/gi,
+      /xuất thủ/gi, /công kích/gi, /phòng thủ/gi, /trận đấu/gi,
+      /đấu với/gi, /chiếm ưu thế/gi, /bại trận/gi, /thắng trận/gi,
+    ];
+
+    return battlePatterns.some(p => p.test(content));
+  }
+
+  /**
+   * Generate comprehensive rewrite instructions
+   */
+  generateFullRewriteInstructions(result: FullGateResult): string {
+    const baseInstructions = this.generateEnhancedRewriteInstructions(result);
+    const additionalInstructions: string[] = [];
+
+    // Writing style instructions
+    if (result.styleAnalysis && result.scores.writingStyle < this.fullThresholds.writingStyleMin) {
+      additionalInstructions.push('\n### Writing Style Improvements:');
+      
+      for (const issue of result.styleAnalysis.issues.slice(0, 3)) {
+        additionalInstructions.push(`- ${issue.description}`);
+        additionalInstructions.push(`  → ${issue.suggestion}`);
+      }
+
+      if (result.styleAnalysis.weakVerbs.length > 0) {
+        const topWeak = result.styleAnalysis.weakVerbs.slice(0, 3);
+        additionalInstructions.push(`- Replace weak verbs: ${topWeak.map(v => `"${v.verb}"`).join(', ')}`);
+      }
+    }
+
+    // Battle variety instructions
+    if (result.battleAnalysis && result.battleAnalysis.issues.length > 0) {
+      additionalInstructions.push('\n### Battle Variety Improvements:');
+      for (const issue of result.battleAnalysis.issues) {
+        additionalInstructions.push(`- ${issue}`);
+      }
+      if (result.battleAnalysis.suggestions.length > 0) {
+        additionalInstructions.push('Suggestions:');
+        for (const suggestion of result.battleAnalysis.suggestions) {
+          additionalInstructions.push(`  → ${suggestion}`);
+        }
+      }
+    }
+
+    // Character depth instructions
+    if (result.characterAnalysis) {
+      if (result.characterAnalysis.villainsLackingDepth.length > 0) {
+        additionalInstructions.push('\n### Villain Depth Required:');
+        for (const villain of result.characterAnalysis.villainsLackingDepth) {
+          additionalInstructions.push(`- ${villain}: Add sympathetic elements, backstory motivation`);
+        }
+      }
+
+      if (result.characterAnalysis.charactersNeedingDevelopment.length > 0) {
+        additionalInstructions.push('\n### Character Development Needed:');
+        for (const char of result.characterAnalysis.charactersNeedingDevelopment) {
+          additionalInstructions.push(`- ${char}: Add growth moment or milestone`);
+        }
+      }
+    }
+
+    return baseInstructions + additionalInstructions.join('\n');
+  }
+}
+
+export function createFullQCGating(
+  projectId: string,
+  thresholds?: Partial<FullGatingThresholds>,
+  options?: {
+    battleTracker?: BattleVarietyTracker;
+    characterTracker?: CharacterDepthTracker;
+  }
+): FullQCGating {
+  return new FullQCGating(projectId, thresholds, options);
+}

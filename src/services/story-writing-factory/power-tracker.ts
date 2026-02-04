@@ -538,6 +538,163 @@ export class PowerTracker {
 
     return { realm: realm.name, level };
   }
+
+  // ============================================================================
+  // ENEMY SCALING INTEGRATION (Sprint 2 Enhancement)
+  // ============================================================================
+
+  /**
+   * Parse power level string to numeric value for comparison
+   */
+  parsePowerLevel(level: string): number {
+    const realmValues: Record<string, number> = {};
+    
+    // Build realm values from power system
+    for (let i = 0; i < this.powerSystem.length; i++) {
+      const normalizedName = this.powerSystem[i].name.toLowerCase();
+      realmValues[normalizedName] = (i + 1) * 10;
+    }
+    
+    const lower = level.toLowerCase();
+    let baseValue = 0;
+    
+    for (const [realm, value] of Object.entries(realmValues)) {
+      if (lower.includes(realm)) {
+        baseValue = value;
+        break;
+      }
+    }
+    
+    // Extract sub-level if present
+    const subLevelMatch = lower.match(/(\d+)/);
+    const subLevel = subLevelMatch ? parseInt(subLevelMatch[1]) : 1;
+    
+    return baseValue + subLevel;
+  }
+
+  /**
+   * Validate enemy power scaling against protagonist
+   * Returns whether the battle outcome is logically consistent
+   */
+  validateEnemyScaling(
+    protagonistName: string,
+    enemyLevel: string,
+    battleOutcome: 'clean_victory' | 'pyrrhic_victory' | 'narrow_escape' | 'strategic_retreat' | 'interrupted' | 'draw' | 'defeat_recovery' | 'total_defeat',
+    chapterNumber: number,
+    totalChapters: number = 2000
+  ): {
+    valid: boolean;
+    powerGap: number;
+    issues: string[];
+    suggestions: string[];
+  } {
+    const issues: string[] = [];
+    const suggestions: string[] = [];
+    
+    const protagonistState = this.characterPowers.get(protagonistName);
+    if (!protagonistState) {
+      return { valid: true, powerGap: 0, issues: ['Protagonist power state not found'], suggestions: [] };
+    }
+    
+    const protLevel = this.parsePowerLevel(`${protagonistState.realm} ${protagonistState.level}`);
+    const enemyLvl = this.parsePowerLevel(enemyLevel);
+    const powerGap = enemyLvl - protLevel;
+    
+    // Check if outcome makes sense with power gap
+    const easyWins = ['clean_victory', 'pyrrhic_victory'];
+    const losses = ['defeat_recovery', 'total_defeat'];
+    
+    if (powerGap > 3 && easyWins.includes(battleOutcome)) {
+      issues.push(`Enemy mạnh hơn ${powerGap} levels nhưng thua dễ dàng - không hợp lý`);
+      suggestions.push('Thêm giải thích: item đặc biệt, weakness của enemy, external help');
+    }
+    
+    if (powerGap < -2 && losses.includes(battleOutcome)) {
+      issues.push(`MC mạnh hơn nhiều nhưng vẫn thua - cần giải thích`);
+      suggestions.push('Thêm: enemy có hidden power, MC bị hạn chế, bị phản bội');
+    }
+    
+    // Check pacing - is MC leveling too fast compared to enemies?
+    const expectedRealm = this.getExpectedRealm(chapterNumber, totalChapters);
+    const expectedLevel = this.parsePowerLevel(`${expectedRealm.realm} ${expectedRealm.level}`);
+    
+    if (protLevel > expectedLevel + 10) {
+      issues.push(`MC đang mạnh hơn expected cho chapter ${chapterNumber}`);
+      suggestions.push('Giảm tốc độ đột phá hoặc tăng độ khó của enemy');
+    }
+    
+    if (protLevel < expectedLevel - 10) {
+      issues.push(`MC đang yếu hơn expected cho chapter ${chapterNumber}`);
+      suggestions.push('Cân nhắc power-up event hoặc time-skip');
+    }
+    
+    return {
+      valid: issues.length === 0,
+      powerGap,
+      issues,
+      suggestions,
+    };
+  }
+
+  /**
+   * Get power comparison context for battle planning
+   */
+  getBattleContext(protagonistName: string, enemyLevel: string, chapterNumber: number): string {
+    const protagonistState = this.characterPowers.get(protagonistName);
+    if (!protagonistState) return 'Protagonist power state not found';
+    
+    const protLevel = this.parsePowerLevel(`${protagonistState.realm} ${protagonistState.level}`);
+    const enemyLvl = this.parsePowerLevel(enemyLevel);
+    const powerGap = enemyLvl - protLevel;
+    
+    const lines = [
+      `## Battle Power Context`,
+      `**MC:** ${protagonistState.realm} ${protagonistState.level} tầng (power: ${protLevel})`,
+      `**Enemy:** ${enemyLevel} (power: ${enemyLvl})`,
+      `**Power Gap:** ${powerGap > 0 ? '+' : ''}${powerGap} (${this.getPowerGapDescription(powerGap)})`,
+      '',
+      '### Expected Outcome:',
+    ];
+    
+    if (powerGap <= -5) {
+      lines.push('- MC nên thắng dễ dàng (clean_victory)');
+      lines.push('- Hoặc có thể dùng để showcase power');
+    } else if (powerGap <= -2) {
+      lines.push('- MC có lợi thế, nên thắng');
+      lines.push('- Có thể khó khăn nếu enemy có hidden cards');
+    } else if (powerGap <= 2) {
+      lines.push('- Trận đấu cân bằng');
+      lines.push('- Outcome phụ thuộc vào tactics, items, support');
+    } else if (powerGap <= 5) {
+      lines.push('- Enemy mạnh hơn, MC cần edge');
+      lines.push('- Reasonable outcomes: pyrrhic_victory, narrow_escape, strategic_retreat');
+    } else {
+      lines.push('- Enemy quá mạnh');
+      lines.push('- MC cần miracle/trump card để thắng');
+      lines.push('- Reasonable outcomes: escape, strategic_retreat, interrupted');
+    }
+    
+    // Add MC's recent abilities/items that could affect battle
+    if (protagonistState.abilities.length > 0) {
+      lines.push('');
+      lines.push(`### MC Abilities: ${protagonistState.abilities.slice(-5).join(', ')}`);
+    }
+    
+    const recentItems = protagonistState.items.slice(-3);
+    if (recentItems.length > 0) {
+      lines.push(`### Recent Items: ${recentItems.map(i => `${i.name} (${i.grade})`).join(', ')}`);
+    }
+    
+    return lines.join('\n');
+  }
+
+  private getPowerGapDescription(gap: number): string {
+    if (gap <= -5) return 'MC overwhelmingly stronger';
+    if (gap <= -2) return 'MC stronger';
+    if (gap <= 2) return 'Even match';
+    if (gap <= 5) return 'Enemy stronger';
+    return 'Enemy much stronger';
+  }
 }
 
 // Export factory function

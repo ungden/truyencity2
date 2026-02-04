@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { AuthGuard } from '@/components/admin/auth-guard';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -104,7 +104,7 @@ const STATUS_COLORS: Record<string, string> = {
   in_production: 'bg-blue-500',
 };
 
-export default function FactoryBlueprintsPage() {
+function FactoryBlueprintsContent() {
   const searchParams = useSearchParams();
   const [blueprints, setBlueprints] = useState<StoryBlueprint[]>([]);
   const [loading, setLoading] = useState(true);
@@ -653,5 +653,13 @@ export default function FactoryBlueprintsPage() {
         </Dialog>
       </div>
     </AuthGuard>
+  );
+}
+
+export default function FactoryBlueprintsPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center h-screen"><Loader2 className="w-8 h-8 animate-spin" /></div>}>
+      <FactoryBlueprintsContent />
+    </Suspense>
   );
 }

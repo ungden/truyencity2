@@ -1,11 +1,25 @@
 /**
  * Gemini Image Service for Story Factory
- * Uses Google Imagen 3 for cover image generation
+ * Uses Gemini 3 Pro Image Preview (Nano Banana Pro) ONLY
+ * 
+ * Features:
+ * - Best quality image generation with 4K support
+ * - Advanced reasoning (Thinking mode)
+ * - Upload to Supabase Storage
+ * - Job-based async processing for long operations
  */
 
-import { GeminiImageOptions, GeminiImageResult, ServiceResult } from './types';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { 
+  GeminiImageOptions, 
+  GeminiImageResult, 
+  ServiceResult,
+  ImageAspectRatio,
+  ImageResolution 
+} from './types';
 
 const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta';
+const MODEL = 'gemini-3-pro-image-preview'; // Nano Banana Pro - ONLY model
 
 export interface ImageGenerationRequest {
   prompt: string;
@@ -13,49 +27,69 @@ export interface ImageGenerationRequest {
   options?: GeminiImageOptions;
 }
 
+export interface ImageJobResult {
+  jobId: string;
+  status: 'pending' | 'running' | 'completed' | 'failed';
+  resultUrl?: string;
+  errorMessage?: string;
+}
+
 export class GeminiImageService {
   private apiKey: string;
-  private defaultModel: string;
+  private supabaseUrl: string;
+  private supabaseKey: string;
 
-  constructor(options?: { apiKey?: string; defaultModel?: string }) {
+  constructor(options?: { 
+    apiKey?: string; 
+    supabaseUrl?: string;
+    supabaseKey?: string;
+  }) {
     this.apiKey = options?.apiKey || process.env.GEMINI_API_KEY || '';
-    this.defaultModel = options?.defaultModel || 'imagen-3.0-generate-001';
+    this.supabaseUrl = options?.supabaseUrl || process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+    this.supabaseKey = options?.supabaseKey || process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
     if (!this.apiKey) {
       console.warn('[GeminiImageService] No API key provided. Set GEMINI_API_KEY env var.');
     }
   }
 
+  private getSupabase(): SupabaseClient {
+    return createClient(this.supabaseUrl, this.supabaseKey);
+  }
+
   /**
-   * Generate image using Imagen 3
+   * Generate image using Nano Banana Pro (gemini-3-pro-image-preview)
    */
   async generateImage(request: ImageGenerationRequest): Promise<ServiceResult<GeminiImageResult>> {
     const { prompt, negativePrompt, options } = request;
-    const model = options?.model || this.defaultModel;
 
     try {
+      const fullPrompt = this.buildImagePrompt(prompt, negativePrompt);
+
       const requestBody: Record<string, unknown> = {
-        instances: [
-          {
-            prompt: this.buildImagePrompt(prompt, negativePrompt),
-          },
-        ],
-        parameters: {
-          sampleCount: options?.numberOfImages || 1,
-          aspectRatio: options?.aspectRatio || '3:4', // Default book cover ratio
-          personGeneration: options?.personGeneration || 'allow_adult',
-          safetyFilterLevel: options?.safetyFilterLevel || 'block_medium_and_above',
-        },
+        contents: [{
+          parts: [{ text: fullPrompt }]
+        }],
+        generationConfig: {
+          responseModalities: ['TEXT', 'IMAGE'],
+          imageConfig: {
+            aspectRatio: options?.aspectRatio || '3:4',
+            imageSize: options?.imageSize || '2K'
+          }
+        }
       };
 
-      // Imagen 3 uses a different endpoint structure
+      if (options?.useGoogleSearch) {
+        requestBody.tools = [{ google_search: {} }];
+      }
+
+      console.log(`[GeminiImageService] Generating with ${MODEL}...`);
+
       const response = await fetch(
-        `${GEMINI_API_BASE}/models/${model}:predict?key=${this.apiKey}`,
+        `${GEMINI_API_BASE}/models/${MODEL}:generateContent?key=${this.apiKey}`,
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(requestBody),
         }
       );
@@ -64,7 +98,6 @@ export class GeminiImageService {
         const errorText = await response.text();
         console.error('[GeminiImageService] API error:', response.status, errorText);
 
-        // Check for specific error types
         if (response.status === 400 && errorText.includes('SAFETY')) {
           return {
             success: false,
@@ -75,33 +108,45 @@ export class GeminiImageService {
 
         return {
           success: false,
-          error: `Imagen API error: ${response.status} - ${errorText}`,
-          errorCode: `IMAGEN_${response.status}`,
+          error: `Gemini API error: ${response.status} - ${errorText}`,
+          errorCode: `GEMINI_${response.status}`,
         };
       }
 
       const data = await response.json();
 
-      // Extract images from response
-      const images =
-        data.predictions?.map((pred: { bytesBase64Encoded?: string; mimeType?: string }) => ({
-          base64: pred.bytesBase64Encoded || '',
-          mimeType: pred.mimeType || 'image/png',
-        })) || [];
+      const images: Array<{ base64: string; mimeType: string }> = [];
+      let responseText = '';
+
+      const parts = data.candidates?.[0]?.content?.parts || [];
+      for (const part of parts) {
+        if (part.thought) continue;
+        if (part.text) {
+          responseText += part.text;
+        } else if (part.inlineData) {
+          images.push({
+            base64: part.inlineData.data,
+            mimeType: part.inlineData.mimeType || 'image/png',
+          });
+        }
+      }
 
       if (images.length === 0) {
         return {
           success: false,
           error: 'No images generated',
-          errorCode: 'IMAGEN_NO_OUTPUT',
+          errorCode: 'GEMINI_NO_IMAGE_OUTPUT',
         };
       }
+
+      console.log(`[GeminiImageService] Generated ${images.length} image(s)`);
 
       return {
         success: true,
         data: {
           success: true,
           images,
+          text: responseText || undefined,
         },
       };
     } catch (error) {
@@ -109,7 +154,7 @@ export class GeminiImageService {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
-        errorCode: 'IMAGEN_EXCEPTION',
+        errorCode: 'GEMINI_EXCEPTION',
       };
     }
   }
@@ -121,25 +166,289 @@ export class GeminiImageService {
     title: string,
     genre: string,
     description: string,
-    style?: string
+    style?: string,
+    options?: {
+      resolution?: ImageResolution;
+      aspectRatio?: ImageAspectRatio;
+    }
   ): Promise<ServiceResult<GeminiImageResult>> {
     const prompt = this.buildCoverPrompt(title, genre, description, style);
 
     return this.generateImage({
       prompt,
-      negativePrompt: 'text, words, letters, watermark, signature, blurry, low quality, distorted',
+      negativePrompt: 'text, words, letters, watermark, signature, blurry, low quality, distorted, deformed',
       options: {
-        aspectRatio: '3:4', // Book cover ratio
+        aspectRatio: options?.aspectRatio || '3:4',
+        imageSize: options?.resolution || '2K',
         numberOfImages: 1,
-        personGeneration: 'allow_adult',
-        safetyFilterLevel: 'block_medium_and_above',
       },
     });
   }
 
   /**
-   * Build image prompt with optional negative prompt
+   * Generate cover with high resolution (4K)
    */
+  async generateHighResCover(
+    title: string,
+    genre: string,
+    description: string,
+    style?: string
+  ): Promise<ServiceResult<GeminiImageResult>> {
+    return this.generateBookCover(title, genre, description, style, {
+      resolution: '4K'
+    });
+  }
+
+  /**
+   * Generate cover and upload to Supabase Storage
+   */
+  async generateAndUploadCover(
+    title: string,
+    genre: string,
+    description: string,
+    options?: {
+      resolution?: ImageResolution;
+      aspectRatio?: ImageAspectRatio;
+      bucket?: string;
+      filePrefix?: string;
+    }
+  ): Promise<ServiceResult<{ publicUrl: string; fileName: string }>> {
+    const result = await this.generateBookCover(title, genre, description, undefined, {
+      resolution: options?.resolution || '2K',
+      aspectRatio: options?.aspectRatio || '3:4',
+    });
+
+    if (!result.success || !result.data?.images?.[0]) {
+      return {
+        success: false,
+        error: result.error || 'Failed to generate image',
+        errorCode: result.errorCode,
+      };
+    }
+
+    const image = result.data.images[0];
+    return this.uploadToStorage(
+      image.base64,
+      image.mimeType,
+      options?.bucket || 'covers',
+      options?.filePrefix || 'cover'
+    );
+  }
+
+  /**
+   * Upload base64 image to Supabase Storage
+   */
+  async uploadToStorage(
+    base64Data: string,
+    mimeType: string,
+    bucket: string = 'covers',
+    filePrefix: string = 'ai'
+  ): Promise<ServiceResult<{ publicUrl: string; fileName: string }>> {
+    try {
+      const supabase = this.getSupabase();
+      
+      const ext = mimeType.includes('png') ? 'png' : 'jpg';
+      const fileName = `${filePrefix}-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+      const buffer = Buffer.from(base64Data, 'base64');
+
+      const { error: uploadError } = await supabase.storage
+        .from(bucket)
+        .upload(fileName, buffer, {
+          contentType: mimeType,
+          upsert: true
+        });
+
+      if (uploadError) {
+        console.error('[GeminiImageService] Upload error:', uploadError);
+        return {
+          success: false,
+          error: `Storage upload failed: ${uploadError.message}`,
+          errorCode: 'STORAGE_UPLOAD_ERROR',
+        };
+      }
+
+      const { data: publicUrlData } = supabase.storage
+        .from(bucket)
+        .getPublicUrl(fileName);
+
+      const publicUrl = publicUrlData?.publicUrl;
+      if (!publicUrl) {
+        return {
+          success: false,
+          error: 'Failed to get public URL',
+          errorCode: 'STORAGE_URL_ERROR',
+        };
+      }
+
+      console.log(`[GeminiImageService] Uploaded to ${bucket}/${fileName}`);
+
+      return {
+        success: true,
+        data: { publicUrl, fileName },
+      };
+    } catch (error) {
+      console.error('[GeminiImageService] Upload exception:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        errorCode: 'STORAGE_EXCEPTION',
+      };
+    }
+  }
+
+  /**
+   * Create an image generation job for async processing
+   */
+  async createImageJob(
+    prompt: string,
+    metadata?: Record<string, unknown>
+  ): Promise<ServiceResult<{ jobId: string }>> {
+    try {
+      const supabase = this.getSupabase();
+
+      const { data, error } = await supabase
+        .from('ai_image_jobs')
+        .insert({
+          prompt,
+          status: 'pending',
+          metadata,
+          created_at: new Date().toISOString(),
+        })
+        .select('id')
+        .single();
+
+      if (error) {
+        return {
+          success: false,
+          error: `Failed to create job: ${error.message}`,
+          errorCode: 'JOB_CREATE_ERROR',
+        };
+      }
+
+      return {
+        success: true,
+        data: { jobId: data.id },
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        errorCode: 'JOB_EXCEPTION',
+      };
+    }
+  }
+
+  /**
+   * Process an image job (for use in Edge Functions)
+   */
+  async processImageJob(jobId: string): Promise<ServiceResult<ImageJobResult>> {
+    const supabase = this.getSupabase();
+
+    try {
+      const { data: job, error: fetchError } = await supabase
+        .from('ai_image_jobs')
+        .select('*')
+        .eq('id', jobId)
+        .single();
+
+      if (fetchError || !job) {
+        return {
+          success: false,
+          error: 'Job not found',
+          errorCode: 'JOB_NOT_FOUND',
+        };
+      }
+
+      await supabase
+        .from('ai_image_jobs')
+        .update({ status: 'running', updated_at: new Date().toISOString() })
+        .eq('id', jobId);
+
+      const result = await this.generateImage({
+        prompt: job.prompt,
+        options: job.metadata?.options || {},
+      });
+
+      if (!result.success || !result.data?.images?.[0]) {
+        await supabase
+          .from('ai_image_jobs')
+          .update({ 
+            status: 'failed', 
+            error_message: result.error,
+            updated_at: new Date().toISOString() 
+          })
+          .eq('id', jobId);
+
+        return {
+          success: false,
+          error: result.error,
+          data: { jobId, status: 'failed', errorMessage: result.error },
+        };
+      }
+
+      const image = result.data.images[0];
+      const uploadResult = await this.uploadToStorage(
+        image.base64,
+        image.mimeType,
+        job.metadata?.bucket || 'covers',
+        job.metadata?.filePrefix || 'ai'
+      );
+
+      if (!uploadResult.success || !uploadResult.data) {
+        await supabase
+          .from('ai_image_jobs')
+          .update({ 
+            status: 'failed', 
+            error_message: uploadResult.error,
+            updated_at: new Date().toISOString() 
+          })
+          .eq('id', jobId);
+
+        return {
+          success: false,
+          error: uploadResult.error,
+          data: { jobId, status: 'failed', errorMessage: uploadResult.error },
+        };
+      }
+
+      await supabase
+        .from('ai_image_jobs')
+        .update({ 
+          status: 'completed', 
+          result_url: uploadResult.data.publicUrl,
+          updated_at: new Date().toISOString() 
+        })
+        .eq('id', jobId);
+
+      return {
+        success: true,
+        data: { 
+          jobId, 
+          status: 'completed', 
+          resultUrl: uploadResult.data.publicUrl 
+        },
+      };
+    } catch (error) {
+      console.error(`[GeminiImageService] Job ${jobId} error:`, error);
+      
+      await supabase
+        .from('ai_image_jobs')
+        .update({ 
+          status: 'failed', 
+          error_message: error instanceof Error ? error.message : 'Unknown error',
+          updated_at: new Date().toISOString() 
+        })
+        .eq('id', jobId);
+
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        data: { jobId, status: 'failed' },
+      };
+    }
+  }
+
   private buildImagePrompt(prompt: string, negativePrompt?: string): string {
     if (negativePrompt) {
       return `${prompt}. Avoid: ${negativePrompt}`;
@@ -147,9 +456,6 @@ export class GeminiImageService {
     return prompt;
   }
 
-  /**
-   * Build a prompt for book cover generation
-   */
   private buildCoverPrompt(
     title: string,
     genre: string,
@@ -159,111 +465,81 @@ export class GeminiImageService {
     const genreStyles = this.getGenreStyle(genre);
     const baseStyle = style || genreStyles.style;
 
-    return `Book cover art for "${title}". 
-Genre: ${genre}. 
-Style: ${baseStyle}, professional book cover design, high quality illustration, dramatic lighting, cinematic composition.
-Scene: ${description}
-${genreStyles.elements}
-No text, no title, no words - image only. Ultra detailed, 8k quality, trending on artstation.`;
+    return `Create a stunning professional book cover illustration.
+
+TITLE: "${title}"
+GENRE: ${genre}
+STYLE: ${baseStyle}
+
+SCENE DESCRIPTION:
+${description}
+
+VISUAL REQUIREMENTS:
+- ${genreStyles.elements}
+- Professional book cover composition
+- Dramatic cinematic lighting with rich colors
+- High detail and ultra-sharp focus
+- Atmospheric depth and mood
+- Visually striking and eye-catching design
+
+IMPORTANT: 
+- Generate ONLY the visual artwork, NO text or title on the cover
+- No watermarks or signatures
+- Create a complete, publication-ready cover illustration`;
   }
 
-  /**
-   * Get genre-specific style elements
-   */
   private getGenreStyle(genre: string): { style: string; elements: string } {
     const styles: Record<string, { style: string; elements: string }> = {
       'system-litrpg': {
-        style: 'fantasy RPG game art',
-        elements:
-          'holographic UI elements, status windows, gaming interface aesthetic, glowing effects',
+        style: 'epic fantasy RPG game art with holographic UI elements',
+        elements: 'Glowing status windows, magical interface elements, gaming aesthetic, fantasy world with modern UI overlays',
       },
       'urban-modern': {
-        style: 'modern urban photography style',
-        elements:
-          'city skyline, modern architecture, sleek corporate aesthetic, neon lights, luxury cars',
+        style: 'sleek modern urban photography with cinematic color grading',
+        elements: 'City skyline, modern architecture, luxury aesthetic, neon lights reflecting on wet streets, high contrast',
       },
       romance: {
-        style: 'romantic illustration',
-        elements:
-          'soft lighting, emotional atmosphere, beautiful characters, dreamy bokeh, warm colors',
+        style: 'romantic soft-focus illustration with dreamy atmosphere',
+        elements: 'Soft golden hour lighting, emotional atmosphere, beautiful characters, dreamy bokeh, warm pastel colors',
       },
       'huyen-huyen': {
-        style: 'Chinese fantasy xuanhuan art',
-        elements:
-          'mystical creatures, floating mountains, magical auras, ancient Chinese architecture, celestial themes',
+        style: 'Chinese xuanhuan fantasy art with ethereal quality',
+        elements: 'Mystical creatures, floating mountains in clouds, magical auras, ancient Chinese architecture, celestial themes',
       },
       'action-adventure': {
-        style: 'action movie poster',
-        elements:
-          'dynamic poses, explosions, intense lighting, dramatic composition, epic scale',
+        style: 'dynamic action movie poster with explosive energy',
+        elements: 'Dynamic poses in motion, dramatic lighting effects, intense composition, epic sense of scale',
       },
       historical: {
-        style: 'historical painting',
-        elements:
-          'period-accurate costumes, ancient architecture, traditional art style, rich textures',
+        style: 'classical oil painting with historical accuracy',
+        elements: 'Period-accurate costumes and architecture, traditional art techniques, rich detailed textures, golden age lighting',
       },
       'tien-hiep': {
-        style: 'Chinese cultivation fantasy art',
-        elements:
-          'immortal cultivators, sword qi, floating pavilions, clouds, celestial atmosphere, yin-yang symbolism',
+        style: 'Chinese cultivation fantasy with celestial atmosphere',
+        elements: 'Immortal cultivators with flowing robes, sword qi energy, floating pavilions in clouds, yin-yang symbolism, ethereal mist',
       },
       'sci-fi-apocalypse': {
-        style: 'sci-fi concept art',
-        elements:
-          'futuristic technology, post-apocalyptic landscapes, cyberpunk elements, alien worlds, space ships',
+        style: 'cyberpunk sci-fi concept art with dystopian atmosphere',
+        elements: 'Futuristic technology, post-apocalyptic landscapes, neon holographics, alien worlds, massive spacecraft',
       },
       'horror-mystery': {
-        style: 'dark gothic art',
-        elements:
-          'atmospheric shadows, eerie lighting, mysterious silhouettes, fog, haunting imagery',
+        style: 'dark gothic atmospheric art with unsettling mood',
+        elements: 'Deep shadows and atmospheric fog, eerie dramatic lighting, mysterious silhouettes, haunting imagery',
       },
     };
 
-    return (
-      styles[genre] || {
-        style: 'professional book cover art',
-        elements: 'high quality illustration, dramatic lighting',
-      }
-    );
+    return styles[genre] || {
+      style: 'professional fantasy book cover art',
+      elements: 'High quality dramatic illustration, cinematic lighting, atmospheric depth',
+    };
   }
 
-  /**
-   * Convert base64 image to data URL
-   */
   base64ToDataUrl(base64: string, mimeType: string = 'image/png'): string {
     return `data:${mimeType};base64,${base64}`;
   }
 
   /**
-   * Upload image to storage and return URL
-   * This is a placeholder - implement with your storage solution
-   */
-  async uploadImage(
-    base64: string,
-    filename: string,
-    bucket: string = 'covers'
-  ): Promise<ServiceResult<string>> {
-    // This would be implemented with Supabase Storage or similar
-    // For now, return a placeholder
-    console.log(`[GeminiImageService] Would upload ${filename} to ${bucket}`);
-
-    // TODO: Implement actual upload
-    // const supabase = createServerClient();
-    // const { data, error } = await supabase.storage
-    //   .from(bucket)
-    //   .upload(filename, Buffer.from(base64, 'base64'), {
-    //     contentType: 'image/png',
-    //   });
-
-    return {
-      success: false,
-      error: 'Image upload not implemented - use Supabase storage',
-      errorCode: 'NOT_IMPLEMENTED',
-    };
-  }
-
-  /**
-   * Generate cover with retry and fallback
+   * Generate cover with retry
    */
   async generateCoverWithRetry(
     title: string,
@@ -274,7 +550,11 @@ No text, no title, no words - image only. Ultra detailed, 8k quality, trending o
     let lastError: string | undefined;
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      const result = await this.generateBookCover(title, genre, description);
+      console.log(`[GeminiImageService] Attempt ${attempt}/${maxRetries}...`);
+      
+      const result = await this.generateBookCover(title, genre, description, undefined, {
+        resolution: '2K'
+      });
 
       if (result.success) {
         return result;
@@ -282,16 +562,11 @@ No text, no title, no words - image only. Ultra detailed, 8k quality, trending o
 
       lastError = result.error;
 
-      // If safety blocked, try with modified prompt
-      if (result.errorCode === 'IMAGE_SAFETY_BLOCK' && attempt < maxRetries) {
-        console.warn(`[GeminiImageService] Safety block on attempt ${attempt}, modifying prompt...`);
-        // Simplify the description for next attempt
+      if (result.errorCode === 'IMAGE_SAFETY_BLOCK') {
+        console.warn(`[GeminiImageService] Safety block, modifying prompt...`);
         const simplifiedDescription = this.sanitizeDescription(description);
         const retryResult = await this.generateBookCover(
-          title,
-          genre,
-          simplifiedDescription,
-          'abstract artistic'
+          title, genre, simplifiedDescription, 'abstract artistic'
         );
         if (retryResult.success) {
           return retryResult;
@@ -299,7 +574,6 @@ No text, no title, no words - image only. Ultra detailed, 8k quality, trending o
       }
 
       if (attempt < maxRetries) {
-        console.warn(`[GeminiImageService] Attempt ${attempt} failed, retrying...`);
         await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
       }
     }
@@ -307,15 +581,54 @@ No text, no title, no words - image only. Ultra detailed, 8k quality, trending o
     return {
       success: false,
       error: `Failed after ${maxRetries} attempts: ${lastError}`,
-      errorCode: 'IMAGEN_MAX_RETRIES',
+      errorCode: 'GEMINI_MAX_RETRIES',
     };
   }
 
   /**
-   * Sanitize description to avoid safety filters
+   * Generate cover and upload with retry
    */
+  async generateCoverWithUpload(
+    title: string,
+    genre: string,
+    description: string,
+    options?: {
+      bucket?: string;
+      maxRetries?: number;
+    }
+  ): Promise<ServiceResult<string>> {
+    const result = await this.generateCoverWithRetry(
+      title, genre, description, options?.maxRetries || 3
+    );
+
+    if (!result.success || !result.data?.images?.[0]) {
+      return {
+        success: false,
+        error: result.error,
+        errorCode: result.errorCode,
+      };
+    }
+
+    const image = result.data.images[0];
+    const uploadResult = await this.uploadToStorage(
+      image.base64, image.mimeType, options?.bucket || 'covers', 'cover'
+    );
+
+    if (!uploadResult.success || !uploadResult.data) {
+      return {
+        success: false,
+        error: uploadResult.error,
+        errorCode: uploadResult.errorCode,
+      };
+    }
+
+    return {
+      success: true,
+      data: uploadResult.data.publicUrl,
+    };
+  }
+
   private sanitizeDescription(description: string): string {
-    // Remove potentially problematic words
     const safeDescription = description
       .replace(/blood|gore|death|kill|murder|violent|weapon/gi, '')
       .replace(/sexy|nude|naked|erotic/gi, '')
@@ -325,22 +638,24 @@ No text, no title, no words - image only. Ultra detailed, 8k quality, trending o
     return safeDescription || 'dramatic fantasy scene with magical elements';
   }
 
-  /**
-   * Check if service is configured
-   */
   isConfigured(): boolean {
     return !!this.apiKey;
   }
 
-  /**
-   * Set API key
-   */
   setApiKey(apiKey: string): void {
     this.apiKey = apiKey;
   }
+
+  getModelInfo(): { id: string; name: string; description: string } {
+    return {
+      id: MODEL,
+      name: 'Nano Banana Pro',
+      description: 'Best quality, 4K resolution, advanced reasoning, text rendering'
+    };
+  }
 }
 
-// Singleton instance
+// Singleton
 let imageServiceInstance: GeminiImageService | null = null;
 
 export function getGeminiImageService(): GeminiImageService {
@@ -352,7 +667,8 @@ export function getGeminiImageService(): GeminiImageService {
 
 export function createGeminiImageService(options?: {
   apiKey?: string;
-  defaultModel?: string;
+  supabaseUrl?: string;
+  supabaseKey?: string;
 }): GeminiImageService {
   return new GeminiImageService(options);
 }

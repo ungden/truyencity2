@@ -678,12 +678,23 @@ export interface GeminiGenerateOptions {
   systemInstruction?: string;
 }
 
+// Image resolution options for Gemini 3 Pro Image
+export type ImageResolution = '1K' | '2K' | '4K';
+
+// Expanded aspect ratio options for Gemini 3 Pro Image
+export type ImageAspectRatio = '1:1' | '2:3' | '3:2' | '3:4' | '4:3' | '4:5' | '5:4' | '9:16' | '16:9' | '21:9';
+
+// Gemini image model - Nano Banana Pro only
+export type GeminiImageModel = 'gemini-3-pro-image-preview';
+
 export interface GeminiImageOptions {
-  model?: string;
+  model?: GeminiImageModel;
   numberOfImages?: number;
-  aspectRatio?: '1:1' | '3:4' | '4:3' | '9:16' | '16:9';
+  aspectRatio?: ImageAspectRatio;
+  imageSize?: ImageResolution;  // For gemini-3-pro-image-preview: '1K', '2K', '4K'
   personGeneration?: 'dont_allow' | 'allow_adult';
   safetyFilterLevel?: 'block_low_and_above' | 'block_medium_and_above' | 'block_only_high';
+  useGoogleSearch?: boolean;  // Enable grounding with Google Search
 }
 
 export interface GeminiImageResult {
@@ -692,5 +703,6 @@ export interface GeminiImageResult {
     base64: string;
     mimeType: string;
   }>;
+  text?: string;  // Model may return text alongside images
   error?: string;
 }

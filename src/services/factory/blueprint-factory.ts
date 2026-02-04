@@ -298,6 +298,7 @@ OUTPUT JSON:
 
   /**
    * Generate cover image for blueprint
+   * Uses Nano Banana Pro (gemini-3-pro-image-preview) and uploads to Supabase Storage
    */
   async generateCover(blueprintId: string): Promise<ServiceResult<string>> {
     const supabase = this.getSupabase();
@@ -325,15 +326,15 @@ OUTPUT JSON:
       };
     }
 
-    // Generate cover image
-    const imageResult = await this.imageService.generateCoverWithRetry(
+    // Generate cover image and upload to storage
+    const imageResult = await this.imageService.generateCoverWithUpload(
       blueprint.title,
       blueprint.genre,
       blueprint.cover_prompt,
-      3
+      { bucket: 'covers', maxRetries: 3 }
     );
 
-    if (!imageResult.success || !imageResult.data?.images?.[0]) {
+    if (!imageResult.success || !imageResult.data) {
       return {
         success: false,
         error: imageResult.error || 'Failed to generate cover',
@@ -341,23 +342,20 @@ OUTPUT JSON:
       };
     }
 
-    // TODO: Upload to storage and get URL
-    // For now, return base64 data URL
-    const image = imageResult.data.images[0];
-    const dataUrl = this.imageService.base64ToDataUrl(image.base64, image.mimeType);
+    const publicUrl = imageResult.data;
 
-    // Update blueprint with cover URL (placeholder)
+    // Update blueprint with cover URL
     await supabase
       .from('story_blueprints')
       .update({
-        cover_url: dataUrl.substring(0, 200) + '...', // Truncate for DB
+        cover_url: publicUrl,
         status: 'ready',
       })
       .eq('id', blueprintId);
 
     return {
       success: true,
-      data: dataUrl,
+      data: publicUrl,
     };
   }
 

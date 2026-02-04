@@ -33,7 +33,8 @@ export { ChapterWriter, chapterWriter } from './chapter';
 export { QualityGate, ContentAnalyzer, qualityGate, contentAnalyzer } from './quality';
 export { StoryPlanner, storyPlanner } from './planner';
 export { StoryRunner, createStoryRunner, getStoryRunner } from './runner';
-export { MemoryManager, createMemoryManager } from './memory';
+export { MemoryManager, createMemoryManager, validateSummaryQuality, extractKeyElements, generateBetterSummary } from './memory';
+export type { SummaryQualityReport, HierarchicalMemory, ChapterMemory, ArcMemory } from './memory';
 export { CostOptimizer, WorkflowOptimizer, getCostOptimizer, createCostOptimizer } from './cost-optimizer';
 
 // New systems for consistency, power tracking, and RAG
@@ -47,8 +48,16 @@ export type { PowerState, ProgressionEvent, ProgressionValidation } from './powe
 // Phase 2: Canon Resolver, QC Gating, Beat Ledger, Style Bible, Cost Cache
 export { CanonResolver, createCanonResolver, CanonLevel } from './canon-resolver';
 export type { CanonFact, ConflictReport, ContinuityIssue } from './canon-resolver';
-export { QCGating, createQCGating, DEFAULT_THRESHOLDS } from './qc-gating';
-export type { GatingThresholds, QCScores, GateResult } from './qc-gating';
+export { 
+  QCGating, createQCGating, DEFAULT_THRESHOLDS,
+  EnhancedQCGating, createEnhancedQCGating, ENHANCED_DEFAULT_THRESHOLDS,
+  FullQCGating, createFullQCGating, FULL_DEFAULT_THRESHOLDS,
+} from './qc-gating';
+export type { 
+  GatingThresholds, QCScores, GateResult,
+  EnhancedGatingThresholds, EnhancedQCScores, EnhancedGateResult,
+  FullGatingThresholds, FullQCScores, FullGateResult,
+} from './qc-gating';
 export { BeatLedger, createBeatLedger } from './beat-ledger';
 export type { BeatEntry, BeatCategory, PlotBeat, EmotionalBeat, SettingBeat, BeatRecommendation } from './beat-ledger';
 export { getEnhancedStyleBible, buildStyleContext, QIDIAN_VOCABULARY, QIDIAN_EXEMPLARS, PACING_RULES, CLIFFHANGER_TECHNIQUES } from './style-bible';
@@ -57,12 +66,34 @@ export { CostCache, BatchSummarizer, createCostCache, createBatchSummarizer, MOD
 export type { ModelTier } from './cost-cache';
 
 // Auto-Rewriter
-export { AutoRewriter, createAutoRewriter, DEFAULT_REWRITE_CONFIG } from './auto-rewriter';
+export { AutoRewriter, createAutoRewriter, createFullAutoRewriter, DEFAULT_REWRITE_CONFIG } from './auto-rewriter';
 export type { RewriteConfig, RewriteResult } from './auto-rewriter';
 
 // Author Generator
 export { AuthorGenerator, createAuthorGenerator, generateQuickAuthor } from './author-generator';
 export type { GeneratedAuthor, AuthorGenerationConfig } from './author-generator';
+
+// Sprint 1 Enhanced Modules
+export { DialogueAnalyzer, createDialogueAnalyzer, dialogueAnalyzer, getQuickDialogueScore } from './dialogue-analyzer';
+export type { DialogueAnalysisResult, DialogueIssue, CharacterVoiceProfile, AttributedDialogue, SubtextAnalysis } from './dialogue-analyzer';
+export { ItemTracker, createItemTracker, detectItemsInContent, generateItemNameSuggestions, getItemStatistics } from './item-tracker';
+export type { TrackedItem, ItemGrade, ItemCategory, ItemNameValidation, ItemUsageReminder, EconomyValidation, DetectedItem, ItemStatistics } from './item-tracker';
+
+// Sprint 2 Character & Battle Systems
+export { CharacterDepthTracker, createCharacterDepthTracker } from './character-depth';
+export type { 
+  CharacterDepthProfile, CharacterMilestone, RomanceProgression, CharacterUniquenessReport,
+  CharacterRole, PersonalityTrait, MotivationType, RelationshipStage 
+} from './character-depth';
+export { BattleVarietyTracker, createBattleVarietyTracker, BATTLE_TEMPLATES } from './battle-variety';
+export type { 
+  BattleRecord, BattleVarietyReport, EnemyScaling,
+  BattleType, TacticalApproach, BattleOutcome, CombatElement 
+} from './battle-variety';
+
+// Sprint 3 Writing Style Analysis
+export { WritingStyleAnalyzer, writingStyleAnalyzer } from './writing-style-analyzer';
+export type { StyleAnalysisResult, StyleIssue } from './writing-style-analyzer';
 
 // Author Assigner - Types only (functions have supabase dependency)
 // Import functions directly from './author-assigner' when needed

@@ -675,6 +675,235 @@ Major Events: ${arc.majorEvents.join('; ')}`;
 }
 
 // ============================================================================
+// SUMMARY QUALITY VALIDATION
+// ============================================================================
+
+export interface SummaryQualityReport {
+  score: number; // 0-100
+  issues: Array<{
+    type: 'missing_characters' | 'missing_events' | 'too_short' | 'too_long' | 'missing_location' | 'missing_cliffhanger';
+    severity: 'minor' | 'moderate' | 'major';
+    description: string;
+  }>;
+  missingElements: string[];
+  compressionRatio: number;
+  isAcceptable: boolean;
+}
+
+/**
+ * Validate summary quality against original content
+ */
+export function validateSummaryQuality(
+  originalContent: string,
+  summary: string,
+  metadata: {
+    expectedCharacters?: string[];
+    expectedEvents?: string[];
+    chapterNumber?: number;
+  } = {}
+): SummaryQualityReport {
+  const issues: SummaryQualityReport['issues'] = [];
+  const missingElements: string[] = [];
+  let score = 100;
+
+  // Calculate compression ratio
+  const originalWords = originalContent.split(/\s+/).length;
+  const summaryWords = summary.split(/\s+/).length;
+  const compressionRatio = summaryWords / originalWords;
+
+  // 1. Check summary length
+  const idealMinWords = 50;
+  const idealMaxWords = 200;
+
+  if (summaryWords < idealMinWords) {
+    issues.push({
+      type: 'too_short',
+      severity: summaryWords < 30 ? 'major' : 'moderate',
+      description: `Summary quá ngắn (${summaryWords} từ, cần ít nhất ${idealMinWords})`,
+    });
+    score -= summaryWords < 30 ? 20 : 10;
+  }
+
+  if (summaryWords > idealMaxWords) {
+    issues.push({
+      type: 'too_long',
+      severity: 'minor',
+      description: `Summary quá dài (${summaryWords} từ, nên dưới ${idealMaxWords})`,
+    });
+    score -= 5;
+  }
+
+  // 2. Check for expected characters
+  if (metadata.expectedCharacters && metadata.expectedCharacters.length > 0) {
+    const summaryLower = summary.toLowerCase();
+    const missingChars = metadata.expectedCharacters.filter(
+      char => !summaryLower.includes(char.toLowerCase())
+    );
+
+    if (missingChars.length > 0) {
+      const missingRatio = missingChars.length / metadata.expectedCharacters.length;
+      issues.push({
+        type: 'missing_characters',
+        severity: missingRatio > 0.5 ? 'major' : 'moderate',
+        description: `Thiếu nhân vật trong summary: ${missingChars.join(', ')}`,
+      });
+      missingElements.push(...missingChars.map(c => `Character: ${c}`));
+      score -= missingRatio > 0.5 ? 15 : 8;
+    }
+  }
+
+  // 3. Check for expected events
+  if (metadata.expectedEvents && metadata.expectedEvents.length > 0) {
+    const summaryLower = summary.toLowerCase();
+    const missingEvents = metadata.expectedEvents.filter(
+      event => !summaryLower.includes(event.toLowerCase().substring(0, 10))
+    );
+
+    if (missingEvents.length > 0) {
+      const missingRatio = missingEvents.length / metadata.expectedEvents.length;
+      issues.push({
+        type: 'missing_events',
+        severity: missingRatio > 0.5 ? 'major' : 'moderate',
+        description: `Thiếu sự kiện quan trọng: ${missingEvents.length}/${metadata.expectedEvents.length}`,
+      });
+      missingElements.push(...missingEvents.map(e => `Event: ${e}`));
+      score -= missingRatio > 0.5 ? 20 : 10;
+    }
+  }
+
+  // 4. Check for location mention (from original)
+  const locationPatterns = /tại\s+(\w+)|ở\s+(\w+)|trong\s+(\w+\s+\w*)|nơi\s+(\w+)/gi;
+  const originalLocations = originalContent.match(locationPatterns);
+  if (originalLocations && originalLocations.length > 0) {
+    const hasLocation = locationPatterns.test(summary);
+    if (!hasLocation) {
+      issues.push({
+        type: 'missing_location',
+        severity: 'minor',
+        description: 'Summary không đề cập địa điểm',
+      });
+      score -= 5;
+    }
+  }
+
+  // 5. Check for cliffhanger/ending mention
+  const cliffhangerKeywords = ['...', 'sẽ', 'liệu', 'chờ đợi', 'tiếp theo', 'sắp', 'chuẩn bị'];
+  const originalEnd = originalContent.slice(-500);
+  const hasOriginalCliffhanger = cliffhangerKeywords.some(kw => originalEnd.includes(kw));
+  
+  if (hasOriginalCliffhanger) {
+    const summaryHasCliffhanger = cliffhangerKeywords.some(kw => summary.includes(kw));
+    if (!summaryHasCliffhanger) {
+      issues.push({
+        type: 'missing_cliffhanger',
+        severity: 'moderate',
+        description: 'Summary không capture cliffhanger cuối chương',
+      });
+      score -= 10;
+    }
+  }
+
+  // Calculate final score
+  score = Math.max(0, Math.min(100, score));
+
+  return {
+    score,
+    issues,
+    missingElements,
+    compressionRatio: Math.round(compressionRatio * 1000) / 1000,
+    isAcceptable: score >= 60 && !issues.some(i => i.severity === 'major'),
+  };
+}
+
+/**
+ * Auto-extract key elements from chapter content for summary validation
+ */
+export function extractKeyElements(content: string): {
+  characters: string[];
+  events: string[];
+  locations: string[];
+} {
+  const characters: string[] = [];
+  const events: string[] = [];
+  const locations: string[] = [];
+
+  // Extract character names (capitalized Vietnamese names pattern)
+  const namePattern = /(?:^|[.!?]\s+)([A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸĐ][a-zàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]+(?:\s+[A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸĐ][a-zàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]*)?)/g;
+  const nameMatches = content.match(namePattern);
+  if (nameMatches) {
+    const uniqueNames = new Set(nameMatches.map(m => m.trim().replace(/^[.!?\s]+/, '')));
+    characters.push(...Array.from(uniqueNames).slice(0, 10));
+  }
+
+  // Extract key events (action verbs with context)
+  const eventPatterns = [
+    /đột phá.*?(?:\.|!)/gi,
+    /đánh bại.*?(?:\.|!)/gi,
+    /phát hiện.*?(?:\.|!)/gi,
+    /nhận được.*?(?:\.|!)/gi,
+    /gặp.*?(?:\.|!)/gi,
+    /bị.*?tấn công.*?(?:\.|!)/gi,
+    /chiến đấu.*?(?:\.|!)/gi,
+  ];
+
+  for (const pattern of eventPatterns) {
+    const matches = content.match(pattern);
+    if (matches) {
+      events.push(...matches.slice(0, 2).map(m => m.trim().substring(0, 50)));
+    }
+  }
+
+  // Extract locations
+  const locationPattern = /(?:tại|ở|trong|đến)\s+([A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸĐ][a-zàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ\s]+)/gi;
+  const locationMatches = content.match(locationPattern);
+  if (locationMatches) {
+    locations.push(...locationMatches.slice(0, 5));
+  }
+
+  return { characters, events, locations };
+}
+
+/**
+ * Generate improved summary if original fails quality check
+ */
+export function generateBetterSummary(
+  originalSummary: string,
+  qualityReport: SummaryQualityReport,
+  originalContent: string
+): string {
+  let improved = originalSummary;
+
+  // Add missing elements
+  if (qualityReport.missingElements.length > 0) {
+    const additions: string[] = [];
+
+    for (const element of qualityReport.missingElements) {
+      if (element.startsWith('Character:')) {
+        const charName = element.replace('Character: ', '');
+        // Find context for character in original
+        const charPattern = new RegExp(`[^.]*${charName}[^.]*\\.`, 'gi');
+        const matches = originalContent.match(charPattern);
+        if (matches && matches[0]) {
+          additions.push(matches[0].trim().substring(0, 100));
+        }
+      }
+    }
+
+    if (additions.length > 0) {
+      improved = improved + ' ' + additions.join(' ');
+    }
+  }
+
+  // Trim if too long
+  const words = improved.split(/\s+/);
+  if (words.length > 200) {
+    improved = words.slice(0, 180).join(' ') + '...';
+  }
+
+  return improved;
+}
+
+// ============================================================================
 // FACTORY FUNCTION
 // ============================================================================
 

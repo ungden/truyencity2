@@ -344,3 +344,196 @@ export class QualityGate {
 // Export singletons
 export const contentAnalyzer = new ContentAnalyzer();
 export const qualityGate = new QualityGate();
+
+// ============================================================================
+// ENHANCED QUALITY CHECK - Integrating Sprint 1 Features
+// ============================================================================
+
+import { dialogueAnalyzer, getQuickDialogueScore } from './dialogue-analyzer';
+
+export interface EnhancedQualityReport extends QualityReport {
+  dialogueQuality: number;
+  clicheScore: number;
+  itemConsistency?: number;
+  summaryQuality?: number;
+  detailedBreakdown: {
+    writingQuality: number;
+    pacing: number;
+    engagement: number;
+    dopamineDelivery: number;
+    dialogueQuality: number;
+    clicheAvoidance: number;
+  };
+}
+
+/**
+ * Enhanced quality evaluation including dialogue analysis
+ */
+export function evaluateChapterEnhanced(
+  content: string,
+  chapterNumber: number,
+  genre: GenreType,
+  storyId: string,
+  options?: {
+    styleBible?: StyleBible;
+    charactersInvolved?: string[];
+  }
+): EnhancedQualityReport {
+  // Get base quality report
+  const baseReport = qualityGate.evaluate(
+    content,
+    chapterNumber,
+    genre,
+    storyId,
+    options?.styleBible
+  );
+
+  // Get dialogue quality score
+  const dialogueScore = getQuickDialogueScore(content);
+  const dialogueQuality = dialogueScore.score / 10; // Convert to 0-10 scale
+
+  // Calculate cliche avoidance score (inverse of cliche penalty)
+  const clicheScore = Math.max(0, 10 - dialogueScore.breakdown.clichePenalty / 3);
+
+  // Adjust overall score with dialogue quality
+  const enhancedOverallScore = (
+    baseReport.overallScore * 0.7 +
+    dialogueQuality * 0.2 +
+    clicheScore * 0.1
+  );
+
+  // Add dialogue-related issues
+  const enhancedIssues = [...baseReport.issues];
+
+  if (dialogueQuality < 6) {
+    enhancedIssues.push({
+      type: 'repetitive' as const,
+      severity: dialogueQuality < 4 ? 'major' : 'moderate',
+      description: `Dialogue quality thấp (${Math.round(dialogueQuality * 10)}/100)`,
+      suggestion: 'Giảm cliche, đa dạng hóa dialogue patterns',
+    });
+  }
+
+  if (dialogueScore.breakdown.clichePenalty > 15) {
+    enhancedIssues.push({
+      type: 'repetitive' as const,
+      severity: dialogueScore.breakdown.clichePenalty > 25 ? 'major' : 'moderate',
+      description: `Quá nhiều cliché phrases`,
+      suggestion: 'Thay thế các câu như "Ngươi dám!", "Tìm chết!" bằng dialogue cụ thể hơn',
+    });
+  }
+
+  if (dialogueScore.breakdown.exclamationPenalty > 10) {
+    enhancedIssues.push({
+      type: 'pacing' as const,
+      severity: 'minor',
+      description: `Lạm dụng dấu chấm than (!)`,
+      suggestion: 'Sử dụng miêu tả cảm xúc thay vì dấu chấm than',
+    });
+  }
+
+  if (dialogueScore.breakdown.expositionPenalty > 15) {
+    enhancedIssues.push({
+      type: 'pacing' as const,
+      severity: 'moderate',
+      description: `Info-dump trong dialogue`,
+      suggestion: 'Show information through action, not dialogue exposition',
+    });
+  }
+
+  // Determine action
+  let action: 'approve' | 'revise' | 'rewrite' = baseReport.action;
+  if (enhancedOverallScore < THRESHOLDS.minQualityScore - 2) {
+    action = 'rewrite';
+  } else if (enhancedOverallScore < THRESHOLDS.minQualityScore) {
+    action = 'revise';
+  }
+
+  return {
+    ...baseReport,
+    overallScore: Math.round(enhancedOverallScore * 10) / 10,
+    dialogueQuality: Math.round(dialogueQuality * 10) / 10,
+    clicheScore: Math.round(clicheScore * 10) / 10,
+    issues: enhancedIssues,
+    action,
+    detailedBreakdown: {
+      writingQuality: baseReport.writingQuality,
+      pacing: baseReport.pacing,
+      engagement: baseReport.engagement,
+      dopamineDelivery: baseReport.dopamineDelivery,
+      dialogueQuality: Math.round(dialogueQuality * 10) / 10,
+      clicheAvoidance: Math.round(clicheScore * 10) / 10,
+    },
+  };
+}
+
+/**
+ * Quick comprehensive quality check
+ */
+export function quickQualityCheck(content: string, genre: GenreType): {
+  passed: boolean;
+  score: number;
+  majorIssues: string[];
+} {
+  const majorIssues: string[] = [];
+
+  // Basic checks
+  const wordCount = contentAnalyzer.countWords(content);
+  if (wordCount < THRESHOLDS.minWordCount * 0.7) {
+    majorIssues.push(`Too short: ${wordCount} words`);
+  }
+
+  // Dialogue checks
+  const dialogueScore = getQuickDialogueScore(content);
+  if (dialogueScore.breakdown.clichePenalty > 25) {
+    majorIssues.push('Too many clichés');
+  }
+  if (dialogueScore.breakdown.expositionPenalty > 20) {
+    majorIssues.push('Excessive info-dump');
+  }
+
+  // Composition checks
+  const composition = contentAnalyzer.analyzeComposition(content);
+  if (composition.hookStrength < 0.2) {
+    majorIssues.push('Weak opening hook');
+  }
+  if (composition.cliffhangerStrength < 0.15) {
+    majorIssues.push('Missing cliffhanger');
+  }
+
+  // Dopamine check
+  const dopamine = contentAnalyzer.detectDopaminePoints(content, 0);
+  if (dopamine.length === 0) {
+    majorIssues.push('No dopamine points');
+  }
+
+  // Calculate combined score
+  const baseScore = qualityGate.quickCheck(content, genre) ? 70 : 40;
+  const dialogueBonus = (dialogueScore.score - 50) / 5;
+  const score = Math.max(0, Math.min(100, baseScore + dialogueBonus));
+
+  return {
+    passed: majorIssues.length === 0 && score >= 60,
+    score: Math.round(score),
+    majorIssues,
+  };
+}
+
+/**
+ * Get detailed quality breakdown for debugging/analysis
+ */
+export function getQualityBreakdown(content: string, genre: GenreType): {
+  composition: CompositionAnalysis;
+  dialogue: ReturnType<typeof getQuickDialogueScore>;
+  dopaminePoints: DopaminePoint[];
+  wordCount: number;
+  repetitionScore: number;
+} {
+  return {
+    composition: contentAnalyzer.analyzeComposition(content),
+    dialogue: getQuickDialogueScore(content),
+    dopaminePoints: contentAnalyzer.detectDopaminePoints(content, 0),
+    wordCount: contentAnalyzer.countWords(content),
+    repetitionScore: contentAnalyzer.calculateRepetition(content),
+  };
+}

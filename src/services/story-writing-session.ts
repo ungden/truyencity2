@@ -5,7 +5,7 @@
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { AIProviderService } from './ai-provider';
-import { AIStoryWriter } from './ai-story-writer';
+import { AIStoryWriter } from './_legacy/ai-story-writer';
 import { createDopamineOptimizer } from './dopamine-writing-optimizer';
 import {
   AIProviderType,
