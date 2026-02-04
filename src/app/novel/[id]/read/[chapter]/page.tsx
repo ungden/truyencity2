@@ -14,6 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { startSession, updateSessionDuration, endSession, markChapterRead } from '@/services/reading-sessions';
 import { READING } from '@/lib/config';
 import DOMPurify from 'isomorphic-dompurify';
+import { Comments } from '@/components/comments';
 
 type ChapterListItem = {
   id: string;
@@ -417,6 +418,11 @@ export default function ReadingPage() {
         >
           Chương sau →
         </button>
+      </div>
+
+      {/* Comments */}
+      <div className="mt-12 pt-8 border-t border-border">
+        <Comments novelId={novelId} chapterId={currentChapter?.id} />
       </div>
     </div>
   );

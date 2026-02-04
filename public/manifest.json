@@ -1,8 +1,8 @@
 {
-  "name": "TruyenCity - AI Story Writer",
-  "short_name": "TruyenCity",
-  "description": "Nền tảng viết truyện AI thông minh - Viết truyện tự động với 1 click",
-  "start_url": "/admin/ai-writer",
+  "name": "Truyện City - Đọc truyện online miễn phí",
+  "short_name": "Truyện City",
+  "description": "Đọc truyện online miễn phí - Tiên hiệp, kiếm hiệp, ngôn tình, đô thị",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#7c3aed",
@@ -57,40 +57,8 @@
       "purpose": "maskable any"
     }
   ],
-  "categories": ["productivity", "entertainment", "books"],
+  "categories": ["entertainment", "books"],
   "lang": "vi",
   "dir": "ltr",
-  "prefer_related_applications": false,
-  "screenshots": [
-    {
-      "src": "/screenshots/desktop.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "AI Writer Dashboard"
-    },
-    {
-      "src": "/screenshots/mobile.png",
-      "sizes": "390x844",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Mobile AI Writer"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "AI Writer",
-      "short_name": "Writer",
-      "description": "Mở AI Writer để viết truyện",
-      "url": "/admin/ai-writer",
-      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
-    },
-    {
-      "name": "Claude Code",
-      "short_name": "Claude",
-      "description": "Viết truyện với Claude Code",
-      "url": "/admin/claude-code",
-      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
-    }
-  ]
+  "prefer_related_applications": false
 }

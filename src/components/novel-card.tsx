@@ -14,8 +14,8 @@ interface NovelCardProps {
   title: string;
   author: string;
   cover: string;
-  rating: number;
-  views: number;
+  rating?: number;
+  views?: number;
   chapters?: number;
   status: string;
   genre?: string;
@@ -40,10 +40,11 @@ export const NovelCard: React.FC<NovelCardProps> = ({
 }) => {
   const novelLink = `/novel/${id}`;
 
-  const formatViews = (views: number) => {
-    if (views >= 1000000) return `${(views / 1000000).toFixed(1)}M`;
-    if (views >= 1000) return `${(views / 1000).toFixed(0)}K`;
-    return views.toString();
+  const formatViews = (v?: number) => {
+    if (!v) return '0';
+    if (v >= 1000000) return `${(v / 1000000).toFixed(1)}M`;
+    if (v >= 1000) return `${(v / 1000).toFixed(0)}K`;
+    return v.toString();
   };
 
   const isComplete = status === 'Full' || status === 'Hoàn thành';

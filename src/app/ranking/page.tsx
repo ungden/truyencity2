@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Crown, TrendingUp, Eye, Star } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useRouter } from 'next/navigation';
 
 type NovelRow = {
   id: string;
@@ -13,6 +14,7 @@ type NovelRow = {
   author: string | null;
   cover_url: string | null;
   status: string | null;
+  genres: string[] | null;
   created_at: string;
 };
 
@@ -55,16 +57,11 @@ const RankingCard = ({
         <p className="text-muted-foreground text-xs mb-2">{novel.author || 'N/A'}</p>
         
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1">
-            <Star size={12} className="text-yellow-400 fill-current" />
-            <span className="text-xs">{novel.rating ?? 4.5}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Eye size={12} className="text-muted-foreground" />
-            <span className="text-xs text-muted-foreground">
-              {novel.viewsLabel ?? '1.0K'}
-            </span>
-          </div>
+          {novel.genre && (
+            <Badge variant="secondary" className="text-xs">
+              {novel.genre}
+            </Badge>
+          )}
           {showTrend && novel.trend && (
             <Badge variant="secondary" className="text-xs text-green-600">
               <TrendingUp size={10} className="mr-1" />
@@ -82,6 +79,7 @@ const RankingCard = ({
 };
 
 export default function RankingPage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('popular');
   const [novels, setNovels] = useState<NovelRow[]>([]);
 
@@ -90,37 +88,35 @@ export default function RankingPage() {
     (async () => {
       const { data } = await supabase
         .from('novels')
-        .select('id,title,author,cover_url,status,created_at')
-        .order('created_at', { ascending: false });
+        .select('id,title,author,cover_url,status,genres,created_at')
+        .order('created_at', { ascending: false })
+        .limit(20);
       if (!cancelled) setNovels(data || []);
     })();
     return () => { cancelled = true; };
   }, []);
 
-  const topNovels = novels.slice(0, 5).map((n, idx) => ({
+  const topNovels = novels.slice(0, 10).map((n, idx) => ({
     ...n,
-    rating: 4.5,
-    viewsLabel: '1.0K',
+    genre: n.genres?.[0] || null,
     rank: idx + 1
   }));
 
-  const trendingNovels = novels.slice(0, 3).map((n, idx) => ({
+  const trendingNovels = novels.slice(0, 10).map((n, idx) => ({
     ...n,
-    rating: 4.4,
-    viewsLabel: '0.9K',
+    genre: n.genres?.[0] || null,
     rank: idx + 1,
-    trend: `+${(10 - idx * 2)}%`
+    trend: `+${(10 - idx)}%`
   }));
 
-  const ratingNovels = [...novels].slice(0, 5).map((n, idx) => ({
+  const ratingNovels = novels.slice(0, 10).map((n, idx) => ({
     ...n,
-    rating: 4.9 - idx * 0.1,
-    viewsLabel: '1.1K',
+    genre: n.genres?.[0] || null,
     rank: idx + 1
   }));
 
   const handleNovelClick = (novelId: string) => {
-    console.log('Navigate to novel:', novelId);
+    router.push(`/novel/${novelId}`);
   };
 
   return (

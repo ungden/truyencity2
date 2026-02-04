@@ -23,7 +23,8 @@ export default async function HomePage() {
     const { data, error } = await supabase
       .from('novels')
       .select('*')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(20);
 
     if (error) {
       console.error('Error fetching novels:', error);
@@ -35,11 +36,9 @@ export default async function HomePage() {
   }
 
   const featuredNovel = novels?.[0];
-  const trendingNovels = novels?.slice(0, 5) || [];
-  const latestNovels = novels?.slice(0, 6) || [];
+  const trendingNovels = novels?.slice(1, 6) || [];
+  const latestNovels = novels?.slice(6, 12) || [];
   const rankingNovels = novels?.slice(0, 6) || [];
-
-  const genres = ['Tiên Hiệp', 'Khoa Huyễn', 'Huyền Ảo', 'Đô Thị', 'Ngôn Tình', 'Kiếm Hiệp'];
 
   return (
     <div className="min-h-screen bg-background">
@@ -61,10 +60,8 @@ export default async function HomePage() {
                   title={featuredNovel.title}
                   author={featuredNovel.author || 'N/A'}
                   cover={featuredNovel.cover_url || ''}
-                  rating={4.9}
-                  views={850000}
                   status={featuredNovel.status || 'Đang ra'}
-                  description="Trong cơn thủy triều hơi nước và máy móc, ai có thể chạm đến phi phàm? Sương mù xám phía trên, ai đang thì thầm?"
+                  description={featuredNovel.description || ''}
                   variant="featured"
                 />
               </section>
@@ -88,17 +85,15 @@ export default async function HomePage() {
 
               <div className="relative">
                 <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4">
-                  {trendingNovels.map((novel: Novel, index) => (
+                  {trendingNovels.map((novel: Novel) => (
                     <div key={novel.id} className="flex-shrink-0 w-[160px]">
                       <NovelCard
                         id={novel.id}
                         title={novel.title}
                         author={novel.author || 'N/A'}
                         cover={novel.cover_url || ''}
-                        rating={4.5 + (index * 0.1)}
-                        views={1200000 - (index * 100000)}
-                        status={index % 3 === 0 ? 'Full' : 'Đang ra'}
-                        genre={genres[index % genres.length]}
+                        status={novel.status || 'Đang ra'}
+                        genre={novel.genres?.[0]}
                       />
                     </div>
                   ))}
@@ -121,19 +116,16 @@ export default async function HomePage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {latestNovels.map((novel: Novel, index) => (
+                {latestNovels.map((novel: Novel) => (
                   <NovelCard
                     key={novel.id}
                     id={novel.id}
                     title={novel.title}
                     author={novel.author || 'N/A'}
                     cover={novel.cover_url || ''}
-                    rating={4.5}
-                    views={1000}
-                    chapters={1420 - (index * 200)}
-                    status={index % 2 === 0 ? 'Đang ra' : 'Full'}
-                    genre={genres[index % genres.length]}
-                    description="Một đời Đan Đế trong sinh, mở ra con đường nghịch thiên cải mệnh, trấn áp vạn cổ thiên kiêu."
+                    status={novel.status || 'Đang ra'}
+                    genre={novel.genres?.[0]}
+                    description={novel.description || ''}
                     variant="horizontal"
                   />
                 ))}
@@ -157,10 +149,8 @@ export default async function HomePage() {
                     title={novel.title}
                     author={novel.author || 'N/A'}
                     cover={novel.cover_url || ''}
-                    rating={4.9 - (index * 0.1)}
-                    views={1000}
                     status={novel.status || 'Đang ra'}
-                    genre={genres[index % genres.length]}
+                    genre={novel.genres?.[0]}
                     variant="ranking"
                     rank={index + 1}
                   />

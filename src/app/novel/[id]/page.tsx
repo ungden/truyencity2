@@ -22,18 +22,49 @@ import SafeImage from '@/components/ui/safe-image';
 import { ChapterList } from '@/components/chapter-list';
 import { NovelActions } from '@/components/novel-actions';
 import { AppContainer, TwoColumnLayout, ContentCard, Section } from '@/components/layout';
+import { Comments } from '@/components/comments';
+import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
 
-const formatNumber = (num: number) => {
-  if (num >= 1000000) {
-    return (num / 1000000).toFixed(1) + 'M';
+// SEO: generateMetadata
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const supabase = await createServerClient();
+  const { data: novel } = await supabase
+    .from('novels')
+    .select('title, description, author, cover_url, genres')
+    .eq('id', id)
+    .single();
+
+  if (!novel) {
+    return { title: 'Truyện không tồn tại - Truyện City' };
   }
-  if (num >= 1000) {
-    return (num / 1000).toFixed(1) + 'K';
-  }
-  return num.toString();
-};
+
+  const title = `${novel.title} - ${novel.author || 'Truyện City'}`;
+  const description = novel.description?.slice(0, 160) || `Đọc ${novel.title} miễn phí tại Truyện City`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: novel.cover_url ? [{ url: novel.cover_url }] : [],
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: novel.cover_url ? [novel.cover_url] : [],
+    },
+  };
+}
 
 export default async function NovelDetailPage({
   params,
@@ -55,6 +86,13 @@ export default async function NovelDetailPage({
 
   const chapters = Array.isArray(novel.chapters) ? novel.chapters : [];
   const chapterCount = chapters.length;
+
+  // Get real view count from chapter_reads
+  const { count: viewCount } = await supabase
+    .from('chapter_reads')
+    .select('*', { count: 'exact', head: true })
+    .eq('novel_id', id);
+  const totalViews = viewCount || 0;
 
   let mainGenre: (typeof GENRE_CONFIG)[keyof typeof GENRE_CONFIG] | null = null;
   let topic: Topic | null = null;
@@ -84,19 +122,8 @@ export default async function NovelDetailPage({
             <span className="font-bold text-blue-600">{chapterCount}</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Số từ</span>
-            <span className="font-bold text-green-600">{formatNumber(100000)}</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Lượt xem</span>
-            <span className="font-bold text-purple-600">{formatNumber(1000)}</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Đánh giá</span>
-            <div className="flex items-center gap-1">
-              <Star size={14} className="text-yellow-500 fill-current" />
-              <span className="font-bold">4.5</span>
-            </div>
+            <span className="text-muted-foreground">Lượt đọc</span>
+            <span className="font-bold text-purple-600">{totalViews.toLocaleString('vi-VN')}</span>
           </div>
         </div>
       </ContentCard>
@@ -205,13 +232,15 @@ export default async function NovelDetailPage({
                             )}
                           </div>
                           <div className="flex items-center gap-1">
-                            <Star size={16} className="text-yellow-500 fill-current" />
-                            <span className="font-medium text-foreground">4.5</span>
+                            <BookOpen size={16} />
+                            <span>{chapterCount} chương</span>
                           </div>
-                          <div className="flex items-center gap-1">
-                            <Eye size={16} />
-                            <span>{formatNumber(1000)} lượt xem</span>
-                          </div>
+                          {totalViews > 0 && (
+                            <div className="flex items-center gap-1">
+                              <Eye size={16} />
+                              <span>{totalViews.toLocaleString('vi-VN')} lượt đọc</span>
+                            </div>
+                          )}
                         </div>
                       </div>
 
@@ -281,6 +310,11 @@ export default async function NovelDetailPage({
               >
                 <ChapterList novelId={novel.id} chapters={chapters} />
               </Section>
+
+              {/* Comments */}
+              <Section title="Bình luận">
+                <Comments novelId={novel.id} />
+              </Section>
             </div>
           </TwoColumnLayout>
         </div>
@@ -317,13 +351,15 @@ export default async function NovelDetailPage({
 
                 <div className="flex items-center gap-4 text-sm">
                   <div className="flex items-center gap-1">
-                    <Star size={14} className="text-yellow-500 fill-current" />
-                    <span className="font-medium">4.5</span>
+                    <BookOpen size={14} className="text-muted-foreground" />
+                    <span className="font-medium">{chapterCount} chương</span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Eye size={14} className="text-muted-foreground" />
-                    <span>{formatNumber(1000)}</span>
-                  </div>
+                  {totalViews > 0 && (
+                    <div className="flex items-center gap-1">
+                      <Eye size={14} className="text-muted-foreground" />
+                      <span>{totalViews.toLocaleString('vi-VN')}</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex flex-wrap gap-2">
@@ -346,18 +382,14 @@ export default async function NovelDetailPage({
           <NovelActions novelId={novel.id} />
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <Card className="p-4 text-center bg-gradient-to-br from-blue-500/10 to-blue-600/10 border-blue-500/20 rounded-xl">
               <div className="text-xl font-bold text-blue-600">{chapterCount}</div>
               <div className="text-xs text-muted-foreground">Chương</div>
             </Card>
-            <Card className="p-4 text-center bg-gradient-to-br from-green-500/10 to-green-600/10 border-green-500/20 rounded-xl">
-              <div className="text-xl font-bold text-green-600">{formatNumber(100000)}</div>
-              <div className="text-xs text-muted-foreground">Từ</div>
-            </Card>
             <Card className="p-4 text-center bg-gradient-to-br from-purple-500/10 to-purple-600/10 border-purple-500/20 rounded-xl">
-              <div className="text-xl font-bold text-purple-600">{formatNumber(1000)}</div>
-              <div className="text-xs text-muted-foreground">Lượt xem</div>
+              <div className="text-xl font-bold text-purple-600">{totalViews.toLocaleString('vi-VN')}</div>
+              <div className="text-xs text-muted-foreground">Lượt đọc</div>
             </Card>
           </div>
 
@@ -373,6 +405,9 @@ export default async function NovelDetailPage({
 
           {/* Chapter List */}
           <ChapterList novelId={novel.id} chapters={chapters} />
+
+          {/* Comments */}
+          <Comments novelId={novel.id} />
 
           {/* Info */}
           <div>

@@ -67,6 +67,8 @@ const statusOptions = [
   { id: 'drop', label: 'Drop', value: 'Drop' }
 ];
 
+const PAGE_SIZE = 30;
+
 export default function BrowsePage() {
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
@@ -74,57 +76,72 @@ export default function BrowsePage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [novels, setNovels] = useState<NovelRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(0);
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      setLoading(true);
-      const { data } = await supabase
-        .from('novels')
-        .select('id,title,author,cover_url,status,genres,updated_at')
-        .order('updated_at', { ascending: false, nullsFirst: false });
-      if (!cancelled) {
-        setNovels(data || []);
-        setLoading(false);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, []);
+  // Build and execute query
+  const fetchNovels = async (pageNum: number, append: boolean = false) => {
+    if (pageNum === 0) setLoading(true);
+    else setLoadingMore(true);
 
-  const filtered = React.useMemo(() => {
-    let list = [...novels];
+    const from = pageNum * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
 
+    let query = supabase
+      .from('novels')
+      .select('id,title,author,cover_url,status,genres,updated_at');
+
+    // Apply filters server-side
     if (selectedGenres.length > 0) {
-      list = list.filter(novel => {
-        const g = novel.genres || [];
-        return selectedGenres.some(selectedId => g.includes(selectedId));
-      });
+      query = query.overlaps('genres', selectedGenres);
     }
-
     if (selectedStatus.length > 0) {
-      list = list.filter(novel => selectedStatus.includes(novel.status || ''));
+      query = query.in('status', selectedStatus);
     }
 
-    list.sort((a, b) => {
-      switch (sortBy) {
-        case 'rating':
-          return 0;
-        case 'views':
-          return 0;
-        case 'title':
-          return a.title.localeCompare(b.title);
-        case 'updated':
-        default:
-          return new Date(b.updated_at || 0).getTime() - new Date(a.updated_at || 0).getTime();
-      }
-    });
+    // Apply sort
+    switch (sortBy) {
+      case 'title':
+        query = query.order('title', { ascending: true });
+        break;
+      case 'updated':
+      default:
+        query = query.order('updated_at', { ascending: false, nullsFirst: false });
+        break;
+    }
 
-    return list;
-  }, [novels, selectedGenres, selectedStatus, sortBy]);
+    query = query.range(from, to);
 
-  const handleNovelClick = (novelId: string) => {
-    console.log('Navigate to novel:', novelId);
+    const { data } = await query;
+    const results = data || [];
+
+    if (append) {
+      setNovels(prev => [...prev, ...results]);
+    } else {
+      setNovels(results);
+    }
+
+    setHasMore(results.length === PAGE_SIZE);
+    setLoading(false);
+    setLoadingMore(false);
   };
+
+  // Initial load + re-fetch on filter/sort change
+  useEffect(() => {
+    setPage(0);
+    fetchNovels(0, false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedGenres, selectedStatus, sortBy]);
+
+  const loadMore = () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchNovels(nextPage, true);
+  };
+
+  // novels is already filtered + sorted from server
+  const filtered = novels;
 
   const toggleGenre = (genreId: string) => {
     setSelectedGenres(prev =>
@@ -262,8 +279,6 @@ export default function BrowsePage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="updated">Mới cập nhật</SelectItem>
-              <SelectItem value="rating">Đánh giá cao</SelectItem>
-              <SelectItem value="views">Nhiều lượt đọc</SelectItem>
               <SelectItem value="title">Tên A-Z</SelectItem>
             </SelectContent>
           </Select>
@@ -318,8 +333,6 @@ export default function BrowsePage() {
               title={novel.title}
               author={novel.author || 'N/A'}
               cover={novel.cover_url || ''}
-              rating={4.5}
-              views={1000}
               status={novel.status || 'Đang ra'}
               variant={viewMode === 'list' ? 'horizontal' : 'default'}
             />
@@ -341,6 +354,15 @@ export default function BrowsePage() {
           )}
         </div>
       ))}
+
+      {/* Load More */}
+      {!loading && hasMore && filtered.length > 0 && (
+        <div className="text-center mt-6">
+          <Button variant="outline" onClick={loadMore} disabled={loadingMore} className="px-8">
+            {loadingMore ? 'Đang tải...' : 'Xem thêm'}
+          </Button>
+        </div>
+      )}
     </div>
   );
 
@@ -386,8 +408,6 @@ export default function BrowsePage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="updated">Cập nhật</SelectItem>
-                  <SelectItem value="rating">Đánh giá</SelectItem>
-                  <SelectItem value="views">Lượt đọc</SelectItem>
                   <SelectItem value="title">Tên A-Z</SelectItem>
                 </SelectContent>
               </Select>
@@ -445,8 +465,6 @@ export default function BrowsePage() {
                   title={novel.title}
                   author={novel.author || 'N/A'}
                   cover={novel.cover_url || ''}
-                  rating={4.5}
-                  views={1000}
                   status={novel.status || 'Đang ra'}
                   variant={viewMode === 'list' ? 'horizontal' : 'default'}
                 />
@@ -460,6 +478,15 @@ export default function BrowsePage() {
               </p>
             </div>
           ))}
+
+          {/* Load More - Mobile */}
+          {!loading && hasMore && filtered.length > 0 && (
+            <div className="text-center mt-4">
+              <Button variant="outline" onClick={loadMore} disabled={loadingMore} className="px-8">
+                {loadingMore ? 'Đang tải...' : 'Xem thêm'}
+              </Button>
+            </div>
+          )}
         </div>
       </AppContainer>
     </div>

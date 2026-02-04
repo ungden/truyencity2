@@ -7,8 +7,8 @@ import {
   Home,
   Compass,
   BookOpenText,
-  Settings,
-  BookOpen
+  BookOpen,
+  Tags
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ThemeToggle from '@/components/theme-toggle';
@@ -25,6 +25,12 @@ const navigationItems = [
     label: 'Khám phá',
     icon: Compass,
     path: '/browse'
+  },
+  {
+    id: 'genres',
+    label: 'Thể loại',
+    icon: Tags,
+    path: '/genres'
   },
   {
     id: 'library',
@@ -75,25 +81,8 @@ export const DesktopSidebar = () => {
       </nav>
 
       {/* Bottom Section */}
-      <div className="p-4 border-t border-border space-y-1">
-        <Link
-          href="/settings"
-          className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-all duration-200"
-        >
-          <Settings size={20} strokeWidth={1.5} />
-          <span>Cài đặt</span>
-        </Link>
-
-        {/* User Profile */}
-        <div className="flex items-center gap-3 px-4 py-3 mt-2">
-          <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center overflow-hidden">
-            <span className="text-sm font-medium text-muted-foreground">MA</span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">Minh Anh</p>
-            <p className="text-xs text-muted-foreground">Độc giả VIP</p>
-          </div>
-        </div>
+      <div className="p-4 border-t border-border">
+        <ThemeToggle />
       </div>
     </aside>
   );
