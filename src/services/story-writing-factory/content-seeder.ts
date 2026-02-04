@@ -3,11 +3,13 @@
  *
  * Generates:
  * - 200 AI authors with unique pen names and personas
- * - 4000 novels (20 per author) across 12 genres
+ * - 4000 novels (20 per author) across all genres defined in GENRE_CONFIG
  * - Activates 1000 novels initially (5 per author)
+ * - Enqueues cover generation jobs for novels missing covers
  *
  * Uses template-based generation (no AI calls for authors)
- * Uses Gemini batch calls for novel titles/premises (~80 calls total)
+ * Uses Gemini batch calls for novel titles/premises/descriptions/systems
+ * Genres are dynamically derived from GENRE_CONFIG to stay in sync with AI Writer
  */
 
 import { randomUUID } from 'crypto';
@@ -15,31 +17,19 @@ import { generateQuickAuthor } from './author-generator';
 import { getSupabase } from './supabase-helper';
 import { AIProviderService } from '../ai-provider';
 import { GenreType } from './types';
+import { GENRE_CONFIG } from '@/lib/types/genre-config';
 
 // ============================================================================
 // CONSTANTS
 // ============================================================================
 
-const ALL_GENRES: GenreType[] = [
-  'tien-hiep', 'huyen-huyen', 'do-thi', 'kiem-hiep',
-  'lich-su', 'khoa-huyen', 'vong-du', 'dong-nhan',
-  'mat-the', 'linh-di', 'quan-truong', 'di-gioi',
-];
+// NOTE: Seed only genres that are supported by AI Writer (GENRE_CONFIG)
+// so we can fill required system fields correctly.
+const ALL_GENRES: GenreType[] = Object.keys(GENRE_CONFIG) as GenreType[];
 
-const GENRE_LABELS: Record<string, string> = {
-  'tien-hiep': 'Tiên Hiệp',
-  'huyen-huyen': 'Huyền Huyễn',
-  'do-thi': 'Đô Thị',
-  'kiem-hiep': 'Kiếm Hiệp',
-  'lich-su': 'Lịch Sử',
-  'khoa-huyen': 'Khoa Huyễn',
-  'vong-du': 'Võng Du',
-  'dong-nhan': 'Đồng Nhân',
-  'mat-the': 'Mạt Thế',
-  'linh-di': 'Linh Dị',
-  'quan-truong': 'Quan Trường',
-  'di-gioi': 'Dị Giới',
-};
+const GENRE_LABELS: Record<string, string> = Object.fromEntries(
+  Object.entries(GENRE_CONFIG).map(([k, v]) => [k, v.name])
+);
 
 // Vietnamese main character name components
 const MC_NAMES = {
@@ -61,13 +51,13 @@ export interface SeedConfig {
   activatePerAuthor: number;
   minChapters: number;
   maxChapters: number;
-  useGemini: boolean;
 }
 
 export interface SeedResult {
   authors: number;
   novels: number;
   activated: number;
+  coverJobs?: number;
   errors: string[];
   durationMs: number;
 }
@@ -75,10 +65,14 @@ export interface SeedResult {
 interface NovelIdea {
   title: string;
   premise: string;
-  mainCharacter: string;
-  description?: string;     // rich 200-400 word description
-  worldSystem?: string;     // cultivation/magic system details
-  coverPrompt?: string;     // English cover scene prompt
+  mainCharacter: string; // name only
+  mainCharacterProfile?: string;
+  description?: string;        // rich intro 200-500 words
+  shortSynopsis?: string;      // 2-3 sentences
+  worldDescription?: string;   // world bible / setting
+  requiredFieldKey?: string;   // e.g. cultivation_system
+  requiredFieldValue?: string; // value for requiredFieldKey
+  coverPrompt?: string;        // English prompt forcing title text
 }
 
 // ============================================================================
@@ -176,26 +170,31 @@ export class ContentSeeder {
     const errors: string[] = [];
 
     // Check existing
-    const { data: existing } = await this.supabase.from('ai_authors').select('count');
-    const existingCount = existing?.[0]?.count || 0;
-    if (existingCount >= count) {
-      return { authors: existingCount, novels: 0, activated: 0, errors: [`Already have ${existingCount} authors, skipping`], durationMs: Date.now() - startTime };
+    const { count: existingCount, error: countErr } = await this.supabase
+      .from('ai_authors')
+      .select('*', { count: 'exact', head: true });
+    if (countErr) {
+      errors.push(`Count ai_authors failed: ${countErr.message}`);
+    }
+    const existingSafe = existingCount || 0;
+    if (existingSafe >= count) {
+      return { authors: existingSafe, novels: 0, activated: 0, errors: [`Already have ${existingSafe} authors, skipping`], durationMs: Date.now() - startTime };
     }
 
-    const needed = count - existingCount;
-    console.log(`[Seeder] Step 1: Have ${existingCount}, need ${needed} more authors`);
+    const needed = count - existingSafe;
+    console.log(`[Seeder] Step 1: Have ${existingSafe}, need ${needed} more authors`);
     const authorIds = await this.seedAuthors(needed, errors);
 
-    return { authors: existingCount + authorIds.length, novels: 0, activated: 0, errors, durationMs: Date.now() - startTime };
+    return { authors: existingSafe + authorIds.length, novels: 0, activated: 0, errors, durationMs: Date.now() - startTime };
   }
 
   /**
-   * Step 2 only: Generate novels for existing authors. Uses fallback templates if useGemini=false.
+   * Step 2 only: Generate novels for existing authors via Gemini.
    */
   async seedNovelsOnly(config: Partial<SeedConfig> = {}): Promise<SeedResult> {
     const startTime = Date.now();
     const errors: string[] = [];
-    const { novelsPerAuthor = 20, minChapters = 1000, maxChapters = 2000, useGemini = true } = config;
+    const { novelsPerAuthor = 20, minChapters = 1000, maxChapters = 2000 } = config;
 
     this.userId = await this.getSystemUserId();
     if (!this.userId) {
@@ -210,30 +209,21 @@ export class ContentSeeder {
     const authorIds = authors.map(a => a.id);
 
     // Check how many novels already exist
-    const { data: novelCount } = await this.supabase.from('novels').select('count');
-    const existingNovels = novelCount?.[0]?.count || 0;
+    const { count: existingNovelsCount, error: novelsCountErr } = await this.supabase
+      .from('novels')
+      .select('*', { count: 'exact', head: true });
+    if (novelsCountErr) {
+      errors.push(`Count novels failed: ${novelsCountErr.message}`);
+    }
+    const existingNovels = existingNovelsCount || 0;
     const targetNovels = authorIds.length * novelsPerAuthor;
     if (existingNovels >= targetNovels) {
       return { authors: authorIds.length, novels: existingNovels, activated: 0, errors: [`Already have ${existingNovels} novels`], durationMs: Date.now() - startTime };
     }
 
-    console.log(`[Seeder] Step 2: ${authorIds.length} authors, generating ${targetNovels} novels (useGemini=${useGemini})`);
+    console.log(`[Seeder] Step 2: ${authorIds.length} authors, generating ${targetNovels} novels via Gemini`);
 
-    let novelIdeas: Map<string, NovelIdea[]>;
-    if (useGemini) {
-      novelIdeas = await this.generateAllNovelIdeas(targetNovels, errors);
-    } else {
-      // Fallback only — fast, no AI calls
-      novelIdeas = new Map();
-      const perGenre = Math.ceil(targetNovels / ALL_GENRES.length);
-      for (const genre of ALL_GENRES) {
-        const ideas: NovelIdea[] = [];
-        for (let i = 0; i < perGenre; i++) {
-          ideas.push(this.generateFallbackNovel(genre, i));
-        }
-        novelIdeas.set(genre, ideas);
-      }
-    }
+    const novelIdeas = await this.generateAllNovelIdeas(targetNovels, errors);
 
     const totalInserted = await this.seedNovels(authorIds, novelIdeas, novelsPerAuthor, minChapters, maxChapters, errors);
 
@@ -256,6 +246,256 @@ export class ContentSeeder {
     const activated = await this.activateInitialBatch(authorIds, perAuthor, errors);
 
     return { authors: authorIds.length, novels: 0, activated, errors, durationMs: Date.now() - startTime };
+  }
+
+  /**
+   * Step clear: Delete ALL AI-seeded data in FK-safe order.
+   * Only deletes data linked to AI-seeded novels (ai_author_id IS NOT NULL).
+   * Also removes cover files from Supabase Storage.
+   *
+   * FK-safe deletion order (innermost children first):
+   *   1. Collect AI-seeded novel IDs
+   *   2. ai_image_jobs WHERE novel_id IN (...)
+   *   3. ai_story_projects WHERE novel_id IN (...) — cascades 24+ child tables
+   *   4. chapters WHERE novel_id IN (...) — FK behavior unknown, delete explicitly
+   *   5. comments, reading_sessions, chapter_reads, notifications WHERE novel_id IN (...)
+   *   6. novels WHERE ai_author_id IS NOT NULL — remaining CASCADE FKs handle bookmarks, reading_progress, etc.
+   *   7. ai_authors (all)
+   *   8. Storage: remove ai-* cover files
+   */
+  async clearAll(): Promise<SeedResult> {
+    const startTime = Date.now();
+    const errors: string[] = [];
+
+    // Step 0: Collect all AI-seeded novel IDs first
+    const aiNovelIds: string[] = [];
+    let offset = 0;
+    const pageSize = 1000;
+    while (true) {
+      const { data, error } = await this.supabase
+        .from('novels')
+        .select('id')
+        .not('ai_author_id', 'is', null)
+        .range(offset, offset + pageSize - 1);
+      if (error) {
+        errors.push(`Fetch AI novel IDs: ${error.message}`);
+        break;
+      }
+      if (!data || data.length === 0) break;
+      aiNovelIds.push(...data.map(r => r.id));
+      if (data.length < pageSize) break;
+      offset += pageSize;
+    }
+
+    console.log(`[Seeder] Found ${aiNovelIds.length} AI-seeded novels to clear`);
+
+    if (aiNovelIds.length === 0) {
+      // Still clean up orphaned authors
+      const { error: authorErr } = await this.supabase
+        .from('ai_authors')
+        .delete()
+        .gte('created_at', '1970-01-01');
+      if (authorErr) errors.push(`Delete ai_authors: ${authorErr.message}`);
+
+      return { authors: 0, novels: 0, activated: 0, errors, durationMs: Date.now() - startTime };
+    }
+
+    // Process in chunks of 200 (Supabase .in() has limits)
+    const chunks = this.chunkArray(aiNovelIds, 200);
+
+    // 1. Delete ai_image_jobs scoped to AI novels
+    for (const chunk of chunks) {
+      const { error } = await this.supabase
+        .from('ai_image_jobs')
+        .delete()
+        .in('novel_id', chunk);
+      if (error) errors.push(`Delete ai_image_jobs chunk: ${error.message}`);
+    }
+    console.log(`[Seeder] Deleted ai_image_jobs for ${aiNovelIds.length} novels`);
+
+    // 2. Delete ai_story_projects scoped to AI novels (cascades 24+ child tables)
+    for (const chunk of chunks) {
+      const { error } = await this.supabase
+        .from('ai_story_projects')
+        .delete()
+        .in('novel_id', chunk);
+      if (error) errors.push(`Delete ai_story_projects chunk: ${error.message}`);
+    }
+    console.log(`[Seeder] Deleted ai_story_projects for ${aiNovelIds.length} novels`);
+
+    // 3. Delete chapters explicitly (FK behavior unknown — could be RESTRICT)
+    for (const chunk of chunks) {
+      const { error } = await this.supabase
+        .from('chapters')
+        .delete()
+        .in('novel_id', chunk);
+      if (error) errors.push(`Delete chapters chunk: ${error.message}`);
+    }
+    console.log(`[Seeder] Deleted chapters for ${aiNovelIds.length} novels`);
+
+    // 4. Delete other tables with unknown FK behavior
+    const otherTables = ['comments', 'reading_sessions', 'chapter_reads', 'notifications'] as const;
+    for (const table of otherTables) {
+      for (const chunk of chunks) {
+        const { error } = await this.supabase
+          .from(table)
+          .delete()
+          .in('novel_id', chunk);
+        if (error) errors.push(`Delete ${table} chunk: ${error.message}`);
+      }
+    }
+    console.log(`[Seeder] Deleted comments/reading_sessions/chapter_reads/notifications`);
+
+    // 5. Delete novels (remaining CASCADE FKs: bookmarks, reading_progress, production_queue)
+    const { error: novelErr } = await this.supabase
+      .from('novels')
+      .delete()
+      .not('ai_author_id', 'is', null);
+    if (novelErr) errors.push(`Delete novels: ${novelErr.message}`);
+    else console.log(`[Seeder] Deleted ${aiNovelIds.length} AI-seeded novels`);
+
+    // 6. Delete ai_authors (all — this table is only used by the seeder)
+    const { error: authorErr } = await this.supabase
+      .from('ai_authors')
+      .delete()
+      .gte('created_at', '1970-01-01');
+    if (authorErr) errors.push(`Delete ai_authors: ${authorErr.message}`);
+    else console.log(`[Seeder] Deleted ai_authors`);
+
+    // 7. Clear cover files starting with "ai-" from Supabase Storage "covers" bucket
+    //    Paginate to handle >1000 files
+    try {
+      let totalRemoved = 0;
+      let hasMore = true;
+      while (hasMore) {
+        const { data: files, error: listErr } = await this.supabase.storage
+          .from('covers')
+          .list('', { limit: 1000 });
+        if (listErr) {
+          errors.push(`List covers bucket: ${listErr.message}`);
+          break;
+        }
+        if (!files || files.length === 0) break;
+
+        const aiFiles = files
+          .filter(f => f.name.startsWith('ai-'))
+          .map(f => f.name);
+
+        if (aiFiles.length === 0) {
+          hasMore = false;
+          break;
+        }
+
+        const { error: rmErr } = await this.supabase.storage
+          .from('covers')
+          .remove(aiFiles);
+        if (rmErr) {
+          errors.push(`Remove cover files: ${rmErr.message}`);
+          break;
+        }
+        totalRemoved += aiFiles.length;
+
+        // If we found fewer ai- files than total files, no more ai- files to clean
+        if (aiFiles.length < files.length) hasMore = false;
+      }
+      if (totalRemoved > 0) {
+        console.log(`[Seeder] Removed ${totalRemoved} cover files from storage`);
+      }
+    } catch (e: any) {
+      errors.push(`Storage cleanup: ${e?.message || String(e)}`);
+    }
+
+    return {
+      authors: 0,
+      novels: 0,
+      activated: 0,
+      errors,
+      durationMs: Date.now() - startTime,
+    };
+  }
+
+  /**
+   * Step covers: Enqueue cover generation jobs for novels missing cover_url.
+   * Uses the existing ai_image_jobs + edge function pipeline.
+   */
+  async enqueueCoversOnly(limit: number = 20): Promise<SeedResult> {
+    const startTime = Date.now();
+    const errors: string[] = [];
+
+    this.userId = await this.getSystemUserId();
+    if (!this.userId) {
+      return { authors: 0, novels: 0, activated: 0, coverJobs: 0, errors: ['No user found in profiles table'], durationMs: Date.now() - startTime };
+    }
+
+    // Find novels without cover (include saved cover_prompt)
+    const { data: novels, error: novelErr } = await this.supabase
+      .from('novels')
+      .select('id, title, description, genres, cover_url, cover_prompt')
+      .is('cover_url', null)
+      .order('created_at', { ascending: true })
+      .limit(limit);
+
+    if (novelErr) {
+      return { authors: 0, novels: 0, activated: 0, coverJobs: 0, errors: [novelErr.message], durationMs: Date.now() - startTime };
+    }
+
+    if (!novels || novels.length === 0) {
+      return { authors: 0, novels: 0, activated: 0, coverJobs: 0, errors: ['No novels need covers'], durationMs: Date.now() - startTime };
+    }
+
+    let enqueued = 0;
+
+    for (const novel of novels as any[]) {
+      try {
+        const genre = Array.isArray(novel.genres) && novel.genres.length > 0 ? novel.genres[0] : 'tien-hiep';
+        const desc = String(novel.description || '').slice(0, 800);
+        const title = String(novel.title || '');
+
+        const prompt = novel.cover_prompt || this.buildCoverPrompt(title, genre, desc);
+
+        const { data: job, error: jobError } = await this.supabase
+          .from('ai_image_jobs')
+          .insert({
+            user_id: this.userId,
+            novel_id: novel.id,
+            prompt,
+            status: 'pending',
+          })
+          .select('id')
+          .single();
+
+        if (jobError || !job?.id) {
+          errors.push(`Create cover job failed (${String(novel.id).slice(0, 8)}): ${jobError?.message || 'unknown'}`);
+          continue;
+        }
+
+        // Invoke edge function and AWAIT to avoid overwhelming Gemini API
+        try {
+          await this.supabase.functions
+            .invoke('gemini-cover-generate', { body: { jobId: job.id, prompt } });
+        } catch (e: any) {
+          errors.push(`Invoke cover job failed (${job.id.slice(0, 8)}): ${e?.message || String(e)}`);
+        }
+
+        enqueued++;
+
+        // Rate limit: 3s delay between jobs (Gemini image gen is slow anyway)
+        if (enqueued < novels.length) {
+          await new Promise(r => setTimeout(r, 3000));
+        }
+      } catch (e: any) {
+        errors.push(`Enqueue cover exception: ${e?.message || String(e)}`);
+      }
+    }
+
+    return {
+      authors: 0,
+      novels: 0,
+      activated: 0,
+      coverJobs: enqueued,
+      errors,
+      durationMs: Date.now() - startTime,
+    };
   }
 
   // ============================================================================
@@ -299,8 +539,9 @@ export class ContentSeeder {
         const genre = ALL_GENRES[i % ALL_GENRES.length];
         const author = generateQuickAuthor(genre);
         const id = randomUUID();
-        // Append short hash to ensure unique name
-        const uniqueName = `${author.name} ${id.slice(0, 4)}`;
+        // Use sequential number suffix for unique + natural-looking names
+        const authorNum = i + 1;
+        const uniqueName = `${author.name} ${this.toVietnameseOrdinal(authorNum)}`;
 
         rows.push({
           id,
@@ -338,7 +579,7 @@ export class ContentSeeder {
   ): Promise<Map<string, NovelIdea[]>> {
     const ideasByGenre = new Map<string, NovelIdea[]>();
     const novelsPerGenre = Math.ceil(totalNovels / ALL_GENRES.length);
-    const batchSize = 50; // 50 novels per Gemini call
+    const batchSize = 20; // 20 novels per Gemini call (fits well within 60K token limit)
 
     // Process genres in parallel (4 at a time to respect rate limits)
     const genreChunks = this.chunkArray(ALL_GENRES, 4);
@@ -349,16 +590,11 @@ export class ContentSeeder {
 
         for (let offset = 0; offset < novelsPerGenre; offset += batchSize) {
           const count = Math.min(batchSize, novelsPerGenre - offset);
-          const batch = await this.generateNovelBatch(genre, count, offset);
-
-          if (batch.length > 0) {
+          try {
+            const batch = await this.generateNovelBatch(genre, count, offset);
             ideas.push(...batch);
-          } else {
-            errors.push(`Failed to generate novels for ${genre} batch at offset ${offset}`);
-            // Generate fallback ideas
-            for (let j = 0; j < count; j++) {
-              ideas.push(this.generateFallbackNovel(genre, offset + j));
-            }
+          } catch (e: any) {
+            errors.push(`FAILED: ${genre} batch at offset ${offset}: ${e?.message || String(e)}. No fallback.`);
           }
         }
 
@@ -381,6 +617,19 @@ export class ContentSeeder {
     offset: number
   ): Promise<NovelIdea[]> {
     const genreLabel = GENRE_LABELS[genre] || genre;
+    const requiredKey = (GENRE_CONFIG as any)[genre]?.requiredFields?.[0] as string | undefined;
+    const requiredExample = requiredKey ? (GENRE_CONFIG as any)[genre]?.example : '';
+
+    const requiredRulesByKey: Record<string, string> = {
+      cultivation_system: 'Viết hệ thống tu luyện rõ ràng, ít nhất 7 cảnh giới theo thứ tự, mỗi cảnh giới có đặc trưng và điều kiện đột phá.',
+      magic_system: 'Viết hệ thống phép thuật rõ ràng (nguyên tố/trường phái/cấp bậc), ít nhất 7 bậc hoặc 7 vòng tiến hoá sức mạnh.',
+      game_system: 'Viết hệ thống game/VR: cấp độ, class, skill tree, nhiệm vụ, thưởng/phạt, UI trạng thái. Có luật rõ.',
+      modern_setting: 'Viết bối cảnh đô thị hiện đại: thành phố/ngành nghề/chính trị-xã hội/quy tắc quyền lực. Cụ thể và có xung đột.',
+      tech_level: 'Viết mức công nghệ tương lai: mốc công nghệ chủ đạo (AI, cơ giáp, du hành, nano, lượng tử...), mức độ phổ cập và hệ quả xã hội.',
+      historical_period: 'Nêu rõ thời kỳ lịch sử (triều đại/niên đại), bối cảnh chính trị-xã hội, phong tục và mâu thuẫn thời đại.',
+      original_work: 'Nêu rõ tác phẩm gốc (tên) và cách biến tấu/nhánh rẽ (AU) để tạo câu chuyện mới.',
+    };
+    const requiredRule = requiredKey ? (requiredRulesByKey[requiredKey] || 'Viết chi tiết, cụ thể, có cấu trúc rõ ràng.') : 'Viết chi tiết, cụ thể, có cấu trúc rõ ràng.';
 
     const prompt = `Bạn là tác giả webnovel chuyên nghiệp. Hãy tạo ${count} tiểu thuyết thể loại ${genreLabel} với NỘI DUNG ĐẦY ĐỦ.
 
@@ -388,17 +637,21 @@ Mỗi tiểu thuyết cần:
 1. "title": Tên truyện (hấp dẫn, kiểu webnovel, 2-8 chữ)
 2. "premise": Hook 1-2 câu ngắn gọn
 3. "mainCharacter": Tên nhân vật chính (Trung/Việt, 2-3 chữ)
-4. "description": Giới thiệu truyện 200-400 chữ tiếng Việt. Bao gồm: bối cảnh thế giới, nhân vật chính (xuất thân, tính cách, năng lực), xung đột chính, điểm hấp dẫn. Câu đầu phải HOOK. KHÔNG spoil kết.
-5. "worldSystem": Mô tả hệ thống thế giới 100-200 chữ. Nếu tu luyện: liệt kê 7+ cấp bậc. Nếu game: level system. Nếu đô thị: hệ thống xã hội/quyền lực. Phải chi tiết, cụ thể.
-6. "coverPrompt": 2-3 câu tiếng ANH mô tả cảnh bìa: nhân vật đang làm gì, bối cảnh, mood, màu sắc.
+4. "mainCharacterProfile": Hồ sơ NV chính 120-220 chữ (tuổi/xuất thân/tính cách/năng lực/mục tiêu/điểm yếu)
+5. "description": Giới thiệu truyện 250-500 chữ tiếng Việt. Bao gồm: bối cảnh thế giới, nhân vật chính, xung đột chính, điểm hấp dẫn. Câu đầu phải HOOK. KHÔNG spoil kết.
+6. "shortSynopsis": Tóm tắt 2-3 câu (không spoil kết)
+7. "worldDescription": Mô tả thế giới 120-220 chữ (địa danh, thế lực, quy tắc)
+8. "${requiredKey || 'required_system'}": Trường BẮT BUỘC cho thể loại này. ${requiredRule} Ví dụ format: ${requiredExample}
+9. "coverPrompt": Prompt tiếng Anh 3-5 câu để Nano Banana Pro tạo ảnh bìa. BẮT BUỘC render chữ tiêu đề.
 
 Trả về JSON array:
-[{"title":"...","premise":"...","mainCharacter":"...","description":"...","worldSystem":"...","coverPrompt":"..."},...]
+[{"title":"...","premise":"...","mainCharacter":"...","mainCharacterProfile":"...","description":"...","shortSynopsis":"...","worldDescription":"...","${requiredKey || 'required_system'}":"...","coverPrompt":"..."},...]
 
 CHÚ Ý:
-- Mỗi truyện PHẢI có description dài 200+ chữ, worldSystem 100+ chữ
-- Ý tưởng ĐỘC ĐÁO, không lặp lại
-- Batch ${Math.floor(offset / count) + 1}: sáng tạo theo hướng khác batch trước
+- Mỗi truyện PHẢI có description dài 250+ chữ, có shortSynopsis + worldDescription + mainCharacterProfile
+- Trường "${requiredKey || 'required_system'}" là BẮT BUỘC, không được để trống
+- coverPrompt phải chứa câu: Title text must be exactly: "<TITLE>" và yêu cầu đặt title top-center, font serif, high contrast, no other text
+- Mỗi truyện phải có ý tưởng ĐỘC ĐÁO, KHÔNG lặp lại ý tưởng trong cùng batch
 - CHỈ trả về JSON array, không thêm text khác`;
 
     try {
@@ -406,27 +659,32 @@ CHÚ Ý:
         provider: 'gemini',
         model: 'gemini-3-flash-preview',
         messages: [{ role: 'user', content: prompt }],
-        temperature: 1.0,
-        maxTokens: 8192,
+        temperature: 0.8,
+        maxTokens: 60000,
       });
 
       if (!response.success || !response.content) {
-        console.error(`[Seeder] Gemini failed for ${genre}: ${response.error}`);
-        return [];
+        const errMsg = `Gemini failed for ${genre}: ${response.error || 'empty response'}`;
+        console.error(`[Seeder] ${errMsg}`);
+        throw new Error(errMsg);
       }
 
       // Parse JSON from response
-      return this.parseNovelIdeas(response.content, count);
+      const ideas = this.parseNovelIdeas(response.content, count, requiredKey);
+      if (ideas.length === 0) {
+        throw new Error(`Gemini returned unparseable JSON for ${genre} (expected ${count} novels)`);
+      }
+      return ideas;
     } catch (error) {
       console.error(`[Seeder] Gemini error for ${genre}:`, error);
-      return [];
+      throw error;
     }
   }
 
   /**
    * Parse JSON array of novel ideas from Gemini response
    */
-  private parseNovelIdeas(content: string, expectedCount: number): NovelIdea[] {
+  private parseNovelIdeas(content: string, expectedCount: number, requiredKey?: string): NovelIdea[] {
     try {
       // Extract JSON array from response
       const jsonMatch = content.match(/\[[\s\S]*\]/);
@@ -436,18 +694,18 @@ CHÚ Ý:
         const repairedMatch = repaired.match(/\[[\s\S]*\]/);
         if (!repairedMatch) return [];
         const parsed = JSON.parse(repairedMatch[0]);
-        return this.validateNovelIdeas(parsed);
+        return this.validateNovelIdeas(parsed, requiredKey);
       }
 
       const parsed = JSON.parse(jsonMatch[0]);
-      return this.validateNovelIdeas(parsed);
+      return this.validateNovelIdeas(parsed, requiredKey);
     } catch (error) {
       console.error('[Seeder] JSON parse error:', error);
       return [];
     }
   }
 
-  private validateNovelIdeas(parsed: unknown[]): NovelIdea[] {
+  private validateNovelIdeas(parsed: unknown[], requiredKey?: string): NovelIdea[] {
     if (!Array.isArray(parsed)) return [];
 
     return parsed
@@ -456,8 +714,12 @@ CHÚ Ý:
         title: String(item.title).trim(),
         premise: String(item.premise).trim(),
         mainCharacter: String(item.mainCharacter || this.randomMCName()).trim(),
+        mainCharacterProfile: item.mainCharacterProfile ? String(item.mainCharacterProfile).trim() : undefined,
         description: item.description ? String(item.description).trim() : undefined,
-        worldSystem: item.worldSystem ? String(item.worldSystem).trim() : undefined,
+        shortSynopsis: item.shortSynopsis ? String(item.shortSynopsis).trim() : undefined,
+        worldDescription: item.worldDescription ? String(item.worldDescription).trim() : undefined,
+        requiredFieldKey: requiredKey,
+        requiredFieldValue: requiredKey && item[requiredKey] ? String(item[requiredKey]).trim() : undefined,
         coverPrompt: item.coverPrompt ? String(item.coverPrompt).trim() : undefined,
       }));
   }
@@ -482,31 +744,6 @@ CHÚ Ý:
     }
 
     return result;
-  }
-
-  /**
-   * Generate a fallback novel idea (no AI)
-   */
-  private generateFallbackNovel(genre: string, index: number): NovelIdea {
-    const genreLabel = GENRE_LABELS[genre] || genre;
-    const mc = this.randomMCName();
-    // Use UUID suffix to guarantee unique titles
-    const uid = randomUUID().slice(0, 6);
-
-    const templates = [
-      { title: `${mc} ${genreLabel} Ký`, premise: `${mc} bước vào con đường ${genreLabel.toLowerCase()}, từ kẻ vô danh trở thành tuyệt thế cường giả.` },
-      { title: `Thiên Đạo ${genreLabel}: ${mc}`, premise: `Trong thế giới ${genreLabel.toLowerCase()}, ${mc} phát hiện bí mật kinh thiên, bắt đầu hành trình nghịch thiên.` },
-      { title: `${genreLabel} Chi Vương: ${mc}`, premise: `${mc} mang theo ký ức tiền kiếp, quyết tâm đứng trên đỉnh thế giới ${genreLabel.toLowerCase()}.` },
-      { title: `Vô Thượng ${genreLabel}: ${mc}`, premise: `Cả thế giới đều nói ${mc} là phế vật, nhưng hắn lại có bí mật mà không ai biết.` },
-      { title: `${mc} Truyền Kỳ`, premise: `Câu chuyện về ${mc} - từ thiếu niên bình thường đến bá chủ ${genreLabel.toLowerCase()}.` },
-    ];
-
-    const template = templates[index % templates.length];
-    return {
-      title: `${template.title} [${uid}]`,
-      premise: template.premise,
-      mainCharacter: mc,
-    };
   }
 
   // ============================================================================
@@ -540,11 +777,28 @@ CHÚ Ý:
         const ideas = ideasByGenre.get(genre) || [];
         const ideaIdx = genreIterators.get(genre) || 0;
 
-        const idea = ideas[ideaIdx] || this.generateFallbackNovel(genre, ideaIdx);
+        if (ideaIdx >= ideas.length) {
+          errors.push(`FAILED: Not enough Gemini ideas for genre ${genre} (need index ${ideaIdx}, have ${ideas.length}). Skipping novel.`);
+          genreIterators.set(genre, ideaIdx + 1);
+          continue;
+        }
+        const idea = ideas[ideaIdx];
         genreIterators.set(genre, ideaIdx + 1);
 
         allIdeas.push({ genre, idea });
       }
+    }
+
+    // Dedup titles — DB has unique constraint on novels.title
+    // If duplicate, append a short hash to make it unique
+    const seenTitles = new Set<string>();
+    for (const entry of allIdeas) {
+      let title = entry.idea.title;
+      while (seenTitles.has(title)) {
+        title = `${entry.idea.title} [${randomUUID().slice(0, 4)}]`;
+      }
+      seenTitles.add(title);
+      entry.idea.title = title;
     }
 
     // Insert in batches
@@ -562,23 +816,37 @@ CHÚ Ý:
         const projectId = randomUUID();
         const totalChapters = this.randomInt(minChapters, maxChapters);
 
+        const requiredKey =
+          idea.requiredFieldKey || ((GENRE_CONFIG as any)[genre]?.requiredFields?.[0] as string | undefined);
+        const requiredValue = idea.requiredFieldValue;
+        if (requiredKey && !requiredValue) {
+          errors.push(`WARNING: Novel "${idea.title}" missing required field ${requiredKey}. Gemini did not provide it.`);
+        }
+
+        const formattedDescription = this.formatNovelDescription({
+          ...idea,
+          requiredFieldKey: requiredKey,
+          requiredFieldValue: requiredValue,
+        });
+
         novelRows.push({
           id: novelId,
           title: idea.title,
           author: '', // Will be filled separately via updateNovelAuthorNames
           ai_author_id: authorId,
-          description: idea.description || idea.premise,
+          description: formattedDescription,
           status: 'Đang ra',
           genres: [genre],
+          cover_prompt: idea.coverPrompt || this.buildCoverPrompt(idea.title, genre, formattedDescription),
         });
 
-        projectRows.push({
+        const projectRow: any = {
           id: projectId,
           user_id: this.userId,
           novel_id: novelId,
           genre,
           main_character: idea.mainCharacter,
-          world_description: idea.worldSystem || idea.premise,
+          world_description: idea.worldDescription || idea.description || idea.premise,
           writing_style: 'webnovel_chinese',
           target_chapter_length: 2500,
           ai_model: 'gemini-3-flash-preview',
@@ -586,7 +854,14 @@ CHÚ Ý:
           current_chapter: 0,
           total_planned_chapters: totalChapters,
           status: 'paused', // Start paused, activate later
-        });
+        };
+
+        // Fill genre-required system field (AI Writer relies on this)
+        if (requiredKey && requiredValue) {
+          projectRow[requiredKey] = requiredValue;
+        }
+
+        projectRows.push(projectRow);
       }
 
       // Insert novels first (FK dependency)
@@ -707,6 +982,52 @@ CHÚ Ý:
   // HELPERS
   // ============================================================================
 
+  private formatNovelDescription(idea: NovelIdea): string {
+    const blocks: string[] = [];
+
+    const intro = (idea.description || idea.premise || '').trim();
+    if (intro) blocks.push(intro);
+
+    const shortSynopsis = (idea.shortSynopsis || '').trim();
+    if (shortSynopsis) blocks.push(`TÓM TẮT\n${shortSynopsis}`);
+
+    const mcProfile = (idea.mainCharacterProfile || '').trim();
+    const mcLine = mcProfile ? `${idea.mainCharacter}: ${mcProfile}` : idea.mainCharacter;
+    blocks.push(`NHÂN VẬT CHÍNH\n${mcLine}`);
+
+    const world = (idea.worldDescription || '').trim();
+    if (world) blocks.push(`THẾ GIỚI\n${world}`);
+
+    const systemKey = (idea.requiredFieldKey || '').trim();
+    const systemVal = (idea.requiredFieldValue || '').trim();
+    if (systemKey && systemVal) {
+      const label = systemKey.replace(/_/g, ' ').toUpperCase();
+      blocks.push(`${label}\n${systemVal}`);
+    }
+
+    // Missing required field = Gemini didn't provide it. Leave empty — error is logged upstream.
+
+    return blocks.filter(Boolean).join('\n\n');
+  }
+
+  private toVietnameseOrdinal(n: number): string {
+    // Generate natural-looking Vietnamese pen name suffixes
+    const suffixes = [
+      'Nhất', 'Nhị', 'Tam', 'Tứ', 'Ngũ', 'Lục', 'Thất', 'Bát', 'Cửu', 'Thập',
+      'Phong', 'Vân', 'Sơn', 'Hà', 'Nguyệt', 'Tinh', 'Hải', 'Thiên', 'Địa', 'Nhân',
+      'Long', 'Hổ', 'Phượng', 'Quy', 'Lân', 'Hạc', 'Ưng', 'Bằng', 'Xà', 'Mã',
+      'Xuân', 'Hạ', 'Thu', 'Đông', 'Mai', 'Lan', 'Cúc', 'Trúc', 'Tùng', 'Bách',
+      'Kim', 'Mộc', 'Thủy', 'Hỏa', 'Thổ', 'Thiết', 'Ngọc', 'Lôi', 'Băng', 'Viêm',
+    ];
+    if (n <= suffixes.length) {
+      return suffixes[n - 1];
+    }
+    // Beyond 50: combine two suffixes
+    const a = suffixes[(n - 1) % suffixes.length];
+    const b = suffixes[Math.floor((n - 1) / suffixes.length) % suffixes.length];
+    return `${a} ${b}`;
+  }
+
   private randomMCName(): string {
     const ho = MC_NAMES.ho[Math.floor(Math.random() * MC_NAMES.ho.length)];
     const ten = MC_NAMES.ten[Math.floor(Math.random() * MC_NAMES.ten.length)];
@@ -737,6 +1058,22 @@ CHÚ Ý:
       chunks.push(arr.slice(i, i + size));
     }
     return chunks;
+  }
+
+  private buildCoverPrompt(title: string, genre: string, description: string): string {
+    const genreName = GENRE_LABELS[genre] || genre;
+    // Gemini Nano Banana Pro is good at text rendering if you are explicit.
+    // Keep prompt simple, design-forward, and constrain extra text.
+    return [
+      `A photo of a glossy, design-forward webnovel book cover.`,
+      `Genre: ${genreName}.`,
+      `Story description: ${description}`,
+      `Title text must be exactly: "${title}".`,
+      `Place the title at the top-center in large bold serif font, high contrast, perfectly readable.`,
+      `No other text besides the title.`,
+      `Vertical 3:4 composition, cinematic lighting, high-detail illustration, premium publishing quality.`,
+      `No watermark, no signature, no logos.`,
+    ].join(' ');
   }
 }
 

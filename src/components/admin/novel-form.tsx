@@ -143,7 +143,7 @@ export function NovelForm({ novel, isOpen, onOpenChange }: NovelFormProps) {
 
     setIsGeneratingCover(true);
     try {
-      const { data, error } = await supabase.functions.invoke('ideogram-generate', {
+      const { data, error } = await supabase.functions.invoke('gemini-cover-generate', {
         body: { prompt },
       });
 

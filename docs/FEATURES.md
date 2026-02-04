@@ -770,7 +770,7 @@ supabase/migrations/0007_add_foreign_key_constraints_with_cascade_for_other_tabl
 
 src/app/admin/settings/authors/page.tsx: 0.07
 
-supabase/functions/ideogram-generate/index.ts: 0.07
+supabase/functions/gemini-cover-generate/index.ts: 0.07
 
 supabase/migrations/0009_add_performance_indexes_for_frequently_queried_columns.sql: 0.06
 

@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Invoke the edge function asynchronously (fire-and-forget)
-    supabase.functions.invoke('ideogram-generate', {
+    supabase.functions.invoke('gemini-cover-generate', {
       body: { jobId: job.id, prompt },
     }).catch(err => {
       console.error("Error invoking edge function (fire-and-forget):", err);

@@ -282,7 +282,7 @@ export function ProjectSetupDialog({ isOpen, onOpenChange, onProjectSaved, initi
           ai_author_id: freshNovel.ai_author_id || '',
         } as ProjectFormValues);
         setCoverUrl(freshNovel.cover_url || '');
-        const suggestedPrompt = `A book cover for a webnovel titled "${freshNovel.title}". The story is about: ${freshNovel.description}. Style: digital painting, anime, epic, fantasy.`;
+        const suggestedPrompt = `A photo of a glossy, design-forward webnovel book cover. Title text must be exactly: "${freshNovel.title}". Place the title at the top-center in large bold serif font, high contrast, perfectly readable. No other text besides the title. The story is about: ${freshNovel.description}. Style: premium digital illustration, cinematic lighting, high detail, publication-ready. Vertical 3:4.`;
         setCoverPrompt(suggestedPrompt);
       } else {
         form.reset({
@@ -322,7 +322,7 @@ export function ProjectSetupDialog({ isOpen, onOpenChange, onProjectSaved, initi
 
   useEffect(() => {
     if (mode === 'new' && (watchedTitle || watchedDescription)) {
-      const suggestedPrompt = `A book cover for a webnovel titled "${watchedTitle}". The story is about: ${watchedDescription}. Style: digital painting, anime, epic, fantasy.`;
+      const suggestedPrompt = `A photo of a glossy, design-forward webnovel book cover. Title text must be exactly: "${watchedTitle}". Place the title at the top-center in large bold serif font, high contrast, perfectly readable. No other text besides the title. The story is about: ${watchedDescription}. Style: premium digital illustration, cinematic lighting, high detail, publication-ready. Vertical 3:4.`;
       setCoverPrompt(suggestedPrompt);
     }
   }, [watchedTitle, watchedDescription, mode]);

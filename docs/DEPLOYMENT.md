@@ -23,8 +23,8 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 # OpenRouter
 OPENROUTER_API_KEY=your-openrouter-key
 
-# Optional: Ideogram for cover generation
-IDEOGRAM_API_KEY=your-ideogram-key
+# Gemini (for novel generation + cover art)
+GEMINI_API_KEY=your-gemini-key
 ```
 
 ## 📦 Local Development
@@ -56,6 +56,7 @@ npx supabase db push
 npx supabase functions deploy openrouter-chat
 npx supabase functions deploy ai-writer-scheduler
 npx supabase functions deploy notify-new-chapter
+npx supabase functions deploy gemini-cover-generate
 ```
 
 ### 3. Configure Edge Function Secrets
@@ -96,7 +97,7 @@ NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 OPENROUTER_API_KEY=your-openrouter-key
-IDEOGRAM_API_KEY=your-ideogram-key (optional)
+GEMINI_API_KEY=your-gemini-key
 ```
 
 #### Step 3: Deploy
@@ -228,7 +229,7 @@ In Supabase Dashboard → Edge Functions → Manage Secrets:
 
 ```
 OPENROUTER_API_KEY=sk-or-v1-...
-IDEOGRAM_API_KEY=... (optional)
+GEMINI_API_KEY=... (for novel generation + cover art)
 ```
 
 ## 🔐 Security Checklist

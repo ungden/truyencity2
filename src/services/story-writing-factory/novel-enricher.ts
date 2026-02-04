@@ -13,37 +13,29 @@
 import { AIProviderService } from '../ai-provider';
 import { GeminiImageService } from '../factory/gemini-image';
 import { getSupabase } from './supabase-helper';
+import { GENRE_CONFIG } from '@/lib/types/genre-config';
 
-const GENRE_LABELS: Record<string, string> = {
-  'tien-hiep': 'Tiên Hiệp',
-  'huyen-huyen': 'Huyền Huyễn',
-  'do-thi': 'Đô Thị',
-  'kiem-hiep': 'Kiếm Hiệp',
-  'lich-su': 'Lịch Sử',
-  'khoa-huyen': 'Khoa Huyễn',
-  'vong-du': 'Võng Du',
-  'dong-nhan': 'Đồng Nhân',
-  'mat-the': 'Mạt Thế',
-  'linh-di': 'Linh Dị',
-  'quan-truong': 'Quan Trường',
-  'di-gioi': 'Dị Giới',
-};
+// Derive labels from GENRE_CONFIG to stay in sync with AI Writer
+const GENRE_LABELS: Record<string, string> = Object.fromEntries(
+  Object.entries(GENRE_CONFIG).map(([k, v]) => [k, v.name])
+);
 
 // Map genres to cover style keys used by GeminiImageService
-const GENRE_COVER_STYLE: Record<string, string> = {
-  'tien-hiep': 'tien-hiep',
-  'huyen-huyen': 'huyen-huyen',
-  'do-thi': 'urban-modern',
-  'kiem-hiep': 'action-adventure',
-  'lich-su': 'historical',
-  'khoa-huyen': 'sci-fi-apocalypse',
-  'vong-du': 'system-litrpg',
-  'dong-nhan': 'huyen-huyen',
-  'mat-the': 'sci-fi-apocalypse',
-  'linh-di': 'horror-mystery',
-  'quan-truong': 'urban-modern',
-  'di-gioi': 'huyen-huyen',
-};
+// aiPromptCategory from GENRE_CONFIG is the primary source; fallback to genre slug
+const GENRE_COVER_STYLE: Record<string, string> = Object.fromEntries(
+  Object.entries(GENRE_CONFIG).map(([k, v]) => {
+    const categoryToStyle: Record<string, string> = {
+      'cultivation': 'tien-hiep',
+      'fantasy': 'huyen-huyen',
+      'urban': 'urban-modern',
+      'sci-fi': 'sci-fi-apocalypse',
+      'historical': 'historical',
+      'fanfiction': 'huyen-huyen',
+      'game': 'system-litrpg',
+    };
+    return [k, categoryToStyle[v.aiPromptCategory] || k];
+  })
+);
 
 export interface EnrichResult {
   enriched: number;
