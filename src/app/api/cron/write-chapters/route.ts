@@ -65,7 +65,66 @@ type RunResult = {
   tier: 'resume' | 'init';
   success: boolean;
   error?: string;
+  rotatedProjectId?: string | null;
 };
+
+/**
+ * Auto-rotate: When a novel completes, activate a paused novel from the same author.
+ * Returns the newly activated project ID, or null if none available.
+ */
+async function autoRotate(
+  completedNovelId: string,
+  supabase: ReturnType<typeof getSupabaseAdmin>
+): Promise<string | null> {
+  try {
+    // Find the author of the completed novel
+    const { data: novel } = await supabase
+      .from('novels')
+      .select('ai_author_id')
+      .eq('id', completedNovelId)
+      .single();
+
+    if (!novel?.ai_author_id) return null;
+
+    // Find a paused project from the same author
+    const { data: pausedNovels } = await supabase
+      .from('novels')
+      .select('id')
+      .eq('ai_author_id', novel.ai_author_id)
+      .neq('id', completedNovelId);
+
+    if (!pausedNovels || pausedNovels.length === 0) return null;
+
+    const novelIds = pausedNovels.map(n => n.id);
+
+    const { data: pausedProjects } = await supabase
+      .from('ai_story_projects')
+      .select('id')
+      .in('novel_id', novelIds)
+      .eq('status', 'paused')
+      .limit(1);
+
+    if (!pausedProjects || pausedProjects.length === 0) return null;
+
+    const projectToActivate = pausedProjects[0].id;
+
+    const { error } = await supabase
+      .from('ai_story_projects')
+      .update({ status: 'active', updated_at: new Date().toISOString() })
+      .eq('id', projectToActivate);
+
+    if (error) {
+      console.error(`[AutoRotate] Failed to activate ${projectToActivate}:`, error.message);
+      return null;
+    }
+
+    console.log(`[AutoRotate] Novel ${completedNovelId.slice(0, 8)} completed → Activated ${projectToActivate.slice(0, 8)}`);
+    return projectToActivate;
+  } catch (error) {
+    console.error('[AutoRotate] Error:', error);
+    return null;
+  }
+}
 
 /**
  * Create a runner, set callbacks, execute 1 chapter.
@@ -136,12 +195,17 @@ async function writeOneChapter(
     currentChapter: currentCh,  // 0 for init (full plan), >0 for resume (dummy arcs)
   });
 
-  // Check completion
+  // Check completion + auto-rotate
   const nextCh = currentCh + 1;
+  let rotatedProjectId: string | null = null;
+
   if (nextCh >= (project.total_planned_chapters || 200)) {
     await supabase.from('ai_story_projects')
       .update({ status: 'completed', updated_at: new Date().toISOString() })
       .eq('id', project.id);
+
+    // AUTO-ROTATE: Activate a paused novel from the same author
+    rotatedProjectId = await autoRotate(novel.id, supabase);
   }
 
   return {
@@ -150,6 +214,7 @@ async function writeOneChapter(
     tier,
     success: result.success,
     error: result.error,
+    rotatedProjectId,
   };
 }
 
@@ -265,9 +330,10 @@ export async function GET(request: NextRequest) {
 
     const resumeSuccess = summary.filter(r => r.tier === 'resume' && r.success).length;
     const initSuccess = summary.filter(r => r.tier === 'init' && r.success).length;
+    const rotations = summary.filter(r => r.rotatedProjectId).length;
     const duration = (Date.now() - startTime) / 1000;
 
-    console.log(`[Cron] Done in ${duration.toFixed(1)}s. Resume: ${resumeSuccess}/${resumeProjects.length}, Init: ${initSuccess}/${initProjects.length}`);
+    console.log(`[Cron] Done in ${duration.toFixed(1)}s. Resume: ${resumeSuccess}/${resumeProjects.length}, Init: ${initSuccess}/${initProjects.length}, Rotations: ${rotations}`);
 
     return NextResponse.json({
       success: true,
@@ -276,6 +342,7 @@ export async function GET(request: NextRequest) {
       resumeSuccess,
       initCount: initProjects.length,
       initSuccess,
+      rotations,
       durationSeconds: Math.round(duration),
       results: summary,
     });
