@@ -91,13 +91,31 @@ export class FactoryOrchestrator {
 
   /**
    * Update factory configuration
+   * Note: factory_config is a singleton table (one row). We first get the ID,
+   * then update with an explicit WHERE clause for safety.
    */
   async updateConfig(updates: Partial<FactoryConfig>): Promise<ServiceResult<FactoryConfig>> {
     const supabase = this.getSupabase();
 
+    // First get the config row ID to ensure we update the correct row
+    const { data: existing, error: fetchError } = await supabase
+      .from('factory_config')
+      .select('id')
+      .limit(1)
+      .single();
+
+    if (fetchError || !existing) {
+      return {
+        success: false,
+        error: fetchError?.message || 'No factory config found',
+        errorCode: 'DB_SELECT_ERROR',
+      };
+    }
+
     const { data, error } = await supabase
       .from('factory_config')
       .update(updates)
+      .eq('id', existing.id)
       .select()
       .single();
 

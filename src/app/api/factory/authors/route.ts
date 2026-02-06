@@ -6,9 +6,13 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthorManagerService, FactoryGenre } from '@/services/factory';
+import { factoryAuth, finalizeResponse } from '../_auth';
 
 export async function GET(request: NextRequest) {
   try {
+    const auth = await factoryAuth(request, '/api/factory/authors');
+    if (!auth.success) return auth.response;
+
     const { searchParams } = new URL(request.url);
     const genre = searchParams.get('genre') as FactoryGenre | null;
     const view = searchParams.get('view') || 'list';
@@ -24,10 +28,10 @@ export async function GET(request: NextRequest) {
           { status: 404 }
         );
       }
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: true,
         data: result.data,
-      });
+      }), auth, '/api/factory/authors', 'GET');
     }
 
     if (view === 'leaderboard') {
@@ -35,39 +39,39 @@ export async function GET(request: NextRequest) {
       const limit = parseInt(searchParams.get('limit') || '10');
       
       const result = await authorManager.getLeaderboard(metric, limit);
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: result.data,
         error: result.error,
-      });
+      }), auth, '/api/factory/authors', 'GET');
     }
 
     if (view === 'stats') {
       const result = await authorManager.getAuthorStats();
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: result.data,
         error: result.error,
-      });
+      }), auth, '/api/factory/authors', 'GET');
     }
 
     if (genre) {
       const result = await authorManager.getAuthorsByGenre(genre);
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: result.data,
         count: result.data?.length || 0,
         error: result.error,
-      });
+      }), auth, '/api/factory/authors', 'GET');
     }
 
     const result = await authorManager.getActiveAuthors();
-    return NextResponse.json({
+    return finalizeResponse(NextResponse.json({
       success: result.success,
       data: result.data,
       count: result.data?.length || 0,
       error: result.error,
-    });
+    }), auth, '/api/factory/authors', 'GET');
   } catch (error) {
     console.error('[API] Authors GET error:', error);
     return NextResponse.json(
@@ -79,6 +83,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await factoryAuth(request, '/api/factory/authors');
+    if (!auth.success) return auth.response;
+
     const body = await request.json();
     const action = body.action || 'create';
 
@@ -120,11 +127,11 @@ export async function POST(request: NextRequest) {
         status: 'active',
       });
 
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: result.data,
         error: result.error,
-      });
+      }), auth, '/api/factory/authors', 'POST');
     }
 
     if (action === 'update') {
@@ -162,11 +169,11 @@ export async function POST(request: NextRequest) {
 
       const result = await authorManager.updateAuthor(authorId, filteredUpdates);
 
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: result.data,
         error: result.error,
-      });
+      }), auth, '/api/factory/authors', 'POST');
     }
 
     if (action === 'set_status') {
@@ -189,10 +196,10 @@ export async function POST(request: NextRequest) {
 
       const result = await authorManager.setAuthorStatus(authorId, status);
 
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         error: result.error,
-      });
+      }), auth, '/api/factory/authors', 'POST');
     }
 
     if (action === 'find_for_genre') {
@@ -207,11 +214,11 @@ export async function POST(request: NextRequest) {
 
       const result = await authorManager.findAuthorForGenre(genre);
 
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: result.data,
         error: result.error,
-      });
+      }), auth, '/api/factory/authors', 'POST');
     }
 
     return NextResponse.json(

@@ -6,9 +6,13 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getIdeaBankService } from '@/services/factory';
+import { factoryAuth, finalizeResponse } from '../_auth';
 
 export async function GET(request: NextRequest) {
   try {
+    const auth = await factoryAuth(request, '/api/factory/ideas');
+    if (!auth.success) return auth.response;
+
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status') || 'generated';
     const limit = parseInt(searchParams.get('limit') || '50');
@@ -34,11 +38,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({
+    return finalizeResponse(NextResponse.json({
       success: true,
       data: result.data,
       count: result.data?.length || 0,
-    });
+    }), auth, '/api/factory/ideas', 'GET');
   } catch (error) {
     console.error('[API] Ideas GET error:', error);
     return NextResponse.json(
@@ -50,6 +54,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await factoryAuth(request, '/api/factory/ideas');
+    if (!auth.success) return auth.response;
+
     const body = await request.json();
     const action = body.action || 'generate';
 
@@ -61,14 +68,14 @@ export async function POST(request: NextRequest) {
 
       const result = await ideaBank.generateAndSaveIdeas(count, genreDistribution);
 
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: {
           total: result.total,
           succeeded: result.succeeded,
           failed: result.failed,
         },
-      });
+      }), auth, '/api/factory/ideas', 'POST');
     }
 
     if (action === 'approve') {
@@ -81,21 +88,21 @@ export async function POST(request: NextRequest) {
       }
 
       const result = await ideaBank.approveIdea(ideaId);
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: result.data,
         error: result.error,
-      });
+      }), auth, '/api/factory/ideas', 'POST');
     }
 
     if (action === 'approve_all') {
       const limit = body.limit || 100;
       const result = await ideaBank.autoApproveIdeas(limit);
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: { approved: result.data },
         error: result.error,
-      });
+      }), auth, '/api/factory/ideas', 'POST');
     }
 
     if (action === 'reject') {
@@ -110,10 +117,10 @@ export async function POST(request: NextRequest) {
       }
 
       const result = await ideaBank.rejectIdea(ideaId, reason);
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         error: result.error,
-      });
+      }), auth, '/api/factory/ideas', 'POST');
     }
 
     return NextResponse.json(

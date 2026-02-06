@@ -311,55 +311,58 @@ export class ErrorHandlerService {
     const supabase = this.getSupabase();
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
+    const startISO = startDate.toISOString();
 
-    const { data, error } = await supabase
-      .from('factory_errors')
-      .select('*')
-      .gte('created_at', startDate.toISOString());
+    // Count by type
+    const typeKeys: ErrorType[] = ['ai_failure', 'quality_failure', 'publish_failure', 'system_error', 'rate_limit'];
+    const severityKeys: ErrorSeverity[] = ['info', 'warning', 'error', 'critical'];
+    const statusKeys: ErrorStatus[] = ['new', 'acknowledged', 'investigating', 'resolved', 'ignored'];
 
-    if (error) {
+    const [totalResult, ...countResults] = await Promise.all([
+      supabase.from('factory_errors').select('*', { count: 'exact', head: true }).gte('created_at', startISO),
+      // By type (5 queries)
+      ...typeKeys.map(t =>
+        supabase.from('factory_errors').select('*', { count: 'exact', head: true }).gte('created_at', startISO).eq('error_type', t)
+      ),
+      // By severity (4 queries)
+      ...severityKeys.map(s =>
+        supabase.from('factory_errors').select('*', { count: 'exact', head: true }).gte('created_at', startISO).eq('severity', s)
+      ),
+      // By status (5 queries)
+      ...statusKeys.map(st =>
+        supabase.from('factory_errors').select('*', { count: 'exact', head: true }).gte('created_at', startISO).eq('status', st)
+      ),
+    ]);
+
+    const allResults = [totalResult, ...countResults];
+    const firstError = allResults.find(r => r.error);
+    if (firstError?.error) {
       return {
         success: false,
-        error: error.message,
-        errorCode: 'DB_SELECT_ERROR',
+        error: firstError.error.message,
+        errorCode: 'DB_COUNT_ERROR',
       };
     }
 
-    const errors = data as FactoryError[];
+    const byType = {} as Record<ErrorType, number>;
+    typeKeys.forEach((key, i) => {
+      byType[key] = countResults[i].count || 0;
+    });
 
-    const byType: Record<ErrorType, number> = {
-      ai_failure: 0,
-      quality_failure: 0,
-      publish_failure: 0,
-      system_error: 0,
-      rate_limit: 0,
-    };
+    const bySeverity = {} as Record<ErrorSeverity, number>;
+    severityKeys.forEach((key, i) => {
+      bySeverity[key] = countResults[typeKeys.length + i].count || 0;
+    });
 
-    const bySeverity: Record<ErrorSeverity, number> = {
-      info: 0,
-      warning: 0,
-      error: 0,
-      critical: 0,
-    };
-
-    const byStatus: Record<ErrorStatus, number> = {
-      new: 0,
-      acknowledged: 0,
-      investigating: 0,
-      resolved: 0,
-      ignored: 0,
-    };
-
-    for (const err of errors) {
-      byType[err.error_type]++;
-      bySeverity[err.severity]++;
-      byStatus[err.status]++;
-    }
+    const byStatus = {} as Record<ErrorStatus, number>;
+    statusKeys.forEach((key, i) => {
+      byStatus[key] = countResults[typeKeys.length + severityKeys.length + i].count || 0;
+    });
 
     return {
       success: true,
       data: {
-        total: errors.length,
+        total: totalResult.count || 0,
         new: byStatus.new,
         critical: bySeverity.critical,
         byType,

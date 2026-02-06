@@ -43,6 +43,8 @@ import { PowerTracker } from './power-tracker';
 import { AutoRewriter, RewriteResult } from './auto-rewriter';
 import { CanonResolver } from './canon-resolver';
 import { BeatLedger } from './beat-ledger';
+import { ConsistencyChecker, ConsistencyReport } from './consistency';
+import { PlotArcManager } from '../plot-arc-manager';
 
 // ============================================================================
 // DEFAULT RUNNER CONFIG
@@ -83,6 +85,8 @@ export class StoryRunner {
   private autoRewriter: AutoRewriter | null = null;
   private canonResolver: CanonResolver | null = null;
   private beatLedger: BeatLedger | null = null;
+  private consistencyChecker: ConsistencyChecker | null = null;
+  private plotArcManager: PlotArcManager | null = null;
 
   // State
   private state: RunnerState | null = null;
@@ -200,6 +204,12 @@ export class StoryRunner {
       characterTracker: this.characterTracker,
     });
 
+    // Initialize ConsistencyChecker for contradiction detection
+    this.consistencyChecker = new ConsistencyChecker(this.state.projectId);
+
+    // Initialize PlotArcManager for long-form story structure (especially resume mode)
+    this.plotArcManager = new PlotArcManager(this.state.projectId);
+
     // Initialize AutoRewriter for quality recovery
     this.autoRewriter = new AutoRewriter(
       this.state.projectId,
@@ -224,6 +234,7 @@ export class StoryRunner {
         this.fullQCGating.initialize(),
         this.canonResolver.initialize(),
         this.beatLedger.initialize(),
+        this.consistencyChecker.initialize(),
       ]);
     } catch (e) {
       // Non-fatal: quality systems can work without prior data
@@ -555,6 +566,31 @@ export class StoryRunner {
             previousSummary += `\n- ${warning}`;
           }
         }
+
+        // Enrich context with PlotArcManager data (arc structure, twists, tension)
+        if (this.plotArcManager) {
+          try {
+            // Ensure arc exists for this chapter (auto-creates if needed)
+            await this.plotArcManager.ensureArcExists(chapterNumber);
+
+            // Get plot objectives (tension level, arc theme, upcoming twists, character milestones)
+            const plotObjectives = await this.plotArcManager.generatePlotObjectives(chapterNumber);
+            if (plotObjectives) {
+              previousSummary += `\n\n📊 PLOT OBJECTIVES:\n${plotObjectives}`;
+            }
+
+            // Get relevant arc summaries for long-term context
+            const arcSummaries = await this.plotArcManager.getRelevantArcSummaries(chapterNumber, 2);
+            if (arcSummaries.length > 0) {
+              previousSummary += `\n\n📖 ARC CONTEXT:`;
+              for (const summary of arcSummaries) {
+                previousSummary += `\n- Arc ${summary.level_number} (Ch.${summary.start_chapter}-${summary.end_chapter}): ${summary.summary?.substring(0, 200) || 'No summary'}`;
+              }
+            }
+          } catch (plotErr) {
+            // PlotArcManager failure is non-fatal
+          }
+        }
       } else {
         previousSummary = this.getPreviousSummary(chapterNumber);
       }
@@ -699,6 +735,60 @@ export class StoryRunner {
           }
         }
 
+        // ========== CONSISTENCY CHECK (contradiction detection) ==========
+        if (this.consistencyChecker && result.data) {
+          try {
+            const outlineCharacters = result.outline?.scenes
+              ?.flatMap(s => s.characters)
+              .filter((c, i, arr) => arr.indexOf(c) === i) || [];
+
+            const consistencyReport = await this.consistencyChecker.checkChapter(
+              chapterNumber,
+              result.data.content,
+              {
+                charactersInvolved: [
+                  this.worldBible?.protagonist.name || '',
+                  ...outlineCharacters,
+                ].filter(Boolean),
+                locations: result.outline?.location ? [result.outline.location] : [],
+                powerEvents: result.outline?.dopaminePoints
+                  ?.filter(d => d.type === 'breakthrough')
+                  .map(d => ({
+                    character: this.worldBible?.protagonist.name || '',
+                    toLevel: d.description,
+                  })),
+                newCharacters: outlineCharacters
+                  .filter(c => c !== this.worldBible?.protagonist.name)
+                  .map(c => ({ name: c, role: 'supporting' as const })),
+              }
+            );
+
+            if (consistencyReport.hasCriticalIssues) {
+              const criticalIssues = consistencyReport.issues
+                .filter(i => i.severity === 'critical' || i.severity === 'major')
+                .map(i => `${i.type}: ${i.description}`)
+                .join('; ');
+
+              this.callbacks.onError?.(
+                `Ch.${chapterNumber} consistency issues (score: ${consistencyReport.overallScore}): ${criticalIssues}`
+              );
+
+              // If critical and we haven't exhausted retries, this could trigger rewrite
+              // For now, log and continue - the chapter is still usable
+              if (consistencyReport.overallScore < 40) {
+                this.callbacks.onStatusChange?.('writing',
+                  `Ch.${chapterNumber} WARNING: Low consistency score ${consistencyReport.overallScore}/100`
+                );
+              }
+            }
+          } catch (consistencyErr) {
+            // ConsistencyChecker failure is non-fatal - don't block chapter saving
+            this.callbacks.onError?.(
+              `Ch.${chapterNumber} consistency check failed (non-fatal): ${consistencyErr instanceof Error ? consistencyErr.message : 'Unknown'}`
+            );
+          }
+        }
+
         // Store chapter
         this.writtenChapters.set(chapterNumber, result.data);
 
@@ -709,17 +799,42 @@ export class StoryRunner {
 
         // Update memory manager
         if (this.memoryManager) {
-          // Build meaningful summary from outline + critic feedback
+          // Generate AI-powered summary for better context across 100+ chapters
+          let summary: string;
           const outlineSummary = result.outline?.summary || '';
-          const criticNotes = result.criticReport?.issues
-            ?.filter(i => i.severity === 'major')
-            .map(i => i.description)
-            .join('; ') || '';
           const dopamineTypes = result.data.dopamineDelivered
             ?.map(d => d.type).join(', ') || '';
-          const summary = outlineSummary
-            ? `${result.data.title}: ${outlineSummary}${dopamineTypes ? ` [Dopamine: ${dopamineTypes}]` : ''}`
-            : `${result.data.title}: ${result.data.content.substring(0, 300)}...`;
+
+          try {
+            // Use AI to create a concise, information-dense summary
+            const summaryResponse = await this.aiService.chat({
+              provider: this.config.provider,
+              model: this.config.model,
+              messages: [
+                {
+                  role: 'system',
+                  content: 'Bạn là trợ lý tóm tắt chương truyện. Tóm tắt ngắn gọn 2-3 câu, nêu: (1) sự kiện chính, (2) thay đổi trạng thái nhân vật/cảnh giới, (3) mối quan hệ mới/thay đổi, (4) cliffhanger. KHÔNG dùng markdown.',
+                },
+                {
+                  role: 'user',
+                  content: `Tóm tắt chương ${chapterNumber} "${result.data.title}" trong 2-3 câu:\n\n${result.data.content.substring(0, 4000)}${result.data.content.length > 4000 ? '\n\n...' + result.data.content.slice(-1500) : ''}`,
+                },
+              ],
+              temperature: 0.2,
+              maxTokens: 300,
+            });
+
+            summary = summaryResponse.success && summaryResponse.content
+              ? `${result.data.title}: ${summaryResponse.content.trim()}`
+              : outlineSummary
+                ? `${result.data.title}: ${outlineSummary}${dopamineTypes ? ` [Dopamine: ${dopamineTypes}]` : ''}`
+                : `${result.data.title}: ${result.data.content.substring(0, 300)}...`;
+          } catch {
+            // Fallback to outline summary if AI fails
+            summary = outlineSummary
+              ? `${result.data.title}: ${outlineSummary}${dopamineTypes ? ` [Dopamine: ${dopamineTypes}]` : ''}`
+              : `${result.data.title}: ${result.data.content.substring(0, 300)}...`;
+          }
 
           // Extract characters from outline
           const outlineCharacters = result.outline?.scenes
@@ -736,7 +851,9 @@ export class StoryRunner {
               ...outlineCharacters.filter(c => c !== this.worldBible!.protagonist.name),
             ],
             locationUsed: result.outline?.location || '',
-            plotThreadsAdvanced: [],
+            plotThreadsAdvanced: result.outline?.scenes
+              ?.map(s => s.goal)
+              .filter(g => g && g.length > 0) || [],
             emotionalBeat: result.outline?.dopaminePoints?.[0]?.type || '',
             cliffhanger: result.outline?.cliffhanger || result.data.content.slice(-300),
             wordCount: result.data.wordCount,

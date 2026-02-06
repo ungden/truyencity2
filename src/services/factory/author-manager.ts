@@ -147,7 +147,9 @@ export class AuthorManagerService {
     const { data, error } = await supabase
       .from('ai_author_profiles')
       .select('*')
-      .eq('status', 'active');
+      .eq('status', 'active')
+      .or(`primary_genres.cs.{${genre}},secondary_genres.cs.{${genre}}`)
+      .not('avoid_genres', 'cs', `{${genre}}`);
 
     if (error) {
       return {
@@ -157,15 +159,10 @@ export class AuthorManagerService {
       };
     }
 
-    // Filter authors who can write this genre
-    const filtered = (data as AIAuthorProfile[]).filter(
-      (a) =>
-        (a.primary_genres.includes(genre) || a.secondary_genres.includes(genre)) &&
-        !a.avoid_genres.includes(genre)
-    );
+    const authors = data as AIAuthorProfile[];
 
     // Sort by relevance (primary genre match first, then by story count)
-    filtered.sort((a, b) => {
+    authors.sort((a, b) => {
       const aIsPrimary = a.primary_genres.includes(genre) ? 0 : 1;
       const bIsPrimary = b.primary_genres.includes(genre) ? 0 : 1;
       if (aIsPrimary !== bIsPrimary) return aIsPrimary - bIsPrimary;
@@ -174,7 +171,7 @@ export class AuthorManagerService {
 
     return {
       success: true,
-      data: filtered,
+      data: authors,
     };
   }
 
@@ -404,22 +401,29 @@ export class AuthorManagerService {
   > {
     const supabase = this.getSupabase();
 
-    const { data, error } = await supabase.from('ai_author_profiles').select('*');
+    const [totalResult, activeResult, aggregateResult] = await Promise.all([
+      supabase.from('ai_author_profiles').select('*', { count: 'exact', head: true }),
+      supabase.from('ai_author_profiles').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+      supabase.from('ai_author_profiles').select('total_stories, total_chapters, avg_quality_score'),
+    ]);
 
-    if (error) {
+    const firstError = [totalResult, activeResult, aggregateResult].find(r => r.error);
+    if (firstError?.error) {
       return {
         success: false,
-        error: error.message,
-        errorCode: 'DB_SELECT_ERROR',
+        error: firstError.error.message,
+        errorCode: 'DB_COUNT_ERROR',
       };
     }
 
-    const authors = data as AIAuthorProfile[];
-    const active = authors.filter((a) => a.status === 'active');
-
-    const totalStories = authors.reduce((sum, a) => sum + a.total_stories, 0);
-    const totalChapters = authors.reduce((sum, a) => sum + a.total_chapters, 0);
-    const qualityScores = authors.filter((a) => a.avg_quality_score > 0);
+    const rows = (aggregateResult.data || []) as Array<{
+      total_stories: number;
+      total_chapters: number;
+      avg_quality_score: number;
+    }>;
+    const totalStories = rows.reduce((sum, a) => sum + a.total_stories, 0);
+    const totalChapters = rows.reduce((sum, a) => sum + a.total_chapters, 0);
+    const qualityScores = rows.filter((a) => a.avg_quality_score > 0);
     const avgQuality =
       qualityScores.length > 0
         ? qualityScores.reduce((sum, a) => sum + a.avg_quality_score, 0) / qualityScores.length
@@ -428,8 +432,8 @@ export class AuthorManagerService {
     return {
       success: true,
       data: {
-        total: authors.length,
-        active: active.length,
+        total: totalResult.count || 0,
+        active: activeResult.count || 0,
         totalStories,
         totalChapters,
         avgQuality: Math.round(avgQuality * 100) / 100,

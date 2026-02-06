@@ -5,11 +5,15 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getFactoryOrchestrator } from '@/services/factory';
+import { factoryAuth, finalizeResponse } from '../_auth';
 
 type ActionType = 'start' | 'stop' | 'run_daily' | 'run_main_loop';
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await factoryAuth(request, '/api/factory/control');
+    if (!auth.success) return auth.response;
+
     const body = await request.json();
     const action = body.action as ActionType;
 
@@ -54,11 +58,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({
+    return finalizeResponse(NextResponse.json({
       success: true,
       action,
       data: result.data,
-    });
+    }), auth, '/api/factory/control', 'POST');
   } catch (error) {
     console.error('[API] Control error:', error);
     return NextResponse.json(

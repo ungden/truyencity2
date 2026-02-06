@@ -5,9 +5,13 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getFactoryOrchestrator, BootstrapConfig, BootstrapProgress } from '@/services/factory';
+import { factoryAuth, finalizeResponse } from '../_auth';
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await factoryAuth(request, '/api/factory/bootstrap');
+    if (!auth.success) return auth.response;
+
     const body = await request.json();
 
     // Validate input
@@ -35,12 +39,12 @@ export async function POST(request: NextRequest) {
 
     const result = await orchestrator.bootstrap(config, onProgress);
 
-    return NextResponse.json({
+    return finalizeResponse(NextResponse.json({
       success: result.success,
       data: result.data,
       progress: progressUpdates,
       error: result.error,
-    });
+    }), auth, '/api/factory/bootstrap', 'POST');
   } catch (error) {
     console.error('[API] Bootstrap error:', error);
     return NextResponse.json(

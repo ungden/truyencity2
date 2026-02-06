@@ -233,10 +233,14 @@ export async function GET(request: NextRequest) {
   const supabase = getSupabaseAdmin();
 
   try {
-    // ====== QUERY TWO TIERS IN PARALLEL ======
+    // ====== DISTRIBUTED LOCK: Skip projects claimed in the last 4 minutes ======
+    // This prevents concurrent cron invocations from processing the same projects.
+    // Each invocation only picks projects whose updated_at is older than 4 minutes,
+    // then immediately bumps updated_at to "claim" them.
+    const fourMinutesAgo = new Date(Date.now() - 4 * 60 * 1000).toISOString();
 
     const [resumeQuery, initQuery] = await Promise.all([
-      // Tier 1: Resume projects (current_chapter > 0)
+      // Tier 1: Resume projects (current_chapter > 0, not claimed recently)
       supabase
         .from('ai_story_projects')
         .select(`
@@ -248,10 +252,11 @@ export async function GET(request: NextRequest) {
         `)
         .eq('status', 'active')
         .gt('current_chapter', 0)
+        .lt('updated_at', fourMinutesAgo)
         .order('updated_at', { ascending: true })
         .limit(RESUME_BATCH_SIZE),
 
-      // Tier 2: Init projects (current_chapter = 0)
+      // Tier 2: Init projects (current_chapter = 0, not claimed recently)
       supabase
         .from('ai_story_projects')
         .select(`
@@ -263,6 +268,7 @@ export async function GET(request: NextRequest) {
         `)
         .eq('status', 'active')
         .eq('current_chapter', 0)
+        .lt('updated_at', fourMinutesAgo)
         .order('created_at', { ascending: true }) // Oldest new project first
         .limit(INIT_BATCH_SIZE),
     ]);
@@ -284,7 +290,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: true, message: 'No projects to process' });
     }
 
-    // Mark all as "processing"
+    // Claim projects by bumping updated_at to now (distributed lock).
+    // Concurrent invocations will skip these because of the .lt('updated_at', fourMinutesAgo) guard.
     const allIds = [...resumeProjects, ...initProjects].map(p => p.id);
     await supabase
       .from('ai_story_projects')

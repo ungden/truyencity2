@@ -1,6 +1,6 @@
 /**
  * Gemini Image Service for Story Factory
- * Uses Gemini 3 Pro Image Preview (Nano Banana Pro) ONLY
+ * Uses Gemini 2.0 Flash Preview Image Generation ONLY
  * 
  * Features:
  * - Best quality image generation with 4K support
@@ -19,7 +19,7 @@ import {
 } from './types';
 
 const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta';
-const MODEL = 'gemini-3-pro-image-preview'; // Nano Banana Pro - ONLY model
+const MODEL = 'gemini-2.0-flash-preview-image-generation';
 
 export interface ImageGenerationRequest {
   prompt: string;
@@ -58,7 +58,7 @@ export class GeminiImageService {
   }
 
   /**
-   * Generate image using Nano Banana Pro (gemini-3-pro-image-preview)
+   * Generate image using Gemini 2.0 Flash Preview Image Generation
    */
   async generateImage(request: ImageGenerationRequest): Promise<ServiceResult<GeminiImageResult>> {
     const { prompt, negativePrompt, options } = request;
@@ -72,10 +72,6 @@ export class GeminiImageService {
         }],
         generationConfig: {
           responseModalities: ['TEXT', 'IMAGE'],
-          imageConfig: {
-            aspectRatio: options?.aspectRatio || '3:4',
-            imageSize: options?.imageSize || '2K'
-          }
         }
       };
 
@@ -649,8 +645,8 @@ IMPORTANT:
   getModelInfo(): { id: string; name: string; description: string } {
     return {
       id: MODEL,
-      name: 'Nano Banana Pro',
-      description: 'Best quality, 4K resolution, advanced reasoning, text rendering'
+      name: 'Gemini 2.0 Flash Preview Image Generation',
+      description: 'High quality image generation with Gemini 2.0 Flash'
     };
   }
 }

@@ -14,8 +14,56 @@ import {
   PublishSlotConfig,
 } from './types';
 
-// Vietnam timezone offset (UTC+7)
-const VIETNAM_TIMEZONE_OFFSET = 7 * 60 * 60 * 1000;
+// Vietnam timezone helpers (UTC+7, no DST)
+const VIETNAM_TZ = 'Asia/Ho_Chi_Minh';
+
+/**
+ * Get current time in Vietnam timezone as a Date
+ * Uses Intl.DateTimeFormat for correct timezone handling
+ */
+function getVietnamNow(): Date {
+  const formatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone: VIETNAM_TZ,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  });
+  const parts = formatter.formatToParts(new Date());
+  const get = (type: string) => parts.find(p => p.type === type)?.value || '0';
+  // Parse as Vietnam time then convert to UTC by creating a date string with +07:00 offset
+  const isoString = `${get('year')}-${get('month')}-${get('day')}T${get('hour')}:${get('minute')}:${get('second')}+07:00`;
+  return new Date(isoString);
+}
+
+/**
+ * Get start of today in Vietnam timezone (midnight VN time) as UTC Date
+ */
+function getVietnamTodayStart(): Date {
+  const formatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone: VIETNAM_TZ,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+  const dateStr = formatter.format(new Date()); // YYYY-MM-DD
+  return new Date(`${dateStr}T00:00:00+07:00`);
+}
+
+/**
+ * Get the hour in Vietnam timezone for a given UTC Date
+ */
+function getVietnamHour(date: Date): number {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: VIETNAM_TZ,
+    hour: 'numeric',
+    hour12: false,
+  });
+  return parseInt(formatter.format(date), 10);
+}
 
 export class PublishingSchedulerService {
   private supabaseUrl: string;
@@ -276,13 +324,9 @@ export class PublishingSchedulerService {
   > {
     const supabase = this.getSupabase();
 
-    // Get today's date range in Vietnam timezone
-    const now = new Date();
-    const vietnamNow = new Date(now.getTime() + VIETNAM_TIMEZONE_OFFSET);
-    const todayStart = new Date(vietnamNow);
-    todayStart.setHours(0, 0, 0, 0);
-    const todayEnd = new Date(todayStart);
-    todayEnd.setDate(todayEnd.getDate() + 1);
+    // Get today's date range in Vietnam timezone (proper timezone handling)
+    const todayStart = getVietnamTodayStart();
+    const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
 
     const { data, error } = await supabase
       .from('chapter_publish_queue')
@@ -427,8 +471,7 @@ export class PublishingSchedulerService {
 
     const now = new Date();
     const hourLater = new Date(now.getTime() + 60 * 60 * 1000);
-    const todayStart = new Date(now);
-    todayStart.setHours(0, 0, 0, 0);
+    const todayStart = getVietnamTodayStart(); // Use Vietnam timezone consistently
 
     const [scheduledResult, publishedResult, failedResult, upcomingResult] = await Promise.all([
       supabase
@@ -472,30 +515,28 @@ export class PublishingSchedulerService {
       throw new Error(`Invalid slot: ${slot}`);
     }
 
-    const now = new Date();
-    const vietnamNow = new Date(now.getTime() + VIETNAM_TIMEZONE_OFFSET);
+    const vietnamNow = getVietnamNow();
+    const todayStart = getVietnamTodayStart();
 
-    // Set to slot start hour
-    const scheduled = new Date(vietnamNow);
-    scheduled.setHours(slotConfig.start_hour, 0, 0, 0);
+    // Calculate slot time for today in UTC
+    const slotTimeMs = todayStart.getTime() + slotConfig.start_hour * 60 * 60 * 1000;
+    let scheduled = new Date(slotTimeMs);
 
     // If slot already passed today, schedule for tomorrow
     if (scheduled <= vietnamNow) {
-      scheduled.setDate(scheduled.getDate() + 1);
+      scheduled = new Date(slotTimeMs + 24 * 60 * 60 * 1000);
     }
 
     // Add some randomization within the slot
     const slotDurationMinutes = (slotConfig.end_hour - slotConfig.start_hour) * 60;
     const randomMinutes = Math.floor(Math.random() * slotDurationMinutes);
-    scheduled.setMinutes(randomMinutes);
+    scheduled = new Date(scheduled.getTime() + randomMinutes * 60 * 1000);
 
-    // Convert back to UTC
-    return new Date(scheduled.getTime() - VIETNAM_TIMEZONE_OFFSET);
+    return scheduled;
   }
 
   private getSlotForTime(time: Date): PublishSlot {
-    const vietnamTime = new Date(time.getTime() + VIETNAM_TIMEZONE_OFFSET);
-    const hour = vietnamTime.getHours();
+    const hour = getVietnamHour(time);
 
     for (const slot of DEFAULT_PUBLISH_SLOTS) {
       if (hour >= slot.start_hour && hour < slot.end_hour) {

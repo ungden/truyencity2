@@ -15,7 +15,8 @@
 export type GenreType =
   | 'tien-hiep' | 'huyen-huyen' | 'do-thi' | 'kiem-hiep'
   | 'lich-su' | 'khoa-huyen' | 'vong-du' | 'dong-nhan'
-  | 'mat-the' | 'linh-di' | 'quan-truong' | 'di-gioi';
+  | 'mat-the' | 'linh-di' | 'quan-truong' | 'di-gioi'
+  | 'ngon-tinh';
 
 export type AIProviderType = 'openrouter' | 'deepseek' | 'openai' | 'claude' | 'gemini';
 
@@ -220,6 +221,13 @@ export type TwistType =
 // CHAPTER TYPES
 // ============================================================================
 
+export interface EmotionalArc {
+  opening: string;
+  midpoint: string;
+  climax: string;
+  closing: string;
+}
+
 export interface ChapterOutline {
   chapterNumber: number;
   title: string;
@@ -229,6 +237,7 @@ export interface ChapterOutline {
   scenes: SceneOutline[];
   tensionLevel: number;
   dopaminePoints: DopaminePoint[];
+  emotionalArc?: EmotionalArc;
   cliffhanger: string;
   targetWordCount: number;
 }

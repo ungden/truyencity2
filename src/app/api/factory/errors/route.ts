@@ -6,9 +6,13 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getErrorHandlerService, ErrorSeverity } from '@/services/factory';
+import { factoryAuth, finalizeResponse } from '../_auth';
 
 export async function GET(request: NextRequest) {
   try {
+    const auth = await factoryAuth(request, '/api/factory/errors');
+    if (!auth.success) return auth.response;
+
     const { searchParams } = new URL(request.url);
     const view = searchParams.get('view') || 'new';
     const severity = searchParams.get('severity') as ErrorSeverity | null;
@@ -20,50 +24,50 @@ export async function GET(request: NextRequest) {
 
     if (view === 'summary' || view === 'dashboard') {
       const result = await errorHandler.getDashboardSummary();
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: result.data,
         error: result.error,
-      });
+      }), auth, '/api/factory/errors', 'GET');
     }
 
     if (view === 'stats') {
       const result = await errorHandler.getErrorStats(days);
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: result.data,
         error: result.error,
-      });
+      }), auth, '/api/factory/errors', 'GET');
     }
 
     if (productionId) {
       const result = await errorHandler.getProductionErrors(productionId);
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: result.data,
         count: result.data?.length || 0,
         error: result.error,
-      });
+      }), auth, '/api/factory/errors', 'GET');
     }
 
     if (severity) {
       const result = await errorHandler.getErrorsBySeverity(severity, limit);
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: result.data,
         count: result.data?.length || 0,
         error: result.error,
-      });
+      }), auth, '/api/factory/errors', 'GET');
     }
 
     // Default: get new errors
     const result = await errorHandler.getNewErrors(limit);
-    return NextResponse.json({
+    return finalizeResponse(NextResponse.json({
       success: result.success,
       data: result.data,
       count: result.data?.length || 0,
       error: result.error,
-    });
+    }), auth, '/api/factory/errors', 'GET');
   } catch (error) {
     console.error('[API] Errors GET error:', error);
     return NextResponse.json(
@@ -75,6 +79,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await factoryAuth(request, '/api/factory/errors');
+    if (!auth.success) return auth.response;
+
     const body = await request.json();
     const action = body.action || 'acknowledge';
 
@@ -91,10 +98,10 @@ export async function POST(request: NextRequest) {
       }
 
       const result = await errorHandler.acknowledgeError(errorId);
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         error: result.error,
-      });
+      }), auth, '/api/factory/errors', 'POST');
     }
 
     if (action === 'acknowledge_bulk') {
@@ -108,11 +115,11 @@ export async function POST(request: NextRequest) {
       }
 
       const result = await errorHandler.bulkAcknowledge(errorIds);
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: { acknowledged: result.data },
         error: result.error,
-      });
+      }), auth, '/api/factory/errors', 'POST');
     }
 
     if (action === 'resolve') {
@@ -128,10 +135,10 @@ export async function POST(request: NextRequest) {
       }
 
       const result = await errorHandler.resolveError(errorId, resolvedBy, notes, false);
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         error: result.error,
-      });
+      }), auth, '/api/factory/errors', 'POST');
     }
 
     if (action === 'ignore') {
@@ -145,30 +152,30 @@ export async function POST(request: NextRequest) {
       }
 
       const result = await errorHandler.ignoreError(errorId);
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         error: result.error,
-      });
+      }), auth, '/api/factory/errors', 'POST');
     }
 
     if (action === 'auto_resolve_old') {
       const daysOld = body.days_old || 7;
       const result = await errorHandler.autoResolveOldErrors(daysOld);
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: { resolved: result.data },
         error: result.error,
-      });
+      }), auth, '/api/factory/errors', 'POST');
     }
 
     if (action === 'cleanup') {
       const daysOld = body.days_old || 30;
       const result = await errorHandler.cleanupOldErrors(daysOld);
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: { deleted: result.data },
         error: result.error,
-      });
+      }), auth, '/api/factory/errors', 'POST');
     }
 
     if (action === 'log') {
@@ -202,20 +209,20 @@ export async function POST(request: NextRequest) {
         error_details,
       });
 
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: result.data,
         error: result.error,
-      });
+      }), auth, '/api/factory/errors', 'POST');
     }
 
     if (action === 'check_alerts') {
       const result = await errorHandler.shouldAlertAdmin();
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: { should_alert: result.data },
         error: result.error,
-      });
+      }), auth, '/api/factory/errors', 'POST');
     }
 
     return NextResponse.json(

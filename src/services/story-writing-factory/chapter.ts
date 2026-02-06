@@ -30,8 +30,10 @@ import {
   AgentRole,
   FactoryConfig,
   DEFAULT_CONFIG,
+  GenreType,
 } from './types';
 import { GOLDEN_CHAPTER_REQUIREMENTS } from './templates';
+import { buildStyleContext, getEnhancedStyleBible, CLIFFHANGER_TECHNIQUES, SceneType } from './style-bible';
 
 // ============================================================================
 // AGENT SYSTEM PROMPTS
@@ -174,7 +176,9 @@ export class ChapterWriter {
         // Step 2: Writer creates content (with length enforcement)
         const writerResult = await this.runWriter(
           architectResult.data.chapterOutline,
-          context.styleBible
+          context.styleBible,
+          this.config.genre,
+          context.worldBible
         );
 
         if (!writerResult.success || !writerResult.data) {
@@ -346,11 +350,21 @@ CURRENT ARC: ${context.currentArc.title} (${context.currentArc.theme})
 
 GENRE CONVENTIONS: ${context.styleBible.genreConventions.join('; ')}
 
+CLIFFHANGER TECHNIQUES (chọn 1 cho cuối chương):
+${CLIFFHANGER_TECHNIQUES.slice(0, 4).map(c => `- ${c.name}: ${c.example}`).join('\n')}
+
 PREVIOUS: ${context.previousSummary}
 
 ${isGolden ? `GOLDEN CHAPTER ${chapterNumber}:\nMust have: ${goldenReqs?.mustHave.join(', ')}\nAvoid: ${goldenReqs?.avoid.join(', ')}` : ''}
 
 ${additionalInstructions}
+
+CẢM XÚC ARC (bắt buộc lên kế hoạch):
+- Mở đầu: cảm xúc gì cho người đọc? (tò mò, lo lắng, phẫn nộ...)
+- Giữa chương: chuyển sang cảm xúc gì? (căng thẳng, hồi hộp, đau lòng...)
+- Cao trào: đỉnh điểm cảm xúc? (phấn khích, sốc, hả hê...)
+- Kết: để lại cảm xúc gì? (háo hức đọc tiếp, day dứt, mong chờ...)
+Nguyên tắc: PHẢI có contrast cảm xúc giữa các phần (buồn→vui, sợ→phấn khích)
 
 YÊU CẦU QUAN TRỌNG:
 - Tạo TỐI THIỂU ${minScenes} scenes (mỗi scene ~${wordsPerScene} từ)
@@ -373,6 +387,12 @@ Trả về JSON (KHÔNG có comment):
     ],
     "tensionLevel": 50,
     "dopaminePoints": [{"type": "face_slap", "description": "...", "intensity": 7, "setup": "...", "payoff": "..."}],
+    "emotionalArc": {
+      "opening": "tên cảm xúc mở đầu (vd: tò mò, lo lắng)",
+      "midpoint": "tên cảm xúc giữa chương (vd: căng thẳng, hồi hộp)",
+      "climax": "tên cảm xúc cao trào (vd: phấn khích, sốc)",
+      "closing": "tên cảm xúc kết thúc (vd: háo hức, day dứt)"
+    },
     "cliffhanger": "Mô tả cliffhanger mạnh",
     "targetWordCount": ${this.config.targetWordCount}
   }
@@ -422,9 +442,32 @@ Trả về JSON (KHÔNG có comment):
 
   private async runWriter(
     outline: ChapterOutline,
-    styleBible: StyleBible
+    styleBible: StyleBible,
+    genre?: GenreType,
+    worldBible?: WorldBible
   ): Promise<{ success: boolean; data?: WriterOutput; error?: string }> {
     const totalTargetWords = outline.targetWordCount || this.config.targetWordCount;
+
+    // Determine dominant scene type for style context
+    const dominantSceneType = this.getDominantSceneType(outline);
+    const genreType = genre || this.config.genre || 'tien-hiep';
+
+    // Build rich style context with exemplars, pacing rules, and vocabulary
+    const richStyleContext = buildStyleContext(genreType, dominantSceneType);
+    const enhancedStyle = getEnhancedStyleBible(genreType);
+
+    // Build per-scene pacing hints
+    const sceneGuidance = outline.scenes.map(s => {
+      const sceneType = this.inferSceneType(s);
+      const pacing = enhancedStyle.pacingRules[sceneType];
+      return `- Scene ${s.order}: ${s.goal} → Conflict: ${s.conflict} → Resolution: ${s.resolution}
+  Bối cảnh: ${s.setting} | Nhân vật: ${s.characters.join(', ')}
+  ⚠️ Viết TỐI THIỂU ${s.estimatedWords} từ cho scene này
+  📝 Nhịp điệu: câu ${pacing.sentenceLength.min}-${pacing.sentenceLength.max} từ, tốc độ ${pacing.paceSpeed === 'fast' ? 'NHANH (câu ngắn, dứt khoát)' : pacing.paceSpeed === 'slow' ? 'CHẬM (câu dài, miêu tả chi tiết)' : 'VỪA'}, đối thoại ${Math.round(pacing.dialogueRatio.min * 100)}-${Math.round(pacing.dialogueRatio.max * 100)}%`;
+    }).join('\n\n');
+
+    // Select relevant vocabulary for this chapter's content
+    const vocabHints = this.buildVocabularyHints(outline, enhancedStyle.vocabulary);
 
     const prompt = `Viết TOÀN BỘ Chương ${outline.chapterNumber}: ${outline.title}
 
@@ -432,12 +475,17 @@ OUTLINE:
 ${outline.summary}
 
 SCENES (viết ĐẦY ĐỦ chi tiết cho MỖI scene - KHÔNG được bỏ qua scene nào):
-${outline.scenes.map(s => `- Scene ${s.order}: ${s.goal} → Conflict: ${s.conflict} → Resolution: ${s.resolution}
-  Bối cảnh: ${s.setting} | Nhân vật: ${s.characters.join(', ')}
-  ⚠️ Viết TỐI THIỂU ${s.estimatedWords} từ cho scene này`).join('\n\n')}
+${sceneGuidance}
 
 DOPAMINE (phải có trong chương):
 ${outline.dopaminePoints.map(dp => `- ${dp.type}: Setup: ${dp.setup} → Payoff: ${dp.payoff}`).join('\n')}
+
+${outline.emotionalArc ? `CẢM XÚC ARC (PHẢI tuân thủ):
+- Mở đầu: ${outline.emotionalArc.opening}
+- Giữa chương: ${outline.emotionalArc.midpoint}
+- Cao trào: ${outline.emotionalArc.climax}
+- Kết thúc: ${outline.emotionalArc.closing}
+→ Viết sao cho người đọc CẢM NHẬN được sự chuyển đổi cảm xúc rõ ràng qua từng phần.` : ''}
 
 CLIFFHANGER: ${outline.cliffhanger}
 
@@ -446,6 +494,12 @@ STYLE:
 - Tone: ${styleBible.toneKeywords.join(', ')}
 - Tỷ lệ đối thoại: ${styleBible.dialogueRatio[0]}-${styleBible.dialogueRatio[1]}%
 - Conventions: ${styleBible.genreConventions.join('; ')}
+
+${vocabHints}
+
+${this.buildCharacterVoiceGuide(outline, worldBible)}
+
+${richStyleContext}
 
 ĐỘ DÀI YÊU CẦU (BẮT BUỘC - QUY TẮC CỨNG):
 - Viết TỐI THIỂU ${totalTargetWords} từ. Chương dưới ${Math.round(totalTargetWords * 0.7)} từ sẽ bị từ chối.
@@ -517,12 +571,12 @@ Bắt đầu viết (nhớ: TỐI THIỂU ${totalTargetWords} từ):`;
     const targetWords = outline.targetWordCount || this.config.targetWordCount;
     const wordRatio = Math.round((wordCount / targetWords) * 100);
 
-    // Show more content to the critic for better evaluation
-    // For chapters under 5000 chars, show everything
-    const maxPreview = 8000;
+    // Show full content to the critic - Gemini Flash supports 1M context window
+    // Only truncate for extremely long chapters (>30K chars) to save tokens
+    const maxPreview = 30000;
     const contentPreview = content.length <= maxPreview
       ? content
-      : `${content.substring(0, 5000)}\n\n[... phần giữa ...]\n\n${content.substring(content.length - 2000)}`;
+      : `${content.substring(0, 15000)}\n\n[... phần giữa ${Math.round((content.length - 20000) / 1000)}K chars ...]\n\n${content.substring(content.length - 5000)}`;
 
     const prompt = `Đánh giá chương nghiêm túc:
 
@@ -671,6 +725,11 @@ Viết tiếp ngay:`,
     chapterNumber: number,
     context: { worldBible: WorldBible; styleBible: StyleBible; previousSummary: string }
   ): string {
+    const genreType = this.config.genre || 'tien-hiep';
+    const enhancedStyle = getEnhancedStyleBible(genreType);
+    // Pick a random exemplar for variety
+    const exemplar = enhancedStyle.exemplars[chapterNumber % enhancedStyle.exemplars.length];
+
     return `Viết Chương ${chapterNumber}:
 
 WORLD: ${context.worldBible.storyTitle}
@@ -683,6 +742,20 @@ STYLE:
 - Tone: ${context.styleBible.toneKeywords.join(', ')}
 - Conventions: ${context.styleBible.genreConventions.join('; ')}
 
+TỪ VỰNG SỬ DỤNG (bắt buộc dùng ít nhất 3-5 biểu đạt sau):
+- Cảm xúc: ${enhancedStyle.vocabulary.emotions.anger.slice(0, 3).join(', ')}; ${enhancedStyle.vocabulary.emotions.shock.slice(0, 3).join(', ')}
+- Sức mạnh: ${enhancedStyle.vocabulary.powerExpressions.techniques.slice(0, 3).join(', ')}
+- Bầu không khí: ${enhancedStyle.vocabulary.atmosphere.tense.slice(0, 3).join(', ')}
+
+VÍ DỤ VĂN PHONG CHUẨN (viết theo phong cách này):
+"""
+${exemplar.content.substring(0, 500)}
+"""
+Lưu ý: ${exemplar.notes.join('; ')}
+
+CLIFFHANGER (dùng 1 trong các kỹ thuật):
+${enhancedStyle.cliffhangerTechniques.slice(0, 3).map(c => `- ${c.name}: "${c.example}"`).join('\n')}
+
 ĐỘ DÀI YÊU CẦU (BẮT BUỘC):
 - Viết TỐI THIỂU ${this.config.targetWordCount} từ
 - Viết chi tiết, không tóm tắt
@@ -692,6 +765,167 @@ STYLE:
 - Bao gồm: miêu tả bối cảnh, cảm xúc nội tâm, đối thoại phong phú, hành động chi tiết
 
 Viết chương (nhớ: TỐI THIỂU ${this.config.targetWordCount} từ):`;
+  }
+
+  // ============================================================================
+  // PRIVATE: STYLE BIBLE HELPERS
+  // ============================================================================
+
+  /**
+   * Determine the dominant scene type from outline for style context selection
+   */
+  private getDominantSceneType(outline: ChapterOutline): SceneType {
+    const sceneCounts: Record<string, number> = {};
+
+    for (const scene of outline.scenes) {
+      const type = this.inferSceneType(scene);
+      sceneCounts[type] = (sceneCounts[type] || 0) + 1;
+    }
+
+    // Check dopamine points for additional hints
+    for (const dp of outline.dopaminePoints || []) {
+      if (['face_slap', 'power_reveal', 'revenge'].includes(dp.type)) {
+        sceneCounts['action'] = (sceneCounts['action'] || 0) + 1;
+      } else if (['breakthrough'].includes(dp.type)) {
+        sceneCounts['cultivation'] = (sceneCounts['cultivation'] || 0) + 1;
+      } else if (['beauty_encounter'].includes(dp.type)) {
+        sceneCounts['romance'] = (sceneCounts['romance'] || 0) + 1;
+      }
+    }
+
+    let maxType: SceneType = 'action';
+    let maxCount = 0;
+    for (const [type, count] of Object.entries(sceneCounts)) {
+      if (count > maxCount) {
+        maxCount = count;
+        maxType = type as SceneType;
+      }
+    }
+    return maxType;
+  }
+
+  /**
+   * Infer scene type from scene description
+   */
+  private inferSceneType(scene: { goal: string; conflict: string; resolution?: string; setting?: string }): SceneType {
+    const text = `${scene.goal} ${scene.conflict} ${scene.resolution || ''} ${scene.setting || ''}`.toLowerCase();
+
+    if (/chiến đấu|đánh|tấn công|kiếm|quyền|sát|giết|đấu|chiêu thức|pháp thuật|battle|fight/.test(text)) return 'action';
+    if (/tu luyện|đột phá|đan điền|linh khí|cảnh giới|thiền|cultivation|breakthrough/.test(text)) return 'cultivation';
+    if (/tiết lộ|bí mật|phát hiện|sự thật|reveal|secret|discovery/.test(text)) return 'revelation';
+    if (/tình cảm|yêu|nhớ|thương|romance|love|nàng|mỹ nhân/.test(text)) return 'romance';
+    if (/hội thoại|nói chuyện|bàn bạc|thương lượng|discuss|negotiate/.test(text)) return 'dialogue';
+    if (/nguy hiểm|căng thẳng|bẫy|vây|danger|trap|tension/.test(text)) return 'tension';
+    if (/hài|cười|buồn cười|comedy|funny|joke/.test(text)) return 'comedy';
+    return 'dialogue'; // default
+  }
+
+  /**
+   * Build vocabulary hints relevant to the chapter's dopamine types and scenes
+   */
+  private buildVocabularyHints(
+    outline: ChapterOutline,
+    vocabulary: import('./style-bible').VocabularyGuide
+  ): string {
+    const hints: string[] = ['TỪ VỰNG BẮT BUỘC SỬ DỤNG (dùng ít nhất 5-8 biểu đạt sau trong chương):'];
+
+    const hasAction = outline.scenes.some(s => this.inferSceneType(s) === 'action');
+    const hasCultivation = outline.scenes.some(s => this.inferSceneType(s) === 'cultivation');
+    const dopamineTypes = (outline.dopaminePoints || []).map(d => d.type);
+
+    // Power expressions for action/combat scenes
+    if (hasAction || dopamineTypes.includes('face_slap') || dopamineTypes.includes('power_reveal')) {
+      hints.push(`Chiêu thức: ${vocabulary.powerExpressions.techniques.slice(0, 4).join(', ')}`);
+      hints.push(`Uy lực: ${vocabulary.powerExpressions.weakToStrong.slice(0, 4).join(', ')}`);
+    }
+
+    // Breakthrough expressions
+    if (hasCultivation || dopamineTypes.includes('breakthrough')) {
+      hints.push(`Đột phá: ${vocabulary.powerExpressions.breakthrough.slice(0, 4).join(', ')}`);
+    }
+
+    // Emotional expressions based on dopamine types
+    if (dopamineTypes.includes('face_slap') || dopamineTypes.includes('revenge')) {
+      hints.push(`Khinh bỉ: ${vocabulary.emotions.contempt.slice(0, 4).join(', ')}`);
+      hints.push(`Phẫn nộ: ${vocabulary.emotions.anger.slice(0, 4).join(', ')}`);
+    }
+
+    // Always include shock (most common reaction) and determination
+    hints.push(`Kinh ngạc: ${vocabulary.emotions.shock.slice(0, 4).join(', ')}`);
+    hints.push(`Quyết tâm: ${vocabulary.emotions.determination.slice(0, 3).join(', ')}`);
+
+    // Atmosphere based on tension level
+    if ((outline.tensionLevel || 50) >= 70) {
+      hints.push(`Bầu không khí: ${vocabulary.atmosphere.tense.slice(0, 3).join(', ')}; ${vocabulary.atmosphere.dangerous.slice(0, 3).join(', ')}`);
+    } else {
+      hints.push(`Bầu không khí: ${vocabulary.atmosphere.mysterious.slice(0, 3).join(', ')}`);
+    }
+
+    // Honorifics
+    hints.push(`Xưng hô bề trên: ${vocabulary.honorifics.superior.slice(0, 4).join(', ')}`);
+    hints.push(`Xưng hô ngang hàng: ${vocabulary.honorifics.peer.slice(0, 4).join(', ')}`);
+    hints.push(`Xưng hô kẻ thù: ${vocabulary.honorifics.enemy.slice(0, 3).join(', ')}`);
+
+    return hints.join('\n');
+  }
+
+  /**
+   * Build character voice guide from outline characters and worldBible
+   */
+  private buildCharacterVoiceGuide(outline: ChapterOutline, worldBible?: WorldBible): string {
+    if (!worldBible) return '';
+
+    const lines: string[] = [
+      'GIỌNG NÓI NHÂN VẬT (mỗi nhân vật PHẢI có giọng nói khác biệt):',
+    ];
+
+    // Protagonist voice based on traits
+    const protag = worldBible.protagonist;
+    const protagTraits = protag.traits.length > 0 ? protag.traits.join(', ') : 'bình tĩnh, quyết đoán';
+    lines.push(`- ${protag.name} (Protagonist): giọng ${protagTraits}, xưng hô phù hợp cảnh giới ${protag.realm}`);
+
+    // Build voice profiles from NPC relationships appearing in this chapter
+    const chapterCharNames = new Set(outline.scenes.flatMap(s => s.characters));
+
+    for (const npc of worldBible.npcRelationships) {
+      // Only include NPCs that appear in this chapter's scenes
+      if (!chapterCharNames.has(npc.name) && chapterCharNames.size > 0) continue;
+
+      switch (npc.role) {
+        case 'enemy':
+          lines.push(`- ${npc.name} (Villain/Kẻ thù): giọng ngạo mạn, lạnh lùng, dùng từ kẻ cả, xưng hô coi thường đối phương`);
+          break;
+        case 'mentor':
+          lines.push(`- ${npc.name} (Sư phụ/Tiền bối): giọng trầm ổn, dùng cổ ngữ, nói ít nhưng sâu sắc, xưng lão phu/ta`);
+          break;
+        case 'ally':
+          if (npc.affinity > 50) {
+            lines.push(`- ${npc.name} (Đồng minh thân): giọng thân thiết, sôi nổi, xưng hô huynh đệ/tỷ muội`);
+          } else {
+            lines.push(`- ${npc.name} (Đồng minh): giọng lịch sự, cẩn trọng, giữ khoảng cách vừa phải`);
+          }
+          break;
+        case 'love_interest':
+          lines.push(`- ${npc.name} (Nữ chính/Tình cảm): giọng kiên quyết nhưng ẩn chứa mềm mại, lời nói sắc bén nhưng ánh mắt dịu dàng`);
+          break;
+        case 'neutral':
+          lines.push(`- ${npc.name} (NPC): giọng phù hợp với vai trò: ${npc.description}`);
+          break;
+      }
+    }
+
+    // Add young rival if there's an enemy NPC with recent appearance
+    const hasRival = worldBible.npcRelationships.some(n =>
+      n.role === 'enemy' && n.affinity > -80 && n.affinity < 0
+    );
+    if (!hasRival && worldBible.npcRelationships.some(n => n.role === 'enemy')) {
+      lines.push('- Tiểu phản diện/Tình địch: giọng sôi nổi, khiêu khích, tự cao tự đại');
+    }
+
+    lines.push('NGUYÊN TẮC: Che tên nhân vật, người đọc vẫn phải nhận ra ai đang nói qua cách dùng từ.');
+    lines.push('Mỗi nhân vật có cách xưng hô, ngữ điệu, từ vựng riêng biệt - TUYỆT ĐỐI không được lẫn lộn.');
+
+    return lines.join('\n');
   }
 
   private cleanContent(content: string): string {

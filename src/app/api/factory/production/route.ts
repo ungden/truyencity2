@@ -11,12 +11,16 @@ import {
   getBlueprintFactoryService,
   getAuthorManagerService,
 } from '@/services/factory';
+import { factoryAuth, finalizeResponse } from '../_auth';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 export async function GET(request: NextRequest) {
   try {
+    const auth = await factoryAuth(request, '/api/factory/production');
+    if (!auth.success) return auth.response;
+
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
     const limit = parseInt(searchParams.get('limit') || '50');
@@ -43,10 +47,10 @@ export async function GET(request: NextRequest) {
         );
       }
 
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: true,
         data,
-      });
+      }), auth, '/api/factory/production', 'GET');
     }
 
     let query = supabase
@@ -74,11 +78,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({
+    return finalizeResponse(NextResponse.json({
       success: true,
       data,
       count: data?.length || 0,
-    });
+    }), auth, '/api/factory/production', 'GET');
   } catch (error) {
     console.error('[API] Production GET error:', error);
     return NextResponse.json(
@@ -90,6 +94,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await factoryAuth(request, '/api/factory/production');
+    if (!auth.success) return auth.response;
+
     const body = await request.json();
     const action = body.action || 'start';
 
@@ -140,11 +147,11 @@ export async function POST(request: NextRequest) {
         chaptersPerDay
       );
 
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: result.data,
         error: result.error,
-      });
+      }), auth, '/api/factory/production', 'POST');
     }
 
     if (action === 'activate') {
@@ -154,11 +161,11 @@ export async function POST(request: NextRequest) {
 
       const result = await productionManager.activateProductions(count, maxActive);
 
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: { activated: result.data },
         error: result.error,
-      });
+      }), auth, '/api/factory/production', 'POST');
     }
 
     if (action === 'pause') {
@@ -189,7 +196,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      return NextResponse.json({ success: true });
+      return finalizeResponse(NextResponse.json({ success: true }), auth, '/api/factory/production', 'POST');
     }
 
     if (action === 'resume') {
@@ -204,10 +211,10 @@ export async function POST(request: NextRequest) {
 
       const result = await productionManager.resumeProduction(productionId);
 
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         error: result.error,
-      });
+      }), auth, '/api/factory/production', 'POST');
     }
 
     if (action === 'set_priority') {
@@ -234,17 +241,17 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      return NextResponse.json({ success: true });
+      return finalizeResponse(NextResponse.json({ success: true }), auth, '/api/factory/production', 'POST');
     }
 
     if (action === 'stats') {
       const result = await productionManager.getProductionStats();
 
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: result.data,
         error: result.error,
-      });
+      }), auth, '/api/factory/production', 'POST');
     }
 
     return NextResponse.json(

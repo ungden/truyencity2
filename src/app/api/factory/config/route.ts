@@ -6,9 +6,13 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getFactoryOrchestrator } from '@/services/factory';
+import { factoryAuth, finalizeResponse } from '../_auth';
 
 export async function GET(request: NextRequest) {
   try {
+    const auth = await factoryAuth(request, '/api/factory/config');
+    if (!auth.success) return auth.response;
+
     const orchestrator = getFactoryOrchestrator();
     const result = await orchestrator.getConfig();
 
@@ -19,10 +23,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({
+    return finalizeResponse(NextResponse.json({
       success: true,
       data: result.data,
-    });
+    }), auth, '/api/factory/config', 'GET');
   } catch (error) {
     console.error('[API] Config GET error:', error);
     return NextResponse.json(
@@ -34,6 +38,9 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
+    const auth = await factoryAuth(request, '/api/factory/config');
+    if (!auth.success) return auth.response;
+
     const body = await request.json();
     const orchestrator = getFactoryOrchestrator();
 
@@ -79,10 +86,10 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({
+    return finalizeResponse(NextResponse.json({
       success: true,
       data: result.data,
-    });
+    }), auth, '/api/factory/config', 'PUT');
   } catch (error) {
     console.error('[API] Config PUT error:', error);
     return NextResponse.json(

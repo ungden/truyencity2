@@ -2,7 +2,7 @@
 /* deno-lint-ignore-file */
 /**
  * Gemini Cover Generation Edge Function
- * Uses Nano Banana Pro (gemini-3-pro-image-preview) for high-quality book covers
+ * Uses Gemini 2.0 Flash Preview Image Generation for high-quality book covers
  * 
  * Supports:
  * - Job-based async processing (avoids timeouts)
@@ -108,8 +108,7 @@ async function updateJobStatus(supabase: any, jobId: string, status: string, dat
     .eq('id', jobId);
 }
 
-// ONLY use Nano Banana Pro
-const MODEL = 'gemini-3-pro-image-preview';
+const MODEL = 'gemini-2.0-flash-preview-image-generation';
 
 async function generateWithGemini(
   apiKey: string, 
@@ -123,10 +122,6 @@ async function generateWithGemini(
     }],
     generationConfig: {
       responseModalities: ['TEXT', 'IMAGE'],
-      imageConfig: {
-        aspectRatio: options.aspectRatio || '3:4',
-        imageSize: options.imageSize || '2K'
-      }
     }
   };
 

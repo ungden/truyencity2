@@ -10,9 +10,13 @@ import {
   getIdeaBankService,
   getAuthorManagerService 
 } from '@/services/factory';
+import { factoryAuth, finalizeResponse } from '../_auth';
 
 export async function GET(request: NextRequest) {
   try {
+    const auth = await factoryAuth(request, '/api/factory/blueprints');
+    if (!auth.success) return auth.response;
+
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status') || 'ready';
     const limit = parseInt(searchParams.get('limit') || '50');
@@ -28,10 +32,10 @@ export async function GET(request: NextRequest) {
           { status: result.errorCode === 'DB_SELECT_ERROR' ? 500 : 404 }
         );
       }
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: true,
         data: result.data,
-      });
+      }), auth, '/api/factory/blueprints', 'GET');
     }
 
     const result = await blueprintFactory.getReadyBlueprints(limit);
@@ -43,11 +47,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({
+    return finalizeResponse(NextResponse.json({
       success: true,
       data: result.data,
       count: result.data?.length || 0,
-    });
+    }), auth, '/api/factory/blueprints', 'GET');
   } catch (error) {
     console.error('[API] Blueprints GET error:', error);
     return NextResponse.json(
@@ -59,6 +63,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await factoryAuth(request, '/api/factory/blueprints');
+    if (!auth.success) return auth.response;
+
     const body = await request.json();
     const action = body.action || 'create';
 
@@ -113,11 +120,11 @@ export async function POST(request: NextRequest) {
         target_chapters: targetChapters,
       });
 
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: result.data,
         error: result.error,
-      });
+      }), auth, '/api/factory/blueprints', 'POST');
     }
 
     if (action === 'create_batch') {
@@ -149,14 +156,14 @@ export async function POST(request: NextRequest) {
         targetChapters
       );
 
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: {
           total: result.total,
           succeeded: result.succeeded,
           failed: result.failed,
         },
-      });
+      }), auth, '/api/factory/blueprints', 'POST');
     }
 
     if (action === 'generate_cover') {
@@ -171,11 +178,11 @@ export async function POST(request: NextRequest) {
 
       const result = await blueprintFactory.generateCover(blueprintId);
 
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: result.data ? { cover_url: result.data } : undefined,
         error: result.error,
-      });
+      }), auth, '/api/factory/blueprints', 'POST');
     }
 
     return NextResponse.json(

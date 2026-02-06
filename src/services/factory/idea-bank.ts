@@ -462,15 +462,37 @@ export class IdeaBankService {
   async autoApproveIdeas(limit: number = 100): Promise<ServiceResult<number>> {
     const supabase = this.getSupabase();
 
+    // Fix: .limit() on .update() doesn't actually limit rows updated in PostgREST.
+    // Instead: SELECT IDs first with limit, then UPDATE by IDs.
+    const { data: idsToApprove, error: selectError } = await supabase
+      .from('story_ideas')
+      .select('id')
+      .eq('status', 'generated')
+      .order('created_at', { ascending: true })
+      .limit(limit);
+
+    if (selectError) {
+      return {
+        success: false,
+        error: selectError.message,
+        errorCode: 'DB_SELECT_ERROR',
+      };
+    }
+
+    if (!idsToApprove || idsToApprove.length === 0) {
+      return { success: true, data: 0 };
+    }
+
+    const ids = idsToApprove.map(r => r.id);
+
     const { data, error } = await supabase
       .from('story_ideas')
       .update({
         status: 'approved',
         approved_at: new Date().toISOString(),
       })
-      .eq('status', 'generated')
-      .select('id')
-      .limit(limit);
+      .in('id', ids)
+      .select('id');
 
     if (error) {
       return {
@@ -541,24 +563,30 @@ export class IdeaBankService {
   > {
     const supabase = this.getSupabase();
 
-    const { data, error } = await supabase.from('story_ideas').select('status');
+    const [generated, approved, rejected, blueprint_created] = await Promise.all([
+      supabase.from('story_ideas').select('*', { count: 'exact', head: true }).eq('status', 'generated'),
+      supabase.from('story_ideas').select('*', { count: 'exact', head: true }).eq('status', 'approved'),
+      supabase.from('story_ideas').select('*', { count: 'exact', head: true }).eq('status', 'rejected'),
+      supabase.from('story_ideas').select('*', { count: 'exact', head: true }).eq('status', 'blueprint_created'),
+    ]);
 
-    if (error) {
+    const firstError = [generated, approved, rejected, blueprint_created].find(r => r.error);
+    if (firstError?.error) {
       return {
         success: false,
-        error: error.message,
-        errorCode: 'DB_SELECT_ERROR',
+        error: firstError.error.message,
+        errorCode: 'DB_COUNT_ERROR',
       };
-    }
-
-    const counts: Record<string, number> = {};
-    for (const row of data || []) {
-      counts[row.status] = (counts[row.status] || 0) + 1;
     }
 
     return {
       success: true,
-      data: counts,
+      data: {
+        generated: generated.count || 0,
+        approved: approved.count || 0,
+        rejected: rejected.count || 0,
+        blueprint_created: blueprint_created.count || 0,
+      },
     };
   }
 

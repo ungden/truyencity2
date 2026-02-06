@@ -298,7 +298,7 @@ OUTPUT JSON:
 
   /**
    * Generate cover image for blueprint
-   * Uses Nano Banana Pro (gemini-3-pro-image-preview) and uploads to Supabase Storage
+   * Uses Gemini 2.0 Flash Preview Image Generation and uploads to Supabase Storage
    */
   async generateCover(blueprintId: string): Promise<ServiceResult<string>> {
     const supabase = this.getSupabase();

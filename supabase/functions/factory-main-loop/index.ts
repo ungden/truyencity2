@@ -154,12 +154,30 @@ serve(async (req: Request) => {
       .limit(20)
 
     if (pendingChapters && pendingChapters.length > 0) {
-      // Invoke writer worker for each batch
-      // In production, this would call the factory-writer-worker function
       result.chaptersWriteTriggered = pendingChapters.length
 
-      // Mark as queued for writing (the writer worker will pick them up)
-      // For now, just count them - actual writing happens in factory-writer-worker
+      // Invoke the factory-writer-worker edge function to process pending chapters
+      try {
+        const workerResponse = await fetch(
+          `${supabaseUrl}/functions/v1/factory-writer-worker`,
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${supabaseServiceKey}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ batch_size: Math.min(pendingChapters.length, 10) }),
+          }
+        )
+
+        if (!workerResponse.ok) {
+          const errorText = await workerResponse.text().catch(() => 'Unknown error')
+          result.errors.push(`Writer worker invocation failed: ${workerResponse.status} ${errorText}`)
+        }
+      } catch (workerErr) {
+        result.errors.push(`Writer worker invocation error: ${workerErr}`)
+        // Non-fatal: chapters remain in 'pending' state for next loop iteration
+      }
     }
 
     // 6. Publish due chapters

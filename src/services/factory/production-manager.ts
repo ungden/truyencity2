@@ -505,53 +505,43 @@ export class ProductionManagerService {
     }>
   > {
     const supabase = this.getSupabase();
+    const today = new Date().toISOString().split('T')[0];
 
-    const { data, error } = await supabase.from('production_queue').select('status, chapters_written_today, last_write_date');
+    const [queued, active, writing, paused, finished, errored, chaptersTodayResult] = await Promise.all([
+      supabase.from('production_queue').select('*', { count: 'exact', head: true }).eq('status', 'queued'),
+      supabase.from('production_queue').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+      supabase.from('production_queue').select('*', { count: 'exact', head: true }).eq('status', 'writing'),
+      supabase.from('production_queue').select('*', { count: 'exact', head: true }).eq('status', 'paused'),
+      supabase.from('production_queue').select('*', { count: 'exact', head: true }).eq('status', 'finished'),
+      supabase.from('production_queue').select('*', { count: 'exact', head: true }).eq('status', 'error'),
+      supabase.from('production_queue').select('chapters_written_today').eq('last_write_date', today),
+    ]);
 
-    if (error) {
+    const firstError = [queued, active, writing, paused, finished, errored, chaptersTodayResult].find(r => r.error);
+    if (firstError?.error) {
       return {
         success: false,
-        error: error.message,
-        errorCode: 'DB_SELECT_ERROR',
+        error: firstError.error.message,
+        errorCode: 'DB_COUNT_ERROR',
       };
     }
 
-    const today = new Date().toISOString().split('T')[0];
-    const stats = {
-      queued: 0,
-      active: 0,
-      paused: 0,
-      finished: 0,
-      errored: 0,
-      chaptersToday: 0,
+    const chaptersToday = (chaptersTodayResult.data || []).reduce(
+      (sum: number, row: { chapters_written_today: number }) => sum + (row.chapters_written_today || 0),
+      0
+    );
+
+    return {
+      success: true,
+      data: {
+        queued: queued.count || 0,
+        active: (active.count || 0) + (writing.count || 0),
+        paused: paused.count || 0,
+        finished: finished.count || 0,
+        errored: errored.count || 0,
+        chaptersToday,
+      },
     };
-
-    for (const row of data || []) {
-      switch (row.status) {
-        case 'queued':
-          stats.queued++;
-          break;
-        case 'active':
-        case 'writing':
-          stats.active++;
-          break;
-        case 'paused':
-          stats.paused++;
-          break;
-        case 'finished':
-          stats.finished++;
-          break;
-        case 'error':
-          stats.errored++;
-          break;
-      }
-
-      if (row.last_write_date === today) {
-        stats.chaptersToday += row.chapters_written_today || 0;
-      }
-    }
-
-    return { success: true, data: stats };
   }
 
   /**

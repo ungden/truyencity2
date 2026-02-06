@@ -1,7 +1,7 @@
 // @ts-nocheck
 /* deno-lint-ignore-file */
 // Edge function: gemini-cover-generate
-// Uses Gemini 3 Pro Image Preview (Nano Banana Pro) to generate novel cover art.
+// Uses Gemini 2.0 Flash Preview Image Generation to generate novel cover art.
 // Supports Vietnamese title text rendering on covers.
 // @ts-ignore
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts"
@@ -83,11 +83,10 @@ serve(async (req: Request) => {
       // ignore
     }
 
-    // Gemini Nano Banana Pro
     const geminiKey = Deno.env.get('GEMINI_API_KEY')
     if (!geminiKey) throw new Error('GEMINI_API_KEY is not set');
 
-    const model = 'gemini-3-pro-image-preview';
+    const model = 'gemini-2.0-flash-preview-image-generation';
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
 
     const geminiRes = await fetch(url, {
@@ -103,10 +102,6 @@ serve(async (req: Request) => {
         }],
         generationConfig: {
           responseModalities: ['TEXT', 'IMAGE'],
-          imageConfig: {
-            aspectRatio: '3:4',
-            imageSize: '2K',
-          },
         },
       }),
     });

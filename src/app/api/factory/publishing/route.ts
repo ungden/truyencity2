@@ -6,9 +6,13 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getPublishingSchedulerService } from '@/services/factory';
+import { factoryAuth, finalizeResponse } from '../_auth';
 
 export async function GET(request: NextRequest) {
   try {
+    const auth = await factoryAuth(request, '/api/factory/publishing');
+    if (!auth.success) return auth.response;
+
     const { searchParams } = new URL(request.url);
     const view = searchParams.get('view') || 'today';
     const hours = parseInt(searchParams.get('hours') || '24');
@@ -17,41 +21,41 @@ export async function GET(request: NextRequest) {
 
     if (view === 'today') {
       const result = await publishingScheduler.getTodaySchedule();
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: result.data,
         error: result.error,
-      });
+      }), auth, '/api/factory/publishing', 'GET');
     }
 
     if (view === 'upcoming') {
       const result = await publishingScheduler.getUpcomingPublishes(hours);
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: result.data,
         count: result.data?.length || 0,
         error: result.error,
-      });
+      }), auth, '/api/factory/publishing', 'GET');
     }
 
     if (view === 'stats') {
       const result = await publishingScheduler.getPublishingStats();
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: result.data,
         error: result.error,
-      });
+      }), auth, '/api/factory/publishing', 'GET');
     }
 
     if (view === 'due') {
       const limit = parseInt(searchParams.get('limit') || '100');
       const result = await publishingScheduler.getChaptersDueForPublishing(limit);
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: result.data,
         count: result.data?.length || 0,
         error: result.error,
-      });
+      }), auth, '/api/factory/publishing', 'GET');
     }
 
     return NextResponse.json(
@@ -69,6 +73,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await factoryAuth(request, '/api/factory/publishing');
+    if (!auth.success) return auth.response;
+
     const body = await request.json();
     const action = body.action || 'publish_due';
 
@@ -76,14 +83,14 @@ export async function POST(request: NextRequest) {
 
     if (action === 'publish_due') {
       const result = await publishingScheduler.publishDueChapters();
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: {
           total: result.total,
           succeeded: result.succeeded,
           failed: result.failed,
         },
-      });
+      }), auth, '/api/factory/publishing', 'POST');
     }
 
     if (action === 'publish') {
@@ -97,10 +104,10 @@ export async function POST(request: NextRequest) {
       }
 
       const result = await publishingScheduler.publishChapter(queueItemId);
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         error: result.error,
-      });
+      }), auth, '/api/factory/publishing', 'POST');
     }
 
     if (action === 'schedule') {
@@ -120,11 +127,11 @@ export async function POST(request: NextRequest) {
         scheduled_time ? new Date(scheduled_time) : undefined
       );
 
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: result.data,
         error: result.error,
-      });
+      }), auth, '/api/factory/publishing', 'POST');
     }
 
     if (action === 'reschedule') {
@@ -143,11 +150,11 @@ export async function POST(request: NextRequest) {
         new Date(newTime)
       );
 
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: result.data,
         error: result.error,
-      });
+      }), auth, '/api/factory/publishing', 'POST');
     }
 
     if (action === 'cancel') {
@@ -161,20 +168,20 @@ export async function POST(request: NextRequest) {
       }
 
       const result = await publishingScheduler.cancelPublish(queueItemId);
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         error: result.error,
-      });
+      }), auth, '/api/factory/publishing', 'POST');
     }
 
     if (action === 'retry_failed') {
       const maxRetries = body.max_retries || 3;
       const result = await publishingScheduler.retryFailedPublishes(maxRetries);
-      return NextResponse.json({
+      return finalizeResponse(NextResponse.json({
         success: result.success,
         data: { retried: result.data },
         error: result.error,
-      });
+      }), auth, '/api/factory/publishing', 'POST');
     }
 
     return NextResponse.json(

@@ -28,19 +28,83 @@ export class GeminiClient {
   private defaultTemperature: number;
   private defaultMaxTokens: number;
 
+  // Rate limiting: Token bucket algorithm
+  private rateLimit: {
+    tokens: number;
+    maxTokens: number;
+    refillRate: number; // tokens per second
+    lastRefill: number;
+  };
+
+  // Request timeout in milliseconds
+  private requestTimeoutMs: number;
+
   constructor(options?: {
     apiKey?: string;
     defaultModel?: string;
     defaultTemperature?: number;
     defaultMaxTokens?: number;
+    maxRequestsPerMinute?: number;
+    requestTimeoutMs?: number;
   }) {
     this.apiKey = options?.apiKey || process.env.GEMINI_API_KEY || '';
     this.defaultModel = options?.defaultModel || 'gemini-2.0-flash-exp';
     this.defaultTemperature = options?.defaultTemperature || 0.8;
     this.defaultMaxTokens = options?.defaultMaxTokens || 8192;
+    this.requestTimeoutMs = options?.requestTimeoutMs || 60000; // 60s default
+
+    // Initialize rate limiter (default 50 RPM to stay under Gemini Flash limits)
+    const maxRPM = options?.maxRequestsPerMinute || 50;
+    this.rateLimit = {
+      tokens: maxRPM,
+      maxTokens: maxRPM,
+      refillRate: maxRPM / 60, // refill per second
+      lastRefill: Date.now(),
+    };
 
     if (!this.apiKey) {
       console.warn('[GeminiClient] No API key provided. Set GEMINI_API_KEY env var.');
+    }
+  }
+
+  /**
+   * Wait for rate limit token availability
+   */
+  private async waitForRateLimit(): Promise<void> {
+    // Refill tokens based on time elapsed
+    const now = Date.now();
+    const elapsed = (now - this.rateLimit.lastRefill) / 1000;
+    this.rateLimit.tokens = Math.min(
+      this.rateLimit.maxTokens,
+      this.rateLimit.tokens + elapsed * this.rateLimit.refillRate
+    );
+    this.rateLimit.lastRefill = now;
+
+    // If no tokens available, wait
+    if (this.rateLimit.tokens < 1) {
+      const waitMs = Math.ceil((1 - this.rateLimit.tokens) / this.rateLimit.refillRate * 1000);
+      console.log(`[GeminiClient] Rate limit: waiting ${waitMs}ms`);
+      await new Promise(resolve => setTimeout(resolve, waitMs));
+      this.rateLimit.tokens = 1;
+      this.rateLimit.lastRefill = Date.now();
+    }
+
+    // Consume one token
+    this.rateLimit.tokens -= 1;
+  }
+
+  /**
+   * Fetch with timeout support
+   */
+  private async fetchWithTimeout(url: string, init: RequestInit): Promise<Response> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.requestTimeoutMs);
+
+    try {
+      const response = await fetch(url, { ...init, signal: controller.signal });
+      return response;
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 
@@ -78,7 +142,10 @@ export class GeminiClient {
         };
       }
 
-      const response = await fetch(
+      // Wait for rate limit token
+      await this.waitForRateLimit();
+
+      const response = await this.fetchWithTimeout(
         `${GEMINI_API_BASE}/models/${model}:generateContent?key=${this.apiKey}`,
         {
           method: 'POST',
@@ -91,6 +158,15 @@ export class GeminiClient {
 
       if (!response.ok) {
         const errorText = await response.text();
+
+        // Handle rate limit (429) with exponential backoff
+        if (response.status === 429) {
+          console.warn('[GeminiClient] Rate limited (429). Waiting 5s before returning error.');
+          await new Promise(resolve => setTimeout(resolve, 5000));
+          // Reduce available tokens to prevent cascading requests
+          this.rateLimit.tokens = Math.max(0, this.rateLimit.tokens - 5);
+        }
+
         console.error('[GeminiClient] API error:', response.status, errorText);
         return {
           success: false,
@@ -174,7 +250,10 @@ export class GeminiClient {
         };
       }
 
-      const response = await fetch(
+      // Wait for rate limit token
+      await this.waitForRateLimit();
+
+      const response = await this.fetchWithTimeout(
         `${GEMINI_API_BASE}/models/${model}:generateContent?key=${this.apiKey}`,
         {
           method: 'POST',
@@ -187,6 +266,14 @@ export class GeminiClient {
 
       if (!response.ok) {
         const errorText = await response.text();
+
+        // Handle rate limit (429) with backoff
+        if (response.status === 429) {
+          console.warn('[GeminiClient] Rate limited in chat (429). Waiting 5s.');
+          await new Promise(resolve => setTimeout(resolve, 5000));
+          this.rateLimit.tokens = Math.max(0, this.rateLimit.tokens - 5);
+        }
+
         return {
           success: false,
           error: `Gemini API error: ${response.status} - ${errorText}`,

@@ -521,10 +521,80 @@ LAST CHAPTER: ${lastChapter?.summary || 'Chương đầu tiên'}`;
     };
   }
 
+  /**
+   * Update Story Essence from chapter content and metadata.
+   * Keeps the high-level story state current across 100+ chapters.
+   */
   private updateStoryEssence(chapter: ChapterMemory): void {
+    const essence = this.memory.storyEssence;
+
     // Update location if changed
     if (chapter.locationUsed) {
-      this.memory.storyEssence.currentLocation = chapter.locationUsed;
+      essence.currentLocation = chapter.locationUsed;
+    }
+
+    // Detect realm/cultivation changes from key events
+    const realmKeywords = ['đột phá', 'tiến nhập', 'cảnh giới', 'thăng cấp', 'đạt được', 'bước vào'];
+    for (const event of chapter.keyEvents) {
+      const eventLower = event.toLowerCase();
+
+      // Detect realm change
+      if (realmKeywords.some(k => eventLower.includes(k))) {
+        // Extract the new realm from the event description
+        const realmMatch = event.match(/(?:tiến nhập|đột phá|bước vào|đạt được)\s+(.+?)(?:\s*[,.]|$)/i);
+        if (realmMatch) {
+          essence.currentRealm = realmMatch[1].trim();
+        }
+      }
+    }
+
+    // Update allies/enemies from characters involved
+    const protagonistName = essence.protagonistName || this.characterTracker.protagonist.name;
+    for (const character of chapter.charactersInvolved) {
+      if (character === protagonistName) continue;
+
+      // Check if this character is already tracked
+      const isAlly = essence.majorAllies?.includes(character);
+      const isEnemy = essence.majorEnemies?.includes(character);
+
+      // If character appears in events with positive connotation, add as ally
+      const inPositiveEvent = chapter.keyEvents.some(e =>
+        e.includes(character) && /đồng minh|giúp đỡ|cùng chiến|hợp tác|bằng hữu/.test(e)
+      );
+      const inNegativeEvent = chapter.keyEvents.some(e =>
+        e.includes(character) && /kẻ thù|tấn công|phản bội|đánh|giết/.test(e)
+      );
+
+      if (inPositiveEvent && !isAlly) {
+        if (!essence.majorAllies) essence.majorAllies = [];
+        essence.majorAllies.push(character);
+        // Remove from enemies if previously classified
+        if (essence.majorEnemies) {
+          essence.majorEnemies = essence.majorEnemies.filter(e => e !== character);
+        }
+      }
+      if (inNegativeEvent && !isEnemy) {
+        if (!essence.majorEnemies) essence.majorEnemies = [];
+        essence.majorEnemies.push(character);
+      }
+    }
+
+    // Keep lists manageable (max 10 each)
+    if (essence.majorAllies && essence.majorAllies.length > 10) {
+      essence.majorAllies = essence.majorAllies.slice(-10);
+    }
+    if (essence.majorEnemies && essence.majorEnemies.length > 10) {
+      essence.majorEnemies = essence.majorEnemies.slice(-10);
+    }
+
+    // Track unresolved mysteries from cliffhangers
+    if (chapter.cliffhanger && chapter.cliffhanger.length > 20) {
+      if (!essence.unresolvedMysteries) essence.unresolvedMysteries = [];
+      essence.unresolvedMysteries.push(`Ch.${chapter.chapterNumber}: ${chapter.cliffhanger.substring(0, 100)}`);
+      // Keep last 5 mysteries
+      if (essence.unresolvedMysteries.length > 5) {
+        essence.unresolvedMysteries = essence.unresolvedMysteries.slice(-5);
+      }
     }
   }
 
