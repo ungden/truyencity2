@@ -14,8 +14,39 @@ import {
 export class AIProviderService {
   private apiKeys: Partial<Record<AIProviderType, string>> = {};
 
+  // Token bucket rate limiter for Gemini API (shared across all parallel projects in one cron tick)
+  // Tier 3 Gemini = 2,000 RPM; we use 200 RPM to leave safe headroom for bursts
+  private static geminiRateLimit = {
+    tokens: 200,
+    maxTokens: 200,
+    refillRate: 200 / 60, // ~3.33 tokens/second
+    lastRefill: Date.now(),
+  };
+
   constructor(apiKeys?: Partial<Record<AIProviderType, string>>) {
     this.apiKeys = apiKeys || {};
+  }
+
+  /**
+   * Wait for a Gemini rate limit token before making an API call.
+   * Uses a static token bucket shared across all AIProviderService instances.
+   */
+  private async waitForGeminiRateLimit(): Promise<void> {
+    const rl = AIProviderService.geminiRateLimit;
+    const now = Date.now();
+    const elapsed = (now - rl.lastRefill) / 1000;
+    rl.tokens = Math.min(rl.maxTokens, rl.tokens + elapsed * rl.refillRate);
+    rl.lastRefill = now;
+
+    if (rl.tokens < 1) {
+      const waitMs = Math.ceil((1 - rl.tokens) / rl.refillRate * 1000);
+      console.log(`[AIProvider] Gemini rate limit: waiting ${waitMs}ms`);
+      await new Promise(resolve => setTimeout(resolve, waitMs));
+      rl.tokens = 1;
+      rl.lastRefill = Date.now();
+    }
+
+    rl.tokens -= 1;
   }
 
   setApiKey(provider: AIProviderType, apiKey: string) {
@@ -258,6 +289,9 @@ export class AIProviderService {
     temperature: number,
     maxTokens: number
   ): Promise<AIResponse> {
+    // Wait for rate limit token before making the request
+    await this.waitForGeminiRateLimit();
+
     // Convert messages to Gemini format
     const systemMessage = messages.find(m => m.role === 'system');
     const chatMessages = messages.filter(m => m.role !== 'system');
@@ -333,6 +367,10 @@ export class AIProviderService {
 
       // Retryable errors: 429 (rate limit) and 503 (server overload)
       if ((response.status === 429 || response.status === 503) && attempt < MAX_RETRIES) {
+        // Drain rate limit tokens on 429 to slow down all concurrent callers
+        if (response.status === 429) {
+          AIProviderService.geminiRateLimit.tokens = Math.max(0, AIProviderService.geminiRateLimit.tokens - 10);
+        }
         const errorText = await response.text();
         lastError = new Error(`Gemini API error: ${response.status} - ${errorText}`);
         console.warn(`[Gemini] ${response.status} error on attempt ${attempt + 1}, will retry...`);

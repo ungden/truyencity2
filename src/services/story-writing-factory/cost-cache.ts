@@ -89,9 +89,9 @@ export class CostCache {
   private retrievalCacheTTL: number = 1 * 60 * 60 * 1000;       // 1 hour
   private maxCacheSize: number = 10000;
 
-  // Cost limits
-  private dailyBudget: number = 10;  // USD
-  private sessionBudget: number = 5; // USD
+  // Cost limits (scaled for 200 novels x 20 chapters/day = 4,000 chapters/day @ ~$0.006/ch)
+  private dailyBudget: number = 50;  // USD
+  private sessionBudget: number = 25; // USD
 
   constructor(projectId: string, options?: {
     dailyBudget?: number;

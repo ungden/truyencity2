@@ -5,15 +5,16 @@
  * 
  * Two-tier processing:
  *   Tier 1 (RESUME): Projects with current_chapter > 0
- *     - Pick up to 15 projects, write 1 chapter each in PARALLEL
+ *     - Pick up to 20 projects, write 1 chapter each in PARALLEL
  *     - Fast: ~30-60s per project (uses dummy arcs, skips planning)
+ *     - Per-project timeout: 120s to prevent one slow project from blocking the batch
  *   
  *   Tier 2 (INIT): Projects with current_chapter = 0
  *     - Pick only 1 new project, plan story + arcs + write Ch.1
  *     - Slow: ~2-5 minutes (full Gemini planning pipeline)
  * 
  * Both tiers run in parallel via Promise.allSettled.
- * Designed for ~4,000+ chapters/day throughput.
+ * Designed for ~5,700+ chapters/day throughput (20 projects * 288 cron ticks/day).
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -23,8 +24,9 @@ import { StoryRunner } from '@/services/story-writing-factory/runner';
 import type { FactoryConfig, RunnerConfig, GenreType } from '@/services/story-writing-factory/types';
 
 // CONFIGURATION
-const RESUME_BATCH_SIZE = 15;  // Tier 1: resume projects (fast)
+const RESUME_BATCH_SIZE = 20;  // Tier 1: resume projects (fast) — 20 * 288 ticks/day = 5,760 slots/day
 const INIT_BATCH_SIZE = 1;     // Tier 2: new projects needing full plan (slow)
+const PROJECT_TIMEOUT_MS = 120_000; // 120s per-project timeout — prevents 1 slow project from blocking the batch
 
 export const maxDuration = 300; // 5 minutes (Vercel Pro)
 export const dynamic = 'force-dynamic';
@@ -302,11 +304,21 @@ export async function GET(request: NextRequest) {
 
     // ====== EXECUTE BOTH TIERS IN PARALLEL ======
 
+    // Helper: wrap a promise with a timeout to prevent one slow project from blocking the batch
+    const withTimeout = <T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> =>
+      Promise.race([
+        promise,
+        new Promise<T>(resolve => setTimeout(() => resolve(fallback), ms)),
+      ]);
+
     const allPromises = [
-      // Tier 1: All resume projects in parallel
+      // Tier 1: All resume projects in parallel (with per-project timeout)
       ...resumeProjects.map(p =>
-        writeOneChapter(p, geminiKey, supabase, 'resume')
-          .catch(err => ({
+        withTimeout(
+          writeOneChapter(p, geminiKey, supabase, 'resume'),
+          PROJECT_TIMEOUT_MS,
+          { id: p.id, title: '?', tier: 'resume' as const, success: false, error: `Timeout after ${PROJECT_TIMEOUT_MS / 1000}s` }
+        ).catch(err => ({
             id: p.id,
             title: '?',
             tier: 'resume' as const,
@@ -314,10 +326,13 @@ export async function GET(request: NextRequest) {
             error: err instanceof Error ? err.message : String(err),
           }))
       ),
-      // Tier 2: Init projects (usually just 1)
+      // Tier 2: Init projects (usually just 1, longer timeout: 4 min for full planning)
       ...initProjects.map(p =>
-        writeOneChapter(p, geminiKey, supabase, 'init')
-          .catch(err => ({
+        withTimeout(
+          writeOneChapter(p, geminiKey, supabase, 'init'),
+          240_000, // 4 min for init (full planning pipeline)
+          { id: p.id, title: '?', tier: 'init' as const, success: false, error: 'Timeout after 240s' }
+        ).catch(err => ({
             id: p.id,
             title: '?',
             tier: 'init' as const,
