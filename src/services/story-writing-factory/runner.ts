@@ -735,112 +735,113 @@ export class StoryRunner {
           }
         }
 
-        // ========== CONSISTENCY CHECK (contradiction detection) ==========
-        if (this.consistencyChecker && result.data) {
-          try {
-            const outlineCharacters = result.outline?.scenes
-              ?.flatMap(s => s.characters)
-              .filter((c, i, arr) => arr.indexOf(c) === i) || [];
-
-            const consistencyReport = await this.consistencyChecker.checkChapter(
-              chapterNumber,
-              result.data.content,
-              {
-                charactersInvolved: [
-                  this.worldBible?.protagonist.name || '',
-                  ...outlineCharacters,
-                ].filter(Boolean),
-                locations: result.outline?.location ? [result.outline.location] : [],
-                powerEvents: result.outline?.dopaminePoints
-                  ?.filter(d => d.type === 'breakthrough')
-                  .map(d => ({
-                    character: this.worldBible?.protagonist.name || '',
-                    toLevel: d.description,
-                  })),
-                newCharacters: outlineCharacters
-                  .filter(c => c !== this.worldBible?.protagonist.name)
-                  .map(c => ({ name: c, role: 'supporting' as const })),
-              }
-            );
-
-            if (consistencyReport.hasCriticalIssues) {
-              const criticalIssues = consistencyReport.issues
-                .filter(i => i.severity === 'critical' || i.severity === 'major')
-                .map(i => `${i.type}: ${i.description}`)
-                .join('; ');
-
-              this.callbacks.onError?.(
-                `Ch.${chapterNumber} consistency issues (score: ${consistencyReport.overallScore}): ${criticalIssues}`
-              );
-
-              // If critical and we haven't exhausted retries, this could trigger rewrite
-              // For now, log and continue - the chapter is still usable
-              if (consistencyReport.overallScore < 40) {
-                this.callbacks.onStatusChange?.('writing',
-                  `Ch.${chapterNumber} WARNING: Low consistency score ${consistencyReport.overallScore}/100`
-                );
-              }
-            }
-          } catch (consistencyErr) {
-            // ConsistencyChecker failure is non-fatal - don't block chapter saving
-            this.callbacks.onError?.(
-              `Ch.${chapterNumber} consistency check failed (non-fatal): ${consistencyErr instanceof Error ? consistencyErr.message : 'Unknown'}`
-            );
-          }
-        }
-
         // Store chapter
         this.writtenChapters.set(chapterNumber, result.data);
 
-        // ========== UPDATE TRACKING SYSTEMS ==========
+        // ========== PARALLEL POST-WRITE OPERATIONS ==========
+        // Run consistency check, tracker recording, and AI summary in parallel
+        // to save ~10-15s per chapter (previously sequential)
 
-        // Extract & record data to Sprint 2/3 trackers (DB persistence)
-        await this.extractAndRecordFromChapter(chapterNumber, result, result.data.content);
+        const outlineCharacters = result.outline?.scenes
+          ?.flatMap(s => s.characters)
+          .filter((c, i, arr) => arr.indexOf(c) === i) || [];
 
-        // Update memory manager
+        const outlineSummary = result.outline?.summary || '';
+        const dopamineTypes = result.data.dopamineDelivered
+          ?.map(d => d.type).join(', ') || '';
+
+        // Build fallback summary (used if AI summary fails)
+        const fallbackSummary = outlineSummary
+          ? `${result.data.title}: ${outlineSummary}${dopamineTypes ? ` [Dopamine: ${dopamineTypes}]` : ''}`
+          : `${result.data.title}: ${result.data.content.substring(0, 300)}...`;
+
+        // --- Parallel task 1: Consistency check ---
+        const consistencyPromise = (this.consistencyChecker && result.data)
+          ? (async () => {
+              try {
+                const consistencyReport = await this.consistencyChecker!.checkChapter(
+                  chapterNumber,
+                  result.data!.content,
+                  {
+                    charactersInvolved: [
+                      this.worldBible?.protagonist.name || '',
+                      ...outlineCharacters,
+                    ].filter(Boolean),
+                    locations: result.outline?.location ? [result.outline.location] : [],
+                    powerEvents: result.outline?.dopaminePoints
+                      ?.filter(d => d.type === 'breakthrough')
+                      .map(d => ({
+                        character: this.worldBible?.protagonist.name || '',
+                        toLevel: d.description,
+                      })),
+                    newCharacters: outlineCharacters
+                      .filter(c => c !== this.worldBible?.protagonist.name)
+                      .map(c => ({ name: c, role: 'supporting' as const })),
+                  }
+                );
+
+                if (consistencyReport.hasCriticalIssues) {
+                  const criticalIssues = consistencyReport.issues
+                    .filter(i => i.severity === 'critical' || i.severity === 'major')
+                    .map(i => `${i.type}: ${i.description}`)
+                    .join('; ');
+
+                  this.callbacks.onError?.(
+                    `Ch.${chapterNumber} consistency issues (score: ${consistencyReport.overallScore}): ${criticalIssues}`
+                  );
+
+                  if (consistencyReport.overallScore < 40) {
+                    this.callbacks.onStatusChange?.('writing',
+                      `Ch.${chapterNumber} WARNING: Low consistency score ${consistencyReport.overallScore}/100`
+                    );
+                  }
+                }
+              } catch (consistencyErr) {
+                this.callbacks.onError?.(
+                  `Ch.${chapterNumber} consistency check failed (non-fatal): ${consistencyErr instanceof Error ? consistencyErr.message : 'Unknown'}`
+                );
+              }
+            })()
+          : Promise.resolve();
+
+        // --- Parallel task 2: Extract & record to trackers (DB persistence) ---
+        const trackerPromise = this.extractAndRecordFromChapter(chapterNumber, result, result.data.content);
+
+        // --- Parallel task 3: AI summary generation ---
+        const summaryPromise = (this.memoryManager)
+          ? (async () => {
+              try {
+                const summaryResponse = await this.aiService.chat({
+                  provider: this.config.provider,
+                  model: this.config.model,
+                  messages: [
+                    {
+                      role: 'system',
+                      content: 'Bạn là trợ lý tóm tắt chương truyện. Tóm tắt ngắn gọn 2-3 câu, nêu: (1) sự kiện chính, (2) thay đổi trạng thái nhân vật/cảnh giới, (3) mối quan hệ mới/thay đổi, (4) cliffhanger. KHÔNG dùng markdown.',
+                    },
+                    {
+                      role: 'user',
+                      content: `Tóm tắt chương ${chapterNumber} "${result.data!.title}" trong 2-3 câu:\n\n${result.data!.content.substring(0, 4000)}${result.data!.content.length > 4000 ? '\n\n...' + result.data!.content.slice(-1500) : ''}`,
+                    },
+                  ],
+                  temperature: 0.2,
+                  maxTokens: 300,
+                });
+
+                return summaryResponse.success && summaryResponse.content
+                  ? `${result.data!.title}: ${summaryResponse.content.trim()}`
+                  : fallbackSummary;
+              } catch {
+                return fallbackSummary;
+              }
+            })()
+          : Promise.resolve(fallbackSummary);
+
+        // Wait for all parallel operations to complete
+        const [, , summary] = await Promise.all([consistencyPromise, trackerPromise, summaryPromise]);
+
+        // ========== UPDATE MEMORY (depends on summary result) ==========
         if (this.memoryManager) {
-          // Generate AI-powered summary for better context across 100+ chapters
-          let summary: string;
-          const outlineSummary = result.outline?.summary || '';
-          const dopamineTypes = result.data.dopamineDelivered
-            ?.map(d => d.type).join(', ') || '';
-
-          try {
-            // Use AI to create a concise, information-dense summary
-            const summaryResponse = await this.aiService.chat({
-              provider: this.config.provider,
-              model: this.config.model,
-              messages: [
-                {
-                  role: 'system',
-                  content: 'Bạn là trợ lý tóm tắt chương truyện. Tóm tắt ngắn gọn 2-3 câu, nêu: (1) sự kiện chính, (2) thay đổi trạng thái nhân vật/cảnh giới, (3) mối quan hệ mới/thay đổi, (4) cliffhanger. KHÔNG dùng markdown.',
-                },
-                {
-                  role: 'user',
-                  content: `Tóm tắt chương ${chapterNumber} "${result.data.title}" trong 2-3 câu:\n\n${result.data.content.substring(0, 4000)}${result.data.content.length > 4000 ? '\n\n...' + result.data.content.slice(-1500) : ''}`,
-                },
-              ],
-              temperature: 0.2,
-              maxTokens: 300,
-            });
-
-            summary = summaryResponse.success && summaryResponse.content
-              ? `${result.data.title}: ${summaryResponse.content.trim()}`
-              : outlineSummary
-                ? `${result.data.title}: ${outlineSummary}${dopamineTypes ? ` [Dopamine: ${dopamineTypes}]` : ''}`
-                : `${result.data.title}: ${result.data.content.substring(0, 300)}...`;
-          } catch {
-            // Fallback to outline summary if AI fails
-            summary = outlineSummary
-              ? `${result.data.title}: ${outlineSummary}${dopamineTypes ? ` [Dopamine: ${dopamineTypes}]` : ''}`
-              : `${result.data.title}: ${result.data.content.substring(0, 300)}...`;
-          }
-
-          // Extract characters from outline
-          const outlineCharacters = result.outline?.scenes
-            ?.flatMap(s => s.characters)
-            .filter((c, i, arr) => arr.indexOf(c) === i) || [];
-
           const chapterMemory: ChapterMemory = {
             chapterNumber,
             title: result.data.title,

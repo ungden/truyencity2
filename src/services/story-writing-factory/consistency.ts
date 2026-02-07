@@ -156,27 +156,24 @@ export class ConsistencyChecker {
   ): Promise<ConsistencyReport> {
     const issues: ConsistencyIssue[] = [];
 
-    // 1. Check for dead character appearances
+    // 1. Check for dead character appearances (sync)
     const deadIssues = this.checkDeadCharacters(chapterNumber, metadata.charactersInvolved, content);
     issues.push(...deadIssues);
 
-    // 2. Check power progression consistency
-    if (metadata.powerEvents) {
-      const powerIssues = await this.checkPowerConsistency(chapterNumber, metadata.powerEvents);
-      issues.push(...powerIssues);
-    }
-
-    // 3. Check character trait consistency using AI
-    const traitIssues = await this.checkCharacterTraits(chapterNumber, content, metadata.charactersInvolved);
-    issues.push(...traitIssues);
-
-    // 4. Check relationship consistency
+    // 4. Check relationship consistency (sync)
     const relationshipIssues = this.checkRelationshipConsistency(content, metadata.charactersInvolved);
     issues.push(...relationshipIssues);
 
-    // 5. Check world rule violations
-    const worldIssues = await this.checkWorldRules(content);
-    issues.push(...worldIssues);
+    // 2, 3, 5: Run async checks in parallel (power: DB, traits: DeepSeek AI, world: DeepSeek AI)
+    const [powerIssues, traitIssues, worldIssues] = await Promise.all([
+      metadata.powerEvents
+        ? this.checkPowerConsistency(chapterNumber, metadata.powerEvents)
+        : Promise.resolve([] as ConsistencyIssue[]),
+      this.checkCharacterTraits(chapterNumber, content, metadata.charactersInvolved),
+      this.checkWorldRules(content),
+    ]);
+
+    issues.push(...powerIssues, ...traitIssues, ...worldIssues);
 
     // Calculate overall score
     const severityWeights = { minor: 5, moderate: 15, major: 30, critical: 50 };

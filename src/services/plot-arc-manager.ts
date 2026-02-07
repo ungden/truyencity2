@@ -35,10 +35,31 @@ export class PlotArcManager {
   private projectId: string;
   private supabaseServiceRoleClient: SupabaseClient | null = null;
   private externalClient: SupabaseClient | null = null;
+  private tablesMissing = false; // Graceful degradation flag
+  // Cache getCurrentArc() results to avoid repeated DB round-trips per chapter
+  // Key: chapterNumber, Value: { arc, expiry timestamp }
+  private arcCache: Map<number, { arc: PlotArc | null; expiry: number }> = new Map();
+  private static ARC_CACHE_TTL = 60_000; // 60 seconds
 
   constructor(projectId: string, client?: SupabaseClient) {
     this.projectId = projectId;
     this.externalClient = client || null;
+  }
+
+  /**
+   * Check if a Supabase error indicates the table doesn't exist (PGRST205).
+   * Once detected, all future calls degrade gracefully without spamming logs.
+   */
+  private isTableMissingError(error: { code?: string; message?: string } | null): boolean {
+    if (!error) return false;
+    if (error.code === 'PGRST205' || error.code === '42P01') {
+      if (!this.tablesMissing) {
+        console.warn('[PlotArcManager] Tables not found in DB (migration 0012 not applied). Degrading gracefully.');
+        this.tablesMissing = true;
+      }
+      return true;
+    }
+    return false;
   }
 
   private async getClient(): Promise<SupabaseClient> {
@@ -67,8 +88,16 @@ export class PlotArcManager {
    * Lấy arc hiện tại cho chương đang viết
    */
   async getCurrentArc(chapterNumber: number): Promise<PlotArc | null> {
+    if (this.tablesMissing) return null;
+
+    // Check cache first
+    const cached = this.arcCache.get(chapterNumber);
+    if (cached && Date.now() < cached.expiry) {
+      return cached.arc;
+    }
+
     const supabase = await this.getClient();
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('plot_arcs')
       .select('*')
       .eq('project_id', this.projectId)
@@ -76,13 +105,22 @@ export class PlotArcManager {
       .gte('end_chapter', chapterNumber)
       .single();
 
-    return data as PlotArc | null;
+    if (this.isTableMissingError(error)) return null;
+
+    const arc = data as PlotArc | null;
+
+    // Cache the result
+    this.arcCache.set(chapterNumber, { arc, expiry: Date.now() + PlotArcManager.ARC_CACHE_TTL });
+
+    return arc;
   }
 
   /**
    * Tạo arc mới tự động nếu chưa có
    */
-  async ensureArcExists(chapterNumber: number): Promise<PlotArc> {
+  async ensureArcExists(chapterNumber: number): Promise<PlotArc | null> {
+    if (this.tablesMissing) return null;
+
     let arc = await this.getCurrentArc(chapterNumber);
 
     if (!arc) {
@@ -114,11 +152,17 @@ export class PlotArcManager {
         .single();
 
       if (error) {
+        if (this.isTableMissingError(error)) return null;
         console.error('[PlotArcManager] Error creating arc:', error);
         throw error;
       }
 
       arc = data as PlotArc;
+
+      // Invalidate cache for all chapters in this new arc
+      for (let ch = startChapter; ch <= endChapter; ch++) {
+        this.arcCache.delete(ch);
+      }
 
       // Tạo twist cho arc mới
       await this.planTwistsForArc(arc);
@@ -176,6 +220,7 @@ export class PlotArcManager {
    * Lấy tension target cho chương hiện tại
    */
   async getTensionTarget(chapterNumber: number): Promise<number> {
+    if (this.tablesMissing) return 50;
     const arc = await this.getCurrentArc(chapterNumber);
     if (!arc || !arc.tension_curve) {
       return 50; // Default medium tension
@@ -193,6 +238,7 @@ export class PlotArcManager {
    * Generate plot objectives dựa trên tension và arc theme
    */
   async generatePlotObjectives(chapterNumber: number): Promise<string> {
+    if (this.tablesMissing) return '';
     const arc = await this.getCurrentArc(chapterNumber);
     const tension = await this.getTensionTarget(chapterNumber);
     const upcomingTwists = await this.getUpcomingTwists(chapterNumber);
@@ -263,6 +309,7 @@ export class PlotArcManager {
    * Mỗi arc (10 chương) nên có 1-2 twist lớn
    */
   private async planTwistsForArc(arc: PlotArc): Promise<void> {
+    if (this.tablesMissing) return;
     const supabase = await this.getClient();
 
     // Twist 1: Ở chương 4-5 (40-50% arc)
@@ -303,8 +350,9 @@ export class PlotArcManager {
    * Lấy twists sắp tới (trong vòng 5 chương)
    */
   async getUpcomingTwists(chapterNumber: number): Promise<PlannedTwist[]> {
+    if (this.tablesMissing) return [];
     const supabase = await this.getClient();
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('planned_twists')
       .select('*')
       .eq('project_id', this.projectId)
@@ -313,6 +361,7 @@ export class PlotArcManager {
       .in('status', ['planned', 'foreshadowed'])
       .order('target_chapter', { ascending: true });
 
+    if (this.isTableMissingError(error)) return [];
     return (data as PlannedTwist[]) || [];
   }
 
@@ -320,6 +369,7 @@ export class PlotArcManager {
    * Mark twist as revealed
    */
   async markTwistRevealed(twistId: string, chapterNumber: number): Promise<void> {
+    if (this.tablesMissing) return;
     const supabase = await this.getClient();
     await supabase
       .from('planned_twists')
@@ -342,16 +392,19 @@ export class PlotArcManager {
     characterName: string,
     startState: string,
     targetState: string
-  ): Promise<CharacterArc> {
+  ): Promise<CharacterArc | null> {
+    if (this.tablesMissing) return null;
     const supabase = await this.getClient();
 
     // Check if exists
-    const { data: existing } = await supabase
+    const { data: existing, error: selectError } = await supabase
       .from('character_arcs')
       .select('*')
       .eq('project_id', this.projectId)
       .eq('character_name', characterName)
       .single();
+
+    if (this.isTableMissingError(selectError)) return null;
 
     if (existing) {
       return existing as CharacterArc;
@@ -374,6 +427,7 @@ export class PlotArcManager {
       .single();
 
     if (error) {
+      if (this.isTableMissingError(error)) return null;
       console.error('[PlotArcManager] Error creating character arc:', error);
       throw error;
     }
@@ -390,6 +444,7 @@ export class PlotArcManager {
     event: string,
     change: string
   ): Promise<void> {
+    if (this.tablesMissing) return;
     const supabase = await this.getClient();
 
     const { data: arc } = await supabase
@@ -440,6 +495,7 @@ export class PlotArcManager {
    * Generate arc summary khi arc hoàn thành
    */
   async generateArcSummary(arcId: string): Promise<HierarchicalSummary | null> {
+    if (this.tablesMissing) return null;
     const supabase = await this.getClient();
 
     // Get arc info
@@ -495,6 +551,7 @@ export class PlotArcManager {
    * Get relevant arc summaries (instead of all chapter summaries) to save tokens
    */
   async getRelevantArcSummaries(currentChapter: number, lookbackArcs: number = 2): Promise<HierarchicalSummary[]> {
+    if (this.tablesMissing) return [];
     const supabase = await this.getClient();
     const currentArcNumber = Math.floor((currentChapter - 1) / 10) + 1;
 

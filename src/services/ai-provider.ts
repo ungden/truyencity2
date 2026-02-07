@@ -286,41 +286,66 @@ export class AIProviderService {
       };
     }
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      }
-    );
+    // Retry with exponential backoff for rate limit (429) and server errors (503)
+    const MAX_RETRIES = 3;
+    const RETRY_DELAYS = [2000, 5000, 10000]; // 2s, 5s, 10s
+    let lastError: Error | null = null;
 
-    if (!response.ok) {
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      if (attempt > 0) {
+        const delay = RETRY_DELAYS[attempt - 1] || 10000;
+        console.warn(`[Gemini] Retry ${attempt}/${MAX_RETRIES} after ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+
+        // Extract content from Gemini response
+        const content = data.candidates?.[0]?.content?.parts
+          ?.map((part: { text?: string }) => part.text || '')
+          .join('') || '';
+
+        return {
+          success: true,
+          content,
+          usage: {
+            promptTokens: data.usageMetadata?.promptTokenCount || 0,
+            completionTokens: data.usageMetadata?.candidatesTokenCount || 0,
+            totalTokens: data.usageMetadata?.totalTokenCount || 0,
+          },
+          model,
+          provider: 'gemini',
+          finishReason: data.candidates?.[0]?.finishReason,
+        };
+      }
+
+      // Retryable errors: 429 (rate limit) and 503 (server overload)
+      if ((response.status === 429 || response.status === 503) && attempt < MAX_RETRIES) {
+        const errorText = await response.text();
+        lastError = new Error(`Gemini API error: ${response.status} - ${errorText}`);
+        console.warn(`[Gemini] ${response.status} error on attempt ${attempt + 1}, will retry...`);
+        continue;
+      }
+
+      // Non-retryable error or final attempt — throw immediately
       const errorText = await response.text();
       throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
     }
 
-    const data = await response.json();
-
-    // Extract content from Gemini response
-    const content = data.candidates?.[0]?.content?.parts
-      ?.map((part: { text?: string }) => part.text || '')
-      .join('') || '';
-
-    return {
-      success: true,
-      content,
-      usage: {
-        promptTokens: data.usageMetadata?.promptTokenCount || 0,
-        completionTokens: data.usageMetadata?.candidatesTokenCount || 0,
-        totalTokens: data.usageMetadata?.totalTokenCount || 0,
-      },
-      model,
-      provider: 'gemini',
-      finishReason: data.candidates?.[0]?.finishReason,
-    };
+    // Should not reach here, but safety net
+    throw lastError || new Error('Gemini API: max retries exceeded');
   }
 
   // Streaming support for real-time output

@@ -201,7 +201,7 @@ export class ChapterWriter {
         // Build result
         const content: ChapterContent = {
           chapterNumber,
-          title: writerResult.data.title || `Chương ${chapterNumber}`,
+          title: writerResult.data.title || this.extractTitleFromContent(writerResult.data.chapterContent, chapterNumber),
           content: writerResult.data.chapterContent,
           wordCount: writerResult.data.wordCount,
           qualityScore: criticResult.data?.overallScore || 5,
@@ -289,11 +289,14 @@ export class ChapterWriter {
         }
       }
 
+      // Extract title from AI-written content (looks for "Chương N: Title" pattern)
+      const extractedTitle = this.extractTitleFromContent(content, chapterNumber);
+
       return {
         success: true,
         data: {
           chapterNumber,
-          title: `Chương ${chapterNumber}`,
+          title: extractedTitle,
           content,
           wordCount,
           qualityScore: 6,
@@ -705,6 +708,53 @@ Viết tiếp ngay:`,
   }
 
   // ============================================================================
+  // PRIVATE: TITLE EXTRACTION
+  // ============================================================================
+
+  /**
+   * Extract a descriptive chapter title from AI-written content.
+   * Looks for patterns like:
+   *   "Chương N: Descriptive Title"
+   *   "Chương N - Descriptive Title"
+   *   "# Chương N: Title"
+   * Falls back to generating a title from the first meaningful sentence.
+   */
+  private extractTitleFromContent(content: string, chapterNumber: number): string {
+    const fallback = `Chương ${chapterNumber}`;
+    if (!content) return fallback;
+
+    const lines = content.split('\n');
+    // Check first 8 lines for a chapter heading pattern
+    for (let i = 0; i < Math.min(8, lines.length); i++) {
+      const line = lines[i].replace(/^#+\s*/, '').trim(); // strip markdown headings
+      if (!line) continue;
+
+      // Pattern: "Chương N: Title" or "Chương N - Title"
+      const match = line.match(/^Chương\s*\d+\s*[:\-–—]\s*(.+)/i);
+      if (match) {
+        const title = match[1].trim();
+        // Only accept if the extracted part is a real title (not empty, not just punctuation)
+        if (title.length >= 3 && !/^\d+$/.test(title)) {
+          return title;
+        }
+      }
+    }
+
+    // Fallback: Use the first non-empty, non-trivial sentence as a title hint
+    for (let i = 0; i < Math.min(15, lines.length); i++) {
+      const line = lines[i].replace(/^#+\s*/, '').replace(/^\*+/, '').trim();
+      if (!line || line.length < 8) continue;
+      // Skip lines that look like "Chương N" without descriptor
+      if (/^Chương\s*\d+\s*$/i.test(line)) continue;
+      // Take first ~60 chars of the first real content line
+      const snippet = line.length > 60 ? line.substring(0, 57) + '...' : line;
+      return snippet;
+    }
+
+    return fallback;
+  }
+
+  // ============================================================================
   // PRIVATE: HELPERS
   // ============================================================================
 
@@ -757,6 +807,8 @@ CLIFFHANGER (dùng 1 trong các kỹ thuật):
 ${enhancedStyle.cliffhangerTechniques.slice(0, 3).map(c => `- ${c.name}: "${c.example}"`).join('\n')}
 
 ĐỘ DÀI YÊU CẦU (BẮT BUỘC):
+- BẮT ĐẦU bằng dòng tiêu đề: "Chương ${chapterNumber}: [Tiêu đề hấp dẫn bằng tiếng Việt]"
+  (VD: "Chương ${chapterNumber}: Huyết Chiến Vạn Thú Sơn", KHÔNG được viết chỉ "Chương ${chapterNumber}" mà thiếu tiêu đề)
 - Viết TỐI THIỂU ${this.config.targetWordCount} từ
 - Viết chi tiết, không tóm tắt
 - KHÔNG markdown, viết văn thuần túy
@@ -764,7 +816,7 @@ ${enhancedStyle.cliffhangerTechniques.slice(0, 3).map(c => `- ${c.name}: "${c.ex
 - Có ít nhất 1 điểm dopamine (face-slap, đột phá, thu hoạch)
 - Bao gồm: miêu tả bối cảnh, cảm xúc nội tâm, đối thoại phong phú, hành động chi tiết
 
-Viết chương (nhớ: TỐI THIỂU ${this.config.targetWordCount} từ):`;
+Viết chương (nhớ: BẮT ĐẦU bằng "Chương ${chapterNumber}: [Tiêu đề]", sau đó TỐI THIỂU ${this.config.targetWordCount} từ):`;
   }
 
   // ============================================================================
