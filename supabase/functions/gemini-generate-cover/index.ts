@@ -2,7 +2,7 @@
 /* deno-lint-ignore-file */
 /**
  * Gemini Cover Generation Edge Function
- * Uses Gemini 2.0 Flash Preview Image Generation for high-quality book covers
+ * Uses Gemini 3 Pro Image Preview for high-quality book covers with native text rendering
  * 
  * Supports:
  * - Job-based async processing (avoids timeouts)
@@ -76,9 +76,8 @@ function getGenreStyle(genre: string) {
 function buildCoverPrompt(title: string, genre: string, description: string) {
   const genreStyle = getGenreStyle(genre);
   
-  return `Create a stunning professional book cover illustration.
+  return `Create a stunning professional webnovel book cover.
 
-TITLE: "${title}"
 GENRE: ${genre}
 STYLE: ${genreStyle.style}
 
@@ -87,18 +86,22 @@ ${description}
 
 VISUAL REQUIREMENTS:
 - ${genreStyle.elements}
-- Professional book cover composition
+- Professional book cover composition, vertical 3:4
 - Dramatic cinematic lighting with rich colors
 - High detail and ultra-sharp focus
 - Atmospheric depth and mood
 - Visually striking and eye-catching design
 
-IMPORTANT: 
-- Generate ONLY the visual artwork, NO text or title on the cover
-- No watermarks or signatures
+TEXT ON COVER (MUST render these exactly):
+- Title text must be exactly: "${title}". Place at the top-center in large bold serif font, high contrast, perfectly readable.
+- At the bottom-center, include small text: "Truyencity.com"
+- No other text besides the title and Truyencity.com
+
+IMPORTANT:
+- No watermarks or signatures besides Truyencity.com
 - Create a complete, publication-ready cover illustration
 
-Avoid: text, words, letters, watermark, signature, blurry, low quality, distorted, deformed`;
+Avoid: watermark, signature, blurry, low quality, distorted, deformed`;
 }
 
 async function updateJobStatus(supabase: any, jobId: string, status: string, data: Record<string, any> = {}) {
@@ -108,7 +111,7 @@ async function updateJobStatus(supabase: any, jobId: string, status: string, dat
     .eq('id', jobId);
 }
 
-const MODEL = 'gemini-2.0-flash-preview-image-generation';
+const MODEL = 'gemini-3-pro-image-preview';
 
 async function generateWithGemini(
   apiKey: string, 
@@ -122,7 +125,11 @@ async function generateWithGemini(
     }],
     generationConfig: {
       responseModalities: ['TEXT', 'IMAGE'],
-    }
+      imageConfig: {
+        aspectRatio: options.aspectRatio || '3:4',
+        imageSize: options.imageSize || '2K',
+      },
+    },
   };
 
   const response = await fetch(

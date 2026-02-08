@@ -328,7 +328,7 @@ Nếu không có vấn đề, trả về: {"issues": []}`,
 ${characterInfo}
 
 Nội dung chương ${chapterNumber}:
-${content.substring(0, 3000)}
+${content.substring(0, 6000)}
 
 Có mâu thuẫn tính cách không?`,
           },
@@ -427,7 +427,7 @@ Nếu không vi phạm: {"violations": []}`,
 ${this.worldRulesCache.slice(0, 10).join('\n')}
 
 Nội dung:
-${content.substring(0, 2000)}`,
+${content.substring(0, 4000)}`,
           },
         ],
         temperature: 0.1,

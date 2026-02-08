@@ -247,6 +247,7 @@ export class ChapterWriter {
       worldBible: WorldBible;
       styleBible: StyleBible;
       previousSummary: string;
+      currentArc?: StoryArc;
     }
   ): Promise<ChapterResult> {
     const startTime = Date.now();
@@ -773,17 +774,34 @@ Viết tiếp ngay:`,
 
   private buildSimplePrompt(
     chapterNumber: number,
-    context: { worldBible: WorldBible; styleBible: StyleBible; previousSummary: string }
+    context: { worldBible: WorldBible; styleBible: StyleBible; previousSummary: string; currentArc?: StoryArc }
   ): string {
     const genreType = this.config.genre || 'tien-hiep';
     const enhancedStyle = getEnhancedStyleBible(genreType);
     // Pick a random exemplar for variety
     const exemplar = enhancedStyle.exemplars[chapterNumber % enhancedStyle.exemplars.length];
 
+    // Build NPC context (top 5 most relevant)
+    const npcContext = context.worldBible.npcRelationships.length > 0
+      ? `\nNPCs QUAN TRỌNG:\n${context.worldBible.npcRelationships.slice(0, 5).map(n => `- ${n.name} (${n.role}, affinity: ${n.affinity}): ${n.description}`).join('\n')}`
+      : '';
+
+    // Build arc context if available
+    const arcContext = context.currentArc
+      ? `\nARC HIỆN TẠI: ${context.currentArc.title} (${context.currentArc.theme})
+- Chapters: ${context.currentArc.startChapter}-${context.currentArc.endChapter}
+- Climax at: ${context.currentArc.climaxChapter}
+- Tension target: ${context.currentArc.tensionCurve?.[chapterNumber - context.currentArc.startChapter] || 50}/100`
+      : '';
+
     return `Viết Chương ${chapterNumber}:
 
 WORLD: ${context.worldBible.storyTitle}
 PROTAGONIST: ${context.worldBible.protagonist.name} (${context.worldBible.protagonist.realm})
+- Tính cách: ${context.worldBible.protagonist.traits.join(', ')}
+- Mục tiêu: ${context.worldBible.protagonist.goals.join('; ')}
+${context.worldBible.protagonist.abilities.length > 0 ? `- Năng lực: ${context.worldBible.protagonist.abilities.join(', ')}` : ''}
+${npcContext}${arcContext}
 
 PREVIOUS: ${context.previousSummary}
 

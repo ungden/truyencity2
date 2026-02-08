@@ -1,12 +1,16 @@
 /**
  * Gemini Image Service for Story Factory
- * Uses Gemini 2.0 Flash Preview Image Generation ONLY
+ * Uses Gemini 3 Pro Image Preview (gemini-3-pro-image-preview) ONLY
  * 
  * Features:
  * - Best quality image generation with 4K support
- * - Advanced reasoning (Thinking mode)
+ * - Advanced text rendering (can render Vietnamese titles natively)
+ * - Thinking mode for refined composition
  * - Upload to Supabase Storage
  * - Job-based async processing for long operations
+ * 
+ * IMPORTANT: NEVER use gemini-2.0-flash-preview-image-generation.
+ * The correct model is gemini-3-pro-image-preview.
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
@@ -19,7 +23,7 @@ import {
 } from './types';
 
 const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta';
-const MODEL = 'gemini-2.0-flash-preview-image-generation';
+const MODEL = 'gemini-3-pro-image-preview';
 
 export interface ImageGenerationRequest {
   prompt: string;
@@ -58,7 +62,7 @@ export class GeminiImageService {
   }
 
   /**
-   * Generate image using Gemini 2.0 Flash Preview Image Generation
+   * Generate image using Gemini 3 Pro Image Preview
    */
   async generateImage(request: ImageGenerationRequest): Promise<ServiceResult<GeminiImageResult>> {
     const { prompt, negativePrompt, options } = request;
@@ -66,13 +70,19 @@ export class GeminiImageService {
     try {
       const fullPrompt = this.buildImagePrompt(prompt, negativePrompt);
 
+      const generationConfig: Record<string, unknown> = {
+        responseModalities: ['TEXT', 'IMAGE'],
+        imageConfig: {
+          aspectRatio: options?.aspectRatio || '3:4',
+          imageSize: options?.imageSize || '2K',
+        },
+      };
+
       const requestBody: Record<string, unknown> = {
         contents: [{
           parts: [{ text: fullPrompt }]
         }],
-        generationConfig: {
-          responseModalities: ['TEXT', 'IMAGE'],
-        }
+        generationConfig,
       };
 
       if (options?.useGoogleSearch) {
@@ -172,7 +182,7 @@ export class GeminiImageService {
 
     return this.generateImage({
       prompt,
-      negativePrompt: 'text, words, letters, watermark, signature, blurry, low quality, distorted, deformed',
+      negativePrompt: 'watermark, signature, blurry, low quality, distorted, deformed',
       options: {
         aspectRatio: options?.aspectRatio || '3:4',
         imageSize: options?.resolution || '2K',
@@ -461,9 +471,8 @@ export class GeminiImageService {
     const genreStyles = this.getGenreStyle(genre);
     const baseStyle = style || genreStyles.style;
 
-    return `Create a stunning professional book cover illustration.
+    return `Create a stunning professional webnovel book cover.
 
-TITLE: "${title}"
 GENRE: ${genre}
 STYLE: ${baseStyle}
 
@@ -472,15 +481,19 @@ ${description}
 
 VISUAL REQUIREMENTS:
 - ${genreStyles.elements}
-- Professional book cover composition
+- Professional book cover composition, vertical 3:4
 - Dramatic cinematic lighting with rich colors
 - High detail and ultra-sharp focus
 - Atmospheric depth and mood
 - Visually striking and eye-catching design
 
-IMPORTANT: 
-- Generate ONLY the visual artwork, NO text or title on the cover
-- No watermarks or signatures
+TEXT ON COVER (MUST render these exactly):
+- Title text must be exactly: "${title}". Place at the top-center in large bold serif font, high contrast, perfectly readable.
+- At the bottom-center, include small text: "Truyencity.com"
+- No other text besides the title and Truyencity.com
+
+IMPORTANT:
+- No watermarks or signatures besides Truyencity.com
 - Create a complete, publication-ready cover illustration`;
   }
 
@@ -645,8 +658,8 @@ IMPORTANT:
   getModelInfo(): { id: string; name: string; description: string } {
     return {
       id: MODEL,
-      name: 'Gemini 2.0 Flash Preview Image Generation',
-      description: 'High quality image generation with Gemini 2.0 Flash'
+      name: 'Gemini 3 Pro Image Preview',
+      description: 'High quality image generation with native text rendering and 4K support'
     };
   }
 }

@@ -111,7 +111,12 @@ supabase/
 
 **Table:** `ai_image_jobs`
 **Edge function:** `supabase/functions/gemini-cover-generate/`
-**Model:** `gemini-2.0-flash-preview-image-generation` (supports Vietnamese text)
+**Model:** `gemini-3-pro-image-preview` (Gemini 3 Pro Image Preview)
+
+**CRITICAL:** NEVER use `gemini-2.0-flash-preview-image-generation`. The correct model is `gemini-3-pro-image-preview`.
+- It has **advanced text rendering** (renders Vietnamese titles natively)
+- Supports `imageConfig: { aspectRatio: "3:4", imageSize: "2K" }` in `generationConfig`
+- All covers must be 3:4 aspect ratio, 2K resolution minimum
 
 Flow:
 1. `enqueueCoversOnly()` creates jobs in `ai_image_jobs`
@@ -119,7 +124,10 @@ Flow:
 3. Image uploaded to Supabase Storage `covers` bucket
 4. `novels.cover_url` updated with public URL
 
-**Cover prompt must include:** `"Title text must be exactly: [TITLE]"`
+**Cover prompt MUST include:**
+- `"Title text must be exactly: [TITLE]"` — rendered by Gemini 3 Pro natively
+- `"At the bottom-center, include small text: Truyencity.com"`
+- `"No other text besides the title and Truyencity.com"`
 
 ---
 

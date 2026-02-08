@@ -1,6 +1,6 @@
 /**
  * Test Cover Generation API
- * Endpoint to test the Gemini 2.0 Flash Preview Image Generation integration
+ * Endpoint to test the Gemini 3 Pro Image Preview integration
  * 
  * Features:
  * - Generate and return base64 image (quick test)
@@ -13,7 +13,7 @@ import { factoryAuth, finalizeResponse } from '../_auth';
 
 export const maxDuration = 120; // 2 minutes for image generation
 
-// Only Gemini 2.0 Flash Preview Image Generation
+// Only Gemini 3 Pro Image Preview (gemini-3-pro-image-preview)
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,14 +25,14 @@ export async function POST(request: NextRequest) {
       title = 'Thiên Đạo Vô Song',
       genre = 'tien-hiep',
       description = 'Thiếu niên tu luyện đứng giữa mây trắng, kiếm khí xung thiên, áo trắng phất phơ trong gió',
-      // model is always gemini-2.0-flash-preview-image-generation
+      // model is always gemini-3-pro-image-preview
       resolution = '2K',
       aspectRatio = '3:4',
       uploadToStorage = false,  // Set true to upload to Supabase Storage
       bucket = 'covers'
     } = body;
 
-    console.log('[Test Cover] Starting generation with Gemini 2.0 Flash...');
+    console.log('[Test Cover] Starting generation with Gemini 3 Pro Image...');
     console.log(`  Title: ${title}`);
     console.log(`  Genre: ${genre}`);
     console.log(`  Resolution: ${resolution}`);
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
         success: true,
         data: {
           publicUrl: result.data,
-          model: 'gemini-2.0-flash-preview-image-generation',
+          model: 'gemini-3-pro-image-preview',
           duration,
           uploaded: true,
         }
@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
         mimeType: image.mimeType,
         sizeKB: Math.round(image.base64.length / 1024),
         text: result.data.text,
-        model: 'gemini-2.0-flash-preview-image-generation',
+        model: 'gemini-3-pro-image-preview',
         duration,
         uploaded: false,
       }

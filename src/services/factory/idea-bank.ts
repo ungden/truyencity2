@@ -205,6 +205,25 @@ export class IdeaBankService {
     const protagonist = this.selectRandomItems(PROTAGONIST_ARCHETYPES, 1)[0];
     const antagonist = this.selectRandomItems(ANTAGONIST_TYPES, 1)[0];
 
+    // Dedup: fetch existing titles for this genre to avoid repetition
+    let existingTitles = avoid_similar_to || [];
+    if (existingTitles.length === 0) {
+      try {
+        const supabase = this.getSupabase();
+        const { data: existingNovels } = await supabase
+          .from('novels')
+          .select('title')
+          .eq('genre', genre)
+          .order('created_at', { ascending: false })
+          .limit(20);
+        if (existingNovels && existingNovels.length > 0) {
+          existingTitles = existingNovels.map(n => n.title);
+        }
+      } catch {
+        // Non-fatal: dedup is best-effort
+      }
+    }
+
     const prompt = this.buildIdeaPrompt({
       genre,
       tropes: include_tropes || selectedTropes,
@@ -212,7 +231,7 @@ export class IdeaBankService {
       protagonist,
       antagonist,
       targetAudience: target_audience || 'general',
-      avoidSimilar: avoid_similar_to,
+      avoidSimilar: existingTitles.length > 0 ? existingTitles : undefined,
     });
 
     const result = await this.gemini.generateJSON<GeneratedIdea>(prompt, {
@@ -624,26 +643,45 @@ ${params.excludeTropes ? `- Tránh tropes: ${params.excludeTropes.join(', ')}` :
 - Kiểu nhân vật chính: ${params.protagonist}
 - Kiểu phản diện: ${params.antagonist}
 - Đối tượng: ${params.targetAudience}
-${params.avoidSimilar ? `- Tránh giống: ${params.avoidSimilar.join(', ')}` : ''}
+${params.avoidSimilar ? `- TRÁNH GIỐNG các truyện đã có: ${params.avoidSimilar.join(', ')}` : ''}
+
+MẪU TÊN TRUYỆN HẤP DẪN (chọn 1 pattern phù hợp):
+- "Trùng Sinh: [XX]" — cho truyện có trùng sinh/xuyên không
+- "Ta Tại [Bối Cảnh] [Hành Động OP]" — VD: "Ta Tại Thần Giới Vô Địch"
+- "[Hệ Thống] + [Mục Tiêu]" — VD: "Hệ Thống Ký Danh: Ta Lên Cấp Mỗi Ngày"
+- "[Danh Hiệu] + [Nhân Vật]" — VD: "Vạn Cổ Đệ Nhất Kiếm Thần"
+- "[Hành Động] + [Kết Quả Sốc]" — VD: "Bắt Đầu Từ Việc Thu Phục Thần Thú"
+- Có thể dùng tiếng Hán-Việt hoặc tiếng Việt thuần tùy thể loại
+
+GOLDEN FINGER (BẮT BUỘC):
+Nhân vật chính PHẢI có ít nhất 1 "golden finger" (lợi thế đặc biệt) rõ ràng:
+- Hệ thống sign-in (điểm danh hàng ngày nhận thưởng)
+- Kiến thức từ kiếp trước / tương lai
+- Hệ thống gacha / rút thưởng
+- Kho tàng cổ đại / di sản bí ẩn
+- Không gian tu luyện riêng (time dilation)
+- Thiên phú đặc biệt (mắt thần, thể chất đặc biệt)
+- Hệ thống nhiệm vụ / thành tựu
+→ Golden finger phải xuất hiện rõ ràng trong premise và hook!
 
 YÊU CẦU:
-1. Tên truyện PHẢI hấp dẫn, có thể dùng tiếng Hán-Việt hoặc tiếng Việt hiện đại
-2. Premise (tiền đề) phải rõ ràng, cho thấy xung đột chính
-3. Hook (mở đầu) phải cuốn hút ngay từ chương 1
-4. USP (điểm độc đáo) - điều gì làm truyện này khác biệt?
-5. Tags và tropes phải phù hợp thể loại
+1. Tên truyện PHẢI hấp dẫn, gợi tò mò, đúng pattern trên
+2. Premise phải rõ ràng xung đột chính + golden finger
+3. Hook phải cuốn hút ngay từ chương 1 — có sự kiện sốc hoặc bất ngờ
+4. USP — điều gì khác biệt so với hàng nghìn truyện cùng thể loại?
+5. Tags và tropes phù hợp thể loại
 
 OUTPUT JSON (chỉ JSON, không markdown):
 {
-  "title": "Tên truyện hấp dẫn",
+  "title": "Tên truyện hấp dẫn (theo pattern trên)",
   "sub_genre": "phân nhánh thể loại nếu có",
-  "premise": "Mô tả ngắn gọn tiền đề truyện (2-3 câu)",
-  "hook": "Mô tả mở đầu cuốn hút (sự kiện chương 1-3)",
-  "usp": "Điểm độc đáo của truyện này",
+  "premise": "Mô tả tiền đề + golden finger rõ ràng (2-3 câu)",
+  "hook": "Mô tả mở đầu cuốn hút với sự kiện sốc (chương 1-3)",
+  "usp": "Điểm độc đáo - tại sao reader nên đọc truyện này?",
   "protagonist_archetype": "Kiểu nhân vật chính",
   "antagonist_type": "Kiểu phản diện",
   "setting_type": "Bối cảnh (thế giới tu tiên, đô thị hiện đại, v.v.)",
-  "power_system_type": "Hệ thống sức mạnh nếu có",
+  "power_system_type": "Hệ thống sức mạnh / golden finger",
   "main_conflict": "Xung đột chính của truyện",
   "estimated_chapters": 1500,
   "content_rating": "teen",

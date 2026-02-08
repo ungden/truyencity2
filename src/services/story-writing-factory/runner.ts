@@ -325,6 +325,9 @@ export class StoryRunner {
         this.callbacks.onArcPlanned?.(arc);
       }
 
+      // Enrich WorldBible with NPC data from first arc (if available)
+      this.enrichWorldBibleFromArcs();
+
       // ========== PHASE 3: WRITE ARC BY ARC ==========
       this.updateStatus('writing', 'Bắt đầu viết truyện...');
 
@@ -619,11 +622,23 @@ export class StoryRunner {
           previousSummary,
         });
       } else {
-        // Use simple workflow to save costs
+        // Use simple workflow to save costs (but still pass arc context for quality)
         result = await this.chapterWriter.writeChapterSimple(chapterNumber, {
           worldBible: this.worldBible!,
           styleBible: this.styleBible!,
           previousSummary,
+          currentArc: {
+            id: arc.id,
+            projectId: this.state!.projectId,
+            arcNumber: arc.arcNumber,
+            title: arc.title,
+            theme: arc.theme,
+            startChapter: arc.startChapter,
+            endChapter: arc.endChapter,
+            tensionCurve: arc.tensionCurve,
+            climaxChapter: arc.startChapter + Math.floor(arc.chapterCount * 0.75),
+            status: arc.status,
+          },
         });
       }
 
@@ -944,6 +959,14 @@ export class StoryRunner {
   ): WorldBible {
     const powerSystem = getPowerSystemByGenre(genre);
 
+    // Extract meaningful traits from outline's protagonist data
+    const baseTraits = this.extractTraitsFromOutline(outline);
+
+    // Extract initial abilities from power system + outline hooks
+    const initialAbilities = outline.uniqueHooks
+      .filter(h => h.length < 50) // Short hooks are likely ability names
+      .slice(0, 3);
+
     return {
       projectId: this.state!.projectId,
       storyTitle: outline.title,
@@ -953,8 +976,8 @@ export class StoryRunner {
         realm: powerSystem.realms[0].name,
         level: 1,
         age: 18,
-        traits: ['kiên trì', 'thông minh'],
-        abilities: [],
+        traits: baseTraits,
+        abilities: initialAbilities,
         inventory: [],
         goals: [outline.protagonist.endGoal],
         status: 'active',
@@ -976,6 +999,99 @@ export class StoryRunner {
         'Cảnh giới cao áp chế cảnh giới thấp',
       ],
     };
+  }
+
+  /**
+   * Extract meaningful protagonist traits from StoryOutline instead of hardcoding.
+   * Uses startingState + characterArc + premise keywords to derive 3-5 traits.
+   */
+  private extractTraitsFromOutline(outline: StoryOutline): string[] {
+    const traits: string[] = [];
+    const text = `${outline.protagonist.startingState} ${outline.protagonist.characterArc} ${outline.premise}`.toLowerCase();
+
+    // Map keywords in outline text to personality traits
+    const traitMap: Record<string, string> = {
+      'kiên trì': 'kiên trì', 'bền bỉ': 'kiên trì', 'không bỏ cuộc': 'kiên trì', 'nỗ lực': 'kiên trì',
+      'thông minh': 'thông minh', 'mưu trí': 'mưu trí', 'tính toán': 'mưu lược', 'trí tuệ': 'thông minh',
+      'lạnh lùng': 'lạnh lùng', 'cold': 'lạnh lùng', 'bình tĩnh': 'bình tĩnh',
+      'nóng nảy': 'nóng nảy', 'hot-blooded': 'nóng nảy', 'bốc đồng': 'bốc đồng',
+      'tham vọng': 'tham vọng', 'ambitious': 'tham vọng',
+      'trùng sinh': 'từng trải', 'reincarnated': 'từng trải', 'reborn': 'từng trải',
+      'khiêm tốn': 'khiêm tốn', 'humble': 'khiêm tốn',
+      'nghĩa khí': 'nghĩa khí', 'chính nghĩa': 'chính nghĩa',
+      'cô độc': 'cô độc', 'alone': 'cô độc', 'lonely': 'cô độc',
+      'báo thù': 'quyết tâm', 'revenge': 'quyết tâm', 'trả thù': 'quyết tâm',
+      'system': 'thích nghi nhanh', 'hệ thống': 'thích nghi nhanh',
+      'lucky': 'may mắn', 'luck': 'may mắn',
+      'genius': 'thiên tài', 'prodigy': 'thiên tài', 'thiên tài': 'thiên tài',
+      'fallen': 'kiên cường', 'thất bại': 'kiên cường',
+    };
+
+    for (const [keyword, trait] of Object.entries(traitMap)) {
+      if (text.includes(keyword) && !traits.includes(trait)) {
+        traits.push(trait);
+      }
+      if (traits.length >= 5) break;
+    }
+
+    // Ensure at least 2 traits
+    if (traits.length < 2) {
+      const defaults = ['kiên trì', 'thông minh', 'quyết tâm'];
+      for (const d of defaults) {
+        if (!traits.includes(d)) {
+          traits.push(d);
+          if (traits.length >= 3) break;
+        }
+      }
+    }
+
+    return traits;
+  }
+
+  /**
+   * Enrich WorldBible with NPC data extracted from arc outlines.
+   * Called after arc planning, before chapter writing begins.
+   */
+  private enrichWorldBibleFromArcs(): void {
+    if (!this.worldBible || this.arcOutlines.length === 0) return;
+
+    for (const arc of this.arcOutlines) {
+      // Add NPCs from arc's newCharacters
+      if (arc.newCharacters && arc.newCharacters.length > 0) {
+        for (const npcName of arc.newCharacters) {
+          // Skip if already tracked or if it's the protagonist
+          const exists = this.worldBible.npcRelationships.some(
+            n => n.name.toLowerCase() === npcName.toLowerCase()
+          );
+          if (exists || npcName.toLowerCase() === this.worldBible.protagonist.name.toLowerCase()) continue;
+
+          this.worldBible.npcRelationships.push({
+            name: npcName,
+            role: 'neutral',
+            affinity: 0,
+            description: `Nhân vật mới xuất hiện trong arc ${arc.arcNumber}`,
+            firstAppearance: arc.startChapter,
+          });
+        }
+      }
+
+      // Add enemy/obstacle from arc as an NPC
+      if (arc.enemyOrObstacle && arc.enemyOrObstacle.length > 0) {
+        const enemyName = arc.enemyOrObstacle;
+        const exists = this.worldBible.npcRelationships.some(
+          n => n.name.toLowerCase() === enemyName.toLowerCase()
+        );
+        if (!exists && enemyName.toLowerCase() !== this.worldBible.protagonist.name.toLowerCase()) {
+          this.worldBible.npcRelationships.push({
+            name: enemyName,
+            role: 'enemy',
+            affinity: -50,
+            description: `Kẻ thù/chướng ngại arc ${arc.arcNumber}: ${arc.theme}`,
+            firstAppearance: arc.startChapter,
+          });
+        }
+      }
+    }
   }
 
   private getPreviousSummary(chapterNumber: number): string {
@@ -1141,18 +1257,19 @@ export class StoryRunner {
           });
         }
 
-        // Register new NPCs as minor characters
+        // Register new NPCs as minor characters with context-extracted traits
         for (const charName of allCharacters) {
           if (charName === protagonistName) continue;
           if (existingNames.has(charName.toLowerCase())) continue;
 
           const guessedRole = this.guessCharacterRole(charName, content);
+          const extractedTraits = this.extractNPCTraitsFromContent(charName, content);
           await this.characterTracker.createCharacter(charName, guessedRole, {
             primaryMotivation: guessedRole === 'antagonist' ? 'power' as MotivationType : 'survival' as MotivationType,
             backstory: `Xuất hiện lần đầu ở chương ${chapterNumber}`,
             flaw: 'chưa rõ',
             strength: 'chưa rõ',
-            personalityTraits: ['serious'] as PersonalityTrait[],
+            personalityTraits: extractedTraits as PersonalityTrait[],
             firstAppearance: chapterNumber,
           });
           existingNames.add(charName.toLowerCase());
@@ -1224,6 +1341,48 @@ export class StoryRunner {
   /**
    * Guess a character's role from context clues in the content.
    */
+  /**
+   * Extract 2-3 personality traits for an NPC from the chapter content where they appear.
+   * Looks for behavioral and descriptive keywords near the character's name.
+   */
+  private extractNPCTraitsFromContent(name: string, content: string): string[] {
+    const traits: string[] = [];
+    const nameLower = name.toLowerCase();
+    
+    // Find sentences containing the character name to form local context
+    const sentences = content.split(/[。.!！？?\n]/).filter(s => 
+      s.toLowerCase().includes(nameLower)
+    );
+    const localContext = sentences.join(' ').toLowerCase();
+    
+    const traitKeywords: Record<string, string> = {
+      'lạnh lùng': 'cold', 'bình tĩnh': 'calm', 'điềm đạm': 'calm',
+      'hung ác': 'aggressive', 'tàn nhẫn': 'ruthless', 'ác độc': 'ruthless',
+      'mưu mô': 'cunning', 'xảo quyệt': 'cunning', 'thâm trầm': 'cunning',
+      'kiêu ngạo': 'arrogant', 'ngạo mạn': 'arrogant', 'khinh thường': 'arrogant',
+      'trung thành': 'loyal', 'nghĩa khí': 'loyal',
+      'xinh đẹp': 'charming', 'mỹ lệ': 'charming', 'quyến rũ': 'charming',
+      'mạnh mẽ': 'brave', 'dũng cảm': 'brave', 'liều lĩnh': 'brave',
+      'thông minh': 'intelligent', 'tinh tế': 'intelligent',
+      'hiền lành': 'gentle', 'nhân hậu': 'gentle', 'từ bi': 'gentle',
+      'bí ẩn': 'mysterious', 'khó đoán': 'mysterious',
+    };
+
+    for (const [keyword, trait] of Object.entries(traitKeywords)) {
+      if (localContext.includes(keyword) && !traits.includes(trait)) {
+        traits.push(trait);
+      }
+      if (traits.length >= 3) break;
+    }
+
+    // Fallback if no traits found
+    if (traits.length === 0) {
+      traits.push('serious');
+    }
+
+    return traits;
+  }
+
   private guessCharacterRole(name: string, content: string): CharacterRole {
     const lower = content.toLowerCase();
     const nameLower = name.toLowerCase();

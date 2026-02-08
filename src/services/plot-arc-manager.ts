@@ -25,9 +25,9 @@ const getSupabaseConfig = () => {
  * PlotArcManager - Quản lý cao trào, twist, và character development
  *
  * Nhiệm vụ:
- * 1. Tự động tạo plot arcs mỗi 10-15 chương
- * 2. Tính toán tension curve (cao trào dần, đỉnh ở chương 7-8, giải quyết ở 9-10)
- * 3. Lập kế hoạch twists mỗi 10-15 chương
+ * 1. Tự động tạo plot arcs mỗi 20 chương (aligned with MemoryManager's chaptersPerArc)
+ * 2. Tính toán tension curve (cao trào dần, đỉnh ở 75%, giải quyết cuối arc)
+ * 3. Lập kế hoạch twists mỗi 20 chương
  * 4. Theo dõi character development
  * 5. Tạo hierarchical summaries để tiết kiệm token
  */
@@ -124,14 +124,15 @@ export class PlotArcManager {
     let arc = await this.getCurrentArc(chapterNumber);
 
     if (!arc) {
-      // Tính arc number dựa trên chapter (mỗi arc 10 chương)
-      const arcNumber = Math.floor((chapterNumber - 1) / 10) + 1;
-      const startChapter = (arcNumber - 1) * 10 + 1;
-      const endChapter = arcNumber * 10;
+      // Tính arc number dựa trên chapter (mỗi arc 20 chương, khớp với MemoryManager)
+      const chaptersPerArc = 20;
+      const arcNumber = Math.floor((chapterNumber - 1) / chaptersPerArc) + 1;
+      const startChapter = (arcNumber - 1) * chaptersPerArc + 1;
+      const endChapter = arcNumber * chaptersPerArc;
 
       // Tạo tension curve mặc định: rise → climax → fall
-      const tensionCurve = this.generateDefaultTensionCurve(10);
-      const climaxChapter = startChapter + 7; // Cao trào ở chương 8 của arc
+      const tensionCurve = this.generateDefaultTensionCurve(chaptersPerArc);
+      const climaxChapter = startChapter + Math.floor(chaptersPerArc * 0.75); // Cao trào ở 75% của arc
 
       const supabase = await this.getClient();
       const { data, error } = await supabase
@@ -173,10 +174,10 @@ export class PlotArcManager {
 
   /**
    * Generate tension curve mặc định
-   * Pattern: [30, 40, 50, 60, 70, 80, 90, 95, 70, 50]
-   * - Chương 1-6: Tăng dần
-   * - Chương 7-8: Cao trào (90-95)
-   * - Chương 9-10: Giải quyết, hạ xuống
+   * Pattern: gradual rise → climax at 70% → falling action
+   * - Chương 1-14: Tăng dần (30 → 90)
+   * - Chương 14-15: Cao trào (90-95)
+   * - Chương 16-20: Giải quyết, hạ xuống
    */
   private generateDefaultTensionCurve(arcLength: number): number[] {
     const curve: number[] = [];

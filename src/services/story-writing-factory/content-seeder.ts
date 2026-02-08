@@ -635,14 +635,28 @@ export class ContentSeeder {
 
 Mỗi tiểu thuyết cần:
 1. "title": Tên truyện (hấp dẫn, kiểu webnovel, 2-8 chữ)
-2. "premise": Hook 1-2 câu ngắn gọn
+2. "premise": Hook 1-2 câu ngắn gọn — PHẢI nêu rõ golden finger của nhân vật chính
 3. "mainCharacter": Tên nhân vật chính (Trung/Việt, 2-3 chữ)
 4. "mainCharacterProfile": Hồ sơ NV chính 120-220 chữ (tuổi/xuất thân/tính cách/năng lực/mục tiêu/điểm yếu)
 5. "description": Giới thiệu truyện 250-500 chữ tiếng Việt. Bao gồm: bối cảnh thế giới, nhân vật chính, xung đột chính, điểm hấp dẫn. Câu đầu phải HOOK. KHÔNG spoil kết.
 6. "shortSynopsis": Tóm tắt 2-3 câu (không spoil kết)
 7. "worldDescription": Mô tả thế giới 120-220 chữ (địa danh, thế lực, quy tắc)
 8. "${requiredKey || 'required_system'}": Trường BẮT BUỘC cho thể loại này. ${requiredRule} Ví dụ format: ${requiredExample}
-9. "coverPrompt": Prompt tiếng Anh 3-5 câu để Nano Banana Pro tạo ảnh bìa. BẮT BUỘC render chữ tiêu đề.
+9. "coverPrompt": Prompt tiếng Anh 3-5 câu để AI tạo ảnh bìa. BẮT BUỘC chứa: Title text must be exactly: "<TITLE>", At the bottom-center include small text: "Truyencity.com", No other text.
+
+MẪU TÊN TRUYỆN HẤP DẪN (BẮT BUỘC theo 1 trong các pattern sau):
+- "Trùng Sinh: [XX]" — cho truyện trùng sinh/xuyên không
+- "Ta Tại [Bối Cảnh] [Hành Động OP]" — VD: "Ta Tại Thần Giới Vô Địch"
+- "[Hệ Thống] + [Mục Tiêu]" — VD: "Hệ Thống Ký Danh: Ta Lên Cấp Mỗi Ngày"
+- "[Danh Hiệu] + [Nhân Vật]" — VD: "Vạn Cổ Đệ Nhất Kiếm Thần"
+- "[Hành Động] + [Kết Quả Sốc]" — VD: "Bắt Đầu Từ Việc Thu Phục Thần Thú"
+
+GOLDEN FINGER (BẮT BUỘC cho mỗi truyện):
+Nhân vật chính PHẢI có ít nhất 1 lợi thế đặc biệt rõ ràng, ví dụ:
+- Hệ thống sign-in / gacha / nhiệm vụ
+- Kiến thức từ kiếp trước / tiên tri
+- Kho tàng cổ đại / không gian tu luyện riêng
+- Thiên phú/thể chất đặc biệt / huyết mạch thần bí
 
 Trả về JSON array:
 [{"title":"...","premise":"...","mainCharacter":"...","mainCharacterProfile":"...","description":"...","shortSynopsis":"...","worldDescription":"...","${requiredKey || 'required_system'}":"...","coverPrompt":"..."},...]
@@ -650,7 +664,7 @@ Trả về JSON array:
 CHÚ Ý:
 - Mỗi truyện PHẢI có description dài 250+ chữ, có shortSynopsis + worldDescription + mainCharacterProfile
 - Trường "${requiredKey || 'required_system'}" là BẮT BUỘC, không được để trống
-- coverPrompt phải chứa câu: Title text must be exactly: "<TITLE>" và yêu cầu đặt title top-center, font serif, high contrast, no other text
+- coverPrompt phải chứa: Title text must be exactly: "<TITLE>" và "At the bottom-center, include small text: Truyencity.com" và "No other text besides the title and Truyencity.com"
 - Mỗi truyện phải có ý tưởng ĐỘC ĐÁO, KHÔNG lặp lại ý tưởng trong cùng batch
 - CHỈ trả về JSON array, không thêm text khác`;
 
@@ -1062,17 +1076,16 @@ CHÚ Ý:
 
   private buildCoverPrompt(title: string, genre: string, description: string): string {
     const genreName = GENRE_LABELS[genre] || genre;
-    // Gemini Nano Banana Pro is good at text rendering if you are explicit.
-    // Keep prompt simple, design-forward, and constrain extra text.
+    // Gemini 3 Pro Image Preview has advanced text rendering for Vietnamese titles.
     return [
       `A photo of a glossy, design-forward webnovel book cover.`,
       `Genre: ${genreName}.`,
       `Story description: ${description}`,
-      `Title text must be exactly: "${title}".`,
-      `Place the title at the top-center in large bold serif font, high contrast, perfectly readable.`,
-      `No other text besides the title.`,
+      `Title text must be exactly: "${title}". Place at the top-center in large bold serif font, high contrast, perfectly readable.`,
+      `At the bottom-center, include small text: "Truyencity.com"`,
+      `No other text besides the title and Truyencity.com.`,
       `Vertical 3:4 composition, cinematic lighting, high-detail illustration, premium publishing quality.`,
-      `No watermark, no signature, no logos.`,
+      `No watermark, no signature, no logos besides Truyencity.com.`,
     ].join(' ');
   }
 }
