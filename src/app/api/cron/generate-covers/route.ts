@@ -98,11 +98,15 @@ export async function GET(request: NextRequest) {
         let coverUrl: string | null = null;
 
         if (novel.cover_prompt) {
-          // Use pre-saved cover prompt (already has title text + Truyencity.com branding)
+          // Use pre-saved cover prompt — inject Truyencity.com branding if missing
+          let coverPrompt = novel.cover_prompt;
+          if (!coverPrompt.toLowerCase().includes('truyencity')) {
+            coverPrompt += `\n\nIMPORTANT: At the bottom-center of the cover, include small text: "Truyencity.com". No other text besides the title and Truyencity.com. No watermarks or signatures besides Truyencity.com.`;
+          }
           console.log(`[CoverCron] Using saved prompt for: ${title.slice(0, 40)}`);
 
           const result = await imageService.generateImage({
-            prompt: novel.cover_prompt,
+            prompt: coverPrompt,
             negativePrompt: 'watermark, signature, blurry, low quality, distorted, deformed',
             options: { aspectRatio: '3:4', imageSize: '2K', numberOfImages: 1 },
           });
