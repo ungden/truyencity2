@@ -43,7 +43,19 @@ NHIỆM VỤ: Thiết kế chi tiết một arc, bao gồm:
 2. Tension curve từ thấp đến climax
 3. Protagonist growth trong arc
 4. Dopamine points phân bố đều
-5. Cliffhanger mạnh cuối arc
+5. Cliffhanger mạnh cuối arc (trừ khi đây là arc cuối cùng — lúc đó cần kết thúc thỏa mãn)
+
+OUTPUT: JSON với arc outline và chapter plans.`;
+
+const ARC_FINALE_PROMPT = `Bạn là ARC DESIGNER - chuyên gia thiết kế arc KẾT THÚC cho webnovel.
+
+NHIỆM VỤ: Thiết kế arc CUỐI CÙNG của bộ truyện, bao gồm:
+1. 3-act structure: Setup (chuẩn bị trận chiến cuối) → Confrontation (đại chiến) → Resolution (kết thúc thỏa mãn)
+2. Tension curve đạt đỉnh cao nhất toàn truyện
+3. Protagonist đạt đỉnh sức mạnh, hoàn thành mục tiêu
+4. Giải quyết TẤT CẢ plot threads còn lại
+5. KHÔNG có cliffhanger — kết thúc hoàn chỉnh, thỏa mãn người đọc
+6. Có thể kết thúc mở (gợi ý phần tiếp) nhưng mạch truyện chính PHẢI kết thúc
 
 OUTPUT: JSON với arc outline và chapter plans.`;
 
@@ -185,12 +197,28 @@ Trả về JSON:
     endChapter: number;
     plotPoints: PlotPoint[];
     previousArc?: ArcOutline;
+    isFinalArc?: boolean;
   }): Promise<{ success: boolean; data?: ArcOutline; error?: string }> {
     const chapterCount = input.endChapter - input.startChapter + 1;
     const arcThemes: ArcTheme[] = [
       'foundation', 'conflict', 'growth', 'tournament', 'exploration',
       'betrayal', 'revelation', 'revenge', 'war', 'triumph',
     ];
+
+    // Detect final arc
+    const isFinalArc = input.isFinalArc || input.arcNumber === input.storyOutline.targetArcs;
+    const theme = isFinalArc ? 'finale' : arcThemes[(input.arcNumber - 1) % arcThemes.length];
+
+    // Finale-specific instructions
+    const finaleInstructions = isFinalArc ? `
+ĐÂY LÀ ARC CUỐI CÙNG CỦA BỘ TRUYỆN!
+- PHẢI giải quyết TẤT CẢ plot threads còn lại
+- PHẢI cho protagonist đạt mục tiêu cuối: ${input.storyOutline.protagonist.endGoal}
+- PHẢI kết thúc hoàn chỉnh: ${input.storyOutline.endingVision}
+- KHÔNG có cliffhanger ở chương cuối cùng — thay vào đó viết epilogue/kết thúc thỏa mãn
+- Chương cuối nên có: trận chiến cuối → chiến thắng → epilogue (vài năm sau)
+- Protagonist phải đạt cảnh giới cao nhất hoặc gần cao nhất
+` : '';
 
     const prompt = `Thiết kế chi tiết Arc ${input.arcNumber}:
 
@@ -202,7 +230,7 @@ ARC ${input.arcNumber}/${input.storyOutline.targetArcs}:
 - Chapters: ${input.startChapter} - ${input.endChapter} (${chapterCount} chương)
 ${input.plotPoints.length > 0 ? `- Major plot points in this arc: ${input.plotPoints.map(p => p.name).join(', ')}` : ''}
 ${input.previousArc ? `- Previous arc ended: ${input.previousArc.resolution}` : '- Đây là arc đầu tiên'}
-
+${finaleInstructions}
 POWER SYSTEM: ${input.worldBible.powerSystem.name}
 CURRENT REALM: ${input.previousArc?.endingRealm || input.worldBible.powerSystem.realms[0].name}
 
@@ -211,7 +239,7 @@ Trả về JSON:
   "id": "arc_${input.arcNumber}",
   "arcNumber": ${input.arcNumber},
   "title": "Tên arc hấp dẫn",
-  "theme": "${arcThemes[(input.arcNumber - 1) % arcThemes.length]}",
+  "theme": "${theme}",
   "premise": "Premise của arc này 1-2 câu",
   "startChapter": ${input.startChapter},
   "endChapter": ${input.endChapter},
@@ -222,12 +250,12 @@ Trả về JSON:
   "incitingIncident": "Sự kiện khởi đầu arc",
   "midpoint": "Điểm giữa arc (twist hoặc revelation)",
   "climax": "Cao trào của arc",
-  "cliffhanger": "Cliffhanger cuối arc để hook arc sau",
+  "cliffhanger": "${isFinalArc ? 'KHÔNG CÓ — đây là arc cuối, kết thúc bằng epilogue thỏa mãn' : 'Cliffhanger cuối arc để hook arc sau'}",
   "protagonistGrowth": "Protagonist phát triển như thế nào trong arc",
   "newCharacters": ["Nhân vật mới 1", "Nhân vật mới 2"],
   "enemyOrObstacle": "Kẻ thù hoặc thử thách chính của arc",
   "startingRealm": "${input.previousArc?.endingRealm || input.worldBible.powerSystem.realms[0].name}",
-  "endingRealm": "Cảnh giới cuối arc",
+  "endingRealm": "${isFinalArc ? 'Cảnh giới cao nhất hoặc gần cao nhất' : 'Cảnh giới cuối arc'}",
   "breakthroughs": ["Đột phá 1 (chương X)", "Đột phá 2 (nếu có)"],
   "chapterOutlines": [
     ${this.generateChapterPlanTemplate(input.startChapter, chapterCount)}
@@ -249,7 +277,7 @@ Trả về JSON:
           provider: this.config.provider,
           model: this.config.model,
           messages: [
-            { role: 'system', content: ARC_PLANNER_PROMPT },
+            { role: 'system', content: isFinalArc ? ARC_FINALE_PROMPT : ARC_PLANNER_PROMPT },
             { role: 'user', content: prompt },
           ],
           temperature: 0.7,

@@ -15,11 +15,11 @@ export class AIProviderService {
   private apiKeys: Partial<Record<AIProviderType, string>> = {};
 
   // Token bucket rate limiter for Gemini API (shared across all parallel projects in one cron tick)
-  // Tier 3 Gemini = 2,000 RPM; we use 200 RPM to leave safe headroom for bursts
+  // Tier 3 Gemini Flash = 20,000 RPM; we use 2,000 RPM (10%) to leave safe headroom
   private static geminiRateLimit = {
-    tokens: 200,
-    maxTokens: 200,
-    refillRate: 200 / 60, // ~3.33 tokens/second
+    tokens: 2000,
+    maxTokens: 2000,
+    refillRate: 2000 / 60, // ~33.3 tokens/second
     lastRefill: Date.now(),
   };
 

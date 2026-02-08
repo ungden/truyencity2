@@ -354,8 +354,9 @@ CURRENT ARC: ${context.currentArc.title} (${context.currentArc.theme})
 
 GENRE CONVENTIONS: ${context.styleBible.genreConventions.join('; ')}
 
-CLIFFHANGER TECHNIQUES (chọn 1 cho cuối chương):
-${CLIFFHANGER_TECHNIQUES.slice(0, 4).map(c => `- ${c.name}: ${c.example}`).join('\n')}
+${context.currentArc.isFinalArc
+  ? 'KẾT THÚC CHƯƠNG (ARC CUỐI):\n- KHÔNG dùng cliffhanger — kết thúc thỏa mãn\n- Nếu đây là chương cuối cùng: viết epilogue, giải quyết mọi xung đột\n- Nếu gần cuối: có thể dùng mild suspense nhưng không mở plot thread mới'
+  : 'CLIFFHANGER TECHNIQUES (chọn 1 cho cuối chương):\n' + CLIFFHANGER_TECHNIQUES.slice(0, 4).map(c => '- ' + c.name + ': ' + c.example).join('\n')}
 
 PREVIOUS: ${context.previousSummary}
 
@@ -397,7 +398,7 @@ Trả về JSON (KHÔNG có comment):
       "climax": "tên cảm xúc cao trào (vd: phấn khích, sốc)",
       "closing": "tên cảm xúc kết thúc (vd: háo hức, day dứt)"
     },
-    "cliffhanger": "Mô tả cliffhanger mạnh",
+    "cliffhanger": "${context.currentArc.isFinalArc ? 'Kết thúc thỏa mãn (KHÔNG cliffhanger — arc cuối)' : 'Mô tả cliffhanger mạnh'}",
     "targetWordCount": ${this.config.targetWordCount}
   }
 }`;
@@ -821,8 +822,9 @@ ${exemplar.content.substring(0, 500)}
 """
 Lưu ý: ${exemplar.notes.join('; ')}
 
-CLIFFHANGER (dùng 1 trong các kỹ thuật):
-${enhancedStyle.cliffhangerTechniques.slice(0, 3).map(c => `- ${c.name}: "${c.example}"`).join('\n')}
+${context.currentArc?.isFinalArc
+  ? 'KẾT THÚC (ARC CUỐI — KHÔNG cliffhanger):\n- Kết thúc chương thỏa mãn, không treo\n- Nếu là chương cuối cùng: viết epilogue ngắn'
+  : 'CLIFFHANGER (dùng 1 trong các kỹ thuật):\n' + enhancedStyle.cliffhangerTechniques.slice(0, 3).map(c => '- ' + c.name + ': "' + c.example + '"').join('\n')}
 
 ĐỘ DÀI YÊU CẦU (BẮT BUỘC):
 - BẮT ĐẦU bằng dòng tiêu đề: "Chương ${chapterNumber}: [Tiêu đề hấp dẫn bằng tiếng Việt]"
@@ -830,7 +832,7 @@ ${enhancedStyle.cliffhangerTechniques.slice(0, 3).map(c => `- ${c.name}: "${c.ex
 - Viết TỐI THIỂU ${this.config.targetWordCount} từ
 - Viết chi tiết, không tóm tắt
 - KHÔNG markdown, viết văn thuần túy
-- Cliffhanger mạnh cuối chương
+${context.currentArc?.isFinalArc ? '- Kết thúc thỏa mãn (ARC CUỐI — KHÔNG cliffhanger)' : '- Cliffhanger mạnh cuối chương'}
 - Có ít nhất 1 điểm dopamine (face-slap, đột phá, thu hoạch)
 - Bao gồm: miêu tả bối cảnh, cảm xúc nội tâm, đối thoại phong phú, hành động chi tiết
 

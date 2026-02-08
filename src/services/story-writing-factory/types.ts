@@ -196,12 +196,14 @@ export interface StoryArc {
   climaxChapter: number;
   status: 'planned' | 'in_progress' | 'completed';
   summary?: string;
+  isFinalArc?: boolean;
 }
 
 export type ArcTheme =
   | 'foundation' | 'conflict' | 'growth' | 'betrayal'
   | 'redemption' | 'revelation' | 'war' | 'triumph'
-  | 'tournament' | 'exploration' | 'revenge' | 'romance';
+  | 'tournament' | 'exploration' | 'revenge' | 'romance'
+  | 'finale';
 
 export interface PlannedTwist {
   id: string;

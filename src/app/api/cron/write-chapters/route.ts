@@ -24,7 +24,7 @@ import { StoryRunner } from '@/services/story-writing-factory/runner';
 import type { FactoryConfig, RunnerConfig, GenreType } from '@/services/story-writing-factory/types';
 
 // CONFIGURATION
-const RESUME_BATCH_SIZE = 20;  // Tier 1: resume projects (fast) — 20 * 288 ticks/day = 5,760 slots/day
+const RESUME_BATCH_SIZE = 30;  // Tier 1: resume projects (fast) — 30 * 288 ticks/day = 8,640 slots/day
 const INIT_BATCH_SIZE = 1;     // Tier 2: new projects needing full plan (slow)
 const PROJECT_TIMEOUT_MS = 120_000; // 120s per-project timeout — prevents 1 slow project from blocking the batch
 

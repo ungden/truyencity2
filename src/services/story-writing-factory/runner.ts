@@ -32,6 +32,7 @@ import {
   FactoryConfig,
   DEFAULT_CONFIG,
   GenreType,
+  StoryArc,
 } from './types';
 import { getStyleByGenre, getPowerSystemByGenre } from './templates';
 
@@ -601,24 +602,47 @@ export class StoryRunner {
       // Decide if 3-agent workflow is needed (cost optimization)
       const use3Agent = WorkflowOptimizer.shouldUse3Agent(chapterNumber, this.lastQualityScore);
 
+      // Detect if this is the final arc (by theme or if arc contains the last chapter)
+      const isFinalArc = arc.theme === 'finale' || arc.endChapter >= this.state!.totalChapters;
+      const isFinalChapter = chapterNumber >= this.state!.totalChapters;
+      const isNearEnd = chapterNumber >= this.state!.totalChapters - 20;
+
+      // Add finale context to previousSummary
+      if (isNearEnd && !isFinalChapter) {
+        previousSummary += `\n\n🏁 APPROACHING STORY FINALE (${this.state!.totalChapters - chapterNumber} chapters left):`;
+        previousSummary += `\n- Bắt đầu giải quyết các plot threads còn lại`;
+        previousSummary += `\n- Không mở thêm xung đột mới hoặc bí ẩn mới`;
+        previousSummary += `\n- Đẩy protagonist lên cảnh giới cao hơn nhanh chóng`;
+      }
+      if (isFinalChapter) {
+        previousSummary += `\n\n🏁 ĐÂY LÀ CHƯƠNG CUỐI CÙNG CỦA BỘ TRUYỆN!`;
+        previousSummary += `\n- Kết thúc hoàn chỉnh, thỏa mãn — KHÔNG có cliffhanger`;
+        previousSummary += `\n- Giải quyết mọi xung đột còn lại`;
+        previousSummary += `\n- Viết epilogue ngắn (vài năm sau) ở cuối chương`;
+      }
+
+      // Build currentArc context
+      const currentArcContext: StoryArc = {
+        id: arc.id,
+        projectId: this.state!.projectId,
+        arcNumber: arc.arcNumber,
+        title: arc.title,
+        theme: arc.theme,
+        startChapter: arc.startChapter,
+        endChapter: arc.endChapter,
+        tensionCurve: arc.tensionCurve,
+        climaxChapter: arc.startChapter + Math.floor(arc.chapterCount * 0.75),
+        status: arc.status,
+        isFinalArc,
+      };
+
       // Write chapter
       let result: ChapterResult;
       if (use3Agent) {
         result = await this.chapterWriter.writeChapter(chapterNumber, {
           worldBible: this.worldBible!,
           styleBible: this.styleBible!,
-          currentArc: {
-            id: arc.id,
-            projectId: this.state!.projectId,
-            arcNumber: arc.arcNumber,
-            title: arc.title,
-            theme: arc.theme,
-            startChapter: arc.startChapter,
-            endChapter: arc.endChapter,
-            tensionCurve: arc.tensionCurve,
-            climaxChapter: arc.startChapter + Math.floor(arc.chapterCount * 0.75),
-            status: arc.status,
-          },
+          currentArc: currentArcContext,
           previousSummary,
         });
       } else {
@@ -627,18 +651,7 @@ export class StoryRunner {
           worldBible: this.worldBible!,
           styleBible: this.styleBible!,
           previousSummary,
-          currentArc: {
-            id: arc.id,
-            projectId: this.state!.projectId,
-            arcNumber: arc.arcNumber,
-            title: arc.title,
-            theme: arc.theme,
-            startChapter: arc.startChapter,
-            endChapter: arc.endChapter,
-            tensionCurve: arc.tensionCurve,
-            climaxChapter: arc.startChapter + Math.floor(arc.chapterCount * 0.75),
-            status: arc.status,
-          },
+          currentArc: currentArcContext,
         });
       }
 
@@ -1191,22 +1204,23 @@ export class StoryRunner {
             cliffhangerHint: ''
         }));
 
+        const isLastArc = i === arcCount;
         arcs.push({
             id: randomUUID(),
             arcNumber: i,
-            title: `Arc ${i}`,
-            theme: 'growth',
-            premise: `Arc ${i} premise`,
+            title: isLastArc ? `Arc Cuối - Đại Kết Cục` : `Arc ${i}`,
+            theme: isLastArc ? 'finale' : 'growth',
+            premise: isLastArc ? 'Arc cuối cùng - kết thúc bộ truyện' : `Arc ${i} premise`,
             startChapter: startCh,
             endChapter: endCh,
             chapterCount: endCh - startCh + 1,
             setup: 'Setup',
             confrontation: 'Confrontation',
-            resolution: 'Resolution',
+            resolution: isLastArc ? 'Kết thúc hoàn chỉnh - epilogue' : 'Resolution',
             incitingIncident: 'Incident',
             midpoint: 'Midpoint',
             climax: 'Climax',
-            cliffhanger: 'Cliffhanger',
+            cliffhanger: isLastArc ? 'KHÔNG CÓ — kết thúc thỏa mãn' : 'Cliffhanger',
             protagonistGrowth: 'Growth',
             newCharacters: [],
             enemyOrObstacle: 'Enemy',

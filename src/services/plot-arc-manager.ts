@@ -274,6 +274,28 @@ export class PlotArcManager {
   }
 
   /**
+   * Get total_planned_chapters from the project record (cached)
+   */
+  private totalPlannedChaptersCache: number | null = null;
+  private async getTotalPlannedChapters(): Promise<number | null> {
+    if (this.totalPlannedChaptersCache !== null) return this.totalPlannedChaptersCache;
+    try {
+      const client = await this.getClient();
+      if (!client) return null;
+      const { data } = await client
+        .from('ai_story_projects')
+        .select('total_planned_chapters')
+        .eq('id', this.projectId)
+        .single();
+      if (data?.total_planned_chapters) {
+        this.totalPlannedChaptersCache = data.total_planned_chapters;
+        return data.total_planned_chapters;
+      }
+    } catch { /* non-fatal */ }
+    return null;
+  }
+
+  /**
    * Generate plot objectives dựa trên tension và arc theme
    */
   async generatePlotObjectives(chapterNumber: number): Promise<string> {
@@ -306,6 +328,7 @@ export class PlotArcManager {
         revelation: 'Tiết lộ bí mật lớn, sự thật ẩn giấu',
         war: 'Chiến tranh quy mô lớn, liên minh, chiến lược',
         triumph: 'Chiến thắng vẻ vang, đạt mục tiêu lớn',
+        finale: 'ARC CUỐI CÙNG: Đại chiến cuối, giải quyết tất cả, kết thúc thỏa mãn, epilogue',
       };
       objectives += `- Chủ đề arc: ${themeGuidance[arc.theme] || 'Phát triển cốt truyện'}\n`;
     }
@@ -334,6 +357,22 @@ export class PlotArcManager {
     const characterMilestone = await this.getCharacterMilestoneForChapter(chapterNumber);
     if (characterMilestone) {
       objectives += `- Character development: ${characterMilestone}\n`;
+    }
+
+    // 6. Story finale awareness
+    const totalPlanned = await this.getTotalPlannedChapters();
+    if (totalPlanned) {
+      const chaptersLeft = totalPlanned - chapterNumber;
+      if (chaptersLeft <= 0) {
+        objectives += '- 🏁 ĐÂY LÀ CHƯƠNG CUỐI CÙNG! Kết thúc hoàn chỉnh, KHÔNG cliffhanger\n';
+        objectives += '- Giải quyết TẤT CẢ xung đột còn lại, viết epilogue\n';
+      } else if (chaptersLeft <= 5) {
+        objectives += `- 🏁 GẦN KẾT THÚC (còn ${chaptersLeft} chương): Giải quyết các plot threads chính\n`;
+        objectives += '- Không mở xung đột mới. Đẩy mạnh resolution\n';
+      } else if (chaptersLeft <= 20) {
+        objectives += `- 📌 APPROACHING FINALE (còn ${chaptersLeft} chương): Bắt đầu wrap up dần\n`;
+        objectives += '- Hạn chế giới thiệu nhân vật/xung đột mới. Tập trung giải quyết plot threads cũ\n';
+      }
     }
 
     return objectives || '- Tiếp tục phát triển cốt truyện một cách tự nhiên\n';

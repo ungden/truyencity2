@@ -18,8 +18,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { GeminiImageService } from '@/services/factory/gemini-image';
 
-// Process up to 12 covers per tick (conservative: ~15-20s each = ~3-4 min total)
-const BATCH_SIZE = 12;
+// Process up to 20 covers per tick, 4 in parallel (~15-20s each = ~1-1.5 min per wave)
+const BATCH_SIZE = 20;
+const PARALLEL_CONCURRENCY = 4;
 
 export const maxDuration = 300; // 5 minutes (Vercel Pro)
 export const dynamic = 'force-dynamic';
@@ -81,88 +82,97 @@ export async function GET(request: NextRequest) {
       error?: string;
     }> = [];
 
-    for (const novel of novels) {
+    // Process a single novel's cover
+    type NovelRow = NonNullable<typeof novels>[0];
+    async function processOneCover(novel: NovelRow): Promise<{
+      id: string; title: string; success: boolean; error?: string;
+    }> {
+      const genre = Array.isArray(novel.genres) && novel.genres.length > 0
+        ? novel.genres[0]
+        : 'tien-hiep';
+      const desc = String(novel.description || novel.title).slice(0, 500);
+      const title = String(novel.title);
+
+      let coverUrl: string | null = null;
+
+      if (novel.cover_prompt) {
+        // Use pre-saved cover prompt — inject Truyencity.com branding if missing
+        let coverPrompt = novel.cover_prompt;
+        if (!coverPrompt.toLowerCase().includes('truyencity')) {
+          coverPrompt += `\n\nIMPORTANT: At the bottom-center of the cover, include small text: "Truyencity.com". No other text besides the title and Truyencity.com. No watermarks or signatures besides Truyencity.com.`;
+        }
+        console.log(`[CoverCron] Using saved prompt for: ${title.slice(0, 40)}`);
+
+        const result = await imageService.generateImage({
+          prompt: coverPrompt,
+          negativePrompt: 'watermark, signature, blurry, low quality, distorted, deformed',
+          options: { aspectRatio: '3:4', imageSize: '2K', numberOfImages: 1 },
+        });
+
+        if (result.success && result.data?.images?.[0]) {
+          const image = result.data.images[0];
+          const uploadResult = await imageService.uploadToStorage(
+            image.base64, image.mimeType, 'covers', 'cover'
+          );
+          if (uploadResult.success && uploadResult.data) {
+            coverUrl = uploadResult.data.publicUrl;
+          }
+        } else if (result.errorCode === 'IMAGE_SAFETY_BLOCK') {
+          console.log(`[CoverCron] Safety block, retrying with sanitized prompt...`);
+          const fallback = await imageService.generateCoverWithUpload(
+            title, genre, desc, { bucket: 'covers', maxRetries: 2 }
+          );
+          if (fallback.success && fallback.data) {
+            coverUrl = fallback.data;
+          }
+        }
+      } else {
+        console.log(`[CoverCron] Generating cover for: ${title.slice(0, 40)}`);
+        const result = await imageService.generateCoverWithUpload(
+          title, genre, desc, { bucket: 'covers', maxRetries: 2 }
+        );
+        if (result.success && result.data) {
+          coverUrl = result.data;
+        }
+      }
+
+      if (coverUrl) {
+        const { error: updateErr } = await supabase
+          .from('novels')
+          .update({ cover_url: coverUrl })
+          .eq('id', novel.id);
+        if (updateErr) {
+          return { id: novel.id, title, success: false, error: `DB update failed: ${updateErr.message}` };
+        }
+        console.log(`[CoverCron] OK: ${title.slice(0, 40)}`);
+        return { id: novel.id, title, success: true };
+      }
+      return { id: novel.id, title, success: false, error: 'Image generation failed' };
+    }
+
+    // Process novels in parallel waves of PARALLEL_CONCURRENCY
+    for (let i = 0; i < novels.length; i += PARALLEL_CONCURRENCY) {
       // Check time budget: stop if we've used > 260s (leave 40s buffer)
       if (Date.now() - startTime > 260_000) {
         console.log(`[CoverCron] Time budget exceeded, stopping at ${results.length}/${novels.length}`);
         break;
       }
 
-      try {
-        const genre = Array.isArray(novel.genres) && novel.genres.length > 0
-          ? novel.genres[0]
-          : 'tien-hiep';
-        const desc = String(novel.description || novel.title).slice(0, 500);
-        const title = String(novel.title);
+      const wave = novels.slice(i, i + PARALLEL_CONCURRENCY);
+      const waveResults = await Promise.allSettled(
+        wave.map(novel => processOneCover(novel))
+      );
 
-        let coverUrl: string | null = null;
-
-        if (novel.cover_prompt) {
-          // Use pre-saved cover prompt — inject Truyencity.com branding if missing
-          let coverPrompt = novel.cover_prompt;
-          if (!coverPrompt.toLowerCase().includes('truyencity')) {
-            coverPrompt += `\n\nIMPORTANT: At the bottom-center of the cover, include small text: "Truyencity.com". No other text besides the title and Truyencity.com. No watermarks or signatures besides Truyencity.com.`;
-          }
-          console.log(`[CoverCron] Using saved prompt for: ${title.slice(0, 40)}`);
-
-          const result = await imageService.generateImage({
-            prompt: coverPrompt,
-            negativePrompt: 'watermark, signature, blurry, low quality, distorted, deformed',
-            options: { aspectRatio: '3:4', imageSize: '2K', numberOfImages: 1 },
-          });
-
-          if (result.success && result.data?.images?.[0]) {
-            const image = result.data.images[0];
-            const uploadResult = await imageService.uploadToStorage(
-              image.base64, image.mimeType, 'covers', 'cover'
-            );
-            if (uploadResult.success && uploadResult.data) {
-              coverUrl = uploadResult.data.publicUrl;
-            }
-          } else if (result.errorCode === 'IMAGE_SAFETY_BLOCK') {
-            // Fallback to generateCoverWithUpload (has safety sanitization + retry)
-            console.log(`[CoverCron] Safety block, retrying with sanitized prompt...`);
-            const fallback = await imageService.generateCoverWithUpload(
-              title, genre, desc, { bucket: 'covers', maxRetries: 2 }
-            );
-            if (fallback.success && fallback.data) {
-              coverUrl = fallback.data;
-            }
-          }
+      for (let j = 0; j < waveResults.length; j++) {
+        const r = waveResults[j];
+        if (r.status === 'fulfilled') {
+          results.push(r.value);
         } else {
-          // No saved prompt — use the full cover generation pipeline
-          console.log(`[CoverCron] Generating cover for: ${title.slice(0, 40)}`);
-
-          const result = await imageService.generateCoverWithUpload(
-            title, genre, desc, { bucket: 'covers', maxRetries: 2 }
-          );
-          if (result.success && result.data) {
-            coverUrl = result.data;
-          }
+          const novel = wave[j];
+          const msg = r.reason instanceof Error ? r.reason.message : String(r.reason);
+          results.push({ id: novel.id, title: novel.title, success: false, error: msg });
+          console.error(`[CoverCron] Exception for ${novel.id.slice(0, 8)}: ${msg}`);
         }
-
-        if (coverUrl) {
-          const { error: updateErr } = await supabase
-            .from('novels')
-            .update({ cover_url: coverUrl })
-            .eq('id', novel.id);
-
-          if (updateErr) {
-            results.push({ id: novel.id, title, success: false, error: `DB update failed: ${updateErr.message}` });
-          } else {
-            results.push({ id: novel.id, title, success: true });
-            console.log(`[CoverCron] OK: ${title.slice(0, 40)}`);
-          }
-        } else {
-          results.push({ id: novel.id, title, success: false, error: 'Image generation failed' });
-        }
-
-        // Rate limit: 3s delay between covers
-        await new Promise(r => setTimeout(r, 3000));
-      } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : String(err);
-        results.push({ id: novel.id, title: novel.title, success: false, error: msg });
-        console.error(`[CoverCron] Exception for ${novel.id.slice(0, 8)}: ${msg}`);
       }
     }
 

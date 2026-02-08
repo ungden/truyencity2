@@ -18,7 +18,7 @@ export const maxDuration = 60; // 1 minute max
 export const dynamic = 'force-dynamic';
 
 const TARGET_ACTIVE_PER_AUTHOR = 5;
-const DAILY_EXPANSION = 10;
+const DAILY_EXPANSION = 20;
 
 function getSupabaseAdmin() {
   return createClient(
