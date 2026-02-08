@@ -4,8 +4,7 @@
 
 Vietnamese webnovel platform with AI-powered content generation. Features:
 - AI authors generate novels automatically
-- Gemini for novel ideas + cover art (with Vietnamese text)
-- OpenRouter for chapter writing
+- **ALL AI uses Google Gemini only** — no other providers
 - Full content pipeline: authors → novels → projects → chapters → covers
 
 **Tech Stack:** Next.js 15, React 19, TypeScript, Supabase, Tailwind CSS, Vercel
@@ -14,9 +13,30 @@ Vietnamese webnovel platform with AI-powered content generation. Features:
 
 ---
 
-## Critical Rules
+## Critical Rules — AI Models
 
-1. **NO FALLBACKS** - If Gemini/AI fails, throw error. Never substitute with templates.
+### ONLY TWO MODELS ALLOWED IN THE ENTIRE CODEBASE:
+
+| Purpose | Model ID | Notes |
+|---------|----------|-------|
+| **ALL text generation** (chapters, planning, ideas, authors) | `gemini-3-flash-preview` | Fast, 1M context, free tier |
+| **ALL image generation** (covers with title + branding) | `gemini-3-pro-image-preview` | Native Vietnamese text rendering, 3:4, 2K |
+
+### BANNED — NEVER USE THESE OLD MODELS:
+- ~~`gemini-2.0-flash`~~ ~~`gemini-2.0-flash-exp`~~ ~~`gemini-2.0-flash-preview-image-generation`~~
+- ~~`gemini-2.5-flash-preview-05-20`~~ ~~`gemini-2.5-pro-preview-05-06`~~
+- ~~`gemini-1.5-pro`~~ ~~`gemini-exp-1206`~~
+- ~~Any OpenRouter/DeepSeek/OpenAI/Anthropic model~~
+
+### BANNED — NEVER USE THESE API KEYS:
+- ~~`OPENROUTER_API_KEY`~~ ~~`DEEPSEEK_API_KEY`~~ ~~`OPENAI_API_KEY`~~ ~~`ANTHROPIC_API_KEY`~~
+- The ONLY AI API key is `GEMINI_API_KEY`
+
+---
+
+## Other Critical Rules
+
+1. **NO FALLBACKS** - If Gemini fails, throw error. Never substitute with templates.
 2. **Vietnamese diacritics** - All titles, names, descriptions must have proper diacritics (á, ă, â, é, ê, í, ó, ô, ơ, ú, ư, ý)
 3. **Service role key** - Use `SUPABASE_SERVICE_ROLE_KEY` for all seeder/admin operations (bypasses RLS)
 4. **Genre consistency** - Always derive from `GENRE_CONFIG`, never hardcode genre lists
@@ -58,10 +78,12 @@ src/
 
 supabase/
 ├── functions/                         # Edge functions
-│   ├── gemini-cover-generate/         # Cover art generation (Gemini Image)
-│   ├── openrouter-chat/               # LLM chat completion
-│   ├── ai-writer-scheduler/           # Autopilot scheduler
-│   ├── factory-*/                     # Factory cron jobs
+│   ├── gemini-cover-generate/         # Cover art generation (gemini-3-pro-image-preview)
+│   ├── gemini-generate-cover/         # Alternate cover generation
+│   ├── factory-writer-worker/         # Factory chapter writing (gemini-3-flash-preview)
+│   ├── factory-daily-tasks/           # Daily rotation tasks
+│   ├── openrouter-chat/               # LEGACY — do not use
+│   ├── ai-writer-scheduler/           # LEGACY — do not use
 │   └── notify-new-chapter/            # Notification system
 └── migrations/                        # Database migrations (0001-0027)
 ```
@@ -113,7 +135,7 @@ supabase/
 **Edge function:** `supabase/functions/gemini-cover-generate/`
 **Model:** `gemini-3-pro-image-preview` (Gemini 3 Pro Image Preview)
 
-**CRITICAL:** NEVER use `gemini-2.0-flash-preview-image-generation`. The correct model is `gemini-3-pro-image-preview`.
+**CRITICAL:** Image model is `gemini-3-pro-image-preview`. See "Critical Rules — AI Models" above for banned models.
 - It has **advanced text rendering** (renders Vietnamese titles natively)
 - Supports `imageConfig: { aspectRatio: "3:4", imageSize: "2K" }` in `generationConfig`
 - All covers must be 3:4 aspect ratio, 2K resolution minimum
@@ -152,19 +174,22 @@ ai_image_jobs (id, novel_id, prompt, status, result_url, error, ...)
 
 ## Environment Variables
 
+Only 5 env vars needed (Vercel + local):
+
 ```env
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
-SUPABASE_SERVICE_ROLE_KEY=...     # Required for seeder
+SUPABASE_SERVICE_ROLE_KEY=...     # Required for seeder/admin
 
-# AI APIs
-GEMINI_API_KEY=...                 # Novel generation + covers
-OPENROUTER_API_KEY=...             # Chapter writing
+# AI — Gemini ONLY (no other providers)
+GEMINI_API_KEY=...                 # ALL AI: chapters, covers, ideas, authors
 
 # Cron
-CRON_SECRET=...                    # Auth for cron endpoints
+CRON_SECRET=...                    # Auth for Vercel cron endpoints
 ```
+
+**NO OTHER API KEYS NEEDED.** All DeepSeek/OpenRouter/OpenAI/Anthropic references have been removed.
 
 ---
 
@@ -261,6 +286,22 @@ GROUP BY status;
 ```bash
 npx supabase functions logs gemini-cover-generate --tail
 ```
+
+---
+
+## Auto-Run System (Cron)
+
+**Vercel Cron:** `vercel.json` → `/api/cron/write-chapters` every 5 minutes
+**Endpoint:** `src/app/api/cron/write-chapters/route.ts`
+**Auth:** `CRON_SECRET` env var (Vercel sends `Authorization: Bearer <CRON_SECRET>`)
+
+Two-tier processing per tick:
+- **Tier 1 (RESUME):** Up to 20 projects with chapters > 0, write 1 chapter each in parallel
+- **Tier 2 (INIT):** 1 new project (chapter = 0), full planning + Ch.1
+
+**LEGACY — do NOT use:**
+- `supabase/functions/ai-writer-scheduler/` (uses OpenRouter, old architecture)
+- `supabase/functions/openrouter-chat/` (old provider)
 
 ---
 
