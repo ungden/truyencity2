@@ -154,11 +154,49 @@ export class PlotArcManager {
 
       if (error) {
         if (this.isTableMissingError(error)) return null;
-        console.error('[PlotArcManager] Error creating arc:', error);
-        throw error;
-      }
 
-      arc = data as PlotArc;
+        // Handle duplicate key (23505): arc already exists but with old chapter range.
+        // This happens when arc span changed (e.g. 10→20 chapters) and the existing arc
+        // doesn't cover the current chapter. Fetch the existing arc, expand its range.
+        if (error.code === '23505') {
+          console.log(`[PlotArcManager] Arc ${arcNumber} already exists, expanding range to ch${startChapter}-${endChapter}`);
+          const { data: existing, error: fetchErr } = await supabase
+            .from('plot_arcs')
+            .select('*')
+            .eq('project_id', this.projectId)
+            .eq('arc_number', arcNumber)
+            .single();
+
+          if (fetchErr || !existing) {
+            console.error('[PlotArcManager] Failed to fetch existing arc after 23505:', fetchErr);
+            return null;
+          }
+
+          // Expand the arc range to cover the new chapter span
+          const newStart = Math.min(existing.start_chapter, startChapter);
+          const newEnd = Math.max(existing.end_chapter, endChapter);
+
+          if (newStart !== existing.start_chapter || newEnd !== existing.end_chapter) {
+            await supabase
+              .from('plot_arcs')
+              .update({
+                start_chapter: newStart,
+                end_chapter: newEnd,
+                tension_curve: tensionCurve,
+                climax_chapter: climaxChapter,
+                updated_at: new Date().toISOString(),
+              })
+              .eq('id', existing.id);
+          }
+
+          arc = { ...existing, start_chapter: newStart, end_chapter: newEnd } as PlotArc;
+        } else {
+          console.error('[PlotArcManager] Error creating arc:', error);
+          throw error;
+        }
+      } else {
+        arc = data as PlotArc;
+      }
 
       // Invalidate cache for all chapters in this new arc
       for (let ch = startChapter; ch <= endChapter; ch++) {
