@@ -197,11 +197,42 @@ async function writeOneChapter(
     currentChapter: currentCh,  // 0 for init (full plan), >0 for resume (dummy arcs)
   });
 
-  // Check completion + auto-rotate
+  // ====== SOFT ENDING LOGIC ======
+  // total_planned_chapters is a SOFT TARGET, not a hard cutoff.
+  // The story should finish at a natural arc boundary, not mid-arc.
+  //
+  // Phase 1: chapter < target - 20       → normal writing
+  // Phase 2: target - 20 ≤ chapter < target → "approaching finale" (handled by runner/planner)
+  // Phase 3: target ≤ chapter < target + 20 → grace period: keep writing until arc boundary
+  // Phase 4: chapter ≥ target + 20         → hard stop (safety net)
+
+  const CHAPTERS_PER_ARC = 20;
+  const GRACE_BUFFER = CHAPTERS_PER_ARC; // Allow up to 1 extra arc to finish properly
   const nextCh = currentCh + 1;
+  const targetChapters = project.total_planned_chapters || 200;
+  const hardStop = targetChapters + GRACE_BUFFER;
   let rotatedProjectId: string | null = null;
 
-  if (nextCh >= (project.total_planned_chapters || 200)) {
+  // Check if we should complete the story
+  let shouldComplete = false;
+
+  if (nextCh >= hardStop) {
+    // Phase 4: Hard stop — safety net, prevent infinite writing
+    shouldComplete = true;
+    console.log(`[WriteChapter] ${project.id.slice(0, 8)} HARD STOP at ch.${nextCh} (target=${targetChapters}, hard=${hardStop})`);
+  } else if (nextCh >= targetChapters) {
+    // Phase 3: Grace period — only complete at arc boundary (every 20 chapters)
+    const isArcBoundary = nextCh % CHAPTERS_PER_ARC === 0;
+    if (isArcBoundary) {
+      shouldComplete = true;
+      console.log(`[WriteChapter] ${project.id.slice(0, 8)} CLEAN FINISH at arc boundary ch.${nextCh} (target=${targetChapters})`);
+    } else {
+      // Not at arc boundary — continue writing to finish the current arc
+      console.log(`[WriteChapter] ${project.id.slice(0, 8)} Grace period: ch.${nextCh}/${targetChapters}, waiting for arc boundary (next: ${Math.ceil(nextCh / CHAPTERS_PER_ARC) * CHAPTERS_PER_ARC})`);
+    }
+  }
+
+  if (shouldComplete) {
     await supabase.from('ai_story_projects')
       .update({ status: 'completed', updated_at: new Date().toISOString() })
       .eq('id', project.id);

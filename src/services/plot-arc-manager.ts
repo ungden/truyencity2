@@ -359,18 +359,23 @@ export class PlotArcManager {
       objectives += `- Character development: ${characterMilestone}\n`;
     }
 
-    // 6. Story finale awareness
+    // 6. Story finale awareness (soft target — total_planned_chapters is not a hard limit)
     const totalPlanned = await this.getTotalPlannedChapters();
     if (totalPlanned) {
       const chaptersLeft = totalPlanned - chapterNumber;
-      if (chaptersLeft <= 0) {
-        objectives += '- 🏁 ĐÂY LÀ CHƯƠNG CUỐI CÙNG! Kết thúc hoàn chỉnh, KHÔNG cliffhanger\n';
-        objectives += '- Giải quyết TẤT CẢ xung đột còn lại, viết epilogue\n';
+      if (chaptersLeft <= -15) {
+        // Far past target — MUST end immediately
+        objectives += '- 🏁 PHẢI KẾT THÚC NGAY! Đã vượt xa target. Giải quyết tất cả, viết epilogue\n';
+        objectives += '- KHÔNG cliffhanger, KHÔNG mở thêm gì. Kết thúc hoàn chỉnh trong chương này hoặc chương tới\n';
+      } else if (chaptersLeft <= 0) {
+        // Grace period — past target, wrapping up
+        objectives += `- 🏁 GIAI ĐOẠN KẾT THÚC (đã vượt target ${Math.abs(chaptersLeft)} chương): Đẩy nhanh resolution\n`;
+        objectives += '- Giải quyết TẤT CẢ xung đột còn lại, chuẩn bị kết thúc tại ranh giới arc\n';
       } else if (chaptersLeft <= 5) {
-        objectives += `- 🏁 GẦN KẾT THÚC (còn ${chaptersLeft} chương): Giải quyết các plot threads chính\n`;
+        objectives += `- 🏁 GẦN KẾT THÚC (còn ~${chaptersLeft} chương): Giải quyết các plot threads chính\n`;
         objectives += '- Không mở xung đột mới. Đẩy mạnh resolution\n';
       } else if (chaptersLeft <= 20) {
-        objectives += `- 📌 APPROACHING FINALE (còn ${chaptersLeft} chương): Bắt đầu wrap up dần\n`;
+        objectives += `- 📌 APPROACHING FINALE (còn ~${chaptersLeft} chương): Bắt đầu wrap up dần\n`;
         objectives += '- Hạn chế giới thiệu nhân vật/xung đột mới. Tập trung giải quyết plot threads cũ\n';
       }
     }

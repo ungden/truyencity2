@@ -602,23 +602,31 @@ export class StoryRunner {
       // Decide if 3-agent workflow is needed (cost optimization)
       const use3Agent = WorkflowOptimizer.shouldUse3Agent(chapterNumber, this.lastQualityScore);
 
-      // Detect if this is the final arc (by theme or if arc contains the last chapter)
-      const isFinalArc = arc.theme === 'finale' || arc.endChapter >= this.state!.totalChapters;
-      const isFinalChapter = chapterNumber >= this.state!.totalChapters;
-      const isNearEnd = chapterNumber >= this.state!.totalChapters - 20;
+      // Detect if this is the final arc (by theme or if arc contains/exceeds the target)
+      const targetChapters = this.state!.totalChapters;
+      const isFinalArc = arc.theme === 'finale' || arc.endChapter >= targetChapters;
+      const isInGracePeriod = chapterNumber >= targetChapters; // Past soft target, must wrap up
+      const isNearEnd = chapterNumber >= targetChapters - 20;
+      // Check if this is the last chapter of the current arc (natural ending point)
+      const isLastChapterOfArc = chapterNumber === arc.endChapter || (chapterNumber % 20 === 0);
 
       // Add finale context to previousSummary
-      if (isNearEnd && !isFinalChapter) {
-        previousSummary += `\n\n🏁 APPROACHING STORY FINALE (${this.state!.totalChapters - chapterNumber} chapters left):`;
+      if (isInGracePeriod) {
+        // Grace period: past target, MUST finish at next arc boundary
+        previousSummary += `\n\n🏁 GIAI ĐOẠN KẾT THÚC (đã vượt target ${targetChapters} chương):`;
+        previousSummary += `\n- PHẢI kết thúc bộ truyện trong arc hiện tại`;
+        previousSummary += `\n- Giải quyết TẤT CẢ xung đột còn lại ngay lập tức`;
+        previousSummary += `\n- Không mở thêm bất kỳ xung đột hoặc bí ẩn mới nào`;
+        if (isLastChapterOfArc) {
+          previousSummary += `\n- ĐÂY LÀ CHƯƠNG CUỐI! Kết thúc hoàn chỉnh + epilogue, KHÔNG cliffhanger`;
+        } else {
+          previousSummary += `\n- Đẩy nhanh resolution, chuẩn bị cho chương cuối`;
+        }
+      } else if (isNearEnd) {
+        previousSummary += `\n\n🏁 APPROACHING STORY FINALE (còn ~${targetChapters - chapterNumber} chương):`;
         previousSummary += `\n- Bắt đầu giải quyết các plot threads còn lại`;
         previousSummary += `\n- Không mở thêm xung đột mới hoặc bí ẩn mới`;
         previousSummary += `\n- Đẩy protagonist lên cảnh giới cao hơn nhanh chóng`;
-      }
-      if (isFinalChapter) {
-        previousSummary += `\n\n🏁 ĐÂY LÀ CHƯƠNG CUỐI CÙNG CỦA BỘ TRUYỆN!`;
-        previousSummary += `\n- Kết thúc hoàn chỉnh, thỏa mãn — KHÔNG có cliffhanger`;
-        previousSummary += `\n- Giải quyết mọi xung đột còn lại`;
-        previousSummary += `\n- Viết epilogue ngắn (vài năm sau) ở cuối chương`;
       }
 
       // Build currentArc context
