@@ -34,7 +34,7 @@ select cron.schedule(
   $$
   select net.http_get(
     url := 'https://truyencity2.vercel.app/api/cron/write-chapters',
-    headers := '{"Authorization": "Bearer fb1032e81b64968b2a320a7276f36852f08181822fe46d7b3d473a7f8812ca64"}'::jsonb,
+    headers := '{"Authorization": "Bearer YOUR_CRON_SECRET"}'::jsonb,
     timeout_milliseconds := 290000
   ) as request_id;
   $$
@@ -55,7 +55,7 @@ select cron.schedule(
   $$
   select net.http_get(
     url := 'https://truyencity2.vercel.app/api/cron/generate-covers',
-    headers := '{"Authorization": "Bearer fb1032e81b64968b2a320a7276f36852f08181822fe46d7b3d473a7f8812ca64"}'::jsonb,
+    headers := '{"Authorization": "Bearer YOUR_CRON_SECRET"}'::jsonb,
     timeout_milliseconds := 290000
   ) as request_id;
   $$
@@ -69,7 +69,7 @@ select cron.schedule(
   $$
   select net.http_get(
     url := 'https://truyencity2.vercel.app/api/cron/daily-rotate',
-    headers := '{"Authorization": "Bearer fb1032e81b64968b2a320a7276f36852f08181822fe46d7b3d473a7f8812ca64"}'::jsonb,
+    headers := '{"Authorization": "Bearer YOUR_CRON_SECRET"}'::jsonb,
     timeout_milliseconds := 30000
   ) as request_id;
   $$
