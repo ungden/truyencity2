@@ -61,8 +61,8 @@ export const AI_MODEL_PRICING: Record<string, { input: number; output: number }>
   'openai/gpt-4o-mini': { input: 0.15, output: 0.60 },
   'anthropic/claude-3-5-sonnet': { input: 3.00, output: 15.00 },
   'anthropic/claude-3-haiku': { input: 0.25, output: 1.25 },
-  'google/gemini-2.0-flash-exp': { input: 0.10, output: 0.40 },
-  'google/gemini-pro': { input: 0.50, output: 1.50 },
+  'google/gemini-3-flash-preview': { input: 0.10, output: 0.40 },
+  'google/gemini-3-pro-image-preview': { input: 0.50, output: 1.50 },
 };
 
 class UsageTrackingService {

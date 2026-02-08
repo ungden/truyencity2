@@ -118,7 +118,7 @@ export async function assignAuthorToStory(
   if (useAI) {
     // Use AI to generate detailed author profile
     try {
-      const generator = new AuthorGenerator('gemini', 'gemini-2.0-flash');
+      const generator = new AuthorGenerator('gemini', 'gemini-3-flash-preview');
       newAuthorData = await generator.generateAuthor({ genre });
     } catch (error) {
       console.warn('AI author generation failed, using quick generation:', error);

@@ -410,7 +410,7 @@ Viết chương đầy đủ:`
 
   try {
     const response = await fetch(
-      `${GEMINI_API_BASE}/models/${blueprint.ai_model || 'gemini-2.0-flash-exp'}:generateContent?key=${apiKey}`,
+      `${GEMINI_API_BASE}/models/${blueprint.ai_model || 'gemini-3-flash-preview'}:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -490,7 +490,7 @@ Score 1-10 và issues nếu có. OUTPUT JSON:
 {"score": 7, "issues": []}`
 
     const response = await fetch(
-      `${GEMINI_API_BASE}/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`,
+      `${GEMINI_API_BASE}/models/gemini-3-flash-preview:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -541,7 +541,7 @@ Viết lại đầy đủ:`
 
   try {
     const response = await fetch(
-      `${GEMINI_API_BASE}/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`,
+      `${GEMINI_API_BASE}/models/gemini-3-flash-preview:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -573,7 +573,7 @@ async function generateSummary(apiKey: string, content: string, chapterNumber: n
 ${content.substring(0, 3000)}...`
 
     const response = await fetch(
-      `${GEMINI_API_BASE}/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`,
+      `${GEMINI_API_BASE}/models/gemini-3-flash-preview:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 
     if (use_ai) {
       // Use AI for detailed profile generation
-      const generator = new AuthorGenerator('gemini', 'gemini-2.0-flash');
+      const generator = new AuthorGenerator('gemini', 'gemini-3-flash-preview');
       generatedAuthor = await generator.generateAuthor({
         genre,
         style,
@@ -115,7 +115,7 @@ export async function PUT(request: NextRequest) {
     // Limit batch size
     const batchCount = Math.min(count, 10);
 
-    const generator = new AuthorGenerator('gemini', 'gemini-2.0-flash');
+    const generator = new AuthorGenerator('gemini', 'gemini-3-flash-preview');
     const authors = await generator.generateAuthorPool(batchCount, genres);
 
     if (save_to_db) {

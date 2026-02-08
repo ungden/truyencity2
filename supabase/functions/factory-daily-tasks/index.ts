@@ -399,7 +399,7 @@ OUTPUT JSON (chỉ JSON):
 }`
 
   const response = await fetch(
-    `${GEMINI_API_BASE}/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`,
+    `${GEMINI_API_BASE}/models/gemini-3-flash-preview:generateContent?key=${apiKey}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -454,7 +454,7 @@ OUTPUT JSON:
 }`
 
   const response = await fetch(
-    `${GEMINI_API_BASE}/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`,
+    `${GEMINI_API_BASE}/models/gemini-3-flash-preview:generateContent?key=${apiKey}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

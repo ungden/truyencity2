@@ -568,7 +568,7 @@ export default function FactoryConfigPage() {
                   id="ai_model"
                   value={config.ai_model}
                   onChange={(e) => updateConfig({ ai_model: e.target.value })}
-                  placeholder="gemini-1.5-pro"
+                  placeholder="gemini-3-flash-preview"
                 />
               </div>
               <div className="space-y-2">
@@ -577,7 +577,7 @@ export default function FactoryConfigPage() {
                   id="ai_image_model"
                   value={config.ai_image_model}
                   onChange={(e) => updateConfig({ ai_image_model: e.target.value })}
-                  placeholder="imagen-3.0-generate-001"
+                  placeholder="gemini-3-pro-image-preview"
                 />
               </div>
               <div className="space-y-4">

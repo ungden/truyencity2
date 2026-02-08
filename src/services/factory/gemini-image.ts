@@ -9,8 +9,9 @@
  * - Upload to Supabase Storage
  * - Job-based async processing for long operations
  * 
- * IMPORTANT: NEVER use gemini-2.0-flash-preview-image-generation.
- * The correct model is gemini-3-pro-image-preview.
+ * IMPORTANT: NEVER use old models (gemini-2.0-flash-preview-image-generation, etc).
+ * Image model: gemini-3-pro-image-preview
+ * Text model: gemini-3-flash-preview
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';

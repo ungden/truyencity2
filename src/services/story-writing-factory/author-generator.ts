@@ -89,7 +89,7 @@ export class AuthorGenerator {
   private model: string;
   private aiService: AIProviderService;
 
-  constructor(provider: AIProviderType = 'gemini', model: string = 'gemini-2.0-flash') {
+  constructor(provider: AIProviderType = 'gemini', model: string = 'gemini-3-flash-preview') {
     this.provider = provider;
     this.model = model;
     this.aiService = new AIProviderService({
@@ -391,7 +391,7 @@ export function generateQuickAuthor(genre: string): Omit<GeneratedAuthor, 'avata
 
 export function createAuthorGenerator(
   provider: AIProviderType = 'gemini',
-  model: string = 'gemini-2.0-flash'
+  model: string = 'gemini-3-flash-preview'
 ): AuthorGenerator {
   return new AuthorGenerator(provider, model);
 }

@@ -48,7 +48,7 @@ export class GeminiClient {
     requestTimeoutMs?: number;
   }) {
     this.apiKey = options?.apiKey || process.env.GEMINI_API_KEY || '';
-    this.defaultModel = options?.defaultModel || 'gemini-2.0-flash-exp';
+    this.defaultModel = options?.defaultModel || 'gemini-3-flash-preview';
     this.defaultTemperature = options?.defaultTemperature || 0.8;
     this.defaultMaxTokens = options?.defaultMaxTokens || 8192;
     this.requestTimeoutMs = options?.requestTimeoutMs || 60000; // 60s default
