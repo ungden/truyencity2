@@ -65,7 +65,7 @@ export class AIProviderService {
     if (!effectiveApiKey) {
       return {
         success: false,
-        error: `API key not configured for provider: ${provider}. Please set DEEPSEEK_API_KEY env var or provide it in settings.`,
+        error: `API key not configured for provider: ${provider}. Please set GEMINI_API_KEY env var or provide it in settings.`,
       };
     }
 
@@ -465,10 +465,6 @@ let serverInstance: AIProviderService | null = null;
 export function getAIProviderService(): AIProviderService {
   if (!serverInstance) {
     serverInstance = new AIProviderService({
-      openrouter: process.env.OPENROUTER_API_KEY,
-      openai: process.env.OPENAI_API_KEY,
-      claude: process.env.ANTHROPIC_API_KEY,
-      deepseek: process.env.DEEPSEEK_API_KEY,
       gemini: process.env.GEMINI_API_KEY,
     });
   }

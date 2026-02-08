@@ -59,7 +59,7 @@ export function ApiStatusIndicator() {
           icon: <AlertTriangle className="h-3 w-3" />,
           text: 'Lỗi kết nối',
           variant: 'destructive',
-          tooltip: `Lỗi: ${message}. Vui lòng kiểm tra OPENROUTER_API_KEY và Supabase Edge Functions.`,
+          tooltip: `Lỗi: ${message}. Vui lòng kiểm tra GEMINI_API_KEY và Supabase config.`,
         };
     }
   };

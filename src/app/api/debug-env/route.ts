@@ -1,38 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/integrations/supabase/client';
 
 export async function GET(request: NextRequest) {
-  const nextKey = process.env.OPENROUTER_API_KEY || '';
-  const nextHasKey = !!nextKey;
-
-  let edgeResult: { success: boolean; modelsCount?: number; error?: string } = {
-    success: false,
-  };
-
-  try {
-    const { data, error } = await supabase.functions.invoke('openrouter-chat', {
-      body: { action: 'models' },
-    });
-
-    if (error) {
-      edgeResult = { success: false, error: error.message || 'Edge invoke error' };
-    } else if (data?.success === true) {
-      edgeResult = { success: true, modelsCount: data.modelsCount ?? 0 };
-    } else {
-      edgeResult = { success: false, error: data?.error || 'Unknown edge error' };
-    }
-  } catch (e) {
-    edgeResult = { success: false, error: e instanceof Error ? e.message : 'Unknown error' };
-  }
+  const geminiKey = process.env.GEMINI_API_KEY || '';
+  const hasGeminiKey = !!geminiKey;
 
   return NextResponse.json({
     nodeEnv: process.env.NODE_ENV,
-    next: {
-      hasKey: nextHasKey,
-      keyLength: nextKey.length,
-      keyPreview: nextHasKey ? `${nextKey.slice(0, 8)}...` : 'Not found',
-      keys: Object.keys(process.env).filter((k) => k.includes('OPENROUTER') || k.includes('SUPABASE')),
+    gemini: {
+      hasKey: hasGeminiKey,
+      keyLength: geminiKey.length,
+      keyPreview: hasGeminiKey ? `${geminiKey.slice(0, 8)}...` : 'Not found',
     },
-    edge: edgeResult,
+    supabase: {
+      hasUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+      hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+      hasAnonKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    },
+    cron: {
+      hasSecret: !!process.env.CRON_SECRET,
+    },
   });
 }

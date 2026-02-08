@@ -103,33 +103,12 @@ export class RAGService {
   }
 
   /**
-   * Fallback embedding generation using OpenRouter
+   * Fallback embedding generation — returns null (no external provider needed).
+   * Primary path uses Supabase Edge Function; if that fails, embeddings are skipped.
    */
-  private async generateEmbeddingFallback(text: string): Promise<number[] | null> {
-    try {
-      const response = await fetch('https://openrouter.ai/api/v1/embeddings', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'openai/text-embedding-ada-002',
-          input: text.substring(0, 8000), // Limit input length
-        }),
-      });
-
-      if (!response.ok) {
-        console.error('OpenRouter embedding failed:', await response.text());
-        return null;
-      }
-
-      const data = await response.json();
-      return data?.data?.[0]?.embedding || null;
-    } catch (error) {
-      console.error('Fallback embedding error:', error);
-      return null;
-    }
+  private async generateEmbeddingFallback(_text: string): Promise<number[] | null> {
+    console.warn('[RAGService] Embedding fallback: no external provider configured, skipping.');
+    return null;
   }
 
   // ============================================================================
