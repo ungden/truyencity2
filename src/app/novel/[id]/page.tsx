@@ -23,6 +23,7 @@ import { ChapterList } from '@/components/chapter-list';
 import { NovelActions } from '@/components/novel-actions';
 import { AppContainer, TwoColumnLayout, ContentCard, Section } from '@/components/layout';
 import { Comments } from '@/components/comments';
+import { cleanNovelDescription } from '@/lib/utils';
 import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
@@ -46,7 +47,7 @@ export async function generateMetadata({
   }
 
   const title = `${novel.title} - ${novel.author || 'Truyện City'}`;
-  const description = novel.description?.slice(0, 160) || `Đọc ${novel.title} miễn phí tại Truyện City`;
+  const description = cleanNovelDescription(novel.description).slice(0, 160) || `Đọc ${novel.title} miễn phí tại Truyện City`;
 
   return {
     title,
@@ -292,7 +293,7 @@ export default async function NovelDetailPage({
               <Section title="Mô tả">
                 <ContentCard>
                   <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-                    {novel.description || 'Chưa có mô tả.'}
+                    {cleanNovelDescription(novel.description) || 'Chưa có mô tả.'}
                   </p>
                 </ContentCard>
               </Section>
@@ -397,8 +398,8 @@ export default async function NovelDetailPage({
           <div>
             <h3 className="text-lg font-semibold mb-3">Mô tả</h3>
             <Card className="p-4 bg-gradient-to-br from-card to-card/50 border-0 rounded-xl">
-              <p className="text-muted-foreground leading-relaxed text-sm">
-                {novel.description || 'Chưa có mô tả.'}
+              <p className="text-muted-foreground leading-relaxed text-sm whitespace-pre-line">
+                {cleanNovelDescription(novel.description) || 'Chưa có mô tả.'}
               </p>
             </Card>
           </div>

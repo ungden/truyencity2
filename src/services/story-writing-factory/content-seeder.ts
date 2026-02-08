@@ -860,7 +860,7 @@ CHÚ Ý:
           novel_id: novelId,
           genre,
           main_character: idea.mainCharacter,
-          world_description: idea.worldDescription || idea.description || idea.premise,
+          world_description: this.formatWorldDescription(idea),
           writing_style: 'webnovel_chinese',
           target_chapter_length: 2500,
           ai_model: 'gemini-3-flash-preview',
@@ -996,6 +996,11 @@ CHÚ Ý:
   // HELPERS
   // ============================================================================
 
+  /**
+   * Format the user-facing novel description.
+   * Only includes the intro paragraph + short synopsis.
+   * Metadata (characters, world, system) is stored in ai_story_projects, not shown to readers.
+   */
   private formatNovelDescription(idea: NovelIdea): string {
     const blocks: string[] = [];
 
@@ -1003,23 +1008,30 @@ CHÚ Ý:
     if (intro) blocks.push(intro);
 
     const shortSynopsis = (idea.shortSynopsis || '').trim();
-    if (shortSynopsis) blocks.push(`TÓM TẮT\n${shortSynopsis}`);
+    if (shortSynopsis && shortSynopsis !== intro) blocks.push(shortSynopsis);
 
-    const mcProfile = (idea.mainCharacterProfile || '').trim();
-    const mcLine = mcProfile ? `${idea.mainCharacter}: ${mcProfile}` : idea.mainCharacter;
-    blocks.push(`NHÂN VẬT CHÍNH\n${mcLine}`);
+    return blocks.filter(Boolean).join('\n\n');
+  }
+
+  /**
+   * Build a rich world_description for ai_story_projects (internal, not shown to users).
+   * Includes character profiles, world details, and genre-specific systems.
+   */
+  private formatWorldDescription(idea: NovelIdea): string {
+    const blocks: string[] = [];
 
     const world = (idea.worldDescription || '').trim();
-    if (world) blocks.push(`THẾ GIỚI\n${world}`);
+    if (world) blocks.push(world);
+
+    const mcProfile = (idea.mainCharacterProfile || '').trim();
+    if (mcProfile) blocks.push(`Nhân vật chính: ${idea.mainCharacter} — ${mcProfile}`);
 
     const systemKey = (idea.requiredFieldKey || '').trim();
     const systemVal = (idea.requiredFieldValue || '').trim();
     if (systemKey && systemVal) {
-      const label = systemKey.replace(/_/g, ' ').toUpperCase();
-      blocks.push(`${label}\n${systemVal}`);
+      const label = systemKey.replace(/_/g, ' ');
+      blocks.push(`${label}: ${systemVal}`);
     }
-
-    // Missing required field = Gemini didn't provide it. Leave empty — error is logged upstream.
 
     return blocks.filter(Boolean).join('\n\n');
   }

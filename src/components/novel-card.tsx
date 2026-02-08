@@ -6,7 +6,7 @@ import {
   Eye,
   MessageSquare
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, cleanNovelDescription } from '@/lib/utils';
 import Link from 'next/link';
 
 interface NovelCardProps {
@@ -78,7 +78,7 @@ export const NovelCard: React.FC<NovelCardProps> = ({
 
             {description && (
               <p className="text-white/90 text-sm mb-5 line-clamp-2 max-w-lg">
-                {description}
+                {cleanNovelDescription(description)}
               </p>
             )}
 
@@ -131,7 +131,7 @@ export const NovelCard: React.FC<NovelCardProps> = ({
             </h3>
             {description && (
               <p className="text-muted-foreground text-sm mb-2 line-clamp-2">
-                {description}
+                {cleanNovelDescription(description)}
               </p>
             )}
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
