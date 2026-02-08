@@ -188,7 +188,11 @@ export class MemoryManager {
 
   constructor(projectId: string, savePath?: string) {
     this.projectId = projectId;
-    this.savePath = savePath || path.join(process.cwd(), 'chapters', projectId);
+    // Use /tmp on serverless (Vercel/Lambda) where cwd is read-only
+    const baseDir = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME
+      ? '/tmp'
+      : process.cwd();
+    this.savePath = savePath || path.join(baseDir, 'chapters', projectId);
 
     this.memory = this.createEmptyMemory();
     this.beatLedger = this.createEmptyBeatLedger();
@@ -409,24 +413,28 @@ LAST CHAPTER: ${lastChapter?.summary || 'Chương đầu tiên'}`;
   // ============================================================================
 
   /**
-   * Save all state to disk
+   * Save all state to disk (non-fatal on serverless where fs may be unavailable)
    */
   async save(): Promise<void> {
-    const state = {
-      projectId: this.projectId,
-      memory: this.memory,
-      beatLedger: this.beatLedger,
-      characterTracker: this.characterTracker,
-      foreshadowing: this.foreshadowing,
-      worldBible: this.worldBible,
-      savedAt: Date.now(),
-    };
+    try {
+      const state = {
+        projectId: this.projectId,
+        memory: this.memory,
+        beatLedger: this.beatLedger,
+        characterTracker: this.characterTracker,
+        foreshadowing: this.foreshadowing,
+        worldBible: this.worldBible,
+        savedAt: Date.now(),
+      };
 
-    // Ensure directory exists (async)
-    await fsp.mkdir(this.savePath, { recursive: true });
+      await fsp.mkdir(this.savePath, { recursive: true });
 
-    const filePath = path.join(this.savePath, 'memory.json');
-    await fsp.writeFile(filePath, JSON.stringify(state, null, 2));
+      const filePath = path.join(this.savePath, 'memory.json');
+      await fsp.writeFile(filePath, JSON.stringify(state, null, 2));
+    } catch (err) {
+      // Non-fatal: serverless environments may not support persistent fs
+      console.warn(`[MemoryManager] save() failed (non-fatal): ${err instanceof Error ? err.message : String(err)}`);
+    }
   }
 
   /**
@@ -456,18 +464,24 @@ LAST CHAPTER: ${lastChapter?.summary || 'Chương đầu tiên'}`;
   }
 
   /**
-   * Export chapter content to file
+   * Export chapter content to file (non-fatal on serverless)
    */
   async saveChapter(chapterNumber: number, content: string, title: string): Promise<string> {
-    await fsp.mkdir(this.savePath, { recursive: true });
+    try {
+      await fsp.mkdir(this.savePath, { recursive: true });
 
-    const fileName = `chapter_${String(chapterNumber).padStart(4, '0')}.txt`;
-    const filePath = path.join(this.savePath, fileName);
+      const fileName = `chapter_${String(chapterNumber).padStart(4, '0')}.txt`;
+      const filePath = path.join(this.savePath, fileName);
 
-    const fullContent = `Chương ${chapterNumber}: ${title}\n\n${content}`;
-    await fsp.writeFile(filePath, fullContent);
+      const fullContent = `Chương ${chapterNumber}: ${title}\n\n${content}`;
+      await fsp.writeFile(filePath, fullContent);
 
-    return filePath;
+      return filePath;
+    } catch (err) {
+      // Non-fatal: chapter content is already saved to DB via callback
+      console.warn(`[MemoryManager] saveChapter() failed (non-fatal): ${err instanceof Error ? err.message : String(err)}`);
+      return '';
+    }
   }
 
   // ============================================================================
