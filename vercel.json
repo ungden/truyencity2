@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/write-chapters",
       "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/daily-rotate",
+      "schedule": "0 0 * * *"
     }
   ]
 }

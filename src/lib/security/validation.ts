@@ -67,7 +67,7 @@ export const CreateProjectSchema = z.object({
   worldDescription: z.string().max(2000).optional(),
   writingStyle: z.string().max(500).default('sinh động, hấp dẫn'),
   targetChapterLength: z.number().int().min(500).max(10000).default(2500),
-  aiModel: z.string().default('deepseek/deepseek-chat'),
+  aiModel: z.string().default('gemini-3-flash-preview'),
   temperature: z.number().min(0).max(2).default(0.8),
   totalPlannedChapters: z.number().int().min(1).max(5000).default(100),
 });

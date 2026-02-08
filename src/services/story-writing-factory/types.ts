@@ -43,8 +43,8 @@ export interface FactoryConfig {
 }
 
 export const DEFAULT_CONFIG: FactoryConfig = {
-  provider: 'openrouter',
-  model: 'deepseek/deepseek-chat-v3-0324',
+  provider: 'gemini',
+  model: 'gemini-3-flash-preview',
   temperature: 0.75,
   maxTokens: 8000,
   targetWordCount: 2800,

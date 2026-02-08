@@ -85,7 +85,9 @@ export class ConsistencyChecker {
 
   constructor(projectId: string) {
     this.projectId = projectId;
-    this.aiService = new AIProviderService();
+    this.aiService = new AIProviderService({
+      gemini: process.env.GEMINI_API_KEY,
+    });
   }
 
   private get supabase() {
@@ -313,8 +315,8 @@ export class ConsistencyChecker {
 
     try {
       const response = await this.aiService.chat({
-        provider: 'openrouter',
-        model: 'deepseek/deepseek-chat-v3-0324',
+        provider: 'gemini',
+        model: 'gemini-3-flash-preview',
         messages: [
           {
             role: 'system',
@@ -412,8 +414,8 @@ Có mâu thuẫn tính cách không?`,
     // Use AI to check world rules
     try {
       const response = await this.aiService.chat({
-        provider: 'openrouter',
-        model: 'deepseek/deepseek-chat-v3-0324',
+        provider: 'gemini',
+        model: 'gemini-3-flash-preview',
         messages: [
           {
             role: 'system',

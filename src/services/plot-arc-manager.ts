@@ -592,7 +592,7 @@ export class PlotArcManager {
   async getRelevantArcSummaries(currentChapter: number, lookbackArcs: number = 2): Promise<HierarchicalSummary[]> {
     if (this.tablesMissing) return [];
     const supabase = await this.getClient();
-    const currentArcNumber = Math.floor((currentChapter - 1) / 10) + 1;
+    const currentArcNumber = Math.floor((currentChapter - 1) / 20) + 1;
 
     const { data } = await supabase
       .from('hierarchical_summaries')

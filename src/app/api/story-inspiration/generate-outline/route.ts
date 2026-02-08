@@ -74,8 +74,8 @@ export async function POST(request: NextRequest) {
         // Configure AI if params provided
         if (config) {
           generator.configureAI(
-            config.provider || 'openrouter' as AIProviderType,
-            config.model || 'deepseek/deepseek-chat-v3-0324',
+            config.provider || 'gemini' as AIProviderType,
+            config.model || 'gemini-3-flash-preview',
             config.temperature
           );
         }

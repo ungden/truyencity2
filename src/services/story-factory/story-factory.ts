@@ -288,7 +288,7 @@ export class StoryFactory {
 
   constructor(config?: Partial<StoryFactoryConfig>) {
     this.config = {
-      primaryProvider: 'deepseek',
+      primaryProvider: 'gemini',
       maxWorkers: 10,
       workerTimeout: 300000, // 5 minutes
       minQualityScore: 7,
@@ -537,7 +537,7 @@ export function createStoryFactory(config?: Partial<StoryFactoryConfig>): StoryF
 
 // Export default config
 export const DEFAULT_FACTORY_CONFIG: StoryFactoryConfig = {
-  primaryProvider: 'deepseek',
+  primaryProvider: 'gemini',
   maxWorkers: 10,
   workerTimeout: 300000,
   minQualityScore: 7,

@@ -75,8 +75,8 @@ export default function AIAgentWriterPage() {
   const stopBatchRef = useRef(false);
 
   // AI Configuration
-  const [selectedProvider, setSelectedProvider] = useState<AIProviderType>('openrouter');
-  const [selectedModel, setSelectedModel] = useState(AI_PROVIDERS['openrouter'].defaultModel);
+  const [selectedProvider, setSelectedProvider] = useState<AIProviderType>('gemini');
+  const [selectedModel, setSelectedModel] = useState(AI_PROVIDERS['gemini'].defaultModel);
 
   useEffect(() => {
     fetchProjects();

@@ -207,7 +207,7 @@ export default function StoryWritingToolPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [providers, setProviders] = useState<AIProvider[]>([]);
-  const [selectedProvider, setSelectedProvider] = useState('openrouter');
+  const [selectedProvider, setSelectedProvider] = useState('gemini');
   const [selectedModel, setSelectedModel] = useState('');
   const [apiKeys, setApiKeys] = useState<Record<string, string>>({});
   const [showSettings, setShowSettings] = useState(false);
@@ -392,7 +392,7 @@ export default function StoryWritingToolPage() {
         body: JSON.stringify({
           outline_id: selectedOutline,
           writing_style: 'engaging',
-          ai_model: selectedModel || 'deepseek/deepseek-chat',
+          ai_model: selectedModel || 'gemini-3-flash-preview',
           temperature: 0.7,
           target_chapter_length: 2500,
         }),
@@ -441,8 +441,8 @@ export default function StoryWritingToolPage() {
         const data = await response.json();
         setProviders(data.providers || []);
         if (data.providers?.length > 0) {
-          // Default to OpenRouter or first
-          const defaultP = data.providers.find((p: any) => p.id === 'openrouter') ? 'openrouter' : data.providers[0].id;
+          // Default to Gemini or first
+          const defaultP = data.providers.find((p: any) => p.id === 'gemini') ? 'gemini' : data.providers[0].id;
           setSelectedProvider(defaultP);
           const pData = data.providers.find((p: any) => p.id === defaultP);
           if (pData) setSelectedModel(pData.defaultModel);

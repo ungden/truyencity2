@@ -120,8 +120,8 @@ export async function POST(request: NextRequest) {
         }
 
         const defaultConfig = {
-          provider: config?.provider || 'openrouter' as AIProviderType,
-          model: config?.model || AI_PROVIDERS['openrouter'].defaultModel,
+          provider: config?.provider || 'gemini' as AIProviderType,
+          model: config?.model || AI_PROVIDERS['gemini'].defaultModel,
           temperature: config?.temperature || 0.7,
           targetWordCount: config?.targetWordCount || 2500,
           useAgents: config?.useAgents || false, // Capture the flag
@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
         const result = await sessionService.processUserInput(
           sessionId,
           message,
-          apiKeys?.[config?.provider || 'openrouter']
+          apiKeys?.[config?.provider || 'gemini']
         );
 
         const session = await sessionService.getSession(sessionId);

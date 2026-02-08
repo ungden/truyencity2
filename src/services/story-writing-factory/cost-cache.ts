@@ -24,7 +24,7 @@ export const MODEL_TIERS: Record<string, ModelTier> = {
   // Small/Fast - for QC, summarization, extraction
   small: {
     name: 'Small',
-    modelId: 'deepseek/deepseek-chat-v3-0324',  // Fast and cheap
+    modelId: 'gemini-3-flash-preview',
     costPer1kTokens: 0.0001,
     maxTokens: 8000,
     bestFor: ['qc', 'summarization', 'extraction', 'classification'],
@@ -32,17 +32,17 @@ export const MODEL_TIERS: Record<string, ModelTier> = {
   // Medium - for outline, planning
   medium: {
     name: 'Medium',
-    modelId: 'anthropic/claude-3-haiku',
-    costPer1kTokens: 0.00025,
+    modelId: 'gemini-3-flash-preview',
+    costPer1kTokens: 0.0001,
     maxTokens: 16000,
     bestFor: ['outline', 'planning', 'editing'],
   },
   // Large - for actual writing
   large: {
     name: 'Large',
-    modelId: 'anthropic/claude-sonnet-4',
-    costPer1kTokens: 0.003,
-    maxTokens: 32000,
+    modelId: 'gemini-3-flash-preview',
+    costPer1kTokens: 0.0001,
+    maxTokens: 65536,
     bestFor: ['writing', 'creative', 'complex_dialogue'],
   },
 };

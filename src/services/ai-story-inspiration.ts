@@ -29,8 +29,8 @@ export class AIStoryInspiration {
   private externalClient: SupabaseClient | null = null;
   
   // Configuration
-  private provider: AIProviderType = 'openrouter';
-  private model: string = 'deepseek/deepseek-chat-v3-0324';
+  private provider: AIProviderType = 'gemini';
+  private model: string = 'gemini-3-flash-preview';
   private temperature: number = 0.7;
   private apiKey?: string;
 
@@ -726,7 +726,7 @@ Trả về JSON array với ĐÚNG ${chaptersToDetail} chương:
           world_description: outline.world_description,
           writing_style: options.writing_style || 'webnovel_chinese',
           target_chapter_length: options.target_chapter_length || 2500,
-          ai_model: options.ai_model || 'deepseek/deepseek-chat-v3-0324',
+          ai_model: options.ai_model || 'gemini-3-flash-preview',
           temperature: options.temperature || 0.75,
           current_chapter: 0,
           total_planned_chapters: outline.total_planned_chapters,

@@ -46,14 +46,7 @@ import SafeImage from '@/components/ui/safe-image';
 import { useRouter } from 'next/navigation';
 
 const AI_MODELS = [
-  { id: 'deepseek/deepseek-chat-v3-0324', name: 'DeepSeek Chat V3 (0324)', provider: 'DeepSeek', description: 'Hiệu quả cao, chi phí thấp, phù hợp viết dài', cost: 'Thấp', recommended: true },
-  { id: 'qwen/qwen3-235b-a22b-thinking-2507', name: 'Qwen3 235B Thinking', provider: 'Qwen', description: 'Reasoning 235B, mạnh cho viết dài', cost: 'Trung bình', recommended: false },
-  { id: 'openai/gpt-4o', name: 'GPT-4o', provider: 'OpenAI', description: 'Chất lượng cao cho viết truyện', cost: 'Cao', recommended: false },
-  { id: 'openai/gpt-4o-mini', name: 'GPT-4o Mini', provider: 'OpenAI', description: 'Nhanh và rẻ, chất lượng tốt', cost: 'Thấp', recommended: false },
-  { id: 'anthropic/claude-3.5-sonnet', name: 'Claude 3.5 Sonnet', provider: 'Anthropic', description: 'Xuất sắc cho sáng tạo', cost: 'Cao', recommended: false },
-  { id: 'anthropic/claude-3-haiku', name: 'Claude 3 Haiku', provider: 'Anthropic', description: 'Nhanh và tiết kiệm', cost: 'Thấp', recommended: false },
-  { id: 'google/gemini-pro-1.5', name: 'Gemini Pro 1.5', provider: 'Google', description: 'Context dài', cost: 'Trung bình', recommended: false },
-  { id: 'meta-llama/llama-3.1-70b-instruct', name: 'Llama 3.1 70B', provider: 'Meta', description: 'Mã nguồn mở, ổn định', cost: 'Thấp', recommended: false }
+  { id: 'gemini-3-flash-preview', name: 'Gemini 3 Flash Preview', provider: 'Google', description: 'Model chính — nhanh, 1M context, viết truyện chất lượng cao', cost: 'Miễn phí', recommended: true },
 ];
 
 const projectSchema = z.object({
@@ -204,7 +197,7 @@ export function ProjectSetupDialog({ isOpen, onOpenChange, onProjectSaved, initi
       world_description: '',
       writing_style: 'webnovel_chinese',
       target_chapter_length: 2500,
-      ai_model: 'deepseek/deepseek-chat-v3-0324',
+      ai_model: 'gemini-3-flash-preview',
       temperature: 0.7,
       total_planned_chapters: 100,
       ai_author_id: '',
@@ -278,7 +271,7 @@ export function ProjectSetupDialog({ isOpen, onOpenChange, onProjectSaved, initi
           novel_author: freshNovel.author || '',
           novel_description: freshNovel.description || '',
           topic: genreArray[1] || '',
-          ai_model: initialData.ai_model || 'deepseek/deepseek-chat-v3-0324',
+          ai_model: initialData.ai_model || 'gemini-3-flash-preview',
           ai_author_id: freshNovel.ai_author_id || '',
         } as ProjectFormValues);
         setCoverUrl(freshNovel.cover_url || '');
@@ -303,7 +296,7 @@ export function ProjectSetupDialog({ isOpen, onOpenChange, onProjectSaved, initi
           world_description: '',
           writing_style: 'webnovel_chinese',
           target_chapter_length: 2500,
-          ai_model: 'deepseek/deepseek-chat-v3-0324',
+          ai_model: 'gemini-3-flash-preview',
           temperature: 0.7,
           total_planned_chapters: 100,
           ai_author_id: '',
@@ -384,7 +377,7 @@ export function ProjectSetupDialog({ isOpen, onOpenChange, onProjectSaved, initi
       const response = await fetch('/api/ai-writer/generate-idea', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ genre: selectedGenre, topic: selectedTopic, model: 'deepseek/deepseek-chat-v3-0324' }),
+        body: JSON.stringify({ genre: selectedGenre, topic: selectedTopic, model: 'gemini-3-flash-preview' }),
       });
       if (!response.ok) throw new Error((await response.json()).error || 'Failed to generate');
       const data = await response.json();

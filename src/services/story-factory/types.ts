@@ -462,7 +462,7 @@ export interface StoryAnalytics {
 
 export interface StoryFactoryConfig {
   // AI Provider
-  primaryProvider: 'deepseek' | 'openrouter' | 'claude' | 'openai';
+  primaryProvider: 'deepseek' | 'openrouter' | 'claude' | 'openai' | 'gemini';
   fallbackProvider?: string;
 
   // Workers

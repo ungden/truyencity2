@@ -82,8 +82,8 @@ async function writeChapter(supabase: any, userId: string, projectId: string, cu
 
   // Use AI Provider Service
   const aiService = getAIProviderService();
-  const provider = (config?.provider as AIProviderType) || 'openrouter';
-  const model = config?.model || project.ai_model || 'deepseek/deepseek-chat';
+  const provider = (config?.provider as AIProviderType) || 'gemini';
+  const model = config?.model || project.ai_model || 'gemini-3-flash-preview';
 
   try {
     const result = await aiService.chat({

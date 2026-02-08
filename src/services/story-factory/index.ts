@@ -124,7 +124,7 @@ export async function quickStart(options: {
   const { createStoryFactory } = await import('./story-factory');
 
   const factory = createStoryFactory({
-    primaryProvider: 'deepseek',
+    primaryProvider: 'gemini',
     maxWorkers: 5
   });
 
