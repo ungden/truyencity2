@@ -19,24 +19,26 @@ import {
 } from '@/components/ui/select';
 import { Grid3X3, List, ArrowUpDown, Filter, X, SlidersHorizontal } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { AppContainer, TwoColumnLayout, ContentCard, Section } from '@/components/layout';
+import { AppContainer, TwoColumnLayout, ContentCard } from '@/components/layout';
 import { cn } from '@/lib/utils';
 import { GENRE_CONFIG } from '@/lib/types/genre-config';
 
 type NovelRow = {
   id: string;
+  slug: string | null;
   title: string;
   author: string | null;
   cover_url: string | null;
   status: string | null;
   genres: string[] | null;
   updated_at: string | null;
+  chapters: { count: number }[];
 };
 
 const NovelCardSkeleton = ({ variant = 'default' }: { variant?: 'default' | 'horizontal' }) => {
   if (variant === 'horizontal') {
     return (
-      <div className="flex p-4 gap-4 bg-white dark:bg-gray-800 rounded-2xl border-0 shadow-modern">
+      <div className="flex p-4 gap-4 bg-card rounded-2xl border-0 shadow-sm">
         <Skeleton className="w-20 h-28 rounded-xl" />
         <div className="flex-1 space-y-2">
           <Skeleton className="h-5 w-3/4" />
@@ -61,10 +63,24 @@ const NovelCardSkeleton = ({ variant = 'default' }: { variant?: 'default' | 'hor
 };
 
 const statusOptions = [
-  { id: 'dang-ra', label: 'Đang ra', value: 'Đang ra' },
-  { id: 'hoan-thanh', label: 'Hoàn thành', value: 'Hoàn thành' },
-  { id: 'tam-dung', label: 'Tạm dừng', value: 'Tạm dừng' },
+  { id: 'dang-ra', label: 'Dang ra', value: 'Dang ra' },
+  { id: 'hoan-thanh', label: 'Hoan thanh', value: 'Hoan thanh' },
+  { id: 'tam-dung', label: 'Tam dung', value: 'Tam dung' },
   { id: 'drop', label: 'Drop', value: 'Drop' }
+];
+
+const chapterRangeOptions = [
+  { id: 'all', label: 'Tat ca', min: 0, max: Infinity },
+  { id: '0-50', label: '0-50 chuong', min: 0, max: 50 },
+  { id: '50-200', label: '50-200 chuong', min: 50, max: 200 },
+  { id: '200-500', label: '200-500 chuong', min: 200, max: 500 },
+  { id: '500+', label: '500+ chuong', min: 500, max: Infinity },
+];
+
+const sortOptions = [
+  { value: 'updated', label: 'Moi cap nhat' },
+  { value: 'chapters_desc', label: 'Nhieu chuong nhat' },
+  { value: 'title', label: 'Ten A-Z' },
 ];
 
 const PAGE_SIZE = 30;
@@ -72,6 +88,7 @@ const PAGE_SIZE = 30;
 export default function BrowsePage() {
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
+  const [chapterRange, setChapterRange] = useState('all');
   const [sortBy, setSortBy] = useState('updated');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [novels, setNovels] = useState<NovelRow[]>([]);
@@ -90,7 +107,7 @@ export default function BrowsePage() {
 
     let query = supabase
       .from('novels')
-      .select('id,title,author,cover_url,status,genres,updated_at');
+      .select('id,slug,title,author,cover_url,status,genres,updated_at,chapters(count)');
 
     // Apply filters server-side
     if (selectedGenres.length > 0) {
@@ -105,6 +122,10 @@ export default function BrowsePage() {
       case 'title':
         query = query.order('title', { ascending: true });
         break;
+      case 'chapters_desc':
+        // We'll sort client-side for chapters since it's a joined count
+        query = query.order('updated_at', { ascending: false, nullsFirst: false });
+        break;
       case 'updated':
       default:
         query = query.order('updated_at', { ascending: false, nullsFirst: false });
@@ -114,7 +135,21 @@ export default function BrowsePage() {
     query = query.range(from, to);
 
     const { data } = await query;
-    const results = data || [];
+    let results = (data || []) as NovelRow[];
+
+    // Client-side chapter range filter
+    const range = chapterRangeOptions.find(r => r.id === chapterRange);
+    if (range && range.id !== 'all') {
+      results = results.filter(n => {
+        const count = n.chapters?.[0]?.count || 0;
+        return count >= range.min && count <= range.max;
+      });
+    }
+
+    // Client-side sort for chapters
+    if (sortBy === 'chapters_desc') {
+      results.sort((a, b) => (b.chapters?.[0]?.count || 0) - (a.chapters?.[0]?.count || 0));
+    }
 
     if (append) {
       setNovels(prev => [...prev, ...results]);
@@ -132,7 +167,7 @@ export default function BrowsePage() {
     setPage(0);
     fetchNovels(0, false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedGenres, selectedStatus, sortBy]);
+  }, [selectedGenres, selectedStatus, sortBy, chapterRange]);
 
   const loadMore = () => {
     const nextPage = page + 1;
@@ -140,7 +175,6 @@ export default function BrowsePage() {
     fetchNovels(nextPage, true);
   };
 
-  // novels is already filtered + sorted from server
   const filtered = novels;
 
   const toggleGenre = (genreId: string) => {
@@ -162,9 +196,10 @@ export default function BrowsePage() {
   const clearFilters = () => {
     setSelectedGenres([]);
     setSelectedStatus([]);
+    setChapterRange('all');
   };
 
-  const hasFilters = selectedGenres.length > 0 || selectedStatus.length > 0;
+  const hasFilters = selectedGenres.length > 0 || selectedStatus.length > 0 || chapterRange !== 'all';
 
   // Desktop Sidebar Filters
   const FilterSidebar = (
@@ -173,18 +208,18 @@ export default function BrowsePage() {
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold flex items-center gap-2">
             <SlidersHorizontal size={16} />
-            Bộ lọc
+            Bo loc
           </h3>
           {hasFilters && (
             <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs h-7">
-              Xóa tất cả
+              Xoa tat ca
             </Button>
           )}
         </div>
 
         {/* Status Filter */}
         <div className="mb-6">
-          <h4 className="text-sm font-medium mb-3 text-muted-foreground">Trạng thái</h4>
+          <h4 className="text-sm font-medium mb-3 text-muted-foreground">Trang thai</h4>
           <div className="space-y-2">
             {statusOptions.map((status) => (
               <div key={status.id} className="flex items-center space-x-2">
@@ -204,9 +239,31 @@ export default function BrowsePage() {
           </div>
         </div>
 
+        {/* Chapter Range Filter */}
+        <div className="mb-6">
+          <h4 className="text-sm font-medium mb-3 text-muted-foreground">So chuong</h4>
+          <div className="space-y-2">
+            {chapterRangeOptions.map((range) => (
+              <div key={range.id} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`range-${range.id}`}
+                  checked={chapterRange === range.id}
+                  onCheckedChange={() => setChapterRange(chapterRange === range.id ? 'all' : range.id)}
+                />
+                <Label
+                  htmlFor={`range-${range.id}`}
+                  className="text-sm cursor-pointer"
+                >
+                  {range.label}
+                </Label>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Genre Filter */}
         <div>
-          <h4 className="text-sm font-medium mb-3 text-muted-foreground">Thể loại</h4>
+          <h4 className="text-sm font-medium mb-3 text-muted-foreground">The loai</h4>
           <div className="space-y-2 max-h-[400px] overflow-y-auto scrollbar-custom pr-2">
             {Object.entries(GENRE_CONFIG).map(([id, genre]) => (
               <div key={id} className="flex items-center space-x-2">
@@ -259,8 +316,20 @@ export default function BrowsePage() {
           <X size={14} className="ml-1" />
         </Badge>
       ))}
+      {chapterRange !== 'all' && (
+        <Badge
+          variant="secondary"
+          className="flex items-center gap-1 pr-1 cursor-pointer hover:bg-destructive/10"
+          onClick={() => setChapterRange('all')}
+        >
+          {chapterRangeOptions.find(r => r.id === chapterRange)?.label}
+          <X size={14} className="ml-1" />
+        </Badge>
+      )}
     </div>
   );
+
+  const getChapterCount = (n: NovelRow) => n.chapters?.[0]?.count || 0;
 
   // Main content
   const MainContent = (
@@ -268,18 +337,19 @@ export default function BrowsePage() {
       {/* Toolbar */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          {loading ? 'Đang tải...' : `Hiển thị ${filtered.length} truyện`}
+          {loading ? 'Dang tai...' : `Hien thi ${filtered.length} truyen`}
         </p>
 
         <div className="flex items-center gap-3">
           <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-36 rounded-xl">
+            <SelectTrigger className="w-44 rounded-xl">
               <ArrowUpDown size={14} className="mr-2" />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="updated">Mới cập nhật</SelectItem>
-              <SelectItem value="title">Tên A-Z</SelectItem>
+              {sortOptions.map(opt => (
+                <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
@@ -330,10 +400,13 @@ export default function BrowsePage() {
             <NovelCard
               key={novel.id}
               id={novel.id}
+              slug={novel.slug || undefined}
               title={novel.title}
               author={novel.author || 'N/A'}
               cover={novel.cover_url || ''}
-              status={novel.status || 'Đang ra'}
+              status={novel.status || 'Dang ra'}
+              genre={novel.genres?.[0]}
+              chapters={getChapterCount(novel)}
               variant={viewMode === 'list' ? 'horizontal' : 'default'}
             />
           ))}
@@ -343,13 +416,13 @@ export default function BrowsePage() {
           <div className="w-16 h-16 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
             <Filter size={24} className="text-muted-foreground" />
           </div>
-          <p className="text-lg font-medium">Không tìm thấy truyện nào</p>
+          <p className="text-lg font-medium">Khong tim thay truyen nao</p>
           <p className="text-sm text-muted-foreground mt-1">
-            Thử thay đổi bộ lọc để xem thêm kết quả
+            Thu thay doi bo loc de xem them ket qua
           </p>
           {hasFilters && (
             <Button variant="outline" onClick={clearFilters} className="mt-4">
-              Xóa bộ lọc
+              Xoa bo loc
             </Button>
           )}
         </div>
@@ -359,7 +432,7 @@ export default function BrowsePage() {
       {!loading && hasMore && filtered.length > 0 && (
         <div className="text-center mt-6">
           <Button variant="outline" onClick={loadMore} disabled={loadingMore} className="px-8">
-            {loadingMore ? 'Đang tải...' : 'Xem thêm'}
+            {loadingMore ? 'Dang tai...' : 'Xem them'}
           </Button>
         </div>
       )}
@@ -370,15 +443,15 @@ export default function BrowsePage() {
     <div className="min-h-screen bg-background">
       {/* Mobile Header */}
       <div className="lg:hidden">
-        <Header title="Duyệt Truyện" showBack={true} />
+        <Header title="Duyet Truyen" showBack={true} />
       </div>
 
       <AppContainer className="py-6 lg:py-8">
         {/* Desktop: Two Column with Sidebar */}
         <div className="hidden lg:block">
           <div className="mb-6">
-            <h1 className="text-2xl font-bold">Duyệt Truyện</h1>
-            <p className="text-muted-foreground">Khám phá kho truyện phong phú</p>
+            <h1 className="text-2xl font-bold">Duyet Truyen</h1>
+            <p className="text-muted-foreground">Kham pha kho truyen phong phu</p>
           </div>
           <TwoColumnLayout
             sidebar={FilterSidebar}
@@ -402,13 +475,14 @@ export default function BrowsePage() {
 
             <div className="flex items-center gap-2">
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-28 rounded-xl">
+                <SelectTrigger className="w-32 rounded-xl">
                   <ArrowUpDown size={14} className="mr-1" />
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="updated">Cập nhật</SelectItem>
-                  <SelectItem value="title">Tên A-Z</SelectItem>
+                  {sortOptions.map(opt => (
+                    <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
 
@@ -438,7 +512,7 @@ export default function BrowsePage() {
 
           {/* Results count */}
           <p className="text-sm text-muted-foreground">
-            {loading ? 'Đang tải...' : `Hiển thị ${filtered.length} truyện`}
+            {loading ? 'Dang tai...' : `Hien thi ${filtered.length} truyen`}
           </p>
 
           {/* Novel Grid/List */}
@@ -462,19 +536,22 @@ export default function BrowsePage() {
                 <NovelCard
                   key={novel.id}
                   id={novel.id}
+                  slug={novel.slug || undefined}
                   title={novel.title}
                   author={novel.author || 'N/A'}
                   cover={novel.cover_url || ''}
-                  status={novel.status || 'Đang ra'}
+                  status={novel.status || 'Dang ra'}
+                  genre={novel.genres?.[0]}
+                  chapters={getChapterCount(novel)}
                   variant={viewMode === 'list' ? 'horizontal' : 'default'}
                 />
               ))}
             </div>
           ) : (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">Không tìm thấy truyện nào</p>
+              <p className="text-muted-foreground">Khong tim thay truyen nao</p>
               <p className="text-sm text-muted-foreground mt-1">
-                Thử thay đổi bộ lọc để xem thêm kết quả
+                Thu thay doi bo loc de xem them ket qua
               </p>
             </div>
           ))}
@@ -483,7 +560,7 @@ export default function BrowsePage() {
           {!loading && hasMore && filtered.length > 0 && (
             <div className="text-center mt-4">
               <Button variant="outline" onClick={loadMore} disabled={loadingMore} className="px-8">
-                {loadingMore ? 'Đang tải...' : 'Xem thêm'}
+                {loadingMore ? 'Dang tai...' : 'Xem them'}
               </Button>
             </div>
           )}

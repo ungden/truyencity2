@@ -12,7 +12,9 @@ import {
   BookOpen,
   Heart,
   Share2,
-  ChevronRight
+  ChevronRight,
+  Bookmark,
+  MessageSquare
 } from 'lucide-react';
 import { createServerClient } from '@/integrations/supabase/server';
 import { notFound, redirect } from 'next/navigation';
@@ -23,6 +25,10 @@ import { ChapterList } from '@/components/chapter-list';
 import { NovelActions } from '@/components/novel-actions';
 import { AppContainer, TwoColumnLayout, ContentCard, Section } from '@/components/layout';
 import { Comments } from '@/components/comments';
+import { StarDisplay } from '@/components/star-rating';
+import { RelatedNovels } from '@/components/related-novels';
+import { AuthorWorks } from '@/components/author-works';
+import { NovelRatingSection } from './rating-section';
 import { cleanNovelDescription } from '@/lib/utils';
 import type { Metadata } from 'next';
 
@@ -75,11 +81,11 @@ export async function generateMetadata({
     .single();
 
   if (!novel) {
-    return { title: 'Truyện không tồn tại - Truyện City' };
+    return { title: 'Truyen khong ton tai - Truyen City' };
   }
 
-  const title = `${novel.title} - ${novel.author || 'Truyện City'}`;
-  const description = cleanNovelDescription(novel.description).slice(0, 160) || `Đọc ${novel.title} miễn phí tại Truyện City`;
+  const title = `${novel.title} - ${novel.author || 'Truyen City'}`;
+  const description = cleanNovelDescription(novel.description).slice(0, 160) || `Doc ${novel.title} mien phi tai Truyen City`;
 
   return {
     title,
@@ -114,13 +120,32 @@ export default async function NovelDetailPage({
   const chapters = Array.isArray(novel.chapters) ? novel.chapters : [];
   const chapterCount = chapters.length;
 
-  // Get real view count from chapter_reads
+  // Get stats from database
   const supabase = await createServerClient();
-  const { count: viewCount } = await supabase
-    .from('chapter_reads')
-    .select('*', { count: 'exact', head: true })
-    .eq('novel_id', novel.id);
-  const totalViews = viewCount || 0;
+  
+  // Parallel fetch: views, bookmarks, rating stats
+  const [viewResult, bookmarkResult, ratingRaw] = await Promise.all([
+    supabase
+      .from('chapter_reads')
+      .select('*', { count: 'exact', head: true })
+      .eq('novel_id', novel.id),
+    supabase
+      .from('bookmarks')
+      .select('*', { count: 'exact', head: true })
+      .eq('novel_id', novel.id),
+    supabase
+      .from('ratings')
+      .select('score')
+      .eq('novel_id', novel.id),
+  ]);
+
+  const totalViews = viewResult.count || 0;
+  const totalBookmarks = bookmarkResult.count || 0;
+  const ratingScores = ratingRaw.data || [];
+  const ratingCount = ratingScores.length;
+  const ratingAvg = ratingCount > 0
+    ? Math.round((ratingScores.reduce((s: number, r: { score: number }) => s + r.score, 0) / ratingCount) * 100) / 100
+    : 0;
 
   let mainGenre: (typeof GENRE_CONFIG)[keyof typeof GENRE_CONFIG] | null = null;
   let topic: Topic | null = null;
@@ -140,32 +165,77 @@ export default async function NovelDetailPage({
 
   const novelSlug = novel.slug || novel.id;
 
+  // Format large numbers
+  const formatNumber = (n: number) => {
+    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+    if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+    return n.toLocaleString('vi-VN');
+  };
+
   // Sidebar content for desktop
   const SidebarContent = (
     <div className="space-y-6">
-      {/* Quick Stats */}
+      {/* Rating Card */}
       <ContentCard>
-        <h3 className="font-semibold mb-4">Thống kê</h3>
+        <h3 className="font-semibold mb-4 flex items-center gap-2">
+          <Star size={16} className="text-yellow-500" />
+          Danh gia
+        </h3>
+        <div className="text-center space-y-3">
+          <div className="text-4xl font-bold text-yellow-500">
+            {ratingAvg > 0 ? ratingAvg.toFixed(1) : '--'}
+          </div>
+          <StarDisplay rating={ratingAvg} size="lg" showCount={false} />
+          <p className="text-sm text-muted-foreground">
+            {ratingCount > 0 ? `${ratingCount.toLocaleString('vi-VN')} luot danh gia` : 'Chua co danh gia'}
+          </p>
+          <NovelRatingSection novelId={novel.id} />
+        </div>
+      </ContentCard>
+
+      {/* Stats Card */}
+      <ContentCard>
+        <h3 className="font-semibold mb-4">Thong ke</h3>
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Chương</span>
-            <span className="font-bold text-blue-600">{chapterCount}</span>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <BookOpen size={14} />
+              <span>Chuong</span>
+            </div>
+            <span className="font-bold text-blue-500">{chapterCount}</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Lượt đọc</span>
-            <span className="font-bold text-purple-600">{totalViews.toLocaleString('vi-VN')}</span>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Eye size={14} />
+              <span>Luot doc</span>
+            </div>
+            <span className="font-bold text-purple-500">{formatNumber(totalViews)}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Bookmark size={14} />
+              <span>Yeu thich</span>
+            </div>
+            <span className="font-bold text-red-500">{formatNumber(totalBookmarks)}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Star size={14} />
+              <span>Danh gia</span>
+            </div>
+            <span className="font-bold text-yellow-500">{ratingAvg > 0 ? ratingAvg.toFixed(1) : '--'}</span>
           </div>
         </div>
       </ContentCard>
 
       {/* Info Card */}
       <ContentCard>
-        <h3 className="font-semibold mb-4">Thông tin</h3>
+        <h3 className="font-semibold mb-4">Thong tin</h3>
         <div className="space-y-3 text-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-muted-foreground">
               <User size={14} />
-              <span>Tác giả</span>
+              <span>Tac gia</span>
             </div>
             {novel.author ? (
               <Link
@@ -175,23 +245,23 @@ export default async function NovelDetailPage({
                 {novel.author}
               </Link>
             ) : (
-              <span className="text-muted-foreground">Chưa rõ</span>
+              <span className="text-muted-foreground">Chua ro</span>
             )}
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-muted-foreground">
               <Calendar size={14} />
-              <span>Cập nhật</span>
+              <span>Cap nhat</span>
             </div>
-            <span className="font-medium">{new Date(novel.created_at).toLocaleDateString('vi-VN')}</span>
+            <span className="font-medium">{new Date(novel.updated_at || novel.created_at).toLocaleDateString('vi-VN')}</span>
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-muted-foreground">
               <Clock size={14} />
-              <span>Trạng thái</span>
+              <span>Trang thai</span>
             </div>
-            <Badge variant={novel.status === 'Hoàn thành' ? 'default' : 'secondary'}>
-              {novel.status || 'Đang ra'}
+            <Badge variant={novel.status === 'Hoan thanh' ? 'default' : 'secondary'}>
+              {novel.status || 'Dang ra'}
             </Badge>
           </div>
         </div>
@@ -200,7 +270,7 @@ export default async function NovelDetailPage({
       {/* Topic Info */}
       {topic && (
         <ContentCard>
-          <h3 className="font-semibold mb-3">Chủ đề</h3>
+          <h3 className="font-semibold mb-3">Chu de</h3>
           <div className="flex items-start gap-3">
             <div className="p-2 bg-primary/10 rounded-lg flex-shrink-0">
               <Tag size={16} className="text-primary" />
@@ -227,51 +297,63 @@ export default async function NovelDetailPage({
         <div className="hidden lg:block">
           <TwoColumnLayout sidebar={SidebarContent} sidebarPosition="right" sidebarWidth="sm">
             <div className="space-y-8">
-              {/* Hero Section */}
+              {/* Hero Section — WebNovel style */}
               <Card className="p-0 overflow-hidden border-0 shadow-lg rounded-2xl">
-                <div className="relative h-48 bg-gradient-to-br from-primary/30 via-purple-500/15 to-blue-500/10">
-                  <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent" />
+                <div className="relative h-56 bg-gradient-to-br from-primary/30 via-purple-500/20 to-blue-500/10">
+                  <div className="absolute inset-0 bg-gradient-to-t from-card via-card/80 to-transparent" />
                 </div>
                 <div className="relative px-8 pb-8">
-                  <div className="flex gap-6 -mt-20">
-                    {/* Large Cover */}
+                  <div className="flex gap-8 -mt-28">
+                    {/* Large Cover — 250px width */}
                     <div className="relative flex-shrink-0">
                       <SafeImage
                         src={novel.cover_url}
                         alt={novel.title}
-                        className="w-40 h-56 object-cover rounded-xl shadow-2xl ring-4 ring-background"
+                        className="w-[200px] h-[280px] object-cover rounded-xl shadow-2xl ring-4 ring-background"
                       />
                     </div>
 
                     {/* Info */}
-                    <div className="flex-1 pt-20 space-y-4">
+                    <div className="flex-1 pt-28 space-y-4">
                       <div>
-                        <h1 className="text-3xl font-bold leading-tight mb-2">{novel.title}</h1>
+                        <h1 className="text-3xl font-bold leading-tight mb-3">{novel.title}</h1>
                         <div className="flex items-center gap-4 text-muted-foreground">
                           <div className="flex items-center gap-2">
                             <User size={16} />
                             {novel.author ? (
                               <Link
                                 href={`/authors/${encodeURIComponent(novel.author)}`}
-                                className="hover:text-primary transition-colors"
+                                className="hover:text-primary transition-colors font-medium"
                               >
                                 {novel.author}
                               </Link>
                             ) : (
-                              <span>Chưa rõ</span>
+                              <span>Chua ro</span>
                             )}
                           </div>
-                          <div className="flex items-center gap-1">
-                            <BookOpen size={16} />
-                            <span>{chapterCount} chương</span>
-                          </div>
-                          {totalViews > 0 && (
-                            <div className="flex items-center gap-1">
-                              <Eye size={16} />
-                              <span>{totalViews.toLocaleString('vi-VN')} lượt đọc</span>
-                            </div>
-                          )}
                         </div>
+                      </div>
+
+                      {/* Stats Row */}
+                      <div className="flex items-center gap-6 text-sm">
+                        <div className="flex items-center gap-1.5">
+                          <StarDisplay rating={ratingAvg} count={ratingCount} size="sm" />
+                        </div>
+                        <div className="flex items-center gap-1.5 text-muted-foreground">
+                          <Eye size={14} />
+                          <span>{formatNumber(totalViews)}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-muted-foreground">
+                          <BookOpen size={14} />
+                          <span>{chapterCount} chuong</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-muted-foreground">
+                          <Bookmark size={14} />
+                          <span>{formatNumber(totalBookmarks)}</span>
+                        </div>
+                        <Badge variant={novel.status === 'Hoan thanh' ? 'default' : 'secondary'} className="text-xs">
+                          {novel.status || 'Dang ra'}
+                        </Badge>
                       </div>
 
                       {/* Tags */}
@@ -292,9 +374,6 @@ export default async function NovelDetailPage({
                             </Badge>
                           </Link>
                         )}
-                        <Badge variant={novel.status === 'Hoàn thành' ? 'default' : 'secondary'} className="px-3 py-1">
-                          {novel.status || 'Đang ra'}
-                        </Badge>
                       </div>
 
                       {/* Actions */}
@@ -302,13 +381,16 @@ export default async function NovelDetailPage({
                         <Button asChild size="lg" className="rounded-xl shadow-md">
                           <Link href={`/truyen/${novelSlug}/read/1`}>
                             <BookOpen size={18} className="mr-2" />
-                            Đọc từ đầu
+                            Doc tu dau
                           </Link>
                         </Button>
-                        <Button variant="outline" size="lg" className="rounded-xl">
-                          <Heart size={18} className="mr-2" />
-                          Yêu thích
-                        </Button>
+                        {chapterCount > 1 && (
+                          <Button asChild variant="outline" size="lg" className="rounded-xl">
+                            <Link href={`/truyen/${novelSlug}/read/${chapterCount}`}>
+                              Chuong moi nhat
+                            </Link>
+                          </Button>
+                        )}
                         <Button variant="ghost" size="icon" className="rounded-xl">
                           <Share2 size={18} />
                         </Button>
@@ -319,21 +401,21 @@ export default async function NovelDetailPage({
               </Card>
 
               {/* Description */}
-              <Section title="Mô tả">
+              <Section title="Mo ta">
                 <ContentCard>
                   <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-                    {cleanNovelDescription(novel.description) || 'Chưa có mô tả.'}
+                    {cleanNovelDescription(novel.description) || 'Chua co mo ta.'}
                   </p>
                 </ContentCard>
               </Section>
 
               {/* Chapter List */}
               <Section
-                title="Danh sách chương"
-                subtitle={`${chapterCount} chương`}
+                title="Danh sach chuong"
+                subtitle={`${chapterCount} chuong`}
                 action={
                   <Button variant="ghost" size="sm" className="text-primary">
-                    Xem tất cả
+                    Xem tat ca
                     <ChevronRight size={16} className="ml-1" />
                   </Button>
                 }
@@ -341,8 +423,22 @@ export default async function NovelDetailPage({
                 <ChapterList novelId={novel.id} novelSlug={novelSlug} chapters={chapters} />
               </Section>
 
+              {/* Related Novels */}
+              {Array.isArray(novel.genres) && novel.genres.length > 0 && (
+                <Section title="Co the ban cung thich">
+                  <RelatedNovels novelId={novel.id} genres={novel.genres} limit={6} />
+                </Section>
+              )}
+
+              {/* Author's Other Works */}
+              {novel.author && (
+                <Section title={`Tac pham cung tac gia`}>
+                  <AuthorWorks novelId={novel.id} authorName={novel.author} limit={6} />
+                </Section>
+              )}
+
               {/* Comments */}
-              <Section title="Bình luận">
+              <Section title="Binh luan">
                 <Comments novelId={novel.id} />
               </Section>
             </div>
@@ -375,22 +471,12 @@ export default async function NovelDetailPage({
                       {novel.author}
                     </Link>
                   ) : (
-                    <span>Chưa rõ</span>
+                    <span>Chua ro</span>
                   )}
                 </div>
 
-                <div className="flex items-center gap-4 text-sm">
-                  <div className="flex items-center gap-1">
-                    <BookOpen size={14} className="text-muted-foreground" />
-                    <span className="font-medium">{chapterCount} chương</span>
-                  </div>
-                  {totalViews > 0 && (
-                    <div className="flex items-center gap-1">
-                      <Eye size={14} className="text-muted-foreground" />
-                      <span>{totalViews.toLocaleString('vi-VN')}</span>
-                    </div>
-                  )}
-                </div>
+                {/* Rating */}
+                <StarDisplay rating={ratingAvg} count={ratingCount} size="sm" />
 
                 <div className="flex flex-wrap gap-2">
                   {mainGenre && mainGenreId && (
@@ -401,8 +487,8 @@ export default async function NovelDetailPage({
                       </Badge>
                     </Link>
                   )}
-                  <Badge variant={novel.status === 'Hoàn thành' ? 'default' : 'secondary'} className="text-xs">
-                    {novel.status || 'Đang ra'}
+                  <Badge variant={novel.status === 'Hoan thanh' ? 'default' : 'secondary'} className="text-xs">
+                    {novel.status || 'Dang ra'}
                   </Badge>
                 </div>
               </div>
@@ -412,23 +498,41 @@ export default async function NovelDetailPage({
           <NovelActions novelId={novel.id} />
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-2 gap-3">
-            <Card className="p-4 text-center bg-gradient-to-br from-blue-500/10 to-blue-600/10 border-blue-500/20 rounded-xl">
-              <div className="text-xl font-bold text-blue-600">{chapterCount}</div>
-              <div className="text-xs text-muted-foreground">Chương</div>
+          <div className="grid grid-cols-4 gap-2">
+            <Card className="p-3 text-center bg-gradient-to-br from-blue-500/10 to-blue-600/10 border-blue-500/20 rounded-xl">
+              <BookOpen size={16} className="mx-auto mb-1 text-blue-500" />
+              <div className="text-lg font-bold text-blue-500">{chapterCount}</div>
+              <div className="text-[10px] text-muted-foreground">Chuong</div>
             </Card>
-            <Card className="p-4 text-center bg-gradient-to-br from-purple-500/10 to-purple-600/10 border-purple-500/20 rounded-xl">
-              <div className="text-xl font-bold text-purple-600">{totalViews.toLocaleString('vi-VN')}</div>
-              <div className="text-xs text-muted-foreground">Lượt đọc</div>
+            <Card className="p-3 text-center bg-gradient-to-br from-purple-500/10 to-purple-600/10 border-purple-500/20 rounded-xl">
+              <Eye size={16} className="mx-auto mb-1 text-purple-500" />
+              <div className="text-lg font-bold text-purple-500">{formatNumber(totalViews)}</div>
+              <div className="text-[10px] text-muted-foreground">Luot doc</div>
+            </Card>
+            <Card className="p-3 text-center bg-gradient-to-br from-red-500/10 to-red-600/10 border-red-500/20 rounded-xl">
+              <Bookmark size={16} className="mx-auto mb-1 text-red-500" />
+              <div className="text-lg font-bold text-red-500">{formatNumber(totalBookmarks)}</div>
+              <div className="text-[10px] text-muted-foreground">Yeu thich</div>
+            </Card>
+            <Card className="p-3 text-center bg-gradient-to-br from-yellow-500/10 to-yellow-600/10 border-yellow-500/20 rounded-xl">
+              <Star size={16} className="mx-auto mb-1 text-yellow-500" />
+              <div className="text-lg font-bold text-yellow-500">{ratingAvg > 0 ? ratingAvg.toFixed(1) : '--'}</div>
+              <div className="text-[10px] text-muted-foreground">Danh gia</div>
             </Card>
           </div>
 
+          {/* Rate this novel */}
+          <Card className="p-4 border-0 bg-card rounded-xl">
+            <h3 className="text-sm font-semibold mb-2">Danh gia truyen nay</h3>
+            <NovelRatingSection novelId={novel.id} />
+          </Card>
+
           {/* Description */}
           <div>
-            <h3 className="text-lg font-semibold mb-3">Mô tả</h3>
+            <h3 className="text-lg font-semibold mb-3">Mo ta</h3>
             <Card className="p-4 bg-gradient-to-br from-card to-card/50 border-0 rounded-xl">
               <p className="text-muted-foreground leading-relaxed text-sm whitespace-pre-line">
-                {cleanNovelDescription(novel.description) || 'Chưa có mô tả.'}
+                {cleanNovelDescription(novel.description) || 'Chua co mo ta.'}
               </p>
             </Card>
           </div>
@@ -436,27 +540,43 @@ export default async function NovelDetailPage({
           {/* Chapter List */}
           <ChapterList novelId={novel.id} novelSlug={novelSlug} chapters={chapters} />
 
+          {/* Related Novels */}
+          {Array.isArray(novel.genres) && novel.genres.length > 0 && (
+            <div>
+              <h3 className="text-lg font-semibold mb-3">Co the ban cung thich</h3>
+              <RelatedNovels novelId={novel.id} genres={novel.genres} limit={6} />
+            </div>
+          )}
+
+          {/* Author Works */}
+          {novel.author && (
+            <div>
+              <h3 className="text-lg font-semibold mb-3">Tac pham cung tac gia</h3>
+              <AuthorWorks novelId={novel.id} authorName={novel.author} limit={6} />
+            </div>
+          )}
+
           {/* Comments */}
           <Comments novelId={novel.id} />
 
           {/* Info */}
           <div>
-            <h3 className="text-lg font-semibold mb-3">Thông tin</h3>
+            <h3 className="text-lg font-semibold mb-3">Thong tin</h3>
             <Card className="p-4 space-y-3 bg-gradient-to-br from-card to-card/50 border-0 rounded-xl">
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Calendar size={14} />
-                  <span>Cập nhật cuối</span>
+                  <span>Cap nhat cuoi</span>
                 </div>
-                <span className="font-medium">{new Date(novel.created_at).toLocaleDateString('vi-VN')}</span>
+                <span className="font-medium">{new Date(novel.updated_at || novel.created_at).toLocaleDateString('vi-VN')}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Clock size={14} />
-                  <span>Trạng thái</span>
+                  <span>Trang thai</span>
                 </div>
-                <Badge variant={novel.status === 'Hoàn thành' ? 'default' : 'secondary'} className="text-xs">
-                  {novel.status || 'Đang ra'}
+                <Badge variant={novel.status === 'Hoan thanh' ? 'default' : 'secondary'} className="text-xs">
+                  {novel.status || 'Dang ra'}
                 </Badge>
               </div>
             </Card>

@@ -3,14 +3,18 @@ import { Button } from '@/components/ui/button';
 import { Header } from '@/components/header';
 import {
   ChevronRight,
-  ChevronLeft,
   Star,
   TrendingUp,
-  Sparkles
+  Sparkles,
+  BookOpen,
+  Clock,
+  Flame
 } from 'lucide-react';
 import Link from 'next/link';
 import { createServerClient } from '@/integrations/supabase/server';
 import { Novel } from '@/lib/types';
+import { ContinueReading } from '@/components/continue-reading';
+import { LatestUpdatesCarousel } from '@/components/latest-updates-carousel';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -22,67 +26,73 @@ function getChapterCount(novel: Novel): number {
 }
 
 export default async function HomePage() {
-  let novels: Novel[] | null = null;
-  let featuredNovels: Novel[] | null = null;
+  const supabase = await createServerClient();
 
-  try {
-    const supabase = await createServerClient();
+  // Parallel fetch all data
+  const [latestResult, featuredResult, tienHiepResult, doThiResult] = await Promise.all([
+    // Recently updated novels
+    supabase
+      .from('novels')
+      .select('*, chapters(count)')
+      .order('updated_at', { ascending: false })
+      .limit(20),
+    // Featured: novels with covers, most chapters
+    supabase
+      .from('novels')
+      .select('*, chapters(count)')
+      .not('cover_url', 'is', null)
+      .order('updated_at', { ascending: false })
+      .limit(10),
+    // Tien Hiep genre
+    supabase
+      .from('novels')
+      .select('*, chapters(count)')
+      .overlaps('genres', ['tien-hiep'])
+      .not('cover_url', 'is', null)
+      .order('updated_at', { ascending: false })
+      .limit(8),
+    // Do Thi genre
+    supabase
+      .from('novels')
+      .select('*, chapters(count)')
+      .overlaps('genres', ['do-thi'])
+      .not('cover_url', 'is', null)
+      .order('updated_at', { ascending: false })
+      .limit(8),
+  ]);
 
-    // Fetch recently updated novels (sorted by latest activity)
-    const [latestResult, featuredResult] = await Promise.all([
-      supabase
-        .from('novels')
-        .select('*, chapters(count)')
-        .order('updated_at', { ascending: false })
-        .limit(20),
-      // Featured: novels with covers, most chapters (established stories)
-      supabase
-        .from('novels')
-        .select('*, chapters(count)')
-        .not('cover_url', 'is', null)
-        .order('updated_at', { ascending: false })
-        .limit(10),
-    ]);
-    // Note: slug is included in '*' select from novels table
-
-    if (latestResult.error) {
-      console.error('Error fetching novels:', latestResult.error);
-    } else {
-      novels = latestResult.data;
-    }
-
-    if (!featuredResult.error) {
-      // Pick the featured novel with the most chapters (most established)
-      featuredNovels = (featuredResult.data || [])
-        .sort((a: Novel, b: Novel) => getChapterCount(b) - getChapterCount(a));
-    }
-  } catch (err) {
-    console.error('Failed to connect to database:', err);
-  }
+  const novels: Novel[] = latestResult.data || [];
+  const featuredNovels: Novel[] = (featuredResult.data || [])
+    .sort((a: Novel, b: Novel) => getChapterCount(b) - getChapterCount(a));
+  const tienHiepNovels: Novel[] = tienHiepResult.data || [];
+  const doThiNovels: Novel[] = doThiResult.data || [];
 
   // Featured = novel with most chapters and a cover
-  const featuredNovel = featuredNovels?.[0] || novels?.[0];
+  const featuredNovel = featuredNovels[0] || novels[0];
   // Trending = novels with most chapters (active writing)
-  const allSorted = [...(novels || [])].sort((a, b) => getChapterCount(b) - getChapterCount(a));
-  const trendingNovels = allSorted.filter(n => n.id !== featuredNovel?.id).slice(0, 5);
+  const allSorted = [...novels].sort((a, b) => getChapterCount(b) - getChapterCount(a));
+  const trendingNovels = allSorted.filter(n => n.id !== featuredNovel?.id).slice(0, 6);
   // Latest = most recently updated (excluding featured + trending)
   const usedIds = new Set([featuredNovel?.id, ...trendingNovels.map(n => n.id)]);
-  const latestNovels = (novels || []).filter(n => !usedIds.has(n.id)).slice(0, 6);
-  // Ranking = by chapter count (most content = most popular proxy)
+  const latestNovels = novels.filter(n => !usedIds.has(n.id)).slice(0, 8);
+  // Ranking = by chapter count
   const rankingNovels = allSorted.slice(0, 6);
 
   return (
     <div className="min-h-screen bg-background">
       {/* Mobile Header */}
       <div className="lg:hidden">
-        <Header title="Truyện City" variant="search" />
+        <Header title="Truyen City" variant="search" />
       </div>
 
       <div className="px-4 lg:px-6 py-6 lg:py-8">
         {/* Main Content Grid */}
         <div className="flex gap-8">
           {/* Left Content Area */}
-          <div className="flex-1 min-w-0 space-y-8">
+          <div className="flex-1 min-w-0 space-y-10">
+            {/* Continue Reading (client component — only shows for logged in users) */}
+            <ContinueReading />
+
             {/* Hero Section */}
             {featuredNovel && (
               <section>
@@ -92,7 +102,7 @@ export default async function HomePage() {
                   title={featuredNovel.title}
                   author={featuredNovel.author || 'N/A'}
                   cover={featuredNovel.cover_url || ''}
-                  status={featuredNovel.status || 'Đang ra'}
+                  status={featuredNovel.status || 'Dang ra'}
                   description={featuredNovel.description || ''}
                   chapters={getChapterCount(featuredNovel)}
                   variant="featured"
@@ -106,13 +116,13 @@ export default async function HomePage() {
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <Sparkles size={20} className="text-primary" />
-                  <h2 className="text-lg font-semibold">Thịnh hành tuần này</h2>
+                  <h2 className="text-lg font-semibold">Thinh hanh tuan nay</h2>
                 </div>
                 <Link
                   href="/ranking"
                   className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1"
                 >
-                  Xem tất cả
+                  Xem tat ca
                   <ChevronRight size={16} />
                 </Link>
               </div>
@@ -127,7 +137,7 @@ export default async function HomePage() {
                         title={novel.title}
                         author={novel.author || 'N/A'}
                         cover={novel.cover_url || ''}
-                        status={novel.status || 'Đang ra'}
+                        status={novel.status || 'Dang ra'}
                         genre={novel.genres?.[0]}
                         chapters={getChapterCount(novel)}
                       />
@@ -137,38 +147,86 @@ export default async function HomePage() {
               </div>
             </section>
 
-            {/* Latest Updates */}
+            {/* Latest Updates with working carousel */}
             <section>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold">Mới cập nhật</h2>
                 <div className="flex items-center gap-2">
-                  <button className="w-8 h-8 rounded-full border border-border flex items-center justify-center hover:bg-accent transition-colors">
-                    <ChevronLeft size={16} />
-                  </button>
-                  <button className="w-8 h-8 rounded-full border border-border flex items-center justify-center hover:bg-accent transition-colors">
-                    <ChevronRight size={16} />
-                  </button>
+                  <Clock size={20} className="text-primary" />
+                  <h2 className="text-lg font-semibold">Moi cap nhat</h2>
                 </div>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {latestNovels.map((novel: Novel) => (
-                  <NovelCard
-                    key={novel.id}
-                    id={novel.id}
-                    slug={novel.slug || undefined}
-                    title={novel.title}
-                    author={novel.author || 'N/A'}
-                    cover={novel.cover_url || ''}
-                    status={novel.status || 'Đang ra'}
-                    genre={novel.genres?.[0]}
-                    description={novel.description || ''}
-                    chapters={getChapterCount(novel)}
-                    variant="horizontal"
-                  />
-                ))}
-              </div>
+              <LatestUpdatesCarousel novels={latestNovels} />
             </section>
+
+            {/* Tien Hiep Genre Section */}
+            {tienHiepNovels.length > 0 && (
+              <section>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl">&#x2694;&#xFE0F;</span>
+                    <h2 className="text-lg font-semibold">Tien Hiep Moi</h2>
+                  </div>
+                  <Link
+                    href="/browse?genre=tien-hiep"
+                    className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1"
+                  >
+                    Xem tat ca
+                    <ChevronRight size={16} />
+                  </Link>
+                </div>
+                <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4">
+                  {tienHiepNovels.map((novel: Novel) => (
+                    <div key={novel.id} className="flex-shrink-0 w-[160px]">
+                      <NovelCard
+                        id={novel.id}
+                        slug={novel.slug || undefined}
+                        title={novel.title}
+                        author={novel.author || 'N/A'}
+                        cover={novel.cover_url || ''}
+                        status={novel.status || 'Dang ra'}
+                        genre={novel.genres?.[0]}
+                        chapters={getChapterCount(novel)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Do Thi Genre Section */}
+            {doThiNovels.length > 0 && (
+              <section>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <Flame size={20} className="text-orange-500" />
+                    <h2 className="text-lg font-semibold">Do Thi Hot</h2>
+                  </div>
+                  <Link
+                    href="/browse?genre=do-thi"
+                    className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1"
+                  >
+                    Xem tat ca
+                    <ChevronRight size={16} />
+                  </Link>
+                </div>
+                <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4">
+                  {doThiNovels.map((novel: Novel) => (
+                    <div key={novel.id} className="flex-shrink-0 w-[160px]">
+                      <NovelCard
+                        id={novel.id}
+                        slug={novel.slug || undefined}
+                        title={novel.title}
+                        author={novel.author || 'N/A'}
+                        cover={novel.cover_url || ''}
+                        status={novel.status || 'Dang ra'}
+                        genre={novel.genres?.[0]}
+                        chapters={getChapterCount(novel)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
           </div>
 
           {/* Right Sidebar - Rankings */}
@@ -176,7 +234,7 @@ export default async function HomePage() {
             <div className="sticky top-24">
               <div className="flex items-center gap-2 mb-4">
                 <TrendingUp size={20} className="text-primary" />
-                <h2 className="text-lg font-semibold">Bảng Xếp Hạng</h2>
+                <h2 className="text-lg font-semibold">Bang Xep Hang</h2>
               </div>
 
               <div className="space-y-2">
@@ -188,7 +246,7 @@ export default async function HomePage() {
                     title={novel.title}
                     author={novel.author || 'N/A'}
                     cover={novel.cover_url || ''}
-                    status={novel.status || 'Đang ra'}
+                    status={novel.status || 'Dang ra'}
                     genre={novel.genres?.[0]}
                     variant="ranking"
                     rank={index + 1}
@@ -201,12 +259,12 @@ export default async function HomePage() {
                 className="w-full mt-4 rounded-xl"
                 asChild
               >
-                <Link href="/ranking">Xem đầy đủ</Link>
+                <Link href="/ranking">Xem day du</Link>
               </Button>
 
               {/* Ad Placeholder */}
               <div className="mt-6 h-[250px] bg-card border border-border/50 rounded-2xl flex items-center justify-center">
-                <span className="text-sm text-muted-foreground">Khu vực Quảng Cáo</span>
+                <span className="text-sm text-muted-foreground">Khu vuc Quang Cao</span>
               </div>
             </div>
           </aside>
