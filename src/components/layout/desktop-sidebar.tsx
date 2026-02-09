@@ -3,11 +3,11 @@
 import React from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   Home,
   Compass,
   BookOpenText,
-  BookOpen,
   Tags
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -48,8 +48,8 @@ export const DesktopSidebar = () => {
       {/* Logo */}
       <div className="p-6">
         <Link href="/" className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-foreground flex items-center justify-center">
-            <BookOpen size={20} className="text-background" />
+          <div className="relative w-9 h-9 rounded-lg overflow-hidden">
+            <Image src="/icons/icon-192x192.png" alt="TruyenCity" fill sizes="36px" className="object-cover" />
           </div>
           <span className="text-lg font-semibold">Truyện City</span>
         </Link>

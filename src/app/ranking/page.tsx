@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { Header } from '@/components/header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -48,12 +49,15 @@ const RankingCard = ({
       </div>
       
       <div className="w-16 h-20 rounded-md overflow-hidden flex-shrink-0">
-        <img 
-          src={novel.cover_url || '/placeholder.svg'}
-          alt={novel.title}
-          className="w-full h-full object-cover"
-          onError={(e) => { e.currentTarget.src = '/placeholder.svg'; }}
-        />
+        <div className="relative w-full h-full">
+          <Image
+            src={novel.cover_url || '/placeholder.svg'}
+            alt={novel.title}
+            fill
+            sizes="64px"
+            className="object-cover"
+          />
+        </div>
       </div>
       
       <div className="flex-1 min-w-0">

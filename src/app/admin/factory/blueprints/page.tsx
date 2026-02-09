@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import { AuthGuard } from '@/components/admin/auth-guard';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -307,11 +308,15 @@ function FactoryBlueprintsContent() {
                     <TableRow key={blueprint.id}>
                       <TableCell>
                         {blueprint.cover_url ? (
-                          <img
-                            src={blueprint.cover_url}
-                            alt={blueprint.title}
-                            className="w-12 h-16 object-cover rounded"
-                          />
+                          <div className="relative w-12 h-16">
+                            <Image
+                              src={blueprint.cover_url}
+                              alt={blueprint.title}
+                              fill
+                              sizes="48px"
+                              className="object-cover rounded"
+                            />
+                          </div>
                         ) : (
                           <div className="w-12 h-16 bg-muted rounded flex items-center justify-center">
                             <ImageIcon className="w-6 h-6 text-muted-foreground" />
@@ -457,11 +462,15 @@ function FactoryBlueprintsContent() {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-3">
                 {selectedBlueprint?.cover_url && (
-                  <img
-                    src={selectedBlueprint.cover_url}
-                    alt={selectedBlueprint.title}
-                    className="w-16 h-20 object-cover rounded"
-                  />
+                  <div className="relative w-16 h-20">
+                    <Image
+                      src={selectedBlueprint.cover_url}
+                      alt={selectedBlueprint.title}
+                      fill
+                      sizes="64px"
+                      className="object-cover rounded"
+                    />
+                  </div>
                 )}
                 <div>
                   <p>{selectedBlueprint?.title}</p>

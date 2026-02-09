@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import Image from 'next/image';
 import {
   Star,
   Eye,
@@ -42,6 +43,7 @@ export const NovelCard: React.FC<NovelCardProps> = ({
   rank
 }) => {
   const novelLink = slug ? `/truyen/${slug}` : `/novel/${id}`;
+  const coverSrc = cover || '/placeholder.svg';
 
   const formatViews = (v?: number) => {
     if (!v) return '0';
@@ -58,9 +60,17 @@ export const NovelCard: React.FC<NovelCardProps> = ({
       <Link href={novelLink} className="block">
         <div className="relative w-full h-[400px] rounded-2xl overflow-hidden group cursor-pointer shadow-xl shadow-black/20">
           <div
-            className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-            style={{ backgroundImage: `url(${cover || '/placeholder.svg'})` }}
-          />
+            className="absolute inset-0 transition-transform duration-700 group-hover:scale-110"
+          >
+            <Image
+              src={coverSrc}
+              alt={title}
+              fill
+              sizes="100vw"
+              priority
+              className="object-cover"
+            />
+          </div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />
           <div className="absolute inset-0 bg-gradient-to-r from-purple-900/30 to-transparent" />
 
@@ -116,9 +126,16 @@ export const NovelCard: React.FC<NovelCardProps> = ({
           {/* Cover */}
           <div className="relative w-24 h-32 rounded-xl overflow-hidden flex-shrink-0">
             <div
-              className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-300"
-              style={{ backgroundImage: `url(${cover || '/placeholder.svg'})` }}
-            />
+              className="absolute inset-0 group-hover:scale-105 transition-transform duration-300"
+            >
+              <Image
+                src={coverSrc}
+                alt={title}
+                fill
+                sizes="96px"
+                className="object-cover"
+              />
+            </div>
             {genre && (
               <div className="absolute top-2 left-2">
                 <span className={cn(
@@ -182,10 +199,15 @@ export const NovelCard: React.FC<NovelCardProps> = ({
           </span>
         )}
         <div className="w-12 h-16 rounded-lg overflow-hidden flex-shrink-0">
-          <div
-            className="w-full h-full bg-cover bg-center"
-            style={{ backgroundImage: `url(${cover || '/placeholder.svg'})` }}
-          />
+          <div className="relative w-full h-full">
+            <Image
+              src={coverSrc}
+              alt={title}
+              fill
+              sizes="48px"
+              className="object-cover"
+            />
+          </div>
         </div>
         <div className="flex-1 min-w-0">
           <h4 className="font-medium text-sm line-clamp-1">{title}</h4>
@@ -204,9 +226,16 @@ export const NovelCard: React.FC<NovelCardProps> = ({
     <Link href={novelLink} className="block group">
       <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer ring-1 ring-border/50 group-hover:ring-primary/40 transition-all duration-300 shadow-md shadow-black/10 group-hover:shadow-lg group-hover:shadow-primary/10">
         <div
-          className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-          style={{ backgroundImage: `url(${cover || '/placeholder.svg'})` }}
-        />
+          className="absolute inset-0 transition-transform duration-700 group-hover:scale-110"
+        >
+          <Image
+            src={coverSrc}
+            alt={title}
+            fill
+            sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 20vw"
+            className="object-cover"
+          />
+        </div>
 
         {/* Rating badge */}
         <div className="absolute top-2 left-2">

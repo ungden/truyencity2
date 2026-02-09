@@ -11,6 +11,15 @@ export const metadata: Metadata = {
   description: "Nền tảng viết truyện AI thông minh - Viết truyện tự động với 1 click",
   manifest: "/manifest.json",
   themeColor: "#7c3aed",
+  icons: {
+    icon: [
+      { url: "/icons/icon-192x192.png", type: "image/png", sizes: "192x192" },
+      { url: "/icons/icon-512x512.png", type: "image/png", sizes: "512x512" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+    shortcut: ["/favicon.ico"],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

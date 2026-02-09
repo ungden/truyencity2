@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import {
   Search,
   Menu,
   ArrowLeft,
-  Settings2,
-  BookOpen
+  Settings2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -75,8 +75,8 @@ export const Header: React.FC<HeaderProps> = ({
                 </Button>
               )}
               <div className="flex items-center gap-2 flex-1">
-                <div className="w-8 h-8 rounded-lg bg-foreground flex items-center justify-center">
-                  <BookOpen size={16} className="text-background" />
+                <div className="relative w-8 h-8 rounded-lg overflow-hidden">
+                  <Image src="/icons/icon-192x192.png" alt="TruyenCity" fill sizes="32px" className="object-cover" />
                 </div>
                 <h1 className="text-lg font-semibold">{title}</h1>
               </div>
@@ -181,8 +181,8 @@ export const Header: React.FC<HeaderProps> = ({
               </Button>
             )}
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-foreground flex items-center justify-center">
-                <BookOpen size={16} className="text-background" />
+              <div className="relative w-8 h-8 rounded-lg overflow-hidden">
+                <Image src="/icons/icon-192x192.png" alt="TruyenCity" fill sizes="32px" className="object-cover" />
               </div>
               <h1 className="text-lg font-semibold">{title}</h1>
             </div>
