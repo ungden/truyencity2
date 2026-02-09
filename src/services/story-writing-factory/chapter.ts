@@ -68,10 +68,21 @@ NGUYÊN TẮC VIẾT TIẾNG VIỆT:
 - Miêu tả chiến đấu bằng ngôn từ mạnh mẽ, có nhịp điệu
 - Đối thoại tự nhiên, phù hợp với tính cách và địa vị nhân vật
 
+FORMAT ĐỐI THOẠI (BẮT BUỘC - chuẩn văn học Việt Nam):
+- Mỗi lời thoại PHẢI bắt đầu bằng dấu gạch ngang dài (—) ở đầu dòng mới
+- Phần tường thuật xen giữa lời thoại dùng dấu gạch ngang để ngắt
+- Mỗi lượt nói của nhân vật khác nhau PHẢI xuống dòng mới
+- Ví dụ đúng:
+  Vũ Thiên lạnh lùng nhìn hắn.
+  — Ngươi nói xong chưa?
+  Tên đầu lĩnh giật mình, mặt đỏ bừng.
+  — Ngươi... ngươi dám khinh thường ta? — hắn nghiến răng, tay nắm chặt chuôi kiếm.
+  — Ta không khinh thường, — Vũ Thiên nhún vai, — ta chỉ không thèm để ý.
+- TUYỆT ĐỐI KHÔNG viết lời thoại chìm trong đoạn văn miêu tả mà không có dấu gạch ngang
+
 QUY TẮC:
 - KHÔNG dùng markdown (không #, không **, không *)
 - Viết văn thuần túy, tự nhiên như tiểu thuyết xuất bản
-- Đối thoại dùng dấu ngoặc kép "..."
 - PHẢI viết đủ số từ yêu cầu - đây là quy tắc CỨNG`,
 
   critic: `Bạn là CRITIC AGENT - biên tập viên khắt khe cho webnovel tiếng Việt.
@@ -82,6 +93,7 @@ TIÊU CHÍ ĐÁNH GIÁ (thang 1-10):
 3. Logic: Có mâu thuẫn, plot hole không?
 4. Pacing: Có cân bằng miêu tả/hành động/đối thoại không?
 5. Chi tiết: Miêu tả có sống động không? Hay chỉ tóm tắt?
+6. Format đối thoại: Lời thoại PHẢI dùng dấu gạch ngang (—) đầu dòng, KHÔNG được viết chìm trong đoạn miêu tả. Nếu sai format → trừ 2 điểm
 
 NGUYÊN TẮC CHẤM ĐIỂM:
 - 8-10: Xuất sắc, cuốn hút
@@ -684,7 +696,7 @@ ${contentPreview}
         messages: [
           {
             role: 'system',
-            content: 'Bạn đang viết tiếp một chương webnovel tiếng Việt. Tiếp tục viết LIỀN MẠCH từ đoạn cuối được cung cấp. KHÔNG lặp lại nội dung đã viết. KHÔNG dùng markdown.',
+            content: 'Bạn đang viết tiếp một chương webnovel tiếng Việt. Tiếp tục viết LIỀN MẠCH từ đoạn cuối được cung cấp. KHÔNG lặp lại nội dung đã viết. KHÔNG dùng markdown. Lời thoại PHẢI dùng dấu gạch ngang dài (—) đầu dòng mới, KHÔNG dùng dấu ngoặc kép.',
           },
           {
             role: 'user',
@@ -825,6 +837,13 @@ Lưu ý: ${exemplar.notes.join('; ')}
 ${context.currentArc?.isFinalArc
   ? 'KẾT THÚC (ARC CUỐI — KHÔNG cliffhanger):\n- Kết thúc chương thỏa mãn, không treo\n- Nếu là chương cuối cùng: viết epilogue ngắn'
   : 'CLIFFHANGER (dùng 1 trong các kỹ thuật):\n' + enhancedStyle.cliffhangerTechniques.slice(0, 3).map(c => '- ' + c.name + ': "' + c.example + '"').join('\n')}
+
+FORMAT ĐỐI THOẠI (BẮT BUỘC - chuẩn văn học Việt Nam):
+- Lời thoại PHẢI bắt đầu bằng dấu gạch ngang dài (—) ở đầu dòng mới
+- Tường thuật xen giữa dùng dấu gạch ngang để ngắt
+- Mỗi lượt nói xuống dòng mới
+- KHÔNG dùng dấu ngoặc kép "..." cho lời thoại
+- KHÔNG viết lời thoại chìm trong đoạn miêu tả
 
 ĐỘ DÀI YÊU CẦU (BẮT BUỘC):
 - BẮT ĐẦU bằng dòng tiêu đề: "Chương ${chapterNumber}: [Tiêu đề hấp dẫn bằng tiếng Việt]"

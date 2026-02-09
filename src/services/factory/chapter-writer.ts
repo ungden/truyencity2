@@ -491,6 +491,7 @@ Tension target: ${tension_target}/100
 4. Kết thúc với cliffhanger hoặc hook cho chương tiếp
 5. Show don't tell - miêu tả qua hành động, không info dump
 6. Nhất quán với tính cách nhân vật và world rules
+7. FORMAT ĐỐI THOẠI BẮT BUỘC: Lời thoại dùng dấu gạch ngang dài (—) đầu dòng mới. Tường thuật xen giữa dùng — để ngắt. KHÔNG dùng dấu ngoặc kép. KHÔNG viết lời thoại chìm trong đoạn miêu tả.
 
 ${special_instructions ? `=== CHỈ DẪN THÊM ===\n${special_instructions}` : ''}
 

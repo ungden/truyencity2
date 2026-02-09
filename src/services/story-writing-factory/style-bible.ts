@@ -298,11 +298,11 @@ export const QIDIAN_EXEMPLARS: StyleExemplar[] = [
     description: 'Cảnh chiến đấu tốc độ cao với nhân vật mạnh hơn',
     content: `Lâm Phong không kịp phản ứng, nắm đấm của đối phương đã ập đến.
 
-"Bang!"
+Bang!
 
 Hắn bay ngược ra sau, máu tuôn ra từ khóe miệng. Nhưng ánh mắt vẫn lạnh như băng.
 
-"Chỉ có thế thôi sao?"
+— Chỉ có thế thôi sao?
 
 Linh lực bùng nổ! Thân hình hắn biến mất tại chỗ, xuất hiện ngay sau lưng kẻ địch.
 
@@ -310,9 +310,7 @@ Một kiếm!
 
 Kiếm mang lóe lên, xé toạc không khí. Máu tươi phun ra.
 
-"Ngươi..."
-
-Kẻ địch không kịp nói hết câu, đã ngã xuống.`,
+— Ngươi... — kẻ địch không kịp nói hết câu, đã ngã xuống.`,
     notes: [
       'Câu ngắn, tiết tấu nhanh',
       'Nhiều dấu chấm than và onomatopoeia',
@@ -324,29 +322,29 @@ Kẻ địch không kịp nói hết câu, đã ngã xuống.`,
     id: 'humiliation_revenge_1',
     sceneType: 'dialogue',
     description: 'Cảnh bị sỉ nhục và thề báo thù - chuẩn Qidian',
-    content: `"Thằng phế vật, cũng dám đứng trước mặt ta?"
+    content: `Trương Hạo cười lạnh, ánh mắt đầy khinh bỉ nhìn xuống Lâm Phong.
 
-Trương Hạo cười lạnh, ánh mắt đầy khinh bỉ nhìn xuống Lâm Phong.
+— Thằng phế vật, cũng dám đứng trước mặt ta?
 
 Xung quanh, tiếng cười chế nhạo vang lên.
 
-"Luyện Khí tầng ba? Ha ha ha!"
-"Cũng dám đòi vào tông môn?"
-"Có lẽ hắn muốn quét dọn sân bãi?"
+— Luyện Khí tầng ba? Ha ha ha!
+— Cũng dám đòi vào tông môn?
+— Có lẽ hắn muốn quét dọn sân bãi?
 
 Lâm Phong im lặng. Nắm tay siết chặt, móng tay đâm sâu vào lòng bàn tay, máu từ từ chảy ra.
 
 Hắn ngẩng đầu lên, ánh mắt như đao.
 
-"Được. Ta nhớ ngươi rồi."
+— Được. Ta nhớ ngươi rồi.
 
 Giọng nói bình tĩnh đến lạ thường, nhưng ai cũng cảm nhận được cơn bão đang ẩn giấu trong đó.
 
-"Ba năm! Ba năm nữa, ta sẽ quay lại đây. Lúc đó..."
+— Ba năm! Ba năm nữa, ta sẽ quay lại đây. Lúc đó...
 
 Hắn quay người bước đi, để lại một câu vang vọng:
 
-"Ngươi sẽ quỳ dưới chân ta."`,
+— Ngươi sẽ quỳ dưới chân ta.`,
     notes: [
       'Cấu trúc: Sỉ nhục → Chịu đựng → Thề phục hận',
       'Villain tự cao tự đại, dùng từ khinh miệt',
@@ -364,7 +362,7 @@ Hắn quay người bước đi, để lại một câu vang vọng:
 
 Trong đan điền, luồng linh lực ngày càng lớn mạnh. Từng đường kinh mạch được khai thông, từng huyệt đạo được tẩy luyện.
 
-"Phụp!"
+Phụp!
 
 Một âm thanh vang lên trong cơ thể. Hắn cảm giác như có thứ gì đó vỡ ra.
 
@@ -376,7 +374,7 @@ Không! Không phải thiên kiếp. Đây là dấu hiệu của Trúc Cơ thà
 
 Linh lực trong cơ thể Lâm Phong bùng nổ. Cảnh giới từ Luyện Khí đỉnh phong, chính thức bước vào Trúc Cơ sơ kỳ!
 
-"Ha ha ha!"
+— Ha ha ha!
 
 Hắn ngửa mặt cười lớn. Bao nhiêu năm chịu đựng, bao nhiêu sỉ nhục, cuối cùng cũng đến lúc trả lại!`,
     notes: [
@@ -390,25 +388,25 @@ Hắn ngửa mặt cười lớn. Bao nhiêu năm chịu đựng, bao nhiêu s�
     id: 'revelation_secret_1',
     sceneType: 'revelation',
     description: 'Cảnh tiết lộ bí mật gây sốc',
-    content: `"Ngươi... ngươi nói gì?"
+    content: `— Ngươi... ngươi nói gì?
 
 Lâm Phong như bị sét đánh, đứng chết lặng tại chỗ.
 
 Lão nhân nhìn hắn, ánh mắt đầy phức tạp.
 
-"Ta nói, cha ngươi không phải người phàm. Hắn ta... là tiên nhân bị đày xuống trần!"
+— Ta nói, cha ngươi không phải người phàm. Hắn ta... là tiên nhân bị đày xuống trần!
 
-"Không thể nào!"
+— Không thể nào!
 
 Lâm Phong lắc đầu. Trong ký ức của hắn, cha chỉ là một tiều phu bình thường. Sao có thể là tiên nhân?
 
-"Nghĩ xem, tại sao linh căn của ngươi lại kỳ dị như vậy? Tại sao ngươi có thể tu luyện những thứ mà người khác không thể? Tất cả... đều là vì huyết mạch tiên nhân trong người ngươi!"
+— Nghĩ xem, tại sao linh căn của ngươi lại kỳ dị như vậy? Tại sao ngươi có thể tu luyện những thứ mà người khác không thể? Tất cả... đều là vì huyết mạch tiên nhân trong người ngươi!
 
 Mỗi lời của lão nhân như búa nện vào tim Lâm Phong.
 
 Hắn bỗng nhớ lại. Những lần cha nhìn bầu trời đêm với ánh mắt đầy hoài niệm. Những câu nói khó hiểu trước khi cha qua đời.
 
-"Cha... cha thật sự..."
+— Cha... cha thật sự...
 
 Lâm Phong ngồi xuống, đầu óc quay cuồng. Mọi thứ hắn biết đã bị đảo lộn hoàn toàn.`,
     notes: [
@@ -430,7 +428,7 @@ Trên trời, còn có Nguyên Anh cường giả đang khoanh tay đứng.
 
 Không còn đường lui.
 
-"Lâm Phong, ngươi đã giết Thiếu Tông Chủ. Tội này, không thể tha!"
+— Lâm Phong, ngươi đã giết Thiếu Tông Chủ. Tội này, không thể tha!
 
 Thanh kiếm trong tay hắn run lên. Không phải vì sợ, mà vì phấn khích.
 
@@ -438,17 +436,11 @@ Thanh kiếm trong tay hắn run lên. Không phải vì sợ, mà vì phấn kh
 
 Hắn mỉm cười, một nụ cười khiến tất cả đều rùng mình.
 
-"Các ngươi muốn mạng ta?"
+— Các ngươi muốn mạng ta?
 
 Linh lực bùng nổ, một luồng khí tức khủng khiếp từ trong người Lâm Phong tuôn ra.
 
-"Được! Nhưng trước tiên..."
-
-Hắn ngẩng đầu nhìn Nguyên Anh cường giả trên không, ánh mắt không chút sợ hãi.
-
-"... ngươi phải trả giá trước!"
-
-[Hết chương]`,
+— Được! Nhưng trước tiên... — hắn ngẩng đầu nhìn Nguyên Anh cường giả trên không, ánh mắt không chút sợ hãi — ... ngươi phải trả giá trước!`,
     notes: [
       'Setup tình thế tuyệt vọng',
       'MC vẫn giữ bình tĩnh, thậm chí tự tin',
@@ -460,31 +452,31 @@ Hắn ngẩng đầu nhìn Nguyên Anh cường giả trên không, ánh mắt k
     id: 'face_slapping_1',
     sceneType: 'dialogue',
     description: 'Cảnh "tát mặt" - đảo ngược tình thế',
-    content: `"Luyện Khí tầng ba dám thách đấu ta? Ngươi điên rồi!"
+    content: `Vương Thiên cười lớn, hoàn toàn không coi Lâm Phong ra gì.
 
-Vương Thiên cười lớn, hoàn toàn không coi Lâm Phong ra gì.
+— Luyện Khí tầng ba dám thách đấu ta? Ngươi điên rồi!
 
-"Ta cho ngươi một chiêu. Đứng vững được, ta thua!"
+Hắn khoanh tay, ánh mắt đầy khinh thường.
+
+— Ta cho ngươi một chiêu. Đứng vững được, ta thua!
 
 Nắm đấm của hắn vung ra, mang theo uy lực của Trúc Cơ trung kỳ.
 
 Mọi người đều nghĩ Lâm Phong sẽ bay ra. Nhưng...
 
-"Bang!"
+Bàng!
 
 Lâm Phong không nhúc nhích. Một tay hắn nhẹ nhàng đỡ lấy quyền phong.
 
-"Hết rồi sao?"
+— Hết rồi sao?
 
-"Ngươi...!"
+— Ngươi...! — Vương Thiên biến sắc. Làm sao có thể? Luyện Khí tầng ba đỡ được đòn của Trúc Cơ trung kỳ?
 
-Vương Thiên biến sắc. Làm sao có thể? Luyện Khí tầng ba đỡ được đòn của Trúc Cơ trung kỳ?
-
-"Đến lượt ta."
+— Đến lượt ta.
 
 Lâm Phong vung tay. Chỉ một chưởng!
 
-"Bàng!"
+Bàng!
 
 Vương Thiên bay ngược ra xa, máu phun thành vòi. Khi rơi xuống đất, đã bất tỉnh nhân sự.
 
@@ -494,7 +486,7 @@ Tất cả mọi người đều há hốc miệng nhìn cảnh tượng trướ
 
 Lâm Phong phủi tay, bình thản bước đi.
 
-"Chỉ có thế mà cũng đòi Trúc Cơ trung kỳ?"`,
+— Chỉ có thế mà cũng đòi Trúc Cơ trung kỳ?`,
     notes: [
       'Setup: Villain tự tin, xem thường MC',
       'Build-up: Villain tấn công trước',
@@ -506,7 +498,7 @@ Lâm Phong phủi tay, bình thản bước đi.
     id: 'inner_monologue_1',
     sceneType: 'tension',
     description: 'Inner monologue trong tình huống nguy hiểm',
-    content: `"Chết rồi!"
+    content: `Chết rồi!
 
 Lâm Phong thầm kinh hãi. Đối phương là Nguyên Anh cường giả, chỉ một ngón tay là có thể nghiền nát hắn.
 
@@ -528,9 +520,7 @@ Rủi ro cực lớn. Nhưng đây là cơ hội duy nhất.
 
 Lâm Phong hít một hơi thật sâu, rồi... nhảy xuống vực!
 
-"Muốn chết!"
-
-Nguyên Anh cường giả chỉ kịp thấy bóng dáng Lâm Phong biến mất trong màn sương.`,
+— Muốn chết! — Nguyên Anh cường giả chỉ kịp thấy bóng dáng Lâm Phong biến mất trong màn sương.`,
     notes: [
       'Suy nghĩ nhanh, liệt kê các options',
       'Tìm ra giải pháp bất ngờ',
@@ -570,7 +560,7 @@ export const CLIFFHANGER_TECHNIQUES = [
   {
     name: 'Lời thề/Tuyên bố',
     description: 'MC đưa ra tuyên bố mạnh mẽ',
-    example: '"Từ hôm nay, ai dám động vào gia tộc ta, ta sẽ tru diệt cửu tộc!"',
+    example: '— Từ hôm nay, ai dám động vào gia tộc ta, ta sẽ tru diệt cửu tộc!',
   },
 ];
 
@@ -630,6 +620,14 @@ export function buildStyleContext(genre: GenreType, sceneType: SceneType): strin
     lines.push('Notes:');
     lines.push(...exemplar.notes.map(n => `- ${n}`));
   }
+
+  // Dialogue format reminder (critical)
+  lines.push('');
+  lines.push('### FORMAT ĐỐI THOẠI (BẮT BUỘC):');
+  lines.push('- Lời thoại dùng dấu gạch ngang dài (—) ở đầu dòng mới');
+  lines.push('- Tường thuật xen giữa dùng — để ngắt: — Lời thoại, — hắn nói, — tiếp lời thoại.');
+  lines.push('- KHÔNG dùng dấu ngoặc kép "..." cho lời thoại');
+  lines.push('- KHÔNG viết lời thoại chìm trong đoạn miêu tả');
 
   // Add cliffhanger tip if near end
   lines.push('');

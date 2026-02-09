@@ -403,6 +403,7 @@ Tension: ${queueItem.tension_target}/100
 3. Dialogue 35-50%
 4. Kết thúc với hook/cliffhanger
 5. Viết bằng tiếng Việt
+6. FORMAT ĐỐI THOẠI BẮT BUỘC: Lời thoại dùng dấu gạch ngang dài (—) đầu dòng mới. Mỗi lượt nói xuống dòng. Tường thuật xen giữa dùng — để ngắt. KHÔNG dùng dấu ngoặc kép cho lời thoại.
 
 ${queueItem.special_instructions ? `=== CHỈ DẪN THÊM ===\n${queueItem.special_instructions}` : ''}
 
