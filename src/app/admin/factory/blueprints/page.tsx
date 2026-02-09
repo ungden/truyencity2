@@ -314,6 +314,7 @@ function FactoryBlueprintsContent() {
                               alt={blueprint.title}
                               fill
                               sizes="48px"
+                              quality={60}
                               className="object-cover rounded"
                             />
                           </div>
@@ -468,6 +469,7 @@ function FactoryBlueprintsContent() {
                       alt={selectedBlueprint.title}
                       fill
                       sizes="64px"
+                      quality={65}
                       className="object-cover rounded"
                     />
                   </div>

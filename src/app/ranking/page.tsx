@@ -55,6 +55,7 @@ const RankingCard = ({
             alt={novel.title}
             fill
             sizes="64px"
+            quality={65}
             className="object-cover"
           />
         </div>

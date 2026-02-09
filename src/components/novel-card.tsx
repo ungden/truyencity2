@@ -25,6 +25,7 @@ interface NovelCardProps {
   description?: string;
   variant?: 'default' | 'horizontal' | 'featured' | 'ranking';
   rank?: number;
+  imagePriority?: boolean;
 }
 
 export const NovelCard: React.FC<NovelCardProps> = ({
@@ -40,7 +41,8 @@ export const NovelCard: React.FC<NovelCardProps> = ({
   genre,
   description,
   variant = 'default',
-  rank
+  rank,
+  imagePriority = false
 }) => {
   const novelLink = slug ? `/truyen/${slug}` : `/novel/${id}`;
   const coverSrc = cover || '/placeholder.svg';
@@ -66,8 +68,9 @@ export const NovelCard: React.FC<NovelCardProps> = ({
               src={coverSrc}
               alt={title}
               fill
-              sizes="100vw"
-              priority
+              sizes="(max-width: 1024px) 100vw, (max-width: 1536px) calc(100vw - 24rem), 1100px"
+              priority={imagePriority}
+              quality={75}
               className="object-cover"
             />
           </div>
@@ -133,6 +136,7 @@ export const NovelCard: React.FC<NovelCardProps> = ({
                 alt={title}
                 fill
                 sizes="96px"
+                quality={70}
                 className="object-cover"
               />
             </div>
@@ -205,6 +209,7 @@ export const NovelCard: React.FC<NovelCardProps> = ({
               alt={title}
               fill
               sizes="48px"
+              quality={65}
               className="object-cover"
             />
           </div>
@@ -232,7 +237,8 @@ export const NovelCard: React.FC<NovelCardProps> = ({
             src={coverSrc}
             alt={title}
             fill
-            sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 20vw"
+            sizes="(max-width: 640px) 46vw, (max-width: 768px) 30vw, (max-width: 1024px) 22vw, (max-width: 1280px) 18vw, 16vw"
+            quality={70}
             className="object-cover"
           />
         </div>

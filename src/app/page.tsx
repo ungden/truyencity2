@@ -96,6 +96,7 @@ export default async function HomePage() {
                   description={featuredNovel.description || ''}
                   chapters={getChapterCount(featuredNovel)}
                   variant="featured"
+                  imagePriority
                 />
               </section>
             )}
