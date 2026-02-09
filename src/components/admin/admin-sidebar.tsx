@@ -17,7 +17,8 @@ import {
   ListTree,
   Upload,
   Factory,
-  Pen
+  Pen,
+  Activity,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -79,6 +80,11 @@ const menuItems = [
     icon: Wand2,
     badge: 'Hub',
     hasSubmenu: true,
+  },
+  {
+    title: 'Health Check',
+    href: '/admin/health',
+    icon: Activity,
   },
   {
     title: 'Thông báo',
