@@ -23,10 +23,10 @@ export default function GlobalError({
               500
             </div>
             <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#171717' }}>
-              Da xay ra loi
+              Đã xảy ra lỗi
             </h1>
             <p style={{ color: '#737373', marginBottom: '2rem' }}>
-              Co loi nghiem trong xay ra. Vui long thu tai lai trang.
+              Có lỗi nghiêm trọng xảy ra. Vui lòng thử tải lại trang.
             </p>
             <button
               onClick={reset}
@@ -41,7 +41,7 @@ export default function GlobalError({
                 fontWeight: '500',
               }}
             >
-              Thu lai
+              Thử lại
             </button>
           </div>
         </div>

@@ -119,11 +119,11 @@ function formatNumber(n: number): string {
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 60) return `${mins} phut truoc`;
+  if (mins < 60) return `${mins} phút trước`;
   const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs} gio truoc`;
+  if (hrs < 24) return `${hrs} giờ trước`;
   const days = Math.floor(hrs / 24);
-  return `${days} ngay truoc`;
+  return `${days} ngày trước`;
 }
 
 export default function HealthDashboard() {
@@ -187,12 +187,12 @@ export default function HealthDashboard() {
             System Health
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Kiem tra trang thai he thong hang ngay
+            Kiểm tra trạng thái hệ thống hàng ngày
           </p>
         </div>
         <Button onClick={runHealthCheck} disabled={loading} className="gap-2">
           <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-          {loading ? 'Dang kiem tra...' : 'Kiem tra ngay'}
+          {loading ? 'Đang kiểm tra...' : 'Kiểm tra ngay'}
         </Button>
       </div>
 
@@ -201,9 +201,9 @@ export default function HealthDashboard() {
         <Card className="border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-16">
             <Activity size={48} className="text-muted-foreground mb-4" />
-            <p className="text-lg font-medium mb-2">Chua co bao cao</p>
+            <p className="text-lg font-medium mb-2">Chưa có báo cáo</p>
             <p className="text-sm text-muted-foreground mb-4">
-              Nhan &ldquo;Kiem tra ngay&rdquo; de chay health check, hoac chon tu lich su ben duoi.
+              Nhấn &ldquo;Kiểm tra ngay&rdquo; để chạy health check, hoặc chọn từ lịch sử bên dưới.
             </p>
           </CardContent>
         </Card>
@@ -214,7 +214,7 @@ export default function HealthDashboard() {
         <Card>
           <CardContent className="flex items-center justify-center py-16">
             <RefreshCw size={32} className="animate-spin text-primary mr-3" />
-            <span className="text-lg">Dang scan he thong...</span>
+            <span className="text-lg">Đang scan hệ thống...</span>
           </CardContent>
         </Card>
       )}
@@ -261,7 +261,7 @@ export default function HealthDashboard() {
           {/* Individual Checks */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Chi tiet kiem tra</CardTitle>
+              <CardTitle className="text-lg">Chi tiết kiểm tra</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               {displayReport.checks.map((check, i) => {
@@ -289,13 +289,13 @@ export default function HealthDashboard() {
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <Clock size={18} />
-            Lich su kiem tra
+            Lịch sử kiểm tra
           </CardTitle>
         </CardHeader>
         <CardContent>
           {history.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-8">
-              Chua co lich su. Chay health check lan dau de bat dau.
+              Chưa có lịch sử. Chạy health check lần đầu để bắt đầu.
             </p>
           ) : (
             <div className="space-y-2">
