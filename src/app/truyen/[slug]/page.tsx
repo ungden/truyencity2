@@ -81,11 +81,11 @@ export async function generateMetadata({
     .single();
 
   if (!novel) {
-    return { title: 'Truyen khong ton tai - Truyen City' };
+    return { title: 'Truyện không tồn tại - Truyện City' };
   }
 
-  const title = `${novel.title} - ${novel.author || 'Truyen City'}`;
-  const description = cleanNovelDescription(novel.description).slice(0, 160) || `Doc ${novel.title} mien phi tai Truyen City`;
+  const title = `${novel.title} - ${novel.author || 'Truyện City'}`;
+  const description = cleanNovelDescription(novel.description).slice(0, 160) || `Đọc ${novel.title} miễn phí tại Truyện City`;
 
   return {
     title,
@@ -179,7 +179,7 @@ export default async function NovelDetailPage({
       <ContentCard>
         <h3 className="font-semibold mb-4 flex items-center gap-2">
           <Star size={16} className="text-yellow-500" />
-          Danh gia
+          Đánh giá
         </h3>
         <div className="text-center space-y-3">
           <div className="text-4xl font-bold text-yellow-500">
@@ -187,7 +187,7 @@ export default async function NovelDetailPage({
           </div>
           <StarDisplay rating={ratingAvg} size="lg" showCount={false} />
           <p className="text-sm text-muted-foreground">
-            {ratingCount > 0 ? `${ratingCount.toLocaleString('vi-VN')} luot danh gia` : 'Chua co danh gia'}
+            {ratingCount > 0 ? `${ratingCount.toLocaleString('vi-VN')} lượt đánh giá` : 'Chưa có đánh giá'}
           </p>
           <NovelRatingSection novelId={novel.id} />
         </div>
@@ -195,33 +195,33 @@ export default async function NovelDetailPage({
 
       {/* Stats Card */}
       <ContentCard>
-        <h3 className="font-semibold mb-4">Thong ke</h3>
+        <h3 className="font-semibold mb-4">Thống kê</h3>
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-muted-foreground">
               <BookOpen size={14} />
-              <span>Chuong</span>
+              <span>Chương</span>
             </div>
             <span className="font-bold text-blue-500">{chapterCount}</span>
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-muted-foreground">
               <Eye size={14} />
-              <span>Luot doc</span>
+              <span>Lượt đọc</span>
             </div>
             <span className="font-bold text-purple-500">{formatNumber(totalViews)}</span>
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-muted-foreground">
               <Bookmark size={14} />
-              <span>Yeu thich</span>
+              <span>Yêu thích</span>
             </div>
             <span className="font-bold text-red-500">{formatNumber(totalBookmarks)}</span>
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-muted-foreground">
               <Star size={14} />
-              <span>Danh gia</span>
+              <span>Đánh giá</span>
             </div>
             <span className="font-bold text-yellow-500">{ratingAvg > 0 ? ratingAvg.toFixed(1) : '--'}</span>
           </div>
@@ -230,12 +230,12 @@ export default async function NovelDetailPage({
 
       {/* Info Card */}
       <ContentCard>
-        <h3 className="font-semibold mb-4">Thong tin</h3>
+        <h3 className="font-semibold mb-4">Thông tin</h3>
         <div className="space-y-3 text-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-muted-foreground">
               <User size={14} />
-              <span>Tac gia</span>
+              <span>Tác giả</span>
             </div>
             {novel.author ? (
               <Link
@@ -245,23 +245,23 @@ export default async function NovelDetailPage({
                 {novel.author}
               </Link>
             ) : (
-              <span className="text-muted-foreground">Chua ro</span>
+              <span className="text-muted-foreground">Chưa rõ</span>
             )}
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-muted-foreground">
               <Calendar size={14} />
-              <span>Cap nhat</span>
+              <span>Cập nhật</span>
             </div>
             <span className="font-medium">{new Date(novel.updated_at || novel.created_at).toLocaleDateString('vi-VN')}</span>
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-muted-foreground">
               <Clock size={14} />
-              <span>Trang thai</span>
+              <span>Trạng thái</span>
             </div>
-            <Badge variant={novel.status === 'Hoan thanh' ? 'default' : 'secondary'}>
-              {novel.status || 'Dang ra'}
+            <Badge variant={novel.status === 'Hoàn thành' ? 'default' : 'secondary'}>
+              {novel.status || 'Đang ra'}
             </Badge>
           </div>
         </div>
@@ -270,7 +270,7 @@ export default async function NovelDetailPage({
       {/* Topic Info */}
       {topic && (
         <ContentCard>
-          <h3 className="font-semibold mb-3">Chu de</h3>
+          <h3 className="font-semibold mb-3">Chủ đề</h3>
           <div className="flex items-start gap-3">
             <div className="p-2 bg-primary/10 rounded-lg flex-shrink-0">
               <Tag size={16} className="text-primary" />
@@ -328,7 +328,7 @@ export default async function NovelDetailPage({
                                 {novel.author}
                               </Link>
                             ) : (
-                              <span>Chua ro</span>
+                              <span>Chưa rõ</span>
                             )}
                           </div>
                         </div>
@@ -345,14 +345,14 @@ export default async function NovelDetailPage({
                         </div>
                         <div className="flex items-center gap-1.5 text-muted-foreground">
                           <BookOpen size={14} />
-                          <span>{chapterCount} chuong</span>
+                          <span>{chapterCount} chương</span>
                         </div>
                         <div className="flex items-center gap-1.5 text-muted-foreground">
                           <Bookmark size={14} />
                           <span>{formatNumber(totalBookmarks)}</span>
                         </div>
-                        <Badge variant={novel.status === 'Hoan thanh' ? 'default' : 'secondary'} className="text-xs">
-                          {novel.status || 'Dang ra'}
+                        <Badge variant={novel.status === 'Hoàn thành' ? 'default' : 'secondary'} className="text-xs">
+                          {novel.status || 'Đang ra'}
                         </Badge>
                       </div>
 
@@ -381,13 +381,13 @@ export default async function NovelDetailPage({
                         <Button asChild size="lg" className="rounded-xl shadow-md">
                           <Link href={`/truyen/${novelSlug}/read/1`}>
                             <BookOpen size={18} className="mr-2" />
-                            Doc tu dau
+                            Đọc từ đầu
                           </Link>
                         </Button>
                         {chapterCount > 1 && (
                           <Button asChild variant="outline" size="lg" className="rounded-xl">
                             <Link href={`/truyen/${novelSlug}/read/${chapterCount}`}>
-                              Chuong moi nhat
+                              Chương mới nhất
                             </Link>
                           </Button>
                         )}
@@ -401,21 +401,21 @@ export default async function NovelDetailPage({
               </Card>
 
               {/* Description */}
-              <Section title="Mo ta">
+              <Section title="Mô tả">
                 <ContentCard>
                   <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-                    {cleanNovelDescription(novel.description) || 'Chua co mo ta.'}
+                    {cleanNovelDescription(novel.description) || 'Chưa có mô tả.'}
                   </p>
                 </ContentCard>
               </Section>
 
               {/* Chapter List */}
               <Section
-                title="Danh sach chuong"
-                subtitle={`${chapterCount} chuong`}
+                title="Danh sách chương"
+                subtitle={`${chapterCount} chương`}
                 action={
                   <Button variant="ghost" size="sm" className="text-primary">
-                    Xem tat ca
+                    Xem tất cả
                     <ChevronRight size={16} className="ml-1" />
                   </Button>
                 }
@@ -425,20 +425,20 @@ export default async function NovelDetailPage({
 
               {/* Related Novels */}
               {Array.isArray(novel.genres) && novel.genres.length > 0 && (
-                <Section title="Co the ban cung thich">
+                <Section title="Có thể bạn cũng thích">
                   <RelatedNovels novelId={novel.id} genres={novel.genres} limit={6} />
                 </Section>
               )}
 
               {/* Author's Other Works */}
               {novel.author && (
-                <Section title={`Tac pham cung tac gia`}>
+                <Section title={`Tác phẩm cùng tác giả`}>
                   <AuthorWorks novelId={novel.id} authorName={novel.author} limit={6} />
                 </Section>
               )}
 
               {/* Comments */}
-              <Section title="Binh luan">
+              <Section title="Bình luận">
                 <Comments novelId={novel.id} />
               </Section>
             </div>
@@ -471,7 +471,7 @@ export default async function NovelDetailPage({
                       {novel.author}
                     </Link>
                   ) : (
-                    <span>Chua ro</span>
+                    <span>Chưa rõ</span>
                   )}
                 </div>
 
@@ -487,8 +487,8 @@ export default async function NovelDetailPage({
                       </Badge>
                     </Link>
                   )}
-                  <Badge variant={novel.status === 'Hoan thanh' ? 'default' : 'secondary'} className="text-xs">
-                    {novel.status || 'Dang ra'}
+                  <Badge variant={novel.status === 'Hoàn thành' ? 'default' : 'secondary'} className="text-xs">
+                    {novel.status || 'Đang ra'}
                   </Badge>
                 </div>
               </div>
@@ -502,37 +502,37 @@ export default async function NovelDetailPage({
             <Card className="p-3 text-center bg-gradient-to-br from-blue-500/10 to-blue-600/10 border-blue-500/20 rounded-xl">
               <BookOpen size={16} className="mx-auto mb-1 text-blue-500" />
               <div className="text-lg font-bold text-blue-500">{chapterCount}</div>
-              <div className="text-[10px] text-muted-foreground">Chuong</div>
+              <div className="text-[10px] text-muted-foreground">Chương</div>
             </Card>
             <Card className="p-3 text-center bg-gradient-to-br from-purple-500/10 to-purple-600/10 border-purple-500/20 rounded-xl">
               <Eye size={16} className="mx-auto mb-1 text-purple-500" />
               <div className="text-lg font-bold text-purple-500">{formatNumber(totalViews)}</div>
-              <div className="text-[10px] text-muted-foreground">Luot doc</div>
+              <div className="text-[10px] text-muted-foreground">Lượt đọc</div>
             </Card>
             <Card className="p-3 text-center bg-gradient-to-br from-red-500/10 to-red-600/10 border-red-500/20 rounded-xl">
               <Bookmark size={16} className="mx-auto mb-1 text-red-500" />
               <div className="text-lg font-bold text-red-500">{formatNumber(totalBookmarks)}</div>
-              <div className="text-[10px] text-muted-foreground">Yeu thich</div>
+              <div className="text-[10px] text-muted-foreground">Yêu thích</div>
             </Card>
             <Card className="p-3 text-center bg-gradient-to-br from-yellow-500/10 to-yellow-600/10 border-yellow-500/20 rounded-xl">
               <Star size={16} className="mx-auto mb-1 text-yellow-500" />
               <div className="text-lg font-bold text-yellow-500">{ratingAvg > 0 ? ratingAvg.toFixed(1) : '--'}</div>
-              <div className="text-[10px] text-muted-foreground">Danh gia</div>
+              <div className="text-[10px] text-muted-foreground">Đánh giá</div>
             </Card>
           </div>
 
           {/* Rate this novel */}
           <Card className="p-4 border-0 bg-card rounded-xl">
-            <h3 className="text-sm font-semibold mb-2">Danh gia truyen nay</h3>
+            <h3 className="text-sm font-semibold mb-2">Đánh giá truyện này</h3>
             <NovelRatingSection novelId={novel.id} />
           </Card>
 
           {/* Description */}
           <div>
-            <h3 className="text-lg font-semibold mb-3">Mo ta</h3>
+            <h3 className="text-lg font-semibold mb-3">Mô tả</h3>
             <Card className="p-4 bg-gradient-to-br from-card to-card/50 border-0 rounded-xl">
               <p className="text-muted-foreground leading-relaxed text-sm whitespace-pre-line">
-                {cleanNovelDescription(novel.description) || 'Chua co mo ta.'}
+                {cleanNovelDescription(novel.description) || 'Chưa có mô tả.'}
               </p>
             </Card>
           </div>
@@ -543,7 +543,7 @@ export default async function NovelDetailPage({
           {/* Related Novels */}
           {Array.isArray(novel.genres) && novel.genres.length > 0 && (
             <div>
-              <h3 className="text-lg font-semibold mb-3">Co the ban cung thich</h3>
+              <h3 className="text-lg font-semibold mb-3">Có thể bạn cũng thích</h3>
               <RelatedNovels novelId={novel.id} genres={novel.genres} limit={6} />
             </div>
           )}
@@ -551,7 +551,7 @@ export default async function NovelDetailPage({
           {/* Author Works */}
           {novel.author && (
             <div>
-              <h3 className="text-lg font-semibold mb-3">Tac pham cung tac gia</h3>
+              <h3 className="text-lg font-semibold mb-3">Tác phẩm cùng tác giả</h3>
               <AuthorWorks novelId={novel.id} authorName={novel.author} limit={6} />
             </div>
           )}
@@ -561,22 +561,22 @@ export default async function NovelDetailPage({
 
           {/* Info */}
           <div>
-            <h3 className="text-lg font-semibold mb-3">Thong tin</h3>
+            <h3 className="text-lg font-semibold mb-3">Thông tin</h3>
             <Card className="p-4 space-y-3 bg-gradient-to-br from-card to-card/50 border-0 rounded-xl">
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Calendar size={14} />
-                  <span>Cap nhat cuoi</span>
+                  <span>Cập nhật cuối</span>
                 </div>
                 <span className="font-medium">{new Date(novel.updated_at || novel.created_at).toLocaleDateString('vi-VN')}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Clock size={14} />
-                  <span>Trang thai</span>
+                  <span>Trạng thái</span>
                 </div>
-                <Badge variant={novel.status === 'Hoan thanh' ? 'default' : 'secondary'} className="text-xs">
-                  {novel.status || 'Dang ra'}
+                <Badge variant={novel.status === 'Hoàn thành' ? 'default' : 'secondary'} className="text-xs">
+                  {novel.status || 'Đang ra'}
                 </Badge>
               </div>
             </Card>

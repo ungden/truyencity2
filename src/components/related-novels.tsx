@@ -83,7 +83,7 @@ export function RelatedNovels({ novelId, genres, limit = 6, className }: Related
             title={novel.title}
             author={novel.author || 'N/A'}
             cover={novel.cover_url || ''}
-            status={novel.status || 'Dang ra'}
+            status={novel.status || 'Đang ra'}
             genre={novel.genres?.[0]}
           />
         ))}

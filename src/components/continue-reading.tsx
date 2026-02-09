@@ -58,7 +58,7 @@ export function ContinueReading() {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <BookOpen size={20} className="text-primary" />
-          <h2 className="text-lg font-semibold">Tiep tuc doc</h2>
+          <h2 className="text-lg font-semibold">Tiếp tục đọc</h2>
         </div>
       </div>
 
@@ -94,10 +94,10 @@ export function ContinueReading() {
                       {novel.title}
                     </h4>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      Chuong {item.chapter_number}
+                      Chương {item.chapter_number}
                     </p>
                     <div className="flex items-center gap-1 mt-1.5 text-xs text-primary font-medium">
-                      Doc tiep
+                      Đọc tiếp
                       <ChevronRight size={12} />
                     </div>
                   </div>

@@ -63,24 +63,24 @@ const NovelCardSkeleton = ({ variant = 'default' }: { variant?: 'default' | 'hor
 };
 
 const statusOptions = [
-  { id: 'dang-ra', label: 'Dang ra', value: 'Dang ra' },
-  { id: 'hoan-thanh', label: 'Hoan thanh', value: 'Hoan thanh' },
-  { id: 'tam-dung', label: 'Tam dung', value: 'Tam dung' },
+  { id: 'dang-ra', label: 'Đang ra', value: 'Đang ra' },
+  { id: 'hoan-thanh', label: 'Hoàn thành', value: 'Hoàn thành' },
+  { id: 'tam-dung', label: 'Tạm dừng', value: 'Tạm dừng' },
   { id: 'drop', label: 'Drop', value: 'Drop' }
 ];
 
 const chapterRangeOptions = [
-  { id: 'all', label: 'Tat ca', min: 0, max: Infinity },
-  { id: '0-50', label: '0-50 chuong', min: 0, max: 50 },
-  { id: '50-200', label: '50-200 chuong', min: 50, max: 200 },
-  { id: '200-500', label: '200-500 chuong', min: 200, max: 500 },
-  { id: '500+', label: '500+ chuong', min: 500, max: Infinity },
+  { id: 'all', label: 'Tất cả', min: 0, max: Infinity },
+  { id: '0-50', label: '0-50 chương', min: 0, max: 50 },
+  { id: '50-200', label: '50-200 chương', min: 50, max: 200 },
+  { id: '200-500', label: '200-500 chương', min: 200, max: 500 },
+  { id: '500+', label: '500+ chương', min: 500, max: Infinity },
 ];
 
 const sortOptions = [
-  { value: 'updated', label: 'Moi cap nhat' },
-  { value: 'chapters_desc', label: 'Nhieu chuong nhat' },
-  { value: 'title', label: 'Ten A-Z' },
+  { value: 'updated', label: 'Mới cập nhật' },
+  { value: 'chapters_desc', label: 'Nhiều chương nhất' },
+  { value: 'title', label: 'Tên A-Z' },
 ];
 
 const PAGE_SIZE = 30;
@@ -208,18 +208,18 @@ export default function BrowsePage() {
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold flex items-center gap-2">
             <SlidersHorizontal size={16} />
-            Bo loc
+            Bộ lọc
           </h3>
           {hasFilters && (
             <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs h-7">
-              Xoa tat ca
+              Xóa tất cả
             </Button>
           )}
         </div>
 
         {/* Status Filter */}
         <div className="mb-6">
-          <h4 className="text-sm font-medium mb-3 text-muted-foreground">Trang thai</h4>
+          <h4 className="text-sm font-medium mb-3 text-muted-foreground">Trạng thái</h4>
           <div className="space-y-2">
             {statusOptions.map((status) => (
               <div key={status.id} className="flex items-center space-x-2">
@@ -241,7 +241,7 @@ export default function BrowsePage() {
 
         {/* Chapter Range Filter */}
         <div className="mb-6">
-          <h4 className="text-sm font-medium mb-3 text-muted-foreground">So chuong</h4>
+          <h4 className="text-sm font-medium mb-3 text-muted-foreground">Số chương</h4>
           <div className="space-y-2">
             {chapterRangeOptions.map((range) => (
               <div key={range.id} className="flex items-center space-x-2">
@@ -263,7 +263,7 @@ export default function BrowsePage() {
 
         {/* Genre Filter */}
         <div>
-          <h4 className="text-sm font-medium mb-3 text-muted-foreground">The loai</h4>
+          <h4 className="text-sm font-medium mb-3 text-muted-foreground">Thể loại</h4>
           <div className="space-y-2 max-h-[400px] overflow-y-auto scrollbar-custom pr-2">
             {Object.entries(GENRE_CONFIG).map(([id, genre]) => (
               <div key={id} className="flex items-center space-x-2">
@@ -337,7 +337,7 @@ export default function BrowsePage() {
       {/* Toolbar */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          {loading ? 'Dang tai...' : `Hien thi ${filtered.length} truyen`}
+          {loading ? 'Đang tải...' : `Hiển thị ${filtered.length} truyện`}
         </p>
 
         <div className="flex items-center gap-3">
@@ -404,7 +404,7 @@ export default function BrowsePage() {
               title={novel.title}
               author={novel.author || 'N/A'}
               cover={novel.cover_url || ''}
-              status={novel.status || 'Dang ra'}
+              status={novel.status || 'Đang ra'}
               genre={novel.genres?.[0]}
               chapters={getChapterCount(novel)}
               variant={viewMode === 'list' ? 'horizontal' : 'default'}
@@ -416,13 +416,13 @@ export default function BrowsePage() {
           <div className="w-16 h-16 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
             <Filter size={24} className="text-muted-foreground" />
           </div>
-          <p className="text-lg font-medium">Khong tim thay truyen nao</p>
-          <p className="text-sm text-muted-foreground mt-1">
-            Thu thay doi bo loc de xem them ket qua
-          </p>
-          {hasFilters && (
-            <Button variant="outline" onClick={clearFilters} className="mt-4">
-              Xoa bo loc
+           <p className="text-lg font-medium">Không tìm thấy truyện nào</p>
+           <p className="text-sm text-muted-foreground mt-1">
+             Thử thay đổi bộ lọc để xem thêm kết quả
+           </p>
+           {hasFilters && (
+             <Button variant="outline" onClick={clearFilters} className="mt-4">
+               Xóa bộ lọc
             </Button>
           )}
         </div>
@@ -432,7 +432,7 @@ export default function BrowsePage() {
       {!loading && hasMore && filtered.length > 0 && (
         <div className="text-center mt-6">
           <Button variant="outline" onClick={loadMore} disabled={loadingMore} className="px-8">
-            {loadingMore ? 'Dang tai...' : 'Xem them'}
+            {loadingMore ? 'Đang tải...' : 'Xem thêm'}
           </Button>
         </div>
       )}
@@ -443,15 +443,15 @@ export default function BrowsePage() {
     <div className="min-h-screen bg-background">
       {/* Mobile Header */}
       <div className="lg:hidden">
-        <Header title="Duyet Truyen" showBack={true} />
+        <Header title="Duyệt Truyện" showBack={true} />
       </div>
 
       <AppContainer className="py-6 lg:py-8">
         {/* Desktop: Two Column with Sidebar */}
         <div className="hidden lg:block">
           <div className="mb-6">
-            <h1 className="text-2xl font-bold">Duyet Truyen</h1>
-            <p className="text-muted-foreground">Kham pha kho truyen phong phu</p>
+            <h1 className="text-2xl font-bold">Duyệt Truyện</h1>
+            <p className="text-muted-foreground">Khám phá kho truyện phong phú</p>
           </div>
           <TwoColumnLayout
             sidebar={FilterSidebar}
@@ -512,7 +512,7 @@ export default function BrowsePage() {
 
           {/* Results count */}
           <p className="text-sm text-muted-foreground">
-            {loading ? 'Dang tai...' : `Hien thi ${filtered.length} truyen`}
+            {loading ? 'Đang tải...' : `Hiển thị ${filtered.length} truyện`}
           </p>
 
           {/* Novel Grid/List */}
@@ -540,7 +540,7 @@ export default function BrowsePage() {
                   title={novel.title}
                   author={novel.author || 'N/A'}
                   cover={novel.cover_url || ''}
-                  status={novel.status || 'Dang ra'}
+                  status={novel.status || 'Đang ra'}
                   genre={novel.genres?.[0]}
                   chapters={getChapterCount(novel)}
                   variant={viewMode === 'list' ? 'horizontal' : 'default'}
@@ -549,9 +549,9 @@ export default function BrowsePage() {
             </div>
           ) : (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">Khong tim thay truyen nao</p>
+              <p className="text-muted-foreground">Không tìm thấy truyện nào</p>
               <p className="text-sm text-muted-foreground mt-1">
-                Thu thay doi bo loc de xem them ket qua
+                Thử thay đổi bộ lọc để xem thêm kết quả
               </p>
             </div>
           ))}
@@ -560,7 +560,7 @@ export default function BrowsePage() {
           {!loading && hasMore && filtered.length > 0 && (
             <div className="text-center mt-4">
               <Button variant="outline" onClick={loadMore} disabled={loadingMore} className="px-8">
-                {loadingMore ? 'Dang tai...' : 'Xem them'}
+                {loadingMore ? 'Đang tải...' : 'Xem thêm'}
               </Button>
             </div>
           )}

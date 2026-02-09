@@ -30,12 +30,12 @@ const STORAGE_KEY = 'truyencity_recent_searches';
 const MAX_RECENT = 8;
 
 const trendingSearches = [
-  { term: 'Tien Hiep' },
-  { term: 'Huyen Huyen' },
-  { term: 'Do Thi' },
-  { term: 'Khoa Huyen' },
-  { term: 'Ngon Tinh' },
-  { term: 'Lich Su' },
+  { term: 'Tiên Hiệp' },
+  { term: 'Huyền Huyễn' },
+  { term: 'Đô Thị' },
+  { term: 'Khoa Huyễn' },
+  { term: 'Ngôn Tình' },
+  { term: 'Lịch Sử' },
 ];
 
 type SearchRow = {
@@ -171,14 +171,14 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md mx-auto h-[85vh] p-0 bg-background border border-border rounded-2xl overflow-hidden">
         <DialogHeader className="p-5 pb-0">
-          <DialogTitle className="sr-only">Tim kiem truyen</DialogTitle>
+          <DialogTitle className="sr-only">Tìm kiếm truyện</DialogTitle>
 
           <div className="relative">
             <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
               <Search size={18} />
             </div>
             <Input
-              placeholder="Tim truyen, tac gia..."
+              placeholder="Tìm truyện, tác giả..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="pl-10 pr-10 bg-muted border-0 rounded-xl h-11 text-sm"
@@ -203,9 +203,9 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="rounded-lg">
-                  <SelectItem value="relevance">Lien quan</SelectItem>
-                  <SelectItem value="chapters">Nhieu chuong</SelectItem>
-                  <SelectItem value="updated">Cap nhat</SelectItem>
+                  <SelectItem value="relevance">Liên quan</SelectItem>
+                  <SelectItem value="chapters">Nhiều chương</SelectItem>
+                  <SelectItem value="updated">Cập nhật</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -215,14 +215,14 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="rounded-lg">
-                  <SelectItem value="all">Tat ca</SelectItem>
-                  <SelectItem value="tien-hiep">Tien Hiep</SelectItem>
-                  <SelectItem value="huyen-huyen">Huyen Huyen</SelectItem>
-                  <SelectItem value="do-thi">Do Thi</SelectItem>
-                  <SelectItem value="khoa-huyen">Khoa Huyen</SelectItem>
-                  <SelectItem value="lich-su">Lich Su</SelectItem>
-                  <SelectItem value="dong-nhan">Dong Nhan</SelectItem>
-                  <SelectItem value="vong-du">Vong Du</SelectItem>
+                  <SelectItem value="all">Tất cả</SelectItem>
+                  <SelectItem value="tien-hiep">Tiên Hiệp</SelectItem>
+                  <SelectItem value="huyen-huyen">Huyền Huyễn</SelectItem>
+                  <SelectItem value="do-thi">Đô Thị</SelectItem>
+                  <SelectItem value="khoa-huyen">Khoa Huyễn</SelectItem>
+                  <SelectItem value="lich-su">Lịch Sử</SelectItem>
+                  <SelectItem value="dong-nhan">Đồng Nhân</SelectItem>
+                  <SelectItem value="vong-du">Võng Du</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -238,7 +238,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <Clock size={16} className="text-muted-foreground" />
-                      <h3 className="font-medium text-sm text-muted-foreground">Tim kiem gan day</h3>
+                      <h3 className="font-medium text-sm text-muted-foreground">Tìm kiếm gần đây</h3>
                     </div>
                     <Button
                       variant="ghost"
@@ -247,7 +247,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                       onClick={handleClearRecent}
                     >
                       <Trash2 size={12} className="mr-1" />
-                      Xoa
+                      Xóa
                     </Button>
                   </div>
                   <div className="flex flex-wrap gap-2">
@@ -269,7 +269,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <TrendingUp size={16} className="text-muted-foreground" />
-                  <h3 className="font-medium text-sm text-muted-foreground">The loai pho bien</h3>
+                  <h3 className="font-medium text-sm text-muted-foreground">Thể loại phổ biến</h3>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   {trendingSearches.map((item) => (
@@ -291,12 +291,12 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                   <div className="w-12 h-12 bg-muted rounded-xl flex items-center justify-center mx-auto mb-4 animate-pulse">
                     <Search size={24} className="text-muted-foreground" />
                   </div>
-                  <p className="text-muted-foreground text-sm">Dang tim kiem...</p>
+                   <p className="text-muted-foreground text-sm">Đang tìm kiếm...</p>
                 </div>
               ) : results.length > 0 ? (
                 <div className="space-y-3">
                   <p className="text-xs text-muted-foreground mb-4">
-                    Tim thay {results.length} ket qua cho &quot;{query}&quot;
+                    Tìm thấy {results.length} kết quả cho &quot;{query}&quot;
                   </p>
                   {results.map((novel) => (
                     <div key={novel.id} onClick={onClose}>
@@ -306,7 +306,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                         title={novel.title}
                         author={novel.author || 'N/A'}
                         cover={novel.cover_url || ''}
-                        status={novel.status || 'Dang ra'}
+                        status={novel.status || 'Đang ra'}
                         genre={novel.genres?.[0]}
                         chapters={novel.chapters?.[0]?.count || 0}
                         variant="horizontal"
@@ -319,9 +319,9 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                   <div className="w-12 h-12 bg-muted rounded-xl flex items-center justify-center mx-auto mb-4">
                     <Search size={24} className="text-muted-foreground" />
                   </div>
-                  <p className="text-muted-foreground text-sm">Khong tim thay ket qua</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Thu tim kiem voi tu khoa khac
+                   <p className="text-muted-foreground text-sm">Không tìm thấy kết quả</p>
+                   <p className="text-xs text-muted-foreground mt-1">
+                     Thử tìm kiếm với từ khóa khác
                   </p>
                 </div>
               )}

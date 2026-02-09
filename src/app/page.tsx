@@ -102,7 +102,7 @@ export default async function HomePage() {
                   title={featuredNovel.title}
                   author={featuredNovel.author || 'N/A'}
                   cover={featuredNovel.cover_url || ''}
-                  status={featuredNovel.status || 'Dang ra'}
+                  status={featuredNovel.status || 'Đang ra'}
                   description={featuredNovel.description || ''}
                   chapters={getChapterCount(featuredNovel)}
                   variant="featured"
@@ -116,13 +116,13 @@ export default async function HomePage() {
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <Sparkles size={20} className="text-primary" />
-                  <h2 className="text-lg font-semibold">Thinh hanh tuan nay</h2>
+                  <h2 className="text-lg font-semibold">Thịnh hành tuần này</h2>
                 </div>
                 <Link
                   href="/ranking"
                   className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1"
                 >
-                  Xem tat ca
+                  Xem tất cả
                   <ChevronRight size={16} />
                 </Link>
               </div>
@@ -137,7 +137,7 @@ export default async function HomePage() {
                         title={novel.title}
                         author={novel.author || 'N/A'}
                         cover={novel.cover_url || ''}
-                        status={novel.status || 'Dang ra'}
+                        status={novel.status || 'Đang ra'}
                         genre={novel.genres?.[0]}
                         chapters={getChapterCount(novel)}
                       />
@@ -152,7 +152,7 @@ export default async function HomePage() {
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <Clock size={20} className="text-primary" />
-                  <h2 className="text-lg font-semibold">Moi cap nhat</h2>
+                  <h2 className="text-lg font-semibold">Mới cập nhật</h2>
                 </div>
               </div>
               <LatestUpdatesCarousel novels={latestNovels} />
@@ -164,13 +164,13 @@ export default async function HomePage() {
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <span className="text-xl">&#x2694;&#xFE0F;</span>
-                    <h2 className="text-lg font-semibold">Tien Hiep Moi</h2>
+                    <h2 className="text-lg font-semibold">Tiên Hiệp Mới</h2>
                   </div>
                   <Link
                     href="/browse?genre=tien-hiep"
                     className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1"
                   >
-                    Xem tat ca
+                    Xem tất cả
                     <ChevronRight size={16} />
                   </Link>
                 </div>
@@ -183,7 +183,7 @@ export default async function HomePage() {
                         title={novel.title}
                         author={novel.author || 'N/A'}
                         cover={novel.cover_url || ''}
-                        status={novel.status || 'Dang ra'}
+                        status={novel.status || 'Đang ra'}
                         genre={novel.genres?.[0]}
                         chapters={getChapterCount(novel)}
                       />
@@ -199,13 +199,13 @@ export default async function HomePage() {
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <Flame size={20} className="text-orange-500" />
-                    <h2 className="text-lg font-semibold">Do Thi Hot</h2>
+                    <h2 className="text-lg font-semibold">Đô Thị Hot</h2>
                   </div>
                   <Link
                     href="/browse?genre=do-thi"
                     className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1"
                   >
-                    Xem tat ca
+                    Xem tất cả
                     <ChevronRight size={16} />
                   </Link>
                 </div>
@@ -218,7 +218,7 @@ export default async function HomePage() {
                         title={novel.title}
                         author={novel.author || 'N/A'}
                         cover={novel.cover_url || ''}
-                        status={novel.status || 'Dang ra'}
+                        status={novel.status || 'Đang ra'}
                         genre={novel.genres?.[0]}
                         chapters={getChapterCount(novel)}
                       />
@@ -234,7 +234,7 @@ export default async function HomePage() {
             <div className="sticky top-24">
               <div className="flex items-center gap-2 mb-4">
                 <TrendingUp size={20} className="text-primary" />
-                <h2 className="text-lg font-semibold">Bang Xep Hang</h2>
+                <h2 className="text-lg font-semibold">Bảng Xếp Hạng</h2>
               </div>
 
               <div className="space-y-2">
@@ -246,7 +246,7 @@ export default async function HomePage() {
                     title={novel.title}
                     author={novel.author || 'N/A'}
                     cover={novel.cover_url || ''}
-                    status={novel.status || 'Dang ra'}
+                    status={novel.status || 'Đang ra'}
                     genre={novel.genres?.[0]}
                     variant="ranking"
                     rank={index + 1}
@@ -259,12 +259,12 @@ export default async function HomePage() {
                 className="w-full mt-4 rounded-xl"
                 asChild
               >
-                <Link href="/ranking">Xem day du</Link>
+                <Link href="/ranking">Xem đầy đủ</Link>
               </Button>
 
               {/* Ad Placeholder */}
               <div className="mt-6 h-[250px] bg-card border border-border/50 rounded-2xl flex items-center justify-center">
-                <span className="text-sm text-muted-foreground">Khu vuc Quang Cao</span>
+                <span className="text-sm text-muted-foreground">Khu vực Quảng Cáo</span>
               </div>
             </div>
           </aside>

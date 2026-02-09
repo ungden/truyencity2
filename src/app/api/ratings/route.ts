@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
-    return NextResponse.json({ error: 'Vui long dang nhap' }, { status: 401 });
+    return NextResponse.json({ error: 'Vui lòng đăng nhập' }, { status: 401 });
   }
 
   const body = await request.json();
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
 
   if (error) {
     console.error('Rating upsert error:', error);
-    return NextResponse.json({ error: 'Khong the danh gia' }, { status: 500 });
+    return NextResponse.json({ error: 'Không thể đánh giá' }, { status: 500 });
   }
 
   // Return updated aggregates

@@ -65,7 +65,7 @@ export function LatestUpdatesCarousel({ novels }: LatestUpdatesCarouselProps) {
             title={novel.title}
             author={novel.author || 'N/A'}
             cover={novel.cover_url || ''}
-            status={novel.status || 'Dang ra'}
+            status={novel.status || 'Đang ra'}
             genre={novel.genres?.[0]}
             description={novel.description || ''}
             chapters={getChapterCount(novel)}

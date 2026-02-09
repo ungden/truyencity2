@@ -76,7 +76,7 @@ export function AuthorWorks({ novelId, authorName, limit = 6, className }: Autho
             title={novel.title}
             author={novel.author || 'N/A'}
             cover={novel.cover_url || ''}
-            status={novel.status || 'Dang ra'}
+            status={novel.status || 'Đang ra'}
             genre={novel.genres?.[0]}
           />
         ))}

@@ -44,9 +44,9 @@ export function NovelRatingSection({ novelId }: NovelRatingSectionProps) {
         size="lg"
       />
       {userScore ? (
-        <p className="text-xs text-muted-foreground">Ban da danh gia {userScore}/5</p>
+        <p className="text-xs text-muted-foreground">Bạn đã đánh giá {userScore}/5</p>
       ) : (
-        <p className="text-xs text-muted-foreground">Nhan sao de danh gia</p>
+        <p className="text-xs text-muted-foreground">Nhấn sao để đánh giá</p>
       )}
     </div>
   );

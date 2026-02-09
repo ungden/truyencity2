@@ -88,7 +88,7 @@ const RankingCard = ({
       </div>
 
       <Badge variant="outline" className="text-xs flex-shrink-0 hidden sm:flex">
-        {novel.status || 'Dang ra'}
+        {novel.status || 'Đang ra'}
       </Badge>
     </div>
   );
@@ -100,22 +100,22 @@ function timeAgo(dateStr: string | null): string {
   const now = Date.now();
   const diff = now - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 60) return `${mins} phut truoc`;
+  if (mins < 60) return `${mins} phút trước`;
   const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours} gio truoc`;
+  if (hours < 24) return `${hours} giờ trước`;
   const days = Math.floor(hours / 24);
-  if (days < 7) return `${days} ngay truoc`;
-  return `${Math.floor(days / 7)} tuan truoc`;
+  if (days < 7) return `${days} ngày trước`;
+  return `${Math.floor(days / 7)} tuần trước`;
 }
 
 type TabKey = 'hot' | 'rating' | 'updated' | 'chapters' | 'bookmarks';
 
 const TAB_CONFIG: { key: TabKey; label: string; icon: React.ReactNode; title: string }[] = [
-  { key: 'hot', label: 'Hot', icon: <TrendingUp size={14} />, title: 'Top luot doc 7 ngay' },
-  { key: 'rating', label: 'Danh gia', icon: <Star size={14} />, title: 'Danh gia cao nhat' },
-  { key: 'updated', label: 'Moi cap nhat', icon: <Clock size={14} />, title: 'Moi cap nhat' },
-  { key: 'chapters', label: 'Nhieu chuong', icon: <BookOpen size={14} />, title: 'Nhieu chuong nhat' },
-  { key: 'bookmarks', label: 'Yeu thich', icon: <Heart size={14} />, title: 'Yeu thich nhat' },
+  { key: 'hot', label: 'Hot', icon: <TrendingUp size={14} />, title: 'Top lượt đọc 7 ngày' },
+  { key: 'rating', label: 'Đánh giá', icon: <Star size={14} />, title: 'Đánh giá cao nhất' },
+  { key: 'updated', label: 'Mới cập nhật', icon: <Clock size={14} />, title: 'Mới cập nhật' },
+  { key: 'chapters', label: 'Nhiều chương', icon: <BookOpen size={14} />, title: 'Nhiều chương nhất' },
+  { key: 'bookmarks', label: 'Yêu thích', icon: <Heart size={14} />, title: 'Yêu thích nhất' },
 ];
 
 export default function RankingPage() {
@@ -246,12 +246,12 @@ export default function RankingPage() {
       case 'hot':
         return novel.viewCount ? (
           <span className="text-xs text-muted-foreground flex items-center gap-1">
-            <Eye size={10} /> {novel.viewCount.toLocaleString('vi-VN')} luot doc
+            <Eye size={10} /> {novel.viewCount.toLocaleString('vi-VN')} lượt đọc
           </span>
         ) : (
           <Badge variant="secondary" className="text-xs">
             <BookOpen size={10} className="mr-1" />
-            {novel.chapterCount} chuong
+            {novel.chapterCount} chương
           </Badge>
         );
       case 'rating':
@@ -260,31 +260,31 @@ export default function RankingPage() {
         ) : (
           <Badge variant="secondary" className="text-xs">
             <BookOpen size={10} className="mr-1" />
-            {novel.chapterCount} chuong
+            {novel.chapterCount} chương
           </Badge>
         );
       case 'updated':
         return (
           <span className="text-xs text-muted-foreground">
-            {timeAgo(novel.updated_at)} · {novel.chapterCount} chuong
+            {timeAgo(novel.updated_at)} · {novel.chapterCount} chương
           </span>
         );
       case 'chapters':
         return (
           <Badge variant="secondary" className="text-xs">
             <BookOpen size={10} className="mr-1" />
-            {novel.chapterCount} chuong
+            {novel.chapterCount} chương
           </Badge>
         );
       case 'bookmarks':
         return novel.bookmarkCount ? (
           <span className="text-xs text-muted-foreground flex items-center gap-1">
-            <Heart size={10} /> {novel.bookmarkCount.toLocaleString('vi-VN')} yeu thich
+            <Heart size={10} /> {novel.bookmarkCount.toLocaleString('vi-VN')} yêu thích
           </span>
         ) : (
           <Badge variant="secondary" className="text-xs">
             <BookOpen size={10} className="mr-1" />
-            {novel.chapterCount} chuong
+            {novel.chapterCount} chương
           </Badge>
         );
     }
@@ -292,7 +292,7 @@ export default function RankingPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header title="Xep Hang" showSearch={false} />
+      <Header title="Xếp Hạng" showSearch={false} />
 
       <AppContainer className="py-6">
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabKey)} className="w-full">
@@ -326,7 +326,7 @@ export default function RankingPage() {
             </div>
           ) : rankedNovels.length === 0 ? (
             <div className="text-center py-16 text-muted-foreground">
-              <p>Chua co du lieu xep hang</p>
+              <p>Chưa có dữ liệu xếp hạng</p>
             </div>
           ) : (
             <div className="space-y-3">
