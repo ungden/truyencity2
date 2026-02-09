@@ -48,9 +48,10 @@ Industrial-scale Vietnamese webnovel platform. AI generates 200+ novels with 100
 
 | Cron | Interval | File | What it does |
 |------|----------|------|-------------|
-| `write-chapters` | Every 5 min | `src/app/api/cron/write-chapters/route.ts` | 30 resume + 1 init in parallel |
+| `write-chapters` | Every 5 min | `src/app/api/cron/write-chapters/route.ts` | 30 resume + 5 init in parallel |
 | `generate-covers` | Every 10 min | `src/app/api/cron/generate-covers/route.ts` | 20 covers, 4 parallel |
 | `daily-rotate` | Once/day 0h UTC | `src/app/api/cron/daily-rotate/route.ts` | Backfill + expand 20/day |
+| `health-check` | Once/day 6h UTC | `src/app/api/cron/health-check/route.ts` | 8 system checks, save to DB |
 
 **Auth:** All crons use `Authorization: Bearer ${CRON_SECRET}`
 **Config:** `vercel.json` + `supabase/migrations/0025_setup_pg_cron.sql`
@@ -100,7 +101,7 @@ Throughput: 30 projects × 288 ticks/day = **8,640 chapter slots/day**
 ## Key Files
 
 ### Cron Endpoints
-- `src/app/api/cron/write-chapters/route.ts` — RESUME_BATCH=30, INIT_BATCH=1
+- `src/app/api/cron/write-chapters/route.ts` — RESUME_BATCH=30, INIT_BATCH=5
 - `src/app/api/cron/generate-covers/route.ts` — BATCH=20, PARALLEL=4
 - `src/app/api/cron/daily-rotate/route.ts` — EXPANSION=20, TARGET_ACTIVE=5
 
@@ -127,7 +128,7 @@ Throughput: 30 projects × 288 ticks/day = **8,640 chapter slots/day**
 - `src/lib/utils.ts` — `cleanNovelDescription()` strips metadata from descriptions
 
 ### Config
-- `vercel.json` — 3 cron entries
+- `vercel.json` — 4 cron entries (write-chapters, generate-covers, daily-rotate, health-check)
 - `.env.local` — 5 env vars (gitignored)
 - `supabase/migrations/0025_setup_pg_cron.sql` — pg_cron setup
 
@@ -182,6 +183,21 @@ Old seeded novels may have metadata blocks (NHÂN VẬT CHÍNH, THẾ GIỚI, MO
 - **MUST include:** title text + "Truyencity.com" branding at bottom
 - Cron injects branding if saved `cover_prompt` is missing it
 - Upload to Supabase Storage `covers` bucket
+
+---
+
+## Vietnamese Language Rules (QUAN TRỌNG)
+
+**Tất cả text tiếng Việt hiển thị cho người dùng PHẢI có dấu đầy đủ.**
+
+- "Kiểm tra" chứ KHÔNG phải "Kiem tra"
+- "Đang tải..." chứ KHÔNG phải "Dang tai..."
+- "Chưa có dữ liệu" chứ KHÔNG phải "Chua co du lieu"
+- "Thử lại" chứ KHÔNG phải "Thu lai"
+
+**Áp dụng cho:** UI labels, button text, titles, descriptions, placeholders, error messages, toast messages, admin panel text, page headers, empty states, loading states.
+
+**KHÔNG áp dụng cho:** code comments, variable names, console.log, CSS class names, URL slugs (slugs dùng không dấu là đúng).
 
 ---
 
