@@ -22,6 +22,7 @@ import {
 } from './types';
 import { GENRE_STYLES } from './templates';
 import { dialogueAnalyzer, getQuickDialogueScore } from './dialogue-analyzer';
+import { titleChecker, TitleCheckResult } from './title-checker';
 
 // ============================================================================
 // QUALITY THRESHOLDS
@@ -178,7 +179,8 @@ export class QualityGate {
     chapterNumber: number,
     genre: GenreType,
     storyId: string,
-    styleBible?: StyleBible
+    styleBible?: StyleBible,
+    titleContext?: { title: string; previousTitles?: string[] }
   ): QualityReport {
     const issues: QualityIssue[] = [];
     const composition = this.analyzer.analyzeComposition(content);
@@ -269,6 +271,35 @@ export class QualityGate {
         suggestion: 'Dùng từ đồng nghĩa',
       });
       writingQuality -= repetition > 0.5 ? 1.5 : 0.5;
+    }
+
+    // Check title quality
+    if (titleContext?.title) {
+      const titleResult = titleChecker.checkTitle(
+        titleContext.title,
+        titleContext.previousTitles || []
+      );
+      if (!titleResult.isValid) {
+        issues.push({
+          type: 'repetitive',
+          severity: 'moderate',
+          description: `Tên chương kém: ${titleResult.issues.map(i => i.description).join('; ')}`,
+          suggestion: titleResult.suggestions.length > 0
+            ? titleResult.suggestions[0]
+            : 'Đổi tên chương theo TITLE_TEMPLATES',
+        });
+        engagement -= 1;
+      } else if (titleResult.score < 7) {
+        issues.push({
+          type: 'repetitive',
+          severity: 'minor',
+          description: `Tên chương có thể cải thiện (${titleResult.score}/10)`,
+          suggestion: titleResult.suggestions.length > 0
+            ? titleResult.suggestions[0]
+            : 'Thử mẫu tên khác cho đa dạng',
+        });
+        engagement -= 0.5;
+      }
     }
 
     // Calculate overall

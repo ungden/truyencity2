@@ -564,6 +564,123 @@ export const CLIFFHANGER_TECHNIQUES = [
   },
 ];
 
+// ============================================================================
+// EMOTIONAL VARIETY RULES - Đảm bảo đa dạng cảm xúc
+// ============================================================================
+
+export const EMOTIONAL_VARIETY_RULES = {
+  // Minimum distinct emotions per 5 chapters
+  minDistinctEmotionsPerGroup: 3,
+
+  // Emotion categories
+  categories: {
+    positive: ['phấn khích', 'hả hê', 'cảm động', 'ấm áp', 'tự hào', 'hoan hỉ', 'mãn nguyện'],
+    negative: ['phẫn nộ', 'đau lòng', 'sợ hãi', 'bất lực', 'thất vọng', 'tuyệt vọng', 'bi thương'],
+    tense: ['hồi hộp', 'lo lắng', 'nghi ngờ', 'căng thẳng', 'bất an', 'hoang mang', 'dè chừng'],
+    curious: ['tò mò', 'kinh ngạc', 'sốc', 'ngỡ ngàng', 'khó tin', 'bất ngờ', 'ngạc nhiên'],
+    triumphant: ['sảng khoái', 'ngạo nghễ', 'bá khí', 'uy phong', 'chiến thắng', 'vinh quang'],
+  },
+
+  // Mỗi 5 chương phải cover ít nhất 3 categories
+  minCategoriesPerGroup: 3,
+
+  // Anti-pattern: không cho cùng emotion chủ đạo 3 chương liền
+  maxSameEmotionConsecutive: 2,
+
+  // Recommended emotional arc patterns per chapter type
+  arcPatterns: {
+    action: {
+      opening: ['tense', 'curious'],
+      midpoint: ['negative', 'tense'],
+      climax: ['triumphant', 'positive'],
+      closing: ['curious', 'tense'],
+    },
+    revelation: {
+      opening: ['curious', 'tense'],
+      midpoint: ['curious', 'negative'],
+      climax: ['curious', 'positive'],
+      closing: ['tense', 'curious'],
+    },
+    cultivation: {
+      opening: ['tense', 'negative'],
+      midpoint: ['tense', 'positive'],
+      climax: ['triumphant', 'positive'],
+      closing: ['positive', 'curious'],
+    },
+    romance: {
+      opening: ['curious', 'positive'],
+      midpoint: ['positive', 'tense'],
+      climax: ['positive', 'negative'],
+      closing: ['curious', 'tense'],
+    },
+    face_slap: {
+      opening: ['negative', 'tense'],
+      midpoint: ['negative', 'tense'],
+      climax: ['triumphant', 'positive'],
+      closing: ['triumphant', 'curious'],
+    },
+  },
+};
+
+/**
+ * Analyze emotional variety across a list of emotional arcs
+ * Returns issues if variety is too low
+ */
+export function checkEmotionalVariety(
+  emotionalArcs: Array<{ opening: string; midpoint: string; climax: string; closing: string }>
+): { score: number; issues: string[] } {
+  const issues: string[] = [];
+  let score = 10;
+
+  if (emotionalArcs.length < 3) {
+    return { score: 10, issues: [] }; // Not enough data
+  }
+
+  // Collect all dominant emotions
+  const allEmotions = emotionalArcs.flatMap(arc => [arc.opening, arc.midpoint, arc.climax, arc.closing]);
+
+  // Check variety in groups of 5
+  for (let i = 0; i + 4 < emotionalArcs.length; i += 5) {
+    const group = emotionalArcs.slice(i, i + 5);
+    const groupEmotions = group.flatMap(arc => [arc.opening, arc.midpoint, arc.climax, arc.closing]);
+
+    // Determine which categories are represented
+    const categoriesHit = new Set<string>();
+    for (const emotion of groupEmotions) {
+      for (const [category, keywords] of Object.entries(EMOTIONAL_VARIETY_RULES.categories)) {
+        if (keywords.some(kw => emotion.toLowerCase().includes(kw))) {
+          categoriesHit.add(category);
+        }
+      }
+    }
+
+    if (categoriesHit.size < EMOTIONAL_VARIETY_RULES.minCategoriesPerGroup) {
+      issues.push(
+        `Chương ${i + 1}-${i + 5}: chỉ có ${categoriesHit.size} loại cảm xúc (cần ít nhất ${EMOTIONAL_VARIETY_RULES.minCategoriesPerGroup})`
+      );
+      score -= 1.5;
+    }
+  }
+
+  // Check consecutive same-emotion climax
+  for (let i = 1; i < emotionalArcs.length; i++) {
+    if (i >= 2) {
+      const prev2 = emotionalArcs[i - 2].climax.toLowerCase();
+      const prev1 = emotionalArcs[i - 1].climax.toLowerCase();
+      const curr = emotionalArcs[i].climax.toLowerCase();
+
+      if (prev2 === prev1 && prev1 === curr) {
+        issues.push(
+          `Chương ${i - 1}-${i + 1}: 3 chương liên tiếp có cùng cao trào "${curr}" → nhàm chán`
+        );
+        score -= 2;
+      }
+    }
+  }
+
+  return { score: Math.max(0, Math.min(10, score)), issues };
+}
+
 // Get style bible for genre
 export function getEnhancedStyleBible(genre: GenreType): {
   vocabulary: VocabularyGuide;

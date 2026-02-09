@@ -32,7 +32,7 @@ import {
   DEFAULT_CONFIG,
   GenreType,
 } from './types';
-import { GOLDEN_CHAPTER_REQUIREMENTS } from './templates';
+import { GOLDEN_CHAPTER_REQUIREMENTS, buildTitleRulesPrompt, ENGAGEMENT_CHECKLIST } from './templates';
 import { buildStyleContext, getEnhancedStyleBible, CLIFFHANGER_TECHNIQUES, SceneType } from './style-bible';
 
 // ============================================================================
@@ -166,6 +166,7 @@ export class ChapterWriter {
       currentArc: StoryArc;
       previousSummary: string;
       recentChapters?: string;
+      previousTitles?: string[];
     }
   ): Promise<ChapterResult> {
     const startTime = Date.now();
@@ -178,7 +179,8 @@ export class ChapterWriter {
         const architectResult = await this.runArchitect(
           chapterNumber,
           context,
-          additionalInstructions
+          additionalInstructions,
+          context.previousTitles
         );
 
         if (!architectResult.success || !architectResult.data) {
@@ -260,6 +262,7 @@ export class ChapterWriter {
       styleBible: StyleBible;
       previousSummary: string;
       currentArc?: StoryArc;
+      previousTitles?: string[];
     }
   ): Promise<ChapterResult> {
     const startTime = Date.now();
@@ -341,7 +344,8 @@ export class ChapterWriter {
       currentArc: StoryArc;
       previousSummary: string;
     },
-    additionalInstructions: string
+    additionalInstructions: string,
+    previousTitles?: string[]
   ): Promise<{ success: boolean; data?: ArchitectOutput; error?: string }> {
     const isGolden = chapterNumber <= 3;
     const goldenReqs = isGolden
@@ -388,11 +392,16 @@ YÊU CẦU QUAN TRỌNG:
 - Tổng targetWordCount: ${this.config.targetWordCount} từ
 - Mỗi scene phải có conflict/tension riêng
 
+${buildTitleRulesPrompt(previousTitles)}
+
+ENGAGEMENT (mỗi chương phải có):
+${ENGAGEMENT_CHECKLIST.perChapter.map(e => '- ' + e).join('\n')}
+
 Trả về JSON (KHÔNG có comment):
 {
   "chapterOutline": {
     "chapterNumber": ${chapterNumber},
-    "title": "Tiêu đề hấp dẫn bằng tiếng Việt",
+    "title": "Tiêu đề theo QUY TẮC ĐẶT TÊN ở trên - NGẮN, GỢI TÒ MÒ, KHÔNG lặp",
     "summary": "Tóm tắt 2-3 câu",
     "pov": "${context.worldBible.protagonist.name}",
     "location": "Địa điểm",
@@ -787,7 +796,7 @@ Viết tiếp ngay:`,
 
   private buildSimplePrompt(
     chapterNumber: number,
-    context: { worldBible: WorldBible; styleBible: StyleBible; previousSummary: string; currentArc?: StoryArc }
+    context: { worldBible: WorldBible; styleBible: StyleBible; previousSummary: string; currentArc?: StoryArc; previousTitles?: string[] }
   ): string {
     const genreType = this.config.genre || 'tien-hiep';
     const enhancedStyle = getEnhancedStyleBible(genreType);
@@ -846,8 +855,10 @@ FORMAT ĐỐI THOẠI (BẮT BUỘC - chuẩn văn học Việt Nam):
 - KHÔNG viết lời thoại chìm trong đoạn miêu tả
 
 ĐỘ DÀI YÊU CẦU (BẮT BUỘC):
-- BẮT ĐẦU bằng dòng tiêu đề: "Chương ${chapterNumber}: [Tiêu đề hấp dẫn bằng tiếng Việt]"
-  (VD: "Chương ${chapterNumber}: Huyết Chiến Vạn Thú Sơn", KHÔNG được viết chỉ "Chương ${chapterNumber}" mà thiếu tiêu đề)
+- BẮT ĐẦU bằng dòng tiêu đề: "Chương ${chapterNumber}: [Tiêu đề theo quy tắc]"
+
+${buildTitleRulesPrompt(context.previousTitles)}
+
 - Viết TỐI THIỂU ${this.config.targetWordCount} từ
 - Viết chi tiết, không tóm tắt
 - KHÔNG markdown, viết văn thuần túy

@@ -132,6 +132,12 @@ export const GENRE_STYLES: Record<GenreType, StyleBible> = {
       'Thân phận bí ẩn của MC được hint dần dần: manh mối nhỏ → tiết lộ sốc → thân phận chấn động thiên hạ',
       'Kết chương bằng cliffhanger: kẻ thù mới xuất hiện, bí mật lộ ra, nguy hiểm ập đến bất ngờ',
       'Thế giới mở rộng theo cảnh giới MC: thôn → thành → quốc → đại lục → tinh giới → thần giới',
+      // Bổ sung: yếu tố còn thiếu
+      'Phế vật → thiên tài setup phải dài tối thiểu 3 chương: bị khinh → tích lũy → bùng nổ, KHÔNG đột ngột',
+      'Foreshadowing: mỗi arc plant ít nhất 2 seed cho arc tiếp theo (manh mối nhỏ về kẻ thù/bí mật lớn hơn)',
+      'Side character phải có diễn biến riêng: huynh đệ có thể phản bội, sư muội có thể hy sinh, không chỉ phục vụ MC',
+      'Đấu giá scene: miêu tả chi tiết giá cả, phản ứng đám đông, MC flex tiền/quyền lực khiến mọi người sốc',
+      'Ngược → Sảng ratio: mỗi 5 chương có 1-2 chương MC gặp khó khăn thực sự trước khi chiến thắng ngoạn mục',
     ],
   },
   'huyen-huyen': {
@@ -165,6 +171,10 @@ export const GENRE_STYLES: Record<GenreType, StyleBible> = {
       'Mỗi 10 chương giới thiệu 1 loại tài nguyên/bảo vật mới kích thích ham muốn sưu tập của người đọc',
       'Prophecy/lời tiên tri bí ẩn liên quan MC được hint từ đầu, giải mã dần qua các arc',
       'Kết chương bằng phát hiện sốc: kẻ thù thật sự, bí mật thân phận, nguy cơ mới lớn hơn',
+      // Bổ sung
+      'Rival phát triển song song MC: có đối thủ cùng thế hệ cũng mạnh lên, không chỉ villain tĩnh',
+      'Foreshadowing network: plant seeds sớm (chương 5), harvest muộn (chương 30+), tạo "aha moment"',
+      'Side character arc: ít nhất 1 nhân vật phụ có diễn biến riêng (phản bội, hy sinh, trưởng thành)',
     ],
   },
   'do-thi': {
@@ -198,6 +208,11 @@ export const GENRE_STYLES: Record<GenreType, StyleBible> = {
       'Tiệc tùng/sự kiện xã hội là sân khấu để MC tỏa sáng, khiến kẻ khinh thường câm lặng',
       'Bí mật thân phận MC hé lộ từng phần: manh mối → nghi ngờ → xác nhận → chấn động',
       'Đời sống xa hoa miêu tả chi tiết: siêu xe, biệt thự, nhà hàng 5 sao, du thuyền, tạo cảm giác sảng',
+      // Bổ sung
+      'Status flex mỗi 10 chương: scene MC thể hiện tài sản/quyền lực trước mặt kẻ khinh thường, miêu tả chi tiết',
+      'Nhạc phụ/nhạc mẫu arc: từ khinh thường → nghi ngờ → kinh ngạc → nể phục → tự hào, kéo dài 10-15 chương',
+      'Foreshadowing cho thân phận: mỗi 5 chương drop 1 hint nhỏ (vết sẹo, kỹ năng lạ, quen biết bí ẩn)',
+      'Ngược → Sảng: mỗi tiệc/sự kiện MC bị khinh trước → flex sau, KHÔNG cho MC flex ngay từ đầu',
     ],
   },
   'kiem-hiep': {
@@ -402,6 +417,10 @@ export const GENRE_STYLES: Record<GenreType, StyleBible> = {
       'Bí mật thân phận: nữ chính/nam chính có quá khứ bí ẩn ảnh hưởng đến mối quan hệ hiện tại',
       'Cảnh sủng (pampering): nam chính bảo hộ/chiều chuộng nữ chính trước mặt mọi người, tạo cảm giác sảng',
       'Kết chương bằng hiểu lầm mới, xuất hiện tình địch, hoặc tin sốc về quá khứ ảnh hưởng tình yêu',
+      // Bổ sung
+      'Nữ chính phải có depth: có sự nghiệp riêng, quyết định riêng, không chỉ xoay quanh nam chính',
+      'Side character có arc riêng: bạn thân có tình yêu riêng, nữ phụ có kết cục rõ ràng (không bỏ lửng)',
+      'Emotional variety: không chỉ ngọt ngào, cần xen kẽ căng thẳng, đau lòng, hài hước, rung động',
     ],
   },
 };
@@ -508,6 +527,236 @@ export const GOLDEN_CHAPTER_REQUIREMENTS = {
     avoid: ['Giải quyết quá dễ', 'Không stakes'],
   },
 };
+
+// ============================================================================
+// CHAPTER TITLE RULES - Quy tắc đặt tên chương hấp dẫn
+// ============================================================================
+
+export interface TitleTemplate {
+  id: string;
+  name: string;
+  pattern: string;
+  examples: string[];
+  description: string;
+}
+
+export const TITLE_TEMPLATES: TitleTemplate[] = [
+  {
+    id: 'action_location',
+    name: 'Hành Động + Địa Điểm',
+    pattern: '[Hành động] [Tại/Ở] [Địa điểm]',
+    examples: ['Huyết Chiến Vạn Thú Sơn', 'Đại Náo Vạn Bảo Lâu', 'Quyết Đấu Trên Sinh Tử Đài'],
+    description: 'Gợi cảnh chiến đấu, thích hợp cho chương action',
+  },
+  {
+    id: 'declaration',
+    name: 'Tuyên Bố/Lời Nói',
+    pattern: '"[Câu nói ấn tượng]"',
+    examples: ['Ta Chính Là Luật Lệ', 'Ngươi Không Xứng', 'Từ Hôm Nay, Không Ai Được Động Vào Nàng'],
+    description: 'Dùng lời thoại mạnh mẽ làm title, gợi tò mò ai nói',
+  },
+  {
+    id: 'mystery_question',
+    name: 'Câu Hỏi Bí Ẩn',
+    pattern: '[Ai/Gì/Tại Sao] [Bí ẩn]?',
+    examples: ['Ai Là Kẻ Phản Bội?', 'Bí Mật Của Huyết Ngọc', 'Thân Phận Thực Sự Của Lão Nhân'],
+    description: 'Kích thích tò mò, thích hợp cho chương tiết lộ/twist',
+  },
+  {
+    id: 'foreshadowing',
+    name: 'Gợi Ý/Ám Thị',
+    pattern: '[Hình ảnh ám chỉ sự kiện sắp tới]',
+    examples: ['Bóng Tối Sau Cổng Thành', 'Cơn Bão Đang Đến', 'Máu Nhuộm Đỏ Hoàng Hôn'],
+    description: 'Tạo bầu không khí, hint cho sự kiện lớn',
+  },
+  {
+    id: 'turning_point',
+    name: 'Bước Ngoặt',
+    pattern: '[Sự kiện thay đổi cục diện]',
+    examples: ['Sự Thật Về Huyết Mạch', 'Ngày Tông Môn Sụp Đổ', 'Lần Đột Phá Nghịch Thiên'],
+    description: 'Thích hợp cho chương climax, major revelation',
+  },
+  {
+    id: 'power_moment',
+    name: 'Khoảnh Khắc Sức Mạnh',
+    pattern: '[Chiêu thức/Cảnh giới/Sức mạnh mới]',
+    examples: ['Thiên Lôi Diệt Thế', 'Kim Đan Thành Tựu', 'Nhất Kiếm Phá Vạn Pháp'],
+    description: 'Gợi cảm giác sảng, power fantasy',
+  },
+  {
+    id: 'character_focus',
+    name: 'Nhân Vật Trọng Tâm',
+    pattern: '[Tên nhân vật] + [Hành động/Trạng thái]',
+    examples: ['Lâm Phong Trở Về', 'Nữ Đế Giáng Lâm', 'Sư Phụ Bí Ẩn Của Lão Quái'],
+    description: 'Highlight nhân vật quan trọng, thích hợp giới thiệu nhân vật mới',
+  },
+  {
+    id: 'emotion_atmosphere',
+    name: 'Cảm Xúc/Bầu Không Khí',
+    pattern: '[Cảm xúc/Không khí ấn tượng]',
+    examples: ['Giọt Lệ Của Kẻ Mạnh', 'Đêm Dài Không Ngủ', 'Tiếng Cười Trong Mưa Máu'],
+    description: 'Thích hợp cho chương cảm xúc mạnh, romance, bi kịch',
+  },
+  {
+    id: 'countdown_urgency',
+    name: 'Đếm Ngược/Cấp Bách',
+    pattern: '[Thời gian/Deadline] + [Nguy hiểm]',
+    examples: ['Ba Ngày Trước Đại Chiến', 'Giờ Phút Sinh Tử', 'Trước Khi Đan Dược Hết Hạn'],
+    description: 'Tạo urgency, thích hợp cho chương tension cao',
+  },
+  {
+    id: 'ironic_contrast',
+    name: 'Tương Phản/Nghịch Lý',
+    pattern: '[Tương phản gây sốc]',
+    examples: ['Phế Vật? Thiên Tài!', 'Kẻ Cứu Thế Hay Ác Ma', 'Ân Nhân Chính Là Kẻ Thù'],
+    description: 'Tạo twist, gợi tò mò bằng mâu thuẫn',
+  },
+];
+
+export const CHAPTER_TITLE_RULES = {
+  // Quy tắc chung
+  general: [
+    'Tên chương phải NGẮN GỌN (3-10 từ), ẤN TƯỢNG, gợi TÒ MÒ',
+    'KHÔNG dùng mẫu "X Và Sự Y" lặp đi lặp lại',
+    'KHÔNG dùng mẫu "Sự [Danh từ] Của [Đối tượng]" quá 2 lần trong 20 chương',
+    'Tên chương phải khiến người đọc MUỐN click vào đọc ngay',
+    'Mỗi tên chương phải KHÁC BIỆT rõ ràng với các chương trước',
+    'Ưu tiên: hành động cụ thể > miêu tả trừu tượng',
+    'Có thể dùng: lời thoại, câu hỏi, hình ảnh mạnh, tương phản',
+  ],
+
+  // Anti-patterns cần tránh
+  antiPatterns: [
+    'X Và Sự Y (VD: "Linh Kiện Phế Thải Và Sự Sỉ Nhục")',
+    'Nghịch Lý Của X',
+    'Quy Luật Của X',
+    'Định Luật Của X',
+    'Sự Trỗi Dậy Của X',
+    'Sự Kinh Ngạc Của X',
+    'Bí Mật Của X (dùng tối đa 1 lần/20 chương)',
+    'Lặp cùng keyword giữa 2 chương liên tiếp',
+  ],
+
+  // Quy tắc đa dạng
+  diversityRules: {
+    maxSamePatternConsecutive: 2,
+    maxSamePatternPer20: 4,
+    maxSameKeywordPer10: 2,
+    minUniquePatterns: 5,
+  },
+
+  // Mẫu title theo loại chương
+  chapterTypeTitleGuide: {
+    action: ['action_location', 'power_moment', 'declaration'] as string[],
+    revelation: ['mystery_question', 'turning_point', 'ironic_contrast'] as string[],
+    cultivation: ['power_moment', 'turning_point', 'countdown_urgency'] as string[],
+    romance: ['emotion_atmosphere', 'character_focus', 'foreshadowing'] as string[],
+    tension: ['countdown_urgency', 'foreshadowing', 'mystery_question'] as string[],
+    comedy: ['declaration', 'ironic_contrast', 'character_focus'] as string[],
+  },
+};
+
+// ============================================================================
+// ENGAGEMENT CHECKLIST - Yếu tố hấp dẫn truyện TQ (Qidian-style)
+// ============================================================================
+
+export const ENGAGEMENT_CHECKLIST = {
+  // Yếu tố BẮT BUỘC mỗi chương
+  perChapter: [
+    'Có ít nhất 1 micro-hook (gợi tò mò nhỏ) trong 500 từ đầu',
+    'Cliffhanger hoặc strong ending cuối chương',
+    'Ít nhất 1 điểm dopamine (face-slap, đột phá, thu hoạch, recognition...)',
+    'Ít nhất 1 chi tiết worldbuilding nhỏ (mở rộng thế giới)',
+    'Emotional contrast: cảm xúc phải thay đổi ít nhất 1 lần trong chương',
+  ],
+
+  // Yếu tố BẮT BUỘC mỗi 5 chương
+  per5Chapters: [
+    'MC phải có tiến bộ rõ ràng (sức mạnh, địa vị, hoặc relationship)',
+    'Ít nhất 1 face-slap hoặc power reveal moment',
+    'Giới thiệu ít nhất 1 yếu tố mới (nhân vật, địa danh, kỹ thuật)',
+    'Ít nhất 1 hint/foreshadowing cho plot lớn hơn',
+  ],
+
+  // Yếu tố BẮT BUỘC mỗi arc (15-30 chương)
+  perArc: [
+    'MC đột phá cảnh giới hoặc có power-up đáng kể',
+    'Đánh bại boss/kẻ thù chính của arc',
+    'Ít nhất 1 major revelation (thân phận, thế giới, hoặc hệ thống)',
+    'Relationship development (romance, huynh đệ, hoặc sư đồ)',
+    'Mở rộng thế giới: MC tiến vào khu vực/tầng mới',
+    'Emotional climax: moment khiến người đọc rung động',
+  ],
+
+  // Yếu tố "gây nghiện" đặc trưng TQ webnovel
+  addictiveElements: {
+    faceSlapFormula: {
+      name: 'Công Thức Tát Mặt',
+      description: 'Setup: kẻ thù coi thường → MC ẩn nhẫn → Kẻ thù ra tay → MC nghiền nát → Bàng quan kinh ngạc',
+      frequency: 'Mỗi 2-3 chương có 1 lần minor, mỗi arc có 1 lần major',
+      escalation: 'Quy mô tăng dần: cá nhân → nhóm → gia tộc → tông phái → quốc gia',
+    },
+    powerFantasyLoop: {
+      name: 'Vòng Lặp Sức Mạnh',
+      description: 'Encounter → Bị khinh thường → Training/Cơ duyên → Đột phá → Thể hiện → Chấn kinh',
+      frequency: 'Vòng lặp 10-15 chương, mỗi vòng scale lớn hơn',
+    },
+    treasureHunt: {
+      name: 'Săn Kho Báu',
+      description: 'Manh mối → Bí cảnh → Thử thách → Boss → Thu hoạch → Kẻ thù đuổi theo',
+      frequency: 'Mỗi arc 1 bí cảnh/treasure hunt',
+    },
+    mysteryReveal: {
+      name: 'Bí Mật Từng Lớp',
+      description: 'Hint nhỏ → Manh mối → Nghi ngờ → Xác nhận → Sốc → Hệ quả',
+      layers: ['Thân phận MC', 'Bí mật thế giới', 'Âm mưu lớn', 'Kẻ đứng sau tất cả'],
+    },
+    haremTeasing: {
+      name: 'Tình Cảm Mờ Ảo',
+      description: 'Gặp gỡ ấn tượng → Xung đột → Cứu giúp → Hint tình cảm → Chia ly tạm → Hội ngộ',
+      rule: 'Mỗi arc giới thiệu 1 nữ nhân vật, mỗi 5 chương có 1 sweet moment nhẹ',
+    },
+    statusFlex: {
+      name: 'Flex Địa Vị',
+      description: 'Đặc biệt trong đô thị: siêu xe, biệt thự, VIP, nhân mạch khủng',
+      rule: 'Mỗi 10 chương có 1 scene MC flex tài sản/quyền lực khiến kẻ khinh câm lặng',
+    },
+  },
+
+  // Nguyên tắc "ngược trước sảng sau"
+  adversityToTriumphRatio: {
+    description: 'Mỗi victory phải được build bằng adversity trước đó',
+    idealRatio: '30% ngược (MC bị khinh/gặp khó) → 70% sảng (MC chiến thắng/được tôn trọng)',
+    rule: 'KHÔNG BAO GIỜ để MC thua liên tiếp 3+ chương mà không có minor win',
+    antiPattern: 'MC thắng liên tục không gặp khó khăn = nhàm chán, mất tension',
+  },
+};
+
+/**
+ * Build title rules string for injection into AI prompts
+ */
+export function buildTitleRulesPrompt(previousTitles?: string[]): string {
+  const titleExamples = TITLE_TEMPLATES
+    .map(t => `  - ${t.name}: ${t.examples.slice(0, 2).join(', ')}`)
+    .join('\n');
+
+  const antiExamples = CHAPTER_TITLE_RULES.antiPatterns.slice(0, 5).join(', ');
+
+  let prompt = `QUY TẮC ĐẶT TÊN CHƯƠNG (BẮT BUỘC):
+- Ngắn gọn 3-10 từ, GỢI TÒ MÒ, khiến người đọc muốn click
+- TUYỆT ĐỐI KHÔNG dùng các mẫu nhàm chán sau: ${antiExamples}
+- Chọn 1 trong 10 mẫu đa dạng:
+${titleExamples}
+- VÍ DỤ TỐT: "Huyết Chiến Vạn Thú Sơn", "Ngươi Không Xứng!", "Phế Vật? Thiên Tài!", "Bóng Tối Sau Cổng Thành"
+- VÍ DỤ XẤU (CẤM): "Sự Sỉ Nhục Và Sự Trỗi Dậy", "Nghịch Lý Của Linh Áp", "Quy Luật Của Những Con Số", "X Và Sự Y"`;
+
+  if (previousTitles && previousTitles.length > 0) {
+    const recent = previousTitles.slice(-10);
+    prompt += `\n- CÁC CHƯƠNG GẦN ĐÂY: [${recent.join(' | ')}]. KHÔNG lặp keyword hoặc pattern với chúng.`;
+  }
+
+  return prompt;
+}
 
 // ============================================================================
 // HELPER FUNCTIONS

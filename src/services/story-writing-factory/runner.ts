@@ -17,7 +17,7 @@ import { StoryPlanner } from './planner';
 import { ChapterWriter } from './chapter';
 import { MemoryManager, ChapterMemory } from './memory';
 import { CostOptimizer, WorkflowOptimizer } from './cost-optimizer';
-import { ensureProjectRecord } from './supabase-helper';
+import { ensureProjectRecord, getSupabase } from './supabase-helper';
 import {
   StoryOutline,
   ArcOutline,
@@ -644,6 +644,9 @@ export class StoryRunner {
         isFinalArc,
       };
 
+      // Fetch previous chapter titles for title diversity checking
+      const previousTitles = await this.getPreviousTitles(chapterNumber);
+
       // Write chapter
       let result: ChapterResult;
       if (use3Agent) {
@@ -652,6 +655,7 @@ export class StoryRunner {
           styleBible: this.styleBible!,
           currentArc: currentArcContext,
           previousSummary,
+          previousTitles,
         });
       } else {
         // Use simple workflow to save costs (but still pass arc context for quality)
@@ -660,6 +664,7 @@ export class StoryRunner {
           styleBible: this.styleBible!,
           previousSummary,
           currentArc: currentArcContext,
+          previousTitles,
         });
       }
 
@@ -1137,6 +1142,70 @@ export class StoryRunner {
     }
 
     return recentChapters.map(s => s.summary).join('\n');
+  }
+
+  /**
+   * Get previous chapter titles for title diversity checking.
+   * 1. Try in-memory writtenChapters (current session)
+   * 2. Fallback to Supabase chapters table (resume mode)
+   */
+  private async getPreviousTitles(chapterNumber: number, limit: number = 10): Promise<string[]> {
+    const titles: string[] = [];
+
+    // 1. Collect from in-memory writtenChapters (current session)
+    for (let i = chapterNumber - 1; i >= Math.max(1, chapterNumber - limit); i--) {
+      const chapter = this.writtenChapters.get(i);
+      if (chapter?.title) {
+        titles.unshift(chapter.title);
+      }
+    }
+
+    // If we got enough titles from memory, return early
+    if (titles.length >= limit) {
+      return titles.slice(-limit);
+    }
+
+    // 2. Fallback: Query Supabase for previous titles (resume mode)
+    if (titles.length < limit && this.state?.projectId) {
+      try {
+        const supabase = getSupabase();
+        // Get novel_id from ai_story_projects
+        const { data: project } = await supabase
+          .from('ai_story_projects')
+          .select('novel_id')
+          .eq('id', this.state.projectId)
+          .single();
+
+        if (project?.novel_id) {
+          const { data: chapters } = await supabase
+            .from('chapters')
+            .select('title')
+            .eq('novel_id', project.novel_id)
+            .lt('chapter_number', chapterNumber)
+            .order('chapter_number', { ascending: false })
+            .limit(limit);
+
+          if (chapters && chapters.length > 0) {
+            const dbTitles = chapters
+              .reverse()
+              .map(c => c.title)
+              .filter((t): t is string => !!t);
+
+            // Merge: prefer in-memory (more recent), fill with DB titles
+            const memoryTitleSet = new Set(titles);
+            for (const dbTitle of dbTitles) {
+              if (!memoryTitleSet.has(dbTitle)) {
+                titles.unshift(dbTitle);
+              }
+            }
+          }
+        }
+      } catch {
+        // Non-fatal: title checking works without previous titles, just less effective
+      }
+    }
+
+    return titles.slice(-limit);
   }
 
   private updateStatus(status: RunnerStatus, message: string) {
