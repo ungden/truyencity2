@@ -143,6 +143,39 @@ async function writeOneChapter(
   const aiService = new AIProviderService({ gemini: geminiKey });
   const currentCh = project.current_chapter || 0;
 
+  // ====== PRE-WRITE COMPLETION CHECK ======
+  // If current_chapter already reached/exceeded total_planned_chapters,
+  // check if we should mark completed WITHOUT writing another chapter.
+  // This handles the edge case where a project reached its target but
+  // the completion logic didn't trigger (e.g., not at arc boundary last time).
+  const targetCh = project.total_planned_chapters || 200;
+  if (currentCh >= targetCh) {
+    const CHAPTERS_PER_ARC_CHECK = 20;
+    const isArcBoundary = currentCh % CHAPTERS_PER_ARC_CHECK === 0;
+    const isExactTarget = currentCh === targetCh;
+    const hardStop = targetCh + CHAPTERS_PER_ARC_CHECK;
+
+    if (isArcBoundary || isExactTarget || currentCh >= hardStop) {
+      // Complete immediately — no need to write more
+      await supabase.from('ai_story_projects')
+        .update({ status: 'completed', updated_at: new Date().toISOString() })
+        .eq('id', project.id);
+
+      const rotatedProjectId = await autoRotate(novel.id, supabase);
+      console.log(`[WriteChapter] ${project.id.slice(0, 8)} PRE-WRITE COMPLETE at ch.${currentCh} (target=${targetCh}, arcBoundary=${isArcBoundary}, exactTarget=${isExactTarget})`);
+
+      return {
+        id: project.id,
+        title: novel.title,
+        tier,
+        success: true,
+        error: undefined,
+        rotatedProjectId,
+      };
+    }
+    // else: in grace period, not at boundary — fall through to write 1 more chapter toward arc boundary
+  }
+
   const factoryConfig: Partial<FactoryConfig> = {
     provider: 'gemini',
     model: 'gemini-3-flash-preview',
@@ -222,10 +255,12 @@ async function writeOneChapter(
     console.log(`[WriteChapter] ${project.id.slice(0, 8)} HARD STOP at ch.${nextCh} (target=${targetChapters}, hard=${hardStop})`);
   } else if (nextCh >= targetChapters) {
     // Phase 3: Grace period — only complete at arc boundary (every 20 chapters)
+    // Also complete if we've exactly hit the target (covers small novels where target isn't a multiple of arc size)
     const isArcBoundary = nextCh % CHAPTERS_PER_ARC === 0;
-    if (isArcBoundary) {
+    const isExactTarget = nextCh === targetChapters;
+    if (isArcBoundary || isExactTarget) {
       shouldComplete = true;
-      console.log(`[WriteChapter] ${project.id.slice(0, 8)} CLEAN FINISH at arc boundary ch.${nextCh} (target=${targetChapters})`);
+      console.log(`[WriteChapter] ${project.id.slice(0, 8)} CLEAN FINISH at ch.${nextCh} (target=${targetChapters}, arcBoundary=${isArcBoundary}, exactTarget=${isExactTarget})`);
     } else {
       // Not at arc boundary — continue writing to finish the current arc
       console.log(`[WriteChapter] ${project.id.slice(0, 8)} Grace period: ch.${nextCh}/${targetChapters}, waiting for arc boundary (next: ${Math.ceil(nextCh / CHAPTERS_PER_ARC) * CHAPTERS_PER_ARC})`);
@@ -309,10 +344,14 @@ export async function GET(request: NextRequest) {
     if (resumeQuery.error) throw resumeQuery.error;
     if (initQuery.error) throw initQuery.error;
 
+    // Filter resume projects: include grace period (current >= total but < hardStop)
+    // so soft-ending logic can complete them at arc boundaries.
+    const GRACE_BUFFER_FILTER = 20; // Must match GRACE_BUFFER in writeOneChapter
     const resumeProjects = (resumeQuery.data || []).filter(p => {
       const total = p.total_planned_chapters || 200;
       const current = p.current_chapter || 0;
-      return current < total && p.novels;
+      const hardStop = total + GRACE_BUFFER_FILTER;
+      return current < hardStop && p.novels;
     }) as ProjectRow[];
 
     const initProjects = (initQuery.data || []).filter(p => p.novels) as ProjectRow[];
