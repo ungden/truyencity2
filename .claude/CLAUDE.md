@@ -1,326 +1,193 @@
-# TruyenCity2 - Vietnamese Webnovel Platform
+# TruyenCity2 - AI Webnovel Factory
 
 ## Project Overview
 
-Vietnamese webnovel platform with AI-powered content generation. Features:
-- AI authors generate novels automatically
-- **ALL AI uses Google Gemini only** — no other providers
-- Full content pipeline: authors → novels → projects → chapters → covers
+Industrial-scale Vietnamese webnovel platform. AI generates 200+ novels with 1000-2000 chapters each, fully automated.
 
-**Tech Stack:** Next.js 15, React 19, TypeScript, Supabase, Tailwind CSS, Vercel
-
-**User Communication:** Vietnamese preferred, direct/blunt, zero tolerance for fallback data
+**Stack:** Next.js 15, React 19, TypeScript, Supabase (PostgreSQL + pg_cron + pg_net), Google Gemini AI, Vercel Pro
+**Domain:** `truyencity2.vercel.app`
+**Repo:** `https://github.com/ungden/truyencity2.git` (branch: `main`)
+**User:** Vietnamese, direct/blunt style
 
 ---
 
 ## Critical Rules — AI Models
 
-### ONLY TWO MODELS ALLOWED IN THE ENTIRE CODEBASE:
+### ONLY TWO MODELS ALLOWED:
 
-| Purpose | Model ID | Notes |
-|---------|----------|-------|
-| **ALL text generation** (chapters, planning, ideas, authors) | `gemini-3-flash-preview` | Fast, 1M context, free tier |
-| **ALL image generation** (covers with title + branding) | `gemini-3-pro-image-preview` | Native Vietnamese text rendering, 3:4, 2K |
+| Purpose | Model ID |
+|---------|----------|
+| **ALL text** (chapters, planning, ideas, authors) | `gemini-3-flash-preview` |
+| **ALL images** (covers with title + branding) | `gemini-3-pro-image-preview` |
 
-### BANNED — NEVER USE THESE OLD MODELS:
-- ~~`gemini-2.0-flash`~~ ~~`gemini-2.0-flash-exp`~~ ~~`gemini-2.0-flash-preview-image-generation`~~
-- ~~`gemini-2.5-flash-preview-05-20`~~ ~~`gemini-2.5-pro-preview-05-06`~~
-- ~~`gemini-1.5-pro`~~ ~~`gemini-exp-1206`~~
-- ~~Any OpenRouter/DeepSeek/OpenAI/Anthropic model~~
-
-### BANNED — NEVER USE THESE API KEYS:
-- ~~`OPENROUTER_API_KEY`~~ ~~`DEEPSEEK_API_KEY`~~ ~~`OPENAI_API_KEY`~~ ~~`ANTHROPIC_API_KEY`~~
-- The ONLY AI API key is `GEMINI_API_KEY`
+### BANNED:
+- Any old Gemini model (2.0, 2.5, 1.5, exp)
+- Any non-Gemini provider (OpenRouter, DeepSeek, OpenAI, Anthropic)
+- Any API key other than `GEMINI_API_KEY`
+- **NO FALLBACKS** — if Gemini fails, throw error, never substitute with templates
 
 ---
 
-## Other Critical Rules
+## Two-Phase Production System
 
-1. **NO FALLBACKS** - If Gemini fails, throw error. Never substitute with templates.
-2. **Vietnamese diacritics** - All titles, names, descriptions must have proper diacritics (á, ă, â, é, ê, í, ó, ô, ơ, ú, ư, ý)
-3. **Service role key** - Use `SUPABASE_SERVICE_ROLE_KEY` for all seeder/admin operations (bypasses RLS)
-4. **Genre consistency** - Always derive from `GENRE_CONFIG`, never hardcode genre lists
+### Phase 1: Initial Seed (one-time, COMPLETED)
+- 10 AI authors × 20 novels = 200 novels seeded
+- Each novel has `total_planned_chapters` = random 1000-2000
+- pg_cron writes ~20 chapters/novel/day automatically
+- pg_cron generates covers (20 per tick, 4 parallel)
+
+### Phase 2: Daily Rotation (ongoing, automated)
+- `daily-rotate` cron activates **20 new novels/day** (`DAILY_EXPANSION = 20`)
+- Each author maintains ~5 active novels (`TARGET_ACTIVE_PER_AUTHOR = 5`)
+- When a novel finishes → auto-rotate: activate paused novel from same author
+- Cycle: ~20-50 novels finish/day, 20 new start → steady state ~200-400 active
 
 ---
 
-## Directory Structure
+## Cron System (3 jobs via pg_cron + Vercel)
+
+| Cron | Interval | File | What it does |
+|------|----------|------|-------------|
+| `write-chapters` | Every 5 min | `src/app/api/cron/write-chapters/route.ts` | 30 resume + 1 init in parallel |
+| `generate-covers` | Every 10 min | `src/app/api/cron/generate-covers/route.ts` | 20 covers, 4 parallel |
+| `daily-rotate` | Once/day 0h UTC | `src/app/api/cron/daily-rotate/route.ts` | Backfill + expand 20/day |
+
+**Auth:** All crons use `Authorization: Bearer ${CRON_SECRET}`
+**Config:** `vercel.json` + `supabase/migrations/0025_setup_pg_cron.sql`
+
+---
+
+## Story Writing Pipeline
 
 ```
-src/
-├── app/
-│   ├── api/
-│   │   ├── seed/generate-content/     # Content seeder API
-│   │   ├── ai-image/jobs/             # Cover generation jobs
-│   │   ├── factory/                   # Story writing factory APIs
-│   │   ├── story-runner/              # Chapter generation
-│   │   └── cron/                      # Cron endpoints
-│   ├── admin/                         # Admin dashboard pages
-│   ├── truyen/[slug]/                 # Novel detail pages
-│   └── (auth)/                        # Auth pages
-├── components/
-│   ├── admin/                         # Admin components
-│   └── ui/                            # shadcn/ui components
-├── services/
-│   └── story-writing-factory/         # Core AI writing engine
-│       ├── content-seeder.ts          # Novel/author seeding
-│       ├── novel-enricher.ts          # Enrich existing novels
-│       ├── runner.ts                  # Chapter writing orchestrator
-│       ├── chapter.ts                 # Single chapter generator
-│       ├── memory.ts                  # Story context/memory
-│       ├── planner.ts                 # Plot planning
-│       └── ...                        # Many more modules
-├── lib/
-│   ├── types/
-│   │   └── genre-config.ts            # GENRE_CONFIG (source of truth)
-│   ├── supabase/                      # Supabase clients
-│   └── config.ts                      # App configuration
-└── integrations/supabase/             # Generated Supabase types
+SEED → PLAN → WRITE → QC → COMPLETE → ROTATE
 
-supabase/
-├── functions/                         # Edge functions
-│   ├── gemini-cover-generate/         # Cover art generation (gemini-3-pro-image-preview)
-│   ├── gemini-generate-cover/         # Alternate cover generation
-│   ├── factory-writer-worker/         # Factory chapter writing (gemini-3-flash-preview)
-│   ├── factory-daily-tasks/           # Daily rotation tasks
-│   ├── openrouter-chat/               # LEGACY — do not use
-│   ├── ai-writer-scheduler/           # LEGACY — do not use
-│   └── notify-new-chapter/            # Notification system
-└── migrations/                        # Database migrations (0001-0027)
+1. ContentSeeder generates novel ideas via Gemini (batch 20)
+2. StoryRunner.run() → planStory() → planSingleArc() → writeArc()
+3. Each chapter: Architect (outline) → Writer (prose) → Critic (QC) → Summary
+4. 7 quality systems: QC Gating, ConsistencyChecker, PowerTracker, BeatLedger, etc.
+5. Soft ending: finish at arc boundary, grace period +20 chapters
+6. Auto-rotate: completed → activate next paused novel
 ```
 
----
+### Soft Ending Logic (IMPORTANT)
+`total_planned_chapters` is a **SOFT TARGET**, not a hard cutoff:
+- **Phase 1** (ch 1 → target-20): Normal writing
+- **Phase 2** (target-20 → target): "Approaching finale" — wrap up, no new conflicts
+- **Phase 3** (target → target+20): Grace period — keep writing until arc boundary (every 20ch)
+- **Phase 4** (target+20): Hard stop safety net
 
-## Genre System
-
-**Source of truth:** `src/lib/types/genre-config.ts`
-
-| Genre ID | Name | Required Field | Cover Style |
-|----------|------|----------------|-------------|
-| `tien-hiep` | Tiên Hiệp | `cultivation_system` | ethereal clouds, celestial |
-| `huyen-huyen` | Huyền Huyễn | `magic_system` | mystical, arcane symbols |
-| `do-thi` | Đô Thị | `modern_setting` | modern cityscape |
-| `vong-du` | Võng Du | `game_system` | digital, game UI |
-| `khoa-huyen` | Khoa Huyễn | `tech_level` | futuristic, sci-fi |
-| `lich-su` | Lịch Sử | `historical_period` | historical, period drama |
-| `dong-nhan` | Đồng Nhân | `original_work` | fanfiction style |
-
-**Never hardcode genres.** Always import from `GENRE_CONFIG`.
+The system detects final arc via `theme: 'finale'` and injects ending context:
+- Planner uses `ARC_FINALE_PROMPT` (resolve all threads, epilogue, no cliffhanger)
+- Runner injects "GIAI ĐOẠN KẾT THÚC" context
+- Chapter writer disables cliffhanger instructions
+- PlotArcManager adds graduated urgency objectives
 
 ---
 
-## Content Seeder Pipeline
+## Rate Limits (Gemini Tier 3)
 
-**API:** `POST /api/seed/generate-content`
+| Model | Limit | Our setting | File |
+|-------|-------|-------------|------|
+| Gemini 3 Flash (text) | 20,000 RPM | **2,000 RPM** (10%) | `ai-provider.ts` |
+| Gemini 3 Pro Image | 2,000 RPM | ~60 RPM (4 parallel) | `generate-covers/route.ts` |
 
-| Step | Action | Description |
-|------|--------|-------------|
-| `clear` | Delete all AI data | FK-safe deletion: jobs → projects → novels → authors → covers |
-| `1` | Seed authors | 10 authors with Vietnamese ordinal names (Nhất, Nhị, Tam...) |
-| `2` | Seed novels | 200 novels via Gemini (20 per batch, 60K tokens) |
-| `3` | Activate | Mark 5 novels per author as active |
-| `covers` | Generate covers | Enqueue cover jobs with 3s delay between |
-
-**Key settings in `content-seeder.ts`:**
-- `batchSize: 20` novels per Gemini call
-- `maxTokens: 60000`
-- `temperature: 0.8`
-- Title dedup before insert (unique constraint)
-- `cover_prompt` saved to `novels.cover_prompt` column
+AI calls per chapter: ~4 (Architect + Writer + Critic + Summary)
+Throughput: 30 projects × 288 ticks/day = **8,640 chapter slots/day**
 
 ---
 
-## Cover Generation Pipeline
+## Key Files
 
-**Table:** `ai_image_jobs`
-**Edge function:** `supabase/functions/gemini-cover-generate/`
-**Model:** `gemini-3-pro-image-preview` (Gemini 3 Pro Image Preview)
+### Cron Endpoints
+- `src/app/api/cron/write-chapters/route.ts` — RESUME_BATCH=30, INIT_BATCH=1
+- `src/app/api/cron/generate-covers/route.ts` — BATCH=20, PARALLEL=4
+- `src/app/api/cron/daily-rotate/route.ts` — EXPANSION=20, TARGET_ACTIVE=5
 
-**CRITICAL:** Image model is `gemini-3-pro-image-preview`. See "Critical Rules — AI Models" above for banned models.
-- It has **advanced text rendering** (renders Vietnamese titles natively)
-- Supports `imageConfig: { aspectRatio: "3:4", imageSize: "2K" }` in `generationConfig`
-- All covers must be 3:4 aspect ratio, 2K resolution minimum
+### Story Writing Engine (`src/services/story-writing-factory/`)
+- `runner.ts` — Orchestrator (plan → write → QC), finale detection, dummy arcs
+- `chapter.ts` — 3-agent pipeline (Architect/Writer/Critic), cliffhanger/finale toggle
+- `planner.ts` — Story outline + arc planning, `ARC_FINALE_PROMPT` for last arc
+- `memory.ts` — 4-level hierarchical memory (recent → arc → volume → essence)
+- `types.ts` — All types including `ArcTheme` with `'finale'`
+- `content-seeder.ts` — Bulk novel seeding, clean description (no metadata)
+- `power-tracker.ts` — 9-realm cultivation tracking + breakthrough validation
+- `beat-ledger.ts` — 50+ beat types with cooldowns, anti-repetition
+- `consistency.ts` — Dead character detection, power/trait contradictions
+- `qc-gating.ts` — Chapter scoring, auto-rewrite if < 65/100
 
-Flow:
-1. `enqueueCoversOnly()` creates jobs in `ai_image_jobs`
-2. Edge function polls jobs, calls Gemini Image API
-3. Image uploaded to Supabase Storage `covers` bucket
-4. `novels.cover_url` updated with public URL
+### Other Services
+- `src/services/ai-provider.ts` — Gemini-only, 2000 RPM rate limiter
+- `src/services/plot-arc-manager.ts` — DB-backed arcs, tension curves, finale objectives
+- `src/services/factory/gemini-image.ts` — Cover generation with Truyencity.com branding
 
-**Cover prompt MUST include:**
-- `"Title text must be exactly: [TITLE]"` — rendered by Gemini 3 Pro natively
-- `"At the bottom-center, include small text: Truyencity.com"`
-- `"No other text besides the title and Truyencity.com"`
+### Frontend
+- `src/app/novel/[id]/page.tsx` — Novel detail (uses `cleanNovelDescription()`)
+- `src/components/novel-card.tsx` — Card component (uses `cleanNovelDescription()`)
+- `src/lib/utils.ts` — `cleanNovelDescription()` strips metadata from descriptions
+
+### Config
+- `vercel.json` — 3 cron entries
+- `.env.local` — 5 env vars (gitignored)
+- `supabase/migrations/0025_setup_pg_cron.sql` — pg_cron setup
 
 ---
 
-## Database Schema (Key Tables)
+## Database State
 
-```sql
--- Core content
-novels (id, title, slug, author_id, genre, description, cover_url, cover_prompt, status, ...)
-chapters (id, novel_id, chapter_number, title, content, word_count, ...)
-ai_authors (id, name, pen_name, bio, avatar_url, ...)
+- **200 novels** in `novels` table (cover_prompt populated)
+- **200 ai_story_projects** (196 active, 4 completed)
+- **10 ai_authors** with Vietnamese pen names
+- **Chapters** growing via pg_cron (~8K+ slots/day)
+- **Covers** growing via pg_cron (19+ done, 181 remaining)
+- **pg_cron:** 3 jobs active
 
--- AI writing system
-ai_story_projects (id, novel_id, status, world_description, main_character, ...)
-ai_writing_jobs (id, project_id, status, chapter_number, ...)
-story_graph_nodes (id, project_id, chapter_number, plot_data, ...)
-
--- Cover generation
-ai_image_jobs (id, novel_id, prompt, status, result_url, error, ...)
+### Key Tables
+```
+novels (id, title, author, ai_author_id, description, cover_url, cover_prompt, genres, status)
+chapters (id, novel_id, chapter_number, title, content)
+ai_story_projects (id, novel_id, genre, main_character, world_description, 
+                   total_planned_chapters, current_chapter, status: active|paused|completed)
+ai_authors (id, name, bio, writing_style_description, specialized_genres, status)
+plot_arcs (id, project_id, arc_number, tension_curve, theme, climax_chapter)
 ```
 
 ---
 
-## Environment Variables
+## Environment Variables (5 only)
 
-Only 5 env vars needed (Vercel + local):
-
-```env
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
+```
+NEXT_PUBLIC_SUPABASE_URL=https://jxhpejyowuihvjpqwarm.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
-SUPABASE_SERVICE_ROLE_KEY=...     # Required for seeder/admin
-
-# AI — Gemini ONLY (no other providers)
-GEMINI_API_KEY=...                 # ALL AI: chapters, covers, ideas, authors
-
-# Cron
-CRON_SECRET=...                    # Auth for Vercel cron endpoints
-```
-
-**NO OTHER API KEYS NEEDED.** All DeepSeek/OpenRouter/OpenAI/Anthropic references have been removed.
-
----
-
-## Common Commands
-
-```bash
-# Development
-pnpm dev                           # Start dev server
-pnpm build                         # Production build
-pnpm typecheck                     # TypeScript check
-pnpm test                          # Run Jest tests
-
-# Database
-npx supabase db push               # Push migrations
-npx supabase db reset              # Reset + reseed
-
-# Edge functions
-npx supabase functions deploy gemini-cover-generate
-npx supabase functions logs gemini-cover-generate
-
-# Git
-git push                           # Deploy to Vercel (auto)
+SUPABASE_SERVICE_ROLE_KEY=...
+GEMINI_API_KEY=...
+CRON_SECRET=...
 ```
 
 ---
 
-## API Quick Reference
+## Description Cleanup
 
-### Seed Content
-```bash
-# Clear all AI data
-curl -X POST http://localhost:3000/api/seed/generate-content \
-  -H "Content-Type: application/json" \
-  -d '{"step": "clear"}'
+`novels.description` from seeder contains intro + synopsis ONLY (fixed).
+Old seeded novels may have metadata blocks (NHÂN VẬT CHÍNH, THẾ GIỚI, MODERN SETTING...) but `cleanNovelDescription()` in `src/lib/utils.ts` strips them on render.
 
-# Generate 200 novels
-curl -X POST http://localhost:3000/api/seed/generate-content \
-  -H "Content-Type: application/json" \
-  -d '{"step": "2", "authorCount": 10, "novelsPerAuthor": 20}'
-
-# Generate covers (batch of 20)
-curl -X POST http://localhost:3000/api/seed/generate-content \
-  -H "Content-Type: application/json" \
-  -d '{"step": "covers", "coverJobLimit": 20}'
-```
+**Rule:** Never show raw `novel.description` without `cleanNovelDescription()`.
 
 ---
 
-## Recent Changes (Session History)
+## Cover Generation Rules
 
-### Feb 2026 - Content Seeder Optimization
-
-**Problem:** Old seeder had batchSize=50 + maxTokens=8192 → 80-85% novels got fallback templates.
-
-**Fixed:**
-- `batchSize`: 50 → 20
-- `maxTokens`: 8192 → 60000
-- `temperature`: 1.0 → 0.8
-- Removed all fallbacks — Gemini failure = error
-- Author names: UUID → Vietnamese ordinals
-- Rich Gemini prompt: description, synopsis, world, character, coverPrompt
-- Title dedup before DB insert
-- `cover_prompt` saved to DB
-
-**Renamed:** `ideogram-generate` → `gemini-cover-generate`
-
-**Migrations added:**
-- `0026_create_ai_image_jobs.sql`
-- `0027_add_cover_prompt_to_novels.sql`
-
-**Test results:** 200/200 novels, 0 errors, avg 493 words description
+- Model: `gemini-3-pro-image-preview`
+- Aspect: 3:4, resolution: 2K
+- **MUST include:** title text + "Truyencity.com" branding at bottom
+- Cron injects branding if saved `cover_prompt` is missing it
+- Upload to Supabase Storage `covers` bucket
 
 ---
 
-## Debugging Tips
+## Git Conventions
 
-### Check novel quality
-```sql
-SELECT 
-  COUNT(*) as total,
-  AVG(LENGTH(description) - LENGTH(REPLACE(description, ' ', '')) + 1) as avg_words
-FROM novels 
-WHERE ai_generated = true;
-```
-
-### Check cover jobs
-```sql
-SELECT status, COUNT(*) 
-FROM ai_image_jobs 
-GROUP BY status;
-```
-
-### Edge function logs
-```bash
-npx supabase functions logs gemini-cover-generate --tail
-```
-
----
-
-## Auto-Run System (Cron)
-
-**Vercel Cron:** `vercel.json` → `/api/cron/write-chapters` every 5 minutes
-**Endpoint:** `src/app/api/cron/write-chapters/route.ts`
-**Auth:** `CRON_SECRET` env var (Vercel sends `Authorization: Bearer <CRON_SECRET>`)
-
-Two-tier processing per tick:
-- **Tier 1 (RESUME):** Up to 20 projects with chapters > 0, write 1 chapter each in parallel
-- **Tier 2 (INIT):** 1 new project (chapter = 0), full planning + Ch.1
-
-**LEGACY — do NOT use:**
-- `supabase/functions/ai-writer-scheduler/` (uses OpenRouter, old architecture)
-- `supabase/functions/openrouter-chat/` (old provider)
-
----
-
-## Known Issues / TODOs
-
-1. **Migration 0025 (pg_cron)** - Requires `pg_net` extension enabled in Supabase Dashboard
-2. **Jest hangs after tests** - Pre-existing async cleanup issue, tests still pass
-3. **react-day-picker** - Peer dependency warning (expects React 18, we use 19)
-
----
-
-## File Locations for Common Tasks
-
-| Task | File |
-|------|------|
-| Add new genre | `src/lib/types/genre-config.ts` |
-| Modify seeder logic | `src/services/story-writing-factory/content-seeder.ts` |
-| Change cover prompt | `content-seeder.ts` → `buildCoverPrompt()` |
-| Edit chapter generation | `src/services/story-writing-factory/chapter.ts` |
-| Add API endpoint | `src/app/api/[name]/route.ts` |
-| Database migration | `supabase/migrations/0028_xxx.sql` |
-| Edge function | `supabase/functions/[name]/index.ts` |
+- Push to `main` → auto-deploy on Vercel
+- Commit style: `type: description` (fix, feat, perf, refactor)
+- Never commit `.env.local` or secrets
+- Never force push to main

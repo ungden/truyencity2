@@ -25,7 +25,7 @@ import type { FactoryConfig, RunnerConfig, GenreType } from '@/services/story-wr
 
 // CONFIGURATION
 const RESUME_BATCH_SIZE = 30;  // Tier 1: resume projects (fast) — 30 * 288 ticks/day = 8,640 slots/day
-const INIT_BATCH_SIZE = 1;     // Tier 2: new projects needing full plan (slow)
+const INIT_BATCH_SIZE = 5;     // Tier 2: new projects needing full plan (slow) — bumped from 1 to clear 33 stuck novels faster
 const PROJECT_TIMEOUT_MS = 120_000; // 120s per-project timeout — prevents 1 slow project from blocking the batch
 
 export const maxDuration = 300; // 5 minutes (Vercel Pro)

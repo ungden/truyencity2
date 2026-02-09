@@ -14,12 +14,14 @@ interface Chapter {
 
 interface ChapterListProps {
   novelId: string;
+  novelSlug?: string;
   chapters: Chapter[];
 }
 
 const CHAPTERS_PER_PAGE = 20;
 
-export function ChapterList({ novelId, chapters }: ChapterListProps) {
+export function ChapterList({ novelId, novelSlug, chapters }: ChapterListProps) {
+  const basePath = novelSlug ? `/truyen/${novelSlug}` : `/novel/${novelId}`;
   const [visibleCount, setVisibleCount] = useState(CHAPTERS_PER_PAGE);
 
   if (!chapters || chapters.length === 0) {
@@ -54,7 +56,7 @@ export function ChapterList({ novelId, chapters }: ChapterListProps) {
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {visibleChapters.map((chapter) => (
-              <Link key={chapter.id} href={`/novel/${novelId}/read/${chapter.chapter_number}`} passHref>
+              <Link key={chapter.id} href={`${basePath}/read/${chapter.chapter_number}`} passHref>
                 <Button
                   variant="ghost"
                   className="w-full justify-start text-left h-auto p-3"

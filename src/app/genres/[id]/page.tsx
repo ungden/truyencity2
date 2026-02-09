@@ -5,9 +5,11 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { supabase } from "@/integrations/supabase/client";
+import { getGenreLabel, getGenreIcon } from "@/lib/utils/genre";
 
 type Novel = {
   id: string;
+  slug: string | null;
   title: string;
   author: string | null;
   cover_url: string | null;
@@ -26,7 +28,7 @@ export default function GenrePage() {
     (async () => {
       const { data, error } = await supabase
         .from("novels")
-        .select("id,title,author,cover_url,genres")
+        .select("id,slug,title,author,cover_url,genres")
         .contains("genres", [genreId])
         .order("updated_at", { ascending: false });
 
@@ -44,7 +46,9 @@ export default function GenrePage() {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <h1 className="text-2xl font-semibold mb-4">Thể loại: {genreId}</h1>
+      <h1 className="text-2xl font-semibold mb-4">
+        {getGenreIcon(genreId)} Thể loại: {getGenreLabel(genreId)}
+      </h1>
 
       {loading ? (
         <p>Đang tải...</p>
@@ -55,8 +59,8 @@ export default function GenrePage() {
           {novels.map((n) => (
             <Link
               key={n.id}
-              href={`/novel/${n.id}`}
-              className="group rounded-md border bg-card hover:shadow transition"
+              href={n.slug ? `/truyen/${n.slug}` : `/novel/${n.id}`}
+              className="group rounded-xl border border-border/50 bg-card hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-200"
             >
               <div className="aspect-[3/4] relative bg-muted">
                 {n.cover_url ? (
@@ -64,7 +68,7 @@ export default function GenrePage() {
                     src={n.cover_url}
                     alt={n.title}
                     fill
-                    className="object-cover rounded-t-md"
+                    className="object-cover rounded-t-xl"
                     sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 16vw"
                   />
                 ) : (

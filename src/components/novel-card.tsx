@@ -7,10 +7,12 @@ import {
   MessageSquare
 } from 'lucide-react';
 import { cn, cleanNovelDescription } from '@/lib/utils';
+import { getGenreLabel, getGenreColor } from '@/lib/utils/genre';
 import Link from 'next/link';
 
 interface NovelCardProps {
   id: string;
+  slug?: string;
   title: string;
   author: string;
   cover: string;
@@ -26,6 +28,7 @@ interface NovelCardProps {
 
 export const NovelCard: React.FC<NovelCardProps> = ({
   id,
+  slug,
   title,
   author,
   cover,
@@ -38,7 +41,7 @@ export const NovelCard: React.FC<NovelCardProps> = ({
   variant = 'default',
   rank
 }) => {
-  const novelLink = `/novel/${id}`;
+  const novelLink = slug ? `/truyen/${slug}` : `/novel/${id}`;
 
   const formatViews = (v?: number) => {
     if (!v) return '0';
@@ -53,40 +56,49 @@ export const NovelCard: React.FC<NovelCardProps> = ({
   if (variant === 'featured') {
     return (
       <Link href={novelLink} className="block">
-        <div className="relative w-full h-[400px] rounded-2xl overflow-hidden group cursor-pointer">
+        <div className="relative w-full h-[400px] rounded-2xl overflow-hidden group cursor-pointer shadow-xl shadow-black/20">
           <div
-            className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+            className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
             style={{ backgroundImage: `url(${cover || '/placeholder.svg'})` }}
           />
-          <div className="absolute inset-0 bg-black/60" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-900/30 to-transparent" />
 
           {/* Content */}
           <div className="absolute inset-0 p-8 flex flex-col justify-end">
             <div className="flex items-center gap-2 mb-3">
-              <span className="px-3 py-1 bg-white text-foreground text-xs font-medium rounded">
+              <span className="px-3 py-1 bg-primary text-primary-foreground text-xs font-semibold rounded-full">
                 NỔI BẬT
               </span>
-              <span className="flex items-center gap-1 px-2 py-1 bg-white/90 rounded">
-                <Star size={12} className="text-rating fill-rating" />
-                <span className="text-foreground text-xs font-medium">{rating}</span>
-              </span>
+              {rating && (
+                <span className="flex items-center gap-1 px-2.5 py-1 bg-white/15 backdrop-blur-sm rounded-full border border-white/20">
+                  <Star size={12} className="text-rating fill-rating" />
+                  <span className="text-white text-xs font-medium">{rating}</span>
+                </span>
+              )}
             </div>
 
-            <h2 className="text-3xl font-bold text-white mb-3 leading-tight">
+            <h2 className="text-3xl font-bold text-white mb-3 leading-tight drop-shadow-lg">
               {title}
             </h2>
 
             {description && (
-              <p className="text-white/90 text-sm mb-5 line-clamp-2 max-w-lg">
+              <p className="text-white/80 text-sm mb-3 line-clamp-2 max-w-lg">
                 {cleanNovelDescription(description)}
               </p>
             )}
 
+            {chapters !== undefined && chapters > 0 && (
+              <p className="text-white/60 text-xs mb-4">
+                {chapters} chương đã cập nhật
+              </p>
+            )}
+
             <div className="flex items-center gap-3">
-              <button className="px-5 py-2.5 bg-white text-foreground font-medium rounded-lg hover:bg-gray-100 transition-colors">
+              <button className="px-6 py-2.5 bg-primary text-primary-foreground font-semibold rounded-xl hover:opacity-90 transition-all shadow-lg shadow-primary/25">
                 Đọc ngay
               </button>
-              <button className="px-5 py-2.5 bg-white/20 text-white font-medium rounded-lg hover:bg-white/30 transition-colors">
+              <button className="px-5 py-2.5 bg-white/10 backdrop-blur-sm text-white font-medium rounded-xl border border-white/20 hover:bg-white/20 transition-all">
                 Thêm vào tủ
               </button>
             </div>
@@ -100,7 +112,7 @@ export const NovelCard: React.FC<NovelCardProps> = ({
   if (variant === 'horizontal') {
     return (
       <Link href={novelLink} className="block">
-        <div className="flex gap-4 p-4 bg-card rounded-2xl hover:bg-accent/50 transition-colors cursor-pointer group">
+        <div className="flex gap-4 p-4 bg-card rounded-2xl border border-border/50 hover:border-primary/30 hover:bg-accent/50 transition-all duration-200 cursor-pointer group">
           {/* Cover */}
           <div className="relative w-24 h-32 rounded-xl overflow-hidden flex-shrink-0">
             <div
@@ -111,14 +123,9 @@ export const NovelCard: React.FC<NovelCardProps> = ({
               <div className="absolute top-2 left-2">
                 <span className={cn(
                   "px-2 py-0.5 text-[10px] font-medium rounded text-white",
-                  genre === 'Tiên Hiệp' && "bg-amber-600",
-                  genre === 'Khoa Huyễn' && "bg-blue-600",
-                  genre === 'Huyền Ảo' && "bg-purple-600",
-                  genre === 'Đô Thị' && "bg-emerald-600",
-                  genre === 'Ngôn Tình' && "bg-pink-500",
-                  !['Tiên Hiệp', 'Khoa Huyễn', 'Huyền Ảo', 'Đô Thị', 'Ngôn Tình'].includes(genre || '') && "bg-gray-600"
+                  getGenreColor(genre)
                 )}>
-                  {genre}
+                  {getGenreLabel(genre)}
                 </span>
               </div>
             )}
@@ -141,10 +148,10 @@ export const NovelCard: React.FC<NovelCardProps> = ({
                 </div>
                 {author}
               </span>
-              {chapters && (
+              {chapters !== undefined && chapters > 0 && (
                 <span className="flex items-center gap-1">
                   <MessageSquare size={14} />
-                  {chapters}
+                  {chapters} chương
                 </span>
               )}
             </div>
@@ -162,7 +169,7 @@ export const NovelCard: React.FC<NovelCardProps> = ({
   // Ranking card (for sidebar)
   if (variant === 'ranking') {
     return (
-      <Link href={novelLink} className="flex items-center gap-3 p-2 hover:bg-accent rounded-xl transition-colors">
+      <Link href={novelLink} className="flex items-center gap-3 p-2.5 hover:bg-accent rounded-xl transition-all duration-200 hover:translate-x-0.5">
         {rank && (
           <span className={cn(
             "w-6 text-lg font-bold",
@@ -182,7 +189,7 @@ export const NovelCard: React.FC<NovelCardProps> = ({
         </div>
         <div className="flex-1 min-w-0">
           <h4 className="font-medium text-sm line-clamp-1">{title}</h4>
-          <p className="text-xs text-muted-foreground">{genre || author}</p>
+          <p className="text-xs text-muted-foreground">{(genre ? getGenreLabel(genre) : null) || author}</p>
           <div className="flex items-center gap-1 mt-1">
             <Star size={10} className="text-rating fill-rating" />
             <span className="text-xs text-muted-foreground">{rating}</span>
@@ -195,9 +202,9 @@ export const NovelCard: React.FC<NovelCardProps> = ({
   // Default vertical card
   return (
     <Link href={novelLink} className="block group">
-      <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer">
+      <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer ring-1 ring-border/50 group-hover:ring-primary/40 transition-all duration-300 shadow-md shadow-black/10 group-hover:shadow-lg group-hover:shadow-primary/10">
         <div
-          className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+          className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
           style={{ backgroundImage: `url(${cover || '/placeholder.svg'})` }}
         />
 
@@ -221,10 +228,10 @@ export const NovelCard: React.FC<NovelCardProps> = ({
 
       {/* Info below image */}
       <div className="mt-3 space-y-1">
-        <h3 className="font-medium text-sm line-clamp-1 group-hover:text-foreground/80 transition-colors">
+        <h3 className="font-medium text-sm line-clamp-1 group-hover:text-primary transition-colors">
           {title}
         </h3>
-        <p className="text-xs text-muted-foreground">{genre || author}</p>
+        <p className="text-xs text-muted-foreground">{(genre ? getGenreLabel(genre) : null) || author}</p>
         <div className="flex items-center gap-1 text-muted-foreground">
           <Eye size={12} />
           <span className="text-xs">{formatViews(views)}</span>

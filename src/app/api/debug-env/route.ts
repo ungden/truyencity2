@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
-  const geminiKey = process.env.GEMINI_API_KEY || '';
-  const hasGeminiKey = !!geminiKey;
+  // Require CRON_SECRET to prevent unauthorized access
+  const authHeader = request.headers.get('authorization');
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
 
   return NextResponse.json({
     nodeEnv: process.env.NODE_ENV,
     gemini: {
-      hasKey: hasGeminiKey,
-      keyLength: geminiKey.length,
-      keyPreview: hasGeminiKey ? `${geminiKey.slice(0, 8)}...` : 'Not found',
+      hasKey: !!process.env.GEMINI_API_KEY,
     },
     supabase: {
       hasUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,

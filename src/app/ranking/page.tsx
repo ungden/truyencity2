@@ -4,27 +4,31 @@ import React, { useEffect, useState } from 'react';
 import { Header } from '@/components/header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Crown, TrendingUp, Eye, Star } from 'lucide-react';
+import { Crown, TrendingUp, Star, BookOpen } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useRouter } from 'next/navigation';
+import { getGenreLabel } from '@/lib/utils/genre';
 
-type NovelRow = {
+type NovelWithChapters = {
   id: string;
+  slug: string | null;
   title: string;
   author: string | null;
   cover_url: string | null;
   status: string | null;
   genres: string[] | null;
   created_at: string;
+  updated_at: string | null;
+  chapters: { count: number }[];
 };
 
 const RankingCard = ({ 
   novel, 
-  showTrend = false, 
+  metric,
   onClick 
 }: { 
   novel: any; 
-  showTrend?: boolean; 
+  metric?: React.ReactNode;
   onClick?: () => void; 
 }) => {
   const getRankIcon = (rank: number) => {
@@ -36,7 +40,7 @@ const RankingCard = ({
 
   return (
     <div 
-      className="flex items-center gap-4 p-4 bg-card rounded-lg hover:bg-accent/50 transition-colors cursor-pointer"
+      className="flex items-center gap-4 p-4 bg-card rounded-xl border border-border/50 hover:border-primary/30 hover:bg-accent/50 transition-all duration-200 cursor-pointer"
       onClick={onClick}
     >
       <div className="flex-shrink-0 w-8 flex justify-center">
@@ -59,64 +63,96 @@ const RankingCard = ({
         <div className="flex items-center gap-3">
           {novel.genre && (
             <Badge variant="secondary" className="text-xs">
-              {novel.genre}
+              {getGenreLabel(novel.genre)}
             </Badge>
           )}
-          {showTrend && novel.trend && (
-            <Badge variant="secondary" className="text-xs text-green-600">
-              <TrendingUp size={10} className="mr-1" />
-              {novel.trend}
-            </Badge>
-          )}
+          {metric}
         </div>
       </div>
       
-      <Badge variant="outline" className="text-xs">
+      <Badge variant="outline" className="text-xs flex-shrink-0">
         {novel.status || 'Đang ra'}
       </Badge>
     </div>
   );
 };
 
+// Format relative time in Vietnamese
+function timeAgo(dateStr: string | null): string {
+  if (!dateStr) return '';
+  const now = Date.now();
+  const diff = now - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `${mins} phút trước`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours} giờ trước`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days} ngày trước`;
+  return `${Math.floor(days / 7)} tuần trước`;
+}
+
 export default function RankingPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('popular');
-  const [novels, setNovels] = useState<NovelRow[]>([]);
+  const [novels, setNovels] = useState<NovelWithChapters[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
+      setLoading(true);
       const { data } = await supabase
         .from('novels')
-        .select('id,title,author,cover_url,status,genres,created_at')
-        .order('created_at', { ascending: false })
-        .limit(20);
-      if (!cancelled) setNovels(data || []);
+        .select('id,slug,title,author,cover_url,status,genres,created_at,updated_at,chapters(count)')
+        .order('updated_at', { ascending: false })
+        .limit(50);
+      if (!cancelled) {
+        setNovels((data as NovelWithChapters[] | null) || []);
+        setLoading(false);
+      }
     })();
     return () => { cancelled = true; };
   }, []);
 
-  const topNovels = novels.slice(0, 10).map((n, idx) => ({
-    ...n,
-    genre: n.genres?.[0] || null,
-    rank: idx + 1
-  }));
+  const getChapterCount = (n: NovelWithChapters) => n.chapters?.[0]?.count || 0;
 
-  const trendingNovels = novels.slice(0, 10).map((n, idx) => ({
-    ...n,
-    genre: n.genres?.[0] || null,
-    rank: idx + 1,
-    trend: `+${(10 - idx)}%`
-  }));
+  // Popular = most chapters (proxy for most read)
+  const popularNovels = [...novels]
+    .sort((a, b) => getChapterCount(b) - getChapterCount(a))
+    .slice(0, 20)
+    .map((n, idx) => ({
+      ...n,
+      genre: n.genres?.[0] || null,
+      rank: idx + 1,
+      chapterCount: getChapterCount(n),
+    }));
 
-  const ratingNovels = novels.slice(0, 10).map((n, idx) => ({
-    ...n,
-    genre: n.genres?.[0] || null,
-    rank: idx + 1
-  }));
+  // Trending = most recently updated (active writing)
+  const trendingNovels = [...novels]
+    .filter(n => getChapterCount(n) > 0) // only novels with content
+    .sort((a, b) => new Date(b.updated_at || b.created_at).getTime() - new Date(a.updated_at || a.created_at).getTime())
+    .slice(0, 20)
+    .map((n, idx) => ({
+      ...n,
+      genre: n.genres?.[0] || null,
+      rank: idx + 1,
+      chapterCount: getChapterCount(n),
+    }));
 
-  const handleNovelClick = (novelId: string) => {
-    router.push(`/novel/${novelId}`);
+  // "Top Rated" = most chapters among novels with covers (quality proxy)
+  const ratedNovels = [...novels]
+    .filter(n => n.cover_url)
+    .sort((a, b) => getChapterCount(b) - getChapterCount(a))
+    .slice(0, 20)
+    .map((n, idx) => ({
+      ...n,
+      genre: n.genres?.[0] || null,
+      rank: idx + 1,
+      chapterCount: getChapterCount(n),
+    }));
+
+  const handleNovelClick = (novelSlug: string | null, novelId: string) => {
+    router.push(novelSlug ? `/truyen/${novelSlug}` : `/novel/${novelId}`);
   };
 
   return (
@@ -126,21 +162,28 @@ export default function RankingPage() {
       <main className="px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3 mb-6">
-            <TabsTrigger value="popular">Phổ biến</TabsTrigger>
-            <TabsTrigger value="trending">Thịnh hành</TabsTrigger>
-            <TabsTrigger value="rating">Đánh giá</TabsTrigger>
+            <TabsTrigger value="popular">Nhiều chương</TabsTrigger>
+            <TabsTrigger value="trending">Mới cập nhật</TabsTrigger>
+            <TabsTrigger value="rating">Có bìa đẹp</TabsTrigger>
           </TabsList>
           
           <TabsContent value="popular" className="space-y-3">
             <div className="flex items-center gap-2 mb-4">
               <Crown className="text-yellow-500" size={20} />
-              <h2 className="text-lg font-semibold">Top truyện phổ biến</h2>
+              <h2 className="text-lg font-semibold">Top truyện nhiều chương nhất</h2>
             </div>
-            {topNovels.map((novel) => (
+            {loading && <p className="text-muted-foreground text-sm">Đang tải...</p>}
+            {popularNovels.map((novel) => (
               <RankingCard 
                 key={novel.id} 
                 novel={novel}
-                onClick={() => handleNovelClick(novel.id)}
+                metric={
+                  <Badge variant="secondary" className="text-xs">
+                    <BookOpen size={10} className="mr-1" />
+                    {novel.chapterCount} chương
+                  </Badge>
+                }
+                onClick={() => handleNovelClick(novel.slug, novel.id)}
               />
             ))}
           </TabsContent>
@@ -148,14 +191,19 @@ export default function RankingPage() {
           <TabsContent value="trending" className="space-y-3">
             <div className="flex items-center gap-2 mb-4">
               <TrendingUp className="text-green-500" size={20} />
-              <h2 className="text-lg font-semibold">Đang thịnh hành</h2>
+              <h2 className="text-lg font-semibold">Đang cập nhật</h2>
             </div>
+            {loading && <p className="text-muted-foreground text-sm">Đang tải...</p>}
             {trendingNovels.map((novel) => (
               <RankingCard 
                 key={novel.id} 
                 novel={novel}
-                showTrend={true}
-                onClick={() => handleNovelClick(novel.id)}
+                metric={
+                  <span className="text-xs text-muted-foreground">
+                    {timeAgo(novel.updated_at)} · {novel.chapterCount} chương
+                  </span>
+                }
+                onClick={() => handleNovelClick(novel.slug, novel.id)}
               />
             ))}
           </TabsContent>
@@ -163,13 +211,20 @@ export default function RankingPage() {
           <TabsContent value="rating" className="space-y-3">
             <div className="flex items-center gap-2 mb-4">
               <Star className="text-yellow-500 fill-current" size={20} />
-              <h2 className="text-lg font-semibold">Đánh giá cao nhất</h2>
+              <h2 className="text-lg font-semibold">Truyện có bìa đẹp nhất</h2>
             </div>
-            {ratingNovels.map((novel) => (
+            {loading && <p className="text-muted-foreground text-sm">Đang tải...</p>}
+            {ratedNovels.map((novel) => (
               <RankingCard 
                 key={novel.id} 
                 novel={novel}
-                onClick={() => handleNovelClick(novel.id)}
+                metric={
+                  <Badge variant="secondary" className="text-xs">
+                    <BookOpen size={10} className="mr-1" />
+                    {novel.chapterCount} chương
+                  </Badge>
+                }
+                onClick={() => handleNovelClick(novel.slug, novel.id)}
               />
             ))}
           </TabsContent>

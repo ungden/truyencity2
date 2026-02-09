@@ -15,30 +15,61 @@ import { Novel } from '@/lib/types';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
+// Helper to extract chapter count from joined data
+function getChapterCount(novel: Novel): number {
+  if (!novel.chapters || !novel.chapters.length) return 0;
+  return novel.chapters[0]?.count || 0;
+}
+
 export default async function HomePage() {
   let novels: Novel[] | null = null;
+  let featuredNovels: Novel[] | null = null;
 
   try {
     const supabase = await createServerClient();
-    const { data, error } = await supabase
-      .from('novels')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(20);
 
-    if (error) {
-      console.error('Error fetching novels:', error);
+    // Fetch recently updated novels (sorted by latest activity)
+    const [latestResult, featuredResult] = await Promise.all([
+      supabase
+        .from('novels')
+        .select('*, chapters(count)')
+        .order('updated_at', { ascending: false })
+        .limit(20),
+      // Featured: novels with covers, most chapters (established stories)
+      supabase
+        .from('novels')
+        .select('*, chapters(count)')
+        .not('cover_url', 'is', null)
+        .order('updated_at', { ascending: false })
+        .limit(10),
+    ]);
+    // Note: slug is included in '*' select from novels table
+
+    if (latestResult.error) {
+      console.error('Error fetching novels:', latestResult.error);
     } else {
-      novels = data;
+      novels = latestResult.data;
+    }
+
+    if (!featuredResult.error) {
+      // Pick the featured novel with the most chapters (most established)
+      featuredNovels = (featuredResult.data || [])
+        .sort((a: Novel, b: Novel) => getChapterCount(b) - getChapterCount(a));
     }
   } catch (err) {
     console.error('Failed to connect to database:', err);
   }
 
-  const featuredNovel = novels?.[0];
-  const trendingNovels = novels?.slice(1, 6) || [];
-  const latestNovels = novels?.slice(6, 12) || [];
-  const rankingNovels = novels?.slice(0, 6) || [];
+  // Featured = novel with most chapters and a cover
+  const featuredNovel = featuredNovels?.[0] || novels?.[0];
+  // Trending = novels with most chapters (active writing)
+  const allSorted = [...(novels || [])].sort((a, b) => getChapterCount(b) - getChapterCount(a));
+  const trendingNovels = allSorted.filter(n => n.id !== featuredNovel?.id).slice(0, 5);
+  // Latest = most recently updated (excluding featured + trending)
+  const usedIds = new Set([featuredNovel?.id, ...trendingNovels.map(n => n.id)]);
+  const latestNovels = (novels || []).filter(n => !usedIds.has(n.id)).slice(0, 6);
+  // Ranking = by chapter count (most content = most popular proxy)
+  const rankingNovels = allSorted.slice(0, 6);
 
   return (
     <div className="min-h-screen bg-background">
@@ -57,11 +88,13 @@ export default async function HomePage() {
               <section>
                 <NovelCard
                   id={featuredNovel.id}
+                  slug={featuredNovel.slug || undefined}
                   title={featuredNovel.title}
                   author={featuredNovel.author || 'N/A'}
                   cover={featuredNovel.cover_url || ''}
                   status={featuredNovel.status || 'Đang ra'}
                   description={featuredNovel.description || ''}
+                  chapters={getChapterCount(featuredNovel)}
                   variant="featured"
                 />
               </section>
@@ -71,7 +104,7 @@ export default async function HomePage() {
             <section>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <Sparkles size={20} className="text-rating" />
+                  <Sparkles size={20} className="text-primary" />
                   <h2 className="text-lg font-semibold">Thịnh hành tuần này</h2>
                 </div>
                 <Link
@@ -89,11 +122,13 @@ export default async function HomePage() {
                     <div key={novel.id} className="flex-shrink-0 w-[160px]">
                       <NovelCard
                         id={novel.id}
+                        slug={novel.slug || undefined}
                         title={novel.title}
                         author={novel.author || 'N/A'}
                         cover={novel.cover_url || ''}
                         status={novel.status || 'Đang ra'}
                         genre={novel.genres?.[0]}
+                        chapters={getChapterCount(novel)}
                       />
                     </div>
                   ))}
@@ -120,12 +155,14 @@ export default async function HomePage() {
                   <NovelCard
                     key={novel.id}
                     id={novel.id}
+                    slug={novel.slug || undefined}
                     title={novel.title}
                     author={novel.author || 'N/A'}
                     cover={novel.cover_url || ''}
                     status={novel.status || 'Đang ra'}
                     genre={novel.genres?.[0]}
                     description={novel.description || ''}
+                    chapters={getChapterCount(novel)}
                     variant="horizontal"
                   />
                 ))}
@@ -137,7 +174,7 @@ export default async function HomePage() {
           <aside className="hidden xl:block w-[280px] flex-shrink-0">
             <div className="sticky top-24">
               <div className="flex items-center gap-2 mb-4">
-                <TrendingUp size={20} className="text-destructive" />
+                <TrendingUp size={20} className="text-primary" />
                 <h2 className="text-lg font-semibold">Bảng Xếp Hạng</h2>
               </div>
 
@@ -146,6 +183,7 @@ export default async function HomePage() {
                   <NovelCard
                     key={novel.id}
                     id={novel.id}
+                    slug={novel.slug || undefined}
                     title={novel.title}
                     author={novel.author || 'N/A'}
                     cover={novel.cover_url || ''}
@@ -166,7 +204,7 @@ export default async function HomePage() {
               </Button>
 
               {/* Ad Placeholder */}
-              <div className="mt-6 h-[250px] bg-muted rounded-2xl flex items-center justify-center">
+              <div className="mt-6 h-[250px] bg-card border border-border/50 rounded-2xl flex items-center justify-center">
                 <span className="text-sm text-muted-foreground">Khu vực Quảng Cáo</span>
               </div>
             </div>

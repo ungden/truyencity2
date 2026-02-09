@@ -22,6 +22,7 @@ export type NovelFormValues = z.input<typeof novelSchema>;
 export type Novel = {
   id: string;
   title: string;
+  slug?: string | null;
   // giữ lại author để hiển thị, nhưng nguồn chân lý là ai_author_id
   author?: string | null;
   ai_author_id?: string | null;
@@ -31,6 +32,9 @@ export type Novel = {
   genres?: string[] | null;
   owner_id?: string | null;
   created_at: string;
+  updated_at?: string | null;
+  // Joined from chapters count
+  chapters?: { count: number }[] | null;
 };
 
 // Chapter Schema

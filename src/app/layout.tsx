@@ -36,7 +36,7 @@ export default function RootLayout({
   return (
     <html lang="vi" suppressHydrationWarning>
       <body className="font-sans antialiased">
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <PWAProvider>
             <ReadingProvider>
               <AppShell>
