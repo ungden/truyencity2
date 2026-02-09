@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 
 interface DesktopReadingHeaderProps {
   novelId: string;
+  novelSlug?: string;
   novelTitle: string;
   chapterTitle: string;
   currentChapter: number;
@@ -32,6 +33,7 @@ interface DesktopReadingHeaderProps {
 
 export const DesktopReadingHeader: React.FC<DesktopReadingHeaderProps> = ({
   novelId,
+  novelSlug,
   novelTitle,
   chapterTitle,
   currentChapter,
@@ -55,7 +57,7 @@ export const DesktopReadingHeader: React.FC<DesktopReadingHeaderProps> = ({
         </Button>
         <span className="text-muted-foreground">/</span>
         <Button variant="ghost" size="sm" asChild className="gap-2 max-w-[200px]">
-          <Link href={`/novel/${novelId}`}>
+          <Link href={novelSlug ? `/truyen/${novelSlug}` : `/novel/${novelId}`}>
             <BookOpen size={16} />
             <span className="truncate hidden xl:inline">{novelTitle}</span>
           </Link>

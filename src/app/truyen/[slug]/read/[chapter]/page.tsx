@@ -378,7 +378,13 @@ export default function ReadingPage() {
 
       <article
         className={cn(
-          "prose prose-lg max-w-none whitespace-pre-wrap",
+          "max-w-none whitespace-pre-wrap text-inherit",
+          "[&>p]:mb-4 [&>p]:leading-relaxed",
+          "[&>h1]:text-2xl [&>h1]:font-bold [&>h1]:mb-4 [&>h1]:mt-8",
+          "[&>h2]:text-xl [&>h2]:font-semibold [&>h2]:mb-3 [&>h2]:mt-6",
+          "[&>h3]:text-lg [&>h3]:font-semibold [&>h3]:mb-2 [&>h3]:mt-4",
+          "[&>blockquote]:border-l-4 [&>blockquote]:border-current/30 [&>blockquote]:pl-4 [&>blockquote]:italic [&>blockquote]:opacity-80",
+          "[&>hr]:my-8 [&>hr]:border-current/20",
           !isMobile && settings.twoColumnsDesktop ? "lg:columns-2 lg:gap-12" : ""
         )}
         style={{
@@ -387,6 +393,7 @@ export default function ReadingPage() {
           fontFamily: settings.fontFamily,
           letterSpacing: `${settings.letterSpacing}em`,
           textAlign: settings.justify ? 'justify' as const : 'start' as const,
+          color: 'inherit',
         }}
         dangerouslySetInnerHTML={{ __html: sanitizedContent }}
       />
@@ -440,6 +447,7 @@ export default function ReadingPage() {
         {!isFullscreen && (
           <DesktopReadingSidebar
             novelId={novelId}
+            novelSlug={novelSlug}
             novelTitle={novelTitle}
             currentChapter={chapterNumber}
             totalChapters={allChapters.length}
@@ -454,6 +462,7 @@ export default function ReadingPage() {
           {!isFullscreen && (
             <DesktopReadingHeader
               novelId={novelId}
+              novelSlug={novelSlug}
               novelTitle={novelTitle}
               chapterTitle={currentChapter.title}
               currentChapter={chapterNumber}

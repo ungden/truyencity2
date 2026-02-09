@@ -20,7 +20,7 @@ export const ThemeToggle: React.FC = () => {
   ];
 
   return (
-    <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
+    <div className="flex items-center gap-1 p-1 bg-muted rounded-lg overflow-hidden">
       {themes.map(({ value, Icon, label }) => {
         const active = theme === value || (!theme && value === "system");
         return (
@@ -29,16 +29,18 @@ export const ThemeToggle: React.FC = () => {
             variant="ghost"
             size="sm"
             className={cn(
-              "h-8 px-3 rounded-md transition-colors",
+              "h-8 rounded-md transition-all",
               active
-                ? "bg-background text-foreground"
-                : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                ? "bg-background text-foreground px-2.5"
+                : "text-muted-foreground hover:text-foreground hover:bg-background/50 px-2"
             )}
             onClick={() => setTheme(value)}
             title={label}
           >
-            <Icon size={14} />
-            <span className="ml-1.5 text-xs font-medium">{label}</span>
+            <Icon size={14} className="shrink-0" />
+            {active && (
+              <span className="ml-1.5 text-xs font-medium truncate">{label}</span>
+            )}
           </Button>
         );
       })}

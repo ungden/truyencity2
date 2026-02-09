@@ -10,7 +10,8 @@ import {
   BookOpen,
   Search,
   ChevronUp,
-  ChevronDown
+  ChevronDown,
+  PanelLeftOpen
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,6 +26,7 @@ interface Chapter {
 
 interface DesktopReadingSidebarProps {
   novelId: string;
+  novelSlug?: string;
   novelTitle: string;
   currentChapter: number;
   totalChapters: number;
@@ -36,6 +38,7 @@ interface DesktopReadingSidebarProps {
 
 export const DesktopReadingSidebar: React.FC<DesktopReadingSidebarProps> = ({
   novelId,
+  novelSlug,
   novelTitle,
   currentChapter,
   totalChapters,
@@ -45,8 +48,10 @@ export const DesktopReadingSidebar: React.FC<DesktopReadingSidebarProps> = ({
   onNextChapter
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [sidebarState, setSidebarState] = useState<'expanded' | 'collapsed' | 'hidden'>('expanded');
   const currentChapterRef = useRef<HTMLButtonElement>(null);
+
+  const novelUrl = novelSlug ? `/truyen/${novelSlug}` : `/novel/${novelId}`;
 
   // Filter chapters based on search
   const filteredChapters = chapters.filter(chapter =>
@@ -64,16 +69,43 @@ export const DesktopReadingSidebar: React.FC<DesktopReadingSidebarProps> = ({
     }
   }, [currentChapter]);
 
-  if (isCollapsed) {
+  // Fully hidden — show a floating toggle on the left edge
+  if (sidebarState === 'hidden') {
+    return (
+      <div className="fixed left-0 top-1/2 -translate-y-1/2 z-40">
+        <Button
+          variant="secondary"
+          size="icon"
+          onClick={() => setSidebarState('expanded')}
+          className="h-10 w-8 rounded-l-none rounded-r-lg shadow-lg border border-l-0 border-border opacity-60 hover:opacity-100 transition-opacity"
+          title="Mở thanh bên"
+        >
+          <PanelLeftOpen size={16} />
+        </Button>
+      </div>
+    );
+  }
+
+  // Collapsed — narrow icon strip
+  if (sidebarState === 'collapsed') {
     return (
       <div className="w-12 h-screen sticky top-0 bg-card border-r border-border flex flex-col items-center py-4">
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => setIsCollapsed(false)}
-          className="mb-4"
+          onClick={() => setSidebarState('expanded')}
+          className="mb-2"
         >
           <ChevronRight size={18} />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setSidebarState('hidden')}
+          className="mb-4"
+          title="Ẩn hoàn toàn"
+        >
+          <ChevronLeft size={14} />
         </Button>
         <div className="flex-1 flex flex-col items-center gap-2">
           <Button variant="ghost" size="icon" asChild>
@@ -82,7 +114,7 @@ export const DesktopReadingSidebar: React.FC<DesktopReadingSidebarProps> = ({
             </Link>
           </Button>
           <Button variant="ghost" size="icon" asChild>
-            <Link href={`/novel/${novelId}`}>
+            <Link href={novelUrl}>
               <BookOpen size={18} />
             </Link>
           </Button>
@@ -110,27 +142,31 @@ export const DesktopReadingSidebar: React.FC<DesktopReadingSidebarProps> = ({
     );
   }
 
+  // Expanded — full sidebar
   return (
     <div className="w-72 h-screen sticky top-0 bg-card border-r border-border flex flex-col">
       {/* Header */}
       <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between mb-3">
           <Link
-            href={`/novel/${novelId}`}
+            href={novelUrl}
             className="flex-1 min-w-0"
           >
             <h2 className="font-semibold text-sm truncate hover:text-primary transition-colors">
               {novelTitle}
             </h2>
           </Link>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsCollapsed(true)}
-            className="h-8 w-8 ml-2"
-          >
-            <ChevronLeft size={16} />
-          </Button>
+          <div className="flex items-center ml-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSidebarState('collapsed')}
+              className="h-8 w-8"
+              title="Thu gọn"
+            >
+              <ChevronLeft size={16} />
+            </Button>
+          </div>
         </div>
 
         {/* Quick Navigation */}
@@ -142,7 +178,7 @@ export const DesktopReadingSidebar: React.FC<DesktopReadingSidebarProps> = ({
             </Link>
           </Button>
           <Button variant="ghost" size="sm" asChild className="flex-1 h-8 text-xs">
-            <Link href={`/novel/${novelId}`}>
+            <Link href={novelUrl}>
               <BookOpen size={14} className="mr-1" />
               Chi tiết
             </Link>
