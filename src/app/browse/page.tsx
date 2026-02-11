@@ -6,7 +6,6 @@ import { NovelCard } from '@/components/novel-card';
 import { GenreFilter } from '@/components/genre-filter';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
@@ -32,7 +31,7 @@ type NovelRow = {
   status: string | null;
   genres: string[] | null;
   updated_at: string | null;
-  chapters: { count: number }[];
+  total_chapters: number;
 };
 
 const NovelCardSkeleton = ({ variant = 'default' }: { variant?: 'default' | 'horizontal' }) => {
@@ -96,70 +95,87 @@ export default function BrowsePage() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   // Build and execute query
   const fetchNovels = async (pageNum: number, append: boolean = false) => {
     if (pageNum === 0) setLoading(true);
     else setLoadingMore(true);
+    setError(null);
 
     const from = pageNum * PAGE_SIZE;
     const to = from + PAGE_SIZE - 1;
 
-    let query = supabase
-      .from('novels')
-      .select('id,slug,title,author,cover_url,status,genres,updated_at,chapters(count)');
+    try {
+      let query = supabase
+        .from('novels')
+        .select('id,slug,title,author,cover_url,status,genres,updated_at,total_chapters');
 
-    // Apply filters server-side
-    if (selectedGenres.length > 0) {
-      query = query.overlaps('genres', selectedGenres);
+      // Apply filters server-side
+      if (selectedGenres.length > 0) {
+        query = query.overlaps('genres', selectedGenres);
+      }
+      if (selectedStatus.length > 0) {
+        query = query.in('status', selectedStatus);
+      }
+
+      // Apply sort
+      switch (sortBy) {
+        case 'title':
+          query = query.order('title', { ascending: true });
+          break;
+        case 'chapters_desc':
+          // We'll sort client-side for chapters since it's a joined count
+          query = query.order('updated_at', { ascending: false, nullsFirst: false });
+          break;
+        case 'updated':
+        default:
+          query = query.order('updated_at', { ascending: false, nullsFirst: false });
+          break;
+      }
+
+      query = query.range(from, to);
+
+      const { data, error: queryError } = await query;
+
+      if (queryError) {
+        console.error('Failed to fetch novels:', queryError);
+        setError('Không thể tải danh sách truyện. Vui lòng thử lại.');
+        setLoading(false);
+        setLoadingMore(false);
+        return;
+      }
+
+      let results = (data || []) as NovelRow[];
+
+      // Client-side chapter range filter
+      const range = chapterRangeOptions.find(r => r.id === chapterRange);
+      if (range && range.id !== 'all') {
+        results = results.filter(n => {
+          const count = n.total_chapters || 0;
+          return count >= range.min && count <= range.max;
+        });
+      }
+
+      // Client-side sort for chapters
+      if (sortBy === 'chapters_desc') {
+        results.sort((a, b) => (b.total_chapters || 0) - (a.total_chapters || 0));
+      }
+
+      if (append) {
+        setNovels(prev => [...prev, ...results]);
+      } else {
+        setNovels(results);
+      }
+
+      setHasMore(results.length === PAGE_SIZE);
+    } catch (err) {
+      console.error('Failed to fetch novels:', err);
+      setError('Không thể tải danh sách truyện. Vui lòng thử lại.');
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
     }
-    if (selectedStatus.length > 0) {
-      query = query.in('status', selectedStatus);
-    }
-
-    // Apply sort
-    switch (sortBy) {
-      case 'title':
-        query = query.order('title', { ascending: true });
-        break;
-      case 'chapters_desc':
-        // We'll sort client-side for chapters since it's a joined count
-        query = query.order('updated_at', { ascending: false, nullsFirst: false });
-        break;
-      case 'updated':
-      default:
-        query = query.order('updated_at', { ascending: false, nullsFirst: false });
-        break;
-    }
-
-    query = query.range(from, to);
-
-    const { data } = await query;
-    let results = (data || []) as NovelRow[];
-
-    // Client-side chapter range filter
-    const range = chapterRangeOptions.find(r => r.id === chapterRange);
-    if (range && range.id !== 'all') {
-      results = results.filter(n => {
-        const count = n.chapters?.[0]?.count || 0;
-        return count >= range.min && count <= range.max;
-      });
-    }
-
-    // Client-side sort for chapters
-    if (sortBy === 'chapters_desc') {
-      results.sort((a, b) => (b.chapters?.[0]?.count || 0) - (a.chapters?.[0]?.count || 0));
-    }
-
-    if (append) {
-      setNovels(prev => [...prev, ...results]);
-    } else {
-      setNovels(results);
-    }
-
-    setHasMore(results.length === PAGE_SIZE);
-    setLoading(false);
-    setLoadingMore(false);
   };
 
   // Initial load + re-fetch on filter/sort change
@@ -329,7 +345,7 @@ export default function BrowsePage() {
     </div>
   );
 
-  const getChapterCount = (n: NovelRow) => n.chapters?.[0]?.count || 0;
+  const getChapterCount = (n: NovelRow) => n.total_chapters || 0;
 
   // Main content
   const MainContent = (
@@ -359,6 +375,7 @@ export default function BrowsePage() {
               size="sm"
               onClick={() => setViewMode('grid')}
               className="rounded-none"
+              aria-label="Chế độ lưới"
             >
               <Grid3X3 size={16} />
             </Button>
@@ -367,6 +384,7 @@ export default function BrowsePage() {
               size="sm"
               onClick={() => setViewMode('list')}
               className="rounded-none"
+              aria-label="Chế độ danh sách"
             >
               <List size={16} />
             </Button>
@@ -379,8 +397,21 @@ export default function BrowsePage() {
         {ActiveFilters}
       </div>
 
+      {/* Error State */}
+      {error && (
+        <div className="text-center py-16">
+          <div className="w-16 h-16 mx-auto mb-4 bg-destructive/10 rounded-full flex items-center justify-center">
+            <X size={24} className="text-destructive" />
+          </div>
+          <p className="text-lg font-medium">{error}</p>
+          <Button variant="outline" onClick={() => fetchNovels(0, false)} className="mt-4">
+            Thử lại
+          </Button>
+        </div>
+      )}
+
       {/* Novel Grid/List */}
-      {loading ? (
+      {!error && loading ? (
         <div className={cn(
           viewMode === 'grid'
             ? "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
@@ -390,7 +421,7 @@ export default function BrowsePage() {
             <NovelCardSkeleton key={i} variant={viewMode === 'list' ? 'horizontal' : 'default'} />
           ))}
         </div>
-      ) : (filtered.length > 0 ? (
+      ) : (!error && filtered.length > 0 ? (
         <div className={cn(
           viewMode === 'grid'
             ? "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
@@ -492,6 +523,7 @@ export default function BrowsePage() {
                   size="sm"
                   onClick={() => setViewMode('grid')}
                   className="rounded-r-none h-9 w-9 p-0"
+                  aria-label="Chế độ lưới"
                 >
                   <Grid3X3 size={14} />
                 </Button>
@@ -500,6 +532,7 @@ export default function BrowsePage() {
                   size="sm"
                   onClick={() => setViewMode('list')}
                   className="rounded-l-none h-9 w-9 p-0"
+                  aria-label="Chế độ danh sách"
                 >
                   <List size={14} />
                 </Button>

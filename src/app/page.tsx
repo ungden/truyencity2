@@ -3,10 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Header } from '@/components/header';
 import {
   ChevronRight,
-  Star,
   TrendingUp,
   Sparkles,
-  BookOpen,
   Clock,
   Flame
 } from 'lucide-react';
@@ -16,16 +14,31 @@ import { Novel } from '@/lib/types';
 import { ContinueReading } from '@/components/continue-reading';
 import { LatestUpdatesCarousel } from '@/components/latest-updates-carousel';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 300;
 
-// Helper to extract chapter count from joined data
+// Helper to extract chapter count from total_chapters column
 function getChapterCount(novel: Novel): number {
-  if (!novel.chapters || !novel.chapters.length) return 0;
-  return novel.chapters[0]?.count || 0;
+  return novel.total_chapters || 0;
 }
 
 export default async function HomePage() {
+  // Allow builds/tests to succeed without Supabase env configured.
+  // In production, these env vars must be set.
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="max-w-6xl mx-auto px-4 py-12">
+          <h1 className="text-2xl font-bold">TruyenCity</h1>
+          <p className="mt-2 text-muted-foreground">
+            Missing Supabase environment variables. Set `NEXT_PUBLIC_SUPABASE_URL` and
+            `NEXT_PUBLIC_SUPABASE_ANON_KEY` to enable homepage data.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   const supabase = await createServerClient();
 
   // Parallel fetch all data
@@ -33,28 +46,28 @@ export default async function HomePage() {
     // Recently updated novels
     supabase
       .from('novels')
-      .select('*, chapters(count)')
+      .select('*')
       .order('updated_at', { ascending: false })
       .limit(20),
     // Featured: novels with covers, most chapters
     supabase
       .from('novels')
-      .select('*, chapters(count)')
+      .select('*')
       .not('cover_url', 'is', null)
       .order('updated_at', { ascending: false })
       .limit(10),
-    // Tien Hiep genre
+    // Tiên Hiệp genre
     supabase
       .from('novels')
-      .select('*, chapters(count)')
+      .select('*')
       .overlaps('genres', ['tien-hiep'])
       .not('cover_url', 'is', null)
       .order('updated_at', { ascending: false })
       .limit(8),
-    // Do Thi genre
+    // Đô Thị genre
     supabase
       .from('novels')
-      .select('*, chapters(count)')
+      .select('*')
       .overlaps('genres', ['do-thi'])
       .not('cover_url', 'is', null)
       .order('updated_at', { ascending: false })
@@ -82,7 +95,7 @@ export default async function HomePage() {
     <div className="min-h-screen bg-background">
       {/* Mobile Header */}
       <div className="lg:hidden">
-        <Header title="Truyen City" variant="search" />
+        <Header title="TruyenCity" variant="search" />
       </div>
 
       <div className="px-4 lg:px-6 py-6 lg:py-8">
@@ -158,7 +171,7 @@ export default async function HomePage() {
               <LatestUpdatesCarousel novels={latestNovels} />
             </section>
 
-            {/* Tien Hiep Genre Section */}
+            {/* Tiên Hiệp Genre Section */}
             {tienHiepNovels.length > 0 && (
               <section>
                 <div className="flex items-center justify-between mb-4">
@@ -193,7 +206,7 @@ export default async function HomePage() {
               </section>
             )}
 
-            {/* Do Thi Genre Section */}
+            {/* Đô Thị Genre Section */}
             {doThiNovels.length > 0 && (
               <section>
                 <div className="flex items-center justify-between mb-4">

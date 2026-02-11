@@ -33,7 +33,9 @@ export type Novel = {
   owner_id?: string | null;
   created_at: string;
   updated_at?: string | null;
-  // Joined from chapters count
+  // Total chapters count (denormalized from chapters table)
+  total_chapters?: number;
+  // DEPRECATED: Use total_chapters instead for better performance
   chapters?: { count: number }[] | null;
 };
 
