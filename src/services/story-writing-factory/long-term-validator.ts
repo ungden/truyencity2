@@ -12,6 +12,7 @@
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { randomUUID } from 'crypto';
 import { logger } from '@/lib/security/logger';
 
 // Lazy initialization
@@ -419,12 +420,12 @@ export class LongTermValidator {
     const avgGap = chapterNumber / (breakthroughs.length || 1);
 
     if (avgGap < 50 && chapterNumber > 300) {
-      issues.push({
-        type: 'warning',
-        description: 'Power progression too fast: breakthrough every ${Math.round(avgGap)} chapters',
-        affectedElements: breakthroughs.map(b => `Ch${b.chapter_number}`),
-        suggestedFix: 'Space out breakthroughs more',
-      });
+        issues.push({
+          type: 'warning',
+          description: `Power progression too fast: breakthrough every ${Math.round(avgGap)} chapters`,
+          affectedElements: breakthroughs.map(b => `Ch${b.chapter_number}`),
+          suggestedFix: 'Space out breakthroughs more',
+        });
       recommendations.push('Increase time between major breakthroughs');
     } else {
       strengths.push(`Reasonable breakthrough pacing: every ${Math.round(avgGap)} chapters`);
@@ -561,7 +562,7 @@ export class LongTermValidator {
     details: ValidationDetails,
     recommendations: string[]
   ): MilestoneValidation {
-    const id = `val_${milestoneChapter}_${type}_${Date.now()}`;
+    const id = randomUUID();
     
     return {
       id,

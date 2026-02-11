@@ -1,5 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { smartMigrationService } from '@/services/story-writing-factory/smart-migration';
+import { createServerClient } from '@/integrations/supabase/server';
+
+export const maxDuration = 300;
+
+async function isAuthorizedAdmin(request: NextRequest): Promise<boolean> {
+  const authHeader = request.headers.get('authorization');
+  const cronSecret = process.env.CRON_SECRET;
+
+  if (authHeader && cronSecret && authHeader === `Bearer ${cronSecret}`) {
+    return true;
+  }
+
+  const supabase = await createServerClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) {
+    return false;
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  return profile?.role === 'admin';
+}
 
 /**
  * POST /api/admin/migrate-smart
@@ -13,9 +39,8 @@ import { smartMigrationService } from '@/services/story-writing-factory/smart-mi
  */
 export async function POST(request: NextRequest) {
   try {
-    // Check auth (should be admin only)
-    const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    const isAuthorized = await isAuthorizedAdmin(request);
+    if (!isAuthorized) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -40,6 +65,7 @@ export async function POST(request: NextRequest) {
       message: 'Smart migration completed successfully',
       result: {
         ...result,
+        totalBatches: Math.ceil(result.total / 5),
         duration: `${duration.toFixed(1)} minutes`,
       },
       summary: {
@@ -69,8 +95,8 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    const isAuthorized = await isAuthorizedAdmin(request);
+    if (!isAuthorized) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }

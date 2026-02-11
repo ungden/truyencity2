@@ -12,6 +12,7 @@
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { randomUUID } from 'crypto';
 import { logger } from '@/lib/security/logger';
 
 // Lazy initialization
@@ -137,7 +138,7 @@ export class RuleIndexer {
     introducedChapter: number,
     importance: number = 50
   ): Promise<WorldRule> {
-    const id = `rule_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const id = randomUUID();
     
     const rule: WorldRule = {
       id,

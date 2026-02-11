@@ -12,6 +12,7 @@
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { randomUUID } from 'crypto';
 import { logger } from '@/lib/security/logger';
 
 // Lazy initialization
@@ -182,7 +183,7 @@ export class VolumeSummaryManager {
     }
 
     const volume: VolumeSummary = {
-      id: `vol_${Date.now()}`,
+      id: randomUUID(),
       projectId: this.projectId,
       volumeNumber,
       startChapter,

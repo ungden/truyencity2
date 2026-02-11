@@ -45,9 +45,6 @@ export default function MigrationPage() {
     try {
       const response = await fetch('/api/admin/migrate-smart', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_CRON_SECRET || ''}`,
-        },
       });
 
       const data = await response.json();
@@ -97,7 +94,7 @@ export default function MigrationPage() {
         <AlertCircle className="h-4 w-4 text-blue-600" />
         <AlertDescription className="text-blue-800">
           <strong>Smart Migration</strong> chỉ analyze 6 chương quan trọng (1, 10, 50, và 3 chương gần nhất) 
-          thay vì toàn bộ chương. Thờ gian: 30 phút, chi phí: 5%, chất lượng: 90%.
+          thay vì toàn bộ chương. Thời gian: 30 phút, chi phí: 5%, chất lượng: 90%.
         </AlertDescription>
       </Alert>
 

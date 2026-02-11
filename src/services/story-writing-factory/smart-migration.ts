@@ -317,15 +317,23 @@ export class SmartMigrationService {
           if (!rules.includes(ruleName) && ruleName.length > 3) {
             rules.push(ruleName);
 
-            await supabase.from('world_rules_index').insert({
-              id: `rule_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            const { error } = await supabase.from('world_rules_index').insert({
               project_id: projectId,
               rule_text: ruleName,
               category: pattern.category,
               tags: [pattern.category, setupChapter.title?.toLowerCase() || ''],
               introduced_chapter: 1,
               importance: 70,
-            }).then(() => {});
+            });
+
+            if (error) {
+              logger.warn('Failed to insert world rule during smart migration', {
+                projectId,
+                ruleName,
+                error: error.message,
+              });
+              continue;
+            }
           }
         }
       }
@@ -348,8 +356,7 @@ export class SmartMigrationService {
     const setupSummary = keyChapters[0]?.title || '';
     const recentSummary = keyChapters[keyChapters.length - 1]?.title || '';
 
-    await supabase.from('volume_summaries').insert({
-      id: `vol_${Date.now()}`,
+    const { error } = await supabase.from('volume_summaries').upsert({
       project_id: projectId,
       volume_number: volumeNumber,
       start_chapter: 1,
@@ -358,7 +365,17 @@ export class SmartMigrationService {
       summary: `Từ "${setupSummary}" đến "${recentSummary}"`,
       major_milestones: keyChapters.map(c => `Ch${c.chapterNumber}: ${c.title}`),
       arcs_included: [1, 2, 3, 4, 5].slice(0, Math.ceil(currentChapter / 20)),
-    }).then(() => {});
+    }, {
+      onConflict: 'project_id,volume_number',
+    });
+
+    if (error) {
+      logger.warn('Failed to upsert volume summary during smart migration', {
+        projectId,
+        volumeNumber,
+        error: error.message,
+      });
+    }
   }
 
   /**

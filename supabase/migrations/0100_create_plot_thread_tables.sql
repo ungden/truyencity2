@@ -7,7 +7,7 @@
 
 CREATE TABLE IF NOT EXISTS plot_threads (
   id TEXT PRIMARY KEY,
-  project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
+  project_id UUID REFERENCES ai_story_projects(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   description TEXT NOT NULL,
   priority TEXT NOT NULL CHECK (priority IN ('critical', 'main', 'sub', 'background')),
@@ -68,7 +68,8 @@ CREATE TRIGGER trigger_update_plot_thread_timestamp
 ALTER TABLE character_tracker 
   ADD COLUMN IF NOT EXISTS relationship_summary TEXT,
   ADD COLUMN IF NOT EXISTS key_facts TEXT[] DEFAULT '{}',
-  ADD COLUMN IF NOT EXISTS pending_promises TEXT[] DEFAULT '{}';
+  ADD COLUMN IF NOT EXISTS pending_promises TEXT[] DEFAULT '{}',
+  ADD COLUMN IF NOT EXISTS last_seen_chapter INTEGER;
 
 -- Index for character lookups
 CREATE INDEX IF NOT EXISTS idx_character_tracker_last_seen 
@@ -80,7 +81,7 @@ CREATE INDEX IF NOT EXISTS idx_character_tracker_last_seen
 
 CREATE TABLE IF NOT EXISTS volume_summaries (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
+  project_id UUID REFERENCES ai_story_projects(id) ON DELETE CASCADE,
   volume_number INTEGER NOT NULL,
   start_chapter INTEGER NOT NULL,
   end_chapter INTEGER NOT NULL,
@@ -113,7 +114,7 @@ CREATE POLICY "Allow authenticated users to manage volume_summaries"
 
 CREATE TABLE IF NOT EXISTS world_rules_index (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
+  project_id UUID REFERENCES ai_story_projects(id) ON DELETE CASCADE,
   rule_text TEXT NOT NULL,
   category TEXT NOT NULL, -- e.g., 'power_system', 'politics', 'economy'
   tags TEXT[] DEFAULT '{}', -- e.g., ['realm=kimet', 'skill=fire']
@@ -142,7 +143,7 @@ CREATE POLICY "Allow authenticated users to manage world_rules_index"
 
 CREATE TABLE IF NOT EXISTS milestone_validations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
+  project_id UUID REFERENCES ai_story_projects(id) ON DELETE CASCADE,
   milestone_chapter INTEGER NOT NULL,
   validation_type TEXT NOT NULL, -- 'thread_resolution', 'character_arc', 'power_consistency'
   status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'passed', 'failed', 'warning')),
