@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Header } from '@/components/header';
 import { NovelCard } from '@/components/novel-card';
 import { GenreFilter } from '@/components/genre-filter';
@@ -17,10 +17,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Grid3X3, List, ArrowUpDown, Filter, X, SlidersHorizontal } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { AppContainer, TwoColumnLayout, ContentCard } from '@/components/layout';
 import { cn } from '@/lib/utils';
 import { GENRE_CONFIG } from '@/lib/types/genre-config';
+import { useNovelsInfinite } from '@/hooks/use-novels-infinite';
+import { useIntersectionObserver } from '@/hooks/use-intersection-observer';
+import { useEffect } from 'react';
 
 type NovelRow = {
   id: string;
@@ -90,108 +92,46 @@ export default function BrowsePage() {
   const [chapterRange, setChapterRange] = useState('all');
   const [sortBy, setSortBy] = useState('updated');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [novels, setNovels] = useState<NovelRow[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [page, setPage] = useState(0);
-  const [error, setError] = useState<string | null>(null);
 
-  // Build and execute query
-  const fetchNovels = async (pageNum: number, append: boolean = false) => {
-    if (pageNum === 0) setLoading(true);
-    else setLoadingMore(true);
-    setError(null);
+  // Use React Query infinite query hook
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isError,
+    error,
+  } = useNovelsInfinite({
+    selectedGenres,
+    selectedStatus,
+    chapterRange,
+    sortBy,
+  });
 
-    const from = pageNum * PAGE_SIZE;
-    const to = from + PAGE_SIZE - 1;
+  // Flatten all pages into single array
+  const novels = data?.pages.flatMap((page) => page) ?? [];
 
-    try {
-      let query = supabase
-        .from('novels')
-        .select('id,slug,title,author,cover_url,status,genres,updated_at,total_chapters');
+  // Intersection Observer for auto infinite scroll
+  const { targetRef, isIntersecting } = useIntersectionObserver<HTMLDivElement>({
+    threshold: 0.1,
+    rootMargin: '200px', // Trigger 200px before reaching the sentinel
+    enabled: hasNextPage && !isFetchingNextPage,
+  });
 
-      // Apply filters server-side
-      if (selectedGenres.length > 0) {
-        query = query.overlaps('genres', selectedGenres);
-      }
-      if (selectedStatus.length > 0) {
-        query = query.in('status', selectedStatus);
-      }
+  // Auto-fetch next page when sentinel is visible
+  useEffect(() => {
+    if (isIntersecting && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [isIntersecting, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-      // Apply sort
-      switch (sortBy) {
-        case 'title':
-          query = query.order('title', { ascending: true });
-          break;
-        case 'chapters_desc':
-          // We'll sort client-side for chapters since it's a joined count
-          query = query.order('updated_at', { ascending: false, nullsFirst: false });
-          break;
-        case 'updated':
-        default:
-          query = query.order('updated_at', { ascending: false, nullsFirst: false });
-          break;
-      }
-
-      query = query.range(from, to);
-
-      const { data, error: queryError } = await query;
-
-      if (queryError) {
-        console.error('Failed to fetch novels:', queryError);
-        setError('Không thể tải danh sách truyện. Vui lòng thử lại.');
-        setLoading(false);
-        setLoadingMore(false);
-        return;
-      }
-
-      let results = (data || []) as NovelRow[];
-
-      // Client-side chapter range filter
-      const range = chapterRangeOptions.find(r => r.id === chapterRange);
-      if (range && range.id !== 'all') {
-        results = results.filter(n => {
-          const count = n.total_chapters || 0;
-          return count >= range.min && count <= range.max;
-        });
-      }
-
-      // Client-side sort for chapters
-      if (sortBy === 'chapters_desc') {
-        results.sort((a, b) => (b.total_chapters || 0) - (a.total_chapters || 0));
-      }
-
-      if (append) {
-        setNovels(prev => [...prev, ...results]);
-      } else {
-        setNovels(results);
-      }
-
-      setHasMore(results.length === PAGE_SIZE);
-    } catch (err) {
-      console.error('Failed to fetch novels:', err);
-      setError('Không thể tải danh sách truyện. Vui lòng thử lại.');
-    } finally {
-      setLoading(false);
-      setLoadingMore(false);
+  // Manual load more handler (fallback button)
+  const loadMore = () => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
     }
   };
-
-  // Initial load + re-fetch on filter/sort change
-  useEffect(() => {
-    setPage(0);
-    fetchNovels(0, false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedGenres, selectedStatus, sortBy, chapterRange]);
-
-  const loadMore = () => {
-    const nextPage = page + 1;
-    setPage(nextPage);
-    fetchNovels(nextPage, true);
-  };
-
-  const filtered = novels;
 
   const toggleGenre = (genreId: string) => {
     setSelectedGenres(prev =>
@@ -353,7 +293,7 @@ export default function BrowsePage() {
       {/* Toolbar */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          {loading ? 'Đang tải...' : `Hiển thị ${filtered.length} truyện`}
+          {isLoading ? 'Đang tải...' : `Hiển thị ${novels.length} truyện`}
         </p>
 
         <div className="flex items-center gap-3">
@@ -398,20 +338,20 @@ export default function BrowsePage() {
       </div>
 
       {/* Error State */}
-      {error && (
+      {isError && (
         <div className="text-center py-16">
           <div className="w-16 h-16 mx-auto mb-4 bg-destructive/10 rounded-full flex items-center justify-center">
             <X size={24} className="text-destructive" />
           </div>
-          <p className="text-lg font-medium">{error}</p>
-          <Button variant="outline" onClick={() => fetchNovels(0, false)} className="mt-4">
+          <p className="text-lg font-medium">{error?.message || 'Không thể tải danh sách truyện'}</p>
+          <Button variant="outline" onClick={() => window.location.reload()} className="mt-4">
             Thử lại
           </Button>
         </div>
       )}
 
       {/* Novel Grid/List */}
-      {!error && loading ? (
+      {!error && isLoading ? (
         <div className={cn(
           viewMode === 'grid'
             ? "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
@@ -421,13 +361,13 @@ export default function BrowsePage() {
             <NovelCardSkeleton key={i} variant={viewMode === 'list' ? 'horizontal' : 'default'} />
           ))}
         </div>
-      ) : (!error && filtered.length > 0 ? (
+      ) : (!error && novels.length > 0 ? (
         <div className={cn(
           viewMode === 'grid'
             ? "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
             : "space-y-3"
         )}>
-          {filtered.map((novel) => (
+          {novels.map((novel) => (
             <NovelCard
               key={novel.id}
               id={novel.id}
@@ -459,11 +399,23 @@ export default function BrowsePage() {
         </div>
       ))}
 
-      {/* Load More */}
-      {!loading && hasMore && filtered.length > 0 && (
+      {/* Infinite Scroll Sentinel - invisible div that triggers load more */}
+      {!isLoading && hasNextPage && novels.length > 0 && (
+        <div ref={targetRef} className="h-20 flex items-center justify-center">
+          {isFetchingNextPage && (
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <div className="animate-spin h-5 w-5 border-2 border-current border-t-transparent rounded-full" />
+              <span className="text-sm">Đang tải thêm...</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Fallback Manual Load More Button (in case auto-scroll doesn't work) */}
+      {!isLoading && hasNextPage && novels.length > 0 && !isIntersecting && (
         <div className="text-center mt-6">
-          <Button variant="outline" onClick={loadMore} disabled={loadingMore} className="px-8">
-            {loadingMore ? 'Đang tải...' : 'Xem thêm'}
+          <Button variant="outline" onClick={loadMore} disabled={isFetchingNextPage} className="px-8">
+            Xem thêm
           </Button>
         </div>
       )}
@@ -545,11 +497,11 @@ export default function BrowsePage() {
 
           {/* Results count */}
           <p className="text-sm text-muted-foreground">
-            {loading ? 'Đang tải...' : `Hiển thị ${filtered.length} truyện`}
+            {isLoading ? 'Đang tải...' : `Hiển thị ${novels.length} truyện`}
           </p>
 
           {/* Novel Grid/List */}
-          {loading ? (
+          {isLoading ? (
             <div className={cn(
               viewMode === 'grid'
                 ? "grid grid-cols-2 sm:grid-cols-3 gap-3"
@@ -559,13 +511,13 @@ export default function BrowsePage() {
                 <NovelCardSkeleton key={i} variant={viewMode === 'list' ? 'horizontal' : 'default'} />
               ))}
             </div>
-          ) : (filtered.length > 0 ? (
+          ) : (novels.length > 0 ? (
             <div className={cn(
               viewMode === 'grid'
                 ? "grid grid-cols-2 sm:grid-cols-3 gap-3"
                 : "space-y-3"
             )}>
-              {filtered.map((novel) => (
+              {novels.map((novel) => (
                 <NovelCard
                   key={novel.id}
                   id={novel.id}
@@ -589,12 +541,15 @@ export default function BrowsePage() {
             </div>
           ))}
 
-          {/* Load More - Mobile */}
-          {!loading && hasMore && filtered.length > 0 && (
-            <div className="text-center mt-4">
-              <Button variant="outline" onClick={loadMore} disabled={loadingMore} className="px-8">
-                {loadingMore ? 'Đang tải...' : 'Xem thêm'}
-              </Button>
+          {/* Mobile: Same infinite scroll sentinel */}
+          {!isLoading && hasNextPage && novels.length > 0 && (
+            <div ref={targetRef} className="h-20 flex items-center justify-center mt-4">
+              {isFetchingNextPage && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <div className="animate-spin h-5 w-5 border-2 border-current border-t-transparent rounded-full" />
+                  <span className="text-sm">Đang tải thêm...</span>
+                </div>
+              )}
             </div>
           )}
         </div>
