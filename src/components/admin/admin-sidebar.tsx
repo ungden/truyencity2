@@ -19,6 +19,7 @@ import {
   Factory,
   Pen,
   Activity,
+  ClipboardList,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -85,6 +86,11 @@ const menuItems = [
     title: 'Health Check',
     href: '/admin/health',
     icon: Activity,
+  },
+  {
+    title: 'Production Report',
+    href: '/admin/production-report',
+    icon: ClipboardList,
   },
   {
     title: 'Thông báo',
