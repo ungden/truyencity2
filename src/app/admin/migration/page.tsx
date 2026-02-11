@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Play, CheckCircle, AlertCircle, Clock } from 'lucide-react';
+import { Loader2, Play, CheckCircle, AlertCircle, Clock, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface MigrationStatus {
@@ -17,6 +17,32 @@ interface MigrationStatus {
   totalBatches: number;
   averageConfidence: number;
   estimatedTimeRemaining: number;
+}
+
+interface MigrationReportProject {
+  projectId: string;
+  novelId: string;
+  currentChapter: number;
+  mainCharacter: string;
+  genre: string;
+  threads: number;
+  rules: number;
+  volumes: number;
+  confidence: number;
+  status: 'migrated' | 'pending';
+}
+
+interface MigrationReport {
+  summary: {
+    totalActive: number;
+    migrated: number;
+    pending: number;
+    withThreads: number;
+    withRules: number;
+    withVolumes: number;
+    coveragePercent: number;
+  };
+  projects: MigrationReportProject[];
 }
 
 export default function MigrationPage() {
@@ -31,7 +57,9 @@ export default function MigrationPage() {
     estimatedTimeRemaining: 0,
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [isRefreshingReport, setIsRefreshingReport] = useState(false);
   const [logs, setLogs] = useState<string[]>([]);
+  const [report, setReport] = useState<MigrationReport | null>(null);
 
   const addLog = (message: string) => {
     setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${message}`]);
@@ -65,6 +93,7 @@ export default function MigrationPage() {
         addLog(`🎯 Average confidence: ${data.result.averageConfidence.toFixed(1)}%`);
         addLog(`⏱️ Duration: ${data.result.duration}`);
         toast.success('Migration hoàn thành!');
+        await loadReport();
       } else {
         throw new Error(data.error);
       }
@@ -77,6 +106,41 @@ export default function MigrationPage() {
     }
   };
 
+  const loadReport = async () => {
+    setIsRefreshingReport(true);
+    try {
+      const response = await fetch('/api/admin/migrate-smart?report=1&limit=30', {
+        method: 'GET',
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.error || 'Không tải được báo cáo migration');
+      }
+
+      if (data?.status) {
+        setStatus(prev => ({
+          ...prev,
+          total: data.status.total || prev.total,
+          completed: data.status.completed || prev.completed,
+          failed: data.status.failed || prev.failed,
+        }));
+      }
+
+      if (data?.report) {
+        setReport(data.report);
+      }
+    } catch (error) {
+      addLog(`⚠️ Không tải được báo cáo: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsRefreshingReport(false);
+    }
+  };
+
+  useEffect(() => {
+    void loadReport();
+  }, []);
+
   const progress = status.total > 0 ? (status.completed / status.total) * 100 : 0;
 
   return (
@@ -88,6 +152,18 @@ export default function MigrationPage() {
             Nâng cấp truyện đang viết lên hệ thống Scalability 4 Phases
           </p>
         </div>
+        <Button
+          variant="outline"
+          onClick={loadReport}
+          disabled={isRefreshingReport || isLoading}
+        >
+          {isRefreshingReport ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <RefreshCw className="mr-2 h-4 w-4" />
+          )}
+          Refresh Report
+        </Button>
       </div>
 
       <Alert className="bg-blue-50 border-blue-200">
@@ -106,7 +182,7 @@ export default function MigrationPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{status.total}</div>
+            <div className="text-3xl font-bold">{report?.summary.totalActive ?? status.total}</div>
             <p className="text-xs text-muted-foreground mt-1">
               Novels active &gt;20 chương
             </p>
@@ -124,6 +200,11 @@ export default function MigrationPage() {
               {status.completed}/{status.total}
             </div>
             <Progress value={progress} className="mt-2" />
+            {report && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Pending: {report.summary.pending}
+              </p>
+            )}
           </CardContent>
         </Card>
 
@@ -140,9 +221,72 @@ export default function MigrationPage() {
             <p className="text-xs text-muted-foreground mt-1">
               Mức độ tin cậy
             </p>
+            {report && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Coverage: {report.summary.coveragePercent.toFixed(1)}%
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>
+
+      {report && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Migration Report</CardTitle>
+            <CardDescription>
+              Top {report.projects.length} projects theo chapter giảm dần
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+              <div className="rounded border p-3">
+                <div className="text-muted-foreground">Migrated</div>
+                <div className="font-semibold text-green-700">{report.summary.migrated}</div>
+              </div>
+              <div className="rounded border p-3">
+                <div className="text-muted-foreground">Pending</div>
+                <div className="font-semibold text-amber-700">{report.summary.pending}</div>
+              </div>
+              <div className="rounded border p-3">
+                <div className="text-muted-foreground">With Threads</div>
+                <div className="font-semibold">{report.summary.withThreads}</div>
+              </div>
+              <div className="rounded border p-3">
+                <div className="text-muted-foreground">With Rules</div>
+                <div className="font-semibold">{report.summary.withRules}</div>
+              </div>
+            </div>
+
+            <div className="rounded border overflow-hidden">
+              <div className="grid grid-cols-12 bg-muted px-3 py-2 text-xs font-medium">
+                <div className="col-span-4">Project</div>
+                <div className="col-span-2 text-center">Chapter</div>
+                <div className="col-span-3 text-center">T/R/V</div>
+                <div className="col-span-2 text-center">Confidence</div>
+                <div className="col-span-1 text-right">State</div>
+              </div>
+              {report.projects.map((project) => (
+                <div key={project.projectId} className="grid grid-cols-12 px-3 py-2 text-xs border-t">
+                  <div className="col-span-4 truncate" title={project.projectId}>
+                    {project.projectId.slice(0, 8)}... - {project.mainCharacter || 'N/A'}
+                  </div>
+                  <div className="col-span-2 text-center">{project.currentChapter}</div>
+                  <div className="col-span-3 text-center">
+                    {project.threads}/{project.rules}/{project.volumes}
+                  </div>
+                  <div className="col-span-2 text-center">{project.confidence}%</div>
+                  <div className="col-span-1 text-right">
+                    <span className={project.status === 'migrated' ? 'text-green-700' : 'text-amber-700'}>
+                      {project.status}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>

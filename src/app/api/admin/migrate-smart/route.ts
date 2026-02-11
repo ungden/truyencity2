@@ -104,9 +104,16 @@ export async function GET(request: NextRequest) {
     }
 
     const status = await smartMigrationService.getMigrationStatus();
+    const shouldIncludeReport = request.nextUrl.searchParams.get('report') === '1';
+    const limit = Number(request.nextUrl.searchParams.get('limit') || '20');
+    const safeLimit = Number.isFinite(limit) ? Math.min(Math.max(1, limit), 200) : 20;
+    const report = shouldIncludeReport
+      ? await smartMigrationService.getMigrationReport(safeLimit)
+      : null;
 
     return NextResponse.json({
       status,
+      report,
       message: 'Migration status retrieved',
     });
 

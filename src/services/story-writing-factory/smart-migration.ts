@@ -47,7 +47,56 @@ interface KeyChapter {
 
 export class SmartMigrationService {
   private batchSize: number = 5; // Process 5 novels at a time
-  private confidenceThreshold: number = 0.7;
+
+  private async getActiveProjects() {
+    const supabase = getSupabase();
+    const { data: projects, error } = await supabase
+      .from('ai_story_projects')
+      .select('id, novel_id, current_chapter, genre, main_character, updated_at')
+      .eq('status', 'active')
+      .gt('current_chapter', 20)
+      .order('current_chapter', { ascending: false });
+
+    if (error || !projects) {
+      logger.error('Failed to fetch active novels for migration status/report');
+      throw error;
+    }
+
+    return projects;
+  }
+
+  private async getCountsByProject(projectIds: string[]): Promise<{
+    threadCounts: Record<string, number>;
+    ruleCounts: Record<string, number>;
+    volumeCounts: Record<string, number>;
+  }> {
+    if (projectIds.length === 0) {
+      return { threadCounts: {}, ruleCounts: {}, volumeCounts: {} };
+    }
+
+    const supabase = getSupabase();
+    const [threadsRes, rulesRes, volumesRes] = await Promise.all([
+      supabase.from('plot_threads').select('project_id').in('project_id', projectIds),
+      supabase.from('world_rules_index').select('project_id').in('project_id', projectIds),
+      supabase.from('volume_summaries').select('project_id').in('project_id', projectIds),
+    ]);
+
+    const threadCounts: Record<string, number> = {};
+    const ruleCounts: Record<string, number> = {};
+    const volumeCounts: Record<string, number> = {};
+
+    for (const row of threadsRes.data || []) {
+      threadCounts[row.project_id] = (threadCounts[row.project_id] || 0) + 1;
+    }
+    for (const row of rulesRes.data || []) {
+      ruleCounts[row.project_id] = (ruleCounts[row.project_id] || 0) + 1;
+    }
+    for (const row of volumesRes.data || []) {
+      volumeCounts[row.project_id] = (volumeCounts[row.project_id] || 0) + 1;
+    }
+
+    return { threadCounts, ruleCounts, volumeCounts };
+  }
 
   /**
    * Main entry: Migrate all active novels
@@ -60,20 +109,7 @@ export class SmartMigrationService {
     duration: number;
   }> {
     const startTime = Date.now();
-    const supabase = getSupabase();
-
-    // Get active novels
-    const { data: novels, error } = await supabase
-      .from('ai_story_projects')
-      .select('id, novel_id, current_chapter, genre, main_character')
-      .eq('status', 'active')
-      .gt('current_chapter', 20)
-      .order('current_chapter', { ascending: false });
-
-    if (error || !novels) {
-      logger.error('Failed to fetch active novels');
-      throw error;
-    }
+    const novels = await this.getActiveProjects();
 
     logger.info(`Starting smart migration for ${novels.length} novels`);
 
@@ -407,20 +443,115 @@ export class SmartMigrationService {
    * Get migration status
    */
   async getMigrationStatus(): Promise<{
+    total: number;
     pending: number;
     analyzing: number;
     completed: number;
     failed: number;
   }> {
-    const supabase = getSupabase();
+    const projects = await this.getActiveProjects();
+    const projectIds = projects.map(p => p.id);
+    const { threadCounts, ruleCounts, volumeCounts } = await this.getCountsByProject(projectIds);
 
-    // This would need a status table in production
-    // For now, return placeholder
+    let completed = 0;
+    for (const projectId of projectIds) {
+      const hasAnyData = (threadCounts[projectId] || 0) > 0 ||
+        (ruleCounts[projectId] || 0) > 0 ||
+        (volumeCounts[projectId] || 0) > 0;
+      if (hasAnyData) {
+        completed++;
+      }
+    }
+
     return {
-      pending: 0,
+      total: projects.length,
+      pending: Math.max(0, projects.length - completed),
       analyzing: 0,
-      completed: 0,
+      completed,
       failed: 0,
+    };
+  }
+
+  async getMigrationReport(limit: number = 20): Promise<{
+    summary: {
+      totalActive: number;
+      migrated: number;
+      pending: number;
+      withThreads: number;
+      withRules: number;
+      withVolumes: number;
+      coveragePercent: number;
+    };
+    projects: Array<{
+      projectId: string;
+      novelId: string;
+      currentChapter: number;
+      mainCharacter: string;
+      genre: string;
+      updatedAt: string;
+      threads: number;
+      rules: number;
+      volumes: number;
+      confidence: number;
+      status: 'migrated' | 'pending';
+    }>;
+  }> {
+    const projects = await this.getActiveProjects();
+    const projectIds = projects.map(p => p.id);
+    const { threadCounts, ruleCounts, volumeCounts } = await this.getCountsByProject(projectIds);
+
+    let migrated = 0;
+    let withThreads = 0;
+    let withRules = 0;
+    let withVolumes = 0;
+
+    const projectReports = projects.map(project => {
+      const threads = threadCounts[project.id] || 0;
+      const rules = ruleCounts[project.id] || 0;
+      const volumes = volumeCounts[project.id] || 0;
+
+      if (threads > 0) withThreads++;
+      if (rules > 0) withRules++;
+      if (volumes > 0) withVolumes++;
+
+      const confidence =
+        (threads > 0 ? 40 : 0) +
+        (rules > 0 ? 30 : 0) +
+        (volumes > 0 ? 30 : 0);
+
+      const status: 'migrated' | 'pending' = confidence > 0 ? 'migrated' : 'pending';
+      if (status === 'migrated') migrated++;
+
+      return {
+        projectId: project.id,
+        novelId: project.novel_id,
+        currentChapter: project.current_chapter || 0,
+        mainCharacter: project.main_character || '',
+        genre: project.genre || '',
+        updatedAt: project.updated_at || '',
+        threads,
+        rules,
+        volumes,
+        confidence,
+        status,
+      };
+    });
+
+    const totalActive = projects.length;
+    const pending = Math.max(0, totalActive - migrated);
+    const coveragePercent = totalActive > 0 ? (migrated / totalActive) * 100 : 0;
+
+    return {
+      summary: {
+        totalActive,
+        migrated,
+        pending,
+        withThreads,
+        withRules,
+        withVolumes,
+        coveragePercent,
+      },
+      projects: projectReports.slice(0, Math.max(1, limit)),
     };
   }
 }
