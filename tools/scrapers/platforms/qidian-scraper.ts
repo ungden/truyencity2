@@ -98,8 +98,8 @@ export class QiDianScraper extends BaseScraper {
   }
 
   private async parseNovelItem(
-    $: cheerio.CheerioAPI,
-    item: cheerio.Cheerio<any>,
+    $: ReturnType<typeof cheerio.load>,
+    item: cheerio.Cheerio,
     genre: string,
     rank: number
   ): Promise<ScrapedNovel | null> {
