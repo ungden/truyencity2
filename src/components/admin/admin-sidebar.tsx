@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   LayoutDashboard,
   BookOpen,
@@ -59,7 +59,15 @@ const aiToolsSubmenu = [
   },
 ];
 
-const menuItems = [
+type MenuItem = {
+  title: string;
+  href: string;
+  icon: typeof LayoutDashboard;
+  badge?: string;
+  hasSubmenu?: boolean;
+};
+
+const menuItems: MenuItem[] = [
   {
     title: 'Tổng quan',
     href: '/admin',
@@ -128,7 +136,7 @@ const mobileNavItems = [
   },
 ];
 
-function NavLink({ item, isActive, onClick }: { item: typeof menuItems[0] & { badge?: string; hasSubmenu?: boolean }, isActive: boolean, onClick?: () => void }) {
+function NavLink({ item, isActive, onClick }: { item: MenuItem, isActive: boolean, onClick?: () => void }) {
   const Icon = item.icon;
   return (
     <Link
@@ -228,6 +236,40 @@ function AIToolsMenu({ isActive, onClick }: { isActive: boolean; onClick?: () =>
 export function AdminSidebar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const [productionAlertLevel, setProductionAlertLevel] = useState<'ok' | 'warn' | 'critical' | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchProductionHealth = async () => {
+      try {
+        const response = await fetch('/api/admin/production-report', {
+          method: 'GET',
+          cache: 'no-store',
+        });
+
+        if (!response.ok) {
+          return;
+        }
+
+        const data = await response.json();
+        const level = data?.summary?.healthAlertLevel;
+        if (!cancelled && (level === 'ok' || level === 'warn' || level === 'critical')) {
+          setProductionAlertLevel(level);
+        }
+      } catch {
+        // Ignore sidebar telemetry errors to avoid blocking navigation UI
+      }
+    };
+
+    fetchProductionHealth();
+    const timer = setInterval(fetchProductionHealth, 5 * 60 * 1000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, []);
 
   const isActive = (href: string) => {
     return pathname === href || (href !== '/admin' && pathname.startsWith(href));
@@ -258,7 +300,12 @@ export function AdminSidebar() {
               ) : (
                 <NavLink
                   key={item.href}
-                  item={item}
+                  item={item.href === '/admin/production-report' && productionAlertLevel && productionAlertLevel !== 'ok'
+                    ? {
+                        ...item,
+                        badge: productionAlertLevel === 'critical' ? 'ALERT' : 'WARN',
+                      }
+                    : item}
                   isActive={isActive(item.href)}
                 />
               )
@@ -306,12 +353,17 @@ export function AdminSidebar() {
                         onClick={() => setIsOpen(false)}
                       />
                     ) : (
-                      <NavLink
-                        key={item.href}
-                        item={item}
-                        isActive={isActive(item.href)}
-                        onClick={() => setIsOpen(false)}
-                      />
+                       <NavLink
+                         key={item.href}
+                         item={item.href === '/admin/production-report' && productionAlertLevel && productionAlertLevel !== 'ok'
+                           ? {
+                               ...item,
+                               badge: productionAlertLevel === 'critical' ? 'ALERT' : 'WARN',
+                             }
+                           : item}
+                         isActive={isActive(item.href)}
+                         onClick={() => setIsOpen(false)}
+                       />
                     )
                   ))}
                 </nav>
