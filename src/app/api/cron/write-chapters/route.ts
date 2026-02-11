@@ -27,6 +27,7 @@ import type { FactoryConfig, RunnerConfig, GenreType } from '@/services/story-wr
 const RESUME_BATCH_SIZE = 30;  // Tier 1: resume projects (fast) — 30 * 288 ticks/day = 8,640 slots/day
 const INIT_BATCH_SIZE = 5;     // Tier 2: new projects needing full plan (slow) — bumped from 1 to clear 33 stuck novels faster
 const PROJECT_TIMEOUT_MS = 120_000; // 120s per-project timeout — prevents 1 slow project from blocking the batch
+const DAILY_CHAPTER_QUOTA = 20; // Hard cap per novel per Vietnam day
 
 export const maxDuration = 300; // 5 minutes (Vercel Pro)
 export const dynamic = 'force-dynamic';
@@ -43,6 +44,24 @@ function verifyCronAuth(request: NextRequest): boolean {
   const cronSecret = process.env.CRON_SECRET;
   if (!cronSecret) return process.env.NODE_ENV === 'development';
   return authHeader === `Bearer ${cronSecret}`;
+}
+
+function getVietnamDayBounds(now: Date = new Date()): { startIso: string; endIso: string } {
+  const dateStr = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Ho_Chi_Minh',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(now);
+
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const startUtc = new Date(Date.UTC(year, month - 1, day, -7, 0, 0));
+  const endUtc = new Date(startUtc.getTime() + 24 * 60 * 60 * 1000);
+
+  return {
+    startIso: startUtc.toISOString(),
+    endIso: endUtc.toISOString(),
+  };
 }
 
 // Shared type for project row
@@ -350,15 +369,61 @@ export async function GET(request: NextRequest) {
 
     const initProjects = (initQuery.data || []).filter(p => p.novels) as ProjectRow[];
 
-    const totalProjects = resumeProjects.length + initProjects.length;
+    const allCandidates = [...resumeProjects, ...initProjects];
+    const novelIds = allCandidates
+      .map((p) => {
+        const novel = Array.isArray(p.novels) ? p.novels[0] : p.novels;
+        return novel?.id as string | undefined;
+      })
+      .filter((id): id is string => Boolean(id));
+
+    let chapterCountByNovel = new Map<string, number>();
+    if (novelIds.length > 0) {
+      const { startIso, endIso } = getVietnamDayBounds();
+      const { data: todayChapters, error: todayChaptersError } = await supabase
+        .from('chapters')
+        .select('novel_id')
+        .in('novel_id', novelIds)
+        .gte('created_at', startIso)
+        .lt('created_at', endIso);
+
+      if (todayChaptersError) {
+        throw todayChaptersError;
+      }
+
+      chapterCountByNovel = (todayChapters || []).reduce((map, row) => {
+        const current = map.get(row.novel_id) || 0;
+        map.set(row.novel_id, current + 1);
+        return map;
+      }, new Map<string, number>());
+    }
+
+    const isBelowQuota = (project: ProjectRow): boolean => {
+      const novel = Array.isArray(project.novels) ? project.novels[0] : project.novels;
+      if (!novel?.id) return false;
+      const chaptersToday = chapterCountByNovel.get(novel.id) || 0;
+      return chaptersToday < DAILY_CHAPTER_QUOTA;
+    };
+
+    const filteredResumeProjects = resumeProjects.filter(isBelowQuota);
+    const filteredInitProjects = initProjects.filter(isBelowQuota);
+
+    const totalProjects = filteredResumeProjects.length + filteredInitProjects.length;
+    const skippedDueToQuota = allCandidates.length - totalProjects;
 
     if (totalProjects === 0) {
-      return NextResponse.json({ success: true, message: 'No projects to process' });
+      return NextResponse.json({
+        success: true,
+        message: skippedDueToQuota > 0
+          ? `No projects to process (all ${skippedDueToQuota} candidates reached daily quota)`
+          : 'No projects to process',
+        skippedDueToQuota,
+      });
     }
 
     // Claim projects by bumping updated_at to now (distributed lock).
     // Concurrent invocations will skip these because of the .lt('updated_at', fourMinutesAgo) guard.
-    const allIds = [...resumeProjects, ...initProjects].map(p => p.id);
+    const allIds = [...filteredResumeProjects, ...filteredInitProjects].map(p => p.id);
     await supabase
       .from('ai_story_projects')
       .update({ updated_at: new Date().toISOString() })
@@ -375,7 +440,7 @@ export async function GET(request: NextRequest) {
 
     const allPromises = [
       // Tier 1: All resume projects in parallel (with per-project timeout)
-      ...resumeProjects.map(p =>
+      ...filteredResumeProjects.map(p =>
         withTimeout(
           writeOneChapter(p, geminiKey, supabase, 'resume'),
           PROJECT_TIMEOUT_MS,
@@ -389,7 +454,7 @@ export async function GET(request: NextRequest) {
           }))
       ),
       // Tier 2: Init projects (usually just 1, longer timeout: 4 min for full planning)
-      ...initProjects.map(p =>
+      ...filteredInitProjects.map(p =>
         withTimeout(
           writeOneChapter(p, geminiKey, supabase, 'init'),
           240_000, // 4 min for init (full planning pipeline)
@@ -420,10 +485,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       processed: totalProjects,
-      resumeCount: resumeProjects.length,
+      resumeCount: filteredResumeProjects.length,
       resumeSuccess,
-      initCount: initProjects.length,
+      initCount: filteredInitProjects.length,
       initSuccess,
+      skippedDueToQuota,
       rotations,
       durationSeconds: Math.round(duration),
       results: summary,

@@ -62,6 +62,13 @@ export interface SeedResult {
   durationMs: number;
 }
 
+export interface DailySpawnResult {
+  created: number;
+  target: number;
+  errors: string[];
+  durationMs: number;
+}
+
 interface NovelIdea {
   title: string;
   premise: string;
@@ -283,6 +290,198 @@ export class ContentSeeder {
     const activated = await this.activateInitialBatch(authorIds, perAuthor, errors);
 
     return { authors: authorIds.length, novels: 0, activated, errors, durationMs: Date.now() - startTime };
+  }
+
+  /**
+   * Daily spawn: create a small number of brand-new novels/projects.
+   * Newly created projects start as paused so daily rotation can activate fairly.
+   */
+  async spawnDailyNovels(targetCount: number = 20): Promise<DailySpawnResult> {
+    const startTime = Date.now();
+    const errors: string[] = [];
+
+    this.userId = await this.getSystemUserId();
+    if (!this.userId) {
+      return {
+        created: 0,
+        target: targetCount,
+        errors: ['No user found in profiles table. Cannot create projects.'],
+        durationMs: Date.now() - startTime,
+      };
+    }
+
+    const { data: authors, error: authorError } = await this.supabase
+      .from('ai_authors')
+      .select('id, name')
+      .eq('status', 'active');
+
+    if (authorError || !authors || authors.length === 0) {
+      return {
+        created: 0,
+        target: targetCount,
+        errors: [`Failed to load authors: ${authorError?.message || 'No active authors'}`],
+        durationMs: Date.now() - startTime,
+      };
+    }
+
+    const authorIds = authors.map((a) => a.id);
+    const authorNameMap = new Map(authors.map((a) => [a.id, a.name]));
+
+    const { data: authorNovels } = await this.supabase
+      .from('novels')
+      .select('id, ai_author_id')
+      .in('ai_author_id', authorIds);
+
+    const novelIds = (authorNovels || []).map((n) => n.id);
+    const novelAuthorMap = new Map((authorNovels || []).map((n) => [n.id, n.ai_author_id as string]));
+
+    const { data: authorProjects } = novelIds.length > 0
+      ? await this.supabase
+          .from('ai_story_projects')
+          .select('novel_id, status')
+          .in('novel_id', novelIds)
+      : { data: [] as Array<{ novel_id: string; status: string }> };
+
+    const activeCountByAuthor = new Map<string, number>();
+    for (const authorId of authorIds) {
+      activeCountByAuthor.set(authorId, 0);
+    }
+
+    for (const project of authorProjects || []) {
+      if (project.status !== 'active') continue;
+      const authorId = novelAuthorMap.get(project.novel_id);
+      if (!authorId) continue;
+      activeCountByAuthor.set(authorId, (activeCountByAuthor.get(authorId) || 0) + 1);
+    }
+
+    const sortedAuthorIds = [...authorIds].sort(
+      (a, b) => (activeCountByAuthor.get(a) || 0) - (activeCountByAuthor.get(b) || 0)
+    );
+
+    const selectedAuthorIds: string[] = [];
+    for (let i = 0; i < targetCount; i++) {
+      selectedAuthorIds.push(sortedAuthorIds[i % sortedAuthorIds.length]);
+    }
+
+    const assignedGenres = selectedAuthorIds.map((_, idx) => ALL_GENRES[idx % ALL_GENRES.length]);
+    const genreCounts = new Map<string, number>();
+    for (const genre of assignedGenres) {
+      genreCounts.set(genre, (genreCounts.get(genre) || 0) + 1);
+    }
+
+    const ideasByGenre = new Map<string, NovelIdea[]>();
+    for (const [genre, count] of genreCounts.entries()) {
+      try {
+        const ideas = await this.generateNovelBatch(genre, count, Date.now() % 1000);
+        ideasByGenre.set(genre, ideas);
+      } catch (e: unknown) {
+        const message = e instanceof Error ? e.message : String(e);
+        errors.push(`Generate ideas failed for ${genre}: ${message}. Using fallback templates.`);
+        const fallbackIdeas = Array.from({ length: count }, (_, idx) => this.createFallbackIdea(genre, idx));
+        ideasByGenre.set(genre, fallbackIdeas);
+      }
+    }
+
+    const genreCursor = new Map<string, number>();
+    for (const genre of genreCounts.keys()) {
+      genreCursor.set(genre, 0);
+    }
+
+    const novelRows: NovelInsertRow[] = [];
+    const projectRows: ProjectInsertRow[] = [];
+
+    for (let i = 0; i < targetCount; i++) {
+      const authorId = selectedAuthorIds[i];
+      const genre = assignedGenres[i];
+      const cursor = genreCursor.get(genre) || 0;
+      const pool = ideasByGenre.get(genre) || [];
+      const idea = pool[cursor] || this.createFallbackIdea(genre, i);
+      genreCursor.set(genre, cursor + 1);
+
+      const novelId = randomUUID();
+      const projectId = randomUUID();
+      const requiredKey = idea.requiredFieldKey || this.getGenreConfigEntry(genre)?.requiredFields?.[0];
+      const requiredValue = idea.requiredFieldValue || this.getFallbackRequiredValue(genre, requiredKey);
+      const safeTitle = `${idea.title} [${new Date().toISOString().slice(0, 10)}-${randomUUID().slice(0, 4)}]`;
+      const formattedDescription = this.formatNovelDescription({
+        ...idea,
+        title: safeTitle,
+        requiredFieldKey: requiredKey,
+        requiredFieldValue: requiredValue,
+      });
+
+      novelRows.push({
+        id: novelId,
+        title: safeTitle,
+        author: authorNameMap.get(authorId) || '',
+        ai_author_id: authorId,
+        description: formattedDescription,
+        status: 'Đang ra',
+        genres: [genre],
+        cover_prompt: idea.coverPrompt || this.buildCoverPrompt(safeTitle, genre, formattedDescription),
+      });
+
+      const projectRow: ProjectInsertRow = {
+        id: projectId,
+        user_id: this.userId,
+        novel_id: novelId,
+        genre,
+        main_character: idea.mainCharacter || this.randomMCName(),
+        world_description: this.formatWorldDescription({
+          ...idea,
+          title: safeTitle,
+          requiredFieldKey: requiredKey,
+          requiredFieldValue: requiredValue,
+        }),
+        writing_style: 'webnovel_chinese',
+        target_chapter_length: 2500,
+        ai_model: 'gemini-3-flash-preview',
+        temperature: 1.0,
+        current_chapter: 0,
+        total_planned_chapters: this.randomInt(1000, 2000),
+        status: 'paused',
+      };
+
+      if (requiredKey && requiredValue) {
+        projectRow[requiredKey] = requiredValue;
+      }
+
+      projectRows.push(projectRow);
+    }
+
+    let created = 0;
+
+    const { error: novelInsertError } = await this.supabase.from('novels').insert(novelRows);
+    if (novelInsertError) {
+      errors.push(`Insert daily novels failed: ${novelInsertError.message}`);
+      return {
+        created: 0,
+        target: targetCount,
+        errors,
+        durationMs: Date.now() - startTime,
+      };
+    }
+
+    const { error: projectInsertError } = await this.supabase.from('ai_story_projects').insert(projectRows);
+    if (projectInsertError) {
+      errors.push(`Insert daily projects failed: ${projectInsertError.message}`);
+      await this.supabase.from('novels').delete().in('id', novelRows.map((n) => n.id));
+      return {
+        created: 0,
+        target: targetCount,
+        errors,
+        durationMs: Date.now() - startTime,
+      };
+    }
+
+    created = projectRows.length;
+
+    return {
+      created,
+      target: targetCount,
+      errors,
+      durationMs: Date.now() - startTime,
+    };
   }
 
   /**
@@ -1120,6 +1319,46 @@ CHÚ Ý:
     const ho = MC_NAMES.ho[Math.floor(Math.random() * MC_NAMES.ho.length)];
     const ten = MC_NAMES.ten[Math.floor(Math.random() * MC_NAMES.ten.length)];
     return `${ho} ${ten}`;
+  }
+
+  private createFallbackIdea(genre: string, seed: number): NovelIdea {
+    const genreLabel = GENRE_LABELS[genre] || genre;
+    const mainCharacter = this.randomMCName();
+    const title = `${genreLabel} - Tân Truyện ${seed + 1}`;
+    const requiredFieldKey = this.getGenreConfigEntry(genre)?.requiredFields?.[0];
+    const requiredFieldValue = this.getFallbackRequiredValue(genre, requiredFieldKey);
+
+    return {
+      title,
+      premise: `${mainCharacter} vô tình bước vào một biến cố thay đổi vận mệnh và phải lớn mạnh để sinh tồn.`,
+      mainCharacter,
+      mainCharacterProfile: `${mainCharacter} là nhân vật kiên định, có mục tiêu rõ ràng và tiềm năng bứt phá khi gặp nghịch cảnh.`,
+      description: `${mainCharacter} khởi đầu trong hoàn cảnh bất lợi nhưng dần khám phá quy luật ẩn giấu của thế giới. Chuỗi thử thách liên tục đẩy nhân vật tới giới hạn, buộc phải lựa chọn giữa an toàn và đột phá.`,
+      shortSynopsis: `${mainCharacter} dùng ý chí và cơ duyên để vươn lên giữa thế giới đầy cạnh tranh.`,
+      worldDescription: `Một thế giới phân tầng quyền lực, nơi kẻ mạnh định đoạt cục diện và mọi quyết định đều có cái giá tương xứng.`,
+      requiredFieldKey,
+      requiredFieldValue,
+      coverPrompt: this.buildCoverPrompt(title, genre, `${mainCharacter} rises in a dangerous world with escalating conflict.`),
+    };
+  }
+
+  private getFallbackRequiredValue(genre: string, requiredKey?: string): string {
+    if (!requiredKey) return '';
+
+    const example = this.getGenreConfigEntry(genre)?.example;
+    if (example) return example;
+
+    const fallbackByKey: Record<string, string> = {
+      cultivation_system: 'Luyện Khí -> Trúc Cơ -> Kim Đan -> Nguyên Anh -> Hóa Thần -> Luyện Hư -> Hợp Thể',
+      magic_system: 'Học Đồ -> Pháp Sư -> Đại Pháp Sư -> Ma Đạo Sư -> Hiền Giả -> Truyền Kỳ',
+      game_system: 'Leveling, class progression, skill tree, guild wars, dungeon ranking',
+      modern_setting: 'Đô thị hiện đại với cạnh tranh tài nguyên, truyền thông và thế lực ngầm',
+      tech_level: 'Kỷ nguyên AI và công nghệ nano phổ cập trong đời sống',
+      historical_period: 'Thời kỳ phong kiến loạn thế với tranh đoạt giữa các chư hầu',
+      original_work: 'Thế giới gốc được mở rộng với tuyến nhân vật và nhánh sự kiện mới',
+    };
+
+    return fallbackByKey[requiredKey] || `Core ${requiredKey.replace(/_/g, ' ')}`;
   }
 
   private randomInt(min: number, max: number): number {
