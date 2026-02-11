@@ -1,0 +1,108 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createServerClient } from '@/integrations/supabase/server';
+import { aiEditorService } from '@/services/story-writing-factory/ai-editor';
+import { getSupabase } from '@/services/story-writing-factory/supabase-helper';
+
+export const dynamic = 'force-dynamic';
+
+async function isAuthorizedAdmin(request: NextRequest): Promise<boolean> {
+  const authHeader = request.headers.get('authorization');
+  const cronSecret = process.env.CRON_SECRET;
+
+  if (authHeader && cronSecret && authHeader === `Bearer ${cronSecret}`) {
+    return true;
+  }
+
+  const supabase = await createServerClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return false;
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  return profile?.role === 'admin';
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    if (!(await isAuthorizedAdmin(request))) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const limit = Number(request.nextUrl.searchParams.get('limit') || '25');
+    const dashboard = await aiEditorService.getDashboard(limit);
+
+    return NextResponse.json({
+      success: true,
+      dashboard,
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, error: error instanceof Error ? error.message : 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    if (!(await isAuthorizedAdmin(request))) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const action = body?.action as string | undefined;
+
+    if (action === 'scan') {
+      const result = await aiEditorService.runDailyScan({
+        maxProjects: 250,
+        lowScoreThreshold: 65,
+      });
+      return NextResponse.json({ success: true, action, result });
+    }
+
+    if (action === 'rewrite') {
+      const result = await aiEditorService.processRewriteWorker({
+        maxJobs: 1,
+        maxChaptersPerJob: 2,
+      });
+      return NextResponse.json({ success: true, action, result });
+    }
+
+    if (action === 'cancel_job') {
+      const jobId = body?.jobId as string | undefined;
+      if (!jobId) {
+        return NextResponse.json({ success: false, error: 'Missing jobId' }, { status: 400 });
+      }
+
+      const supabase = getSupabase();
+      const { error } = await supabase
+        .from('rewrite_chain_jobs')
+        .update({ status: 'cancelled' })
+        .eq('id', jobId)
+        .in('status', ['pending', 'running']);
+
+      if (error) {
+        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+      }
+
+      return NextResponse.json({ success: true, action, jobId });
+    }
+
+    return NextResponse.json({ success: false, error: 'Unsupported action' }, { status: 400 });
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, error: error instanceof Error ? error.message : 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}

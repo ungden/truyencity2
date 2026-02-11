@@ -85,6 +85,7 @@ export { MODEL_TIERS, type ModelTier } from './cost-optimizer';
 // Auto-Rewriter
 export { AutoRewriter, createAutoRewriter, createFullAutoRewriter, DEFAULT_REWRITE_CONFIG } from './auto-rewriter';
 export type { RewriteConfig, RewriteResult } from './auto-rewriter';
+export { AIEditorService, aiEditorService } from './ai-editor';
 
 // Author Generator
 export { AuthorGenerator, createAuthorGenerator, generateQuickAuthor } from './author-generator';

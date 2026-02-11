@@ -101,6 +101,11 @@ const menuItems: MenuItem[] = [
     icon: ClipboardList,
   },
   {
+    title: 'AI Editor',
+    href: '/admin/ai-editor',
+    icon: Wand2,
+  },
+  {
     title: 'Thông báo',
     href: '/admin/notifications',
     icon: Bell,
