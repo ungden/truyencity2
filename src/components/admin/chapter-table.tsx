@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
-import { MoreHorizontal, PlusCircle, Loader2, Bug } from 'lucide-react';
+import { MoreHorizontal, PlusCircle, Bug } from 'lucide-react';
 
 import {
   Table,
@@ -54,14 +54,11 @@ export function ChapterTable({ novelId, chapters, onChapterDeleted }: ChapterTab
   };
 
   const handleDelete = (chapter: Chapter) => {
-    console.log('handleDelete called with chapter:', chapter);
     setSelectedChapter(chapter);
     setIsConfirmOpen(true);
   };
 
   const handleDebugDelete = async (chapter: Chapter) => {
-    console.log('Debug delete for chapter:', chapter.id);
-    
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -78,8 +75,6 @@ export function ChapterTable({ novelId, chapters, onChapterDeleted }: ChapterTab
         return;
       }
 
-      console.log('User permissions:', permData);
-
       if (!permData.isAdmin) {
         toast.error('Bạn không có quyền admin');
         return;
@@ -93,8 +88,6 @@ export function ChapterTable({ novelId, chapters, onChapterDeleted }: ChapterTab
         toast.error(`Lỗi kiểm tra tham chiếu: ${refError?.message || 'Unknown error'}`);
         return;
       }
-
-      console.log('Chapter references:', refData.references);
 
       const { data: deleteData, error: deleteError } = await supabase.functions.invoke('debug-delete', {
         body: { action: 'force_delete', chapterId: chapter.id }
@@ -121,11 +114,8 @@ export function ChapterTable({ novelId, chapters, onChapterDeleted }: ChapterTab
 
   const confirmDelete = () => {
     if (!selectedChapter) {
-      console.log('confirmDelete: No selected chapter');
       return;
     }
-    
-    console.log('confirmDelete: Starting delete for chapter:', selectedChapter.id, 'novelId:', novelId);
     
     startTransition(async () => {
       try {
@@ -135,7 +125,6 @@ export function ChapterTable({ novelId, chapters, onChapterDeleted }: ChapterTab
           return;
         }
 
-        console.log('About to call API route...');
         const response = await fetch(`/api/chapters/${selectedChapter.id}`, {
           method: 'DELETE',
           headers: {
@@ -145,13 +134,11 @@ export function ChapterTable({ novelId, chapters, onChapterDeleted }: ChapterTab
         });
 
         const result = await response.json();
-        console.log('API response:', result);
         
         if (!response.ok) {
           console.error('API error:', result.error);
           toast.error(result.error || 'Không thể xóa chương');
         } else {
-          console.log('Delete success via API');
           toast.success('Xóa chương thành công');
           setIsConfirmOpen(false);
           setSelectedChapter(null);
@@ -214,7 +201,6 @@ export function ChapterTable({ novelId, chapters, onChapterDeleted }: ChapterTab
                           <DropdownMenuSeparator />
                           <DropdownMenuItem 
                             onClick={() => {
-                              console.log('Delete menu item clicked for chapter:', chapter.id);
                               handleDelete(chapter);
                             }} 
                             className="text-destructive"
@@ -270,7 +256,6 @@ export function ChapterTable({ novelId, chapters, onChapterDeleted }: ChapterTab
         isOpen={isConfirmOpen}
         onOpenChange={setIsConfirmOpen}
         onConfirm={() => {
-          console.log('DeleteConfirmationDialog onConfirm called');
           confirmDelete();
         }}
         title="Xóa chương?"

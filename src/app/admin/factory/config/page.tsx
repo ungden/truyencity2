@@ -9,14 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Separator } from '@/components/ui/separator';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+
 import {
   Select,
   SelectContent,
@@ -27,7 +20,6 @@ import {
 import {
   Settings,
   Loader2,
-  RefreshCw,
   ChevronLeft,
   Save,
   RotateCcw,
@@ -70,26 +62,14 @@ interface FactoryConfig {
 
 const GENRE_LABELS: Record<string, string> = {
   'system-litrpg': 'System/LitRPG',
-  'urban-modern': 'Urban Modern',
-  'romance': 'Romance',
-  'huyen-huyen': 'Huyen Huyen',
-  'action-adventure': 'Action/Adventure',
-  'historical': 'Historical',
-  'tien-hiep': 'Tien Hiep',
-  'sci-fi-apocalypse': 'Sci-Fi/Apocalypse',
-  'horror-mystery': 'Horror/Mystery',
-};
-
-const DEFAULT_GENRE_DISTRIBUTION: Record<string, number> = {
-  'system-litrpg': 20,
-  'urban-modern': 18,
-  'romance': 15,
-  'huyen-huyen': 12,
-  'action-adventure': 10,
-  'historical': 10,
-  'tien-hiep': 8,
-  'sci-fi-apocalypse': 5,
-  'horror-mystery': 2,
+  'urban-modern': 'Đô Thị Hiện Đại',
+  'romance': 'Ngôn Tình',
+  'huyen-huyen': 'Huyền Huyễn',
+  'action-adventure': 'Hành Động/Phiêu Lưu',
+  'historical': 'Lịch Sử',
+  'tien-hiep': 'Tiên Hiệp',
+  'sci-fi-apocalypse': 'Khoa Huyễn/Mạt Thế',
+  'horror-mystery': 'Kinh Dị/Bí Ẩn',
 };
 
 export default function FactoryConfigPage() {

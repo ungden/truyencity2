@@ -570,9 +570,9 @@ export interface PowerSystem {
   name: string;
   type: 'cultivation' | 'magic' | 'system' | 'martial_arts' | 'tech';
   realms: PowerRealm[];
-  techniques: any[];
+  techniques: unknown[];
   itemGrades: string[];
-  currencies: any[];
+  currencies: unknown[];
 }
 
 export interface CharacterState {
@@ -599,8 +599,8 @@ export interface InventoryItem {
 export interface CharacterInventory {
   characterId: string;
   items: InventoryItem[];
-  techniques: any[];
-  wealth: any[];
+  techniques: unknown[];
+  wealth: unknown[];
   lastUpdated: Date;
   lastUpdatedChapter: number;
 }
@@ -624,6 +624,14 @@ export interface PlotThread {
   priority: 'main' | 'sub' | 'background';
 }
 
+export interface LocationVisit {
+  location: MapType;
+  locationName: string;
+  startChapter: number;
+  endChapter?: number;
+  mainEvents: string[];
+}
+
 export interface WorldBible {
   id: string;
   projectId: string;
@@ -634,10 +642,10 @@ export interface WorldBible {
   relationships: NPCRelationship[];
   currentLocation: MapType;
   currentLocationName: string;
-  visitedLocations: any[];
+  visitedLocations: LocationVisit[];
   openPlotThreads: PlotThread[];
   resolvedPlotThreads: PlotThread[];
-  foreshadowing: any[];
+  foreshadowing: unknown[];
   lastUpdated: Date;
   lastUpdatedChapter: number;
 }
@@ -663,8 +671,8 @@ export interface ChapterOutline {
   suppressionMoments: string[];
   explosionMoments: string[];
   cliffhanger: string;
-  characterUpdates: any[];
-  worldUpdates: any[];
+  characterUpdates: unknown[];
+  worldUpdates: unknown[];
   targetWordCount: number;
   targetDopamineScore: number;
 }
@@ -672,7 +680,7 @@ export interface ChapterOutline {
 export interface ArchitectOutput {
   chapterOutline: ChapterOutline;
   dopaminePoints: DopaminePoint[];
-  worldBibleUpdates?: any;
+  worldBibleUpdates?: unknown;
 }
 
 export interface WriterOutput {

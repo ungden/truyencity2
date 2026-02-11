@@ -1,0 +1,67 @@
+{
+  "premise_hook_examples": [
+    {
+      "novel": "凡人修仙传 (Phàm Nhân Tu Tiên Truyện)",
+      "rating": 9.3,
+      "views": "500M",
+      "archetype": "underdog",
+      "premise": "Một thiếu niên làng nghèo tư chất tầm thường vô tình gia nhập tiểu môn phái tu tiên. Không có thiên phú, không có nền tảng, chỉ nhờ cẩn thận cùng sự chăm chỉ mà từng bước vươn lên trong thế giới tu tiên khốc liệt.",
+      "hook": "Làng Thanh Ngưu, thiếu niên Hàn Lập được chọn vào thử nghiệm môn phái. Trong đêm đầu tiên tại Thất Huyền Môn, cậu uống nhầm một chai dược dịch bí ẩn mà sư huynh để lại...",
+      "golden_finger": "Bình xanh nhỏ có thể tăng tốc thời gian trồng linh dược",
+      "why_works": "Relatable origin + clear progression path + mystery element + cautious MC (unique personality)"
+    },
+    {
+      "novel": "诡秘之主 (Quỷ Bí Chi Chủ)",
+      "rating": 9.4,
+      "views": "340M",
+      "archetype": "transmigrator",
+      "premise": "Tỉnh dậy trong thế giới hơi nước và cơ khí thời Victoria, Klein Moretti phát hiện mình có thể chiêu hồn và tiếp cận con đường phi phàm đầy bí ẩn. Trong bóng tối lịch sử, những thực thể cổ xưa đang thì thầm...",
+      "hook": "Klein mở mắt trong căn phòng lạ, ánh nến nhấp nhô. Bên cạnh là một khẩu súng lục, một mảnh giấy viết 'Everyone will die, including me', và thi thể của chính mình từ ba ngày trước...",
+      "golden_finger": "Gray Fog space - không gian xám có thể cách ly chiêm bốc + kết nối thế giới",
+      "why_works": "Immediate mystery + shocking visual + supernatural + cosmic horror vibe + Victorian setting (unique)"
+    },
+    {
+      "novel": "万古神帝 (Vạn Cổ Thần Đế)",
+      "rating": 8.7,
+      "views": "300M",
+      "archetype": "reborn_avenger",
+      "premise": "Tám trăm năm trước, Trương Nhược Trần là minh đế chi tử, thiên tài nhất đại nhưng bị vị hôn thê Trì Dao công chúa phản bội giết hại. Tám trăm năm sau, anh ta tỉnh lại trong thân xác chính mình, phát hiện kẻ giết mình đã thống nhất Côn Lôn giới, xưng 'Trì Dao Nữ Hoàng'.",
+      "hook": "Ngọn kiếm xuyên qua ngực, máu nhuộm đỏ lễ phục hôn lễ. Trương Nhược Trần nhìn khuôn mặt quen thuộc đang cầm kiếm: 'Công chúa... vì sao...?' Trì Dao cười lạnh: 'Vì ngươi quá yếu. Ta cần một người chồng mạnh hơn để thống nhất thiên hạ.'",
+      "golden_finger": "Ký ức 800 năm + tu vi từ kiếp trước từ từ tỉnh thức",
+      "why_works": "Huge time gap + betrayal + power imbalance = strong motivation + clear antagonist + revenge arc"
+    },
+    {
+      "novel": "大王饶命 (Đại Vương Nhiêu Mệnh)",
+      "rating": 9.0,
+      "views": "260M",
+      "archetype": "comedy_system",
+      "premise": "Thời đại linh khí phục hồi, toàn dân giác tỉnh dị năng. Lữ Thụ phát hiện mình có hệ thống đặc biệt: thu thập giá trị cảm xúc tiêu cực của người khác để rút thưởng. Từ đó, anh ta bắt đầu hành trình 'khiêu khích toàn thiên hạ' để kiếm điểm.",
+      "hook": "Kỳ thi giác tỉnh dị năng, Lữ Thụ xếp hạng F. Lý Uy Dương chế giễu: 'Phế vật!' Hệ thống: 'Từ Lý Uy Dương cảm xúc tiêu cực +99!' Lữ Thụ mỉm cười: 'Cảm ơn nhé, hôm nay lại kiếm được tiền rồi~'",
+      "golden_finger": "Hệ thống thu thập cảm xúc tiêu cực đổi lấy kỹ năng/vật phẩm",
+      "why_works": "Unique system + comedy potential + clear game mechanic + protagonist actively trolls people (hilarious)"
+    },
+    {
+      "novel": "超神机械师 (Siêu Thần Cơ Giới Sư)",
+      "rating": 9.0,
+      "views": "190M",
+      "archetype": "game_transmigrator",
+      "premise": "Hàn Tiêu, đại lão trong game Tinh Hải, bị lực lượng bí ẩn đưa về 10 năm trước - trước khi server mở. Với tri thức về tất cả hidden quests, bugs, và meta của 10 năm tương lai, anh ta chọn nghề Cơ Giới Sư - nghề yếu đầu game nhưng thần thánh cuối game.",
+      "hook": "Hàn Tiêu mở mắt, thấy giao diện quen thuộc: 'Welcome to Starry Sea Beta v1.0 - Character Creation'. Anh ta cười: 'Mười năm rồi... lần này ta sẽ không để bất kỳ cơ hội nào trôi qua. Cơ Giới Sư, đây là nghề của vua!'",
+      "golden_finger": "Kiến thức meta game 10 năm + nhớ toàn bộ hidden quests và NPCs",
+      "why_works": "Unfair knowledge advantage + nostalgia + gamer fantasy + underestimated class choice"
+    }
+  ],
+  "key_patterns": {
+    "premise_structure": "Situation + Golden Finger + Goal (2-3 sentences)",
+    "hook_structure": "Visual scene + Immediate problem + Curiosity gap",
+    "golden_finger_placement": "MUST appear explicitly in premise",
+    "avoid": "Don't spoil ending, only tease the journey",
+    "best_practices": [
+      "Premise sets up the world and MC advantage clearly",
+      "Hook creates immediate visual + emotional response",
+      "Golden finger is concrete and understandable",
+      "USP should be obvious from premise alone",
+      "Time gap / power imbalance = strong motivation"
+    ]
+  }
+}

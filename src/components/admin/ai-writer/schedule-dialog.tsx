@@ -23,13 +23,6 @@ import {
   FormMessage,
   FormDescription,
 } from '@/components/ui/form';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -44,7 +37,8 @@ const scheduleSchema = z.object({
   startNow: z.boolean().default(false),
 });
 
-type ScheduleFormValues = z.infer<typeof scheduleSchema>;
+type ScheduleFormInput = z.input<typeof scheduleSchema>;
+type ScheduleFormValues = z.output<typeof scheduleSchema>;
 
 interface ScheduleDialogProps {
   project: AIStoryProject | null;
@@ -56,8 +50,8 @@ interface ScheduleDialogProps {
 export function ScheduleDialog({ project, isOpen, onOpenChange, onScheduleCreated }: ScheduleDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
 
-  const form = useForm<ScheduleFormValues, any, ScheduleFormValues>({
-    resolver: zodResolver(scheduleSchema) as any,
+  const form = useForm<ScheduleFormInput, unknown, ScheduleFormValues>({
+    resolver: zodResolver(scheduleSchema),
     defaultValues: {
       timeOfDay: '10:00',
       chaptersPerRun: 1,

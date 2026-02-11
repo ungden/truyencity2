@@ -9,13 +9,14 @@
  */
 
 import { ChapterWriter } from './chapter';
-import { QCGating, GateResult, FullQCGating, FullGateResult } from './qc-gating';
+import { QCGating, GateResult, FullQCGating } from './qc-gating';
 import { CanonResolver } from './canon-resolver';
 import { BeatLedger } from './beat-ledger';
-import { GenreType, WorldBible, StyleBible, StoryArc, ChapterResult } from './types';
+import { WorldBible, StyleBible, StoryArc, ChapterResult } from './types';
 import { getSupabase } from './supabase-helper';
 import { BattleVarietyTracker } from './battle-variety';
 import { CharacterDepthTracker } from './character-depth';
+import { logger } from '@/lib/security/logger';
 
 export interface RewriteConfig {
   maxAttempts: number;           // Max rewrite attempts (default: 3)
@@ -53,7 +54,6 @@ export class AutoRewriter {
   private config: RewriteConfig;
   private chapterWriter: ChapterWriter;
   private qcGating: QCGating;
-  private canonResolver: CanonResolver;
   private beatLedger: BeatLedger;
 
   constructor(
@@ -68,7 +68,6 @@ export class AutoRewriter {
     this.config = { ...DEFAULT_REWRITE_CONFIG, ...config };
     this.chapterWriter = chapterWriter;
     this.qcGating = qcGating;
-    this.canonResolver = canonResolver;
     this.beatLedger = beatLedger;
   }
 
@@ -118,7 +117,6 @@ export class AutoRewriter {
 
     // Rewrite loop
     for (let attempt = 1; attempt <= this.config.maxAttempts; attempt++) {
-      console.log(`Rewrite attempt ${attempt}/${this.config.maxAttempts} for chapter ${chapterNumber}`);
 
       // Generate rewrite instructions
       const instructions = this.generateRewriteInstructions(lastQCResult, attempt);
@@ -382,7 +380,12 @@ Hãy viết lại chương này, giữ nguyên cốt truyện nhưng khắc ph�
           onConflict: 'project_id,chapter_number',
         });
     } catch (e) {
-      console.warn('Failed to save rewrite version:', e);
+      logger.warn('QC result persistence failed (non-fatal)', {
+        projectId: this.projectId,
+        chapterNumber,
+        attemptNumber,
+        error: e instanceof Error ? e.message : String(e),
+      });
     }
   }
 

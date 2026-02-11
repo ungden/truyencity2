@@ -31,33 +31,62 @@ serve(async (req: Request) => {
       })
     }
 
+    // ── Auth guard: require valid JWT and admin role ──────────────────────
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Missing Authorization header' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
+    }
+
+    // Create an anon client to verify the JWT (not service role)
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY')
+    if (!anonKey) {
+      return new Response(JSON.stringify({ error: 'Missing anon key' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
+    }
+
+    const userClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } }
+    })
+
+    const { data: { user }, error: authError } = await userClient.auth.getUser()
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: 'Invalid or expired token' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
+    }
+
+    // Use service-role client to check admin role in profiles table
     const supabase = createClient(supabaseUrl, serviceKey)
 
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (profileError || profile?.role !== 'admin') {
+      return new Response(JSON.stringify({ error: 'Admin access required' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
+    }
+    // ── End auth guard ───────────────────────────────────────────────────
+
     if (req.method === 'POST') {
-      const { action, chapterId, userId } = await req.json()
+      const { action, chapterId } = await req.json()
 
       if (action === 'check_permissions') {
-        // Kiểm tra user role
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', userId)
-          .single()
-
-        if (profileError) {
-          return new Response(JSON.stringify({ 
-            error: 'Profile error', 
-            details: profileError 
-          }), {
-            status: 400,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-          })
-        }
-
+        // User is already verified as admin above
         return new Response(JSON.stringify({ 
           success: true, 
-          userRole: profile?.role,
-          isAdmin: profile?.role === 'admin'
+          userRole: profile.role,
+          isAdmin: true
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         })

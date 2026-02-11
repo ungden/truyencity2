@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Select,
@@ -28,7 +27,6 @@ import {
   CheckCircle2,
   Circle,
   PlayCircle,
-  Target,
   Users,
   Map,
   Sword,
@@ -387,7 +385,6 @@ function StoryOverview({ project, outline }: {
 export default function OutlinesPage() {
   const [projects, setProjects] = useState<ProjectWithOutline[]>([]);
   const [selectedProject, setSelectedProject] = useState<ProjectWithOutline | null>(null);
-  const [outlines, setOutlines] = useState<StoryOutline[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('arcs');
 
@@ -410,7 +407,6 @@ export default function OutlinesPage() {
         if (outlinesRes.ok) {
           const oData = await outlinesRes.json();
           outlinesData = oData.data || [];
-          setOutlines(outlinesData);
         }
 
         // Match projects with outlines

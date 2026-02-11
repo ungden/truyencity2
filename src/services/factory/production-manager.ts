@@ -10,11 +10,8 @@ import {
   AIAuthorProfile,
   ChapterWriteQueueItem,
   ServiceResult,
-  BatchResult,
-  ProductionStatus,
   PublishSlot,
   DEFAULT_PUBLISH_SLOTS,
-  FactoryConfig,
 } from './types';
 
 export class ProductionManagerService {

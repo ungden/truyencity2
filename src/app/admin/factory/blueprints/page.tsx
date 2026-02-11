@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { AuthGuard } from '@/components/admin/auth-guard';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,7 +10,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import {
   Dialog,
   DialogContent,
@@ -88,14 +86,14 @@ interface StoryBlueprint {
 
 const GENRE_LABELS: Record<string, string> = {
   'system-litrpg': 'System/LitRPG',
-  'urban-modern': 'Urban Modern',
-  'romance': 'Romance',
-  'huyen-huyen': 'Huyen Huyen',
-  'action-adventure': 'Action/Adventure',
-  'historical': 'Historical',
-  'tien-hiep': 'Tien Hiep',
-  'sci-fi-apocalypse': 'Sci-Fi/Apocalypse',
-  'horror-mystery': 'Horror/Mystery',
+  'urban-modern': 'Đô Thị Hiện Đại',
+  'romance': 'Ngôn Tình',
+  'huyen-huyen': 'Huyền Huyễn',
+  'action-adventure': 'Hành Động/Phiêu Lưu',
+  'historical': 'Lịch Sử',
+  'tien-hiep': 'Tiên Hiệp',
+  'sci-fi-apocalypse': 'Khoa Huyễn/Mạt Thế',
+  'horror-mystery': 'Kinh Dị/Bí Ẩn',
 };
 
 const STATUS_COLORS: Record<string, string> = {
@@ -106,7 +104,6 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 function FactoryBlueprintsContent() {
-  const searchParams = useSearchParams();
   const [blueprints, setBlueprints] = useState<StoryBlueprint[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);

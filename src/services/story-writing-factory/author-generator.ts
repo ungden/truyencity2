@@ -208,7 +208,6 @@ export class AuthorGenerator {
    */
   private selectSpecializedGenres(mainGenre: string, count: number): string[] {
     const allGenres = Object.keys(GENRE_SPECIALIZATIONS);
-    const mainGenreIndex = allGenres.indexOf(mainGenre);
 
     // Always include main genre
     const selected = [mainGenre];

@@ -91,8 +91,6 @@ export class NovelEnricher {
       return { enriched: 0, covers: 0, errors: [error?.message || 'No novels to enrich'], durationMs: Date.now() - start };
     }
 
-    console.log(`[Enricher] Found ${novels.length} novels to enrich`);
-
     // Process 5 at a time (Gemini rate limits)
     for (let i = 0; i < novels.length; i += 5) {
       const batch = novels.slice(i, i + 5);
@@ -103,8 +101,6 @@ export class NovelEnricher {
       for (const r of results) {
         if (r.status === 'fulfilled' && r.value) enriched++;
       }
-
-      console.log(`[Enricher] Progress: ${enriched}/${novels.length} enriched`);
 
       // Small delay between batches
       if (i + 5 < novels.length) {
@@ -135,16 +131,12 @@ export class NovelEnricher {
       return { enriched: 0, covers: 0, errors: [error?.message || 'No novels need covers'], durationMs: Date.now() - start };
     }
 
-    console.log(`[Enricher] Generating covers for ${novels.length} novels`);
-
     // 1 at a time — image gen is slow + expensive
     for (const novel of novels) {
       try {
         const genre = novel.genres?.[0] || 'tien-hiep';
         const coverStyle = GENRE_COVER_STYLE[genre] || 'huyen-huyen';
         const desc = (novel.description || novel.title).slice(0, 300);
-
-        console.log(`[Enricher] Cover for: ${novel.title.slice(0, 40)}...`);
 
         const result = await this.imageService.generateCoverWithUpload(
           novel.title,
@@ -163,7 +155,6 @@ export class NovelEnricher {
             errors.push(`Update cover for ${novel.id.slice(0, 8)}: ${updateErr.message}`);
           } else {
             covers++;
-            console.log(`[Enricher] Cover OK: ${novel.title.slice(0, 40)}`);
           }
         } else {
           errors.push(`Cover gen failed for ${novel.title.slice(0, 30)}: ${result.error}`);

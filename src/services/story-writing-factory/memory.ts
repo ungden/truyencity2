@@ -8,15 +8,16 @@
  * 4. Persistence - Save/Load state
  */
 
-import * as fs from 'fs';
 import { promises as fsp } from 'fs';
 import * as path from 'path';
+import { logger } from '@/lib/security/logger';
 import {
   WorldBible,
-  ChapterSummary,
   DopamineType,
   GenreType,
 } from './types';
+import { PlotThreadManager, ThreadSelectionResult } from './plot-thread-manager';
+import { VolumeSummaryManager, VolumeSelectionResult } from './volume-summary-manager';
 
 // ============================================================================
 // TYPES
@@ -185,6 +186,8 @@ export class MemoryManager {
   private characterTracker: CharacterTracker;
   private foreshadowing: ForeshadowingItem[];
   private worldBible: WorldBible | null = null;
+  private plotThreadManager: PlotThreadManager | null = null;
+  private volumeSummaryManager: VolumeSummaryManager | null = null;
 
   constructor(projectId: string, savePath?: string) {
     this.projectId = projectId;
@@ -200,6 +203,38 @@ export class MemoryManager {
     this.foreshadowing = [];
   }
 
+  /**
+   * Initialize plot thread manager
+   */
+  async initializePlotThreadManager(): Promise<void> {
+    this.plotThreadManager = new PlotThreadManager(this.projectId);
+    await this.plotThreadManager.initialize();
+    logger.info('PlotThreadManager initialized', { projectId: this.projectId });
+  }
+
+  /**
+   * Get plot thread manager instance
+   */
+  getPlotThreadManager(): PlotThreadManager | null {
+    return this.plotThreadManager;
+  }
+
+  /**
+   * Initialize volume summary manager
+   */
+  async initializeVolumeSummaryManager(): Promise<void> {
+    this.volumeSummaryManager = new VolumeSummaryManager(this.projectId);
+    await this.volumeSummaryManager.initialize();
+    logger.info('VolumeSummaryManager initialized', { projectId: this.projectId });
+  }
+
+  /**
+   * Get volume summary manager instance
+   */
+  getVolumeSummaryManager(): VolumeSummaryManager | null {
+    return this.volumeSummaryManager;
+  }
+
   // ============================================================================
   // CONTEXT BUILDING - Hierarchical
   // ============================================================================
@@ -208,7 +243,12 @@ export class MemoryManager {
    * Build optimized context for AI based on current chapter
    * Uses hierarchical memory to stay within token limits
    */
-  buildContext(currentChapter: number, maxTokens: number = 2000): string {
+  async buildContext(
+    currentChapter: number, 
+    maxTokens: number = 2000,
+    charactersInChapter: string[] = [],
+    arcNumber: number = 1
+  ): Promise<string> {
     const parts: string[] = [];
     let estimatedTokens = 0;
 
@@ -216,35 +256,49 @@ export class MemoryManager {
     parts.push(this.formatStoryEssence());
     estimatedTokens += 100;
 
-    // Layer 2: Current Arc Summary ~150 tokens
+    // Layer 2: Smart Plot Thread Selection ~200 tokens
+    if (this.plotThreadManager) {
+      const threadContext = await this.plotThreadManager.selectThreadsForChapter(
+        currentChapter,
+        charactersInChapter,
+        arcNumber,
+        50 // default tension
+      );
+      if (threadContext.selectedThreads.length > 0) {
+        parts.push(this.formatThreadContext(threadContext));
+        estimatedTokens += 200;
+      }
+    }
+
+    // Layer 3: Current Arc Summary ~150 tokens
     const currentArc = this.getCurrentArcSummary(currentChapter);
     if (currentArc) {
       parts.push(this.formatArcSummary(currentArc));
       estimatedTokens += 150;
     }
 
-    // Layer 3: Recent Chapters (last 3) ~300 tokens
+    // Layer 4: Recent Chapters (last 3) ~300 tokens
     const recent = this.memory.recentChapters.slice(-3);
     if (recent.length > 0) {
       parts.push(this.formatRecentChapters(recent));
       estimatedTokens += recent.length * 100;
     }
 
-    // Layer 4: Active Characters ~200 tokens
+    // Layer 5: Active Characters ~200 tokens
     const activeChars = this.getActiveCharacters(currentChapter);
     if (activeChars.length > 0 && estimatedTokens < maxTokens - 200) {
       parts.push(this.formatActiveCharacters(activeChars));
       estimatedTokens += 200;
     }
 
-    // Layer 5: Pending Foreshadowing ~100 tokens
+    // Layer 6: Pending Foreshadowing ~100 tokens
     const pendingFS = this.getPendingForeshadowing(currentChapter);
     if (pendingFS.length > 0 && estimatedTokens < maxTokens - 100) {
       parts.push(this.formatForeshadowing(pendingFS));
       estimatedTokens += 100;
     }
 
-    // Layer 6: Beat Restrictions ~50 tokens
+    // Layer 7: Beat Restrictions ~50 tokens
     const restrictions = this.getBeatRestrictions(currentChapter);
     if (restrictions.length > 0 && estimatedTokens < maxTokens - 50) {
       parts.push(this.formatBeatRestrictions(restrictions));
@@ -433,7 +487,9 @@ LAST CHAPTER: ${lastChapter?.summary || 'Chương đầu tiên'}`;
       await fsp.writeFile(filePath, JSON.stringify(state, null, 2));
     } catch (err) {
       // Non-fatal: serverless environments may not support persistent fs
-      console.warn(`[MemoryManager] save() failed (non-fatal): ${err instanceof Error ? err.message : String(err)}`);
+      logger.debug('MemoryManager save failed (non-fatal)', {
+        error: err instanceof Error ? err.message : String(err),
+      });
     }
   }
 
@@ -479,7 +535,10 @@ LAST CHAPTER: ${lastChapter?.summary || 'Chương đầu tiên'}`;
       return filePath;
     } catch (err) {
       // Non-fatal: chapter content is already saved to DB via callback
-      console.warn(`[MemoryManager] saveChapter() failed (non-fatal): ${err instanceof Error ? err.message : String(err)}`);
+      logger.debug('MemoryManager saveChapter failed (non-fatal)', {
+        chapterNumber,
+        error: err instanceof Error ? err.message : String(err),
+      });
       return '';
     }
   }
@@ -712,7 +771,54 @@ Major Events: ${arc.majorEvents.join('; ')}`;
   }
 
   private formatBeatRestrictions(restrictions: string[]): string {
-    return `⚠️ BEAT RESTRICTIONS\n${restrictions.join('\n')}`;
+    return `⚠️ BEAT RESTRICTIONS
+${restrictions.join('\n')}`;
+  }
+
+  private formatThreadContext(context: ThreadSelectionResult): string {
+    const parts: string[] = ['🎭 ACTIVE PLOT THREADS'];
+    
+    // Selected threads
+    for (const thread of context.selectedThreads) {
+      parts.push(`\n📌 ${thread.name} (${thread.priority})`);
+      parts.push(`   Status: ${thread.status}`);
+      parts.push(`   ${thread.description}`);
+      if (thread.targetPayoffChapter) {
+        parts.push(`   Target payoff: Chapter ${thread.targetPayoffChapter}`);
+      }
+    }
+    
+    // Foreshadowing hints
+    if (context.foreshadowingHints.length > 0) {
+      parts.push('\n💡 FORESHADOWING TO PAY OFF:');
+      for (const hint of context.foreshadowingHints) {
+        parts.push(`   - "${hint.hint}" (deadline: Ch${hint.payoffDeadline})`);
+      }
+    }
+    
+    // Character recaps
+    if (context.characterRecaps.length > 0) {
+      parts.push('\n👤 CHARACTER RECAPS:');
+      for (const recap of context.characterRecaps) {
+        parts.push(`   ${recap.characterName}: Last seen Ch${recap.lastSeenChapter}`);
+        if (recap.relationshipSummary) {
+          parts.push(`   Relationship: ${recap.relationshipSummary}`);
+        }
+        if (recap.pendingPromises.length > 0) {
+          parts.push(`   Pending: ${recap.pendingPromises.join(', ')}`);
+        }
+      }
+    }
+    
+    // Urgency warnings
+    if (context.urgencyWarnings.length > 0) {
+      parts.push('\n⚠️ URGENT:');
+      for (const warning of context.urgencyWarnings) {
+        parts.push(`   ${warning}`);
+      }
+    }
+    
+    return parts.join('\n');
   }
 
   // ============================================================================

@@ -54,11 +54,11 @@ export type RateLimitType = keyof typeof RATE_LIMIT_CONFIGS;
 
 class RateLimiter {
   private store: Map<string, RateLimitEntry> = new Map();
-  private cleanupInterval: NodeJS.Timeout | null = null;
+  private cleanupInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
     // Clean up expired entries every 5 minutes
-    if (typeof setInterval !== 'undefined') {
+    if (process.env.NODE_ENV !== 'test' && typeof setInterval !== 'undefined') {
       this.cleanupInterval = setInterval(() => this.cleanup(), 5 * 60 * 1000);
     }
   }

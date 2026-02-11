@@ -4,7 +4,6 @@ import { AIProviderType } from '@/lib/types/ai-providers';
 
 // POST: Generate inspired outline from analysis
 export async function POST(request: NextRequest) {
-  console.log('[GENERATE OUTLINE API] Received request.');
   try {
     const { client, token } = createSupabaseFromAuthHeader(request);
     if (!client || !token) {
@@ -63,8 +62,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to create outline job' }, { status: 500 });
     }
 
-    console.log(`[GENERATE OUTLINE API] Created job ${job.id}`);
-
     // Start outline generation asynchronously
     (async () => {
       try {
@@ -89,7 +86,6 @@ export async function POST(request: NextRequest) {
           total_chapters: total_chapters || 100,
           transformation_style: transformation_style || 'similar'
         });
-        console.log(`[GENERATE OUTLINE API] Outline generation completed for job ${job.id}`);
       } catch (err) {
         console.error(`[GENERATE OUTLINE API] Error in async generation:`, err);
         const again = createSupabaseFromAuthHeader(request).client;

@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Header } from '@/components/header';
 import { NovelCard } from '@/components/novel-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
-import { toggleBookmarkServer, listBookmarks } from '@/services/bookmarks';
+import { listBookmarks } from '@/services/bookmarks';
 
 type ProgressRow = {
   novel_id: string;
@@ -85,27 +85,6 @@ export default function LibraryPage() {
     })();
     return () => { cancelled = true; };
   }, []);
-
-  const handleRead = (novelId: string) => {
-    console.log('Read novel:', novelId);
-  };
-
-  const handleBookmark = async (novelId: string) => {
-    await toggleBookmarkServer(novelId);
-    await fetchBookmarks();
-  };
-
-  const handleRemove = async (novelId: string) => {
-    const { data: userData } = await supabase.auth.getUser();
-    const userId = userData.user?.id;
-    if (!userId) return;
-    await supabase
-      .from('reading_progress')
-      .delete()
-      .eq('user_id', userId)
-      .eq('novel_id', novelId);
-    await fetchHistory();
-  };
 
   return (
     <div className="min-h-screen bg-background">

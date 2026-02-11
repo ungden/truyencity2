@@ -35,7 +35,7 @@ export const DELETE = async (
     }
 
     // Check role
-    const { data: profile, error: profileError } = await client
+    const { data: profile } = await client
       .from('profiles')
       .select('role')
       .eq('id', user.id)

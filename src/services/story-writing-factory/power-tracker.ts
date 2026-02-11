@@ -9,8 +9,9 @@
  * 5. Validates progression is logical
  */
 
-import { PowerSystem, PowerRealm } from './types';
+import { PowerRealm } from './types';
 import { getSupabase } from './supabase-helper';
+import { logger } from '@/lib/security/logger';
 
 // ============================================================================
 // TYPES
@@ -103,7 +104,10 @@ export class PowerTracker {
       .eq('project_id', this.projectId);
 
     if (charsError) {
-      console.warn('[DB] Load character power states failed:', charsError.message);
+      logger.debug('PowerTracker character_tracker load failed (non-fatal)', {
+        projectId: this.projectId,
+        error: charsError.message,
+      });
     }
     if (characters) {
       for (const char of characters) {
@@ -128,7 +132,10 @@ export class PowerTracker {
       .order('chapter_number', { ascending: true });
 
     if (progsError) {
-      console.warn('[DB] Load progression history failed:', progsError.message);
+      logger.debug('PowerTracker power_progression load failed (non-fatal)', {
+        projectId: this.projectId,
+        error: progsError.message,
+      });
     }
     if (progressions) {
       for (const prog of progressions) {
@@ -202,7 +209,12 @@ export class PowerTracker {
         onConflict: 'project_id,character_name',
       });
     if (error) {
-      console.warn('[DB] initializeCharacter failed:', error.message);
+      logger.debug('character_tracker upsert failed (non-fatal)', {
+        projectId: this.projectId,
+        characterName,
+        operation: 'initializeCharacter',
+        error: error.message,
+      });
     }
 
     return state;
@@ -469,7 +481,13 @@ export class PowerTracker {
       consequences: event.consequences,
     });
     if (error) {
-      console.warn('[DB] saveProgression failed:', error.message);
+      logger.debug('power_progression insert failed (non-fatal)', {
+        projectId: this.projectId,
+        characterName: event.characterName,
+        chapterNumber: event.chapterNumber,
+        operation: 'saveProgression',
+        error: error.message,
+      });
     }
   }
 
@@ -492,7 +510,12 @@ export class PowerTracker {
       .eq('project_id', this.projectId)
       .eq('character_name', name);
     if (error) {
-      console.warn('[DB] updateCharacterPowerState failed:', error.message);
+      logger.debug('character_tracker update failed (non-fatal)', {
+        projectId: this.projectId,
+        characterName: name,
+        operation: 'updateCharacterPowerState',
+        error: error.message,
+      });
     }
   }
 
@@ -502,8 +525,6 @@ export class PowerTracker {
   getProgressionSummary(characterName: string): string {
     const state = this.characterPowers.get(characterName);
     if (!state) return `${characterName}: Chưa có thông tin`;
-
-    const history = this.progressionHistory.get(characterName) || [];
 
     return `${characterName}: ${state.realm} ${state.level} tầng
     - Tổng đột phá: ${state.totalBreakthroughs}

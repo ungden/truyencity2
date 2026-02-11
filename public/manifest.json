@@ -1,7 +1,7 @@
 {
-  "name": "Truyện City - Đọc truyện online miễn phí",
-  "short_name": "Truyện City",
-  "description": "Đọc truyện online miễn phí - Tiên hiệp, kiếm hiệp, ngôn tình, đô thị",
+  "name": "TruyenCity - Đọc Truyện Online Miễn Phí",
+  "short_name": "TruyenCity",
+  "description": "Nền tảng đọc truyện tiên tiến nhất cho người Việt. Tiên hiệp, huyền huyễn, đô thị, ngôn tình — miễn phí, cập nhật liên tục.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

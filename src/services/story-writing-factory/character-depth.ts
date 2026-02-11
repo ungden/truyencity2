@@ -12,6 +12,7 @@
 
 import { randomUUID } from 'crypto';
 import { getSupabase } from './supabase-helper';
+import { logger } from '@/lib/security/logger';
 
 // ============================================================================
 // TYPES
@@ -170,7 +171,10 @@ export class CharacterDepthTracker {
       .eq('project_id', this.projectId);
     
     if (profilesError) {
-      console.warn('[DB] Load character profiles failed:', profilesError.message);
+      logger.debug('character_depth_profiles load failed (non-fatal)', {
+        projectId: this.projectId,
+        error: profilesError.message,
+      });
     }
     if (profiles) {
       for (const p of profiles) {
@@ -208,7 +212,10 @@ export class CharacterDepthTracker {
       .eq('project_id', this.projectId);
     
     if (romancesError) {
-      console.warn('[DB] Load romance progressions failed:', romancesError.message);
+      logger.debug('romance_progressions load failed (non-fatal)', {
+        projectId: this.projectId,
+        error: romancesError.message,
+      });
     }
     if (romances) {
       for (const r of romances) {
@@ -768,7 +775,12 @@ export class CharacterDepthTracker {
         updated_at: new Date(profile.updatedAt).toISOString(),
       }, { onConflict: 'id' });
     if (error) {
-      console.warn('[DB] saveCharacter failed:', error.message);
+      logger.debug('character_depth_profiles upsert failed (non-fatal)', {
+        projectId: this.projectId,
+        characterName: profile.name,
+        operation: 'saveCharacter',
+        error: error.message,
+      });
     }
   }
   
@@ -795,7 +807,12 @@ export class CharacterDepthTracker {
         status: romance.status,
       }, { onConflict: 'id' });
     if (error) {
-      console.warn('[DB] saveRomance failed:', error.message);
+      logger.debug('romance_progressions upsert failed (non-fatal)', {
+        projectId: this.projectId,
+        characters: `${romance.character1} & ${romance.character2}`,
+        operation: 'saveRomance',
+        error: error.message,
+      });
     }
   }
   

@@ -36,13 +36,13 @@ const aiToolsSubmenu = [
     title: 'Story Runner',
     href: '/admin/story-runner',
     icon: Pen,
-    description: 'Viết truyện AI tự động'
+    description: 'Tạo nội dung tự động'
   },
   {
     title: 'Story Factory',
     href: '/admin/factory',
     icon: Factory,
-    description: 'Industrial-scale AI story generation'
+    description: 'Tạo truyện quy mô lớn'
   },
   {
     title: 'Story Inspiration',

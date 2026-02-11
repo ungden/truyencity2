@@ -25,7 +25,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
 } from '@/components/ui/dialog';
 import {
@@ -35,8 +34,6 @@ import {
   BookOpen,
   Play,
   Loader2,
-  Check,
-  X,
   RefreshCw,
   Trash2,
   Eye,
@@ -51,9 +48,13 @@ import { toast } from 'sonner';
 import type { SourceStory, StoryOutline, InspirationJob, StoryAnalysis } from '@/lib/types/story-inspiration';
 import { AI_PROVIDERS, AIProviderType } from '@/lib/types/ai-providers';
 
+type SourceStoryWithAnalysis = SourceStory & {
+  story_analysis?: Pick<StoryAnalysis, 'id' | 'detected_genre' | 'full_plot_summary'>[];
+};
+
 export function StoryInspirationDashboard() {
   const [activeTab, setActiveTab] = useState('import');
-  const [sourceStories, setSourceStories] = useState<SourceStory[]>([]);
+  const [sourceStories, setSourceStories] = useState<SourceStoryWithAnalysis[]>([]);
   const [outlines, setOutlines] = useState<StoryOutline[]>([]);
   const [jobs, setJobs] = useState<InspirationJob[]>([]);
   const [loading, setLoading] = useState(true);
@@ -446,7 +447,7 @@ export function StoryInspirationDashboard() {
 
   // Get analyzed stories (for outline generation)
   const analyzedStories = sourceStories.filter(s =>
-    s.analysis_status === 'completed' && (s as any).story_analysis?.length > 0
+    s.analysis_status === 'completed' && (s.story_analysis?.length ?? 0) > 0
   );
 
   if (loading) {
@@ -672,11 +673,14 @@ export function StoryInspirationDashboard() {
                             Phân tích
                           </Button>
                         )}
-                        {story.analysis_status === 'completed' && (story as any).story_analysis?.[0] && (
+                        {story.analysis_status === 'completed' && story.story_analysis?.[0] && (
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => fetchAnalysis((story as any).story_analysis[0].id)}
+                            onClick={() => {
+                              const analysis = story.story_analysis?.[0];
+                              if (analysis) fetchAnalysis(analysis.id);
+                            }}
                           >
                             <Eye className="h-4 w-4 mr-1" />
                             Xem
@@ -718,7 +722,7 @@ export function StoryInspirationDashboard() {
               ) : (
                 <div className="space-y-4">
                   {analyzedStories.map((story) => {
-                    const analysis = (story as any).story_analysis?.[0];
+                    const analysis = story.story_analysis?.[0];
                     return (
                       <Card key={story.id}>
                         <CardHeader className="pb-2">
@@ -786,7 +790,7 @@ export function StoryInspirationDashboard() {
                   </SelectTrigger>
                   <SelectContent>
                     {analyzedStories.map((story) => {
-                      const analysis = (story as any).story_analysis?.[0];
+                      const analysis = story.story_analysis?.[0];
                       return (
                         <SelectItem key={analysis?.id} value={analysis?.id || ''}>
                           {story.title} ({analysis?.detected_genre})
@@ -1077,7 +1081,7 @@ export function StoryInspirationDashboard() {
               <div>
                 <h4 className="font-medium mb-2">Nhân vật ({viewAnalysis.characters?.length || 0})</h4>
                 <div className="space-y-2">
-                  {viewAnalysis.characters?.slice(0, 5).map((char: any, i: number) => (
+                  {viewAnalysis.characters?.slice(0, 5).map((char, i: number) => (
                     <div key={i} className="p-2 border rounded text-sm">
                       <span className="font-medium">{char.name}</span>
                       <span className="text-muted-foreground"> - {char.role} | {char.archetype}</span>
@@ -1155,10 +1159,10 @@ export function StoryInspirationDashboard() {
               </div>
 
               <div>
-                <h4 className="font-medium mb-2">Arc Outlines ({(viewOutline.arc_outlines as any[])?.length || 0})</h4>
+                <h4 className="font-medium mb-2">Arc Outlines ({viewOutline.arc_outlines?.length || 0})</h4>
                 <ScrollArea className="h-[200px]">
                   <div className="space-y-2">
-                    {(viewOutline.arc_outlines as any[])?.map((arc: any, i: number) => (
+                    {viewOutline.arc_outlines?.map((arc, i: number) => (
                       <div key={i} className="p-3 border rounded">
                         <div className="flex items-center justify-between">
                           <span className="font-medium">Arc {arc.arc_number}: {arc.title}</span>
@@ -1174,10 +1178,10 @@ export function StoryInspirationDashboard() {
               </div>
 
               <div>
-                <h4 className="font-medium mb-2">Chapter Outlines ({(viewOutline.chapter_outlines as any[])?.length || 0})</h4>
+                <h4 className="font-medium mb-2">Chapter Outlines ({viewOutline.chapter_outlines?.length || 0})</h4>
                 <ScrollArea className="h-[200px]">
                   <div className="space-y-2">
-                    {(viewOutline.chapter_outlines as any[])?.slice(0, 20).map((ch: any, i: number) => (
+                    {viewOutline.chapter_outlines?.slice(0, 20).map((ch, i: number) => (
                       <div key={i} className="p-2 border rounded text-sm">
                         <span className="font-medium">Chương {ch.chapter_number}: {ch.title}</span>
                         <p className="text-muted-foreground">{ch.summary}</p>

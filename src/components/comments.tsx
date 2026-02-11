@@ -4,8 +4,9 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { MessageSquare, Send, Loader2 } from 'lucide-react';
+import { MessageSquare, Send, Loader2, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 type Comment = {
   id: string;
@@ -31,16 +32,25 @@ export function Comments({ novelId, chapterId, className }: CommentsProps) {
   const [userId, setUserId] = useState<string | null>(null);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const PAGE_SIZE = 10;
 
   useEffect(() => {
+    let cancelled = false;
+
     supabase.auth.getUser().then(({ data }) => {
+      if (cancelled) return;
       setUserId(data.user?.id || null);
     });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const fetchComments = useCallback(async (pageNum: number, append = false) => {
     setLoading(true);
+    setFetchError(null);
     try {
       let query = supabase
         .from('comments')
@@ -57,7 +67,13 @@ export function Comments({ novelId, chapterId, className }: CommentsProps) {
 
       const { data, error } = await query;
 
-      if (!error && data) {
+      if (error) {
+        console.error('Failed to fetch comments:', error);
+        setFetchError('Không thể tải bình luận.');
+        return;
+      }
+
+      if (data) {
         const mapped = data.map((c: any) => ({
           ...c,
           profile: Array.isArray(c.profiles) ? c.profiles[0] : c.profiles,
@@ -65,8 +81,9 @@ export function Comments({ novelId, chapterId, className }: CommentsProps) {
         setComments(prev => append ? [...prev, ...mapped] : mapped);
         setHasMore(data.length === PAGE_SIZE);
       }
-    } catch {
-      // silent
+    } catch (err) {
+      console.error('Failed to fetch comments:', err);
+      setFetchError('Không thể tải bình luận.');
     } finally {
       setLoading(false);
     }
@@ -88,12 +105,16 @@ export function Comments({ novelId, chapterId, className }: CommentsProps) {
         status: 'pending',
       });
 
-      if (!error) {
-        setContent('');
-        // Show optimistic message
+      if (error) {
+        toast.error('Gửi bình luận thất bại. Vui lòng thử lại.');
+        return;
       }
-    } catch {
-      // silent
+      
+      setContent('');
+      toast.success('Bình luận đã được gửi và đang chờ duyệt.');
+    } catch (err) {
+      console.error('Failed to submit comment:', err);
+      toast.error('Gửi bình luận thất bại. Vui lòng thử lại.');
     } finally {
       setSubmitting(false);
     }
@@ -162,7 +183,15 @@ export function Comments({ novelId, chapterId, className }: CommentsProps) {
       )}
 
       {/* Comments list */}
-      {loading && comments.length === 0 ? (
+      {fetchError ? (
+        <div className="text-center py-8">
+          <AlertCircle size={20} className="mx-auto mb-2 text-destructive" />
+          <p className="text-muted-foreground text-sm">{fetchError}</p>
+          <Button variant="ghost" size="sm" onClick={() => fetchComments(0)} className="mt-2">
+            Thử lại
+          </Button>
+        </div>
+      ) : loading && comments.length === 0 ? (
         <div className="text-center py-8 text-muted-foreground text-sm">Đang tải...</div>
       ) : comments.length === 0 ? (
         <div className="text-center py-8 text-muted-foreground text-sm">

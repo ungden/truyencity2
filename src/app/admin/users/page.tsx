@@ -1,6 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { AuthGuard } from '@/components/admin/auth-guard';
 import { UserTable } from '@/components/admin/user-table';
 import { createServerClient } from '@/integrations/supabase/server';

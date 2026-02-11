@@ -1,13 +1,20 @@
-# TruyenCity2 - AI Webnovel Factory
+# TruyenCity2 — Vietnamese Webnovel Platform
 
 ## Project Overview
 
-Industrial-scale Vietnamese webnovel platform. AI generates 200+ novels with 1000-2000 chapters each, fully automated.
+Vietnamese webnovel reading platform with two frontends:
+1. **Web app** — Next.js 15 at project root (`/`)
+2. **Mobile app** — Expo React Native at `/mobile/`
 
-**Stack:** Next.js 15, React 19, TypeScript, Supabase (PostgreSQL + pg_cron + pg_net), Google Gemini AI, Vercel Pro
+Both share the same Supabase backend.
+
+**Stack (Web):** Next.js 15, React 19, TypeScript, Supabase (PostgreSQL + pg_cron + pg_net), Google Gemini AI, Vercel Pro
+**Stack (Mobile):** Expo SDK 54, expo-router v6, NativeWind v5, Tailwind CSS v4, react-native-css v3, Supabase
 **Domain:** `truyencity.com` (prod), `truyencity2.vercel.app` (Vercel)
 **Repo:** `https://github.com/ungden/truyencity2.git` (branch: `main`)
 **User:** Vietnamese, direct/blunt style. Do everything at once, not incrementally.
+
+**Brand positioning:** TruyenCity là nền tảng đọc truyện tiên tiến nhất của người Việt cho người Việt. NO mention of AI in any public/reader-facing text. Admin tools keep AI references internally only.
 
 ---
 
@@ -20,6 +27,25 @@ Industrial-scale Vietnamese webnovel platform. AI generates 200+ novels with 100
 - Dark theme is the default/primary theme.
 - WebNovel/Wuxiaworld modern style for UI.
 - 5-star rating system (not thumbs up/down).
+- Brand name is **TruyenCity** (one word, no diacritics, capital T and C). Not "Truyen City" or "Truyện City".
+- Brand color: `#7c3aed` (purple).
+
+---
+
+## Vietnamese Language Rules (QUAN TRỌNG)
+
+**Tất cả text tiếng Việt hiển thị cho người dùng PHẢI có dấu đầy đủ.**
+
+Ví dụ đúng:
+- "Kiểm tra" chứ KHÔNG phải "Kiem tra"
+- "Đang tải..." chứ KHÔNG phải "Dang tai..."
+- "Tiên Hiệp" chứ KHÔNG phải "Tien Hiep"
+- "Huyền Huyễn" chứ KHÔNG phải "Huyen Huyen"
+- "Đô Thị" chứ KHÔNG phải "Do Thi"
+
+**Áp dụng cho:** UI labels, button text, titles, descriptions, placeholders, error messages, toast messages, admin panel text, page headers, empty states, loading states, genre labels, code comments có tiếng Việt.
+
+**KHÔNG áp dụng cho:** variable names, CSS class names, URL slugs (slugs không dấu là đúng), brand name "TruyenCity".
 
 ---
 
@@ -40,34 +66,163 @@ Industrial-scale Vietnamese webnovel platform. AI generates 200+ novels with 100
 
 ---
 
-## Vietnamese Language Rules (QUAN TRONG)
+## Mobile App (`/mobile/`)
 
-**Tat ca text tieng Viet hien thi cho nguoi dung PHAI co dau day du.**
+### Architecture & Dependencies
+- **Expo SDK 54** with `expo-router` v6
+- **NativeTabs** from `expo-router/unstable-native-tabs` (NOT JS Tabs)
+- **SF Symbols** via `expo-symbols` for tab icons
+- **react-native-css** v3.0.1 + **nativewind** v5.0.0-preview.2 for styling
+- **Tailwind CSS v4** with `@tailwindcss/postcss`
+- **lightningcss 1.30.1** — MUST stay at this version. 1.31.1 causes `failed to deserialize; expected an object-like struct named Specifier` error.
+- **expo-image** for all images (not RN Image)
+- **expo-secure-store** for Supabase auth tokens
+- **expo-sqlite** for localStorage polyfill — NEVER use AsyncStorage
+- **expo-speech** for TTS (Vietnamese vi-VN)
+- **expo-haptics** for haptic feedback
+- CSS wrapper components in `src/tw/index.tsx` using `useCssElement` from `react-native-css`
+- Metro port: **8088** (8081 is used by another app)
+- `process.env.EXPO_OS` not `Platform.OS`
+- **Inline styles** preferred over `StyleSheet.create`
+- `contentInsetAdjustmentBehavior="automatic"` on ScrollViews
+- Supabase: `EXPO_PUBLIC_SUPABASE_URL=https://jxhpejyowuihvjpqwarm.supabase.co`
 
-- "Kiem tra" chu KHONG phai "Kiem tra"
-- "Dang tai..." chu KHONG phai "Dang tai..."
-- "Chua co du lieu" chu KHONG phai "Chua co du lieu"
-- "Thu lai" chu KHONG phai "Thu lai"
+### Tailwind/Styling Gotchas (Mobile)
+- `bg-gradient-*` doesn't work on RN — use View overlay with rgba backgroundColor
+- `var(--color-*)` doesn't work in RN inline `style={{}}` — use hardcoded colors
+- `Link asChild` + CSS-wrapped `Pressable` can have style merging issues — use inline styles as fallback
+- `FlatList` is NOT CSS-wrapped — always from `react-native`, use `style={{}}` not `className`
 
-**Ap dung cho:** UI labels, button text, titles, descriptions, placeholders, error messages, toast messages, admin panel text, page headers, empty states, loading states.
+### Verification Commands (Mobile)
+```bash
+cd mobile && npx tsc --noEmit          # TypeScript check
+cd mobile && npx expo export --platform ios  # iOS export
+```
 
-**KHONG ap dung cho:** code comments, variable names, console.log, CSS class names, URL slugs (slugs dung khong dau la dung).
+### Mobile File Structure
+```
+mobile/
+├── app/
+│   ├── _layout.tsx                    # Root Stack — imports @/global.css
+│   ├── +not-found.tsx
+│   ├── read/[slug]/[chapter].tsx      # Reading screen (dark) — TTS + offline-first
+│   └── (tabs)/
+│       ├── _layout.tsx                # NativeTabs (4 tabs)
+│       ├── (discover)/               # Tab 1: "Trang Chủ" — branded header
+│       │   ├── _layout.tsx            # Stack with HeaderLogo component
+│       │   ├── index.tsx              # Hero carousel + sections
+│       │   ├── latest.tsx
+│       │   └── novel/[slug].tsx       # Novel detail — has download button
+│       ├── (rankings)/               # Tab 2: "Khám Phá"
+│       │   ├── _layout.tsx
+│       │   └── index.tsx
+│       ├── (library)/                # Tab 3: "Tủ Sách" — has "Đã tải" tab
+│       │   ├── _layout.tsx
+│       │   └── index.tsx
+│       └── (account)/                # Tab 4: "Cài Đặt" — gamified profile
+│           ├── _layout.tsx
+│           ├── index.tsx              # Full gamified profile + offline storage
+│           └── login.tsx              # Branded login
+├── src/
+│   ├── tw/index.tsx                   # CSS wrapper components
+│   ├── tw/image.tsx                   # expo-image CSS wrapper
+│   ├── global.css                     # Tailwind v4 + nativewind/theme + custom colors
+│   ├── components/
+│   │   ├── novel-card.tsx             # 7 card variants
+│   │   ├── underline-tabs.tsx
+│   │   ├── hero-carousel.tsx
+│   │   └── section-header.tsx
+│   ├── hooks/
+│   │   ├── use-user-stats.ts          # Supabase user stats (9 parallel queries)
+│   │   ├── use-tts.ts                 # TTS playback hook
+│   │   └── use-offline.ts            # Offline download state machine
+│   ├── lib/
+│   │   ├── config.ts                  # READING, CACHE, PAGINATION constants
+│   │   ├── gamification.ts            # XP, 13 cultivation levels, 22 achievements
+│   │   ├── genre.ts                   # Vietnamese genre labels
+│   │   ├── offline-db.ts              # SQLite offline schema + CRUD
+│   │   ├── storage.ts                 # expo-sqlite localStorage polyfill
+│   │   ├── supabase.ts                # Supabase client
+│   │   ├── tts.ts                     # HTML stripping, text chunking
+│   │   └── types.ts                   # Novel, Chapter, Author types
+│   └── utils/
+│       └── use-storage.ts             # useSyncExternalStore + storage
+├── assets/
+│   └── logo.png                       # TruyenCity brand icon (from web PWA)
+├── app.config.ts
+├── metro.config.js
+├── postcss.config.mjs
+├── tsconfig.json
+└── package.json                       # lightningcss pinned at 1.30.1
+```
+
+### Mobile Features Built
+1. **Full UI** — 4 tab structure, novel cards (7 variants), hero carousel, underline tabs, section headers
+2. **Reading screen** — `app/read/[slug]/[chapter].tsx` with dark theme
+3. **TTS (Nghe Truyện)** — expo-speech with vi-VN, mini player bar, speed control (0.5x-2x), chunk queuing, pseudo-pause on Android
+4. **Offline Download** — SQLite `truyencity-offline.db`, batch download (20 at a time), offline-first fetch (SQLite before Supabase), progress tracking, cancel support
+5. **Gamified Profile** — XP system, 13 cultivation levels (Phàm Nhân → Tiên Đế), 22 achievements, stats grid, settings menu
+6. **Branding** — Logo in header, login, account screen, version footer
+
+---
+
+## Web App — Key Files
+
+### Frontend — Pages
+- `src/app/page.tsx` — Homepage: ContinueReading, genre sections (Tiên Hiệp, Đô Thị), latest updates carousel
+- `src/app/truyen/[slug]/page.tsx` — Novel detail (WebNovel style): 200px cover, 4-stat grid, StarDisplay, interactive rating, related novels, author works
+- `src/app/truyen/[slug]/read/[chapter]/page.tsx` — Reading page (dark-friendly, collapsible sidebar)
+- `src/app/ranking/page.tsx` — Rankings: 5 tabs (Hot/Rating/Updated/Chapters/Bookmarks), Top 50, RPC functions
+- `src/app/browse/page.tsx` — Browse: genre/status/chapter-range filters, grid/list view, sort, pagination
+- `src/app/login/LoginClient.tsx` — Auth UI with Supabase, Google OAuth, Vietnamese localization
+
+### Frontend — Components
+- `src/components/star-rating.tsx` — `StarDisplay` (read-only, fractional) + `StarRating` (interactive)
+- `src/components/related-novels.tsx` — Same-genre novels with overlap scoring
+- `src/components/author-works.tsx` — Same-author novels
+- `src/components/continue-reading.tsx` — "Tiếp tục đọc" from `reading_progress`
+- `src/components/latest-updates-carousel.tsx` — Prev/next pagination with page counter
+- `src/components/search-modal.tsx` — localStorage recent searches, relevance/chapter/updated sort, genre filter
+- `src/components/novel-card.tsx` — Multi-variant novel card (default/horizontal)
+- `src/components/chapter-list.tsx` — Paginated chapter list
+- `src/components/header.tsx` — Header with search trigger, default title "TruyenCity"
+- `src/components/layout/desktop-sidebar.tsx` — Sidebar with TruyenCity branding
+- `src/components/onboarding/OnboardingWizard.tsx` — Reader-focused onboarding (NO AI mentions)
+- `src/components/pwa-provider.tsx` — PWA context, service worker, push notifications
+- `src/components/admin/pwa-install-button.tsx` — PWA install + notification panel
+- `src/components/admin/admin-sidebar.tsx` — Admin panel navigation
+
+### Story Writing Engine (`src/services/story-writing-factory/`)
+- `runner.ts` — Orchestrator (plan -> write -> QC), finale detection
+- `chapter.ts` — 3-agent pipeline (Architect/Writer/Critic)
+- `planner.ts` — Story outline + arc planning
+- `memory.ts` — 4-level hierarchical memory
+- `content-seeder.ts` — Bulk novel seeding
+- `power-tracker.ts` — 9-realm cultivation tracking
+- `beat-ledger.ts` — 50+ beat types with cooldowns
+- `consistency.ts` — Dead character detection, contradictions
+- `qc-gating.ts` — Chapter scoring, auto-rewrite if < 65/100
+- `style-bible.ts` — Style context + em dash dialogue
+
+### Types & Utils
+- `src/lib/types.ts` — Novel, Chapter, Author types
+- `src/lib/types/genre-config.ts` — GENRE_CONFIG with icons/names (canonical source)
+- `src/lib/utils.ts` — `cleanNovelDescription()` strips metadata
+- `src/lib/utils/genre.ts` — `getGenreLabel()` helper
 
 ---
 
 ## Two-Phase Production System
 
-### Phase 1: Initial Seed (one-time, COMPLETED)
+### Phase 1: Initial Seed (COMPLETED)
 - 10 AI authors x 20 novels = 200 novels seeded
 - Each novel has `total_planned_chapters` = random 1000-2000
 - pg_cron writes ~20 chapters/novel/day automatically
-- pg_cron generates covers (20 per tick, 4 parallel)
 
 ### Phase 2: Daily Rotation (ongoing, automated)
-- `daily-rotate` cron activates **20 new novels/day** (`DAILY_EXPANSION = 20`)
-- Each author maintains ~5 active novels (`TARGET_ACTIVE_PER_AUTHOR = 5`)
-- When a novel finishes -> auto-rotate: activate paused novel from same author
-- Cycle: ~20-50 novels finish/day, 20 new start -> steady state ~200-400 active
+- `daily-rotate` cron activates **20 new novels/day**
+- Each author maintains ~5 active novels
+- Auto-rotate when novel finishes
 
 ---
 
@@ -75,53 +230,12 @@ Industrial-scale Vietnamese webnovel platform. AI generates 200+ novels with 100
 
 | Cron | Interval | File | What it does |
 |------|----------|------|-------------|
-| `write-chapters` | Every 5 min | `src/app/api/cron/write-chapters/route.ts` | 30 resume + 5 init in parallel |
+| `write-chapters` | Every 5 min | `src/app/api/cron/write-chapters/route.ts` | 30 resume + 5 init |
 | `generate-covers` | Every 10 min | `src/app/api/cron/generate-covers/route.ts` | 20 covers, 4 parallel |
 | `daily-rotate` | Once/day 0h UTC | `src/app/api/cron/daily-rotate/route.ts` | Backfill + expand 20/day |
-| `health-check` | Once/day 6h UTC | `src/app/api/cron/health-check/route.ts` | 8 system checks, save to DB |
+| `health-check` | Once/day 6h UTC | `src/app/api/cron/health-check/route.ts` | 8 system checks |
 
 **Auth:** All crons use `Authorization: Bearer ${CRON_SECRET}`
-**Config:** `vercel.json` + `supabase/migrations/0025_setup_pg_cron.sql`
-
----
-
-## Story Writing Pipeline
-
-```
-SEED -> PLAN -> WRITE -> QC -> COMPLETE -> ROTATE
-
-1. ContentSeeder generates novel ideas via Gemini (batch 20)
-2. StoryRunner.run() -> planStory() -> planSingleArc() -> writeArc()
-3. Each chapter: Architect (outline) -> Writer (prose) -> Critic (QC) -> Summary
-4. 7 quality systems: QC Gating, ConsistencyChecker, PowerTracker, BeatLedger, etc.
-5. Soft ending: finish at arc boundary, grace period +20 chapters
-6. Auto-rotate: completed -> activate next paused novel
-```
-
-### Soft Ending Logic
-`total_planned_chapters` is a **SOFT TARGET**, not a hard cutoff:
-- **Phase 1** (ch 1 -> target-20): Normal writing
-- **Phase 2** (target-20 -> target): "Approaching finale" — wrap up, no new conflicts
-- **Phase 3** (target -> target+20): Grace period — keep writing until arc boundary (every 20ch)
-- **Phase 4** (target+20): Hard stop safety net
-
-The system detects final arc via `theme: 'finale'` and injects ending context.
-
-### Title Diversity System (commit `c321936`)
-- Chapter titles use templates, anti-patterns, engagement checklist
-- Files: `templates.ts`, `chapter.ts`, `title-checker.ts`, `quality.ts`, `style-bible.ts`, `runner.ts`
-
----
-
-## Rate Limits (Gemini Tier 3)
-
-| Model | Limit | Our setting | File |
-|-------|-------|-------------|------|
-| Gemini 3 Flash (text) | 20,000 RPM | **2,000 RPM** (10%) | `ai-provider.ts` |
-| Gemini 3 Pro Image | 2,000 RPM | ~60 RPM (4 parallel) | `generate-covers/route.ts` |
-
-AI calls per chapter: ~4 (Architect + Writer + Critic + Summary)
-Throughput: 30 projects x 288 ticks/day = **8,640 chapter slots/day**
 
 ---
 
@@ -143,101 +257,26 @@ ratings — 5-star ratings (unique user+novel, RLS enabled, auto updated_at)
 ```
 
 ### RPC Functions (migration `0030`)
-All created and **applied to production Supabase**:
 - `get_novel_stats(novel_id)` — single novel stats aggregation
 - `get_novels_with_stats(novel_ids[])` — batch stats (avoids N+1)
 - `get_top_novels_by_views(days, limit)` — Hot ranking tab
 - `get_top_novels_by_rating(min_ratings, limit)` — Rating ranking tab
 - `get_top_novels_by_bookmarks(limit)` — Bookmarks ranking tab
 
-### Database State
-- **200 novels** in `novels` table (cover_prompt populated)
-- **200 ai_story_projects** (196 active, 4 completed)
-- **10 ai_authors** with Vietnamese pen names
-- **Chapters** growing via pg_cron (~8K+ slots/day)
-- **Covers** growing via pg_cron
-- **pg_cron:** 4 jobs active
+---
+
+## Rate Limits (Gemini Tier 3)
+
+| Model | Limit | Our setting |
+|-------|-------|-------------|
+| Gemini 3 Flash (text) | 20,000 RPM | 2,000 RPM (10%) |
+| Gemini 3 Pro Image | 2,000 RPM | ~60 RPM (4 parallel) |
 
 ---
 
-## Key Files
+## Environment Variables
 
-### Cron Endpoints
-- `src/app/api/cron/write-chapters/route.ts` — RESUME_BATCH=30, INIT_BATCH=5
-- `src/app/api/cron/generate-covers/route.ts` — BATCH=20, PARALLEL=4
-- `src/app/api/cron/daily-rotate/route.ts` — EXPANSION=20, TARGET_ACTIVE=5
-- `src/app/api/cron/health-check/route.ts` — 8 system checks
-
-### Story Writing Engine (`src/services/story-writing-factory/`)
-- `runner.ts` — Orchestrator (plan -> write -> QC), finale detection, dummy arcs
-- `chapter.ts` — 3-agent pipeline (Architect/Writer/Critic), cliffhanger/finale toggle
-- `planner.ts` — Story outline + arc planning, `ARC_FINALE_PROMPT` for last arc
-- `memory.ts` — 4-level hierarchical memory (recent -> arc -> volume -> essence)
-- `types.ts` — All types including `ArcTheme` with `'finale'`
-- `content-seeder.ts` — Bulk novel seeding, clean description (no metadata)
-- `power-tracker.ts` — 9-realm cultivation tracking + breakthrough validation
-- `beat-ledger.ts` — 50+ beat types with cooldowns, anti-repetition
-- `consistency.ts` — Dead character detection, power/trait contradictions
-- `qc-gating.ts` — Chapter scoring, auto-rewrite if < 65/100
-- `templates.ts` — Title diversity templates
-- `title-checker.ts` — Anti-repetition for chapter titles
-- `quality.ts` — Engagement quality checklist
-- `style-bible.ts` — Style context + few-shot exemplars, em dash dialogue
-
-### Frontend — Pages
-- `src/app/page.tsx` — Homepage: ContinueReading, genre sections ("Tien Hiep Moi", "Do Thi Hot"), latest updates carousel
-- `src/app/truyen/[slug]/page.tsx` — Novel detail (WebNovel style): 200px cover, 4-stat grid, StarDisplay, interactive rating, related novels, author works, "Latest chapter" button, parallel data fetching
-- `src/app/truyen/[slug]/read/[chapter]/page.tsx` — Reading page (dark-friendly, collapsible sidebar)
-- `src/app/ranking/page.tsx` — Rankings: 5 tabs (Hot/Rating/Updated/Chapters/Bookmarks), Top 50, uses RPC functions with client-side fallback
-- `src/app/browse/page.tsx` — Browse: genre/status/chapter-range filters, grid/list view, sort (updated/chapters/title), load more pagination
-- `src/app/novel/[id]/page.tsx` — Legacy redirect/compat route
-
-### Frontend — Components
-- `src/components/star-rating.tsx` — `StarDisplay` (read-only, fractional) + `StarRating` (interactive, calls API)
-- `src/components/related-novels.tsx` — Same-genre novels with overlap scoring
-- `src/components/author-works.tsx` — Same-author novels
-- `src/components/continue-reading.tsx` — "Tiep tuc doc" from `reading_progress`
-- `src/components/latest-updates-carousel.tsx` — Prev/next pagination with page counter
-- `src/components/search-modal.tsx` — localStorage recent searches, relevance/chapter/updated sort, genre filter
-- `src/components/novel-card.tsx` — Multi-variant novel card (default/horizontal)
-- `src/components/chapter-list.tsx` — Paginated chapter list
-- `src/components/novel-actions.tsx` — Read/Bookmark/Share buttons
-- `src/components/comments.tsx` — Comment system
-- `src/components/reading/desktop-reading-sidebar.tsx` — Expanded/collapsed/hidden states, slug URLs
-- `src/components/theme-toggle.tsx` — Overflow fix: inactive=icon-only, active=icon+label
-
-### Frontend — API Routes
-- `src/app/api/ratings/route.ts` — GET (avg + user score) / POST (upsert rating)
-
-### Frontend — Rating
-- `src/app/truyen/[slug]/rating-section.tsx` — Client component for interactive rating on detail page
-
-### Other Services
-- `src/services/ai-provider.ts` — Gemini-only, 2000 RPM rate limiter
-- `src/services/plot-arc-manager.ts` — DB-backed arcs, tension curves, finale objectives
-- `src/services/factory/gemini-image.ts` — Cover generation with Truyencity.com branding
-
-### Types & Utils
-- `src/lib/types.ts` — Novel, Chapter, Author types
-- `src/lib/types/genre-config.ts` — GENRE_CONFIG with icons/names
-- `src/lib/utils.ts` — `cleanNovelDescription()` strips metadata from descriptions
-- `src/lib/utils/genre.ts` — `getGenreLabel()` helper
-
-### Layout
-- `src/components/layout.tsx` — AppContainer, TwoColumnLayout, ContentCard
-- `src/components/header.tsx` — Header with search trigger
-- `src/components/genre-filter.tsx` — Mobile genre/status filter sheet
-
-### Config
-- `vercel.json` — 4 cron entries
-- `.env.local` — 5 env vars (gitignored)
-- `supabase/migrations/0025_setup_pg_cron.sql` — pg_cron setup
-- `supabase/migrations/0030_create_ratings_table_and_novel_stats.sql` — Ratings + RPC functions (APPLIED to prod)
-
----
-
-## Environment Variables (5 only)
-
+### Web (.env.local)
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://jxhpejyowuihvjpqwarm.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
@@ -246,44 +285,35 @@ GEMINI_API_KEY=...
 CRON_SECRET=...
 ```
 
-Supabase CLI linked to project `jxhpejyowuihvjpqwarm` (truyencity).
-
----
-
-## Description Cleanup
-
-`novels.description` from seeder contains intro + synopsis ONLY (fixed).
-Old seeded novels may have metadata blocks but `cleanNovelDescription()` in `src/lib/utils.ts` strips them on render.
-
-**Rule:** Never show raw `novel.description` without `cleanNovelDescription()`.
-
----
-
-## Cover Generation Rules
-
-- Model: `gemini-3-pro-image-preview`
-- Aspect: 3:4, resolution: 2K
-- **MUST include:** title text + "Truyencity.com" branding at bottom
-- Cron injects branding if saved `cover_prompt` is missing it
-- Upload to Supabase Storage `covers` bucket
+### Mobile (in app.config.ts)
+```
+EXPO_PUBLIC_SUPABASE_URL=https://jxhpejyowuihvjpqwarm.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=...
+```
 
 ---
 
 ## Image Delivery + Branding Rules
 
-### Cover Performance Rules
-- All user-facing cover rendering must use `next/image` (no raw `<img>` and no CSS `background-image` for covers).
-- Primary components already migrated: `novel-card.tsx`, `ranking/page.tsx`, `admin/factory/blueprints/page.tsx`
-- `next.config.ts` image optimization: `formats: ["image/avif", "image/webp"]`, `minimumCacheTTL: 60 * 60 * 24 * 30`
-- Keep generation at 2K; optimize via responsive `sizes`, controlled `quality`, and selective `priority`.
+- All covers use `next/image` (no raw `<img>` or CSS `background-image`)
+- Cover generation: 2K, 3:4 aspect, title text + "Truyencity.com" branding
+- Brand icon source: `public/icons/brand-logo.png`
+- Mobile logo: `mobile/assets/logo.png` (copied from web PWA icon)
 
-### Brand Icon/Favicon Source of Truth
-- Base brand image: `public/icons/brand-logo.png`
-- Favicon: `src/app/favicon.ico`
-- App icons: `src/app/icon.png`, `src/app/apple-icon.png`
-- PWA icons: `public/icons/icon-72x72.png` ... `public/icons/icon-512x512.png`
-- Metadata icons configured in `src/app/layout.tsx`
-- Header/sidebar logo uses branded icon image (not default Lucide book icon).
+---
+
+## Website Rebrand Status (COMPLETED)
+
+All public-facing text rebranded from "AI Story Writer" to reading platform. Files updated:
+- `src/app/layout.tsx` — Title: "TruyenCity - Đọc Truyện Online Miễn Phí"
+- `public/manifest.json` — Consistent PWA name/description
+- `src/components/onboarding/OnboardingWizard.tsx` — Reader-focused welcome, no AI
+- `src/app/login/LoginClient.tsx` — "Đăng nhập để lưu tiến trình đọc"
+- `src/components/admin/admin-sidebar.tsx` — Toned down descriptions
+- `src/components/admin/pwa-install-button.tsx` — "Đọc truyện nhanh hơn, ngay cả khi offline"
+- `src/components/pwa-provider.tsx` — Generic SW messages (no "viết chương")
+
+Genre labels in 5 factory pages (`blueprints`, `config`, `authors`, `production`, `ideas`) all converted to proper Vietnamese with diacritics.
 
 ---
 
@@ -294,8 +324,20 @@ Old seeded novels may have metadata blocks but `cleanNovelDescription()` in `src
 - Never commit `.env.local` or secrets
 - Never force push to main
 
-### Recent Commits (latest first)
-- `e301ead` — fix: add Vietnamese diacritics to all UI strings across 11 files
-- `ca0bb53` — feat: massive UI overhaul — ratings, detail page, ranking, genre sections, continue reading, search
-- `00cf725` — fix: cron stuck projects when current_chapter >= total_planned_chapters
-- `c321936` — feat: title diversity system + engagement checklist for AI chapter writing
+---
+
+## Description Cleanup
+
+`novels.description` from seeder contains intro + synopsis ONLY.
+Old novels may have metadata blocks but `cleanNovelDescription()` in `src/lib/utils.ts` strips them.
+**Rule:** Never show raw `novel.description` without `cleanNovelDescription()`.
+
+---
+
+## Soft Ending Logic
+
+`total_planned_chapters` is a **SOFT TARGET**:
+- **Phase 1** (ch 1 -> target-20): Normal writing
+- **Phase 2** (target-20 -> target): Wrap up, no new conflicts
+- **Phase 3** (target -> target+20): Grace period until arc boundary
+- **Phase 4** (target+20): Hard stop safety net

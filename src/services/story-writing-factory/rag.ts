@@ -107,7 +107,7 @@ export class RAGService {
    * Primary path uses Supabase Edge Function; if that fails, embeddings are skipped.
    */
   private async generateEmbeddingFallback(_text: string): Promise<number[] | null> {
-    console.warn('[RAGService] Embedding fallback: no external provider configured, skipping.');
+
     return null;
   }
 

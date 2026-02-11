@@ -13,6 +13,7 @@ import {
 } from '@/lib/types/story-inspiration';
 import { getAIProviderService } from './ai-provider';
 import { AIProviderType } from '@/lib/types/ai-providers';
+import { logger } from '@/lib/security/logger';
 
 const getSupabaseConfig = () => {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -133,9 +134,9 @@ export class AIStoryInspiration {
       const jsonStr = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : text;
       return JSON.parse(jsonStr);
     } catch (e) {
-      console.warn(`[AIStoryInspiration] Failed to parse JSON:`, e);
-      // Optional: Log the raw text for debugging
-      // console.log('Raw text:', text);
+      logger.debug('Failed to parse JSON from AI response (non-fatal)', {
+        error: e instanceof Error ? e.message : String(e),
+      });
     }
     return fallback;
   }

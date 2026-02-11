@@ -15,8 +15,7 @@ import {
   CheckCircle,
   FileText,
   Trash2,
-  Copy,
-  ListTree
+  Copy
 } from 'lucide-react';
 import { AIStoryProject, WritingProgress } from '@/lib/types/ai-writer';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -139,7 +138,7 @@ export function WritingInterface({
               {canActOnChapter && (
                 <div className="grid grid-cols-2 gap-2">
                   <Button asChild variant="secondary">
-                    <Link href={`/novel/${project.novel_id}/read/${project.current_chapter}`}>
+                    <Link href={`/truyen/${project.novel_id}/read/${project.current_chapter}`}>
                       <FileText className="mr-2 h-4 w-4" /> Xem chương
                     </Link>
                   </Button>

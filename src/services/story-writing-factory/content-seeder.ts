@@ -75,6 +75,47 @@ interface NovelIdea {
   coverPrompt?: string;        // English prompt forcing title text
 }
 
+interface GenreConfigEntry {
+  requiredFields?: readonly string[];
+  example?: string;
+}
+
+interface CoverlessNovelRow {
+  id: string;
+  title: string | null;
+  description: string | null;
+  genres: string[] | null;
+  cover_prompt: string | null;
+}
+
+interface NovelInsertRow {
+  id: string;
+  title: string;
+  author: string;
+  ai_author_id: string;
+  description: string;
+  status: string;
+  genres: string[];
+  cover_prompt: string;
+}
+
+interface ProjectInsertRow {
+  id: string;
+  user_id: string | null;
+  novel_id: string;
+  genre: string;
+  main_character: string;
+  world_description: string;
+  writing_style: string;
+  target_chapter_length: number;
+  ai_model: string;
+  temperature: number;
+  current_chapter: number;
+  total_planned_chapters: number;
+  status: string;
+  [key: string]: string | number | null;
+}
+
 // ============================================================================
 // CONTENT SEEDER CLASS
 // ============================================================================
@@ -87,6 +128,15 @@ export class ContentSeeder {
   constructor(geminiApiKey: string) {
     this.aiService = new AIProviderService({ gemini: geminiApiKey });
     this.supabase = getSupabase();
+  }
+
+  private getGenreConfigEntry(genre: string): GenreConfigEntry | undefined {
+    const configByGenre = GENRE_CONFIG as Record<string, GenreConfigEntry>;
+    return configByGenre[genre];
+  }
+
+  private isObjectRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === 'object' && value !== null;
   }
 
   /**
@@ -106,8 +156,6 @@ export class ContentSeeder {
 
     const totalNovels = authorCount * novelsPerAuthor;
 
-    console.log(`[Seeder] Starting: ${authorCount} authors, ${totalNovels} novels`);
-
     // Step 0: Get a valid user_id for FK constraints
     this.userId = await this.getSystemUserId();
     if (!this.userId) {
@@ -119,9 +167,7 @@ export class ContentSeeder {
     }
 
     // Step 1: Generate and insert authors
-    console.log(`[Seeder] Step 1: Generating ${authorCount} authors...`);
     const authorIds = await this.seedAuthors(authorCount, errors);
-    console.log(`[Seeder] Created ${authorIds.length} authors`);
 
     if (authorIds.length === 0) {
       return {
@@ -132,22 +178,16 @@ export class ContentSeeder {
     }
 
     // Step 2: Generate novel ideas via Gemini
-    console.log(`[Seeder] Step 2: Generating ${totalNovels} novel ideas via Gemini...`);
     const novelIdeas = await this.generateAllNovelIdeas(totalNovels, errors);
-    console.log(`[Seeder] Generated ${novelIdeas.size} novel ideas across ${novelIdeas.size} genres`);
 
     // Step 3: Insert novels + ai_story_projects (paused)
-    console.log(`[Seeder] Step 3: Inserting novels and projects...`);
     let totalInserted = 0;
     totalInserted = await this.seedNovels(
       authorIds, novelIdeas, novelsPerAuthor, minChapters, maxChapters, errors
     );
-    console.log(`[Seeder] Inserted ${totalInserted} novels`);
 
     // Step 4: Activate initial batch
-    console.log(`[Seeder] Step 4: Activating ${activatePerAuthor} novels per author...`);
     const activated = await this.activateInitialBatch(authorIds, activatePerAuthor, errors);
-    console.log(`[Seeder] Activated ${activated} novels`);
 
     return {
       authors: authorIds.length,
@@ -182,7 +222,6 @@ export class ContentSeeder {
     }
 
     const needed = count - existingSafe;
-    console.log(`[Seeder] Step 1: Have ${existingSafe}, need ${needed} more authors`);
     const authorIds = await this.seedAuthors(needed, errors);
 
     return { authors: existingSafe + authorIds.length, novels: 0, activated: 0, errors, durationMs: Date.now() - startTime };
@@ -220,8 +259,6 @@ export class ContentSeeder {
     if (existingNovels >= targetNovels) {
       return { authors: authorIds.length, novels: existingNovels, activated: 0, errors: [`Already have ${existingNovels} novels`], durationMs: Date.now() - startTime };
     }
-
-    console.log(`[Seeder] Step 2: ${authorIds.length} authors, generating ${targetNovels} novels via Gemini`);
 
     const novelIdeas = await this.generateAllNovelIdeas(targetNovels, errors);
 
@@ -287,8 +324,6 @@ export class ContentSeeder {
       offset += pageSize;
     }
 
-    console.log(`[Seeder] Found ${aiNovelIds.length} AI-seeded novels to clear`);
-
     if (aiNovelIds.length === 0) {
       // Still clean up orphaned authors
       const { error: authorErr } = await this.supabase
@@ -311,7 +346,6 @@ export class ContentSeeder {
         .in('novel_id', chunk);
       if (error) errors.push(`Delete ai_image_jobs chunk: ${error.message}`);
     }
-    console.log(`[Seeder] Deleted ai_image_jobs for ${aiNovelIds.length} novels`);
 
     // 2. Delete ai_story_projects scoped to AI novels (cascades 24+ child tables)
     for (const chunk of chunks) {
@@ -321,7 +355,6 @@ export class ContentSeeder {
         .in('novel_id', chunk);
       if (error) errors.push(`Delete ai_story_projects chunk: ${error.message}`);
     }
-    console.log(`[Seeder] Deleted ai_story_projects for ${aiNovelIds.length} novels`);
 
     // 3. Delete chapters explicitly (FK behavior unknown — could be RESTRICT)
     for (const chunk of chunks) {
@@ -331,7 +364,6 @@ export class ContentSeeder {
         .in('novel_id', chunk);
       if (error) errors.push(`Delete chapters chunk: ${error.message}`);
     }
-    console.log(`[Seeder] Deleted chapters for ${aiNovelIds.length} novels`);
 
     // 4. Delete other tables with unknown FK behavior
     const otherTables = ['comments', 'reading_sessions', 'chapter_reads', 'notifications'] as const;
@@ -344,7 +376,6 @@ export class ContentSeeder {
         if (error) errors.push(`Delete ${table} chunk: ${error.message}`);
       }
     }
-    console.log(`[Seeder] Deleted comments/reading_sessions/chapter_reads/notifications`);
 
     // 5. Delete novels (remaining CASCADE FKs: bookmarks, reading_progress, production_queue)
     const { error: novelErr } = await this.supabase
@@ -352,7 +383,6 @@ export class ContentSeeder {
       .delete()
       .not('ai_author_id', 'is', null);
     if (novelErr) errors.push(`Delete novels: ${novelErr.message}`);
-    else console.log(`[Seeder] Deleted ${aiNovelIds.length} AI-seeded novels`);
 
     // 6. Delete ai_authors (all — this table is only used by the seeder)
     const { error: authorErr } = await this.supabase
@@ -360,7 +390,6 @@ export class ContentSeeder {
       .delete()
       .gte('created_at', '1970-01-01');
     if (authorErr) errors.push(`Delete ai_authors: ${authorErr.message}`);
-    else console.log(`[Seeder] Deleted ai_authors`);
 
     // 7. Clear cover files starting with "ai-" from Supabase Storage "covers" bucket
     //    Paginate to handle >1000 files
@@ -398,11 +427,10 @@ export class ContentSeeder {
         // If we found fewer ai- files than total files, no more ai- files to clean
         if (aiFiles.length < files.length) hasMore = false;
       }
-      if (totalRemoved > 0) {
-        console.log(`[Seeder] Removed ${totalRemoved} cover files from storage`);
-      }
-    } catch (e: any) {
-      errors.push(`Storage cleanup: ${e?.message || String(e)}`);
+      // storage cleanup complete
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e);
+      errors.push(`Storage cleanup: ${message}`);
     }
 
     return {
@@ -445,7 +473,9 @@ export class ContentSeeder {
 
     let enqueued = 0;
 
-    for (const novel of novels as any[]) {
+    const novelsToProcess = (novels ?? []) as CoverlessNovelRow[];
+
+    for (const novel of novelsToProcess) {
       try {
         const genre = Array.isArray(novel.genres) && novel.genres.length > 0 ? novel.genres[0] : 'tien-hiep';
         const desc = String(novel.description || '').slice(0, 800);
@@ -473,8 +503,9 @@ export class ContentSeeder {
         try {
           await this.supabase.functions
             .invoke('gemini-cover-generate', { body: { jobId: job.id, prompt } });
-        } catch (e: any) {
-          errors.push(`Invoke cover job failed (${job.id.slice(0, 8)}): ${e?.message || String(e)}`);
+        } catch (e: unknown) {
+          const message = e instanceof Error ? e.message : String(e);
+          errors.push(`Invoke cover job failed (${job.id.slice(0, 8)}): ${message}`);
         }
 
         enqueued++;
@@ -483,8 +514,9 @@ export class ContentSeeder {
         if (enqueued < novels.length) {
           await new Promise(r => setTimeout(r, 3000));
         }
-      } catch (e: any) {
-        errors.push(`Enqueue cover exception: ${e?.message || String(e)}`);
+      } catch (e: unknown) {
+        const message = e instanceof Error ? e.message : String(e);
+        errors.push(`Enqueue cover exception: ${message}`);
       }
     }
 
@@ -561,8 +593,6 @@ export class ContentSeeder {
         errors.push(`Author batch ${batch}-${batchEnd} failed: ${error.message}`);
         // Remove failed IDs
         authorIds.splice(authorIds.length - rows.length, rows.length);
-      } else {
-        console.log(`[Seeder] Authors ${batch + 1}-${batchEnd} inserted`);
       }
     }
 
@@ -593,13 +623,13 @@ export class ContentSeeder {
           try {
             const batch = await this.generateNovelBatch(genre, count, offset);
             ideas.push(...batch);
-          } catch (e: any) {
-            errors.push(`FAILED: ${genre} batch at offset ${offset}: ${e?.message || String(e)}. No fallback.`);
+          } catch (e: unknown) {
+            const message = e instanceof Error ? e.message : String(e);
+            errors.push(`FAILED: ${genre} batch at offset ${offset}: ${message}. No fallback.`);
           }
         }
 
         ideasByGenre.set(genre, ideas);
-        console.log(`[Seeder] Genre ${genre}: ${ideas.length} ideas`);
       });
 
       await Promise.all(promises);
@@ -617,8 +647,9 @@ export class ContentSeeder {
     offset: number
   ): Promise<NovelIdea[]> {
     const genreLabel = GENRE_LABELS[genre] || genre;
-    const requiredKey = (GENRE_CONFIG as any)[genre]?.requiredFields?.[0] as string | undefined;
-    const requiredExample = requiredKey ? (GENRE_CONFIG as any)[genre]?.example : '';
+    const genreConfig = this.getGenreConfigEntry(genre);
+    const requiredKey = genreConfig?.requiredFields?.[0];
+    const requiredExample = requiredKey ? genreConfig?.example : '';
 
     const requiredRulesByKey: Record<string, string> = {
       cultivation_system: 'Viết hệ thống tu luyện rõ ràng, ít nhất 7 cảnh giới theo thứ tự, mỗi cảnh giới có đặc trưng và điều kiện đột phá.',
@@ -644,12 +675,13 @@ Mỗi tiểu thuyết cần:
 8. "${requiredKey || 'required_system'}": Trường BẮT BUỘC cho thể loại này. ${requiredRule} Ví dụ format: ${requiredExample}
 9. "coverPrompt": Prompt tiếng Anh 3-5 câu để AI tạo ảnh bìa. BẮT BUỘC chứa: Title text must be exactly: "<TITLE>", At the bottom-center include small text: "Truyencity.com", No other text.
 
-MẪU TÊN TRUYỆN HẤP DẪN (BẮT BUỘC theo 1 trong các pattern sau):
-- "Trùng Sinh: [XX]" — cho truyện trùng sinh/xuyên không
-- "Ta Tại [Bối Cảnh] [Hành Động OP]" — VD: "Ta Tại Thần Giới Vô Địch"
-- "[Hệ Thống] + [Mục Tiêu]" — VD: "Hệ Thống Ký Danh: Ta Lên Cấp Mỗi Ngày"
-- "[Danh Hiệu] + [Nhân Vật]" — VD: "Vạn Cổ Đệ Nhất Kiếm Thần"
-- "[Hành Động] + [Kết Quả Sốc]" — VD: "Bắt Đầu Từ Việc Thu Phục Thần Thú"
+MẪU TÊN TRUYỆN - Học từ webnovels HOT nhất Trung Quốc:
+• [Số Lớn]+[Cảnh Giới]: Vạn Cổ Thần Đế, Cửu Tinh Bá Thể Quyết → Epicness
+• [Động Từ]+[Vũ Trụ]: Thôn Phệ Tinh Không (360M views), Già Thiên (450M) → Power
+• [Bí Ẩn]+Chi+[Chủ]: Quỷ Bí Chi Chủ (9.4★ highest rated) → Mystery Hook
+• [Nhân Vật]+Truyện: Phàm Nhân Tu Tiên Truyện (#1 all-time, 500M views) → Relatable
+• [Nghề]+Thần: Tu La Vũ Thần, Siêu Thần Cơ Giới Sư → Identity
+Lưu ý: 2-6 chữ, gợi tò mò, Hán-Việt cho tu tiên/huyền huyễn
 
 GOLDEN FINGER (BẮT BUỘC cho mỗi truyện):
 Nhân vật chính PHẢI có ít nhất 1 lợi thế đặc biệt rõ ràng, ví dụ:
@@ -657,6 +689,35 @@ Nhân vật chính PHẢI có ít nhất 1 lợi thế đặc biệt rõ ràng, 
 - Kiến thức từ kiếp trước / tiên tri
 - Kho tàng cổ đại / không gian tu luyện riêng
 - Thiên phú/thể chất đặc biệt / huyết mạch thần bí
+
+HOOK TECHNIQUES cho Description (học từ top novels):
+
+1. Mystery Hook (诡秘之主 9.4★):
+"蒸汽与机械的浪潮中，谁能触及非凡？历史和黑暗的迷雾里，又是谁在耳语？"
+→ Đặt câu hỏi bí ẩn ngay đầu, gợi tò mò
+
+2. Epic Scale (完美世界 9.2★):
+"一粒尘可填海，一根草斩尽日月星辰，弹指间天翻地覆。"
+→ Mở đầu với quy mô vũ trụ, sức mạnh phi thường
+
+3. Shocking Event (斗破苍穹 8.9★):
+"少年萧炎，自幼天赋异禀，可一夜之间却沦为废人。"
+→ Sự kiện sốc, từ đỉnh cao xuống vực thẳm
+
+4. Relatable Underdog (凡人修仙传 9.3★):
+"一个普通山村少年，偶然进入江湖小门派，成为记名弟子。他资质平庸..."
+→ Nhân vật bình thường, dễ đồng cảm
+
+5. Time/Rebirth (万古神帝 8.7★):
+"八百年前被杀死，八百年后重新活过来，却发现..."
+→ Khoảng cách thời gian lớn, tạo drama
+
+✨ Description Structure (250-500 chữ):
+Câu 1: Hook (mystery/epic/shock)
+Câu 2-3: Bối cảnh thế giới + quy tắc
+Câu 4-5: Nhân vật chính + xuất thân + golden finger
+Câu 6-7: Xung đột chính + mục tiêu
+Câu cuối: Teaser "Liệu anh ta có thể...?" (NO spoil kết cục)
 
 Trả về JSON array:
 [{"title":"...","premise":"...","mainCharacter":"...","mainCharacterProfile":"...","description":"...","shortSynopsis":"...","worldDescription":"...","${requiredKey || 'required_system'}":"...","coverPrompt":"..."},...]
@@ -719,23 +780,27 @@ CHÚ Ý:
     }
   }
 
-  private validateNovelIdeas(parsed: unknown[], requiredKey?: string): NovelIdea[] {
+  private validateNovelIdeas(parsed: unknown, requiredKey?: string): NovelIdea[] {
     if (!Array.isArray(parsed)) return [];
 
     return parsed
-      .filter((item: any) => item.title && item.premise)
-      .map((item: any) => ({
-        title: String(item.title).trim(),
-        premise: String(item.premise).trim(),
-        mainCharacter: String(item.mainCharacter || this.randomMCName()).trim(),
-        mainCharacterProfile: item.mainCharacterProfile ? String(item.mainCharacterProfile).trim() : undefined,
-        description: item.description ? String(item.description).trim() : undefined,
-        shortSynopsis: item.shortSynopsis ? String(item.shortSynopsis).trim() : undefined,
-        worldDescription: item.worldDescription ? String(item.worldDescription).trim() : undefined,
-        requiredFieldKey: requiredKey,
-        requiredFieldValue: requiredKey && item[requiredKey] ? String(item[requiredKey]).trim() : undefined,
-        coverPrompt: item.coverPrompt ? String(item.coverPrompt).trim() : undefined,
-      }));
+      .filter((item): item is Record<string, unknown> => this.isObjectRecord(item) && !!item.title && !!item.premise)
+      .map((item) => {
+        const requiredValue = requiredKey && item[requiredKey] ? String(item[requiredKey]).trim() : undefined;
+
+        return {
+          title: String(item.title).trim(),
+          premise: String(item.premise).trim(),
+          mainCharacter: String(item.mainCharacter || this.randomMCName()).trim(),
+          mainCharacterProfile: item.mainCharacterProfile ? String(item.mainCharacterProfile).trim() : undefined,
+          description: item.description ? String(item.description).trim() : undefined,
+          shortSynopsis: item.shortSynopsis ? String(item.shortSynopsis).trim() : undefined,
+          worldDescription: item.worldDescription ? String(item.worldDescription).trim() : undefined,
+          requiredFieldKey: requiredKey,
+          requiredFieldValue: requiredValue,
+          coverPrompt: item.coverPrompt ? String(item.coverPrompt).trim() : undefined,
+        };
+      });
   }
 
   /**
@@ -774,7 +839,6 @@ CHÚ Ý:
   ): Promise<number> {
     let totalInserted = 0;
     const novelBatchSize = 50;
-    const projectBatchSize = 50;
 
     // Flatten all ideas into a single pool, cycling genres
     const allIdeas: Array<{ genre: string; idea: NovelIdea }> = [];
@@ -818,8 +882,8 @@ CHÚ Ý:
     // Insert in batches
     for (let batch = 0; batch < allIdeas.length; batch += novelBatchSize) {
       const batchEnd = Math.min(batch + novelBatchSize, allIdeas.length);
-      const novelRows: any[] = [];
-      const projectRows: any[] = [];
+      const novelRows: NovelInsertRow[] = [];
+      const projectRows: ProjectInsertRow[] = [];
 
       for (let i = batch; i < batchEnd; i++) {
         const authorIdx = Math.floor(i / novelsPerAuthor);
@@ -831,7 +895,7 @@ CHÚ Ý:
         const totalChapters = this.randomInt(minChapters, maxChapters);
 
         const requiredKey =
-          idea.requiredFieldKey || ((GENRE_CONFIG as any)[genre]?.requiredFields?.[0] as string | undefined);
+          idea.requiredFieldKey || this.getGenreConfigEntry(genre)?.requiredFields?.[0];
         const requiredValue = idea.requiredFieldValue;
         if (requiredKey && !requiredValue) {
           errors.push(`WARNING: Novel "${idea.title}" missing required field ${requiredKey}. Gemini did not provide it.`);
@@ -854,7 +918,7 @@ CHÚ Ý:
           cover_prompt: idea.coverPrompt || this.buildCoverPrompt(idea.title, genre, formattedDescription),
         });
 
-        const projectRow: any = {
+        const projectRow: ProjectInsertRow = {
           id: projectId,
           user_id: this.userId,
           novel_id: novelId,
@@ -896,7 +960,6 @@ CHÚ Ý:
       }
 
       totalInserted += novelRows.length;
-      console.log(`[Seeder] Novels ${batch + 1}-${batchEnd} inserted (${totalInserted} total)`);
     }
 
     // Update author names on novels
@@ -986,7 +1049,6 @@ CHÚ Ý:
 
       const results = await Promise.all(promises);
       totalActivated += results.reduce((sum, n) => sum + n, 0);
-      console.log(`[Seeder] Activated batch ${i + 1}-${Math.min(i + 20, authorIds.length)}: ${totalActivated} total`);
     }
 
     return totalActivated;
@@ -1062,20 +1124,6 @@ CHÚ Ý:
 
   private randomInt(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-
-  private slugify(text: string): string {
-    return text
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/đ/g, 'd')
-      .replace(/Đ/g, 'd')
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '')
-      .substring(0, 100);
   }
 
   private chunkArray<T>(arr: T[], size: number): T[][] {

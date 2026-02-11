@@ -128,26 +128,12 @@ export async function quickStart(options: {
     maxWorkers: 5
   });
 
-  // Log events
-  factory.onEvent(async (event) => {
-    if (event.type === 'chapter_written') {
-      console.log(`✅ Story ${event.storyId} - Chapter ${event.chapter} (Quality: ${event.quality.toFixed(1)})`);
-    } else if (event.type === 'story_completed') {
-      console.log(`🎉 Story ${event.storyId} completed! (${event.totalChapters} chapters)`);
-    }
-  });
-
   const batch = await factory.createBatch({
     quantity: storyCount,
     genres: genres as any[],
     targetChapters: chaptersPerStory,
     dailyChaptersPerStory: 5
   });
-
-  console.log(`\n🏭 Story Factory Started!`);
-  console.log(`📚 Stories: ${batch.totalStories}`);
-  console.log(`📝 Target: ${chaptersPerStory} chapters each`);
-  console.log(`⚙️  Workers: ${batch.workerCount}`);
 
   return { factory, batch };
 }

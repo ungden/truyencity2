@@ -10,6 +10,7 @@
 
 import { randomUUID } from 'crypto';
 import { getSupabase } from './supabase-helper';
+import { logger } from '@/lib/security/logger';
 
 // ============================================================================
 // TYPES
@@ -124,7 +125,10 @@ export class ItemTracker {
       .eq('project_id', this.projectId);
     
     if (itemsError) {
-      console.warn('[DB] Load tracked items failed:', itemsError.message);
+      logger.debug('ItemTracker tracked_items load failed (non-fatal)', {
+        projectId: this.projectId,
+        error: itemsError.message,
+      });
     }
     if (items) {
       for (const item of items) {
@@ -335,7 +339,13 @@ export class ItemTracker {
       })
       .eq('id', itemId);
     if (error) {
-      console.warn('[DB] recordMention failed:', error.message);
+      logger.debug('tracked_items update failed (non-fatal)', {
+        projectId: this.projectId,
+        itemName: name,
+        chapterNumber,
+        operation: 'recordMention',
+        error: error.message,
+      });
     }
   }
   
@@ -617,7 +627,12 @@ export class ItemTracker {
         status_change_chapter: item.statusChangeChapter,
       }, { onConflict: 'id' });
     if (error) {
-      console.warn('[DB] saveItem failed:', error.message);
+      logger.debug('tracked_items upsert failed (non-fatal)', {
+        projectId: this.projectId,
+        itemName: item.name,
+        operation: 'saveItem',
+        error: error.message,
+      });
     }
   }
 }

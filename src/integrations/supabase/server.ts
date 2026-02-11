@@ -1,5 +1,6 @@
 import { createServerClient as createSupabaseServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import { logger } from '@/lib/security/logger';
 
 // Lazy-load env vars to avoid build-time errors
 const getSupabaseConfig = () => {
@@ -39,7 +40,10 @@ export const createServerClient = async () => {
             });
           } catch (error) {
             // Safe to ignore in Server Components
-            console.warn('Failed to set cookie:', error);
+            logger.debug('Supabase server cookie set failed (ignored)', {
+              name,
+              error: error instanceof Error ? error.message : String(error),
+            });
           }
         },
         remove(name: string, options: CookieOptions) {
@@ -57,7 +61,10 @@ export const createServerClient = async () => {
             });
           } catch (error) {
             // Safe to ignore in Server Components
-            console.warn('Failed to remove cookie:', error);
+            logger.debug('Supabase server cookie remove failed (ignored)', {
+              name,
+              error: error instanceof Error ? error.message : String(error),
+            });
           }
         },
       },

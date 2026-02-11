@@ -28,7 +28,7 @@ interface NovelCardProps {
   imagePriority?: boolean;
 }
 
-export const NovelCard: React.FC<NovelCardProps> = ({
+const NovelCardComponent: React.FC<NovelCardProps> = ({
   id,
   slug,
   title,
@@ -275,3 +275,6 @@ export const NovelCard: React.FC<NovelCardProps> = ({
     </Link>
   );
 };
+
+export const NovelCard = React.memo(NovelCardComponent);
+NovelCard.displayName = 'NovelCard';

@@ -18,11 +18,7 @@ export function PWAInstallButton({ className }: { className?: string }) {
   const {
     isInstalled,
     canInstall,
-    isOnline,
-    pushSupported,
-    pushSubscription,
     installApp,
-    subscribeToPush,
   } = usePWA();
 
   if (isInstalled) {
@@ -122,7 +118,6 @@ export function PWAPanel() {
   const {
     isInstalled,
     canInstall,
-    isOnline,
     pushSupported,
     pushSubscription,
     installApp,
@@ -182,7 +177,7 @@ export function PWAPanel() {
       <p className="text-xs text-muted-foreground">
         {isInstalled
           ? "Ứng dụng có thể chạy trong nền và nhận thông báo."
-          : "Cài đặt ứng dụng để viết truyện trong nền."}
+          : "Cài đặt ứng dụng để đọc truyện nhanh hơn, ngay cả khi offline."}
       </p>
     </div>
   );

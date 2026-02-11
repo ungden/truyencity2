@@ -8,7 +8,6 @@ import {
   WorkerStatus,
   ProductionBatch,
   StoryBlueprint,
-  QualityReport,
   FactoryEvent,
   StoryFactoryConfig
 } from './types';
@@ -65,7 +64,7 @@ export class WorkerPool {
    * Get an available worker
    */
   getAvailableWorker(): WorkerStatus | undefined {
-    for (const [id, worker] of this.workers) {
+    for (const [, worker] of this.workers) {
       if (worker.status === 'idle') {
         return worker;
       }
@@ -259,7 +258,7 @@ export class ProductionPipeline {
   private eventHandlers: Array<(event: FactoryEvent) => Promise<void>> = [];
   private config: StoryFactoryConfig;
   private isRunning: boolean = false;
-  private processInterval: NodeJS.Timeout | null = null;
+  private processInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor(config: StoryFactoryConfig) {
     this.config = config;
@@ -335,7 +334,7 @@ export class ProductionPipeline {
 
     this.isRunning = true;
     this.processInterval = setInterval(() => this.processQueue(), 1000);
-    console.log('Production pipeline started');
+
   }
 
   /**
@@ -347,7 +346,7 @@ export class ProductionPipeline {
       clearInterval(this.processInterval);
       this.processInterval = null;
     }
-    console.log('Production pipeline stopped');
+
   }
 
   /**

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import {
   Search,
   Menu,
@@ -11,11 +12,18 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
-import { SearchModal } from '@/components/search-modal';
-import { NotificationCenter } from '@/components/notification-center';
-import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import ThemeToggle from '@/components/theme-toggle';
+
+const SearchModal = dynamic(
+  () => import('@/components/search-modal').then((mod) => mod.SearchModal),
+  { ssr: false }
+);
+
+const NotificationCenter = dynamic(
+  () => import('@/components/notification-center').then((mod) => mod.NotificationCenter),
+  { ssr: false }
+);
 
 interface HeaderProps {
   title?: string;
@@ -29,7 +37,7 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({
-  title = "Truyện City",
+  title = "TruyenCity",
   showBack = false,
   showSearch = true,
   showNotifications = true,
@@ -70,6 +78,7 @@ export const Header: React.FC<HeaderProps> = ({
                   size="sm"
                   onClick={handleBack}
                   className="rounded-full h-10 w-10 p-0"
+                  aria-label="Quay lại"
                 >
                   <ArrowLeft size={20} />
                 </Button>
@@ -89,6 +98,7 @@ export const Header: React.FC<HeaderProps> = ({
                     size="sm"
                     onClick={handleMenu}
                     className="rounded-full h-10 w-10 p-0"
+                    aria-label="Mở menu"
                   >
                     <Menu size={20} />
                   </Button>
@@ -176,6 +186,7 @@ export const Header: React.FC<HeaderProps> = ({
                 size="sm"
                 onClick={handleBack}
                 className="rounded-full h-10 w-10 p-0"
+                aria-label="Quay lại"
               >
                 <ArrowLeft size={20} />
               </Button>
@@ -195,6 +206,7 @@ export const Header: React.FC<HeaderProps> = ({
                 size="sm"
                 onClick={handleSearchClick}
                 className="rounded-full h-10 w-10 p-0"
+                aria-label="Tìm kiếm"
               >
                 <Search size={20} />
               </Button>
@@ -208,6 +220,7 @@ export const Header: React.FC<HeaderProps> = ({
                 size="sm"
                 onClick={handleMenu}
                 className="rounded-full h-10 w-10 p-0"
+                aria-label="Mở menu"
               >
                 <Menu size={20} />
               </Button>

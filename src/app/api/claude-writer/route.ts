@@ -2,6 +2,58 @@ import { createSupabaseFromAuthHeader } from '@/integrations/supabase/auth-helpe
 import { NextRequest, NextResponse } from 'next/server';
 import { getAIProviderService } from '@/services/ai-provider';
 import { AIProviderType } from '@/lib/types/ai-providers';
+import type { SupabaseClient } from '@supabase/supabase-js';
+
+type WriterAction = 'write_chapter' | 'write_batch' | 'get_status';
+
+interface WriterConfig {
+  provider?: AIProviderType;
+  model?: string;
+}
+
+interface WriterRequestBody {
+  action: WriterAction;
+  projectId: string;
+  customPrompt?: string;
+  chapterCount?: number;
+  config?: WriterConfig;
+  jobId?: string;
+}
+
+interface NovelInfo {
+  title?: string | null;
+  description?: string | null;
+  author?: string | null;
+}
+
+interface AIStoryProjectRow {
+  id: string;
+  user_id: string;
+  novel_id: string;
+  genre: string;
+  main_character: string;
+  current_chapter: number;
+  target_chapter_length?: number | null;
+  cultivation_system?: string | null;
+  magic_system?: string | null;
+  world_description?: string | null;
+  writing_style?: string | null;
+  temperature?: number | null;
+  ai_model?: string | null;
+  novel?: NovelInfo | null;
+}
+
+interface RecentChapterRow {
+  chapter_number: number;
+  title: string | null;
+  content: string | null;
+}
+
+interface StoryGraphNodeRow {
+  chapter_number: number;
+  summary: string | null;
+  key_events?: unknown;
+}
 
 // Claude Writer API (Now AI Agent Writer)
 // Viết truyện trực tiếp bằng AI Provider Service
@@ -21,7 +73,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized: Invalid token' }, { status: 401 });
     }
 
-    const body = await request.json();
+    const body = (await request.json()) as WriterRequestBody;
     const { action, projectId, customPrompt, chapterCount = 1, config } = body;
 
     switch (action) {
@@ -32,6 +84,9 @@ export async function POST(request: NextRequest) {
         return await writeBatch(supabase, user.id, projectId, chapterCount, customPrompt, config);
 
       case 'get_status':
+        if (!body.jobId) {
+          return NextResponse.json({ error: 'Missing jobId' }, { status: 400 });
+        }
         return await getWritingStatus(supabase, user.id, body.jobId);
 
       default:
@@ -43,7 +98,13 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function writeChapter(supabase: any, userId: string, projectId: string, customPrompt?: string, config?: any) {
+async function writeChapter(
+  supabase: SupabaseClient,
+  userId: string,
+  projectId: string,
+  customPrompt?: string,
+  config?: WriterConfig
+) {
   // Get project info
   const { data: project, error: projectError } = await supabase
     .from('ai_story_projects')
@@ -55,17 +116,19 @@ async function writeChapter(supabase: any, userId: string, projectId: string, cu
     .eq('user_id', userId)
     .single();
 
-  if (projectError || !project) {
+  const typedProject = project as unknown as AIStoryProjectRow | null;
+
+  if (projectError || !typedProject) {
     return NextResponse.json({ error: 'Project not found' }, { status: 404 });
   }
 
-  const nextChapter = project.current_chapter + 1;
+  const nextChapter = typedProject.current_chapter + 1;
 
   // Get recent chapters for context
   const { data: recentChapters } = await supabase
     .from('chapters')
     .select('chapter_number, title, content')
-    .eq('novel_id', project.novel_id)
+    .eq('novel_id', typedProject.novel_id)
     .order('chapter_number', { ascending: false })
     .limit(3);
 
@@ -78,12 +141,18 @@ async function writeChapter(supabase: any, userId: string, projectId: string, cu
     .limit(5);
 
   // Build the prompt
-  const prompt = buildWritingPrompt(project, nextChapter, recentChapters || [], storyGraph || [], customPrompt);
+  const prompt = buildWritingPrompt(
+    typedProject,
+    nextChapter,
+    (recentChapters as unknown as RecentChapterRow[]) || [],
+    (storyGraph as unknown as StoryGraphNodeRow[]) || [],
+    customPrompt
+  );
 
   // Use AI Provider Service
   const aiService = getAIProviderService();
-  const provider = (config?.provider as AIProviderType) || 'gemini';
-  const model = config?.model || project.ai_model || 'gemini-3-flash-preview';
+  const provider = config?.provider || 'gemini';
+  const model = config?.model || typedProject.ai_model || 'gemini-3-flash-preview';
 
   try {
     const result = await aiService.chat({
@@ -92,14 +161,14 @@ async function writeChapter(supabase: any, userId: string, projectId: string, cu
       messages: [
         {
           role: 'system',
-          content: getSystemPrompt(project.genre),
+          content: getSystemPrompt(typedProject.genre),
         },
         {
           role: 'user',
           content: prompt,
         },
       ],
-      temperature: project.temperature || 0.7,
+      temperature: typedProject.temperature || 0.7,
       maxTokens: 8000,
     });
 
@@ -116,7 +185,7 @@ async function writeChapter(supabase: any, userId: string, projectId: string, cu
     const { data: chapter, error: chapterError } = await supabase
       .from('chapters')
       .insert({
-        novel_id: project.novel_id,
+        novel_id: typedProject.novel_id,
         chapter_number: nextChapter,
         title: title,
         content: content,
@@ -153,7 +222,14 @@ async function writeChapter(supabase: any, userId: string, projectId: string, cu
   }
 }
 
-async function writeBatch(supabase: any, userId: string, projectId: string, count: number, customPrompt?: string, config?: any) {
+async function writeBatch(
+  supabase: SupabaseClient,
+  userId: string,
+  projectId: string,
+  count: number,
+  customPrompt?: string,
+  config?: WriterConfig
+) {
   const results = [];
 
   for (let i = 0; i < count; i++) {
@@ -179,7 +255,7 @@ async function writeBatch(supabase: any, userId: string, projectId: string, coun
   });
 }
 
-async function getWritingStatus(supabase: any, userId: string, jobId: string) {
+async function getWritingStatus(supabase: SupabaseClient, userId: string, jobId: string) {
   const { data: job } = await supabase
     .from('ai_writing_jobs')
     .select('*')
@@ -191,10 +267,10 @@ async function getWritingStatus(supabase: any, userId: string, jobId: string) {
 }
 
 function buildWritingPrompt(
-  project: any,
+  project: AIStoryProjectRow,
   chapterNumber: number,
-  recentChapters: any[],
-  storyGraph: any[],
+  recentChapters: RecentChapterRow[],
+  storyGraph: StoryGraphNodeRow[],
   customPrompt?: string
 ): string {
   let prompt = `Viết chương ${chapterNumber} cho tiểu thuyết "${project.novel?.title}".
@@ -277,7 +353,7 @@ function parseChapterContent(content: string, chapterNumber: number): { title: s
     cleanContent = content.replace(/^Chương\s*\d+[:\s]*.+?[\n\r]+/i, '').trim();
   }
 
-  // Clean up any remaining markdown
+  // Clean up remaining markdown
   cleanContent = cleanContent
     .replace(/\*\*/g, '')
     .replace(/##?\s*/g, '')
@@ -287,7 +363,13 @@ function parseChapterContent(content: string, chapterNumber: number): { title: s
   return { title, content: cleanContent };
 }
 
-async function updateStoryGraph(supabase: any, projectId: string, chapterNumber: number, title: string, content: string) {
+async function updateStoryGraph(
+  supabase: SupabaseClient,
+  projectId: string,
+  chapterNumber: number,
+  title: string,
+  content: string
+) {
   // Create a simple summary (first 200 chars)
   const summary = content.substring(0, 200) + '...';
 

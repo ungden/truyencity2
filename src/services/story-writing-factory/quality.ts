@@ -18,11 +18,10 @@ import {
   StyleBible,
   GenreType,
   DopaminePoint,
-  DopamineType,
 } from './types';
 import { GENRE_STYLES } from './templates';
-import { dialogueAnalyzer, getQuickDialogueScore } from './dialogue-analyzer';
-import { titleChecker, TitleCheckResult } from './title-checker';
+import { getQuickDialogueScore } from './dialogue-analyzer';
+import { titleChecker } from './title-checker';
 
 // ============================================================================
 // QUALITY THRESHOLDS
@@ -187,7 +186,6 @@ export class QualityGate {
     const wordCount = this.analyzer.countWords(content);
     const dopaminePoints = this.analyzer.detectDopaminePoints(content, chapterNumber);
     const repetition = this.analyzer.calculateRepetition(content);
-    const dialogueSegments = this.analyzer.countDialogueSegments(content);
 
     // Get targets
     const style = styleBible || GENRE_STYLES[genre];

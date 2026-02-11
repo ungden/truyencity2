@@ -2,13 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { AuthGuard } from '@/components/admin/auth-guard';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Dialog,
   DialogContent,
@@ -97,14 +96,14 @@ const STATUS_CONFIG: Record<string, { color: string; icon: any }> = {
 
 const GENRE_LABELS: Record<string, string> = {
   'system-litrpg': 'System/LitRPG',
-  'urban-modern': 'Urban Modern',
-  'romance': 'Romance',
-  'huyen-huyen': 'Huyen Huyen',
-  'action-adventure': 'Action/Adventure',
-  'historical': 'Historical',
-  'tien-hiep': 'Tien Hiep',
-  'sci-fi-apocalypse': 'Sci-Fi/Apocalypse',
-  'horror-mystery': 'Horror/Mystery',
+  'urban-modern': 'Đô Thị Hiện Đại',
+  'romance': 'Ngôn Tình',
+  'huyen-huyen': 'Huyền Huyễn',
+  'action-adventure': 'Hành Động/Phiêu Lưu',
+  'historical': 'Lịch Sử',
+  'tien-hiep': 'Tiên Hiệp',
+  'sci-fi-apocalypse': 'Khoa Huyễn/Mạt Thế',
+  'horror-mystery': 'Kinh Dị/Bí Ẩn',
 };
 
 export default function FactoryProductionPage() {

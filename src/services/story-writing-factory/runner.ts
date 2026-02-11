@@ -35,16 +35,17 @@ import {
   StoryArc,
 } from './types';
 import { getStyleByGenre, getPowerSystemByGenre } from './templates';
+import { logger } from '@/lib/security/logger';
 
 // Sprint 1/2/3 Quality Systems
 import { FullQCGating, FullGateResult } from './qc-gating';
 import { CharacterDepthTracker, CharacterRole, MotivationType, PersonalityTrait } from './character-depth';
 import { BattleVarietyTracker, BattleType, TacticalApproach, BattleOutcome, CombatElement } from './battle-variety';
 import { PowerTracker } from './power-tracker';
-import { AutoRewriter, RewriteResult } from './auto-rewriter';
+import { AutoRewriter } from './auto-rewriter';
 import { CanonResolver } from './canon-resolver';
 import { BeatLedger } from './beat-ledger';
-import { ConsistencyChecker, ConsistencyReport } from './consistency';
+import { ConsistencyChecker } from './consistency';
 import { PlotArcManager } from '../plot-arc-manager';
 
 // ============================================================================
@@ -98,7 +99,6 @@ export class StoryRunner {
   private writtenChapters: Map<number, ChapterContent> = new Map();
   private lastQualityScore: number = 5;
   private lastQCResult: FullGateResult | null = null;
-  private totalTokensUsed: number = 0;
   private chaptersToWriteLimit?: number; // Limit chapters per run
   private sessionChaptersWritten: number = 0; // Track chapters written in current run session
 
@@ -238,7 +238,10 @@ export class StoryRunner {
         this.consistencyChecker.initialize(),
       ]);
     } catch (e) {
-      // Non-fatal: quality systems can work without prior data
+      logger.debug('Quality system initialization failed (non-fatal)', {
+        projectId: this.state.projectId,
+        error: e instanceof Error ? e.message : String(e),
+      });
     }
 
     try {
@@ -536,9 +539,9 @@ export class StoryRunner {
       if (this.memoryManager) {
         // Use hierarchical memory for optimized context
         if (contextLevel === 'full') {
-          previousSummary = this.memoryManager.buildContext(chapterNumber, 2000);
+          previousSummary = await this.memoryManager.buildContext(chapterNumber, 2000);
         } else if (contextLevel === 'medium') {
-          previousSummary = this.memoryManager.buildContext(chapterNumber, 1000);
+          previousSummary = await this.memoryManager.buildContext(chapterNumber, 1000);
         } else {
           previousSummary = this.memoryManager.buildMinimalContext(chapterNumber);
         }
@@ -592,7 +595,11 @@ export class StoryRunner {
               }
             }
           } catch (plotErr) {
-            // PlotArcManager failure is non-fatal
+            logger.debug('PlotArcManager enrichment failed (non-fatal)', {
+              projectId: this.state?.projectId,
+              chapterNumber,
+              error: plotErr instanceof Error ? plotErr.message : String(plotErr),
+            });
           }
         }
       } else {
@@ -772,7 +779,11 @@ export class StoryRunner {
               this.callbacks.onError?.(`Ch.${chapterNumber} QC low (${qcResult.scores.overall}): ${qcResult.failures.join(', ')}`);
             }
           } catch (e) {
-            // QC failure is non-fatal
+            logger.debug('QC gating failed (non-fatal)', {
+              projectId: this.state?.projectId,
+              chapterNumber,
+              error: e instanceof Error ? e.message : String(e),
+            });
           }
         }
 
@@ -1475,7 +1486,6 @@ export class StoryRunner {
   }
 
   private guessCharacterRole(name: string, content: string): CharacterRole {
-    const lower = content.toLowerCase();
     const nameLower = name.toLowerCase();
     
     // Find sentences containing the character name

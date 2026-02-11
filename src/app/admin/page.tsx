@@ -5,10 +5,7 @@ import {
   Users,
   BookOpen,
   MessageSquare,
-  TrendingUp,
   Calendar,
-  Clock,
-  Star,
   Activity
 } from 'lucide-react';
 import { getDashboardStats } from '@/lib/actions';

@@ -557,7 +557,7 @@ Bắt đầu viết (nhớ: TỐI THIỂU ${totalTargetWords} từ):`;
 
       // Check for truncation (output hit maxTokens limit)
       if (response.finishReason === 'length' || response.finishReason === 'MAX_TOKENS') {
-        console.log(`[ChapterWriter] Chapter ${outline.chapterNumber}: output truncated (${wordCount} words). Requesting continuation...`);
+
         const continuation = await this.requestContinuation(content);
         if (continuation) {
           content = content + '\n\n' + continuation;
@@ -567,7 +567,7 @@ Bắt đầu viết (nhớ: TỐI THIỂU ${totalTargetWords} từ):`;
 
       // Length enforcement: if still too short, request continuation
       if (wordCount < totalTargetWords * 0.7) {
-        console.log(`[ChapterWriter] Chapter ${outline.chapterNumber}: too short (${wordCount}/${totalTargetWords}). Requesting continuation...`);
+
         const remaining = totalTargetWords - wordCount;
         const continuation = await this.requestContinuation(content, remaining);
         if (continuation) {

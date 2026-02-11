@@ -220,7 +220,7 @@ export class BlueprintFactoryService {
     characters: CharactersResult,
     plot: PlotStructureResult
   ): Promise<ServiceResult<SynopsisResult>> {
-    const prompt = `Dựa trên thông tin sau, viết synopsis cho truyện:
+    const prompt = `Dựa trên thông tin sau, viết synopsis HẤP DẪN cho truyện:
 
 TIÊU ĐỀ: ${idea.title}
 THỂ LOẠI: ${idea.genre}
@@ -229,10 +229,21 @@ THẾ GIỚI: ${world.world_name} - ${world.world_description}
 NHÂN VẬT CHÍNH: ${characters.protagonist?.name} - ${characters.protagonist?.personality}
 SỐ CHƯƠNG: ${plot.arc_outlines?.length || 0} arcs, kết thúc ${plot.ending_type}
 
+HOOK TECHNIQUES (học từ top CN webnovels):
+• Mystery Hook: Đặt câu hỏi bí ẩn → "Ai đang thao túng...?" "Bí mật gì ẩn sau...?"
+• Epic Scale: Quy mô vũ trụ → "Một hạt bụi có thể lấp biển, một ngọn cỏ chém đứt nhật nguyệt..."
+• Shocking Reversal: Sự kiện sốc → "Từ thiên tài rơi xuống phế vật chỉ trong một đêm..."
+• Underdog Rise: Nhân vật bình thường vươn lên → "Một thiếu niên tư chất tầm thường..."
+• Time Drama: Trùng sinh/800 năm sau → "Tám trăm năm trước bị giết, tám trăm năm sau tỉnh lại..."
+
+STRUCTURE:
+- short_synopsis: CÂU 1 = Hook (bí ẩn/epic/sốc). CÂU 2 = Nhân vật + golden finger. CÂU 3 = Mục tiêu.
+- full_synopsis: CÂU 1-2 = Hook + Bối cảnh. CÂU 3-4 = NV chính + golden finger. CÂU 5-7 = Xung đột + hành trình. CÂU 8-10 = Teaser "Liệu anh ta có thể...?" (NO SPOIL kết thúc)
+
 OUTPUT JSON:
 {
-  "short_synopsis": "2-3 câu giới thiệu truyện hấp dẫn để hiển thị trên trang chủ",
-  "full_synopsis": "5-10 câu mô tả chi tiết plot chính, không spoil kết thúc"
+  "short_synopsis": "2-3 câu, BẮT ĐẦU bằng hook technique, giới thiệu hấp dẫn cho homepage",
+  "full_synopsis": "5-10 câu, mô tả đầy đủ nhưng KHÔNG spoil kết thúc, có hook + conflict + teaser"
 }`;
 
     return this.gemini.generateJSON<SynopsisResult>(prompt, {

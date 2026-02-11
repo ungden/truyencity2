@@ -10,6 +10,7 @@
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { logger } from '@/lib/security/logger';
 
 // Lazy initialization to avoid build-time errors
 let _supabase: SupabaseClient | null = null;
@@ -504,7 +505,14 @@ export class BeatLedger {
           cooldown_until: cooldownUntil,
         });
     } catch (e) {
-      console.warn('Failed to persist beat usage:', e);
+      logger.warn('Beat usage persistence failed', {
+        projectId: this.projectId,
+        chapterNumber,
+        arcNumber: this.currentArc,
+        beatCategory: category,
+        beatType,
+        error: e instanceof Error ? e.message : String(e),
+      });
     }
 
     // Check for warnings

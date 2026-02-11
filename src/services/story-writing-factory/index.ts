@@ -48,6 +48,22 @@ export type { PowerState, ProgressionEvent, ProgressionValidation } from './powe
 // Phase 2: Canon Resolver, QC Gating, Beat Ledger, Style Bible, Cost Cache
 export { CanonResolver, createCanonResolver, CanonLevel } from './canon-resolver';
 export type { CanonFact, ConflictReport, ContinuityIssue } from './canon-resolver';
+
+// Phase 1 (Scalability): Plot Thread Manager
+export { PlotThreadManager } from './plot-thread-manager';
+export type { PlotThread, ForeshadowingHint, ThreadSelectionResult, ThreadAbandonmentReport } from './plot-thread-manager';
+
+// Phase 2 (Scalability): Volume Summary Manager
+export { VolumeSummaryManager } from './volume-summary-manager';
+export type { VolumeSummary, VolumeSelectionResult, CharacterVolumeArc } from './volume-summary-manager';
+
+// Phase 3 (Scalability): Rule Indexer
+export { RuleIndexer } from './rule-indexer';
+export type { WorldRule, RuleSearchQuery, RuleSearchResult, RuleCategory } from './rule-indexer';
+
+// Phase 4 (Scalability): Long-term Validator
+export { LongTermValidator } from './long-term-validator';
+export type { MilestoneValidation, MilestoneReport, ValidationType, ValidationStatus } from './long-term-validator';
 export { 
   QCGating, createQCGating, DEFAULT_THRESHOLDS,
   EnhancedQCGating, createEnhancedQCGating, ENHANCED_DEFAULT_THRESHOLDS,
@@ -121,7 +137,7 @@ import {
   RunnerCallbacks,
 } from './types';
 import { StoryRunner } from './runner';
-import { getStyleByGenre, getPowerSystemByGenre, GOLDEN_CHAPTER_REQUIREMENTS } from './templates';
+import { getStyleByGenre, getPowerSystemByGenre } from './templates';
 
 // ============================================================================
 // PROJECT STATE

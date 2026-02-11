@@ -797,3 +797,194 @@ export function getDopaminePatternsByGenre(genre: GenreType): DopaminePattern[] 
       return common;
   }
 }
+
+// ============================================================================
+// SCENE EXPANSION RULES - "CÂU CHƯƠNG" OPTIMIZATION
+// Nguyên tắc: 1 scene = 1 chapter, expand don't summarize
+// ============================================================================
+
+export const SCENE_EXPANSION_RULES = {
+  // Anti-speed rules - prevent rushing through plot
+  antiSpeed: {
+    description: 'Prevent summarizing instead of experiencing',
+    forbidden: [
+      'Tóm tắt cảnh bằng câu tường thuật ngắn',
+      'Liệt kê sự kiện thay vì mô tả chi tiết',
+      'Dùng từ "sau đó", "rồi", "tiếp theo" quá nhiều',
+      'Chuyển cảnh quá nhanh (trong 1 đoạn)',
+    ],
+    required: [
+      'Mỗi scene kéo dài ít nhất 800-1200 từ',
+      'Mô tả 5 giác quan cho mỗi không gian',
+      'Nội tâm nhiều lớp: surface → deeper → deepest',
+      'Xen kẽ flashback khi MC đau đớn/suy tư',
+    ],
+  },
+
+  // Pacing by scene type
+  scenePacing: {
+    action: {
+      sentenceLength: { min: 5, max: 15 },
+      paragraphLength: { min: 2, max: 5 },
+      description: 'Ngắn, nhanh, dứt khoát',
+    },
+    emotional: {
+      sentenceLength: { min: 15, max: 35 },
+      paragraphLength: { min: 5, max: 10 },
+      description: 'Dài, chậm, sâu sắc',
+    },
+    dialogue: {
+      sentenceLength: { min: 8, max: 25 },
+      paragraphLength: { min: 3, max: 8 },
+      description: 'Vừa phải, xen kẽ hành động',
+    },
+  },
+
+  // Word count targets per scene type
+  wordCountTargets: {
+    'opening_scene': { min: 500, max: 800 },
+    'beating_scene': { min: 800, max: 1200 },
+    'despair_scene': { min: 800, max: 1200 },
+    'dialogue_scene': { min: 600, max: 1000 },
+    'transformation_scene': { min: 500, max: 800 },
+    'cliffhanger_scene': { min: 200, max: 400 },
+  },
+
+  // Techniques for expansion
+  expansionTechniques: [
+    {
+      name: 'FiveSenses',
+      description: 'Mô tả bằng 5 giác quan',
+      example: 'Mùi ẩm mốc nồng nặc. Tiếng chuột chạy. Ánh đèn vàng rung rinh. Lạnh. Rất lạnh.',
+    },
+    {
+      name: 'InnerMonologueLayers',
+      description: 'Nhiều lớp nội tâm',
+      example: 'Surface: "Đau quá" → Deeper: "Ta sẽ chết?" → Deepest: "Không ai nhớ đến ta..."',
+    },
+    {
+      name: 'BystanderReactions',
+      description: 'Phản ứng đám đông',
+      example: 'Kẻ cưở nhạo, ngườ xót xa, kẻ quay đi, trẻ con sợ hãi',
+    },
+    {
+      name: 'FlashbackIntercutting',
+      description: 'Xen kẽ quá khứ',
+      example: 'Khi bị đánh, nhớ về nụ cưới của mẹ, lờ hứa của cha',
+    },
+    {
+      name: 'MicroActionDetail',
+      description: 'Phân rã hành động',
+      example: 'Nắm tay siết chặt → Cơ bắp căng → Vai xoay → Lực từ hông → Bắn ra',
+    },
+    {
+      name: 'EnvironmentalMirror',
+      description: 'Môi trường phản chiếu cảm xúc',
+      example: 'Tuyệt vọng → Mưa bão. Tức giận → Sấm chớp. Buồn → Hoàng hôn.',
+    },
+  ],
+
+  // Chapter 1 specific
+  chapter1Rules: {
+    structure: [
+      { part: 'Opening', percent: 20, minWords: 600 },
+      { part: 'Beating/Humiliation', percent: 30, minWords: 900 },
+      { part: 'Despair', percent: 30, minWords: 900 },
+      { part: 'Transformation', percent: 15, minWords: 450 },
+      { part: 'Cliffhanger', percent: 5, minWords: 150 },
+    ],
+    totalMinWords: 3000,
+    totalMaxWords: 5000,
+    forbidden: [
+      'MC trả thù ngay trong chương 1',
+      'Antagonist nói cliché ("Ngươi là phế vật")',
+      'Hệ thống game thân thiện ("Chúc mừng bạn...")',
+      'Loading percentage bars',
+      'Resolution/Ending hạnh phúc',
+    ],
+  },
+
+  // Villain dialogue anti-cliché
+  villainDialogue: {
+    forbidden: [
+      'Ngươi chỉ là con kiến',
+      'Tìm chết',
+      'Ngươi dám',
+      'Đồ phế vật',
+      'Cút đi',
+      'Biến',
+      'Muốn chết sao',
+      'Không biết trời cao đất dày',
+      'Ếch ngời đáy giếng',
+      'Cũng dám mơ',
+    ],
+    recommended: [
+      'Xử lý sạch sẽ',
+      'Đừng để chết trong tông môn, phiền phức',
+      'Ngươi nên cảm ơn ta. Ít nhất, ngươi còn được đứng đây',
+      'Ở thành phố này, công lý chỉ là một công cụ. Vấn đề là... ai cầm nó',
+      'Cường giả vi tôn. Đây là quy luật',
+    ],
+  },
+};
+
+// Helper function to check if chapter follows câu chương rules
+export function checkSceneExpansion(
+  content: string,
+  chapterNumber: number
+): { valid: boolean; issues: string[]; wordCount: number } {
+  const issues: string[] = [];
+  const wordCount = content.split(/\s+/).length;
+  
+  // Check word count for chapter 1
+  if (chapterNumber === 1) {
+    if (wordCount < SCENE_EXPANSION_RULES.chapter1Rules.totalMinWords) {
+      issues.push(`Chương 1 quá ngắn: ${wordCount} từ (cần ${SCENE_EXPANSION_RULES.chapter1Rules.totalMinWords}+)`);
+    }
+  }
+  
+  // Check for forbidden patterns
+  const forbiddenPatterns = [
+    /sau đó[^\.,;]{0,30}sau đó/i,
+    /tiếp theo[^\.,;]{0,30}tiếp theo/i,
+    /rồi[^\.,;]{0,20}rồi[^\.,;]{0,20}rồi/i,
+  ];
+  
+  forbiddenPatterns.forEach(pattern => {
+    if (pattern.test(content)) {
+      issues.push('Phát hiện tóm tắt nhanh - cần mô tả chi tiết hơn');
+    }
+  });
+  
+  // Check for cliché villain dialogue
+  SCENE_EXPANSION_RULES.villainDialogue.forbidden.forEach(phrase => {
+    if (content.toLowerCase().includes(phrase.toLowerCase())) {
+      issues.push(`Phát hiện cliché villain: "${phrase}" - cần viết lại`);
+    }
+  });
+  
+  // Check for game-like system
+  if (/\d+%.*\d+%.*100%/.test(content) || /Chúc mừng.*nhận được/i.test(content)) {
+    issues.push('Phát hiện hệ thống game - cần viết lại theo phong cách kinh dị/huyền bí');
+  }
+  
+  // Check for immediate revenge
+  if (chapterNumber === 1) {
+    const revengePatterns = [
+      /trả thù.*ngay/i,
+      /đánh lại.*ngay/i,
+      /phản kháng.*thành công/i,
+    ];
+    revengePatterns.forEach(pattern => {
+      if (pattern.test(content)) {
+        issues.push('Chương 1 có cảnh trả thù ngay - cần kéo dài xây dựng');
+      }
+    });
+  }
+  
+  return {
+    valid: issues.length === 0,
+    issues,
+    wordCount,
+  };
+}

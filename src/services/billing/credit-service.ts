@@ -200,9 +200,9 @@ class CreditService {
     wordCount?: number
   ): Promise<ConsumeResult> {
     try {
+      // p_user_id removed — the DB function now uses auth.uid() internally
       const { data, error } = await supabase
         .rpc('consume_chapter_credit', {
-          p_user_id: userId,
           p_chapter_id: chapterId,
           p_words_count: wordCount || 0,
         });

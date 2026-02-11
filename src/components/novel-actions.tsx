@@ -73,7 +73,7 @@ export function NovelActions({ novelId }: NovelActionsProps) {
   };
 
   const handleShare = async () => {
-    const url = `${window.location.origin}/novel/${novelId}`;
+    const url = window.location.href;
     
     if (navigator.share) {
       try {
@@ -95,6 +95,8 @@ export function NovelActions({ novelId }: NovelActionsProps) {
     }
   };
 
+  // Note: We use /novel/ as a fallback; the /truyen/[slug] route is preferred
+  // but requires a slug that we don't have at this component level
   const readHref = `/novel/${novelId}/read/${continueChapter || 1}`;
 
   if (loading) {
@@ -104,10 +106,10 @@ export function NovelActions({ novelId }: NovelActionsProps) {
           <Loader2 size={18} className="mr-2 animate-spin" />
           Đang tải...
         </Button>
-        <Button variant="outline" size="icon" className="h-12 w-12 rounded-xl" disabled>
+        <Button variant="outline" size="icon" className="h-12 w-12 rounded-xl" disabled aria-label="Thêm vào yêu thích">
           <Heart size={18} />
         </Button>
-        <Button variant="outline" size="icon" className="h-12 w-12 rounded-xl" disabled>
+        <Button variant="outline" size="icon" className="h-12 w-12 rounded-xl" disabled aria-label="Chia sẻ">
           <Share2 size={18} />
         </Button>
       </div>
@@ -131,6 +133,7 @@ export function NovelActions({ novelId }: NovelActionsProps) {
         )}
         onClick={handleBookmark}
         disabled={isPending}
+        aria-label={isBookmarkedState ? "Bỏ yêu thích" : "Thêm vào yêu thích"}
       >
         <Heart 
           size={18} 
@@ -145,6 +148,7 @@ export function NovelActions({ novelId }: NovelActionsProps) {
         size="icon" 
         className="h-12 w-12 rounded-xl"
         onClick={handleShare}
+        aria-label="Chia sẻ"
       >
         <Share2 size={18} />
       </Button>

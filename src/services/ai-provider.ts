@@ -40,7 +40,6 @@ export class AIProviderService {
 
     if (rl.tokens < 1) {
       const waitMs = Math.ceil((1 - rl.tokens) / rl.refillRate * 1000);
-      console.log(`[AIProvider] Gemini rate limit: waiting ${waitMs}ms`);
       await new Promise(resolve => setTimeout(resolve, waitMs));
       rl.tokens = 1;
       rl.lastRefill = Date.now();
@@ -328,7 +327,6 @@ export class AIProviderService {
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
       if (attempt > 0) {
         const delay = RETRY_DELAYS[attempt - 1] || 10000;
-        console.warn(`[Gemini] Retry ${attempt}/${MAX_RETRIES} after ${delay}ms...`);
         await new Promise(resolve => setTimeout(resolve, delay));
       }
 
@@ -373,7 +371,6 @@ export class AIProviderService {
         }
         const errorText = await response.text();
         lastError = new Error(`Gemini API error: ${response.status} - ${errorText}`);
-        console.warn(`[Gemini] ${response.status} error on attempt ${attempt + 1}, will retry...`);
         continue;
       }
 
@@ -388,7 +385,7 @@ export class AIProviderService {
 
   // Streaming support for real-time output
   async *chatStream(options: AIRequestOptions): AsyncGenerator<{ content: string; done: boolean }> {
-    const { provider, model, messages, temperature = 0.7, maxTokens = 4096, apiKey } = options;
+    const { provider, apiKey } = options;
 
     const effectiveApiKey = apiKey || this.apiKeys[provider];
 

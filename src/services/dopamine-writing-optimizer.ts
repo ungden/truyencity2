@@ -22,7 +22,6 @@ import {
   DEFAULT_DOPAMINE_CONFIG,
   AGENT_SYSTEM_PROMPTS,
   WorldBible,
-  PowerSystem,
   CharacterState,
   CharacterInventory,
   NPCRelationship,
@@ -32,8 +31,6 @@ import {
   ArchitectOutput,
   WriterOutput,
   CriticOutput,
-  CriticIssue,
-  AIProviderType,
   AIMessage,
 } from '@/lib/types/ai-providers';
 import { AIProviderService } from './ai-provider';
@@ -131,7 +128,6 @@ export class AgentOrchestrator {
     while (retryCount < maxRetries) {
       try {
         // Step 1: Architect creates outline
-        console.log(`[AgentOrchestrator] Step 1: Architect planning chapter ${chapterNumber}...`);
         const architectResult = await this.runArchitect(
           chapterNumber,
           previousChapterSummary,
@@ -143,7 +139,6 @@ export class AgentOrchestrator {
         }
 
         // Step 2: Writer creates content
-        console.log(`[AgentOrchestrator] Step 2: Writer creating content...`);
         const writerResult = await this.runWriter(architectResult.output);
 
         if (!writerResult.success || !writerResult.output) {
@@ -151,7 +146,6 @@ export class AgentOrchestrator {
         }
 
         // Step 3: Critic evaluates
-        console.log(`[AgentOrchestrator] Step 3: Critic evaluating...`);
         const criticResult = await this.runCritic(
           architectResult.output,
           writerResult.output
@@ -163,7 +157,6 @@ export class AgentOrchestrator {
 
         // Check if rewrite is needed
         if (criticResult.output.requiresRewrite && retryCount < maxRetries - 1) {
-          console.log(`[AgentOrchestrator] Critic requested rewrite. Retry ${retryCount + 1}...`);
           retryCount++;
           additionalContext = `REWRITE INSTRUCTIONS: ${criticResult.output.rewriteInstructions}`;
           continue;

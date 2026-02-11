@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { 
   ChevronLeft, 
   ChevronRight, 
-  Settings, 
   List, 
   Bookmark
 } from 'lucide-react';
@@ -41,14 +40,21 @@ export const ReadingControls: React.FC<ReadingControlsProps> = ({
   isBookmarked,
   chapters
 }) => {
-  const { settings } = useReading();
+  useReading();
   const [showControls, setShowControls] = useState(true);
 
   const progress = (currentChapter / totalChapters) * 100;
 
   return (
     <>
-      <div className="fixed top-0 left-0 right-0 h-1 bg-muted z-50">
+      <div
+        className="fixed top-0 left-0 right-0 h-1 bg-muted z-50"
+        role="progressbar"
+        aria-label="Tiến độ đọc"
+        aria-valuenow={Math.round(progress)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
         <div 
           className="h-full bg-primary transition-all duration-300"
           style={{ width: `${progress}%` }}
@@ -65,6 +71,7 @@ export const ReadingControls: React.FC<ReadingControlsProps> = ({
             size="sm"
             onClick={onPrevChapter}
             disabled={currentChapter <= 1}
+            aria-label="Chương trước"
           >
             <ChevronLeft size={20} />
           </Button>
@@ -72,7 +79,7 @@ export const ReadingControls: React.FC<ReadingControlsProps> = ({
           <div className="flex items-center gap-2">
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" aria-label="Danh sách chương">
                   <List size={20} />
                 </Button>
               </SheetTrigger>
@@ -116,6 +123,7 @@ export const ReadingControls: React.FC<ReadingControlsProps> = ({
               variant="ghost" 
               size="sm"
               onClick={onBookmark}
+              aria-label={isBookmarked ? "Bỏ đánh dấu" : "Đánh dấu trang"}
             >
               <Bookmark 
                 size={20} 
@@ -129,6 +137,7 @@ export const ReadingControls: React.FC<ReadingControlsProps> = ({
             size="sm"
             onClick={onNextChapter}
             disabled={currentChapter >= totalChapters}
+            aria-label="Chương sau"
           >
             <ChevronRight size={20} />
           </Button>

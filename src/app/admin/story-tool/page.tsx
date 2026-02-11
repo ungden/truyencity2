@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -30,7 +30,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -41,25 +40,18 @@ import {
   Loader2,
   BookOpen,
   Settings,
-  Plus,
-  Trash2,
   Sparkles,
   Bot,
   User,
   AlertCircle,
   CheckCircle2,
-  Clock,
   Cpu,
   Key,
-  RefreshCw,
   Play,
-  Pause,
   Square,
   Zap,
   FileText,
   TrendingUp,
-  ChevronRight,
-  Circle,
   BookMarked,
   Rocket,
   Wand2,
@@ -67,8 +59,7 @@ import {
   PenTool,
   ArrowRight,
   Library,
-  BrainCircuit,
-  MessageSquare
+  BrainCircuit
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -228,7 +219,6 @@ export default function StoryWritingToolPage() {
   });
 
   // Autopilot state
-  const [autopilotEnabled, setAutopilotEnabled] = useState(false);
   const [autopilotTarget, setAutopilotTarget] = useState(10);
   const [autopilotRunning, setAutopilotRunning] = useState(false);
   const [writtenChapters, setWrittenChapters] = useState<WrittenChapter[]>([]);
@@ -248,10 +238,22 @@ export default function StoryWritingToolPage() {
 
   // Load initial data
   useEffect(() => {
-    fetchProjects();
-    fetchProviders();
-    fetchStoryOutlines();
-    loadSavedApiKeys();
+    let cancelled = false;
+
+    const loadInitialData = async () => {
+      await Promise.all([
+        fetchProjects(),
+        fetchProviders(),
+        fetchStoryOutlines(),
+        loadSavedApiKeys()
+      ]);
+    };
+
+    loadInitialData();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Fetch projects
@@ -453,23 +455,55 @@ export default function StoryWritingToolPage() {
     }
   };
 
-  // Load saved API keys
-  const loadSavedApiKeys = () => {
+  // Load saved API keys from server-side settings
+  const loadSavedApiKeys = async () => {
     try {
-      const saved = localStorage.getItem('story-tool-api-keys');
-      if (saved) {
-        setApiKeys(JSON.parse(saved));
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+      
+      const { data } = await supabase
+        .from('ai_provider_settings')
+        .select('provider, api_key')
+        .eq('user_id', session.user.id);
+      
+      if (data) {
+        const keys: Record<string, string> = {};
+        data.forEach((row: { provider: string; api_key: string }) => {
+          keys[row.provider] = row.api_key;
+        });
+        setApiKeys(keys);
       }
     } catch {
-      // Ignore
+      // Ignore - use env defaults
     }
   };
 
-  // Save API keys
-  const saveApiKeys = (keys: Record<string, string>) => {
+  // Save API keys to server-side settings
+  const saveApiKeys = async (keys: Record<string, string>) => {
     setApiKeys(keys);
-    localStorage.setItem('story-tool-api-keys', JSON.stringify(keys));
-    toast.success('API keys saved');
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error('Please login to save API keys');
+        return;
+      }
+      
+      for (const [provider, apiKey] of Object.entries(keys)) {
+        if (apiKey) {
+          await supabase
+            .from('ai_provider_settings')
+            .upsert({
+              user_id: session.user.id,
+              provider,
+              api_key: apiKey,
+              updated_at: new Date().toISOString(),
+            }, { onConflict: 'user_id,provider' });
+        }
+      }
+      toast.success('API keys saved securely');
+    } catch {
+      toast.error('Failed to save API keys');
+    }
   };
 
   // Create new session

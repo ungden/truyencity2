@@ -10,6 +10,7 @@
 
 import { randomUUID } from 'crypto';
 import { getSupabase } from './supabase-helper';
+import { logger } from '@/lib/security/logger';
 
 // ============================================================================
 // BATTLE TEMPLATES & PATTERNS
@@ -211,7 +212,10 @@ export class BattleVarietyTracker {
       .order('chapter_number', { ascending: true });
     
     if (battlesError) {
-      console.warn('[DB] Load battle records failed:', battlesError.message);
+      logger.debug('BattleVarietyTracker battle_records load failed (non-fatal)', {
+        projectId: this.projectId,
+        error: battlesError.message,
+      });
     }
     if (battles) {
       this.battles = battles.map(b => ({
@@ -238,7 +242,10 @@ export class BattleVarietyTracker {
       .eq('project_id', this.projectId);
     
     if (scalingError) {
-      console.warn('[DB] Load enemy scaling failed:', scalingError.message);
+      logger.debug('BattleVarietyTracker enemy_scaling load failed (non-fatal)', {
+        projectId: this.projectId,
+        error: scalingError.message,
+      });
     }
     if (scaling) {
       this.enemyScaling = scaling;
@@ -270,7 +277,6 @@ export class BattleVarietyTracker {
       issues.push(`"${battleType}" battle đã dùng ${sameTypeRecent} lần trong 30 chương gần đây`);
       
       // Suggest alternatives
-      const template = BATTLE_TEMPLATES[battleType];
       const unusedTypes = Object.keys(BATTLE_TEMPLATES).filter(t => 
         !recentBattles.some(b => b.battleType === t)
       ) as BattleType[];
@@ -485,7 +491,12 @@ export class BattleVarietyTracker {
       issues: record.issues,
     });
     if (insertError) {
-      console.warn('[DB] Insert battle record failed:', insertError.message);
+      logger.debug('battle_records insert failed (non-fatal)', {
+        projectId: this.projectId,
+        chapterNumber: battle.chapterNumber,
+        operation: 'recordBattle',
+        error: insertError.message,
+      });
     }
   }
   

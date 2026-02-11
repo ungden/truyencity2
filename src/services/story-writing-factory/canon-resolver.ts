@@ -10,6 +10,7 @@
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { logger } from '@/lib/security/logger';
 
 // Lazy initialization to avoid build-time errors
 let _supabase: SupabaseClient | null = null;
@@ -398,7 +399,11 @@ export class CanonResolver {
           importance: Math.round(fact.canonLevel / 10),
         });
     } catch (e) {
-      console.warn('Failed to persist canon fact:', e);
+      logger.warn('World state persistence failed (non-fatal)', {
+        projectId: this.projectId,
+        chapterNumber: fact.sourceChapter || 0,
+        error: e instanceof Error ? e.message : String(e),
+      });
     }
   }
 
@@ -424,7 +429,12 @@ export class CanonResolver {
           status: 'open',
         });
     } catch (e) {
-      console.warn('Failed to log continuity issue:', e);
+      logger.warn('Consistency issue persistence failed (non-fatal)', {
+        projectId: this.projectId,
+        chapterNumber: issue.chapterNumber,
+        issueType: issue.issueType,
+        error: e instanceof Error ? e.message : String(e),
+      });
     }
   }
 

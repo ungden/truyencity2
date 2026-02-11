@@ -4,6 +4,7 @@
  */
 
 import { GeminiGenerateOptions, ServiceResult } from './types';
+import { logger } from '@/lib/security/logger';
 
 const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta';
 
@@ -63,7 +64,7 @@ export class GeminiClient {
     };
 
     if (!this.apiKey) {
-      console.warn('[GeminiClient] No API key provided. Set GEMINI_API_KEY env var.');
+      logger.warn('GeminiClient initialized without API key');
     }
   }
 
@@ -83,7 +84,6 @@ export class GeminiClient {
     // If no tokens available, wait
     if (this.rateLimit.tokens < 1) {
       const waitMs = Math.ceil((1 - this.rateLimit.tokens) / this.rateLimit.refillRate * 1000);
-      console.log(`[GeminiClient] Rate limit: waiting ${waitMs}ms`);
       await new Promise(resolve => setTimeout(resolve, waitMs));
       this.rateLimit.tokens = 1;
       this.rateLimit.lastRefill = Date.now();
@@ -161,7 +161,6 @@ export class GeminiClient {
 
         // Handle rate limit (429) with exponential backoff
         if (response.status === 429) {
-          console.warn('[GeminiClient] Rate limited (429). Waiting 5s before returning error.');
           await new Promise(resolve => setTimeout(resolve, 5000));
           // Reduce available tokens to prevent cascading requests
           this.rateLimit.tokens = Math.max(0, this.rateLimit.tokens - 5);
@@ -269,7 +268,6 @@ export class GeminiClient {
 
         // Handle rate limit (429) with backoff
         if (response.status === 429) {
-          console.warn('[GeminiClient] Rate limited in chat (429). Waiting 5s.');
           await new Promise(resolve => setTimeout(resolve, 5000));
           this.rateLimit.tokens = Math.max(0, this.rateLimit.tokens - 5);
         }
@@ -410,7 +408,6 @@ IMPORTANT: Respond ONLY with valid JSON. No markdown, no code blocks, no explana
 
       // Don't retry on last attempt
       if (attempt < maxRetries) {
-        console.warn(`[GeminiClient] Attempt ${attempt} failed, retrying in ${retryDelay}ms...`);
         await new Promise((resolve) => setTimeout(resolve, retryDelay * attempt));
       }
     }

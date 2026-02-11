@@ -9,19 +9,10 @@ import { ChapterWriterService, getChapterWriterService } from './chapter-writer'
 import {
   ChapterQualityCheckInput,
   ChapterQualityResult,
-  StoryBlueprint,
   AIAuthorProfile,
   ServiceResult,
   FactoryGenre,
 } from './types';
-
-// Quality thresholds
-const QUALITY_THRESHOLDS = {
-  EXCELLENT: 9,
-  GOOD: 7,
-  ACCEPTABLE: 6,
-  NEEDS_REWRITE: 5,
-};
 
 // Genre-specific quality weights
 const GENRE_QUALITY_WEIGHTS: Record<FactoryGenre, QualityWeights> = {

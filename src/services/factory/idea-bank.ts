@@ -19,6 +19,7 @@ import {
 // Tropes by genre for variety
 const GENRE_TROPES: Record<FactoryGenre, string[]> = {
   'system-litrpg': [
+    // Original 12
     'sign-in system',
     'daily rewards',
     'tower climbing',
@@ -31,8 +32,28 @@ const GENRE_TROPES: Record<FactoryGenre, string[]> = {
     'quest completion',
     'achievement hunting',
     'leaderboard competition',
+    // New 18
+    'gacha summoning',
+    'crafting system',
+    'pet evolution',
+    'guild building',
+    'player vs player arena',
+    'hidden class unlock',
+    'skill fusion mechanics',
+    'achievement shop',
+    'daily login bonuses',
+    'event dungeons',
+    'world boss raids',
+    'skill tree customization',
+    'auto-battle system',
+    'reincarnation prestige',
+    'breakthrough bottleneck',
+    'VIP privilege levels',
+    'seasonal rankings',
+    'cross-server competition',
   ],
   'urban-modern': [
+    // Original 12
     'rich CEO',
     'hidden identity',
     'business warfare',
@@ -45,8 +66,28 @@ const GENRE_TROPES: Record<FactoryGenre, string[]> = {
     'family drama',
     'inheritance battle',
     'undercover billionaire',
+    // New 18
+    'e-sports prodigy',
+    'streaming celebrity',
+    'app startup founder',
+    'food critic empire',
+    'fashion designer',
+    'underground racing',
+    'auction house',
+    'bodyguard protection',
+    'private detective',
+    'social media influencer',
+    'cryptocurrency trading',
+    'talent agency',
+    'nightclub owner',
+    'martial arts school',
+    'gym fitness coach',
+    'esports team manager',
+    'bar musician',
+    'luxury car dealer',
   ],
   romance: [
+    // Original 12
     'enemies to lovers',
     'fake relationship',
     'second chance',
@@ -59,8 +100,28 @@ const GENRE_TROPES: Record<FactoryGenre, string[]> = {
     'boss/employee',
     'secret identity',
     'healing journey',
+    // New 18
+    'contract marriage',
+    'forced proximity',
+    'bodyguard romance',
+    'teacher/student (adult)',
+    'rival to lovers',
+    'amnesia romance',
+    'pregnancy surprise',
+    'single parent romance',
+    'age gap romance',
+    'roommate romance',
+    'workplace rivals',
+    'online to offline',
+    'time travel romance',
+    'reincarnated lovers',
+    'soul mates destiny',
+    'love after divorce',
+    'enemies with benefits',
+    'matchmaking gone wrong',
   ],
   'huyen-huyen': [
+    // Original 12
     'beast taming',
     'magic academy',
     'dimensional travel',
@@ -73,8 +134,28 @@ const GENRE_TROPES: Record<FactoryGenre, string[]> = {
     'divine inheritance',
     'demon transformation',
     'world creation',
+    // New 18
+    'spirit fusion',
+    'rune engraving',
+    'summoning contracts',
+    'curse breaking',
+    'prophecy fulfillment',
+    'parallel universe',
+    'memory inheritance',
+    'devouring evolution',
+    'puppet mastery',
+    'illusion domain',
+    'karma manipulation',
+    'fate defying',
+    'void cultivation',
+    'primordial chaos',
+    'dragon ancestry',
+    'phoenix rebirth',
+    'titan bloodline',
+    'ancient relic fusion',
   ],
   'action-adventure': [
+    // Original 12
     'treasure hunting',
     'martial arts tournament',
     'assassin organization',
@@ -87,8 +168,28 @@ const GENRE_TROPES: Record<FactoryGenre, string[]> = {
     'international spy',
     'mercenary life',
     'underground fighting',
+    // New 18
+    'jungle expedition',
+    'desert survival',
+    'mountain climbing',
+    'ocean exploration',
+    'artifact retrieval',
+    'rescue mission',
+    'heist planning',
+    'race against time',
+    'wilderness tracking',
+    'urban parkour',
+    'demolition expert',
+    'hostage negotiation',
+    'weapons master',
+    'tactical planning',
+    'survival instructor',
+    'extreme sports',
+    'death-defying stunts',
+    'vigilante justice',
   ],
   historical: [
+    // Original 12
     'palace intrigue',
     'war general',
     'merchant empire',
@@ -101,8 +202,28 @@ const GENRE_TROPES: Record<FactoryGenre, string[]> = {
     'diplomatic mission',
     'secret society',
     'cultural revolution',
+    // New 18
+    'strategist advisor',
+    'physician healing',
+    'inventor innovation',
+    'poet scholar',
+    'warlord conquest',
+    'eunuch power',
+    'empress dowager',
+    'princess marriage alliance',
+    'courtier rivalry',
+    'tax reform',
+    'famine crisis',
+    'plague outbreak',
+    'foreign invasion',
+    'naval warfare',
+    'silk road trade',
+    'monastery secrets',
+    'noble family decline',
+    'peasant uprising',
   ],
   'tien-hiep': [
+    // Original 12
     'pill refinement',
     'sword cultivation',
     'sect politics',
@@ -115,8 +236,28 @@ const GENRE_TROPES: Record<FactoryGenre, string[]> = {
     'reincarnation',
     'divine treasure',
     'supreme bloodline',
+    // New 18
+    'dao comprehension',
+    'inner demon tribulation',
+    'spirit root awakening',
+    'immortal artifact forging',
+    'buddhist enlightenment',
+    'demonic path cultivation',
+    'righteous sect alliance',
+    'forbidden technique mastery',
+    'celestial beast contract',
+    'void traversal',
+    'karma cleansing',
+    'soul splitting',
+    'mortal realm guardian',
+    'immortal world ascension',
+    'jade palace invitation',
+    'heavenly dao defiance',
+    'chaotic body physique',
+    'primordial scripture',
   ],
   'sci-fi-apocalypse': [
+    // Original 12
     'zombie survival',
     'alien invasion',
     'post-nuclear',
@@ -129,8 +270,28 @@ const GENRE_TROPES: Record<FactoryGenre, string[]> = {
     'pandemic survival',
     'mech pilot',
     'colony ship',
+    // New 18
+    'cyborg enhancement',
+    'terraforming planets',
+    'wormhole navigation',
+    'quantum computing',
+    'nano-tech healing',
+    'bio-weapon threat',
+    'android rebellion',
+    'space station siege',
+    'asteroid mining',
+    'dimensional rift',
+    'cryogenic awakening',
+    'military exosuit',
+    'interstellar war',
+    'resource scarcity',
+    'mutant evolution',
+    'underground bunker',
+    'radiation zones',
+    'last human colony',
   ],
   'horror-mystery': [
+    // Original 12
     'haunted location',
     'serial killer',
     'supernatural entity',
@@ -143,11 +304,31 @@ const GENRE_TROPES: Record<FactoryGenre, string[]> = {
     'unreliable narrator',
     'cosmic horror',
     'ghost story',
+    // New 18
+    'possession exorcism',
+    'time loop horror',
+    'doppelganger mystery',
+    'memory manipulation',
+    'reality distortion',
+    'forbidden ritual',
+    'ancient curse',
+    'nightmare realm',
+    'mind reading terror',
+    'disappearing people',
+    'isolated mansion',
+    'dark family secret',
+    'vengeful spirit',
+    'eldritch abomination',
+    'sanity erosion',
+    'death game',
+    'parallel dimension horror',
+    'forbidden knowledge',
   ],
 };
 
-// Protagonist archetypes
+// Protagonist archetypes (30 total - expanded for diversity)
 const PROTAGONIST_ARCHETYPES = [
+  // Original 12
   'humble origin rising star',
   'fallen genius returning',
   'reincarnated ancient master',
@@ -160,10 +341,31 @@ const PROTAGONIST_ARCHETYPES = [
   'transmigrator with knowledge',
   'awakened bloodline heir',
   'ordinary person with extraordinary luck',
+  
+  // New 18 (added for variety)
+  'body-swapped modern person',           // Hiện đại xuyên vào cổ đại
+  'villain turned hero',                  // Phản diện hối cải
+  'assassin seeking redemption',          // Sát thủ tẩy trắng
+  'merchant building empire',             // Thương nhân xây đế chế
+  'chef with god-tier cooking',           // Đầu bếp thần cấp
+  'doctor saving worlds',                 // Bác sĩ cứu thế
+  'librarian with forbidden knowledge',   // Thủ thư tri thức cấm
+  'musician with soul power',             // Nhạc công linh hồn
+  'crafter mastering artifacts',          // Thợ thủ công tạo thần khí
+  'beast whisperer tamer',                // Người thuần thú
+  'dungeon creator architect',            // Người tạo ngục tối
+  'time loop survivor',                   // Người sống sót vòng lặp
+  'cursed immortal',                      // Bất tử bị nguyền
+  'necromancer with ethics',              // Pháp sư tử linh có đạo đức
+  'AI in human body',                     // AI trong thân người
+  'parallel world jumper',                // Người nhảy thế giới song song
+  'dream architect manipulator',          // Kiến trúc sư giấc mơ
+  'karma debt collector',                 // Người thao túng nhân quả
 ];
 
-// Antagonist types
+// Antagonist types (30 total - expanded for diversity)
 const ANTAGONIST_TYPES = [
+  // Original 12
   'arrogant young master',
   'scheming elder',
   'jealous rival',
@@ -176,17 +378,66 @@ const ANTAGONIST_TYPES = [
   'family enemy',
   'world-destroying force',
   'inner demon',
+  
+  // New 18 (added for variety)
+  'former ally betrayer',                 // Đồng minh phản bội
+  'obsessed collector',                   // Kẻ sưu tập ám ảnh
+  'cult leader prophet',                  // Giáo chủ tà giáo
+  'rogue AI system',                      // AI nổi loạn
+  'time paradox entity',                  // Thực thể nghịch lý thời gian
+  'dimension invader',                    // Kẻ xâm lược chiều không gian
+  'corrupted hero mirror',                // Anh hùng sa đọa (mirror của MC)
+  'vengeful ghost spirit',                // Oan hồn báo thù
+  'greedy merchant guild',                // Hội thương nhân tham lam
+  'mad scientist experimenter',           // Nhà khoa học điên
+  'parasite entity',                      // Thực thể ký sinh
+  'false prophet manipulator',            // Tiên tri giả
+  'puppeteer noble',                      // Quý tộc điều khiển bù nhìn
+  'plague spreader fanatic',              // Kẻ phát tán dịch bệnh
+  'reality warper',                       // Người bẻ cong thực tại
+  'hive mind collective',                 // Ý thức tập thể
+  'doppelganger clone',                   // Bản sao của MC
+  'fate manipulator weaver',              // Kẻ thao túng vận mệnh
 ];
 
 export class IdeaBankService {
   private gemini: GeminiClient;
   private supabaseUrl: string;
   private supabaseKey: string;
+  private qualityValidator?: import('./idea-quality-validator').IdeaQualityValidator;
+  private uniquenessChecker?: import('./idea-uniqueness-checker').IdeaUniquenessChecker;
 
-  constructor(options?: { geminiClient?: GeminiClient; supabaseUrl?: string; supabaseKey?: string }) {
+  constructor(options?: { 
+    geminiClient?: GeminiClient; 
+    supabaseUrl?: string; 
+    supabaseKey?: string;
+    enableQualityCheck?: boolean;
+    enableUniquenessCheck?: boolean;
+  }) {
     this.gemini = options?.geminiClient || getGeminiClient();
     this.supabaseUrl = options?.supabaseUrl || process.env.NEXT_PUBLIC_SUPABASE_URL || '';
     this.supabaseKey = options?.supabaseKey || process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+    
+    // Initialize validators if enabled (default: true)
+    if (options?.enableQualityCheck !== false) {
+      import('./idea-quality-validator').then(module => {
+        this.qualityValidator = new module.IdeaQualityValidator({
+          geminiClient: this.gemini,
+          threshold: 7.0,
+        });
+      });
+    }
+    
+    if (options?.enableUniquenessCheck !== false) {
+      import('./idea-uniqueness-checker').then(module => {
+        this.uniquenessChecker = new module.IdeaUniquenessChecker({
+          geminiClient: this.gemini,
+          supabaseUrl: this.supabaseUrl,
+          supabaseKey: this.supabaseKey,
+          threshold: 0.85,
+        });
+      });
+    }
   }
 
   private getSupabase() {
@@ -281,6 +532,100 @@ export class IdeaBankService {
   }
 
   /**
+   * Generate a quality, unique story idea with auto-regeneration
+   * This is the recommended method to use instead of generateIdea()
+   * 
+   * @param input - Idea generation parameters
+   * @param options - Quality threshold and retry settings
+   * @returns Story idea with quality_score field
+   */
+  async generateQualityUniqueIdea(
+    input: IdeaGenerationPrompt,
+    options?: {
+      minQualityThreshold?: number;
+      maxRetries?: number;
+    }
+  ): Promise<ServiceResult<StoryIdea & { quality_score: number }>> {
+    const threshold = options?.minQualityThreshold || 7.0;
+    const maxRetries = options?.maxRetries || 3;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      // 1. Generate idea using existing method
+      const result = await this.generateIdea(input);
+      if (!result.success || !result.data) {
+        console.log(`Attempt ${attempt}: Generation failed - ${result.error}`);
+        continue;
+      }
+
+      const idea = result.data;
+
+      // 2. Validate quality (if validator enabled)
+      if (this.qualityValidator) {
+        const quality = await this.qualityValidator.validate(idea);
+        
+        if (!quality.pass) {
+          console.log(
+            `Attempt ${attempt}: Quality too low (${quality.overall.toFixed(1)}/10). ` +
+            `Issues: ${quality.issues.join(', ')}`
+          );
+          
+          // Add feedback for next attempt
+          const feedback = quality.suggestions.slice(0, 2).join('. '); // Top 2 suggestions
+          input.special_instructions = feedback;
+          continue;
+        }
+
+        // 3. Check uniqueness (if checker enabled)
+        if (this.uniquenessChecker) {
+          const uniqueness = await this.uniquenessChecker.checkUniqueness(idea, idea.genre);
+          
+          if (!uniqueness.unique) {
+            console.log(
+              `Attempt ${attempt}: Too similar to "${uniqueness.most_similar?.title}" ` +
+              `(${((uniqueness.similarity_score || 0) * 100).toFixed(0)}% similar)`
+            );
+            
+            // Avoid this title in next attempt
+            input.avoid_similar_to = [
+              ...(input.avoid_similar_to || []),
+              uniqueness.most_similar?.title || '',
+            ];
+            continue;
+          }
+        }
+
+        // Both quality and uniqueness passed!
+        console.log(
+          `✓ Attempt ${attempt}: Success! Quality: ${quality.overall.toFixed(1)}/10`
+        );
+        return {
+          success: true,
+          data: {
+            ...idea,
+            quality_score: quality.overall,
+          },
+        };
+      }
+
+      // If validators disabled, just return
+      return {
+        success: true,
+        data: {
+          ...idea,
+          quality_score: 7.0, // Default if no validation
+        },
+      };
+    }
+
+    // Failed after max retries
+    return {
+      success: false,
+      error: `Failed to generate quality unique idea after ${maxRetries} attempts`,
+      errorCode: 'MAX_RETRIES_EXCEEDED',
+    };
+  }
+
+  /**
    * Generate multiple ideas based on genre distribution
    */
   async generateIdeasBatch(
@@ -298,9 +643,15 @@ export class IdeaBankService {
 
     for (const [genre, genreCount] of Object.entries(genreCounts)) {
       for (let i = 0; i < genreCount; i++) {
-        const result = await this.generateIdea({
-          genre: genre as FactoryGenre,
-        });
+        const result = await this.generateQualityUniqueIdea(
+          {
+            genre: genre as FactoryGenre,
+          },
+          {
+            minQualityThreshold: 7.0,
+            maxRetries: 3,
+          }
+        );
 
         if (result.success && result.data) {
           results.push({ item: result.data, success: true });
@@ -645,13 +996,55 @@ ${params.excludeTropes ? `- Tránh tropes: ${params.excludeTropes.join(', ')}` :
 - Đối tượng: ${params.targetAudience}
 ${params.avoidSimilar ? `- TRÁNH GIỐNG các truyện đã có: ${params.avoidSimilar.join(', ')}` : ''}
 
-MẪU TÊN TRUYỆN HẤP DẪN (chọn 1 pattern phù hợp):
-- "Trùng Sinh: [XX]" — cho truyện có trùng sinh/xuyên không
-- "Ta Tại [Bối Cảnh] [Hành Động OP]" — VD: "Ta Tại Thần Giới Vô Địch"
-- "[Hệ Thống] + [Mục Tiêu]" — VD: "Hệ Thống Ký Danh: Ta Lên Cấp Mỗi Ngày"
-- "[Danh Hiệu] + [Nhân Vật]" — VD: "Vạn Cổ Đệ Nhất Kiếm Thần"
-- "[Hành Động] + [Kết Quả Sốc]" — VD: "Bắt Đầu Từ Việc Thu Phục Thần Thú"
-- Có thể dùng tiếng Hán-Việt hoặc tiếng Việt thuần tùy thể loại
+MẪU TÊN TRUYỆN HẤP DẪN - Học từ top webnovels Trung Quốc:
+
+PATTERN 1: [Số Lớn] + [Cảnh Giới/Danh Hiệu] (Rating: 9.1★, Epicness + Time Span)
+- 万古神帝 (Vạn Cổ Thần Đế) - 300M views, 8.7★
+- 九星霸体诀 (Cửu Tinh Bá Thể Quyết) - 280M views, 8.8★
+- 十方武圣 (Thập Phương Vũ Thánh) - 170M views, 8.9★
+→ Dùng: Vạn/Thiên/Cửu/Thập + Cổ/Giới/Phương + Thần/Đế/Thánh/Tôn
+
+PATTERN 2: [Động Từ Mạnh] + [Vật Thể Vũ Trụ] (Rating: 9.1★, Power + Ambition)
+- 吞噬星空 (Thôn Phệ Tinh Không) - 360M views, 9.0★
+- 遮天 (Già Thiên) - 450M views, 9.1★
+- 斗破苍穹 (Đấu Phá Thương Khiêng) - 380M views, 8.9★
+→ Dùng: Thôn Phệ/Trấn Áp/Lược Đoạt/Đấu Phá/Già + Tinh Không/Thiên/Thương Khiêng
+
+PATTERN 3: [Cảnh Giới] ngắn 2-3 chữ (Rating: 8.8★, Direct + Memorable)
+- 元尊 (Nguyên Tôn) - 270M views, 8.6★
+- 圣墟 (Thánh Hư) - 240M views, 8.5★
+→ Dùng: Đơn giản, súc tích, có chứa Thánh/Tôn/Đế/Tiên
+
+PATTERN 4: [Từ Bí Ẩn] + 之 + [Chủ/Vương] (Rating: 9.4★, Mystery + Curiosity)
+- 诡秘之主 (Quỷ Bí Chi Chủ) - 340M views, 9.4★
+→ Dùng: Quỷ Bí/Cấm Kỵ/Ẩn Mật + Chi + Chủ/Vương
+
+PATTERN 5: [Hệ Thống] + Feature (LitRPG)
+- 超神机械师 (Siêu Thần Cơ Giới Sư) - 190M views, 9.0★
+- 全职高手 (Toàn Chức Cao Thủ) - 320M views, 9.1★
+→ Dùng: Ký Danh/Siêu Thần/Toàn Chức + Feature
+
+PATTERN 6: [Thế Giới/Địa Điểm] + Ký/Truyện (World-building)
+- 完美世界 (Hoàn Mỹ Thế Giới) - 420M views, 9.2★
+- 牧神记 (Mục Thần Ký) - 250M views, 9.2★
+
+PATTERN 7: [Nghề Nghiệp/Vai Trò] + Thần/Thánh (Rating: 8.9★)
+- 修罗武神 (Tu La Vũ Thần) - 220M views, 8.4★
+- 武炼巅峰 (Vũ Luyện Đỉnh Phong) - 210M views, 8.3★
+
+PATTERN 8: [Nhân Vật] + Câu Chuyện (Character-focused)
+- 凡人修仙传 (Phàm Nhân Tu Tiên Truyện) - 500M views, 9.3★ [#1 ALL-TIME]
+- 我师兄实在太稳健了 (Sư Huynh Ta Thực Tại Quá Ổn Định) - 230M views, 9.3★
+
+PATTERN 9: Unique/Urban Modern
+- 大王饶命 (Đại Vương Nhiêu Mệnh) - 260M views, 9.0★
+- 夜的命名术 (Dạ Đích Mệnh Danh Thuật) - 180M views, 9.2★
+
+✨ LƯU Ý: 
+- Tên ngắn (2-6 chữ) > Tên dài
+- Dùng Hán-Việt cho tien-hiep/huyen-huyen (威严 + 古典)
+- Dùng Việt thuần cho urban/romance (dễ nhớ + gần gũi)
+- Phải gợi tò mò: "Vạn Cổ" = bao lâu? "Thôn Phệ" = ăn gì? "Quỷ Bí" = gì vậy?
 
 GOLDEN FINGER (BẮT BUỘC):
 Nhân vật chính PHẢI có ít nhất 1 "golden finger" (lợi thế đặc biệt) rõ ràng:
@@ -663,6 +1056,33 @@ Nhân vật chính PHẢI có ít nhất 1 "golden finger" (lợi thế đặc b
 - Thiên phú đặc biệt (mắt thần, thể chất đặc biệt)
 - Hệ thống nhiệm vụ / thành tựu
 → Golden finger phải xuất hiện rõ ràng trong premise và hook!
+
+PREMISE & HOOK EXAMPLES - Học từ top CN webnovels (chỉ tham khảo cấu trúc, KHÔNG copy):
+
+1. UNDERDOG (凡人修仙传 9.3★, 500M views)
+   Premise: "Thiếu niên làng nghèo tư chất tầm thường vô tình gia nhập tiểu môn phái tu tiên. 
+   Không có thiên phú, chỉ nhờ cẩn thận + chăm chỉ mà từng bước vươn lên."
+   Hook: "Làng Thanh Ngưu, thiếu niên được chọn vào thử nghiệm môn phái. Đêm đầu tiên, 
+   cậu uống nhầm chai dược dịch bí ẩn..."
+   Why it works: Relatable + clear progression + mystery element
+
+2. REBIRTH (万古神帝 8.7★, 300M views)
+   Premise: "800 năm trước bị fiancée giết hại, 800 năm sau tỉnh lại. Người giết anh đã 
+   thành nữ hoàng thống nhất thiên hạ."
+   Hook: "Ngọn kiếm xuyên qua ngực. Anh nhìn khuôn mặt quen thuộc đang cầm kiếm: 
+   'Công chúa... vì sao...?'"
+   Why it works: Time gap + betrayal + power imbalance = strong motivation
+
+3. COMEDY SYSTEM (大王饶命 9.0★, 260M views)
+   Premise: "Thời đại linh khí phục hồi, phát hiện mình có hệ thống thu thập cảm xúc tiêu 
+   cực của người khác để rút thưởng."
+   Hook: "Kỳ thi giác tỉnh, xếp hạng F. Người khác chế giễu. Hệ thống: 'Cảm xúc tiêu cực +99!'"
+   Why it works: Unique system + comedy + clear mechanic
+
+✨ STRUCTURE TO FOLLOW:
+- Premise = Situation (1 câu) + Golden Finger (1 câu) + Goal (1 câu)  
+- Hook = Visual scene + Immediate problem + Curiosity gap
+- KHÔNG spoil ending, chỉ tease hành trình
 
 YÊU CẦU:
 1. Tên truyện PHẢI hấp dẫn, gợi tò mò, đúng pattern trên

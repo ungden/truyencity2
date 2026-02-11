@@ -3,7 +3,6 @@ import { createSupabaseFromAuthHeader } from '@/integrations/supabase/auth-helpe
 
 // POST: Create AI project from outline
 export async function POST(request: NextRequest) {
-  console.log('[CREATE PROJECT API] Received request.');
   try {
     const { client, token } = createSupabaseFromAuthHeader(request);
     if (!client || !token) {
@@ -66,8 +65,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to create job' }, { status: 500 });
     }
 
-    console.log(`[CREATE PROJECT API] Created job ${job.id}`);
-
     // Start project creation asynchronously
     (async () => {
       try {
@@ -79,7 +76,6 @@ export async function POST(request: NextRequest) {
           temperature,
           target_chapter_length
         });
-        console.log(`[CREATE PROJECT API] Project creation completed for job ${job.id}`);
       } catch (err) {
         console.error(`[CREATE PROJECT API] Error in async creation:`, err);
         const again = createSupabaseFromAuthHeader(request).client;

@@ -18,7 +18,6 @@ export async function GET(request: NextRequest) {
     if (!auth.success) return auth.response;
 
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status') || 'ready';
     const limit = parseInt(searchParams.get('limit') || '50');
     const id = searchParams.get('id');
 

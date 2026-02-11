@@ -32,12 +32,6 @@ export async function POST(request: NextRequest) {
       bucket = 'covers'
     } = body;
 
-    console.log('[Test Cover] Starting generation with Gemini 3 Pro Image...');
-    console.log(`  Title: ${title}`);
-    console.log(`  Genre: ${genre}`);
-    console.log(`  Resolution: ${resolution}`);
-    console.log(`  Upload: ${uploadToStorage}`);
-
     const imageService = getGeminiImageService();
 
     if (!imageService.isConfigured()) {
@@ -69,8 +63,6 @@ export async function POST(request: NextRequest) {
           duration,
         }, { status: 400 });
       }
-
-      console.log(`[Test Cover] Success! Generated and uploaded in ${duration}ms`);
 
       return finalizeResponse(NextResponse.json({
         success: true,
@@ -109,9 +101,6 @@ export async function POST(request: NextRequest) {
 
     const image = result.data.images[0];
     const dataUrl = imageService.base64ToDataUrl(image.base64, image.mimeType);
-
-    console.log(`[Test Cover] Success! Generated in ${duration}ms`);
-    console.log(`  Image size: ${Math.round(image.base64.length / 1024)}KB`);
 
     return finalizeResponse(NextResponse.json({
       success: true,

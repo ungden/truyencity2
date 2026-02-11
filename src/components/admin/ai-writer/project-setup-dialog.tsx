@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useForm, type SubmitHandler, useWatch } from 'react-hook-form';
+import { useForm, type SubmitHandler, useWatch, type FieldErrors, type Path, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
@@ -41,9 +41,9 @@ import { AIStoryProject } from '@/lib/types/ai-writer';
 import { supabase } from '@/integrations/supabase/client';
 import { GENRE_CONFIG, type GenreKey } from '@/lib/types/genre-config';
 import { cn } from '@/lib/utils';
-import { updateNovelCover } from '@/lib/actions';
+
 import SafeImage from '@/components/ui/safe-image';
-import { useRouter } from 'next/navigation';
+
 
 const AI_MODELS = [
   { id: 'gemini-3-flash-preview', name: 'Gemini 3 Flash Preview', provider: 'Google', description: 'Model chính — nhanh, 1M context, viết truyện chất lượng cao', cost: 'Miễn phí', recommended: true },
@@ -75,6 +75,8 @@ const projectSchema = z.object({
 
 type ProjectFormValues = z.infer<typeof projectSchema>;
 
+type DynamicRecord = Record<string, unknown>;
+
 interface Topic {
   id: string;
   name: string;
@@ -105,8 +107,6 @@ export function ProjectSetupDialog({ isOpen, onOpenChange, onProjectSaved, initi
   const [coverPrompt, setCoverPrompt] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const router = useRouter();
-
   const [authors, setAuthors] = useState<Array<{ id: string; name: string }>>([]);
   const [isLoadingAuthors, setIsLoadingAuthors] = useState(false);
 
@@ -132,7 +132,7 @@ export function ProjectSetupDialog({ isOpen, onOpenChange, onProjectSaved, initi
         .join('\n');
     }
     if (typeof val === 'object') {
-      const obj: any = val;
+      const obj = val as DynamicRecord;
       // Nếu có levels là mảng, ưu tiên định dạng theo cấp độ
       if (Array.isArray(obj.levels)) {
         const header = obj.name ? `Hệ thống: ${obj.name}\n` : '';
@@ -142,16 +142,17 @@ export function ProjectSetupDialog({ isOpen, onOpenChange, onProjectSaved, initi
           .join('\n');
 
         const levels = obj.levels
-          .map((lvl: any, i: number) => {
+          .map((lvl: unknown, i: number) => {
             if (typeof lvl === 'string') return `Cấp ${i + 1}: ${lvl}`;
             if (lvl && typeof lvl === 'object') {
-              const name = lvl.name ?? lvl.title ?? `Cấp ${i + 1}`;
-              const mech = lvl.mechanism ?? lvl.mechanics ?? lvl.core ?? lvl.principle ?? '';
-              const reqs = lvl.requirements ?? lvl.conditions ?? '';
-              const risks = lvl.risk ?? lvl.risks ?? lvl.weakness ?? '';
-              const metrics = lvl.metrics ?? lvl.progress ?? '';
+              const levelObj = lvl as DynamicRecord;
+              const name = levelObj.name ?? levelObj.title ?? `Cấp ${i + 1}`;
+              const mech = levelObj.mechanism ?? levelObj.mechanics ?? levelObj.core ?? levelObj.principle ?? '';
+              const reqs = levelObj.requirements ?? levelObj.conditions ?? '';
+              const risks = levelObj.risk ?? levelObj.risks ?? levelObj.weakness ?? '';
+              const metrics = levelObj.metrics ?? levelObj.progress ?? '';
               return [
-                `${name}`,
+                String(name),
                 mech && `- Cơ chế: ${mech}`,
                 reqs && `- Điều kiện: ${reqs}`,
                 risks && `- Rủi ro: ${risks}`,
@@ -178,7 +179,7 @@ export function ProjectSetupDialog({ isOpen, onOpenChange, onProjectSaved, initi
   };
 
   const form = useForm<ProjectFormValues>({
-    resolver: zodResolver(projectSchema) as any,
+    resolver: zodResolver(projectSchema) as Resolver<ProjectFormValues>,
     defaultValues: {
       genre: '',
       topic: '',
@@ -395,7 +396,7 @@ export function ProjectSetupDialog({ isOpen, onOpenChange, onProjectSaved, initi
       if (rawVal != null) {
         const normalized = normalizeDynamicField(rawVal);
         if (normalized.trim()) {
-          form.setValue(primaryField as any, normalized);
+          form.setValue(primaryField as Path<ProjectFormValues>, normalized);
           if (typeof rawVal === 'object') {
             toast.info('Đã chuẩn hóa nội dung hệ thống sang dạng văn bản.');
           }
@@ -415,7 +416,6 @@ export function ProjectSetupDialog({ isOpen, onOpenChange, onProjectSaved, initi
   };
 
   const handleGenerateCover = async () => {
-    console.log('[AI Cover] Bắt đầu quá trình tạo ảnh.');
     const novelId = isEditMode ? initialData?.novel_id : (mode === 'existing' ? selectedNovelId : null);
     
     if (!coverPrompt) {
@@ -425,24 +425,19 @@ export function ProjectSetupDialog({ isOpen, onOpenChange, onProjectSaved, initi
     }
 
     setIsGeneratingCover(true);
-    console.log('[AI Cover] Trạng thái: isGeneratingCover = true.');
     try {
-      console.log('[AI Cover] Đang lấy session người dùng...');
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         console.error('[AI Cover] Lỗi: Người dùng chưa đăng nhập.');
         throw new Error('Bạn cần đăng nhập');
       }
-      console.log('[AI Cover] Lấy session thành công.');
 
-      console.log(`[AI Cover] Gửi yêu cầu đến API: /api/ai-image/jobs`);
       const response = await fetch('/api/ai-image/jobs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
         body: JSON.stringify({ prompt: coverPrompt, novelId: novelId || null }),
       });
 
-      console.log(`[AI Cover] Phản hồi từ API: status ${response.status}`);
       const responseData = await response.json();
 
       if (!response.ok) {
@@ -451,11 +446,9 @@ export function ProjectSetupDialog({ isOpen, onOpenChange, onProjectSaved, initi
       }
       
       const { jobId } = responseData;
-      console.log(`[AI Cover] Tạo job thành công, jobId: ${jobId}`);
 
       toast.info('Đang tạo ảnh bìa, vui lòng chờ...');
       const startTime = Date.now();
-      console.log(`[AI Cover] Bắt đầu polling cho jobId: ${jobId}`);
 
       pollIntervalRef.current = setInterval(async () => {
         if (Date.now() - startTime > 90_000) {
@@ -471,7 +464,6 @@ export function ProjectSetupDialog({ isOpen, onOpenChange, onProjectSaved, initi
               headers: { Authorization: `Bearer ${session.access_token}` },
             });
     
-            console.log(`[AI Cover Polling] Trạng thái job: status ${statusRes.status}`);
             if (!statusRes.ok) {
               let errMsg = 'Không thể lấy trạng thái job';
               try {
@@ -488,7 +480,6 @@ export function ProjectSetupDialog({ isOpen, onOpenChange, onProjectSaved, initi
             }
     
             const { job } = await statusRes.json();
-            console.log(`[AI Cover Polling] Trạng thái job từ DB: ${job.status}`);
     
             if (job.status === 'completed') {
               if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
@@ -496,7 +487,6 @@ export function ProjectSetupDialog({ isOpen, onOpenChange, onProjectSaved, initi
               setCoverUrl(newCoverUrl);
               setIsGeneratingCover(false);
               toast.success('Tạo ảnh bìa thành công!');
-              console.log(`[AI Cover] Hoàn thành job: ${jobId}`);
             } else if (job.status === 'failed') {
               if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
               setIsGeneratingCover(false);
@@ -572,12 +562,16 @@ export function ProjectSetupDialog({ isOpen, onOpenChange, onProjectSaved, initi
 
       // Kiểm tra nghiêm ngặt các trường bắt buộc theo thể loại, không fallback
       const required = GENRE_CONFIG[values.genre as GenreKey]?.requiredFields || [];
-      const missing = required.filter((f) => !String((values as any)[f] || '').trim());
+      const valuesRecord: Partial<Record<keyof ProjectFormValues, unknown>> = values;
+      const missing = required.filter((f) => {
+        const key = f as keyof ProjectFormValues;
+        return !String(valuesRecord[key] || '').trim();
+      });
       if (missing.length > 0) {
         setIsLoading(false);
         const first = missing[0];
         toast.error(`Thiếu trường bắt buộc: "${first.replace(/_/g, ' ')}". Vui lòng điền trước khi lưu.`);
-        form.setFocus(first as any);
+        form.setFocus(first as Path<ProjectFormValues>);
         return;
       }
 
@@ -597,7 +591,7 @@ export function ProjectSetupDialog({ isOpen, onOpenChange, onProjectSaved, initi
         toast.success('Cập nhật dự án thành công!');
         onProjectSaved(data.project);
       } else {
-        let payload: any;
+        let payload: unknown;
         if (mode === 'existing') {
           if (!values.novel_id) throw new Error('Vui lòng chọn truyện');
           payload = {
@@ -634,7 +628,7 @@ export function ProjectSetupDialog({ isOpen, onOpenChange, onProjectSaved, initi
     }
   };
 
-  const onInvalid = (errors: any) => {
+  const onInvalid = (errors: FieldErrors<ProjectFormValues>) => {
     console.error('Form validation errors:', errors);
     toast.error('Tạo dự án thất bại. Vui lòng kiểm tra lại các trường báo lỗi màu đỏ.');
   };
@@ -649,7 +643,7 @@ export function ProjectSetupDialog({ isOpen, onOpenChange, onProjectSaved, initi
         <FormField
           key={String(fieldName)}
           control={form.control}
-          name={fieldName as any}
+          name={fieldName as Path<ProjectFormValues>}
           render={({ field }) => (
             <FormItem>
               <FormLabel>{String(fieldName).replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</FormLabel>

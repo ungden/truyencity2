@@ -141,8 +141,6 @@ export class QCGating {
   private projectId: string;
   private thresholds: GatingThresholds;
   private recentChapters: Array<{ number: number; content: string; beats: string[] }> = [];
-  private currentArcStartChapter: number = 1;
-  private startingRealm: number = 0;
 
   constructor(projectId: string, thresholds?: Partial<GatingThresholds>) {
     this.projectId = projectId;
@@ -170,16 +168,12 @@ export class QCGating {
     }
 
     // Get arc info
-    const { data: arcs } = await supabase
+    await supabase
       .from('plot_arcs')
       .select('start_chapter, end_chapter')
       .eq('project_id', this.projectId)
       .eq('status', 'in_progress')
       .single();
-
-    if (arcs) {
-      this.currentArcStartChapter = arcs.start_chapter;
-    }
   }
 
   /**
@@ -580,7 +574,7 @@ export function createQCGating(projectId: string, thresholds?: Partial<GatingThr
 // ENHANCED QC GATING - Integration with Sprint 1 features
 // ============================================================================
 
-import { getQuickDialogueScore, DialogueAnalysisResult, dialogueAnalyzer } from './dialogue-analyzer';
+import { getQuickDialogueScore, dialogueAnalyzer } from './dialogue-analyzer';
 
 export interface EnhancedGatingThresholds extends GatingThresholds {
   dialogueQualityMin: number;    // Default: 60
@@ -762,7 +756,7 @@ export function createEnhancedQCGating(
 // FULL QC GATING - Integration with Sprint 2/3 features
 // ============================================================================
 
-import { WritingStyleAnalyzer, writingStyleAnalyzer, StyleAnalysisResult } from './writing-style-analyzer';
+import { writingStyleAnalyzer, StyleAnalysisResult } from './writing-style-analyzer';
 import { BattleVarietyTracker, BattleType, TacticalApproach, CombatElement, BattleOutcome } from './battle-variety';
 import { CharacterDepthTracker, CharacterDepthProfile } from './character-depth';
 
@@ -1158,6 +1152,187 @@ export class FullQCGating extends EnhancedQCGating {
 
     return baseInstructions + additionalInstructions.join('\n');
   }
+}
+
+// ============================================================================
+// FLEXIBLE CHAPTER VALIDATION - Quality over Structure
+// ============================================================================
+
+import { GenreType } from './types';
+
+export interface FlexibleValidationResult {
+  score: number; // 0-100
+  passed: boolean;
+  issues: string[];
+  strengths: string[];
+  suggestions: string[];
+  metrics: {
+    wordCount: number;
+    showDontTell: number;
+    sensoryDetail: number;
+    villainQuality: number;
+    pacing: number;
+  };
+}
+
+export function validateChapterFlexible(
+  content: string,
+  chapterNumber: number,
+  genre: GenreType
+): FlexibleValidationResult {
+  const issues: string[] = [];
+  const strengths: string[] = [];
+  const suggestions: string[] = [];
+  
+  const wordCount = content.split(/\s+/).length;
+  
+  // Genre-specific word count checks
+  const genreWordCounts: Record<GenreType, { min: number; max: number }> = {
+    'tien-hiep': { min: 2000, max: 5000 },
+    'huyen-huyen': { min: 2000, max: 5000 },
+    'do-thi': { min: 1500, max: 4000 },
+    'kiem-hiep': { min: 2000, max: 4500 },
+    'mat-the': { min: 1500, max: 3500 },
+    'khoa-huyen': { min: 2000, max: 4500 },
+    'lich-su': { min: 2500, max: 5000 },
+    'dong-nhan': { min: 2000, max: 4500 },
+    'vong-du': { min: 1500, max: 3500 },
+    'ngon-tinh': { min: 2000, max: 4000 },
+    'linh-di': { min: 2000, max: 4500 },
+    'quan-truong': { min: 2500, max: 5000 },
+    'di-gioi': { min: 2000, max: 4500 },
+  };
+  
+  const wordRange = genreWordCounts[genre] || { min: 2000, max: 4000 };
+  
+  // Word count check
+  if (wordCount < wordRange.min) {
+    issues.push(`Chương ${chapterNumber} hơi ngắn: ${wordCount} từ (nên ${wordRange.min}+ cho ${genre})`);
+  } else if (wordCount > wordRange.max) {
+    suggestions.push(`Chương ${chapterNumber} khá dài: ${wordCount} từ (có thể xem xét cắt ngắn)`);
+  } else {
+    strengths.push(`Độ dài phù hợp: ${wordCount} từ`);
+  }
+  
+  // Show don't tell check
+  const tellingPhrases = [
+    'rất đau đớn',
+    'rất buồn',
+    'rất tức giận',
+    'rất sợ hãi',
+    'rất tuyệt vọng',
+    'rất hạnh phúc',
+    'rất đau khổ',
+  ];
+  
+  const tellingFound = tellingPhrases.filter(phrase => 
+    content.toLowerCase().includes(phrase.toLowerCase())
+  );
+  
+  if (tellingFound.length > 2) {
+    issues.push(`Phát hiện ${tellingFound.length} chỗ "tell" thay vì "show": ${tellingFound.join(', ')}`);
+  } else if (tellingFound.length === 0) {
+    strengths.push('Tốt: Không phát hiện "telling", chủ yếu là "showing"');
+  }
+  
+  // 5 senses check
+  const sensoryWords = {
+    sight: ['nhìn', 'thấy', 'sáng', 'tối', 'màu', 'ánh sáng', 'hình ảnh'],
+    sound: ['nghe', 'tiếng', 'âm thanh', 'vang', 'im lặng', 'gầm', 'rít'],
+    smell: ['mùi', 'thơm', 'hôi', 'nồng', 'tanh', 'thoang thoảng'],
+    taste: ['vị', 'ngọt', 'đắng', 'máu', 'nước miếng', 'tanh'],
+    touch: ['lạnh', 'nóng', 'mềm', 'cứng', 'mồ hôi', 'run', 'rát'],
+  };
+  
+  const sensesFound = Object.entries(sensoryWords).filter(([sense, words]) => 
+    words.some(w => content.toLowerCase().includes(w.toLowerCase()))
+  ).map(([sense]) => sense);
+  
+  if (sensesFound.length >= 3) {
+    strengths.push(`Sử dụng ${sensesFound.length} giác quan: ${sensesFound.join(', ')}`);
+  } else {
+    suggestions.push(`Có thể thêm mô tả giác quan (hiện có: ${sensesFound.join(', ') || 'chưa rõ'})`);
+  }
+  
+  // Villain cliché check
+  const villainClichés = [
+    'ngươi chỉ là con kiến',
+    'tìm chết',
+    'ngươi dám',
+    'đồ phế vật',
+    'cút đi',
+    'biến',
+    'muốn chết sao',
+    'không biết trở trở',
+    'ếch ngồi đáy giếng',
+    'cũng dám mơ',
+    'con sâu',
+    'thằng chó',
+  ];
+  
+  const clichésFound = villainClichés.filter(phrase => 
+    content.toLowerCase().includes(phrase.toLowerCase())
+  );
+  
+  if (clichésFound.length > 0) {
+    issues.push(`Phát hiện cliché villain: "${clichésFound[0]}" - nên viết lại lạnh lùng, ít nói hơn`);
+  }
+  
+  // Anti-speed check (câu chương)
+  const speedTransitions = ['sau đó', 'tiếp theo', 'rồi thì', 'không lâu sau', 'một lúc sau'];
+  const speedCount = speedTransitions.filter(w => 
+    content.toLowerCase().includes(w.toLowerCase())
+  ).length;
+  
+  if (speedCount > 5) {
+    suggestions.push(`Phát hiện ${speedCount} từ nối nhanh. Có thể mở rộng thêm chi tiết để "câu chương"`);
+  } else if (speedCount < 3) {
+    strengths.push('Tốt: Ít dùng từ nối nhanh, mô tả chi tiết');
+  }
+  
+  // Game-like system check (only warn, not error)
+  if (/\d+%.*\d+%.*100%/.test(content)) {
+    suggestions.push('Phát hiện loading percentage - nên viết lại theo phong cách kinh dị/huyền bí hơn');
+  }
+  if (/Chúc mừng.*nhận được/i.test(content)) {
+    suggestions.push('Phát hiện thông báo game thân thiện - có thể thêm cái giá/bí ẩn');
+  }
+  
+  // Calculate metrics
+  const showDontTellScore = Math.max(0, 100 - tellingFound.length * 20);
+  const sensoryScore = Math.min(100, sensesFound.length * 20);
+  const villainScore = clichésFound.length > 0 ? 60 : 90;
+  const pacingScore = Math.max(0, 100 - speedCount * 10);
+  
+  // Calculate overall score
+  const baseScore = 70;
+  const issuePenalty = issues.length * 8;
+  const strengthBonus = strengths.length * 5;
+  const score = Math.max(0, Math.min(100, baseScore - issuePenalty + strengthBonus));
+  
+  return {
+    score,
+    passed: score >= 60,
+    issues,
+    strengths,
+    suggestions,
+    metrics: {
+      wordCount,
+      showDontTell: showDontTellScore,
+      sensoryDetail: sensoryScore,
+      villainQuality: villainScore,
+      pacing: pacingScore,
+    },
+  };
+}
+
+// Export helper function - maintains backward compatibility
+export function checkChapterQuality(
+  content: string,
+  chapterNumber: number,
+  genre: GenreType
+): FlexibleValidationResult {
+  return validateChapterFlexible(content, chapterNumber, genre);
 }
 
 export function createFullQCGating(

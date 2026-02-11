@@ -581,6 +581,7 @@ export interface IdeaGenerationPrompt {
   target_audience?: TargetAudience;
   include_tropes?: string[];
   exclude_tropes?: string[];
+  special_instructions?: string; // For quality improvement feedback
 }
 
 export interface BlueprintGenerationInput {

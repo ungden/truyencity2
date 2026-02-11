@@ -11,7 +11,6 @@ import {
   GenreType,
   StoryFactoryConfig,
   FactoryEvent,
-  QualityReport
 } from './types';
 import { BlueprintGenerator } from './blueprint-generator';
 import { ProductionPipeline, BatchManager, createProductionPipeline } from './production-pipeline';
@@ -27,7 +26,7 @@ export class IdeaGenerator {
    * Generate random story ideas based on genre
    */
   generateIdeas(genre: GenreType, count: number): StoryIdea[] {
-    const template = getGenreTemplate(genre);
+    getGenreTemplate(genre);
     const ideas: StoryIdea[] = [];
 
     const premises = this.getPremisesForGenre(genre);
@@ -338,8 +337,6 @@ export class StoryFactory {
       name = `Batch ${new Date().toISOString().split('T')[0]}`
     } = options;
 
-    console.log(`Creating batch with ${quantity} stories across genres: ${genres.join(', ')}`);
-
     // Generate ideas
     const ideasPerGenre = Math.ceil(quantity / genres.length);
     const allIdeas: StoryIdea[] = [];
@@ -353,7 +350,6 @@ export class StoryFactory {
     const selectedIdeas = allIdeas.slice(0, quantity);
 
     // Generate blueprints
-    console.log('Generating blueprints...');
     const blueprints: StoryBlueprint[] = [];
     for (const idea of selectedIdeas) {
       idea.estimatedChapters = targetChapters; // Override with target
@@ -362,7 +358,6 @@ export class StoryFactory {
     }
 
     // Create batch
-    console.log('Starting production...');
     const batch = await this.batchManager.createBatch(blueprints, name, dailyChaptersPerStory);
 
     await this.emitEvent({
@@ -430,7 +425,6 @@ export class StoryFactory {
     const jobs = this.pipeline.getAllJobs();
 
     // Calculate today's chapters
-    const today = new Date().toDateString();
     const chaptersToday = jobs.reduce((sum, job) => {
       // In real impl, track by date
       return sum + job.currentChapter;

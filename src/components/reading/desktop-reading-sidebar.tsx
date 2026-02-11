@@ -5,7 +5,6 @@ import Link from 'next/link';
 import {
   ChevronLeft,
   ChevronRight,
-  List,
   Home,
   BookOpen,
   Search,
@@ -95,6 +94,7 @@ export const DesktopReadingSidebar: React.FC<DesktopReadingSidebarProps> = ({
           size="icon"
           onClick={() => setSidebarState('expanded')}
           className="mb-2"
+          aria-label="Mở rộng thanh bên"
         >
           <ChevronRight size={18} />
         </Button>
@@ -108,12 +108,12 @@ export const DesktopReadingSidebar: React.FC<DesktopReadingSidebarProps> = ({
           <ChevronLeft size={14} />
         </Button>
         <div className="flex-1 flex flex-col items-center gap-2">
-          <Button variant="ghost" size="icon" asChild>
+          <Button variant="ghost" size="icon" asChild aria-label="Trang chủ">
             <Link href="/">
               <Home size={18} />
             </Link>
           </Button>
-          <Button variant="ghost" size="icon" asChild>
+          <Button variant="ghost" size="icon" asChild aria-label="Chi tiết truyện">
             <Link href={novelUrl}>
               <BookOpen size={18} />
             </Link>
@@ -125,6 +125,7 @@ export const DesktopReadingSidebar: React.FC<DesktopReadingSidebarProps> = ({
             size="icon"
             onClick={onPrevChapter}
             disabled={currentChapter <= 1}
+            aria-label="Chương trước"
           >
             <ChevronUp size={18} />
           </Button>
@@ -134,6 +135,7 @@ export const DesktopReadingSidebar: React.FC<DesktopReadingSidebarProps> = ({
             size="icon"
             onClick={onNextChapter}
             disabled={currentChapter >= totalChapters}
+            aria-label="Chương sau"
           >
             <ChevronDown size={18} />
           </Button>

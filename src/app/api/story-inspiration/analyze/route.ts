@@ -4,7 +4,6 @@ import { AIProviderType } from '@/lib/types/ai-providers';
 
 // POST: Start analysis job for a source story
 export async function POST(request: NextRequest) {
-  console.log('[ANALYZE API] Received request to analyze source story.');
   try {
     const { client, token } = createSupabaseFromAuthHeader(request);
     if (!client || !token) {
@@ -71,8 +70,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to create analysis job' }, { status: 500 });
     }
 
-    console.log(`[ANALYZE API] Created job ${job.id} for source story ${sourceStoryId}`);
-
     // Start analysis asynchronously
     (async () => {
       try {
@@ -89,7 +86,6 @@ export async function POST(request: NextRequest) {
         }
         
         await analyzer.analyzeSourceStory(sourceStoryId);
-        console.log(`[ANALYZE API] Analysis completed for job ${job.id}`);
       } catch (err) {
         console.error(`[ANALYZE API] Error in async analysis:`, err);
         const again = createSupabaseFromAuthHeader(request).client;

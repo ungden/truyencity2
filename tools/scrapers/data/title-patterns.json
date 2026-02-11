@@ -1,0 +1,233 @@
+{
+  "patterns": [
+    {
+      "pattern_id": "mystery_hook",
+      "pattern_type": "Mystery Hook",
+      "structure": "[Mystery Word] + [之] + [Title]",
+      "examples": [
+        "诡秘之主"
+      ],
+      "frequency": 1,
+      "avg_rating": 9.4,
+      "genres": [
+        "horror-mystery"
+      ],
+      "description": "Uses mystery/forbidden keywords to create intrigue and curiosity."
+    },
+    {
+      "pattern_id": "other",
+      "pattern_type": "Other",
+      "structure": "Mixed or Unique",
+      "examples": [
+        "夜的命名术"
+      ],
+      "frequency": 1,
+      "avg_rating": 9.2,
+      "genres": [
+        "urban-modern"
+      ],
+      "description": "Unique or mixed pattern not fitting standard categories."
+    },
+    {
+      "pattern_id": "location_title",
+      "pattern_type": "Location/World",
+      "structure": "[World/Location] + [Title]",
+      "examples": [
+        "遮天",
+        "完美世界",
+        "吞噬星空",
+        "九星霸体诀",
+        "牧神记"
+      ],
+      "frequency": 5,
+      "avg_rating": 9.1,
+      "genres": [
+        "huyen-huyen",
+        "sci-fi-apocalypse"
+      ],
+      "description": "Focuses on world or location names. Good for world-building emphasis."
+    },
+    {
+      "pattern_id": "action_object",
+      "pattern_type": "Action Verb",
+      "structure": "[Action Verb] + [Cosmic Object/Goal]",
+      "examples": [
+        "遮天",
+        "吞噬星空"
+      ],
+      "frequency": 2,
+      "avg_rating": 9.1,
+      "genres": [
+        "huyen-huyen",
+        "sci-fi-apocalypse"
+      ],
+      "description": "Strong action verbs combined with cosmic or grand objects. Conveys power and ambition."
+    },
+    {
+      "pattern_id": "occupation_title",
+      "pattern_type": "Occupation/Role",
+      "structure": "[Occupation] + [Title]",
+      "examples": [
+        "诡秘之主",
+        "全职高手",
+        "万古神帝",
+        "大王饶命",
+        "我师兄实在太稳健了"
+      ],
+      "frequency": 8,
+      "avg_rating": 8.9,
+      "genres": [
+        "horror-mystery",
+        "system-litrpg",
+        "tien-hiep",
+        "urban-modern",
+        "huyen-huyen"
+      ],
+      "description": "Highlights protagonist's role or occupation. Clear identity."
+    },
+    {
+      "pattern_id": "person_focused",
+      "pattern_type": "Character Focused",
+      "structure": "[Person/Character] + [Journey]",
+      "examples": [
+        "凡人修仙传",
+        "我师兄实在太稳健了",
+        "龙王传说"
+      ],
+      "frequency": 3,
+      "avg_rating": 8.9,
+      "genres": [
+        "tien-hiep",
+        "huyen-huyen"
+      ],
+      "description": "Centers on character (common person, protagonist). Relatable hook."
+    },
+    {
+      "pattern_id": "poetic_four_char",
+      "pattern_type": "Poetic Four Characters",
+      "structure": "[Verb] + [破/裂] + [Sky/Nature]",
+      "examples": [
+        "斗破苍穹"
+      ],
+      "frequency": 1,
+      "avg_rating": 8.9,
+      "genres": [
+        "huyen-huyen"
+      ],
+      "description": "Four-character poetic phrases with dynamic imagery. Classic Chinese style."
+    },
+    {
+      "pattern_id": "realm_title",
+      "pattern_type": "Realm/Title",
+      "structure": "[Realm/Title] (2-3 chars)",
+      "examples": [
+        "元尊",
+        "牧神记",
+        "圣墟"
+      ],
+      "frequency": 3,
+      "avg_rating": 8.8,
+      "genres": [
+        "huyen-huyen"
+      ],
+      "description": "Short, punchy realm or title words. Direct and memorable."
+    },
+    {
+      "pattern_id": "number_realm",
+      "pattern_type": "Number Emphasis",
+      "structure": "[Big Number] + [Realm/Title]",
+      "examples": [
+        "万古神帝",
+        "十方武圣"
+      ],
+      "frequency": 2,
+      "avg_rating": 8.8,
+      "genres": [
+        "tien-hiep"
+      ],
+      "description": "Uses large numbers (万/千/九) combined with realm/title words. Creates sense of epicness and time span."
+    },
+    {
+      "pattern_id": "emotion_realm",
+      "pattern_type": "Emotion/Power",
+      "structure": "[Emotion/Power] + [Realm]",
+      "examples": [
+        "武炼巅峰"
+      ],
+      "frequency": 1,
+      "avg_rating": 8.3,
+      "genres": [
+        "huyen-huyen"
+      ],
+      "description": "Emphasizes power level through emotion words (invincible, supreme, peak)."
+    }
+  ],
+  "insights": {
+    "most_common_patterns": [
+      "Occupation/Role (8 examples, avg 8.9★)",
+      "Location/World (5 examples, avg 9.1★)",
+      "Character Focused (3 examples, avg 8.9★)",
+      "Realm/Title (3 examples, avg 8.8★)",
+      "Action Verb (2 examples, avg 9.1★)"
+    ],
+    "highest_rated_patterns": [
+      "Mystery Hook (9.4★)",
+      "Other (9.2★)",
+      "Location/World (9.1★)",
+      "Action Verb (9.1★)",
+      "Occupation/Role (8.9★)"
+    ],
+    "genre_specific_patterns": {
+      "horror-mystery": [
+        "Mystery Hook",
+        "Occupation/Role"
+      ],
+      "urban-modern": [
+        "Other",
+        "Occupation/Role"
+      ],
+      "huyen-huyen": [
+        "Location/World",
+        "Action Verb",
+        "Occupation/Role",
+        "Character Focused",
+        "Poetic Four Characters",
+        "Realm/Title",
+        "Emotion/Power"
+      ],
+      "sci-fi-apocalypse": [
+        "Location/World",
+        "Action Verb"
+      ],
+      "system-litrpg": [
+        "Occupation/Role"
+      ],
+      "tien-hiep": [
+        "Occupation/Role",
+        "Character Focused",
+        "Number Emphasis"
+      ]
+    },
+    "keyword_frequency": {
+      "仙": 1,
+      "天": 1,
+      "界": 1,
+      "世": 1,
+      "吞噬": 1,
+      "星": 2,
+      "主": 1,
+      "秘": 1,
+      "诡": 1,
+      "万": 1,
+      "帝": 1,
+      "神": 4,
+      "九": 1,
+      "尊": 1,
+      "王": 2,
+      "圣": 2,
+      "师": 2,
+      "巅峰": 1,
+      "十": 1
+    }
+  }
+}

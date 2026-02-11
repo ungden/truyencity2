@@ -3,7 +3,7 @@
  * Manages chat-based writing sessions similar to Claude Code CLI
  */
 
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { type SupabaseClient } from '@supabase/supabase-js';
 import { AIProviderService } from './ai-provider';
 import { AIStoryWriter } from './_legacy/ai-story-writer';
 import { createDopamineOptimizer } from './dopamine-writing-optimizer';

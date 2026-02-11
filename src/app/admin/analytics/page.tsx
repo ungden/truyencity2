@@ -6,7 +6,6 @@ import {
   BookOpen,
   Eye,
   Clock,
-  Star,
   Activity,
   BarChart3
 } from 'lucide-react';

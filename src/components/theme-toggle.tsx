@@ -36,6 +36,7 @@ export const ThemeToggle: React.FC = () => {
             )}
             onClick={() => setTheme(value)}
             title={label}
+            aria-label={label}
           >
             <Icon size={14} className="shrink-0" />
             {active && (

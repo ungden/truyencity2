@@ -6,7 +6,6 @@
 import {
   GenreTemplate,
   GenreType,
-  ArcTemplate,
   ProtagonistTemplate,
   AntagonistTemplate,
   PowerSystemTemplate,

@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
+  // Only available in development
+  if (process.env.NODE_ENV !== 'development') {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
+
   // Require CRON_SECRET to prevent unauthorized access
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;

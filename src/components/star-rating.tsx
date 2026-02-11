@@ -146,6 +146,7 @@ export function StarRating({ novelId, initialScore, onRated, size = 'lg', classN
             onMouseEnter={() => setHovered(starNum)}
             onMouseLeave={() => setHovered(null)}
             onClick={() => handleRate(starNum)}
+            aria-label={`Đánh giá ${starNum} sao`}
           >
             <Star
               size={iconSize}

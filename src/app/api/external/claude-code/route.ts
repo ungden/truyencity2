@@ -1,6 +1,7 @@
 import { createServerClient } from '@/integrations/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { createHash } from 'crypto';
+import type { z } from 'zod';
 import {
   rateLimiter,
   RATE_LIMIT_CONFIGS,
@@ -17,12 +18,40 @@ import {
 } from '@/lib/security/validation';
 import { logger, getRequestContext, createTimer } from '@/lib/security/logger';
 
+type SupabaseServerClient = Awaited<ReturnType<typeof createServerClient>>;
+
+type ValidatedExternalBody = z.infer<typeof ExternalAPISchema>;
+type SubmitChapterBody = Extract<ValidatedExternalBody, { action: 'submit_chapter' }>;
+
+interface AIStoryProjectRow {
+  id: string;
+  novel_id: string;
+  genre: string;
+  main_character: string;
+  current_chapter: number;
+  target_chapter_length?: number | null;
+  cultivation_system?: string | null;
+  magic_system?: string | null;
+  world_description?: string | null;
+  writing_style?: string | null;
+  novel?: {
+    title?: string | null;
+    description?: string | null;
+  } | null;
+}
+
+interface ChapterRow {
+  chapter_number: number;
+  title: string | null;
+  content: string | null;
+}
+
 // External API for Claude Code Integration
 // Allows Claude Code CLI to submit chapters using API token
 // NOTE: Credentials moved to environment variables for security
 
 // Verify API token and get user
-async function verifyToken(supabase: any, authHeader: string | null): Promise<string | null> {
+async function verifyToken(supabase: SupabaseServerClient, authHeader: string | null): Promise<string | null> {
   if (!authHeader || !authHeader.startsWith('Bearer tc_')) {
     return null;
   }
@@ -157,7 +186,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Validate input
-    let validatedBody;
+    let validatedBody: ValidatedExternalBody;
     try {
       validatedBody = validateInput(ExternalAPISchema, body);
     } catch (err) {
@@ -191,7 +220,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function getProjects(supabase: any, userId: string) {
+async function getProjects(supabase: SupabaseServerClient, userId: string) {
   const { data: projects, error } = await supabase
     .from('ai_story_projects')
     .select(`
@@ -227,7 +256,7 @@ async function getProjects(supabase: any, userId: string) {
   });
 }
 
-async function getContext(supabase: any, userId: string, projectId: string) {
+async function getContext(supabase: SupabaseServerClient, userId: string, projectId: string) {
   // Get project
   const { data: project, error: projectError } = await supabase
     .from('ai_story_projects')
@@ -239,7 +268,9 @@ async function getContext(supabase: any, userId: string, projectId: string) {
     .eq('user_id', userId)
     .single();
 
-  if (projectError || !project) {
+  const typedProject = project as unknown as AIStoryProjectRow | null;
+
+  if (projectError || !typedProject) {
     return NextResponse.json({ error: 'Project not found' }, { status: 404 });
   }
 
@@ -247,7 +278,7 @@ async function getContext(supabase: any, userId: string, projectId: string) {
   const { data: recentChapters } = await supabase
     .from('chapters')
     .select('chapter_number, title, content')
-    .eq('novel_id', project.novel_id)
+    .eq('novel_id', typedProject.novel_id)
     .order('chapter_number', { ascending: false })
     .limit(3);
 
@@ -259,33 +290,33 @@ async function getContext(supabase: any, userId: string, projectId: string) {
     .order('chapter_number', { ascending: false })
     .limit(5);
 
-  const nextChapter = project.current_chapter + 1;
+  const nextChapter = typedProject.current_chapter + 1;
 
   return NextResponse.json({
     project: {
-      id: project.id,
-      novelTitle: project.novel?.title,
-      genre: project.genre,
-      mainCharacter: project.main_character,
-      cultivationSystem: project.cultivation_system,
-      magicSystem: project.magic_system,
-      worldDescription: project.world_description,
-      writingStyle: project.writing_style,
-      targetLength: project.target_chapter_length || 2500,
-      currentChapter: project.current_chapter,
+      id: typedProject.id,
+      novelTitle: typedProject.novel?.title,
+      genre: typedProject.genre,
+      mainCharacter: typedProject.main_character,
+      cultivationSystem: typedProject.cultivation_system,
+      magicSystem: typedProject.magic_system,
+      worldDescription: typedProject.world_description,
+      writingStyle: typedProject.writing_style,
+      targetLength: typedProject.target_chapter_length || 2500,
+      currentChapter: typedProject.current_chapter,
       nextChapter: nextChapter,
     },
-    recentChapters: (recentChapters || []).reverse().map((ch: any) => ({
+    recentChapters: ((recentChapters as unknown as ChapterRow[]) || []).reverse().map((ch) => ({
       number: ch.chapter_number,
       title: ch.title,
-      summary: ch.content?.substring(0, 300) + '...',
+      summary: (ch.content?.substring(0, 300) || '') + '...',
     })),
     storyGraph: (storyGraph || []).reverse(),
-    prompt: buildPromptForClaude(project, nextChapter, recentChapters || []),
+    prompt: buildPromptForClaude(typedProject, nextChapter, ((recentChapters as unknown as ChapterRow[]) || [])),
   });
 }
 
-async function submitChapter(supabase: any, userId: string, body: any) {
+async function submitChapter(supabase: SupabaseServerClient, userId: string, body: SubmitChapterBody) {
   const { projectId, title, content, chapterNumber } = body;
 
   if (!projectId || !content) {
@@ -313,7 +344,7 @@ async function submitChapter(supabase: any, userId: string, body: any) {
     chapterTitle = titleMatch ? titleMatch[1].trim() : `Chương ${nextChapter}`;
   }
 
-  // Clean content (remove markdown if any)
+  // Clean content (remove markdown if present)
   const cleanContent = content
     .replace(/^Chương\s*\d+[:\s]*.+?[\n\r]+/i, '') // Remove title line
     .replace(/\*\*/g, '')
@@ -371,7 +402,7 @@ async function submitChapter(supabase: any, userId: string, body: any) {
   });
 }
 
-async function getWritingPrompt(supabase: any, userId: string, projectId: string) {
+async function getWritingPrompt(supabase: SupabaseServerClient, userId: string, projectId: string) {
   const contextResponse = await getContext(supabase, userId, projectId);
   const context = await contextResponse.json();
 
@@ -394,7 +425,7 @@ POST /api/external/claude-code
   });
 }
 
-function buildPromptForClaude(project: any, nextChapter: number, recentChapters: any[]): string {
+function buildPromptForClaude(project: AIStoryProjectRow, nextChapter: number, recentChapters: ChapterRow[]): string {
   let prompt = `Viết Chương ${nextChapter} cho tiểu thuyết "${project.novel?.title}".
 
 **Thông tin cơ bản:**

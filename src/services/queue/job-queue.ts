@@ -70,7 +70,7 @@ const RETRY_DELAYS = [
 ];
 
 class JobQueue {
-  private processingJobs: Map<string, NodeJS.Timeout> = new Map();
+  private processingJobs: Map<string, ReturnType<typeof setTimeout>> = new Map();
 
   /**
    * Create a new job

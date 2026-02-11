@@ -98,27 +98,27 @@ export function OnboardingWizard({ onComplete, onSkip }: OnboardingWizardProps) 
               <Sparkles className="w-10 h-10 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold mb-2">Chào mừng đến với TruyenCity AI</h2>
+              <h2 className="text-2xl font-bold mb-2">Chào mừng đến với TruyenCity</h2>
               <p className="text-muted-foreground">
-                Nền tảng viết truyện tự động bằng AI hàng đầu Việt Nam.
-                Hãy để chúng tôi giúp bạn tạo dự án đầu tiên!
+                Nền tảng đọc truyện tiên tiến nhất của người Việt cho người Việt.
+                Hãy để chúng tôi giúp bạn thiết lập trải nghiệm đọc tốt nhất!
               </p>
             </div>
             <div className="grid grid-cols-3 gap-4 pt-4">
               <div className="p-4 bg-muted rounded-lg">
                 <BookOpen className="w-8 h-8 mx-auto mb-2 text-blue-500" />
-                <p className="text-sm font-medium">7 thể loại</p>
-                <p className="text-xs text-muted-foreground">Đa dạng phong cách</p>
+                <p className="text-sm font-medium">Kho truyện khổng lồ</p>
+                <p className="text-xs text-muted-foreground">Đa dạng thể loại</p>
               </div>
               <div className="p-4 bg-muted rounded-lg">
                 <Sparkles className="w-8 h-8 mx-auto mb-2 text-purple-500" />
-                <p className="text-sm font-medium">AI thông minh</p>
-                <p className="text-xs text-muted-foreground">Viết tự động</p>
+                <p className="text-sm font-medium">Đọc miễn phí</p>
+                <p className="text-xs text-muted-foreground">Không giới hạn</p>
               </div>
               <div className="p-4 bg-muted rounded-lg">
                 <Rocket className="w-8 h-8 mx-auto mb-2 text-pink-500" />
-                <p className="text-sm font-medium">3 chương/ngày</p>
-                <p className="text-xs text-muted-foreground">Miễn phí</p>
+                <p className="text-sm font-medium">Cập nhật liên tục</p>
+                <p className="text-xs text-muted-foreground">Chương mới mỗi ngày</p>
               </div>
             </div>
           </div>

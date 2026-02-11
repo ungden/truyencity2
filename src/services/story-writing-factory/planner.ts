@@ -286,14 +286,10 @@ Trả về JSON:
 
         if (!response.success || !response.content) {
           lastError = response.error || 'Empty response';
-          console.warn(`[Planner] Arc ${input.arcNumber} attempt ${attempt + 1} failed: ${lastError}`);
           continue; // Retry
         }
 
         // Check for truncated response
-        if (response.finishReason && response.finishReason !== 'STOP' && response.finishReason !== 'stop') {
-          console.warn(`[Planner] Arc ${input.arcNumber} attempt ${attempt + 1} truncated (finishReason=${response.finishReason}), maxTokens=${currentMaxTokens}`);
-        }
 
         const parsed = this.parseJSON<ArcOutline>(response.content);
 
@@ -309,7 +305,6 @@ Trả về JSON:
         return { success: true, data: parsed };
       } catch (error) {
         lastError = error instanceof Error ? error.message : 'Unknown error';
-        console.warn(`[Planner] Arc ${input.arcNumber} attempt ${attempt + 1}/${maxRetries} failed: ${lastError}`);
         // Continue to next attempt
       }
     }
@@ -519,7 +514,6 @@ Trả về JSON:
     // Final trailing comma cleanup
     repaired = repaired.replace(/,\s*}/g, '}').replace(/,\s*]/g, ']');
 
-    console.warn(`[Planner] Repaired truncated JSON (added closing brackets/braces)`);
     return repaired;
   }
 }

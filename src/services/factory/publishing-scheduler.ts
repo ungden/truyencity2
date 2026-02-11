@@ -6,12 +6,10 @@
 import { createClient } from '@supabase/supabase-js';
 import {
   ChapterPublishQueueItem,
-  ProductionQueueItem,
   ServiceResult,
   BatchResult,
   PublishSlot,
   DEFAULT_PUBLISH_SLOTS,
-  PublishSlotConfig,
 } from './types';
 
 // Vietnam timezone helpers (UTC+7, no DST)

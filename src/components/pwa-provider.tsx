@@ -89,7 +89,6 @@ export function PWAProvider({ children }: { children: ReactNode }) {
         scope: '/',
       });
       setSwRegistration(registration);
-      console.log('[PWA] Service Worker registered:', registration.scope);
 
       // Check for push subscription
       const subscription = await registration.pushManager.getSubscription();
@@ -127,13 +126,13 @@ export function PWAProvider({ children }: { children: ReactNode }) {
 
     switch (type) {
       case 'JOB_QUEUED':
-        toast.success('Đã xếp hàng viết chương trong nền');
+        toast.success('Đã thêm vào hàng đợi xử lý trong nền');
         break;
       case 'JOB_STATUS_UPDATE':
         if (payload.job?.status === 'completed') {
-          toast.success(`Viết xong chương ${payload.job.chapter_number}!`);
+          toast.success(`Hoàn thành chương ${payload.job.chapter_number}!`);
         } else if (payload.job?.status === 'failed') {
-          toast.error(`Viết chương thất bại: ${payload.job.error_message}`);
+          toast.error(`Xử lý chương thất bại: ${payload.job.error_message}`);
         }
         break;
     }
@@ -171,7 +170,6 @@ export function PWAProvider({ children }: { children: ReactNode }) {
       // Get VAPID public key from server
       const response = await fetch('/api/push/vapid-public-key');
       if (!response.ok) {
-        console.log('[PWA] VAPID key not configured');
         return null;
       }
       const { publicKey } = await response.json();
@@ -226,7 +224,6 @@ export function PWAProvider({ children }: { children: ReactNode }) {
       if ('sync' in swRegistration) {
         // @ts-ignore
         await swRegistration.sync.register('sync-writing-jobs');
-        console.log('[PWA] Background sync registered');
       }
 
       // Try periodic sync for long-running jobs
@@ -241,7 +238,6 @@ export function PWAProvider({ children }: { children: ReactNode }) {
           await swRegistration.periodicSync.register('check-writing-jobs', {
             minInterval: 60 * 1000, // Check every minute
           });
-          console.log('[PWA] Periodic sync registered');
         }
       }
     } catch (error) {

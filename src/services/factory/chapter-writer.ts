@@ -9,12 +9,10 @@ import {
   StoryBlueprint,
   ProductionQueueItem,
   ChapterWriteQueueItem,
-  AIAuthorProfile,
   ChapterGenerationInput,
   ChapterQualityCheckInput,
   ChapterQualityResult,
   ServiceResult,
-  FactoryGenre,
   ArcOutline,
   PlotPoint,
 } from './types';

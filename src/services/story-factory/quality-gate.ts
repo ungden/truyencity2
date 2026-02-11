@@ -32,7 +32,6 @@ export class ContentAnalyzer {
    * Analyze chapter content and extract metrics
    */
   analyzeContent(content: string): QualityMetrics {
-    const lines = content.split('\n').filter(l => l.trim());
     const words = content.split(/\s+/).filter(w => w.trim());
     const sentences = content.split(/[.!?。！？]+/).filter(s => s.trim());
 

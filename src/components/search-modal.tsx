@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, X, Clock, TrendingUp, Filter, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -190,6 +190,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                 size="sm"
                 className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 rounded-lg hover:bg-accent"
                 onClick={clearSearch}
+                aria-label="Xóa tìm kiếm"
               >
                 <X size={16} />
               </Button>

@@ -51,7 +51,7 @@ export const DesktopSidebar = () => {
           <div className="relative w-9 h-9 rounded-lg overflow-hidden">
             <Image src="/icons/icon-192x192.png" alt="TruyenCity" fill sizes="36px" className="object-cover" />
           </div>
-          <span className="text-lg font-semibold">Truyện City</span>
+          <span className="text-lg font-semibold">TruyenCity</span>
         </Link>
       </div>
 

@@ -73,8 +73,6 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    console.log(`[CoverCron] Processing ${novels.length} novels without covers...`);
-
     const results: Array<{
       id: string;
       title: string;
@@ -101,8 +99,6 @@ export async function GET(request: NextRequest) {
         if (!coverPrompt.toLowerCase().includes('truyencity')) {
           coverPrompt += `\n\nIMPORTANT: At the bottom-center of the cover, include small text: "Truyencity.com". No other text besides the title and Truyencity.com. No watermarks or signatures besides Truyencity.com.`;
         }
-        console.log(`[CoverCron] Using saved prompt for: ${title.slice(0, 40)}`);
-
         const result = await imageService.generateImage({
           prompt: coverPrompt,
           negativePrompt: 'watermark, signature, blurry, low quality, distorted, deformed',
@@ -118,7 +114,6 @@ export async function GET(request: NextRequest) {
             coverUrl = uploadResult.data.publicUrl;
           }
         } else if (result.errorCode === 'IMAGE_SAFETY_BLOCK') {
-          console.log(`[CoverCron] Safety block, retrying with sanitized prompt...`);
           const fallback = await imageService.generateCoverWithUpload(
             title, genre, desc, { bucket: 'covers', maxRetries: 2 }
           );
@@ -127,7 +122,6 @@ export async function GET(request: NextRequest) {
           }
         }
       } else {
-        console.log(`[CoverCron] Generating cover for: ${title.slice(0, 40)}`);
         const result = await imageService.generateCoverWithUpload(
           title, genre, desc, { bucket: 'covers', maxRetries: 2 }
         );
@@ -144,7 +138,6 @@ export async function GET(request: NextRequest) {
         if (updateErr) {
           return { id: novel.id, title, success: false, error: `DB update failed: ${updateErr.message}` };
         }
-        console.log(`[CoverCron] OK: ${title.slice(0, 40)}`);
         return { id: novel.id, title, success: true };
       }
       return { id: novel.id, title, success: false, error: 'Image generation failed' };
@@ -154,7 +147,6 @@ export async function GET(request: NextRequest) {
     for (let i = 0; i < novels.length; i += PARALLEL_CONCURRENCY) {
       // Check time budget: stop if we've used > 260s (leave 40s buffer)
       if (Date.now() - startTime > 260_000) {
-        console.log(`[CoverCron] Time budget exceeded, stopping at ${results.length}/${novels.length}`);
         break;
       }
 
@@ -185,8 +177,6 @@ export async function GET(request: NextRequest) {
       .from('novels')
       .select('*', { count: 'exact', head: true })
       .is('cover_url', null);
-
-    console.log(`[CoverCron] Done in ${duration.toFixed(1)}s. OK: ${succeeded}, Failed: ${failed}, Remaining: ${remaining || '?'}`);
 
     return NextResponse.json({
       success: true,

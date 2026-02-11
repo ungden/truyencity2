@@ -40,6 +40,7 @@ export function LatestUpdatesCarousel({ novels }: LatestUpdatesCarouselProps) {
           disabled={!canPrev}
           onClick={() => setPageIndex(p => p - 1)}
           className="w-8 h-8 rounded-full border border-border flex items-center justify-center hover:bg-accent transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          aria-label="Trang trước"
         >
           <ChevronLeft size={16} />
         </button>
@@ -50,6 +51,7 @@ export function LatestUpdatesCarousel({ novels }: LatestUpdatesCarouselProps) {
           disabled={!canNext}
           onClick={() => setPageIndex(p => p + 1)}
           className="w-8 h-8 rounded-full border border-border flex items-center justify-center hover:bg-accent transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          aria-label="Trang sau"
         >
           <ChevronRight size={16} />
         </button>

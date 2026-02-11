@@ -190,11 +190,6 @@ export async function GET(request: NextRequest) {
     const totalPaused = authorStats.reduce((sum, s) => sum + s.pausedProjectIds.length, 0);
     const duration = (Date.now() - startTime) / 1000;
 
-    console.log(
-      `[DailyRotate] Done in ${duration.toFixed(1)}s. ` +
-      `Backfilled: ${backfilled}, Expanded: ${expanded}, Total activated: ${totalActivated}. ` +
-      `Active: ${totalActive}, Paused remaining: ${totalPaused}`
-    );
 
     return NextResponse.json({
       success: true,

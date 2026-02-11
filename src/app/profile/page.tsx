@@ -20,7 +20,6 @@ import {
   ChevronRight,
   Shield
 } from 'lucide-react';
-import { useReading } from '@/contexts/reading-context';
 import { supabase } from '@/integrations/supabase/client';
 import { useRouter } from 'next/navigation';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
@@ -67,7 +66,6 @@ const menuItems = [
 ];
 
 export default function ProfilePage() {
-  const { settings, history, bookmarks: localBookmarks } = useReading();
   const router = useRouter();
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [profile, setProfile] = useState<{ role: string } | null>(null);
@@ -78,11 +76,15 @@ export default function ProfilePage() {
   const [chaptersRead, setChaptersRead] = useState<number>(0);
   const [bookmarksCount, setBookmarksCount] = useState<number>(0);
   const [readingCount, setReadingCount] = useState<number>(0);
-  const [completedCount, setCompletedCount] = useState<number>(0);
+  const [, setCompletedCount] = useState<number>(0);
 
   useEffect(() => {
+    let cancelled = false;
+
     const getUserData = async () => {
       const { data: { user } } = await supabase.auth.getUser();
+      if (cancelled) return;
+
       if (user) {
         setUser(user);
         const { data: profileData } = await supabase
@@ -91,6 +93,7 @@ export default function ProfilePage() {
           .eq('id', user.id)
           .single();
         
+        if (cancelled) return;
         if (profileData) setProfile(profileData);
 
         // Fetch stats in parallel
@@ -108,6 +111,8 @@ export default function ProfilePage() {
           supabase.from('reading_progress').select('*', { count: 'exact', head: true }).eq('user_id', user.id).gte('position_percent', 100),
         ]);
 
+        if (cancelled) return;
+
         const sumSeconds = (sessionsRes.data || []).reduce((acc, r: any) => acc + (Number(r.duration_seconds) || 0), 0);
         setTotalSeconds(sumSeconds);
         setChaptersRead(chapterReadsCountRes.count || 0);
@@ -115,11 +120,16 @@ export default function ProfilePage() {
         setReadingCount((readingRes.data || []).map((r: any) => r.novel_id).filter(Boolean).length);
         setCompletedCount(completedRes.count || 0);
       } else {
-        router.push('/login');
+        if (!cancelled) router.push('/login');
       }
-      setLoading(false);
+      if (!cancelled) setLoading(false);
     };
+
     getUserData();
+
+    return () => {
+      cancelled = true;
+    };
   }, [router]);
 
   const handleLogout = async () => {

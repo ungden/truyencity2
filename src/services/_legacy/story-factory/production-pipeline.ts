@@ -259,7 +259,7 @@ export class ProductionPipeline {
   private eventHandlers: Array<(event: FactoryEvent) => Promise<void>> = [];
   private config: StoryFactoryConfig;
   private isRunning: boolean = false;
-  private processInterval: NodeJS.Timeout | null = null;
+  private processInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor(config: StoryFactoryConfig) {
     this.config = config;

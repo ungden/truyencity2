@@ -10,6 +10,7 @@
 
 import crypto from 'crypto';
 import { getSupabase } from './supabase-helper';
+import { logger } from '@/lib/security/logger';
 
 // Model tiers for different tasks
 export interface ModelTier {
@@ -209,7 +210,11 @@ export class CostCache {
         }, {
           onConflict: 'project_id,text_hash',
         })
-    ).catch((e: Error) => console.warn('Failed to persist embedding cache:', e));
+    ).catch((e) => logger.debug('embedding_cache upsert failed (non-fatal)', {
+      projectId: this.projectId,
+      operation: 'cacheEmbedding',
+      error: e instanceof Error ? e.message : String(e),
+    }));
   }
 
   /**
@@ -322,7 +327,11 @@ export class CostCache {
           output_tokens: outputTokens,
           cost,
         })
-    ).catch((e: Error) => console.warn('Failed to persist cost:', e));
+    ).catch((e) => logger.debug('cost_tracking insert failed (non-fatal)', {
+      projectId: this.projectId,
+      operation: 'recordCost',
+      error: e instanceof Error ? e.message : String(e),
+    }));
 
     // Check budget
     const todayCost = this.getTodayCost();
@@ -452,12 +461,10 @@ export class CostCache {
 
 // Batch summarization helper
 export class BatchSummarizer {
-  private projectId: string;
   private pendingSummaries: Map<number, string> = new Map();
   private summarizedArcs: Set<number> = new Set();
 
-  constructor(projectId: string) {
-    this.projectId = projectId;
+  constructor(_projectId: string) {
   }
 
   /**

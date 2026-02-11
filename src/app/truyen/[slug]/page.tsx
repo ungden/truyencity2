@@ -10,11 +10,9 @@ import {
   Calendar,
   Tag,
   BookOpen,
-  Heart,
   Share2,
   ChevronRight,
   Bookmark,
-  MessageSquare
 } from 'lucide-react';
 import { createServerClient } from '@/integrations/supabase/server';
 import { notFound, redirect } from 'next/navigation';
@@ -81,11 +79,11 @@ export async function generateMetadata({
     .single();
 
   if (!novel) {
-    return { title: 'Truyện không tồn tại - Truyện City' };
+    return { title: 'Truyện không tồn tại - TruyenCity' };
   }
 
-  const title = `${novel.title} - ${novel.author || 'Truyện City'}`;
-  const description = cleanNovelDescription(novel.description).slice(0, 160) || `Đọc ${novel.title} miễn phí tại Truyện City`;
+  const title = `${novel.title} - ${novel.author || 'TruyenCity'}`;
+  const description = cleanNovelDescription(novel.description).slice(0, 160) || `Đọc ${novel.title} miễn phí tại TruyenCity`;
 
   return {
     title,

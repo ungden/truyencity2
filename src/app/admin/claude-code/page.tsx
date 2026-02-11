@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
@@ -79,7 +79,33 @@ export default function AIAgentWriterPage() {
   const [selectedModel, setSelectedModel] = useState(AI_PROVIDERS['gemini'].defaultModel);
 
   useEffect(() => {
-    fetchProjects();
+    let cancelled = false;
+    
+    const loadProjects = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session || cancelled) return;
+
+        const response = await fetch('/api/ai-writer/projects', {
+          headers: { 'Authorization': `Bearer ${session.access_token}` },
+        });
+
+        if (response.ok && !cancelled) {
+          const data = await response.json();
+          setProjects(data.projects || []);
+          if (data.projects?.length > 0 && !selectedProject) {
+            setSelectedProject(data.projects[0].id);
+          }
+        }
+      } catch (error) {
+        if (!cancelled) console.error('Error fetching projects:', error);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    
+    loadProjects();
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {

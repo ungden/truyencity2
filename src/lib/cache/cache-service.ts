@@ -48,12 +48,12 @@ export type CacheKey =
 class CacheService {
   private cache: Map<string, CacheEntry<unknown>> = new Map();
   private stats = { hits: 0, misses: 0 };
-  private cleanupInterval: NodeJS.Timeout | null = null;
+  private cleanupInterval: ReturnType<typeof setInterval> | null = null;
   private maxSize: number = 1000; // Maximum cache entries
 
   constructor() {
     // Cleanup expired entries every minute
-    if (typeof setInterval !== 'undefined') {
+    if (process.env.NODE_ENV !== 'test' && typeof setInterval !== 'undefined') {
       this.cleanupInterval = setInterval(() => this.cleanup(), 60 * 1000);
     }
   }

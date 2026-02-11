@@ -32,6 +32,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -42,3 +43,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# AI/Editor tool directories (IDE plugins, code assistants)
+.agent/
+.agents/
+.claude/skills/
+.codebuddy/
+.cursor/
+.opencode/
+.trae/
+.windsurf/
+
+# Mobile app (separate project with own git tracking)
+/mobile/

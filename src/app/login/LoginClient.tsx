@@ -31,15 +31,21 @@ export default function LoginClient() {
         
         if (error) {
           console.error('Auth error:', error);
-          // Clear everything and continue to login
-          localStorage.clear();
-          sessionStorage.clear();
+          // Clear only Supabase auth tokens, not all user data
+          try {
+            const keysToRemove = Object.keys(localStorage).filter(
+              key => key.startsWith('sb-') || key.startsWith('supabase.')
+            );
+            keysToRemove.forEach(key => localStorage.removeItem(key));
+            sessionStorage.clear();
+          } catch {
+            // Ignore storage errors
+          }
           setLoading(false);
           return;
         }
 
         if (session?.user && mounted) {
-          console.log('Already logged in, checking role...');
           
           // If redirecting to admin, check role first
           if (redirectTo.startsWith('/admin')) {
@@ -53,7 +59,6 @@ export default function LoginClient() {
               if (profile?.role === 'admin') {
                 router.push(redirectTo);
               } else {
-                console.log('User is not admin');
                 router.push('/?error=unauthorized');
               }
             } catch (error) {
@@ -69,9 +74,16 @@ export default function LoginClient() {
         setLoading(false);
       } catch (error) {
         console.error('Initial auth check failed:', error);
-        // Clear everything and continue to login
-        localStorage.clear();
-        sessionStorage.clear();
+        // Clear only Supabase auth tokens, not all user data
+        try {
+          const keysToRemove = Object.keys(localStorage).filter(
+            key => key.startsWith('sb-') || key.startsWith('supabase.')
+          );
+          keysToRemove.forEach(key => localStorage.removeItem(key));
+          sessionStorage.clear();
+        } catch {
+          // Ignore storage errors
+        }
         setLoading(false);
       }
     };
@@ -79,10 +91,7 @@ export default function LoginClient() {
     checkInitialAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event, !!session);
-      
       if (event === 'SIGNED_IN' && session && mounted) {
-        console.log('User signed in, redirecting to:', redirectTo);
         
         // If redirecting to admin, check role first
         if (redirectTo.startsWith('/admin')) {
@@ -96,7 +105,6 @@ export default function LoginClient() {
             if (profile?.role === 'admin') {
               router.push(redirectTo);
             } else {
-              console.log('User is not admin, redirecting to home');
               router.push('/?error=unauthorized');
             }
           } catch (error) {
@@ -109,7 +117,6 @@ export default function LoginClient() {
       }
       
       if (event === 'SIGNED_OUT' && mounted) {
-        console.log('User signed out');
         setLoading(false);
       }
     });
@@ -138,12 +145,9 @@ export default function LoginClient() {
       </Button>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Chào mừng trở lại</CardTitle>
+          <CardTitle className="text-2xl">Chào mừng đến TruyenCity</CardTitle>
           <CardDescription>
-            {redirectTo.startsWith('/admin') 
-              ? 'Đăng nhập để truy cập bảng quản trị' 
-              : 'Đăng nhập để tiếp tục đọc truyện'
-            }
+            Đăng nhập để lưu tiến trình đọc và đồng bộ tủ sách của bạn
           </CardDescription>
         </CardHeader>
         <CardContent>

@@ -5,7 +5,6 @@ import Link from 'next/link';
 import {
   Home,
   BookOpen,
-  Settings,
   Bookmark,
   ChevronLeft,
   ChevronRight,
@@ -14,7 +13,6 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ReadingSettings from '@/components/reading-settings';
-import { cn } from '@/lib/utils';
 
 interface DesktopReadingHeaderProps {
   novelId: string;
@@ -104,6 +102,7 @@ export const DesktopReadingHeader: React.FC<DesktopReadingHeaderProps> = ({
           size="icon"
           onClick={onBookmark}
           className="h-9 w-9"
+          aria-label={isBookmarked ? "Bỏ đánh dấu" : "Đánh dấu trang"}
         >
           <Bookmark
             size={18}
@@ -118,6 +117,7 @@ export const DesktopReadingHeader: React.FC<DesktopReadingHeaderProps> = ({
           size="icon"
           onClick={onToggleFullscreen}
           className="h-9 w-9"
+          aria-label={isFullscreen ? "Thoát toàn màn hình" : "Toàn màn hình"}
         >
           {isFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
         </Button>

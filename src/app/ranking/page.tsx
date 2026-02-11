@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import { Header } from '@/components/header';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { StarDisplay } from '@/components/star-rating';
 import { Crown, TrendingUp, Star, BookOpen, Eye, Heart, Clock } from 'lucide-react';
@@ -53,8 +53,12 @@ const RankingCard = ({
 
   return (
     <div
-      className="flex items-center gap-4 p-4 bg-card rounded-xl border border-border/50 hover:border-primary/30 hover:bg-accent/50 transition-all duration-200 cursor-pointer"
+      className="flex items-center gap-4 p-4 bg-card rounded-xl border border-border/50 hover:border-primary/30 hover:bg-accent/50 transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      role="button"
+      tabIndex={0}
       onClick={onClick}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick?.(); } }}
+      aria-label={novel.title}
     >
       <div className="flex-shrink-0">
         {getRankDisplay(novel.rank)}

@@ -12,6 +12,7 @@
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { AIProviderService } from '../ai-provider';
+import { logger } from '@/lib/security/logger';
 
 // Lazy initialization to avoid build-time errors
 let _supabase: SupabaseClient | null = null;
@@ -354,7 +355,9 @@ Có mâu thuẫn tính cách không?`,
             }
           }
         } catch (e) {
-          // JSON parse error - ignore
+          logger.debug('Trait check JSON parse failed (non-fatal)', {
+            error: e instanceof Error ? e.message : String(e),
+          });
         }
       }
     } catch (error) {

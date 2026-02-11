@@ -1,8 +1,15 @@
+import { Metadata } from 'next';
 import Link from 'next/link';
 import { Header } from '@/components/header';
 import { Card } from '@/components/ui/card';
 import { GENRE_CONFIG } from '@/lib/types/genre-config';
 import { createServerClient } from '@/integrations/supabase/server';
+
+export const metadata: Metadata = {
+  title: "Thể Loại Truyện",
+  description: "Duyệt truyện theo thể loại: tiên hiệp, huyền huyễn, đô thị, ngôn tình, kiếm hiệp, khoa huyễn và nhiều hơn nữa.",
+  alternates: { canonical: "/genres" },
+};
 
 export const dynamic = 'force-dynamic';
 

@@ -19,9 +19,7 @@ import {
   getGenreTemplate,
   getRandomProtagonist,
   getRandomAntagonist,
-  getPowerSystem,
-  PROTAGONIST_TEMPLATES,
-  ANTAGONIST_TEMPLATES
+  getPowerSystem
 } from './genre-templates';
 
 // Vietnamese name generators
@@ -64,6 +62,7 @@ export class BlueprintGenerator {
 
   constructor(aiProvider?: any) {
     this.aiProvider = aiProvider;
+    void this.aiProvider;
   }
 
   /**
@@ -71,7 +70,7 @@ export class BlueprintGenerator {
    */
   async generateBlueprint(idea: StoryIdea): Promise<StoryBlueprint> {
     const genre = idea.genre;
-    const template = getGenreTemplate(genre);
+    void getGenreTemplate(genre);
 
     // Generate all components
     const protagonist = this.generateProtagonist(genre, idea);
@@ -151,8 +150,6 @@ export class BlueprintGenerator {
   private generateAntagonists(genre: GenreType, idea: StoryIdea, count: number): GeneratedCharacter[] {
     const antagonists: GeneratedCharacter[] = [];
     const isCultivation = ['tien-hiep', 'huyen-huyen', 'kiem-hiep'].includes(genre);
-
-    const threatLevels: Array<'minor' | 'arc_boss' | 'major' | 'final'> = ['minor', 'arc_boss', 'major'];
 
     for (let i = 0; i < count; i++) {
       const template = getRandomAntagonist(genre);

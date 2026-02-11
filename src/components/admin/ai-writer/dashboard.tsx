@@ -10,8 +10,6 @@ import { Label } from '@/components/ui/label';
 import {
   PenTool,
   Plus,
-  BookOpen,
-  Zap,
   AlertTriangle,
   Loader2,
   MousePointerClick,
@@ -59,7 +57,7 @@ export function AIWriterDashboard() {
   
   const [recentJobs, setRecentJobs] = useState<any[]>([]);
   const [isCancellingJob, setIsCancellingJob] = useState<string | null>(null);
-  const [isDeletingChapter, setIsDeletingChapter] = useState<boolean>(false);
+  const [_isDeletingChapter, setIsDeletingChapter] = useState(false);
   
   const [schedules, setSchedules] = useState<any[]>([]);
   const [isLoadingSchedules, setIsLoadingSchedules] = useState(false);
@@ -69,7 +67,7 @@ export function AIWriterDashboard() {
   const [batchProgress, setBatchProgress] = useState({ current: 0, total: 0 });
   const [isProjectListExpanded, setIsProjectListExpanded] = useState(true);
 
-  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     fetchProjects();
@@ -113,7 +111,8 @@ export function AIWriterDashboard() {
       } else {
         setProjects([]);
       }
-    } catch {
+    } catch (err) {
+      console.error('Failed to fetch AI writer projects:', err);
       setProjects([]);
     } finally {
       setLoading(false);
@@ -154,7 +153,8 @@ export function AIWriterDashboard() {
       } else {
         setRecentJobs([]);
       }
-    } catch {
+    } catch (err) {
+      console.error('Failed to fetch recent jobs:', err);
       setRecentJobs([]);
     }
   };

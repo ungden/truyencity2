@@ -636,9 +636,6 @@ export function checkEmotionalVariety(
     return { score: 10, issues: [] }; // Not enough data
   }
 
-  // Collect all dominant emotions
-  const allEmotions = emotionalArcs.flatMap(arc => [arc.opening, arc.midpoint, arc.climax, arc.closing]);
-
   // Check variety in groups of 5
   for (let i = 0; i + 4 < emotionalArcs.length; i += 5) {
     const group = emotionalArcs.slice(i, i + 5);

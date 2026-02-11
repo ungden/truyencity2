@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { READING, CACHE } from '@/lib/config';
 
 interface ReadingSettings {
@@ -51,7 +51,9 @@ interface ReadingContextType {
   setCurrentNovel: (novel: Novel) => void;
   currentChapter: Chapter | null;
   setCurrentChapter: (chapter: Chapter) => void;
+  /** @deprecated Use reading-progress.ts service instead for progress tracking */
   readingProgress: ReadingProgress[];
+  /** @deprecated Use saveProgress() from reading-progress.ts instead */
   updateProgress: (progress: ReadingProgress) => void;
   bookmarks: string[];
   toggleBookmark: (novelId: string) => void;
@@ -117,50 +119,60 @@ export const ReadingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, []);
 
-  const updateSettings = (newSettings: Partial<ReadingSettings>) => {
-    const updatedSettings = { ...settings, ...newSettings };
-    setSettings(updatedSettings);
-    localStorage.setItem(CACHE.READING_SETTINGS_KEY, JSON.stringify(updatedSettings));
-  };
+  const updateSettings = useCallback((newSettings: Partial<ReadingSettings>) => {
+    setSettings(prev => {
+      const updatedSettings = { ...prev, ...newSettings };
+      localStorage.setItem(CACHE.READING_SETTINGS_KEY, JSON.stringify(updatedSettings));
+      return updatedSettings;
+    });
+  }, []);
 
-  const updateProgress = (progress: ReadingProgress) => {
-    const updatedProgress = readingProgress.filter(p => p.novelId !== progress.novelId);
-    updatedProgress.push(progress);
-    setReadingProgress(updatedProgress);
-    localStorage.setItem(CACHE.READING_PROGRESS_KEY, JSON.stringify(updatedProgress));
-  };
+  const updateProgress = useCallback((progress: ReadingProgress) => {
+    setReadingProgress(prev => {
+      const updatedProgress = prev.filter(p => p.novelId !== progress.novelId);
+      updatedProgress.push(progress);
+      localStorage.setItem(CACHE.READING_PROGRESS_KEY, JSON.stringify(updatedProgress));
+      return updatedProgress;
+    });
+  }, []);
 
-  const toggleBookmark = (novelId: string) => {
-    const updatedBookmarks = bookmarks.includes(novelId)
-      ? bookmarks.filter(id => id !== novelId)
-      : [...bookmarks, novelId];
-    setBookmarks(updatedBookmarks);
-    localStorage.setItem(CACHE.BOOKMARKS_KEY, JSON.stringify(updatedBookmarks));
-  };
+  const toggleBookmark = useCallback((novelId: string) => {
+    setBookmarks(prev => {
+      const updatedBookmarks = prev.includes(novelId)
+        ? prev.filter(id => id !== novelId)
+        : [...prev, novelId];
+      localStorage.setItem(CACHE.BOOKMARKS_KEY, JSON.stringify(updatedBookmarks));
+      return updatedBookmarks;
+    });
+  }, []);
 
-  const addToHistory = (novel: Novel) => {
-    const updatedHistory = history.filter(n => n.id !== novel.id);
-    updatedHistory.unshift(novel);
-    const limitedHistory = updatedHistory.slice(0, CACHE.MAX_HISTORY_ITEMS);
-    setHistory(limitedHistory);
-    localStorage.setItem(CACHE.READING_HISTORY_KEY, JSON.stringify(limitedHistory));
-  };
+  const addToHistory = useCallback((novel: Novel) => {
+    setHistory(prev => {
+      const updatedHistory = prev.filter(n => n.id !== novel.id);
+      updatedHistory.unshift(novel);
+      const limitedHistory = updatedHistory.slice(0, CACHE.MAX_HISTORY_ITEMS);
+      localStorage.setItem(CACHE.READING_HISTORY_KEY, JSON.stringify(limitedHistory));
+      return limitedHistory;
+    });
+  }, []);
+
+  const contextValue = useMemo(() => ({
+    settings,
+    updateSettings,
+    currentNovel,
+    setCurrentNovel,
+    currentChapter,
+    setCurrentChapter,
+    readingProgress,
+    updateProgress,
+    bookmarks,
+    toggleBookmark,
+    history,
+    addToHistory,
+  }), [settings, updateSettings, currentNovel, currentChapter, readingProgress, updateProgress, bookmarks, toggleBookmark, history, addToHistory]);
 
   return (
-    <ReadingContext.Provider value={{
-      settings,
-      updateSettings,
-      currentNovel,
-      setCurrentNovel,
-      currentChapter,
-      setCurrentChapter,
-      readingProgress,
-      updateProgress,
-      bookmarks,
-      toggleBookmark,
-      history,
-      addToHistory
-    }}>
+    <ReadingContext.Provider value={contextValue}>
       {children}
     </ReadingContext.Provider>
   );

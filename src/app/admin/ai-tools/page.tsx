@@ -5,25 +5,17 @@ import { AuthGuard } from '@/components/admin/auth-guard';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Progress } from '@/components/ui/progress';
 import {
-  Wand2,
   PenTool,
   BookOpen,
-  Sparkles,
   ArrowRight,
-  Play,
-  FileText,
-  Layers,
   Target,
   Zap,
   CheckCircle2,
   Clock,
-  AlertCircle,
   ChevronRight,
-  Eye,
   Plus,
   Upload,
   Brain,
@@ -208,41 +200,52 @@ export default function AIToolsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    let cancelled = false;
 
-  const fetchData = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
+    const fetchData = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (cancelled || !session) return;
 
-      // Fetch projects
-      const response = await fetch('/api/ai-writer/projects', {
-        headers: { 'Authorization': `Bearer ${session.access_token}` },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const projectsData = data.projects || [];
-        setProjects(projectsData);
-
-        // Calculate stats
-        const totalChapters = projectsData.reduce((sum: number, p: AIStoryProject) => sum + p.current_chapter, 0);
-        const activeProjects = projectsData.filter((p: AIStoryProject) => p.status === 'active').length;
-
-        setStats({
-          totalProjects: projectsData.length,
-          activeProjects,
-          totalChapters,
-          runningJobs: 0 // TODO: fetch from jobs
+        // Fetch projects
+        const response = await fetch('/api/ai-writer/projects', {
+          headers: { 'Authorization': `Bearer ${session.access_token}` },
         });
+
+        if (cancelled) return;
+
+        if (response.ok) {
+          const data = await response.json();
+          const projectsData = data.projects || [];
+
+          if (cancelled) return;
+
+          setProjects(projectsData);
+
+          // Calculate stats
+          const totalChapters = projectsData.reduce((sum: number, p: AIStoryProject) => sum + p.current_chapter, 0);
+          const activeProjects = projectsData.filter((p: AIStoryProject) => p.status === 'active').length;
+
+          setStats({
+            totalProjects: projectsData.length,
+            activeProjects,
+            totalChapters,
+            runningJobs: 0 // TODO: fetch from jobs
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    fetchData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <AuthGuard>

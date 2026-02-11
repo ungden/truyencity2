@@ -74,9 +74,32 @@ export const NotificationCenter: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (isOpen) {
-      fetchNotifications();
-    }
+    let cancelled = false;
+
+    const fetchData = async () => {
+      if (!isOpen) return;
+
+      setLoading(true);
+      try {
+        const [notifs, count] = await Promise.all([
+          getUserNotifications(),
+          getUnreadCount()
+        ]);
+        if (cancelled) return;
+        setNotifications(notifs);
+        setUnreadCount(count);
+      } catch (error) {
+        console.error('Error fetching notifications:', error);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      cancelled = true;
+    };
   }, [isOpen]);
 
   const fetchNotifications = async () => {
@@ -162,7 +185,7 @@ export const NotificationCenter: React.FC = () => {
     const isUnread = !userNotif.read_at;
     
     const notificationLink = notif.novel_id 
-      ? `/novel/${notif.novel_id}${notif.chapter_id ? `/read/${notif.chapter_id}` : ''}`
+      ? `/truyen/${notif.novel_id}${notif.chapter_id ? `/read/${notif.chapter_id}` : ''}`
       : null;
 
     const content = (
@@ -197,6 +220,7 @@ export const NotificationCenter: React.FC = () => {
                   variant="ghost"
                   size="sm"
                   className="h-8 w-8 p-0 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                  aria-label="Đánh dấu đã đọc"
                   onClick={(e) => {
                     e.preventDefault();
                     handleMarkAsRead(notif.id);
@@ -225,7 +249,7 @@ export const NotificationCenter: React.FC = () => {
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="sm" className="relative rounded-full h-10 w-10 p-0">
+        <Button variant="ghost" size="sm" className="relative rounded-full h-10 w-10 p-0" aria-label="Thông báo">
           <Bell size={20} />
           {unreadCount > 0 && (
             <Badge

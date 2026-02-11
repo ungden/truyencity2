@@ -19,7 +19,7 @@ export function RefreshableNovelPage({ novelId, initialChapters }: RefreshableNo
     try {
       const updatedChapters = await getChaptersByNovelId(novelId);
       setChapters(updatedChapters);
-      console.log('Chapters refreshed:', updatedChapters.length);
+
     } catch (error) {
       console.error('Error refreshing chapters:', error);
     } finally {

@@ -4,9 +4,7 @@ import {
   PlannedTwist,
   CharacterArc,
   HierarchicalSummary,
-  AIStoryProject,
   TwistType,
-  CharacterArcType,
 } from '@/lib/types/ai-writer';
 
 // Get Supabase config from environment variables
@@ -54,7 +52,7 @@ export class PlotArcManager {
     if (!error) return false;
     if (error.code === 'PGRST205' || error.code === '42P01') {
       if (!this.tablesMissing) {
-        console.warn('[PlotArcManager] Tables not found in DB (migration 0012 not applied). Degrading gracefully.');
+
         this.tablesMissing = true;
       }
       return true;
@@ -159,7 +157,7 @@ export class PlotArcManager {
         // This happens when arc span changed (e.g. 10→20 chapters) and the existing arc
         // doesn't cover the current chapter. Fetch the existing arc, expand its range.
         if (error.code === '23505') {
-          console.log(`[PlotArcManager] Arc ${arcNumber} already exists, expanding range to ch${startChapter}-${endChapter}`);
+
           const { data: existing, error: fetchErr } = await supabase
             .from('plot_arcs')
             .select('*')

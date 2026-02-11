@@ -6,21 +6,6 @@ import { CommentTable } from '@/components/admin/comment-table';
 
 export const dynamic = 'force-dynamic';
 
-function getTimeAgo(dateString: string): string {
-  const now = new Date();
-  const date = new Date(dateString);
-  const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-
-  if (diffInMinutes < 1) return 'Vừa xong';
-  if (diffInMinutes < 60) return `${diffInMinutes} phút trước`;
-  
-  const diffInHours = Math.floor(diffInMinutes / 60);
-  if (diffInHours < 24) return `${diffInHours} giờ trước`;
-  
-  const diffInDays = Math.floor(diffInHours / 24);
-  return `${diffInDays} ngày trước`;
-}
-
 export default async function AdminCommentsPage() {
   const [stats, comments] = await Promise.all([
     getCommentStats(),

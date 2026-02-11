@@ -742,7 +742,12 @@ export async function saveCharacterVoice(
       onConflict: 'project_id,character_name',
     });
   if (error) {
-    console.warn('[DB] saveCharacterVoice failed:', error.message);
+    logger.debug('character_voices upsert failed (non-fatal)', {
+      projectId,
+      characterName: profile.characterName,
+      operation: 'saveCharacterVoice',
+      error: error.message,
+    });
   }
 }
 
@@ -757,7 +762,11 @@ export async function loadCharacterVoices(projectId: string): Promise<CharacterV
     .eq('project_id', projectId);
 
   if (error) {
-    console.warn('[DB] loadCharacterVoices failed:', error.message);
+    logger.debug('character_voices load failed (non-fatal)', {
+      projectId,
+      operation: 'loadCharacterVoices',
+      error: error.message,
+    });
     return [];
   }
   if (!data) return [];
@@ -774,6 +783,7 @@ export async function loadCharacterVoices(projectId: string): Promise<CharacterV
 }
 
 import { getSupabase } from './supabase-helper';
+import { logger } from '@/lib/security/logger';
 
 // Export singleton
 export const dialogueAnalyzer = new DialogueAnalyzer();

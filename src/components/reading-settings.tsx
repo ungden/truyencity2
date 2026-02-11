@@ -55,7 +55,7 @@ export const ReadingSettings: React.FC<{ buttonProps?: ButtonProps }> = ({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="sm" {...buttonProps}>
+        <Button variant="ghost" size="sm" aria-label="Cài đặt đọc" {...buttonProps}>
           <Settings size={20} />
         </Button>
       </PopoverTrigger>
@@ -98,6 +98,7 @@ export const ReadingSettings: React.FC<{ buttonProps?: ButtonProps }> = ({
                 size="sm"
                 onClick={() => changeFont(-2)}
                 disabled={settings.fontSize <= READING.MIN_FONT_SIZE}
+                aria-label="Giảm cỡ chữ"
               >
                 <Minus size={14} />
               </Button>
@@ -109,6 +110,7 @@ export const ReadingSettings: React.FC<{ buttonProps?: ButtonProps }> = ({
                 size="sm"
                 onClick={() => changeFont(2)}
                 disabled={settings.fontSize >= READING.MAX_FONT_SIZE}
+                aria-label="Tăng cỡ chữ"
               >
                 <Plus size={14} />
               </Button>

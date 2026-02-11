@@ -120,7 +120,6 @@ async function autoRotate(
       return null;
     }
 
-    console.log(`[AutoRotate] Novel ${completedNovelId.slice(0, 8)} completed → Activated ${projectToActivate.slice(0, 8)}`);
     return projectToActivate;
   } catch (error) {
     console.error('[AutoRotate] Error:', error);
@@ -162,8 +161,6 @@ async function writeOneChapter(
         .eq('id', project.id);
 
       const rotatedProjectId = await autoRotate(novel.id, supabase);
-      console.log(`[WriteChapter] ${project.id.slice(0, 8)} PRE-WRITE COMPLETE at ch.${currentCh} (target=${targetCh}, arcBoundary=${isArcBoundary}, exactTarget=${isExactTarget})`);
-
       return {
         id: project.id,
         title: novel.title,
@@ -252,7 +249,6 @@ async function writeOneChapter(
   if (nextCh >= hardStop) {
     // Phase 4: Hard stop — safety net, prevent infinite writing
     shouldComplete = true;
-    console.log(`[WriteChapter] ${project.id.slice(0, 8)} HARD STOP at ch.${nextCh} (target=${targetChapters}, hard=${hardStop})`);
   } else if (nextCh >= targetChapters) {
     // Phase 3: Grace period — only complete at arc boundary (every 20 chapters)
     // Also complete if we've exactly hit the target (covers small novels where target isn't a multiple of arc size)
@@ -260,10 +256,8 @@ async function writeOneChapter(
     const isExactTarget = nextCh === targetChapters;
     if (isArcBoundary || isExactTarget) {
       shouldComplete = true;
-      console.log(`[WriteChapter] ${project.id.slice(0, 8)} CLEAN FINISH at ch.${nextCh} (target=${targetChapters}, arcBoundary=${isArcBoundary}, exactTarget=${isExactTarget})`);
     } else {
       // Not at arc boundary — continue writing to finish the current arc
-      console.log(`[WriteChapter] ${project.id.slice(0, 8)} Grace period: ch.${nextCh}/${targetChapters}, waiting for arc boundary (next: ${Math.ceil(nextCh / CHAPTERS_PER_ARC) * CHAPTERS_PER_ARC})`);
     }
   }
 
@@ -370,8 +364,6 @@ export async function GET(request: NextRequest) {
       .update({ updated_at: new Date().toISOString() })
       .in('id', allIds);
 
-    console.log(`[Cron] Processing ${resumeProjects.length} resume + ${initProjects.length} init projects...`);
-
     // ====== EXECUTE BOTH TIERS IN PARALLEL ======
 
     // Helper: wrap a promise with a timeout to prevent one slow project from blocking the batch
@@ -424,8 +416,6 @@ export async function GET(request: NextRequest) {
     const initSuccess = summary.filter(r => r.tier === 'init' && r.success).length;
     const rotations = summary.filter(r => r.rotatedProjectId).length;
     const duration = (Date.now() - startTime) / 1000;
-
-    console.log(`[Cron] Done in ${duration.toFixed(1)}s. Resume: ${resumeSuccess}/${resumeProjects.length}, Init: ${initSuccess}/${initProjects.length}, Rotations: ${rotations}`);
 
     return NextResponse.json({
       success: true,

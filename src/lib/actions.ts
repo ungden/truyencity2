@@ -4,7 +4,7 @@ import { createServerClient } from '@/integrations/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
-import { novelSchema, chapterSchema, authorSchema } from './types';
+import { novelSchema, chapterSchema } from './types';
 
 export async function getUser() {
   const supabase = await createServerClient();
@@ -93,13 +93,13 @@ export async function createNovel(values: z.infer<typeof novelSchema>) {
     return { error: 'Không tìm thấy tác giả AI' };
   }
 
-  const insertData = {
+  const insertData: Record<string, unknown> = {
     ...values,
     ai_author_id: authorId,
     author: selectedAuthor.name,
     owner_id: ownerToSet,
     created_by: user.id, // giữ nguyên nếu cột đã tồn tại
-  } as any;
+  };
 
   const { data, error } = await supabase
     .from('novels')
@@ -148,11 +148,11 @@ export async function updateNovel(id: string, values: z.infer<typeof novelSchema
     return { error: 'Không tìm thấy tác giả AI' };
   }
 
-  const updateValues = { 
+  const updateValues: Record<string, unknown> = { 
     ...values, 
     ai_author_id: authorId,
     author: selectedAuthor.name
-  } as any;
+  };
 
   if (profile?.role !== 'admin') {
     delete updateValues.owner_id;
@@ -617,7 +617,7 @@ export async function getAuthors() {
   return data || [];
 }
 
-export async function createAuthor(values: any) {
+export async function createAuthor(values: Record<string, unknown>) {
   const supabase = await createServerClient();
   
   const { error } = await supabase
@@ -633,7 +633,7 @@ export async function createAuthor(values: any) {
   return { success: 'Tạo tác giả thành công' };
 }
 
-export async function updateAuthor(id: string, values: any) {
+export async function updateAuthor(id: string, values: Record<string, unknown>) {
   const supabase = await createServerClient();
   
   const { error } = await supabase

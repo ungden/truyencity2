@@ -19,9 +19,6 @@ import {
   BootstrapConfig,
   BootstrapProgress,
   ServiceResult,
-  StoryIdea,
-  StoryBlueprint,
-  AIAuthorProfile,
   ProductionQueueItem,
 } from './types';
 

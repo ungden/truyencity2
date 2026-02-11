@@ -1,17 +1,23 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import {
   Search,
-  Bell,
   Calendar
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { SearchModal } from '@/components/search-modal';
-import { NotificationCenter } from '@/components/notification-center';
+
+const SearchModal = dynamic(
+  () => import('@/components/search-modal').then((mod) => mod.SearchModal),
+  { ssr: false }
+);
+
+const NotificationCenter = dynamic(
+  () => import('@/components/notification-center').then((mod) => mod.NotificationCenter),
+  { ssr: false }
+);
 
 interface DesktopHeaderProps {
   showSearch?: boolean;
@@ -22,7 +28,6 @@ export const DesktopHeader: React.FC<DesktopHeaderProps> = ({
   showSearch = true,
   variant = 'default'
 }) => {
-  const router = useRouter();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   // Listen for search modal trigger from sidebar

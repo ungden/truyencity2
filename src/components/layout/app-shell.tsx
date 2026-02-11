@@ -15,7 +15,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
   const pathname = usePathname();
 
   // Routes where we want minimal chrome (reading page)
-  const isReadingRoute = /^\/novel\/[^/]+\/(read|chapter)\/.+/.test(pathname ?? '');
+  const isReadingRoute = /^\/(novel|truyen)\/[^/]+\/(read|chapter)\/.+/.test(pathname ?? '');
 
   // Admin routes have their own layout with AdminSidebar
   const isAdminRoute = pathname?.startsWith('/admin') ?? false;

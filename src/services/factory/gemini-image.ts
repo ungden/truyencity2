@@ -54,7 +54,7 @@ export class GeminiImageService {
     this.supabaseKey = options?.supabaseKey || process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
     if (!this.apiKey) {
-      console.warn('[GeminiImageService] No API key provided. Set GEMINI_API_KEY env var.');
+      console.warn('[GeminiImageService] Initialized without API key');
     }
   }
 
@@ -89,8 +89,6 @@ export class GeminiImageService {
       if (options?.useGoogleSearch) {
         requestBody.tools = [{ google_search: {} }];
       }
-
-      console.log(`[GeminiImageService] Generating with ${MODEL}...`);
 
       const response = await fetch(
         `${GEMINI_API_BASE}/models/${MODEL}:generateContent?key=${this.apiKey}`,
@@ -145,8 +143,6 @@ export class GeminiImageService {
           errorCode: 'GEMINI_NO_IMAGE_OUTPUT',
         };
       }
-
-      console.log(`[GeminiImageService] Generated ${images.length} image(s)`);
 
       return {
         success: true,
@@ -287,8 +283,6 @@ export class GeminiImageService {
           errorCode: 'STORAGE_URL_ERROR',
         };
       }
-
-      console.log(`[GeminiImageService] Uploaded to ${bucket}/${fileName}`);
 
       return {
         success: true,
@@ -560,8 +554,6 @@ IMPORTANT:
     let lastError: string | undefined;
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      console.log(`[GeminiImageService] Attempt ${attempt}/${maxRetries}...`);
-      
       const result = await this.generateBookCover(title, genre, description, undefined, {
         resolution: '2K'
       });
@@ -573,7 +565,6 @@ IMPORTANT:
       lastError = result.error;
 
       if (result.errorCode === 'IMAGE_SAFETY_BLOCK') {
-        console.warn(`[GeminiImageService] Safety block, modifying prompt...`);
         const simplifiedDescription = this.sanitizeDescription(description);
         const retryResult = await this.generateBookCover(
           title, genre, simplifiedDescription, 'abstract artistic'

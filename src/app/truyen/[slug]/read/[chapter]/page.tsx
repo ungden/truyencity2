@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import { useParams, useRouter } from 'next/navigation';
 import { ReadingControls } from '@/components/reading-controls';
 import { DesktopReadingSidebar, DesktopReadingHeader } from '@/components/reading';
@@ -14,7 +15,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { startSession, updateSessionDuration, endSession, markChapterRead } from '@/services/reading-sessions';
 import { READING } from '@/lib/config';
 import DOMPurify from 'isomorphic-dompurify';
-import { Comments } from '@/components/comments';
+
+const Comments = dynamic(
+  () => import('@/components/comments').then((mod) => mod.Comments),
+  { ssr: false }
+);
 
 type ChapterListItem = {
   id: string;

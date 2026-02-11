@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
-import { MoreHorizontal, Send, Trash2, Eye } from 'lucide-react';
+import { MoreHorizontal, Send, Trash2 } from 'lucide-react';
 
 import {
   Table,

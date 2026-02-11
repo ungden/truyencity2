@@ -7,7 +7,6 @@
  * 3. Non-null assertion trên env vars
  */
 
-import { randomUUID } from 'crypto';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 // ============================================================================
@@ -84,14 +83,12 @@ export async function safeSelect<T = Record<string, unknown>>(
     const { data, error } = await q;
     
     if (error) {
-      console.warn(`[DB] Select ${table} failed:`, error.message);
       return { data: null, error: error.message };
     }
     
     return { data: data as T[], error: null };
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'Unknown DB error';
-    console.warn(`[DB] Select ${table} error:`, msg);
     return { data: null, error: msg };
   }
 }
@@ -111,14 +108,12 @@ export async function safeUpsert(
       .upsert(data, options ? { onConflict: options.onConflict } : undefined);
     
     if (error) {
-      console.warn(`[DB] Upsert ${table} failed:`, error.message);
       return { data: null, error: error.message };
     }
     
     return { data: null, error: null };
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'Unknown DB error';
-    console.warn(`[DB] Upsert ${table} error:`, msg);
     return { data: null, error: msg };
   }
 }
@@ -135,14 +130,12 @@ export async function safeInsert(
     const { error } = await supabase.from(table).insert(data);
     
     if (error) {
-      console.warn(`[DB] Insert ${table} failed:`, error.message);
       return { data: null, error: error.message };
     }
     
     return { data: null, error: null };
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'Unknown DB error';
-    console.warn(`[DB] Insert ${table} error:`, msg);
     return { data: null, error: msg };
   }
 }
@@ -166,14 +159,12 @@ export async function safeUpdate(
     const { error } = await q;
     
     if (error) {
-      console.warn(`[DB] Update ${table} failed:`, error.message);
       return { data: null, error: error.message };
     }
     
     return { data: null, error: null };
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'Unknown DB error';
-    console.warn(`[DB] Update ${table} error:`, msg);
     return { data: null, error: msg };
   }
 }
@@ -214,12 +205,10 @@ export async function ensureProjectRecord(
       .maybeSingle();
 
     if (checkError) {
-      console.warn(`[DB] Check project failed: ${checkError.message}`);
       return { success: false, error: checkError.message };
     }
 
     if (existing) {
-      console.log(`[DB] Project ${projectId.substring(0, 8)}... already exists`);
       return { success: true };
     }
 
@@ -231,7 +220,6 @@ export async function ensureProjectRecord(
       .limit(1);
 
     if (userError || !users?.length) {
-      console.warn(`[DB] No users found for project record. DB persistence disabled.`);
       return { success: false, error: 'No users available for FK constraint' };
     }
 
@@ -256,15 +244,12 @@ export async function ensureProjectRecord(
       });
 
     if (insertError) {
-      console.warn(`[DB] Insert project failed: ${insertError.message}`);
       return { success: false, error: insertError.message };
     }
 
-    console.log(`[DB] Created project record: ${projectId.substring(0, 8)}...`);
     return { success: true };
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'Unknown error';
-    console.warn(`[DB] ensureProjectRecord error: ${msg}`);
     return { success: false, error: msg };
   }
 }

@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AuthGuard } from '@/components/admin/auth-guard';
-import { Bell, Send, Users, AlertCircle, CheckCircle } from 'lucide-react';
+import { Bell, Send, AlertCircle, CheckCircle } from 'lucide-react';
 import { getNotifications, getNotificationStats } from '@/lib/actions';
 import { NotificationTable } from '@/components/admin/notification-table';
 import { NotificationPageClient } from '@/components/admin/notification-page-client';

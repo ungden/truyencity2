@@ -121,7 +121,7 @@ export async function assignAuthorToStory(
       const generator = new AuthorGenerator('gemini', 'gemini-3-flash-preview');
       newAuthorData = await generator.generateAuthor({ genre });
     } catch (error) {
-      console.warn('AI author generation failed, using quick generation:', error);
+
       newAuthorData = generateQuickAuthor(genre);
     }
   } else {
@@ -241,7 +241,6 @@ export async function suggestAuthorRebalance(): Promise<{
   const maxAllowed = Math.ceil(avgStories * 1.5); // 50% above average is threshold
 
   const overloadedAuthors = stats.storiesPerAuthor.filter(a => a.storyCount > maxAllowed);
-  const underloadedAuthors = stats.storiesPerAuthor.filter(a => a.storyCount < avgStories);
 
   if (overloadedAuthors.length === 0) {
     return {
