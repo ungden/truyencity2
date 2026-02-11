@@ -72,6 +72,8 @@ export async function GET(request: NextRequest) {
       chaptersTodayRes,
       chaptersTodayRowsRes,
       chaptersLast24hRes,
+      healthChecksLast4hRes,
+      latestHealthRes,
       activeProjectNovelIdsRes,
       recentSpawnProjectsRes,
       recentChaptersRes,
@@ -83,6 +85,13 @@ export async function GET(request: NextRequest) {
       supabase.from('chapters').select('*', { count: 'exact', head: true }).gte('created_at', vnStartIso).lt('created_at', vnEndIso),
       supabase.from('chapters').select('novel_id').gte('created_at', vnStartIso).lt('created_at', vnEndIso),
       supabase.from('chapters').select('*', { count: 'exact', head: true }).gte('created_at', last24hIso),
+      supabase.from('health_checks').select('*', { count: 'exact', head: true }).gte('created_at', last24hIso),
+      supabase
+        .from('health_checks')
+        .select('id, status, score, created_at, summary')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle(),
       supabase.from('ai_story_projects').select('novel_id').eq('status', 'active'),
       supabase
         .from('ai_story_projects')
@@ -108,6 +117,8 @@ export async function GET(request: NextRequest) {
       chaptersTodayRes.error,
       chaptersTodayRowsRes.error,
       chaptersLast24hRes.error,
+      healthChecksLast4hRes.error,
+      latestHealthRes.error,
       activeProjectNovelIdsRes.error,
       recentSpawnProjectsRes.error,
       recentChaptersRes.error,
@@ -184,6 +195,17 @@ export async function GET(request: NextRequest) {
 
     const activeProjects = activeProjectsRes.count || 0;
     const chaptersToday = (chaptersTodayRowsRes.data || []).length;
+    const latestHealthAt = latestHealthRes.data?.created_at || null;
+    const healthStaleMinutes = latestHealthAt
+      ? Math.floor((now.getTime() - new Date(latestHealthAt).getTime()) / 60000)
+      : null;
+    const healthAlertLevel = healthStaleMinutes === null
+      ? 'critical'
+      : healthStaleMinutes > 360
+        ? 'critical'
+        : healthStaleMinutes > 120
+          ? 'warn'
+          : 'ok';
 
     return NextResponse.json({
       generatedAt: now.toISOString(),
@@ -203,6 +225,12 @@ export async function GET(request: NextRequest) {
         pausedProjects: pausedProjectsRes.count || 0,
         chaptersToday,
         chaptersLast24h: chaptersLast24hRes.count || 0,
+        healthChecksLast24h: healthChecksLast4hRes.count || 0,
+        latestHealthAt,
+        latestHealthStatus: latestHealthRes.data?.status || null,
+        latestHealthScore: latestHealthRes.data?.score ?? null,
+        healthStaleMinutes,
+        healthAlertLevel,
         avgChaptersPerActiveToday: activeProjects > 0
           ? Number((chaptersToday / activeProjects).toFixed(2))
           : 0,

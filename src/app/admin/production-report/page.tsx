@@ -25,6 +25,12 @@ type ReportResponse = {
     pausedProjects: number;
     chaptersToday: number;
     chaptersLast24h: number;
+    healthChecksLast24h: number;
+    latestHealthAt: string | null;
+    latestHealthStatus: 'healthy' | 'warning' | 'critical' | null;
+    latestHealthScore: number | null;
+    healthStaleMinutes: number | null;
+    healthAlertLevel: 'ok' | 'warn' | 'critical';
     avgChaptersPerActiveToday: number;
     storiesAtQuota: number;
     storiesBelowQuota: number;
@@ -60,6 +66,14 @@ function formatTime(ts: string): string {
     day: '2-digit',
     month: '2-digit',
   });
+}
+
+function formatAgoMinutes(minutes: number | null): string {
+  if (minutes === null) return 'Chua co du lieu';
+  if (minutes < 60) return `${minutes} phut truoc`;
+  const hours = Math.floor(minutes / 60);
+  const rem = minutes % 60;
+  return rem > 0 ? `${hours}h ${rem}m truoc` : `${hours}h truoc`;
 }
 
 export default function ProductionReportPage() {
@@ -162,7 +176,51 @@ export default function ProductionReportPage() {
                 <p className="text-xs text-muted-foreground mt-1">At quota: {report.summary.storiesAtQuota}</p>
               </CardContent>
             </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm">Health Check</CardTitle>
+                <CardDescription>Do tuoi ban ghi health moi nhat</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-2">
+                  <div className="text-2xl font-bold">
+                    {formatAgoMinutes(report.summary.healthStaleMinutes)}
+                  </div>
+                  <Badge
+                    variant={
+                      report.summary.healthAlertLevel === 'ok'
+                        ? 'default'
+                        : report.summary.healthAlertLevel === 'warn'
+                          ? 'secondary'
+                          : 'destructive'
+                    }
+                  >
+                    {report.summary.healthAlertLevel}
+                  </Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  24h: {report.summary.healthChecksLast24h} checks
+                </p>
+                {report.summary.latestHealthAt && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Latest: {formatTime(report.summary.latestHealthAt)}
+                  </p>
+                )}
+              </CardContent>
+            </Card>
           </div>
+
+          {report.summary.healthAlertLevel !== 'ok' && (
+            <Card className="border-amber-300">
+              <CardContent className="pt-6 text-sm">
+                <span className="font-medium">Canh bao Health Check:</span>{' '}
+                {report.summary.healthAlertLevel === 'critical'
+                  ? 'He thong khong co health-check moi trong >6h. Nen kiem tra cron /api/cron/health-check ngay.'
+                  : 'Health-check co dau hieu tre (>2h). Nen theo doi cron health-check.'}
+              </CardContent>
+            </Card>
+          )}
 
           <Card>
             <CardHeader>
