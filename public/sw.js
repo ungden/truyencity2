@@ -4,9 +4,11 @@
 const CACHE_NAME = 'truyencity-v1';
 const STATIC_ASSETS = [
   '/',
-  '/admin/ai-writer',
-  '/admin/claude-code',
+  '/browse',
+  '/ranking',
   '/manifest.json',
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png',
 ];
 
 // Background sync queue name
@@ -18,7 +20,14 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log('[SW] Caching static assets');
-      return cache.addAll(STATIC_ASSETS);
+      // Cache assets individually to avoid failing entire install if one asset fails
+      return Promise.allSettled(
+        STATIC_ASSETS.map(url => 
+          cache.add(url).catch(err => {
+            console.warn(`[SW] Failed to cache ${url}:`, err.message);
+          })
+        )
+      );
     })
   );
   self.skipWaiting();
