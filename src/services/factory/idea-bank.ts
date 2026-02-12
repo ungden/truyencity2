@@ -400,6 +400,136 @@ const ANTAGONIST_TYPES = [
   'fate manipulator weaver',              // Kẻ thao túng vận mệnh
 ];
 
+const PLATFORM_TITLE_DNA = {
+  qidian: 'scale lớn, cảnh giới mạnh, power fantasy rõ ràng',
+  zongheng: 'xung đột nhanh, vào việc sớm, motif sắc gọn',
+  faloo: 'nhịp cực nhanh, high-concept + golden finger rõ ngay premise + payoff sớm',
+};
+
+const FALOO_TITLE_PATTERNS = [
+  '人在X：开局Y -> "Ta Ở X: Khai Cục Y"',
+  '重生X：开局Y -> "Trọng Sinh X: Khai Cục Y"',
+  '让你X，你却Y？ -> "Bảo X, Ngươi Lại Y?"',
+  '全民X：从Y开始 -> "Toàn Dân X: Bắt Đầu Từ Y"',
+  '我在X有座Y -> "Ta Tại X Có Một Y"',
+];
+
+const PLATFORM_TOPIC_POOLS: Record<FactoryGenre, string[]> = {
+  'system-litrpg': [
+    'đăng nhập vô hạn + mở kho kỹ năng',
+    'phó bản quốc chiến liên server',
+    'mở lãnh địa, xây quân đoàn NPC',
+    'thức tỉnh class ẩn sau khi bị kick guild',
+    'game thực tế ảo trộn thế giới thật',
+    'hệ thống đổi nghề theo boss bị săn',
+    'võng du hòa vào hiện thực sau bản vá tận thế',
+    'toàn dân chuyển chức, nghề ẩn mở khóa từ nhiệm vụ cấm',
+    'mở tiệm net chiến thuật huấn luyện người chơi top server',
+    'kinh tế game thao túng chợ đấu giá liên server',
+    'săn boss biển sâu đổi thần trang',
+  ],
+  'urban-modern': [
+    'streamer nghèo thành ông trùm truyền thông',
+    'thương chiến AI + data monopoly',
+    'phá án đô thị bằng năng lực đọc vi biểu cảm',
+    'đạo diễn web drama thành vua phòng vé',
+    'từ shipper thành chủ chuỗi logistics',
+    'giới tài phiệt đấu ngầm bằng quỹ đầu tư',
+    'mở vườn nông nghiệp công nghệ cao và đế chế thực phẩm',
+    'đi biển bắt hải sản thành ông trùm chuỗi đông lạnh',
+    'lên núi săn thú hợp pháp kết hợp livestream sinh tồn',
+    'mở tiệm net cũ nát thành trung tâm esports quốc dân',
+    'tận thế đô thị: vận hành khu an toàn như công ty',
+    'kinh doanh nhượng quyền từ một cửa hàng ven đường',
+  ],
+  romance: [
+    'hợp đồng hôn nhân + đấu trí gia tộc',
+    'trùng sinh trả thù rồi rơi vào tình yêu',
+    'cặp oan gia làm nội dung viral cùng nhau',
+    'tổng tài giả nghèo và bác sĩ thiên tài',
+    'cứu rỗi hai chiều sau ly hôn',
+    'tình yêu xuyên sách với cơ chế nhiệm vụ',
+  ],
+  'huyen-huyen': [
+    'huyết mạch cổ thần thức tỉnh tầng tầng',
+    'học viện ma pháp + chiến tranh chủng tộc',
+    'khắc văn cấm thuật + rèn hồn binh',
+    'đảo nổi bầu trời và hành trình săn relic',
+    'khế ước thú thần nhiều hệ',
+    'điều khiển vận mệnh bằng nhân quả thuật',
+    'mở tiệm net ma pháp mô phỏng chiến trường cổ thần',
+    'trang trại ma dược và thương hội xuyên đế quốc',
+    'thợ săn ma thú rừng sâu xây đội săn cấp quốc gia',
+  ],
+  'action-adventure': [
+    'đột kích tàn tích cổ + tranh đoạt bản đồ',
+    'đội đặc nhiệm phản khủng toàn cầu',
+    'siêu trộm lập tổ đội heist',
+    'đấu trường ngầm sinh tồn có livestream',
+    'truy sát qua sa mạc và hải cảng',
+    'chiến dịch giải cứu con tin cấp quốc gia',
+  ],
+  historical: [
+    'hàn môn sĩ tử khuấy triều đình',
+    'thương lộ tơ lụa và chiến tranh thuế',
+    'nữ quân sư đảo chiều quốc vận',
+    'xây thành phòng thủ biên cương từ con số 0',
+    'thái y dùng y thuật phá cục chính trị',
+    'tranh ngôi kèm mưu cục nhiều tầng',
+    'kinh doanh thương hội từ chợ huyện đến kinh thành',
+    'đi biển mở tuyến hải thương và cảng tự trị',
+    'thợ săn miền núi gây dựng thế lực biên cương',
+    'xuyên thời gian mở tiệm net chiến cờ cho võ tướng',
+  ],
+  'tien-hiep': [
+    'phàm nhân mang ngọc giản cổ đế',
+    'tông môn suy tàn được vực dậy bằng luyện đan',
+    'bí cảnh thượng cổ + tranh đoạt truyền thừa',
+    'độ kiếp liên hoàn và phản sát thiên kiêu',
+    'song tu chính tà, một thân hai đạo',
+    'từ hạ giới phi thăng rồi nghịch phạt tiên đình',
+    'hồng hoang cổ vực, tranh thánh vị trước đại kiếp',
+    'mở tông môn từ một đệ tử ngoại môn bị ruồng bỏ',
+    'linh điền nông trại, trồng tiên dược để đổi cảnh giới',
+    'đi biển săn yêu thú, cướp cơ duyên hải đảo',
+    'mở tiệm net mô phỏng bí cảnh cho tu sĩ đột phá',
+  ],
+  'sci-fi-apocalypse': [
+    'tận thế bug hệ thống + city bunker',
+    'đội cơ giáp bảo vệ thuộc địa cuối cùng',
+    'du hành sao với trí tuệ nhân tạo phản loạn',
+    'dị biến gen khiến xã hội phân tầng mới',
+    'khai hoang hành tinh bằng công nghệ nano',
+    'vòng lặp thời gian trước ngày diệt vong',
+    'võng du thực tế hóa qua thiết bị thần kinh toàn dân',
+    'mở net-cafe VR thành trung tâm huấn luyện chiến binh',
+    'kinh doanh công nghệ lõi giữa thời đại mạt thế',
+    'đi biển săn tài nguyên trong đại dương ô nhiễm',
+  ],
+  'horror-mystery': [
+    'thị trấn mất tích theo chu kỳ 13 ngày',
+    'điều tra giáo phái với nghi thức cấm',
+    'nhà trọ dị không gian và luật sống sót',
+    'phòng chat đêm dự báo án mạng',
+    'thám tử tâm linh truy vết ký ức giả',
+    'bản sao doppelganger thay người thân',
+  ],
+};
+
+const TITLE_POWER_WORDS = [
+  'vạn', 'cửu', 'thập', 'thiên', 'thần', 'đế', 'thánh', 'chủ',
+  'ma', 'kiếm', 'đạo', 'bá', 'vương', 'phá', 'nghịch', 'tuyệt',
+  'vô', 'huyết', 'long', 'tu', 'kiếp', 'hệ thống', 'siêu', 'chí tôn',
+];
+
+const TITLE_WEAK_PATTERNS = [
+  'tân truyện',
+  'câu chuyện của',
+  'hành trình của',
+  'truyện về',
+  'một ngày nọ',
+];
+
 export class IdeaBankService {
   private gemini: GeminiClient;
   private supabaseUrl: string;
@@ -448,7 +578,7 @@ export class IdeaBankService {
    * Generate a single story idea for a genre
    */
   async generateIdea(input: IdeaGenerationPrompt): Promise<ServiceResult<StoryIdea>> {
-    const { genre, avoid_similar_to, target_audience, include_tropes, exclude_tropes } = input;
+    const { genre, avoid_similar_to, target_audience, include_tropes, exclude_tropes, special_instructions } = input;
 
     // Get random tropes for variety
     const genreTropes = GENRE_TROPES[genre] || [];
@@ -483,6 +613,7 @@ export class IdeaBankService {
       antagonist,
       targetAudience: target_audience || 'general',
       avoidSimilar: existingTitles.length > 0 ? existingTitles : undefined,
+      specialInstructions: special_instructions,
     });
 
     const result = await this.gemini.generateJSON<GeneratedIdea>(prompt, {
@@ -499,12 +630,14 @@ export class IdeaBankService {
     }
 
     const generated = result.data;
+    const normalizedTitle = this.normalizeTitle(generated.title);
+    const title = this.upgradeTitleIfWeak(normalizedTitle, genre, include_tropes || selectedTropes);
 
     // Create StoryIdea object
     const idea: Omit<StoryIdea, 'id' | 'created_at'> = {
       genre,
       sub_genre: generated.sub_genre || null,
-      title: generated.title,
+      title,
       premise: generated.premise,
       hook: generated.hook,
       usp: generated.usp,
@@ -972,6 +1105,7 @@ export class IdeaBankService {
     antagonist: string;
     targetAudience: string;
     avoidSimilar?: string[];
+    specialInstructions?: string;
   }): string {
     const genreDescriptions: Record<FactoryGenre, string> = {
       'system-litrpg': 'LitRPG/System truyện có hệ thống game, level up, skill, quest',
@@ -985,6 +1119,14 @@ export class IdeaBankService {
       'horror-mystery': 'Kinh dị, bí ẩn, trinh thám',
     };
 
+    const topicSeeds = this.selectRandomItems(PLATFORM_TOPIC_POOLS[params.genre] || [], 4);
+    const platformDNA = [
+      `- Qidian DNA: ${PLATFORM_TITLE_DNA.qidian}`,
+      `- Zongheng DNA: ${PLATFORM_TITLE_DNA.zongheng}`,
+      `- Faloo DNA: ${PLATFORM_TITLE_DNA.faloo}`,
+    ].join('\n');
+    const falooPatterns = FALOO_TITLE_PATTERNS.map((p) => `- ${p}`).join('\n');
+
     return `Bạn là chuyên gia sáng tạo ý tưởng webnovel tiếng Việt. Tạo một ý tưởng truyện mới và độc đáo.
 
 THÔNG TIN:
@@ -995,6 +1137,25 @@ ${params.excludeTropes ? `- Tránh tropes: ${params.excludeTropes.join(', ')}` :
 - Kiểu phản diện: ${params.antagonist}
 - Đối tượng: ${params.targetAudience}
 ${params.avoidSimilar ? `- TRÁNH GIỐNG các truyện đã có: ${params.avoidSimilar.join(', ')}` : ''}
+${params.specialInstructions ? `- CẢI THIỆN BẮT BUỘC: ${params.specialInstructions}` : ''}
+
+PLATFORM BLEND (BẮT BUỘC ÁP DỤNG):
+${platformDNA}
+- Trộn theo tỉ lệ 50% Qidian + 30% Zongheng + 20% Faloo.
+- KHÔNG copy tên truyện có thật; chỉ học nhịp, độ kích thích và cấu trúc hook.
+
+FALOO TITLE PATTERNS (THAM KHẢO CẤU TRÚC):
+${falooPatterns}
+
+STYLE ƯU TIÊN (SƯỚNG VĂN MAINSTREAM):
+- Nhịp nhanh: vào xung đột trong 1-2 đoạn đầu.
+- Golden finger xuất hiện rõ ngay premise.
+- Ít đau khổ kéo dài: KHÔNG để MC bị đè liên tiếp quá lâu.
+- Mỗi 1-2 chương dự kiến phải có 1 payoff nhỏ (thu hoạch, tát mặt, tăng cấp, kiếm lợi).
+- Vẫn giữ hợp lý nhân quả, không vô não; tránh gây phản cảm lowbrow.
+
+TOPIC SEEDS (ưu tiên chọn 1-2 để phối):
+- ${topicSeeds.join('\n- ')}
 
 MẪU TÊN TRUYỆN HẤP DẪN - Học từ top webnovels Trung Quốc:
 
@@ -1045,6 +1206,9 @@ PATTERN 9: Unique/Urban Modern
 - Dùng Hán-Việt cho tien-hiep/huyen-huyen (威严 + 古典)
 - Dùng Việt thuần cho urban/romance (dễ nhớ + gần gũi)
 - Phải gợi tò mò: "Vạn Cổ" = bao lâu? "Thôn Phệ" = ăn gì? "Quỷ Bí" = gì vậy?
+- Tránh tên generic kiểu "Tân Truyện", "Câu Chuyện Của...", "Hành Trình Của...".
+- Tên phải tạo cảm giác high-stakes hoặc bí ẩn ngay khi đọc.
+- Tạo nội bộ 5-8 title candidates rồi chọn 1 title mạnh nhất để xuất JSON.
 
 GOLDEN FINGER (BẮT BUỘC):
 Nhân vật chính PHẢI có ít nhất 1 "golden finger" (lợi thế đặc biệt) rõ ràng:
@@ -1139,6 +1303,68 @@ OUTPUT JSON (chỉ JSON, không markdown):
   private selectRandomItems<T>(items: T[], count: number): T[] {
     const shuffled = [...items].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, Math.min(count, items.length));
+  }
+
+  private normalizeTitle(rawTitle: string): string {
+    return (rawTitle || '')
+      .trim()
+      .replace(/^['"“”‘’\s]+|['"“”‘’\s]+$/g, '')
+      .replace(/\s+/g, ' ');
+  }
+
+  private scoreTitle(title: string): number {
+    if (!title) return 0;
+    const cleaned = title.toLowerCase();
+    const words = cleaned.split(/\s+/).filter(Boolean);
+    let score = 0;
+
+    if (words.length >= 2 && words.length <= 7) score += 3;
+    else if (words.length <= 10) score += 1;
+
+    if (TITLE_POWER_WORDS.some((kw) => cleaned.includes(kw))) score += 2;
+    if (/[?!]|chi\s+chủ|hệ\s+thống|vạn|cửu|thập|thôn\s+phệ|quỷ\s+bí/i.test(title)) score += 2;
+    if (/[：:]/.test(title)) score += 1;
+    if (/khai cục|bắt đầu|trọng sinh|toàn dân|ta tại/i.test(cleaned)) score += 1;
+
+    if (TITLE_WEAK_PATTERNS.some((p) => cleaned.includes(p))) score -= 4;
+    if (/^[a-z0-9\s-]+$/i.test(title) && !/[A-ZÀ-Ỹ]/.test(title)) score -= 1;
+
+    return Math.max(0, Math.min(10, score));
+  }
+
+  private upgradeTitleIfWeak(title: string, genre: FactoryGenre, tropes: string[]): string {
+    if (this.scoreTitle(title) >= 6) return title;
+
+    const trope = (tropes[0] || '').split(' ')[0] || 'Hệ Thống';
+    const replacements: Record<FactoryGenre, string[]> = {
+      'system-litrpg': ['Siêu Thần', 'Toàn Chức', 'Ký Danh', 'Vô Hạn'],
+      'urban-modern': ['Đỉnh Lưu', 'Thương Vương', 'Ẩn Long', 'Nghịch Tập'],
+      romance: ['Cưng Chiều', 'Nghịch Tập Tình Yêu', 'Hôn Ước', 'Tái Ngộ'],
+      'huyen-huyen': ['Quỷ Bí', 'Thần Vực', 'Huyền Môn', 'Vạn Linh'],
+      'action-adventure': ['Sinh Tử Cục', 'Truy Sát', 'Đại Chiến', 'Tử Đấu'],
+      historical: ['Quyền Thần', 'Loạn Thế', 'Đại Tần', 'Mưu Triều'],
+      'tien-hiep': ['Vạn Cổ', 'Cửu Thiên', 'Đế Tôn', 'Nghịch Thiên'],
+      'sci-fi-apocalypse': ['Mạt Nhật', 'Tinh Hải', 'Cơ Giáp', 'Dị Biến'],
+      'horror-mystery': ['Quỷ Dị', 'Cấm Kỵ', 'Dạ Hành', 'Án Mệnh'],
+    };
+
+    const pool = replacements[genre] || ['Chí Tôn'];
+    const prefix = this.selectRandomItems(pool, 1)[0];
+    const suffix = trope.charAt(0).toUpperCase() + trope.slice(1);
+    const patternByGenre: Record<FactoryGenre, string[]> = {
+      'system-litrpg': [`Toàn Dân Chuyển Chức: ${prefix} ${suffix}`, `Ta Tại Game: Khai Cục ${prefix}`],
+      'urban-modern': [`Trọng Sinh Đô Thị: Khai Cục ${prefix}`, `Bảo Ta Khởi Nghiệp, Ta Lại ${prefix}?`],
+      romance: [`Trọng Sinh Tình Trường: Khai Cục ${prefix}`, `Ta Tại Hào Môn: ${prefix} ${suffix}`],
+      'huyen-huyen': [`Ta Tại Huyền Huyễn: Khai Cục ${prefix}`, `${prefix} Chi Chủ`],
+      'action-adventure': [`Ta Tại Tử Cục: Khai Cục ${prefix}`, `${prefix} Sinh Tử Cục`],
+      historical: [`Trọng Sinh Loạn Thế: Khai Cục ${prefix}`, `Ta Tại Cổ Đại: ${prefix} ${suffix}`],
+      'tien-hiep': [`Ta Tại Tiên Hiệp: Khai Cục ${prefix}`, `${prefix} ${suffix}`],
+      'sci-fi-apocalypse': [`Tận Thế Giáng Lâm: Khai Cục ${prefix}`, `Ta Tại Mạt Thế: ${prefix} ${suffix}`],
+      'horror-mystery': [`Ta Tại Quỷ Vực: Khai Cục ${prefix}`, `${prefix} Án Mệnh`],
+    };
+
+    const candidates = patternByGenre[genre] || [`${prefix} ${suffix}`];
+    return this.selectRandomItems(candidates, 1)[0].trim();
   }
 
   private delay(ms: number): Promise<void> {

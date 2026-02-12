@@ -31,6 +31,94 @@ const GENRE_LABELS: Record<string, string> = Object.fromEntries(
   Object.entries(GENRE_CONFIG).map(([k, v]) => [k, v.name])
 );
 
+const PLATFORM_BLEND_RULE = 'Blend 50% Qidian + 30% Zongheng + 20% Faloo (BFALOO)';
+
+const SOURCE_TOPIC_SEEDS: Record<string, string[]> = {
+  'tien-hiep': [
+    'tông môn suy tàn được vực dậy từ ngoại môn',
+    'phàm nhân có ngọc giản cổ đế',
+    'bí cảnh thượng cổ và tranh đoạt truyền thừa',
+    'độ kiếp liên hoàn phản sát thiên kiêu',
+    'phi thăng rồi phát hiện tiên giới là bẫy',
+    'song tu chính tà, một thân hai đạo',
+    'hồng hoang đại kiếp và tranh đoạt thánh vị',
+    'mở tông môn từ ngoại môn phế vật',
+    'linh điền nông trại đổi tài nguyên tu luyện',
+    'mở tiệm net mô phỏng bí cảnh cho tu sĩ',
+    'hải vực săn bảo, đoạt truyền thừa cổ tiên',
+    'sơn lâm săn yêu thú đổi điểm cống hiến tông môn',
+  ],
+  'huyen-huyen': [
+    'học viện ma pháp + chiến tranh chủng tộc',
+    'khế ước thú thần nhiều hệ',
+    'khắc văn cấm thuật và lò rèn linh hồn',
+    'đảo nổi bầu trời, hành trình săn di vật',
+    'huyết mạch cổ thần thức tỉnh từng tầng',
+    'pháp tắc nhân quả thao túng vận mệnh',
+    'mở tiệm net ma pháp trong thành học viện',
+    'trang trại ma dược và thương hội liên quốc',
+    'thợ săn ma thú rừng sâu thành lãnh chủ',
+  ],
+  'do-thi': [
+    'livestream nghèo thành đỉnh lưu',
+    'thương chiến AI + dữ liệu độc quyền',
+    'bảo tiêu đô thị và giới tài phiệt ngầm',
+    'đạo diễn web-drama thành vua phòng vé',
+    'shipper nghịch tập thành ông trùm logistics',
+    'hệ thống nhiệm vụ trong môi trường công sở',
+    'tận thế đô thị và mô hình khu an toàn',
+    'mở vườn kinh doanh nông nghiệp công nghệ cao',
+    'đi biển bắt hải sản và chuỗi cung ứng lạnh',
+    'lên núi săn thú hợp pháp kết hợp livestream',
+    'mở tiệm net cũ thành trung tâm esports',
+    'võng du vào hiện thực, kỹ năng game dùng ngoài đời',
+  ],
+  'khoa-huyen': [
+    'tận thế bug hệ thống + thành phố bunker',
+    'đội cơ giáp bảo vệ thuộc địa cuối cùng',
+    'du hành sao cùng AI phản loạn',
+    'dị biến gen tạo xã hội phân tầng mới',
+    'khai hoang hành tinh bằng nano',
+    'vòng lặp thời gian trước ngày diệt vong',
+    'võng du thực hóa qua thiết bị thần kinh',
+    'mở net-cafe VR thành trung tâm huấn luyện',
+    'kinh doanh công nghệ lõi trong thời mạt thế',
+    'đi biển săn tài nguyên ở đại dương độc hại',
+  ],
+  'lich-su': [
+    'hàn môn sĩ tử khuấy triều đình',
+    'thương lộ tơ lụa và chiến tranh thuế',
+    'nữ quân sư đảo chiều quốc vận',
+    'thái y phá cục bằng y thuật',
+    'xây thành biên cương từ con số 0',
+    'tranh ngôi nhiều tầng mưu cục',
+    'kinh doanh thương hội cổ đại từ chợ huyện',
+    'đội tàu hải thương tranh cảng chiến lược',
+    'thợ săn miền núi lập nghiệp biên cương',
+    'xuyên thời gian mở tiệm net chiến cờ cho võ tướng',
+  ],
+  'dong-nhan': [
+    'xuyên vào vai phản diện phụ',
+    'AU đổi tuyến chính sử của tác phẩm gốc',
+    'người ngoài cuộc phá timeline canon',
+    'bản thể phụ tỉnh thức chống tác giả',
+    'hệ thống nhiệm vụ trong thế giới IP gốc',
+    'liên động đa vũ trụ fanfic',
+  ],
+  'vong-du': [
+    'class ẩn sau khi bị kick khỏi top guild',
+    'quốc chiến liên server + lãnh địa',
+    'gacha summon phá meta mùa giải',
+    'đội tuyển esports từ hạng bét lên vô địch',
+    'thực tế ảo trộn thế giới thật',
+    'nghề phụ crafting thành thần khí',
+    'võng du vào hiện thực sau sự kiện đồng bộ máy chủ',
+    'toàn dân chuyển chức, nghề ẩn mở khóa từ nhiệm vụ cấm',
+    'kinh tế game thao túng chợ đấu giá liên server',
+    'mở tiệm net chiến thuật và đào tạo tuyển thủ',
+  ],
+};
+
 // Vietnamese main character name components
 const MC_NAMES = {
   ho: ['Lâm', 'Trần', 'Lý', 'Vương', 'Triệu', 'Chu', 'Tống', 'Ngô', 'Hoàng', 'Tô',
@@ -860,6 +948,7 @@ export class ContentSeeder {
       original_work: 'Nêu rõ tác phẩm gốc (tên) và cách biến tấu/nhánh rẽ (AU) để tạo câu chuyện mới.',
     };
     const requiredRule = requiredKey ? (requiredRulesByKey[requiredKey] || 'Viết chi tiết, cụ thể, có cấu trúc rõ ràng.') : 'Viết chi tiết, cụ thể, có cấu trúc rõ ràng.';
+    const topicSeeds = this.pickTopicSeeds(genre, 5).map((item: string) => `- ${item}`).join('\n');
 
     const prompt = `Bạn là tác giả webnovel chuyên nghiệp. Hãy tạo ${count} tiểu thuyết thể loại ${genreLabel} với NỘI DUNG ĐẦY ĐỦ.
 
@@ -874,6 +963,28 @@ Mỗi tiểu thuyết cần:
 8. "${requiredKey || 'required_system'}": Trường BẮT BUỘC cho thể loại này. ${requiredRule} Ví dụ format: ${requiredExample}
 9. "coverPrompt": Prompt tiếng Anh 3-5 câu để AI tạo ảnh bìa. BẮT BUỘC chứa: Title text must be exactly: "<TITLE>", At the bottom-center include small text: "Truyencity.com", No other text.
 
+PLATFORM DNA (BẮT BUỘC):
+- ${PLATFORM_BLEND_RULE}
+- Qidian: worldbuilding lớn, progression chắc
+- Zongheng: conflict nhanh, nhịp mở đầu mạnh
+- Faloo/BFALOO: high-concept, payoff sớm, cực hook
+
+FALOO STYLE MẪU (THAM KHẢO CẤU TRÚC):
+- "Ta Ở X: Khai Cục Y"
+- "Trọng Sinh X: Khai Cục Y"
+- "Bảo Ta X, Ta Lại Y?"
+- "Toàn Dân X: Bắt Đầu Từ Y"
+- "Ta Tại X Có Một Y"
+
+TOPIC SEEDS (mở rộng chủ đề, chọn 1-2 seed/truyện):
+${topicSeeds}
+
+NHỊP CỐT TRUYỆN (ƯU TIÊN SƯỚNG VĂN MAINSTREAM):
+- Mỗi truyện phải có payoff sớm trong mở đầu, tránh dìm cảm xúc quá lâu.
+- Không để nhân vật chính bị ngược liên tục nhiều chương trong setup.
+- Giữ mâu thuẫn hợp lý nhưng tỷ trọng cảm giác thắng thế phải cao hơn cảm giác bế tắc.
+- Tránh nội dung phản cảm/lowbrow; giữ chất lượng đại chúng lâu dài.
+
 MẪU TÊN TRUYỆN - Học từ webnovels HOT nhất Trung Quốc:
 • [Số Lớn]+[Cảnh Giới]: Vạn Cổ Thần Đế, Cửu Tinh Bá Thể Quyết → Epicness
 • [Động Từ]+[Vũ Trụ]: Thôn Phệ Tinh Không (360M views), Già Thiên (450M) → Power
@@ -881,6 +992,9 @@ MẪU TÊN TRUYỆN - Học từ webnovels HOT nhất Trung Quốc:
 • [Nhân Vật]+Truyện: Phàm Nhân Tu Tiên Truyện (#1 all-time, 500M views) → Relatable
 • [Nghề]+Thần: Tu La Vũ Thần, Siêu Thần Cơ Giới Sư → Identity
 Lưu ý: 2-6 chữ, gợi tò mò, Hán-Việt cho tu tiên/huyền huyễn
+Không dùng tên generic kiểu "Tân Truyện", "Câu Chuyện Của...", "Hành Trình Của..."
+
+Mỗi truyện tự tạo 5-8 title candidates nội bộ, chọn 1 title tốt nhất để xuất JSON.
 
 GOLDEN FINGER (BẮT BUỘC cho mỗi truyện):
 Nhân vật chính PHẢI có ít nhất 1 lợi thế đặc biệt rõ ràng, ví dụ:
@@ -1321,10 +1435,42 @@ CHÚ Ý:
     return `${ho} ${ten}`;
   }
 
+  private pickTopicSeeds(genre: string, count: number): string[] {
+    const pool = SOURCE_TOPIC_SEEDS[genre] || [];
+    if (pool.length <= count) return pool;
+    return [...pool].sort(() => Math.random() - 0.5).slice(0, count);
+  }
+
+  private buildFallbackTitle(genre: string, seed: number): string {
+    const prefixByGenre: Record<string, string[]> = {
+      'tien-hiep': ['Vạn Cổ', 'Cửu Thiên', 'Nghịch Thiên', 'Đế Tôn'],
+      'huyen-huyen': ['Quỷ Bí', 'Thần Vực', 'Huyền Môn', 'Vạn Linh'],
+      'do-thi': ['Nghịch Tập', 'Đỉnh Lưu', 'Ẩn Long', 'Thương Vương'],
+      'khoa-huyen': ['Mạt Nhật', 'Tinh Hải', 'Cơ Giáp', 'Dị Biến'],
+      'lich-su': ['Loạn Thế', 'Quyền Thần', 'Đại Tần', 'Mưu Triều'],
+      'dong-nhan': ['Xuyên Thư', 'Phản Diện', 'Canon Phá Cục', 'Đa Vũ Trụ'],
+      'vong-du': ['Toàn Chức', 'Siêu Thần', 'Vô Hạn', 'Đăng Nhập'],
+    };
+    const suffixByGenre: Record<string, string[]> = {
+      'tien-hiep': ['Thần Đế', 'Kiếm Chủ', 'Tiên Tôn', 'Bất Diệt'],
+      'huyen-huyen': ['Chi Chủ', 'Ma Tôn', 'Thánh Vương', 'Cấm Điển'],
+      'do-thi': ['Toàn Năng', 'Chiến Thần', 'Trùm Đô Thị', 'Siêu Cấp'],
+      'khoa-huyen': ['Thủ Lĩnh', 'Khai Hoang', 'Sinh Tồn', 'Cơ Giới Sư'],
+      'lich-su': ['Ký', 'Đại Nghiệp', 'Tranh Bá', 'Hưng Triều'],
+      'dong-nhan': ['Nghịch Kịch Bản', 'Chi Lộ', 'Phản Công', 'Bẻ Canon'],
+      'vong-du': ['Cao Thủ', 'Chí Tôn', 'Vương Giả', 'Truyền Thuyết'],
+    };
+
+    const prefixes = prefixByGenre[genre] || ['Chí Tôn'];
+    const suffixes = suffixByGenre[genre] || ['Truyền Kỳ'];
+    const prefix = prefixes[seed % prefixes.length];
+    const suffix = suffixes[Math.floor(seed / Math.max(1, prefixes.length)) % suffixes.length];
+    return `${prefix} ${suffix}`.trim();
+  }
+
   private createFallbackIdea(genre: string, seed: number): NovelIdea {
-    const genreLabel = GENRE_LABELS[genre] || genre;
     const mainCharacter = this.randomMCName();
-    const title = `${genreLabel} - Tân Truyện ${seed + 1}`;
+    const title = this.buildFallbackTitle(genre, seed);
     const requiredFieldKey = this.getGenreConfigEntry(genre)?.requiredFields?.[0];
     const requiredFieldValue = this.getFallbackRequiredValue(genre, requiredFieldKey);
 

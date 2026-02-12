@@ -666,6 +666,7 @@ export const ENGAGEMENT_CHECKLIST = {
     'Có ít nhất 1 micro-hook (gợi tò mò nhỏ) trong 500 từ đầu',
     'Cliffhanger hoặc strong ending cuối chương',
     'Ít nhất 1 điểm dopamine (face-slap, đột phá, thu hoạch, recognition...)',
+    'MC phải có ít nhất 1 tiến triển tích cực nhỏ (thu hoạch/tăng lợi thế/xóa nguy cơ)',
     'Ít nhất 1 chi tiết worldbuilding nhỏ (mở rộng thế giới)',
     'Emotional contrast: cảm xúc phải thay đổi ít nhất 1 lần trong chương',
   ],
@@ -674,6 +675,7 @@ export const ENGAGEMENT_CHECKLIST = {
   per5Chapters: [
     'MC phải có tiến bộ rõ ràng (sức mạnh, địa vị, hoặc relationship)',
     'Ít nhất 1 face-slap hoặc power reveal moment',
+    'Không được có chuỗi 3 chương liên tiếp chỉ thua thiệt hoặc bị đè nén',
     'Giới thiệu ít nhất 1 yếu tố mới (nhân vật, địa danh, kỹ thuật)',
     'Ít nhất 1 hint/foreshadowing cho plot lớn hơn',
   ],
@@ -726,8 +728,8 @@ export const ENGAGEMENT_CHECKLIST = {
   // Nguyên tắc "ngược trước sảng sau"
   adversityToTriumphRatio: {
     description: 'Mỗi victory phải được build bằng adversity trước đó',
-    idealRatio: '30% ngược (MC bị khinh/gặp khó) → 70% sảng (MC chiến thắng/được tôn trọng)',
-    rule: 'KHÔNG BAO GIỜ để MC thua liên tiếp 3+ chương mà không có minor win',
+    idealRatio: '20% ngược (MC gặp khó) → 80% sảng (MC tiến bộ/chiến thắng/được tôn trọng)',
+    rule: 'KHÔNG BAO GIỜ để MC thua liên tiếp 2+ chương mà không có minor win',
     antiPattern: 'MC thắng liên tục không gặp khó khăn = nhàm chán, mất tension',
   },
 };

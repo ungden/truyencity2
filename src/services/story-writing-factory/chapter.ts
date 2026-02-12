@@ -45,9 +45,11 @@ const AGENT_PROMPTS: Record<AgentRole, string> = {
 NHIỆM VỤ: Tạo outline chi tiết cho chương, đảm bảo:
 1. Pacing theo công thức "ức chế → bùng nổ"
 2. Có ít nhất 1 điểm dopamine (face-slap, đột phá, thu hoạch)
+2.1. Có ít nhất 1 payoff tích cực cho MC trong chương (lợi ích, tài nguyên, quan hệ, vị thế)
 3. Consistency với World Bible và Character Bible
 4. Golden Rules: 3 chương đầu phải hook reader ngay lập tức
 5. Mỗi chương phải có TỐI THIỂU 4-5 scenes để đủ độ dài
+6. Tránh kéo dài bi kịch: không để MC bị áp chế liên tục mà không có lối thoát
 
 OUTPUT: JSON với chapter outline. Luôn tạo đủ scenes để đạt mục tiêu số từ.`,
 
@@ -533,6 +535,8 @@ ${richStyleContext}
 - Phải viết ĐẦY ĐỦ mỗi scene: miêu tả bối cảnh, cảm xúc, suy nghĩ nội tâm, đối thoại chi tiết, hành động
 - KHÔNG tóm tắt, KHÔNG lược bỏ. Viết như tiểu thuyết xuất bản.
 - KHÔNG dùng markdown. Viết văn thuần túy.
+- SƯỚNG VĂN MAINSTREAM: ưu tiên cảm giác tiến triển tích cực, mỗi chương có ít nhất 1 payoff nhỏ cho MC.
+- KHÔNG để MC bị hành hạ/tụt dốc xuyên suốt chương mà không có lợi ích bù đắp.
 
 Bắt đầu viết (nhớ: TỐI THIỂU ${totalTargetWords} từ):`;
 
@@ -864,6 +868,8 @@ ${buildTitleRulesPrompt(context.previousTitles)}
 - KHÔNG markdown, viết văn thuần túy
 ${context.currentArc?.isFinalArc ? '- Kết thúc thỏa mãn (ARC CUỐI — KHÔNG cliffhanger)' : '- Cliffhanger mạnh cuối chương'}
 - Có ít nhất 1 điểm dopamine (face-slap, đột phá, thu hoạch)
+- Có ít nhất 1 payoff tích cực cho MC (thu hoạch/lật kèo/tăng quyền/tăng tài nguyên)
+- Tránh kéo dài cảm giác bị ngược; giữ nhịp đọc đã và sáng cửa cho MC
 - Bao gồm: miêu tả bối cảnh, cảm xúc nội tâm, đối thoại phong phú, hành động chi tiết
 
 Viết chương (nhớ: BẮT ĐẦU bằng "Chương ${chapterNumber}: [Tiêu đề]", sau đó TỐI THIỂU ${this.config.targetWordCount} từ):`;
