@@ -344,6 +344,17 @@ async function writeOneChapter(
       .eq('id', project.id);
   }
 
+  if (result.success && !chapterWritten && !completionReason) {
+    return {
+      id: project.id,
+      title: novel.title,
+      tier,
+      success: false,
+      error: 'No chapter written in this run',
+      chapterWritten: false,
+    };
+  }
+
   return {
     id: project.id,
     title: novel.title,
