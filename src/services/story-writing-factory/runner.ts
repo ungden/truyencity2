@@ -334,6 +334,8 @@ export class StoryRunner {
 
       // ========== PHASE 3: WRITE ARC BY ARC ==========
       this.updateStatus('writing', 'Bắt đầu viết truyện...');
+      const chaptersWrittenAtStart = this.state.chaptersWritten;
+      let hadArcFailure = false;
 
       for (let arcIndex = 0; arcIndex < this.arcOutlines.length; arcIndex++) {
         if (this.shouldStop) break;
@@ -350,6 +352,7 @@ export class StoryRunner {
         const arcResult = await this.writeArc(arc);
 
         if (!arcResult.success) {
+          hadArcFailure = true;
           if (this.shouldStop) {
             // Don't mark as completed if stopped
             break;
@@ -381,6 +384,19 @@ export class StoryRunner {
       }
 
       // ========== COMPLETED ==========
+      if (this.state.chaptersWritten === chaptersWrittenAtStart) {
+        const noWriteError = hadArcFailure
+          ? 'No chapters were successfully written in this run'
+          : 'Run completed without producing chapters';
+        this.updateStatus('error', noWriteError);
+        this.callbacks.onError?.(noWriteError);
+        return {
+          success: false,
+          state: this.state,
+          error: noWriteError,
+        };
+      }
+
       this.updateStatus('completed', 'Hoàn thành bộ truyện!');
       this.callbacks.onCompleted?.(this.state);
 
