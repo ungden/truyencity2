@@ -139,7 +139,7 @@ function detectNaturalEnding(title?: string | null, content?: string | null): bo
 
 async function ensureDailyQuotasForActiveProjects(
   supabase: ReturnType<typeof getSupabaseAdmin>,
-  projects: ProjectRow[],
+  projects: Array<{ id: string }>,
   vnDate: string,
   dayStartIso: string,
   dayEndIso: string,
@@ -376,11 +376,16 @@ export async function GET(request: NextRequest) {
     // then immediately bumps updated_at to "claim" them.
     const fourMinutesAgo = new Date(Date.now() - 4 * 60 * 1000).toISOString();
 
-    const [activeCountQuery, candidateQuery] = await Promise.all([
+    const [activeCountQuery, activeForQuotaQuery, candidateQuery] = await Promise.all([
       supabase
         .from('ai_story_projects')
         .select('id', { count: 'exact', head: true })
         .eq('status', 'active'),
+      supabase
+        .from('ai_story_projects')
+        .select('id')
+        .eq('status', 'active')
+        .limit(5000),
       supabase
         .from('ai_story_projects')
         .select(`
@@ -398,6 +403,7 @@ export async function GET(request: NextRequest) {
 
     if (activeCountQuery.error) throw activeCountQuery.error;
     if (candidateQuery.error) throw candidateQuery.error;
+    if (activeForQuotaQuery.error) throw activeForQuotaQuery.error;
 
     const activeCount = activeCountQuery.count || 0;
     const dynamicResumeBatchSize = computeDynamicResumeBatchSize(activeCount);
@@ -417,7 +423,7 @@ export async function GET(request: NextRequest) {
     const { vnDate, startIso, endIso } = getVietnamDayBounds(now);
 
     // Ensure every active candidate has today's quota row.
-    await ensureDailyQuotasForActiveProjects(supabase, allCandidates, vnDate, startIso, endIso, now);
+    await ensureDailyQuotasForActiveProjects(supabase, activeForQuotaQuery.data || [], vnDate, startIso, endIso, now);
 
     const projectIds = allCandidates.map((p) => p.id);
     let quotaRows: DailyQuotaRow[] = [];
