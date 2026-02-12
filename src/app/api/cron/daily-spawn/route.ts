@@ -34,14 +34,38 @@ export async function GET(request: NextRequest) {
 
   try {
     const seeder = new ContentSeeder(geminiKey);
-    const result = await seeder.spawnDailyNovels(target);
+    const errors: string[] = [];
+    let created = 0;
+    const maxAttempts = 4;
+
+    for (let attempt = 1; attempt <= maxAttempts && created < target; attempt++) {
+      const remaining = target - created;
+      const result = await seeder.spawnDailyNovels(remaining);
+      created += result.created;
+      if (result.errors.length > 0) {
+        errors.push(...result.errors.map((e) => `[attempt ${attempt}] ${e}`));
+      }
+    }
+
+    if (created < target) {
+      return NextResponse.json(
+        {
+          success: false,
+          target,
+          created,
+          missing: target - created,
+          errors,
+          error: `Daily spawn incomplete: required ${target}, created ${created}`,
+        },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({
       success: true,
       target,
-      created: result.created,
-      errors: result.errors,
-      durationSeconds: Math.round(result.durationMs / 1000),
+      created,
+      errors,
     });
   } catch (error) {
     return NextResponse.json(

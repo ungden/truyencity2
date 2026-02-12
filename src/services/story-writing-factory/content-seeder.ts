@@ -382,7 +382,7 @@ export class ContentSeeder {
 
   /**
    * Daily spawn: create a small number of brand-new novels/projects.
-   * Newly created projects start as paused so daily rotation can activate fairly.
+   * Newly created projects start as active and are immediately scheduled for daily writing quota.
    */
   async spawnDailyNovels(targetCount: number = 20): Promise<DailySpawnResult> {
     const startTime = Date.now();
@@ -527,7 +527,7 @@ export class ContentSeeder {
         temperature: 1.0,
         current_chapter: 0,
         total_planned_chapters: this.randomInt(1000, 2000),
-        status: 'paused',
+        status: 'active',
       };
 
       if (requiredKey && requiredValue) {

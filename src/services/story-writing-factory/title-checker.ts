@@ -21,6 +21,14 @@ export interface TitleCheckResult {
   suggestions: string[];
 }
 
+export interface TitleOptimizeResult {
+  original: string;
+  optimized: string;
+  originalScore: number;
+  optimizedScore: number;
+  changed: boolean;
+}
+
 export interface TitleIssue {
   type: 'anti_pattern' | 'repetition' | 'too_long' | 'too_short' | 'monotony';
   description: string;
@@ -201,6 +209,72 @@ export class TitleChecker {
   }
 
   /**
+   * Optimize title quality with soft reranking.
+   * Does not force fixed patterns; only improves when a better option exists.
+   */
+  optimizeTitle(
+    title: string,
+    previousTitles: string[] = [],
+    options?: { contentHint?: string; chapterNumber?: number }
+  ): TitleOptimizeResult {
+    const original = (title || '').trim();
+    const originalCheck = this.checkTitle(original, previousTitles);
+
+    const candidates = new Set<string>();
+    if (original) candidates.add(this.normalizeCandidate(original));
+
+    // Candidate 1: remove weak prefixes/suffixes and tighten wording
+    const tightened = this.tightenTitle(original);
+    if (tightened) candidates.add(tightened);
+
+    // Candidate 2+: build from content keywords if available
+    const contentKeywords = this.extractContentKeywords(options?.contentHint || '');
+    if (contentKeywords.length >= 2) {
+      const [k1, k2, k3] = contentKeywords;
+      candidates.add(this.normalizeCandidate(`${k1} ${k2}`));
+      candidates.add(this.normalizeCandidate(`${k1}: ${k2}`));
+      candidates.add(this.normalizeCandidate(`${k1} Và ${k2}`));
+      if (k3) candidates.add(this.normalizeCandidate(`${k1} ${k3}`));
+      candidates.add(this.normalizeCandidate(`Nước Cờ ${k1}`));
+      candidates.add(this.normalizeCandidate(`Giờ Phản Công`));
+      candidates.add(this.normalizeCandidate(`Ai Dám ${k1}?`));
+    }
+
+    // Candidate from template examples (softly adapted)
+    const sampledTemplates = TITLE_TEMPLATES.slice(0, 6);
+    for (const tmpl of sampledTemplates) {
+      const ex = tmpl.examples[0];
+      if (ex) candidates.add(this.normalizeCandidate(ex));
+    }
+
+    // Score all candidates using quality + novelty blend
+    let bestTitle = original || `Chương ${options?.chapterNumber || ''}`.trim();
+    let bestScore = this.blendedScore(bestTitle, previousTitles);
+
+    for (const candidate of candidates) {
+      if (!candidate || candidate.length < 2) continue;
+      const score = this.blendedScore(candidate, previousTitles);
+      if (score > bestScore) {
+        bestScore = score;
+        bestTitle = candidate;
+      }
+    }
+
+    const optimizedCheck = this.checkTitle(bestTitle, previousTitles);
+    const shouldChange =
+      bestTitle !== original &&
+      (optimizedCheck.score >= originalCheck.score + 1 || originalCheck.score < 6);
+
+    return {
+      original,
+      optimized: shouldChange ? bestTitle : original,
+      originalScore: originalCheck.score,
+      optimizedScore: shouldChange ? optimizedCheck.score : originalCheck.score,
+      changed: shouldChange,
+    };
+  }
+
+  /**
    * Batch check: analyze diversity across a list of titles
    */
   checkTitleDiversity(titles: string[]): {
@@ -296,6 +370,86 @@ export class TitleChecker {
       .toLowerCase()
       .split(/\s+/)
       .filter(w => w.length > 1 && !STOP_WORDS.has(w));
+  }
+
+  private normalizeCandidate(title: string): string {
+    return title
+      .replace(/\s+/g, ' ')
+      .replace(/^[:\-–—\s]+|[:\-–—\s]+$/g, '')
+      .trim();
+  }
+
+  private tightenTitle(title: string): string {
+    const cleaned = this.normalizeCandidate(title);
+    if (!cleaned) return cleaned;
+
+    let next = cleaned
+      .replace(/^Chương\s*\d+\s*[:\-–—]\s*/i, '')
+      .replace(/^Sự\s+/i, '')
+      .replace(/^Một\s+/i, '')
+      .replace(/\s+Trong\s+\w+\s+Khắc$/i, '')
+      .trim();
+
+    const words = next.split(/\s+/);
+    if (words.length > 8) {
+      next = words.slice(0, 8).join(' ');
+    }
+    return this.normalizeCandidate(next);
+  }
+
+  private extractContentKeywords(content: string): string[] {
+    if (!content) return [];
+    const text = content
+      .replace(/\n/g, ' ')
+      .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+      .toLowerCase();
+
+    const blacklist = new Set([
+      ...STOP_WORDS,
+      'chương', 'hắn', 'nàng', 'bọn', 'người', 'trong', 'ngoài', 'không', 'đây', 'kia',
+      'ánh', 'không', 'khí', 'tiếng', 'đột', 'nhiên', 'lập', 'tức',
+    ]);
+
+    const freq = new Map<string, number>();
+    for (const token of text.split(/\s+/)) {
+      const w = token.trim();
+      if (w.length < 3 || blacklist.has(w)) continue;
+      freq.set(w, (freq.get(w) || 0) + 1);
+    }
+
+    return Array.from(freq.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6)
+      .map(([w]) => this.capitalizeWord(w));
+  }
+
+  private capitalizeWord(word: string): string {
+    if (!word) return word;
+    return word.charAt(0).toUpperCase() + word.slice(1);
+  }
+
+  private blendedScore(title: string, previousTitles: string[]): number {
+    const check = this.checkTitle(title, previousTitles);
+    const noveltyPenalty = this.computeNoveltyPenalty(title, previousTitles);
+    return check.score - noveltyPenalty;
+  }
+
+  private computeNoveltyPenalty(title: string, previousTitles: string[]): number {
+    if (!previousTitles.length) return 0;
+    const words = this.extractMeaningfulWords(title);
+    if (!words.length) return 0;
+
+    const recent = previousTitles.slice(-10);
+    let maxOverlap = 0;
+    for (const t of recent) {
+      const prev = this.extractMeaningfulWords(t);
+      const overlap = words.filter(w => prev.includes(w)).length;
+      if (overlap > maxOverlap) maxOverlap = overlap;
+    }
+
+    if (maxOverlap >= 3) return 2;
+    if (maxOverlap === 2) return 1;
+    return 0;
   }
 
   /**

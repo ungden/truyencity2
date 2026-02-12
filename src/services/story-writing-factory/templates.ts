@@ -729,7 +729,7 @@ export const ENGAGEMENT_CHECKLIST = {
   adversityToTriumphRatio: {
     description: 'Mỗi victory phải được build bằng adversity trước đó',
     idealRatio: '20% ngược (MC gặp khó) → 80% sảng (MC tiến bộ/chiến thắng/được tôn trọng)',
-    rule: 'KHÔNG BAO GIỜ để MC thua liên tiếp 2+ chương mà không có minor win',
+    rule: 'Ưu tiên tránh chuỗi thua kéo dài; nếu có adversity thì nên có minor win hoặc cửa thoát sớm',
     antiPattern: 'MC thắng liên tục không gặp khó khăn = nhàm chán, mất tension',
   },
 };
@@ -744,17 +744,17 @@ export function buildTitleRulesPrompt(previousTitles?: string[]): string {
 
   const antiExamples = CHAPTER_TITLE_RULES.antiPatterns.slice(0, 5).join(', ');
 
-  let prompt = `QUY TẮC ĐẶT TÊN CHƯƠNG (BẮT BUỘC):
-- Ngắn gọn 3-10 từ, GỢI TÒ MÒ, khiến người đọc muốn click
-- TUYỆT ĐỐI KHÔNG dùng các mẫu nhàm chán sau: ${antiExamples}
-- Chọn 1 trong 10 mẫu đa dạng:
+  let prompt = `ĐỊNH HƯỚNG ĐẶT TÊN CHƯƠNG:
+- Ưu tiên ngắn gọn 3-10 từ, gợi tò mò và có lực click
+- Hạn chế dùng các mẫu nhàm chán sau: ${antiExamples}
+- Có thể chọn 1 trong 10 mẫu đa dạng:
 ${titleExamples}
 - VÍ DỤ TỐT: "Huyết Chiến Vạn Thú Sơn", "Ngươi Không Xứng!", "Phế Vật? Thiên Tài!", "Bóng Tối Sau Cổng Thành"
-- VÍ DỤ XẤU (CẤM): "Sự Sỉ Nhục Và Sự Trỗi Dậy", "Nghịch Lý Của Linh Áp", "Quy Luật Của Những Con Số", "X Và Sự Y"`;
+- VÍ DỤ NÊN TRÁNH: "Sự Sỉ Nhục Và Sự Trỗi Dậy", "Nghịch Lý Của Linh Áp", "Quy Luật Của Những Con Số", "X Và Sự Y"`;
 
   if (previousTitles && previousTitles.length > 0) {
     const recent = previousTitles.slice(-10);
-    prompt += `\n- CÁC CHƯƠNG GẦN ĐÂY: [${recent.join(' | ')}]. KHÔNG lặp keyword hoặc pattern với chúng.`;
+    prompt += `\n- CÁC CHƯƠNG GẦN ĐÂY: [${recent.join(' | ')}]. Ưu tiên tránh lặp keyword hoặc pattern với chúng.`;
   }
 
   return prompt;

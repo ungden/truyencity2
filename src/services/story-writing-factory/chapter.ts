@@ -34,6 +34,7 @@ import {
 } from './types';
 import { GOLDEN_CHAPTER_REQUIREMENTS, buildTitleRulesPrompt, ENGAGEMENT_CHECKLIST } from './templates';
 import { buildStyleContext, getEnhancedStyleBible, CLIFFHANGER_TECHNIQUES, SceneType } from './style-bible';
+import { titleChecker } from './title-checker';
 
 // ============================================================================
 // AGENT SYSTEM PROMPTS
@@ -49,7 +50,7 @@ NHIỆM VỤ: Tạo outline chi tiết cho chương, đảm bảo:
 3. Consistency với World Bible và Character Bible
 4. Golden Rules: 3 chương đầu phải hook reader ngay lập tức
 5. Mỗi chương phải có TỐI THIỂU 4-5 scenes để đủ độ dài
-6. Tránh kéo dài bi kịch: không để MC bị áp chế liên tục mà không có lối thoát
+6. Tránh kéo dài bi kịch: ưu tiên để MC luôn có lối thoát hoặc tiến triển dần
 
 OUTPUT: JSON với chapter outline. Luôn tạo đủ scenes để đạt mục tiêu số từ.`,
 
@@ -215,9 +216,14 @@ export class ChapterWriter {
         }
 
         // Build result
+        const rawTitle = writerResult.data.title || this.extractTitleFromContent(writerResult.data.chapterContent, chapterNumber);
+        const optimizedTitle = titleChecker.optimizeTitle(rawTitle, context.previousTitles || [], {
+          chapterNumber,
+          contentHint: writerResult.data.chapterContent,
+        });
         const content: ChapterContent = {
           chapterNumber,
-          title: writerResult.data.title || this.extractTitleFromContent(writerResult.data.chapterContent, chapterNumber),
+          title: optimizedTitle.optimized,
           content: writerResult.data.chapterContent,
           wordCount: writerResult.data.wordCount,
           qualityScore: criticResult.data?.overallScore || 5,
@@ -309,12 +315,16 @@ export class ChapterWriter {
 
       // Extract title from AI-written content (looks for "Chương N: Title" pattern)
       const extractedTitle = this.extractTitleFromContent(content, chapterNumber);
+      const optimizedTitle = titleChecker.optimizeTitle(extractedTitle, context.previousTitles || [], {
+        chapterNumber,
+        contentHint: content,
+      });
 
       return {
         success: true,
         data: {
           chapterNumber,
-          title: extractedTitle,
+          title: optimizedTitle.optimized,
           content,
           wordCount,
           qualityScore: 6,
@@ -536,7 +546,7 @@ ${richStyleContext}
 - KHÔNG tóm tắt, KHÔNG lược bỏ. Viết như tiểu thuyết xuất bản.
 - KHÔNG dùng markdown. Viết văn thuần túy.
 - SƯỚNG VĂN MAINSTREAM: ưu tiên cảm giác tiến triển tích cực, mỗi chương có ít nhất 1 payoff nhỏ cho MC.
-- KHÔNG để MC bị hành hạ/tụt dốc xuyên suốt chương mà không có lợi ích bù đắp.
+- Hạn chế kéo dài trạng thái tụt dốc; nên có điểm hồi phục hoặc lợi ích bù đắp.
 
 Bắt đầu viết (nhớ: TỐI THIỂU ${totalTargetWords} từ):`;
 

@@ -24,10 +24,12 @@ import { StoryRunner } from '@/services/story-writing-factory/runner';
 import type { FactoryConfig, RunnerConfig, GenreType } from '@/services/story-writing-factory/types';
 
 // CONFIGURATION
-const RESUME_BATCH_SIZE = 30;  // Tier 1: resume projects (fast) — 30 * 288 ticks/day = 8,640 slots/day
-const INIT_BATCH_SIZE = 5;     // Tier 2: new projects needing full plan (slow) — bumped from 1 to clear 33 stuck novels faster
+const MIN_RESUME_BATCH_SIZE = 30;
+const MAX_RESUME_BATCH_SIZE = 180;
+const INIT_BATCH_SIZE = 8;
+const CANDIDATE_POOL_SIZE = 1200;
 const PROJECT_TIMEOUT_MS = 120_000; // 120s per-project timeout — prevents 1 slow project from blocking the batch
-const DAILY_CHAPTER_QUOTA = 20; // Hard cap per novel per Vietnam day
+const DAILY_CHAPTER_QUOTA = 20; // Hard exact target per active novel per Vietnam day
 
 export const maxDuration = 300; // 5 minutes (Vercel Pro)
 export const dynamic = 'force-dynamic';
@@ -46,7 +48,7 @@ function verifyCronAuth(request: NextRequest): boolean {
   return authHeader === `Bearer ${cronSecret}`;
 }
 
-function getVietnamDayBounds(now: Date = new Date()): { startIso: string; endIso: string } {
+function getVietnamDayBounds(now: Date = new Date()): { vnDate: string; startIso: string; endIso: string } {
   const dateStr = new Intl.DateTimeFormat('en-CA', {
     timeZone: 'Asia/Ho_Chi_Minh',
     year: 'numeric',
@@ -59,9 +61,23 @@ function getVietnamDayBounds(now: Date = new Date()): { startIso: string; endIso
   const endUtc = new Date(startUtc.getTime() + 24 * 60 * 60 * 1000);
 
   return {
+    vnDate: dateStr,
     startIso: startUtc.toISOString(),
     endIso: endUtc.toISOString(),
   };
+}
+
+function hashStringToInt(input: string): number {
+  let hash = 0;
+  for (let i = 0; i < input.length; i++) {
+    hash = (hash << 5) - hash + input.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
 }
 
 // Shared type for project row
@@ -80,70 +96,93 @@ type ProjectRow = {
   novels: any;
 };
 
+type DailyQuotaRow = {
+  project_id: string;
+  vn_date: string;
+  target_chapters: number;
+  written_chapters: number;
+  next_due_at: string | null;
+  status: 'active' | 'completed' | 'failed';
+  retry_count: number;
+};
+
 type RunResult = {
   id: string;
   title: string;
   tier: 'resume' | 'init';
   success: boolean;
   error?: string;
-  rotatedProjectId?: string | null;
+  completionReason?: 'exact_target' | 'arc_boundary' | 'natural_ending' | 'hard_stop';
+  chapterWritten?: boolean;
 };
 
-/**
- * Auto-rotate: When a novel completes, activate a paused novel from the same author.
- * Returns the newly activated project ID, or null if none available.
- */
-async function autoRotate(
-  completedNovelId: string,
-  supabase: ReturnType<typeof getSupabaseAdmin>
-): Promise<string | null> {
-  try {
-    // Find the author of the completed novel
-    const { data: novel } = await supabase
-      .from('novels')
-      .select('ai_author_id')
-      .eq('id', completedNovelId)
-      .single();
+function detectNaturalEnding(title?: string | null, content?: string | null): boolean {
+  const t = `${title || ''}\n${content || ''}`.toLowerCase();
+  if (!t.trim()) return false;
 
-    if (!novel?.ai_author_id) return null;
+  let score = 0;
 
-    // Find a paused project from the same author
-    const { data: pausedNovels } = await supabase
-      .from('novels')
-      .select('id')
-      .eq('ai_author_id', novel.ai_author_id)
-      .neq('id', completedNovelId);
+  // Strong ending markers
+  if (/hết truyện|hoàn truyện|toàn thư hoàn|đại kết cục|kết thúc thỏa mãn|epilogue/i.test(t)) score += 4;
+  if (/nhiều năm sau|vài năm sau|hậu truyện|ngoại truyện/i.test(t)) score += 2;
 
-    if (!pausedNovels || pausedNovels.length === 0) return null;
+  // Resolution markers
+  if (/mọi chuyện đã kết thúc|cuối cùng cũng kết thúc|khép lại hành trình|khép lại một kỷ nguyên/i.test(t)) score += 2;
+  if (/trật tự mới|thiên hạ thái bình|bình yên trở lại|đăng cơ|xưng đế|phi thăng thành công/i.test(t)) score += 2;
 
-    const novelIds = pausedNovels.map(n => n.id);
+  // Anti-signals: obvious continuation cliffhangers
+  if (/to be continued|chưa xong|lần sau|chương sau|hồi sau sẽ rõ|một bí mật khác/i.test(t)) score -= 3;
+  if (/cliffhanger|bầu không khí căng thẳng vẫn|màn đêm nuốt chửng|cánh cửa vừa mở/i.test(t)) score -= 2;
 
-    const { data: pausedProjects } = await supabase
-      .from('ai_story_projects')
-      .select('id')
-      .in('novel_id', novelIds)
-      .eq('status', 'paused')
-      .limit(1);
+  return score >= 4;
+}
 
-    if (!pausedProjects || pausedProjects.length === 0) return null;
+async function ensureDailyQuotasForActiveProjects(
+  supabase: ReturnType<typeof getSupabaseAdmin>,
+  projects: ProjectRow[],
+  vnDate: string,
+  dayStartIso: string,
+  dayEndIso: string,
+  now: Date
+): Promise<void> {
+  if (projects.length === 0) return;
 
-    const projectToActivate = pausedProjects[0].id;
+  const dayStartMs = new Date(dayStartIso).getTime();
+  const dayEndMs = new Date(dayEndIso).getTime();
+  const nowMs = now.getTime();
+  const minutesLeft = Math.max(1, Math.floor((dayEndMs - nowMs) / 60000));
+  const spacing = clamp(Math.floor(minutesLeft / DAILY_CHAPTER_QUOTA), 5, 72);
 
-    const { error } = await supabase
-      .from('ai_story_projects')
-      .update({ status: 'active', updated_at: new Date().toISOString() })
-      .eq('id', projectToActivate);
+  const rows = projects.map((p) => {
+    const seed = hashStringToInt(`${p.id}:${vnDate}`);
+    const offsetMinutes = seed % spacing;
+    const nextDueMs = Math.max(dayStartMs, nowMs) + offsetMinutes * 60 * 1000;
+    return {
+      project_id: p.id,
+      vn_date: vnDate,
+      target_chapters: DAILY_CHAPTER_QUOTA,
+      written_chapters: 0,
+      status: 'active' as const,
+      retry_count: 0,
+      slot_seed: seed,
+      next_due_at: new Date(nextDueMs).toISOString(),
+    };
+  });
 
-    if (error) {
-      console.error(`[AutoRotate] Failed to activate ${projectToActivate}:`, error.message);
-      return null;
-    }
+  const { error } = await supabase
+    .from('project_daily_quotas')
+    .upsert(rows, { onConflict: 'project_id,vn_date', ignoreDuplicates: true });
 
-    return projectToActivate;
-  } catch (error) {
-    console.error('[AutoRotate] Error:', error);
-    return null;
+  if (error) {
+    throw new Error(`ensureDailyQuotasForActiveProjects failed: ${error.message}`);
   }
+}
+
+function computeDynamicResumeBatchSize(activeCount: number): number {
+  // 288 ticks/day with 5-minute cron
+  const requiredPerTick = Math.ceil((activeCount * DAILY_CHAPTER_QUOTA) / 288);
+  const buffered = Math.ceil(requiredPerTick * 1.2);
+  return clamp(buffered, MIN_RESUME_BATCH_SIZE, MAX_RESUME_BATCH_SIZE);
 }
 
 /**
@@ -179,14 +218,14 @@ async function writeOneChapter(
         .update({ status: 'completed', updated_at: new Date().toISOString() })
         .eq('id', project.id);
 
-      const rotatedProjectId = await autoRotate(novel.id, supabase);
       return {
         id: project.id,
         title: novel.title,
         tier,
         success: true,
         error: undefined,
-        rotatedProjectId,
+        completionReason: currentCh >= hardStop ? 'hard_stop' : isExactTarget ? 'exact_target' : 'arc_boundary',
+        chapterWritten: false,
       };
     }
     // else: in grace period, not at boundary — fall through to write 1 more chapter toward arc boundary
@@ -214,10 +253,16 @@ async function writeOneChapter(
   };
 
   const runner = new StoryRunner(factoryConfig, runnerConfig, aiService);
+  let latestWrittenTitle: string | null = null;
+  let latestWrittenContent: string | null = null;
+  let chapterWritten = false;
 
   runner.setCallbacks({
     onChapterCompleted: async (chNum, result) => {
       if (result.data) {
+        latestWrittenTitle = result.data.title;
+        latestWrittenContent = result.data.content;
+
         await supabase.from('chapters').upsert({
           novel_id: novel.id,
           chapter_number: chNum,
@@ -229,6 +274,8 @@ async function writeOneChapter(
           current_chapter: chNum,
           updated_at: new Date().toISOString(),
         }).eq('id', project.id);
+
+        chapterWritten = true;
       }
     },
     onError: (e) => console.error(`[${tier}][${project.id.slice(0, 8)}] Error: ${e}`),
@@ -260,7 +307,8 @@ async function writeOneChapter(
   const nextCh = currentCh + 1;
   const targetChapters = project.total_planned_chapters || 200;
   const hardStop = targetChapters + GRACE_BUFFER;
-  let rotatedProjectId: string | null = null;
+  const hasNaturalEnding = detectNaturalEnding(latestWrittenTitle, latestWrittenContent);
+  let completionReason: RunResult['completionReason'];
 
   // Check if we should complete the story
   let shouldComplete = false;
@@ -268,6 +316,7 @@ async function writeOneChapter(
   if (nextCh >= hardStop) {
     // Phase 4: Hard stop — safety net, prevent infinite writing
     shouldComplete = true;
+    completionReason = 'hard_stop';
   } else if (nextCh >= targetChapters) {
     // Phase 3: Grace period — only complete at arc boundary (every 20 chapters)
     // Also complete if we've exactly hit the target (covers small novels where target isn't a multiple of arc size)
@@ -275,18 +324,24 @@ async function writeOneChapter(
     const isExactTarget = nextCh === targetChapters;
     if (isArcBoundary || isExactTarget) {
       shouldComplete = true;
+      completionReason = isExactTarget ? 'exact_target' : 'arc_boundary';
+    } else if (hasNaturalEnding) {
+      // Semantic early finish in grace period: the chapter clearly closes the story
+      shouldComplete = true;
+      completionReason = 'natural_ending';
     } else {
       // Not at arc boundary — continue writing to finish the current arc
     }
+  } else if (nextCh >= targetChapters - 5 && hasNaturalEnding) {
+    // Close slightly before target when the narrative clearly ended naturally.
+    shouldComplete = true;
+    completionReason = 'natural_ending';
   }
 
   if (shouldComplete) {
     await supabase.from('ai_story_projects')
       .update({ status: 'completed', updated_at: new Date().toISOString() })
       .eq('id', project.id);
-
-    // AUTO-ROTATE: Activate a paused novel from the same author
-    rotatedProjectId = await autoRotate(novel.id, supabase);
   }
 
   return {
@@ -295,7 +350,8 @@ async function writeOneChapter(
     tier,
     success: result.success,
     error: result.error,
-    rotatedProjectId,
+    completionReason,
+    chapterWritten,
   };
 }
 
@@ -320,8 +376,11 @@ export async function GET(request: NextRequest) {
     // then immediately bumps updated_at to "claim" them.
     const fourMinutesAgo = new Date(Date.now() - 4 * 60 * 1000).toISOString();
 
-    const [resumeQuery, initQuery] = await Promise.all([
-      // Tier 1: Resume projects (current_chapter > 0, not claimed recently)
+    const [activeCountQuery, candidateQuery] = await Promise.all([
+      supabase
+        .from('ai_story_projects')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'active'),
       supabase
         .from('ai_story_projects')
         .select(`
@@ -332,92 +391,83 @@ export async function GET(request: NextRequest) {
           novels!ai_story_projects_novel_id_fkey (id, title)
         `)
         .eq('status', 'active')
-        .gt('current_chapter', 0)
         .lt('updated_at', fourMinutesAgo)
         .order('updated_at', { ascending: true })
-        .limit(RESUME_BATCH_SIZE),
-
-      // Tier 2: Init projects (current_chapter = 0, not claimed recently)
-      supabase
-        .from('ai_story_projects')
-        .select(`
-          id, main_character, genre, status,
-          current_chapter, total_planned_chapters,
-          world_description, writing_style, temperature,
-          target_chapter_length,
-          novels!ai_story_projects_novel_id_fkey (id, title)
-        `)
-        .eq('status', 'active')
-        .eq('current_chapter', 0)
-        .lt('updated_at', fourMinutesAgo)
-        .order('created_at', { ascending: true }) // Oldest new project first
-        .limit(INIT_BATCH_SIZE),
+        .limit(CANDIDATE_POOL_SIZE),
     ]);
 
-    if (resumeQuery.error) throw resumeQuery.error;
-    if (initQuery.error) throw initQuery.error;
+    if (activeCountQuery.error) throw activeCountQuery.error;
+    if (candidateQuery.error) throw candidateQuery.error;
 
-    // Filter resume projects: include grace period (current >= total but < hardStop)
-    // so soft-ending logic can complete them at arc boundaries.
-    const GRACE_BUFFER_FILTER = 20; // Must match GRACE_BUFFER in writeOneChapter
-    const resumeProjects = (resumeQuery.data || []).filter(p => {
+    const activeCount = activeCountQuery.count || 0;
+    const dynamicResumeBatchSize = computeDynamicResumeBatchSize(activeCount);
+
+    const rawCandidates = (candidateQuery.data || []) as ProjectRow[];
+
+    // Filter candidates eligible for processing (respect soft-ending grace buffer)
+    const GRACE_BUFFER_FILTER = 20;
+    const allCandidates = rawCandidates.filter((p) => {
       const total = p.total_planned_chapters || 200;
       const current = p.current_chapter || 0;
       const hardStop = total + GRACE_BUFFER_FILTER;
       return current < hardStop && p.novels;
-    }) as ProjectRow[];
+    });
 
-    const initProjects = (initQuery.data || []).filter(p => p.novels) as ProjectRow[];
+    const now = new Date();
+    const { vnDate, startIso, endIso } = getVietnamDayBounds(now);
 
-    const allCandidates = [...resumeProjects, ...initProjects];
-    const novelIds = allCandidates
-      .map((p) => {
-        const novel = Array.isArray(p.novels) ? p.novels[0] : p.novels;
-        return novel?.id as string | undefined;
-      })
-      .filter((id): id is string => Boolean(id));
+    // Ensure every active candidate has today's quota row.
+    await ensureDailyQuotasForActiveProjects(supabase, allCandidates, vnDate, startIso, endIso, now);
 
-    let chapterCountByNovel = new Map<string, number>();
-    if (novelIds.length > 0) {
-      const { startIso, endIso } = getVietnamDayBounds();
-      const { data: todayChapters, error: todayChaptersError } = await supabase
-        .from('chapters')
-        .select('novel_id')
-        .in('novel_id', novelIds)
-        .gte('created_at', startIso)
-        .lt('created_at', endIso);
+    const projectIds = allCandidates.map((p) => p.id);
+    let quotaRows: DailyQuotaRow[] = [];
 
-      if (todayChaptersError) {
-        throw todayChaptersError;
-      }
+    if (projectIds.length > 0) {
+      const { data: quotas, error: quotasError } = await supabase
+        .from('project_daily_quotas')
+        .select('project_id,vn_date,target_chapters,written_chapters,next_due_at,status,retry_count')
+        .in('project_id', projectIds)
+        .eq('vn_date', vnDate);
 
-      chapterCountByNovel = (todayChapters || []).reduce((map, row) => {
-        const current = map.get(row.novel_id) || 0;
-        map.set(row.novel_id, current + 1);
-        return map;
-      }, new Map<string, number>());
+      if (quotasError) throw quotasError;
+      quotaRows = (quotas || []) as DailyQuotaRow[];
     }
 
-    const isBelowQuota = (project: ProjectRow): boolean => {
-      const novel = Array.isArray(project.novels) ? project.novels[0] : project.novels;
-      if (!novel?.id) return false;
-      const chaptersToday = chapterCountByNovel.get(novel.id) || 0;
-      return chaptersToday < DAILY_CHAPTER_QUOTA;
-    };
+    const nowIso = now.toISOString();
+    const dueQuotaByProject = new Map(
+      quotaRows
+        .filter((q) => q.status !== 'completed' && q.written_chapters < q.target_chapters && (!!q.next_due_at ? q.next_due_at <= nowIso : true))
+        .map((q) => [q.project_id, q])
+    );
 
-    const filteredResumeProjects = resumeProjects.filter(isBelowQuota);
-    const filteredInitProjects = initProjects.filter(isBelowQuota);
+    const dueCandidates = allCandidates.filter((p) => dueQuotaByProject.has(p.id));
+    const sortedDue = [...dueCandidates].sort((a, b) => {
+      const qa = dueQuotaByProject.get(a.id)!;
+      const qb = dueQuotaByProject.get(b.id)!;
+      if (qa.written_chapters !== qb.written_chapters) return qa.written_chapters - qb.written_chapters;
+      const da = qa.next_due_at || '';
+      const db = qb.next_due_at || '';
+      return da.localeCompare(db);
+    });
+
+    const resumeCandidates = sortedDue.filter((p) => (p.current_chapter || 0) > 0);
+    const initCandidates = sortedDue.filter((p) => (p.current_chapter || 0) === 0);
+
+    const filteredResumeProjects = resumeCandidates.slice(0, dynamicResumeBatchSize);
+    const filteredInitProjects = initCandidates.slice(0, INIT_BATCH_SIZE);
 
     const totalProjects = filteredResumeProjects.length + filteredInitProjects.length;
-    const skippedDueToQuota = allCandidates.length - totalProjects;
+    const skippedDueToQuota = allCandidates.length - dueCandidates.length;
 
     if (totalProjects === 0) {
       return NextResponse.json({
         success: true,
         message: skippedDueToQuota > 0
-          ? `No projects to process (all ${skippedDueToQuota} candidates reached daily quota)`
-          : 'No projects to process',
+          ? `No projects due now (quota complete for ${skippedDueToQuota} candidates)`
+          : 'No projects due now',
         skippedDueToQuota,
+        activeCount,
+        dueCandidates: dueCandidates.length,
       });
     }
 
@@ -477,20 +527,79 @@ export async function GET(request: NextRequest) {
         : { id: '?', title: '?', tier: 'resume' as const, success: false, error: r.reason?.message || 'Unknown' }
     );
 
+    const quotaByProject = new Map(quotaRows.map((q) => [q.project_id, q]));
+    const quotaUpdates = summary
+      .filter((r) => r.id !== '?' && r.chapterWritten)
+      .map(async (r) => {
+        const q = quotaByProject.get(r.id);
+        if (!q) return;
+
+        const nowTick = new Date();
+        const written = Math.min(q.target_chapters, q.written_chapters + 1);
+        const remaining = Math.max(0, q.target_chapters - written);
+
+        let status: DailyQuotaRow['status'] = 'active';
+        let nextDueAt: string | null = q.next_due_at;
+
+        if (remaining <= 0) {
+          status = 'completed';
+          nextDueAt = null;
+        } else {
+          const endMs = new Date(endIso).getTime();
+          const nowMs = nowTick.getTime();
+          const minutesLeft = Math.max(5, Math.floor((endMs - nowMs) / 60000));
+          const cadence = clamp(Math.floor(minutesLeft / remaining), 5, 120);
+          const jitter = (hashStringToInt(`${r.id}:${written}:${vnDate}`) % 11) - 5;
+          const delayMinutes = Math.max(5, cadence + jitter);
+          nextDueAt = new Date(nowMs + delayMinutes * 60 * 1000).toISOString();
+        }
+
+        await supabase
+          .from('project_daily_quotas')
+          .update({
+            written_chapters: written,
+            status,
+            retry_count: 0,
+            last_error: null,
+            next_due_at: nextDueAt,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('project_id', r.id)
+          .eq('vn_date', vnDate);
+      });
+
+    const failedUpdates = summary
+      .filter((r) => r.id !== '?' && !r.success)
+      .map(async (r) => {
+        await supabase
+          .from('project_daily_quotas')
+          .update({
+            retry_count: 1,
+            last_error: (r.error || 'unknown').slice(0, 500),
+            next_due_at: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq('project_id', r.id)
+          .eq('vn_date', vnDate);
+      });
+
+    await Promise.allSettled([...quotaUpdates, ...failedUpdates]);
+
     const resumeSuccess = summary.filter(r => r.tier === 'resume' && r.success).length;
     const initSuccess = summary.filter(r => r.tier === 'init' && r.success).length;
-    const rotations = summary.filter(r => r.rotatedProjectId).length;
     const duration = (Date.now() - startTime) / 1000;
 
     return NextResponse.json({
       success: true,
       processed: totalProjects,
+      activeCount,
+      dynamicResumeBatchSize,
+      dueCandidates: dueCandidates.length,
       resumeCount: filteredResumeProjects.length,
       resumeSuccess,
       initCount: filteredInitProjects.length,
       initSuccess,
       skippedDueToQuota,
-      rotations,
       durationSeconds: Math.round(duration),
       results: summary,
     });
