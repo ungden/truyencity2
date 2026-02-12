@@ -513,6 +513,8 @@ export class StoryRunner {
 
   private async writeArc(arc: ArcOutline): Promise<{ success: boolean; error?: string }> {
     arc.status = 'in_progress';
+    let successfulChaptersInArc = 0;
+    let firstArcError: string | undefined;
 
     for (let i = 0; i < arc.chapterOutlines.length; i++) {
       if (this.shouldStop) return { success: false, error: 'Stopped by user' };
@@ -691,6 +693,7 @@ export class StoryRunner {
       }
 
       if (result.success && result.data) {
+        successfulChaptersInArc++;
         // ========== QC EVALUATION (Sprint 1/2/3) ==========
         if (this.fullQCGating) {
           try {
@@ -948,6 +951,9 @@ export class StoryRunner {
       } else {
         this.state!.chaptersFailed++;
         this.state!.lastError = result.error;
+        if (!firstArcError) {
+          firstArcError = result.error || `Chapter ${chapterNumber} failed`;
+        }
         this.callbacks.onChapterFailed?.(chapterNumber, result.error || 'Unknown error');
 
         if (this.runnerConfig.pauseOnError) {
@@ -962,6 +968,13 @@ export class StoryRunner {
         const adaptiveDelay = (result.duration || 0) > 5000 ? 500 : this.runnerConfig.delayBetweenChapters;
         await this.delay(adaptiveDelay);
       }
+    }
+
+    if (successfulChaptersInArc === 0) {
+      return {
+        success: false,
+        error: firstArcError || `Arc ${arc.arcNumber} produced no successful chapters`,
+      };
     }
 
     return { success: true };
