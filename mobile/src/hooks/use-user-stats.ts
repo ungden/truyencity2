@@ -93,99 +93,114 @@ export function useUserStats(): UseUserStatsReturn {
 
       const userId = user.id;
 
-      // Fire all queries in parallel
-      const [
-        profileRes,
-        chaptersRes,
-        progressRes,
-        sessionsRes,
-        bookmarksRes,
-        ratingsRes,
-        commentsRes,
-        sessionDatesRes,
-        genresRes,
-      ] = await Promise.all([
-        // 1. Profile
+      // Fire all queries in parallel with allSettled for resilience
+      const results = await Promise.allSettled([
+        // 0. Profile
         supabase.from("profiles").select("*").eq("id", userId).single(),
 
-        // 2. Unique chapters read
+        // 1. Unique chapters read
         supabase
           .from("chapter_reads")
           .select("id", { count: "exact", head: true })
           .eq("user_id", userId),
 
-        // 3. Reading progress — novels started + completed
+        // 2. Reading progress — novels started + completed
         supabase
           .from("reading_progress")
           .select("novel_id, position_percent")
-          .eq("user_id", userId),
+          .eq("user_id", userId)
+          .limit(500),
 
-        // 4. Reading sessions — total time
+        // 3. Reading sessions — total time
         supabase
           .from("reading_sessions")
           .select("duration_seconds")
-          .eq("user_id", userId),
+          .eq("user_id", userId)
+          .limit(1000),
 
-        // 5. Bookmarks count
+        // 4. Bookmarks count
         supabase
           .from("bookmarks")
           .select("id", { count: "exact", head: true })
           .eq("user_id", userId),
 
-        // 6. Ratings count
+        // 5. Ratings count
         supabase
           .from("ratings")
           .select("id", { count: "exact", head: true })
           .eq("user_id", userId),
 
-        // 7. Comments count
+        // 6. Comments count
         supabase
           .from("comments")
           .select("id", { count: "exact", head: true })
           .eq("user_id", userId),
 
-        // 8. Session dates for streak calculation
+        // 7. Session dates for streak calculation
         supabase
           .from("reading_sessions")
           .select("started_at")
           .eq("user_id", userId)
-          .order("started_at", { ascending: false }),
+          .order("started_at", { ascending: false })
+          .limit(365),
 
-        // 9. Genres from novels user has read
+        // 8. Genres from novels user has read
         supabase
           .from("reading_progress")
           .select("novel_id, novels(genres)")
-          .eq("user_id", userId),
+          .eq("user_id", userId)
+          .limit(200),
       ]);
 
+      // Helper to safely extract fulfilled result
+      const get = <T,>(idx: number): T | null => {
+        const r = results[idx];
+        if (r.status === "fulfilled") return r.value as T;
+        console.warn(`Stats query ${idx} failed:`, r.reason);
+        return null;
+      };
+
       // Profile
-      if (profileRes.data) {
+      const profileRes = get<{ data: any }>(0);
+      if (profileRes?.data) {
         setProfile({ ...profileRes.data, email: user.email });
       }
 
+      // Chapters read
+      const chaptersRes = get<{ count: number | null }>(1);
+
       // Novels started / completed
-      const progressData = progressRes.data || [];
+      const progressRes = get<{ data: any[] | null }>(2);
+      const progressData = progressRes?.data || [];
       const novelsStarted = progressData.length;
       const novelsCompleted = progressData.filter(
-        (p) => (p.position_percent ?? 0) >= 95
+        (p: any) => (p.position_percent ?? 0) >= 95
       ).length;
 
       // Total reading time
-      const sessionData = sessionsRes.data || [];
+      const sessionsRes = get<{ data: any[] | null }>(3);
+      const sessionData = sessionsRes?.data || [];
       const totalReadingSeconds = sessionData.reduce(
-        (sum, s) => sum + (s.duration_seconds || 0),
+        (sum: number, s: any) => sum + (s.duration_seconds || 0),
         0
       );
 
+      // Counts
+      const bookmarksRes = get<{ count: number | null }>(4);
+      const ratingsRes = get<{ count: number | null }>(5);
+      const commentsRes = get<{ count: number | null }>(6);
+
       // Streak
-      const sessionDates = (sessionDatesRes.data || []).map((s) =>
+      const sessionDatesRes = get<{ data: any[] | null }>(7);
+      const sessionDates = (sessionDatesRes?.data || []).map((s: any) =>
         s.started_at ? s.started_at.slice(0, 10) : ""
       ).filter(Boolean);
       const { current: currentStreak, longest: longestStreak } =
         calculateStreak(sessionDates);
 
       // Unique genres
-      const genresData = genresRes.data || [];
+      const genresRes = get<{ data: any[] | null }>(8);
+      const genresData = genresRes?.data || [];
       const allGenres = new Set<string>();
       for (const row of genresData) {
         const novel = row.novels as unknown as { genres?: string[] | null };
@@ -197,13 +212,13 @@ export function useUserStats(): UseUserStatsReturn {
       }
 
       setStats({
-        chaptersRead: chaptersRes.count || 0,
+        chaptersRead: chaptersRes?.count || 0,
         novelsStarted,
         novelsCompleted,
         totalReadingSeconds,
-        bookmarkCount: bookmarksRes.count || 0,
-        ratingCount: ratingsRes.count || 0,
-        commentCount: commentsRes.count || 0,
+        bookmarkCount: bookmarksRes?.count || 0,
+        ratingCount: ratingsRes?.count || 0,
+        commentCount: commentsRes?.count || 0,
         currentStreak,
         longestStreak,
         uniqueGenres: allGenres.size,

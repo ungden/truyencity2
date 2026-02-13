@@ -202,11 +202,7 @@ function DiscoverListCard({ novel }: { novel: Novel }) {
                   #{getGenreLabel(g).toUpperCase()}
                 </Text>
               ))}
-              {novel.ai_author_id && (
-                <Text className="text-xs font-bold text-primary">
-                  #AI
-                </Text>
-              )}
+
             </View>
           )}
           <Text
@@ -286,7 +282,7 @@ function RankingCard({ novel, rank }: { novel: Novel; rank?: number }) {
                   style={{
                     fontSize: 14,
                     fontWeight: "700",
-                    color: rank <= 3 ? "#fff" : "#1a1a1a",
+                    color: rank <= 3 ? "#fff" : "#a1a1aa",
                   }}
                 >
                   {rank}
@@ -294,7 +290,8 @@ function RankingCard({ novel, rank }: { novel: Novel; rank?: number }) {
               </View>
             )}
             <Text
-              style={{ flex: 1, fontSize: 16, fontWeight: "600", color: "#1a1a1a" }}
+              className="text-foreground"
+              style={{ flex: 1, fontSize: 16, fontWeight: "600" }}
               numberOfLines={2}
             >
               {novel.title}
@@ -323,7 +320,7 @@ function RankingCard({ novel, rank }: { novel: Novel; rank?: number }) {
 }
 
 // --- Featured: large card with description, rating, CTA (screenshot 2) ---
-function FeaturedCard({ novel }: { novel: Novel }) {
+function FeaturedCard({ novel, onBookmark }: { novel: Novel; onBookmark?: () => void }) {
   const genre = novel.genres?.[0];
   const chapterCount = getChapterCount(novel);
 
@@ -360,9 +357,11 @@ function FeaturedCard({ novel }: { novel: Novel }) {
               </Text>
             </Pressable>
           </Link>
-          <Pressable className="w-9 h-9 rounded-full bg-primary items-center justify-center">
-            <Text className="text-white text-xl leading-none">+</Text>
-          </Pressable>
+          <Link href={`/novel/${novel.slug || novel.id}`} asChild>
+            <Pressable className="w-9 h-9 rounded-full bg-primary items-center justify-center">
+              <Text className="text-white text-xl leading-none">+</Text>
+            </Pressable>
+          </Link>
         </View>
       </View>
       <Link href={`/novel/${novel.slug || novel.id}`} asChild>

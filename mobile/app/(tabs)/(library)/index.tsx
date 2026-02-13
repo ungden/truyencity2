@@ -69,7 +69,8 @@ export default function LibraryScreen() {
           .from("bookmarks")
           .select("novel_id, created_at")
           .eq("user_id", userId!)
-          .order("created_at", { ascending: false }),
+          .order("created_at", { ascending: false })
+          .limit(100),
       ]);
 
       if (historyRes.data && historyRes.data.length > 0) {
@@ -195,7 +196,7 @@ export default function LibraryScreen() {
                 paddingVertical: 12,
                 paddingHorizontal: 16,
                 borderBottomWidth: 1,
-                borderBottomColor: "#e8e8e8",
+                borderBottomColor: "rgba(128,128,128,0.2)",
               }}
             >
               <Image

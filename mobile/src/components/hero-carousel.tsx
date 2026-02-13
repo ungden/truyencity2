@@ -37,7 +37,6 @@ export default function HeroCarousel({ novels }: HeroCarouselProps) {
         data={novels}
         keyExtractor={(item) => item.id}
         horizontal
-        pagingEnabled
         showsHorizontalScrollIndicator={false}
         snapToInterval={cardWidth + 12}
         decelerationRate="fast"

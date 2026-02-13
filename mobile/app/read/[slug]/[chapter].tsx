@@ -220,7 +220,9 @@ export default function ReadingScreen() {
           { onConflict: "user_id,novel_id" }
         );
       }
-    } catch {}
+    } catch (err) {
+      console.warn("Failed to save reading progress:", err);
+    }
   }
 
   // Navigation

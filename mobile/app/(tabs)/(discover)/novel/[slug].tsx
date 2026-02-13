@@ -89,7 +89,8 @@ export default function NovelDetailScreen() {
           .from("chapters")
           .select("id, novel_id, chapter_number, title, created_at")
           .eq("novel_id", data.id)
-          .order("chapter_number", { ascending: true });
+          .order("chapter_number", { ascending: true })
+          .limit(500);
         setChapters(chapterData || []);
 
         // Fetch stats in parallel
@@ -105,7 +106,8 @@ export default function NovelDetailScreen() {
           supabase
             .from("ratings")
             .select("rating")
-            .eq("novel_id", data.id),
+            .eq("novel_id", data.id)
+            .limit(500),
         ]);
 
         const ratings = ratingsRes.data || [];

@@ -141,11 +141,17 @@ export default function DiscoverScreen() {
         <View className="mt-4">
           <SectionHeader title="Đề cử" />
           <View className="px-4 flex-row flex-wrap" style={{ gap: 12 }}>
-            {recommended.slice(0, 6).map((novel) => (
-              <View key={novel.id} style={{ width: (width - 32 - 24) / 3 }}>
-                <NovelCard novel={novel} variant="grid" />
-              </View>
-            ))}
+            {recommended.slice(0, 6).map((novel) => {
+              const columns = width >= 768 ? 4 : 3;
+              const gap = 12;
+              const totalGap = gap * (columns - 1);
+              const itemWidth = (width - 32 - totalGap) / columns;
+              return (
+                <View key={novel.id} style={{ width: itemWidth }}>
+                  <NovelCard novel={novel} variant="grid" />
+                </View>
+              );
+            })}
           </View>
         </View>
       )}

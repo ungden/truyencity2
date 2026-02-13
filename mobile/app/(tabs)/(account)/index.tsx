@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Alert, FlatList, Image as RNImage } from "react-native";
+import { Alert, FlatList, Image as RNImage, Linking } from "react-native";
 import { View, Text, ScrollView, Pressable, Link } from "@/tw";
 import { supabase } from "@/lib/supabase";
 import { useUserStats } from "@/hooks/use-user-stats";
@@ -478,6 +478,16 @@ export default function ProfileScreen() {
             </Text>
           </Pressable>
         </Link>
+
+        {/* Legal links — visible without login (Apple Guideline 3.1.2) */}
+        <View style={{ flexDirection: "row", gap: 16, marginTop: 24 }}>
+          <Pressable onPress={() => Linking.openURL("https://truyencity.com/terms")}>
+            <Text style={{ fontSize: 13, color: "#5c9cff" }}>Điều khoản sử dụng</Text>
+          </Pressable>
+          <Pressable onPress={() => Linking.openURL("https://truyencity.com/privacy")}>
+            <Text style={{ fontSize: 13, color: "#5c9cff" }}>Chính sách bảo mật</Text>
+          </Pressable>
+        </View>
       </ScrollView>
     );
   }
@@ -542,15 +552,31 @@ export default function ProfileScreen() {
 
   // ── Menu items ──
   const menuItems: MenuItem[] = [
-    { label: "Cài đặt đọc truyện", icon: "⚙️" },
-    { label: "Thông báo", icon: "🔔" },
+    {
+      label: "Cài đặt đọc truyện",
+      icon: "⚙️",
+      onPress: () => Alert.alert("Sắp ra mắt", "Tính năng đang phát triển"),
+    },
+    {
+      label: "Thông báo",
+      icon: "🔔",
+      onPress: () => Alert.alert("Sắp ra mắt", "Tính năng đang phát triển"),
+    },
     {
       label: `Dữ liệu offline (${formatStorageSize(offlineSize)})`,
       icon: "📥",
       onPress: handleClearOfflineData,
     },
     { label: "Xóa bộ nhớ đệm", icon: "🗑️", onPress: handleClearCache },
-    { label: "Về TruyenCity", icon: "ℹ️" },
+    {
+      label: "Về TruyenCity",
+      icon: "ℹ️",
+      onPress: () =>
+        Alert.alert(
+          "TruyenCity",
+          "Phiên bản 1.0.0\nĐọc truyện online miễn phí\n\ntruyencity.com"
+        ),
+    },
   ];
 
   // ── Authenticated screen ──
@@ -628,6 +654,20 @@ export default function ProfileScreen() {
           Đăng xuất
         </Text>
       </Pressable>
+
+      {/* Legal links */}
+      <View className="mx-4 gap-2">
+        <Pressable onPress={() => Linking.openURL("https://truyencity.com/terms")}>
+          <Text style={{ fontSize: 13, color: "#5c9cff", textAlign: "center" }}>
+            Điều khoản sử dụng
+          </Text>
+        </Pressable>
+        <Pressable onPress={() => Linking.openURL("https://truyencity.com/privacy")}>
+          <Text style={{ fontSize: 13, color: "#5c9cff", textAlign: "center" }}>
+            Chính sách bảo mật
+          </Text>
+        </Pressable>
+      </View>
 
       {/* Branding footer */}
       <View style={{ alignItems: "center", gap: 8, marginTop: 8, paddingBottom: 8 }}>

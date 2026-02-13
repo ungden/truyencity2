@@ -5,6 +5,7 @@ import { router, Stack } from "expo-router";
 import { supabase } from "@/lib/supabase";
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
+import { Linking as RNLinking } from "react-native";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -45,7 +46,7 @@ export default function LoginScreen() {
 
   async function handleGoogleAuth() {
     try {
-      const redirectUrl = Linking.createURL("/(profile)");
+      const redirectUrl = Linking.createURL("/(account)");
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
@@ -176,6 +177,22 @@ export default function LoginScreen() {
             </Text>
           </Text>
         </Pressable>
+
+        {/* Legal links */}
+        <View className="items-center gap-2 mt-4">
+          <Text className="text-muted-foreground text-xs">
+            Bằng việc tiếp tục, bạn đồng ý với
+          </Text>
+          <View className="flex-row items-center gap-2">
+            <Pressable onPress={() => RNLinking.openURL("https://truyencity.com/terms")}>
+              <Text className="text-primary text-xs font-medium">Điều khoản sử dụng</Text>
+            </Pressable>
+            <Text className="text-muted-foreground text-xs">và</Text>
+            <Pressable onPress={() => RNLinking.openURL("https://truyencity.com/privacy")}>
+              <Text className="text-primary text-xs font-medium">Chính sách bảo mật</Text>
+            </Pressable>
+          </View>
+        </View>
       </ScrollView>
     </>
   );

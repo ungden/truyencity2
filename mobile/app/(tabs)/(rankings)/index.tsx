@@ -32,10 +32,10 @@ export default function RankingsScreen() {
 
       switch (mode) {
         case "views":
-          query = query.order("updated_at", { ascending: false });
+          query = query.order("view_count", { ascending: false, nullsFirst: false });
           break;
         case "bookmarks":
-          query = query.order("updated_at", { ascending: false });
+          query = query.order("bookmark_count", { ascending: false, nullsFirst: false });
           break;
         case "latest":
           query = query.order("created_at", { ascending: false });
@@ -50,16 +50,7 @@ export default function RankingsScreen() {
       const { data, error } = await query;
       if (error) throw error;
 
-      let results = data || [];
-
-      if (mode === "views") {
-        results = results.sort(
-          (a, b) =>
-            (b.chapters?.[0]?.count ?? 0) - (a.chapters?.[0]?.count ?? 0)
-        );
-      }
-
-      setNovels(results);
+      setNovels(data || []);
     } catch (error) {
       console.error("Error fetching rankings:", error);
     } finally {
