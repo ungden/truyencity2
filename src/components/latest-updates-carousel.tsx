@@ -10,6 +10,7 @@ interface LatestUpdatesCarouselProps {
 }
 
 function getChapterCount(novel: Novel): number {
+  if (typeof novel.total_chapters === 'number') return novel.total_chapters;
   if (!novel.chapters || !novel.chapters.length) return 0;
   return novel.chapters[0]?.count || 0;
 }

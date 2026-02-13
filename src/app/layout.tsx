@@ -3,7 +3,6 @@ import "./globals.css";
 import { ReadingProvider } from "@/contexts/reading-context";
 import ThemeProvider from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { PWAProvider } from "@/components/pwa-provider";
 import { AppShell } from "@/components/layout/app-shell";
 import { QueryProvider } from "@/providers/query-provider";
 
@@ -14,7 +13,6 @@ export const metadata: Metadata = {
     template: "%s | TruyenCity",
   },
   description: "Nền tảng đọc truyện tiên tiến nhất của người Việt cho người Việt. Hàng ngàn bộ truyện tiên hiệp, huyền huyễn, đô thị, ngôn tình — đọc miễn phí, cập nhật liên tục.",
-  manifest: "/manifest.json",
   openGraph: {
     type: "website",
     locale: "vi_VN",
@@ -37,14 +35,6 @@ export const metadata: Metadata = {
     ],
     apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
     shortcut: ["/favicon.ico"],
-  },
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "TruyenCity",
-  },
-  other: {
-    "mobile-web-app-capable": "yes",
   },
 };
 
@@ -73,14 +63,12 @@ export default function RootLayout({
         </a>
         <QueryProvider>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-            <PWAProvider>
-              <ReadingProvider>
-                <AppShell>
-                  <main id="main-content">{children}</main>
-                </AppShell>
-                <Toaster />
-              </ReadingProvider>
-            </PWAProvider>
+            <ReadingProvider>
+              <AppShell>
+                <main id="main-content">{children}</main>
+              </AppShell>
+              <Toaster />
+            </ReadingProvider>
           </ThemeProvider>
         </QueryProvider>
       </body>

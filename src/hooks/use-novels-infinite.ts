@@ -10,6 +10,7 @@ type NovelRow = {
   status: string | null;
   genres: string[] | null;
   updated_at: string | null;
+  created_at: string | null;
   total_chapters: number;
 };
 
@@ -43,7 +44,7 @@ async function fetchNovels({
 
   let query = supabase
     .from('novels')
-    .select('id,slug,title,author,cover_url,status,genres,updated_at,total_chapters');
+    .select('id,slug,title,author,cover_url,status,genres,updated_at,created_at,total_chapters');
 
   // Apply filters server-side
   if (selectedGenres.length > 0) {
@@ -70,6 +71,9 @@ async function fetchNovels({
       break;
     case 'chapters_desc':
       query = query.order('total_chapters', { ascending: false, nullsFirst: false });
+      break;
+    case 'newest':
+      query = query.order('created_at', { ascending: false, nullsFirst: false });
       break;
     case 'updated':
     default:

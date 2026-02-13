@@ -42,13 +42,19 @@ export default async function HomePage() {
   const supabase = await createServerClient();
 
   // Parallel fetch all data
-  const [latestResult, featuredResult, tienHiepResult, doThiResult] = await Promise.all([
+  const [latestResult, newestResult, featuredResult, tienHiepResult, doThiResult] = await Promise.all([
     // Recently updated novels
     supabase
       .from('novels')
       .select('*')
       .order('updated_at', { ascending: false })
       .limit(20),
+    // Newly launched novels
+    supabase
+      .from('novels')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(12),
     // Featured: novels with covers, most chapters
     supabase
       .from('novels')
@@ -75,6 +81,7 @@ export default async function HomePage() {
   ]);
 
   const novels: Novel[] = latestResult.data || [];
+  const newestNovelsRaw: Novel[] = newestResult.data || [];
   const featuredNovels: Novel[] = (featuredResult.data || [])
     .sort((a: Novel, b: Novel) => getChapterCount(b) - getChapterCount(a));
   const tienHiepNovels: Novel[] = tienHiepResult.data || [];
@@ -88,6 +95,7 @@ export default async function HomePage() {
   // Latest = most recently updated (excluding featured + trending)
   const usedIds = new Set([featuredNovel?.id, ...trendingNovels.map(n => n.id)]);
   const latestNovels = novels.filter(n => !usedIds.has(n.id)).slice(0, 8);
+  const newestNovels = newestNovelsRaw.filter(n => !usedIds.has(n.id)).slice(0, 8);
   // Ranking = by chapter count
   const rankingNovels = allSorted.slice(0, 6);
 
@@ -167,9 +175,52 @@ export default async function HomePage() {
                   <Clock size={20} className="text-primary" />
                   <h2 className="text-lg font-semibold">Mới cập nhật</h2>
                 </div>
+                <Link
+                  href="/browse?sort=newest"
+                  className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1"
+                >
+                  Truyện mới ra mắt
+                  <ChevronRight size={16} />
+                </Link>
               </div>
               <LatestUpdatesCarousel novels={latestNovels} />
             </section>
+
+            {/* New Releases */}
+            {newestNovels.length > 0 && (
+              <section>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <Sparkles size={20} className="text-emerald-500" />
+                    <h2 className="text-lg font-semibold">Truyện mới ra mắt</h2>
+                  </div>
+                  <Link
+                    href="/browse?sort=newest"
+                    className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1"
+                  >
+                    Xem tất cả
+                    <ChevronRight size={16} />
+                  </Link>
+                </div>
+
+                <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4">
+                  {newestNovels.map((novel: Novel) => (
+                    <div key={novel.id} className="flex-shrink-0 w-[160px]">
+                      <NovelCard
+                        id={novel.id}
+                        slug={novel.slug || undefined}
+                        title={novel.title}
+                        author={novel.author || 'N/A'}
+                        cover={novel.cover_url || ''}
+                        status={novel.status || 'Đang ra'}
+                        genre={novel.genres?.[0]}
+                        chapters={getChapterCount(novel)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
 
             {/* Tiên Hiệp Genre Section */}
             {tienHiepNovels.length > 0 && (

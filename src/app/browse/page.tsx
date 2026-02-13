@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Header } from '@/components/header';
 import { NovelCard } from '@/components/novel-card';
 import { GenreFilter } from '@/components/genre-filter';
@@ -22,7 +22,6 @@ import { cn } from '@/lib/utils';
 import { GENRE_CONFIG } from '@/lib/types/genre-config';
 import { useNovelsInfinite } from '@/hooks/use-novels-infinite';
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer';
-import { useEffect } from 'react';
 
 type NovelRow = {
   id: string;
@@ -80,6 +79,7 @@ const chapterRangeOptions = [
 
 const sortOptions = [
   { value: 'updated', label: 'Mới cập nhật' },
+  { value: 'newest', label: 'Truyện mới ra mắt' },
   { value: 'chapters_desc', label: 'Nhiều chương nhất' },
   { value: 'title', label: 'Tên A-Z' },
 ];
@@ -92,6 +92,14 @@ export default function BrowsePage() {
   const [chapterRange, setChapterRange] = useState('all');
   const [sortBy, setSortBy] = useState('updated');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const sort = params.get('sort');
+    if (sort && sortOptions.some((s) => s.value === sort)) {
+      setSortBy(sort);
+    }
+  }, []);
 
   // Use React Query infinite query hook
   const {

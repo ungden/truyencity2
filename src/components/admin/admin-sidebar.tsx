@@ -24,7 +24,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
-import { PWAPanel } from './pwa-install-button';
 import {
   Collapsible,
   CollapsibleContent,
@@ -318,8 +317,6 @@ export function AdminSidebar() {
           </nav>
         </div>
 
-        {/* PWA Panel at bottom */}
-        <PWAPanel />
       </aside>
 
       {/* Mobile Header with Menu */}
@@ -373,8 +370,6 @@ export function AdminSidebar() {
                   ))}
                 </nav>
               </div>
-              {/* PWA Panel in mobile menu */}
-              <PWAPanel />
             </SheetContent>
           </Sheet>
         </div>
