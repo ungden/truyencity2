@@ -28,12 +28,11 @@
     }
   },
   "submit": {
-    "production": {},
-    "development": {
+    "production": {
       "ios": {
-        "appleId": "your-apple-id@email.com"
-      },
-      "android": {}
+        "ascAppId": "6759160705",
+        "appleTeamId": "Q8A7CBYV5Z"
+      }
     }
   }
 }
