@@ -251,47 +251,70 @@ async function writeOneChapter(
     minQualityToProgress: 4,
     pauseOnError: false,
   };
-
-  const runner = new StoryRunner(factoryConfig, runnerConfig, aiService);
   let latestWrittenTitle: string | null = null;
   let latestWrittenContent: string | null = null;
-  let chapterWritten = false;
 
-  runner.setCallbacks({
-    onChapterCompleted: async (chNum, result) => {
-      if (result.data) {
+  const runAttempt = async (overrides?: Partial<FactoryConfig>) => {
+    let attemptWrote = false;
+    const runner = new StoryRunner({ ...factoryConfig, ...overrides }, runnerConfig, aiService);
+
+    runner.setCallbacks({
+      onChapterCompleted: async (chNum, result) => {
+        if (!result.data) return;
+
         latestWrittenTitle = result.data.title;
         latestWrittenContent = result.data.content;
 
-        await supabase.from('chapters').upsert({
+        const upsertRes = await supabase.from('chapters').upsert({
           novel_id: novel.id,
           chapter_number: chNum,
           title: result.data.title,
           content: result.data.content,
         }, { onConflict: 'novel_id,chapter_number' });
+        if (upsertRes.error) {
+          throw new Error(`Chapter upsert failed: ${upsertRes.error.message}`);
+        }
 
-        await supabase.from('ai_story_projects').update({
+        const updateRes = await supabase.from('ai_story_projects').update({
           current_chapter: chNum,
           updated_at: new Date().toISOString(),
         }).eq('id', project.id);
+        if (updateRes.error) {
+          throw new Error(`Project progress update failed: ${updateRes.error.message}`);
+        }
 
-        chapterWritten = true;
-      }
-    },
-    onError: (e) => console.error(`[${tier}][${project.id.slice(0, 8)}] Error: ${e}`),
-  });
+        attemptWrote = true;
+      },
+      onError: (e) => console.error(`[${tier}][${project.id.slice(0, 8)}] Error: ${e}`),
+    });
 
-  const result = await runner.run({
-    title: novel.title,
-    protagonistName: project.main_character || 'MC',
-    genre: (project.genre || 'tien-hiep') as GenreType,
-    premise: project.world_description || novel.title,
-    targetChapters: project.total_planned_chapters || 200,
-    chaptersPerArc: 20,
-    projectId: project.id,
-    chaptersToWrite: 1,
-    currentChapter: currentCh,  // 0 for init (full plan), >0 for resume (dummy arcs)
-  });
+    const runResult = await runner.run({
+      title: novel.title,
+      protagonistName: project.main_character || 'MC',
+      genre: (project.genre || 'tien-hiep') as GenreType,
+      premise: project.world_description || novel.title,
+      targetChapters: project.total_planned_chapters || 200,
+      chaptersPerArc: 20,
+      projectId: project.id,
+      chaptersToWrite: 1,
+      currentChapter: currentCh,
+    });
+
+    return { runResult, attemptWrote };
+  };
+
+  let { runResult: result, attemptWrote: chapterWritten } = await runAttempt();
+
+  // Fallback path: if first attempt produced no chapter, retry once with cheaper/simple workflow.
+  if (!chapterWritten) {
+    const fallback = await runAttempt({ use3AgentWorkflow: false, maxRetries: 0, maxTokens: 6144, temperature: 0.9 });
+    if (fallback.attemptWrote) {
+      chapterWritten = true;
+      result = fallback.runResult;
+    } else if (!result.success && fallback.runResult.success) {
+      result = fallback.runResult;
+    }
+  }
 
   // ====== SOFT ENDING LOGIC ======
   // total_planned_chapters is a SOFT TARGET, not a hard cutoff.
@@ -344,13 +367,13 @@ async function writeOneChapter(
       .eq('id', project.id);
   }
 
-  if (result.success && !chapterWritten && !completionReason) {
+  if (!chapterWritten && !completionReason) {
     return {
       id: project.id,
       title: novel.title,
       tier,
       success: false,
-      error: 'No chapter written in this run',
+      error: result.error || 'No chapter written in this run',
       chapterWritten: false,
     };
   }
