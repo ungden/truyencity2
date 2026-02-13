@@ -25,17 +25,20 @@ export default function RankingsScreen() {
   const fetchRankings = useCallback(async (mode: SortMode) => {
     setLoading(true);
     try {
+      const NOVEL_LIST_FIELDS = "id,title,slug,author,cover_url,genres,status,ai_author_id,created_at,updated_at,chapters(count)";
       let query = supabase
         .from("novels")
-        .select("*, chapters(count)")
+        .select(NOVEL_LIST_FIELDS)
         .limit(30);
 
       switch (mode) {
         case "views":
-          query = query.order("view_count", { ascending: false, nullsFirst: false });
+          // view_count column doesn't exist yet — fallback to updated_at
+          query = query.order("updated_at", { ascending: false });
           break;
         case "bookmarks":
-          query = query.order("bookmark_count", { ascending: false, nullsFirst: false });
+          // bookmark_count column doesn't exist yet — fallback to updated_at
+          query = query.order("updated_at", { ascending: false });
           break;
         case "latest":
           query = query.order("created_at", { ascending: false });

@@ -25,15 +25,16 @@ export default function DiscoverScreen() {
 
   async function fetchData() {
     try {
+      const NOVEL_LIST_FIELDS = "id,title,slug,author,cover_url,description,genres,status,ai_author_id,created_at,updated_at,chapters(count)";
       const [latestRes, completedRes] = await Promise.all([
         supabase
           .from("novels")
-          .select("*, chapters(count)")
+          .select(NOVEL_LIST_FIELDS)
           .order("updated_at", { ascending: false })
           .limit(30),
         supabase
           .from("novels")
-          .select("*, chapters(count)")
+          .select(NOVEL_LIST_FIELDS)
           .eq("status", "completed")
           .order("updated_at", { ascending: false })
           .limit(10),

@@ -64,9 +64,10 @@ export default function NovelDetailScreen() {
   async function fetchNovel() {
     try {
       // Try slug first, then UUID
+      const NOVEL_DETAIL_FIELDS = "id,title,slug,author,cover_url,description,genres,status,ai_author_id,created_at,updated_at,chapters(count)";
       let query = supabase
         .from("novels")
-        .select("*, chapters(count)")
+        .select(NOVEL_DETAIL_FIELDS)
         .eq("slug", slug)
         .single();
 
@@ -75,7 +76,7 @@ export default function NovelDetailScreen() {
       if (error || !data) {
         const uuidResult = await supabase
           .from("novels")
-          .select("*, chapters(count)")
+          .select(NOVEL_DETAIL_FIELDS)
           .eq("id", slug)
           .single();
         data = uuidResult.data;

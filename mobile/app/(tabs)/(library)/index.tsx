@@ -82,9 +82,10 @@ export default function LibraryScreen() {
             novelIds.push(h.novel_id);
           }
         }
+        const NOVEL_LIST_FIELDS = "id,title,slug,author,cover_url,genres,status,ai_author_id,created_at,updated_at,chapters(count)";
         const { data: novels } = await supabase
           .from("novels")
-          .select("*, chapters(count)")
+          .select(NOVEL_LIST_FIELDS)
           .in("id", novelIds);
         const novelMap = new Map((novels || []).map((n) => [n.id, n]));
         const ordered = novelIds
@@ -104,9 +105,10 @@ export default function LibraryScreen() {
         const novelIds = (bookmarkRes.data as BookmarkItem[]).map(
           (b) => b.novel_id
         );
+        const NOVEL_LIST_FIELDS = "id,title,slug,author,cover_url,genres,status,ai_author_id,created_at,updated_at,chapters(count)";
         const { data: novels } = await supabase
           .from("novels")
-          .select("*, chapters(count)")
+          .select(NOVEL_LIST_FIELDS)
           .in("id", novelIds);
         const novelMap = new Map((novels || []).map((n) => [n.id, n]));
         const ordered = novelIds
