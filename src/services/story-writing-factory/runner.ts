@@ -957,7 +957,15 @@ export class StoryRunner {
         );
         this.state!.lastActivityAt = Date.now();
 
-        this.callbacks.onChapterCompleted?.(chapterNumber, result);
+        try {
+          await this.callbacks.onChapterCompleted?.(chapterNumber, result);
+        } catch (callbackError) {
+          const msg = callbackError instanceof Error
+            ? callbackError.message
+            : String(callbackError);
+          this.state!.lastError = `onChapterCompleted failed: ${msg}`;
+          throw new Error(this.state!.lastError);
+        }
         this.emitProgress();
 
         // Auto-save every N chapters

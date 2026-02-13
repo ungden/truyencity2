@@ -255,12 +255,16 @@ async function writeOneChapter(
   let latestWrittenContent: string | null = null;
 
   const runAttempt = async (overrides?: Partial<FactoryConfig>) => {
-    let attemptWrote = false;
+    let attemptGenerated = false;
+    let attemptPersisted = false;
+    let persistError: string | undefined;
     const runner = new StoryRunner({ ...factoryConfig, ...overrides }, runnerConfig, aiService);
 
     runner.setCallbacks({
       onChapterCompleted: async (chNum, result) => {
         if (!result.data) return;
+
+        attemptGenerated = true;
 
         latestWrittenTitle = result.data.title;
         latestWrittenContent = result.data.content;
@@ -272,7 +276,8 @@ async function writeOneChapter(
           content: result.data.content,
         }, { onConflict: 'novel_id,chapter_number' });
         if (upsertRes.error) {
-          throw new Error(`Chapter upsert failed: ${upsertRes.error.message}`);
+          persistError = `Chapter upsert failed: ${upsertRes.error.message}`;
+          throw new Error(persistError);
         }
 
         const updateRes = await supabase.from('ai_story_projects').update({
@@ -280,10 +285,11 @@ async function writeOneChapter(
           updated_at: new Date().toISOString(),
         }).eq('id', project.id);
         if (updateRes.error) {
-          throw new Error(`Project progress update failed: ${updateRes.error.message}`);
+          persistError = `Project progress update failed: ${updateRes.error.message}`;
+          throw new Error(persistError);
         }
 
-        attemptWrote = true;
+        attemptPersisted = true;
       },
       onError: (e) => console.error(`[${tier}][${project.id.slice(0, 8)}] Error: ${e}`),
     });
@@ -300,18 +306,25 @@ async function writeOneChapter(
       currentChapter: currentCh,
     });
 
-    return { runResult, attemptWrote };
+    return { runResult, attemptGenerated, attemptPersisted, persistError };
   };
 
-  let { runResult: result, attemptWrote: chapterWritten } = await runAttempt();
+  let { runResult: result, attemptGenerated: chapterGenerated, attemptPersisted: chapterWritten, persistError } = await runAttempt();
 
   // Fallback path: if first attempt produced no chapter, retry once with cheaper/simple workflow.
   if (!chapterWritten) {
     const fallback = await runAttempt({ use3AgentWorkflow: false, maxRetries: 0, maxTokens: 6144, temperature: 0.9 });
-    if (fallback.attemptWrote) {
+    if (fallback.attemptPersisted) {
+      chapterGenerated = true;
       chapterWritten = true;
       result = fallback.runResult;
-    } else if (!result.success && fallback.runResult.success) {
+      persistError = undefined;
+    } else {
+      chapterGenerated = chapterGenerated || fallback.attemptGenerated;
+      persistError = persistError || fallback.persistError;
+    }
+
+    if (!result.success && fallback.runResult.success) {
       result = fallback.runResult;
     }
   }
@@ -368,12 +381,15 @@ async function writeOneChapter(
   }
 
   if (!chapterWritten && !completionReason) {
+    const rootError = persistError
+      ? `Chapter generated but persistence failed: ${persistError}`
+      : result.error || (chapterGenerated ? 'Chapter generated but not persisted' : 'No chapter written in this run');
     return {
       id: project.id,
       title: novel.title,
       tier,
       success: false,
-      error: result.error || 'No chapter written in this run',
+      error: rootError,
       chapterWritten: false,
     };
   }
