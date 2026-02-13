@@ -54,5 +54,8 @@ next-env.d.ts
 .trae/
 .windsurf/
 
-# Mobile app (separate project with own git tracking)
-/mobile/
+# Mobile app - generated native projects (from expo prebuild)
+/mobile/ios/
+/mobile/android/
+/mobile/node_modules/
+/mobile/.expo/

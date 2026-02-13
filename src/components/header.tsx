@@ -277,6 +277,24 @@ export const Header: React.FC<HeaderProps> = ({
                 Duyệt truyện
               </Button>
             </div>
+
+            <div className="rounded-xl border p-4 space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">Phap ly va ho tro</p>
+              <div className="grid grid-cols-2 gap-2">
+                <Button variant="ghost" className="justify-start" onClick={() => { setIsMenuOpen(false); router.push('/privacy'); }}>
+                  Bao mat
+                </Button>
+                <Button variant="ghost" className="justify-start" onClick={() => { setIsMenuOpen(false); router.push('/terms'); }}>
+                  Dieu khoan
+                </Button>
+                <Button variant="ghost" className="justify-start" onClick={() => { setIsMenuOpen(false); router.push('/support'); }}>
+                  Ho tro
+                </Button>
+                <Button variant="ghost" className="justify-start" onClick={() => { setIsMenuOpen(false); router.push('/account-deletion'); }}>
+                  Xoa tai khoan
+                </Button>
+              </div>
+            </div>
           </div>
         </SheetContent>
       </Sheet>
