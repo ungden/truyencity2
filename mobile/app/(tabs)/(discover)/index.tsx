@@ -25,7 +25,7 @@ export default function DiscoverScreen() {
 
   async function fetchData() {
     try {
-      const NOVEL_LIST_FIELDS = "id,title,slug,author,cover_url,description,genres,status,ai_author_id,created_at,updated_at,chapters(count)";
+      const NOVEL_LIST_FIELDS = "id,title,slug,author,cover_url,genres,status,ai_author_id,created_at,updated_at,chapters(count)";
       const [latestRes, completedRes] = await Promise.all([
         supabase
           .from("novels")
@@ -141,12 +141,17 @@ export default function DiscoverScreen() {
       {recommended.length > 0 && (
         <View className="mt-4">
           <SectionHeader title="Đề cử" />
-          <View className="px-4 flex-row flex-wrap" style={{ gap: 12 }}>
+          <View
+            style={{
+              paddingHorizontal: 16,
+              flexDirection: "row",
+              flexWrap: "wrap",
+              gap: 12,
+            }}
+          >
             {recommended.slice(0, 6).map((novel) => {
               const columns = width >= 768 ? 4 : 3;
-              const gap = 12;
-              const totalGap = gap * (columns - 1);
-              const itemWidth = (width - 32 - totalGap) / columns;
+              const itemWidth = (width - 32 - 12 * (columns - 1)) / columns;
               return (
                 <View key={novel.id} style={{ width: itemWidth }}>
                   <NovelCard novel={novel} variant="grid" />

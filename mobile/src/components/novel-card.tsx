@@ -55,7 +55,7 @@ function DefaultCard({ novel }: { novel: Novel }) {
 function GridCard({ novel }: { novel: Novel }) {
   return (
     <Link href={`/novel/${novel.slug || novel.id}`} asChild>
-      <Pressable style={{ flex: 1 }}>
+      <Pressable>
         <Image
           source={novel.cover_url || "https://placehold.co/220x300"}
           style={{ width: "100%", aspectRatio: 3 / 4, borderRadius: 12 }}
