@@ -28,7 +28,9 @@ const MIN_RESUME_BATCH_SIZE = 30;
 const MAX_RESUME_BATCH_SIZE = 180;
 const INIT_BATCH_SIZE = 8;
 const CANDIDATE_POOL_SIZE = 1200;
-const PROJECT_TIMEOUT_MS = 120_000; // 120s per-project timeout — prevents 1 slow project from blocking the batch
+const PROJECT_TIMEOUT_MS = 180_000; // 180s per-project timeout for long-context chapters
+const INIT_PROJECT_TIMEOUT_MS = 300_000;
+const RUN_CONCURRENCY = 12; // Limit parallel pressure on model provider
 const DAILY_CHAPTER_QUOTA = 20; // Hard exact target per active novel per Vietnam day
 
 export const maxDuration = 300; // 5 minutes (Vercel Pro)
@@ -78,6 +80,29 @@ function hashStringToInt(input: string): number {
 
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
+}
+
+async function executeWithConcurrency<T>(
+  tasks: Array<() => Promise<T>>,
+  concurrency: number
+): Promise<T[]> {
+  if (tasks.length === 0) return [];
+
+  const limit = Math.max(1, Math.min(concurrency, tasks.length));
+  const results: T[] = new Array(tasks.length);
+  let cursor = 0;
+
+  const worker = async () => {
+    while (true) {
+      const i = cursor;
+      cursor += 1;
+      if (i >= tasks.length) break;
+      results[i] = await tasks[i]();
+    }
+  };
+
+  await Promise.all(Array.from({ length: limit }, () => worker()));
+  return results;
 }
 
 // Shared type for project row
@@ -235,7 +260,7 @@ async function writeOneChapter(
     provider: 'gemini',
     model: 'gemini-3-flash-preview',
     temperature: project.temperature || 1.0,
-    maxTokens: 8192,
+    maxTokens: 6144,
     targetWordCount: project.target_chapter_length || 2500,
     genre: (project.genre || 'tien-hiep') as GenreType,
     minQualityScore: 5,
@@ -535,7 +560,7 @@ export async function GET(request: NextRequest) {
       .update({ updated_at: new Date().toISOString() })
       .in('id', allIds);
 
-    // ====== EXECUTE BOTH TIERS IN PARALLEL ======
+    // ====== EXECUTE WITH BOUNDED CONCURRENCY ======
 
     // Helper: wrap a promise with a timeout to prevent one slow project from blocking the batch
     const withTimeout = <T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> =>
@@ -544,44 +569,36 @@ export async function GET(request: NextRequest) {
         new Promise<T>(resolve => setTimeout(() => resolve(fallback), ms)),
       ]);
 
-    const allPromises = [
-      // Tier 1: All resume projects in parallel (with per-project timeout)
-      ...filteredResumeProjects.map(p =>
+    const runTasks: Array<() => Promise<RunResult>> = [
+      ...filteredResumeProjects.map(p => async () =>
         withTimeout(
           writeOneChapter(p, geminiKey, supabase, 'resume'),
           PROJECT_TIMEOUT_MS,
           { id: p.id, title: '?', tier: 'resume' as const, success: false, error: `Timeout after ${PROJECT_TIMEOUT_MS / 1000}s` }
         ).catch(err => ({
-            id: p.id,
-            title: '?',
-            tier: 'resume' as const,
-            success: false,
-            error: err instanceof Error ? err.message : String(err),
-          }))
+          id: p.id,
+          title: '?',
+          tier: 'resume' as const,
+          success: false,
+          error: err instanceof Error ? err.message : String(err),
+        }))
       ),
-      // Tier 2: Init projects (usually just 1, longer timeout: 4 min for full planning)
-      ...filteredInitProjects.map(p =>
+      ...filteredInitProjects.map(p => async () =>
         withTimeout(
           writeOneChapter(p, geminiKey, supabase, 'init'),
-          240_000, // 4 min for init (full planning pipeline)
-          { id: p.id, title: '?', tier: 'init' as const, success: false, error: 'Timeout after 240s' }
+          INIT_PROJECT_TIMEOUT_MS,
+          { id: p.id, title: '?', tier: 'init' as const, success: false, error: `Timeout after ${INIT_PROJECT_TIMEOUT_MS / 1000}s` }
         ).catch(err => ({
-            id: p.id,
-            title: '?',
-            tier: 'init' as const,
-            success: false,
-            error: err instanceof Error ? err.message : String(err),
-          }))
+          id: p.id,
+          title: '?',
+          tier: 'init' as const,
+          success: false,
+          error: err instanceof Error ? err.message : String(err),
+        }))
       ),
     ];
 
-    const results = await Promise.allSettled(allPromises);
-
-    const summary: RunResult[] = results.map(r =>
-      r.status === 'fulfilled'
-        ? r.value
-        : { id: '?', title: '?', tier: 'resume' as const, success: false, error: r.reason?.message || 'Unknown' }
-    );
+    const summary: RunResult[] = await executeWithConcurrency(runTasks, RUN_CONCURRENCY);
 
     const quotaByProject = new Map(quotaRows.map((q) => [q.project_id, q]));
     const quotaUpdates = summary
@@ -650,6 +667,8 @@ export async function GET(request: NextRequest) {
       processed: totalProjects,
       activeCount,
       dynamicResumeBatchSize,
+      runConcurrency: RUN_CONCURRENCY,
+      timeoutSeconds: PROJECT_TIMEOUT_MS / 1000,
       dueCandidates: dueCandidates.length,
       resumeCount: filteredResumeProjects.length,
       resumeSuccess,
