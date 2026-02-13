@@ -385,9 +385,10 @@ export class StoryRunner {
 
       // ========== COMPLETED ==========
       if (this.state.chaptersWritten === chaptersWrittenAtStart) {
+        const detail = this.state.lastError ? ` Last error: ${this.state.lastError}` : '';
         const noWriteError = hadArcFailure
-          ? 'No chapters were successfully written in this run'
-          : 'Run completed without producing chapters';
+          ? `No chapters were successfully written in this run.${detail}`
+          : `Run completed without producing chapters.${detail}`;
         this.updateStatus('error', noWriteError);
         this.callbacks.onError?.(noWriteError);
         return {
