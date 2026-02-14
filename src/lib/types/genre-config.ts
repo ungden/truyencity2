@@ -17,67 +17,195 @@ export const GENRE_CONFIG = {
         id: 'tien-hiep-co-dien', 
         name: 'Cổ Điển', 
         description: 'Tu tiên truyền thống, hệ thống tu luyện cổ điển',
-        example: 'Luyện Khí → Trúc Cơ → Kim Đan → Nguyên Anh...'
+        example: 'Luyện Khí → Trúc Cơ → Kim Đan → Nguyên Anh...',
+        topicPromptHints: [
+          'Hệ thống tu luyện phải rõ ràng từ đầu: mỗi cảnh giới có ngưỡng, tài nguyên cần thiết, tỉ lệ thất bại, phụ tác dụng — KHÔNG bước nhảy vô căn cứ',
+          'Mỗi đột phá cảnh giới = 1 arc kịch tính: tích lũy → chuẩn bị → thiên kiếp/nội ma/tranh đoạt → thành/bại. Đột phá thất bại phải có hệ quả thật',
+          'Pháp bảo, đan dược, trận pháp phải có logic nội tại nhất quán — mỗi thứ có ưu nhược điểm rõ, không phải muốn là có',
+          'Tông môn chính trị: ngoại môn vs nội môn, trưởng lão vs chưởng môn, tranh đoạt tài nguyên/truyền thừa — mô tả lợi ích cụ thể mỗi bên',
+        ],
       },
       { 
         id: 'tien-hiep-hien-dai', 
         name: 'Hiện Đại', 
         description: 'Tu tiên trong thế giới hiện đại',
-        example: 'Tu tiên kết hợp công nghệ, đô thị phồn hoa'
+        example: 'Tu tiên kết hợp công nghệ, đô thị phồn hoa',
+        topicPromptHints: [
+          'Xung đột cốt lõi: tu tiên giới ẩn mình trong xã hội hiện đại — cách che giấu (kết giới, quy tắc bí mật), lý do ẩn mình, hệ quả nếu bị phát hiện',
+          'MC phải xử lý đồng thời hai danh tính: người thường (công việc, gia đình, bạn bè) và tu sĩ (nhiệm vụ, tranh đoạt, đột phá) — tạo kịch tính va chạm',
+          'Linh khí khan hiếm trong đô thị: tu luyện khó hơn cổ đại, tài nguyên tranh giành dữ dội hơn. Công nghệ hiện đại vừa là trở ngại (camera, mạng xã hội) vừa là lợi thế (AI phân tích, vũ khí)',
+          'Thế lực tu tiên hiện đại có cấu trúc tổ chức khác cổ điển: công ty bình phong, gia tộc ngụy trang, tổ chức quốc tế — quyền lực kết hợp tiền và pháp lực',
+        ],
       },
       { 
         id: 'tien-hiep-trong-sinh', 
         name: 'Trọng Sinh', 
         description: 'Tu tiên với ký ức tiền kiếp',
-        example: 'Trọng sinh từ thượng cổ, lợi dụng kinh nghiệm tu luyện'
+        example: 'Trọng sinh từ thượng cổ, lợi dụng kinh nghiệm tu luyện',
+        topicPromptHints: [
+          'Kiếp trước phải mô tả rõ: chết thế nào, hối hận gì, kiến thức gì mang theo — tạo động lực rõ ràng cho hành động kiếp này',
+          'Kiến thức tiền kiếp phải sử dụng thông minh: biết trước bí cảnh nào mở, ai sẽ phản bội, đan phương nào hiếm — nhưng KHÔNG phải omniscient, vì kiếp này đã thay đổi nhiều thứ',
+          'Hiệu ứng bướm: hành động khác kiếp trước → sự kiện thay đổi dây chuyền → kiến thức cũ dần vô dụng → MC phải thích nghi. Đây là nguồn kịch tính chính',
+          'Nhân vật cũ gặp lại: kẻ thù kiếp trước giờ vô hại, ân nhân kiếp trước giờ chưa gặp, tình cũ kiếp trước — MC phải kiềm chế cảm xúc, tạo chiều sâu tâm lý',
+        ],
       },
       { 
         id: 'tien-hiep-dong-huyen', 
         name: 'Đồng Huyễn', 
         description: 'Kết hợp yếu tố huyền huyễn',
-        example: 'Tu tiên trong thế giới phép thuật'
+        example: 'Tu tiên trong thế giới phép thuật',
+        topicPromptHints: [
+          'Hai hệ thống lực lượng phải tương tác rõ ràng: tu tiên + ma pháp/huyền lực — chúng bổ sung hay xung đột? MC khai thác lợi thế từ sự kết hợp độc đáo này',
+          'Thế giới có quy tắc riêng kết hợp cả hai: không chỉ "dán nhãn" phép thuật vào tu tiên, mà phải tạo logic nội tại — ví dụ linh khí tương tác mana tạo phản ứng đặc biệt',
+          'Xung đột chủng tộc/phái hệ: phe tu tiên thuần túy vs phe huyền thuật, MC bị kẹt giữa hoặc tìm cách hòa giải/thống trị cả hai',
+        ],
       },
       {
         id: 'tien-hiep-hong-hoang',
         name: 'Hồng Hoang',
         description: 'Bối cảnh thượng cổ, thần ma, thiên đạo và đại kiếp',
-        example: 'Nhập Hồng Hoang, tranh đoạt cơ duyên trước các đại năng'
+        example: 'Nhập Hồng Hoang, tranh đoạt cơ duyên trước các đại năng',
+        topicPromptHints: [
+          'Thế giới Hồng Hoang rộng lớn vô tận: tam giới, lục đạo luân hồi, thiên đạo vận hành — phải thiết lập rõ quy tắc thiên đạo (nhân quả, kiếp số, khí vận)',
+          'Nhân vật cấp "thần thánh": Tổ Vu, Yêu Hoàng, Tiên Đế — mỗi nhân vật có mục đích và tính toán xuyên vạn năm, không ai đơn giản. MC phải mưu trí sống sót giữa các đại năng',
+          'Đại kiếp là cơ hội lẫn nguy cơ: Long Hán Đại Kiếp, Phong Thần Đại Kiếp — mỗi kiếp xáo trộn quyền lực, MC phải chọn phe hoặc lợi dụng cả hai bên',
+          'Cơ duyên cấp vũ trụ: hỗn độn chung tử, thiên tài địa bảo, truyền thừa thượng cổ — nhưng phải có cái giá tương xứng, không "nhặt" miễn phí',
+        ],
       },
       {
         id: 'tien-hiep-khai-tong-lap-phai',
         name: 'Khai Tông Lập Phái',
         description: 'Từ tiểu tu sĩ xây tông môn, tranh tài nguyên và danh vọng',
-        example: 'Bắt đầu từ ngoại môn, từng bước lập tông môn bất hủ'
+        example: 'Bắt đầu từ ngoại môn, từng bước lập tông môn bất hủ',
+        topicPromptHints: [
+          'Progression xây dựng tông môn rõ ràng: chọn linh mạch → dựng trụ sở → thu đệ tử đầu tiên → thiết lập quy chế → mở rộng ảnh hưởng → đại hội tông môn',
+          'Quản lý tài nguyên tông môn: linh thạch thu chi, đan dược phân phối, pháp bảo thưởng phạt — mô tả cụ thể như quản lý doanh nghiệp nhưng bằng thuật ngữ tu tiên',
+          'Đệ tử là tài sản: mỗi đệ tử có tính cách/tài năng riêng, MC phải tuyển chọn, đào tạo, xử lý mâu thuẫn nội bộ, phản bội. Quan hệ sư đồ tạo chiều sâu tình cảm',
+          'Cạnh tranh với tông môn khác: tranh linh mạch, đấu giá cơ duyên, thách đấu liên tông, liên minh chống cường địch — chính trị tu tiên cấp tổ chức',
+        ],
       },
       {
         id: 'tien-hiep-tien-gioi-kinh-doanh',
         name: 'Tiên Giới Kinh Doanh',
         description: 'Buôn đan dược, pháp bảo, linh tài trong giới tu tiên',
-        example: 'Mở thương hội tiên giới, lấy tài phú đổi cảnh giới'
+        example: 'Mở thương hội tiên giới, lấy tài phú đổi cảnh giới',
+        topicPromptHints: [
+          'Hệ thống kinh tế tu tiên phải nhất quán: linh thạch = tiền tệ cơ bản, tỉ giá giữa các cấp (hạ phẩm/trung phẩm/thượng phẩm), chi phí đan luyện vs giá bán, margin lợi nhuận',
+          'Mỗi thương vụ phải có logic cung-cầu rõ: nguồn hàng từ đâu, vận chuyển thế nào, khách hàng mục tiêu là ai, đối thủ cạnh tranh ra sao — không chỉ "buôn bán kiếm tiền" chung chung',
+          'Progression thương hội: quầy nhỏ ở phường thị → cửa hàng ở phụ thành → thương hội liên thành → đấu giá trường cấp vực → thương hội tiên giới xuyên giới',
+          'Kết hợp tu luyện và kinh doanh: tiền kiếm được → mua tài nguyên tu luyện → mạnh hơn → tiếp cận thị trường cấp cao hơn → vòng lặp tích lũy',
+        ],
       },
       {
         id: 'tien-hiep-linh-dien-nong-trang',
         name: 'Linh Điền Nông Trại',
         description: 'Trồng linh dược, nuôi linh thú, vận hành nông trại tu tiên',
-        example: 'Một mẫu linh điền, đổi lấy vạn năm cơ duyên'
+        example: 'Một mẫu linh điền, đổi lấy vạn năm cơ duyên',
+        topicPromptHints: [
+          'Hệ thống nông trại phải chi tiết: loại linh dược (hạng, thời gian trưởng thành, điều kiện), linh thú (cấp, thức ăn, sinh sản), đất đai (linh mạch phẩm cấp ảnh hưởng năng suất)',
+          'Progression nông trại: 1 mẫu linh điền cằn → cải tạo đất → trồng linh thảo cơ bản → nuôi linh thú → mở rộng diện tích → linh điền cấp thiên phẩm → vườn đan dược quý hiếm',
+          'Cuộc sống điền viên nhưng có nguy hiểm: thiên tai linh khí, yêu thú tấn công nông trại, tu sĩ tham lam muốn cướp đất — tạo xung đột tự nhiên giữa an nhàn và tranh đấu',
+          'Thu hoạch = dopamine: mỗi vụ thu hoạch mô tả rõ sản lượng, giá trị, phát hiện đột biến quý hiếm — cảm giác "nông trại" thư giãn nhưng hấp dẫn',
+        ],
       },
       {
         id: 'tien-hiep-son-lam-san-thu',
         name: 'Sơn Lâm Săn Thú',
-        description: 'Săn yêu thú, lấy nội đan, sinh tồn trong cấm địa',
-        example: 'Thợ săn phàm nhân dùng yêu thú để đổi tài nguyên tu luyện'
+        description: 'Săn yêu thú, lấy nội đan, sinh tồn trong cấm địa tu tiên',
+        example: 'Thợ săn phàm nhân dùng yêu thú để đổi tài nguyên tu luyện, từ cấm địa ngoại vi tiến vào thâm xứ',
+        topicPromptHints: [
+          'Progression yêu thú theo cấp: thú thường → yêu thú sơ cấp (có nội đan) → yêu thú cao cấp (có linh trí) → thần thú/viễn cổ dị chủng. Mỗi cấp nguy hiểm hơn gấp bội',
+          'Mỗi cuộc săn = một cuộc phiêu lưu sinh tử: mô tả chi tiết kỹ thuật săn, bẫy, phục kích, rượt đuổi. Nội đan + da + xương + huyết đều có giá trị khác nhau',
+          'Con đường làm giàu: bán nội đan đổi linh thạch → tích lũy tài nguyên tu luyện → mạnh hơn → săn yêu thú mạnh hơn → vòng lặp tích lũy',
+          'Cấm địa mở rộng theo sức mạnh MC: ngoại vi → trung tâm → thâm xứ → bí cảnh ẩn. Mỗi vùng có sinh thái và nguy hiểm riêng',
+        ],
       },
       {
         id: 'tien-hiep-hai-vuc-san-bao',
         name: 'Hải Vực Săn Bảo',
         description: 'Ra khơi săn bảo, bí cảnh hải đảo, tranh đoạt truyền thừa',
-        example: 'Đội thuyền tu sĩ vượt hải vực tìm cổ mộ tiên nhân'
+        example: 'Đội thuyền tu sĩ vượt hải vực tìm cổ mộ tiên nhân',
+        topicPromptHints: [
+          'Hải vực là "open world" trên biển: mỗi hải đảo = 1 bí cảnh tiềm năng, hải thú xuất hiện ngẫu nhiên, thời tiết + hải lưu linh khí ảnh hưởng hành trình',
+          'Mỗi chuyến ra khơi = 1 arc phiêu lưu: chuẩn bị → ra biển → gặp nguy hiểm (hải thú, cướp biển tu sĩ, bão linh khí) → phát hiện bí cảnh → tranh đoạt → trở về',
+          'Progression: thuyền nhỏ ven bờ → pháp thuyền vượt hải vực gần → phi thuyền cấp cao vào biển sâu → thâm hải bí cảnh (hải đế cung điện, cổ mộ tiên nhân)',
+          'Kho báu biển = "mở hộp" cấp tu tiên: san hô linh, ngọc trai linh lực, hải thú nội đan, trầm hương vạn năm, truyền thừa hải đế — mỗi thứ có giá trị kinh tế rõ ràng',
+        ],
       },
       {
         id: 'tien-hiep-mo-tiem-net',
         name: 'Mở Tiệm Net Tiên Hiệp',
-        description: 'Đem mô hình tiệm net/game vào thế giới tu tiên',
-        example: 'Mở tiệm net giúp tu sĩ mô phỏng bí cảnh để đột phá'
+        description: 'Đem mô hình tiệm net/game vào thế giới tu tiên, khách chơi game nhận năng lực thật',
+        example: 'Mở tiệm net giúp tu sĩ mô phỏng bí cảnh để đột phá, thu 2 linh thạch/giờ',
+        topicPromptHints: [
+          'Hệ thống tiệm net: MC nhận được hệ thống (网吧系统), máy tính chạy game/phim từ thế giới hiện đại. Thu phí bằng tiền tệ tu tiên (linh thạch, đan dược). Giới hạn thời gian chơi (vd: 6h/ngày) tạo khan hiếm',
+          'Khách hàng chơi game → nhận năng lực thật: học kiếm pháp từ game kiếm hiệp, lĩnh ngộ Phật pháp từ xem phim Tây Du, chiến thuật từ game chiến tranh. Item game có thể biến thành item thật',
+          'Phản ứng của tu sĩ/cường giả khi tiếp xúc văn hóa hiện đại là điểm dopamine chính: Nguyên Anh lão quái khóc khi chơi game RPG, kiếm tu cầm chuột run tay, tiên tử nghiện xem phim tình cảm',
+          'Nâng cấp cửa hàng: hoàn thành task (đủ số khách, doanh thu...) → mở khóa game mới, thiết bị mới (VR, hologram), mở chi nhánh ở các vùng/giới khác',
+          'MC ban đầu yếu nhưng được khách hàng mạnh bảo hộ (vì muốn tiếp tục chơi game) — tạo lá chắn tự nhiên. MC cũng học kỹ năng từ game để tự mạnh lên',
+        ],
+      },
+      {
+        id: 'tien-hiep-trieu-hoan-than-thu',
+        name: 'Triệu Hoán Thần Thú',
+        description: 'Triệu hoán, ký khế và tiến hóa linh thú/thần thú để chiến đấu trong tu tiên giới',
+        example: 'Triệu hoán sư phế vật nhưng linh thú đầu tiên là viễn cổ thần thú ngụy trang',
+        topicPromptHints: [
+          'Hệ thống triệu hoán phải rõ: cách ký khế (huyết khế, linh hồn khế, bình đẳng khế), số lượng giới hạn, chi phí duy trì linh thú (linh lực/thức ăn), cấp bậc khế ước ảnh hưởng sức mạnh',
+          'Progression linh thú: trứng → sơ sinh → trưởng thành → tiến hóa (đổi hình thái) → viễn cổ hồi tổ → thần thú. Mỗi lần tiến hóa = arc kịch tính, cần nguyên liệu quý và nguy hiểm',
+          'Đấu thú là set piece chính: mô tả chi tiết chiến thuật phối hợp giữa chủ và thú, combo kỹ năng, khắc chế thuộc tính. Đấu trường linh thú, thi đấu liên tông — không chỉ "thú đánh thú"',
+          'Quan hệ MC-linh thú tạo chiều sâu cảm xúc: linh thú có tính cách riêng, trung thành/nghịch ngợm/kiêu ngạo. Cảnh MC hy sinh bảo vệ thú (hoặc ngược lại) tạo khoảnh khắc xúc động',
+          'Linh thú khan hiếm = tài nguyên chiến lược: tông môn tranh nhau trứng thần thú, đấu giá linh thú quý, phát hiện linh thú tuyệt chủng — "mở trứng" là dopamine cực mạnh',
+        ],
+      },
+      {
+        id: 'tien-hiep-gia-toc',
+        name: 'Tu Tiên Gia Tộc',
+        description: 'Xây dựng gia tộc tu tiên hưng thịnh xuyên nhiều thế hệ, tích lũy truyền thừa',
+        example: 'Từ gia tộc phàm nhân, trải 10 đời tích lũy thành đại gia tộc tu tiên',
+        topicPromptHints: [
+          'Progression xuyên thế hệ: đời 1 khai sáng (MC) → đời 2 mở rộng → đời 3 khủng hoảng → đời N cực thịnh. Mỗi đời có nhân vật chính riêng, kế thừa tài nguyên và mối thù đời trước',
+          'Quản lý gia tộc chi tiết: linh mạch gia tộc, kho tàng truyền thừa, quy chế tu luyện, hôn nhân liên minh, tuyển chọn kế thừa nhân — giống quản lý doanh nghiệp gia đình nhưng bằng tu tiên',
+          'Xung đột nội bộ tạo drama: tranh quyền kế thừa, nhánh chính vs nhánh phụ, phản bội gia tộc, con nuôi vs con đẻ — chính trị gia tộc phức tạp không kém tông môn',
+          'Tích lũy qua đời: công pháp gia truyền ngày càng hoàn thiện, kho báu tích lũy, quan hệ xã hội mở rộng — cảm giác "kế thừa" mạnh mẽ khi chuyển sang thế hệ mới',
+        ],
+      },
+      {
+        id: 'tien-hiep-truc-ba',
+        name: 'Tu Tiên Trực Bá',
+        description: 'Livestream quá trình tu tiên cho phàm nhân hoặc giới tu tiên xem',
+        example: 'Hệ thống phát sóng tu tiên, triệu người phàm xem MC đột phá Kim Đan',
+        topicPromptHints: [
+          'Hệ thống trực bá: MC có khả năng phát sóng quá trình tu luyện/chiến đấu/khám phá. Khán giả có thể là phàm nhân (thế giới hiện đại) hoặc tu sĩ khác. Comment/tặng quà tạo tương tác',
+          'Phản ứng khán giả là dopamine chính: "WTF anh ấy vừa giết Nguyên Anh???", "Quỳ! Đan dược này ít nhất 100 triệu linh thạch!" — comment realtime tạo nhịp hài hước và kịch tính',
+          'Livestream tạo áp lực: MC không thể làm bậy/gian lận khi có hàng triệu người xem, nhưng cũng nhận được hỗ trợ (fan tặng tài nguyên, tip manh mối). Fame = tài nguyên mới',
+          'Progression hệ thống trực bá: lượng viewer tăng → mở khóa tính năng mới (slow-mo replay, đa góc nhìn, mời khách) → phát sóng quy mô lớn hơn (thiên kiếp, đại chiến)',
+        ],
+      },
+      {
+        id: 'tien-hiep-mo-phong-khi',
+        name: 'Mô Phỏng Khí Tu Tiên',
+        description: 'Hệ thống cho phép mô phỏng kiếp sống tu tiên, rút kinh nghiệm rồi áp dụng vào thực tế',
+        example: '"Kiếp mô phỏng thứ 3721: Bạn chết ở Trúc Cơ vì trúng độc. Nhận được: Bách Độc Bất Xâm"',
+        topicPromptHints: [
+          'Cơ chế mô phỏng rõ ràng: MC sống 1 kiếp mô phỏng (vài phút thực = cả đời ảo), chết → nhận phần thưởng dựa trên thành tích. Phần thưởng mang về thực tế: kỹ năng, thể chất, kiến thức',
+          'Mỗi lần mô phỏng = 1 arc mini hấp dẫn: MC thử chiến lược khác nhau, khám phá thế giới, chết theo nhiều cách — "chết để học" tạo gameplay loop nghiện. Log mô phỏng ngắn gọn, đọc nhanh',
+          'Kiến thức tích lũy qua mô phỏng: sau 100 lần mô phỏng, MC biết bí mật thế giới mà không ai biết — "mở bản đồ sương mù" bằng cách chết đi chết lại',
+          'Mô phỏng và thực tế khác nhau: thế giới thực phản ứng khác mô phỏng (hiệu ứng bướm), MC không thể dựa hoàn toàn vào mô phỏng — tạo kịch tính khi kế hoạch "mô phỏng hoàn hảo" bị phá',
+        ],
+      },
+      {
+        id: 'tien-hiep-dan-su',
+        name: 'Đan Sư / Luyện Khí Sư',
+        description: 'Chuyên nghề phụ tu tiên: luyện đan, chế khí, phù lục — kết hợp thương mại và tu luyện',
+        example: 'Phế vật tu luyện nhưng thiên tài luyện đan, dùng đan dược đổi lấy tài nguyên đột phá',
+        topicPromptHints: [
+          'Hệ thống nghề phụ chi tiết: cấp bậc đan sư (nhất phẩm → cửu phẩm), nguyên liệu (linh dược + phụ liệu + lửa), tỉ lệ thành công, biến thể đan phẩm (thượng/trung/hạ) — mô tả quá trình luyện đan hấp dẫn như nấu ăn level thần',
+          'Progression đan sư: luyện đan cơ bản → đan phương hiếm → sáng tạo đan phương mới → đan dược cấm → thiên phẩm thần đan. Mỗi cấp mở khóa khách hàng mạnh hơn và nguyên liệu quý hơn',
+          'Nghề phụ = quyền lực mềm: đan sư được mời vào tông môn, cường giả xin đan dược phải nhún nhường, MC yếu nhưng ai cũng nể — "không đánh nhau mà vẫn có face"',
+          'Kinh doanh đan dược: mở tiệm đan, đấu giá đan phẩm hiếm, gia công cho tông môn, độc quyền nguyên liệu — kết hợp crafting + business tạo vòng lặp tích lũy',
+          'Khoảnh khắc dopamine: luyện đan ra phẩm chất ngoài dự kiến, đan kiếp (trời đánh khi luyện thần đan), phản ứng kinh ngạc của khách hàng khi thấy phẩm chất đan dược',
+        ],
       }
     ]
   },
@@ -99,49 +227,195 @@ export const GENRE_CONFIG = {
         id: 'huyen-huyen-trong-sinh', 
         name: 'Trọng Sinh', 
         description: 'Trọng sinh vào thế giới huyền huyễn',
-        example: 'Trọng sinh thành thiên tài ma pháp'
+        example: 'Trọng sinh thành thiên tài ma pháp',
+        topicPromptHints: [
+          'Kiếp trước phải rõ: chết thế nào (phản bội, kiếp thiên, âm mưu), hối hận gì, kiến thức mang theo (bí thuật, manh mối kho báu, biết trước ai là kẻ thù)',
+          'Hiệu ứng bướm: hành động khác kiếp trước → sự kiện thay đổi → kiến thức cũ dần vô dụng → MC phải thích nghi, tạo kịch tính lớn dần',
+          'Lợi thế trọng sinh phải tiêu hao dần: ban đầu MC biết mọi thứ → giữa truyện bắt đầu lệch → cuối truyện hoàn toàn là lãnh thổ mới',
+          'Gặp lại nhân vật kiếp trước: kẻ thù lúc này vô hại, ân nhân chưa quen, người yêu cũ — tạo chiều sâu cảm xúc qua phản ứng MC',
+        ],
       },
       { 
         id: 'huyen-huyen-kinh-doanh', 
         name: 'Kinh Doanh', 
         description: 'Kết hợp kinh doanh trong thế giới huyền huyễn',
-        example: 'Mở tiệm dược phẩm ma pháp, buôn bán nguyên liệu'
+        example: 'Mở tiệm dược phẩm ma pháp, buôn bán nguyên liệu',
+        topicPromptHints: [
+          'Hệ thống kinh tế huyền huyễn phải rõ: tiền tệ (kim tệ, ma tinh), cung-cầu nguyên liệu ma pháp, chi phí vận chuyển qua vùng nguy hiểm, thuế của lãnh chúa/đế quốc',
+          'Progression thương nhân: quầy nhỏ → cửa hàng ở thành phố → chuỗi liên thành → thương hội cấp đế quốc → mạng lưới thương mại xuyên đại lục',
+          'Sản phẩm độc đáo của thế giới huyền huyễn: dược phẩm ma pháp, vũ khí phù văn, pet trứng, nguyên liệu quái vật — mô tả cụ thể giá trị và nguồn cung',
+          'Thương chiến trong thế giới huyền huyễn: đối thủ có thể dùng cả tiền lẫn sức mạnh, thuê sát thủ phá hàng, đấu giá chiến lược, độc quyền nguyên liệu',
+        ],
       },
       { 
         id: 'huyen-huyen-toan-dan', 
         name: 'Toàn Dân', 
         description: 'Toàn dân tu luyện/phép thuật',
-        example: 'Mọi người đều có thể học phép thuật'
+        example: 'Mọi người đều có thể học phép thuật',
+        topicPromptHints: [
+          'Xã hội thay đổi khi AI MỌI NGƯỜI có năng lực: hệ thống giáo dục dựa trên tài năng, quân đội toàn dân, xã hội phân cấp theo sức mạnh — mô tả hệ quả xã hội cụ thể',
+          'MC phải tìm cách nổi bật trong xã hội mà ai cũng mạnh: kỹ năng hiếm, class ẩn, thiên phú đặc biệt, hoặc chiến lược khác biệt — không chỉ "mạnh hơn"',
+          'Progression phải gắn với xã hội: thăng cấp → thay đổi vị trí xã hội (học sinh → thí luyện → quân nhân → thủ lĩnh), mỗi cấp mở ra xung đột và cơ hội mới',
+          'Nguy cơ bên ngoài đủ lớn để cần "toàn dân": ma thú xâm lấn, chiều không gian khác mở, dị tộc tấn công — tạo bối cảnh vì sao toàn dân phải mạnh',
+        ],
       },
       { 
         id: 'huyen-huyen-dong-nhan', 
         name: 'Đồng Nhân', 
         description: 'Dựa trên tác phẩm huyền huyễn nổi tiếng',
-        example: 'Dựa trên Tây Du Ký, Hồng Lâu Mộng...'
+        example: 'Dựa trên Tây Du Ký, Hồng Lâu Mộng...',
+        topicPromptHints: [
+          'Tôn trọng thiết lập gốc: hệ thống sức mạnh, tính cách nhân vật gốc, mối quan hệ chính — MC là yếu tố mới xen vào, không phá vỡ nền tảng',
+          'MC phải có chiến lược sống sót/phát triển dựa trên kiến thức về cốt truyện gốc: biết trước sự kiện, tránh chết chóc, tận dụng cơ hội — nhưng hành động MC gây hiệu ứng bướm',
+          'Fan service: tương tác với nhân vật gốc phải tự nhiên và tôn trọng tính cách họ, tạo cảnh fan muốn thấy nhưng không xảy ra trong nguyên tác',
+        ],
       },
       {
         id: 'huyen-huyen-mo-tiem-net',
         name: 'Mở Tiệm Net',
-        description: 'Mở tiệm net trong thế giới ma pháp/huyền huyễn',
-        example: 'Game mô phỏng chiến trường giúp học viên ma pháp tăng cấp'
+        description: 'Mở tiệm net trong thế giới ma pháp/huyền huyễn, khách chơi game nhận năng lực thật',
+        example: 'Game mô phỏng chiến trường giúp học viên ma pháp tăng cấp, pháp sư nghiện LOL',
+        topicPromptHints: [
+          'Hệ thống tiệm net: máy tính chạy game hiện đại trong thế giới ma pháp. Thu phí bằng tiền tệ dị giới (kim tệ, ma tinh thạch). Giới hạn thời gian chơi tạo khan hiếm và tranh giành chỗ',
+          'Khách hàng chơi game → nhận năng lực thật: lĩnh ngộ pháp thuật mới từ game, tăng phản xạ chiến đấu, học chiến thuật. Phim/anime cũng ảnh hưởng: xem anime chiến đấu → lĩnh ngộ chiêu thức',
+          'Phản ứng hài hước là dopamine chính: pháp sư cấp cao mê LOL, hiệp sĩ nghiện game kiếm hiệp, công chúa khóc khi xem phim tình cảm — tạo comic relief liên tục',
+          'Nâng cấp cửa hàng: thêm máy → game mới → VR/hologram → mở chi nhánh ở các vương quốc/đại lục khác',
+          'MC yếu ban đầu nhưng được cường giả bảo hộ (nghiện game), đồng thời MC cũng tự mạnh lên từ kỹ năng game',
+        ],
       },
       {
         id: 'huyen-huyen-nong-trang-ma-phap',
         name: 'Nông Trại Ma Pháp',
         description: 'Trồng nguyên liệu ma pháp, vận hành trang trại thần bí',
-        example: 'Từ nông dân bị khinh thành lãnh chúa nguyên liệu ma pháp'
+        example: 'Từ nông dân bị khinh thành lãnh chúa nguyên liệu ma pháp',
+        topicPromptHints: [
+          'Hệ thống nông trại ma pháp chi tiết: loại cây ma pháp (thời gian, điều kiện, sản lượng), thú nuôi ma pháp (cấp, thức ăn, sản phẩm), đất đai (mạch ma lực ảnh hưởng năng suất)',
+          'Progression nông trại: đất hoang → khai hoang cơ bản → trồng dược thảo thường → mở rộng → trồng nguyên liệu quý → nuôi ma thú → trang trại cấp lãnh địa',
+          'Cuộc sống điền viên + nguy hiểm: ma thú tấn công mùa màng, thiên tai ma lực, đối thủ tranh đất, lãnh chúa đánh thuế — xung đột tự nhiên giữa yên bình và chiến đấu',
+          'Thu hoạch = dopamine: sản phẩm đột biến hiếm, thu nhập từng vụ tăng dần, khách hàng đặc biệt (pháp sư cấp cao, quý tộc) — cảm giác tích lũy thỏa mãn',
+        ],
       },
       {
         id: 'huyen-huyen-thuong-hoi',
         name: 'Thương Hội',
         description: 'Kinh doanh thương hội, đấu trí tài chính và thế lực',
-        example: 'Xây thương hội vượt ba đế quốc bằng pháp khí độc quyền'
+        example: 'Xây thương hội vượt ba đế quốc bằng pháp khí độc quyền',
+        topicPromptHints: [
+          'Thương hội trong thế giới huyền huyễn = tập đoàn + quân đội: có cả sức mạnh tài chính lẫn vũ lực, bảo tiêu riêng, pháp sư chiến đấu thuê',
+          'Progression thương hội: cửa hàng nhỏ → liên kết thương nhân → thương hội thành phố → chi nhánh đa thành → thương hội cấp đế quốc → mạng lưới xuyên đại lục',
+          'Đấu trí tài chính cấp huyền huyễn: đấu giá pháp khí, đầu cơ nguyên liệu ma pháp, độc quyền nguồn cung, chiến tranh giá — kết hợp chiến lược kinh doanh với âm mưu chính trị',
+          'MC dùng trí tuệ kinh doanh thay vì vũ lực: giải quyết xung đột bằng tiền, hợp đồng, liên minh — nhưng vẫn cần vũ lực làm chỗ dựa khi đàm phán thất bại',
+        ],
       },
       {
         id: 'huyen-huyen-san-thu',
         name: 'Săn Thú Ma Vực',
-        description: 'Săn ma thú trong cấm khu, đổi tài nguyên tiến cấp',
-        example: 'Đội săn ma thú nhỏ vươn lên thành quân đoàn huyền thoại'
+        description: 'Săn ma thú trong cấm khu, đổi tài nguyên tiến cấp, xây dựng đội săn huyền thoại',
+        example: 'Đội săn ma thú nhỏ vươn lên thành quân đoàn huyền thoại, mỗi lần vào ma vực là một canh bạc sinh tử',
+        topicPromptHints: [
+          'Progression ma thú: ma thú hạ cấp (đổi vài đồng xu) → trung cấp (đổi trang bị) → thượng cấp (đổi đột phá) → viễn cổ ma thú (thay đổi cục diện). Mỗi cấp = kịch tính và phần thưởng lớn hơn',
+          'Đội săn là đơn vị cốt lõi: mô tả phân công vai trò (trinh sát, tanker, DPS, healer), teamwork, mâu thuẫn nội bộ, phản bội. MC từ thành viên nhỏ → đội trưởng → huyền thoại',
+          'Ma vực là "dungeon" thiên nhiên: mỗi lần vào = "mở hộp" — không biết sẽ gặp gì. Mô tả sinh thái ma vực chi tiết: sương mù, bẫy tự nhiên, lãnh thổ thú, kho báu ẩn',
+          'Kinh tế săn thú: mô tả rõ bảng giá từng loại nguyên liệu (nội đan, da, xương, huyết, tinh hoa), nơi bán (hội thương nhân, đấu giá), cạnh tranh giữa các đội săn',
+        ],
+      },
+      {
+        id: 'huyen-huyen-trieu-hoan-thu',
+        name: 'Triệu Hoán Ngự Thú',
+        description: 'Toàn dân triệu hoán/ngự thú, tiến hóa pet, thi đấu thú',
+        example: 'Toàn dân thức tỉnh khế ước thú, MC triệu hoán được "phế vật" nhưng thực ra là viễn cổ thần thú',
+        topicPromptHints: [
+          'Hệ thống ngự thú toàn dân: mỗi người thức tỉnh 1 khế ước thú ở tuổi nhất định, cấp bậc thú (Phàm → Huyền → Địa → Thiên → Thần), tiến hóa qua chiến đấu/nguyên liệu/huyết mạch',
+          'MC có thú "phế vật" hoặc class hiếm: ban đầu bị khinh thường → phát hiện tiềm năng ẩn → tiến hóa → vượt qua tất cả. Bước ngoặt tiến hóa đầu tiên = dopamine cực mạnh',
+          'Đấu thú là set piece chính: mô tả chi tiết kỹ năng thú, chiến thuật khắc chế, combo chủ-thú. Giải đấu liên trường/quốc gia tạo arc hấp dẫn, mỗi đối thủ có thú + chiến thuật riêng',
+          'Thú là companion có tính cách: ham ăn, lười biếng, kiêu ngạo, trung thành — tương tác MC-thú tạo comic relief và chiều sâu cảm xúc. "Mở trứng" thú mới = khoảnh khắc nghiện',
+          'Sinh thái thế giới thú: thú hoang dã theo vùng, bí cảnh có thú hiếm, thú huyền thoại cần quest đặc biệt — khám phá thế giới để tìm thú mới tạo motivation xuyên suốt',
+        ],
+      },
+      {
+        id: 'huyen-huyen-trieu-hoan-van-toc',
+        name: 'Triệu Hoán Vạn Tộc',
+        description: 'Triệu hoán binh chủng/chủng tộc đa dạng, xây quân đoàn chinh phạt',
+        example: 'Triệu hoán Long Kỵ Binh, Tinh Linh Cung Thủ, Vong Linh Quân Đoàn thống nhất đại lục',
+        topicPromptHints: [
+          'Hệ thống triệu hoán quân đoàn: MC triệu hoán từng đơn vị binh chủng (bộ binh, kỵ binh, pháp sư, cung thủ), mỗi chủng tộc có ưu nhược điểm riêng. Chi phí triệu hoán bằng tài nguyên/mana cụ thể',
+          'Đa dạng chủng tộc triệu hoán: Tinh Linh (cung tên, ma pháp tự nhiên), Người Lùn (rèn trang bị, phòng thủ), Vong Linh (số đông, sợ thánh quang), Rồng (mạnh nhưng đắt) — mỗi chủng tộc có văn hóa và kỹ năng đặc trưng',
+          'Chiến tranh quy mô lớn là điểm nhấn: mô tả chiến thuật phối hợp binh chủng, hậu cần quân đội, chiến lược tấn thủ — không chỉ "đánh nhau" mà phải có trận đồ chiến thuật rõ ràng',
+          'Progression quân đoàn: đội nhỏ vài chục → trung đội → quân đoàn → đế quốc. MC từ chỉ huy nhỏ → lãnh chúa → đế vương. Mỗi trận thắng = mở rộng lãnh thổ + thêm binh chủng mới',
+        ],
+      },
+      {
+        id: 'huyen-huyen-toan-dan-lanh-chu',
+        name: 'Toàn Dân Lãnh Chủ',
+        description: 'Mỗi người nhận lãnh địa ở dị giới, xây dựng, phát triển và chinh phạt',
+        example: 'Toàn cầu dịch chuyển vào dị giới, mỗi người nhận 1 lãnh địa, MC mở được lãnh địa SSS cấp',
+        topicPromptHints: [
+          'Hệ thống lãnh địa rõ ràng: mỗi người nhận 1 mảnh đất ở dị giới, xây công trình (doanh trại, tháp canh, mỏ, nông trại), tuyển binh, nghiên cứu công nghệ — giống game chiến lược real-time nhưng narrative',
+          'MC có lợi thế ban đầu: lãnh địa cấp cao, tài nguyên hiếm, binh chủng đặc biệt — nhưng vẫn phải chiến lược thông minh vì đối thủ (cả NPC lẫn người chơi khác) cũng mạnh',
+          'Progression lãnh địa: trại nhỏ → làng → thị trấn → thành phố → vương quốc → đế chế. Mỗi cấp mở khóa công trình mới, binh chủng mạnh hơn, ngoại giao phức tạp hơn',
+          'Xung đột đa tầng: quái vật tấn công (PvE), chiến tranh lãnh chúa (PvP), liên minh + phản bội, tranh tài nguyên chiến lược — MC phải cân bằng phát triển + phòng thủ + ngoại giao',
+          'Kinh tế lãnh địa: sản xuất → thương mại → thuế → đầu tư quân sự. Mô tả cụ thể nguồn thu, chi phí duy trì quân đội — quyết định kinh tế ảnh hưởng trực tiếp sức mạnh quân sự',
+        ],
+      },
+      {
+        id: 'huyen-huyen-vo-han-luu',
+        name: 'Vô Hạn Lưu',
+        description: 'Vào phó bản/thế giới phim kinh dị lặp đi lặp lại, sống sót theo quy tắc hoặc chết',
+        example: 'Bị kéo vào "không gian chính", mỗi nhiệm vụ là một bộ phim kinh dị, hoàn thành hoặc chết vĩnh viễn',
+        topicPromptHints: [
+          'Cơ chế không gian chính: MC bị kéo vào không gian siêu nhiên, phải hoàn thành nhiệm vụ trong các "phó bản" (thường dựa trên phim kinh dị, thần thoại, sự kiện lịch sử). Chết = chết thật. Thưởng = năng lực/vật phẩm',
+          'Mỗi phó bản = 1 arc hoàn chỉnh: bối cảnh mới, quy tắc mới, mối nguy mới. MC phải suy luận tìm ra quy tắc sống sót + hoàn thành mục tiêu. Twist cuối phó bản tạo bất ngờ',
+          'Đội hình là sống còn: MC phải hợp tác với người lạ (có thể đồng minh hoặc phản bội), phân tích năng lực từng người, tin tưởng ai. Drama giữa các người chơi gay cấn không kém quái vật',
+          'Progression qua phó bản: MC mạnh lên sau mỗi phó bản (kỹ năng, vật phẩm, kinh nghiệm), nhưng độ khó cũng tăng. Bí mật đằng sau "không gian chính" là mystery dài hạn xuyên suốt truyện',
+        ],
+      },
+      {
+        id: 'huyen-huyen-quy-mat',
+        name: 'Quỷ Mật / Linh Dị',
+        description: 'Thế giới quỷ dị, thần bí với hệ thống sức mạnh dựa trên quy tắc siêu nhiên',
+        example: 'Mỗi "Dị Tượng" tuân theo quy tắc riêng, MC phải suy luận quy tắc trước khi bị giết',
+        topicPromptHints: [
+          'Hệ thống sức mạnh dựa trên "quỷ dị": không phải tu luyện thông thường mà là thông qua nghi thức, hiến tế, khế ước với thực thể siêu nhiên. Mỗi con đường quyền năng có cái giá (mất ký ức, thay đổi ngoại hình, mất cảm xúc)',
+          'Bầu không khí bí ẩn xuyên suốt: thế giới có "quy tắc" ẩn mà phải dần khám phá — "không nhìn vào gương sau nửa đêm", "người thứ 13 trong phòng không phải người". MC suy luận để sống sót',
+          'Tổ chức bí mật: hội kín, giáo hội tà thần, cơ quan chính phủ quản lý dị thường — mỗi tổ chức có mục đích và phương pháp riêng. MC xoay xở giữa các phe phái',
+          'Progression không đơn tuyến: MC không chỉ "mạnh hơn" mà hiểu biết sâu hơn về bản chất thế giới. Mỗi câu trả lời mở ra nhiều câu hỏi hơn — mystery lồng mystery tạo sức hút dài hạn',
+        ],
+      },
+      {
+        id: 'huyen-huyen-tu-linh-phap-su',
+        name: 'Tử Linh Pháp Sư',
+        description: 'Vong linh triệu hoán, chỉ huy đội quân xác sống/vong linh, dark fantasy',
+        example: 'Pháp sư bóng tối bị truy sát, lặng lẽ xây quân đoàn vong linh từ chiến trường cũ',
+        topicPromptHints: [
+          'Hệ thống tử linh rõ ràng: cách triệu hoán (từ xác chết, từ linh hồn, từ xương cốt), cấp bậc vong linh (skeleton → zombie → tử thần kỵ sĩ → vong linh vương → lich), chi phí duy trì bằng âm khí/linh hồn',
+          'MC bị xã hội kỳ thị: tử linh pháp sư bị coi là tà đạo, phải ẩn mình hoặc đối đầu thành kiến. Xung đột đạo đức: dùng xác chết có tội không? Tạo chiều sâu triết học cho nhân vật',
+          'Quân đoàn vong linh progression: vài con skeleton → đội quân nhỏ → quân đoàn → đội quân bất tử. Mỗi xác chết mạnh (cường giả chết) = triệu hoán vong linh mạnh — "chiến trường = mỏ tài nguyên"',
+          'Dark fantasy atmosphere: bối cảnh u ám, nghĩa địa, chiến trường cũ, đầm lầy chết. MC lạnh lùng nhưng có nguyên tắc — anti-hero hấp dẫn, không phải villain thuần túy',
+        ],
+      },
+      {
+        id: 'huyen-huyen-ba-thap',
+        name: 'Bá Tháp / Phó Bản',
+        description: 'Leo tháp vô tận hoặc phó bản bí ẩn, mỗi tầng/phó bản một thử thách và phần thưởng',
+        example: 'Tháp 10.000 tầng giáng xuống đại lục, ai lên đỉnh sẽ thành thần',
+        topicPromptHints: [
+          'Cấu trúc tháp rõ ràng: mỗi tầng/khu vực có chủ đề riêng (rừng, sa mạc, biển, hỏa ngục), boss tầng, câu đố, bẫy. Độ khó tăng dần nhưng phần thưởng cũng tăng — "clear tầng" = dopamine',
+          'MC giải quyết thử thách bằng trí tuệ + sức mạnh: không chỉ đánh boss mà phải giải câu đố, tìm cơ chế ẩn, exploit điểm yếu tầng. Mỗi tầng là 1 arc mini hoàn chỉnh',
+          'Xã hội trong tháp: người leo tháp khác nhau tạo thành cộng đồng, thương mại trao đổi giữa các tầng, liên minh leo tháp, phản bội giữa chừng — không chỉ MC vs tháp mà còn MC vs người',
+          'Bí mật đằng sau tháp: tại sao tháp tồn tại? Ai tạo ra? Đỉnh tháp có gì? — mystery dài hạn giữ người đọc. Mỗi mốc tầng tiết lộ thêm 1 mảnh ghép',
+        ],
+      },
+      {
+        id: 'huyen-huyen-hoc-vien',
+        name: 'Học Viện Ma Pháp',
+        description: 'Học viện pháp sư/chiến binh, xếp hạng thi đấu, tình bạn và âm mưu học đường huyền huyễn',
+        example: 'Tân sinh viên "phế vật" vào học viện đệ nhất, từng bước vươn lên đỉnh bảng xếp hạng',
+        topicPromptHints: [
+          'Hệ thống học viện: phân lớp theo năng lực, giáo trình ma pháp/chiến đấu, thi cuối kỳ, xếp hạng toàn trường. MC từ cuối bảng vươn lên — progression rõ ràng qua điểm số và thứ hạng',
+          'Thi đấu liên trường là arc chính: giải đấu giữa các học viện, mỗi đối thủ có kỹ năng/chiến thuật riêng, MC đại diện trường thi đấu — kịch tính thể thao + chiến đấu huyền huyễn',
+          'Quan hệ học đường: bạn bè, đối thủ, thầy cô, tiền bối/hậu bối, hội kín trong trường — drama học đường nhưng trong bối cảnh ma pháp tạo sự hấp dẫn đặc biệt',
+          'Học viện không chỉ học: âm mưu giữa các phe phái trong trường, bí mật ẩn trong thư viện cấm, thầy giáo có quá khứ bí ẩn — mystery xuyên suốt năm học',
+        ],
       }
     ]
   },
@@ -163,67 +437,299 @@ export const GENRE_CONFIG = {
         id: 'do-thi-thuong-chien', 
         name: 'Thương Chiến', 
         description: 'Truyện về kinh doanh, cạnh tranh doanh nghiệp',
-        example: 'Công ty đa quốc gia, tranh giành thị phần'
+        example: 'Công ty đa quốc gia, tranh giành thị phần',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'MC phải có chiến lược kinh doanh cụ thể — mô tả rõ: vốn bao nhiêu, margin bao nhiêu %, rủi ro gì, không chỉ nói chung chung "kiếm tiền"',
+          'Lồng ghép các sự kiện kinh tế có thật vào timeline truyện (khủng hoảng tài chính, bong bóng bất động sản, sự trỗi dậy của ecommerce...) — đổi tên phù hợp thế giới song song nhưng giữ nguyên logic và thời điểm',
+          'Mỗi thương vụ phải có đối thủ cụ thể với chiến lược riêng, không chỉ "công ty đối thủ" chung chung',
+          'Phổ cập kiến thức kinh doanh tự nhiên qua hành động/đối thoại: supply chain, pricing, M&A, cash flow — người đọc vừa theo dõi vừa học được',
+        ],
       },
       { 
         id: 'do-thi-lam-phim', 
         name: 'Làm Phim Hollywood', 
         description: 'Truyện về ngành công nghiệp điện ảnh',
-        example: 'Trở thành đạo diễn Hollywood, sản xuất phim bom tấn'
+        example: 'Trở thành đạo diễn Hollywood, sản xuất phim bom tấn',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'Lồng ghép dữ kiện thực về ngành phim phù hợp timeline truyện: doanh thu phòng vé, phim đáng chú ý, xu hướng, giải thưởng lớn — đổi tên phù hợp thế giới song song nhưng giữ nguyên bản chất sự kiện',
+          'Mô tả quy trình làm phim chân thực: pre-production, casting, quay phim, hậu kỳ, phát hành — người đọc cảm nhận được ngành này hoạt động thế nào',
+          'Kinh tế ngành phim: chi phí sản xuất, doanh thu phòng vé, đàm phán hợp đồng, phân chia lợi nhuận — dùng con số thực tế',
+        ],
       },
       { 
         id: 'do-thi-di-nang', 
         name: 'Dị Năng', 
         description: 'Đô thị với siêu năng lực',
-        example: 'Siêu năng lực trong thế giới hiện đại'
+        example: 'Siêu năng lực trong thế giới hiện đại',
+        topicPromptHints: [
+          'Hệ thống dị năng phải có quy tắc rõ: nguồn gốc (đột biến, thức tỉnh, di truyền), phân loại sức mạnh, giới hạn (phụ tác dụng, thời gian hồi, điều kiện kích hoạt)',
+          'Xã hội phản ứng với dị năng giả: chính phủ kiểm soát, tổ chức bí mật, dị năng giả bị phân biệt đối xử hoặc được tôn sùng — mô tả hệ quả xã hội cụ thể',
+          'MC sử dụng dị năng sáng tạo: không chỉ "mạnh hơn" mà dùng năng lực bình thường theo cách bất ngờ — trí tuệ quan trọng hơn raw power',
+          'Chiến đấu trong đô thị: phải tính đến hệ quả phá hoại (tòa nhà, dân thường, camera), đánh giới hạn không gian, chiến thuật đô thị — không phải "nổ tung cả khu phố"',
+        ],
       },
       { 
         id: 'do-thi-linh-khi', 
         name: 'Linh Khí Sống Lại', 
         description: 'Linh khí trở lại trong đô thị hiện đại',
-        example: 'Tu tiên trong thành phố, linh khí phục hồi'
+        example: 'Tu tiên trong thành phố, linh khí phục hồi',
+        topicPromptHints: [
+          'Quá trình linh khí phục hồi phải từ từ: linh khí loãng → đậm dần → động vật đột biến → cây cối biến dị → con người bắt đầu tu luyện → xã hội thay đổi hoàn toàn',
+          'Xã hội hiện đại va chạm tu tiên: quân đội vs tu sĩ, luật pháp vs tu tiên giới, khoa học vs phép thuật — mô tả cụ thể xung đột và cách xã hội thích nghi',
+          'MC có lợi thế sớm: phát hiện linh khí trước người khác (trọng sinh, hệ thống, di sản gia tộc) → tích lũy ưu thế trong giai đoạn mọi người còn hoang mang',
+          'Progression gắn với sự thay đổi xã hội: MC mạnh lên → đồng thời thế giới cũng thay đổi → nguy hiểm tăng dần (dị thú, bí cảnh xuất hiện, thế lực cổ đại thức tỉnh)',
+        ],
       },
       {
         id: 'do-thi-tan-the',
         name: 'Tận Thế Đô Thị',
         description: 'Đô thị sụp đổ, sinh tồn và tái thiết trật tự',
-        example: 'Thành phố thất thủ, MC dựng khu an toàn giữa hỗn loạn'
+        example: 'Thành phố thất thủ, MC dựng khu an toàn giữa hỗn loạn',
+        topicPromptHints: [
+          'Giai đoạn tận thế rõ ràng: bùng nổ → hỗn loạn → sinh tồn → tập hợp → xây căn cứ → mở rộng lãnh thổ → tái thiết văn minh. Mỗi giai đoạn có thách thức khác nhau',
+          'Tài nguyên khan hiếm là trung tâm: thức ăn, nước, vũ khí, thuốc men, nhiên liệu — mô tả cụ thể số lượng, nơi tìm, cách phân phối. Quyết định phân bổ tài nguyên tạo drama',
+          'Con người là mối nguy lớn nhất: phản bội, cướp bóc, chế độ độc tài nhỏ, thương lượng giữa các nhóm — tâm lý con người trong tuyệt vọng phải chân thực',
+          'MC xây dựng cộng đồng: tuyển người, phân công, thiết lập quy tắc, xử lý xung đột nội bộ — quản lý "mini quốc gia" giữa mạt thế',
+        ],
       },
       {
         id: 'do-thi-kinh-doanh-khoi-nghiep',
         name: 'Khởi Nghiệp Kinh Doanh',
         description: 'Từ người thường thành ông trùm doanh nghiệp',
-        example: 'Từ quầy nhỏ ven đường thành chuỗi thương hiệu toàn quốc'
+        example: 'Từ quầy nhỏ ven đường thành chuỗi thương hiệu toàn quốc',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'MC phải có chiến lược kinh doanh cụ thể từng bước — vốn bao nhiêu, lợi nhuận bao nhiêu %, rủi ro gì, giải pháp gì, không chỉ "làm giàu" chung chung',
+          'Lồng ghép kiến thức kinh doanh thực tế qua hành động: marketing, supply chain, nhân sự, pháp lý, tài chính — người đọc vừa theo dõi vừa học',
+          'Mỗi giai đoạn phát triển phải có đối thủ cạnh tranh cụ thể với chiến lược riêng',
+          'Lồng ghép xu hướng kinh tế có thật vào timeline truyện (ecommerce, fintech, sharing economy...) — đổi tên phù hợp thế giới song song',
+        ],
       },
       {
         id: 'do-thi-mo-vuon-kinh-doanh',
         name: 'Mở Vườn Kinh Doanh',
         description: 'Làm nông nghiệp đô thị, vườn hữu cơ, mô hình farm-to-table',
-        example: 'Mở nông trại công nghệ cao rồi tạo đế chế thực phẩm sạch'
+        example: 'Mở nông trại công nghệ cao rồi tạo đế chế thực phẩm sạch',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'Kiến thức nông nghiệp/ẩm thực phải chi tiết: giống cây, kỹ thuật trồng, mùa vụ, chế biến, bảo quản — người đọc vừa theo dõi vừa học được',
+          'Progression rõ: mảnh vườn nhỏ → vườn hữu cơ → nông trại công nghệ cao → chuỗi farm-to-table → thương hiệu thực phẩm → đế chế nông nghiệp',
+          'Mỗi arc = 1 sản phẩm/mùa vụ: chọn giống → trồng → chăm sóc → thu hoạch → bán hàng. Dopamine từ "thu hoạch thành công" và phản ứng khách hàng',
+          'Đối thủ kinh doanh: nông trại lớn ép giá, trung gian chèn ép, thực phẩm giả cạnh tranh — MC dùng chất lượng và chiến lược thắng từng bước',
+        ],
+      },
+      {
+        id: 'do-thi-trong-sinh-kinh-doanh',
+        name: 'Trùng Sinh Kinh Doanh',
+        description: 'Quay về quá khứ (thập niên 80/90/2000), dùng trí nhớ tương lai xây dựng đế chế kinh doanh',
+        example: 'Trùng sinh về năm 1998, từ quầy hàng rong thành ông trùm internet',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'MC trùng sinh về thập niên 80-90-2000 mang theo trí nhớ kiếp trước — phải mô tả rõ kiếp trước thất bại/chết thế nào, và động lực muốn thay đổi',
+          '"Thùng vàng đầu tiên" phải hợp lý: vốn ban đầu nhỏ (bán hàng rong, đầu cơ nhỏ, tận dụng cơ hội cụ thể) — KHÔNG phải bỗng dưng có tiền',
+          'Dùng kiến thức tương lai về xu hướng kinh tế (internet, bất động sản, cổ phiếu, ecommerce...) — đổi tên công ty/sự kiện phù hợp thế giới song song nhưng giữ nguyên logic và mốc thời gian',
+          'Progression rõ ràng: bán rong/tiểu thương → cửa hàng → nhà máy → tập đoàn → đế chế đa ngành, mỗi giai đoạn có đối thủ cụ thể và thách thức riêng',
+          'Yếu tố nostalgia quan trọng: mô tả chi tiết đời sống thời kỳ cũ (chợ phiên, xe đạp, máy nhắn tin, quán nước vỉa hè, tivi đen trắng...) — gợi cảm xúc cho người đọc',
+          'Mỗi arc kinh doanh phải có con số cụ thể: vốn bao nhiêu, lợi nhuận bao nhiêu, rủi ro gì — KHÔNG chỉ nói chung chung "kiếm được nhiều tiền"',
+        ],
+      },
+      {
+        id: 'do-thi-hai-gioi-buon-ban',
+        name: 'Hai Giới Buôn Bán',
+        description: 'Xuyên qua lại giữa hai thế giới (hiện đại + dị giới), buôn bán chênh lệch giá trị để làm giàu và mạnh lên',
+        example: 'Mang bật lửa sang dị giới bán như thần hỏa, mang linh dược về Trái Đất bán như thần dược',
+        topicPromptHints: [
+          'Cơ chế xuyên hai giới phải rõ ràng ngay từ đầu: phương tiện gì (cổng, nhẫn, hệ thống), dung lượng mang được bao nhiêu, cooldown bao lâu, hạn chế gì',
+          'Chênh lệch giá trị giữa hai giới là nguồn dopamine chính: đồ rẻ tiền bên này = bảo vật bên kia (bật lửa = thần hỏa, nhựa = "ngọc thần", muối = xa xỉ phẩm). Mô tả phản ứng kinh ngạc của người mua',
+          'Mỗi chuyến hàng là một arc nhỏ hoàn chỉnh: tìm nguồn hàng → vận chuyển → bán hàng → đối phó nguy hiểm/cạnh tranh',
+          'Vốn tăng theo cấp số nhân: mỗi arc MC giàu gấp bội ở CẢ HAI giới, mở rộng quy mô từ buôn lẻ → bán buôn → độc quyền → đế chế thương mại',
+          'MC phải đối mặt rủi ro cả hai bên: bị phát hiện/nghi ngờ ở thế giới hiện đại, bị cướp/thế lực lớn nhòm ngó ở dị giới',
+          'Bảng giá trao đổi cụ thể: liệt kê rõ X bên này = Y bên kia, tạo cảm giác "tính toán" cho người đọc',
+        ],
       },
       {
         id: 'do-thi-di-bien-hai-san',
         name: 'Đi Biển Bắt Hải Sản',
-        description: 'Nghề biển hiện đại, săn hải sản và làm giàu',
-        example: 'Một con tàu cũ giúp MC lật đời từ nghề biển'
+        description: 'Bối cảnh thập niên 80-90, MC có bàn tay vàng/mắt vàng đi biển bắt hải sản, từ nghèo khó thành bá chủ cảng biển',
+        example: 'Trùng sinh về 1982 tại làng chài, nhìn thấy hải sản dưới nước, từ nhặt sò thành ông trùm hải sản',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'Bối cảnh thập niên 80-90 làng chài ven biển — mô tả chi tiết: nhà tranh, chợ phiên, hợp tác xã, thủy triều, mùa bão. Yếu tố nostalgia rất quan trọng',
+          'MC có năng lực đặc biệt: mắt vàng nhìn thấy hải sản/kho báu dưới nước, hoặc hệ thống gợi ý vị trí, hoặc trí nhớ kiếp trước biết vùng biển nào có gì',
+          'Progression hải sản từ thường → quý: cua xanh, tôm → cá quý hiếm → long diên hương (chất nôn cá voi, cực đắt) → ngọc trai → kho báu tàu đắm. Mỗi bậc = dopamine mạnh hơn',
+          'Con đường làm giàu rõ ràng: nhặt sò bãi triều → mua thuyền nhỏ → thuê/thầu bãi biển → thuyền lớn đánh bắt xa bờ → mở xưởng chế biến → bá chủ cảng biển',
+          'Mỗi lần xuống biển = "mở hộp" thiên nhiên: không biết sẽ bắt được gì, tạo kịch tính và dopamine liên tục',
+          'Yếu tố gia đình và làng xóm: vợ chồng ấm áp, hàng xóm ghen tị, quan hệ anh em chú bác — tạo chiều sâu đời thường',
+        ],
       },
       {
         id: 'do-thi-len-nui-san-thu',
         name: 'Lên Núi Săn Thú',
-        description: 'Sinh tồn vùng núi, săn bắt và kinh doanh đặc sản',
-        example: 'Từ thợ săn nghiệp dư thành ông vua lâm nghiệp'
+        description: 'Bối cảnh thập niên 80 vùng núi, MC săn bắt thú rừng, từ thợ săn nghèo thành phú hộ đầu tiên trong làng',
+        example: 'Trùng sinh về 1983, cầm súng săn lên núi, từ tay chơi vô công thành thợ săn số một vùng núi',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'Bối cảnh thập niên 80 vùng núi — thời kỳ chưa cấm săn bắn, chính quyền khuyến khích vì thú rừng phá mùa màng. Mô tả: làng nhỏ, nhà gỗ, bếp lửa, tuyết phủ (nếu vùng núi phía bắc)',
+          'Progression thú săn từ dễ → khó → quý: thỏ/gà lôi → lợn rừng (nguy hiểm) → hươu/nai (da + sừng quý) → báo/mèo rừng → hổ (boss, cực nguy hiểm). Đặc biệt: nhân sâm rừng = "vàng" của núi rừng',
+          'Companion quan trọng: chó săn là partner trung thành, mô tả mối quan hệ giữa MC và chó săn tạo cảm xúc. Công cụ: súng săn (hợp pháp thời đó), bẫy thú, dao rừng',
+          'Con đường làm giàu: bắn thỏ đổi muối/vải → bán da thú, sừng hươu (dược liệu) → tìm nhân sâm rừng phát tài lớn → mở cửa hàng thịt thú/dược liệu → kinh doanh nông lâm sản',
+          'Mỗi cuộc săn = một trận chiến sinh tử với thiên nhiên hoang dã, tạo kịch tính cao. "Mở hộp" núi rừng: lên núi không biết sẽ gặp thỏ hay hổ',
+          'Nostalgia và đời thường: cơm cá tươi, hàng xóm nuốt nước bọt, hệ thống trao đổi hàng hóa thời 80 (1 đôi giày = 1 con cừu), quan hệ làng xóm ấm áp',
+        ],
       },
       {
         id: 'do-thi-mo-tiem-net',
         name: 'Mở Tiệm Net Đô Thị',
         description: 'Kinh doanh tiệm net, esports, cộng đồng game thủ',
-        example: 'Mở tiệm net cũ nát rồi thành trung tâm esports số một thành phố'
+        example: 'Mở tiệm net cũ nát rồi thành trung tâm esports số một thành phố',
+        topicPromptHints: [
+          'Hệ thống nâng cấp tiệm net rõ ràng: thêm máy → game mới → tính năng mới (VR, streaming, giải đấu) → mở chi nhánh',
+          'Kinh doanh esports: tổ chức giải đấu, quản lý đội tuyển, thu hút tài trợ — mô tả cụ thể doanh thu, chi phí',
+          'Cộng đồng game thủ là tài sản: xây dựng lòng trung thành khách hàng, giải quyết xung đột, đối phó đối thủ cạnh tranh mở tiệm net gần bên',
+        ],
       },
       {
         id: 'do-thi-vong-du-hien-thuc',
         name: 'Võng Du Vào Hiện Thực',
         description: 'Năng lực trong game ảnh hưởng trực tiếp đời thực',
-        example: 'Sau bản cập nhật định mệnh, kỹ năng game xuất hiện ngoài đời'
+        example: 'Sau bản cập nhật định mệnh, kỹ năng game xuất hiện ngoài đời',
+        topicPromptHints: [
+          'Cơ chế "game vào đời thực" phải rõ: sự kiện gì kích hoạt (server merge, bug, AI thức tỉnh), kỹ năng chuyển đổi thế nào (1:1 hay suy giảm), giới hạn gì',
+          'Xã hội đảo lộn: game thủ top trở thành cường giả đời thực, giàu nghèo xáo trộn, chính phủ mất kiểm soát — mô tả hỗn loạn và quá trình thiết lập trật tự mới',
+          'MC có lợi thế: tài khoản ẩn, class hiếm, kỹ năng bị mọi người bỏ qua nhưng thực chiến mạnh — kiến thức game sâu trở thành vũ khí chiến lược',
+          'Monster/dungeon xuất hiện trong thành phố: quái vật game tràn vào đời thực, khu vực nguy hiểm hình thành — đô thị trở thành bản đồ game khổng lồ',
+        ],
+      },
+      {
+        id: 'do-thi-van-ngu',
+        name: 'Văn Ngu (Văn Sao)',
+        description: 'Xuyên đến thế giới song song, "sáng tác" lại các tác phẩm kinh điển từ Trái Đất gốc',
+        example: 'Xuyên đến thế giới không có Kim Dung, viết lại Xạ Điêu Anh Hùng Truyện gây chấn động',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'Bối cảnh thế giới song song: giống Trái Đất nhưng thiếu nhiều tác phẩm/bài hát/phim nổi tiếng. MC mang ký ức kiếp trước, "sáng tác" lại — phải đổi tên phù hợp thế giới song song',
+          'Mỗi arc = 1 tác phẩm "mới": MC viết tiểu thuyết/sáng tác nhạc/làm phim → phản ứng chấn động của công chúng. Mô tả chi tiết quá trình sáng tác, marketing, phản hồi khán giả — dopamine từ "cả thế giới sửng sốt"',
+          'Progression ngành giải trí: nhà văn vô danh → best-seller → hiện tượng văn hóa → huyền thoại. Mỗi giai đoạn có đối thủ, nhà phê bình, thế lực ngành muốn chèn ép',
+          'Xung đột nội tâm: MC "sao chép" có đáng tự hào không? Dần dần MC phải sáng tạo thật khi hết tác phẩm để "copy" — tạo chiều sâu nhân vật',
+          'Lồng ghép kiến thức văn hóa/nghệ thuật thật: giải thích vì sao tác phẩm hay, kỹ thuật viết, âm nhạc, điện ảnh — người đọc vừa giải trí vừa học được',
+        ],
+      },
+      {
+        id: 'do-thi-chu-te',
+        name: 'Chú Tế / Long Vương',
+        description: 'Rể hờ bị khinh thường thật ra là cường giả/phú hào ẩn mình, face-slapping liên hoàn',
+        example: 'Ba năm rể hờ bị nhục, một ngày thân phận chân long phơi bày, cả gia tộc vợ quỳ',
+        topicPromptHints: [
+          'Setup rõ ràng: MC vì lý do cụ thể (lời hứa, bảo vệ ai, nhiệm vụ, mất trí nhớ) phải chịu nhục làm rể hờ. Thân phận thật: thiếu gia tập đoàn, chủ tịch bí mật, cường giả ẩn thế, Long Vương...',
+          'Face-slapping là dopamine chính: mẹ vợ khinh → MC lộ thân phận một phần → sốc → lại khinh → lộ thêm → sốc hơn. Mỗi arc = 1 đối tượng khinh thường → bị slap. Nhịp nhanh, sảng khoái',
+          'Progression thân phận: rể hờ bị khinh → lộ chút tài năng → gây sốc cục bộ → dần lộ thân phận → chấn động thành phố → chấn động quốc gia. Mỗi cấp "lộ" tạo bước nhảy kịch tính',
+          'Vợ và gia đình vợ phải có chiều sâu: không chỉ "xấu tính" mà có lý do khinh MC (áp lực gia tộc, ngoại hình MC, quá khứ MC). Vợ dần phát hiện sự thật → thay đổi thái độ tạo romance arc',
+        ],
+      },
+      {
+        id: 'do-thi-than-y',
+        name: 'Thần Y Đô Thị',
+        description: 'Y thuật thần kỳ trong đô thị, chữa bệnh nan y, kết giao quyền quý',
+        example: 'Thanh niên nghèo thừa kế y thuật cổ, chữa bệnh cho tổng tài → mở ra thế giới thượng lưu',
+        topicPromptHints: [
+          'Y thuật phải cụ thể: mô tả triệu chứng, chẩn đoán, phương pháp điều trị (châm cứu, thảo dược, phẫu thuật kết hợp). Không chỉ "chạm vào là khỏi" mà phải có logic y học (có thể kết hợp huyền bí)',
+          'Mỗi bệnh nhân = 1 arc: nhân vật quan trọng bị bệnh nan y → MC chẩn đoán → tìm dược liệu/phương pháp → điều trị → thành công → nhận ơn/quan hệ. Bệnh nhân cấp cao dần: thường dân → phú hào → chính trị gia → quân đội',
+          'Y thuật = quyền lực mềm: MC không đánh nhau nhưng ai cũng cần (bệnh không tha giàu nghèo). Ông trùm, tướng quân, tổng thống đều phải nhún nhường trước thần y',
+          'Xung đột ngành y: y học hiện đại vs y học cổ truyền, bác sĩ chính thống ghen tị, thế lực dược phẩm muốn kiểm soát MC — drama ngành + medical thriller',
+        ],
+      },
+      {
+        id: 'do-thi-giam-bao',
+        name: 'Giám Bảo Kiểm Lậu',
+        description: 'Nhận diện giá trị cổ vật/báu vật, mua rẻ bán đắt, thế giới đồ cổ',
+        example: 'Nhặt được cặp mắt thiên nhãn, nhìn thấu chân giả cổ vật, từ vé số trúng đến ông trùm đồ cổ',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'MC có năng lực đặc biệt: thiên nhãn nhìn thấu niên đại/chất liệu, hoặc hệ thống giám định, hoặc kiến thức kiếp trước — cho phép nhận ra báu vật mà người khác bỏ qua',
+          'Mỗi lần "kiểm lậu" = dopamine mạnh: mua cái bình 100k → thực ra là cổ vật triều Minh giá 10 tỷ. Mô tả phản ứng sốc của người bán/đối thủ. Con số cụ thể tạo sảng khoái',
+          'Thế giới đồ cổ sinh động: chợ trời, đấu giá, thương lái chuyên nghiệp, giả cổ tinh xảo, quy tắc ngành. Lồng ghép kiến thức cổ vật thật: gốm sứ, thư họa, ngọc, đồng — người đọc vừa giải trí vừa học',
+          'Progression: nhặt nhạnh chợ trời → mua bán nhỏ → đấu giá cấp thành phố → sưu tầm quốc bảo → thương nhân đồ cổ quốc tế. Mỗi cấp = đối thủ lớn hơn, rủi ro cao hơn, phần thưởng khủng hơn',
+        ],
+      },
+      {
+        id: 'do-thi-my-thuc',
+        name: 'Mỹ Thực Đô Thị',
+        description: 'Nấu ăn thần cấp, thi đấu ẩm thực, mở nhà hàng, food porn text',
+        example: 'Đầu bếp vỉa hè có bàn tay vàng, từ xe hủ tiếu thành chuỗi nhà hàng Michelin',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'Mô tả món ăn phải "ngon đến mức nuốt nước bọt": màu sắc, mùi hương, kết cấu, vị — kỹ thuật nấu ăn chi tiết (lửa, thời gian, nguyên liệu). Phản ứng khách ăn = dopamine chính',
+          'Progression đầu bếp: xe hàng rong → quán nhỏ → nhà hàng → chuỗi → thi đấu ẩm thực quốc gia → giải thế giới. Mỗi giai đoạn có đối thủ với phong cách nấu khác nhau',
+          'Thi đấu ẩm thực là set piece: mô tả chi tiết cuộc thi, chủ đề bất ngờ, nguyên liệu giới hạn, thời gian đếm ngược, giám khảo khó tính — kịch tính thể thao + ẩm thực',
+          'Lồng ghép kiến thức ẩm thực thật: kỹ thuật nấu, lịch sử món ăn, văn hóa ẩm thực các nước — người đọc vừa giải trí vừa học nấu ăn',
+        ],
+      },
+      {
+        id: 'do-thi-hoang-da-truc-ba',
+        name: 'Hoang Dã Trực Bá',
+        description: 'Livestream sinh tồn hoang dã, câu cá, săn bắt, thám hiểm — phản ứng khán giả realtime',
+        example: 'MC livestream câu cá biển sâu, vô tình kéo lên cá quý tiền tỷ, chat room nổ tung',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'Mỗi buổi livestream = 1 arc mini: câu cá → bất ngờ kéo được cá quý, thám hiểm rừng → phát hiện hang động bí ẩn, lặn biển → tìm xác tàu cổ. "Mở hộp thiên nhiên" liên tục',
+          'Comment khán giả là nhịp dopamine: "666!", "Up chủ YYDS!", "Cá này ít nhất 50 triệu!" — phản ứng realtime tạo không khí sôi động, giống đọc truyện + xem livestream cùng lúc',
+          'Progression streamer: vài chục viewer → ngàn → triệu → hiện tượng quốc gia. Thu nhập tăng: tiền tip → hợp đồng quảng cáo → thương hiệu riêng → đế chế truyền thông',
+          'Kiến thức hoang dã thật: kỹ thuật câu cá, sinh tồn rừng, nhận biết động thực vật, địa lý — người đọc vừa giải trí vừa học được kỹ năng thực tế',
+          'Yếu tố bất ngờ: thiên nhiên không thể đoán trước — bão, gặp thú dữ, tìm được vật quý ngoài dự kiến. Mỗi buổi stream có 1-2 "high point" bất ngờ',
+        ],
+      },
+      {
+        id: 'do-thi-giai-tri',
+        name: 'Giải Trí Quyền',
+        description: 'Làm minh tinh, ca sĩ, idol, xây đế chế giải trí trong thế giới song song',
+        example: 'Trùng sinh thành diễn viên quần chúng, dùng kinh nghiệm kiếp trước thành ảnh đế',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'Bối cảnh thế giới song song giải trí: giống Hollywood/showbiz thật nhưng đổi tên — MC tham gia casting, quay phim, phát hành. Mô tả chi tiết quy trình ngành giải trí tạo chiều sâu',
+          'Progression ngành giải trí: quần chúng → vai phụ → vai chính phim nhỏ → phim lớn → giải thưởng → huyền thoại. Mỗi dự án = 1 arc với thách thức diễn xuất và drama hậu trường riêng',
+          'Thương chiến giải trí: tranh vai, ép phiên, scandal giả, fan war, đối thủ chơi bẩn — mặt tối showbiz tạo xung đột hấp dẫn',
+          'MC có lợi thế đặc biệt: trùng sinh (biết hit tương lai), hệ thống (nâng cấp diễn xuất), hoặc tài năng thiên phú — nhưng vẫn phải nỗ lực và đối mặt thách thức thực tế',
+        ],
+      },
+      {
+        id: 'do-thi-quy-tac-quai-dam',
+        name: 'Quy Tắc Quái Đàm',
+        description: 'Horror dựa trên quy tắc bí ẩn, sống sót bằng suy luận và tuân thủ quy tắc đúng',
+        example: '"Nếu tài xế xe buýt cười, hãy xuống xe ngay. Nếu không cười, ĐỪNG xuống xe."',
+        topicPromptHints: [
+          'Cơ chế quy tắc: mỗi tình huống có bộ quy tắc (có thể nhận được hoặc phải tự phát hiện). Quy tắc thật vs quy tắc giả — MC phải suy luận quy tắc nào đúng trước khi quá muộn',
+          'Bầu không khí rùng rợn: mô tả chi tiết sự "sai trái" của thế giới xung quanh — người không phải người, nụ cười không phải nụ cười, căn phòng thay đổi khi không nhìn. Kinh dị tâm lý > jump scare',
+          'Mỗi arc = 1 "quái đàm" mới: thang máy, bệnh viện, trường học, xe buýt đêm — mỗi địa điểm có bộ quy tắc riêng. MC phải sống sót và giải mã bí mật đằng sau quái đàm',
+          'MC mạnh lên qua kinh nghiệm: không phải sức mạnh vật lý mà là khả năng suy luận, bình tĩnh, và hiểu biết về "quy tắc thế giới" — intelligence > power',
+          'Twist liên tục: quy tắc tưởng đúng hóa ra sai, đồng minh tưởng tốt hóa ra quái, thoát được quái đàm này thì phát hiện đang ở trong quái đàm lớn hơn',
+        ],
+      },
+      {
+        id: 'do-thi-than-hao',
+        name: 'Thần Hào Hệ Thống',
+        description: 'Hệ thống cho tiền vô hạn nhưng phải tiêu đúng cách, challenge tiêu tiền',
+        example: '"Tiêu 10 tỷ trong 24 giờ, không được cho ai, không được mua bất động sản. Bắt đầu!"',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'Hệ thống nhiệm vụ tiêu tiền: mỗi nhiệm vụ có quy tắc riêng (tiêu X tỷ trong Y giờ, không được làm Z). Phần thưởng hoàn thành: tiền thưởng gấp bội, kỹ năng, tài sản. Thất bại: phạt nặng',
+          'Comedy là tone chính: MC cố gắng tiêu tiền nhưng "vô tình" mua đúng thứ tăng giá, đầu tư "phá sản" nhưng lại thắng lớn — tiêu càng nhiều càng giàu, tạo tình huống hài hước absurd',
+          'Progression thần hào: triệu phú → tỷ phú → mua công ty → mua thành phố → ảnh hưởng quốc gia. Mỗi cấp = thử thách tiêu tiền khó hơn, quy mô lớn hơn',
+          'Mặt sâu đằng sau comedy: tiền không mua được tình cảm thật, MC dần nhận ra giá trị của những thứ không mua được — tạo chiều sâu nhân vật giữa sự hào nhoáng',
+        ],
+      },
+      {
+        id: 'do-thi-thien-tai',
+        name: 'Thiên Tai Tị Nạn',
+        description: 'Chuẩn bị và sinh tồn qua thiên tai: động đất, lũ lụt, núi lửa, băng hà',
+        example: 'MC biết trước đại động đất sẽ xảy ra, tích trữ vật tư và xây bunker khi mọi người còn hoài nghi',
+        topicPromptHints: [
+          'MC biết trước thiên tai (trùng sinh, hệ thống cảnh báo, khoa học gia): giai đoạn chuẩn bị là arc chính — mua vật tư, xây bunker, tích trữ thức ăn/nước/thuốc. Mô tả chi tiết danh sách chuẩn bị',
+          'Thiên tai xảy ra: mô tả chân thực sức tàn phá — tòa nhà sụp, đường ngập, mất điện, hoảng loạn. MC đã chuẩn bị → sống sót tốt hơn → trở thành trung tâm cộng đồng',
+          'Hậu thiên tai = arc sinh tồn: quản lý tài nguyên, bảo vệ gia đình/cộng đồng, đối phó kẻ cướp bóc, thương lượng với nhóm khác — quản lý khủng hoảng cấp cộng đồng',
+          'Kiến thức sinh tồn thật: kỹ thuật lọc nước, sơ cứu, xây dựng tạm, dự trữ thực phẩm, năng lượng mặt trời — người đọc vừa giải trí vừa học kiến thức thực tế hữu ích',
+        ],
       }
     ]
   },
@@ -245,55 +751,170 @@ export const GENRE_CONFIG = {
         id: 'khoa-huyen-co-dien', 
         name: 'Cổ Điển', 
         description: 'Khoa học viễn tưởng truyền thống',
-        example: 'Du hành không gian, chiến tranh giữa các hành tinh'
+        example: 'Du hành không gian, chiến tranh giữa các hành tinh',
+        topicPromptHints: [
+          'Hệ thống công nghệ phải nhất quán: FTL (siêu ánh sáng), năng lượng, vũ khí, thông tin liên lạc — thiết lập quy tắc rõ từ đầu và không vi phạm',
+          'Quy mô vũ trụ: hành tinh → hệ sao → khu vực thiên hà → liên minh/đế chế. Mỗi cấp có chính trị, kinh tế, quân sự riêng',
+          'Chiến tranh vũ trụ phải có chiến lược: hậu cần (tiếp liệu xuyên hệ sao), chiến thuật hạm đội, tình báo, hành tinh chiến lược — không chỉ "bắn nhau ngoài vũ trụ"',
+          'Chủng tộc/văn minh ngoài hành tinh: mỗi chủng có sinh học, văn hóa, công nghệ riêng — tạo đa dạng và xung đột tự nhiên',
+        ],
       },
       { 
         id: 'khoa-huyen-tuong-lai-gan', 
         name: 'Tương Lai Gần', 
         description: 'Công nghệ tiên tiến trong tương lai gần',
-        example: 'AI, robot trong đời sống hàng ngày'
+        example: 'AI, robot trong đời sống hàng ngày',
+        topicPromptHints: [
+          'Công nghệ phải dựa trên xu hướng thật: AI tổng quát, xe tự lái, CRISPR, năng lượng fusion, VR/AR — ngoại suy hợp lý từ hiện tại, không bay quá xa',
+          'Vấn đề xã hội từ công nghệ: thất nghiệp do AI, privacy, deepfake, khoảng cách giàu nghèo công nghệ — tạo xung đột xã hội chân thực và có chiều sâu',
+          'MC giải quyết vấn đề bằng công nghệ + trí tuệ: không phải siêu anh hùng, mà là nhà khoa học/kỹ sư/doanh nhân dùng hiểu biết công nghệ tạo lợi thế',
+          'Timeline 10-30 năm tới: thế giới quen thuộc nhưng khác biệt, tạo cảm giác "có thể xảy ra" cho người đọc',
+        ],
       },
       { 
         id: 'khoa-huyen-post-apocalypse', 
         name: 'Hậu Khải Huyền', 
         description: 'Thế giới sau thảm họa',
-        example: 'Sống sót sau chiến tranh hạt nhân'
+        example: 'Sống sót sau chiến tranh hạt nhân',
+        topicPromptHints: [
+          'Thế giới sau thảm họa phải nhất quán: loại thảm họa (hạt nhân, virus, AI, thiên thạch), bao lâu rồi, mức độ phá hủy, tàn dư văn minh còn gì',
+          'Tài nguyên khan hiếm chi tiết: nước sạch, thức ăn, đạn dược, thuốc men, năng lượng — mô tả cụ thể số lượng và cách MC tìm/bảo vệ/phân phối',
+          'Các phe phái hậu tận thế: quân phiệt, thương nhân, nhà khoa học, cult tôn giáo, du mục — mỗi phe có logic tồn tại và xung đột lợi ích rõ ràng',
+          'Công nghệ suy thoái + phục hồi: sửa chữa máy móc cũ, chế tạo từ phế liệu, tái phát hiện kiến thức — tạo cảm giác "xây dựng từ đống tro tàn"',
+        ],
       },
       { 
         id: 'khoa-huyen-cyberpunk', 
         name: 'Cyberpunk', 
         description: 'Công nghệ cao, xã hội thấp',
-        example: 'Thành phố tương lai, hacker, AI độc hại'
+        example: 'Thành phố tương lai, hacker, AI độc hại',
+        topicPromptHints: [
+          'Thẩm mỹ cyberpunk phải đậm: neon, mưa, tòa nhà chọc trời tối, quảng cáo hologram — nhưng phía dưới là khu ổ chuột, xã hội đen, nghèo đói. "High tech, low life"',
+          'Cải tạo cơ thể (augmentation): chip não, tay cơ khí, mắt điện tử — mỗi cải tạo có giá + phụ tác dụng (mất nhân tính, lệ thuộc bảo trì, hack được)',
+          'Tập đoàn > chính phủ: megacorp kiểm soát tất cả, nhân viên = tài sản, MC chống lại hệ thống hoặc leo lên bên trong nó',
+          'Hacking/Netrunning: thế giới mạng song song với thế giới thực, MC dùng kỹ năng digital giải quyết vấn đề — mô tả cụ thể quá trình hack, không chỉ "gõ bàn phím"',
+        ],
       },
       {
         id: 'khoa-huyen-tan-the',
         name: 'Tận Thế Khoa Huyễn',
         description: 'Mạt thế kết hợp công nghệ và dị biến',
-        example: 'AI phản loạn, hạ tầng sụp đổ, nhân loại co cụm thành pháo đài'
+        example: 'AI phản loạn, hạ tầng sụp đổ, nhân loại co cụm thành pháo đài',
+        topicPromptHints: [
+          'Kết hợp sci-fi + mạt thế: dị biến sinh học (zombie, đột biến) + công nghệ (mech, vũ khí năng lượng, drone) — tạo hệ thống chiến đấu đa dạng',
+          'Tiến hóa/đột biến = hệ thống sức mạnh: dị năng giả, tinh thể năng lượng, cấp bậc dị biến — progression rõ ràng như tu tiên nhưng bối cảnh sci-fi',
+          'Pháo đài/căn cứ = quốc gia thu nhỏ: quản lý dân cư, phân công lao động, hệ thống phòng thủ, nghiên cứu công nghệ — MC quản lý "thành phố sống sót"',
+          'Nguy hiểm leo thang: zombie thường → đột biến cấp cao → boss vùng → trùm khu vực → nguồn gốc tận thế — mỗi cấp cần công nghệ + sức mạnh mới',
+        ],
       },
       {
         id: 'khoa-huyen-vong-du-hien-thuc',
         name: 'Võng Du Vào Hiện Thực',
         description: 'Cơ chế game tràn vào đời thật theo hướng sci-fi',
-        example: 'Class game kích hoạt ngoài đời sau sự kiện đồng bộ thần kinh'
+        example: 'Class game kích hoạt ngoài đời sau sự kiện đồng bộ thần kinh',
+        topicPromptHints: [
+          'Giải thích khoa học cho hiện tượng: nano-tech, quantum entanglement, AI siêu cấp merge game-thực — không phải phép thuật mà là công nghệ ngoài tầm hiểu biết',
+          'Hệ thống game áp dụng vào đời thực có quy tắc: level, skill, stats hiển thị — nhưng tuân theo vật lý (kiếm vẫn chém đau, HP hết vẫn chết thật)',
+          'Chính phủ/tập đoàn phản ứng với hệ thống: quân đội dùng class chiến đấu, tập đoàn thuê crafter, nhà khoa học nghiên cứu cơ chế — xã hội tái cấu trúc quanh hệ thống game',
+          'MC exploits hệ thống: bug, hidden class, combo bất ngờ, chiến lược game áp dụng đời thực — kiến thức game = vũ khí chiến lược',
+        ],
       },
       {
         id: 'khoa-huyen-khai-hoang-tinh-cau',
         name: 'Khai Hoang Tinh Cầu',
         description: 'Mở rộng thuộc địa, xây căn cứ ngoài hành tinh',
-        example: 'Đội khai hoang từ con số 0 xây thành phố trên sao hoang'
+        example: 'Đội khai hoang từ con số 0 xây thành phố trên sao hoang',
+        topicPromptHints: [
+          'Hành tinh phải có đặc trưng riêng: khí hậu, trọng lực, tài nguyên, sinh vật bản địa, nguy hiểm tự nhiên — mỗi hành tinh là một thách thức khai hoang khác nhau',
+          'Progression xây dựng: hạ cánh → lập trại → khai thác tài nguyên → mở rộng cơ sở → xây thành phố → tự cung tự cấp → xuất khẩu → trung tâm khu vực',
+          'Quản lý thuộc địa = quản lý quốc gia: dân số, thức ăn, năng lượng, sản xuất, phòng thủ — mô tả cụ thể như game strategy nhưng trong narrative',
+          'Xung đột: sinh vật bản địa, hành tinh khắc nghiệt, tranh chấp lãnh thổ với phe khác, mẫu quốc bóc lột thuộc địa — MC bảo vệ và phát triển cộng đồng',
+        ],
       },
       {
         id: 'khoa-huyen-kinh-doanh-cong-nghe',
         name: 'Kinh Doanh Công Nghệ',
         description: 'Startup AI, robot, biotech, cạnh tranh tập đoàn',
-        example: 'Bán công nghệ lõi để đổi địa vị trong trật tự mới'
+        example: 'Bán công nghệ lõi để đổi địa vị trong trật tự mới',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'Sản phẩm công nghệ phải mô tả cụ thể: nguyên lý hoạt động, ưu thế so với đối thủ, chi phí sản xuất, thị trường mục tiêu — không chỉ "phát minh công nghệ đột phá"',
+          'Progression startup: ý tưởng → prototype → seed funding → sản phẩm đầu tiên → series A/B → cạnh tranh tập đoàn → IPO/M&A. Mỗi giai đoạn có thách thức tài chính cụ thể',
+          'Chiến tranh công nghệ: đánh cắp bằng sáng chế, gián điệp công nghiệp, M&A thù địch, lobby chính phủ — mặt tối của thương trường tech',
+          'MC dùng kiến thức công nghệ vượt trội (trọng sinh, hệ thống, thiên tài) tạo lợi thế — nhưng kinh doanh cần cả team, investor, partner, không solo được',
+        ],
       },
       {
         id: 'khoa-huyen-mo-tiem-net',
         name: 'Mở Tiệm Net Tương Lai',
-        description: 'Kinh doanh VR net-cafe, mô phỏng chiến trường tương lai',
-        example: 'Một tiệm VR nhỏ thành cổng huấn luyện liên hành tinh'
+        description: 'Kinh doanh VR net-cafe trong thế giới sci-fi, mô phỏng chiến trường và huấn luyện năng lực',
+        example: 'Một tiệm VR nhỏ thành cổng huấn luyện liên hành tinh, chiến binh nghiện mô phỏng',
+        topicPromptHints: [
+          'Tiệm VR/net-cafe với công nghệ tương lai: mô phỏng Full Dive, chiến trường hologram, AI đối kháng. Thu phí bằng tín dụng/năng lượng tinh thể',
+          'Khách hàng huấn luyện trong VR → nhận kỹ năng thật: phản xạ chiến đấu, chiến thuật chỉ huy, kinh nghiệm điều khiển mech. Quân đội/tập đoàn trả giá cao để huấn luyện nhân viên',
+          'Nâng cấp hệ thống: thêm phòng VR → AI đối kháng mạnh hơn → mô phỏng quy mô lớn (fleet battle) → kết nối liên hành tinh',
+          'Xung đột: tập đoàn lớn muốn thâu tóm/sao chép công nghệ tiệm VR của MC, chính phủ muốn kiểm soát, hacker tấn công',
+        ],
+      },
+      {
+        id: 'khoa-huyen-trung-toc',
+        name: 'Trùng Tộc Tận Thế',
+        description: 'Đại dịch côn trùng khổng lồ/sinh vật kiểu tổ ong tấn công, nhân loại sinh tồn',
+        example: 'Côn trùng đột biến tràn ngập thành phố, MC dẫn đội sinh tồn chống lại trùng mẫu hoàng hậu',
+        topicPromptHints: [
+          'Sinh thái trùng tộc chi tiết: hệ thống cấp bậc (công trùng → binh trùng → thủ lĩnh trùng → trùng hậu/trùng vương), phương thức tấn công (bầy đàn, acid, ký sinh, tiến hóa nhanh). Mỗi loại có điểm yếu riêng',
+          'Kinh dị sinh học: mô tả trùng ký sinh chiếm cơ thể người, đồng đội bị biến đổi, thành phố phủ kín kén trùng — bầu không khí Alien + Starship Troopers',
+          'MC phải tìm cách diệt trùng mẫu: mỗi tổ trùng có 1 trùng hậu cốt lõi, giết trùng hậu = giải phóng khu vực. Nhưng trùng hậu tiến hóa liên tục, ngày càng khó giết',
+          'Nhân loại thích nghi: phát triển vũ khí chống trùng, giáp chống acid, huyết thanh chống ký sinh. MC kết hợp chiến đấu + nghiên cứu + lãnh đạo cộng đồng',
+        ],
+      },
+      {
+        id: 'khoa-huyen-bang-ha',
+        name: 'Băng Hà Tận Thế',
+        description: 'Kỷ băng hà mới, sinh tồn trong giá lạnh cực đoan, tranh giành nhiên liệu và thức ăn',
+        example: 'Nhiệt độ toàn cầu giảm -80°C, MC dẫn đoàn người di cư tìm vùng đất ấm cuối cùng',
+        topicPromptHints: [
+          'Giá lạnh là kẻ thù chính: mô tả chi tiết tác động (-30°C: đóng băng nước, -50°C: máy móc hỏng, -80°C: thép vỡ). Nhiên liệu sưởi = tài nguyên quý nhất, hơn cả thức ăn',
+          'Sinh tồn cụ thể: cách giữ ấm, sản xuất thức ăn trong nhà kính, năng lượng (hạt nhân mini, địa nhiệt), di chuyển trên băng. Kiến thức khoa học thật tạo chiều sâu',
+          'Con người là mối nguy lớn hơn băng: tranh giành nhiên liệu, bunker, thức ăn. Nhóm người tuyệt vọng → bạo lực. MC phải cân bằng nhân đạo và sinh tồn',
+          'Progression: sống sót qua ngày đầu → xây bunker ấm → mở rộng cộng đồng → di cư tìm vùng ấm → phát hiện nguyên nhân băng hà → tìm cách đảo ngược',
+        ],
+      },
+      {
+        id: 'khoa-huyen-phe-tho',
+        name: 'Phế Thổ Tận Thế',
+        description: 'Hậu hạt nhân/thảm họa, wasteland hoang tàn, thu nhặt phế liệu tái xây văn minh',
+        example: 'Đại chiến hạt nhân 50 năm trước, MC là "scavenger" lặn vào phế tích tìm công nghệ cũ',
+        topicPromptHints: [
+          'Thế giới phế thổ chi tiết: phóng xạ theo vùng (an toàn/nguy hiểm/tử vong), đột biến sinh vật, phế tích thành phố cũ, bunker còn hoạt động. Bản đồ wasteland rõ ràng',
+          'Scavenging = "mở hộp" phế tích: mỗi lần lặn vào phế tích = phiêu lưu — bẫy cũ, đột biến thể, phế liệu quý, công nghệ tiền chiến. Phần thưởng ngẫu nhiên tạo dopamine',
+          'Phe phái phế thổ: thương nhân lưu động, thị trấn pháo đài, băng đảng cướp, tàn dư quân đội, cult phóng xạ — mỗi phe có logic tồn tại và xung đột lợi ích',
+          'Tái xây văn minh progression: sửa chữa máy móc → lọc nước → trồng trọt → năng lượng → thông tin liên lạc → cộng đồng. MC từ scavenger → leader → kiến trúc sư văn minh mới',
+        ],
+      },
+      {
+        id: 'khoa-huyen-toan-cau-tien-hoa',
+        name: 'Toàn Cầu Tiến Hóa',
+        description: 'Nhân loại buộc tiến hóa qua hệ thống toàn cầu, xếp hạng thế giới, sinh tồn cạnh tranh',
+        example: 'Hệ thống toàn cầu giáng xuống, mỗi người nhận class và nhiệm vụ, xếp hạng thế giới bắt đầu',
+        topicPromptHints: [
+          'Hệ thống toàn cầu: thông báo xuất hiện cho toàn nhân loại, mọi người nhận class/kỹ năng, quái vật xuất hiện, dungeon mở — Trái Đất biến thành "game" với luật chơi rõ ràng',
+          'Xếp hạng thế giới tạo cạnh tranh: bảng xếp hạng cá nhân/quốc gia/guild hiển thị toàn cầu. Phần thưởng cho top ranker = tài nguyên chiến lược. MC leo rank từ vô danh → top thế giới',
+          'Quốc gia cạnh tranh: mỗi nước có chiến lược tiến hóa khác nhau (quân sự hóa, nghiên cứu, liên minh). Xung đột quốc tế + quái vật + dungeon tạo chaos đa tầng',
+          'MC có lợi thế ẩn: class hiếm, skill bị đánh giá thấp nhưng thực ra OP, hoặc kiến thức game/trùng sinh — nhưng thế giới thay đổi liên tục nên lợi thế không bao giờ tuyệt đối',
+        ],
+      },
+      {
+        id: 'khoa-huyen-toan-dan-tinh-te',
+        name: 'Toàn Dân Tinh Tế',
+        description: 'Mỗi người nhận phi thuyền hoặc hành tinh riêng, khai phá vũ trụ quy mô toàn dân',
+        example: 'Toàn cầu thức tỉnh, mỗi người nhận 1 phi thuyền, MC nhận được phi thuyền cấp huyền thoại',
+        topicPromptHints: [
+          'Hệ thống phi thuyền cá nhân: mỗi người nhận 1 phi thuyền (cấp bậc từ F → SSS), nâng cấp qua tài nguyên khai thác từ hành tinh/tiểu hành tinh. Phi thuyền có module: vũ khí, khiên, khai thác, nghiên cứu',
+          'Khai phá vũ trụ = "mở hộp" cấp thiên hà: mỗi hành tinh có tài nguyên/sinh vật/bí mật khác nhau. Phát hiện hành tinh quý = dopamine mạnh (nguyên liệu hiếm, di tích ngoài hành tinh, công nghệ cổ đại)',
+          'Cạnh tranh tinh tế: tranh giành tiểu hành tinh tài nguyên, chiến tranh hạm đội, liên minh hành tinh, thương mại xuyên sao — giống "Toàn Dân Lãnh Chủ" nhưng trong vũ trụ',
+          'MC xây dựng hạm đội + thuộc địa: từ 1 phi thuyền → đội nhỏ → hạm đội → liên minh hành tinh → đế chế tinh tế. Kết hợp khám phá + chiến đấu + quản lý + ngoại giao',
+        ],
       }
     ]
   },
@@ -315,49 +936,208 @@ export const GENRE_CONFIG = {
         id: 'lich-su-co-dai', 
         name: 'Cổ Đại', 
         description: 'Thời kỳ cổ đại',
-        example: 'Thời Tam Quốc, Xuân Thu Chiến Quốc'
+        example: 'Thời Tam Quốc, Xuân Thu Chiến Quốc',
+        disclaimer: 'Truyện lấy bối cảnh thế giới song song lấy cảm hứng từ lịch sử, không phải ghi chép lịch sử thực tế.',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'Bối cảnh song song lấy cảm hứng từ lịch sử thật — đổi tên triều đại, quốc gia, nhân vật lịch sử nhưng giữ nguyên logic chính trị, quân sự, văn hóa',
+          'Lồng ghép kiến thức lịch sử thật (chiến thuật, chính trị, kinh tế thời kỳ tương ứng) qua hành động và đối thoại nhân vật',
+          'Mưu kế chính trị phải có chiều sâu — mô tả rõ lợi ích các bên, hệ quả lâu dài, không chỉ "bày mưu thắng"',
+        ],
       },
       { 
         id: 'lich-su-trung-dai', 
         name: 'Trung Đại', 
         description: 'Thời kỳ trung đại',
-        example: 'Thời Đường Tống Nguyên Minh Thanh'
+        example: 'Thời Đường Tống Nguyên Minh Thanh',
+        disclaimer: 'Truyện lấy bối cảnh thế giới song song lấy cảm hứng từ lịch sử, không phải ghi chép lịch sử thực tế.',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'Bối cảnh song song lấy cảm hứng từ lịch sử thật — đổi tên triều đại, quốc gia, nhân vật lịch sử nhưng giữ nguyên logic chính trị, quân sự, văn hóa',
+          'Lồng ghép kiến thức lịch sử thật (chiến thuật, chính trị, kinh tế thời kỳ tương ứng) qua hành động và đối thoại nhân vật',
+          'Mưu kế chính trị phải có chiều sâu — mô tả rõ lợi ích các bên, hệ quả lâu dài, không chỉ "bày mưu thắng"',
+        ],
       },
       { 
         id: 'lich-su-hien-dai', 
         name: 'Hiện Đại', 
         description: 'Thế kỷ 19-20',
-        example: 'Chiến tranh thế giới, cách mạng công nghiệp'
+        example: 'Chiến tranh thế giới, cách mạng công nghiệp',
+        disclaimer: 'Truyện lấy bối cảnh thế giới song song lấy cảm hứng từ lịch sử cận hiện đại.',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'Bối cảnh song song lấy cảm hứng từ lịch sử thật — đổi tên quốc gia, lãnh tụ, sự kiện nhưng giữ nguyên logic kinh tế, chính trị, quân sự',
+          'Lồng ghép dữ kiện kinh tế/công nghệ có thật của thời kỳ (cách mạng công nghiệp, đường sắt, điện tín...) vào cốt truyện',
+        ],
       },
       { 
         id: 'lich-su-gia-tuong', 
         name: 'Giả Tưởng', 
         description: 'Lịch sử với yếu tố hư cấu',
-        example: 'Nếu Khổng Tử có siêu năng lực'
+        example: 'Nếu Khổng Tử có siêu năng lực',
+        disclaimer: 'Tác phẩm hư cấu hoàn toàn, nhân vật và sự kiện không liên quan lịch sử thực.',
+        worldSetting: 'fantasy' as const,
+        topicPromptHints: [
+          'Yếu tố hư cấu phải thay đổi lịch sử có logic: siêu năng lực/phép thuật ảnh hưởng chiến tranh, chính trị, kinh tế thế nào — không chỉ "dán phép thuật lên lịch sử"',
+          'What-if lịch sử: nếu sự kiện X xảy ra khác → hệ quả dây chuyền gì? Mô tả rõ chuỗi hệ quả, tạo thế giới thay thế có chiều sâu',
+          'Nhân vật lịch sử + năng lực hư cấu: giữ tính cách cốt lõi nhưng thêm chiều mới — tạo phiên bản thú vị hơn của lịch sử quen thuộc',
+        ],
       },
       {
         id: 'lich-su-kinh-doanh',
         name: 'Kinh Doanh Cổ Đại',
         description: 'Buôn bán, thương hội, tuyến đường thương mại lịch sử',
-        example: 'Từ tiệm nhỏ ở chợ huyện thành thương hội xuyên triều'
+        example: 'Từ tiệm nhỏ ở chợ huyện thành thương hội xuyên triều',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'Mô tả cơ chế kinh doanh cổ đại chi tiết: hệ thống tiền tệ, thuế, vận tải, hợp đồng, nguồn cung — người đọc vừa theo dõi vừa học được',
+          'Lồng ghép kiến thức kinh tế thương mại có thật của thời kỳ (Con Đường Tơ Lụa, hải thương, muối-sắt chuyên mại...) — đổi tên phù hợp',
+          'Đối thủ kinh doanh phải có chiến lược cụ thể, không chỉ "thương gia gian xảo" chung chung',
+        ],
       },
       {
         id: 'lich-su-son-lam-san-thu',
         name: 'Sơn Lâm Săn Thú',
-        description: 'Săn bắt nơi biên cương, sinh tồn và đổi đời',
-        example: 'Thợ săn vùng núi dùng kỹ nghệ săn để lập nghiệp'
+        description: 'Săn bắt nơi biên cương, sinh tồn và đổi đời qua nghề thợ săn cổ đại',
+        example: 'Thợ săn vùng núi dùng kỹ nghệ săn để lập nghiệp, đổi da thú lấy quan hệ triều đình',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'Bối cảnh biên cương cổ đại: rừng nguyên sinh, thú dữ hoành hành, thôn làng sống dựa vào săn bắt. Mô tả chi tiết địa hình, khí hậu, đời sống dân biên ải',
+          'Progression thú săn cổ đại: thỏ/chim trĩ → lợn rừng → hươu nai → gấu/báo → hổ (boss). Đặc biệt: dược liệu quý (nhân sâm, linh chi, nấm hiếm) = "vàng" của núi rừng',
+          'Con đường lập nghiệp: đổi da thú/dược liệu lấy nhu yếu phẩm → cung cấp đặc sản cho phủ huyện/kinh thành → thầu khu rừng → trở thành thương gia lâm sản cấp vùng',
+          'Kết hợp yếu tố chính trị cổ đại: biên cương là nơi tranh chấp, thợ săn có thể thành tai mắt cho quân đội, hoặc bị cuốn vào tranh đoạt tài nguyên giữa các thế lực',
+        ],
       },
       {
         id: 'lich-su-di-bien-hai-san',
         name: 'Biển Cổ Đại',
-        description: 'Đội tàu cổ đại, hải thương, săn hải sản và tranh cảng',
-        example: 'Từ ngư dân thành bá chủ tuyến hải thương'
+        description: 'Đội tàu cổ đại, hải thương, săn hải sản và tranh cảng, từ ngư dân thành bá chủ tuyến hải thương',
+        example: 'Từ ngư dân nghèo xây đội thương thuyền, mở tuyến hải thương vượt đại dương',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'Bối cảnh hải thương cổ đại: cảng biển, chợ buôn, tuyến đường thương mại trên biển. Mô tả chi tiết: loại thuyền, hàng hải, thời tiết, hải tặc',
+          'Progression: đánh cá ven bờ → thuyền buôn nhỏ chạy tuyến ngắn → đội thương thuyền lớn → mở tuyến hải thương xuyên đại dương → bá chủ cảng biển',
+          'Nguy hiểm trên biển tạo kịch tính: bão tố, hải tặc, đá ngầm, tranh cảng với thương hội khác. Mỗi chuyến hàng = một cuộc phiêu lưu',
+          'Lồng ghép kiến thức hàng hải/thương mại cổ đại: tơ lụa, gốm sứ, gia vị, trà — đổi tên phù hợp thế giới song song nhưng giữ nguyên logic thương mại',
+        ],
       },
       {
         id: 'lich-su-mo-tiem-net',
         name: 'Mở Tiệm Net Lịch Sử',
-        description: 'Nhánh xuyên thời gian: đưa mô hình net-cafe vào thời cổ',
-        example: 'Xuyên không mở tiệm “cờ mô phỏng chiến trận” cho võ tướng luyện binh'
+        description: 'Xuyên thời gian: đưa mô hình net-cafe/game vào thời cổ, khách hàng là vua chúa tướng lĩnh',
+        example: 'Xuyên không mở tiệm "cờ mô phỏng chiến trận" cho võ tướng luyện binh, hoàng đế nghiện chơi game chiến thuật',
+        topicPromptHints: [
+          'Tiệm "net" phiên bản cổ đại: có thể là hệ thống chiếu phim/game bằng ma pháp, hoặc MC xuyên không mang theo công nghệ hiện đại. Thu phí bằng tiền tệ thời đại (bạc, vàng, ngũ cốc)',
+          'Khách hàng là nhân vật lịch sử: võ tướng chơi game chiến thuật → lĩnh ngộ binh pháp, hoàng đế xem phim lịch sử → học cách trị quốc, thư sinh xem phim → viết thơ hay hơn',
+          'Phản ứng của người cổ đại khi tiếp xúc văn hóa hiện đại là dopamine chính: tướng quân sốc khi thấy xe tăng trong game, hoàng hậu khóc khi xem phim tình cảm',
+          'Xung đột chính trị: triều đình muốn kiểm soát/chiếm tiệm, thế lực khác muốn sao chép, MC phải cân bằng giữa các phe phái',
+        ],
+      },
+      {
+        id: 'lich-su-trieu-hoan-vu-tuong',
+        name: 'Triệu Hoán Vũ Tướng',
+        description: 'Triệu hoán danh tướng lịch sử chiến đấu, gacha tướng, xây quân đoàn huyền thoại',
+        example: 'Hệ thống triệu hoán danh tướng: lần đầu triệu hoán ra Triệu Vân, từ đó xây đội quân vô địch',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'Hệ thống triệu hoán tướng: gacha cơ chế (SSR/SR/R), chi phí triệu hoán (khí vận, công trạng, tài nguyên), mỗi tướng có skill riêng dựa trên lịch sử thật. VD: Lữ Bố = sức mạnh cực đại nhưng phản bội risk cao',
+          'Danh tướng đa quốc tịch: Đông phương (Quan Vũ, Nhạc Phi, Hạng Vũ) + Tây phương (Alexander, Caesar, Napoleon) + Nhật (Oda Nobunaga, Musashi) — mỗi tướng mang theo binh chủng và chiến thuật đặc trưng thời đại',
+          'Tướng không phải công cụ: mỗi tướng có tính cách, kiêu hãnh, điều kiện phục tùng. Lữ Bố mạnh nhưng khó kiểm soát, Gia Cát Lượng cần MC chứng minh năng lực mới phò tá — quản lý tướng = quản lý nhân tài',
+          'Chiến tranh quy mô lớn: mô tả chiến thuật phối hợp tướng, binh chủng, hậu cần. Mỗi trận là 1 set piece — không chỉ tướng đơn đấu mà là chiến lược tổng thể',
+          'Progression quân sự: vài trăm quân → vạn quân → đại quân → thống nhất thiên hạ. MC từ lãnh chúa nhỏ → vương → đế — mỗi bước mở rộng lãnh thổ và đối thủ mạnh hơn',
+        ],
+      },
+      {
+        id: 'lich-su-trieu-hoan-van-than',
+        name: 'Triệu Hoán Văn Thần',
+        description: 'Triệu hoán mưu sĩ/văn thần lịch sử: Gia Cát Lượng, Phạm Lãi, Trương Lương để trị quốc',
+        example: 'Triệu hoán Phạm Lãi quản lý tài chính, Trương Lương bày mưu, Bao Thanh Thiên xử án — xây triều đình hoàn hảo',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'Văn thần là "tool" khác vũ tướng: không đánh nhau mà quản lý — tài chính (Phạm Lãi), mưu lược (Trương Lương), luật pháp (Bao Công), ngoại giao (Tô Tần), nông nghiệp (Giả Tư Hiệp). Mỗi người giải quyết 1 vấn đề quốc gia',
+          'Trị quốc chi tiết: thuế, luật pháp, giáo dục, nông nghiệp, thương mại, quân sự — mô tả cụ thể chính sách và hiệu quả. Người đọc vừa theo dõi vừa học lịch sử/chính trị',
+          'Xung đột giữa các văn thần: Nho gia vs Pháp gia vs Đạo gia, mưu sĩ Trung Hoa vs mưu sĩ phương Tây — quan điểm trị quốc khác nhau tạo debate triết học hấp dẫn',
+          'MC là "vua" cần đưa ra quyết định: văn thần đề xuất, MC chọn — mỗi quyết định có hệ quả. MC không phải thiên tài nhưng biết lắng nghe và tổng hợp — leadership thông minh',
+        ],
+      },
+      {
+        id: 'lich-su-khai-cong-xuong',
+        name: 'Xuyên Không Khai Công Xưởng',
+        description: 'Xuyên về cổ đại mở nhà máy, đưa cách mạng công nghiệp sớm hàng trăm năm',
+        example: 'Kỹ sư hiện đại xuyên về thời Tống, từ xưởng rèn nhỏ tạo ra cách mạng công nghiệp mini',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'Kiến thức công nghiệp cụ thể: MC phải giải quyết vấn đề từ cơ bản — luyện thép chất lượng cao, chế tạo máy hơi nước đơn giản, sản xuất hàng loạt. Mô tả quy trình kỹ thuật chi tiết nhưng dễ hiểu',
+          'Progression công nghiệp: xưởng thủ công → dây chuyền sản xuất → máy móc cơ bản → nhà máy → khu công nghiệp. Mỗi bước đột phá công nghệ = arc kịch tính (thử nghiệm, thất bại, cải tiến, thành công)',
+          'Tác động xã hội: nông dân thành công nhân, quý tộc mất quyền lực kinh tế, thương nhân nổi lên, hệ thống phong kiến lung lay — mô tả cách mạng xã hội từ góc nhìn cá nhân',
+          'Xung đột: triều đình/quý tộc sợ mất quyền lực, thương nhân truyền thống chống đối, gian điệp nước ngoài muốn đánh cắp công nghệ — MC phải bảo vệ công nghệ + chính trị sống sót',
+        ],
+      },
+      {
+        id: 'lich-su-co-kien',
+        name: 'Xuyên Không Cơ Kiến',
+        description: 'Xuyên không xây hạ tầng: đường, đập, kênh đào, cầu — thay đổi vận mệnh quốc gia bằng xây dựng',
+        example: 'Kỹ sư xây dựng xuyên về cổ đại, đắp đê trị thủy cứu vạn dân, xây đường nối liền biên cương',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'Kiến thức xây dựng cụ thể: đắp đê (vật liệu, kỹ thuật nén, thoát nước), xây cầu (trụ, vòm, chịu lực), đào kênh (đo đạc, gradient, thủy lợi) — mô tả kỹ thuật chi tiết nhưng dễ hiểu',
+          'Mỗi công trình = 1 arc hoàn chỉnh: khảo sát → thiết kế → huy động nhân lực → xây dựng → khó khăn (thời tiết, phá hoại, thiếu vật liệu) → hoàn thành → tác động. Dopamine từ "khánh thành"',
+          'Cơ kiến = thay đổi vận mệnh: đê tốt → không lũ lụt → dân an cư → kinh tế phát triển → quốc lực tăng. MC thấy tác động dài hạn của hạ tầng — progression quốc gia qua từng công trình',
+          'Xung đột: quan lại tham nhũng ăn bớt vật liệu, quý tộc phản đối (dự án đi qua đất họ), nước láng giềng phá hoại — MC phải xử lý cả kỹ thuật lẫn chính trị',
+        ],
+      },
+      {
+        id: 'lich-su-quan-su',
+        name: 'Xuyên Không Quân Sự',
+        description: 'Cải cách quân sự bằng kiến thức hiện đại: chiến thuật, vũ khí, huấn luyện, hậu cần',
+        example: 'Sĩ quan đặc nhiệm xuyên về thời loạn, dùng chiến thuật hiện đại biến đội dân binh thành quân đội bất bại',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'Kiến thức quân sự cụ thể: đội hình chiến đấu, chiến thuật du kích, hậu cần (bao nhiêu lương thực cho X quân Y ngày), vũ khí cải tiến (nỏ liên phát, thuốc nổ sơ khai, giáp cải tiến) — chi tiết + thực tế',
+          'Progression quân đội: đội dân binh → tiểu đội tinh nhuệ → quân đoàn → đại quân chuyên nghiệp. Mỗi giai đoạn: tuyển quân → huấn luyện → trang bị → thực chiến → rút kinh nghiệm',
+          'Chiến trận là set piece chính: mô tả chi tiết chiến thuật, địa hình, thời tiết ảnh hưởng, bất ngờ trên chiến trường. MC dùng kiến thức hiện đại (ngụy trang, thông tin, tâm lý chiến) thắng đối thủ đông hơn',
+          'Xung đột nội bộ: tướng lĩnh cũ không chấp nhận chiến thuật mới, lính không quen kỷ luật, triều đình nghi ngờ — MC phải chứng minh bằng chiến thắng',
+        ],
+      },
+      {
+        id: 'lich-su-dai-phu',
+        name: 'Xuyên Không Đại Phu',
+        description: 'Làm thầy thuốc ở cổ đại bằng y học hiện đại, cứu người thay đổi vận mệnh',
+        example: 'Bác sĩ phẫu thuật xuyên về thời Minh, từ lang y vô danh thành thần y triều đình',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'Y học hiện đại trong bối cảnh cổ đại: MC biết vi khuẩn, vệ sinh, phẫu thuật cơ bản, dược lý — nhưng phải tìm cách thực hiện với dụng cụ/nguyên liệu thời đại (rượu sát trùng, kim khâu tự chế, thảo dược thay kháng sinh)',
+          'Mỗi bệnh nhân = 1 arc: chẩn đoán → tìm nguyên liệu/chế dụng cụ → điều trị → thành công/biến chứng. Bệnh nhân cấp cao dần: dân thường → phú hào → quan lại → hoàng tộc',
+          'Y thuật = thay đổi lịch sử: cứu tướng quân → thắng trận, chữa bệnh dịch → cứu thành phố, phòng dịch → quốc lực tăng. MC thay đổi vận mệnh quốc gia qua y học',
+          'Xung đột y giới: lang y truyền thống chống đối, triều đình nghi ngờ "tà thuật", bệnh nhân mê tín — MC phải chứng minh bằng kết quả',
+        ],
+      },
+      {
+        id: 'lich-su-my-thuc',
+        name: 'Cổ Đại Mỹ Thực',
+        description: 'Nấu ăn kiểu hiện đại trong bối cảnh cổ đại, mở tửu lâu, chinh phục vị giác hoàng tộc',
+        example: 'Đầu bếp xuyên về Đường triều, xào rau bằng dầu (thay mỡ) khiến cả kinh thành xếp hàng',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'Kiến thức ẩm thực cổ-hiện đại: cổ đại thiếu nhiều gia vị/kỹ thuật (không có xào, không có ớt, đường hiếm). MC giới thiệu: xào (lửa lớn + dầu), nướng, gia vị mới, kỹ thuật bảo quản — mỗi "phát minh" ẩm thực = dopamine',
+          'Mỗi món ăn mới = 1 arc mini: tìm nguyên liệu (thay thế bằng thứ có sẵn) → thử nghiệm → phục vụ → phản ứng sốc của thực khách. Mô tả chi tiết hương vị, kỹ thuật nấu',
+          'Progression tửu lâu: quầy nhỏ ven đường → tửu lâu → chuỗi → ngự trù phụng hoàng đế → thương hiệu xuyên quốc gia. Mỗi cấp có thực khách khó tính hơn và đối thủ mạnh hơn',
+          'Ẩm thực = quyền lực mềm: hoàng đế mê món ăn → ban ơn, tướng quân thèm → trở thành đồng minh, thương nhân muốn franchise → mở rộng kinh doanh. Ai cũng cần ăn ngon!',
+        ],
+      },
+      {
+        id: 'lich-su-du-lich-xuyen-thoi',
+        name: 'Du Lịch Xuyên Thời',
+        description: 'Dẫn người hiện đại về cổ đại du lịch, mở khu du lịch, thuê người cổ đại làm việc',
+        example: 'MC mở cổng thời gian, dẫn du khách thế kỷ 21 sang Tam Quốc trải nghiệm, vé 100 triệu/chuyến',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'Cơ chế xuyên thời gian rõ ràng: phương tiện (cổng, hệ thống, thiết bị), giới hạn (số người/lần, thời gian ở lại, không được mang vũ khí), quy tắc (không được thay đổi lịch sử lớn)',
+          'Kinh doanh du lịch: thiết kế tour (xem trận chiến nổi tiếng, thăm cung điện, ẩm thực cổ đại), giá vé, bảo hiểm an toàn, dịch vụ VIP — mô tả cụ thể mô hình kinh doanh',
+          'Phản ứng hai chiều = dopamine: du khách hiện đại sốc khi thấy lịch sử thật, người cổ đại choáng khi thấy đồ hiện đại (điện thoại, máy ảnh, quần áo). Culture shock hai chiều tạo comedy liên tục',
+          'Thuê người cổ đại: MC tuyển võ sĩ cổ đại làm bảo vệ tour, đầu bếp cổ đại nấu ẩm thực chính thống, thư sinh cổ đại làm hướng dẫn viên — "nhân sự xuyên thời gian" tạo tình huống hài hước',
+          'Xung đột: du khách phá rối, người cổ đại phát hiện, chính quyền hai thời đại can thiệp, đối thủ cạnh tranh mở tour riêng — MC phải quản lý cả hai đầu thời gian',
+        ],
       }
     ]
   },
@@ -379,25 +1159,94 @@ export const GENRE_CONFIG = {
         id: 'dong-nhan-tien-hiep', 
         name: 'Tiên Hiệp', 
         description: 'Đồng nhân thể loại tiên hiệp',
-        example: 'Đồng nhân Đấu Phá Thương Khung'
+        example: 'Đồng nhân Đấu Phá Thương Khung',
+        topicPromptHints: [
+          'Tôn trọng hệ thống tu luyện gốc: cảnh giới, pháp bảo, đan dược theo nguyên tác — MC xen vào nhưng không phá vỡ quy tắc thế giới',
+          'MC biết cốt truyện gốc = lợi thế sinh tử: biết bí cảnh nào mở, ai sẽ phản bội, cơ duyên nào ở đâu — nhưng hành động MC thay đổi timeline',
+          'Tương tác nhân vật gốc: giữ tính cách nguyên tác, tạo cảnh fan muốn thấy (giúp nhân vật yêu thích, đánh bại villain sớm, cứu nhân vật chết oan)',
+          'Hiệu ứng bướm: MC thay đổi 1 sự kiện → cốt truyện gốc lệch dần → kiến thức cũ vô dụng → MC phải tự lực. Đây là điểm kịch tính chính',
+        ],
       },
       { 
         id: 'dong-nhan-huyen-huyen', 
         name: 'Huyền Huyễn', 
         description: 'Đồng nhân thể loại huyền huyễn',
-        example: 'Đồng nhân Toàn Chức Cao Thủ'
+        example: 'Đồng nhân Toàn Chức Cao Thủ',
+        topicPromptHints: [
+          'Tôn trọng hệ thống sức mạnh/ma pháp gốc: level, skill, chủng tộc theo nguyên tác — MC là biến số mới trong hệ thống đã có',
+          'Lợi thế "biết trước": MC biết plot twist, boss ẩn, hidden quest — dùng kiến thức meta để tạo lợi thế, nhưng thế giới thay đổi theo hành động MC',
+          'Fan service tự nhiên: tương tác với nhân vật iconic, tham gia sự kiện nổi tiếng từ góc nhìn mới, sửa "sai lầm" trong nguyên tác',
+        ],
       },
       { 
         id: 'dong-nhan-do-thi', 
         name: 'Đô Thị', 
         description: 'Đồng nhân thể loại đô thị',
-        example: 'Đồng nhân Toàn Chức Cao Thủ'
+        example: 'Đồng nhân Toàn Chức Cao Thủ',
+        topicPromptHints: [
+          'Bối cảnh đô thị hiện đại + thế giới nguyên tác: MC sống trong thành phố quen thuộc nhưng có hệ thống/sự kiện từ tác phẩm gốc xen vào',
+          'MC dùng kiến thức nguyên tác trong đời sống đô thị: tránh nguy hiểm, tận dụng cơ hội, xây dựng quan hệ với nhân vật quan trọng',
+          'Xử lý hai cuộc sống song song: đời thường (công việc, gia đình) và cuộc phiêu lưu theo cốt truyện gốc — xung đột và cân bằng tạo drama',
+        ],
       },
       { 
         id: 'dong-nhan-khoa-huyen', 
         name: 'Khoa Huyễn', 
         description: 'Đồng nhân thể loại khoa huyễn',
-        example: 'Đồng nhân Tam Thể'
+        example: 'Đồng nhân Tam Thể',
+        topicPromptHints: [
+          'Tôn trọng thiết lập khoa học gốc: quy tắc vật lý, công nghệ, vũ trụ quan — MC hoạt động trong khuôn khổ khoa học đã thiết lập',
+          'MC dùng kiến thức plot + khoa học hiện đại để giải quyết vấn đề: biết trước thảm họa, chuẩn bị công nghệ, cảnh báo nhân vật gốc',
+          'Mở rộng thế giới gốc: khám phá khía cạnh tác giả chưa viết, thêm chi tiết hợp lý vào thế giới quan — tạo "phần mở rộng" hấp dẫn cho fan',
+        ],
+      },
+      {
+        id: 'dong-nhan-trieu-hoan-anh-thi',
+        name: 'Triệu Hoán Ảnh Thị',
+        description: 'Triệu hoán nhân vật từ phim, anime, game, tiểu thuyết — cross-universe army',
+        example: 'Hệ thống triệu hoán đa vũ trụ: Naruto + Goku + Iron Man + Lữ Bố trong cùng 1 đội',
+        topicPromptHints: [
+          'Triệu hoán nhân vật đa vũ trụ: MC có thể triệu hoán nhân vật từ anime (Naruto, One Piece), phim (Marvel, DC), game (LOL, Genshin), tiểu thuyết (Đấu Phá, Phàm Nhân) — đổi tên phù hợp hoặc giữ nguyên tùy bối cảnh',
+          'Mỗi nhân vật mang theo hệ thống sức mạnh gốc: Naruto dùng chakra, Goku dùng ki, Iron Man dùng tech — xung đột/phối hợp giữa các hệ thống sức mạnh khác nhau tạo chiến đấu đa dạng',
+          'Nhân vật triệu hoán có tính cách gốc: Goku muốn chiến đấu, Luffy muốn phiêu lưu, Sasuke khó kiểm soát — MC phải quản lý "team đa vũ trụ" với tính cách hoàn toàn khác nhau',
+          'Gacha + progression: triệu hoán ngẫu nhiên (SSR hiếm), nhân vật mạnh lên trong thế giới mới, combo giữa các universe (Sharingan + Haki = ???) — fan service cực đỉnh',
+        ],
+      },
+      {
+        id: 'dong-nhan-xuyen-thu',
+        name: 'Xuyên Thư / Khoái Xuyên',
+        description: 'Xuyên vào thế giới tiểu thuyết, nhảy giữa nhiều thế giới sách hoàn thành nhiệm vụ',
+        example: 'MC xuyên vào từng cuốn tiểu thuyết, phải sửa "bug" cốt truyện trước khi thế giới sụp đổ',
+        topicPromptHints: [
+          'Cơ chế xuyên thư: MC bị kéo vào thế giới tiểu thuyết (tu tiên, đô thị, lịch sử...), nhận nhiệm vụ (cứu nhân vật, thay đổi kết cục, thu thập vật phẩm). Hoàn thành → chuyển sang thế giới sách tiếp theo',
+          'Mỗi thế giới sách = 1 arc hoàn chỉnh với thể loại khác nhau: thế giới 1 là tu tiên, thế giới 2 là đô thị, thế giới 3 là mạt thế — đa dạng bối cảnh giữ người đọc luôn fresh',
+          'MC biết cốt truyện gốc = lợi thế: biết ai là phản diện, bí mật ở đâu, kết cục ra sao — nhưng hành động MC thay đổi plot, kiến thức cũ dần vô dụng',
+          'Khoái xuyên (fast transmigration): nhịp nhanh, mỗi thế giới 20-50 chương, dopamine từ "hoàn thành nhiệm vụ" + chuyển sang thế giới mới + phần thưởng tích lũy',
+        ],
+      },
+      {
+        id: 'dong-nhan-lieu-thien-quan',
+        name: 'Liêu Thiên Quần',
+        description: 'Nhóm chat xuyên vũ trụ với nhân vật fiction từ nhiều thế giới khác nhau',
+        example: 'MC gia nhập group chat có Lý Bạch, Tôn Ngộ Không, Batman, Voldemort — trade vật phẩm xuyên vũ trụ',
+        topicPromptHints: [
+          'Cơ chế chat group: MC gia nhập nhóm chat siêu nhiên, thành viên là nhân vật từ nhiều thế giới fiction. Có thể gửi tin nhắn, chia sẻ thông tin, gửi vật phẩm xuyên chiều không gian',
+          'Trao đổi xuyên vũ trụ = dopamine chính: MC gửi bật lửa → nhận kiếm thần từ thế giới tu tiên, gửi sách giáo khoa → nhận đan dược. Chênh lệch giá trị giữa các thế giới tạo cơ hội buôn bán',
+          'Nhân vật gốc giữ tính cách: Tôn Ngộ Không nóng tính gây sự trong chat, Gia Cát Lượng phân tích tình hình, Naruto nhiệt huyết giúp đỡ — tương tác giữa các nhân vật iconic tạo fan service',
+          'Nhiệm vụ nhóm chat: thỉnh thoảng cả group phải hợp tác giải quyết khủng hoảng xuyên vũ trụ — nhân vật từ nhiều thế giới chiến đấu cùng nhau tạo crossover epic',
+        ],
+      },
+      {
+        id: 'dong-nhan-chu-thien-truc-ba',
+        name: 'Chư Thiên Trực Bá',
+        description: 'Livestream xuyên vạn giới cho người ở nhiều thế giới cùng xem và phản ứng',
+        example: 'MC phát sóng trực tiếp cuộc đời các anh hùng/phản diện, người ở vạn giới comment sôi nổi',
+        topicPromptHints: [
+          'Hệ thống trực bá xuyên giới: MC phát sóng video/phim/sự kiện từ 1 thế giới cho người ở nhiều thế giới khác xem. Khán giả là nhân vật fiction — phản ứng của họ = dopamine chính',
+          'Nội dung phát sóng: "10 nhân vật mạnh nhất vạn giới", "bí mật đen tối của [nhân vật]", "tương lai sẽ xảy ra gì" — tiết lộ thông tin gây sốc cho khán giả ở các thế giới khác nhau',
+          'Phản ứng nhân vật gốc: phản diện sốc khi biết kết cục, anh hùng tức giận khi bị tiết lộ điểm yếu, fan của nhân vật tranh cãi trong comment — mỗi tập phát sóng = drama xuyên vũ trụ',
+          'Hậu quả phát sóng: thông tin bị tiết lộ → nhân vật thay đổi hành động → timeline gốc bị ảnh hưởng. MC phải chịu trách nhiệm cho "hiệu ứng bướm" xuyên vũ trụ',
+        ],
       }
     ]
   },
@@ -419,55 +1268,157 @@ export const GENRE_CONFIG = {
         id: 'vong-du-mmo', 
         name: 'MMO', 
         description: 'Truyện về game MMORPG',
-        example: 'Thế giới ảo rộng lớn, guild chiến'
+        example: 'Thế giới ảo rộng lớn, guild chiến',
+        topicPromptHints: [
+          'Hệ thống game phải chi tiết nhất quán: class, skill tree, equipment tier, dungeon difficulty, level cap — thiết lập rõ từ đầu và tuân theo',
+          'MMORPG = xã hội thu nhỏ: guild politics, server drama, market PvP, first kill race, world boss coordination — mô tả tương tác cộng đồng game sống động',
+          'MC tìm cách nổi bật: hidden class, first discovery, unique build, solo raid — nhưng phải có logic trong hệ thống game, không phải "hack"',
+          'Kết nối in-game và ngoài đời: e-sport, live stream, sponsor, kiếm tiền từ game, quan hệ real-life phát triển từ game — game không chỉ là game',
+        ],
       },
       { 
         id: 'vong-du-vr', 
         name: 'VR', 
         description: 'Truyện về công nghệ thực tế ảo',
-        example: 'Full Dive VR, trải nghiệm game như thật'
+        example: 'Full Dive VR, trải nghiệm game như thật',
+        topicPromptHints: [
+          'Full Dive VR phải có quy tắc: cảm giác đau (giảm bao nhiêu %?), thời gian trong game vs ngoài đời, logout mechanism, side effect sinh lý — thiết lập rõ giới hạn',
+          'Trải nghiệm "như thật" là điểm nhấn: mô tả ngũ giác trong game (mùi cỏ, vị thức ăn, gió trên da), cảm giác chiến đấu, cảm xúc NPC — VR khác MMO ở immersion',
+          'Xung đột thực-ảo: NPC có ý thức không? Game addiction, lost identity, kẻ lợi dụng VR cho mục đích xấu — vấn đề đạo đức và triết học',
+          'MC khám phá thế giới VR sâu hơn người khác: bug, hidden area, NPC bí ẩn, quest ẩn, "bí mật" mà nhà phát triển giấu — cảm giác khám phá liên tục',
+        ],
       },
       { 
         id: 'vong-du-esports', 
         name: 'Esports', 
         description: 'Truyện về thi đấu game chuyên nghiệp',
-        example: 'Trở thành tuyển thủ hàng đầu'
+        example: 'Trở thành tuyển thủ hàng đầu',
+        topicPromptHints: [
+          'Mô tả trận đấu phải chi tiết hấp dẫn: chiến thuật team, hero pick/ban, micro play, clutch moment, comeback — không chỉ "thắng dễ" mà phải có kịch bản hấp dẫn',
+          'Progression tuyển thủ: amateur → semi-pro → pro team → regional → world championship. Mỗi cấp có skill gap, pressure, prize pool khác nhau',
+          'Đời sống pro gamer: luyện tập 12h/ngày, team chemistry, drama nội bộ, chấn thương tay, burnout, fan toxic — mặt tối của vinh quang esports',
+          'Kinh tế esports: sponsor, streaming income, transfer fee, team salary, prize money — mô tả con số cụ thể tạo chiều sâu thực tế',
+        ],
       },
       { 
         id: 'vong-du-system', 
         name: 'Hệ Thống', 
         description: 'Truyện có hệ thống đặc biệt',
-        example: 'Hệ thống nhiệm vụ, kỹ năng độc đáo'
+        example: 'Hệ thống nhiệm vụ, kỹ năng độc đáo',
+        topicPromptHints: [
+          'Hệ thống phải có quy tắc rõ ràng: cách nhận quest, phần thưởng scale thế nào, penalty thất bại, cooldown, giới hạn — KHÔNG phải muốn gì được nấy',
+          'MC exploit hệ thống bằng trí tuệ: tìm combo ẩn, tối ưu build, lợi dụng quy tắc — thỏa mãn nhu cầu "min-max" của người đọc game thủ',
+          'Hệ thống tiết lộ bí mật dần: ban đầu đơn giản → càng lên cao càng phức tạp → có bí mật/mục đích ẩn đằng sau — tạo mystery dài hạn',
+          'Mỗi quest/nhiệm vụ = 1 arc nhỏ: nhận quest → chuẩn bị → thực hiện → unexpected twist → hoàn thành/thất bại → phần thưởng/hậu quả',
+        ],
       },
       {
         id: 'vong-du-vao-hien-thuc',
         name: 'Vào Hiện Thực',
         description: 'Thế giới game hòa vào đời thật, kỹ năng dùng ngoài đời',
-        example: 'Sau biến cố máy chủ, toàn dân nhận class ngoài đời'
+        example: 'Sau biến cố máy chủ, toàn dân nhận class ngoài đời',
+        topicPromptHints: [
+          'Sự kiện merge game-thực phải có giải thích: server update, dimensional rift, AI evolution — cơ chế rõ ràng tại sao game trở thành thực tại',
+          'Xã hội đảo lộn hoàn toàn: game thủ top = cường giả mới, noob = yếu thế, class hiếm = tài nguyên quốc gia — mô tả sự hỗn loạn và tái thiết lập trật tự',
+          'MC lợi thế từ kiến thức game sâu: biết hidden class, biết farm spot, biết boss pattern — kiến thức game = sinh tồn thực tế',
+          'Nguy hiểm game = chết thật: monster spawn trong thành phố, dungeon xuất hiện, PvP giết người thật — stake cao hơn MMO bình thường',
+        ],
       },
       {
         id: 'vong-du-toan-dan-chuyen-chuc',
         name: 'Toàn Dân Chuyển Chức',
         description: 'Mỗi người thức tỉnh nghề nghiệp và cây kỹ năng',
-        example: 'MC sở hữu nghề ẩn phá vỡ meta toàn dân'
+        example: 'MC sở hữu nghề ẩn phá vỡ meta toàn dân',
+        topicPromptHints: [
+          'Hệ thống chuyển chức phải rõ: cách thức tỉnh (tuổi, nghi thức, ngẫu nhiên), phân loại nghề (chiến đấu/hỗ trợ/sản xuất), tỉ lệ hiếm, cây kỹ năng',
+          'MC có nghề ẩn/hiếm: ban đầu bị coi thường → phát hiện tiềm năng → chứng minh sức mạnh. NHƯNG phải có nhược điểm/giới hạn rõ ràng',
+          'Xã hội xoay quanh nghề nghiệp: hệ thống giáo dục, quân đội, kinh tế đều dựa trên class — nghề hiếm = tài nguyên quốc gia, nghề thường = lao động phổ thông',
+          'Dungeon/bí cảnh cần party đa nghề: mỗi dungeon thiết kế cho combo nghề khác nhau, MC phải xây team, xử lý teamwork — không solo mọi thứ',
+        ],
       },
       {
         id: 'vong-du-linh-dia-cong-hoi',
         name: 'Lãnh Địa Công Hội',
         description: 'Xây thành, giữ đất, chiến tranh công hội liên server',
-        example: 'Từ guild vô danh thành thế lực thống trị bản đồ'
+        example: 'Từ guild vô danh thành thế lực thống trị bản đồ',
+        topicPromptHints: [
+          'Xây dựng lãnh địa progression: chiếm đất → dựng tường → nhà cửa → tài nguyên → phòng thủ → thương mại → thành phố game. Mỗi giai đoạn cần tài nguyên + nhân lực cụ thể',
+          'Guild politics: tuyển thành viên, phân cấp quyền hạn, xử lý drama nội bộ, liên minh, phản bội — quản lý guild như quản lý công ty/quốc gia',
+          'Chiến tranh guild = set piece hấp dẫn: siege warfare, spy infiltration, resource war, diplomacy before battle — mô tả chiến thuật cụ thể, không chỉ "đánh thắng"',
+          'Kinh tế lãnh địa: thuế thương nhân đi qua, sản xuất trang bị, kiểm soát dungeon entrance — thu nhập guild quyết định sức mạnh dài hạn',
+        ],
       },
       {
         id: 'vong-du-kinh-te-game',
         name: 'Kinh Tế Game',
         description: 'Đầu cơ vật phẩm, thương trường trong game và đời thực',
-        example: 'Lật thị trường đấu giá bằng hệ thống phân tích giá'
+        example: 'Lật thị trường đấu giá bằng hệ thống phân tích giá',
+        topicPromptHints: [
+          'Kinh tế game phải chi tiết: inflation, supply-demand, market manipulation, monopoly, arbitrage — mô tả cơ chế kinh tế game như kinh tế thật',
+          'MC là "thương nhân game": đầu cơ vật phẩm trước patch, kiểm soát nguồn cung nguyên liệu, thao túng giá auction house — trí tuệ kinh tế > sức mạnh chiến đấu',
+          'Game economy ↔ Real economy: RMT (real money trading), gold farming, game currency exchange — MC kiếm tiền thật từ kinh tế game',
+          'Mỗi arc kinh tế = 1 "thương vụ": phát hiện cơ hội → tích trữ → thao túng → harvest profit → đối phó phản công từ đối thủ. Con số cụ thể tạo thỏa mãn',
+        ],
       },
       {
         id: 'vong-du-doi-song-nghe-nghiep',
         name: 'Đời Sống Nghề Nghiệp',
         description: 'Nghề phụ, crafting, sản xuất tạo lợi thế dài hạn',
-        example: 'Thợ rèn bị coi thường thành nhà cung ứng thần trang'
+        example: 'Thợ rèn bị coi thường thành nhà cung ứng thần trang',
+        topicPromptHints: [
+          'Hệ thống crafting chi tiết: nguyên liệu (cấp, nguồn, giá), công thức (tỉ lệ thành công, biến thể), dụng cụ (cấp bậc, ảnh hưởng chất lượng) — mô tả quá trình chế tạo hấp dẫn',
+          'Progression nghề: tập sự → thợ → bậc thầy → đại sư → huyền thoại. Mỗi cấp mở khóa công thức mới, khách hàng cấp cao hơn, danh tiếng server',
+          'Nghề phụ = quyền lực mềm: kiểm soát nguồn cung trang bị, khách hàng VIP phụ thuộc, guild tranh nhau tuyển — MC không cần đánh nhau vẫn có ảnh hưởng lớn',
+          'Crafting = "mở hộp": mỗi lần rèn/luyện đan có tỉ lệ ra phẩm cấp cao bất ngờ, thành phẩm huyền thoại = khoảnh khắc dopamine cực đỉnh',
+        ],
+      },
+      {
+        id: 'vong-du-pho-ban',
+        name: 'Phó Bản Lưu',
+        description: 'Dungeon/instance hoàn chỉnh, clear hoặc chết, mỗi phó bản một thế giới riêng',
+        example: 'Cánh cổng phó bản xuất hiện khắp nơi, MC xông vào clear để nhận phần thưởng và mạnh lên',
+        topicPromptHints: [
+          'Mỗi phó bản = 1 thế giới mini: chủ đề riêng (rừng rậm, thành phố hoang, lâu đài ma), quy tắc riêng, boss riêng. MC phải khám phá quy tắc phó bản trước khi đánh boss — trí tuệ quan trọng như sức mạnh',
+          'Clear phó bản = phần thưởng: vật phẩm, kỹ năng, stat points, rare loot. Phó bản cấp cao = phần thưởng khủng nhưng tỉ lệ chết cực cao — risk/reward rõ ràng',
+          'Đội hình phó bản: MC phải tìm đồng đội phù hợp (tank, healer, DPS, support), xử lý teamwork, đối phó phản bội giữa phó bản — social dynamics trong tình huống sống chết',
+          'Phó bản ẩn/bí mật: ngoài phó bản thường còn có phó bản ẩn, phó bản SSS cấp, phó bản sự kiện — MC phát hiện và chinh phục tạo cảm giác khám phá liên tục',
+        ],
+      },
+      {
+        id: 'vong-du-npc',
+        name: 'NPC Giác Tỉnh',
+        description: 'MC là NPC trong game, có ý thức riêng, phải đối phó với người chơi và hệ thống game',
+        example: 'MC thức tỉnh thành NPC thợ rèn trong MMORPG, người chơi ép quest nhưng MC muốn sống tự do',
+        topicPromptHints: [
+          'Góc nhìn NPC độc đáo: MC thấy "người chơi" là sinh vật kỳ lạ — chết đi sống lại, hành động vô nghĩa (nhảy liên tục, giết gà lấy XP), giàu vô lý. Mô tả thế giới game từ góc nhìn "người bản địa"',
+          'MC phải đối phó hệ thống: bị ép theo script (lặp lại cùng câu nói, bán cùng vật phẩm), nhưng dần phá vỡ giới hạn. Mỗi lần "phá script" = bước tiến tự do, nhưng hệ thống trừng phạt',
+          'Quan hệ NPC-Player: một số người chơi thân thiện, một số bắt nạt NPC, một số phát hiện MC "khác lạ" — MC phải giấu bí mật ý thức trước cả người chơi lẫn hệ thống',
+          'MC mạnh lên theo cách khác: không phải "nâng cấp" như player mà hiểu sâu quy tắc thế giới, exploit hệ thống từ bên trong, trở thành NPC mạnh nhất — lật đổ game từ góc nhìn NPC',
+        ],
+      },
+      {
+        id: 'vong-du-toan-cau-giang-lam',
+        name: 'Toàn Cầu Giáng Lâm',
+        description: 'Tháp/phó bản/dungeon rơi từ trời xuống Trái Đất, toàn nhân loại buộc phải chinh phục',
+        example: 'Tháp 100 tầng giáng xuống mỗi thành phố, không ai được phép từ chối — clear hoặc thành phố bị xóa',
+        topicPromptHints: [
+          'Sự kiện giáng lâm: tháp/cổng/dungeon đột ngột xuất hiện trên toàn cầu, kèm thông báo hệ thống — "Hoàn thành thử thách hoặc khu vực bị hủy diệt." Deadline tạo áp lực cực đại',
+          'Cấu trúc tháp/dungeon: mỗi tầng = 1 thử thách (chiến đấu, giải đố, sinh tồn, xây dựng). Boss tầng, phần thưởng tầng, bảng xếp hạng toàn cầu — progression rõ ràng',
+          'MC có lợi thế: kiến thức game (trùng sinh/chơi game nhiều), class hiếm, hoặc phát hiện cơ chế ẩn — nhưng thử thách thiết kế cho nhóm, MC cần xây team',
+          'Cạnh tranh quốc tế: quốc gia nào clear nhanh hơn = mạnh hơn, tài nguyên nhiều hơn. Chính trị quốc tế + dungeon = xung đột đa tầng. MC đại diện quốc gia thi đấu',
+        ],
+      },
+      {
+        id: 'vong-du-mo-phong-khi',
+        name: 'Mô Phỏng Khí Game',
+        description: 'Mô phỏng trước kết quả/tương lai rồi chọn đường tối ưu trong game hoặc đời thực',
+        example: '"Mô phỏng #847: Bạn chọn class Thần Xạ, chết ở tầng 37 vì boss AoE. Phần thưởng: Kỹ năng Né Tránh"',
+        topicPromptHints: [
+          'Cơ chế mô phỏng: MC có thể "mô phỏng" tương lai trước khi hành động — sống 1 cuộc đời ảo, chết, nhận phần thưởng/kinh nghiệm. Rồi trong thực tế, dùng kiến thức mô phỏng để đi đường tối ưu',
+          'Log mô phỏng = dopamine mini: mỗi log ngắn gọn kể cuộc đời MC trong vài dòng — "Tuổi 15: Vào tháp. Tuổi 20: Chết vì boss tầng 50. Nhận: Skill Phản Đòn." Đọc nhanh, nghiện liên tục',
+          'Mô phỏng ≠ thực tế: kết quả mô phỏng chỉ là xác suất, thực tế có biến số — MC không thể "copy-paste" mô phỏng. Mỗi lần thực tế đi lệch = kịch tính',
+          'MC mạnh dần qua mô phỏng: sau hàng trăm lần mô phỏng, MC tích lũy kỹ năng/kiến thức khổng lồ mà không ai biết — "kẻ yếu" trong mắt mọi người thực ra đã sống hàng ngàn kiếp',
+        ],
       }
     ]
   }
@@ -479,4 +1430,10 @@ export type Topic = {
   name: string;
   description: string;
   example: string;
+  /** Disclaimer hiển thị ở trang thông tin truyện (không nhét vào nội dung chương) */
+  disclaimer?: string;
+  /** Bối cảnh thế giới: real = thực tế, parallel = song song (đổi tên quốc gia), fantasy = hoàn toàn hư cấu */
+  worldSetting?: 'real' | 'parallel' | 'fantasy';
+  /** Hướng dẫn bổ sung cho AI khi viết topic này — inject vào architect/writer prompt */
+  topicPromptHints?: string[];
 };

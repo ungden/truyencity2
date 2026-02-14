@@ -47,6 +47,14 @@ const SOURCE_TOPIC_SEEDS: Record<string, string[]> = {
     'mở tiệm net mô phỏng bí cảnh cho tu sĩ',
     'hải vực săn bảo, đoạt truyền thừa cổ tiên',
     'sơn lâm săn yêu thú đổi điểm cống hiến tông môn',
+    // Wave 2: summoning, family, livestream, simulator, alchemy
+    'triệu hoán viễn cổ thần thú từ trứng phế vật',
+    'ký khế linh thú tiến hóa, đấu trường liên tông',
+    'xây gia tộc tu tiên xuyên mười đời tích lũy',
+    'livestream tu tiên cho phàm nhân, triệu viewer xem đột phá',
+    'mô phỏng ngàn kiếp tu tiên rồi chọn đường tối ưu',
+    'đan sư phế vật luyện ra thần đan chấn động tu tiên giới',
+    'luyện khí sư mở tiệm pháp bảo, cường giả xếp hàng chờ',
   ],
   'huyen-huyen': [
     'học viện ma pháp + chiến tranh chủng tộc',
@@ -58,6 +66,15 @@ const SOURCE_TOPIC_SEEDS: Record<string, string[]> = {
     'mở tiệm net ma pháp trong thành học viện',
     'trang trại ma dược và thương hội liên quốc',
     'thợ săn ma thú rừng sâu thành lãnh chủ',
+    // Wave 2: summoning, lord, infinite, occult, necromancer, tower, academy
+    'toàn dân ngự thú, MC triệu hoán được phế vật thực ra là thần thú',
+    'triệu hoán vạn tộc binh chủng chinh phạt đại lục',
+    'toàn dân nhận lãnh địa dị giới, MC lãnh địa SSS',
+    'vào phó bản phim kinh dị sống sót, chết là chết thật',
+    'quỷ mật thế giới quy tắc siêu nhiên, suy luận để sống',
+    'tử linh pháp sư xây quân đoàn vong linh từ chiến trường cũ',
+    'leo tháp vô tận mười ngàn tầng, đỉnh tháp thành thần',
+    'phế vật vào học viện ma pháp đệ nhất, leo bảng xếp hạng',
   ],
   'do-thi': [
     'livestream nghèo thành đỉnh lưu',
@@ -72,6 +89,17 @@ const SOURCE_TOPIC_SEEDS: Record<string, string[]> = {
     'lên núi săn thú hợp pháp kết hợp livestream',
     'mở tiệm net cũ thành trung tâm esports',
     'võng du vào hiện thực, kỹ năng game dùng ngoài đời',
+    // Wave 2: literary, face-slap, medical, antique, culinary, livestream, entertainment, horror, rich, disaster
+    'xuyên đến thế giới không có Kim Dung, viết lại kiếm hiệp gây chấn động',
+    'rể hờ ba năm bị nhục, lộ thân phận Long Vương cả gia tộc quỳ',
+    'thần y đô thị chữa bệnh nan y, kết giao giới thượng lưu',
+    'thiên nhãn nhìn thấu cổ vật, mua rẻ bán đắt thành ông trùm',
+    'đầu bếp vỉa hè có bàn tay vàng, thi đấu ẩm thực quốc tế',
+    'livestream câu cá biển sâu, kéo lên cá quý tiền tỷ',
+    'trùng sinh thành diễn viên quần chúng, thành ảnh đế giải trí',
+    'quy tắc quái đàm: tài xế cười thì xuống xe, suy luận để sống',
+    'hệ thống thần hào: tiêu 10 tỷ trong 24 giờ, càng tiêu càng giàu',
+    'biết trước động đất sắp xảy ra, tích trữ xây bunker sinh tồn',
   ],
   'khoa-huyen': [
     'tận thế bug hệ thống + thành phố bunker',
@@ -84,6 +112,12 @@ const SOURCE_TOPIC_SEEDS: Record<string, string[]> = {
     'mở net-cafe VR thành trung tâm huấn luyện',
     'kinh doanh công nghệ lõi trong thời mạt thế',
     'đi biển săn tài nguyên ở đại dương độc hại',
+    // Wave 2: insect, ice-age, wasteland, global-evolution, space
+    'trùng tộc khổng lồ tấn công, chống lại trùng mẫu hoàng hậu',
+    'kỷ băng hà -80 độ, di cư tìm vùng đất ấm cuối cùng',
+    'phế thổ hậu hạt nhân, scavenger lặn phế tích tìm công nghệ',
+    'toàn cầu tiến hóa bắt buộc, hệ thống xếp hạng thế giới',
+    'toàn dân nhận phi thuyền, khai phá vũ trụ cạnh tranh hạm đội',
   ],
   'lich-su': [
     'hàn môn sĩ tử khuấy triều đình',
@@ -96,6 +130,15 @@ const SOURCE_TOPIC_SEEDS: Record<string, string[]> = {
     'đội tàu hải thương tranh cảng chiến lược',
     'thợ săn miền núi lập nghiệp biên cương',
     'xuyên thời gian mở tiệm net chiến cờ cho võ tướng',
+    // Wave 2: summon generals, summon strategists, factory, infrastructure, military, doctor, food, tourism
+    'triệu hoán Triệu Vân, Lữ Bố xây quân đoàn danh tướng',
+    'triệu hoán Gia Cát Lượng, Phạm Lãi trị quốc kiến nghiệp',
+    'kỹ sư xuyên về cổ đại mở nhà máy cách mạng công nghiệp',
+    'xuyên không đắp đê trị thủy, xây đường nối biên cương',
+    'đặc nhiệm xuyên về thời loạn cải cách quân sự bất bại',
+    'bác sĩ xuyên không làm thần y triều đình cứu vạn dân',
+    'đầu bếp xuyên về Đường triều, xào rau khiến kinh thành xếp hàng',
+    'mở cổng thời gian dẫn du khách hiện đại về cổ đại du lịch',
   ],
   'dong-nhan': [
     'xuyên vào vai phản diện phụ',
@@ -104,6 +147,11 @@ const SOURCE_TOPIC_SEEDS: Record<string, string[]> = {
     'bản thể phụ tỉnh thức chống tác giả',
     'hệ thống nhiệm vụ trong thế giới IP gốc',
     'liên động đa vũ trụ fanfic',
+    // Wave 2: summon characters, book transmigration, chat group, multiverse livestream
+    'triệu hoán Naruto + Goku + Iron Man vào cùng đội chiến đấu',
+    'xuyên vào tiểu thuyết sửa bug cốt truyện trước khi thế giới sụp',
+    'nhóm chat xuyên vũ trụ: Tôn Ngộ Không trade đan dược với Batman',
+    'livestream cuộc đời anh hùng/phản diện cho vạn giới comment',
   ],
   'vong-du': [
     'class ẩn sau khi bị kick khỏi top guild',
@@ -116,6 +164,11 @@ const SOURCE_TOPIC_SEEDS: Record<string, string[]> = {
     'toàn dân chuyển chức, nghề ẩn mở khóa từ nhiệm vụ cấm',
     'kinh tế game thao túng chợ đấu giá liên server',
     'mở tiệm net chiến thuật và đào tạo tuyển thủ',
+    // Wave 2: dungeon, NPC, global descent, simulator
+    'phó bản xuất hiện khắp nơi, clear hoặc chết không có lựa chọn khác',
+    'NPC thức tỉnh trong game, đối phó người chơi và phá vỡ hệ thống',
+    'tháp 100 tầng giáng xuống mỗi thành phố, clear hoặc bị xóa',
+    'mô phỏng ngàn lần chọn class tối ưu trước khi hành động thật',
   ],
 };
 
@@ -985,7 +1038,7 @@ NHỊP CỐT TRUYỆN (ƯU TIÊN SƯỚNG VĂN MAINSTREAM):
 - Giữ mâu thuẫn hợp lý nhưng tỷ trọng cảm giác thắng thế phải cao hơn cảm giác bế tắc.
 - Tránh nội dung phản cảm/lowbrow; giữ chất lượng đại chúng lâu dài.
 
-MẪU TÊN TRUYỆN - Học từ webnovels HOT nhất Trung Quốc:
+MẪU TÊN TRUYỆN - Học từ webnovels HOT nhất:
 • [Số Lớn]+[Cảnh Giới]: Vạn Cổ Thần Đế, Cửu Tinh Bá Thể Quyết → Epicness
 • [Động Từ]+[Vũ Trụ]: Thôn Phệ Tinh Không (360M views), Già Thiên (450M) → Power
 • [Bí Ẩn]+Chi+[Chủ]: Quỷ Bí Chi Chủ (9.4★ highest rated) → Mystery Hook
