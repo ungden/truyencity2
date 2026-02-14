@@ -167,7 +167,7 @@ export default function NovelDetailScreen() {
 
       // Fetch recommended novels (same genre)
       if (data.genres && data.genres.length > 0) {
-        const LIST_FIELDS = "id,title,slug,author,cover_url,genres,status,created_at,updated_at,chapters(count)";
+        const LIST_FIELDS = "id,title,slug,author,cover_url,genres,status,created_at,updated_at,chapter_count";
         const { data: recData } = await supabase
           .from("novels")
           .select(LIST_FIELDS)
@@ -233,7 +233,7 @@ export default function NovelDetailScreen() {
   }
 
   // ── Derived data ──
-  const chapterCount = novel.chapters?.[0]?.count ?? 0;
+  const chapterCount = novel.chapter_count ?? novel.chapters?.[0]?.count ?? 0;
   const readChapter = resumeChapter || 1;
   const ctaLabel = resumeChapter ? `Tiếp tục Ch.${resumeChapter}` : "Đọc truyện";
   const visibleChapters = chaptersExpanded ? chapters : chapters.slice(0, CHAPTERS_PER_PAGE);

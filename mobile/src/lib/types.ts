@@ -14,6 +14,7 @@ export type Novel = {
   owner_id?: string | null;
   created_at: string;
   updated_at?: string | null;
+  chapter_count?: number | null;
   chapters?: { count: number }[] | null;
   rating?: number | null;
   view_count?: number | null;

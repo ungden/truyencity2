@@ -82,7 +82,7 @@ export default function LibraryScreen() {
             novelIds.push(h.novel_id);
           }
         }
-        const NOVEL_LIST_FIELDS = "id,title,slug,author,cover_url,genres,status,ai_author_id,created_at,updated_at,chapters(count)";
+        const NOVEL_LIST_FIELDS = "id,title,slug,author,cover_url,genres,status,ai_author_id,created_at,updated_at,chapter_count";
         const { data: novels } = await supabase
           .from("novels")
           .select(NOVEL_LIST_FIELDS)
@@ -105,7 +105,7 @@ export default function LibraryScreen() {
         const novelIds = (bookmarkRes.data as BookmarkItem[]).map(
           (b) => b.novel_id
         );
-        const NOVEL_LIST_FIELDS = "id,title,slug,author,cover_url,genres,status,ai_author_id,created_at,updated_at,chapters(count)";
+        const NOVEL_LIST_FIELDS = "id,title,slug,author,cover_url,genres,status,ai_author_id,created_at,updated_at,chapter_count";
         const { data: novels } = await supabase
           .from("novels")
           .select(NOVEL_LIST_FIELDS)
@@ -124,8 +124,9 @@ export default function LibraryScreen() {
   }
 
   function getChapterCount(novel: Novel): number {
-    if (!novel.chapters || novel.chapters.length === 0) return 0;
-    return novel.chapters[0]?.count ?? 0;
+    if (novel.chapter_count != null) return novel.chapter_count;
+    if (novel.chapters && Array.isArray(novel.chapters) && novel.chapters.length > 0) return novel.chapters[0]?.count ?? 0;
+    return 0;
   }
 
   // Not logged in — centered in a ScrollView so it respects header inset

@@ -25,7 +25,7 @@ export default function RankingsScreen() {
   const fetchRankings = useCallback(async (mode: SortMode) => {
     setLoading(true);
     try {
-      const NOVEL_LIST_FIELDS = "id,title,slug,author,cover_url,genres,status,ai_author_id,created_at,updated_at,chapters(count)";
+      const NOVEL_LIST_FIELDS = "id,title,slug,author,cover_url,genres,status,ai_author_id,created_at,updated_at,chapter_count";
       let query = supabase
         .from("novels")
         .select(NOVEL_LIST_FIELDS)

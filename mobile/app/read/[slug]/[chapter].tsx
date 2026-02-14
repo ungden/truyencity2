@@ -1,51 +1,100 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import {
   ActivityIndicator,
   useWindowDimensions,
   ScrollView as RNScrollView,
   NativeScrollEvent,
   NativeSyntheticEvent,
+  Animated,
+  StatusBar,
 } from "react-native";
 import { View, Text, Pressable } from "@/tw";
 import { useLocalSearchParams, Stack, router } from "expo-router";
 import { supabase } from "@/lib/supabase";
-import { READING, CACHE } from "@/lib/config";
+import {
+  READING,
+  CACHE,
+  READER_THEMES,
+  READER_FONTS,
+  type ReaderSettings,
+  type ReaderThemeId,
+} from "@/lib/config";
 import type { Chapter } from "@/lib/types";
 import RenderHtml from "react-native-render-html";
 import * as Haptics from "expo-haptics";
 import { useTTS } from "@/hooks/use-tts";
 import { TTS_SPEEDS } from "@/lib/tts";
 import { getChapterOffline } from "@/lib/offline-db";
+import { useKeepAwake } from "expo-keep-awake";
+import ReaderSettingsSheet from "@/components/reader-settings-sheet";
 
-type ReadingSettings = {
-  fontSize: number;
-  lineHeight: number;
+// ── Settings persistence ─────────────────────────────────────
+
+const DEFAULT_SETTINGS: ReaderSettings = {
+  fontSize: READING.DEFAULT_FONT_SIZE,
+  lineHeight: READING.DEFAULT_LINE_HEIGHT,
+  theme: "dark",
+  fontFamily: "system",
+  brightness: 0.8,
+  ttsSpeed: 1.0,
+  autoScrollSpeed: 0,
 };
 
-function getStoredSettings(): ReadingSettings {
+function getStoredSettings(): ReaderSettings {
   try {
     const raw = localStorage.getItem(CACHE.READING_SETTINGS_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      return { ...DEFAULT_SETTINGS, ...parsed };
+    }
   } catch {}
-  return {
-    fontSize: READING.DEFAULT_FONT_SIZE,
-    lineHeight: READING.DEFAULT_LINE_HEIGHT,
-  };
+  return DEFAULT_SETTINGS;
 }
 
-function saveSettings(s: ReadingSettings) {
+function saveSettings(s: ReaderSettings) {
   localStorage.setItem(CACHE.READING_SETTINGS_KEY, JSON.stringify(s));
 }
+
+// ── Strip duplicate chapter heading from content ─────────────
+
+function stripChapterHeading(html: string, chapterNumber: number, title: string): string {
+  // Many chapters start with "Chương X: Title" or "Chương X - Title" as first line
+  // Since we render it separately, strip it from content
+  const patterns = [
+    // "Chương 1: Title" as plain text at start
+    new RegExp(`^\\s*Chương\\s+${chapterNumber}[:\\s-–—]+${escapeRegex(title)}[.!?]*\\s*`, "i"),
+    // Wrapped in tags: <p>Chương 1: Title</p> or <h1>...</h1> etc
+    new RegExp(`^\\s*<(?:p|h[1-6]|div|strong)[^>]*>\\s*Chương\\s+${chapterNumber}[:\\s-–—]+[^<]*<\\/(?:p|h[1-6]|div|strong)>\\s*`, "i"),
+    // Just "Chương X:" without title
+    new RegExp(`^\\s*<(?:p|h[1-6]|div|strong)[^>]*>\\s*Chương\\s+${chapterNumber}[:\\s-–—]*[^<]*<\\/(?:p|h[1-6]|div|strong)>\\s*`, "i"),
+  ];
+
+  let result = html;
+  for (const pat of patterns) {
+    result = result.replace(pat, "");
+  }
+  return result;
+}
+
+function escapeRegex(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+// ── Main Component ───────────────────────────────────────────
 
 export default function ReadingScreen() {
   const { slug, chapter } = useLocalSearchParams<{
     slug: string;
     chapter: string;
   }>();
-  const { width } = useWindowDimensions();
+  const { width, height: screenHeight } = useWindowDimensions();
   const scrollRef = useRef<RNScrollView>(null);
   const chapterNumber = parseInt(chapter || "1", 10);
 
+  // Keep screen awake while reading
+  useKeepAwake();
+
+  // State
   const [novelId, setNovelId] = useState<string | null>(null);
   const [novelTitle, setNovelTitle] = useState("");
   const [currentChapter, setCurrentChapter] = useState<Chapter | null>(null);
@@ -53,18 +102,93 @@ export default function ReadingScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [settings, setSettings] = useState<ReadingSettings>(getStoredSettings);
+  const [settings, setSettings] = useState<ReaderSettings>(getStoredSettings);
   const [showControls, setShowControls] = useState(true);
+  const [showSettings, setShowSettings] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isOffline, setIsOffline] = useState(false);
 
-  // TTS
+  // Auto-scroll
+  const autoScrollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const scrollOffsetRef = useRef(0);
+  const maxScrollRef = useRef(0);
+
+  // TTS — init with persisted speed
   const tts = useTTS();
+  const ttsSpeedInitialized = useRef(false);
+
+  // Initialize TTS speed from stored settings
+  useEffect(() => {
+    if (!ttsSpeedInitialized.current && settings.ttsSpeed !== 1.0) {
+      tts.setSpeed(settings.ttsSpeed);
+      ttsSpeedInitialized.current = true;
+    }
+  }, [settings.ttsSpeed]);
+
+  // Active theme
+  const theme = READER_THEMES[settings.theme];
+
+  // Brightness is controlled via a dark overlay (no native module needed)
+  // settings.brightness: 1 = full bright (no overlay), 0 = very dim
+  const brightnessOverlayOpacity = 1 - settings.brightness;
 
   // Stop TTS when chapter changes
   useEffect(() => {
     tts.stop();
   }, [slug, chapter]);
+
+  // Auto-scroll logic
+  useEffect(() => {
+    if (settings.autoScrollSpeed > 0 && !showSettings) {
+      // Clear any existing interval
+      if (autoScrollRef.current) clearInterval(autoScrollRef.current);
+
+      const pxPerTick = settings.autoScrollSpeed / 20; // 50ms interval = 20 ticks/sec
+      autoScrollRef.current = setInterval(() => {
+        if (scrollRef.current && maxScrollRef.current > 0) {
+          scrollOffsetRef.current = Math.min(
+            scrollOffsetRef.current + pxPerTick,
+            maxScrollRef.current
+          );
+          scrollRef.current.scrollTo({
+            y: scrollOffsetRef.current,
+            animated: false,
+          });
+        }
+      }, 50);
+    } else {
+      if (autoScrollRef.current) {
+        clearInterval(autoScrollRef.current);
+        autoScrollRef.current = null;
+      }
+    }
+
+    return () => {
+      if (autoScrollRef.current) clearInterval(autoScrollRef.current);
+    };
+  }, [settings.autoScrollSpeed, showSettings]);
+
+  // ── Settings update handler ──
+
+  function updateSettings(partial: Partial<ReaderSettings>) {
+    setSettings((prev) => {
+      const next = { ...prev, ...partial };
+      saveSettings(next);
+
+      // Sync TTS speed if changed
+      if (partial.ttsSpeed !== undefined) {
+        tts.setSpeed(partial.ttsSpeed);
+      }
+
+      return next;
+    });
+
+    if (process.env.EXPO_OS === "ios") {
+      Haptics.selectionAsync();
+    }
+  }
+
+  // ── TTS handlers ──
 
   function handleTTSToggle() {
     if (tts.status === "idle") {
@@ -81,13 +205,16 @@ export default function ReadingScreen() {
   function cycleTTSSpeed() {
     const currentIdx = TTS_SPEEDS.findIndex((s) => s.rate === tts.speed);
     const nextIdx = (currentIdx + 1) % TTS_SPEEDS.length;
-    tts.setSpeed(TTS_SPEEDS[nextIdx].rate);
+    const newRate = TTS_SPEEDS[nextIdx].rate;
+    tts.setSpeed(newRate);
+    updateSettings({ ttsSpeed: newRate });
     if (process.env.EXPO_OS === "ios") {
       Haptics.selectionAsync();
     }
   }
 
-  // Fetch chapter data
+  // ── Fetch chapter data ──
+
   useEffect(() => {
     if (slug && chapter) fetchChapter();
   }, [slug, chapter]);
@@ -96,7 +223,6 @@ export default function ReadingScreen() {
     setLoading(true);
     setError(null);
     try {
-      // Resolve slug to novel
       const { data: novelData, error: novelError } = await supabase
         .from("novels")
         .select("id, title, slug")
@@ -104,7 +230,6 @@ export default function ReadingScreen() {
         .single();
 
       if (novelError || !novelData) {
-        // Try by ID
         const { data: byId } = await supabase
           .from("novels")
           .select("id, title, slug")
@@ -132,7 +257,7 @@ export default function ReadingScreen() {
   }
 
   async function fetchChapterData(nId: string) {
-    // Offline-first: check local SQLite cache
+    // Offline-first
     try {
       const offlineChapter = getChapterOffline(nId, chapterNumber);
       if (offlineChapter && offlineChapter.content) {
@@ -145,8 +270,6 @@ export default function ReadingScreen() {
           created_at: offlineChapter.downloaded_at,
         });
         setIsOffline(true);
-
-        // Still try to get total chapter count (may fail offline)
         try {
           const { count } = await supabase
             .from("chapters")
@@ -154,18 +277,13 @@ export default function ReadingScreen() {
             .eq("novel_id", nId);
           setTotalChapters(count || 0);
         } catch {
-          // Offline — estimate from cached chapters or use 0
           setTotalChapters(0);
         }
-
         saveProgress(nId, chapterNumber);
         return;
       }
-    } catch {
-      // SQLite error — fall through to online fetch
-    }
+    } catch {}
 
-    // Online fetch
     setIsOffline(false);
     const [chapterRes, countRes] = await Promise.all([
       supabase
@@ -187,14 +305,11 @@ export default function ReadingScreen() {
 
     setCurrentChapter(chapterRes.data);
     setTotalChapters(countRes.count || 0);
-
-    // Save reading progress
     saveProgress(nId, chapterNumber);
   }
 
   async function saveProgress(nId: string, chapNum: number) {
     try {
-      // Local storage
       const progressKey = CACHE.READING_PROGRESS_KEY;
       const existing = JSON.parse(localStorage.getItem(progressKey) || "{}");
       existing[nId] = {
@@ -204,7 +319,6 @@ export default function ReadingScreen() {
       };
       localStorage.setItem(progressKey, JSON.stringify(existing));
 
-      // Server (if logged in)
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -225,7 +339,8 @@ export default function ReadingScreen() {
     }
   }
 
-  // Navigation
+  // ── Navigation ──
+
   const hasPrev = chapterNumber > 1;
   const hasNext = chapterNumber < totalChapters;
 
@@ -236,29 +351,14 @@ export default function ReadingScreen() {
     router.replace(`/read/${slug}/${num}`);
   }
 
-  // Font size controls
-  function adjustFontSize(delta: number) {
-    setSettings((prev) => {
-      const next = {
-        ...prev,
-        fontSize: Math.max(
-          READING.MIN_FONT_SIZE,
-          Math.min(READING.MAX_FONT_SIZE, prev.fontSize + delta)
-        ),
-      };
-      saveSettings(next);
-      return next;
-    });
-    if (process.env.EXPO_OS === "ios") {
-      Haptics.selectionAsync();
-    }
-  }
+  // ── Scroll handling ──
 
-  // Scroll handling
   const handleScroll = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
       const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
       const maxScroll = contentSize.height - layoutMeasurement.height;
+      maxScrollRef.current = maxScroll;
+      scrollOffsetRef.current = contentOffset.y;
       if (maxScroll > 0) {
         const pct = Math.round((contentOffset.y / maxScroll) * 100);
         setScrollProgress(Math.min(100, Math.max(0, pct)));
@@ -267,67 +367,138 @@ export default function ReadingScreen() {
     []
   );
 
-  // Toggle controls on tap
-  function toggleControls() {
-    setShowControls((prev) => !prev);
+  // ── Tap zones ──
+  // Left 1/3 = scroll up one viewport, Center 1/3 = toggle controls, Right 1/3 = scroll down
+
+  function handleTapZone(pageX: number) {
+    if (showSettings) {
+      setShowSettings(false);
+      return;
+    }
+
+    const leftZone = width / 3;
+    const rightZone = (width * 2) / 3;
+
+    if (pageX < leftZone) {
+      // Tap left — scroll up by screen height
+      const newOffset = Math.max(0, scrollOffsetRef.current - (screenHeight - 120));
+      scrollRef.current?.scrollTo({ y: newOffset, animated: true });
+      if (process.env.EXPO_OS === "ios") Haptics.selectionAsync();
+    } else if (pageX > rightZone) {
+      // Tap right — scroll down by screen height
+      const newOffset = Math.min(
+        maxScrollRef.current,
+        scrollOffsetRef.current + (screenHeight - 120)
+      );
+      scrollRef.current?.scrollTo({ y: newOffset, animated: true });
+      if (process.env.EXPO_OS === "ios") Haptics.selectionAsync();
+    } else {
+      // Tap center — toggle controls
+      setShowControls((prev) => !prev);
+    }
   }
 
-  // Build HTML source for RenderHtml
-  const htmlSource = currentChapter?.content
-    ? { html: currentChapter.content }
-    : undefined;
+  // ── HTML rendering ──
 
-  const tagsStyles = {
-    body: {
-      color: "#e4e4e7", // zinc-200
-      fontSize: settings.fontSize,
-      lineHeight: settings.fontSize * settings.lineHeight,
-    },
-    p: {
-      marginBottom: 16,
-    },
-    h1: {
-      fontSize: settings.fontSize + 8,
-      fontWeight: "bold" as const,
-      marginBottom: 16,
-      marginTop: 24,
-      color: "#fafafa",
-    },
-    h2: {
-      fontSize: settings.fontSize + 4,
-      fontWeight: "600" as const,
-      marginBottom: 12,
-      marginTop: 20,
-      color: "#fafafa",
-    },
-    h3: {
-      fontSize: settings.fontSize + 2,
-      fontWeight: "600" as const,
-      marginBottom: 8,
-      marginTop: 16,
-      color: "#fafafa",
-    },
-    blockquote: {
-      borderLeftWidth: 4,
-      borderLeftColor: "#52525b",
-      paddingLeft: 16,
-      fontStyle: "italic" as const,
-      color: "#a1a1aa",
-    },
-    a: {
-      color: "#a78bfa",
-      textDecorationLine: "none" as const,
-    },
-  };
+  const fontFamily = READER_FONTS.find((f) => f.id === settings.fontFamily)?.fontFamily || "System";
 
-  // --- Render ---
+  const cleanedHtml = useMemo(() => {
+    if (!currentChapter?.content) return "";
+    let content = stripChapterHeading(
+      currentChapter.content,
+      chapterNumber,
+      currentChapter.title || ""
+    );
+
+    // If content is plain text (no HTML tags), wrap paragraphs in <p> tags
+    const hasHtmlTags = /<\/?[a-z][\s\S]*>/i.test(content);
+    if (!hasHtmlTags) {
+      content = content
+        .split(/\n\n+/)
+        .map((para) => para.trim())
+        .filter((para) => para.length > 0)
+        .map((para) => `<p>${para.replace(/\n/g, "<br/>")}</p>`)
+        .join("");
+    }
+
+    return content;
+  }, [currentChapter?.content, chapterNumber, currentChapter?.title]);
+
+  const htmlSource = cleanedHtml ? { html: cleanedHtml } : undefined;
+
+  const tagsStyles = useMemo(
+    () => ({
+      body: {
+        color: theme.text,
+        fontSize: settings.fontSize,
+        lineHeight: settings.fontSize * settings.lineHeight,
+        fontFamily,
+      },
+      p: {
+        marginBottom: 20,
+        textAlign: "justify" as const,
+        textIndent: 24,
+      },
+      h1: {
+        fontSize: settings.fontSize + 8,
+        fontWeight: "bold" as const,
+        marginBottom: 16,
+        marginTop: 24,
+        color: theme.heading,
+        fontFamily,
+      },
+      h2: {
+        fontSize: settings.fontSize + 4,
+        fontWeight: "600" as const,
+        marginBottom: 12,
+        marginTop: 20,
+        color: theme.heading,
+        fontFamily,
+      },
+      h3: {
+        fontSize: settings.fontSize + 2,
+        fontWeight: "600" as const,
+        marginBottom: 8,
+        marginTop: 16,
+        color: theme.heading,
+        fontFamily,
+      },
+      blockquote: {
+        borderLeftWidth: 4,
+        borderLeftColor: theme.blockquoteBorder,
+        paddingLeft: 16,
+        fontStyle: "italic" as const,
+        color: theme.textSecondary,
+      },
+      a: {
+        color: theme.linkColor,
+        textDecorationLine: "none" as const,
+      },
+    }),
+    [theme, settings.fontSize, settings.lineHeight, fontFamily]
+  );
+
+  // ── Control bar fade animation ──
+
+  const controlOpacity = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    Animated.timing(controlOpacity, {
+      toValue: showControls ? 1 : 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  }, [showControls]);
+
+  // ── Render ──
 
   if (loading) {
     return (
       <>
-        <Stack.Screen options={{ title: "" }} />
-        <View className="flex-1 bg-[#09090b] items-center justify-center">
-          <ActivityIndicator size="large" color="#a78bfa" />
+        <Stack.Screen options={{ title: "", headerShown: false }} />
+        <StatusBar barStyle={theme.statusBar === "light" ? "light-content" : "dark-content"} />
+        <View style={{ flex: 1, backgroundColor: theme.bg, alignItems: "center", justifyContent: "center" }}>
+          <ActivityIndicator size="large" color={theme.accent} />
         </View>
       </>
     );
@@ -336,18 +507,16 @@ export default function ReadingScreen() {
   if (error || !currentChapter) {
     return (
       <>
-        <Stack.Screen options={{ title: "Lỗi" }} />
-        <View className="flex-1 bg-[#09090b] items-center justify-center gap-4 px-6">
-          <Text className="text-white text-lg text-center">
+        <Stack.Screen options={{ title: "Lỗi", headerShown: true }} />
+        <View style={{ flex: 1, backgroundColor: theme.bg, alignItems: "center", justifyContent: "center", gap: 16, paddingHorizontal: 24 }}>
+          <Text style={{ color: theme.text, fontSize: 18, textAlign: "center" }}>
             {error || "Không tìm thấy nội dung"}
           </Text>
           <Pressable
             onPress={() => router.back()}
-            className="bg-primary px-6 py-3 rounded-xl"
+            style={{ backgroundColor: theme.accent, paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 }}
           >
-            <Text className="text-primary-foreground font-semibold">
-              Quay lại
-            </Text>
+            <Text style={{ color: "#fff", fontWeight: "600" }}>Quay lại</Text>
           </Pressable>
         </View>
       </>
@@ -356,61 +525,122 @@ export default function ReadingScreen() {
 
   return (
     <>
-      <Stack.Screen
-        options={{
-          title: `Ch. ${chapterNumber}`,
-          headerShown: showControls,
-          headerStyle: { backgroundColor: "#09090b" },
-          headerTintColor: "#fafafa",
-          headerBackButtonDisplayMode: "minimal",
-        }}
-      />
+      <Stack.Screen options={{ headerShown: false }} />
+      <StatusBar barStyle={theme.statusBar === "light" ? "light-content" : "dark-content"} />
 
-      {/* Progress bar */}
-      <View className="h-[2px] bg-zinc-800">
+      {/* ── Top header bar ── */}
+      <Animated.View
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 50,
+          backgroundColor: theme.barBg,
+          paddingTop: 54, // safe area
+          paddingBottom: 12,
+          paddingHorizontal: 16,
+          flexDirection: "row",
+          alignItems: "center",
+          opacity: controlOpacity,
+          borderBottomWidth: 1,
+          borderBottomColor: theme.controlBorder,
+        }}
+        pointerEvents={showControls ? "auto" : "none"}
+      >
+        <Pressable
+          onPress={() => router.back()}
+          hitSlop={12}
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: 18,
+            backgroundColor: theme.controlBg,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Text style={{ color: theme.text, fontSize: 20, marginTop: -2 }}>{"‹"}</Text>
+        </Pressable>
+        <View style={{ flex: 1, marginLeft: 12 }}>
+          <Text style={{ color: theme.textSecondary, fontSize: 12 }} numberOfLines={1}>
+            {novelTitle}
+          </Text>
+          <Text style={{ color: theme.text, fontSize: 15, fontWeight: "600" }} numberOfLines={1}>
+            Ch. {chapterNumber}: {currentChapter.title}
+          </Text>
+        </View>
+        {isOffline && (
+          <View
+            style={{
+              backgroundColor: "#22c55e20",
+              paddingHorizontal: 8,
+              paddingVertical: 4,
+              borderRadius: 6,
+              marginLeft: 8,
+            }}
+          >
+            <Text style={{ color: "#22c55e", fontSize: 10, fontWeight: "700" }}>OFFLINE</Text>
+          </View>
+        )}
+      </Animated.View>
+
+      {/* ── Progress bar (always visible, thin) ── */}
+      <View
+        style={{
+          position: "absolute",
+          top: showControls ? 102 : 0,
+          left: 0,
+          right: 0,
+          height: 2,
+          backgroundColor: theme.controlBorder,
+          zIndex: 49,
+        }}
+      >
         <View
-          className="h-full bg-primary"
-          style={{ width: `${scrollProgress}%` }}
+          style={{
+            height: "100%",
+            backgroundColor: theme.accent,
+            width: `${scrollProgress}%`,
+          }}
         />
       </View>
 
+      {/* ── Content area with tap zones ── */}
       <Pressable
-        onPress={toggleControls}
-        style={{ flex: 1, backgroundColor: "#09090b" }}
+        onPress={(e) => handleTapZone(e.nativeEvent.pageX)}
+        style={{ flex: 1, backgroundColor: theme.bg }}
       >
         <RNScrollView
           ref={scrollRef}
           style={{ flex: 1 }}
-          contentContainerStyle={{ padding: 16, paddingBottom: 128 }}
+          contentContainerStyle={{
+            paddingHorizontal: 20,
+            paddingTop: showControls ? 116 : 52,
+            paddingBottom: 160,
+          }}
           onScroll={handleScroll}
           scrollEventThrottle={16}
+          showsVerticalScrollIndicator={false}
         >
-          {/* Chapter header */}
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 4 }}>
-            <Text className="text-zinc-400 text-sm">{novelTitle}</Text>
-            {isOffline && (
-              <View
-                style={{
-                  backgroundColor: "#22c55e20",
-                  paddingHorizontal: 6,
-                  paddingVertical: 2,
-                  borderRadius: 4,
-                }}
-              >
-                <Text style={{ color: "#22c55e", fontSize: 10, fontWeight: "600" }}>
-                  Offline
-                </Text>
-              </View>
-            )}
-          </View>
-          <Text className="text-white text-xl font-bold mb-6">
+          {/* Chapter heading */}
+          <Text
+            style={{
+              color: theme.heading,
+              fontSize: settings.fontSize + 6,
+              fontWeight: "800",
+              fontFamily,
+              marginBottom: 24,
+              lineHeight: (settings.fontSize + 6) * 1.3,
+            }}
+          >
             Chương {chapterNumber}: {currentChapter.title}
           </Text>
 
           {/* Chapter content */}
           {htmlSource && (
             <RenderHtml
-              contentWidth={width - 32}
+              contentWidth={width - 40}
               source={htmlSource}
               tagsStyles={tagsStyles}
               defaultTextProps={{
@@ -421,33 +651,41 @@ export default function ReadingScreen() {
           )}
 
           {/* Chapter end navigation */}
-          <View className="mt-8 gap-3 pb-8">
-            <View className="h-px bg-zinc-800 mb-4" />
-            <Text className="text-zinc-500 text-sm text-center mb-2">
+          <View style={{ marginTop: 32, gap: 12, paddingBottom: 32 }}>
+            <View style={{ height: 1, backgroundColor: theme.controlBorder, marginBottom: 16 }} />
+            <Text style={{ color: theme.textSecondary, fontSize: 13, textAlign: "center", marginBottom: 8 }}>
               Chương {chapterNumber} / {totalChapters}
             </Text>
-            <View className="flex-row gap-3">
+            <View style={{ flexDirection: "row", gap: 12 }}>
               <Pressable
                 onPress={() => hasPrev && goToChapter(chapterNumber - 1)}
-                className={`flex-1 py-3 rounded-xl items-center ${
-                  hasPrev ? "bg-zinc-800" : "bg-zinc-900 opacity-40"
-                }`}
                 disabled={!hasPrev}
+                style={{
+                  flex: 1,
+                  paddingVertical: 14,
+                  borderRadius: 12,
+                  alignItems: "center",
+                  backgroundColor: hasPrev ? theme.controlBg : theme.controlBorder,
+                  opacity: hasPrev ? 1 : 0.3,
+                  borderWidth: 1,
+                  borderColor: theme.controlBorder,
+                }}
               >
-                <Text className="text-white font-medium">Chương trước</Text>
+                <Text style={{ color: theme.text, fontWeight: "600" }}>Chương trước</Text>
               </Pressable>
               <Pressable
                 onPress={() => hasNext && goToChapter(chapterNumber + 1)}
-                className={`flex-1 py-3 rounded-xl items-center ${
-                  hasNext ? "bg-primary" : "bg-zinc-900 opacity-40"
-                }`}
                 disabled={!hasNext}
+                style={{
+                  flex: 1,
+                  paddingVertical: 14,
+                  borderRadius: 12,
+                  alignItems: "center",
+                  backgroundColor: hasNext ? theme.accent : theme.controlBorder,
+                  opacity: hasNext ? 1 : 0.3,
+                }}
               >
-                <Text
-                  className={`font-medium ${
-                    hasNext ? "text-primary-foreground" : "text-white"
-                  }`}
-                >
+                <Text style={{ color: hasNext ? "#fff" : theme.text, fontWeight: "600" }}>
                   Chương tiếp
                 </Text>
               </Pressable>
@@ -456,13 +694,30 @@ export default function ReadingScreen() {
         </RNScrollView>
       </Pressable>
 
-      {/* TTS mini player — shown when TTS is active */}
+      {/* ── Brightness overlay (dims screen without native module) ── */}
+      {brightnessOverlayOpacity > 0.01 && (
+        <View
+          pointerEvents="none"
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "#000",
+            opacity: brightnessOverlayOpacity * 0.7, // max 70% dim
+            zIndex: 40,
+          }}
+        />
+      )}
+
+      {/* ── TTS mini player ── */}
       {tts.status !== "idle" && (
         <View
           style={{
-            backgroundColor: "#18181b",
+            backgroundColor: theme.controlBg,
             borderTopWidth: 1,
-            borderTopColor: "#27272a",
+            borderTopColor: theme.controlBorder,
             paddingHorizontal: 16,
             paddingVertical: 10,
             flexDirection: "row",
@@ -470,14 +725,13 @@ export default function ReadingScreen() {
             gap: 12,
           }}
         >
-          {/* Play/Pause */}
           <Pressable
             onPress={handleTTSToggle}
             style={{
               width: 40,
               height: 40,
               borderRadius: 20,
-              backgroundColor: "#a78bfa",
+              backgroundColor: theme.accent,
               alignItems: "center",
               justifyContent: "center",
             }}
@@ -487,149 +741,197 @@ export default function ReadingScreen() {
             </Text>
           </Pressable>
 
-          {/* Progress info */}
           <View style={{ flex: 1, gap: 2 }}>
-            <Text style={{ color: "#e4e4e7", fontSize: 13, fontWeight: "600" }}>
+            <Text style={{ color: theme.text, fontSize: 13, fontWeight: "600" }}>
               {tts.status === "playing" ? "Đang đọc..." : "Tạm dừng"}
             </Text>
             {tts.totalChunks > 1 && (
               <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-                {/* Mini progress bar */}
-                <View style={{ flex: 1, height: 3, backgroundColor: "#27272a", borderRadius: 2 }}>
+                <View style={{ flex: 1, height: 3, backgroundColor: theme.controlBorder, borderRadius: 2 }}>
                   <View
                     style={{
                       height: "100%",
                       width: `${Math.max(((tts.currentChunk + 1) / tts.totalChunks) * 100, 5)}%`,
-                      backgroundColor: "#a78bfa",
+                      backgroundColor: theme.accent,
                       borderRadius: 2,
                     }}
                   />
                 </View>
-                <Text style={{ color: "#71717a", fontSize: 10 }}>
+                <Text style={{ color: theme.textSecondary, fontSize: 10 }}>
                   {tts.currentChunk + 1}/{tts.totalChunks}
                 </Text>
               </View>
             )}
           </View>
 
-          {/* Speed button */}
           <Pressable
             onPress={cycleTTSSpeed}
             style={{
               paddingHorizontal: 10,
               paddingVertical: 6,
               borderRadius: 8,
-              backgroundColor: "#27272a",
+              backgroundColor: theme.controlBorder,
             }}
           >
-            <Text style={{ color: "#a78bfa", fontSize: 13, fontWeight: "700" }}>
+            <Text style={{ color: theme.accent, fontSize: 13, fontWeight: "700" }}>
               {tts.speed}x
             </Text>
           </Pressable>
 
-          {/* Stop button */}
           <Pressable
             onPress={tts.stop}
             style={{
               width: 36,
               height: 36,
               borderRadius: 18,
-              backgroundColor: "#27272a",
+              backgroundColor: theme.controlBorder,
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <Text style={{ color: "#ef4444", fontSize: 14, fontWeight: "700" }}>
-              ■
-            </Text>
+            <Text style={{ color: "#ef4444", fontSize: 14, fontWeight: "700" }}>■</Text>
           </Pressable>
         </View>
       )}
 
-      {/* Bottom control bar */}
-      {showControls && (
-        <View
+      {/* ── Bottom control bar ── */}
+      <Animated.View
+        style={{
+          backgroundColor: theme.barBg,
+          borderTopWidth: 1,
+          borderTopColor: theme.controlBorder,
+          paddingHorizontal: 16,
+          paddingTop: 10,
+          paddingBottom: 40, // safe area
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          opacity: controlOpacity,
+        }}
+        pointerEvents={showControls ? "auto" : "none"}
+      >
+        {/* Settings button (Aa) */}
+        <Pressable
+          onPress={() => setShowSettings((prev) => !prev)}
           style={{
-            backgroundColor: "#09090b",
-            borderTopWidth: 1,
-            borderTopColor: "#27272a",
-            paddingHorizontal: 16,
-            paddingTop: 10,
-            paddingBottom: 40,
-            flexDirection: "row",
+            width: 44,
+            height: 44,
+            borderRadius: 12,
+            backgroundColor: showSettings ? theme.accent : theme.controlBg,
+            borderWidth: 1,
+            borderColor: showSettings ? theme.accent : theme.controlBorder,
             alignItems: "center",
-            justifyContent: "space-between",
+            justifyContent: "center",
           }}
         >
-          {/* Font controls */}
-          <View className="flex-row items-center gap-3">
-            <Pressable
-              onPress={() => adjustFontSize(-2)}
-              className="w-10 h-10 rounded-lg bg-zinc-800 items-center justify-center"
-            >
-              <Text className="text-white text-lg font-bold">A-</Text>
-            </Pressable>
-            <Text className="text-zinc-400 text-sm min-w-[32px] text-center">
-              {settings.fontSize}
-            </Text>
-            <Pressable
-              onPress={() => adjustFontSize(2)}
-              className="w-10 h-10 rounded-lg bg-zinc-800 items-center justify-center"
-            >
-              <Text className="text-white text-lg font-bold">A+</Text>
-            </Pressable>
-          </View>
-
-          {/* TTS trigger button */}
-          <Pressable
-            onPress={handleTTSToggle}
+          <Text
             style={{
-              paddingHorizontal: 14,
-              paddingVertical: 8,
-              borderRadius: 10,
-              backgroundColor: tts.status !== "idle" ? "#a78bfa" : "#27272a",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 6,
+              fontSize: 17,
+              fontWeight: "700",
+              color: showSettings ? "#fff" : theme.text,
             }}
           >
-            <Text
-              style={{
-                fontSize: 14,
-                color: tts.status !== "idle" ? "#fff" : "#a78bfa",
-                fontWeight: "600",
-              }}
-            >
-              {tts.status === "playing" ? "⏸ Dừng" : tts.status === "paused" ? "▶ Tiếp" : "🔊 Nghe"}
+            Aa
+          </Text>
+        </Pressable>
+
+        {/* TTS trigger */}
+        <Pressable
+          onPress={handleTTSToggle}
+          style={{
+            paddingHorizontal: 16,
+            paddingVertical: 10,
+            borderRadius: 12,
+            backgroundColor: tts.status !== "idle" ? theme.accent : theme.controlBg,
+            borderWidth: 1,
+            borderColor: tts.status !== "idle" ? theme.accent : theme.controlBorder,
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 6,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 14,
+              color: tts.status !== "idle" ? "#fff" : theme.accent,
+              fontWeight: "600",
+            }}
+          >
+            {tts.status === "playing"
+              ? "⏸ Dừng"
+              : tts.status === "paused"
+              ? "▶ Tiếp"
+              : "🔊 Nghe"}
+          </Text>
+        </Pressable>
+
+        {/* Auto-scroll indicator */}
+        {settings.autoScrollSpeed > 0 && (
+          <Pressable
+            onPress={() => updateSettings({ autoScrollSpeed: 0 })}
+            style={{
+              paddingHorizontal: 10,
+              paddingVertical: 6,
+              borderRadius: 8,
+              backgroundColor: theme.accent + "20",
+            }}
+          >
+            <Text style={{ color: theme.accent, fontSize: 11, fontWeight: "700" }}>
+              ▼ {settings.autoScrollSpeed}
             </Text>
           </Pressable>
+        )}
 
-          {/* Chapter nav */}
-          <View className="flex-row items-center gap-2">
-            <Pressable
-              onPress={() => hasPrev && goToChapter(chapterNumber - 1)}
-              disabled={!hasPrev}
-              className={`px-4 py-2 rounded-lg ${
-                hasPrev ? "bg-zinc-800" : "bg-zinc-900 opacity-40"
-              }`}
-            >
-              <Text className="text-white text-sm">{"<"}</Text>
-            </Pressable>
-            <Text className="text-zinc-400 text-sm">
-              {chapterNumber}/{totalChapters}
-            </Text>
-            <Pressable
-              onPress={() => hasNext && goToChapter(chapterNumber + 1)}
-              disabled={!hasNext}
-              className={`px-4 py-2 rounded-lg ${
-                hasNext ? "bg-zinc-800" : "bg-zinc-900 opacity-40"
-              }`}
-            >
-              <Text className="text-white text-sm">{">"}</Text>
-            </Pressable>
-          </View>
+        {/* Chapter navigation */}
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+          <Pressable
+            onPress={() => hasPrev && goToChapter(chapterNumber - 1)}
+            disabled={!hasPrev}
+            style={{
+              width: 38,
+              height: 38,
+              borderRadius: 10,
+              backgroundColor: hasPrev ? theme.controlBg : "transparent",
+              borderWidth: 1,
+              borderColor: hasPrev ? theme.controlBorder : "transparent",
+              alignItems: "center",
+              justifyContent: "center",
+              opacity: hasPrev ? 1 : 0.3,
+            }}
+          >
+            <Text style={{ color: theme.text, fontSize: 16 }}>{"‹"}</Text>
+          </Pressable>
+          <Text style={{ color: theme.textSecondary, fontSize: 12, minWidth: 40, textAlign: "center" }}>
+            {chapterNumber}/{totalChapters}
+          </Text>
+          <Pressable
+            onPress={() => hasNext && goToChapter(chapterNumber + 1)}
+            disabled={!hasNext}
+            style={{
+              width: 38,
+              height: 38,
+              borderRadius: 10,
+              backgroundColor: hasNext ? theme.controlBg : "transparent",
+              borderWidth: 1,
+              borderColor: hasNext ? theme.controlBorder : "transparent",
+              alignItems: "center",
+              justifyContent: "center",
+              opacity: hasNext ? 1 : 0.3,
+            }}
+          >
+            <Text style={{ color: theme.text, fontSize: 16 }}>{"›"}</Text>
+          </Pressable>
         </View>
-      )}
+      </Animated.View>
+
+      {/* ── Settings Sheet ── */}
+      <ReaderSettingsSheet
+        visible={showSettings}
+        settings={settings}
+        theme={theme}
+        onUpdate={updateSettings}
+        onClose={() => setShowSettings(false)}
+      />
     </>
   );
 }

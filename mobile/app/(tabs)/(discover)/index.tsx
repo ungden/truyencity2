@@ -25,7 +25,7 @@ export default function DiscoverScreen() {
 
   async function fetchData() {
     try {
-      const NOVEL_LIST_FIELDS = "id,title,slug,author,cover_url,genres,status,ai_author_id,created_at,updated_at,chapters(count)";
+      const NOVEL_LIST_FIELDS = "id,title,slug,author,cover_url,genres,status,ai_author_id,created_at,updated_at,chapter_count";
       const [latestRes, completedRes] = await Promise.all([
         supabase
           .from("novels")
@@ -42,11 +42,10 @@ export default function DiscoverScreen() {
 
       const allNovels = latestRes.data || [];
 
-      // Hero: novels with covers, sorted by chapter count (most popular)
+      // Hero: novels with covers, sorted by chapter_count (most content = most popular)
       const withCovers = allNovels.filter((n) => n.cover_url);
       const sortedByChapters = [...withCovers].sort(
-        (a, b) =>
-          (b.chapters?.[0]?.count ?? 0) - (a.chapters?.[0]?.count ?? 0)
+        (a, b) => (b.chapter_count ?? 0) - (a.chapter_count ?? 0)
       );
       setHeroNovels(sortedByChapters.slice(0, 8));
 

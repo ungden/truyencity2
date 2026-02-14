@@ -24,8 +24,11 @@ interface NovelCardProps {
 }
 
 function getChapterCount(novel: Novel): number {
-  if (!novel.chapters || novel.chapters.length === 0) return 0;
-  return novel.chapters[0]?.count ?? 0;
+  // Prefer denormalized chapter_count column (fast, no join)
+  if (novel.chapter_count != null) return novel.chapter_count;
+  // Fallback to chapters(count) subquery result (detail page)
+  if (novel.chapters && novel.chapters.length > 0) return novel.chapters[0]?.count ?? 0;
+  return 0;
 }
 
 // --- Default: small vertical card for horizontal scroll ---

@@ -129,10 +129,20 @@ export interface SpeedOption {
 
 export const TTS_SPEEDS: SpeedOption[] = [
   { label: "0.5x", rate: 0.5 },
-  { label: "0.75x", rate: 0.75 },
+  { label: "0.6x", rate: 0.6 },
+  { label: "0.7x", rate: 0.7 },
+  { label: "0.8x", rate: 0.8 },
+  { label: "0.9x", rate: 0.9 },
   { label: "1x", rate: 1.0 },
-  { label: "1.25x", rate: 1.25 },
+  { label: "1.1x", rate: 1.1 },
+  { label: "1.2x", rate: 1.2 },
+  { label: "1.3x", rate: 1.3 },
+  { label: "1.4x", rate: 1.4 },
   { label: "1.5x", rate: 1.5 },
+  { label: "1.6x", rate: 1.6 },
+  { label: "1.7x", rate: 1.7 },
+  { label: "1.8x", rate: 1.8 },
+  { label: "1.9x", rate: 1.9 },
   { label: "2x", rate: 2.0 },
 ];
 
