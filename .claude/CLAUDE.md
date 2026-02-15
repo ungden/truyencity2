@@ -193,16 +193,20 @@ mobile/
 - `src/components/admin/admin-sidebar.tsx` — Admin panel navigation
 
 ### Story Writing Engine (`src/services/story-writing-factory/`)
-- `runner.ts` — Orchestrator (plan -> write -> QC), finale detection
-- `chapter.ts` — 3-agent pipeline (Architect/Writer/Critic)
+- `runner.ts` — Orchestrator (plan -> write -> QC), finale detection, 4-layer context assembly
+- `chapter.ts` — 3-agent pipeline (Architect/Writer/Critic), multi-POV, scene label stripping
 - `planner.ts` — Story outline + arc planning
-- `memory.ts` — 4-level hierarchical memory
+- `memory.ts` — Legacy hierarchical memory (fallback only; primary is context-loader)
+- `context-loader.ts` — **4-layer DB-backed context** (story bible + synopsis + last 5 chapters + arc plan)
+- `context-generators.ts` — AI generators (synopsis, arc plans, story bible, chapter summaries)
+- `constraint-extractor.ts` — World constraint extraction for consistency
 - `content-seeder.ts` — Bulk novel seeding
 - `power-tracker.ts` — 9-realm cultivation tracking
 - `beat-ledger.ts` — 50+ beat types with cooldowns
 - `consistency.ts` — Dead character detection, contradictions
 - `qc-gating.ts` — Chapter scoring, auto-rewrite if < 65/100
 - `style-bible.ts` — Style context + em dash dialogue
+- `title-checker.ts` — Jaccard + containment similarity, banned titles, 70% hard rejection
 
 ### **Scalability System (4 Phases) — IMPLEMENTED 2026-02-11**
 
@@ -277,6 +281,102 @@ const report = await validator.checkAndValidate(chapterNumber);
 psql -d your_db -f supabase/migrations/0100_create_plot_thread_tables.sql
 ```
 
+### 4-Layer Context System (IMPLEMENTED 2026-02-15)
+
+**Problem:** Each cron run creates a fresh StoryRunner with zero memory. MemoryManager uses ephemeral `/tmp` — always empty in resume mode. Result: duplicate titles (15-25%), repetitive openings (10-40%), zero plot coherence across 1,000-2,000 chapter novels.
+
+**Solution:** DB-backed 4-layer context system providing ~22,000-27,000 tokens per chapter write.
+
+#### Architecture
+```
+LAYER 1: STORY BIBLE (~2,000 tokens, static after ch.3)
+  - AI-generated from first 3 chapters, persisted in ai_story_projects.story_bible
+  - Triggers: ch.3 in cron post-write callback
+
+LAYER 2: ROLLING SYNOPSIS (~1,000-3,000 tokens, updated every 20 chapters)
+  - AI reads old synopsis + 20 new chapter summaries → writes new synopsis
+  - Persisted in story_synopsis table
+  - Triggers: ch % 20 == 0 in cron post-write callback
+
+LAYER 3: LAST 5 FULL CHAPTERS (~17,000 tokens)
+  - Raw text loaded from chapters table
+
+LAYER 4: ARC INTELLIGENCE (~1,000-2,000 tokens)
+  - AI-generated 20-chapter arc plan with per-chapter briefs
+  - Persisted in arc_plans table
+  - Triggers: ch % 20 == 0 in cron post-write callback
+
+ANTI-REPETITION (~500-1,000 tokens)
+  - All previous titles for dedup
+  - Last 20 opening sentences from chapter_summaries
+```
+
+#### Cron Flow Per Chapter
+```
+1. ContextLoader loads all 4 layers from DB in parallel
+2. If arc boundary (chapter % 20 == 0):
+   a. Generate new ROLLING SYNOPSIS
+   b. Generate ARC PLAN for next 20 chapters
+3. If chapter == 3: Generate STORY BIBLE
+4. Assemble ~22K-27K token context into previousSummary
+5. Write chapter (3-agent pipeline: Architect → Writer → Critic)
+6. Post-write: AI generates chapter summary, save to DB
+```
+
+#### Key Files
+- `context-loader.ts` — `ContextLoader.load()` + `ContextLoader.assembleContext()` + persistence helpers
+- `context-generators.ts` — `summarizeChapter()`, `generateSynopsis()`, `generateArcPlan()`, `generateStoryBible()`
+- `write-chapters/route.ts` — Post-write callback wiring (lines 325-405)
+- `runner.ts` — Context assembly in `writeArc()` (line 588-591)
+
+#### DB Tables (Migration 0113)
+```
+chapter_summaries (project_id, chapter_number, title, summary, opening_sentence, mc_state, cliffhanger)
+story_synopsis (project_id, synopsis_text, mc_current_state, active_allies, active_enemies, open_threads)
+arc_plans (project_id, arc_number, start_chapter, end_chapter, arc_theme, plan_text, chapter_briefs)
+ai_story_projects.story_bible (text column)
+```
+
+#### Quality Results (40 chapters audited)
+| Metric | Old System | New System |
+|---|---|---|
+| Duplicate titles | 15-25% | **0%** |
+| Duplicate openings | 10-40% | **0%** |
+| Avg chapter length | ~13,777 chars | **16,646 chars** |
+
+#### What's NOT Yet Tested at Scale
+- **Story Bible**: triggers at ch.3 — working (1 novel has it)
+- **Synopsis**: triggers at ch.20 — **NOT YET TESTED** (no novel has 20+ chapters yet)
+- **Arc Plan**: triggers at ch.20 — **NOT YET TESTED**
+- Plot drift, character inconsistency — only visible after 50-100+ chapters
+
+#### Current Data (as of 2026-02-15)
+- **20 novels** active, each at ch.1-2 (fresh start with new system)
+- **40 chapters** written total
+- **0 duplicate titles, 0 duplicate openings** confirmed
+- All old data (46,093 chapters, 243 novels) wiped and regenerated
+
+### Bug Fixes Applied (2026-02-15)
+
+1. **Scene label leak** — `cleanContent()` in `chapter.ts` now strips `Scene N:` / `Cảnh N:` leaked from Architect outline
+2. **Chapter numbering gap** — Pre-write gap check in cron route: if `current_chapter` is ahead of actual max chapter in DB, auto-correct before writing
+3. **Fallback overwrite** — Cron fallback `runAttempt` now skips if the chapter was already generated (prevents overwriting 3-agent quality with simple workflow)
+4. **Silent save failures** — `saveChapterSummary`, `saveSynopsis`, `saveArcPlan`, `saveStoryBible` now use `console.warn` instead of `logger.debug` (these were silently losing context data)
+5. **Unsafe singletons** — Removed `getStoryRunner()` and `chapterWriter` singleton exports (mutable state not safe for concurrent requests)
+6. **Stale completion logic** — `nextCh` renamed to `lastWrittenCh` with correct value accounting for whether a chapter was actually written
+7. **Wrong averageWordsPerChapter** — Resume mode was dividing session-only word count by total historical chapter count; now uses `sessionChaptersWritten`
+8. **Natural ending false positives** — `detectNaturalEnding` now only checks last 800 chars (not whole chapter), weakened mid-story achievement markers, added more anti-signals
+9. **Title dialogue fragments** — Fallback title extraction now filters out lines starting with `—` (dialogue markers)
+10. **Fragile cursor pattern** — `executeWithConcurrency` uses atomic `cursor++` instead of separate read-increment
+11. **Hardcoded protagonist flaw** — Character tracker now derives flaw/strength from outline instead of hardcoding "kinh mạch bị phế"
+
+### Known Remaining Issues
+
+1. **Context payload loaded once per run** — If `chaptersToWrite > 1`, the same context is reused for all chapters in that batch (stale `recentChapters` and `previousTitles`). Currently mitigated because cron uses `chaptersToWrite: 1`, but would be a bug for multi-chapter runs.
+2. **Two Supabase clients** — Cron route creates its own via `getSupabaseAdmin()` while factory modules use `getSupabase()` from supabase-helper. Not a bug, but wastes connection pool slots.
+3. **`isArcBoundary` in ContextPayload unused** — The field is loaded but never consumed downstream. Dead code.
+4. **ensureProjectRecord uses arbitrary first user** — All auto-created projects are owned by whatever user is first in `profiles` table. Would break if RLS is enforced.
+
 ### Types & Utils
 - `src/lib/types.ts` — Novel, Chapter, Author types
 - `src/lib/types/genre-config.ts` — GENRE_CONFIG with icons/names (canonical source)
@@ -287,9 +387,10 @@ psql -d your_db -f supabase/migrations/0100_create_plot_thread_tables.sql
 
 ## Two-Phase Production System
 
-### Phase 1: Initial Seed (COMPLETED)
-- 10 AI authors x 20 novels = 200 novels seeded
+### Phase 1: Initial Seed (RE-SEEDED 2026-02-15)
+- 10 AI authors x 2 novels each = **20 novels** seeded fresh
 - Each novel has `total_planned_chapters` = random 1000-2000
+- All old novels/chapters wiped to start with 4-layer context system
 - pg_cron writes ~20 chapters/novel/day automatically
 
 ### Phase 2: Daily Rotation (ongoing, automated)
@@ -303,7 +404,7 @@ psql -d your_db -f supabase/migrations/0100_create_plot_thread_tables.sql
 
 | Cron | Interval | File | What it does |
 |------|----------|------|-------------|
-| `write-chapters` | Every 5 min | `src/app/api/cron/write-chapters/route.ts` | 30 resume + 5 init |
+| `write-chapters` | Every 5 min | `src/app/api/cron/write-chapters/route.ts` | 30-180 resume + 8 init, 12 concurrency, 4-layer context |
 | `generate-covers` | Every 10 min | `src/app/api/cron/generate-covers/route.ts` | 20 covers, 4 parallel |
 | `daily-rotate` | Once/day 0h UTC | `src/app/api/cron/daily-rotate/route.ts` | Backfill + expand 20/day |
 | `health-check` | Once/day 6h UTC | `src/app/api/cron/health-check/route.ts` | 8 system checks |
@@ -331,7 +432,15 @@ comments — Comments with moderation
 ratings — 5-star ratings (unique user+novel, RLS enabled, auto updated_at)
 ```
 
-#### Scalability Tables (NEW - Migration 0100)
+#### 4-Layer Context Tables (Migration 0113)
+```
+chapter_summaries (project_id, chapter_number, title, summary, opening_sentence, mc_state, cliffhanger)
+story_synopsis (project_id, synopsis_text, mc_current_state, active_allies, active_enemies, open_threads, last_updated_chapter)
+arc_plans (project_id, arc_number, start_chapter, end_chapter, arc_theme, plan_text, chapter_briefs, threads_to_advance, threads_to_resolve, new_threads)
+ai_story_projects.story_bible — text column added
+```
+
+#### Scalability Tables (Migration 0100)
 ```
 plot_threads (id, project_id, name, description, priority, status,
               start_chapter, target_payoff_chapter, resolved_chapter,
@@ -431,6 +540,15 @@ Old novels may have metadata blocks but `cleanNovelDescription()` in `src/lib/ut
 
 ---
 
+## Critical Operational Notes
+
+- **`ai_story_projects.updated_at` has a DB trigger** that auto-sets to `now()`. Cannot be backdated manually. The cron uses `.lt('updated_at', fourMinutesAgo)` as a distributed lock — must wait 4+ minutes between cron calls for the same projects.
+- **`ensureDailyQuotasForActiveProjects()` uses `ignoreDuplicates: true`** — forcing `next_due_at` manually works, but the `updated_at` lock is the real gatekeeper for processing.
+- **Never use `getStoryRunner()` or `chapterWriter` singletons** — they hold mutable state. Always create new instances.
+- **Context payload is loaded once per `runner.run()` call** — safe for `chaptersToWrite: 1` (cron), but would need reload logic for multi-chapter runs.
+
+---
+
 ## Soft Ending Logic
 
 `total_planned_chapters` is a **SOFT TARGET**:
@@ -496,9 +614,10 @@ key_path = "/Users/alexle/Downloads/AuthKey_K4XKK27BYH.p8"
 - Mobile queries use `chapter_count` instead of `chapters(count)` subquery (was causing timeouts)
 - Migration: `supabase/migrations/0109_add_chapter_count_to_novels.sql`
 
-### Current Stats
-- **222 novels**, **40,880+ chapters**
-- Supabase project: `jxhpejyowuihvjpqwarm`
+### Current Stats (2026-02-15 — post-wipe rebuild)
+- **20 novels**, **~40 chapters** (fresh start with 4-layer context system)
+- All old data (243 novels, 46,093 chapters) wiped and regenerated from scratch
+- Supabase project: `jxhpejyowuihvjpqwarm` (region: Singapore)
 - Service role key in `.env.local`
 
 ---
@@ -576,8 +695,10 @@ AI writer generates repetitive chapter titles. Top novels had 22-45% duplicate t
 ### Chapter Titles Synced
 ~5,300+ chapter titles were mismatched (metadata `title` vs actual first-line title in content). Fixed via Python script scanning all 40,880 chapters.
 
-### Content Quality Metrics
-- 2,138 chapters written in 12h window
-- Avg length: ~16,120 chars (~10,700 words) per chapter
-- Short chapters (<2000 chars): 0
-- All 221 active novels producing content
+### Content Quality Metrics (post-rebuild with 4-layer context)
+- **40 chapters** written with new system
+- Avg length: **~16,646 chars** per chapter (up from ~13,777)
+- **0% duplicate titles** (was 15-25%)
+- **0% duplicate openings** (was 10-40%)
+- 20 active novels producing content
+- Daily quota: 20 chapters/novel/day, distributed across the day via `project_daily_quotas`

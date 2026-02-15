@@ -232,9 +232,15 @@ export class ChapterWriter {
           const { similarity } = titleChecker.findMostSimilar(finalTitle, context.previousTitles);
           if (similarity >= 0.7) {
             // Fallback: use chapter number + unique content snippet
+            // Filter out dialogue lines (starting with —) and very short fragments
             const contentSnippet = writerResult.data.chapterContent.slice(0, 500);
             const sentences = contentSnippet.match(/[^.!?。！？]+[.!?。！？]/g) || [];
-            const shortSentence = sentences.find(s => s.trim().length >= 5 && s.trim().length <= 40);
+            const shortSentence = sentences.find(s => {
+              const trimmed = s.trim();
+              return trimmed.length >= 5 && trimmed.length <= 40
+                && !trimmed.startsWith('—') && !trimmed.startsWith('-')
+                && !trimmed.startsWith('"') && !trimmed.startsWith('「');
+            });
             finalTitle = shortSentence 
               ? shortSentence.trim().replace(/^["'"「『\s]+|["'"」』\s.!?。！？]+$/g, '')
               : `Chương ${chapterNumber}`;
@@ -346,7 +352,12 @@ export class ChapterWriter {
         const { similarity } = titleChecker.findMostSimilar(finalTitle, context.previousTitles);
         if (similarity >= 0.7) {
           const sentences = content.slice(0, 500).match(/[^.!?。！？]+[.!?。！？]/g) || [];
-          const shortSentence = sentences.find(s => s.trim().length >= 5 && s.trim().length <= 40);
+          const shortSentence = sentences.find(s => {
+            const trimmed = s.trim();
+            return trimmed.length >= 5 && trimmed.length <= 40
+              && !trimmed.startsWith('—') && !trimmed.startsWith('-')
+              && !trimmed.startsWith('"') && !trimmed.startsWith('「');
+          });
           finalTitle = shortSentence
             ? shortSentence.trim().replace(/^["'"「『\s]+|["'"」』\s.!?。！？]+$/g, '')
             : `Chương ${chapterNumber}`;
@@ -1117,6 +1128,8 @@ Viết chương (nhớ: BẮT ĐẦU bằng "Chương ${chapterNumber}: [Tiêu �
       .replace(/\*\*([^*]+)\*\*/g, '$1')
       .replace(/\*([^*]+)\*/g, '$1')
       .replace(/```[\s\S]*?```/g, '')
+      // Strip scene labels leaked from Architect outline (e.g. "Scene 1:", "Cảnh 2:", "SCENE 3:")
+      .replace(/^(?:Scene|Cảnh|SCENE|scene|cảnh)\s*\d+\s*[:：]\s*/gm, '')
       .replace(/\n{3,}/g, '\n\n')
       .trim();
   }
@@ -1230,5 +1243,5 @@ ${topic.topicPromptHints.map(h => `- ${h}`).join('\n')}`);
   }
 }
 
-// Export singleton
-export const chapterWriter = new ChapterWriter();
+// NOTE: No singleton export — ChapterWriter holds mutable agent configs that are
+// NOT safe to share across concurrent requests. Create instances via new ChapterWriter().

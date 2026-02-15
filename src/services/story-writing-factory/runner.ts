@@ -947,9 +947,10 @@ export class StoryRunner {
         this.state!.chaptersWritten++;
         this.sessionChaptersWritten++; // Increment session counter
         this.state!.totalWords += result.data.wordCount;
-        this.state!.averageWordsPerChapter = Math.round(
-          this.state!.totalWords / this.state!.chaptersWritten
-        );
+        // Use sessionChaptersWritten for average to avoid dividing session words by total historical count
+        this.state!.averageWordsPerChapter = this.sessionChaptersWritten > 0
+          ? Math.round(this.state!.totalWords / this.sessionChaptersWritten)
+          : 0;
         this.state!.lastActivityAt = Date.now();
 
         try {
@@ -1382,11 +1383,15 @@ export class StoryRunner {
 
         // Register protagonist on first chapter
         if (chapterNumber === 1 && !existingNames.has(protagonistName.toLowerCase())) {
+          // Derive flaw/strength from outline rather than hardcoding genre-specific tropes
+          const protagTraits = this.worldBible?.protagonist.traits || [];
+          const derivedStrength = protagTraits[0] || 'ý chí kiên cường';
+          const derivedFlaw = this.storyOutline?.protagonist.startingState || 'chưa rõ';
           await this.characterTracker.createCharacter(protagonistName, 'protagonist', {
             primaryMotivation: 'power' as MotivationType,
             backstory: this.storyOutline?.protagonist.characterArc || 'Nhân vật chính',
-            flaw: 'kinh mạch bị phế',
-            strength: 'ý chí kiên cường',
+            flaw: derivedFlaw,
+            strength: derivedStrength,
             personalityTraits: ['brave', 'stubborn'] as PersonalityTrait[],
             firstAppearance: 1,
           });
@@ -1474,9 +1479,6 @@ export class StoryRunner {
   }
 
   /**
-   * Guess a character's role from context clues in the content.
-   */
-  /**
    * Extract 2-3 personality traits for an NPC from the chapter content where they appear.
    * Looks for behavioral and descriptive keywords near the character's name.
    */
@@ -1550,16 +1552,6 @@ export function createStoryRunner(
   return new StoryRunner(factoryConfig, runnerConfig, aiService);
 }
 
-// Export singleton
-let defaultRunner: StoryRunner | null = null;
-
-export function getStoryRunner(
-  factoryConfig?: Partial<FactoryConfig>,
-  runnerConfig?: Partial<RunnerConfig>,
-  aiService?: AIProviderService
-): StoryRunner {
-  if (!defaultRunner) {
-    defaultRunner = new StoryRunner(factoryConfig, runnerConfig, aiService);
-  }
-  return defaultRunner;
-}
+// NOTE: No singleton export — StoryRunner holds mutable state (writtenChapters, quality
+// trackers, etc.) that is NOT safe to share across concurrent requests. Always create
+// a new instance per invocation via createStoryRunner().

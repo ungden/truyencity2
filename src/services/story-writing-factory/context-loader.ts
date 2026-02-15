@@ -501,7 +501,9 @@ export async function saveChapterSummary(
       cliffhanger,
     }, { onConflict: 'project_id,chapter_number' });
   } catch (e) {
-    logger.debug('Failed to save chapter summary', { projectId, chapterNumber, error: e });
+    console.warn('[context-loader] Failed to save chapter summary — context may drift over time', {
+      projectId, chapterNumber, error: e instanceof Error ? e.message : String(e),
+    });
   }
 }
 
@@ -530,7 +532,9 @@ export async function saveSynopsis(
       updated_at: new Date().toISOString(),
     }, { onConflict: 'project_id' });
   } catch (e) {
-    logger.debug('Failed to save synopsis', { projectId, error: e });
+    console.warn('[context-loader] Failed to save synopsis — rolling synopsis will be stale', {
+      projectId, error: e instanceof Error ? e.message : String(e),
+    });
   }
 }
 
@@ -564,7 +568,9 @@ export async function saveArcPlan(
       new_threads: newThreads,
     }, { onConflict: 'project_id,arc_number' });
   } catch (e) {
-    logger.debug('Failed to save arc plan', { projectId, arcNumber, error: e });
+    console.warn('[context-loader] Failed to save arc plan', {
+      projectId, arcNumber, error: e instanceof Error ? e.message : String(e),
+    });
   }
 }
 
@@ -579,6 +585,8 @@ export async function saveStoryBible(projectId: string, storyBible: string): Pro
       .update({ story_bible: storyBible })
       .eq('id', projectId);
   } catch (e) {
-    logger.debug('Failed to save story bible', { projectId, error: e });
+    console.warn('[context-loader] Failed to save story bible', {
+      projectId, error: e instanceof Error ? e.message : String(e),
+    });
   }
 }

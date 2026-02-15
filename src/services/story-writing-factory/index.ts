@@ -29,10 +29,10 @@ export * from './types';
 export * from './templates';
 
 // Re-export modules
-export { ChapterWriter, chapterWriter } from './chapter';
+export { ChapterWriter } from './chapter';
 export { QualityGate, ContentAnalyzer, qualityGate, contentAnalyzer } from './quality';
 export { StoryPlanner, storyPlanner } from './planner';
-export { StoryRunner, createStoryRunner, getStoryRunner } from './runner';
+export { StoryRunner, createStoryRunner } from './runner';
 export { MemoryManager, createMemoryManager, validateSummaryQuality, extractKeyElements, generateBetterSummary } from './memory';
 export type { SummaryQualityReport, HierarchicalMemory, ChapterMemory, ArcMemory } from './memory';
 export { CostOptimizer, WorkflowOptimizer, getCostOptimizer, createCostOptimizer } from './cost-optimizer';

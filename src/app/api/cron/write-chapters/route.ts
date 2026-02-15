@@ -92,12 +92,13 @@ async function executeWithConcurrency<T>(
 
   const limit = Math.max(1, Math.min(concurrency, tasks.length));
   const results: T[] = new Array(tasks.length);
+  // Atomic read-and-increment: cursor++ returns the old value and increments in one step.
+  // Safe in JS single-threaded event loop — no await between read and increment.
   let cursor = 0;
 
   const worker = async () => {
     while (true) {
-      const i = cursor;
-      cursor += 1;
+      const i = cursor++;
       if (i >= tasks.length) break;
       results[i] = await tasks[i]();
     }
@@ -144,23 +145,30 @@ type RunResult = {
 };
 
 function detectNaturalEnding(title?: string | null, content?: string | null): boolean {
-  const t = `${title || ''}\n${content || ''}`.toLowerCase();
+  // Only check the LAST ~800 chars of content (the actual ending) + full title,
+  // not mid-chapter achievements that happen to use ending vocabulary
+  const lastParagraph = (content || '').slice(-800);
+  const t = `${title || ''}\n${lastParagraph}`.toLowerCase();
   if (!t.trim()) return false;
 
   let score = 0;
 
-  // Strong ending markers
+  // Strong ending markers (explicit "story ended" signals)
   if (/hết truyện|hoàn truyện|toàn thư hoàn|đại kết cục|kết thúc thỏa mãn|epilogue/i.test(t)) score += 4;
   if (/nhiều năm sau|vài năm sau|hậu truyện|ngoại truyện/i.test(t)) score += 2;
 
-  // Resolution markers
+  // Resolution markers (weaker — can appear mid-story as chapter-level events)
   if (/mọi chuyện đã kết thúc|cuối cùng cũng kết thúc|khép lại hành trình|khép lại một kỷ nguyên/i.test(t)) score += 2;
-  if (/trật tự mới|thiên hạ thái bình|bình yên trở lại|đăng cơ|xưng đế|phi thăng thành công/i.test(t)) score += 2;
+  // These can be chapter-level achievements, only score +1 each (was +2)
+  if (/trật tự mới|thiên hạ thái bình|bình yên trở lại/i.test(t)) score += 1;
+  if (/đăng cơ|xưng đế|phi thăng thành công/i.test(t)) score += 1;
 
-  // Anti-signals: obvious continuation cliffhangers
-  if (/to be continued|chưa xong|lần sau|chương sau|hồi sau sẽ rõ|một bí mật khác/i.test(t)) score -= 3;
-  if (/cliffhanger|bầu không khí căng thẳng vẫn|màn đêm nuốt chửng|cánh cửa vừa mở/i.test(t)) score -= 2;
+  // Anti-signals: obvious continuation cliffhangers (heavy penalty)
+  if (/to be continued|chưa xong|lần sau|chương sau|hồi sau sẽ rõ|một bí mật khác/i.test(t)) score -= 4;
+  if (/cliffhanger|bầu không khí căng thẳng vẫn|cánh cửa vừa mở|chưa kết thúc/i.test(t)) score -= 3;
+  if (/nhưng .{0,30}chưa|mới chỉ là bắt đầu|cuộc chiến .{0,20}thực sự/i.test(t)) score -= 2;
 
+  // Require score >= 4 (same threshold but harder to reach due to weakened mid-story markers)
   return score >= 4;
 }
 
@@ -225,7 +233,29 @@ async function writeOneChapter(
   if (!novel?.id) throw new Error('No novel linked');
 
   const aiService = new AIProviderService({ gemini: geminiKey });
-  const currentCh = project.current_chapter || 0;
+  let currentCh = project.current_chapter || 0;
+
+  // ====== CHAPTER GAP CHECK ======
+  // If current_chapter says N but chapter N doesn't exist in DB, backtrack
+  // to the highest actually-existing chapter. Prevents gaps (e.g. ch.1→ch.3).
+  if (currentCh > 0 && tier === 'resume') {
+    const { data: existingChapters } = await supabase
+      .from('chapters')
+      .select('chapter_number')
+      .eq('novel_id', novel.id)
+      .order('chapter_number', { ascending: false })
+      .limit(1);
+    
+    const maxExisting = existingChapters?.[0]?.chapter_number ?? 0;
+    if (maxExisting < currentCh) {
+      // current_chapter is ahead of actual chapters — fix it
+      console.warn(`[${tier}][${project.id.slice(0, 8)}] Gap detected: current_chapter=${currentCh} but max chapter in DB=${maxExisting}. Correcting.`);
+      currentCh = maxExisting;
+      await supabase.from('ai_story_projects')
+        .update({ current_chapter: maxExisting })
+        .eq('id', project.id);
+    }
+  }
 
   // ====== PRE-WRITE COMPLETION CHECK ======
   // If current_chapter already reached/exceeded total_planned_chapters,
@@ -403,7 +433,9 @@ async function writeOneChapter(
   let { runResult: result, attemptGenerated: chapterGenerated, attemptPersisted: chapterWritten, persistError } = await runAttempt();
 
   // Fallback path: if first attempt produced no chapter, retry once with cheaper/simple workflow.
-  if (!chapterWritten) {
+  // IMPORTANT: Skip fallback if the chapter was already generated (even if persist failed),
+  // to avoid overwriting a good 3-agent chapter with a worse simple-workflow version.
+  if (!chapterWritten && !chapterGenerated) {
     const fallback = await runAttempt({ use3AgentWorkflow: false, maxRetries: 0, maxTokens: 6144, temperature: 0.9 });
     if (fallback.attemptPersisted) {
       chapterGenerated = true;
@@ -431,7 +463,8 @@ async function writeOneChapter(
 
   const CHAPTERS_PER_ARC = 20;
   const GRACE_BUFFER = CHAPTERS_PER_ARC; // Allow up to 1 extra arc to finish properly
-  const nextCh = currentCh + 1;
+  // lastWrittenCh = the chapter number that was just written (currentCh was the state BEFORE writing)
+  const lastWrittenCh = chapterWritten ? currentCh + 1 : currentCh;
   const targetChapters = project.total_planned_chapters || 200;
   const hardStop = targetChapters + GRACE_BUFFER;
   const hasNaturalEnding = detectNaturalEnding(latestWrittenTitle, latestWrittenContent);
@@ -440,15 +473,15 @@ async function writeOneChapter(
   // Check if we should complete the story
   let shouldComplete = false;
 
-  if (nextCh >= hardStop) {
+  if (lastWrittenCh >= hardStop) {
     // Phase 4: Hard stop — safety net, prevent infinite writing
     shouldComplete = true;
     completionReason = 'hard_stop';
-  } else if (nextCh >= targetChapters) {
+  } else if (lastWrittenCh >= targetChapters) {
     // Phase 3: Grace period — only complete at arc boundary (every 20 chapters)
     // Also complete if we've exactly hit the target (covers small novels where target isn't a multiple of arc size)
-    const isArcBoundary = nextCh % CHAPTERS_PER_ARC === 0;
-    const isExactTarget = nextCh === targetChapters;
+    const isArcBoundary = lastWrittenCh % CHAPTERS_PER_ARC === 0;
+    const isExactTarget = lastWrittenCh === targetChapters;
     if (isArcBoundary || isExactTarget) {
       shouldComplete = true;
       completionReason = isExactTarget ? 'exact_target' : 'arc_boundary';
@@ -459,7 +492,7 @@ async function writeOneChapter(
     } else {
       // Not at arc boundary — continue writing to finish the current arc
     }
-  } else if (nextCh >= targetChapters - 5 && hasNaturalEnding) {
+  } else if (lastWrittenCh >= targetChapters - 5 && hasNaturalEnding) {
     // Close slightly before target when the narrative clearly ended naturally.
     shouldComplete = true;
     completionReason = 'natural_ending';
