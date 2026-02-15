@@ -18,7 +18,7 @@ import { ChapterWriter } from './chapter';
 import { MemoryManager, ChapterMemory } from './memory';
 import { CostOptimizer, WorkflowOptimizer } from './cost-optimizer';
 import { ensureProjectRecord, getSupabase } from './supabase-helper';
-import { ContextLoader, ContextPayload } from './context-loader';
+import { ContextLoader, ContextPayload, saveStoryOutline, loadStoryOutline } from './context-loader';
 import {
   StoryOutline,
   ArcOutline,
@@ -278,8 +278,16 @@ export class StoryRunner {
       this.updateStatus('planning_story', 'Đang lên cốt truyện...');
 
       if (input.currentChapter && input.currentChapter > 0) {
-        // Resume mode: Create dummy/reconstruct
-        this.storyOutline = this.createDummyOutline(input.title, input.protagonistName, genre, input.premise);
+        // Resume mode: Try to load persisted StoryOutline from DB first (Gap 1 fix)
+        const savedOutline = input.projectId ? await loadStoryOutline(input.projectId) : null;
+        if (savedOutline) {
+          this.storyOutline = savedOutline as unknown as StoryOutline;
+          logger.debug('Loaded persisted StoryOutline from DB', { projectId: input.projectId });
+        } else {
+          // Fallback: create dummy if no persisted outline
+          this.storyOutline = this.createDummyOutline(input.title, input.protagonistName, genre, input.premise);
+          logger.debug('Using dummy outline (no persisted outline found)', { projectId: input.projectId });
+        }
         this.callbacks.onStoryPlanned?.(this.storyOutline);
       } else {
         const storyResult = await this.planner.planStory({
@@ -297,6 +305,12 @@ export class StoryRunner {
         
         this.storyOutline = storyResult.data;
         this.callbacks.onStoryPlanned?.(this.storyOutline);
+
+        // Persist StoryOutline to DB for future resume (Gap 1 fix)
+        if (input.projectId) {
+          await saveStoryOutline(input.projectId, this.storyOutline as unknown as Record<string, unknown>);
+          logger.debug('Persisted StoryOutline to DB', { projectId: input.projectId });
+        }
       }
 
       // Create world and style bibles
@@ -582,8 +596,19 @@ export class StoryRunner {
 
       // ═══════════════════════════════════════════════════════════════
       // CONTEXT ASSEMBLY: 4-layer DB-backed context (primary) or legacy MemoryManager (fallback)
+      // H2 fix: Reload context per-chapter (not per-arc) to get fresh last-5-chapters & summaries
       // ═══════════════════════════════════════════════════════════════
       let previousSummary: string;
+
+      // Reload context from DB for EVERY chapter to ensure freshness
+      if (this.novelId) {
+        try {
+          const contextLoader = new ContextLoader(this.state!.projectId, this.novelId);
+          this.contextPayload = await contextLoader.load(chapterNumber);
+        } catch {
+          // Keep existing contextPayload if reload fails
+        }
+      }
 
       if (this.contextPayload) {
         // PRIMARY PATH: Use 4-layer context loaded from DB
@@ -612,7 +637,7 @@ export class StoryRunner {
       // Append quality feedback regardless of context source
       if (this.lastQCResult && this.lastQCResult.scores.overall < 65) {
         previousSummary += `\n\n⚠️ QUALITY NOTE (từ chương trước):`;
-        for (const warning of this.lastQCResult.warnings.slice(0, 3)) {
+        for (const warning of this.lastQCResult.warnings.slice(0, 10)) {
           previousSummary += `\n- ${warning}`;
         }
       }
@@ -624,13 +649,17 @@ export class StoryRunner {
       const targetChapters = this.state!.totalChapters;
       const isFinalArc = arc.theme === 'finale' || arc.endChapter >= targetChapters;
       const isInGracePeriod = chapterNumber >= targetChapters; // Past soft target, must wrap up
-      const isNearEnd = chapterNumber >= targetChapters - 20;
+      // Progressive wind-down thresholds (Gap 12 fix)
+      const progressPct = chapterNumber / targetChapters;
+      const isAt80Pct = progressPct >= 0.80 && progressPct < 0.90;
+      const isAt90Pct = progressPct >= 0.90 && chapterNumber < targetChapters - 20;
+      const isNearEnd = chapterNumber >= targetChapters - 20 && !isInGracePeriod;
       // Check if this is the last chapter of the current arc (natural ending point)
       const isLastChapterOfArc = chapterNumber === arc.endChapter || (chapterNumber % 20 === 0);
 
-      // Add finale context to previousSummary
+      // Add progressive finale context to previousSummary (Gap 12 fix: earlier wind-down)
       if (isInGracePeriod) {
-        // Grace period: past target, MUST finish at next arc boundary
+        // Phase 4: Grace period — past target, MUST finish at next arc boundary
         previousSummary += `\n\n🏁 GIAI ĐOẠN KẾT THÚC (đã vượt target ${targetChapters} chương):`;
         previousSummary += `\n- PHẢI kết thúc bộ truyện trong arc hiện tại`;
         previousSummary += `\n- Giải quyết TẤT CẢ xung đột còn lại ngay lập tức`;
@@ -641,10 +670,25 @@ export class StoryRunner {
           previousSummary += `\n- Đẩy nhanh resolution, chuẩn bị cho chương cuối`;
         }
       } else if (isNearEnd) {
-        previousSummary += `\n\n🏁 APPROACHING STORY FINALE (còn ~${targetChapters - chapterNumber} chương):`;
-        previousSummary += `\n- Bắt đầu giải quyết các plot threads còn lại`;
+        // Phase 3: Last 20 chapters — actively resolving everything
+        previousSummary += `\n\n🏁 FINAL PUSH (còn ~${targetChapters - chapterNumber} chương):`;
+        previousSummary += `\n- Giải quyết NGAY các plot threads còn lại — KHÔNG trì hoãn`;
         previousSummary += `\n- Không mở thêm xung đột mới hoặc bí ẩn mới`;
         previousSummary += `\n- Đẩy protagonist lên cảnh giới cao hơn nhanh chóng`;
+        previousSummary += `\n- Chuẩn bị climax lớn nhất và kết cục`;
+      } else if (isAt90Pct) {
+        // Phase 2: 90% mark — urgently resolving
+        previousSummary += `\n\n⚡ GIAI ĐOẠN CUỐI (90%+ truyện, còn ~${targetChapters - chapterNumber} chương):`;
+        previousSummary += `\n- Tích cực giải quyết các tuyến truyện đang mở`;
+        previousSummary += `\n- HẠN CHẾ mở tuyến mới (chỉ nếu phục vụ kết cục)`;
+        previousSummary += `\n- Đẩy nhanh tiến triển sức mạnh MC`;
+        previousSummary += `\n- Bắt đầu thiết lập final confrontation`;
+      } else if (isAt80Pct) {
+        // Phase 1: 80% mark — planting seeds for resolution
+        previousSummary += `\n\n📋 CHUẨN BỊ KẾT THÚC (80%+ truyện, còn ~${targetChapters - chapterNumber} chương):`;
+        previousSummary += `\n- Bắt đầu gieo hạt cho kết cục — các tuyến truyện nên hội tụ`;
+        previousSummary += `\n- Ưu tiên giải quyết tuyến phụ trước, để dành xung đột chính cho cuối`;
+        previousSummary += `\n- Vẫn có thể có twist nhưng phải phục vụ hướng đến kết cục`;
       }
 
       // Build currentArc context

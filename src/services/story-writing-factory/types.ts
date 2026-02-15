@@ -48,7 +48,7 @@ export const DEFAULT_CONFIG: FactoryConfig = {
   provider: 'gemini',
   model: 'gemini-3-flash-preview',
   temperature: 0.75,
-  maxTokens: 8000,
+  maxTokens: 32768,
   targetWordCount: 2800,
   genre: 'tien-hiep',
   minQualityScore: 7,

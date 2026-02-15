@@ -22,8 +22,9 @@ import { createClient } from '@supabase/supabase-js';
 import { AIProviderService } from '@/services/ai-provider';
 import { StoryRunner } from '@/services/story-writing-factory/runner';
 import type { FactoryConfig, RunnerConfig, GenreType } from '@/services/story-writing-factory/types';
-import { summarizeChapter, generateSynopsis, generateArcPlan, generateStoryBible } from '@/services/story-writing-factory/context-generators';
-import { saveChapterSummary, ContextLoader } from '@/services/story-writing-factory/context-loader';
+import { summarizeChapter, generateSynopsis, generateArcPlan, generateStoryBible, refreshStoryBible, shouldBeFinaleArc } from '@/services/story-writing-factory/context-generators';
+import { saveChapterSummary, ContextLoader, loadStoryOutline } from '@/services/story-writing-factory/context-loader';
+import type { StoryVision } from '@/services/story-writing-factory/context-generators';
 
 // CONFIGURATION
 const MIN_RESUME_BATCH_SIZE = 30;
@@ -292,7 +293,7 @@ async function writeOneChapter(
     provider: 'gemini',
     model: 'gemini-3-flash-preview',
     temperature: project.temperature || 1.0,
-    maxTokens: 6144,
+    maxTokens: 32768,
     targetWordCount: project.target_chapter_length || 2500,
     genre: (project.genre || 'tien-hiep') as GenreType,
     minQualityScore: 5,
@@ -385,12 +386,52 @@ async function writeOneChapter(
             // Reload synopsis (just updated) for arc plan generation
             const updatedPayload = await contextLoader.load(chNum + 1);
 
+            // Load story vision for directional coherence (Gap 2/7 fix)
+            let storyVision: StoryVision | null = null;
+            try {
+              const savedOutline = await loadStoryOutline(project.id);
+              if (savedOutline) {
+                storyVision = {
+                  endingVision: (savedOutline as Record<string, unknown>).endingVision as string | undefined,
+                  majorPlotPoints: ((savedOutline as Record<string, unknown>).majorPlotPoints as Array<{ description?: string }> | undefined)
+                    ?.map(p => typeof p === 'string' ? p : p.description || JSON.stringify(p)),
+                  mainConflict: (savedOutline as Record<string, unknown>).mainConflict as string | undefined,
+                  endGoal: ((savedOutline as Record<string, unknown>).protagonist as Record<string, unknown> | undefined)?.endGoal as string | undefined,
+                };
+              }
+            } catch { /* non-fatal */ }
+
+            // Finale detection: should next arc be the final one? (Gap 3 fix)
+            const totalTarget = project.total_planned_chapters || 200;
+            let isFinale = (nextArcNumber * 20) >= totalTarget; // structural check
+            if (!isFinale && chNum >= totalTarget * 0.6) {
+              // AI-based finale detection at >= 60% progress
+              try {
+                isFinale = await shouldBeFinaleArc(
+                  aiService, updatedPayload.synopsis, storyVision,
+                  updatedPayload.synopsis?.openThreads || [], chNum, totalTarget,
+                );
+              } catch { /* non-fatal, keep isFinale = false */ }
+            }
+
             // Generate arc plan for the NEXT arc
             await generateArcPlan(
               aiService, project.id, nextArcNumber, genre, protagonistName,
               updatedPayload.synopsis, updatedPayload.storyBible,
-              project.total_planned_chapters || 200,
+              totalTarget,
+              storyVision,
             );
+
+            // Mark arc as finale if detected (Gap 3 fix)
+            if (isFinale) {
+              try {
+                const adminSupa = getSupabaseAdmin();
+                await adminSupa.from('arc_plans')
+                  .update({ is_finale_arc: true })
+                  .eq('project_id', project.id)
+                  .eq('arc_number', nextArcNumber);
+              } catch { /* non-fatal */ }
+            }
           }
 
           // 3. Generate story bible after chapter 3 (one-time)
@@ -403,6 +444,23 @@ async function writeOneChapter(
                 project.world_description || novel.title,
                 biblePayload.recentChapters,
               );
+            }
+          }
+
+          // 4. Refresh story bible every 100 chapters (Gap 5b fix)
+          const ARC_SIZE_CHECK = 20;
+          if (chNum % ARC_SIZE_CHECK === 0) {
+            const arcNum = Math.floor(chNum / ARC_SIZE_CHECK);
+            if (arcNum > 0 && arcNum % 5 === 0) { // every 100 chapters (5 arcs)
+              const ctxLoader = new ContextLoader(project.id, novel.id);
+              const refreshPayload = await ctxLoader.load(chNum + 1);
+              if (refreshPayload.storyBible) {
+                await refreshStoryBible(
+                  aiService, project.id, genre, protagonistName,
+                  refreshPayload.storyBible, refreshPayload.synopsis,
+                  refreshPayload.recentChapters, chNum,
+                );
+              }
             }
           }
         } catch (postWriteErr) {
@@ -436,7 +494,7 @@ async function writeOneChapter(
   // IMPORTANT: Skip fallback if the chapter was already generated (even if persist failed),
   // to avoid overwriting a good 3-agent chapter with a worse simple-workflow version.
   if (!chapterWritten && !chapterGenerated) {
-    const fallback = await runAttempt({ use3AgentWorkflow: false, maxRetries: 0, maxTokens: 6144, temperature: 0.9 });
+    const fallback = await runAttempt({ use3AgentWorkflow: false, maxRetries: 0, maxTokens: 32768, temperature: 0.9 });
     if (fallback.attemptPersisted) {
       chapterGenerated = true;
       chapterWritten = true;

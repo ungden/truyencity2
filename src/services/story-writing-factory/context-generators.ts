@@ -34,7 +34,7 @@ async function aiCall(
   aiService: AIProviderService,
   systemPrompt: string,
   userPrompt: string,
-  maxTokens: number = 4096,
+  maxTokens: number = 16384,
   temperature: number = 0.5,
 ): Promise<string> {
   const result = await aiService.chat({
@@ -105,7 +105,7 @@ QUAN TRỌNG:
 - Giữ lại TẤT CẢ tên nhân vật, địa điểm, sự kiện quan trọng
 - Ghi rõ trạng thái hiện tại của MC (cảnh giới, vị trí, mục tiêu)
 - Liệt kê tuyến truyện còn mở (chưa giải quyết)
-- Tối đa 2000 từ cho synopsis, ngắn gọn súc tích`;
+- Tối đa 8000 từ cho synopsis, chi tiết đầy đủ mọi sự kiện và nhân vật quan trọng`;
 
   const userPrompt = `Nhân vật chính: ${protagonistName}
 Thể loại: ${genre}
@@ -127,7 +127,7 @@ Trả về JSON:
 }`;
 
   try {
-    const raw = await aiCall(aiService, systemPrompt, userPrompt, 6144, 0.3);
+    const raw = await aiCall(aiService, systemPrompt, userPrompt, 16384, 0.3);
     const json = JSON.parse(extractJSON(raw));
 
     await saveSynopsis(
@@ -155,6 +155,17 @@ Trả về JSON:
  * Generate a detailed 20-chapter arc plan.
  * Called at arc boundaries (chapter % 20 == 1).
  */
+/**
+ * Story outline vision data passed to arc planner for directional coherence.
+ * Loaded from ai_story_projects.story_outline (persisted in Phase 2).
+ */
+export interface StoryVision {
+  endingVision?: string;
+  majorPlotPoints?: string[];
+  mainConflict?: string;
+  endGoal?: string;
+}
+
 export async function generateArcPlan(
   aiService: AIProviderService,
   projectId: string,
@@ -164,6 +175,7 @@ export async function generateArcPlan(
   synopsis: SynopsisData | null,
   storyBible: string | null,
   totalPlannedChapters: number,
+  storyVision?: StoryVision | null,
 ): Promise<void> {
   const startChapter = (arcNumber - 1) * 20 + 1;
   const endChapter = arcNumber * 20;
@@ -172,6 +184,20 @@ export async function generateArcPlan(
   const remainingChapters = totalPlannedChapters - startChapter + 1;
 
   const contextParts: string[] = [];
+
+  // Inject endingVision + majorPlotPoints from persisted StoryOutline (Gap 2/7 fix)
+  if (storyVision) {
+    const visionParts: string[] = [];
+    if (storyVision.endingVision) visionParts.push(`KẾT CỤC DỰ KIẾN: ${storyVision.endingVision}`);
+    if (storyVision.mainConflict) visionParts.push(`XUNG ĐỘT CHÍNH: ${storyVision.mainConflict}`);
+    if (storyVision.endGoal) visionParts.push(`MỤC TIÊU CUỐI: ${storyVision.endGoal}`);
+    if (storyVision.majorPlotPoints && storyVision.majorPlotPoints.length > 0) {
+      visionParts.push(`CÁC MỐC CỐT TRUYỆN LỚN:\n${storyVision.majorPlotPoints.map((p, i) => `  ${i + 1}. ${typeof p === 'string' ? p : JSON.stringify(p)}`).join('\n')}`);
+    }
+    if (visionParts.length > 0) {
+      contextParts.push(`TẦM NHÌN CỐT TRUYỆN (từ kế hoạch ban đầu):\n${visionParts.join('\n')}`);
+    }
+  }
 
   if (storyBible) {
     contextParts.push(`STORY BIBLE:\n${storyBible}`);
@@ -184,8 +210,8 @@ export async function generateArcPlan(
   const phaseGuidance = isFirstArc
     ? 'ARC MỞ ĐẦU: Giới thiệu MC, thế giới, xung đột chính. Hook mạnh, worldbuilding hấp dẫn.'
     : isFinalArc
-    ? `ARC KẾT THÚC (còn ~${remainingChapters} chương): Giải quyết TẤT CẢ tuyến truyện, climax lớn nhất, kết cục thỏa mãn.`
-    : `ARC GIỮA (${arcNumber}/${Math.ceil(totalPlannedChapters / 20)}): Phát triển nhân vật, escalate xung đột, mở tuyến truyện mới.`;
+    ? `ARC KẾT THÚC (còn ~${remainingChapters} chương): Giải quyết TẤT CẢ tuyến truyện, climax lớn nhất, kết cục thỏa mãn.${storyVision?.endingVision ? ` Hướng đến kết cục: ${storyVision.endingVision}` : ''}`
+    : `ARC GIỮA (${arcNumber}/${Math.ceil(totalPlannedChapters / 20)}): Phát triển nhân vật, escalate xung đột, mở tuyến truyện mới.${storyVision?.endingVision ? ` (Nhớ: câu chuyện hướng đến: ${storyVision.endingVision})` : ''}`;
 
   const systemPrompt = `Bạn là chuyên gia lên kế hoạch tiểu thuyết ${genre} dài kỳ. Nhiệm vụ: tạo KẾ HOẠCH CHI TIẾT cho 20 chương tiếp theo.
 
@@ -243,6 +269,70 @@ LƯU Ý: chapter_briefs phải có ĐỦ 20 entries (từ ${startChapter} đến
 }
 
 // ============================================================================
+// 2b. FINALE DETECTION (Gap 3 fix)
+// ============================================================================
+
+/**
+ * Ask AI whether the upcoming arc should be the FINAL arc.
+ * Called at arc boundaries when chapter >= 60% of target.
+ * Returns true if AI judges the story is ready to conclude.
+ */
+export async function shouldBeFinaleArc(
+  aiService: AIProviderService,
+  synopsis: SynopsisData | null,
+  storyVision: StoryVision | null,
+  openThreads: string[],
+  currentChapter: number,
+  targetChapters: number,
+): Promise<boolean> {
+  const progress = Math.round((currentChapter / targetChapters) * 100);
+  const remainingChapters = targetChapters - currentChapter;
+
+  const contextParts: string[] = [];
+  contextParts.push(`TIẾN ĐỘ: Ch.${currentChapter}/${targetChapters} (${progress}%), còn ~${remainingChapters} chương`);
+
+  if (synopsis) {
+    contextParts.push(`TÓM TẮT: ${synopsis.synopsisText}`);
+    contextParts.push(`MC: ${synopsis.mcCurrentState || 'N/A'}`);
+  }
+
+  if (openThreads.length > 0) {
+    contextParts.push(`TUYẾN MỞ (${openThreads.length}): ${openThreads.join(' | ')}`);
+  }
+
+  if (storyVision?.endingVision) {
+    contextParts.push(`KẾT CỤC DỰ KIẾN: ${storyVision.endingVision}`);
+  }
+  if (storyVision?.endGoal) {
+    contextParts.push(`MỤC TIÊU CUỐI: ${storyVision.endGoal}`);
+  }
+
+  const systemPrompt = `Bạn là chuyên gia phân tích cấu trúc tiểu thuyết dài kỳ.
+Nhiệm vụ: Quyết định xem arc tiếp theo có nên là ARC CUỐI CÙNG hay không.
+
+CÂN NHẮC:
+- Nếu đa số tuyến truyện đã sẵn sàng resolution → NÊN kết thúc
+- Nếu còn quá nhiều tuyến mở chưa đủ setup → CHƯA kết thúc
+- Nếu MC đã đạt hoặc gần đạt mục tiêu cuối → NÊN kết thúc
+- Kết thúc tự nhiên tốt hơn kéo dài vô nghĩa
+- Còn ${remainingChapters} chương (~${Math.ceil(remainingChapters / 20)} arcs) để kết thúc
+
+Trả về JSON: {"is_finale": true/false, "reason": "lý do ngắn"}`;
+
+  try {
+    const raw = await aiCall(aiService, systemPrompt, contextParts.join('\n\n'), 1024, 0.2);
+    const json = JSON.parse(extractJSON(raw));
+    const isFinale = json.is_finale === true;
+    logger.debug('Finale detection result', { currentChapter, targetChapters, isFinale, reason: json.reason });
+    return isFinale;
+  } catch (e) {
+    logger.debug('Finale detection failed, using fallback', { error: e });
+    // Fallback: if >= 90% done, default to finale
+    return currentChapter >= targetChapters * 0.9;
+  }
+}
+
+// ============================================================================
 // 3. STORY BIBLE GENERATOR
 // ============================================================================
 
@@ -277,7 +367,7 @@ STORY BIBLE bao gồm:
 QUAN TRỌNG:
 - Chỉ ghi những gì ĐÃ ĐƯỢC THIẾT LẬP trong các chương
 - KHÔNG thêm thông tin tưởng tượng
-- Tối đa 1500 từ, súc tích`;
+- Tối đa 5000 từ, chi tiết đầy đủ`;
 
   const userPrompt = `Thế giới ban đầu: ${worldDescription}
 Nhân vật chính: ${protagonistName}
@@ -289,11 +379,79 @@ ${chaptersText}
 Hãy phân tích và tạo STORY BIBLE. Viết dạng text thuần (không JSON), có heading rõ ràng.`;
 
   try {
-    const bible = await aiCall(aiService, systemPrompt, userPrompt, 4096, 0.3);
+    const bible = await aiCall(aiService, systemPrompt, userPrompt, 16384, 0.3);
     await saveStoryBible(projectId, bible);
     logger.debug('Story bible generated', { projectId });
   } catch (e) {
     logger.debug('Story bible generation failed', { projectId, error: e });
+  }
+}
+
+// ============================================================================
+// 3b. STORY BIBLE REFRESH (Gap 5b fix)
+// ============================================================================
+
+/**
+ * Refresh/update the story bible using current synopsis + recent chapters.
+ * Unlike initial generation (from first 3 chapters), this UPDATES the existing bible.
+ * Called every 100-200 chapters (every 5-10 arcs) at arc boundaries.
+ */
+export async function refreshStoryBible(
+  aiService: AIProviderService,
+  projectId: string,
+  genre: GenreType,
+  protagonistName: string,
+  currentBible: string,
+  synopsis: SynopsisData | null,
+  recentChapters: RecentChapter[],
+  currentChapter: number,
+): Promise<void> {
+  const synopsisText = synopsis
+    ? `TÓM TẮT CỐT TRUYỆN (đến ch.${synopsis.lastUpdatedChapter}):\n${synopsis.synopsisText}\n\nMC: ${synopsis.mcCurrentState || 'N/A'}\nĐồng minh: ${synopsis.activeAllies.join(', ') || 'N/A'}\nKẻ thù: ${synopsis.activeEnemies.join(', ') || 'N/A'}\nTuyến mở: ${synopsis.openThreads.join(' | ') || 'N/A'}`
+    : '';
+
+  const recentText = recentChapters.length > 0
+    ? recentChapters.map(ch => `--- Ch.${ch.chapterNumber}: ${ch.title} ---\n${ch.content}`).join('\n\n')
+    : '';
+
+  const systemPrompt = `Bạn là chuyên gia cập nhật STORY BIBLE cho tiểu thuyết ${genre} dài kỳ.
+
+STORY BIBLE hiện tại đã CŨ (được tạo từ các chương đầu). Nhiệm vụ: CẬP NHẬT nó dựa trên synopsis + chương gần đây.
+
+CẬP NHẬT:
+1. THẾ GIỚI: Thêm địa điểm mới, tổ chức mới, quy tắc mới đã xuất hiện
+2. NHÂN VẬT CHÍNH: Cập nhật cảnh giới, sức mạnh, vị trí, mục tiêu hiện tại
+3. NHÂN VẬT PHỤ: Thêm NPC mới quan trọng, cập nhật trạng thái (đã chết → ghi rõ ĐÃ CHẾT)
+4. XUNG ĐỘT: Cập nhật xung đột hiện tại, đánh dấu xung đột đã giải quyết
+5. QUY TẮC: Thêm quy tắc mới, giữ nguyên quy tắc cũ vẫn đúng
+6. NHÂN VẬT ĐÃ CHẾT: Liệt kê rõ ràng (QUAN TRỌNG - để tránh nhân vật chết sống lại)
+
+NGUYÊN TẮC:
+- GIỮ LẠI tất cả thông tin từ bible cũ vẫn đúng
+- CẬP NHẬT thông tin đã thay đổi
+- THÊM thông tin mới
+- ĐÁNH DẤU rõ nhân vật đã chết
+- Tối đa 6000 từ, chi tiết đầy đủ`;
+
+  const userPrompt = `STORY BIBLE HIỆN TẠI (cần cập nhật):
+${currentBible}
+
+${synopsisText}
+
+CHƯƠNG GẦN ĐÂY (ch.${currentChapter - recentChapters.length + 1} → ch.${currentChapter}):
+${recentText}
+
+Nhân vật chính: ${protagonistName}
+Chương hiện tại: ${currentChapter}
+
+Hãy viết STORY BIBLE CẬP NHẬT. Viết dạng text thuần (không JSON), có heading rõ ràng.`;
+
+  try {
+    const updatedBible = await aiCall(aiService, systemPrompt, userPrompt, 16384, 0.3);
+    await saveStoryBible(projectId, updatedBible);
+    logger.debug('Story bible refreshed', { projectId, currentChapter });
+  } catch (e) {
+    logger.debug('Story bible refresh failed (non-fatal)', { projectId, error: e });
   }
 }
 
@@ -330,7 +488,7 @@ Trả về JSON:
 }`;
 
   try {
-    const raw = await aiCall(aiService, systemPrompt, userPrompt, 1024, 0.2);
+    const raw = await aiCall(aiService, systemPrompt, userPrompt, 2048, 0.2);
     const json = JSON.parse(extractJSON(raw));
     return {
       summary: json.summary || `Chương ${chapterNumber}: ${title}`,

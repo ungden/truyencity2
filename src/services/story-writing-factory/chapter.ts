@@ -194,21 +194,24 @@ export class ChapterWriter {
         }
 
         // Step 2: Writer creates content (with length enforcement)
+        // Pass trimmed previousSummary to writer for voice/event continuity (Gap 5 fix)
         const writerResult = await this.runWriter(
           architectResult.data.chapterOutline,
           context.styleBible,
           this.config.genre,
-          context.worldBible
+          context.worldBible,
+          context.previousSummary,
         );
 
         if (!writerResult.success || !writerResult.data) {
           throw new Error(writerResult.error || 'Writer failed');
         }
 
-        // Step 3: Critic evaluates
+        // Step 3: Critic evaluates (with cross-chapter context for contradiction detection — C2 fix)
         const criticResult = await this.runCritic(
           architectResult.data.chapterOutline,
-          writerResult.data.chapterContent
+          writerResult.data.chapterContent,
+          context.previousSummary,
         );
 
         if (criticResult.data?.requiresRewrite && retryCount < this.config.maxRetries - 1) {
@@ -423,7 +426,7 @@ WORLD BIBLE:
 - Protagonist: ${context.worldBible.protagonist.name} (${context.worldBible.protagonist.realm})
 - Power System: ${context.worldBible.powerSystem.name}
 - Traits: ${context.worldBible.protagonist.traits.join(', ')}
-${context.worldBible.npcRelationships.length > 0 ? `- NPCs: ${context.worldBible.npcRelationships.slice(0, 5).map(n => `${n.name}(${n.role})`).join(', ')}` : ''}
+${context.worldBible.npcRelationships.length > 0 ? `- NPCs: ${context.worldBible.npcRelationships.slice(0, 20).map(n => `${n.name}(${n.role})`).join(', ')}` : ''}
 ${constraintSection}${topicSection}
 CURRENT ARC: ${context.currentArc.title} (${context.currentArc.theme})
 - Chapters: ${context.currentArc.startChapter}-${context.currentArc.endChapter}
@@ -433,7 +436,7 @@ GENRE CONVENTIONS: ${context.styleBible.genreConventions.join('; ')}
 
 ${context.currentArc.isFinalArc
   ? 'KẾT THÚC CHƯƠNG (ARC CUỐI):\n- KHÔNG dùng cliffhanger — kết thúc thỏa mãn\n- Nếu đây là chương cuối cùng: viết epilogue, giải quyết mọi xung đột\n- Nếu gần cuối: có thể dùng mild suspense nhưng không mở plot thread mới'
-  : 'CLIFFHANGER TECHNIQUES (chọn 1 cho cuối chương):\n' + CLIFFHANGER_TECHNIQUES.slice(0, 4).map(c => '- ' + c.name + ': ' + c.example).join('\n')}
+  : 'CLIFFHANGER TECHNIQUES (chọn 1 cho cuối chương):\n' + CLIFFHANGER_TECHNIQUES.map(c => '- ' + c.name + ': ' + c.example).join('\n')}
 
 PREVIOUS: ${context.previousSummary}
 
@@ -503,7 +506,7 @@ Trả về JSON (KHÔNG có comment):
           { role: 'user', content: prompt },
         ],
         temperature: this.agents.architect.temperature,
-        maxTokens: 4000,
+        maxTokens: 8192,
       });
 
       if (!response.success || !response.content) {
@@ -540,7 +543,8 @@ Trả về JSON (KHÔNG có comment):
     outline: ChapterOutline,
     styleBible: StyleBible,
     genre?: GenreType,
-    worldBible?: WorldBible
+    worldBible?: WorldBible,
+    previousContext?: string,
   ): Promise<{ success: boolean; data?: WriterOutput; error?: string }> {
     // Load constraints for writer too
     const writerConstraintSection = worldBible
@@ -583,9 +587,19 @@ Trả về JSON (KHÔNG có comment):
 - Protagonist vẫn là trọng tâm — scene POV khác chỉ để bổ sung chiều sâu, KHÔNG lấn át\n`
       : '';
 
+    // Full previous context for writer continuity (Gap 5 fix + C1 fix)
+    // Writer needs the FULL assembled context to maintain voice, reference events, and avoid contradictions.
+    // Gemini 3 Flash has 1M context — no need to truncate.
+    const prevContextSection = previousContext
+      ? `BỐI CẢNH TRƯỚC ĐÓ (để duy trì giọng văn + liên kết sự kiện — ĐỌC KỸ trước khi viết):
+${previousContext}
+
+`
+      : '';
+
     const prompt = `Viết TOÀN BỘ Chương ${outline.chapterNumber}: ${outline.title}
 
-OUTLINE:
+${prevContextSection}OUTLINE:
 ${outline.summary}
 
 SCENES (viết ĐẦY ĐỦ chi tiết cho MỖI scene - KHÔNG được bỏ qua scene nào):
@@ -681,22 +695,29 @@ Bắt đầu viết (nhớ: TỐI THIỂU ${totalTargetWords} từ):`;
 
   private async runCritic(
     outline: ChapterOutline,
-    content: string
+    content: string,
+    previousContext?: string,
   ): Promise<{ success: boolean; data?: CriticOutput; error?: string }> {
     const wordCount = this.countWords(content);
     const targetWords = outline.targetWordCount || this.config.targetWordCount;
     const wordRatio = Math.round((wordCount / targetWords) * 100);
 
     // Show full content to the critic - Gemini Flash supports 1M context window
-    // Only truncate for extremely long chapters (>30K chars) to save tokens
-    const maxPreview = 30000;
-    const contentPreview = content.length <= maxPreview
-      ? content
-      : `${content.substring(0, 15000)}\n\n[... phần giữa ${Math.round((content.length - 20000) / 1000)}K chars ...]\n\n${content.substring(content.length - 5000)}`;
+    const contentPreview = content;
+
+    // Cross-chapter context for contradiction detection (C2 fix)
+    // Give critic the synopsis + last chapter summary so it can catch:
+    // dead characters reappearing, power inconsistencies, contradictions
+    const crossChapterSection = previousContext
+      ? `BỐI CẢNH CÂU CHUYỆN (dùng để KIỂM TRA mâu thuẫn):
+${previousContext}
+
+`
+      : '';
 
     const prompt = `Đánh giá chương nghiêm túc:
 
-OUTLINE: ${outline.title} - ${outline.summary}
+${crossChapterSection}OUTLINE: ${outline.title} - ${outline.summary}
 TARGET DOPAMINE: ${outline.dopaminePoints.map(dp => `${dp.type}: ${dp.description}`).join('; ')}
 TARGET WORDS: ${targetWords}
 ACTUAL WORDS: ${wordCount} (đạt ${wordRatio}% target)
@@ -712,11 +733,17 @@ ${contentPreview}
   "overallScore": <1-10 điểm thực tế, KHÔNG mặc định 7>,
   "dopamineScore": <1-10 dopamine có satisfying không>,
   "pacingScore": <1-10 nhịp điệu có tốt không>,
-  "issues": [{"type": "word_count|pacing|logic|detail", "description": "mô tả cụ thể", "severity": "minor|moderate|major"}],
+  "issues": [{"type": "word_count|pacing|logic|detail|continuity", "description": "mô tả cụ thể", "severity": "minor|moderate|major"}],
   "approved": <true nếu overallScore >= 6 VÀ wordRatio >= 70%>,
-  "requiresRewrite": <true nếu overallScore <= 3 HOẶC wordRatio < 60%>,
+  "requiresRewrite": <true nếu overallScore <= 3 HOẶC wordRatio < 60% HOẶC có lỗi continuity major>,
   "rewriteInstructions": "hướng dẫn cụ thể nếu cần rewrite"
-}`;
+}
+
+KIỂM TRA MÂU THUẪN (BẮT BUỘC nếu có BỐI CẢNH ở trên):
+- Nhân vật đã chết có xuất hiện lại không?
+- Cảnh giới/sức mạnh MC có mâu thuẫn với trạng thái trong bối cảnh không?
+- Có vi phạm quy tắc thế giới đã thiết lập không?
+- Nếu phát hiện, ghi vào issues với type "continuity" và severity "major"`;
 
     try {
       const response = await this.aiService.chat({
@@ -727,7 +754,7 @@ ${contentPreview}
           { role: 'user', content: prompt },
         ],
         temperature: this.agents.critic.temperature,
-        maxTokens: 1500,
+        maxTokens: 4096,
       });
 
       if (!response.success || !response.content) {
@@ -785,8 +812,8 @@ ${contentPreview}
     targetRemainingWords?: number
   ): Promise<string | null> {
     const remaining = targetRemainingWords || this.config.targetWordCount;
-    // Take last 1500 chars as context for continuation
-    const lastPart = existingContent.substring(existingContent.length - 1500);
+    // Take larger tail context for better continuation coherence
+    const lastPart = existingContent.substring(existingContent.length - 10000);
 
     try {
       const response = await this.aiService.chat({
@@ -808,7 +835,7 @@ Viết tiếp ngay:`,
           },
         ],
         temperature: this.agents.writer.temperature,
-        maxTokens: Math.min(this.config.maxTokens, 4096),
+        maxTokens: Math.min(this.config.maxTokens, 16384),
       });
 
       if (response.success && response.content) {
@@ -893,9 +920,9 @@ Viết tiếp ngay:`,
     // Pick a random exemplar for variety
     const exemplar = enhancedStyle.exemplars[chapterNumber % enhancedStyle.exemplars.length];
 
-    // Build NPC context (top 5 most relevant)
+    // Build NPC context (top 20 most relevant)
     const npcContext = context.worldBible.npcRelationships.length > 0
-      ? `\nNPCs QUAN TRỌNG:\n${context.worldBible.npcRelationships.slice(0, 5).map(n => `- ${n.name} (${n.role}, affinity: ${n.affinity}): ${n.description}`).join('\n')}`
+      ? `\nNPCs QUAN TRỌNG:\n${context.worldBible.npcRelationships.slice(0, 20).map(n => `- ${n.name} (${n.role}, affinity: ${n.affinity}): ${n.description}`).join('\n')}`
       : '';
 
     // Build arc context if available
@@ -929,7 +956,7 @@ TỪ VỰNG SỬ DỤNG (bắt buộc dùng ít nhất 3-5 biểu đạt sau):
 
 VÍ DỤ VĂN PHONG CHUẨN (viết theo phong cách này):
 """
-${exemplar.content.substring(0, 500)}
+${exemplar.content.substring(0, 2000)}
 """
 Lưu ý: ${exemplar.notes.join('; ')}
 

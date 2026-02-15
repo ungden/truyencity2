@@ -32,6 +32,28 @@ Both share the same Supabase backend.
 
 ---
 
+## Supreme Goals — Long-Form Novel Quality (MANDATORY)
+
+All agents working on story generation must preserve these 5 goals:
+
+1. **Coherence từ chương 1 đến chương cuối** — zero plot holes, zero logic breaks.
+2. **Character consistency tuyệt đối** — nhân vật đã chết KHÔNG được xuất hiện lại; sức mạnh/cảnh giới KHÔNG được tự thoái lui vô lý.
+3. **Directional plot progression** — không lan man, có escalating conflict, có climax, có payoff.
+4. **Natural ending trong khoảng 1000-2000 chương** — để AI tự quyết định điểm kết thúc phù hợp trong range, không ép cứng đúng 1 con số.
+5. **Uniform quality xuyên suốt** — chương 800 phải giữ chất lượng tương đương chương 8.
+
+### Technical Principles (Gemini 3 Flash Preview)
+
+- **Cost is not a concern**: ưu tiên chất lượng tối đa.
+- Model context window: **1,000,000 input tokens / 65,000 output tokens**.
+- Không tự bóp context vô lý. Mục tiêu mỗi AI call:
+  - Input: ~100K-200K tokens khi cần ngữ cảnh sâu.
+  - Output: ~16K-32K tokens cho các bước viết/chuyển cảnh dài.
+- Ưu tiên context đầy đủ cho Architect/Writer/Critic để giảm mâu thuẫn dài hạn.
+- Hệ thống phải hỗ trợ chạy batch **5 novel song song qua đêm** đến điểm kết tự nhiên.
+
+---
+
 ## Vietnamese Language Rules (QUAN TRỌNG)
 
 **Tất cả text tiếng Việt hiển thị cho người dùng PHẢI có dấu đầy đủ.**

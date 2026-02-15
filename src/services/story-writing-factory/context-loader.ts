@@ -114,10 +114,10 @@ export class ContextLoader {
     ] = await Promise.all([
       this.loadStoryBible(),
       this.loadSynopsis(),
-      this.loadRecentChapters(chapterNumber, 5),
+      this.loadRecentChapters(chapterNumber, 15),
       this.loadArcPlan(arcNumber),
       this.loadPreviousTitles(chapterNumber),
-      this.loadRecentOpenings(chapterNumber, 20),
+      this.loadRecentOpenings(chapterNumber, 50),
       isArcBoundary ? this.loadArcChapterSummaries(arcNumber - 1) : Promise.resolve([]),
     ]);
 
@@ -254,16 +254,19 @@ export class ContextLoader {
   private async loadPreviousTitles(currentChapter: number): Promise<string[]> {
     try {
       const supabase = getSupabase();
-      // Load ALL previous titles for the novel (needed for dedup)
+      // Cap at last 500 titles to preserve richer long-range title context.
+      // Title dedup still works because ChapterWriter uses titleChecker on the returned list.
       const { data, error } = await supabase
         .from('chapters')
         .select('title')
         .eq('novel_id', this.novelId)
         .lt('chapter_number', currentChapter)
-        .order('chapter_number', { ascending: true });
+        .order('chapter_number', { ascending: false })
+        .limit(500);
 
       if (error || !data) return [];
-      return (data as { title: string }[]).map(row => row.title);
+      // Return in chronological order (oldest first) for context coherence
+      return (data as { title: string }[]).reverse().map(row => row.title);
     } catch (e) {
       logger.debug('Failed to load previous titles', { novelId: this.novelId, error: e });
       return [];
@@ -552,6 +555,7 @@ export async function saveArcPlan(
   threadsToAdvance: string[],
   threadsToResolve: string[],
   newThreads: string[],
+  isFinaleArc: boolean = false,
 ): Promise<void> {
   try {
     const supabase = getSupabase();
@@ -566,6 +570,7 @@ export async function saveArcPlan(
       threads_to_advance: threadsToAdvance,
       threads_to_resolve: threadsToResolve,
       new_threads: newThreads,
+      is_finale_arc: isFinaleArc,
     }, { onConflict: 'project_id,arc_number' });
   } catch (e) {
     console.warn('[context-loader] Failed to save arc plan', {
@@ -588,5 +593,49 @@ export async function saveStoryBible(projectId: string, storyBible: string): Pro
     console.warn('[context-loader] Failed to save story bible', {
       projectId, error: e instanceof Error ? e.message : String(e),
     });
+  }
+}
+
+// ============================================================================
+// STORY OUTLINE PERSISTENCE (Gap 1 fix)
+// ============================================================================
+
+/**
+ * Save the full StoryOutline to ai_story_projects.story_outline (jsonb).
+ * Called once after planStory() succeeds on init.
+ */
+export async function saveStoryOutline(projectId: string, outline: Record<string, unknown>): Promise<void> {
+  try {
+    const supabase = getSupabase();
+    await supabase
+      .from('ai_story_projects')
+      .update({ story_outline: outline })
+      .eq('id', projectId);
+  } catch (e) {
+    console.warn('[context-loader] Failed to save story outline', {
+      projectId, error: e instanceof Error ? e.message : String(e),
+    });
+  }
+}
+
+/**
+ * Load StoryOutline from DB. Returns null if not found.
+ */
+export async function loadStoryOutline(projectId: string): Promise<Record<string, unknown> | null> {
+  try {
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from('ai_story_projects')
+      .select('story_outline')
+      .eq('id', projectId)
+      .single();
+
+    if (error || !data?.story_outline) return null;
+    return data.story_outline as Record<string, unknown>;
+  } catch (e) {
+    console.warn('[context-loader] Failed to load story outline', {
+      projectId, error: e instanceof Error ? e.message : String(e),
+    });
+    return null;
   }
 }
