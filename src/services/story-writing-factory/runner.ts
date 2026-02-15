@@ -18,6 +18,7 @@ import { ChapterWriter } from './chapter';
 import { MemoryManager, ChapterMemory } from './memory';
 import { CostOptimizer, WorkflowOptimizer } from './cost-optimizer';
 import { ensureProjectRecord, getSupabase } from './supabase-helper';
+import { ContextLoader, ContextPayload } from './context-loader';
 import {
   StoryOutline,
   ArcOutline,
@@ -101,6 +102,8 @@ export class StoryRunner {
   private lastQCResult: FullGateResult | null = null;
   private chaptersToWriteLimit?: number; // Limit chapters per run
   private sessionChaptersWritten: number = 0; // Track chapters written in current run session
+  private contextPayload: ContextPayload | null = null; // 4-layer context from DB
+  private novelId: string | null = null; // For context loader queries
 
   // Control flags
   private isRunning = false;
@@ -151,6 +154,7 @@ export class StoryRunner {
     targetChapters?: number;
     chaptersPerArc?: number;
     projectId?: string; // Optional: reuse existing ai_story_projects UUID
+    novelId?: string; // Optional: novel UUID for context loader (chapters table)
     chaptersToWrite?: number; // Optional: limit how many chapters to write in this run
     currentChapter?: number; // Optional: resume from this chapter
   }): Promise<{ success: boolean; state: RunnerState; error?: string }> {
@@ -169,6 +173,7 @@ export class StoryRunner {
 
     this.chaptersToWriteLimit = input.chaptersToWrite;
     this.sessionChaptersWritten = 0;
+    this.novelId = input.novelId || null;
 
     // Initialize state
     this.state = this.createInitialState(targetChapters, targetArcs, input.projectId);
@@ -191,7 +196,31 @@ export class StoryRunner {
       targetChapters,
     });
 
-    // Initialize memory manager
+    // Load 4-layer context from DB (replaces ephemeral MemoryManager)
+    if (this.novelId && input.currentChapter && input.currentChapter > 0) {
+      try {
+        const nextChapter = input.currentChapter + 1;
+        const contextLoader = new ContextLoader(this.state.projectId, this.novelId);
+        this.contextPayload = await contextLoader.load(nextChapter);
+        logger.debug('4-layer context loaded', {
+          projectId: this.state.projectId,
+          nextChapter,
+          hasStoryBible: this.contextPayload.hasStoryBible,
+          hasSynopsis: !!this.contextPayload.synopsis,
+          hasArcPlan: !!this.contextPayload.arcPlan,
+          recentChapters: this.contextPayload.recentChapters.length,
+          previousTitles: this.contextPayload.previousTitles.length,
+        });
+      } catch (e) {
+        logger.debug('Context loader failed (falling back to MemoryManager)', {
+          projectId: this.state.projectId,
+          error: e instanceof Error ? e.message : String(e),
+        });
+        this.contextPayload = null;
+      }
+    }
+
+    // Initialize memory manager (fallback if context loader not available)
     this.memoryManager = new MemoryManager(this.state.projectId);
 
     // Initialize Sprint 1/2/3 Quality Systems
@@ -551,12 +580,18 @@ export class StoryRunner {
       this.state!.currentChapter = chapterNumber;
       this.callbacks.onChapterStarted?.(chapterNumber);
 
-      // Determine context level based on chapter importance
-      const contextLevel = WorkflowOptimizer.getContextLevel(chapterNumber);
+      // ═══════════════════════════════════════════════════════════════
+      // CONTEXT ASSEMBLY: 4-layer DB-backed context (primary) or legacy MemoryManager (fallback)
+      // ═══════════════════════════════════════════════════════════════
       let previousSummary: string;
 
-      if (this.memoryManager) {
-        // Use hierarchical memory for optimized context
+      if (this.contextPayload) {
+        // PRIMARY PATH: Use 4-layer context loaded from DB
+        // This provides ~22,000-27,000 tokens of context (story bible + synopsis + last 5 chapters + arc plan)
+        previousSummary = ContextLoader.assembleContext(this.contextPayload, chapterNumber);
+      } else if (this.memoryManager) {
+        // FALLBACK PATH: Legacy MemoryManager (ephemeral, mostly empty in cron resume mode)
+        const contextLevel = WorkflowOptimizer.getContextLevel(chapterNumber);
         if (contextLevel === 'full') {
           previousSummary = await this.memoryManager.buildContext(chapterNumber, 2000);
         } else if (contextLevel === 'medium') {
@@ -570,59 +605,16 @@ export class StoryRunner {
         if (restrictions.length > 0) {
           previousSummary += `\n\n⚠️ AVOID: ${restrictions.join(', ')}`;
         }
-
-        // Add character depth context (Sprint 2)
-        if (this.characterTracker) {
-          const needsDev = this.characterTracker.getCharactersNeedingDevelopment(chapterNumber);
-          if (needsDev.length > 0) {
-            const highPriority = needsDev.filter(d => d.priority === 'high').slice(0, 2);
-            if (highPriority.length > 0) {
-              previousSummary += `\n\n📌 CHARACTER DEVELOPMENT NEEDED:`;
-              for (const dev of highPriority) {
-                previousSummary += `\n- ${dev.character.name}: ${dev.reason}`;
-              }
-            }
-          }
-        }
-
-        // Add last QC feedback for improvement (Sprint 1/2/3)
-        if (this.lastQCResult && this.lastQCResult.scores.overall < 65) {
-          previousSummary += `\n\n⚠️ QUALITY NOTE (từ chương trước):`;
-          for (const warning of this.lastQCResult.warnings.slice(0, 3)) {
-            previousSummary += `\n- ${warning}`;
-          }
-        }
-
-        // Enrich context with PlotArcManager data (arc structure, twists, tension)
-        if (this.plotArcManager) {
-          try {
-            // Ensure arc exists for this chapter (auto-creates if needed)
-            await this.plotArcManager.ensureArcExists(chapterNumber);
-
-            // Get plot objectives (tension level, arc theme, upcoming twists, character milestones)
-            const plotObjectives = await this.plotArcManager.generatePlotObjectives(chapterNumber);
-            if (plotObjectives) {
-              previousSummary += `\n\n📊 PLOT OBJECTIVES:\n${plotObjectives}`;
-            }
-
-            // Get relevant arc summaries for long-term context
-            const arcSummaries = await this.plotArcManager.getRelevantArcSummaries(chapterNumber, 2);
-            if (arcSummaries.length > 0) {
-              previousSummary += `\n\n📖 ARC CONTEXT:`;
-              for (const summary of arcSummaries) {
-                previousSummary += `\n- Arc ${summary.level_number} (Ch.${summary.start_chapter}-${summary.end_chapter}): ${summary.summary?.substring(0, 200) || 'No summary'}`;
-              }
-            }
-          } catch (plotErr) {
-            logger.debug('PlotArcManager enrichment failed (non-fatal)', {
-              projectId: this.state?.projectId,
-              chapterNumber,
-              error: plotErr instanceof Error ? plotErr.message : String(plotErr),
-            });
-          }
-        }
       } else {
         previousSummary = this.getPreviousSummary(chapterNumber);
+      }
+
+      // Append quality feedback regardless of context source
+      if (this.lastQCResult && this.lastQCResult.scores.overall < 65) {
+        previousSummary += `\n\n⚠️ QUALITY NOTE (từ chương trước):`;
+        for (const warning of this.lastQCResult.warnings.slice(0, 3)) {
+          previousSummary += `\n- ${warning}`;
+        }
       }
 
       // Decide if 3-agent workflow is needed (cost optimization)
@@ -671,7 +663,10 @@ export class StoryRunner {
       };
 
       // Fetch previous chapter titles for title diversity checking
-      const previousTitles = await this.getPreviousTitles(chapterNumber);
+      // Prefer context payload (all titles from DB) over in-memory getPreviousTitles
+      const previousTitles = this.contextPayload?.previousTitles.length
+        ? this.contextPayload.previousTitles
+        : await this.getPreviousTitles(chapterNumber);
 
       // Write chapter
       let result: ChapterResult;
@@ -1198,7 +1193,7 @@ export class StoryRunner {
    * 1. Try in-memory writtenChapters (current session)
    * 2. Fallback to Supabase chapters table (resume mode)
    */
-  private async getPreviousTitles(chapterNumber: number, limit: number = 10): Promise<string[]> {
+  private async getPreviousTitles(chapterNumber: number, limit: number = 50): Promise<string[]> {
     const titles: string[] = [];
 
     // 1. Collect from in-memory writtenChapters (current session)

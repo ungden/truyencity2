@@ -159,6 +159,30 @@ export class CanonResolver {
       }
     }
 
+    // Load world constraints (highest priority)
+    const { data: constraintsData } = await supabase
+      .from('world_constraints')
+      .select('*')
+      .eq('project_id', this.projectId);
+
+    if (constraintsData) {
+      for (const wc of constraintsData) {
+        const fact: CanonFact = {
+          id: `constraint_${wc.id}`,
+          projectId: this.projectId,
+          factType: 'world_rule',
+          subject: wc.subject,
+          predicate: wc.predicate,
+          value: wc.value,
+          canonLevel: CanonLevel.WORLD_BIBLE,
+          sourceType: 'world_constraint',
+          confidence: 100,
+          createdAt: new Date(wc.created_at as string),
+        };
+        this.factCache.set(this.getFactKey(fact), fact);
+      }
+    }
+
     // Load unresolved continuity issues
     const { data: issues } = await supabase
       .from('consistency_issues')

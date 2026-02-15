@@ -35,6 +35,9 @@ import {
 import { GOLDEN_CHAPTER_REQUIREMENTS, buildTitleRulesPrompt, ENGAGEMENT_CHECKLIST } from './templates';
 import { buildStyleContext, getEnhancedStyleBible, CLIFFHANGER_TECHNIQUES, SceneType } from './style-bible';
 import { titleChecker } from './title-checker';
+import { ConstraintExtractor, getConstraintExtractor } from './constraint-extractor';
+import { WorldConstraint } from './types';
+import { GENRE_CONFIG, Topic } from '../../lib/types/genre-config';
 
 // ============================================================================
 // AGENT SYSTEM PROMPTS
@@ -221,9 +224,26 @@ export class ChapterWriter {
           chapterNumber,
           contentHint: writerResult.data.chapterContent,
         });
+
+        // Safety: if optimized title is still >70% similar to any previous title, 
+        // generate a unique fallback from content keywords
+        let finalTitle = optimizedTitle.optimized;
+        if (context.previousTitles && context.previousTitles.length > 0) {
+          const { similarity } = titleChecker.findMostSimilar(finalTitle, context.previousTitles);
+          if (similarity >= 0.7) {
+            // Fallback: use chapter number + unique content snippet
+            const contentSnippet = writerResult.data.chapterContent.slice(0, 500);
+            const sentences = contentSnippet.match(/[^.!?。！？]+[.!?。！？]/g) || [];
+            const shortSentence = sentences.find(s => s.trim().length >= 5 && s.trim().length <= 40);
+            finalTitle = shortSentence 
+              ? shortSentence.trim().replace(/^["'"「『\s]+|["'"」』\s.!?。！？]+$/g, '')
+              : `Chương ${chapterNumber}`;
+          }
+        }
+
         const content: ChapterContent = {
           chapterNumber,
-          title: optimizedTitle.optimized,
+          title: finalTitle,
           content: writerResult.data.chapterContent,
           wordCount: writerResult.data.wordCount,
           qualityScore: criticResult.data?.overallScore || 5,
@@ -320,11 +340,24 @@ export class ChapterWriter {
         contentHint: content,
       });
 
+      // Safety: if optimized title is still >70% similar, fallback to content-derived title
+      let finalTitle = optimizedTitle.optimized;
+      if (context.previousTitles && context.previousTitles.length > 0) {
+        const { similarity } = titleChecker.findMostSimilar(finalTitle, context.previousTitles);
+        if (similarity >= 0.7) {
+          const sentences = content.slice(0, 500).match(/[^.!?。！？]+[.!?。！？]/g) || [];
+          const shortSentence = sentences.find(s => s.trim().length >= 5 && s.trim().length <= 40);
+          finalTitle = shortSentence
+            ? shortSentence.trim().replace(/^["'"「『\s]+|["'"」』\s.!?。！？]+$/g, '')
+            : `Chương ${chapterNumber}`;
+        }
+      }
+
       return {
         success: true,
         data: {
           chapterNumber,
-          title: optimizedTitle.optimized,
+          title: finalTitle,
           content,
           wordCount,
           qualityScore: 6,
@@ -359,10 +392,15 @@ export class ChapterWriter {
     additionalInstructions: string,
     previousTitles?: string[]
   ): Promise<{ success: boolean; data?: ArchitectOutput; error?: string }> {
+    // Load relevant constraints based on chapter context
+    const constraintSection = await this.loadConstraintSection(context.worldBible);
+    // Load topic-specific hints (worldSetting, topicPromptHints)
+    const topicSection = this.buildTopicSection();
+
     const isGolden = chapterNumber <= 3;
-    const goldenReqs = isGolden
-      ? GOLDEN_CHAPTER_REQUIREMENTS[`chapter${chapterNumber}` as keyof typeof GOLDEN_CHAPTER_REQUIREMENTS]
-      : null;
+  const goldenReqs = isGolden
+    ? GOLDEN_CHAPTER_REQUIREMENTS[`chapter${chapterNumber}` as keyof typeof GOLDEN_CHAPTER_REQUIREMENTS]
+    : null;
 
     const minScenes = Math.max(4, Math.ceil(this.config.targetWordCount / 600));
     const wordsPerScene = Math.round(this.config.targetWordCount / minScenes);
@@ -375,7 +413,7 @@ WORLD BIBLE:
 - Power System: ${context.worldBible.powerSystem.name}
 - Traits: ${context.worldBible.protagonist.traits.join(', ')}
 ${context.worldBible.npcRelationships.length > 0 ? `- NPCs: ${context.worldBible.npcRelationships.slice(0, 5).map(n => `${n.name}(${n.role})`).join(', ')}` : ''}
-
+${constraintSection}${topicSection}
 CURRENT ARC: ${context.currentArc.title} (${context.currentArc.theme})
 - Chapters: ${context.currentArc.startChapter}-${context.currentArc.endChapter}
 - Climax at: ${context.currentArc.climaxChapter}
@@ -404,6 +442,15 @@ YÊU CẦU QUAN TRỌNG:
 - Tổng targetWordCount: ${this.config.targetWordCount} từ
 - Mỗi scene phải có conflict/tension riêng
 
+ĐA GÓC NHÌN (MULTI-POV):
+- POV mặc định là ${context.worldBible.protagonist.name} (protagonist)
+- CÓ THỂ chuyển POV sang nhân vật khác cho 1-2 scenes NẾU phù hợp cốt truyện:
+  + Scene phản diện bày mưu (POV villain) → tạo suspense
+  + Scene đồng minh phản ứng (POV ally) → mở rộng thế giới
+  + Scene đám đông/bàng quan chứng kiến sự kiện (POV bystander) → tăng epic
+- KHÔNG ÉP đổi POV nếu chương không cần — phần lớn chương vẫn nên theo POV protagonist
+- Nếu đổi POV, ghi rõ "pov" trong từng scene object
+
 ${buildTitleRulesPrompt(previousTitles)}
 
 ENGAGEMENT (mỗi chương phải có):
@@ -418,7 +465,7 @@ Trả về JSON (KHÔNG có comment):
     "pov": "${context.worldBible.protagonist.name}",
     "location": "Địa điểm",
     "scenes": [
-      {"order": 1, "setting": "...", "characters": ["..."], "goal": "...", "conflict": "...", "resolution": "...", "estimatedWords": ${wordsPerScene}},
+      {"order": 1, "setting": "...", "characters": ["..."], "goal": "...", "conflict": "...", "resolution": "...", "estimatedWords": ${wordsPerScene}, "pov": "${context.worldBible.protagonist.name}"},
       {"order": 2, "setting": "...", "characters": ["..."], "goal": "...", "conflict": "...", "resolution": "...", "estimatedWords": ${wordsPerScene}},
       {"order": 3, "setting": "...", "characters": ["..."], "goal": "...", "conflict": "...", "resolution": "...", "estimatedWords": ${wordsPerScene}},
       {"order": 4, "setting": "...", "characters": ["..."], "goal": "...", "conflict": "...", "resolution": "...", "estimatedWords": ${wordsPerScene}}
@@ -484,6 +531,11 @@ Trả về JSON (KHÔNG có comment):
     genre?: GenreType,
     worldBible?: WorldBible
   ): Promise<{ success: boolean; data?: WriterOutput; error?: string }> {
+    // Load constraints for writer too
+    const writerConstraintSection = worldBible
+      ? await this.loadConstraintSection(worldBible)
+      : '';
+
     const totalTargetWords = outline.targetWordCount || this.config.targetWordCount;
 
     // Determine dominant scene type for style context
@@ -494,18 +546,31 @@ Trả về JSON (KHÔNG có comment):
     const richStyleContext = buildStyleContext(genreType, dominantSceneType);
     const enhancedStyle = getEnhancedStyleBible(genreType);
 
-    // Build per-scene pacing hints
+    // Build per-scene pacing hints (with POV info)
     const sceneGuidance = outline.scenes.map(s => {
       const sceneType = this.inferSceneType(s);
       const pacing = enhancedStyle.pacingRules[sceneType];
+      const povHint = s.pov && s.pov !== outline.pov
+        ? `\n  👁 POV: ${s.pov} (GÓC NHÌN KHÁC — viết từ suy nghĩ, cảm xúc, nhận thức của ${s.pov}, KHÔNG của protagonist)`
+        : '';
       return `- Scene ${s.order}: ${s.goal} → Conflict: ${s.conflict} → Resolution: ${s.resolution}
-  Bối cảnh: ${s.setting} | Nhân vật: ${s.characters.join(', ')}
+  Bối cảnh: ${s.setting} | Nhân vật: ${s.characters.join(', ')}${povHint}
   ⚠️ Viết TỐI THIỂU ${s.estimatedWords} từ cho scene này
   📝 Nhịp điệu: câu ${pacing.sentenceLength.min}-${pacing.sentenceLength.max} từ, tốc độ ${pacing.paceSpeed === 'fast' ? 'NHANH (câu ngắn, dứt khoát)' : pacing.paceSpeed === 'slow' ? 'CHẬM (câu dài, miêu tả chi tiết)' : 'VỪA'}, đối thoại ${Math.round(pacing.dialogueRatio.min * 100)}-${Math.round(pacing.dialogueRatio.max * 100)}%`;
     }).join('\n\n');
 
     // Select relevant vocabulary for this chapter's content
     const vocabHints = this.buildVocabularyHints(outline, enhancedStyle.vocabulary);
+
+    // Detect if this chapter has multi-POV scenes
+    const hasMultiPOV = outline.scenes.some(s => s.pov && s.pov !== outline.pov);
+    const multiPOVGuide = hasMultiPOV
+      ? `\nCHUYỂN GÓC NHÌN (MULTI-POV):
+- Khi chuyển POV sang nhân vật khác, PHẢI có dấu hiệu rõ ràng (xuống dòng + dấu hiệu cảnh mới)
+- Viết nội tâm, cảm xúc, nhận thức đúng nhân vật POV đó — KHÔNG biết thông tin nhân vật khác giấu
+- Mỗi POV phải có giọng văn/ngữ điệu khác biệt phù hợp tính cách nhân vật
+- Protagonist vẫn là trọng tâm — scene POV khác chỉ để bổ sung chiều sâu, KHÔNG lấn át\n`
+      : '';
 
     const prompt = `Viết TOÀN BỘ Chương ${outline.chapterNumber}: ${outline.title}
 
@@ -514,7 +579,7 @@ ${outline.summary}
 
 SCENES (viết ĐẦY ĐỦ chi tiết cho MỖI scene - KHÔNG được bỏ qua scene nào):
 ${sceneGuidance}
-
+${multiPOVGuide}
 DOPAMINE (phải có trong chương):
 ${outline.dopaminePoints.map(dp => `- ${dp.type}: Setup: ${dp.setup} → Payoff: ${dp.payoff}`).join('\n')}
 
@@ -526,7 +591,7 @@ ${outline.emotionalArc ? `CẢM XÚC ARC (PHẢI tuân thủ):
 → Viết sao cho người đọc CẢM NHẬN được sự chuyển đổi cảm xúc rõ ràng qua từng phần.` : ''}
 
 CLIFFHANGER: ${outline.cliffhanger}
-
+${writerConstraintSection}${this.buildTopicSection()}
 STYLE:
 - Giọng văn: ${styleBible.authorVoice}
 - Tone: ${styleBible.toneKeywords.join(', ')}
@@ -1058,6 +1123,85 @@ Viết chương (nhớ: BẮT ĐẦU bằng "Chương ${chapterNumber}: [Tiêu �
 
   private countWords(content: string): number {
     return content.trim().split(/\s+/).filter(w => w.trim()).length;
+  }
+
+  /**
+   * Look up the matched Topic from GENRE_CONFIG based on config.genre and config.topicId.
+   * Returns the topic or null if not found.
+   */
+  private getMatchedTopic(): Topic | null {
+    const genreKey = this.config.genre;
+    if (!genreKey || !(genreKey in GENRE_CONFIG)) return null;
+
+    const genreConfig = GENRE_CONFIG[genreKey as keyof typeof GENRE_CONFIG];
+    if (!genreConfig?.topics || !this.config.topicId) return null;
+
+    const topics = genreConfig.topics as Topic[];
+    return topics.find(t => t.id === this.config.topicId) || null;
+  }
+
+  /**
+   * Build topic-specific prompt section (topicPromptHints + worldSetting directive).
+   * Returns formatted string or empty string if no topic config.
+   */
+  private buildTopicSection(): string {
+    const topic = this.getMatchedTopic();
+    if (!topic) return '';
+
+    const sections: string[] = [];
+
+    if (topic.worldSetting === 'parallel') {
+      sections.push(`BỐI CẢNH THẾ GIỚI SONG SONG:
+- Đây là thế giới song song, KHÔNG dùng tên quốc gia/thành phố/nhân vật thật
+- Đổi tên phù hợp nhưng giữ nguyên logic kinh tế, chính trị, văn hóa`);
+    }
+
+    if (topic.topicPromptHints && topic.topicPromptHints.length > 0) {
+      sections.push(`HƯỚNG DẪN ĐẶC THÙ TOPIC:
+${topic.topicPromptHints.map(h => `- ${h}`).join('\n')}`);
+    }
+
+    return sections.length > 0 ? '\n' + sections.join('\n\n') + '\n' : '';
+  }
+
+  /**
+   * Load constraints relevant to the current World Bible and format for prompt injection.
+   * Extracts keywords from protagonist, NPCs, locations to find matching constraints.
+   * Returns formatted prompt section or empty string if no constraints / no projectId.
+   */
+  private async loadConstraintSection(worldBible: WorldBible): Promise<string> {
+    if (!worldBible.projectId) return '';
+
+    try {
+      const keywords: string[] = [];
+
+      // Protagonist name
+      if (worldBible.protagonist?.name) keywords.push(worldBible.protagonist.name);
+
+      // NPC names
+      if (worldBible.npcRelationships) {
+        for (const npc of worldBible.npcRelationships.slice(0, 8)) {
+          if (npc.name) keywords.push(npc.name);
+        }
+      }
+
+      // Location names
+      if (worldBible.locations) {
+        for (const loc of worldBible.locations.slice(0, 5)) {
+          if (loc.name) keywords.push(loc.name);
+        }
+      }
+
+      // Power system name
+      if (worldBible.powerSystem?.name) keywords.push(worldBible.powerSystem.name);
+
+      const extractor = getConstraintExtractor(worldBible.projectId);
+      const constraints = await extractor.getRelevantConstraints(worldBible.projectId, keywords);
+      return ConstraintExtractor.formatForPrompt(constraints);
+    } catch {
+      // Non-fatal: if constraints fail to load, continue without them
+      return '';
+    }
   }
 
   /**

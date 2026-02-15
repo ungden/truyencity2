@@ -57,6 +57,25 @@ const OVERUSED_KEYWORDS = [
   'khinh miệt', 'khinh thường',
 ];
 
+// Banned title strings — most-repeated offenders from production data analysis
+const BANNED_TITLES = new Set([
+  'kẻ săn mồi hay con mồi?',
+  'ai cho ngươi tư cách?',
+  'ngươi không xứng!',
+  'bóng tối sau cổng thành',
+  'kẻ đứng sau tất cả',
+  'sự thật đằng sau',
+  'cơn bão sắp đến',
+  'ai mới là kẻ thù?',
+  'bí mật được hé lộ',
+  'giờ phản công',
+  'nước cờ cuối cùng',
+  'kẻ phản bội',
+  'trận chiến cuối cùng',
+  'ai là kẻ phản bội?',
+  'lửa cháy trong tim',
+]);
+
 // Vietnamese stop words to ignore in comparison
 const STOP_WORDS = new Set([
   'của', 'và', 'là', 'một', 'với', 'cho', 'trong', 'về', 'từ',
@@ -70,6 +89,66 @@ const STOP_WORDS = new Set([
 // ============================================================================
 
 export class TitleChecker {
+  /**
+   * Compute Jaccard similarity between two sets of words (0-1)
+   */
+  private jaccardSimilarity(a: string[], b: string[]): number {
+    if (a.length === 0 && b.length === 0) return 1;
+    const setA = new Set(a);
+    const setB = new Set(b);
+    const intersection = [...setA].filter(w => setB.has(w)).length;
+    const union = new Set([...setA, ...setB]).size;
+    return union === 0 ? 0 : intersection / union;
+  }
+
+  /**
+   * Compute containment similarity — what fraction of the shorter title's
+   * words appear in the longer one. Catches "Kẻ Săn Mồi" ⊂ "Kẻ Săn Mồi Trong Bóng Tối"
+   */
+  private containmentSimilarity(a: string[], b: string[]): number {
+    if (a.length === 0 || b.length === 0) return 0;
+    const shorter = a.length <= b.length ? a : b;
+    const longer = a.length <= b.length ? b : a;
+    const longerSet = new Set(longer);
+    const contained = shorter.filter(w => longerSet.has(w)).length;
+    return contained / shorter.length;
+  }
+
+  /**
+   * Fuzzy similarity combining Jaccard + containment.
+   * Returns 0-1 where 1 = identical.
+   */
+  private fuzzySimilarity(titleA: string, titleB: string): number {
+    const wordsA = this.extractMeaningfulWords(titleA);
+    const wordsB = this.extractMeaningfulWords(titleB);
+
+    // Exact match (case-insensitive)
+    if (titleA.toLowerCase().trim() === titleB.toLowerCase().trim()) return 1.0;
+
+    const jaccard = this.jaccardSimilarity(wordsA, wordsB);
+    const containment = this.containmentSimilarity(wordsA, wordsB);
+
+    // Weighted blend: containment matters more (catches subsets)
+    return jaccard * 0.4 + containment * 0.6;
+  }
+
+  /**
+   * Check if title is too similar to ANY previous title.
+   * Returns the highest similarity score and the matching title.
+   */
+  findMostSimilar(title: string, previousTitles: string[]): { similarity: number; matchedTitle: string } {
+    let maxSim = 0;
+    let matchedTitle = '';
+    for (const prev of previousTitles) {
+      const sim = this.fuzzySimilarity(title, prev);
+      if (sim > maxSim) {
+        maxSim = sim;
+        matchedTitle = prev;
+      }
+    }
+    return { similarity: maxSim, matchedTitle };
+  }
+
   /**
    * Check a single title against all rules
    */
@@ -88,6 +167,16 @@ export class TitleChecker {
     }
 
     const trimmed = title.trim();
+
+    // 0. Banned title check (exact match, case-insensitive)
+    if (BANNED_TITLES.has(trimmed.toLowerCase())) {
+      issues.push({
+        type: 'repetition',
+        description: `"${trimmed}" nằm trong danh sách tên chương bị cấm (quá phổ biến)`,
+        severity: 'major',
+      });
+      score -= 5;
+    }
 
     // 1. Length check
     const wordCount = trimmed.split(/\s+/).length;
@@ -146,25 +235,54 @@ export class TitleChecker {
       }
     }
 
-    // 4. Keyword overlap with recent titles (last 5)
+    // 4. Fuzzy similarity check against ALL previous titles (not just recent 5)
     if (previousTitles.length > 0) {
+      const { similarity, matchedTitle } = this.findMostSimilar(trimmed, previousTitles);
+
+      if (similarity >= 0.9) {
+        // Near-duplicate or exact duplicate
+        issues.push({
+          type: 'repetition',
+          description: `Gần trùng lặp (${Math.round(similarity * 100)}%) với "${matchedTitle}"`,
+          severity: 'major',
+        });
+        score -= 5;
+      } else if (similarity >= 0.7) {
+        // Too similar
+        issues.push({
+          type: 'repetition',
+          description: `Quá giống (${Math.round(similarity * 100)}%) với "${matchedTitle}"`,
+          severity: 'major',
+        });
+        score -= 3;
+      } else if (similarity >= 0.5) {
+        // Somewhat similar — warn
+        issues.push({
+          type: 'repetition',
+          description: `Tương tự (${Math.round(similarity * 100)}%) với "${matchedTitle}"`,
+          severity: 'moderate',
+        });
+        score -= 1;
+      }
+
+      // Also check keyword overlap with recent 10 titles (tighter window)
       const titleWords = this.extractMeaningfulWords(trimmed);
-      const recentTitles = previousTitles.slice(-5);
+      const recentTitles = previousTitles.slice(-10);
 
       for (let i = 0; i < recentTitles.length; i++) {
         const prevWords = this.extractMeaningfulWords(recentTitles[i]);
         const overlap = titleWords.filter(w => prevWords.includes(w));
 
         if (overlap.length >= 2) {
-          const distance = recentTitles.length - i; // how many chapters ago
-          const severity = distance <= 2 ? 'major' as const : 'moderate' as const;
+          const distance = recentTitles.length - i;
+          const severity = distance <= 3 ? 'major' as const : 'moderate' as const;
           issues.push({
             type: 'repetition',
             description: `Lặp keyword [${overlap.join(', ')}] với chương cách ${distance} chương`,
             severity,
           });
           score -= severity === 'major' ? 3 : 1;
-          break; // Only report worst overlap
+          break;
         }
       }
     }
@@ -248,11 +366,20 @@ export class TitleChecker {
     }
 
     // Score all candidates using quality + novelty blend
+    // ALSO hard-reject any candidate with >70% fuzzy similarity to previous titles
     let bestTitle = original || `Chương ${options?.chapterNumber || ''}`.trim();
     let bestScore = this.blendedScore(bestTitle, previousTitles);
 
     for (const candidate of candidates) {
       if (!candidate || candidate.length < 2) continue;
+
+      // Hard rejection: skip candidates too similar to any previous title
+      const { similarity } = this.findMostSimilar(candidate, previousTitles);
+      if (similarity >= 0.7) continue;
+
+      // Skip banned titles
+      if (BANNED_TITLES.has(candidate.toLowerCase())) continue;
+
       const score = this.blendedScore(candidate, previousTitles);
       if (score > bestScore) {
         bestScore = score;
@@ -260,17 +387,24 @@ export class TitleChecker {
       }
     }
 
+    // Final safety check: if best title is still too similar, flag it
+    const { similarity: finalSim } = this.findMostSimilar(bestTitle, previousTitles);
     const optimizedCheck = this.checkTitle(bestTitle, previousTitles);
     const shouldChange =
       bestTitle !== original &&
       (optimizedCheck.score >= originalCheck.score + 1 || originalCheck.score < 6);
 
+    // If the result is still a near-duplicate (>90%), fall back to chapter number title
+    const finalTitle = finalSim >= 0.9 && previousTitles.length > 0
+      ? `Chương ${options?.chapterNumber || ''}: ${this.extractContentKeywords(options?.contentHint || '').slice(0, 2).join(' ')}`.trim()
+      : (shouldChange ? bestTitle : original);
+
     return {
       original,
-      optimized: shouldChange ? bestTitle : original,
+      optimized: finalTitle,
       originalScore: originalCheck.score,
       optimizedScore: shouldChange ? optimizedCheck.score : originalCheck.score,
-      changed: shouldChange,
+      changed: finalTitle !== original,
     };
   }
 
@@ -439,7 +573,13 @@ export class TitleChecker {
     const words = this.extractMeaningfulWords(title);
     if (!words.length) return 0;
 
-    const recent = previousTitles.slice(-10);
+    // Check against ALL previous titles for fuzzy similarity
+    const { similarity } = this.findMostSimilar(title, previousTitles);
+    if (similarity >= 0.9) return 5; // Near duplicate — massive penalty
+    if (similarity >= 0.7) return 3; // Too similar — strong penalty
+
+    // Also check keyword overlap with recent 15 titles
+    const recent = previousTitles.slice(-15);
     let maxOverlap = 0;
     for (const t of recent) {
       const prev = this.extractMeaningfulWords(t);

@@ -138,6 +138,10 @@ export const GENRE_STYLES: Record<GenreType, StyleBible> = {
       'Side character phải có diễn biến riêng: huynh đệ có thể phản bội, sư muội có thể hy sinh, không chỉ phục vụ MC',
       'Đấu giá scene: miêu tả chi tiết giá cả, phản ứng đám đông, MC flex tiền/quyền lực khiến mọi người sốc',
       'Ngược → Sảng ratio: mỗi 5 chương có 1-2 chương MC gặp khó khăn thực sự trước khi chiến thắng ngoạn mục',
+      // Exposition thông minh
+      'Worldbuilding qua trải nghiệm: hệ thống sức mạnh, quy tắc thế giới phải được giải thích qua hành động, đối thoại, khám phá — KHÔNG dùng đoạn văn giải thích dài (info-dump)',
+      // Multi-POV
+      'Đa góc nhìn khi cần: scene phản diện bày mưu (POV villain), đám đông chứng kiến MC tỏa sáng (POV bystander), đồng minh phản ứng — tạo chiều sâu thế giới',
     ],
   },
   'huyen-huyen': {
@@ -175,6 +179,10 @@ export const GENRE_STYLES: Record<GenreType, StyleBible> = {
       'Rival phát triển song song MC: có đối thủ cùng thế hệ cũng mạnh lên, không chỉ villain tĩnh',
       'Foreshadowing network: plant seeds sớm (chương 5), harvest muộn (chương 30+), tạo "aha moment"',
       'Side character arc: ít nhất 1 nhân vật phụ có diễn biến riêng (phản bội, hy sinh, trưởng thành)',
+      // Exposition thông minh
+      'Worldbuilding qua khám phá: hệ thống ma pháp, quy tắc thế giới được MC và người đọc khám phá cùng lúc qua thử thách, đối thoại, không dùng đoạn văn giải thích',
+      // Multi-POV
+      'Đa góc nhìn khi cần: scene rival cùng thế hệ cũng đang nỗ lực (POV rival), hội trưởng bàn mưu đối phó (POV villain), quần chúng kinh ngạc (POV bystander)',
     ],
   },
   'do-thi': {
@@ -213,6 +221,10 @@ export const GENRE_STYLES: Record<GenreType, StyleBible> = {
       'Nhạc phụ/nhạc mẫu arc: từ khinh thường → nghi ngờ → kinh ngạc → nể phục → tự hào, kéo dài 10-15 chương',
       'Foreshadowing cho thân phận: mỗi 5 chương drop 1 hint nhỏ (vết sẹo, kỹ năng lạ, quen biết bí ẩn)',
       'Ngược → Sảng: mỗi tiệc/sự kiện MC bị khinh trước → flex sau, KHÔNG cho MC flex ngay từ đầu',
+      // Exposition thông minh
+      'Kiến thức kinh doanh, y thuật, võ công được phổ cập tự nhiên qua đối thoại, hành động, tranh luận — KHÔNG có đoạn giải thích dài kiểu sách giáo khoa',
+      // Multi-POV
+      'Đa góc nhìn khi cần: scene thiếu gia bàn mưu hại MC (POV villain), nữ tổng tài quan sát MC (POV love interest), bạn bè/nhạc phụ kinh ngạc (POV bystander)',
     ],
   },
   'kiem-hiep': {
@@ -279,6 +291,10 @@ export const GENRE_STYLES: Record<GenreType, StyleBible> = {
       'Hậu cung chính trị: mỗi phi tử đại diện 1 thế lực, tình cảm gắn liền lợi ích quốc gia',
       'Chi tiết lịch sử chân thực xen kẽ hư cấu: triều đại, phong tục, quân sự, tạo cảm giác chân thực',
       'Kết chương bằng bước ngoặt chính trị: mưu kế bại lộ, đồng minh phản bội, chiếu chỉ bất ngờ',
+      // Exposition thông minh
+      'Kiến thức lịch sử, quân sự, kinh tế phổ cập qua hành động và đối thoại nhân vật — KHÔNG có đoạn giảng giải lịch sử dài',
+      // Multi-POV
+      'Đa góc nhìn thường xuyên hơn: scene gian thần mưu kế (POV villain), tướng biên cương nhận tin (POV ally), dân chúng chịu ảnh hưởng — tạo bức tranh toàn cảnh',
     ],
   },
   'khoa-huyen': {
@@ -312,6 +328,10 @@ export const GENRE_STYLES: Record<GenreType, StyleBible> = {
       'Khám phá vũ trụ mở rộng thế giới: mỗi hành tinh/nền văn minh có quy tắc và sinh thái riêng',
       'Bí mật công nghệ cổ đại: nền văn minh tiền sử để lại di tích công nghệ vượt xa hiện tại',
       'Countdown/deadline tạo tension: thiên thạch va chạm, dịch bệnh lan rộng, AI tiến hóa ngoài tầm kiểm soát',
+      // Exposition thông minh
+      'Giải thích công nghệ/khoa học qua hành động, thí nghiệm, đối thoại tranh luận — KHÔNG dùng đoạn văn giải thích như bài báo khoa học',
+      // Multi-POV
+      'Đa góc nhìn khi cần: scene AI/villain suy nghĩ (POV antagonist), đồng đội chuyên gia phân tích (POV ally), chính phủ phản ứng (POV authority)',
     ],
   },
   'vong-du': {
@@ -421,6 +441,8 @@ export const GENRE_STYLES: Record<GenreType, StyleBible> = {
       'Nữ chính phải có depth: có sự nghiệp riêng, quyết định riêng, không chỉ xoay quanh nam chính',
       'Side character có arc riêng: bạn thân có tình yêu riêng, nữ phụ có kết cục rõ ràng (không bỏ lửng)',
       'Emotional variety: không chỉ ngọt ngào, cần xen kẽ căng thẳng, đau lòng, hài hước, rung động',
+      // Multi-POV
+      'Đa góc nhìn khi cần: scene nam chính suy nghĩ về nữ chính (POV male lead), nữ phụ ghen tuông bày mưu (POV rival), bạn thân quan sát tình cảm (POV friend)',
     ],
   },
 };
@@ -744,17 +766,24 @@ export function buildTitleRulesPrompt(previousTitles?: string[]): string {
 
   const antiExamples = CHAPTER_TITLE_RULES.antiPatterns.slice(0, 5).join(', ');
 
-  let prompt = `ĐỊNH HƯỚNG ĐẶT TÊN CHƯƠNG:
-- Ưu tiên ngắn gọn 3-10 từ, gợi tò mò và có lực click
-- Hạn chế dùng các mẫu nhàm chán sau: ${antiExamples}
+  let prompt = `QUY TẮC ĐẶT TÊN CHƯƠNG (BẮT BUỘC):
+- Ngắn gọn 3-10 từ, gợi tò mò, có lực click
+- CẤM TUYỆT ĐỐI lặp lại hoặc tương tự bất kỳ tên chương nào đã viết trước đó
+- CẤM dùng các mẫu nhàm chán: ${antiExamples}
+- Mỗi tên chương PHẢI là DUY NHẤT — không được trùng keyword chính với chương trước
+- Nếu 2 từ khóa chính trùng với tên chương cũ → ĐỔI NGAY
 - Có thể chọn 1 trong 10 mẫu đa dạng:
 ${titleExamples}
 - VÍ DỤ TỐT: "Huyết Chiến Vạn Thú Sơn", "Ngươi Không Xứng!", "Phế Vật? Thiên Tài!", "Bóng Tối Sau Cổng Thành"
 - VÍ DỤ NÊN TRÁNH: "Sự Sỉ Nhục Và Sự Trỗi Dậy", "Nghịch Lý Của Linh Áp", "Quy Luật Của Những Con Số", "X Và Sự Y"`;
 
   if (previousTitles && previousTitles.length > 0) {
-    const recent = previousTitles.slice(-10);
-    prompt += `\n- CÁC CHƯƠNG GẦN ĐÂY: [${recent.join(' | ')}]. Ưu tiên tránh lặp keyword hoặc pattern với chúng.`;
+    // Send ALL previous titles so AI knows what NOT to repeat
+    const allTitles = previousTitles;
+    prompt += `\n\n⚠️ DANH SÁCH TẤT CẢ TÊN CHƯƠNG ĐÃ DÙNG (CẤM LẶP LẠI):
+[${allTitles.join(' | ')}]
+
+KHÔNG ĐƯỢC đặt tên giống hoặc tương tự bất kỳ tên nào ở trên. Tên chương mới phải HOÀN TOÀN KHÁC BIỆT về ý nghĩa và từ khóa.`;
   }
 
   return prompt;

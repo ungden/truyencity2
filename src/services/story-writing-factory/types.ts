@@ -37,6 +37,8 @@ export interface FactoryConfig {
   maxTokens: number;
   targetWordCount: number;
   genre: GenreType;
+  /** Topic ID from GENRE_CONFIG (e.g. 'do-thi-thuong-chien') — used to load topicPromptHints */
+  topicId?: string;
   minQualityScore: number;
   maxRetries: number;
   use3AgentWorkflow: boolean;
@@ -164,6 +166,22 @@ export interface Foreshadowing {
 }
 
 // ============================================================================
+// WORLD CONSTRAINTS (for consistency enforcement across all genres)
+// ============================================================================
+
+export interface WorldConstraint {
+  id: string;
+  projectId?: string;
+  blueprintId?: string;
+  category: 'quantity' | 'hierarchy' | 'rule' | 'geography' | 'character_limit' | 'power_cap';
+  subject: string;
+  predicate: string;
+  value: string | number;
+  context: string;
+  immutable: boolean;
+}
+
+// ============================================================================
 // STYLE BIBLE
 // ============================================================================
 
@@ -253,6 +271,8 @@ export interface SceneOutline {
   resolution: string;
   dopamineType?: DopamineType;
   estimatedWords: number;
+  /** Optional per-scene POV character — enables multi-POV storytelling */
+  pov?: string;
 }
 
 export interface DopaminePoint {

@@ -281,7 +281,7 @@ Bối cảnh thế giới: {{WORLD_DESCRIPTION}}
 
 Yêu cầu:
 - Viết khoảng {{TARGET_LENGTH}} từ
-- Sử dụng văn phong tiểu thuyết tu tiên Trung Quốc
+- Sử dụng văn phong tiểu thuyết tu tiên kinh điển
 - Mô tả chi tiết các cảnh chiến đấu và đột phá
 - Tạo cliffhanger cuối chương
 - Không sử dụng markdown`,

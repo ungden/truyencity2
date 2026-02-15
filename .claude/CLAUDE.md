@@ -438,3 +438,146 @@ Old novels may have metadata blocks but `cleanNovelDescription()` in `src/lib/ut
 - **Phase 2** (target-20 -> target): Wrap up, no new conflicts
 - **Phase 3** (target -> target+20): Grace period until arc boundary
 - **Phase 4** (target+20): Hard stop safety net
+
+---
+
+## iOS App Store Submission
+
+### EAS Build Pipeline
+- **EAS project**: `@titanlabs/truyencity` (projectId: `b08cdab3-d9a8-49f9-9a8d-c0789d4df743`)
+- **Bundle ID**: `com.truyencity.app`
+- **ASC App ID**: `6759160705`
+- **Apple Team**: `Q8A7CBYV5Z` (Tien Duong Le, Individual)
+- **Current version**: 1.0.0, buildNumber: `"2"` in app.config.ts (build #1 was submitted)
+- **Build command**:
+```bash
+cd /Users/alexle/Documents/truyencity2/mobile
+EXPO_ASC_API_KEY_PATH="/Users/alexle/Downloads/AuthKey_K4XKK27BYH.p8" \
+EXPO_ASC_KEY_ID="K4XKK27BYH" \
+EXPO_ASC_ISSUER_ID="16b1bc8e-5a12-4788-b4d2-4c9ebe0068fb" \
+EXPO_APPLE_TEAM_ID="Q8A7CBYV5Z" \
+EXPO_APPLE_TEAM_TYPE="INDIVIDUAL" \
+npx eas build --platform ios --profile production --non-interactive --auto-submit
+```
+
+### ASC Status (as of 2026-02-14)
+- **Build**: v1.0.0 build #1 — VALID, assigned to version
+- **Version**: 1.0 — PREPARE_FOR_SUBMISSION
+- **Metadata set via API**: description, keywords, subtitle, copyright ("2026 TruyenCity"), categories (Books + Entertainment), privacy URL, support URL, age rating (12+), review contact info, pricing (FREE)
+- **Screenshots uploaded**: 4x iPhone 6.7" (APP_IPHONE_67, 1290x2796) + 4x iPad Pro 12.9" (APP_IPAD_PRO_129, 2048x2732)
+- **BLOCKING**: App Privacy must be set in ASC web UI (API doesn't support it) — select "Data Not Collected" → Publish
+- **After privacy**: Submit for review via API or ASC web UI
+
+### ASC API Authentication
+```python
+# JWT token generation for App Store Connect API
+key_id = "K4XKK27BYH"
+issuer_id = "16b1bc8e-5a12-4788-b4d2-4c9ebe0068fb"
+key_path = "/Users/alexle/Downloads/AuthKey_K4XKK27BYH.p8"
+# Generate with PyJWT: jwt.encode(payload, key, algorithm="ES256", headers={"kid": key_id})
+```
+
+### ASC Resource IDs (for API calls)
+- App Info ID: `4ae1c9a9-f118-4e25-ad98-eb0e88d15328`
+- Version ID: `a12fa36c-2e3f-4ab4-ad66-af040a7c406b`
+- Version Localization (vi): `d90fa54e-6984-4f0e-a9f1-82ae0b313bdf`
+- App Info Localization (vi): `90e11dc3-0099-45af-941b-7c94fae407fe`
+- Review Detail: `7cb7f0ea-48d2-4d83-a165-c0c024d38881`
+- Build ID: `8c739520-d257-4402-84f1-e52bd6c89063`
+
+---
+
+## Database Optimizations
+
+### Denormalized `chapter_count` (Migration 0109)
+- Added `chapter_count` integer column to `novels` table
+- Trigger `trg_update_novel_chapter_count` auto-increments/decrements on chapter INSERT/DELETE
+- Index: `idx_novels_chapter_count ON novels(chapter_count DESC)`
+- Mobile queries use `chapter_count` instead of `chapters(count)` subquery (was causing timeouts)
+- Migration: `supabase/migrations/0109_add_chapter_count_to_novels.sql`
+
+### Current Stats
+- **222 novels**, **40,880+ chapters**
+- Supabase project: `jxhpejyowuihvjpqwarm`
+- Service role key in `.env.local`
+
+---
+
+## Reader Screen (`mobile/app/read/[slug]/[chapter].tsx`)
+
+### Features (Full Rewrite — 2026-02-14)
+- **4 Reading Themes**: Dark (#09090b) / Light (#ffffff) / Sepia (#f4ecd8) / Green (#dce8d2) — constants in `config.ts`
+- **3 Font Families**: Sans (System) / Serif (Georgia) / Mono (Menlo)
+- **Font size slider**: 14-32, custom pure-RN slider (no native module)
+- **3 Line spacing presets**: Gọn (1.4) / Vừa (1.7) / Rộng (2.0)
+- **Settings Bottom Sheet**: `reader-settings-sheet.tsx` — animated slide up, swipe down dismiss
+- **Brightness control**: Dark overlay approach (View with `backgroundColor: "#000"` and `opacity: (1 - brightness) * 0.7`)
+- **Auto-scroll**: Configurable speed 0-100 px/s
+- **Tap zones**: Left 1/3 = scroll up, Center 1/3 = toggle controls, Right 1/3 = scroll down
+- **Keep screen awake**: `expo-keep-awake`
+- **TTS speed**: 0.1 step increments (0.5-2.0), persisted to localStorage
+- **Chapter title dedup**: `stripChapterHeading()` strips "Chương X: ..." from content
+- **Plain text → HTML**: Auto-wraps paragraphs with `textIndent: 24`, `marginBottom: 20`
+- **Justified text**: `textAlign: "justify"`
+- **Animated controls**: Fade in/out top header + bottom bar
+
+### Bottom bar: `[Aa settings]` | `[Nghe TTS]` | `[auto-scroll]` | `[‹ 1/27 ›]`
+
+### Critical Notes
+- `expo-brightness` DOES NOT WORK in Expo dev client (needs native rebuild) — replaced with overlay
+- `@react-native-community/slider` — replaced with custom `CustomSlider` using `Pressable` + `onLayout` + `locationX`
+- Packages installed: `expo-keep-awake`
+- Packages removed: `@react-native-community/slider`, `expo-brightness`
+
+---
+
+## Writer Pipeline — Title Deduplication System (2026-02-14)
+
+### Problem
+AI writer generates repetitive chapter titles. Top novels had 22-45% duplicate title rate.
+
+### Solution — Multi-layer Defense
+
+#### Layer 1: `title-checker.ts` — Fuzzy Similarity Detection
+- **Jaccard + Containment similarity** (weighted 40/60): catches "Kẻ Săn Mồi" ⊂ "Kẻ Săn Mồi Trong Bóng Tối"
+- `findMostSimilar()` — scans ALL previous titles, returns highest match
+- `checkTitle()` — tiered penalties: ≥90% → -5, ≥70% → -3, ≥50% → -1
+- **15 banned titles** (most-repeated offenders): `BANNED_TITLES` set
+- Keyword overlap check against last 10 titles (was 5)
+- Novelty penalty uses fuzzy sim against all titles (was keyword-only on last 10)
+
+#### Layer 2: `templates.ts` — `buildTitleRulesPrompt()`
+- Sends ALL previous titles (up to 50) to AI, not just last 10
+- Stronger "CẤM TUYỆT ĐỐI" anti-repetition instructions
+
+#### Layer 3: `runner.ts` + `ai-editor.ts` — `getPreviousTitles()`
+- Default limit increased from 10 to **50**
+- Fetches from in-memory + Supabase fallback
+
+#### Layer 4: `chapter.ts` — Post-Optimization Safety
+- After `optimizeTitle()`, checks fuzzy similarity again
+- If still ≥70% similar, fallback to extracting a short sentence from chapter content
+- Both `writeChapter` (3-agent) and `writeChapterSimple` have this safety net
+
+### Key Files
+- `src/services/story-writing-factory/title-checker.ts` — Core fuzzy matching + banned list
+- `src/services/story-writing-factory/templates.ts` — AI prompt injection
+- `src/services/story-writing-factory/runner.ts` — Title history fetching
+- `src/services/story-writing-factory/chapter.ts` — Post-optimization fallback
+- `src/services/story-writing-factory/ai-editor.ts` — Editor title history
+
+---
+
+## Data Fixes Applied (2026-02-14)
+
+### Novel Titles Cleaned
+22 novels had batch IDs like `[2026-02-12-8017]` in titles. Stripped via Supabase REST API.
+
+### Chapter Titles Synced
+~5,300+ chapter titles were mismatched (metadata `title` vs actual first-line title in content). Fixed via Python script scanning all 40,880 chapters.
+
+### Content Quality Metrics
+- 2,138 chapters written in 12h window
+- Avg length: ~16,120 chars (~10,700 words) per chapter
+- Short chapters (<2000 chars): 0
+- All 221 active novels producing content

@@ -667,7 +667,7 @@ export class AIEditorService {
       .eq('novel_id', novelId)
       .lt('chapter_number', chapterNumber)
       .order('chapter_number', { ascending: false })
-      .limit(20);
+      .limit(50);
 
     return (data || []).map((row) => row.title).filter(Boolean);
   }

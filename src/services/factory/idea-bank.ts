@@ -1157,7 +1157,7 @@ STYLE ƯU TIÊN (SƯỚNG VĂN MAINSTREAM):
 TOPIC SEEDS (ưu tiên chọn 1-2 để phối):
 - ${topicSeeds.join('\n- ')}
 
-MẪU TÊN TRUYỆN HẤP DẪN - Học từ top webnovels Trung Quốc:
+MẪU TÊN TRUYỆN HẤP DẪN - Học từ top webnovels:
 
 PATTERN 1: [Số Lớn] + [Cảnh Giới/Danh Hiệu] (Rating: 9.1★, Epicness + Time Span)
 - 万古神帝 (Vạn Cổ Thần Đế) - 300M views, 8.7★

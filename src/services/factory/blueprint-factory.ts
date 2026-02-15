@@ -23,6 +23,8 @@ import {
   LocationInfo,
   FactionInfo,
 } from './types';
+import { getConstraintExtractor } from '../story-writing-factory/constraint-extractor';
+import { GENRE_CONFIG, Topic } from '../../lib/types/genre-config';
 
 export class BlueprintFactoryService {
   private gemini: GeminiClient;
@@ -58,6 +60,10 @@ export class BlueprintFactoryService {
       if (!worldResult.success || !worldResult.data) {
         return { success: false, error: worldResult.error, errorCode: worldResult.errorCode };
       }
+
+      // Extract constraints from world building
+      const extractor = getConstraintExtractor();
+      await extractor.extract(worldResult.data);
 
       // Step 2: Generate characters
       const charactersResult = await this.generateCharacters(idea, author, worldResult.data);
@@ -506,7 +512,58 @@ OUTPUT JSON:
   // PRIVATE HELPER METHODS
   // ============================================
 
+  /**
+   * Find the best matching Topic from GENRE_CONFIG for this idea.
+   * Matches genre key first, then fuzzy-matches sub_genre against topic name/id/description.
+   */
+  private findMatchingTopic(idea: StoryIdea): Topic | null {
+    // Map FactoryGenre → GenreKey (approximate mapping)
+    const genreMapping: Record<string, string> = {
+      'tien-hiep': 'tien-hiep',
+      'huyen-huyen': 'huyen-huyen',
+      'urban-modern': 'do-thi',
+      'historical': 'lich-su',
+      'sci-fi-apocalypse': 'khoa-huyen',
+      'system-litrpg': 'vong-du',
+      'action-adventure': 'huyen-huyen',
+      'romance': 'ngon-tinh',
+      'horror-mystery': 'linh-di',
+    };
+
+    const genreKey = genreMapping[idea.genre];
+    if (!genreKey || !(genreKey in GENRE_CONFIG)) return null;
+
+    const genreConfig = GENRE_CONFIG[genreKey as keyof typeof GENRE_CONFIG];
+    if (!genreConfig?.topics || !idea.sub_genre) return null;
+
+    const subGenreLower = idea.sub_genre.toLowerCase();
+
+    // Try exact ID match first, then fuzzy name/description match
+    const topics = genreConfig.topics as Topic[];
+    return topics.find(t => t.id === idea.sub_genre)
+      || topics.find(t => subGenreLower.includes(t.name.toLowerCase()) || t.name.toLowerCase().includes(subGenreLower))
+      || topics.find(t => t.description.toLowerCase().includes(subGenreLower) || subGenreLower.includes(t.description.toLowerCase().slice(0, 20)))
+      || null;
+  }
+
   private buildWorldBuildingPrompt(idea: StoryIdea, author: AIAuthorProfile): string {
+    // Look up topic-level config for worldSetting and hints
+    const matchedTopic = this.findMatchingTopic(idea);
+    const isParallel = matchedTopic?.worldSetting === 'parallel';
+    const topicHints = matchedTopic?.topicPromptHints || [];
+
+    const parallelDirective = isParallel
+      ? `\nQUAN TRỌNG — BỐI CẢNH THẾ GIỚI SONG SONG:
+- Đây là thế giới song song (parallel Earth), KHÔNG phải thế giới thực
+- ĐỔI TÊN tất cả quốc gia, thành phố, tổ chức, nhân vật lịch sử thành tên hư cấu
+- GIỮ NGUYÊN logic kinh tế, chính trị, văn hóa, công nghệ của thời kỳ tương ứng
+- KHÔNG dùng tên quốc gia thật (Trung Quốc, Mỹ, Nhật Bản...)\n`
+      : '';
+
+    const topicHintsSection = topicHints.length > 0
+      ? `\nHƯỚNG DẪN ĐẶC THÙ TOPIC:\n${topicHints.map(h => `- ${h}`).join('\n')}\n`
+      : '';
+
     return `Với phong cách của ${author.pen_name}, xây dựng thế giới cho truyện:
 
 THÔNG TIN TRUYỆN:
@@ -515,7 +572,7 @@ THÔNG TIN TRUYỆN:
 - Tiền đề: ${idea.premise}
 - Hệ thống sức mạnh: ${idea.power_system_type || 'Tự do sáng tạo'}
 - Bối cảnh: ${idea.setting_type || 'Tự do sáng tạo'}
-
+${parallelDirective}${topicHintsSection}
 YÊU CẦU:
 1. Tạo thế giới phù hợp thể loại ${idea.genre}
 2. Hệ thống sức mạnh PHẢI rõ ràng, có cấp bậc cụ thể

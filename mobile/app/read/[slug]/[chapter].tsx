@@ -57,27 +57,21 @@ function saveSettings(s: ReaderSettings) {
 
 // ── Strip duplicate chapter heading from content ─────────────
 
-function stripChapterHeading(html: string, chapterNumber: number, title: string): string {
-  // Many chapters start with "Chương X: Title" or "Chương X - Title" as first line
-  // Since we render it separately, strip it from content
+function stripChapterHeading(html: string, chapterNumber: number): string {
+  // Strip any "Chương X: Whatever" line at the start of content
+  // regardless of whether it matches the metadata title
   const patterns = [
-    // "Chương 1: Title" as plain text at start
-    new RegExp(`^\\s*Chương\\s+${chapterNumber}[:\\s-–—]+${escapeRegex(title)}[.!?]*\\s*`, "i"),
-    // Wrapped in tags: <p>Chương 1: Title</p> or <h1>...</h1> etc
-    new RegExp(`^\\s*<(?:p|h[1-6]|div|strong)[^>]*>\\s*Chương\\s+${chapterNumber}[:\\s-–—]+[^<]*<\\/(?:p|h[1-6]|div|strong)>\\s*`, "i"),
-    // Just "Chương X:" without title
-    new RegExp(`^\\s*<(?:p|h[1-6]|div|strong)[^>]*>\\s*Chương\\s+${chapterNumber}[:\\s-–—]*[^<]*<\\/(?:p|h[1-6]|div|strong)>\\s*`, "i"),
+    // Plain text: "Chương 123: Any Title Here" (with optional punctuation)
+    /^\s*Chương\s+\d+\s*[:\-–—]\s*[^\n]+\n*/i,
+    // Wrapped in HTML tags: <p>Chương 123: Title</p>
+    /^\s*<(?:p|h[1-6]|div|strong)[^>]*>\s*Chương\s+\d+\s*[:\-–—]\s*[^<]*<\/(?:p|h[1-6]|div|strong)>\s*/i,
   ];
 
   let result = html;
   for (const pat of patterns) {
     result = result.replace(pat, "");
   }
-  return result;
-}
-
-function escapeRegex(s: string): string {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return result.trim();
 }
 
 // ── Main Component ───────────────────────────────────────────
@@ -404,11 +398,7 @@ export default function ReadingScreen() {
 
   const cleanedHtml = useMemo(() => {
     if (!currentChapter?.content) return "";
-    let content = stripChapterHeading(
-      currentChapter.content,
-      chapterNumber,
-      currentChapter.title || ""
-    );
+    let content = stripChapterHeading(currentChapter.content, chapterNumber);
 
     // If content is plain text (no HTML tags), wrap paragraphs in <p> tags
     const hasHtmlTags = /<\/?[a-z][\s\S]*>/i.test(content);

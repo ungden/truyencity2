@@ -22,6 +22,8 @@ import { createClient } from '@supabase/supabase-js';
 import { AIProviderService } from '@/services/ai-provider';
 import { StoryRunner } from '@/services/story-writing-factory/runner';
 import type { FactoryConfig, RunnerConfig, GenreType } from '@/services/story-writing-factory/types';
+import { summarizeChapter, generateSynopsis, generateArcPlan, generateStoryBible } from '@/services/story-writing-factory/context-generators';
+import { saveChapterSummary, ContextLoader } from '@/services/story-writing-factory/context-loader';
 
 // CONFIGURATION
 const MIN_RESUME_BATCH_SIZE = 30;
@@ -315,6 +317,69 @@ async function writeOneChapter(
         }
 
         attemptPersisted = true;
+
+        // ═══════════════════════════════════════════════════════════════
+        // POST-WRITE: Save chapter summary + trigger arc boundary generators
+        // All non-fatal — failures here don't block the chapter write
+        // ═══════════════════════════════════════════════════════════════
+        try {
+          const protagonistName = project.main_character || 'MC';
+          const genre = (project.genre || 'tien-hiep') as GenreType;
+
+          // 1. Generate + save chapter summary (AI call)
+          const summaryResult = await summarizeChapter(
+            aiService, project.id, chNum, result.data.title, result.data.content, protagonistName,
+          );
+          await saveChapterSummary(
+            project.id, chNum, result.data.title,
+            summaryResult.summary, summaryResult.openingSentence,
+            summaryResult.mcState, summaryResult.cliffhanger,
+          );
+
+          // 2. At arc boundaries (chapter is multiple of 20), generate synopsis + next arc plan
+          const ARC_SIZE = 20;
+          if (chNum % ARC_SIZE === 0) {
+            const completedArcNumber = Math.floor(chNum / ARC_SIZE);
+            const nextArcNumber = completedArcNumber + 1;
+
+            // Load chapter summaries for the just-completed arc
+            const contextLoader = new ContextLoader(project.id, novel.id);
+            const arcPayload = await contextLoader.load(chNum + 1);
+
+            // Generate rolling synopsis from old synopsis + arc summaries
+            await generateSynopsis(
+              aiService, project.id, arcPayload.synopsis,
+              arcPayload.arcChapterSummaries, genre, protagonistName, chNum,
+            );
+
+            // Reload synopsis (just updated) for arc plan generation
+            const updatedPayload = await contextLoader.load(chNum + 1);
+
+            // Generate arc plan for the NEXT arc
+            await generateArcPlan(
+              aiService, project.id, nextArcNumber, genre, protagonistName,
+              updatedPayload.synopsis, updatedPayload.storyBible,
+              project.total_planned_chapters || 200,
+            );
+          }
+
+          // 3. Generate story bible after chapter 3 (one-time)
+          if (chNum === 3) {
+            const contextLoader = new ContextLoader(project.id, novel.id);
+            const biblePayload = await contextLoader.load(chNum + 1);
+            if (!biblePayload.hasStoryBible) {
+              await generateStoryBible(
+                aiService, project.id, genre, protagonistName,
+                project.world_description || novel.title,
+                biblePayload.recentChapters,
+              );
+            }
+          }
+        } catch (postWriteErr) {
+          // Non-fatal: log and continue — chapter is already saved
+          console.error(`[${tier}][${project.id.slice(0, 8)}] Post-write processing failed:`,
+            postWriteErr instanceof Error ? postWriteErr.message : String(postWriteErr));
+        }
       },
       onError: (e) => console.error(`[${tier}][${project.id.slice(0, 8)}] Error: ${e}`),
     });
@@ -327,6 +392,7 @@ async function writeOneChapter(
       targetChapters: project.total_planned_chapters || 200,
       chaptersPerArc: 20,
       projectId: project.id,
+      novelId: novel.id,
       chaptersToWrite: 1,
       currentChapter: currentCh,
     });
