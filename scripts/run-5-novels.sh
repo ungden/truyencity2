@@ -13,15 +13,16 @@ mkdir -p logs
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
 # ════════════════════════════════════════════════════════════════
-# 5 NOVELS — project_id, novel_id, target_chapters
+# 5 NOVELS — key project_id novel_id target_chapters
+# Use plain indexed array for macOS bash 3.2 compatibility.
 # ════════════════════════════════════════════════════════════════
 
-declare -A NOVELS=(
-  ["1_van_yeu"]="62b7ce71-887c-4b9b-9fbc-bbcdcd8cfe01 524c60e0-0af5-448e-b458-53e62a5f3ec5 1500"
-  ["2_quy_tac"]="54402228-6f27-480b-8543-b1a8de7ab49f bfabe43b-2e94-4fa0-b4e9-fbe19fb11e6f 1810"
-  ["3_shipper"]="7435910f-0e42-4e68-bb2c-15e497ad0ac4 45a84994-f3ec-4c49-895b-4e4e259eac0e 1021"
-  ["4_tinh_hai"]="1636223f-a3a3-4c0f-bd2f-38d9cfa7dfd4 14daf145-2786-440b-8b91-7a9ce24fab6c 1602"
-  ["5_npc"]="365bbff9-1ff5-44cc-84ad-7e7e6b3e3fe7 8517390b-42ad-4dea-b2e5-22d1e7d2c5b3 1131"
+NOVELS=(
+  "1_van_yeu 62b7ce71-887c-4b9b-9fbc-bbcdcd8cfe01 524c60e0-0af5-448e-b458-53e62a5f3ec5 1500"
+  "2_quy_tac 54402228-f503-4a19-bb34-67b9637709d5 bfabe43b-7098-4f94-8ff0-59518f3e74b8 1810"
+  "3_shipper 7435910f-825e-49a0-a89f-8363d6ca111f 45a84994-8974-4b2d-af35-4c35fa14a4b8 1021"
+  "4_tinh_hai 1636223f-e7f1-4ce8-980a-99633a587c9d 14daf145-a014-4816-85a1-4a823482bd2e 1602"
+  "5_npc 365bbff9-28e0-472d-b54f-c8bba7227bad 8517390b-4f02-4408-b286-a2bd1d387d95 1131"
 )
 
 echo "══════════════════════════════════════════════════"
@@ -29,8 +30,8 @@ echo "  LAUNCHING 5 NOVELS — $TIMESTAMP"
 echo "══════════════════════════════════════════════════"
 echo ""
 
-for KEY in "${!NOVELS[@]}"; do
-  IFS=' ' read -r PROJECT_ID NOVEL_ID TARGET <<< "${NOVELS[$KEY]}"
+for ROW in "${NOVELS[@]}"; do
+  IFS=' ' read -r KEY PROJECT_ID NOVEL_ID TARGET <<< "$ROW"
   LOG="logs/batch-${KEY}-${TIMESTAMP}.log"
   PID_FILE="logs/batch-${KEY}.pid"
 
