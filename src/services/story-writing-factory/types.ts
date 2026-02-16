@@ -363,7 +363,7 @@ export interface CriticOutput {
 export interface CriticIssue {
   type: string;
   description: string;
-  severity: 'minor' | 'moderate' | 'major';
+  severity: 'minor' | 'moderate' | 'major' | 'critical';
   location?: string;
 }
 

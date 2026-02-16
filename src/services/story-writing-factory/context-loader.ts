@@ -33,6 +33,8 @@ export interface ContextPayload {
   previousTitles: string[];
   /** Anti-repetition: last 20 opening sentences */
   recentOpenings: string[];
+  /** Anti-repetition: last 10 ending cliffhangers */
+  recentCliffhangers: string[];
   /** Chapter summaries for the current arc (for synopsis generation) */
   arcChapterSummaries: ChapterSummaryRow[];
   /** Whether we're at an arc boundary (chapter % 20 == 1) */
@@ -110,6 +112,7 @@ export class ContextLoader {
       arcPlan,
       previousTitles,
       recentOpenings,
+      recentCliffhangers,
       arcChapterSummaries,
     ] = await Promise.all([
       this.loadStoryBible(),
@@ -118,6 +121,7 @@ export class ContextLoader {
       this.loadArcPlan(arcNumber),
       this.loadPreviousTitles(chapterNumber),
       this.loadRecentOpenings(chapterNumber, 50),
+      this.loadRecentCliffhangers(chapterNumber, 10),
       isArcBoundary ? this.loadArcChapterSummaries(arcNumber - 1) : Promise.resolve([]),
     ]);
 
@@ -128,6 +132,7 @@ export class ContextLoader {
       arcPlan,
       previousTitles,
       recentOpenings,
+      recentCliffhangers,
       arcChapterSummaries,
       isArcBoundary,
       arcNumber,
@@ -318,6 +323,33 @@ export class ContextLoader {
     }
   }
 
+  // ============================================================================
+  // ANTI-REPETITION: Recent ending cliffhangers
+  // ============================================================================
+
+  private async loadRecentCliffhangers(currentChapter: number, count: number): Promise<string[]> {
+    try {
+      const supabase = getSupabase();
+      const { data, error } = await supabase
+        .from('chapter_summaries')
+        .select('chapter_number, cliffhanger')
+        .eq('project_id', this.projectId)
+        .lt('chapter_number', currentChapter)
+        .order('chapter_number', { ascending: false })
+        .limit(count);
+
+      if (error || !data) return [];
+
+      return (data as { chapter_number: number; cliffhanger: string | null }[])
+        .filter((row) => !!row.cliffhanger)
+        .reverse()
+        .map((row) => `Ch.${row.chapter_number}: ${row.cliffhanger}`);
+    } catch (e) {
+      logger.debug('Failed to load recent cliffhangers', { projectId: this.projectId, error: e });
+      return [];
+    }
+  }
+
   /**
    * Fallback: extract first sentence from raw chapter content
    */
@@ -472,6 +504,11 @@ export class ContextLoader {
       parts.push(`═══ CÂU MỞ ĐẦU ${payload.recentOpenings.length} CHƯƠNG GẦN NHẤT (CẤM LẶP LẠI CÁCH MỞ ĐẦU) ═══\n${payload.recentOpenings.map((o, i) => `${i + 1}. ${o}`).join('\n')}\n\n⚠️ Chương ${chapterNumber} PHẢI mở đầu bằng cách HOÀN TOÀN KHÁC — khác cấu trúc câu, khác nhân vật/hành động, khác bối cảnh.`);
     }
 
+    // ── ANTI-REPETITION: Ending cliffhangers ──
+    if (payload.recentCliffhangers.length > 0) {
+      parts.push(`═══ KẾT THÚC/CLIFFHANGER ${payload.recentCliffhangers.length} CHƯƠNG GẦN NHẤT (CẤM LẶP LẠI MOTIF) ═══\n${payload.recentCliffhangers.join('\n')}\n\n⚠️ Chương ${chapterNumber} PHẢI kết thúc bằng motif HOÀN TOÀN KHÁC — khác kiểu hook, khác tình huống, khác cảm xúc.`);
+    }
+
     return parts.join('\n\n');
   }
 }
@@ -491,10 +528,11 @@ export async function saveChapterSummary(
   openingSentence: string | null,
   mcState: string | null,
   cliffhanger: string | null,
+  options?: { throwOnError?: boolean },
 ): Promise<void> {
   try {
     const supabase = getSupabase();
-    await supabase.from('chapter_summaries').upsert({
+    const { error } = await supabase.from('chapter_summaries').upsert({
       project_id: projectId,
       chapter_number: chapterNumber,
       title,
@@ -503,7 +541,13 @@ export async function saveChapterSummary(
       mc_state: mcState,
       cliffhanger,
     }, { onConflict: 'project_id,chapter_number' });
+    if (error) {
+      throw new Error(error.message);
+    }
   } catch (e) {
+    if (options?.throwOnError) {
+      throw e;
+    }
     console.warn('[context-loader] Failed to save chapter summary — context may drift over time', {
       projectId, chapterNumber, error: e instanceof Error ? e.message : String(e),
     });

@@ -173,6 +173,66 @@ function detectNaturalEnding(title?: string | null, content?: string | null): bo
   return score >= 4;
 }
 
+async function resolveChapterCursorPlan(
+  supabase: ReturnType<typeof getSupabaseAdmin>,
+  novelId: string,
+  currentCh: number,
+): Promise<{
+  runCurrentChapter: number;
+  persistedCurrentChapter: number;
+  nextChapter: number;
+  reason?: 'ahead_of_db_max' | 'internal_gap';
+}> {
+  if (currentCh <= 0) {
+    return { runCurrentChapter: 0, persistedCurrentChapter: 0, nextChapter: 1 };
+  }
+
+  const { data, error } = await supabase
+    .from('chapters')
+    .select('chapter_number')
+    .eq('novel_id', novelId)
+    .lte('chapter_number', currentCh + 1)
+    .order('chapter_number', { ascending: true });
+
+  if (error) {
+    return {
+      runCurrentChapter: currentCh,
+      persistedCurrentChapter: currentCh,
+      nextChapter: currentCh + 1,
+    };
+  }
+
+  const numbers = (data || []).map((r) => r.chapter_number as number);
+  let expected = 1;
+  for (const n of numbers) {
+    if (n > expected) {
+      return {
+        runCurrentChapter: expected - 1,
+        persistedCurrentChapter: currentCh,
+        nextChapter: expected,
+        reason: 'internal_gap',
+      };
+    }
+    if (n === expected) expected++;
+  }
+
+  const maxExisting = numbers.length > 0 ? numbers[numbers.length - 1] : 0;
+  if (maxExisting < currentCh) {
+    return {
+      runCurrentChapter: maxExisting,
+      persistedCurrentChapter: maxExisting,
+      nextChapter: maxExisting + 1,
+      reason: 'ahead_of_db_max',
+    };
+  }
+
+  return {
+    runCurrentChapter: currentCh,
+    persistedCurrentChapter: currentCh,
+    nextChapter: currentCh + 1,
+  };
+}
+
 async function ensureDailyQuotasForActiveProjects(
   supabase: ReturnType<typeof getSupabaseAdmin>,
   projects: Array<{ id: string }>,
@@ -235,26 +295,33 @@ async function writeOneChapter(
 
   const aiService = new AIProviderService({ gemini: geminiKey });
   let currentCh = project.current_chapter || 0;
+  let runCurrentCh = currentCh;
+  let persistedCurrentCh = currentCh;
+  let internalGapBackfill = false;
 
   // ====== CHAPTER GAP CHECK ======
-  // If current_chapter says N but chapter N doesn't exist in DB, backtrack
-  // to the highest actually-existing chapter. Prevents gaps (e.g. ch.1→ch.3).
+  // Canonicalize chapter cursor against real chapter rows.
+  // - ahead_of_db_max: project cursor is ahead of DB max -> move persisted cursor backward.
+  // - internal_gap: missing chapter inside range -> backfill missing chapter without lowering persisted cursor.
   if (currentCh > 0 && tier === 'resume') {
-    const { data: existingChapters } = await supabase
-      .from('chapters')
-      .select('chapter_number')
-      .eq('novel_id', novel.id)
-      .order('chapter_number', { ascending: false })
-      .limit(1);
-    
-    const maxExisting = existingChapters?.[0]?.chapter_number ?? 0;
-    if (maxExisting < currentCh) {
-      // current_chapter is ahead of actual chapters — fix it
-      console.warn(`[${tier}][${project.id.slice(0, 8)}] Gap detected: current_chapter=${currentCh} but max chapter in DB=${maxExisting}. Correcting.`);
-      currentCh = maxExisting;
+    const plan = await resolveChapterCursorPlan(supabase, novel.id, currentCh);
+    runCurrentCh = plan.runCurrentChapter;
+    persistedCurrentCh = plan.persistedCurrentChapter;
+    internalGapBackfill = plan.reason === 'internal_gap';
+
+    if (plan.reason === 'ahead_of_db_max' && persistedCurrentCh !== currentCh) {
+      const from = currentCh;
+      currentCh = persistedCurrentCh;
+      console.warn(
+        `[${tier}][${project.id.slice(0, 8)}] Gap detected (${plan.reason}): current_chapter=${from} -> ${currentCh}. Correcting before write.`
+      );
       await supabase.from('ai_story_projects')
-        .update({ current_chapter: maxExisting })
+        .update({ current_chapter: currentCh })
         .eq('id', project.id);
+    } else if (plan.reason === 'internal_gap') {
+      console.warn(
+        `[${tier}][${project.id.slice(0, 8)}] Internal chapter gap detected. Backfilling missing chapter ${plan.nextChapter} while keeping current_chapter=${persistedCurrentCh}.`
+      );
     }
   }
 
@@ -264,7 +331,7 @@ async function writeOneChapter(
   // This handles the edge case where a project reached its target but
   // the completion logic didn't trigger (e.g., not at arc boundary last time).
   const targetCh = project.total_planned_chapters || 200;
-  if (currentCh >= targetCh) {
+  if (currentCh >= targetCh && !internalGapBackfill) {
     const CHAPTERS_PER_ARC_CHECK = 20;
     const isArcBoundary = currentCh % CHAPTERS_PER_ARC_CHECK === 0;
     const isExactTarget = currentCh === targetCh;
@@ -311,6 +378,7 @@ async function writeOneChapter(
   };
   let latestWrittenTitle: string | null = null;
   let latestWrittenContent: string | null = null;
+  let writtenChapterNumber: number | null = null;
 
   const runAttempt = async (overrides?: Partial<FactoryConfig>) => {
     let attemptGenerated = false;
@@ -323,6 +391,7 @@ async function writeOneChapter(
         if (!result.data) return;
 
         attemptGenerated = true;
+        writtenChapterNumber = chNum;
 
         latestWrittenTitle = result.data.title;
         latestWrittenContent = result.data.content;
@@ -338,8 +407,50 @@ async function writeOneChapter(
           throw new Error(persistError);
         }
 
+        const protagonistName = project.main_character || 'MC';
+        const genre = (project.genre || 'tien-hiep') as GenreType;
+
+        // ═══════════════════════════════════════════════════════════════
+        // POST-WRITE PIPELINE (critical-first)
+        // 1) CRITICAL: chapter summary must succeed before advancing cursor
+        // 2) NON-CRITICAL: synopsis/arc-plan/bible refresh (best effort)
+        // ═══════════════════════════════════════════════════════════════
+
+        // 1) CRITICAL: Generate + save chapter summary with retries
+        let summarySaved = false;
+        let summaryErrMsg = 'unknown summary error';
+        for (let summaryAttempt = 1; summaryAttempt <= 3; summaryAttempt++) {
+          try {
+            const summaryResult = await summarizeChapter(
+              aiService, project.id, chNum, result.data.title, result.data.content, protagonistName,
+            );
+            await saveChapterSummary(
+              project.id, chNum, result.data.title,
+              summaryResult.summary, summaryResult.openingSentence,
+              summaryResult.mcState, summaryResult.cliffhanger,
+              { throwOnError: true },
+            );
+            summarySaved = true;
+            break;
+          } catch (summaryErr) {
+            summaryErrMsg = summaryErr instanceof Error ? summaryErr.message : String(summaryErr);
+            console.warn(
+              `[${tier}][${project.id.slice(0, 8)}] Chapter ${chNum} summary attempt ${summaryAttempt}/3 failed: ${summaryErrMsg}`
+            );
+            if (summaryAttempt < 3) {
+              await new Promise(resolve => setTimeout(resolve, 1500));
+            }
+          }
+        }
+
+        if (!summarySaved) {
+          persistError = `Critical post-write failed: chapter summary not saved after retries (${summaryErrMsg})`;
+          throw new Error(persistError);
+        }
+
+        // Advance project cursor ONLY after chapter + summary are both persisted
         const updateRes = await supabase.from('ai_story_projects').update({
-          current_chapter: chNum,
+          current_chapter: Math.max(persistedCurrentCh, chNum),
           updated_at: new Date().toISOString(),
         }).eq('id', project.id);
         if (updateRes.error) {
@@ -349,25 +460,9 @@ async function writeOneChapter(
 
         attemptPersisted = true;
 
-        // ═══════════════════════════════════════════════════════════════
-        // POST-WRITE: Save chapter summary + trigger arc boundary generators
-        // All non-fatal — failures here don't block the chapter write
-        // ═══════════════════════════════════════════════════════════════
+        // 2) NON-CRITICAL: Arc boundary generators and bible maintenance
         try {
-          const protagonistName = project.main_character || 'MC';
-          const genre = (project.genre || 'tien-hiep') as GenreType;
-
-          // 1. Generate + save chapter summary (AI call)
-          const summaryResult = await summarizeChapter(
-            aiService, project.id, chNum, result.data.title, result.data.content, protagonistName,
-          );
-          await saveChapterSummary(
-            project.id, chNum, result.data.title,
-            summaryResult.summary, summaryResult.openingSentence,
-            summaryResult.mcState, summaryResult.cliffhanger,
-          );
-
-          // 2. At arc boundaries (chapter is multiple of 20), generate synopsis + next arc plan
+          // At arc boundaries (chapter is multiple of 20), generate synopsis + next arc plan
           const ARC_SIZE = 20;
           if (chNum % ARC_SIZE === 0) {
             const completedArcNumber = Math.floor(chNum / ARC_SIZE);
@@ -386,7 +481,7 @@ async function writeOneChapter(
             // Reload synopsis (just updated) for arc plan generation
             const updatedPayload = await contextLoader.load(chNum + 1);
 
-            // Load story vision for directional coherence (Gap 2/7 fix)
+            // Load story vision for directional coherence
             let storyVision: StoryVision | null = null;
             try {
               const savedOutline = await loadStoryOutline(project.id);
@@ -399,19 +494,22 @@ async function writeOneChapter(
                   endGoal: ((savedOutline as Record<string, unknown>).protagonist as Record<string, unknown> | undefined)?.endGoal as string | undefined,
                 };
               }
-            } catch { /* non-fatal */ }
+            } catch {
+              // non-fatal
+            }
 
-            // Finale detection: should next arc be the final one? (Gap 3 fix)
+            // Finale detection: should next arc be the final one?
             const totalTarget = project.total_planned_chapters || 200;
-            let isFinale = (nextArcNumber * 20) >= totalTarget; // structural check
+            let isFinale = (nextArcNumber * 20) >= totalTarget;
             if (!isFinale && chNum >= totalTarget * 0.6) {
-              // AI-based finale detection at >= 60% progress
               try {
                 isFinale = await shouldBeFinaleArc(
                   aiService, updatedPayload.synopsis, storyVision,
                   updatedPayload.synopsis?.openThreads || [], chNum, totalTarget,
                 );
-              } catch { /* non-fatal, keep isFinale = false */ }
+              } catch {
+                // non-fatal, keep false
+              }
             }
 
             // Generate arc plan for the NEXT arc
@@ -422,7 +520,7 @@ async function writeOneChapter(
               storyVision,
             );
 
-            // Mark arc as finale if detected (Gap 3 fix)
+            // Mark arc as finale if detected
             if (isFinale) {
               try {
                 const adminSupa = getSupabaseAdmin();
@@ -430,11 +528,13 @@ async function writeOneChapter(
                   .update({ is_finale_arc: true })
                   .eq('project_id', project.id)
                   .eq('arc_number', nextArcNumber);
-              } catch { /* non-fatal */ }
+              } catch {
+                // non-fatal
+              }
             }
           }
 
-          // 3. Generate story bible after chapter 3 (one-time)
+          // Generate story bible after chapter 3 (one-time)
           if (chNum === 3) {
             const contextLoader = new ContextLoader(project.id, novel.id);
             const biblePayload = await contextLoader.load(chNum + 1);
@@ -447,11 +547,11 @@ async function writeOneChapter(
             }
           }
 
-          // 4. Refresh story bible every 100 chapters (Gap 5b fix)
+          // Refresh story bible every 100 chapters
           const ARC_SIZE_CHECK = 20;
           if (chNum % ARC_SIZE_CHECK === 0) {
             const arcNum = Math.floor(chNum / ARC_SIZE_CHECK);
-            if (arcNum > 0 && arcNum % 5 === 0) { // every 100 chapters (5 arcs)
+            if (arcNum > 0 && arcNum % 5 === 0) {
               const ctxLoader = new ContextLoader(project.id, novel.id);
               const refreshPayload = await ctxLoader.load(chNum + 1);
               if (refreshPayload.storyBible) {
@@ -464,8 +564,7 @@ async function writeOneChapter(
             }
           }
         } catch (postWriteErr) {
-          // Non-fatal: log and continue — chapter is already saved
-          console.error(`[${tier}][${project.id.slice(0, 8)}] Post-write processing failed:`,
+          console.error(`[${tier}][${project.id.slice(0, 8)}] Non-critical post-write failed:`,
             postWriteErr instanceof Error ? postWriteErr.message : String(postWriteErr));
         }
       },
@@ -482,7 +581,7 @@ async function writeOneChapter(
       projectId: project.id,
       novelId: novel.id,
       chaptersToWrite: 1,
-      currentChapter: currentCh,
+      currentChapter: runCurrentCh,
     });
 
     return { runResult, attemptGenerated, attemptPersisted, persistError };
@@ -522,7 +621,9 @@ async function writeOneChapter(
   const CHAPTERS_PER_ARC = 20;
   const GRACE_BUFFER = CHAPTERS_PER_ARC; // Allow up to 1 extra arc to finish properly
   // lastWrittenCh = the chapter number that was just written (currentCh was the state BEFORE writing)
-  const lastWrittenCh = chapterWritten ? currentCh + 1 : currentCh;
+  const lastWrittenCh = chapterWritten
+    ? Math.max(currentCh, writtenChapterNumber || currentCh)
+    : currentCh;
   const targetChapters = project.total_planned_chapters || 200;
   const hardStop = targetChapters + GRACE_BUFFER;
   const hasNaturalEnding = detectNaturalEnding(latestWrittenTitle, latestWrittenContent);
@@ -709,13 +810,35 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Claim projects by bumping updated_at to now (distributed lock).
-    // Concurrent invocations will skip these because of the .lt('updated_at', fourMinutesAgo) guard.
+    // Atomic claim: only rows that are still older than fourMinutesAgo are claimed.
+    // If another worker already claimed a row, it won't match this WHERE and won't be processed twice.
     const allIds = [...filteredResumeProjects, ...filteredInitProjects].map(p => p.id);
-    await supabase
+    const claimTimestamp = new Date().toISOString();
+    const { data: claimedRows, error: claimError } = await supabase
       .from('ai_story_projects')
-      .update({ updated_at: new Date().toISOString() })
-      .in('id', allIds);
+      .update({ updated_at: claimTimestamp })
+      .in('id', allIds)
+      .lt('updated_at', fourMinutesAgo)
+      .select('id');
+    if (claimError) throw claimError;
+
+    const claimedIds = new Set((claimedRows || []).map((r: { id: string }) => r.id));
+    const claimedResumeProjects = filteredResumeProjects.filter(p => claimedIds.has(p.id));
+    const claimedInitProjects = filteredInitProjects.filter(p => claimedIds.has(p.id));
+
+    if (claimedIds.size < allIds.length) {
+      console.log(`[Cron] Atomic claim ${claimedIds.size}/${allIds.length}; ${allIds.length - claimedIds.size} already claimed by another worker.`);
+    }
+
+    const claimedTotal = claimedResumeProjects.length + claimedInitProjects.length;
+    if (claimedTotal === 0) {
+      return NextResponse.json({
+        success: true,
+        message: 'Candidates were due, but all were already claimed by another worker',
+        activeCount,
+        dueCandidates: dueCandidates.length,
+      });
+    }
 
     // ====== EXECUTE WITH BOUNDED CONCURRENCY ======
 
@@ -727,7 +850,7 @@ export async function GET(request: NextRequest) {
       ]);
 
     const runTasks: Array<() => Promise<RunResult>> = [
-      ...filteredResumeProjects.map(p => async () =>
+      ...claimedResumeProjects.map(p => async () =>
         withTimeout(
           writeOneChapter(p, geminiKey, supabase, 'resume'),
           PROJECT_TIMEOUT_MS,
@@ -740,7 +863,7 @@ export async function GET(request: NextRequest) {
           error: err instanceof Error ? err.message : String(err),
         }))
       ),
-      ...filteredInitProjects.map(p => async () =>
+      ...claimedInitProjects.map(p => async () =>
         withTimeout(
           writeOneChapter(p, geminiKey, supabase, 'init'),
           INIT_PROJECT_TIMEOUT_MS,
@@ -821,15 +944,15 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      processed: totalProjects,
+      processed: claimedTotal,
       activeCount,
       dynamicResumeBatchSize,
       runConcurrency: RUN_CONCURRENCY,
       timeoutSeconds: PROJECT_TIMEOUT_MS / 1000,
       dueCandidates: dueCandidates.length,
-      resumeCount: filteredResumeProjects.length,
+      resumeCount: claimedResumeProjects.length,
       resumeSuccess,
-      initCount: filteredInitProjects.length,
+      initCount: claimedInitProjects.length,
       initSuccess,
       skippedDueToQuota,
       durationSeconds: Math.round(duration),

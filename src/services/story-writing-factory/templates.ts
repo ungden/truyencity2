@@ -687,8 +687,8 @@ export const ENGAGEMENT_CHECKLIST = {
   perChapter: [
     'Có ít nhất 1 micro-hook (gợi tò mò nhỏ) trong 500 từ đầu',
     'Cliffhanger hoặc strong ending cuối chương',
-    'Ít nhất 1 điểm dopamine (face-slap, đột phá, thu hoạch, recognition...)',
-    'MC phải có ít nhất 1 tiến triển tích cực nhỏ (thu hoạch/tăng lợi thế/xóa nguy cơ)',
+    'Duy trì độ hấp dẫn qua tension, mystery, phát triển nhân vật hoặc worldbuilding (KHÔNG bắt buộc dopamine mỗi chương)',
+    'MC phải có ít nhất 1 khoảnh khắc đáng nhớ (quyết định chiến lược, khám phá, đối thoại sâu hoặc tiến triển nhỏ)',
     'Ít nhất 1 chi tiết worldbuilding nhỏ (mở rộng thế giới)',
     'Emotional contrast: cảm xúc phải thay đổi ít nhất 1 lần trong chương',
   ],
@@ -753,6 +753,28 @@ export const ENGAGEMENT_CHECKLIST = {
     idealRatio: '20% ngược (MC gặp khó) → 80% sảng (MC tiến bộ/chiến thắng/được tôn trọng)',
     rule: 'Ưu tiên tránh chuỗi thua kéo dài; nếu có adversity thì nên có minor win hoặc cửa thoát sớm',
     antiPattern: 'MC thắng liên tục không gặp khó khăn = nhàm chán, mất tension',
+  },
+
+  // Ngân sách sức mạnh — chống power creep trong truyện dài
+  powerBudget: {
+    description: 'Kiểm soát tốc độ tăng sức mạnh để giữ tension bền vững cho truyện 1000-2000 chương',
+    perArcRules: {
+      maxPowerUps: 3,
+      maxBreakthroughs: 1,
+      nonPowerChapters: 'Tối thiểu 17/20 chương phát triển qua chiến lược, quan hệ, worldbuilding, mưu kế, khám phá',
+    },
+    deceleratingFrequency: {
+      earlyArcs: 'Arc 1-5: power-up mỗi 7 chương; breakthrough tối đa 1 lần/arc',
+      midArcs: 'Arc 6-15: power-up mỗi 10 chương; breakthrough tối đa 1 lần/2 arc',
+      lateArcs: 'Arc 16-30: power-up mỗi 15 chương; breakthrough tối đa 1 lần/3 arc',
+      endArcs: 'Arc 31+: power-up mỗi 20 chương; breakthrough chỉ tại climax arc',
+    },
+    antiPowerCreep: [
+      'KHÔNG tăng sức mạnh mỗi chương',
+      'Mỗi power-up phải có điều kiện hoặc cái giá rõ ràng',
+      'Kẻ thù và trở ngại phải leo thang tương ứng để giữ áp lực',
+      'Sau breakthrough cần 3-5 chương thích nghi thay vì breakthrough liên tiếp',
+    ],
   },
 };
 

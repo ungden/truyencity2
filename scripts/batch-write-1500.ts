@@ -79,6 +79,61 @@ function eta(startMs: number, done: number, total: number): string {
   return `~${h}h${m}m`;
 }
 
+async function resolveChapterCursorPlan(
+  supabase: SupabaseClient,
+  novelId: string,
+  currentCh: number,
+): Promise<{
+  persistedCurrentChapter: number;
+  nextChapter: number;
+  reason?: 'ahead_of_db_max' | 'internal_gap';
+}> {
+  if (currentCh <= 0) {
+    return { persistedCurrentChapter: 0, nextChapter: 1 };
+  }
+
+  const { data, error } = await supabase
+    .from('chapters')
+    .select('chapter_number')
+    .eq('novel_id', novelId)
+    .lte('chapter_number', currentCh + 1)
+    .order('chapter_number', { ascending: true });
+
+  if (error) {
+    return {
+      persistedCurrentChapter: currentCh,
+      nextChapter: currentCh + 1,
+    };
+  }
+
+  const numbers = (data || []).map((r) => r.chapter_number as number);
+  let expected = 1;
+  for (const n of numbers) {
+    if (n > expected) {
+      return {
+        persistedCurrentChapter: currentCh,
+        nextChapter: expected,
+        reason: 'internal_gap',
+      };
+    }
+    if (n === expected) expected++;
+  }
+
+  const maxExisting = numbers.length > 0 ? numbers[numbers.length - 1] : 0;
+  if (maxExisting < currentCh) {
+    return {
+      persistedCurrentChapter: maxExisting,
+      nextChapter: maxExisting + 1,
+      reason: 'ahead_of_db_max',
+    };
+  }
+
+  return {
+    persistedCurrentChapter: currentCh,
+    nextChapter: currentCh + 1,
+  };
+}
+
 // ============================================================================
 // BUILD DYNAMIC WORLDBIBLE from synopsis data (C4 fix — was frozen/static)
 // ============================================================================
@@ -296,10 +351,39 @@ async function main() {
   let consecutiveFailures = 0;
   let currentCh = startChapter;
 
+  // Canonicalize startup cursor only for tail drift.
+  // For internal gaps, we backfill missing chapter numbers without regressing current_chapter.
+  const startupPlan = await resolveChapterCursorPlan(supabase, NOVEL_ID, currentCh);
+  if (startupPlan.reason === 'ahead_of_db_max' && startupPlan.persistedCurrentChapter !== currentCh) {
+    const from = currentCh;
+    currentCh = startupPlan.persistedCurrentChapter;
+    await supabase
+      .from('ai_story_projects')
+      .update({ current_chapter: currentCh, updated_at: new Date().toISOString() })
+      .eq('id', PROJECT_ID);
+    console.log(`  ⚠ Corrected chapter cursor (${startupPlan.reason}): ${from} -> ${currentCh}`);
+  }
+
   // Allow writing past TARGET_CHAPTERS for grace period (up to +1 arc = 20 chapters)
   // Soft-ending logic inside the loop handles actual completion detection
   while (currentCh < TARGET_CHAPTERS + ARC_SIZE) {
-    const nextCh = currentCh + 1;
+    // Re-evaluate cursor every loop.
+    // - ahead_of_db_max: move cursor backward to real max
+    // - internal_gap: backfill missing chapter while keeping persisted cursor at max
+    const plan = await resolveChapterCursorPlan(supabase, NOVEL_ID, currentCh);
+    if (plan.reason === 'ahead_of_db_max' && plan.persistedCurrentChapter !== currentCh) {
+      const from = currentCh;
+      currentCh = plan.persistedCurrentChapter;
+      await supabase
+        .from('ai_story_projects')
+        .update({ current_chapter: currentCh, updated_at: new Date().toISOString() })
+        .eq('id', PROJECT_ID);
+      console.log(`  ⚠ Gap repair (${plan.reason}): ${from} -> ${currentCh}`);
+    }
+
+    const persistedCurrentCh = plan.persistedCurrentChapter;
+    const nextCh = plan.nextChapter;
+    const isGapBackfill = plan.reason === 'internal_gap';
     const writeStartMs = Date.now();
 
     process.stdout.write(
@@ -358,19 +442,19 @@ async function main() {
 
       const { error: updateErr } = await supabase
         .from('ai_story_projects')
-        .update({ current_chapter: nextCh, updated_at: new Date().toISOString() })
+        .update({ current_chapter: Math.max(persistedCurrentCh, nextCh), updated_at: new Date().toISOString() })
         .eq('id', PROJECT_ID);
       if (updateErr) throw new Error(`Project update failed: ${updateErr.message}`);
 
       // ── 4. SUCCESS ──
       consecutiveFailures = 0;
       chaptersWrittenThisRun++;
-      currentCh = nextCh;
+      currentCh = Math.max(persistedCurrentCh, nextCh);
       latestTitle = result.data.title;
       latestContent = result.data.content;
 
       const titlePreview = (result.data.title || '').substring(0, 50);
-      process.stdout.write(`OK ${writeDurationSec}s | ${result.data.wordCount || 0}w | "${titlePreview}"`);
+      process.stdout.write(`OK ${writeDurationSec}s | ${result.data.wordCount || 0}w | "${titlePreview}"${isGapBackfill ? ' [GAP-FILL]' : ''}`);
 
       // ── 5. PIPELINE POST-WRITE (fire-and-forget background) ──
       // Wait for PREVIOUS post-write to finish before starting new one

@@ -48,8 +48,8 @@ const AGENT_PROMPTS: Record<AgentRole, string> = {
 
 NHIỆM VỤ: Tạo outline chi tiết cho chương, đảm bảo:
 1. Pacing theo công thức "ức chế → bùng nổ"
-2. Có ít nhất 1 điểm dopamine (face-slap, đột phá, thu hoạch)
-2.1. Có ít nhất 1 payoff tích cực cho MC trong chương (lợi ích, tài nguyên, quan hệ, vị thế)
+2. Mỗi chương có ít nhất 1 khoảnh khắc đáng nhớ (có thể là dopamine, khám phá, đối thoại sâu, hoặc quyết định chiến lược)
+2.1. Tránh power creep: KHÔNG ép tăng sức mạnh ở mọi chương
 3. Consistency với World Bible và Character Bible
 4. Golden Rules: 3 chương đầu phải hook reader ngay lập tức
 5. Mỗi chương phải có TỐI THIỂU 4-5 scenes để đủ độ dài
@@ -418,6 +418,7 @@ export class ChapterWriter {
 
     const minScenes = Math.max(4, Math.ceil(this.config.targetWordCount / 600));
     const wordsPerScene = Math.round(this.config.targetWordCount / minScenes);
+    const recentCliffhangers = this.extractRecentCliffhangersFromContext(context.previousSummary);
 
     const prompt = `Tạo outline cho Chương ${chapterNumber}.
 
@@ -437,6 +438,10 @@ GENRE CONVENTIONS: ${context.styleBible.genreConventions.join('; ')}
 ${context.currentArc.isFinalArc
   ? 'KẾT THÚC CHƯƠNG (ARC CUỐI):\n- KHÔNG dùng cliffhanger — kết thúc thỏa mãn\n- Nếu đây là chương cuối cùng: viết epilogue, giải quyết mọi xung đột\n- Nếu gần cuối: có thể dùng mild suspense nhưng không mở plot thread mới'
   : 'CLIFFHANGER TECHNIQUES (chọn 1 cho cuối chương):\n' + CLIFFHANGER_TECHNIQUES.map(c => '- ' + c.name + ': ' + c.example).join('\n')}
+
+${!context.currentArc.isFinalArc && recentCliffhangers.length > 0
+  ? `CHỐNG LẶP MOTIF KẾT THÚC (CẤM TUYỆT ĐỐI):\n${recentCliffhangers.map((c) => '- ' + c).join('\n')}\n⚠️ Chương này PHẢI dùng motif kết thúc khác hoàn toàn các chương gần đây (khác tình huống, khác cảm xúc, khác kiểu hook).`
+  : ''}
 
 PREVIOUS: ${context.previousSummary}
 
@@ -469,6 +474,12 @@ ${buildTitleRulesPrompt(previousTitles)}
 
 ENGAGEMENT (mỗi chương phải có):
 ${ENGAGEMENT_CHECKLIST.perChapter.map(e => '- ' + e).join('\n')}
+
+NGÂN SÁCH SỨC MẠNH (BẮT BUỘC):
+- Trong arc 20 chương: tối đa ${ENGAGEMENT_CHECKLIST.powerBudget.perArcRules.maxPowerUps} power-up, tối đa ${ENGAGEMENT_CHECKLIST.powerBudget.perArcRules.maxBreakthroughs} breakthrough
+- ${ENGAGEMENT_CHECKLIST.powerBudget.perArcRules.nonPowerChapters}
+- KHÔNG được cho MC tăng cảnh giới/sức mạnh mỗi chương
+- Mỗi power-up cần điều kiện/cái giá rõ ràng, không "tự nhiên mạnh lên"
 
 Trả về JSON (KHÔNG có comment):
 {
@@ -635,7 +646,7 @@ ${richStyleContext}
 - Phải viết ĐẦY ĐỦ mỗi scene: miêu tả bối cảnh, cảm xúc, suy nghĩ nội tâm, đối thoại chi tiết, hành động
 - KHÔNG tóm tắt, KHÔNG lược bỏ. Viết như tiểu thuyết xuất bản.
 - KHÔNG dùng markdown. Viết văn thuần túy.
-- SƯỚNG VĂN MAINSTREAM: ưu tiên cảm giác tiến triển tích cực, mỗi chương có ít nhất 1 payoff nhỏ cho MC.
+- SƯỚNG VĂN MAINSTREAM CÓ KIỂM SOÁT: ưu tiên cảm giác tiến triển tích cực qua chiến lược, trí tuệ, quan hệ, khám phá — KHÔNG chỉ bằng power-up.
 - Hạn chế kéo dài trạng thái tụt dốc; nên có điểm hồi phục hoặc lợi ích bù đắp.
 
 Bắt đầu viết (nhớ: TỐI THIỂU ${totalTargetWords} từ):`;
@@ -733,17 +744,17 @@ ${contentPreview}
   "overallScore": <1-10 điểm thực tế, KHÔNG mặc định 7>,
   "dopamineScore": <1-10 dopamine có satisfying không>,
   "pacingScore": <1-10 nhịp điệu có tốt không>,
-  "issues": [{"type": "word_count|pacing|logic|detail|continuity", "description": "mô tả cụ thể", "severity": "minor|moderate|major"}],
+  "issues": [{"type": "word_count|pacing|logic|detail|continuity", "description": "mô tả cụ thể", "severity": "minor|moderate|major|critical"}],
   "approved": <true nếu overallScore >= 6 VÀ wordRatio >= 70%>,
   "requiresRewrite": <true nếu overallScore <= 3 HOẶC wordRatio < 60% HOẶC có lỗi continuity major>,
   "rewriteInstructions": "hướng dẫn cụ thể nếu cần rewrite"
 }
 
 KIỂM TRA MÂU THUẪN (BẮT BUỘC nếu có BỐI CẢNH ở trên):
-- Nhân vật đã chết có xuất hiện lại không?
-- Cảnh giới/sức mạnh MC có mâu thuẫn với trạng thái trong bối cảnh không?
-- Có vi phạm quy tắc thế giới đã thiết lập không?
-- Nếu phát hiện, ghi vào issues với type "continuity" và severity "major"`;
+- Nếu nhân vật đã CHẾT mà xuất hiện lại sống -> type "continuity", severity "critical", requiresRewrite=true, overallScore<=3
+- Nếu sức mạnh/cảnh giới MC bị THOÁI LUI vô lý (không có giải thích) -> type "continuity", severity "critical", requiresRewrite=true, overallScore<=3
+- Nếu vi phạm quy tắc thế giới đã thiết lập -> type "continuity", severity "critical", requiresRewrite=true, overallScore<=3
+- Nếu nhân vật hành xử trái ngược hoàn toàn với tính cách đã thiết lập -> type "continuity", severity "major", requiresRewrite=true`;
 
     try {
       const response = await this.aiService.chat({
@@ -773,6 +784,20 @@ KIỂM TRA MÂU THUẪN (BẮT BUỘC nếu có BỐI CẢNH ở trên):
       }
 
       const parsed = this.parseJSON<CriticOutput>(response.content);
+
+      // Hard enforcement: critical/major continuity issues must be rewritten.
+      const forcedRewriteIssues = (parsed.issues || []).filter((issue) => {
+        if (issue.type !== 'continuity') return false;
+        return issue.severity === 'critical' || issue.severity === 'major';
+      });
+      if (forcedRewriteIssues.length > 0) {
+        parsed.requiresRewrite = true;
+        parsed.approved = false;
+        parsed.overallScore = Math.min(parsed.overallScore || 10, 3);
+        if (!parsed.rewriteInstructions || parsed.rewriteInstructions.trim().length === 0) {
+          parsed.rewriteInstructions = `Sửa lỗi continuity nghiêm trọng: ${forcedRewriteIssues.map(i => i.description).join('; ')}`;
+        }
+      }
 
       // Override: force rewrite if word count is critically low
       if (wordCount < targetWords * 0.6) {
@@ -980,8 +1005,9 @@ ${buildTitleRulesPrompt(context.previousTitles)}
 - Viết chi tiết, không tóm tắt
 - KHÔNG markdown, viết văn thuần túy
 ${context.currentArc?.isFinalArc ? '- Kết thúc thỏa mãn (ARC CUỐI — KHÔNG cliffhanger)' : '- Cliffhanger mạnh cuối chương'}
-- Có ít nhất 1 điểm dopamine (face-slap, đột phá, thu hoạch)
-- Có ít nhất 1 payoff tích cực cho MC (thu hoạch/lật kèo/tăng quyền/tăng tài nguyên)
+- Duy trì độ hấp dẫn qua tension, mystery, phát triển nhân vật hoặc worldbuilding (không bắt buộc dopamine mỗi chương)
+- MC nên có khoảnh khắc đáng nhớ (quyết định chiến lược, khám phá, đối thoại sâu hoặc tiến triển nhỏ)
+- KHÔNG cho MC tăng sức mạnh/cảnh giới ở mọi chương; giữ nhịp tăng trưởng theo arc
 - Tránh kéo dài cảm giác bị ngược; giữ nhịp đọc đã và sáng cửa cho MC
 - Bao gồm: miêu tả bối cảnh, cảm xúc nội tâm, đối thoại phong phú, hành động chi tiết
 
@@ -1147,6 +1173,26 @@ Viết chương (nhớ: BẮT ĐẦU bằng "Chương ${chapterNumber}: [Tiêu �
     lines.push('Mỗi nhân vật có cách xưng hô, ngữ điệu, từ vựng riêng biệt - TUYỆT ĐỐI không được lẫn lộn.');
 
     return lines.join('\n');
+  }
+
+  private extractRecentCliffhangersFromContext(previousSummary: string): string[] {
+    if (!previousSummary) return [];
+    const marker = '═══ KẾT THÚC/CLIFFHANGER';
+    const start = previousSummary.indexOf(marker);
+    if (start < 0) return [];
+
+    const tail = previousSummary.slice(start);
+    const lines = tail.split('\n').slice(1);
+    const cliffhangers: string[] = [];
+    for (const raw of lines) {
+      const line = raw.trim();
+      if (!line) continue;
+      if (line.startsWith('═══')) break;
+      if (line.startsWith('⚠️')) break;
+      cliffhangers.push(line.replace(/^[-*]\s*/, ''));
+      if (cliffhangers.length >= 10) break;
+    }
+    return cliffhangers;
   }
 
   private cleanContent(content: string): string {

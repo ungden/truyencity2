@@ -54,6 +54,37 @@ All agents working on story generation must preserve these 5 goals:
 
 ---
 
+## Core Runtime Fixes (2026-02-16)
+
+Đã triển khai trực tiếp vào pipeline để tránh phụ thuộc vào audit ngoài:
+
+1. **Atomic project claim** (`src/app/api/cron/write-chapters/route.ts`)
+   - Claim job dùng `UPDATE ... WHERE updated_at < fourMinutesAgo ... RETURNING id`.
+   - Chỉ chạy các project thực sự claim được (`claimedResumeProjects`, `claimedInitProjects`).
+   - Loại race condition SELECT-then-UPDATE (TOCTOU) khi có nhiều worker.
+
+2. **Mandatory post-write summary pipeline** (`src/app/api/cron/write-chapters/route.ts` + `src/services/story-writing-factory/context-loader.ts`)
+   - Chapter summary là bước **critical**: retry tối đa 3 lần, fail thì throw.
+   - `current_chapter` chỉ được tăng sau khi chapter + summary đã persist.
+   - `saveChapterSummary` hỗ trợ `throwOnError` để đảm bảo fail-closed khi cần.
+
+3. **Power progression budget (anti power-creep)** (`src/services/story-writing-factory/templates.ts` + `src/services/story-writing-factory/chapter.ts`)
+   - Bỏ ép dopamine/power-up mỗi chương.
+   - Thêm ngân sách per-arc: tối đa 3 power-up, tối đa 1 breakthrough/20 chương.
+   - Prompt Architect/Writer nhấn mạnh tiến triển qua chiến lược, quan hệ, worldbuilding.
+
+4. **Anti-repetition ending/cliffhanger** (`src/services/story-writing-factory/context-loader.ts` + `src/services/story-writing-factory/chapter.ts`)
+   - Nạp `recentCliffhangers` từ `chapter_summaries` vào context layer.
+   - Inject vào prompt Architect để cấm lặp motif kết thúc 5-10 chương gần nhất.
+
+5. **Continuity hard enforcement in Critic** (`src/services/story-writing-factory/chapter.ts`)
+   - Prompt critic quy định hard reject cho: resurrection vô lý, power regression vô lý, world-rule violations.
+   - Sau parse, code cưỡng bức `requiresRewrite=true` nếu có issue continuity `major|critical`.
+
+Khi tiếp tục tối ưu sau này, ưu tiên chỉnh trong runtime pipeline hiện có, không thêm lớp audit bên ngoài trừ khi bắt buộc.
+
+---
+
 ## Vietnamese Language Rules (QUAN TRỌNG)
 
 **Tất cả text tiếng Việt hiển thị cho người dùng PHẢI có dấu đầy đủ.**
