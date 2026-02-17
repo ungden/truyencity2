@@ -309,6 +309,8 @@ export class AIProviderService {
         maxOutputTokens: maxTokens,
         topP: 0.95,
         topK: 40,
+        frequencyPenalty: 0.4,
+        presencePenalty: 0.1,
       },
     };
 

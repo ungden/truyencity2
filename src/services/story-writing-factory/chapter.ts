@@ -89,7 +89,8 @@ FORMAT ĐỐI THOẠI (BẮT BUỘC - chuẩn văn học Việt Nam):
 QUY TẮC:
 - KHÔNG dùng markdown (không #, không **, không *)
 - Viết văn thuần túy, tự nhiên như tiểu thuyết xuất bản
-- PHẢI viết đủ số từ yêu cầu - đây là quy tắc CỨNG`,
+- PHẢI viết đủ số từ yêu cầu - đây là quy tắc CỨNG
+- TUYỆT ĐỐI KHÔNG lặp lại cùng một từ hoặc cụm từ liên tiếp. Mỗi câu phải dùng từ ngữ khác nhau, đa dạng. Nếu thấy mình viết lặp, hãy paraphrase ngay.`,
 
   critic: `Bạn là CRITIC AGENT - biên tập viên khắt khe cho webnovel tiếng Việt.
 
@@ -911,6 +912,10 @@ Viết tiếp ngay:`,
       if (!line || line.length < 8) continue;
       // Skip lines that look like "Chương N" without descriptor
       if (/^Chương\s*\d+\s*$/i.test(line)) continue;
+      // Skip lines that are repetition garbage (same word repeated)
+      const words = line.split(/\s+/);
+      const uniqueWords = new Set(words);
+      if (words.length > 3 && uniqueWords.size <= 2) continue;
       // Take first ~60 chars of the first real content line
       const snippet = line.length > 60 ? line.substring(0, 57) + '...' : line;
       return snippet;
@@ -1196,15 +1201,39 @@ Viết chương (nhớ: BẮT ĐẦU bằng "Chương ${chapterNumber}: [Tiêu �
   }
 
   private cleanContent(content: string): string {
-    return content
+    let cleaned = content
       .replace(/^#{1,6}\s+/gm, '')
       .replace(/\*\*([^*]+)\*\*/g, '$1')
       .replace(/\*([^*]+)\*/g, '$1')
       .replace(/```[\s\S]*?```/g, '')
       // Strip scene labels leaked from Architect outline (e.g. "Scene 1:", "Cảnh 2:", "SCENE 3:")
       .replace(/^(?:Scene|Cảnh|SCENE|scene|cảnh)\s*\d+\s*[:：]\s*/gm, '')
+      // Strip literal English instruction words that leaked into Vietnamese narrative
+      .replace(/\bCliffhanger\b/gi, '')
       .replace(/\n{3,}/g, '\n\n')
       .trim();
+
+    // Strip intra-chapter repetition loops: any phrase (2-6 words) repeated 3+ times consecutively
+    // Handles "bấy giờ bấy giờ bấy giờ" and "bàng hoàng bỗng chốc bàng hoàng bỗng chốc" patterns
+    cleaned = this.stripRepetitionLoops(cleaned);
+
+    return cleaned;
+  }
+
+  /**
+   * Detect and collapse consecutive repetition loops in text.
+   * A "loop" is any sequence of 2-20 characters repeated 3+ times in a row.
+   * Keeps exactly ONE occurrence of the repeated phrase.
+   */
+  private stripRepetitionLoops(text: string): string {
+    // Pattern: capture a phrase (2-60 chars), then match it repeating 2+ more times (with optional whitespace between)
+    // This catches: "bấy giờ bấy giờ bấy giờ bấy giờ" → "bấy giờ"
+    let result = text;
+    // Multi-word phrase loops (2+ words repeated 3+ times)
+    result = result.replace(/(\S+(?:\s+\S+){1,5}?)(?:\s+\1){2,}/g, '$1');
+    // Single-word loops (same word repeated 3+ times)
+    result = result.replace(/(\S{2,})(?:\s+\1){2,}/g, '$1');
+    return result;
   }
 
   private countWords(content: string): number {

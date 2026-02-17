@@ -132,6 +132,8 @@ export class GeminiClient {
           maxOutputTokens,
           topP: options?.topP ?? 0.95,
           topK: options?.topK ?? 40,
+          frequencyPenalty: 0.4,
+          presencePenalty: 0.1,
         },
       };
 
@@ -240,6 +242,8 @@ export class GeminiClient {
           maxOutputTokens,
           topP: options?.topP ?? 0.95,
           topK: options?.topK ?? 40,
+          frequencyPenalty: 0.4,
+          presencePenalty: 0.1,
         },
       };
 
