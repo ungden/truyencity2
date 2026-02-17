@@ -11,7 +11,7 @@
  */
 
 import { AIProviderService } from '../ai-provider';
-import { GeminiImageService } from '../factory/gemini-image';
+import { GeminiImageService } from '../gemini-image';
 import { getSupabase } from './supabase-helper';
 import { GENRE_CONFIG } from '@/lib/types/genre-config';
 

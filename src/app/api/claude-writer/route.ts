@@ -4,6 +4,9 @@ import { createSupabaseFromAuthHeader } from '@/integrations/supabase/auth-helpe
 import { getAIProviderService } from '@/services/ai-provider';
 import { AIProviderType } from '@/lib/types/ai-providers';
 import { writeSingleChapterCanonical } from '@/services/story-writing-factory/canonical-write';
+import { writeChapterForProject } from '@/services/story-engine';
+
+const USE_V2 = process.env.USE_STORY_ENGINE_V2 === 'true';
 
 type WriterAction = 'write_chapter' | 'write_batch' | 'get_status';
 
@@ -52,17 +55,30 @@ export async function POST(request: NextRequest) {
     const provider = config?.provider || 'gemini';
 
     if (action === 'write_chapter') {
-      const result = await writeSingleChapterCanonical({
-        supabase: supabase as SupabaseClient,
-        aiService,
-        projectId,
-        userId: user.id,
-        provider,
-        model: config?.model,
-        temperature: config?.temperature,
-        targetWordCount: config?.targetWordCount,
-        customPrompt,
-      });
+      let result: { chapterNumber: number; title: string; wordCount: number };
+
+      if (USE_V2) {
+        const v2 = await writeChapterForProject({
+          projectId,
+          customPrompt,
+          temperature: config?.temperature,
+          targetWordCount: config?.targetWordCount,
+          model: config?.model,
+        });
+        result = { chapterNumber: v2.chapterNumber, title: v2.title, wordCount: v2.wordCount };
+      } else {
+        result = await writeSingleChapterCanonical({
+          supabase: supabase as SupabaseClient,
+          aiService,
+          projectId,
+          userId: user.id,
+          provider,
+          model: config?.model,
+          temperature: config?.temperature,
+          targetWordCount: config?.targetWordCount,
+          customPrompt,
+        });
+      }
 
       return NextResponse.json({
         success: true,
@@ -80,17 +96,30 @@ export async function POST(request: NextRequest) {
 
       for (let i = 0; i < maxCount; i++) {
         try {
-          const result = await writeSingleChapterCanonical({
-            supabase: supabase as SupabaseClient,
-            aiService,
-            projectId,
-            userId: user.id,
-            provider,
-            model: config?.model,
-            temperature: config?.temperature,
-            targetWordCount: config?.targetWordCount,
-            customPrompt,
-          });
+          let result: { chapterNumber: number; title: string; wordCount: number };
+
+          if (USE_V2) {
+            const v2 = await writeChapterForProject({
+              projectId,
+              customPrompt,
+              temperature: config?.temperature,
+              targetWordCount: config?.targetWordCount,
+              model: config?.model,
+            });
+            result = { chapterNumber: v2.chapterNumber, title: v2.title, wordCount: v2.wordCount };
+          } else {
+            result = await writeSingleChapterCanonical({
+              supabase: supabase as SupabaseClient,
+              aiService,
+              projectId,
+              userId: user.id,
+              provider,
+              model: config?.model,
+              temperature: config?.temperature,
+              targetWordCount: config?.targetWordCount,
+              customPrompt,
+            });
+          }
 
           results.push({
             success: true,

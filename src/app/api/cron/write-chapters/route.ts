@@ -26,6 +26,11 @@ import { summarizeChapter, generateSynopsis, generateArcPlan, generateStoryBible
 import { saveChapterSummary, ContextLoader, loadStoryOutline } from '@/services/story-writing-factory/context-loader';
 import type { StoryVision } from '@/services/story-writing-factory/context-generators';
 
+// Story Engine v2 — feature-flagged
+import { writeOneChapter as writeOneChapterV2 } from '@/services/story-engine';
+
+const USE_STORY_ENGINE_V2 = process.env.USE_STORY_ENGINE_V2 === 'true';
+
 // CONFIGURATION
 const MIN_RESUME_BATCH_SIZE = 30;
 const MAX_RESUME_BATCH_SIZE = 180;
@@ -298,6 +303,9 @@ async function writeOneChapter(
   let runCurrentCh = currentCh;
   let persistedCurrentCh = currentCh;
   let internalGapBackfill = false;
+  let latestWrittenTitle: string | null = null;
+  let latestWrittenContent: string | null = null;
+  let writtenChapterNumber: number | null = null;
 
   // ====== CHAPTER GAP CHECK ======
   // Canonicalize chapter cursor against real chapter rows.
@@ -356,6 +364,72 @@ async function writeOneChapter(
     // else: in grace period, not at boundary — fall through to write 1 more chapter toward arc boundary
   }
 
+  // ====== STORY ENGINE V2 PATH ======
+  if (USE_STORY_ENGINE_V2 && tier === 'resume') {
+    try {
+      const v2Result = await writeOneChapterV2({
+        projectId: project.id,
+        temperature: project.temperature || undefined,
+        targetWordCount: project.target_chapter_length || undefined,
+      });
+
+      writtenChapterNumber = v2Result.chapterNumber;
+      latestWrittenTitle = v2Result.title;
+
+      // Load content for natural ending detection
+      try {
+        const { data: ch } = await supabase.from('chapters')
+          .select('content').eq('novel_id', novel.id)
+          .eq('chapter_number', v2Result.chapterNumber).maybeSingle();
+        latestWrittenContent = ch?.content || null;
+      } catch { /* non-fatal */ }
+
+      // ====== SOFT ENDING (same logic as v1) ======
+      const lastWrittenCh = v2Result.chapterNumber;
+      const targetChapters = project.total_planned_chapters || 200;
+      const CHAPTERS_PER_ARC = 20;
+      const GRACE_BUFFER = CHAPTERS_PER_ARC;
+      const hardStop = targetChapters + GRACE_BUFFER;
+      const hasNaturalEnding = detectNaturalEnding(latestWrittenTitle, latestWrittenContent);
+      let completionReason: RunResult['completionReason'];
+      let shouldComplete = false;
+
+      if (lastWrittenCh >= hardStop) {
+        shouldComplete = true; completionReason = 'hard_stop';
+      } else if (lastWrittenCh >= targetChapters) {
+        const isArcBoundary = lastWrittenCh % CHAPTERS_PER_ARC === 0;
+        const isExactTarget = lastWrittenCh === targetChapters;
+        if (isArcBoundary || isExactTarget) {
+          shouldComplete = true;
+          completionReason = isExactTarget ? 'exact_target' : 'arc_boundary';
+        } else if (hasNaturalEnding) {
+          shouldComplete = true; completionReason = 'natural_ending';
+        }
+      } else if (lastWrittenCh >= targetChapters - 5 && hasNaturalEnding) {
+        shouldComplete = true; completionReason = 'natural_ending';
+      }
+
+      if (shouldComplete) {
+        await supabase.from('ai_story_projects')
+          .update({ status: 'completed', updated_at: new Date().toISOString() })
+          .eq('id', project.id);
+      }
+
+      return {
+        id: project.id,
+        title: novel.title,
+        tier,
+        success: true,
+        completionReason,
+        chapterWritten: true,
+      };
+    } catch (v2Err) {
+      console.error(`[${tier}][${project.id.slice(0, 8)}] V2 engine failed, falling through to V1:`,
+        v2Err instanceof Error ? v2Err.message : String(v2Err));
+      // Fall through to v1 path
+    }
+  }
+
   const factoryConfig: Partial<FactoryConfig> = {
     provider: 'gemini',
     model: 'gemini-3-flash-preview',
@@ -376,9 +450,6 @@ async function writeOneChapter(
     minQualityToProgress: 4,
     pauseOnError: false,
   };
-  let latestWrittenTitle: string | null = null;
-  let latestWrittenContent: string | null = null;
-  let writtenChapterNumber: number | null = null;
 
   const runAttempt = async (overrides?: Partial<FactoryConfig>) => {
     let attemptGenerated = false;

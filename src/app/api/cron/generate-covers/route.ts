@@ -16,7 +16,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { GeminiImageService } from '@/services/factory/gemini-image';
+import { GeminiImageService } from '@/services/gemini-image';
 
 // Process up to 20 covers per tick, 4 in parallel (~15-20s each = ~1-1.5 min per wave)
 const BATCH_SIZE = 20;
