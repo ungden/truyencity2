@@ -5,8 +5,7 @@
 
 import { type SupabaseClient } from '@supabase/supabase-js';
 import { AIProviderService } from './ai-provider';
-import { AIStoryWriter } from './_legacy/ai-story-writer';
-import { createDopamineOptimizer } from './dopamine-writing-optimizer';
+import { writeSingleChapterCanonical } from './story-writing-factory/canonical-write';
 import {
   AIProviderType,
   SessionMessage,
@@ -300,11 +299,9 @@ export class StoryWritingSessionService {
     if (!session) throw new Error('Session not found');
 
     const customPrompt = args.join(' ');
-    // @ts-ignore
-    const useAgents = session.config.useAgents === true;
 
     await this.updateStatus(sessionId, 'writing', 5, 'Initializing writer...');
-    await this.addMessage(sessionId, 'progress', useAgents ? 'Starting 3-Agent Workflow (Architect -> Writer -> Critic)...' : 'Starting chapter writing...', { progress: 5 });
+    await this.addMessage(sessionId, 'progress', 'Starting canonical chapter pipeline...', { progress: 5 });
 
     // Get project
     const { data: project } = await this.supabase
@@ -319,111 +316,43 @@ export class StoryWritingSessionService {
     }
 
     try {
-      // Create a writing job
-      const { data: job } = await this.supabase
-        .from('ai_writing_jobs')
-        .insert({
-          project_id: session.projectId,
-          user_id: this.userId,
-          status: 'running',
-          progress: 0,
-          step_message: 'Initializing...',
-        })
-        .select()
-        .single();
-
-      if (!job) throw new Error('Failed to create writing job');
-
-      // --- NEW AGENT WORKFLOW ---
-      if (useAgents) {
-        // Initialize Dopamine Optimizer
-        const optimizer = createDopamineOptimizer(this.aiProvider, project.id);
-        
-        // Pass API Key if available
-        const effectiveKey = apiKey || this.aiProvider.getApiKey(session.config.provider);
-        if (effectiveKey) this.aiProvider.setApiKey(session.config.provider, effectiveKey);
-
-        const nextChapter = project.current_chapter + 1;
-        
-        // Step 1: Architect
-        await this.updateStatus(sessionId, 'writing', 20, 'Architect is planning...');
-        await this.addMessage(sessionId, 'progress', 'Architect Agent: Creating blueprint...', { progress: 20 });
-
-        // Get context summary (simplified for now)
-        const prevSummary = `Chapter ${project.current_chapter} ended.`; // TODO: Fetch real summary
-
-        const result = await optimizer.orchestrator.writeChapter(
-          nextChapter,
-          prevSummary,
-          customPrompt
-        );
-
-        if (!result.success) {
-          throw new Error(result.error || 'Agent workflow failed');
-        }
-
-        // Output Critic Report
-        if (result.criticReport) {
-           const score = result.criticReport.overallScore;
-           const badge = score >= 80 ? 'Excellent' : score >= 70 ? 'Good' : 'Needs Improvement';
-           const criticMsg = `Critic Report:
-- Overall Score: ${score}/100 (${badge})
-- Dopamine: ${result.criticReport.dopamineScore}/100
-- Pacing: ${result.criticReport.pacingScore}/100
-- Suggestions: ${result.criticReport.suggestions.join(', ')}`;
-           
-           await this.addMessage(sessionId, 'system', criticMsg);
-        }
-
-        // Save content using classic flow methods (reusing save logic for now)
-        // In a real implementation, we should move saving logic to a shared service
-        // For now, we update status and return content
-        await this.updateStatus(sessionId, 'idle', 100, 'Chapter written successfully');
-
-        const responseText = `Successfully wrote Chapter ${nextChapter}\n\n${result.content}`;
-        await this.addMessage(sessionId, 'assistant', responseText, {
-          chapterNumber: nextChapter,
-          wordCount: result.content?.split(/\s+/).length || 0,
-        });
-
-        return {
-          response: responseText,
-          action: 'chapter_written',
-          data: {
-            title: `Chapter ${nextChapter}`,
-            wordCount: result.content?.split(/\s+/).length || 0,
-            content: result.content
-          },
-        };
-
-      } else {
-        // --- CLASSIC FLOW ---
-        const writer = new AIStoryWriter(project, job.id, this.supabase);
-
-        await this.updateStatus(sessionId, 'writing', 20, 'Getting story context...');
-        await this.addMessage(sessionId, 'progress', 'Analyzing story context...', { progress: 20 });
-
-        const result = await writer.writeNextChapter();
-
-        if (result) {
-          await this.updateStatus(sessionId, 'idle', 100, 'Chapter written successfully');
-
-          const responseText = `Successfully wrote Chapter ${project.current_chapter + 1}: ${result.title}\n\nWord count: ${result.wordCount}\n\nSummary: ${result.summary}`;
-
-          await this.addMessage(sessionId, 'assistant', responseText, {
-            chapterNumber: project.current_chapter + 1,
-            wordCount: result.wordCount,
-          });
-
-          return {
-            response: responseText,
-            action: 'chapter_written',
-            data: result,
-          };
-        } else {
-          throw new Error('Writing failed - no result returned');
-        }
+      const effectiveKey = apiKey || this.aiProvider.getApiKey(session.config.provider);
+      if (effectiveKey) {
+        this.aiProvider.setApiKey(session.config.provider, effectiveKey);
       }
+
+      await this.updateStatus(sessionId, 'writing', 25, 'Writing chapter with long-form context...');
+      await this.addMessage(sessionId, 'progress', 'Loading 4-layer context and writing next chapter...', { progress: 25 });
+
+      const result = await writeSingleChapterCanonical({
+        supabase: this.supabase,
+        aiService: this.aiProvider,
+        projectId: session.projectId,
+        userId: this.userId,
+        provider: session.config.provider,
+        model: session.config.model,
+        temperature: session.config.temperature,
+        targetWordCount: session.config.targetWordCount,
+        customPrompt,
+      });
+
+      await this.updateStatus(sessionId, 'idle', 100, 'Chapter written successfully');
+
+      const responseText = `Successfully wrote Chapter ${result.chapterNumber}: ${result.title}\n\nWord count: ${result.wordCount}`;
+
+      await this.addMessage(sessionId, 'assistant', responseText, {
+        chapterNumber: result.chapterNumber,
+        wordCount: result.wordCount,
+      });
+
+      return {
+        response: responseText,
+        action: 'chapter_written',
+        data: {
+          title: result.title,
+          wordCount: result.wordCount,
+        },
+      };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       await this.updateStatus(sessionId, 'error', 0, undefined, errorMessage);
@@ -515,9 +444,6 @@ export class StoryWritingSessionService {
       return { response: 'Project not found' };
     }
 
-    // @ts-ignore
-    const useAgents = session.config.useAgents === true;
-
     const status = `
 Project Status
 ==============
@@ -533,7 +459,6 @@ Status: ${session.status}
 Progress: ${session.progress}%
 Provider: ${session.config.provider}
 Model: ${session.config.model}
-Agent Mode: ${useAgents ? 'ON (Architect-Writer-Critic)' : 'OFF (Standard)'}
 Messages: ${session.messages.length}
     `.trim();
 
@@ -638,13 +563,12 @@ Available Commands
 /status                - Show project and session status
 /context               - Show recent story context
 /outline               - Show current story outline
-/provider <name>       - Switch AI provider (deepseek, openrouter, openai, claude)
+/provider <name>       - Switch AI provider (gemini, openrouter, openai, claude)
 /model <name>          - Switch AI model
 /help                  - Show this help message
 
 Tips
 ====
-- Check "Agent Settings" to enable High Quality Mode (3-Agent Workflow).
 - Add instructions after /write to guide the chapter content
 - Use /context before writing to review story state
     `.trim();

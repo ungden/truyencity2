@@ -1,5 +1,6 @@
 import { createServerClient } from '@/integrations/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { ContextLoader } from '@/services/story-writing-factory/context-loader';
 
 // Claude Code Integration API
 // This endpoint allows Claude Code to interact with the AI Writer system
@@ -134,36 +135,33 @@ async function getProjectContext(supabase: any, projectId: string) {
     return NextResponse.json({ error: 'Project not found' }, { status: 404 });
   }
 
-  // Get recent chapters for context
+  const nextChapterNumber = (project.current_chapter || 0) + 1;
+  let canonicalContext: unknown = null;
+
+  try {
+    if (project.novel_id) {
+      const payload = await new ContextLoader(projectId, project.novel_id).load(nextChapterNumber);
+      canonicalContext = {
+        nextChapter: nextChapterNumber,
+        hasStoryBible: payload.hasStoryBible,
+        synopsis: payload.synopsis,
+        arcPlan: payload.arcPlan,
+        recentChapters: payload.recentChapters,
+        previousTitles: payload.previousTitles,
+        recentOpenings: payload.recentOpenings,
+        recentCliffhangers: payload.recentCliffhangers,
+      };
+    }
+  } catch {
+    canonicalContext = null;
+  }
+
   const { data: recentChapters } = await supabase
     .from('chapters')
-    .select('chapter_number, title, content')
+    .select('chapter_number, title')
     .eq('novel_id', project.novel_id)
     .order('chapter_number', { ascending: false })
     .limit(5);
-
-  // Get story graph context
-  const { data: storyGraph } = await supabase
-    .from('story_graph_nodes')
-    .select('chapter_number, summary, key_events, character_states, plot_threads')
-    .eq('project_id', projectId)
-    .order('chapter_number', { ascending: false })
-    .limit(10);
-
-  // Get plot arcs
-  const { data: plotArcs } = await supabase
-    .from('plot_arcs')
-    .select('*')
-    .eq('project_id', projectId)
-    .eq('status', 'active');
-
-  // Get planned twists
-  const { data: plannedTwists } = await supabase
-    .from('planned_twists')
-    .select('*')
-    .eq('project_id', projectId)
-    .eq('status', 'planned')
-    .gte('target_chapter', project.current_chapter);
 
   return NextResponse.json({
     project: {
@@ -179,10 +177,8 @@ async function getProjectContext(supabase: any, projectId: string) {
       current_chapter: project.current_chapter,
     },
     recentChapters: recentChapters?.reverse() || [],
-    storyGraph: storyGraph?.reverse() || [],
-    plotArcs: plotArcs || [],
-    plannedTwists: plannedTwists || [],
-    nextChapterNumber: project.current_chapter + 1,
+    canonicalContext,
+    nextChapterNumber,
   });
 }
 

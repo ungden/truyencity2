@@ -466,16 +466,45 @@ story_memory_chunks (project_id, chapter_number, chunk_type, content, embedding 
 | Power regression | Common | Partial fix | **DB-tracked** |
 | Genre drift | Common | No fix | **Boundary enforced** |
 
+#### Cron Architecture (Single Source of Truth: Supabase pg_cron)
+```
+ALL scheduling via pg_cron → pg_net HTTP calls to Vercel API routes.
+Vercel cron REMOVED (vercel.json empty) — was dead anyway (no Bearer auth).
+Secret stored in Supabase Vault as 'cron_secret' — no hardcoded secrets.
+Migration 0121 is the definitive cron setup (reads vault, reschedules all 7 jobs).
+
+Jobs:
+  write-chapters-cron     */5 * * * *    Core pipeline — writes chapters
+  generate-covers-cron    */10 * * * *   AI cover generation
+  daily-rotate-cron       0 0 * * *      Activate paused novels (midnight UTC)
+  daily-spawn-cron        55 23 * * *    Create 20 new novels (23:55 UTC)
+  health-check-cron       2 * * * *      Hourly health check + webhook alert
+  ai-editor-scan-cron     5 0 * * *      Daily quality scan
+  ai-editor-rewrite-cron  */10 * * * *   Rewrite low-quality chapters
+
+SECRET ROTATION PROCEDURE:
+  1. Generate new secret: openssl rand -hex 32
+  2. Update Supabase vault:
+     SELECT vault.update_secret(id, 'new_secret_here')
+     FROM vault.secrets WHERE name = 'cron_secret';
+  3. Update Vercel env var: CRON_SECRET=new_secret_here
+  4. Re-run migration 0121 or the DO block inside it
+  5. Verify: check cron.job_run_details for 'succeeded' status
+
+ALERTING:
+  Health check sends webhook to ALERT_WEBHOOK_URL (Discord/Slack) on critical status.
+  Set env var on Vercel: ALERT_WEBHOOK_URL=https://discord.com/api/webhooks/...
+```
+
 #### Deployment Checklist
 ```
-[x] Run migration 0100: plot_threads, world_rules_index, beat_usage, volume_summaries (done)
-[x] Run migration 0120: character_states, story_memory_chunks + pgvector (done 2026-02-17)
-[x] Verify pgvector extension enabled on production (confirmed)
-[ ] Verify GEMINI_API_KEY has access to text-embedding-004 model
-[ ] Deploy code to Vercel
-[ ] Monitor character_states table growth
-[ ] Monitor story_memory_chunks table growth (embeddings should be non-null for new chapters)
-[ ] Monitor plot_threads, beat_usage, world_rules_index tables for data
+[x] Run migration 0100: plot_threads, world_rules_index, beat_usage, volume_summaries
+[x] Run migration 0120: character_states, story_memory_chunks + pgvector (2026-02-17)
+[x] Run migration 0121: vault-based pg_cron reschedule (2026-02-17)
+[x] Verify pgvector extension enabled on production
+[x] Remove Vercel cron (vercel.json emptied)
+[ ] Set ALERT_WEBHOOK_URL env var on Vercel for critical alerts
+[ ] Monitor character_states, story_memory_chunks, beat_usage, plot_threads growth
 [ ] Run coherence audit after 50+ chapters to verify improvement
 [ ] Optional: backfill embeddings with `npx tsx scripts/backfill-embeddings.ts`
 ```

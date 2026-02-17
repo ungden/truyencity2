@@ -79,23 +79,15 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const {
-      title,
-      protagonistName,
-      genre = 'tien-hiep',
-      premise,
-      targetChapters = 200,
-      chaptersPerArc = 20,
-      chaptersToWrite,
-      projectId: existingProjectId,
-    } = body;
+    const existingProjectId: string | undefined = body.projectId;
 
-    if (!title || !protagonistName) {
-      return NextResponse.json(
-        { success: false, error: 'title and protagonistName are required' },
-        { status: 400 }
-      );
-    }
+    let title: string | undefined = body.title;
+    let protagonistName: string | undefined = body.protagonistName;
+    let genre: GenreType = (body.genre || 'tien-hiep') as GenreType;
+    let premise: string | undefined = body.premise;
+    let targetChapters: number = body.targetChapters || 200;
+    const chaptersPerArc: number = body.chaptersPerArc || 20;
+    const chaptersToWrite: number | undefined = body.chaptersToWrite;
 
     // Check Gemini API key
     const geminiKey = process.env.GEMINI_API_KEY;
@@ -148,13 +140,52 @@ export async function POST(request: NextRequest) {
         world_description: premise || title,
       });
     } else {
-      // Get existing novel_id
-      const { data: existing } = await supabase
+      // Get existing project metadata
+      const { data: existing, error: existingError } = await supabase
         .from('ai_story_projects')
-        .select('novel_id')
+        .select('novel_id,current_chapter,total_planned_chapters,main_character,genre,world_description')
         .eq('id', existingProjectId)
         .single();
-      novelId = existing?.novel_id || null;
+
+      if (existingError || !existing) {
+        return NextResponse.json(
+          { success: false, error: `Failed to load project: ${existingError?.message || 'not found'}` },
+          { status: 404 },
+        );
+      }
+
+      novelId = existing.novel_id || null;
+
+      // Fill missing request fields from project record for canonical resume behavior
+      if (!protagonistName && existing.main_character) {
+        protagonistName = existing.main_character;
+      }
+      if (!body.genre && existing.genre) {
+        genre = existing.genre as GenreType;
+      }
+      if (!premise && existing.world_description) {
+        premise = existing.world_description;
+      }
+      if (!body.targetChapters && existing.total_planned_chapters) {
+        targetChapters = existing.total_planned_chapters;
+      }
+      if (body.currentChapter == null && existing.current_chapter != null) {
+        body.currentChapter = existing.current_chapter;
+      }
+    }
+
+    if (!title || !protagonistName) {
+      return NextResponse.json(
+        { success: false, error: 'title and protagonistName are required (or available on existing project)' },
+        { status: 400 }
+      );
+    }
+
+    if (!novelId) {
+      return NextResponse.json(
+        { success: false, error: 'Project has no novel_id. Canonical pipeline requires novel linkage.' },
+        { status: 400 },
+      );
     }
 
     // Create AI service
@@ -167,7 +198,7 @@ export async function POST(request: NextRequest) {
       temperature: 1.0,
       maxTokens: 8192,
       targetWordCount: 2500,
-      genre: genre as GenreType,
+      genre,
       minQualityScore: 5,
       maxRetries: 2,
       use3AgentWorkflow: true,
@@ -234,15 +265,19 @@ export async function POST(request: NextRequest) {
     });
 
     // Start the run in background (don't await — return immediately)
-    const actualChapters = chaptersToWrite || targetChapters;
+    const actualChapters = chaptersToWrite || 1;
+    const canonicalTarget = Math.max(targetChapters || 1, (body.currentChapter || 0) + actualChapters);
     runner.run({
       title,
       protagonistName,
-      genre: genre as GenreType,
+      genre,
       premise,
-      targetChapters: actualChapters,
-      chaptersPerArc: Math.min(chaptersPerArc, actualChapters),
+      targetChapters: canonicalTarget,
+      chaptersPerArc,
       projectId,
+      novelId,
+      chaptersToWrite: actualChapters,
+      currentChapter: body.currentChapter,
     }).then((result) => {
       const entry = activeRunners.get(projectId);
       if (entry) {

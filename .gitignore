@@ -30,6 +30,14 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# local logs
+/logs/
+
+# diagnostic scripts with hardcoded secrets (local-only)
+scripts/audit-pipeline.ts
+scripts/check-results.ts
+scripts/trigger-write-chapters.ts
+
 # env files (can opt-in for committing if needed)
 .env*
 !.env.example

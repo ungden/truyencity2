@@ -322,6 +322,26 @@ export async function GET(request: NextRequest) {
       console.error('[HealthCheck] Failed to save:', saveError.message);
     }
 
+    // Alert on critical status via webhook (Discord/Slack/generic)
+    if (overallStatus === 'critical') {
+      const webhookUrl = process.env.ALERT_WEBHOOK_URL;
+      if (webhookUrl) {
+        try {
+          const failedChecks = checks.filter(c => c.status === 'fail').map(c => `${c.name}: ${c.message}`);
+          await fetch(webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              content: `🚨 **TruyenCity CRITICAL** (score: ${score}/100)\n${failedChecks.join('\n')}\n\nChapters 24h: ${metrics.chaptersLast24h} | Active: ${metrics.activeProjects} | Stuck: ${metrics.stuckNovels}`,
+            }),
+            signal: AbortSignal.timeout(5000),
+          });
+        } catch {
+          // Alert failure is non-fatal
+        }
+      }
+    }
+
     return NextResponse.json({
       status: overallStatus,
       score,

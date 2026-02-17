@@ -124,15 +124,13 @@ export async function POST(request: NextRequest) {
           model: config?.model || AI_PROVIDERS['gemini'].defaultModel,
           temperature: config?.temperature || 0.7,
           targetWordCount: config?.targetWordCount || 2500,
-          useAgents: config?.useAgents || false, // Capture the flag
+          useAgents: false,
         };
 
         const session = await sessionService.createSession(projectId, defaultConfig);
 
         // Add welcome message
-        const welcomeMsg = defaultConfig.useAgents 
-          ? `Welcome to Agent Mode (Architect-Writer-Critic)!\n\nProject loaded. Current chapter: ${body.currentChapter || 0}\n\nI will plan, write, and critique each chapter to ensure high quality.`
-          : `Welcome to Story Writing Tool!\n\nProject loaded. Current chapter: ${body.currentChapter || 0}\n\nType /help to see available commands.`;
+        const welcomeMsg = `Welcome to Story Writing Tool!\n\nProject loaded. Current chapter: ${body.currentChapter || 0}\n\nAll /write requests use the canonical long-form pipeline (StoryRunner + 4-layer context). Type /help to see available commands.`;
 
         await sessionService.addMessage(session.id, 'assistant', welcomeMsg);
 

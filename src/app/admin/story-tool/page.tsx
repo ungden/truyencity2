@@ -9,7 +9,6 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Select,
@@ -58,8 +57,7 @@ import {
   FolderOpen,
   PenTool,
   ArrowRight,
-  Library,
-  BrainCircuit
+  Library
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -202,7 +200,6 @@ export default function StoryWritingToolPage() {
   const [selectedModel, setSelectedModel] = useState('');
   const [apiKeys, setApiKeys] = useState<Record<string, string>>({});
   const [showSettings, setShowSettings] = useState(false);
-  const [useAgentMode, setUseAgentMode] = useState(false);
 
   // New project creation state
   const [showNewProject, setShowNewProject] = useState(false);
@@ -535,7 +532,7 @@ export default function StoryWritingToolPage() {
             model: selectedModel,
             temperature: 0.7,
             targetWordCount: 2500,
-            useAgents: useAgentMode, // Pass the agent mode flag
+            useAgents: false,
           },
           apiKeys,
         }),
@@ -635,10 +632,8 @@ export default function StoryWritingToolPage() {
     addLocalMessage('system', `Starting Autopilot Mode - Writing ${autopilotTarget} chapters automatically...`);
 
     // First, plan the story if no outline exists
-    if (!useAgentMode) {
-      addLocalMessage('progress', 'Phase 1: Planning story outline...', { progress: 5 });
-      await sendMessage('/plan');
-    }
+    addLocalMessage('progress', 'Phase 1: Planning story outline...', { progress: 5 });
+    await sendMessage('/plan');
 
     if (!autopilotRef.current) {
       addLocalMessage('system', 'Autopilot stopped by user.');
@@ -775,21 +770,11 @@ export default function StoryWritingToolPage() {
                 <SheetDescription>Configure AI providers and workflow</SheetDescription>
               </SheetHeader>
               <div className="mt-6 space-y-6">
-                {/* Agent Mode Toggle */}
-                <div className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/10 dark:to-pink-900/10">
-                  <div className="space-y-0.5">
-                    <Label className="text-base font-semibold flex items-center gap-2">
-                      <BrainCircuit className="h-4 w-4 text-purple-600" />
-                      Agent Mode (3-Step)
-                    </Label>
-                    <p className="text-xs text-muted-foreground">
-                      Use Architect-Writer-Critic workflow for higher quality.
-                    </p>
-                  </div>
-                  <Switch
-                    checked={useAgentMode}
-                    onCheckedChange={setUseAgentMode}
-                  />
+                <div className="rounded-lg border p-4 shadow-sm bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/10 dark:to-cyan-900/10">
+                  <Label className="text-base font-semibold">Canonical Pipeline</Label>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Story writing always uses StoryRunner with 4-layer long-form context for chapter continuity.
+                  </p>
                 </div>
 
                 <div className="space-y-2">
@@ -1143,7 +1128,7 @@ export default function StoryWritingToolPage() {
                   <p className="text-sm text-muted-foreground mb-4">
                     {projects.length === 0
                       ? 'Click the wand icon to create a new story project from scratch or from an existing outline'
-                      : 'Select a project and click Play to start a writing session. Enable "Agent Mode" for higher quality.'}
+                      : 'Select a project and click Play to start a writing session.'}
                   </p>
                   {projects.length === 0 && (
                     <Button onClick={() => setShowNewProject(true)}>
@@ -1331,9 +1316,9 @@ export default function StoryWritingToolPage() {
                 </span>
               </div>
               <div className="flex items-center gap-2 text-sm mt-1">
-                <BrainCircuit className="h-4 w-4 text-muted-foreground" />
+                <BookMarked className="h-4 w-4 text-muted-foreground" />
                 <span className="text-muted-foreground">
-                  Mode: {activeSession?.config?.useAgents ? '3-Agent (High Quality)' : 'Standard'}
+                  Pipeline: StoryRunner + 4-layer context
                 </span>
               </div>
             </CardContent>

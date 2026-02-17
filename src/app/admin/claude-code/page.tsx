@@ -60,7 +60,7 @@ interface WritingResult {
   error?: string;
 }
 
-export default function AIAgentWriterPage() {
+export default function AIWriterPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProject, setSelectedProject] = useState<string>('');
   const [selectedProjectData, setSelectedProjectData] = useState<Project | null>(null);
@@ -255,10 +255,10 @@ export default function AIAgentWriterPage() {
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
             <Bot className="text-primary" />
-            AI Agent Writer
+            AI Writer
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground mt-1">
-            Viết truyện tự động với các mô hình AI mạnh mẽ nhất
+            Viết truyện tự động với canonical long-form pipeline
           </p>
         </div>
         <Button
