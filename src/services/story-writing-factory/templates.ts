@@ -981,6 +981,275 @@ export const SCENE_EXPANSION_RULES = {
   },
 };
 
+// ============================================================================
+// GENRE BOUNDARY RULES — Prevent genre drift (Phase 5)
+// ============================================================================
+
+export interface GenreBoundary {
+  /** Core identity of this genre — what it MUST always feel like */
+  coreIdentity: string;
+  /** Elements that are FORBIDDEN in this genre */
+  forbidden: string[];
+  /** Allowed expansions (things that can mix in with caution) */
+  allowedExpansions: string[];
+  /** Warning signs that genre is drifting */
+  driftWarnings: string[];
+}
+
+export const GENRE_BOUNDARIES: Record<GenreType, GenreBoundary> = {
+  'tien-hiep': {
+    coreIdentity: 'Tu tiên cổ điển: tu luyện, cảnh giới, tông phái, linh khí, đan dược, pháp bảo',
+    forbidden: [
+      'Công nghệ hiện đại (máy tính, điện thoại, internet, AI)',
+      'Vũ khí hiện đại (súng, tên lửa, bom nguyên tử)',
+      'Du hành không gian, hành tinh khác (trừ khi đã setup tinh giới)',
+      'Hệ thống game rõ ràng (level up notification, UI panel)',
+    ],
+    allowedExpansions: [
+      'Tu luyện kết hợp luyện khí/luyện thể',
+      'Cổ trận pháp, cổ đại di tích',
+      'Thần giới, ma giới (khi cảnh giới đủ cao)',
+    ],
+    driftWarnings: [
+      'MC dùng khoa học để giải thích tu luyện',
+      'Xuất hiện vũ khí/công nghệ vượt thời đại',
+      'Bối cảnh chuyển sang hoàn toàn hiện đại',
+    ],
+  },
+  'huyen-huyen': {
+    coreIdentity: 'Huyền huyễn: thế giới hư cấu, hệ thống sức mạnh độc đáo, nhiều chủng tộc',
+    forbidden: [
+      'Công nghệ Trái Đất hiện đại',
+      'Tham chiếu đến thế giới thực (quốc gia, thành phố thực)',
+      'Hệ thống game rõ ràng',
+    ],
+    allowedExpansions: [
+      'Ma pháp + tu luyện kết hợp',
+      'Nhiều chủng tộc, không gian khác nhau',
+      'Thần thoại, truyền thuyết nội tại',
+    ],
+    driftWarnings: [
+      'Xuất hiện yếu tố khoa học cứng',
+      'MC xuyên không về Trái Đất',
+    ],
+  },
+  'do-thi': {
+    coreIdentity: 'Đô thị hiện đại: thành phố, kinh doanh, quyền lực xã hội, đời thường',
+    forbidden: [
+      'Tu tiên cao cấp (bay trên trời, hủy diệt thành phố bằng chiêu thức)',
+      'Xuyên không sang thế giới khác',
+      'Chiến tranh giữa các hành tinh',
+      'Ma thuật/phép thuật rõ ràng (trừ khi đã setup từ đầu)',
+    ],
+    allowedExpansions: [
+      'Võ thuật nhẹ (kung fu, boxing)',
+      'Năng lực siêu nhiên nhẹ (nếu setup từ đầu)',
+      'Hệ thống bí ẩn (nếu là đô thị dị năng)',
+    ],
+    driftWarnings: [
+      'MC bắt đầu bay, phá hủy tòa nhà bằng nội lực',
+      'Xuất hiện quái vật, ma quỷ khi không phải thể loại linh dị',
+      'Bối cảnh rời thành phố hoàn toàn sang rừng núi tu luyện',
+    ],
+  },
+  'kiem-hiep': {
+    coreIdentity: 'Kiếm hiệp cổ trang: giang hồ, bang hội, kiếm pháp, nghĩa hiệp, ân oán',
+    forbidden: [
+      'Công nghệ hiện đại',
+      'Tu tiên level thần tiên (bay vào vũ trụ)',
+      'Hệ thống game',
+      'Vũ khí hiện đại',
+    ],
+    allowedExpansions: [
+      'Nội công, khinh công, điểm huyệt',
+      'Bí kíp võ công, thần binh lợi khí',
+      'Ẩn sĩ cao nhân, bí mật giang hồ',
+    ],
+    driftWarnings: [
+      'MC đạt sức mạnh phá hủy núi non',
+      'Xuất hiện phép thuật/tu tiên thực sự',
+      'Bối cảnh chuyển sang hiện đại',
+    ],
+  },
+  'lich-su': {
+    coreIdentity: 'Lịch sử Trung Quốc/châu Á: triều đại, chính trị, quân sự, văn hóa thời đại',
+    forbidden: [
+      'Phi thuyền, laser, năng lượng hạt nhân',
+      'Xâm lăng hành tinh khác',
+      'Công nghệ vượt thời đại quá nhiều (máy tính, điện)',
+      'Tu tiên cao cấp (trừ khi đã setup rõ từ đầu)',
+      'Quái vật ngoài hành tinh',
+    ],
+    allowedExpansions: [
+      'Cải tiến công nghệ hợp lý cho thời đại (thuốc súng sớm, in ấn, thủy lợi)',
+      'Chiến thuật quân sự tiên tiến',
+      'Yếu tố thần bí nhẹ nếu phù hợp văn hóa (phong thủy, bói toán)',
+    ],
+    driftWarnings: [
+      'MC phát minh công nghệ hiện đại hoàn chỉnh',
+      'Xuất hiện vũ khí vượt thời đại 500+ năm',
+      'Bối cảnh chuyển sang khoa học viễn tưởng',
+      'Tu luyện tu tiên trong truyện lịch sử thuần',
+    ],
+  },
+  'khoa-huyen': {
+    coreIdentity: 'Khoa huyễn: công nghệ tương lai, vũ trụ, AI, robot, siêu nhân khoa học',
+    forbidden: [
+      'Tu tiên truyền thống (linh khí, đan điền)',
+      'Ma thuật/phép thuật (trừ khi đã setup là tech-magic)',
+      'Kiếm hiệp cổ trang thuần',
+    ],
+    allowedExpansions: [
+      'Năng lực siêu nhiên giải thích bằng khoa học',
+      'Alien, du hành vũ trụ',
+      'AI, robot, cyborg, gene enhancement',
+    ],
+    driftWarnings: [
+      'MC bắt đầu tu luyện kiểu cổ xưa',
+      'Bối cảnh chuyển về cổ đại hoàn toàn',
+    ],
+  },
+  'vong-du': {
+    coreIdentity: 'Vọng du/Game: thế giới ảo, game mechanics, quest, raid, PvP, level system',
+    forbidden: [
+      'Bối cảnh hoàn toàn rời thế giới game mà không quay lại',
+      'Mất hoàn toàn yếu tố game (level, quest, boss)',
+    ],
+    allowedExpansions: [
+      'Real-world stakes ảnh hưởng game',
+      'AI trong game phát triển ý thức',
+      'Multiple games/thế giới ảo',
+    ],
+    driftWarnings: [
+      'Game elements biến mất hoàn toàn',
+      'Chuyển sang tu tiên thuần túy không còn game',
+    ],
+  },
+  'dong-nhan': {
+    coreIdentity: 'Đồng nhân: fanfiction trong thế giới anime/manga/game nổi tiếng',
+    forbidden: [
+      'Phá hủy hoàn toàn setting gốc mà không giải thích',
+      'OC hoàn toàn không liên quan đến thế giới gốc',
+    ],
+    allowedExpansions: [
+      'Crossover nhiều thế giới',
+      'AU (Alternative Universe)',
+      'Thêm hệ thống/golden finger',
+    ],
+    driftWarnings: [
+      'Nhân vật gốc bị OOC quá mức',
+      'Bối cảnh không còn nhận ra thế giới gốc',
+    ],
+  },
+  'mat-the': {
+    coreIdentity: 'Mạt thế: apocalypse, zombie, đột biến, sinh tồn, tài nguyên khan hiếm',
+    forbidden: [
+      'Xã hội phục hồi hoàn toàn quá sớm',
+      'MC trở thành thần/tiên rời khỏi thế giới mạt thế',
+    ],
+    allowedExpansions: [
+      'Năng lực siêu nhiên từ đột biến',
+      'Crystal/tinh thể năng lượng',
+      'Quái vật đột biến tiến hóa',
+    ],
+    driftWarnings: [
+      'Bối cảnh sinh tồn biến mất, thành đô thị bình thường',
+      'MC mạnh quá không có thử thách sinh tồn',
+    ],
+  },
+  'linh-di': {
+    coreIdentity: 'Linh dị: ma quỷ, huyền bí, kinh dị, tâm linh, phong thủy',
+    forbidden: [
+      'Khoa học giải thích mọi thứ siêu nhiên',
+      'Tu tiên cao cấp (phá hủy thế giới)',
+      'Không gian/vũ trụ, alien',
+    ],
+    allowedExpansions: [
+      'Phong thủy, bùa chú, pháp sư',
+      'Tâm linh, luân hồi, nghiệp báo',
+      'Yếu tố kinh dị tâm lý',
+    ],
+    driftWarnings: [
+      'Ma quỷ biến thành quái vật kiểu fantasy thuần',
+      'MC trở thành tu tiên mạnh mẽ bỏ qua yếu tố kinh dị',
+    ],
+  },
+  'quan-truong': {
+    coreIdentity: 'Quan trường: chính trị, leo lên quyền lực, mưu kế, quan hệ, tham nhũng',
+    forbidden: [
+      'Siêu năng lực, tu luyện',
+      'Chiến tranh vũ trụ',
+      'Ma thuật/phép thuật',
+    ],
+    allowedExpansions: [
+      'Kinh doanh, tài chính',
+      'Tình cảm, gia đình',
+      'Điều tra, phá án',
+    ],
+    driftWarnings: [
+      'MC dùng vũ lực thay vì mưu trí',
+      'Bối cảnh rời chính trường hoàn toàn',
+    ],
+  },
+  'di-gioi': {
+    coreIdentity: 'Dị giới: xuyên không sang thế giới khác, khám phá, sinh tồn, phát triển',
+    forbidden: [
+      'Quay về Trái Đất vĩnh viễn mà không quay lại dị giới',
+    ],
+    allowedExpansions: [
+      'Hệ thống/golden finger',
+      'Tu luyện, ma pháp tùy thế giới',
+      'Xây dựng lãnh thổ, phát triển vương quốc',
+    ],
+    driftWarnings: [
+      'Bối cảnh dị giới biến mất, thành đô thị hiện đại',
+    ],
+  },
+  'ngon-tinh': {
+    coreIdentity: 'Ngôn tình: tình yêu, cảm xúc, quan hệ, drama gia đình, heal',
+    forbidden: [
+      'Chiến tranh quy mô lớn',
+      'Tu luyện/sức mạnh chiến đấu là focus chính',
+      'Khoa học viễn tưởng hardcore',
+    ],
+    allowedExpansions: [
+      'Kinh doanh, sự nghiệp',
+      'Gia đình, con cái',
+      'Bí mật thân phận, drama',
+    ],
+    driftWarnings: [
+      'MC bắt đầu đánh nhau nhiều hơn yêu đương',
+      'Tình cảm biến mất, thành action thuần',
+    ],
+  },
+};
+
+/**
+ * Get genre boundary text for injection into context.
+ */
+export function getGenreBoundaryText(genre: GenreType): string {
+  const boundary = GENRE_BOUNDARIES[genre];
+  if (!boundary) return '';
+
+  const parts: string[] = [];
+  parts.push(`THỂ LOẠI: ${genre.toUpperCase()}`);
+  parts.push(`BẢN SẮC CỐT LÕI: ${boundary.coreIdentity}`);
+  parts.push(`\nCẤM TUYỆT ĐỐI (nếu vi phạm → genre drift):`);
+  for (const item of boundary.forbidden) {
+    parts.push(`  - ${item}`);
+  }
+  parts.push(`\nCHO PHÉP MỞ RỘNG (có kiểm soát):`);
+  for (const item of boundary.allowedExpansions) {
+    parts.push(`  + ${item}`);
+  }
+  parts.push(`\nDẤU HIỆU CẢNH BÁO (nếu thấy → đang lệch thể loại):`);
+  for (const item of boundary.driftWarnings) {
+    parts.push(`  ! ${item}`);
+  }
+
+  return parts.join('\n');
+}
+
 // Helper function to check if chapter follows câu chương rules
 export function checkSceneExpansion(
   content: string,

@@ -35,7 +35,9 @@ import {
   GenreType,
   StoryArc,
 } from './types';
-import { getStyleByGenre, getPowerSystemByGenre } from './templates';
+import { getStyleByGenre, getPowerSystemByGenre, getGenreBoundaryText } from './templates';
+import { extractAndSaveCharacterStates, chunkAndStoreChapter } from './context-generators';
+import { retrieveRAGContext, embedChapterChunks } from './rag-retriever';
 import { logger } from '@/lib/security/logger';
 
 // Sprint 1/2/3 Quality Systems
@@ -48,6 +50,8 @@ import { CanonResolver } from './canon-resolver';
 import { BeatLedger } from './beat-ledger';
 import { ConsistencyChecker } from './consistency';
 import { PlotArcManager } from '../plot-arc-manager';
+import { PlotThreadManager } from './plot-thread-manager';
+import { RuleIndexer } from './rule-indexer';
 
 // ============================================================================
 // DEFAULT RUNNER CONFIG
@@ -90,6 +94,8 @@ export class StoryRunner {
   private beatLedger: BeatLedger | null = null;
   private consistencyChecker: ConsistencyChecker | null = null;
   private plotArcManager: PlotArcManager | null = null;
+  private plotThreadManager: PlotThreadManager | null = null;
+  private ruleIndexer: RuleIndexer | null = null;
 
   // State
   private state: RunnerState | null = null;
@@ -171,9 +177,13 @@ export class StoryRunner {
     const chaptersPerArc = input.chaptersPerArc || 20;
     const targetArcs = Math.ceil(targetChapters / chaptersPerArc);
 
+    if (!input.novelId) {
+      throw new Error('StoryRunner requires novelId for canonical 4-layer continuity context.');
+    }
+
     this.chaptersToWriteLimit = input.chaptersToWrite;
     this.sessionChaptersWritten = 0;
-    this.novelId = input.novelId || null;
+    this.novelId = input.novelId;
 
     // Initialize state
     this.state = this.createInitialState(targetChapters, targetArcs, input.projectId);
@@ -197,7 +207,7 @@ export class StoryRunner {
     });
 
     // Load 4-layer context from DB (replaces ephemeral MemoryManager)
-    if (this.novelId && input.currentChapter && input.currentChapter > 0) {
+    if (input.currentChapter && input.currentChapter > 0) {
       try {
         const nextChapter = input.currentChapter + 1;
         const contextLoader = new ContextLoader(this.state.projectId, this.novelId);
@@ -212,7 +222,7 @@ export class StoryRunner {
           previousTitles: this.contextPayload.previousTitles.length,
         });
       } catch (e) {
-        logger.debug('Context loader failed (falling back to MemoryManager)', {
+        logger.debug('Context loader failed before run start', {
           projectId: this.state.projectId,
           error: e instanceof Error ? e.message : String(e),
         });
@@ -240,6 +250,10 @@ export class StoryRunner {
     // Initialize PlotArcManager for long-form story structure (especially resume mode)
     this.plotArcManager = new PlotArcManager(this.state.projectId);
 
+    // Initialize scalability modules (Phase 10: full pipeline wiring)
+    this.plotThreadManager = new PlotThreadManager(this.state.projectId);
+    this.ruleIndexer = new RuleIndexer(this.state.projectId);
+
     // Initialize AutoRewriter for quality recovery
     this.autoRewriter = new AutoRewriter(
       this.state.projectId,
@@ -265,6 +279,8 @@ export class StoryRunner {
         this.canonResolver.initialize(),
         this.beatLedger.initialize(),
         this.consistencyChecker.initialize(),
+        this.plotThreadManager.initialize(),
+        this.ruleIndexer.initialize(),
       ]);
     } catch (e) {
       logger.debug('Quality system initialization failed (non-fatal)', {
@@ -601,18 +617,36 @@ export class StoryRunner {
       let previousSummary: string;
 
       // Reload context from DB for EVERY chapter to ensure freshness
-      if (this.novelId) {
-        try {
-          const contextLoader = new ContextLoader(this.state!.projectId, this.novelId);
-          this.contextPayload = await contextLoader.load(chapterNumber);
-        } catch {
-          // Keep existing contextPayload if reload fails
-        }
-      }
+      const contextLoader = new ContextLoader(this.state!.projectId, this.novelId!);
+      this.contextPayload = await contextLoader.load(chapterNumber);
 
       if (this.contextPayload) {
+        // Inject genre boundary to prevent genre drift (Phase 5)
+        const genre = this.config.genre || 'tien-hiep';
+        this.contextPayload.genreBoundary = getGenreBoundaryText(genre);
+
+        // Populate RAG context from vector search (Phase 9: Continuous Memory)
+        // Retrieves semantically relevant chunks from chapters older than last 5
+        try {
+          const arcSummary = this.contextPayload.arcPlan?.planText?.slice(0, 500) || null;
+          const lastCliffhanger = this.contextPayload.chapterBridge?.cliffhanger || null;
+          const protagonistName = this.worldBible?.protagonist.name || '';
+          this.contextPayload.ragContext = await retrieveRAGContext(
+            this.state!.projectId,
+            chapterNumber,
+            arcSummary,
+            lastCliffhanger,
+            protagonistName,
+          );
+        } catch (ragErr) {
+          logger.debug('RAG retrieval failed (non-fatal)', {
+            chapterNumber,
+            error: ragErr instanceof Error ? ragErr.message : String(ragErr),
+          });
+        }
+
         // PRIMARY PATH: Use 4-layer context loaded from DB
-        // This provides ~22,000-27,000 tokens of context (story bible + synopsis + last 5 chapters + arc plan)
+        // This provides ~22,000-27,000 tokens of context (bridge + bible + synopsis + chapters + arc plan + RAG)
         previousSummary = ContextLoader.assembleContext(this.contextPayload, chapterNumber);
       } else if (this.memoryManager) {
         // FALLBACK PATH: Legacy MemoryManager (ephemeral, mostly empty in cron resume mode)
@@ -632,6 +666,81 @@ export class StoryRunner {
         }
       } else {
         previousSummary = this.getPreviousSummary(chapterNumber);
+      }
+
+      // ═══════════════════════════════════════════════════════════════
+      // SCALABILITY MODULES: PlotThreadManager + BeatLedger + RuleIndexer (Phase 10)
+      // Inject thread context, beat guidelines, and world rules into the writing prompt
+      // ═══════════════════════════════════════════════════════════════
+      try {
+        const outlineChars = this.worldBible?.protagonist.name
+          ? [this.worldBible.protagonist.name]
+          : [];
+        const arcNum = this.contextPayload?.arcNumber || Math.ceil(chapterNumber / 20);
+
+        // PlotThreadManager: select top-5 relevant threads + foreshadowing hints
+        if (this.plotThreadManager) {
+          const threadResult = await this.plotThreadManager.selectThreadsForChapter(
+            chapterNumber,
+            outlineChars,
+            arcNum,
+            5, // default tension level
+          );
+          if (threadResult.selectedThreads.length > 0) {
+            let threadContext = '\n\n═══ TUYẾN TRUYỆN CẦN CHÚ Ý ═══';
+            for (const t of threadResult.selectedThreads) {
+              threadContext += `\n• [${t.priority}] ${t.name}: ${t.description.slice(0, 200)}`;
+            }
+            if (threadResult.foreshadowingHints.length > 0) {
+              threadContext += '\n\nGợi ý phục bút cần trả:';
+              for (const h of threadResult.foreshadowingHints.slice(0, 3)) {
+                threadContext += `\n- Ch.${h.chapterNumber}: "${h.hint}" (deadline: ch.${h.payoffDeadline})`;
+              }
+            }
+            if (threadResult.urgencyWarnings.length > 0) {
+              threadContext += `\n\n⚠️ ${threadResult.urgencyWarnings.join(' | ')}`;
+            }
+            if (threadResult.characterRecaps.length > 0) {
+              threadContext += '\n\nNhân vật tái xuất hiện (cần recap):';
+              for (const r of threadResult.characterRecaps) {
+                threadContext += `\n- ${r.characterName} (lần cuối ch.${r.lastSeenChapter}): ${r.keyFacts.slice(0, 2).join(', ')}`;
+              }
+            }
+            previousSummary += threadContext;
+          }
+        }
+
+        // BeatLedger: inject beat guidelines (suggestions + avoidance list)
+        if (this.beatLedger) {
+          const beatContext = this.beatLedger.buildBeatContext(chapterNumber);
+          if (beatContext) {
+            previousSummary += `\n\n═══ BEAT GUIDELINES ═══\n${beatContext}`;
+          }
+        }
+
+        // RuleIndexer: suggest relevant world rules for this chapter
+        if (this.ruleIndexer) {
+          const arcSummary = this.contextPayload?.arcPlan?.planText?.slice(0, 300) || '';
+          const location = ''; // Will be enriched once outline is available
+          const suggestions = this.ruleIndexer.suggestRulesForChapter(
+            chapterNumber,
+            arcSummary,
+            outlineChars,
+            location,
+          );
+          if (suggestions.length > 0) {
+            let ruleContext = '\n\n═══ QUY TẮC THẾ GIỚI LIÊN QUAN ═══';
+            for (const s of suggestions.slice(0, 5)) {
+              ruleContext += `\n• [${s.rule.category}] ${s.rule.ruleText.slice(0, 200)} (${s.reason})`;
+            }
+            previousSummary += ruleContext;
+          }
+        }
+      } catch (scalabilityErr) {
+        logger.debug('Scalability module context injection failed (non-fatal)', {
+          chapterNumber,
+          error: scalabilityErr instanceof Error ? scalabilityErr.message : String(scalabilityErr),
+        });
       }
 
       // Append quality feedback regardless of context source
@@ -948,8 +1057,94 @@ export class StoryRunner {
             })()
           : Promise.resolve(fallbackSummary);
 
+        // --- Parallel task 4: Character state extraction (Phase 3: Continuous Memory) ---
+        const characterStatePromise = (async () => {
+          try {
+            await extractAndSaveCharacterStates(
+              this.aiService,
+              this.state!.projectId,
+              chapterNumber,
+              result.data!.content,
+              this.worldBible?.protagonist.name || '',
+            );
+          } catch (e) {
+            logger.debug('Character state extraction failed (non-fatal)', {
+              chapterNumber, error: e instanceof Error ? e.message : String(e),
+            });
+          }
+        })();
+
+        // --- Parallel task 5: Chapter chunking + embedding for RAG (Phase 2+9: Continuous Memory) ---
+        // Chunks are stored first, then embeddings are generated and backfilled
+        const chunkPromise = (async () => {
+          try {
+            await chunkAndStoreChapter(
+              this.state!.projectId,
+              chapterNumber,
+              result.data!.content,
+              result.data!.title,
+              outlineSummary || result.data!.title,
+              [
+                this.worldBible?.protagonist.name || '',
+                ...outlineCharacters,
+              ].filter(Boolean),
+            );
+            // After chunks are stored, embed them (sequential dependency)
+            await embedChapterChunks(this.state!.projectId, chapterNumber);
+          } catch (e) {
+            logger.debug('Chapter chunking/embedding failed (non-fatal)', {
+              chapterNumber, error: e instanceof Error ? e.message : String(e),
+            });
+          }
+        })();
+
+        // --- Parallel task 6: BeatLedger detect + record beats (Phase 10) ---
+        const beatRecordPromise = (async () => {
+          try {
+            if (this.beatLedger && result.data) {
+              const detected = this.beatLedger.detectBeats(result.data.content);
+              for (const beat of detected) {
+                await this.beatLedger.recordBeat(
+                  chapterNumber,
+                  beat.beatType,
+                  beat.category,
+                  beat.intensity,
+                );
+              }
+            }
+          } catch (e) {
+            logger.debug('Beat recording failed (non-fatal)', {
+              chapterNumber, error: e instanceof Error ? e.message : String(e),
+            });
+          }
+        })();
+
+        // --- Parallel task 7: RuleIndexer extract rules from chapter (Phase 10) ---
+        const ruleExtractPromise = (async () => {
+          try {
+            if (this.ruleIndexer && result.data) {
+              await this.ruleIndexer.extractRulesFromChapter(
+                result.data.content,
+                chapterNumber,
+              );
+            }
+          } catch (e) {
+            logger.debug('Rule extraction failed (non-fatal)', {
+              chapterNumber, error: e instanceof Error ? e.message : String(e),
+            });
+          }
+        })();
+
         // Wait for all parallel operations to complete
-        const [, , summary] = await Promise.all([consistencyPromise, trackerPromise, summaryPromise]);
+        const [, , summary] = await Promise.all([
+          consistencyPromise,
+          trackerPromise,
+          summaryPromise,
+          characterStatePromise,
+          chunkPromise,
+          beatRecordPromise,
+          ruleExtractPromise,
+        ]);
 
         // ========== UPDATE MEMORY (depends on summary result) ==========
         if (this.memoryManager) {
@@ -1460,7 +1655,27 @@ export class StoryRunner {
         }
       }
 
-      // 2. Detect and record battles from QC result
+      // 2a. PowerTracker: Detect and record breakthroughs (Phase 10)
+      if (this.powerTracker && content) {
+        const breakthroughMatch = content.match(/đột phá.*?([\p{L}\s]+tầng\s*\d+|[\p{L}\s]+cảnh|[\p{L}\s]+kỳ)/u);
+        if (breakthroughMatch) {
+          const newRealm = breakthroughMatch[1]?.trim() || 'unknown';
+          const protagonistName = this.worldBible!.protagonist.name;
+          try {
+            await this.powerTracker.recordBreakthrough(
+              protagonistName,
+              chapterNumber,
+              newRealm,
+              1, // default sub-level
+              'Tự động phát hiện từ nội dung chương',
+            );
+          } catch {
+            // Non-fatal: breakthrough recording is best-effort
+          }
+        }
+      }
+
+      // 2b. Detect and record battles from QC result
       if (this.battleTracker && this.lastQCResult) {
         const hasBattle = this.lastQCResult.warnings?.some(w => 
           w.toLowerCase().includes('battle') || w.toLowerCase().includes('combat')

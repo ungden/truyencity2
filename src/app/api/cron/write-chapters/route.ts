@@ -462,20 +462,55 @@ async function writeOneChapter(
 
         // 2) NON-CRITICAL: Arc boundary generators and bible maintenance
         try {
-          // At arc boundaries (chapter is multiple of 20), generate synopsis + next arc plan
+          // Synopsis: generate every 5 chapters (Phase 6: more frequent synopsis for better continuity)
+          // Arc plan: generate every 20 chapters (arc structure unchanged)
           const ARC_SIZE = 20;
-          if (chNum % ARC_SIZE === 0) {
+          const SYNOPSIS_INTERVAL = 5;
+          const isSynopsisUpdate = chNum % SYNOPSIS_INTERVAL === 0;
+          const isArcPlanUpdate = chNum % ARC_SIZE === 0;
+          if (isSynopsisUpdate) {
             const completedArcNumber = Math.floor(chNum / ARC_SIZE);
             const nextArcNumber = completedArcNumber + 1;
 
-            // Load chapter summaries for the just-completed arc
+            // Load context for synopsis generation
             const contextLoader = new ContextLoader(project.id, novel.id);
             const arcPayload = await contextLoader.load(chNum + 1);
 
-            // Generate rolling synopsis from old synopsis + arc summaries
+            // For synopsis: use arc summaries at arc boundary, or recent summaries at 5-ch interval
+            // At arc boundaries (every 20ch) we have full arc summaries.
+            // At 5-ch intervals, we load the last 5 chapter summaries directly.
+            let synopsisSummaries = arcPayload.arcChapterSummaries;
+            if (!isArcPlanUpdate && synopsisSummaries.length === 0) {
+              // Load last 5 chapter summaries for mini-synopsis update
+              try {
+                const sb = getSupabaseAdmin();
+                const { data } = await sb
+                  .from('chapter_summaries')
+                  .select('chapter_number, title, summary, opening_sentence, mc_state, cliffhanger')
+                  .eq('project_id', project.id)
+                  .lte('chapter_number', chNum)
+                  .gt('chapter_number', chNum - SYNOPSIS_INTERVAL)
+                  .order('chapter_number', { ascending: true });
+                if (data && data.length > 0) {
+                  synopsisSummaries = (data as Array<{
+                    chapter_number: number; title: string; summary: string;
+                    opening_sentence: string | null; mc_state: string | null; cliffhanger: string | null;
+                  }>).map(row => ({
+                    chapterNumber: row.chapter_number,
+                    title: row.title,
+                    summary: row.summary,
+                    openingSentence: row.opening_sentence,
+                    mcState: row.mc_state,
+                    cliffhanger: row.cliffhanger,
+                  }));
+                }
+              } catch { /* non-fatal */ }
+            }
+
+            // Generate rolling synopsis from old synopsis + recent summaries
             await generateSynopsis(
               aiService, project.id, arcPayload.synopsis,
-              arcPayload.arcChapterSummaries, genre, protagonistName, chNum,
+              synopsisSummaries, genre, protagonistName, chNum,
             );
 
             // Reload synopsis (just updated) for arc plan generation
@@ -512,24 +547,26 @@ async function writeOneChapter(
               }
             }
 
-            // Generate arc plan for the NEXT arc
-            await generateArcPlan(
-              aiService, project.id, nextArcNumber, genre, protagonistName,
-              updatedPayload.synopsis, updatedPayload.storyBible,
-              totalTarget,
-              storyVision,
-            );
+            // Generate arc plan for the NEXT arc (only at 20-chapter boundaries)
+            if (isArcPlanUpdate) {
+              await generateArcPlan(
+                aiService, project.id, nextArcNumber, genre, protagonistName,
+                updatedPayload.synopsis, updatedPayload.storyBible,
+                totalTarget,
+                storyVision,
+              );
 
-            // Mark arc as finale if detected
-            if (isFinale) {
-              try {
-                const adminSupa = getSupabaseAdmin();
-                await adminSupa.from('arc_plans')
-                  .update({ is_finale_arc: true })
-                  .eq('project_id', project.id)
-                  .eq('arc_number', nextArcNumber);
-              } catch {
-                // non-fatal
+              // Mark arc as finale if detected
+              if (isFinale) {
+                try {
+                  const adminSupa = getSupabaseAdmin();
+                  await adminSupa.from('arc_plans')
+                    .update({ is_finale_arc: true })
+                    .eq('project_id', project.id)
+                    .eq('arc_number', nextArcNumber);
+                } catch {
+                  // non-fatal
+                }
               }
             }
           }

@@ -334,24 +334,34 @@ const report = await validator.checkAndValidate(chapterNumber);
 psql -d your_db -f supabase/migrations/0100_create_plot_thread_tables.sql
 ```
 
-### 4-Layer Context System (IMPLEMENTED 2026-02-15)
+### Continuous Story Memory System (UPGRADED 2026-02-16)
 
-**Problem:** Each cron run creates a fresh StoryRunner with zero memory. MemoryManager uses ephemeral `/tmp` — always empty in resume mode. Result: duplicate titles (15-25%), repetitive openings (10-40%), zero plot coherence across 1,000-2,000 chapter novels.
+**Problem (identified 2026-02-15):** Original 4-layer context had critical gaps:
+1. **Cliffhanger→Opening mismatch** — #1 issue (continuity score 6.55/10): chương sau không nối tiếp chương trước
+2. **No character state tracking** — nhân vật chết sống lại, power regression
+3. **No genre guard** — truyện lịch sử biến thành sci-fi
+4. **Synopsis quá thưa** — update mỗi 20 chương, gây context drift
+5. **RAG missing** — không có semantic search cho context chính xác
 
-**Solution:** DB-backed 4-layer context system providing ~22,000-27,000 tokens per chapter write.
+**Solution:** Nâng cấp lên "Continuous Story Memory" — 7-layer context system with RAG.
 
-#### Architecture
+#### Architecture (7 Layers)
 ```
+LAYER 0: CHAPTER BRIDGE (~500 tokens, loaded every chapter) **NEW**
+  - Cliffhanger + MC state + last paragraph from ch.N-1
+  - FORCES ch.N to continue directly from ch.N-1's ending
+  - "TUYỆT ĐỐI KHÔNG nhảy bối cảnh/thời gian mà không giải thích"
+
 LAYER 1: STORY BIBLE (~2,000 tokens, static after ch.3)
   - AI-generated from first 3 chapters, persisted in ai_story_projects.story_bible
   - Triggers: ch.3 in cron post-write callback
 
-LAYER 2: ROLLING SYNOPSIS (~1,000-3,000 tokens, updated every 20 chapters)
-  - AI reads old synopsis + 20 new chapter summaries → writes new synopsis
+LAYER 2: ROLLING SYNOPSIS (~1,000-3,000 tokens, updated every 5 chapters) **CHANGED: was 20**
+  - AI reads old synopsis + 5 new chapter summaries → writes new synopsis
   - Persisted in story_synopsis table
-  - Triggers: ch % 20 == 0 in cron post-write callback
+  - Triggers: ch % 5 == 0 in cron post-write callback
 
-LAYER 3: LAST 5 FULL CHAPTERS (~17,000 tokens)
+LAYER 3: LAST 15 FULL CHAPTERS (~17,000 tokens)
   - Raw text loaded from chapters table
 
 LAYER 4: ARC INTELLIGENCE (~1,000-2,000 tokens)
@@ -359,49 +369,116 @@ LAYER 4: ARC INTELLIGENCE (~1,000-2,000 tokens)
   - Persisted in arc_plans table
   - Triggers: ch % 20 == 0 in cron post-write callback
 
+CHARACTER STATES (~1,000 tokens) **NEW**
+  - Per-chapter snapshots: name, alive/dead, power_level, power_realm_index, location
+  - Extracted by AI after each chapter write
+  - Dead characters marked with "TUYỆT ĐỐI KHÔNG ĐƯỢC XUẤT HIỆN LẠI"
+  - DB: character_states table
+
+GENRE BOUNDARY (~300 tokens) **NEW**
+  - Per-genre rules: coreIdentity, forbidden elements, allowed expansions, drift warnings
+  - Defined in templates.ts GENRE_BOUNDARIES
+  - Injected into context to prevent genre drift
+
+RAG CONTEXT (~2K tokens, when populated) **FULLY WIRED (Phase 9)**
+  - Semantic search via pgvector on story_memory_chunks
+  - Chapters chunked into scene-level segments after writing
+  - Embedding via Gemini text-embedding-004 (768 dims, REST API — no SDK)
+  - Query built from: arc plan summary + last cliffhanger + protagonist name
+  - Asymmetric search: documents use RETRIEVAL_DOCUMENT, queries use RETRIEVAL_QUERY
+  - Batch embedding (batchEmbedContents) for post-write efficiency
+  - Filters out last 5 chapters (already in Layer 3) to avoid duplication
+  - Capped at 6,000 chars (~2K tokens) to stay within budget
+  - Implementation: rag-retriever.ts (embedText, embedBatch, embedChapterChunks, retrieveRAGContext)
+
 ANTI-REPETITION (~500-1,000 tokens)
   - All previous titles for dedup
-  - Last 20 opening sentences from chapter_summaries
+  - Last 50 opening sentences from chapter_summaries
+  - Last 10 cliffhangers
 ```
 
-#### Cron Flow Per Chapter
+#### Cron Flow Per Chapter (Updated Phase 10)
 ```
-1. ContextLoader loads all 4 layers from DB in parallel
-2. If arc boundary (chapter % 20 == 0):
-   a. Generate new ROLLING SYNOPSIS
-   b. Generate ARC PLAN for next 20 chapters
-3. If chapter == 3: Generate STORY BIBLE
-4. Assemble ~22K-27K token context into previousSummary
-5. Write chapter (3-agent pipeline: Architect → Writer → Critic)
-6. Post-write: AI generates chapter summary, save to DB
+PRE-WRITE:
+1. ContextLoader loads ALL layers from DB in parallel (bridge + bible + synopsis + chapters + arc + states)
+2. Genre boundary injected from GENRE_BOUNDARIES config
+3. RAG retrieval: embed query → match_story_chunks() RPC → format top-8 results (Phase 9)
+4. Assemble ~20-29K token context with Chapter Bridge FIRST, RAG after genre boundary
+5. Scalability modules inject into context (Phase 10):
+   a. PlotThreadManager.selectThreadsForChapter() → top-5 threads + foreshadowing hints + character recaps
+   b. BeatLedger.buildBeatContext() → suggested/avoid beats + recent beat history
+   c. RuleIndexer.suggestRulesForChapter() → relevant world rules
+6. Write chapter (3-agent pipeline: Architect → Writer → Critic)
+
+POST-WRITE (all 7 tasks in parallel):
+   a. AI generates chapter summary → save to chapter_summaries
+   b. AI extracts character states → save to character_states
+   c. Chapter chunked for RAG → save to story_memory_chunks → embed via Gemini (Phase 9)
+   d. Consistency check
+   e. Tracker recording (characters, battles, PowerTracker.recordBreakthrough) (Phase 10)
+   f. BeatLedger.detectBeats() + recordBeat() for each detected beat (Phase 10)
+   g. RuleIndexer.extractRulesFromChapter() — auto-extract world rules (Phase 10)
+7. If chapter % 5 == 0: Generate ROLLING SYNOPSIS
+8. If chapter % 20 == 0: Generate ARC PLAN for next 20 chapters
+9. If chapter == 3: Generate STORY BIBLE
 ```
 
 #### Key Files
-- `context-loader.ts` — `ContextLoader.load()` + `ContextLoader.assembleContext()` + persistence helpers
-- `context-generators.ts` — `summarizeChapter()`, `generateSynopsis()`, `generateArcPlan()`, `generateStoryBible()`
-- `write-chapters/route.ts` — Post-write callback wiring (lines 325-405)
-- `runner.ts` — Context assembly in `writeArc()` (line 588-591)
+- `context-loader.ts` — `ContextLoader.load()` + `assembleContext()` (with Layer 0 bridge + character states + genre boundary + RAG)
+- `context-generators.ts` — `summarizeChapter()`, `generateSynopsis()`, `generateArcPlan()`, `generateStoryBible()`, `extractAndSaveCharacterStates()`, `chunkAndStoreChapter()`
+- `rag-retriever.ts` — `embedText()`, `embedBatch()`, `embedChapterChunks()`, `retrieveRAGContext()` (Phase 9)
+- `templates.ts` — `GENRE_BOUNDARIES`, `getGenreBoundaryText()`
+- `plot-thread-manager.ts` — `PlotThreadManager` — thread lifecycle, smart selection, foreshadowing deadlines (Phase 10)
+- `beat-ledger.ts` — `BeatLedger` — beat detection, cooldowns, arc budgets, anti-repetition (Phase 10)
+- `rule-indexer.ts` — `RuleIndexer` — world rule indexing, tag-based search, auto-extraction (Phase 10)
+- `power-tracker.ts` — `PowerTracker` — breakthrough recording/validation, enemy scaling (Phase 10)
+- `write-chapters/route.ts` — Post-write callback wiring with synopsis every 5ch
+- `runner.ts` — Context assembly + RAG + scalability modules + 7 parallel post-write tasks
 
-#### DB Tables (Migration 0113)
+#### DB Tables
 ```
+-- Migration 0113 (existing):
 chapter_summaries (project_id, chapter_number, title, summary, opening_sentence, mc_state, cliffhanger)
 story_synopsis (project_id, synopsis_text, mc_current_state, active_allies, active_enemies, open_threads)
 arc_plans (project_id, arc_number, start_chapter, end_chapter, arc_theme, plan_text, chapter_briefs)
 ai_story_projects.story_bible (text column)
+
+-- Migration 0100 (scalability):
+plot_threads (project_id, name, description, priority, status, foreshadowing_hints JSONB, importance)
+world_rules_index (project_id, rule_text, category, tags TEXT[], importance, usage_count)
+beat_usage (project_id, chapter_number, beat_type, beat_category, intensity, cooldown_until)
+volume_summaries (project_id, volume_number, summary, major_milestones, character_development)
+
+-- Migration 0120 (continuous memory):
+character_states (project_id, chapter_number, character_name, status, power_level, power_realm_index, location, notes)
+story_memory_chunks (project_id, chapter_number, chunk_type, content, embedding vector(768), metadata)
++ match_story_chunks() RPC function for vector similarity search
 ```
 
-#### Quality Results (40 chapters audited)
-| Metric | Old System | New System |
-|---|---|---|
-| Duplicate titles | 15-25% | **0%** |
-| Duplicate openings | 10-40% | **0%** |
-| Avg chapter length | ~13,777 chars | **16,646 chars** |
+#### Quality Results (40 chapters audited before upgrade)
+| Metric | Old System | 4-Layer (2026-02-15) | Target (with CSM) |
+|---|---|---|---|
+| Duplicate titles | 15-25% | **0%** | 0% |
+| Duplicate openings | 10-40% | **0%** | 0% |
+| Continuity score | N/A | 6.55/10 | **8.0+/10** |
+| Cliffhanger→Opening match | N/A | Poor | **Enforced** |
+| Character resurrection | Common | Partial fix | **Hard blocked** |
+| Power regression | Common | Partial fix | **DB-tracked** |
+| Genre drift | Common | No fix | **Boundary enforced** |
 
-#### What's NOT Yet Tested at Scale
-- **Story Bible**: triggers at ch.3 — working (1 novel has it)
-- **Synopsis**: triggers at ch.20 — **NOT YET TESTED** (no novel has 20+ chapters yet)
-- **Arc Plan**: triggers at ch.20 — **NOT YET TESTED**
-- Plot drift, character inconsistency — only visible after 50-100+ chapters
+#### Deployment Checklist
+```
+[x] Run migration 0100: plot_threads, world_rules_index, beat_usage, volume_summaries (done)
+[x] Run migration 0120: character_states, story_memory_chunks + pgvector (done 2026-02-17)
+[x] Verify pgvector extension enabled on production (confirmed)
+[ ] Verify GEMINI_API_KEY has access to text-embedding-004 model
+[ ] Deploy code to Vercel
+[ ] Monitor character_states table growth
+[ ] Monitor story_memory_chunks table growth (embeddings should be non-null for new chapters)
+[ ] Monitor plot_threads, beat_usage, world_rules_index tables for data
+[ ] Run coherence audit after 50+ chapters to verify improvement
+[ ] Optional: backfill embeddings with `npx tsx scripts/backfill-embeddings.ts`
+```
 
 #### Current Data (as of 2026-02-15)
 - **20 novels** active, each at ch.1-2 (fresh start with new system)

@@ -21,6 +21,8 @@ import { logger } from '@/lib/security/logger';
 // ============================================================================
 
 export interface ContextPayload {
+  /** Layer 0: Chapter Bridge — previous chapter's cliffhanger + state for opening continuity */
+  chapterBridge: ChapterBridgeData | null;
   /** Layer 1: Story bible text (world, characters, power system) */
   storyBible: string | null;
   /** Layer 2: Rolling synopsis of entire story so far */
@@ -43,6 +45,12 @@ export interface ContextPayload {
   arcNumber: number;
   /** Whether story bible exists */
   hasStoryBible: boolean;
+  /** Character states snapshot from latest chapter */
+  characterStates: CharacterStateRow[];
+  /** RAG-retrieved relevant context from vector search */
+  ragContext: string | null;
+  /** Genre boundary rules to prevent drift */
+  genreBoundary: string | null;
 }
 
 export interface RecentChapter {
@@ -81,6 +89,37 @@ export interface ChapterSummaryRow {
   cliffhanger: string | null;
 }
 
+/**
+ * Layer 0: Chapter Bridge — the most critical data for chapter-to-chapter continuity.
+ * Contains the EXACT state at the end of the previous chapter so the next chapter
+ * can open seamlessly.
+ */
+export interface ChapterBridgeData {
+  /** Previous chapter number */
+  prevChapterNumber: number;
+  /** Cliffhanger/ending hook from previous chapter */
+  cliffhanger: string;
+  /** MC state at end of previous chapter (location, condition, emotion, goal) */
+  mcState: string;
+  /** Summary of what happened in previous chapter */
+  summary: string;
+  /** Last ~500 chars of previous chapter raw text for seamless prose continuation */
+  lastParagraph: string;
+}
+
+/**
+ * Character state row from DB — tracks each character across chapters.
+ */
+export interface CharacterStateRow {
+  characterName: string;
+  status: 'alive' | 'dead' | 'missing' | 'unknown';
+  powerLevel: string | null;
+  powerRealmIndex: number | null;
+  location: string | null;
+  notes: string | null;
+  lastSeenChapter: number;
+}
+
 // ============================================================================
 // CONTEXT LOADER
 // ============================================================================
@@ -106,6 +145,7 @@ export class ContextLoader {
 
     // Fire all queries in parallel
     const [
+      chapterBridge,
       storyBible,
       synopsis,
       recentChapters,
@@ -114,7 +154,9 @@ export class ContextLoader {
       recentOpenings,
       recentCliffhangers,
       arcChapterSummaries,
+      characterStates,
     ] = await Promise.all([
+      this.loadChapterBridge(chapterNumber),
       this.loadStoryBible(),
       this.loadSynopsis(),
       this.loadRecentChapters(chapterNumber, 15),
@@ -123,9 +165,11 @@ export class ContextLoader {
       this.loadRecentOpenings(chapterNumber, 50),
       this.loadRecentCliffhangers(chapterNumber, 10),
       isArcBoundary ? this.loadArcChapterSummaries(arcNumber - 1) : Promise.resolve([]),
+      this.loadCharacterStates(),
     ]);
 
     return {
+      chapterBridge,
       storyBible,
       synopsis,
       recentChapters,
@@ -137,7 +181,142 @@ export class ContextLoader {
       isArcBoundary,
       arcNumber,
       hasStoryBible: !!storyBible,
+      characterStates,
+      ragContext: null, // Will be populated by RAG retriever in Phase 2
+      genreBoundary: null, // Will be populated by genre guard in Phase 5
     };
+  }
+
+  // ============================================================================
+  // LAYER 0: Chapter Bridge — seamless chapter-to-chapter continuity
+  // ============================================================================
+
+  /**
+   * Load bridge data from the immediately preceding chapter.
+   * This is THE most critical piece for chapter continuity:
+   * - Cliffhanger: what tension was set up at the end
+   * - MC State: where MC is, what condition, what emotion
+   * - Summary: what happened (for reference)
+   * - Last paragraph: raw text for seamless prose continuation
+   */
+  private async loadChapterBridge(currentChapter: number): Promise<ChapterBridgeData | null> {
+    if (currentChapter <= 1) return null;
+    const prevChapter = currentChapter - 1;
+
+    try {
+      const supabase = getSupabase();
+
+      // Load summary data and raw text in parallel
+      const [summaryResult, chapterResult] = await Promise.all([
+        supabase
+          .from('chapter_summaries')
+          .select('summary, mc_state, cliffhanger')
+          .eq('project_id', this.projectId)
+          .eq('chapter_number', prevChapter)
+          .single(),
+        supabase
+          .from('chapters')
+          .select('content')
+          .eq('novel_id', this.novelId)
+          .eq('chapter_number', prevChapter)
+          .single(),
+      ]);
+
+      // Need at least the summary OR the raw chapter
+      if ((!summaryResult.data && !chapterResult.data)) return null;
+
+      const summary = summaryResult.data?.summary || '';
+      const mcState = summaryResult.data?.mc_state || '';
+      const cliffhanger = summaryResult.data?.cliffhanger || '';
+
+      // Extract last paragraph from raw chapter content for prose continuity
+      let lastParagraph = '';
+      if (chapterResult.data?.content) {
+        const content = chapterResult.data.content as string;
+        // Get last ~500 chars, try to start at a paragraph break
+        const tail = content.slice(-800);
+        const lastParaBreak = tail.lastIndexOf('\n\n');
+        lastParagraph = lastParaBreak > 0
+          ? tail.slice(lastParaBreak).trim()
+          : tail.slice(-500).trim();
+      }
+
+      // If we have no structured data, extract from raw content
+      if (!cliffhanger && chapterResult.data?.content) {
+        const content = chapterResult.data.content as string;
+        const lastSentences = content.slice(-300).trim();
+        return {
+          prevChapterNumber: prevChapter,
+          cliffhanger: lastSentences,
+          mcState: mcState || 'Không rõ',
+          summary: summary || `Chương ${prevChapter}`,
+          lastParagraph,
+        };
+      }
+
+      return {
+        prevChapterNumber: prevChapter,
+        cliffhanger: cliffhanger || 'Không có cliffhanger cụ thể',
+        mcState: mcState || 'Không rõ',
+        summary,
+        lastParagraph,
+      };
+    } catch (e) {
+      logger.debug('Failed to load chapter bridge', { projectId: this.projectId, currentChapter, error: e });
+      return null;
+    }
+  }
+
+  // ============================================================================
+  // CHARACTER STATES — latest state of all tracked characters
+  // ============================================================================
+
+  /**
+   * Load latest character states from character_states table.
+   * Returns the most recent state for each character (up to 30 characters).
+   */
+  private async loadCharacterStates(): Promise<CharacterStateRow[]> {
+    try {
+      const supabase = getSupabase();
+      // Use a subquery approach: get latest chapter_number per character
+      const { data, error } = await supabase
+        .from('character_states')
+        .select('character_name, status, power_level, power_realm_index, location, notes, chapter_number')
+        .eq('project_id', this.projectId)
+        .order('chapter_number', { ascending: false })
+        .limit(100); // Get recent entries, will dedupe by character
+
+      if (error || !data || data.length === 0) return [];
+
+      // Deduplicate: keep only the latest entry per character
+      const latestByChar = new Map<string, CharacterStateRow>();
+      for (const row of data as {
+        character_name: string;
+        status: string;
+        power_level: string | null;
+        power_realm_index: number | null;
+        location: string | null;
+        notes: string | null;
+        chapter_number: number;
+      }[]) {
+        if (!latestByChar.has(row.character_name)) {
+          latestByChar.set(row.character_name, {
+            characterName: row.character_name,
+            status: (row.status as 'alive' | 'dead' | 'missing' | 'unknown') || 'alive',
+            powerLevel: row.power_level,
+            powerRealmIndex: row.power_realm_index,
+            location: row.location,
+            notes: row.notes,
+            lastSeenChapter: row.chapter_number,
+          });
+        }
+      }
+
+      return Array.from(latestByChar.values()).slice(0, 30);
+    } catch (e) {
+      logger.debug('Failed to load character states', { projectId: this.projectId, error: e });
+      return [];
+    }
   }
 
   // ============================================================================
@@ -439,6 +618,61 @@ export class ContextLoader {
    */
   static assembleContext(payload: ContextPayload, chapterNumber: number): string {
     const parts: string[] = [];
+
+    // ── LAYER 0: Chapter Bridge (HIGHEST PRIORITY — must be first) ──
+    if (payload.chapterBridge) {
+      const bridge = payload.chapterBridge;
+      parts.push(
+`═══ CẦU NỐI CHƯƠNG (BẮT BUỘC TUÂN THỦ — ĐỌC TRƯỚC TIÊN) ═══
+CHƯƠNG TRƯỚC (Ch.${bridge.prevChapterNumber}) KẾT THÚC:
+- Tóm tắt: ${bridge.summary}
+- Trạng thái MC cuối chương: ${bridge.mcState}
+- Cliffhanger/Tình huống cuối: ${bridge.cliffhanger}
+${bridge.lastParagraph ? `\nĐOẠN CUỐI CHƯƠNG ${bridge.prevChapterNumber} (để nối tiếp giọng văn):\n"...${bridge.lastParagraph.slice(-300)}"` : ''}
+
+⚠️ QUY TẮC NỐI CHƯƠNG (TUYỆT ĐỐI KHÔNG VI PHẠM):
+1. Chương ${chapterNumber} PHẢI bắt đầu NGAY SAU tình huống cliffhanger ở trên
+2. Nếu chương trước kết giữa trận chiến → mở đầu ĐANG TRONG trận chiến
+3. Nếu chương trước kết bằng reveal/tiết lộ → mở đầu là PHẢN ỨNG với reveal đó
+4. Nếu chương trước kết ở địa điểm X → mở đầu VẪN Ở địa điểm X (trừ khi có time skip hợp lý)
+5. TUYỆT ĐỐI KHÔNG nhảy sang bối cảnh/địa điểm/thời gian khác mà không giải thích
+6. MC phải ở đúng trạng thái (cảm xúc, vị trí, sức mạnh) như cuối chương trước`
+      );
+    }
+
+    // ── CHARACTER STATES (if available) ──
+    if (payload.characterStates.length > 0) {
+      const alive = payload.characterStates.filter(c => c.status === 'alive');
+      const dead = payload.characterStates.filter(c => c.status === 'dead');
+
+      let stateSection = `═══ TRẠNG THÁI NHÂN VẬT HIỆN TẠI (CẤM MÂU THUẪN) ═══`;
+      if (alive.length > 0) {
+        stateSection += `\nCÒN SỐNG:`;
+        for (const c of alive) {
+          stateSection += `\n- ${c.characterName}`;
+          if (c.powerLevel) stateSection += ` | Sức mạnh: ${c.powerLevel}`;
+          if (c.location) stateSection += ` | Vị trí: ${c.location}`;
+          if (c.notes) stateSection += ` | ${c.notes}`;
+        }
+      }
+      if (dead.length > 0) {
+        stateSection += `\n\nĐÃ CHẾT (TUYỆT ĐỐI KHÔNG ĐƯỢC XUẤT HIỆN LẠI):`;
+        for (const c of dead) {
+          stateSection += `\n- ${c.characterName} (chết tại ch.${c.lastSeenChapter})`;
+        }
+      }
+      parts.push(stateSection);
+    }
+
+    // ── GENRE BOUNDARY (if available) ──
+    if (payload.genreBoundary) {
+      parts.push(`═══ RANH GIỚI THỂ LOẠI (CẤM VI PHẠM) ═══\n${payload.genreBoundary}`);
+    }
+
+    // ── RAG CONTEXT (if available) ──
+    if (payload.ragContext) {
+      parts.push(`═══ NGỮ CẢNH LIÊN QUAN TỪ CÁC CHƯƠNG TRƯỚC (RAG) ═══\n${payload.ragContext}`);
+    }
 
     // ── LAYER 1: Story Bible ──
     if (payload.storyBible) {

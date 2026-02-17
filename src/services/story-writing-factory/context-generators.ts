@@ -20,6 +20,7 @@ import {
   ChapterSummaryRow,
   RecentChapter,
 } from './context-loader';
+import { getSupabase } from './supabase-helper';
 import { GenreType } from './types';
 import { logger } from '@/lib/security/logger';
 
@@ -507,4 +508,217 @@ Trả về JSON:
       cliffhanger: '',
     };
   }
+}
+
+// ============================================================================
+// 5. CHARACTER STATE EXTRACTION (Phase 3: Continuous Memory)
+// ============================================================================
+
+/**
+ * Extract and save character states from a just-written chapter.
+ * AI analyzes the chapter content and extracts the state of every character
+ * that appears, including: status (alive/dead), power level, location, etc.
+ *
+ * Called after each chapter write in the post-write pipeline.
+ */
+export async function extractAndSaveCharacterStates(
+  aiService: AIProviderService,
+  projectId: string,
+  chapterNumber: number,
+  content: string,
+  protagonistName: string,
+): Promise<void> {
+  const systemPrompt = `Bạn là chuyên gia phân tích tiểu thuyết. Nhiệm vụ: trích xuất TRẠNG THÁI của MỌI nhân vật xuất hiện trong chương.
+
+Cho mỗi nhân vật, xác định:
+1. Tên (chính xác như trong truyện)
+2. Trạng thái: alive (còn sống), dead (chết trong chương này hoặc đã chết), missing (mất tích), unknown
+3. Cảnh giới/sức mạnh hiện tại (nếu có thay đổi hoặc được đề cập)
+4. Vị trí cuối chương (ở đâu)
+5. Ghi chú quan trọng (bị thương, thay đổi phe, bí mật mới, etc.)
+
+QUAN TRỌNG:
+- Liệt kê TẤT CẢ nhân vật xuất hiện, kể cả nhân vật phụ
+- Nếu nhân vật CHẾT → status PHẢI là "dead"
+- Nếu cảnh giới KHÔNG được đề cập → power_level = null
+- power_realm_index: số thứ tự cảnh giới (1=thấp nhất, tăng dần). Ví dụ: Luyện Khí=1, Trúc Cơ=2, Kim Đan=3, Nguyên Anh=4, Hóa Thần=5...`;
+
+  const userPrompt = `Nhân vật chính: ${protagonistName}
+Chương ${chapterNumber}:
+
+${content.slice(0, 8000)}${content.length > 8000 ? '\n...\n' + content.slice(-3000) : ''}
+
+Trả về JSON array:
+[
+  {
+    "character_name": "Tên nhân vật",
+    "status": "alive|dead|missing|unknown",
+    "power_level": "Cảnh giới hiện tại hoặc null",
+    "power_realm_index": 1,
+    "location": "Vị trí cuối chương hoặc null",
+    "notes": "Ghi chú quan trọng hoặc null"
+  }
+]`;
+
+  try {
+    const raw = await aiCall(aiService, systemPrompt, userPrompt, 4096, 0.2);
+
+    // Parse JSON array from response
+    const cleaned = raw.replace(/```(?:json)?\s*/gi, '').replace(/```/g, '');
+    const startBracket = cleaned.indexOf('[');
+    const endBracket = cleaned.lastIndexOf(']');
+    if (startBracket === -1 || endBracket === -1) {
+      logger.debug('Character state extraction returned non-array response', { projectId, chapterNumber });
+      return;
+    }
+
+    const states = JSON.parse(cleaned.slice(startBracket, endBracket + 1)) as Array<{
+      character_name: string;
+      status: string;
+      power_level: string | null;
+      power_realm_index: number | null;
+      location: string | null;
+      notes: string | null;
+    }>;
+
+    if (!Array.isArray(states) || states.length === 0) return;
+
+    // Batch upsert to DB
+    const supabase = getSupabase();
+    const rows = states
+      .filter(s => s.character_name && s.character_name.trim())
+      .map(s => ({
+        project_id: projectId,
+        chapter_number: chapterNumber,
+        character_name: s.character_name.trim(),
+        status: ['alive', 'dead', 'missing', 'unknown'].includes(s.status) ? s.status : 'alive',
+        power_level: s.power_level || null,
+        power_realm_index: s.power_realm_index || null,
+        location: s.location || null,
+        notes: s.notes || null,
+      }));
+
+    const { error } = await supabase
+      .from('character_states')
+      .upsert(rows, { onConflict: 'project_id,chapter_number,character_name' });
+
+    if (error) {
+      logger.debug('Failed to save character states', { projectId, chapterNumber, error: error.message });
+    } else {
+      logger.debug('Character states saved', { projectId, chapterNumber, count: rows.length });
+    }
+  } catch (e) {
+    logger.debug('Character state extraction failed (non-fatal)', { projectId, chapterNumber, error: e });
+  }
+}
+
+// ============================================================================
+// 6. RAG CHUNK GENERATION (Phase 2: Embedding Pipeline)
+// ============================================================================
+
+/**
+ * Chunk a chapter into semantic segments and store for RAG retrieval.
+ * Each chunk is a meaningful story unit (scene, key event, character moment).
+ *
+ * Note: Embedding is done separately by the embedding service.
+ * This function only creates the chunks with metadata.
+ */
+export async function chunkAndStoreChapter(
+  projectId: string,
+  chapterNumber: number,
+  content: string,
+  title: string,
+  summary: string,
+  characters: string[],
+): Promise<void> {
+  try {
+    const supabase = getSupabase();
+
+    // Simple chunking strategy: split by double newlines (paragraph groups)
+    // then group into ~500 token chunks
+    const paragraphs = content.split(/\n\n+/).filter(p => p.trim().length > 50);
+    const chunks: Array<{
+      project_id: string;
+      chapter_number: number;
+      chunk_type: string;
+      content: string;
+      metadata: Record<string, unknown>;
+    }> = [];
+
+    // Chunk 1: Chapter summary (always stored)
+    chunks.push({
+      project_id: projectId,
+      chapter_number: chapterNumber,
+      chunk_type: 'key_event',
+      content: `Ch.${chapterNumber} "${title}": ${summary}`,
+      metadata: { characters, title },
+    });
+
+    // Chunk by scenes (group paragraphs into ~500-word chunks)
+    let currentChunk = '';
+    let chunkIndex = 0;
+    for (const para of paragraphs) {
+      currentChunk += (currentChunk ? '\n\n' : '') + para;
+      const wordCount = currentChunk.split(/\s+/).length;
+
+      if (wordCount >= 400) {
+        chunkIndex++;
+        // Detect chunk type from content
+        const chunkType = detectChunkType(currentChunk);
+        chunks.push({
+          project_id: projectId,
+          chapter_number: chapterNumber,
+          chunk_type: chunkType,
+          content: currentChunk.slice(0, 2000), // Cap chunk size
+          metadata: {
+            characters: characters.filter(c => currentChunk.includes(c)),
+            chunk_index: chunkIndex,
+          },
+        });
+        currentChunk = '';
+      }
+    }
+
+    // Don't forget the last chunk
+    if (currentChunk.trim().length > 50) {
+      chunkIndex++;
+      chunks.push({
+        project_id: projectId,
+        chapter_number: chapterNumber,
+        chunk_type: detectChunkType(currentChunk),
+        content: currentChunk.slice(0, 2000),
+        metadata: {
+          characters: characters.filter(c => currentChunk.includes(c)),
+          chunk_index: chunkIndex,
+        },
+      });
+    }
+
+    // Batch insert (no embedding yet — that happens in the embedding service)
+    if (chunks.length > 0) {
+      const { error } = await supabase
+        .from('story_memory_chunks')
+        .insert(chunks);
+
+      if (error) {
+        logger.debug('Failed to store chapter chunks', { projectId, chapterNumber, error: error.message });
+      } else {
+        logger.debug('Chapter chunks stored', { projectId, chapterNumber, count: chunks.length });
+      }
+    }
+  } catch (e) {
+    logger.debug('Chapter chunking failed (non-fatal)', { projectId, chapterNumber, error: e });
+  }
+}
+
+/**
+ * Detect the type of a text chunk based on content keywords.
+ */
+function detectChunkType(text: string): string {
+  const lower = text.toLowerCase();
+  if (/chiến đấu|đánh|tấn công|kiếm|quyền|giết|pháp thuật|chiêu thức/.test(lower)) return 'scene';
+  if (/đột phá|lên cảnh giới|tu luyện|đan điền|linh khí/.test(lower)) return 'character_event';
+  if (/phát hiện|bí mật|tiết lộ|sự thật|hóa ra/.test(lower)) return 'plot_point';
+  if (/thế giới|địa hình|thành phố|tông môn|lãnh thổ/.test(lower)) return 'world_detail';
+  return 'scene'; // default
 }
