@@ -2,7 +2,7 @@
  * RAG Retriever - Embedding + Vector Search for Continuous Story Memory
  *
  * Two responsibilities:
- * 1. embedText() — calls Gemini text-embedding-004 REST API to produce 768-dim vectors
+ * 1. embedText() — calls Gemini gemini-embedding-001 REST API to produce 3072-dim vectors
  * 2. retrieveRAGContext() — embeds a query, searches story_memory_chunks via
  *    match_story_chunks() RPC, and formats results into a prompt-ready string
  *
@@ -20,9 +20,10 @@ import { logger } from '@/lib/security/logger';
 // CONSTANTS
 // ============================================================================
 
-const GEMINI_EMBEDDING_MODEL = 'text-embedding-004';
+const GEMINI_EMBEDDING_MODEL = 'gemini-embedding-001';
 const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta';
 const EMBEDDING_DIMENSION = 768;
+const OUTPUT_DIMENSIONALITY = 768; // Truncate 3072 -> 768 to keep DB column compatible
 
 /** Max chunks to retrieve per query */
 const MAX_CHUNKS = 8;
@@ -54,7 +55,7 @@ interface MatchedChunk {
 // ============================================================================
 
 /**
- * Generate embedding for a single text using Gemini text-embedding-004.
+ * Generate embedding for a single text using Gemini gemini-embedding-001.
  * Returns a 768-dim float array, or null on failure.
  */
 export async function embedText(text: string): Promise<number[] | null> {
@@ -84,6 +85,7 @@ export async function embedText(text: string): Promise<number[] | null> {
               parts: [{ text: truncated }],
             },
             taskType: 'RETRIEVAL_DOCUMENT',
+            outputDimensionality: OUTPUT_DIMENSIONALITY,
           }),
           signal: AbortSignal.timeout(15000), // 15s timeout
         },
@@ -144,6 +146,7 @@ export async function embedBatch(texts: string[]): Promise<(number[] | null)[]> 
           parts: [{ text: text.slice(0, 8000) }],
         },
         taskType: 'RETRIEVAL_DOCUMENT',
+        outputDimensionality: OUTPUT_DIMENSIONALITY,
       }));
 
       const response = await fetch(
@@ -376,6 +379,7 @@ async function embedQuery(text: string): Promise<number[] | null> {
             parts: [{ text: text.slice(0, 8000) }],
           },
           taskType: 'RETRIEVAL_QUERY',
+          outputDimensionality: OUTPUT_DIMENSIONALITY,
         }),
         signal: AbortSignal.timeout(15000),
       },

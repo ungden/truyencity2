@@ -1,7 +1,7 @@
 /**
  * Backfill Embeddings Script
  *
- * Generates Gemini text-embedding-004 embeddings for all story_memory_chunks
+ * Generates Gemini gemini-embedding-001 embeddings for all story_memory_chunks
  * that have NULL embedding values. Processes in batches per project+chapter.
  *
  * Usage:
@@ -17,9 +17,10 @@ dotenv.config({ path: '.env.local' });
 
 // ── Gemini Embedding API (same as rag-retriever.ts) ──
 
-const GEMINI_EMBEDDING_MODEL = 'text-embedding-004';
+const GEMINI_EMBEDDING_MODEL = 'gemini-embedding-001';
 const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta';
 const EMBEDDING_DIMENSION = 768;
+const OUTPUT_DIMENSIONALITY = 768; // Truncate 3072 -> 768 to keep DB column compatible
 const BATCH_SIZE = 100; // Gemini batch limit
 
 function getEnv(name: string): string {
@@ -33,6 +34,7 @@ async function embedBatch(texts: string[], apiKey: string): Promise<(number[] | 
     model: `models/${GEMINI_EMBEDDING_MODEL}`,
     content: { parts: [{ text: text.slice(0, 8000) }] },
     taskType: 'RETRIEVAL_DOCUMENT',
+    outputDimensionality: OUTPUT_DIMENSIONALITY,
   }));
 
   try {
