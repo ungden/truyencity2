@@ -161,6 +161,8 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   const contextString = assembleContext(context, nextChapter);
 
   // ── Step 4: Write chapter via 3-agent pipeline ─────────────────────────
+  const isFinalArc = nextChapter >= totalPlanned - 20;
+
   const result: WriteChapterResult = await writeChapter(
     nextChapter,
     contextString,
@@ -169,6 +171,13 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     context.previousTitles,
     geminiConfig,
     DEFAULT_CONFIG.maxRetries,
+    {
+      projectId: project.id,
+      protagonistName,
+      isFinalArc,
+      genreBoundary: context.genreBoundary,
+      worldBible: context.storyBible,
+    },
   );
 
   // ── Step 5: Save chapter to DB ─────────────────────────────────────────

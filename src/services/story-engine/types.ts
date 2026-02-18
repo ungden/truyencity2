@@ -82,6 +82,8 @@ export interface ChapterOutline {
   scenes: SceneOutline[];
   tensionLevel: number;
   dopaminePoints: DopaminePoint[];
+  /** Emotional arc for the chapter - guides tone shifts */
+  emotionalArc?: EmotionalArc;
   cliffhanger: string;
   targetWordCount: number;
 }
@@ -95,6 +97,15 @@ export interface SceneOutline {
   resolution: string;
   dopamineType?: DopamineType;
   estimatedWords: number;
+  /** Optional per-scene POV character — enables multi-POV storytelling */
+  pov?: string;
+}
+
+export interface EmotionalArc {
+  opening: string;
+  midpoint: string;
+  climax: string;
+  closing: string;
 }
 
 export interface DopaminePoint {
@@ -102,6 +113,8 @@ export interface DopaminePoint {
   scene: number;
   description: string;
   intensity: number;
+  setup?: string;
+  payoff?: string;
 }
 
 // ── Critic Output ────────────────────────────────────────────────────────────
@@ -117,10 +130,24 @@ export interface CriticOutput {
 }
 
 export interface CriticIssue {
-  type: 'pacing' | 'consistency' | 'dopamine' | 'quality' | 'word_count' | 'dialogue';
-  severity: 'minor' | 'major' | 'critical';
+  type: 'pacing' | 'consistency' | 'continuity' | 'dopamine' | 'quality' | 'word_count' | 'dialogue' | 'critic_error' | 'logic' | 'detail';
+  severity: 'minor' | 'moderate' | 'major' | 'critical';
   description: string;
   suggestion?: string;
+}
+
+// ── World Constraints ────────────────────────────────────────────────────────
+
+export interface WorldConstraint {
+  id: string;
+  project_id?: string;
+  blueprint_id?: string;
+  category: 'quantity' | 'hierarchy' | 'rule' | 'geography' | 'character_limit' | 'power_cap';
+  subject: string;
+  predicate: string;
+  value: string | number;
+  context: string;
+  immutable: boolean;
 }
 
 // ── Context Payload (assembled before writing) ───────────────────────────────
@@ -138,6 +165,12 @@ export interface ContextPayload {
 
   // Layer 2: Rolling Synopsis
   synopsis?: string;
+  synopsisStructured?: {
+    mc_current_state?: string;
+    active_allies?: string[];
+    active_enemies?: string[];
+    open_threads?: string[];
+  };
 
   // Layer 3: Recent Chapters
   recentChapters: string[];
@@ -145,6 +178,11 @@ export interface ContextPayload {
   // Layer 4: Arc Plan
   arcPlan?: string;
   chapterBrief?: string;
+  arcPlanThreads?: {
+    threads_to_advance?: string[];
+    threads_to_resolve?: string[];
+    new_threads?: string[];
+  };
 
   // Anti-repetition
   previousTitles: string[];

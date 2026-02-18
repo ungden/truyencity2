@@ -180,22 +180,111 @@ async function tryGenerateStoryBible(
   try {
     const db = getSupabase();
 
-    // Load first 3 chapters for bible generation
-    const { data: chapters } = await db
-      .from('chapters')
-      .select('content')
-      .eq('novel_id', novelId)
-      .order('chapter_number', { ascending: true })
-      .limit(3);
+    // Load synopsis and recent chapters for bible refresh (v1 feature)
+    const [{ data: synRow }, { data: recentChapters }] = await Promise.all([
+      db.from('story_synopsis').select('synopsis_text').eq('project_id', projectId).order('last_updated_chapter', { ascending: false }).limit(1).maybeSingle(),
+      db.from('chapters').select('content,chapter_number').eq('novel_id', novelId).order('chapter_number', { ascending: false }).limit(10),
+    ]);
 
-    if (!chapters || chapters.length === 0) return;
+    // Use synopsis + recent chapters if available, otherwise fall back to first 3
+    let chapterContents: string[];
+    if (recentChapters && recentChapters.length > 0) {
+      chapterContents = recentChapters.reverse().map(c => c.content);
+    } else {
+      const { data: firstChapters } = await db
+        .from('chapters')
+        .select('content')
+        .eq('novel_id', novelId)
+        .order('chapter_number', { ascending: true })
+        .limit(3);
+      chapterContents = firstChapters?.map(c => c.content) || [];
+    }
+
+    if (chapterContents.length === 0) return;
 
     await generateStoryBible(
       projectId, genre, protagonistName, worldDescription,
-      chapters.map(c => c.content),
-      config,
+      chapterContents, config,
+      synRow?.synopsis_text,
     );
   } catch {
     // Non-fatal
+  }
+}
+
+// ── Internal: Should Be Finale Arc Detection ─────────────────────────────────
+
+/**
+ * Detect if the story should enter the finale arc based on progress and synopsis.
+ */
+export function shouldBeFinaleArc(
+  currentChapter: number,
+  totalPlanned: number,
+  openThreads?: string[],
+): boolean {
+  const progressPct = currentChapter / totalPlanned;
+  const remaining = totalPlanned - currentChapter;
+
+  // Hard rules for finale
+  if (remaining <= 10) return true;
+  if (progressPct >= 0.95) return true;
+
+  // Soft: if approaching end and most threads resolved
+  if (progressPct >= 0.85 && (!openThreads || openThreads.length <= 2)) {
+    return true;
+  }
+
+  return false;
+}
+
+// ── StoryVision (for synopsis generation) ────────────────────────────────────
+
+export interface StoryVision {
+  overallTheme: string;
+  mcEndGoal: string;
+  mainConflictResolution: string;
+  emotionalTone: string;
+}
+
+/**
+ * Generate StoryVision from synopsis and arc plans.
+ */
+export async function generateStoryVision(
+  projectId: string,
+  config: GeminiConfig,
+): Promise<StoryVision | null> {
+  try {
+    const db = getSupabase();
+
+    const [{ data: synRow }, { data: arcRows }] = await Promise.all([
+      db.from('story_synopsis').select('synopsis_text').eq('project_id', projectId).order('last_updated_chapter', { ascending: false }).limit(1).maybeSingle(),
+      db.from('arc_plans').select('plan_text,arc_theme').eq('project_id', projectId).order('arc_number', { ascending: true }).limit(5),
+    ]);
+
+    if (!synRow?.synopsis_text) return null;
+
+    const prompt = `Phân tích cốt truyện và tạo StoryVision.
+
+Synopsis: ${synRow.synopsis_text.slice(0, 2000)}
+
+Arc Plans: ${(arcRows || []).map(a => a.plan_text?.slice(0, 500)).join('\n---\n')}
+
+Trả về JSON:
+{
+  "overallTheme": "chủ đề chính của truyện",
+  "mcEndGoal": "mục tiêu cuối cùng của MC",
+  "mainConflictResolution": "cách giải quyết xung đột chính",
+  "emotionalTone": "tone cảm xúc tổng thể"
+}`;
+
+    const { callGemini } = await import('../utils/gemini');
+    const { parseJSON } = await import('../utils/json-repair');
+
+    const res = await callGemini(prompt, { ...config, temperature: 0.3, maxTokens: 2048 });
+    const parsed = parseJSON<StoryVision>(res.content);
+
+    return parsed;
+  } catch {
+    return null;
   }
 }

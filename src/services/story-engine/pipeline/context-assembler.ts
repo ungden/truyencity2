@@ -70,6 +70,21 @@ export async function loadContext(
   const recentChapters = (recentResult?.data || []).reverse();
   const arc = arcResult?.data;
 
+  // Build structured synopsis fields
+  const synopsisStructured = synopsis ? {
+    mc_current_state: synopsis.mc_current_state,
+    active_allies: synopsis.active_allies || [],
+    active_enemies: synopsis.active_enemies || [],
+    open_threads: synopsis.open_threads || [],
+  } : undefined;
+
+  // Build arc plan threads
+  const arcPlanThreads = arc ? {
+    threads_to_advance: arc.threads_to_advance || [],
+    threads_to_resolve: arc.threads_to_resolve || [],
+    new_threads: arc.new_threads || [],
+  } : undefined;
+
   // Deduplicate character states (latest per character)
   const charMap = new Map<string, any>();
   for (const cs of (charStatesResult?.data || [])) {
@@ -111,11 +126,13 @@ export async function loadContext(
     storyBible: bible,
     hasStoryBible: !!bible,
     synopsis: synopsis?.synopsis_text,
+    synopsisStructured,
     recentChapters: recentChapters.map((c: any) =>
       `[Ch.${c.chapter_number}: "${c.title}"]\n${(c.content || '').slice(0, 3000)}`
     ),
     arcPlan: arc?.plan_text,
     chapterBrief,
+    arcPlanThreads,
     previousTitles: (titlesResult?.data || []).map((t: any) => t.title).filter(Boolean),
     recentOpenings: (openingsResult?.data || []).map((o: any) => o.opening_sentence).filter(Boolean),
     recentCliffhangers: (cliffhangersResult?.data || []).map((c: any) => c.cliffhanger).filter(Boolean),
@@ -167,6 +184,20 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
   if (payload.synopsis) {
     parts.push('[TỔNG QUAN CỐT TRUYỆN]');
     parts.push(payload.synopsis.slice(0, 3000));
+    if (payload.synopsisStructured) {
+      if (payload.synopsisStructured.mc_current_state) {
+        parts.push(`Trạng thái MC: ${payload.synopsisStructured.mc_current_state}`);
+      }
+      if (payload.synopsisStructured.active_allies?.length) {
+        parts.push(`Đồng minh: ${payload.synopsisStructured.active_allies.join(', ')}`);
+      }
+      if (payload.synopsisStructured.active_enemies?.length) {
+        parts.push(`Kẻ thù: ${payload.synopsisStructured.active_enemies.join(', ')}`);
+      }
+      if (payload.synopsisStructured.open_threads?.length) {
+        parts.push(`Tuyến truyện đang mở: ${payload.synopsisStructured.open_threads.join(', ')}`);
+      }
+    }
   }
 
   // Layer 3: Recent Chapters
@@ -183,6 +214,17 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
     parts.push(payload.arcPlan.slice(0, 3000));
     if (payload.chapterBrief) {
       parts.push(`[BRIEF CHO CHƯƠNG ${chapterNumber}]: ${payload.chapterBrief}`);
+    }
+    if (payload.arcPlanThreads) {
+      if (payload.arcPlanThreads.threads_to_advance?.length) {
+        parts.push(`Tuyến cần đẩy: ${payload.arcPlanThreads.threads_to_advance.join(', ')}`);
+      }
+      if (payload.arcPlanThreads.threads_to_resolve?.length) {
+        parts.push(`Tuyến cần giải quyết: ${payload.arcPlanThreads.threads_to_resolve.join(', ')}`);
+      }
+      if (payload.arcPlanThreads.new_threads?.length) {
+        parts.push(`Tuyến mới: ${payload.arcPlanThreads.new_threads.join(', ')}`);
+      }
     }
   }
 
@@ -349,16 +391,20 @@ export async function generateStoryBible(
   genre: GenreType,
   protagonistName: string,
   worldDescription: string,
-  firstChapters: string[],
+  chapters: string[],
   config: GeminiConfig,
+  synopsis?: string,
 ): Promise<void> {
-  const chapterText = firstChapters.slice(0, 3).map((c, i) => `Ch.${i + 1}:\n${c.slice(0, 3000)}`).join('\n\n');
+  // Use synopsis + recent chapters if available (for refresh), otherwise use first chapters
+  const chapterText = chapters.slice(0, 3).map((c, i) => `Ch.${i + 1}:\n${c.slice(0, 3000)}`).join('\n\n');
 
-  const prompt = `Phân tích các chương đầu của truyện ${genre} và tạo STORY BIBLE.
+  const prompt = `Phân tích ${synopsis ? 'các chương gần đây' : 'các chương đầu'} của truyện ${genre} và tạo/cập nhật STORY BIBLE.
 
 Thế giới: ${worldDescription}
 Nhân vật chính: ${protagonistName}
+${synopsis ? `\nTỔNG QUAN HIỆN TẠI:\n${synopsis.slice(0, 2000)}\n` : ''}
 
+NỘI DUNG CHƯƠNG:
 ${chapterText}
 
 Viết Story Bible bao gồm:
