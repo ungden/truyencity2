@@ -543,7 +543,7 @@ export class ContentSeeder {
       const projectId = randomUUID();
       const requiredKey = idea.requiredFieldKey || this.getGenreConfigEntry(genre)?.requiredFields?.[0];
       const requiredValue = idea.requiredFieldValue || this.getFallbackRequiredValue(genre, requiredKey);
-      const safeTitle = `${idea.title} [${new Date().toISOString().slice(0, 10)}-${randomUUID().slice(0, 4)}]`;
+      const safeTitle = idea.title;
       const formattedDescription = this.formatNovelDescription({
         ...idea,
         title: safeTitle,
