@@ -52,7 +52,41 @@ Nền tảng viết truyện tự động bằng AI với khả năng "1 Click =
 
 ---
 
-### 🆕 **Hệ thống Scalability 4 Phases (MỚI - 2026-02-11)**
+### 🆕 **Story Engine v2 (MỚI - 2026-02-18)**
+
+Architecture rewrite từ v1 với modular pipeline, giảm 85% code nhưng giữ đầy đủ tính năng:
+
+#### 3-Agent Pipeline
+```
+Architect → Writer → Critic
+   ↓          ↓         ↓
+Outline   Content   Review
+```
+
+- **Architect**: Lập kế hoạch với constraints, emotional arc, golden rules
+- **Writer**: Viết content với multi-POV, vocabulary hints, per-scene pacing  
+- **Critic**: Review với full content, hard-enforce continuity, fail-closed on error
+
+#### 4-Layer Context System
+1. **Chapter Bridge** - Previous cliffhanger (PHẢI giải quyết), MC state
+2. **Story Bible** - World rules, power system
+3. **Rolling Synopsis** - Structured fields (mc_state, allies, enemies, threads)
+4. **Arc Plan** - Chapter brief + plot threads (advance/resolve/new)
+
+#### Key Features
+- ✅ **Multi-POV** - Chuyển góc nhìn per scene
+- ✅ **Emotional Arc** - Opening→Midpoint→Climax→Closing
+- ✅ **Constraint Extractor** - Load world rules từ DB per project
+- ✅ **Style Bible** - Vocabulary & pacing rules theo scene type
+- ✅ **Golden Chapter** - Special rules cho ch.1-3
+- ✅ **Power Budget** - Chống power-creep (max 3 power-ups/arc)
+- ✅ **7 Parallel Tasks** - Summary, RAG, Beats, Rules, Consistency, Bible, Synopsis
+
+**Stats**: 13 files (~3,300 lines) vs v1: 41 files (28,470 lines)
+
+---
+
+### 🆕 **Hệ thống Scalability 4 Phases (2026-02-11)**
 
 Hệ thống mới hỗ trợ viết truyện dài **1000-2000 chương** mà không bị "lú lẫn" về cốt truyện:
 
@@ -241,14 +275,27 @@ npm run dev
 - [x] Abandoned thread detection
 - [x] Foreshadowing payoff tracking
 
-### Phase 3: Advanced Features (🚧 Đang phát triển)
+### Phase 3: Story Engine v2 (✅ Hoàn thành - 2026-02-18)
+- [x] **3-Agent Pipeline** - Architect → Writer → Critic
+- [x] **4-Layer Context** - Bridge → Bible → Synopsis → Arc Plan
+- [x] **Multi-POV Support** - Per-scene POV switching
+- [x] **Emotional Arc Planning** - Opening/Midpoint/Climax/Closing
+- [x] **Constraint Extractor** - Per-project world rules enforcement
+- [x] **Style Bible** - Rich vocabulary & pacing rules per scene type
+- [x] **Golden Chapter Requirements** - Special rules for ch.1-3
+- [x] **Power Budget** - Anti power-creep enforcement
+- [x] **7 Parallel Post-Write Tasks** - Summary, RAG, Beats, Rules, etc.
+- [x] Port 36 missing features from v1 to v2
+- [x] 13 files, ~3,300 lines (down from 41 files, 28,470 lines)
+
+### Phase 4: Advanced Features (🚧 Đang phát triển)
 - [ ] Neo4j integration cho Story Graph phức tạp
 - [ ] AI-powered contradiction detection (GPT-4)
 - [ ] Character relationship graph
 - [ ] Plot arc visualization
 - [ ] Multi-language support
 
-### Phase 4: Optimization (📋 Kế hoạch)
+### Phase 5: Optimization (📋 Kế hoạch)
 - [ ] Fine-tune model trên webnovel dataset
 - [ ] Caching layer cho Story Graph
 - [ ] Real-time collaboration
