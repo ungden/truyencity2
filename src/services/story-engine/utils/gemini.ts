@@ -56,8 +56,8 @@ export async function callGemini(
       maxOutputTokens: config.maxTokens,
       topP: 0.95,
       topK: 40,
-      frequencyPenalty: 0.4,
-      presencePenalty: 0.1,
+      // NOTE: frequencyPenalty/presencePenalty NOT supported by thinking models
+      // (gemini-3-flash-preview). Sending them causes empty content response.
     },
   };
 
