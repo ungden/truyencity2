@@ -50,7 +50,7 @@ QUY TẮC:
 1. Pacing theo "ức chế → bùng nổ" — mỗi chương ít nhất 1 khoảnh khắc sảng khoái
 2. TỐI THIỂU 4-5 scenes, mỗi scene có mục tiêu + xung đột rõ ràng
 3. Consistency tuyệt đối với context (nhân vật, sức mạnh, vị trí)
-4. Cliffhanger cuối chương — tạo lý do đọc tiếp
+4. Trừ khi là finale arc, PHẢI có cliffhanger cuối chương — tạo lý do đọc tiếp
 5. Nếu có cliffhanger từ chương trước → PHẢI giải quyết ngay đầu chương
 6. Tránh kéo dài bi kịch: ưu tiên để MC luôn có lối thoát hoặc tiến triển dần
 7. Đa góc nhìn (Multi-POV): CÓ THỂ chuyển POV sang nhân vật khác cho 1-2 scenes NẾU phù hợp
@@ -80,6 +80,7 @@ TIÊU CHÍ ĐÁNH GIÁ (thang 1-10):
 1. overallScore: Tổng thể
 2. dopamineScore: Có khoảnh khắc sảng khoái?
 3. pacingScore: Nhịp truyện hợp lý?
+4. endingHookScore: Kết chương có lực kéo đọc tiếp?
 
 ISSUES: Liệt kê vấn đề (pacing/consistency/dopamine/quality/word_count/dialogue/continuity)
 
@@ -92,7 +93,7 @@ KIỂM TRA MÂU THUẪN (BẮT BUỘC):
 VERDICT:
 - APPROVE (overallScore >= 6 VÀ đủ từ): approved=true, requiresRewrite=false
 - REVISE (4-5): approved=false, requiresRewrite=false
-- REWRITE (<=3 HOẶC <60% target words HOẶC continuity critical/major): approved=false, requiresRewrite=true
+- REWRITE (<=3 HOẶC <60% target words HOẶC continuity critical/major HOẶC thiếu ending hook ở non-finale): approved=false, requiresRewrite=true
 
 OUTPUT: JSON theo format CriticOutput.`;
 
@@ -156,7 +157,14 @@ export async function writeChapter(
     const finalWordCount = countWords(content);
 
     // Step 3: Critic
-    const critic = await runCritic(outline, content, targetWordCount, contextString, config);
+    const critic = await runCritic(
+      outline,
+      content,
+      targetWordCount,
+      contextString,
+      config,
+      options?.isFinalArc === true,
+    );
 
     if (critic.requiresRewrite && attempt < maxRetries - 1) {
       rewriteInstructions = critic.rewriteInstructions || 'Cải thiện chất lượng tổng thể.';
@@ -279,7 +287,7 @@ Trả về JSON ChapterOutline:
   "tensionLevel": 7,
   "dopaminePoints": [{"type":"face_slap", "scene":1, "description":"...", "intensity":8, "setup":"...", "payoff":"..."}],
   "emotionalArc": {"opening":"tò mò", "midpoint":"căng thẳng", "climax":"phấn khích", "closing":"háo hức"},
-  "cliffhanger": "tình huống lơ lửng",
+  "cliffhanger": "tình huống lơ lửng (BẮT BUỘC nếu không phải finale arc)",
   "targetWordCount": ${targetWords}
 }`;
 
@@ -325,6 +333,11 @@ Trả về JSON ChapterOutline:
 
   // Enforce targetWordCount
   parsed.targetWordCount = targetWords;
+
+  // Enforce non-empty cliffhanger for non-finale arcs
+  if (!options?.isFinalArc && !parsed.cliffhanger?.trim()) {
+    parsed.cliffhanger = synthesizeFallbackCliffhanger(parsed);
+  }
 
   return parsed;
 }
@@ -483,6 +496,7 @@ async function runCritic(
   targetWords: number,
   previousContext: string,
   config: GeminiConfig,
+  isFinalArc: boolean,
 ): Promise<CriticOutput> {
   const wordCount = countWords(content);
   const wordRatio = wordCount / targetWords;
@@ -507,6 +521,7 @@ ACTUAL WORDS: ${wordCount} (đạt ${Math.round(wordRatio * 100)}% target)
 
 ${wordRatio < 0.6 ? '⚠️ CẢNH BÁO: Số từ DƯỚI 60% target → requiresRewrite PHẢI = true' : ''}
 ${wordRatio < 0.8 ? '⚠️ LƯU Ý: Số từ dưới 80% target → giảm điểm overallScore' : ''}
+${!isFinalArc ? '⚠️ NON-FINALE: Kết chương PHẢI có ending hook/cliffhanger rõ ràng. Nếu thiếu, tạo issue severity major và requiresRewrite=true.' : '⚠️ FINALE ARC: Có thể kết chương đóng, không bắt buộc cliffhanger.'}
 
 NỘI DUNG CHƯƠNG (FULL):
 ${contentPreview}
@@ -516,6 +531,7 @@ ${contentPreview}
   "overallScore": <1-10>,
   "dopamineScore": <1-10>,
   "pacingScore": <1-10>,
+  "endingHookScore": <1-10>,
   "issues": [{"type": "word_count|pacing|logic|detail|continuity", "description": "...", "severity": "minor|moderate|major|critical"}],
   "approved": <true nếu overallScore >= 6 VÀ wordRatio >= 70%>,
   "requiresRewrite": <true nếu overallScore <= 3 HOẶC wordRatio < 60% HOẶC có lỗi continuity major/critical>,
@@ -563,6 +579,22 @@ KIỂM TRA MÂU THUẪN (BẮT BUỘC):
       parsed.approved = false;
       if (!parsed.rewriteInstructions) {
         parsed.rewriteInstructions = `Chương quá ngắn (${wordCount}/${targetWords} từ). Phải viết đầy đủ.`;
+      }
+    }
+
+    // Hard enforcement for non-finale chapters: ending hook is required
+    if (!isFinalArc && !hasCliffhangerSignal(content)) {
+      parsed.issues = parsed.issues || [];
+      parsed.issues.push({
+        type: 'pacing',
+        description: 'Kết chương thiếu lực kéo đọc tiếp (cliffhanger/ending hook yếu hoặc không có).',
+        severity: 'major',
+      });
+      parsed.requiresRewrite = true;
+      parsed.approved = false;
+      parsed.overallScore = Math.min(parsed.overallScore || 10, 5);
+      if (!parsed.rewriteInstructions || parsed.rewriteInstructions.trim().length === 0) {
+        parsed.rewriteInstructions = 'Viết lại đoạn kết để có cliffhanger/hook rõ ràng, tạo lý do đọc tiếp ngay chương sau.';
       }
     }
 
@@ -651,6 +683,38 @@ function extractTitle(
   }
 
   return finalTitle;
+}
+
+function synthesizeFallbackCliffhanger(outline: ChapterOutline): string {
+  const lastScene = outline.scenes?.[outline.scenes.length - 1];
+  const conflict = lastScene?.conflict?.trim();
+  const resolution = lastScene?.resolution?.trim();
+
+  if (conflict && conflict.length > 8) {
+    return `Mâu thuẫn cuối chương vẫn chưa khép: ${conflict}`;
+  }
+
+  if (resolution && resolution.length > 8) {
+    return `Sau khi ${resolution.toLowerCase()}, một biến cố mới bất ngờ xuất hiện.`;
+  }
+
+  return 'Khi mọi thứ tưởng như đã yên, một nguy cơ mới đột ngột xuất hiện ngay trước mắt.';
+}
+
+function hasCliffhangerSignal(content: string): boolean {
+  const tail = content.slice(-420).toLowerCase();
+  const signals = [
+    '?', '...', '…', 'bất ngờ', 'đột nhiên', 'bỗng', 'sững sờ', 'kinh hãi',
+    'ngay lúc đó', 'vừa khi', 'tiếng động', 'cánh cửa', 'bóng đen', 'khựng lại',
+    'không thể tin', 'run lên', 'hô lớn',
+  ];
+
+  let score = 0;
+  for (const signal of signals) {
+    if (tail.includes(signal)) score += 1;
+  }
+
+  return score >= 2;
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────

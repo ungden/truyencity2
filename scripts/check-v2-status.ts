@@ -17,6 +17,7 @@ if (!supabaseUrl || !supabaseKey) {
 }
 
 const db = createClient(supabaseUrl, supabaseKey);
+const CLIFFHANGER_FILL_WARNING_THRESHOLD = 0.8;
 
 async function main() {
   console.log('='.repeat(70));
@@ -120,6 +121,33 @@ async function main() {
   }
   console.log('');
 
+  // 4b. Cliffhanger fill-rate (24h quality health check)
+  console.log('🪝 CLIFFHANGER FILL-RATE (last 24h):');
+  console.log('-'.repeat(70));
+
+  const sinceIso = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const { data: summaries24h, error: cliffErr } = await db
+    .from('chapter_summaries')
+    .select('cliffhanger,created_at')
+    .gte('created_at', sinceIso);
+
+  if (cliffErr) {
+    console.error('Error fetching 24h cliffhanger stats:', cliffErr);
+  } else {
+    const total24h = summaries24h?.length || 0;
+    const filled24h = (summaries24h || []).filter((s: any) => (s.cliffhanger || '').trim().length > 0).length;
+    const fillRate = total24h > 0 ? filled24h / total24h : 0;
+    console.log(`  Total summaries 24h: ${total24h}`);
+    console.log(`  Filled cliffhanger: ${filled24h}`);
+    console.log(`  Fill rate: ${(fillRate * 100).toFixed(1)}%`);
+    if (fillRate < CLIFFHANGER_FILL_WARNING_THRESHOLD) {
+      console.log(`  ⚠️ WARNING: Fill rate dưới ${(CLIFFHANGER_FILL_WARNING_THRESHOLD * 100).toFixed(0)}%`);
+    } else {
+      console.log('  ✅ Fill rate đạt ngưỡng an toàn');
+    }
+  }
+  console.log('');
+
   // 5. Check arc_plans
   console.log('📐 ARC PLANS (recent):');
   console.log('-'.repeat(70));
@@ -147,7 +175,7 @@ async function main() {
   
   const { data: projects, error: projError } = await db
     .from('ai_story_projects')
-    .select('id, main_character, current_chapter, total_chapters, created_at')
+    .select('id, main_character, current_chapter, total_planned_chapters, created_at')
     .gt('current_chapter', 0)
     .order('current_chapter', { ascending: false })
     .limit(10);
@@ -156,7 +184,7 @@ async function main() {
     console.error('Error fetching projects:', projError);
   } else if (projects && projects.length > 0) {
     for (const p of projects) {
-      console.log(`  ${p.main_character}: Ch.${p.current_chapter}/${p.total_chapters} | ${p.id.slice(0, 8)}...`);
+      console.log(`  ${p.main_character}: Ch.${p.current_chapter}/${p.total_planned_chapters} | ${p.id.slice(0, 8)}...`);
     }
   } else {
     console.log('  No active projects');

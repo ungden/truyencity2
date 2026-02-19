@@ -267,27 +267,81 @@ export async function generateChapterSummary(
   content: string,
   protagonistName: string,
   config: GeminiConfig,
+  options?: { allowEmptyCliffhanger?: boolean },
 ): Promise<ChapterSummary> {
+  const headSnippet = content.slice(0, 3000);
+  const tailSnippet = content.slice(-3000);
+
   const prompt = `Tóm tắt chương truyện sau. Trả về JSON:
 {
   "summary": "tóm tắt 2-3 câu",
   "openingSentence": "câu mở đầu chương (nguyên văn từ nội dung)",
   "mcState": "trạng thái ${protagonistName} cuối chương (cảnh giới, vị trí, tình trạng)",
-  "cliffhanger": "tình huống chưa giải quyết cuối chương (hoặc rỗng)"
+  "cliffhanger": "tình huống chưa giải quyết cuối chương"
 }
 
 Chương ${chapterNumber}: "${title}"
-${content.slice(0, 6000)}`;
+
+[MỞ ĐẦU]
+${headSnippet}
+
+[KẾT CHƯƠNG]
+${tailSnippet}
+
+QUY TẮC CLIFFHANGER:
+- Nếu không phải chương kết/finale, KHÔNG ĐƯỢC để rỗng
+- Trích đúng tình huống căng thẳng hoặc câu chốt mở ở cuối chương
+- Chỉ cho phép rỗng khi chương đã khép hoàn toàn theo chủ đích finale`;
 
   const res = await callGemini(prompt, { ...config, temperature: 0.1, maxTokens: 1024 });
   const parsed = parseJSON<ChapterSummary>(res.content);
 
-  return parsed || {
+  const allowEmptyCliffhanger = options?.allowEmptyCliffhanger === true;
+
+  if (parsed) {
+    if (!parsed.openingSentence?.trim()) {
+      parsed.openingSentence = content.slice(0, 160).trim();
+    }
+
+    if (!allowEmptyCliffhanger && !parsed.cliffhanger?.trim()) {
+      parsed.cliffhanger = extractFallbackCliffhanger(content);
+    }
+
+    return parsed;
+  }
+
+  return {
     summary: `Chương ${chapterNumber}: ${title}`,
     openingSentence: content.slice(0, 100),
     mcState: '',
-    cliffhanger: '',
+    cliffhanger: allowEmptyCliffhanger ? '' : extractFallbackCliffhanger(content),
   };
+}
+
+function extractFallbackCliffhanger(content: string): string {
+  const tail = content.slice(-900).trim();
+  if (!tail) return 'Biến cố cuối chương vẫn chưa ngã ngũ.';
+
+  const sentenceMatches = tail.match(/[^.!?。！？\n]+[.!?。！？]?/g) || [];
+  const sentences = sentenceMatches
+    .map(s => s.trim())
+    .filter(Boolean)
+    .slice(-5);
+
+  const hookKeywords = [
+    'bất ngờ', 'đột nhiên', 'bỗng', 'kinh hãi', 'sững sờ', 'không thể tin',
+    'ngay lúc đó', 'tiếng động', 'bóng đen', 'cánh cửa', 'hô lớn',
+  ];
+
+  for (let i = sentences.length - 1; i >= 0; i--) {
+    const s = sentences[i];
+    const lower = s.toLowerCase();
+    if (lower.includes('?') || lower.includes('...') || hookKeywords.some(k => lower.includes(k))) {
+      return s;
+    }
+  }
+
+  return sentences[sentences.length - 1] || 'Biến cố cuối chương vẫn chưa ngã ngũ.';
 }
 
 // ── Post-Write: Generate Synopsis ────────────────────────────────────────────

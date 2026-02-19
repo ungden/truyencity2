@@ -50,9 +50,16 @@ export async function runSummaryTasks(
   config: GeminiConfig,
 ): Promise<void> {
   try {
+    const isLikelyFinale = shouldBeFinaleArc(chapterNumber, totalPlannedChapters);
+
     // 1. Always: generate and save chapter summary
     const summary = await generateChapterSummary(
-      chapterNumber, title, content, protagonistName, config,
+      chapterNumber,
+      title,
+      content,
+      protagonistName,
+      config,
+      { allowEmptyCliffhanger: isLikelyFinale },
     );
     await saveChapterSummary(projectId, chapterNumber, title, summary);
 
