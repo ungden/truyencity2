@@ -275,12 +275,21 @@ export interface PowerSystem {
   resources: string[];
   techniqueGrades: string[];
   itemGrades: string[];
+  currencies?: Array<{
+    name: string;
+    value: number;
+    description: string;
+  }>;
 }
 
 export interface PowerRealm {
   name: string;
   description: string;
-  index: number;
+  index?: number;
+  rank?: number;
+  subLevels?: number;
+  abilities?: string[];
+  breakthroughDifficulty?: string;
 }
 
 // ── Style Bible ──────────────────────────────────────────────────────────────

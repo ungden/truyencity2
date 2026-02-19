@@ -1,11 +1,10 @@
 /**
  * Story Engine v2 — Configuration
  *
- * Re-exports genre templates, style bibles, and boundaries from v1.
- * These are pure data (no logic) — will be migrated here during Phase 8.
+ * Re-exports genre templates, style bibles, and boundaries.
+ * Migrated from v1 story-writing-factory (Phase 7 cleanup).
  */
 
-// Re-export all config data from v1 templates (pure data, no dependencies)
 export {
   DOPAMINE_PATTERNS,
   GENRE_STYLES,
@@ -19,6 +18,6 @@ export {
   getPowerSystemByGenre,
   getDopaminePatternsByGenre,
   buildTitleRulesPrompt,
-} from '../story-writing-factory/templates';
+} from './templates';
 
-export type { DopaminePattern } from '../story-writing-factory/templates';
+export type { DopaminePattern } from './templates';

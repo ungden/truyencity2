@@ -17,7 +17,6 @@ import {
   ListTree,
   Upload,
   Factory,
-  Pen,
   Activity,
   ClipboardList,
 } from 'lucide-react';
@@ -32,12 +31,6 @@ import {
 
 // AI Tools submenu items
 const aiToolsSubmenu = [
-  {
-    title: 'Story Runner',
-    href: '/admin/story-runner',
-    icon: Pen,
-    description: 'Tạo nội dung tự động'
-  },
   {
     title: 'Story Factory',
     href: '/admin/factory',
