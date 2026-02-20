@@ -275,7 +275,7 @@ npm run dev
 - [x] Abandoned thread detection
 - [x] Foreshadowing payoff tracking
 
-### Phase 3: Story Engine v2 (✅ Hoàn thành - 2026-02-18)
+### Phase 3: Story Engine v2 (✅ Hoàn thành - 2026-02-19)
 - [x] **3-Agent Pipeline** - Architect → Writer → Critic
 - [x] **4-Layer Context** - Bridge → Bible → Synopsis → Arc Plan
 - [x] **Multi-POV Support** - Per-scene POV switching
@@ -285,7 +285,9 @@ npm run dev
 - [x] **Golden Chapter Requirements** - Special rules for ch.1-3
 - [x] **Power Budget** - Anti power-creep enforcement
 - [x] **7 Parallel Post-Write Tasks** - Summary, RAG, Beats, Rules, etc.
+- [x] **Cliffhanger Enforcement** - Hard requirements for ending hooks
 - [x] Port 36 missing features from v1 to v2
+- [x] Legacy Admin Cleanup - removed deprecated routes
 - [x] 13 files, ~3,300 lines (down from 41 files, 28,470 lines)
 
 ### Phase 4: Advanced Features (🚧 Đang phát triển)
@@ -299,7 +301,7 @@ npm run dev
 - [ ] Fine-tune model trên webnovel dataset
 - [ ] Caching layer cho Story Graph
 - [ ] Real-time collaboration
-- [ ] Mobile app
+- [x] Mobile app (EAS build & App Store pending)
 
 ---
 

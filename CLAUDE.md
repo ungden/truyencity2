@@ -39,7 +39,7 @@ src/services/story-engine/
 
 #### HIGH Priority (9)
 1. **Critic fail-closed** - Không auto-approve khi lỗi (line 576-587)
-2. **Critic hard-enforce continuity** - Critical/major = bắt buộc rewrite (line 546-558)
+2. **Critic hard-enforce continuity & cliffhanger** - Bắt buộc rewrite nếu thiếu ending hook ở non-finale (line 546-560)
 3. **Critic FULL content** - Không cắt 8000 chars nữa (line 509)
 4. **finishReason check** - Phát hiện truncate, log warning (line 273-276)
 5. **Architect scene fallback** - Tối thiểu 4 scenes (line 310-314)
@@ -290,15 +290,16 @@ Khi làm việc với story engine:
 2. **chapter-writer.ts** - Hiểu 3-agent pipeline
 3. **context-assembler.ts** - Hiểu 4-layer context
 4. **orchestrator.ts** - Hiểu overall flow
-5. **templates.ts** (v1) - Genre configs, GOLDEN_CHAPTER_REQUIREMENTS, ENGAGEMENT_CHECKLIST
+5. **templates.ts** (trong v2) - Genre configs, GOLDEN_CHAPTER_REQUIREMENTS, ENGAGEMENT_CHECKLIST
+6. **check-v2-status.ts** - Script kiểm tra trạng thái production của v2 (throughput, metrics, cliffhanger quality)
 
 ## Contact & Support
 
 - Repo: https://github.com/ungden/truyencity2
-- Current commit: `5473e6a` (port 36 features v1→v2)
-- Previous: `1ce709e` (fix penalty params), `0c9590b` (v2 rewrite)
+- Current commit: `e5f1313` (enforce cliffhanger quality + fill-rate guard)
+- Previous: `c240bdf` (cleanup legacy admin paths), `5473e6a` (port 36 features v1→v2)
 
 ---
 
-**Last Updated**: 2026-02-18
+**Last Updated**: 2026-02-19
 **Author**: AI Assistant (Claude)
