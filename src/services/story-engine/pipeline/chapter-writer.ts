@@ -30,8 +30,9 @@
 
 import { callGemini } from '../utils/gemini';
 import { parseJSON } from '../utils/json-repair';
-import { getStyleByGenre, buildTitleRulesPrompt, GOLDEN_CHAPTER_REQUIREMENTS, ENGAGEMENT_CHECKLIST } from '../config';
+import { getStyleByGenre, buildTitleRulesPrompt, GOLDEN_CHAPTER_REQUIREMENTS, ENGAGEMENT_CHECKLIST, SCENE_EXPANSION_RULES, ANTI_CLICHE_RULES, SUBTEXT_DIALOGUE_RULES } from '../config';
 import { getConstraintExtractor } from '../memory/constraint-extractor';
+import { GENRE_CONFIG } from '../../../lib/types/genre-config';
 import { buildStyleContext, getEnhancedStyleBible, CLIFFHANGER_TECHNIQUES } from '../memory/style-bible';
 import { titleChecker } from '../memory/title-checker';
 import type {
@@ -47,46 +48,47 @@ const ARCHITECT_SYSTEM = `Bạn là ARCHITECT AGENT — chuyên gia lên kế ho
 NHIỆM VỤ: Tạo blueprint chi tiết cho 1 chương.
 
 QUY TẮC:
-1. Pacing theo "ức chế → bùng nổ" — mỗi chương ít nhất 1 khoảnh khắc sảng khoái
-2. TỐI THIỂU 4-5 scenes, mỗi scene có mục tiêu + xung đột rõ ràng
-3. Consistency tuyệt đối với context (nhân vật, sức mạnh, vị trí)
-4. Trừ khi là finale arc, PHẢI có cliffhanger cuối chương — tạo lý do đọc tiếp
-5. Nếu có cliffhanger từ chương trước → PHẢI giải quyết ngay đầu chương
-6. Tránh kéo dài bi kịch: ưu tiên để MC luôn có lối thoát hoặc tiến triển dần
-7. Đa góc nhìn (Multi-POV): CÓ THỂ chuyển POV sang nhân vật khác cho 1-2 scenes NẾU phù hợp
+1. Pacing theo "ức chế → bùng nổ" — mỗi chương ít nhất 1 khoảnh khắc thỏa mãn hoặc sảng khoái (kể cả truyện điền viên, kinh doanh cũng cần thu hoạch, chốt deal hoặc sự bình yên hài hước).
+2. TỐI THIỂU 4-5 scenes, mỗi scene có động lực/mục tiêu rõ ràng (tương tác, xây dựng, mâu thuẫn, khám phá, kinh doanh).
+3. Consistency tuyệt đối với context (nhân vật, sức mạnh/tài chính, vị trí).
+4. Kết chương phải có lực kéo đọc tiếp (Ending Hook). Đối với truyện tranh đấu thì là cliffhanger nguy hiểm. Đối với truyện sinh hoạt, kinh doanh, điền viên thì là sự tò mò, mong đợi kết quả hoặc một bước ngoặt nhỏ.
+5. Nếu có hook/cliffhanger từ chương trước → PHẢI giải quyết ngay đầu chương.
+6. Tránh kéo dài bi kịch/khó khăn: ưu tiên để MC luôn có hướng giải quyết, tiến triển dần hoặc thu hoạch nhỏ.
+7. Đa góc nhìn (Multi-POV): CÓ THỂ chuyển POV sang nhân vật khác cho 1-2 scenes NẾU phù hợp để tăng tính hấp dẫn.
 
 OUTPUT: JSON theo format ChapterOutline.`;
 
 const WRITER_SYSTEM = `Bạn là WRITER AGENT — nhà văn chuyên nghiệp viết truyện dài kỳ tiếng Việt.
 
-PHONG CÁCH: Chi tiết sống động. KHÔNG BAO GIỜ tóm tắt — luôn SHOW, don't tell.
+PHONG CÁCH: Chi tiết sống động. KHÔNG BAO GIỜ tóm tắt — luôn SHOW, don't tell. Dùng đúng giọng văn của thể loại (ví dụ: kinh doanh thì dùng từ ngữ tài chính/thương trường, điền viên thì miêu tả món ăn, thiên nhiên).
 
-FORMAT ĐỐI THOẠI: Dấu gạch ngang dài (—) đầu dòng mới. Mỗi lờii thoại 1 dòng riêng.
+FORMAT ĐỐI THOẠI: Dấu gạch ngang dài (—) đầu dòng mới. Mỗi lời thoại 1 dòng riêng.
 
-QUY TẮC:
+QUY TẮC BẮT BUỘC:
 - KHÔNG dùng markdown (**, ##, etc). Văn xuôi thuần túy.
-- PHẢI đủ số từ yêu cầu. Nếu thiếu → viết thêm scenes.
-- Mỗi scene cần: mô tả bối cảnh + hành động + nội tâm + đối thoại.
-- KHÔNG lặp lại từ/cụm từ. Đa dạng từ vựng.
-- Tiếng Việt tự nhiên: dùng thành ngữ, xưng hô đúng vai vế.
-- Thuật ngữ Hán-Việt khi cần thiết (tu tiên, kiếm hiệp).
-- KHÔNG viết "Cliffhanger:" hay bất kỳ chỉ dẫn bằng tiếng Anh nào.
-- SƯỚNG VĂN MAINSTREAM CÓ KIỂM SOÁT: ưu tiên cảm giác tiến triển tích cực qua chiến lược, trí tuệ, quan hệ, khám phá — KHÔNG chỉ bằng power-up.
+- PHẢI đủ số từ yêu cầu. CẤM tóm tắt cốt truyện. Nếu thiếu từ → CÂU CHƯƠNG bằng cách viết thêm chi tiết 5 giác quan, nội tâm nhiều lớp, phản ứng của người xung quanh, hoặc kéo dài hành động.
+- MỖI ĐOẠN HỘI THOẠI: Không nói thẳng tuột. Áp dụng "hội thoại kẹp dao" (mỉa mai, ẩn dụ, giấu diếm cảm xúc).
+- CẤM SỬ DỤNG VĂN PHONG AI: Loại bỏ hoàn toàn các cụm từ sáo rỗng như "Hít một ngụm khí lạnh", "Không thể tin nổi", "Đột nhiên", "Khẽ nhếch mép". Tả hành động thực tế thay vì dùng văn mẫu.
+- Mỗi scene cần: mô tả bối cảnh chi tiết + hành động/tương tác + nội tâm + đối thoại.
+- KHÔNG lặp lại từ/cụm từ. Đa dạng từ vựng theo chuyên ngành của thể loại truyện.
+- Tiếng Việt tự nhiên: dùng thành ngữ, xưng hô đúng vai vế, từ vựng phù hợp bối cảnh.
+- KHÔNG viết "Cliffhanger:" hay bất kỳ chỉ dẫn tiếng Anh nào.
+- SƯỚNG VĂN MAINSTREAM CÓ KIỂM SOÁT: ưu tiên cảm giác tiến triển tích cực qua chiến lược, trí tuệ, quan hệ, thu hoạch, kinh doanh hoặc khám phá — KHÔNG chỉ bằng power-up hay bạo lực.
 - Hạn chế kéo dài trạng thái tụt dốc; nên có điểm hồi phục hoặc lợi ích bù đắp.`;
 
 const CRITIC_SYSTEM = `Bạn là CRITIC AGENT — biên tập viên nghiêm khắc đánh giá chất lượng.
 
 TIÊU CHÍ ĐÁNH GIÁ (thang 1-10):
 1. overallScore: Tổng thể
-2. dopamineScore: Có khoảnh khắc sảng khoái?
+2. dopamineScore: Có khoảnh khắc sảng khoái? (chốt deal, thu hoạch, vả mặt, đột phá, ấm áp chữa lành)
 3. pacingScore: Nhịp truyện hợp lý?
-4. endingHookScore: Kết chương có lực kéo đọc tiếp?
+4. endingHookScore: Kết chương có lực kéo đọc tiếp? (sự tò mò, mong chờ kết quả hoặc cliffhanger)
 
 ISSUES: Liệt kê vấn đề (pacing/consistency/dopamine/quality/word_count/dialogue/continuity)
 
 KIỂM TRA MÂU THUẪN (BẮT BUỘC):
 - Nếu nhân vật đã CHẾT mà xuất hiện lại sống -> type "continuity", severity "critical"
-- Nếu sức mạnh/cảnh giới MC bị THOÁI LUI vô lý -> type "continuity", severity "critical"
+- Nếu sức mạnh/tài sản MC bị THOÁI LUI vô lý -> type "continuity", severity "critical"
 - Nếu vi phạm quy tắc thế giới đã thiết lập -> type "continuity", severity "critical"
 - Nếu nhân vật hành xử trái ngược hoàn toàn với tính cách -> type "continuity", severity "major"
 
@@ -94,6 +96,9 @@ VERDICT:
 - APPROVE (overallScore >= 6 VÀ đủ từ): approved=true, requiresRewrite=false
 - REVISE (4-5): approved=false, requiresRewrite=false
 - REWRITE (<=3 HOẶC <60% target words HOẶC continuity critical/major HOẶC thiếu ending hook ở non-finale): approved=false, requiresRewrite=true
+
+LƯU Ý THỂ LOẠI:
+- Truyện kinh doanh/điền viên/sinh hoạt KHÔNG CẦN cliffhanger nguy hiểm, chỉ cần "Ending Hook" gây tò mò, mong đợi kết quả. KHÔNG đánh lỗi pacing nếu truyện nhịp độ chậm ấm áp.
 
 OUTPUT: JSON theo format CriticOutput.`;
 
@@ -426,6 +431,19 @@ ${sceneGuidance}
 ${multiPOVGuide}
 ${emotionalArcSection}
 
+KỸ THUẬT CÂU CHƯƠNG (BẮT BUỘC ÁP DỤNG ĐỂ ĐẠT ĐỘ DÀI):
+- 🖐️ ${SCENE_EXPANSION_RULES.expansionTechniques.find(t => t.name === 'FiveSenses')?.description}: ${SCENE_EXPANSION_RULES.expansionTechniques.find(t => t.name === 'FiveSenses')?.example}
+- 🧠 ${SCENE_EXPANSION_RULES.expansionTechniques.find(t => t.name === 'InnerMonologueLayers')?.description}: ${SCENE_EXPANSION_RULES.expansionTechniques.find(t => t.name === 'InnerMonologueLayers')?.example}
+- 👥 ${SCENE_EXPANSION_RULES.expansionTechniques.find(t => t.name === 'BystanderReactions')?.description}: ${SCENE_EXPANSION_RULES.expansionTechniques.find(t => t.name === 'BystanderReactions')?.example}
+
+HỘI THOẠI KẸP DAO (SUBTEXT):
+${SUBTEXT_DIALOGUE_RULES.rules.map(r => `- ${r}`).join('\n')}
+
+CẤM SỬ DỤNG VĂN MẪU AI (ANTI-CLICHÉ):
+- ${ANTI_CLICHE_RULES.description}
+- Các từ bị CẤM: ${ANTI_CLICHE_RULES.blacklist.join(', ')}
+- Hướng dẫn thay thế: ${ANTI_CLICHE_RULES.guidance}
+
 DOPAMINE (phải có):
 ${outline.dopaminePoints.map(dp => `- ${dp.type}: Setup: ${dp.setup} → Payoff: ${dp.payoff}`).join('\n')}
 
@@ -442,9 +460,9 @@ ${richStyleContext}
 
 ĐỘ DÀI YÊU CẦU (BẮT BUỘC):
 - Viết TỐI THIỂU ${totalTargetWords} từ
+- CẤM TÓM TẮT. Phải kéo dài thời gian và không gian của từng cảnh.
 - Chương dưới ${Math.round(totalTargetWords * 0.7)} từ sẽ bị từ chối
 - Tổng ${outline.scenes.length} scenes x ~${Math.round(totalTargetWords / outline.scenes.length)} từ/scene
-- KHÔNG tóm tắt, KHÔNG lược bỏ. Viết như tiểu thuyết xuất bản.
 - KHÔNG dùng markdown. Viết văn thuần túy.
 
 Bắt đầu viết:`;
@@ -702,11 +720,16 @@ function synthesizeFallbackCliffhanger(outline: ChapterOutline): string {
 }
 
 function hasCliffhangerSignal(content: string): boolean {
-  const tail = content.slice(-420).toLowerCase();
+  const tail = content.slice(-500).toLowerCase();
   const signals = [
+    // Action / Suspense
     '?', '...', '…', 'bất ngờ', 'đột nhiên', 'bỗng', 'sững sờ', 'kinh hãi',
     'ngay lúc đó', 'vừa khi', 'tiếng động', 'cánh cửa', 'bóng đen', 'khựng lại',
     'không thể tin', 'run lên', 'hô lớn',
+    // Business / Curiosity / Chill
+    'chờ đợi', 'kết quả', 'ngày mai', 'sáng mai', 'mỉm cười', 'thú vị',
+    'bắt đầu', 'chuẩn bị', 'mong đợi', 'thành quả', 'thu hoạch', 'giá trị',
+    'chưa biết', 'bí ẩn', 'rốt cuộc', 'suy nghĩ'
   ];
 
   let score = 0;
@@ -775,8 +798,14 @@ async function loadConstraintSection(projectId: string, context: string, protago
 function buildTopicSection(topicId?: string): string {
   if (!topicId) return '';
 
-  // Topic config should be loaded from a central place
-  // For now, return empty - this would need the full GENRE_CONFIG
+  for (const genreConfig of Object.values(GENRE_CONFIG)) {
+    const topic = genreConfig.topics.find(t => t.id === topicId);
+    if (topic && topic.topicPromptHints) {
+      return `\nTHÔNG TIN ĐẶC THÙ THỂ LOẠI (${topic.name}):\n` + 
+             topic.topicPromptHints.map(h => `- ${h}`).join('\n') + '\n';
+    }
+  }
+
   return '';
 }
 

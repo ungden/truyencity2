@@ -20,6 +20,7 @@ interface CharacterStateRow {
   power_level: string | null;
   power_realm_index: number | null;
   location: string | null;
+  personality_quirks: string | null;
   notes: string | null;
 }
 
@@ -53,6 +54,7 @@ export async function extractAndSaveCharacterStates(
     "power_level": "cảnh giới/sức mạnh hiện tại hoặc null",
     "power_realm_index": null,
     "location": "vị trí cuối chương hoặc null",
+    "personality_quirks": "đặc điểm tính cách, thói quen nổi bật, tấu hài hoặc điểm nhấn (rất quan trọng để giữ cái hồn nhân vật) hoặc null",
     "notes": "ghi chú ngắn quan trọng hoặc null"
   }
 ]
@@ -95,6 +97,7 @@ ${truncated}`;
         power_level: s.power_level || null,
         power_realm_index: typeof s.power_realm_index === 'number' ? s.power_realm_index : null,
         location: s.location || null,
+        personality_quirks: s.personality_quirks || null,
         notes: s.notes || null,
       }));
 
@@ -123,7 +126,7 @@ export async function loadCharacterStatesText(
     const db = getSupabase();
     const { data } = await db
       .from('character_states')
-      .select('character_name,status,power_level,power_realm_index,location,notes,chapter_number')
+      .select('character_name,status,power_level,power_realm_index,location,personality_quirks,notes,chapter_number')
       .eq('project_id', projectId)
       .order('chapter_number', { ascending: false })
       .limit(50);
@@ -147,6 +150,7 @@ export async function loadCharacterStatesText(
       let line = `• ${c.character_name} (${c.status})`;
       if (c.power_level) line += ` — ${c.power_level}`;
       if (c.location) line += ` tại ${c.location}`;
+      if (c.personality_quirks) line += ` | Tính cách/Thói quen: ${c.personality_quirks}`;
       if (c.notes) line += ` | ${c.notes}`;
       parts.push(line);
     }

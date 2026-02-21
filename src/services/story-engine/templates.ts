@@ -94,6 +94,51 @@ export const DOPAMINE_PATTERNS: Record<DopamineType, DopaminePattern> = {
     setup: 'Manh mối về quá khứ MC',
     payoff: 'Tiết lộ thân phận choáng váng',
   },
+  business_success: {
+    type: 'business_success',
+    name: 'Thành công kinh doanh',
+    description: 'Chốt deal lớn, kiếm lợi nhuận bùng nổ',
+    frequency: 'every_3_chapters',
+    intensity: 'high',
+    setup: 'Bị ép giá, gặp rào cản kinh doanh hoặc đối thủ chèn ép',
+    payoff: 'Lật ngược thế cờ, kiếm tiền sốc, thị trường kinh ngạc',
+  },
+  harvest: {
+    type: 'harvest',
+    name: 'Thu hoạch thành quả',
+    description: 'Đạt được thành quả sau thời gian dài chăm sóc',
+    frequency: 'every_3_chapters',
+    intensity: 'medium',
+    setup: 'Chăm sóc vất vả, chờ đợi hoặc có nguy cơ thất thu',
+    payoff: 'Thu hoạch đột biến, sản phẩm chất lượng cao hiếm có',
+  },
+  flex_wealth: {
+    type: 'flex_wealth',
+    name: 'Thể hiện tài phú/IQ',
+    description: 'Giải quyết vấn đề bằng tiền hoặc trí tuệ áp đảo',
+    frequency: 'every_chapter',
+    intensity: 'high',
+    setup: 'Bị coi thường vì vẻ ngoài hoặc bị dồn vào góc',
+    payoff: 'Dùng tiền hoặc IQ đập nát âm mưu, đối phương câm nín',
+  },
+  comfort: {
+    type: 'comfort',
+    name: 'Ấm áp/Chữa lành',
+    description: 'Khoảnh khắc bình yên, thấu hiểu, đồ ăn ngon',
+    frequency: 'every_chapter',
+    intensity: 'medium',
+    setup: 'Mệt mỏi, áp lực từ bên ngoài hoặc vết thương cũ',
+    payoff: 'Được quan tâm, ăn ngon, cảm thấy bình yên và thấu hiểu',
+  },
+  comedy_misunderstanding: {
+    type: 'comedy_misunderstanding',
+    name: 'Hiểu lầm hài hước',
+    description: 'Hiểu lầm tạo ra tình huống dở khóc dở cười',
+    frequency: 'every_3_chapters',
+    intensity: 'medium',
+    setup: 'Thông tin không đồng nhất, suy diễn sai lệch',
+    payoff: 'Phát hiện sự thật đầy bất ngờ và hài hước',
+  },
 };
 
 // ============================================================================
@@ -520,33 +565,33 @@ export const POWER_SYSTEMS: Record<string, PowerSystem> = {
 export const GOLDEN_CHAPTER_REQUIREMENTS = {
   chapter1: {
     mustHave: [
-      'Golden finger/hệ thống xuất hiện',
-      'Xung đột ngay lập tức',
-      'Mục tiêu rõ ràng của MC',
-      'Demo sức mạnh tiềm năng',
-      'Giới thiệu thế giới tự nhiên',
+      'Xung đột ngay lập tức HOẶC Mâu thuẫn sinh hoạt/Kế hoạch kinh doanh',
+      'Mục tiêu rõ ràng của MC (cứu mạng, kiếm tiền, thăng tiến, hay yên bình)',
+      'Demo sức mạnh, trí tuệ hoặc bàn tay vàng',
+      'Giới thiệu thiết lập thế giới tự nhiên, cuốn hút',
+      'Tạo sự mong đợi hoặc căng thẳng nhỏ',
     ],
-    avoid: ['Mở đầu chậm', 'Worldbuilding dump', 'MC passive'],
+    avoid: ['Mở đầu chậm, lan man', 'Worldbuilding dump', 'MC thụ động không làm gì'],
   },
   chapter2: {
     mustHave: [
-      'Chiến thắng nhỏ đầu tiên',
-      'Mở rộng hệ thống/sức mạnh',
+      'Thành quả hoặc chiến thắng nhỏ đầu tiên',
+      'Mở rộng hệ thống/sức mạnh/kế hoạch',
       'Nhân vật mới xuất hiện',
-      'Reward/thu hoạch đầu tiên',
+      'Khó khăn/Trở ngại mới',
       'Hook cho chapter tiếp',
     ],
-    avoid: ['Chỉ training không action', 'Không tiến triển'],
+    avoid: ['Chỉ training/giải thích không hành động', 'Cốt truyện dậm chân'],
   },
   chapter3: {
     mustHave: [
-      'Thử thách thực sự',
-      'Face-slap hoặc đánh bại kẻ coi thường',
-      'Growth rõ ràng của MC',
-      'Hint về plot lớn hơn',
+      'Thử thách thực sự hoặc Rào cản đầu tiên',
+      'Face-slap, chốt deal lớn, hoặc đạt thành quả thu hoạch',
+      'Growth rõ ràng của MC (tiền, sức mạnh, trí tuệ, quan hệ)',
+      'Hint về plot/quy mô thế giới lớn hơn',
       'Reader bị hook',
     ],
-    avoid: ['Giải quyết quá dễ', 'Không stakes'],
+    avoid: ['Giải quyết quá dễ dàng', 'Không stakes/hậu quả'],
   },
 };
 
@@ -564,53 +609,53 @@ export interface TitleTemplate {
 
 export const TITLE_TEMPLATES: TitleTemplate[] = [
   {
-    id: 'action_location',
-    name: 'Hành Động + Địa Điểm',
-    pattern: '[Hành động] [Tại/Ở] [Địa điểm]',
-    examples: ['Huyết Chiến Vạn Thú Sơn', 'Đại Náo Vạn Bảo Lâu', 'Quyết Đấu Trên Sinh Tử Đài'],
-    description: 'Gợi cảnh chiến đấu, thích hợp cho chương action',
-  },
-  {
-    id: 'declaration',
-    name: 'Tuyên Bố/Lời Nói',
-    pattern: '"[Câu nói ấn tượng]"',
-    examples: ['Ta Chính Là Luật Lệ', 'Ngươi Không Xứng', 'Từ Hôm Nay, Không Ai Được Động Vào Nàng'],
-    description: 'Dùng lời thoại mạnh mẽ làm title, gợi tò mò ai nói',
-  },
-  {
     id: 'mystery_question',
-    name: 'Câu Hỏi Bí Ẩn',
-    pattern: '[Ai/Gì/Tại Sao] [Bí ẩn]?',
-    examples: ['Ai Là Kẻ Phản Bội?', 'Bí Mật Của Huyết Ngọc', 'Thân Phận Thực Sự Của Lão Nhân'],
-    description: 'Kích thích tò mò, thích hợp cho chương tiết lộ/twist',
+    name: 'Nghi Vấn/Kích Thích Tò Mò',
+    pattern: '[Đối tượng] + [Hành động bí ẩn]?',
+    examples: ['Giao Dịch? Các Người Không Đủ Tư Cách!', 'Ai Đang Nói Dối?', 'Chuyện Gì Xảy Ra Trong Đêm Đó?'],
+    description: 'Tạo câu hỏi khiến người đọc muốn tìm câu trả lời',
   },
   {
-    id: 'foreshadowing',
-    name: 'Gợi Ý/Ám Thị',
-    pattern: '[Hình ảnh ám chỉ sự kiện sắp tới]',
-    examples: ['Bóng Tối Sau Cổng Thành', 'Cơn Bão Đang Đến', 'Máu Nhuộm Đỏ Hoàng Hôn'],
-    description: 'Tạo bầu không khí, hint cho sự kiện lớn',
-  },
-  {
-    id: 'turning_point',
-    name: 'Bước Ngoặt',
-    pattern: '[Sự kiện thay đổi cục diện]',
-    examples: ['Sự Thật Về Huyết Mạch', 'Ngày Tông Môn Sụp Đổ', 'Lần Đột Phá Nghịch Thiên'],
-    description: 'Thích hợp cho chương climax, major revelation',
+    id: 'action_location',
+    name: 'Nửa Kín Nửa Hở',
+    pattern: '[Hành động kịch tính] + [Địa điểm/Tình huống]',
+    examples: ['Biến Số Đêm Đấu Giá, Vạn Kim Khó Cầu', 'Huyết Chiến Vạn Thú Sơn', 'Cuộc Gặp Gỡ Bất Ngờ'],
+    description: 'Chỉ hé lộ một nửa sự kiện quan trọng',
   },
   {
     id: 'power_moment',
-    name: 'Khoảnh Khắc Sức Mạnh',
-    pattern: '[Chiêu thức/Cảnh giới/Sức mạnh mới]',
-    examples: ['Thiên Lôi Diệt Thế', 'Kim Đan Thành Tựu', 'Nhất Kiếm Phá Vạn Pháp'],
-    description: 'Gợi cảm giác sảng, power fantasy',
+    name: 'Quyền Lực Áp Đảo',
+    pattern: '[Đối tượng] + [Thể hiện sức mạnh]',
+    examples: ['Quỳ Xuống!', 'Một Kiếm Trảm Thiên Địa', 'Đừng Ép Ta Phải Ra Tay'],
+    description: 'Thích hợp cho chương có face-slap hoặc breakthrough',
   },
   {
     id: 'character_focus',
-    name: 'Nhân Vật Trọng Tâm',
-    pattern: '[Tên nhân vật] + [Hành động/Trạng thái]',
-    examples: ['Lâm Phong Trở Về', 'Nữ Đế Giáng Lâm', 'Sư Phụ Bí Ẩn Của Lão Quái'],
-    description: 'Highlight nhân vật quan trọng, thích hợp giới thiệu nhân vật mới',
+    name: 'Tiêu Điểm Nhân Vật',
+    pattern: '[Đặc điểm] + [Tên/Danh xưng]',
+    examples: ['Sự Lựa Chọn Của Kẻ Mạnh', 'Nước Mắt Của Ác Ma', 'Nụ Cười Bí Ẩn'],
+    description: 'Dành cho chương phát triển nội tâm hoặc nhân vật mới',
+  },
+  {
+    id: 'turning_point',
+    name: 'Bước Ngoặt Bất Ngờ',
+    pattern: '[Tình huống] + [Kết quả bất ngờ]',
+    examples: ['Lật Ngược Thế Cờ', 'Kế Hoạch Đổ Vỡ', 'Sự Thật Phơi Bày'],
+    description: 'Dùng cho chương có plot twist hoặc revelation',
+  },
+  {
+    id: 'foreshadowing',
+    name: 'Điềm Báo/Gợi Ý',
+    pattern: '[Sự vật/Sự kiện] + [Hệ quả tương lai]',
+    examples: ['Bão Tố Sắp Bắt Đầu', 'Bóng Đen Đang Đến Gần', 'Cái Giá Của Quyền Lực'],
+    description: 'Tạo tension cho những chương setup',
+  },
+  {
+    id: 'declaration',
+    name: 'Tuyên Bố Sốc/Mệnh Lệnh',
+    pattern: '[Câu nói ấn tượng]',
+    examples: ['Ta Sẽ Trở Lại!', 'Từ Nay Về Sau, Ta Là Luật!', 'Đừng Cản Đường Ta!'],
+    description: 'Chương có quyết định mạnh mẽ của MC',
   },
   {
     id: 'emotion_atmosphere',
@@ -630,7 +675,7 @@ export const TITLE_TEMPLATES: TitleTemplate[] = [
     id: 'ironic_contrast',
     name: 'Tương Phản/Nghịch Lý',
     pattern: '[Tương phản gây sốc]',
-    examples: ['Phế Vật? Thiên Tài!', 'Kẻ Cứu Thế Hay Ác Ma', 'Ân Nhân Chính Là Kẻ Thù'],
+    examples: ['Tên Ăn Mày Và Bản Hợp Đồng Ngàn Tỷ', 'Phế Vật? Thiên Tài!', 'Kẻ Cứu Thế Hay Ác Ma', 'Ân Nhân Chính Là Kẻ Thù'],
     description: 'Tạo twist, gợi tò mò bằng mâu thuẫn',
   },
 ];
@@ -638,18 +683,19 @@ export const TITLE_TEMPLATES: TitleTemplate[] = [
 export const CHAPTER_TITLE_RULES = {
   // Quy tắc chung
   general: [
-    'Tên chương phải NGẮN GỌN (3-10 từ), ẤN TƯỢNG, gợi TÒ MÒ',
-    'KHÔNG dùng mẫu "X Và Sự Y" lặp đi lặp lại',
-    'KHÔNG dùng mẫu "Sự [Danh từ] Của [Đối tượng]" quá 2 lần trong 20 chương',
-    'Tên chương phải khiến người đọc MUỐN click vào đọc ngay',
+    'Tên chương mang phong cách CLICKBAIT Qidian, phải có LỰC CLICK (CTR cao)',
+    'Tên chương phải NGẮN GỌN (3-10 từ), ẤN TƯỢNG, gợi TÒ MÒ tột độ',
+    'KHÔNG dùng mẫu tóm tắt nội dung hiền lành (VD: "Giao dịch thành công", "Đột phá Kim Đan")',
     'Mỗi tên chương phải KHÁC BIỆT rõ ràng với các chương trước',
-    'Ưu tiên: hành động cụ thể > miêu tả trừu tượng',
+    'Ưu tiên: lời thoại nghênh ngang, câu hỏi nghi vấn, tương phản sốc, hoặc mệnh lệnh',
     'Có thể dùng: lời thoại, câu hỏi, hình ảnh mạnh, tương phản',
   ],
 
   // Anti-patterns cần tránh
   antiPatterns: [
+    'Chương tóm tắt nhàm chán (VD: "Cuộc gặp gỡ", "Đi mua đồ", "Đột phá Kim Đan")',
     'X Và Sự Y (VD: "Linh Kiện Phế Thải Và Sự Sỉ Nhục")',
+    'Sự [Danh từ] Của [Đối tượng]',
     'Nghịch Lý Của X',
     'Quy Luật Của X',
     'Định Luật Của X',
@@ -669,12 +715,12 @@ export const CHAPTER_TITLE_RULES = {
 
   // Mẫu title theo loại chương
   chapterTypeTitleGuide: {
-    action: ['action_location', 'power_moment', 'declaration'] as string[],
+    action: ['declaration', 'power_moment', 'action_location'] as string[],
     revelation: ['mystery_question', 'turning_point', 'ironic_contrast'] as string[],
-    cultivation: ['power_moment', 'turning_point', 'countdown_urgency'] as string[],
+    cultivation: ['power_moment', 'turning_point', 'ironic_contrast'] as string[],
     romance: ['emotion_atmosphere', 'character_focus', 'foreshadowing'] as string[],
     tension: ['countdown_urgency', 'foreshadowing', 'mystery_question'] as string[],
-    comedy: ['declaration', 'ironic_contrast', 'character_focus'] as string[],
+    comedy: ['declaration', 'ironic_contrast', 'mystery_question'] as string[],
   },
 };
 
@@ -720,9 +766,19 @@ export const ENGAGEMENT_CHECKLIST = {
       frequency: 'Mỗi 2-3 chương có 1 lần minor, mỗi arc có 1 lần major',
       escalation: 'Quy mô tăng dần: cá nhân → nhóm → gia tộc → tông phái → quốc gia',
     },
+    businessEmpire: {
+      name: 'Đế Chế Kinh Doanh',
+      description: 'Tính toán chi phí/lợi nhuận → Chống ép giá/đối thủ → Tung sản phẩm/mưu kế → Đối thủ sụp đổ/khách hàng cuồng nhiệt',
+      frequency: 'Mỗi arc một thương vụ lớn hoặc mở rộng sản phẩm mới',
+    },
+    cozyFarming: {
+      name: 'Điền Viên Chữa Lành',
+      description: 'Lao động chăm sóc → Khó khăn sinh hoạt/kẻ gian phá → Giải quyết khéo léo → Thu hoạch bùng nổ/đồ ăn ngon/hài hước',
+      frequency: 'Mỗi 2-3 chương có một thu hoạch nhỏ hoặc cảnh ăn ngon ấm áp',
+    },
     powerFantasyLoop: {
-      name: 'Vòng Lặp Sức Mạnh',
-      description: 'Encounter → Bị khinh thường → Training/Cơ duyên → Đột phá → Thể hiện → Chấn kinh',
+      name: 'Vòng Lặp Sức Mạnh / Trí Tuệ',
+      description: 'Encounter → Bị khinh thường → Training/Cơ duyên/Chuẩn bị → Đột phá/Thành công → Thể hiện → Chấn kinh',
       frequency: 'Vòng lặp 10-15 chương, mỗi vòng scale lớn hơn',
     },
     treasureHunt: {
@@ -1241,6 +1297,45 @@ export function getGenreBoundaryText(genre: GenreType): string {
 /**
  * Check if chapter follows scene expansion rules.
  */
+// ============================================================================
+// ANTI-CLICHÉ DICTIONARY - Triệt tiêu văn phong AI
+// ============================================================================
+
+export const ANTI_CLICHE_RULES = {
+  description: 'Tránh sử dụng các cụm từ sáo rỗng, lặp đi lặp lại mang đậm dấu vết AI.',
+  blacklist: [
+    'Hít một ngụm khí lạnh',
+    'Không thể tin nổi',
+    'Đột nhiên',
+    'Khẽ nhếch mép',
+    'Ánh mắt kiên định',
+    'Một cỗ lực lượng vô hình',
+    'Khí tức khủng bố',
+    'Mỉm cười thâm ý',
+    'Không hẹn mà cùng',
+    'Đồng tử co rụt lại (nếu dùng quá 1 lần/chương)',
+    'Trong chớp mắt',
+    'Không ai biết rằng',
+    'Chỉ thấy',
+  ],
+  guidance: 'Thay vì dùng các từ cấm, hãy MÔ TẢ hệ quả của chúng. Ví dụ: thay vì "hít một ngụm khí lạnh", tả "sắc mặt tái nhợt, lùi lại nửa bước". Thay vì "đột nhiên", tả trực tiếp âm thanh/hình ảnh cắt ngang.',
+};
+
+// ============================================================================
+// SUBTEXT DIALOGUE RULES - Hội thoại kẹp dao
+// ============================================================================
+
+export const SUBTEXT_DIALOGUE_RULES = {
+  description: 'Hội thoại nhiều tầng nghĩa, không nói thẳng, kẹp dao trong nụ cười.',
+  rules: [
+    'Phản diện cấp cao KHÔNG chửi bới, KHÔNG dùng từ ngữ hạ cấp. Nói lời lịch sự nhưng đầy sát khí, uy hiếp ngầm.',
+    'Nhân vật mưu mô KHÔNG bao giờ nói thẳng mục đích. Dùng ẩn dụ (metaphor), mượn vật nói người (chỉ trà, chỉ cây, chỉ thời tiết).',
+    'Mọi đoạn hội thoại quan trọng PHẢI đi kèm vi biểu cảm (micro-expressions) hoặc hành động nhỏ để che giấu nội tâm (nhấp trà, vuốt nếp áo, nhìn bâng quơ, gõ ngón tay).',
+    'Tránh kiểu hỏi đáp QA (Hỏi 1 câu, trả lời 1 câu đầy đủ). Trả lời bằng câu hỏi ngược lại, sự im lặng, hoặc trả lời lạc đề có chủ đích.',
+    'Lời nói và suy nghĩ nội tâm có thể trái ngược hoàn toàn (ví dụ: cười nói khen ngợi nhưng trong lòng đang tính toán cách giết).',
+  ]
+};
+
 export function checkSceneExpansion(
   content: string,
   chapterNumber: number

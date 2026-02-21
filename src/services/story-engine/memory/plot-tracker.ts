@@ -508,9 +508,9 @@ export async function checkConsistency(
 ): Promise<ConsistencyIssue[]> {
   try {
     const issues: ConsistencyIssue[] = [];
-
-    // Check dead characters
     const db = getSupabase();
+
+    // 1. Quick regex checks: Dead characters
     const { data: deadChars } = await db
       .from('character_states')
       .select('character_name')
@@ -529,6 +529,39 @@ export async function checkConsistency(
             description: `${character_name} đã chết nhưng xuất hiện trong chương (không phải flashback)`,
           });
         }
+      }
+    }
+
+    // 2. Fast LLM check for logic/world rules if business/finance context detected
+    const BUSINESS_WORDS = /tỷ|triệu|công ty|cổ phần|doanh thu|lợi nhuận|giá|mua|bán|đầu tư|tài sản/i;
+    if (BUSINESS_WORDS.test(content) && content.length < 15000) {
+      // Lazy load to avoid circular deps
+      const { callGemini } = await import('../utils/gemini');
+      const { parseJSON } = await import('../utils/json-repair');
+      
+      const prompt = `Kiểm tra logic tài chính/thương mại trong chương truyện sau.
+Chỉ trả về JSON rỗng [] nếu không có lỗi rõ ràng. Nếu có lỗi logic nực cười (ví dụ: nhân vật đang nghèo tự nhiên lấy ra tỷ đô mà không có lý do, hoặc định giá sai lệch hàng nghìn lần), hãy trả về:
+[
+  {
+    "type": "logic_error",
+    "severity": "major",
+    "description": "Lý do lỗi logic"
+  }
+]
+
+Nội dung:
+${content.slice(0, 5000)}`;
+
+      try {
+        const res = await callGemini(prompt, { model: 'gemini-3-flash-preview', temperature: 0.1, maxTokens: 1024 });
+        if (res.content && res.content.trim().length > 5) { // not just []
+           const parsedIssues = parseJSON<ConsistencyIssue[]>(res.content);
+           if (Array.isArray(parsedIssues)) {
+             issues.push(...parsedIssues);
+           }
+        }
+      } catch (e) {
+        // ignore LLM failures
       }
     }
 

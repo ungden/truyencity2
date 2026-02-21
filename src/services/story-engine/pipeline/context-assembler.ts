@@ -403,11 +403,19 @@ export async function generateArcPlan(
   const startChapter = (arcNumber - 1) * 20 + 1;
   const endChapter = Math.min(arcNumber * 20, totalPlanned);
 
+  const isClosingPhase = endChapter >= totalPlanned * 0.8;
+  const closingInstruction = isClosingPhase ? 
+    `\n\nCHÚ Ý QUAN TRỌNG (GIAI ĐOẠN ĐÓNG TRUYỆN): Truyện đang ở ${Math.round((endChapter/totalPlanned)*100)}% tiến độ.
+Yêu cầu:
+- BẮT ĐẦU ĐÓNG CÁC PLOT THREADS: Đưa các tuyến truyện phụ, ân oán cũ vào danh sách "threads_to_resolve".
+- KHÔNG MỞ THÊM THREAD MỚI LỚN ("new_threads" chỉ nên là các tình tiết dẫn tới final boss/climax).
+- Gom các nhân vật lại gần nhau để chuẩn bị cho đại chiến/sự kiện cuối cùng.` : '';
+
   const prompt = `Bạn là Story Architect cho truyện ${genre}.
 
 ${synopsis ? `TỔNG QUAN:\n${synopsis}\n\n` : ''}${storyBible ? `STORY BIBLE:\n${storyBible.slice(0, 2000)}\n\n` : ''}
 Lập kế hoạch ARC ${arcNumber} (chương ${startChapter}-${endChapter}) cho ${protagonistName}.
-Tổng dự kiến: ${totalPlanned} chương.
+Tổng dự kiến: ${totalPlanned} chương.${closingInstruction}
 
 Trả về JSON:
 {

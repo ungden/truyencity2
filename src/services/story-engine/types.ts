@@ -20,7 +20,8 @@ export type AgentRole = 'architect' | 'writer' | 'critic';
 
 export type DopamineType =
   | 'face_slap' | 'power_reveal' | 'treasure_gain' | 'breakthrough'
-  | 'revenge' | 'recognition' | 'beauty_encounter' | 'secret_identity';
+  | 'revenge' | 'recognition' | 'beauty_encounter' | 'secret_identity'
+  | 'business_success' | 'harvest' | 'flex_wealth' | 'comfort' | 'comedy_misunderstanding';
 
 // ── Engine Config ────────────────────────────────────────────────────────────
 
