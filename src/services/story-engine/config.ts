@@ -16,6 +16,7 @@ export {
   SCENE_EXPANSION_RULES,
   ANTI_CLICHE_RULES,
   SUBTEXT_DIALOGUE_RULES,
+  COMEDY_MECHANICS_RULES,
   getStyleByGenre,
   getGenreBoundaryText,
   getPowerSystemByGenre,

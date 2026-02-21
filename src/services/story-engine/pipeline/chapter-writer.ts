@@ -30,7 +30,7 @@
 
 import { callGemini } from '../utils/gemini';
 import { parseJSON } from '../utils/json-repair';
-import { getStyleByGenre, buildTitleRulesPrompt, GOLDEN_CHAPTER_REQUIREMENTS, ENGAGEMENT_CHECKLIST, SCENE_EXPANSION_RULES, ANTI_CLICHE_RULES, SUBTEXT_DIALOGUE_RULES } from '../config';
+import { getStyleByGenre, buildTitleRulesPrompt, GOLDEN_CHAPTER_REQUIREMENTS, ENGAGEMENT_CHECKLIST, SCENE_EXPANSION_RULES, ANTI_CLICHE_RULES, SUBTEXT_DIALOGUE_RULES, COMEDY_MECHANICS_RULES } from '../config';
 import { getConstraintExtractor } from '../memory/constraint-extractor';
 import { GENRE_CONFIG } from '../../../lib/types/genre-config';
 import { buildStyleContext, getEnhancedStyleBible, CLIFFHANGER_TECHNIQUES } from '../memory/style-bible';
@@ -55,6 +55,7 @@ QUY TẮC:
 5. Nếu có hook/cliffhanger từ chương trước → PHẢI giải quyết ngay đầu chương.
 6. Tránh kéo dài bi kịch/khó khăn: ưu tiên để MC luôn có hướng giải quyết, tiến triển dần hoặc thu hoạch nhỏ.
 7. Đa góc nhìn (Multi-POV): CÓ THỂ chuyển POV sang nhân vật khác cho 1-2 scenes NẾU phù hợp để tăng tính hấp dẫn.
+8. Tình huống hài hước: Ưu tiên thiết kế tình huống "Não bổ" (người khác tự suy diễn cao siêu về hành động ngớ ngẩn của MC) hoặc "Phản kém" (Tương phản hình tượng). Cấm trò đùa kiểu phương Tây.
 
 OUTPUT: JSON theo format ChapterOutline.`;
 
@@ -68,6 +69,7 @@ QUY TẮC BẮT BUỘC:
 - KHÔNG dùng markdown (**, ##, etc). Văn xuôi thuần túy.
 - PHẢI đủ số từ yêu cầu. CẤM tóm tắt cốt truyện. Nếu thiếu từ → CÂU CHƯƠNG bằng cách viết thêm chi tiết 5 giác quan, nội tâm nhiều lớp, phản ứng của người xung quanh, hoặc kéo dài hành động.
 - MỖI ĐOẠN HỘI THOẠI: Không nói thẳng tuột. Áp dụng "hội thoại kẹp dao" (mỉa mai, ẩn dụ, giấu diếm cảm xúc).
+- YẾU TỐ HÀI HƯỚC: Nếu scene có yếu tố hài hước, PHẢI dùng tình huống (hiểu lầm, vô sỉ, tự vả, não bổ). CẤM nhân vật kể chuyện cười/chơi chữ.
 - CẤM SỬ DỤNG VĂN PHONG AI: Loại bỏ hoàn toàn các cụm từ sáo rỗng như "Hít một ngụm khí lạnh", "Không thể tin nổi", "Đột nhiên", "Khẽ nhếch mép". Tả hành động thực tế thay vì dùng văn mẫu.
 - Mỗi scene cần: mô tả bối cảnh chi tiết + hành động/tương tác + nội tâm + đối thoại.
 - KHÔNG lặp lại từ/cụm từ. Đa dạng từ vựng theo chuyên ngành của thể loại truyện.
@@ -438,6 +440,11 @@ KỸ THUẬT CÂU CHƯƠNG (BẮT BUỘC ÁP DỤNG ĐỂ ĐẠT ĐỘ DÀI):
 
 HỘI THOẠI KẸP DAO (SUBTEXT):
 ${SUBTEXT_DIALOGUE_RULES.rules.map(r => `- ${r}`).join('\n')}
+
+TẤU HÀI WEBNOVEL (COMEDY MECHANICS):
+- ${COMEDY_MECHANICS_RULES.description}
+${COMEDY_MECHANICS_RULES.mechanics.map(m => `- ${m.name}: ${m.description}`).join('\n')}
+- Lệnh CẤM Tuyện Đối: ${COMEDY_MECHANICS_RULES.forbidden.join(', ')}
 
 CẤM SỬ DỤNG VĂN MẪU AI (ANTI-CLICHÉ):
 - ${ANTI_CLICHE_RULES.description}

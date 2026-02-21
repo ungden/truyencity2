@@ -1336,6 +1336,37 @@ export const SUBTEXT_DIALOGUE_RULES = {
   ]
 };
 
+// ============================================================================
+// COMEDY MECHANICS RULES - Kỹ thuật tấu hài webnovel
+// ============================================================================
+
+export const COMEDY_MECHANICS_RULES = {
+  description: 'Kỹ thuật tạo tiếng cười qua tình huống và tính cách, CẤM dùng trò đùa chơi chữ phương Tây.',
+  mechanics: [
+    {
+      name: 'Não Bổ (Suy Diễn)',
+      description: 'MC làm một hành động lãng xẹt/vô tình/tham tiền. Người xung quanh (đặc biệt là cao thủ) tự suy diễn đó là nước đi cao thâm mạt trắc, tự dọa mình sợ.',
+    },
+    {
+      name: 'Vô Sỉ (Shameless)',
+      description: 'Phá vỡ hình tượng hoàn mỹ. MC tỏ ra đạo mạo nhưng lại lật lọng, sợ chết, tham món lợi nhỏ, chối bỏ trách nhiệm với khuôn mặt tỉnh bơ.',
+    },
+    {
+      name: 'Phản Kém (Gap Moe)',
+      description: 'Tạo tương phản cực gắt: Ma đầu giết người không chớp mắt nhưng cực sợ vợ; Thần khí uy chấn thiên hạ nhưng lải nhải chửi bậy như trẻ trâu.',
+    },
+    {
+      name: 'Hệ Thống Troll',
+      description: 'Hệ thống không đưa quà ngoan ngoãn mà đưa ra các lựa chọn mất mặt (VD: Cứu người được 10 xu, vứt liêm sỉ bỏ chạy được Thần binh).',
+    }
+  ],
+  forbidden: [
+    'Tự nhiên kể một câu chuyện cười/tiếu lâm',
+    'Chơi chữ, gieo vần gượng ép',
+    'Tạo tiếng cười đùa cợt trong lúc nhân vật khác đang bi kịch/chết chóc (làm hỏng mood)',
+  ]
+};
+
 export function checkSceneExpansion(
   content: string,
   chapterNumber: number
