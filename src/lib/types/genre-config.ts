@@ -1493,8 +1493,8 @@ export type Topic = {
   example: string;
   /** Disclaimer hiển thị ở trang thông tin truyện (không nhét vào nội dung chương) */
   disclaimer?: string;
-  /** Bối cảnh thế giới: real = thực tế, parallel = song song (đổi tên quốc gia), fantasy = hoàn toàn hư cấu */
-  worldSetting?: 'real' | 'parallel' | 'fantasy';
+  /** Bối cảnh thế giới: real = thực tế, parallel = song song (đổi tên quốc gia), fantasy = hoàn toàn hư cấu, historical = lịch sử */
+  worldSetting?: 'real' | 'parallel' | 'fantasy' | 'historical';
   /** Hướng dẫn bổ sung cho AI khi viết topic này — inject vào architect/writer prompt */
   topicPromptHints?: string[];
 };
