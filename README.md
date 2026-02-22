@@ -112,6 +112,14 @@ Mở rộng 100+ topics, bao gồm 10 siêu lưu phái (Wave 4) đang làm mưa 
 - Ghi nhớ thói quen buồn cười của nhân vật (Personality Quirks) xuyên suốt hàng ngàn chương.
 - Giai đoạn "Hạ cánh": Khi tiến độ đạt 80%, tự động ép AI đóng các plot threads phụ để chuẩn bị cho Final Boss.
 
+### 🆕 **Daily Spawn Reliability Update (2026-02-22)**
+
+- Fixed `spawnDailyNovels()` để project mới luôn có đủ `master_outline` + `story_outline` trước khi viết Ch.1.
+- Tối ưu hiệu năng cron daily spawn bằng parallel idea generation theo batch, giảm nguy cơ timeout.
+- Verified production endpoint `GET /api/cron/daily-spawn?target=20` chạy thành công trong giới hạn timeout pg_cron.
+- Backfilled toàn bộ project mới phát sinh trong lúc test/deploy để không còn thiếu outline/cover.
+- Giữ lại các novel spawn trong phiên test làm dữ liệu production hợp lệ (không rollback/xóa).
+
 ### 🆕 **Hệ thống Scalability 4 Phases (2026-02-11)**
 
 Hệ thống mới hỗ trợ viết truyện dài **1000-2000 chương** mà không bị "lú lẫn" về cốt truyện:

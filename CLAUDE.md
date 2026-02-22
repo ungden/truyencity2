@@ -44,6 +44,13 @@ src/services/story-engine/
 - **Logic Checkers:** Enhanced Plot Tracker to verify business/finance logic using fast LLM calls. Added `personality_quirks` to Character Tracker.
 - **10 New Super Genres (Wave 4):** Sáng Thế, Đệ Tứ Thiên Tai, Tứ Hợp Viện, Dị Thú, Thần Bút, Lưỡng Giới Mậu Dịch, Cá Mặn, Vô Địch, Phản Phái, Bộc Quang.
 
+### Daily Spawn Reliability Update (2026-02-22)
+- **spawnDailyNovels fix:** New projects now generate `master_outline` and `story_outline` inside daily spawn flow (not only bulk seed flow).
+- **Performance hardening:** Genre idea generation in daily spawn now runs in parallel batches to keep total runtime under pg_cron HTTP timeout.
+- **Production validation:** `daily-spawn?target=20` verified successful on `truyencity2.vercel.app` after deploy.
+- **Data backfill:** Missing outlines/covers for projects created during test/deploy were backfilled.
+- **Operational decision:** Keep test-spawned novels (already valid data) instead of deleting.
+
 ### Key Features Ported from v1 (36 items)
 
 #### HIGH Priority (9)
@@ -221,6 +228,13 @@ interface ContextPayload {
 
 ## Common Tasks
 
+### Daily Spawn / Cron Checklist
+
+1. Verify endpoint manually: `GET /api/cron/daily-spawn?target=1` with `Authorization: Bearer $CRON_SECRET`
+2. Validate newly created project has both `master_outline` and `story_outline`
+3. For `target=20`, ensure runtime stays below pg_cron `net.http_get` timeout
+4. If missing outlines appear, run `npx tsx scripts/fix-missing-data.ts`
+
 ### Thêm Feature Mới vào Chapter Writer
 
 1. **Update types.ts** - Thêm field vào interface nếu cần
@@ -305,10 +319,10 @@ Khi làm việc với story engine:
 ## Contact & Support
 
 - Repo: https://github.com/ungden/truyencity2
-- Current commit: `e5f1313` (enforce cliffhanger quality + fill-rate guard)
-- Previous: `c240bdf` (cleanup legacy admin paths), `5473e6a` (port 36 features v1→v2)
+- Current commit: `090b800` (parallelize daily spawn idea generation)
+- Previous: `a39e30a` (daily spawn outline generation), `c8f2fc0` (Qidian Master update docs)
 
 ---
 
-**Last Updated**: 2026-02-19
+**Last Updated**: 2026-02-22
 **Author**: AI Assistant (Claude)
