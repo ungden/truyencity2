@@ -416,6 +416,42 @@ export const GENRE_CONFIG = {
           'Quan hệ học đường: bạn bè, đối thủ, thầy cô, tiền bối/hậu bối, hội kín trong trường — drama học đường nhưng trong bối cảnh ma pháp tạo sự hấp dẫn đặc biệt',
           'Học viện không chỉ học: âm mưu giữa các phe phái trong trường, bí mật ẩn trong thư viện cấm, thầy giáo có quá khứ bí ẩn — mystery xuyên suốt năm học',
         ],
+      },
+      {
+        id: 'huyen-huyen-vo-dich-luu',
+        name: 'Vô Địch Lưu',
+        description: 'MC mạnh vô địch ngay từ đầu, giả heo ăn hổ, đi dạo nhân gian',
+        example: 'Vừa xuyên không đã là cảnh giới cao nhất, nhận đồ đệ phế vật rồi đào tạo thành thần',
+        topicPromptHints: [
+          'Không có progression sức mạnh cho MC vì đã max level. Động lực truyện đến từ việc thu nhận đồ đệ, xây dựng thế lực, hoặc khám phá bí ẩn thế giới.',
+          'Dopamine chính: "Flex" sức mạnh tiện tay. Kẻ địch dùng chiêu mạnh nhất, MC chỉ phẩy tay là nát. Bàng quan kinh hãi tột độ.',
+          'Tấu hài (Comedy) là yếu tố cốt lõi: MC làm gì cũng bị người khác "não bổ" là thâm thúy, hoặc MC có những sở thích kỳ quặc trái ngược với thân phận bá đạo (Gap Moe).',
+          'Tập trung phát triển nhân vật phụ (đồ đệ, thú cưỡi): để họ gặp khó khăn và trưởng thành, MC chỉ đứng sau chống lưng khi họ thực sự tuyệt vọng.',
+        ],
+      },
+      {
+        id: 'huyen-huyen-phan-phai-luu',
+        name: 'Phản Phái Lưu',
+        description: 'Xuyên thành nhân vật phản diện, cướp đoạt cơ duyên và hồng nhan của Thiên Mệnh Chi Tử (Nhân vật chính nguyên tác)',
+        example: 'Trở thành thiếu gia phản diện sắp bị main đánh chết, dùng hệ thống cướp đoạt khí vận để lật kèo',
+        topicPromptHints: [
+          'MC phải thông minh, mưu mô và tàn nhẫn hơn "Nhân vật chính nguyên tác" (Thiên Mệnh Chi Tử - TMCT). Không đối đầu trực diện ngay vì TMCT có hào quang bảo vệ.',
+          'Chiến thuật cướp đoạt: Cướp kỳ ngộ của TMCT trước một bước, ly gián quan hệ của TMCT với sư phụ/hồng nhan, làm TMCT mất đi sự ủng hộ của thế giới.',
+          'Dopamine chính: Cảm giác thượng phong trí tuệ. TMCT tức hộc máu vì mọi kế hoạch đều bị MC nắm thóp nhưng không thể làm gì được.',
+          'Lật ngược sáo rỗng (Trope Subversion): Chế nhạo các tình tiết truyện cũ (ví dụ: TMCT hay gào thét "Ngươi khinh thiếu niên nghèo", MC sẽ đập nát niềm tin đó bằng bối cảnh và tài nguyên).',
+        ],
+      },
+      {
+        id: 'huyen-huyen-boc-quang-luu',
+        name: 'Bộc Quang Lưu / Ký Ức Lộ Ra',
+        description: 'MC bị hiểu lầm là ác ma tàn bạo, khi sắp chết thì ký ức quá khứ được chiếu cho cả thiên hạ xem',
+        example: 'Thiên hạ bủa vây giết Ma Đế, nhưng khi Ký Ức phơi bày, mọi người mới biết hắn đã gánh vác mọi tội lỗi để cứu thế giới',
+        topicPromptHints: [
+          'Cấu trúc truyện hai luồng: Hiện tại (mọi người chửi rủa, căm ghét MC) xen kẽ Quá khứ (sự thật về những hy sinh thầm lặng, đau đớn của MC).',
+          'Dopamine chính: "Nước mắt hối hận" (Tears of Regret). Từng người từng người (nữ chính, đồ đệ, huynh đệ) nhận ra mình đã hiểu lầm và oán hận ân nhân lớn nhất đời mình.',
+          'Contrast cảm xúc cực mạnh: Nửa đầu uất ức tột cùng vì MC bị hàm oan, nửa sau thỏa mãn đẫm nước mắt khi những kẻ phản bội gào khóc cầu xin MC tha thứ.',
+          'Không được cho MC dễ dàng tha thứ: Sự tổn thương đã quá lớn, MC lạnh lùng cắt đứt quan hệ hoặc coi họ như người dưng mới tạo được sự day dứt sâu sắc.',
+        ],
       }
     ]
   },
@@ -729,6 +765,31 @@ export const GENRE_CONFIG = {
           'Thiên tai xảy ra: mô tả chân thực sức tàn phá — tòa nhà sụp, đường ngập, mất điện, hoảng loạn. MC đã chuẩn bị → sống sót tốt hơn → trở thành trung tâm cộng đồng',
           'Hậu thiên tai = arc sinh tồn: quản lý tài nguyên, bảo vệ gia đình/cộng đồng, đối phó kẻ cướp bóc, thương lượng với nhóm khác — quản lý khủng hoảng cấp cộng đồng',
           'Kiến thức sinh tồn thật: kỹ thuật lọc nước, sơ cứu, xây dựng tạm, dự trữ thực phẩm, năng lượng mặt trời — người đọc vừa giải trí vừa học kiến thức thực tế hữu ích',
+        ],
+      },
+      {
+        id: 'do-thi-ca-man-luu',
+        name: 'Cá Mặn Lưu (Nằm Vạ)',
+        description: 'MC cực kỳ lười biếng, chỉ muốn sống qua ngày nhưng hệ thống/hoàn cảnh cứ ép phải thành cường giả/tỷ phú',
+        example: 'Hệ thống bắt làm nhiệm vụ nguy hiểm, MC từ chối chọn nằm ngủ, hệ thống tức điên đành phải thưởng điểm Bất Tử',
+        topicPromptHints: [
+          'Tính cách MC: Lười biếng cực độ, chán ghét sự chú ý, triết lý sống "không làm thì không sai". Càng bị ép, MC càng tìm cách lách luật để được đi ngủ.',
+          'Cơ chế hài hước (Não Bổ): MC ngủ gật trong cuộc họp cổ đông, mọi người lại tưởng MC đang suy nghĩ mưu kế thâm sâu; MC trốn việc đi câu cá, vô tình bắt được gián điệp.',
+          'Hệ thống "tiện tiện": Hệ thống không buff sức mạnh thẳng, mà luôn ra điều kiện quái gở. MC và Hệ thống cãi nhau như chó với mèo là một nguồn tấu hài lớn.',
+          'Phản kém (Gap Moe): Nhìn bề ngoài lười biếng vô hại, nhưng khi thực sự đụng đến "ranh giới đỏ" (ví dụ: phá hỏng giấc ngủ), MC sẽ tiện tay giải quyết vấn đề bằng sức mạnh khủng khiếp.',
+        ],
+      },
+      {
+        id: 'do-thi-tu-hop-vien',
+        name: 'Tứ Hợp Viện / Niên Đại Văn',
+        description: 'Xuyên về thời bao cấp (thập niên 60-80), sống trong khu tập thể với những người hàng xóm "cầm thú"',
+        example: 'Trở về năm 1960, mỗi ngày đấu trí với mấy bà thím hàng xóm hay ăn cắp vặt, tự xây dựng cuộc sống sung túc',
+        worldSetting: 'historical' as const,
+        topicPromptHints: [
+          'Đặc trưng bối cảnh: Tem phiếu, khan hiếm lương thực, sinh hoạt tập thể, xe đạp Phượng Hoàng, radio. Mọi thứ đều phải mua bằng tem phiếu, không có tiền cũng vô dụng.',
+          'Tuyến nhân vật phản diện (Cầm Thú): Hàng xóm đạo đức giả, người lớn tuổi cậy già lên mặt, trẻ con trộm cắp. Không phải kẻ thù hủy diệt thế giới, mà là sự bực mình nhỏ nhặt hằng ngày.',
+          'Dopamine chính: Vả mặt đạo đức giả. Bắt quả tang tại trận kẻ trộm gà, vạch trần bộ mặt giả nhân giả nghĩa của "bác cả" trước toàn khu tập thể.',
+          'Comfort & Harvest (Ấm áp/Thu hoạch): Trong khi mọi người ăn ngô khoai đói kém, MC đóng kín cửa nấu thịt kho tàu, ăn cơm trắng cá kho. Cảm giác tích lũy tài sản thời bao cấp cực kỳ sảng khoái.',
         ],
       }
     ]

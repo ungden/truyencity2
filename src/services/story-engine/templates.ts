@@ -139,6 +139,42 @@ export const DOPAMINE_PATTERNS: Record<DopamineType, DopaminePattern> = {
     setup: 'Thông tin không đồng nhất, suy diễn sai lệch',
     payoff: 'Phát hiện sự thật đầy bất ngờ và hài hước',
   },
+  steal_luck: {
+    type: 'steal_luck',
+    name: 'Cướp đoạt Khí vận',
+    description: 'Phản phái MC cướp đoạt cơ duyên, bảo vật hoặc hồng nhan của Thiên Mệnh Chi Tử',
+    frequency: 'every_3_chapters',
+    intensity: 'high',
+    setup: 'Thiên Mệnh Chi Tử chuẩn bị lấy được bảo vật/tình cảm',
+    payoff: 'MC xen ngang cướp đoạt mượt mà, Thiên Mệnh Chi Tử tức hộc máu nhưng không làm gì được',
+  },
+  simulate_success: {
+    type: 'simulate_success',
+    name: 'Mô phỏng thành công',
+    description: 'MC dùng hệ thống mô phỏng tìm ra đường sống trong chỗ chết',
+    frequency: 'every_3_chapters',
+    intensity: 'extreme',
+    setup: 'Tình huống bế tắc, 99.9% là chết',
+    payoff: 'MC dùng kết quả mô phỏng lật kèo hoàn hảo, bàng quan kinh hãi vì sự "tiên tri" của MC',
+  },
+  tears_of_regret: {
+    type: 'tears_of_regret',
+    name: 'Nước mắt hối hận',
+    description: 'Sự thật về sự hy sinh thầm lặng của MC được phơi bày',
+    frequency: 'arc_end',
+    intensity: 'extreme',
+    setup: 'MC bị hiểu lầm là kẻ ác, bị mọi người xỉ vả và phản bội',
+    payoff: 'Ký ức/sự thật bộc quang, những kẻ từng phản bội ôm đầu khóc lóc hối hận tột cùng',
+  },
+  flex_power_casual: {
+    type: 'flex_power_casual',
+    name: 'Tiện tay nghiền nát',
+    description: 'MC quá mạnh, tiện tay làm một việc nhỏ cũng gây chấn động',
+    frequency: 'every_3_chapters',
+    intensity: 'high',
+    setup: 'Kẻ thù tự cao tự đại đem theo tuyệt chiêu mạnh nhất',
+    payoff: 'MC chỉ hắt xì hoặc phẩy tay cũng khiến kẻ thù tan thành tro bụi, quần chúng hóa đá',
+  },
 };
 
 // ============================================================================
@@ -554,6 +590,59 @@ export const POWER_SYSTEMS: Record<string, PowerSystem> = {
     currencies: [
       { name: 'Tiền', value: 1, description: 'Tiền thường' },
       { name: 'Điểm hệ thống', value: 100, description: 'Tiền tệ hệ thống' },
+    ],
+  },
+  beast_taming: {
+    name: 'Ngự Thú Sư',
+    realms: [
+      { name: 'Ngự Thú Đồ Tể', rank: 1, subLevels: 9, description: 'Mới khế ước thú', abilities: ['Câu thông tinh thần'], breakthroughDifficulty: 'easy' },
+      { name: 'Sơ Cấp', rank: 2, subLevels: 9, description: 'Khế ước 2 thú', abilities: ['Sủng thú dung hợp (yếu)'], breakthroughDifficulty: 'easy' },
+      { name: 'Trung Cấp', rank: 3, subLevels: 9, description: 'Lĩnh vực ngự thú', abilities: ['Chia sẻ sinh mệnh'], breakthroughDifficulty: 'medium' },
+      { name: 'Cao Cấp', rank: 4, subLevels: 9, description: 'Trọng sinh sủng thú', abilities: ['Triệu hồi không gian'], breakthroughDifficulty: 'medium' },
+      { name: 'Đại Sư', rank: 5, subLevels: 9, description: 'Tiến hóa ẩn', abilities: ['Khế ước Thần Thú'], breakthroughDifficulty: 'hard' },
+      { name: 'Truyền Thuyết', rank: 6, subLevels: 3, description: 'Đứng đầu thế giới', abilities: ['Tạo quy tắc mới'], breakthroughDifficulty: 'bottleneck' },
+      { name: 'Thần Thoại', rank: 7, subLevels: 3, description: 'Bất hủ', abilities: ['Sáng thế'], breakthroughDifficulty: 'bottleneck' },
+    ],
+    resources: ['Vật liệu tiến hóa', 'Lõi năng lượng', 'Mảnh vỡ tinh thạch'],
+    techniqueGrades: ['Thức tỉnh', 'Siêu phàm', 'Thống lĩnh', 'Quân vương', 'Bá chủ', 'Thần thoại'],
+    itemGrades: ['Thường', 'Cấp cao', 'Đỉnh phong', 'Sử thi', 'Truyền thuyết'],
+    currencies: [
+      { name: 'Ngự thú tệ', value: 1, description: 'Tiền mặt' },
+      { name: 'Điểm cống hiến', value: 1000, description: 'Mua tài nguyên hiếm' },
+    ],
+  },
+  rules_horror: {
+    name: 'Quy Tắc Quái Đàm',
+    realms: [
+      { name: 'Người sống sót mới', rank: 1, subLevels: 1, description: 'Chỉ có cái mạng', abilities: ['Suy luận cơ bản'], breakthroughDifficulty: 'easy' },
+      { name: 'Kẻ phá đảo', rank: 2, subLevels: 3, description: 'Qua 3 phó bản', abilities: ['Nhìn thấu ảo ảnh (Hạn chế)'], breakthroughDifficulty: 'medium' },
+      { name: 'Kẻ nắm giữ quy tắc', rank: 3, subLevels: 3, description: 'Qua 10 phó bản', abilities: ['Sửa 1 dòng quy tắc', 'Dùng quỷ dị làm vũ khí'], breakthroughDifficulty: 'hard' },
+      { name: 'Chủ Quái Đàm', rank: 4, subLevels: 3, description: 'Chiếm phó bản', abilities: ['Tạo phó bản mới', 'Miễn nhiễm ô nhiễm tinh thần'], breakthroughDifficulty: 'bottleneck' },
+      { name: 'Cthulhu', rank: 5, subLevels: 1, description: 'Cấm kỵ', abilities: ['Đọc tâm trí quỷ', 'Nuốt chửng ác thần'], breakthroughDifficulty: 'bottleneck' },
+    ],
+    resources: ['Điểm san trị (Sanity)', 'Đạo cụ quỷ dị', 'Mảnh vỡ quy tắc'],
+    techniqueGrades: ['Cấp D', 'Cấp C', 'Cấp B', 'Cấp A', 'Cấp S (Vô giải)'],
+    itemGrades: ['Đồ thường', 'Đồ bị nguyền rủa', 'Vật phẩm cấm kỵ'],
+    currencies: [
+      { name: 'Quỷ tệ', value: 1, description: 'Giao dịch với thế giới bên kia' },
+      { name: 'Tuổi thọ', value: 9999, description: 'Đánh đổi để lấy cơ hội' },
+    ],
+  },
+  lord_building: {
+    name: 'Lãnh Chúa Cầu Sinh',
+    realms: [
+      { name: 'Thôn Trưởng', rank: 1, subLevels: 3, description: 'Nhà tranh vách đất', abilities: ['Chiêu mộ nông dân'], breakthroughDifficulty: 'easy' },
+      { name: 'Trấn Trưởng', rank: 2, subLevels: 5, description: 'Trấn nhỏ, có dân binh', abilities: ['Chiêu binh', 'Xây chợ'], breakthroughDifficulty: 'medium' },
+      { name: 'Thành Chủ', rank: 3, subLevels: 5, description: 'Thành phố vững chắc', abilities: ['Mở rào chắn phép thuật', 'Tướng lĩnh cấp sử thi'], breakthroughDifficulty: 'hard' },
+      { name: 'Lĩnh Chủ Tối Cao', rank: 4, subLevels: 3, description: 'Đế quốc rộng lớn', abilities: ['Đội quân bay', 'Dịch chuyển không gian'], breakthroughDifficulty: 'bottleneck' },
+      { name: 'Thần Chủ', rank: 5, subLevels: 3, description: 'Kiểm soát thế giới', abilities: ['Tạo anh hùng mới', 'Nâng cấp vạn vật'], breakthroughDifficulty: 'bottleneck' },
+    ],
+    resources: ['Gỗ', 'Đá', 'Lương thực', 'Quặng sắt', 'Bản đồ xây dựng', 'Lệnh bài chiêu mộ'],
+    techniqueGrades: ['Cấp 1', 'Cấp 2', 'Cấp 3', 'Cấp 4', 'Cấp 5'],
+    itemGrades: ['Rách nát', 'Thường', 'Tinh xảo', 'Hoàn mỹ', 'Truyền Thuyết', 'Thần Thoại'],
+    currencies: [
+      { name: 'Đồng xu', value: 1, description: 'Trao đổi kênh chat' },
+      { name: 'Linh thạch năng lượng', value: 500, description: 'Nâng cấp kiến trúc lõi' },
     ],
   },
 };
