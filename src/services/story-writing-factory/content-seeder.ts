@@ -1038,16 +1038,18 @@ NHỊP CỐT TRUYỆN (ƯU TIÊN SƯỚNG VĂN MAINSTREAM):
 - Giữ mâu thuẫn hợp lý nhưng tỷ trọng cảm giác thắng thế phải cao hơn cảm giác bế tắc.
 - Tránh nội dung phản cảm/lowbrow; giữ chất lượng đại chúng lâu dài.
 
-MẪU TÊN TRUYỆN - Học từ webnovels HOT nhất:
+MẪU TÊN TRUYỆN - Học TỪ CẤU TRÚC (KHÔNG ĐƯỢC COPY TÊN):
 • [Số Lớn]+[Cảnh Giới]: Vạn Cổ Thần Đế, Cửu Tinh Bá Thể Quyết → Epicness
-• [Động Từ]+[Vũ Trụ]: Thôn Phệ Tinh Không (360M views), Già Thiên (450M) → Power
-• [Bí Ẩn]+Chi+[Chủ]: Quỷ Bí Chi Chủ (9.4★ highest rated) → Mystery Hook
-• [Nhân Vật]+Truyện: Phàm Nhân Tu Tiên Truyện (#1 all-time, 500M views) → Relatable
+• [Động Từ]+[Vũ Trụ]: Thôn Phệ Tinh Không, Già Thiên → Power
+• [Bí Ẩn]+Chi+[Chủ]: Quỷ Bí Chi Chủ → Mystery Hook
+• [Nhân Vật]+Truyện: Phàm Nhân Tu Tiên Truyện → Relatable
 • [Nghề]+Thần: Tu La Vũ Thần, Siêu Thần Cơ Giới Sư → Identity
-Lưu ý: 2-6 chữ, gợi tò mò, Hán-Việt cho tu tiên/huyền huyễn
-Không dùng tên generic kiểu "Tân Truyện", "Câu Chuyện Của...", "Hành Trình Của..."
 
-Mỗi truyện tự tạo 5-8 title candidates nội bộ, chọn 1 title tốt nhất để xuất JSON.
+CẤM TUYỆT ĐỐI (LỖI NGHIÊM TRỌNG):
+- KHÔNG ĐƯỢC ĐẶT TÊN TRUYỆN TRÙNG VỚI CÁC TRUYỆN NỔI TIẾNG CÓ THẬT (như: Quỷ Bí Chi Chủ, Thôn Phệ Tinh Không, Đấu Phá Thương Khung, Phàm Nhân Tu Tiên, Già Thiên, Đạo Mộ Bút Ký, v.v.). Bắt buộc phải sáng tạo tên mới hoàn toàn dựa trên công thức.
+- KHÔNG dùng tên generic kiểu "Tân Truyện", "Câu Chuyện Của...", "Hành Trình Của..."
+
+Mỗi truyện tự tạo 5-8 title candidates nội bộ, chọn 1 title TỰ SÁNG TẠO tốt nhất để xuất JSON.
 
 GOLDEN FINGER (BẮT BUỘC cho mỗi truyện):
 Nhân vật chính PHẢI có ít nhất 1 lợi thế đặc biệt rõ ràng, ví dụ:
@@ -1316,7 +1318,22 @@ CHÚ Ý:
       }
 
       // Then insert projects
-      const { error: projectError } = await this.supabase.from('ai_story_projects').insert(projectRows);
+      const { data: insertedProjects, error: projectError } = await this.supabase.from('ai_story_projects').insert(projectRows).select('id, novel_id, genre, novel:novels(title)');
+      if (!projectError && insertedProjects) {
+        // Trigger master outline generation in background
+        import('../story-engine/pipeline/master-outline').then(({ generateMasterOutline }) => {
+          for (const p of insertedProjects) {
+            generateMasterOutline(
+              p.id,
+              p.novel?.[0]?.title || 'Unknown',
+              p.genre as any,
+              'Truyện tự động tạo từ Seeder',
+              2000,
+              { model: 'gemini-3-flash-preview', temperature: 0.7, maxTokens: 2048 }
+            ).catch(e => console.error('Seeder outline error:', e));
+          }
+        }).catch(e => console.error('Failed to import outline gen:', e));
+      }
       if (projectError) {
         errors.push(`Project batch ${batch}-${batchEnd} failed: ${projectError.message}`);
         // Clean up orphaned novels
