@@ -617,6 +617,67 @@ export class ContentSeeder {
 
     created = projectRows.length;
 
+    // ── Generate master_outline + story_outline for each new project ──
+    // These are required by V2 Engine before writing Chapter 1.
+    // Run in parallel batches of 5 to stay within rate limits.
+    try {
+      const { generateMasterOutline } = await import('../story-engine/pipeline/master-outline');
+      const { callGemini } = await import('../story-engine/utils/gemini');
+      const { parseJSON } = await import('../story-engine/utils/json-repair');
+
+      const OUTLINE_BATCH = 5;
+      for (let i = 0; i < projectRows.length; i += OUTLINE_BATCH) {
+        const batch = projectRows.slice(i, i + OUTLINE_BATCH);
+        await Promise.all(batch.map(async (pRow) => {
+          const novel = novelRows.find(n => n.id === pRow.novel_id);
+          const title = novel?.title || 'Unknown';
+          const desc = novel?.description || '';
+          const totalCh = pRow.total_planned_chapters || 1500;
+
+          // 1. Master outline
+          try {
+            await generateMasterOutline(
+              pRow.id, title, pRow.genre as any, desc.substring(0, 500),
+              totalCh,
+              { model: 'gemini-2.0-flash', temperature: 0.7, maxTokens: 2048 }
+            );
+          } catch (e) {
+            errors.push(`Master outline failed for "${title}": ${e instanceof Error ? e.message : String(e)}`);
+          }
+
+          // 2. Story outline
+          try {
+            const arcs = Math.ceil(totalCh / 20);
+            const mid = Math.ceil(arcs / 2);
+            const prompt = `Tạo dàn ý tổng thể cho truyện:
+TITLE: ${title}
+GENRE: ${pRow.genre}
+PROTAGONIST: ${pRow.main_character}
+PREMISE: ${desc.substring(0, 400)}
+TARGET: ${totalCh} chương, ${arcs} arcs
+
+Trả về JSON:
+{"id":"story_${Date.now()}","title":"${title}","genre":"${pRow.genre}","premise":"...","themes":[],"mainConflict":"...","targetChapters":${totalCh},"targetArcs":${arcs},"protagonist":{"name":"${pRow.main_character}","startingState":"...","endGoal":"...","characterArc":"..."},"majorPlotPoints":[{"id":"pp1","name":"Khởi đầu","description":"...","targetArc":1,"type":"inciting_incident","importance":"critical"},{"id":"pp3","name":"Midpoint","description":"...","targetArc":${mid},"type":"midpoint","importance":"critical"},{"id":"pp5","name":"Climax","description":"...","targetArc":${arcs - 1},"type":"climax","importance":"critical"},{"id":"pp6","name":"Resolution","description":"...","targetArc":${arcs},"type":"resolution","importance":"critical"}],"endingVision":"...","uniqueHooks":[]}`;
+            const res = await callGemini(prompt, {
+              model: 'gemini-2.0-flash', temperature: 0.7, maxTokens: 4096,
+              systemPrompt: 'Bạn là STORY ARCHITECT. CHỈ trả về JSON.',
+            });
+            const outline = parseJSON(res.content);
+            if (outline) {
+              await this.supabase
+                .from('ai_story_projects')
+                .update({ story_outline: outline as any })
+                .eq('id', pRow.id);
+            }
+          } catch (e) {
+            errors.push(`Story outline failed for "${title}": ${e instanceof Error ? e.message : String(e)}`);
+          }
+        }));
+      }
+    } catch (e) {
+      errors.push(`Outline generation module failed: ${e instanceof Error ? e.message : String(e)}`);
+    }
+
     return {
       created,
       target: targetCount,
