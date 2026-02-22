@@ -452,6 +452,50 @@ export const GENRE_CONFIG = {
           'Contrast cảm xúc cực mạnh: Nửa đầu uất ức tột cùng vì MC bị hàm oan, nửa sau thỏa mãn đẫm nước mắt khi những kẻ phản bội gào khóc cầu xin MC tha thứ.',
           'Không được cho MC dễ dàng tha thứ: Sự tổn thương đã quá lớn, MC lạnh lùng cắt đứt quan hệ hoặc coi họ như người dưng mới tạo được sự day dứt sâu sắc.',
         ],
+      },
+      {
+        id: 'huyen-huyen-sang-the',
+        name: 'Sáng Thế Lưu / Sân Cát',
+        description: 'Nuôi cấy một thế giới trong hộp cát (sandbox). Tua nhanh thời gian, quan sát nền văn minh',
+        example: 'Tìm được một cái rương, bên trong là một tinh cầu thu nhỏ. Tua nhanh 1 ngày = 1 vạn năm',
+        topicPromptHints: [
+          'Góc nhìn Thượng Đế: Không trực tiếp đánh nhau, MC đóng vai người quan sát và can thiệp ở vĩ mô. Một hơi thở của MC thành Bão táp, một giọt mồ hôi thành Đại hồng thủy.',
+          'Dopamine chính: Thu hoạch văn minh. MC gieo mầm một chủng tộc (Kiến, Tinh tinh), cho họ thời gian tiến hóa vạn năm rồi thu hoạch sức mạnh, phép thuật hoặc công nghệ của họ để dùng cho bản thân ở ngoài đời.',
+          'Tương tác vi mô: Thi thoảng MC hiển linh (Giáng thần tích) tạo ra tôn giáo trong hộp cát, hoặc ném một món đồ hiện đại (cái bật lửa) vào để nền văn minh đó nghiên cứu.'
+        ]
+      },
+      {
+        id: 'huyen-huyen-tien-hoa-quai-vat',
+        name: 'Tiến Hóa Quái Vật (Dị Thú Lưu)',
+        description: 'Xuyên qua không làm người, biến thành thú, côn trùng, thực vật. Nuốt chửng vạn vật để tiến hóa',
+        example: 'Trùng sinh thành một cây liễu, rễ cắm sâu vào địa ngục, cành đâm thủng cửu tiêu',
+        topicPromptHints: [
+          'Focus vào hệ thống nuốt chửng và lấy Gene: Ăn xác quái vật khác để lấy kỹ năng của chúng (VD: ăn rồng có vảy rồng, ăn chim có cánh).',
+          'Sự phi nhân tính: Góc nhìn của dã thú/quái vật đối với con người. Con người chỉ là "thức ăn" hoặc "kẻ đi săn phiền phức". Không có đạo đức loài người.',
+          'Scale tăng tiến cực mạnh: Từ một con rết nhỏ bằng ngón tay -> Tiến hóa thành Tinh Không Cự Thú nuốt chửng cả Mặt Trời. Mỗi lần tiến hóa là thay đổi ngoại hình và tên gọi.'
+        ]
+      },
+      {
+        id: 'huyen-huyen-than-but',
+        name: 'Thần Bút / Viết Sách Hiện Thực',
+        description: 'Viết truyện tạo ra sức mạnh thực tế. Độc giả lĩnh ngộ võ công, tác giả triệu hoán nhân vật',
+        example: 'Viết xong Tây Du Ký, có người lĩnh ngộ 72 phép thần thông, MC thì vung bút gọi ra Tôn Ngộ Không',
+        topicPromptHints: [
+          'Sức mạnh từ độc giả: MC càng có nhiều độc giả (fan) thì văn khí càng mạnh. Độc giả đọc truyện sẽ "vô tình" ngộ đạo, từ đó tôn MC lên làm Thánh Nhân.',
+          'Triệu hoán nhân vật hư cấu: Phân đoạn chiến đấu chính là lúc MC triệu hoán các nhân vật trong sách (những nhân vật mạnh mẽ vô địch) ra đập nát kẻ thù đang khinh thường mình.',
+          'Dopamine: Kẻ địch tự mãn tung chiêu -> MC nhẹ nhàng rút bút viết một dòng chữ -> Bầu trời nứt nẻ, Tề Thiên Đại Thánh giáng lâm đập nát tất cả.'
+        ]
+      },
+      {
+        id: 'huyen-huyen-thu-do-de',
+        name: 'Thu Đồ Lưu (Sư Tôn Vô Địch)',
+        description: 'Thu nhận toàn đồ đệ Khí Vận Chi Tử. Đồ đệ tu luyện, MC nhận lại sức mạnh x100',
+        example: 'Thu nhận cô bé bị từ hôn làm đồ đệ, hóa ra nàng là Nữ Đế trùng sinh',
+        topicPromptHints: [
+          'Hệ thống phản hồi: MC không cần cày cuốc, chỉ cần ném đồ cho đồ đệ hoặc để đồ đệ tu luyện, hệ thống sẽ trả lại gấp 100 lần hoặc 1000 lần cho MC.',
+          'Đồ đệ tự "não bổ": MC hành xử bình thường, nhưng dưới góc nhìn của Khí Vận Chi Tử, mọi hành động của MC đều là "Đạo lý chí cao", từ đó kính sùng MC tuyệt đối.',
+          'Sư tôn hộ khuyết: Đồ đệ ra ngoài gây họa, bị đại năng bắt nạt -> MC xuất hiện với dáng vẻ Tiên Phong Đạo Cốt, tiện tay phẩy một cái bay màu tông môn địch.'
+        ]
       }
     ]
   },
@@ -791,6 +835,42 @@ export const GENRE_CONFIG = {
           'Dopamine chính: Vả mặt đạo đức giả. Bắt quả tang tại trận kẻ trộm gà, vạch trần bộ mặt giả nhân giả nghĩa của "bác cả" trước toàn khu tập thể.',
           'Comfort & Harvest (Ấm áp/Thu hoạch): Trong khi mọi người ăn ngô khoai đói kém, MC đóng kín cửa nấu thịt kho tàu, ăn cơm trắng cá kho. Cảm giác tích lũy tài sản thời bao cấp cực kỳ sảng khoái.',
         ],
+      },
+      {
+        id: 'do-thi-luong-gioi-mau-dich',
+        name: 'Lưỡng Giới Mậu Dịch',
+        description: 'Mở cánh cửa nối liền hiện đại và dị giới/cổ đại. Làm con buôn không gian, mua rẻ bán đắt',
+        example: 'Đem mì gói, súng AK sang thế giới tu tiên đổi lấy đan dược, hoàng kim, mỹ nữ',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'Chênh lệch giá trị tài sản: Ở dị giới, đồ thủ công tinh xảo, linh thạch, nhân sâm vạn năm thì rẻ như bèo. Còn ở hiện đại, đồ nhựa, bật lửa, bột ngọt lại là "thần khí" trong mắt người dị giới.',
+          'Dopamine chính (Hai thế giới kinh hãi): Cao thủ tu tiên quỳ lạy trước cái bật lửa zippo tưởng là Hỏa Long chi bảo. Các đại gia hiện đại thì tranh nhau mua nhân sâm 1000 năm của MC.',
+          'Quản lý bí mật: MC phải khéo léo giấu giếm nguồn hàng ở cả 2 thế giới, đối phó với chính phủ và các tập đoàn dòm ngó.',
+          'Xây dựng thế lực dị giới: Dùng tài nguyên hiện đại (vũ khí, lương thực) để chiêu mộ cường giả dị giới làm bảo kê, lập ra vương quốc thương mại của riêng mình.'
+        ]
+      },
+      {
+        id: 'do-thi-nghe-nghiep-an',
+        name: 'Nghề Nghiệp Ẩn / Chuyên Gia Ngách',
+        description: 'Làm những nghề nghiệp kỳ lạ nhưng nắm giữ năng lực siêu phàm nhờ hệ thống',
+        example: 'Hệ thống thợ trang điểm thi hài, chạm vào xác chết để biết quá khứ và giải oan',
+        topicPromptHints: [
+          'Đặc thù nghề nghiệp: Mô tả quy trình làm việc rất chuyên nghiệp và chi tiết (cách mổ xác, cách sửa khóa, cách giám định). Người đọc phải cảm thấy MC là chuyên gia thực sự.',
+          'Tương tác với góc khuất xã hội: Nghề ngách giúp MC tiếp xúc với những vụ án bí ẩn, những âm mưu gia tộc mà cảnh sát cũng chịu thua.',
+          'Dopamine chính: "Pretend to be a pig to eat a tiger". Chuyên gia hàng đầu của ngành (giáo sư, chuyên gia pháp y) bó tay, MC chỉ dùng vài thao tác ngách đã giải quyết hoàn hảo khiến họ kinh hãi.'
+        ]
+      },
+      {
+        id: 'do-thi-lam-game',
+        name: 'Làm Game Thế Giới Song Song',
+        description: 'Đem các siêu phẩm game của Trái Đất (Dark Souls, PUBG) sang dị giới phát hành',
+        example: 'Xuyên đến thế giới VR cực đỉnh nhưng game cực rác, MC phát hành Resident Evil dọa khóc toàn cầu',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'Hệ thống game: MC lấy game Trái Đất, hoặc tự thiết kế game bằng hệ thống. Mô tả chi tiết gameplay, đồ họa, và cảm giác khi chơi bằng công nghệ VR/Hologram.',
+          'Thu hoạch "Oán niệm": Người chơi chơi game khó (như Dark Souls) bị hành hạ lên bờ xuống ruộng, chửi bới MC nhưng vẫn nạp tiền chơi tiếp. MC nhận sức mạnh từ cảm xúc của họ.',
+          'Phản ứng người chơi: Focus vào các streamer/cao thủ dị giới chơi game bị hành hạ, bình luận của cộng đồng mạng (tấu hài, khóc lóc).'
+        ]
       }
     ]
   },
@@ -1480,6 +1560,17 @@ export const GENRE_CONFIG = {
           'Mô phỏng ≠ thực tế: kết quả mô phỏng chỉ là xác suất, thực tế có biến số — MC không thể "copy-paste" mô phỏng. Mỗi lần thực tế đi lệch = kịch tính',
           'MC mạnh dần qua mô phỏng: sau hàng trăm lần mô phỏng, MC tích lũy kỹ năng/kiến thức khổng lồ mà không ai biết — "kẻ yếu" trong mắt mọi người thực ra đã sống hàng ngàn kiếp',
         ],
+      },
+      {
+        id: 'vong-du-de-tu-thien-tai',
+        name: 'Đệ Tứ Thiên Tai (Triệu hoán game thủ)',
+        description: 'MC triệu hoán game thủ Trái Đất sang dị giới dưới dạng nhân vật game bất tử để làm cu li',
+        example: 'MC làm NPC phát nhiệm vụ, lừa game thủ đi đánh rồng rồi thu chiến lợi phẩm',
+        topicPromptHints: [
+          'Sự tấu hài của game thủ: Bọn họ không sợ chết, sẵn sàng cởi truồng lao vào boss, chat nhảm, nhảy múa, làm các hành động kỳ quặc khiến người dị giới khiếp sợ.',
+          'Sự bóc lột của MC: MC tạo ra các quest củ chuối (bắt nhặt 1000 cục đá) rồi thưởng vài đồng xu, nhưng game thủ vẫn khen game thực tế ảo này quá siêu phẩm.',
+          'Góc nhìn đa chiều: Chuyển đổi giữa góc nhìn của MC (đang tính toán lợi ích), góc nhìn game thủ (đang cày cuốc tấu hài) và góc nhìn NPC dị giới (đang hoang mang tột độ).'
+        ]
       }
     ]
   }
