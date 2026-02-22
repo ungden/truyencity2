@@ -511,16 +511,21 @@ export class ContentSeeder {
     }
 
     const ideasByGenre = new Map<string, NovelIdea[]>();
-    for (const [genre, count] of genreCounts.entries()) {
-      try {
-        const ideas = await this.generateNovelBatch(genre, count, Date.now() % 1000);
-        ideasByGenre.set(genre, ideas);
-      } catch (e: unknown) {
-        const message = e instanceof Error ? e.message : String(e);
-        errors.push(`Generate ideas failed for ${genre}: ${message}. Using fallback templates.`);
-        const fallbackIdeas = Array.from({ length: count }, (_, idx) => this.createFallbackIdea(genre, idx));
-        ideasByGenre.set(genre, fallbackIdeas);
-      }
+    const genreEntries = [...genreCounts.entries()];
+    const IDEA_BATCH = 5;
+    for (let i = 0; i < genreEntries.length; i += IDEA_BATCH) {
+      const batch = genreEntries.slice(i, i + IDEA_BATCH);
+      await Promise.all(batch.map(async ([genre, count]) => {
+        try {
+          const ideas = await this.generateNovelBatch(genre, count, Date.now() % 1000);
+          ideasByGenre.set(genre, ideas);
+        } catch (e: unknown) {
+          const message = e instanceof Error ? e.message : String(e);
+          errors.push(`Generate ideas failed for ${genre}: ${message}. Using fallback templates.`);
+          const fallbackIdeas = Array.from({ length: count }, (_, idx) => this.createFallbackIdea(genre, idx));
+          ideasByGenre.set(genre, fallbackIdeas);
+        }
+      }));
     }
 
     const genreCursor = new Map<string, number>();
