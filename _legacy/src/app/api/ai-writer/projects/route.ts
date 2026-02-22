@@ -3,6 +3,7 @@ import { createSupabaseFromAuthHeader } from '@/integrations/supabase/auth-helpe
 import { GENRE_CONFIG } from '@/lib/types/genre-config';
 import { revalidatePath } from 'next/cache';
 import { assignAuthorToStory } from '@/services/story-writing-factory/author-assigner';
+import { generateMasterOutline } from '@/services/story-engine/pipeline/master-outline';
 
 export async function GET(request: NextRequest) {
   try {
@@ -200,6 +201,19 @@ export async function POST(request: NextRequest) {
 
     revalidatePath('/admin/novels');
     revalidatePath('/admin/ai-writer');
+
+    // Asynchronously generate Master Outline in the background
+    // We don't await this because it can take 10-30 seconds and we don't want to block the UI
+    const synopsis = world_description || `Truyện ${genre} về nhân vật chính ${main_character}. ${original_work || ''}`;
+    generateMasterOutline(
+      project.id,
+      novel_title || novel.title,
+      genre as any,
+      synopsis,
+      total_planned_chapters,
+      { model: 'gemini-3-flash-preview', temperature: 0.7, maxTokens: 2048 }
+    ).catch(e => console.error('Failed to generate master outline in background:', e));
+
 
     return NextResponse.json({ project });
   } catch (error) {
