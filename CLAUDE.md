@@ -35,6 +35,15 @@ src/services/story-engine/
     └── title-checker.ts        # Title similarity + optimization
 ```
 
+
+### Qidian Master Update (2026-02-22)
+- **Master Outline System:** Added `generateMasterOutline` which runs in the background upon project creation to build a 2000-chapter skeleton (main plot, final boss, world map). Injected as Layer 0.5 in Context Assembler.
+- **Scene Expansion Rules:** Enforced 5-senses description, layered inner monologues, and bystander reactions to reach natural 2500+ word counts (Anti-summarize).
+- **Comedy & Subtext:** Added `COMEDY_MECHANICS_RULES` (Overthinking, Shameless, Gap Moe) and `SUBTEXT_DIALOGUE_RULES` to fix generic AI tones.
+- **Anti-Cliche Dictionary:** Banned repetitive AI phrases like "Hít một ngụm khí lạnh".
+- **Logic Checkers:** Enhanced Plot Tracker to verify business/finance logic using fast LLM calls. Added `personality_quirks` to Character Tracker.
+- **10 New Super Genres (Wave 4):** Sáng Thế, Đệ Tứ Thiên Tai, Tứ Hợp Viện, Dị Thú, Thần Bút, Lưỡng Giới Mậu Dịch, Cá Mặn, Vô Địch, Phản Phái, Bộc Quang.
+
 ### Key Features Ported from v1 (36 items)
 
 #### HIGH Priority (9)

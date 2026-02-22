@@ -86,6 +86,32 @@ Outline   Content   Review
 
 ---
 
+
+### 🆕 **Bản Nâng Cấp "Đại Thần" (Master Writer Update - 2026-02-22)**
+Bản cập nhật biến AI thành tác giả chuyên nghiệp với kỹ năng "câu chương", tấu hài và thiết lập đại cương đỉnh cao.
+
+#### 1. Hệ thống Lưu Phái (Sub-Genres) Đồ Sộ
+Mở rộng 100+ topics, bao gồm 10 siêu lưu phái (Wave 4) đang làm mưa làm gió:
+- **Huyền Huyễn:** Sáng Thế Lưu, Dị Thú Tiến Hóa, Thần Bút Hiện Thực, Thu Đồ Vô Địch.
+- **Đô Thị:** Lưỡng Giới Mậu Dịch, Nghề Nghiệp Ẩn, Làm Game Bức Tử Người Chơi, Cá Mặn (Nằm Vạ), Tứ Hợp Viện.
+- **Võng Du:** Đệ Tứ Thiên Tai (Triệu hoán game thủ Trái Đất).
+
+#### 2. Kỹ Thuật Viết Truyện Đỉnh Cao
+- **Câu Chương (Scene Expansion):** Bắt buộc AI sử dụng 3 kỹ thuật: Miêu tả 5 giác quan, Nội tâm nhiều lớp, Phản ứng đám đông. Cấm tóm tắt cốt truyện.
+- **Hội Thoại Kẹp Dao (Subtext Dialogue):** Phản diện không nói tục chửi bậy, nói chuyện lịch sự nhưng sát khí. Ẩn dụ, vi biểu cảm.
+- **Từ Điển Chống Rập Khuôn (Anti-Cliché):** Khai tử các cụm từ "Hít một ngụm khí lạnh", "Khẽ nhếch mép"...
+- **Tấu Hài Webnovel (Comedy Mechanics):** Bơm muối bằng 4 kỹ thuật: Não bổ (Suy diễn), Mặt dày vô sỉ, Phản kém (Gap Moe), Hệ thống Troll.
+- **Clickbait Titles:** Tên chương gợi tò mò tột độ (Nghi vấn, Bức bách, Tương phản).
+
+#### 3. Đại Cương Toàn Truyện (Master Outline)
+- Ngay khi tạo dự án, **Chief Editor Agent** tự động sinh ra "Master Outline" (Mục tiêu tối thượng, Trùm cuối, Bản đồ thế giới, 5-10 Arc lớn kéo dài 1000-2000 chương).
+- Inject Master Outline vào bộ nhớ (Layer 0.5) trước khi viết mọi chương để AI không bao giờ bị "đầu voi đuôi chuột".
+
+#### 4. Logic & Consistency Checker
+- Check logic dòng tiền / sức mạnh bằng mô hình LLM siêu tốc để chống "ngáo giá" trong truyện kinh doanh.
+- Ghi nhớ thói quen buồn cười của nhân vật (Personality Quirks) xuyên suốt hàng ngàn chương.
+- Giai đoạn "Hạ cánh": Khi tiến độ đạt 80%, tự động ép AI đóng các plot threads phụ để chuẩn bị cho Final Boss.
+
 ### 🆕 **Hệ thống Scalability 4 Phases (2026-02-11)**
 
 Hệ thống mới hỗ trợ viết truyện dài **1000-2000 chương** mà không bị "lú lẫn" về cốt truyện:
