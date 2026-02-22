@@ -33,13 +33,37 @@ WITH seed_data AS (
      'Trở về năm 1960, mỗi ngày đấu trí với mấy bà thím hàng xóm hay ăn cắp vặt, tự xây dựng cuộc sống sung túc',
      91, ARRAY['historical','slice-of-life','drama']::text[])
 
-  ) AS t(genre_id, name, id, description, example, sort_order, tags)
+  ) AS t(genre_id, name, slug, description, example, popularity_score, tags)
 )
-INSERT INTO genre_topics (genre_id, name, id, description, example, sort_order, tags)
-SELECT genre_id, name, id, description, example, sort_order, tags FROM seed_data
-ON CONFLICT (id) DO UPDATE SET
-  name = EXCLUDED.name,
-  description = EXCLUDED.description,
-  example = EXCLUDED.example,
-  sort_order = EXCLUDED.sort_order,
-  tags = EXCLUDED.tags;
+INSERT INTO genre_topics (
+  genre_id,
+  name,
+  slug,
+  description,
+  example,
+  status,
+  display_order,
+  popularity_score,
+  tags,
+  source_refs,
+  locale
+)
+SELECT
+  s.genre_id,
+  s.name,
+  s.slug,
+  s.description,
+  s.example,
+  'active',
+  500,
+  s.popularity_score,
+  s.tags,
+  ARRAY['qidian', 'zongheng', 'faloo']::text[],
+  'vi'
+FROM seed_data s
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM genre_topics gt
+  WHERE gt.genre_id = s.genre_id
+    AND gt.slug = s.slug
+);
