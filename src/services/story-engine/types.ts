@@ -22,7 +22,8 @@ export type DopamineType =
   | 'face_slap' | 'power_reveal' | 'treasure_gain' | 'breakthrough'
   | 'revenge' | 'recognition' | 'beauty_encounter' | 'secret_identity'
   | 'business_success' | 'harvest' | 'flex_wealth' | 'comfort' | 'comedy_misunderstanding'
-  | 'steal_luck' | 'simulate_success' | 'tears_of_regret' | 'flex_power_casual';
+  | 'steal_luck' | 'simulate_success' | 'tears_of_regret' | 'flex_power_casual'
+  | 'civilization_harvest' | 'player_exploitation' | 'two_world_shock' | 'master_flex' | 'book_manifestation' | 'monster_evolution';
 
 // ── Engine Config ────────────────────────────────────────────────────────────
 

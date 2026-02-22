@@ -1,0 +1,33 @@
+[dotenv@17.2.3] injecting env (4) from .env.local -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+Fetching fallback novels...
+Found 10 novels to fix.
+
+Fixing novel: 9bd4b061-1925-4bfc-86fa-4c64d7f60018 | Genre: dong-nhan
+New Title: Cầm Nhầm Kịch Bản: Ta Tại Thế Giới Manga Sửa Đổi Tương Lai
+
+Fixing novel: e7da9104-31c4-4847-bf38-379b8634980a | Genre: tien-hiep
+New Title: Cửu Thiên Trái Chủ: Ta Thu Nợ Thành Thần
+
+Fixing novel: 038c4164-11fb-43f4-9fda-fb017c4a02f0 | Genre: huyen-huyen
+New Title: Vạn Cổ Táng Thần Sư: Khởi Đầu Táng Một Tôn Tiên Đế
+
+Fixing novel: 039206d3-ffd7-4d5f-98a1-0375de3c77d2 | Genre: khoa-huyen
+New Title: Vạn Cổ Tinh Đồ: Trạm Thu Phát Linh Hồn
+
+Fixing novel: 40cad2e4-fada-435f-90a9-d5b7f215cc91 | Genre: dong-nhan
+New Title: Thiên Đạo Trọng Viết: Ta Sửa Kịch Bản Diệt Thế
+
+Fixing novel: c746a520-fb47-4a58-a383-314989b9807a | Genre: lich-su
+New Title: Huyết Tẩy Càn Khôn: Tế Tửu Cuối Cùng
+
+Fixing novel: 5d188bcf-26f3-4f23-baba-c5b777bf9bf3 | Genre: do-thi
+New Title: Kẻ Thu Mua Tuổi Thọ: Ta Có Thể Sửa Đổi Nhân Quả
+
+Fixing novel: cbad4609-d28c-4713-83d8-cebd583e035c | Genre: huyen-huyen
+New Title: Vạn Cổ Đan Tôn: Từ Luyện Hóa Thiên Đạo Bắt Đầu
+
+Fixing novel: fd239ad8-441e-471c-9ce7-76a8327f48f2 | Genre: do-thi
+New Title: Đế Chế Cầm Đồ: Kẻ Thâu Tóm Vận Mệnh
+
+Fixing novel: f4a005c3-79ee-4680-af2f-980a94ebaa09 | Genre: tien-hiep
+New Title: Cửu Tiêu Lược Đoạt Thiên Cơ

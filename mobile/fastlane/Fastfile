@@ -1,0 +1,67 @@
+platform :ios do
+  lane :revoke_all do
+    require 'spaceship'
+
+    api_key = app_store_connect_api_key(
+      key_id: "ZR6H3P77RU",
+      issuer_id: "16b1bc8e-5a12-4788-b4d2-4c9ebe0068fb",
+      key_filepath: "/Users/alexle/Downloads/AuthKey_ZR6H3P77RU.p8",
+      in_house: false
+    )
+    # Don't use Spaceship::ConnectAPI.token = api_key directly, instead use:
+    Spaceship::ConnectAPI.token = Spaceship::ConnectAPI::Token.create(
+      key_id: "ZR6H3P77RU",
+      issuer_id: "16b1bc8e-5a12-4788-b4d2-4c9ebe0068fb",
+      filepath: "/Users/alexle/Downloads/AuthKey_ZR6H3P77RU.p8"
+    )
+
+    certs = Spaceship::ConnectAPI::Certificate.all
+    certs.each do |c|
+      if c.certificate_type == "DISTRIBUTION" || c.certificate_type == "IOS_DISTRIBUTION" || c.certificate_type == "MAC_APP_DISTRIBUTION"
+        puts "Revoking #{c.id} (#{c.name}) [#{c.certificate_type}]"
+        c.delete!
+      end
+    end
+  end
+
+  lane :generate_creds do
+    api_key = app_store_connect_api_key(
+      key_id: "ZR6H3P77RU",
+      issuer_id: "16b1bc8e-5a12-4788-b4d2-4c9ebe0068fb",
+      key_filepath: "/Users/alexle/Downloads/AuthKey_ZR6H3P77RU.p8",
+      in_house: false
+    )
+
+    temp_keychain_path = File.expand_path("~/Library/Keychains/temp.keychain-db")
+    
+    create_keychain(
+      name: "temp.keychain",
+      password: "temp",
+      default_keychain: true,
+      unlock: true,
+      timeout: 3600,
+      lock_when_sleeps: false
+    )
+
+    cert(
+      api_key: api_key,
+      development: false,
+      output_path: "./fastlane_certs",
+      keychain_path: temp_keychain_path,
+      keychain_password: "temp",
+      force: true
+    )
+
+    sigh(
+      api_key: api_key,
+      app_identifier: "com.truyencity.app",
+      development: false,
+      output_path: "./fastlane_certs",
+      force: true
+    )
+
+    delete_keychain(
+      name: "temp.keychain"
+    )
+  end
+end

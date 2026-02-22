@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="fastlane.lanes">
+    
+    
+    
+      
+      <testcase classname="fastlane.lanes" name="0: app_store_connect_api_key" time="0.001467">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="1: create_keychain" time="0.059691">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="2: cert" time="1.918949">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="3: sigh" time="5.981102">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="4: delete_keychain" time="0.009222">
+        
+      </testcase>
+    
+  </testsuite>
+</testsuites>

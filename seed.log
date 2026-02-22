@@ -1,0 +1,19 @@
+[dotenv@17.2.3] injecting env (4) from .env.local -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+Starting to seed 200 novels in the background...
+
+--- STEP 1: GENERATING AUTHORS ---
+{ authors: 20, novels: 0, activated: 0, errors: [], durationMs: 346 }
+
+--- STEP 2: GENERATING NOVELS AND PROJECTS ---
+{
+  authors: 20,
+  novels: 200,
+  activated: 0,
+  errors: [],
+  durationMs: 443545
+}
+
+--- STEP 3: ACTIVATING PROJECTS ---
+{ authors: 20, novels: 0, activated: 100, errors: [], durationMs: 673 }
+
+Done seeding 200 new stories!
