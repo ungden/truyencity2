@@ -30,6 +30,7 @@ export async function loadContext(
     synopsisResult,
     recentResult,
     arcResult,
+    masterOutlineResult,
     titlesResult,
     openingsResult,
     cliffhangersResult,
@@ -50,6 +51,8 @@ export async function loadContext(
     db.from('chapters').select('content,title,chapter_number').eq('novel_id', novelId).lt('chapter_number', chapterNumber).order('chapter_number', { ascending: false }).limit(15),
     // Layer 4: Arc Plan
     db.from('arc_plans').select('arc_number,start_chapter,end_chapter,arc_theme,plan_text,chapter_briefs,threads_to_advance,threads_to_resolve,new_threads').eq('project_id', projectId).order('arc_number', { ascending: false }).limit(1).maybeSingle(),
+    // Master Outline
+    db.from('ai_story_projects').select('master_outline').eq('id', projectId).maybeSingle(),
     // Anti-repetition: titles
     db.from('chapters').select('title').eq('novel_id', novelId).order('chapter_number', { ascending: false }).limit(500),
     // Anti-repetition: openings
@@ -69,6 +72,7 @@ export async function loadContext(
   const synopsis = synopsisResult?.data;
   const recentChapters = (recentResult?.data || []).reverse();
   const arc = arcResult?.data;
+  const masterOutline = masterOutlineResult?.data?.master_outline;
 
   // Build structured synopsis fields
   const synopsisStructured = synopsis ? {
@@ -140,6 +144,7 @@ export async function loadContext(
     genreBoundary: undefined, // set by orchestrator
     ragContext: undefined,    // set by orchestrator
     arcChapterSummaries: undefined, // loaded separately for synopsis generation
+    masterOutline: typeof masterOutline === 'string' ? masterOutline : (masterOutline ? JSON.stringify(masterOutline) : undefined),
   };
 }
 
@@ -147,6 +152,12 @@ export async function loadContext(
 
 export function assembleContext(payload: ContextPayload, chapterNumber: number): string {
   const parts: string[] = [];
+
+  // Layer 0.5: Master Outline
+  if (payload.masterOutline) {
+    parts.push('[ĐẠI CƯƠNG TOÀN TRUYỆN - BẮT BUỘC BÁM SÁT LỘ TRÌNH ĐỂ TRÁNH LAN MAN]');
+    parts.push(payload.masterOutline.slice(0, 5000));
+  }
 
   // Layer 0: Chapter Bridge (highest priority)
   if (payload.previousCliffhanger || payload.previousSummary) {

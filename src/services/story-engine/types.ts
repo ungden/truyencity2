@@ -204,6 +204,7 @@ export interface ContextPayload {
   plotThreads?: string;
   beatGuidance?: string;
   worldRules?: string;
+  masterOutline?: string;
 
   // Arc chapter summaries (for synopsis generation)
   arcChapterSummaries?: Array<{ chapter_number: number; title: string; summary: string }>;
