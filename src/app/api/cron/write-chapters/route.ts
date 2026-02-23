@@ -4,17 +4,22 @@
  * Called by Supabase pg_cron + pg_net every 5 minutes.
  * Uses Story Engine V2 exclusively for all tiers.
  * 
- * Two-tier processing:
+ * Three-tier processing:
  *   Tier 1 (RESUME): Projects with current_chapter > 0
  *     - Dynamic batch size (30-180), write 1 chapter each in PARALLEL
  *     - Per-project timeout: 180s
  *   
- *   Tier 2 (INIT): Projects with current_chapter = 0
- *     - Up to 20 projects per tick, write Ch.1 via V2 engine
- *     - Per-project timeout: 300s
+ *   Tier 2 (INIT-PREP): Projects with current_chapter = 0 AND no arc plan
+ *     - Generate arc plan only (fast ~30-60s), no chapter write
+ *     - Next cron tick picks them up as INIT-WRITE
+ *     - Up to 20 projects per tick, timeout: 120s
+ *   
+ *   Tier 3 (INIT-WRITE): Projects with current_chapter = 0 AND arc plan exists
+ *     - Write Ch.1 via V2 engine (arc plan already cached)
+ *     - Up to 10 projects per tick, timeout: 240s
  * 
- * Both tiers run in parallel with bounded concurrency (12).
- * Designed for ~5,700+ chapters/day throughput (20 projects * 288 cron ticks/day).
+ * All tiers run in parallel with bounded concurrency (12).
+ * Two-phase init prevents Vercel 300s timeout from killing arc plan + write.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -22,14 +27,19 @@ import { createClient } from '@supabase/supabase-js';
 
 // Story Engine v2 — sole engine for all tiers (init + resume)
 import { writeOneChapter as writeOneChapterV2 } from '@/services/story-engine';
+import { generateArcPlan } from '@/services/story-engine/pipeline/context-assembler';
+import type { GenreType, GeminiConfig } from '@/services/story-engine/types';
+import { DEFAULT_CONFIG } from '@/services/story-engine/types';
 
 // CONFIGURATION
 const MIN_RESUME_BATCH_SIZE = 30;
 const MAX_RESUME_BATCH_SIZE = 180;
-const INIT_BATCH_SIZE = 20;
+const INIT_PREP_BATCH_SIZE = 20;   // Arc plan generation only (fast)
+const INIT_WRITE_BATCH_SIZE = 10;  // Chapter 1 writing (arc plan already exists)
 const CANDIDATE_POOL_SIZE = 1200;
-const PROJECT_TIMEOUT_MS = 180_000; // 180s per-project timeout for long-context chapters
-const INIT_PROJECT_TIMEOUT_MS = 300_000;
+const PROJECT_TIMEOUT_MS = 180_000;        // 180s per resume project
+const INIT_PREP_TIMEOUT_MS = 120_000;      // 120s for arc plan generation only
+const INIT_WRITE_TIMEOUT_MS = 240_000;     // 240s for chapter 1 write (no arc plan gen)
 const RUN_CONCURRENCY = 12; // Limit parallel pressure on model provider
 const DAILY_CHAPTER_QUOTA = 20; // Hard exact target per active novel per Vietnam day
 
@@ -135,11 +145,12 @@ type DailyQuotaRow = {
 type RunResult = {
   id: string;
   title: string;
-  tier: 'resume' | 'init';
+  tier: 'resume' | 'init-prep' | 'init-write';
   success: boolean;
   error?: string;
   completionReason?: 'exact_target' | 'arc_boundary' | 'natural_ending' | 'hard_stop';
   chapterWritten?: boolean;
+  arcPlanGenerated?: boolean;
 };
 
 function detectNaturalEnding(title?: string | null, content?: string | null): boolean {
@@ -219,13 +230,78 @@ function computeDynamicResumeBatchSize(activeCount: number): number {
 }
 
 /**
- * Create a runner, set callbacks, execute 1 chapter.
+ * INIT-PREP: Generate arc plan only for a project at chapter 0.
+ * Fast (~30-60s), no chapter writing. Next tick picks it up for INIT-WRITE.
+ */
+async function prepareInitProject(
+  project: ProjectRow,
+  supabase: ReturnType<typeof getSupabaseAdmin>,
+): Promise<RunResult> {
+  const novel = Array.isArray(project.novels) ? project.novels[0] : project.novels;
+  if (!novel?.id) throw new Error('No novel linked');
+
+  const genre = (project.genre || 'tien-hiep') as GenreType;
+  const protagonistName = project.main_character || 'Nhân vật chính';
+  const totalPlanned = project.total_planned_chapters || 1000;
+  const geminiConfig: GeminiConfig = {
+    model: DEFAULT_CONFIG.model,
+    temperature: 0.3,
+    maxTokens: DEFAULT_CONFIG.maxTokens,
+  };
+
+  // Load story_outline for StoryVision injection
+  const { data: projRow } = await supabase
+    .from('ai_story_projects')
+    .select('story_outline,story_bible,master_outline')
+    .eq('id', project.id)
+    .maybeSingle();
+
+  let outlineSynopsis: string | undefined;
+  let storyVision: { endingVision?: string; majorPlotPoints?: string[]; mainConflict?: string; endGoal?: string } | undefined;
+
+  if (projRow?.story_outline) {
+    const o = typeof projRow.story_outline === 'string' ? JSON.parse(projRow.story_outline) : projRow.story_outline;
+    const parts: string[] = [];
+    if (o.premise) parts.push(`Premise: ${o.premise}`);
+    if (o.mainConflict) parts.push(`Xung đột: ${o.mainConflict}`);
+    if (o.protagonist?.name) parts.push(`MC: ${o.protagonist.name} — ${o.protagonist.startingState || ''}`);
+    if (o.endingVision) parts.push(`Kết cục: ${o.endingVision}`);
+    outlineSynopsis = parts.join('\n');
+
+    storyVision = {
+      endingVision: o.endingVision,
+      majorPlotPoints: o.majorPlotPoints,
+      mainConflict: o.mainConflict,
+      endGoal: o.endGoal,
+    };
+  }
+
+  await generateArcPlan(
+    project.id, 1, genre, protagonistName,
+    outlineSynopsis || projRow?.master_outline || undefined,
+    projRow?.story_bible || undefined,
+    totalPlanned, geminiConfig, storyVision,
+  );
+
+  return {
+    id: project.id,
+    title: novel.title,
+    tier: 'init-prep',
+    success: true,
+    chapterWritten: false,
+    arcPlanGenerated: true,
+  };
+}
+
+/**
+ * Write one chapter for a project (resume or init-write).
+ * For init-write, arc plan must already exist.
  */
 async function writeOneChapter(
   project: ProjectRow,
   _geminiKey: string,
   supabase: ReturnType<typeof getSupabaseAdmin>,
-  tier: 'resume' | 'init'
+  tier: 'resume' | 'init-write'
 ): Promise<RunResult> {
   const novel = Array.isArray(project.novels) ? project.novels[0] : project.novels;
   if (!novel?.id) throw new Error('No novel linked');
@@ -233,11 +309,8 @@ async function writeOneChapter(
   const currentCh = project.current_chapter || 0;
   let latestWrittenTitle: string | null = null;
   let latestWrittenContent: string | null = null;
-  let writtenChapterNumber: number | null = null;
 
   // ====== PRE-WRITE COMPLETION CHECK ======
-  // If current_chapter already reached/exceeded total_planned_chapters,
-  // check if we should mark completed WITHOUT writing another chapter.
   const targetCh = project.total_planned_chapters || 200;
   if (currentCh >= targetCh) {
     const CHAPTERS_PER_ARC_CHECK = 20;
@@ -260,7 +333,6 @@ async function writeOneChapter(
         chapterWritten: false,
       };
     }
-    // else: in grace period, not at boundary — fall through to write 1 more chapter toward arc boundary
   }
 
   // ====== STORY ENGINE V2 — sole engine for all tiers ======
@@ -271,7 +343,6 @@ async function writeOneChapter(
       targetWordCount: project.target_chapter_length || undefined,
     });
 
-    writtenChapterNumber = v2Result.chapterNumber;
     latestWrittenTitle = v2Result.title;
 
     // Load content for natural ending detection
@@ -439,10 +510,30 @@ export async function GET(request: NextRequest) {
     const resumeCandidates = sortedDue.filter((p) => (p.current_chapter || 0) > 0);
     const initCandidates = sortedDue.filter((p) => (p.current_chapter || 0) === 0);
 
-    const filteredResumeProjects = resumeCandidates.slice(0, dynamicResumeBatchSize);
-    const filteredInitProjects = initCandidates.slice(0, INIT_BATCH_SIZE);
+    // ====== TWO-PHASE INIT: Split init candidates by arc plan existence ======
+    // Phase 1 (init-prep): No arc plan → generate arc plan only (fast, ~30-60s)
+    // Phase 2 (init-write): Arc plan exists → write chapter 1 (no arc plan gen needed)
+    let initPrepCandidates: ProjectRow[] = [];
+    let initWriteCandidates: ProjectRow[] = [];
 
-    const totalProjects = filteredResumeProjects.length + filteredInitProjects.length;
+    if (initCandidates.length > 0) {
+      const initIds = initCandidates.map(p => p.id);
+      const { data: arcRows } = await supabase
+        .from('arc_plans')
+        .select('project_id')
+        .in('project_id', initIds)
+        .eq('arc_number', 1);
+
+      const hasArcPlan = new Set((arcRows || []).map((r: { project_id: string }) => r.project_id));
+      initPrepCandidates = initCandidates.filter(p => !hasArcPlan.has(p.id));
+      initWriteCandidates = initCandidates.filter(p => hasArcPlan.has(p.id));
+    }
+
+    const filteredResumeProjects = resumeCandidates.slice(0, dynamicResumeBatchSize);
+    const filteredInitPrepProjects = initPrepCandidates.slice(0, INIT_PREP_BATCH_SIZE);
+    const filteredInitWriteProjects = initWriteCandidates.slice(0, INIT_WRITE_BATCH_SIZE);
+
+    const totalProjects = filteredResumeProjects.length + filteredInitPrepProjects.length + filteredInitWriteProjects.length;
     const skippedDueToQuota = allCandidates.length - dueCandidates.length;
 
     if (totalProjects === 0) {
@@ -458,8 +549,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Atomic claim: only rows that are still older than fourMinutesAgo are claimed.
-    // If another worker already claimed a row, it won't match this WHERE and won't be processed twice.
-    const allIds = [...filteredResumeProjects, ...filteredInitProjects].map(p => p.id);
+    const allIds = [...filteredResumeProjects, ...filteredInitPrepProjects, ...filteredInitWriteProjects].map(p => p.id);
     const claimTimestamp = new Date().toISOString();
     const { data: claimedRows, error: claimError } = await supabase
       .from('ai_story_projects')
@@ -471,13 +561,14 @@ export async function GET(request: NextRequest) {
 
     const claimedIds = new Set((claimedRows || []).map((r: { id: string }) => r.id));
     const claimedResumeProjects = filteredResumeProjects.filter(p => claimedIds.has(p.id));
-    const claimedInitProjects = filteredInitProjects.filter(p => claimedIds.has(p.id));
+    const claimedInitPrepProjects = filteredInitPrepProjects.filter(p => claimedIds.has(p.id));
+    const claimedInitWriteProjects = filteredInitWriteProjects.filter(p => claimedIds.has(p.id));
 
     if (claimedIds.size < allIds.length) {
       console.log(`[Cron] Atomic claim ${claimedIds.size}/${allIds.length}; ${allIds.length - claimedIds.size} already claimed by another worker.`);
     }
 
-    const claimedTotal = claimedResumeProjects.length + claimedInitProjects.length;
+    const claimedTotal = claimedResumeProjects.length + claimedInitPrepProjects.length + claimedInitWriteProjects.length;
     if (claimedTotal === 0) {
       return NextResponse.json({
         success: true,
@@ -489,7 +580,6 @@ export async function GET(request: NextRequest) {
 
     // ====== EXECUTE WITH BOUNDED CONCURRENCY ======
 
-    // Helper: wrap a promise with a timeout to prevent one slow project from blocking the batch
     const withTimeout = <T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> =>
       Promise.race([
         promise,
@@ -497,7 +587,8 @@ export async function GET(request: NextRequest) {
       ]);
 
     const runTasks: Array<() => Promise<RunResult>> = [
-      ...claimedResumeProjects.map(p => async () =>
+      // Tier 1: Resume projects (write next chapter)
+      ...claimedResumeProjects.map(p => async (): Promise<RunResult> =>
         withTimeout(
           writeOneChapter(p, geminiKey, supabase, 'resume'),
           PROJECT_TIMEOUT_MS,
@@ -510,15 +601,30 @@ export async function GET(request: NextRequest) {
           error: err instanceof Error ? err.message : String(err),
         }))
       ),
-      ...claimedInitProjects.map(p => async () =>
+      // Tier 2: Init-prep projects (arc plan generation only, fast)
+      ...claimedInitPrepProjects.map(p => async (): Promise<RunResult> =>
         withTimeout(
-          writeOneChapter(p, geminiKey, supabase, 'init'),
-          INIT_PROJECT_TIMEOUT_MS,
-          { id: p.id, title: '?', tier: 'init' as const, success: false, error: `Timeout after ${INIT_PROJECT_TIMEOUT_MS / 1000}s` }
+          prepareInitProject(p, supabase),
+          INIT_PREP_TIMEOUT_MS,
+          { id: p.id, title: '?', tier: 'init-prep' as const, success: false, error: `Timeout after ${INIT_PREP_TIMEOUT_MS / 1000}s` }
         ).catch(err => ({
           id: p.id,
           title: '?',
-          tier: 'init' as const,
+          tier: 'init-prep' as const,
+          success: false,
+          error: err instanceof Error ? err.message : String(err),
+        }))
+      ),
+      // Tier 3: Init-write projects (arc plan exists, write ch.1)
+      ...claimedInitWriteProjects.map(p => async (): Promise<RunResult> =>
+        withTimeout(
+          writeOneChapter(p, geminiKey, supabase, 'init-write'),
+          INIT_WRITE_TIMEOUT_MS,
+          { id: p.id, title: '?', tier: 'init-write' as const, success: false, error: `Timeout after ${INIT_WRITE_TIMEOUT_MS / 1000}s` }
+        ).catch(err => ({
+          id: p.id,
+          title: '?',
+          tier: 'init-write' as const,
           success: false,
           error: err instanceof Error ? err.message : String(err),
         }))
@@ -527,7 +633,10 @@ export async function GET(request: NextRequest) {
 
     const summary: RunResult[] = await executeWithConcurrency(runTasks, RUN_CONCURRENCY);
 
+    // ====== QUOTA UPDATES ======
     const quotaByProject = new Map(quotaRows.map((q) => [q.project_id, q]));
+
+    // Only update quota for projects that actually wrote a chapter
     const quotaUpdates = summary
       .filter((r) => r.id !== '?' && r.chapterWritten)
       .map(async (r) => {
@@ -586,7 +695,8 @@ export async function GET(request: NextRequest) {
     await Promise.allSettled([...quotaUpdates, ...failedUpdates]);
 
     const resumeSuccess = summary.filter(r => r.tier === 'resume' && r.success).length;
-    const initSuccess = summary.filter(r => r.tier === 'init' && r.success).length;
+    const initPrepSuccess = summary.filter(r => r.tier === 'init-prep' && r.success).length;
+    const initWriteSuccess = summary.filter(r => r.tier === 'init-write' && r.success).length;
     const duration = (Date.now() - startTime) / 1000;
 
     return NextResponse.json({
@@ -599,8 +709,10 @@ export async function GET(request: NextRequest) {
       dueCandidates: dueCandidates.length,
       resumeCount: claimedResumeProjects.length,
       resumeSuccess,
-      initCount: claimedInitProjects.length,
-      initSuccess,
+      initPrepCount: claimedInitPrepProjects.length,
+      initPrepSuccess,
+      initWriteCount: claimedInitWriteProjects.length,
+      initWriteSuccess,
       skippedDueToQuota,
       durationSeconds: Math.round(duration),
       results: summary,
