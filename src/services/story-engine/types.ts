@@ -206,6 +206,8 @@ export interface ContextPayload {
   beatGuidance?: string;
   worldRules?: string;
   masterOutline?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  storyOutline?: any;
 
   // Arc chapter summaries (for synopsis generation)
   arcChapterSummaries?: Array<{ chapter_number: number; title: string; summary: string }>;

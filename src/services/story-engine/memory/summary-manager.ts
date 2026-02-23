@@ -20,7 +20,7 @@ import type { GeminiConfig, GenreType } from '../types';
 
 // ── Trigger Thresholds ───────────────────────────────────────────────────────
 
-const SYNOPSIS_INTERVAL = 20;   // Regenerate synopsis every 20 chapters
+const SYNOPSIS_INTERVAL = 5;    // Regenerate synopsis every 5 chapters (V1 parity)
 const ARC_SIZE = 20;            // Chapters per arc
 const BIBLE_TRIGGER = 3;        // Generate bible after chapter 3
 const BIBLE_REFRESH_INTERVAL = 150; // Refresh bible every 150 chapters
@@ -52,16 +52,33 @@ export async function runSummaryTasks(
   try {
     const isLikelyFinale = shouldBeFinaleArc(chapterNumber, totalPlannedChapters);
 
-    // 1. Always: generate and save chapter summary
-    const summary = await generateChapterSummary(
-      chapterNumber,
-      title,
-      content,
-      protagonistName,
-      config,
-      { allowEmptyCliffhanger: isLikelyFinale },
-    );
-    await saveChapterSummary(projectId, chapterNumber, title, summary);
+    // 1. CRITICAL: generate and save chapter summary with retries
+    // Summary is essential for chapter bridge (next chapter's context)
+    let summarySaved = false;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const summary = await generateChapterSummary(
+          chapterNumber,
+          title,
+          content,
+          protagonistName,
+          config,
+          { allowEmptyCliffhanger: isLikelyFinale },
+        );
+        await saveChapterSummary(projectId, chapterNumber, title, summary);
+        summarySaved = true;
+        break;
+      } catch (summaryErr) {
+        console.warn(
+          `[SummaryManager] Chapter ${chapterNumber} summary attempt ${attempt}/3 failed:`,
+          summaryErr instanceof Error ? summaryErr.message : String(summaryErr),
+        );
+        if (attempt < 3) await new Promise(r => setTimeout(r, 1500));
+      }
+    }
+    if (!summarySaved) {
+      console.error(`[SummaryManager] Chapter ${chapterNumber} summary FAILED after 3 retries`);
+    }
 
     // 2. Synopsis: every SYNOPSIS_INTERVAL chapters
     if (chapterNumber % SYNOPSIS_INTERVAL === 0) {
@@ -158,16 +175,31 @@ async function tryGenerateArcPlan(
 
     if (existing) return; // Already planned
 
-    // Load synopsis and bible for context
-    const [{ data: synRow }, { data: bibleRow }] = await Promise.all([
+    // Load synopsis, bible, and story_outline for context + StoryVision
+    const [{ data: synRow }, { data: projectRow }] = await Promise.all([
       db.from('story_synopsis').select('synopsis_text').eq('project_id', projectId).order('last_updated_chapter', { ascending: false }).limit(1).maybeSingle(),
-      db.from('ai_story_projects').select('story_bible').eq('id', projectId).maybeSingle(),
+      db.from('ai_story_projects').select('story_bible,story_outline').eq('id', projectId).maybeSingle(),
     ]);
+
+    // Extract StoryVision from story_outline for directional coherence
+    let storyVision: { endingVision?: string; majorPlotPoints?: string[]; mainConflict?: string; endGoal?: string } | undefined;
+    const outline = projectRow?.story_outline;
+    if (outline && typeof outline === 'object') {
+      storyVision = {
+        endingVision: outline.endingVision,
+        mainConflict: outline.mainConflict,
+        endGoal: outline.protagonist?.endGoal,
+        majorPlotPoints: outline.majorPlotPoints
+          ?.map((p: any) => typeof p === 'string' ? p : p.description || p.name || JSON.stringify(p))
+          ?.slice(0, 6),
+      };
+    }
 
     await generateArcPlan(
       projectId, arcNumber, genre, protagonistName,
-      synRow?.synopsis_text, bibleRow?.story_bible,
+      synRow?.synopsis_text, projectRow?.story_bible,
       totalPlanned, config,
+      storyVision,
     );
   } catch {
     // Non-fatal

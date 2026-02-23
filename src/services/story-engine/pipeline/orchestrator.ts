@@ -28,6 +28,7 @@ import {
   checkConsistency,
 } from '../memory/plot-tracker';
 import { runSummaryTasks } from '../memory/summary-manager';
+import { generateArcPlan } from './context-assembler';
 import type {
   WriteChapterInput, WriteChapterResult, GeminiConfig, GenreType,
 } from '../types';
@@ -155,6 +156,54 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   if (options.customPrompt) {
     context.ragContext = (context.ragContext || '') +
       `\n\n[YÊU CẦU ĐẶC BIỆT CHO CHƯƠNG ${nextChapter}]: ${options.customPrompt}`;
+  }
+
+  // ── Step 2g: Auto-generate arc plan for arc 1 if missing ──────────────
+  // When writing chapters 1-20, if no arc plan exists, generate it from
+  // story_outline + master_outline to give the writer proper direction.
+  if (!context.arcPlan && nextChapter <= 20) {
+    try {
+      const arcNumber = 1;
+      // Build synopsis-like context from story outline for arc planning
+      let outlineSynopsis: string | undefined;
+      if (context.storyOutline) {
+        const o = context.storyOutline;
+        const parts: string[] = [];
+        if (o.premise) parts.push(`Premise: ${o.premise}`);
+        if (o.mainConflict) parts.push(`Xung đột: ${o.mainConflict}`);
+        if (o.protagonist?.name) parts.push(`MC: ${o.protagonist.name} — ${o.protagonist.startingState || ''}`);
+        if (o.endingVision) parts.push(`Kết cục: ${o.endingVision}`);
+        outlineSynopsis = parts.join('\n');
+      }
+
+      await generateArcPlan(
+        project.id, arcNumber, genre, protagonistName,
+        outlineSynopsis || context.masterOutline,
+        context.storyBible,
+        totalPlanned, geminiConfig,
+      );
+
+      // Reload arc plan from DB
+      const { data: arcRow } = await db.from('arc_plans')
+        .select('plan_text,chapter_briefs,threads_to_advance,threads_to_resolve,new_threads')
+        .eq('project_id', project.id).eq('arc_number', arcNumber).maybeSingle();
+
+      if (arcRow) {
+        context.arcPlan = arcRow.plan_text;
+        if (arcRow.chapter_briefs && Array.isArray(arcRow.chapter_briefs)) {
+          const brief = (arcRow.chapter_briefs as Array<{ chapterNumber: number; brief: string }>)
+            .find(b => b.chapterNumber === nextChapter);
+          context.chapterBrief = brief?.brief;
+        }
+        context.arcPlanThreads = {
+          threads_to_advance: arcRow.threads_to_advance || [],
+          threads_to_resolve: arcRow.threads_to_resolve || [],
+          new_threads: arcRow.new_threads || [],
+        };
+      }
+    } catch {
+      // Non-fatal: arc plan generation failure shouldn't block chapter writing
+    }
   }
 
   // ── Step 3: Assemble context string ────────────────────────────────────

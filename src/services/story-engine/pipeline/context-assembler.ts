@@ -51,8 +51,8 @@ export async function loadContext(
     db.from('chapters').select('content,title,chapter_number').eq('novel_id', novelId).lt('chapter_number', chapterNumber).order('chapter_number', { ascending: false }).limit(15),
     // Layer 4: Arc Plan
     db.from('arc_plans').select('arc_number,start_chapter,end_chapter,arc_theme,plan_text,chapter_briefs,threads_to_advance,threads_to_resolve,new_threads').eq('project_id', projectId).order('arc_number', { ascending: false }).limit(1).maybeSingle(),
-    // Master Outline
-    db.from('ai_story_projects').select('master_outline').eq('id', projectId).maybeSingle(),
+    // Master Outline + Story Outline
+    db.from('ai_story_projects').select('master_outline,story_outline').eq('id', projectId).maybeSingle(),
     // Anti-repetition: titles
     db.from('chapters').select('title').eq('novel_id', novelId).order('chapter_number', { ascending: false }).limit(500),
     // Anti-repetition: openings
@@ -73,6 +73,7 @@ export async function loadContext(
   const recentChapters = (recentResult?.data || []).reverse();
   const arc = arcResult?.data;
   const masterOutline = masterOutlineResult?.data?.master_outline;
+  const storyOutline = masterOutlineResult?.data?.story_outline;
 
   // Build structured synopsis fields
   const synopsisStructured = synopsis ? {
@@ -145,6 +146,7 @@ export async function loadContext(
     ragContext: undefined,    // set by orchestrator
     arcChapterSummaries: undefined, // loaded separately for synopsis generation
     masterOutline: typeof masterOutline === 'string' ? masterOutline : (masterOutline ? JSON.stringify(masterOutline) : undefined),
+    storyOutline: storyOutline || undefined,
   };
 }
 
@@ -157,6 +159,33 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
   if (payload.masterOutline) {
     parts.push('[ĐẠI CƯƠNG TOÀN TRUYỆN - BẮT BUỘC BÁM SÁT LỘ TRÌNH ĐỂ TRÁNH LAN MAN]');
     parts.push(payload.masterOutline.slice(0, 5000));
+  }
+
+  // Layer 0.6: Story Outline (premise, protagonist, plot points, ending vision)
+  if (payload.storyOutline) {
+    const outline = payload.storyOutline;
+    const outlineParts: string[] = ['[STORY OUTLINE — HƯỚNG ĐI CỐT TRUYỆN]'];
+    if (outline.premise) outlineParts.push(`Premise: ${outline.premise}`);
+    if (outline.mainConflict) outlineParts.push(`Xung đột chính: ${outline.mainConflict}`);
+    if (outline.themes?.length) outlineParts.push(`Chủ đề: ${outline.themes.join(', ')}`);
+    if (outline.protagonist) {
+      const p = outline.protagonist;
+      outlineParts.push(`MC: ${p.name || 'MC'}`);
+      if (p.startingState) outlineParts.push(`  Khởi điểm: ${p.startingState}`);
+      if (p.endGoal) outlineParts.push(`  Mục tiêu cuối: ${p.endGoal}`);
+      if (p.characterArc) outlineParts.push(`  Hành trình: ${p.characterArc}`);
+    }
+    if (outline.majorPlotPoints?.length) {
+      outlineParts.push('Plot Points chính:');
+      for (const pp of outline.majorPlotPoints.slice(0, 8)) {
+        const name = pp.name || pp.event || '';
+        const desc = pp.description || '';
+        outlineParts.push(`  • ${name}${desc ? ': ' + desc : ''}`);
+      }
+    }
+    if (outline.endingVision) outlineParts.push(`Kết cục: ${outline.endingVision}`);
+    if (outline.uniqueHooks?.length) outlineParts.push(`Hooks: ${outline.uniqueHooks.join(', ')}`);
+    parts.push(outlineParts.join('\n'));
   }
 
   // Layer 0: Chapter Bridge (highest priority)
@@ -410,6 +439,7 @@ export async function generateArcPlan(
   storyBible: string | undefined,
   totalPlanned: number,
   config: GeminiConfig,
+  storyVision?: { endingVision?: string; majorPlotPoints?: string[]; mainConflict?: string; endGoal?: string },
 ): Promise<void> {
   const startChapter = (arcNumber - 1) * 20 + 1;
   const endChapter = Math.min(arcNumber * 20, totalPlanned);
@@ -422,9 +452,22 @@ Yêu cầu:
 - KHÔNG MỞ THÊM THREAD MỚI LỚN ("new_threads" chỉ nên là các tình tiết dẫn tới final boss/climax).
 - Gom các nhân vật lại gần nhau để chuẩn bị cho đại chiến/sự kiện cuối cùng.` : '';
 
+  // StoryVision injection for directional coherence
+  let visionBlock = '';
+  if (storyVision) {
+    const vParts: string[] = ['[STORY VISION — HƯỚNG ĐI TỔNG THỂ]'];
+    if (storyVision.mainConflict) vParts.push(`Xung đột chính: ${storyVision.mainConflict}`);
+    if (storyVision.endGoal) vParts.push(`Mục tiêu cuối: ${storyVision.endGoal}`);
+    if (storyVision.endingVision) vParts.push(`Kết cục: ${storyVision.endingVision}`);
+    if (storyVision.majorPlotPoints?.length) {
+      vParts.push('Plot points: ' + storyVision.majorPlotPoints.slice(0, 6).join(' → '));
+    }
+    visionBlock = vParts.join('\n') + '\n\n';
+  }
+
   const prompt = `Bạn là Story Architect cho truyện ${genre}.
 
-${synopsis ? `TỔNG QUAN:\n${synopsis}\n\n` : ''}${storyBible ? `STORY BIBLE:\n${storyBible.slice(0, 2000)}\n\n` : ''}
+${visionBlock}${synopsis ? `TỔNG QUAN:\n${synopsis}\n\n` : ''}${storyBible ? `STORY BIBLE:\n${storyBible.slice(0, 2000)}\n\n` : ''}
 Lập kế hoạch ARC ${arcNumber} (chương ${startChapter}-${endChapter}) cho ${protagonistName}.
 Tổng dự kiến: ${totalPlanned} chương.${closingInstruction}
 
