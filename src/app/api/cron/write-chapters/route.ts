@@ -186,21 +186,22 @@ async function ensureDailyQuotasForActiveProjects(
   projects: Array<{ id: string }>,
   vnDate: string,
   dayStartIso: string,
-  dayEndIso: string,
-  now: Date
+  _dayEndIso: string,
+  _now: Date
 ): Promise<void> {
   if (projects.length === 0) return;
 
   const dayStartMs = new Date(dayStartIso).getTime();
-  const dayEndMs = new Date(dayEndIso).getTime();
-  const nowMs = now.getTime();
-  const minutesLeft = Math.max(1, Math.floor((dayEndMs - nowMs) / 60000));
-  const spacing = clamp(Math.floor(minutesLeft / DAILY_CHAPTER_QUOTA), 5, 72);
+
+  // Spread 20 chapters evenly across 24h → 1 chapter every 72 minutes.
+  // Each project gets a deterministic first-slot offset within [0, 72) minutes
+  // from the start of the VN day, so they don't all fire at once.
+  const cadenceMinutes = Math.floor(1440 / DAILY_CHAPTER_QUOTA); // 72 min
 
   const rows = projects.map((p) => {
     const seed = hashStringToInt(`${p.id}:${vnDate}`);
-    const offsetMinutes = seed % spacing;
-    const nextDueMs = Math.max(dayStartMs, nowMs) + offsetMinutes * 60 * 1000;
+    const offsetMinutes = seed % cadenceMinutes;
+    const nextDueMs = dayStartMs + offsetMinutes * 60 * 1000;
     return {
       project_id: p.id,
       vn_date: vnDate,
@@ -222,6 +223,76 @@ async function ensureDailyQuotasForActiveProjects(
   }
 }
 
+/**
+ * Update quota IMMEDIATELY after a chapter is written or a task fails.
+ * This runs inside each task, NOT at end of function, so it survives Vercel timeout.
+ */
+async function updateQuotaAfterWrite(
+  supabase: ReturnType<typeof getSupabaseAdmin>,
+  projectId: string,
+  vnDate: string,
+  endIso: string,
+): Promise<void> {
+  // Read current quota to get written_chapters (atomic read-then-write)
+  const { data: q } = await supabase
+    .from('project_daily_quotas')
+    .select('written_chapters,target_chapters')
+    .eq('project_id', projectId)
+    .eq('vn_date', vnDate)
+    .maybeSingle();
+
+  if (!q) return;
+
+  const written = Math.min(q.target_chapters, q.written_chapters + 1);
+  const remaining = Math.max(0, q.target_chapters - written);
+
+  let status: 'active' | 'completed' = 'active';
+  let nextDueAt: string | null = null;
+
+  if (remaining <= 0) {
+    status = 'completed';
+  } else {
+    const endMs = new Date(endIso).getTime();
+    const nowMs = Date.now();
+    const minutesLeft = Math.max(5, Math.floor((endMs - nowMs) / 60000));
+    const cadence = clamp(Math.floor(minutesLeft / remaining), 5, 120);
+    const jitter = (hashStringToInt(`${projectId}:${written}:${vnDate}`) % 11) - 5;
+    const delayMinutes = Math.max(5, cadence + jitter);
+    nextDueAt = new Date(nowMs + delayMinutes * 60 * 1000).toISOString();
+  }
+
+  await supabase
+    .from('project_daily_quotas')
+    .update({
+      written_chapters: written,
+      status,
+      retry_count: 0,
+      last_error: null,
+      next_due_at: nextDueAt,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('project_id', projectId)
+    .eq('vn_date', vnDate);
+}
+
+async function updateQuotaAfterError(
+  supabase: ReturnType<typeof getSupabaseAdmin>,
+  projectId: string,
+  vnDate: string,
+  errorMsg: string,
+): Promise<void> {
+  await supabase
+    .from('project_daily_quotas')
+    .update({
+      retry_count: 1,
+      last_error: errorMsg.slice(0, 500),
+      next_due_at: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq('project_id', projectId)
+    .eq('vn_date', vnDate);
+}
+
 function computeDynamicResumeBatchSize(activeCount: number): number {
   // 288 ticks/day with 5-minute cron
   const requiredPerTick = Math.ceil((activeCount * DAILY_CHAPTER_QUOTA) / 288);
@@ -236,6 +307,8 @@ function computeDynamicResumeBatchSize(activeCount: number): number {
 async function prepareInitProject(
   project: ProjectRow,
   supabase: ReturnType<typeof getSupabaseAdmin>,
+  _vnDate: string,
+  _endIso: string,
 ): Promise<RunResult> {
   const novel = Array.isArray(project.novels) ? project.novels[0] : project.novels;
   if (!novel?.id) throw new Error('No novel linked');
@@ -296,12 +369,15 @@ async function prepareInitProject(
 /**
  * Write one chapter for a project (resume or init-write).
  * For init-write, arc plan must already exist.
+ * Updates quota IMMEDIATELY after success/failure (survives Vercel timeout).
  */
 async function writeOneChapter(
   project: ProjectRow,
   _geminiKey: string,
   supabase: ReturnType<typeof getSupabaseAdmin>,
-  tier: 'resume' | 'init-write'
+  tier: 'resume' | 'init-write',
+  vnDate: string,
+  endIso: string,
 ): Promise<RunResult> {
   const novel = Array.isArray(project.novels) ? project.novels[0] : project.novels;
   if (!novel?.id) throw new Error('No novel linked');
@@ -342,6 +418,11 @@ async function writeOneChapter(
       temperature: project.temperature || undefined,
       targetWordCount: project.target_chapter_length || undefined,
     });
+
+    // ====== QUOTA UPDATE — IMMEDIATELY after successful write ======
+    try {
+      await updateQuotaAfterWrite(supabase, project.id, vnDate, endIso);
+    } catch { /* non-fatal: don't fail the chapter because of quota */ }
 
     latestWrittenTitle = v2Result.title;
 
@@ -395,6 +476,12 @@ async function writeOneChapter(
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : String(err);
     console.error(`[${tier}][${project.id.slice(0, 8)}] V2 engine failed:`, errorMsg);
+
+    // ====== QUOTA ERROR — IMMEDIATELY after failure ======
+    try {
+      await updateQuotaAfterError(supabase, project.id, vnDate, errorMsg);
+    } catch { /* non-fatal */ }
+
     return {
       id: project.id,
       title: novel.title,
@@ -590,7 +677,7 @@ export async function GET(request: NextRequest) {
       // Tier 1: Resume projects (write next chapter)
       ...claimedResumeProjects.map(p => async (): Promise<RunResult> =>
         withTimeout(
-          writeOneChapter(p, geminiKey, supabase, 'resume'),
+          writeOneChapter(p, geminiKey, supabase, 'resume', vnDate, endIso),
           PROJECT_TIMEOUT_MS,
           { id: p.id, title: '?', tier: 'resume' as const, success: false, error: `Timeout after ${PROJECT_TIMEOUT_MS / 1000}s` }
         ).catch(err => ({
@@ -604,7 +691,7 @@ export async function GET(request: NextRequest) {
       // Tier 2: Init-prep projects (arc plan generation only, fast)
       ...claimedInitPrepProjects.map(p => async (): Promise<RunResult> =>
         withTimeout(
-          prepareInitProject(p, supabase),
+          prepareInitProject(p, supabase, vnDate, endIso),
           INIT_PREP_TIMEOUT_MS,
           { id: p.id, title: '?', tier: 'init-prep' as const, success: false, error: `Timeout after ${INIT_PREP_TIMEOUT_MS / 1000}s` }
         ).catch(err => ({
@@ -618,7 +705,7 @@ export async function GET(request: NextRequest) {
       // Tier 3: Init-write projects (arc plan exists, write ch.1)
       ...claimedInitWriteProjects.map(p => async (): Promise<RunResult> =>
         withTimeout(
-          writeOneChapter(p, geminiKey, supabase, 'init-write'),
+          writeOneChapter(p, geminiKey, supabase, 'init-write', vnDate, endIso),
           INIT_WRITE_TIMEOUT_MS,
           { id: p.id, title: '?', tier: 'init-write' as const, success: false, error: `Timeout after ${INIT_WRITE_TIMEOUT_MS / 1000}s` }
         ).catch(err => ({
@@ -633,66 +720,8 @@ export async function GET(request: NextRequest) {
 
     const summary: RunResult[] = await executeWithConcurrency(runTasks, RUN_CONCURRENCY);
 
-    // ====== QUOTA UPDATES ======
-    const quotaByProject = new Map(quotaRows.map((q) => [q.project_id, q]));
-
-    // Only update quota for projects that actually wrote a chapter
-    const quotaUpdates = summary
-      .filter((r) => r.id !== '?' && r.chapterWritten)
-      .map(async (r) => {
-        const q = quotaByProject.get(r.id);
-        if (!q) return;
-
-        const nowTick = new Date();
-        const written = Math.min(q.target_chapters, q.written_chapters + 1);
-        const remaining = Math.max(0, q.target_chapters - written);
-
-        let status: DailyQuotaRow['status'] = 'active';
-        let nextDueAt: string | null = q.next_due_at;
-
-        if (remaining <= 0) {
-          status = 'completed';
-          nextDueAt = null;
-        } else {
-          const endMs = new Date(endIso).getTime();
-          const nowMs = nowTick.getTime();
-          const minutesLeft = Math.max(5, Math.floor((endMs - nowMs) / 60000));
-          const cadence = clamp(Math.floor(minutesLeft / remaining), 5, 120);
-          const jitter = (hashStringToInt(`${r.id}:${written}:${vnDate}`) % 11) - 5;
-          const delayMinutes = Math.max(5, cadence + jitter);
-          nextDueAt = new Date(nowMs + delayMinutes * 60 * 1000).toISOString();
-        }
-
-        await supabase
-          .from('project_daily_quotas')
-          .update({
-            written_chapters: written,
-            status,
-            retry_count: 0,
-            last_error: null,
-            next_due_at: nextDueAt,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('project_id', r.id)
-          .eq('vn_date', vnDate);
-      });
-
-    const failedUpdates = summary
-      .filter((r) => r.id !== '?' && !r.success)
-      .map(async (r) => {
-        await supabase
-          .from('project_daily_quotas')
-          .update({
-            retry_count: 1,
-            last_error: (r.error || 'unknown').slice(0, 500),
-            next_due_at: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
-            updated_at: new Date().toISOString(),
-          })
-          .eq('project_id', r.id)
-          .eq('vn_date', vnDate);
-      });
-
-    await Promise.allSettled([...quotaUpdates, ...failedUpdates]);
+    // Quota updates already happened inside each task (writeOneChapter / prepareInitProject).
+    // No batch quota update needed here — survives Vercel timeout.
 
     const resumeSuccess = summary.filter(r => r.tier === 'resume' && r.success).length;
     const initPrepSuccess = summary.filter(r => r.tier === 'init-prep' && r.success).length;
