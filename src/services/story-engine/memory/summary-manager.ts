@@ -233,29 +233,33 @@ async function tryGenerateArcPlan(
       .eq('arc_number', arcNumber)
       .maybeSingle();
 
-    // Load master outline for world map
+    // Load master outline for world map (JSONB → stringify)
     const { data: masterRow } = await db
       .from('ai_story_projects')
       .select('master_outline')
       .eq('id', projectId)
       .maybeSingle();
+    const rawMO = masterRow?.master_outline;
+    const masterOutlineStr: string | undefined = rawMO
+      ? (typeof rawMO === 'string' ? rawMO : JSON.stringify(rawMO))
+      : undefined;
 
     await Promise.all([
       generateForeshadowingAgenda(
         projectId, arcNumber, arcStart, arcEnd, totalPlanned,
-        synRow?.synopsis_text, masterRow?.master_outline,
+        synRow?.synopsis_text, masterOutlineStr,
         openThreads, genre, config,
-      ).catch(() => {}),
+      ).catch((e) => console.warn(`[SummaryManager] Foreshadowing agenda failed for arc ${arcNumber}:`, e instanceof Error ? e.message : String(e))),
 
       generatePacingBlueprint(
         projectId, arcNumber, arcStart, arcEnd, genre,
         arcPlanRow?.plan_text, config,
-      ).catch(() => {}),
+      ).catch((e) => console.warn(`[SummaryManager] Pacing blueprint failed for arc ${arcNumber}:`, e instanceof Error ? e.message : String(e))),
 
       // World map: only initialize once (initializeWorldMap has internal guard)
       initializeWorldMap(
-        projectId, masterRow?.master_outline, genre, totalPlanned, config,
-      ).catch(() => {}),
+        projectId, masterOutlineStr, genre, totalPlanned, config,
+      ).catch((e) => console.warn(`[SummaryManager] World map init failed:`, e instanceof Error ? e.message : String(e))),
     ]);
   } catch {
     // Non-fatal

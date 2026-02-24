@@ -333,32 +333,32 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     // Task 7: Update foreshadowing status
     updateForeshadowingStatus(
       project.id, nextChapter,
-    ).catch(() => {}),
+    ).catch((e) => console.warn(`[Orchestrator] Task 7 foreshadowing status failed:`, e instanceof Error ? e.message : String(e))),
 
     // Task 8: Update character arcs
     updateCharacterArcs(
       project.id, nextChapter, characters, geminiConfig,
-    ).catch(() => {}),
+    ).catch((e) => console.warn(`[Orchestrator] Task 8 character arcs failed:`, e instanceof Error ? e.message : String(e))),
 
     // Task 9: Update voice fingerprint (every 10 chapters)
     updateVoiceFingerprint(
       project.id, novel.id, nextChapter, geminiConfig,
-    ).catch(() => {}),
+    ).catch((e) => console.warn(`[Orchestrator] Task 9 voice fingerprint failed:`, e instanceof Error ? e.message : String(e))),
 
     // Task 10: Update MC power state (every 3 chapters or on breakthrough)
     updateMCPowerState(
       project.id, nextChapter, result.content, protagonistName, genre, geminiConfig,
-    ).catch(() => {}),
+    ).catch((e) => console.warn(`[Orchestrator] Task 10 MC power failed:`, e instanceof Error ? e.message : String(e))),
 
     // Task 11: Update location exploration
     updateLocationExploration(
       project.id, nextChapter,
-    ).catch(() => {}),
+    ).catch((e) => console.warn(`[Orchestrator] Task 11 location exploration failed:`, e instanceof Error ? e.message : String(e))),
 
     // Task 12: Pre-generate upcoming location bible
     prepareUpcomingLocation(
       project.id, nextChapter, genre, context.synopsis, context.masterOutline, geminiConfig,
-    ).catch(() => {}),
+    ).catch((e) => console.warn(`[Orchestrator] Task 12 upcoming location failed:`, e instanceof Error ? e.message : String(e))),
   ]);
 
   // ── Step 7: Update project current_chapter ─────────────────────────────

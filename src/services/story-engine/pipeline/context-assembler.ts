@@ -72,7 +72,10 @@ export async function loadContext(
   const synopsis = synopsisResult?.data;
   const recentChapters = (recentResult?.data || []).reverse();
   const arc = arcResult?.data;
-  const masterOutline = masterOutlineResult?.data?.master_outline;
+  const rawMasterOutline = masterOutlineResult?.data?.master_outline;
+  const masterOutline = rawMasterOutline
+    ? (typeof rawMasterOutline === 'string' ? rawMasterOutline : JSON.stringify(rawMasterOutline))
+    : undefined;
   const storyOutline = masterOutlineResult?.data?.story_outline;
 
   // Build structured synopsis fields
