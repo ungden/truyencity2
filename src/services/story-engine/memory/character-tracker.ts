@@ -26,6 +26,29 @@ interface CharacterStateRow {
 
 const VALID_STATUSES = new Set(['alive', 'dead', 'missing', 'unknown']);
 
+/**
+ * Validate character name to filter garbage from AI extraction.
+ * Rejects: numbers only, single chars, special chars, generic labels, too long names.
+ */
+function isValidCharacterName(name: string): boolean {
+  if (!name || name.length < 2) return false;
+  if (name.length > 50) return false;
+  // Reject pure numbers (e.g., "001", "123")
+  if (/^\d+$/.test(name)) return false;
+  // Reject names that are just punctuation/special chars
+  if (/^[^a-zA-ZÀ-ỹ\u4e00-\u9fff]+$/.test(name)) return false;
+  // Reject generic AI labels
+  const genericLabels = new Set([
+    'unknown', 'null', 'none', 'n/a', 'unnamed', 'nhân vật', 'npc',
+    'người lạ', 'tên', 'character', 'protagonist', 'mc', 'main character',
+    'nhân vật chính', 'phản diện', 'villain', 'boss',
+  ]);
+  if (genericLabels.has(name.toLowerCase())) return false;
+  // Reject names starting with numbers followed by short text (e.g., "001_guard")
+  if (/^\d{2,}/.test(name)) return false;
+  return true;
+}
+
 // ── Public: Extract & Save Character States ──────────────────────────────────
 
 /**
@@ -49,7 +72,7 @@ export async function extractAndSaveCharacterStates(
     const prompt = `Trích xuất trạng thái TỪNG nhân vật xuất hiện trong chương. Trả về JSON array:
 [
   {
-    "character_name": "tên",
+    "character_name": "TÊN RIÊNG đầy đủ (VD: 'Lâm Phong', 'Aria', 'Tiêu Viêm'). CẤM dùng số, mã code, hoặc nhãn chung (NPC, guard, mob...)",
     "status": "alive|dead|missing|unknown",
     "power_level": "cảnh giới/sức mạnh hiện tại hoặc null",
     "power_realm_index": null,
@@ -60,7 +83,10 @@ export async function extractAndSaveCharacterStates(
 ]
 
 Nhân vật chính: ${protagonistName}
-Chỉ liệt kê nhân vật THỰC SỰ xuất hiện hoặc được nhắc đến.
+QUY TẮC:
+- Chỉ liệt kê nhân vật CÓ TÊN RIÊNG thực sự xuất hiện hoặc được nhắc đến.
+- CẤM dùng số (001, 123), mã code, hoặc mô tả chung ("người lạ", "guard", "NPC") làm character_name.
+- Nhân vật quần chúng/mob không có tên riêng → KHÔNG liệt kê.
 
 NỘI DUNG CHƯƠNG ${chapterNumber}:
 ${truncated}`;
@@ -82,9 +108,9 @@ ${truncated}`;
 
     if (!Array.isArray(states) || states.length === 0) return;
 
-    // Validate and clean
+    // Validate and clean — filter garbage names from AI extraction
     const rows = states
-      .filter(s => s.character_name && s.character_name.trim().length > 0)
+      .filter(s => s.character_name && isValidCharacterName(s.character_name.trim()))
       .map(s => ({
         project_id: projectId,
         chapter_number: chapterNumber,

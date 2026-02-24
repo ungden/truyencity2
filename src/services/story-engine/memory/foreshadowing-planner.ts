@@ -202,6 +202,17 @@ export async function getForeshadowingContext(
     }
   }
 
+  // Add overdue hint warnings
+  try {
+    const overdue = await getOverdueHints(projectId, chapterNumber);
+    if (overdue.length > 0) {
+      parts.push('═══ FORESHADOWING — SẮP HẾT HẠN ═══');
+      parts.push(...overdue);
+    }
+  } catch {
+    // Non-fatal
+  }
+
   return parts.length > 0 ? parts.join('\n') : null;
 }
 
@@ -214,6 +225,7 @@ export async function updateForeshadowingStatus(
   const db = getSupabase();
 
   // Mark planned hints around this chapter as planted
+  // (generous window: if chapter is within range, assume Architect/Writer included it)
   await db
     .from('foreshadowing_plans')
     .update({ status: 'planted' })
@@ -230,4 +242,50 @@ export async function updateForeshadowingStatus(
     .eq('status', 'planted')
     .lte('payoff_chapter', chapterNumber)
     .gte('payoff_chapter', chapterNumber - 5);
+
+  // Abandon stale hints: planned hints whose plant window has passed by >10 chapters
+  // These were never planted (Architect/Writer ignored them)
+  await db
+    .from('foreshadowing_plans')
+    .update({ status: 'abandoned' })
+    .eq('project_id', projectId)
+    .eq('status', 'planned')
+    .lt('plant_chapter', chapterNumber - 10);
+
+  // Abandon overdue payoff hints: planted hints whose payoff deadline passed by >20 chapters
+  // These were planted but never paid off — mark abandoned so they don't clog context
+  await db
+    .from('foreshadowing_plans')
+    .update({ status: 'abandoned' })
+    .eq('project_id', projectId)
+    .eq('status', 'planted')
+    .lt('payoff_chapter', chapterNumber - 20);
+}
+
+// ── Get Overdue Hints for Re-injection ───────────────────────────────────────
+
+/**
+ * Get hints that are planted but approaching their payoff deadline without resolution.
+ * Returns context string urging the Architect to resolve them soon.
+ * Called from getForeshadowingContext() to add urgency.
+ */
+async function getOverdueHints(
+  projectId: string,
+  chapterNumber: number,
+): Promise<string[]> {
+  const db = getSupabase();
+  const { data } = await db
+    .from('foreshadowing_plans')
+    .select('hint_text,payoff_chapter,payoff_description')
+    .eq('project_id', projectId)
+    .eq('status', 'planted')
+    .lte('payoff_chapter', chapterNumber + 15)
+    .gt('payoff_chapter', chapterNumber)
+    .order('payoff_chapter', { ascending: true });
+
+  if (!data?.length) return [];
+
+  return data.map(h =>
+    `⏰ OVERDUE HINT (payoff by ch.${h.payoff_chapter}): "${h.hint_text}" → "${h.payoff_description}". Cần bắt đầu setup payoff SỚM.`
+  );
 }

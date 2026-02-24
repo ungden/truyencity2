@@ -91,10 +91,11 @@ TIÊU CHÍ ĐÁNH GIÁ (thang 1-10):
 4. endingHookScore: Kết chương có lực kéo đọc tiếp? (sự tò mò, mong chờ kết quả hoặc cliffhanger)
 
 KIỂM TRA BỔ SUNG (BẮT BUỘC):
-5. COMEDY: Chương có ít nhất 1 khoảnh khắc hài hước tự nhiên không? (nội tâm tự giễu, não bổ, gap moe, vô sỉ). Nếu KHÔNG CÓ bất kỳ yếu tố hài nào → tạo issue type "quality", severity "major", description "Thiếu comedy beat — chương không có khoảnh khắc hài hước nào".
-6. LẶP TỪ: Đếm các tính từ/trạng từ/màu sắc xuất hiện nhiều nhất. Nếu BẤT KỲ từ nào xuất hiện >5 lần → tạo issue type "quality", severity "major", mô tả từ bị lặp và số lần. Nếu >8 lần → severity "critical".
-7. NỘI TÂM ĐA LỚP: Chương có ít nhất 2 đoạn nội tâm đi sâu hơn bề mặt không? (không chỉ "anh cảm thấy đau" mà phải tả cụ thể cảm giác, ký ức liên quan, nỗi sợ ẩn giấu). Nếu thiếu → tạo issue type "quality", severity "moderate".
-8. GIỌNG NÓI NHÂN VẬT: Các nhân vật có giọng nói khác biệt nhau không? Nếu bỏ tên đi mà không phân biệt được ai nói → tạo issue type "dialogue", severity "moderate".
+5. COMEDY: Chương có ít nhất 1 khoảnh khắc hài hước tự nhiên không? (nội tâm tự giễu, não bổ, gap moe, vô sỉ). Nếu KHÔNG CÓ bất kỳ yếu tố hài nào → tạo issue type "quality", severity "moderate", description "Thiếu comedy beat". CHỈ severity "major" nếu đây là chương đối thoại/sinh hoạt mà vẫn hoàn toàn không hài.
+6. LẶP TỪ: Dùng BÁO CÁO LẶP TỪ tự động. Nếu BẤT KỲ từ nào xuất hiện >8 lần → issue severity "critical". Nếu >5 lần → severity "moderate" (CHỈ "major" nếu ≥3 nhóm từ đều >5 lần).
+7. NỘI TÂM ĐA LỚP: Chương có ít nhất 1 đoạn nội tâm đi sâu hơn bề mặt không? Nếu thiếu → tạo issue type "quality", severity "minor". CHỈ severity "moderate" nếu toàn bộ chương đều nội tâm 1 lớp.
+8. GIỌNG NÓI NHÂN VẬT: Nếu ≥3 nhân vật nói giống hệt nhau → issue type "dialogue", severity "moderate". Nếu chỉ 2 nhân vật → "minor".
+9. SUBTEXT HỘI THOẠI: Nếu >50% đối thoại quan trọng là hỏi-đáp thẳng tuột (A hỏi, B trả lời đầy đủ) → issue type "dialogue", severity "minor". CHỈ "moderate" nếu toàn bộ đối thoại đều nói thẳng.
 
 ISSUES: Liệt kê vấn đề (pacing/consistency/dopamine/quality/word_count/dialogue/continuity)
 
@@ -108,7 +109,7 @@ VERDICT:
 - APPROVE (overallScore >= 6 VÀ đủ từ): approved=true, requiresRewrite=false
 - REVISE (4-5): approved=false, requiresRewrite=false
 - REWRITE (<=3 HOẶC <60% target words HOẶC continuity critical/major HOẶC thiếu ending hook ở non-finale): approved=false, requiresRewrite=true
-- LƯU Ý: Nếu có ≥2 issues severity "major" (kể cả comedy, lặp từ, nội tâm) → overallScore giảm tối thiểu 1 điểm.
+- LƯU Ý: Nếu có ≥3 issues severity "major" hoặc ≥1 "critical" → overallScore giảm tối thiểu 1 điểm. Issues severity "moderate" KHÔNG ảnh hưởng overallScore — chỉ ghi nhận để cải thiện dần.
 
 LƯU Ý THỂ LOẠI:
 - Truyện kinh doanh/điền viên/sinh hoạt KHÔNG CẦN cliffhanger nguy hiểm, chỉ cần "Ending Hook" gây tò mò, mong đợi kết quả. KHÔNG đánh lỗi pacing nếu truyện nhịp độ chậm ấm áp.
@@ -267,8 +268,9 @@ NGÂN SÁCH SỨC MẠNH (BẮT BUỘC):
 - KHÔNG dùng cliffhanger — kết thúc thỏa mãn
 - Nếu đây là chương cuối cùng: viết epilogue, giải quyết mọi xung đột
 - Nếu gần cuối: có thể dùng mild suspense nhưng không mở plot thread mới`
-    : `CLIFFHANGER TECHNIQUES (chọn 1 cho cuối chương):
-${CLIFFHANGER_TECHNIQUES.map((c: { name: string; example: string }) => '- ' + c.name + ': ' + c.example).join('\n')}`;
+    : `CLIFFHANGER TECHNIQUES (chọn 1 — CẤM LẶP loại đã dùng gần đây):
+${CLIFFHANGER_TECHNIQUES.map((c: { name: string; example: string }) => '- ' + c.name + ': ' + c.example).join('\n')}
+⚠️ QUAN TRỌNG: Context đã liệt kê [CLIFFHANGER ĐÃ DÙNG]. Bạn PHẢI chọn loại KHÁC. Nếu 3 chương gần nhất đều dùng Threat → chọn Revelation/Choice/Pending Result/v.v.`;
 
   const prompt = `Lên kế hoạch cho CHƯƠNG ${chapterNumber}.
 
@@ -440,8 +442,15 @@ KỸ THUẬT CÂU CHƯƠNG (BẮT BUỘC ÁP DỤNG ĐỂ ĐẠT ĐỘ DÀI):
 - 🧠 ${SCENE_EXPANSION_RULES.expansionTechniques.find(t => t.name === 'InnerMonologueLayers')?.description}: ${SCENE_EXPANSION_RULES.expansionTechniques.find(t => t.name === 'InnerMonologueLayers')?.example}
 - 👥 ${SCENE_EXPANSION_RULES.expansionTechniques.find(t => t.name === 'BystanderReactions')?.description}: ${SCENE_EXPANSION_RULES.expansionTechniques.find(t => t.name === 'BystanderReactions')?.example}
 
-HỘI THOẠI KẸP DAO (SUBTEXT):
+HỘI THOẠI KẸP DAO (SUBTEXT — CỰC KỲ QUAN TRỌNG):
 ${SUBTEXT_DIALOGUE_RULES.rules.map(r => `- ${r}`).join('\n')}
+
+KỸ THUẬT SUBTEXT CỤ THỂ (chọn ít nhất 2 cho mỗi chương):
+- Nói A hiểu B: Nhân vật nói về thời tiết nhưng thực ra đang nói về quan hệ ("Trời sắp đổi gió rồi" = "Phe ta sắp thay đổi")
+- Trả lời bằng hành động: Thay vì "Tôi đồng ý" → nhân vật lặng lẽ rót trà thêm cho đối phương
+- Im lặng có ý nghĩa: Dừng giữa câu, nhìn ra cửa sổ 3 giây, rồi đổi chủ đề = đang giấu điều gì đó
+- Lời nói VS hành động mâu thuẫn: "Tôi không quan tâm" nhưng tay siết chặt tách trà đến nứt
+- Hỏi để đe dọa: "Gia đình con ngươi vẫn ở thành Lâm An chứ?" = đe dọa ngầm
 
 TẤU HÀI WEBNOVEL (COMEDY MECHANICS):
 - ${COMEDY_MECHANICS_RULES.description}
@@ -587,11 +596,11 @@ KIỂM TRA MÂU THUẪN (BẮT BUỘC):
 - Nếu nhân vật hành xử trái ngược hoàn toàn với tính cách -> type "continuity", severity "major", requiresRewrite=true
 
 KIỂM TRA CHẤT LƯỢNG BỔ SUNG (BẮT BUỘC):
-- COMEDY: Nếu chương KHÔNG có khoảnh khắc hài hước nào → issue type "quality", severity "major"
-- LẶP TỪ: Dùng BÁO CÁO LẶP TỪ ở trên. Nếu có từ >5 lần → issue type "quality", severity "major". Nếu >8 lần → severity "critical", requiresRewrite=true
-- NỘI TÂM: Nếu không có đoạn nội tâm đi sâu hơn bề mặt → issue type "quality", severity "moderate"
-- GIỌNG NÓI: Nếu các nhân vật nói giống nhau → issue type "dialogue", severity "moderate"
-- NHỊP ĐIỆU: Nếu toàn bộ scenes đều cùng cường độ cao (không có scene chậm) → pacingScore tối đa 5`;
+- COMEDY: Nếu KHÔNG có hài hước → issue severity "moderate". CHỈ "major" nếu chương sinh hoạt/đối thoại mà không hài.
+- LẶP TỪ: Dùng BÁO CÁO LẶP TỪ ở trên. >8 lần → severity "critical", requiresRewrite=true. >5 lần → severity "moderate". CHỈ "major" nếu ≥3 nhóm từ đều >5.
+- NỘI TÂM: Nếu thiếu nội tâm đa lớp → severity "minor". CHỈ "moderate" nếu toàn bộ chương không có.
+- GIỌNG NÓI: ≥3 nhân vật giống nhau → severity "moderate". 2 nhân vật → "minor".
+- NHỊP ĐIỆU: Toàn bộ scenes cùng cường độ → pacingScore tối đa 5`;
 
   try {
     const res = await callGemini(prompt, { ...config, temperature: 0.2, maxTokens: 4096, systemPrompt: CRITIC_SYSTEM }, { jsonMode: true });
@@ -638,17 +647,15 @@ KIỂM TRA CHẤT LƯỢNG BỔ SUNG (BẮT BUỘC):
       for (const ri of repetitionIssues) {
         parsed.issues.push(ri);
       }
-      // Only force rewrite for critical repetition (8+ occurrences)
+      // Only force rewrite for critical repetition (generic 8+ or plot_element 12+)
       const hasCritical = repetitionIssues.some(ri => ri.severity === 'critical');
       if (hasCritical) {
         parsed.requiresRewrite = true;
         parsed.approved = false;
         const repetitionGuide = repetitionIssues.map(ri => ri.description).join('; ');
         parsed.rewriteInstructions = (parsed.rewriteInstructions || '') + ` Sửa lặp từ: ${repetitionGuide}`;
-      } else {
-        // Major repetition: penalize score but don't force rewrite
-        parsed.overallScore = Math.min(parsed.overallScore || 10, parsed.overallScore - 1);
       }
+      // Moderate repetition: just log, don't penalize score (Critic already sees report)
     }
 
     // Hard enforcement for non-finale chapters: ending hook is required
@@ -800,43 +807,55 @@ function countWords(text: string): number {
 /**
  * Detect severe word repetition and return CriticIssue objects.
  * Used for hard enforcement in runCritic.
+ *
+ * Words are categorized:
+ * - 'generic': colors, adjectives, emotions — strict thresholds (5=moderate, 8=critical)
+ * - 'plot_element': words that may naturally recur as plot elements — relaxed thresholds (8=moderate, 12=critical)
  */
 function detectSevereRepetition(content: string): CriticIssue[] {
   const text = content.toLowerCase();
   const issues: CriticIssue[] = [];
 
-  const tracked: Record<string, string[]> = {
-    'tím sẫm': ['tím sẫm', 'tím đen', 'sắc tím'],
-    'vàng kim': ['vàng kim', 'ánh vàng kim'],
-    'đỏ rực': ['đỏ rực', 'đỏ thẫm', 'đỏ rỉ sét'],
-    'rực rỡ': ['rực rỡ'],
-    'kinh hoàng': ['kinh hoàng', 'kinh hãi', 'kinh ngạc'],
-    'pixel hóa': ['pixel hóa', 'pixel'],
-    'rỉ sét': ['rỉ sét'],
-    'ken két': ['ken két'],
-    'đặc quánh': ['đặc quánh'],
-    'mờ ảo': ['mờ ảo', 'mờ nhạt'],
-    'bùng phát': ['bùng phát', 'bùng nổ'],
+  const tracked: Record<string, { variants: string[]; category: 'generic' | 'plot_element' }> = {
+    'tím sẫm': { variants: ['tím sẫm', 'tím đen', 'sắc tím'], category: 'generic' },
+    'vàng kim': { variants: ['vàng kim', 'ánh vàng kim'], category: 'generic' },
+    'đỏ rực': { variants: ['đỏ rực', 'đỏ thẫm'], category: 'generic' },
+    'rực rỡ': { variants: ['rực rỡ'], category: 'generic' },
+    'kinh hoàng': { variants: ['kinh hoàng', 'kinh hãi', 'kinh ngạc'], category: 'generic' },
+    'sững sờ': { variants: ['sững sờ', 'sững người'], category: 'generic' },
+    'mờ ảo': { variants: ['mờ ảo', 'mờ nhạt'], category: 'generic' },
+    'đặc quánh': { variants: ['đặc quánh'], category: 'generic' },
+    'bùng phát': { variants: ['bùng phát', 'bùng nổ'], category: 'generic' },
+    'ken két': { variants: ['ken két'], category: 'generic' },
+    // Plot element words — naturally recur more often
+    'pixel hóa': { variants: ['pixel hóa', 'pixel'], category: 'plot_element' },
+    'rỉ sét': { variants: ['rỉ sét'], category: 'plot_element' },
+    'linh khí': { variants: ['linh khí'], category: 'plot_element' },
+    'đan điền': { variants: ['đan điền'], category: 'plot_element' },
   };
 
-  for (const [groupName, variants] of Object.entries(tracked)) {
+  for (const [groupName, { variants, category }] of Object.entries(tracked)) {
     let total = 0;
     for (const variant of variants) {
       const regex = new RegExp(variant, 'gi');
       const matches = text.match(regex);
       if (matches) total += matches.length;
     }
-    if (total >= 8) {
+
+    const criticalThreshold = category === 'plot_element' ? 12 : 8;
+    const moderateThreshold = category === 'plot_element' ? 8 : 5;
+
+    if (total >= criticalThreshold) {
       issues.push({
         type: 'quality',
-        description: `Lặp từ nghiêm trọng: "${groupName}" xuất hiện ${total} lần. Thay bằng từ đồng nghĩa hoặc miêu tả gián tiếp.`,
+        description: `Lặp từ nghiêm trọng: "${groupName}" xuất hiện ${total} lần (${category === 'plot_element' ? 'plot keyword, ngưỡng cao' : 'generic'}). Thay bằng từ đồng nghĩa hoặc miêu tả gián tiếp.`,
         severity: 'critical',
       });
-    } else if (total >= 5) {
+    } else if (total >= moderateThreshold) {
       issues.push({
         type: 'quality',
-        description: `Lặp từ: "${groupName}" xuất hiện ${total} lần. Giảm xuống tối đa 3 lần, dùng từ thay thế.`,
-        severity: 'major',
+        description: `Lặp từ: "${groupName}" xuất hiện ${total} lần. Giảm xuống tối đa ${category === 'plot_element' ? '6' : '3'} lần, dùng từ thay thế.`,
+        severity: 'moderate',
       });
     }
   }

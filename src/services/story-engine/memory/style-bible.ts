@@ -52,11 +52,23 @@ export interface EnhancedStyleBible {
 }
 
 export const CLIFFHANGER_TECHNIQUES = [
-  { name: 'Revelation', example: 'MC phát hiện bí mật động trờii' },
+  // Action/Suspense
+  { name: 'Revelation', example: 'MC phát hiện bí mật động trời' },
   { name: 'Threat', example: 'Kẻ thù mạnh xuất hiện đột ngột' },
   { name: 'Choice', example: 'MC phải chọn giữa hai điều quan trọng' },
   { name: 'Discovery', example: 'Tìm thấy vật phẩm/cổ vật bí ẩn' },
-  { name: 'Promise', example: 'Lờii hứa/hẹn gặp lại đầy nguy hiểm' },
+  { name: 'Promise', example: 'Lời hứa/hẹn gặp lại đầy nguy hiểm' },
+  // Business/Slice-of-life
+  { name: 'Pending Result', example: 'Kết quả đấu thầu/thi đấu sắp công bố, chưa biết thắng thua' },
+  { name: 'Unexpected Visitor', example: 'Có người gõ cửa/gọi điện bất ngờ cuối chương' },
+  { name: 'Hidden Cost', example: 'MC thắng lớn nhưng phát hiện cái giá phải trả' },
+  // Emotional/Relationship
+  { name: 'Confession', example: 'Nhân vật sắp nói ra sự thật/tình cảm, chương kết trước khi nói xong' },
+  { name: 'Betrayal Hint', example: 'MC phát hiện manh mối đồng minh có thể phản bội' },
+  { name: 'Return', example: 'Nhân vật tưởng đã mất/rời đi bất ngờ xuất hiện lại' },
+  // Mystery/Knowledge
+  { name: 'Forbidden Knowledge', example: 'MC vô tình đọc/nghe được thông tin không nên biết' },
+  { name: 'Pattern Break', example: 'Quy luật đã thiết lập bị phá vỡ, chưa rõ nguyên nhân' },
 ];
 
 const DEFAULT_VOCABULARY: VocabularyGuide = {

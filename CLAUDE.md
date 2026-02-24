@@ -58,6 +58,19 @@ Scored chapters 160-163 against 10-dimension rubric comparing to đại thần a
 
 **Estimated improvement**: 58/100 → 68-72/100.
 
+### Quality Stabilization Round 2 (2026-02-24)
+
+6 fixes addressing post-audit issues (Critic paradox, false positives, data quality, subtext, foreshadowing, cliffhanger):
+
+- **P1: Critic Calibration** — Quality checks (comedy, inner monologue, voice) downgraded from `major` to `moderate` severity. Only `critical` or `≥3 major` penalize overallScore. Prevents unnecessary rewrites on decent chapters (Ch164 scored 5/10 due to over-strict checks).
+- **P2: Contextual Repetition** — `detectSevereRepetition()` now categorizes words: `generic` (tím sẫm, kinh hoàng) keeps strict thresholds (5/8), `plot_element` (rỉ sét, pixel hóa, linh khí, đan điền) uses relaxed thresholds (8/12). Prevents false positives on plot keywords.
+- **P3: Character Name Validation** — Added `isValidCharacterName()` filter in character-tracker.ts. Rejects numbers-only ('001'), single chars, generic labels ('NPC', 'villain'), too-long names. Improved AI prompt to explicitly prohibit non-name extractions.
+- **P4: Dialogue Subtext** — Enhanced Writer prompt with 5 concrete subtext techniques (Nói A hiểu B, trả lời bằng hành động, im lặng có nghĩa, lời nói VS hành động mâu thuẫn, hỏi để đe dọa). Added Critic check #9 for straight Q&A dialogue detection.
+- **P5: Foreshadowing Lifecycle** — Added stale hint abandonment: planned hints >10 chapters overdue auto-abandon, planted hints >20 chapters past payoff deadline auto-abandon. Added overdue hint urgency warnings in `getForeshadowingContext()`.
+- **P6: Cliffhanger Variety** — Expanded `CLIFFHANGER_TECHNIQUES` from 5→13 types (added business/emotional/mystery categories). Architect prompt now explicitly requires choosing a DIFFERENT type from recent chapters.
+
+**Files modified**: chapter-writer.ts, character-tracker.ts, foreshadowing-planner.ts, style-bible.ts, CLAUDE.md
+
 ### Qidian Master Update (2026-02-22)
 - **Master Outline System:** Added `generateMasterOutline` which runs in the background upon project creation to build a 2000-chapter skeleton (main plot, final boss, world map). Injected as Layer 0.5 in Context Assembler.
 - **Scene Expansion Rules:** Enforced 5-senses description, layered inner monologues, and bystander reactions to reach natural 2500+ word counts (Anti-summarize).
