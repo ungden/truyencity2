@@ -1463,6 +1463,17 @@ export const ANTI_CLICHE_RULES = {
     'Cảm thấy một luồng',
   ],
   guidance: 'Thay vì dùng các từ cấm, hãy MÔ TẢ hệ quả của chúng. Ví dụ: thay vì "hít một ngụm khí lạnh", tả "sắc mặt tái nhợt, lùi lại nửa bước". Thay vì "đột nhiên", tả trực tiếp âm thanh/hình ảnh cắt ngang.',
+  colorRepetitionRule: `QUY TẮC LẶP MÀU SẮC & TÍNH TỪ (CỰC KỲ QUAN TRỌNG):
+- KHÔNG dùng cùng một tính từ/trạng từ/cụm miêu tả màu sắc quá 3 lần trong MỘT chương.
+- Sau lần thứ 3, BẮT BUỘC dùng từ đồng nghĩa, ẩn dụ, hoặc miêu tả gián tiếp.
+- Ví dụ thay thế:
+  + "tím sẫm" lần 4+ → "màu bầm tím trên da", "sắc hoàng hôn pha loãng", "như mực cũ loang trên giấy", "tối như đáy vực"
+  + "vàng kim" lần 4+ → "màu nắng chói chang", "rực như hoàng hôn sa mạc", "sắc mật ong đặc quánh", "lấp lánh tựa kim sa"
+  + "rực rỡ" lần 4+ → "chói mắt", "tỏa sáng rạng ngời", "lóa mắt", "rực lửa"
+  + "kinh hoàng" lần 4+ → "ớn lạnh", "máu đông cứng", "hồn vía lên mây", "tim nhảy khỏi lồng ngực"
+  + "pixel hóa" lần 4+ → "tan rã thành điểm ảnh", "vỡ vụn thành hạt sáng", "phân giải", "bị số hóa cưỡng ép"
+- Các từ THƯỜNG BỊ LẶP cần chú ý: rỉ sét, ken két, rực rỡ, đặc quánh, mờ ảo, chập chờn, kinh hoàng, kinh ngạc, khủng bố, sững sờ
+- TUYỆT ĐỐI KHÔNG dùng cùng tính từ 2 lần trong 1 đoạn văn (paragraph).`,
 };
 
 // ============================================================================

@@ -89,6 +89,10 @@ export interface ChapterOutline {
   dopaminePoints: DopaminePoint[];
   /** Emotional arc for the chapter - guides tone shifts */
   emotionalArc?: EmotionalArc;
+  /** Comedy beat plan - what type (não bổ/vô sỉ/phản kém/nội tâm tự giễu) and which scene */
+  comedyBeat?: string;
+  /** Which scene number is the slow/breathing scene for pacing contrast */
+  slowScene?: string;
   cliffhanger: string;
   targetWordCount: number;
 }

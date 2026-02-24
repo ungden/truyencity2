@@ -21,13 +21,19 @@ export function extractJSON(text: string): string {
 
 /**
  * Parse JSON with repair for truncated Gemini responses.
+ * Handles Gemini's habit of wrapping JSON objects in arrays: [{...}] → {...}
  */
 export function parseJSON<T>(text: string): T | null {
   const raw = extractJSON(text);
 
   // Try direct parse first
   try {
-    return JSON.parse(raw) as T;
+    const parsed = JSON.parse(raw);
+    // Unwrap single-element array (Gemini sometimes returns [{...}] instead of {...})
+    if (Array.isArray(parsed) && parsed.length === 1 && typeof parsed[0] === 'object') {
+      return parsed[0] as T;
+    }
+    return parsed as T;
   } catch {
     // Fall through to repair
   }
@@ -35,7 +41,12 @@ export function parseJSON<T>(text: string): T | null {
   // Attempt repair
   try {
     const repaired = repairTruncatedJSON(raw);
-    return JSON.parse(repaired) as T;
+    const parsed = JSON.parse(repaired);
+    // Unwrap single-element array after repair
+    if (Array.isArray(parsed) && parsed.length === 1 && typeof parsed[0] === 'object') {
+      return parsed[0] as T;
+    }
+    return parsed as T;
   } catch {
     return null;
   }

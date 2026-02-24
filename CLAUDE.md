@@ -42,6 +42,22 @@ src/services/story-engine/
 ```
 
 
+### Quality Audit & Đại Thần Level Fixes (2026-02-24)
+
+**Full audit report**: `docs/quality-audit-v1.md`
+
+Scored chapters 160-163 against 10-dimension rubric comparing to đại thần authors. **Overall: 5.8/10** ("competent but clearly AI-generated"). Implemented 5 fixes targeting the biggest gaps:
+
+- **P0: Anti-Repetition System** — Added `colorRepetitionRule` to `ANTI_CLICHE_RULES` in templates.ts. Added `buildRepetitionReport()` (JS word frequency analyzer) and `detectSevereRepetition()` (hard enforcement) in chapter-writer.ts. Critic now receives automated repetition report. Words appearing 8+ times trigger forced rewrite; 5+ times trigger score penalty.
+- **P1: Mandatory Comedy** — Added rule 10 to ARCHITECT_SYSTEM requiring `comedyBeat` field in outline JSON. Writer prompt now enforces comedy beat per chapter. Critic checks for humor and creates major issue if absent.
+- **P2: Pacing Variety** — Added rule 9 to ARCHITECT_SYSTEM requiring `slowScene` field (at least 1 slow/breathing scene per chapter). Writer prompt enforces rhythm diversity. Critic caps pacingScore at 5 if all scenes are same intensity.
+- **P3: Character Voice Differentiation** — Rewrote `buildCharacterVoiceGuide()` with concrete speech rules per role (MC: short/direct/self-deprecating, AI companion: technical/sarcastic, high-level villain: polite/metaphorical, low-level villain: crude/short, etc.).
+- **P4: Emotional Depth** — Added "3-layer inner monologue" rule to WRITER_SYSTEM with concrete example. Critic checks for multi-layered inner thoughts and creates moderate issue if absent.
+
+**New types**: `comedyBeat?: string` and `slowScene?: string` added to `ChapterOutline` in types.ts.
+
+**Estimated improvement**: 58/100 → 68-72/100.
+
 ### Qidian Master Update (2026-02-22)
 - **Master Outline System:** Added `generateMasterOutline` which runs in the background upon project creation to build a 2000-chapter skeleton (main plot, final boss, world map). Injected as Layer 0.5 in Context Assembler.
 - **Scene Expansion Rules:** Enforced 5-senses description, layered inner monologues, and bystander reactions to reach natural 2500+ word counts (Anti-summarize).
