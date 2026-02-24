@@ -67,3 +67,5 @@ next-env.d.ts
 /mobile/android/
 /mobile/node_modules/
 /mobile/.expo/
+/mobile/credentials.json
+/mobile/fastlane_certs/
