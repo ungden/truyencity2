@@ -44,8 +44,12 @@ function isValidCharacterName(name: string): boolean {
     'nhân vật chính', 'phản diện', 'villain', 'boss',
   ]);
   if (genericLabels.has(name.toLowerCase())) return false;
-  // Reject names starting with numbers followed by short text (e.g., "001_guard")
+  // Reject names starting with numbers followed by short text (e.g., "001_guard", "12 Ám Vệ")
   if (/^\d{2,}/.test(name)) return false;
+  // Reject group descriptions containing parentheses (e.g., "Đám đông tu sĩ (Tu sĩ trung niên, Thiếu niên tu sĩ)")
+  if (name.includes('(') && name.includes(')')) return false;
+  // Reject names containing comma-separated lists (e.g., "A, B, C")
+  if ((name.match(/,/g) || []).length >= 2) return false;
   return true;
 }
 

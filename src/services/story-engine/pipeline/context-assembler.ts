@@ -358,6 +358,11 @@ QUY TẮC CLIFFHANGER:
     parsed.openingSentence = content.slice(0, 160).trim();
   }
 
+  if (!parsed.mcState?.trim()) {
+    // Fallback: extract MC state from the tail of the chapter
+    parsed.mcState = extractFallbackMcState(content, protagonistName);
+  }
+
   if (!allowEmptyCliffhanger && !parsed.cliffhanger?.trim()) {
     parsed.cliffhanger = extractFallbackCliffhanger(content);
   }
@@ -389,6 +394,55 @@ function extractFallbackCliffhanger(content: string): string {
   }
 
   return sentences[sentences.length - 1] || 'Biến cố cuối chương vẫn chưa ngã ngũ.';
+}
+
+/**
+ * Extract a basic MC state from the chapter tail when AI fails to provide one.
+ * Looks for cultivation/power keywords, location hints, and condition markers.
+ */
+function extractFallbackMcState(content: string, protagonistName: string): string {
+  const tail = content.slice(-2000).toLowerCase();
+
+  // Try to find cultivation/power level mentions
+  const powerKeywords = [
+    'cảnh giới', 'đột phá', 'luyện khí', 'trúc cơ', 'kim đan', 'nguyên anh',
+    'hóa thần', 'luyện hư', 'độ kiếp', 'đại thừa', 'tiên nhân',
+    'cấp bậc', 'rank', 'level', 'bậc',
+  ];
+  const locationKeywords = ['đang ở', 'tại', 'quay về', 'rời khỏi', 'đến'];
+  const conditionKeywords = ['bị thương', 'hồi phục', 'mệt mỏi', 'tỉnh lại', 'ngất', 'khỏe mạnh'];
+
+  const parts: string[] = [];
+
+  // Check for power/cultivation state
+  for (const kw of powerKeywords) {
+    const idx = tail.lastIndexOf(kw);
+    if (idx >= 0) {
+      // Extract surrounding context (up to 80 chars)
+      const start = Math.max(0, idx - 20);
+      const end = Math.min(tail.length, idx + kw.length + 60);
+      const snippet = content.slice(content.length - 2000 + start, content.length - 2000 + end).trim();
+      if (snippet.length > 10) {
+        parts.push(snippet.replace(/\n/g, ' ').slice(0, 100));
+        break;
+      }
+    }
+  }
+
+  // Check for condition
+  for (const kw of conditionKeywords) {
+    if (tail.includes(kw)) {
+      parts.push(kw);
+      break;
+    }
+  }
+
+  if (parts.length > 0) {
+    return `${protagonistName}: ${parts.join(', ')}`;
+  }
+
+  // Last resort: generic state
+  return `${protagonistName} cuối chương — xem nội dung để biết chi tiết`;
 }
 
 // ── Post-Write: Generate Synopsis ────────────────────────────────────────────

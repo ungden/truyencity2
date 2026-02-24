@@ -98,6 +98,17 @@ export async function runSummaryTasks(
       );
     }
 
+    // 3b. Quality module catch-up: on the first chapter of each arc (ch 21, 41, 61...),
+    //     ensure quality modules exist for the CURRENT arc. This handles the case where
+    //     arc plans were generated before quality module code was deployed, so their
+    //     foreshadowing/pacing/worldmap were never created.
+    if (chapterNumber > 1 && (chapterNumber - 1) % ARC_SIZE === 0) {
+      const currentArc = Math.ceil(chapterNumber / ARC_SIZE);
+      await tryEnsureQualityModules(
+        projectId, currentArc, genre, totalPlannedChapters, config,
+      );
+    }
+
     // 4. Story Bible: generate at chapter 3, refresh periodically
     if (chapterNumber === BIBLE_TRIGGER) {
       await tryGenerateStoryBible(projectId, novelId, genre, protagonistName, worldDescription, config);
@@ -178,40 +189,41 @@ async function tryGenerateArcPlan(
       .eq('arc_number', arcNumber)
       .maybeSingle();
 
-    if (existing) return; // Already planned
-
     // Load synopsis, bible, and story_outline for context + StoryVision
     const [{ data: synRow }, { data: projectRow }] = await Promise.all([
       db.from('story_synopsis').select('synopsis_text').eq('project_id', projectId).order('last_updated_chapter', { ascending: false }).limit(1).maybeSingle(),
       db.from('ai_story_projects').select('story_bible,story_outline').eq('id', projectId).maybeSingle(),
     ]);
 
-    // Extract StoryVision from story_outline for directional coherence
-    let storyVision: { endingVision?: string; majorPlotPoints?: string[]; mainConflict?: string; endGoal?: string } | undefined;
-    const outline = projectRow?.story_outline;
-    if (outline && typeof outline === 'object') {
-      storyVision = {
-        endingVision: outline.endingVision,
-        mainConflict: outline.mainConflict,
-        endGoal: outline.protagonist?.endGoal,
-        majorPlotPoints: outline.majorPlotPoints
-          ?.map((p: any) => typeof p === 'string' ? p : p.description || p.name || JSON.stringify(p))
-          ?.slice(0, 6),
-      };
+    if (!existing) {
+      // Generate arc plan if it doesn't exist yet
+      // Extract StoryVision from story_outline for directional coherence
+      let storyVision: { endingVision?: string; majorPlotPoints?: string[]; mainConflict?: string; endGoal?: string } | undefined;
+      const outline = projectRow?.story_outline;
+      if (outline && typeof outline === 'object') {
+        storyVision = {
+          endingVision: outline.endingVision,
+          mainConflict: outline.mainConflict,
+          endGoal: outline.protagonist?.endGoal,
+          majorPlotPoints: outline.majorPlotPoints
+            ?.map((p: any) => typeof p === 'string' ? p : p.description || p.name || JSON.stringify(p))
+            ?.slice(0, 6),
+        };
+      }
+
+      await generateArcPlan(
+        projectId, arcNumber, genre, protagonistName,
+        synRow?.synopsis_text, projectRow?.story_bible,
+        totalPlanned, config,
+        storyVision,
+      );
     }
 
-    await generateArcPlan(
-      projectId, arcNumber, genre, protagonistName,
-      synRow?.synopsis_text, projectRow?.story_bible,
-      totalPlanned, config,
-      storyVision,
-    );
-
     // ── Arc-triggered quality module generation (all non-fatal) ──────────
-    // When a new arc plan is generated, also generate:
-    // 1. Foreshadowing agenda for this arc
-    // 2. Pacing blueprint for this arc
-    // 3. World map initialization (only once, first arc)
+    // IMPORTANT: These run regardless of whether arc plan already existed.
+    // Each module has its own internal guard (checks if data already exists).
+    // This ensures quality modules are populated even for arcs whose plans
+    // were generated before the quality module code was deployed.
     const arcStart = (arcNumber - 1) * ARC_SIZE + 1;
     const arcEnd = arcNumber * ARC_SIZE;
 
@@ -225,7 +237,7 @@ async function tryGenerateArcPlan(
       .maybeSingle();
     const openThreads: string[] = synopsisRow?.open_threads || [];
 
-    // Load newly generated arc plan text for pacing blueprint
+    // Load arc plan text for pacing blueprint
     const { data: arcPlanRow } = await db
       .from('arc_plans')
       .select('plan_text')
@@ -261,6 +273,95 @@ async function tryGenerateArcPlan(
         projectId, masterOutlineStr, genre, totalPlanned, config,
       ).catch((e) => console.warn(`[SummaryManager] World map init failed:`, e instanceof Error ? e.message : String(e))),
     ]);
+  } catch {
+    // Non-fatal
+  }
+}
+
+// ── Internal: Quality Module Catch-up ─────────────────────────────────────────
+
+/**
+ * Ensure quality modules (foreshadowing, pacing, worldmap) exist for a given arc.
+ * Called on the first chapter of each arc to catch up any arcs that were planned
+ * before the quality module code was deployed.
+ * Each module has its own internal guard, so this is safe to call repeatedly.
+ */
+async function tryEnsureQualityModules(
+  projectId: string,
+  arcNumber: number,
+  genre: GenreType,
+  totalPlanned: number,
+  config: GeminiConfig,
+): Promise<void> {
+  try {
+    const db = getSupabase();
+    const arcStart = (arcNumber - 1) * ARC_SIZE + 1;
+    const arcEnd = arcNumber * ARC_SIZE;
+
+    // Quick check: if all 3 modules already have data for this arc, skip entirely
+    const [{ count: fhCount }, { count: pbCount }, { count: lbCount }] = await Promise.all([
+      db.from('foreshadowing_plans').select('*', { count: 'exact', head: true })
+        .eq('project_id', projectId).eq('arc_number', arcNumber),
+      db.from('arc_pacing_blueprints').select('*', { count: 'exact', head: true })
+        .eq('project_id', projectId).eq('arc_number', arcNumber),
+      db.from('location_bibles').select('*', { count: 'exact', head: true })
+        .eq('project_id', projectId),
+    ]);
+
+    if ((fhCount ?? 0) > 0 && (pbCount ?? 0) > 0 && (lbCount ?? 0) > 0) {
+      return; // All modules already populated
+    }
+
+    // Load context needed by quality modules
+    const [{ data: synRow }, { data: arcPlanRow }, { data: masterRow }, { data: synopsisRow }] = await Promise.all([
+      db.from('story_synopsis').select('synopsis_text').eq('project_id', projectId)
+        .order('last_updated_chapter', { ascending: false }).limit(1).maybeSingle(),
+      db.from('arc_plans').select('plan_text').eq('project_id', projectId)
+        .eq('arc_number', arcNumber).maybeSingle(),
+      db.from('ai_story_projects').select('master_outline').eq('id', projectId).maybeSingle(),
+      db.from('story_synopsis').select('open_threads').eq('project_id', projectId)
+        .order('last_updated_chapter', { ascending: false }).limit(1).maybeSingle(),
+    ]);
+
+    const openThreads: string[] = synopsisRow?.open_threads || [];
+    const rawMO = masterRow?.master_outline;
+    const masterOutlineStr: string | undefined = rawMO
+      ? (typeof rawMO === 'string' ? rawMO : JSON.stringify(rawMO))
+      : undefined;
+
+    const tasks: Promise<void>[] = [];
+
+    if ((fhCount ?? 0) === 0) {
+      tasks.push(
+        generateForeshadowingAgenda(
+          projectId, arcNumber, arcStart, arcEnd, totalPlanned,
+          synRow?.synopsis_text, masterOutlineStr,
+          openThreads, genre, config,
+        ).catch((e) => console.warn(`[SummaryManager] Catch-up foreshadowing arc ${arcNumber}:`, e instanceof Error ? e.message : String(e))),
+      );
+    }
+
+    if ((pbCount ?? 0) === 0) {
+      tasks.push(
+        generatePacingBlueprint(
+          projectId, arcNumber, arcStart, arcEnd, genre,
+          arcPlanRow?.plan_text, config,
+        ).catch((e) => console.warn(`[SummaryManager] Catch-up pacing arc ${arcNumber}:`, e instanceof Error ? e.message : String(e))),
+      );
+    }
+
+    if ((lbCount ?? 0) === 0) {
+      tasks.push(
+        initializeWorldMap(
+          projectId, masterOutlineStr, genre, totalPlanned, config,
+        ).catch((e) => console.warn(`[SummaryManager] Catch-up worldmap:`, e instanceof Error ? e.message : String(e))),
+      );
+    }
+
+    if (tasks.length > 0) {
+      console.log(`[SummaryManager] Catch-up: generating ${tasks.length} quality modules for project ${projectId.slice(0, 8)} arc ${arcNumber}`);
+      await Promise.all(tasks);
+    }
   } catch {
     // Non-fatal
   }

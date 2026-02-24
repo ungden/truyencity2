@@ -71,6 +71,36 @@ Scored chapters 160-163 against 10-dimension rubric comparing to đại thần a
 
 **Files modified**: chapter-writer.ts, character-tracker.ts, foreshadowing-planner.ts, style-bible.ts, CLAUDE.md
 
+### Production Quality Audit & Fixes (2026-02-24)
+
+Full production audit of 90 active projects (50+ novels writing in parallel, 1 chapter/cron cycle each). Scored system health, identified 3 critical module failures, and fixed them.
+
+**Audit Results (before fixes)**:
+- Word count: avg=3170, min=2388, max=4290. **0% under 2000 words** ✅
+- Chapter summaries: 100% cliffhanger, 0% degraded ✅ (was 49% before)
+- mc_state: only 55% populated ⚠️
+- Character names: 178 unique, only 3 garbage (2%) ✅
+- **foreshadowing_plans: 13 rows** (should be hundreds) ❌
+- **arc_pacing_blueprints: 3 rows** ❌
+- **location_bibles: 13 rows** ❌
+- Content quality spot-check: Comedy 1-4/ch ✅, Inner monologue 2-3 ✅, Dialogue ~43% ✅
+
+**Root Cause**: Quality module triggers (foreshadowing, pacing, worldmap) were chained inside `tryGenerateArcPlan()` AFTER the `if (existing) return;` guard. Since arc plans for arcs 2-8 were generated before quality module code was deployed, the guard skipped the entire function — quality modules never executed.
+
+**Fixes Applied**:
+- **P0: Decoupled quality module triggers** — Moved foreshadowing/pacing/worldmap generation OUTSIDE the arc plan existence guard in summary-manager.ts. Now runs regardless of whether arc plan already existed (each module has its own internal guard).
+- **P1: Arc-boundary catch-up** — Added `tryEnsureQualityModules()` triggered on first chapter of each arc (ch 21, 41, 61...) to backfill missing modules for the current arc.
+- **P2: mc_state fallback** — Added `extractFallbackMcState()` in context-assembler.ts. If AI returns empty mcState, extracts cultivation/power/condition keywords from chapter tail.
+- **P3: Character name filter tightened** — Added rejection for parenthesized group descriptions and comma-separated lists. Cleaned 8 garbage names from DB.
+- **P4: Backfill script** — Created `scripts/backfill-quality-modules.ts`. Ran for all 90 projects: 0 errors.
+
+**Post-fix Data**:
+- foreshadowing_plans: 13 → **384 rows** (90 projects)
+- arc_pacing_blueprints: 3 → **96 rows** (90 projects)  
+- location_bibles: 13 → **368 rows** (48+ projects with master_outline)
+
+**Files modified**: summary-manager.ts, context-assembler.ts, character-tracker.ts, scripts/backfill-quality-modules.ts
+
 ### Qidian Master Update (2026-02-22)
 - **Master Outline System:** Added `generateMasterOutline` which runs in the background upon project creation to build a 2000-chapter skeleton (main plot, final boss, world map). Injected as Layer 0.5 in Context Assembler.
 - **Scene Expansion Rules:** Enforced 5-senses description, layered inner monologues, and bystander reactions to reach natural 2500+ word counts (Anti-summarize).
