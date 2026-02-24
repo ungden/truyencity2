@@ -69,17 +69,13 @@ ${truncated}`;
       ...config,
       temperature: 0.2,
       maxTokens: 4096,
-    });
-
-    // Parse as array — try extracting [...] from response
-    const arrayMatch = res.content.match(/\[[\s\S]*\]/);
-    if (!arrayMatch) return;
+    }, { jsonMode: true });
 
     let states: CharacterStateRow[];
     try {
-      states = JSON.parse(arrayMatch[0]);
+      states = JSON.parse(res.content);
     } catch {
-      const repaired = parseJSON<CharacterStateRow[]>(arrayMatch[0]);
+      const repaired = parseJSON<CharacterStateRow[]>(res.content);
       if (!repaired) return;
       states = repaired;
     }

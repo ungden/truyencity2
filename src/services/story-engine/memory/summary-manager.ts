@@ -319,7 +319,7 @@ Trả về JSON:
     const { callGemini } = await import('../utils/gemini');
     const { parseJSON } = await import('../utils/json-repair');
 
-    const res = await callGemini(prompt, { ...config, temperature: 0.3, maxTokens: 2048 });
+    const res = await callGemini(prompt, { ...config, temperature: 0.3, maxTokens: 2048 }, { jsonMode: true });
     const parsed = parseJSON<StoryVision>(res.content);
 
     return parsed;

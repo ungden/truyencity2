@@ -188,6 +188,7 @@ export async function writeChapter(
       wordCount: finalWordCount,
       qualityScore: critic.overallScore,
       criticReport: critic,
+      outline,
       duration: Date.now() - startTime,
     };
   }
@@ -298,30 +299,17 @@ Trả về JSON ChapterOutline:
   "targetWordCount": ${targetWords}
 }`;
 
-  const res = await callGemini(prompt, { ...config, temperature: 0.3, maxTokens: 8192, systemPrompt: ARCHITECT_SYSTEM });
+  const res = await callGemini(prompt, { ...config, temperature: 0.3, maxTokens: 8192, systemPrompt: ARCHITECT_SYSTEM }, { jsonMode: true });
 
   // Check finishReason for truncation
   if (res.finishReason === 'length' || res.finishReason === 'MAX_TOKENS') {
     console.warn(`[Architect] Chapter ${chapterNumber}: output truncated (finishReason=${res.finishReason})`);
   }
 
-  let parsed = parseJSON<ChapterOutline>(res.content);
+  const parsed = parseJSON<ChapterOutline>(res.content);
 
-  // Fallback if parsing failed
-  if (!parsed) {
-    parsed = {
-      chapterNumber,
-      title: `Chương ${chapterNumber}`,
-      summary: '',
-      pov: options?.protagonistName || '',
-      location: '',
-      scenes: generateMinimalScenes(minScenes, wordsPerScene, options?.protagonistName || ''),
-      tensionLevel: 5,
-      dopaminePoints: [],
-      emotionalArc: { opening: 'tò mò', midpoint: 'căng thẳng', climax: 'phấn khích', closing: 'háo hức' },
-      cliffhanger: '',
-      targetWordCount: targetWords,
-    };
+  if (!parsed || !parsed.scenes?.length) {
+    throw new Error(`Architect chapter ${chapterNumber}: JSON parse failed — raw: ${res.content.slice(0, 300)}`);
   }
 
   // Validate: ensure enough scenes
@@ -570,7 +558,7 @@ KIỂM TRA MÂU THUẪN (BẮT BUỘC):
 - Nếu nhân vật hành xử trái ngược hoàn toàn với tính cách -> type "continuity", severity "major", requiresRewrite=true`;
 
   try {
-    const res = await callGemini(prompt, { ...config, temperature: 0.2, maxTokens: 4096, systemPrompt: CRITIC_SYSTEM });
+    const res = await callGemini(prompt, { ...config, temperature: 0.2, maxTokens: 4096, systemPrompt: CRITIC_SYSTEM }, { jsonMode: true });
 
     if (!res.content) {
       // Fail closed: don't approve on error

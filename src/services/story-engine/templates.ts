@@ -1460,6 +1460,7 @@ export const ANTI_CLICHE_RULES = {
     'Trong chớp mắt',
     'Không ai biết rằng',
     'Chỉ thấy',
+    'Cảm thấy một luồng',
   ],
   guidance: 'Thay vì dùng các từ cấm, hãy MÔ TẢ hệ quả của chúng. Ví dụ: thay vì "hít một ngụm khí lạnh", tả "sắc mặt tái nhợt, lùi lại nửa bước". Thay vì "đột nhiên", tả trực tiếp âm thanh/hình ảnh cắt ngang.',
 };

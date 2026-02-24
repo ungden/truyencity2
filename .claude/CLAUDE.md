@@ -340,7 +340,7 @@ psql -d your_db -f supabase/migrations/0100_create_plot_thread_tables.sql
 1. **Cliffhanger→Opening mismatch** — #1 issue (continuity score 6.55/10): chương sau không nối tiếp chương trước
 2. **No character state tracking** — nhân vật chết sống lại, power regression
 3. **No genre guard** — truyện lịch sử biến thành sci-fi
-4. **Synopsis quá thưa** — update mỗi 20 chương, gây context drift
+4. **Synopsis quá thưa** — update mỗi 5 chương (fixed from v1's 20-chapter interval)
 5. **RAG missing** — không có semantic search cho context chính xác
 
 **Solution:** Nâng cấp lên "Continuous Story Memory" — 7-layer context system with RAG.

@@ -71,6 +71,8 @@ export interface WriteChapterResult {
   wordCount: number;
   qualityScore: number;
   criticReport?: CriticOutput;
+  /** The Architect's chapter outline — used by post-write tasks for character extraction */
+  outline?: ChapterOutline;
   duration: number;
 }
 

@@ -60,7 +60,7 @@ Quy tắc:
       temperature: 0.7,
       maxTokens: 2048,
       systemPrompt: "Bạn là Master Architect chuyên lập Đại cương tổng thể cho tiểu thuyết mạng.",
-    });
+    }, { jsonMode: true });
 
     const parsed = parseJSON<MasterOutline>(res.content);
     

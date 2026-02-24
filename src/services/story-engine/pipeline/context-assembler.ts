@@ -333,29 +333,24 @@ QUY TẮC CLIFFHANGER:
 - Trích đúng tình huống căng thẳng hoặc câu chốt mở ở cuối chương
 - Chỉ cho phép rỗng khi chương đã khép hoàn toàn theo chủ đích finale`;
 
-  const res = await callGemini(prompt, { ...config, temperature: 0.1, maxTokens: 1024 });
+  const res = await callGemini(prompt, { ...config, temperature: 0.1, maxTokens: 1024 }, { jsonMode: true });
   const parsed = parseJSON<ChapterSummary>(res.content);
+
+  if (!parsed || !parsed.summary?.trim()) {
+    throw new Error(`Chapter ${chapterNumber} summary: JSON parse failed — raw: ${res.content.slice(0, 200)}`);
+  }
 
   const allowEmptyCliffhanger = options?.allowEmptyCliffhanger === true;
 
-  if (parsed) {
-    if (!parsed.openingSentence?.trim()) {
-      parsed.openingSentence = content.slice(0, 160).trim();
-    }
-
-    if (!allowEmptyCliffhanger && !parsed.cliffhanger?.trim()) {
-      parsed.cliffhanger = extractFallbackCliffhanger(content);
-    }
-
-    return parsed;
+  if (!parsed.openingSentence?.trim()) {
+    parsed.openingSentence = content.slice(0, 160).trim();
   }
 
-  return {
-    summary: `Chương ${chapterNumber}: ${title}`,
-    openingSentence: content.slice(0, 100),
-    mcState: '',
-    cliffhanger: allowEmptyCliffhanger ? '' : extractFallbackCliffhanger(content),
-  };
+  if (!allowEmptyCliffhanger && !parsed.cliffhanger?.trim()) {
+    parsed.cliffhanger = extractFallbackCliffhanger(content);
+  }
+
+  return parsed;
 }
 
 function extractFallbackCliffhanger(content: string): string {
@@ -412,9 +407,11 @@ Trả về JSON:
   "open_threads": ["các tuyến truyện đang mở"]
 }`;
 
-  const res = await callGemini(prompt, { ...config, temperature: 0.2, maxTokens: 2048 });
+  const res = await callGemini(prompt, { ...config, temperature: 0.2, maxTokens: 2048 }, { jsonMode: true });
   const parsed = parseJSON<any>(res.content);
-  if (!parsed) return;
+  if (!parsed || !parsed.synopsis_text?.trim()) {
+    throw new Error(`Synopsis generation failed: JSON parse error — raw: ${res.content.slice(0, 200)}`);
+  }
 
   const db = getSupabase();
   await db.from('story_synopsis').upsert({
@@ -481,9 +478,11 @@ Trả về JSON:
   "new_threads": ["thread mới"]
 }`;
 
-  const res = await callGemini(prompt, { ...config, temperature: 0.3, maxTokens: 4096 });
+  const res = await callGemini(prompt, { ...config, temperature: 0.3, maxTokens: 4096 }, { jsonMode: true });
   const parsed = parseJSON<any>(res.content);
-  if (!parsed) return;
+  if (!parsed || !parsed.plan_text?.trim()) {
+    throw new Error(`Arc plan generation failed: JSON parse error — raw: ${res.content.slice(0, 200)}`);
+  }
 
   const db = getSupabase();
   await db.from('arc_plans').upsert({

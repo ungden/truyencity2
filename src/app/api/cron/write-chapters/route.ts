@@ -226,6 +226,10 @@ async function ensureDailyQuotasForActiveProjects(
 /**
  * Update quota IMMEDIATELY after a chapter is written or a task fails.
  * This runs inside each task, NOT at end of function, so it survives Vercel timeout.
+ *
+ * Attempts atomic SQL increment via Supabase RPC to prevent race conditions
+ * when concurrent cron workers process the same project.
+ * Falls back to non-atomic read-then-write if RPC function doesn't exist.
  */
 async function updateQuotaAfterWrite(
   supabase: ReturnType<typeof getSupabaseAdmin>,
@@ -233,18 +237,46 @@ async function updateQuotaAfterWrite(
   vnDate: string,
   endIso: string,
 ): Promise<void> {
-  // Read current quota to get written_chapters (atomic read-then-write)
-  const { data: q } = await supabase
-    .from('project_daily_quotas')
-    .select('written_chapters,target_chapters')
-    .eq('project_id', projectId)
-    .eq('vn_date', vnDate)
-    .maybeSingle();
+  // Try atomic increment first: written_chapters = LEAST(written_chapters + 1, target_chapters)
+  // The RPC function `increment_quota_written` must be created in Supabase SQL editor.
+  let written: number;
+  let target: number;
 
-  if (!q) return;
+  try {
+    const { data: rpcResult, error: rpcErr } = await supabase.rpc('increment_quota_written', {
+      p_project_id: projectId,
+      p_vn_date: vnDate,
+    });
 
-  const written = Math.min(q.target_chapters, q.written_chapters + 1);
-  const remaining = Math.max(0, q.target_chapters - written);
+    if (rpcErr) throw rpcErr;
+
+    const row = Array.isArray(rpcResult) ? rpcResult[0] : rpcResult;
+    written = row?.written_chapters ?? 1;
+    target = row?.target_chapters ?? DAILY_CHAPTER_QUOTA;
+  } catch {
+    // Fallback: non-atomic read-then-write (works without RPC function)
+    const { data: q } = await supabase
+      .from('project_daily_quotas')
+      .select('written_chapters,target_chapters')
+      .eq('project_id', projectId)
+      .eq('vn_date', vnDate)
+      .maybeSingle();
+
+    if (!q) return;
+
+    written = Math.min(q.target_chapters, q.written_chapters + 1);
+    target = q.target_chapters;
+
+    // Non-atomic write of written_chapters (fallback only)
+    await supabase
+      .from('project_daily_quotas')
+      .update({ written_chapters: written })
+      .eq('project_id', projectId)
+      .eq('vn_date', vnDate);
+  }
+
+  // Compute next_due_at and status (same logic for both paths)
+  const remaining = Math.max(0, target - written);
 
   let status: 'active' | 'completed' = 'active';
   let nextDueAt: string | null = null;
@@ -264,7 +296,6 @@ async function updateQuotaAfterWrite(
   await supabase
     .from('project_daily_quotas')
     .update({
-      written_chapters: written,
       status,
       retry_count: 0,
       last_error: null,
@@ -373,7 +404,6 @@ async function prepareInitProject(
  */
 async function writeOneChapter(
   project: ProjectRow,
-  _geminiKey: string,
   supabase: ReturnType<typeof getSupabaseAdmin>,
   tier: 'resume' | 'init-write',
   vnDate: string,
@@ -500,10 +530,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
   }
 
-  const geminiKey = process.env.GEMINI_API_KEY;
-  if (!geminiKey) {
-    return NextResponse.json({ success: false, error: 'GEMINI_API_KEY missing' }, { status: 500 });
-  }
+    if (!process.env.GEMINI_API_KEY) {
+      return NextResponse.json({ success: false, error: 'GEMINI_API_KEY missing' }, { status: 500 });
+    }
 
   const supabase = getSupabaseAdmin();
 
@@ -677,7 +706,7 @@ export async function GET(request: NextRequest) {
       // Tier 1: Resume projects (write next chapter)
       ...claimedResumeProjects.map(p => async (): Promise<RunResult> =>
         withTimeout(
-          writeOneChapter(p, geminiKey, supabase, 'resume', vnDate, endIso),
+          writeOneChapter(p, supabase, 'resume', vnDate, endIso),
           PROJECT_TIMEOUT_MS,
           { id: p.id, title: '?', tier: 'resume' as const, success: false, error: `Timeout after ${PROJECT_TIMEOUT_MS / 1000}s` }
         ).catch(err => ({
@@ -705,7 +734,7 @@ export async function GET(request: NextRequest) {
       // Tier 3: Init-write projects (arc plan exists, write ch.1)
       ...claimedInitWriteProjects.map(p => async (): Promise<RunResult> =>
         withTimeout(
-          writeOneChapter(p, geminiKey, supabase, 'init-write', vnDate, endIso),
+          writeOneChapter(p, supabase, 'init-write', vnDate, endIso),
           INIT_WRITE_TIMEOUT_MS,
           { id: p.id, title: '?', tier: 'init-write' as const, success: false, error: `Timeout after ${INIT_WRITE_TIMEOUT_MS / 1000}s` }
         ).catch(err => ({

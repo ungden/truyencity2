@@ -43,22 +43,30 @@ async function waitForRateLimit(): Promise<void> {
 export async function callGemini(
   userPrompt: string,
   config: GeminiConfig,
+  options?: { jsonMode?: boolean },
 ): Promise<GeminiResponse> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('GEMINI_API_KEY not set');
 
   await waitForRateLimit();
 
+  const generationConfig: Record<string, unknown> = {
+    temperature: config.temperature,
+    maxOutputTokens: config.maxTokens,
+    topP: 0.95,
+    topK: 40,
+    // NOTE: frequencyPenalty/presencePenalty NOT supported by thinking models
+    // (gemini-3-flash-preview). Sending them causes empty content response.
+  };
+
+  // JSON mode: force Gemini to return raw JSON (no markdown wrapping)
+  if (options?.jsonMode) {
+    generationConfig.responseMimeType = 'application/json';
+  }
+
   const body: Record<string, unknown> = {
     contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
-    generationConfig: {
-      temperature: config.temperature,
-      maxOutputTokens: config.maxTokens,
-      topP: 0.95,
-      topK: 40,
-      // NOTE: frequencyPenalty/presencePenalty NOT supported by thinking models
-      // (gemini-3-flash-preview). Sending them causes empty content response.
-    },
+    generationConfig,
   };
 
   if (config.systemPrompt) {

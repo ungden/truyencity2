@@ -246,7 +246,19 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
 
   // ── Step 6: 7 parallel post-write tasks (all non-fatal) ───────────────
   const arcNumber = Math.ceil(nextChapter / 20);
-  const characters = [protagonistName]; // TODO: extract from outline once available
+
+  // Extract all unique character names from the Architect outline
+  const outlineChars = new Set<string>();
+  if (result.outline?.scenes) {
+    for (const scene of result.outline.scenes) {
+      for (const char of scene.characters || []) {
+        outlineChars.add(char);
+      }
+    }
+  }
+  // Always include protagonist, then add outline characters
+  outlineChars.add(protagonistName);
+  const characters = Array.from(outlineChars);
 
   await Promise.all([
     // Task 1: Summary + synopsis + arc plan + bible (conditional)

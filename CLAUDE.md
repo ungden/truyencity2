@@ -151,7 +151,7 @@ writeOneChapter() [orchestrator.ts]
 ### 3. Post-Write Tasks [summary-manager.ts]
 
 **Trigger Conditions**:
-- **Synopsis**: Every 20 chapters
+- **Synopsis**: Every 5 chapters
 - **Arc Plan**: At arc boundaries (every 20 chapters)
 - **Story Bible**: Ch.3, then every 150 chapters
 - **StoryVision**: On demand (not automatic)
