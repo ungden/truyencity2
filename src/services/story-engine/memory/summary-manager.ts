@@ -31,7 +31,7 @@ const BIBLE_REFRESH_INTERVAL = 150; // Refresh bible every 150 chapters
  * After a chapter is written and saved, run all summary-related post-write tasks.
  * This handles:
  * 1. Always: generate + save chapter summary
- * 2. Conditionally: update synopsis (every 20 chapters)
+ * 2. Conditionally: update synopsis (every 5 chapters)
  * 3. Conditionally: generate new arc plan (at arc boundaries)
  * 4. Conditionally: generate/refresh story bible (ch.3, then every 150)
  *
@@ -85,9 +85,11 @@ export async function runSummaryTasks(
       await tryUpdateSynopsis(projectId, chapterNumber, genre, protagonistName, config);
     }
 
-    // 3. Arc plan: at arc boundaries (start of new arc)
-    if ((chapterNumber - 1) % ARC_SIZE === 0 && chapterNumber > 1) {
-      const arcNumber = Math.ceil(chapterNumber / ARC_SIZE);
+    // 3. Arc plan: at end of each arc, generate plan for NEXT arc
+    //    e.g., at chapter 20 generate arc 2 plan, at chapter 40 generate arc 3 plan
+    //    so the plan is ready BEFORE writing the first chapter of the new arc.
+    if (chapterNumber % ARC_SIZE === 0) {
+      const arcNumber = (chapterNumber / ARC_SIZE) + 1; // next arc
       await tryGenerateArcPlan(
         projectId, arcNumber, genre, protagonistName, totalPlannedChapters, config,
       );

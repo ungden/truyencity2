@@ -64,6 +64,11 @@ Quy tắc:
 
     const parsed = parseJSON<MasterOutline>(res.content);
     
+    if (!parsed) {
+      console.error('Failed to parse master outline JSON — skipping DB save');
+      return null;
+    }
+
     // Save to DB
     const db = getSupabase();
     await db.from('ai_story_projects')

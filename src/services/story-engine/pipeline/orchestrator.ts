@@ -47,6 +47,7 @@ interface ProjectRow {
   temperature: number | null;
   target_chapter_length: number | null;
   ai_model: string | null;
+  topic_id: string | null;
   novels: { id: string; title: string } | { id: string; title: string }[] | null;
 }
 
@@ -82,7 +83,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   // ── Step 1: Load project ───────────────────────────────────────────────
   const { data: projectData, error: projectError } = await db
     .from('ai_story_projects')
-    .select('id,novel_id,main_character,genre,current_chapter,total_planned_chapters,world_description,temperature,target_chapter_length,ai_model,novels!ai_story_projects_novel_id_fkey(id,title)')
+    .select('id,novel_id,main_character,genre,current_chapter,total_planned_chapters,world_description,temperature,target_chapter_length,ai_model,topic_id,novels!ai_story_projects_novel_id_fkey(id,title)')
     .eq('id', options.projectId)
     .single();
 
@@ -223,6 +224,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     {
       projectId: project.id,
       protagonistName,
+      topicId: project.topic_id || undefined,
       isFinalArc,
       genreBoundary: context.genreBoundary,
       worldBible: context.storyBible,

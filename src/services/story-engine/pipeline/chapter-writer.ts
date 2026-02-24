@@ -145,6 +145,7 @@ export async function writeChapter(
     let content = await runWriter(
       outline,
       contextString,
+      genre,
       style,
       targetWordCount,
       config,
@@ -342,6 +343,7 @@ Trả về JSON ChapterOutline:
 async function runWriter(
   outline: ChapterOutline,
   context: string,
+  genre: GenreType,
   style: ReturnType<typeof getStyleByGenre>,
   targetWords: number,
   config: GeminiConfig,
@@ -349,7 +351,6 @@ async function runWriter(
   options?: WriteChapterOptions,
 ): Promise<string> {
   const totalTargetWords = outline.targetWordCount || targetWords;
-  const genre = (options?.genreBoundary ? 'tien-hiep' : 'tien-hiep') as GenreType; // Default, should be passed properly
 
   // Build rich style context
   const richStyleContext = buildStyleContext(genre, getDominantSceneType(outline));

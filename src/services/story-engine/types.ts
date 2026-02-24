@@ -128,6 +128,7 @@ export interface CriticOutput {
   overallScore: number;
   dopamineScore: number;
   pacingScore: number;
+  endingHookScore?: number;
   issues: CriticIssue[];
   approved: boolean;
   requiresRewrite: boolean;
