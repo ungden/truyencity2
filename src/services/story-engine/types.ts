@@ -214,6 +214,14 @@ export interface ContextPayload {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   storyOutline?: any;
 
+  // Quality modules (Qidian Master Level)
+  foreshadowingContext?: string;
+  characterArcContext?: string;
+  pacingContext?: string;
+  voiceContext?: string;
+  powerContext?: string;
+  worldContext?: string;
+
   // Arc chapter summaries (for synopsis generation)
   arcChapterSummaries?: Array<{ chapter_number: number; title: string; summary: string }>;
 }

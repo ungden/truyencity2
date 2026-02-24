@@ -29,6 +29,13 @@ import {
 } from '../memory/plot-tracker';
 import { runSummaryTasks } from '../memory/summary-manager';
 import { generateArcPlan } from './context-assembler';
+// Quality modules (Qidian Master Level)
+import { getForeshadowingContext, updateForeshadowingStatus, generateForeshadowingAgenda } from '../memory/foreshadowing-planner';
+import { getCharacterArcContext, updateCharacterArcs } from '../memory/character-arc-engine';
+import { getChapterPacingContext, generatePacingBlueprint } from '../memory/pacing-director';
+import { getVoiceContext, updateVoiceFingerprint } from '../memory/voice-fingerprint';
+import { getPowerContext, updateMCPowerState } from '../memory/power-system-tracker';
+import { getWorldContext, updateLocationExploration, prepareUpcomingLocation, initializeWorldMap } from '../memory/world-expansion-tracker';
 import type {
   WriteChapterInput, WriteChapterResult, GeminiConfig, GenreType,
 } from '../types';
@@ -147,6 +154,27 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     if (plotCtx) context.plotThreads = plotCtx;
     if (beatCtx) context.beatGuidance = beatCtx;
     if (ruleCtx) context.worldRules = ruleCtx;
+  } catch {
+    // Non-fatal
+  }
+
+  // ── Step 2d+: Inject quality modules (all non-fatal) ────────────────────
+  try {
+    const [foreshadowCtx, charArcCtx, pacingCtx, voiceCtx, powerCtx, worldCtx] = await Promise.all([
+      getForeshadowingContext(project.id, nextChapter).catch(() => null),
+      getCharacterArcContext(project.id, nextChapter, context.knownCharacterNames).catch(() => null),
+      getChapterPacingContext(project.id, nextChapter).catch(() => null),
+      getVoiceContext(project.id).catch(() => null),
+      getPowerContext(project.id).catch(() => null),
+      getWorldContext(project.id, nextChapter).catch(() => null),
+    ]);
+
+    if (foreshadowCtx) context.foreshadowingContext = foreshadowCtx;
+    if (charArcCtx) context.characterArcContext = charArcCtx;
+    if (pacingCtx) context.pacingContext = pacingCtx;
+    if (voiceCtx) context.voiceContext = voiceCtx;
+    if (powerCtx) context.powerContext = powerCtx;
+    if (worldCtx) context.worldContext = worldCtx;
   } catch {
     // Non-fatal
   }
@@ -298,6 +326,38 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     // Task 6: Consistency check (log-only, doesn't block)
     checkConsistency(
       project.id, nextChapter, result.content, characters,
+    ).catch(() => {}),
+
+    // ── Quality modules post-write (Tasks 7-12, all non-fatal) ──────────
+
+    // Task 7: Update foreshadowing status
+    updateForeshadowingStatus(
+      project.id, nextChapter,
+    ).catch(() => {}),
+
+    // Task 8: Update character arcs
+    updateCharacterArcs(
+      project.id, nextChapter, characters, geminiConfig,
+    ).catch(() => {}),
+
+    // Task 9: Update voice fingerprint (every 10 chapters)
+    updateVoiceFingerprint(
+      project.id, novel.id, nextChapter, geminiConfig,
+    ).catch(() => {}),
+
+    // Task 10: Update MC power state (every 3 chapters or on breakthrough)
+    updateMCPowerState(
+      project.id, nextChapter, result.content, protagonistName, genre, geminiConfig,
+    ).catch(() => {}),
+
+    // Task 11: Update location exploration
+    updateLocationExploration(
+      project.id, nextChapter,
+    ).catch(() => {}),
+
+    // Task 12: Pre-generate upcoming location bible
+    prepareUpcomingLocation(
+      project.id, nextChapter, genre, context.synopsis, context.masterOutline, geminiConfig,
     ).catch(() => {}),
   ]);
 

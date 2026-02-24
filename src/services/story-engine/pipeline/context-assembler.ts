@@ -215,6 +215,14 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
   if (payload.beatGuidance) parts.push(payload.beatGuidance);
   if (payload.worldRules) parts.push(payload.worldRules);
 
+  // Quality modules (Qidian Master Level)
+  if (payload.foreshadowingContext) parts.push(payload.foreshadowingContext);
+  if (payload.characterArcContext) parts.push(payload.characterArcContext);
+  if (payload.pacingContext) parts.push(payload.pacingContext);
+  if (payload.voiceContext) parts.push(payload.voiceContext);
+  if (payload.powerContext) parts.push(payload.powerContext);
+  if (payload.worldContext) parts.push(payload.worldContext);
+
   // Layer 1: Story Bible
   if (payload.storyBible) {
     parts.push('[STORY BIBLE]');

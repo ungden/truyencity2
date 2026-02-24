@@ -10,7 +10,7 @@ TruyenCity là nền tảng viết truyện tự động bằng AI, hỗ trợ v
 
 **Location**: `src/services/story-engine/`
 
-V2 là rewrite từ v1 (`story-writing-factory/`) với architecture tối ưu hơn, giảm từ 41 files (28,470 lines) xuống còn 13 files (~3,300 lines) nhưng vẫn giữ đầy đủ tính năng.
+V2 là rewrite từ v1 (`story-writing-factory/`) với architecture tối ưu hơn. Now 19 files (~4,700 lines) with 6 new quality modules.
 
 ```
 src/services/story-engine/
@@ -24,15 +24,21 @@ src/services/story-engine/
 ├── pipeline/
 │   ├── context-assembler.ts    # 4-layer context + post-write generators
 │   ├── chapter-writer.ts       # 3-agent: Architect → Writer → Critic
-│   └── orchestrator.ts         # Main entry, 7 parallel post-write tasks
+│   └── orchestrator.ts         # Main entry, 12 parallel post-write tasks
 └── memory/
     ├── rag-store.ts            # Chunk + embed + vector search
     ├── character-tracker.ts    # Extract + save character states
     ├── plot-tracker.ts         # Plot threads + beat ledger + rule indexer
-    ├── summary-manager.ts      # Synopsis + bible triggers + StoryVision
+    ├── summary-manager.ts      # Synopsis + bible triggers + StoryVision + quality module triggers
     ├── constraint-extractor.ts # Per-project world rules from DB
     ├── style-bible.ts          # Rich style context + vocabulary + pacing
-    └── title-checker.ts        # Title similarity + optimization
+    ├── title-checker.ts        # Title similarity + optimization
+    ├── foreshadowing-planner.ts   # [NEW] Long-range hint planning (50-500ch apart)
+    ├── character-arc-engine.ts    # [NEW] Character development + signature traits
+    ├── pacing-director.ts         # [NEW] Per-arc pacing blueprints (10 mood types)
+    ├── voice-fingerprint.ts       # [NEW] Style fingerprint + drift detection
+    ├── power-system-tracker.ts    # [NEW] MC power state + anti-plot-armor
+    └── world-expansion-tracker.ts # [NEW] World map + location bibles
 ```
 
 
@@ -90,19 +96,32 @@ writeOneChapter() [orchestrator.ts]
   │   ├── Layer 0: Chapter Bridge (previous summary, cliffhanger, MC state)
   │   ├── Layer 1: Story Bible
   │   ├── Layer 2: Rolling Synopsis (structured fields)
-  │   ├── Layer 3: Recent Chapters (15 chương)
+  │   ├── Layer 3: Recent Chapters (5 chương × 5K chars)
   │   └── Layer 4: Arc Plan (threads injection)
+  ├── Inject quality modules (6 parallel, non-fatal)
+  │   ├── getForeshadowingContext()
+  │   ├── getCharacterArcContext()
+  │   ├── getChapterPacingContext()
+  │   ├── getVoiceContext()
+  │   ├── getPowerContext()
+  │   └── getWorldContext()
   ├── writeChapter() [chapter-writer.ts]
   │   ├── runArchitect() - Tạo outline với constraints, emotional arc, golden rules
   │   ├── runWriter() - Viết content với style context, vocab hints, multi-POV
   │   └── runCritic() - Review với continuity check, fail-closed
-  └── 7 parallel post-write tasks
-      ├── runSummaryTasks() - Synopsis, arc plan, bible
+  └── 12 parallel post-write tasks (all non-fatal)
+      ├── runSummaryTasks() - Synopsis, arc plan, bible + quality module triggers
       ├── extractAndSaveCharacterStates()
       ├── chunkAndStoreChapter() - RAG
       ├── detectAndRecordBeats()
       ├── extractRulesFromChapter()
-      └── checkConsistency()
+      ├── checkConsistency()
+      ├── updateForeshadowingStatus()
+      ├── updateCharacterArcs()
+      ├── updateVoiceFingerprint() - every 10 chapters
+      ├── updateMCPowerState() - every 3 chapters
+      ├── updateLocationExploration()
+      └── prepareUpcomingLocation()
 ```
 
 ## Critical Configuration
@@ -155,6 +174,11 @@ writeOneChapter() [orchestrator.ts]
 - **Arc Plan**: At arc boundaries (every 20 chapters)
 - **Story Bible**: Ch.3, then every 150 chapters
 - **StoryVision**: On demand (not automatic)
+
+**Arc-Triggered Quality Module Generation** (when a new arc plan is generated):
+- `generateForeshadowingAgenda()` — Plan hints for the new arc
+- `generatePacingBlueprint()` — Create mood blueprint for the new arc
+- `initializeWorldMap()` — Initialize world map (only once, first arc)
 
 **shouldBeFinaleArc()**:
 - Remaining <= 10 chapters → true
@@ -279,7 +303,7 @@ npm run typecheck
 npm run dev
 ```
 
-**Test Coverage**: 217 tests, all pass ✅
+**Test Coverage**: 60 passing, 1 known failure (critic rejects mock 18-word chapter) ✅
 
 ## Git Workflow
 
@@ -298,11 +322,11 @@ git push  # Auto deploy to Vercel
 
 | Aspect | V1 (story-writing-factory/) | V2 (story-engine/) |
 |--------|---------------------------|-------------------|
-| Files | 41 files, 28,470 lines | 13 files, ~3,300 lines |
+| Files | 41 files, 28,470 lines | 19 files, ~4,700 lines |
 | Architecture | Monolithic class | Modular pipeline |
 | AI Calls | Multiple per agent | 3 calls (Architect→Writer→Critic) |
-| Context | Manual assembly | 4-layer automatic |
-| Post-write | Sequential | 7 parallel tasks |
+| Context | Manual assembly | 4-layer automatic + 6 quality modules |
+| Post-write | Sequential | 12 parallel tasks |
 | Status | Legacy (kept for reference) | Production (USE_STORY_ENGINE_V2=true) |
 
 ## Important Files to Read
@@ -319,10 +343,10 @@ Khi làm việc với story engine:
 ## Contact & Support
 
 - Repo: https://github.com/ungden/truyencity2
-- Current commit: `090b800` (parallelize daily spawn idea generation)
-- Previous: `a39e30a` (daily spawn outline generation), `c8f2fc0` (Qidian Master update docs)
+- Current commit: (pending — 6 quality modules + integration)
+- Previous: `0a94924` (audit bug fixes), `090b800` (parallelize daily spawn)
 
 ---
 
-**Last Updated**: 2026-02-22
+**Last Updated**: 2026-02-24
 **Author**: AI Assistant (Claude)

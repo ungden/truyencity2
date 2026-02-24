@@ -16,6 +16,9 @@ import {
   generateStoryBible,
 } from '../pipeline/context-assembler';
 import { getSupabase } from '../utils/supabase';
+import { generateForeshadowingAgenda } from './foreshadowing-planner';
+import { generatePacingBlueprint } from './pacing-director';
+import { initializeWorldMap } from './world-expansion-tracker';
 import type { GeminiConfig, GenreType } from '../types';
 
 // ── Trigger Thresholds ───────────────────────────────────────────────────────
@@ -203,6 +206,57 @@ async function tryGenerateArcPlan(
       totalPlanned, config,
       storyVision,
     );
+
+    // ── Arc-triggered quality module generation (all non-fatal) ──────────
+    // When a new arc plan is generated, also generate:
+    // 1. Foreshadowing agenda for this arc
+    // 2. Pacing blueprint for this arc
+    // 3. World map initialization (only once, first arc)
+    const arcStart = (arcNumber - 1) * ARC_SIZE + 1;
+    const arcEnd = arcNumber * ARC_SIZE;
+
+    // Load synopsis structured fields for open threads
+    const { data: synopsisRow } = await db
+      .from('story_synopsis')
+      .select('open_threads')
+      .eq('project_id', projectId)
+      .order('last_updated_chapter', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const openThreads: string[] = synopsisRow?.open_threads || [];
+
+    // Load newly generated arc plan text for pacing blueprint
+    const { data: arcPlanRow } = await db
+      .from('arc_plans')
+      .select('plan_text')
+      .eq('project_id', projectId)
+      .eq('arc_number', arcNumber)
+      .maybeSingle();
+
+    // Load master outline for world map
+    const { data: masterRow } = await db
+      .from('ai_story_projects')
+      .select('master_outline')
+      .eq('id', projectId)
+      .maybeSingle();
+
+    await Promise.all([
+      generateForeshadowingAgenda(
+        projectId, arcNumber, arcStart, arcEnd, totalPlanned,
+        synRow?.synopsis_text, masterRow?.master_outline,
+        openThreads, genre, config,
+      ).catch(() => {}),
+
+      generatePacingBlueprint(
+        projectId, arcNumber, arcStart, arcEnd, genre,
+        arcPlanRow?.plan_text, config,
+      ).catch(() => {}),
+
+      // World map: only initialize once (initializeWorldMap has internal guard)
+      initializeWorldMap(
+        projectId, masterRow?.master_outline, genre, totalPlanned, config,
+      ).catch(() => {}),
+    ]);
   } catch {
     // Non-fatal
   }
