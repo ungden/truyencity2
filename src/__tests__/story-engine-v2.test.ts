@@ -55,6 +55,7 @@ describe('Story Engine v2', () => {
         previousTitles: [],
         recentOpenings: [],
         recentCliffhangers: [],
+        knownCharacterNames: ['MC', 'Ally1', 'Enemy1'],
         synopsisStructured: {
           mc_current_state: 'Training',
           active_allies: ['Ally1'],

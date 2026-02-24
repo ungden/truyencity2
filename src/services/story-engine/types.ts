@@ -197,6 +197,8 @@ export interface ContextPayload {
 
   // Character states
   characterStates?: string;
+  /** All known character names (alive + dead) for scalability module queries */
+  knownCharacterNames: string[];
 
   // Genre boundary
   genreBoundary?: string;

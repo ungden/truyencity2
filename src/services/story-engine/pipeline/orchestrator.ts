@@ -132,7 +132,11 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   // ── Step 2d: Inject scalability modules (non-fatal) ────────────────────
   try {
     const arcNumber = Math.ceil(nextChapter / 20);
-    const characters = [protagonistName];
+    // Use all known characters from DB (not just protagonist) for better
+    // plot thread scoring and rule matching with secondary characters
+    const characters = context.knownCharacterNames.length > 0
+      ? context.knownCharacterNames
+      : [protagonistName];
 
     const [plotCtx, beatCtx, ruleCtx] = await Promise.all([
       buildPlotThreadContext(project.id, nextChapter, characters, arcNumber),

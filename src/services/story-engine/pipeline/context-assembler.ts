@@ -47,8 +47,8 @@ export async function loadContext(
     db.from('ai_story_projects').select('story_bible').eq('id', projectId).maybeSingle(),
     // Layer 2: Synopsis
     db.from('story_synopsis').select('synopsis_text,mc_current_state,active_allies,active_enemies,open_threads,last_updated_chapter').eq('project_id', projectId).order('last_updated_chapter', { ascending: false }).limit(1).maybeSingle(),
-    // Layer 3: Recent Chapters
-    db.from('chapters').select('content,title,chapter_number').eq('novel_id', novelId).lt('chapter_number', chapterNumber).order('chapter_number', { ascending: false }).limit(15),
+    // Layer 3: Recent Chapters (5 chapters × 5000 chars = ~25K tokens, down from 15 × 3000 = 45K)
+    db.from('chapters').select('content,title,chapter_number').eq('novel_id', novelId).lt('chapter_number', chapterNumber).order('chapter_number', { ascending: false }).limit(5),
     // Layer 4: Arc Plan
     db.from('arc_plans').select('arc_number,start_chapter,end_chapter,arc_theme,plan_text,chapter_briefs,threads_to_advance,threads_to_resolve,new_threads').eq('project_id', projectId).order('arc_number', { ascending: false }).limit(1).maybeSingle(),
     // Master Outline + Story Outline
@@ -133,7 +133,7 @@ export async function loadContext(
     synopsis: synopsis?.synopsis_text,
     synopsisStructured,
     recentChapters: recentChapters.map((c: any) =>
-      `[Ch.${c.chapter_number}: "${c.title}"]\n${(c.content || '').slice(0, 3000)}`
+      `[Ch.${c.chapter_number}: "${c.title}"]\n${(c.content || '').slice(0, 5000)}`
     ),
     arcPlan: arc?.plan_text,
     chapterBrief,
@@ -142,6 +142,7 @@ export async function loadContext(
     recentOpenings: (openingsResult?.data || []).map((o: any) => o.opening_sentence).filter(Boolean),
     recentCliffhangers: (cliffhangersResult?.data || []).map((c: any) => c.cliffhanger).filter(Boolean),
     characterStates: charText,
+    knownCharacterNames: characters.map(c => c.character_name),
     genreBoundary: undefined, // set by orchestrator
     ragContext: undefined,    // set by orchestrator
     arcChapterSummaries: undefined, // loaded separately for synopsis generation
