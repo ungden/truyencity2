@@ -18,7 +18,7 @@ import { getGenreBoundaryText } from '../config';
 import { loadContext, assembleContext } from './context-assembler';
 import { writeChapter } from './chapter-writer';
 import { retrieveRAGContext, chunkAndStoreChapter } from '../memory/rag-store';
-import { extractAndSaveCharacterStates, saveCharacterStatesFromCombined } from '../memory/character-tracker';
+import { saveCharacterStatesFromCombined } from '../memory/character-tracker';
 import {
   buildPlotThreadContext,
   buildBeatContext,
@@ -344,7 +344,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
 
     // Task 8: Update character arcs
     updateCharacterArcs(
-      project.id, nextChapter, characters, geminiConfig,
+      project.id, nextChapter, characters, geminiConfig, genre, protagonistName,
     ).catch((e) => console.warn(`[Orchestrator] Task 8 character arcs failed:`, e instanceof Error ? e.message : String(e))),
 
     // Task 9: Update voice fingerprint (every 10 chapters)

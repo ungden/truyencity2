@@ -8,6 +8,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { createServerClient } from '@/integrations/supabase/server';
 
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
@@ -24,6 +25,20 @@ function verifyCronAuth(request: NextRequest): boolean {
   const cronSecret = process.env.CRON_SECRET;
   if (!cronSecret) return process.env.NODE_ENV === 'development';
   return authHeader === `Bearer ${cronSecret}`;
+}
+
+async function isAuthorizedAdmin(request: NextRequest): Promise<boolean> {
+  const supabase = await createServerClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) return false;
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  return profile?.role === 'admin';
 }
 
 // ========== INDIVIDUAL CHECKS ==========
@@ -235,9 +250,10 @@ async function checkNovelDistribution(supabase: ReturnType<typeof getSupabase>):
 // ========== MAIN HANDLER ==========
 
 export async function GET(request: NextRequest) {
-  // Allow both cron auth and admin access (via query param)
-  const isAdminManual = request.nextUrl.searchParams.get('manual') === 'true';
-  if (!isAdminManual && !verifyCronAuth(request)) {
+  // Allow cron Bearer auth OR authenticated admin users
+  const isCron = verifyCronAuth(request);
+  const isManual = request.nextUrl.searchParams.get('manual') === 'true';
+  if (!isCron && !(isManual && await isAuthorizedAdmin(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

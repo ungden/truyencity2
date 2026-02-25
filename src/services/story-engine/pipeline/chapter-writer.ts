@@ -278,9 +278,19 @@ SỨC MẠNH: Tối đa ${ENGAGEMENT_CHECKLIST.powerBudget.perArcRules.maxPowerU
 ${CLIFFHANGER_TECHNIQUES.map((c: { name: string; example: string }) => '- ' + c.name + ': ' + c.example).join('\n')}
 ⚠️ QUAN TRỌNG: Context đã liệt kê [CLIFFHANGER ĐÃ DÙNG]. Bạn PHẢI chọn loại KHÁC. Nếu 3 chương gần nhất đều dùng Threat → chọn Revelation/Choice/Pending Result/v.v.`;
 
+  // Token budget: progressively trim context if total prompt exceeds ~120K chars (~30K tokens)
+  const MAX_PROMPT_CHARS = 120_000;
+  let trimmedContext = context;
+  const staticParts = [constraintSection, topicSection, titleRules, emotionalArcGuide, finalArcGuide, engagementGuide].join('').length + 2000; // overhead
+  if (trimmedContext.length + staticParts > MAX_PROMPT_CHARS) {
+    // Trim context to fit budget
+    trimmedContext = trimmedContext.slice(0, MAX_PROMPT_CHARS - staticParts);
+    console.warn(`[Architect] Chapter ${chapterNumber}: context trimmed from ${context.length} to ${trimmedContext.length} chars`);
+  }
+
   const prompt = `Lên kế hoạch cho CHƯƠNG ${chapterNumber}.
 
-${context}
+${trimmedContext}
 
 ${constraintSection}
 ${topicSection}
@@ -540,16 +550,34 @@ async function runCritic(
   const wordCount = countWords(content);
   const wordRatio = wordCount / targetWords;
 
-  // Show FULL content to critic (not truncated)
-  const contentPreview = content;
+  // Size guard: if content is extremely long (>60K chars ≈ 15K tokens), use head+tail
+  const MAX_CRITIC_CONTENT_CHARS = 60_000;
+  let contentPreview = content;
+  if (content.length > MAX_CRITIC_CONTENT_CHARS) {
+    const headSize = Math.floor(MAX_CRITIC_CONTENT_CHARS * 0.6);
+    const tailSize = MAX_CRITIC_CONTENT_CHARS - headSize;
+    contentPreview = content.slice(0, headSize) + '\n\n[...phần giữa bị lược bỏ...]\n\n' + content.slice(-tailSize);
+    console.warn(`[Critic] Chapter content trimmed from ${content.length} to ${contentPreview.length} chars (head+tail)`);
+  }
 
-  // Cross-chapter context for contradiction detection
-  const crossChapterSection = previousContext
-    ? `BỐI CẢNH CÂU CHUYỆN (dùng để KIỂM TRA mâu thuẫn):
-${previousContext.slice(0, 5000)}
+  // Cross-chapter context for contradiction detection (B5 fix: extract bridge + character states, not blind slice)
+  let crossChapterSection = '';
+  if (previousContext) {
+    const relevantParts: string[] = [];
+    // Extract bridge section (cliffhanger + MC state)
+    const bridgeMatch = previousContext.match(/\[CẦU NỐI CHƯƠNG[^\]]*\][\s\S]*?(?=\n\n\[|$)/);
+    if (bridgeMatch) relevantParts.push(bridgeMatch[0]);
+    // Extract character states
+    const charMatch = previousContext.match(/\[NHÂN VẬT HIỆN TẠI[^\]]*\][\s\S]*?(?=\n\n\[|$)/);
+    if (charMatch) relevantParts.push(charMatch[0]);
+    // Extract synopsis structured fields (MC state, allies, enemies, threads)
+    const synopsisMatch = previousContext.match(/\[TÓM TẮT[^\]]*\][\s\S]*?(?=\n\n\[|$)/);
+    if (synopsisMatch) relevantParts.push(synopsisMatch[0].slice(0, 2000));
 
-`
-    : '';
+    crossChapterSection = relevantParts.length > 0
+      ? `BỐI CẢNH CÂU CHUYỆN (dùng để KIỂM TRA mâu thuẫn):\n${relevantParts.join('\n\n').slice(0, 5000)}\n\n`
+      : `BỐI CẢNH CÂU CHUYỆN (dùng để KIỂM TRA mâu thuẫn):\n${previousContext.slice(0, 5000)}\n\n`;
+  }
 
   // Build repetition report for Critic
   const repetitionReport = buildRepetitionReport(content);
@@ -1024,7 +1052,7 @@ function inferSceneType(scene: { goal: string; conflict: string; resolution?: st
   if (/tình cảm|yêu|nhớ|thương|nàng|mỹ nhân/.test(text)) return 'romance';
   if (/hội thoại|nói chuyện|bàn bạc|thương lượng/.test(text)) return 'dialogue';
   if (/nguy hiểm|căng thẳng|bẫy|vây/.test(text)) return 'tension';
-  if (/hài|cườii|buồn cườii/.test(text)) return 'comedy';
+  if (/hài|cười|buồn cười/.test(text)) return 'comedy';
   return 'dialogue';
 }
 

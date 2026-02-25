@@ -2,7 +2,7 @@
  * Story Engine v2 — Gemini API Client
  *
  * Single Gemini wrapper for the entire engine. No other AI providers needed.
- * Handles: rate limiting, retries, response parsing.
+ * Handles: retries (429/503), response parsing.
  */
 
 import type { GeminiResponse, GeminiConfig } from '../types';
@@ -10,35 +10,9 @@ import type { GeminiResponse, GeminiConfig } from '../types';
 const API_BASE = 'https://generativelanguage.googleapis.com/v1beta';
 const RETRY_DELAYS = [2000, 5000, 10000];
 
-// ── Rate Limiter (token bucket, 2000 RPM) ────────────────────────────────────
-
-const rateLimit = {
-  tokens: 2000,
-  maxTokens: 2000,
-  refillRate: 2000 / 60, // ~33 tokens/sec
-  lastRefill: Date.now(),
-};
-
-function refillTokens(): void {
-  const now = Date.now();
-  const elapsed = (now - rateLimit.lastRefill) / 1000;
-  rateLimit.tokens = Math.min(rateLimit.maxTokens, rateLimit.tokens + elapsed * rateLimit.refillRate);
-  rateLimit.lastRefill = now;
-}
-
-async function waitForRateLimit(): Promise<void> {
-  refillTokens();
-  if (rateLimit.tokens >= 1) {
-    rateLimit.tokens -= 1;
-    return;
-  }
-  const waitMs = ((1 - rateLimit.tokens) / rateLimit.refillRate) * 1000;
-  await new Promise(r => setTimeout(r, Math.ceil(waitMs)));
-  refillTokens();
-  rateLimit.tokens -= 1;
-}
-
 // ── Core API Call ────────────────────────────────────────────────────────────
+// NOTE: Client-side rate limiter removed — Gemini tier 3 unlimited.
+// Server-side 429/503 retries in the call loop handle transient throttling.
 
 export async function callGemini(
   userPrompt: string,
@@ -47,8 +21,6 @@ export async function callGemini(
 ): Promise<GeminiResponse> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('GEMINI_API_KEY not set');
-
-  await waitForRateLimit();
 
   const generationConfig: Record<string, unknown> = {
     temperature: config.temperature,
@@ -89,7 +61,6 @@ export async function callGemini(
       });
 
       if (res.status === 429 || res.status === 503) {
-        rateLimit.tokens = Math.max(0, rateLimit.tokens - 10);
         if (attempt < RETRY_DELAYS.length) continue;
       }
 

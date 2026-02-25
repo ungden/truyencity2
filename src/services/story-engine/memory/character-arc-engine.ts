@@ -221,11 +221,13 @@ export async function updateCharacterArcs(
   chapterNumber: number,
   charactersInContent: string[],
   config: GeminiConfig,
+  genre?: GenreType,
+  protagonistName?: string,
 ): Promise<void> {
   const db = getSupabase();
 
-  // Update last_seen for characters that appeared
-  for (const name of charactersInContent) {
+  // Batch update last_seen for characters that appeared (instead of N+1 individual updates)
+  if (charactersInContent.length > 0) {
     await db
       .from('character_arcs')
       .update({
@@ -233,7 +235,7 @@ export async function updateCharacterArcs(
         updated_at: new Date().toISOString(),
       })
       .eq('project_id', projectId)
-      .eq('character_name', name);
+      .in('character_name', charactersInContent);
   }
 
   // Check if any character needs an arc generated (appeared >= 3 times, no arc yet)
@@ -263,7 +265,7 @@ export async function updateCharacterArcs(
     if (count >= 3 && !arcNames.has(name) && charactersInContent.includes(name)) {
       // Generate arc for this recurring character (non-blocking)
       generateCharacterArc(
-        projectId, name, 'tien-hiep', '', chapterNumber, 1000,
+        projectId, name, genre || 'tien-hiep', protagonistName || '', chapterNumber, 1000,
         undefined, undefined, config,
       ).catch(() => {}); // Non-fatal, fire-and-forget
       break; // Only generate 1 per chapter to avoid token burn
@@ -271,20 +273,4 @@ export async function updateCharacterArcs(
   }
 }
 
-// ── Advance Character Phase (called when trigger event detected) ─────────────
 
-export async function advanceCharacterPhase(
-  projectId: string,
-  characterName: string,
-  newPhase: string,
-): Promise<void> {
-  const db = getSupabase();
-  await db
-    .from('character_arcs')
-    .update({
-      current_phase: newPhase,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('project_id', projectId)
-    .eq('character_name', characterName);
-}

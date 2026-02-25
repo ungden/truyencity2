@@ -293,17 +293,22 @@ export async function updateLocationExploration(
     .eq('project_id', projectId)
     .eq('explored', false);
 
-  if (!locations) return;
+  if (!locations || locations.length === 0) return;
 
-  for (const loc of locations) {
-    const range = loc.arc_range || [0, 0];
-    if (arcNumber >= range[0] && arcNumber <= range[1]) {
-      await db
-        .from('location_bibles')
-        .update({ explored: true })
-        .eq('project_id', projectId)
-        .eq('location_name', loc.location_name);
-    }
+  // Collect location names that should be marked explored, then batch update
+  const toExplore = locations
+    .filter(loc => {
+      const range = loc.arc_range || [0, 0];
+      return arcNumber >= range[0] && arcNumber <= range[1];
+    })
+    .map(loc => loc.location_name);
+
+  if (toExplore.length > 0) {
+    await db
+      .from('location_bibles')
+      .update({ explored: true })
+      .eq('project_id', projectId)
+      .in('location_name', toExplore);
   }
 }
 

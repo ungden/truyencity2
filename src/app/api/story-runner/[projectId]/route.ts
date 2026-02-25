@@ -6,6 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { createServerClient } from '@/integrations/supabase/server';
 
 function getSupabaseAdmin() {
   return createClient(
@@ -14,11 +15,35 @@ function getSupabaseAdmin() {
   );
 }
 
+async function isAuthorizedAdmin(request: NextRequest): Promise<boolean> {
+  const authHeader = request.headers.get('authorization');
+  const cronSecret = process.env.CRON_SECRET;
+  if (authHeader && cronSecret && authHeader === `Bearer ${cronSecret}`) {
+    return true;
+  }
+
+  const supabase = await createServerClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) return false;
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  return profile?.role === 'admin';
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
+    if (!(await isAuthorizedAdmin(request))) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { projectId } = await params;
     const supabase = getSupabaseAdmin();
 

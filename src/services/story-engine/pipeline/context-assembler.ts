@@ -8,7 +8,7 @@
 import { getSupabase } from '../utils/supabase';
 import { callGemini } from '../utils/gemini';
 import { parseJSON } from '../utils/json-repair';
-import { getGenreBoundaryText } from '../config';
+
 import type {
   ContextPayload, ChapterSummary, GenreType, GeminiConfig,
 } from '../types';

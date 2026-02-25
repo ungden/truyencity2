@@ -196,10 +196,10 @@ async function tryGenerateArcPlan(
       .eq('arc_number', arcNumber)
       .maybeSingle();
 
-    // Load synopsis, bible, and story_outline for context + StoryVision
+    // Load synopsis, bible, story_outline, and master_outline in one batch (B4 fix: no duplicate queries)
     const [{ data: synRow }, { data: projectRow }] = await Promise.all([
-      db.from('story_synopsis').select('synopsis_text').eq('project_id', projectId).order('last_updated_chapter', { ascending: false }).limit(1).maybeSingle(),
-      db.from('ai_story_projects').select('story_bible,story_outline').eq('id', projectId).maybeSingle(),
+      db.from('story_synopsis').select('synopsis_text,open_threads').eq('project_id', projectId).order('last_updated_chapter', { ascending: false }).limit(1).maybeSingle(),
+      db.from('ai_story_projects').select('story_bible,story_outline,master_outline').eq('id', projectId).maybeSingle(),
     ]);
 
     if (!existing) {
@@ -234,15 +234,8 @@ async function tryGenerateArcPlan(
     const arcStart = (arcNumber - 1) * ARC_SIZE + 1;
     const arcEnd = arcNumber * ARC_SIZE;
 
-    // Load synopsis structured fields for open threads
-    const { data: synopsisRow } = await db
-      .from('story_synopsis')
-      .select('open_threads')
-      .eq('project_id', projectId)
-      .order('last_updated_chapter', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    const openThreads: string[] = synopsisRow?.open_threads || [];
+    // Reuse synRow (already loaded above) for open_threads
+    const openThreads: string[] = synRow?.open_threads || [];
 
     // Load arc plan text for pacing blueprint
     const { data: arcPlanRow } = await db
@@ -252,13 +245,8 @@ async function tryGenerateArcPlan(
       .eq('arc_number', arcNumber)
       .maybeSingle();
 
-    // Load master outline for world map (JSONB → stringify)
-    const { data: masterRow } = await db
-      .from('ai_story_projects')
-      .select('master_outline')
-      .eq('id', projectId)
-      .maybeSingle();
-    const rawMO = masterRow?.master_outline;
+    // Reuse projectRow (already loaded above) for master_outline
+    const rawMO = projectRow?.master_outline;
     const masterOutlineStr: string | undefined = rawMO
       ? (typeof rawMO === 'string' ? rawMO : JSON.stringify(rawMO))
       : undefined;
@@ -444,54 +432,4 @@ export function shouldBeFinaleArc(
   return false;
 }
 
-// ── StoryVision (for synopsis generation) ────────────────────────────────────
 
-export interface StoryVision {
-  overallTheme: string;
-  mcEndGoal: string;
-  mainConflictResolution: string;
-  emotionalTone: string;
-}
-
-/**
- * Generate StoryVision from synopsis and arc plans.
- */
-export async function generateStoryVision(
-  projectId: string,
-  config: GeminiConfig,
-): Promise<StoryVision | null> {
-  try {
-    const db = getSupabase();
-
-    const [{ data: synRow }, { data: arcRows }] = await Promise.all([
-      db.from('story_synopsis').select('synopsis_text').eq('project_id', projectId).order('last_updated_chapter', { ascending: false }).limit(1).maybeSingle(),
-      db.from('arc_plans').select('plan_text,arc_theme').eq('project_id', projectId).order('arc_number', { ascending: true }).limit(5),
-    ]);
-
-    if (!synRow?.synopsis_text) return null;
-
-    const prompt = `Phân tích cốt truyện và tạo StoryVision.
-
-Synopsis: ${synRow.synopsis_text.slice(0, 2000)}
-
-Arc Plans: ${(arcRows || []).map(a => a.plan_text?.slice(0, 500)).join('\n---\n')}
-
-Trả về JSON:
-{
-  "overallTheme": "chủ đề chính của truyện",
-  "mcEndGoal": "mục tiêu cuối cùng của MC",
-  "mainConflictResolution": "cách giải quyết xung đột chính",
-  "emotionalTone": "tone cảm xúc tổng thể"
-}`;
-
-    const { callGemini } = await import('../utils/gemini');
-    const { parseJSON } = await import('../utils/json-repair');
-
-    const res = await callGemini(prompt, { ...config, temperature: 0.3, maxTokens: 2048 }, { jsonMode: true });
-    const parsed = parseJSON<StoryVision>(res.content);
-
-    return parsed;
-  } catch {
-    return null;
-  }
-}

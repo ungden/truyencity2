@@ -146,13 +146,20 @@ async function embedChapterChunks(projectId: string, chapterNumber: number): Pro
       'RETRIEVAL_DOCUMENT',
     );
 
-    for (let i = 0; i < chunks.length; i++) {
-      const emb = embeddings[i];
-      if (!emb) continue;
-      await db
-        .from('story_memory_chunks')
-        .update({ embedding: JSON.stringify(emb) })
-        .eq('id', chunks[i].id);
+    // Batch update embeddings using Promise.all instead of sequential N+1 queries
+    const updatePromises = chunks
+      .map((chunk, i) => {
+        const emb = embeddings[i];
+        if (!emb) return null;
+        return db
+          .from('story_memory_chunks')
+          .update({ embedding: JSON.stringify(emb) })
+          .eq('id', chunk.id);
+      })
+      .filter(Boolean);
+
+    if (updatePromises.length > 0) {
+      await Promise.all(updatePromises);
     }
   } catch {
     // Non-fatal
