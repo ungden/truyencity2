@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseFromAuthHeader } from '@/integrations/supabase/auth-helpers';
 import { revalidatePath } from 'next/cache';
 
+export const maxDuration = 30;
+
 export const DELETE = async (
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
@@ -69,7 +71,8 @@ export const DELETE = async (
     // Delete chapter
     const { error: deleteError } = await client.from('chapters').delete().eq('id', chapterId);
     if (deleteError) {
-      return NextResponse.json({ error: deleteError.message }, { status: 500 });
+      console.error('[chapters] Delete error:', deleteError);
+      return NextResponse.json({ error: 'Không thể xóa chương' }, { status: 500 });
     }
 
     // Delete story graph from this chapter number
@@ -79,7 +82,7 @@ export const DELETE = async (
       .eq('novel_id', chapter.novel_id);
 
     if (projects && projects.length > 0) {
-      const projectIds = projects.map((p: any) => p.id);
+      const projectIds = projects.map((p: { id: string }) => p.id);
 
       await client
         .from('story_graph_nodes')

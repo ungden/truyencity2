@@ -72,7 +72,7 @@ Quy tắc:
     // Save to DB
     const db = getSupabase();
     await db.from('ai_story_projects')
-      .update({ master_outline: parsed as any })
+      .update({ master_outline: parsed as unknown as Record<string, unknown> })
       .eq('id', projectId);
 
     return parsed;

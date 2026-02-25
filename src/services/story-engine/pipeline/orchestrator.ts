@@ -307,7 +307,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   if (combinedResult?.characters && combinedResult.characters.length > 0) {
     await saveCharacterStatesFromCombined(
       project.id, nextChapter, combinedResult.characters,
-    ).catch(() => {});
+    ).catch(e => console.warn('[Orchestrator] Task 2 character state save failed:', e instanceof Error ? e.message : String(e)));
   }
 
   await Promise.all([
@@ -315,24 +315,24 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     chunkAndStoreChapter(
       project.id, nextChapter, result.content, result.title,
       `Chương ${nextChapter}: ${result.title}`, characters,
-    ).catch(() => {}),
+    ).catch(e => console.warn('[Orchestrator] Task 3 RAG chunking failed:', e instanceof Error ? e.message : String(e))),
 
     // Task 4: Beat detection + recording
     detectAndRecordBeats(
       project.id, nextChapter, arcNumber, result.content,
-    ).catch(() => {}),
+    ).catch(e => console.warn('[Orchestrator] Task 4 beat detection failed:', e instanceof Error ? e.message : String(e))),
 
     // Task 5: Rule extraction
     extractRulesFromChapter(
       project.id, nextChapter, result.content,
-    ).catch(() => {}),
+    ).catch(e => console.warn('[Orchestrator] Task 5 rule extraction failed:', e instanceof Error ? e.message : String(e))),
 
     // Task 6: Consistency check — every 3 chapters to reduce AI calls
     // (dead character regex runs every chapter; business logic AI check runs every 3)
     ...(nextChapter % 3 === 0 ? [
       checkConsistency(
         project.id, nextChapter, result.content, characters,
-      ).catch(() => {}),
+      ).catch(e => console.warn('[Orchestrator] Task 6 consistency check failed:', e instanceof Error ? e.message : String(e))),
     ] : []),
 
     // ── Quality modules post-write (Tasks 7-12, all non-fatal) ──────────
@@ -369,10 +369,14 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   ]);
 
   // ── Step 7: Update project current_chapter ─────────────────────────────
-  await db
+  const { error: stepSevenErr } = await db
     .from('ai_story_projects')
     .update({ current_chapter: nextChapter, updated_at: new Date().toISOString() })
     .eq('id', project.id);
+
+  if (stepSevenErr) {
+    console.warn(`[Orchestrator] CRITICAL: Failed to update current_chapter to ${nextChapter} for project ${project.id}: ${stepSevenErr.message}`);
+  }
 
   return {
     chapterNumber: nextChapter,

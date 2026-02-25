@@ -2,14 +2,8 @@
  * Story Engine v2 — Title Checker
  *
  * Ported from v1 title-checker.ts
- * Checks title similarity and optimizes titles.
+ * Checks title similarity against previous titles.
  */
-
-export interface TitleCheckResult {
-  optimized: string;
-  confidence: number;
-  reason: string;
-}
 
 export interface SimilarTitleResult {
   mostSimilar: string | null;
@@ -39,36 +33,5 @@ export const titleChecker = {
     }
 
     return { mostSimilar, similarity: maxSimilarity };
-  },
-
-  /**
-   * Optimize a title to be more engaging
-   */
-  optimizeTitle(
-    rawTitle: string,
-    previousTitles: string[],
-    context?: { chapterNumber?: number; contentHint?: string }
-  ): TitleCheckResult {
-    let optimized = rawTitle.trim();
-
-    // Remove common prefixes
-    optimized = optimized.replace(/^(Chapter|Chương)\s*\d*\s*[:\-–—]\s*/i, '');
-
-    // Check similarity
-    const { similarity } = this.findMostSimilar(optimized, previousTitles);
-
-    if (similarity >= 0.7) {
-      return {
-        optimized,
-        confidence: 0.3,
-        reason: `Title too similar (${Math.round(similarity * 100)}%) to previous`,
-      };
-    }
-
-    return {
-      optimized,
-      confidence: 0.8,
-      reason: 'Title optimized successfully',
-    };
   },
 };

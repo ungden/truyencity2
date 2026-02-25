@@ -7,7 +7,6 @@
 import type { SceneOutline, ChapterOutline, ContextPayload } from '@/services/story-engine/types';
 import { getEnhancedStyleBible } from '@/services/story-engine/memory/style-bible';
 import { titleChecker } from '@/services/story-engine/memory/title-checker';
-import { ConstraintExtractor } from '@/services/story-engine/memory/constraint-extractor';
 import { shouldBeFinaleArc } from '@/services/story-engine/memory/summary-manager';
 
 describe('Story Engine v2', () => {
@@ -111,19 +110,6 @@ describe('Story Engine v2', () => {
       ]);
       
       expect(result.similarity).toBeLessThan(0.5);
-    });
-  });
-
-  describe('Constraint Extractor', () => {
-    it('should format constraints for prompt', () => {
-      const constraints = [
-        { id: '1', subject: 'MC', predicate: 'realm', value: 'Kim Đan', context: 'MC đang ở cảnh giới Kim Đan', immutable: true, category: 'power_cap' as const },
-        { id: '2', subject: 'Enemy', predicate: 'status', value: 'dead', context: 'Enemy đã bị giết ở ch.10', immutable: true, category: 'character_limit' as const },
-      ];
-      
-      const formatted = ConstraintExtractor.formatForPrompt(constraints);
-      expect(formatted).toContain('RÀNG BUỘC CỨNG');
-      expect(formatted).toContain('Kim Đan');
     });
   });
 

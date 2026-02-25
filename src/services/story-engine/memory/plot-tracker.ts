@@ -150,13 +150,27 @@ function scoreThread(
   return score;
 }
 
-function mapThreadRow(row: Record<string, any>): PlotThread {
+interface PlotThreadRow {
+  id: string;
+  name: string;
+  description: string | null;
+  priority: PlotThread['priority'] | string | null;
+  status: PlotThread['status'] | string | null;
+  start_chapter: number | null;
+  target_payoff_chapter: number | null;
+  last_active_chapter: number | null;
+  related_characters: string[] | null;
+  foreshadowing_hints: ForeshadowingHint[] | null;
+  importance: number | null;
+}
+
+function mapThreadRow(row: PlotThreadRow): PlotThread {
   return {
     id: row.id,
     name: row.name,
     description: row.description || '',
-    priority: row.priority || 'sub',
-    status: row.status || 'open',
+    priority: (row.priority || 'sub') as PlotThread['priority'],
+    status: (row.status || 'open') as PlotThread['status'],
     startChapter: row.start_chapter || 0,
     targetPayoffChapter: row.target_payoff_chapter ?? undefined,
     lastActiveChapter: row.last_active_chapter || 0,

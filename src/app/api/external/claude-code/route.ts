@@ -2,6 +2,8 @@ import { createServerClient } from '@/integrations/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { createHash } from 'crypto';
 import type { z } from 'zod';
+
+export const maxDuration = 60;
 import {
   rateLimiter,
   RATE_LIMIT_CONFIGS,

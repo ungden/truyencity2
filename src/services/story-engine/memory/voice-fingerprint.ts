@@ -136,13 +136,14 @@ Trả về JSON:
     }
   }
 
-  await db.from('voice_fingerprints').upsert({
+  const { error: upsertErr } = await db.from('voice_fingerprints').upsert({
     project_id: projectId,
     fingerprint: parsed,
     sample_chapters: chapters.map(c => c.chapter_number),
     anti_patterns: antiPatterns,
     last_updated_chapter: chapterNumber,
   }, { onConflict: 'project_id' });
+  if (upsertErr) console.warn('[VoiceFingerprint] Failed to save voice fingerprint: ' + upsertErr.message);
 }
 
 // ── Get Voice Fingerprint Context (pre-write injection) ──────────────────────

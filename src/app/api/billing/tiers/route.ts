@@ -4,6 +4,8 @@ import { subscriptionService } from '@/services/billing/subscription-service';
 import { logger, getRequestContext, createTimer } from '@/lib/security/logger';
 import { cacheService, CACHE_TTL } from '@/lib/cache/cache-service';
 
+export const maxDuration = 10;
+
 /**
  * GET /api/billing/tiers
  * Get all subscription tier information (public endpoint)

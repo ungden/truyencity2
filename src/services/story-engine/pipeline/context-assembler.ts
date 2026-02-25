@@ -13,6 +13,41 @@ import type {
   ContextPayload, ChapterSummary, GenreType, GeminiConfig,
 } from '../types';
 
+// ── AI Response Interfaces ───────────────────────────────────────────────────
+
+interface CombinedAIResponse {
+  summary?: string;
+  openingSentence?: string;
+  mcState?: string;
+  cliffhanger?: string;
+  characters?: Array<{
+    character_name: string;
+    status: string;
+    power_level: string | null;
+    power_realm_index: number | null;
+    location: string | null;
+    personality_quirks: string | null;
+    notes: string | null;
+  }>;
+}
+
+interface SynopsisAIResponse {
+  synopsis_text?: string;
+  mc_current_state?: string;
+  active_allies?: string[];
+  active_enemies?: string[];
+  open_threads?: string[];
+}
+
+interface ArcPlanAIResponse {
+  arc_theme?: string;
+  plan_text?: string;
+  chapter_briefs?: Array<{ chapterNumber: number; brief: string }>;
+  threads_to_advance?: string[];
+  threads_to_resolve?: string[];
+  new_threads?: string[];
+}
+
 // ── Load Context ─────────────────────────────────────────────────────────────
 
 export async function loadContext(
@@ -64,7 +99,7 @@ export async function loadContext(
   ]);
 
   // Build payload
-  const [summaryData, endingData] = bridgeResult as [{ data: any }, { data: any }];
+  const [summaryData, endingData] = bridgeResult as [{ data: { summary?: string; mc_state?: string; cliffhanger?: string } | null }, { data: { content?: string } | null }];
   const bridge = summaryData?.data;
   const ending = endingData?.data;
 
@@ -94,7 +129,16 @@ export async function loadContext(
   } : undefined;
 
   // Deduplicate character states (latest per character)
-  const charMap = new Map<string, any>();
+  interface CharacterStateRow {
+    character_name: string;
+    status: string;
+    power_level: string | null;
+    power_realm_index: number | null;
+    location: string | null;
+    notes: string | null;
+    chapter_number: number;
+  }
+  const charMap = new Map<string, CharacterStateRow>();
   for (const cs of (charStatesResult?.data || [])) {
     if (!charMap.has(cs.character_name)) charMap.set(cs.character_name, cs);
   }
@@ -135,16 +179,16 @@ export async function loadContext(
     hasStoryBible: !!bible,
     synopsis: synopsis?.synopsis_text,
     synopsisStructured,
-    recentChapters: recentChapters.map((c: any) => {
+    recentChapters: recentChapters.map((c: { chapter_number: number; title: string; content: string }) => {
       const charLimit = chapterNumber > 50 ? 3000 : 5000;
       return `[Ch.${c.chapter_number}: "${c.title}"]\n${(c.content || '').slice(0, charLimit)}`;
     }),
     arcPlan: arc?.plan_text,
     chapterBrief,
     arcPlanThreads,
-    previousTitles: (titlesResult?.data || []).map((t: any) => t.title).filter(Boolean),
-    recentOpenings: (openingsResult?.data || []).map((o: any) => o.opening_sentence).filter(Boolean),
-    recentCliffhangers: (cliffhangersResult?.data || []).map((c: any) => c.cliffhanger).filter(Boolean),
+    previousTitles: (titlesResult?.data || []).map((t: { title: string }) => t.title).filter(Boolean),
+    recentOpenings: (openingsResult?.data || []).map((o: { opening_sentence: string }) => o.opening_sentence).filter(Boolean),
+    recentCliffhangers: (cliffhangersResult?.data || []).map((c: { cliffhanger: string }) => c.cliffhanger).filter(Boolean),
     characterStates: charText,
     knownCharacterNames: characters.map(c => c.character_name),
     genreBoundary: undefined, // set by orchestrator
@@ -301,7 +345,7 @@ export async function saveChapterSummary(
   summary: ChapterSummary,
 ): Promise<void> {
   const db = getSupabase();
-  await db.from('chapter_summaries').upsert({
+  const { error } = await db.from('chapter_summaries').upsert({
     project_id: projectId,
     chapter_number: chapterNumber,
     title,
@@ -310,6 +354,10 @@ export async function saveChapterSummary(
     mc_state: summary.mcState,
     cliffhanger: summary.cliffhanger,
   }, { onConflict: 'project_id,chapter_number' });
+
+  if (error) {
+    console.warn(`[ContextAssembler] Failed to save chapter ${chapterNumber} summary: ${error.message}`);
+  }
 }
 
 // ── Post-Write: Generate Summary via AI ──────────────────────────────────────
@@ -515,7 +563,7 @@ QUY TẮC:
 - CHARACTERS: Chỉ nhân vật CÓ TÊN RIÊNG thực sự. CẤM số, mã code, mô tả chung.`;
 
   const res = await callGemini(prompt, { ...config, temperature: 0.1, maxTokens: 2048 }, { jsonMode: true });
-  const parsed = parseJSON<any>(res.content);
+  const parsed = parseJSON<CombinedAIResponse>(res.content);
 
   if (!parsed || !parsed.summary?.trim()) {
     throw new Error(`Chapter ${chapterNumber} combined summary: JSON parse failed — raw: ${res.content.slice(0, 200)}`);
@@ -533,7 +581,10 @@ QUY TẮC:
 
   return {
     summary,
-    characters: Array.isArray(parsed.characters) ? parsed.characters : [],
+    characters: Array.isArray(parsed.characters) ? parsed.characters.map(c => ({
+      ...c,
+      status: (c.status || 'unknown') as 'alive' | 'dead' | 'missing' | 'unknown',
+    })) : [],
   };
 }
 
@@ -566,13 +617,13 @@ Trả về JSON:
 }`;
 
   const res = await callGemini(prompt, { ...config, temperature: 0.2, maxTokens: 2048 }, { jsonMode: true });
-  const parsed = parseJSON<any>(res.content);
+  const parsed = parseJSON<SynopsisAIResponse>(res.content);
   if (!parsed || !parsed.synopsis_text?.trim()) {
     throw new Error(`Synopsis generation failed: JSON parse error — raw: ${res.content.slice(0, 200)}`);
   }
 
   const db = getSupabase();
-  await db.from('story_synopsis').upsert({
+  const { error: synopsisErr } = await db.from('story_synopsis').upsert({
     project_id: projectId,
     synopsis_text: parsed.synopsis_text || '',
     mc_current_state: parsed.mc_current_state || '',
@@ -581,6 +632,10 @@ Trả về JSON:
     open_threads: parsed.open_threads || [],
     last_updated_chapter: lastChapter,
   }, { onConflict: 'project_id' });
+
+  if (synopsisErr) {
+    console.warn(`[ContextAssembler] Failed to save synopsis for project ${projectId}: ${synopsisErr.message}`);
+  }
 }
 
 // ── Post-Write: Generate Arc Plan ────────────────────────────────────────────
@@ -637,13 +692,13 @@ Trả về JSON:
 }`;
 
   const res = await callGemini(prompt, { ...config, temperature: 0.3, maxTokens: 4096 }, { jsonMode: true });
-  const parsed = parseJSON<any>(res.content);
+  const parsed = parseJSON<ArcPlanAIResponse>(res.content);
   if (!parsed || !parsed.plan_text?.trim()) {
     throw new Error(`Arc plan generation failed: JSON parse error — raw: ${res.content.slice(0, 200)}`);
   }
 
   const db = getSupabase();
-  await db.from('arc_plans').upsert({
+  const { error: arcErr } = await db.from('arc_plans').upsert({
     project_id: projectId,
     arc_number: arcNumber,
     start_chapter: startChapter,
@@ -655,6 +710,10 @@ Trả về JSON:
     threads_to_resolve: parsed.threads_to_resolve || [],
     new_threads: parsed.new_threads || [],
   }, { onConflict: 'project_id,arc_number' });
+
+  if (arcErr) {
+    console.warn(`[ContextAssembler] Failed to save arc plan ${arcNumber} for project ${projectId}: ${arcErr.message}`);
+  }
 }
 
 // ── Post-Write: Generate/Refresh Story Bible ─────────────────────────────────
@@ -694,5 +753,9 @@ Viết dạng text thuần, 800-1500 từ.`;
   if (!res.content || res.content.length < 100) return;
 
   const db = getSupabase();
-  await db.from('ai_story_projects').update({ story_bible: res.content }).eq('id', projectId);
+  const { error: bibleErr } = await db.from('ai_story_projects').update({ story_bible: res.content }).eq('id', projectId);
+
+  if (bibleErr) {
+    console.warn(`[ContextAssembler] Failed to save story bible for project ${projectId}: ${bibleErr.message}`);
+  }
 }

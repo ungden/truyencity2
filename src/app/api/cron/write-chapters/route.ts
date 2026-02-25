@@ -23,7 +23,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { verifyCronAuth } from '@/lib/auth/cron-auth';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
+import { getVietnamDayBounds } from '@/lib/utils/vietnam-time';
 
 // Story Engine v2 — sole engine for all tiers (init + resume)
 import { writeOneChapter as writeOneChapterV2 } from '@/services/story-engine';
@@ -45,39 +47,6 @@ const DAILY_CHAPTER_QUOTA = 20; // Hard exact target per active novel per Vietna
 
 export const maxDuration = 300; // 5 minutes (Vercel Pro)
 export const dynamic = 'force-dynamic';
-
-function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-}
-
-function verifyCronAuth(request: NextRequest): boolean {
-  const authHeader = request.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret) return process.env.NODE_ENV === 'development';
-  return authHeader === `Bearer ${cronSecret}`;
-}
-
-function getVietnamDayBounds(now: Date = new Date()): { vnDate: string; startIso: string; endIso: string } {
-  const dateStr = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Asia/Ho_Chi_Minh',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(now);
-
-  const [year, month, day] = dateStr.split('-').map(Number);
-  const startUtc = new Date(Date.UTC(year, month - 1, day, -7, 0, 0));
-  const endUtc = new Date(startUtc.getTime() + 24 * 60 * 60 * 1000);
-
-  return {
-    vnDate: dateStr,
-    startIso: startUtc.toISOString(),
-    endIso: endUtc.toISOString(),
-  };
-}
 
 function hashStringToInt(input: string): number {
   let hash = 0;

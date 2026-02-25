@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseFromAuthHeader } from '@/integrations/supabase/auth-helpers';
 
+export const maxDuration = 10;
+
 export async function GET(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
@@ -31,7 +33,7 @@ export async function GET(
 
     return NextResponse.json({ job });
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Failed to fetch job status';
-    return NextResponse.json({ error: errorMessage }, { status: 500 });
+    console.error('[ai-image/jobs/id] GET error:', error);
+    return NextResponse.json({ error: 'Failed to fetch job status' }, { status: 500 });
   }
 }

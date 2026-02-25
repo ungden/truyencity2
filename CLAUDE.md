@@ -2,150 +2,50 @@
 
 ## Project Overview
 
-TruyenCity là nền tảng viết truyện tự động bằng AI, hỗ trợ viết truyện dài 1000-2000 chương với khả năng "1 Click = 1 Chương hoàn chỉnh".
+TruyenCity la nen tang viet truyen tu dong bang AI, ho tro viet truyen dai 1000-2000 chuong voi kha nang "1 Click = 1 Chuong hoan chinh".
+
+**Stack**: Next.js 15, React 19, TypeScript, Supabase (PostgreSQL + pgvector + pg_cron), Google Gemini AI, Vercel Pro
+**Mobile**: Expo SDK 54, expo-router v6, NativeWind v5, at `/mobile/`
+**Repo**: `https://github.com/ungden/truyencity2.git` (branch: `main`)
+**Domain**: `truyencity.com` (prod), `truyencity2.vercel.app` (Vercel)
 
 ## Architecture
 
-### Story Engine v2 (Current - 2026-02-18)
+### Story Engine v2 (Production — `USE_STORY_ENGINE_V2=true`)
 
 **Location**: `src/services/story-engine/`
 
-V2 là rewrite từ v1 (`story-writing-factory/`) với architecture tối ưu hơn. Now 19 files (~4,700 lines) with 6 new quality modules.
+V2 replaced v1 (`story-writing-factory/`). ~19 files, modular pipeline. V1 still exists for some API route dependencies (daily-spawn, ai-editor, ai-authors) but the core writing is all v2.
 
 ```
 src/services/story-engine/
 ├── index.ts                    # Public API: writeChapterForProject()
 ├── types.ts                    # All type definitions
-├── config.ts                   # Re-exports from v1 templates.ts
+├── config.ts                   # Re-exports active items from templates.ts
+├── templates.ts                # Genre configs, rules, prompts (~1578 lines)
 ├── utils/
-│   ├── gemini.ts               # Gemini REST API client (NO penalty params!)
+│   ├── gemini.ts               # Gemini REST API client (NO penalty params! API key via x-goog-api-key header)
 │   ├── supabase.ts             # Singleton Supabase client
 │   └── json-repair.ts          # JSON extraction & repair
 ├── pipeline/
-│   ├── context-assembler.ts    # 4-layer context + post-write generators
+│   ├── context-assembler.ts    # 4-layer context + combined summary+character extraction
 │   ├── chapter-writer.ts       # 3-agent: Architect → Writer → Critic
 │   └── orchestrator.ts         # Main entry, 12 parallel post-write tasks
 └── memory/
     ├── rag-store.ts            # Chunk + embed + vector search
-    ├── character-tracker.ts    # Extract + save character states
+    ├── character-tracker.ts    # Save character states (from combined AI call)
     ├── plot-tracker.ts         # Plot threads + beat ledger + rule indexer
-    ├── summary-manager.ts      # Synopsis + bible triggers + StoryVision + quality module triggers
+    ├── summary-manager.ts      # Synopsis + bible + arc plan triggers + quality module triggers
     ├── constraint-extractor.ts # Per-project world rules from DB
     ├── style-bible.ts          # Rich style context + vocabulary + pacing
-    ├── title-checker.ts        # Title similarity + optimization
-    ├── foreshadowing-planner.ts   # [NEW] Long-range hint planning (50-500ch apart)
-    ├── character-arc-engine.ts    # [NEW] Character development + signature traits
-    ├── pacing-director.ts         # [NEW] Per-arc pacing blueprints (10 mood types)
-    ├── voice-fingerprint.ts       # [NEW] Style fingerprint + drift detection
-    ├── power-system-tracker.ts    # [NEW] MC power state + anti-plot-armor
-    └── world-expansion-tracker.ts # [NEW] World map + location bibles
+    ├── title-checker.ts        # Title similarity check (70% threshold)
+    ├── foreshadowing-planner.ts   # Long-range hint planning (50-500ch apart)
+    ├── character-arc-engine.ts    # Character development arcs + signature traits
+    ├── pacing-director.ts         # Per-arc pacing blueprints (10 mood types)
+    ├── voice-fingerprint.ts       # Style fingerprint + drift detection
+    ├── power-system-tracker.ts    # MC power state + anti-plot-armor
+    └── world-expansion-tracker.ts # World map + location bibles
 ```
-
-
-### Quality Audit & Đại Thần Level Fixes (2026-02-24)
-
-**Full audit report**: `docs/quality-audit-v1.md`
-
-Scored chapters 160-163 against 10-dimension rubric comparing to đại thần authors. **Overall: 5.8/10** ("competent but clearly AI-generated"). Implemented 5 fixes targeting the biggest gaps:
-
-- **P0: Anti-Repetition System** — Added `colorRepetitionRule` to `ANTI_CLICHE_RULES` in templates.ts. Added `buildRepetitionReport()` (JS word frequency analyzer) and `detectSevereRepetition()` (hard enforcement) in chapter-writer.ts. Critic now receives automated repetition report. Words appearing 8+ times trigger forced rewrite; 5+ times trigger score penalty.
-- **P1: Mandatory Comedy** — Added rule 10 to ARCHITECT_SYSTEM requiring `comedyBeat` field in outline JSON. Writer prompt now enforces comedy beat per chapter. Critic checks for humor and creates major issue if absent.
-- **P2: Pacing Variety** — Added rule 9 to ARCHITECT_SYSTEM requiring `slowScene` field (at least 1 slow/breathing scene per chapter). Writer prompt enforces rhythm diversity. Critic caps pacingScore at 5 if all scenes are same intensity.
-- **P3: Character Voice Differentiation** — Rewrote `buildCharacterVoiceGuide()` with concrete speech rules per role (MC: short/direct/self-deprecating, AI companion: technical/sarcastic, high-level villain: polite/metaphorical, low-level villain: crude/short, etc.).
-- **P4: Emotional Depth** — Added "3-layer inner monologue" rule to WRITER_SYSTEM with concrete example. Critic checks for multi-layered inner thoughts and creates moderate issue if absent.
-
-**New types**: `comedyBeat?: string` and `slowScene?: string` added to `ChapterOutline` in types.ts.
-
-**Estimated improvement**: 58/100 → 68-72/100.
-
-### Quality Stabilization Round 2 (2026-02-24)
-
-6 fixes addressing post-audit issues (Critic paradox, false positives, data quality, subtext, foreshadowing, cliffhanger):
-
-- **P1: Critic Calibration** — Quality checks (comedy, inner monologue, voice) downgraded from `major` to `moderate` severity. Only `critical` or `≥3 major` penalize overallScore. Prevents unnecessary rewrites on decent chapters (Ch164 scored 5/10 due to over-strict checks).
-- **P2: Contextual Repetition** — `detectSevereRepetition()` now categorizes words: `generic` (tím sẫm, kinh hoàng) keeps strict thresholds (5/8), `plot_element` (rỉ sét, pixel hóa, linh khí, đan điền) uses relaxed thresholds (8/12). Prevents false positives on plot keywords.
-- **P3: Character Name Validation** — Added `isValidCharacterName()` filter in character-tracker.ts. Rejects numbers-only ('001'), single chars, generic labels ('NPC', 'villain'), too-long names. Improved AI prompt to explicitly prohibit non-name extractions.
-- **P4: Dialogue Subtext** — Enhanced Writer prompt with 5 concrete subtext techniques (Nói A hiểu B, trả lời bằng hành động, im lặng có nghĩa, lời nói VS hành động mâu thuẫn, hỏi để đe dọa). Added Critic check #9 for straight Q&A dialogue detection.
-- **P5: Foreshadowing Lifecycle** — Added stale hint abandonment: planned hints >10 chapters overdue auto-abandon, planted hints >20 chapters past payoff deadline auto-abandon. Added overdue hint urgency warnings in `getForeshadowingContext()`.
-- **P6: Cliffhanger Variety** — Expanded `CLIFFHANGER_TECHNIQUES` from 5→13 types (added business/emotional/mystery categories). Architect prompt now explicitly requires choosing a DIFFERENT type from recent chapters.
-
-**Files modified**: chapter-writer.ts, character-tracker.ts, foreshadowing-planner.ts, style-bible.ts, CLAUDE.md
-
-### Production Quality Audit & Fixes (2026-02-24)
-
-Full production audit of 90 active projects (50+ novels writing in parallel, 1 chapter/cron cycle each). Scored system health, identified 3 critical module failures, and fixed them.
-
-**Audit Results (before fixes)**:
-- Word count: avg=3170, min=2388, max=4290. **0% under 2000 words** ✅
-- Chapter summaries: 100% cliffhanger, 0% degraded ✅ (was 49% before)
-- mc_state: only 55% populated ⚠️
-- Character names: 178 unique, only 3 garbage (2%) ✅
-- **foreshadowing_plans: 13 rows** (should be hundreds) ❌
-- **arc_pacing_blueprints: 3 rows** ❌
-- **location_bibles: 13 rows** ❌
-- Content quality spot-check: Comedy 1-4/ch ✅, Inner monologue 2-3 ✅, Dialogue ~43% ✅
-
-**Root Cause**: Quality module triggers (foreshadowing, pacing, worldmap) were chained inside `tryGenerateArcPlan()` AFTER the `if (existing) return;` guard. Since arc plans for arcs 2-8 were generated before quality module code was deployed, the guard skipped the entire function — quality modules never executed.
-
-**Fixes Applied**:
-- **P0: Decoupled quality module triggers** — Moved foreshadowing/pacing/worldmap generation OUTSIDE the arc plan existence guard in summary-manager.ts. Now runs regardless of whether arc plan already existed (each module has its own internal guard).
-- **P1: Arc-boundary catch-up** — Added `tryEnsureQualityModules()` triggered on first chapter of each arc (ch 21, 41, 61...) to backfill missing modules for the current arc.
-- **P2: mc_state fallback** — Added `extractFallbackMcState()` in context-assembler.ts. If AI returns empty mcState, extracts cultivation/power/condition keywords from chapter tail.
-- **P3: Character name filter tightened** — Added rejection for parenthesized group descriptions and comma-separated lists. Cleaned 8 garbage names from DB.
-- **P4: Backfill script** — Created `scripts/backfill-quality-modules.ts`. Ran for all 90 projects: 0 errors.
-
-**Post-fix Data**:
-- foreshadowing_plans: 13 → **384 rows** (90 projects)
-- arc_pacing_blueprints: 3 → **96 rows** (90 projects)  
-- location_bibles: 13 → **368 rows** (48+ projects with master_outline)
-
-**Files modified**: summary-manager.ts, context-assembler.ts, character-tracker.ts, scripts/backfill-quality-modules.ts
-
-### Qidian Master Update (2026-02-22)
-- **Master Outline System:** Added `generateMasterOutline` which runs in the background upon project creation to build a 2000-chapter skeleton (main plot, final boss, world map). Injected as Layer 0.5 in Context Assembler.
-- **Scene Expansion Rules:** Enforced 5-senses description, layered inner monologues, and bystander reactions to reach natural 2500+ word counts (Anti-summarize).
-- **Comedy & Subtext:** Added `COMEDY_MECHANICS_RULES` (Overthinking, Shameless, Gap Moe) and `SUBTEXT_DIALOGUE_RULES` to fix generic AI tones.
-- **Anti-Cliche Dictionary:** Banned repetitive AI phrases like "Hít một ngụm khí lạnh".
-- **Logic Checkers:** Enhanced Plot Tracker to verify business/finance logic using fast LLM calls. Added `personality_quirks` to Character Tracker.
-- **10 New Super Genres (Wave 4):** Sáng Thế, Đệ Tứ Thiên Tai, Tứ Hợp Viện, Dị Thú, Thần Bút, Lưỡng Giới Mậu Dịch, Cá Mặn, Vô Địch, Phản Phái, Bộc Quang.
-
-### Daily Spawn Reliability Update (2026-02-22)
-- **spawnDailyNovels fix:** New projects now generate `master_outline` and `story_outline` inside daily spawn flow (not only bulk seed flow).
-- **Performance hardening:** Genre idea generation in daily spawn now runs in parallel batches to keep total runtime under pg_cron HTTP timeout.
-- **Production validation:** `daily-spawn?target=20` verified successful on `truyencity2.vercel.app` after deploy.
-- **Data backfill:** Missing outlines/covers for projects created during test/deploy were backfilled.
-- **Operational decision:** Keep test-spawned novels (already valid data) instead of deleting.
-
-### Key Features Ported from v1 (36 items)
-
-#### HIGH Priority (9)
-1. **Critic fail-closed** - Không auto-approve khi lỗi (line 576-587)
-2. **Critic hard-enforce continuity & cliffhanger** - Bắt buộc rewrite nếu thiếu ending hook ở non-finale (line 546-560)
-3. **Critic FULL content** - Không cắt 8000 chars nữa (line 509)
-4. **finishReason check** - Phát hiện truncate, log warning (line 273-276)
-5. **Architect scene fallback** - Tối thiểu 4 scenes (line 310-314)
-6. **Scene word estimate correction** - Fix nếu total < 80% target (line 316-323)
-7. **Rewrite instructions → Writer** - Pass vào cả Writer, không chỉ Architect (line 400-405)
-8. **Constraint Extractor** - Load per-project rules từ DB (line 659-709)
-9. **Topic section** - topicPromptHints + parallel world ban (line 711-717)
-
-#### MEDIUM Priority (16)
-10. **Multi-POV** - `pov` field trong SceneOutline (types.ts line 96)
-11. **Character Voice Guide** - Giọng riêng mỗi nhân vật (line 760-780)
-12. **Emotional Arc** - Opening/midpoint/climax/closing (line 415-420)
-13. **Golden Chapter Requirements** - Ch.1-3 special rules (line 256-258)
-14. **Vocabulary Hints** - Injection theo scene type (line 761-794)
-15. **Rich Style Context** - Per-scene pacing rules (line 395-399)
-16. **Cliffhanger dedup** - Từ structured summary
-17. **Title similarity check** - 70% threshold fallback (line 649-666)
-18. **isFinalArc** - Trong prompt, không cliffhanger (line 235-242)
-19. **ENGAGEMENT_CHECKLIST** - Per chapter requirements (line 225-233)
-20. **Synopsis structured fields** - mc_state, allies, enemies, threads (context-assembler.ts line 67-77)
-21. **ArcPlan threads injection** - advance/resolve/new (line 180-195)
-22. **StoryVision** - Từ synopsis + arc plans (summary-manager.ts line 265-297)
-23. **shouldBeFinaleArc()** - AI detection (line 215-231)
-24. **refreshStoryBible()** - Dùng synopsis + recent chapters, không chỉ 3 chương đầu (line 170-213)
-25. **Story outline persistence** - Support trong types
 
 ### API Flow
 
@@ -155,9 +55,9 @@ writeOneChapter() [orchestrator.ts]
   │   ├── Layer 0: Chapter Bridge (previous summary, cliffhanger, MC state)
   │   ├── Layer 1: Story Bible
   │   ├── Layer 2: Rolling Synopsis (structured fields)
-  │   ├── Layer 3: Recent Chapters (5 chương × 5K chars)
+  │   ├── Layer 3: Recent Chapters (3×3000 after ch50, 5×5000 before)
   │   └── Layer 4: Arc Plan (threads injection)
-  ├── Inject quality modules (6 parallel, non-fatal)
+  ├── Inject quality modules (6 parallel, non-fatal, capped 800 chars each)
   │   ├── getForeshadowingContext()
   │   ├── getCharacterArcContext()
   │   ├── getChapterPacingContext()
@@ -165,21 +65,21 @@ writeOneChapter() [orchestrator.ts]
   │   ├── getPowerContext()
   │   └── getWorldContext()
   ├── writeChapter() [chapter-writer.ts]
-  │   ├── runArchitect() - Tạo outline với constraints, emotional arc, golden rules
-  │   ├── runWriter() - Viết content với style context, vocab hints, multi-POV
-  │   └── runCritic() - Review với continuity check, fail-closed
-  └── 12 parallel post-write tasks (all non-fatal)
-      ├── runSummaryTasks() - Synopsis, arc plan, bible + quality module triggers
-      ├── extractAndSaveCharacterStates()
-      ├── chunkAndStoreChapter() - RAG
+  │   ├── runArchitect() — Outline with constraints, emotional arc, golden rules (120K char budget)
+  │   ├── runWriter() — Content with lean context (bridge + chars + quality modules only)
+  │   └── runCritic() — Review with full content (60K char guard), structured context extraction
+  └── Post-write tasks (all non-fatal)
+      ├── runSummaryTasks() — Combined summary+character extraction (1 AI call)
+      ├── saveCharacterStatesFromCombined() — Save from combined result (no extra AI call)
+      ├── chunkAndStoreChapter() — RAG (batch embedding via Promise.all)
       ├── detectAndRecordBeats()
       ├── extractRulesFromChapter()
-      ├── checkConsistency()
+      ├── checkConsistency() — Every 3 chapters
       ├── updateForeshadowingStatus()
-      ├── updateCharacterArcs()
-      ├── updateVoiceFingerprint() - every 10 chapters
-      ├── updateMCPowerState() - every 3 chapters
-      ├── updateLocationExploration()
+      ├── updateCharacterArcs() — Passes actual genre + protagonistName
+      ├── updateVoiceFingerprint() — Every 10 chapters
+      ├── updateMCPowerState() — Every 3 chapters
+      ├── updateLocationExploration() — Batched UPDATE
       └── prepareUpcomingLocation()
 ```
 
@@ -187,182 +87,117 @@ writeOneChapter() [orchestrator.ts]
 
 ### AI Model
 - **Model**: `gemini-3-flash-preview` (thinking model)
-- **IMPORTANT**: KHÔNG dùng `frequencyPenalty`/`presencePenalty` - thinking models không support, sẽ trả content rỗng
+- **IMPORTANT**: KHONG dung `frequencyPenalty`/`presencePenalty` - thinking models khong support, se tra content rong
+- **IMPORTANT**: Gemini tier 3 unlimited — khong can client-side rate limiter
 - **Embeddings**: `gemini-embedding-001`, 768 dims, `outputDimensionality` param
 
 ### Database
 - **Supabase pgvector** (premium plan)
 - **pg_cron**: Single source of truth cho scheduling
-- **Secrets**: Supabase Vault - không hardcode
+- **Secrets**: Supabase Vault - khong hardcode
 
-### Feature Flag
-- `USE_STORY_ENGINE_V2=true` trên Vercel → v2 đang chạy production
-- V1 (`story-writing-factory/`) vẫn còn, chưa xóa (Phase 7 pending)
+### Vercel
+- **Pro plan**: `maxDuration = 300s` hard ceiling
+- Auto-deploy on `git push` to main
 
 ## Important Notes for AI Assistants
 
 ### 1. Chapter Writer Logic [chapter-writer.ts]
 
 **3-Agent Pipeline**:
-- **Architect**: Tạo outline với min 4 scenes, emotional arc, golden rules
-- **Writer**: Viết content với constraints, vocab hints, multi-POV guidance
-- **Critic**: Review với full content, hard-enforce continuity issues
+- **Architect**: Outline with min 4 scenes, emotional arc, golden rules. Token budget: 120K chars max, trims context if exceeded.
+- **Writer**: Content with lean context (only bridge + character states + quality modules — Architect already consumed full context). Static rules (ANTI_CLICHE, COMEDY, SUBTEXT, SCENE_EXPANSION) are in WRITER_SYSTEM prompt (cached by Gemini).
+- **Critic**: Review with full content (60K char head+tail guard). Cross-chapter context extracts bridge + character states + synopsis (not blind slice). Fail-closed on error.
 
-**Retry Logic**:
-- Max 3 attempts
-- Nếu Critic yêu cầu rewrite → pass instructions vào cả Writer và Architect lần sau
-- Fail-closed: Nếu Critic lỗi → không approve, trả về requiresRewrite nếu word count < 60%
+**Retry Logic**: Max 3 attempts. Critic rewrite instructions passed to both Writer AND Architect.
+
+**Repetition Detection**: `detectSevereRepetition()` categorizes words — generic (strict: 5/8 thresholds) vs plot_element (relaxed: 8/12). `buildRepetitionReport()` provides automated report to Critic.
+
+**Scene Type Detection**: `inferSceneType()` uses Vietnamese keyword regex to classify scenes (action/cultivation/revelation/romance/dialogue/tension/comedy).
 
 ### 2. Context Assembly [context-assembler.ts]
 
-**4 Layers** (theo thứ tự priority):
-1. **Chapter Bridge**: Previous cliffhanger (PHẢI giải quyết), MC state, 300 chars cuối
+**4 Layers** (priority order):
+1. **Chapter Bridge**: Previous cliffhanger (PHAI giai quyet), MC state, 300 chars cuoi
 2. **Story Bible**: World rules, power system
 3. **Rolling Synopsis**: + structured fields (mc_state, allies, enemies, open_threads)
 4. **Arc Plan**: Chapter brief + threads (advance/resolve/new)
 
-**Non-fatal Modules** (catch errors, don't crash):
-- RAG context retrieval
-- Constraint extraction
-- All post-write tasks
+**Combined Summary+Character Call**: `generateSummaryAndCharacters()` — single AI call returns both summary and character states. Orchestrator awaits this first, then saves characters from result (saves ~1 AI call/chapter).
 
-### 3. Post-Write Tasks [summary-manager.ts]
+**Adaptive**: After ch50, recent chapters reduced to 3x3000 chars (synopsis covers history). Titles capped at 50 most recent.
 
-**Trigger Conditions**:
+### 3. Post-Write Triggers [summary-manager.ts]
+
 - **Synopsis**: Every 5 chapters
 - **Arc Plan**: At arc boundaries (every 20 chapters)
 - **Story Bible**: Ch.3, then every 150 chapters
-- **StoryVision**: On demand (not automatic)
+- **Quality modules**: Triggered at arc boundaries, OUTSIDE arc plan existence guard (each has its own internal guard)
 
-**Arc-Triggered Quality Module Generation** (when a new arc plan is generated):
-- `generateForeshadowingAgenda()` — Plan hints for the new arc
-- `generatePacingBlueprint()` — Create mood blueprint for the new arc
-- `initializeWorldMap()` — Initialize world map (only once, first arc)
+**Arc-boundary catch-up**: `tryEnsureQualityModules()` runs on first chapter of each arc (ch 21, 41, 61...) to backfill missing modules.
 
-**shouldBeFinaleArc()**:
-- Remaining <= 10 chapters → true
-- Progress >= 95% → true
-- Progress >= 85% AND open threads <= 2 → true
+### 4. Security
 
-### 4. Types [types.ts]
+All admin/internal API routes require auth:
+- **Cron routes**: `Authorization: Bearer ${CRON_SECRET}` — shared `verifyCronAuth()` from `src/lib/auth/cron-auth.ts`
+- **Admin routes**: `isAuthorizedAdmin()` from `src/lib/auth/admin-auth.ts` — checks Bearer token OR Supabase user with `role='admin'`
+- **story-runner**: Admin auth required
+- **health-check manual**: Admin auth required (no more `?manual=true` bypass)
+- **Input validation**: Zod schemas in `src/lib/security/validation.ts` — 10+ route-specific schemas
+- **Error sanitization**: All API routes return generic error messages, no internal details leaked
 
-**Key Types**:
-```typescript
-// Multi-POV support
-interface SceneOutline {
-  order: number;
-  setting: string;
-  characters: string[];
-  goal: string;
-  conflict: string;
-  resolution: string;
-  estimatedWords: number;
-  pov?: string;  // Per-scene POV
-}
+### 6. Shared Utilities (Phase 9)
 
-// Emotional arc
-interface ChapterOutline {
-  // ... other fields
-  emotionalArc?: {
-    opening: string;
-    midpoint: string;
-    climax: string;
-    closing: string;
-  };
-}
+- `src/lib/auth/cron-auth.ts` — shared `verifyCronAuth()` (was duplicated in 7 files)
+- `src/lib/auth/admin-auth.ts` — shared `isAuthorizedAdmin()` (was duplicated in 5 files)
+- `src/lib/supabase/admin.ts` — singleton `getSupabaseAdmin()` (was duplicated in 7 files)
+- `src/lib/utils/vietnam-time.ts` — shared `getVietnamDayBounds()` (was duplicated in 2 files)
 
-// Structured synopsis
-interface ContextPayload {
-  synopsis?: string;
-  synopsisStructured?: {
-    mc_current_state?: string;
-    active_allies?: string[];
-    active_enemies?: string[];
-    open_threads?: string[];
-  };
-  arcPlanThreads?: {
-    threads_to_advance?: string[];
-    threads_to_resolve?: string[];
-    new_threads?: string[];
-  };
-}
-```
+### 5. Performance Optimizations (Phase 7+)
 
-### 5. Constraints [constraint-extractor.ts]
-
-**World Constraints** từ DB (`world_constraints` table):
-- Category: quantity | hierarchy | rule | geography | character_limit | power_cap
-- Immutable vs Mutable
-- Auto-load theo keywords (character names, locations)
-
-### 6. Style & Vocabulary [style-bible.ts]
-
-**Pacing Rules** per SceneType:
-- action: fast, short sentences, low dialogue
-- cultivation: slow, long sentences, description-heavy
-- dialogue: medium, high dialogue ratio
-- tension: fast, very short sentences
-
-**Vocabulary Injection**:
-- Động từ chiến đấu (action scenes)
-- Từ đột phá (cultivation scenes)
-- Cảm xúc (theo dopamine points)
-- Xưng hô (honorifics)
+- Writer gets lean context (~5-10K) instead of full context (~50K) — Architect already distilled it into outline
+- Static prompt rules moved to system prompts (Gemini caches them)
+- Combined summary+character extraction (1 AI call instead of 2)
+- Titles capped at 50, recent chapters adaptive (3x3000 after ch50)
+- checkConsistency every 3 chapters instead of every chapter
+- Quality module contexts capped at 800 chars each
+- N+1 queries batched (character arcs, RAG embeddings, location exploration)
+- Duplicate DB queries consolidated in summary-manager
 
 ## Common Tasks
 
-### Daily Spawn / Cron Checklist
+### Them Feature Moi vao Chapter Writer
 
-1. Verify endpoint manually: `GET /api/cron/daily-spawn?target=1` with `Authorization: Bearer $CRON_SECRET`
-2. Validate newly created project has both `master_outline` and `story_outline`
-3. For `target=20`, ensure runtime stays below pg_cron `net.http_get` timeout
-4. If missing outlines appear, run `npx tsx scripts/fix-missing-data.ts`
-
-### Thêm Feature Mới vào Chapter Writer
-
-1. **Update types.ts** - Thêm field vào interface nếu cần
+1. **Update types.ts** - Them field vao interface neu can
 2. **Update chapter-writer.ts**:
-   - Thêm vào ARCHITECT_SYSTEM hoặc WRITER_SYSTEM prompt
-   - Thêm logic trong runArchitect() hoặc runWriter()
-   - Nếu liên quan Critic → update CRITIC_SYSTEM và runCritic()
-3. **Update context-assembler.ts** - Nếu cần load thêm data từ DB
+   - Them vao ARCHITECT_SYSTEM hoac WRITER_SYSTEM prompt
+   - Them logic trong runArchitect() hoac runWriter()
+   - Neu lien quan Critic → update CRITIC_SYSTEM va runCritic()
+3. **Update context-assembler.ts** - Neu can load them data tu DB
 4. **Run tests** - `npm test`
 5. **Type check** - `npm run typecheck`
 
-### Fix Bug trong Pipeline
+### Them Memory Module Moi
 
-1. **Check 3-agent flow**:
-   - Architect output có đúng format?
-   - Writer có nhận đủ context?
-   - Critic có nhận full content?
-2. **Check non-fatal handling**:
-   - Có try-catch đúng chỗ?
-   - Có `.catch(() => {})` trong Promise.all?
-3. **Check types**:
-   - Interface có đầy đủ fields?
-   - Optional vs required đúng chưa?
+1. Tao file trong `memory/` (vi du: `new-tracker.ts`)
+2. Export functions chinh
+3. Import trong `orchestrator.ts` va them vao Promise.all post-write tasks
+4. Mark as non-fatal: `.catch(err => console.warn('[orchestrator] TaskName failed:', err))`
 
-### Thêm Memory Module Mới
+### Daily Spawn / Cron Checklist
 
-1. Tạo file trong `memory/` (ví dụ: `new-tracker.ts`)
-2. Export functions chính
-3. Import trong `orchestrator.ts` và thêm vào Promise.all post-write tasks
-4. Mark as non-fatal: `.catch(() => {})`
+1. Verify endpoint: `GET /api/cron/daily-spawn?target=1` with `Authorization: Bearer $CRON_SECRET`
+2. Validate project has both `master_outline` and `story_outline`
+3. For `target=20`, ensure runtime stays below pg_cron timeout
+4. If missing outlines: `npx tsx scripts/fix-missing-data.ts`
 
 ## Testing
 
 ```bash
-# Run all tests
-npm test
-
-# Type check
+npm test       # 60 passing
 npm run typecheck
-
-# Dev server
 npm run dev
 ```
-
-**Test Coverage**: 60 passing, 1 known failure (critic rejects mock 18-word chapter) ✅
 
 ## Git Workflow
 
@@ -370,6 +205,7 @@ npm run dev
 # Commit message format
 feat: description
 fix: description
+perf: description
 refactor: description
 docs: description
 
@@ -377,35 +213,120 @@ docs: description
 git push  # Auto deploy to Vercel
 ```
 
-## V1 vs V2
+## Commit History (Phases)
 
-| Aspect | V1 (story-writing-factory/) | V2 (story-engine/) |
-|--------|---------------------------|-------------------|
-| Files | 41 files, 28,470 lines | 19 files, ~4,700 lines |
-| Architecture | Monolithic class | Modular pipeline |
-| AI Calls | Multiple per agent | 3 calls (Architect→Writer→Critic) |
-| Context | Manual assembly | 4-layer automatic + 6 quality modules |
-| Post-write | Sequential | 12 parallel tasks |
-| Status | Legacy (kept for reference) | Production (USE_STORY_ENGINE_V2=true) |
+| Commit | Phase | Description |
+|--------|-------|-------------|
+| `36d2080` | Phase 1 | 6 audit bug fixes |
+| `78a1474`, `81a18ac` | Phase 2 | 6 quality modules + bug fixes |
+| `f007560` | Phase 3 | Quality audit + 5 dai than level fixes |
+| `9bcdf6a` | Phase 4 | Quality stabilization round 2 |
+| `6ad0a55` | Phase 5 | Production audit + 4 fixes + backfill |
+| `5153317` | Phase 6 | Location bible fix |
+| `8060495` | Phase 7 | 12 performance optimizations (~25-30K tokens/chapter saved) |
+| `c7a5d99` | Phase 8 | 3 critical + 3 security + 5 bug fixes + dead code cleanup (-8,200 lines) |
+| `pending` | Phase 9 | Comprehensive audit: security + dedup + type safety + hardening (68 issues) |
+
+## Phase 9 Details (2026-02-25) — Comprehensive Audit Fix
+
+### Phase 9A — Critical Security & Error Handling
+- **9A-1**: Moved Gemini API key from URL query param to `x-goog-api-key` header (both `callGemini` and `embedBatchInternal`)
+- **9A-2**: Added 10+ Zod schemas to `validation.ts`: WriterAction, RatingSubmit, CreateNovel, AIImageJob, AIAuthorGenerate, AIAuthorBatch, ExportNovel, CreditAction, SubscriptionAction
+- **9A-3**: Applied Zod validation to 10 routes: claude-writer, ratings, novels, ai-image/jobs, ai-authors/generate, export, billing/credits, billing/subscription, user/api-tokens
+- **9A-4**: Added DB error check to orchestrator `current_chapter` update
+- **9A-5**: Added DB error checks to context-assembler: saveChapterSummary, generateSynopsis, generateArcPlan, generateStoryBible
+- **9A-6**: Deleted `debug-env` route (was exposed in production)
+- **9A-7**: Added admin role check to `/api/ai-authors/generate` POST+PUT
+- **9A-8**: Added try/catch + error sanitization to ratings GET + 5 other routes
+
+### Phase 9B — Deduplication & maxDuration
+- **9B-1**: Shared `verifyCronAuth()` → replaced in 7 cron/seed routes
+- **9B-2**: Shared `isAuthorizedAdmin()` → replaced in 5 admin routes
+- **9B-3**: Shared singleton `getSupabaseAdmin()` → replaced in 7+ files
+- **9B-4**: Shared `getVietnamDayBounds()` → replaced in 2 files
+- **9B-5**: Added `maxDuration` to 17 routes (values: 10-300s based on workload)
+
+### Phase 9C — Type Safety & Performance
+- **9C-1**: Fixed 11+ `any` types: types.ts storyOutline, context-assembler (6 fixes with new interfaces), chapter-writer vocabulary, master-outline, plot-tracker, chapters/[id]
+- **9C-2**: Ratings: DB-level count via `head:true` + `count:'exact'`
+- **9C-3**: Story-runner: paginated chapters query (default limit=100, max=500)
+
+### Phase 9D — Cleanup & Hardening
+- **9D-1**: Added DB error checks to 7 memory modules (character-tracker, character-arc-engine, foreshadowing-planner, world-expansion-tracker, power-system-tracker, voice-fingerprint, pacing-director)
+- **9D-2**: Removed dead code: `formatForPrompt()`, `projectId` field, `optimizeTitle()`, `extractAndSaveCharacterStates()`, unused re-exports
+- **9D-3**: Fixed foreshadowing `hint_id` collision — sequential IDs → `crypto.randomUUID()`
+- **9D-4**: Added TODO comments to style-bible genre params
+- **9D-5**: Standardized error swallowing in orchestrator Tasks 2-6 → descriptive `console.warn`
+
+## Phase 8 Details (2026-02-25)
+
+### Critical Fixes
+- **C1**: Removed race-condition rate limiter in gemini.ts — Gemini tier 3 unlimited, retry logic handles 429/503
+- **C2**: Added 120K char token budget to Architect prompt — progressive context trimming if too large
+- **C3**: Added 60K char head+tail size guard to Critic input — prevents model limit overflow
+
+### Security Fixes
+- **S1**: Added admin auth to `/api/admin/health-history`
+- **S2**: Added admin auth to `/api/story-runner/[projectId]`
+- **S3**: Fixed `?manual=true` auth bypass in health-check — requires authenticated admin user
+
+### Bug Fixes
+- **B1**: Fixed hardcoded genre `'tien-hiep'` + empty protagonist in character-arc-engine — now receives actual genre/protagonistName from orchestrator
+- **B2**: Fixed regex typo `cườii` → `cười` — comedy scenes were never detected by inferSceneType
+- **B3**: Batched N+1 queries in character-arc-engine (.in() update), rag-store (Promise.all), world-expansion-tracker (.in() update)
+- **B4**: Consolidated duplicate DB queries in summary-manager — synopsis loaded once with `synopsis_text,open_threads`, project loaded once with `story_bible,story_outline,master_outline`
+- **B5**: Fixed Critic cross-chapter context — now extracts bridge + character states + synopsis (structured relevant data) instead of blind `previousContext.slice(0, 5000)`
+
+### Dead Code Removed (~8,200 lines)
+- `_legacy/` directory (17 files, ~3,221 lines)
+- 17 one-time scripts (backfill, test, seed scripts)
+- 2 disabled route stubs (ai-editor-scan, ai-editor-rewrite)
+- 2 empty directories (claude-code/, story-writing-tool/)
+- `seed-more.js` root stub
+- Dead functions: `advanceCharacterPhase`, `loadCharacterStatesText`, `generateStoryVision`, `StoryVision` interface
+- Dead imports: `extractAndSaveCharacterStates` from orchestrator, `getGenreBoundaryText` from context-assembler
+- Dead re-exports from config.ts: SCENE_EXPANSION_RULES, SUBTEXT_DIALOGUE_RULES, COMEDY_MECHANICS_RULES, getPowerSystemByGenre, getDopaminePatternsByGenre, DopaminePattern type
+- Dead type declaration: `mammoth.d.ts`
+- Unused npm packages: `mammoth`, `pdf-parse`, `date-fns`
+
+## V1 Legacy Status
+
+V1 (`story-writing-factory/`) has ~38 files but only **7 are still actively imported** by API routes:
+- `/api/cron/daily-spawn` → `ContentSeeder`
+- `/api/admin/ai-editor` → `aiEditorService`
+- `/api/ai-authors/generate` → `AuthorGenerator`
+- `/api/seed/generate-content` → `ContentSeeder`
+- `/api/seed/enrich-novels` → `NovelEnricher`
+
+The remaining ~31 files are dead. Full V1 removal requires migrating these 5 routes to V2 equivalents.
+
+## Remaining Known Issues
+
+### Low Priority (deferred)
+- `buildStyleContext` and `getEnhancedStyleBible` ignore genre parameter (return same static content) — TODO comments added
+- Ratings average still computed client-side (score column only) — true DB aggregate requires Supabase RPC migration
 
 ## Important Files to Read
 
-Khi làm việc với story engine:
+When working with the story engine:
 
-1. **types.ts** - Hiểu data structures
-2. **chapter-writer.ts** - Hiểu 3-agent pipeline
-3. **context-assembler.ts** - Hiểu 4-layer context
-4. **orchestrator.ts** - Hiểu overall flow
-5. **templates.ts** (trong v2) - Genre configs, GOLDEN_CHAPTER_REQUIREMENTS, ENGAGEMENT_CHECKLIST
-6. **check-v2-status.ts** - Script kiểm tra trạng thái production của v2 (throughput, metrics, cliffhanger quality)
+1. **types.ts** — Data structures
+2. **chapter-writer.ts** — 3-agent pipeline (~1110 lines)
+3. **context-assembler.ts** — 4-layer context + combined AI call (~700 lines)
+4. **orchestrator.ts** — Overall flow (~444 lines)
+5. **templates.ts** — Genre configs, GOLDEN_CHAPTER_REQUIREMENTS, ENGAGEMENT_CHECKLIST (~1578 lines)
+6. **summary-manager.ts** — Synopsis/bible/arc triggers + quality module triggers (~435 lines)
 
-## Contact & Support
+## Scripts (kept)
 
-- Repo: https://github.com/ungden/truyencity2
-- Current commit: (pending — 6 quality modules + integration)
-- Previous: `0a94924` (audit bug fixes), `090b800` (parallelize daily spawn)
+- `scripts/quality-check-v2.ts` — Quality check
+- `scripts/coherence-audit-v2.ts` — Coherence audit
+- `scripts/audit-pipeline.ts` — Full audit pipeline
+- `scripts/fix-missing-data.ts` — Fix missing outlines/data
+- `scripts/quality-report.js` — Quality report
 
 ---
 
-**Last Updated**: 2026-02-24
-**Author**: AI Assistant (Claude)
+**Last Updated**: 2026-02-25
+**Latest Commit**: `c7a5d99` (Phase 8)
+**Pending Commit**: Phase 9 — Comprehensive audit fix (68 issues)

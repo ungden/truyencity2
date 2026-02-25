@@ -9,6 +9,9 @@ import {
   getClientIdentifier,
   createRateLimitResponse,
 } from '@/lib/security/rate-limiter';
+import { ExportNovelSchema, ValidationError, createValidationErrorResponse } from '@/lib/security/validation';
+
+export const maxDuration = 120;
 
 /**
  * GET /api/export
@@ -70,22 +73,14 @@ export async function POST(request: NextRequest) {
       return createRateLimitResponse(rateCheck.resetIn);
     }
 
-    const body = await request.json();
-    const {
-      novelId,
-      format,
-      chapters,
-      includeMetadata = true,
-      includeCover = true,
-      title,
-      author,
-    } = body;
-
-    if (!novelId || !format) {
-      return NextResponse.json({
-        error: 'Missing required fields: novelId, format'
-      }, { status: 400 });
+    const rawBody = await request.json();
+    const parseResult = ExportNovelSchema.safeParse(rawBody);
+    if (!parseResult.success) {
+      const errors = parseResult.error.errors.map(e => ({ field: e.path.join('.'), message: e.message }));
+      return createValidationErrorResponse(new ValidationError('Validation failed', errors));
     }
+
+    const { novelId, format, chapters, includeMetadata, includeCover, title, author } = parseResult.data;
 
     // Check format access based on subscription
     const subscription = await subscriptionService.getSubscription(supabase, user.id);

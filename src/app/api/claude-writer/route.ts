@@ -1,23 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseFromAuthHeader } from '@/integrations/supabase/auth-helpers';
 import { writeChapterForProject } from '@/services/story-engine';
+import { WriterActionSchema, ValidationError, createValidationErrorResponse } from '@/lib/security/validation';
 
-type WriterAction = 'write_chapter' | 'write_batch' | 'get_status';
-
-interface WriterConfig {
-  provider?: string;
-  model?: string;
-  temperature?: number;
-  targetWordCount?: number;
-}
-
-interface WriterRequestBody {
-  action: WriterAction;
-  projectId: string;
-  customPrompt?: string;
-  chapterCount?: number;
-  config?: WriterConfig;
-}
+export const maxDuration = 300;
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,12 +17,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized: Invalid token' }, { status: 401 });
     }
 
-    const body = (await request.json()) as WriterRequestBody;
-    const { action, projectId, customPrompt, chapterCount = 1, config } = body;
-
-    if (!projectId) {
-      return NextResponse.json({ error: 'projectId is required' }, { status: 400 });
+    const rawBody = await request.json();
+    const parseResult = WriterActionSchema.safeParse(rawBody);
+    if (!parseResult.success) {
+      const errors = parseResult.error.errors.map(e => ({ field: e.path.join('.'), message: e.message }));
+      return createValidationErrorResponse(new ValidationError('Validation failed', errors));
     }
+
+    const body = parseResult.data;
+    const action = body.action;
+    const projectId = body.projectId;
+    const customPrompt = 'customPrompt' in body ? body.customPrompt : undefined;
+    const chapterCount = 'chapterCount' in body ? body.chapterCount : 1;
+    const config = 'config' in body ? body.config : undefined;
 
     if (action === 'get_status') {
       return NextResponse.json(
@@ -107,8 +100,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
   } catch (error) {
+    console.error('[claude-writer] Error:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { error: 'Internal server error' },
       { status: 500 },
     );
   }

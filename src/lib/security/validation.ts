@@ -152,6 +152,133 @@ export const CreditPurchaseSchema = z.object({
 });
 
 // ============================================================================
+// CLAUDE WRITER SCHEMAS
+// ============================================================================
+
+const WriterConfigSchema = z.object({
+  model: z.string().optional(),
+  temperature: z.number().min(0).max(2).optional(),
+  targetWordCount: z.number().int().min(500).max(10000).optional(),
+}).optional();
+
+export const WriterActionSchema = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('write_chapter'),
+    projectId: UUIDSchema,
+    customPrompt: z.string().max(2000).optional(),
+    config: WriterConfigSchema,
+  }),
+  z.object({
+    action: z.literal('write_batch'),
+    projectId: UUIDSchema,
+    chapterCount: z.number().int().min(1).max(20).default(1),
+    customPrompt: z.string().max(2000).optional(),
+    config: WriterConfigSchema,
+  }),
+  z.object({
+    action: z.literal('get_status'),
+    projectId: UUIDSchema,
+  }),
+]);
+
+// ============================================================================
+// RATINGS SCHEMAS
+// ============================================================================
+
+export const RatingSubmitSchema = z.object({
+  novel_id: UUIDSchema,
+  score: z.number().int().min(1).max(5),
+});
+
+// ============================================================================
+// NOVELS SCHEMAS
+// ============================================================================
+
+export const CreateNovelSchema = z.object({
+  title: z.string().min(1).max(500),
+  ai_author_id: UUIDSchema,
+  description: z.string().max(5000).optional(),
+  status: z.string().default('Đang ra'),
+  genres: z.array(z.string()).min(1),
+  cover_url: z.string().url().optional().nullable(),
+});
+
+// ============================================================================
+// AI IMAGE SCHEMAS
+// ============================================================================
+
+export const AIImageJobSchema = z.object({
+  prompt: z.string().min(1).max(2000),
+  novelId: UUIDSchema.optional().nullable(),
+});
+
+// ============================================================================
+// AI AUTHOR SCHEMAS
+// ============================================================================
+
+export const AIAuthorGenerateSchema = z.object({
+  genre: z.string().default('tien-hiep'),
+  style: z.enum(['traditional', 'modern', 'mixed']).default('mixed'),
+  gender: z.enum(['male', 'female', 'neutral']).default('neutral'),
+  age_group: z.enum(['young', 'middle', 'senior']).default('middle'),
+  use_ai: z.boolean().default(true),
+  save_to_db: z.boolean().default(false),
+});
+
+export const AIAuthorBatchSchema = z.object({
+  count: z.number().int().min(1).max(10).default(5),
+  genres: z.array(z.string()).default(['tien-hiep', 'huyen-huyen', 'do-thi']),
+  save_to_db: z.boolean().default(false),
+});
+
+// ============================================================================
+// EXPORT SCHEMAS
+// ============================================================================
+
+export const ExportNovelSchema = z.object({
+  novelId: UUIDSchema,
+  format: z.enum(['txt', 'epub', 'pdf']),
+  chapters: z.array(z.number().int()).optional(),
+  includeMetadata: z.boolean().default(true),
+  includeCover: z.boolean().default(true),
+  title: z.string().optional(),
+  author: z.string().optional(),
+});
+
+// ============================================================================
+// BILLING ACTION SCHEMAS
+// ============================================================================
+
+export const CreditActionSchema = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('purchase'),
+    packageId: z.string().min(1),
+    paymentMethod: z.enum(['stripe', 'vnpay', 'momo']),
+    paymentProviderId: z.string().min(1),
+  }),
+  z.object({
+    action: z.literal('consume'),
+    chapterId: UUIDSchema,
+    wordCount: z.number().int().positive(),
+  }),
+]);
+
+export const SubscriptionActionSchema = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('upgrade'),
+    tier: SubscriptionTierSchema,
+    paymentInfo: z.record(z.unknown()).optional(),
+  }),
+  z.object({
+    action: z.literal('cancel'),
+    reason: z.string().max(1000).optional(),
+  }),
+  z.object({
+    action: z.literal('check_write'),
+  }),
+]);
+
+// ============================================================================
 // VALIDATION HELPERS
 // ============================================================================
 

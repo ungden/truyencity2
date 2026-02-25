@@ -116,9 +116,10 @@ Trả về JSON:
     mysteries: [],
   }));
 
-  await db.from('location_bibles').upsert(rows, {
+  const { error: upsertErr } = await db.from('location_bibles').upsert(rows, {
     onConflict: 'project_id,location_name',
   });
+  if (upsertErr) console.warn('[WorldExpansionTracker] Failed to save world map: ' + upsertErr.message);
 }
 
 // ── Generate Location Bible (called 1 arc before MC arrives) ─────────────────
@@ -186,7 +187,7 @@ Trả về JSON:
   const parsed = parseJSON<LocationBible>(res.content);
   if (!parsed) return;
 
-  await db
+  const { error: updateErr } = await db
     .from('location_bibles')
     .update({
       location_bible: parsed,
@@ -194,6 +195,7 @@ Trả về JSON:
     })
     .eq('project_id', projectId)
     .eq('location_name', locationName);
+  if (updateErr) console.warn('[WorldExpansionTracker] Failed to save location bible: ' + updateErr.message);
 }
 
 // ── Get World Context (pre-write injection) ──────────────────────────────────
@@ -304,11 +306,12 @@ export async function updateLocationExploration(
     .map(loc => loc.location_name);
 
   if (toExplore.length > 0) {
-    await db
+    const { error: updateErr } = await db
       .from('location_bibles')
       .update({ explored: true })
       .eq('project_id', projectId)
       .in('location_name', toExplore);
+    if (updateErr) console.warn('[WorldExpansionTracker] Failed to update location exploration: ' + updateErr.message);
   }
 }
 

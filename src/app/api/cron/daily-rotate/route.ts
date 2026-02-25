@@ -12,27 +12,14 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { verifyCronAuth } from '@/lib/auth/cron-auth';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 
 export const maxDuration = 60; // 1 minute max
 export const dynamic = 'force-dynamic';
 
 const TARGET_ACTIVE_PER_AUTHOR = 5;
 const DAILY_EXPANSION = 20;
-
-function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-}
-
-function verifyCronAuth(request: NextRequest): boolean {
-  const authHeader = request.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret) return process.env.NODE_ENV === 'development';
-  return authHeader === `Bearer ${cronSecret}`;
-}
 
 interface AuthorActiveCount {
   authorId: string;

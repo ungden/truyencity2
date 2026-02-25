@@ -1,30 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/integrations/supabase/server';
 import { AuthorGenerator, generateQuickAuthor } from '@/services/story-writing-factory/author-generator';
+import { AIAuthorGenerateSchema, AIAuthorBatchSchema, ValidationError, createValidationErrorResponse } from '@/lib/security/validation';
+
+export const maxDuration = 120;
 
 /**
  * POST /api/ai-authors/generate
- * Generate a new AI author profile
+ * Generate a new AI author profile (admin only)
  */
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createServerClient();
 
-    // Verify auth
+    // Verify auth + admin role
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await request.json();
-    const {
-      genre = 'tien-hiep',
-      style = 'mixed',
-      gender = 'neutral',
-      age_group = 'middle',
-      use_ai = true, // Use AI for detailed generation, false for quick generation
-      save_to_db = false, // Whether to save directly to database
-    } = body;
+    const { data: profile } = await supabase
+      .from('profiles').select('role').eq('id', user.id).single();
+    if (profile?.role !== 'admin') {
+      return NextResponse.json({ error: 'Admin only' }, { status: 403 });
+    }
+
+    const rawBody = await request.json();
+    const parseResult = AIAuthorGenerateSchema.safeParse(rawBody);
+    if (!parseResult.success) {
+      const errors = parseResult.error.errors.map(e => ({ field: e.path.join('.'), message: e.message }));
+      return createValidationErrorResponse(new ValidationError('Validation failed', errors));
+    }
+
+    const { genre, style, gender, age_group, use_ai, save_to_db } = parseResult.data;
 
     let generatedAuthor;
 
@@ -99,18 +107,26 @@ export async function PUT(request: NextRequest) {
   try {
     const supabase = await createServerClient();
 
-    // Verify auth
+    // Verify auth + admin role
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await request.json();
-    const {
-      count = 5,
-      genres = ['tien-hiep', 'huyen-huyen', 'do-thi'],
-      save_to_db = false,
-    } = body;
+    const { data: profile } = await supabase
+      .from('profiles').select('role').eq('id', user.id).single();
+    if (profile?.role !== 'admin') {
+      return NextResponse.json({ error: 'Admin only' }, { status: 403 });
+    }
+
+    const rawBody = await request.json();
+    const parseResult = AIAuthorBatchSchema.safeParse(rawBody);
+    if (!parseResult.success) {
+      const errors = parseResult.error.errors.map(e => ({ field: e.path.join('.'), message: e.message }));
+      return createValidationErrorResponse(new ValidationError('Validation failed', errors));
+    }
+
+    const { count, genres, save_to_db } = parseResult.data;
 
     // Limit batch size
     const batchCount = Math.min(count, 10);

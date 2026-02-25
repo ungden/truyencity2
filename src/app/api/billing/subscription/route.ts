@@ -8,6 +8,9 @@ import {
   getClientIdentifier,
   createRateLimitResponse,
 } from '@/lib/security/rate-limiter';
+import { SubscriptionActionSchema, ValidationError, createValidationErrorResponse } from '@/lib/security/validation';
+
+export const maxDuration = 15;
 
 /**
  * GET /api/billing/subscription
@@ -89,20 +92,22 @@ export async function POST(request: NextRequest) {
       return createRateLimitResponse(rateCheck.resetIn);
     }
 
-    const body = await request.json();
-    const { action, tier, reason, paymentInfo } = body;
+    const rawBody = await request.json();
+    const parseResult = SubscriptionActionSchema.safeParse(rawBody);
+    if (!parseResult.success) {
+      const errors = parseResult.error.errors.map(e => ({ field: e.path.join('.'), message: e.message }));
+      return createValidationErrorResponse(new ValidationError('Validation failed', errors));
+    }
 
-    switch (action) {
+    const validatedBody = parseResult.data;
+
+    switch (validatedBody.action) {
       case 'upgrade':
-        if (!tier) {
-          return NextResponse.json({ error: 'Tier is required' }, { status: 400 });
-        }
-
         const upgradeResult = await subscriptionService.upgradeSubscription(
           supabase,
           user.id,
-          tier,
-          paymentInfo
+          validatedBody.tier,
+          validatedBody.paymentInfo
         );
 
         if (!upgradeResult.success) {
@@ -112,7 +117,7 @@ export async function POST(request: NextRequest) {
         logger.apiRequest('POST', '/api/billing/subscription', 200, timer(), {
           userId: user.id,
           action: 'upgrade',
-          tier,
+          tier: validatedBody.tier,
         });
 
         return NextResponse.json({ success: true, message: 'Subscription upgraded' });
@@ -121,7 +126,7 @@ export async function POST(request: NextRequest) {
         const cancelResult = await subscriptionService.cancelSubscription(
           supabase,
           user.id,
-          reason
+          'reason' in validatedBody ? validatedBody.reason : undefined
         );
 
         if (!cancelResult.success) {

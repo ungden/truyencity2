@@ -7,17 +7,11 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyCronAuth } from '@/lib/auth/cron-auth';
 import { ContentSeeder } from '@/services/story-writing-factory/content-seeder';
 
 export const maxDuration = 300;
 export const dynamic = 'force-dynamic';
-
-function verifyCronAuth(request: NextRequest): boolean {
-  const authHeader = request.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret) return process.env.NODE_ENV === 'development';
-  return authHeader === `Bearer ${cronSecret}`;
-}
 
 export async function GET(request: NextRequest) {
   if (!verifyCronAuth(request)) {

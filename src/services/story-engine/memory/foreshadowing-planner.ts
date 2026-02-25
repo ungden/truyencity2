@@ -11,6 +11,7 @@
  *   arc_number INT, payoff_description TEXT, created_at TIMESTAMPTZ
  */
 
+import { randomUUID } from 'crypto';
 import { getSupabase } from '../utils/supabase';
 import { callGemini } from '../utils/gemini';
 import { parseJSON } from '../utils/json-repair';
@@ -112,9 +113,9 @@ Trả về JSON:
   if (!parsed?.hints?.length) return;
 
   // Save to DB
-  const rows = parsed.hints.map((h, i) => ({
+  const rows = parsed.hints.map((h) => ({
     project_id: projectId,
-    hint_id: `arc${arcNumber}_hint${i + 1}`,
+    hint_id: randomUUID(),
     hint_text: h.hintText,
     hint_type: h.hintType || 'event',
     plant_chapter: h.plantChapter,
@@ -124,9 +125,10 @@ Trả về JSON:
     arc_number: arcNumber,
   }));
 
-  await db.from('foreshadowing_plans').upsert(rows, {
+  const { error: upsertErr } = await db.from('foreshadowing_plans').upsert(rows, {
     onConflict: 'project_id,hint_id',
   });
+  if (upsertErr) console.warn('[ForeshadowingPlanner] Failed to save foreshadowing hints: ' + upsertErr.message);
 }
 
 // ── Get Active Hints for Chapter (pre-write injection) ───────────────────────

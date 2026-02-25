@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseFromAuthHeader } from '@/integrations/supabase/auth-helpers';
 import { supabase } from '@/integrations/supabase/client';
+import { AIImageJobSchema, ValidationError, createValidationErrorResponse } from '@/lib/security/validation';
+
+export const maxDuration = 15;
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,10 +17,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { prompt, novelId } = await request.json();
-    if (!prompt) {
-      return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
+    const rawBody = await request.json();
+    const parseResult = AIImageJobSchema.safeParse(rawBody);
+    if (!parseResult.success) {
+      const errors = parseResult.error.errors.map(e => ({ field: e.path.join('.'), message: e.message }));
+      return createValidationErrorResponse(new ValidationError('Validation failed', errors));
     }
+
+    const { prompt, novelId } = parseResult.data;
 
     // Create a job record in the database
     const { data: job, error: jobError } = await userClient
@@ -45,8 +52,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, jobId: job.id });
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Failed to start image generation';
-    console.error('Error in POST /api/ai-image/jobs:', error);
-    return NextResponse.json({ error: errorMessage }, { status: 500 });
+    console.error('[ai-image/jobs] POST error:', error);
+    return NextResponse.json({ error: 'Failed to start image generation' }, { status: 500 });
   }
 }

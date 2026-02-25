@@ -22,20 +22,14 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyCronAuth } from '@/lib/auth/cron-auth';
 import { ContentSeeder } from '@/services/story-writing-factory/content-seeder';
 
 export const maxDuration = 300; // 5 minutes (Vercel Pro)
 export const dynamic = 'force-dynamic';
 
-function verifyAuth(request: NextRequest): boolean {
-  const authHeader = request.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret) return process.env.NODE_ENV === 'development';
-  return authHeader === `Bearer ${cronSecret}`;
-}
-
 export async function POST(request: NextRequest) {
-  if (!verifyAuth(request)) {
+  if (!verifyCronAuth(request)) {
     return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
   }
 

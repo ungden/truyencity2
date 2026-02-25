@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/integrations/supabase/server';
+import { CreateNovelSchema, ValidationError, createValidationErrorResponse } from '@/lib/security/validation';
+
+export const maxDuration = 15;
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,27 +14,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await request.json();
-    const { title, ai_author_id, description, status = 'Đang ra', genres = [], cover_url } = body;
-
-    // Validate required fields
-    if (!title) {
-      return NextResponse.json({ 
-        error: 'Title is required' 
-      }, { status: 400 });
+    const rawBody = await request.json();
+    const parseResult = CreateNovelSchema.safeParse(rawBody);
+    if (!parseResult.success) {
+      const errors = parseResult.error.errors.map(e => ({ field: e.path.join('.'), message: e.message }));
+      return createValidationErrorResponse(new ValidationError('Validation failed', errors));
     }
 
-    if (!ai_author_id) {
-      return NextResponse.json({
-        error: 'Vui lòng chọn tác giả AI',
-      }, { status: 400 });
-    }
-
-    if (!Array.isArray(genres) || genres.length === 0) {
-      return NextResponse.json({
-        error: 'Vui lòng chọn thể loại (ít nhất 1)',
-      }, { status: 400 });
-    }
+    const { title, ai_author_id, description, status, genres, cover_url } = parseResult.data;
 
     // Lấy tên tác giả theo ai_author_id để lưu cùng (giữ tương thích UI hiện tại)
     const { data: authorRecord, error: authorFetchError } = await supabase

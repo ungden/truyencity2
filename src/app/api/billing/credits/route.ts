@@ -8,6 +8,9 @@ import {
   getClientIdentifier,
   createRateLimitResponse,
 } from '@/lib/security/rate-limiter';
+import { CreditActionSchema, ValidationError, createValidationErrorResponse } from '@/lib/security/validation';
+
+export const maxDuration = 15;
 
 /**
  * GET /api/billing/credits
@@ -112,18 +115,18 @@ export async function POST(request: NextRequest) {
       return createRateLimitResponse(rateCheck.resetIn);
     }
 
-    const body = await request.json();
-    const { action } = body;
+    const rawBody = await request.json();
+    const parseResult = CreditActionSchema.safeParse(rawBody);
+    if (!parseResult.success) {
+      const errors = parseResult.error.errors.map(e => ({ field: e.path.join('.'), message: e.message }));
+      return createValidationErrorResponse(new ValidationError('Validation failed', errors));
+    }
 
-    switch (action) {
+    const validatedBody = parseResult.data;
+
+    switch (validatedBody.action) {
       case 'purchase':
-        const { packageId, paymentMethod, paymentProviderId } = body;
-
-        if (!packageId || !paymentMethod || !paymentProviderId) {
-          return NextResponse.json({
-            error: 'Missing required fields: packageId, paymentMethod, paymentProviderId'
-          }, { status: 400 });
-        }
+        const { packageId, paymentMethod, paymentProviderId } = validatedBody;
 
         // Validate package exists
         const pkg = CREDIT_PACKAGES.find(p => p.id === packageId);
@@ -159,7 +162,7 @@ export async function POST(request: NextRequest) {
 
       case 'consume':
         // This is typically called internally when writing chapters
-        const { chapterId, wordCount } = body;
+        const { chapterId, wordCount } = validatedBody;
 
         const consumeResult = await creditService.consumeChapterCredit(
           supabase,

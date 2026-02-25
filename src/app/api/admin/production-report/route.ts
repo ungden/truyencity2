@@ -1,52 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import { createServerClient } from '@/integrations/supabase/server';
+import { isAuthorizedAdmin } from '@/lib/auth/admin-auth';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
+import { getVietnamDayBounds } from '@/lib/utils/vietnam-time';
 
 export const dynamic = 'force-dynamic';
+export const maxDuration = 30;
 
 const DAILY_SPAWN_TARGET = 20;
 const DAILY_CHAPTER_QUOTA = 20;
-
-function getVietnamDayBounds(now: Date = new Date()): { startIso: string; endIso: string } {
-  const dateStr = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Asia/Ho_Chi_Minh',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(now);
-
-  const [year, month, day] = dateStr.split('-').map(Number);
-  const startUtc = new Date(Date.UTC(year, month - 1, day, -7, 0, 0));
-  const endUtc = new Date(startUtc.getTime() + 24 * 60 * 60 * 1000);
-
-  return {
-    startIso: startUtc.toISOString(),
-    endIso: endUtc.toISOString(),
-  };
-}
-
-async function isAuthorizedAdmin(request: NextRequest): Promise<boolean> {
-  const authHeader = request.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET;
-
-  if (authHeader && cronSecret && authHeader === `Bearer ${cronSecret}`) {
-    return true;
-  }
-
-  const supabase = await createServerClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) {
-    return false;
-  }
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  return profile?.role === 'admin';
-}
 
 export async function GET(request: NextRequest) {
   try {
@@ -55,10 +16,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const supabase = getSupabaseAdmin();
 
     const now = new Date();
     const { startIso: vnStartIso, endIso: vnEndIso } = getVietnamDayBounds(now);

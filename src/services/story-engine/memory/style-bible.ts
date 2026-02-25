@@ -133,8 +133,8 @@ const DEFAULT_PACING_RULES: Record<SceneType, PacingRule> = {
   },
 };
 
+// TODO: implement per-genre style differentiation in future (currently returns same content for all genres)
 export function getEnhancedStyleBible(_genre: GenreType): EnhancedStyleBible {
-  // For now, return default. Could be extended per genre.
   return {
     vocabulary: DEFAULT_VOCABULARY,
     pacingRules: DEFAULT_PACING_RULES,
@@ -143,8 +143,8 @@ export function getEnhancedStyleBible(_genre: GenreType): EnhancedStyleBible {
   };
 }
 
+// TODO: implement per-genre and per-scene-type style differentiation in future (currently returns same content for all genres)
 export function buildStyleContext(_genre: GenreType, _dominantSceneType: string): string {
-  // Returns style context for Writer
   return `PHONG CÁCH VIẾT:
 - Câu ngắn gọn, súc tích cho action; câu dài, miêu tả chi tiết cho cultivation
 - Đối thoại tự nhiên, mỗi nhân vật có giọng riêng

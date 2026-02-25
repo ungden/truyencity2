@@ -5,35 +5,10 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import { createServerClient } from '@/integrations/supabase/server';
+import { isAuthorizedAdmin } from '@/lib/auth/admin-auth';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 
-function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-}
-
-async function isAuthorizedAdmin(request: NextRequest): Promise<boolean> {
-  const authHeader = request.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET;
-  if (authHeader && cronSecret && authHeader === `Bearer ${cronSecret}`) {
-    return true;
-  }
-
-  const supabase = await createServerClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) return false;
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  return profile?.role === 'admin';
-}
+export const maxDuration = 30;
 
 export async function GET(
   request: NextRequest,
@@ -46,6 +21,12 @@ export async function GET(
 
     const { projectId } = await params;
     const supabase = getSupabaseAdmin();
+
+    // Pagination params for chapters (default: last 100)
+    const limitParam = request.nextUrl.searchParams.get('limit');
+    const offsetParam = request.nextUrl.searchParams.get('offset');
+    const chapterLimit = Math.min(Number(limitParam) || 100, 500);
+    const chapterOffset = Number(offsetParam) || 0;
 
     // Get project info
     const { data: project, error: projectError } = await supabase
@@ -61,12 +42,19 @@ export async function GET(
       );
     }
 
-    // Get chapters
+    // Get total chapter count (DB-level, no row fetching)
+    const { count: totalChapterCount } = await supabase
+      .from('chapters')
+      .select('*', { count: 'exact', head: true })
+      .eq('novel_id', project.novel_id);
+
+    // Get chapters (paginated)
     const { data: chapters } = await supabase
       .from('chapters')
       .select('id, chapter_number, title, created_at')
       .eq('novel_id', project.novel_id)
-      .order('chapter_number', { ascending: true });
+      .order('chapter_number', { ascending: true })
+      .range(chapterOffset, chapterOffset + chapterLimit - 1);
 
     // Get quality data
     const { data: styleData } = await supabase
@@ -88,6 +76,8 @@ export async function GET(
       .eq('project_id', projectId)
       .order('chapter_number', { ascending: true });
 
+    const total = totalChapterCount ?? 0;
+
     return NextResponse.json({
       success: true,
       data: {
@@ -96,11 +86,16 @@ export async function GET(
         qualityScores: styleData || [],
         characters: characters || [],
         battles: battles || [],
+        pagination: {
+          total,
+          limit: chapterLimit,
+          offset: chapterOffset,
+        },
         stats: {
-          totalChapters: chapters?.length || 0,
+          totalChapters: total,
           targetChapters: project.total_planned_chapters,
-          progress: chapters?.length
-            ? Math.round((chapters.length / project.total_planned_chapters) * 100)
+          progress: total
+            ? Math.round((total / project.total_planned_chapters) * 100)
             : 0,
           avgQuality: styleData?.length
             ? Math.round(styleData.reduce((sum, s) => sum + (s.overall_score || 0), 0) / styleData.length)

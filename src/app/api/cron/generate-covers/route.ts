@@ -15,7 +15,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { verifyCronAuth } from '@/lib/auth/cron-auth';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { GeminiImageService } from '@/services/gemini-image';
 
 // Process up to 20 covers per tick, 4 in parallel (~15-20s each = ~1-1.5 min per wave)
@@ -24,13 +25,6 @@ const PARALLEL_CONCURRENCY = 4;
 
 export const maxDuration = 300; // 5 minutes (Vercel Pro)
 export const dynamic = 'force-dynamic';
-
-function verifyCronAuth(request: NextRequest): boolean {
-  const authHeader = request.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret) return process.env.NODE_ENV === 'development';
-  return authHeader === `Bearer ${cronSecret}`;
-}
 
 export async function GET(request: NextRequest) {
   const startTime = Date.now();
@@ -44,10 +38,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: false, error: 'GEMINI_API_KEY missing' }, { status: 500 });
   }
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  const supabase = getSupabaseAdmin();
 
   const imageService = new GeminiImageService({ apiKey: geminiKey });
 

@@ -7,39 +7,12 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import { createServerClient } from '@/integrations/supabase/server';
+import { verifyCronAuth } from '@/lib/auth/cron-auth';
+import { isAuthorizedAdmin } from '@/lib/auth/admin-auth';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
-
-function getSupabase() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-}
-
-function verifyCronAuth(request: NextRequest): boolean {
-  const authHeader = request.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret) return process.env.NODE_ENV === 'development';
-  return authHeader === `Bearer ${cronSecret}`;
-}
-
-async function isAuthorizedAdmin(request: NextRequest): Promise<boolean> {
-  const supabase = await createServerClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) return false;
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  return profile?.role === 'admin';
-}
 
 // ========== INDIVIDUAL CHECKS ==========
 
@@ -50,7 +23,7 @@ type CheckResult = {
   value?: number | string;
 };
 
-async function checkChapterProduction(supabase: ReturnType<typeof getSupabase>): Promise<CheckResult & { chaptersLast24h: number; chaptersLastHour: number }> {
+async function checkChapterProduction(supabase: ReturnType<typeof getSupabaseAdmin>): Promise<CheckResult & { chaptersLast24h: number; chaptersLastHour: number }> {
   const now = new Date();
   const h1 = new Date(now.getTime() - 60 * 60 * 1000).toISOString();
   const h24 = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
@@ -77,7 +50,7 @@ async function checkChapterProduction(supabase: ReturnType<typeof getSupabase>):
   return { name: 'Chapter Production', status, message, value: ch24h, chaptersLast24h: ch24h, chaptersLastHour: ch1h };
 }
 
-async function checkStuckNovels(supabase: ReturnType<typeof getSupabase>): Promise<CheckResult & { stuckCount: number }> {
+async function checkStuckNovels(supabase: ReturnType<typeof getSupabaseAdmin>): Promise<CheckResult & { stuckCount: number }> {
   const { count } = await supabase
     .from('ai_story_projects')
     .select('id', { count: 'exact', head: true })
@@ -99,7 +72,7 @@ async function checkStuckNovels(supabase: ReturnType<typeof getSupabase>): Promi
   return { name: 'Stuck Novels (ch=0)', status, message, value: stuck, stuckCount: stuck };
 }
 
-async function checkActiveProjects(supabase: ReturnType<typeof getSupabase>): Promise<CheckResult & { activeCount: number; completedCount: number }> {
+async function checkActiveProjects(supabase: ReturnType<typeof getSupabaseAdmin>): Promise<CheckResult & { activeCount: number; completedCount: number }> {
   const [active, completed] = await Promise.all([
     supabase.from('ai_story_projects').select('id', { count: 'exact', head: true }).eq('status', 'active'),
     supabase.from('ai_story_projects').select('id', { count: 'exact', head: true }).eq('status', 'completed'),
@@ -121,7 +94,7 @@ async function checkActiveProjects(supabase: ReturnType<typeof getSupabase>): Pr
   return { name: 'Active Projects', status, message, value: a, activeCount: a, completedCount: c };
 }
 
-async function checkTotalChapters(supabase: ReturnType<typeof getSupabase>): Promise<CheckResult & { totalChapters: number }> {
+async function checkTotalChapters(supabase: ReturnType<typeof getSupabaseAdmin>): Promise<CheckResult & { totalChapters: number }> {
   const { count } = await supabase
     .from('chapters')
     .select('id', { count: 'exact', head: true });
@@ -136,7 +109,7 @@ async function checkTotalChapters(supabase: ReturnType<typeof getSupabase>): Pro
   };
 }
 
-async function checkCoverStatus(supabase: ReturnType<typeof getSupabase>): Promise<CheckResult & { withCover: number; withoutCover: number }> {
+async function checkCoverStatus(supabase: ReturnType<typeof getSupabaseAdmin>): Promise<CheckResult & { withCover: number; withoutCover: number }> {
   const [total, noCover] = await Promise.all([
     supabase.from('novels').select('id', { count: 'exact', head: true }),
     supabase.from('novels').select('id', { count: 'exact', head: true }).is('cover_url', null),
@@ -157,7 +130,7 @@ async function checkCoverStatus(supabase: ReturnType<typeof getSupabase>): Promi
   return { name: 'Cover Images', status, message, value: `${hasCover}/${totalN}`, withCover: hasCover, withoutCover: missing };
 }
 
-async function checkCronHeartbeat(supabase: ReturnType<typeof getSupabase>): Promise<CheckResult & { staleCount: number }> {
+async function checkCronHeartbeat(supabase: ReturnType<typeof getSupabaseAdmin>): Promise<CheckResult & { staleCount: number }> {
   // Projects not touched in >30 minutes means cron may be dead
   const thirtyMinAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();
 
@@ -193,7 +166,7 @@ async function checkCronHeartbeat(supabase: ReturnType<typeof getSupabase>): Pro
   return { name: 'Cron Heartbeat', status, message, value: `${fresh}/${total}`, staleCount: stale };
 }
 
-async function checkWordQuality(supabase: ReturnType<typeof getSupabase>): Promise<CheckResult & { avgWords: number }> {
+async function checkWordQuality(supabase: ReturnType<typeof getSupabaseAdmin>): Promise<CheckResult & { avgWords: number }> {
   // Sample 20 recent chapters
   const { data: chapters } = await supabase
     .from('chapters')
@@ -223,7 +196,7 @@ async function checkWordQuality(supabase: ReturnType<typeof getSupabase>): Promi
   return { name: 'Word Quality', status, message, value: avg, avgWords: avg };
 }
 
-async function checkNovelDistribution(supabase: ReturnType<typeof getSupabase>): Promise<CheckResult & { topNovel: number; avgChapters: number }> {
+async function checkNovelDistribution(supabase: ReturnType<typeof getSupabaseAdmin>): Promise<CheckResult & { topNovel: number; avgChapters: number }> {
   const { data: projects } = await supabase
     .from('ai_story_projects')
     .select('current_chapter')
@@ -258,7 +231,7 @@ export async function GET(request: NextRequest) {
   }
 
   const startTime = Date.now();
-  const supabase = getSupabase();
+  const supabase = getSupabaseAdmin();
 
   try {
     // Run all checks in parallel

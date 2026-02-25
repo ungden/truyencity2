@@ -131,7 +131,7 @@ Trả về JSON:
 
   if (!parsed) return;
 
-  await db.from('character_arcs').upsert({
+  const { error: upsertErr } = await db.from('character_arcs').upsert({
     project_id: projectId,
     character_name: characterName,
     role: parsed.role || 'recurring_npc',
@@ -143,6 +143,7 @@ Trả về JSON:
     appearance_count: 3,
     last_seen_chapter: currentChapter,
   }, { onConflict: 'project_id,character_name' });
+  if (upsertErr) console.warn('[CharacterArcEngine] Failed to save character arc: ' + upsertErr.message);
 }
 
 // ── Get Character Arc Context (pre-write injection) ──────────────────────────

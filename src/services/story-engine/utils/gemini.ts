@@ -45,7 +45,8 @@ export async function callGemini(
     body.systemInstruction = { parts: [{ text: config.systemPrompt }] };
   }
 
-  const url = `${API_BASE}/models/${config.model}:generateContent?key=${apiKey}`;
+  // API key passed via header (not URL query param) to avoid log/proxy exposure
+  const url = `${API_BASE}/models/${config.model}:generateContent`;
 
   for (let attempt = 0; attempt <= RETRY_DELAYS.length; attempt++) {
     try {
@@ -55,7 +56,7 @@ export async function callGemini(
 
       const res = await fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
         body: JSON.stringify(body),
         signal: AbortSignal.timeout(120000),
       });
@@ -128,10 +129,10 @@ async function embedBatchInternal(
       if (attempt > 0) await new Promise(r => setTimeout(r, 2000 * attempt));
 
       const res = await fetch(
-        `${API_BASE}/models/${EMBEDDING_MODEL}:batchEmbedContents?key=${apiKey}`,
+        `${API_BASE}/models/${EMBEDDING_MODEL}:batchEmbedContents`,
         {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
           body: JSON.stringify({ requests }),
           signal: AbortSignal.timeout(30000),
         },

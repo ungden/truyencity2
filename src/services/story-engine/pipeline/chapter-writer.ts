@@ -39,7 +39,7 @@ import type {
   WriteChapterResult, ChapterOutline, CriticOutput, CriticIssue,
   GenreType, GeminiConfig, EmotionalArc, SceneOutline,
 } from '../types';
-import type { SceneType } from '../memory/style-bible';
+import type { SceneType, VocabularyGuide } from '../memory/style-bible';
 
 // ── System Prompts ───────────────────────────────────────────────────────────
 
@@ -976,7 +976,7 @@ async function loadConstraintSection(projectId: string, context: string, protago
       }
     }
 
-    const extractor = getConstraintExtractor(projectId);
+    const extractor = getConstraintExtractor();
     const constraints = await extractor.getRelevantConstraints(projectId, keywords);
 
     if (constraints.length === 0) return '';
@@ -1056,7 +1056,7 @@ function inferSceneType(scene: { goal: string; conflict: string; resolution?: st
   return 'dialogue';
 }
 
-function buildVocabularyHints(outline: ChapterOutline, vocabulary: any): string {
+function buildVocabularyHints(outline: ChapterOutline, vocabulary: VocabularyGuide): string {
   if (!vocabulary) return '';
 
   const hints: string[] = ['TỪ VỰNG BẮT BUỘC SỬ DỤNG (dùng ít nhất 5-8 biểu đạt):'];
@@ -1124,6 +1124,3 @@ function buildCharacterVoiceGuide(outline: ChapterOutline, worldBible?: string):
 
   return lines.join('\n');
 }
-
-// Re-export for backward compatibility
-export { GOLDEN_CHAPTER_REQUIREMENTS, ENGAGEMENT_CHECKLIST };

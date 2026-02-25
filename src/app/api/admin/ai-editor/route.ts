@@ -1,36 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/integrations/supabase/server';
+import { isAuthorizedAdmin } from '@/lib/auth/admin-auth';
 import { aiEditorService } from '@/services/story-writing-factory/ai-editor';
 import { getSupabase } from '@/services/story-writing-factory/supabase-helper';
 
 export const dynamic = 'force-dynamic';
-
-async function isAuthorizedAdmin(request: NextRequest): Promise<boolean> {
-  const authHeader = request.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET;
-
-  if (authHeader && cronSecret && authHeader === `Bearer ${cronSecret}`) {
-    return true;
-  }
-
-  const supabase = await createServerClient();
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-
-  if (authError || !user) {
-    return false;
-  }
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  return profile?.role === 'admin';
-}
+export const maxDuration = 300;
 
 export async function GET(request: NextRequest) {
   try {

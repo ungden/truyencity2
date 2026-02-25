@@ -215,8 +215,7 @@ export interface ContextPayload {
   beatGuidance?: string;
   worldRules?: string;
   masterOutline?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  storyOutline?: any;
+  storyOutline?: StoryOutline;
 
   // Quality modules (Qidian Master Level)
   foreshadowingContext?: string;
@@ -254,7 +253,8 @@ export interface StoryOutline {
     endGoal: string;
     characterArc: string;
   };
-  majorPlotPoints: Array<{ chapter: number; event: string }>;
+  majorPlotPoints: Array<{ chapter: number; event: string; name?: string; description?: string }>;
+  uniqueHooks?: string[];
   endingVision: string;
 }
 

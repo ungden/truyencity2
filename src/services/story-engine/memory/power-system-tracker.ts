@@ -126,11 +126,12 @@ Trả về JSON:
     parsed.recentLosses = [...oldLosses, ...(parsed.recentLosses || [])].slice(-20);
   }
 
-  await db.from('mc_power_states').upsert({
+  const { error: upsertErr } = await db.from('mc_power_states').upsert({
     project_id: projectId,
     power_state: parsed,
     last_updated_chapter: chapterNumber,
   }, { onConflict: 'project_id' });
+  if (upsertErr) console.warn('[PowerSystemTracker] Failed to save MC power state: ' + upsertErr.message);
 }
 
 // ── Get Power Context (pre-write injection) ──────────────────────────────────

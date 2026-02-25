@@ -128,11 +128,12 @@ Trả về JSON:
   const parsed = parseJSON<PacingBlueprint>(res.content);
   if (!parsed?.chapters?.length) return;
 
-  await db.from('arc_pacing_blueprints').upsert({
+  const { error: upsertErr } = await db.from('arc_pacing_blueprints').upsert({
     project_id: projectId,
     arc_number: arcNumber,
     blueprint: parsed,
   }, { onConflict: 'project_id,arc_number' });
+  if (upsertErr) console.warn('[PacingDirector] Failed to save pacing blueprint: ' + upsertErr.message);
 }
 
 // ── Get Chapter Pacing (pre-write injection) ─────────────────────────────────
