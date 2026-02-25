@@ -47,14 +47,14 @@ export async function loadContext(
     db.from('ai_story_projects').select('story_bible').eq('id', projectId).maybeSingle(),
     // Layer 2: Synopsis
     db.from('story_synopsis').select('synopsis_text,mc_current_state,active_allies,active_enemies,open_threads,last_updated_chapter').eq('project_id', projectId).order('last_updated_chapter', { ascending: false }).limit(1).maybeSingle(),
-    // Layer 3: Recent Chapters (5 chapters × 5000 chars = ~25K tokens, down from 15 × 3000 = 45K)
-    db.from('chapters').select('content,title,chapter_number').eq('novel_id', novelId).lt('chapter_number', chapterNumber).order('chapter_number', { ascending: false }).limit(5),
+    // Layer 3: Recent Chapters — adaptive: 3×3000 after ch50 (synopsis covers history), 5×5000 early on
+    db.from('chapters').select('content,title,chapter_number').eq('novel_id', novelId).lt('chapter_number', chapterNumber).order('chapter_number', { ascending: false }).limit(chapterNumber > 50 ? 3 : 5),
     // Layer 4: Arc Plan
     db.from('arc_plans').select('arc_number,start_chapter,end_chapter,arc_theme,plan_text,chapter_briefs,threads_to_advance,threads_to_resolve,new_threads').eq('project_id', projectId).order('arc_number', { ascending: false }).limit(1).maybeSingle(),
     // Master Outline + Story Outline
     db.from('ai_story_projects').select('master_outline,story_outline').eq('id', projectId).maybeSingle(),
-    // Anti-repetition: titles
-    db.from('chapters').select('title').eq('novel_id', novelId).order('chapter_number', { ascending: false }).limit(500),
+    // Anti-repetition: titles (cap at 50 most recent to reduce context size)
+    db.from('chapters').select('title').eq('novel_id', novelId).order('chapter_number', { ascending: false }).limit(50),
     // Anti-repetition: openings
     db.from('chapter_summaries').select('opening_sentence').eq('project_id', projectId).order('chapter_number', { ascending: false }).limit(50),
     // Anti-repetition: cliffhangers
@@ -135,9 +135,10 @@ export async function loadContext(
     hasStoryBible: !!bible,
     synopsis: synopsis?.synopsis_text,
     synopsisStructured,
-    recentChapters: recentChapters.map((c: any) =>
-      `[Ch.${c.chapter_number}: "${c.title}"]\n${(c.content || '').slice(0, 5000)}`
-    ),
+    recentChapters: recentChapters.map((c: any) => {
+      const charLimit = chapterNumber > 50 ? 3000 : 5000;
+      return `[Ch.${c.chapter_number}: "${c.title}"]\n${(c.content || '').slice(0, charLimit)}`;
+    }),
     arcPlan: arc?.plan_text,
     chapterBrief,
     arcPlanThreads,
@@ -443,6 +444,97 @@ function extractFallbackMcState(content: string, protagonistName: string): strin
 
   // Last resort: generic state
   return `${protagonistName} cuối chương — xem nội dung để biết chi tiết`;
+}
+
+// ── Post-Write: Combined Summary + Character Extraction (single AI call) ─────
+
+export interface CombinedSummaryAndCharacters {
+  summary: ChapterSummary;
+  characters: Array<{
+    character_name: string;
+    status: 'alive' | 'dead' | 'missing' | 'unknown';
+    power_level: string | null;
+    power_realm_index: number | null;
+    location: string | null;
+    personality_quirks: string | null;
+    notes: string | null;
+  }>;
+}
+
+/**
+ * Generate chapter summary AND extract character states in a single AI call.
+ * Saves ~1 AI call per chapter compared to separate generateChapterSummary + extractAndSaveCharacterStates.
+ */
+export async function generateSummaryAndCharacters(
+  chapterNumber: number,
+  title: string,
+  content: string,
+  protagonistName: string,
+  config: GeminiConfig,
+  options?: { allowEmptyCliffhanger?: boolean },
+): Promise<CombinedSummaryAndCharacters> {
+  const headSnippet = content.slice(0, 4000);
+  const tailSnippet = content.slice(-4000);
+  // Mid section for character extraction context
+  const midStart = Math.floor(content.length * 0.3);
+  const midSnippet = content.length > 12000
+    ? content.slice(midStart, midStart + 3000)
+    : '';
+
+  const prompt = `Phân tích chương truyện sau, thực hiện 2 nhiệm vụ ĐỒNG THỜI. Trả về JSON:
+{
+  "summary": "tóm tắt 2-3 câu",
+  "openingSentence": "câu mở đầu chương (nguyên văn)",
+  "mcState": "trạng thái ${protagonistName} cuối chương (cảnh giới, vị trí, tình trạng)",
+  "cliffhanger": "tình huống chưa giải quyết cuối chương",
+  "characters": [
+    {
+      "character_name": "TÊN RIÊNG đầy đủ (VD: 'Lâm Phong', 'Aria'). CẤM số, mã code, nhãn chung",
+      "status": "alive|dead|missing|unknown",
+      "power_level": "cảnh giới/sức mạnh hoặc null",
+      "power_realm_index": null,
+      "location": "vị trí cuối chương hoặc null",
+      "personality_quirks": "đặc điểm tính cách nổi bật hoặc null",
+      "notes": "ghi chú quan trọng hoặc null"
+    }
+  ]
+}
+
+Chương ${chapterNumber}: "${title}"
+Nhân vật chính: ${protagonistName}
+
+[MỞ ĐẦU]
+${headSnippet}
+${midSnippet ? `\n[GIỮA CHƯƠNG]\n${midSnippet}` : ''}
+
+[KẾT CHƯƠNG]
+${tailSnippet}
+
+QUY TẮC:
+- CLIFFHANGER: Nếu không phải finale, KHÔNG để rỗng. Trích đúng tình huống căng thẳng cuối chương.
+- CHARACTERS: Chỉ nhân vật CÓ TÊN RIÊNG thực sự. CẤM số, mã code, mô tả chung.`;
+
+  const res = await callGemini(prompt, { ...config, temperature: 0.1, maxTokens: 2048 }, { jsonMode: true });
+  const parsed = parseJSON<any>(res.content);
+
+  if (!parsed || !parsed.summary?.trim()) {
+    throw new Error(`Chapter ${chapterNumber} combined summary: JSON parse failed — raw: ${res.content.slice(0, 200)}`);
+  }
+
+  const allowEmptyCliffhanger = options?.allowEmptyCliffhanger === true;
+
+  // Build summary
+  const summary: ChapterSummary = {
+    summary: parsed.summary,
+    openingSentence: parsed.openingSentence?.trim() || content.slice(0, 160).trim(),
+    mcState: parsed.mcState?.trim() || extractFallbackMcState(content, protagonistName),
+    cliffhanger: parsed.cliffhanger?.trim() || (allowEmptyCliffhanger ? '' : extractFallbackCliffhanger(content)),
+  };
+
+  return {
+    summary,
+    characters: Array.isArray(parsed.characters) ? parsed.characters : [],
+  };
 }
 
 // ── Post-Write: Generate Synopsis ────────────────────────────────────────────

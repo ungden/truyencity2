@@ -999,9 +999,10 @@ ${titleExamples}
 - VÍ DỤ NÊN TRÁNH: "Sự Sỉ Nhục Và Sự Trỗi Dậy", "Nghịch Lý Của Linh Áp", "Quy Luật Của Những Con Số", "X Và Sự Y"`;
 
   if (previousTitles && previousTitles.length > 0) {
-    const allTitles = previousTitles;
-    prompt += `\n\n⚠️ DANH SÁCH TẤT CẢ TÊN CHƯƠNG ĐÃ DÙNG (CẤM LẶP LẠI):
-[${allTitles.join(' | ')}]
+    // Cap at 50 most recent titles to avoid context bloat (was unlimited/500)
+    const recentTitles = previousTitles.slice(0, 50);
+    prompt += `\n\n⚠️ DANH SÁCH ${recentTitles.length} TÊN CHƯƠNG GẦN NHẤT (CẤM LẶP LẠI):
+[${recentTitles.join(' | ')}]
 
 KHÔNG ĐƯỢC đặt tên giống hoặc tương tự bất kỳ tên nào ở trên. Tên chương mới phải HOÀN TOÀN KHÁC BIỆT về ý nghĩa và từ khóa.`;
   }

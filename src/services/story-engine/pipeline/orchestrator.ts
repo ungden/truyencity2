@@ -18,7 +18,7 @@ import { getGenreBoundaryText } from '../config';
 import { loadContext, assembleContext } from './context-assembler';
 import { writeChapter } from './chapter-writer';
 import { retrieveRAGContext, chunkAndStoreChapter } from '../memory/rag-store';
-import { extractAndSaveCharacterStates } from '../memory/character-tracker';
+import { extractAndSaveCharacterStates, saveCharacterStatesFromCombined } from '../memory/character-tracker';
 import {
   buildPlotThreadContext,
   buildBeatContext,
@@ -169,12 +169,13 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       getWorldContext(project.id, nextChapter).catch(() => null),
     ]);
 
-    if (foreshadowCtx) context.foreshadowingContext = foreshadowCtx;
-    if (charArcCtx) context.characterArcContext = charArcCtx;
-    if (pacingCtx) context.pacingContext = pacingCtx;
-    if (voiceCtx) context.voiceContext = voiceCtx;
-    if (powerCtx) context.powerContext = powerCtx;
-    if (worldCtx) context.worldContext = worldCtx;
+    // Cap quality module contexts to prevent unbounded growth (800 chars each)
+    if (foreshadowCtx) context.foreshadowingContext = foreshadowCtx.slice(0, 800);
+    if (charArcCtx) context.characterArcContext = charArcCtx.slice(0, 800);
+    if (pacingCtx) context.pacingContext = pacingCtx.slice(0, 800);
+    if (voiceCtx) context.voiceContext = voiceCtx.slice(0, 800);
+    if (powerCtx) context.powerContext = powerCtx.slice(0, 800);
+    if (worldCtx) context.worldContext = worldCtx.slice(0, 800);
   } catch {
     // Non-fatal
   }
@@ -294,19 +295,22 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   outlineChars.add(protagonistName);
   const characters = Array.from(outlineChars);
 
+  // Task 1: Combined summary + character extraction (single AI call)
+  // Returns combined result so we can save character states without a separate AI call.
+  const combinedResult = await runSummaryTasks(
+    project.id, novel.id, nextChapter, result.title, result.content,
+    protagonistName, genre, totalPlanned,
+    project.world_description || storyTitle, geminiConfig,
+  ).catch(() => null);
+
+  // Task 2: Save character states from combined result (no AI call needed)
+  if (combinedResult?.characters && combinedResult.characters.length > 0) {
+    await saveCharacterStatesFromCombined(
+      project.id, nextChapter, combinedResult.characters,
+    ).catch(() => {});
+  }
+
   await Promise.all([
-    // Task 1: Summary + synopsis + arc plan + bible (conditional)
-    runSummaryTasks(
-      project.id, novel.id, nextChapter, result.title, result.content,
-      protagonistName, genre, totalPlanned,
-      project.world_description || storyTitle, geminiConfig,
-    ).catch(() => {}),
-
-    // Task 2: Character state extraction
-    extractAndSaveCharacterStates(
-      project.id, nextChapter, result.content, protagonistName, geminiConfig,
-    ).catch(() => {}),
-
     // Task 3: RAG chunking + embedding
     chunkAndStoreChapter(
       project.id, nextChapter, result.content, result.title,
@@ -323,10 +327,13 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       project.id, nextChapter, result.content,
     ).catch(() => {}),
 
-    // Task 6: Consistency check (log-only, doesn't block)
-    checkConsistency(
-      project.id, nextChapter, result.content, characters,
-    ).catch(() => {}),
+    // Task 6: Consistency check — every 3 chapters to reduce AI calls
+    // (dead character regex runs every chapter; business logic AI check runs every 3)
+    ...(nextChapter % 3 === 0 ? [
+      checkConsistency(
+        project.id, nextChapter, result.content, characters,
+      ).catch(() => {}),
+    ] : []),
 
     // ── Quality modules post-write (Tasks 7-12, all non-fatal) ──────────
 

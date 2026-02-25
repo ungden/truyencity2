@@ -139,6 +139,53 @@ ${truncated}`;
   }
 }
 
+// ── Public: Save Character States from Combined Summary Result ───────────────
+
+/**
+ * Save character states extracted by the combined summary+character AI call.
+ * No AI call needed — data comes from the combined result.
+ */
+export async function saveCharacterStatesFromCombined(
+  projectId: string,
+  chapterNumber: number,
+  characters: Array<{
+    character_name: string;
+    status: string;
+    power_level: string | null;
+    power_realm_index: number | null;
+    location: string | null;
+    personality_quirks: string | null;
+    notes: string | null;
+  }>,
+): Promise<void> {
+  try {
+    if (!characters || characters.length === 0) return;
+
+    const rows = characters
+      .filter(s => s.character_name && isValidCharacterName(s.character_name.trim()))
+      .map(s => ({
+        project_id: projectId,
+        chapter_number: chapterNumber,
+        character_name: s.character_name.trim(),
+        status: VALID_STATUSES.has(s.status) ? s.status : 'alive',
+        power_level: s.power_level || null,
+        power_realm_index: typeof s.power_realm_index === 'number' ? s.power_realm_index : null,
+        location: s.location || null,
+        personality_quirks: s.personality_quirks || null,
+        notes: s.notes || null,
+      }));
+
+    if (rows.length === 0) return;
+
+    const db = getSupabase();
+    await db.from('character_states').upsert(rows, {
+      onConflict: 'project_id,chapter_number,character_name',
+    });
+  } catch {
+    // Non-fatal
+  }
+}
+
 // ── Public: Load Latest Character States for Context ─────────────────────────
 
 /**

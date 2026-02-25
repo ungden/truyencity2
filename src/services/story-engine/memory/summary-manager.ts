@@ -11,10 +11,12 @@
 import {
   saveChapterSummary,
   generateChapterSummary,
+  generateSummaryAndCharacters,
   generateSynopsis,
   generateArcPlan,
   generateStoryBible,
 } from '../pipeline/context-assembler';
+import type { CombinedSummaryAndCharacters } from '../pipeline/context-assembler';
 import { getSupabase } from '../utils/supabase';
 import { generateForeshadowingAgenda } from './foreshadowing-planner';
 import { generatePacingBlueprint } from './pacing-director';
@@ -40,6 +42,10 @@ const BIBLE_REFRESH_INTERVAL = 150; // Refresh bible every 150 chapters
  *
  * Returns void. All tasks are non-fatal.
  */
+/**
+ * Run all summary tasks. Returns combined result so orchestrator can reuse
+ * character extraction data (avoids separate AI call for character states).
+ */
 export async function runSummaryTasks(
   projectId: string,
   novelId: string,
@@ -51,16 +57,16 @@ export async function runSummaryTasks(
   totalPlannedChapters: number,
   worldDescription: string,
   config: GeminiConfig,
-): Promise<void> {
+): Promise<CombinedSummaryAndCharacters | null> {
+  let combinedResult: CombinedSummaryAndCharacters | null = null;
   try {
     const isLikelyFinale = shouldBeFinaleArc(chapterNumber, totalPlannedChapters);
 
-    // 1. CRITICAL: generate and save chapter summary with retries
-    // Summary is essential for chapter bridge (next chapter's context)
+    // 1. CRITICAL: combined summary + character extraction (single AI call)
     let summarySaved = false;
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
-        const summary = await generateChapterSummary(
+        combinedResult = await generateSummaryAndCharacters(
           chapterNumber,
           title,
           content,
@@ -68,12 +74,12 @@ export async function runSummaryTasks(
           config,
           { allowEmptyCliffhanger: isLikelyFinale },
         );
-        await saveChapterSummary(projectId, chapterNumber, title, summary);
+        await saveChapterSummary(projectId, chapterNumber, title, combinedResult.summary);
         summarySaved = true;
         break;
       } catch (summaryErr) {
         console.warn(
-          `[SummaryManager] Chapter ${chapterNumber} summary attempt ${attempt}/3 failed:`,
+          `[SummaryManager] Chapter ${chapterNumber} combined summary attempt ${attempt}/3 failed:`,
           summaryErr instanceof Error ? summaryErr.message : String(summaryErr),
         );
         if (attempt < 3) await new Promise(r => setTimeout(r, 1500));
@@ -118,6 +124,7 @@ export async function runSummaryTasks(
   } catch {
     // Non-fatal: summary tasks should never crash chapter writing
   }
+  return combinedResult;
 }
 
 // ── Internal: Synopsis ───────────────────────────────────────────────────────

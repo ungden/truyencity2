@@ -30,7 +30,7 @@
 
 import { callGemini } from '../utils/gemini';
 import { parseJSON } from '../utils/json-repair';
-import { getStyleByGenre, buildTitleRulesPrompt, GOLDEN_CHAPTER_REQUIREMENTS, ENGAGEMENT_CHECKLIST, SCENE_EXPANSION_RULES, ANTI_CLICHE_RULES, SUBTEXT_DIALOGUE_RULES, COMEDY_MECHANICS_RULES } from '../config';
+import { getStyleByGenre, buildTitleRulesPrompt, GOLDEN_CHAPTER_REQUIREMENTS, ENGAGEMENT_CHECKLIST } from '../config';
 import { getConstraintExtractor } from '../memory/constraint-extractor';
 import { GENRE_CONFIG } from '../../../lib/types/genre-config';
 import { buildStyleContext, getEnhancedStyleBible, CLIFFHANGER_TECHNIQUES } from '../memory/style-bible';
@@ -63,24 +63,33 @@ OUTPUT: JSON theo format ChapterOutline.`;
 
 const WRITER_SYSTEM = `Bạn là WRITER AGENT — nhà văn chuyên nghiệp viết truyện dài kỳ tiếng Việt.
 
-PHONG CÁCH: Chi tiết sống động. KHÔNG BAO GIỜ tóm tắt — luôn SHOW, don't tell. Dùng đúng giọng văn của thể loại (ví dụ: kinh doanh thì dùng từ ngữ tài chính/thương trường, điền viên thì miêu tả món ăn, thiên nhiên).
+PHONG CÁCH: Chi tiết sống động. KHÔNG BAO GIỜ tóm tắt — luôn SHOW, don't tell. Dùng đúng giọng văn của thể loại.
 
 FORMAT ĐỐI THOẠI: Dấu gạch ngang dài (—) đầu dòng mới. Mỗi lời thoại 1 dòng riêng.
 
 QUY TẮC BẮT BUỘC:
-- KHÔNG dùng markdown (**, ##, etc). Văn xuôi thuần túy.
-- PHẢI đủ số từ yêu cầu. CẤM tóm tắt cốt truyện. Nếu thiếu từ → CÂU CHƯƠNG bằng cách viết thêm chi tiết 5 giác quan, nội tâm nhiều lớp, phản ứng của người xung quanh, hoặc kéo dài hành động.
-- MỖI ĐOẠN HỘI THOẠI: Không nói thẳng tuột. Áp dụng "hội thoại kẹp dao" (mỉa mai, ẩn dụ, giấu diếm cảm xúc).
-- YẾU TỐ HÀI HƯỚC (BẮT BUỘC): Mỗi chương PHẢI có ít nhất 1 khoảnh khắc hài hước. Dùng tình huống (hiểu lầm, vô sỉ, tự vả, não bổ, nội tâm tự giễu nhại khô khan). CẤM nhân vật kể chuyện cười/chơi chữ. Ngay cả lúc căng thẳng nhất, MC phải có 1 suy nghĩ nội tâm tự mỉa mai hoặc bình luận khô khan — đây là cốt lõi của webnovel Trung Quốc đỉnh cao.
-- CẤM SỬ DỤNG VĂN PHONG AI: Loại bỏ hoàn toàn các cụm từ sáo rỗng như "Hít một ngụm khí lạnh", "Không thể tin nổi", "Đột nhiên", "Khẽ nhếch mép". Tả hành động thực tế thay vì dùng văn mẫu.
-- CHỐNG LẶP TỪ (CỰC KỲ QUAN TRỌNG): KHÔNG dùng cùng một tính từ/màu sắc/trạng từ quá 3 lần trong chương. Sau lần 3, BẮT BUỘC dùng từ đồng nghĩa hoặc miêu tả gián tiếp. TUYỆT ĐỐI KHÔNG dùng cùng tính từ 2 lần trong 1 đoạn văn. Đặc biệt chú ý: màu sắc (tím sẫm, vàng kim), cảm xúc (kinh hoàng, sững sờ), âm thanh (ken két, rít lên), trạng thái (mờ ảo, đặc quánh).
-- Mỗi scene cần: mô tả bối cảnh chi tiết + hành động/tương tác + nội tâm + đối thoại.
-- Tiếng Việt tự nhiên: dùng thành ngữ, xưng hô đúng vai vế, từ vựng phù hợp bối cảnh.
+- KHÔNG dùng markdown. Văn xuôi thuần túy.
+- PHẢI đủ số từ yêu cầu. CẤM tóm tắt. Nếu thiếu từ → viết thêm chi tiết 5 giác quan, nội tâm nhiều lớp, phản ứng người xung quanh.
+- SƯỚNG VĂN CÓ KIỂM SOÁT: ưu tiên tiến triển tích cực qua chiến lược, trí tuệ, quan hệ, thu hoạch — KHÔNG chỉ bằng power-up.
+- Tiếng Việt tự nhiên: dùng thành ngữ, xưng hô đúng vai vế.
 - KHÔNG viết "Cliffhanger:" hay bất kỳ chỉ dẫn tiếng Anh nào.
-- SƯỚNG VĂN MAINSTREAM CÓ KIỂM SOÁT: ưu tiên cảm giác tiến triển tích cực qua chiến lược, trí tuệ, quan hệ, thu hoạch, kinh doanh hoặc khám phá — KHÔNG chỉ bằng power-up hay bạo lực.
-- Hạn chế kéo dài trạng thái tụt dốc; nên có điểm hồi phục hoặc lợi ích bù đắp.
-- NỘI TÂM ĐA LỚP (BẮT BUỘC mỗi scene chính): Mỗi scene quan trọng PHẢI có ít nhất 1 đoạn nội tâm 3 lớp: (Bề mặt) MC nghĩ/nói gì → (Sâu hơn) MC thực sự cảm thấy gì → (Sâu nhất) Nỗi sợ/khao khát/bí mật mà MC không dám thừa nhận. Ví dụ: "Anh cười nhạt nói đây là chuyện nhỏ (bề mặt) → nhưng bàn tay giấu sau lưng siết chặt đến trắng bệch (thật sự) → bởi vì mỗi lần thấy máu, hình ảnh cha mẹ gục xuống lại hiện lên rõ mồn một (sâu nhất)."
-- NHỊP ĐIỆU ĐA DẠNG: Phải có ít nhất 1 scene/đoạn nhịp chậm trong chương. Sau đỉnh điểm căng thẳng, MC cần 1 khoảnh khắc thở — ăn bát mì, nhìn bầu trời, nói chuyện phiếm. Đỉnh cao chỉ cao khi có thung lũng làm tương phản.`;
+
+HỘI THOẠI KẸP DAO (SUBTEXT): Không nói thẳng tuột. Kỹ thuật: Nói A hiểu B, trả lời bằng hành động, im lặng có nghĩa, lời nói VS hành động mâu thuẫn, hỏi để đe dọa.
+
+TẤU HÀI WEBNOVEL (BẮT BUỘC): Mỗi chương ≥1 khoảnh khắc hài hước tự nhiên. Dùng: Não Bổ (bystander suy diễn cao siêu), Vô Sỉ (MC lật lọng), Phản Kém (gap moe), nội tâm tự giễu nhại khô khan. CẤM nhân vật kể chuyện cười. CẤM hài phương Tây.
+
+CHỐNG LẶP TỪ: KHÔNG dùng cùng tính từ/màu sắc quá 3 lần trong chương. Sau lần 3 → dùng từ đồng nghĩa. TUYỆT ĐỐI KHÔNG dùng cùng tính từ 2 lần trong 1 đoạn.
+
+CẤM VĂN MẪU AI: Loại bỏ "Hít một ngụm khí lạnh", "Không thể tin nổi", "Đột nhiên", "Khẽ nhếch mép". Tả hành động thực tế.
+
+NỘI TÂM ĐA LỚP (mỗi scene chính): 3 lớp: Bề mặt (MC nói gì) → Thật sự (MC cảm thấy gì) → Sâu nhất (nỗi sợ/khao khát bí mật).
+
+NHỊP ĐIỆU ĐA DẠNG: ≥1 scene nhịp chậm. Sau căng thẳng, MC cần khoảnh khắc thở.
+
+KỸ THUẬT CÂU CHƯƠNG:
+- 🖐️ 5 Giác Quan: Mỗi scene ≥3 giác quan (thị giác, thính giác, xúc giác, khứu giác, vị giác)
+- 🧠 Nội Tâm Đa Lớp: Suy nghĩ bề mặt → cảm xúc thật → nỗi sợ/khao khát sâu nhất
+- 👥 Phản Ứng Người Xung Quanh: Bystander kinh ngạc, đồn đoán, thay đổi thái độ`;
 
 const CRITIC_SYSTEM = `Bạn là CRITIC AGENT — biên tập viên nghiêm khắc đánh giá chất lượng.
 
@@ -252,15 +261,12 @@ CẢM XÚC ARC (bắt buộc lên kế hoạch):
 - Kết: để lại cảm xúc gì? (háo hức đọc tiếp, day dứt, mong chờ...)
 Nguyên tắc: PHẢI có contrast cảm xúc giữa các phần (buồn→vui, sợ→phấn khích)`;
 
-  // Engagement checklist
+  // Engagement checklist — only inject perChapter (saves ~4K chars vs full checklist)
   const engagementGuide = `
 ENGAGEMENT (mỗi chương phải có):
 ${ENGAGEMENT_CHECKLIST.perChapter.map((e: string) => '- ' + e).join('\n')}
 
-NGÂN SÁCH SỨC MẠNH (BẮT BUỘC):
-- Trong arc 20 chương: tối đa ${ENGAGEMENT_CHECKLIST.powerBudget.perArcRules.maxPowerUps} power-up, tối đa ${ENGAGEMENT_CHECKLIST.powerBudget.perArcRules.maxBreakthroughs} breakthrough
-- ${ENGAGEMENT_CHECKLIST.powerBudget.perArcRules.nonPowerChapters}
-- KHÔNG được cho MC tăng cảnh giới/sức mạnh mỗi chương`;
+SỨC MẠNH: Tối đa ${ENGAGEMENT_CHECKLIST.powerBudget.perArcRules.maxPowerUps} power-up/arc. KHÔNG tăng sức mạnh mỗi chương.`;
 
   // Final arc handling
   const finalArcGuide = options?.isFinalArc
@@ -424,55 +430,44 @@ async function runWriter(
     style.genreConventions.slice(0, 10).join('\n'),
   ].join('\n');
 
+  // Build lean Writer context: only bridge + character states + quality modules
+  // (Architect already consumed full context and distilled it into the outline)
+  const writerContextParts: string[] = [];
+  // Bridge: cliffhanger + MC state (critical for continuity)
+  const bridgeMatch = context.match(/\[CẦU NỐI CHƯƠNG[^\]]*\][\s\S]*?(?=\n\n\[|$)/);
+  if (bridgeMatch) writerContextParts.push(bridgeMatch[0]);
+  // Character states
+  const charMatch = context.match(/\[NHÂN VẬT HIỆN TẠI[^\]]*\][\s\S]*?(?=\n\n\[|$)/);
+  if (charMatch) writerContextParts.push(charMatch[0]);
+  // Quality modules (foreshadowing, character arc, pacing, voice, power, world)
+  for (const tag of ['FORESHADOWING', 'CHARACTER ARC', 'PACING', 'VOICE', 'POWER', 'WORLD', 'LOCATION']) {
+    const regex = new RegExp(`\\[${tag}[^\\]]*\\][\\s\\S]*?(?=\\n\\n\\[|$)`);
+    const match = context.match(regex);
+    if (match) writerContextParts.push(match[0].slice(0, 800));
+  }
+  const writerContext = writerContextParts.join('\n\n');
+
   const prompt = `Viết CHƯƠNG ${outline.chapterNumber}: "${outline.title}"
 
 ${rewriteSection}BLUEPRINT:
 ${JSON.stringify(outline, null, 2)}
 
-CONTEXT:
-${context}
+BỐI CẢNH:
+${writerContext}
 
 SCENES (viết ĐẦY ĐỦ cho MỖI scene — KHÔNG bỏ qua scene nào):
 ${sceneGuidance}
 ${multiPOVGuide}
 ${emotionalArcSection}
 
-KỸ THUẬT CÂU CHƯƠNG (BẮT BUỘC ÁP DỤNG ĐỂ ĐẠT ĐỘ DÀI):
-- 🖐️ ${SCENE_EXPANSION_RULES.expansionTechniques.find(t => t.name === 'FiveSenses')?.description}: ${SCENE_EXPANSION_RULES.expansionTechniques.find(t => t.name === 'FiveSenses')?.example}
-- 🧠 ${SCENE_EXPANSION_RULES.expansionTechniques.find(t => t.name === 'InnerMonologueLayers')?.description}: ${SCENE_EXPANSION_RULES.expansionTechniques.find(t => t.name === 'InnerMonologueLayers')?.example}
-- 👥 ${SCENE_EXPANSION_RULES.expansionTechniques.find(t => t.name === 'BystanderReactions')?.description}: ${SCENE_EXPANSION_RULES.expansionTechniques.find(t => t.name === 'BystanderReactions')?.example}
-
-HỘI THOẠI KẸP DAO (SUBTEXT — CỰC KỲ QUAN TRỌNG):
-${SUBTEXT_DIALOGUE_RULES.rules.map(r => `- ${r}`).join('\n')}
-
-KỸ THUẬT SUBTEXT CỤ THỂ (chọn ít nhất 2 cho mỗi chương):
-- Nói A hiểu B: Nhân vật nói về thời tiết nhưng thực ra đang nói về quan hệ ("Trời sắp đổi gió rồi" = "Phe ta sắp thay đổi")
-- Trả lời bằng hành động: Thay vì "Tôi đồng ý" → nhân vật lặng lẽ rót trà thêm cho đối phương
-- Im lặng có ý nghĩa: Dừng giữa câu, nhìn ra cửa sổ 3 giây, rồi đổi chủ đề = đang giấu điều gì đó
-- Lời nói VS hành động mâu thuẫn: "Tôi không quan tâm" nhưng tay siết chặt tách trà đến nứt
-- Hỏi để đe dọa: "Gia đình con ngươi vẫn ở thành Lâm An chứ?" = đe dọa ngầm
-
-TẤU HÀI WEBNOVEL (COMEDY MECHANICS):
-- ${COMEDY_MECHANICS_RULES.description}
-${COMEDY_MECHANICS_RULES.mechanics.map(m => `- ${m.name}: ${m.description}`).join('\n')}
-- Lệnh CẤM Tuyện Đối: ${COMEDY_MECHANICS_RULES.forbidden.join(', ')}
-
-CẤM SỬ DỤNG VĂN MẪU AI (ANTI-CLICHÉ):
-- ${ANTI_CLICHE_RULES.description}
-- Các từ bị CẤM: ${ANTI_CLICHE_RULES.blacklist.join(', ')}
-- Hướng dẫn thay thế: ${ANTI_CLICHE_RULES.guidance}
-
-CHỐNG LẶP MÀU SẮC & TÍNH TỪ (CỰC KỲ QUAN TRỌNG — vi phạm sẽ bị REWRITE):
-${ANTI_CLICHE_RULES.colorRepetitionRule}
-
 DOPAMINE (phải có):
 ${outline.dopaminePoints.map(dp => `- ${dp.type}: Setup: ${dp.setup} → Payoff: ${dp.payoff}`).join('\n')}
 
-COMEDY BEAT (BẮT BUỘC — chương KHÔNG CÓ hài hước sẽ bị REWRITE):
-${outline.comedyBeat ? `Kế hoạch: ${outline.comedyBeat}` : 'Tự chọn 1 khoảnh khắc: MC nội tâm tự giễu nhại, hoặc bystander não bổ suy diễn, hoặc gap moe phá hình tượng.'}
+COMEDY BEAT (BẮT BUỘC):
+${outline.comedyBeat ? `Kế hoạch: ${outline.comedyBeat}` : 'Tự chọn 1 khoảnh khắc hài hước tự nhiên.'}
 
-SCENE NHỊP CHẬM (BẮT BUỘC — toàn bộ cùng cường độ cao sẽ bị trừ điểm):
-${outline.slowScene ? `Scene nhịp chậm: ${outline.slowScene}` : 'Chọn 1 scene để giảm nhịp: MC dừng lại ăn uống/nghỉ ngơi/nói chuyện phiếm/chiêm nghiệm. Tạo tương phản "thung lũng" trước hoặc sau cao trào.'}
+SCENE NHỊP CHẬM (BẮT BUỘC):
+${outline.slowScene ? `Scene nhịp chậm: ${outline.slowScene}` : 'Chọn 1 scene để giảm nhịp.'}
 
 CLIFFHANGER: ${outline.cliffhanger}
 ${topicSection}
@@ -490,7 +485,6 @@ ${richStyleContext}
 - CẤM TÓM TẮT. Phải kéo dài thời gian và không gian của từng cảnh.
 - Chương dưới ${Math.round(totalTargetWords * 0.7)} từ sẽ bị từ chối
 - Tổng ${outline.scenes.length} scenes x ~${Math.round(totalTargetWords / outline.scenes.length)} từ/scene
-- KHÔNG dùng markdown. Viết văn thuần túy.
 
 Bắt đầu viết:`;
 
