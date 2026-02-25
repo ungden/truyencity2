@@ -17,6 +17,7 @@ type ReportResponse = {
   config: {
     dailySpawnTarget: number;
     dailyChapterQuota: number;
+    vnDate: string;
   };
   summary: {
     newNovelsToday: number;
@@ -35,6 +36,16 @@ type ReportResponse = {
     storiesAtQuota: number;
     storiesBelowQuota: number;
     storiesOverQuota: number;
+    quotaTargetTotal: number;
+    quotaWrittenTotal: number;
+    quotaCompletionPct: number;
+    hoursElapsedToday: number;
+    hoursRemainingToday: number;
+    currentWriteRatePerHour: number;
+    requiredWriteRatePerHour: number;
+    projectedEndOfDayWritten: number;
+    projectedEndOfDayCompletionPct: number;
+    forecastStatus: 'on_track' | 'at_risk' | 'off_track';
   };
   quotaViolations: Array<{
     novelId: string;
@@ -117,6 +128,11 @@ export default function ProductionReportPage() {
           <p className="text-sm text-muted-foreground mt-1">
             Theo dõi mục tiêu +20 truyện/ngày và quota 20 chương/truyện/ngày
           </p>
+          {report && (
+            <p className="text-xs text-muted-foreground mt-1">
+              VN date: {report.config.vnDate}
+            </p>
+          )}
         </div>
         <Button onClick={loadReport} disabled={loading}>
           {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
@@ -209,6 +225,37 @@ export default function ProductionReportPage() {
                 )}
               </CardContent>
             </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm">EOD Forecast</CardTitle>
+                <CardDescription>Du bao kha nang dat quota cuoi ngay</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-2">
+                  <div className="text-2xl font-bold">
+                    {report.summary.projectedEndOfDayCompletionPct}%
+                  </div>
+                  <Badge
+                    variant={
+                      report.summary.forecastStatus === 'on_track'
+                        ? 'default'
+                        : report.summary.forecastStatus === 'at_risk'
+                          ? 'secondary'
+                          : 'destructive'
+                    }
+                  >
+                    {report.summary.forecastStatus}
+                  </Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {report.summary.projectedEndOfDayWritten}/{report.summary.quotaTargetTotal} chương (projected)
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Rate: {report.summary.currentWriteRatePerHour}/h (need {report.summary.requiredWriteRatePerHour}/h)
+                </p>
+              </CardContent>
+            </Card>
           </div>
 
           {report.summary.healthAlertLevel !== 'ok' && (
@@ -241,6 +288,18 @@ export default function ProductionReportPage() {
               <div className="rounded border p-3">
                 <div className="text-xs text-muted-foreground">Over Quota</div>
                 <div className="text-xl font-semibold text-red-600">{report.summary.storiesOverQuota}</div>
+              </div>
+            </CardContent>
+            <CardContent className="pt-0">
+              <div className="rounded border p-3 text-sm">
+                <div className="text-xs text-muted-foreground">Quota Progress (all active projects)</div>
+                <div className="mt-1 font-medium">
+                  {report.summary.quotaWrittenTotal}/{report.summary.quotaTargetTotal} chapters ({report.summary.quotaCompletionPct}%)
+                </div>
+                <Progress value={Math.min(100, report.summary.quotaCompletionPct)} className="mt-2" />
+                <div className="mt-2 text-xs text-muted-foreground">
+                  Elapsed: {report.summary.hoursElapsedToday}h · Remaining: {report.summary.hoursRemainingToday}h
+                </div>
               </div>
             </CardContent>
           </Card>

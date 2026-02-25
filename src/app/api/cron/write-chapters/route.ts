@@ -18,7 +18,7 @@
  *     - Write Ch.1 via V2 engine (arc plan already cached)
  *     - Up to 10 projects per tick, timeout: 240s
  * 
- * All tiers run in parallel with bounded concurrency (12).
+ * All tiers run in parallel with bounded, configurable concurrency (default 20).
  * Two-phase init prevents Vercel 300s timeout from killing arc plan + write.
  */
 
@@ -34,16 +34,28 @@ import type { GenreType, GeminiConfig } from '@/services/story-engine/types';
 import { DEFAULT_CONFIG } from '@/services/story-engine/types';
 
 // CONFIGURATION
-const MIN_RESUME_BATCH_SIZE = 30;
-const MAX_RESUME_BATCH_SIZE = 180;
-const INIT_PREP_BATCH_SIZE = 20;   // Arc plan generation only (fast)
-const INIT_WRITE_BATCH_SIZE = 10;  // Chapter 1 writing (arc plan already exists)
-const CANDIDATE_POOL_SIZE = 1200;
-const PROJECT_TIMEOUT_MS = 180_000;        // 180s per resume project
-const INIT_PREP_TIMEOUT_MS = 120_000;      // 120s for arc plan generation only
-const INIT_WRITE_TIMEOUT_MS = 240_000;     // 240s for chapter 1 write (no arc plan gen)
-const RUN_CONCURRENCY = 12; // Limit parallel pressure on model provider
+function parseIntEnv(name: string, fallback: number): number {
+  const raw = process.env[name];
+  if (!raw) return fallback;
+  const parsed = Number.parseInt(raw, 10);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
 const DAILY_CHAPTER_QUOTA = 20; // Hard exact target per active novel per Vietnam day
+
+const MIN_RESUME_BATCH_SIZE = clamp(parseIntEnv('WRITE_CHAPTERS_MIN_RESUME_BATCH', 30), 10, 300);
+const MAX_RESUME_BATCH_SIZE = clamp(parseIntEnv('WRITE_CHAPTERS_MAX_RESUME_BATCH', 220), MIN_RESUME_BATCH_SIZE, 400);
+const INIT_PREP_BATCH_SIZE = clamp(parseIntEnv('WRITE_CHAPTERS_INIT_PREP_BATCH', 20), 0, 100);   // Arc plan generation only (fast)
+const INIT_WRITE_BATCH_SIZE = clamp(parseIntEnv('WRITE_CHAPTERS_INIT_WRITE_BATCH', 10), 0, 100);  // Chapter 1 writing (arc plan already exists)
+const CANDIDATE_POOL_SIZE = clamp(parseIntEnv('WRITE_CHAPTERS_CANDIDATE_POOL', 1600), 200, 5000);
+const PROJECT_TIMEOUT_MS = clamp(parseIntEnv('WRITE_CHAPTERS_RESUME_TIMEOUT_MS', 180_000), 30_000, 300_000);     // 180s per resume project
+const INIT_PREP_TIMEOUT_MS = clamp(parseIntEnv('WRITE_CHAPTERS_INIT_PREP_TIMEOUT_MS', 120_000), 30_000, 300_000); // 120s for arc plan generation only
+const INIT_WRITE_TIMEOUT_MS = clamp(parseIntEnv('WRITE_CHAPTERS_INIT_WRITE_TIMEOUT_MS', 240_000), 30_000, 300_000); // 240s for chapter 1 write (no arc plan gen)
+const RUN_CONCURRENCY = clamp(parseIntEnv('WRITE_CHAPTERS_CONCURRENCY', 20), 1, 32); // Tier-3 Gemini is effectively unlimited; bottleneck is orchestration
+const TICKS_PER_DAY = clamp(parseIntEnv('WRITE_CHAPTERS_TICKS_PER_DAY', 288), 60, 1440); // 5m cron => 288, 3m cron => 480
+const OVERLOAD_RESUME_THRESHOLD = clamp(parseIntEnv('WRITE_CHAPTERS_OVERLOAD_RESUME_THRESHOLD', 120), 0, 2000);
+const OVERLOAD_INIT_PREP_CAP = clamp(parseIntEnv('WRITE_CHAPTERS_OVERLOAD_INIT_PREP_CAP', 8), 0, 100);
+const OVERLOAD_INIT_WRITE_CAP = clamp(parseIntEnv('WRITE_CHAPTERS_OVERLOAD_INIT_WRITE_CAP', 6), 0, 100);
 
 export const maxDuration = 300; // 5 minutes (Vercel Pro)
 export const dynamic = 'force-dynamic';
@@ -294,8 +306,7 @@ async function updateQuotaAfterError(
 }
 
 function computeDynamicResumeBatchSize(activeCount: number): number {
-  // 288 ticks/day with 5-minute cron
-  const requiredPerTick = Math.ceil((activeCount * DAILY_CHAPTER_QUOTA) / 288);
+  const requiredPerTick = Math.ceil((activeCount * DAILY_CHAPTER_QUOTA) / TICKS_PER_DAY);
   const buffered = Math.ceil(requiredPerTick * 1.2);
   return clamp(buffered, MIN_RESUME_BATCH_SIZE, MAX_RESUME_BATCH_SIZE);
 }
@@ -609,9 +620,17 @@ export async function GET(request: NextRequest) {
       initWriteCandidates = initCandidates.filter(p => hasArcPlan.has(p.id));
     }
 
+    const overloadMode = resumeCandidates.length >= OVERLOAD_RESUME_THRESHOLD;
+    const effectiveInitPrepBatch = overloadMode
+      ? Math.min(INIT_PREP_BATCH_SIZE, OVERLOAD_INIT_PREP_CAP)
+      : INIT_PREP_BATCH_SIZE;
+    const effectiveInitWriteBatch = overloadMode
+      ? Math.min(INIT_WRITE_BATCH_SIZE, OVERLOAD_INIT_WRITE_CAP)
+      : INIT_WRITE_BATCH_SIZE;
+
     const filteredResumeProjects = resumeCandidates.slice(0, dynamicResumeBatchSize);
-    const filteredInitPrepProjects = initPrepCandidates.slice(0, INIT_PREP_BATCH_SIZE);
-    const filteredInitWriteProjects = initWriteCandidates.slice(0, INIT_WRITE_BATCH_SIZE);
+    const filteredInitPrepProjects = initPrepCandidates.slice(0, effectiveInitPrepBatch);
+    const filteredInitWriteProjects = initWriteCandidates.slice(0, effectiveInitWriteBatch);
 
     const totalProjects = filteredResumeProjects.length + filteredInitPrepProjects.length + filteredInitWriteProjects.length;
     const skippedDueToQuota = allCandidates.length - dueCandidates.length;
@@ -726,6 +745,16 @@ export async function GET(request: NextRequest) {
       processed: claimedTotal,
       activeCount,
       dynamicResumeBatchSize,
+      overloadMode,
+      config: {
+        runConcurrency: RUN_CONCURRENCY,
+        minResumeBatch: MIN_RESUME_BATCH_SIZE,
+        maxResumeBatch: MAX_RESUME_BATCH_SIZE,
+        effectiveInitPrepBatch,
+        effectiveInitWriteBatch,
+        ticksPerDay: TICKS_PER_DAY,
+        candidatePoolSize: CANDIDATE_POOL_SIZE,
+      },
       runConcurrency: RUN_CONCURRENCY,
       timeoutSeconds: PROJECT_TIMEOUT_MS / 1000,
       dueCandidates: dueCandidates.length,
