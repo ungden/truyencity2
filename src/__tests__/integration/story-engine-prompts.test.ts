@@ -29,6 +29,8 @@ function generateMockContent(targetWords: number): string {
     'Hai người nói chuyện hàng giờ về kế hoạch và tương lai phía trước.',
     'Khi kết thúc cuộc gọi trời đã tối hẳn ngoài cửa sổ.',
     'Hắn nhìn bản kế hoạch trên bàn với ánh mắt kiên quyết.',
+    'Hắn thầm nghĩ mình nghèo đến mức cốc mì cũng thành xa xỉ, rồi tự giễu vì ý nghĩ ấy.',
+    'Người bạn im lặng vài giây, chỉ cười rồi đổi chủ đề như đang che giấu điều gì.',
     'Đêm nay hắn không ngủ được vì quá nhiều suy nghĩ trong đầu.',
     'Từng bước một hắn sẽ xây dựng đế chế kinh doanh của riêng mình.',
     'Không ai tin một thanh niên nghèo có thể làm được điều phi thường.',

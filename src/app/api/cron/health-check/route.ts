@@ -196,6 +196,74 @@ async function checkWordQuality(supabase: ReturnType<typeof getSupabaseAdmin>): 
   return { name: 'Word Quality', status, message, value: avg, avgWords: avg };
 }
 
+async function checkQualityDrift(supabase: ReturnType<typeof getSupabaseAdmin>): Promise<CheckResult & { avgWords1h: number; avgWords6h: number; driftPct: number }> {
+  const now = new Date();
+  const h1 = new Date(now.getTime() - 60 * 60 * 1000).toISOString();
+  const h6 = new Date(now.getTime() - 6 * 60 * 60 * 1000).toISOString();
+
+  const [recent1h, recent6h] = await Promise.all([
+    supabase
+      .from('chapters')
+      .select('content')
+      .gte('created_at', h1)
+      .order('created_at', { ascending: false })
+      .limit(120),
+    supabase
+      .from('chapters')
+      .select('content')
+      .gte('created_at', h6)
+      .order('created_at', { ascending: false })
+      .limit(720),
+  ]);
+
+  const oneHourRows = recent1h.data || [];
+  const sixHourRows = recent6h.data || [];
+
+  if (oneHourRows.length < 10 || sixHourRows.length < 50) {
+    return {
+      name: 'Quality Drift',
+      status: 'warn',
+      message: 'Not enough data to evaluate quality drift reliably',
+      value: 'n/a',
+      avgWords1h: 0,
+      avgWords6h: 0,
+      driftPct: 0,
+    };
+  }
+
+  const avg = (rows: Array<{ content: string | null }>) => {
+    const counts = rows.map(r => (r.content || '').split(/\s+/).filter(Boolean).length);
+    return counts.length > 0 ? Math.round(counts.reduce((a, b) => a + b, 0) / counts.length) : 0;
+  };
+
+  const avgWords1h = avg(oneHourRows);
+  const avgWords6h = avg(sixHourRows);
+  const driftPct = avgWords6h > 0
+    ? Number((((avgWords1h - avgWords6h) / avgWords6h) * 100).toFixed(1))
+    : 0;
+
+  let status: CheckResult['status'] = 'pass';
+  let message = `1h avg: ${avgWords1h}, 6h avg: ${avgWords6h} (drift ${driftPct}%)`;
+
+  if (avgWords1h < 2200 || driftPct <= -20) {
+    status = 'fail';
+    message = `Quality dropped sharply — 1h avg ${avgWords1h}, 6h baseline ${avgWords6h} (${driftPct}%)`;
+  } else if (avgWords1h < 2500 || driftPct <= -12) {
+    status = 'warn';
+    message = `Quality drift detected — 1h avg ${avgWords1h}, baseline ${avgWords6h} (${driftPct}%)`;
+  }
+
+  return {
+    name: 'Quality Drift',
+    status,
+    message,
+    value: driftPct,
+    avgWords1h,
+    avgWords6h,
+    driftPct,
+  };
+}
+
 async function checkNovelDistribution(supabase: ReturnType<typeof getSupabaseAdmin>): Promise<CheckResult & { topNovel: number; avgChapters: number }> {
   const { data: projects } = await supabase
     .from('ai_story_projects')
@@ -243,6 +311,7 @@ export async function GET(request: NextRequest) {
       covers,
       heartbeat,
       quality,
+      qualityDrift,
       distribution,
     ] = await Promise.all([
       checkChapterProduction(supabase),
@@ -252,12 +321,13 @@ export async function GET(request: NextRequest) {
       checkCoverStatus(supabase),
       checkCronHeartbeat(supabase),
       checkWordQuality(supabase),
+      checkQualityDrift(supabase),
       checkNovelDistribution(supabase),
     ]);
 
     const checks: CheckResult[] = [
       production, stuck, activeProjects, totalChapters,
-      covers, heartbeat, quality, distribution,
+      covers, heartbeat, quality, qualityDrift, distribution,
     ];
 
     // Calculate overall score
@@ -283,6 +353,9 @@ export async function GET(request: NextRequest) {
       coversComplete: covers.withCover,
       coversMissing: covers.withoutCover,
       avgWordsPerChapter: quality.avgWords,
+      avgWordsLastHour: qualityDrift.avgWords1h,
+      avgWordsLast6Hours: qualityDrift.avgWords6h,
+      qualityDriftPct: qualityDrift.driftPct,
       topNovelChapters: distribution.topNovel,
       avgChaptersPerNovel: distribution.avgChapters,
       cronStaleProjects: heartbeat.staleCount,

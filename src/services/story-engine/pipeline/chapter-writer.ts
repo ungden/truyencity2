@@ -58,6 +58,8 @@ QUY TẮC:
 8. Tình huống hài hước: Ưu tiên thiết kế tình huống "Não bổ" (người khác tự suy diễn cao siêu về hành động ngớ ngẩn của MC) hoặc "Phản kém" (Tương phản hình tượng). Cấm trò đùa kiểu phương Tây.
 9. NHỊP ĐIỆU ĐA DẠNG (BẮT BUỘC): Trong 4-6 scenes, PHẢI có ít nhất 1 scene nhịp CHẬM (đối thoại chiêm nghiệm, nội tâm sâu, ký ức, slice-of-life, phản ứng cảm xúc). CẤM toàn bộ scenes đều là chiến đấu/hành động. Ngay cả arc chiến đấu khốc liệt nhất cũng phải có 1 khoảnh khắc MC dừng lại thở, suy nghĩ, hoặc tương tác đời thường.
 10. COMEDY BEAT (BẮT BUỘC): Mỗi chương PHẢI có ít nhất 1 khoảnh khắc hài hước tự nhiên. Ghi rõ "comedyBeat" trong JSON. Dùng Não Bổ (bystander suy diễn cao siêu), Vô Sỉ (MC lật lọng), Phản Kém (gap moe), hoặc nội tâm tự giễu nhại. Ngay cả trong trận chiến sinh tử, MC hoặc đồng đội PHẢI có ít nhất 1 suy nghĩ khô khan/tự chế giễu.
+11. PAYOFF NHỎ TRONG CHƯƠNG (BẮT BUỘC): Mỗi chương phải có ít nhất 1 "hạt giống đã gieo" được thu hoạch ngay trong chương (gợi ý ở scene đầu, trả ở scene sau). CẤM chỉ setup mà không payoff.
+12. SUBTEXT XUNG ĐỘT: Mỗi chương cần ít nhất 1 cảnh đối thoại có lớp nghĩa ngầm (không nói thẳng mục tiêu thật).
 
 OUTPUT: JSON theo format ChapterOutline.`;
 
@@ -89,7 +91,12 @@ NHỊP ĐIỆU ĐA DẠNG: ≥1 scene nhịp chậm. Sau căng thẳng, MC cần
 KỸ THUẬT CÂU CHƯƠNG:
 - 🖐️ 5 Giác Quan: Mỗi scene ≥3 giác quan (thị giác, thính giác, xúc giác, khứu giác, vị giác)
 - 🧠 Nội Tâm Đa Lớp: Suy nghĩ bề mặt → cảm xúc thật → nỗi sợ/khao khát sâu nhất
-- 👥 Phản Ứng Người Xung Quanh: Bystander kinh ngạc, đồn đoán, thay đổi thái độ`;
+- 👥 Phản Ứng Người Xung Quanh: Bystander kinh ngạc, đồn đoán, thay đổi thái độ
+
+CHỐNG "MÙI AI" (BẮT BUỘC):
+- Tránh mở đoạn bằng các cụm sáo rỗng chung chung.
+- Cứ mỗi 2 scenes phải có ít nhất 1 câu "chi tiết cụ thể" (vật thể, con số, hành động có hệ quả) thay vì câu cảm thán trừu tượng.
+- Mỗi chương phải có ít nhất 1 đoạn đối thoại mà nhân vật "không nói điều họ thật sự muốn" (subtext).`;
 
 const CRITIC_SYSTEM = `Bạn là CRITIC AGENT — biên tập viên nghiêm khắc đánh giá chất lượng.
 
@@ -105,6 +112,7 @@ KIỂM TRA BỔ SUNG (BẮT BUỘC):
 7. NỘI TÂM ĐA LỚP: Chương có ít nhất 1 đoạn nội tâm đi sâu hơn bề mặt không? Nếu thiếu → tạo issue type "quality", severity "minor". CHỈ severity "moderate" nếu toàn bộ chương đều nội tâm 1 lớp.
 8. GIỌNG NÓI NHÂN VẬT: Nếu ≥3 nhân vật nói giống hệt nhau → issue type "dialogue", severity "moderate". Nếu chỉ 2 nhân vật → "minor".
 9. SUBTEXT HỘI THOẠI: Nếu >50% đối thoại quan trọng là hỏi-đáp thẳng tuột (A hỏi, B trả lời đầy đủ) → issue type "dialogue", severity "minor". CHỈ "moderate" nếu toàn bộ đối thoại đều nói thẳng.
+10. PAYOFF: Chương có payoff cho setup trong cùng chương không? Nếu setup nhiều nhưng payoff rỗng → issue type "quality", severity "moderate".
 
 ISSUES: Liệt kê vấn đề (pacing/consistency/dopamine/quality/word_count/dialogue/continuity)
 
@@ -596,6 +604,9 @@ ${!isFinalArc ? '⚠️ NON-FINALE: Kết chương PHẢI có ending hook/cliffh
 BÁO CÁO LẶP TỪ (tự động phân tích):
 ${repetitionReport}
 
+BÁO CÁO TÍN HIỆU CHẤT LƯỢNG (tự động phân tích):
+${buildSignalReport(content)}
+
 NỘI DUNG CHƯƠNG (FULL):
 ${contentPreview}
 
@@ -678,6 +689,57 @@ KIỂM TRA CHẤT LƯỢNG BỔ SUNG (BẮT BUỘC):
         parsed.rewriteInstructions = (parsed.rewriteInstructions || '') + ` Sửa lặp từ: ${repetitionGuide}`;
       }
       // Moderate repetition: just log, don't penalize score (Critic already sees report)
+    }
+
+    // Hard enforcement: quality signal floor
+    const signal = analyzeQualitySignals(content);
+    const missingQualityAxes: string[] = [];
+    parsed.issues = parsed.issues || [];
+
+    if (signal.comedyCount === 0) {
+      missingQualityAxes.push('comedy');
+      parsed.issues.push({
+        type: 'quality',
+        severity: 'moderate',
+        description: 'Thiếu comedy beat tự nhiên (não bổ/vô sỉ/phản kém/tự giễu).',
+      });
+    }
+
+    if (signal.innerCount === 0) {
+      missingQualityAxes.push('inner_monologue');
+      parsed.issues.push({
+        type: 'quality',
+        severity: 'moderate',
+        description: 'Thiếu nội tâm đa lớp rõ ràng.',
+      });
+    }
+
+    if (signal.slowCount === 0) {
+      missingQualityAxes.push('slow_scene');
+      parsed.issues.push({
+        type: 'pacing',
+        severity: 'moderate',
+        description: 'Thiếu nhịp chậm để tạo tương phản cảm xúc.',
+      });
+    }
+
+    if (signal.dialogueRatio >= 0.18 && signal.subtextCount === 0) {
+      missingQualityAxes.push('subtext');
+      parsed.issues.push({
+        type: 'dialogue',
+        severity: 'moderate',
+        description: 'Đối thoại thiếu subtext (nói thẳng quá nhiều).',
+      });
+    }
+
+    if (missingQualityAxes.length >= 2) {
+      parsed.requiresRewrite = true;
+      parsed.approved = false;
+      parsed.overallScore = Math.min(parsed.overallScore || 10, 5);
+      const guidance = `Bổ sung bắt buộc: ${missingQualityAxes.join(', ')}.`;
+      parsed.rewriteInstructions = parsed.rewriteInstructions
+        ? `${parsed.rewriteInstructions} ${guidance}`
+        : guidance;
     }
 
     // Hard enforcement for non-finale chapters: ending hook is required
@@ -818,6 +880,59 @@ function hasCliffhangerSignal(content: string): boolean {
   }
 
   return score >= 2;
+}
+
+type QualitySignals = {
+  comedyCount: number;
+  innerCount: number;
+  slowCount: number;
+  subtextCount: number;
+  dialogueRatio: number;
+};
+
+function analyzeQualitySignals(content: string): QualitySignals {
+  const lower = content.toLowerCase();
+  const lines = content.split('\n').map(l => l.trim()).filter(Boolean);
+  const dialogueLines = lines.filter(l => l.startsWith('—') || l.startsWith('-')).length;
+  const dialogueRatio = lines.length > 0 ? dialogueLines / lines.length : 0;
+
+  const comedySignals = [
+    'tự giễu', 'mỉa mai', 'khô khan', 'ngớ ngẩn', 'buồn cười',
+    'não bổ', 'vô sỉ', 'tỉnh bơ', 'lật lọng', 'dở khóc dở cười', 'ngượng',
+  ];
+  const innerSignals = [
+    'thầm nghĩ', 'trong lòng', 'tâm trí', 'nội tâm', 'sâu thẳm',
+    'không dám thừa nhận', 'nỗi sợ', 'khao khát',
+  ];
+  const slowSignals = [
+    'yên tĩnh', 'bình yên', 'nhắm mắt', 'hít thở', 'uống trà', 'nghỉ ngơi',
+    'gió nhẹ', 'nhìn bầu trời',
+  ];
+  const subtextSignals = [
+    'im lặng', 'khựng lại', 'không trả lời', 'chỉ cười', 'đổi chủ đề',
+    'ánh mắt', 'nói một đằng',
+  ];
+
+  const countByPresence = (signals: string[]) => signals.filter(s => lower.includes(s)).length;
+
+  return {
+    comedyCount: countByPresence(comedySignals),
+    innerCount: countByPresence(innerSignals),
+    slowCount: countByPresence(slowSignals),
+    subtextCount: countByPresence(subtextSignals),
+    dialogueRatio,
+  };
+}
+
+function buildSignalReport(content: string): string {
+  const s = analyzeQualitySignals(content);
+  return [
+    `- Comedy signals: ${s.comedyCount}`,
+    `- Inner-monologue signals: ${s.innerCount}`,
+    `- Slow-scene signals: ${s.slowCount}`,
+    `- Subtext signals: ${s.subtextCount}`,
+    `- Dialogue ratio: ${Math.round(s.dialogueRatio * 100)}%`,
+  ].join('\n');
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
