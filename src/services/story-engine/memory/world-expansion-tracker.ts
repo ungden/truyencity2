@@ -320,23 +320,34 @@ export async function prepareUpcomingLocation(
   const arcNumber = Math.ceil(chapterNumber / 20);
   const db = getSupabase();
 
-  // Find location for next arc that doesn't have a bible yet
-  const { data: upcoming } = await db
+  // Find locations without a bible yet
+  const { data: noBible } = await db
     .from('location_bibles')
     .select('location_name,location_bible,arc_range')
     .eq('project_id', projectId)
     .is('location_bible', null);
 
-  if (!upcoming) return;
+  if (!noBible?.length) return;
 
-  for (const loc of upcoming) {
+  // Priority 1: Generate bible for CURRENT location (MC is there now but no bible)
+  for (const loc of noBible) {
     const range = loc.arc_range || [0, 0];
-    // Generate bible 1 arc before MC arrives
+    if (arcNumber >= range[0] && arcNumber <= range[1]) {
+      await generateLocationBible(
+        projectId, loc.location_name, genre, synopsis, masterOutline, config,
+      );
+      return; // Only 1 per chapter — current location takes priority
+    }
+  }
+
+  // Priority 2: Generate bible 1 arc before MC arrives at a NEW location
+  for (const loc of noBible) {
+    const range = loc.arc_range || [0, 0];
     if (range[0] === arcNumber + 1) {
       await generateLocationBible(
         projectId, loc.location_name, genre, synopsis, masterOutline, config,
       );
-      break; // Only 1 per chapter
+      return; // Only 1 per chapter
     }
   }
 }
