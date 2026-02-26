@@ -1,6 +1,8 @@
 /**
  * AI Author Generator - Creates realistic virtual author profiles
  *
+ * Extracted from story-writing-factory/author-generator.ts (Phase 11 migration).
+ *
  * Generates:
  * - Vietnamese pen names (bút danh)
  * - Author bios and writing style descriptions
@@ -10,7 +12,13 @@
 
 import { AIProviderService } from '../ai-provider';
 import { AIProviderType } from '@/lib/types/ai-providers';
-import { GenreType } from './types';
+
+/** Genre slugs used across the platform */
+export type GenreType =
+  | 'tien-hiep' | 'huyen-huyen' | 'do-thi' | 'kiem-hiep'
+  | 'lich-su' | 'khoa-huyen' | 'vong-du' | 'dong-nhan'
+  | 'mat-the' | 'linh-di' | 'quan-truong' | 'di-gioi'
+  | 'ngon-tinh';
 
 export interface GeneratedAuthor {
   name: string;

@@ -1,6 +1,8 @@
 /**
  * Content Seeder - Seed platform with AI authors and novels at scale
  *
+ * Extracted from story-writing-factory/content-seeder.ts (Phase 11 migration).
+ *
  * Generates:
  * - 200 AI authors with unique pen names and personas
  * - 4000 novels (20 per author) across all genres defined in GENRE_CONFIG
@@ -13,10 +15,9 @@
  */
 
 import { randomUUID } from 'crypto';
-import { generateQuickAuthor } from './author-generator';
-import { getSupabase } from './supabase-helper';
+import { generateQuickAuthor, GenreType } from '@/services/author-generator';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { AIProviderService } from '../ai-provider';
-import { GenreType } from './types';
 import { GENRE_CONFIG } from '@/lib/types/genre-config';
 
 // ============================================================================
@@ -335,12 +336,12 @@ interface ProjectInsertRow {
 
 export class ContentSeeder {
   private aiService: AIProviderService;
-  private supabase: ReturnType<typeof getSupabase>;
+  private supabase: ReturnType<typeof getSupabaseAdmin>;
   private userId: string | null = null;
 
   constructor(geminiApiKey: string) {
     this.aiService = new AIProviderService({ gemini: geminiApiKey });
-    this.supabase = getSupabase();
+    this.supabase = getSupabaseAdmin();
   }
 
   private getGenreConfigEntry(genre: string): GenreConfigEntry | undefined {

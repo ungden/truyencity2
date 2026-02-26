@@ -1,6 +1,8 @@
 /**
  * Novel Enricher - Upgrade existing novels with rich content + covers
  *
+ * Extracted from story-writing-factory/novel-enricher.ts (Phase 11 migration).
+ *
  * For each novel, generates via Gemini:
  * - Full description (200-500 words): giới thiệu, tóm tắt, hook
  * - World system (hệ thống tu luyện / magic / setting)
@@ -12,7 +14,7 @@
 
 import { AIProviderService } from '../ai-provider';
 import { GeminiImageService } from '../gemini-image';
-import { getSupabase } from './supabase-helper';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { GENRE_CONFIG } from '@/lib/types/genre-config';
 
 // Derive labels from GENRE_CONFIG to stay in sync with AI Writer
@@ -63,12 +65,12 @@ interface EnrichedContent {
 export class NovelEnricher {
   private ai: AIProviderService;
   private imageService: GeminiImageService;
-  private supabase: ReturnType<typeof getSupabase>;
+  private supabase: ReturnType<typeof getSupabaseAdmin>;
 
   constructor(geminiApiKey: string) {
     this.ai = new AIProviderService({ gemini: geminiApiKey });
     this.imageService = new GeminiImageService({ apiKey: geminiApiKey });
-    this.supabase = getSupabase();
+    this.supabase = getSupabaseAdmin();
   }
 
   /**

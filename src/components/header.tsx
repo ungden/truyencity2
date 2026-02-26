@@ -36,6 +36,91 @@ interface HeaderProps {
   onMenuClick?: () => void;
 }
 
+/** Shared menu sheet content used by both header variants */
+function MenuSheetContent({
+  isMenuOpen,
+  setIsMenuOpen,
+  router,
+}: {
+  isMenuOpen: boolean;
+  setIsMenuOpen: (v: boolean) => void;
+  router: ReturnType<typeof useRouter>;
+}) {
+  return (
+    <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+      <SheetContent side="right" className="w-full sm:max-w-sm">
+        <SheetHeader>
+          <SheetTitle className="flex items-center gap-2">
+            <Settings2 size={20} />
+            Menu
+          </SheetTitle>
+        </SheetHeader>
+        <div className="mt-6 space-y-6">
+          <div className="flex items-center justify-between p-4 rounded-xl bg-muted">
+            <span className="text-sm font-medium">Giao diện</span>
+            <ThemeToggle />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              variant="outline"
+              onClick={() => { setIsMenuOpen(false); router.push('/library'); }}
+              className="h-12 rounded-xl"
+            >
+              Tủ sách
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => { setIsMenuOpen(false); router.push('/ranking'); }}
+              className="h-12 rounded-xl"
+            >
+              Xếp hạng
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => { setIsMenuOpen(false); router.push('/profile'); }}
+              className="h-12 rounded-xl"
+            >
+              Tài khoản
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => { setIsMenuOpen(false); router.push('/browse'); }}
+              className="h-12 rounded-xl"
+            >
+              Duyệt truyện
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => { setIsMenuOpen(false); router.push('/pricing'); }}
+              className="h-12 rounded-xl col-span-2 bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border-amber-500/30 text-amber-700 dark:text-amber-400 hover:from-amber-500/20 hover:to-yellow-500/20"
+            >
+              Nâng cấp VIP
+            </Button>
+          </div>
+
+          <div className="rounded-xl border p-4 space-y-2">
+            <p className="text-xs font-medium text-muted-foreground">Phap ly va ho tro</p>
+            <div className="grid grid-cols-2 gap-2">
+              <Button variant="ghost" className="justify-start" onClick={() => { setIsMenuOpen(false); router.push('/privacy'); }}>
+                Bao mat
+              </Button>
+              <Button variant="ghost" className="justify-start" onClick={() => { setIsMenuOpen(false); router.push('/terms'); }}>
+                Dieu khoan
+              </Button>
+              <Button variant="ghost" className="justify-start" onClick={() => { setIsMenuOpen(false); router.push('/support'); }}>
+                Ho tro
+              </Button>
+              <Button variant="ghost" className="justify-start" onClick={() => { setIsMenuOpen(false); router.push('/account-deletion'); }}>
+                Xoa tai khoan
+              </Button>
+            </div>
+          </div>
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}
+
 export const Header: React.FC<HeaderProps> = ({
   title = "TruyenCity",
   showBack = false,
@@ -125,52 +210,7 @@ export const Header: React.FC<HeaderProps> = ({
           onClose={() => setIsSearchOpen(false)}
         />
 
-        <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-          <SheetContent side="right" className="w-full sm:max-w-sm">
-            <SheetHeader>
-              <SheetTitle className="flex items-center gap-2">
-                <Settings2 size={20} />
-                Menu
-              </SheetTitle>
-            </SheetHeader>
-            <div className="mt-6 space-y-6">
-              <div className="flex items-center justify-between p-4 rounded-xl bg-muted">
-                <span className="text-sm font-medium">Giao diện</span>
-                <ThemeToggle />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <Button
-                  variant="outline"
-                  onClick={() => { setIsMenuOpen(false); router.push('/library'); }}
-                  className="h-12 rounded-xl"
-                >
-                  Tủ sách
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => { setIsMenuOpen(false); router.push('/ranking'); }}
-                  className="h-12 rounded-xl"
-                >
-                  Xếp hạng
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => { setIsMenuOpen(false); router.push('/profile'); }}
-                  className="h-12 rounded-xl"
-                >
-                  Tài khoản
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => { setIsMenuOpen(false); router.push('/browse'); }}
-                  className="h-12 rounded-xl"
-                >
-                  Duyệt truyện
-                </Button>
-              </div>
-            </div>
-          </SheetContent>
-        </Sheet>
+        <MenuSheetContent isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} router={router} />
       </>
     );
   }
@@ -234,70 +274,7 @@ export const Header: React.FC<HeaderProps> = ({
         onClose={() => setIsSearchOpen(false)}
       />
 
-      <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-        <SheetContent side="right" className="w-full sm:max-w-sm">
-          <SheetHeader>
-            <SheetTitle className="flex items-center gap-2">
-              <Settings2 size={20} />
-              Menu
-            </SheetTitle>
-          </SheetHeader>
-          <div className="mt-6 space-y-6">
-            <div className="flex items-center justify-between p-4 rounded-xl bg-muted">
-              <span className="text-sm font-medium">Giao diện</span>
-              <ThemeToggle />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                variant="outline"
-                onClick={() => { setIsMenuOpen(false); router.push('/library'); }}
-                className="h-12 rounded-xl"
-              >
-                Tủ sách
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => { setIsMenuOpen(false); router.push('/ranking'); }}
-                className="h-12 rounded-xl"
-              >
-                Xếp hạng
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => { setIsMenuOpen(false); router.push('/profile'); }}
-                className="h-12 rounded-xl"
-              >
-                Tài khoản
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => { setIsMenuOpen(false); router.push('/browse'); }}
-                className="h-12 rounded-xl"
-              >
-                Duyệt truyện
-              </Button>
-            </div>
-
-            <div className="rounded-xl border p-4 space-y-2">
-              <p className="text-xs font-medium text-muted-foreground">Phap ly va ho tro</p>
-              <div className="grid grid-cols-2 gap-2">
-                <Button variant="ghost" className="justify-start" onClick={() => { setIsMenuOpen(false); router.push('/privacy'); }}>
-                  Bao mat
-                </Button>
-                <Button variant="ghost" className="justify-start" onClick={() => { setIsMenuOpen(false); router.push('/terms'); }}>
-                  Dieu khoan
-                </Button>
-                <Button variant="ghost" className="justify-start" onClick={() => { setIsMenuOpen(false); router.push('/support'); }}>
-                  Ho tro
-                </Button>
-                <Button variant="ghost" className="justify-start" onClick={() => { setIsMenuOpen(false); router.push('/account-deletion'); }}>
-                  Xoa tai khoan
-                </Button>
-              </div>
-            </div>
-          </div>
-        </SheetContent>
-      </Sheet>
+      <MenuSheetContent isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} router={router} />
     </>
   );
 };

@@ -19,7 +19,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyCronAuth } from '@/lib/auth/cron-auth';
-import { NovelEnricher } from '@/services/story-writing-factory/novel-enricher';
+import { NovelEnricher } from '@/services/novel-enricher';
 
 export const maxDuration = 300; // 5 min
 export const dynamic = 'force-dynamic';

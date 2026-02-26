@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAuthorizedAdmin } from '@/lib/auth/admin-auth';
 import { aiEditorService } from '@/services/story-writing-factory/ai-editor';
-import { getSupabase } from '@/services/story-writing-factory/supabase-helper';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 300;
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: false, error: 'Missing jobId' }, { status: 400 });
       }
 
-      const supabase = getSupabase();
+      const supabase = getSupabaseAdmin();
       const { error } = await supabase
         .from('rewrite_chain_jobs')
         .update({ status: 'cancelled' })

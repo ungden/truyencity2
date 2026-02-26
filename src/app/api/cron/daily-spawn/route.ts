@@ -8,7 +8,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyCronAuth } from '@/lib/auth/cron-auth';
-import { ContentSeeder } from '@/services/story-writing-factory/content-seeder';
+import { ContentSeeder } from '@/services/content-seeder';
 
 export const maxDuration = 300;
 export const dynamic = 'force-dynamic';

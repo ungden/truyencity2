@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/integrations/supabase/server';
-import { AuthorGenerator, generateQuickAuthor } from '@/services/story-writing-factory/author-generator';
+import { AuthorGenerator, generateQuickAuthor } from '@/services/author-generator';
 import { AIAuthorGenerateSchema, AIAuthorBatchSchema, ValidationError, createValidationErrorResponse } from '@/lib/security/validation';
 
 export const maxDuration = 120;

@@ -8,7 +8,8 @@ import {
   Home,
   Compass,
   BookOpenText,
-  Tags
+  Tags,
+  Crown
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ThemeToggle from '@/components/theme-toggle';
@@ -37,6 +38,12 @@ const navigationItems = [
     label: 'Tủ sách',
     icon: BookOpenText,
     path: '/library'
+  },
+  {
+    id: 'pricing',
+    label: 'Nâng cấp VIP',
+    icon: Crown,
+    path: '/pricing'
   }
 ];
 

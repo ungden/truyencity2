@@ -24,6 +24,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useRouter } from 'next/navigation';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 import StatsTile from '@/components/profile/stats-tile';
+import { useTheme } from 'next-themes';
 
 function formatDuration(totalSeconds: number): string {
   const h = Math.floor(totalSeconds / 3600);
@@ -35,8 +36,8 @@ function formatDuration(totalSeconds: number): string {
 const menuItems = [
   {
     icon: Settings,
-    label: 'Cài đặt',
-    description: 'Tùy chỉnh ứng dụng',
+    label: 'Gói dịch vụ',
+    description: 'Quản lý gói VIP & thanh toán',
     action: 'settings'
   },
   {
@@ -54,19 +55,20 @@ const menuItems = [
   {
     icon: Moon,
     label: 'Chế độ tối',
-    description: 'Bật/tắt chế độ tối',
+    description: 'Chuyển đổi giao diện sáng/tối',
     action: 'theme'
   },
   {
     icon: HelpCircle,
     label: 'Trợ giúp',
-    description: 'Hướng dẫn sử dụng',
+    description: 'Hỗ trợ & hướng dẫn sử dụng',
     action: 'help'
   }
 ];
 
 export default function ProfilePage() {
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [profile, setProfile] = useState<{ role: string } | null>(null);
   const [loading, setLoading] = useState(true);
@@ -138,12 +140,28 @@ export default function ProfilePage() {
   };
 
   const handleMenuClick = (action: string) => {
-    if (action === 'logout') {
-      handleLogout();
-    } else if (action === 'admin') {
-      router.push('/admin');
-    } else {
-      // noop
+    switch (action) {
+      case 'logout':
+        handleLogout();
+        break;
+      case 'admin':
+        router.push('/admin');
+        break;
+      case 'settings':
+        router.push('/pricing');
+        break;
+      case 'help':
+        router.push('/support');
+        break;
+      case 'theme':
+        setTheme(theme === 'dark' ? 'light' : 'dark');
+        break;
+      case 'notifications':
+        alert('Sắp ra mắt! Tính năng thông báo đang được phát triển.');
+        break;
+      case 'downloads':
+        alert('Sắp ra mắt! Tính năng tải xuống đang được phát triển.');
+        break;
     }
   };
 
