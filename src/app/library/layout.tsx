@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 
 export const metadata: Metadata = {
   title: "Tủ Sách",
@@ -8,5 +9,15 @@ export const metadata: Metadata = {
 };
 
 export default function LibraryLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Trang chủ", url: "https://truyencity.com" },
+          { name: "Tủ Sách", url: "https://truyencity.com/library" },
+        ]}
+      />
+      {children}
+    </>
+  );
 }

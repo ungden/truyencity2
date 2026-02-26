@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { getGenreLabel } from "@/lib/utils/genre";
+import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -16,6 +17,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function GenreDetailLayout({ children }: { children: React.ReactNode }) {
-  return children;
+export default async function GenreDetailLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const genreLabel = getGenreLabel(id) || decodeURIComponent(id);
+
+  return (
+    <>
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Trang chủ", url: "https://truyencity.com" },
+          { name: "Thể loại", url: "https://truyencity.com/browse" },
+          { name: `Truyện ${genreLabel}`, url: `https://truyencity.com/genres/${id}` },
+        ]}
+      />
+      {children}
+    </>
+  );
 }

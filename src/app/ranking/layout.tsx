@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 
 export const metadata: Metadata = {
   title: "Bảng Xếp Hạng",
@@ -7,5 +8,15 @@ export const metadata: Metadata = {
 };
 
 export default function RankingLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Trang chủ", url: "https://truyencity.com" },
+          { name: "Bảng Xếp Hạng", url: "https://truyencity.com/ranking" },
+        ]}
+      />
+      {children}
+    </>
+  );
 }

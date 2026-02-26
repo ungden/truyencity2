@@ -1,10 +1,14 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import "./globals.css";
 import { ReadingProvider } from "@/contexts/reading-context";
 import ThemeProvider from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { AppShell } from "@/components/layout/app-shell";
 import { QueryProvider } from "@/providers/query-provider";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { WebsiteJsonLd, OrganizationJsonLd } from "@/components/seo/JsonLd";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://truyencity.com"),
@@ -52,9 +56,37 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const adsensePubId = process.env.NEXT_PUBLIC_ADSENSE_PUB_ID || "";
+  const ga4Id = process.env.NEXT_PUBLIC_GA4_ID || "";
+
   return (
     <html lang="vi" suppressHydrationWarning>
+      <head>
+        {/* Google AdSense */}
+        {adsensePubId && (
+          <script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsensePubId}`}
+            crossOrigin="anonymous"
+          />
+        )}
+        {/* Structured Data */}
+        <WebsiteJsonLd />
+        <OrganizationJsonLd />
+      </head>
       <body className="font-sans antialiased">
+        {/* Google Analytics 4 */}
+        {ga4Id && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${ga4Id}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga4-init" strategy="afterInteractive">
+              {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${ga4Id}');`}
+            </Script>
+          </>
+        )}
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:text-sm focus:font-medium"
@@ -71,6 +103,8 @@ export default function RootLayout({
             </ReadingProvider>
           </ThemeProvider>
         </QueryProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

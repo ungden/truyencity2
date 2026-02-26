@@ -28,6 +28,7 @@ import { RelatedNovels } from '@/components/related-novels';
 import { AuthorWorks } from '@/components/author-works';
 import { NovelRatingSection } from './rating-section';
 import { cleanNovelDescription } from '@/lib/utils';
+import { BookJsonLd, BreadcrumbJsonLd } from '@/components/seo/JsonLd';
 import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
@@ -88,6 +89,9 @@ export async function generateMetadata({
   return {
     title,
     description,
+    alternates: {
+      canonical: `https://truyencity.com/truyen/${slug}`,
+    },
     openGraph: {
       title,
       description,
@@ -267,8 +271,34 @@ export default async function NovelDetailPage({
     </div>
   );
 
+  const genreLabel = mainGenre?.name || undefined;
+  const canonicalUrl = `https://truyencity.com/truyen/${novelSlug}`;
+
   return (
     <div className="min-h-screen bg-background">
+      {/* JSON-LD Structured Data */}
+      <BookJsonLd
+        name={novel.title}
+        author={novel.author || 'TruyenCity'}
+        description={cleanNovelDescription(novel.description).slice(0, 500)}
+        genre={genreLabel}
+        datePublished={novel.created_at}
+        dateModified={novel.updated_at || novel.created_at}
+        image={novel.cover_url || undefined}
+        url={canonicalUrl}
+        ratingValue={ratingAvg}
+        ratingCount={ratingCount}
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'Trang chủ', url: 'https://truyencity.com' },
+          ...(mainGenreId && genreLabel
+            ? [{ name: genreLabel, url: `https://truyencity.com/genres/${encodeURIComponent(mainGenreId)}` }]
+            : []),
+          { name: novel.title, url: canonicalUrl },
+        ]}
+      />
+
       {/* Mobile Header */}
       <div className="lg:hidden">
         <Header title={novel.title} showBack />
