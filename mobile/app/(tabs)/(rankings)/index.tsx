@@ -25,35 +25,15 @@ export default function RankingsScreen() {
   const fetchRankings = useCallback(async (mode: SortMode) => {
     setLoading(true);
     try {
-      const NOVEL_LIST_FIELDS = "id,title,slug,author,cover_url,genres,status,ai_author_id,created_at,updated_at,chapter_count";
-      let query = supabase
-        .from("novels")
-        .select(NOVEL_LIST_FIELDS)
-        .limit(30);
+      const { data, error } = await supabase.rpc("get_ranked_novels", {
+        p_sort_by: mode,
+        p_limit: 30,
+        p_offset: 0,
+      });
 
-      switch (mode) {
-        case "views":
-          // view_count column doesn't exist yet — fallback to updated_at
-          query = query.order("updated_at", { ascending: false });
-          break;
-        case "bookmarks":
-          // bookmark_count column doesn't exist yet — fallback to updated_at
-          query = query.order("updated_at", { ascending: false });
-          break;
-        case "latest":
-          query = query.order("created_at", { ascending: false });
-          break;
-        case "completed":
-          query = query
-            .eq("status", "completed")
-            .order("updated_at", { ascending: false });
-          break;
-      }
-
-      const { data, error } = await query;
       if (error) throw error;
 
-      setNovels(data || []);
+      setNovels((data || []) as Novel[]);
     } catch (error) {
       console.error("Error fetching rankings:", error);
     } finally {
