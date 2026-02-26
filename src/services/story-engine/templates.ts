@@ -1128,6 +1128,26 @@ export const ENGAGEMENT_CHECKLIST = {
 };
 
 /**
+ * Genre-specific title examples — injected into title rules to guide genre-appropriate naming.
+ * Each genre has 6 example titles that capture the genre's unique flavor.
+ */
+export const GENRE_TITLE_EXAMPLES: Record<GenreType, string[]> = {
+  'tien-hiep': ['Một Kiếm Phá Thiên', 'Quỳ Xuống!', 'Đan Thành, Thiên Kiếp Giáng', 'Ai Dám Coi Thường?', 'Chín Tầng Trời Rung Chuyển', 'Kẻ Không Xứng Đứng Đây'],
+  'huyen-huyen': ['Thức Tỉnh Huyết Mạch', 'Đừng Ép Ta Ra Tay', 'Bí Mật Trong Hư Không', 'Thiên Đạo Sợ Ta?', 'Khế Ước Với Bóng Tối', 'Vạn Pháp Thần Giới'],
+  'do-thi': ['Thẻ Đen Và Nụ Cười', 'Ai Cho Ngươi Quyền?', 'Chốt Deal Ngàn Tỷ', 'Kẻ Đứng Sau Tất Cả', 'Giao Dịch? Không Đủ Tư Cách!', 'Nước Cờ Kinh Thiên'],
+  'khoa-huyen': ['Mã Gen Thứ 13', 'Hệ Thống Đã Thức Tỉnh', 'Vũ Trụ Đang Sợ', 'Tiến Hóa Bất Khả Nghịch', 'Trạm Không Gian Số 7', 'Tín Hiệu Từ Hư Vô'],
+  'lich-su': ['Long Bào Dưới Áo Rách', 'Mưu Kế Trong Tiệc Rượu', 'Ai Mới Là Quân Sư?', 'Nước Cờ Cuối Cùng', 'Máu Đổ Trước Ngọ Môn', 'Lệnh Hổ Phù Đã Ban'],
+  'dong-nhan': ['Nguyên Tác? Đã Vỡ', 'Ta Không Theo Kịch Bản', 'Hắn Biết Kết Cục Của Ngươi', 'Cướp Cơ Duyên? Chậm Rồi!', 'Nhân Vật Phụ Phản Kích', 'Thiên Mệnh Không Thuộc Về Hắn'],
+  'vong-du': ['Hidden Quest: ???', 'Toàn Server Chấn Động', 'Bug Hay Cố Ý?', 'PK Tại Vùng An Toàn', 'First Blood Đẫm Máu', 'Top 1 Không Phải Để Chơi'],
+  'kiem-hiep': ['Một Kiếm Xé Mây', 'Giang Hồ Ai Xứng Đệ Nhất?', 'Huyết Ảnh Dưới Trăng', 'Rượu Cạn, Kiếm Tuốt', 'Ân Oán Mười Năm', 'Thanh Kiếm Không Tên'],
+  'mat-the': ['Ngày Thứ 47', 'Tiếng Gầm Trong Bóng Tối', 'Đồ Ăn Còn 3 Ngày', 'Ai Đang Theo Dõi?', 'Bức Tường Cuối Cùng', 'Sống Sót Bằng Mọi Giá'],
+  'linh-di': ['Đừng Nhìn Lại', 'Căn Phòng Số 444', 'Xương Cốt Dưới Giếng', 'Nửa Đêm Có Người Gõ Cửa', 'Bóng Ma Trong Gương', 'Lời Nguyền Thứ Bảy'],
+  'quan-truong': ['Ai Đứng Sau Bản Báo Cáo?', 'Cuộc Họp Kín', 'Thăng Chức Hay Bẫy?', 'Nước Cờ Của Kẻ Nhẫn', 'Phong Thanh Từ Tầng Trên', 'Lá Phiếu Quyết Định'],
+  'di-gioi': ['Lãnh Chúa Bất Đắc Dĩ', 'Đất Mới, Luật Mới', 'Thổ Dân Quỳ Gối?', 'Xây Thành Từ Hoang Vu', 'Chiến Tranh Đầu Tiên', 'Vương Quốc Phôi Thai'],
+  'ngon-tinh': ['Anh Ấy Lại Đến', 'Nụ Cười Và Nước Mắt', 'Đêm Mưa Không Ngủ', 'Ai Đang Giấu Bí Mật?', 'Trái Tim Không Nói Dối', 'Hoa Rơi Trước Cửa Nhà'],
+};
+
+/**
  * Genre-specific engagement items — supplement the generic ENGAGEMENT_CHECKLIST.perChapter
  * with items tailored to each genre's reader expectations.
  */
@@ -1209,12 +1229,17 @@ export function getGenreEngagement(genre: GenreType): string[] {
 /**
  * Build title rules string for injection into AI prompts
  */
-export function buildTitleRulesPrompt(previousTitles?: string[]): string {
+export function buildTitleRulesPrompt(previousTitles?: string[], genre?: GenreType): string {
   const titleExamples = TITLE_TEMPLATES
     .map(t => `  - ${t.name}: ${t.examples.slice(0, 2).join(', ')}`)
     .join('\n');
 
   const antiExamples = CHAPTER_TITLE_RULES.antiPatterns.slice(0, 5).join(', ');
+
+  // Genre-specific title examples
+  const genreTitleSection = genre && GENRE_TITLE_EXAMPLES[genre]
+    ? `\n- VÍ DỤ TỐT CHO THỂ LOẠI ${genre}: ${GENRE_TITLE_EXAMPLES[genre].slice(0, 6).map(t => `"${t}"`).join(', ')}`
+    : '';
 
   let prompt = `QUY TẮC ĐẶT TÊN CHƯƠNG (BẮT BUỘC):
 - Ngắn gọn 3-10 từ, gợi tò mò, có lực click
@@ -1223,8 +1248,7 @@ export function buildTitleRulesPrompt(previousTitles?: string[]): string {
 - Mỗi tên chương phải là DUY NHẤT — không được trùng keyword chính với chương trước
 - Nếu 2 từ khóa chính trùng với tên chương cũ → ĐỔI NGAY
 - Có thể chọn 1 trong 10 mẫu đa dạng:
-${titleExamples}
-- VÍ DỤ TỐT: "Huyết Chiến Vạn Thú Sơn", "Ngươi Không Xứng!", "Phế Vật? Thiên Tài!", "Bóng Tối Sau Cổng Thành"
+${titleExamples}${genreTitleSection}
 - VÍ DỤ NÊN TRÁNH: "Sự Sỉ Nhục Và Sự Trỗi Dậy", "Nghịch Lý Của Linh Áp", "Quy Luật Của Những Con Số", "X Và Sự Y"`;
 
   if (previousTitles && previousTitles.length > 0) {
@@ -1709,6 +1733,85 @@ export function getGenreBoundaryText(genre: GenreType): string {
 // ============================================================================
 // ANTI-CLICHÉ DICTIONARY - Triệt tiêu văn phong AI
 // ============================================================================
+
+/**
+ * Genre-specific anti-cliche blacklists — phrases that mark AI writing in each genre.
+ * Supplements the generic ANTI_CLICHE_RULES.blacklist with genre-appropriate bans.
+ */
+export const GENRE_ANTI_CLICHE: Record<GenreType, string[]> = {
+  'tien-hiep': [
+    'cảnh giới kinh người', 'linh khí cuộn cuộn', 'chân khí tràn ngập',
+    'thiên địa biến sắc', 'uy áp trùm xuống', 'một chưởng phá thiên',
+    'trong mắt lóe lên sát ý', 'khí tức hùng hồn', 'tu vi cao thâm mạt trắc',
+  ],
+  'huyen-huyen': [
+    'phóng ra một cỗ lực lượng', 'cảm nhận được một sức mạnh', 'hỗn loạn lan ra',
+    'ánh sáng chói lóa', 'đại trận pháp vận hành', 'vẫn mang vẻ bình tĩnh',
+    'toàn thân tỏa ra khí tức', 'chỉ là phế vật', 'mắt lạnh nhìn xuống',
+  ],
+  'do-thi': [
+    'anh ta chỉ mỉm cười bí ẩn', 'mọi người sửng sốt', 'không ngờ anh ta lại',
+    'cả hội trường im lặng', 'điện thoại đột nhiên reo', 'tài khoản có thêm',
+    'tất cả mọi người quay đầu lại', 'siêu xe đỗ trước cửa', 'thẻ đen VIP',
+  ],
+  'khoa-huyen': [
+    'hệ thống phát ra tiếng cảnh báo', 'năng lượng tăng vọt', 'dữ liệu cho thấy',
+    'AI phân tích xong', 'công nghệ vượt thời đại', 'tế bào đang biến đổi',
+    'con số trên màn hình', 'sức mạnh tăng theo cấp số nhân', 'tiến hóa hoàn hảo',
+  ],
+  'lich-su': [
+    'hoàng thượng sáng suốt', 'thần xin tâu', 'một mưu kế hoàn hảo',
+    'triều thần kinh ngạc', 'long nhan đại duyệt', 'tất cả là nằm trong tính toán',
+    'muôn năm muôn năm muôn muôn năm', 'thiên hạ đệ nhất', 'vận nước sắp đổi thay',
+  ],
+  'dong-nhan': [
+    'nguyên tác sẽ không xảy ra nữa', 'hắn biết tương lai', 'butterfly effect',
+    'cốt truyện đã thay đổi', 'ta sẽ cứu tất cả', 'lịch sử đã rẽ nhánh',
+    'nhân vật chính nguyên tác', 'ta biết kết cục của ngươi', 'thiên mệnh đã đổi',
+  ],
+  'vong-du': [
+    'hệ thống thông báo', 'kinh nghiệm +100', 'level up', 'hidden quest triggered',
+    'congratulations player', 'stats tăng vọt', 'first kill reward', 'bug hệ thống',
+    'server announcement', 'toàn server chấn động', 'top bảng xếp hạng',
+  ],
+  'kiem-hiep': [
+    'kiếm khí tung hoành', 'chiêu thức tinh diệu', 'giang hồ nghĩa khí',
+    'huynh đệ xin nhận thua', 'một kiếm xé gió', 'đao quang kiếm ảnh',
+    'nội công thâm hậu', 'vận khí đẩy chưởng', 'cao thủ ẩn thế',
+  ],
+  'mat-the': [
+    'cấp bách sinh tồn', 'tìm được nguồn nước sạch', 'dị thú cấp X',
+    'base đã nâng cấp', 'nhân loại cuối cùng', 'virus biến đổi',
+    'tận thế đã đến', 'chỉ còn N ngày', 'kho vũ khí bí mật',
+  ],
+  'linh-di': [
+    'một luồng khí lạnh', 'bóng đen lướt qua', 'tiếng cười ghê rợn',
+    'máu tươi chảy ngược', 'linh hồn oán hận', 'ngôi mộ cổ',
+    'đừng nhìn lại phía sau', 'hắn đã chết từ lâu', 'lời nguyền truyền đời',
+  ],
+  'quan-truong': [
+    'đồng chí yên tâm', 'tổ chức đã quyết định', 'một bước lên mây',
+    'quan lộ hanh thông', 'bàn tay vô hình phía sau', 'hắn chỉ mỉm cười ý nhị',
+    'cuộc họp kết thúc trong im lặng', 'người đứng sau tất cả', 'thế cờ đã rõ',
+  ],
+  'di-gioi': [
+    'thế giới này thật lạ', 'quy tắc khác hẳn', 'lãnh địa phát triển',
+    'dân bản địa quỳ lạy', 'xây dựng từ số không', 'vương quốc sẽ hùng mạnh',
+    'tài nguyên vô tận', 'sức mạnh thần bí', 'cánh cổng xuyên không',
+  ],
+  'ngon-tinh': [
+    'tim đập thình thịch', 'má ửng hồng', 'cảm giác lạ lùng',
+    'anh ấy thật khác biệt', 'nụ cười ấm áp', 'không hiểu sao lại',
+    'trái tim rung động', 'đêm đó không ngủ được', 'tình yêu sét đánh',
+  ],
+};
+
+/**
+ * Get genre-specific anti-cliche phrases.
+ */
+export function getGenreAntiCliche(genre: GenreType): string[] {
+  return GENRE_ANTI_CLICHE[genre] || [];
+}
 
 export const ANTI_CLICHE_RULES = {
   description: 'Tránh sử dụng các cụm từ sáo rỗng, lặp đi lặp lại mang đậm dấu vết AI.',

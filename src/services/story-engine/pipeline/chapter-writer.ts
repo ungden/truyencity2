@@ -30,7 +30,7 @@
 
 import { callGemini } from '../utils/gemini';
 import { parseJSON } from '../utils/json-repair';
-import { getStyleByGenre, buildTitleRulesPrompt, GOLDEN_CHAPTER_REQUIREMENTS, ENGAGEMENT_CHECKLIST, getGenreEngagement } from '../config';
+import { getStyleByGenre, buildTitleRulesPrompt, GOLDEN_CHAPTER_REQUIREMENTS, ENGAGEMENT_CHECKLIST, getGenreEngagement, getGenreAntiCliche } from '../config';
 import { getConstraintExtractor } from '../memory/constraint-extractor';
 import { GENRE_CONFIG } from '../../../lib/types/genre-config';
 import { buildStyleContext, getEnhancedStyleBible, CLIFFHANGER_TECHNIQUES } from '../memory/style-bible';
@@ -239,7 +239,7 @@ async function runArchitect(
   options?: WriteChapterOptions,
   genre?: GenreType,
 ): Promise<ChapterOutline> {
-  const titleRules = buildTitleRulesPrompt(previousTitles);
+  const titleRules = buildTitleRulesPrompt(previousTitles, genre);
   const minScenes = Math.max(4, Math.ceil(targetWords / 600));
   const wordsPerScene = Math.round(targetWords / minScenes);
 
@@ -517,7 +517,7 @@ ${vocabHints}
 ${charVoiceGuide}
 
 ${richStyleContext}
-
+${buildGenreAntiClicheSection(genre)}
 ĐỘ DÀI YÊU CẦU (BẮT BUỘC):
 - Viết TỐI THIỂU ${totalTargetWords} từ
 - CẤM TÓM TẮT. Phải kéo dài thời gian và không gian của từng cảnh.
@@ -1234,6 +1234,18 @@ function buildVocabularyHints(outline: ChapterOutline, vocabulary: VocabularyGui
   hints.push(`Xưng hô ngang hàng: ${vocabulary.honorifics?.peer?.slice(0, 4).join(', ') || ''}`);
 
   return hints.join('\n');
+}
+
+/**
+ * Build genre-specific anti-cliche section for Writer prompt.
+ * Supplements the static WRITER_SYSTEM anti-cliche rules with genre-targeted bans.
+ */
+function buildGenreAntiClicheSection(genre: GenreType): string {
+  const phrases = getGenreAntiCliche(genre);
+  if (phrases.length === 0) return '';
+  return `\nCẤM CỤM TỪ CLICHÉ THỂ LOẠI (${genre}):
+${phrases.map(p => `- "${p}"`).join('\n')}
+→ Thay bằng miêu tả cụ thể, hành động thực tế, hoặc chi tiết 5 giác quan.\n`;
 }
 
 /**

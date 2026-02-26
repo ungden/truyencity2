@@ -12,4 +12,5 @@ export {
   getGenreBoundaryText,
   buildTitleRulesPrompt,
   getGenreEngagement,
+  getGenreAntiCliche,
 } from './templates';
