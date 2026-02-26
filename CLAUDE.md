@@ -294,14 +294,14 @@ git push  # Auto deploy to Vercel
 
 ## V1 Legacy Status
 
-V1 (`story-writing-factory/`) has ~38 files but only **7 are still actively imported** by API routes:
-- `/api/cron/daily-spawn` → `ContentSeeder`
-- `/api/admin/ai-editor` → `aiEditorService`
-- `/api/ai-authors/generate` → `AuthorGenerator`
-- `/api/seed/generate-content` → `ContentSeeder`
-- `/api/seed/enrich-novels` → `NovelEnricher`
+V1 (`story-writing-factory/`) reduced from 38 files to **13 files** (Phase 14A+14B).
 
-The remaining ~31 files are dead. Full V1 removal requires migrating these 5 routes to V2 equivalents.
+**Migrated to standalone services**:
+- `src/services/content-seeder/` — ContentSeeder (used by daily-spawn, seed/generate-content)
+- `src/services/author-generator/` — AuthorGenerator (used by ai-authors/generate)
+- `src/services/novel-enricher/` — NovelEnricher (used by seed/enrich-novels)
+
+**Remaining in V1**: 13 files (all are ai-editor.ts dependency chain — chapter.ts, qc-gating.ts, templates.ts, etc.). Full removal requires rewriting ai-editor to use V2 pipeline.
 
 ## Phase 10 Details (2026-02-26) — Genre Completion + Ratings Fix
 
@@ -315,10 +315,71 @@ The remaining ~31 files are dead. Full V1 removal requires migrating these 5 rou
 - **10B-2**: Replaced 3-query parallel fetch in `/app/truyen/[slug]/page.tsx` with single `get_novel_stats()` RPC (also returns view_count, bookmark_count — fewer DB calls)
 - **10B-3**: Fixed mobile novel detail column name bug (`r.rating` → uses RPC `get_novel_stats()` instead of broken `.select("rating")` query)
 
+## Monetization System (Phase 11)
+
+### Reader VIP (Freemium Model)
+- **Free**: Ads shown, 5 offline chapters/day, 60 min TTS/day
+- **VIP**: 49,000 VND/mo — No ads, unlimited download/TTS, exclusive themes, badge
+- DB: `reader_tier_limits` table, `tts_usage`/`download_usage` tracking tables
+- API: `GET/POST /api/billing/reader-vip` (status, upgrade, cancel, record_tts, record_download)
+- Mobile: `useVipStatus()` hook, `AdBanner` component, `useInterstitialAd` hook
+- Web: `AdBanner` + `AdPlacement` components (AdSense), VIP check hides ads
+
+### Writer Tiers (existing)
+- Free / Creator / Pro / Enterprise — for AI writing features
+- API: `/api/billing/subscription`, `/api/billing/credits`, `/api/billing/tiers`
+
+### Payment Gateway
+- Not yet integrated (Apple IAP, Google Play Billing, VNPay/MoMo planned)
+- DB schema supports `apple_iap`, `google_play`, `vnpay`, `momo` payment methods
+
+## Mobile App (Phase 12)
+
+### Features Implemented
+- Reader with 4 themes, TTS, offline (SQLite), auto-scroll, keep-awake
+- Search with debounce, recent searches
+- Star rating input (upsert to ratings table)
+- Comments section (pagination, moderation queue, auth-gated)
+- Gamification (13 cultivation levels, 22 achievements)
+- AdMob integration (banner + interstitial, hidden for VIP)
+- Rankings via `get_ranked_novels()` RPC (views, bookmarks, rating, latest, completed)
+
+### App Store Status
+- iOS build configured (EAS), buildNumber: 4
+- Android versionCode: 2
+- NOT yet submitted to App Store/Play Store
+- Needs: device testing, screenshots, TestFlight, submission
+
+## Infrastructure (Phase 14C)
+
+### Redis (Upstash)
+- Rate limiting: sliding window via `@upstash/ratelimit` (falls back to in-memory)
+- Caching: async get/set with TTL (falls back to in-memory)
+- Env: `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`
+
+### Error Tracking (Sentry)
+- Integrated via `logger.ts` `sendToSentry()` (lazy init)
+- Env: `NEXT_PUBLIC_SENTRY_DSN`
+
+### Security Headers
+- `vercel.json`: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, X-DNS-Prefetch-Control
+
+## SEO & Analytics (Phase 13)
+
+- JSON-LD: WebSite, Organization, Book (novel detail), BreadcrumbList
+- Canonical URLs on novel detail pages
+- `/search` page for SEO (not just modal)
+- GA4 via `NEXT_PUBLIC_GA4_ID`
+- Vercel Analytics + Speed Insights
+- AdSense via `NEXT_PUBLIC_ADSENSE_PUB_ID`
+
 ## Remaining Known Issues
 
-### Low Priority (deferred)
-- None currently tracked
+### Pending (needs external setup)
+- Phase 12C: App Store submission (needs device testing + screenshots)
+- Phase 12D: Google Play submission (needs Android build)
+- Phase 13C: Email notifications (needs email service like Resend/SendGrid)
+- Payment gateway integration (Apple IAP, Google Play Billing, VNPay)
 
 ## Important Files to Read
 
@@ -342,6 +403,7 @@ When working with the story engine:
 ---
 
 **Last Updated**: 2026-02-26
-**Latest Commit**: `a3d995b` (Quality Phase 5)
+**Latest Commit**: `b6a0464` (Phase 14B+15B)
 **All 5 quality phases complete** — Phases 1-5 shipped to production
 **Phase 10 complete** — 6 missing genres + ratings RPC migration
+**Phases 11-15 complete** — Monetization, mobile features, SEO, analytics, infra hardening
