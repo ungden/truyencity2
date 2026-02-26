@@ -7,6 +7,8 @@ import { supabase } from "@/lib/supabase";
 import NovelCard from "@/components/novel-card";
 import HeroCarousel from "@/components/hero-carousel";
 import SectionHeader from "@/components/section-header";
+import SearchResults from "@/components/search-results";
+import { useSearchContext } from "@/contexts/search-context";
 import type { Novel } from "@/lib/types";
 
 export default function DiscoverScreen() {
@@ -18,6 +20,8 @@ export default function DiscoverScreen() {
   const [newPosts, setNewPosts] = useState<Novel[]>([]);
   const [completed, setCompleted] = useState<Novel[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const search = useSearchContext();
 
   useEffect(() => {
     fetchData();
@@ -71,6 +75,32 @@ export default function DiscoverScreen() {
     } finally {
       setLoading(false);
     }
+  }
+
+  // When search is active, show search overlay instead of discover content
+  if (search.isSearchActive) {
+    return (
+      <View
+        className="flex-1 bg-background"
+        style={{ paddingTop: 0 }}
+      >
+        <SearchResults
+          query={search.query}
+          results={search.results}
+          loading={search.loading}
+          recentSearches={search.recentSearches}
+          onSelectRecent={(term) => {
+            search.onChangeText(term);
+            search.saveRecentSearch(term);
+          }}
+          onRemoveRecent={search.removeRecentSearch}
+          onClearRecent={search.clearRecentSearches}
+          onResultTap={() => {
+            search.saveRecentSearch(search.query);
+          }}
+        />
+      </View>
+    );
   }
 
   if (loading) {

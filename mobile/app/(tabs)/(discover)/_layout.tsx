@@ -1,6 +1,7 @@
 import React from "react";
 import { Image as RNImage, View as RNView, Text as RNText } from "react-native";
 import { Stack } from "expo-router/stack";
+import { SearchProvider, useSearchContext } from "@/contexts/search-context";
 
 function HeaderLogo() {
   return (
@@ -22,7 +23,9 @@ function HeaderLogo() {
   );
 }
 
-export default function DiscoverStack() {
+function DiscoverStackInner() {
+  const { onChangeText, clearSearch, setSearchActive } = useSearchContext();
+
   return (
     <Stack
       screenOptions={{
@@ -41,6 +44,16 @@ export default function DiscoverStack() {
             placeholder: "Tìm truyện...",
             autoCapitalize: "none" as const,
             hideWhenScrolling: true,
+            onChangeText: (e) => {
+              onChangeText(e.nativeEvent.text);
+            },
+            onFocus: () => {
+              setSearchActive(true);
+            },
+            onCancelButtonPress: () => {
+              clearSearch();
+              setSearchActive(false);
+            },
           },
         }}
       />
@@ -57,5 +70,13 @@ export default function DiscoverStack() {
         }}
       />
     </Stack>
+  );
+}
+
+export default function DiscoverStack() {
+  return (
+    <SearchProvider>
+      <DiscoverStackInner />
+    </SearchProvider>
   );
 }

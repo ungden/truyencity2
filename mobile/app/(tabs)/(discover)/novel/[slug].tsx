@@ -18,6 +18,8 @@ import { useOfflineDownload } from "@/hooks/use-offline";
 import { formatStorageSize, getNovelStorageSize } from "@/lib/offline-db";
 import UnderlineTabs from "@/components/underline-tabs";
 import NovelCard from "@/components/novel-card";
+import StarRatingInput from "@/components/star-rating-input";
+import CommentsSection from "@/components/comments-section";
 
 const CHAPTERS_PER_PAGE = 20;
 const DETAIL_TABS = ["Giới Thiệu", "Đánh Giá", "D.S Chương"];
@@ -575,21 +577,51 @@ export default function NovelDetailScreen() {
 
           {/* ── Tab 1: Đánh Giá ── */}
           {activeTab === 1 && (
-            <View style={{ paddingHorizontal: 16, paddingTop: 24, alignItems: "center", gap: 12 }}>
-              <Text style={{ fontSize: 48, fontWeight: "800", color: C.text }}>
-                {stats.rating > 0 ? stats.rating.toFixed(1) : "—"}
-              </Text>
-              <Text style={{ fontSize: 20, color: C.star, letterSpacing: 2 }}>
-                {renderStars(stats.rating)}
-              </Text>
-              <Text style={{ fontSize: 14, color: C.textSub }}>
-                {stats.ratingCount > 0
-                  ? `${stats.ratingCount} đánh giá`
-                  : "Chưa có đánh giá"}
-              </Text>
-              <Text style={{ fontSize: 13, color: C.textMuted, marginTop: 16, textAlign: "center" }}>
-                Tính năng đánh giá đang phát triển
-              </Text>
+            <View style={{ paddingHorizontal: 16, paddingTop: 24, gap: 24 }}>
+              {/* Aggregate rating display */}
+              <View style={{ alignItems: "center", gap: 12 }}>
+                <Text style={{ fontSize: 48, fontWeight: "800", color: C.text }}>
+                  {stats.rating > 0 ? stats.rating.toFixed(1) : "—"}
+                </Text>
+                <Text style={{ fontSize: 20, color: C.star, letterSpacing: 2 }}>
+                  {renderStars(stats.rating)}
+                </Text>
+                <Text style={{ fontSize: 14, color: C.textSub }}>
+                  {stats.ratingCount > 0
+                    ? `${stats.ratingCount} đánh giá`
+                    : "Chưa có đánh giá"}
+                </Text>
+              </View>
+
+              {/* Divider */}
+              <View style={{ height: 1, backgroundColor: C.border }} />
+
+              {/* Star rating input */}
+              <StarRatingInput
+                novelId={novel.id}
+                colors={C}
+                onRated={() => {
+                  // Re-fetch stats after rating
+                  supabase.rpc("get_novel_stats", { p_novel_id: novel.id }).then(({ data }) => {
+                    const r = data
+                      ? typeof data === "string" ? JSON.parse(data) : data
+                      : null;
+                    if (r) {
+                      setStats((prev) => ({
+                        ...prev,
+                        rating: Math.round((r.rating_avg ?? 0) * 10) / 10,
+                        ratingCount: r.rating_count ?? 0,
+                      }));
+                    }
+                  });
+                }}
+              />
+
+              {/* Divider */}
+              <View style={{ height: 1, backgroundColor: C.border }} />
+
+              {/* Comments section */}
+              <CommentsSection novelId={novel.id} colors={C} />
             </View>
           )}
 
