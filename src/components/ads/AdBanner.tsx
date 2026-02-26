@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
-import { supabase } from "@/integrations/supabase/client";
+import { useVipContext } from "@/contexts/vip-context";
 
 declare global {
   interface Window {
@@ -27,35 +27,18 @@ const FORMAT_STYLES: Record<AdFormat, string> = {
 export function AdBanner({ slot, format = "auto", className }: AdBannerProps) {
   const adRef = useRef<HTMLModElement>(null);
   const pushed = useRef(false);
-  const [isVip, setIsVip] = useState<boolean | null>(null);
+  const prevSlot = useRef(slot);
+  const { isVip, loading } = useVipContext();
 
-  // Check VIP status
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const { data: userData } = await supabase.auth.getUser();
-      if (cancelled) return;
-      if (!userData.user) {
-        setIsVip(false);
-        return;
-      }
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("reader_tier")
-        .eq("id", userData.user.id)
-        .single();
-      if (!cancelled) {
-        setIsVip(profile?.reader_tier === "vip");
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  // Reset pushed state if slot changes
+  if (prevSlot.current !== slot) {
+    pushed.current = false;
+    prevSlot.current = slot;
+  }
 
   // Push ad after mount
   useEffect(() => {
-    if (isVip !== false) return; // Wait for VIP check, or skip if VIP
+    if (loading || isVip) return;
     if (pushed.current) return;
 
     const pubId = process.env.NEXT_PUBLIC_ADSENSE_PUB_ID;
@@ -67,16 +50,19 @@ export function AdBanner({ slot, format = "auto", className }: AdBannerProps) {
     } catch {
       // AdSense not loaded or blocked
     }
-  }, [isVip]);
+  }, [isVip, loading]);
 
   // Don't render if VIP or still checking
-  if (isVip === null || isVip === true) return null;
+  if (loading || isVip) return null;
 
   const pubId = process.env.NEXT_PUBLIC_ADSENSE_PUB_ID;
   if (!pubId) return null;
 
   return (
-    <div className={cn("overflow-hidden", className)} aria-hidden="true">
+    <div
+      className={cn("overflow-hidden", FORMAT_STYLES[format], className)}
+      aria-hidden="true"
+    >
       <ins
         ref={adRef}
         className="adsbygoogle block"

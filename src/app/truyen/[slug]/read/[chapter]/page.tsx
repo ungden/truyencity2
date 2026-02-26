@@ -15,6 +15,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { startSession, updateSessionDuration, endSession, markChapterRead } from '@/services/reading-sessions';
 import { READING } from '@/lib/config';
 import DOMPurify from 'isomorphic-dompurify';
+import { AdPlacement } from '@/components/ads/AdPlacement';
 
 const Comments = dynamic(
   () => import('@/components/comments').then((mod) => mod.Comments),
@@ -402,6 +403,9 @@ export default function ReadingPage() {
         }}
         dangerouslySetInnerHTML={{ __html: sanitizedContent }}
       />
+
+      {/* Post-chapter ad */}
+      <AdPlacement placement="chapter" slot="chapter-end" />
 
       <div className="flex justify-between items-center mt-12 pt-8 border-t border-border">
         <button

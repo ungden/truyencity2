@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { View } from "react-native";
 import {
   BannerAd,
@@ -12,13 +12,15 @@ interface AdBannerProps {
 }
 
 /**
- * Banner ad component that hides for VIP users
+ * Banner ad component that hides for VIP users.
+ * Gracefully handles load failures by collapsing to zero height.
  */
 export function AdBanner({ placement = "home" }: AdBannerProps) {
   const { isVip, loading } = useVipStatus();
+  const [adFailed, setAdFailed] = useState(false);
 
-  // Don't show ads for VIP users or while loading
-  if (loading || isVip) return null;
+  // Don't show ads for VIP users, while loading, or if ad failed
+  if (loading || isVip || adFailed) return null;
 
   const unitId =
     placement === "detail" ? AD_UNITS.BANNER_DETAIL : AD_UNITS.BANNER_HOME;
@@ -30,6 +32,10 @@ export function AdBanner({ placement = "home" }: AdBannerProps) {
         size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
         requestOptions={{
           requestNonPersonalizedAdsOnly: false,
+        }}
+        onAdFailedToLoad={(error) => {
+          console.warn(`[AdBanner] Failed to load (${placement}):`, error.message);
+          setAdFailed(true);
         }}
       />
     </View>

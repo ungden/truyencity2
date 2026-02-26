@@ -157,29 +157,34 @@ Hệ thống mới hỗ trợ viết truyện dài **1000-2000 chương** mà kh
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
-### Frontend
-- **Framework**: Next.js 15 (App Router)
+### Frontend (Web)
+- **Framework**: Next.js 15 (App Router), React 19
 - **Language**: TypeScript
 - **UI**: Shadcn/UI + Tailwind CSS
-- **Icons**: Lucide React
-- **Forms**: React Hook Form + Zod
-- **State**: React Context API
-- **Notifications**: Sonner
+- **Ads**: Google AdSense (lazy loaded, VIP-gated)
+- **Analytics**: GA4, Vercel Analytics + Speed Insights
+- **SEO**: JSON-LD (WebSite, Organization, Book, Breadcrumb)
+
+### Mobile
+- **Framework**: Expo SDK 54, expo-router v6
+- **Styling**: NativeWind v5
+- **Ads**: Google AdMob (banner + interstitial, VIP-gated)
+- **Offline**: SQLite, TTS, auto-scroll, keep-awake
 
 ### Backend
-- **Database**: Supabase (PostgreSQL)
+- **Database**: Supabase (PostgreSQL + pgvector + pg_cron)
 - **Auth**: Supabase Auth
-- **Storage**: Supabase Storage
-- **Edge Functions**: Deno
-- **AI**: OpenRouter API (GPT-4, Claude, Qwen)
+- **AI**: Google Gemini (`gemini-3-flash-preview`)
+- **Cache**: Upstash Redis (rate limiting + caching, in-memory fallback)
+- **Monitoring**: Sentry (via logger.ts)
+- **Hosting**: Vercel Pro (maxDuration 300s)
 
-### AI Features
-- **Story Graph**: PostgreSQL JSONB
-- **Context Management**: 5 chương gần nhất + keyword search
-- **Contradiction Detection**: Rule-based + cultivation level tracking
-- **Prompt Templates**: Dynamic generation từ database
+### Monetization
+- **Reader VIP**: 49,000 VND/mo — no ads, unlimited download/TTS, exclusive themes
+- **Free tier**: Ads (AdSense web, AdMob mobile), 5 offline chapters/day, 60 min TTS/day
+- **Payment**: Not yet integrated (Apple IAP, Google Play Billing, VNPay/MoMo planned)
 
 ## 📊 Đánh giá tiến độ
 
@@ -246,10 +251,21 @@ Hệ thống mới hỗ trợ viết truyện dài **1000-2000 chương** mà kh
 
 ### Environment Variables
 ```env
+# Required
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-OPENROUTER_API_KEY=your_openrouter_key
+GEMINI_API_KEY=your_gemini_api_key
+CRON_SECRET=your_cron_secret
+
+# Optional (graceful fallback if unset)
+NEXT_PUBLIC_ADSENSE_PUB_ID=       # Google AdSense publisher ID
+NEXT_PUBLIC_GA4_ID=               # Google Analytics 4
+NEXT_PUBLIC_SENTRY_DSN=           # Sentry error tracking
+UPSTASH_REDIS_REST_URL=           # Upstash Redis (falls back to in-memory)
+UPSTASH_REDIS_REST_TOKEN=         # Upstash Redis auth
+EXPO_PUBLIC_ADMOB_IOS_APP_ID=     # AdMob iOS (test ID fallback)
+EXPO_PUBLIC_ADMOB_ANDROID_APP_ID= # AdMob Android (test ID fallback)
 ```
 
 ### Installation
@@ -324,18 +340,19 @@ npm run dev
 - [x] Legacy Admin Cleanup - removed deprecated routes
 - [x] 13 files, ~3,300 lines (down from 41 files, 28,470 lines)
 
-### Phase 4: Advanced Features (🚧 Đang phát triển)
-- [ ] Neo4j integration cho Story Graph phức tạp
-- [ ] AI-powered contradiction detection (GPT-4)
-- [ ] Character relationship graph
-- [ ] Plot arc visualization
-- [ ] Multi-language support
+### Phase 4: Monetization & Mobile (Completed)
+- [x] Reader VIP system (Free + VIP tiers)
+- [x] Google AdSense (web) + AdMob (mobile)
+- [x] VIP context provider (shared, single RPC)
+- [x] Mobile app (Expo SDK 54, offline, TTS, rankings)
+- [x] SEO (JSON-LD, canonical URLs, /search page)
+- [x] Analytics (GA4, Vercel Analytics)
+- [x] Infrastructure (Upstash Redis, Sentry, security headers)
 
-### Phase 5: Optimization (📋 Kế hoạch)
-- [ ] Fine-tune model trên webnovel dataset
-- [ ] Caching layer cho Story Graph
-- [ ] Real-time collaboration
-- [x] Mobile app (EAS build & App Store pending)
+### Pending
+- [ ] App Store / Play Store submission
+- [ ] Payment gateway (Apple IAP, Google Play Billing, VNPay)
+- [ ] Email notifications (Resend/SendGrid)
 
 ---
 
@@ -346,17 +363,19 @@ npm run dev
 - **Changes Summary**: `SCALABILITY_CHANGES_SUMMARY.md`
 - **Test Suite**: `src/__tests__/scalability.test.ts`
 
-### Các file mới quan trọng
+### Key Directories
 ```
-src/services/story-writing-factory/
-├── plot-thread-manager.ts          # Phase 1: Thread management
-├── volume-summary-manager.ts       # Phase 2: 4-level memory
-├── rule-indexer.ts                 # Phase 3: Rules indexing
-├── long-term-validator.ts          # Phase 4: Milestone validation
-└── chapter1-template.ts            # Refactored genre-flexible templates
-
-supabase/migrations/
-└── 0100_create_plot_thread_tables.sql  # DB migrations for all 4 phases
+src/services/story-engine/       # V2 pipeline (production)
+src/services/billing/            # Reader VIP service
+src/services/content-seeder/     # Daily novel spawner
+src/services/author-generator/   # AI author generation
+src/services/novel-enricher/     # Novel metadata enrichment
+src/components/ads/              # AdBanner + AdPlacement (web)
+src/contexts/vip-context.tsx     # Shared VIP status provider
+src/lib/auth/                    # Shared auth utilities
+src/lib/redis/                   # Upstash Redis client
+mobile/src/components/ads/       # AdBanner + ad-config (mobile)
+mobile/src/hooks/                # useVipStatus, useInterstitialAd
 ```
 
 ## 🤝 Contributing

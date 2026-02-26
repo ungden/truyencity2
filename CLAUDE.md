@@ -362,7 +362,7 @@ V1 (`story-writing-factory/`) reduced from 38 files to **13 files** (Phase 14A+1
 - Env: `NEXT_PUBLIC_SENTRY_DSN`
 
 ### Security Headers
-- `vercel.json`: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, X-DNS-Prefetch-Control
+- `vercel.json`: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, X-DNS-Prefetch-Control, Strict-Transport-Security, Permissions-Policy
 
 ## SEO & Analytics (Phase 13)
 
@@ -373,6 +373,30 @@ V1 (`story-writing-factory/`) reduced from 38 files to **13 files** (Phase 14A+1
 - Vercel Analytics + Speed Insights
 - AdSense via `NEXT_PUBLIC_ADSENSE_PUB_ID`
 
+## Phase 16 Details (2026-02-27) — Ad Integration Audit Fix
+
+Comprehensive audit found 3 critical + 4 high + 5 medium + 5 low issues in the ad integration layer. All actionable issues fixed.
+
+### 16A — Web Ad Fixes
+- **16A-1**: AdSense `<script>` → Next.js `<Script strategy="lazyOnload">` (was render-blocking, now lazy)
+- **16A-2**: AdSense script moved from `<head>` to `<body>` (no longer blocks SSR)
+- **16A-3**: Created `VipProvider` context (`src/contexts/vip-context.tsx`) — single RPC call shared by all AdBanner instances (was N separate queries)
+- **16A-4**: Web AdBanner now uses `get_reader_status` RPC (handles VIP expiration) instead of querying `profiles` table directly
+- **16A-5**: `FORMAT_STYLES` now applied to ad container (prevents CLS — reserving min-height for ad slots)
+- **16A-6**: `pushed` ref resets when `slot` prop changes (edge case fix)
+- **16A-7**: Wired `AdPlacement` into web pages: home sidebar, novel detail (between description & chapters), chapter reader (post-content)
+
+### 16B — Mobile Ad Fixes
+- **16B-1**: `AdBanner` — added `onAdFailedToLoad` handler, collapses to null on failure (was blank gap)
+- **16B-2**: `useInterstitialAd` — added `AdEventType.ERROR` listener with retry logic (max 3 attempts, exponential backoff)
+- **16B-3**: Wired `AdBanner` into mobile screens: discover home (after hero carousel), novel detail (before tabs), chapter reader (post-content)
+- **16B-4**: Wired `useInterstitialAd` into chapter reader `goToChapter()` — shows ad every 4 chapter navigations
+
+### 16C — SQL & Security Fixes
+- **16C-1**: Migration 0137 — `get_reader_status()` now clears `reader_tier_expires_at` on VIP expiration (was leaving stale timestamp)
+- **16C-2**: `reader-vip-service.ts` — `credit_transactions` insert now checks for errors + logs (was fire-and-forget)
+- **16C-3**: `vercel.json` — Added `Strict-Transport-Security` (HSTS with preload) and `Permissions-Policy` (camera/mic/geo disabled)
+
 ## Remaining Known Issues
 
 ### Pending (needs external setup)
@@ -380,6 +404,7 @@ V1 (`story-writing-factory/`) reduced from 38 files to **13 files** (Phase 14A+1
 - Phase 12D: Google Play submission (needs Android build)
 - Phase 13C: Email notifications (needs email service like Resend/SendGrid)
 - Payment gateway integration (Apple IAP, Google Play Billing, VNPay)
+- VIP upgrade endpoint needs server-side receipt validation when payment gateway is integrated
 
 ## Important Files to Read
 
@@ -402,8 +427,7 @@ When working with the story engine:
 
 ---
 
-**Last Updated**: 2026-02-26
-**Latest Commit**: `b6a0464` (Phase 14B+15B)
+**Last Updated**: 2026-02-27
 **All 5 quality phases complete** — Phases 1-5 shipped to production
 **Phase 10 complete** — 6 missing genres + ratings RPC migration
-**Phases 11-15 complete** — Monetization, mobile features, SEO, analytics, infra hardening
+**Phases 11-16 complete** — Monetization, mobile features, SEO, analytics, infra hardening, ad integration audit fix

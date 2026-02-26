@@ -13,6 +13,7 @@ import { createServerClient } from '@/integrations/supabase/server';
 import { Novel } from '@/lib/types';
 import { ContinueReading } from '@/components/continue-reading';
 import { LatestUpdatesCarousel } from '@/components/latest-updates-carousel';
+import { AdPlacement } from '@/components/ads/AdPlacement';
 
 export const revalidate = 300;
 
@@ -326,10 +327,8 @@ export default async function HomePage() {
                 <Link href="/ranking">Xem đầy đủ</Link>
               </Button>
 
-              {/* Ad Placeholder */}
-              <div className="mt-6 h-[250px] bg-card border border-border/50 rounded-2xl flex items-center justify-center">
-                <span className="text-sm text-muted-foreground">Khu vực Quảng Cáo</span>
-              </div>
+              {/* Sidebar Ad */}
+              <AdPlacement placement="sidebar" slot="sidebar-home" className="mt-6" />
             </div>
           </aside>
         </div>

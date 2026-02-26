@@ -138,8 +138,8 @@ class ReaderVipService {
         return { success: false, error: error.message };
       }
 
-      // Record transaction
-      await supabase.from('credit_transactions').insert({
+      // Record transaction (non-fatal — upgrade already succeeded)
+      const { error: txError } = await supabase.from('credit_transactions').insert({
         user_id: userId,
         type: 'subscription',
         amount: 0,
@@ -150,6 +150,9 @@ class ReaderVipService {
         price_usd: 1.99,
         description: 'Nang cap VIP Reader - 1 thang',
       });
+      if (txError) {
+        logger.error('Failed to record VIP transaction', txError, { userId });
+      }
 
       logger.billingEvent('reader_vip_upgraded', userId, {
         payment_method: paymentInfo.payment_method,

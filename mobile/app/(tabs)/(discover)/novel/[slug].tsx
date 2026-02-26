@@ -20,6 +20,7 @@ import UnderlineTabs from "@/components/underline-tabs";
 import NovelCard from "@/components/novel-card";
 import StarRatingInput from "@/components/star-rating-input";
 import CommentsSection from "@/components/comments-section";
+import { AdBanner } from "@/components/ads/ad-banner";
 
 const CHAPTERS_PER_PAGE = 20;
 const DETAIL_TABS = ["Giới Thiệu", "Đánh Giá", "D.S Chương"];
@@ -394,6 +395,9 @@ export default function NovelDetailScreen() {
               </View>
             </View>
           </View>
+
+          {/* Ad between hero and tabs */}
+          <AdBanner placement="detail" />
 
           {/* ═══════════════ TABS ═══════════════ */}
           <UnderlineTabs
