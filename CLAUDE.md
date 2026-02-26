@@ -303,11 +303,22 @@ V1 (`story-writing-factory/`) has ~38 files but only **7 are still actively impo
 
 The remaining ~31 files are dead. Full V1 removal requires migrating these 5 routes to V2 equivalents.
 
+## Phase 10 Details (2026-02-26) — Genre Completion + Ratings Fix
+
+### 10A — 6 Missing Genres Added to Daily Spawn
+- **10A-1**: Added 6 genre entries to `GENRE_CONFIG` in `genre-config.ts`: kiem-hiep (7 topics), mat-the (7 topics), linh-di (7 topics), quan-truong (6 topics), di-gioi (7 topics), ngon-tinh (8 topics) — all 13 genres now spawn
+- **10A-2**: Added `SOURCE_TOPIC_SEEDS` for 6 genres in `content-seeder.ts`: kiem-hiep (8), mat-the (9), linh-di (9), quan-truong (8), di-gioi (9), ngon-tinh (10) seed descriptions
+- Total: 42 new topics with 3-4 topicPromptHints each, 53 new seed descriptions
+
+### 10B — Ratings Aggregate Migrated to DB-Level RPC
+- **10B-1**: Replaced client-side JS average in `/api/ratings/route.ts` with `get_novel_stats()` RPC (single DB call returns rating_avg + rating_count)
+- **10B-2**: Replaced 3-query parallel fetch in `/app/truyen/[slug]/page.tsx` with single `get_novel_stats()` RPC (also returns view_count, bookmark_count — fewer DB calls)
+- **10B-3**: Fixed mobile novel detail column name bug (`r.rating` → uses RPC `get_novel_stats()` instead of broken `.select("rating")` query)
+
 ## Remaining Known Issues
 
 ### Low Priority (deferred)
-- Ratings average still computed client-side (score column only) — true DB aggregate requires Supabase RPC migration
-- 6 genres never spawned by daily-spawn (kiem-hiep, mat-the, linh-di, quan-truong, di-gioi, ngon-tinh) — ContentSeeder GENRE_CONFIG may only have 7 genres
+- None currently tracked
 
 ## Important Files to Read
 
@@ -333,3 +344,4 @@ When working with the story engine:
 **Last Updated**: 2026-02-26
 **Latest Commit**: `a3d995b` (Quality Phase 5)
 **All 5 quality phases complete** — Phases 1-5 shipped to production
+**Phase 10 complete** — 6 missing genres + ratings RPC migration

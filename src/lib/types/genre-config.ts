@@ -1570,8 +1570,611 @@ export const GENRE_CONFIG = {
           'Sự tấu hài của game thủ: Bọn họ không sợ chết, sẵn sàng cởi truồng lao vào boss, chat nhảm, nhảy múa, làm các hành động kỳ quặc khiến người dị giới khiếp sợ.',
           'Sự bóc lột của MC: MC tạo ra các quest củ chuối (bắt nhặt 1000 cục đá) rồi thưởng vài đồng xu, nhưng game thủ vẫn khen game thực tế ảo này quá siêu phẩm.',
           'Góc nhìn đa chiều: Chuyển đổi giữa góc nhìn của MC (đang tính toán lợi ích), góc nhìn game thủ (đang cày cuốc tấu hài) và góc nhìn NPC dị giới (đang hoang mang tột độ).'
-        ]
+         ]
       }
+    ]
+  },
+  'kiem-hiep': {
+    name: 'Kiếm Hiệp',
+    icon: '🗡️',
+    requiredFields: ['martial_arts_system'],
+    optionalFields: ['world_description', 'factions'],
+    aiPromptCategory: 'wuxia',
+    description: 'Giang hồ kiếm hiệp, võ lâm ân oán, hiệp khách nghĩa sĩ',
+    example: 'Võ lâm đại hội, bí kíp tuyệt học, ân oán giang hồ...',
+    compositionTargets: {
+      dialogue: [35, 45],
+      description: [30, 40],
+      inner: [15, 20]
+    },
+    topics: [
+      {
+        id: 'kiem-hiep-co-dien',
+        name: 'Cổ Điển',
+        description: 'Kiếm hiệp truyền thống phong cách Kim Dung/Cổ Long, giang hồ ân oán, tông môn tranh đoạt',
+        example: 'Võ lâm đại hội, tranh đoạt bí kíp, nghĩa hiệp hành đạo...',
+        topicPromptHints: [
+          'Giang hồ phải có quy tắc rõ ràng: luật giang hồ, nghĩa khí, lời hứa = mạng sống — vi phạm thì bị truy sát, mất danh dự còn hơn mất mạng',
+          'Hệ thống võ công phải có nguồn gốc: mỗi tuyệt kỹ gắn liền với môn phái/sư phụ, có ưu nhược điểm rõ — KHÔNG phải muốn học là được, cần căn cơ + cơ duyên',
+          'Ân oán giang hồ phải nhiều tầng: thù cha, thù sư, thù môn phái — mỗi mối thù có lịch sử, có hai mặt đúng sai, MC phải lựa chọn khó khăn',
+          'Mô tả chiêu thức chiến đấu phải có chiến thuật: phân tích điểm yếu đối thủ, lợi dụng địa hình, dụ kế — KHÔNG phải chỉ so sánh nội lực ai mạnh hơn',
+        ],
+      },
+      {
+        id: 'kiem-hiep-trong-sinh',
+        name: 'Trọng Sinh',
+        description: 'Tái sinh về giang hồ cũ, lợi dụng kiến thức kiếp trước để phục thù và bảo vệ người thân',
+        example: 'Đại hiệp bị phản bội, trọng sinh về thời trẻ, biết trước âm mưu...',
+        topicPromptHints: [
+          'Kiếp trước phải bi thảm rõ ràng: bị sư huynh phản bội, vợ bị giết, môn phái bị diệt — tạo động lực mãnh liệt cho hành động kiếp này',
+          'Kiến thức giang hồ kiếp trước là lợi thế lớn: biết ai sẽ thành cao thủ, bí kíp nào ở đâu, âm mưu nào sẽ xảy ra — nhưng hiệu ứng bướm khiến sự kiện dần thay đổi',
+          'Nội tâm trọng sinh = chiều sâu nhân vật: MC già dặn trong thân xác trẻ, phải kiềm chế cảm xúc khi gặp lại kẻ thù/ân nhân kiếp trước',
+          'Phục thù phải có kế hoạch dài hạn: không phải gặp kẻ thù là giết, mà bày mưu, tích lũy lực lượng, phá hủy từ gốc — "mười năm chưa muộn"',
+        ],
+      },
+      {
+        id: 'kiem-hiep-kinh-doanh',
+        name: 'Kinh Doanh',
+        description: 'Mở thương hội, tiệm vũ khí, tửu lâu trong giang hồ, kết hợp buôn bán và võ lực',
+        example: 'Mở tiệm rèn kiếm nổi tiếng giang hồ, các bang phái tranh nhau đặt hàng...',
+        topicPromptHints: [
+          'Kinh doanh giang hồ khác kinh doanh thường: khách hàng là võ lâm nhân, thanh toán bằng bạc/linh thạch, bảo kê bằng võ lực — ai dám quỵt nợ thì kiếm nói chuyện',
+          'Hệ thống sản phẩm phải có chiều sâu: rèn kiếm (chất liệu + kỹ thuật + linh văn), nấu rượu (bí phương + nguyên liệu hiếm), bán thuốc (y thuật + dược liệu) — mỗi nghề có progression riêng',
+          'Thương chiến giang hồ: cạnh tranh với thương hội khác, bị bang phái ép giá, gián điệp thương mại — xử lý bằng cả trí tuệ và võ lực',
+          'Danh tiếng = tiền: sản phẩm tốt → giang hồ truyền tai → khách hàng cấp cao tìm đến → mở rộng chuỗi — vòng lặp tích lũy hấp dẫn',
+        ],
+      },
+      {
+        id: 'kiem-hiep-nu-hiep',
+        name: 'Nữ Hiệp',
+        description: 'Nữ chính hành hiệp giang hồ, phá bỏ định kiến giới, chứng minh bản thân',
+        example: 'Nữ hiệp giả trai xông pha giang hồ, võ công cao cường...',
+        topicPromptHints: [
+          'Nữ chính phải đối mặt định kiến giới trong giang hồ: bị coi thường, bị từ chối dạy võ công, phải chứng minh bản thân gấp đôi — nhưng KHÔNG biến thành nạn nhân, mà dùng trí tuệ + võ công để đáp trả',
+          'Tính cách nữ hiệp phải đa chiều: mạnh mẽ trên giang hồ nhưng có lúc mềm yếu, nghĩa khí nhưng biết tính toán, độc lập nhưng trân trọng tình bạn/tình yêu',
+          'Hành hiệp = có nguyên tắc rõ: bảo vệ kẻ yếu, trừng phạt kẻ ác, giữ lời hứa — nhưng gặp tình huống xám xịt phải lựa chọn khó khăn giữa nghĩa và tình',
+          'Tình yêu nếu có phải bình đẳng: đối tượng phải tôn trọng nữ chính, không phải "cứu mỹ nhân" mà là "cùng chiến đấu" — tránh cliché yếu đuối cần bảo vệ',
+        ],
+      },
+      {
+        id: 'kiem-hiep-an-sat',
+        name: 'Ám Sát',
+        description: 'Tổ chức sát thủ giang hồ, nhiệm vụ ám sát, đạo đức mờ ám',
+        example: 'Sát thủ hạng nhất nhận nhiệm vụ giết đại hiệp, nhưng phát hiện sự thật phức tạp...',
+        topicPromptHints: [
+          'Tổ chức sát thủ phải có hệ thống rõ: xếp hạng nhiệm vụ, quy tắc (không giết trẻ em, hoàn thành hợp đồng, bảo mật danh tính), hình phạt vi phạm — tạo thế giới ngầm hoàn chỉnh',
+          'Mỗi nhiệm vụ ám sát = 1 mini arc: điều tra mục tiêu, lập kế hoạch, xâm nhập, thực hiện, rút lui — mô tả chi tiết chiến thuật, không phải "lao vào giết"',
+          'Xung đột đạo đức là cốt lõi: mục tiêu có thể là người tốt, người đặt hàng có thể là kẻ ác — MC dần đặt câu hỏi về nghề nghiệp, tạo chiều sâu tâm lý',
+          'Ám sát trong giang hồ cần khinh công + ám khí + ngụy trang: mô tả kỹ thuật ám sát đẹp mắt, hồi hộp, không phải chỉ "đâm một kiếm"',
+        ],
+      },
+      {
+        id: 'kiem-hiep-tham-an',
+        name: 'Thám Án',
+        description: 'Phá án kết hợp giang hồ, dùng võ công và trí tuệ để tìm ra sự thật',
+        example: 'Bao Công phiên bản giang hồ, phá án mạng liên quan các bang phái...',
+        topicPromptHints: [
+          'Mỗi vụ án phải liên quan giang hồ: nạn nhân là võ lâm nhân, hung thủ dùng võ công giết người, manh mối là chiêu thức/vũ khí — kết hợp phá án và kiến thức võ lâm',
+          'Manh mối phải fair play: đưa đủ gợi ý để người đọc có thể đoán, nhưng có twist bất ngờ — không phải "MC đột nhiên phát hiện manh mối từ trên trời rơi xuống"',
+          'Chính trị giang hồ gây khó cho phá án: bang phái che chở hung thủ, nhân chứng bị ép im lặng, quan phủ bị mua chuộc — MC phải vừa phá án vừa đối phó thế lực',
+          'Kết hợp hành động và suy luận: không chỉ ngồi suy nghĩ mà phải đi điều tra, chiến đấu thu thập bằng chứng, truy đuổi nghi phạm — nhịp phim nhanh',
+        ],
+      },
+      {
+        id: 'kiem-hiep-mon-phai',
+        name: 'Môn Phái',
+        description: 'Xây dựng môn phái từ con số 0, thu nạp đệ tử, phát triển thế lực',
+        example: 'Từ một túp lều trên núi hoang, xây dựng thành đại phái võ lâm...',
+        topicPromptHints: [
+          'Xây dựng môn phái = xây dựng vương quốc mini: tuyển đệ tử (tiêu chuẩn), tạo công pháp (độc đáo), xây sơn môn (phong thủy), thiết lập quy tắc — mỗi bước đều có thử thách',
+          'Đệ tử phải có cá tính riêng: không phải NPC vô hồn, mỗi đệ tử có ưu nhược điểm, tham vọng, trung thành — tạo drama nội bộ (phản bội, cạnh tranh, tình cảm)',
+          'Cạnh tranh với các môn phái khác: tranh giành đệ tử thiên tài, lãnh thổ, tài nguyên — ngoại giao, liên minh, chiến tranh giữa các phái',
+          'MC vừa là sư phụ vừa là lãnh đạo: dạy võ công, xử lý nội bộ, đối ngoại giang hồ — khác biệt với "MC một mình đánh thiên hạ"',
+        ],
+      },
+    ]
+  },
+  'mat-the': {
+    name: 'Mạt Thế',
+    icon: '☠️',
+    requiredFields: ['apocalypse_type'],
+    optionalFields: ['survival_mechanics', 'mutation_system'],
+    aiPromptCategory: 'apocalypse',
+    description: 'Tận thế, sinh tồn, zombie, đột biến, xây dựng căn cứ',
+    example: 'Zombie tràn lan, đột biến gen, xây dựng base sinh tồn...',
+    compositionTargets: {
+      dialogue: [25, 35],
+      description: [35, 45],
+      inner: [15, 25]
+    },
+    topics: [
+      {
+        id: 'mat-the-zombie',
+        name: 'Zombie',
+        description: 'Thế giới tràn ngập zombie, sinh tồn trong đống đổ nát văn minh',
+        example: 'Virus bùng phát, zombie tiến hóa, nhóm sinh tồn tìm vùng an toàn...',
+        topicPromptHints: [
+          'Zombie phải có hệ thống tiến hóa: zombie thường → zombie chạy nhanh → zombie thông minh → zombie boss — mỗi cấp nguy hiểm hơn, tạo áp lực leo thang',
+          'Sinh tồn = quản lý tài nguyên: nước, thực phẩm, vũ khí, thuốc men — mỗi quyết định đều có trade-off, không phải "tìm được siêu thị là xong"',
+          'Con người nguy hiểm hơn zombie: tranh giành vật tư, phản bội đồng đội, bạo chúa chiếm đóng — xung đột người-người tạo kịch tính sâu hơn zombie',
+          'Mất mát phải có trọng lượng: nhân vật phụ chết phải có impact, không phải chết rồi quên — sống sót có cái giá về tinh thần',
+        ],
+      },
+      {
+        id: 'mat-the-di-nang',
+        name: 'Dị Năng',
+        description: 'Tận thế kích hoạt dị năng ở con người, phân chia giai cấp mới theo sức mạnh',
+        example: 'Thiên thạch rơi, 1% nhân loại thức tỉnh dị năng, xã hội tái cấu trúc...',
+        topicPromptHints: [
+          'Hệ thống dị năng phải có quy luật: phân loại (hệ lửa/băng/tinh thần/thể chất), cấp bậc rõ ràng, cách nâng cấp (hạch năng lượng/tinh thể), giới hạn sử dụng — KHÔNG phải muốn gì được nấy',
+          'Xã hội mới phân chia theo sức mạnh: dị năng giả = giai cấp thống trị, người thường = công dân hạng hai — xung đột giai cấp mới thay thế xung đột cũ',
+          'MC nâng cấp dị năng phải có cái giá: đau đớn thể xác, mất trí nhớ, biến dị ngoại hình — sức mạnh không miễn phí, tạo chiều sâu cho progression',
+          'Quái vật đột biến đa dạng: không chỉ zombie mà còn thú đột biến, thực vật biến dị, côn trùng khổng lồ — mỗi loại có điểm yếu riêng cần chiến thuật khác nhau',
+        ],
+      },
+      {
+        id: 'mat-the-xay-base',
+        name: 'Xây Base',
+        description: 'Xây dựng căn cứ sinh tồn, phát triển từ nhóm nhỏ thành cộng đồng',
+        example: 'Chiếm siêu thị làm base, xây tường thành, trồng trọt, tuyển người...',
+        topicPromptHints: [
+          'Xây base phải có progression rõ: nơi trú ẩn tạm → căn cứ nhỏ → khu định cư → thành phố mini — mỗi giai đoạn có thử thách mới (tài nguyên, nhân lực, phòng thủ)',
+          'Quản lý cộng đồng = quản lý xung đột: phân chia công việc, giải quyết tranh chấp, đối phó phần tử phá hoại — MC vừa là thủ lĩnh quân sự vừa là lãnh đạo dân sự',
+          'Mỗi đợt nâng cấp base = 1 arc: thu thập vật liệu → xây dựng → bảo vệ khỏi tấn công — tạo vòng lặp build-defend thỏa mãn',
+          'Ngoại giao giữa các base: liên minh, trao đổi tài nguyên, chiến tranh giành lãnh thổ — thế giới mạt thế có chính trị riêng',
+        ],
+      },
+      {
+        id: 'mat-the-trong-sinh',
+        name: 'Trọng Sinh',
+        description: 'Trọng sinh về trước ngày tận thế, lợi dụng kiến thức để chuẩn bị sinh tồn',
+        example: 'Trọng sinh về 1 tháng trước tận thế, tích trữ vật tư, chuẩn bị base...',
+        topicPromptHints: [
+          'Giai đoạn chuẩn bị trước tận thế = dopamine cực mạnh: mua sắm điên cuồng, tích trữ chiến lược, tập luyện — người xung quanh nghĩ MC điên, đọc giả biết MC đúng',
+          'Kiến thức tương lai phải cụ thể: biết zombie xuất hiện ở đâu trước, biết vùng an toàn nào, biết ai sẽ thức tỉnh dị năng — nhưng timeline có thể thay đổi',
+          'Sau khi tận thế bắt đầu: MC có lợi thế ban đầu nhưng dần mất đi khi sự kiện diverge — phải dùng trí tuệ thay vì chỉ dựa vào ký ức',
+          'Thu thập đồng đội trước tận thế: tìm người sẽ thức tỉnh dị năng mạnh, kết giao trước, tạo nhóm nòng cốt — "bài binh bố trận" trước ngày D',
+        ],
+      },
+      {
+        id: 'mat-the-bang-ha',
+        name: 'Băng Hà',
+        description: 'Kỷ băng hà tàn khốc, nhiệt độ giảm không ngừng, sinh tồn trong băng giá',
+        example: 'Nhiệt độ giảm xuống -60°C, văn minh sụp đổ, tranh giành nhiên liệu...',
+        topicPromptHints: [
+          'Lạnh = kẻ thù vô hình: mô tả chi tiết tác động của lạnh lên cơ thể (tê cóng, hoại tử, mất ý thức), lên cơ sở hạ tầng (ống nước vỡ, đường sá nứt, xe cộ chết máy) — tạo cảm giác áp bức liên tục',
+          'Tài nguyên cốt lõi thay đổi: nhiên liệu + thực phẩm nóng > vàng bạc — kinh tế mới xoay quanh than/dầu/gỗ, ai kiểm soát nhiên liệu = kiểm soát quyền lực',
+          'Di cư về phía nam/xích đạo: hành trình di chuyển qua vùng băng giá, gặp các nhóm sinh tồn khác — mỗi đoạn đường = 1 arc kịch tính',
+          'Sinh vật băng giá: động vật thích nghi (gấu trắng khổng lồ, sói băng), thực vật đột biến chịu lạnh — hệ sinh thái mới đầy nguy hiểm',
+        ],
+      },
+      {
+        id: 'mat-the-hai-duong',
+        name: 'Hải Dương',
+        description: 'Mực nước biển dâng, lục địa chìm, sinh tồn trên biển và đảo',
+        example: 'Đại hồng thủy nhấn chìm 90% lục địa, nhân loại sống trên tàu và đảo nhân tạo...',
+        topicPromptHints: [
+          'Thế giới nước = thay đổi hoàn toàn cách sinh tồn: di chuyển bằng tàu/thuyền, đánh bắt cá, lọc nước ngọt, xây đảo nổi — mô tả chi tiết cuộc sống trên biển',
+          'Đại dương ẩn chứa nguy hiểm: sinh vật biển đột biến khổng lồ, bão tố, xoáy nước, hải tặc — mỗi chuyến đi biển = canh bạc sinh tử',
+          'Chính trị trên biển: các hạm đội tranh giành đảo/tài nguyên, liên minh tàu thuyền, quốc gia nổi — cấu trúc xã hội mới hoàn toàn',
+          'Khám phá thành phố chìm: lặn xuống đô thị cũ tìm vật tư, công nghệ, bí mật — mỗi lần lặn = nhiệm vụ nguy hiểm + phần thưởng giá trị',
+        ],
+      },
+      {
+        id: 'mat-the-he-thong',
+        name: 'Hệ Thống',
+        description: 'Có hệ thống game/AI hỗ trợ sinh tồn trong tận thế, quest và level up',
+        example: 'Hệ thống toàn cầu kích hoạt, mọi người có bảng trạng thái, giết quái lấy kinh nghiệm...',
+        topicPromptHints: [
+          'Hệ thống phải có lý do tồn tại: không phải "bỗng dưng xuất hiện" mà gắn với nguyên nhân tận thế — AI giám sát, thực thể ngoài hành tinh, trò chơi thần linh',
+          'Quest hệ thống phải có stakes: hoàn thành = phần thưởng giá trị, thất bại = hình phạt thật (mất level, debuff, chết) — không phải game an toàn',
+          'Hệ thống tạo bất bình đẳng mới: người được SSR skill vs người được skill trash — số mệnh ban đầu khác nhau, MC phải tìm cách tối ưu từ hand bài xấu',
+          'Kết hợp RPG elements với sinh tồn thực tế: level up, skill tree, inventory — nhưng vẫn cần ăn uống, ngủ nghỉ, đối phó con người, không phải game thuần túy',
+        ],
+      },
+    ]
+  },
+  'linh-di': {
+    name: 'Linh Dị',
+    icon: '👻',
+    requiredFields: ['supernatural_system'],
+    optionalFields: ['ghost_types', 'ritual_rules'],
+    aiPromptCategory: 'supernatural',
+    description: 'Linh dị, kinh dị, ma quỷ, phong thủy, tâm linh',
+    example: 'Pháp sư trừ tà, vụ án tâm linh, phong thủy bí ẩn...',
+    compositionTargets: {
+      dialogue: [30, 40],
+      description: [35, 50],
+      inner: [20, 30]
+    },
+    topics: [
+      {
+        id: 'linh-di-phap-su',
+        name: 'Pháp Sư',
+        description: 'Pháp sư bắt ma trừ tà, đối đầu với các thế lực tâm linh đen tối',
+        example: 'Pháp sư đời thứ 7 thừa kế gia nghiệp trừ tà, đối mặt đại hung linh...',
+        topicPromptHints: [
+          'Hệ thống pháp thuật phải có logic: bùa chú cần nguyên liệu (chu sa, máu gà đen, tóc đồng trinh), nghi thức cần thời gian + địa điểm phù hợp — KHÔNG phải vẫy tay là xong',
+          'Mỗi vụ trừ tà = 1 arc hoàn chỉnh: điều tra nguyên nhân ám → chuẩn bị pháp khí → đối đầu hung linh → giải quyết hậu quả. Hung linh phải có backstory bi thương',
+          'MC pháp sư phải có cái giá: trừ tà tổn hao tinh thần/tuổi thọ, tiếp xúc âm khí nhiều ảnh hưởng sức khỏe — sức mạnh không miễn phí',
+          'Thế giới tâm linh có quy tắc: ma không thể đi ban ngày, cõi âm có phân cấp, luật nhân quả chi phối — tạo hệ thống nhất quán',
+        ],
+      },
+      {
+        id: 'linh-di-phong-thuy',
+        name: 'Phong Thủy',
+        description: 'Phong thủy, trận pháp, mộ táng, long mạch — khám phá bí ẩn đất trời',
+        example: 'Phong thủy sư tìm long mạch, bố trí trận pháp, phá giải lời nguyền...',
+        topicPromptHints: [
+          'Phong thủy phải có hệ thống chi tiết: ngũ hành (kim mộc thủy hỏa thổ), bát quái, la bàn phong thủy — mô tả cách đọc địa thế, tìm huyệt vị, bố cục nhà/mộ',
+          'Long mạch = tài nguyên quý: các thế lực tranh giành long mạch tốt để táng mộ/xây nhà — ai chiếm được = gia tộc hưng thịnh, tạo xung đột lớn',
+          'Mỗi vụ phong thủy có bí ẩn: tại sao gia đình này liên tục gặp nạn, tại sao vùng đất này có sát khí — MC phải giải đáp bằng kiến thức phong thủy',
+          'Kết hợp phong thủy và lịch sử: cổ mộ đế vương, trận pháp ngàn năm, lời nguyền cổ đại — mỗi vụ việc gắn liền với câu chuyện lịch sử hấp dẫn',
+        ],
+      },
+      {
+        id: 'linh-di-quy-tac',
+        name: 'Quy Tắc',
+        description: 'Quái đàm quy tắc kinh dị: tuân thủ các quy tắc kỳ lạ để sinh tồn',
+        example: 'Nhận được bản quy tắc: "Không được nhìn vào gương sau 12h đêm"...',
+        topicPromptHints: [
+          'Quy tắc phải bất thường nhưng có logic ẩn: "Không mở cửa khi nghe tiếng gõ 3 lần", "Luôn đi cầu thang bên trái" — vi phạm = chết, nhưng tại sao lại có quy tắc này? Bí ẩn cần giải đáp',
+          'Không khí kinh dị qua chi tiết: không cần jump scare, mà dùng sự bất thường nhỏ tạo ám ảnh — đồng nghiệp cười nhưng răng thay đổi, bóng mình di chuyển khác',
+          'MC phải suy luận quy tắc mới: không phải lúc nào cũng có hướng dẫn sẵn, đôi khi phải tự phát hiện quy tắc qua quan sát và suy luận — sai = chết',
+          'Quy tắc xung đột: khi hai quy tắc mâu thuẫn nhau, MC phải chọn tuân thủ cái nào — tạo tình huống sinh tử căng thẳng',
+        ],
+      },
+      {
+        id: 'linh-di-tam-linh',
+        name: 'Tâm Linh',
+        description: 'MC có khả năng thông linh, nói chuyện với người chết, giúp vong hồn siêu thoát',
+        example: 'Sau tai nạn, MC có thể nhìn thấy vong hồn và nghe được tâm nguyện của họ...',
+        topicPromptHints: [
+          'Khả năng thông linh vừa là phúc vừa là họa: nhìn thấy thứ người khác không thấy, bị quấy rầy liên tục, khó phân biệt người sống và người chết — tạo cảm giác cô độc',
+          'Mỗi vong hồn có câu chuyện: không phải chỉ "ma đáng sợ" mà có backstory cảm động — người mẹ chết oan không yên tâm về con, chiến sĩ chưa hoàn thành nhiệm vụ',
+          'Giúp vong siêu thoát = giải quyết tâm nguyện: tìm hung thủ, truyền đạt lời cuối, hoàn thành ước nguyện — mỗi vụ = 1 mini arc đầy cảm xúc',
+          'MC phải đối mặt với ranh giới sống-chết: càng gần cõi âm càng nguy hiểm cho bản thân, ác linh lợi dụng khả năng thông linh để xâm nhập — stakes cá nhân rõ ràng',
+        ],
+      },
+      {
+        id: 'linh-di-co-mo',
+        name: 'Cổ Mộ',
+        description: 'Khám phá cổ mộ, cơ quan trận pháp, bí ẩn ngàn năm dưới lòng đất',
+        example: 'Đội đạo mộ chuyên nghiệp khám phá lăng mộ hoàng đế, đối mặt cơ quan tử thần...',
+        topicPromptHints: [
+          'Mỗi cổ mộ = 1 dungeon hoàn chỉnh: cấu trúc (hành lang, phòng chính, mật thất), cơ quan (bẫy tên, hố sâu, khí độc, cơ quan cơ giới), phần thưởng (bảo vật, bí mật) — mô tả chi tiết kiến trúc',
+          'Kiến thức đạo mộ phải chuyên nghiệp: phân kim định huyệt, nhìn phong thủy đoán cổ mộ, đọc bích họa suy luận — MC không phải cướp mộ bừa mà có kỹ năng thật',
+          'Nguy hiểm đa tầng: cơ quan vật lý + sinh vật (côn trùng, rắn, thây ma) + tâm linh (lời nguyền, ảo giác) — mỗi tầng mộ thêm 1 loại nguy hiểm',
+          'Lịch sử gắn liền mỗi cổ mộ: ai được chôn, tại sao chôn cầu kỳ thế, bí mật gì muốn giấu — giải mã lịch sử qua cổ mộ tạo chiều sâu',
+        ],
+      },
+      {
+        id: 'linh-di-dan-gian',
+        name: 'Dân Gian',
+        description: 'Ma quỷ dân gian Việt/Trung, truyền thuyết địa phương, phong tục tâm linh',
+        example: 'Ma da dụ người xuống sông, Bà Mụ chấm điểm trẻ sơ sinh, ông Ba Bị...',
+        topicPromptHints: [
+          'Ma quỷ dân gian phải đúng folklore: ma da (vùng sông nước), ma trơi (nghĩa địa), cô hồn (chết oan), thần cây đa — mỗi loại có đặc tính, cách xử lý riêng theo truyền thống',
+          'Phong tục tâm linh tạo bối cảnh đậm đà: cúng cô hồn, đốt vàng mã, kiêng kỵ ngày rằm, tục thờ cúng tổ tiên — mô tả chân thực phong tục dân gian',
+          'Không khí kinh dị từ đời thường: vùng quê, làng xóm, đêm khuya — sự bất thường trong cái quen thuộc tạo ám ảnh mạnh hơn setting xa lạ',
+          'Kết hợp hiện đại và truyền thống: MC đô thị về quê gặp hiện tượng tâm linh, dùng cả kiến thức hiện đại và truyền thống để giải quyết — tạo xung đột thế giới quan',
+        ],
+      },
+      {
+        id: 'linh-di-tham-an',
+        name: 'Thám Án Tâm Linh',
+        description: 'Phá án kết hợp yếu tố tâm linh, manh mối từ cả cõi âm và cõi dương',
+        example: 'Thanh tra gặp vụ án mà khoa học không giải thích, buộc phải tìm đáp án từ thế giới tâm linh...',
+        topicPromptHints: [
+          'Mỗi vụ án có hai tầng: bề mặt là vụ án hình sự (giết người, mất tích), bề sâu là nguyên nhân tâm linh (lời nguyền, báo oán, oan hồn) — MC phải giải quyết cả hai',
+          'MC thường là người duy nhất thấy yếu tố tâm linh: đồng nghiệp không tin, cấp trên yêu cầu bằng chứng khoa học — tạo xung đột giữa logic và tâm linh',
+          'Bằng chứng tâm linh không dùng được ở tòa: MC biết hung thủ nhờ vong hồn nạn nhân, nhưng phải tìm bằng chứng vật lý để kết án — 2 track điều tra song song',
+          'Mỗi vụ án để lại ảnh hưởng tâm linh lên MC: ám ảnh, mộng mị, kết nối sâu hơn với cõi âm — progression tâm linh của MC qua từng vụ',
+        ],
+      },
+    ]
+  },
+  'quan-truong': {
+    name: 'Quan Trường',
+    icon: '🏛️',
+    requiredFields: ['political_system'],
+    optionalFields: ['career_path', 'political_factions'],
+    aiPromptCategory: 'political',
+    description: 'Quan trường, chính trị, mưu kế, thăng tiến sự nghiệp',
+    example: 'Leo chức từ cán bộ xã, đấu trí chính trường, cải cách...',
+    compositionTargets: {
+      dialogue: [45, 55],
+      description: [25, 35],
+      inner: [20, 30]
+    },
+    topics: [
+      {
+        id: 'quan-truong-thang-tien',
+        name: 'Thăng Tiến',
+        description: 'Cán bộ thăng tiến qua mưu kế chính trường, từ cấp xã lên trung ương',
+        example: 'Cán bộ xã mới ra trường, dùng trí tuệ và quan hệ leo lên từng bước...',
+        topicPromptHints: [
+          'Hệ thống quan trường phải rõ: cấp xã → huyện → tỉnh → trung ương, mỗi cấp có bao nhiêu vị trí, ai quyết định thăng chức — mô tả cơ cấu quyền lực cụ thể',
+          'Thăng tiến = đấu trí nhiều mặt: không chỉ làm việc giỏi mà cần quan hệ, thời cơ, đối phó đối thủ chính trị — mỗi lần thăng chức = 1 arc mưu kế',
+          'Mỗi cấp có thử thách riêng: cấp xã (giải quyết dân sinh), huyện (cân bằng phe phái), tỉnh (dự án lớn), trung ương (chính sách quốc gia) — complexity tăng dần',
+          'MC phải giữ đường lối đúng đắn trong môi trường phức tạp: có lúc phải thỏa hiệp nhưng không mất nguyên tắc — tạo xung đột nội tâm giữa lý tưởng và thực tế',
+        ],
+      },
+      {
+        id: 'quan-truong-co-dai',
+        name: 'Cổ Đại',
+        description: 'Quan trường trong bối cảnh triều đình cổ đại, mưu kế cung đình, phe phái triều thần',
+        example: 'Thi đỗ trạng nguyên, bước vào triều đình đầy mưu mô, phe thái tử vs hoàng tử...',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'Triều đình phải có cấu trúc phức tạp: lục bộ (lại, hộ, lễ, binh, hình, công), nội các, hậu cung, hoạn quan — mỗi thế lực có lợi ích riêng, liên minh xoay vòng',
+          'Mưu kế cung đình phải tinh vi: không phải chỉ "vu oan hãm hại" mà có bài bản — giả thua, mượn đao, gài bẫy nhiều bước, hy sinh quân tốt — mỗi nước cờ tính trước 3 bước',
+          'MC phải có tài năng thật: không chỉ mưu kế mà phải giỏi trị quốc — cải cách thuế, trị thủy, bình giặc — thể hiện qua kết quả cụ thể, không phải nói suông',
+          'Quan hệ vua-tôi phức tạp: vua tin dùng nhưng cũng đề phòng, đại thần ganh ghét nhưng cũng cần hợp tác — mỗi mối quan hệ đều có hai mặt',
+        ],
+      },
+      {
+        id: 'quan-truong-kinh-te',
+        name: 'Kinh Tế',
+        description: 'Phát triển kinh tế địa phương, đấu tranh vì lợi ích dân sinh',
+        example: 'Bí thư huyện nghèo, thu hút đầu tư, phát triển kinh tế, đối phó cản trở...',
+        topicPromptHints: [
+          'Phát triển kinh tế phải cụ thể: dự án nào, vốn bao nhiêu, tạo bao nhiêu việc làm, tác động môi trường — không phải "phát triển" chung chung mà có số liệu, kế hoạch rõ',
+          'Xung đột lợi ích = nguồn kịch tính: doanh nghiệp muốn lợi nhuận, dân muốn đất, cấp trên muốn chỉ tiêu — MC phải cân bằng tất cả, thỏa hiệp thông minh',
+          'Đối thủ chính trị cản trở phát triển: phe đối lập phá dự án, doanh nghiệp hối lộ quan chức khác, dân bị xúi giục — MC vừa phát triển vừa đấu tranh',
+          'Thành công kinh tế = thăng tiến chính trị: kết quả kinh tế tạo uy tín, uy tín tạo cơ hội thăng tiến — vòng lặp tích cực nhưng cũng tạo đố kỵ',
+        ],
+      },
+      {
+        id: 'quan-truong-phan-tham',
+        name: 'Phản Tham',
+        description: 'Chống tham nhũng, phơi bày bộ mặt thật của quan chức tham ô',
+        example: 'Thanh tra chống tham nhũng đối đầu mạng lưới tham nhũng cấp cao...',
+        topicPromptHints: [
+          'Tham nhũng phải có hệ thống: không phải 1 người mà là mạng lưới — quan chức, doanh nghiệp, ngân hàng, thậm chí báo chí — mỗi mắt xích bảo vệ lẫn nhau',
+          'MC chống tham nhũng phải đối mặt nguy hiểm thật: bị đe dọa, gia đình bị gây áp lực, đồng nghiệp bị mua chuộc, bằng chứng bị tiêu hủy — tạo cảm giác cô độc chiến đấu',
+          'Thu thập bằng chứng = quá trình gian nan: mỗi manh mối phải điều tra, xác minh, bảo quản — không phải "tìm được 1 USB là xong"',
+          'Chiến thắng từng bước: hạ từng con cá nhỏ trước, dần tiến đến cá lớn — mỗi lần hạ 1 quan tham = 1 arc thỏa mãn, nhưng cũng lộ ra kẻ mạnh hơn',
+        ],
+      },
+      {
+        id: 'quan-truong-ngoai-giao',
+        name: 'Ngoại Giao',
+        description: 'Chính trị ngoại giao quốc tế, đàm phán, bảo vệ lợi ích quốc gia',
+        example: 'Nhà ngoại giao trẻ đối mặt khủng hoảng quốc tế, đàm phán bảo vệ chủ quyền...',
+        topicPromptHints: [
+          'Ngoại giao = chiến tranh không tiếng súng: mỗi cuộc đàm phán có stakes rõ (lãnh thổ, thương mại, an ninh), chiến thuật (cứng/mềm, liên minh, thông tin), kết quả ảnh hưởng triệu người',
+          'Kiến thức quốc tế phải cụ thể: luật quốc tế, tổ chức quốc tế, quan hệ song phương — MC phải am hiểu cả văn hóa, lịch sử, kinh tế của đối tác',
+          'Khủng hoảng ngoại giao = arc kịch tính cực điểm: thời hạn gấp, áp lực từ cả trong và ngoài nước, 1 sai lầm = hậu quả nghiêm trọng — tạo tension liên tục',
+          'MC phải cân bằng lý tưởng và thực tế: muốn hòa bình nhưng phải cứng rắn, muốn hợp tác nhưng phải bảo vệ lợi ích — ngoại giao không có đúng sai tuyệt đối',
+        ],
+      },
+      {
+        id: 'quan-truong-trong-sinh',
+        name: 'Trọng Sinh',
+        description: 'Trọng sinh về đầu sự nghiệp chính trị, lợi dụng kiến thức tương lai',
+        example: 'Quan chức cấp cao trọng sinh về thời mới ra trường, biết trước xu hướng chính sách...',
+        topicPromptHints: [
+          'Kiến thức tương lai áp dụng vào chính trị: biết chính sách nào sẽ thành công/thất bại, biết ai sẽ lên/xuống, biết xu hướng kinh tế — nhưng phải thực hiện khéo léo vì "biết trước" gây nghi ngờ',
+          'Sửa sai kiếp trước: MC biết mình đã ra quyết định sai ở đâu, đã tin nhầm ai, đã bỏ lỡ cơ hội nào — động lực rõ ràng cho hành động kiếp này',
+          'Thay đổi lịch sử chính trị: hành động của MC khiến sự kiện đi khác timeline cũ — kiến thức dần mất giá trị, phải dựa vào năng lực thật',
+          'Quan hệ nhân sự thay đổi: người kiếp trước là kẻ thù giờ có thể kết giao sớm, đồng minh cũ giờ chưa gặp — MC phải xây dựng lại từ đầu',
+        ],
+      },
+    ]
+  },
+  'di-gioi': {
+    name: 'Dị Giới',
+    icon: '🌍',
+    requiredFields: ['world_system'],
+    optionalFields: ['power_system', 'races'],
+    aiPromptCategory: 'isekai',
+    description: 'Xuyên không sang thế giới khác, sinh tồn và phát triển',
+    example: 'Xuyên không sang dị giới, xây dựng lãnh địa, chinh phục...',
+    compositionTargets: {
+      dialogue: [30, 40],
+      description: [35, 45],
+      inner: [15, 25]
+    },
+    topics: [
+      {
+        id: 'di-gioi-lanh-chua',
+        name: 'Lãnh Chúa',
+        description: 'Xuyên không sang dị giới, xây dựng lãnh địa từ vùng đất hoang, phát triển thành vương quốc',
+        example: 'Xuyên không thành lãnh chúa vùng biên giới, phát triển lãnh địa bằng kiến thức hiện đại...',
+        topicPromptHints: [
+          'Xây dựng lãnh địa phải có progression rõ: làng nhỏ → thị trấn → thành phố → vương quốc — mỗi giai đoạn cần tài nguyên, nhân lực, công nghệ khác nhau',
+          'Kiến thức hiện đại áp dụng vào dị giới: nông nghiệp (luân canh, phân bón), quân sự (đội hình, vũ khí), quản lý (luật pháp, thuế) — nhưng phải adapt cho bối cảnh dị giới',
+          'Quan hệ ngoại giao dị giới: các lãnh chúa khác, vương quốc, chủng tộc — liên minh, thương mại, chiến tranh. MC không chỉ xây mà phải bảo vệ',
+          'Dân cư đa dạng: con người, tiểu yêu, thú nhân, lùn — mỗi chủng tộc có kỹ năng riêng, quản lý đa chủng tộc = thử thách lớn',
+        ],
+      },
+      {
+        id: 'di-gioi-sinh-ton',
+        name: 'Sinh Tồn',
+        description: 'Sinh tồn trong dị giới nguy hiểm, quái vật, môi trường khắc nghiệt',
+        example: 'Xuyên không sang rừng rậm dị giới đầy quái vật, phải sinh tồn từ con số 0...',
+        topicPromptHints: [
+          'Dị giới phải thực sự nguy hiểm: quái vật ở khắp nơi, thực vật có thể ăn thịt người, thời tiết cực đoan — sống qua 1 ngày đã là thành tựu lớn ban đầu',
+          'Sinh tồn = học hỏi liên tục: MC phải tìm hiểu đặc tính từng loài quái vật, thực vật ăn được, cách tạo nơi trú ẩn — knowledge progression song song combat progression',
+          'Quái vật dị giới phải độc đáo: không chỉ "sói lớn hơn" mà có đặc tính kỳ lạ (phun acid, ngụy trang, kiểm soát tâm trí) — mỗi cuộc chiến cần chiến thuật riêng',
+          'Từ sinh tồn → thịnh vượng: dần dần MC không chỉ sống sót mà bắt đầu thuần hóa quái vật, khai thác tài nguyên, xây căn cứ — arc chuyển dần sang building',
+        ],
+      },
+      {
+        id: 'di-gioi-kinh-doanh',
+        name: 'Kinh Doanh',
+        description: 'Buôn bán giữa hai thế giới hoặc kinh doanh ở dị giới bằng kiến thức hiện đại',
+        example: 'Mở cổng giữa Trái Đất và dị giới, buôn bán vật phẩm hai chiều kiếm tiền...',
+        topicPromptHints: [
+          'Chênh lệch công nghệ = lợi nhuận: đồ thường ở Trái Đất (bật lửa, gương, gia vị) là đồ quý ở dị giới, ngược lại thảo dược/khoáng vật dị giới là kho báu ở Trái Đất',
+          'Kinh doanh xuyên giới cần logistics: cách vận chuyển hàng hóa qua cổng, bảo quản, che giấu — mỗi chuyến hàng = 1 mini adventure',
+          'Đối tác dị giới đa dạng: thương nhân lùn (tinh ranh), thương gia yêu tộc (kiêu ngạo), lái buôn nhân loại (thực dụng) — mỗi đối tác cần cách tiếp cận khác',
+          'Quy mô kinh doanh tăng dần: bán lẻ → bán sỉ → thương hội → đế chế thương mại — kéo theo ảnh hưởng chính trị và quân sự',
+        ],
+      },
+      {
+        id: 'di-gioi-he-thong',
+        name: 'Hệ Thống',
+        description: 'Có hệ thống golden finger (bảng trạng thái, quest, shop) khi xuyên không sang dị giới',
+        example: 'Xuyên không sang dị giới kèm hệ thống game: bảng trạng thái, quest, shop mua skill...',
+        topicPromptHints: [
+          'Hệ thống phải có giới hạn rõ: shop có tiền tệ riêng (điểm kinh nghiệm, điểm nhiệm vụ), quest có deadline và hình phạt, skill có cooldown — KHÔNG phải "muốn gì mua nấy"',
+          'Quest hệ thống phải thú vị: không chỉ "giết 10 con sói" mà có quest chain, quest ẩn, quest chọn lựa (phần thưởng A hoặc B) — tạo vòng lặp dopamine',
+          'Hệ thống tương tác với thế giới dị giới: cư dân dị giới không có hệ thống, MC có lợi thế bất công — nhưng hệ thống cũng thu hút chú ý nguy hiểm (thần linh, kẻ mạnh)',
+          'Level up phải có cảm giác mạnh: mỗi level mở khóa skill/perk mới, stats tăng rõ rệt — nhưng quest cũng khó dần, kẻ thù mạnh dần, đảm bảo tension',
+        ],
+      },
+      {
+        id: 'di-gioi-nong-trang',
+        name: 'Nông Trại',
+        description: 'Nông trại hoặc điền viên ở dị giới, trồng trọt chăn nuôi sinh vật kỳ lạ',
+        example: 'Xuyên không sang dị giới mở nông trại, trồng linh thảo, nuôi thần thú nhỏ...',
+        topicPromptHints: [
+          'Nông trại dị giới khác nông trại thường: trồng linh thảo (cần linh khí, thời gian dài, có thể nổ), nuôi thần thú (mỗi loài có tính cách, cần thức ăn đặc biệt) — tạo farming loop nghiện',
+          'Progression nông trại: mảnh đất nhỏ → trang trại → đại nông trang → thiên phủ vườn — mỗi cấp mở khóa giống cây/thú mới, đất mở rộng, công nghệ nông nghiệp dị giới',
+          'Sản phẩm nông trại = tiền tệ trong dị giới: linh thảo dùng luyện đan, thần thú bán cho thế gia, lương thực cung cấp cho quân đội — ai kiểm soát lương thực = quyền lực',
+          'Slice-of-life + adventure: ban ngày chăm nông trại (healing), đêm đuổi quái vật xâm nhập, cuối tuần đi phiên chợ dị giới bán hàng — nhịp sống thú vị',
+        ],
+      },
+      {
+        id: 'di-gioi-quan-su',
+        name: 'Quân Sự',
+        description: 'Chinh phạt quân sự dị giới, xây dựng quân đội, chiến tranh quy mô lớn',
+        example: 'Xuyên không thành tướng quân dị giới, dùng chiến thuật hiện đại đánh bại đội quân ma tộc...',
+        topicPromptHints: [
+          'Chiến thuật hiện đại áp dụng vào dị giới: đội hình, hậu cần, tình báo, chiến tranh tâm lý — nhưng phải adapt cho magic/quái vật: pháo binh ≠ pháp sư, kỵ binh ≠ phi kỵ',
+          'Xây dựng quân đội từ yếu đến mạnh: tuyển binh → huấn luyện → trang bị → thực chiến — mỗi giai đoạn có thử thách (binh lính sợ hãi, thiếu vũ khí, nội gián)',
+          'Chiến tranh quy mô lớn phải có chiều sâu: không chỉ "2 đội quân đánh nhau" mà có tuyến phòng thủ, đường tiếp tế, tinh thần quân, thời tiết — mỗi trận đánh = arc chiến lược',
+          'Chính trị quân sự: liên minh với các phe phái dị giới, đàm phán đầu hàng, quản lý vùng chiếm đóng — chiến thắng trên chiến trường chỉ là nửa cuộc chiến',
+        ],
+      },
+      {
+        id: 'di-gioi-mo-tiem',
+        name: 'Mở Tiệm',
+        description: 'Mở cửa hàng hoặc tiệm ở dị giới, phục vụ khách hàng đa chủng tộc',
+        example: 'Mở tiệm thuốc ở thị trấn dị giới, chữa bệnh cho cả người lẫn thú nhân...',
+        topicPromptHints: [
+          'Tiệm ở dị giới phải độc đáo: tiệm thuốc (chữa bệnh + giải độc quái vật), tiệm rèn (vũ khí ma thuật), quán ăn (món ăn từ nguyên liệu dị giới) — sản phẩm phải match thế giới',
+          'Khách hàng đa dạng = câu chuyện đa dạng: mạo hiểm giả cần trang bị, quý tộc cần xa xỉ phẩm, pháp sư cần nguyên liệu — mỗi khách hàng mang theo 1 câu chuyện nhỏ',
+          'Tiệm phát triển → MC phát triển: bắt đầu từ tiệm nhỏ → dần nổi tiếng → khách hàng cấp cao tìm đến → ảnh hưởng đến thế giới — progression tự nhiên không cưỡng ép',
+          'Slice-of-life healing kết hợp adventure: phục vụ khách ban ngày (ấm áp), đi thu thập nguyên liệu hiếm (nguy hiểm), xử lý rắc rối (kịch tính) — nhịp phim đa dạng',
+        ],
+      },
+    ]
+  },
+  'ngon-tinh': {
+    name: 'Ngôn Tình',
+    icon: '💕',
+    requiredFields: ['romance_type'],
+    optionalFields: ['setting', 'character_dynamics'],
+    aiPromptCategory: 'romance',
+    description: 'Ngôn tình, lãng mạn, tình cảm, sủng văn',
+    example: 'Tổng tài bá đạo, ngọt sủng, tình yêu vượt giai cấp...',
+    compositionTargets: {
+      dialogue: [40, 55],
+      description: [25, 35],
+      inner: [20, 30]
+    },
+    topics: [
+      {
+        id: 'ngon-tinh-tong-tai',
+        name: 'Tổng Tài',
+        description: 'Tổng tài giàu có yêu cô gái bình thường, romance giàu-nghèo',
+        example: 'CEO tập đoàn bá đạo lạnh lùng gặp cô nhân viên cứng đầu...',
+        topicPromptHints: [
+          'Tổng tài phải có lý do hấp dẫn ngoài tiền: tài năng kinh doanh thật sự, quá khứ bi thương tạo tính cách lạnh lùng, khoảnh khắc yếu đuối chỉ thể hiện trước nữ chính — không phải chỉ "giàu và đẹp trai"',
+          'Nữ chính phải có bản lĩnh riêng: không phải "gặp tổng tài đổi đời" mà có sự nghiệp, mục tiêu, lòng tự trọng — sức hút đến từ tính cách, không phải ngoại hình',
+          'Khoảng cách giai cấp = nguồn xung đột: gia đình tổng tài phản đối, đồng nghiệp ghen ghét, truyền thông soi mói — mỗi thử thách kiểm tra tình yêu',
+          'Sủng ngọt phải tự nhiên: không phải "đưa thẻ đen" 5 trang liên tiếp, mà là hành động nhỏ tinh tế (nhớ sở thích, bảo vệ lặng lẽ, thay đổi thói quen) — sủng bằng chi tiết',
+        ],
+      },
+      {
+        id: 'ngon-tinh-co-dai',
+        name: 'Cổ Đại',
+        description: 'Ngôn tình cổ trang, hậu cung, hoàng tử-công chúa, tình yêu trong triều đình',
+        example: 'Nữ chính xuyên không thành thê tử bỏ, dùng trí tuệ hiện đại chinh phục vương gia...',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'Bối cảnh cổ đại phải chân thực: phong tục, lễ nghi, phân chia đẳng cấp (đích/thứ, chính/thiếp), quy tắc xã hội — nữ chính phải navigate trong hệ thống phong kiến',
+          'Hậu cung/nội trạch = chiến trường: tranh sủng, đố kỵ, vu hãm — nhưng nữ chính dùng trí tuệ thay vì thủ đoạn bẩn, giữ phẩm giá trong mưu đồ',
+          'Tình yêu cổ đại phải có rào cản đặc thù: kẻ thù gia tộc, hôn ước chính trị, thân phận chênh lệch, hoàng đế chỉ hôn — stakes cao hơn romance hiện đại',
+          'Nữ chính cổ đại phải mạnh mẽ theo cách phù hợp thời đại: thông minh, khéo léo, biết tiến biết lùi — không phải "hiện đại hóa" hoàn toàn mà adapt kiến thức vào bối cảnh',
+        ],
+      },
+      {
+        id: 'ngon-tinh-do-thi',
+        name: 'Đô Thị',
+        description: 'Tình cảm đô thị hiện đại, cuộc sống công sở, tình yêu trong thành phố',
+        example: 'Hai đồng nghiệp ghét nhau dần phát hiện tình cảm, vượt qua hiểu lầm...',
+        topicPromptHints: [
+          'Setting đô thị phải chân thực: công sở, quán cà phê, chung cư, công viên — mô tả cuộc sống thành phố quen thuộc để người đọc đồng cảm',
+          'Tình yêu phát triển tự nhiên: từ xa lạ → quen biết → hiểu nhau → rung động → thổ lộ — KHÔNG yêu ngay từ cái nhìn đầu tiên (trừ khi là crush lâu năm)',
+          'Xung đột hiện đại thực tế: công việc bận rộn, ex quay lại, gia đình áp lực kết hôn, khoảng cách địa lý — vấn đề người đọc gặp trong đời thực',
+          'Chemistry thể hiện qua tương tác nhỏ: tin nhắn lúc đêm khuya, chia sẻ tai nghe, che ô khi mưa, nấu ăn cho nhau — không cần cảnh hùng tráng, chi tiết nhỏ đủ rung động',
+        ],
+      },
+      {
+        id: 'ngon-tinh-xuyen-khong',
+        name: 'Xuyên Không',
+        description: 'Xuyên không ngôn tình, mang kiến thức hiện đại vào tình yêu cổ đại/dị giới',
+        example: 'Nữ chính xuyên không thành vai phản diện trong tiểu thuyết, quyết tâm thay đổi số phận...',
+        worldSetting: 'parallel' as const,
+        topicPromptHints: [
+          'Xuyên không = xung đột văn hóa: tư tưởng hiện đại (bình đẳng, tự do yêu) vs xã hội cổ đại (hôn ước, thê thiếp, nam tôn nữ ti) — nữ chính phải cân bằng, không phải "ép hiện đại lên cổ đại"',
+          'Nếu xuyên vào tiểu thuyết: nữ chính biết plot, biết ai là nam chính, biết mình "phải chết" — dùng kiến thức này để thay đổi số phận nhưng plot cũng thay đổi theo',
+          'Kiến thức hiện đại gây ấn tượng: nấu ăn ngon, kiến thức y học, cách nói chuyện — thu hút nam chính bằng sự khác biệt, không phải ngoại hình',
+          'Nỗi nhớ thế giới cũ: nữ chính đôi lúc nhớ nhà, nhớ gia đình, nhớ cuộc sống tiện nghi — tạo chiều sâu cảm xúc, không phải "vui vẻ adapt ngay"',
+        ],
+      },
+      {
+        id: 'ngon-tinh-trong-sinh',
+        name: 'Trọng Sinh',
+        description: 'Trọng sinh sống lại cuộc đời, sửa sai trong tình yêu, phục thù kẻ phản bội',
+        example: 'Kiếp trước bị chồng và em gái hại chết, trọng sinh sống lại để phục thù và tìm tình yêu thật...',
+        topicPromptHints: [
+          'Kiếp trước phải đau đớn cụ thể: bị phản bội bởi ai (chồng, bạn thân, gia đình), hậu quả (mất con, mất tài sản, chết oan) — tạo động lực mãnh liệt cho kiếp này',
+          'Phục thù phải tinh vi: không phải "tát vào mặt kẻ thù" mà bày mưu, phá hủy dần dần — trả thù bằng trí tuệ, mỗi bước phục thù = 1 arc thỏa mãn',
+          'Tình yêu mới khác kiếp trước: kiếp trước mù quáng, kiếp này tỉnh táo — nhận ra ai thật sự tốt, ai giả vờ. Nam chính mới phải chứng minh bằng hành động',
+          'Nội tâm trọng sinh sâu sắc: nữ chính 30 tuổi trong thân 18 tuổi — trưởng thành, bình tĩnh, nhưng đôi lúc đau khi nhớ kiếp trước — chiều sâu tâm lý là điểm mạnh',
+        ],
+      },
+      {
+        id: 'ngon-tinh-hao-mon',
+        name: 'Hào Môn',
+        description: 'Tình yêu trong giới thượng lưu, gia tộc hào môn, cuộc chiến nội bộ gia đình giàu có',
+        example: 'Cô gái bình thường bước vào gia đình tỷ phú, đối mặt mẹ chồng khắc nghiệt...',
+        topicPromptHints: [
+          'Hào môn phải có cấu trúc gia tộc rõ: ông bà patriarch, các nhánh tranh giành, thế hệ kế thừa, tài sản phân chia — mỗi thành viên có mục đích riêng',
+          'Nữ chính hào môn phải chứng minh giá trị: không phải chỉ "được nam chính bảo vệ" mà tự mình chinh phục — bằng tài năng, bản lĩnh, sự khéo léo',
+          'Xung đột hào môn đa tầng: mẹ chồng thử thách, em chồng ganh ghét, đối thủ kinh doanh phá hoại hôn nhân, truyền thông soi mói — áp lực từ mọi phía',
+          'Tình yêu hào môn có cái giá: mất tự do, mất bạn bè bình thường, mọi hành động bị đánh giá — nữ chính phải quyết định: đáng hay không đáng?',
+        ],
+      },
+      {
+        id: 'ngon-tinh-ngot-sung',
+        name: 'Ngọt Sủng',
+        description: 'Sủng ngọt ngào không ngược, nam chính sủng nữ chính không điều kiện',
+        example: 'Nam chính lạnh lùng với thiên hạ nhưng ngọt ngào chiều chuộng nữ chính...',
+        topicPromptHints: [
+          'Sủng phải có chiều sâu: không phải chỉ "mua quà đắt tiền" mà thể hiện qua sự thấu hiểu — nhớ sở thích nhỏ, bảo vệ lặng lẽ, hy sinh không nói, thay đổi thói quen vì đối phương',
+          'Ngọt ngào nhưng vẫn có plot: không phải 1000 chương chỉ hẹn hò — có xung đột bên ngoài (đối thủ, gia đình, sự nghiệp) để tình yêu thêm đáng quý',
+          'Chemistry phải tự nhiên: banter dí dỏm, hiểu ý nhau không cần nói, khoảnh khắc bất chợt rung động — viết tương tác vui vẻ, không sến',
+          'Khoảnh khắc ngọt phải đa dạng: không chỉ "ôm hôn" mà còn nấu ăn cùng, đi siêu thị, chăm sóc lúc ốm, nhắn tin dễ thương — ngọt trong đời thường',
+        ],
+      },
+      {
+        id: 'ngon-tinh-phuc-thu',
+        name: 'Phục Thù',
+        description: 'Nữ chính mạnh mẽ phục thù kẻ phản bội, kết hợp lãng mạn với dark theme',
+        example: 'Bị bạn thân và chồng phản bội, nữ chính lột xác phục thù, gặp nam chính mới...',
+        topicPromptHints: [
+          'Nữ chính phục thù phải lột xác thuyết phục: từ ngây thơ → tỉnh táo, từ yếu đuối → mạnh mẽ — quá trình biến đổi cần thời gian và sự kiện, không phải "bỗng nhiên thay đổi"',
+          'Kế hoạch phục thù phải tinh vi: phá hủy sự nghiệp, phá hủy danh tiếng, phá hủy mối quan hệ của kẻ thù — mỗi bước phục thù = 1 arc thỏa mãn',
+          'Nam chính mới là đồng minh, không phải cứu tinh: hỗ trợ nhưng tôn trọng nữ chính tự chiến đấu — tình yêu xây trên sự bình đẳng và tôn trọng',
+          'Cân bằng dark và sweet: phục thù (dark, mưu mô, căng thẳng) xen kẽ lãng mạn (ngọt ngào, chữa lành, ấm áp) — nhịp phim xen kẽ tạo trải nghiệm đọc phong phú',
+        ],
+      },
     ]
   }
 };

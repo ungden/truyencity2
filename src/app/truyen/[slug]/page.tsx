@@ -121,29 +121,13 @@ export default async function NovelDetailPage({
   // Get stats from database
   const supabase = await createServerClient();
   
-  // Parallel fetch: views, bookmarks, rating stats
-  const [viewResult, bookmarkResult, ratingRaw] = await Promise.all([
-    supabase
-      .from('chapter_reads')
-      .select('*', { count: 'exact', head: true })
-      .eq('novel_id', novel.id),
-    supabase
-      .from('bookmarks')
-      .select('*', { count: 'exact', head: true })
-      .eq('novel_id', novel.id),
-    supabase
-      .from('ratings')
-      .select('score')
-      .eq('novel_id', novel.id),
-  ]);
-
-  const totalViews = viewResult.count || 0;
-  const totalBookmarks = bookmarkResult.count || 0;
-  const ratingScores = ratingRaw.data || [];
-  const ratingCount = ratingScores.length;
-  const ratingAvg = ratingCount > 0
-    ? Math.round((ratingScores.reduce((s: number, r: { score: number }) => s + r.score, 0) / ratingCount) * 100) / 100
-    : 0;
+  // Fetch all stats via single DB RPC call (views, bookmarks, ratings, comments, chapters)
+  const { data: statsData } = await supabase.rpc('get_novel_stats', { p_novel_id: novel.id });
+  const stats = statsData ? (typeof statsData === 'string' ? JSON.parse(statsData) : statsData) : null;
+  const totalViews = stats?.view_count ?? 0;
+  const totalBookmarks = stats?.bookmark_count ?? 0;
+  const ratingCount = stats?.rating_count ?? 0;
+  const ratingAvg = stats?.rating_avg ?? 0;
 
   let mainGenre: (typeof GENRE_CONFIG)[keyof typeof GENRE_CONFIG] | null = null;
   let topic: Topic | null = null;

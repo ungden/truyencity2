@@ -4,33 +4,20 @@ import { RatingSubmitSchema, ValidationError, createValidationErrorResponse } fr
 
 export const maxDuration = 10;
 
-// Helper: compute rating stats using DB-level count + limited score fetch
+// Helper: compute rating stats using DB-level AVG via RPC
 async function getRatingStats(supabase: Awaited<ReturnType<typeof createServerClient>>, novelId: string) {
-  // Use Supabase head:true + count:'exact' to get count without fetching rows
-  const { count } = await supabase
-    .from('ratings')
-    .select('*', { count: 'exact', head: true })
-    .eq('novel_id', novelId);
+  const { data, error } = await supabase.rpc('get_novel_stats', { p_novel_id: novelId });
 
-  const rating_count = count ?? 0;
-
-  if (rating_count === 0) {
+  if (error || !data) {
+    console.warn('[ratings] get_novel_stats RPC failed:', error?.message);
     return { rating_count: 0, rating_avg: 0 };
   }
 
-  // Fetch only scores (lightweight — just one column) for average calculation
-  // Note: true DB aggregate (AVG via RPC) would be ideal for 10K+ ratings per novel,
-  // but score-only select is efficient enough for current scale
-  const { data: scores } = await supabase
-    .from('ratings')
-    .select('score')
-    .eq('novel_id', novelId);
-
-  const scoreList = scores || [];
-  const rating_avg = scoreList.length > 0
-    ? Math.round((scoreList.reduce((s, r) => s + r.score, 0) / scoreList.length) * 100) / 100
-    : 0;
-  return { rating_count, rating_avg };
+  const stats = typeof data === 'string' ? JSON.parse(data) : data;
+  return {
+    rating_count: stats.rating_count ?? 0,
+    rating_avg: stats.rating_avg ?? 0,
+  };
 }
 
 // GET /api/ratings?novel_id=xxx — get current user's rating + avg

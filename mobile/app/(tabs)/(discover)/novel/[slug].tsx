@@ -132,25 +132,21 @@ export default function NovelDetailScreen() {
           .from("bookmarks")
           .select("id", { count: "exact", head: true })
           .eq("novel_id", data.id),
-        supabase
-          .from("ratings")
-          .select("rating")
-          .eq("novel_id", data.id)
-          .limit(500),
+        supabase.rpc("get_novel_stats", { p_novel_id: data.id }),
       ]);
 
       setChapters(chapterRes.data || []);
 
-      const ratings = ratingsRes.data || [];
-      const avgRating =
-        ratings.length > 0
-          ? ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length
-          : 0;
+      const ratingStats = ratingsRes.data
+        ? typeof ratingsRes.data === "string"
+          ? JSON.parse(ratingsRes.data)
+          : ratingsRes.data
+        : null;
       setStats({
-        views: viewsRes.count || 0,
-        bookmarks: bookmarksRes.count || 0,
-        rating: Math.round(avgRating * 10) / 10,
-        ratingCount: ratings.length,
+        views: ratingStats?.view_count ?? viewsRes.count ?? 0,
+        bookmarks: ratingStats?.bookmark_count ?? bookmarksRes.count ?? 0,
+        rating: Math.round((ratingStats?.rating_avg ?? 0) * 10) / 10,
+        ratingCount: ratingStats?.rating_count ?? 0,
       });
 
       // Bookmark status
