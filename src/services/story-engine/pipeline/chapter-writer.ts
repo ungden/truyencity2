@@ -286,10 +286,13 @@ SỨC MẠNH: Tối đa ${ENGAGEMENT_CHECKLIST.powerBudget.perArcRules.maxPowerU
 ${CLIFFHANGER_TECHNIQUES.map((c: { name: string; example: string }) => '- ' + c.name + ': ' + c.example).join('\n')}
 ⚠️ QUAN TRỌNG: Context đã liệt kê [CLIFFHANGER ĐÃ DÙNG]. Bạn PHẢI chọn loại KHÁC. Nếu 3 chương gần nhất đều dùng Threat → chọn Revelation/Choice/Pending Result/v.v.`;
 
+  // Extract foreshadowing hints for forceful injection into Architect prompt
+  const foreshadowingInjection = extractForeshadowingForArchitect(context);
+
   // Token budget: progressively trim context if total prompt exceeds ~120K chars (~30K tokens)
   const MAX_PROMPT_CHARS = 120_000;
   let trimmedContext = context;
-  const staticParts = [constraintSection, topicSection, titleRules, emotionalArcGuide, finalArcGuide, engagementGuide].join('').length + 2000; // overhead
+  const staticParts = [constraintSection, topicSection, titleRules, emotionalArcGuide, finalArcGuide, engagementGuide, foreshadowingInjection].join('').length + 2000; // overhead
   if (trimmedContext.length + staticParts > MAX_PROMPT_CHARS) {
     // Trim context to fit budget
     trimmedContext = trimmedContext.slice(0, MAX_PROMPT_CHARS - staticParts);
@@ -302,7 +305,7 @@ ${trimmedContext}
 
 ${constraintSection}
 ${topicSection}
-
+${foreshadowingInjection}
 ${titleRules}
 
 Target: ${targetWords} từ. Tối thiểu ${minScenes} scenes (mỗi ~${wordsPerScene} từ).
@@ -458,10 +461,24 @@ async function runWriter(
   const charMatch = context.match(/\[NHÂN VẬT HIỆN TẠI[^\]]*\][\s\S]*?(?=\n\n\[|$)/);
   if (charMatch) writerContextParts.push(charMatch[0]);
   // Quality modules (foreshadowing, character arc, pacing, voice, power, world)
-  for (const tag of ['FORESHADOWING', 'CHARACTER ARC', 'PACING', 'VOICE', 'POWER', 'WORLD', 'LOCATION']) {
+  // Per-module budgets: foreshadowing/character-arc need more space (per-hint/per-character data)
+  const qualityModuleBudgets: Record<string, number> = {
+    'FORESHADOWING': 1500, 'CHARACTER ARC': 1500,
+    'PACING': 600, 'VOICE': 600, 'POWER': 600, 'WORLD': 600, 'LOCATION': 600,
+  };
+  for (const tag of Object.keys(qualityModuleBudgets)) {
     const regex = new RegExp(`\\[${tag}[^\\]]*\\][\\s\\S]*?(?=\\n\\n\\[|$)`);
     const match = context.match(regex);
-    if (match) writerContextParts.push(match[0].slice(0, 800));
+    if (match) {
+      const budget = qualityModuleBudgets[tag];
+      const text = match[0];
+      if (text.length <= budget) {
+        writerContextParts.push(text);
+      } else {
+        const cutPoint = text.lastIndexOf('\n', budget);
+        writerContextParts.push(cutPoint > budget * 0.5 ? text.slice(0, cutPoint) : text.slice(0, budget));
+      }
+    }
   }
   const writerContext = writerContextParts.join('\n\n');
 
@@ -590,6 +607,9 @@ async function runCritic(
   // Build repetition report for Critic
   const repetitionReport = buildRepetitionReport(content);
 
+  // Extract quality module expectations for compliance verification
+  const qualityComplianceSection = buildQualityComplianceSection(previousContext);
+
   const prompt = `Đánh giá chương nghiêm túc:
 
 ${crossChapterSection}OUTLINE: ${outline.title} — ${outline.summary}
@@ -606,7 +626,7 @@ ${repetitionReport}
 
 BÁO CÁO TÍN HIỆU CHẤT LƯỢNG (tự động phân tích):
 ${buildSignalReport(content)}
-
+${qualityComplianceSection}
 NỘI DUNG CHƯƠNG (FULL):
 ${contentPreview}
 
@@ -633,7 +653,13 @@ KIỂM TRA CHẤT LƯỢNG BỔ SUNG (BẮT BUỘC):
 - LẶP TỪ: Dùng BÁO CÁO LẶP TỪ ở trên. >8 lần → severity "critical", requiresRewrite=true. >5 lần → severity "moderate". CHỈ "major" nếu ≥3 nhóm từ đều >5.
 - NỘI TÂM: Nếu thiếu nội tâm đa lớp → severity "minor". CHỈ "moderate" nếu toàn bộ chương không có.
 - GIỌNG NÓI: ≥3 nhân vật giống nhau → severity "moderate". 2 nhân vật → "minor".
-- NHỊP ĐIỆU: Toàn bộ scenes cùng cường độ → pacingScore tối đa 5`;
+- NHỊP ĐIỆU: Toàn bộ scenes cùng cường độ → pacingScore tối đa 5
+
+KIỂM TRA TUÂN THỦ QUALITY MODULES (NẾU CÓ THÔNG TIN):
+- FORESHADOWING: Nếu mục "YÊU CẦU TUÂN THỦ" có hint cần gieo (GIEO HINT BẮT BUỘC) mà chương KHÔNG chứa chi tiết tương ứng → type "quality", severity "major", description nêu rõ hint bị bỏ qua.
+  Nếu có hint cần PAYOFF mà chương không callback → type "quality", severity "major".
+- CHARACTER VOICE: Nếu có "signature traits" (câu cửa miệng, thói quen, cách nói) cho nhân vật xuất hiện trong chương mà nhân vật đó KHÔNG thể hiện bất kỳ trait nào → type "quality", severity "moderate".
+- PACING BLUEPRINT: Nếu pacing blueprint chỉ định mood (VD: "CALM BEFORE STORM", "CLIMAX") mà chương viết hoàn toàn ngược (VD: blueprint là calm nhưng toàn action cao trào) → type "pacing", severity "moderate".`;
 
   try {
     const res = await callGemini(prompt, { ...config, temperature: 0.2, maxTokens: 4096, systemPrompt: CRITIC_SYSTEM }, { jsonMode: true });
@@ -1205,6 +1231,121 @@ function buildVocabularyHints(outline: ChapterOutline, vocabulary: VocabularyGui
   hints.push(`Xưng hô ngang hàng: ${vocabulary.honorifics?.peer?.slice(0, 4).join(', ') || ''}`);
 
   return hints.join('\n');
+}
+
+/**
+ * Extract foreshadowing GIEO/PAYOFF hints from context and format as
+ * forceful instructions for the Architect. This ensures the Architect
+ * explicitly plans scenes that incorporate pending foreshadowing hints
+ * rather than leaving them buried in the general context.
+ */
+function extractForeshadowingForArchitect(context: string): string {
+  if (!context) return '';
+
+  const foreshadowMatch = context.match(/═══ FORESHADOWING[\s\S]*?(?=═══ [A-Z]|\[|$)/);
+  if (!foreshadowMatch) return '';
+
+  const parts: string[] = [];
+
+  // Extract GIEO hints (must plant)
+  const plantMatches = [...foreshadowMatch[0].matchAll(/🌱 GIEO HINT\s*\[([^\]]+)\]:\s*(.+)/g)];
+  if (plantMatches.length > 0) {
+    parts.push('🌱 FORESHADOWING — GIEO BẮT BUỘC (Architect PHẢI lên kế hoạch scene chứa hint):');
+    for (const m of plantMatches) {
+      parts.push(`  - [${m[1]}] ${m[2].trim().slice(0, 200)}`);
+    }
+    parts.push('  → Chọn scene PHÙ HỢP NHẤT để gieo hint một cách TỰ NHIÊN. Ghi rõ trong scene goal/resolution.');
+  }
+
+  // Extract PAYOFF hints (must resolve)
+  const payoffMatches = [...foreshadowMatch[0].matchAll(/💥 PAYOFF HINT:\s*(.+)/g)];
+  const payoffDescMatches = [...foreshadowMatch[0].matchAll(/→ Callback rõ ràng:\s*"([^"]+)"/g)];
+  if (payoffMatches.length > 0) {
+    parts.push('💥 FORESHADOWING — PAYOFF BẮT BUỘC (Architect PHẢI tạo scene callback):');
+    for (let i = 0; i < payoffMatches.length; i++) {
+      const hint = payoffMatches[i][1].trim().slice(0, 200);
+      const desc = payoffDescMatches[i]?.[1] || '';
+      parts.push(`  - Hint: ${hint}${desc ? ` → Payoff: ${desc}` : ''}`);
+    }
+    parts.push('  → Tạo khoảnh khắc "à, hóa ra hồi đó..." — người đọc nhớ lại chi tiết gốc.');
+  }
+
+  // Extract overdue hints
+  const overdueMatches = [...foreshadowMatch[0].matchAll(/⏰ OVERDUE HINT[^:]*:\s*"([^"]+)"\s*→\s*"([^"]+)"/g)];
+  if (overdueMatches.length > 0) {
+    parts.push('⏰ FORESHADOWING — SẮP HẾT HẠN (ưu tiên cao):');
+    for (const m of overdueMatches) {
+      parts.push(`  - "${m[1].slice(0, 150)}" → payoff: "${m[2].slice(0, 150)}"`);
+    }
+    parts.push('  → Bắt đầu setup payoff NGAY trong chương này.');
+  }
+
+  if (parts.length === 0) return '';
+  return '\n' + parts.join('\n') + '\n';
+}
+
+/**
+ * Extract quality module expectations from context for Critic compliance verification.
+ * Pulls foreshadowing hints, character signature traits, and pacing mood
+ * so the Critic can verify the Writer actually used them.
+ */
+function buildQualityComplianceSection(context: string): string {
+  if (!context) return '';
+  const parts: string[] = [];
+
+  // Extract foreshadowing hints (GIEO and PAYOFF sections)
+  const foreshadowMatch = context.match(/═══ FORESHADOWING[\s\S]*?(?=═══ [A-Z]|$)/);
+  if (foreshadowMatch) {
+    const hintLines: string[] = [];
+    const plantMatches = foreshadowMatch[0].matchAll(/🌱 GIEO HINT[^:]*:\s*(.+)/g);
+    for (const m of plantMatches) hintLines.push(`- GIEO: ${m[1].trim().slice(0, 150)}`);
+    const payoffMatches = foreshadowMatch[0].matchAll(/💥 PAYOFF HINT:\s*(.+)/g);
+    for (const m of payoffMatches) hintLines.push(`- PAYOFF: ${m[1].trim().slice(0, 150)}`);
+
+    if (hintLines.length > 0) {
+      parts.push('YÊU CẦU TUÂN THỦ — FORESHADOWING:');
+      parts.push(...hintLines);
+    }
+  }
+
+  // Extract character signature traits
+  const charArcMatch = context.match(/═══ CHARACTER ARCS[\s\S]*?(?=═══ [A-Z]|$)/);
+  if (charArcMatch) {
+    const traitLines: string[] = [];
+    const charBlocks = charArcMatch[0].matchAll(/【([^】]+)】[\s\S]*?(?=【|$)/g);
+    for (const block of charBlocks) {
+      const name = block[1];
+      const traits: string[] = [];
+      const speechMatch = block[0].match(/🗣 Cách nói:\s*(.+)/);
+      if (speechMatch) traits.push(`cách nói: ${speechMatch[1].trim()}`);
+      const catchphraseMatch = block[0].match(/💬 Câu cửa miệng:\s*"([^"]+)"/);
+      if (catchphraseMatch) traits.push(`câu cửa miệng: "${catchphraseMatch[1]}"`);
+      const habitMatch = block[0].match(/🔄 Thói quen:\s*(.+)/);
+      if (habitMatch) traits.push(`thói quen: ${habitMatch[1].trim()}`);
+      const quirkMatch = block[0].match(/🎭 Gap Moe:\s*(.+)/);
+      if (quirkMatch) traits.push(`quirk: ${quirkMatch[1].trim()}`);
+      if (traits.length > 0) {
+        traitLines.push(`- ${name}: ${traits.join(', ')}`);
+      }
+    }
+    if (traitLines.length > 0) {
+      parts.push('YÊU CẦU TUÂN THỦ — CHARACTER TRAITS:');
+      parts.push(...traitLines);
+    }
+  }
+
+  // Extract pacing mood
+  const pacingMatch = context.match(/═══ NHỊP TRUYỆN[\s\S]*?(?=═══ [A-Z]|$)/);
+  if (pacingMatch) {
+    const moodMatch = pacingMatch[0].match(/(BUILDUP|RISING|CALM BEFORE STORM|CLIMAX|AFTERMATH|TRAINING|VILLAIN FOCUS|COMEDIC BREAK|REVELATION|TRANSITION)/);
+    const intensityMatch = pacingMatch[0].match(/Cường độ:\s*(\d+)\/10/);
+    if (moodMatch) {
+      parts.push(`YÊU CẦU TUÂN THỦ — PACING: mood="${moodMatch[1]}"${intensityMatch ? `, cường độ=${intensityMatch[1]}/10` : ''}`);
+    }
+  }
+
+  if (parts.length === 0) return '';
+  return '\n' + parts.join('\n') + '\n';
 }
 
 function buildCharacterVoiceGuide(outline: ChapterOutline, worldBible?: string): string {

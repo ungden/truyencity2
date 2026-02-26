@@ -169,13 +169,15 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       getWorldContext(project.id, nextChapter).catch(() => null),
     ]);
 
-    // Cap quality module contexts to prevent unbounded growth (800 chars each)
-    if (foreshadowCtx) context.foreshadowingContext = foreshadowCtx.slice(0, 800);
-    if (charArcCtx) context.characterArcContext = charArcCtx.slice(0, 800);
-    if (pacingCtx) context.pacingContext = pacingCtx.slice(0, 800);
-    if (voiceCtx) context.voiceContext = voiceCtx.slice(0, 800);
-    if (powerCtx) context.powerContext = powerCtx.slice(0, 800);
-    if (worldCtx) context.worldContext = worldCtx.slice(0, 800);
+    // Smart truncation: per-module budgets, cut at section boundaries (newline)
+    // Foreshadowing & character arcs contain per-hint/per-character blocks → need more space
+    // Pacing/voice/power/world are shorter by nature → tighter budgets
+    if (foreshadowCtx) context.foreshadowingContext = smartTruncate(foreshadowCtx, 1500);
+    if (charArcCtx) context.characterArcContext = smartTruncate(charArcCtx, 1500);
+    if (pacingCtx) context.pacingContext = smartTruncate(pacingCtx, 600);
+    if (voiceCtx) context.voiceContext = smartTruncate(voiceCtx, 600);
+    if (powerCtx) context.powerContext = smartTruncate(powerCtx, 600);
+    if (worldCtx) context.worldContext = smartTruncate(worldCtx, 600);
   } catch {
     // Non-fatal
   }
@@ -435,6 +437,23 @@ function buildFinaleContext(chapterNumber: number, totalPlanned: number): string
   }
 
   return null;
+}
+
+// ── Smart Truncation ─────────────────────────────────────────────────────────
+
+/**
+ * Truncate text at the last newline boundary before maxChars.
+ * Preserves complete lines/sections instead of cutting mid-sentence.
+ * If no newline found before maxChars, falls back to hard cut.
+ */
+function smartTruncate(text: string, maxChars: number): string {
+  if (text.length <= maxChars) return text;
+  const cutPoint = text.lastIndexOf('\n', maxChars);
+  if (cutPoint > maxChars * 0.5) {
+    return text.slice(0, cutPoint);
+  }
+  // Fallback: no good newline boundary, cut at maxChars
+  return text.slice(0, maxChars);
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────

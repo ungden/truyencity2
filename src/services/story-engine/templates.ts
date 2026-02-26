@@ -479,7 +479,32 @@ export const GENRE_STYLES: Record<GenreType, StyleBible> = {
     innerThoughtRatio: [15, 25],
     actionRatio: [15, 25],
     pacingStyle: 'fast',
-    genreConventions: ['System/stats rõ ràng', 'Boss fights epic'],
+    genreConventions: [
+      // Nhân vật mẫu
+      'MC là game thủ thiên tài hoặc bình thường nhưng có hệ thống/class ẩn đặc biệt mà người khác không biết',
+      'Villain là PKer máu lạnh, guild master độc tài, hoặc GM/NPC boss có ý thức riêng',
+      'Đồng đội đa dạng class (tank, healer, DPS, support), mỗi người có personality và playstyle riêng',
+      'Nữ chính là top player/guild flower hoặc NPC có ý thức, ban đầu coi thường MC rồi dần nể phục',
+      // Tiến trình cốt truyện
+      'Hệ thống game rõ ràng: stats, level, skill tree, equipment grade, class system — PHẢI nhất quán',
+      'Mỗi 5-10 chương có 1 dungeon/raid mới, quy mô tăng dần: solo → party → guild raid → server boss',
+      'Tournament/PvP arena mỗi 15-20 chương: ranking match, guild war, cross-server battle',
+      // Hệ thống sức mạnh
+      'MC có hidden class/unique skill mà hệ thống chưa công bố, tạo bất ngờ khi sử dụng',
+      'Equipment upgrade loop: tìm nguyên liệu hiếm → craft/enhance → test trong dungeon → loot tốt hơn',
+      // Leo thang xung đột
+      'Xung đột từ PK cá nhân → guild war → server battle → cross-server war → world boss event',
+      'Mỗi lần MC thắng, lộ ra bí mật game lớn hơn: NPC có ý thức, thế giới game là thật, developer ẩn mưu',
+      // Phụ tuyến & hook
+      'Hidden quest/easter egg tạo sense of discovery: MC tìm được quest mà không ai biết, reward khủng',
+      'IRL stakes: game ảnh hưởng đời thực (tiền, sức khỏe, mạng sống) để tăng tension',
+      'Guild management: tuyển member, training, nội bộ drama, phản bội, tạo chiều sâu xã hội',
+      'Loot addiction: miêu tả chi tiết khi drop rare item, stats comparison, đám đông ghen tỵ',
+      // Exposition thông minh
+      'Game mechanics giải thích qua trải nghiệm và thử nghiệm, KHÔNG info-dump bảng stats dài',
+      // Multi-POV
+      'Đa góc nhìn: scene đối thủ chuẩn bị chiến thuật (POV rival), guild member ngưỡng mộ MC (POV ally), NPC quan sát player (POV NPC)',
+    ],
   },
   'dong-nhan': {
     authorVoice: 'Giọng văn tùy thuộc original, có twist',
@@ -491,7 +516,32 @@ export const GENRE_STYLES: Record<GenreType, StyleBible> = {
     innerThoughtRatio: [15, 25],
     actionRatio: [10, 20],
     pacingStyle: 'medium',
-    genreConventions: ['Callbacks tới original', 'Thay đổi số phận'],
+    genreConventions: [
+      // Nhân vật mẫu
+      'MC xuyên không/chuyển sinh vào thế giới anime/manga/game, mang theo kiến thức về plot gốc',
+      'MC có hệ thống hoặc golden finger riêng, KHÔNG phải nhân vật gốc bị nerf',
+      'Nhân vật gốc phải in-character: tính cách, cách nói, quyết định phải nhất quán với nguyên tác',
+      'Villain có thể là phản diện nguyên tác hoặc kẻ xuyên không khác, tạo mind game',
+      // Tiến trình cốt truyện
+      'Butterfly effect rõ ràng: mỗi hành động của MC tạo ra hệ quả khác nguyên tác, plot divergence tăng dần',
+      'Mỗi 5-10 chương giải quyết 1 event quan trọng của nguyên tác: MC can thiệp hoặc thay đổi kết quả',
+      'Timeline awareness: MC phải nhớ và chuẩn bị cho event sắp tới, tạo tension "kịp hay không kịp"',
+      // Hệ thống sức mạnh
+      'MC cướp cơ duyên của protagonist gốc hoặc tìm cơ duyên bị bỏ sót, tạo power divergence',
+      'Sức mạnh MC phát triển song song nhưng khác đường với protagonist gốc, so sánh tạo hứng thú',
+      // Leo thang xung đột
+      'Xung đột từ thay đổi nhỏ → butterfly effect lớn → timeline bất ổn → thế giới gốc biến dạng',
+      'MC phải đối mặt hệ quả của việc thay đổi plot: cứu người này nhưng vô tình hại người khác',
+      // Phụ tuyến & hook
+      'Fan service callback: đề cập đến sự kiện, câu nói, meme nổi tiếng của nguyên tác một cách tự nhiên',
+      'Protagonist gốc vẫn phát triển (có thể thành đồng minh hoặc đối thủ), tạo dynamic thú vị',
+      'Meta knowledge tension: MC biết tương lai nhưng không phải lúc nào cũng đúng (thế giới có biến)',
+      'Crossover hint: nếu multi-world, seed nhỏ cho thế giới tiếp theo từ sớm',
+      // Exposition thông minh
+      'Nguyên tác lore giới thiệu qua trải nghiệm MC và phản ứng so sánh, KHÔNG tóm tắt nguyên tác cho người đọc',
+      // Multi-POV
+      'Đa góc nhìn: scene protagonist gốc phản ứng khi plot thay đổi (POV original MC), villain nhận ra có biến (POV antagonist), side character thấy khác lạ (POV observer)',
+    ],
   },
   'mat-the': {
     authorVoice: 'Giọng văn căng thẳng, survival horror',
@@ -503,7 +553,32 @@ export const GENRE_STYLES: Record<GenreType, StyleBible> = {
     innerThoughtRatio: [15, 25],
     actionRatio: [15, 25],
     pacingStyle: 'fast',
-    genreConventions: ['Stakes cao', 'Character deaths có thể'],
+    genreConventions: [
+      // Nhân vật mẫu
+      'MC là người bình thường bị ném vào mạt thế, hoặc chuyển sinh biết trước tận thế sắp đến',
+      'MC phải có survival skills cụ thể: chiến đấu, y tế, xây dựng, lãnh đạo — KHÔNG phải siêu nhân từ đầu',
+      'Villain là con người tàn ác hơn cả zombie: kẻ cướp, lãnh đạo độc tài căn cứ, mad scientist',
+      'Đồng đội đa dạng: có người trung thành, có kẻ phản bội, có người hy sinh — KHÔNG AI an toàn tuyệt đối',
+      // Tiến trình cốt truyện
+      'Tài nguyên là trung tâm: mỗi 3-5 chương phải có xung đột liên quan thức ăn, nước, vũ khí, thuốc men',
+      'Base building: MC xây dựng căn cứ từ nhỏ đến lớn, recruit người, phòng thủ, mở rộng lãnh thổ',
+      'Mỗi 10-15 chương có 1 expedition/mission lớn: tìm tài nguyên, cứu người, khám phá vùng mới',
+      // Hệ thống sức mạnh
+      'Năng lực siêu nhiên đến từ đột biến/crystal: MC thức tỉnh dần, mỗi lần dùng có cost (thể lực, sanity)',
+      'Zombie/quái vật tiến hóa: từ shambler → runner → mutant → boss, buộc MC phải liên tục thích nghi',
+      // Leo thang xung đột
+      'Xung đột từ sinh tồn cá nhân → nhóm nhỏ → base vs base → faction war → human vs mutant boss',
+      'Mỗi arc mất mát tăng dần: mất đồ → mất base → mất đồng đội → gần mất tất cả',
+      // Phụ tuyến & hook
+      'Trust dilemma: mỗi 5-10 chương MC phải quyết định tin ai, nhận ai vào nhóm, kết quả không luôn tốt',
+      'Bí mật nguồn gốc tận thế: manh mối từng chương về nguyên nhân thật sự (virus, thí nghiệm, ngoại lai)',
+      'Dark moral choices: MC phải chọn giữa nhân đạo và sinh tồn, không có đáp án đúng 100%',
+      'Mùa/thời tiết khắc nghiệt ảnh hưởng gameplay: mùa đông thiếu thức ăn, mùa mưa lũ lụt, mùa hè dịch bệnh',
+      // Exposition thông minh
+      'Kiến thức sinh tồn (y tế, xây dựng, chiến thuật) phổ cập qua hành động thực tế, KHÔNG dạy lý thuyết',
+      // Multi-POV
+      'Đa góc nhìn: scene kẻ cướp lên kế hoạch tấn công base (POV raider), đồng đội bí mật phản bội (POV traitor), zombie mutant tiến hóa (POV threat)',
+    ],
   },
   'linh-di': {
     authorVoice: 'Giọng văn rùng rợn, mystery',
@@ -515,7 +590,32 @@ export const GENRE_STYLES: Record<GenreType, StyleBible> = {
     innerThoughtRatio: [20, 30],
     actionRatio: [5, 15],
     pacingStyle: 'slow',
-    genreConventions: ['Atmosphere quan trọng', 'Plot twists'],
+    genreConventions: [
+      // Nhân vật mẫu
+      'MC là pháp sư/thiên sư kế thừa dòng tộc, hoặc người thường bị cuốn vào sự kiện tâm linh',
+      'MC có năng lực đặc biệt (âm dương nhãn, thông linh, phong thủy) nhưng có giới hạn và cái giá phải trả',
+      'Villain là oan hồn mạnh mẽ, tà sư thâm hiểm, hoặc thế lực hắc ám cổ xưa đang thức tỉnh',
+      'Side character: đồng môn, cảnh sát/nhà báo hoài nghi, nạn nhân cần cứu — một số có thể chết bất ngờ',
+      // Tiến trình cốt truyện
+      'Mỗi 5-10 chương giải quyết 1 vụ án tâm linh: ma ám, lời nguyền, phong thủy xấu, quỷ dị',
+      'Quy tắc quái đàm: mỗi vụ án có rules riêng mà MC phải tìm ra để sống sót và giải quyết',
+      'Overarching mystery: tuyến chính xuyên suốt — kẻ đứng sau tất cả, bí mật cổ đại, lời tiên tri',
+      // Hệ thống sức mạnh
+      'Sức mạnh đến từ kiến thức (phong thủy, bùa chú, kinh văn), không phải bạo lực thuần — IQ chiến thắng',
+      'Mỗi lần dùng pháp thuật có cost: tuổi thọ, tinh thần, nghiệp báo — KHÔNG free power',
+      // Leo thang xung đột
+      'Xung đột từ quỷ dị nhỏ → ma mạnh → tà sư → cổ đại tà linh → đại ma vương/thiên kiếp',
+      'Mỗi vụ án hé lộ 1 mảnh ghép của bí mật lớn, đến cuối arc mới nhìn ra bức tranh toàn cảnh',
+      // Phụ tuyến & hook
+      'Atmospheric horror: xây dựng không khí rùng rợn qua 5 giác quan, im lặng đáng sợ hơn jump scare',
+      'Phong thủy/bùa chú miêu tả chi tiết: trận pháp, nguyên liệu, quy trình — tạo cảm giác chân thực',
+      'Moral ambiguity: không phải ma quỷ nào cũng ác, không phải pháp sư nào cũng thiện',
+      'Lời nguyền/nghiệp báo ảnh hưởng MC: mỗi lần giải cứu, MC gánh thêm nghiệp, tạo internal conflict',
+      // Exposition thông minh
+      'Kiến thức tâm linh, phong thủy qua trải nghiệm trực tiếp và hồi ức sư phụ, KHÔNG giảng giải lý thuyết dài',
+      // Multi-POV
+      'Đa góc nhìn: scene nạn nhân bị ma ám (POV victim tạo kinh hoàng), oan hồn hồi ức quá khứ (POV ghost tạo đồng cảm), đồng đội bí mật che giấu (POV ally tạo nghi ngờ)',
+    ],
   },
   'quan-truong': {
     authorVoice: 'Giọng văn chính trị, nhiều mưu kế',
@@ -527,7 +627,32 @@ export const GENRE_STYLES: Record<GenreType, StyleBible> = {
     innerThoughtRatio: [20, 30],
     actionRatio: [5, 10],
     pacingStyle: 'medium',
-    genreConventions: ['Chính trị phức tạp', 'Thăng tiến từng bước'],
+    genreConventions: [
+      // Nhân vật mẫu
+      'MC là cán bộ cấp thấp thông minh, có tầm nhìn xa và khả năng đọc người, dần leo lên quyền lực',
+      'MC có lợi thế đặc biệt: chuyển sinh biết tương lai, hoặc tài năng thiên bẩm về chính trị/kinh tế',
+      'Villain là quan chức tham nhũng, thế lực ngầm, hoặc đối thủ chính trị cùng phe đấu đá nội bộ',
+      'Mentor/backer: MC cần quý nhân phù trợ (lãnh đạo cấp cao tin tưởng), nhưng backer cũng có agenda riêng',
+      // Tiến trình cốt truyện
+      'Mỗi 10-15 chương giải quyết 1 vụ việc chính trị: điều tra tham nhũng, dự án phát triển, đấu đá nội bộ',
+      'Thăng tiến tuần tự: cán bộ xã → huyện → tỉnh → trung ương, mỗi bước có thử thách chính trị khác nhau',
+      'Mỗi lần thăng chức, kẻ thù và đồng minh đều thay đổi — không có đồng minh vĩnh viễn',
+      // Hệ thống sức mạnh (quyền lực)
+      'Sức mạnh = quyền lực + quan hệ + thông tin: MC chiến thắng bằng mưu kế và nhân mạch, KHÔNG bạo lực',
+      'Mỗi quyết định có hệ quả chính trị: giúp người này sẽ đắc tội người kia, phải cân nhắc phe phái',
+      // Leo thang xung đột
+      'Xung đột từ xã/phường → huyện → tỉnh → bộ → trung ương → cấp quốc gia, mỗi cấp phức tạp hơn',
+      'Mỗi arc kẻ thù mưu mô hơn, background mạnh hơn, MC phải dùng chiến thuật tinh vi hơn',
+      // Phụ tuyến & hook
+      'Tình cảm phức tạp: vợ/bạn gái có thể là con gái thế lực chính trị, tình yêu gắn liền lợi ích',
+      'Phát triển kinh tế địa phương: MC dùng kiến thức hiện đại cải cách, tạo thành tích chính trị để thăng tiến',
+      'Mạng lưới quan hệ: bạn đại học, đồng nghiệp cũ, quý nhân — mỗi mối quan hệ có thể dùng hoặc bị lợi dụng',
+      'Kết chương bằng bước ngoặt chính trị: backer gặp nạn, đối thủ phản đòn, tin đồn phá hoại, nhân sự thay đổi',
+      // Exposition thông minh
+      'Kiến thức chính trị, kinh tế, luật pháp qua hành động và đối thoại thực tế, KHÔNG giảng giải chính sách',
+      // Multi-POV
+      'Đa góc nhìn thường xuyên: scene đối thủ bày mưu (POV rival), cấp trên đánh giá MC (POV superior), dân chúng hưởng lợi/phản đối (POV public)',
+    ],
   },
   'di-gioi': {
     authorVoice: 'Giọng văn adventure, khám phá',
@@ -539,7 +664,32 @@ export const GENRE_STYLES: Record<GenreType, StyleBible> = {
     innerThoughtRatio: [15, 25],
     actionRatio: [10, 20],
     pacingStyle: 'fast',
-    genreConventions: ['Worldbuilding quan trọng', 'Adaptation arc'],
+    genreConventions: [
+      // Nhân vật mẫu
+      'MC xuyên không sang thế giới khác, mang theo tri thức hiện đại và/hoặc hệ thống golden finger',
+      'MC ban đầu yếu ớt trong thế giới mới, phải thích nghi với quy tắc khác biệt để sinh tồn',
+      'Villain là thế lực bản địa coi MC là ngoại lai nguy hiểm, hoặc kẻ xuyên không khác tranh đoạt',
+      'Đồng hành là dân bản địa giúp MC hiểu thế giới mới, có chemistry từ culture clash',
+      // Tiến trình cốt truyện
+      'Adaptation arc đầu tiên (10-15 chương): MC học ngôn ngữ, quy tắc, sinh tồn cơ bản trong thế giới mới',
+      'MC dùng tri thức hiện đại gây sốc: nấu ăn, y học, kỹ thuật, chiến thuật quân sự — mỗi arc 1-2 innovation',
+      'Mỗi 15-20 chương MC mở rộng lãnh thổ khám phá: vùng đất mới, chủng tộc mới, hệ thống mới',
+      // Hệ thống sức mạnh
+      'Sức mạnh dị giới (ma pháp, battle qi, bloodline) kết hợp tri thức hiện đại tạo unique advantage',
+      'MC thăng cấp theo hệ thống dị giới nhưng có approach khác biệt nhờ tư duy logic/khoa học',
+      // Leo thang xung đột
+      'Xung đột từ sinh tồn cá nhân → bộ tộc nhỏ → thành bang → vương quốc → đại lục → thần giới/về Trái Đất',
+      'Mỗi vùng đất mới có hệ thống quyền lực và quy tắc riêng, MC phải adapt lại từ đầu',
+      // Phụ tuyến & hook
+      'Culture clash comedy: MC dùng kiến thức hiện đại (mì gói, bật lửa, toán học) gây sốc cho dân bản địa',
+      'Worldbuilding rich: mỗi 5 chương giới thiệu 1 yếu tố thế giới mới (sinh vật, phong tục, ẩm thực, ngôn ngữ)',
+      'Homesickness: MC nhớ nhà, tìm cách về nhưng dần gắn bó với thế giới mới, internal conflict',
+      'Base/kingdom building: MC xây dựng lãnh thổ riêng, recruit dân bản địa, phát triển kinh tế/quân sự',
+      // Exposition thông minh
+      'Thế giới mới giải thích qua trải nghiệm trực tiếp và phản ứng ngạc nhiên của MC, KHÔNG info-dump worldbuilding',
+      // Multi-POV
+      'Đa góc nhìn: scene dân bản địa kinh ngạc trước tri thức MC (POV local), thế lực thù địch đánh giá mối đe dọa (POV enemy), đồng hành bối rối vì MC hành xử khác lạ (POV companion)',
+    ],
   },
   'ngon-tinh': {
     authorVoice: 'Giọng văn mềm mại, giàu cảm xúc, miêu tả nội tâm tinh tế và lãng mạn',
@@ -1023,11 +1173,30 @@ export function getPowerSystemByGenre(genre: GenreType): PowerSystem {
     case 'tien-hiep':
       return POWER_SYSTEMS.cultivation_standard;
     case 'huyen-huyen':
+      return POWER_SYSTEMS.cultivation_standard;
     case 'kiem-hiep':
       return POWER_SYSTEMS.martial_world;
     case 'do-thi':
+    case 'quan-truong':
+      return POWER_SYSTEMS.urban_system;
     case 'vong-du':
+      return POWER_SYSTEMS.urban_system;
     case 'mat-the':
+      return POWER_SYSTEMS.urban_system;
+    case 'khoa-huyen':
+      return POWER_SYSTEMS.urban_system;
+    case 'linh-di':
+      return POWER_SYSTEMS.rules_horror;
+    case 'di-gioi':
+      return POWER_SYSTEMS.lord_building;
+    case 'dong-nhan':
+      // dong-nhan depends on the original work; default to cultivation
+      return POWER_SYSTEMS.cultivation_standard;
+    case 'lich-su':
+      // lich-su: power = political/military, no fantasy power; use urban as closest analog
+      return POWER_SYSTEMS.urban_system;
+    case 'ngon-tinh':
+      // ngon-tinh: no combat power system; use urban as closest (social status)
       return POWER_SYSTEMS.urban_system;
     default:
       return POWER_SYSTEMS.cultivation_standard;
@@ -1035,18 +1204,35 @@ export function getPowerSystemByGenre(genre: GenreType): PowerSystem {
 }
 
 export function getDopaminePatternsByGenre(genre: GenreType): DopaminePattern[] {
-  const common = [DOPAMINE_PATTERNS.face_slap, DOPAMINE_PATTERNS.power_reveal];
-
   switch (genre) {
     case 'tien-hiep':
+      return [DOPAMINE_PATTERNS.face_slap, DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.breakthrough, DOPAMINE_PATTERNS.treasure_gain, DOPAMINE_PATTERNS.secret_identity];
     case 'huyen-huyen':
-      return [...common, DOPAMINE_PATTERNS.breakthrough, DOPAMINE_PATTERNS.treasure_gain];
+      return [DOPAMINE_PATTERNS.face_slap, DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.breakthrough, DOPAMINE_PATTERNS.treasure_gain, DOPAMINE_PATTERNS.revenge];
     case 'do-thi':
-      return [...common, DOPAMINE_PATTERNS.beauty_encounter, DOPAMINE_PATTERNS.recognition];
+      return [DOPAMINE_PATTERNS.face_slap, DOPAMINE_PATTERNS.flex_wealth, DOPAMINE_PATTERNS.beauty_encounter, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.secret_identity, DOPAMINE_PATTERNS.business_success];
+    case 'kiem-hiep':
+      return [DOPAMINE_PATTERNS.face_slap, DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.revenge, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.secret_identity];
+    case 'lich-su':
+      return [DOPAMINE_PATTERNS.face_slap, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.revenge, DOPAMINE_PATTERNS.business_success, DOPAMINE_PATTERNS.secret_identity];
+    case 'khoa-huyen':
+      return [DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.breakthrough, DOPAMINE_PATTERNS.treasure_gain, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.secret_identity];
+    case 'vong-du':
+      return [DOPAMINE_PATTERNS.face_slap, DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.breakthrough, DOPAMINE_PATTERNS.treasure_gain, DOPAMINE_PATTERNS.player_exploitation];
+    case 'dong-nhan':
+      return [DOPAMINE_PATTERNS.face_slap, DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.steal_luck, DOPAMINE_PATTERNS.secret_identity, DOPAMINE_PATTERNS.recognition];
     case 'mat-the':
-      return [...common, DOPAMINE_PATTERNS.treasure_gain];
+      return [DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.treasure_gain, DOPAMINE_PATTERNS.monster_evolution, DOPAMINE_PATTERNS.revenge, DOPAMINE_PATTERNS.recognition];
+    case 'linh-di':
+      return [DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.secret_identity, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.revenge, DOPAMINE_PATTERNS.breakthrough];
+    case 'quan-truong':
+      return [DOPAMINE_PATTERNS.face_slap, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.business_success, DOPAMINE_PATTERNS.flex_wealth, DOPAMINE_PATTERNS.secret_identity];
+    case 'di-gioi':
+      return [DOPAMINE_PATTERNS.face_slap, DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.treasure_gain, DOPAMINE_PATTERNS.two_world_shock, DOPAMINE_PATTERNS.breakthrough];
+    case 'ngon-tinh':
+      return [DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.beauty_encounter, DOPAMINE_PATTERNS.comfort, DOPAMINE_PATTERNS.comedy_misunderstanding, DOPAMINE_PATTERNS.tears_of_regret];
     default:
-      return common;
+      return [DOPAMINE_PATTERNS.face_slap, DOPAMINE_PATTERNS.power_reveal];
   }
 }
 
