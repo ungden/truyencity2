@@ -11,4 +11,5 @@ export {
   getStyleByGenre,
   getGenreBoundaryText,
   buildTitleRulesPrompt,
+  getGenreEngagement,
 } from './templates';

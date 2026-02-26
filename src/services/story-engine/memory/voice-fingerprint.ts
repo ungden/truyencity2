@@ -118,20 +118,60 @@ Trả về JSON:
   const parsed = parseJSON<VoiceFingerprint>(res.content);
   if (!parsed) return;
 
-  // Detect drift and add anti-patterns
+  // Detect drift across 7 dimensions and add anti-patterns
   const antiPatterns: string[] = [];
   if (existing?.fingerprint) {
     const old = existing.fingerprint as VoiceFingerprint;
-    // Detect opening pattern repetition
+
+    // 1. Opening pattern repetition
     if (parsed.openingPatterns?.length === 1 && old.openingPatterns?.length === 1
       && parsed.openingPatterns[0] === old.openingPatterns[0]) {
       antiPatterns.push(`KHÔNG mở chương bằng "${parsed.openingPatterns[0]}" liên tục — thay đổi`);
     }
-    // Detect dialogue ratio drift
+
+    // 2. Dialogue ratio drift (>15% change)
     if (old.dialogueRatio && parsed.dialogueRatio) {
       const drift = Math.abs(parsed.dialogueRatio - old.dialogueRatio);
       if (drift > 0.15) {
-        antiPatterns.push(`Tỷ lệ đối thoại đang drift (${old.dialogueRatio} → ${parsed.dialogueRatio}) — điều chỉnh lại`);
+        antiPatterns.push(`Tỷ lệ đối thoại drift: ${(old.dialogueRatio * 100).toFixed(0)}% → ${(parsed.dialogueRatio * 100).toFixed(0)}% — điều chỉnh lại`);
+      }
+    }
+
+    // 3. Sentence length drift (>30% change)
+    if (old.avgSentenceLength && parsed.avgSentenceLength) {
+      const drift = Math.abs(parsed.avgSentenceLength - old.avgSentenceLength) / old.avgSentenceLength;
+      if (drift > 0.3) {
+        const dir = parsed.avgSentenceLength > old.avgSentenceLength ? 'DÀI hơn' : 'NGẮN hơn';
+        antiPatterns.push(`Độ dài câu đang drift ${dir}: ${old.avgSentenceLength} → ${parsed.avgSentenceLength} từ/câu — giữ ổn định`);
+      }
+    }
+
+    // 4. Inner thought ratio drift (>10% absolute change)
+    if (old.innerThoughtRatio !== undefined && parsed.innerThoughtRatio !== undefined) {
+      const drift = Math.abs(parsed.innerThoughtRatio - old.innerThoughtRatio);
+      if (drift > 0.10) {
+        const dir = parsed.innerThoughtRatio > old.innerThoughtRatio ? 'TĂNG' : 'GIẢM';
+        antiPatterns.push(`Tỷ lệ nội tâm ${dir}: ${(old.innerThoughtRatio * 100).toFixed(0)}% → ${(parsed.innerThoughtRatio * 100).toFixed(0)}% — giữ cân bằng`);
+      }
+    }
+
+    // 5. Emotional register change
+    if (old.emotionalRegister && parsed.emotionalRegister
+      && old.emotionalRegister !== parsed.emotionalRegister) {
+      antiPatterns.push(`Tông cảm xúc đã thay đổi: "${old.emotionalRegister}" → "${parsed.emotionalRegister}" — giữ nhất quán trừ khi cốt truyện yêu cầu`);
+    }
+
+    // 6. Description style change
+    if (old.descriptionStyle && parsed.descriptionStyle
+      && old.descriptionStyle !== parsed.descriptionStyle) {
+      antiPatterns.push(`Phong cách miêu tả đã thay đổi: "${old.descriptionStyle}" → "${parsed.descriptionStyle}" — giữ nhất quán`);
+    }
+
+    // 7. Signature phrase erosion (old phrases disappearing)
+    if (old.signaturePhrases?.length && parsed.signaturePhrases?.length) {
+      const lost = old.signaturePhrases.filter(p => !parsed.signaturePhrases.includes(p));
+      if (lost.length >= 2) {
+        antiPatterns.push(`Đang MẤT cụm từ đặc trưng: "${lost.slice(0, 3).join('", "')}" — DUY TRÌ các cụm từ này`);
       }
     }
   }

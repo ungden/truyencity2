@@ -161,6 +161,34 @@ export async function getChapterPacingContext(
 
   const parts: string[] = ['═══ NHỊP TRUYỆN CHƯƠNG NÀY ═══'];
 
+  // Cross-chapter emotional arc enforcement: detect consecutive same-mood chapters
+  const recentMoods = getRecentMoods(blueprint, chapterNumber, 3);
+  if (recentMoods.length >= 2) {
+    const allSame = recentMoods.every(m => m === recentMoods[0]);
+    if (allSame) {
+      const moodName = recentMoods[0];
+      parts.push(`⚠️ CẢNH BÁO NHỊP ĐƠN ĐIỆU: ${recentMoods.length} chương gần nhất đều mood "${moodName}".`);
+      parts.push(`→ Chương này PHẢI tạo CONTRAST cảm xúc rõ ràng — đổi nhịp, đổi cường độ.`);
+      if (moodName === 'climax') {
+        parts.push(`→ Sau ${recentMoods.length} chương climax: CẦN chương aftermath/calm hoặc comedic_break.`);
+      } else if (moodName === 'training') {
+        parts.push(`→ Sau ${recentMoods.length} chương training: CẦN event, revelation, hoặc conflict mới.`);
+      } else if (moodName === 'buildup') {
+        parts.push(`→ Sau ${recentMoods.length} chương buildup: Người đọc đang mất kiên nhẫn — CẦN rising hoặc micro-climax.`);
+      }
+    }
+
+    // Also warn if intensity has been flat (within ±1) for 3+ chapters
+    const recentIntensities = getRecentIntensities(blueprint, chapterNumber, 3);
+    if (recentIntensities.length >= 3) {
+      const min = Math.min(...recentIntensities);
+      const max = Math.max(...recentIntensities);
+      if (max - min <= 1) {
+        parts.push(`⚠️ CƯỜNG ĐỘ PHẲNG: ${recentIntensities.length} chương gần nhất cường độ ${min}-${max}/10. CẦN biến động lớn hơn.`);
+      }
+    }
+  }
+
   const moodGuides: Record<ChapterMood, string> = {
     buildup: '🏗 BUILDUP — Nhịp CHẬM. Tập trung worldbuilding, setup. KHÔNG cần dopamine lớn. Gây TÒ MÒ, không gây kích thích.',
     rising: '📈 RISING — Tension LEO THANG. Hé lộ thông tin mới. Stakes bắt đầu rõ ràng. Nhịp tăng dần.',
@@ -193,4 +221,29 @@ export async function getChapterPacingContext(
   parts.push(cliffGuides[chapterPacing.cliffhangerIntensity] || '');
 
   return parts.join('\n');
+}
+
+// ── Cross-chapter Mood Helpers ───────────────────────────────────────────────
+
+/**
+ * Get moods of the N chapters immediately before chapterNumber from the blueprint.
+ * Returns moods in chronological order (oldest first).
+ */
+function getRecentMoods(blueprint: PacingBlueprint, chapterNumber: number, count: number): ChapterMood[] {
+  if (!blueprint.chapters?.length) return [];
+  return blueprint.chapters
+    .filter(c => c.chapterNumber < chapterNumber && c.chapterNumber >= chapterNumber - count)
+    .sort((a, b) => a.chapterNumber - b.chapterNumber)
+    .map(c => c.mood);
+}
+
+/**
+ * Get intensity levels of the N chapters immediately before chapterNumber.
+ */
+function getRecentIntensities(blueprint: PacingBlueprint, chapterNumber: number, count: number): number[] {
+  if (!blueprint.chapters?.length) return [];
+  return blueprint.chapters
+    .filter(c => c.chapterNumber < chapterNumber && c.chapterNumber >= chapterNumber - count)
+    .sort((a, b) => a.chapterNumber - b.chapterNumber)
+    .map(c => c.intensityLevel);
 }

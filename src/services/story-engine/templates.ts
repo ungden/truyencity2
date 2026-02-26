@@ -1128,6 +1128,85 @@ export const ENGAGEMENT_CHECKLIST = {
 };
 
 /**
+ * Genre-specific engagement items — supplement the generic ENGAGEMENT_CHECKLIST.perChapter
+ * with items tailored to each genre's reader expectations.
+ */
+export const GENRE_ENGAGEMENT: Record<GenreType, string[]> = {
+  'tien-hiep': [
+    'Mỗi 2-3 chương phải có 1 face-slap hoặc khoảnh khắc "chấn kinh" (bàng quan kinh ngạc)',
+    'Tu luyện phải có chi tiết cụ thể (cảm giác thể xác, biến hóa linh khí) — KHÔNG chỉ nói "đột phá"',
+    'Đan dược/pháp khí phải có tên riêng và hiệu quả rõ ràng',
+  ],
+  'huyen-huyen': [
+    'Hệ thống sức mạnh phải có quy tắc rõ ràng — người đọc phải hiểu MC mạnh cỡ nào so với kẻ thù',
+    'Mỗi arc phải mở rộng thế giới (tầng mới, vùng đất mới, cảnh giới mới)',
+    'Cơ duyên phải có giá phải trả (không free lunch)',
+  ],
+  'do-thi': [
+    'Flex tài sản/quyền lực phải cụ thể (con số, thương hiệu, vị trí) — KHÔNG chỉ nói "giàu"',
+    'Mỗi 5 chương phải có 1 scene đối đầu xã hội (đàm phán, lật kèo, chốt deal)',
+    'Tình cảm phải có tension (tam giác, hiểu lầm, khoảng cách giai cấp)',
+  ],
+  'khoa-huyen': [
+    'Công nghệ/hệ thống phải có chi tiết kỹ thuật hấp dẫn — không quá khô nhưng phải "có vẻ thật"',
+    'Mỗi arc phải có 1 khám phá khoa học hoặc technology reveal gây WOW',
+    'Mối đe dọa phải leo thang (cá nhân → hành tinh → vũ trụ)',
+  ],
+  'lich-su': [
+    'Chi tiết lịch sử phải chính xác (triều đại, phong tục, xưng hô) — sai 1 chi tiết mất uy tín',
+    'Mưu kế chính trị phải nhiều lớp (mưu trong mưu, kẻ hưởng lợi bất ngờ)',
+    'Nhân vật lịch sử thật phải có chiều sâu — không chỉ là NPC',
+  ],
+  'dong-nhan': [
+    'Nhân vật gốc phải IN-CHARACTER — fan sẽ phát hiện ngay nếu OOC',
+    'MC phải tận dụng "meta knowledge" một cách thông minh (không quá OP nhưng cũng không ngu)',
+    'Butterfly effect: hành động MC phải tạo hệ quả khác nguyên tác',
+  ],
+  'vong-du': [
+    'Game mechanics phải nhất quán (stats, skills, rules) — KHÔNG thay đổi tùy tiện',
+    'Mỗi 3-5 chương phải có 1 "thao tác thần thánh" (exploit system, PvP outplay, hidden quest)',
+    'Players phải có hành vi giống game thật (trade, PK, guild drama)',
+  ],
+  'kiem-hiep': [
+    'Chiêu thức kiếm pháp phải có tên và mô tả cảm quan (không chỉ "vung kiếm")',
+    'Giang hồ phải có quy tắc (nghĩa khí, thù hận, tôn ti bang phái)',
+    'Mỗi arc phải có 1 đại hội/tỷ thí hoặc ân oán giang hồ cần giải quyết',
+  ],
+  'mat-the': [
+    'Sinh tồn phải có chi tiết cụ thể (tìm nước, xây trại, chế tạo vũ khí)',
+    'Mỗi 3-5 chương phải có 1 mối đe dọa mới (dị thú, thiên tai, phe phái thù địch)',
+    'Base building phải có tiến triển rõ ràng qua từng arc',
+  ],
+  'linh-di': [
+    'Horror phải có atmosphere — miêu tả 5 giác quan, đặc biệt thính giác và xúc giác',
+    'Bí ẩn phải có manh mối hợp lý — người đọc có thể đoán nếu chú ý',
+    'Mỗi arc phải có 1 plot twist kinh hoàng mà người đọc không ngờ tới',
+  ],
+  'quan-truong': [
+    'Quan hệ quyền lực phải rõ ràng (ai bảo kê ai, phe phái nào chống phe nào)',
+    'Mỗi 5 chương phải có 1 mưu kế chính trị hoàn chỉnh (setup → thực hiện → kết quả)',
+    'Thăng tiến phải có logic (công trạng, quan hệ, thời cơ) — KHÔNG may mắn suông',
+  ],
+  'di-gioi': [
+    'Thế giới mới phải có quy tắc khác biệt rõ ràng (MC phải thích nghi)',
+    'Xây dựng lãnh địa phải có milestone cụ thể qua từng arc',
+    'Dân bản địa phải có văn hóa riêng — KHÔNG chỉ là NPC vô hồn',
+  ],
+  'ngon-tinh': [
+    'Tình cảm phải có push-pull (tiến 1 bước, lùi 2 bước) — KHÔNG yêu ngay',
+    'Mỗi 3-5 chương phải có 1 sweet moment hoặc heart-fluttering scene',
+    'Side couples phải có câu chuyện riêng — không chỉ là background',
+  ],
+};
+
+/**
+ * Get genre-specific engagement items to inject into Architect prompt.
+ */
+export function getGenreEngagement(genre: GenreType): string[] {
+  return GENRE_ENGAGEMENT[genre] || [];
+}
+
+/**
  * Build title rules string for injection into AI prompts
  */
 export function buildTitleRulesPrompt(previousTitles?: string[]): string {

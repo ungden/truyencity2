@@ -30,7 +30,7 @@
 
 import { callGemini } from '../utils/gemini';
 import { parseJSON } from '../utils/json-repair';
-import { getStyleByGenre, buildTitleRulesPrompt, GOLDEN_CHAPTER_REQUIREMENTS, ENGAGEMENT_CHECKLIST } from '../config';
+import { getStyleByGenre, buildTitleRulesPrompt, GOLDEN_CHAPTER_REQUIREMENTS, ENGAGEMENT_CHECKLIST, getGenreEngagement } from '../config';
 import { getConstraintExtractor } from '../memory/constraint-extractor';
 import { GENRE_CONFIG } from '../../../lib/types/genre-config';
 import { buildStyleContext, getEnhancedStyleBible, CLIFFHANGER_TECHNIQUES } from '../memory/style-bible';
@@ -168,6 +168,7 @@ export async function writeChapter(
       rewriteInstructions,
       config,
       options,
+      genre,
     );
 
     // Step 2: Writer
@@ -236,6 +237,7 @@ async function runArchitect(
   rewriteInstructions: string,
   config: GeminiConfig,
   options?: WriteChapterOptions,
+  genre?: GenreType,
 ): Promise<ChapterOutline> {
   const titleRules = buildTitleRulesPrompt(previousTitles);
   const minScenes = Math.max(4, Math.ceil(targetWords / 600));
@@ -269,11 +271,12 @@ CẢM XÚC ARC (bắt buộc lên kế hoạch):
 - Kết: để lại cảm xúc gì? (háo hức đọc tiếp, day dứt, mong chờ...)
 Nguyên tắc: PHẢI có contrast cảm xúc giữa các phần (buồn→vui, sợ→phấn khích)`;
 
-  // Engagement checklist — only inject perChapter (saves ~4K chars vs full checklist)
+  // Engagement checklist — generic + genre-specific items
+  const genreEngagementItems = genre ? getGenreEngagement(genre) : [];
   const engagementGuide = `
 ENGAGEMENT (mỗi chương phải có):
 ${ENGAGEMENT_CHECKLIST.perChapter.map((e: string) => '- ' + e).join('\n')}
-
+${genreEngagementItems.length > 0 ? `\nENGAGEMENT THỂ LOẠI (BẮT BUỘC):\n${genreEngagementItems.map(e => '- ' + e).join('\n')}` : ''}
 SỨC MẠNH: Tối đa ${ENGAGEMENT_CHECKLIST.powerBudget.perArcRules.maxPowerUps} power-up/arc. KHÔNG tăng sức mạnh mỗi chương.`;
 
   // Final arc handling
