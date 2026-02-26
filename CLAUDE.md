@@ -225,7 +225,10 @@ git push  # Auto deploy to Vercel
 | `5153317` | Phase 6 | Location bible fix |
 | `8060495` | Phase 7 | 12 performance optimizations (~25-30K tokens/chapter saved) |
 | `c7a5d99` | Phase 8 | 3 critical + 3 security + 5 bug fixes + dead code cleanup (-8,200 lines) |
-| `pending` | Phase 9 | Comprehensive audit: security + dedup + type safety + hardening (68 issues) |
+| `2833142` | Phase 9 | Comprehensive audit: security + dedup + type safety + hardening (68 issues) |
+| `8e24652` | Quality Phases 1-3 | Genre style bible, complete genre conventions, quality module effectiveness |
+| `6fe2db2` | Quality Phase 4 | Emotional intelligence: mood enforcement, voice drift, genre engagement |
+| `a3d995b` | Quality Phase 5 | Anti-AI polish: genre anti-cliche blacklists, genre title templates |
 
 ## Phase 9 Details (2026-02-25) — Comprehensive Audit Fix
 
@@ -303,18 +306,18 @@ The remaining ~31 files are dead. Full V1 removal requires migrating these 5 rou
 ## Remaining Known Issues
 
 ### Low Priority (deferred)
-- `buildStyleContext` and `getEnhancedStyleBible` ignore genre parameter (return same static content) — TODO comments added
 - Ratings average still computed client-side (score column only) — true DB aggregate requires Supabase RPC migration
+- 6 genres never spawned by daily-spawn (kiem-hiep, mat-the, linh-di, quan-truong, di-gioi, ngon-tinh) — ContentSeeder GENRE_CONFIG may only have 7 genres
 
 ## Important Files to Read
 
 When working with the story engine:
 
 1. **types.ts** — Data structures
-2. **chapter-writer.ts** — 3-agent pipeline (~1110 lines)
+2. **chapter-writer.ts** — 3-agent pipeline + quality compliance (~1385 lines)
 3. **context-assembler.ts** — 4-layer context + combined AI call (~700 lines)
-4. **orchestrator.ts** — Overall flow (~444 lines)
-5. **templates.ts** — Genre configs, GOLDEN_CHAPTER_REQUIREMENTS, ENGAGEMENT_CHECKLIST (~1578 lines)
+4. **orchestrator.ts** — Overall flow + smart truncation (~465 lines)
+5. **templates.ts** — Genre configs, engagement, anti-cliche, title templates (~1943 lines)
 6. **summary-manager.ts** — Synopsis/bible/arc triggers + quality module triggers (~435 lines)
 
 ## Scripts (kept)
@@ -327,6 +330,6 @@ When working with the story engine:
 
 ---
 
-**Last Updated**: 2026-02-25
-**Latest Commit**: `c7a5d99` (Phase 8)
-**Pending Commit**: Phase 9 — Comprehensive audit fix (68 issues)
+**Last Updated**: 2026-02-26
+**Latest Commit**: `a3d995b` (Quality Phase 5)
+**All 5 quality phases complete** — Phases 1-5 shipped to production
