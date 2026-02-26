@@ -1,13 +1,11 @@
 /**
  * Centralized Error Logging & Monitoring
  *
- * In production, integrate with:
- * - Sentry (sentry.io) for error tracking
- * - LogRocket for session replay
- * - DataDog / New Relic for APM
- *
- * For now, structured console logging with context
+ * Sends error/fatal events to Sentry when NEXT_PUBLIC_SENTRY_DSN is set.
+ * Otherwise structured console logging with context.
  */
+
+import * as Sentry from '@sentry/nextjs';
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
 
@@ -36,6 +34,38 @@ interface LogEntry {
   };
 }
 
+// ---------------------------------------------------------------------------
+// Sentry initialisation (lazy, one-time)
+// ---------------------------------------------------------------------------
+
+let _sentryInitialised = false;
+
+function ensureSentry(): boolean {
+  if (_sentryInitialised) return true;
+
+  const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
+  if (!dsn) return false;
+
+  try {
+    Sentry.init({
+      dsn,
+      environment: process.env.NODE_ENV || 'development',
+      // Only send errors/fatals — keep volume low
+      tracesSampleRate: 0,
+    });
+    _sentryInitialised = true;
+    console.info('[logger] Sentry initialised');
+    return true;
+  } catch (err) {
+    console.warn('[logger] Sentry init failed:', err);
+    return false;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Logger
+// ---------------------------------------------------------------------------
+
 class Logger {
   private serviceName: string;
   private environment: string;
@@ -47,10 +77,8 @@ class Logger {
 
   private formatLog(entry: LogEntry): string {
     if (this.environment === 'development') {
-      // Pretty print for development
       return JSON.stringify(entry, null, 2);
     }
-    // Single line JSON for production (easier to parse in log aggregators)
     return JSON.stringify(entry);
   }
 
@@ -89,24 +117,44 @@ class Logger {
       case 'error':
       case 'fatal':
         console.error(output);
-        // In production, send to external service
-        this.sendToExternalService(entry);
+        this.sendToSentry(level, message, context, error);
         break;
     }
   }
 
   /**
-   * Send critical errors to external monitoring service
-   * TODO: Implement actual integration with Sentry/DataDog
+   * Send error/fatal events to Sentry (no-op when DSN is not set)
    */
-  private sendToExternalService(entry: LogEntry): void {
-    // Placeholder for external service integration
-    // Example Sentry integration:
-    // if (typeof Sentry !== 'undefined') {
-    //   Sentry.captureException(new Error(entry.message), {
-    //     extra: entry.context,
-    //   });
-    // }
+  private sendToSentry(
+    level: LogLevel,
+    message: string,
+    context?: LogContext,
+    error?: Error,
+  ): void {
+    if (!ensureSentry()) return;
+
+    try {
+      Sentry.withScope((scope) => {
+        scope.setLevel(level === 'fatal' ? 'fatal' : 'error');
+
+        if (context) {
+          // Set structured context
+          scope.setExtras(context as Record<string, unknown>);
+          if (context.userId) scope.setUser({ id: context.userId });
+          if (context.endpoint) scope.setTag('endpoint', context.endpoint);
+          if (context.projectId) scope.setTag('projectId', context.projectId);
+        }
+
+        if (error) {
+          Sentry.captureException(error);
+        } else {
+          Sentry.captureMessage(message, level === 'fatal' ? 'fatal' : 'error');
+        }
+      });
+    } catch (err) {
+      // Never let Sentry failure break the app
+      console.warn('[logger] Sentry capture failed:', err);
+    }
   }
 
   debug(message: string, context?: LogContext): void {
@@ -137,7 +185,7 @@ class Logger {
     endpoint: string,
     statusCode: number,
     duration: number,
-    context?: Partial<LogContext>
+    context?: Partial<LogContext>,
   ): void {
     const level: LogLevel = statusCode >= 500 ? 'error' : statusCode >= 400 ? 'warn' : 'info';
 
@@ -158,7 +206,7 @@ class Logger {
     projectId: string,
     success: boolean,
     duration: number,
-    details?: Record<string, unknown>
+    details?: Record<string, unknown>,
   ): void {
     const level: LogLevel = success ? 'info' : 'error';
 
@@ -176,7 +224,7 @@ class Logger {
   billingEvent(
     event: string,
     userId: string,
-    details?: Record<string, unknown>
+    details?: Record<string, unknown>,
   ): void {
     this.log('info', `Billing: ${event}`, {
       userId,
@@ -190,7 +238,7 @@ class Logger {
   securityEvent(
     event: string,
     ip: string,
-    details?: Record<string, unknown>
+    details?: Record<string, unknown>,
   ): void {
     this.log('warn', `Security: ${event}`, {
       ip,
@@ -212,9 +260,10 @@ export function getRequestContext(request: Request): Partial<LogContext> {
     endpoint: url.pathname,
     method: request.method,
     userAgent: request.headers.get('user-agent') || undefined,
-    ip: request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-        request.headers.get('x-real-ip') ||
-        undefined,
+    ip:
+      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      request.headers.get('x-real-ip') ||
+      undefined,
   };
 }
 

@@ -1,5 +1,5 @@
 /**
- * Cache Service - In-memory caching with TTL
+ * Cache Service - Redis-backed caching with in-memory fallback
  *
  * Provides caching for:
  * - Story context (expensive to compute)
@@ -7,10 +7,12 @@
  * - Tier limits
  * - Frequently accessed data
  *
- * For production scale, replace with Redis
+ * Uses Upstash Redis when available (works across Vercel serverless instances),
+ * otherwise falls back to a per-instance in-memory Map.
  */
 
 import { logger } from '@/lib/security/logger';
+import { getRedis } from '@/lib/redis/upstash';
 
 interface CacheEntry<T> {
   value: T;
@@ -45,74 +47,108 @@ export type CacheKey =
   | `chapter_list:${string}`
   | string;
 
+const REDIS_PREFIX = 'cache:';
+
 class CacheService {
-  private cache: Map<string, CacheEntry<unknown>> = new Map();
+  private memoryCache: Map<string, CacheEntry<unknown>> = new Map();
   private stats = { hits: 0, misses: 0 };
   private cleanupInterval: ReturnType<typeof setInterval> | null = null;
-  private maxSize: number = 1000; // Maximum cache entries
+  private maxSize: number = 1000; // Maximum in-memory cache entries
 
   constructor() {
-    // Cleanup expired entries every minute
+    // Cleanup expired in-memory entries every minute
     if (process.env.NODE_ENV !== 'test' && typeof setInterval !== 'undefined') {
-      this.cleanupInterval = setInterval(() => this.cleanup(), 60 * 1000);
+      this.cleanupInterval = setInterval(() => this.cleanupMemory(), 60 * 1000);
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // Public API
+  // ---------------------------------------------------------------------------
+
   /**
-   * Get value from cache
+   * Get value from cache (Redis first, then in-memory)
    */
-  get<T>(key: CacheKey): T | null {
-    const entry = this.cache.get(key) as CacheEntry<T> | undefined;
-
-    if (!entry) {
-      this.stats.misses++;
-      return null;
+  async get<T>(key: CacheKey): Promise<T | null> {
+    // Try Redis
+    const redis = getRedis();
+    if (redis) {
+      try {
+        const raw = await redis.get<T>(REDIS_PREFIX + key);
+        if (raw !== null && raw !== undefined) {
+          this.stats.hits++;
+          return raw;
+        }
+        this.stats.misses++;
+        return null;
+      } catch (err) {
+        logger.warn('Redis GET failed, falling back to memory', { key, error: String(err) });
+      }
     }
 
-    if (Date.now() > entry.expiresAt) {
-      this.cache.delete(key);
-      this.stats.misses++;
-      return null;
-    }
-
-    entry.hits++;
-    this.stats.hits++;
-    return entry.value;
+    // Fallback: in-memory
+    return this.getMemory<T>(key);
   }
 
   /**
-   * Set value in cache
+   * Synchronous in-memory get (for callers that cannot await)
    */
-  set<T>(key: CacheKey, value: T, ttl?: number): void {
-    // Evict if at max size
-    if (this.cache.size >= this.maxSize) {
-      this.evictLRU();
+  getSync<T>(key: CacheKey): T | null {
+    return this.getMemory<T>(key);
+  }
+
+  /**
+   * Set value in cache (writes to Redis AND in-memory)
+   */
+  async set<T>(key: CacheKey, value: T, ttl?: number): Promise<void> {
+    const ttlMs = ttl || this.getTTLForKey(key);
+
+    // Write to Redis (fire-and-forget, non-fatal)
+    const redis = getRedis();
+    if (redis) {
+      try {
+        const ttlSec = Math.max(1, Math.round(ttlMs / 1000));
+        await redis.set(REDIS_PREFIX + key, value, { ex: ttlSec });
+      } catch (err) {
+        logger.warn('Redis SET failed', { key, error: String(err) });
+      }
     }
 
-    const expiresAt = Date.now() + (ttl || this.getTTLForKey(key));
+    // Always write to in-memory as well (local fast path)
+    this.setMemory(key, value, ttlMs);
+  }
 
-    this.cache.set(key, {
-      value,
-      expiresAt,
-      hits: 0,
-    });
+  /**
+   * Synchronous in-memory set (for callers that cannot await)
+   */
+  setSync<T>(key: CacheKey, value: T, ttl?: number): void {
+    this.setMemory(key, value, ttl || this.getTTLForKey(key));
   }
 
   /**
    * Delete value from cache
    */
-  delete(key: CacheKey): void {
-    this.cache.delete(key);
+  async delete(key: CacheKey): Promise<void> {
+    this.memoryCache.delete(key);
+
+    const redis = getRedis();
+    if (redis) {
+      try {
+        await redis.del(REDIS_PREFIX + key);
+      } catch (err) {
+        logger.warn('Redis DEL failed', { key, error: String(err) });
+      }
+    }
   }
 
   /**
-   * Delete all entries matching a pattern
+   * Delete all entries matching a pattern (in-memory only — Redis SCAN avoided for simplicity)
    */
   deletePattern(pattern: string): number {
     let deleted = 0;
-    for (const key of this.cache.keys()) {
+    for (const key of this.memoryCache.keys()) {
       if (key.includes(pattern)) {
-        this.cache.delete(key);
+        this.memoryCache.delete(key);
         deleted++;
       }
     }
@@ -125,16 +161,14 @@ class CacheService {
   async getOrSet<T>(
     key: CacheKey,
     fetcher: () => Promise<T>,
-    ttl?: number
+    ttl?: number,
   ): Promise<T> {
-    const cached = this.get<T>(key);
-    if (cached !== null) {
-      return cached;
-    }
+    const cached = await this.get<T>(key);
+    if (cached !== null) return cached;
 
     try {
       const value = await fetcher();
-      this.set(key, value, ttl);
+      await this.set(key, value, ttl);
       return value;
     } catch (error) {
       logger.error('Cache fetch failed', error as Error, { key });
@@ -160,10 +194,10 @@ class CacheService {
   }
 
   /**
-   * Clear entire cache
+   * Clear entire in-memory cache
    */
   clear(): void {
-    this.cache.clear();
+    this.memoryCache.clear();
     this.stats = { hits: 0, misses: 0 };
   }
 
@@ -173,7 +207,7 @@ class CacheService {
   getStats(): CacheStats {
     const total = this.stats.hits + this.stats.misses;
     return {
-      size: this.cache.size,
+      size: this.memoryCache.size,
       hits: this.stats.hits,
       misses: this.stats.misses,
       hitRate: total > 0 ? this.stats.hits / total : 0,
@@ -184,23 +218,53 @@ class CacheService {
    * Warm up cache with frequently accessed data
    */
   async warmup(
-    fetchers: Array<{ key: CacheKey; fetcher: () => Promise<unknown>; ttl?: number }>
+    fetchers: Array<{ key: CacheKey; fetcher: () => Promise<unknown>; ttl?: number }>,
   ): Promise<void> {
     await Promise.allSettled(
       fetchers.map(async ({ key, fetcher, ttl }) => {
         try {
           const value = await fetcher();
-          this.set(key, value, ttl);
+          await this.set(key, value, ttl);
         } catch (error) {
           logger.error('Cache warmup failed', error as Error, { key });
         }
-      })
+      }),
     );
   }
 
   /**
-   * Get TTL based on key pattern
+   * Cleanup on shutdown
    */
+  shutdown(): void {
+    if (this.cleanupInterval) clearInterval(this.cleanupInterval);
+    this.memoryCache.clear();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Private helpers
+  // ---------------------------------------------------------------------------
+
+  private getMemory<T>(key: string): T | null {
+    const entry = this.memoryCache.get(key) as CacheEntry<T> | undefined;
+    if (!entry) {
+      this.stats.misses++;
+      return null;
+    }
+    if (Date.now() > entry.expiresAt) {
+      this.memoryCache.delete(key);
+      this.stats.misses++;
+      return null;
+    }
+    entry.hits++;
+    this.stats.hits++;
+    return entry.value;
+  }
+
+  private setMemory<T>(key: string, value: T, ttlMs: number): void {
+    if (this.memoryCache.size >= this.maxSize) this.evictLRU();
+    this.memoryCache.set(key, { value, expiresAt: Date.now() + ttlMs, hits: 0 });
+  }
+
   private getTTLForKey(key: string): number {
     if (key.startsWith('story_context:')) return CACHE_TTL.storyContext;
     if (key.startsWith('user_subscription:')) return CACHE_TTL.userSubscription;
@@ -211,53 +275,30 @@ class CacheService {
     return CACHE_TTL.default;
   }
 
-  /**
-   * Cleanup expired entries
-   */
-  private cleanup(): void {
+  private cleanupMemory(): void {
     const now = Date.now();
     let expired = 0;
-
-    for (const [key, entry] of this.cache.entries()) {
+    for (const [key, entry] of this.memoryCache.entries()) {
       if (now > entry.expiresAt) {
-        this.cache.delete(key);
+        this.memoryCache.delete(key);
         expired++;
       }
     }
-
     if (expired > 0) {
-      logger.debug('Cache cleanup', { expired, remaining: this.cache.size });
+      logger.debug('Cache cleanup', { expired, remaining: this.memoryCache.size });
     }
   }
 
-  /**
-   * Evict least recently used entries
-   */
   private evictLRU(): void {
-    // Find entry with lowest hits
     let minHits = Infinity;
     let minKey: string | null = null;
-
-    for (const [key, entry] of this.cache.entries()) {
+    for (const [key, entry] of this.memoryCache.entries()) {
       if (entry.hits < minHits) {
         minHits = entry.hits;
         minKey = key;
       }
     }
-
-    if (minKey) {
-      this.cache.delete(minKey);
-    }
-  }
-
-  /**
-   * Cleanup on shutdown
-   */
-  shutdown(): void {
-    if (this.cleanupInterval) {
-      clearInterval(this.cleanupInterval);
-    }
-    this.cache.clear();
+    if (minKey) this.memoryCache.delete(minKey);
   }
 }
 
@@ -269,12 +310,12 @@ export const cacheService = new CacheService();
  */
 export function cached<T>(
   keyFn: (...args: unknown[]) => CacheKey,
-  ttl?: number
+  ttl?: number,
 ) {
   return function (
     _target: unknown,
     _propertyKey: string,
-    descriptor: PropertyDescriptor
+    descriptor: PropertyDescriptor,
   ) {
     const originalMethod = descriptor.value;
 

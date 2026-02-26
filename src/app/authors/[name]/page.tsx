@@ -25,8 +25,8 @@ type NovelBrief = {
   author: string | null;
   cover_url: string | null;
   status: string | null;
-  rating: number;
-  views: number;
+  rating?: number;
+  views?: number;
 };
 
 export default function AuthorPage() {
@@ -70,11 +70,19 @@ export default function AuthorPage() {
       if (novelError) {
         console.error("Error fetching novels:", novelError);
       } else {
-        const novelsWithStats = (novelData || []).map(n => ({
-          ...n,
-          rating: 4.5, // Placeholder
-          views: 1000, // Placeholder
-        }));
+        const rawNovels = novelData || [];
+        // Fetch real stats for each novel via RPC
+        const novelsWithStats = await Promise.all(
+          rawNovels.map(async (n) => {
+            const { data: stats } = await supabase.rpc("get_novel_stats", { p_novel_id: n.id });
+            const parsed = stats ? (typeof stats === "string" ? JSON.parse(stats) : stats) : null;
+            return {
+              ...n,
+              rating: parsed?.rating_avg ?? undefined,
+              views: parsed?.view_count ?? undefined,
+            };
+          })
+        );
         setNovels(novelsWithStats as NovelBrief[]);
       }
       

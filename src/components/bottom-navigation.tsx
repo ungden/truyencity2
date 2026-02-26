@@ -45,8 +45,8 @@ export const BottomNavigation = () => {
     router.push(path);
   };
 
-  // Hide nav on reading routes
-  const isReadingRoute = /^\/novel\/[^/]+\/(read|chapter)\/.+/.test(pathname ?? '');
+  // Hide nav on reading routes (matches /truyen/[slug]/read/[chapter])
+  const isReadingRoute = /^\/truyen\/[^/]+\/(read|chapter)\/.+/.test(pathname ?? '');
 
   if (isReadingRoute) {
     return null;

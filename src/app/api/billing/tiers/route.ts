@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Try cache first
-    const cached = cacheService.get<unknown>('tier_limits');
+    const cached = await cacheService.get<unknown>('tier_limits');
     if (cached) {
       logger.apiRequest('GET', '/api/billing/tiers', 200, timer(), { cached: true });
       return NextResponse.json({ tiers: cached });
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     const tiers = await subscriptionService.getTierLimits(supabase);
 
     // Cache for 1 hour
-    cacheService.set('tier_limits', tiers, CACHE_TTL.tierLimits);
+    await cacheService.set('tier_limits', tiers, CACHE_TTL.tierLimits);
 
     logger.apiRequest('GET', '/api/billing/tiers', 200, timer(), { cached: false });
 

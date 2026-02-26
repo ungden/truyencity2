@@ -1,5 +1,8 @@
 /**
  * Cache Service Unit Tests
+ *
+ * Uses the synchronous in-memory methods (getSync/setSync) since
+ * tests run without Redis configured.
  */
 
 import { cacheService, CACHE_TTL } from '@/lib/cache/cache-service';
@@ -11,63 +14,63 @@ describe('CacheService', () => {
 
   describe('get/set', () => {
     it('should store and retrieve values', () => {
-      cacheService.set('test-key', { data: 'test' });
-      const result = cacheService.get<{ data: string }>('test-key');
+      cacheService.setSync('test-key', { data: 'test' });
+      const result = cacheService.getSync<{ data: string }>('test-key');
 
       expect(result).toEqual({ data: 'test' });
     });
 
     it('should return null for missing keys', () => {
-      const result = cacheService.get('non-existent');
+      const result = cacheService.getSync('non-existent');
       expect(result).toBeNull();
     });
 
     it('should return null for expired entries', async () => {
-      cacheService.set('expiring-key', 'value', 1); // 1ms TTL
+      cacheService.setSync('expiring-key', 'value', 1); // 1ms TTL
 
       // Wait for expiration
       await new Promise(resolve => setTimeout(resolve, 10));
 
-      const result = cacheService.get('expiring-key');
+      const result = cacheService.getSync('expiring-key');
       expect(result).toBeNull();
     });
 
     it('should respect custom TTL', () => {
       const customTTL = 1000;
-      cacheService.set('custom-ttl', 'value', customTTL);
+      cacheService.setSync('custom-ttl', 'value', customTTL);
 
-      const result = cacheService.get('custom-ttl');
+      const result = cacheService.getSync('custom-ttl');
       expect(result).toBe('value');
     });
   });
 
   describe('delete', () => {
-    it('should delete specific key', () => {
-      cacheService.set('delete-test', 'value');
-      cacheService.delete('delete-test');
+    it('should delete specific key', async () => {
+      cacheService.setSync('delete-test', 'value');
+      await cacheService.delete('delete-test');
 
-      expect(cacheService.get('delete-test')).toBeNull();
+      expect(cacheService.getSync('delete-test')).toBeNull();
     });
   });
 
   describe('deletePattern', () => {
     it('should delete keys matching pattern', () => {
-      cacheService.set('user:1:data', 'data1');
-      cacheService.set('user:1:settings', 'settings1');
-      cacheService.set('user:2:data', 'data2');
+      cacheService.setSync('user:1:data', 'data1');
+      cacheService.setSync('user:1:settings', 'settings1');
+      cacheService.setSync('user:2:data', 'data2');
 
       const deleted = cacheService.deletePattern('user:1');
 
       expect(deleted).toBe(2);
-      expect(cacheService.get('user:1:data')).toBeNull();
-      expect(cacheService.get('user:1:settings')).toBeNull();
-      expect(cacheService.get('user:2:data')).toBe('data2');
+      expect(cacheService.getSync('user:1:data')).toBeNull();
+      expect(cacheService.getSync('user:1:settings')).toBeNull();
+      expect(cacheService.getSync('user:2:data')).toBe('data2');
     });
   });
 
   describe('getOrSet', () => {
     it('should return cached value if exists', async () => {
-      cacheService.set('cached', 'existing');
+      cacheService.setSync('cached', 'existing');
 
       const fetcher = jest.fn().mockResolvedValue('new');
       const result = await cacheService.getOrSet('cached', fetcher);
@@ -82,7 +85,7 @@ describe('CacheService', () => {
 
       expect(result).toBe('fetched');
       expect(fetcher).toHaveBeenCalledTimes(1);
-      expect(cacheService.get('new-key')).toBe('fetched');
+      expect(cacheService.getSync('new-key')).toBe('fetched');
     });
 
     it('should propagate fetcher errors', async () => {
@@ -94,41 +97,41 @@ describe('CacheService', () => {
 
   describe('invalidateUserCache', () => {
     it('should invalidate all user-related entries', () => {
-      cacheService.set('user_subscription:user-1', 'sub');
-      cacheService.set('user_credits:user-1', 'credits');
-      cacheService.set('project_list:user-1', 'projects');
-      cacheService.set('user_subscription:user-2', 'other');
+      cacheService.setSync('user_subscription:user-1', 'sub');
+      cacheService.setSync('user_credits:user-1', 'credits');
+      cacheService.setSync('project_list:user-1', 'projects');
+      cacheService.setSync('user_subscription:user-2', 'other');
 
       cacheService.invalidateUserCache('user-1');
 
-      expect(cacheService.get('user_subscription:user-1')).toBeNull();
-      expect(cacheService.get('user_credits:user-1')).toBeNull();
-      expect(cacheService.get('project_list:user-1')).toBeNull();
-      expect(cacheService.get('user_subscription:user-2')).toBe('other');
+      expect(cacheService.getSync('user_subscription:user-1')).toBeNull();
+      expect(cacheService.getSync('user_credits:user-1')).toBeNull();
+      expect(cacheService.getSync('project_list:user-1')).toBeNull();
+      expect(cacheService.getSync('user_subscription:user-2')).toBe('other');
     });
   });
 
   describe('invalidateProjectCache', () => {
     it('should invalidate project-related entries', () => {
-      cacheService.set('story_context:proj-1', 'context');
-      cacheService.set('chapter_list:proj-1', 'chapters');
-      cacheService.set('story_context:proj-2', 'other');
+      cacheService.setSync('story_context:proj-1', 'context');
+      cacheService.setSync('chapter_list:proj-1', 'chapters');
+      cacheService.setSync('story_context:proj-2', 'other');
 
       cacheService.invalidateProjectCache('proj-1');
 
-      expect(cacheService.get('story_context:proj-1')).toBeNull();
-      expect(cacheService.get('chapter_list:proj-1')).toBeNull();
-      expect(cacheService.get('story_context:proj-2')).toBe('other');
+      expect(cacheService.getSync('story_context:proj-1')).toBeNull();
+      expect(cacheService.getSync('chapter_list:proj-1')).toBeNull();
+      expect(cacheService.getSync('story_context:proj-2')).toBe('other');
     });
   });
 
   describe('getStats', () => {
     it('should return cache statistics', () => {
-      cacheService.set('stat-1', 'value');
-      cacheService.set('stat-2', 'value');
-      cacheService.get('stat-1'); // hit
-      cacheService.get('stat-1'); // hit
-      cacheService.get('missing'); // miss
+      cacheService.setSync('stat-1', 'value');
+      cacheService.setSync('stat-2', 'value');
+      cacheService.getSync('stat-1'); // hit
+      cacheService.getSync('stat-1'); // hit
+      cacheService.getSync('missing'); // miss
 
       const stats = cacheService.getStats();
 
@@ -142,8 +145,8 @@ describe('CacheService', () => {
 
   describe('clear', () => {
     it('should clear all entries and reset stats', () => {
-      cacheService.set('clear-1', 'value');
-      cacheService.set('clear-2', 'value');
+      cacheService.setSync('clear-1', 'value');
+      cacheService.setSync('clear-2', 'value');
 
       cacheService.clear();
 
