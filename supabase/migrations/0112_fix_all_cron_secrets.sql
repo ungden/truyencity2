@@ -1,4 +1,9 @@
--- Fix all pg_cron jobs: replace placeholder secrets with real CRON_SECRET.
+-- SECURITY NOTICE: This migration contained a hardcoded CRON_SECRET in plaintext.
+-- It has been superseded by migration 0121 which reads from Supabase Vault.
+-- The secret in this file should be considered COMPROMISED and has been rotated.
+-- See 0121_vault_cron_secrets.sql for the current approach.
+--
+-- Original purpose: Fix all pg_cron jobs: replace placeholder secrets with real CRON_SECRET.
 -- All 4 jobs were sending "Bearer YOUR_CRON_SECRET" or "Bearer __CRON_SECRET__"
 -- causing 401 Unauthorized on every call since migration 0102-0106.
 

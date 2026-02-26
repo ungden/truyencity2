@@ -18,14 +18,26 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     supportsTablet: true,
     bundleIdentifier: "com.truyencity.app",
-    buildNumber: "3",
+    buildNumber: "4",
     appStoreUrl: "https://apps.apple.com/app/truyencity",
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
       NSAppTransportSecurity: {
-        NSAllowsArbitraryLoads: true
-      }
-    }
+        NSAllowsArbitraryLoads: false,
+        NSExceptionDomains: {
+          "supabase.co": {
+            NSIncludesSubdomains: true,
+            NSThirdPartyExceptionAllowsInsecureHTTPLoads: false,
+          },
+        },
+      },
+      SKAdNetworkItems: [
+        { SKAdNetworkIdentifier: "cstr6suwn9.skadnetwork" }, // Google
+      ],
+      GADApplicationIdentifier:
+        process.env.EXPO_PUBLIC_ADMOB_IOS_APP_ID ||
+        "ca-app-pub-3940256099942544~1458002511", // Test ID
+    },
   },
   android: {
     adaptiveIcon: {
@@ -33,7 +45,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       backgroundColor: "#1a1625",
     },
     package: "com.truyencity.app",
-    versionCode: 1,
+    versionCode: 2,
     softwareKeyboardLayoutMode: "resize",
     permissions: ["INTERNET", "ACCESS_NETWORK_STATE"],
   },
@@ -46,6 +58,17 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-sqlite",
     "expo-secure-store",
     "expo-web-browser",
+    [
+      "react-native-google-mobile-ads",
+      {
+        androidAppId:
+          process.env.EXPO_PUBLIC_ADMOB_ANDROID_APP_ID ||
+          "ca-app-pub-3940256099942544~3347511713", // Test ID
+        iosAppId:
+          process.env.EXPO_PUBLIC_ADMOB_IOS_APP_ID ||
+          "ca-app-pub-3940256099942544~1458002511", // Test ID
+      },
+    ],
   ],
   extra: {
     eas: {

@@ -108,28 +108,9 @@ BEGIN
     )
   );
 
-  -- 6. ai-editor-scan: 00:05 UTC daily
-  PERFORM cron.schedule(
-    'ai-editor-scan-cron',
-    '5 0 * * *',
-    format(
-      'SELECT net.http_get(url := %L, headers := %L::jsonb, timeout_milliseconds := 290000) AS request_id;',
-      _base_url || '/api/cron/ai-editor-scan',
-      json_build_object('Authorization', 'Bearer ' || _secret)::text
-    )
-  );
+  -- 6-7. ai-editor-scan + ai-editor-rewrite: REMOVED in migration 0134
+  -- Route handlers were deleted in Phase 8. Jobs unscheduled in 0134.
 
-  -- 7. ai-editor-rewrite: every 10 minutes
-  PERFORM cron.schedule(
-    'ai-editor-rewrite-cron',
-    '*/10 * * * *',
-    format(
-      'SELECT net.http_get(url := %L, headers := %L::jsonb, timeout_milliseconds := 290000) AS request_id;',
-      _base_url || '/api/cron/ai-editor-rewrite?maxJobs=1&maxChaptersPerJob=2',
-      json_build_object('Authorization', 'Bearer ' || _secret)::text
-    )
-  );
-
-  RAISE NOTICE 'All 7 pg_cron jobs rescheduled with vault secret';
+  RAISE NOTICE 'All 5 pg_cron jobs rescheduled with vault secret';
 END;
 $$;
