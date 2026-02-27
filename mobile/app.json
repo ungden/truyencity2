@@ -15,7 +15,10 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.truyencity.app",
-      "buildNumber": "7"
+      "buildNumber": "7",
+      "infoPlist": {
+        "CFBundleShortVersionString": "1.0.0"
+      }
     },
     "android": {
       "adaptiveIcon": {
