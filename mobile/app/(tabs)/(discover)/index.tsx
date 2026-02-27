@@ -8,7 +8,6 @@ import NovelCard from "@/components/novel-card";
 import HeroCarousel from "@/components/hero-carousel";
 import SectionHeader from "@/components/section-header";
 import SearchResults from "@/components/search-results";
-import { AdBanner } from "@/components/ads/ad-banner";
 import { useSearchContext } from "@/contexts/search-context";
 import type { Novel } from "@/lib/types";
 
@@ -144,9 +143,6 @@ export default function DiscoverScreen() {
           <HeroCarousel novels={heroNovels} />
         </View>
       )}
-
-      {/* Banner Ad */}
-      <AdBanner placement="home" />
 
       {/* Latest section — small thumbnails */}
       {latest.length > 0 && (

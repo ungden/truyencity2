@@ -29,7 +29,6 @@ import { AuthorWorks } from '@/components/author-works';
 import { NovelRatingSection } from './rating-section';
 import { cleanNovelDescription } from '@/lib/utils';
 import { BookJsonLd, BreadcrumbJsonLd } from '@/components/seo/JsonLd';
-import { AdPlacement } from '@/components/ads/AdPlacement';
 import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
@@ -421,9 +420,6 @@ export default async function NovelDetailPage({
                   </p>
                 </ContentCard>
               </Section>
-
-              {/* Ad between description and chapters */}
-              <AdPlacement placement="between-content" slot="novel-detail-mid" />
 
               {/* Chapter List */}
               <Section

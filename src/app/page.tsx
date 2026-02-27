@@ -13,7 +13,6 @@ import { createServerClient } from '@/integrations/supabase/server';
 import { Novel } from '@/lib/types';
 import { ContinueReading } from '@/components/continue-reading';
 import { LatestUpdatesCarousel } from '@/components/latest-updates-carousel';
-import { AdPlacement } from '@/components/ads/AdPlacement';
 
 export const revalidate = 300;
 
@@ -327,8 +326,7 @@ export default async function HomePage() {
                 <Link href="/ranking">Xem đầy đủ</Link>
               </Button>
 
-              {/* Sidebar Ad */}
-              <AdPlacement placement="sidebar" slot="sidebar-home" className="mt-6" />
+              {/* TODO: Wire <AdPlacement placement="sidebar" slot="..." /> when ADSENSE_PUB_ID is set */}
             </div>
           </aside>
         </div>

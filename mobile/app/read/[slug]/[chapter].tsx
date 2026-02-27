@@ -27,9 +27,6 @@ import { TTS_SPEEDS } from "@/lib/tts";
 import { getChapterOffline } from "@/lib/offline-db";
 import { useKeepAwake } from "expo-keep-awake";
 import ReaderSettingsSheet from "@/components/reader-settings-sheet";
-import { useInterstitialAd } from "@/hooks/use-interstitial-ad";
-import { useVipStatus } from "@/hooks/use-vip-status";
-import { AdBanner } from "@/components/ads/ad-banner";
 
 // ── Settings persistence ─────────────────────────────────────
 
@@ -90,10 +87,6 @@ export default function ReadingScreen() {
 
   // Keep screen awake while reading
   useKeepAwake();
-
-  // Ads: interstitial between chapters, disabled for VIP
-  const { isVip } = useVipStatus();
-  const { onChapterChange } = useInterstitialAd(isVip);
 
   // State
   const [novelId, setNovelId] = useState<string | null>(null);
@@ -349,8 +342,6 @@ export default function ReadingScreen() {
     if (process.env.EXPO_OS === "ios") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    // Show interstitial ad between chapters (skipped for VIP)
-    onChapterChange();
     router.replace(`/read/${slug}/${num}`);
   }
 
@@ -648,9 +639,6 @@ export default function ReadingScreen() {
               enableExperimentalMarginCollapsing
             />
           )}
-
-          {/* Post-chapter banner ad */}
-          <AdBanner placement="detail" />
 
           {/* Chapter end navigation */}
           <View style={{ marginTop: 32, gap: 12, paddingBottom: 32 }}>
