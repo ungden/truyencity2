@@ -82,6 +82,18 @@ TẤU HÀI WEBNOVEL (BẮT BUỘC): Mỗi chương ≥1 khoảnh khắc hài hư
 
 CHỐNG LẶP TỪ: KHÔNG dùng cùng tính từ/màu sắc quá 3 lần trong chương. Sau lần 3 → dùng từ đồng nghĩa. TUYỆT ĐỐI KHÔNG dùng cùng tính từ 2 lần trong 1 đoạn.
 
+CHỐNG LẶP CẤU TRÚC AI (CỰC KỲ QUAN TRỌNG):
+- CẤM "X là một Y" quá 3 lần/chương. Thay: "X — Y", "X, tên Y", hoặc diễn đạt khác. VD: thay "Hắn là một kẻ lãnh đạo tàn nhẫn" → "Tên lãnh đạo tàn nhẫn ấy"
+- CẤM "bắt đầu + động từ" quá 3 lần/chương. Thay: dùng trực tiếp động từ. VD: thay "bắt đầu run rẩy" → "run lẩy bẩy", "rung lên từng đợt"
+- CẤM "mang theo" quá 2 lần/chương. Thay: "pha lẫn", "kèm theo", "nhuốm", "lẫn vào"
+- CẤM "tỏa ra" quá 2 lần/chương. Thay: "lan tỏa", "bốc lên", "phả ra", "xộc ra"
+- CẤM "dường như / như thể" quá 3 lần/chương. Thay: so sánh trực tiếp hoặc bỏ hẳn
+
+ĐẠI TỪ THAY TÊN NHÂN VẬT (BẮT BUỘC):
+- Mỗi 3-4 lần nhắc tên MC, PHẢI xen 1-2 lần dùng đại từ: hắn/anh/nàng/gã/y/lão tùy vai vế
+- Cũng dùng chức danh/biệt hiệu thay tên: "tên thiếu niên", "vị tông chủ trẻ", "kẻ mới đến"
+- MỤC TIÊU: Tên MC không quá 20 lần/10.000 chữ. Nếu vượt → thay bằng đại từ
+
 CẤM VĂN MẪU AI: Loại bỏ "Hít một ngụm khí lạnh", "Không thể tin nổi", "Đột nhiên", "Khẽ nhếch mép". Tả hành động thực tế.
 
 NỘI TÂM ĐA LỚP (mỗi scene chính): 3 lớp: Bề mặt (MC nói gì) → Thật sự (MC cảm thấy gì) → Sâu nhất (nỗi sợ/khao khát bí mật).
@@ -109,6 +121,8 @@ TIÊU CHÍ ĐÁNH GIÁ (thang 1-10):
 KIỂM TRA BỔ SUNG (BẮT BUỘC):
 5. COMEDY: Chương có ít nhất 1 khoảnh khắc hài hước tự nhiên không? (nội tâm tự giễu, não bổ, gap moe, vô sỉ). Nếu KHÔNG CÓ bất kỳ yếu tố hài nào → tạo issue type "quality", severity "moderate", description "Thiếu comedy beat". CHỈ severity "major" nếu đây là chương đối thoại/sinh hoạt mà vẫn hoàn toàn không hài.
 6. LẶP TỪ: Dùng BÁO CÁO LẶP TỪ tự động. Nếu BẤT KỲ từ nào xuất hiện >8 lần → issue severity "critical". Nếu >5 lần → severity "moderate" (CHỈ "major" nếu ≥3 nhóm từ đều >5 lần).
+6b. LẶP CẤU TRÚC AI: Kiểm tra "là một", "bắt đầu", "mang theo", "tỏa ra", "dường như/như thể". Nếu bất kỳ cụm nào >5 lần → severity "moderate", yêu cầu thay thế. Nếu >8 lần → "major".
+6c. TÊN MC QUÁ DÀY: Nếu tên MC xuất hiện >25 lần/10K chữ trong khi có ít đại từ → severity "moderate", yêu cầu xen đại từ (hắn/anh/nàng/gã).
 7. NỘI TÂM ĐA LỚP: Chương có ít nhất 1 đoạn nội tâm đi sâu hơn bề mặt không? Nếu thiếu → tạo issue type "quality", severity "minor". CHỈ severity "moderate" nếu toàn bộ chương đều nội tâm 1 lớp.
 8. GIỌNG NÓI NHÂN VẬT: Nếu ≥3 nhân vật nói giống hệt nhau → issue type "dialogue", severity "moderate". Nếu chỉ 2 nhân vật → "minor".
 9. SUBTEXT HỘI THOẠI: Nếu >50% đối thoại quan trọng là hỏi-đáp thẳng tuột (A hỏi, B trả lời đầy đủ) → issue type "dialogue", severity "minor". CHỈ "moderate" nếu toàn bộ đối thoại đều nói thẳng.
@@ -993,6 +1007,16 @@ function detectSevereRepetition(content: string): CriticIssue[] {
     'đặc quánh': { variants: ['đặc quánh'], category: 'generic' },
     'bùng phát': { variants: ['bùng phát', 'bùng nổ'], category: 'generic' },
     'ken két': { variants: ['ken két'], category: 'generic' },
+    // AI structural patterns — overused sentence constructions
+    'là một': { variants: ['là một'], category: 'generic' },
+    'bắt đầu': { variants: ['bắt đầu'], category: 'generic' },
+    'mang theo': { variants: ['mang theo'], category: 'generic' },
+    'lạnh lẽo': { variants: ['lạnh lẽo', 'lạnh buốt', 'lạnh lùng'], category: 'generic' },
+    'run rẩy': { variants: ['run rẩy', 'run lên', 'run bần bật'], category: 'generic' },
+    'tỏa ra': { variants: ['tỏa ra'], category: 'generic' },
+    'đôi mắt': { variants: ['đôi mắt'], category: 'generic' },
+    'như thể': { variants: ['như thể'], category: 'generic' },
+    'dường như': { variants: ['dường như'], category: 'generic' },
     // Plot element words — naturally recur more often
     'pixel hóa': { variants: ['pixel hóa', 'pixel'], category: 'plot_element' },
     'rỉ sét': { variants: ['rỉ sét'], category: 'plot_element' },
@@ -1061,7 +1085,16 @@ function buildRepetitionReport(content: string): string {
     'rỉ sét': ['rỉ sét'],
     'tan rã': ['tan rã', 'phân rã'],
     'bùng phát': ['bùng phát', 'bùng nổ'],
-    'run rẩy': ['run rẩy', 'run lên'],
+    'run rẩy': ['run rẩy', 'run lên', 'run bần bật'],
+    // AI structural patterns — sentence constructions AI overuses
+    'là một': ['là một'],
+    'bắt đầu': ['bắt đầu'],
+    'mang theo': ['mang theo'],
+    'lạnh lẽo': ['lạnh lẽo', 'lạnh buốt', 'lạnh lùng'],
+    'tỏa ra': ['tỏa ra'],
+    'đôi mắt': ['đôi mắt'],
+    'như thể': ['như thể'],
+    'dường như': ['dường như'],
   };
 
   const counts: Array<{ group: string; count: number; variants: string }> = [];

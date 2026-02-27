@@ -1830,6 +1830,15 @@ export const ANTI_CLICHE_RULES = {
     'Không ai biết rằng',
     'Chỉ thấy',
     'Cảm thấy một luồng',
+    'Siết chặt nắm tay',
+    'Mồ hôi lạnh túa ra',
+    'Da gà nổi lên',
+    'Đôi mắt lóe lên tia sáng',
+    'Ánh mắt sắc lẹm',
+    'Nghiến răng (nếu dùng quá 1 lần/chương)',
+    'Hít một hơi thật sâu (nếu dùng quá 1 lần/chương)',
+    'Gầm lên',
+    'Khóe môi nhếch lên (nếu dùng quá 1 lần/chương)',
   ],
   guidance: 'Thay vì dùng các từ cấm, hãy MÔ TẢ hệ quả của chúng. Ví dụ: thay vì "hít một ngụm khí lạnh", tả "sắc mặt tái nhợt, lùi lại nửa bước". Thay vì "đột nhiên", tả trực tiếp âm thanh/hình ảnh cắt ngang.',
   colorRepetitionRule: `QUY TẮC LẶP MÀU SẮC & TÍNH TỪ (CỰC KỲ QUAN TRỌNG):
@@ -1842,6 +1851,7 @@ export const ANTI_CLICHE_RULES = {
   + "kinh hoàng" lần 4+ → "ớn lạnh", "máu đông cứng", "hồn vía lên mây", "tim nhảy khỏi lồng ngực"
   + "pixel hóa" lần 4+ → "tan rã thành điểm ảnh", "vỡ vụn thành hạt sáng", "phân giải", "bị số hóa cưỡng ép"
 - Các từ THƯỜNG BỊ LẶP cần chú ý: rỉ sét, ken két, rực rỡ, đặc quánh, mờ ảo, chập chờn, kinh hoàng, kinh ngạc, khủng bố, sững sờ
+- CẤU TRÚC AI THƯỜNG LẶP: "là một" (thay: bỏ hoặc dùng gạch ngang), "bắt đầu" (thay: dùng động từ trực tiếp), "mang theo" (thay: pha lẫn, nhuốm), "tỏa ra" (thay: lan tỏa, phả ra), "đôi mắt" (thay: mắt, cặp mắt, tròng mắt, ánh nhìn)
 - TUYỆT ĐỐI KHÔNG dùng cùng tính từ 2 lần trong 1 đoạn văn (paragraph).`,
 };
 
