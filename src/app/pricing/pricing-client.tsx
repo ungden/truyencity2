@@ -6,8 +6,11 @@ import { Header } from "@/components/header";
 import { PricingCards } from "@/components/billing/PricingCards";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Check, Headphones, BookOpen, ShieldOff } from "lucide-react";
 import { Loader2 } from "lucide-react";
+import { Download } from "lucide-react";
+import { VipCheckoutModal } from "@/components/billing/VipCheckoutModal";
 
 const READER_TIERS = [
   {
@@ -16,18 +19,18 @@ const READER_TIERS = [
     badge: null,
     features: [
       { icon: BookOpen, text: "Đọc truyện miễn phí với quảng cáo" },
-      { icon: Check, text: "5 chương tải offline/ngày" },
-      { icon: Headphones, text: "Nghe truyện 60 phút/ngày" },
+      { icon: Headphones, text: "Nghe audio 1 tiếng/ngày" },
     ],
   },
   {
     name: "VIP Đọc",
-    price: "49,000đ/tháng",
+    price: "99,000đ/tháng",
+    priceAnnual: "999,000đ/năm (tiết kiệm 17%)",
     badge: "Phổ biến",
     features: [
       { icon: ShieldOff, text: "Không quảng cáo" },
-      { icon: BookOpen, text: "Tải & đọc offline không giới hạn" },
-      { icon: Headphones, text: "Nghe truyện không giới hạn" },
+      { icon: Download, text: "Tải truyện về đọc offline" },
+      { icon: Headphones, text: "Nghe audio không giới hạn" },
     ],
   },
 ];
@@ -50,6 +53,16 @@ interface WriterTier {
 export function PricingPageClient() {
   const [writerTiers, setWriterTiers] = useState<WriterTier[]>([]);
   const [loading, setLoading] = useState(true);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<"monthly" | "yearly">("monthly");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Check auth state
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session);
+    });
+  }, []);
 
   useEffect(() => {
     const fetchTiers = async () => {
@@ -94,6 +107,9 @@ export function PricingPageClient() {
                     <p className="text-2xl font-bold mt-1">
                       {tier.price ?? "Miễn phí"}
                     </p>
+                    {"priceAnnual" in tier && tier.priceAnnual && (
+                      <p className="text-sm text-green-600 mt-1">{tier.priceAnnual}</p>
+                    )}
                   </div>
                   <ul className="space-y-2">
                     {tier.features.map((f, i) => (
@@ -103,10 +119,52 @@ export function PricingPageClient() {
                       </li>
                     ))}
                   </ul>
+                  {tier.price && (
+                    <div className="space-y-2 pt-2">
+                      <Button
+                        className="w-full"
+                        onClick={() => {
+                          if (!isLoggedIn) {
+                            window.location.href = "/auth?redirect=/pricing";
+                            return;
+                          }
+                          setSelectedPlan("monthly");
+                          setCheckoutOpen(true);
+                        }}
+                      >
+                        Mua gói tháng — 99,000đ
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => {
+                          if (!isLoggedIn) {
+                            window.location.href = "/auth?redirect=/pricing";
+                            return;
+                          }
+                          setSelectedPlan("yearly");
+                          setCheckoutOpen(true);
+                        }}
+                      >
+                        Mua gói năm — 999,000đ
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))}
           </div>
+
+          {/* SePay QR Checkout Modal */}
+          <VipCheckoutModal
+            open={checkoutOpen}
+            onOpenChange={setCheckoutOpen}
+            plan={selectedPlan}
+            onSuccess={() => {
+              // Reload to reflect VIP status
+              setTimeout(() => window.location.reload(), 2000);
+            }}
+          />
         </section>
 
         {/* Writer Tiers Section */}
