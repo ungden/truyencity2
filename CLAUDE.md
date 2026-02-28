@@ -408,7 +408,6 @@ Comprehensive audit found 3 critical + 4 high + 5 medium + 5 low issues in the a
 ## Remaining Known Issues
 
 ### Pending (needs external setup)
-- Phase 12C: App Store submission (needs device testing + screenshots)
 - Phase 12D: Google Play submission (needs Android build)
 - Phase 13C: Email notifications (needs email service like Resend/SendGrid)
 - Payment gateway integration (Apple IAP, Google Play Billing, VNPay)

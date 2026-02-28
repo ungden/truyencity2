@@ -346,12 +346,12 @@ npm run dev
 - [x] VIP context provider (shared, single RPC)
 - [x] Mobile app (Expo SDK 54, offline, TTS, rankings, iPad support)
 - [x] App Store submission (TestFlight uploaded, screenshots captured)
+- [x] App Store Privacy declared & Submitted for Review
 - [x] SEO (JSON-LD, canonical URLs, /search page)
 - [x] Analytics (GA4, Vercel Analytics)
 - [x] Infrastructure (Upstash Redis, Sentry, security headers)
 
 ### Pending
-- [ ] App Store Privacy Review (Manual step required)
 - [ ] Google Play submission
 - [ ] Payment gateway (Apple IAP, Google Play Billing, VNPay)
 - [ ] Email notifications (Resend/SendGrid)
