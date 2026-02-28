@@ -1,7 +1,6 @@
 import React, { useRef, useState, useCallback } from "react";
 import {
   FlatList,
-  useWindowDimensions,
   NativeScrollEvent,
   NativeSyntheticEvent,
   ViewToken,
@@ -10,15 +9,19 @@ import { View, Pressable, Text } from "@/tw";
 import { Image } from "@/tw/image";
 import { Link } from "expo-router";
 import type { Novel } from "@/lib/types";
+import { useDevice } from "@/hooks/use-device";
 
 interface HeroCarouselProps {
   novels: Novel[];
 }
 
 export default function HeroCarousel({ novels }: HeroCarouselProps) {
-  const { width } = useWindowDimensions();
+  const { width, isTablet } = useDevice();
   const [activeIndex, setActiveIndex] = useState(0);
-  const cardWidth = width - 32; // 16px padding each side
+  
+  // On iPad, limit width to 700 to prevent extreme panorama, and center it
+  const cardWidth = isTablet ? Math.min(width - 48, 800) : width - 32; 
+  const cardHeight = isTablet ? 360 : 220;
 
   const onViewableItemsChanged = useCallback(
     ({ viewableItems }: { viewableItems: ViewToken[] }) => {
@@ -46,11 +49,11 @@ export default function HeroCarousel({ novels }: HeroCarouselProps) {
         renderItem={({ item }) => (
           <Link href={`/novel/${item.slug || item.id}`} asChild>
             <Pressable
-              style={{ width: cardWidth, height: 220, borderRadius: 16, overflow: "hidden" }}
+              style={{ width: cardWidth, height: cardHeight, borderRadius: 16, overflow: "hidden" }}
             >
               <Image
                 source={item.cover_url || "https://placehold.co/400x220"}
-                style={{ width: cardWidth, height: 220 }}
+                style={{ width: cardWidth, height: cardHeight }}
                 className="object-cover"
               />
               {/* Dark overlay bottom half for text readability */}
@@ -60,7 +63,7 @@ export default function HeroCarousel({ novels }: HeroCarouselProps) {
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  height: 120,
+                  height: cardHeight * 0.6,
                   backgroundColor: "rgba(0,0,0,0.55)",
                 }}
               />
@@ -71,15 +74,15 @@ export default function HeroCarousel({ novels }: HeroCarouselProps) {
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  paddingHorizontal: 16,
-                  paddingBottom: 16,
+                  paddingHorizontal: 24,
+                  paddingBottom: 24,
                   paddingTop: 8,
                 }}
               >
                 <Text
                   style={{
                     color: "#fff",
-                    fontSize: 22,
+                    fontSize: isTablet ? 32 : 22,
                     fontWeight: "700",
                     textShadowColor: "rgba(0,0,0,0.9)",
                     textShadowRadius: 6,
@@ -93,8 +96,8 @@ export default function HeroCarousel({ novels }: HeroCarouselProps) {
                   <Text
                     style={{
                       color: "rgba(255,255,255,0.85)",
-                      fontSize: 14,
-                      marginTop: 4,
+                      fontSize: isTablet ? 18 : 14,
+                      marginTop: 8,
                       textShadowColor: "rgba(0,0,0,0.7)",
                       textShadowRadius: 4,
                       textShadowOffset: { width: 0, height: 1 },

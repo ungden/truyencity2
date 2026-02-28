@@ -178,7 +178,7 @@ export default function LibraryScreen() {
       <FlatList
         data={offlineNovels}
         keyExtractor={(item) => item.novel_id}
-        style={{ flex: 1 }}
+        style={{ flex: 1, backgroundColor: "#131620" }}
         ListHeaderComponent={
           <UnderlineTabs
             tabs={["Lịch sử", "Đánh dấu", "Đã tải"]}
@@ -296,7 +296,7 @@ export default function LibraryScreen() {
     <FlatList
       data={data}
       keyExtractor={(item) => item.id}
-      style={{ flex: 1 }}
+      style={{ flex: 1, backgroundColor: "#131620" }}
       ListHeaderComponent={
         <UnderlineTabs
           tabs={["Lịch sử", "Đánh dấu", "Đã tải"]}

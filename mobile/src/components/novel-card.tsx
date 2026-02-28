@@ -4,6 +4,7 @@ import { Image } from "@/tw/image";
 import { Link } from "expo-router";
 import { getGenreLabel, getGenreTagColor } from "@/lib/genre";
 import type { Novel } from "@/lib/types";
+import { useDevice } from "@/hooks/use-device";
 
 type Variant =
   | "default"
@@ -34,18 +35,21 @@ function getChapterCount(novel: Novel): number {
 // --- Default: small vertical card for horizontal scroll ---
 function DefaultCard({ novel }: { novel: Novel }) {
   const chapterCount = getChapterCount(novel);
+  const { isTablet } = useDevice();
+  const cardWidth = isTablet ? 140 : 100;
 
   return (
     <Link href={`/novel/${novel.slug || novel.id}`} asChild>
-      <Pressable style={{ width: 100 }}>
+      <Pressable style={{ width: cardWidth }}>
         <Image
           source={novel.cover_url || "https://placehold.co/200x267"}
-          style={{ width: 100, height: 133, borderRadius: 8 }}
+          style={{ width: cardWidth, aspectRatio: 3/4, borderRadius: 8 }}
           className="object-cover"
         />
         <Text
           className="text-foreground text-xs font-medium mt-1.5"
           numberOfLines={2}
+          style={isTablet ? { fontSize: 14 } : undefined}
         >
           {novel.title}
         </Text>

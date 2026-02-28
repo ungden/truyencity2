@@ -22,37 +22,36 @@
 
 /* Register custom colors as Tailwind theme tokens */
 @theme {
-  /* Light mode colors (defaults) */
-  --color-background: #ffffff;
-  --color-foreground: #1a1a1a;
-  --color-card: #f5f5f5;
-  --color-card-foreground: #1a1a1a;
-  --color-primary: #1a8cff;
+  /* Light mode colors (defaults) - FORCING DARK MODE COLORS HERE */
+  --color-background: #131620;
+  --color-foreground: #e8e6f0;
+  --color-card: #1a1d28;
+  --color-card-foreground: #e8e6f0;
+  --color-primary: #5c9cff;
   --color-primary-foreground: #ffffff;
-  --color-secondary: #f0f0f0;
-  --color-secondary-foreground: #555555;
-  --color-muted: #f2f2f2;
-  --color-muted-foreground: #999999;
-  --color-accent: #f5f5f5;
-  --color-accent-foreground: #1a1a1a;
-  --color-destructive: #e53935;
+  --color-secondary: #242736;
+  --color-secondary-foreground: #d6d4de;
+  --color-muted: #232536;
+  --color-muted-foreground: #82818e;
+  --color-accent: #282b3a;
+  --color-accent-foreground: #e8e6f0;
+  --color-destructive: #c0392b;
   --color-destructive-foreground: #ffffff;
-  --color-border: #e8e8e8;
-  --color-input: #e8e8e8;
-  --color-ring: #1a8cff;
+  --color-border: #282b3a;
+  --color-input: #282b3a;
+  --color-ring: #5c9cff;
   --color-rating: #ff9800;
-  --color-success: #4caf50;
+  --color-success: #27ae60;
 
   /* Radii */
   --radius-card: 12px;
   --radius-button: 10px;
 }
 
-/* Dark mode overrides */
+/* Dark mode overrides (same colors) */
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
-
     --color-background: #131620;
     --color-foreground: #e8e6f0;
     --color-card: #1a1d28;

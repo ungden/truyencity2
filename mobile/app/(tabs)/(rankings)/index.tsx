@@ -79,7 +79,7 @@ export default function RankingsScreen() {
     <FlatList
       data={novels}
       keyExtractor={(item) => item.id}
-      style={{ flex: 1 }}
+      style={{ flex: 1, backgroundColor: "#131620" }}
       ListHeaderComponent={<ListHeader />}
       stickyHeaderIndices={[0]}
       renderItem={({ item, index }) => (

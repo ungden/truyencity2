@@ -1,4 +1,7 @@
+import { Platform } from "react-native";
 import { Stack } from "expo-router/stack";
+
+const isIPad = Platform.OS === "ios" && (Platform as any).isPad === true;
 
 export default function AccountStack() {
   return (
@@ -12,7 +15,7 @@ export default function AccountStack() {
         name="index"
         options={{
           title: "Cài Đặt",
-          headerLargeTitle: true,
+          headerLargeTitle: !isIPad,
         }}
       />
       <Stack.Screen

@@ -397,6 +397,14 @@ Comprehensive audit found 3 critical + 4 high + 5 medium + 5 low issues in the a
 - **16C-2**: `reader-vip-service.ts` — `credit_transactions` insert now checks for errors + logs (was fire-and-forget)
 - **16C-3**: `vercel.json` — Added `Strict-Transport-Security` (HSTS with preload) and `Permissions-Policy` (camera/mic/geo disabled)
 
+### 16D — iPad UI & Routing Fixes
+- **16D-1**: Fixed routing bug where app launched into `(account)` instead of `(discover)` by adding explicit `/mobile/app/index.tsx` redirect
+- **16D-2**: Forced Dark Mode globally (`userInterfaceStyle: "dark"`) and synchronized `global.css` root colors to fix white-flash/inconsistent colors on iPad
+- **16D-3**: Fixed `headerLargeTitle` bleeding on iPad OS 18 top tab bar by conditionally disabling it via `useDevice` hook
+- **16D-4**: Optimized iPad layouts: constrained Hero carousel width (max 800px), expanded grid columns (4-5 columns), added responsive margins to Settings/Library screens
+- **16D-5**: Fixed `get_ranked_novels` RPC crashing Rankings tab (applied Migration 0136 manually, fixed JSONB to TEXT[] cast)
+- **16D-6**: Captured 13-inch iPad screenshots (`ipad-13-1.png`, `ipad-13-2.png`) for App Store Connect
+
 ## Remaining Known Issues
 
 ### Pending (needs external setup)

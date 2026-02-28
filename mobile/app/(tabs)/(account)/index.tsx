@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Alert, FlatList, Image as RNImage, Linking } from "react-native";
+import { Alert, FlatList, Image as RNImage, Linking, Platform, useWindowDimensions } from "react-native";
 import { View, Text, ScrollView, Pressable, Link } from "@/tw";
 import { supabase } from "@/lib/supabase";
 import { useUserStats } from "@/hooks/use-user-stats";
@@ -155,8 +155,13 @@ interface StatItem {
 }
 
 function StatsGrid({ items }: { items: StatItem[] }) {
+  const { width } = useWindowDimensions();
+  const isTablet = Platform.OS === "ios" && width >= 700;
+  // 4 columns on iPad, 2 on phone
+  const itemWidth = isTablet ? "23%" : "47%";
+
   return (
-    <View className="mx-4 gap-3">
+    <View className="mx-4 gap-3" style={isTablet ? { maxWidth: 700, alignSelf: "center", width: "100%" } : undefined}>
       <Text
         style={{
           fontSize: 16,
@@ -175,7 +180,7 @@ function StatsGrid({ items }: { items: StatItem[] }) {
               backgroundColor: "#1a1d28",
               borderRadius: 14,
               padding: 14,
-              width: "47%",
+              width: itemWidth as any,
               flexGrow: 1,
               gap: 6,
             }}

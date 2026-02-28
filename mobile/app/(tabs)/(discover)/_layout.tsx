@@ -1,6 +1,8 @@
 import React from "react";
-import { Image as RNImage, View as RNView, Text as RNText } from "react-native";
+import { Image as RNImage, View as RNView, Text as RNText, Platform } from "react-native";
 import { Stack } from "expo-router/stack";
+
+const isIPad = Platform.OS === "ios" && (Platform as any).isPad === true;
 import { SearchProvider, useSearchContext } from "@/contexts/search-context";
 
 function HeaderLogo() {
@@ -31,19 +33,24 @@ function DiscoverStackInner() {
       screenOptions={{
         headerBackButtonDisplayMode: "minimal",
         headerShadowVisible: false,
+        headerStyle: { backgroundColor: "#131620" },
+        headerTintColor: "#fafafa",
       }}
     >
       <Stack.Screen
         name="index"
         options={{
           title: "Trang Chủ",
-          headerLargeTitle: true,
+          headerLargeTitle: !isIPad,
+          headerLargeTitleStyle: { color: "#e8e6f0" },
           headerLargeTitleShadowVisible: false,
-          headerTitle: () => <HeaderLogo />,
+          headerTitle: isIPad ? "" : () => <HeaderLogo />,
           headerSearchBarOptions: {
             placeholder: "Tìm truyện...",
             autoCapitalize: "none" as const,
             hideWhenScrolling: true,
+            textColor: "#e8e6f0",
+            tintColor: "#5c9cff",
             onChangeText: (e) => {
               onChangeText(e.nativeEvent.text);
             },

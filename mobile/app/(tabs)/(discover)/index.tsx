@@ -178,7 +178,7 @@ export default function DiscoverScreen() {
               gap: 12,
             }}
           >
-            {recommended.slice(0, 6).map((novel) => {
+            {recommended.slice(0, width >= 768 ? 8 : 6).map((novel) => {
               const columns = width >= 768 ? 4 : 3;
               const itemWidth = (width - 32 - 12 * (columns - 1)) / columns;
               return (
@@ -201,23 +201,26 @@ export default function DiscoverScreen() {
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: 16, gap: 12 }}
-            renderItem={({ item }) => (
+            renderItem={({ item }) => {
+              const cardWidth = width >= 768 ? 140 : 100;
+              return (
               <Link href={`/novel/${item.slug || item.id}`} asChild>
-                <Pressable style={{ width: 140 }}>
+                <Pressable style={{ width: cardWidth }}>
                   <Image
                     source={item.cover_url || "https://placehold.co/280x373"}
-                    style={{ width: 140, height: 187, borderRadius: 12 }}
+                    style={{ width: cardWidth, aspectRatio: 3/4, borderRadius: 12 }}
                     className="object-cover"
                   />
                   <Text
                     className="text-foreground text-sm font-medium mt-1.5"
                     numberOfLines={2}
+                    style={width >= 768 ? { fontSize: 14 } : { fontSize: 12 }}
                   >
                     {item.title}
                   </Text>
                 </Pressable>
               </Link>
-            )}
+            )}}
           />
         </View>
       )}

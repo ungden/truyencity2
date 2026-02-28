@@ -16,7 +16,7 @@ RETURNS TABLE (
   slug TEXT,
   author TEXT,
   cover_url TEXT,
-  genres JSONB,
+  genres TEXT[],
   status TEXT,
   ai_author_id UUID,
   created_at TIMESTAMPTZ,
