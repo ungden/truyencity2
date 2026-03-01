@@ -144,25 +144,21 @@ export async function POST(request: NextRequest) {
 
     switch (body.action) {
       case 'upgrade': {
-        const result = await readerVipService.upgradeToVip(supabase, user.id, {
-          payment_method: body.payment_method,
-          store_tx_id: body.store_tx_id,
-          auto_renew: body.auto_renew,
-        });
-
-        if (!result.success) {
-          return NextResponse.json({ error: result.error }, { status: 400 });
-        }
-
-        logger.apiRequest('POST', '/api/billing/reader-vip', 200, timer(), {
+        // SECURITY: VIP upgrades are now handled exclusively by RevenueCat webhook.
+        // Client-side upgrade is disabled to prevent unauthorized VIP grants.
+        // The webhook at /api/webhooks/revenuecat handles receipt-validated upgrades.
+        logger.securityEvent('reader_vip_direct_upgrade_blocked', request.headers.get('x-forwarded-for') ?? 'unknown', {
           userId: user.id,
-          action: 'upgrade',
+          payment_method: body.payment_method,
         });
 
-        return NextResponse.json({
-          success: true,
-          message: 'Nang cap VIP thanh cong!',
-        });
+        return NextResponse.json(
+          {
+            error: 'Direct upgrade is disabled. Please purchase via the app.',
+            code: 'UPGRADE_VIA_APP_ONLY',
+          },
+          { status: 403 }
+        );
       }
 
       case 'cancel': {

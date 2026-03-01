@@ -19,7 +19,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     supportsTablet: true,
     bundleIdentifier: "com.truyencity.app",
     buildNumber: "4",
-    appStoreUrl: "https://apps.apple.com/app/truyencity",
+    appStoreUrl: "https://apps.apple.com/app/truyencity/id6759160705",
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
       NSAppTransportSecurity: {
@@ -69,6 +69,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
           "ca-app-pub-3940256099942544~1458002511", // Test ID
       },
     ],
+
   ],
   extra: {
     eas: {
