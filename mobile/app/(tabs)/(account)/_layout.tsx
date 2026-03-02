@@ -25,6 +25,15 @@ export default function AccountStack() {
           presentation: "modal",
         }}
       />
+      <Stack.Screen
+        name="paywall"
+        options={{
+          title: "Nâng cấp VIP",
+          presentation: "modal",
+          headerStyle: { backgroundColor: "#131620" },
+          headerTintColor: "#fafafa",
+        }}
+      />
     </Stack>
   );
 }

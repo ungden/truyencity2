@@ -22,6 +22,7 @@ import { cn } from '@/lib/utils';
 import { GENRE_CONFIG } from '@/lib/types/genre-config';
 import { useNovelsInfinite } from '@/hooks/use-novels-infinite';
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer';
+import { AdPlacement } from '@/components/ads/AdPlacement';
 
 type NovelRow = {
   id: string;
@@ -248,6 +249,9 @@ export default function BrowsePage() {
           </div>
         </div>
       </ContentCard>
+
+      {/* Ad: below sidebar filters */}
+      <AdPlacement placement="sidebar" slot="browse-sidebar" />
     </div>
   );
 

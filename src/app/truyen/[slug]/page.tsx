@@ -18,6 +18,7 @@ import { createServerClient } from '@/integrations/supabase/server';
 import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
 import { GENRE_CONFIG, type Topic } from '@/lib/types/genre-config';
+import { AdPlacement } from '@/components/ads/AdPlacement';
 import SafeImage from '@/components/ui/safe-image';
 import { ChapterList } from '@/components/chapter-list';
 import { NovelActions } from '@/components/novel-actions';
@@ -421,6 +422,9 @@ export default async function NovelDetailPage({
                 </ContentCard>
               </Section>
 
+              {/* Ad: between description and chapters */}
+              <AdPlacement placement="between-content" slot="novel-detail-1" />
+
               {/* Chapter List */}
               <Section
                 title="Danh sách chương"
@@ -448,6 +452,9 @@ export default async function NovelDetailPage({
                   <AuthorWorks novelId={novel.id} authorName={novel.author} limit={6} />
                 </Section>
               )}
+
+              {/* Ad: before comments */}
+              <AdPlacement placement="between-content" slot="novel-detail-2" />
 
               {/* Comments */}
               <Section title="Bình luận">
@@ -548,6 +555,9 @@ export default async function NovelDetailPage({
               </p>
             </Card>
           </div>
+
+          {/* Ad: mobile between description and chapters */}
+          <AdPlacement placement="between-content" slot="novel-detail-mobile" />
 
           {/* Chapter List */}
           <ChapterList novelId={novel.id} novelSlug={novelSlug} chapters={chapters} />

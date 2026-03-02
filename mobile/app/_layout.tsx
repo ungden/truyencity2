@@ -1,9 +1,15 @@
 import "@/global.css";
 import "@/lib/storage"; // init localStorage polyfill
 
+import { useEffect } from "react";
 import { Stack } from "expo-router/stack";
+import { initRevenueCat } from "@/lib/revenuecat";
 
 export default function RootLayout() {
+  useEffect(() => {
+    initRevenueCat();
+  }, []);
+
   return (
     <Stack
       screenOptions={{

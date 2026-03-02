@@ -4,6 +4,7 @@ import { Header } from '@/components/header';
 import { Card } from '@/components/ui/card';
 import { GENRE_CONFIG } from '@/lib/types/genre-config';
 import { createServerClient } from '@/integrations/supabase/server';
+import { AdPlacement } from '@/components/ads/AdPlacement';
 
 export const metadata: Metadata = {
   title: "Thể Loại Truyện",
@@ -81,6 +82,9 @@ export default async function GenresPage() {
             </Link>
           ))}
         </div>
+
+        {/* Ad: after genre grid */}
+        <AdPlacement placement="between-content" slot="genres-bottom" />
       </div>
     </div>
   );

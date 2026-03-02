@@ -3,6 +3,7 @@ import { Alert, FlatList, Image as RNImage, Linking, Platform, useWindowDimensio
 import { View, Text, ScrollView, Pressable, Link } from "@/tw";
 import { supabase } from "@/lib/supabase";
 import { useUserStats } from "@/hooks/use-user-stats";
+import { useRevenueCat } from "@/hooks/use-revenuecat";
 import {
   calculateXP,
   getCurrentLevel,
@@ -353,6 +354,7 @@ function SettingsMenu({ items }: { items: MenuItem[] }) {
 
 export default function ProfileScreen() {
   const { profile, stats, loading, refetch } = useUserStats();
+  const { isVip } = useRevenueCat();
   const [offlineSize, setOfflineSize] = useState(0);
 
   useEffect(() => {
@@ -623,6 +625,74 @@ export default function ProfileScreen() {
           )}
         </View>
       </View>
+
+      {/* VIP upgrade banner — only show for non-VIP */}
+      {!isVip && (
+        <Link href="/(account)/paywall" asChild>
+          <Pressable
+            style={{
+              marginHorizontal: 16,
+              backgroundColor: "#1a1d28",
+              borderRadius: 16,
+              padding: 16,
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 14,
+              borderWidth: 1,
+              borderColor: "#fbbf2440",
+            }}
+          >
+            <View
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                backgroundColor: "#fbbf2420",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text style={{ fontSize: 22 }}>👑</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 15, fontWeight: "700", color: "#fbbf24" }}>
+                Nâng cấp Reader VIP
+              </Text>
+              <Text style={{ fontSize: 12, color: "#82818e", marginTop: 2 }}>
+                Không quảng cáo, tải offline, audio không giới hạn
+              </Text>
+            </View>
+            <Text style={{ fontSize: 16, color: "#fbbf24" }}>›</Text>
+          </Pressable>
+        </Link>
+      )}
+
+      {/* VIP badge — show for VIP users */}
+      {isVip && (
+        <View
+          style={{
+            marginHorizontal: 16,
+            backgroundColor: "#fbbf2415",
+            borderRadius: 16,
+            padding: 16,
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 14,
+            borderWidth: 1,
+            borderColor: "#fbbf2430",
+          }}
+        >
+          <Text style={{ fontSize: 22 }}>👑</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 15, fontWeight: "700", color: "#fbbf24" }}>
+              Reader VIP
+            </Text>
+            <Text style={{ fontSize: 12, color: "#82818e", marginTop: 2 }}>
+              Đang hoạt động
+            </Text>
+          </View>
+        </View>
+      )}
 
       {/* Level card */}
       <LevelCard xp={xp} levelColor={currentLevel.color} />

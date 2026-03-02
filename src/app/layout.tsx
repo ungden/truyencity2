@@ -9,7 +9,7 @@ import { QueryProvider } from "@/providers/query-provider";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { WebsiteJsonLd, OrganizationJsonLd } from "@/components/seo/JsonLd";
-// TODO: import { VipProvider } from "@/contexts/vip-context"; — enable when ads are active
+import { VipProvider } from "@/contexts/vip-context";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://truyencity.com"),
@@ -88,22 +88,24 @@ export default function RootLayout({
         </a>
         <QueryProvider>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-            <ReadingProvider>
-              <AppShell>
-                <main id="main-content">{children}</main>
-              </AppShell>
-              <Toaster />
-            </ReadingProvider>
+            <VipProvider>
+              <ReadingProvider>
+                <AppShell>
+                  <main id="main-content">{children}</main>
+                </AppShell>
+                <Toaster />
+              </ReadingProvider>
+            </VipProvider>
           </ThemeProvider>
         </QueryProvider>
-        {/* Google AdSense — loaded lazily, only when pub ID is set */}
-        {adsensePubId && (
+        {/* Google AdSense — DISABLED: app chưa được duyệt, bật lại sau */}
+        {/* {adsensePubId && (
           <Script
             src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsensePubId}`}
             strategy="lazyOnload"
             crossOrigin="anonymous"
           />
-        )}
+        )} */}
         <Analytics />
         <SpeedInsights />
       </body>

@@ -1,5 +1,19 @@
+/**
+ * VIP Status Hook (RevenueCat + Supabase hybrid)
+ *
+ * - VIP subscription status: sourced from RevenueCat entitlements (single source of truth)
+ * - Usage tracking (TTS, downloads): sourced from Supabase (RevenueCat doesn't track usage)
+ *
+ * This approach ensures:
+ * 1. VIP status can't be spoofed (RevenueCat validates with Apple/Google)
+ * 2. Usage limits still work correctly via DB
+ * 3. Web fallback still works via DB (webhook syncs status)
+ */
+
 import { useCallback, useEffect, useState } from "react";
+import Purchases from "react-native-purchases";
 import { supabase } from "@/lib/supabase";
+import { ENTITLEMENT_READER_VIP } from "@/lib/revenuecat";
 
 export type ReaderTier = "free" | "vip";
 
@@ -22,13 +36,24 @@ const DEFAULT_FREE_STATUS: ReaderStatus = {
   reader_tier: "free",
   expires_at: null,
   show_ads: true,
-  daily_download_limit: 5,
-  daily_tts_limit_seconds: 3600,
+  daily_download_limit: 0, // Free tier: no downloads (VIP only)
+  daily_tts_limit_seconds: 3600, // Free tier: 1 hour/day
   downloads_used_today: 0,
   tts_seconds_used_today: 0,
   has_exclusive_themes: false,
   has_early_access: false,
   has_badge: false,
+  can_download: false, // Free tier: no downloads
+  can_use_tts: true,
+};
+
+const VIP_STATUS_OVERRIDES: Partial<ReaderStatus> = {
+  show_ads: false,
+  daily_download_limit: -1,
+  daily_tts_limit_seconds: -1,
+  has_exclusive_themes: true,
+  has_early_access: true,
+  has_badge: true,
   can_download: true,
   can_use_tts: true,
 };
@@ -38,7 +63,7 @@ export function useVipStatus() {
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
 
-  // Fetch VIP status from DB
+  // Fetch VIP status: RevenueCat for subscription, Supabase for usage
   const refresh = useCallback(async () => {
     try {
       const {
@@ -53,15 +78,65 @@ export function useVipStatus() {
 
       setUserId(user.id);
 
-      const { data, error } = await supabase.rpc("get_reader_status", {
-        p_user_id: user.id,
-      });
+      // 1. Check RevenueCat entitlements (primary source for VIP)
+      let rcIsVip = false;
+      let rcExpiresAt: string | null = null;
+      try {
+        const customerInfo = await Purchases.getCustomerInfo();
+        const entitlement =
+          customerInfo.entitlements.active[ENTITLEMENT_READER_VIP];
+        if (entitlement) {
+          rcIsVip = true;
+          rcExpiresAt = entitlement.expirationDate;
+        }
+      } catch (rcErr) {
+        // RevenueCat not available (e.g. Expo Go) — fall back to DB
+        console.warn("[useVipStatus] RevenueCat check failed, falling back to DB:", rcErr);
+      }
 
-      if (error || !data) {
-        console.warn("[useVipStatus] Failed to get status:", error?.message);
-        setStatus(DEFAULT_FREE_STATUS);
+      // 2. Get usage data from Supabase (TTS/download counts)
+      const { data: dbStatus, error } = await supabase.rpc(
+        "get_reader_status",
+        { p_user_id: user.id }
+      );
+
+      if (error || !dbStatus) {
+        console.warn("[useVipStatus] DB status failed:", error?.message);
+        // Still use RevenueCat result for VIP
+        if (rcIsVip) {
+          setStatus({
+            ...DEFAULT_FREE_STATUS,
+            reader_tier: "vip",
+            expires_at: rcExpiresAt,
+            ...VIP_STATUS_OVERRIDES,
+          });
+        } else {
+          setStatus(DEFAULT_FREE_STATUS);
+        }
       } else {
-        setStatus(data as ReaderStatus);
+        const base = dbStatus as ReaderStatus;
+
+        if (rcIsVip) {
+          // RevenueCat says VIP — override DB tier (in case webhook hasn't synced yet)
+          setStatus({
+            ...base,
+            reader_tier: "vip",
+            expires_at: rcExpiresAt ?? base.expires_at,
+            ...VIP_STATUS_OVERRIDES,
+          });
+        } else {
+          // RevenueCat says not VIP — use DB status as-is
+          // (DB may still show VIP if webhook hasn't processed expiration yet,
+          //  but RevenueCat is the source of truth)
+          setStatus({
+            ...base,
+            reader_tier: "free",
+            show_ads: true,
+            has_exclusive_themes: false,
+            has_early_access: false,
+            has_badge: false,
+          });
+        }
       }
     } catch (err) {
       console.warn("[useVipStatus] Error:", err);
@@ -73,6 +148,17 @@ export function useVipStatus() {
 
   useEffect(() => {
     refresh();
+  }, [refresh]);
+
+  // Listen for RevenueCat customer info updates
+  useEffect(() => {
+    const listener = () => {
+      refresh();
+    };
+    Purchases.addCustomerInfoUpdateListener(listener);
+    return () => {
+      Purchases.removeCustomerInfoUpdateListener(listener);
+    };
   }, [refresh]);
 
   // Record TTS usage and update local state
@@ -133,8 +219,7 @@ export function useVipStatus() {
       setStatus((prev) => ({
         ...prev,
         downloads_used_today: result.chapters_downloaded_today,
-        can_download:
-          result.daily_limit === -1 || result.can_download_more,
+        can_download: result.daily_limit === -1 || result.can_download_more,
       }));
 
       return result;

@@ -13,6 +13,7 @@ import { createServerClient } from '@/integrations/supabase/server';
 import { Novel } from '@/lib/types';
 import { ContinueReading } from '@/components/continue-reading';
 import { LatestUpdatesCarousel } from '@/components/latest-updates-carousel';
+import { AdPlacement } from '@/components/ads/AdPlacement';
 
 export const revalidate = 300;
 
@@ -186,6 +187,9 @@ export default async function HomePage() {
               <LatestUpdatesCarousel novels={latestNovels} />
             </section>
 
+            {/* Ad: between content sections */}
+            <AdPlacement placement="between-content" slot="home-between-1" />
+
             {/* New Releases */}
             {newestNovels.length > 0 && (
               <section>
@@ -257,6 +261,9 @@ export default async function HomePage() {
               </section>
             )}
 
+            {/* Ad: between genre sections */}
+            <AdPlacement placement="between-content" slot="home-between-2" />
+
             {/* Đô Thị Genre Section */}
             {doThiNovels.length > 0 && (
               <section>
@@ -326,7 +333,7 @@ export default async function HomePage() {
                 <Link href="/ranking">Xem đầy đủ</Link>
               </Button>
 
-              {/* TODO: Wire <AdPlacement placement="sidebar" slot="..." /> when ADSENSE_PUB_ID is set */}
+              <AdPlacement placement="sidebar" slot="home-sidebar" />
             </div>
           </aside>
         </div>

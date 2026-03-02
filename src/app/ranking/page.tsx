@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useRouter } from 'next/navigation';
 import { getGenreLabel } from '@/lib/utils/genre';
 import { AppContainer } from '@/components/layout';
+import { AdPlacement } from '@/components/ads/AdPlacement';
 
 type NovelWithChapters = {
   id: string;
@@ -334,14 +335,19 @@ export default function RankingPage() {
             </div>
           ) : (
             <div className="space-y-3">
-              {rankedNovels.map((novel) => (
-                <RankingCard
-                  key={novel.id}
-                  novel={novel}
-                  metric={getMetric(novel)}
-                  onClick={() => handleNovelClick(novel.slug, novel.id)}
-                />
+              {rankedNovels.map((novel, idx) => (
+                <React.Fragment key={novel.id}>
+                  <RankingCard
+                    novel={novel}
+                    metric={getMetric(novel)}
+                    onClick={() => handleNovelClick(novel.slug, novel.id)}
+                  />
+                  {idx === 9 && (
+                    <AdPlacement placement="between-content" slot="ranking-mid" />
+                  )}
+                </React.Fragment>
               ))}
+              <AdPlacement placement="between-content" slot="ranking-bottom" />
             </div>
           )}
         </Tabs>

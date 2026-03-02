@@ -146,8 +146,8 @@ class ReaderVipService {
         balance_after: 0,
         payment_method: paymentInfo.payment_method,
         payment_provider_id: paymentInfo.store_tx_id,
-        price_vnd: 49000,
-        price_usd: 1.99,
+        price_vnd: 99000,
+        price_usd: 3.99,
         description: 'Nang cap VIP Reader - 1 thang',
       });
       if (txError) {

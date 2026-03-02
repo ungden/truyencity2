@@ -18,6 +18,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { GENRE_CONFIG } from '@/lib/types/genre-config';
 import { cn } from '@/lib/utils';
+import { AdPlacement } from '@/components/ads/AdPlacement';
 
 type SearchRow = {
   id: string;
@@ -255,36 +256,42 @@ export default function SearchClient() {
           ))}
         </div>
       ) : results.length > 0 ? (
-        <div className={cn(
-          viewMode === 'grid'
-            ? 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4'
-            : 'space-y-3'
-        )}>
-          {results.map((novel) => (
-            <NovelCard
-              key={novel.id}
-              id={novel.id}
-              slug={novel.slug || undefined}
-              title={novel.title}
-              author={novel.author || 'N/A'}
-              cover={novel.cover_url || ''}
-              status={novel.status || 'Đang ra'}
-              genre={novel.genres?.[0]}
-              chapters={novel.chapters?.[0]?.count || 0}
-              variant={viewMode === 'list' ? 'horizontal' : 'default'}
-            />
-          ))}
-        </div>
-      ) : hasSearched ? (
-        <div className="text-center py-16">
-          <div className="w-16 h-16 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
-            <Search size={24} className="text-muted-foreground" />
+        <>
+          <div className={cn(
+            viewMode === 'grid'
+              ? 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4'
+              : 'space-y-3'
+          )}>
+            {results.map((novel) => (
+              <NovelCard
+                key={novel.id}
+                id={novel.id}
+                slug={novel.slug || undefined}
+                title={novel.title}
+                author={novel.author || 'N/A'}
+                cover={novel.cover_url || ''}
+                status={novel.status || 'Đang ra'}
+                genre={novel.genres?.[0]}
+                chapters={novel.chapters?.[0]?.count || 0}
+                variant={viewMode === 'list' ? 'horizontal' : 'default'}
+              />
+            ))}
           </div>
-          <p className="text-lg font-medium">Không tìm thấy kết quả</p>
-          <p className="text-sm text-muted-foreground mt-1">
-            Thử tìm kiếm với từ khóa khác hoặc thay đổi bộ lọc
-          </p>
-        </div>
+          <AdPlacement placement="between-content" slot="search-results" />
+        </>
+      ) : hasSearched ? (
+        <>
+          <div className="text-center py-16">
+            <div className="w-16 h-16 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
+              <Search size={24} className="text-muted-foreground" />
+            </div>
+            <p className="text-lg font-medium">Không tìm thấy kết quả</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Thử tìm kiếm với từ khóa khác hoặc thay đổi bộ lọc
+            </p>
+          </div>
+          <AdPlacement placement="between-content" slot="search-bottom" />
+        </>
       ) : (
         <div className="text-center py-16">
           <div className="w-16 h-16 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">

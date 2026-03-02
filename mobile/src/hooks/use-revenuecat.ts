@@ -1,0 +1,160 @@
+import { useCallback, useEffect, useState } from "react";
+import Purchases, {
+  type CustomerInfo,
+  type PurchasesPackage,
+} from "react-native-purchases";
+import { supabase } from "@/lib/supabase";
+import {
+  ENTITLEMENT_READER_VIP,
+  identifyUser,
+  logOutRevenueCat,
+} from "@/lib/revenuecat";
+
+export interface RevenueCatState {
+  /** Whether user has active Reader VIP */
+  isVip: boolean;
+  /** Full customer info from RevenueCat */
+  customerInfo: CustomerInfo | null;
+  /** Available packages for purchase */
+  packages: PurchasesPackage[];
+  /** Loading state */
+  loading: boolean;
+  /** Error message if any */
+  error: string | null;
+  /** Refresh customer info */
+  refresh: () => Promise<void>;
+  /** Purchase a package (triggers Apple/Google payment sheet) */
+  purchasePackage: (pkg: PurchasesPackage) => Promise<boolean>;
+  /** Restore purchases (for "Already purchased?" button) */
+  restorePurchases: () => Promise<boolean>;
+}
+
+export function useRevenueCat(): RevenueCatState {
+  const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
+  const [packages, setPackages] = useState<PurchasesPackage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Derive VIP status from RevenueCat entitlements
+  const isVip =
+    customerInfo?.entitlements?.active?.[ENTITLEMENT_READER_VIP] !== undefined;
+
+  // Fetch customer info + available offerings
+  const refresh = useCallback(async () => {
+    try {
+      setError(null);
+
+      // 1. Identify user with RevenueCat if logged in
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        await identifyUser(user.id);
+      }
+
+      // 2. Get customer info (subscription status)
+      const info = await Purchases.getCustomerInfo();
+      setCustomerInfo(info);
+
+      // 3. Get available offerings (products for paywall)
+      try {
+        const offerings = await Purchases.getOfferings();
+        if (offerings.current?.availablePackages) {
+          setPackages(offerings.current.availablePackages);
+        }
+      } catch (offeringsErr) {
+        // Non-fatal — offerings may not be available in Expo Go
+        console.warn("[useRevenueCat] Offerings fetch failed:", offeringsErr);
+      }
+    } catch (err) {
+      console.warn("[useRevenueCat] Error:", err);
+      setError(err instanceof Error ? err.message : "Unknown error");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Init on mount
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  // Listen for auth state changes to re-identify
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === "SIGNED_IN" && session?.user) {
+        await identifyUser(session.user.id);
+        await refresh();
+      } else if (event === "SIGNED_OUT") {
+        await logOutRevenueCat();
+        setCustomerInfo(null);
+        setPackages([]);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [refresh]);
+
+  // Listen for RevenueCat customer info updates (e.g. subscription renewal/expiry)
+  useEffect(() => {
+    const listener = (info: CustomerInfo) => {
+      setCustomerInfo(info);
+    };
+    Purchases.addCustomerInfoUpdateListener(listener);
+    return () => {
+      Purchases.removeCustomerInfoUpdateListener(listener);
+    };
+  }, []);
+
+  // Purchase a package
+  const purchasePackage = useCallback(
+    async (pkg: PurchasesPackage): Promise<boolean> => {
+      try {
+        setError(null);
+        const { customerInfo: newInfo } =
+          await Purchases.purchasePackage(pkg);
+        setCustomerInfo(newInfo);
+        return (
+          newInfo.entitlements.active[ENTITLEMENT_READER_VIP] !== undefined
+        );
+      } catch (err: any) {
+        // User cancelled purchase
+        if (err.userCancelled) {
+          return false;
+        }
+        console.error("[useRevenueCat] Purchase error:", err);
+        setError(err.message ?? "Lỗi khi mua hàng");
+        return false;
+      }
+    },
+    []
+  );
+
+  // Restore purchases
+  const restorePurchases = useCallback(async (): Promise<boolean> => {
+    try {
+      setError(null);
+      const info = await Purchases.restorePurchases();
+      setCustomerInfo(info);
+      return info.entitlements.active[ENTITLEMENT_READER_VIP] !== undefined;
+    } catch (err: any) {
+      console.error("[useRevenueCat] Restore error:", err);
+      setError(err.message ?? "Lỗi khi khôi phục");
+      return false;
+    }
+  }, []);
+
+  return {
+    isVip,
+    customerInfo,
+    packages,
+    loading,
+    error,
+    refresh,
+    purchasePackage,
+    restorePurchases,
+  };
+}

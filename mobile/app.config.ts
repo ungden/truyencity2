@@ -18,7 +18,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     supportsTablet: true,
     bundleIdentifier: "com.truyencity.app",
-    buildNumber: "4",
+    buildNumber: "9",
     appStoreUrl: "https://apps.apple.com/app/truyencity/id6759160705",
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
@@ -31,12 +31,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
           },
         },
       },
-      SKAdNetworkItems: [
-        { SKAdNetworkIdentifier: "cstr6suwn9.skadnetwork" }, // Google
-      ],
-      GADApplicationIdentifier:
-        process.env.EXPO_PUBLIC_ADMOB_IOS_APP_ID ||
-        "ca-app-pub-3940256099942544~1458002511", // Test ID
+      // AdMob disabled — re-enable when app is approved
+      // SKAdNetworkItems: [
+      //   { SKAdNetworkIdentifier: "cstr6suwn9.skadnetwork" },
+      // ],
+      // GADApplicationIdentifier:
+      //   process.env.EXPO_PUBLIC_ADMOB_IOS_APP_ID ||
+      //   "ca-app-pub-3940256099942544~1458002511",
     },
   },
   android: {
@@ -58,17 +59,18 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-sqlite",
     "expo-secure-store",
     "expo-web-browser",
-    [
-      "react-native-google-mobile-ads",
-      {
-        androidAppId:
-          process.env.EXPO_PUBLIC_ADMOB_ANDROID_APP_ID ||
-          "ca-app-pub-3940256099942544~3347511713", // Test ID
-        iosAppId:
-          process.env.EXPO_PUBLIC_ADMOB_IOS_APP_ID ||
-          "ca-app-pub-3940256099942544~1458002511", // Test ID
-      },
-    ],
+    // AdMob disabled — re-enable when app is approved
+    // [
+    //   "react-native-google-mobile-ads",
+    //   {
+    //     androidAppId:
+    //       process.env.EXPO_PUBLIC_ADMOB_ANDROID_APP_ID ||
+    //       "ca-app-pub-3940256099942544~3347511713",
+    //     iosAppId:
+    //       process.env.EXPO_PUBLIC_ADMOB_IOS_APP_ID ||
+    //       "ca-app-pub-3940256099942544~1458002511",
+    //   },
+    // ],
 
   ],
   extra: {

@@ -318,11 +318,11 @@ V1 (`story-writing-factory/`) reduced from 38 files to **13 files** (Phase 14A+1
 ## Monetization System (Phase 11)
 
 ### Reader VIP (Freemium Model)
-- **Free**: Ads shown, 5 offline chapters/day, 60 min TTS/day
-- **VIP**: 49,000 VND/mo — No ads, unlimited download/TTS, exclusive themes, badge
-- DB: `reader_tier_limits` table, `tts_usage`/`download_usage` tracking tables
-- API: `GET/POST /api/billing/reader-vip` (status, upgrade, cancel, record_tts, record_download)
-- Mobile: `useVipStatus()` hook, `AdBanner` component, `useInterstitialAd` hook
+- **Free**: Ads shown, no offline download, 1h audio/day
+- **VIP**: 99,000 VND/mo or 999,000 VND/yr (save 2 months) — No ads, offline download, unlimited audio
+- DB: `reader_tier_limits` table (incl. `price_vnd_yearly`), `tts_usage`/`download_usage` tracking
+- API: `GET/POST /api/billing/reader-vip` (status, cancel, record_tts, record_download — upgrade locked, via RevenueCat only)
+- Mobile: `useRevenueCat()` + `useVipStatus()` hooks, paywall screen, `AdBanner`, `useInterstitialAd`
 - Web: `AdBanner` + `AdPlacement` components (AdSense), VIP check hides ads
 
 ### Writer Tiers (existing)
@@ -330,7 +330,8 @@ V1 (`story-writing-factory/`) reduced from 38 files to **13 files** (Phase 14A+1
 - API: `/api/billing/subscription`, `/api/billing/credits`, `/api/billing/tiers`
 
 ### Payment Gateway
-- Not yet integrated (Apple IAP, Google Play Billing, VNPay/MoMo planned)
+- **RevenueCat** handles Apple IAP + Google Play Billing (Phase 17)
+- Webhook syncs subscription status to Supabase (`/api/webhooks/revenuecat`)
 - DB schema supports `apple_iap`, `google_play`, `vnpay`, `momo` payment methods
 
 ## Mobile App (Phase 12)
@@ -384,7 +385,7 @@ Comprehensive audit found 3 critical + 4 high + 5 medium + 5 low issues in the a
 - **16A-4**: Web AdBanner now uses `get_reader_status` RPC (handles VIP expiration) instead of querying `profiles` table directly
 - **16A-5**: `FORMAT_STYLES` now applied to ad container (prevents CLS — reserving min-height for ad slots)
 - **16A-6**: `pushed` ref resets when `slot` prop changes (edge case fix)
-- **16A-7**: Wired `AdPlacement` into web pages: home sidebar, novel detail (between description & chapters), chapter reader (post-content)
+- **16A-7**: Wired `AdPlacement` into web pages: home (2 between-content + 1 sidebar), novel detail (between desc & chapters desktop+mobile, before comments desktop), chapter reader (post-content), browse (sidebar below filters), ranking (after rank 10 + bottom), genres (after grid), search (after results + no-results)
 
 ### 16B — Mobile Ad Fixes
 - **16B-1**: `AdBanner` — added `onAdFailedToLoad` handler, collapses to null on failure (was blank gap)
@@ -405,13 +406,129 @@ Comprehensive audit found 3 critical + 4 high + 5 medium + 5 low issues in the a
 - **16D-5**: Fixed `get_ranked_novels` RPC crashing Rankings tab (applied Migration 0136 manually, fixed JSONB to TEXT[] cast)
 - **16D-6**: Captured 13-inch iPad screenshots (`ipad-13-1.png`, `ipad-13-2.png`) for App Store Connect
 
+## Phase 17 Details (2026-02-28) — RevenueCat Payment Integration
+
+### Architecture
+- **RevenueCat** is the single source of truth for VIP subscription status
+- Mobile app uses RevenueCat SDK to trigger Apple/Google payment sheets
+- RevenueCat validates receipts with Apple/Google servers
+- Webhook syncs subscription status to Supabase DB (for web/API access)
+- Usage tracking (TTS, downloads) still uses Supabase directly
+
+### 17A — Mobile SDK Integration
+- **17A-1**: Installed `react-native-purchases` + `react-native-purchases-ui` in mobile
+- **17A-2**: Added `react-native-purchases` plugin to `app.json`, `BILLING` permission for Android
+- **17A-3**: Created `src/lib/revenuecat.ts` — SDK init, user identity, entitlement check
+- **17A-4**: Init RevenueCat in root `_layout.tsx`
+
+### 17B — Hooks & Paywall
+- **17B-1**: Created `use-revenuecat.ts` hook — full purchase flow, offerings, customer info listener
+- **17B-2**: Created paywall screen `(account)/paywall.tsx` — VIP features, price, purchase/restore buttons, legal links
+- **17B-3**: Added VIP upgrade banner to account screen (conditionally shows upgrade CTA or active badge)
+- **17B-4**: Updated `use-vip-status.ts` — hybrid approach: RevenueCat for VIP status, Supabase for usage tracking
+
+### 17C — Server Webhook & Security
+- **17C-1**: Created `/api/webhooks/revenuecat/route.ts` — handles INITIAL_PURCHASE, RENEWAL, CANCELLATION, EXPIRATION, BILLING_ISSUE, etc.
+- **17C-2**: Webhook auth via `REVENUECAT_WEBHOOK_SECRET` Bearer token
+- **17C-3**: Syncs subscription status to `user_subscriptions` table on each event
+- **17C-4**: Records transactions in `credit_transactions` table
+- **17C-5**: Locked down `POST /api/billing/reader-vip` upgrade action — returns 403, forces purchase through app/RevenueCat
+
+### Env Variables Required
+```
+# Mobile (.env)
+EXPO_PUBLIC_REVENUECAT_IOS_KEY=appl_xxx
+EXPO_PUBLIC_REVENUECAT_ANDROID_KEY=goog_xxx
+
+# Server (.env)
+REVENUECAT_WEBHOOK_SECRET=whsec_xxx
+```
+
+### RevenueCat Dashboard Setup Required
+1. Create project at app.revenuecat.com
+2. Connect Apple App Store (Shared Secret from ASC)
+3. Connect Google Play Store (Service Account JSON)
+4. Create entitlement: `reader_vip`
+5. Create product: `reader_vip_monthly` in ASC/GPC
+6. Create offering with monthly package
+7. Configure webhook URL: `https://truyencity.com/api/webhooks/revenuecat`
+8. Set webhook auth header: `Bearer ${REVENUECAT_WEBHOOK_SECRET}`
+
+## Phase 18 Details (2026-02-28) — SePay Web Payment Integration
+
+### Architecture
+- **SePay** handles web VIP payments via bank transfer + VietQR
+- User clicks "Mua VIP" on /pricing -> modal shows VietQR code + bank info
+- User scans QR with banking app -> transfers with content `TCVIP{code}`
+- SePay detects payment -> webhook POST to `/api/webhooks/sepay`
+- Webhook matches payment code to `vip_orders` -> activates VIP
+- Frontend polls `/api/billing/vip-order?order_id=X` -> shows success
+
+### 18A — SePay Webhook
+- **18A-1**: Created `/api/webhooks/sepay/route.ts` — receives SePay transaction webhook
+- **18A-2**: Auth via `Authorization: Apikey ${SEPAY_API_KEY}` header
+- **18A-3**: Extracts payment code (TCVIP...) from content, matches to pending order
+- **18A-4**: Returns `{success: true}` with HTTP 200 (SePay format)
+- **18A-5**: Only returns 500 for transient DB errors (SePay retries on non-200)
+
+### 18B — SePay Service
+- **18B-1**: Created `src/services/billing/sepay-service.ts` — singleton service
+- **18B-2**: `createVipOrder()` — creates pending order in `vip_orders` table, returns QR URL + bank info
+- **18B-3**: `handlePayment()` — processes webhook: dedup check, amount verification, VIP activation
+- **18B-4**: `getOrderStatus()` — returns order status for polling
+- **18B-5**: Reuses existing pending order if user hasn't paid yet (prevents order spam)
+- **18B-6**: Payment code format: `TCVIP` + 8 random alphanumeric chars
+
+### 18C — VIP Order API
+- **18C-1**: Created `/api/billing/vip-order/route.ts` — POST (create order) + GET (poll status)
+- **18C-2**: POST validates plan, checks if user already VIP, creates order via SePay service
+- **18C-3**: GET returns order status (pending/paid/expired) for frontend polling
+- **18C-4**: Both endpoints require auth + rate limiting
+
+### 18D — QR Checkout Modal
+- **18D-1**: Created `src/components/billing/VipCheckoutModal.tsx` — full checkout flow
+- **18D-2**: Shows QR code (via `qr.sepay.vn`) + manual bank transfer info
+- **18D-3**: Auto-polls every 3 seconds for payment confirmation
+- **18D-4**: Countdown timer (30 min expiry), copy-to-clipboard for payment code
+- **18D-5**: Success/error states with appropriate UI
+
+### 18E — Pricing Page Integration
+- **18E-1**: Added "Mua gói tháng" + "Mua gói năm" buttons to VIP tier card
+- **18E-2**: Redirects to /auth if not logged in
+- **18E-3**: Opens VipCheckoutModal with selected plan
+- **18E-4**: Reloads page on success to reflect VIP status
+
+### 18F — Database Migration
+- **18F-1**: Created `0139_vip_orders_sepay.sql` — `vip_orders` table with plan, amount, payment_code, status
+- **18F-2**: SePay transaction dedup via `sepay_transaction_id` unique constraint
+- **18F-3**: RLS: users can read own orders, service role for insert/update
+- **18F-4**: pg_cron job auto-expires pending orders after 30 minutes
+
+### Env Variables Required
+Set in **Vercel** dashboard (Settings > Environment Variables) — these are server-side only, used by Next.js API routes:
+```
+SEPAY_API_KEY=your_sepay_api_key          # From SePay dashboard > Webhooks > API Key
+SEPAY_BANK_CODE=MBBank                    # Bank short code (see qr.sepay.vn/banks.json)
+SEPAY_ACCOUNT_NUMBER=0123456789           # Your bank account number
+SEPAY_ACCOUNT_NAME=YOUR_NAME              # Account holder name (shown to user)
+```
+
+### SePay Dashboard Setup Required
+1. Register at my.sepay.vn
+2. Link bank account
+3. Create webhook: URL = `https://truyencity.com/api/webhooks/sepay`
+4. Set webhook auth: API Key mode, key = `${SEPAY_API_KEY}`
+5. Event: "Có tiền vào" (incoming transfers only)
+6. Configure payment code pattern: `TCVIP` prefix in Cấu hình chung
+
 ## Remaining Known Issues
 
 ### Pending (needs external setup)
 - Phase 12D: Google Play submission (needs Android build)
 - Phase 13C: Email notifications (needs email service like Resend/SendGrid)
-- Payment gateway integration (Apple IAP, Google Play Billing, VNPay)
-- VIP upgrade endpoint needs server-side receipt validation when payment gateway is integrated
+- RevenueCat dashboard setup (products, entitlements, webhook URL)
+- App Store Connect product creation (subscription group, pricing)
+- SePay dashboard setup (bank account, webhook URL, API key)
 
 ## Important Files to Read
 
@@ -434,7 +551,9 @@ When working with the story engine:
 
 ---
 
-**Last Updated**: 2026-02-27
+**Last Updated**: 2026-02-28
 **All 5 quality phases complete** — Phases 1-5 shipped to production
 **Phase 10 complete** — 6 missing genres + ratings RPC migration
 **Phases 11-16 complete** — Monetization, mobile features, SEO, analytics, infra hardening, ad integration audit fix
+**Phase 17 complete** — RevenueCat payment integration (mobile IAP + server webhook)
+**Phase 18 complete** — SePay web payment integration (bank transfer + VietQR)
