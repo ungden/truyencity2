@@ -1131,6 +1131,12 @@ Trả về JSON:
       tech_level: 'Viết mức công nghệ tương lai: mốc công nghệ chủ đạo (AI, cơ giáp, du hành, nano, lượng tử...), mức độ phổ cập và hệ quả xã hội.',
       historical_period: 'Nêu rõ thời kỳ lịch sử (triều đại/niên đại), bối cảnh chính trị-xã hội, phong tục và mâu thuẫn thời đại.',
       original_work: 'Nêu rõ tác phẩm gốc (tên) và cách biến tấu/nhánh rẽ (AU) để tạo câu chuyện mới.',
+      martial_arts_system: 'Viết hệ thống võ công giang hồ rõ ràng: các môn phái (ít nhất 5), tuyệt kỹ đặc trưng, nội công tâm pháp, cấp bậc võ lực từ thấp đến cao.',
+      apocalypse_type: 'Viết loại tận thế rõ ràng: nguyên nhân (zombie/thiên tai/virus/AI), giai đoạn sụp đổ, hệ thống sinh tồn, mức độ nguy hiểm và cách thức tiến hóa.',
+      supernatural_system: 'Viết hệ thống siêu nhiên/tâm linh rõ ràng: phân loại ma quỷ/yêu quái, bùa chú/phong thủy, quy tắc và giới hạn, cấp bậc pháp sư/đạo sĩ.',
+      political_system: 'Viết hệ thống chính trị rõ ràng: cấp bậc quan chức (từ xã đến trung ương), phe phái, cơ chế thăng tiến, luật lệ và mưu kế quan trường.',
+      world_system: 'Viết hệ thống thế giới dị giới rõ ràng: các chủng tộc, phép thuật/năng lực, quy tắc vận hành, cấp bậc sức mạnh từ Sơ cấp đến Thần cấp.',
+      romance_type: 'Viết thể loại ngôn tình rõ ràng: kiểu tình yêu (sủng/ngược/cứu vớt), bối cảnh (cổ đại/hiện đại/xuyên không), dynamic nhân vật, tone cảm xúc.',
     };
     const requiredRule = requiredKey ? (requiredRulesByKey[requiredKey] || 'Viết chi tiết, cụ thể, có cấu trúc rõ ràng.') : 'Viết chi tiết, cụ thể, có cấu trúc rõ ràng.';
     const topicSeeds = this.pickTopicSeeds(genre, 5).map((item: string) => `- ${item}`).join('\n');
@@ -1652,6 +1658,12 @@ CHÚ Ý:
       'lich-su': ['Loạn Thế', 'Quyền Thần', 'Đại Tần', 'Mưu Triều'],
       'dong-nhan': ['Xuyên Thư', 'Phản Diện', 'Canon Phá Cục', 'Đa Vũ Trụ'],
       'vong-du': ['Toàn Chức', 'Siêu Thần', 'Vô Hạn', 'Đăng Nhập'],
+      'kiem-hiep': ['Thiên Hạ', 'Giang Hồ', 'Kiếm Khách', 'Võ Lâm'],
+      'mat-the': ['Mạt Nhật', 'Tận Thế', 'Sinh Tồn', 'Biến Dị'],
+      'linh-di': ['Quỷ Mật', 'Âm Dương', 'Trừ Tà', 'Linh Dị'],
+      'quan-truong': ['Quyền Mưu', 'Quan Trường', 'Mưu Triều', 'Thăng Tiến'],
+      'di-gioi': ['Dị Giới', 'Xuyên Không', 'Lãnh Chúa', 'Đa Giới'],
+      'ngon-tinh': ['Sủng Thê', 'Ngọt Ngào', 'Tình Yêu', 'Khuynh Thành'],
     };
     const suffixByGenre: Record<string, string[]> = {
       'tien-hiep': ['Thần Đế', 'Kiếm Chủ', 'Tiên Tôn', 'Bất Diệt'],
@@ -1661,6 +1673,12 @@ CHÚ Ý:
       'lich-su': ['Ký', 'Đại Nghiệp', 'Tranh Bá', 'Hưng Triều'],
       'dong-nhan': ['Nghịch Kịch Bản', 'Chi Lộ', 'Phản Công', 'Bẻ Canon'],
       'vong-du': ['Cao Thủ', 'Chí Tôn', 'Vương Giả', 'Truyền Thuyết'],
+      'kiem-hiep': ['Đệ Nhất', 'Kiếm Thần', 'Bá Đao', 'Vô Song'],
+      'mat-the': ['Thủ Lĩnh', 'Sinh Tồn Ký', 'Tiến Hóa', 'Khai Hoang'],
+      'linh-di': ['Trấn Ma', 'Tâm Linh Sư', 'Phong Ấn', 'Quỷ Thoại'],
+      'quan-truong': ['Phong Vân', 'Đại Nghiệp', 'Quyền Lộ', 'Mưu Lược Gia'],
+      'di-gioi': ['Bá Chủ', 'Chinh Phạt', 'Vương Quốc', 'Truyền Kỳ'],
+      'ngon-tinh': ['Mộng Uyển', 'Tình Thâm', 'Phong Hoa', 'Kỷ Niên'],
     };
 
     const prefixes = prefixByGenre[genre] || ['Chí Tôn'];
@@ -1704,6 +1722,12 @@ CHÚ Ý:
       tech_level: 'Kỷ nguyên AI và công nghệ nano phổ cập trong đời sống',
       historical_period: 'Thời kỳ phong kiến loạn thế với tranh đoạt giữa các chư hầu',
       original_work: 'Thế giới gốc được mở rộng với tuyến nhân vật và nhánh sự kiện mới',
+      martial_arts_system: 'Luyện Thể -> Hậu Thiên -> Tiên Thiên -> Tông Sư -> Đại Tông Sư -> Vô Thượng Tông Sư. Môn phái: Thiếu Lâm, Võ Đang, Nga Mi, Cái Bang, Côn Lôn.',
+      apocalypse_type: 'Zombie virus đột biến, 5 giai đoạn sụp đổ, hệ thống tinh thể năng lượng, base sinh tồn, đột biến gene cấp 1-10.',
+      supernatural_system: 'Âm dương nhãn, bùa chú phong thủy, trừ tà nghi thức, 7 cấp thiên sư (Sơ nhập -> Đại sư -> Thiên sư), ma quỷ phân 9 hạng.',
+      political_system: 'Cán bộ xã -> huyện -> tỉnh -> bộ -> trung ương. Phe phái: cải cách vs bảo thủ. Mưu kế thăng tiến, thanh tra, phản gián.',
+      world_system: 'Dị giới 5 đại lục, 7 chủng tộc (Nhân/Yêu/Ma/Thú/Tinh Linh/Long/Thần), hệ thống đấu khí 9 cấp từ Sơ cấp đến Thần cấp.',
+      romance_type: 'Tổng tài sủng thê, ngọt ngào xen ngược nhẹ. Gặp gỡ -> hiểu lầm -> rung động -> thử thách -> HE. Bối cảnh đô thị hiện đại.',
     };
 
     return fallbackByKey[requiredKey] || `Core ${requiredKey.replace(/_/g, ' ')}`;

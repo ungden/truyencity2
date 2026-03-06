@@ -100,6 +100,12 @@ export interface AIStoryProject {
   historical_period?: string;
   original_work?: string;
   game_system?: string;
+  martial_arts_system?: string;
+  apocalypse_type?: string;
+  supernatural_system?: string;
+  political_system?: string;
+  world_system?: string;
+  romance_type?: string;
   world_description?: string;
   writing_style: string;
   target_chapter_length: number;
