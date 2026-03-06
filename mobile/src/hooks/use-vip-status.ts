@@ -13,7 +13,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Purchases from "react-native-purchases";
 import { supabase } from "@/lib/supabase";
-import { ENTITLEMENT_READER_VIP } from "@/lib/revenuecat";
+import { ENTITLEMENT_READER_VIP, isRevenueCatReady } from "@/lib/revenuecat";
 
 export type ReaderTier = "free" | "vip";
 
@@ -81,17 +81,19 @@ export function useVipStatus() {
       // 1. Check RevenueCat entitlements (primary source for VIP)
       let rcIsVip = false;
       let rcExpiresAt: string | null = null;
-      try {
-        const customerInfo = await Purchases.getCustomerInfo();
-        const entitlement =
-          customerInfo.entitlements.active[ENTITLEMENT_READER_VIP];
-        if (entitlement) {
-          rcIsVip = true;
-          rcExpiresAt = entitlement.expirationDate;
+      if (isRevenueCatReady()) {
+        try {
+          const customerInfo = await Purchases.getCustomerInfo();
+          const entitlement =
+            customerInfo.entitlements.active[ENTITLEMENT_READER_VIP];
+          if (entitlement) {
+            rcIsVip = true;
+            rcExpiresAt = entitlement.expirationDate;
+          }
+        } catch (rcErr) {
+          // RevenueCat not available (e.g. Expo Go) — fall back to DB
+          console.warn("[useVipStatus] RevenueCat check failed, falling back to DB:", rcErr);
         }
-      } catch (rcErr) {
-        // RevenueCat not available (e.g. Expo Go) — fall back to DB
-        console.warn("[useVipStatus] RevenueCat check failed, falling back to DB:", rcErr);
       }
 
       // 2. Get usage data from Supabase (TTS/download counts)
@@ -152,6 +154,8 @@ export function useVipStatus() {
 
   // Listen for RevenueCat customer info updates
   useEffect(() => {
+    if (!isRevenueCatReady()) return;
+
     const listener = () => {
       refresh();
     };

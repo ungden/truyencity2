@@ -7,7 +7,11 @@ import { initRevenueCat } from "@/lib/revenuecat";
 
 export default function RootLayout() {
   useEffect(() => {
-    initRevenueCat();
+    // Fire-and-forget — initRevenueCat has its own try/catch
+    // so it won't crash the app even if SDK init fails
+    initRevenueCat().catch(() => {
+      // Already handled inside initRevenueCat
+    });
   }, []);
 
   return (

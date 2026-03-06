@@ -8,6 +8,7 @@ import {
   ENTITLEMENT_READER_VIP,
   identifyUser,
   logOutRevenueCat,
+  isRevenueCatReady,
 } from "@/lib/revenuecat";
 
 export interface RevenueCatState {
@@ -41,6 +42,12 @@ export function useRevenueCat(): RevenueCatState {
 
   // Fetch customer info + available offerings
   const refresh = useCallback(async () => {
+    // Guard: skip if RevenueCat SDK failed to init (prevents native crash)
+    if (!isRevenueCatReady()) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setError(null);
 
@@ -100,6 +107,8 @@ export function useRevenueCat(): RevenueCatState {
 
   // Listen for RevenueCat customer info updates (e.g. subscription renewal/expiry)
   useEffect(() => {
+    if (!isRevenueCatReady()) return;
+
     const listener = (info: CustomerInfo) => {
       setCustomerInfo(info);
     };
@@ -112,6 +121,10 @@ export function useRevenueCat(): RevenueCatState {
   // Purchase a package
   const purchasePackage = useCallback(
     async (pkg: PurchasesPackage): Promise<boolean> => {
+      if (!isRevenueCatReady()) {
+        setError("Hệ thống thanh toán chưa sẵn sàng");
+        return false;
+      }
       try {
         setError(null);
         const { customerInfo: newInfo } =
@@ -135,6 +148,10 @@ export function useRevenueCat(): RevenueCatState {
 
   // Restore purchases
   const restorePurchases = useCallback(async (): Promise<boolean> => {
+    if (!isRevenueCatReady()) {
+      setError("Hệ thống thanh toán chưa sẵn sàng");
+      return false;
+    }
     try {
       setError(null);
       const info = await Purchases.restorePurchases();
