@@ -59,7 +59,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-sqlite",
     "expo-secure-store",
     "expo-web-browser",
-    "react-native-purchases",
     // AdMob disabled — re-enable when app is approved
     // [
     //   "react-native-google-mobile-ads",
