@@ -14,7 +14,6 @@ import { Chapter } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { startSession, updateSessionDuration, endSession, markChapterRead } from '@/services/reading-sessions';
 import { READING } from '@/lib/config';
-import DOMPurify from 'isomorphic-dompurify';
 import { AdPlacement } from '@/components/ads/AdPlacement';
 
 const Comments = dynamic(
@@ -27,6 +26,30 @@ type ChapterListItem = {
   title: string;
   chapterNumber: number;
 };
+
+function escapeHtml(text: string) {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function formatChapterContent(content: string) {
+  const trimmed = content.trim();
+  if (!trimmed) return '';
+
+  const hasHtmlTags = /<[^>]+>/.test(trimmed);
+  if (hasHtmlTags) {
+    return trimmed;
+  }
+
+  return trimmed
+    .split(/\n\s*\n/)
+    .map((paragraph) => `<p>${escapeHtml(paragraph).replace(/\n/g, '<br />')}</p>`)
+    .join('');
+}
 
 export default function ReadingPage() {
   const params = useParams();
@@ -44,6 +67,7 @@ export default function ReadingPage() {
   const [error, setError] = useState<string | null>(null);
   const [novelTitle, setNovelTitle] = useState<string>('');
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [sanitizedContent, setSanitizedContent] = useState('');
 
   const [isBookmarked, setIsBookmarked] = useState(false);
 
@@ -116,6 +140,38 @@ export default function ReadingPage() {
 
     fetchData();
   }, [novelSlug, chapterNumber]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadSanitizedContent = async () => {
+      const rawContent = currentChapter?.content || '';
+      const formattedContent = formatChapterContent(rawContent);
+
+      if (!formattedContent) {
+        setSanitizedContent('');
+        return;
+      }
+
+      try {
+        const { default: DOMPurify } = await import('isomorphic-dompurify');
+        if (!cancelled) {
+          setSanitizedContent(DOMPurify.sanitize(formattedContent));
+        }
+      } catch (sanitizeError) {
+        console.warn('Failed to load DOMPurify for chapter content:', sanitizeError);
+        if (!cancelled) {
+          setSanitizedContent(escapeHtml(rawContent).replace(/\n/g, '<br />'));
+        }
+      }
+    };
+
+    void loadSanitizedContent();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currentChapter?.content]);
 
   // Keyboard shortcuts for navigation
   useEffect(() => {
@@ -373,8 +429,6 @@ export default function ReadingPage() {
       </div>
     );
   }
-
-  const sanitizedContent = DOMPurify.sanitize(currentChapter.content || '');
 
   const ReadingContent = (
     <div
