@@ -19,6 +19,7 @@ interface DesktopReadingHeaderProps {
   novelSlug?: string;
   novelTitle: string;
   chapterTitle: string;
+  theme?: 'light' | 'dark' | 'sepia' | 'black';
   currentChapter: number;
   totalChapters: number;
   onPrevChapter: () => void;
@@ -34,6 +35,7 @@ export const DesktopReadingHeader: React.FC<DesktopReadingHeaderProps> = ({
   novelSlug,
   novelTitle,
   chapterTitle,
+  theme = 'light',
   currentChapter,
   totalChapters,
   onPrevChapter,
@@ -43,8 +45,22 @@ export const DesktopReadingHeader: React.FC<DesktopReadingHeaderProps> = ({
   isFullscreen,
   onToggleFullscreen
 }) => {
+  const headerClasses: Record<'light' | 'dark' | 'sepia' | 'black', string> = {
+    light: 'bg-white/90 text-slate-900 border-slate-200',
+    dark: 'bg-slate-950/95 text-slate-100 border-slate-800',
+    sepia: 'bg-[#f8f2e8]/92 text-[#5a3926] border-[#dbcab0]',
+    black: 'bg-black/95 text-zinc-100 border-zinc-800',
+  };
+
+  const meterClasses: Record<'light' | 'dark' | 'sepia' | 'black', string> = {
+    light: 'bg-slate-100 text-slate-700',
+    dark: 'bg-slate-900 text-slate-200',
+    sepia: 'bg-[#eadfcf] text-[#6b452d]',
+    black: 'bg-zinc-900 text-zinc-100',
+  };
+
   return (
-    <header className="sticky top-0 z-30 h-14 bg-background/95 backdrop-blur border-b border-border flex items-center justify-between px-6">
+    <header className={headerClasses[theme] + ' sticky top-0 z-30 h-14 backdrop-blur border-b flex items-center justify-between px-6'}>
       {/* Left: Navigation */}
       <div className="flex items-center gap-3">
         <Button variant="ghost" size="sm" asChild className="gap-2">
@@ -78,7 +94,7 @@ export const DesktopReadingHeader: React.FC<DesktopReadingHeaderProps> = ({
           <ChevronLeft size={16} className="mr-1" />
           <span className="hidden sm:inline">Chương trước</span>
         </Button>
-        <div className="px-3 py-1 bg-muted rounded-lg">
+        <div className={meterClasses[theme] + ' px-3 py-1 rounded-lg'}>
           <span className="text-sm font-medium">
             {currentChapter} / {totalChapters}
           </span>

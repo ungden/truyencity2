@@ -27,6 +27,7 @@ interface DesktopReadingSidebarProps {
   novelId: string;
   novelSlug?: string;
   novelTitle: string;
+  theme?: 'light' | 'dark' | 'sepia' | 'black';
   currentChapter: number;
   totalChapters: number;
   chapters: Chapter[];
@@ -39,6 +40,7 @@ export const DesktopReadingSidebar: React.FC<DesktopReadingSidebarProps> = ({
   novelId,
   novelSlug,
   novelTitle,
+  theme = 'light',
   currentChapter,
   totalChapters,
   chapters,
@@ -49,6 +51,27 @@ export const DesktopReadingSidebar: React.FC<DesktopReadingSidebarProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [sidebarState, setSidebarState] = useState<'expanded' | 'collapsed' | 'hidden'>('expanded');
   const currentChapterRef = useRef<HTMLButtonElement>(null);
+
+  const themeChromeClasses: Record<'light' | 'dark' | 'sepia' | 'black', string> = {
+    light: 'bg-white/95 text-slate-900 border-slate-200',
+    dark: 'bg-slate-950 text-slate-100 border-slate-800',
+    sepia: 'bg-[#f5efe2] text-[#4f3422] border-[#d9ccb4]',
+    black: 'bg-black text-zinc-100 border-zinc-800',
+  };
+
+  const mutedClasses: Record<'light' | 'dark' | 'sepia' | 'black', string> = {
+    light: 'text-slate-500',
+    dark: 'text-slate-400',
+    sepia: 'text-[#7b5c44]',
+    black: 'text-zinc-500',
+  };
+
+  const currentChapterClasses: Record<'light' | 'dark' | 'sepia' | 'black', string> = {
+    light: 'bg-slate-900 text-white hover:bg-slate-800',
+    dark: 'bg-orange-500 text-slate-950 hover:bg-orange-400',
+    sepia: 'bg-[#8b4a24] text-[#fff9f0] hover:bg-[#7a3f1e]',
+    black: 'bg-zinc-100 text-black hover:bg-white',
+  };
 
   const novelUrl = novelSlug ? `/truyen/${novelSlug}` : `/novel/${novelId}`;
 
@@ -76,7 +99,10 @@ export const DesktopReadingSidebar: React.FC<DesktopReadingSidebarProps> = ({
           variant="secondary"
           size="icon"
           onClick={() => setSidebarState('expanded')}
-          className="h-10 w-8 rounded-l-none rounded-r-lg shadow-lg border border-l-0 border-border opacity-60 hover:opacity-100 transition-opacity"
+          className={cn(
+            'h-10 w-8 rounded-l-none rounded-r-lg shadow-lg border border-l-0 opacity-70 hover:opacity-100 transition-opacity',
+            themeChromeClasses[theme]
+          )}
           title="Mở thanh bên"
         >
           <PanelLeftOpen size={16} />
@@ -88,7 +114,7 @@ export const DesktopReadingSidebar: React.FC<DesktopReadingSidebarProps> = ({
   // Collapsed — narrow icon strip
   if (sidebarState === 'collapsed') {
     return (
-      <div className="w-12 h-screen sticky top-0 bg-card border-r border-border flex flex-col items-center py-4">
+      <div className={cn('w-12 h-screen sticky top-0 border-r flex flex-col items-center py-4', themeChromeClasses[theme])}>
         <Button
           variant="ghost"
           size="icon"
@@ -146,7 +172,7 @@ export const DesktopReadingSidebar: React.FC<DesktopReadingSidebarProps> = ({
 
   // Expanded — full sidebar
   return (
-    <div className="w-72 h-screen sticky top-0 bg-card border-r border-border flex flex-col">
+    <div className={cn('w-72 h-screen sticky top-0 border-r flex flex-col backdrop-blur-sm', themeChromeClasses[theme])}>
       {/* Header */}
       <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between mb-3">
@@ -154,7 +180,7 @@ export const DesktopReadingSidebar: React.FC<DesktopReadingSidebarProps> = ({
             href={novelUrl}
             className="flex-1 min-w-0"
           >
-            <h2 className="font-semibold text-sm truncate hover:text-primary transition-colors">
+            <h2 className="font-semibold text-sm truncate hover:opacity-80 transition-colors">
               {novelTitle}
             </h2>
           </Link>
@@ -194,7 +220,7 @@ export const DesktopReadingSidebar: React.FC<DesktopReadingSidebarProps> = ({
             placeholder="Tìm chương..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-8 h-9 text-sm"
+            className={cn('pl-8 h-9 text-sm', theme === 'sepia' && 'border-[#cfbea2] bg-[#fcf7ef] placeholder:text-[#8f735b]')}
           />
         </div>
       </div>
@@ -211,9 +237,9 @@ export const DesktopReadingSidebar: React.FC<DesktopReadingSidebarProps> = ({
           <ChevronLeft size={14} className="mr-1" />
           Trước
         </Button>
-        <span className="text-sm font-medium">
-          {currentChapter} / {totalChapters}
-        </span>
+          <span className="text-sm font-medium">
+            {currentChapter} / {totalChapters}
+          </span>
         <Button
           variant="outline"
           size="sm"
@@ -238,9 +264,9 @@ export const DesktopReadingSidebar: React.FC<DesktopReadingSidebarProps> = ({
                   ref={isCurrent ? currentChapterRef : null}
                   onClick={() => onChapterSelect(chapter.chapterNumber)}
                   className={cn(
-                    "w-full text-left px-3 py-2.5 rounded-lg transition-all text-sm",
-                    "hover:bg-accent",
-                    isCurrent && "bg-primary text-primary-foreground hover:bg-primary/90"
+                    'w-full text-left px-3 py-2.5 rounded-lg transition-all text-sm',
+                    theme === 'sepia' ? 'hover:bg-[#eadfcb]' : 'hover:bg-accent',
+                    isCurrent ? currentChapterClasses[theme] : ''
                   )}
                 >
                   <div className="font-medium truncate">
@@ -248,8 +274,8 @@ export const DesktopReadingSidebar: React.FC<DesktopReadingSidebarProps> = ({
                   </div>
                   <div className={cn(
                     "text-xs truncate mt-0.5",
-                    isCurrent ? "text-primary-foreground/80" : "text-muted-foreground"
-                  )}>
+                      isCurrent ? 'text-current/80' : mutedClasses[theme]
+                    )}>
                     {chapter.title}
                   </div>
                 </button>

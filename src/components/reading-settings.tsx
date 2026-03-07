@@ -33,7 +33,7 @@ const themePresets: Array<{
 }> = [
   { id: "light", label: "Light", bg: "#ffffff", fg: "#111111" },
   { id: "dark", label: "Dark", bg: "#0b1220", fg: "#e6e8ef" },
-  { id: "sepia", label: "Sepia", bg: "#f8ecd9", fg: "#3b2f2a" },
+  { id: "sepia", label: "Sepia", bg: "#efe7d8", fg: "#4c301f" },
   { id: "black", label: "True Black", bg: "#000000", fg: "#ffffff" },
 ];
 

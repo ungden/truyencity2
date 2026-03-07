@@ -310,10 +310,24 @@ export default function ReadingPage() {
   };
 
   const themeClasses: Record<typeof settings.theme, string> = {
-    light: 'bg-white text-black',
-    dark: 'bg-gray-900 text-white',
-    sepia: 'bg-amber-50 text-amber-900',
-    black: 'bg-black text-white'
+    light: 'bg-[#f8fafc] text-[#0f172a]',
+    dark: 'bg-[#0b1220] text-[#e5edf7]',
+    sepia: 'bg-[#efe7d8] text-[#4c301f]',
+    black: 'bg-black text-[#f5f5f5]'
+  };
+
+  const contentShellClasses: Record<typeof settings.theme, string> = {
+    light: 'bg-white/90 shadow-[0_20px_60px_rgba(15,23,42,0.08)] ring-1 ring-slate-200/80',
+    dark: 'bg-[#101826] shadow-[0_20px_60px_rgba(0,0,0,0.45)] ring-1 ring-white/5',
+    sepia: 'bg-[#f8f1e6] shadow-[0_24px_80px_rgba(90,57,38,0.12)] ring-1 ring-[#dcc7ab]',
+    black: 'bg-[#050505] shadow-[0_20px_60px_rgba(0,0,0,0.6)] ring-1 ring-white/10'
+  };
+
+  const articleToneClasses: Record<typeof settings.theme, string> = {
+    light: 'text-[#1f2937] [&_h1]:text-[#0f172a] [&_h2]:text-[#0f172a] [&_h3]:text-[#0f172a] [&_strong]:text-[#0f172a]',
+    dark: 'text-[#dbe4f0] [&_h1]:text-white [&_h2]:text-white [&_h3]:text-white [&_strong]:text-white',
+    sepia: 'text-[#6a4129] [&_h1]:text-[#7a3f1e] [&_h2]:text-[#7a3f1e] [&_h3]:text-[#7a3f1e] [&_strong]:text-[#532f1c]',
+    black: 'text-[#ededed] [&_h1]:text-white [&_h2]:text-white [&_h3]:text-white [&_strong]:text-white'
   };
 
   const maxWidthCh = !isMobile && settings.wideDesktop ? Math.min(90, settings.columnWidth + 20) : settings.columnWidth;
@@ -364,12 +378,13 @@ export default function ReadingPage() {
 
   const ReadingContent = (
     <div
-      className={cn("mx-auto", isMobile ? "px-4 py-8 pb-24" : "px-8 lg:px-12 py-8")}
+      className={cn('mx-auto', isMobile ? 'px-4 py-8 pb-24' : 'px-8 lg:px-12 py-10')}
       style={{ maxWidth: `${maxWidthCh}ch` }}
     >
-      <div className="text-center mb-8">
+      <div className={cn('rounded-[28px] px-6 py-8 md:px-10 md:py-10', contentShellClasses[settings.theme])}>
+      <div className="text-center mb-10">
         <h1
-          className="text-2xl font-bold mb-2"
+          className="text-2xl font-bold mb-2 tracking-tight"
           style={{
             fontSize: `${settings.fontSize + 8}px`,
             fontFamily: settings.fontFamily
@@ -377,15 +392,16 @@ export default function ReadingPage() {
         >
           {currentChapter.title}
         </h1>
-        <p className="text-sm opacity-70">
+        <p className="text-sm opacity-75 font-medium">
           Chương {currentChapter.chapter_number} / {allChapters.length}
         </p>
       </div>
 
       <article
         className={cn(
-          "max-w-none whitespace-pre-wrap text-inherit",
-          "[&>p]:mb-4 [&>p]:leading-relaxed",
+          'max-w-none whitespace-pre-wrap text-inherit',
+          articleToneClasses[settings.theme],
+          '[&>p]:mb-5 [&>p]:leading-relaxed',
           "[&>h1]:text-2xl [&>h1]:font-bold [&>h1]:mb-4 [&>h1]:mt-8",
           "[&>h2]:text-xl [&>h2]:font-semibold [&>h2]:mb-3 [&>h2]:mt-6",
           "[&>h3]:text-lg [&>h3]:font-semibold [&>h3]:mb-2 [&>h3]:mt-4",
@@ -407,7 +423,7 @@ export default function ReadingPage() {
       {/* Ad: after chapter content */}
       <AdPlacement placement="chapter" slot="chapter-post-content" />
 
-      <div className="flex justify-between items-center mt-12 pt-8 border-t border-border">
+      <div className="flex justify-between items-center mt-12 pt-8 border-t border-current/12">
         <button
           onClick={handlePrevChapter}
           disabled={chapterNumber <= 1}
@@ -415,13 +431,13 @@ export default function ReadingPage() {
             "px-4 py-2 rounded-lg transition-colors",
             chapterNumber <= 1
               ? "opacity-50 cursor-not-allowed"
-              : "hover:bg-accent"
+              : settings.theme === 'sepia' ? 'hover:bg-[#eadfcb]' : 'hover:bg-accent'
           )}
         >
           &larr; Chương trước
         </button>
 
-        <span className="text-sm opacity-70">
+        <span className="text-sm opacity-75 font-medium">
           {chapterNumber} / {allChapters.length}
         </span>
 
@@ -432,7 +448,7 @@ export default function ReadingPage() {
             "px-4 py-2 rounded-lg transition-colors",
             chapterNumber >= allChapters.length
               ? "opacity-50 cursor-not-allowed"
-              : "hover:bg-accent"
+              : settings.theme === 'sepia' ? 'hover:bg-[#eadfcb]' : 'hover:bg-accent'
           )}
         >
           Chương sau &rarr;
@@ -440,8 +456,9 @@ export default function ReadingPage() {
       </div>
 
       {/* Comments */}
-      <div className="mt-12 pt-8 border-t border-border">
+      <div className="mt-12 pt-8 border-t border-current/12">
         <Comments novelId={novelId} chapterId={currentChapter?.id} />
+      </div>
       </div>
     </div>
   );
@@ -458,6 +475,7 @@ export default function ReadingPage() {
             novelId={novelId}
             novelSlug={novelSlug}
             novelTitle={novelTitle}
+            theme={settings.theme}
             currentChapter={chapterNumber}
             totalChapters={allChapters.length}
             chapters={allChapters}
@@ -474,6 +492,7 @@ export default function ReadingPage() {
               novelSlug={novelSlug}
               novelTitle={novelTitle}
               chapterTitle={currentChapter.title}
+              theme={settings.theme}
               currentChapter={chapterNumber}
               totalChapters={allChapters.length}
               onPrevChapter={handlePrevChapter}
