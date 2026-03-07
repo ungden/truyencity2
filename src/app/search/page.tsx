@@ -5,7 +5,17 @@ import SearchClient from './search-client';
 export const metadata: Metadata = {
   title: 'Tìm kiếm truyện | TruyenCity',
   description: 'Tìm kiếm truyện tiên hiệp, huyền huyễn, đô thị, khoa huyễn và nhiều thể loại khác trên TruyenCity.',
+  alternates: {
+    canonical: '/search',
+  },
   openGraph: {
+    title: 'Tìm kiếm truyện | TruyenCity',
+    description: 'Tìm kiếm truyện tiên hiệp, huyền huyễn, đô thị, khoa huyễn và nhiều thể loại khác trên TruyenCity.',
+    url: 'https://truyencity.com/search',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
     title: 'Tìm kiếm truyện | TruyenCity',
     description: 'Tìm kiếm truyện tiên hiệp, huyền huyễn, đô thị, khoa huyễn và nhiều thể loại khác trên TruyenCity.',
   },
