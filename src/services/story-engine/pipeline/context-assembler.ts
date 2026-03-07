@@ -82,8 +82,10 @@ export async function loadContext(
     db.from('ai_story_projects').select('story_bible').eq('id', projectId).maybeSingle(),
     // Layer 2: Synopsis
     db.from('story_synopsis').select('synopsis_text,mc_current_state,active_allies,active_enemies,open_threads,last_updated_chapter').eq('project_id', projectId).order('last_updated_chapter', { ascending: false }).limit(1).maybeSingle(),
-    // Layer 3: Recent Chapters — adaptive: 3×3000 after ch50 (synopsis covers history), 5×5000 early on
-    db.from('chapters').select('content,title,chapter_number').eq('novel_id', novelId).lt('chapter_number', chapterNumber).order('chapter_number', { ascending: false }).limit(chapterNumber > 50 ? 3 : 5),
+    // Layer 3: Recent Chapter Summaries — use summaries instead of full text to save tokens
+    // Full text of recent chapters is expensive (~9-25K chars). Summaries are ~200-400 chars each.
+    // For early chapters (<10), still load 1 full recent chapter for richer context.
+    db.from('chapter_summaries').select('chapter_number,title,summary,mc_state,cliffhanger').eq('project_id', projectId).lt('chapter_number', chapterNumber).order('chapter_number', { ascending: false }).limit(chapterNumber > 50 ? 5 : 8),
     // Layer 4: Arc Plan
     db.from('arc_plans').select('arc_number,start_chapter,end_chapter,arc_theme,plan_text,chapter_briefs,threads_to_advance,threads_to_resolve,new_threads').eq('project_id', projectId).order('arc_number', { ascending: false }).limit(1).maybeSingle(),
     // Master Outline + Story Outline
@@ -105,7 +107,7 @@ export async function loadContext(
 
   const bible = bibleResult?.data?.story_bible;
   const synopsis = synopsisResult?.data;
-  const recentChapters = (recentResult?.data || []).reverse();
+  const recentSummaries = (recentResult?.data || []).reverse();
   const arc = arcResult?.data;
   const rawMasterOutline = masterOutlineResult?.data?.master_outline;
   const masterOutline = rawMasterOutline
@@ -179,9 +181,12 @@ export async function loadContext(
     hasStoryBible: !!bible,
     synopsis: synopsis?.synopsis_text,
     synopsisStructured,
-    recentChapters: recentChapters.map((c: { chapter_number: number; title: string; content: string }) => {
-      const charLimit = chapterNumber > 50 ? 3000 : 5000;
-      return `[Ch.${c.chapter_number}: "${c.title}"]\n${(c.content || '').slice(0, charLimit)}`;
+    recentChapters: recentSummaries.map((c: { chapter_number: number; title: string; summary: string; mc_state?: string; cliffhanger?: string }) => {
+      // Use summaries instead of full text — saves ~5-20K chars per chapter
+      const parts = [`[Ch.${c.chapter_number}: "${c.title}"]`, c.summary || ''];
+      if (c.mc_state) parts.push(`MC: ${c.mc_state}`);
+      if (c.cliffhanger) parts.push(`Hook: ${c.cliffhanger}`);
+      return parts.join('\n');
     }),
     arcPlan: arc?.plan_text,
     chapterBrief,
@@ -297,9 +302,9 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
     }
   }
 
-  // Layer 3: Recent Chapters
+  // Layer 3: Recent Chapter Summaries (token-optimized: summaries instead of full text)
   if (payload.recentChapters.length > 0) {
-    parts.push(`[${payload.recentChapters.length} CHƯƠNG GẦN NHẤT]`);
+    parts.push(`[TÓM TẮT ${payload.recentChapters.length} CHƯƠNG GẦN NHẤT]`);
     for (const ch of payload.recentChapters) {
       parts.push(ch);
     }
@@ -370,8 +375,9 @@ export async function generateChapterSummary(
   config: GeminiConfig,
   options?: { allowEmptyCliffhanger?: boolean },
 ): Promise<ChapterSummary> {
-  const headSnippet = content.slice(0, 3000);
-  const tailSnippet = content.slice(-3000);
+  // Token-optimized: reduced from 3K+3K=6K to 2K+2K=4K chars
+  const headSnippet = content.slice(0, 2000);
+  const tailSnippet = content.slice(-2000);
 
   const prompt = `Tóm tắt chương truyện sau. Trả về JSON:
 {
@@ -521,12 +527,14 @@ export async function generateSummaryAndCharacters(
   config: GeminiConfig,
   options?: { allowEmptyCliffhanger?: boolean },
 ): Promise<CombinedSummaryAndCharacters> {
-  const headSnippet = content.slice(0, 4000);
-  const tailSnippet = content.slice(-4000);
+  // Token-optimized: reduced from 4K+4K+3K=11K to 2K+2K+1K=5K chars
+  // Gemini can extract summary + characters from smaller snippets effectively
+  const headSnippet = content.slice(0, 2000);
+  const tailSnippet = content.slice(-2000);
   // Mid section for character extraction context
   const midStart = Math.floor(content.length * 0.3);
-  const midSnippet = content.length > 12000
-    ? content.slice(midStart, midStart + 3000)
+  const midSnippet = content.length > 8000
+    ? content.slice(midStart, midStart + 1000)
     : '';
 
   const prompt = `Phân tích chương truyện sau, thực hiện 2 nhiệm vụ ĐỒNG THỜI. Trả về JSON:

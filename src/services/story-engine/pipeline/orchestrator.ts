@@ -344,10 +344,12 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       project.id, nextChapter,
     ).catch((e) => console.warn(`[Orchestrator] Task 7 foreshadowing status failed:`, e instanceof Error ? e.message : String(e))),
 
-    // Task 8: Update character arcs
-    updateCharacterArcs(
-      project.id, nextChapter, characters, geminiConfig, genre, protagonistName,
-    ).catch((e) => console.warn(`[Orchestrator] Task 8 character arcs failed:`, e instanceof Error ? e.message : String(e))),
+    // Task 8: Update character arcs (every 3 chapters to save tokens — arcs evolve slowly)
+    ...(nextChapter % 3 === 0 ? [
+      updateCharacterArcs(
+        project.id, nextChapter, characters, geminiConfig, genre, protagonistName,
+      ).catch((e) => console.warn(`[Orchestrator] Task 8 character arcs failed:`, e instanceof Error ? e.message : String(e))),
+    ] : []),
 
     // Task 9: Update voice fingerprint (every 10 chapters)
     updateVoiceFingerprint(
@@ -359,15 +361,19 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       project.id, nextChapter, result.content, protagonistName, genre, geminiConfig,
     ).catch((e) => console.warn(`[Orchestrator] Task 10 MC power failed:`, e instanceof Error ? e.message : String(e))),
 
-    // Task 11: Update location exploration
-    updateLocationExploration(
-      project.id, nextChapter,
-    ).catch((e) => console.warn(`[Orchestrator] Task 11 location exploration failed:`, e instanceof Error ? e.message : String(e))),
+    // Task 11: Update location exploration (every 3 chapters to save tokens)
+    ...(nextChapter % 3 === 0 ? [
+      updateLocationExploration(
+        project.id, nextChapter,
+      ).catch((e) => console.warn(`[Orchestrator] Task 11 location exploration failed:`, e instanceof Error ? e.message : String(e))),
+    ] : []),
 
-    // Task 12: Pre-generate upcoming location bible
-    prepareUpcomingLocation(
-      project.id, nextChapter, genre, context.synopsis, context.masterOutline, geminiConfig,
-    ).catch((e) => console.warn(`[Orchestrator] Task 12 upcoming location failed:`, e instanceof Error ? e.message : String(e))),
+    // Task 12: Pre-generate upcoming location bible (every 3 chapters to save tokens)
+    ...(nextChapter % 3 === 0 ? [
+      prepareUpcomingLocation(
+        project.id, nextChapter, genre, context.synopsis, context.masterOutline, geminiConfig,
+      ).catch((e) => console.warn(`[Orchestrator] Task 12 upcoming location failed:`, e instanceof Error ? e.message : String(e))),
+    ] : []),
   ]);
 
   // ── Step 7: Update project current_chapter ─────────────────────────────

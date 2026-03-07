@@ -592,8 +592,10 @@ async function runCritic(
   const wordCount = countWords(content);
   const wordRatio = wordCount / targetWords;
 
-  // Size guard: if content is extremely long (>60K chars ≈ 15K tokens), use head+tail
-  const MAX_CRITIC_CONTENT_CHARS = 60_000;
+  // Size guard: reduced from 60K to 30K chars (~7.5K tokens) — Critic only needs
+  // enough text to check repetition, pacing, ending hook, and continuity.
+  // A typical chapter is 8-15K chars so most chapters won't be trimmed.
+  const MAX_CRITIC_CONTENT_CHARS = 30_000;
   let contentPreview = content;
   if (content.length > MAX_CRITIC_CONTENT_CHARS) {
     const headSize = Math.floor(MAX_CRITIC_CONTENT_CHARS * 0.6);
@@ -602,7 +604,9 @@ async function runCritic(
     console.warn(`[Critic] Chapter content trimmed from ${content.length} to ${contentPreview.length} chars (head+tail)`);
   }
 
-  // Cross-chapter context for contradiction detection (B5 fix: extract bridge + character states, not blind slice)
+  // Cross-chapter context for contradiction detection (token-optimized: bridge + chars only, no synopsis)
+  // Critic only needs: previous cliffhanger/MC state + character states for continuity checks.
+  // Synopsis is redundant here — Architect/Writer already used it.
   let crossChapterSection = '';
   if (previousContext) {
     const relevantParts: string[] = [];
@@ -612,13 +616,10 @@ async function runCritic(
     // Extract character states
     const charMatch = previousContext.match(/\[NHÂN VẬT HIỆN TẠI[^\]]*\][\s\S]*?(?=\n\n\[|$)/);
     if (charMatch) relevantParts.push(charMatch[0]);
-    // Extract synopsis structured fields (MC state, allies, enemies, threads)
-    const synopsisMatch = previousContext.match(/\[TÓM TẮT[^\]]*\][\s\S]*?(?=\n\n\[|$)/);
-    if (synopsisMatch) relevantParts.push(synopsisMatch[0].slice(0, 2000));
 
     crossChapterSection = relevantParts.length > 0
-      ? `BỐI CẢNH CÂU CHUYỆN (dùng để KIỂM TRA mâu thuẫn):\n${relevantParts.join('\n\n').slice(0, 5000)}\n\n`
-      : `BỐI CẢNH CÂU CHUYỆN (dùng để KIỂM TRA mâu thuẫn):\n${previousContext.slice(0, 5000)}\n\n`;
+      ? `BỐI CẢNH CÂU CHUYỆN (dùng để KIỂM TRA mâu thuẫn):\n${relevantParts.join('\n\n').slice(0, 3000)}\n\n`
+      : `BỐI CẢNH CÂU CHUYỆN (dùng để KIỂM TRA mâu thuẫn):\n${previousContext.slice(0, 3000)}\n\n`;
   }
 
   // Build repetition report for Critic
