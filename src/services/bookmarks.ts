@@ -27,7 +27,8 @@ export async function listBookmarks(): Promise<BookmarkItem[]> {
     .from("bookmarks")
     .select("id, created_at, novels:novel_id ( id, title, author, cover_url, status )")
     .eq("user_id", userId)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(200);
 
   if (error || !data) return [];
   // Map nested key to 'novel'

@@ -12,16 +12,19 @@ export const metadata: Metadata = {
   alternates: { canonical: "/genres" },
 };
 
-export const dynamic = 'force-dynamic';
+// Cache genre counts for 5 minutes (was force-dynamic = 0 cache, causing full scan every pageview)
+export const revalidate = 300;
 
 export default async function GenresPage() {
   const supabase = await createServerClient();
 
-  // Get count per genre
+  // Get count per genre — only select genres column, cap at 10K rows
+  // TODO: Replace with DB-level RPC `get_genre_counts()` when novel count exceeds 10K
   const { data: novels } = await supabase
     .from('novels')
     .select('genres')
-    .not('genres', 'is', null);
+    .not('genres', 'is', null)
+    .limit(10000);
 
   const genreCounts: Record<string, number> = {};
   for (const n of novels || []) {

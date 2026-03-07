@@ -39,7 +39,8 @@ export default function LibraryPage() {
       .from('reading_progress')
       .select('novel_id, chapter_number, position_percent, last_read')
       .eq('user_id', userId)
-      .order('last_read', { ascending: false });
+      .order('last_read', { ascending: false })
+      .limit(100);
 
     const rows: ProgressRow[] = progressRows || [];
     const novelIds = Array.from(new Set(rows.map(r => r.novel_id))).filter(Boolean);

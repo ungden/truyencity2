@@ -16,8 +16,9 @@ export async function getNovels() {
   const supabase = await createServerClient();
   const { data, error } = await supabase
     .from('novels')
-    .select('*')
-    .order('created_at', { ascending: false });
+    .select('id,slug,title,author,cover_url,status,genres,total_chapters,updated_at,created_at,description,ai_story_projects(id)')
+    .order('created_at', { ascending: false })
+    .limit(500);
 
   if (error) {
     console.error('Error fetching novels:', error);
@@ -362,7 +363,8 @@ export async function getComments() {
       chapters:chapter_id(title, chapter_number, novel_id),
       novels:chapters(novels(title))
     `)
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .limit(500);
 
   if (error) {
     console.error('Error fetching comments:', error);
@@ -450,7 +452,8 @@ export async function getNotifications() {
   const { data, error } = await supabase
     .from('notifications')
     .select('*')
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .limit(200);
 
   if (error) {
     console.error('Error fetching notifications:', error);

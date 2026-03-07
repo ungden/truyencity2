@@ -42,31 +42,35 @@ export default async function HomePage() {
 
   const supabase = await createServerClient();
 
+  // Only select columns needed for display — avoids fetching large text fields
+  // (description, master_outline, story_outline, story_bible) that can be 10-50KB each
+  const NOVEL_LIST_COLS = 'id,slug,title,author,cover_url,status,genres,total_chapters,updated_at,created_at,description';
+
   // Parallel fetch all data
   const [latestResult, newestResult, featuredResult, tienHiepResult, doThiResult] = await Promise.all([
     // Recently updated novels
     supabase
       .from('novels')
-      .select('*')
+      .select(NOVEL_LIST_COLS)
       .order('updated_at', { ascending: false })
       .limit(20),
     // Newly launched novels
     supabase
       .from('novels')
-      .select('*')
+      .select(NOVEL_LIST_COLS)
       .order('created_at', { ascending: false })
       .limit(12),
     // Featured: novels with covers, most chapters
     supabase
       .from('novels')
-      .select('*')
+      .select(NOVEL_LIST_COLS)
       .not('cover_url', 'is', null)
       .order('updated_at', { ascending: false })
       .limit(10),
     // Tiên Hiệp genre
     supabase
       .from('novels')
-      .select('*')
+      .select(NOVEL_LIST_COLS)
       .overlaps('genres', ['tien-hiep'])
       .not('cover_url', 'is', null)
       .order('updated_at', { ascending: false })
@@ -74,7 +78,7 @@ export default async function HomePage() {
     // Đô Thị genre
     supabase
       .from('novels')
-      .select('*')
+      .select(NOVEL_LIST_COLS)
       .overlaps('genres', ['do-thi'])
       .not('cover_url', 'is', null)
       .order('updated_at', { ascending: false })

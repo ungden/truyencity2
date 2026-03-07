@@ -29,7 +29,7 @@ type SearchRow = {
   status: string | null;
   updated_at: string | null;
   genres: string[] | null;
-  chapters: { count: number }[];
+  total_chapters: number | null;
 };
 
 const sortOptions = [
@@ -84,22 +84,24 @@ export default function SearchClient() {
       setHasSearched(true);
       const q = `%${query}%`;
 
-      const { data } = await supabase
+      // Build query — apply genre filter at DB level to avoid fetching extra rows
+      let dbQuery = supabase
         .from('novels')
-        .select('id,slug,title,author,cover_url,status,updated_at,genres,chapters(count)')
+        .select('id,slug,title,author,cover_url,status,updated_at,genres,total_chapters')
         .or(`title.ilike.${q},author.ilike.${q}`)
         .order('updated_at', { ascending: false })
         .limit(60);
 
-      let list = (data || []) as SearchRow[];
-
-      // Genre filter
+      // Genre filter at DB level (was client-side, wasting bandwidth)
       if (filterGenre !== 'all') {
-        list = list.filter((n) => Array.isArray(n.genres) && n.genres.includes(filterGenre));
+        dbQuery = dbQuery.contains('genres', [filterGenre]);
       }
 
+      const { data } = await dbQuery;
+      let list = (data || []) as SearchRow[];
+
       // Sort
-      const getChapters = (n: SearchRow) => n.chapters?.[0]?.count || 0;
+      const getChapters = (n: SearchRow) => n.total_chapters || 0;
       list = list.sort((a, b) => {
         switch (sortBy) {
           case 'chapters':
@@ -272,7 +274,7 @@ export default function SearchClient() {
                 cover={novel.cover_url || ''}
                 status={novel.status || 'Đang ra'}
                 genre={novel.genres?.[0]}
-                chapters={novel.chapters?.[0]?.count || 0}
+                chapters={novel.total_chapters || 0}
                 variant={viewMode === 'list' ? 'horizontal' : 'default'}
               />
             ))}

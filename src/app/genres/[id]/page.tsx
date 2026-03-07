@@ -30,7 +30,8 @@ export default function GenrePage() {
         .from("novels")
         .select("id,slug,title,author,cover_url,genres")
         .contains("genres", [genreId])
-        .order("updated_at", { ascending: false });
+        .order("updated_at", { ascending: false })
+        .limit(200);
 
       if (!isMounted) return;
       if (!error) {

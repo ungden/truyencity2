@@ -59,31 +59,21 @@ export default function AuthorPage() {
       }
       setAuthor(authorData as AuthorDetails);
 
-      // Fetch novels by this author
+      // Fetch novels by this author (with limit to prevent unbounded queries)
       const { data: novelData, error: novelError } = await supabase
         .from("novels")
         .select("id, title, author, cover_url, status")
         .eq("author", authorName)
-        .order("updated_at", { ascending: false });
+        .order("updated_at", { ascending: false })
+        .limit(100);
       
       if (!isMounted) return;
       if (novelError) {
         console.error("Error fetching novels:", novelError);
       } else {
-        const rawNovels = novelData || [];
-        // Fetch real stats for each novel via RPC
-        const novelsWithStats = await Promise.all(
-          rawNovels.map(async (n) => {
-            const { data: stats } = await supabase.rpc("get_novel_stats", { p_novel_id: n.id });
-            const parsed = stats ? (typeof stats === "string" ? JSON.parse(stats) : stats) : null;
-            return {
-              ...n,
-              rating: parsed?.rating_avg ?? undefined,
-              views: parsed?.view_count ?? undefined,
-            };
-          })
-        );
-        setNovels(novelsWithStats as NovelBrief[]);
+        // Skip individual RPC calls per novel — the list view doesn't critically need
+        // per-novel stats. This eliminates N+1 RPC calls (was 1 call per novel).
+        setNovels((novelData || []) as NovelBrief[]);
       }
       
       setLoading(false);

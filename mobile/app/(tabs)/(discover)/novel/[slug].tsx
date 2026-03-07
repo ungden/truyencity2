@@ -118,22 +118,15 @@ export default function NovelDetailScreen() {
       setNovel(data);
       setResumeChapter(getReadingProgress(data.id));
 
-      // Parallel fetches
-      const [chapterRes, viewsRes, bookmarksRes, ratingsRes] = await Promise.all([
+      // Parallel fetches — removed redundant reading_sessions/bookmarks count queries
+      // since get_novel_stats RPC already returns view_count + bookmark_count
+      const [chapterRes, ratingsRes] = await Promise.all([
         supabase
           .from("chapters")
           .select("id, novel_id, chapter_number, title, created_at")
           .eq("novel_id", data.id)
           .order("chapter_number", { ascending: true })
           .limit(500),
-        supabase
-          .from("reading_sessions")
-          .select("id", { count: "exact", head: true })
-          .eq("novel_id", data.id),
-        supabase
-          .from("bookmarks")
-          .select("id", { count: "exact", head: true })
-          .eq("novel_id", data.id),
         supabase.rpc("get_novel_stats", { p_novel_id: data.id }),
       ]);
 
@@ -145,8 +138,8 @@ export default function NovelDetailScreen() {
           : ratingsRes.data
         : null;
       setStats({
-        views: ratingStats?.view_count ?? viewsRes.count ?? 0,
-        bookmarks: ratingStats?.bookmark_count ?? bookmarksRes.count ?? 0,
+        views: ratingStats?.view_count ?? 0,
+        bookmarks: ratingStats?.bookmark_count ?? 0,
         rating: Math.round((ratingStats?.rating_avg ?? 0) * 10) / 10,
         ratingCount: ratingStats?.rating_count ?? 0,
       });

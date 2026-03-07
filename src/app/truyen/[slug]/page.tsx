@@ -38,10 +38,14 @@ export const dynamic = 'force-dynamic';
 async function getNovelBySlug(slug: string) {
   const supabase = await createServerClient();
 
+  // Only select columns needed for the detail page — skip large internal fields
+  // (master_outline, story_outline, story_bible can be 10-50KB each)
+  const NOVEL_DETAIL_COLS = 'id,slug,title,author,cover_url,status,genres,total_chapters,updated_at,created_at,description';
+
   // Try slug first
   const { data: novel, error } = await supabase
     .from('novels')
-    .select('*, chapters(id, title, chapter_number)')
+    .select(`${NOVEL_DETAIL_COLS}, chapters(id, title, chapter_number)`)
     .eq('slug', slug)
     .single();
 
@@ -52,7 +56,7 @@ async function getNovelBySlug(slug: string) {
   if (uuidRegex.test(slug)) {
     const { data: novelById } = await supabase
       .from('novels')
-      .select('*, chapters(id, title, chapter_number)')
+      .select(`${NOVEL_DETAIL_COLS}, chapters(id, title, chapter_number)`)
       .eq('id', slug)
       .single();
 
