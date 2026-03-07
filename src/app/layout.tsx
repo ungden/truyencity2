@@ -98,14 +98,13 @@ export default function RootLayout({
             </VipProvider>
           </ThemeProvider>
         </QueryProvider>
-        {/* Google AdSense — DISABLED: app chưa được duyệt, bật lại sau */}
-        {/* {adsensePubId && (
+        {adsensePubId && (
           <Script
             src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsensePubId}`}
             strategy="lazyOnload"
             crossOrigin="anonymous"
           />
-        )} */}
+        )}
         <Analytics />
         <SpeedInsights />
       </body>

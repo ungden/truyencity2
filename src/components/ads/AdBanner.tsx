@@ -25,9 +25,6 @@ const FORMAT_STYLES: Record<AdFormat, string> = {
 };
 
 export function AdBanner({ slot, format = "auto", className }: AdBannerProps) {
-  // ── ADS DISABLED — app chưa được duyệt, bật lại sau ──
-  return null;
-
   const adRef = useRef<HTMLModElement>(null);
   const pushed = useRef(false);
   const prevSlot = useRef(slot);
