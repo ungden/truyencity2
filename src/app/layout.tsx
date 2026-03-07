@@ -57,7 +57,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const adsensePubId = process.env.NEXT_PUBLIC_ADSENSE_PUB_ID || "";
+  const adsensePubId =
+    process.env.NEXT_PUBLIC_ADSENSE_PUB_ID || "ca-pub-5160932470449783";
   const ga4Id = process.env.NEXT_PUBLIC_GA4_ID || "";
 
   return (

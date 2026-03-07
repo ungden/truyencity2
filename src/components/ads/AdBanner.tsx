@@ -24,6 +24,9 @@ const FORMAT_STYLES: Record<AdFormat, string> = {
   horizontal: "min-h-[90px]",
 };
 
+const ADSENSE_PUB_ID =
+  process.env.NEXT_PUBLIC_ADSENSE_PUB_ID || "ca-pub-5160932470449783";
+
 export function AdBanner({ slot, format = "auto", className }: AdBannerProps) {
   const adRef = useRef<HTMLModElement>(null);
   const pushed = useRef(false);
@@ -41,7 +44,7 @@ export function AdBanner({ slot, format = "auto", className }: AdBannerProps) {
     if (loading || isVip) return;
     if (pushed.current) return;
 
-    const pubId = process.env.NEXT_PUBLIC_ADSENSE_PUB_ID;
+    const pubId = ADSENSE_PUB_ID;
     if (!pubId) return;
 
     try {
@@ -55,7 +58,7 @@ export function AdBanner({ slot, format = "auto", className }: AdBannerProps) {
   // Don't render if VIP or still checking
   if (loading || isVip) return null;
 
-  const pubId = process.env.NEXT_PUBLIC_ADSENSE_PUB_ID;
+  const pubId = ADSENSE_PUB_ID;
   if (!pubId) return null;
 
   return (
