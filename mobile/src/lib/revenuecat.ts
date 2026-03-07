@@ -1,8 +1,12 @@
 import { Platform } from "react-native";
-import Purchases, { LOG_LEVEL } from "react-native-purchases";
 
 // ── RevenueCat Configuration ──────────────────────────────────
-// API keys are set in RevenueCat dashboard, per-platform
+// IMPORTANT: react-native-purchases is NOT imported at module level.
+// The static import `import Purchases from "react-native-purchases"` triggers
+// native TurboModule resolution + NativeEventEmitter construction at import time,
+// which can throw an NSException on iOS 26+ and crash the app before any
+// try/catch can protect it. Instead, we use lazy require() inside functions.
+
 const REVENUECAT_IOS_KEY =
   process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY ?? "";
 const REVENUECAT_ANDROID_KEY =
@@ -18,6 +22,26 @@ export const PRODUCT_READER_VIP_YEARLY = "reader_vip_yearly";
 /** Whether RevenueCat SDK initialized successfully */
 let revenueCatReady = false;
 
+/** Cached reference to Purchases module (lazy-loaded) */
+let _Purchases: typeof import("react-native-purchases").default | null = null;
+
+/**
+ * Lazily load the react-native-purchases module.
+ * Returns null if the native module is unavailable or throws.
+ */
+function getPurchases(): typeof import("react-native-purchases").default | null {
+  if (_Purchases) return _Purchases;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const mod = require("react-native-purchases");
+    _Purchases = mod.default || mod;
+    return _Purchases;
+  } catch (err) {
+    console.warn("[RevenueCat] Failed to load native module:", err);
+    return null;
+  }
+}
+
 /**
  * Check if RevenueCat SDK is ready for use.
  * Guards all SDK calls to prevent crashes when init failed.
@@ -31,9 +55,8 @@ export function isRevenueCatReady(): boolean {
  * Call once at app startup (root layout).
  * Safe to call multiple times — SDK guards against re-init.
  *
- * IMPORTANT: Entire init is wrapped in try/catch to prevent crash-on-launch.
- * On iOS 26+ / new devices, the native SDK may throw NSException during
- * configure() which causes a SIGSEGV in the TurboModule bridge if uncaught.
+ * IMPORTANT: Uses lazy require() to defer native module loading.
+ * The entire init is wrapped in try/catch to prevent crash-on-launch.
  */
 export async function initRevenueCat(): Promise<void> {
   try {
@@ -49,10 +72,21 @@ export async function initRevenueCat(): Promise<void> {
       return;
     }
 
+    const Purchases = getPurchases();
+    if (!Purchases) {
+      console.warn("[RevenueCat] Native module unavailable — skipping init.");
+      return;
+    }
+
     Purchases.configure({ apiKey });
 
     if (__DEV__) {
-      Purchases.setLogLevel(LOG_LEVEL.DEBUG);
+      try {
+        const { LOG_LEVEL } = require("react-native-purchases");
+        Purchases.setLogLevel(LOG_LEVEL.DEBUG);
+      } catch {
+        // ignore
+      }
     }
 
     revenueCatReady = true;
@@ -64,12 +98,12 @@ export async function initRevenueCat(): Promise<void> {
 
 /**
  * Identify user with RevenueCat after Supabase auth.
- * This links the RevenueCat anonymous user to our Supabase user ID,
- * enabling cross-platform subscription sync.
  */
 export async function identifyUser(userId: string): Promise<void> {
   if (!revenueCatReady) return;
   try {
+    const Purchases = getPurchases();
+    if (!Purchases) return;
     await Purchases.logIn(userId);
   } catch (err) {
     console.warn("[RevenueCat] Failed to identify user:", err);
@@ -82,6 +116,8 @@ export async function identifyUser(userId: string): Promise<void> {
 export async function logOutRevenueCat(): Promise<void> {
   if (!revenueCatReady) return;
   try {
+    const Purchases = getPurchases();
+    if (!Purchases) return;
     await Purchases.logOut();
   } catch (err) {
     console.warn("[RevenueCat] Failed to logout:", err);
@@ -90,12 +126,12 @@ export async function logOutRevenueCat(): Promise<void> {
 
 /**
  * Check if user has active Reader VIP entitlement.
- * This is the primary way to check subscription status —
- * RevenueCat handles receipt validation, expiry, grace periods etc.
  */
 export async function hasReaderVipEntitlement(): Promise<boolean> {
   if (!revenueCatReady) return false;
   try {
+    const Purchases = getPurchases();
+    if (!Purchases) return false;
     const customerInfo = await Purchases.getCustomerInfo();
     return (
       typeof customerInfo.entitlements.active[ENTITLEMENT_READER_VIP] !==

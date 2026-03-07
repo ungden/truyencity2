@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
-import Purchases, {
-  type CustomerInfo,
-  type PurchasesPackage,
+// IMPORTANT: Do NOT import react-native-purchases at module level.
+// Use lazy getPurchases() from revenuecat.ts to avoid crash-on-launch.
+import type {
+  CustomerInfo,
+  PurchasesPackage,
 } from "react-native-purchases";
 import { supabase } from "@/lib/supabase";
 import {
@@ -10,6 +12,17 @@ import {
   logOutRevenueCat,
   isRevenueCatReady,
 } from "@/lib/revenuecat";
+
+/** Lazy-load Purchases module at call time, not import time */
+function getPurchases() {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const mod = require("react-native-purchases");
+    return (mod.default || mod) as typeof import("react-native-purchases").default;
+  } catch {
+    return null;
+  }
+}
 
 export interface RevenueCatState {
   /** Whether user has active Reader VIP */
@@ -44,6 +57,12 @@ export function useRevenueCat(): RevenueCatState {
   const refresh = useCallback(async () => {
     // Guard: skip if RevenueCat SDK failed to init (prevents native crash)
     if (!isRevenueCatReady()) {
+      setLoading(false);
+      return;
+    }
+
+    const Purchases = getPurchases();
+    if (!Purchases) {
       setLoading(false);
       return;
     }
@@ -109,6 +128,9 @@ export function useRevenueCat(): RevenueCatState {
   useEffect(() => {
     if (!isRevenueCatReady()) return;
 
+    const Purchases = getPurchases();
+    if (!Purchases) return;
+
     const listener = (info: CustomerInfo) => {
       setCustomerInfo(info);
     };
@@ -123,6 +145,11 @@ export function useRevenueCat(): RevenueCatState {
     async (pkg: PurchasesPackage): Promise<boolean> => {
       if (!isRevenueCatReady()) {
         setError("Hệ thống thanh toán chưa sẵn sàng");
+        return false;
+      }
+      const Purchases = getPurchases();
+      if (!Purchases) {
+        setError("Hệ thống thanh toán không khả dụng");
         return false;
       }
       try {
@@ -150,6 +177,11 @@ export function useRevenueCat(): RevenueCatState {
   const restorePurchases = useCallback(async (): Promise<boolean> => {
     if (!isRevenueCatReady()) {
       setError("Hệ thống thanh toán chưa sẵn sàng");
+      return false;
+    }
+    const Purchases = getPurchases();
+    if (!Purchases) {
+      setError("Hệ thống thanh toán không khả dụng");
       return false;
     }
     try {

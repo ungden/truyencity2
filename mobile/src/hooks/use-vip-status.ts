@@ -11,9 +11,20 @@
  */
 
 import { useCallback, useEffect, useState } from "react";
-import Purchases from "react-native-purchases";
+// IMPORTANT: Do NOT import react-native-purchases at module level — causes crash on launch.
 import { supabase } from "@/lib/supabase";
 import { ENTITLEMENT_READER_VIP, isRevenueCatReady } from "@/lib/revenuecat";
+
+/** Lazy-load Purchases module at call time, not import time */
+function getPurchases() {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const mod = require("react-native-purchases");
+    return (mod.default || mod) as typeof import("react-native-purchases").default;
+  } catch {
+    return null;
+  }
+}
 
 export type ReaderTier = "free" | "vip";
 
@@ -83,6 +94,8 @@ export function useVipStatus() {
       let rcExpiresAt: string | null = null;
       if (isRevenueCatReady()) {
         try {
+          const Purchases = getPurchases();
+          if (!Purchases) throw new Error("Native module unavailable");
           const customerInfo = await Purchases.getCustomerInfo();
           const entitlement =
             customerInfo.entitlements.active[ENTITLEMENT_READER_VIP];
@@ -155,6 +168,9 @@ export function useVipStatus() {
   // Listen for RevenueCat customer info updates
   useEffect(() => {
     if (!isRevenueCatReady()) return;
+
+    const Purchases = getPurchases();
+    if (!Purchases) return;
 
     const listener = () => {
       refresh();
