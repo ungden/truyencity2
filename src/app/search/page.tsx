@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import SearchClient from './search-client';
 
 export const metadata: Metadata = {
-  title: 'Tìm kiếm truyện | TruyenCity',
+  title: 'Tìm kiếm truyện',
   description: 'Tìm kiếm truyện tiên hiệp, huyền huyễn, đô thị, khoa huyễn và nhiều thể loại khác trên TruyenCity.',
   alternates: {
     canonical: '/search',
