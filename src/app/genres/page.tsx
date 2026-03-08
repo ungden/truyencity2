@@ -12,8 +12,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/genres" },
 };
 
-// Cache genre counts for 5 minutes (was force-dynamic = 0 cache, causing full scan every pageview)
-export const revalidate = 300;
+export const dynamic = 'force-dynamic';
 
 export default async function GenresPage() {
   const supabase = await createServerClient();
