@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
 
 const DAILY_SPAWN_TARGET = 20;
-const DAILY_CHAPTER_QUOTA = 20;
+const DAILY_CHAPTER_QUOTA = 5;
 
 export async function GET(request: NextRequest) {
   try {

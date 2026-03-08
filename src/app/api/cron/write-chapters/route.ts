@@ -41,7 +41,7 @@ function parseIntEnv(name: string, fallback: number): number {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
-const DAILY_CHAPTER_QUOTA = 20; // Hard exact target per active novel per Vietnam day
+const DAILY_CHAPTER_QUOTA = 5; // Hard exact target per active novel per Vietnam day
 
 const MIN_RESUME_BATCH_SIZE = clamp(parseIntEnv('WRITE_CHAPTERS_MIN_RESUME_BATCH', 30), 10, 300);
 const MAX_RESUME_BATCH_SIZE = clamp(parseIntEnv('WRITE_CHAPTERS_MAX_RESUME_BATCH', 220), MIN_RESUME_BATCH_SIZE, 400);
