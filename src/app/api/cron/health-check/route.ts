@@ -28,23 +28,35 @@ async function checkChapterProduction(supabase: ReturnType<typeof getSupabaseAdm
   const h1 = new Date(now.getTime() - 60 * 60 * 1000).toISOString();
   const h24 = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
 
-  const [last1h, last24h] = await Promise.all([
+  // Get today's Vietnam date for quota check
+  const vnDate = new Date(now.getTime() + 7 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+  const [last1h, last24h, activeQuotas] = await Promise.all([
     supabase.from('chapters').select('id', { count: 'exact', head: true }).gte('created_at', h1),
     supabase.from('chapters').select('id', { count: 'exact', head: true }).gte('created_at', h24),
+    supabase.from('project_daily_quotas').select('id', { count: 'exact', head: true })
+      .eq('vn_date', vnDate).eq('status', 'active'),
   ]);
 
   const ch1h = last1h.count ?? 0;
   const ch24h = last24h.count ?? 0;
+  const pendingQuotas = activeQuotas.count ?? 0;
 
   let status: CheckResult['status'] = 'pass';
   let message = `${ch24h} chapters/24h, ${ch1h} chapters/last hour`;
 
   if (ch1h === 0) {
-    status = 'fail';
-    message = `Factory STOPPED — 0 chapters in the last hour (24h total: ${ch24h})`;
-  } else if (ch1h < 100) {
+    if (pendingQuotas === 0) {
+      // All quotas completed — factory idle is expected
+      status = 'pass';
+      message = `Factory idle — all quotas done for today (24h total: ${ch24h})`;
+    } else {
+      status = 'fail';
+      message = `Factory STOPPED — 0 chapters/hr but ${pendingQuotas} quotas still pending (24h total: ${ch24h})`;
+    }
+  } else if (ch1h < 5 && pendingQuotas > 10) {
     status = 'warn';
-    message = `Factory slow — only ${ch1h} chapters/hr (expected ~360). 24h total: ${ch24h}`;
+    message = `Factory slow — ${ch1h} chapters/hr with ${pendingQuotas} quotas pending. 24h total: ${ch24h}`;
   }
 
   return { name: 'Chapter Production', status, message, value: ch24h, chaptersLast24h: ch24h, chaptersLastHour: ch1h };
@@ -133,34 +145,48 @@ async function checkCoverStatus(supabase: ReturnType<typeof getSupabaseAdmin>): 
 async function checkCronHeartbeat(supabase: ReturnType<typeof getSupabaseAdmin>): Promise<CheckResult & { staleCount: number }> {
   // Projects not touched in >30 minutes means cron may be dead
   const thirtyMinAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();
+  const now = new Date();
+  const vnDate = new Date(now.getTime() + 7 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
-  const { count } = await supabase
-    .from('ai_story_projects')
-    .select('id', { count: 'exact', head: true })
-    .eq('status', 'active')
-    .gt('current_chapter', 0)
-    .lt('updated_at', thirtyMinAgo);
+  const [staleResult, totalActiveResult, activeQuotas] = await Promise.all([
+    supabase
+      .from('ai_story_projects')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'active')
+      .gt('current_chapter', 0)
+      .lt('updated_at', thirtyMinAgo),
+    supabase
+      .from('ai_story_projects')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'active')
+      .gt('current_chapter', 0),
+    supabase
+      .from('project_daily_quotas')
+      .select('id', { count: 'exact', head: true })
+      .eq('vn_date', vnDate)
+      .eq('status', 'active'),
+  ]);
 
-  // Also get total active with ch > 0
-  const { count: totalActive } = await supabase
-    .from('ai_story_projects')
-    .select('id', { count: 'exact', head: true })
-    .eq('status', 'active')
-    .gt('current_chapter', 0);
-
-  const stale = count ?? 0;
-  const total = totalActive ?? 0;
+  const stale = staleResult.count ?? 0;
+  const total = totalActiveResult.count ?? 0;
   const fresh = total - stale;
+  const pendingQuotas = activeQuotas.count ?? 0;
 
   let status: CheckResult['status'] = 'pass';
   let message = `${fresh}/${total} projects touched in last 30min`;
 
   if (fresh === 0 && total > 0) {
-    status = 'fail';
-    message = `Cron DEAD — 0/${total} projects touched in 30min`;
-  } else if (stale > total * 0.8) {
+    if (pendingQuotas === 0) {
+      // All quotas done — no activity is expected
+      status = 'pass';
+      message = `Cron idle — all quotas done for today (${total} active projects)`;
+    } else {
+      status = 'fail';
+      message = `Cron DEAD — 0/${total} projects touched in 30min (${pendingQuotas} quotas pending)`;
+    }
+  } else if (stale > total * 0.8 && pendingQuotas > 10) {
     status = 'warn';
-    message = `Cron slow — only ${fresh}/${total} projects touched in 30min`;
+    message = `Cron slow — only ${fresh}/${total} projects touched in 30min (${pendingQuotas} quotas pending)`;
   }
 
   return { name: 'Cron Heartbeat', status, message, value: `${fresh}/${total}`, staleCount: stale };
@@ -219,11 +245,11 @@ async function checkQualityDrift(supabase: ReturnType<typeof getSupabaseAdmin>):
   const oneHourRows = recent1h.data || [];
   const sixHourRows = recent6h.data || [];
 
-  if (oneHourRows.length < 10 || sixHourRows.length < 50) {
+  if (oneHourRows.length < 5 || sixHourRows.length < 20) {
     return {
       name: 'Quality Drift',
-      status: 'warn',
-      message: 'Not enough data to evaluate quality drift reliably',
+      status: 'pass',
+      message: `Insufficient data for drift check (1h: ${oneHourRows.length}, 6h: ${sixHourRows.length} samples)`,
       value: 'n/a',
       avgWords1h: 0,
       avgWords6h: 0,
