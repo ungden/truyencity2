@@ -37,8 +37,7 @@
       "expo-router",
       "expo-sqlite",
       "expo-secure-store",
-      "expo-web-browser",
-      "react-native-purchases"
+      "expo-web-browser"
     ],
     "extra": {
       "eas": {
