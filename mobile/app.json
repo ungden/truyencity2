@@ -15,10 +15,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.truyencity.app",
-      "buildNumber": "7",
-      "infoPlist": {
-        "CFBundleShortVersionString": "1.0.0"
-      }
+      "buildNumber": "10"
     },
     "android": {
       "adaptiveIcon": {
@@ -26,7 +23,7 @@
         "backgroundColor": "#1a1625"
       },
       "package": "com.truyencity.app",
-      "versionCode": 4,
+      "versionCode": 2,
       "permissions": [
         "INTERNET",
         "ACCESS_NETWORK_STATE",
@@ -40,10 +37,10 @@
       "expo-router",
       "expo-sqlite",
       "expo-secure-store",
-      "expo-web-browser"
+      "expo-web-browser",
+      "react-native-purchases"
     ],
     "extra": {
-      "router": {},
       "eas": {
         "projectId": "b08cdab3-d9a8-49f9-9a8d-c0789d4df743"
       }

@@ -18,9 +18,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     supportsTablet: true,
     bundleIdentifier: "com.truyencity.app",
-    buildNumber: "9",
+    buildNumber: "10",
     appStoreUrl: "https://apps.apple.com/app/truyencity/id6759160705",
+    requireFullScreen: true,
     infoPlist: {
+      UIRequiresFullScreen: true,
       ITSAppUsesNonExemptEncryption: false,
       NSAppTransportSecurity: {
         NSAllowsArbitraryLoads: false,
@@ -59,6 +61,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-sqlite",
     "expo-secure-store",
     "expo-web-browser",
+    "react-native-purchases",
     // AdMob disabled — re-enable when app is approved
     // [
     //   "react-native-google-mobile-ads",
@@ -71,7 +74,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     //       "ca-app-pub-3940256099942544~1458002511",
     //   },
     // ],
-
   ],
   extra: {
     eas: {
