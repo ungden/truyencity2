@@ -228,11 +228,11 @@ export const DesktopReadingSidebar: React.FC<DesktopReadingSidebarProps> = ({
       {/* Chapter Navigation */}
       <div className="px-4 py-3 border-b border-border flex items-center justify-between">
         <Button
-          variant="outline"
+          variant="ghost"
           size="sm"
           onClick={onPrevChapter}
           disabled={currentChapter <= 1}
-          className="h-8"
+          className="h-8 border border-current/20 hover:bg-black/5 dark:hover:bg-white/5"
         >
           <ChevronLeft size={14} className="mr-1" />
           Trước
@@ -241,11 +241,11 @@ export const DesktopReadingSidebar: React.FC<DesktopReadingSidebarProps> = ({
             {currentChapter} / {totalChapters}
           </span>
         <Button
-          variant="outline"
+          variant="ghost"
           size="sm"
           onClick={onNextChapter}
           disabled={currentChapter >= totalChapters}
-          className="h-8"
+          className="h-8 border border-current/20 hover:bg-black/5 dark:hover:bg-white/5"
         >
           Sau
           <ChevronRight size={14} className="ml-1" />

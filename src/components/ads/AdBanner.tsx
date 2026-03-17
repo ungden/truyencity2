@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useVipContext } from "@/contexts/vip-context";
 
@@ -62,19 +63,27 @@ export function AdBanner({ slot, format = "auto", className }: AdBannerProps) {
   if (!pubId) return null;
 
   return (
-    <div
-      className={cn("overflow-hidden", FORMAT_STYLES[format], className)}
-      aria-hidden="true"
-    >
-      <ins
-        ref={adRef}
-        className="adsbygoogle block"
-        style={{ display: "block" }}
-        data-ad-client={pubId}
-        data-ad-slot={slot}
-        data-ad-format={format === "auto" ? "auto" : undefined}
-        data-full-width-responsive={format === "auto" ? "true" : undefined}
-      />
+    <div className={cn("flex flex-col items-center", className)}>
+      <div
+        className={cn("overflow-hidden w-full", FORMAT_STYLES[format])}
+        aria-hidden="true"
+      >
+        <ins
+          ref={adRef}
+          className="adsbygoogle block"
+          style={{ display: "block" }}
+          data-ad-client={pubId}
+          data-ad-slot={slot}
+          data-ad-format={format === "auto" ? "auto" : undefined}
+          data-full-width-responsive={format === "auto" ? "true" : undefined}
+        />
+      </div>
+      <Link
+        href="/pricing"
+        className="mt-1.5 text-[11px] text-muted-foreground/70 hover:text-primary transition-colors"
+      >
+        Bỏ quảng cáo? Nâng cấp VIP &rarr;
+      </Link>
     </div>
   );
 }

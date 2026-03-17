@@ -85,11 +85,11 @@ export const DesktopReadingHeader: React.FC<DesktopReadingHeaderProps> = ({
       {/* Center: Chapter Navigation */}
       <div className="flex items-center gap-2">
         <Button
-          variant="outline"
+          variant="ghost"
           size="sm"
           onClick={onPrevChapter}
           disabled={currentChapter <= 1}
-          className="h-8"
+          className="h-8 border border-current/20 hover:bg-black/5 dark:hover:bg-white/5"
         >
           <ChevronLeft size={16} className="mr-1" />
           <span className="hidden sm:inline">Chương trước</span>
@@ -100,11 +100,11 @@ export const DesktopReadingHeader: React.FC<DesktopReadingHeaderProps> = ({
           </span>
         </div>
         <Button
-          variant="outline"
+          variant="ghost"
           size="sm"
           onClick={onNextChapter}
           disabled={currentChapter >= totalChapters}
-          className="h-8"
+          className="h-8 border border-current/20 hover:bg-black/5 dark:hover:bg-white/5"
         >
           <span className="hidden sm:inline">Chương sau</span>
           <ChevronRight size={16} className="ml-1" />
