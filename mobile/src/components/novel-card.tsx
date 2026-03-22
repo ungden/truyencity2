@@ -60,6 +60,10 @@ function DefaultCard({ novel }: { novel: Novel }) {
 
 // --- Grid: 3-column cover cards for "Đề cử" section ---
 function GridCard({ novel }: { novel: Novel }) {
+  const { isTablet } = useDevice();
+  const chapterCount = getChapterCount(novel);
+  const genres = novel.genres || [];
+  
   return (
     <Link href={`/novel/${novel.slug || novel.id}`} asChild>
       <Pressable>
@@ -68,12 +72,32 @@ function GridCard({ novel }: { novel: Novel }) {
           style={{ width: "100%", aspectRatio: 3 / 4, borderRadius: 12 }}
           className="object-cover"
         />
+        {/* Genre hashtags */}
+        {genres.length > 0 && (
+          <View className="flex-row flex-wrap gap-1.5 mt-2">
+            {genres.slice(0, 1).map((g) => (
+              <Text
+                key={g}
+                style={{ color: getGenreTagColor(g) }}
+                className="text-[10px] font-bold"
+              >
+                #{getGenreLabel(g).toUpperCase()}
+              </Text>
+            ))}
+          </View>
+        )}
         <Text
-          className="text-foreground text-xs font-medium mt-1.5"
+          className="text-foreground text-xs font-medium mt-1"
           numberOfLines={2}
+          style={isTablet ? { fontSize: 14, lineHeight: 20 } : {}}
         >
           {novel.title}
         </Text>
+        {isTablet && novel.author && (
+          <Text className="text-muted-foreground text-xs mt-1" numberOfLines={1}>
+            {novel.author}
+          </Text>
+        )}
       </Pressable>
     </Link>
   );
