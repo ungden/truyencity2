@@ -7,6 +7,7 @@ import {
   NativeSyntheticEvent,
   Animated,
   StatusBar,
+  AppState,
 } from "react-native";
 import { View, Text, Pressable } from "@/tw";
 import { useLocalSearchParams, Stack, router } from "expo-router";
@@ -27,6 +28,17 @@ import { TTS_SPEEDS } from "@/lib/tts";
 import { getChapterOffline } from "@/lib/offline-db";
 import { useKeepAwake } from "expo-keep-awake";
 import ReaderSettingsSheet from "@/components/reader-settings-sheet";
+import {
+  saveProgress as saveReadingProgress,
+  resolveProgress,
+  type ProgressRecord,
+} from "@/services/reading-progress";
+import {
+  startSession,
+  updateSessionDuration,
+  endSession,
+  markChapterRead,
+} from "@/services/reading-sessions";
 
 // ── Settings persistence ─────────────────────────────────────
 
@@ -273,7 +285,7 @@ export default function ReadingScreen() {
         } catch {
           setTotalChapters(0);
         }
-        saveProgress(nId, chapterNumber);
+        doSaveProgress(nId, chapterNumber, offlineChapter.id);
         return;
       }
     } catch {}
@@ -299,38 +311,29 @@ export default function ReadingScreen() {
 
     setCurrentChapter(chapterRes.data);
     setTotalChapters(countRes.count || 0);
-    saveProgress(nId, chapterNumber);
+    doSaveProgress(nId, chapterNumber, chapterRes.data.id);
   }
 
-  async function saveProgress(nId: string, chapNum: number) {
-    try {
-      const progressKey = CACHE.READING_PROGRESS_KEY;
-      const existing = JSON.parse(localStorage.getItem(progressKey) || "{}");
-      existing[nId] = {
-        chapterNumber: chapNum,
-        timestamp: Date.now(),
-        positionPercent: 0,
-      };
-      localStorage.setItem(progressKey, JSON.stringify(existing));
+  // ── Reading progress + session tracking refs ──
+  const lastSaveAtRef = useRef(0);
+  const markedReadRef = useRef(false);
+  const sessionIdRef = useRef<string | null>(null);
+  const secondsRef = useRef(0);
+  const tickTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const heartbeatTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const savedAppliedRef = useRef(false);
+  const scrollPercentRef = useRef(0);
 
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user) {
-        await supabase.from("reading_progress").upsert(
-          {
-            user_id: user.id,
-            novel_id: nId,
-            chapter_number: chapNum,
-            position_percent: 0,
-            updated_at: new Date().toISOString(),
-          },
-          { onConflict: "user_id,novel_id" }
-        );
-      }
-    } catch (err) {
-      console.warn("Failed to save reading progress:", err);
-    }
+  /** Save progress for current chapter (called on load + on scroll throttled) */
+  async function doSaveProgress(nId: string, chapNum: number, chapterId?: string, posPercent = 0) {
+    const record: ProgressRecord = {
+      novelId: nId,
+      chapterId,
+      chapterNumber: chapNum,
+      positionPercent: posPercent,
+      lastRead: new Date().toISOString(),
+    };
+    await saveReadingProgress(record).catch(() => {});
   }
 
   // ── Navigation ──
@@ -345,7 +348,7 @@ export default function ReadingScreen() {
     router.replace(`/read/${slug}/${num}`);
   }
 
-  // ── Scroll handling ──
+  // ── Scroll handling (with progress save + mark-as-read) ──
 
   const handleScroll = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -355,11 +358,122 @@ export default function ReadingScreen() {
       scrollOffsetRef.current = contentOffset.y;
       if (maxScroll > 0) {
         const pct = Math.round((contentOffset.y / maxScroll) * 100);
-        setScrollProgress(Math.min(100, Math.max(0, pct)));
+        const clampedPct = Math.min(100, Math.max(0, pct));
+        setScrollProgress(clampedPct);
+        scrollPercentRef.current = clampedPct;
+
+        // Throttled save: every 5s or at 100%
+        const now = Date.now();
+        if (
+          novelId &&
+          currentChapter &&
+          (now - lastSaveAtRef.current >= READING.PROGRESS_SAVE_INTERVAL_MS || clampedPct === 100)
+        ) {
+          lastSaveAtRef.current = now;
+          doSaveProgress(novelId, chapterNumber, currentChapter.id, clampedPct);
+        }
+
+        // Mark chapter as read at 95%
+        if (
+          !markedReadRef.current &&
+          novelId &&
+          currentChapter &&
+          clampedPct >= READING.MARK_AS_READ_THRESHOLD
+        ) {
+          markedReadRef.current = true;
+          markChapterRead({ novelId, chapterId: currentChapter.id });
+        }
       }
     },
-    []
+    [novelId, currentChapter, chapterNumber]
   );
+
+  // ── Restore scroll position from saved progress ──
+
+  useEffect(() => {
+    if (!currentChapter || !novelId || savedAppliedRef.current || loading) return;
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const resolved = await resolveProgress(novelId);
+        if (cancelled || !resolved) return;
+        if (
+          resolved.chapterNumber === chapterNumber &&
+          resolved.positionPercent > 0 &&
+          maxScrollRef.current > 0
+        ) {
+          const targetY = (resolved.positionPercent / 100) * maxScrollRef.current;
+          // Small delay to let RenderHtml finish layout
+          setTimeout(() => {
+            if (!cancelled) {
+              scrollRef.current?.scrollTo({ y: targetY, animated: false });
+              savedAppliedRef.current = true;
+            }
+          }, 300);
+        }
+      } catch {}
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currentChapter, novelId, loading]);
+
+  // ── Reading session tracking ──
+
+  useEffect(() => {
+    if (!currentChapter || !novelId) return;
+
+    // Reset refs for new chapter
+    markedReadRef.current = false;
+    lastSaveAtRef.current = 0;
+    secondsRef.current = 0;
+
+    // Start session
+    startSession({ novelId, chapterId: currentChapter.id }).then((id) => {
+      sessionIdRef.current = id;
+    });
+
+    // Tick: count seconds only when app is active
+    let appActive = true;
+    const appStateSub = AppState.addEventListener("change", (state) => {
+      appActive = state === "active";
+    });
+
+    tickTimerRef.current = setInterval(() => {
+      if (appActive) secondsRef.current += 1;
+    }, 1000);
+
+    // Heartbeat: push duration to server every 30s
+    heartbeatTimerRef.current = setInterval(() => {
+      if (sessionIdRef.current && secondsRef.current > 0) {
+        updateSessionDuration(sessionIdRef.current, secondsRef.current);
+      }
+    }, READING.SESSION_HEARTBEAT_INTERVAL_MS);
+
+    return () => {
+      // End session
+      if (sessionIdRef.current) {
+        endSession(sessionIdRef.current, secondsRef.current);
+        sessionIdRef.current = null;
+      }
+      if (tickTimerRef.current) {
+        clearInterval(tickTimerRef.current);
+        tickTimerRef.current = null;
+      }
+      if (heartbeatTimerRef.current) {
+        clearInterval(heartbeatTimerRef.current);
+        heartbeatTimerRef.current = null;
+      }
+      appStateSub.remove();
+
+      // Final save of scroll position
+      if (novelId && currentChapter) {
+        doSaveProgress(novelId, chapterNumber, currentChapter.id, scrollPercentRef.current);
+      }
+    };
+  }, [currentChapter, novelId]);
 
   // ── Tap zones ──
   // Left 1/3 = scroll up one viewport, Center 1/3 = toggle controls, Right 1/3 = scroll down

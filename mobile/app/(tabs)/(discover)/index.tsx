@@ -131,6 +131,28 @@ export default function DiscoverScreen() {
     );
   }
 
+  if (!loading && latest.length === 0) {
+    return (
+      <View className="flex-1 bg-background justify-center items-center px-6">
+        <Text className="text-foreground text-lg font-semibold text-center mb-2">
+          Không có dữ liệu
+        </Text>
+        <Text className="text-muted-foreground text-center mb-6">
+          Vui lòng kiểm tra lại kết nối mạng của bạn hoặc thử lại sau.
+        </Text>
+        <Pressable
+          onPress={() => {
+            setLoading(true);
+            fetchData();
+          }}
+          className="bg-primary px-6 py-3 rounded-full"
+        >
+          <Text className="text-primary-foreground font-medium">Thử lại</Text>
+        </Pressable>
+      </View>
+    );
+  }
+
   return (
     <ScrollView
       className="flex-1 bg-background"

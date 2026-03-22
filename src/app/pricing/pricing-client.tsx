@@ -67,7 +67,7 @@ export function PricingPageClient() {
   useEffect(() => {
     const fetchTiers = async () => {
       const { data, error } = await supabase
-        .from("subscription_tiers")
+        .from("subscription_tier_limits")
         .select("*")
         .order("price_vnd_monthly", { ascending: true });
 

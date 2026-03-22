@@ -5,6 +5,7 @@ import { useEffect, Component, type ReactNode } from "react";
 import { View, Text } from "react-native";
 import { Stack } from "expo-router/stack";
 import { initRevenueCat } from "@/lib/revenuecat";
+import * as TrackingTransparency from "expo-tracking-transparency";
 
 // Error boundary to prevent crash-on-launch from killing the app
 class ErrorBoundary extends Component<
@@ -63,6 +64,13 @@ export default function RootLayout() {
     initRevenueCat().catch(() => {
       // Already handled inside initRevenueCat
     });
+
+    // Request tracking permissions for ads (even if currently disabled, needed for App Review)
+    setTimeout(() => {
+      TrackingTransparency.requestTrackingPermissionsAsync().catch((err) => {
+        console.warn("Tracking request failed:", err);
+      });
+    }, 1000);
   }, []);
 
   return (

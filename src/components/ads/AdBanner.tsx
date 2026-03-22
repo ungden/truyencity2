@@ -40,9 +40,12 @@ export function AdBanner({ slot, format = "auto", className }: AdBannerProps) {
     prevSlot.current = slot;
   }
 
+  const isRealAdSlot = /^\d+$/.test(slot);
+
   // Push ad after mount
   useEffect(() => {
     if (loading || isVip) return;
+    if (!isRealAdSlot) return; // Don't push if no <ins> tag
     if (pushed.current) return;
 
     const pubId = ADSENSE_PUB_ID;
@@ -54,7 +57,7 @@ export function AdBanner({ slot, format = "auto", className }: AdBannerProps) {
     } catch {
       // AdSense not loaded or blocked
     }
-  }, [isVip, loading]);
+  }, [isVip, loading, isRealAdSlot]);
 
   // Don't render if VIP or still checking
   if (loading || isVip) return null;
@@ -68,15 +71,21 @@ export function AdBanner({ slot, format = "auto", className }: AdBannerProps) {
         className={cn("overflow-hidden w-full", FORMAT_STYLES[format])}
         aria-hidden="true"
       >
-        <ins
-          ref={adRef}
-          className="adsbygoogle block"
-          style={{ display: "block" }}
-          data-ad-client={pubId}
-          data-ad-slot={slot}
-          data-ad-format={format === "auto" ? "auto" : undefined}
-          data-full-width-responsive={format === "auto" ? "true" : undefined}
-        />
+        {isRealAdSlot ? (
+          <ins
+            ref={adRef}
+            className="adsbygoogle block"
+            style={{ display: "block" }}
+            data-ad-client={pubId}
+            data-ad-slot={slot}
+            data-ad-format={format === "auto" ? "auto" : undefined}
+            data-full-width-responsive={format === "auto" ? "true" : undefined}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-muted/20 border border-dashed border-border rounded-md text-xs text-muted-foreground">
+            [Ad Slot: {slot}]
+          </div>
+        )}
       </div>
       <Link
         href="/pricing"

@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { Alert, Image as RNImage } from "react-native";
+import { Alert, Image as RNImage, Platform } from "react-native";
 import { View, Text, ScrollView, Pressable, TextInput } from "@/tw";
 import { router, Stack } from "expo-router";
 import { supabase } from "@/lib/supabase";
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
 import { Linking as RNLinking } from "react-native";
+import * as AppleAuthentication from 'expo-apple-authentication';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -80,6 +81,40 @@ export default function LoginScreen() {
     }
   }
 
+  async function handleAppleAuth() {
+    try {
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+      });
+
+      if (credential.identityToken) {
+        setLoading(true);
+        const { data, error } = await supabase.auth.signInWithIdToken({
+          provider: 'apple',
+          token: credential.identityToken,
+        });
+
+        if (error) throw error;
+        if (data) {
+          router.back();
+        }
+      } else {
+        throw new Error('No identity token received from Apple');
+      }
+    } catch (error: any) {
+      if (error.code === 'ERR_REQUEST_CANCELED') {
+        // User canceled, do nothing
+      } else {
+        Alert.alert('Lỗi', error.message || 'Không thể đăng nhập bằng Apple');
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <>
       <Stack.Screen options={{ title: "Đăng nhập" }} />
@@ -118,6 +153,17 @@ export default function LoginScreen() {
           <Text className="text-lg">G</Text>
           <Text className="text-foreground font-medium">Tiếp tục với Google</Text>
         </Pressable>
+
+        {/* Apple sign in (iOS only) */}
+        {Platform.OS === 'ios' && (
+          <AppleAuthentication.AppleAuthenticationButton
+            buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+            buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.WHITE_OUTLINE}
+            cornerRadius={12}
+            style={{ width: "100%", height: 52 }}
+            onPress={handleAppleAuth}
+          />
+        )}
 
         {/* Divider */}
         <View className="flex-row items-center gap-3">

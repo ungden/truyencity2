@@ -11,9 +11,9 @@ import { Image } from "@/tw/image";
 import { Link, useLocalSearchParams, Stack, router } from "expo-router";
 import { supabase } from "@/lib/supabase";
 import { getGenreLabel } from "@/lib/genre";
-import { CACHE } from "@/lib/config";
 import type { Novel, Chapter } from "@/lib/types";
 import * as Haptics from "expo-haptics";
+import { resolveProgress, getLocalProgress } from "@/services/reading-progress";
 import { useOfflineDownload } from "@/hooks/use-offline";
 import { formatStorageSize, getNovelStorageSize } from "@/lib/offline-db";
 import UnderlineTabs from "@/components/underline-tabs";
@@ -25,16 +25,6 @@ const CHAPTERS_PER_PAGE = 20;
 const DETAIL_TABS = ["Giới Thiệu", "Đánh Giá", "D.S Chương"];
 
 // ─── Helpers ──────────────────────────────────────────────────
-function getReadingProgress(novelId: string): number | null {
-  try {
-    const raw = localStorage.getItem(CACHE.READING_PROGRESS_KEY);
-    if (!raw) return null;
-    const data = JSON.parse(raw);
-    return data[novelId]?.chapterNumber ?? null;
-  } catch {
-    return null;
-  }
-}
 
 function formatNumber(n: number): string {
   if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
@@ -116,7 +106,16 @@ export default function NovelDetailScreen() {
 
       if (!data) return;
       setNovel(data);
-      setResumeChapter(getReadingProgress(data.id));
+
+      // Cross-device sync: resolve local vs server progress
+      // Use local as instant fallback, then resolve async
+      const localProg = getLocalProgress(data.id);
+      setResumeChapter(localProg?.chapterNumber ?? null);
+      resolveProgress(data.id)
+        .then((resolved) => {
+          if (resolved) setResumeChapter(resolved.chapterNumber);
+        })
+        .catch(() => {});
 
       // Parallel fetches — removed redundant reading_sessions/bookmarks count queries
       // since get_novel_stats RPC already returns view_count + bookmark_count

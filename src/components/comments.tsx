@@ -54,7 +54,7 @@ export function Comments({ novelId, chapterId, className }: CommentsProps) {
     try {
       let query = supabase
         .from('comments')
-        .select('id, user_id, content, created_at, parent_id, status, profiles:user_id(full_name, avatar_url)')
+        .select('id, user_id, content, created_at, parent_id, status, profiles(full_name, avatar_url)')
         .eq('novel_id', novelId)
         .eq('status', 'approved')
         .is('parent_id', null)

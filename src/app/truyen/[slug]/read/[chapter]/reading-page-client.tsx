@@ -109,7 +109,7 @@ export default function ReadingPageClient({ novelSlug, chapterNumber }: ReadingP
           .select('*')
           .eq('novel_id', novelData.id)
           .eq('chapter_number', chapterNumber)
-          .single();
+          .maybeSingle();
 
         if (chapterError) throw new Error('Không thể tải chương này. Vui lòng thử lại.');
         if (!chapterData) throw new Error('Không tìm thấy chương này.');

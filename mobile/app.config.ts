@@ -61,6 +61,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-sqlite",
     "expo-secure-store",
     "expo-web-browser",
+    "expo-apple-authentication",
+    [
+      "expo-tracking-transparency",
+      {
+        "userTrackingPermission": "This identifier will be used to deliver personalized ads to you."
+      }
+    ],
     // AdMob disabled — re-enable when app is approved
     // [
     //   "react-native-google-mobile-ads",
