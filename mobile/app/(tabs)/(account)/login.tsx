@@ -145,15 +145,6 @@ export default function LoginScreen() {
           </Text>
         </View>
 
-        {/* Google sign in */}
-        <Pressable
-          onPress={handleGoogleAuth}
-          className="bg-card border border-border rounded-xl py-3.5 flex-row items-center justify-center gap-2"
-        >
-          <Text className="text-lg">G</Text>
-          <Text className="text-foreground font-medium">Tiếp tục với Google</Text>
-        </Pressable>
-
         {/* Apple sign in (iOS only) */}
         {Platform.OS === 'ios' && (
           <AppleAuthentication.AppleAuthenticationButton
@@ -164,6 +155,15 @@ export default function LoginScreen() {
             onPress={handleAppleAuth}
           />
         )}
+
+        {/* Google sign in */}
+        <Pressable
+          onPress={handleGoogleAuth}
+          className="bg-card border border-border rounded-xl py-3.5 flex-row items-center justify-center gap-2"
+        >
+          <Text className="text-lg">G</Text>
+          <Text className="text-foreground font-medium">Tiếp tục với Google</Text>
+        </Pressable>
 
         {/* Divider */}
         <View className="flex-row items-center gap-3">
