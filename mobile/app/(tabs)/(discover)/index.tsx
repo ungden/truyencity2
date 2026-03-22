@@ -35,7 +35,7 @@ export default function DiscoverScreen() {
           .from("novels")
           .select(NOVEL_LIST_FIELDS)
           .order("updated_at", { ascending: false })
-          .limit(30),
+          .limit(100),
         supabase
           .from("novels")
           .select(NOVEL_LIST_FIELDS)
@@ -47,7 +47,7 @@ export default function DiscoverScreen() {
       const allNovels = latestRes.data || [];
 
       // Hero: novels with covers, sorted by chapter_count (most content = most popular)
-      const withCovers = allNovels.filter((n) => n.cover_url);
+      const withCovers = allNovels.filter((n) => n.cover_url && (n.chapter_count ?? 0) > 0);
       const sortedByChapters = [...withCovers].sort(
         (a, b) => (b.chapter_count ?? 0) - (a.chapter_count ?? 0)
       );
