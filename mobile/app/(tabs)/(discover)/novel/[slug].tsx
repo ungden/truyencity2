@@ -515,13 +515,13 @@ export default function NovelDetailScreen() {
                               className="object-cover"
                             />
                             <Text
-                              style={{ fontSize: isTablet ? 14 : 12, fontWeight: "600", color: C.text, marginTop: 6, lineHeight: isTablet ? 20 : 16 }}
+                              style={{ fontSize: isTablet ? 14 : 12, fontWeight: "600", color: "#e8e6f0", marginTop: 6, lineHeight: isTablet ? 20 : 16 }}
                               numberOfLines={2}
                             >
                               {item.title}
                             </Text>
                             {item.author && (
-                              <Text style={{ fontSize: isTablet ? 13 : 11, color: C.textSub, marginTop: 2 }} numberOfLines={1}>
+                              <Text style={{ fontSize: isTablet ? 13 : 11, color: "#a1a1aa", marginTop: 2 }} numberOfLines={1}>
                                 {item.author}
                               </Text>
                             )}

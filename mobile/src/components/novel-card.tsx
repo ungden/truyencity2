@@ -47,9 +47,9 @@ function DefaultCard({ novel }: { novel: Novel }) {
           className="object-cover"
         />
         <Text
-          className="text-foreground text-xs font-medium mt-1.5"
+          className="text-xs font-medium mt-1.5"
           numberOfLines={2}
-          style={isTablet ? { fontSize: 14 } : undefined}
+          style={{ color: "#e8e6f0", ...(isTablet ? { fontSize: 14 } : undefined) }}
         >
           {novel.title}
         </Text>
@@ -87,14 +87,14 @@ function GridCard({ novel }: { novel: Novel }) {
           </View>
         )}
         <Text
-          className="text-foreground text-xs font-medium mt-1"
+          className="text-xs font-medium mt-1"
           numberOfLines={2}
-          style={isTablet ? { fontSize: 14, lineHeight: 20 } : {}}
+          style={{ color: "#e8e6f0", ...(isTablet ? { fontSize: 14, lineHeight: 20 } : {}) }}
         >
           {novel.title}
         </Text>
         {isTablet && novel.author && (
-          <Text className="text-muted-foreground text-xs mt-1" numberOfLines={1}>
+          <Text className="text-xs mt-1" style={{ color: "#a1a1aa" }} numberOfLines={1}>
             {novel.author}
           </Text>
         )}
@@ -128,24 +128,24 @@ function LibraryRowCard({
         />
         <View className="flex-1 ml-3 justify-center">
           <Text
-            className="text-foreground text-base font-semibold"
+            className="text-base font-semibold text-[#e8e6f0]"
             numberOfLines={2}
           >
             {novel.title}
           </Text>
-          <Text className="text-muted-foreground text-sm mt-1">
+          <Text className="text-sm mt-1 text-[#a1a1aa]">
             Đã đọc {progress.current}/{progress.total}
           </Text>
         </View>
         <View className="flex-row items-center gap-3 ml-2">
           {onBookmark && (
             <Pressable onPress={onBookmark} hitSlop={8}>
-              <Text className="text-primary text-lg">&#9998;</Text>
+              <Text className="text-lg text-[#5c9cff]">&#9998;</Text>
             </Pressable>
           )}
           {onMenu && (
             <Pressable onPress={onMenu} hitSlop={8}>
-              <Text className="text-muted-foreground text-xl">&#8942;</Text>
+              <Text className="text-xl text-[#a1a1aa]">&#8942;</Text>
             </Pressable>
           )}
         </View>
@@ -183,21 +183,21 @@ function HorizontalCard({ novel }: { novel: Novel }) {
             </View>
           )}
           <Text
-            className="text-foreground text-base font-semibold"
+            className="text-base font-semibold text-[#e8e6f0]"
             numberOfLines={2}
           >
             {novel.title}
           </Text>
           {novel.author && (
-            <Text className="text-muted-foreground text-sm" numberOfLines={1}>
+            <Text className="text-sm text-[#a1a1aa]" numberOfLines={1}>
               {novel.author}
             </Text>
           )}
           <View className="flex-row items-center gap-3 mt-0.5">
-            <Text className="text-rating text-sm">
+            <Text className="text-sm text-[#ff9800]">
               ★ {novel.rating ? novel.rating.toFixed(1) : "0.0"}
             </Text>
-            <Text className="text-muted-foreground text-sm">
+            <Text className="text-sm text-[#a1a1aa]">
               ▤ {chapterCount}
             </Text>
           </View>
@@ -217,7 +217,7 @@ function DiscoverListCard({ novel }: { novel: Novel }) {
 
   return (
     <Link href={`/novel/${novel.slug || novel.id}`} asChild>
-      <Pressable className="flex-row py-3 px-4" style={isTablet ? { flex: 1, paddingVertical: 16 } : {}}>
+      <Pressable className={`flex-row px-4 ${isTablet ? 'py-4 flex-1' : 'py-3'}`}>
         <Image
           source={novel.cover_url || "https://placehold.co/160x213"}
           style={{ width: imgWidth, height: imgHeight, borderRadius: 8 }}
@@ -239,23 +239,22 @@ function DiscoverListCard({ novel }: { novel: Novel }) {
             </View>
           )}
           <Text
-            className="text-foreground font-semibold"
-            style={{ fontSize: isTablet ? 18 : 16, lineHeight: isTablet ? 24 : 22 }}
+            className={`font-semibold text-[#e8e6f0] ${isTablet ? 'text-lg leading-6' : 'text-base leading-snug'}`}
             numberOfLines={2}
           >
             {novel.title}
           </Text>
           {novel.author && (
-            <Text className="text-muted-foreground" style={{ fontSize: isTablet ? 15 : 14 }} numberOfLines={1}>
+            <Text className={`text-[#a1a1aa] ${isTablet ? 'text-[15px]' : 'text-sm'}`} numberOfLines={1}>
               {novel.author}
             </Text>
           )}
           <View className="flex-row items-center gap-3 mt-1">
-            <Text className="text-rating font-medium" style={{ fontSize: isTablet ? 15 : 14 }}>
+            <Text className={`font-medium text-[#ff9800] ${isTablet ? 'text-[15px]' : 'text-sm'}`}>
               ★ {novel.rating ? novel.rating.toFixed(1) : "0.0"}
             </Text>
             <View className="flex-row items-center gap-1">
-              <Text className="text-muted-foreground font-medium" style={{ fontSize: isTablet ? 15 : 14 }}>
+              <Text className={`font-medium text-[#a1a1aa] ${isTablet ? 'text-[15px]' : 'text-sm'}`}>
                 ▤ {chapterCount} chương
               </Text>
             </View>
@@ -277,13 +276,7 @@ function RankingCard({ novel, rank }: { novel: Novel; rank?: number }) {
   return (
     <Link href={`/novel/${novel.slug || novel.id}`} asChild>
       <Pressable
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          paddingVertical: isTablet ? 16 : 12,
-          paddingHorizontal: 16,
-          flex: isTablet ? 1 : undefined,
-        }}
+        className={`flex-row items-center px-4 ${isTablet ? 'py-4 flex-1' : 'py-3'}`}
       >
         <Image
           source={novel.cover_url || "https://placehold.co/160x224"}
@@ -297,7 +290,8 @@ function RankingCard({ novel, rank }: { novel: Novel; rank?: number }) {
               {genres.slice(0, 1).map((g) => (
                 <Text
                   key={g}
-                  style={{ color: getGenreTagColor(g), fontSize: 12, fontWeight: "700" }}
+                  style={{ color: getGenreTagColor(g) }}
+                  className="text-xs font-bold"
                 >
                   #{getGenreLabel(g).toUpperCase()}
                 </Text>
@@ -317,19 +311,15 @@ function RankingCard({ novel, rank }: { novel: Novel; rank?: number }) {
                 }}
               >
                 <Text
-                  style={{
-                    fontSize: isTablet ? 16 : 14,
-                    fontWeight: "700",
-                    color: rank <= 3 ? "#fff" : "#a1a1aa",
-                  }}
+                  className="font-bold"
+                  style={{ color: rank <= 3 ? "#fff" : "#a1a1aa", fontSize: isTablet ? 16 : 14 }}
                 >
                   {rank}
                 </Text>
               </View>
             )}
             <Text
-              className="text-foreground"
-              style={{ flex: 1, fontSize: isTablet ? 18 : 16, fontWeight: "600", lineHeight: isTablet ? 26 : 22 }}
+              className={`flex-1 font-semibold text-[#e8e6f0] ${isTablet ? 'text-lg leading-[26px]' : 'text-base leading-snug'}`}
               numberOfLines={2}
             >
               {novel.title}
@@ -337,17 +327,17 @@ function RankingCard({ novel, rank }: { novel: Novel; rank?: number }) {
           </View>
           {novel.author && (
             <Text
-              style={{ fontSize: isTablet ? 15 : 14, color: "#999", marginTop: isTablet ? 4 : 0 }}
+              className={`text-[#a1a1aa] ${isTablet ? 'text-[15px] mt-1' : 'text-sm'}`}
               numberOfLines={1}
             >
               {novel.author}
             </Text>
           )}
           <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginTop: isTablet ? 6 : 2 }}>
-            <Text style={{ fontSize: isTablet ? 15 : 14, color: "#ff9800", fontWeight: "500" }}>
+            <Text className={`font-medium text-[#ff9800] ${isTablet ? 'text-[15px]' : 'text-sm'}`}>
               ★ {novel.rating ? novel.rating.toFixed(1) : "0.0"}
             </Text>
-            <Text style={{ fontSize: isTablet ? 15 : 14, color: "#999", fontWeight: "500" }}>
+            <Text className={`font-medium text-[#a1a1aa] ${isTablet ? 'text-[15px]' : 'text-sm'}`}>
               {chapterCount} chương
             </Text>
           </View>
@@ -366,24 +356,25 @@ function FeaturedCard({ novel, onBookmark }: { novel: Novel; onBookmark?: () => 
     <View className="px-4 flex-row gap-4 py-3">
       <View className="flex-1 justify-center gap-1.5">
         {genre && (
-          <Text className="text-muted-foreground text-sm">
+          <Text className="text-sm" style={{ color: "#a1a1aa" }}>
             {getGenreLabel(genre)}
           </Text>
         )}
-        <Text className="text-foreground text-xl font-bold" numberOfLines={2}>
+        <Text className="text-xl font-bold" style={{ color: "#e8e6f0" }} numberOfLines={2}>
           {novel.title}
         </Text>
         {novel.description && (
           <Text
-            className="text-muted-foreground text-sm leading-relaxed"
+            className="text-sm leading-relaxed"
+            style={{ color: "#a1a1aa" }}
             numberOfLines={3}
           >
             {novel.description}
           </Text>
         )}
         <View className="flex-row items-center gap-1 mt-0.5">
-          <Text className="text-rating text-sm">★★★★★</Text>
-          <Text className="text-muted-foreground text-sm">
+          <Text className="text-sm" style={{ color: "#ff9800" }}>★★★★★</Text>
+          <Text className="text-sm" style={{ color: "#a1a1aa" }}>
             {novel.rating ? novel.rating.toFixed(1) : "0.0"}
           </Text>
         </View>
