@@ -120,13 +120,25 @@ export default function NovelDetailScreen() {
       // Parallel fetches — removed redundant reading_sessions/bookmarks count queries
       // since get_novel_stats RPC already returns view_count + bookmark_count
       const [chapterRes, ratingsRes] = await Promise.all([
-        supabase
-          .from("chapters")
-          .select("id, novel_id, chapter_number, title, created_at")
-          .eq("novel_id", data.id)
-          .order("chapter_number", { ascending: true })
-          .limit(500),
-        supabase.rpc("get_novel_stats", { p_novel_id: data.id }),
+        (async () => {
+          try {
+            return await supabase
+              .from("chapters")
+              .select("id, novel_id, chapter_number, title, created_at")
+              .eq("novel_id", data.id)
+              .order("chapter_number", { ascending: true })
+              .limit(500);
+          } catch (err) {
+            return { data: [], error: err };
+          }
+        })(),
+        (async () => {
+          try {
+            return await supabase.rpc("get_novel_stats", { p_novel_id: data.id });
+          } catch (err) {
+            return { data: null, error: err };
+          }
+        })(),
       ]);
 
       setChapters(chapterRes.data || []);
