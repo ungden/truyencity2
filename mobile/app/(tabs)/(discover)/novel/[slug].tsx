@@ -15,6 +15,7 @@ import type { Novel, Chapter } from "@/lib/types";
 import * as Haptics from "expo-haptics";
 import { resolveProgress, getLocalProgress } from "@/services/reading-progress";
 import { useOfflineDownload } from "@/hooks/use-offline";
+import { useDevice } from "@/hooks/use-device";
 import { formatStorageSize, getNovelStorageSize } from "@/lib/offline-db";
 import UnderlineTabs from "@/components/underline-tabs";
 import NovelCard from "@/components/novel-card";
@@ -43,6 +44,7 @@ export default function NovelDetailScreen() {
   const { width } = useWindowDimensions();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
+  const { isTablet } = useDevice();
 
   const [novel, setNovel] = useState<Novel | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
@@ -501,28 +503,32 @@ export default function NovelDetailScreen() {
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     contentContainerStyle={{ gap: 12 }}
-                    renderItem={({ item }) => (
-                      <Link href={`/novel/${item.slug || item.id}`} asChild>
-                        <Pressable style={{ width: 110 }}>
-                          <Image
-                            source={item.cover_url || "https://placehold.co/220x300"}
-                            style={{ width: 110, height: 150, borderRadius: 8 }}
-                            className="object-cover"
-                          />
-                          <Text
-                            style={{ fontSize: 12, fontWeight: "600", color: C.text, marginTop: 6 }}
-                            numberOfLines={2}
-                          >
-                            {item.title}
-                          </Text>
-                          {item.author && (
-                            <Text style={{ fontSize: 11, color: C.textSub, marginTop: 2 }} numberOfLines={1}>
-                              {item.author}
+                    renderItem={({ item }) => {
+                      const cardWidth = isTablet ? 140 : 110;
+                      const cardHeight = isTablet ? 187 : 150;
+                      return (
+                        <Link href={`/novel/${item.slug || item.id}`} asChild>
+                          <Pressable style={{ width: cardWidth }}>
+                            <Image
+                              source={item.cover_url || "https://placehold.co/220x300"}
+                              style={{ width: cardWidth, height: cardHeight, borderRadius: 8 }}
+                              className="object-cover"
+                            />
+                            <Text
+                              style={{ fontSize: isTablet ? 14 : 12, fontWeight: "600", color: C.text, marginTop: 6, lineHeight: isTablet ? 20 : 16 }}
+                              numberOfLines={2}
+                            >
+                              {item.title}
                             </Text>
-                          )}
-                        </Pressable>
-                      </Link>
-                    )}
+                            {item.author && (
+                              <Text style={{ fontSize: isTablet ? 13 : 11, color: C.textSub, marginTop: 2 }} numberOfLines={1}>
+                                {item.author}
+                              </Text>
+                            )}
+                          </Pressable>
+                        </Link>
+                      );
+                    }}
                   />
                 </View>
               )}
