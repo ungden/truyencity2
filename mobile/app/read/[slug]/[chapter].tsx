@@ -24,6 +24,7 @@ import type { Chapter } from "@/lib/types";
 import RenderHtml from "react-native-render-html";
 import * as Haptics from "expo-haptics";
 import { useTTS } from "@/hooks/use-tts";
+import { useDevice } from "@/hooks/use-device";
 import { TTS_SPEEDS } from "@/lib/tts";
 import { getChapterOffline } from "@/lib/offline-db";
 import { useKeepAwake } from "expo-keep-awake";
@@ -94,6 +95,7 @@ export default function ReadingScreen() {
     chapter: string;
   }>();
   const { width, height: screenHeight } = useWindowDimensions();
+  const { isTablet, readerPadding, readerMaxWidth } = useDevice();
   const scrollRef = useRef<RNScrollView>(null);
   const chapterNumber = parseInt(chapter || "1", 10);
 
@@ -643,7 +645,7 @@ export default function ReadingScreen() {
           backgroundColor: theme.barBg,
           paddingTop: 54, // safe area
           paddingBottom: 12,
-          paddingHorizontal: 16,
+          paddingHorizontal: isTablet ? 32 : 16,
           flexDirection: "row",
           alignItems: "center",
           opacity: controlOpacity,
@@ -719,7 +721,7 @@ export default function ReadingScreen() {
           ref={scrollRef}
           style={{ flex: 1 }}
           contentContainerStyle={{
-            paddingHorizontal: 20,
+            paddingHorizontal: readerPadding,
             paddingTop: showControls ? 116 : 52,
             paddingBottom: 160,
           }}
@@ -744,7 +746,7 @@ export default function ReadingScreen() {
           {/* Chapter content */}
           {htmlSource && (
             <RenderHtml
-              contentWidth={width - 40}
+              contentWidth={readerMaxWidth ? readerMaxWidth - 48 : width - 40}
               source={htmlSource}
               tagsStyles={tagsStyles}
               defaultTextProps={{
@@ -755,7 +757,7 @@ export default function ReadingScreen() {
           )}
 
           {/* Chapter end navigation */}
-          <View style={{ marginTop: 32, gap: 12, paddingBottom: 32 }}>
+          <View style={{ marginTop: 32, gap: 12, paddingBottom: 32, ...(readerMaxWidth ? { maxWidth: readerMaxWidth - 48, alignSelf: "center" as const, width: "100%" as any } : {}) }}>
             <View style={{ height: 1, backgroundColor: theme.controlBorder, marginBottom: 16 }} />
             <Text style={{ color: theme.textSecondary, fontSize: 13, textAlign: "center", marginBottom: 8 }}>
               Chương {chapterNumber} / {totalChapters}
@@ -904,7 +906,7 @@ export default function ReadingScreen() {
           backgroundColor: theme.barBg,
           borderTopWidth: 1,
           borderTopColor: theme.controlBorder,
-          paddingHorizontal: 16,
+          paddingHorizontal: isTablet ? 32 : 16,
           paddingTop: 10,
           paddingBottom: 40, // safe area
           flexDirection: "row",

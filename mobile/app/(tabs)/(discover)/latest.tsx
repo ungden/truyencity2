@@ -3,11 +3,13 @@ import { FlatList, ActivityIndicator } from "react-native";
 import { View, Text } from "@/tw";
 import { supabase } from "@/lib/supabase";
 import NovelCard from "@/components/novel-card";
+import { useDevice } from "@/hooks/use-device";
 import type { Novel } from "@/lib/types";
 
 const PAGE_SIZE = 20;
 
 export default function LatestScreen() {
+  const { centeredStyle } = useDevice();
   const [novels, setNovels] = useState<Novel[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -66,7 +68,7 @@ export default function LatestScreen() {
         keyExtractor={(item) => item.id}
         contentInsetAdjustmentBehavior="automatic"
         renderItem={({ item }) => (
-          <View className="border-b border-border">
+          <View style={[{ borderBottomWidth: 1, borderBottomColor: "rgba(128,128,128,0.15)" }, centeredStyle] as any}>
             <NovelCard novel={item} variant="discover-list" />
           </View>
         )}

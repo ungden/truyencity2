@@ -5,6 +5,7 @@ import { Image } from "@/tw/image";
 import { Link } from "expo-router";
 import { supabase } from "@/lib/supabase";
 import UnderlineTabs from "@/components/underline-tabs";
+import { useDevice } from "@/hooks/use-device";
 import type { Novel } from "@/lib/types";
 import { useOfflineNovels } from "@/hooks/use-offline";
 import {
@@ -30,6 +31,7 @@ type LibraryNovel = Novel & {
 };
 
 export default function LibraryScreen() {
+  const { isTablet, centeredStyle, coverSize } = useDevice();
   const [selectedTab, setSelectedTab] = useState(0);
   const [history, setHistory] = useState<LibraryNovel[]>([]);
   const [bookmarks, setBookmarks] = useState<LibraryNovel[]>([]);
@@ -180,44 +182,46 @@ export default function LibraryScreen() {
         keyExtractor={(item) => item.novel_id}
         style={{ flex: 1, backgroundColor: "#131620" }}
         ListHeaderComponent={
-          <UnderlineTabs
-            tabs={["Lịch sử", "Đánh dấu", "Đã tải"]}
-            selectedIndex={selectedTab}
-            onSelect={(idx) => {
-              setSelectedTab(idx);
-              if (idx === 2) refreshOffline();
-            }}
-          />
+          <View style={centeredStyle}>
+            <UnderlineTabs
+              tabs={["Lịch sử", "Đánh dấu", "Đã tải"]}
+              selectedIndex={selectedTab}
+              onSelect={(idx) => {
+                setSelectedTab(idx);
+                if (idx === 2) refreshOffline();
+              }}
+            />
+          </View>
         }
         stickyHeaderIndices={[0]}
         renderItem={({ item }: { item: OfflineNovel }) => (
           <Link href={`/novel/${item.slug || item.novel_id}`} asChild>
             <Pressable
-              style={{
+              style={[{
                 flexDirection: "row",
                 alignItems: "center",
-                paddingVertical: 12,
+                paddingVertical: isTablet ? 14 : 12,
                 paddingHorizontal: 16,
                 borderBottomWidth: 1,
                 borderBottomColor: "rgba(128,128,128,0.2)",
-              }}
+              }, centeredStyle] as any}
             >
               <Image
                 source={item.cover_url || "https://placehold.co/160x213"}
-                style={{ width: 80, height: 106, borderRadius: 8 }}
+                style={{ width: coverSize.width, height: coverSize.height, borderRadius: coverSize.radius }}
                 className="object-cover"
               />
               <View className="flex-1 ml-3 justify-center">
                 <Text
-                  className="text-foreground text-base font-semibold"
+                  style={{ fontSize: isTablet ? 17 : 16, fontWeight: "600", color: "#e8e6f0" }}
                   numberOfLines={2}
                 >
                   {item.title}
                 </Text>
-                <Text className="text-muted-foreground text-sm mt-1">
+                <Text style={{ fontSize: isTablet ? 14 : 13, color: "#82818e", marginTop: 4 }}>
                   {item.downloaded_chapters}/{item.total_chapters} chương
                 </Text>
-                <Text style={{ fontSize: 11, color: "#22c55e", marginTop: 2 }}>
+                <Text style={{ fontSize: isTablet ? 12 : 11, color: "#22c55e", marginTop: 2 }}>
                   {formatStorageSize(getNovelStorageSize(item.novel_id))}
                 </Text>
               </View>
@@ -264,20 +268,29 @@ export default function LibraryScreen() {
 
     return (
       <Link href={`/novel/${item.slug || item.id}`} asChild>
-        <Pressable className="flex-row items-center py-3 px-4 border-b border-border">
+        <Pressable
+          style={[{
+            flexDirection: "row",
+            alignItems: "center",
+            paddingVertical: isTablet ? 14 : 12,
+            paddingHorizontal: 16,
+            borderBottomWidth: 1,
+            borderBottomColor: "rgba(128,128,128,0.15)",
+          }, centeredStyle] as any}
+        >
           <Image
             source={item.cover_url || "https://placehold.co/160x213"}
-            style={{ width: 80, height: 106, borderRadius: 8 }}
+            style={{ width: coverSize.width, height: coverSize.height, borderRadius: coverSize.radius }}
             className="object-cover"
           />
           <View className="flex-1 ml-3 justify-center">
             <Text
-              className="text-foreground text-base font-semibold"
+              style={{ fontSize: isTablet ? 17 : 16, fontWeight: "600", color: "#e8e6f0" }}
               numberOfLines={2}
             >
               {item.title}
             </Text>
-            <Text className="text-muted-foreground text-sm mt-1">
+            <Text style={{ fontSize: isTablet ? 14 : 13, color: "#82818e", marginTop: 4 }}>
               {selectedTab === 0
                 ? `Đã đọc ${current}/${total}`
                 : `${total} chương`}
@@ -298,14 +311,16 @@ export default function LibraryScreen() {
       keyExtractor={(item) => item.id}
       style={{ flex: 1, backgroundColor: "#131620" }}
       ListHeaderComponent={
-        <UnderlineTabs
-          tabs={["Lịch sử", "Đánh dấu", "Đã tải"]}
-          selectedIndex={selectedTab}
-          onSelect={(idx) => {
-            setSelectedTab(idx);
-            if (idx === 2) refreshOffline();
-          }}
-        />
+        <View style={centeredStyle}>
+          <UnderlineTabs
+            tabs={["Lịch sử", "Đánh dấu", "Đã tải"]}
+            selectedIndex={selectedTab}
+            onSelect={(idx) => {
+              setSelectedTab(idx);
+              if (idx === 2) refreshOffline();
+            }}
+          />
+        </View>
       }
       stickyHeaderIndices={[0]}
       renderItem={renderItem}

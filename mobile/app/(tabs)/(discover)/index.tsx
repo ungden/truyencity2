@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, useWindowDimensions } from "react-native";
+import { FlatList } from "react-native";
 import { View, Text, ScrollView, Pressable } from "@/tw";
 import { Image } from "@/tw/image";
 import { Link } from "expo-router";
@@ -9,10 +9,11 @@ import HeroCarousel from "@/components/hero-carousel";
 import SectionHeader from "@/components/section-header";
 import SearchResults from "@/components/search-results";
 import { useSearchContext } from "@/contexts/search-context";
+import { useDevice } from "@/hooks/use-device";
 import type { Novel } from "@/lib/types";
 
 export default function DiscoverScreen() {
-  const { width } = useWindowDimensions();
+  const { width, isTablet, isLargeTablet, gridColumns, centeredStyle } = useDevice();
   const [heroNovels, setHeroNovels] = useState<Novel[]>([]);
   const [latest, setLatest] = useState<Novel[]>([]);
   const [featured, setFeatured] = useState<Novel | null>(null);
@@ -188,21 +189,23 @@ export default function DiscoverScreen() {
         </View>
       )}
 
-      {/* Recommended — 3-column grid */}
+      {/* Recommended — responsive grid */}
       {recommended.length > 0 && (
         <View className="mt-4">
           <SectionHeader title="Đề cử" />
           <View
-            style={{
-              paddingHorizontal: 16,
-              flexDirection: "row",
-              flexWrap: "wrap",
-              gap: 12,
-            }}
+            style={[
+              {
+                paddingHorizontal: 16,
+                flexDirection: "row",
+                flexWrap: "wrap",
+                gap: 12,
+              },
+              centeredStyle,
+            ] as any}
           >
-            {recommended.slice(0, width >= 768 ? 8 : 6).map((novel) => {
-              const columns = width >= 768 ? 4 : 3;
-              const itemWidth = (width - 32 - 12 * (columns - 1)) / columns;
+            {recommended.slice(0, isLargeTablet ? 10 : isTablet ? 8 : 6).map((novel) => {
+              const itemWidth = (Math.min(width, (centeredStyle?.maxWidth as number) || width) - 32 - 12 * (gridColumns - 1)) / gridColumns;
               return (
                 <View key={novel.id} style={{ width: itemWidth }}>
                   <NovelCard novel={novel} variant="grid" />
@@ -222,9 +225,9 @@ export default function DiscoverScreen() {
             keyExtractor={(item) => item.id}
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 16, gap: 12 }}
+            contentContainerStyle={{ paddingHorizontal: 16, gap: isTablet ? 16 : 12 }}
             renderItem={({ item }) => {
-              const cardWidth = width >= 768 ? 140 : 100;
+              const cardWidth = isLargeTablet ? 160 : isTablet ? 140 : 100;
               return (
               <Link href={`/novel/${item.slug || item.id}`} asChild>
                 <Pressable style={{ width: cardWidth }}>
@@ -234,12 +237,17 @@ export default function DiscoverScreen() {
                     className="object-cover"
                   />
                   <Text
-                    className="text-foreground text-sm font-medium mt-1.5"
+                    className="text-foreground font-medium mt-1.5"
                     numberOfLines={2}
-                    style={width >= 768 ? { fontSize: 14 } : { fontSize: 12 }}
+                    style={{ fontSize: isTablet ? 14 : 12 }}
                   >
                     {item.title}
                   </Text>
+                  {isTablet && item.author && (
+                    <Text style={{ fontSize: 12, color: "#82818e", marginTop: 2 }} numberOfLines={1}>
+                      {item.author}
+                    </Text>
+                  )}
                 </Pressable>
               </Link>
             )}}

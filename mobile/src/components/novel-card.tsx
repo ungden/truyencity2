@@ -25,9 +25,7 @@ interface NovelCardProps {
 }
 
 function getChapterCount(novel: Novel): number {
-  // Prefer denormalized chapter_count column (fast, no join)
   if (novel.chapter_count != null) return novel.chapter_count;
-  // Fallback to chapters(count) subquery result (detail page)
   if (novel.chapters && novel.chapters.length > 0) return novel.chapters[0]?.count ?? 0;
   return 0;
 }
@@ -43,13 +41,12 @@ function DefaultCard({ novel }: { novel: Novel }) {
       <Pressable style={{ width: cardWidth }}>
         <Image
           source={novel.cover_url || "https://placehold.co/200x267"}
-          style={{ width: cardWidth, aspectRatio: 3/4, borderRadius: 8 }}
+          style={{ width: cardWidth, aspectRatio: 3 / 4, borderRadius: 8 }}
           className="object-cover"
         />
         <Text
-          className="text-xs font-medium mt-1.5"
           numberOfLines={2}
-          style={{ color: "#e8e6f0", ...(isTablet ? { fontSize: 14 } : undefined) }}
+          style={{ color: "#e8e6f0", fontSize: isTablet ? 14 : 12, fontWeight: "500", marginTop: 6 }}
         >
           {novel.title}
         </Text>
@@ -58,12 +55,11 @@ function DefaultCard({ novel }: { novel: Novel }) {
   );
 }
 
-// --- Grid: 3-column cover cards for "Đề cử" section ---
+// --- Grid: responsive cover cards for "Đề cử" section ---
 function GridCard({ novel }: { novel: Novel }) {
   const { isTablet } = useDevice();
-  const chapterCount = getChapterCount(novel);
   const genres = novel.genres || [];
-  
+
   return (
     <Link href={`/novel/${novel.slug || novel.id}`} asChild>
       <Pressable>
@@ -72,14 +68,12 @@ function GridCard({ novel }: { novel: Novel }) {
           style={{ width: "100%", aspectRatio: 3 / 4, borderRadius: 12 }}
           className="object-cover"
         />
-        {/* Genre hashtags */}
         {genres.length > 0 && (
-          <View className="flex-row flex-wrap gap-1.5 mt-2">
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 8 }}>
             {genres.slice(0, 1).map((g) => (
               <Text
                 key={g}
-                style={{ color: getGenreTagColor(g) }}
-                className="text-[10px] font-bold"
+                style={{ color: getGenreTagColor(g), fontSize: 10, fontWeight: "700" }}
               >
                 #{getGenreLabel(g).toUpperCase()}
               </Text>
@@ -87,14 +81,13 @@ function GridCard({ novel }: { novel: Novel }) {
           </View>
         )}
         <Text
-          className="text-xs font-medium mt-1"
           numberOfLines={2}
-          style={{ color: "#e8e6f0", ...(isTablet ? { fontSize: 14, lineHeight: 20 } : {}) }}
+          style={{ color: "#e8e6f0", fontSize: isTablet ? 14 : 12, fontWeight: "500", marginTop: 4 }}
         >
           {novel.title}
         </Text>
         {isTablet && novel.author && (
-          <Text className="text-xs mt-1" style={{ color: "#a1a1aa" }} numberOfLines={1}>
+          <Text style={{ color: "#a1a1aa", fontSize: 12, marginTop: 4 }} numberOfLines={1}>
             {novel.author}
           </Text>
         )}
@@ -103,7 +96,7 @@ function GridCard({ novel }: { novel: Novel }) {
   );
 }
 
-// --- Library Row: matches reference screenshot 1 ---
+// --- Library Row ---
 function LibraryRowCard({
   novel,
   readProgress,
@@ -116,36 +109,44 @@ function LibraryRowCard({
   onMenu?: () => void;
 }) {
   const chapterCount = getChapterCount(novel);
+  const { isTablet } = useDevice();
   const progress = readProgress || { current: 0, total: chapterCount };
 
   return (
     <Link href={`/novel/${novel.slug || novel.id}`} asChild>
-      <Pressable className="flex-row items-center py-3 px-4">
+      <Pressable
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          paddingVertical: isTablet ? 14 : 12,
+          paddingHorizontal: 16,
+        }}
+      >
         <Image
           source={novel.cover_url || "https://placehold.co/160x213"}
-          style={{ width: 80, height: 106, borderRadius: 8 }}
+          style={{ width: isTablet ? 100 : 80, height: isTablet ? 140 : 106, borderRadius: isTablet ? 10 : 8 }}
           className="object-cover"
         />
-        <View className="flex-1 ml-3 justify-center">
+        <View style={{ flex: 1, marginLeft: 12, justifyContent: "center" }}>
           <Text
-            className="text-base font-semibold text-[#e8e6f0]"
             numberOfLines={2}
+            style={{ fontSize: isTablet ? 17 : 16, fontWeight: "600", color: "#e8e6f0" }}
           >
             {novel.title}
           </Text>
-          <Text className="text-sm mt-1 text-[#a1a1aa]">
+          <Text style={{ fontSize: isTablet ? 14 : 13, color: "#a1a1aa", marginTop: 4 }}>
             Đã đọc {progress.current}/{progress.total}
           </Text>
         </View>
-        <View className="flex-row items-center gap-3 ml-2">
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginLeft: 8 }}>
           {onBookmark && (
             <Pressable onPress={onBookmark} hitSlop={8}>
-              <Text className="text-lg text-[#5c9cff]">&#9998;</Text>
+              <Text style={{ fontSize: 18, color: "#5c9cff" }}>&#9998;</Text>
             </Pressable>
           )}
           {onMenu && (
             <Pressable onPress={onMenu} hitSlop={8}>
-              <Text className="text-xl text-[#a1a1aa]">&#8942;</Text>
+              <Text style={{ fontSize: 20, color: "#a1a1aa" }}>&#8942;</Text>
             </Pressable>
           )}
         </View>
@@ -158,140 +159,152 @@ function LibraryRowCard({
 function HorizontalCard({ novel }: { novel: Novel }) {
   const genres = novel.genres || [];
   const chapterCount = getChapterCount(novel);
-
-  return (
-    <Link href={`/novel/${novel.slug || novel.id}`} asChild>
-      <Pressable className="flex-row py-3 px-4">
-        <Image
-          source={novel.cover_url || "https://placehold.co/160x213"}
-          style={{ width: 80, height: 112, borderRadius: 8 }}
-          className="object-cover"
-        />
-        <View className="flex-1 ml-3 justify-center gap-1">
-          {/* Genre hashtags */}
-          {genres.length > 0 && (
-            <View className="flex-row flex-wrap gap-1.5">
-              {genres.slice(0, 2).map((g) => (
-                <Text
-                  key={g}
-                  style={{ color: getGenreTagColor(g) }}
-                  className="text-xs font-bold"
-                >
-                  #{getGenreLabel(g).toUpperCase()}
-                </Text>
-              ))}
-            </View>
-          )}
-          <Text
-            className="text-base font-semibold text-[#e8e6f0]"
-            numberOfLines={2}
-          >
-            {novel.title}
-          </Text>
-          {novel.author && (
-            <Text className="text-sm text-[#a1a1aa]" numberOfLines={1}>
-              {novel.author}
-            </Text>
-          )}
-          <View className="flex-row items-center gap-3 mt-0.5">
-            <Text className="text-sm text-[#ff9800]">
-              ★ {novel.rating ? novel.rating.toFixed(1) : "0.0"}
-            </Text>
-            <Text className="text-sm text-[#a1a1aa]">
-              ▤ {chapterCount}
-            </Text>
-          </View>
-        </View>
-      </Pressable>
-    </Link>
-  );
-}
-
-// --- Discover list: for "Mới nhất" full list (screenshot 4) ---
-function DiscoverListCard({ novel }: { novel: Novel }) {
-  const genres = novel.genres || [];
-  const chapterCount = getChapterCount(novel);
   const { isTablet } = useDevice();
-  const imgWidth = isTablet ? 120 : 80;
-  const imgHeight = isTablet ? 168 : 112;
-
-  return (
-    <Link href={`/novel/${novel.slug || novel.id}`} asChild>
-      <Pressable className={`flex-row px-4 ${isTablet ? 'py-4 flex-1' : 'py-3'}`}>
-        <Image
-          source={novel.cover_url || "https://placehold.co/160x213"}
-          style={{ width: imgWidth, height: imgHeight, borderRadius: 8 }}
-          className="object-cover"
-        />
-        <View className="flex-1 ml-4 justify-center gap-1.5">
-          {/* Genre hashtags */}
-          {genres.length > 0 && (
-            <View className="flex-row flex-wrap gap-1.5">
-              {genres.slice(0, 2).map((g) => (
-                <Text
-                  key={g}
-                  style={{ color: getGenreTagColor(g) }}
-                  className="text-xs font-bold"
-                >
-                  #{getGenreLabel(g).toUpperCase()}
-                </Text>
-              ))}
-            </View>
-          )}
-          <Text
-            className={`font-semibold text-[#e8e6f0] ${isTablet ? 'text-lg leading-6' : 'text-base leading-snug'}`}
-            numberOfLines={2}
-          >
-            {novel.title}
-          </Text>
-          {novel.author && (
-            <Text className={`text-[#a1a1aa] ${isTablet ? 'text-[15px]' : 'text-sm'}`} numberOfLines={1}>
-              {novel.author}
-            </Text>
-          )}
-          <View className="flex-row items-center gap-3 mt-1">
-            <Text className={`font-medium text-[#ff9800] ${isTablet ? 'text-[15px]' : 'text-sm'}`}>
-              ★ {novel.rating ? novel.rating.toFixed(1) : "0.0"}
-            </Text>
-            <View className="flex-row items-center gap-1">
-              <Text className={`font-medium text-[#a1a1aa] ${isTablet ? 'text-[15px]' : 'text-sm'}`}>
-                ▤ {chapterCount} chương
-              </Text>
-            </View>
-          </View>
-        </View>
-      </Pressable>
-    </Link>
-  );
-}
-
-// --- Ranking: numbered badge + info (screenshot 5) ---
-function RankingCard({ novel, rank }: { novel: Novel; rank?: number }) {
-  const genres = novel.genres || [];
-  const chapterCount = getChapterCount(novel);
-  const { isTablet } = useDevice();
-  const imgWidth = isTablet ? 120 : 80;
-  const imgHeight = isTablet ? 168 : 112;
+  const imgW = isTablet ? 120 : 80;
+  const imgH = isTablet ? 168 : 112;
 
   return (
     <Link href={`/novel/${novel.slug || novel.id}`} asChild>
       <Pressable
-        className={`flex-row items-center px-4 ${isTablet ? 'py-4 flex-1' : 'py-3'}`}
+        style={{
+          flexDirection: "row",
+          paddingVertical: isTablet ? 16 : 12,
+          paddingHorizontal: 16,
+        }}
+      >
+        <Image
+          source={novel.cover_url || "https://placehold.co/160x213"}
+          style={{ width: imgW, height: imgH, borderRadius: isTablet ? 10 : 8 }}
+          className="object-cover"
+        />
+        <View style={{ flex: 1, marginLeft: isTablet ? 16 : 12, justifyContent: "center", gap: 4 }}>
+          {genres.length > 0 && (
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
+              {genres.slice(0, 2).map((g) => (
+                <Text
+                  key={g}
+                  style={{ color: getGenreTagColor(g), fontSize: 12, fontWeight: "700" }}
+                >
+                  #{getGenreLabel(g).toUpperCase()}
+                </Text>
+              ))}
+            </View>
+          )}
+          <Text
+            numberOfLines={2}
+            style={{ fontSize: isTablet ? 18 : 16, fontWeight: "600", color: "#e8e6f0", lineHeight: isTablet ? 26 : 22 }}
+          >
+            {novel.title}
+          </Text>
+          {novel.author && (
+            <Text numberOfLines={1} style={{ fontSize: isTablet ? 15 : 14, color: "#a1a1aa" }}>
+              {novel.author}
+            </Text>
+          )}
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginTop: 2 }}>
+            <Text style={{ fontSize: isTablet ? 15 : 14, fontWeight: "500", color: "#ff9800" }}>
+              ★ {novel.rating ? novel.rating.toFixed(1) : "0.0"}
+            </Text>
+            <Text style={{ fontSize: isTablet ? 15 : 14, fontWeight: "500", color: "#a1a1aa" }}>
+              ▤ {chapterCount} chương
+            </Text>
+          </View>
+        </View>
+      </Pressable>
+    </Link>
+  );
+}
+
+// --- Discover list: for "Mới nhất" full list ---
+function DiscoverListCard({ novel }: { novel: Novel }) {
+  const genres = novel.genres || [];
+  const chapterCount = getChapterCount(novel);
+  const { isTablet } = useDevice();
+  const imgW = isTablet ? 120 : 80;
+  const imgH = isTablet ? 168 : 112;
+
+  return (
+    <Link href={`/novel/${novel.slug || novel.id}`} asChild>
+      <Pressable
+        style={{
+          flexDirection: "row",
+          paddingVertical: isTablet ? 16 : 12,
+          paddingHorizontal: 16,
+        }}
+      >
+        <Image
+          source={novel.cover_url || "https://placehold.co/160x213"}
+          style={{ width: imgW, height: imgH, borderRadius: isTablet ? 10 : 8 }}
+          className="object-cover"
+        />
+        <View style={{ flex: 1, marginLeft: isTablet ? 16 : 12, justifyContent: "center", gap: 6 }}>
+          {genres.length > 0 && (
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
+              {genres.slice(0, 2).map((g) => (
+                <Text
+                  key={g}
+                  style={{ color: getGenreTagColor(g), fontSize: 12, fontWeight: "700" }}
+                >
+                  #{getGenreLabel(g).toUpperCase()}
+                </Text>
+              ))}
+            </View>
+          )}
+          <Text
+            numberOfLines={2}
+            style={{ fontSize: isTablet ? 18 : 16, fontWeight: "600", color: "#e8e6f0", lineHeight: isTablet ? 26 : 22 }}
+          >
+            {novel.title}
+          </Text>
+          {novel.author && (
+            <Text numberOfLines={1} style={{ fontSize: isTablet ? 15 : 14, color: "#a1a1aa" }}>
+              {novel.author}
+            </Text>
+          )}
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginTop: 2 }}>
+            <Text style={{ fontSize: isTablet ? 15 : 14, fontWeight: "500", color: "#ff9800" }}>
+              ★ {novel.rating ? novel.rating.toFixed(1) : "0.0"}
+            </Text>
+            <Text style={{ fontSize: isTablet ? 15 : 14, fontWeight: "500", color: "#a1a1aa" }}>
+              ▤ {chapterCount} chương
+            </Text>
+          </View>
+        </View>
+      </Pressable>
+    </Link>
+  );
+}
+
+// --- Ranking: numbered badge + info ---
+function RankingCard({ novel, rank }: { novel: Novel; rank?: number }) {
+  const genres = novel.genres || [];
+  const chapterCount = getChapterCount(novel);
+  const { isTablet } = useDevice();
+  const imgW = isTablet ? 120 : 80;
+  const imgH = isTablet ? 168 : 112;
+
+  return (
+    <Link href={`/novel/${novel.slug || novel.id}`} asChild>
+      <Pressable
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          paddingVertical: isTablet ? 16 : 12,
+          paddingHorizontal: 16,
+        }}
       >
         <Image
           source={novel.cover_url || "https://placehold.co/160x224"}
-          style={{ width: imgWidth, height: imgHeight, borderRadius: 8 }}
+          style={{ width: imgW, height: imgH, borderRadius: isTablet ? 10 : 8 }}
           className="object-cover"
         />
         <View style={{ flex: 1, marginLeft: isTablet ? 20 : 12, gap: isTablet ? 6 : 4 }}>
-          {/* Genre hashtag */}
           {genres.length > 0 && (
             <View style={{ flexDirection: "row", gap: 6 }}>
               {genres.slice(0, 1).map((g) => (
                 <Text
                   key={g}
-                  style={{ color: getGenreTagColor(g) }}
-                  className="text-xs font-bold"
+                  style={{ color: getGenreTagColor(g), fontSize: 12, fontWeight: "700" }}
                 >
                   #{getGenreLabel(g).toUpperCase()}
                 </Text>
@@ -311,33 +324,32 @@ function RankingCard({ novel, rank }: { novel: Novel; rank?: number }) {
                 }}
               >
                 <Text
-                  className="font-bold"
-                  style={{ color: rank <= 3 ? "#fff" : "#a1a1aa", fontSize: isTablet ? 16 : 14 }}
+                  style={{ color: rank <= 3 ? "#fff" : "#a1a1aa", fontSize: isTablet ? 16 : 14, fontWeight: "700" }}
                 >
                   {rank}
                 </Text>
               </View>
             )}
             <Text
-              className={`flex-1 font-semibold text-[#e8e6f0] ${isTablet ? 'text-lg leading-[26px]' : 'text-base leading-snug'}`}
               numberOfLines={2}
+              style={{ flex: 1, fontSize: isTablet ? 18 : 16, fontWeight: "600", color: "#e8e6f0", lineHeight: isTablet ? 26 : 22 }}
             >
               {novel.title}
             </Text>
           </View>
           {novel.author && (
             <Text
-              className={`text-[#a1a1aa] ${isTablet ? 'text-[15px] mt-1' : 'text-sm'}`}
               numberOfLines={1}
+              style={{ fontSize: isTablet ? 15 : 14, color: "#a1a1aa", marginTop: isTablet ? 2 : 0 }}
             >
               {novel.author}
             </Text>
           )}
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginTop: isTablet ? 6 : 2 }}>
-            <Text className={`font-medium text-[#ff9800] ${isTablet ? 'text-[15px]' : 'text-sm'}`}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginTop: isTablet ? 4 : 2 }}>
+            <Text style={{ fontSize: isTablet ? 15 : 14, fontWeight: "500", color: "#ff9800" }}>
               ★ {novel.rating ? novel.rating.toFixed(1) : "0.0"}
             </Text>
-            <Text className={`font-medium text-[#a1a1aa] ${isTablet ? 'text-[15px]' : 'text-sm'}`}>
+            <Text style={{ fontSize: isTablet ? 15 : 14, fontWeight: "500", color: "#a1a1aa" }}>
               {chapterCount} chương
             </Text>
           </View>
@@ -347,48 +359,66 @@ function RankingCard({ novel, rank }: { novel: Novel; rank?: number }) {
   );
 }
 
-// --- Featured: large card with description, rating, CTA (screenshot 2) ---
-function FeaturedCard({ novel, onBookmark }: { novel: Novel; onBookmark?: () => void }) {
+// --- Featured: large card with description, rating, CTA ---
+function FeaturedCard({ novel }: { novel: Novel }) {
   const genre = novel.genres?.[0];
-  const chapterCount = getChapterCount(novel);
+  const { isTablet } = useDevice();
 
   return (
-    <View className="px-4 flex-row gap-4 py-3">
-      <View className="flex-1 justify-center gap-1.5">
+    <View style={{ paddingHorizontal: 16, flexDirection: "row", gap: isTablet ? 20 : 16, paddingVertical: 12 }}>
+      <View style={{ flex: 1, justifyContent: "center", gap: 6 }}>
         {genre && (
-          <Text className="text-sm" style={{ color: "#a1a1aa" }}>
+          <Text style={{ fontSize: isTablet ? 15 : 14, color: "#a1a1aa" }}>
             {getGenreLabel(genre)}
           </Text>
         )}
-        <Text className="text-xl font-bold" style={{ color: "#e8e6f0" }} numberOfLines={2}>
+        <Text
+          numberOfLines={2}
+          style={{ fontSize: isTablet ? 24 : 20, fontWeight: "700", color: "#e8e6f0" }}
+        >
           {novel.title}
         </Text>
         {novel.description && (
           <Text
-            className="text-sm leading-relaxed"
-            style={{ color: "#a1a1aa" }}
             numberOfLines={3}
+            style={{ fontSize: isTablet ? 15 : 14, color: "#a1a1aa", lineHeight: isTablet ? 22 : 20 }}
           >
             {novel.description}
           </Text>
         )}
-        <View className="flex-row items-center gap-1 mt-0.5">
-          <Text className="text-sm" style={{ color: "#ff9800" }}>★★★★★</Text>
-          <Text className="text-sm" style={{ color: "#a1a1aa" }}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 4, marginTop: 2 }}>
+          <Text style={{ fontSize: 14, color: "#ff9800" }}>★★★★★</Text>
+          <Text style={{ fontSize: 14, color: "#a1a1aa" }}>
             {novel.rating ? novel.rating.toFixed(1) : "0.0"}
           </Text>
         </View>
-        <View className="flex-row items-center gap-3 mt-2">
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginTop: 8 }}>
           <Link href={`/novel/${novel.slug || novel.id}`} asChild>
-            <Pressable className="bg-foreground px-6 py-2 rounded-full">
-              <Text className="text-background text-sm font-semibold">
+            <Pressable
+              style={{
+                backgroundColor: "#e8e6f0",
+                paddingHorizontal: 24,
+                paddingVertical: 10,
+                borderRadius: 20,
+              }}
+            >
+              <Text style={{ color: "#131620", fontSize: 14, fontWeight: "600" }}>
                 Đọc
               </Text>
             </Pressable>
           </Link>
           <Link href={`/novel/${novel.slug || novel.id}`} asChild>
-            <Pressable className="w-9 h-9 rounded-full bg-primary items-center justify-center">
-              <Text className="text-white text-xl leading-none">+</Text>
+            <Pressable
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 18,
+                backgroundColor: "#5c9cff",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text style={{ color: "#fff", fontSize: 20 }}>+</Text>
             </Pressable>
           </Link>
         </View>
@@ -397,7 +427,7 @@ function FeaturedCard({ novel, onBookmark }: { novel: Novel; onBookmark?: () => 
         <Pressable>
           <Image
             source={novel.cover_url || "https://placehold.co/240x320"}
-            style={{ width: 120, height: 160, borderRadius: 12 }}
+            style={{ width: isTablet ? 160 : 120, height: isTablet ? 213 : 160, borderRadius: 12 }}
             className="object-cover"
           />
         </Pressable>

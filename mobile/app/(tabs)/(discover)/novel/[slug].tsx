@@ -257,8 +257,8 @@ export default function NovelDetailScreen() {
     star: "#f59e0b",
   };
 
-  const coverW = 140;
-  const coverH = 200;
+  const coverW = isTablet ? 180 : 140;
+  const coverH = isTablet ? 260 : 200;
 
   return (
     <>
@@ -283,9 +283,10 @@ export default function NovelDetailScreen() {
               backgroundColor: C.heroBg,
               paddingTop: 100, // space for transparent header
               paddingBottom: 20,
-              paddingHorizontal: 16,
+              paddingHorizontal: isTablet ? 24 : 16,
               flexDirection: "row",
-              gap: 16,
+              gap: isTablet ? 24 : 16,
+              ...(isTablet ? { maxWidth: 780, alignSelf: "center" as const, width: "100%" as any } : {}),
             }}
           >
             {/* Cover */}
@@ -412,7 +413,7 @@ export default function NovelDetailScreen() {
 
           {/* ── Tab 0: Giới Thiệu ── */}
           {activeTab === 0 && (
-            <View style={{ paddingHorizontal: 16 }}>
+            <View style={{ paddingHorizontal: isTablet ? 24 : 16, ...(isTablet ? { maxWidth: 780, alignSelf: "center" as const, width: "100%" as any } : {}) }}>
               {/* Stats row */}
               <View
                 style={{
@@ -587,7 +588,7 @@ export default function NovelDetailScreen() {
 
           {/* ── Tab 1: Đánh Giá ── */}
           {activeTab === 1 && (
-            <View style={{ paddingHorizontal: 16, paddingTop: 24, gap: 24 }}>
+            <View style={{ paddingHorizontal: isTablet ? 24 : 16, paddingTop: 24, gap: 24, ...(isTablet ? { maxWidth: 780, alignSelf: "center" as const, width: "100%" as any } : {}) }}>
               {/* Aggregate rating display */}
               <View style={{ alignItems: "center", gap: 12 }}>
                 <Text style={{ fontSize: 48, fontWeight: "800", color: C.text }}>
@@ -637,7 +638,7 @@ export default function NovelDetailScreen() {
 
           {/* ── Tab 2: D.S Chương ── */}
           {activeTab === 2 && (
-            <View style={{ paddingHorizontal: 16, paddingTop: 8 }}>
+            <View style={{ paddingHorizontal: isTablet ? 24 : 16, paddingTop: 8, ...(isTablet ? { maxWidth: 780, alignSelf: "center" as const, width: "100%" as any } : {}) }}>
               <View
                 style={{
                   flexDirection: "row",

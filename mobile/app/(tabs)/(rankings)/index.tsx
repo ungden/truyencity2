@@ -4,6 +4,7 @@ import { View, Text, Pressable } from "@/tw";
 import { supabase } from "@/lib/supabase";
 import NovelCard from "@/components/novel-card";
 import UnderlineTabs from "@/components/underline-tabs";
+import { useDevice } from "@/hooks/use-device";
 import type { Novel } from "@/lib/types";
 
 const CATEGORIES = ["Lượt đọc", "Đề cử", "Mới nhất", "Hoàn thành"];
@@ -18,6 +19,7 @@ const SORT_MAP: Record<number, SortMode> = {
 };
 
 export default function RankingsScreen() {
+  const { isTablet, centeredStyle } = useDevice();
   const [selectedCategory, setSelectedCategory] = useState(0);
   const [novels, setNovels] = useState<Novel[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,7 +51,7 @@ export default function RankingsScreen() {
     return (
       <View className="bg-background">
         {/* Filter pills */}
-        <View className="flex-row items-center gap-2 px-4 pt-2 pb-2">
+        <View style={[{ flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 16, paddingTop: 8, paddingBottom: 8 }, centeredStyle] as any}>
           <View className="bg-secondary px-3 py-1.5 rounded-full">
             <Text className="text-foreground text-sm font-medium">Tất cả</Text>
           </View>
@@ -60,17 +62,19 @@ export default function RankingsScreen() {
           </View>
         </View>
         {/* Category tabs */}
-        <RNScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={{ flexGrow: 0 }}
-        >
-          <UnderlineTabs
-            tabs={CATEGORIES}
-            selectedIndex={selectedCategory}
-            onSelect={setSelectedCategory}
-          />
-        </RNScrollView>
+        <View style={centeredStyle}>
+          <RNScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={{ flexGrow: 0 }}
+          >
+            <UnderlineTabs
+              tabs={CATEGORIES}
+              selectedIndex={selectedCategory}
+              onSelect={setSelectedCategory}
+            />
+          </RNScrollView>
+        </View>
       </View>
     );
   }
@@ -83,7 +87,7 @@ export default function RankingsScreen() {
       ListHeaderComponent={<ListHeader />}
       stickyHeaderIndices={[0]}
       renderItem={({ item, index }) => (
-        <View className="border-b border-border">
+        <View style={[{ borderBottomWidth: 1, borderBottomColor: "rgba(128,128,128,0.15)" }, centeredStyle] as any}>
           <NovelCard novel={item} variant="ranking" rank={index + 1} />
         </View>
       )}

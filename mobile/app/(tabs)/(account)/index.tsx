@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Alert, FlatList, Image as RNImage, Linking, Platform, useWindowDimensions } from "react-native";
+import { Alert, FlatList, Image as RNImage, Linking, Platform } from "react-native";
 import { View, Text, ScrollView, Pressable, Link } from "@/tw";
 import { supabase } from "@/lib/supabase";
 import { useUserStats } from "@/hooks/use-user-stats";
@@ -19,6 +19,7 @@ import {
   deleteAllOfflineData,
   formatStorageSize,
 } from "@/lib/offline-db";
+import { useDevice } from "@/hooks/use-device";
 
 // Brand logo asset
 const LOGO = require("../../../assets/logo.png");
@@ -50,11 +51,11 @@ function LevelCard({
   const current = getCurrentLevel(xp);
   const next = getNextLevel(xp);
   const progress = getLevelProgress(xp);
+  const { centeredStyle } = useDevice();
 
   return (
     <View
-      className="mx-4 rounded-2xl overflow-hidden"
-      style={{ backgroundColor: "#1a1d28" }}
+      style={[{ marginHorizontal: 16, borderRadius: 16, overflow: "hidden", backgroundColor: "#1a1d28" }, centeredStyle] as any}
     >
       {/* Top accent bar */}
       <View style={{ height: 4, backgroundColor: levelColor }} />
@@ -156,16 +157,15 @@ interface StatItem {
 }
 
 function StatsGrid({ items }: { items: StatItem[] }) {
-  const { width } = useWindowDimensions();
-  const isTablet = Platform.OS === "ios" && width >= 700;
-  // 4 columns on iPad, 2 on phone
+  const { isTablet, isLargeTablet, centeredStyle } = useDevice();
+  // 4 columns on large tablet, 4 on tablet, 2 on phone
   const itemWidth = isTablet ? "23%" : "47%";
 
   return (
-    <View className="mx-4 gap-3" style={isTablet ? { maxWidth: 700, alignSelf: "center", width: "100%" } : undefined}>
+    <View style={[{ marginHorizontal: 16, gap: 12 }, centeredStyle] as any}>
       <Text
         style={{
-          fontSize: 16,
+          fontSize: isTablet ? 18 : 16,
           fontWeight: "700",
           color: "#e8e6f0",
           marginBottom: 2,
@@ -180,19 +180,19 @@ function StatsGrid({ items }: { items: StatItem[] }) {
             style={{
               backgroundColor: "#1a1d28",
               borderRadius: 14,
-              padding: 14,
+              padding: isTablet ? 16 : 14,
               width: itemWidth as any,
               flexGrow: 1,
               gap: 6,
             }}
           >
-            <Text style={{ fontSize: 20 }}>{item.icon}</Text>
+            <Text style={{ fontSize: isTablet ? 24 : 20 }}>{item.icon}</Text>
             <Text
-              style={{ fontSize: 22, fontWeight: "700", color: "#e8e6f0" }}
+              style={{ fontSize: isTablet ? 24 : 22, fontWeight: "700", color: "#e8e6f0" }}
             >
               {item.value}
             </Text>
-            <Text style={{ fontSize: 12, color: "#82818e" }}>
+            <Text style={{ fontSize: isTablet ? 13 : 12, color: "#82818e" }}>
               {item.label}
             </Text>
           </View>
@@ -355,6 +355,7 @@ function SettingsMenu({ items }: { items: MenuItem[] }) {
 export default function ProfileScreen() {
   const { profile, stats, loading, refetch } = useUserStats();
   const { isVip } = useRevenueCat();
+  const { isTablet, centeredStyle } = useDevice();
   const [offlineSize, setOfflineSize] = useState(0);
 
   useEffect(() => {
@@ -595,7 +596,7 @@ export default function ProfileScreen() {
       contentContainerClassName="gap-6 pb-8 pt-4"
     >
       {/* Profile header */}
-      <View className="mx-4 flex-row items-center gap-4">
+      <View style={[{ marginHorizontal: 16, flexDirection: "row", alignItems: "center", gap: 16 }, centeredStyle] as any}>
         <View
           style={{
             width: 60,
@@ -630,7 +631,7 @@ export default function ProfileScreen() {
       {!isVip && (
         <Link href="/(account)/paywall" asChild>
           <Pressable
-            style={{
+            style={[{
               marginHorizontal: 16,
               backgroundColor: "#1a1d28",
               borderRadius: 16,
@@ -640,7 +641,7 @@ export default function ProfileScreen() {
               gap: 14,
               borderWidth: 1,
               borderColor: "#fbbf2440",
-            }}
+            }, centeredStyle] as any}
           >
             <View
               style={{
@@ -670,7 +671,7 @@ export default function ProfileScreen() {
       {/* VIP badge — show for VIP users */}
       {isVip && (
         <View
-          style={{
+          style={[{
             marginHorizontal: 16,
             backgroundColor: "#fbbf2415",
             borderRadius: 16,
@@ -680,7 +681,7 @@ export default function ProfileScreen() {
             gap: 14,
             borderWidth: 1,
             borderColor: "#fbbf2430",
-          }}
+          }, centeredStyle] as any}
         >
           <Text style={{ fontSize: 22 }}>👑</Text>
           <View style={{ flex: 1 }}>
@@ -704,10 +705,9 @@ export default function ProfileScreen() {
       <AchievementsSection unlocked={unlocked} locked={locked} />
 
       {/* Settings menu */}
-      <View className="gap-3">
+      <View style={[{ gap: 12 }, centeredStyle] as any}>
         <Text
-          className="mx-4"
-          style={{ fontSize: 16, fontWeight: "700", color: "#e8e6f0" }}
+          style={{ marginHorizontal: 16, fontSize: isTablet ? 18 : 16, fontWeight: "700", color: "#e8e6f0" }}
         >
           Cài đặt
         </Text>
@@ -717,13 +717,13 @@ export default function ProfileScreen() {
       {/* Logout */}
       <Pressable
         onPress={handleLogout}
-        style={{
+        style={[{
           marginHorizontal: 16,
           backgroundColor: "#e5393520",
           borderRadius: 16,
           paddingVertical: 14,
           alignItems: "center",
-        }}
+        }, centeredStyle] as any}
       >
         <Text style={{ color: "#e53935", fontWeight: "600", fontSize: 15 }}>
           Đăng xuất
@@ -731,7 +731,7 @@ export default function ProfileScreen() {
       </Pressable>
 
       {/* Legal links */}
-      <View className="mx-4 gap-2">
+      <View style={[{ marginHorizontal: 16, gap: 8 }, centeredStyle] as any}>
         <Pressable onPress={() => Linking.openURL("https://truyencity.com/terms")}>
           <Text style={{ fontSize: 13, color: "#5c9cff", textAlign: "center" }}>
             Điều khoản sử dụng
