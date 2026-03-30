@@ -2,7 +2,7 @@ import "@/global.css";
 import "@/lib/storage"; // init localStorage polyfill
 
 import { useEffect, Component, type ReactNode } from "react";
-import { View, Text } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import { Stack } from "expo-router/stack";
 import { initRevenueCat } from "@/lib/revenuecat";
 
@@ -24,6 +24,10 @@ class ErrorBoundary extends Component<
     console.error("[ErrorBoundary] Uncaught error:", error);
   }
 
+  private handleRetry = () => {
+    this.setState({ hasError: false, error: null });
+  };
+
   render() {
     if (this.state.hasError) {
       return (
@@ -33,22 +37,43 @@ class ErrorBoundary extends Component<
             justifyContent: "center",
             alignItems: "center",
             backgroundColor: "#131620",
-            padding: 20,
+            padding: 32,
           }}
         >
-          <Text style={{ color: "#ef4444", fontSize: 18, fontWeight: "bold" }}>
-            Something went wrong
+          <Text
+            style={{
+              color: "#e8e6f0",
+              fontSize: 20,
+              fontWeight: "700",
+              marginBottom: 8,
+            }}
+          >
+            TruyenCity
           </Text>
           <Text
             style={{
               color: "#9ca3af",
-              fontSize: 14,
-              marginTop: 8,
+              fontSize: 15,
               textAlign: "center",
+              marginBottom: 24,
+              lineHeight: 22,
             }}
           >
-            {this.state.error?.message || "Unknown error"}
+            Không thể tải ứng dụng.{"\n"}Vui lòng thử lại.
           </Text>
+          <Pressable
+            onPress={this.handleRetry}
+            style={{
+              backgroundColor: "#7c3aed",
+              paddingHorizontal: 32,
+              paddingVertical: 12,
+              borderRadius: 10,
+            }}
+          >
+            <Text style={{ color: "#fff", fontSize: 16, fontWeight: "600" }}>
+              Thử lại
+            </Text>
+          </Pressable>
         </View>
       );
     }

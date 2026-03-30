@@ -205,7 +205,8 @@ export default function DiscoverScreen() {
             ] as any}
           >
             {recommended.slice(0, isLargeTablet ? 10 : isTablet ? 8 : 6).map((novel) => {
-              const itemWidth = (Math.min(width, (centeredStyle?.maxWidth as number) || width) - 32 - 12 * (gridColumns - 1)) / gridColumns;
+              const containerWidth = centeredStyle?.maxWidth && typeof centeredStyle.maxWidth === "number" ? Math.min(width, centeredStyle.maxWidth) : width;
+              const itemWidth = (containerWidth - 32 - 12 * (gridColumns - 1)) / gridColumns;
               return (
                 <View key={novel.id} style={{ width: itemWidth }}>
                   <NovelCard novel={novel} variant="grid" />

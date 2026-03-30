@@ -65,7 +65,9 @@ function getStoredSettings(): ReaderSettings {
 }
 
 function saveSettings(s: ReaderSettings) {
-  localStorage.setItem(CACHE.READING_SETTINGS_KEY, JSON.stringify(s));
+  try {
+    localStorage.setItem(CACHE.READING_SETTINGS_KEY, JSON.stringify(s));
+  } catch {}
 }
 
 // ── Strip duplicate chapter heading from content ─────────────
@@ -133,8 +135,8 @@ export default function ReadingScreen() {
     }
   }, [settings.ttsSpeed]);
 
-  // Active theme
-  const theme = READER_THEMES[settings.theme];
+  // Active theme (fallback to dark if key is invalid)
+  const theme = READER_THEMES[settings.theme] ?? READER_THEMES.dark;
 
   // Brightness is controlled via a dark overlay (no native module needed)
   // settings.brightness: 1 = full bright (no overlay), 0 = very dim

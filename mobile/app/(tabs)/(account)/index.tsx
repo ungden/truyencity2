@@ -359,7 +359,11 @@ export default function ProfileScreen() {
   const [offlineSize, setOfflineSize] = useState(0);
 
   useEffect(() => {
-    setOfflineSize(getOfflineStorageSize());
+    try {
+      setOfflineSize(getOfflineStorageSize());
+    } catch {
+      // SQLite unavailable
+    }
   }, []);
 
   const xp = calculateXP(stats);

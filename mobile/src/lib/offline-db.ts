@@ -30,31 +30,47 @@ let db: SQLite.SQLiteDatabase | null = null;
 
 function getDB(): SQLite.SQLiteDatabase {
   if (!db) {
-    db = SQLite.openDatabaseSync("truyencity-offline.db");
-    // Run migrations on first access
-    db.execSync(`
-      CREATE TABLE IF NOT EXISTS offline_chapters (
-        id TEXT PRIMARY KEY,
-        novel_id TEXT NOT NULL,
-        chapter_number INTEGER NOT NULL,
-        title TEXT NOT NULL,
-        content TEXT,
-        downloaded_at TEXT NOT NULL,
-        UNIQUE(novel_id, chapter_number)
-      );
-      CREATE INDEX IF NOT EXISTS idx_offline_novel_chapter
-        ON offline_chapters(novel_id, chapter_number);
+    try {
+      db = SQLite.openDatabaseSync("truyencity-offline.db");
+      // Run migrations on first access
+      db.execSync(`
+        CREATE TABLE IF NOT EXISTS offline_chapters (
+          id TEXT PRIMARY KEY,
+          novel_id TEXT NOT NULL,
+          chapter_number INTEGER NOT NULL,
+          title TEXT NOT NULL,
+          content TEXT,
+          downloaded_at TEXT NOT NULL,
+          UNIQUE(novel_id, chapter_number)
+        );
+        CREATE INDEX IF NOT EXISTS idx_offline_novel_chapter
+          ON offline_chapters(novel_id, chapter_number);
 
-      CREATE TABLE IF NOT EXISTS offline_novels (
-        novel_id TEXT PRIMARY KEY,
-        title TEXT NOT NULL,
-        slug TEXT,
-        cover_url TEXT,
-        total_chapters INTEGER DEFAULT 0,
-        downloaded_chapters INTEGER DEFAULT 0,
-        downloaded_at TEXT NOT NULL
-      );
-    `);
+        CREATE TABLE IF NOT EXISTS offline_novels (
+          novel_id TEXT PRIMARY KEY,
+          title TEXT NOT NULL,
+          slug TEXT,
+          cover_url TEXT,
+          total_chapters INTEGER DEFAULT 0,
+          downloaded_chapters INTEGER DEFAULT 0,
+          downloaded_at TEXT NOT NULL
+        );
+      `);
+    } catch (err) {
+      console.warn("[offline-db] SQLite initialization failed:", err);
+      // Return a stub that won't crash the app
+      return {
+        execSync: () => {},
+        runSync: () => ({ changes: 0, lastInsertRowId: 0 }),
+        getFirstSync: () => null,
+        getAllSync: () => [],
+        withTransactionSync: (fn: () => void) => { try { fn(); } catch {} },
+        prepareSync: () => ({
+          executeSync: () => ({ changes: 0, lastInsertRowId: 0 }),
+          finalizeSync: () => {},
+        }),
+      } as unknown as SQLite.SQLiteDatabase;
+    }
   }
   return db;
 }

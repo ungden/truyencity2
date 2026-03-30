@@ -16,14 +16,14 @@ const secureStoreAdapter = {
     } catch {
       // SecureStore has a 2048 byte limit per value
       // Fall back to localStorage for large values
-      localStorage.setItem(key, value);
+      try { localStorage.setItem(key, value); } catch {}
     }
   },
   removeItem: async (key: string): Promise<void> => {
     try {
       await SecureStore.deleteItemAsync(key);
     } catch {
-      localStorage.removeItem(key);
+      try { localStorage.removeItem(key); } catch {}
     }
   },
 };

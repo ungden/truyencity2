@@ -95,7 +95,7 @@ export default function SearchResults({
     <FlatList
       data={results}
       keyExtractor={(item) => item.id}
-      style={{ flex: 1, backgroundColor: "var(--background)" }}
+      style={{ flex: 1, backgroundColor: "#131620" }}
       contentContainerStyle={{ paddingBottom: 40 }}
       keyboardShouldPersistTaps="handled"
       renderItem={({ item }) => (

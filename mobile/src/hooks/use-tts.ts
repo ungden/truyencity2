@@ -45,7 +45,7 @@ export function useTTS(): UseTTSReturn {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      Speech.stop();
+      try { Speech.stop(); } catch {}
     };
   }, []);
 

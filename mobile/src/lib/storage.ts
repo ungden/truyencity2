@@ -1,14 +1,31 @@
 // localStorage polyfill via expo-sqlite (synchronous, same API as web)
-import "expo-sqlite/localStorage/install";
+// Wrapped in try/catch to prevent crash-on-launch if native module fails
+try {
+  require("expo-sqlite/localStorage/install");
+} catch (err) {
+  console.warn("[storage] expo-sqlite localStorage polyfill failed:", err);
+  // Provide a no-op fallback so the app can still run
+  if (typeof globalThis.localStorage === "undefined") {
+    const memStore = new Map<string, string>();
+    (globalThis as any).localStorage = {
+      getItem: (key: string) => memStore.get(key) ?? null,
+      setItem: (key: string, value: string) => memStore.set(key, value),
+      removeItem: (key: string) => memStore.delete(key),
+      clear: () => memStore.clear(),
+      get length() { return memStore.size; },
+      key: (index: number) => [...memStore.keys()][index] ?? null,
+    };
+  }
+}
 
 type Listener = () => void;
 const listeners = new Map<string, Set<Listener>>();
 
 export const storage = {
   get<T>(key: string, defaultValue: T): T {
-    const value = localStorage.getItem(key);
-    if (value === null) return defaultValue;
     try {
+      const value = localStorage.getItem(key);
+      if (value === null) return defaultValue;
       return JSON.parse(value) as T;
     } catch {
       return defaultValue;
@@ -16,12 +33,20 @@ export const storage = {
   },
 
   set<T>(key: string, value: T): void {
-    localStorage.setItem(key, JSON.stringify(value));
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch {
+      // Storage full or unavailable — silently ignore
+    }
     listeners.get(key)?.forEach((fn) => fn());
   },
 
   remove(key: string): void {
-    localStorage.removeItem(key);
+    try {
+      localStorage.removeItem(key);
+    } catch {
+      // Ignore
+    }
     listeners.get(key)?.forEach((fn) => fn());
   },
 

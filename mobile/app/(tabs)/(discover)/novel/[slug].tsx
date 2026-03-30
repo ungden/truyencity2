@@ -145,11 +145,16 @@ export default function NovelDetailScreen() {
 
       setChapters(chapterRes.data || []);
 
-      const ratingStats = ratingsRes.data
-        ? typeof ratingsRes.data === "string"
-          ? JSON.parse(ratingsRes.data)
-          : ratingsRes.data
-        : null;
+      let ratingStats = null;
+      try {
+        ratingStats = ratingsRes.data
+          ? typeof ratingsRes.data === "string"
+            ? JSON.parse(ratingsRes.data)
+            : ratingsRes.data
+          : null;
+      } catch {
+        // Malformed JSON from RPC — use defaults
+      }
       setStats({
         views: ratingStats?.view_count ?? 0,
         bookmarks: ratingStats?.bookmark_count ?? 0,
@@ -614,9 +619,12 @@ export default function NovelDetailScreen() {
                 onRated={() => {
                   // Re-fetch stats after rating
                   supabase.rpc("get_novel_stats", { p_novel_id: novel.id }).then(({ data }) => {
-                    const r = data
-                      ? typeof data === "string" ? JSON.parse(data) : data
-                      : null;
+                    let r = null;
+                    try {
+                      r = data
+                        ? typeof data === "string" ? JSON.parse(data) : data
+                        : null;
+                    } catch {}
                     if (r) {
                       setStats((prev) => ({
                         ...prev,

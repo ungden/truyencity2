@@ -204,7 +204,12 @@ export function useOfflineNovels(): UseOfflineNovelsReturn {
   const [novels, setNovels] = useState<OfflineNovel[]>([]);
 
   const refresh = useCallback(() => {
-    setNovels(getOfflineNovels());
+    try {
+      setNovels(getOfflineNovels());
+    } catch {
+      // SQLite unavailable — show empty list
+      setNovels([]);
+    }
   }, []);
 
   useEffect(() => {
