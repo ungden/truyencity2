@@ -69,3 +69,8 @@ next-env.d.ts
 /mobile/.expo/
 /mobile/credentials.json
 /mobile/fastlane_certs/
+.env*.local
+
+# Mobile temp test files
+mobile/test-*.js
+mobile/expo_output.log
