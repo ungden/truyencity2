@@ -25,8 +25,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: false, error: 'GEMINI_API_KEY missing' }, { status: 500 });
   }
 
-  const targetParam = Number(request.nextUrl.searchParams.get('target') || '20');
-  let target = Number.isFinite(targetParam) ? Math.min(Math.max(1, targetParam), 100) : 20;
+  const targetParam = Number(request.nextUrl.searchParams.get('target') || '5');
+  let target = Number.isFinite(targetParam) ? Math.min(Math.max(1, targetParam), 100) : 5;
 
   try {
     // ====== SPAWN THROTTLE: Skip if backlog (active + paused) is full ======
