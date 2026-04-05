@@ -543,13 +543,14 @@ export async function GET(request: NextRequest) {
         .limit(CANDIDATE_POOL_SIZE),
     ]);
 
-    if (activeCountQuery.error) throw activeCountQuery.error;
-    if (candidateQuery.error) throw candidateQuery.error;
+    if (activeCountQuery.error) { console.error('[Cron] Step 1 activeCount failed:', activeCountQuery.error); throw activeCountQuery.error; }
+    if (candidateQuery.error) { console.error('[Cron] Step 1 candidates failed:', candidateQuery.error); throw candidateQuery.error; }
 
     const activeCount = activeCountQuery.count || 0;
     const dynamicResumeBatchSize = computeDynamicResumeBatchSize(activeCount);
 
     const rawCandidates = (candidateQuery.data || []) as ProjectRow[];
+    console.log(`[Cron] Step 1 OK: ${activeCount} active, ${rawCandidates.length} candidates fetched`);
 
     // Filter candidates eligible for processing (respect soft-ending grace buffer)
     const GRACE_BUFFER_FILTER = 20;
@@ -565,20 +566,30 @@ export async function GET(request: NextRequest) {
 
     // Ensure only candidate pool projects have today's quota (lazy, not ALL 5000 active)
     // This reduces DB load ~288x/day compared to upserting for all active projects every tick.
+    console.log(`[Cron] Step 2: Ensuring quotas for ${allCandidates.length} candidates...`);
     await ensureDailyQuotasForActiveProjects(supabase, allCandidates, vnDate, startIso, endIso, now);
+    console.log('[Cron] Step 2 OK: Quotas ensured');
 
     const projectIds = allCandidates.map((p) => p.id);
     let quotaRows: DailyQuotaRow[] = [];
+    const BATCH_SIZE = 300; // Avoid PostgREST URL length limits for .in() queries
 
     if (projectIds.length > 0) {
-      const { data: quotas, error: quotasError } = await supabase
-        .from('project_daily_quotas')
-        .select('project_id,vn_date,target_chapters,written_chapters,next_due_at,status,retry_count')
-        .in('project_id', projectIds)
-        .eq('vn_date', vnDate);
+      console.log(`[Cron] Step 3: Fetching quotas for ${projectIds.length} projects...`);
+      const allQuotas: DailyQuotaRow[] = [];
+      for (let i = 0; i < projectIds.length; i += BATCH_SIZE) {
+        const batch = projectIds.slice(i, i + BATCH_SIZE);
+        const { data: quotas, error: quotasError } = await supabase
+          .from('project_daily_quotas')
+          .select('project_id,vn_date,target_chapters,written_chapters,next_due_at,status,retry_count')
+          .in('project_id', batch)
+          .eq('vn_date', vnDate);
 
-      if (quotasError) throw quotasError;
-      quotaRows = (quotas || []) as DailyQuotaRow[];
+        if (quotasError) { console.error(`[Cron] Step 3 quotas batch ${i} failed:`, quotasError); throw quotasError; }
+        if (quotas) allQuotas.push(...(quotas as DailyQuotaRow[]));
+      }
+      quotaRows = allQuotas;
+      console.log(`[Cron] Step 3 OK: ${quotaRows.length} quota rows fetched`);
     }
 
     const nowIso = now.toISOString();
@@ -648,17 +659,25 @@ export async function GET(request: NextRequest) {
     }
 
     // Atomic claim: only rows that are still older than fourMinutesAgo are claimed.
+    console.log(`[Cron] Step 5: Claiming ${totalProjects} projects (resume=${filteredResumeProjects.length}, init-prep=${filteredInitPrepProjects.length}, init-write=${filteredInitWriteProjects.length})...`);
     const allIds = [...filteredResumeProjects, ...filteredInitPrepProjects, ...filteredInitWriteProjects].map(p => p.id);
     const claimTimestamp = new Date().toISOString();
-    const { data: claimedRows, error: claimError } = await supabase
-      .from('ai_story_projects')
-      .update({ updated_at: claimTimestamp })
-      .in('id', allIds)
-      .lt('updated_at', fourMinutesAgo)
-      .select('id');
-    if (claimError) throw claimError;
+    // Batch claim to avoid URL length limits
+    const allClaimedIds: string[] = [];
+    for (let i = 0; i < allIds.length; i += BATCH_SIZE) {
+      const batch = allIds.slice(i, i + BATCH_SIZE);
+      const { data: claimedRows, error: claimError } = await supabase
+        .from('ai_story_projects')
+        .update({ updated_at: claimTimestamp })
+        .in('id', batch)
+        .lt('updated_at', fourMinutesAgo)
+        .select('id');
+      if (claimError) { console.error(`[Cron] Step 5 claim batch ${i} failed:`, claimError); throw claimError; }
+      if (claimedRows) allClaimedIds.push(...claimedRows.map((r: { id: string }) => r.id));
+    }
+    console.log(`[Cron] Step 5 OK: Claimed ${allClaimedIds.length}/${allIds.length}`);
 
-    const claimedIds = new Set((claimedRows || []).map((r: { id: string }) => r.id));
+    const claimedIds = new Set(allClaimedIds);
     const claimedResumeProjects = filteredResumeProjects.filter(p => claimedIds.has(p.id));
     const claimedInitPrepProjects = filteredInitPrepProjects.filter(p => claimedIds.has(p.id));
     const claimedInitWriteProjects = filteredInitWriteProjects.filter(p => claimedIds.has(p.id));
@@ -769,10 +788,22 @@ export async function GET(request: NextRequest) {
       results: summary,
     });
 
-  } catch (error) {
-    console.error('[Cron] Fatal error:', error);
+  } catch (error: unknown) {
+    // Extract message from both Error instances and Supabase error objects
+    const errMsg = error instanceof Error
+      ? error.message
+      : (typeof error === 'object' && error !== null && 'message' in error)
+        ? String((error as { message: unknown }).message)
+        : String(error);
+    const errDetails = (typeof error === 'object' && error !== null && 'details' in error)
+      ? String((error as { details: unknown }).details)
+      : undefined;
+    const errCode = (typeof error === 'object' && error !== null && 'code' in error)
+      ? String((error as { code: unknown }).code)
+      : undefined;
+    console.error('[Cron] Fatal error:', { message: errMsg, details: errDetails, code: errCode });
     return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : 'Internal server error' },
+      { success: false, error: errMsg, details: errDetails, code: errCode },
       { status: 500 }
     );
   }
