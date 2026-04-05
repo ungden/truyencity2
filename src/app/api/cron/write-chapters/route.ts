@@ -409,6 +409,23 @@ async function writeOneChapter(
         .update({ status: 'completed', updated_at: new Date().toISOString() })
         .eq('id', project.id);
 
+      // Auto-backfill: activate one paused project to maintain ~1000 active
+      try {
+        const { data: paused } = await supabase
+          .from('ai_story_projects')
+          .select('id')
+          .eq('status', 'paused')
+          .order('created_at', { ascending: true })
+          .limit(1);
+        if (paused && paused.length > 0) {
+          await supabase
+            .from('ai_story_projects')
+            .update({ status: 'active', updated_at: new Date().toISOString() })
+            .eq('id', paused[0].id)
+            .eq('status', 'paused');
+        }
+      } catch { /* non-fatal */ }
+
       return {
         id: project.id,
         title: novel.title,
