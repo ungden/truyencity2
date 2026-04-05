@@ -72,7 +72,7 @@ export async function runSummaryTasks(
           content,
           protagonistName,
           config,
-          { allowEmptyCliffhanger: isLikelyFinale },
+          { allowEmptyCliffhanger: isLikelyFinale, projectId },
         );
         await saveChapterSummary(projectId, chapterNumber, title, combinedResult.summary);
         summarySaved = true;

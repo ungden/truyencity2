@@ -112,7 +112,7 @@ Trả về JSON:
     temperature: 0.1,
     maxTokens: 2048,
     systemPrompt: 'Bạn là Power System Analyst. Chính xác, không phóng đại.',
-  }, { jsonMode: true });
+  }, { jsonMode: true, tracking: { projectId, task: 'power_system' } });
 
   const parsed = parseJSON<MCPowerState>(res.content);
   if (!parsed) return;

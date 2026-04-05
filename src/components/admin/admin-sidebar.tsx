@@ -19,6 +19,7 @@ import {
   Factory,
   Activity,
   ClipboardList,
+  DollarSign,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -91,6 +92,11 @@ const menuItems: MenuItem[] = [
     title: 'Production Report',
     href: '/admin/production-report',
     icon: ClipboardList,
+  },
+  {
+    title: 'Chi phi AI',
+    href: '/admin/cost-tracking',
+    icon: DollarSign,
   },
   {
     title: 'AI Editor',

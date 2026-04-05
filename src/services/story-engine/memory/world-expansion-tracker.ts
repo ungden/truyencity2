@@ -101,7 +101,7 @@ Trả về JSON:
     temperature: 0.5,
     maxTokens: 2048,
     systemPrompt: 'Bạn là World Architect cho webnovel.',
-  }, { jsonMode: true });
+  }, { jsonMode: true, tracking: { projectId, task: 'world_expansion' } });
 
   const parsed = parseJSON<WorldMap>(res.content);
   if (!parsed?.locations?.length) return;
@@ -182,7 +182,7 @@ Trả về JSON:
     temperature: 0.5,
     maxTokens: 2048,
     systemPrompt: 'Bạn là World Architect. Tạo location có chiều sâu, không generic.',
-  }, { jsonMode: true });
+  }, { jsonMode: true, tracking: { projectId, task: 'location_bible' } });
 
   const parsed = parseJSON<LocationBible>(res.content);
   if (!parsed) return;

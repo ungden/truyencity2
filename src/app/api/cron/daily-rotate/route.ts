@@ -14,6 +14,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyCronAuth } from '@/lib/auth/cron-auth';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
+import { MAX_ACTIVE_PROJECTS } from '@/lib/constants/project-limits';
 
 export const maxDuration = 60; // 1 minute max
 export const dynamic = 'force-dynamic';
@@ -99,17 +100,37 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // ====== CAP CHECK: Respect MAX_ACTIVE_PROJECTS ======
+    const currentActive = authorStats.reduce((sum, s) => sum + s.activeCount, 0);
+    let slotsAvailable = Math.max(0, MAX_ACTIVE_PROJECTS - currentActive);
+
+    if (slotsAvailable === 0) {
+      const totalPaused = authorStats.reduce((sum, s) => sum + s.pausedProjectIds.length, 0);
+      return NextResponse.json({
+        success: true,
+        message: `Active cap reached (${currentActive}/${MAX_ACTIVE_PROJECTS})`,
+        totalActive: currentActive,
+        totalPaused,
+        backfilled: 0,
+        expanded: 0,
+        totalActivated: 0,
+        durationSeconds: Math.round((Date.now() - startTime) / 1000),
+      });
+    }
+
     // ====== STEP 2: Backfill - Authors with < TARGET active ======
 
     let backfilled = 0;
     const activateIds: string[] = [];
 
     for (const stat of authorStats) {
+      if (slotsAvailable <= 0) break;
       if (stat.activeCount < TARGET_ACTIVE_PER_AUTHOR && stat.pausedProjectIds.length > 0) {
-        const needed = TARGET_ACTIVE_PER_AUTHOR - stat.activeCount;
+        const needed = Math.min(TARGET_ACTIVE_PER_AUTHOR - stat.activeCount, slotsAvailable);
         const toActivate = stat.pausedProjectIds.slice(0, needed);
         activateIds.push(...toActivate);
         backfilled += toActivate.length;
+        slotsAvailable -= toActivate.length;
 
         // Remove activated from available pool
         stat.pausedProjectIds = stat.pausedProjectIds.slice(needed);
@@ -124,9 +145,10 @@ export async function GET(request: NextRequest) {
       .filter(s => s.pausedProjectIds.length > 0)
       .sort((a, b) => a.activeCount - b.activeCount);
 
+    const expansionCap = Math.min(DAILY_EXPANSION, slotsAvailable);
     let expanded = 0;
     for (const stat of sortedStats) {
-      if (expanded >= DAILY_EXPANSION) break;
+      if (expanded >= expansionCap) break;
       if (stat.pausedProjectIds.length === 0) continue;
 
       const toActivate = stat.pausedProjectIds.slice(0, 1); // 1 per author for fairness
@@ -138,12 +160,12 @@ export async function GET(request: NextRequest) {
     }
 
     // If we haven't hit DAILY_EXPANSION, do another round
-    if (expanded < DAILY_EXPANSION) {
+    if (expanded < expansionCap) {
       for (const stat of sortedStats) {
-        if (expanded >= DAILY_EXPANSION) break;
+        if (expanded >= expansionCap) break;
         if (stat.pausedProjectIds.length === 0) continue;
 
-        const remaining = Math.min(DAILY_EXPANSION - expanded, stat.pausedProjectIds.length);
+        const remaining = Math.min(expansionCap - expanded, stat.pausedProjectIds.length);
         const toActivate = stat.pausedProjectIds.slice(0, remaining);
         activateIds.push(...toActivate);
         expanded += toActivate.length;

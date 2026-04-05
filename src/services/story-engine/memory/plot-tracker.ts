@@ -567,7 +567,7 @@ Nội dung:
 ${content.slice(0, 5000)}`;
 
       try {
-        const res = await callGemini(prompt, { model: 'gemini-3-flash-preview', temperature: 0.1, maxTokens: 1024 }, { jsonMode: true });
+        const res = await callGemini(prompt, { model: 'gemini-3-flash-preview', temperature: 0.1, maxTokens: 1024 }, { jsonMode: true, tracking: { projectId, task: 'plot_tracker' } });
         if (res.content && res.content.trim().length > 5) { // not just []
            const parsedIssues = parseJSON<ConsistencyIssue[]>(res.content);
            if (Array.isArray(parsedIssues)) {

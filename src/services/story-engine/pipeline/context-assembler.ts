@@ -373,7 +373,7 @@ export async function generateChapterSummary(
   content: string,
   protagonistName: string,
   config: GeminiConfig,
-  options?: { allowEmptyCliffhanger?: boolean },
+  options?: { allowEmptyCliffhanger?: boolean; projectId?: string },
 ): Promise<ChapterSummary> {
   // Token-optimized: reduced from 3K+3K=6K to 2K+2K=4K chars
   const headSnippet = content.slice(0, 2000);
@@ -400,7 +400,7 @@ QUY TẮC CLIFFHANGER:
 - Trích đúng tình huống căng thẳng hoặc câu chốt mở ở cuối chương
 - Chỉ cho phép rỗng khi chương đã khép hoàn toàn theo chủ đích finale`;
 
-  const res = await callGemini(prompt, { ...config, temperature: 0.1, maxTokens: 1024 }, { jsonMode: true });
+  const res = await callGemini(prompt, { ...config, temperature: 0.1, maxTokens: 1024 }, { jsonMode: true, tracking: options?.projectId ? { projectId: options.projectId, task: 'chapter_summary' } : undefined });
   const parsed = parseJSON<ChapterSummary>(res.content);
 
   if (!parsed || !parsed.summary?.trim()) {
@@ -525,7 +525,7 @@ export async function generateSummaryAndCharacters(
   content: string,
   protagonistName: string,
   config: GeminiConfig,
-  options?: { allowEmptyCliffhanger?: boolean },
+  options?: { allowEmptyCliffhanger?: boolean; projectId?: string },
 ): Promise<CombinedSummaryAndCharacters> {
   // Token-optimized: reduced from 4K+4K+3K=11K to 2K+2K+1K=5K chars
   // Gemini can extract summary + characters from smaller snippets effectively
@@ -570,7 +570,7 @@ QUY TẮC:
 - CLIFFHANGER: Nếu không phải finale, KHÔNG để rỗng. Trích đúng tình huống căng thẳng cuối chương.
 - CHARACTERS: Chỉ nhân vật CÓ TÊN RIÊNG thực sự. CẤM số, mã code, mô tả chung.`;
 
-  const res = await callGemini(prompt, { ...config, temperature: 0.1, maxTokens: 2048 }, { jsonMode: true });
+  const res = await callGemini(prompt, { ...config, temperature: 0.1, maxTokens: 2048 }, { jsonMode: true, tracking: options?.projectId ? { projectId: options.projectId, task: 'combined_summary' } : undefined });
   const parsed = parseJSON<CombinedAIResponse>(res.content);
 
   if (!parsed || !parsed.summary?.trim()) {
@@ -624,7 +624,7 @@ Trả về JSON:
   "open_threads": ["các tuyến truyện đang mở"]
 }`;
 
-  const res = await callGemini(prompt, { ...config, temperature: 0.2, maxTokens: 2048 }, { jsonMode: true });
+  const res = await callGemini(prompt, { ...config, temperature: 0.2, maxTokens: 2048 }, { jsonMode: true, tracking: { projectId, task: 'synopsis' } });
   const parsed = parseJSON<SynopsisAIResponse>(res.content);
   if (!parsed || !parsed.synopsis_text?.trim()) {
     throw new Error(`Synopsis generation failed: JSON parse error — raw: ${res.content.slice(0, 200)}`);
@@ -699,7 +699,7 @@ Trả về JSON:
   "new_threads": ["thread mới"]
 }`;
 
-  const res = await callGemini(prompt, { ...config, temperature: 0.3, maxTokens: 4096 }, { jsonMode: true });
+  const res = await callGemini(prompt, { ...config, temperature: 0.3, maxTokens: 4096 }, { jsonMode: true, tracking: { projectId, task: 'arc_plan' } });
   const parsed = parseJSON<ArcPlanAIResponse>(res.content);
   if (!parsed || !parsed.plan_text?.trim()) {
     throw new Error(`Arc plan generation failed: JSON parse error — raw: ${res.content.slice(0, 200)}`);
@@ -757,7 +757,7 @@ Viết Story Bible bao gồm:
 
 Viết dạng text thuần, 800-1500 từ.`;
 
-  const res = await callGemini(prompt, { ...config, temperature: 0.2, maxTokens: 4096 });
+  const res = await callGemini(prompt, { ...config, temperature: 0.2, maxTokens: 4096 }, { tracking: { projectId, task: 'story_bible' } });
   if (!res.content || res.content.length < 100) return;
 
   const db = getSupabase();

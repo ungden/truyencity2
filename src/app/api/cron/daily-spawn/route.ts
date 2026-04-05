@@ -8,7 +8,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyCronAuth } from '@/lib/auth/cron-auth';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { ContentSeeder } from '@/services/content-seeder';
+import { MAX_TOTAL_PROJECTS } from '@/lib/constants/project-limits';
 
 export const maxDuration = 300;
 export const dynamic = 'force-dynamic';
@@ -24,9 +26,34 @@ export async function GET(request: NextRequest) {
   }
 
   const targetParam = Number(request.nextUrl.searchParams.get('target') || '20');
-  const target = Number.isFinite(targetParam) ? Math.min(Math.max(1, targetParam), 100) : 20;
+  let target = Number.isFinite(targetParam) ? Math.min(Math.max(1, targetParam), 100) : 20;
 
   try {
+    // ====== SPAWN THROTTLE: Skip if backlog (active + paused) is full ======
+    const supabase = getSupabaseAdmin();
+    const { count: totalProjects, error: countErr } = await supabase
+      .from('ai_story_projects')
+      .select('id', { count: 'exact', head: true })
+      .in('status', ['active', 'paused']);
+
+    if (countErr) throw countErr;
+
+    const currentTotal = totalProjects || 0;
+    if (currentTotal >= MAX_TOTAL_PROJECTS) {
+      return NextResponse.json({
+        success: true,
+        skipped: true,
+        reason: `Backlog full: ${currentTotal} active+paused >= ${MAX_TOTAL_PROJECTS} cap`,
+        currentTotal,
+      });
+    }
+
+    // Reduce target if close to cap
+    const headroom = MAX_TOTAL_PROJECTS - currentTotal;
+    if (target > headroom) {
+      target = headroom;
+    }
+
     const seeder = new ContentSeeder(geminiKey);
     const errors: string[] = [];
     let created = 0;

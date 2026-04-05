@@ -6,9 +6,46 @@
  */
 
 import type { GeminiResponse, GeminiConfig } from '../types';
+import { getSupabase } from './supabase';
 
 const API_BASE = 'https://generativelanguage.googleapis.com/v1beta';
 const RETRY_DELAYS = [2000, 5000, 10000];
+
+// ── Cost Tracking ───────────────────────────────────────────────────────────
+// Pricing per 1M tokens (Google AI docs, Standard tier)
+const PRICING: Record<string, { inputPerMillion: number; outputPerMillion: number }> = {
+  'gemini-3-flash-preview':       { inputPerMillion: 0.50, outputPerMillion: 3.00 },
+  'gemini-3-pro-image-preview':   { inputPerMillion: 2.00, outputPerMillion: 12.00 },
+  'gemini-embedding-001':         { inputPerMillion: 0.15, outputPerMillion: 0 },
+  // Fallback for unknown models
+  '_default':                     { inputPerMillion: 0.50, outputPerMillion: 3.00 },
+};
+
+export interface TrackingContext {
+  projectId: string;
+  task: string;
+}
+
+function trackCost(
+  model: string,
+  inputTokens: number,
+  outputTokens: number,
+  tracking: TrackingContext,
+): void {
+  const p = PRICING[model] || PRICING['_default'];
+  const cost = (inputTokens * p.inputPerMillion + outputTokens * p.outputPerMillion) / 1_000_000;
+
+  getSupabase().from('cost_tracking').insert({
+    project_id: tracking.projectId,
+    model,
+    task: tracking.task,
+    input_tokens: inputTokens,
+    output_tokens: outputTokens,
+    cost,
+  }).then(({ error }) => {
+    if (error) console.warn('[CostTracking] Insert failed:', error.message);
+  });
+}
 
 // ── Core API Call ────────────────────────────────────────────────────────────
 // NOTE: Client-side rate limiter removed — Gemini tier 3 unlimited.
@@ -17,7 +54,7 @@ const RETRY_DELAYS = [2000, 5000, 10000];
 export async function callGemini(
   userPrompt: string,
   config: GeminiConfig,
-  options?: { jsonMode?: boolean },
+  options?: { jsonMode?: boolean; tracking?: TrackingContext },
 ): Promise<GeminiResponse> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('GEMINI_API_KEY not set');
@@ -74,10 +111,18 @@ export async function callGemini(
       const candidate = data?.candidates?.[0];
       const content = candidate?.content?.parts?.map((p: { text?: string }) => p.text || '').join('') || '';
 
+      const promptTokens = data?.usageMetadata?.promptTokenCount || 0;
+      const completionTokens = data?.usageMetadata?.candidatesTokenCount || 0;
+
+      // Fire-and-forget cost tracking
+      if (options?.tracking) {
+        trackCost(config.model, promptTokens, completionTokens, options.tracking);
+      }
+
       return {
         content,
-        promptTokens: data?.usageMetadata?.promptTokenCount || 0,
-        completionTokens: data?.usageMetadata?.candidatesTokenCount || 0,
+        promptTokens,
+        completionTokens,
         finishReason: candidate?.finishReason || 'STOP',
       };
     } catch (e) {

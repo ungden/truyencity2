@@ -200,7 +200,7 @@ export async function writeChapter(
     // Request continuation if truncated
     const wordCount = countWords(content);
     if (wordCount < targetWordCount * 0.7) {
-      const continuation = await requestContinuation(content, outline, targetWordCount, config);
+      const continuation = await requestContinuation(content, outline, targetWordCount, config, options?.projectId);
       if (continuation) content = content + '\n\n' + continuation;
     }
 
@@ -216,6 +216,7 @@ export async function writeChapter(
       contextString,
       config,
       options?.isFinalArc === true,
+      options?.projectId,
     );
 
     if (critic.requiresRewrite && attempt < maxRetries - 1) {
@@ -359,7 +360,7 @@ Trả về JSON ChapterOutline:
   "targetWordCount": ${targetWords}
 }`;
 
-  const res = await callGemini(prompt, { ...config, temperature: 0.3, maxTokens: 16384, systemPrompt: ARCHITECT_SYSTEM }, { jsonMode: true });
+  const res = await callGemini(prompt, { ...config, temperature: 0.3, maxTokens: 16384, systemPrompt: ARCHITECT_SYSTEM }, { jsonMode: true, tracking: options?.projectId ? { projectId: options.projectId, task: 'architect' } : undefined });
 
   // Check finishReason for truncation
   if (res.finishReason === 'length' || res.finishReason === 'MAX_TOKENS') {
@@ -540,7 +541,7 @@ ${buildGenreAntiClicheSection(genre)}
 
 Bắt đầu viết:`;
 
-  const res = await callGemini(prompt, { ...config, systemPrompt: WRITER_SYSTEM });
+  const res = await callGemini(prompt, { ...config, systemPrompt: WRITER_SYSTEM }, { tracking: options?.projectId ? { projectId: options.projectId, task: 'writer' } : undefined });
 
   // Check finishReason
   if (res.finishReason === 'length' || res.finishReason === 'MAX_TOKENS') {
@@ -557,6 +558,7 @@ async function requestContinuation(
   outline: ChapterOutline,
   targetWords: number,
   config: GeminiConfig,
+  projectId?: string,
 ): Promise<string | null> {
   const currentWords = countWords(partialContent);
   const remaining = targetWords - currentWords;
@@ -575,7 +577,7 @@ ${JSON.stringify(outline.scenes.slice(-3))}
 
 TIẾP TỤC NGAY TỪ CHỖ DỪNG — không lặp lại:`;
 
-  const res = await callGemini(prompt, { ...config, systemPrompt: WRITER_SYSTEM });
+  const res = await callGemini(prompt, { ...config, systemPrompt: WRITER_SYSTEM }, { tracking: projectId ? { projectId, task: 'writer_continuation' } : undefined });
   return res.content || null;
 }
 
@@ -588,6 +590,7 @@ async function runCritic(
   previousContext: string,
   config: GeminiConfig,
   isFinalArc: boolean,
+  projectId?: string,
 ): Promise<CriticOutput> {
   const wordCount = countWords(content);
   const wordRatio = wordCount / targetWords;
@@ -680,7 +683,7 @@ KIỂM TRA TUÂN THỦ QUALITY MODULES (NẾU CÓ THÔNG TIN):
 - PACING BLUEPRINT: Nếu pacing blueprint chỉ định mood (VD: "CALM BEFORE STORM", "CLIMAX") mà chương viết hoàn toàn ngược (VD: blueprint là calm nhưng toàn action cao trào) → type "pacing", severity "moderate".`;
 
   try {
-    const res = await callGemini(prompt, { ...config, temperature: 0.2, maxTokens: 4096, systemPrompt: CRITIC_SYSTEM }, { jsonMode: true });
+    const res = await callGemini(prompt, { ...config, temperature: 0.2, maxTokens: 4096, systemPrompt: CRITIC_SYSTEM }, { jsonMode: true, tracking: projectId ? { projectId, task: 'critic' } : undefined });
 
     if (!res.content) {
       // Fail closed: don't approve on error

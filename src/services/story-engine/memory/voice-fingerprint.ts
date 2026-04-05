@@ -113,7 +113,7 @@ Trả về JSON:
     temperature: 0.2,
     maxTokens: 2048,
     systemPrompt: 'Bạn là Style Analyst chuyên nghiệp. Phân tích chính xác, cụ thể.',
-  }, { jsonMode: true });
+  }, { jsonMode: true, tracking: { projectId, task: 'voice_fingerprint' } });
 
   const parsed = parseJSON<VoiceFingerprint>(res.content);
   if (!parsed) return;
