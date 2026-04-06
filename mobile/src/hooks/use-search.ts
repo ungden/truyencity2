@@ -7,7 +7,7 @@ const RECENT_SEARCHES_KEY = "recent_searches";
 const MAX_RECENT = 10;
 const DEBOUNCE_MS = 300;
 const NOVEL_LIST_FIELDS =
-  "id,title,slug,author,cover_url,genres,status,chapter_count,rating,created_at";
+  "id,title,slug,author,cover_url,genres,status,chapter_count,created_at";
 
 export function useSearch() {
   const [query, setQuery] = useState("");

@@ -12,7 +12,9 @@ import { Link, useLocalSearchParams, Stack, router } from "expo-router";
 import { supabase } from "@/lib/supabase";
 import { getGenreLabel } from "@/lib/genre";
 import type { Novel, Chapter } from "@/lib/types";
+import { cleanNovelDescription } from "@/lib/utils";
 import * as Haptics from "expo-haptics";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { resolveProgress, getLocalProgress } from "@/services/reading-progress";
 import { useOfflineDownload } from "@/hooks/use-offline";
 import { useDevice } from "@/hooks/use-device";
@@ -45,6 +47,7 @@ export default function NovelDetailScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const { isTablet } = useDevice();
+  const insets = useSafeAreaInsets();
 
   const [novel, setNovel] = useState<Novel | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
@@ -456,7 +459,7 @@ export default function NovelDetailScreen() {
                     numberOfLines={descExpanded ? undefined : 6}
                     selectable={descExpanded}
                   >
-                    {novel.description}
+                    {cleanNovelDescription(novel.description)}
                   </Text>
                   <Pressable
                     onPress={() => setDescExpanded(!descExpanded)}
@@ -744,7 +747,7 @@ export default function NovelDetailScreen() {
             alignItems: "center",
             paddingHorizontal: 16,
             paddingTop: 10,
-            paddingBottom: 34, // safe area
+            paddingBottom: insets.bottom || 34,
             gap: 12,
           }}
         >

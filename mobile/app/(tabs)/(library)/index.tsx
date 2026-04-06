@@ -180,6 +180,7 @@ export default function LibraryScreen() {
       <FlatList
         data={offlineNovels}
         keyExtractor={(item) => item.novel_id}
+        contentInsetAdjustmentBehavior="automatic"
         style={{ flex: 1, backgroundColor: "#131620" }}
         ListHeaderComponent={
           <View style={centeredStyle}>
@@ -309,6 +310,7 @@ export default function LibraryScreen() {
     <FlatList
       data={data}
       keyExtractor={(item) => item.id}
+      contentInsetAdjustmentBehavior="automatic"
       style={{ flex: 1, backgroundColor: "#131620" }}
       ListHeaderComponent={
         <View style={centeredStyle}>

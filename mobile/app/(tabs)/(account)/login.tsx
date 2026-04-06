@@ -46,6 +46,7 @@ export default function LoginScreen() {
   }
 
   async function handleGoogleAuth() {
+    setLoading(true);
     try {
       const redirectUrl = Linking.createURL("/(account)");
       const { data, error } = await supabase.auth.signInWithOAuth({
@@ -62,22 +63,31 @@ export default function LoginScreen() {
           redirectUrl
         );
         if (result.type === "success" && result.url) {
-          // Extract tokens from URL
-          const url = new URL(result.url);
-          const params = new URLSearchParams(url.hash.substring(1));
-          const accessToken = params.get("access_token");
-          const refreshToken = params.get("refresh_token");
-          if (accessToken && refreshToken) {
-            await supabase.auth.setSession({
-              access_token: accessToken,
-              refresh_token: refreshToken,
-            });
-            router.back();
+          // Extract tokens from URL hash fragment
+          try {
+            const hashIndex = result.url.indexOf('#');
+            if (hashIndex === -1) throw new Error('No token in response');
+            const params = new URLSearchParams(result.url.substring(hashIndex + 1));
+            const accessToken = params.get("access_token");
+            const refreshToken = params.get("refresh_token");
+            if (accessToken && refreshToken) {
+              await supabase.auth.setSession({
+                access_token: accessToken,
+                refresh_token: refreshToken,
+              });
+              router.back();
+            } else {
+              throw new Error('Token not found in response');
+            }
+          } catch {
+            Alert.alert("Lỗi", "Không thể xác thực. Vui lòng thử lại.");
           }
         }
       }
     } catch (error: any) {
       Alert.alert("Lỗi", error.message || "Không thể đăng nhập Google");
+    } finally {
+      setLoading(false);
     }
   }
 

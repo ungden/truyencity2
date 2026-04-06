@@ -28,6 +28,7 @@ import { useDevice } from "@/hooks/use-device";
 import { TTS_SPEEDS } from "@/lib/tts";
 import { getChapterOffline } from "@/lib/offline-db";
 import { useKeepAwake } from "expo-keep-awake";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ReaderSettingsSheet from "@/components/reader-settings-sheet";
 import {
   saveProgress as saveReadingProgress,
@@ -98,6 +99,7 @@ export default function ReadingScreen() {
   }>();
   const { width, height: screenHeight } = useWindowDimensions();
   const { isTablet, readerPadding, readerMaxWidth } = useDevice();
+  const insets = useSafeAreaInsets();
   const scrollRef = useRef<RNScrollView>(null);
   const chapterNumber = parseInt(chapter || "1", 10);
 
@@ -645,7 +647,7 @@ export default function ReadingScreen() {
           right: 0,
           zIndex: 50,
           backgroundColor: theme.barBg,
-          paddingTop: 54, // safe area
+          paddingTop: insets.top + 6,
           paddingBottom: 12,
           paddingHorizontal: isTablet ? 32 : 16,
           flexDirection: "row",
@@ -697,7 +699,7 @@ export default function ReadingScreen() {
       <View
         style={{
           position: "absolute",
-          top: showControls ? 102 : 0,
+          top: showControls ? insets.top + 48 : 0,
           left: 0,
           right: 0,
           height: 2,

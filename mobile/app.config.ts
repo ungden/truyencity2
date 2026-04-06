@@ -18,11 +18,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     supportsTablet: true,
     bundleIdentifier: "com.truyencity.app",
-    buildNumber: "11",
+    buildNumber: "12",
     appStoreUrl: "https://apps.apple.com/app/truyencity/id6759160705",
-    requireFullScreen: true,
     infoPlist: {
-      UIRequiresFullScreen: true,
       ITSAppUsesNonExemptEncryption: false,
       NSAppTransportSecurity: {
         NSAllowsArbitraryLoads: false,
