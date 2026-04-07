@@ -268,6 +268,9 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
   if (payload.beatGuidance) parts.push(payload.beatGuidance);
   if (payload.worldRules) parts.push(payload.worldRules);
 
+  // Character knowledge graph
+  if (payload.characterKnowledgeContext) parts.push(payload.characterKnowledgeContext);
+
   // Quality modules (Qidian Master Level)
   if (payload.foreshadowingContext) parts.push(payload.foreshadowingContext);
   if (payload.characterArcContext) parts.push(payload.characterArcContext);

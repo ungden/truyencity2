@@ -17,8 +17,10 @@ import { getSupabase } from '../utils/supabase';
 import { getGenreBoundaryText } from '../config';
 import { loadContext, assembleContext } from './context-assembler';
 import { writeChapter } from './chapter-writer';
-import { retrieveRAGContext, chunkAndStoreChapter } from '../memory/rag-store';
+import { retrieveRAGContext, chunkAndStoreChapter, retrieveEntityContext, retrieveThemeContext } from '../memory/rag-store';
 import { saveCharacterStatesFromCombined, detectCharacterContradictions } from '../memory/character-tracker';
+import { extractCharacterKnowledge, getCharacterKnowledgeContext } from '../memory/character-knowledge';
+import { autoReviseChapter } from './auto-reviser';
 import {
   buildPlotThreadContext,
   buildBeatContext,
@@ -122,16 +124,43 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   // ── Step 2b: Inject genre boundary ─────────────────────────────────────
   context.genreBoundary = getGenreBoundaryText(genre);
 
-  // ── Step 2c: Inject RAG context (non-fatal) ────────────────────────────
+  // ── Step 2c: Inject RAG context — 3-level retrieval (non-fatal) ────────
   try {
-    const ragCtx = await retrieveRAGContext(
-      project.id,
-      nextChapter,
-      context.arcPlan?.slice(0, 300) || null,
-      context.previousCliffhanger || null,
-      protagonistName,
+    const [ragCtx, entityCtx, themeCtx] = await Promise.all([
+      // Level 0: Hybrid vector search (existing)
+      retrieveRAGContext(
+        project.id, nextChapter,
+        context.arcPlan?.slice(0, 300) || null,
+        context.previousCliffhanger || null,
+        protagonistName,
+      ).catch(() => null),
+      // Level 1: Entity-level retrieval (character-specific events)
+      retrieveEntityContext(
+        project.id, nextChapter, context.knownCharacterNames,
+      ).catch(() => null),
+      // Level 2: Theme-level retrieval (plot thread connections)
+      retrieveThemeContext(
+        project.id, nextChapter,
+        context.arcPlan?.slice(0, 200) || null,
+        context.plotThreads || null,
+      ).catch(() => null),
+    ]);
+
+    const ragParts: string[] = [];
+    if (ragCtx) ragParts.push(ragCtx);
+    if (entityCtx) ragParts.push(entityCtx);
+    if (themeCtx) ragParts.push(themeCtx);
+    if (ragParts.length > 0) context.ragContext = ragParts.join('\n\n');
+  } catch {
+    // Non-fatal
+  }
+
+  // ── Step 2c+: Inject character knowledge graph (non-fatal) ────────────
+  try {
+    const knowledgeCtx = await getCharacterKnowledgeContext(
+      project.id, nextChapter, context.knownCharacterNames,
     );
-    if (ragCtx) context.ragContext = ragCtx;
+    if (knowledgeCtx) context.characterKnowledgeContext = smartTruncate(knowledgeCtx, 1200);
   } catch {
     // Non-fatal
   }
@@ -305,7 +334,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     project.world_description || storyTitle, geminiConfig,
   ).catch(() => null);
 
-  // Task 2: Detect contradictions + save character states from combined result
+  // Task 2: Detect contradictions + auto-revise + save character states
   if (combinedResult?.characters && combinedResult.characters.length > 0) {
     // 2a: Detect contradictions BEFORE saving (compare new vs previous states)
     const contradictions = await detectCharacterContradictions(
@@ -314,6 +343,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       console.warn('[Orchestrator] Task 2a contradiction detection failed:', e instanceof Error ? e.message : String(e));
       return [];
     });
+
     if (contradictions.length > 0) {
       const criticals = contradictions.filter(c => c.severity === 'critical');
       const warnings = contradictions.filter(c => c.severity === 'warning');
@@ -321,6 +351,24 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
         `[Orchestrator] Character contradictions in Ch.${nextChapter}: ${criticals.length} critical, ${warnings.length} warnings`,
         contradictions.map(c => c.description),
       );
+
+      // 2a+: Auto-revise if critical contradictions found
+      if (criticals.length > 0) {
+        try {
+          const revision = await autoReviseChapter(
+            nextChapter, result.content, contradictions, geminiConfig, project.id,
+          );
+          if (revision.revised) {
+            // Update chapter in DB with revised content
+            result.content = revision.content;
+            await db.from('chapters').update({ content: revision.content })
+              .eq('novel_id', novel.id).eq('chapter_number', nextChapter);
+            console.log(`[Orchestrator] Auto-revised Ch.${nextChapter}: fixed ${revision.fixedIssues.length} issues`);
+          }
+        } catch (e) {
+          console.warn('[Orchestrator] Auto-revision failed:', e instanceof Error ? e.message : String(e));
+        }
+      }
     }
 
     // 2b: Save character states
@@ -390,6 +438,13 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       prepareUpcomingLocation(
         project.id, nextChapter, genre, context.synopsis, context.masterOutline, geminiConfig,
       ).catch((e) => console.warn(`[Orchestrator] Task 12 upcoming location failed:`, e instanceof Error ? e.message : String(e))),
+    ] : []),
+
+    // Task 13: Extract character knowledge (every 2 chapters to save tokens)
+    ...(nextChapter % 2 === 0 ? [
+      extractCharacterKnowledge(
+        project.id, nextChapter, result.content, characters, geminiConfig,
+      ).catch((e) => console.warn(`[Orchestrator] Task 13 character knowledge failed:`, e instanceof Error ? e.message : String(e))),
     ] : []),
   ]);
 

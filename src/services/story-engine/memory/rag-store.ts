@@ -335,3 +335,155 @@ function formatRAGContext(chunks: MatchedChunk[], currentChapter: number): strin
   if (lines.length === 0) return '';
   return `Các sự kiện liên quan từ quá khứ xa (trước 5 chương gần nhất):\n${lines.join('\n\n')}`;
 }
+
+// ── Dual-Level RAG (LightRAG-inspired) ──────────────────────────────────────
+
+/**
+ * Level 1: Entity-level retrieval — find all chunks mentioning specific characters.
+ * Complements vector search by catching entity-specific events that might have
+ * low embedding similarity but are critical for consistency.
+ */
+export async function retrieveEntityContext(
+  projectId: string,
+  chapterNumber: number,
+  characterNames: string[],
+): Promise<string | null> {
+  try {
+    if (chapterNumber <= 5 || characterNames.length === 0) return null;
+
+    const db = getSupabase();
+    const recentCutoff = Math.max(1, chapterNumber - 5);
+
+    // Query chunks whose metadata.characters array intersects with our characters
+    // Focus on key_event and character_event types for entity-level search
+    const { data: chunks } = await db
+      .from('story_memory_chunks')
+      .select('chapter_number, chunk_type, content, metadata')
+      .eq('project_id', projectId)
+      .lt('chapter_number', recentCutoff)
+      .in('chunk_type', ['key_event', 'character_event', 'plot_point'])
+      .order('chapter_number', { ascending: false })
+      .limit(100);
+
+    if (!chunks || chunks.length === 0) return null;
+
+    // Filter chunks that mention any of our characters in metadata or content
+    const targetNames = new Set(characterNames.slice(0, 5));
+    const matched: Array<{ chapter_number: number; chunk_type: string; content: string; relevance: number }> = [];
+
+    for (const chunk of chunks) {
+      let relevance = 0;
+      const meta = chunk.metadata as { characters?: string[] } | null;
+
+      // Check metadata.characters
+      if (meta?.characters) {
+        for (const char of meta.characters) {
+          if (targetNames.has(char)) relevance += 2;
+        }
+      }
+
+      // Check content mentions
+      for (const name of targetNames) {
+        if (chunk.content.includes(name)) relevance += 1;
+      }
+
+      if (relevance > 0) {
+        matched.push({
+          chapter_number: chunk.chapter_number,
+          chunk_type: chunk.chunk_type,
+          content: chunk.content,
+          relevance,
+        });
+      }
+    }
+
+    if (matched.length === 0) return null;
+
+    // Sort by relevance then recency, take top 4
+    matched.sort((a, b) => b.relevance - a.relevance || b.chapter_number - a.chapter_number);
+    const top = matched.slice(0, 4);
+
+    const lines: string[] = [];
+    let totalChars = 0;
+    const MAX_ENTITY_CHARS = 2000;
+
+    for (const chunk of top) {
+      const ago = chapterNumber - chunk.chapter_number;
+      const line = `[Ch.${chunk.chapter_number}, ${ago} chương trước] ${chunk.content.slice(0, 500)}`;
+      if (totalChars + line.length > MAX_ENTITY_CHARS) break;
+      lines.push(line);
+      totalChars += line.length;
+    }
+
+    if (lines.length === 0) return null;
+    return `Sự kiện liên quan đến nhân vật chính:\n${lines.join('\n\n')}`;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Level 2: Theme-level retrieval — find chunks matching narrative themes.
+ * Uses chunk_type grouping to find thematic connections (betrayal, revenge,
+ * power struggles) that vector search might miss.
+ */
+export async function retrieveThemeContext(
+  projectId: string,
+  chapterNumber: number,
+  arcTheme: string | null,
+  plotThreads: string | null,
+): Promise<string | null> {
+  try {
+    if (chapterNumber <= 10 || (!arcTheme && !plotThreads)) return null;
+
+    // Extract theme keywords from arc theme and active plot threads
+    const themeText = [arcTheme, plotThreads].filter(Boolean).join(' ');
+    const themeKeywords = extractKeywords(themeText);
+
+    if (themeKeywords.size < 2) return null;
+
+    const db = getSupabase();
+    const recentCutoff = Math.max(1, chapterNumber - 5);
+
+    // Get plot_point and key_event chunks from distant past
+    const { data: chunks } = await db
+      .from('story_memory_chunks')
+      .select('chapter_number, chunk_type, content')
+      .eq('project_id', projectId)
+      .lt('chapter_number', recentCutoff)
+      .in('chunk_type', ['plot_point', 'key_event'])
+      .order('chapter_number', { ascending: false })
+      .limit(80);
+
+    if (!chunks || chunks.length === 0) return null;
+
+    // Score by theme keyword overlap
+    const scored = (chunks as Array<{ chapter_number: number; chunk_type: string; content: string }>)
+      .map(chunk => ({
+        ...chunk,
+        score: keywordOverlapScore(themeKeywords, chunk.content),
+      })).filter(c => c.score > 0.15); // At least 15% keyword overlap
+
+    if (scored.length === 0) return null;
+
+    scored.sort((a: { score: number }, b: { score: number }) => b.score - a.score);
+    const top = scored.slice(0, 3);
+
+    const lines: string[] = [];
+    let totalChars = 0;
+    const MAX_THEME_CHARS = 1500;
+
+    for (const chunk of top) {
+      const ago = chapterNumber - chunk.chapter_number;
+      const line = `[Ch.${chunk.chapter_number}, ${ago} chương trước] ${chunk.content.slice(0, 500)}`;
+      if (totalChars + line.length > MAX_THEME_CHARS) break;
+      lines.push(line);
+      totalChars += line.length;
+    }
+
+    if (lines.length === 0) return null;
+    return `Tuyến truyện liên quan từ quá khứ:\n${lines.join('\n\n')}`;
+  } catch {
+    return null;
+  }
+}
