@@ -18,7 +18,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     supportsTablet: true,
     bundleIdentifier: "com.truyencity.app",
-    buildNumber: "12",
+    buildNumber: "13",
     appStoreUrl: "https://apps.apple.com/app/truyencity/id6759160705",
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,

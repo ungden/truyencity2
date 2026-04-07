@@ -15,7 +15,7 @@ export default function LoginScreen() {
   const [mode, setMode] = useState<"login" | "signup">("login");
 
   async function handleEmailAuth() {
-    if (!email || !password) {
+    if (!email.trim() || !password) {
       Alert.alert("Lỗi", "Vui lòng nhập email và mật khẩu");
       return;
     }
@@ -23,23 +23,36 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       if (mode === "login") {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
           password,
         });
         if (error) throw error;
+        if (!data?.session) throw new Error("Không nhận được phiên đăng nhập");
       } else {
-        const { error } = await supabase.auth.signUp({
-          email,
+        const { data, error } = await supabase.auth.signUp({
+          email: email.trim(),
           password,
         });
         if (error) throw error;
-        Alert.alert("Thành công", "Kiểm tra email để xác nhận tài khoản");
-        return;
+        // If email confirmation is required, user won't have a session yet
+        if (!data?.session) {
+          Alert.alert("Thành công", "Kiểm tra email để xác nhận tài khoản");
+          return;
+        }
       }
       router.back();
     } catch (error: any) {
-      Alert.alert("Lỗi", error.message || "Đã có lỗi xảy ra");
+      const msg = error?.message || "Đã có lỗi xảy ra";
+      // Translate common Supabase auth errors to Vietnamese
+      const translated = msg.includes("Invalid login credentials")
+        ? "Email hoặc mật khẩu không đúng"
+        : msg.includes("Email not confirmed")
+          ? "Email chưa được xác nhận. Kiểm tra hộp thư."
+          : msg.includes("User already registered")
+            ? "Email đã được đăng ký. Hãy đăng nhập."
+            : msg;
+      Alert.alert("Lỗi", translated);
     } finally {
       setLoading(false);
     }
