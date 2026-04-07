@@ -13,11 +13,16 @@ import { embedTexts } from '../utils/gemini';
 // ── Constants ────────────────────────────────────────────────────────────────
 
 const MAX_CHUNKS = 8;
-const SIMILARITY_THRESHOLD = 0.65;
+const SIMILARITY_THRESHOLD = 0.55; // Lowered: hybrid scoring compensates with keyword+temporal
 const MAX_RAG_CHARS = 6000;
 const CHUNK_TARGET_WORDS = 400;
 const CHUNK_MAX_CHARS = 2000;
 const PARAGRAPH_MIN_CHARS = 50;
+
+// Hybrid scoring weights (inspired by MemPalace approach)
+const WEIGHT_VECTOR = 0.50;
+const WEIGHT_KEYWORD = 0.30;
+const WEIGHT_TEMPORAL = 0.20;
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -142,13 +147,13 @@ async function embedChapterChunks(projectId: string, chapterNumber: number): Pro
     if (!chunks || chunks.length === 0) return;
 
     const embeddings = await embedTexts(
-      chunks.map(c => c.content),
+      chunks.map((c: { id: string; content: string }) => c.content),
       'RETRIEVAL_DOCUMENT',
     );
 
     // Batch update embeddings using Promise.all instead of sequential N+1 queries
     const updatePromises = chunks
-      .map((chunk, i) => {
+      .map((chunk: { id: string; content: string }, i: number) => {
         const emb = embeddings[i];
         if (!emb) return null;
         return db
@@ -166,10 +171,76 @@ async function embedChapterChunks(projectId: string, chapterNumber: number): Pro
   }
 }
 
+// ── Hybrid Scoring (MemPalace-inspired) ─────────────────────────────────────
+
+/** Extract Vietnamese keywords from text for keyword overlap scoring */
+function extractKeywords(text: string): Set<string> {
+  const words = text
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+    .split(/\s+/)
+    .filter(w => w.length >= 2);
+  // Filter out common Vietnamese stop words
+  const stopWords = new Set([
+    'của', 'và', 'là', 'có', 'được', 'cho', 'với', 'trong', 'này',
+    'đã', 'một', 'không', 'các', 'từ', 'cũng', 'như', 'nhưng', 'hay',
+    'khi', 'đến', 'thì', 'nên', 'còn', 'để', 'mà', 'vào', 'ra', 'lên',
+    'rồi', 'rất', 'hơn', 'nữa', 'bị', 'tại', 'về', 'qua', 'theo',
+    'hắn', 'nàng', 'gã', 'lão', 'ngươi', 'ta', 'chàng', 'nó', 'cô',
+  ]);
+  return new Set(words.filter(w => !stopWords.has(w)));
+}
+
+/** Keyword overlap ratio between query keywords and chunk content */
+function keywordOverlapScore(queryKeywords: Set<string>, chunkContent: string): number {
+  if (queryKeywords.size === 0) return 0;
+  const chunkLower = chunkContent.toLowerCase();
+  let matches = 0;
+  for (const keyword of queryKeywords) {
+    if (chunkLower.includes(keyword)) matches++;
+  }
+  return matches / queryKeywords.size;
+}
+
+/**
+ * Temporal relevance: balance between recency and distance.
+ * Chunks moderately far away (10-50 chapters) get highest scores —
+ * they represent long-range memory that's likely forgotten.
+ * Very old chunks (100+ chapters) get a slight penalty.
+ */
+function temporalScore(chunkChapter: number, currentChapter: number): number {
+  const distance = currentChapter - chunkChapter;
+  if (distance <= 0) return 0;
+  // Sweet spot: 10-50 chapters ago (recently forgotten)
+  if (distance <= 50) return 1.0;
+  // Gradual decay for older content
+  if (distance <= 150) return 0.8;
+  return 0.6;
+}
+
+/** Re-rank chunks using hybrid scoring: vector similarity + keyword overlap + temporal proximity */
+function hybridRerank(
+  chunks: MatchedChunk[],
+  queryKeywords: Set<string>,
+  currentChapter: number,
+): MatchedChunk[] {
+  const scored = chunks.map(chunk => {
+    const kScore = keywordOverlapScore(queryKeywords, chunk.content);
+    const tScore = temporalScore(chunk.chapter_number, currentChapter);
+    const hybridScore =
+      WEIGHT_VECTOR * chunk.similarity +
+      WEIGHT_KEYWORD * kScore +
+      WEIGHT_TEMPORAL * tScore;
+    return { ...chunk, similarity: hybridScore };
+  });
+  return scored.sort((a, b) => b.similarity - a.similarity);
+}
+
 // ── Public: Retrieve RAG Context ─────────────────────────────────────────────
 
 /**
  * Retrieve semantically relevant past events for a chapter being written.
+ * Uses hybrid scoring (vector + keyword + temporal) for better recall.
  * Returns null if any step fails or not enough history.
  */
 export async function retrieveRAGContext(
@@ -191,28 +262,35 @@ export async function retrieveRAGContext(
     parts.push(`Chương hiện tại: ${chapterNumber}`);
     const query = parts.join('\n');
 
+    // Extract keywords for hybrid scoring
+    const queryKeywords = extractKeywords(query);
+
     // Embed with RETRIEVAL_QUERY
     const [queryEmbedding] = await embedTexts([query], 'RETRIEVAL_QUERY');
     if (!queryEmbedding) return null;
 
-    // Vector search via RPC
+    // Vector search via RPC — fetch more candidates for re-ranking
     const db = getSupabase();
     const { data: chunks, error } = await db.rpc('match_story_chunks', {
       query_embedding: JSON.stringify(queryEmbedding),
       match_project_id: projectId,
       match_threshold: SIMILARITY_THRESHOLD,
-      match_count: MAX_CHUNKS,
+      match_count: MAX_CHUNKS * 2, // Fetch 2x for hybrid re-ranking pool
     });
 
     if (error || !chunks || chunks.length === 0) return null;
 
     // Filter out recent chapters (already in Layer 3 context)
     const recentCutoff = Math.max(1, chapterNumber - 5);
-    const relevant = (chunks as MatchedChunk[]).filter(c => c.chapter_number < recentCutoff);
-    if (relevant.length === 0) return null;
+    const candidates = (chunks as MatchedChunk[]).filter(c => c.chapter_number < recentCutoff);
+    if (candidates.length === 0) return null;
+
+    // Hybrid re-rank and take top MAX_CHUNKS
+    const reranked = hybridRerank(candidates, queryKeywords, chapterNumber);
+    const topChunks = reranked.slice(0, MAX_CHUNKS);
 
     // Format
-    return formatRAGContext(relevant, chapterNumber);
+    return formatRAGContext(topChunks, chapterNumber);
   } catch {
     return null;
   }

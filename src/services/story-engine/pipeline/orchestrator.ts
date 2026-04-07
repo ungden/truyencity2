@@ -18,7 +18,7 @@ import { getGenreBoundaryText } from '../config';
 import { loadContext, assembleContext } from './context-assembler';
 import { writeChapter } from './chapter-writer';
 import { retrieveRAGContext, chunkAndStoreChapter } from '../memory/rag-store';
-import { saveCharacterStatesFromCombined } from '../memory/character-tracker';
+import { saveCharacterStatesFromCombined, detectCharacterContradictions } from '../memory/character-tracker';
 import {
   buildPlotThreadContext,
   buildBeatContext,
@@ -305,11 +305,28 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     project.world_description || storyTitle, geminiConfig,
   ).catch(() => null);
 
-  // Task 2: Save character states from combined result (no AI call needed)
+  // Task 2: Detect contradictions + save character states from combined result
   if (combinedResult?.characters && combinedResult.characters.length > 0) {
+    // 2a: Detect contradictions BEFORE saving (compare new vs previous states)
+    const contradictions = await detectCharacterContradictions(
+      project.id, nextChapter, combinedResult.characters,
+    ).catch(e => {
+      console.warn('[Orchestrator] Task 2a contradiction detection failed:', e instanceof Error ? e.message : String(e));
+      return [];
+    });
+    if (contradictions.length > 0) {
+      const criticals = contradictions.filter(c => c.severity === 'critical');
+      const warnings = contradictions.filter(c => c.severity === 'warning');
+      console.warn(
+        `[Orchestrator] Character contradictions in Ch.${nextChapter}: ${criticals.length} critical, ${warnings.length} warnings`,
+        contradictions.map(c => c.description),
+      );
+    }
+
+    // 2b: Save character states
     await saveCharacterStatesFromCombined(
       project.id, nextChapter, combinedResult.characters,
-    ).catch(e => console.warn('[Orchestrator] Task 2 character state save failed:', e instanceof Error ? e.message : String(e)));
+    ).catch(e => console.warn('[Orchestrator] Task 2b character state save failed:', e instanceof Error ? e.message : String(e)));
   }
 
   await Promise.all([
