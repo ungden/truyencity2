@@ -187,6 +187,8 @@ function extractKeywords(text: string): Set<string> {
     'khi', 'đến', 'thì', 'nên', 'còn', 'để', 'mà', 'vào', 'ra', 'lên',
     'rồi', 'rất', 'hơn', 'nữa', 'bị', 'tại', 'về', 'qua', 'theo',
     'hắn', 'nàng', 'gã', 'lão', 'ngươi', 'ta', 'chàng', 'nó', 'cô',
+    'sẽ', 'phải', 'đều', 'lại', 'vẫn', 'thế', 'đó', 'nào', 'đây',
+    'ở', 'bởi', 'sau', 'trước', 'trên', 'dưới', 'giữa', 'nếu', 'thì',
   ]);
   return new Set(words.filter(w => !stopWords.has(w)));
 }
@@ -354,16 +356,17 @@ export async function retrieveEntityContext(
     const db = getSupabase();
     const recentCutoff = Math.max(1, chapterNumber - 5);
 
-    // Query chunks whose metadata.characters array intersects with our characters
-    // Focus on key_event and character_event types for entity-level search
+    // Query key event chunks, bounded to last 200 chapters to prevent unbounded scan
+    const chapterFloor = Math.max(1, chapterNumber - 200);
     const { data: chunks } = await db
       .from('story_memory_chunks')
       .select('chapter_number, chunk_type, content, metadata')
       .eq('project_id', projectId)
+      .gte('chapter_number', chapterFloor)
       .lt('chapter_number', recentCutoff)
       .in('chunk_type', ['key_event', 'character_event', 'plot_point'])
       .order('chapter_number', { ascending: false })
-      .limit(100);
+      .limit(50);
 
     if (!chunks || chunks.length === 0) return null;
 

@@ -19,6 +19,10 @@ import type { CharacterContradiction } from '../memory/character-tracker';
 
 const MAX_REVISION_CONTENT = 30000; // Cap content to avoid token overflow
 
+const REVISER_SYSTEM = `Bạn là biên tập viên chuyên sửa lỗi mâu thuẫn trong truyện dài kỳ tiếng Việt.
+Khi sửa lỗi: GIỮ NGUYÊN giọng văn, phong cách, cốt truyện. CHỈ thay đổi tối thiểu để sửa mâu thuẫn.
+KHÔNG thêm chú thích, comment, hay giải thích. Trả về nội dung chương thuần túy.`;
+
 // ── Types ────────────────────────────────────────────────────────────────────
 
 export interface RevisionResult {
@@ -74,6 +78,7 @@ Trả về TOÀN BỘ nội dung chương đã sửa (không phải chỉ đoạ
 
     const response = await callGemini(prompt, {
       ...config,
+      systemPrompt: REVISER_SYSTEM,
       temperature: 0.3, // Low temperature for precision editing
       maxTokens: 32768,
     }, {
@@ -93,7 +98,7 @@ Trả về TOÀN BỘ nội dung chương đã sửa (không phải chỉ đoạ
       ? revisedContent + originalContent.slice(MAX_REVISION_CONTENT)
       : revisedContent;
 
-    console.log(`[AutoReviser] Ch.${chapterNumber}: Fixed ${criticals.length} critical contradictions`);
+    console.warn(`[AutoReviser] Ch.${chapterNumber}: Fixed ${criticals.length} critical contradictions`);
 
     return {
       revised: true,

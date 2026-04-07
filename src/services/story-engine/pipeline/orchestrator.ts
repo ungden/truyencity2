@@ -138,11 +138,12 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       retrieveEntityContext(
         project.id, nextChapter, context.knownCharacterNames,
       ).catch(() => null),
-      // Level 2: Theme-level retrieval (plot thread connections)
+      // Level 2: Theme-level retrieval (arc theme + synopsis connections)
+      // NOTE: uses synopsis (available from Step 2 DB load), NOT plotThreads (set later in Step 2d)
       retrieveThemeContext(
         project.id, nextChapter,
         context.arcPlan?.slice(0, 200) || null,
-        context.plotThreads || null,
+        context.synopsis?.slice(0, 200) || null,
       ).catch(() => null),
     ]);
 
@@ -150,17 +151,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     if (ragCtx) ragParts.push(ragCtx);
     if (entityCtx) ragParts.push(entityCtx);
     if (themeCtx) ragParts.push(themeCtx);
-    if (ragParts.length > 0) context.ragContext = ragParts.join('\n\n');
-  } catch {
-    // Non-fatal
-  }
-
-  // ── Step 2c+: Inject character knowledge graph (non-fatal) ────────────
-  try {
-    const knowledgeCtx = await getCharacterKnowledgeContext(
-      project.id, nextChapter, context.knownCharacterNames,
-    );
-    if (knowledgeCtx) context.characterKnowledgeContext = smartTruncate(knowledgeCtx, 1200);
+    if (ragParts.length > 0) context.ragContext = smartTruncate(ragParts.join('\n\n'), 6000);
   } catch {
     // Non-fatal
   }
@@ -187,15 +178,16 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     // Non-fatal
   }
 
-  // ── Step 2d+: Inject quality modules (all non-fatal) ────────────────────
+  // ── Step 2d+: Inject quality modules + character knowledge (all non-fatal, parallel) ──
   try {
-    const [foreshadowCtx, charArcCtx, pacingCtx, voiceCtx, powerCtx, worldCtx] = await Promise.all([
+    const [foreshadowCtx, charArcCtx, pacingCtx, voiceCtx, powerCtx, worldCtx, knowledgeCtx] = await Promise.all([
       getForeshadowingContext(project.id, nextChapter).catch(() => null),
       getCharacterArcContext(project.id, nextChapter, context.knownCharacterNames).catch(() => null),
       getChapterPacingContext(project.id, nextChapter).catch(() => null),
       getVoiceContext(project.id).catch(() => null),
       getPowerContext(project.id).catch(() => null),
       getWorldContext(project.id, nextChapter).catch(() => null),
+      getCharacterKnowledgeContext(project.id, nextChapter, context.knownCharacterNames).catch(() => null),
     ]);
 
     // Smart truncation: per-module budgets, cut at section boundaries (newline)
@@ -207,6 +199,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     if (voiceCtx) context.voiceContext = smartTruncate(voiceCtx, 600);
     if (powerCtx) context.powerContext = smartTruncate(powerCtx, 600);
     if (worldCtx) context.worldContext = smartTruncate(worldCtx, 600);
+    if (knowledgeCtx) context.characterKnowledgeContext = smartTruncate(knowledgeCtx, 1200);
   } catch {
     // Non-fatal
   }
@@ -360,10 +353,15 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
           );
           if (revision.revised) {
             // Update chapter in DB with revised content
-            result.content = revision.content;
-            await db.from('chapters').update({ content: revision.content })
+            const { error: revErr } = await db.from('chapters')
+              .update({ content: revision.content })
               .eq('novel_id', novel.id).eq('chapter_number', nextChapter);
-            console.log(`[Orchestrator] Auto-revised Ch.${nextChapter}: fixed ${revision.fixedIssues.length} issues`);
+            if (revErr) {
+              console.warn(`[Orchestrator] Auto-revision DB update failed: ${revErr.message}, keeping original content`);
+            } else {
+              result.content = revision.content;
+              console.warn(`[Orchestrator] Auto-revised Ch.${nextChapter}: fixed ${revision.fixedIssues.length} issues`);
+            }
           }
         } catch (e) {
           console.warn('[Orchestrator] Auto-revision failed:', e instanceof Error ? e.message : String(e));

@@ -111,7 +111,7 @@ QUY TẮC:
       ...config,
       maxTokens: 4096,
       temperature: 0.3,
-    }, { jsonMode: true });
+    }, { jsonMode: true, tracking: { projectId, task: 'character_knowledge' } });
 
     const parsed = parseJSON<KnowledgeExtractionResult>(response.content);
     if (!parsed?.knowledge_events?.length) return;
@@ -139,7 +139,28 @@ QUY TẮC:
 
     if (rows.length === 0) return;
 
-    const { error } = await db.from('character_knowledge').insert(rows);
+    // Dedup: check existing knowledge to avoid duplicates over many chapters
+    const { data: existing } = await db
+      .from('character_knowledge')
+      .select('character_name, knowledge')
+      .eq('project_id', projectId)
+      .in('character_name', rows.map(r => r.character_name))
+      .order('chapter_number', { ascending: false })
+      .limit(100);
+
+    const existingSet = new Set(
+      (existing || []).map((e: { character_name: string; knowledge: string }) =>
+        `${e.character_name}::${e.knowledge.slice(0, 100).toLowerCase()}`
+      )
+    );
+
+    const deduped = rows.filter(r =>
+      !existingSet.has(`${r.character_name}::${r.knowledge.slice(0, 100).toLowerCase()}`)
+    );
+
+    if (deduped.length === 0) return;
+
+    const { error } = await db.from('character_knowledge').insert(deduped);
     if (error) {
       console.warn('[CharacterKnowledge] Insert failed:', error.message);
     }

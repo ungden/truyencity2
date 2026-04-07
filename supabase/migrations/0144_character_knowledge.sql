@@ -34,5 +34,5 @@ ALTER TABLE character_knowledge ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Service role full access on character_knowledge"
   ON character_knowledge
   FOR ALL
-  USING (true)
-  WITH CHECK (true);
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
