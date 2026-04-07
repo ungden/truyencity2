@@ -88,5 +88,147 @@ export async function saveCharacterStatesFromCombined(
   }
 }
 
+// ── Contradiction Detection (MemPalace-inspired) ───────────────────────────
+
+export interface CharacterContradiction {
+  characterName: string;
+  type: 'resurrection' | 'power_regression' | 'status_flip';
+  severity: 'warning' | 'critical';
+  description: string;
+  previousChapter: number;
+  currentChapter: number;
+}
+
+/**
+ * Detect contradictions between new character states and their last known states.
+ * Runs BEFORE saving new states so it can flag issues for the Critic/Architect.
+ *
+ * Detects:
+ * - Resurrection: character was dead, now alive (critical)
+ * - Power regression: power_realm_index decreased without explanation (warning)
+ * - Status flip: character flips alive↔missing↔dead without narrative support (warning)
+ */
+export async function detectCharacterContradictions(
+  projectId: string,
+  currentChapter: number,
+  newCharacters: Array<{
+    character_name: string;
+    status: string;
+    power_level: string | null;
+    power_realm_index: number | null;
+    location: string | null;
+    notes: string | null;
+  }>,
+): Promise<CharacterContradiction[]> {
+  try {
+    if (!newCharacters || newCharacters.length === 0) return [];
+
+    const db = getSupabase();
+    const contradictions: CharacterContradiction[] = [];
+
+    // Get most recent states for all characters in this project
+    // Use a subquery approach: get the max chapter_number per character
+    const charNames = newCharacters
+      .map(c => c.character_name.trim())
+      .filter(n => isValidCharacterName(n));
+
+    if (charNames.length === 0) return [];
+
+    const { data: previousStates } = await db
+      .from('character_states')
+      .select('character_name, status, power_realm_index, chapter_number')
+      .eq('project_id', projectId)
+      .in('character_name', charNames)
+      .lt('chapter_number', currentChapter)
+      .order('chapter_number', { ascending: false });
+
+    if (!previousStates || previousStates.length === 0) return [];
+
+    // Deduplicate: keep only the latest state per character
+    const latestByChar = new Map<string, typeof previousStates[0]>();
+    for (const state of previousStates) {
+      if (!latestByChar.has(state.character_name)) {
+        latestByChar.set(state.character_name, state);
+      }
+    }
+
+    for (const newChar of newCharacters) {
+      const name = newChar.character_name.trim();
+      const prev = latestByChar.get(name);
+      if (!prev) continue;
+
+      // 1. Resurrection detection: was dead, now alive
+      if (prev.status === 'dead' && newChar.status === 'alive') {
+        contradictions.push({
+          characterName: name,
+          type: 'resurrection',
+          severity: 'critical',
+          description: `${name} đã chết ở Ch.${prev.chapter_number} nhưng xuất hiện sống lại ở Ch.${currentChapter} mà không có cơ chế hồi sinh`,
+          previousChapter: prev.chapter_number,
+          currentChapter,
+        });
+      }
+
+      // 2. Power regression: realm index went down
+      if (
+        typeof prev.power_realm_index === 'number' &&
+        typeof newChar.power_realm_index === 'number' &&
+        newChar.power_realm_index < prev.power_realm_index
+      ) {
+        contradictions.push({
+          characterName: name,
+          type: 'power_regression',
+          severity: 'warning',
+          description: `${name} bị tụt cảnh giới từ index ${prev.power_realm_index} (Ch.${prev.chapter_number}) xuống ${newChar.power_realm_index} (Ch.${currentChapter})`,
+          previousChapter: prev.chapter_number,
+          currentChapter,
+        });
+      }
+
+      // 3. Status flip: missing→alive without explanation is suspicious
+      // (dead→alive already caught above as resurrection)
+      if (prev.status === 'missing' && newChar.status === 'alive') {
+        // Check if notes explain the return
+        const hasExplanation = newChar.notes &&
+          /trở về|xuất hiện lại|tìm thấy|giải cứu|trốn thoát|quay lại/i.test(newChar.notes);
+        if (!hasExplanation) {
+          contradictions.push({
+            characterName: name,
+            type: 'status_flip',
+            severity: 'warning',
+            description: `${name} đang mất tích từ Ch.${prev.chapter_number} nhưng xuất hiện lại ở Ch.${currentChapter} mà không có giải thích`,
+            previousChapter: prev.chapter_number,
+            currentChapter,
+          });
+        }
+      }
+    }
+
+    return contradictions;
+  } catch {
+    return []; // Non-fatal
+  }
+}
+
+/**
+ * Format contradictions into a prompt string for the Architect/Writer.
+ * Returns null if no contradictions.
+ */
+export function formatContradictionWarnings(contradictions: CharacterContradiction[]): string | null {
+  if (contradictions.length === 0) return null;
+  const criticals = contradictions.filter(c => c.severity === 'critical');
+  const warnings = contradictions.filter(c => c.severity === 'warning');
+
+  const lines: string[] = ['⚠️ CẢNH BÁO MÂU THUẪN NHÂN VẬT:'];
+  for (const c of criticals) {
+    lines.push(`🚫 [CRITICAL] ${c.description}`);
+  }
+  for (const c of warnings) {
+    lines.push(`⚠️ [WARNING] ${c.description}`);
+  }
+  lines.push('→ PHẢI giải quyết mâu thuẫn hoặc cung cấp lý do hợp lý trong nội dung chương.');
+  return lines.join('\n');
+}
+
 // ── Public: Load Latest Character States for Context ─────────────────────────
 

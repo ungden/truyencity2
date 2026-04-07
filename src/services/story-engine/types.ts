@@ -225,6 +225,9 @@ export interface ContextPayload {
   powerContext?: string;
   worldContext?: string;
 
+  // Character knowledge graph (MemPalace-inspired)
+  characterKnowledgeContext?: string;
+
   // Arc chapter summaries (for synopsis generation)
   arcChapterSummaries?: Array<{ chapter_number: number; title: string; summary: string }>;
 }
