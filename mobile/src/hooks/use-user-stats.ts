@@ -234,5 +234,27 @@ export function useUserStats(): UseUserStatsReturn {
     fetchAll();
   }, [fetchAll]);
 
+  // Refetch whenever the auth state changes (sign in, sign out, token refresh).
+  // Without this, navigating back to the Account screen after signing in with
+  // Apple/Google wouldn't refresh the profile and the screen would stay in its
+  // "unauthenticated" state, pushing the user back to the login screen — the
+  // exact App Store review rejection we saw in April 2026.
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event) => {
+      if (
+        event === "SIGNED_IN" ||
+        event === "SIGNED_OUT" ||
+        event === "TOKEN_REFRESHED" ||
+        event === "USER_UPDATED"
+      ) {
+        setLoading(true);
+        fetchAll();
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [fetchAll]);
+
   return { profile, stats, loading, refetch: fetchAll };
 }

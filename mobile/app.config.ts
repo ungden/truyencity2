@@ -18,8 +18,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     supportsTablet: true,
     bundleIdentifier: "com.truyencity.app",
-    buildNumber: "13",
+    buildNumber: "14",
     appStoreUrl: "https://apps.apple.com/app/truyencity/id6759160705",
+    // Allow iPad multitasking (Split View, Slide Over). Required — apps that
+    // support iPad without enabling multitasking commonly get flagged in
+    // review. Apple's April 2026 rejection test was on iPad Air M4.
+    requireFullScreen: false,
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
       NSAppTransportSecurity: {
@@ -31,6 +35,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
           },
         },
       },
+      // iPad gets landscape in addition to the iPhone's portrait-only setup.
+      // The top-level `orientation: "portrait"` still constrains iPhone.
+      "UISupportedInterfaceOrientations~ipad": [
+        "UIInterfaceOrientationPortrait",
+        "UIInterfaceOrientationPortraitUpsideDown",
+        "UIInterfaceOrientationLandscapeLeft",
+        "UIInterfaceOrientationLandscapeRight",
+      ],
       // AdMob disabled — re-enable when app is approved
       // SKAdNetworkItems: [
       //   { SKAdNetworkIdentifier: "cstr6suwn9.skadnetwork" },

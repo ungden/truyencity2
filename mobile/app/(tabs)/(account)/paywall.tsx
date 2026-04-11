@@ -22,6 +22,31 @@ export default function PaywallScreen() {
     useRevenueCat();
   const [purchasing, setPurchasing] = useState(false);
   const [restoring, setRestoring] = useState(false);
+  // Must be declared before any early returns to satisfy the rules of hooks.
+  const [selectedPlan, setSelectedPlan] = useState<"monthly" | "annual">("annual");
+
+  // Defined up-front so early-return branches (loading, empty, isVip) can
+  // reference them without relying on function hoisting semantics.
+  async function handleRestore() {
+    setRestoring(true);
+    try {
+      const success = await restorePurchases();
+      if (success) {
+        Alert.alert(
+          "Khôi phục thành công!",
+          "Gói VIP đã được kích hoạt lại.",
+          [{ text: "OK", onPress: () => router.back() }]
+        );
+      } else {
+        Alert.alert(
+          "Không tìm thấy",
+          "Không tìm thấy giao dịch nào trước đó."
+        );
+      }
+    } finally {
+      setRestoring(false);
+    }
+  }
 
   // Already VIP — show success state
   if (isVip) {
@@ -71,6 +96,95 @@ export default function PaywallScreen() {
     );
   }
 
+  // Loading state — packages are still being fetched from RevenueCat
+  if (loading) {
+    return (
+      <ScrollView
+        className="flex-1"
+        style={{ backgroundColor: "#131620" }}
+        contentContainerClassName="items-center justify-center py-20 gap-4"
+      >
+        <ActivityIndicator size="large" color="#fbbf24" />
+        <Text style={{ fontSize: 14, color: "#82818e" }}>
+          Đang tải gói VIP...
+        </Text>
+      </ScrollView>
+    );
+  }
+
+  // Empty-state guard — no packages available (RevenueCat offering missing,
+  // StoreKit rejected the fetch, or the user is running on a sandbox/TestFlight
+  // environment where products aren't configured yet). Show a graceful
+  // fallback instead of an empty-looking paywall that might confuse reviewers.
+  if (packages.length === 0) {
+    return (
+      <ScrollView
+        className="flex-1"
+        style={{ backgroundColor: "#131620" }}
+        contentContainerClassName="items-center justify-center py-20 gap-4"
+      >
+        <Text style={{ fontSize: 48 }}>👑</Text>
+        <Text
+          style={{
+            fontSize: 20,
+            fontWeight: "800",
+            color: "#fbbf24",
+            textAlign: "center",
+            paddingHorizontal: 32,
+          }}
+        >
+          Gói VIP tạm thời không khả dụng
+        </Text>
+        <Text
+          style={{
+            fontSize: 14,
+            color: "#82818e",
+            textAlign: "center",
+            paddingHorizontal: 40,
+            lineHeight: 20,
+          }}
+        >
+          {error
+            ? "Không thể kết nối với App Store. Kiểm tra kết nối mạng và thử lại."
+            : "Vui lòng thử lại sau ít phút."}
+        </Text>
+        <View style={{ flexDirection: "row", gap: 12, marginTop: 12 }}>
+          <Pressable
+            onPress={handleRestore}
+            disabled={restoring}
+            style={{
+              backgroundColor: "#282b3a",
+              paddingHorizontal: 24,
+              paddingVertical: 12,
+              borderRadius: 14,
+            }}
+          >
+            <Text
+              style={{ color: "#e8e6f0", fontWeight: "600", fontSize: 14 }}
+            >
+              {restoring ? "Đang kiểm tra..." : "Khôi phục"}
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => router.back()}
+            style={{
+              backgroundColor: "#282b3a",
+              paddingHorizontal: 24,
+              paddingVertical: 12,
+              borderRadius: 14,
+            }}
+          >
+            <Text
+              style={{ color: "#e8e6f0", fontWeight: "600", fontSize: 14 }}
+            >
+              Quay lại
+            </Text>
+          </Pressable>
+        </View>
+      </ScrollView>
+    );
+  }
+
   // Find monthly and annual packages
   const monthlyPkg = packages.find(
     (p) => p.packageType === "MONTHLY" || p.product.identifier.includes("monthly")
@@ -79,8 +193,6 @@ export default function PaywallScreen() {
   const annualPkg = packages.find(
     (p) => p.packageType === "ANNUAL" || p.product.identifier.includes("yearly") || p.product.identifier.includes("annual")
   ) ?? null;
-
-  const [selectedPlan, setSelectedPlan] = useState<"monthly" | "annual">("annual");
 
   const selectedPkg = selectedPlan === "annual" ? (annualPkg ?? monthlyPkg) : monthlyPkg;
 
@@ -103,25 +215,6 @@ export default function PaywallScreen() {
       }
     } finally {
       setPurchasing(false);
-    }
-  }
-
-  async function handleRestore() {
-    setRestoring(true);
-    try {
-      const success = await restorePurchases();
-      if (success) {
-        Alert.alert("Khôi phục thành công!", "Gói VIP đã được kích hoạt lại.", [
-          { text: "OK", onPress: () => router.back() },
-        ]);
-      } else {
-        Alert.alert(
-          "Không tìm thấy",
-          "Không tìm thấy giao dịch nào trước đó."
-        );
-      }
-    } finally {
-      setRestoring(false);
     }
   }
 

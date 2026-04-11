@@ -41,7 +41,11 @@ export default function LoginScreen() {
           return;
         }
       }
-      router.back();
+      if (router.canGoBack()) {
+        router.back();
+      } else {
+        router.replace("/(tabs)/(account)");
+      }
     } catch (error: any) {
       const msg = error?.message || "Đã có lỗi xảy ra";
       // Translate common Supabase auth errors to Vietnamese
@@ -88,7 +92,11 @@ export default function LoginScreen() {
                 access_token: accessToken,
                 refresh_token: refreshToken,
               });
-              router.back();
+              if (router.canGoBack()) {
+                router.back();
+              } else {
+                router.replace("/(tabs)/(account)");
+              }
             } else {
               throw new Error('Token not found in response');
             }
@@ -105,6 +113,21 @@ export default function LoginScreen() {
   }
 
   async function handleAppleAuth() {
+    // Guard against Apple Sign In not being available (should never fire on
+    // iOS 13+ but covers simulators/older devices gracefully).
+    try {
+      const available = await AppleAuthentication.isAvailableAsync();
+      if (!available) {
+        Alert.alert(
+          "Không khả dụng",
+          "Đăng nhập Apple không khả dụng trên thiết bị này."
+        );
+        return;
+      }
+    } catch {
+      // non-fatal — continue and let signInAsync throw if truly unavailable
+    }
+
     try {
       const credential = await AppleAuthentication.signInAsync({
         requestedScopes: [
@@ -113,26 +136,51 @@ export default function LoginScreen() {
         ],
       });
 
-      if (credential.identityToken) {
-        setLoading(true);
-        const { data, error } = await supabase.auth.signInWithIdToken({
-          provider: 'apple',
-          token: credential.identityToken,
-        });
+      if (!credential.identityToken) {
+        throw new Error("Không nhận được token từ Apple");
+      }
 
-        if (error) throw error;
-        if (data) {
-          router.back();
-        }
+      setLoading(true);
+
+      const { data, error } = await supabase.auth.signInWithIdToken({
+        provider: "apple",
+        token: credential.identityToken,
+      });
+
+      if (error) throw error;
+      if (!data?.session) {
+        throw new Error("Không nhận được phiên đăng nhập");
+      }
+
+      // Defensive: make sure the session is actually readable from storage
+      // before we navigate. This catches the class of bug that caused the
+      // April 2026 App Store rejection (session written but not retrievable).
+      const { data: checkData } = await supabase.auth.getSession();
+      if (!checkData?.session) {
+        throw new Error("Phiên đăng nhập không được lưu, vui lòng thử lại");
+      }
+
+      // Prefer replace() over back() — safer when the login screen was reached
+      // via deep link or when the navigation stack is empty. Falls back to
+      // back() when a history entry exists so native back animations still work.
+      if (router.canGoBack()) {
+        router.back();
       } else {
-        throw new Error('No identity token received from Apple');
+        router.replace("/(tabs)/(account)");
       }
     } catch (error: any) {
-      if (error.code === 'ERR_REQUEST_CANCELED') {
-        // User canceled, do nothing
-      } else {
-        Alert.alert('Lỗi', error.message || 'Không thể đăng nhập bằng Apple');
+      // User canceled the native Apple sheet — not an error, just bail.
+      if (
+        error?.code === "ERR_REQUEST_CANCELED" ||
+        error?.code === "ERR_CANCELED"
+      ) {
+        return;
       }
+      console.warn("[login] Apple sign-in failed:", error);
+      Alert.alert(
+        "Lỗi",
+        error?.message || "Không thể đăng nhập bằng Apple. Vui lòng thử lại."
+      );
     } finally {
       setLoading(false);
     }

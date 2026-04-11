@@ -411,6 +411,68 @@ export default function ProfileScreen() {
     ]);
   }
 
+  // Account deletion — required by App Store Guideline 5.1.1(v).
+  // Two-step confirmation to prevent accidental deletion, then a server-side
+  // RPC that wipes all of the user's data (comments, ratings, bookmarks,
+  // reading history, subscriptions…) before removing the auth record.
+  async function handleDeleteAccount() {
+    if (process.env.EXPO_OS === "ios") {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    }
+    Alert.alert(
+      "Xóa tài khoản",
+      "Hành động này sẽ xóa vĩnh viễn tài khoản và toàn bộ dữ liệu đọc truyện, bình luận, đánh giá, danh sách đã lưu. Không thể khôi phục.\n\nBạn có chắc muốn tiếp tục?",
+      [
+        { text: "Hủy", style: "cancel" },
+        {
+          text: "Xóa vĩnh viễn",
+          style: "destructive",
+          onPress: () => {
+            // Second confirmation to satisfy Apple's "explicit confirmation"
+            // guidance and protect users against fat-finger taps.
+            Alert.alert(
+              "Xác nhận lần cuối",
+              "Tài khoản sẽ bị xóa ngay lập tức. Bạn thực sự chắc chắn?",
+              [
+                { text: "Hủy", style: "cancel" },
+                {
+                  text: "Xóa",
+                  style: "destructive",
+                  onPress: async () => {
+                    try {
+                      const { error } = await supabase.rpc(
+                        "delete_my_account"
+                      );
+                      if (error) throw error;
+                      // Sign out locally so the session is cleared even if
+                      // auth.users.delete invalidates the token server-side.
+                      await supabase.auth.signOut();
+                      Alert.alert(
+                        "Đã xóa tài khoản",
+                        "Tài khoản của bạn đã được xóa hoàn toàn."
+                      );
+                      refetch();
+                    } catch (err: any) {
+                      console.warn(
+                        "[account] delete_my_account failed:",
+                        err
+                      );
+                      Alert.alert(
+                        "Lỗi",
+                        err?.message ||
+                          "Không thể xóa tài khoản. Vui lòng thử lại hoặc liên hệ hỗ trợ."
+                      );
+                    }
+                  },
+                },
+              ]
+            );
+          },
+        },
+      ]
+    );
+  }
+
   function handleClearCache() {
     Alert.alert("Xóa bộ nhớ đệm", "Bạn có muốn xóa cache không?", [
       { text: "Hủy", style: "cancel" },
@@ -731,6 +793,27 @@ export default function ProfileScreen() {
       >
         <Text style={{ color: "#e53935", fontWeight: "600", fontSize: 15 }}>
           Đăng xuất
+        </Text>
+      </Pressable>
+
+      {/* Delete account — required by Apple Guideline 5.1.1(v) */}
+      <Pressable
+        onPress={handleDeleteAccount}
+        style={[{
+          marginHorizontal: 16,
+          marginTop: -4,
+          paddingVertical: 10,
+          alignItems: "center",
+        }, centeredStyle] as any}
+      >
+        <Text
+          style={{
+            color: "#82818e",
+            fontSize: 13,
+            textDecorationLine: "underline",
+          }}
+        >
+          Xóa tài khoản
         </Text>
       </Pressable>
 
