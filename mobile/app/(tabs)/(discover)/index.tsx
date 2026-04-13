@@ -10,6 +10,7 @@ import SectionHeader from "@/components/section-header";
 import SearchResults from "@/components/search-results";
 import { useSearchContext } from "@/contexts/search-context";
 import { useDevice } from "@/hooks/use-device";
+import { AdBanner } from "@/components/ads/ad-banner";
 import type { Novel } from "@/lib/types";
 
 export default function DiscoverScreen() {
@@ -181,6 +182,9 @@ export default function DiscoverScreen() {
           />
         </View>
       )}
+
+      {/* Ad banner after hero + latest */}
+      <AdBanner placement="home" />
 
       {/* Featured novel card */}
       {featured && (

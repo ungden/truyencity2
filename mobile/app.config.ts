@@ -43,13 +43,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         "UIInterfaceOrientationLandscapeLeft",
         "UIInterfaceOrientationLandscapeRight",
       ],
-      // AdMob disabled — re-enable when app is approved
-      // SKAdNetworkItems: [
-      //   { SKAdNetworkIdentifier: "cstr6suwn9.skadnetwork" },
-      // ],
-      // GADApplicationIdentifier:
-      //   process.env.EXPO_PUBLIC_ADMOB_IOS_APP_ID ||
-      //   "ca-app-pub-3940256099942544~1458002511",
+      SKAdNetworkItems: [
+        { SKAdNetworkIdentifier: "cstr6suwn9.skadnetwork" },
+      ],
+      GADApplicationIdentifier:
+        process.env.EXPO_PUBLIC_ADMOB_IOS_APP_ID ||
+        "ca-app-pub-3940256099942544~1458002511",
     },
   },
   android: {
@@ -72,24 +71,24 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-secure-store",
     "expo-web-browser",
     "expo-apple-authentication",
-    // ATT + AdMob disabled — re-enable both together when ads are ready
-    // [
-    //   "expo-tracking-transparency",
-    //   {
-    //     "userTrackingPermission": "This identifier will be used to deliver personalized ads to you."
-    //   }
-    // ],
-    // [
-    //   "react-native-google-mobile-ads",
-    //   {
-    //     androidAppId:
-    //       process.env.EXPO_PUBLIC_ADMOB_ANDROID_APP_ID ||
-    //       "ca-app-pub-3940256099942544~3347511713",
-    //     iosAppId:
-    //       process.env.EXPO_PUBLIC_ADMOB_IOS_APP_ID ||
-    //       "ca-app-pub-3940256099942544~1458002511",
-    //   },
-    // ],
+    [
+      "expo-tracking-transparency",
+      {
+        userTrackingPermission:
+          "Mã nhận dạng này được sử dụng để hiển thị quảng cáo phù hợp với bạn.",
+      },
+    ],
+    [
+      "react-native-google-mobile-ads",
+      {
+        androidAppId:
+          process.env.EXPO_PUBLIC_ADMOB_ANDROID_APP_ID ||
+          "ca-app-pub-3940256099942544~3347511713",
+        iosAppId:
+          process.env.EXPO_PUBLIC_ADMOB_IOS_APP_ID ||
+          "ca-app-pub-3940256099942544~1458002511",
+      },
+    ],
   ],
   extra: {
     eas: {
