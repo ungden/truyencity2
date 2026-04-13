@@ -1,11 +1,13 @@
 import { useEffect, useRef, useCallback, useState } from "react";
+import { TurboModuleRegistry } from "react-native";
 import { AD_UNITS, INTERSTITIAL_CHAPTER_INTERVAL, AD_REQUEST_CONFIG } from "@/components/ads/ad-config";
 import { useVipStatus } from "@/hooks/use-vip-status";
 
 const MAX_RETRY = 3;
 
-/** Lazy-load to avoid crash on Expo Go (no native binary) */
+/** Check native module exists before requiring (prevents Expo Go crash) */
 function getAdsModule() {
+  if (!TurboModuleRegistry.get("RNGoogleMobileAdsModule")) return null;
   try {
     return require("react-native-google-mobile-ads");
   } catch {

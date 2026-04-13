@@ -5,9 +5,7 @@ import { useEffect, Component, type ReactNode } from "react";
 import { View, Text, Pressable } from "react-native";
 import { Stack } from "expo-router/stack";
 import { initRevenueCat } from "@/lib/revenuecat";
-// Lazy-loaded: these native modules crash on Expo Go (no native binary)
-// import mobileAds, { MaxAdContentRating } from "react-native-google-mobile-ads";
-// import * as TrackingTransparency from "expo-tracking-transparency";
+import { TurboModuleRegistry } from "react-native";
 
 // Error boundary to prevent crash-on-launch from killing the app
 class ErrorBoundary extends Component<
@@ -92,23 +90,26 @@ export default function RootLayout() {
       // Already handled inside initRevenueCat
     });
 
-    // Request ATT + init AdMob — lazy-loaded to avoid crash on Expo Go
-    setTimeout(async () => {
-      try {
-        const TT = require("expo-tracking-transparency");
-        await TT.requestTrackingPermissionsAsync();
-      } catch {}
-      try {
-        const ads = require("react-native-google-mobile-ads");
-        const mobileAdsInstance = ads.default();
-        await mobileAdsInstance.setRequestConfiguration({
-          maxAdContentRating: ads.MaxAdContentRating.T,
-        });
-        await mobileAdsInstance.initialize();
-      } catch (e) {
-        console.warn("[AdMob] Init skipped (Expo Go or native module missing):", e);
-      }
-    }, 1500);
+    // Request ATT + init AdMob — only on dev client / production (not Expo Go)
+    const hasAdMob = !!TurboModuleRegistry.get("RNGoogleMobileAdsModule");
+    if (hasAdMob) {
+      setTimeout(async () => {
+        try {
+          const TT = require("expo-tracking-transparency");
+          await TT.requestTrackingPermissionsAsync();
+        } catch {}
+        try {
+          const ads = require("react-native-google-mobile-ads");
+          const mobileAdsInstance = ads.default();
+          await mobileAdsInstance.setRequestConfiguration({
+            maxAdContentRating: ads.MaxAdContentRating.T,
+          });
+          await mobileAdsInstance.initialize();
+        } catch (e) {
+          console.warn("[AdMob] Init failed:", e);
+        }
+      }, 1500);
+    }
   }, []);
 
   return (
