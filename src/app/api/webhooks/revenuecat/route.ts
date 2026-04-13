@@ -184,9 +184,9 @@ export async function POST(request: NextRequest) {
           ? new Date(event.expiration_at_ms).toISOString()
           : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days fallback
 
-        // Determine tier from entitlements (super_vip entitlement = Super VIP)
-        const entitlements = event.entitlement_ids || [];
-        const isSuperVip = entitlements.includes('Truyện City Pro') || entitlements.includes('reader_super_vip');
+        // Determine tier from product ID (both tiers share same entitlement)
+        const productId = event.product_id || '';
+        const isSuperVip = productId.includes('super_vip');
         const readerTier = isSuperVip ? 'super_vip' : 'vip';
 
         // Super VIP gets 3 boost cards on purchase/renewal

@@ -12,9 +12,16 @@ const REVENUECAT_IOS_KEY =
 const REVENUECAT_ANDROID_KEY =
   process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY ?? "";
 
-// Entitlement identifiers — matches what's configured in RevenueCat dashboard
+// Entitlement identifier — matches what's configured in RevenueCat dashboard
+// Both VIP and Super VIP share the same entitlement "Truyện City"
+// We distinguish them by product ID
 export const ENTITLEMENT_READER_VIP = "Truyện City";
-export const ENTITLEMENT_READER_SUPER_VIP = "Truyện City Pro";
+
+// Product IDs for Super VIP (used to distinguish from regular VIP)
+export const SUPER_VIP_PRODUCT_IDS = [
+  "reader_super_vip_monthly",
+  "reader_super_vip_yearly",
+];
 
 // Product identifiers — matches App Store Connect / Google Play Console
 export const PRODUCT_READER_VIP_MONTHLY = "reader_vip_monthly";

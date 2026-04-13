@@ -8,7 +8,7 @@ import type {
 import { supabase } from "@/lib/supabase";
 import {
   ENTITLEMENT_READER_VIP,
-  ENTITLEMENT_READER_SUPER_VIP,
+  SUPER_VIP_PRODUCT_IDS,
   identifyUser,
   logOutRevenueCat,
   isRevenueCatReady,
@@ -53,11 +53,13 @@ export function useRevenueCat(): RevenueCatState {
   const [error, setError] = useState<string | null>(null);
 
   // Derive VIP status from RevenueCat entitlements
-  const isSuperVip =
-    customerInfo?.entitlements?.active?.[ENTITLEMENT_READER_SUPER_VIP] !== undefined;
-  const isVip =
-    isSuperVip ||
-    customerInfo?.entitlements?.active?.[ENTITLEMENT_READER_VIP] !== undefined;
+  // Both VIP and Super VIP share entitlement "Truyện City"
+  // Distinguish by checking the active product ID
+  const activeEntitlement = customerInfo?.entitlements?.active?.[ENTITLEMENT_READER_VIP];
+  const isVip = activeEntitlement !== undefined;
+  const isSuperVip = isVip && activeEntitlement?.productIdentifier
+    ? SUPER_VIP_PRODUCT_IDS.includes(activeEntitlement.productIdentifier)
+    : false;
 
   // Fetch customer info + available offerings
   const refresh = useCallback(async () => {
