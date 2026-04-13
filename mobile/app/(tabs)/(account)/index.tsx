@@ -14,6 +14,7 @@ import {
   type Achievement,
 } from "@/lib/gamification";
 import * as Haptics from "expo-haptics";
+import { router } from "expo-router";
 import {
   getOfflineStorageSize,
   deleteAllOfflineData,
@@ -697,43 +698,42 @@ export default function ProfileScreen() {
 
       {/* VIP upgrade banner — only show for non-VIP */}
       {!isVip && (
-        <Link href="/(account)/paywall" asChild>
-          <Pressable
-            style={[{
-              marginHorizontal: 16,
-              backgroundColor: "#1a1d28",
-              borderRadius: 16,
-              padding: 16,
-              flexDirection: "row",
+        <Pressable
+          onPress={() => router.push("/(account)/paywall")}
+          style={{
+            marginHorizontal: 16,
+            backgroundColor: "#1a1d28",
+            borderRadius: 16,
+            padding: 16,
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 14,
+            borderWidth: 1,
+            borderColor: "rgba(251, 191, 36, 0.25)",
+          }}
+        >
+          <View
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: 22,
+              backgroundColor: "rgba(251, 191, 36, 0.12)",
               alignItems: "center",
-              gap: 14,
-              borderWidth: 1,
-              borderColor: "#fbbf2440",
-            }, centeredStyle] as any}
+              justifyContent: "center",
+            }}
           >
-            <View
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: 22,
-                backgroundColor: "#fbbf2420",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Text style={{ fontSize: 22 }}>👑</Text>
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 15, fontWeight: "700", color: "#fbbf24" }}>
-                Nâng cấp VIP
-              </Text>
-              <Text style={{ fontSize: 12, color: "#a1a1aa", marginTop: 2 }}>
-                Bỏ quảng cáo · Tải offline · Audio không giới hạn
-              </Text>
-            </View>
-            <Text style={{ fontSize: 16, color: "#fbbf24" }}>›</Text>
-          </Pressable>
-        </Link>
+            <Text style={{ fontSize: 22 }}>👑</Text>
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 15, fontWeight: "700", color: "#fbbf24" }}>
+              Nâng cấp VIP
+            </Text>
+            <Text style={{ fontSize: 12, color: "#a1a1aa", marginTop: 2 }}>
+              Bỏ quảng cáo · Tải offline · Audio không giới hạn
+            </Text>
+          </View>
+          <Text style={{ fontSize: 20, color: "#fbbf24" }}>›</Text>
+        </Pressable>
       )}
 
       {/* VIP badge — show for VIP users */}
