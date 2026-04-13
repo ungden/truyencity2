@@ -3,7 +3,7 @@ import {
   InterstitialAd,
   AdEventType,
 } from "react-native-google-mobile-ads";
-import { AD_UNITS, INTERSTITIAL_CHAPTER_INTERVAL } from "@/components/ads/ad-config";
+import { AD_UNITS, INTERSTITIAL_CHAPTER_INTERVAL, AD_REQUEST_CONFIG } from "@/components/ads/ad-config";
 import { useVipStatus } from "@/hooks/use-vip-status";
 
 const MAX_RETRY = 3;
@@ -26,7 +26,10 @@ export function useInterstitialAd(disabled = false) {
     if (isDisabled) return;
 
     const unitId = AD_UNITS.INTERSTITIAL_CHAPTER;
-    const ad = InterstitialAd.createForAdRequest(unitId);
+    const ad = InterstitialAd.createForAdRequest(unitId, {
+      keywords: AD_REQUEST_CONFIG.keywords,
+      requestNonPersonalizedAdsOnly: AD_REQUEST_CONFIG.requestNonPersonalizedAdsOnly,
+    });
 
     const unsubLoaded = ad.addAdEventListener(AdEventType.LOADED, () => {
       setAdLoaded(true);

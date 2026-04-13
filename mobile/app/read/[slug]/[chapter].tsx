@@ -29,7 +29,6 @@ import { TTS_SPEEDS } from "@/lib/tts";
 import { getChapterOffline } from "@/lib/offline-db";
 import { useKeepAwake } from "expo-keep-awake";
 import { useInterstitialAd } from "@/hooks/use-interstitial-ad";
-import { AdBanner } from "@/components/ads/ad-banner";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ReaderSettingsSheet from "@/components/reader-settings-sheet";
 import {
@@ -766,9 +765,6 @@ export default function ReadingScreen() {
               enableExperimentalMarginCollapsing
             />
           )}
-
-          {/* Ad banner after chapter content */}
-          <AdBanner placement="detail" />
 
           {/* Chapter end navigation */}
           <View style={{ marginTop: 32, gap: 12, paddingBottom: 32, ...(readerMaxWidth ? { maxWidth: readerMaxWidth - 48, alignSelf: "center" as const, width: "100%" as any } : {}) }}>

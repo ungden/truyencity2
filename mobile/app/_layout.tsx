@@ -5,6 +5,8 @@ import { useEffect, Component, type ReactNode } from "react";
 import { View, Text, Pressable } from "react-native";
 import { Stack } from "expo-router/stack";
 import { initRevenueCat } from "@/lib/revenuecat";
+import mobileAds, { MaxAdContentRating } from "react-native-google-mobile-ads";
+import * as TrackingTransparency from "expo-tracking-transparency";
 
 // Error boundary to prevent crash-on-launch from killing the app
 class ErrorBoundary extends Component<
@@ -89,10 +91,21 @@ export default function RootLayout() {
       // Already handled inside initRevenueCat
     });
 
-    // ATT disabled — AdMob not active, no tracking. Re-enable together with AdMob.
-    // setTimeout(() => {
-    //   TrackingTransparency.requestTrackingPermissionsAsync().catch(() => {});
-    // }, 1000);
+    // Request ATT permission (required for personalized ads on iOS 14.5+)
+    // Then initialize AdMob SDK with content rating + keyword preferences
+    setTimeout(async () => {
+      try {
+        await TrackingTransparency.requestTrackingPermissionsAsync();
+      } catch {}
+      try {
+        await mobileAds().setRequestConfiguration({
+          maxAdContentRating: MaxAdContentRating.T,
+        });
+        await mobileAds().initialize();
+      } catch (e) {
+        console.warn("[AdMob] Init failed:", e);
+      }
+    }, 1500);
   }, []);
 
   return (
