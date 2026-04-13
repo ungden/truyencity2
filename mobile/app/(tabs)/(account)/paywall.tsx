@@ -24,7 +24,7 @@ export default function PaywallScreen() {
   const [purchasing, setPurchasing] = useState(false);
   const [restoring, setRestoring] = useState(false);
   // Must be declared before any early returns to satisfy the rules of hooks.
-  const [selectedPlan, setSelectedPlan] = useState<"monthly" | "annual">("annual");
+  const [selectedPlan, setSelectedPlan] = useState<"vip_yearly" | "vip_monthly" | "super_vip_yearly" | "super_vip_monthly">("vip_yearly");
 
   // Defined up-front so early-return branches (loading, empty, isVip) can
   // reference them without relying on function hoisting semantics.
@@ -116,16 +116,24 @@ export default function PaywallScreen() {
   // No empty-state guard — always render full paywall with fallback prices
   // so we can screenshot on Simulator and users see plans even if store is slow
 
-  // Find monthly and annual packages
-  const monthlyPkg = packages.find(
-    (p) => p.packageType === "MONTHLY" || p.product.identifier.includes("monthly")
-  ) ?? (packages.length > 0 ? packages[0] : null);
+  // Find packages by product ID
+  const findPkg = (keyword: string) =>
+    packages.find((p) => p.product.identifier.includes(keyword)) ?? null;
 
-  const annualPkg = packages.find(
-    (p) => p.packageType === "ANNUAL" || p.product.identifier.includes("yearly") || p.product.identifier.includes("annual")
-  ) ?? null;
+  const vipMonthlyPkg = findPkg("reader_vip_monthly");
+  const vipYearlyPkg = findPkg("reader_vip_yearly");
+  const superMonthlyPkg = findPkg("reader_super_vip_monthly");
+  const superYearlyPkg = findPkg("reader_super_vip_yearly");
 
-  const selectedPkg = selectedPlan === "annual" ? (annualPkg ?? monthlyPkg) : monthlyPkg;
+  const PLAN_OPTIONS = [
+    { id: "super_vip_yearly" as const, pkg: superYearlyPkg, label: "Super VIP Năm", price: superYearlyPkg?.product?.priceString ?? "1.990.000đ", period: "/năm", badge: "TIẾT KIỆM 17%", badgeColor: "#22c55e", sublabel: "~166k/tháng · 3 thẻ thúc chương/tháng" },
+    { id: "super_vip_monthly" as const, pkg: superMonthlyPkg, label: "Super VIP Tháng", price: superMonthlyPkg?.product?.priceString ?? "199.000đ", period: "/tháng", badge: "HOT", badgeColor: "#f97316", sublabel: "3 thẻ thúc chương/tháng" },
+    { id: "vip_yearly" as const, pkg: vipYearlyPkg, label: "VIP Năm", price: vipYearlyPkg?.product?.priceString ?? "999.000đ", period: "/năm", badge: "TIẾT KIỆM 17%", badgeColor: "#22c55e", sublabel: "~83k/tháng" },
+    { id: "vip_monthly" as const, pkg: vipMonthlyPkg, label: "VIP Tháng", price: vipMonthlyPkg?.product?.priceString ?? "99.000đ", period: "/tháng", badge: null, badgeColor: null, sublabel: null },
+  ];
+
+  const selectedOption = PLAN_OPTIONS.find((p) => p.id === selectedPlan) ?? PLAN_OPTIONS[0];
+  const selectedPkg = selectedOption.pkg;
 
   async function handlePurchase() {
     if (!selectedPkg) {
@@ -248,112 +256,57 @@ export default function PaywallScreen() {
 
       {/* Price + CTA */}
       <View style={{ paddingHorizontal: 20, marginTop: 24, gap: 12 }}>
-        {/* Plan selector — Annual */}
-        <Pressable
-          onPress={() => setSelectedPlan("annual")}
-          style={{
-            backgroundColor: "#1a1d28",
-            borderRadius: 16,
-            padding: 18,
-            borderWidth: 2,
-            borderColor: selectedPlan === "annual" ? "#fbbf24" : "#282b3a",
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 14,
-          }}
-        >
-          {/* Radio */}
-          <View
-            style={{
-              width: 22,
-              height: 22,
-              borderRadius: 11,
-              borderWidth: 2,
-              borderColor: selectedPlan === "annual" ? "#fbbf24" : "#555",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            {selectedPlan === "annual" && (
+        {/* Plan selectors */}
+        {PLAN_OPTIONS.map((plan) => {
+          const isSelected = selectedPlan === plan.id;
+          const isSuperVipPlan = plan.id.startsWith("super_vip");
+          return (
+            <Pressable
+              key={plan.id}
+              onPress={() => setSelectedPlan(plan.id)}
+              style={{
+                backgroundColor: "#1a1d28",
+                borderRadius: 16,
+                padding: 18,
+                borderWidth: 2,
+                borderColor: isSelected ? "#fbbf24" : "#282b3a",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 14,
+              }}
+            >
+              {/* Radio */}
               <View
                 style={{
-                  width: 12,
-                  height: 12,
-                  borderRadius: 6,
-                  backgroundColor: "#fbbf24",
-                }}
-              />
-            )}
-          </View>
-          <View style={{ flex: 1 }}>
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-              <Text style={{ fontSize: 16, fontWeight: "700", color: "#e8e6f0" }}>
-                Hàng năm
-              </Text>
-              <View
-                style={{
-                  backgroundColor: "#22c55e20",
-                  paddingHorizontal: 8,
-                  paddingVertical: 2,
-                  borderRadius: 6,
+                  width: 22, height: 22, borderRadius: 11, borderWidth: 2,
+                  borderColor: isSelected ? "#fbbf24" : "#555",
+                  alignItems: "center", justifyContent: "center",
                 }}
               >
-                <Text style={{ fontSize: 11, fontWeight: "700", color: "#22c55e" }}>
-                  TIẾT KIỆM 17%
+                {isSelected && (
+                  <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: "#fbbf24" }} />
+                )}
+              </View>
+              <View style={{ flex: 1 }}>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                  <Text style={{ fontSize: 16, fontWeight: "700", color: isSuperVipPlan ? "#f97316" : "#e8e6f0" }}>
+                    {plan.label}
+                  </Text>
+                  {plan.badge && (
+                    <View style={{ backgroundColor: (plan.badgeColor ?? "#22c55e") + "20", paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 }}>
+                      <Text style={{ fontSize: 11, fontWeight: "700", color: plan.badgeColor ?? "#22c55e" }}>
+                        {plan.badge}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+                <Text style={{ fontSize: 13, color: "#82818e", marginTop: 2 }}>
+                  {plan.price}{plan.period}{plan.sublabel ? ` · ${plan.sublabel}` : ""}
                 </Text>
               </View>
-            </View>
-            <Text style={{ fontSize: 13, color: "#82818e", marginTop: 2 }}>
-              {annualPkg?.product?.priceString ?? "999.000đ"}/năm (~83k/tháng)
-            </Text>
-          </View>
-        </Pressable>
-
-        {/* Plan selector — Monthly */}
-        <Pressable
-          onPress={() => setSelectedPlan("monthly")}
-          style={{
-            backgroundColor: "#1a1d28",
-            borderRadius: 16,
-            padding: 18,
-            borderWidth: 2,
-            borderColor: selectedPlan === "monthly" ? "#fbbf24" : "#282b3a",
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 14,
-          }}
-        >
-          <View
-            style={{
-              width: 22,
-              height: 22,
-              borderRadius: 11,
-              borderWidth: 2,
-              borderColor: selectedPlan === "monthly" ? "#fbbf24" : "#555",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            {selectedPlan === "monthly" && (
-              <View
-                style={{
-                  width: 12,
-                  height: 12,
-                  borderRadius: 6,
-                  backgroundColor: "#fbbf24",
-                }}
-              />
-            )}
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 16, fontWeight: "700", color: "#e8e6f0" }}>
-              Hàng tháng
-            </Text>
-            <Text style={{ fontSize: 13, color: "#82818e", marginTop: 2 }}>
-              {monthlyPkg?.product?.priceString ?? "99.000đ"}/tháng
-            </Text>
-          </View>
-        </Pressable>
+            </Pressable>
+          );
+        })}
 
         {/* Purchase button */}
         <Pressable
