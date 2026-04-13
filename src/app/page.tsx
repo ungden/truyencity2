@@ -14,6 +14,7 @@ import { Novel } from '@/lib/types';
 import { ContinueReading } from '@/components/continue-reading';
 import { LatestUpdatesCarousel } from '@/components/latest-updates-carousel';
 import { AdPlacement } from '@/components/ads/AdPlacement';
+import { AppDownloadBanner } from '@/components/AppDownloadBanner';
 
 export const revalidate = 300;
 
@@ -116,6 +117,9 @@ export default async function HomePage() {
         <div className="flex gap-8">
           {/* Left Content Area */}
           <div className="flex-1 min-w-0 space-y-10">
+            {/* App Download Banner */}
+            <AppDownloadBanner />
+
             {/* Continue Reading (client component — only shows for logged in users) */}
             <ContinueReading />
 

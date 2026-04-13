@@ -9,7 +9,8 @@ import {
   Compass,
   BookOpenText,
   Tags,
-  Crown
+  Crown,
+  Smartphone
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ThemeToggle from '@/components/theme-toggle';
@@ -86,6 +87,19 @@ export const DesktopSidebar = () => {
           );
         })}
       </nav>
+
+      {/* App Download */}
+      <div className="px-3 pb-2">
+        <a
+          href="https://apps.apple.com/us/app/truy%E1%BB%87n-city-truy%E1%BB%87n-ch%E1%BB%AF/id6759160705"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
+        >
+          <Smartphone size={20} strokeWidth={1.5} />
+          <span>Tải ứng dụng iOS</span>
+        </a>
+      </div>
 
       {/* Bottom Section */}
       <div className="p-4 border-t border-border">

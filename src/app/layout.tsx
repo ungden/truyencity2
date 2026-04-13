@@ -67,6 +67,7 @@ export default function RootLayout({
         {/* Structured Data */}
         <WebsiteJsonLd />
         <OrganizationJsonLd />
+        <meta name="apple-itunes-app" content="app-id=6759160705" />
         <meta name="google-adsense-account" content="ca-pub-5160932470449783" />
       </head>
       <body className="font-sans antialiased">
