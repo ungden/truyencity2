@@ -6,7 +6,6 @@
  */
 
 import { Platform } from "react-native";
-import { MaxAdContentRating } from "react-native-google-mobile-ads";
 
 const isIOS = Platform.OS === "ios";
 
@@ -25,7 +24,7 @@ export const INTERSTITIAL_CHAPTER_INTERVAL = 4;
  */
 export const AD_REQUEST_CONFIG = {
   requestNonPersonalizedAdsOnly: false,
-  maxAdContentRating: MaxAdContentRating.T,
+  maxAdContentRating: "T" as const, // MaxAdContentRating.T — avoid module-level import crash on Expo Go
   // Keywords hint AdMob to serve game/app/video ads (higher eCPM)
   keywords: ["game", "mobile game", "app", "entertainment", "video"],
 };

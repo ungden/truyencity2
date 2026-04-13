@@ -5,8 +5,9 @@ import { useEffect, Component, type ReactNode } from "react";
 import { View, Text, Pressable } from "react-native";
 import { Stack } from "expo-router/stack";
 import { initRevenueCat } from "@/lib/revenuecat";
-import mobileAds, { MaxAdContentRating } from "react-native-google-mobile-ads";
-import * as TrackingTransparency from "expo-tracking-transparency";
+// Lazy-loaded: these native modules crash on Expo Go (no native binary)
+// import mobileAds, { MaxAdContentRating } from "react-native-google-mobile-ads";
+// import * as TrackingTransparency from "expo-tracking-transparency";
 
 // Error boundary to prevent crash-on-launch from killing the app
 class ErrorBoundary extends Component<
@@ -91,19 +92,21 @@ export default function RootLayout() {
       // Already handled inside initRevenueCat
     });
 
-    // Request ATT permission (required for personalized ads on iOS 14.5+)
-    // Then initialize AdMob SDK with content rating + keyword preferences
+    // Request ATT + init AdMob — lazy-loaded to avoid crash on Expo Go
     setTimeout(async () => {
       try {
-        await TrackingTransparency.requestTrackingPermissionsAsync();
+        const TT = require("expo-tracking-transparency");
+        await TT.requestTrackingPermissionsAsync();
       } catch {}
       try {
-        await mobileAds().setRequestConfiguration({
-          maxAdContentRating: MaxAdContentRating.T,
+        const ads = require("react-native-google-mobile-ads");
+        const mobileAdsInstance = ads.default();
+        await mobileAdsInstance.setRequestConfiguration({
+          maxAdContentRating: ads.MaxAdContentRating.T,
         });
-        await mobileAds().initialize();
+        await mobileAdsInstance.initialize();
       } catch (e) {
-        console.warn("[AdMob] Init failed:", e);
+        console.warn("[AdMob] Init skipped (Expo Go or native module missing):", e);
       }
     }, 1500);
   }, []);

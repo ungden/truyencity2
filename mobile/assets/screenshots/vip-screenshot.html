@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { width: 1290px; height: 2796px; background: #131620; font-family: -apple-system, system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.container { width: 1000px; text-align: center; }
+.crown { font-size: 120px; margin-bottom: 40px; }
+h1 { color: #fbbf24; font-size: 72px; font-weight: 800; margin-bottom: 20px; }
+.subtitle { color: #a1a1aa; font-size: 36px; margin-bottom: 80px; }
+.features { display: flex; flex-direction: column; gap: 40px; margin-bottom: 80px; }
+.feature { display: flex; align-items: center; gap: 30px; background: #1a1d28; border-radius: 24px; padding: 40px; }
+.feature-icon { font-size: 48px; flex-shrink: 0; }
+.feature-text { text-align: left; }
+.feature-title { color: #e8e6f0; font-size: 36px; font-weight: 700; }
+.feature-desc { color: #82818e; font-size: 28px; margin-top: 8px; }
+.plans { display: flex; gap: 30px; justify-content: center; }
+.plan { background: #1a1d28; border-radius: 24px; padding: 50px 40px; flex: 1; border: 2px solid #282b3a; }
+.plan.popular { border-color: #fbbf24; }
+.plan-name { color: #e8e6f0; font-size: 32px; font-weight: 700; }
+.plan-price { color: #fbbf24; font-size: 48px; font-weight: 800; margin-top: 16px; }
+.plan-period { color: #82818e; font-size: 24px; }
+.badge { background: #fbbf24; color: #131620; font-size: 22px; font-weight: 700; padding: 8px 20px; border-radius: 12px; display: inline-block; margin-bottom: 16px; }
+.logo { color: #7c3aed; font-size: 32px; font-weight: 800; margin-top: 60px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="crown">👑</div>
+  <h1>TruyenCity VIP</h1>
+  <p class="subtitle">Trải nghiệm đọc truyện không giới hạn</p>
+
+  <div class="features">
+    <div class="feature">
+      <span class="feature-icon">🚫</span>
+      <div class="feature-text">
+        <div class="feature-title">Không quảng cáo</div>
+        <div class="feature-desc">Đọc truyện không bị gián đoạn</div>
+      </div>
+    </div>
+    <div class="feature">
+      <span class="feature-icon">📥</span>
+      <div class="feature-text">
+        <div class="feature-title">Tải truyện offline</div>
+        <div class="feature-desc">Download truyện về đọc khi không có mạng</div>
+      </div>
+    </div>
+    <div class="feature">
+      <span class="feature-icon">🔊</span>
+      <div class="feature-text">
+        <div class="feature-title">Nghe audio không giới hạn</div>
+        <div class="feature-desc">Bản free chỉ được 1 tiếng/ngày</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="plans">
+    <div class="plan popular">
+      <span class="badge">PHỔ BIẾN</span>
+      <div class="plan-name">Gói Tháng</div>
+      <div class="plan-price">99,000đ</div>
+      <div class="plan-period">/tháng</div>
+    </div>
+    <div class="plan">
+      <span class="badge" style="background:#22c55e">TIẾT KIỆM</span>
+      <div class="plan-name">Gói Năm</div>
+      <div class="plan-price">999,000đ</div>
+      <div class="plan-period">/năm</div>
+    </div>
+  </div>
+
+  <p class="logo">TruyenCity</p>
+</div>
+</body>
+</html>
