@@ -8,6 +8,7 @@ import { ArrowLeft, BookOpen, Calendar, User } from 'lucide-react';
 import Link from 'next/link';
 import { NovelCoverUpload } from '@/components/admin/novel-cover-upload';
 import { RefreshableNovelPage } from '@/components/admin/refreshable-novel-page';
+import { NovelArticles } from '@/components/admin/NovelArticles';
 
 export const dynamic = 'force-dynamic';
 
@@ -91,7 +92,8 @@ export default async function NovelPage({
             </Card>
           </div>
 
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-6">
+            <NovelArticles novelId={id} />
             <Suspense fallback={<div>Đang tải...</div>}>
               <RefreshableNovelPage novelId={id} initialChapters={chapters} />
             </Suspense>
