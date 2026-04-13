@@ -186,7 +186,9 @@ function StatsGrid({ items }: { items: StatItem[] }) {
               gap: 6,
             }}
           >
-            <Text style={{ fontSize: isTablet ? 24 : 20 }}>{item.icon}</Text>
+            <View style={{ width: isTablet ? 36 : 32, height: isTablet ? 36 : 32, borderRadius: 8, backgroundColor: "#282b3a", alignItems: "center", justifyContent: "center" }}>
+              <Text style={{ fontSize: isTablet ? 18 : 16 }}>{item.icon}</Text>
+            </View>
             <Text
               style={{ fontSize: isTablet ? 24 : 22, fontWeight: "700", color: "#e8e6f0" }}
             >
@@ -676,7 +678,7 @@ export default function ProfileScreen() {
           }}
         >
           <Text style={{ fontSize: 24, fontWeight: "700", color: currentLevel.color }}>
-            {profile?.first_name?.[0]?.toUpperCase() || "?"}
+            {profile?.first_name?.[0]?.toUpperCase() || "👤"}
           </Text>
         </View>
         <View className="flex-1 gap-1">
@@ -723,10 +725,10 @@ export default function ProfileScreen() {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={{ fontSize: 15, fontWeight: "700", color: "#fbbf24" }}>
-                Nâng cấp Reader VIP
+                Nâng cấp VIP
               </Text>
-              <Text style={{ fontSize: 12, color: "#82818e", marginTop: 2 }}>
-                Không quảng cáo, tải offline, audio không giới hạn
+              <Text style={{ fontSize: 12, color: "#a1a1aa", marginTop: 2 }}>
+                Bỏ quảng cáo · Tải offline · Audio không giới hạn
               </Text>
             </View>
             <Text style={{ fontSize: 16, color: "#fbbf24" }}>›</Text>
