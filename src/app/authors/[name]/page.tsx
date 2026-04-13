@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { NovelCard } from "@/components/novel-card";
 import { Loader2, User, BookOpen } from "lucide-react";
 import { GENRE_CONFIG } from "@/lib/types/genre-config";
+import { AdPlacement } from "@/components/ads/AdPlacement";
 
 type AuthorDetails = {
   id: string;
@@ -141,6 +142,8 @@ export default function AuthorPage() {
             </div>
           </div>
         </Card>
+
+        <AdPlacement placement="between-content" slot="author-between" />
 
         <Card>
           <CardHeader>

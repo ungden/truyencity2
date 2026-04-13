@@ -55,12 +55,23 @@ const PLAN_PRICING: Record<'monthly' | 'yearly', { amount: number; months: numbe
 };
 
 function getSepayConfig() {
-  return {
+  const config = {
     apiKey: process.env.SEPAY_API_KEY || '',
     bankCode: process.env.SEPAY_BANK_CODE || 'MBBank',
     accountNumber: process.env.SEPAY_ACCOUNT_NUMBER || '',
     accountName: process.env.SEPAY_ACCOUNT_NAME || '',
   };
+
+  return config;
+}
+
+/** Returns true if SePay is fully configured and ready to accept payments. */
+export function isSepayConfigured(): boolean {
+  return !!(
+    process.env.SEPAY_API_KEY &&
+    process.env.SEPAY_ACCOUNT_NUMBER &&
+    process.env.SEPAY_ACCOUNT_NAME
+  );
 }
 
 // ── Service ────────────────────────────────────────────────────

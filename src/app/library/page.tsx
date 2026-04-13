@@ -6,6 +6,7 @@ import { NovelCard } from '@/components/novel-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { listBookmarks } from '@/services/bookmarks';
+import { AdPlacement } from '@/components/ads/AdPlacement';
 
 type ProgressRow = {
   novel_id: string;
@@ -150,6 +151,8 @@ export default function LibraryPage() {
             )}
           </TabsContent>
         </Tabs>
+
+        <AdPlacement placement="between-content" slot="library-bottom" />
       </main>
     </div>
   );

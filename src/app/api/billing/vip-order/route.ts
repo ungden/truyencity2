@@ -7,7 +7,7 @@
 
 import { createServerClient } from '@/integrations/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
-import { sepayService } from '@/services/billing/sepay-service';
+import { sepayService, isSepayConfigured } from '@/services/billing/sepay-service';
 import { logger, getRequestContext, createTimer } from '@/lib/security/logger';
 import {
   rateLimiter,
@@ -71,6 +71,15 @@ export async function POST(request: NextRequest) {
     }
 
     const { plan } = parseResult.data;
+
+    // Verify SePay is configured
+    if (!isSepayConfigured()) {
+      logger.warn('SePay not configured — missing env vars', requestContext);
+      return NextResponse.json(
+        { error: 'Thanh toán chưa sẵn sàng. Vui lòng thử lại sau.' },
+        { status: 503 }
+      );
+    }
 
     // Check if user is already VIP
     const { data: sub } = await supabase

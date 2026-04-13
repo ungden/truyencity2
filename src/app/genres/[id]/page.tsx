@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { supabase } from "@/integrations/supabase/client";
 import { getGenreLabel, getGenreIcon } from "@/lib/utils/genre";
+import { AdPlacement } from "@/components/ads/AdPlacement";
 
 type Novel = {
   id: string;
@@ -92,6 +93,8 @@ export default function GenrePage() {
           ))}
         </div>
       )}
+
+      <AdPlacement placement="between-content" slot="genre-detail-bottom" />
     </div>
   );
 }
