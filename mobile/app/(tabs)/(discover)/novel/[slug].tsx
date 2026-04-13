@@ -301,7 +301,7 @@ export default function NovelDetailScreen() {
       <View style={{ flex: 1, backgroundColor: C.bg }}>
         <ScrollView
           style={{ flex: 1 }}
-          contentContainerStyle={{ paddingBottom: 100 }}
+          contentContainerStyle={{ paddingBottom: 160 }}
         >
           {/* ═══════════════ HERO SECTION (always dark like ref) ═══════════════ */}
           <View
