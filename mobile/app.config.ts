@@ -18,7 +18,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     supportsTablet: true,
     bundleIdentifier: "com.truyencity.app",
-    buildNumber: "14",
+    buildNumber: "15",
     appStoreUrl: "https://apps.apple.com/app/truyencity/id6759160705",
     // Allow iPad multitasking (Split View, Slide Over). Required — apps that
     // support iPad without enabling multitasking commonly get flagged in
