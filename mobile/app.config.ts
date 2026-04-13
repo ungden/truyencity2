@@ -46,9 +46,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       SKAdNetworkItems: [
         { SKAdNetworkIdentifier: "cstr6suwn9.skadnetwork" },
       ],
-      GADApplicationIdentifier:
-        process.env.EXPO_PUBLIC_ADMOB_IOS_APP_ID ||
-        "ca-app-pub-3940256099942544~1458002511",
+      GADApplicationIdentifier: "ca-app-pub-5160932470449783~1161564690",
     },
   },
   android: {
@@ -84,9 +82,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         androidAppId:
           process.env.EXPO_PUBLIC_ADMOB_ANDROID_APP_ID ||
           "ca-app-pub-3940256099942544~3347511713",
-        iosAppId:
-          process.env.EXPO_PUBLIC_ADMOB_IOS_APP_ID ||
-          "ca-app-pub-3940256099942544~1458002511",
+        iosAppId: "ca-app-pub-5160932470449783~1161564690",
       },
     ],
   ],
