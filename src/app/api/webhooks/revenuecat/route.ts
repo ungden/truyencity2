@@ -186,7 +186,7 @@ export async function POST(request: NextRequest) {
 
         // Determine tier from entitlements (super_vip entitlement = Super VIP)
         const entitlements = event.entitlement_ids || [];
-        const isSuperVip = entitlements.includes('reader_super_vip');
+        const isSuperVip = entitlements.includes('Truyện City Pro') || entitlements.includes('reader_super_vip');
         const readerTier = isSuperVip ? 'super_vip' : 'vip';
 
         // Super VIP gets 3 boost cards on purchase/renewal
