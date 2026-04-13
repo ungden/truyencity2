@@ -113,78 +113,8 @@ export default function PaywallScreen() {
     );
   }
 
-  // Empty-state guard — no packages available (RevenueCat offering missing,
-  // StoreKit rejected the fetch, or the user is running on a sandbox/TestFlight
-  // environment where products aren't configured yet). Show a graceful
-  // fallback instead of an empty-looking paywall that might confuse reviewers.
-  if (packages.length === 0) {
-    return (
-      <ScrollView
-        className="flex-1"
-        style={{ backgroundColor: "#131620" }}
-        contentContainerClassName="items-center justify-center py-20 gap-4"
-      >
-        <Text style={{ fontSize: 48 }}>👑</Text>
-        <Text
-          style={{
-            fontSize: 20,
-            fontWeight: "800",
-            color: "#fbbf24",
-            textAlign: "center",
-            paddingHorizontal: 32,
-          }}
-        >
-          Gói VIP tạm thời không khả dụng
-        </Text>
-        <Text
-          style={{
-            fontSize: 14,
-            color: "#82818e",
-            textAlign: "center",
-            paddingHorizontal: 40,
-            lineHeight: 20,
-          }}
-        >
-          {error
-            ? "Không thể kết nối với App Store. Kiểm tra kết nối mạng và thử lại."
-            : "Vui lòng thử lại sau ít phút."}
-        </Text>
-        <View style={{ flexDirection: "row", gap: 12, marginTop: 12 }}>
-          <Pressable
-            onPress={handleRestore}
-            disabled={restoring}
-            style={{
-              backgroundColor: "#282b3a",
-              paddingHorizontal: 24,
-              paddingVertical: 12,
-              borderRadius: 14,
-            }}
-          >
-            <Text
-              style={{ color: "#e8e6f0", fontWeight: "600", fontSize: 14 }}
-            >
-              {restoring ? "Đang kiểm tra..." : "Khôi phục"}
-            </Text>
-          </Pressable>
-          <Pressable
-            onPress={() => router.back()}
-            style={{
-              backgroundColor: "#282b3a",
-              paddingHorizontal: 24,
-              paddingVertical: 12,
-              borderRadius: 14,
-            }}
-          >
-            <Text
-              style={{ color: "#e8e6f0", fontWeight: "600", fontSize: 14 }}
-            >
-              Quay lại
-            </Text>
-          </Pressable>
-        </View>
-      </ScrollView>
-    );
-  }
+  // No empty-state guard — always render full paywall with fallback prices
+  // so we can screenshot on Simulator and users see plans even if store is slow
 
   // Find monthly and annual packages
   const monthlyPkg = packages.find(
