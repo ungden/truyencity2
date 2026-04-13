@@ -23,6 +23,7 @@ import UnderlineTabs from "@/components/underline-tabs";
 import NovelCard from "@/components/novel-card";
 import StarRatingInput from "@/components/star-rating-input";
 import CommentsSection from "@/components/comments-section";
+import BoostCardButton from "@/components/boost-card-button";
 
 const CHAPTERS_PER_PAGE = 20;
 const DETAIL_TABS = ["Giới Thiệu", "Đánh Giá", "D.S Chương"];
@@ -409,6 +410,13 @@ export default function NovelDetailScreen() {
               </View>
             </View>
           </View>
+
+          {/* Boost card button (Super VIP only) */}
+          {novel && (
+            <View style={{ paddingHorizontal: 16, paddingVertical: 8 }}>
+              <BoostCardButton novelId={novel.id} novelTitle={novel.title} />
+            </View>
+          )}
 
           {/* ═══════════════ TABS ═══════════════ */}
           <UnderlineTabs

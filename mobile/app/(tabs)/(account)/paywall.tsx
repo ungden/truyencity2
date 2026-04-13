@@ -14,6 +14,7 @@ const VIP_FEATURES = [
   { icon: "🚫", title: "Không quảng cáo", desc: "Đọc truyện không bị gián đoạn bởi quảng cáo" },
   { icon: "📥", title: "Tải truyện offline", desc: "Download truyện về đọc khi không có mạng" },
   { icon: "🔊", title: "Nghe audio không giới hạn", desc: "Bản free chỉ được 1 tiếng/ngày" },
+  { icon: "🚀", title: "Thẻ thúc chương (Super VIP)", desc: "3 thẻ/tháng — truyện ra gấp đôi chương trong 7 ngày" },
 ] as const;
 
 // ── Main Component ────────────────────────────────────────────

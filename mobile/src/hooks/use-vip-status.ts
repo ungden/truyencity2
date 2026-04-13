@@ -26,7 +26,14 @@ function getPurchases() {
   }
 }
 
-export type ReaderTier = "free" | "vip";
+export type ReaderTier = "free" | "vip" | "super_vip";
+
+export interface ActiveBoost {
+  novel_id: string;
+  novel_title: string;
+  expires_at: string;
+  multiplier: number;
+}
 
 export interface ReaderStatus {
   reader_tier: ReaderTier;
@@ -41,21 +48,25 @@ export interface ReaderStatus {
   has_badge: boolean;
   can_download: boolean;
   can_use_tts: boolean;
+  boost_cards_remaining: number;
+  active_boosts: ActiveBoost[];
 }
 
 const DEFAULT_FREE_STATUS: ReaderStatus = {
   reader_tier: "free",
   expires_at: null,
   show_ads: true,
-  daily_download_limit: 0, // Free tier: no downloads (VIP only)
-  daily_tts_limit_seconds: 3600, // Free tier: 1 hour/day
+  daily_download_limit: 0,
+  daily_tts_limit_seconds: 3600,
   downloads_used_today: 0,
   tts_seconds_used_today: 0,
   has_exclusive_themes: false,
   has_early_access: false,
   has_badge: false,
-  can_download: false, // Free tier: no downloads
+  can_download: false,
   can_use_tts: true,
+  boost_cards_remaining: 0,
+  active_boosts: [],
 };
 
 const VIP_STATUS_OVERRIDES: Partial<ReaderStatus> = {
@@ -249,7 +260,8 @@ export function useVipStatus() {
 
   return {
     ...status,
-    isVip: status.reader_tier === "vip",
+    isVip: status.reader_tier === "vip" || status.reader_tier === "super_vip",
+    isSuperVip: status.reader_tier === "super_vip",
     loading,
     refresh,
     recordTTS,

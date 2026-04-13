@@ -7,7 +7,7 @@ import { PricingCards } from "@/components/billing/PricingCards";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Check, Headphones, BookOpen, ShieldOff } from "lucide-react";
+import { Check, Headphones, BookOpen, ShieldOff, Zap } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { Download } from "lucide-react";
 import { VipCheckoutModal } from "@/components/billing/VipCheckoutModal";
@@ -31,6 +31,17 @@ const READER_TIERS = [
       { icon: ShieldOff, text: "Không quảng cáo" },
       { icon: Download, text: "Tải truyện về đọc offline" },
       { icon: Headphones, text: "Nghe audio không giới hạn" },
+    ],
+  },
+  {
+    name: "Super VIP",
+    price: "199,000đ/tháng",
+    priceAnnual: "1,990,000đ/năm (tiết kiệm 17%)",
+    badge: "Cao cấp",
+    features: [
+      { icon: ShieldOff, text: "Tất cả quyền VIP" },
+      { icon: Zap, text: "3 Thẻ thúc chương/tháng" },
+      { icon: Zap, text: "Truyện ra gấp đôi chương trong 7 ngày khi dùng thẻ" },
     ],
   },
 ];

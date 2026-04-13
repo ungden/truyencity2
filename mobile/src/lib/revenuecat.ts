@@ -12,8 +12,9 @@ const REVENUECAT_IOS_KEY =
 const REVENUECAT_ANDROID_KEY =
   process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY ?? "";
 
-// Entitlement identifier — matches what's configured in RevenueCat dashboard
+// Entitlement identifiers — matches what's configured in RevenueCat dashboard
 export const ENTITLEMENT_READER_VIP = "Truyện City";
+export const ENTITLEMENT_READER_SUPER_VIP = "reader_super_vip";
 
 // Product identifiers — matches App Store Connect / Google Play Console
 export const PRODUCT_READER_VIP_MONTHLY = "reader_vip_monthly";

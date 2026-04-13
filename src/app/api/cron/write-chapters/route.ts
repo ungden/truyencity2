@@ -179,14 +179,32 @@ async function ensureDailyQuotasForActiveProjects(
   // from the start of the VN day, so they don't all fire at once.
   const cadenceMinutes = Math.floor(1440 / DAILY_CHAPTER_QUOTA); // 72 min
 
+  // Check for active boosts — boosted novels get 2x daily quota
+  const projectIds = projects.map((p) => p.id);
+  const { data: activeBoosts } = await supabase
+    .from('novel_boosts')
+    .select('novel_id,multiplier')
+    .in('novel_id', projectIds)
+    .eq('status', 'active')
+    .gt('expires_at', new Date().toISOString());
+
+  const boostMap = new Map<string, number>();
+  if (activeBoosts) {
+    for (const b of activeBoosts) {
+      const current = boostMap.get(b.novel_id) || 1;
+      boostMap.set(b.novel_id, Math.max(current, b.multiplier));
+    }
+  }
+
   const rows = projects.map((p) => {
     const seed = hashStringToInt(`${p.id}:${vnDate}`);
     const offsetMinutes = seed % cadenceMinutes;
     const nextDueMs = dayStartMs + offsetMinutes * 60 * 1000;
+    const boostMultiplier = boostMap.get(p.id) || 1;
     return {
       project_id: p.id,
       vn_date: vnDate,
-      target_chapters: DAILY_CHAPTER_QUOTA,
+      target_chapters: DAILY_CHAPTER_QUOTA * boostMultiplier,
       written_chapters: 0,
       status: 'active' as const,
       retry_count: 0,

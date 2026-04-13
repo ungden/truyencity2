@@ -179,20 +179,31 @@ export async function POST(request: NextRequest) {
       case 'UNCANCELLATION':
       case 'NON_RENEWING_PURCHASE':
       case 'SUBSCRIPTION_EXTENDED': {
-        // Grant or extend VIP
+        // Grant or extend VIP / Super VIP
         const expiresAt = event.expiration_at_ms
           ? new Date(event.expiration_at_ms).toISOString()
           : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days fallback
 
+        // Determine tier from entitlements (super_vip entitlement = Super VIP)
+        const entitlements = event.entitlement_ids || [];
+        const isSuperVip = entitlements.includes('reader_super_vip');
+        const readerTier = isSuperVip ? 'super_vip' : 'vip';
+
+        // Super VIP gets 3 boost cards on purchase/renewal
+        const boostUpdate = isSuperVip
+          ? { boost_cards_remaining: 3, boost_cards_reset_at: new Date().toISOString() }
+          : {};
+
         const { error } = await supabase
           .from('user_subscriptions')
           .update({
-            reader_tier: 'vip',
+            reader_tier: readerTier,
             reader_tier_expires_at: expiresAt,
             reader_tier_auto_renew: event.type !== 'NON_RENEWING_PURCHASE',
             reader_tier_payment_method: getPaymentMethod(event.store),
             reader_tier_store_tx_id: event.original_transaction_id,
             updated_at: new Date().toISOString(),
+            ...boostUpdate,
           })
           .eq('user_id', userId);
 

@@ -8,6 +8,7 @@ import type {
 import { supabase } from "@/lib/supabase";
 import {
   ENTITLEMENT_READER_VIP,
+  ENTITLEMENT_READER_SUPER_VIP,
   identifyUser,
   logOutRevenueCat,
   isRevenueCatReady,
@@ -25,8 +26,10 @@ function getPurchases() {
 }
 
 export interface RevenueCatState {
-  /** Whether user has active Reader VIP */
+  /** Whether user has active Reader VIP or Super VIP */
   isVip: boolean;
+  /** Whether user has Super VIP specifically */
+  isSuperVip: boolean;
   /** Full customer info from RevenueCat */
   customerInfo: CustomerInfo | null;
   /** Available packages for purchase */
@@ -50,7 +53,10 @@ export function useRevenueCat(): RevenueCatState {
   const [error, setError] = useState<string | null>(null);
 
   // Derive VIP status from RevenueCat entitlements
+  const isSuperVip =
+    customerInfo?.entitlements?.active?.[ENTITLEMENT_READER_SUPER_VIP] !== undefined;
   const isVip =
+    isSuperVip ||
     customerInfo?.entitlements?.active?.[ENTITLEMENT_READER_VIP] !== undefined;
 
   // Fetch customer info + available offerings
@@ -198,6 +204,7 @@ export function useRevenueCat(): RevenueCatState {
 
   return {
     isVip,
+    isSuperVip,
     customerInfo,
     packages,
     loading,
