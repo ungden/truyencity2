@@ -148,10 +148,13 @@ export default function ReadingScreen() {
   // settings.brightness: 1 = full bright (no overlay), 0 = very dim
   const brightnessOverlayOpacity = 1 - settings.brightness;
 
-  // Stop TTS when chapter changes
+  // Stop TTS when chapter/novel changes (must run before new content loads)
   useEffect(() => {
-    tts.stop();
-  }, [slug, chapter]);
+    return () => {
+      // Cleanup: stop TTS when navigating away or chapter changes
+      tts.stop();
+    };
+  }, [slug, chapterNumber]);
 
   // Auto-scroll logic
   useEffect(() => {
@@ -352,6 +355,8 @@ export default function ReadingScreen() {
   const hasNext = chapterNumber < totalChapters;
 
   function goToChapter(num: number) {
+    // Stop TTS immediately before navigating to prevent stale audio
+    tts.stop();
     if (process.env.EXPO_OS === "ios") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }

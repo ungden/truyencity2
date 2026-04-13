@@ -202,8 +202,8 @@ function HorizontalCard({ novel }: { novel: Novel }) {
             </Text>
           )}
           <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginTop: 2 }}>
-            <Text style={{ fontSize: isTablet ? 15 : 14, fontWeight: "500", color: "#ff9800" }}>
-              ★ {novel.rating ? novel.rating.toFixed(1) : "0.0"}
+            <Text style={{ fontSize: isTablet ? 15 : 14, fontWeight: "500", color: novel.rating ? "#ff9800" : "#a1a1aa" }}>
+              {novel.rating ? `★ ${novel.rating.toFixed(1)}` : "☆ —"}
             </Text>
             <Text style={{ fontSize: isTablet ? 15 : 14, fontWeight: "500", color: "#a1a1aa" }}>
               ▤ {chapterCount} chương
@@ -262,8 +262,8 @@ function DiscoverListCard({ novel }: { novel: Novel }) {
             </Text>
           )}
           <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginTop: 2 }}>
-            <Text style={{ fontSize: isTablet ? 15 : 14, fontWeight: "500", color: "#ff9800" }}>
-              ★ {novel.rating ? novel.rating.toFixed(1) : "0.0"}
+            <Text style={{ fontSize: isTablet ? 15 : 14, fontWeight: "500", color: novel.rating ? "#ff9800" : "#a1a1aa" }}>
+              {novel.rating ? `★ ${novel.rating.toFixed(1)}` : "☆ —"}
             </Text>
             <Text style={{ fontSize: isTablet ? 15 : 14, fontWeight: "500", color: "#a1a1aa" }}>
               ▤ {chapterCount} chương
@@ -346,8 +346,8 @@ function RankingCard({ novel, rank }: { novel: Novel; rank?: number }) {
             </Text>
           )}
           <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginTop: isTablet ? 4 : 2 }}>
-            <Text style={{ fontSize: isTablet ? 15 : 14, fontWeight: "500", color: "#ff9800" }}>
-              ★ {novel.rating ? novel.rating.toFixed(1) : "0.0"}
+            <Text style={{ fontSize: isTablet ? 15 : 14, fontWeight: "500", color: novel.rating ? "#ff9800" : "#a1a1aa" }}>
+              {novel.rating ? `★ ${novel.rating.toFixed(1)}` : "☆ —"}
             </Text>
             <Text style={{ fontSize: isTablet ? 15 : 14, fontWeight: "500", color: "#a1a1aa" }}>
               {chapterCount} chương
@@ -387,10 +387,16 @@ function FeaturedCard({ novel }: { novel: Novel }) {
           </Text>
         )}
         <View style={{ flexDirection: "row", alignItems: "center", gap: 4, marginTop: 2 }}>
-          <Text style={{ fontSize: 14, color: "#ff9800" }}>★★★★★</Text>
-          <Text style={{ fontSize: 14, color: "#a1a1aa" }}>
-            {novel.rating ? novel.rating.toFixed(1) : "0.0"}
-          </Text>
+          {novel.rating && novel.rating > 0 ? (
+            <>
+              <Text style={{ fontSize: 14, color: "#ff9800" }}>
+                {"★".repeat(Math.round(novel.rating))}{"☆".repeat(5 - Math.round(novel.rating))}
+              </Text>
+              <Text style={{ fontSize: 14, color: "#a1a1aa" }}>{novel.rating.toFixed(1)}</Text>
+            </>
+          ) : (
+            <Text style={{ fontSize: 14, color: "#a1a1aa" }}>☆☆☆☆☆ —</Text>
+          )}
         </View>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginTop: 8 }}>
           <Link href={`/novel/${novel.slug || novel.id}`} asChild>

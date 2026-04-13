@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { View, Text, ScrollView, Pressable } from "@/tw";
 import { Image } from "@/tw/image";
-import { Link, useLocalSearchParams, Stack, router } from "expo-router";
+import { Link, useLocalSearchParams, Stack, router, useFocusEffect } from "expo-router";
 import { supabase } from "@/lib/supabase";
 import { getGenreLabel } from "@/lib/genre";
 import type { Novel, Chapter } from "@/lib/types";
@@ -93,6 +93,23 @@ export default function NovelDetailScreen() {
   useEffect(() => {
     if (slug) fetchNovel();
   }, [slug]);
+
+  // Refresh stats when screen regains focus (e.g. after reading a chapter)
+  useFocusEffect(
+    useCallback(() => {
+      if (!novel) return;
+      supabase.rpc("get_novel_stats", { p_novel_id: novel.id }).then(({ data }) => {
+        if (data) {
+          setStats({
+            views: data.view_count ?? 0,
+            bookmarks: data.bookmark_count ?? 0,
+            rating: Math.round((data.rating_avg ?? 0) * 10) / 10,
+            ratingCount: data.rating_count ?? 0,
+          });
+        }
+      });
+    }, [novel?.id])
+  );
 
   async function fetchNovel() {
     try {
@@ -745,7 +762,7 @@ export default function NovelDetailScreen() {
         <View
           style={{
             position: "absolute",
-            bottom: 0,
+            bottom: 49, // Native tab bar height (~49pt on iOS)
             left: 0,
             right: 0,
             backgroundColor: isDark ? "#18181bF0" : "#ffffffF0",
@@ -754,8 +771,7 @@ export default function NovelDetailScreen() {
             flexDirection: "row",
             alignItems: "center",
             paddingHorizontal: 16,
-            paddingTop: 10,
-            paddingBottom: insets.bottom || 34,
+            paddingVertical: 10,
             gap: 12,
           }}
         >
