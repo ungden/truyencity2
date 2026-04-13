@@ -7,7 +7,7 @@ import { PricingCards } from "@/components/billing/PricingCards";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Check, Headphones, BookOpen, ShieldOff, Zap } from "lucide-react";
+import { Headphones, BookOpen, ShieldOff, Zap } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { Download } from "lucide-react";
 import { VipCheckoutModal } from "@/components/billing/VipCheckoutModal";
