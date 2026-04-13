@@ -1,6 +1,26 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import * as Speech from "expo-speech";
+import { Audio, InterruptionModeIOS, InterruptionModeAndroid } from "expo-av";
 import { stripHtml, splitIntoChunks, TTS_LANGUAGE } from "@/lib/tts";
+
+/**
+ * Activate an audio session so iOS keeps TTS alive in background.
+ * Must be called before Speech.speak() for background playback to work.
+ */
+async function activateBackgroundAudioSession() {
+  try {
+    await Audio.setAudioModeAsync({
+      allowsRecordingIOS: false,
+      staysActiveInBackground: true,
+      interruptionModeIOS: InterruptionModeIOS.DuckOthers,
+      playsInSilentModeIOS: true,
+      shouldDuckAndroid: true,
+      interruptionModeAndroid: InterruptionModeAndroid.DuckOthers,
+    });
+  } catch (e) {
+    console.warn("[TTS] Failed to set audio mode:", e);
+  }
+}
 
 export type TTSStatus = "idle" | "playing" | "paused";
 
@@ -100,8 +120,11 @@ export function useTTS(): UseTTSReturn {
     });
   }, []);
 
-  const speak = useCallback((htmlContent: string) => {
+  const speak = useCallback(async (htmlContent: string) => {
     Speech.stop();
+
+    // Activate background audio session so TTS continues when app is backgrounded
+    await activateBackgroundAudioSession();
 
     const plainText = stripHtml(htmlContent);
     if (!plainText) return;

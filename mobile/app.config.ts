@@ -25,6 +25,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     // review. Apple's April 2026 rejection test was on iPad Air M4.
     requireFullScreen: false,
     infoPlist: {
+      UIBackgroundModes: ["audio"],
       ITSAppUsesNonExemptEncryption: false,
       NSAppTransportSecurity: {
         NSAllowsArbitraryLoads: false,
