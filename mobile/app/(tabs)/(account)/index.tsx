@@ -14,7 +14,8 @@ import {
   type Achievement,
 } from "@/lib/gamification";
 import * as Haptics from "expo-haptics";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback } from "react";
 import {
   getOfflineStorageSize,
   deleteAllOfflineData,
@@ -360,6 +361,9 @@ export default function ProfileScreen() {
   const { isVip } = useRevenueCat();
   const { isTablet, centeredStyle } = useDevice();
   const [offlineSize, setOfflineSize] = useState(0);
+
+  // Re-fetch profile when screen regains focus (e.g. after paywall)
+  useFocusEffect(useCallback(() => { refetch(); }, [refetch]));
 
   useEffect(() => {
     try {

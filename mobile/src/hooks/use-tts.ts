@@ -61,9 +61,12 @@ export function useTTS(): UseTTSReturn {
   const isStoppedRef = useRef(false);
   // For Android pseudo-pause: track how far into current chunk we've spoken
   const pausedChunkOffset = useRef(0);
+  // Prevents status reset when changing speed mid-playback
+  const isChangingSpeed = useRef(false);
 
-  // Cleanup on unmount
+  // Activate background audio session on mount + cleanup on unmount
   useEffect(() => {
+    activateBackgroundAudioSession();
     return () => {
       try { Speech.stop(); } catch {}
     };
@@ -100,7 +103,7 @@ export function useTTS(): UseTTSReturn {
       rate: speedRef.current,
       pitch: 1.0,
       onDone: () => {
-        if (!isPausedRef.current && !isStoppedRef.current) {
+        if (!isPausedRef.current && !isStoppedRef.current && !isChangingSpeed.current) {
           // Move to next chunk
           pausedChunkOffset.current = 0;
           speakChunk(chunkIndex + 1, 0);
@@ -120,11 +123,8 @@ export function useTTS(): UseTTSReturn {
     });
   }, []);
 
-  const speak = useCallback(async (htmlContent: string) => {
+  const speak = useCallback((htmlContent: string) => {
     Speech.stop();
-
-    // Activate background audio session so TTS continues when app is backgrounded
-    await activateBackgroundAudioSession();
 
     const plainText = stripHtml(htmlContent);
     if (!plainText) return;
@@ -186,13 +186,15 @@ export function useTTS(): UseTTSReturn {
 
     // If currently playing, restart current chunk at new speed
     if (!isPausedRef.current && !isStoppedRef.current && status === "playing") {
+      isChangingSpeed.current = true;
       isPausedRef.current = true; // prevent onDone from advancing
       Speech.stop();
       // Small delay to let stop() complete before re-speaking
       setTimeout(() => {
         isPausedRef.current = false;
+        isChangingSpeed.current = false;
         speakChunk(currentChunkRef.current, 0);
-      }, 50);
+      }, 100);
     }
   }, [status, speakChunk]);
 

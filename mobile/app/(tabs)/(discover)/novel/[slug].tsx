@@ -762,7 +762,7 @@ export default function NovelDetailScreen() {
         <View
           style={{
             position: "absolute",
-            bottom: 49, // Native tab bar height (~49pt on iOS)
+            bottom: 49 + insets.bottom, // Tab bar (49) + safe area (home indicator)
             left: 0,
             right: 0,
             backgroundColor: isDark ? "#18181bF0" : "#ffffffF0",
