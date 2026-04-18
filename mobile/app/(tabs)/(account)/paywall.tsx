@@ -264,6 +264,9 @@ export default function PaywallScreen() {
             <Pressable
               key={plan.id}
               onPress={() => setSelectedPlan(plan.id)}
+              accessibilityRole="radio"
+              accessibilityState={{ selected: isSelected }}
+              accessibilityLabel={`${plan.label} — ${plan.price}${plan.period}${plan.sublabel ? `. ${plan.sublabel}` : ""}`}
               style={{
                 backgroundColor: "#1a1d28",
                 borderRadius: 16,
@@ -312,6 +315,9 @@ export default function PaywallScreen() {
         <Pressable
           onPress={handlePurchase}
           disabled={purchasing || loading}
+          accessibilityRole="button"
+          accessibilityLabel={`Nâng cấp ${selectedOption.label} với giá ${selectedOption.price}${selectedOption.period}`}
+          accessibilityState={{ disabled: purchasing || loading, busy: purchasing }}
           style={{
             backgroundColor: purchasing ? "#b8860b" : "#fbbf24",
             borderRadius: 16,

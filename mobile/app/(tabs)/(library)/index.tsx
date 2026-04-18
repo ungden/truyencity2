@@ -228,16 +228,18 @@ export default function LibraryScreen() {
               </View>
               <Pressable
                 onPress={() => handleDeleteOfflineNovel(item)}
-                hitSlop={8}
+                hitSlop={16}
                 style={{
-                  paddingHorizontal: 10,
-                  paddingVertical: 6,
-                  borderRadius: 8,
+                  paddingHorizontal: 14,
+                  paddingVertical: 10,
+                  borderRadius: 10,
                   backgroundColor: "#ef444418",
                   marginLeft: 8,
                 }}
+                accessibilityRole="button"
+                accessibilityLabel={`Xóa truyện ${item.title} khỏi thiết bị`}
               >
-                <Text style={{ color: "#ef4444", fontSize: 12, fontWeight: "600" }}>
+                <Text style={{ color: "#ef4444", fontSize: 13, fontWeight: "600" }}>
                   Xóa
                 </Text>
               </Pressable>

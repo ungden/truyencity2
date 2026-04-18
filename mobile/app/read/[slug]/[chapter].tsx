@@ -887,10 +887,13 @@ export default function ReadingScreen() {
 
           <Pressable
             onPress={cycleTTSSpeed}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel={`Tốc độ đọc ${tts.speed}x, nhấn để đổi`}
             style={{
-              paddingHorizontal: 10,
-              paddingVertical: 6,
-              borderRadius: 8,
+              paddingHorizontal: 12,
+              paddingVertical: 10,
+              borderRadius: 10,
               backgroundColor: theme.controlBorder,
             }}
           >
@@ -956,9 +959,18 @@ export default function ReadingScreen() {
           </Text>
         </Pressable>
 
-        {/* TTS trigger */}
+        {/* TTS trigger — reads the chapter aloud, continues in background */}
         <Pressable
           onPress={handleTTSToggle}
+          accessibilityRole="button"
+          accessibilityLabel={
+            tts.status === "playing"
+              ? "Dừng đọc truyện"
+              : tts.status === "paused"
+              ? "Tiếp tục đọc truyện"
+              : "Nghe truyện bằng giọng đọc"
+          }
+          accessibilityHint="Âm thanh tiếp tục phát khi khoá máy hoặc chuyển ứng dụng"
           style={{
             paddingHorizontal: 16,
             paddingVertical: 10,
