@@ -3,22 +3,24 @@ import * as Speech from "expo-speech";
 import { Audio, InterruptionModeIOS, InterruptionModeAndroid } from "expo-av";
 import { stripHtml, splitIntoChunks, TTS_LANGUAGE } from "@/lib/tts";
 
+const isIOS = process.env.EXPO_OS === "ios";
+
 /**
  * Activate the audio session.
  *
- * On iOS, the heavy lifting for background audio is done natively by the
- * `with-spoken-audio-session` config plugin (see mobile/plugins), which runs
- * in AppDelegate.application(didFinishLaunchingWithOptions:) and sets:
- *   AVAudioSession.Category.playback
- *   AVAudioSession.Mode.spokenAudio
- *   AVAudioSession.RouteSharingPolicy.longFormAudio
+ * iOS: Do NOT call Audio.setAudioModeAsync — it would overwrite the
+ * .spokenAudio mode and .longFormAudio policy that our native config
+ * plugin (plugins/with-spoken-audio-session.js) sets at app launch.
+ * expo-av's JS API only exposes category+interruption mode, so any call
+ * here would silently downgrade the session to the default mode and
+ * break AVSpeechSynthesizer's background playback.
  *
- * That native setup is what actually allows AVSpeechSynthesizer to keep
- * speaking when the screen is locked or the app is backgrounded — the JS
- * setAudioModeAsync call below just ensures expo-av doesn't override it
- * if some other code path activates the session.
+ * Android: still configure via JS since we don't have a native plugin
+ * there and Speech.speak() doesn't need the spokenAudio niceties to
+ * survive backgrounding on Android.
  */
 async function activateAudioSession() {
+  if (isIOS) return; // native plugin handles iOS — see file header.
   try {
     await Audio.setAudioModeAsync({
       allowsRecordingIOS: false,
@@ -55,8 +57,6 @@ interface UseTTSReturn {
   /** Progress: total chunks */
   totalChunks: number;
 }
-
-const isIOS = process.env.EXPO_OS === "ios";
 
 export function useTTS(): UseTTSReturn {
   const [status, setStatus] = useState<TTSStatus>("idle");
