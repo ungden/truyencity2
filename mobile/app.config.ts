@@ -18,7 +18,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     supportsTablet: true,
     bundleIdentifier: "com.truyencity.app",
-    buildNumber: "35",
+    buildNumber: "36",
     usesIapIOS: true, // Enable In-App Purchase capability (required for subscriptions)
     appStoreUrl: "https://apps.apple.com/app/truyencity/id6759160705",
     // Allow iPad multitasking (Split View, Slide Over). Required — apps that
@@ -71,6 +71,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-secure-store",
     "expo-web-browser",
     "expo-apple-authentication",
+    // Configure iOS AVAudioSession for background TTS (required by 2.5.4
+    // since we declare UIBackgroundModes: ["audio"]).
+    "./plugins/with-spoken-audio-session",
     [
       "expo-tracking-transparency",
       {
