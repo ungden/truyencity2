@@ -5,20 +5,44 @@ import { stripHtml, splitIntoChunks, TTS_LANGUAGE } from "@/lib/tts";
 
 /**
  * Activate an audio session so iOS keeps TTS alive in background.
- * Must be called before Speech.speak() for background playback to work.
+ *
+ * Critical for Apple guideline 2.5.4 (UIBackgroundModes: audio).
+ * We use MixWithOthers so the silent-loop keeper track can coexist with
+ * AVSpeechSynthesizer's output — the silent loop fills gaps between TTS
+ * chunks so iOS doesn't suspend the audio session when the user locks the
+ * device mid-gap.
  */
 async function activateBackgroundAudioSession() {
   try {
     await Audio.setAudioModeAsync({
       allowsRecordingIOS: false,
       staysActiveInBackground: true,
-      interruptionModeIOS: InterruptionModeIOS.DuckOthers,
+      interruptionModeIOS: InterruptionModeIOS.MixWithOthers,
       playsInSilentModeIOS: true,
-      shouldDuckAndroid: true,
-      interruptionModeAndroid: InterruptionModeAndroid.DuckOthers,
+      shouldDuckAndroid: false,
+      interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
     });
   } catch (e) {
     console.warn("[TTS] Failed to set audio mode:", e);
+  }
+}
+
+/**
+ * Start a silent looping audio track. Its only purpose is to keep the iOS
+ * AVAudioSession active across the gaps between Speech chunks so the OS
+ * doesn't pause us when the app backgrounds. Without this, expo-speech
+ * stops the moment the device locks.
+ */
+async function createSilentKeeper(): Promise<Audio.Sound | null> {
+  try {
+    const { sound } = await Audio.Sound.createAsync(
+      require("../../assets/silent.mp3"),
+      { isLooping: true, volume: 0.01, shouldPlay: false }
+    );
+    return sound;
+  } catch (e) {
+    console.warn("[TTS] Failed to create silent keeper:", e);
+    return null;
   }
 }
 
@@ -63,13 +87,47 @@ export function useTTS(): UseTTSReturn {
   const pausedChunkOffset = useRef(0);
   // Prevents status reset when changing speed mid-playback
   const isChangingSpeed = useRef(false);
+  // Silent keeper — keeps iOS audio session alive across TTS chunk gaps
+  const silentKeeperRef = useRef<Audio.Sound | null>(null);
 
   // Activate background audio session on mount + cleanup on unmount
   useEffect(() => {
     activateBackgroundAudioSession();
     return () => {
       try { Speech.stop(); } catch {}
+      if (silentKeeperRef.current) {
+        silentKeeperRef.current.unloadAsync().catch(() => {});
+        silentKeeperRef.current = null;
+      }
     };
+  }, []);
+
+  const startSilentKeeper = useCallback(async () => {
+    if (!isIOS) return;
+    try {
+      if (!silentKeeperRef.current) {
+        silentKeeperRef.current = await createSilentKeeper();
+      }
+      await silentKeeperRef.current?.playAsync();
+    } catch (e) {
+      console.warn("[TTS] Failed to start silent keeper:", e);
+    }
+  }, []);
+
+  const pauseSilentKeeper = useCallback(async () => {
+    if (!isIOS) return;
+    try {
+      await silentKeeperRef.current?.pauseAsync();
+    } catch {}
+  }, []);
+
+  const stopSilentKeeper = useCallback(async () => {
+    if (!isIOS) return;
+    try {
+      if (silentKeeperRef.current) {
+        await silentKeeperRef.current.stopAsync();
+      }
+    } catch {}
   }, []);
 
   const speakChunk = useCallback((chunkIndex: number, textOffset: number = 0) => {
@@ -79,6 +137,7 @@ export function useTTS(): UseTTSReturn {
       setStatus("idle");
       setCurrentChunk(0);
       currentChunkRef.current = 0;
+      stopSilentKeeper();
       return;
     }
 
@@ -121,7 +180,7 @@ export function useTTS(): UseTTSReturn {
         }
       },
     });
-  }, []);
+  }, [stopSilentKeeper]);
 
   const speak = useCallback((htmlContent: string) => {
     Speech.stop();
@@ -138,8 +197,13 @@ export function useTTS(): UseTTSReturn {
     pausedChunkOffset.current = 0;
     setTotalChunks(chunks.length);
 
+    // Start the silent keeper first so the audio session is active before
+    // AVSpeechSynthesizer begins. Fire-and-forget so TTS startup isn't
+    // blocked on audio file loading.
+    startSilentKeeper();
+
     speakChunk(0, 0);
-  }, [speakChunk]);
+  }, [speakChunk, startSilentKeeper]);
 
   const pause = useCallback(() => {
     if (isIOS) {
@@ -147,6 +211,7 @@ export function useTTS(): UseTTSReturn {
       Speech.pause();
       setStatus("paused");
       isPausedRef.current = true;
+      pauseSilentKeeper();
     } else {
       // Android: pseudo-pause via stop
       // We track the current chunk index. On resume, we'll restart
@@ -155,20 +220,21 @@ export function useTTS(): UseTTSReturn {
       Speech.stop();
       setStatus("paused");
     }
-  }, []);
+  }, [pauseSilentKeeper]);
 
   const resume = useCallback(() => {
     if (isIOS) {
       Speech.resume();
       setStatus("playing");
       isPausedRef.current = false;
+      startSilentKeeper();
     } else {
       // Android: re-speak from current chunk
       isPausedRef.current = false;
       isStoppedRef.current = false;
       speakChunk(currentChunkRef.current, 0);
     }
-  }, [speakChunk]);
+  }, [speakChunk, startSilentKeeper]);
 
   const stop = useCallback(() => {
     isStoppedRef.current = true;
@@ -178,7 +244,8 @@ export function useTTS(): UseTTSReturn {
     setStatus("idle");
     setCurrentChunk(0);
     currentChunkRef.current = 0;
-  }, []);
+    stopSilentKeeper();
+  }, [stopSilentKeeper]);
 
   const setSpeed = useCallback((rate: number) => {
     speedRef.current = rate;
