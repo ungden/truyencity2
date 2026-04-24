@@ -6,6 +6,14 @@ import { View, Text, Pressable } from "react-native";
 import { Stack } from "expo-router/stack";
 import { initRevenueCat } from "@/lib/revenuecat";
 import { TurboModuleRegistry } from "react-native";
+import TrackPlayer from "react-native-track-player";
+
+// Register RNTP playback service at module-load time (required by RNTP — must
+// happen before the app's first render). Without this, the iOS lock-screen
+// Now Playing widget won't appear and iOS will suspend TTS in background.
+TrackPlayer.registerPlaybackService(
+  () => require("../src/lib/tts-playback-service")
+);
 
 // Error boundary to prevent crash-on-launch from killing the app
 class ErrorBoundary extends Component<

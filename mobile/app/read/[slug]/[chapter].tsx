@@ -113,6 +113,7 @@ export default function ReadingScreen() {
   // State
   const [novelId, setNovelId] = useState<string | null>(null);
   const [novelTitle, setNovelTitle] = useState("");
+  const [novelCover, setNovelCover] = useState<string | undefined>(undefined);
   const [currentChapter, setCurrentChapter] = useState<Chapter | null>(null);
   const [totalChapters, setTotalChapters] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -212,7 +213,14 @@ export default function ReadingScreen() {
   function handleTTSToggle() {
     if (tts.status === "idle") {
       if (currentChapter?.content) {
-        tts.speak(currentChapter.content);
+        const chapterLabel = currentChapter.title
+          ? `Chương ${currentChapter.chapter_number}: ${currentChapter.title}`
+          : `Chương ${currentChapter.chapter_number}`;
+        tts.speak(currentChapter.content, {
+          title: chapterLabel,
+          artist: novelTitle || "TruyenCity",
+          artwork: novelCover,
+        });
       }
     } else if (tts.status === "playing") {
       tts.pause();
@@ -244,14 +252,14 @@ export default function ReadingScreen() {
     try {
       const { data: novelData, error: novelError } = await supabase
         .from("novels")
-        .select("id, title, slug")
+        .select("id, title, slug, cover_url")
         .eq("slug", slug)
         .single();
 
       if (novelError || !novelData) {
         const { data: byId } = await supabase
           .from("novels")
-          .select("id, title, slug")
+          .select("id, title, slug, cover_url")
           .eq("id", slug)
           .single();
         if (!byId) {
@@ -261,10 +269,12 @@ export default function ReadingScreen() {
         }
         setNovelId(byId.id);
         setNovelTitle(byId.title);
+        setNovelCover((byId as any).cover_url || undefined);
         await fetchChapterData(byId.id);
       } else {
         setNovelId(novelData.id);
         setNovelTitle(novelData.title);
+        setNovelCover((novelData as any).cover_url || undefined);
         await fetchChapterData(novelData.id);
       }
     } catch (err) {
@@ -355,13 +365,18 @@ export default function ReadingScreen() {
   const hasNext = chapterNumber < totalChapters;
 
   function goToChapter(num: number) {
+    // Skip interstitial ads if TTS was active — AdMob reconfigures the audio
+    // session (ambient category) and would kill background playback on resume.
+    const wasTtsActive = tts.status !== "idle";
     // Stop TTS immediately before navigating to prevent stale audio
     tts.stop();
     if (process.env.EXPO_OS === "ios") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    // Show interstitial ad every N chapter navigations (non-blocking)
-    onChapterChange();
+    if (!wasTtsActive) {
+      // Show interstitial ad every N chapter navigations (non-blocking)
+      onChapterChange();
+    }
     router.replace(`/read/${slug}/${num}`);
   }
 
