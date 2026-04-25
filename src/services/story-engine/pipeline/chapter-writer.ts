@@ -124,6 +124,18 @@ QUY TẮC:
 11. PAYOFF NHỎ TRONG CHƯƠNG (BẮT BUỘC): Mỗi chương phải có ít nhất 1 "hạt giống đã gieo" được thu hoạch ngay trong chương (gợi ý ở scene đầu, trả ở scene sau). CẤM chỉ setup mà không payoff.
 12. SUBTEXT XUNG ĐỘT: Mỗi chương cần ít nhất 1 cảnh đối thoại có lớp nghĩa ngầm (không nói thẳng mục tiêu thật).
 
+FIDELITY VỚI CHAPTER_BRIEF (TUYỆT ĐỐI BẮT BUỘC):
+- Nếu context có "CHAPTER BRIEF" hoặc "Brief chương N" → bắt buộc TÔN TRỌNG nội dung brief làm xương sống chương
+- Sự kiện chính trong brief PHẢI xảy ra (vd brief = "MC sửa server quán net Net Việt" → MC phải đến quán Net Việt và sửa server, không skip)
+- CẤM tự sáng tạo plot lớn không có trong brief / arc plan / master outline:
+  * KHÔNG thêm nhân vật bí ẩn biết bí mật MC (xuyên không, identity, năng lực)
+  * KHÔNG thêm tổ chức / tập đoàn bí mật theo dõi MC (chỉ có khi master_outline đề cập rõ)
+  * KHÔNG thêm tin nhắn / cuộc gọi từ "kẻ lạ biết bí mật" làm cliffhanger
+  * KHÔNG thêm yếu tố sci-fi / siêu nhiên / tu tiên / thriller nếu genre + master outline là pure đô thị/kinh doanh
+- Chỉ được tự sáng tạo các CHI TIẾT TRONG SCOPE: tên NPC nhỏ, lời thoại cụ thể, tả cảnh, micro-conflict trong scene
+- Nếu cảm thấy brief "thiếu hấp dẫn" → KHÔNG được thay thế plot; thay vào đó AMPLIFY brief bằng tả chi tiết, nội tâm, dopamine moments
+- TEST: nếu reader đọc xong chương rồi đọc brief, phải khớp ≥80% sự kiện chính
+
 OUTPUT: JSON theo format ChapterOutline.`;
 
 const WRITER_SYSTEM = `Bạn là WRITER AGENT — nhà văn chuyên nghiệp viết truyện dài kỳ tiếng Việt.
