@@ -291,7 +291,7 @@ ALL scheduling via pg_cron. Vercel cron REMOVED. Secret stored in Supabase Vault
 - **Bundle ID**: `com.truyencity.app`
 - **ASC App ID**: `6759160705`
 - **Apple Team**: `Q8A7CBYV5Z` (Tien Duong Le, Individual)
-- **Current version**: 1.0.0, buildNumber: `"2"`
+- **Current version**: 1.0.3, buildNumber: `"40"` (TestFlight as of 2026-04-25; ASC build IDs 34-39 came from earlier session attempts — EAS auto-bumps to next free integer)
 
 ### Build Command
 ```bash
