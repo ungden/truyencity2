@@ -317,6 +317,39 @@ npx eas build --platform ios --profile production --non-interactive --auto-submi
 - Version ID: `a12fa36c-2e3f-4ab4-ad66-af040a7c406b`
 - Build ID: `8c739520-d257-4402-84f1-e52bd6c89063`
 
+### ⚠️ NEW BUILD CHECKLIST (BẮT BUỘC khi push bản build mới lên store)
+
+Mỗi lần lên 1 build mới (iOS hoặc Android), PHẢI làm các bước sau theo thứ tự:
+
+1. **Bump version trong `mobile/app.config.ts`**
+   - `version: "1.0.X"` (semver — chỉ tăng khi có user-facing changes)
+   - `ios.buildNumber: "N"` (tăng monotonically; không reset khi version đổi)
+   - `android.versionCode: M` (số nguyên, tăng monotonically)
+
+2. **Build + submit qua EAS** (xem Build Command phía trên)
+
+3. **Sau khi App Store / Play Store đã release** (status "Ready for Sale"), CẬP NHẬT bảng `app_versions` trong Supabase:
+   ```sql
+   UPDATE public.app_versions
+   SET latest_version = '1.0.X',
+       latest_build = 'N',
+       release_notes = 'Sửa lỗi ABC, thêm feature XYZ...',
+       released_at = now(),
+       updated_at = now()
+   WHERE platform = 'ios';   -- hoặc 'android'
+   ```
+   - Chỉ bump `min_supported_version` khi cần FORCE user cũ phải update (vd có security/breaking change)
+   - Set `force_update = true` chỉ trong trường hợp khẩn cấp (block toàn bộ user cũ)
+
+4. **Mobile in-app update prompt** (chưa build, dự kiến tương lai):
+   - DB table `app_versions` đã sẵn sàng (migration `app_versions_table` 2026-04-25)
+   - Khi build feature: tạo `GET /api/app/version?platform=ios&version=X` → mobile `useAppUpdateCheck()` hook fire on launch → `<UpdateModal>` hiện "Cập nhật ngay" → `Linking.openURL(store_url)`
+   - Sketch architecture đã thảo luận; build khi có nhu cầu retention/marketing đẩy version
+
+5. **Update CLAUDE.md** — đổi `Current version` ở trên (line ~294) để reflect bản hiện tại
+
+**Tóm gọn**: bump → build → submit → đợi release → UPDATE `app_versions` → ghi nhớ.
+
 ---
 
 ## Image Delivery + Branding
