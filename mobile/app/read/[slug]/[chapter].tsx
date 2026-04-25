@@ -24,6 +24,7 @@ import type { Chapter } from "@/lib/types";
 import RenderHtml from "react-native-render-html";
 import * as Haptics from "expo-haptics";
 import { useTTS } from "@/hooks/use-tts";
+import { ttsController } from "@/lib/tts-controller";
 import { useDevice } from "@/hooks/use-device";
 import { TTS_SPEEDS } from "@/lib/tts";
 import { getChapterOffline } from "@/lib/offline-db";
@@ -379,6 +380,22 @@ export default function ReadingScreen() {
     }
     router.replace(`/read/${slug}/${num}`);
   }
+
+  // ── Auto-advance: when TTS finishes the last chunk, navigate to next chapter ──
+  useEffect(() => {
+    const unsubscribe = ttsController.onChapterComplete(() => {
+      if (hasNext) {
+        if (process.env.EXPO_OS === "ios") {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        }
+        // Navigate; the next chapter screen will mount, and if user had TTS
+        // active (which they did — we got here from TTS finishing), the
+        // TTS toggle preserves auto-resume via its own logic if desired.
+        router.replace(`/read/${slug}/${chapterNumber + 1}`);
+      }
+    });
+    return unsubscribe;
+  }, [slug, chapterNumber, hasNext]);
 
   // ── Scroll handling (with progress save + mark-as-read) ──
 

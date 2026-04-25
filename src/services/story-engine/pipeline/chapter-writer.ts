@@ -157,6 +157,13 @@ CHỐNG LẶP CẤU TRÚC AI (CỰC KỲ QUAN TRỌNG):
 - Cũng dùng chức danh/biệt hiệu thay tên: "tên thiếu niên", "vị tông chủ trẻ", "kẻ mới đến"
 - MỤC TIÊU: Tên MC không quá 20 lần/10.000 chữ. Nếu vượt → thay bằng đại từ
 
+TÊN ĐẦY ĐỦ (BẮT BUỘC, CHỐNG GIẢM TÊN):
+- Trong văn TƯỜNG THUẬT (không phải dialogue), khi gọi tên nhân vật → DÙNG TÊN ĐẦY ĐỦ ("Lý Quang Vinh", "Trần Quốc Hùng", "Tô Lăng"), KHÔNG cắt cụt thành "Vinh", "Hùng", "Lăng".
+- Tên cụt CHỈ dùng trong DIALOGUE giữa người thân (bạn bè, gia đình, người yêu) — vd "— Vinh, em ổn không?" / "— Hùng à!".
+- Lý do: webnovel dài 1000+ chương, độc giả mới gặp nhân vật ở chương N sẽ quên nếu chỉ thấy tên cụt.
+- Dùng họ + tên ("Lý Quang Vinh") giúp brand tên nhân vật cho marketing/cosplay/mạng xã hội.
+- Mẫu chuẩn: "Lý Quang Vinh nghiến răng" ✅ thay vì "Vinh nghiến răng" ❌
+
 CẤM VĂN MẪU AI: Loại bỏ "Hít một ngụm khí lạnh", "Không thể tin nổi", "Đột nhiên", "Khẽ nhếch mép". Tả hành động thực tế.
 
 NỘI TÂM ĐA LỚP (mỗi scene chính): 3 lớp: Bề mặt (MC nói gì) → Thật sự (MC cảm thấy gì) → Sâu nhất (nỗi sợ/khao khát bí mật).

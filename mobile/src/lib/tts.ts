@@ -56,6 +56,49 @@ export function stripHtml(html: string): string {
   return text.trim();
 }
 
+// ─── TTS Sanitizer ───────────────────────────────────────────
+//
+// Vietnamese tiểu thuyết uses em-dash (—) at the start of a paragraph as
+// the dialogue marker (analogous to opening quotation). expo-speech's
+// underlying TTS engines (iOS AVSpeechSynthesizer, Android TextToSpeech)
+// pronounce `—` as "ngang" / "dash" in vi-VN, which sounds robotic.
+// We replace the dialogue-marker dash with empty (the line break already
+// signals a new speaker), and any inline em-dash with a comma so the
+// engine inserts a natural pause instead of reading the punctuation.
+
+/**
+ * Normalize text for TTS: strip dashes, ellipsis, quote chars that the
+ * engine pronounces literally in vi-VN. Apply AFTER stripHtml().
+ */
+export function sanitizeForTTS(text: string): string {
+  let out = text;
+
+  // Em-dash / en-dash at start of line (dialogue marker) → drop
+  out = out.replace(/(^|\n)\s*[—–]\s*/g, "$1");
+
+  // Em-dash / en-dash mid-sentence → comma (gives a natural pause)
+  out = out.replace(/\s*[—–]\s*/g, ", ");
+
+  // Lone hyphens used as dialogue markers (older imports) → drop at line start
+  out = out.replace(/(^|\n)\s*-\s+/g, "$1");
+
+  // Quotation marks → drop (engine sometimes reads "ngoặc kép")
+  out = out.replace(/[“”„«»]/g, "");
+
+  // Three+ dots collapse to single ellipsis (engine handles … fine, but ... → "ba chấm")
+  out = out.replace(/\.{3,}/g, "…");
+
+  // Asterisks / underscores / brackets sometimes leaked from markdown
+  out = out.replace(/[*_]+/g, "");
+  out = out.replace(/[\[\]]/g, "");
+
+  // Normalize whitespace
+  out = out.replace(/[ \t]+/g, " ");
+  out = out.replace(/\n{3,}/g, "\n\n");
+
+  return out.trim();
+}
+
 // ─── Text Chunking ───────────────────────────────────────────
 
 // Android TTS engines typically have a ~4000 char limit per utterance.

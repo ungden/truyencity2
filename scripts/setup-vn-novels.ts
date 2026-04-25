@@ -122,14 +122,14 @@ GHI CHÚ KHÔNG ĐƯỢC VI PHẠM:
     genre: 'huyen-huyen',
     main_character: 'Lý Quang Vinh',
     description:
-      'Năm 2030, Cửa Linh mở ra trên toàn cầu. Mỗi quốc gia có thể triệu hồi anh hùng và thần thoại của lịch sử mình để chiến đấu. Hoa Hạ Đại Quốc triệu hồi Quan Vương, Đại Thánh Khỉ. Tân Lục Hợp Chúng Quốc triệu hồi siêu chiến binh. Đại Nam Liên Bang — bị mỉa mai là "tiểu quốc" — bất ngờ có một sinh viên kích hoạt được Hệ Thống Bách Việt: triệu hồi Trần Hưng Đạo, Hai Bà Trưng, Lê Lợi, Quang Trung, Phù Đổng Thiên Vương, Sơn Tinh, và đỉnh điểm là Lạc Long Quân — Tổ Long khai sáng. Một mình hắn dẫn dắt đất nước nhỏ bé đứng lên giữa cuộc chiến vạn quốc, viết lại lịch sử thế giới mới.',
+      'Năm 2030, Cửa Linh mở ra trên toàn cầu. Mỗi quốc gia có thể triệu hồi anh hùng và thần thoại của lịch sử mình để chiến đấu. Hoa Hạ Đại Quốc triệu hồi Quan Vũ Đại Đế, Tôn Đại Thánh. Tân Lục Hợp Chúng Quốc triệu hồi siêu chiến binh. Đại Nam Liên Bang — bị mỉa mai là "tiểu quốc" — bất ngờ có một sinh viên kích hoạt được Hệ Thống Bách Việt: triệu hồi Trần Hưng Đạo, Hai Bà Trưng, Lê Lợi, Quang Trung, Phù Đổng Thiên Vương, Sơn Tinh, và đỉnh điểm là Lạc Long Quân — Tổ Long khai sáng. Một mình hắn dẫn dắt đất nước nhỏ bé đứng lên giữa cuộc chiến vạn quốc, viết lại lịch sử thế giới mới.',
     world_description: `Bối cảnh: Năm 2030, "Cửa Linh" mở khắp toàn cầu — mỗi quốc gia có thể triệu hồi anh hùng/thần thoại lịch sử của mình để bảo vệ lãnh thổ và bành trướng.
 
 QUỐC GIA:
 - Đại Nam Liên Bang (MC, ~VN-analog): bị xem là "tiểu quốc", dân số 100 triệu, đường bờ biển dài, có Long Khí cội nguồn
-- Hoa Hạ Đại Quốc (~TQ-analog, kẻ thù chính): siêu cường phía Bắc, dân số 1.4 tỷ, triệu hồi Quan Vương, Đại Thánh Khỉ, Vũ Hầu, Thái Tổ Tần
+- Hoa Hạ Đại Quốc (~TQ-analog, kẻ thù chính): siêu cường phía Bắc, dân số 1.4 tỷ, triệu hồi Quan Vũ Đại Đế, Tôn Đại Thánh, Gia Cát Vũ Hầu, Tần Thủy Hoàng
 - Tân Lục Hợp Chúng Quốc (~Mỹ-analog): siêu cường phương Tây, triệu hồi siêu chiến binh, Tự Do Nữ Thần
-- Phù Tang Đảo Quốc (~Nhật-analog): triệu hồi Yamato Đại Tướng, Đỗ Điền Tướng Quân, Mặt Trời Nữ Thần
+- Phù Tang Đảo Quốc (~Nhật-analog): triệu hồi Yamato Takeru, Oda Nobunaga, Mặt Trời Nữ Thần
 - Tây Âu Liên Minh (~EU-analog): Hiệp Sĩ Bàn Tròn, Excalibur, Hoàng Đế Charles
 - Bắc Cực Hùng Quốc (~Russia-analog): Hãn Đế Mông Cổ (mượn lịch sử), Sa Hoàng
 
@@ -169,11 +169,11 @@ TIER TỔ LINH (ch.1100-1500, Linh khí cấp 90+, ULTIMATE):
 - Long Tổ Lạc Vương (Lạc Long Quân): ULTIMATE — Long Khí khởi nguyên, biển sâu, có thể triệu hồi Long tộc cổ xưa, Bách thần phục mệnh
 
 ANTAGONISTS — LỰC LƯỢNG TRIỆU HỒI HOA HẠ:
-- Quan Vương (Quan Vũ): Thanh Long Yển Nguyệt Đao
-- Vũ Hầu (Gia Cát Lượng): trí tuệ, mưu lược
-- Đại Thánh Khỉ (Tôn Ngộ Không): Như Ý Kim Cô Bổng, 72 phép biến hoá
-- Thái Tổ Tần (Tần Thuỷ Hoàng): vạn quân binh mã đất sét, Thanh Long Sơn cổ trận
-- Sát Nhân Vương (Bạch Khởi): tàn nhẫn, vạn người chôn sống
+- Quan Vũ Đại Đế (Quan Công): Thanh Long Yển Nguyệt Đao
+- Gia Cát Vũ Hầu (Khổng Minh): trí tuệ, mưu lược, bát trận đồ
+- Tôn Đại Thánh (Tôn Ngộ Không): Như Ý Kim Cô Bổng, 72 phép biến hoá
+- Tần Thủy Hoàng: vạn quân binh mã đất sét, Thanh Long Sơn cổ trận
+- Vũ An Quân (Bạch Khởi): tàn nhẫn, đồ sát hàng vạn người
 
 TIER LINH KHÍ:
 - Cấp 1-30: Phàm Cấp (sĩ tốt phổ thông)
@@ -189,15 +189,15 @@ NHÂN VẬT CHÍNH:
 - Power: Hệ Thống Bách Việt độc nhất, dần dần triệu hồi 4 tier anh hùng
 
 CONFLICT SETUP:
-- Năm 2025: Cửa Linh đầu tiên mở ra ở Tây Tạng (~Himalaya-analog), Hoa Hạ là quốc gia đầu tiên triệu hồi thành công Quan Vương
+- Năm 2025: Cửa Linh đầu tiên mở ra ở Tây Tạng (~Himalaya-analog), Hoa Hạ là quốc gia đầu tiên triệu hồi thành công Quan Vũ Đại Đế
 - 2026-2029: các quốc gia chạy đua kích hoạt hệ thống
 - 2030 (truyện bắt đầu): Hoa Hạ tấn công Đại Nam, MC bất ngờ kích hoạt hệ thống Bách Việt
 
 5 ARC:
 - Arc 1 (ch.1-100): Cửa Linh khai mở, kích hoạt hệ thống, triệu hồi Quốc Toản Thiếu Tướng — đụng độ Hoa Hạ đầu tiên ở biên giới Bắc
 - Arc 2 (ch.100-300): Bảo vệ Hải Long Đô khỏi quân Hoa Hạ thuỷ chiến — triệu hồi Yết Đại Tướng + Trần Đại Vương — Bạch Đằng tái hiện
-- Arc 3 (ch.300-700): Thế giới chia phe; Đại Nam vào liên minh chống Hoa Hạ; đại chiến cùng Phù Tang vs Yamato Đại Tướng
-- Arc 4 (ch.700-1100): Khám phá Long Khí cội nguồn, đánh thức Phù Đổng Thiên Tướng, đại chiến với Đại Thánh Khỉ
+- Arc 3 (ch.300-700): Thế giới chia phe; Đại Nam vào liên minh chống Hoa Hạ; đại chiến cùng Phù Tang vs Yamato Takeru
+- Arc 4 (ch.700-1100): Khám phá Long Khí cội nguồn, đánh thức Phù Đổng Thiên Tướng, đại chiến với Tôn Đại Thánh
 - Arc 5 (ch.1100-1500): Long Tổ Lạc Vương quy hồi, Đại Nam thành cường quốc dẫn dắt thế giới mới
 
 GHI CHÚ KHÔNG ĐƯỢC VI PHẠM:

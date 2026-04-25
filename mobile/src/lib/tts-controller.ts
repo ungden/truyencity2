@@ -28,7 +28,7 @@ import TrackPlayer, {
   IOSCategoryOptions,
 } from "react-native-track-player";
 import { Asset } from "expo-asset";
-import { stripHtml, splitIntoChunks, TTS_LANGUAGE } from "@/lib/tts";
+import { stripHtml, splitIntoChunks, sanitizeForTTS, TTS_LANGUAGE } from "@/lib/tts";
 
 const isIOS = process.env.EXPO_OS === "ios";
 
@@ -131,6 +131,7 @@ class TTSControllerImpl {
   private isChangingSpeed = false;
   private metadata: TTSMetadata | null = null;
   private onChunkAdvanceHandlers: Set<(i: number, total: number) => void> = new Set();
+  private onChapterCompleteHandlers: Set<() => void> = new Set();
   private listeners: Set<Listener> = new Set();
   private remoteListenersAttached = false;
 
@@ -162,6 +163,14 @@ class TTSControllerImpl {
     return () => this.onChunkAdvanceHandlers.delete(cb);
   }
 
+  /** Fires when the entire chapter has finished speaking (last chunk's onDone).
+   *  Used by the reader screen to auto-advance to the next chapter. Does NOT
+   *  fire when stopped manually, paused, or interrupted by speed-change. */
+  onChapterComplete(cb: () => void) {
+    this.onChapterCompleteHandlers.add(cb);
+    return () => this.onChapterCompleteHandlers.delete(cb);
+  }
+
   // ─── Remote event wiring (attached once on first speak) ───
   private attachRemoteListeners() {
     if (this.remoteListenersAttached) return;
@@ -187,7 +196,7 @@ class TTSControllerImpl {
     await ensurePlayerSetup();
     this.attachRemoteListeners();
 
-    const plainText = stripHtml(htmlContent);
+    const plainText = sanitizeForTTS(stripHtml(htmlContent));
     if (!plainText) return;
 
     const chunks = splitIntoChunks(plainText);
@@ -311,10 +320,18 @@ class TTSControllerImpl {
   // ─── Internals ───
   private speakChunk(index: number) {
     if (index >= this.chunks.length || this.isStopped) {
+      const naturalEnd = !this.isStopped && index >= this.chunks.length;
       this.currentIndex = 0;
       this.chunks = [];
       try { TrackPlayer.stop().catch(() => {}); } catch {}
       this.setStatus("idle");
+      // Fire chapter-complete callback ONLY on natural end (last chunk done),
+      // not on user-initiated stop. Reader screen uses this to auto-advance.
+      if (naturalEnd) {
+        this.onChapterCompleteHandlers.forEach((h) => {
+          try { h(); } catch {}
+        });
+      }
       return;
     }
     const text = this.chunks[index];
