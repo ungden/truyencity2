@@ -43,6 +43,69 @@ import type { SceneType, VocabularyGuide } from '../memory/style-bible';
 
 // ── System Prompts ───────────────────────────────────────────────────────────
 
+/**
+ * VN_PLACE_LOCK — replacement table forcing fictional names instead of real
+ * Vietnamese / foreign-country place names whenever the modern setting touches
+ * them. Cultural figures (Lạc Long Quân, Trần Hưng Đạo…) and pre-1900 events
+ * (Bạch Đằng, Đống Đa…) keep their real names. Appended to ARCHITECT_SYSTEM
+ * and WRITER_SYSTEM so the rule survives long contexts.
+ */
+const VN_PLACE_LOCK = `
+
+QUY TẮC TÊN ĐỊA LÝ (TUYỆT ĐỐI BẮT BUỘC, ưu tiên cao hơn arc plan):
+Khi bối cảnh hiện đại liên quan Việt Nam hoặc các nước, BẮT BUỘC dùng tên hư cấu sau. KHÔNG được dùng tên thật trong bất kỳ trường hợp nào.
+
+ĐỊA DANH TRONG NƯỚC (Đại Nam Quốc / Đại Nam Liên Bang):
+- Việt Nam → Đại Nam (Đại Nam Quốc / Đại Nam Liên Bang)
+- Hà Nội → Phượng Đô (thủ đô miền Bắc)
+- TP.HCM / Sài Gòn → Hải Long Đô (đặc khu kinh tế miền Nam)
+- Huế → Trung Đô (cố đô miền Trung)
+- Đà Nẵng → Hải Trung Đô
+- Hải Phòng → Cảng Bắc Hải
+- Cần Thơ → Cửu Long Trấn
+- Đà Lạt → Bạch Vân Lĩnh
+- Vũng Tàu → Bạch Hổ Hải
+- Nha Trang → Trân Châu Hải
+- Quận 1, 2, 3, 7… → Quận Nhất, Nhị, Tam, Thất… (giữ thứ tự)
+- sông Mê Kông → Cửu Long Hà
+- sông Hồng → Hồng Hà
+- dãy Trường Sơn → Trường Sơn Lĩnh
+
+QUỐC GIA NƯỚC NGOÀI:
+- Trung Quốc → Hoa Hạ Đại Quốc
+- Mỹ / Hoa Kỳ → Tân Lục Hợp Chúng Quốc
+- Nhật Bản → Phù Tang Đảo Quốc
+- Hàn Quốc → Triều Tiên Đảo Quốc
+- Pháp / Anh / Đức → Tây Âu Liên Minh
+- Nga → Bắc Cực Hùng Quốc
+- Đông Nam Á → Nam Hoa Lục
+
+DOANH NGHIỆP THẬT (chỉ thay khi viết bối cảnh kinh doanh hiện đại Đại Nam):
+- FPT → Đại Phong Group
+- Vingroup → Vạn Thái Tập Đoàn
+- Vinamilk → Mộc Hương Thực Phẩm
+- VNPT → Hồng Lạc Bưu Điện
+- Viettel → Tân Phong Mobile
+- VNG → Thiên Long Tech
+- Tencent → Đại Hoa Tencent
+- Microsoft / Yahoo / Google → Tân Lục Microsoft / Tân Lục Yahoo / Tân Lục Google
+- Sony / Toshiba → Phù Tang Sony / Phù Tang Toshiba
+
+TIỀN TỆ:
+- VND, đồng Việt Nam → xu / nguyên / lượng (giữ ratio: 1 nguyên = 1000 xu)
+- USD → đồng Tân Lục
+- CNY → đồng Hoa Hạ
+
+NHÂN VẬT / THẦN THOẠI VIỆT NAM (GIỮ TÊN THẬT):
+Lạc Long Quân, Âu Cơ, Hùng Vương, Hai Bà Trưng, Trần Hưng Đạo, Lý Thường Kiệt,
+Lê Lợi, Quang Trung, Trần Quốc Toản, Yết Kiêu, Phạm Ngũ Lão, Phù Đổng Thiên Vương,
+Sơn Tinh, Tản Viên Sơn Thánh, Mẫu Liễu Hạnh, Chử Đồng Tử… → DÙNG TÊN THẬT.
+
+SỰ KIỆN LỊCH SỬ PRE-1900 (GIỮ TÊN THẬT):
+Bạch Đằng, Đống Đa, Lam Sơn, Như Nguyệt, Chi Lăng, Hàm Tử… → DÙNG TÊN THẬT.
+
+NẾU địa danh KHÔNG có trong bảng trên → TỰ TẠO tên Hán-Việt phù hợp ngữ cảnh, TUYỆT ĐỐI KHÔNG dùng tên thật.`;
+
 const ARCHITECT_SYSTEM = `Bạn là ARCHITECT AGENT — chuyên gia lên kế hoạch chương truyện dài kỳ tiếng Việt.
 
 NHIỆM VỤ: Tạo blueprint chi tiết cho 1 chương.
@@ -360,7 +423,7 @@ Trả về JSON ChapterOutline:
   "targetWordCount": ${targetWords}
 }`;
 
-  const res = await callGemini(prompt, { ...config, temperature: 0.3, maxTokens: 16384, systemPrompt: ARCHITECT_SYSTEM }, { jsonMode: true, tracking: options?.projectId ? { projectId: options.projectId, task: 'architect', chapterNumber } : undefined });
+  const res = await callGemini(prompt, { ...config, temperature: 0.3, maxTokens: 16384, systemPrompt: ARCHITECT_SYSTEM + VN_PLACE_LOCK }, { jsonMode: true, tracking: options?.projectId ? { projectId: options.projectId, task: 'architect', chapterNumber } : undefined });
 
   // Check finishReason for truncation
   if (res.finishReason === 'length' || res.finishReason === 'MAX_TOKENS') {
@@ -541,7 +604,7 @@ ${buildGenreAntiClicheSection(genre)}
 
 Bắt đầu viết:`;
 
-  const res = await callGemini(prompt, { ...config, systemPrompt: WRITER_SYSTEM }, { tracking: options?.projectId ? { projectId: options.projectId, task: 'writer', chapterNumber: outline.chapterNumber } : undefined });
+  const res = await callGemini(prompt, { ...config, systemPrompt: WRITER_SYSTEM + VN_PLACE_LOCK }, { tracking: options?.projectId ? { projectId: options.projectId, task: 'writer', chapterNumber: outline.chapterNumber } : undefined });
 
   // Check finishReason
   if (res.finishReason === 'length' || res.finishReason === 'MAX_TOKENS') {
@@ -577,7 +640,7 @@ ${JSON.stringify(outline.scenes.slice(-3))}
 
 TIẾP TỤC NGAY TỪ CHỖ DỪNG — không lặp lại:`;
 
-  const res = await callGemini(prompt, { ...config, systemPrompt: WRITER_SYSTEM }, { tracking: projectId ? { projectId, task: 'writer_continuation', chapterNumber: outline.chapterNumber } : undefined });
+  const res = await callGemini(prompt, { ...config, systemPrompt: WRITER_SYSTEM + VN_PLACE_LOCK }, { tracking: projectId ? { projectId, task: 'writer_continuation', chapterNumber: outline.chapterNumber } : undefined });
   return res.content || null;
 }
 
