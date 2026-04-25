@@ -39,7 +39,7 @@ export interface EngineConfig {
 }
 
 export const DEFAULT_CONFIG: EngineConfig = {
-  model: 'gemini-3-flash-preview',
+  model: 'deepseek-v4-flash',
   temperature: 0.75,
   maxTokens: 32768,
   targetWordCount: 2800,

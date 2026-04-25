@@ -330,6 +330,10 @@ interface ProjectInsertRow {
   [key: string]: string | number | null;
 }
 
+// Default model assigned to newly seeded projects. Router auto-dispatches to
+// DeepSeek for any model name starting with `deepseek-`.
+const DEFAULT_AI_MODEL = 'deepseek-v4-flash';
+
 // ============================================================================
 // CONTENT SEEDER CLASS
 // ============================================================================
@@ -340,7 +344,7 @@ export class ContentSeeder {
   private userId: string | null = null;
 
   constructor(geminiApiKey: string) {
-    this.aiService = new AIProviderService({ gemini: geminiApiKey });
+    this.aiService = new AIProviderService({ gemini: geminiApiKey, deepseek: process.env.DEEPSEEK_API_KEY });
     this.supabase = getSupabaseAdmin();
   }
 
@@ -647,7 +651,7 @@ export class ContentSeeder {
         }),
         writing_style: 'webnovel_chinese',
         target_chapter_length: 2500,
-        ai_model: 'gemini-3-flash-preview',
+        ai_model: DEFAULT_AI_MODEL,
         temperature: 1.0,
         current_chapter: 0,
         total_planned_chapters: this.randomInt(1000, 2000),
@@ -1237,8 +1241,8 @@ CHÚ Ý:
 
     try {
       const response = await this.aiService.chat({
-        provider: 'gemini',
-        model: 'gemini-3-flash-preview',
+        provider: 'deepseek',
+        model: 'deepseek-v4-flash',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.8,
         maxTokens: 60000,
@@ -1433,7 +1437,7 @@ CHÚ Ý:
           world_description: this.formatWorldDescription(idea),
           writing_style: 'webnovel_chinese',
           target_chapter_length: 2500,
-          ai_model: 'gemini-3-flash-preview',
+          ai_model: DEFAULT_AI_MODEL,
           temperature: 1.0,
           current_chapter: 0,
           total_planned_chapters: totalChapters,
@@ -1467,7 +1471,7 @@ CHÚ Ý:
               p.genre as any,
               'Truyện tự động tạo từ Seeder',
               2000,
-              { model: 'gemini-3-flash-preview', temperature: 0.7, maxTokens: 2048 }
+              { model: 'deepseek-v4-flash', temperature: 0.7, maxTokens: 2048 }
             ).catch(e => console.error('Seeder outline error:', e));
           }
         }).catch(e => console.error('Failed to import outline gen:', e));

@@ -24,6 +24,9 @@ const PRICING: Record<string, { inputPerMillion: number; outputPerMillion: numbe
 export interface TrackingContext {
   projectId: string;
   task: string;
+  /** Chapter being written when this call was made. NULL for outline/bible
+   *  tasks not tied to one chapter. Allows per-chapter cost roll-ups. */
+  chapterNumber?: number;
 }
 
 function trackCost(
@@ -35,16 +38,41 @@ function trackCost(
   const p = PRICING[model] || PRICING['_default'];
   const cost = (inputTokens * p.inputPerMillion + outputTokens * p.outputPerMillion) / 1_000_000;
 
+  if (process.env.DEBUG_ROUTING === '1') {
+    console.warn(`[TRACK-GEMINI] task=${tracking.task} ch=${tracking.chapterNumber ?? 'none'} model=${model} in=${inputTokens} out=${outputTokens}`);
+  }
+
   getSupabase().from('cost_tracking').insert({
     project_id: tracking.projectId,
     model,
     task: tracking.task,
+    chapter_number: tracking.chapterNumber ?? null,
     input_tokens: inputTokens,
     output_tokens: outputTokens,
     cost,
   }).then(({ error }) => {
     if (error) console.warn('[CostTracking] Insert failed:', error.message);
   });
+}
+
+// ── Router ───────────────────────────────────────────────────────────────────
+// Routes call to the right provider based on (1) per-task override via
+// globalThis.__MODEL_ROUTING__, then (2) the model name on `config.model`.
+// Any model name starting with `deepseek-` dispatches to DeepSeek's
+// OpenAI-compatible API. Anything else stays on Gemini.
+// `gemini-embedding-*` and `gemini-3-pro-image-preview` are unaffected because
+// they live in their own helpers (embedTexts, gemini-image.ts) — not callGemini.
+
+declare global {
+  // eslint-disable-next-line no-var
+  var __MODEL_ROUTING__: Record<string, string> | undefined;
+}
+
+function resolveRoute(task: string | undefined): string | null {
+  if (!task) return null;
+  const routing = globalThis.__MODEL_ROUTING__;
+  if (!routing) return null;
+  return routing[task] || routing['_default'] || null;
 }
 
 // ── Core API Call ────────────────────────────────────────────────────────────
@@ -56,6 +84,24 @@ export async function callGemini(
   config: GeminiConfig,
   options?: { jsonMode?: boolean; tracking?: TrackingContext },
 ): Promise<GeminiResponse> {
+  // 1. Per-task routing override (set via globalThis.__MODEL_ROUTING__)
+  // 2. Otherwise, model name itself decides: anything starting with `deepseek-`
+  //    routes to DeepSeek. This makes DEFAULT_CONFIG.model = 'deepseek-v4-flash'
+  //    enough to switch the whole pipeline.
+  const routed = resolveRoute(options?.tracking?.task);
+  const targetModel = routed || config.model;
+  if (process.env.DEBUG_ROUTING === '1') {
+    console.warn(`[ROUTER] task=${options?.tracking?.task || 'NO_TASK'} target=${targetModel}`);
+  }
+  if (targetModel.startsWith('deepseek-')) {
+    const { callDeepSeek } = await import('./deepseek');
+    return callDeepSeek(userPrompt, { ...config, model: targetModel }, options);
+  }
+  if (routed) {
+    // Routed to a different Gemini model name — override
+    config = { ...config, model: routed };
+  }
+
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('GEMINI_API_KEY not set');
 

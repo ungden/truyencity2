@@ -266,8 +266,8 @@ CHỈ trả về JSON, không thêm text khác. Viết bằng tiếng Việt (tr
 
     try {
       const response = await this.ai.chat({
-        provider: 'gemini',
-        model: 'gemini-3-flash-preview',
+        provider: 'deepseek',
+        model: 'deepseek-v4-flash',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.9,
         maxTokens: 4096,

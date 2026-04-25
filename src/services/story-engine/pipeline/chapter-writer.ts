@@ -360,7 +360,7 @@ Trả về JSON ChapterOutline:
   "targetWordCount": ${targetWords}
 }`;
 
-  const res = await callGemini(prompt, { ...config, temperature: 0.3, maxTokens: 16384, systemPrompt: ARCHITECT_SYSTEM }, { jsonMode: true, tracking: options?.projectId ? { projectId: options.projectId, task: 'architect' } : undefined });
+  const res = await callGemini(prompt, { ...config, temperature: 0.3, maxTokens: 16384, systemPrompt: ARCHITECT_SYSTEM }, { jsonMode: true, tracking: options?.projectId ? { projectId: options.projectId, task: 'architect', chapterNumber } : undefined });
 
   // Check finishReason for truncation
   if (res.finishReason === 'length' || res.finishReason === 'MAX_TOKENS') {
@@ -541,7 +541,7 @@ ${buildGenreAntiClicheSection(genre)}
 
 Bắt đầu viết:`;
 
-  const res = await callGemini(prompt, { ...config, systemPrompt: WRITER_SYSTEM }, { tracking: options?.projectId ? { projectId: options.projectId, task: 'writer' } : undefined });
+  const res = await callGemini(prompt, { ...config, systemPrompt: WRITER_SYSTEM }, { tracking: options?.projectId ? { projectId: options.projectId, task: 'writer', chapterNumber: outline.chapterNumber } : undefined });
 
   // Check finishReason
   if (res.finishReason === 'length' || res.finishReason === 'MAX_TOKENS') {
@@ -577,7 +577,7 @@ ${JSON.stringify(outline.scenes.slice(-3))}
 
 TIẾP TỤC NGAY TỪ CHỖ DỪNG — không lặp lại:`;
 
-  const res = await callGemini(prompt, { ...config, systemPrompt: WRITER_SYSTEM }, { tracking: projectId ? { projectId, task: 'writer_continuation' } : undefined });
+  const res = await callGemini(prompt, { ...config, systemPrompt: WRITER_SYSTEM }, { tracking: projectId ? { projectId, task: 'writer_continuation', chapterNumber: outline.chapterNumber } : undefined });
   return res.content || null;
 }
 
@@ -683,7 +683,7 @@ KIỂM TRA TUÂN THỦ QUALITY MODULES (NẾU CÓ THÔNG TIN):
 - PACING BLUEPRINT: Nếu pacing blueprint chỉ định mood (VD: "CALM BEFORE STORM", "CLIMAX") mà chương viết hoàn toàn ngược (VD: blueprint là calm nhưng toàn action cao trào) → type "pacing", severity "moderate".`;
 
   try {
-    const res = await callGemini(prompt, { ...config, temperature: 0.2, maxTokens: 4096, systemPrompt: CRITIC_SYSTEM }, { jsonMode: true, tracking: projectId ? { projectId, task: 'critic' } : undefined });
+    const res = await callGemini(prompt, { ...config, temperature: 0.2, maxTokens: 4096, systemPrompt: CRITIC_SYSTEM }, { jsonMode: true, tracking: projectId ? { projectId, task: 'critic', chapterNumber: outline.chapterNumber } : undefined });
 
     if (!res.content) {
       // Fail closed: don't approve on error

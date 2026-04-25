@@ -97,11 +97,12 @@ export class AuthorGenerator {
   private model: string;
   private aiService: AIProviderService;
 
-  constructor(provider: AIProviderType = 'gemini', model: string = 'gemini-3-flash-preview') {
+  constructor(provider: AIProviderType = 'deepseek', model: string = 'deepseek-v4-flash') {
     this.provider = provider;
     this.model = model;
     this.aiService = new AIProviderService({
       gemini: process.env.GEMINI_API_KEY,
+      deepseek: process.env.DEEPSEEK_API_KEY,
     });
   }
 
@@ -397,8 +398,8 @@ export function generateQuickAuthor(genre: string): Omit<GeneratedAuthor, 'avata
 }
 
 export function createAuthorGenerator(
-  provider: AIProviderType = 'gemini',
-  model: string = 'gemini-3-flash-preview'
+  provider: AIProviderType = 'deepseek',
+  model: string = 'deepseek-v4-flash'
 ): AuthorGenerator {
   return new AuthorGenerator(provider, model);
 }

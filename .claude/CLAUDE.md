@@ -35,18 +35,24 @@ Vi du dung:
 
 ## Critical Rules — AI Models
 
-### ONLY TWO MODELS ALLOWED:
+### Model assignments (post-2026-04-25 swap):
 
-| Purpose | Model ID |
-|---------|----------|
-| **ALL text** (chapters, planning, ideas, authors) | `gemini-3-flash-preview` |
-| **ALL images** (covers with title + branding) | `gemini-3-pro-image-preview` |
+| Purpose | Model ID | Provider |
+|---------|----------|----------|
+| **ALL text** (chapters, planning, ideas, authors) | `deepseek-v4-flash` | DeepSeek |
+| **Embeddings** (RAG vector search, 768-dim) | `gemini-embedding-001` | Google |
+| **Cover images** (title + branding, 2K, 3:4) | `gemini-3-pro-image-preview` | Google |
 
 ### BANNED:
-- Any old Gemini model (2.0, 2.5, 1.5, exp)
-- Any non-Gemini provider (OpenRouter, DeepSeek, OpenAI, Anthropic)
-- Any API key other than `GEMINI_API_KEY`
-- **NO FALLBACKS** — if Gemini fails, throw error, never substitute with templates
+- Any other DeepSeek model (`-pro`, `-chat`, `-reasoner`) without explicit per-task override
+- Any other text provider (OpenRouter, OpenAI, Anthropic) for production
+- **NO FALLBACKS** — if DeepSeek fails, throw error → cron retries on next tick. Never substitute with templates.
+- Existing `gemini-3-flash-preview` references in UI dropdowns are kept as a manual backup option only
+
+### How the swap works:
+- The `callGemini()` function in `src/services/story-engine/utils/gemini.ts` is now a router. If `config.model` starts with `deepseek-`, it dispatches to `callDeepSeek()` (OpenAI-compatible). Otherwise it stays on Gemini.
+- `DEFAULT_CONFIG.model = 'deepseek-v4-flash'` so anywhere the engine doesn't explicitly override the model, DeepSeek is used.
+- Project rows have `ai_model` column — passed through to `geminiConfig.model`. Migration on 2026-04-25 switched all `status='active'` projects from `gemini-3-flash-preview` → `deepseek-v4-flash`.
 
 ---
 
@@ -329,7 +335,8 @@ npx eas build --platform ios --profile production --non-interactive --auto-submi
 NEXT_PUBLIC_SUPABASE_URL=https://jxhpejyowuihvjpqwarm.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 SUPABASE_SERVICE_ROLE_KEY=...
-GEMINI_API_KEY=...
+DEEPSEEK_API_KEY=...      # Primary text generation (chapters, planning, etc.)
+GEMINI_API_KEY=...        # Embeddings + image generation only
 CRON_SECRET=...
 ```
 

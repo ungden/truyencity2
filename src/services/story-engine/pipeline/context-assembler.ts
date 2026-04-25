@@ -403,7 +403,7 @@ QUY TẮC CLIFFHANGER:
 - Trích đúng tình huống căng thẳng hoặc câu chốt mở ở cuối chương
 - Chỉ cho phép rỗng khi chương đã khép hoàn toàn theo chủ đích finale`;
 
-  const res = await callGemini(prompt, { ...config, temperature: 0.1, maxTokens: 1024 }, { jsonMode: true, tracking: options?.projectId ? { projectId: options.projectId, task: 'chapter_summary' } : undefined });
+  const res = await callGemini(prompt, { ...config, temperature: 0.1, maxTokens: 1024 }, { jsonMode: true, tracking: options?.projectId ? { projectId: options.projectId, task: 'chapter_summary', chapterNumber } : undefined });
   const parsed = parseJSON<ChapterSummary>(res.content);
 
   if (!parsed || !parsed.summary?.trim()) {
@@ -573,7 +573,7 @@ QUY TẮC:
 - CLIFFHANGER: Nếu không phải finale, KHÔNG để rỗng. Trích đúng tình huống căng thẳng cuối chương.
 - CHARACTERS: Chỉ nhân vật CÓ TÊN RIÊNG thực sự. CẤM số, mã code, mô tả chung.`;
 
-  const res = await callGemini(prompt, { ...config, temperature: 0.1, maxTokens: 2048 }, { jsonMode: true, tracking: options?.projectId ? { projectId: options.projectId, task: 'combined_summary' } : undefined });
+  const res = await callGemini(prompt, { ...config, temperature: 0.1, maxTokens: 2048 }, { jsonMode: true, tracking: options?.projectId ? { projectId: options.projectId, task: 'combined_summary', chapterNumber } : undefined });
   const parsed = parseJSON<CombinedAIResponse>(res.content);
 
   if (!parsed || !parsed.summary?.trim()) {

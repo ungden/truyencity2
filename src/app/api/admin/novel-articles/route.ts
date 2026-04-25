@@ -152,7 +152,7 @@ Trả về ĐÚNG ${count} object trong array.`;
 
   try {
     const response = await callGemini(prompt, {
-      model: 'gemini-3-flash-preview',
+      model: 'deepseek-v4-flash',
       temperature: 0.9,
       maxTokens: 16000,
     }, { jsonMode: true });

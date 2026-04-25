@@ -125,9 +125,14 @@ export class AIProviderService {
 
     const data = await response.json();
 
+    const choice = data.choices?.[0];
+    // DeepSeek V4 thinking models split output into reasoning_content + content;
+    // fall back to reasoning_content when content is empty.
+    const content = choice?.message?.content || choice?.message?.reasoning_content || '';
+
     return {
       success: true,
-      content: data.choices?.[0]?.message?.content || '',
+      content,
       usage: {
         promptTokens: data.usage?.prompt_tokens || 0,
         completionTokens: data.usage?.completion_tokens || 0,
@@ -135,7 +140,7 @@ export class AIProviderService {
       },
       model: data.model,
       provider: 'deepseek',
-      finishReason: data.choices?.[0]?.finish_reason,
+      finishReason: choice?.finish_reason,
     };
   }
 
@@ -464,6 +469,7 @@ export function getAIProviderService(): AIProviderService {
   if (!serverInstance) {
     serverInstance = new AIProviderService({
       gemini: process.env.GEMINI_API_KEY,
+      deepseek: process.env.DEEPSEEK_API_KEY,
     });
   }
   return serverInstance;

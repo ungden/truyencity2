@@ -101,7 +101,7 @@ export function QuickAISetupDialog({ novel, isOpen, onOpenChange }: QuickAISetup
         world_description: values.world_description || '',
         writing_style: 'webnovel_chinese',
         target_chapter_length: 2500,
-        ai_model: 'gemini-3-flash-preview',
+        ai_model: 'deepseek-v4-flash',
         temperature: 0.7,
         total_planned_chapters: 100,
       };

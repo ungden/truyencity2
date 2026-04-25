@@ -46,7 +46,9 @@ import SafeImage from '@/components/ui/safe-image';
 
 
 const AI_MODELS = [
-  { id: 'gemini-3-flash-preview', name: 'Gemini 3 Flash Preview', provider: 'Google', description: 'Model chính — nhanh, 1M context, viết truyện chất lượng cao', cost: 'Miễn phí', recommended: true },
+  { id: 'deepseek-v4-flash', name: 'DeepSeek V4 Flash', provider: 'DeepSeek', description: 'Model chính — chất lượng prose tu tiên cao, rẻ ($0.14/$0.28 per 1M), 1M context', cost: '~$0.025/chương', recommended: true },
+  { id: 'deepseek-v4-pro', name: 'DeepSeek V4 Pro', provider: 'DeepSeek', description: 'Bản nâng cao — thinking mode mạnh hơn, dùng cho planning/critic chất lượng cao', cost: '~$0.12/chương' },
+  { id: 'gemini-3-flash-preview', name: 'Gemini 3 Flash Preview', provider: 'Google', description: 'Backup option — 1M context, nhanh', cost: '~$0.04/chương' },
 ];
 
 const projectSchema = z.object({
@@ -198,7 +200,7 @@ export function ProjectSetupDialog({ isOpen, onOpenChange, onProjectSaved, initi
       world_description: '',
       writing_style: 'webnovel_chinese',
       target_chapter_length: 2500,
-      ai_model: 'gemini-3-flash-preview',
+      ai_model: 'deepseek-v4-flash',
       temperature: 0.7,
       total_planned_chapters: 100,
       ai_author_id: '',
@@ -272,7 +274,7 @@ export function ProjectSetupDialog({ isOpen, onOpenChange, onProjectSaved, initi
           novel_author: freshNovel.author || '',
           novel_description: freshNovel.description || '',
           topic: genreArray[1] || '',
-          ai_model: initialData.ai_model || 'gemini-3-flash-preview',
+          ai_model: initialData.ai_model || 'deepseek-v4-flash',
           ai_author_id: freshNovel.ai_author_id || '',
         } as ProjectFormValues);
         setCoverUrl(freshNovel.cover_url || '');
@@ -297,7 +299,7 @@ export function ProjectSetupDialog({ isOpen, onOpenChange, onProjectSaved, initi
           world_description: '',
           writing_style: 'webnovel_chinese',
           target_chapter_length: 2500,
-          ai_model: 'gemini-3-flash-preview',
+          ai_model: 'deepseek-v4-flash',
           temperature: 0.7,
           total_planned_chapters: 100,
           ai_author_id: '',
@@ -378,7 +380,7 @@ export function ProjectSetupDialog({ isOpen, onOpenChange, onProjectSaved, initi
       const response = await fetch('/api/ai-writer/generate-idea', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ genre: selectedGenre, topic: selectedTopic, model: 'gemini-3-flash-preview' }),
+        body: JSON.stringify({ genre: selectedGenre, topic: selectedTopic, model: 'deepseek-v4-flash' }),
       });
       if (!response.ok) throw new Error((await response.json()).error || 'Failed to generate');
       const data = await response.json();

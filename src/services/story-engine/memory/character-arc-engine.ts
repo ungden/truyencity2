@@ -119,7 +119,7 @@ Trả về JSON:
     temperature: 0.4,
     maxTokens: 2048,
     systemPrompt: 'Bạn là Character Architect chuyên thiết kế nhân vật sâu sắc cho webnovel.',
-  }, { jsonMode: true, tracking: { projectId, task: 'character_arc' } });
+  }, { jsonMode: true, tracking: { projectId, task: 'character_arc', chapterNumber: currentChapter } });
 
   const parsed = parseJSON<{
     role: string;

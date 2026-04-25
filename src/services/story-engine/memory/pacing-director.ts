@@ -123,7 +123,7 @@ Trả về JSON:
     temperature: 0.4,
     maxTokens: 4096,
     systemPrompt: 'Bạn là Pacing Director cho webnovel dài kỳ. Thiết kế nhịp truyện đa dạng, không lặp lại.',
-  }, { jsonMode: true, tracking: { projectId, task: 'pacing' } });
+  }, { jsonMode: true, tracking: { projectId, task: 'pacing', chapterNumber: arcStartChapter } });
 
   const parsed = parseJSON<PacingBlueprint>(res.content);
   if (!parsed?.chapters?.length) return;

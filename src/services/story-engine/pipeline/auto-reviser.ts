@@ -82,7 +82,7 @@ Trả về TOÀN BỘ nội dung chương đã sửa (không phải chỉ đoạ
       temperature: 0.3, // Low temperature for precision editing
       maxTokens: 32768,
     }, {
-      tracking: projectId ? { projectId, task: 'auto_revision' } : undefined,
+      tracking: projectId ? { projectId, task: 'auto_revision', chapterNumber } : undefined,
     });
 
     const revisedContent = response.content?.trim();

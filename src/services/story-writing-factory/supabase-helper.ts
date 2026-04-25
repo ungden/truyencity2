@@ -237,7 +237,7 @@ export async function ensureProjectRecord(
         status: 'active',
         writing_style: 'webnovel_chinese',
         target_chapter_length: 2500,
-        ai_model: 'gemini-3-flash-preview',
+        ai_model: 'deepseek-v4-flash',
         temperature: 1.0,
         current_chapter: 0,
         world_description: meta?.title || 'Story Writing Factory Project',

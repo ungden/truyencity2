@@ -111,7 +111,7 @@ QUY TẮC:
       ...config,
       maxTokens: 4096,
       temperature: 0.3,
-    }, { jsonMode: true, tracking: { projectId, task: 'character_knowledge' } });
+    }, { jsonMode: true, tracking: { projectId, task: 'character_knowledge', chapterNumber } });
 
     const parsed = parseJSON<KnowledgeExtractionResult>(response.content);
     if (!parsed?.knowledge_events?.length) return;

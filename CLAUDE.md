@@ -4,7 +4,7 @@
 
 TruyenCity la nen tang viet truyen tu dong bang AI, ho tro viet truyen dai 1000-2000 chuong voi kha nang "1 Click = 1 Chuong hoan chinh".
 
-**Stack**: Next.js 15, React 19, TypeScript, Supabase (PostgreSQL + pgvector + pg_cron), Google Gemini AI, Vercel Pro
+**Stack**: Next.js 15, React 19, TypeScript, Supabase (PostgreSQL + pgvector + pg_cron), DeepSeek V4 Flash (text gen) + Google Gemini (embeddings + image), Vercel Pro
 **Mobile**: Expo SDK 54, expo-router v6, NativeWind v5, at `/mobile/`
 **Repo**: `https://github.com/ungden/truyencity2.git` (branch: `main`)
 **Domain**: `truyencity.com` (prod), `truyencity2.vercel.app` (Vercel)
@@ -86,10 +86,18 @@ writeOneChapter() [orchestrator.ts]
 ## Critical Configuration
 
 ### AI Model
-- **Model**: `gemini-3-flash-preview` (thinking model)
-- **IMPORTANT**: KHONG dung `frequencyPenalty`/`presencePenalty` - thinking models khong support, se tra content rong
-- **IMPORTANT**: Gemini tier 3 unlimited — khong can client-side rate limiter
-- **Embeddings**: `gemini-embedding-001`, 768 dims, `outputDimensionality` param
+- **Primary text model**: `deepseek-v4-flash` (V4 thinking model, OpenAI-compatible at `https://api.deepseek.com/chat/completions`)
+  - 1M context, 384K output ceiling, $0.14/$0.28 per 1M tokens (cache miss) — ~12× cheaper than Gemini
+  - Auto-routed by `callGemini()` whenever `config.model` starts with `deepseek-` (router in `src/services/story-engine/utils/gemini.ts`)
+  - V4 thinking models split output into `reasoning_content` + `content` — adapter falls back to `reasoning_content` when `content` is empty
+  - Adapter: `src/services/story-engine/utils/deepseek.ts` (OpenAI-compatible, 5 retries with backoff up to 90s for transient failures)
+- **Premium tier**: `deepseek-v4-pro` ($1.74/$3.48 per 1M) — 12× cost; reserved for tasks where quality justifies (currently unused)
+- **Backup**: `gemini-3-flash-preview` — kept as a UI option but not selected by default
+- **Embeddings**: `gemini-embedding-001`, 768 dims, `outputDimensionality` param (DeepSeek has no embedding API → embeddings stay on Gemini)
+- **Image gen**: `gemini-3-pro-image-preview` (covers; DeepSeek doesn't generate images)
+- **Rate limit**: DeepSeek doesn't publish hard limits; client-side retries handle 429/503/502 + network fetch errors
+- **IMPORTANT**: For Gemini calls, KHONG dung `frequencyPenalty`/`presencePenalty` — thinking models khong support, tra content rong
+- **Required env**: `DEEPSEEK_API_KEY` (production) + `GEMINI_API_KEY` (embeddings + image gen)
 
 ### Database
 - **Supabase pgvector** (premium plan)

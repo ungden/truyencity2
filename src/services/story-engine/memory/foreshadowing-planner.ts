@@ -107,7 +107,7 @@ Trả về JSON:
     temperature: 0.5,
     maxTokens: 2048,
     systemPrompt: 'Bạn là Master Foreshadowing Architect cho webnovel dài kỳ.',
-  }, { jsonMode: true, tracking: { projectId, task: 'foreshadowing' } });
+  }, { jsonMode: true, tracking: { projectId, task: 'foreshadowing', chapterNumber: arcStartChapter } });
 
   const parsed = parseJSON<ForeshadowingAgenda>(res.content);
   if (!parsed?.hints?.length) return;
