@@ -313,7 +313,7 @@ async function createNovelAndProject(
   const { data: novel, error: novelErr } = await s.from('novels').insert({
     title: seed.title,
     slug: seed.slug,
-    author: 'TruyenCity AI',
+    author: 'Truyện City',
     description: seed.description,
     genres: [seed.genre],
     status: 'ongoing',

@@ -39,13 +39,13 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       <div className="flex">
         {/* Desktop Sidebar - hidden on mobile and tablet */}
         <DesktopSidebar />
 
         {/* Main Content Area */}
-        <div className="flex-1 flex flex-col min-h-screen">
+        <div className="flex-1 flex flex-col min-h-screen min-w-0">
           {/* Desktop Header */}
           <DesktopHeader showSearch={true} />
 

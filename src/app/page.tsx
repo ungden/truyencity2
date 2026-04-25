@@ -112,7 +112,7 @@ export default async function HomePage() {
         <Header title="TruyenCity" variant="search" />
       </div>
 
-      <div className="px-4 lg:px-6 py-6 lg:py-8">
+      <div className="px-4 lg:px-6 py-6 lg:py-8 max-w-[1600px] mx-auto overflow-x-hidden">
         {/* Main Content Grid */}
         <div className="flex gap-8">
           {/* Left Content Area */}

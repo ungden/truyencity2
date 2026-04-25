@@ -122,7 +122,7 @@ async function createNovelAndProject(variant: Variant, ownerId: string): Promise
   const { data: novel, error: novelErr } = await supabase.from('novels').insert({
     title,
     slug,
-    author: 'DeepSeek Test',
+    author: 'Truyện City',
     description: `[EXPERIMENT — ${variant}] ${TEST_SEED.world_description.slice(0, 300)}`,
     genres: [TEST_SEED.genre],
     status: 'ongoing',

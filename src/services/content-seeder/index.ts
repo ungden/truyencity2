@@ -629,7 +629,7 @@ export class ContentSeeder {
       novelRows.push({
         id: novelId,
         title: safeTitle,
-        author: authorNameMap.get(authorId) || '',
+        author: 'Truyện City',
         ai_author_id: authorId,
         description: formattedDescription,
         status: 'Đang ra',
@@ -1420,7 +1420,7 @@ CHÚ Ý:
         novelRows.push({
           id: novelId,
           title: idea.title,
-          author: '', // Will be filled separately via updateNovelAuthorNames
+          author: 'Truyện City', // Public author display — ai_author_id keeps the AI persona
           ai_author_id: authorId,
           description: formattedDescription,
           status: 'Đang ra',
@@ -1508,10 +1508,12 @@ CHÚ Ý:
 
       if (!authors) continue;
 
+      // Public author is always 'Truyện City'; ai_author_id keeps the AI persona internally.
+      // This loop now only verifies all novels are correctly attributed.
       for (const author of authors) {
         const { error } = await this.supabase
           .from('novels')
-          .update({ author: author.name })
+          .update({ author: 'Truyện City' })
           .eq('ai_author_id', author.id);
 
         if (error) {
