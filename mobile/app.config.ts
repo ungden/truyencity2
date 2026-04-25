@@ -4,7 +4,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: "TruyenCity",
   slug: "truyencity",
-  version: "1.0.2",
+  version: "1.0.3",
   orientation: "portrait",
   icon: "./assets/icon.png",
   userInterfaceStyle: "dark",
@@ -18,7 +18,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     supportsTablet: true,
     bundleIdentifier: "com.truyencity.app",
-    buildNumber: "1",
+    buildNumber: "34",
     usesIapIOS: true, // Enable In-App Purchase capability (required for subscriptions)
     appStoreUrl: "https://apps.apple.com/app/truyencity/id6759160705",
     // Allow iPad multitasking (Split View, Slide Over). Required — apps that
@@ -57,7 +57,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       backgroundColor: "#1a1625",
     },
     package: "com.truyencity.app",
-    versionCode: 2,
+    versionCode: 3,
     softwareKeyboardLayoutMode: "resize",
     permissions: ["INTERNET", "ACCESS_NETWORK_STATE"],
   },
