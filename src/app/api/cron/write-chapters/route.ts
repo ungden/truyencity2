@@ -57,7 +57,7 @@ const OVERLOAD_RESUME_THRESHOLD = clamp(parseIntEnv('WRITE_CHAPTERS_OVERLOAD_RES
 const OVERLOAD_INIT_PREP_CAP = clamp(parseIntEnv('WRITE_CHAPTERS_OVERLOAD_INIT_PREP_CAP', 8), 0, 100);
 const OVERLOAD_INIT_WRITE_CAP = clamp(parseIntEnv('WRITE_CHAPTERS_OVERLOAD_INIT_WRITE_CAP', 6), 0, 100);
 
-export const maxDuration = 300; // 5 minutes (Vercel Pro)
+export const maxDuration = 800; // 13.3 minutes (Vercel Pro allows up to 800s) — DeepSeek V4 Flash thinking mode needs more headroom
 export const dynamic = 'force-dynamic';
 
 function hashStringToInt(input: string): number {
