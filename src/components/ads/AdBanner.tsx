@@ -68,7 +68,12 @@ const SLOT_MAP: Record<string, string> = {
  */
 function resolveSlot(slot: string): string | null {
   if (/^\d+$/.test(slot)) return slot;
-  return SLOT_MAP[slot] || null;
+  const id = SLOT_MAP[slot] || null;
+  // Reject placeholder/dummy slot IDs (1234567890–1234567899) — AdSense returns 400 for them.
+  // Set NEXT_PUBLIC_ADSENSE_PUB_ID + replace SLOT_MAP values with real slot IDs from the
+  // AdSense dashboard before re-enabling.
+  if (id && /^123456789\d$/.test(id)) return null;
+  return id;
 }
 
 export function AdBanner({ slot, format = "auto", className }: AdBannerProps) {
@@ -103,6 +108,9 @@ export function AdBanner({ slot, format = "auto", className }: AdBannerProps) {
   // Don't render if VIP or ads disabled
   if (loading || isVip || !showAds) return null;
   if (!ADSENSE_PUB_ID) return null;
+  // No real slot configured (placeholder rejected) — skip entirely instead of
+  // rendering a slot-less <ins> that AdSense rejects with HTTP 400.
+  if (!resolvedSlot) return null;
 
   return (
     <div className={cn("flex flex-col items-center", className)}>

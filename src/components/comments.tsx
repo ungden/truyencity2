@@ -15,8 +15,14 @@ type Comment = {
   created_at: string;
   parent_id: string | null;
   status: string;
-  profile?: { full_name: string | null; avatar_url: string | null } | null;
+  profile?: { first_name: string | null; last_name: string | null; avatar_url: string | null } | null;
 };
+
+function formatProfileName(p: Comment['profile']): string {
+  if (!p) return 'Ẩn danh';
+  const name = [p.first_name, p.last_name].filter(Boolean).join(' ').trim();
+  return name || 'Ẩn danh';
+}
 
 interface CommentsProps {
   novelId: string;
@@ -54,7 +60,7 @@ export function Comments({ novelId, chapterId, className }: CommentsProps) {
     try {
       let query = supabase
         .from('comments')
-        .select('id, user_id, content, created_at, parent_id, status, profiles(full_name, avatar_url)')
+        .select('id, user_id, content, created_at, parent_id, status, profiles!comments_user_id_profiles_fkey(first_name, last_name, avatar_url)')
         .eq('novel_id', novelId)
         .eq('status', 'approved')
         .is('parent_id', null)
@@ -204,13 +210,13 @@ export function Comments({ novelId, chapterId, className }: CommentsProps) {
               <div className="flex items-start gap-3">
                 <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
                   <span className="text-xs font-medium text-muted-foreground">
-                    {(c.profile?.full_name || 'U')[0].toUpperCase()}
+                    {formatProfileName(c.profile)[0].toUpperCase()}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium">
-                      {c.profile?.full_name || 'Ẩn danh'}
+                      {formatProfileName(c.profile)}
                     </span>
                     <span className="text-xs text-muted-foreground">
                       {formatTime(c.created_at)}
