@@ -24,20 +24,25 @@ const PROD_INTERSTITIAL_IOS = "ca-app-pub-5160932470449783/1298130212";
 const PROD_BANNER_HOME_IOS = "ca-app-pub-5160932470449783/6193019232";
 const PROD_BANNER_DETAIL_IOS = "ca-app-pub-5160932470449783/8466173798";
 
+// Android production ad unit IDs (created in AdMob console).
+const PROD_INTERSTITIAL_ANDROID = "ca-app-pub-5160932470449783/1837655454";
+const PROD_BANNER_HOME_ANDROID = "ca-app-pub-5160932470449783/3150737127";
+const PROD_BANNER_DETAIL_ANDROID = "ca-app-pub-5160932470449783/2335289416";
+
 export const AD_UNITS = {
   INTERSTITIAL_CHAPTER: isIOS
     ? (process.env.EXPO_PUBLIC_ADMOB_INTERSTITIAL_IOS || PROD_INTERSTITIAL_IOS)
-    : (process.env.EXPO_PUBLIC_ADMOB_INTERSTITIAL_ANDROID || TEST_INTERSTITIAL_ANDROID),
+    : (process.env.EXPO_PUBLIC_ADMOB_INTERSTITIAL_ANDROID || PROD_INTERSTITIAL_ANDROID),
 
   // Banner on browsing/list screens (discover, library).
   BANNER_HOME: isIOS
     ? (process.env.EXPO_PUBLIC_ADMOB_BANNER_HOME_IOS || PROD_BANNER_HOME_IOS)
-    : (process.env.EXPO_PUBLIC_ADMOB_BANNER_HOME_ANDROID || TEST_BANNER_ANDROID),
+    : (process.env.EXPO_PUBLIC_ADMOB_BANNER_HOME_ANDROID || PROD_BANNER_HOME_ANDROID),
 
   // Banner on novel detail page.
   BANNER_DETAIL: isIOS
     ? (process.env.EXPO_PUBLIC_ADMOB_BANNER_DETAIL_IOS || PROD_BANNER_DETAIL_IOS)
-    : (process.env.EXPO_PUBLIC_ADMOB_BANNER_DETAIL_ANDROID || TEST_BANNER_ANDROID),
+    : (process.env.EXPO_PUBLIC_ADMOB_BANNER_DETAIL_ANDROID || PROD_BANNER_DETAIL_ANDROID),
 
   // Banner inside the chapter reader. Falls back to the detail unit when no
   // dedicated reader unit is configured — both placements show during long
@@ -48,7 +53,7 @@ export const AD_UNITS = {
        PROD_BANNER_DETAIL_IOS)
     : (process.env.EXPO_PUBLIC_ADMOB_BANNER_READER_ANDROID ||
        process.env.EXPO_PUBLIC_ADMOB_BANNER_DETAIL_ANDROID ||
-       TEST_BANNER_ANDROID),
+       PROD_BANNER_DETAIL_ANDROID),
 };
 
 /** Show interstitial ad every N chapter navigations (manual nav only) */

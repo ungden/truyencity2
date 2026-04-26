@@ -86,7 +86,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       {
         androidAppId:
           process.env.EXPO_PUBLIC_ADMOB_ANDROID_APP_ID ||
-          "ca-app-pub-3940256099942544~3347511713",
+          "ca-app-pub-5160932470449783~2722302221",
         iosAppId: "ca-app-pub-5160932470449783~1161564690",
       },
     ],

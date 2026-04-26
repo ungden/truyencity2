@@ -33,6 +33,12 @@
       "ios": {
         "ascAppId": "6759160705",
         "appleTeamId": "Q8A7CBYV5Z"
+      },
+      "android": {
+        "serviceAccountKeyPath": "/Users/alexle/Downloads/truyencity-play-service-account.json",
+        "track": "internal",
+        "releaseStatus": "draft",
+        "changesNotSentForReview": true
       }
     }
   }
