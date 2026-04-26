@@ -24,6 +24,8 @@ import NovelCard from "@/components/novel-card";
 import StarRatingInput from "@/components/star-rating-input";
 import CommentsSection from "@/components/comments-section";
 import BoostCardButton from "@/components/boost-card-button";
+import { AdBanner } from "@/components/ads/ad-banner";
+import { useVipStatus } from "@/hooks/use-vip-status";
 
 const CHAPTERS_PER_PAGE = 20;
 const DETAIL_TABS = ["Giới Thiệu", "Đánh Giá", "D.S Chương"];
@@ -69,6 +71,8 @@ export default function NovelDetailScreen() {
     novel?.cover_url
   );
 
+  const vipStatus = useVipStatus();
+
   function handleDownload() {
     if (offline.isDownloaded) {
       Alert.alert(
@@ -85,6 +89,23 @@ export default function NovelDetailScreen() {
         { text: "Hủy tải", style: "destructive", onPress: () => offline.cancelDownload() },
       ]);
     } else {
+      // VIP-gate offline downloads. Free users see a paywall CTA instead of
+      // a silent denial. Skip the check while VIP status is still loading
+      // so we don't false-block legit VIPs on first open.
+      if (!vipStatus.loading && !vipStatus.can_download) {
+        Alert.alert(
+          "Tính năng VIP",
+          "Tải truyện về máy để đọc offline là tính năng dành cho thành viên VIP.",
+          [
+            { text: "Để sau", style: "cancel" },
+            {
+              text: "Nâng cấp VIP",
+              onPress: () => router.push("/(account)/paywall"),
+            },
+          ]
+        );
+        return;
+      }
       if (process.env.EXPO_OS === "ios") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       offline.startDownload();
     }
@@ -435,6 +456,9 @@ export default function NovelDetailScreen() {
             </View>
           )}
 
+          {/* Banner ad — between novel header and tab content. Hidden for VIP. */}
+          <AdBanner placement="detail" />
+
           {/* ═══════════════ TABS ═══════════════ */}
           <UnderlineTabs
             tabs={DETAIL_TABS}
@@ -584,7 +608,13 @@ export default function NovelDetailScreen() {
                 }}
               >
                 <Text style={{ fontSize: 14 }}>
-                  {offline.isDownloaded ? "✓" : offline.status === "downloading" ? "⏳" : "⬇"}
+                  {offline.isDownloaded
+                    ? "✓"
+                    : offline.status === "downloading"
+                      ? "⏳"
+                      : !vipStatus.loading && !vipStatus.can_download
+                        ? "👑"
+                        : "⬇"}
                 </Text>
                 <Text
                   style={{
@@ -594,14 +624,18 @@ export default function NovelDetailScreen() {
                       ? "#22c55e"
                       : offline.status === "downloading"
                         ? "#3b82f6"
-                        : C.textSub,
+                        : !vipStatus.loading && !vipStatus.can_download
+                          ? "#fbbf24"
+                          : C.textSub,
                   }}
                 >
                   {offline.isDownloaded
                     ? "Đã tải offline"
                     : offline.status === "downloading"
                       ? `Đang tải ${offline.downloadedCount}/${offline.totalCount}...`
-                      : "Tải để đọc offline"}
+                      : !vipStatus.loading && !vipStatus.can_download
+                        ? "Tải offline (VIP)"
+                        : "Tải để đọc offline"}
                 </Text>
               </Pressable>
               {offline.status === "downloading" && (

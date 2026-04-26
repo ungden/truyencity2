@@ -7,6 +7,12 @@ import { Stack } from "expo-router/stack";
 import { initRevenueCat } from "@/lib/revenuecat";
 import { TurboModuleRegistry } from "react-native";
 import TrackPlayer from "react-native-track-player";
+import * as WebBrowser from "expo-web-browser";
+
+// Required for OAuth redirects to close the in-app browser cleanly. Without
+// this, the SFAuthenticationSession may stay alive after Google sign-in,
+// causing the app to feel frozen until force-quit.
+WebBrowser.maybeCompleteAuthSession();
 
 // Register RNTP playback service at module-load time (required by RNTP — must
 // happen before the app's first render). Without this, the iOS lock-screen

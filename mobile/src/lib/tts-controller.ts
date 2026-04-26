@@ -135,6 +135,18 @@ class TTSControllerImpl {
   private listeners: Set<Listener> = new Set();
   private remoteListenersAttached = false;
 
+  // Auto-resume bridge: the reader screen sets this on natural chapter end
+  // before navigating to chapter N+1, so the freshly-mounted reader on the
+  // next chapter can detect "auto-advanced — start playing immediately".
+  private pendingAutoResume = false;
+  // Grace window keeping the silent TrackPlayer track alive after a natural
+  // chapter end. Without this, iOS suspends the app the instant TTS finishes
+  // and the new chapter never mounts in background → the user sees a frozen
+  // app that needs foregrounding before audio resumes. If no speak() arrives
+  // within the window, we fall through to a full stop.
+  private autoStopTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  private static AUTO_STOP_GRACE_MS = 15000;
+
   // ─── Subscription API (for React hook) ───
   subscribe(l: Listener): () => void {
     this.listeners.add(l);
@@ -193,6 +205,10 @@ class TTSControllerImpl {
 
   // ─── Public API ───
   async speak(htmlContent: string, metadata: TTSMetadata) {
+    // A new speak() always cancels any pending auto-stop from the previous
+    // chapter — the silent keep-alive track will be reset by loadSilentTrack
+    // below, and we don't want the grace timer to stop us mid-chapter.
+    this.cancelAutoStop();
     await ensurePlayerSetup();
     this.attachRemoteListeners();
 
@@ -265,6 +281,9 @@ class TTSControllerImpl {
   }
 
   async stop() {
+    // Manual stop wins over any pending auto-resume from a prior chapter end.
+    this.cancelAutoStop();
+    this.pendingAutoResume = false;
     this.isStopped = true;
     this.isPaused = false;
     this.chunks = [];
@@ -323,15 +342,25 @@ class TTSControllerImpl {
       const naturalEnd = !this.isStopped && index >= this.chunks.length;
       this.currentIndex = 0;
       this.chunks = [];
-      try { TrackPlayer.stop().catch(() => {}); } catch {}
-      this.setStatus("idle");
-      // Fire chapter-complete callback ONLY on natural end (last chunk done),
-      // not on user-initiated stop. Reader screen uses this to auto-advance.
+
       if (naturalEnd) {
+        // Keep the silent keep-alive TrackPlayer track running so iOS
+        // doesn't suspend the app between chapters. The reader screen will
+        // set pendingAutoResume + navigate, and the new chapter's reader
+        // will call speak() (which cancels the timer + resets the player)
+        // within the grace window. If nothing comes (last chapter, fetch
+        // failure), the timer fires and we stop fully.
+        this.scheduleAutoStop();
+        this.setStatus("idle");
         this.onChapterCompleteHandlers.forEach((h) => {
           try { h(); } catch {}
         });
+        return;
       }
+
+      // Hard stop path (manual stop, error, isStopped path).
+      try { TrackPlayer.stop().catch(() => {}); } catch {}
+      this.setStatus("idle");
       return;
     }
     const text = this.chunks[index];
@@ -373,6 +402,39 @@ class TTSControllerImpl {
       try { h(this.currentIndex, this.chunks.length); } catch {}
     });
     this.emit();
+  }
+
+  // ─── Auto-resume bridge ───
+
+  /** Reader screen calls this on natural chapter end (before navigating to
+   *  chapter N+1). The freshly-mounted next reader checks consumeAutoResume()
+   *  after content loads to decide whether to auto-call speak(). */
+  requestAutoResume() {
+    this.pendingAutoResume = true;
+  }
+
+  /** Returns and atomically clears the auto-resume flag. */
+  consumeAutoResume(): boolean {
+    const flag = this.pendingAutoResume;
+    this.pendingAutoResume = false;
+    return flag;
+  }
+
+  private scheduleAutoStop() {
+    this.cancelAutoStop();
+    this.autoStopTimeoutId = setTimeout(() => {
+      this.autoStopTimeoutId = null;
+      // Grace window expired without a follow-up speak() — fully stop now.
+      this.pendingAutoResume = false;
+      try { TrackPlayer.stop().catch(() => {}); } catch {}
+    }, TTSControllerImpl.AUTO_STOP_GRACE_MS);
+  }
+
+  private cancelAutoStop() {
+    if (this.autoStopTimeoutId) {
+      clearTimeout(this.autoStopTimeoutId);
+      this.autoStopTimeoutId = null;
+    }
   }
 }
 

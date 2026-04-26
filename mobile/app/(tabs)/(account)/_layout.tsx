@@ -16,6 +16,10 @@ export default function AccountStack() {
         options={{
           title: "Cài Đặt",
           headerLargeTitle: !isIPad,
+          headerLargeTitleStyle: { color: "#e8e6f0" },
+          headerLargeTitleShadowVisible: false,
+          headerStyle: { backgroundColor: "#131620" },
+          headerTintColor: "#e8e6f0",
         }}
       />
       <Stack.Screen

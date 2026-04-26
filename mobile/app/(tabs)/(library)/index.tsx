@@ -18,7 +18,7 @@ import {
 type HistoryItem = {
   novel_id: string;
   chapter_number: number;
-  updated_at: string;
+  last_read: string;
 };
 
 type BookmarkItem = {
@@ -63,9 +63,9 @@ export default function LibraryScreen() {
       const [historyRes, bookmarkRes] = await Promise.all([
         supabase
           .from("reading_progress")
-          .select("novel_id, chapter_number, updated_at")
+          .select("novel_id, chapter_number, last_read")
           .eq("user_id", userId!)
-          .order("updated_at", { ascending: false })
+          .order("last_read", { ascending: false })
           .limit(50),
         supabase
           .from("bookmarks")
@@ -135,18 +135,40 @@ export default function LibraryScreen() {
   if (!userId && !loading) {
     return (
       <ScrollView
-        className="flex-1 bg-background"
-        contentContainerClassName="flex-1 items-center justify-center gap-4 px-8"
+        style={{ flex: 1, backgroundColor: "#131620" }}
+        contentInsetAdjustmentBehavior="automatic"
+        contentContainerStyle={{ flexGrow: 1, alignItems: "center", justifyContent: "center", gap: 12, paddingHorizontal: 32, paddingVertical: 48 }}
       >
-        <Text className="text-foreground text-xl font-bold text-center">
+        <View
+          style={{
+            width: 96,
+            height: 96,
+            borderRadius: 48,
+            backgroundColor: "#1a1d28",
+            alignItems: "center",
+            justifyContent: "center",
+            marginBottom: 8,
+          }}
+        >
+          <Text style={{ fontSize: 44 }}>📚</Text>
+        </View>
+        <Text style={{ fontSize: 20, fontWeight: "700", color: "#e8e6f0", textAlign: "center" }}>
           Đăng nhập để xem tủ sách
         </Text>
-        <Text className="text-muted-foreground text-sm text-center">
-          Lưu truyện yêu thích và theo dõi tiến độ đọc của bạn
+        <Text style={{ fontSize: 14, color: "#82818e", textAlign: "center", lineHeight: 20, maxWidth: 300 }}>
+          Lưu truyện yêu thích, theo dõi tiến độ đọc và đồng bộ trên mọi thiết bị
         </Text>
         <Link href="/(account)/login" asChild>
-          <Pressable className="bg-primary px-8 py-3 rounded-xl mt-2">
-            <Text className="text-primary-foreground font-semibold">
+          <Pressable
+            style={{
+              marginTop: 12,
+              backgroundColor: "#5c9cff",
+              paddingHorizontal: 32,
+              paddingVertical: 14,
+              borderRadius: 14,
+            }}
+          >
+            <Text style={{ color: "#ffffff", fontWeight: "600", fontSize: 15 }}>
               Đăng nhập
             </Text>
           </Pressable>
@@ -195,65 +217,90 @@ export default function LibraryScreen() {
           </View>
         }
         stickyHeaderIndices={[0]}
-        renderItem={({ item }: { item: OfflineNovel }) => (
-          <Link href={`/novel/${item.slug || item.novel_id}`} asChild>
-            <Pressable
-              style={[{
-                flexDirection: "row",
-                alignItems: "center",
-                paddingVertical: isTablet ? 14 : 12,
-                paddingHorizontal: 16,
-                borderBottomWidth: 1,
-                borderBottomColor: "rgba(128,128,128,0.2)",
-              }, centeredStyle] as any}
-            >
-              <Image
-                source={item.cover_url || "https://placehold.co/160x213"}
-                style={{ width: coverSize.width, height: coverSize.height, borderRadius: coverSize.radius }}
-                className="object-cover"
-              />
-              <View className="flex-1 ml-3 justify-center">
-                <Text
-                  style={{ fontSize: isTablet ? 17 : 16, fontWeight: "600", color: "#e8e6f0" }}
-                  numberOfLines={2}
-                >
-                  {item.title}
-                </Text>
-                <Text style={{ fontSize: isTablet ? 14 : 13, color: "#82818e", marginTop: 4 }}>
-                  {item.downloaded_chapters}/{item.total_chapters} chương
-                </Text>
-                <Text style={{ fontSize: isTablet ? 12 : 11, color: "#22c55e", marginTop: 2 }}>
-                  {formatStorageSize(getNovelStorageSize(item.novel_id))}
-                </Text>
-              </View>
+        renderItem={({ item }: { item: OfflineNovel }) => {
+          const dlPct = item.total_chapters > 0
+            ? Math.min(100, Math.round((item.downloaded_chapters / item.total_chapters) * 100))
+            : 0;
+          const fullyDownloaded = dlPct === 100;
+          return (
+            <Link href={`/novel/${item.slug || item.novel_id}`} asChild>
               <Pressable
-                onPress={() => handleDeleteOfflineNovel(item)}
-                hitSlop={16}
-                style={{
-                  paddingHorizontal: 14,
-                  paddingVertical: 10,
-                  borderRadius: 10,
-                  backgroundColor: "#ef444418",
-                  marginLeft: 8,
-                }}
-                accessibilityRole="button"
-                accessibilityLabel={`Xóa truyện ${item.title} khỏi thiết bị`}
+                style={[{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  paddingVertical: isTablet ? 16 : 14,
+                  paddingHorizontal: 16,
+                  borderBottomWidth: 1,
+                  borderBottomColor: "rgba(128,128,128,0.12)",
+                }, centeredStyle] as any}
               >
-                <Text style={{ color: "#ef4444", fontSize: 13, fontWeight: "600" }}>
-                  Xóa
-                </Text>
+                <Image
+                  source={item.cover_url || "https://placehold.co/160x213"}
+                  style={{ width: coverSize.width, height: coverSize.height, borderRadius: coverSize.radius }}
+                  className="object-cover"
+                />
+                <View style={{ flex: 1, marginLeft: 12, gap: 6, justifyContent: "center" }}>
+                  <Text
+                    style={{ fontSize: isTablet ? 17 : 15, fontWeight: "600", color: "#e8e6f0", lineHeight: isTablet ? 22 : 20 }}
+                    numberOfLines={2}
+                  >
+                    {item.title}
+                  </Text>
+                  <View style={{ gap: 4, marginTop: 2 }}>
+                    <View style={{ height: 4, backgroundColor: "#282b3a", borderRadius: 2, overflow: "hidden" }}>
+                      <View style={{ height: "100%", width: `${Math.max(dlPct, 2)}%`, backgroundColor: "#22c55e", borderRadius: 2 }} />
+                    </View>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                      <Text style={{ fontSize: 11, color: "#22c55e", fontWeight: "600" }}>
+                        {fullyDownloaded ? "Đã tải xong" : `Đã tải ${item.downloaded_chapters}/${item.total_chapters}`}
+                      </Text>
+                      <Text style={{ fontSize: 11, color: "#555" }}>·</Text>
+                      <Text style={{ fontSize: 11, color: "#82818e" }}>
+                        {formatStorageSize(getNovelStorageSize(item.novel_id))}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+                <Pressable
+                  onPress={() => handleDeleteOfflineNovel(item)}
+                  hitSlop={12}
+                  style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 18,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginLeft: 8,
+                  }}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Xóa truyện ${item.title} khỏi thiết bị`}
+                >
+                  <Text style={{ color: "#ef4444", fontSize: 18 }}>✕</Text>
+                </Pressable>
               </Pressable>
-            </Pressable>
-          </Link>
-        )}
+            </Link>
+          );
+        }}
         ListEmptyComponent={
-          <View className="items-center justify-center py-20 gap-2">
-            <Text style={{ fontSize: 32 }}>📥</Text>
-            <Text className="text-muted-foreground text-base">
-              Chưa tải truyện nào
+          <View style={{ alignItems: "center", paddingVertical: 64, paddingHorizontal: 32, gap: 10 }}>
+            <View
+              style={{
+                width: 88,
+                height: 88,
+                borderRadius: 44,
+                backgroundColor: "#1a1d28",
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: 4,
+              }}
+            >
+              <Text style={{ fontSize: 40 }}>📥</Text>
+            </View>
+            <Text style={{ fontSize: 17, fontWeight: "700", color: "#e8e6f0" }}>
+              Chưa có truyện offline
             </Text>
-            <Text className="text-muted-foreground text-sm text-center px-8">
-              Vào trang truyện và bấm "Tải để đọc offline"
+            <Text style={{ fontSize: 13, color: "#82818e", textAlign: "center", lineHeight: 19, maxWidth: 280 }}>
+              Tải truyện về máy để đọc khi không có kết nối mạng
             </Text>
           </View>
         }
@@ -268,6 +315,8 @@ export default function LibraryScreen() {
   function renderItem({ item }: { item: LibraryNovel }) {
     const total = getChapterCount(item);
     const current = item.readChapter || 0;
+    const pct = total > 0 ? Math.min(100, Math.round((current / total) * 100)) : 0;
+    const isHistory = selectedTab === 0;
 
     return (
       <Link href={`/novel/${item.slug || item.id}`} asChild>
@@ -275,10 +324,10 @@ export default function LibraryScreen() {
           style={[{
             flexDirection: "row",
             alignItems: "center",
-            paddingVertical: isTablet ? 14 : 12,
+            paddingVertical: isTablet ? 16 : 14,
             paddingHorizontal: 16,
             borderBottomWidth: 1,
-            borderBottomColor: "rgba(128,128,128,0.15)",
+            borderBottomColor: "rgba(128,128,128,0.12)",
           }, centeredStyle] as any}
         >
           <Image
@@ -286,23 +335,34 @@ export default function LibraryScreen() {
             style={{ width: coverSize.width, height: coverSize.height, borderRadius: coverSize.radius }}
             className="object-cover"
           />
-          <View className="flex-1 ml-3 justify-center">
+          <View style={{ flex: 1, marginLeft: 12, gap: 6, justifyContent: "center" }}>
             <Text
-              style={{ fontSize: isTablet ? 17 : 16, fontWeight: "600", color: "#e8e6f0" }}
+              style={{ fontSize: isTablet ? 17 : 15, fontWeight: "600", color: "#e8e6f0", lineHeight: isTablet ? 22 : 20 }}
               numberOfLines={2}
             >
               {item.title}
             </Text>
-            <Text style={{ fontSize: isTablet ? 14 : 13, color: "#82818e", marginTop: 4 }}>
-              {selectedTab === 0
-                ? `Đã đọc ${current}/${total}`
-                : `${total} chương`}
-            </Text>
+            {item.author ? (
+              <Text style={{ fontSize: isTablet ? 13 : 12, color: "#82818e" }} numberOfLines={1}>
+                {item.author}
+              </Text>
+            ) : null}
+            {isHistory ? (
+              <View style={{ gap: 4, marginTop: 2 }}>
+                <View style={{ height: 4, backgroundColor: "#282b3a", borderRadius: 2, overflow: "hidden" }}>
+                  <View style={{ height: "100%", width: `${Math.max(pct, 2)}%`, backgroundColor: "#5c9cff", borderRadius: 2 }} />
+                </View>
+                <Text style={{ fontSize: 11, color: "#5c9cff", fontWeight: "600" }}>
+                  Chương {current}/{total} · {pct}%
+                </Text>
+              </View>
+            ) : (
+              <Text style={{ fontSize: isTablet ? 12 : 11, color: "#5c9cff", fontWeight: "600" }}>
+                {total} chương
+              </Text>
+            )}
           </View>
-          <View className="flex-row items-center gap-4 ml-2">
-            <Text className="text-primary text-lg">&#9998;</Text>
-            <Text className="text-muted-foreground text-xl">&#8942;</Text>
-          </View>
+          <Text style={{ fontSize: 24, color: "#555", marginLeft: 8, fontWeight: "300" }}>›</Text>
         </Pressable>
       </Link>
     );
@@ -330,16 +390,47 @@ export default function LibraryScreen() {
       renderItem={renderItem}
       ListEmptyComponent={
         !loading ? (
-          <View className="items-center justify-center py-20">
-            <Text className="text-muted-foreground text-base">
-              {selectedTab === 0
-                ? "Chưa đọc truyện nào"
-                : "Chưa đánh dấu truyện nào"}
+          <View style={{ alignItems: "center", paddingVertical: 64, paddingHorizontal: 32, gap: 10 }}>
+            <View
+              style={{
+                width: 88,
+                height: 88,
+                borderRadius: 44,
+                backgroundColor: "#1a1d28",
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: 4,
+              }}
+            >
+              <Text style={{ fontSize: 40 }}>{selectedTab === 0 ? "📖" : "🔖"}</Text>
+            </View>
+            <Text style={{ fontSize: 17, fontWeight: "700", color: "#e8e6f0" }}>
+              {selectedTab === 0 ? "Tủ sách còn trống" : "Chưa có đánh dấu"}
             </Text>
+            <Text style={{ fontSize: 13, color: "#82818e", textAlign: "center", lineHeight: 19, maxWidth: 280 }}>
+              {selectedTab === 0
+                ? "Bắt đầu đọc một truyện để theo dõi tiến độ tại đây"
+                : "Đánh dấu truyện yêu thích để dễ dàng tìm lại sau"}
+            </Text>
+            <Link href="/(discover)" asChild>
+              <Pressable
+                style={{
+                  marginTop: 12,
+                  backgroundColor: "#5c9cff",
+                  paddingHorizontal: 24,
+                  paddingVertical: 12,
+                  borderRadius: 12,
+                }}
+              >
+                <Text style={{ color: "#ffffff", fontWeight: "600", fontSize: 14 }}>
+                  Khám phá truyện
+                </Text>
+              </Pressable>
+            </Link>
           </View>
         ) : (
-          <View className="items-center py-20">
-            <ActivityIndicator />
+          <View style={{ alignItems: "center", paddingVertical: 80 }}>
+            <ActivityIndicator color="#5c9cff" />
           </View>
         )
       }

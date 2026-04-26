@@ -15,6 +15,7 @@ interface UseUserStatsReturn {
   profile: Profile | null;
   stats: UserStats;
   loading: boolean;
+  isAuthenticated: boolean;
   refetch: () => void;
 }
 
@@ -77,6 +78,7 @@ export function useUserStats(): UseUserStatsReturn {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [stats, setStats] = useState<UserStats>(EMPTY_STATS);
   const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const fetchAll = useCallback(async () => {
     try {
@@ -85,13 +87,50 @@ export function useUserStats(): UseUserStatsReturn {
       } = await supabase.auth.getUser();
 
       if (!user) {
+        setIsAuthenticated(false);
         setProfile(null);
         setStats(EMPTY_STATS);
         setLoading(false);
         return;
       }
 
+      // We have a logged-in user — flip the auth flag IMMEDIATELY so the UI
+      // can render the authenticated state even while profile/stats are still
+      // loading. Without this, first-time Apple/Google users (whose profile
+      // row may not exist yet) get stuck on the unauthenticated view.
+      setIsAuthenticated(true);
+
       const userId = user.id;
+
+      // Auto-create the profile row if it doesn't exist. Supabase auth.users
+      // has no DB trigger to populate public.profiles, so first-time
+      // Apple/Google sign-ins would otherwise have no profile row.
+      // ON CONFLICT DO NOTHING via upsert — safe to run on every fetch.
+      const fullName: string | undefined =
+        (user.user_metadata as any)?.full_name ||
+        (user.user_metadata as any)?.name ||
+        undefined;
+      const [firstName, ...rest] = (fullName || "").trim().split(/\s+/);
+      const lastName = rest.join(" ") || null;
+      await supabase
+        .from("profiles")
+        .upsert(
+          {
+            id: userId,
+            first_name: firstName || null,
+            last_name: lastName,
+            avatar_url:
+              (user.user_metadata as any)?.avatar_url ||
+              (user.user_metadata as any)?.picture ||
+              null,
+          },
+          { onConflict: "id", ignoreDuplicates: true }
+        )
+        .then(({ error }) => {
+          if (error) {
+            console.warn("[use-user-stats] profile upsert failed:", error);
+          }
+        });
 
       // Fire all queries in parallel with allSettled for resilience
       const results = await Promise.allSettled([
@@ -160,10 +199,24 @@ export function useUserStats(): UseUserStatsReturn {
         return null;
       };
 
-      // Profile
+      // Profile — fall back to user_metadata if profile row is missing or
+      // failed to load. This guarantees we always have *something* to render
+      // and never trap a logged-in user in the unauthenticated UI.
       const profileRes = get<{ data: any }>(0);
       if (profileRes?.data) {
         setProfile({ ...profileRes.data, email: user.email });
+      } else {
+        const meta = (user.user_metadata as any) || {};
+        const metaFull: string =
+          meta.full_name || meta.name || "";
+        const [mFirst, ...mRest] = metaFull.trim().split(/\s+/);
+        setProfile({
+          id: userId,
+          email: user.email || null,
+          first_name: mFirst || null,
+          last_name: mRest.join(" ") || null,
+          avatar_url: meta.avatar_url || meta.picture || null,
+        });
       }
 
       // Chapters read
@@ -256,5 +309,5 @@ export function useUserStats(): UseUserStatsReturn {
     return () => subscription.unsubscribe();
   }, [fetchAll]);
 
-  return { profile, stats, loading, refetch: fetchAll };
+  return { profile, stats, loading, isAuthenticated, refetch: fetchAll };
 }

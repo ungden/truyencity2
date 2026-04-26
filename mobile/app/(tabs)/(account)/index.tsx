@@ -357,7 +357,7 @@ function SettingsMenu({ items }: { items: MenuItem[] }) {
 // ─── Main Screen ──────────────────────────────────────────────
 
 export default function ProfileScreen() {
-  const { profile, stats, loading, refetch } = useUserStats();
+  const { profile, stats, loading, isAuthenticated, refetch } = useUserStats();
   const { isVip } = useRevenueCat();
   const { isTablet, centeredStyle } = useDevice();
   const [offlineSize, setOfflineSize] = useState(0);
@@ -501,7 +501,10 @@ export default function ProfileScreen() {
   }
 
   // ── Unauthenticated state ──
-  if (!profile && !loading) {
+  // Gate on isAuthenticated (derived from supabase.auth.getUser), NOT on
+  // profile. First-time Apple/Google users may have a session but no row in
+  // public.profiles yet — we must not bounce them back to the login screen.
+  if (!isAuthenticated && !loading) {
     return (
       <ScrollView
         className="flex-1"

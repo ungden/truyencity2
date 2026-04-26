@@ -28,8 +28,15 @@ import { ttsController } from "@/lib/tts-controller";
 import { useDevice } from "@/hooks/use-device";
 import { TTS_SPEEDS } from "@/lib/tts";
 import { getChapterOffline } from "@/lib/offline-db";
+import {
+  getCachedChapter,
+  setCachedChapter,
+  prefetchChapter,
+} from "@/lib/chapter-prefetch";
 import { useKeepAwake } from "expo-keep-awake";
 import { useInterstitialAd } from "@/hooks/use-interstitial-ad";
+import { AdBanner } from "@/components/ads/ad-banner";
+import { useVipStatus } from "@/hooks/use-vip-status";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ReaderSettingsSheet from "@/components/reader-settings-sheet";
 import {
@@ -211,8 +218,31 @@ export default function ReadingScreen() {
 
   // ── TTS handlers ──
 
+  const vipStatus = useVipStatus();
+
+  function showTtsLimitPaywall() {
+    Alert.alert(
+      "Hết lượt nghe trong ngày",
+      "Bạn đã dùng hết 1 tiếng nghe miễn phí hôm nay. Nâng cấp VIP để nghe không giới hạn.",
+      [
+        { text: "Để sau", style: "cancel" },
+        {
+          text: "Nâng cấp VIP",
+          onPress: () => router.push("/(account)/paywall"),
+        },
+      ]
+    );
+  }
+
   function handleTTSToggle() {
     if (tts.status === "idle") {
+      // Free users get 1 hour of TTS per day. After that, fall through to a
+      // paywall CTA. Skip while VIP status is still loading to avoid false
+      // blocks on first launch.
+      if (!vipStatus.loading && !vipStatus.can_use_tts) {
+        showTtsLimitPaywall();
+        return;
+      }
       if (currentChapter?.content) {
         const chapterLabel = currentChapter.title
           ? `Chương ${currentChapter.chapter_number}: ${currentChapter.title}`
@@ -229,6 +259,24 @@ export default function ReadingScreen() {
       tts.resume();
     }
   }
+
+  // ── TTS usage tracking — periodic increment while playing ──
+  // Calls record_tts_usage RPC every 60s. The RPC returns can_continue=false
+  // once the daily quota is hit; we stop TTS immediately and surface the
+  // paywall. VIP users get can_continue=true unconditionally (limit = -1).
+  useEffect(() => {
+    if (tts.status !== "playing") return;
+    const RECORD_INTERVAL_MS = 60_000;
+    const id = setInterval(async () => {
+      const result = await vipStatus.recordTTS(60);
+      if (result && !result.can_continue) {
+        tts.stop();
+        showTtsLimitPaywall();
+      }
+    }, RECORD_INTERVAL_MS);
+    return () => clearInterval(id);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tts.status]);
 
   function cycleTTSSpeed() {
     const currentIdx = TTS_SPEEDS.findIndex((s) => s.rate === tts.speed);
@@ -250,6 +298,29 @@ export default function ReadingScreen() {
   async function fetchChapter() {
     setLoading(true);
     setError(null);
+
+    // Cache hit — content was prefetched while the previous chapter played.
+    // Skip the network round-trip entirely so TTS auto-resume can start
+    // speaking the moment this screen mounts.
+    const cached = getCachedChapter(slug, chapterNumber);
+    if (cached?.content) {
+      setNovelId(cached.novelId);
+      setNovelTitle(cached.novelTitle);
+      setNovelCover(cached.novelCover);
+      setCurrentChapter({
+        id: cached.id,
+        novel_id: cached.novel_id,
+        chapter_number: cached.chapter_number,
+        title: cached.title,
+        content: cached.content,
+        created_at: cached.created_at,
+      });
+      if (cached.totalChapters > 0) setTotalChapters(cached.totalChapters);
+      doSaveProgress(cached.novelId, chapterNumber, cached.id);
+      setLoading(false);
+      return;
+    }
+
     try {
       const { data: novelData, error: novelError } = await supabase
         .from("novels")
@@ -271,12 +342,16 @@ export default function ReadingScreen() {
         setNovelId(byId.id);
         setNovelTitle(byId.title);
         setNovelCover((byId as any).cover_url || undefined);
-        await fetchChapterData(byId.id);
+        await fetchChapterData(byId.id, byId.title, (byId as any).cover_url || undefined);
       } else {
         setNovelId(novelData.id);
         setNovelTitle(novelData.title);
         setNovelCover((novelData as any).cover_url || undefined);
-        await fetchChapterData(novelData.id);
+        await fetchChapterData(
+          novelData.id,
+          novelData.title,
+          (novelData as any).cover_url || undefined
+        );
       }
     } catch (err) {
       console.error("Error fetching chapter:", err);
@@ -286,7 +361,11 @@ export default function ReadingScreen() {
     }
   }
 
-  async function fetchChapterData(nId: string) {
+  async function fetchChapterData(
+    nId: string,
+    nTitle: string,
+    nCover: string | undefined
+  ) {
     // Offline-first
     try {
       const offlineChapter = getChapterOffline(nId, chapterNumber);
@@ -335,6 +414,15 @@ export default function ReadingScreen() {
 
     setCurrentChapter(chapterRes.data);
     setTotalChapters(countRes.count || 0);
+    // Persist the just-fetched chapter into the prefetch cache so a quick
+    // re-navigation (back/forward) doesn't refetch.
+    setCachedChapter(slug, chapterNumber, {
+      ...chapterRes.data,
+      totalChapters: countRes.count || 0,
+      novelId: nId,
+      novelTitle: nTitle,
+      novelCover: nCover,
+    });
     doSaveProgress(nId, chapterNumber, chapterRes.data.id);
   }
 
@@ -385,17 +473,58 @@ export default function ReadingScreen() {
   useEffect(() => {
     const unsubscribe = ttsController.onChapterComplete(() => {
       if (hasNext) {
+        // Set the auto-resume flag BEFORE navigating. The next chapter's
+        // reader will consume it after content loads and auto-call speak().
+        // The controller keeps the silent keep-alive track running for ~15s
+        // so iOS doesn't suspend the app between mounts.
+        ttsController.requestAutoResume();
         if (process.env.EXPO_OS === "ios") {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         }
-        // Navigate; the next chapter screen will mount, and if user had TTS
-        // active (which they did — we got here from TTS finishing), the
-        // TTS toggle preserves auto-resume via its own logic if desired.
         router.replace(`/read/${slug}/${chapterNumber + 1}`);
       }
     });
     return unsubscribe;
   }, [slug, chapterNumber, hasNext]);
+
+  // ── Auto-resume on next chapter: triggers when reader was reached via
+  //    auto-advance (controller flag set). Without this, the user has to
+  //    foreground the app and tap play to continue listening to chapter N+1. ──
+  useEffect(() => {
+    if (loading || !currentChapter?.content) return;
+    if (!ttsController.consumeAutoResume()) return;
+    // Free user may have exhausted their daily quota mid-listen — silently
+    // skip auto-resume rather than start audio they'll be cut off from.
+    // The paywall already fired on the previous chapter's recordTTS tick.
+    if (!vipStatus.loading && !vipStatus.can_use_tts) return;
+    const chapterLabel = currentChapter.title
+      ? `Chương ${currentChapter.chapter_number}: ${currentChapter.title}`
+      : `Chương ${currentChapter.chapter_number}`;
+    tts.speak(currentChapter.content, {
+      title: chapterLabel,
+      artist: novelTitle || "TruyenCity",
+      artwork: novelCover,
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentChapter?.id, loading]);
+
+  // ── Prefetch the next chapter while the user reads/listens to this one.
+  //    Pairs with the auto-resume flag above: by the time TTS reaches end,
+  //    the next chapter's content is already in memory and `fetchChapter`
+  //    on the new mount returns synchronously → audio resumes without a gap.
+  //    Cheap (one Supabase query, deduped via cache) and entirely free
+  //    (uses on-device TTS). ──
+  useEffect(() => {
+    if (!novelId || !novelTitle || !currentChapter || loading) return;
+    if (chapterNumber >= totalChapters) return; // last chapter — nothing to prefetch
+    const nextNum = chapterNumber + 1;
+    // Fire and forget — prefetchChapter handles its own errors.
+    prefetchChapter(slug, nextNum, {
+      id: novelId,
+      title: novelTitle,
+      cover_url: novelCover,
+    });
+  }, [novelId, novelTitle, novelCover, chapterNumber, totalChapters, currentChapter?.id, loading, slug]);
 
   // ── Scroll handling (with progress save + mark-as-read) ──
 
@@ -803,6 +932,12 @@ export default function ReadingScreen() {
             />
           )}
 
+          {/* Banner ad — between chapter content and end-of-chapter nav.
+              Hidden for VIP users (the core reason to upgrade). */}
+          <View style={{ marginTop: 24 }}>
+            <AdBanner placement="reader" />
+          </View>
+
           {/* Chapter end navigation */}
           <View style={{ marginTop: 32, gap: 12, paddingBottom: 32, ...(readerMaxWidth ? { maxWidth: readerMaxWidth - 48, alignSelf: "center" as const, width: "100%" as any } : {}) }}>
             <View style={{ height: 1, backgroundColor: theme.controlBorder, marginBottom: 16 }} />
@@ -895,9 +1030,32 @@ export default function ReadingScreen() {
           </Pressable>
 
           <View style={{ flex: 1, gap: 2 }}>
-            <Text style={{ color: theme.text, fontSize: 13, fontWeight: "600" }}>
-              {tts.status === "playing" ? "Đang đọc..." : "Tạm dừng"}
-            </Text>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+              <Text style={{ color: theme.text, fontSize: 13, fontWeight: "600" }}>
+                {tts.status === "playing" ? "Đang đọc" : "Tạm dừng"}
+              </Text>
+              {/* Free-tier quota chip — VIP users hide this entirely. Turns
+                  warning-orange when <10 min remain to nudge upgrade. */}
+              {!vipStatus.isVip && vipStatus.daily_tts_limit_seconds > 0 && (() => {
+                const remaining = Math.max(
+                  0,
+                  vipStatus.daily_tts_limit_seconds - vipStatus.tts_seconds_used_today
+                );
+                const minutes = Math.ceil(remaining / 60);
+                const lowQuota = remaining < 600; // <10 min
+                return (
+                  <Text
+                    style={{
+                      fontSize: 11,
+                      fontWeight: "600",
+                      color: lowQuota ? "#fbbf24" : theme.textSecondary,
+                    }}
+                  >
+                    · Còn {minutes} phút
+                  </Text>
+                );
+              })()}
+            </View>
             {tts.totalChunks > 1 && (
               <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
                 <View style={{ flex: 1, height: 3, backgroundColor: theme.controlBorder, borderRadius: 2 }}>
@@ -1026,6 +1184,8 @@ export default function ReadingScreen() {
               ? "⏸ Dừng"
               : tts.status === "paused"
               ? "▶ Tiếp"
+              : !vipStatus.loading && !vipStatus.can_use_tts
+              ? "🔒 Hết lượt"
               : "🔊 Nghe"}
           </Text>
         </Pressable>

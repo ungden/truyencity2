@@ -11,6 +11,7 @@ import SearchResults from "@/components/search-results";
 import { useSearchContext } from "@/contexts/search-context";
 import { useDevice } from "@/hooks/use-device";
 import type { Novel } from "@/lib/types";
+import { AdBanner } from "@/components/ads/ad-banner";
 
 export default function DiscoverScreen() {
   const { width, isTablet, isLargeTablet, gridColumns, centeredStyle } = useDevice();
@@ -188,6 +189,10 @@ export default function DiscoverScreen() {
           <NovelCard novel={featured} variant="featured" />
         </View>
       )}
+
+      {/* Banner ad — between hero/latest sections and the main content grid.
+          Hidden for VIP users. */}
+      <AdBanner placement="home" />
 
       {/* Recommended — responsive grid */}
       {recommended.length > 0 && (

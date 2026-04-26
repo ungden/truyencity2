@@ -15,7 +15,11 @@ export default function LibraryStack() {
         options={{
           title: "Tủ Sách",
           headerLargeTitle: !isIPad,
+          headerLargeTitleStyle: { color: "#e8e6f0" },
+          headerLargeTitleShadowVisible: false,
           headerShadowVisible: false,
+          headerStyle: { backgroundColor: "#131620" },
+          headerTintColor: "#e8e6f0",
         }}
       />
     </Stack>

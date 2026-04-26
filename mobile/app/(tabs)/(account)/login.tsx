@@ -41,11 +41,7 @@ export default function LoginScreen() {
           return;
         }
       }
-      if (router.canGoBack()) {
-        router.back();
-      } else {
-        router.replace("/(tabs)/(account)");
-      }
+      router.replace("/(tabs)/(account)");
     } catch (error: any) {
       const msg = error?.message || "Đã có lỗi xảy ra";
       // Translate common Supabase auth errors to Vietnamese
@@ -65,48 +61,69 @@ export default function LoginScreen() {
   async function handleGoogleAuth() {
     setLoading(true);
     try {
+      // NOTE: this redirect URL must be whitelisted in the Supabase project
+      // dashboard (Authentication → URL Configuration → Redirect URLs).
+      // We keep the existing `/(account)` form to avoid invalidating the
+      // already-configured allow-list entry.
       const redirectUrl = Linking.createURL("/(account)");
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo: redirectUrl,
+          skipBrowserRedirect: true,
         },
       });
 
       if (error) throw error;
-      if (data.url) {
-        const result = await WebBrowser.openAuthSessionAsync(
-          data.url,
-          redirectUrl
-        );
-        if (result.type === "success" && result.url) {
-          // Extract tokens from URL hash fragment
-          try {
-            const hashIndex = result.url.indexOf('#');
-            if (hashIndex === -1) throw new Error('No token in response');
-            const params = new URLSearchParams(result.url.substring(hashIndex + 1));
-            const accessToken = params.get("access_token");
-            const refreshToken = params.get("refresh_token");
-            if (accessToken && refreshToken) {
-              await supabase.auth.setSession({
-                access_token: accessToken,
-                refresh_token: refreshToken,
-              });
-              if (router.canGoBack()) {
-                router.back();
-              } else {
-                router.replace("/(tabs)/(account)");
-              }
-            } else {
-              throw new Error('Token not found in response');
-            }
-          } catch {
-            Alert.alert("Lỗi", "Không thể xác thực. Vui lòng thử lại.");
-          }
-        }
+      if (!data?.url) throw new Error("Không lấy được URL đăng nhập");
+
+      const result = await WebBrowser.openAuthSessionAsync(
+        data.url,
+        redirectUrl
+      );
+
+      // Always dismiss the in-app browser, regardless of result type — guards
+      // against the SFAuthenticationSession staying visible if the session
+      // ended via an unusual path (cancel, dismiss, error).
+      try {
+        WebBrowser.dismissBrowser();
+      } catch {}
+
+      if (result.type !== "success" || !result.url) {
+        // User canceled or browser was dismissed without redirect — bail
+        // silently. The finally block resets loading.
+        return;
       }
+
+      const hashIndex = result.url.indexOf("#");
+      if (hashIndex === -1) throw new Error("Phản hồi không có token");
+      const params = new URLSearchParams(result.url.substring(hashIndex + 1));
+      const accessToken = params.get("access_token");
+      const refreshToken = params.get("refresh_token");
+      if (!accessToken || !refreshToken) {
+        throw new Error("Thiếu token trong phản hồi");
+      }
+
+      const { error: setErr } = await supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken,
+      });
+      if (setErr) throw setErr;
+
+      // Defensive: confirm the session is readable before we navigate. This
+      // guarantees `onAuthStateChange` has fired SIGNED_IN by the time the
+      // account screen regains focus.
+      const { data: checkData } = await supabase.auth.getSession();
+      if (!checkData?.session) {
+        throw new Error("Phiên đăng nhập không được lưu");
+      }
+
+      // Use replace() — modal dismiss via back() can be a no-op when the
+      // navigation stack was rehydrated cold (deep link, kill+relaunch).
+      router.replace("/(tabs)/(account)");
     } catch (error: any) {
-      Alert.alert("Lỗi", error.message || "Không thể đăng nhập Google");
+      console.warn("[login] Google sign-in failed:", error);
+      Alert.alert("Lỗi", error?.message || "Không thể đăng nhập Google. Vui lòng thử lại.");
     } finally {
       setLoading(false);
     }
@@ -160,14 +177,12 @@ export default function LoginScreen() {
         throw new Error("Phiên đăng nhập không được lưu, vui lòng thử lại");
       }
 
-      // Prefer replace() over back() — safer when the login screen was reached
-      // via deep link or when the navigation stack is empty. Falls back to
-      // back() when a history entry exists so native back animations still work.
-      if (router.canGoBack()) {
-        router.back();
-      } else {
-        router.replace("/(tabs)/(account)");
-      }
+      // Always replace() — back() was the source of the "phải thoát app vào
+      // lại" bug. When the login screen is the modal root, back() can be a
+      // no-op (or dismiss without re-firing focus on the parent), leaving the
+      // user staring at a stale UI. replace() forces a fresh mount of the
+      // account screen which always picks up the new session.
+      router.replace("/(tabs)/(account)");
     } catch (error: any) {
       // User canceled the native Apple sheet — not an error, just bail.
       if (
