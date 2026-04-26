@@ -74,3 +74,4 @@ next-env.d.ts
 # Mobile temp test files
 mobile/test-*.js
 mobile/expo_output.log
+.claude/
