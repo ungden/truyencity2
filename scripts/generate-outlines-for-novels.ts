@@ -34,14 +34,14 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY || !GEMINI_API_KEY) {
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-const TARGET_PROJECT_IDS = [
+const TARGET_PROJECT_IDS = (process.env.TARGET_PROJECTS || [
   '788ff59e-7333-4ba8-adb8-5b450b5f90ab',
   '3a50eeeb-034d-4994-8776-390a5aa5597a',
   'cdf9f1f0-a8b6-49ec-b6ec-ad4d03bc69c4',
   '19ac0169-b987-4926-aeb8-77f00b660e65',
   '9516a987-63ef-4dbe-87e5-d8111070564a',
   '374d5990-3914-4ebf-a845-488ead0e85e8',
-];
+].join(',')).split(',').filter(Boolean);
 
 async function callGemini(prompt: string, jsonMode = true): Promise<string> {
   const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent';
