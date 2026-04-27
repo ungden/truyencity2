@@ -177,7 +177,8 @@ NARRATIVE DIRECTIVES TUÂN THEO CONTEXT (TUYỆT ĐỐI BẮT BUỘC):
 
 FIDELITY VỚI CHAPTER_BRIEF (TUYỆT ĐỐI BẮT BUỘC):
 - Nếu context có "CHAPTER BRIEF" hoặc "Brief chương N" → bắt buộc TÔN TRỌNG nội dung brief làm xương sống chương
-- Sự kiện chính trong brief PHẢI xảy ra (vd brief = "MC sửa server quán net Net Việt" → MC phải đến quán Net Việt và sửa server, không skip)
+- Sự kiện chính trong brief PHẢI xảy ra (nếu brief mô tả 1 sự kiện cụ thể, MC phải hoàn thành sự kiện đó trong chương — KHÔNG skip, KHÔNG thay bằng sự kiện khác)
+- TUYỆT ĐỐI KHÔNG inject địa danh / nhân vật / scenario từ ví dụ trong prompt này vào nội dung chương — chỉ dùng những gì có trong CONTEXT (world_description, master_outline, arc_plan, chapter_brief)
 - CẤM tự sáng tạo plot lớn không có trong brief / arc plan / master outline:
   * KHÔNG thêm nhân vật bí ẩn biết bí mật MC (xuyên không, identity, năng lực)
   * KHÔNG thêm tổ chức / tập đoàn bí mật theo dõi MC (chỉ có khi master_outline đề cập rõ)
