@@ -849,6 +849,12 @@ CẤU TRÚC SUB-ARC (HYPERPOP 2024-2026 STANDARD):
 - Sub-arc liên kết tuyến với nhau (cliffhanger cuối sub-arc 1 dẫn vào sub-arc 2) NHƯNG mỗi sub-arc đứng được độc lập như 1 mini-story.
 - Đây là chuẩn modern (微短剧 IP adaptation): reader có thể đọc 5-10 chương 1 lần và cảm thấy có closure, không cần đọc 30 chương mới hiểu.
 
+THREAD RETIREMENT QUOTA (LONG-FORM SUSTAINABILITY):
+- Mỗi arc PHẢI mark ≥1 thread "to_resolve" (close existing plot thread). Tránh thread accumulation.
+- Nếu open_threads > 8 (truyện đã có nhiều thread chưa đóng) → arc này PHẢI resolve ≥2 oldest threads trước khi open new.
+- "new_threads" tối đa 2-3 mỗi arc (không quá load).
+- Reader fatigue compounds nếu thread cứ open mà không close — engine phải force closure.
+
 Trả về JSON:
 {
   "arc_theme": "foundation|conflict|growth|...",

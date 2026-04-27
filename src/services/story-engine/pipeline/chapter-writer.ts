@@ -31,6 +31,7 @@
 import { callGemini } from '../utils/gemini';
 import { parseJSON } from '../utils/json-repair';
 import { getStyleByGenre, buildTitleRulesPrompt, GOLDEN_CHAPTER_REQUIREMENTS, ENGAGEMENT_CHECKLIST, getGenreEngagement, getGenreAntiCliche } from '../config';
+import { VN_PRONOUN_GUIDE, SUB_GENRE_RULES } from '../templates';
 import { getConstraintExtractor } from '../memory/constraint-extractor';
 import { GENRE_CONFIG } from '../../../lib/types/genre-config';
 import { buildStyleContext, getEnhancedStyleBible, CLIFFHANGER_TECHNIQUES } from '../memory/style-bible';
@@ -144,6 +145,18 @@ QUY TẮC:
 10. COMEDY BEAT (BẮT BUỘC): Mỗi chương PHẢI có ít nhất 1 khoảnh khắc hài hước tự nhiên. Ghi rõ "comedyBeat" trong JSON. Dùng Não Bổ (bystander suy diễn cao siêu), Vô Sỉ (MC lật lọng), Phản Kém (gap moe), hoặc nội tâm tự giễu nhại. Ngay cả trong trận chiến sinh tử, MC hoặc đồng đội PHẢI có ít nhất 1 suy nghĩ khô khan/tự chế giễu.
 11. PAYOFF NHỎ TRONG CHƯƠNG (BẮT BUỘC): Mỗi chương phải có ít nhất 1 "hạt giống đã gieo" được thu hoạch ngay trong chương (gợi ý ở scene đầu, trả ở scene sau). CẤM chỉ setup mà không payoff.
 12. SUBTEXT XUNG ĐỘT: Mỗi chương cần ít nhất 1 cảnh đối thoại có lớp nghĩa ngầm (không nói thẳng mục tiêu thật).
+13. PACING RHYTHM TRONG CHƯƠNG (5 scenes pattern): S1 slow setup → S2-S3 escalate → S4 peak (60-70% chương) → S5 breathe + ending hook. CẤM mở chương bằng action cao trào (overwhelm reader). Đặt scene chậm/breathing ở scene 1 hoặc cuối.
+14. SCENE TRANSITION FLUIDITY: Mỗi scene boundary phải clear (đổi địa điểm, đổi POV, time skip rõ). KHI chuyển scene CÙNG location/POV → dùng "sensory bridge" — câu cuối scene và câu đầu scene mới share 1 motif giác quan (mùi/âm thanh/nhiệt độ/ánh sáng). CẤM 2 scene liên tiếp không phân biệt rõ.
+15. EXPOSITION CONTROL: Nếu scene cần explanation (worldbuilding, magic system, business mechanic):
+    - Tối đa 50% scene là explanation
+    - Mỗi 150 từ explanation phải xen 1 action moment (MC react, hỏi, tranh luận)
+    - CẤM pure lecture / monologue dump
+16. CHAPTER 1 (GOLDEN CHAPTER) — chỉ áp dụng nếu chapterNumber = 1:
+    - Mở đầu ≤150 từ: PHẢI có (a) MC trong action/decision, (b) stakes-shift hoặc hook, (c) 1 sensory detail cụ thể
+    - CẤM info-dump opening (worldbuilding lecture / nội tâm dài)
+    - Câu 1 reveal MC personality hoặc immediate conflict
+17. EMOTIONAL ARC PER CHAPTER: opening emotion B → midpoint rise to peak P (60-70% mark) → small fall → ending emotion B' ≠ B. Ghi rõ "emotionalArc" JSON với opening / midpoint / climax / closing emotions cụ thể.
+18. ARC BOUNDARY (chapter đầu sub-arc / arc): nếu chương này là start-of-arc (ch.1, hoặc khi sub_arc_number trong context tăng) → giới thiệu ≥2 yếu tố mới (nhân vật, location, threat) MƯỢT MÀ trong scene, KHÔNG exposition dump.
 
 UNIVERSAL ANTI-SEEDS (CẤM TUYỆT ĐỐI cross-genre — TQ 2024-2026 đã chán):
 - CẤM "Mẹ MC ung thư cần tiền cứu" làm trigger động lực — sến
@@ -216,7 +229,22 @@ TÊN ĐẦY ĐỦ (BẮT BUỘC, CHỐNG GIẢM TÊN):
 - Dùng họ + tên ("Lý Quang Vinh") giúp brand tên nhân vật cho marketing/cosplay/mạng xã hội.
 - Mẫu chuẩn: "Lý Quang Vinh nghiến răng" ✅ thay vì "Vinh nghiến răng" ❌
 
-CẤM VĂN MẪU AI: Loại bỏ "Hít một ngụm khí lạnh", "Không thể tin nổi", "Đột nhiên", "Khẽ nhếch mép". Tả hành động thực tế.
+CẤM VĂN MẪU AI VIETNAMESE-SPECIFIC (Tier 1 - HARD CAP = 0):
+- "khẽ nhếch mép", "khóe miệng nhếch lên một nụ cười", "không khỏi"
+- "chỉ thấy", "không nói nên lời", "ánh mắt phức tạp"
+- "trong lòng thầm nghĩ", "không thể tin nổi", "khẽ thở dài một hơi"
+- "cảm giác như có một dòng điện chạy qua", "một cảm giác lạ lùng"
+→ Mỗi chương CHỈ ĐƯỢC dùng 0 lần các cụm trên. Tả hành động cụ thể thay thế.
+
+CẤM VĂN MẪU AI Tier 2 (CAP ≤2/chương): "đột nhiên", "hít một ngụm khí lạnh", "dường như", "như thể", "khẽ", "một cái".
+
+EMOTION QUA MICRO-ACTION LADDER (3-tier):
+- CẤM raw emotion-naming: "hắn tức giận", "nàng vui mừng", "hắn kinh ngạc"
+- THAY bằng 3-tier:
+  • Physical: clench fist, đập bàn, nghiến răng, đứng dậy
+  • Behavioral: đặt mạnh chén trà, quay đi không trả lời, xé thư
+  • Environmental: đám mây ngoài cửa sổ tụ lại, ngọn nến rung, gió lạnh thổi qua
+- Mix 2-3 tier để show 1 cảm xúc thay vì naming.
 
 NỘI TÂM ĐA LỚP (mỗi scene chính): 3 lớp: Bề mặt (MC nói gì) → Thật sự (MC cảm thấy gì) → Sâu nhất (nỗi sợ/khao khát bí mật).
 
@@ -230,7 +258,37 @@ KỸ THUẬT CÂU CHƯƠNG:
 CHỐNG "MÙI AI" (BẮT BUỘC):
 - Tránh mở đoạn bằng các cụm sáo rỗng chung chung.
 - Cứ mỗi 2 scenes phải có ít nhất 1 câu "chi tiết cụ thể" (vật thể, con số, hành động có hệ quả) thay vì câu cảm thán trừu tượng.
-- Mỗi chương phải có ít nhất 1 đoạn đối thoại mà nhân vật "không nói điều họ thật sự muốn" (subtext).`;
+- Mỗi chương phải có ít nhất 1 đoạn đối thoại mà nhân vật "không nói điều họ thật sự muốn" (subtext).
+
+DIALOGUE BEAT STRUCTURE (BẮT BUỘC):
+- Mỗi 2-3 lines dialogue PHẢI xen 1 action/reaction beat (cười, đặt chén, quay đi, nhìn xuống, im lặng quan sát).
+- CẤM dialogue chain >4 lines liên tiếp không có beat (gây confusing, "bắn dialogue").
+- Dialogue tag variety: KHÔNG chỉ "nói" — dùng action tag thay thế ("Hắn đặt chén trà xuống" + dialogue trên dòng kế).
+
+SENTENCE-LENGTH RHYTHM:
+- Action scenes: mix câu ngắn 3-7 từ + câu dài 15-25 từ ratio ~3:1 (punchy + descriptive).
+- Introspection scenes: lật ngược ratio 1:3 (câu dài chiếm ưu thế, dùng câu ngắn để punctuate).
+- CẤM 5 đoạn liên tiếp có avg sentence length giống nhau (±3 chars) — gây boring rhythm.
+
+SHOW-DON'T-TELL RATIO:
+- Tối đa 25% chương là narrative summary (past tense recap).
+- ≥75% là scene action (present-active, MC in motion).
+- Đặc biệt opening: 150 từ đầu CẤM summary/exposition — phải scene action ngay.
+
+3-LAYER INNER MONOLOGUE (CHỈ DÙNG TẠI EMOTIONAL PIVOT):
+- Layer 1 (Surface): MC immediate reaction
+- Layer 2 (Deeper): MC motivation/fear nội tại
+- Layer 3 (Deepest): MC unspoken belief về bản thân
+- CHỈ dùng 1-2 lần/chương tại pivot scenes. NGOÀI pivot, monologue cap 80 từ.
+
+SENSORY BRIDGE (scene transition):
+- Khi chuyển scene CÙNG location/POV: câu cuối scene + câu đầu scene mới share 1 motif giác quan (mùi hoa nhài, tiếng chuông, hơi lạnh, ánh đèn).
+- CẤM hard-cut giữa scene cùng setting mà không có bridge.
+
+REBIRTH (TRỌNG SINH) MEMORY TRIGGERS — chỉ áp dụng nếu sub-genre 'trong-sinh':
+- Memory budget: max 2 flashbacks/chương, mỗi flashback 50 từ.
+- 5 trigger types: smell, replayed scene, reappearing person, date/anniversary, overheard phrase.
+- CẤM paragraph dump flashback. CẤM MC lecture about future as monologue.`;
 
 const CRITIC_SYSTEM = `Bạn là CRITIC AGENT — biên tập viên nghiêm khắc đánh giá chất lượng.
 
@@ -256,6 +314,32 @@ KIỂM TRA BỔ SUNG (BẮT BUỘC):
     - Đánh lỗi khi: MC đau khổ kéo dài ≥2 scene trong chương (phẫn uất/bất lực/khóc lóc tủi thân, không hề có phản ứng tích cực) → issue type "pacing", severity "major".
     - Đánh lỗi khi: chương climax NHƯNG không có ≥2 breathing moments (đối thoại ấm, observation đời thường, recognition nhỏ, hài hước nhẹ) → issue type "pacing", severity "moderate".
 12. EASY WIN CHECK: Chương này có ≥1 "easy win" (MC giải quyết tự tin, casual competence, smooth opportunity, recognition không cần adversity)? Nếu không, và đây là chương đệm sau conflict → issue type "quality", severity "moderate".
+13. TONE CONSISTENCY CHECK: Kiểm tra "TONE PROFILE" trong META directives.
+    - Nếu tone='cozy' hoặc 'hopeful' NHƯNG chương full action/bạo lực không có breathing → issue "quality" severity "major".
+    - Nếu tone='pragmatic' NHƯNG chương full romance ngây ngô / cảm tính quá đà → flag mismatch.
+    - Nếu tone='bi-revenge' NHƯNG chương quá nhẹ nhàng không có stakes → flag mismatch (chỉ severity "minor" vì breathing chapters trong bi-revenge vẫn ok).
+14. AI-CLICHE AUTO-DETECT (HARD): Đếm tần suất các cụm sau:
+    - "khẽ nhếch mép", "khóe miệng nhếch", "không khỏi", "chỉ thấy", "không nói nên lời"
+    - "ánh mắt phức tạp", "trong lòng thầm nghĩ", "không thể tin nổi", "khẽ thở dài"
+    - Nếu ≥1 lần xuất hiện bất kỳ cụm trên → issue "quality" severity "moderate", yêu cầu thay thế bằng action cụ thể.
+    - Nếu "đột nhiên" / "hít một ngụm khí lạnh" / "dường như" / "như thể" >2 lần → severity "moderate".
+15. ON-THE-NOSE DIALOGUE CHECK: Đếm số lần nhân vật NÓI THẲNG cảm xúc/ý định:
+    - "Tôi rất tức giận", "tôi yêu em", "tôi nghi ngờ anh", "tôi sợ"
+    - Nếu >2 lần (cho cảnh emotional pivot) → issue "dialogue" severity "moderate", yêu cầu subtext.
+    - Modern hits 2024+: tránh nhân vật self-narrate cảm xúc — show qua action/silence.
+16. SHOW-DON'T-TELL RATIO: Ước lượng % narrative summary (past tense recap) vs scene action (present-active).
+    - Nếu >25% là summary narration → issue "quality" severity "moderate".
+    - Đặc biệt với chương opening: nếu >150 từ đầu là exposition/summary → severity "major".
+17. DIALOGUE BEAT CHECK: Kiểm tra dialogue chains.
+    - Nếu có >4 lines dialogue liên tiếp KHÔNG có action/reaction beat (cười, đứng dậy, im lặng, observation) → issue "dialogue" severity "moderate".
+    - Modern best practice: mỗi 2-3 lines dialogue có 1 beat.
+18. RAW EMOTION-NAMING: grep cho "hắn tức giận", "nàng vui mừng", "hắn kinh ngạc", "tôi buồn" — nếu >2 lần raw emotion adjective WITHOUT physical/behavioral/environmental carrier → issue "quality" severity "moderate".
+19. LONG-FORM COHERENCE (chỉ áp dụng nếu chương ≥500): Kiểm tra MC core traits có drift không.
+    - Nếu MC trong chương này hành xử/giá trị mâu thuẫn HOÀN TOÀN với personality đã thiết lập từ early chapters (hint từ context Story Bible + character_states)
+    - → issue "continuity" severity "critical", REWRITE
+    - Common drift patterns to flag: MC pragmatic chuyển nóng vội, MC family-pillar bỏ rơi gia tộc, MC career-driven ngừng quan tâm sự nghiệp.
+20. DIALOGUE CHAIN >4 LINES: Nếu có dialogue chain >4 lines liên tiếp KHÔNG có action/reaction beat → issue "dialogue" severity "moderate".
+21. SENSORY DENSITY: Mỗi scene chính cần ≥2 giác quan. Nếu cả chương chỉ có visual + auditory (thiếu khứu/vị/xúc giác cho ≥3 scenes) → issue "quality" severity "minor".
 
 ISSUES: Liệt kê vấn đề (pacing/consistency/dopamine/quality/word_count/dialogue/continuity)
 
@@ -302,6 +386,8 @@ export interface WriteChapterOptions {
   isFinalArc?: boolean;
   genreBoundary?: string;
   worldBible?: string;
+  /** Sub-genres for blending (e.g., ['trong-sinh','kinh-doanh']). Threaded into VN pronoun + sub-genre rules. */
+  subGenres?: string[];
 }
 
 export async function writeChapter(
@@ -506,7 +592,8 @@ Trả về JSON ChapterOutline:
   "targetWordCount": ${targetWords}
 }`;
 
-  const res = await callGemini(prompt, { ...config, temperature: 0.3, maxTokens: 16384, systemPrompt: ARCHITECT_SYSTEM + VN_PLACE_LOCK }, { jsonMode: true, tracking: options?.projectId ? { projectId: options.projectId, task: 'architect', chapterNumber } : undefined });
+  const genreSuffix = genre ? buildGenreSpecificSuffix(genre, options?.subGenres || []) : '';
+  const res = await callGemini(prompt, { ...config, temperature: 0.3, maxTokens: 16384, systemPrompt: ARCHITECT_SYSTEM + VN_PLACE_LOCK + genreSuffix }, { jsonMode: true, tracking: options?.projectId ? { projectId: options.projectId, task: 'architect', chapterNumber } : undefined });
 
   // Check finishReason for truncation
   if (res.finishReason === 'length' || res.finishReason === 'MAX_TOKENS') {
@@ -537,11 +624,42 @@ Trả về JSON ChapterOutline:
   parsed.targetWordCount = targetWords;
 
   // Enforce non-empty cliffhanger for non-finale arcs
+  // Only synthesize fallback IF outline has no cliffhanger AND chapter doesn't have an
+  // intentional emotional/reveal/comfort ending. Modern guidance (P0.1 cliffhanger detoxify):
+  // emotional/reveal/comfort endings are valid alternatives for breathing/aftermath/comedic chapters.
   if (!options?.isFinalArc && !parsed.cliffhanger?.trim()) {
-    parsed.cliffhanger = synthesizeFallbackCliffhanger(parsed);
+    // Check emotional arc closing intent — if intentionally calm/resolution, skip synthesis
+    const closingIntent = (parsed.emotionalArc?.closing || '').toLowerCase();
+    const isIntentionalSoftEnding = /resolution|aftermath|breath|peace|reflection|comfort|warm|reveal|seed/.test(closingIntent);
+    if (!isIntentionalSoftEnding) {
+      parsed.cliffhanger = synthesizeFallbackCliffhanger(parsed);
+    }
+    // else: leave cliffhanger empty — emotional/reveal ending acceptable
   }
 
   return parsed;
+}
+
+/**
+ * Build genre + sub-genre specific suffix for systemPrompt — VN pronouns, sub-genre patterns.
+ * Inject once at agent call instead of redundantly in WRITER_SYSTEM static text.
+ */
+function buildGenreSpecificSuffix(genre: GenreType, subGenres: string[] = []): string {
+  const parts: string[] = [];
+
+  const pronounRule = VN_PRONOUN_GUIDE[genre];
+  if (pronounRule) {
+    parts.push(`\n\nVN PRONOUN WHITELIST cho thể loại "${genre}":\n${pronounRule}`);
+  }
+
+  for (const sg of subGenres) {
+    const rules = SUB_GENRE_RULES[sg];
+    if (rules?.length) {
+      parts.push('\n\n' + rules.join('\n'));
+    }
+  }
+
+  return parts.join('');
 }
 
 // ── Writer Agent ─────────────────────────────────────────────────────────────
@@ -687,7 +805,8 @@ ${buildGenreAntiClicheSection(genre)}
 
 Bắt đầu viết:`;
 
-  const res = await callGemini(prompt, { ...config, systemPrompt: WRITER_SYSTEM + VN_PLACE_LOCK }, { tracking: options?.projectId ? { projectId: options.projectId, task: 'writer', chapterNumber: outline.chapterNumber } : undefined });
+  const writerSuffix = buildGenreSpecificSuffix(genre, options?.subGenres || []);
+  const res = await callGemini(prompt, { ...config, systemPrompt: WRITER_SYSTEM + VN_PLACE_LOCK + writerSuffix }, { tracking: options?.projectId ? { projectId: options.projectId, task: 'writer', chapterNumber: outline.chapterNumber } : undefined });
 
   // Check finishReason
   if (res.finishReason === 'length' || res.finishReason === 'MAX_TOKENS') {

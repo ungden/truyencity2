@@ -1326,6 +1326,76 @@ export const GENRE_ENGAGEMENT: Record<GenreType, string[]> = {
 };
 
 /**
+ * AI-cliché blacklist Vietnamese-specific (mùi convert thô + mùi AI).
+ * Tier 1 (HARD CAP = 0): các cụm reader-VN ghét tuyệt đối, Critic auto-rewrite nếu phát hiện.
+ * Tier 2 (CAP ≤2/chương): cho phép hạn chế.
+ */
+export const AI_CLICHE_BLACKLIST_HARD: string[] = [
+  'khẽ nhếch mép', 'khóe miệng nhếch lên một nụ cười', 'không khỏi',
+  'chỉ thấy', 'không nói nên lời', 'ánh mắt phức tạp',
+  'trong lòng thầm nghĩ', 'không thể tin nổi', 'khẽ thở dài một hơi',
+  'cảm giác như có một dòng điện chạy qua', 'một cảm giác lạ lùng',
+];
+export const AI_CLICHE_BLACKLIST_SOFT: string[] = [
+  'đột nhiên', 'hít một ngụm khí lạnh', 'dường như', 'như thể',
+  'khẽ', 'một cái',
+];
+
+/**
+ * Vietnamese pronoun whitelist per genre cluster.
+ * Forces appropriate pronouns: hắn/y/lão/nàng for cổ trang, anh/cô for hiện đại.
+ */
+export const VN_PRONOUN_GUIDE: Record<string, string> = {
+  'tien-hiep': 'hắn (MC + nam đồng cấp), y (nam đối thủ), lão (cao niên), nàng (nữ MC/nữ chính), gã (nam phản diện khinh miệt), bà (nữ cao niên). CẤM "anh ta", "cô ta".',
+  'huyen-huyen': 'hắn / y / lão / nàng / gã / bà. CẤM "anh ta", "cô ta".',
+  'kiem-hiep': 'hắn / y / lão / nàng / gã / bà / hảo hán / đại hiệp. CẤM "anh ta".',
+  'do-thi': 'anh / cô / chị / em / chú / bác (HIỆN ĐẠI). DÙNG "anh/cô" cho MC + người trẻ; "chú/bác" cho người lớn tuổi. CẤM "hắn/nàng/y" (cổ trang).',
+  'ngon-tinh': 'anh / cô / chị / em (HIỆN ĐẠI tổng tài) HOẶC hắn / nàng (cổ trang ngôn tình tùy bối cảnh). KHÔNG mix 2 hệ.',
+  'quan-truong': 'anh / cô / chú / bác / đồng chí / lãnh đạo (HIỆN ĐẠI). CẤM "hắn/nàng/y".',
+  'lich-su': 'hắn / y / lão / nàng / gã / bệ hạ / công công / nương nương / vương / hầu (theo cấp bậc).',
+  'mat-the': 'hắn / cô / em (post-apocalypse mix) — choose by character age + tone.',
+  'linh-di': 'hắn / cô / anh / em (hiện đại horror) — flexible.',
+  'di-gioi': 'hắn / nàng / lãnh chúa / chủ nhân (tuỳ vai vế trong dị giới).',
+  'khoa-huyen': 'anh / cô / hắn / nàng (sci-fi mix). Default modern: "anh/cô"; future-far: "hắn/nàng".',
+  'vong-du': 'anh / cô / em / hắn (game mix) — modern player default "anh/cô".',
+  'dong-nhan': 'theo nguyên tác. Tu tiên: hắn/nàng/y; modern fanfic: anh/cô.',
+};
+
+/**
+ * Sub-genre specific patterns (when sub_genres array contains these tags).
+ */
+export const SUB_GENRE_RULES: Record<string, string[]> = {
+  'trong-sinh': [
+    'TRỌNG SINH PATTERNS:',
+    '  • Memory triggers (mỗi 1-2 chương 1 lần, max): smell / replayed scene / reappearing person / date / overheard phrase → 1-2 câu flashback, KHÔNG paragraph dump.',
+    '  • Reader-knows-MC-knows: MC nhìn thấy người/sự kiện → reader cảm nhận MC biết trước nhưng không cần explain hết.',
+    '  • Avoid overpowered cliché: MC không phải biết MỌI THỨ tương lai — chỉ key events. Nhiều chi tiết MC vẫn phải thử + sai.',
+    '  • Causality cost: mỗi action MC dựa trên future memory phải có rủi ro hoặc chi phí (đầu tư có thể fail vì MC làm thị trường thay đổi).',
+    '  • Callback to old life: ≥1 lần/arc nhắc đến kiếp trước (regret, gratitude, lesson learned).',
+  ],
+  'kinh-doanh': [
+    'KINH DOANH PATTERNS:',
+    '  • Concrete numbers: doanh thu / vốn / market share / nhân sự — DÙNG SỐ CỤ THỂ, không "rất nhiều", "vô số".',
+    '  • Realistic timeline: khởi nghiệp → có deal đầu → break-even → scale — KHÔNG skip giai đoạn.',
+    '  • Competitor as REACTIVE: đối thủ phản ứng SAU khi MC act, KHÔNG xuất hiện proactive đe dọa.',
+    '  • Meeting/negotiation scenes: dialogue-heavy, có subtext (mỗi bên có agenda riêng).',
+    '  • Resource tracking: tiền đã chi / còn → consistent với chương trước.',
+  ],
+  'cung-dau': [
+    'CUNG ĐẤU PATTERNS:',
+    '  • Mưu kế đa lớp: mỗi lần ra tay phải có ≥2 lớp ý định.',
+    '  • Phụ nữ vs phụ nữ chính trị: rivals trong cung không nhất thiết evil — có lý do hợp lý.',
+    '  • Chi tiết lễ nghi cụ thể (xưng hô, hành lễ, áo quần) — không generic.',
+  ],
+  'gia-toc': [
+    'GIA TỘC PATTERNS:',
+    '  • Multi-gen narrative: trưởng bối / cha mẹ / anh em / con cháu đều có arc riêng.',
+    '  • Gia tộc affair: nội bộ tranh đoạt, ngoại bộ áp lực — POV multi-character.',
+    '  • Trách nhiệm > tham vọng cá nhân: MC quyết định dựa trên gia tộc trước, không lone wolf.',
+  ],
+};
+
+/**
  * Universal anti-pattern blacklist — TQ 2024-2026 đã chán/loại bỏ các trigger sến.
  * Engine CẤM tạo những setup này trong Architect outline + Writer content.
  * Áp dụng cross-genre.

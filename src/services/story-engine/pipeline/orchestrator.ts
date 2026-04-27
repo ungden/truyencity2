@@ -307,6 +307,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       isFinalArc,
       genreBoundary: context.genreBoundary,
       worldBible: context.storyBible,
+      subGenres: context.subGenres,
     },
   );
 
