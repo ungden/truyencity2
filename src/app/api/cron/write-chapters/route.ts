@@ -48,7 +48,7 @@ const MAX_RESUME_BATCH_SIZE = clamp(parseIntEnv('WRITE_CHAPTERS_MAX_RESUME_BATCH
 const INIT_PREP_BATCH_SIZE = clamp(parseIntEnv('WRITE_CHAPTERS_INIT_PREP_BATCH', 20), 0, 100);   // Arc plan generation only (fast)
 const INIT_WRITE_BATCH_SIZE = clamp(parseIntEnv('WRITE_CHAPTERS_INIT_WRITE_BATCH', 10), 0, 100);  // Chapter 1 writing (arc plan already exists)
 const CANDIDATE_POOL_SIZE = clamp(parseIntEnv('WRITE_CHAPTERS_CANDIDATE_POOL', 1600), 200, 5000);
-const PROJECT_TIMEOUT_MS = clamp(parseIntEnv('WRITE_CHAPTERS_RESUME_TIMEOUT_MS', 180_000), 30_000, 300_000);     // 180s per resume project
+const PROJECT_TIMEOUT_MS = clamp(parseIntEnv('WRITE_CHAPTERS_RESUME_TIMEOUT_MS', 240_000), 30_000, 300_000);     // 240s per resume project (was 180s — increased for chapters past 400 with rich context)
 const INIT_PREP_TIMEOUT_MS = clamp(parseIntEnv('WRITE_CHAPTERS_INIT_PREP_TIMEOUT_MS', 120_000), 30_000, 300_000); // 120s for arc plan generation only
 const INIT_WRITE_TIMEOUT_MS = clamp(parseIntEnv('WRITE_CHAPTERS_INIT_WRITE_TIMEOUT_MS', 240_000), 30_000, 300_000); // 240s for chapter 1 write (no arc plan gen)
 const RUN_CONCURRENCY = clamp(parseIntEnv('WRITE_CHAPTERS_CONCURRENCY', 20), 1, 32); // Tier-3 Gemini is effectively unlimited; bottleneck is orchestration
@@ -174,10 +174,12 @@ async function ensureDailyQuotasForActiveProjects(
 
   const dayStartMs = new Date(dayStartIso).getTime();
 
-  // Spread 20 chapters evenly across 24h → 1 chapter every 72 minutes.
-  // Each project gets a deterministic first-slot offset within [0, 72) minutes
-  // from the start of the VN day, so they don't all fire at once.
-  const cadenceMinutes = Math.floor(1440 / DAILY_CHAPTER_QUOTA); // 72 min
+  // FRONT-LOAD: spread 20 chapters across first 18h (1080 min) → 54 min/chapter target.
+  // Last 6h (1080-1440 min) reserved as catch-up buffer for transient failures.
+  // This way if any chapter stalls, system has 6h to retry before midnight rollover.
+  // Each project gets a deterministic first-slot offset within [0, 54) minutes from VN day start.
+  const ACTIVE_WINDOW_MINUTES = 1080; // 18h working window (was 1440 = 24h)
+  const cadenceMinutes = Math.floor(ACTIVE_WINDOW_MINUTES / DAILY_CHAPTER_QUOTA); // 54 min
 
   // Check for active boosts — boosted novels get 2x daily quota
   const projectIds = projects.map((p) => p.id);
@@ -196,15 +198,39 @@ async function ensureDailyQuotasForActiveProjects(
     }
   }
 
+  // CROSS-DAY CATCH-UP: check yesterday's quotas with shortfall, add to today's target.
+  // Pattern observed: novels sometimes hit 19/20 due to midnight rollover stalls.
+  // By adding shortfall to today's target, we guarantee 20/day rolling-average.
+  // Cap at +5 to avoid unbounded debt accumulation (if 5+ days behind, the project has bigger issues).
+  const yesterday = new Date(new Date(vnDate).getTime() - 24 * 60 * 60 * 1000)
+    .toISOString().slice(0, 10);
+  const { data: yesterdayShortfalls } = await supabase
+    .from('project_daily_quotas')
+    .select('project_id, target_chapters, written_chapters')
+    .in('project_id', projectIds)
+    .eq('vn_date', yesterday)
+    .neq('status', 'completed');
+
+  const shortfallMap = new Map<string, number>();
+  if (yesterdayShortfalls) {
+    for (const q of yesterdayShortfalls) {
+      const shortfall = Math.max(0, (q.target_chapters || 0) - (q.written_chapters || 0));
+      if (shortfall > 0) {
+        shortfallMap.set(q.project_id, Math.min(shortfall, 5));
+      }
+    }
+  }
+
   const rows = projects.map((p) => {
     const seed = hashStringToInt(`${p.id}:${vnDate}`);
     const offsetMinutes = seed % cadenceMinutes;
     const nextDueMs = dayStartMs + offsetMinutes * 60 * 1000;
     const boostMultiplier = boostMap.get(p.id) || 1;
+    const carryover = shortfallMap.get(p.id) || 0;
     return {
       project_id: p.id,
       vn_date: vnDate,
-      target_chapters: DAILY_CHAPTER_QUOTA * boostMultiplier,
+      target_chapters: DAILY_CHAPTER_QUOTA * boostMultiplier + carryover,
       written_chapters: 0,
       status: 'active' as const,
       retry_count: 0,
@@ -219,6 +245,17 @@ async function ensureDailyQuotasForActiveProjects(
 
   if (error) {
     throw new Error(`ensureDailyQuotasForActiveProjects failed: ${error.message}`);
+  }
+
+  // Mark yesterday's stale quotas as completed (cleanup)
+  const staleProjectIds = Array.from(shortfallMap.keys());
+  if (staleProjectIds.length > 0) {
+    await supabase
+      .from('project_daily_quotas')
+      .update({ status: 'completed', updated_at: new Date().toISOString() })
+      .in('project_id', staleProjectIds)
+      .eq('vn_date', yesterday)
+      .neq('status', 'completed');
   }
 }
 
@@ -285,10 +322,17 @@ async function updateQuotaAfterWrite(
   } else {
     const endMs = new Date(endIso).getTime();
     const nowMs = Date.now();
-    const minutesLeft = Math.max(5, Math.floor((endMs - nowMs) / 60000));
-    const cadence = clamp(Math.floor(minutesLeft / remaining), 5, 120);
-    const jitter = (hashStringToInt(`${projectId}:${written}:${vnDate}`) % 11) - 5;
-    const delayMinutes = Math.max(5, cadence + jitter);
+    const minutesLeft = Math.max(1, Math.floor((endMs - nowMs) / 60000));
+
+    // BURST MODE: when behind schedule (chapters left × 7 min > minutes left in day),
+    // drop cadence floor from 5 to 2 min to fire ASAP next cron tick.
+    // 5-min cron tick + 2-min cadence = effectively "fire next tick" — no artificial wait.
+    const isBehindSchedule = remaining * 7 > minutesLeft;
+    const cadenceFloor = isBehindSchedule ? 2 : 5;
+
+    const cadence = clamp(Math.floor(minutesLeft / remaining), cadenceFloor, 120);
+    const jitter = isBehindSchedule ? 0 : (hashStringToInt(`${projectId}:${written}:${vnDate}`) % 11) - 5;
+    const delayMinutes = Math.max(cadenceFloor, cadence + jitter);
     nextDueAt = new Date(nowMs + delayMinutes * 60 * 1000).toISOString();
   }
 
@@ -316,7 +360,9 @@ async function updateQuotaAfterError(
     .update({
       retry_count: 1,
       last_error: errorMsg.slice(0, 500),
-      next_due_at: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
+      // Retry in 3 min instead of 10 — 5-min cron tick means we'll catch the very next tick.
+      // Faster recovery from transient DeepSeek failures.
+      next_due_at: new Date(Date.now() + 3 * 60 * 1000).toISOString(),
       updated_at: new Date().toISOString(),
     })
     .eq('project_id', projectId)
