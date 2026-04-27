@@ -84,6 +84,61 @@ async function checkStuckNovels(supabase: ReturnType<typeof getSupabaseAdmin>): 
   return { name: 'Stuck Novels (ch=0)', status, message, value: stuck, stuckCount: stuck };
 }
 
+async function checkStalledProjects(supabase: ReturnType<typeof getSupabaseAdmin>): Promise<CheckResult & { stalledCount: number; stalledIds: string[] }> {
+  // Projects with current_chapter > 0 BUT no chapter written in last 6 hours.
+  // Indicates pipeline stuck mid-novel (DeepSeek failures, lock issues, etc.)
+  const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString();
+
+  const { data: activeProjects } = await supabase
+    .from('ai_story_projects')
+    .select('id, novel_id, current_chapter, updated_at')
+    .eq('status', 'active')
+    .gt('current_chapter', 0);
+
+  if (!activeProjects?.length) {
+    return { name: 'Stalled Active Projects', status: 'pass', message: '0 stalled', value: 0, stalledCount: 0, stalledIds: [] };
+  }
+
+  // For each active project, find latest chapter created_at and check if recent
+  const stalledIds: string[] = [];
+  const novelIds = activeProjects.map(p => p.novel_id).filter(Boolean);
+  if (novelIds.length === 0) {
+    return { name: 'Stalled Active Projects', status: 'pass', message: '0 stalled (no novels)', value: 0, stalledCount: 0, stalledIds: [] };
+  }
+
+  const { data: latestChapters } = await supabase
+    .from('chapters')
+    .select('novel_id, created_at')
+    .in('novel_id', novelIds)
+    .order('created_at', { ascending: false });
+
+  const latestByNovel = new Map<string, string>();
+  for (const c of latestChapters || []) {
+    if (!latestByNovel.has(c.novel_id)) latestByNovel.set(c.novel_id, c.created_at);
+  }
+
+  for (const proj of activeProjects) {
+    const latest = latestByNovel.get(proj.novel_id);
+    if (!latest) continue;
+    if (latest < sixHoursAgo) {
+      stalledIds.push(proj.id);
+    }
+  }
+
+  const stalled = stalledIds.length;
+  let status: CheckResult['status'] = 'pass';
+  let message = `${stalled} active projects stalled (no chapter in 6h)`;
+  if (stalled >= 3) {
+    status = 'fail';
+    message = `${stalled} active projects STALLED (no chapter written in 6h) — pipeline issue`;
+  } else if (stalled >= 1) {
+    status = 'warn';
+    message = `${stalled} active projects haven't written in 6h`;
+  }
+
+  return { name: 'Stalled Active Projects', status, message, value: stalled, stalledCount: stalled, stalledIds: stalledIds.slice(0, 10) };
+}
+
 async function checkActiveProjects(supabase: ReturnType<typeof getSupabaseAdmin>): Promise<CheckResult & { activeCount: number; completedCount: number }> {
   const [active, completed] = await Promise.all([
     supabase.from('ai_story_projects').select('id', { count: 'exact', head: true }).eq('status', 'active'),
@@ -339,6 +394,7 @@ export async function GET(request: NextRequest) {
       quality,
       qualityDrift,
       distribution,
+      stalled,
     ] = await Promise.all([
       checkChapterProduction(supabase),
       checkStuckNovels(supabase),
@@ -349,11 +405,12 @@ export async function GET(request: NextRequest) {
       checkWordQuality(supabase),
       checkQualityDrift(supabase),
       checkNovelDistribution(supabase),
+      checkStalledProjects(supabase),
     ]);
 
     const checks: CheckResult[] = [
       production, stuck, activeProjects, totalChapters,
-      covers, heartbeat, quality, qualityDrift, distribution,
+      covers, heartbeat, quality, qualityDrift, distribution, stalled,
     ];
 
     // Calculate overall score

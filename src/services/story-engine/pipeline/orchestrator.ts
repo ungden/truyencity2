@@ -318,6 +318,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       chapter_number: nextChapter,
       title: result.title,
       content: result.content,
+      quality_score: result.qualityScore || null, // Critic overallScore (1-10) for reader badge
     },
     { onConflict: 'novel_id,chapter_number' },
   );

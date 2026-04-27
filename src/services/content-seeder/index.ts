@@ -722,6 +722,14 @@ export class ContentSeeder {
       // Modern narrative variant — 70% non-classic (anti-cliché 2024-2026 trend)
       const variant = pickNarrativeVariant(genre);
 
+      // Include sub_genres in novels.genres for search discoverability
+      // Strip duplicates and primary genre.
+      const novelGenres = Array.from(new Set([genre, ...(variant.sub_genres || [])]));
+
+      // Update the novel row genres (already pushed earlier — find and patch in place)
+      const novelEntry = novelRows.find(n => n.id === novelId);
+      if (novelEntry) novelEntry.genres = novelGenres;
+
       const projectRow: ProjectInsertRow = {
         id: projectId,
         user_id: this.userId,
@@ -1520,6 +1528,11 @@ CHÚ Ý:
 
         // Modern narrative variant — 70% non-classic (anti-cliché 2024-2026 trend)
         const variant = pickNarrativeVariant(genre);
+
+        // Include sub_genres in novels.genres for search discoverability
+        const novelGenres = Array.from(new Set([genre, ...(variant.sub_genres || [])]));
+        const novelEntry = novelRows.find(n => n.id === novelId);
+        if (novelEntry) novelEntry.genres = novelGenres;
 
         const projectRow: ProjectInsertRow = {
           id: projectId,
