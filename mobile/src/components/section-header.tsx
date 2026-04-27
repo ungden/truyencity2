@@ -9,7 +9,7 @@ interface SectionHeaderProps {
 }
 
 export default function SectionHeader({ title, href, accent }: SectionHeaderProps) {
-  return (
+  const content = (
     <View
       className={`flex-row items-center justify-between px-4 py-3 ${
         accent ? "bg-primary/10" : ""
@@ -23,12 +23,24 @@ export default function SectionHeader({ title, href, accent }: SectionHeaderProp
         {title}
       </Text>
       {href && (
-        <Link href={href as any} asChild>
-          <Pressable hitSlop={8}>
-            <Text className="text-muted-foreground text-xl">{">"}</Text>
-          </Pressable>
-        </Link>
+        <Text className="text-muted-foreground text-xl">{">"}</Text>
       )}
     </View>
   );
+
+  if (href) {
+    return (
+      <Link href={href as any} asChild>
+        <Pressable
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          android_ripple={{ color: "rgba(255,255,255,0.05)" }}
+          style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
+        >
+          {content}
+        </Pressable>
+      </Link>
+    );
+  }
+
+  return content;
 }

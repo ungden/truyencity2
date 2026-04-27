@@ -9,8 +9,33 @@ const DEBOUNCE_MS = 300;
 const NOVEL_LIST_FIELDS =
   "id,title,slug,author,cover_url,genres,status,chapter_count,created_at";
 
+export interface SearchFilters {
+  /** Genre filter — match novels.genres array (any match) */
+  genres?: string[];
+  /** Status filter — 'completed' / 'ongoing' / null for all */
+  status?: "completed" | "ongoing" | null;
+  /** Minimum chapter count */
+  minChapters?: number;
+  /** Maximum chapter count */
+  maxChapters?: number;
+  /** Sort field */
+  sortBy?: "updated_at" | "chapter_count" | "created_at";
+  /** Sort direction */
+  sortDir?: "asc" | "desc";
+}
+
+const DEFAULT_FILTERS: SearchFilters = {
+  genres: [],
+  status: null,
+  minChapters: undefined,
+  maxChapters: undefined,
+  sortBy: "chapter_count",
+  sortDir: "desc",
+};
+
 export function useSearch() {
   const [query, setQuery] = useState("");
+  const [filters, setFiltersState] = useState<SearchFilters>(DEFAULT_FILTERS);
   const [results, setResults] = useState<Novel[]>([]);
   const [loading, setLoading] = useState(false);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
@@ -25,12 +50,19 @@ export function useSearch() {
     });
   }, []);
 
-  const searchNovels = useCallback(async (text: string) => {
+  const searchNovels = useCallback(async (text: string, currentFilters: SearchFilters) => {
     // Cancel any in-flight request
     abortRef.current?.abort();
 
     const trimmed = text.trim();
-    if (!trimmed) {
+    const hasFilters =
+      (currentFilters.genres && currentFilters.genres.length > 0) ||
+      currentFilters.status ||
+      currentFilters.minChapters != null ||
+      currentFilters.maxChapters != null;
+
+    // Allow filter-only search (no query text) when filters are active
+    if (!trimmed && !hasFilters) {
       setResults([]);
       setLoading(false);
       return;
@@ -41,13 +73,27 @@ export function useSearch() {
     abortRef.current = controller;
 
     try {
-      const { data, error } = await supabase
-        .from("novels")
-        .select(NOVEL_LIST_FIELDS)
-        .ilike("title", `%${trimmed}%`)
-        .order("chapter_count", { ascending: false, nullsFirst: false })
-        .limit(20)
-        .abortSignal(controller.signal);
+      let q = supabase.from("novels").select(NOVEL_LIST_FIELDS);
+
+      if (trimmed) q = q.ilike("title", `%${trimmed}%`);
+      if (currentFilters.genres && currentFilters.genres.length > 0) {
+        q = q.overlaps("genres", currentFilters.genres);
+      }
+      if (currentFilters.status) {
+        q = q.eq("status", currentFilters.status === "completed" ? "completed" : "Đang ra");
+      }
+      if (currentFilters.minChapters != null) {
+        q = q.gte("chapter_count", currentFilters.minChapters);
+      }
+      if (currentFilters.maxChapters != null) {
+        q = q.lte("chapter_count", currentFilters.maxChapters);
+      }
+
+      const sortField = currentFilters.sortBy || "chapter_count";
+      const sortAsc = currentFilters.sortDir === "asc";
+      q = q.order(sortField, { ascending: sortAsc, nullsFirst: false }).limit(50).abortSignal(controller.signal);
+
+      const { data, error } = await q;
 
       if (controller.signal.aborted) return;
       if (error) throw error;
@@ -69,7 +115,13 @@ export function useSearch() {
 
       if (timerRef.current) clearTimeout(timerRef.current);
 
-      if (!text.trim()) {
+      const hasFilters =
+        (filters.genres && filters.genres.length > 0) ||
+        filters.status ||
+        filters.minChapters != null ||
+        filters.maxChapters != null;
+
+      if (!text.trim() && !hasFilters) {
         setResults([]);
         setLoading(false);
         return;
@@ -77,11 +129,33 @@ export function useSearch() {
 
       setLoading(true);
       timerRef.current = setTimeout(() => {
-        searchNovels(text);
+        searchNovels(text, filters);
       }, DEBOUNCE_MS);
     },
-    [searchNovels]
+    [searchNovels, filters]
   );
+
+  const setFilters = useCallback(
+    (newFilters: Partial<SearchFilters>) => {
+      const merged = { ...filters, ...newFilters };
+      setFiltersState(merged);
+      // Re-trigger search with new filters
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => {
+        searchNovels(query, merged);
+      }, DEBOUNCE_MS);
+    },
+    [filters, query, searchNovels]
+  );
+
+  const resetFilters = useCallback(() => {
+    setFiltersState(DEFAULT_FILTERS);
+    if (query.trim()) {
+      searchNovels(query, DEFAULT_FILTERS);
+    } else {
+      setResults([]);
+    }
+  }, [query, searchNovels]);
 
   const saveRecentSearch = useCallback((text: string) => {
     const trimmed = text.trim();
@@ -117,7 +191,10 @@ export function useSearch() {
     results,
     loading,
     recentSearches,
+    filters,
     onChangeText,
+    setFilters,
+    resetFilters,
     saveRecentSearch,
     removeRecentSearch,
     clearRecentSearches,

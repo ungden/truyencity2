@@ -138,6 +138,10 @@ export default function ReadingScreen() {
   const scrollOffsetRef = useRef(0);
   const maxScrollRef = useRef(0);
 
+  // Scroll-end auto-advance — fires when user scrolls past 98% and stays
+  const autoAdvanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const autoAdvanceTriggeredRef = useRef(false);
+
   // TTS — init with persisted speed
   const tts = useTTS();
   const ttsSpeedInitialized = useRef(false);
@@ -561,9 +565,28 @@ export default function ReadingScreen() {
           markedReadRef.current = true;
           markChapterRead({ novelId, chapterId: currentChapter.id });
         }
+
+        // Scroll-end auto-advance: when user scrolls to bottom (≥98%) AND has next chapter,
+        // wait 1.5s of stable scroll position then auto-navigate. Cancel if user scrolls back up.
+        const hasNextLocal = totalChapters > 0 && chapterNumber < totalChapters;
+        if (clampedPct >= 98 && hasNextLocal && !autoAdvanceTriggeredRef.current) {
+          if (autoAdvanceTimerRef.current) clearTimeout(autoAdvanceTimerRef.current);
+          autoAdvanceTimerRef.current = setTimeout(() => {
+            if (autoAdvanceTriggeredRef.current) return;
+            autoAdvanceTriggeredRef.current = true;
+            if (process.env.EXPO_OS === "ios") {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            }
+            router.replace(`/read/${slug}/${chapterNumber + 1}`);
+          }, 1500);
+        } else if (clampedPct < 95 && autoAdvanceTimerRef.current) {
+          // User scrolled back up — cancel pending auto-advance
+          clearTimeout(autoAdvanceTimerRef.current);
+          autoAdvanceTimerRef.current = null;
+        }
       }
     },
-    [novelId, currentChapter, chapterNumber]
+    [novelId, currentChapter, chapterNumber, totalChapters, slug, router]
   );
 
   // ── Restore scroll position from saved progress ──
@@ -607,6 +630,11 @@ export default function ReadingScreen() {
     markedReadRef.current = false;
     lastSaveAtRef.current = 0;
     secondsRef.current = 0;
+    autoAdvanceTriggeredRef.current = false;
+    if (autoAdvanceTimerRef.current) {
+      clearTimeout(autoAdvanceTimerRef.current);
+      autoAdvanceTimerRef.current = null;
+    }
 
     // Start session
     startSession({ novelId, chapterId: currentChapter.id }).then((id) => {

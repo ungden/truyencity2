@@ -2,13 +2,18 @@ import React from "react";
 import { ActivityIndicator, FlatList } from "react-native";
 import { View, Text, Pressable, ScrollView } from "@/tw";
 import NovelCard from "@/components/novel-card";
+import SearchFilterBar from "@/components/search-filters";
 import type { Novel } from "@/lib/types";
+import type { SearchFilters as SearchFiltersType } from "@/hooks/use-search";
 
 interface SearchResultsProps {
   query: string;
   results: Novel[];
   loading: boolean;
   recentSearches: string[];
+  filters?: SearchFiltersType;
+  setFilters?: (f: Partial<SearchFiltersType>) => void;
+  resetFilters?: () => void;
   onSelectRecent: (text: string) => void;
   onRemoveRecent: (text: string) => void;
   onClearRecent: () => void;
@@ -20,12 +25,16 @@ export default function SearchResults({
   results,
   loading,
   recentSearches,
+  filters,
+  setFilters,
+  resetFilters,
   onSelectRecent,
   onRemoveRecent,
   onClearRecent,
   onResultTap,
 }: SearchResultsProps) {
   const trimmed = query.trim();
+  const hasFilterUI = !!(filters && setFilters && resetFilters);
 
   // No query — show recent searches
   if (!trimmed) {
@@ -92,24 +101,29 @@ export default function SearchResults({
 
   // Results list
   return (
-    <FlatList
-      data={results}
-      keyExtractor={(item) => item.id}
-      style={{ flex: 1, backgroundColor: "#131620" }}
-      contentContainerStyle={{ paddingBottom: 40 }}
-      keyboardShouldPersistTaps="handled"
-      renderItem={({ item }) => (
-        <Pressable onPress={onResultTap}>
-          <NovelCard novel={item} variant="horizontal" />
-        </Pressable>
+    <View style={{ flex: 1, backgroundColor: "#131620" }}>
+      {hasFilterUI && filters && setFilters && resetFilters && (
+        <SearchFilterBar filters={filters} setFilters={setFilters} resetFilters={resetFilters} />
       )}
-      ListHeaderComponent={
-        <View className="px-4 pt-2 pb-1">
-          <Text className="text-muted-foreground text-sm">
-            {results.length} kết quả
-          </Text>
-        </View>
-      }
-    />
+      <FlatList
+        data={results}
+        keyExtractor={(item) => item.id}
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingBottom: 40 }}
+        keyboardShouldPersistTaps="handled"
+        renderItem={({ item }) => (
+          <Pressable onPress={onResultTap}>
+            <NovelCard novel={item} variant="horizontal" />
+          </Pressable>
+        )}
+        ListHeaderComponent={
+          <View className="px-4 pt-2 pb-1">
+            <Text className="text-muted-foreground text-sm">
+              {results.length} kết quả
+            </Text>
+          </View>
+        }
+      />
+    </View>
   );
 }

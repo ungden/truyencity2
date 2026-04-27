@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback } from "react";
 import {
   ActivityIndicator,
   Alert,
-  FlatList,
   useColorScheme,
   useWindowDimensions,
 } from "react-native";
@@ -549,23 +548,22 @@ export default function NovelDetailScreen() {
                 </View>
               )}
 
-              {/* Recommended novels */}
+              {/* Recommended novels — use horizontal ScrollView to avoid FlatList-in-ScrollView conflict */}
               {recommended.length > 0 && (
                 <View style={{ marginTop: 24 }}>
                   <Text style={{ fontSize: 16, fontWeight: "700", color: C.text, marginBottom: 12 }}>
                     Truyện tương tự
                   </Text>
-                  <FlatList
-                    data={recommended}
-                    keyExtractor={(item) => item.id}
+                  <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{ gap: 12 }}
-                    renderItem={({ item }) => {
+                    contentContainerStyle={{ gap: 12, paddingRight: 16 }}
+                  >
+                    {recommended.map((item) => {
                       const cardWidth = isTablet ? 140 : 110;
                       const cardHeight = isTablet ? 187 : 150;
                       return (
-                        <Link href={`/novel/${item.slug || item.id}`} asChild>
+                        <Link key={item.id} href={`/novel/${item.slug || item.id}`} asChild>
                           <Pressable style={{ width: cardWidth }}>
                             <Image
                               source={item.cover_url || "https://placehold.co/220x300"}
@@ -586,8 +584,8 @@ export default function NovelDetailScreen() {
                           </Pressable>
                         </Link>
                       );
-                    }}
-                  />
+                    })}
+                  </ScrollView>
                 </View>
               )}
 

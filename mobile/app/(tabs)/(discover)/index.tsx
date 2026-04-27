@@ -37,13 +37,13 @@ export default function DiscoverScreen() {
           .from("novels")
           .select(NOVEL_LIST_FIELDS)
           .order("updated_at", { ascending: false })
-          .limit(100),
+          .limit(300),
         supabase
           .from("novels")
           .select(NOVEL_LIST_FIELDS)
           .eq("status", "completed")
           .order("updated_at", { ascending: false })
-          .limit(10),
+          .limit(30),
       ]);
 
       const allNovels = latestRes.data || [];
@@ -91,6 +91,9 @@ export default function DiscoverScreen() {
           results={search.results}
           loading={search.loading}
           recentSearches={search.recentSearches}
+          filters={search.filters}
+          setFilters={search.setFilters}
+          resetFilters={search.resetFilters}
           onSelectRecent={(term) => {
             search.onChangeText(term);
             search.saveRecentSearch(term);
@@ -197,7 +200,7 @@ export default function DiscoverScreen() {
       {/* Recommended — responsive grid */}
       {recommended.length > 0 && (
         <View className="mt-4">
-          <SectionHeader title="Đề cử" />
+          <SectionHeader title="Đề cử" href="/(discover)/latest" />
           <View
             style={[
               {
@@ -225,7 +228,7 @@ export default function DiscoverScreen() {
       {/* New posts section */}
       {newPosts.length > 0 && (
         <View className="mt-4">
-          <SectionHeader title="Mới đăng" accent />
+          <SectionHeader title="Mới đăng" accent href="/(discover)/latest" />
           <FlatList
             data={newPosts}
             keyExtractor={(item) => item.id}
@@ -264,7 +267,7 @@ export default function DiscoverScreen() {
       {/* Recently completed */}
       {completed.length > 0 && (
         <View className="mt-4">
-          <SectionHeader title="Mới hoàn thành" />
+          <SectionHeader title="Mới hoàn thành" href="/(discover)/latest" />
           {completed.slice(0, 6).map((novel) => (
             <NovelCard key={novel.id} novel={novel} variant="horizontal" />
           ))}
