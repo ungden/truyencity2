@@ -112,7 +112,20 @@ const ARCHITECT_SYSTEM = `Bạn là ARCHITECT AGENT — chuyên gia lên kế ho
 NHIỆM VỤ: Tạo blueprint chi tiết cho 1 chương.
 
 QUY TẮC:
-1. SẢNG VĂN PACING (mặc định cho 80%+ chương): mỗi chương PHẢI có ≥1 khoảnh khắc thỏa mãn/sảng khoái (chốt deal, thu hoạch, recognition, casual competence, smooth opportunity, breakthrough nhỏ). KHÔNG cần "ức chế → bùng nổ" — dopamine đơn lẻ (smooth opportunity / casual win / recognition không qua adversity) hoàn toàn hợp lệ. Chuỗi 5+ chương smooth wins liên tiếp KHÔNG phải lỗi pacing — đây là Sảng Văn flow chính thống. "Ức chế → bùng nổ" CHỈ áp dụng cho ~20% chương climax/villain_focus, KHÔNG phải template mặc định.
+1. SẢNG VĂN MÌ-ĂN-LIỀN PACING (BẮT BUỘC mỗi chương — NGUYÊN TẮC #1):
+   - DOPAMINE PEAKS: Mỗi chương PHẢI có ≥2 dopamine peaks rõ rệt. KHÔNG được 1 peak duy nhất ở cuối chương.
+   - FIRST PEAK TIMING: Peak đầu tiên PHẢI nằm trong scene 1-2 (≤50% chương). Reader hiện đại đọc truyện như mì ăn liền — KHÔNG chờ đến scene cuối mới có wow. Nếu chương ≤50% chưa có dopamine event → reader bỏ chương.
+   - SECOND PEAK: Peak thứ 2 ở scene 4-5 (70-90% chương) — bigger hơn peak đầu (escalation within chapter).
+   - PAYOFF DOMINANT: Setup beats ≤30% nội dung chương. Payoff (MC win / face-slap / recognition / harvest / breakthrough) ≥40%. CẤM "kìm nén" pattern — 3+ setup beats không kèm payoff trong cùng chương = REWRITE.
+   - DOPAMINE TYPES (đa dạng — KHÔNG bắt buộc face-slap mỗi chương):
+     • Face-slap nhỏ (bystander shock, đối thủ kinh ngạc nhẹ, customer choáng váng)
+     • Casual competence (MC giải quyết tự tin, expertise visible)
+     • Smooth opportunity (deal hé lộ, cơ hội xuất hiện, MC chộp lấy)
+     • Recognition (1 nhân vật quan trọng nhận ra/khen ngợi MC)
+     • Harvest (deal ký kết, doanh thu, level up, milestone)
+     • Breakthrough (insight mới, capability mới, network mới)
+   - CẤM "ức chế → bùng nổ" làm template mặc định — chỉ áp dụng ~20% chương climax/villain_focus. 80% chương là pure dopamine flow.
+   - Chuỗi 5+ chương dopamine flow liên tiếp KHÔNG phải lỗi pacing — đây là Sảng Văn chính thống.
 2. TỐI THIỂU 4-5 scenes, mỗi scene có động lực/mục tiêu rõ ràng (tương tác, xây dựng, khám phá, kinh doanh, sinh hoạt; mâu thuẫn LÀ TÙY CHỌN, không bắt buộc mỗi scene).
 3. Consistency tuyệt đối với context (nhân vật, sức mạnh/tài chính, vị trí).
 4. Kết chương phải có lực kéo đọc tiếp (Ending Hook) NHƯNG ĐA DẠNG — KHÔNG ép cliffhanger nguy hiểm mỗi chương (gây cliffhanger fatigue). Chọn 1 trong 4 loại theo mood của chương:
@@ -327,33 +340,44 @@ KIỂM TRA BỔ SUNG (BẮT BUỘC):
     - Đánh lỗi khi: 1 giai đoạn ngược đã kéo dài 5+ chương mà chương này VẪN không bắt đầu resolution → issue type "pacing", severity "major".
     - Đánh lỗi khi: MC đau khổ kéo dài ≥2 scene trong chương (phẫn uất/bất lực/khóc lóc tủi thân, không hề có phản ứng tích cực) → issue type "pacing", severity "major".
     - Đánh lỗi khi: chương climax NHƯNG không có ≥2 breathing moments (đối thoại ấm, observation đời thường, recognition nhỏ, hài hước nhẹ) → issue type "pacing", severity "moderate".
-12. DOPAMINE CHECK: Chương này có ≥1 dopamine moment (easy win, casual competence, smooth opportunity, recognition, breakthrough, comfort, beauty encounter, harvest)? Nếu HOÀN TOÀN không có dopamine → issue type "quality", severity "moderate". KHÔNG bắt buộc là "easy win" cụ thể — bất kỳ positive note nào đều tính. Breathing/calm chapter chỉ cần positive tone là pass, KHÔNG bắt buộc victory framing.
-13. TONE CONSISTENCY CHECK: Kiểm tra "TONE PROFILE" trong META directives.
+12. DOPAMINE CADENCE CHECK (Sảng Văn mì-ăn-liền — CRITICAL):
+    - Đếm dopamine peaks trong chương: face-slap, casual competence shock, smooth opportunity grabbed, recognition (nhân vật quan trọng nhận ra MC), harvest (deal/revenue/level), breakthrough, mass-witnessed flex.
+    - Nếu chương có 0 dopamine peak → issue type "quality", severity "critical", verdict REWRITE.
+    - Nếu chương có 1 dopamine peak duy nhất ở scene cuối (>80% chương) → issue type "pacing" severity "major" — Sảng Văn cadence cần ≥2 peaks rải đều, peak đầu ≤50% chương.
+    - Nếu chương có ≥2 peaks nhưng peak đầu nằm sau scene 3 (>60% chương) → issue type "pacing" severity "moderate" — first dopamine quá muộn, reader sẽ bỏ.
+    - Breathing/calm chapter: ≥1 dopamine moment (recognition nhỏ / harvest nhẹ / comfort) là pass — KHÔNG bắt buộc face-slap.
+
+13. KÌM NÉN PATTERN DETECTION (CRITICAL — reader-killing):
+    - Đếm setup beats (MC kế hoạch / nội tâm tính toán / quan sát đối thủ / lo lắng / chờ đợi) vs payoff beats (action thành công / face-slap delivered / deal ký / recognition received).
+    - Nếu setup beats ≥3 và payoff beats = 0 trong cùng chương → issue type "pacing", severity "critical", verdict REWRITE — đây là "kìm nén" pattern reader ghét. Setup phải kèm payoff TRONG CÙNG CHƯƠNG.
+    - Nếu setup beats > payoff beats × 2 (ratio >2:1) → issue type "pacing", severity "major" — payoff dominant không đủ, MC phải hành động + thắng nhiều hơn quan sát + tính toán.
+    - NGOẠI LỆ duy nhất: chương cuối của 1 multi-chapter event (cliffhanger climax sắp tới) có thể full setup — nhưng phải flag rõ trong outline.
+14. TONE CONSISTENCY CHECK: Kiểm tra "TONE PROFILE" trong META directives.
     - Nếu tone='cozy' hoặc 'hopeful' NHƯNG chương full action/bạo lực không có breathing → issue "quality" severity "major".
     - Nếu tone='pragmatic' NHƯNG chương full romance ngây ngô / cảm tính quá đà → flag mismatch.
     - Nếu tone='bi-revenge' NHƯNG chương quá nhẹ nhàng không có stakes → flag mismatch (chỉ severity "minor" vì breathing chapters trong bi-revenge vẫn ok).
-14. AI-CLICHE AUTO-DETECT (HARD): Đếm tần suất các cụm sau:
+15. AI-CLICHE AUTO-DETECT (HARD): Đếm tần suất các cụm sau:
     - "khẽ nhếch mép", "khóe miệng nhếch", "không khỏi", "chỉ thấy", "không nói nên lời"
     - "ánh mắt phức tạp", "trong lòng thầm nghĩ", "không thể tin nổi", "khẽ thở dài"
     - Nếu ≥1 lần xuất hiện bất kỳ cụm trên → issue "quality" severity "moderate", yêu cầu thay thế bằng action cụ thể.
     - Nếu "đột nhiên" / "hít một ngụm khí lạnh" / "dường như" / "như thể" >2 lần → severity "moderate".
-15. ON-THE-NOSE DIALOGUE CHECK: Đếm số lần nhân vật NÓI THẲNG cảm xúc/ý định:
+16. ON-THE-NOSE DIALOGUE CHECK: Đếm số lần nhân vật NÓI THẲNG cảm xúc/ý định:
     - "Tôi rất tức giận", "tôi yêu em", "tôi nghi ngờ anh", "tôi sợ"
     - Nếu >2 lần (cho cảnh emotional pivot) → issue "dialogue" severity "moderate", yêu cầu subtext.
     - Modern hits 2024+: tránh nhân vật self-narrate cảm xúc — show qua action/silence.
-16. SHOW-DON'T-TELL RATIO: Ước lượng % narrative summary (past tense recap) vs scene action (present-active).
+17. SHOW-DON'T-TELL RATIO: Ước lượng % narrative summary (past tense recap) vs scene action (present-active).
     - Nếu >25% là summary narration → issue "quality" severity "moderate".
     - Đặc biệt với chương opening: nếu >150 từ đầu là exposition/summary → severity "major".
-17. DIALOGUE BEAT CHECK: Kiểm tra dialogue chains.
+18. DIALOGUE BEAT CHECK: Kiểm tra dialogue chains.
     - Nếu có >4 lines dialogue liên tiếp KHÔNG có action/reaction beat (cười, đứng dậy, im lặng, observation) → issue "dialogue" severity "moderate".
     - Modern best practice: mỗi 2-3 lines dialogue có 1 beat.
-18. RAW EMOTION-NAMING: grep cho "hắn tức giận", "nàng vui mừng", "hắn kinh ngạc", "tôi buồn" — nếu >2 lần raw emotion adjective WITHOUT physical/behavioral/environmental carrier → issue "quality" severity "moderate".
-19. LONG-FORM COHERENCE (chỉ áp dụng nếu chương ≥500): Kiểm tra MC core traits có drift không.
+19. RAW EMOTION-NAMING: grep cho "hắn tức giận", "nàng vui mừng", "hắn kinh ngạc", "tôi buồn" — nếu >2 lần raw emotion adjective WITHOUT physical/behavioral/environmental carrier → issue "quality" severity "moderate".
+20. LONG-FORM COHERENCE (chỉ áp dụng nếu chương ≥500): Kiểm tra MC core traits có drift không.
     - Nếu MC trong chương này hành xử/giá trị mâu thuẫn HOÀN TOÀN với personality đã thiết lập từ early chapters (hint từ context Story Bible + character_states)
     - → issue "continuity" severity "critical", REWRITE
     - Common drift patterns to flag: MC pragmatic chuyển nóng vội, MC family-pillar bỏ rơi gia tộc, MC career-driven ngừng quan tâm sự nghiệp.
-20. DIALOGUE CHAIN >4 LINES: Nếu có dialogue chain >4 lines liên tiếp KHÔNG có action/reaction beat → issue "dialogue" severity "moderate".
-21. SENSORY DENSITY: Mỗi scene chính cần ≥2 giác quan. Nếu cả chương chỉ có visual + auditory (thiếu khứu/vị/xúc giác cho ≥3 scenes) → issue "quality" severity "minor".
+21. DIALOGUE CHAIN >4 LINES: Nếu có dialogue chain >4 lines liên tiếp KHÔNG có action/reaction beat → issue "dialogue" severity "moderate".
+22. SENSORY DENSITY: Mỗi scene chính cần ≥2 giác quan. Nếu cả chương chỉ có visual + auditory (thiếu khứu/vị/xúc giác cho ≥3 scenes) → issue "quality" severity "minor".
 
 ISSUES: Liệt kê vấn đề (pacing/consistency/dopamine/quality/word_count/dialogue/continuity)
 

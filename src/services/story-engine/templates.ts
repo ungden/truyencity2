@@ -928,6 +928,8 @@ export const GOLDEN_CHAPTER_REQUIREMENTS = {
     mustHave: [
       'WARM BASELINE OPENING (BẮT BUỘC — TQ trend 2024-2026 "稳健流/暖开局"): MC mở chương ở trạng thái CÓ functional baseline rồi — đã có shop/studio/squad/skill/golden finger ĐANG VẬN HÀNH, KHÔNG phải rock bottom. MC đang LÀM CHỦ domain nhỏ của mình ngay trang 1.',
       'MC trong domain CỦA MÌNH = competence-leader (vô địch trong phạm vi nhỏ): chủ quán net biết mọi PC, dev biết mọi engine, lãnh chúa biết mọi thuộc hạ. Thiếu chỉ là quy mô (small ops), KHÔNG phải competence.',
+      'FIRST WOW BY SCENE 2 (BẮT BUỘC — retain reader): Scene 2 PHẢI có dopamine event đầu tiên — small face-slap (1 customer khinh thường → MC giải quyết → choáng), casual competence shock (MC fix vấn đề người thường thấy khó), smooth opportunity grabbed (deal nhỏ ký nhanh), hoặc recognition (1 nhân vật uy tín nhận ra MC). KHÔNG để reader đọc 50% chương 1 mới có payoff.',
+      'BIG WOW AT SCENE 4-5: Scene cuối chương 1 PHẢI có wow lớn hơn small wow scene 2 — milestone đạt được rõ (deal lớn ký, đối thủ uy tín bị nghiền, recognition mass-witnessed).',
       'Hook chương 1 = OPPORTUNITY-driven, KHÔNG threat-driven: 1 customer giàu bước vào, 1 deal hiện ra, 1 manh mối lộ ra, 1 lựa chọn xuất hiện — KHÔNG phải "MC bị đánh / mất việc / hết tiền / sắp chết".',
       'Mục tiêu rõ ràng của MC (mở rộng quy mô, chốt deal, cứu một người cụ thể, dùng cơ hội mới hé lộ)',
       'Demo competence/golden finger ngay scene 1-2: MC quan sát/thao tác đúng kiểu chuyên gia, bystander react với expertise đó.',
@@ -944,23 +946,24 @@ export const GOLDEN_CHAPTER_REQUIREMENTS = {
   },
   chapter2: {
     mustHave: [
-      'Thành quả/chiến thắng nhỏ thứ 2 (MC nhân đôi cơ hội ch.1 hoặc unlock thêm 1 capability)',
-      'Mở rộng hệ thống/sức mạnh/kế hoạch — show baseline operational expanded',
-      'Nhân vật mới xuất hiện thông qua MC competence (không phải "MC tình cờ gặp khi đang lang thang")',
-      'Mini-conflict mức nhẹ (competitor noticed, supplier hỏi giá, customer quay lại với yêu cầu lớn hơn) — KHÔNG threat đe dọa tính mạng',
-      'Hook cho chapter tiếp',
+      'BIG WOW MOMENT (BẮT BUỘC): Chương 2 PHẢI có ≥1 face-slap mass-witnessed HOẶC deal lớn ký kết HOẶC competence shock đỉnh — bystander kinh ngạc rõ rệt. Reader phải có "khoảnh khắc hooked" trong chương 2.',
+      'EARLY WOW IN-CHAPTER: First dopamine peak ≤50% chương (small face-slap hoặc opportunity grabbed). KHÔNG để chương 2 toàn build-up.',
+      'Thành quả nhân đôi từ chương 1 — MC unlock thêm 1 capability/network/resource visible.',
+      'Nhân vật mới xuất hiện thông qua MC competence (1 nhân vật uy tín nghe đồn → tự tìm đến MC).',
+      'Mini-conflict mức nhẹ (competitor noticed, supplier hỏi giá, customer khó tính) — MC giải quyết ngay TRONG chương, KHÔNG để dây dưa.',
+      'Hook cho chapter tiếp.',
     ],
-    avoid: ['Chỉ training/giải thích không hành động', 'Cốt truyện dậm chân', 'Đột ngột chuyển sang dark tone (giang hồ/bạo lực/villain dập)'],
+    avoid: ['Chỉ training/giải thích không hành động', 'Cốt truyện dậm chân', 'Đột ngột chuyển sang dark tone (giang hồ/bạo lực/villain dập)', 'Setup-only chương — phải có payoff trong cùng chương'],
   },
   chapter3: {
     mustHave: [
-      'Thử thách thực sự nhưng VẪN trong domain của MC (không phải đột ngột bị truy sát/đánh ngoài hẻm)',
-      'Face-slap commercial / chốt deal lớn / showcase competence mạnh hơn — bystander kinh ngạc',
-      'Growth rõ ràng của MC (revenue tăng, quy mô tăng, network mở rộng, capability mới)',
-      'Hint về plot/quy mô thế giới lớn hơn (tập đoàn lớn để ý / quan chức ghé / nhân vật quan trọng nghe đồn)',
-      'Reader bị hook bằng OPPORTUNITY (deal lớn sắp đến) chứ KHÔNG phải THREAT (villain dọa giết)',
+      'DEFINING WOW MOMENT: Chương 3 PHẢI có moment "đóng đinh" — face-slap quy mô lớn hơn ch.2 / deal khủng / recognition tầm city-level / breakthrough cảnh giới rõ. Đây là chương "quyết định reader có theo truyện không".',
+      'EARLY DOPAMINE: First peak ≤40% chương (sớm hơn ch.1-2 vì reader đã hooked).',
+      'Growth visible (revenue tăng X-lần, quy mô +1 cấp, network mở rộng, capability mới).',
+      'Hint về plot/quy mô thế giới lớn hơn (tập đoàn lớn để ý / quan chức ghé / nhân vật quan trọng nghe đồn).',
+      'Reader bị hook bằng OPPORTUNITY (deal lớn sắp đến / nhân vật quan trọng sẽ tìm MC) chứ KHÔNG phải THREAT.',
     ],
-    avoid: ['Giải quyết quá dễ dàng', 'Không stakes/hậu quả', 'Ép villain hard-conflict ngay khi MC mới có 2-3 chương baseline'],
+    avoid: ['Giải quyết quá dễ dàng (cần show MC khéo léo, không phải GF deus ex machina)', 'Không stakes/hậu quả', 'Ép villain hard-conflict ngay khi MC mới có 2-3 chương baseline', '"Kìm nén" — full setup không payoff'],
   },
 };
 
@@ -1098,28 +1101,31 @@ export const CHAPTER_TITLE_RULES = {
 // ============================================================================
 
 export const ENGAGEMENT_CHECKLIST = {
-  // Yếu tố BẮT BUỘC mỗi chương
+  // Yếu tố BẮT BUỘC mỗi chương — SẢNG VĂN MÌ-ĂN-LIỀN (snappy delivery)
   perChapter: [
-    'Có ít nhất 1 micro-hook (gợi tò mò nhỏ) trong 500 từ đầu',
-    'Ending hợp lý — KHÔNG bắt buộc cliffhanger nguy hiểm mỗi chương. Có 4 loại ending:',
-    '  • Plot cliffhanger (chỉ ~1/3 chương): tình huống nguy hiểm/bất ngờ — dùng cho chương climax/villain_focus/revelation',
-    '  • Emotional ending: nội tâm sâu / quyết định nhân vật / cảm xúc rõ — dùng cho aftermath/breathing/calm_before_storm',
-    '  • Reveal/seed ending: hé lộ thông tin nhỏ hoặc gieo manh mối cho chương sau — dùng cho buildup/training/transition',
-    '  • Comfort/resolution ending: đóng nhẹ scene với note ấm áp/hài hước — dùng cho comedic_break/breathing',
-    'CẤM dùng cliffhanger nguy hiểm 3 chương liên tiếp — gây cliffhanger fatigue (đọc giả 2024+ phản đối)',
-    'Duy trì độ hấp dẫn qua tension, mystery, phát triển nhân vật hoặc worldbuilding (KHÔNG bắt buộc dopamine mỗi chương)',
-    'MC phải có ít nhất 1 khoảnh khắc đáng nhớ (quyết định chiến lược, khám phá, đối thoại sâu hoặc tiến triển nhỏ)',
-    'Ít nhất 1 chi tiết worldbuilding nhỏ (mở rộng thế giới) — ưu tiên emerge từ action/cảm xúc, KHÔNG info-dump',
-    'Emotional contrast: cảm xúc phải thay đổi ít nhất 1 lần trong chương',
+    'MICRO-HOOK + EARLY WOW: ≥1 micro-hook trong 500 từ đầu, VÀ first dopamine peak (small face-slap, casual competence shock, recognition, smooth opportunity unlock) PHẢI xuất hiện trong scene 1-2 (≤50% chương). CẤM để reader chờ payoff đến scene cuối.',
+    'DOPAMINE PEAKS: Mỗi chương PHẢI có ≥2 dopamine moments rõ rệt — không phải "1 hint cuối chương". Phân bố: 1 small wow ở 30-50% chương + 1 bigger wow ở 70-90% chương. Mì-ăn-liền pacing.',
+    'PAYOFF DOMINANT: Setup beats ≤30% nội dung chương. Payoff/win/recognition/face-slap chiếm ≥40%. CẤM "kìm nén" pattern (3+ setup beats không kèm payoff trong cùng chương).',
+    'Ending hợp lý — 4 loại ending hợp lệ:',
+    '  • Plot cliffhanger (~1/3 chương): tình huống nguy hiểm/bất ngờ — cho chương climax/villain_focus/revelation',
+    '  • Reveal/seed ending: hé lộ thông tin lớn (face-slap victim choáng váng, deal lớn ký kết, milestone đạt được) — DOPAMINE-positive ending',
+    '  • Triumph/payoff ending: chương kết thúc bằng MC vừa thắng/thu hoạch/recognition đỉnh — KHÔNG cliffhanger nguy hiểm nhưng vẫn hấp dẫn vì reader muốn xem MC tận hưởng',
+    '  • Emotional/comfort ending: cho aftermath/breathing — đóng note ấm áp',
+    'CẤM dùng cliffhanger nguy hiểm 3 chương liên tiếp — cliffhanger fatigue.',
+    'CẤM 1 chương full-setup với 0 payoff (ALL build-up, 0 victory) — đây là "kìm nén" pattern reader bỏ truyện. Setup + payoff PHẢI nằm CÙNG chương.',
+    'Worldbuilding qua action/cảm xúc, KHÔNG info-dump.',
+    'Emotional contrast: cảm xúc phải thay đổi ít nhất 1 lần.',
   ],
 
-  // Yếu tố BẮT BUỘC mỗi 5 chương
+  // Yếu tố BẮT BUỘC mỗi 5 chương — DOPAMINE FLOOR (Sảng Văn cadence cao)
   per5Chapters: [
-    'MC phải có tiến bộ rõ ràng (sức mạnh, địa vị, hoặc relationship)',
-    'Ít nhất 1 face-slap, power reveal, smooth opportunity, hoặc casual competence moment (KHÔNG bắt buộc qua confront kẻ thù)',
-    'CẤM TUYỆT ĐỐI 2 GIAI ĐOẠN ngược liên tiếp không có breathing ở giữa — sau khi 1 sự kiện ngược kết thúc PHẢI có ≥1-3 chương breathing trước sự kiện ngược tiếp theo',
-    'Giới thiệu ít nhất 1 yếu tố mới (nhân vật, địa danh, kỹ thuật)',
-    'Ít nhất 1 hint/foreshadowing cho plot lớn hơn',
+    'BIG WOW MOMENT: ≥1 big face-slap (đối thủ choáng váng) HOẶC milestone lớn (deal ký, breakthrough, network mở rộng, recognition mass-scale). KHÔNG được skip 5 chương không có wow lớn.',
+    'SMALL WOW CADENCE: ≥3 small wow moments rải đều (recognition cá nhân, casual competence shock, smooth opportunity grabbed, harvest). Cadence dày — mì-ăn-liền retain reader.',
+    'MC tiến bộ rõ ràng (sức mạnh, địa vị, doanh thu, network) — visible progress mỗi 5 chương.',
+    'Ít nhất 1 face-slap/power reveal/business win mass-witnessed (≥3 bystanders chứng kiến + react). Solo win không tính.',
+    'CẤM TUYỆT ĐỐI 2 GIAI ĐOẠN ngược liên tiếp không có breathing ở giữa.',
+    'Giới thiệu ít nhất 1 yếu tố mới (nhân vật, địa danh, kỹ thuật, opportunity).',
+    'Ít nhất 1 hint/foreshadowing cho plot lớn hơn.',
   ],
 
   // Yếu tố BẮT BUỘC mỗi arc (15-30 chương)
@@ -1135,10 +1141,10 @@ export const ENGAGEMENT_CHECKLIST = {
   // Yếu tố "gây nghiện" đặc trưng TQ webnovel
   addictiveElements: {
     faceSlapFormula: {
-      name: 'Công Thức Tát Mặt',
-      description: 'PROACTIVE (ưu tiên cho do-thi/quan-truong/kinh-doanh): MC hành động → đạt kết quả → đối thủ kinh ngạc → cố phản kháng nhưng quá muộn → câm lặng nể phục. REACTIVE (cho fantasy/wuxia): kẻ thù coi thường → MC ẩn nhẫn → kẻ thù ra tay → MC nghiền nát → bàng quan kinh ngạc.',
-      frequency: 'KHÔNG bắt buộc mỗi 2-3 chương — chỉ khi arc plan có "đối thủ" tự nhiên xuất hiện. Ép tần suất sẽ tạo villain-first narrative giả tạo.',
-      escalation: 'Quy mô tăng dần (cá nhân → nhóm → quốc gia) ONLY KHI arc plan yêu cầu. Truyện kinh doanh có thể leo thang qua scale doanh nghiệp (cửa hàng → chuỗi → tập đoàn → đa quốc gia) thay vì kẻ thù.',
+      name: 'Công Thức Tát Mặt (Sảng Văn dopamine engine)',
+      description: 'PROACTIVE (ưu tiên cho do-thi/quan-truong/kinh-doanh): MC hành động → đạt kết quả → đối thủ kinh ngạc → cố phản kháng nhưng quá muộn → câm lặng nể phục. REACTIVE (cho fantasy/wuxia): kẻ thù coi thường → MC ẩn nhẫn → kẻ thù ra tay → MC nghiền nát → bàng quan kinh ngạc. ĐÂY LÀ DOPAMINE EVENT, KHÔNG phải adversity event — MC KHÔNG thực sự khổ, đối thủ chỉ là bystander để contrast competence.',
+      frequency: 'BẮT BUỘC cadence cao: ≥1 small face-slap mỗi 1-2 chương (bystander shock cá nhân, đối thủ kinh ngạc nhỏ) + ≥1 big face-slap mỗi 5 chương (mass-witnessed, đối thủ uy tín bị nghiền). Đây là Sảng Văn engine retain reader — KHÔNG bị xếp vào "adversity" hay "tự ngược" vì MC không hề khổ. Đối thủ trong face-slap có thể là customer khinh thường, supplier ép giá, đối thủ kinh doanh phỏng vấn cùng MC, fan ghen tị — KHÔNG bắt buộc villain hardcore.',
+      escalation: 'Mỗi 5 chương face-slap quy mô tăng: chương 1-5 cá nhân (1 bystander shock) → chương 5-10 nhóm (table/team shock) → chương 10-15 mass (cộng đồng/báo chí biết) → chương 15+ nationwide. Truyện kinh doanh leo thang qua scale doanh nghiệp + reputation, KHÔNG cần combat.',
     },
     businessEmpire: {
       name: 'Đế Chế Kinh Doanh',
@@ -1182,16 +1188,18 @@ export const ENGAGEMENT_CHECKLIST = {
   // 1 giai đoạn ngược (event) có thể trải dài 1-3 chương — diễn biến tự nhiên, KHÔNG cắt vụn.
   // Sau mỗi giai đoạn ngược kết thúc → BẮT BUỘC giai đoạn breathing trước khi sự kiện ngược tiếp theo.
   adversityToTriumphRatio: {
-    description: 'Conflict phải GIÃN RA giữa các GIAI ĐOẠN/SỰ KIỆN. Trong cùng 1 sự kiện thì cứ để diễn biến tự nhiên. MC vượt qua không quá đau khổ. Dopamine không cần adversity setup.',
-    idealRatio: '15% chương thuộc giai đoạn ngược → 85% chương thuộc giai đoạn breathing/sảng. Không phải mỗi victory đều cần adversity build-up.',
+    description: 'SẢNG VĂN MÌ-ĂN-LIỀN: MC ít khổ + dopamine cadence CAO. Conflict (MC suffer) ít, NHƯNG face-slap/recognition/milestone (dopamine events, MC không khổ) DÀY ĐẶC. KHÔNG nhầm 2 thứ — face-slap KHÔNG phải adversity, đó là dopamine.',
+    idealRatio: '10% chương MC thực sự suffer → 90% chương dopamine flow (smooth wins / face-slap / milestone / recognition / breakthrough). Trong 90% dopamine flow, mỗi chương PHẢI có 2-3 dopamine peaks rải đều.',
     hardRules: [
-      'TƯ DUY THEO GIAI ĐOẠN: 1 sự kiện ngược (MC bị truy sát, bị bắt, đối đầu villain, gặp tai nạn) có thể trải 1-3 chương — diễn biến tự nhiên, KHÔNG ép cắt giữa sự kiện để chèn breathing.',
-      'CẤM 2 GIAI ĐOẠN ngược liên tiếp KHÔNG có giai đoạn breathing ở giữa. Sau khi 1 sự kiện ngược kết thúc (resolution) → ≥1-3 chương breathing trước khi mở sự kiện ngược mới.',
-      'Mỗi GIAI ĐOẠN ngược phải resolve trong tối đa 3-5 chương — KHÔNG kéo dài 6+ chương lê thê. Resolution có thể là MC thắng, MC thua nhưng sống, hoặc MC tìm được lối thoát.',
-      'Mỗi arc có ≥40% chương thuộc giai đoạn breathing — MC small wins, casual competence, peaceful growth, recognition, slice of life, world-building.',
-      'Mỗi chương dù thuộc giai đoạn ngược cũng PHẢI có ≥2 breathing moments (đối thoại ấm, observation đời thường, recognition nhỏ, hài hước nhẹ) để cân bằng.',
+      'DOPAMINE CADENCE FLOOR: ≥2 dopamine peaks mỗi chương (small face-slap / casual competence shock / recognition / smooth opportunity / harvest / breakthrough). First peak ≤50% chương — KHÔNG để reader đợi đến cuối.',
+      'BIG WOW FLOOR: ≥1 big wow moment mỗi 3-5 chương (deal lớn ký, big face-slap mass-witnessed, milestone đỉnh, breakthrough cảnh giới). KHÔNG để 5 chương trôi qua mà không có wow lớn.',
+      'CẤM "kìm nén" pattern: chương full-setup không có payoff trong cùng chương → REWRITE. Setup beats và payoff PHẢI nằm CÙNG chương (ngoại trừ multi-chapter event natural span).',
+      'TƯ DUY THEO GIAI ĐOẠN: 1 sự kiện adversity (MC bị truy sát, đối đầu villain, gặp tai nạn) có thể trải 1-3 chương — diễn biến tự nhiên. Adversity event hiếm — chỉ ~10% chapters.',
+      'CẤM 2 GIAI ĐOẠN adversity liên tiếp KHÔNG breathing ở giữa.',
+      'Mỗi GIAI ĐOẠN adversity resolve trong tối đa 2-3 chương cho non-combat genres / 3-5 chương cho combat genres. KHÔNG kéo dài lê thê.',
+      'Mỗi arc ≥60% chương Sảng Văn flow — face-slap stream + casual competence + recognition + milestone progression. Face-slap KHÔNG bị xếp vào adversity ratio.',
     ],
-    antiPattern: 'TỰ NGƯỢC — chuỗi nhiều giai đoạn ngược liên tiếp không có breathing ở giữa, hoặc 1 giai đoạn ngược kéo dài 5+ chương lê thê. Đây là pattern reader Việt Nam ghét.',
+    antiPattern: '(1) TỰ NGƯỢC — chuỗi adversity liên tiếp; (2) KÌM NÉN — chương full-setup không payoff; (3) DOPAMINE THIẾU — chương trôi qua không có face-slap/milestone/recognition. Cả 3 đều khiến reader bỏ truyện.',
   },
 
   // Density cap theo GIAI ĐOẠN — KHÔNG đếm theo chương (vì 1 sự kiện có thể span nhiều chương)
