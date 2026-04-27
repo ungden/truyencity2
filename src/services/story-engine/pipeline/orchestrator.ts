@@ -196,26 +196,32 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
 
   // ── Step 2d+: Inject quality modules + character knowledge (all non-fatal, parallel) ──
   try {
-    const [foreshadowCtx, charArcCtx, pacingCtx, voiceCtx, powerCtx, worldCtx, knowledgeCtx] = await Promise.all([
+    const { getRelationshipContext } = await import('../memory/relationship-tracker');
+    const { getEconomicContext } = await import('../memory/economic-ledger');
+    const subGenres = context.subGenres || [];
+
+    const [foreshadowCtx, charArcCtx, pacingCtx, voiceCtx, powerCtx, worldCtx, knowledgeCtx, relationshipCtx, economicCtx] = await Promise.all([
       getForeshadowingContext(project.id, nextChapter).catch(() => null),
       getCharacterArcContext(project.id, nextChapter, context.knownCharacterNames).catch(() => null),
       getChapterPacingContext(project.id, nextChapter).catch(() => null),
       getVoiceContext(project.id).catch(() => null),
-      getPowerContext(project.id).catch(() => null),
+      getPowerContext(project.id, genre).catch(() => null),
       getWorldContext(project.id, nextChapter).catch(() => null),
       getCharacterKnowledgeContext(project.id, nextChapter, context.knownCharacterNames).catch(() => null),
+      getRelationshipContext(project.id, context.knownCharacterNames).catch(() => null),
+      getEconomicContext(project.id, genre, subGenres).catch(() => null),
     ]);
 
-    // Smart truncation: per-module budgets, cut at section boundaries (newline)
-    // Foreshadowing & character arcs contain per-hint/per-character blocks → need more space
-    // Pacing/voice/power/world are shorter by nature → tighter budgets
+    // Smart truncation: per-module budgets
     if (foreshadowCtx) context.foreshadowingContext = smartTruncate(foreshadowCtx, 1500);
     if (charArcCtx) context.characterArcContext = smartTruncate(charArcCtx, 1500);
     if (pacingCtx) context.pacingContext = smartTruncate(pacingCtx, 600);
     if (voiceCtx) context.voiceContext = smartTruncate(voiceCtx, 600);
     if (powerCtx) context.powerContext = smartTruncate(powerCtx, 600);
     if (worldCtx) context.worldContext = smartTruncate(worldCtx, 600);
-    if (knowledgeCtx) context.characterKnowledgeContext = smartTruncate(knowledgeCtx, 1200);
+    if (knowledgeCtx) context.characterKnowledgeContext = smartTruncate(knowledgeCtx, 2000);
+    if (relationshipCtx) context.relationshipContext = smartTruncate(relationshipCtx, 1200);
+    if (economicCtx) context.economicContext = smartTruncate(economicCtx, 1200);
   } catch {
     // Non-fatal
   }
@@ -435,10 +441,12 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       project.id, novel.id, nextChapter, geminiConfig,
     ).catch((e) => console.warn(`[Orchestrator] Task 9 voice fingerprint failed:`, e instanceof Error ? e.message : String(e))),
 
-    // Task 10: Update MC power state (every 3 chapters or on breakthrough)
-    updateMCPowerState(
-      project.id, nextChapter, result.content, protagonistName, genre, geminiConfig,
-    ).catch((e) => console.warn(`[Orchestrator] Task 10 MC power failed:`, e instanceof Error ? e.message : String(e))),
+    // Task 10: Update MC power state (every 3 chapters or on breakthrough) — SKIP for non-combat genres
+    ...(['do-thi','ngon-tinh','quan-truong'].includes(genre) ? [] : [
+      updateMCPowerState(
+        project.id, nextChapter, result.content, protagonistName, genre, geminiConfig,
+      ).catch((e) => console.warn(`[Orchestrator] Task 10 MC power failed:`, e instanceof Error ? e.message : String(e))),
+    ]),
 
     // Task 11: Update location exploration (every 3 chapters to save tokens)
     ...(nextChapter % 3 === 0 ? [
@@ -459,6 +467,22 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       extractCharacterKnowledge(
         project.id, nextChapter, result.content, characters, geminiConfig,
       ).catch((e) => console.warn(`[Orchestrator] Task 13 character knowledge failed:`, e instanceof Error ? e.message : String(e))),
+    ] : []),
+
+    // Task 14: Extract relationships (every 3 chapters — new in 0150)
+    ...(nextChapter % 3 === 0 ? [
+      (async () => {
+        const { extractRelationships } = await import('../memory/relationship-tracker');
+        return extractRelationships(project.id, nextChapter, result.content, characters, geminiConfig);
+      })().catch((e) => console.warn(`[Orchestrator] Task 14 relationships failed:`, e instanceof Error ? e.message : String(e))),
+    ] : []),
+
+    // Task 15: Extract economic ledger (every 3 chapters, only do-thi/quan-truong — new in 0150)
+    ...(nextChapter % 3 === 0 && ['do-thi','quan-truong'].includes(genre) ? [
+      (async () => {
+        const { extractEconomicState } = await import('../memory/economic-ledger');
+        return extractEconomicState(project.id, nextChapter, result.content, protagonistName, geminiConfig);
+      })().catch((e) => console.warn(`[Orchestrator] Task 15 economic ledger failed:`, e instanceof Error ? e.message : String(e))),
     ] : []),
   ]);
 

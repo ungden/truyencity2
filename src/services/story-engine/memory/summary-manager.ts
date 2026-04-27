@@ -28,7 +28,16 @@ import type { GeminiConfig, GenreType } from '../types';
 const SYNOPSIS_INTERVAL = 5;    // Regenerate synopsis every 5 chapters (V1 parity)
 const ARC_SIZE = 20;            // Chapters per arc
 const BIBLE_TRIGGER = 3;        // Generate bible after chapter 3
-const BIBLE_REFRESH_INTERVAL = 150; // Refresh bible every 150 chapters
+
+// Tiered bible refresh — denser early when world rules being established,
+// sparser late when story is stable. Old behavior: every 150 = only 3-4 refreshes
+// for 500-chapter novel → bible drifts. New: 7-9 refreshes covers early growth + late stability.
+const BIBLE_REFRESH_CHAPTERS: number[] = [30, 75, 150, 250, 350, 450, 600, 800, 1000];
+
+function shouldRefreshBible(chapterNumber: number): boolean {
+  return BIBLE_REFRESH_CHAPTERS.includes(chapterNumber)
+    || (chapterNumber > 1000 && chapterNumber % 200 === 0);
+}
 
 // ── Public: Run All Post-Write Summary Tasks ─────────────────────────────────
 
@@ -115,10 +124,8 @@ export async function runSummaryTasks(
       );
     }
 
-    // 4. Story Bible: generate at chapter 3, refresh periodically
-    if (chapterNumber === BIBLE_TRIGGER) {
-      await tryGenerateStoryBible(projectId, novelId, genre, protagonistName, worldDescription, config);
-    } else if (chapterNumber > BIBLE_TRIGGER && chapterNumber % BIBLE_REFRESH_INTERVAL === 0) {
+    // 4. Story Bible: generate at chapter 3, refresh on tiered schedule (denser early)
+    if (chapterNumber === BIBLE_TRIGGER || shouldRefreshBible(chapterNumber)) {
       await tryGenerateStoryBible(projectId, novelId, genre, protagonistName, worldDescription, config);
     }
   } catch {

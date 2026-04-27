@@ -136,9 +136,19 @@ Trả về JSON:
 
 // ── Get Power Context (pre-write injection) ──────────────────────────────────
 
+// Non-combat genres: skip power-system injection entirely. These genres don't have
+// realm/cultivation/level mechanics — injecting urban_system breakthrough rules pollutes prompt.
+const POWER_SYSTEM_GENRES_EXCLUDED: string[] = ['do-thi', 'ngon-tinh', 'quan-truong'];
+
 export async function getPowerContext(
   projectId: string,
+  genre?: string,
 ): Promise<string | null> {
+  // Skip for non-combat genres (modern hits 2024-2026 don't use power system for urban/romance/political)
+  if (genre && POWER_SYSTEM_GENRES_EXCLUDED.includes(genre)) {
+    return null;
+  }
+
   const db = getSupabase();
   const { data } = await db
     .from('mc_power_states')

@@ -257,6 +257,52 @@ export const DOPAMINE_PATTERNS: Record<DopamineType, DopaminePattern> = {
     setup: 'Khoảng thời gian yên bình giữa các sự kiện lớn',
     payoff: 'MC tiến bộ qua training/quan hệ/khám phá nhỏ — không cần kẻ thù tạo áp lực',
   },
+  // ── "Ngón tay vàng" patterns: MC win without combat (modern 2024-2026 standard) ──
+  knowledge_leverage: {
+    type: 'knowledge_leverage',
+    name: 'Dùng Kiến Thức Thắng',
+    description: 'MC leverage chuyên môn / kiến thức tương lai / training quá khứ để giải vấn đề',
+    frequency: 'every_chapter',
+    intensity: 'high',
+    setup: 'Vấn đề xuất hiện, người khác bối rối / không biết hướng giải quyết',
+    payoff: 'MC dùng kiến thức/chuyên môn (kỹ thuật, y học, kinh doanh, lịch sử) đưa giải pháp elegant — bystander kinh ngạc, đối thủ câm lặng. KHÔNG combat.',
+  },
+  network_payoff: {
+    type: 'network_payoff',
+    name: 'Quan Hệ Giải Quyết',
+    description: 'MC dùng network/connection + đàm phán → win không cần đối đầu',
+    frequency: 'every_3_chapters',
+    intensity: 'medium',
+    setup: 'Vấn đề thông thường cần "force" hoặc thời gian dài',
+    payoff: 'MC gọi 1 cuộc điện thoại / nhờ 1 mối quan hệ / đàm phán mượt mà → vấn đề tan biến. Đối thủ ngạc nhiên vì MC có connection họ không ngờ.',
+  },
+  business_pivot: {
+    type: 'business_pivot',
+    name: 'Xoay Chiều Kinh Doanh',
+    description: 'MC đọc thị trường, pivot strategy → grow mà không cần đối đầu trực tiếp',
+    frequency: 'every_3_chapters',
+    intensity: 'high',
+    setup: 'Market signal (đối thủ ra mắt, customer feedback, trend mới)',
+    payoff: 'MC adapt strategy mượt — beat competition bằng innovation/product/positioning, KHÔNG bằng confrontation hay thị phần war.',
+  },
+  quiet_competence: {
+    type: 'quiet_competence',
+    name: 'Lặng Lẽ Chuyên Nghiệp',
+    description: 'MC làm việc lặng lẽ, không khoe — kết quả vượt expect khiến người xung quanh nhận ra',
+    frequency: 'every_chapter',
+    intensity: 'medium',
+    setup: 'MC giao việc thông thường, không ai để ý',
+    payoff: 'Kết quả của MC vượt xa standard — sếp/đồng nghiệp/khách hàng dần nhận ra MC thực lực. Recognition tự nhiên không cần MC self-promotion.',
+  },
+  insider_advantage: {
+    type: 'insider_advantage',
+    name: 'Lợi Thế Kẻ Biết Trước',
+    description: 'MC dùng ký ức tương lai / kiến thức nội bộ → chộp deal trước khi người khác nhận ra',
+    frequency: 'every_3_chapters',
+    intensity: 'high',
+    setup: 'Cơ hội/nguy cơ chỉ MC biết trước (dựa rebirth memory, insider info, expert knowledge)',
+    payoff: 'MC ra quyết định trước — đầu tư đúng, tránh bẫy, ký deal đúng thời điểm. Sau đó người khác mới nhận ra MC "biết trước" như thế nào.',
+  },
 };
 
 // ============================================================================
@@ -1280,6 +1326,22 @@ export const GENRE_ENGAGEMENT: Record<GenreType, string[]> = {
 };
 
 /**
+ * Universal anti-pattern blacklist — TQ 2024-2026 đã chán/loại bỏ các trigger sến.
+ * Engine CẤM tạo những setup này trong Architect outline + Writer content.
+ * Áp dụng cross-genre.
+ */
+export const UNIVERSAL_ANTI_SEEDS: string[] = [
+  'CẤM "Mẹ MC ung thư / bệnh nặng cần tiền cứu" làm trigger động lực — sến, đã chán từ 2020',
+  'CẤM "Bạn gái/người yêu bỏ MC vì nghèo" làm setup chương 1 — overused, đã thành meme',
+  'CẤM "MC bị họ hàng/gia đình giàu khinh ra mặt, ăn cơm thừa" — xa lông, không relate cho reader 2024+',
+  'CẤM "Tai nạn xe tải khiến MC xuyên không/trọng sinh" — meme đùa, dùng nghiêm túc thì cringe',
+  'CẤM "Hôn ước bị hủy" làm trigger DUY NHẤT — overused; có thể dùng nếu kết hợp motif khác sâu hơn',
+  'CẤM scene khóc lóc tủi thân kéo dài >1 đoạn (>200 từ) — TQ premium reader đã chán "凄惨开局"',
+  'CẤM "MC mồ côi từ nhỏ + bị bạn cùng lớp bắt nạt + được lão gia trong nhẫn cứu" — formula cliché 2015-2018',
+  'CẤM lạm dụng "tổng tài lạnh lùng + nữ chính ngây thơ + hợp đồng hôn nhân ép buộc" — TQ 女频 2024 đã reverse trend',
+];
+
+/**
  * Universal anti-self-torture rules — appended to EVERY genre via getGenreEngagement().
  * Triết lý: Tư duy theo GIAI ĐOẠN/SỰ KIỆN, không đếm chương. Giữa các giai đoạn ngược cần breathing.
  */
@@ -1471,10 +1533,30 @@ export function getPowerSystemByGenre(genre: GenreType): PowerSystem {
   }
 }
 
+// Combat patterns — exclude entirely from non-combat genres
+const COMBAT_PATTERN_TYPES: DopamineType[] = [
+  'face_slap', 'power_reveal', 'breakthrough', 'revenge', 'flex_power_casual',
+  'monster_evolution', 'master_flex', 'simulate_success',
+];
+
+// Non-combat genres: do-thi (urban), ngon-tinh (romance), quan-truong (office politics)
+// — these should NEVER receive combat-based dopamine unless arc plan explicitly requires.
+const NON_COMBAT_GENRES: GenreType[] = ['do-thi', 'ngon-tinh', 'quan-truong'];
+
+export function isNonCombatGenre(genre: GenreType): boolean {
+  return NON_COMBAT_GENRES.includes(genre);
+}
+
 export function getDopaminePatternsByGenre(genre: GenreType): DopaminePattern[] {
-  // Anti-self-torture: smooth_opportunity + casual_competence + peaceful_growth are
-  // available cross-genre as alternatives that don't require adversity setup.
+  // Anti-self-torture + Modern golden-finger patterns: prepended for non-combat genres
   const SMOOTH_HEAD = [DOPAMINE_PATTERNS.smooth_opportunity, DOPAMINE_PATTERNS.casual_competence, DOPAMINE_PATTERNS.peaceful_growth];
+  const GOLDEN_FINGER = [
+    DOPAMINE_PATTERNS.knowledge_leverage,
+    DOPAMINE_PATTERNS.network_payoff,
+    DOPAMINE_PATTERNS.business_pivot,
+    DOPAMINE_PATTERNS.quiet_competence,
+    DOPAMINE_PATTERNS.insider_advantage,
+  ];
 
   switch (genre) {
     case 'tien-hiep':
@@ -1482,9 +1564,8 @@ export function getDopaminePatternsByGenre(genre: GenreType): DopaminePattern[] 
     case 'huyen-huyen':
       return [...SMOOTH_HEAD, DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.breakthrough, DOPAMINE_PATTERNS.treasure_gain, DOPAMINE_PATTERNS.face_slap, DOPAMINE_PATTERNS.revenge];
     case 'do-thi':
-      // Proactive business genre — business_success/recognition là core, KHÔNG dùng face_slap.
-      // Face_slap chỉ generate "đối thủ xuất hiện coi thường MC" → trái proactive narrative.
-      return [...SMOOTH_HEAD, DOPAMINE_PATTERNS.business_success, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.flex_wealth, DOPAMINE_PATTERNS.beauty_encounter, DOPAMINE_PATTERNS.comfort, DOPAMINE_PATTERNS.harvest, DOPAMINE_PATTERNS.secret_identity];
+      // NON-COMBAT genre: golden finger + business cycle. ZERO combat patterns.
+      return [...SMOOTH_HEAD, ...GOLDEN_FINGER, DOPAMINE_PATTERNS.business_success, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.flex_wealth, DOPAMINE_PATTERNS.harvest, DOPAMINE_PATTERNS.comfort, DOPAMINE_PATTERNS.beauty_encounter];
     case 'kiem-hiep':
       return [...SMOOTH_HEAD, DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.face_slap, DOPAMINE_PATTERNS.revenge, DOPAMINE_PATTERNS.secret_identity];
     case 'lich-su':
@@ -1500,13 +1581,13 @@ export function getDopaminePatternsByGenre(genre: GenreType): DopaminePattern[] 
     case 'linh-di':
       return [...SMOOTH_HEAD, DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.secret_identity, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.breakthrough, DOPAMINE_PATTERNS.revenge];
     case 'quan-truong':
-      // Proactive political genre — recognition/business_success là core, KHÔNG dùng face_slap.
-      return [...SMOOTH_HEAD, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.business_success, DOPAMINE_PATTERNS.flex_wealth, DOPAMINE_PATTERNS.harvest, DOPAMINE_PATTERNS.secret_identity];
+      // NON-COMBAT genre: political mưu kế thắng bằng kiến thức/quan hệ, KHÔNG combat.
+      return [...SMOOTH_HEAD, ...GOLDEN_FINGER, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.business_success, DOPAMINE_PATTERNS.flex_wealth, DOPAMINE_PATTERNS.harvest];
     case 'di-gioi':
       return [...SMOOTH_HEAD, DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.treasure_gain, DOPAMINE_PATTERNS.two_world_shock, DOPAMINE_PATTERNS.breakthrough, DOPAMINE_PATTERNS.face_slap];
     case 'ngon-tinh':
-      // Smooth-leaning genre
-      return [...SMOOTH_HEAD, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.beauty_encounter, DOPAMINE_PATTERNS.comfort, DOPAMINE_PATTERNS.comedy_misunderstanding, DOPAMINE_PATTERNS.tears_of_regret];
+      // NON-COMBAT genre: emotional + 大女主 career arc. ZERO combat patterns.
+      return [...SMOOTH_HEAD, ...GOLDEN_FINGER, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.beauty_encounter, DOPAMINE_PATTERNS.comfort, DOPAMINE_PATTERNS.comedy_misunderstanding, DOPAMINE_PATTERNS.tears_of_regret];
     default:
       return [...SMOOTH_HEAD, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.power_reveal];
   }

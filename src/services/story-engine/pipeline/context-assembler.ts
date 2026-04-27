@@ -338,6 +338,37 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
       if (sd.target_chapter_length_override) directives.push(`Chapter target length override: ${sd.target_chapter_length_override} từ`);
       if (sd.variant_id) directives.push(`Variant: ${sd.variant_id}`);
       if (directives.length) metaParts.push(`STYLE DIRECTIVES: ${directives.join(' | ')}`);
+
+      // MC starting archetype guide
+      if (sd.starting_archetype) {
+        const archetypeGuide: Record<string, string> = {
+          'phe-vat': 'PHẾ VẬT classic: MC bắt đầu ở vị trí thấp (cô nhi, bị khinh, gia đình nghèo) NHƯNG có tiềm năng. CẨN THẬN: TQ 2024 đã chán pattern này, chỉ dùng cho fantasy/wuxia genre. Tránh "khổ vãi đái" sến.',
+          'professional': 'PROFESSIONAL REBORN (TRENDING 2024-2026): MC đã có nghề (kỹ sư, bác sĩ, doanh nhân nhỏ, sinh viên giỏi), gia đình OK, KHÔNG có bi kịch. MC chỉ cần "ngón tay vàng" để cất cánh. Tone pragmatic, không cần khóc lóc trước khi thành công.',
+          'privileged': 'PRIVILEGED BACKGROUND: MC con nhà giàu / thiếu gia tập đoàn / hậu duệ gia tộc. Bắt đầu đã có resource, chỉ cần khôn ngoan + cơ duyên để phát triển lên đỉnh. KHÔNG cần "phế vật → bá chủ" arc.',
+          'rebirth-memory': 'REBIRTH MEMORY ONLY: MC trọng sinh nhưng KHÔNG có hệ thống/huyền bí. Power duy nhất = ký ức tương lai 25 năm. Pure pragmatic — biết deal nào đáng, tránh bẫy nào, đầu tư đâu trúng. KHÔNG combat/fantasy.',
+          'quasi-normal': 'QUASI-NORMAL LIFE: MC đời sống bình thường, một sự kiện nhỏ kích hoạt (gặp người, nhặt vật, đọc sách). Tone slice-of-life cozy. Ít drama, low-stakes nhưng warm. Match cozy-trend 2024.',
+          'family-pillar': 'FAMILY PILLAR: MC là core của gia tộc multi-gen. Bắt đầu đã có trách nhiệm gia đình (cha mẹ, anh em, con cháu sau). Group narrative thay vì lone wolf. Side characters quan trọng có arc riêng.',
+        };
+        metaParts.push(`MC STARTING ARCHETYPE: ${archetypeGuide[sd.starting_archetype] || sd.starting_archetype}`);
+      }
+
+      // Tone profile guide
+      if (sd.tone_profile) {
+        const toneGuide: Record<string, string> = {
+          empowering: 'EMPOWERING: MC tự tin từ đầu, action-oriented, không tự ti. Tone hào sảng, tích cực.',
+          pragmatic: 'PRAGMATIC: MC tính toán, không cảm tính, business-minded. Mọi quyết định có cost-benefit analysis. Tone calculated, mature.',
+          hopeful: 'HOPEFUL: MC ngây thơ nhưng có tiềm năng. Tone optimistic, mild stakes, curious về thế giới.',
+          cozy: 'COZY: MC nhẹ nhàng, low-drama, warm. Slice-of-life vibes. Mỗi chương có khoảnh khắc bình yên.',
+          'bi-revenge': 'BI-REVENGE: Khắc khổ, revenge-driven. CHỈ dùng khi genre yêu cầu (kiem-hiep, classic tien-hiep). Bi tráng nhưng không tự ngược.',
+          cynical: 'CYNICAL: MC adult, biết đời, không ảo tưởng. Tone slightly dark humor, world-weary nhưng không bitter.',
+        };
+        metaParts.push(`TONE PROFILE: ${toneGuide[sd.tone_profile] || sd.tone_profile}`);
+      }
+
+      // Anti-seeds blacklist (per-project — beyond UNIVERSAL_ANTI_SEEDS in Architect)
+      if (sd.anti_seeds && sd.anti_seeds.length) {
+        metaParts.push(`PROJECT ANTI-SEEDS: ${sd.anti_seeds.join('; ')}`);
+      }
     }
 
     parts.push(metaParts.join('\n'));
@@ -381,6 +412,8 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
 
   // Character knowledge graph
   if (payload.characterKnowledgeContext) parts.push(payload.characterKnowledgeContext);
+  if (payload.relationshipContext) parts.push(payload.relationshipContext);
+  if (payload.economicContext) parts.push(payload.economicContext);
 
   // Quality modules (Qidian Master Level)
   if (payload.foreshadowingContext) parts.push(payload.foreshadowingContext);

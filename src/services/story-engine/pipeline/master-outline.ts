@@ -20,6 +20,73 @@ export interface MasterOutline {
 // goal-driven framing (achievement, market scale) instead of villain-first.
 const PROACTIVE_GENRES: GenreType[] = ['do-thi', 'quan-truong', 'ngon-tinh'];
 
+// Combat-leaning vocabulary that LEAKS into non-combat genres — flag and sanitize.
+const COMBAT_LEAK_PATTERNS = [
+  /trùm cuối/i, /kẻ thù cuối/i, /đại chiến/i, /đánh bại.*kẻ thù/i,
+  /giết.*kẻ thù/i, /chinh phạt/i, /chiến tranh/i, /huyết chiến/i,
+  /diệt.*ma/i, /phong sát/i, /trảm.*ma/i, /thí kiếm/i,
+];
+
+const POWER_LEAK_PATTERNS = [
+  /đột phá.*cảnh giới/i, /thu phục.*dị/i, /tu vi/i, /pháp bảo/i,
+  /linh khí/i, /đan dược/i, /nguyên anh/i, /kim đan/i,
+];
+
+/**
+ * Validate master outline doesn't leak combat/power tropes into non-combat genres.
+ * Returns list of issues (empty = clean).
+ */
+function validateMasterOutlineForGenre(outline: MasterOutline, genre: GenreType): string[] {
+  if (!PROACTIVE_GENRES.includes(genre)) return []; // combat genres can have these
+
+  const issues: string[] = [];
+  const allText = JSON.stringify(outline).toLowerCase();
+
+  for (const pat of COMBAT_LEAK_PATTERNS) {
+    if (pat.test(allText)) issues.push(`Combat leak: ${pat.source}`);
+  }
+  for (const pat of POWER_LEAK_PATTERNS) {
+    if (pat.test(allText)) issues.push(`Power-system leak: ${pat.source}`);
+  }
+  return issues;
+}
+
+/**
+ * Sanitize final goal: replace combat villain framing with proactive milestone.
+ */
+function sanitizeFinalGoal(goal: string, genre: GenreType): string {
+  if (!goal) return goal;
+  let s = goal;
+  // Replace common combat phrasing with milestone-style
+  s = s.replace(/trùm cuối/gi, 'cột mốc tối thượng');
+  s = s.replace(/kẻ thù cuối cùng/gi, 'mục tiêu cuối cùng');
+  s = s.replace(/đánh bại/gi, 'vượt qua');
+  s = s.replace(/diệt/gi, 'hoàn thành');
+  if (genre === 'do-thi') {
+    s = s.replace(/giết/gi, 'cạnh tranh thắng');
+  } else if (genre === 'ngon-tinh') {
+    s = s.replace(/giết/gi, 'vượt qua');
+  } else if (genre === 'quan-truong') {
+    s = s.replace(/giết/gi, 'hạ bệ');
+  }
+  return s;
+}
+
+/**
+ * Sanitize milestone: remove combat keywords, replace with achievement-style.
+ */
+function sanitizeMilestone(milestone: string, genre: GenreType): string {
+  if (!milestone) return milestone;
+  let s = milestone;
+  s = s.replace(/đột phá.*cảnh giới/gi, 'đạt cấp độ mới');
+  s = s.replace(/thu phục.*dị/gi, 'có được tài nguyên quan trọng');
+  s = s.replace(/giết kẻ thù/gi, 'vượt qua đối thủ');
+  if (genre === 'do-thi') {
+    s = s.replace(/đánh bại/gi, 'vượt mặt');
+  }
+  return s;
+}
+
 export async function generateMasterOutline(
   projectId: string,
   title: string,
@@ -91,10 +158,24 @@ Quy tắc:
     }, { jsonMode: true, tracking: { projectId, task: 'master_outline' } });
 
     const parsed = parseJSON<MasterOutline>(res.content);
-    
+
     if (!parsed) {
       console.error('Failed to parse master outline JSON — skipping DB save');
       return null;
+    }
+
+    // Genre-aware validation: detect combat/villain leakage in non-combat genres
+    const validationIssues = validateMasterOutlineForGenre(parsed, genre);
+    if (validationIssues.length > 0) {
+      console.warn(`[MasterOutline] Genre validation issues for ${genre}: ${validationIssues.join('; ')}`);
+      // Sanitize: remove combat-leaning content for non-combat genres
+      if (isProactive) {
+        parsed.finalBossOrGoal = sanitizeFinalGoal(parsed.finalBossOrGoal, genre);
+        parsed.majorArcs = parsed.majorArcs.map(a => ({
+          ...a,
+          keyMilestone: sanitizeMilestone(a.keyMilestone, genre),
+        }));
+      }
     }
 
     // Save to DB

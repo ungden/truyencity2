@@ -39,6 +39,26 @@ export type AntiTropeFlag =
   | 'no_tournament'          // Bỏ tournament arc cliché
   | 'no_cliffhanger_mandate';// Bỏ ép cliffhanger mỗi chương
 
+// ── MC Starting Archetype (TQ 2024-2026 — phế vật giảm 55→25%, professional/privileged tăng) ──
+
+export type StartingArchetype =
+  | 'phe-vat'           // Khổ tận cam lai classic — phế vật, cô nhi, nhà nghèo (CLASSIC, 25%)
+  | 'professional'      // Trung lưu professional reborn (kỹ sư, bác sĩ, doanh nhân nhỏ) (TRENDING, 25%)
+  | 'privileged'        // Thiếu gia / hậu duệ gia tộc (TRENDING, 15-20%)
+  | 'rebirth-memory'    // Trọng sinh chỉ có ký ức tương lai, no system (10-15%)
+  | 'quasi-normal'      // Đời sống bình thường + mild trigger (cozy, 10%)
+  | 'family-pillar';    // Family-focused, gia tộc lead (家族修仙 trend, 10-15%)
+
+// ── Tone Profile (story emotional/narrative tone) ──
+
+export type ToneProfile =
+  | 'empowering'        // MC tự tin từ đầu, action-oriented
+  | 'pragmatic'         // Calculated, không cảm tính, business-minded
+  | 'hopeful'           // Curious, optimistic, mild stakes
+  | 'cozy'              // Slice-of-life, low-drama, warm
+  | 'bi-revenge'        // Khắc khổ, revenge-driven (chỉ khi genre yêu cầu)
+  | 'cynical';          // Adult, biết đời, không ảo tưởng
+
 // ── Style Directives (JSONB metadata) ────────────────────────────────────────
 
 export interface StyleDirectives {
@@ -52,6 +72,12 @@ export interface StyleDirectives {
   critic_strictness?: 'lite' | 'normal' | 'strict';
   /** Variant ID for genres with multiple variants (e.g., "ngon-tinh:dai-nu-chu", "do-thi:thuong-chien") */
   variant_id?: string;
+  /** MC starting circumstances (modern 2024-2026 archetype) */
+  starting_archetype?: StartingArchetype;
+  /** Story tone profile — overall emotional palette */
+  tone_profile?: ToneProfile;
+  /** Anti-pattern flags — explicit prohibition prompts beyond anti_tropes */
+  anti_seeds?: string[];
 }
 
 // ── Dopamine ─────────────────────────────────────────────────────────────────
@@ -62,7 +88,8 @@ export type DopamineType =
   | 'business_success' | 'harvest' | 'flex_wealth' | 'comfort' | 'comedy_misunderstanding'
   | 'steal_luck' | 'simulate_success' | 'tears_of_regret' | 'flex_power_casual'
   | 'civilization_harvest' | 'player_exploitation' | 'two_world_shock' | 'master_flex' | 'book_manifestation' | 'monster_evolution'
-  | 'smooth_opportunity' | 'casual_competence' | 'peaceful_growth';
+  | 'smooth_opportunity' | 'casual_competence' | 'peaceful_growth'
+  | 'knowledge_leverage' | 'network_payoff' | 'business_pivot' | 'quiet_competence' | 'insider_advantage';
 
 // ── Engine Config ────────────────────────────────────────────────────────────
 
@@ -280,6 +307,10 @@ export interface ContextPayload {
 
   // Character knowledge graph (MemPalace-inspired)
   characterKnowledgeContext?: string;
+  /** Per-pair latest relationship state (love/hate/ally/enemy/etc.) — coherence guard */
+  relationshipContext?: string;
+  /** MC + key entities financial state (do-thi/quan-truong only) — economic coherence */
+  economicContext?: string;
 
   // Arc chapter summaries (for synopsis generation)
   arcChapterSummaries?: Array<{ chapter_number: number; title: string; summary: string }>;

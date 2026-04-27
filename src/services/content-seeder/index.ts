@@ -346,49 +346,54 @@ interface NarrativeVariant {
   style_directives?: Record<string, unknown>;
 }
 
+// Variants embed starting_archetype + tone_profile in style_directives so engine
+// can inject these into Architect prompt for tone-consistent generation.
+// Distribution: TQ 2024-2026 — phế vật giảm 55→25%, professional/privileged tăng.
+
 const VARIANTS_BY_GENRE: Record<string, NarrativeVariant[]> = {
   'tien-hiep': [
-    { mc_archetype: 'intelligent', anti_tropes: ['no_system', 'no_invincible'], style_directives: { variant_id: 'tien-hiep:intelligent-mc' } },
-    { mc_archetype: 'family_pillar', sub_genres: [], style_directives: { variant_id: 'tien-hiep:gia-toc' } },
-    { mc_archetype: 'coward_smart', anti_tropes: ['no_face_slap'], style_directives: { variant_id: 'tien-hiep:coward-smart' } },
-    { mc_archetype: 'power_fantasy', style_directives: { variant_id: 'tien-hiep:classic' } }, // classic — 30%
+    { mc_archetype: 'intelligent', anti_tropes: ['no_system', 'no_invincible'], style_directives: { variant_id: 'tien-hiep:intelligent-mc', starting_archetype: 'phe-vat', tone_profile: 'pragmatic' } },
+    { mc_archetype: 'family_pillar', sub_genres: [], style_directives: { variant_id: 'tien-hiep:gia-toc', starting_archetype: 'family-pillar', tone_profile: 'empowering' } },
+    { mc_archetype: 'coward_smart', anti_tropes: ['no_face_slap'], style_directives: { variant_id: 'tien-hiep:coward-smart', starting_archetype: 'quasi-normal', tone_profile: 'cynical' } },
+    { mc_archetype: 'power_fantasy', style_directives: { variant_id: 'tien-hiep:classic', starting_archetype: 'phe-vat', tone_profile: 'bi-revenge' } },
   ],
   'huyen-huyen': [
-    { mc_archetype: 'intelligent', anti_tropes: ['no_system'], sub_genres: ['khoa-huyen'], style_directives: { variant_id: 'huyen-huyen:cross-genre-intelligent' } },
-    { mc_archetype: 'family_pillar', style_directives: { variant_id: 'huyen-huyen:gia-toc' } },
-    { mc_archetype: 'pragmatic', anti_tropes: ['no_tournament'], style_directives: { variant_id: 'huyen-huyen:no-tournament' } },
-    { mc_archetype: 'power_fantasy', style_directives: { variant_id: 'huyen-huyen:classic' } },
+    { mc_archetype: 'intelligent', anti_tropes: ['no_system'], sub_genres: ['khoa-huyen'], style_directives: { variant_id: 'huyen-huyen:cross-genre-intelligent', starting_archetype: 'quasi-normal', tone_profile: 'pragmatic' } },
+    { mc_archetype: 'family_pillar', style_directives: { variant_id: 'huyen-huyen:gia-toc', starting_archetype: 'family-pillar', tone_profile: 'empowering' } },
+    { mc_archetype: 'pragmatic', anti_tropes: ['no_tournament'], style_directives: { variant_id: 'huyen-huyen:no-tournament', starting_archetype: 'privileged', tone_profile: 'pragmatic' } },
+    { mc_archetype: 'power_fantasy', style_directives: { variant_id: 'huyen-huyen:classic', starting_archetype: 'phe-vat', tone_profile: 'bi-revenge' } },
   ],
   'do-thi': [
-    { mc_archetype: 'pragmatic', anti_tropes: ['no_secret_identity', 'no_harem'], style_directives: { variant_id: 'do-thi:realistic-business', cliffhanger_density: 'low' } },
-    { mc_archetype: 'intelligent', sub_genres: ['trong-sinh' as string], anti_tropes: ['no_system'], style_directives: { variant_id: 'do-thi:trong-sinh-intelligent' } },
-    { mc_archetype: 'career_driven', anti_tropes: ['no_harem'], style_directives: { variant_id: 'do-thi:career-driven' } },
-    { mc_archetype: 'power_fantasy', style_directives: { variant_id: 'do-thi:classic' } }, // tổng tài bá đạo classic
+    { mc_archetype: 'pragmatic', anti_tropes: ['no_secret_identity', 'no_harem'], style_directives: { variant_id: 'do-thi:realistic-business', starting_archetype: 'professional', tone_profile: 'pragmatic', cliffhanger_density: 'low' } },
+    { mc_archetype: 'intelligent', sub_genres: ['trong-sinh' as string], anti_tropes: ['no_system'], style_directives: { variant_id: 'do-thi:trong-sinh-intelligent', starting_archetype: 'rebirth-memory', tone_profile: 'pragmatic' } },
+    { mc_archetype: 'career_driven', anti_tropes: ['no_harem'], style_directives: { variant_id: 'do-thi:career-driven', starting_archetype: 'professional', tone_profile: 'empowering' } },
+    { mc_archetype: 'power_fantasy', style_directives: { variant_id: 'do-thi:classic', starting_archetype: 'phe-vat', tone_profile: 'bi-revenge' } },
   ],
   'ngon-tinh': [
-    { mc_archetype: 'career_driven', anti_tropes: ['no_harem'], style_directives: { variant_id: 'ngon-tinh:dai-nu-chu', cliffhanger_density: 'low' } },
-    { mc_archetype: 'career_driven', anti_tropes: ['no_harem', 'no_cliffhanger_mandate'], style_directives: { variant_id: 'ngon-tinh:daily-sweet', cliffhanger_density: 'low' } },
-    { mc_archetype: 'pragmatic', style_directives: { variant_id: 'ngon-tinh:cuoi-truoc-yeu-sau' } },
-    { mc_archetype: 'power_fantasy', style_directives: { variant_id: 'ngon-tinh:tong-tai-classic' } }, // classic
+    { mc_archetype: 'career_driven', anti_tropes: ['no_harem'], style_directives: { variant_id: 'ngon-tinh:dai-nu-chu', starting_archetype: 'professional', tone_profile: 'empowering', cliffhanger_density: 'low' } },
+    { mc_archetype: 'career_driven', anti_tropes: ['no_harem', 'no_cliffhanger_mandate'], style_directives: { variant_id: 'ngon-tinh:daily-sweet', starting_archetype: 'quasi-normal', tone_profile: 'cozy', cliffhanger_density: 'low' } },
+    { mc_archetype: 'pragmatic', style_directives: { variant_id: 'ngon-tinh:cuoi-truoc-yeu-sau', starting_archetype: 'rebirth-memory', tone_profile: 'pragmatic' } },
+    { mc_archetype: 'power_fantasy', style_directives: { variant_id: 'ngon-tinh:tong-tai-classic', starting_archetype: 'phe-vat', tone_profile: 'bi-revenge' } },
   ],
   'quan-truong': [
-    { mc_archetype: 'intelligent', anti_tropes: ['no_system', 'no_face_slap'], style_directives: { variant_id: 'quan-truong:intelligent-political' } },
-    { mc_archetype: 'pragmatic', anti_tropes: ['no_invincible'], style_directives: { variant_id: 'quan-truong:realistic' } },
-    { mc_archetype: 'family_pillar', style_directives: { variant_id: 'quan-truong:gia-toc-political' } },
-    { mc_archetype: 'power_fantasy', style_directives: { variant_id: 'quan-truong:classic' } },
+    { mc_archetype: 'intelligent', anti_tropes: ['no_system', 'no_face_slap'], style_directives: { variant_id: 'quan-truong:intelligent-political', starting_archetype: 'professional', tone_profile: 'pragmatic' } },
+    { mc_archetype: 'pragmatic', anti_tropes: ['no_invincible'], style_directives: { variant_id: 'quan-truong:realistic', starting_archetype: 'professional', tone_profile: 'pragmatic' } },
+    { mc_archetype: 'family_pillar', style_directives: { variant_id: 'quan-truong:gia-toc-political', starting_archetype: 'privileged', tone_profile: 'empowering' } },
+    { mc_archetype: 'power_fantasy', style_directives: { variant_id: 'quan-truong:classic', starting_archetype: 'phe-vat', tone_profile: 'bi-revenge' } },
   ],
   'kiem-hiep': [
-    { mc_archetype: 'intelligent', anti_tropes: ['no_tournament'], style_directives: { variant_id: 'kiem-hiep:no-tournament' } },
-    { mc_archetype: 'coward_smart', anti_tropes: ['no_invincible'], style_directives: { variant_id: 'kiem-hiep:coward-smart' } },
-    { mc_archetype: 'family_pillar', style_directives: { variant_id: 'kiem-hiep:revenge-family' } },
-    { mc_archetype: 'power_fantasy', style_directives: { variant_id: 'kiem-hiep:classic' } },
+    { mc_archetype: 'intelligent', anti_tropes: ['no_tournament'], style_directives: { variant_id: 'kiem-hiep:no-tournament', starting_archetype: 'phe-vat', tone_profile: 'hopeful' } },
+    { mc_archetype: 'coward_smart', anti_tropes: ['no_invincible'], style_directives: { variant_id: 'kiem-hiep:coward-smart', starting_archetype: 'phe-vat', tone_profile: 'cynical' } },
+    { mc_archetype: 'family_pillar', style_directives: { variant_id: 'kiem-hiep:revenge-family', starting_archetype: 'family-pillar', tone_profile: 'bi-revenge' } },
+    { mc_archetype: 'power_fantasy', style_directives: { variant_id: 'kiem-hiep:classic', starting_archetype: 'phe-vat', tone_profile: 'bi-revenge' } },
   ],
 };
 
 // Default fallback for genres not yet customized
 const DEFAULT_VARIANTS: NarrativeVariant[] = [
-  { mc_archetype: 'power_fantasy', style_directives: { variant_id: 'default:classic' } },
-  { mc_archetype: 'intelligent', anti_tropes: ['no_invincible'], style_directives: { variant_id: 'default:intelligent' } },
+  { mc_archetype: 'intelligent', anti_tropes: ['no_invincible'], style_directives: { variant_id: 'default:intelligent', starting_archetype: 'professional', tone_profile: 'pragmatic' } },
+  { mc_archetype: 'pragmatic', style_directives: { variant_id: 'default:pragmatic', starting_archetype: 'quasi-normal', tone_profile: 'hopeful' } },
+  { mc_archetype: 'power_fantasy', style_directives: { variant_id: 'default:classic', starting_archetype: 'phe-vat', tone_profile: 'bi-revenge' } },
 ];
 
 /**

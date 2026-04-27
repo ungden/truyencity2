@@ -145,6 +145,16 @@ QUY TẮC:
 11. PAYOFF NHỎ TRONG CHƯƠNG (BẮT BUỘC): Mỗi chương phải có ít nhất 1 "hạt giống đã gieo" được thu hoạch ngay trong chương (gợi ý ở scene đầu, trả ở scene sau). CẤM chỉ setup mà không payoff.
 12. SUBTEXT XUNG ĐỘT: Mỗi chương cần ít nhất 1 cảnh đối thoại có lớp nghĩa ngầm (không nói thẳng mục tiêu thật).
 
+UNIVERSAL ANTI-SEEDS (CẤM TUYỆT ĐỐI cross-genre — TQ 2024-2026 đã chán):
+- CẤM "Mẹ MC ung thư cần tiền cứu" làm trigger động lực — sến
+- CẤM "Bạn gái/người yêu bỏ MC vì nghèo" chương 1 — overused, đã thành meme
+- CẤM "MC bị họ hàng giàu khinh ra mặt, ăn cơm thừa" — xa lông
+- CẤM "Tai nạn xe tải khiến MC xuyên không/trọng sinh" — meme đùa, dùng nghiêm túc cringe
+- CẤM "Hôn ước bị hủy" làm trigger DUY NHẤT — overused
+- CẤM scene khóc lóc tủi thân kéo dài >1 đoạn (>200 từ) — TQ premium reader đã chán "凄惨开局"
+- CẤM "MC mồ côi + bị bắt nạt + lão gia trong nhẫn cứu" — formula cliché 2015-2018
+- CẤM "tổng tài lạnh lùng + nữ chính ngây thơ + hợp đồng hôn nhân ép buộc" — TQ 女频 2024 đã reverse trend
+
 NARRATIVE DIRECTIVES TUÂN THEO CONTEXT (TUYỆT ĐỐI BẮT BUỘC):
 - Nếu context có "[NARRATIVE DIRECTIVES — TUYỆT ĐỐI BẮT BUỘC]" — đây là META RULES override mọi rule khác.
 - MC ARCHETYPE: ép phong cách MC theo archetype (intelligent → thắng bằng kiến thức, không power-up; pragmatic → tính toán; coward_smart → trốn/lừa; family_pillar → trách nhiệm gia tộc; career_driven → sự nghiệp main, romance phụ; power_fantasy → classic). KHÔNG được mix archetype hoặc fall back default nếu archetype đã specify.
@@ -249,11 +259,16 @@ KIỂM TRA BỔ SUNG (BẮT BUỘC):
 
 ISSUES: Liệt kê vấn đề (pacing/consistency/dopamine/quality/word_count/dialogue/continuity)
 
-KIỂM TRA MÂU THUẪN (BẮT BUỘC):
-- Nếu nhân vật đã CHẾT mà xuất hiện lại sống -> type "continuity", severity "critical"
-- Nếu sức mạnh/tài sản MC bị THOÁI LUI vô lý -> type "continuity", severity "critical"
-- Nếu vi phạm quy tắc thế giới đã thiết lập -> type "continuity", severity "critical"
-- Nếu nhân vật hành xử trái ngược hoàn toàn với tính cách -> type "continuity", severity "major"
+KIỂM TRA MÂU THUẪN (BẮT BUỘC — coherence chặt cho long-form):
+- Nếu nhân vật đã CHẾT mà xuất hiện lại sống -> type "continuity", severity "critical", REWRITE
+- Nếu sức mạnh/tài sản MC bị THOÁI LUI vô lý -> type "continuity", severity "critical", REWRITE
+- Nếu vi phạm quy tắc thế giới đã thiết lập -> type "continuity", severity "critical", REWRITE
+- Nếu nhân vật hành xử TRÁI HOÀN TOÀN với tính cách đã thiết lập -> type "continuity", severity "critical", REWRITE (UPGRADED từ major)
+- Nếu nhân vật BIẾT thông tin chưa từng được tiết lộ trong các chương trước -> type "continuity", severity "critical", REWRITE
+- Nếu RELATIONSHIP giữa 2 nhân vật flip vô lý (yêu→thù, thù→yêu) không có lý do -> type "continuity", severity "critical", REWRITE
+- Nếu MC ở location A chương trước, location B chương này KHÔNG có scene di chuyển -> type "continuity", severity "major"
+- Nếu economic/resource logic vô lý (do-thi: MC chi tiêu vượt tài chính đã thiết lập) -> type "continuity", severity "major"
+- Nếu nhân vật HÀNH XỬ KHÁC tính cách (50%) nhưng có thể rationalize -> type "continuity", severity "major" (khi không phải personality shift hoàn toàn)
 
 VERDICT:
 - APPROVE (overallScore >= 6 VÀ đủ từ): approved=true, requiresRewrite=false
