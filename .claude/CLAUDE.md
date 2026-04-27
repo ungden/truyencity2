@@ -291,7 +291,7 @@ ALL scheduling via pg_cron. Vercel cron REMOVED. Secret stored in Supabase Vault
 - **Bundle ID**: `com.truyencity.app`
 - **ASC App ID**: `6759160705`
 - **Apple Team**: `Q8A7CBYV5Z` (Tien Duong Le, Individual)
-- **Current version**: 1.0.3, buildNumber: `"40"` (TestFlight as of 2026-04-25; ASC build IDs 34-39 came from earlier session attempts — EAS auto-bumps to next free integer)
+- **Current version**: 1.0.5, buildNumber: `"43"`, Android versionCode `4` (uploaded to App Store Connect on 2026-04-28 — submission `a16dcb61-25cf-407c-8fde-511c0ebd3f67`. Android build not yet cut. v1.0.5 ships chapter split + TTS auto-resume + interstitial recovery + free-tier 1h TTS limit enforcement.)
 
 ### Build Command
 ```bash
@@ -411,5 +411,5 @@ Old novels may have metadata blocks but `cleanNovelDescription()` in `src/lib/ut
 
 ---
 
-**Last Updated**: 2026-02-25
-**Complements**: Root `CLAUDE.md` (Story Engine v2 architecture, Phase 1-8 details, known issues)
+**Last Updated**: 2026-04-28
+**Complements**: Root `CLAUDE.md` (Story Engine v2 architecture, Phase 1-19 details, known issues)

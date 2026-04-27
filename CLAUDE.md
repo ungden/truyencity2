@@ -538,6 +538,178 @@ SEPAY_ACCOUNT_NAME=YOUR_NAME              # Account holder name (shown to user)
 - App Store Connect product creation (subscription group, pricing)
 - SePay dashboard setup (bank account, webhook URL, API key)
 
+## Phase 19 Details (2026-04-28) — Sảng Văn Pacing Overhaul + Mobile v1.0.5
+
+User feedback drove multiple back-to-back rounds tuning the story engine
+toward modern TQ webnovel standards (2024-2026). Each round refined the
+prior — read commits in order to understand the trajectory.
+
+### 19A — Chapter Split + TTS Auto-Resume + Interstitial Recovery
+**Commit `059dc80`, `c66b531`, mobile v1.0.5/build 43**
+- AI write target stays at 2800 từ for narrative coherence; orchestrator
+  splits into 2 reader chapters (~1400 each) at paragraph boundaries
+  with em-dash protection. Fallback to single chapter when content <4000
+  chars. Cron `updateQuotaAfterWrite` now ticks per reader chapter.
+- DB: 11 active projects bumped to `target_chapter_length = 2800`.
+- TTS auto-resume bug: reader's `[slug, chapterNumber]` cleanup called
+  `tts.stop()` on every nav, which cleared `pendingAutoResume` and
+  killed cross-chapter audio. Added `hasPendingAutoResume()` peek;
+  cleanup now skips stop when auto-advance is in flight.
+- Interstitial: hook gave up after 3 retries permanently. Now resets
+  retry budget and re-triggers `loadAd` when chapter interval hits
+  without a loaded ad — single bad network window no longer disables
+  popups for the rest of the session.
+- Mobile bumped to v1.0.5 / iOS build 43 / Android versionCode 4.
+
+### 19B — Missing Usage Tracking RPCs (CRITICAL FIX)
+**Commit `3f63431`, migration `0152_record_usage_rpcs.sql`**
+- `record_tts_usage` and `record_download_usage` RPCs were referenced
+  by mobile every 60s but **never existed in the database**. Calls
+  errored, client treated null as "no limit", free users had unlimited
+  TTS playback and the download UI never gated despite `show_ads` and
+  `can_download` flags being correct from `get_reader_status`.
+- Both RPCs added: upsert on `(user_id, usage_date)` constraint,
+  downgrade expired VIP rows to free before reading limits, return
+  field names mobile actually destructures (`seconds_used_today` /
+  `can_continue` for TTS, `chapters_downloaded_today` /
+  `can_download_more` for downloads).
+
+### 19C — Non-Combat Genre Guardrail
+**Commit `7d195af`**
+- User reported do-thi novels drifting into "huyết chiến trong hẻm",
+  LAN gaming tournaments, gangster fights despite genre rules already
+  forbidding combat. Dopamine pattern lists were correct but no actual
+  rejection happened when models defaulted into combat.
+- `buildGenreSpecificSuffix()` in chapter-writer now appends a hard
+  guardrail when `isNonCombatGenre(genre)` (do-thi, ngon-tinh,
+  quan-truong): no physical fights, no "Huyết Chiến/Tử Chiến" titles,
+  no gangster ambush, no MC in tournaments as A-plot. Critic gets a
+  paired hard check that issues critical continuity issue + REWRITE on
+  any of these patterns.
+- Conflict resolves through commercial channels (price wars, M&A,
+  lobby, PR, lawsuits, talent poaching) — never violence.
+
+### 19D — Warm Baseline Opening (Anti-凄惨开局)
+**Commit `6e1ef42`**
+- Modern TQ trend 2024-2026 has shifted from "凄惨开局" (tragic
+  opening) to "稳健流 / 暖开局" (stable / warm opening). MC opens at
+  functional baseline, NOT rock bottom.
+- `GOLDEN_CHAPTER_REQUIREMENTS` ch.1 mandates: MC arrives with golden
+  finger ACTIVE, infrastructure ALREADY operational, hook is
+  OPPORTUNITY-driven (customer walks in, deal appears) not
+  THREAT-driven (MC starving, getting beaten, losing job, losing
+  memory). Avoid list bans rock-bottom pile-on opening.
+- `UNIVERSAL_ANTI_SEEDS` adds 6 bans: ngất xỉu/đói lạnh/nô lệ
+  openings, amnesia ch.1 hook, suffering pile-on triggers, in-alley
+  ambush in first 5 chapters of non-combat genres, "MC tự lực từ con
+  số 0", "5-10 chương đầu MC chỉ ăn cơm cám trước khi golden finger
+  kích hoạt".
+- Architect prompt rule #16 (warm baseline ch.1) + #17 (early-arc
+  1-10: competence-led growth, no gangster ambush, GF active from
+  page one). Sub-genre rules `isekai-net-cafe` and
+  `game-parallel-world` shift baseline so MC opens with shop/studio
+  operational.
+- **Reset 5 novels** poisoned by old pattern: Trở Về Năm 2000, Quán
+  Net Dị Giới, Studio Game Dị Giới, Hollywood 1991, Ngư Dân 1992.
+  Chapters wiped, outlines regenerated under new rules via
+  `scripts/generate-outlines-for-novels.ts` (now reads
+  `TARGET_PROJECTS` env), projects re-activated.
+
+### 19E — Sảng Văn Audit (21 Adversity-Prescribing Rules Softened)
+**Commit `5041c12`**
+- User: "đa phần là Sảng Văn mà — ít main khổ cùng cực." Audit found
+  21 rules across templates.ts / pacing-director.ts / chapter-writer.ts
+  still pushing forced suffering or mandatory conflict density.
+- templates.ts: power-up no longer requires sacrifice; enemy escalation
+  optional; 7 genre engagement floors converted from "every N chapters
+  MUST..." to "≥1 per arc, optional in breathing arcs".
+- pacing-director.ts: breathing minimum 40% → 60%; villain_focus cap
+  2 → 1 per arc; climax cap 3 → 2; non-combat genres explicitly allowed
+  0/0 with milestone-as-climax. Word-count multipliers leveled —
+  breathing/training/calm now 1.0× baseline (was 0.75-0.85).
+- chapter-writer.ts: Architect rule #1 reframed from "ức chế → bùng
+  nổ" template to "Sảng Văn pacing default 80%+, suppression model
+  only for ~20% climax". Critic pacingScore exception for uniform but
+  all-positive scenes. "Easy Win Check" generalized to "Dopamine
+  Check". Breathing-chapter grading no longer discounted to ≥5 — equal
+  priority at ≥6.
+
+### 19F — Mì-Ăn-Liền Pacing (Dopamine Cadence Floor Restored)
+**Commit `95ffae7`** — refines 19E
+- User: "nhịp truyện đang khá chậm, đọc rất kìm nén." Round 19E
+  over-corrected by softening face-slap and milestone cadence — those
+  are dopamine events, not adversity. Reframed as the engagement
+  engine.
+- Architect rule #1 rewritten as SẢNG VĂN MÌ-ĂN-LIỀN: each chapter ≥2
+  dopamine peaks, first peak ≤50% of chapter, setup ≤30%, payoff ≥40%.
+  6 valid dopamine types (face-slap small, casual competence, smooth
+  opportunity, recognition, harvest, breakthrough).
+- `ENGAGEMENT_CHECKLIST.perChapter`/`per5Chapters` mandate cadence:
+  ≥2 peaks/chapter distributed early+late, ≥1 big wow per 3-5
+  chapters, ≥3 small wows per 5 chapters, setup-without-payoff banned.
+- `faceSlapFormula` cadence floor restored: ≥1 small face-slap per 1-2
+  chapters + ≥1 big per 5. Reframed as DOPAMINE event so it's not
+  conflated with adversity. Escalation 5-chapter windows: individual
+  → group → mass → nationwide.
+- `adversityToTriumphRatio` tightened to 10/90. Anti-pattern list
+  names all three reader-killers: tự ngược, kìm nén, dopamine thiếu.
+- `GOLDEN_CHAPTER` ch.1-3 updated with explicit scene timing:
+  - Ch.1: FIRST WOW by scene 2 (≤50%), BIG WOW at scenes 4-5
+  - Ch.2: ≥1 mass-witnessed face-slap or big deal close
+  - Ch.3: "defining wow" — city-level recognition; first peak ≤40%
+- Two new Critic rules:
+  - DOPAMINE CADENCE CHECK: 0 peaks → critical/REWRITE; 1 peak only
+    at end → major; first peak after scene 3 → moderate.
+  - KÌM NÉN DETECTION: ≥3 setup beats with 0 payoff in same chapter
+    → critical/REWRITE; setup:payoff > 2:1 → major. Multi-chapter
+    event cliffhanger is the only carve-out.
+
+### 19G — Refined Sảng Văn Philosophy (consolidated guidance)
+
+When tuning future story-engine work, separate two concerns that were
+previously conflated:
+
+1. **Adversity (MC suffers)** — keep LOW (~10% of chapters). Hard rules
+   in `ANTI_SELF_TORTURE_RULES`, anti-rock-bottom seeds, non-combat
+   guardrail, kìm-nén detection.
+2. **Dopamine cadence (MC wins, face-slaps land, recognition arrives)**
+   — keep HIGH and DENSE. Hard rules in `faceSlapFormula` frequency,
+   `ENGAGEMENT_CHECKLIST.perChapter` peak count, big-wow-per-5 floor,
+   golden chapter scene timing.
+
+Face-slap, recognition, milestone, and harvest are dopamine events,
+not adversity events. MC is never the one suffering during a face-slap
+— the bystander/competitor is. Tune them up, not down.
+
+### Files Changed in Phase 19
+- `src/services/story-engine/templates.ts` — 9 sections rewritten
+  (GOLDEN_CHAPTER_REQUIREMENTS, UNIVERSAL_ANTI_SEEDS,
+  ENGAGEMENT_CHECKLIST.perChapter/per5Chapters/adversityToTriumphRatio/
+  faceSlapFormula, NON_COMBAT_GENRES exports, isekai-net-cafe and
+  game-parallel-world sub-genre rules)
+- `src/services/story-engine/pipeline/chapter-writer.ts` — Architect
+  rule #1 rewritten, rules #16-17 added (warm baseline + early-arc),
+  rules #18-19 renumbered. Critic gains DOPAMINE CADENCE CHECK and
+  KÌM NÉN DETECTION (rules #12-13), subsequent rules renumbered to
+  14-22. `runCritic` accepts genre + emits non-combat hard check via
+  `nonCombatGuard`. `buildGenreSpecificSuffix` adds non-combat block
+  via `isNonCombatGenre`.
+- `src/services/story-engine/pipeline/orchestrator.ts` — chapter split
+  helper, multi-row chapter upsert, `chaptersCreated` /
+  `lastChapterNumber` in OrchestratorResult.
+- `src/services/story-engine/memory/pacing-director.ts` — breathing
+  floor 60%, villain_focus/climax caps lowered, mood word-count
+  multipliers leveled at 1.0× for non-combat moods.
+- `src/app/api/cron/write-chapters/route.ts` — quota loop multiplied
+  by `chaptersCreated`, `lastWrittenCh` tracks last reader chapter.
+- `mobile/src/lib/tts-controller.ts` — `hasPendingAutoResume()` peek.
+- `mobile/app/read/[slug]/[chapter].tsx` — cleanup skip during
+  auto-advance.
+- `mobile/src/hooks/use-interstitial-ad.ts` — retry reset on interval.
+- `mobile/app.config.ts` — v1.0.5 / build 43 / versionCode 4.
+- `supabase/migrations/0152_record_usage_rpcs.sql` — RPCs added.
+- `scripts/generate-outlines-for-novels.ts` — `TARGET_PROJECTS` env.
+
 ## Important Files to Read
 
 When working with the story engine:
@@ -559,9 +731,10 @@ When working with the story engine:
 
 ---
 
-**Last Updated**: 2026-02-28
+**Last Updated**: 2026-04-28
 **All 5 quality phases complete** — Phases 1-5 shipped to production
 **Phase 10 complete** — 6 missing genres + ratings RPC migration
 **Phases 11-16 complete** — Monetization, mobile features, SEO, analytics, infra hardening, ad integration audit fix
 **Phase 17 complete** — RevenueCat payment integration (mobile IAP + server webhook)
 **Phase 18 complete** — SePay web payment integration (bank transfer + VietQR)
+**Phase 19 complete** — Sảng Văn pacing overhaul (warm baseline, dopamine cadence, kìm-nén detection) + chapter split + mobile v1.0.5 (TTS auto-resume, interstitial recovery, missing usage RPCs)
