@@ -108,7 +108,11 @@ export const DEFAULT_CONFIG: EngineConfig = {
   model: 'deepseek-v4-flash',
   temperature: 0.75,
   maxTokens: 32768,
-  targetWordCount: 2800,
+  // 2026-04 update: reduced from 2800 → 2000 từ Việt (~2200-2500 Chinese chars).
+  // Aligns with modern TQ trend 2024+ (Fanqie/七猫 free-platform + 微短剧 IP-adapted hits
+  // ~1500-2500 Chinese chars). Reader VN prefer shorter for mobile reading.
+  // Mood multipliers (in pacing-director.ts) scale this: climax 1.25× → 2500, breathing 0.70× → 1400.
+  targetWordCount: 2000,
   genre: 'tien-hiep',
   minQualityScore: 7,
   maxRetries: 3,
