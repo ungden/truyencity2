@@ -31,7 +31,7 @@
 import { callGemini } from '../utils/gemini';
 import { parseJSON } from '../utils/json-repair';
 import { getStyleByGenre, buildTitleRulesPrompt, GOLDEN_CHAPTER_REQUIREMENTS, ENGAGEMENT_CHECKLIST, getGenreEngagement, getGenreAntiCliche } from '../config';
-import { VN_PRONOUN_GUIDE, SUB_GENRE_RULES } from '../templates';
+import { VN_PRONOUN_GUIDE, SUB_GENRE_RULES, isNonCombatGenre } from '../templates';
 import { getConstraintExtractor } from '../memory/constraint-extractor';
 import { GENRE_CONFIG } from '../../../lib/types/genre-config';
 import { buildStyleContext, getEnhancedStyleBible, CLIFFHANGER_TECHNIQUES } from '../memory/style-bible';
@@ -450,6 +450,7 @@ export async function writeChapter(
       config,
       options?.isFinalArc === true,
       options?.projectId,
+      genre,
     );
 
     if (critic.requiresRewrite && attempt < maxRetries - 1) {
@@ -651,6 +652,16 @@ function buildGenreSpecificSuffix(genre: GenreType, subGenres: string[] = []): s
   const pronounRule = VN_PRONOUN_GUIDE[genre];
   if (pronounRule) {
     parts.push(`\n\nVN PRONOUN WHITELIST cho thể loại "${genre}":\n${pronounRule}`);
+  }
+
+  if (isNonCombatGenre(genre)) {
+    parts.push(`\n\nNON-COMBAT GENRE GUARDRAIL (HARD RULE — thể loại "${genre}"):
+- CẤM TUYỆT ĐỐI scene MC tham gia chiến đấu vật lý: đánh đấm tay đôi, đâm chém, bắn nhau, huyết chiến, MC vung kiếm/dao/súng, MC bị truy sát hành hung trong hẻm tối, MC thoát chết trong đám đánh nhau.
+- CẤM tiêu đề chương kiểu "Huyết Chiến", "Tử Chiến", "Đại Chiến", "Quyết Chiến" — đây là dấu hiệu drift sang fantasy/wuxia.
+- CẤM scene gangster/giang hồ vây MC ngoài đời thực dùng vũ lực. Đối thủ phải phản ứng qua KÊNH HỢP PHÁP/THƯƠNG MẠI: kiện tụng, phá giá, thâu tóm, lobby quan chức, dìm uy tín, cướp khách hàng, ép supplier, leak thông tin báo chí.
+- CẤM scene MC tham gia "giải đấu game/võ thuật/nhảy múa" làm trục chính chương — đây là drift sang sport/combat. Nếu MC có hobby gaming/tournament, chỉ được làm scene phụ ≤1 trong arc, KHÔNG dồn 3+ chương liên tiếp.
+- CONFLICT của thể loại này = THƯƠNG CHIẾN: đối thủ kinh doanh ép giá, M&A thù địch, chiến lược tranh thị phần, scandal PR, lobby chính sách, đầu tư mạo hiểm, đàm phán supplier, kiện tụng IP, chuyển nhượng nhân tài. Tuyệt đối KHÔNG quy đổi sang vũ lực.
+- Trường hợp DUY NHẤT có violence: MC chứng kiến tin tức/báo chí về việc bạo lực ngoài xã hội, hoặc MC nghe kể lại — KHÔNG personally tham gia. MC luôn ở vai THƯƠNG NHÂN/QUẢN LÝ/NHÀ ĐẦU TƯ, không phải võ sĩ/giang hồ.`);
   }
 
   for (const sg of subGenres) {
@@ -857,6 +868,7 @@ async function runCritic(
   config: GeminiConfig,
   isFinalArc: boolean,
   projectId?: string,
+  genre?: GenreType,
 ): Promise<CriticOutput> {
   const wordCount = countWords(content);
   const wordRatio = wordCount / targetWords;
@@ -949,7 +961,14 @@ KIỂM TRA TUÂN THỦ QUALITY MODULES (NẾU CÓ THÔNG TIN):
 - PACING BLUEPRINT: Nếu pacing blueprint chỉ định mood (VD: "CALM BEFORE STORM", "CLIMAX") mà chương viết hoàn toàn ngược (VD: blueprint là calm nhưng toàn action cao trào) → type "pacing", severity "moderate".`;
 
   try {
-    const res = await callGemini(prompt, { ...config, temperature: 0.2, maxTokens: 4096, systemPrompt: CRITIC_SYSTEM }, { jsonMode: true, tracking: projectId ? { projectId, task: 'critic', chapterNumber: outline.chapterNumber } : undefined });
+    const nonCombatGuard = genre && isNonCombatGenre(genre)
+      ? `\n\nNON-COMBAT GENRE HARD CHECK (thể loại "${genre}"):
+- Nếu chương có scene MC tham gia chiến đấu vật lý (đánh đấm/đâm chém/bắn/huyết chiến/bị truy sát hành hung trong đời thực) → issue type "continuity", severity "critical", verdict REWRITE.
+- Nếu tiêu đề chương có "Huyết Chiến/Tử Chiến/Đại Chiến/Quyết Chiến" hoặc các từ khóa combat fantasy → issue "continuity", severity "critical", REWRITE.
+- Nếu MC tham gia "giải đấu game/võ thuật" làm trục chính chương trong khi genre "${genre}" là kinh doanh/chính trường/tình cảm → issue "continuity", severity "critical", REWRITE.
+- Conflict cho thể loại này PHẢI là thương chiến/chính trị/tình cảm — KHÔNG vũ lực. Nếu chương resolve conflict bằng vũ lực → REWRITE bằng phương án thương mại/đàm phán/lobby/PR.`
+      : '';
+    const res = await callGemini(prompt, { ...config, temperature: 0.2, maxTokens: 4096, systemPrompt: CRITIC_SYSTEM + nonCombatGuard }, { jsonMode: true, tracking: projectId ? { projectId, task: 'critic', chapterNumber: outline.chapterNumber } : undefined });
 
     if (!res.content) {
       // Fail closed: don't approve on error
