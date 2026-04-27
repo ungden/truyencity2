@@ -68,6 +68,10 @@ export interface OrchestratorResult {
   projectId: string;
   novelId: string;
   duration: number;
+  /** Number of reader-facing chapters created from this AI write (typically 2 after split) */
+  chaptersCreated: number;
+  /** Last DB chapter_number created in this write (for daily quota tracking) */
+  lastChapterNumber: number;
 }
 
 export interface OrchestratorOptions {
@@ -311,15 +315,24 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     },
   );
 
-  // ── Step 5: Save chapter to DB ─────────────────────────────────────────
+  // ── Step 5: Split AI content into N reader chapters + save to DB ─────────
+  // AI writes 1 logical chapter (~2800 từ). Split into 2 reader-friendly chapters
+  // (~1400 từ each) at natural paragraph boundary. This keeps narrative coherence
+  // for the AI write while delivering shorter mobile-friendly chapters to readers.
+  const SPLIT_PARTS = 2;
+  const splitResults = splitChapterContent(result.content, result.title, SPLIT_PARTS);
+  const lastChapterNumber = nextChapter + splitResults.length - 1;
+
+  const chapterRows = splitResults.map((part, idx) => ({
+    novel_id: novel.id,
+    chapter_number: nextChapter + idx,
+    title: part.title,
+    content: part.content,
+    quality_score: result.qualityScore || null,
+  }));
+
   const { error: upsertErr } = await db.from('chapters').upsert(
-    {
-      novel_id: novel.id,
-      chapter_number: nextChapter,
-      title: result.title,
-      content: result.content,
-      quality_score: result.qualityScore || null, // Critic overallScore (1-10) for reader badge
-    },
+    chapterRows,
     { onConflict: 'novel_id,chapter_number' },
   );
 
@@ -488,14 +501,14 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     ] : []),
   ]);
 
-  // ── Step 7: Update project current_chapter ─────────────────────────────
+  // ── Step 7: Update project current_chapter (use LAST chapter of split) ──
   const { error: stepSevenErr } = await db
     .from('ai_story_projects')
-    .update({ current_chapter: nextChapter, updated_at: new Date().toISOString() })
+    .update({ current_chapter: lastChapterNumber, updated_at: new Date().toISOString() })
     .eq('id', project.id);
 
   if (stepSevenErr) {
-    console.warn(`[Orchestrator] CRITICAL: Failed to update current_chapter to ${nextChapter} for project ${project.id}: ${stepSevenErr.message}`);
+    console.warn(`[Orchestrator] CRITICAL: Failed to update current_chapter to ${lastChapterNumber} for project ${project.id}: ${stepSevenErr.message}`);
   }
 
   return {
@@ -506,6 +519,10 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     projectId: project.id,
     novelId: novel.id,
     duration: Date.now() - startTime,
+    /** Number of reader-facing chapters created from this AI write (after split) */
+    chaptersCreated: splitResults.length,
+    /** Last chapter number written to DB (for daily quota/cron tracking) */
+    lastChapterNumber,
   };
 }
 
@@ -582,4 +599,99 @@ function normalizeNovel(
   const novel = Array.isArray(novels) ? novels[0] : novels;
   if (!novel?.id || !novel?.title) return null;
   return novel;
+}
+
+// ── Chapter Splitter (post-write reader-friendly split) ───────────────────────
+
+/**
+ * Split AI-generated chapter content into N reader chapters at natural paragraph
+ * boundaries. Each split chapter inherits a continuation-aware title.
+ *
+ * Algorithm:
+ * 1. Compute target split points (e.g., 50% for 2-part split)
+ * 2. Find nearest paragraph boundary (\n\n) within ±15% search window
+ * 3. Avoid splitting mid-dialogue (line starts with em dash —)
+ * 4. Title scheme: original title for part 1, "(Tiếp)" / "(Phần N)" suffix for parts 2+
+ *
+ * Falls back to single-part return if content too short to meaningfully split.
+ */
+export function splitChapterContent(
+  content: string,
+  title: string,
+  numParts: number = 2,
+): Array<{ title: string; content: string }> {
+  const trimmed = content.trim();
+  // Don't split if content is too short for clean parts
+  if (numParts <= 1 || trimmed.length < 4000) {
+    return [{ title, content: trimmed }];
+  }
+
+  const totalLen = trimmed.length;
+  const targetChunkLen = totalLen / numParts;
+  const splitPoints: number[] = [0];
+
+  for (let i = 1; i < numParts; i++) {
+    const targetPos = Math.round(targetChunkLen * i);
+    const searchStart = Math.max(splitPoints[splitPoints.length - 1] + 500, Math.round(targetPos - targetChunkLen * 0.15));
+    const searchEnd = Math.min(totalLen - 500, Math.round(targetPos + targetChunkLen * 0.15));
+
+    // Find paragraph boundary (\n\n) closest to target within search window
+    let bestBoundary = -1;
+    let bestDistance = Infinity;
+    let pos = trimmed.indexOf('\n\n', searchStart);
+    while (pos !== -1 && pos < searchEnd) {
+      // Skip boundaries immediately before dialogue (em dash) — keep dialogue blocks together
+      const nextNonWs = trimmed.slice(pos + 2).match(/\S/);
+      const isMidDialogue = nextNonWs && nextNonWs[0] === '—';
+      if (!isMidDialogue) {
+        const distance = Math.abs(pos - targetPos);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          bestBoundary = pos + 2; // include the \n\n
+        }
+      }
+      pos = trimmed.indexOf('\n\n', pos + 1);
+    }
+
+    // Fallback: if no good paragraph break found, use single newline closest to target
+    if (bestBoundary === -1) {
+      let nlPos = trimmed.indexOf('\n', searchStart);
+      while (nlPos !== -1 && nlPos < searchEnd) {
+        const distance = Math.abs(nlPos - targetPos);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          bestBoundary = nlPos + 1;
+        }
+        nlPos = trimmed.indexOf('\n', nlPos + 1);
+      }
+    }
+
+    // Last resort: hard split at target
+    if (bestBoundary === -1) bestBoundary = targetPos;
+
+    splitPoints.push(bestBoundary);
+  }
+  splitPoints.push(totalLen);
+
+  const result: Array<{ title: string; content: string }> = [];
+  for (let i = 0; i < numParts; i++) {
+    const partContent = trimmed.slice(splitPoints[i], splitPoints[i + 1]).trim();
+    if (partContent.length === 0) continue;
+
+    let partTitle: string;
+    if (i === 0) {
+      partTitle = title;
+    } else if (numParts === 2) {
+      partTitle = `${title} (Tiếp)`;
+    } else {
+      partTitle = `${title} (Phần ${i + 1})`;
+    }
+    result.push({ title: partTitle, content: partContent });
+  }
+
+  // Sanity check: if split somehow produced 1 part, return original
+  if (result.length === 0) {
+    return [{ title, content: trimmed }];
+  }
+  return result;
 }

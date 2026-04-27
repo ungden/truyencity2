@@ -420,6 +420,12 @@ class TTSControllerImpl {
     return flag;
   }
 
+  /** Read-only peek: is an auto-resume pending? Used by the reader cleanup
+   *  to skip stop() when we're navigating to chapter N+1 via auto-advance. */
+  hasPendingAutoResume(): boolean {
+    return this.pendingAutoResume;
+  }
+
   private scheduleAutoStop() {
     this.cancelAutoStop();
     this.autoStopTimeoutId = setTimeout(() => {

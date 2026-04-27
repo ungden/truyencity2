@@ -265,27 +265,27 @@ export async function getChapterPacingContext(
  * baseTarget = project.target_chapter_length (default 2500-3000).
  */
 export function adjustWordCountForMood(baseTarget: number, mood: ChapterMood): number {
-  // Reduced multipliers (2026-04) — base now 2000 từ Việt, target output range 1400-2500
-  // matching modern TQ trend (Fanqie/七猫 + 微短剧 era ~1500-2200 Chinese chars/chương).
+  // baseTarget = 2800 (AI write target). Output → split thành 2 reader chapters via orchestrator.
+  // Per-mood multipliers scale AI write length, not reader chapter length.
   const factors: Record<ChapterMood, number> = {
-    climax: 1.25,           // Dense action — slightly longer (2500 từ)
-    villain_focus: 1.10,    // Villain POV — slight bump
-    revelation: 1.15,       // Reveal needs build-up + reaction
-    rising: 1.05,           // Tension build
-    aftermath: 1.00,        // Standard (2000 từ)
+    climax: 1.30,           // Dense, action-packed → longer
+    villain_focus: 1.15,    // Villain POV needs depth
+    revelation: 1.20,       // Reveal needs build-up + reaction
+    rising: 1.10,           // Tension build → slightly longer
+    aftermath: 1.00,        // Standard
     buildup: 0.95,          // Setup, lean
-    training: 0.95,         // Skill development
+    training: 0.95,         // Skill development, lean
     villain_focus_unused: 0.95, // (placeholder unused)
     transition: 0.85,       // Quick scene change
     calm_before_storm: 0.85,// Quiet, lean
     comedic_break: 0.80,    // Light, short
-    breathing: 0.70,        // Anti-self-torture: shorter, dopamine-dense (1400 từ)
+    breathing: 0.75,        // Anti-self-torture: shorter, dopamine-dense
   } as Record<ChapterMood, number>;
 
   const factor = factors[mood] ?? 1.00;
   const adjusted = Math.round(baseTarget * factor);
-  // Clamp to modern range (was 1500-4500). Mobile-friendly + matches 2024 TQ trend.
-  return Math.max(1200, Math.min(adjusted, 3000));
+  // Clamp to reasonable range
+  return Math.max(1500, Math.min(adjusted, 4500));
 }
 
 /**

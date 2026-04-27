@@ -161,10 +161,13 @@ export default function ReadingScreen() {
   // settings.brightness: 1 = full bright (no overlay), 0 = very dim
   const brightnessOverlayOpacity = 1 - settings.brightness;
 
-  // Stop TTS when chapter/novel changes (must run before new content loads)
+  // Stop TTS when chapter/novel changes (must run before new content loads).
+  // Exception: if auto-advance flagged a pending auto-resume, leave the
+  // controller alone — stop() would clear the flag and kill the cross-chapter
+  // audio handoff. The next mount will replace the chunks via tts.speak().
   useEffect(() => {
     return () => {
-      // Cleanup: stop TTS when navigating away or chapter changes
+      if (ttsController.hasPendingAutoResume()) return;
       tts.stop();
     };
   }, [slug, chapterNumber]);

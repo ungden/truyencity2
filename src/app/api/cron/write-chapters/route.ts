@@ -521,8 +521,13 @@ async function writeOneChapter(
     });
 
     // ====== QUOTA UPDATE — IMMEDIATELY after successful write ======
+    // Each AI write creates `chaptersCreated` reader chapters (typically 2 after split).
+    // Increment quota once per reader chapter so daily target counts correctly.
+    const chaptersCreated = v2Result.chaptersCreated || 1;
     try {
-      await updateQuotaAfterWrite(supabase, project.id, vnDate, endIso);
+      for (let i = 0; i < chaptersCreated; i++) {
+        await updateQuotaAfterWrite(supabase, project.id, vnDate, endIso);
+      }
     } catch { /* non-fatal: don't fail the chapter because of quota */ }
 
     latestWrittenTitle = v2Result.title;
@@ -531,12 +536,13 @@ async function writeOneChapter(
     try {
       const { data: ch } = await supabase.from('chapters')
         .select('content').eq('novel_id', novel.id)
-        .eq('chapter_number', v2Result.chapterNumber).maybeSingle();
+        .eq('chapter_number', v2Result.lastChapterNumber || v2Result.chapterNumber).maybeSingle();
       latestWrittenContent = ch?.content || null;
     } catch { /* non-fatal */ }
 
     // ====== SOFT ENDING LOGIC ======
-    const lastWrittenCh = v2Result.chapterNumber;
+    // Use last chapter number after split (e.g., AI write produced ch.21+22 → use 22)
+    const lastWrittenCh = v2Result.lastChapterNumber || v2Result.chapterNumber;
     const targetChapters = project.total_planned_chapters || 200;
     const CHAPTERS_PER_ARC = 20;
     const GRACE_BUFFER = CHAPTERS_PER_ARC;
