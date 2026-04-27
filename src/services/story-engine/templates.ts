@@ -926,33 +926,41 @@ export const POWER_SYSTEMS: Record<string, PowerSystem> = {
 export const GOLDEN_CHAPTER_REQUIREMENTS = {
   chapter1: {
     mustHave: [
-      'Xung đột ngay lập tức HOẶC Mâu thuẫn sinh hoạt/Kế hoạch kinh doanh',
-      'Mục tiêu rõ ràng của MC (cứu mạng, kiếm tiền, thăng tiến, hay yên bình)',
-      'Demo sức mạnh, trí tuệ hoặc bàn tay vàng',
-      'Giới thiệu thiết lập thế giới tự nhiên, cuốn hút',
-      'Tạo sự mong đợi hoặc căng thẳng nhỏ',
+      'WARM BASELINE OPENING (BẮT BUỘC — TQ trend 2024-2026 "稳健流/暖开局"): MC mở chương ở trạng thái CÓ functional baseline rồi — đã có shop/studio/squad/skill/golden finger ĐANG VẬN HÀNH, KHÔNG phải rock bottom. MC đang LÀM CHỦ domain nhỏ của mình ngay trang 1.',
+      'MC trong domain CỦA MÌNH = competence-leader (vô địch trong phạm vi nhỏ): chủ quán net biết mọi PC, dev biết mọi engine, lãnh chúa biết mọi thuộc hạ. Thiếu chỉ là quy mô (small ops), KHÔNG phải competence.',
+      'Hook chương 1 = OPPORTUNITY-driven, KHÔNG threat-driven: 1 customer giàu bước vào, 1 deal hiện ra, 1 manh mối lộ ra, 1 lựa chọn xuất hiện — KHÔNG phải "MC bị đánh / mất việc / hết tiền / sắp chết".',
+      'Mục tiêu rõ ràng của MC (mở rộng quy mô, chốt deal, cứu một người cụ thể, dùng cơ hội mới hé lộ)',
+      'Demo competence/golden finger ngay scene 1-2: MC quan sát/thao tác đúng kiểu chuyên gia, bystander react với expertise đó.',
+      'Giới thiệu thiết lập thế giới qua HÀNH ĐỘNG (MC vận hành, customer hỏi, deal đến) — KHÔNG dump exposition',
     ],
-    avoid: ['Mở đầu chậm, lan man', 'Worldbuilding dump', 'MC thụ động không làm gì'],
+    avoid: [
+      'Mở đầu chậm, lan man',
+      'Worldbuilding dump',
+      'MC thụ động không làm gì',
+      'ROCK-BOTTOM OPENING (CẤM TUYỆT ĐỐI): MC nghèo đói + bị đuổi việc + bị đánh + bị bỏ + nợ ngập đầu + ngất xỉu + mất trí nhớ + khóc lóc tủi thân → đây là "凄惨开局" TQ đã chán từ 2022',
+      'Pre-action backstory dump: dành >150 từ đầu kể past suffering của MC trước khi vào action — TUYỆT ĐỐI CẤM',
+      'MC vừa xuyên không "không biết gì", "chưa có gì", "phải tự lực từ con số 0" — modern trend là MC arrive WITH golden finger ACTIVATED + tools in hand',
+    ],
   },
   chapter2: {
     mustHave: [
-      'Thành quả hoặc chiến thắng nhỏ đầu tiên',
-      'Mở rộng hệ thống/sức mạnh/kế hoạch',
-      'Nhân vật mới xuất hiện',
-      'Khó khăn/Trở ngại mới',
+      'Thành quả/chiến thắng nhỏ thứ 2 (MC nhân đôi cơ hội ch.1 hoặc unlock thêm 1 capability)',
+      'Mở rộng hệ thống/sức mạnh/kế hoạch — show baseline operational expanded',
+      'Nhân vật mới xuất hiện thông qua MC competence (không phải "MC tình cờ gặp khi đang lang thang")',
+      'Mini-conflict mức nhẹ (competitor noticed, supplier hỏi giá, customer quay lại với yêu cầu lớn hơn) — KHÔNG threat đe dọa tính mạng',
       'Hook cho chapter tiếp',
     ],
-    avoid: ['Chỉ training/giải thích không hành động', 'Cốt truyện dậm chân'],
+    avoid: ['Chỉ training/giải thích không hành động', 'Cốt truyện dậm chân', 'Đột ngột chuyển sang dark tone (giang hồ/bạo lực/villain dập)'],
   },
   chapter3: {
     mustHave: [
-      'Thử thách thực sự hoặc Rào cản đầu tiên',
-      'Face-slap, chốt deal lớn, hoặc đạt thành quả thu hoạch',
-      'Growth rõ ràng của MC (tiền, sức mạnh, trí tuệ, quan hệ)',
-      'Hint về plot/quy mô thế giới lớn hơn',
-      'Reader bị hook',
+      'Thử thách thực sự nhưng VẪN trong domain của MC (không phải đột ngột bị truy sát/đánh ngoài hẻm)',
+      'Face-slap commercial / chốt deal lớn / showcase competence mạnh hơn — bystander kinh ngạc',
+      'Growth rõ ràng của MC (revenue tăng, quy mô tăng, network mở rộng, capability mới)',
+      'Hint về plot/quy mô thế giới lớn hơn (tập đoàn lớn để ý / quan chức ghé / nhân vật quan trọng nghe đồn)',
+      'Reader bị hook bằng OPPORTUNITY (deal lớn sắp đến) chứ KHÔNG phải THREAT (villain dọa giết)',
     ],
-    avoid: ['Giải quyết quá dễ dàng', 'Không stakes/hậu quả'],
+    avoid: ['Giải quyết quá dễ dàng', 'Không stakes/hậu quả', 'Ép villain hard-conflict ngay khi MC mới có 2-3 chương baseline'],
   },
 };
 
@@ -1591,6 +1599,8 @@ export const SUB_GENRE_RULES: Record<string, string[]> = {
   'isekai-net-cafe': [
     'ISEKAI NET-CAFE PATTERNS (xuyên không mở quán net ở dị giới — KHÁC HOÀN TOÀN với LÀM GAME):',
     '  • CORE DISTINCTION: MC KHÔNG làm/develop game. MC = OPERATOR / OWNER quán net. Game đã có sẵn trên server cũ — MC chỉ vận hành, sửa máy, bán đồ ăn.',
+    '  • WARM BASELINE OPENING (BẮT BUỘC — TQ trend 2024-2026): Chương 1 PHẢI mở với MC ĐÃ vận hành quán net trong dị giới — máy đã chạy, điện đã có, customer đầu tiên đã đến hoặc sắp đến. MC trong quán net của mình LÀ VÔ ĐỊCH ngay từ scene 1: rành mọi PC, biết từng game, hiểu mọi thiết bị. Thiếu chỉ là QUY MÔ (10 PC nhỏ → tham vọng 100 PC), KHÔNG phải competence. CẤM TUYỆT ĐỐI mở bằng "MC vừa rớt vào dị giới chưa biết gì, lang thang đói khát, bị truy sát" — modern reader bỏ truyện trong 3 trang.',
+    '  • Hook chương 1 = OPPORTUNITY: 1 customer dị giới (hiệp sĩ/pháp sư) ngơ ngác bước vào quán → MC chào mời thành thạo → bystander shocked. KHÔNG threat-driven (giang hồ tới đập, lưu manh đòi tiền bảo kê).',
     '  • MC xuyên không sang dị giới với QUÁN NET CŨ + 30 dàn máy + máy chủ vintage chứa game cổ điển Việt Nam/TQ 2000-2015',
     '  • Game library = GAME CỔ ĐIỂN ĐÃ CÓ SẴN (KHÔNG develop): CS 1.6, Đột Kích, Võ Lâm Truyền Kỳ, MU Online, AoE 2, Diablo 2, WoW, DotA, LoL, Audition, Fifa Online, Half-Life, MapleStory — đây là USP NOSTALGIA cho VN reader',
     '  • Customer Journey: dân dị giới đến quán net → thử chơi game (CS, Võ Lâm, AoE...) → học skill thật từ game → áp dụng combat dị giới → đánh bại đối thủ → quay lại quán net kể MC nghe (POV switch tạm) → reader sướng',
@@ -1615,9 +1625,9 @@ export const SUB_GENRE_RULES: Record<string, string[]> = {
     '  • GOLDEN FINGER (chọn 1):',
     '    (a) HỆ THỐNG THU THẬP CẢM XÚC: MC release game → thu "Điểm sợ hãi" (game kinh dị), "Điểm ức chế" (Flappy Bird/Getting Over It), "Điểm cảm động" (Undertale/Stardew). Điểm = currency mua source code Earth, engine, kỹ năng.',
     '    (b) THƯ VIỆN TRÁI ĐẤT: kho game/nhạc/phim Earth — MC retrieve theo level / điểm.',
-    '  • MC = LẬP TRÌNH VIÊN ĐỘC LẬP / chủ studio sắp phá sản. Bắt đầu nghèo, có nợ hoặc bị đuổi việc. PRAGMATIC + creative + business savvy.',
+    '  • MC = LẬP TRÌNH VIÊN ĐỘC LẬP / chủ studio nhỏ. PRAGMATIC + creative + business savvy. WARM BASELINE (bắt buộc): chương 1 mở với MC ĐÃ có studio nhỏ + máy tính + golden finger activated + ý tưởng/prototype đầu trong tay — KHÔNG bắt đầu bằng "MC vừa bị đuổi việc lang thang về nhà nợ ngập đầu". Có thể có dấu hiệu áp lực nhẹ (rent due, deadline, 1 khách hàng khó tính) NHƯNG MC operational ngay từ trang đầu.',
     '  • 4-PHASE ROADMAP (cấu trúc cho 1500 chương):',
-    '    PHASE 1 (ch.1-50) "Khởi nghiệp tinh gọn": MC nợ/bị đuổi → release game indie nhỏ nhưng đột phá (Five Nights at Freddys, Outlast, Undertale, Getting Over It style) → marketing 0 đồng qua streamer (streamer la hét/phá chuột → viral) → vốn liếng đầu tay.',
+    '    PHASE 1 (ch.1-50) "Khởi nghiệp tinh gọn": MC ĐÃ có studio + golden finger activated → release game indie nhỏ nhưng đột phá (Five Nights at Freddys, Outlast, Undertale, Getting Over It style) → marketing 0 đồng qua streamer (streamer la hét/phá chuột → viral) → vốn liếng đầu tay. CẤM mở chương 1 bằng "MC vừa rớt vào dị giới chưa biết gì" — MC arrive WITH inventory + skills + golden finger active.',
     '    PHASE 2 (ch.51-200) "Studio + cuộc chiến bản quyền": Tuyển team (nhân tài có tật — họa sĩ bị tẩy chay, nhạc sĩ thất thời) → tựa game tầm trung (Stardew Valley, Plants vs Zombies, CS:GO) → tập đoàn lớn copy clone → MC face-slap bằng cập nhật core feature bản nhái không kịp, hoặc kiện ngược bản quyền.',
     '    PHASE 3 (ch.201-500) "Phá vỡ độc quyền + hệ sinh thái": Game AAA đầu tiên (GTA V, The Witcher, Dark Souls, Sekiro) → game = nghệ thuật → tự build platform riêng (Steam analog "Hồng Tâm") → thu hút indie devs → tổ chức esports global (LoL, DotA tournaments).',
     '    PHASE 4 (ch.501+) "VR / Metaverse": Hệ thống đưa hắc khoa kỹ → MC làm thiết bị VR neural-interface (Sword Art Online / Ready Player One) → metaverse trở thành "thế giới thứ hai", apply quân sự/y tế/giáo dục → MC = Bố Già công nghệ.',
@@ -1853,6 +1863,13 @@ export const UNIVERSAL_ANTI_SEEDS: string[] = [
   'CẤM scene khóc lóc tủi thân kéo dài >1 đoạn (>200 từ) — TQ premium reader đã chán "凄惨开局"',
   'CẤM "MC mồ côi từ nhỏ + bị bạn cùng lớp bắt nạt + được lão gia trong nhẫn cứu" — formula cliché 2015-2018',
   'CẤM lạm dụng "tổng tài lạnh lùng + nữ chính ngây thơ + hợp đồng hôn nhân ép buộc" — TQ 女频 2024 đã reverse trend',
+  // ── Anti-tragic-opening (TQ trend 2024-2026: "稳健流" / "暖开局" thay thế "凄惨开局") ──
+  'CẤM "MC vừa xuyên không/trọng sinh đã ngất xỉu vì đói/lạnh/bị đánh/bị bán làm nô lệ" — modern trend là MC arrive WITH golden finger ACTIVATED, có ngay 1 thứ trong tay (shop, studio, squad, cheat function visible)',
+  'CẤM "MC mất trí nhớ chương 1, không biết mình là ai" làm hook — đã chán, lazy worldbuilding',
+  'CẤM "MC bị đuổi việc + nợ chồng chất + người yêu bỏ + mèo chết" cluster suffering làm trigger chương 1 — pile-on cringe, TQ đã reverse',
+  'CẤM "MC bị truy sát ngoài hẻm tối / bị thủ đoạn lưu manh dập" trong 5 chương đầu — đây là combat drift cho non-combat genre, modern reader bỏ truyện ngay',
+  'CẤM "MC tỉnh dậy ở dị giới với 0 tài nguyên, 0 kiến thức, phải tự lực từ con số 0" — modern isekai 2024-2026 MC arrive với INFRASTRUCTURE/INVENTORY/SYSTEM đã activated',
+  'CẤM "5-10 chương đầu MC chỉ ăn cơm cám, ngủ đường, làm cu li" trước khi golden finger kích hoạt — golden finger PHẢI active từ chương 1, MC PHẢI có visible advantage ngay',
 ];
 
 /**

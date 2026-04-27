@@ -155,8 +155,21 @@ QUY TẮC:
     - Mở đầu ≤150 từ: PHẢI có (a) MC trong action/decision, (b) stakes-shift hoặc hook, (c) 1 sensory detail cụ thể
     - CẤM info-dump opening (worldbuilding lecture / nội tâm dài)
     - Câu 1 reveal MC personality hoặc immediate conflict
-17. EMOTIONAL ARC PER CHAPTER: opening emotion B → midpoint rise to peak P (60-70% mark) → small fall → ending emotion B' ≠ B. Ghi rõ "emotionalArc" JSON với opening / midpoint / climax / closing emotions cụ thể.
-18. ARC BOUNDARY (chapter đầu sub-arc / arc): nếu chương này là start-of-arc (ch.1, hoặc khi sub_arc_number trong context tăng) → giới thiệu ≥2 yếu tố mới (nhân vật, location, threat) MƯỢT MÀ trong scene, KHÔNG exposition dump.
+    - WARM BASELINE OPENING (BẮT BUỘC — TQ trend 2024-2026 "稳健流/暖开局" đã thay thế "凄惨开局"):
+      • MC mở chương ở trạng thái CÓ functional baseline rồi — đã có shop/studio/squad/skill/golden finger ĐANG VẬN HÀNH. MC ĐANG LÀM CHỦ domain nhỏ của mình ngay scene 1.
+      • MC trong domain CỦA MÌNH = vô địch (rành mọi thứ trong phạm vi nhỏ). Thiếu chỉ là quy mô (small ops), KHÔNG phải competence.
+      • Hook = OPPORTUNITY (customer giàu bước vào / deal hé lộ / cơ hội xuất hiện), KHÔNG phải THREAT (MC bị đánh / mất việc / đói lả / sắp chết).
+      • CẤM TUYỆT ĐỐI rock-bottom opening: MC nghèo đói + bị đuổi việc + bị bỏ + nợ ngập đầu + ngất xỉu + mất trí nhớ + khóc lóc tủi thân → đây là 凄惨开局 đã chán.
+      • CẤM "MC vừa xuyên không/trọng sinh, không có gì, không biết gì, phải tự lực từ con số 0" — modern isekai 2024-2026 MC arrive WITH inventory + skills + golden finger ACTIVATED ngay chương 1.
+      • Nếu world description đặt MC ở context đặc biệt (xuyên không quán net / studio game / lãnh chúa) → MC mở chương ĐÃ trong cơ sở đó vận hành, KHÔNG bắt đầu bằng cảnh MC tỉnh dậy chưa biết gì.
+
+17. EARLY-ARC RULE (chapterNumber ≤ 10):
+    - 5-10 chương đầu PHẢI giữ MC trong domain expertise — show competence growth + revenue/network expansion + opportunity-driven plot.
+    - CẤM mọi scene MC bị truy sát ngoài hẻm tối / gangster ambush / bị hành hung trong 10 chương đầu cho non-combat genres (do-thi / ngon-tinh / quan-truong / kinh-doanh sub-genres).
+    - Conflict đầu arc = COMMERCIAL/POLITICAL (đối thủ ép giá, customer khó tính, tập đoàn để ý), KHÔNG vũ lực.
+    - Golden finger PHẢI active từ chương 1, MC PHẢI có visible advantage ngay (knowledge / system / inventory / skill). CẤM "5-10 chương đầu MC chỉ ăn cơm cám trước khi golden finger kích hoạt".
+18. EMOTIONAL ARC PER CHAPTER: opening emotion B → midpoint rise to peak P (60-70% mark) → small fall → ending emotion B' ≠ B. Ghi rõ "emotionalArc" JSON với opening / midpoint / climax / closing emotions cụ thể.
+19. ARC BOUNDARY (chapter đầu sub-arc / arc): nếu chương này là start-of-arc (ch.1, hoặc khi sub_arc_number trong context tăng) → giới thiệu ≥2 yếu tố mới (nhân vật, location, threat) MƯỢT MÀ trong scene, KHÔNG exposition dump.
 
 UNIVERSAL ANTI-SEEDS (CẤM TUYỆT ĐỐI cross-genre — TQ 2024-2026 đã chán):
 - CẤM "Mẹ MC ung thư cần tiền cứu" làm trigger động lực — sến
