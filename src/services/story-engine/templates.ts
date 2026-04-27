@@ -1233,8 +1233,8 @@ export const ENGAGEMENT_CHECKLIST = {
     },
     antiPowerCreep: [
       'KHÔNG tăng sức mạnh mỗi chương',
-      'Mỗi power-up phải có điều kiện hoặc cái giá rõ ràng',
-      'Kẻ thù và trở ngại phải leo thang tương ứng để giữ áp lực',
+      'Mỗi power-up CẦN lý do rõ ràng (milestone đạt được, insight, tài nguyên, đồng đội hỗ trợ). "Cái giá phải trả" là TÙY CHỌN — Sảng Văn cho phép MC earn power-up qua intelligence/timing mà KHÔNG cần sacrifice/wound. CẤM ép MC bị thương/tốn tài nguyên nặng để "cân bằng" mỗi lần mạnh lên.',
+      'Kẻ thù/trở ngại CÓ THỂ leo thang HOẶC MC chọn target dễ hơn / outmaneuver bằng kế. Áp lực KHÔNG phải nguồn engagement duy nhất — Sảng Văn lấy engagement từ stream of victories, recognition, scale-up.',
       'Sau breakthrough cần 3-5 chương thích nghi thay vì breakthrough liên tiếp',
     ],
   },
@@ -1266,14 +1266,14 @@ export const GENRE_TITLE_EXAMPLES: Record<GenreType, string[]> = {
  */
 export const GENRE_ENGAGEMENT: Record<GenreType, string[]> = {
   'tien-hiep': [
-    'Mỗi 2-3 chương phải có 1 face-slap hoặc khoảnh khắc "chấn kinh" (bàng quan kinh ngạc)',
+    'Mỗi arc CÓ THỂ có vài khoảnh khắc face-slap HOẶC casual victory (recognition, smooth competence). KHÔNG ép cadence "mỗi 2-3 chương 1 face-slap" — Sảng Văn cho phép chuỗi small wins liên tiếp không cần adversity setup.',
     'Tu luyện phải có chi tiết cụ thể (cảm giác thể xác, biến hóa linh khí) — KHÔNG chỉ nói "đột phá"',
     'Đan dược/pháp khí phải có tên riêng và hiệu quả rõ ràng',
   ],
   'huyen-huyen': [
     'Hệ thống sức mạnh phải có quy tắc rõ ràng — người đọc phải hiểu MC mạnh cỡ nào so với kẻ thù',
     'Mỗi arc phải mở rộng thế giới (tầng mới, vùng đất mới, cảnh giới mới)',
-    'Cơ duyên phải có giá phải trả (không free lunch)',
+    'Cơ duyên ƯU TIÊN compound advantage (MC earn nhiều, mất ít). Giá phải trả TÙY CHỌN — Sảng Văn cho phép "free lunch" khi MC may mắn/destined/timing đúng. CẤM ép sacrifice cho mỗi cơ duyên.',
   ],
   'do-thi': [
     'Flex tài sản/quyền lực phải cụ thể (con số, thương hiệu, vị trí) — KHÔNG chỉ nói "giàu"',
@@ -1298,27 +1298,27 @@ export const GENRE_ENGAGEMENT: Record<GenreType, string[]> = {
   ],
   'vong-du': [
     'Game mechanics phải nhất quán (stats, skills, rules) — KHÔNG thay đổi tùy tiện',
-    'Mỗi 3-5 chương phải có 1 "thao tác thần thánh" (exploit system, PvP outplay, hidden quest)',
+    '≥1 "thao tác thần thánh" (exploit system, PvP outplay, hidden quest) per arc — KHÔNG ép cadence cứng. Sảng Văn cho phép arc full smooth grinding/farming nếu pacing yêu cầu.',
     'Players phải có hành vi giống game thật (trade, PK, guild drama)',
   ],
   'kiem-hiep': [
     'Chiêu thức kiếm pháp phải có tên và mô tả cảm quan (không chỉ "vung kiếm")',
     'Giang hồ phải có quy tắc (nghĩa khí, thù hận, tôn ti bang phái)',
-    'Mỗi arc phải có 1 đại hội/tỷ thí hoặc ân oán giang hồ cần giải quyết',
+    '≥1 đại hội/tỷ thí hoặc ân oán giang hồ trong 2-3 arcs — KHÔNG bắt buộc mỗi arc. Breathing arc (luyện công, kết giao, du lịch giang hồ) hoàn toàn hợp lệ.',
   ],
   'mat-the': [
     'Sinh tồn phải có chi tiết cụ thể (tìm nước, xây trại, chế tạo vũ khí)',
-    'Mỗi 3-5 chương phải có 1 mối đe dọa mới (dị thú, thiên tai, phe phái thù địch)',
+    'Đe dọa mới (dị thú, thiên tai, phe phái thù địch) đến KHI world state escalate tự nhiên — KHÔNG ép cadence cứng. MC có thể có chuỗi chương khám phá/build base / tích trữ tài nguyên không gặp threat mới.',
     'Base building phải có tiến triển rõ ràng qua từng arc',
   ],
   'linh-di': [
     'Horror phải có atmosphere — miêu tả 5 giác quan, đặc biệt thính giác và xúc giác',
     'Bí ẩn phải có manh mối hợp lý — người đọc có thể đoán nếu chú ý',
-    'Mỗi arc phải có 1 plot twist kinh hoàng mà người đọc không ngờ tới',
+    '≥1 revelation/plot twist mỗi 2-3 arcs (KHÔNG bắt buộc "kinh hoàng" — có thể là hé lộ thân thế, lý do hành động kẻ thù, mảnh ghép quá khứ). Breathing arc cho phép MC củng cố sức mạnh / quan hệ không cần twist.',
   ],
   'quan-truong': [
     'Quan hệ quyền lực phải rõ ràng (ai bảo kê ai, phe phái nào chống phe nào)',
-    'Mỗi 5 chương phải có 1 mưu kế chính trị hoàn chỉnh (setup → thực hiện → kết quả)',
+    '≥1 mưu kế chính trị hoàn chỉnh per arc (KHÔNG ép mỗi 5 chương). Cho phép arc thuần "ngồi ghế cao quan sát" hoặc "thu lợi từ mưu kế trước đó vận hành" mà không cần mưu kế mới.',
     'Thăng tiến phải có logic (công trạng, quan hệ, thời cơ) — KHÔNG may mắn suông',
   ],
   'di-gioi': [

@@ -89,17 +89,17 @@ NGUYÊN TẮC NHỊP TRUYỆN ĐẲNG CẤP (CHỐNG TỰ NGƯỢC, TƯ DUY THEO
 5. Mở arc bằng 2-3 chương buildup/setup (CHẬM, gây tò mò)
 6. Giữa arc có ≥2 "calm before storm" hoặc "breathing" — chương yên tĩnh, MC small wins/casual competence
 7. Kết arc bằng aftermath + transition sang arc mới
-8. Tối thiểu 40% chương trong arc là breathing/calm_before_storm/comedic_break/training (chương "phát triển êm")
+8. Tối thiểu 60% chương trong arc là breathing/calm_before_storm/comedic_break/training (chương "phát triển êm" / Sảng Văn flow). MC mở rộng sự nghiệp, recognition, smooth wins LÀ TRỤC CHÍNH — climax/villain_focus là gia vị, KHÔNG phải xương sống.
 
 BẮT BUỘC TRONG MỖI ARC (${chapterCount} chương):
-- Tối đa 2 chương villain_focus (cho phép 1 sự kiện villain trải 2 chương)
-- Tối đa 3 chương climax (1-2 sự kiện climax, mỗi sự kiện 1-2 chương)
-- Ít nhất 2 chương calm_before_storm hoặc breathing
-- Ít nhất 1 chương comedic_break
-- Ít nhất 1 chương revelation (bí mật được hé lộ)
-- Tối đa 3 chương training liên tiếp
-- CẤM 3 chương climax/villain_focus liên tiếp
-- Sau aftermath của 1 sự kiện → BẮT BUỘC ≥1-3 chương breathing trước khi mở sự kiện ngược mới
+- Tối đa 1 chương villain_focus (cho phép 0 nếu arc thuộc loại "scale-up / kinh doanh / luyện công" mà arc plan không yêu cầu villain).
+- Tối đa 2 chương climax (cho phép 0 nếu arc smooth-flow). Ngoại lệ cho thể loại non-combat (do-thi/ngon-tinh/quan-truong): arc có thể 0 villain_focus + 0 climax — climax thay bằng "deal lớn ký kết" / "recognition đỉnh cao" / "milestone đạt được" (vẫn dán nhãn climax mood nhưng nội dung không vũ lực).
+- Ít nhất 3 chương calm_before_storm hoặc breathing (Sảng Văn dominant).
+- Ít nhất 1 chương comedic_break.
+- ≥1 chương revelation TÙY CHỌN (chỉ thêm nếu arc plan yêu cầu — KHÔNG ép mỗi arc).
+- Tối đa 4 chương training/scale-up liên tiếp (cho phép arc thuần cultivation/scale-up).
+- CẤM 3 chương climax/villain_focus liên tiếp.
+- Sau aftermath của 1 sự kiện → BẮT BUỘC ≥1-3 chương breathing trước khi mở sự kiện ngược mới.
 
 MOOD TYPES:
 - buildup: Nhịp chậm, worldbuilding, introduce elements. Cliffhanger: mild
@@ -268,18 +268,18 @@ export function adjustWordCountForMood(baseTarget: number, mood: ChapterMood): n
   // baseTarget = 2800 (AI write target). Output → split thành 2 reader chapters via orchestrator.
   // Per-mood multipliers scale AI write length, not reader chapter length.
   const factors: Record<ChapterMood, number> = {
-    climax: 1.30,           // Dense, action-packed → longer
-    villain_focus: 1.15,    // Villain POV needs depth
-    revelation: 1.20,       // Reveal needs build-up + reaction
-    rising: 1.10,           // Tension build → slightly longer
+    climax: 1.20,           // Dense, action-packed → slightly longer
+    villain_focus: 1.10,    // Villain POV needs depth
+    revelation: 1.15,       // Reveal needs build-up + reaction
+    rising: 1.05,           // Tension build
     aftermath: 1.00,        // Standard
-    buildup: 0.95,          // Setup, lean
-    training: 0.95,         // Skill development, lean
-    villain_focus_unused: 0.95, // (placeholder unused)
-    transition: 0.85,       // Quick scene change
-    calm_before_storm: 0.85,// Quiet, lean
-    comedic_break: 0.80,    // Light, short
-    breathing: 0.75,        // Anti-self-torture: shorter, dopamine-dense
+    buildup: 1.00,          // Setup full-length (Sảng Văn buildup là MC mở rộng)
+    training: 1.00,         // Skill development full-length (training arcs là core Sảng Văn)
+    villain_focus_unused: 1.00,
+    transition: 0.95,
+    calm_before_storm: 1.00,// Sảng Văn equal-priority — không truncate
+    comedic_break: 1.00,    // Comedy chapters đầy đủ, không bị giảm
+    breathing: 1.00,        // Sảng Văn flow — breathing chapter is the MAIN content, not filler
   } as Record<ChapterMood, number>;
 
   const factor = factors[mood] ?? 1.00;
