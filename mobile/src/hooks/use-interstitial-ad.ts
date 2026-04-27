@@ -79,17 +79,21 @@ export function useInterstitialAd(disabled = false) {
 
     navCount.current++;
 
-    if (
-      navCount.current % INTERSTITIAL_CHAPTER_INTERVAL === 0 &&
-      adLoaded &&
-      interstitialRef.current
-    ) {
-      interstitialRef.current.show();
-      return true;
+    // If we hit the interval, try to show. If the ad failed earlier and
+    // exhausted its retry budget, kick off a fresh load attempt so the
+    // next interval has a chance to fire — without this, a single bad
+    // network window early in the session disables interstitials forever.
+    if (navCount.current % INTERSTITIAL_CHAPTER_INTERVAL === 0) {
+      if (adLoaded && interstitialRef.current) {
+        interstitialRef.current.show();
+        return true;
+      }
+      retryCount.current = 0;
+      loadAd();
     }
 
     return false;
-  }, [isDisabled, adLoaded]);
+  }, [isDisabled, adLoaded, loadAd]);
 
   return { onChapterChange, adLoaded };
 }
