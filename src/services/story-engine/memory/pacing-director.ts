@@ -27,11 +27,15 @@ export type ChapterMood =
   | 'villain_focus'    // POV/focus phản diện
   | 'comedic_break'    // Chương hài, nhẹ nhàng
   | 'revelation'       // Bí mật lớn được hé lộ
-  | 'transition';      // Chuyển cảnh, di chuyển, setup arc mới
+  | 'transition'       // Chuyển cảnh, di chuyển, setup arc mới
+  | 'breathing';       // Anti-self-torture: small wins, casual competence, peaceful growth
 
 export interface ChapterPacing {
   chapterNumber: number;
   mood: ChapterMood;
+  /** Optional secondary mood for hybrid chapters (e.g., climax + comedic_break = epic comedy fight).
+   * Modern hits 2024-2026 (《谁让他修仙的！》phản set comedy) blend moods within a single chapter. */
+  secondaryMood?: ChapterMood;
   intensityLevel: number;  // 1-10
   suggestedStructure: string;
   dopamineRequired: boolean;
@@ -77,31 +81,43 @@ ${arcPlanText ? `Kế hoạch arc: ${arcPlanText.slice(0, 2000)}` : ''}
 
 NHIỆM VỤ: Thiết kế nhịp cho từng chương trong arc này.
 
-NGUYÊN TẮC NHỊP TRUYỆN ĐẲNG CẤP:
-1. KHÔNG viết 2 chương climax liên tiếp — phải có "hơi thở" giữa các cao trào
-2. Mở arc bằng 2-3 chương buildup/setup (CHẬM, gây tò mò)
-3. Giữa arc có "calm before storm" — chương yên tĩnh trước bão tố
-4. Climax nên kéo dài 2-3 chương liên tục (không chỉ 1)
-5. Kết arc bằng aftermath + transition sang arc mới
+NGUYÊN TẮC NHỊP TRUYỆN ĐẲNG CẤP (CHỐNG TỰ NGƯỢC, TƯ DUY THEO GIAI ĐOẠN):
+1. 1 SỰ KIỆN ngược có thể trải 1-3 chương — climax/villain_focus được phép 2 chương liên tiếp NẾU thuộc cùng 1 sự kiện (ví dụ: chương 1 MC bị truy đuổi → chương 2 MC chiến đấu lật ngược).
+2. CẤM 3 chương climax/villain_focus liên tiếp — đây là dấu hiệu kéo dài lê thê.
+3. Sau khi 1 SỰ KIỆN ngược kết thúc (climax → aftermath) → BẮT BUỘC ≥1-3 chương breathing/calm_before_storm/comedic_break/training trước khi mở sự kiện ngược mới.
+4. CẤM 2 GIAI ĐOẠN ngược back-to-back: ví dụ "climax(A) → aftermath(A) → climax(B)" thiếu breathing giữa.
+5. Mở arc bằng 2-3 chương buildup/setup (CHẬM, gây tò mò)
+6. Giữa arc có ≥2 "calm before storm" hoặc "breathing" — chương yên tĩnh, MC small wins/casual competence
+7. Kết arc bằng aftermath + transition sang arc mới
+8. Tối thiểu 40% chương trong arc là breathing/calm_before_storm/comedic_break/training (chương "phát triển êm")
 
 BẮT BUỘC TRONG MỖI ARC (${chapterCount} chương):
-- Ít nhất 1 chương villain_focus (hiểu kẻ thù suy nghĩ gì)
-- Ít nhất 1 chương calm_before_storm (tình cảm, hài hước nhẹ)
+- Tối đa 2 chương villain_focus (cho phép 1 sự kiện villain trải 2 chương)
+- Tối đa 3 chương climax (1-2 sự kiện climax, mỗi sự kiện 1-2 chương)
+- Ít nhất 2 chương calm_before_storm hoặc breathing
+- Ít nhất 1 chương comedic_break
 - Ít nhất 1 chương revelation (bí mật được hé lộ)
-- Ít nhất 2 chương climax (cao trào chính)
 - Tối đa 3 chương training liên tiếp
+- CẤM 3 chương climax/villain_focus liên tiếp
+- Sau aftermath của 1 sự kiện → BẮT BUỘC ≥1-3 chương breathing trước khi mở sự kiện ngược mới
 
 MOOD TYPES:
 - buildup: Nhịp chậm, worldbuilding, introduce elements. Cliffhanger: mild
 - rising: Tension tăng dần, hé lộ. Cliffhanger: strong
 - calm_before_storm: Yên tĩnh, nội tâm, tình cảm, slice of life. Cliffhanger: none/mild
-- climax: Action/deal/revelation cực đại. Cliffhanger: extreme
+- climax: Action/deal/revelation cực đại. Cliffhanger: strong (KHÔNG extreme — tránh gây kìm nén)
 - aftermath: Hậu quả, tổng kết, seed arc mới. Cliffhanger: mild
 - training: MC rèn luyện/explore, side character development. Cliffhanger: mild
 - villain_focus: POV phản diện, mưu kế, backstory villain. Cliffhanger: strong
 - comedic_break: Hài hước, nhẹ nhàng, Gap Moe. Cliffhanger: none/mild
-- revelation: Bí mật lớn, twist. Cliffhanger: extreme
+- revelation: Bí mật lớn, twist. Cliffhanger: strong
 - transition: Chuyển địa điểm, gặp nhân vật mới. Cliffhanger: mild
+- breathing: Anti-self-torture chapter — MC small wins, casual competence, peaceful growth, recognition. Cliffhanger: none/mild
+
+MOOD BLENDING (TÙY CHỌN — modern 2024-2026):
+- Một số chương có thể blend 2 mood (primary + secondary) để tạo hybrid scene. Hits 2024 như 《谁让他修仙的！》phản set comedy có "climax + comedic_break" cùng chương.
+- Cách dùng: set "secondaryMood" ở chương cần blend. VD: climax(primary) + comedic_break(secondary) = trận chiến epic nhưng có khoảnh khắc hài.
+- KHÔNG blend mọi chương — chỉ ~10-20% chương có blend, còn lại single-mood chuẩn.
 
 Trả về JSON:
 {
@@ -109,13 +125,14 @@ Trả về JSON:
     {
       "chapterNumber": ${arcStartChapter},
       "mood": "buildup",
+      "secondaryMood": null,
       "intensityLevel": 3,
       "suggestedStructure": "Mô tả ngắn cấu trúc chương (VD: 'Giới thiệu địa điểm mới + gặp NPC bí ẩn + hint trouble')",
       "dopamineRequired": false,
       "cliffhangerIntensity": "mild"
     }
   ],
-  "requiredVariety": ["Must have 1 villain_focus", "Must have 1 calm_before_storm"]
+  "requiredVariety": ["Max 1 villain_focus", "≥2 calm_before_storm or breathing", "≥1 comedic_break", "No 2 climax/villain_focus in a row"]
 }`;
 
   const res = await callGemini(prompt, {
@@ -161,6 +178,18 @@ export async function getChapterPacingContext(
 
   const parts: string[] = ['═══ NHỊP TRUYỆN CHƯƠNG NÀY ═══'];
 
+  // Anti-self-torture adjacency check: forbid 3+ consecutive high-tension moods
+  // (1 event có thể span 2 chương climax/villain_focus liên tiếp, nhưng 3 chương là dấu hiệu lê thê)
+  const HIGH_TENSION_MOODS: ChapterMood[] = ['climax', 'villain_focus'];
+  const last2Moods = getRecentMoods(blueprint, chapterNumber, 2);
+  if (
+    last2Moods.length === 2 &&
+    last2Moods.every(m => HIGH_TENSION_MOODS.includes(m)) &&
+    HIGH_TENSION_MOODS.includes(chapterPacing.mood)
+  ) {
+    parts.push(`🚫 EVENT QUÁ DÀI: 2 chương trước đã là high-tension (${last2Moods.join(' → ')}) — chương này KHÔNG được tiếp tục. PHẢI chuyển sang aftermath/calm_before_storm/breathing/comedic_break để giai đoạn ngược kết thúc.`);
+  }
+
   // Cross-chapter emotional arc enforcement: detect consecutive same-mood chapters
   const recentMoods = getRecentMoods(blueprint, chapterNumber, 3);
   if (recentMoods.length >= 2) {
@@ -200,9 +229,14 @@ export async function getChapterPacingContext(
     comedic_break: '😂 COMEDIC BREAK — Hài hước là chính. Gap Moe, Não Bổ, tình huống ngớ ngẩn. Nhẹ nhàng, thư giãn.',
     revelation: '💡 REVELATION — Bí mật lớn được hé lộ. Plot twist, thay đổi nhận thức. Khoảnh khắc "WOW".',
     transition: '🚶 TRANSITION — Chuyển cảnh, di chuyển, gặp nhân vật mới. Setup cho phần tiếp theo.',
+    breathing: '🌿 BREATHING — Anti-self-torture chapter. MC small wins / casual competence / peaceful growth / recognition. KHÔNG có setback nghiêm trọng. Cliffhanger: none/mild.',
   };
 
   parts.push(moodGuides[chapterPacing.mood] || `Mood: ${chapterPacing.mood}`);
+  if (chapterPacing.secondaryMood) {
+    parts.push(`🎭 MOOD BLEND (secondary): ${moodGuides[chapterPacing.secondaryMood] || chapterPacing.secondaryMood}`);
+    parts.push('→ Đây là chương HYBRID — kết hợp primary + secondary mood. VD: climax + comedic_break = trận chiến epic có khoảnh khắc hài. Đan xen, KHÔNG chia khúc tách rời.');
+  }
   parts.push(`Cường độ: ${chapterPacing.intensityLevel}/10`);
   parts.push(`Gợi ý cấu trúc: ${chapterPacing.suggestedStructure}`);
 
@@ -224,6 +258,50 @@ export async function getChapterPacingContext(
 }
 
 // ── Cross-chapter Mood Helpers ───────────────────────────────────────────────
+
+/**
+ * Compute mood-adjusted target word count. Modern hyperpop pacing (2024-2026)
+ * favors variable chapter length: dense climax/villain_focus, lean breathing/comedic.
+ * baseTarget = project.target_chapter_length (default 2500-3000).
+ */
+export function adjustWordCountForMood(baseTarget: number, mood: ChapterMood): number {
+  const factors: Record<ChapterMood, number> = {
+    climax: 1.30,           // Dense, action-packed → longer
+    villain_focus: 1.15,    // Villain POV needs depth
+    revelation: 1.20,       // Reveal needs build-up + reaction
+    rising: 1.10,           // Tension build → slightly longer
+    aftermath: 1.00,        // Standard
+    buildup: 0.95,          // Setup, lean
+    training: 0.95,         // Skill development, lean
+    villain_focus_unused: 0.95, // (placeholder unused)
+    transition: 0.85,       // Quick scene change
+    calm_before_storm: 0.85,// Quiet, lean
+    comedic_break: 0.80,    // Light, short
+    breathing: 0.75,        // Anti-self-torture: shorter, dopamine-dense
+  } as Record<ChapterMood, number>;
+
+  const factor = factors[mood] ?? 1.00;
+  const adjusted = Math.round(baseTarget * factor);
+  // Clamp to reasonable range
+  return Math.max(1500, Math.min(adjusted, 4500));
+}
+
+/**
+ * Look up the mood for a given chapter from the blueprint. Returns null if no blueprint.
+ */
+export async function getChapterMood(projectId: string, chapterNumber: number): Promise<ChapterMood | null> {
+  const arcNumber = Math.ceil(chapterNumber / 20);
+  const db = getSupabase();
+  const { data } = await db
+    .from('arc_pacing_blueprints')
+    .select('blueprint')
+    .eq('project_id', projectId)
+    .eq('arc_number', arcNumber)
+    .maybeSingle();
+  if (!data?.blueprint) return null;
+  const bp = data.blueprint as PacingBlueprint;
+  return bp.chapters?.find(c => c.chapterNumber === chapterNumber)?.mood ?? null;
+}
 
 /**
  * Get moods of the N chapters immediately before chapterNumber from the blueprint.

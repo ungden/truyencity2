@@ -16,6 +16,44 @@ export type GenreType =
 
 export type AgentRole = 'architect' | 'writer' | 'critic';
 
+// ── MC Archetype (modern narrative variants) ─────────────────────────────────
+
+export type MCArchetype =
+  | 'power_fantasy'   // Default — leveling-grinding hero, classic Qidian-style
+  | 'intelligent'     // Qixia-style — wins by knowledge/psychology, not power
+  | 'pragmatic'       // Calculated, risk-averse, business-minded
+  | 'coward_smart'    // Weak but cunning, survives via mưu trí
+  | 'family_pillar'   // Multi-gen family/gia-toc focus, responsibility-driven
+  | 'career_driven';  // Sự nghiệp focus, common for 大女主 ngon-tinh
+
+// ── Anti-Trope Flags (modern marketing) ──────────────────────────────────────
+
+export type AntiTropeFlag =
+  | 'no_system'              // Bỏ hệ thống cheat (winning marketing 2024+)
+  | 'no_harem'               // Single love interest hoặc no romance
+  | 'no_invincible'          // MC có thể thua, gặp thất bại thực
+  | 'no_face_slap'           // Bỏ pattern "kẻ thù coi thường → nghiền nát"
+  | 'no_rebirth_advantage'   // Trọng sinh nhưng không cheat từ knowledge tương lai
+  | 'no_misery_porn'         // Cấm "tự ngược" — MC vượt qua không quá đau khổ
+  | 'no_secret_identity'     // Bỏ "thân phận bí ẩn cực khủng"
+  | 'no_tournament'          // Bỏ tournament arc cliché
+  | 'no_cliffhanger_mandate';// Bỏ ép cliffhanger mỗi chương
+
+// ── Style Directives (JSONB metadata) ────────────────────────────────────────
+
+export interface StyleDirectives {
+  /** Override DEFAULT_CONFIG.targetWordCount for this project */
+  target_chapter_length_override?: number;
+  /** Cliffhanger density: how often to use plot cliffhangers vs emotional/reveal endings */
+  cliffhanger_density?: 'low' | 'medium' | 'high';
+  /** Sub-arc length in chapters (5-10 typical for hyperpop sub-arc structure) */
+  sub_arc_length?: number;
+  /** Critic strictness — lite for slice-of-life, strict for plot-heavy */
+  critic_strictness?: 'lite' | 'normal' | 'strict';
+  /** Variant ID for genres with multiple variants (e.g., "ngon-tinh:dai-nu-chu", "do-thi:thuong-chien") */
+  variant_id?: string;
+}
+
 // ── Dopamine ─────────────────────────────────────────────────────────────────
 
 export type DopamineType =
@@ -23,7 +61,8 @@ export type DopamineType =
   | 'revenge' | 'recognition' | 'beauty_encounter' | 'secret_identity'
   | 'business_success' | 'harvest' | 'flex_wealth' | 'comfort' | 'comedy_misunderstanding'
   | 'steal_luck' | 'simulate_success' | 'tears_of_regret' | 'flex_power_casual'
-  | 'civilization_harvest' | 'player_exploitation' | 'two_world_shock' | 'master_flex' | 'book_manifestation' | 'monster_evolution';
+  | 'civilization_harvest' | 'player_exploitation' | 'two_world_shock' | 'master_flex' | 'book_manifestation' | 'monster_evolution'
+  | 'smooth_opportunity' | 'casual_competence' | 'peaceful_growth';
 
 // ── Engine Config ────────────────────────────────────────────────────────────
 
@@ -168,6 +207,18 @@ export interface ContextPayload {
   previousMcState?: string;
   previousCliffhanger?: string;
   previousEnding?: string;
+  /** Anti-self-torture: recent 3 chapters' conflict status to prevent back-to-back beat-downs */
+  recentBeatHistory?: string;
+
+  // ── Modern narrative metadata (from ai_story_projects, migration 0149) ──
+  /** Secondary genres for genre blending (e.g., do-thi + trong-sinh). Engine merges conventions. */
+  subGenres?: GenreType[];
+  /** MC archetype — overrides default power-fantasy framing */
+  mcArchetype?: MCArchetype;
+  /** Anti-trope flags — engine injects explicit prohibitions */
+  antiTropes?: AntiTropeFlag[];
+  /** Style directives — chapter length, cliffhanger density, etc. */
+  styleDirectives?: StyleDirectives;
 
   // Layer 1: Story Bible
   storyBible?: string;
@@ -193,6 +244,8 @@ export interface ContextPayload {
     threads_to_resolve?: string[];
     new_threads?: string[];
   };
+  /** Hyperpop sub-arc context: which sub-arc this chapter belongs to + mini-payoff */
+  currentSubArc?: string;
 
   // Anti-repetition
   previousTitles: string[];

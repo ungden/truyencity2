@@ -327,7 +327,84 @@ interface ProjectInsertRow {
   current_chapter: number;
   total_planned_chapters: number;
   status: string;
-  [key: string]: string | number | null;
+  // Modern narrative metadata (migration 0149) — optional, set per-project to vary output
+  sub_genres?: string[];
+  mc_archetype?: string | null;
+  anti_tropes?: string[];
+  style_directives?: Record<string, unknown>;
+  [key: string]: string | number | null | string[] | Record<string, unknown> | undefined;
+}
+
+// ── Modern narrative seeding: 30% projects get anti-trope variants ──
+// Modern hits 2024-2026 explicit anti-trope marketing wins. Engine seeds
+// variations to test market and avoid producing 1000 same-formula novels.
+
+interface NarrativeVariant {
+  mc_archetype?: string;
+  anti_tropes?: string[];
+  sub_genres?: string[];
+  style_directives?: Record<string, unknown>;
+}
+
+const VARIANTS_BY_GENRE: Record<string, NarrativeVariant[]> = {
+  'tien-hiep': [
+    { mc_archetype: 'intelligent', anti_tropes: ['no_system', 'no_invincible'], style_directives: { variant_id: 'tien-hiep:intelligent-mc' } },
+    { mc_archetype: 'family_pillar', sub_genres: [], style_directives: { variant_id: 'tien-hiep:gia-toc' } },
+    { mc_archetype: 'coward_smart', anti_tropes: ['no_face_slap'], style_directives: { variant_id: 'tien-hiep:coward-smart' } },
+    { mc_archetype: 'power_fantasy', style_directives: { variant_id: 'tien-hiep:classic' } }, // classic — 30%
+  ],
+  'huyen-huyen': [
+    { mc_archetype: 'intelligent', anti_tropes: ['no_system'], sub_genres: ['khoa-huyen'], style_directives: { variant_id: 'huyen-huyen:cross-genre-intelligent' } },
+    { mc_archetype: 'family_pillar', style_directives: { variant_id: 'huyen-huyen:gia-toc' } },
+    { mc_archetype: 'pragmatic', anti_tropes: ['no_tournament'], style_directives: { variant_id: 'huyen-huyen:no-tournament' } },
+    { mc_archetype: 'power_fantasy', style_directives: { variant_id: 'huyen-huyen:classic' } },
+  ],
+  'do-thi': [
+    { mc_archetype: 'pragmatic', anti_tropes: ['no_secret_identity', 'no_harem'], style_directives: { variant_id: 'do-thi:realistic-business', cliffhanger_density: 'low' } },
+    { mc_archetype: 'intelligent', sub_genres: ['trong-sinh' as string], anti_tropes: ['no_system'], style_directives: { variant_id: 'do-thi:trong-sinh-intelligent' } },
+    { mc_archetype: 'career_driven', anti_tropes: ['no_harem'], style_directives: { variant_id: 'do-thi:career-driven' } },
+    { mc_archetype: 'power_fantasy', style_directives: { variant_id: 'do-thi:classic' } }, // tổng tài bá đạo classic
+  ],
+  'ngon-tinh': [
+    { mc_archetype: 'career_driven', anti_tropes: ['no_harem'], style_directives: { variant_id: 'ngon-tinh:dai-nu-chu', cliffhanger_density: 'low' } },
+    { mc_archetype: 'career_driven', anti_tropes: ['no_harem', 'no_cliffhanger_mandate'], style_directives: { variant_id: 'ngon-tinh:daily-sweet', cliffhanger_density: 'low' } },
+    { mc_archetype: 'pragmatic', style_directives: { variant_id: 'ngon-tinh:cuoi-truoc-yeu-sau' } },
+    { mc_archetype: 'power_fantasy', style_directives: { variant_id: 'ngon-tinh:tong-tai-classic' } }, // classic
+  ],
+  'quan-truong': [
+    { mc_archetype: 'intelligent', anti_tropes: ['no_system', 'no_face_slap'], style_directives: { variant_id: 'quan-truong:intelligent-political' } },
+    { mc_archetype: 'pragmatic', anti_tropes: ['no_invincible'], style_directives: { variant_id: 'quan-truong:realistic' } },
+    { mc_archetype: 'family_pillar', style_directives: { variant_id: 'quan-truong:gia-toc-political' } },
+    { mc_archetype: 'power_fantasy', style_directives: { variant_id: 'quan-truong:classic' } },
+  ],
+  'kiem-hiep': [
+    { mc_archetype: 'intelligent', anti_tropes: ['no_tournament'], style_directives: { variant_id: 'kiem-hiep:no-tournament' } },
+    { mc_archetype: 'coward_smart', anti_tropes: ['no_invincible'], style_directives: { variant_id: 'kiem-hiep:coward-smart' } },
+    { mc_archetype: 'family_pillar', style_directives: { variant_id: 'kiem-hiep:revenge-family' } },
+    { mc_archetype: 'power_fantasy', style_directives: { variant_id: 'kiem-hiep:classic' } },
+  ],
+};
+
+// Default fallback for genres not yet customized
+const DEFAULT_VARIANTS: NarrativeVariant[] = [
+  { mc_archetype: 'power_fantasy', style_directives: { variant_id: 'default:classic' } },
+  { mc_archetype: 'intelligent', anti_tropes: ['no_invincible'], style_directives: { variant_id: 'default:intelligent' } },
+];
+
+/**
+ * Pick a narrative variant for a new project. Distribution biased toward variants
+ * (70% non-classic) to seed market diversity — modern reader trend 2024-2026.
+ */
+function pickNarrativeVariant(genre: string): NarrativeVariant {
+  const variants = VARIANTS_BY_GENRE[genre] || DEFAULT_VARIANTS;
+  // Last variant in each list is "classic" — give it 30% weight
+  const classicIdx = variants.length - 1;
+  const isClassic = Math.random() < 0.30;
+  if (isClassic) return variants[classicIdx];
+  // Pick uniformly from non-classic variants
+  const nonClassic = variants.slice(0, classicIdx);
+  if (nonClassic.length === 0) return variants[0];
+  return nonClassic[Math.floor(Math.random() * nonClassic.length)];
 }
 
 // Default model assigned to newly seeded projects. Router auto-dispatches to
@@ -637,6 +714,9 @@ export class ContentSeeder {
         cover_prompt: idea.coverPrompt || this.buildCoverPrompt(safeTitle, genre, formattedDescription),
       });
 
+      // Modern narrative variant — 70% non-classic (anti-cliché 2024-2026 trend)
+      const variant = pickNarrativeVariant(genre);
+
       const projectRow: ProjectInsertRow = {
         id: projectId,
         user_id: this.userId,
@@ -656,6 +736,11 @@ export class ContentSeeder {
         current_chapter: 0,
         total_planned_chapters: this.randomInt(1000, 2000),
         status: 'active',
+        // Narrative metadata (migration 0149)
+        sub_genres: variant.sub_genres || [],
+        mc_archetype: variant.mc_archetype || null,
+        anti_tropes: variant.anti_tropes || [],
+        style_directives: variant.style_directives || {},
       };
 
       if (requiredKey && requiredValue) {
@@ -1428,6 +1513,9 @@ CHÚ Ý:
           cover_prompt: idea.coverPrompt || this.buildCoverPrompt(idea.title, genre, formattedDescription),
         });
 
+        // Modern narrative variant — 70% non-classic (anti-cliché 2024-2026 trend)
+        const variant = pickNarrativeVariant(genre);
+
         const projectRow: ProjectInsertRow = {
           id: projectId,
           user_id: this.userId,
@@ -1442,6 +1530,11 @@ CHÚ Ý:
           current_chapter: 0,
           total_planned_chapters: totalChapters,
           status: 'paused', // Start paused, activate later
+          // Narrative metadata (migration 0149)
+          sub_genres: variant.sub_genres || [],
+          mc_archetype: variant.mc_archetype || null,
+          anti_tropes: variant.anti_tropes || [],
+          style_directives: variant.style_directives || {},
         };
 
         // Fill genre-required system field (AI Writer relies on this)

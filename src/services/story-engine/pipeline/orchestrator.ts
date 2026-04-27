@@ -110,7 +110,23 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   const protagonistName = project.main_character || 'Nhân vật chính';
   const storyTitle = novel.title || project.world_description || `Project ${project.id}`;
   const totalPlanned = project.total_planned_chapters || 1000;
-  const targetWordCount = options.targetWordCount ?? project.target_chapter_length ?? DEFAULT_CONFIG.targetWordCount;
+  // Base target: explicit option > project setting > default. style_directives override takes precedence over project setting.
+  const projectStyleDirectives = (project as { style_directives?: { target_chapter_length_override?: number } }).style_directives;
+  const directiveOverride = projectStyleDirectives?.target_chapter_length_override;
+  const baseTargetWordCount = options.targetWordCount ?? directiveOverride ?? project.target_chapter_length ?? DEFAULT_CONFIG.targetWordCount;
+
+  // Mood-adjusted: lookup mood from pacing blueprint (if exists) and scale (climax→long, breathing→short).
+  // This is non-fatal — falls back to baseTargetWordCount if no blueprint.
+  let targetWordCount = baseTargetWordCount;
+  try {
+    const { getChapterMood, adjustWordCountForMood } = await import('../memory/pacing-director');
+    const mood = await getChapterMood(project.id, nextChapter);
+    if (mood) {
+      targetWordCount = adjustWordCountForMood(baseTargetWordCount, mood);
+    }
+  } catch (err) {
+    console.warn('[orchestrator] Mood-adjusted word count failed, using base:', err);
+  }
 
   const geminiConfig: GeminiConfig = {
     model: options.model || project.ai_model || DEFAULT_CONFIG.model,

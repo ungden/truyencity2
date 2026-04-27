@@ -25,11 +25,11 @@ export const DOPAMINE_PATTERNS: Record<DopamineType, DopaminePattern> = {
   face_slap: {
     type: 'face_slap',
     name: 'Tát mặt',
-    description: 'MC đánh bại kẻ coi thường mình',
+    description: 'Đối thủ kinh ngạc/thán phục/câm lặng trước thành tựu hoặc thực lực của MC',
     frequency: 'every_chapter',
     intensity: 'high',
-    setup: 'Villain coi thường/xúc phạm MC',
-    payoff: 'MC đánh bại villain ngoạn mục',
+    setup: 'OPTION A (PROACTIVE — ưu tiên): MC chủ động hành động (kinh doanh, thi triển tài năng, đạt thành tựu) → đối thủ quan sát từ ngoài. OPTION B: Villain coi thường/xúc phạm MC trước.',
+    payoff: 'OPTION A (PROACTIVE — ưu tiên): Kết quả MC vượt xa kỳ vọng → đối thủ kinh ngạc thán phục, không thể phản kháng. OPTION B: MC đánh bại villain ngoạn mục.',
   },
   power_reveal: {
     type: 'power_reveal',
@@ -100,8 +100,8 @@ export const DOPAMINE_PATTERNS: Record<DopamineType, DopaminePattern> = {
     description: 'Chốt deal lớn, kiếm lợi nhuận bùng nổ',
     frequency: 'every_3_chapters',
     intensity: 'high',
-    setup: 'Bị ép giá, gặp rào cản kinh doanh hoặc đối thủ chèn ép',
-    payoff: 'Lật ngược thế cờ, kiếm tiền sốc, thị trường kinh ngạc',
+    setup: 'Bị ép giá / gặp rào cản kinh doanh / đối thủ chèn ép, HOẶC nhìn ra cơ hội thị trường mới (không cần adversity)',
+    payoff: 'Lật ngược thế cờ HOẶC chốt deal mượt mà, kiếm tiền sốc, thị trường kinh ngạc',
   },
   harvest: {
     type: 'harvest',
@@ -109,7 +109,7 @@ export const DOPAMINE_PATTERNS: Record<DopamineType, DopaminePattern> = {
     description: 'Đạt được thành quả sau thời gian dài chăm sóc',
     frequency: 'every_3_chapters',
     intensity: 'medium',
-    setup: 'Chăm sóc vất vả, chờ đợi hoặc có nguy cơ thất thu',
+    setup: 'Chăm sóc vất vả / nguy cơ thất thu, HOẶC chăm sóc đến mùa thu hoạch một cách yên bình',
     payoff: 'Thu hoạch đột biến, sản phẩm chất lượng cao hiếm có',
   },
   flex_wealth: {
@@ -118,8 +118,8 @@ export const DOPAMINE_PATTERNS: Record<DopamineType, DopaminePattern> = {
     description: 'Giải quyết vấn đề bằng tiền hoặc trí tuệ áp đảo',
     frequency: 'every_chapter',
     intensity: 'high',
-    setup: 'Bị coi thường vì vẻ ngoài hoặc bị dồn vào góc',
-    payoff: 'Dùng tiền hoặc IQ đập nát âm mưu, đối phương câm nín',
+    setup: 'Bị coi thường / bị dồn vào góc, HOẶC chủ động dùng tài lực giải quyết (không cần ai khinh trước)',
+    payoff: 'Dùng tiền hoặc IQ đập nát âm mưu HOẶC giải quyết mượt mà, đối phương câm nín hoặc kinh ngạc',
   },
   comfort: {
     type: 'comfort',
@@ -127,7 +127,7 @@ export const DOPAMINE_PATTERNS: Record<DopamineType, DopaminePattern> = {
     description: 'Khoảnh khắc bình yên, thấu hiểu, đồ ăn ngon',
     frequency: 'every_chapter',
     intensity: 'medium',
-    setup: 'Mệt mỏi, áp lực từ bên ngoài hoặc vết thương cũ',
+    setup: 'Mệt mỏi/áp lực/vết thương cũ, HOẶC đơn thuần là khoảnh khắc ấm áp đời thường (không cần đau khổ trước)',
     payoff: 'Được quan tâm, ăn ngon, cảm thấy bình yên và thấu hiểu',
   },
   comedy_misunderstanding: {
@@ -229,6 +229,34 @@ export const DOPAMINE_PATTERNS: Record<DopamineType, DopaminePattern> = {
     setup: 'MC (dạng quái vật) gặp kẻ thù mạnh hơn, đánh bại và nuốt chửng',
     payoff: 'Hệ thống báo tiến hóa, mọc thêm cánh/chuyển dạng, chỉ số tăng vọt, đè bẹp kẻ thù tiếp theo',
   },
+  // ── Anti-self-torture patterns: dopamine without requiring adversity setup ──
+  smooth_opportunity: {
+    type: 'smooth_opportunity',
+    name: 'Chộp cơ hội',
+    description: 'MC quan sát thấy cơ hội rồi hành động nhanh gọn, không cần ai chèn ép trước',
+    frequency: 'every_chapter',
+    intensity: 'medium',
+    setup: 'MC quan sát thấy cơ hội (thị trường ngách, tài nguyên ẩn, quan hệ tốt, manh mối nhỏ)',
+    payoff: 'MC chộp lấy nhanh gọn, kết quả vượt mong đợi — KHÔNG cần kẻ thù hay rào cản trước',
+  },
+  casual_competence: {
+    type: 'casual_competence',
+    name: 'Tự tin giải quyết',
+    description: 'MC giải quyết vấn đề tự nhiên với kinh nghiệm/tài nguyên có sẵn',
+    frequency: 'every_chapter',
+    intensity: 'medium',
+    setup: 'Vấn đề/yêu cầu xuất hiện, người thường thấy khó',
+    payoff: 'MC giải quyết tự nhiên với kinh nghiệm/tài nguyên có sẵn, bystander kinh ngạc nhẹ — KHÔNG cần đau khổ trước',
+  },
+  peaceful_growth: {
+    type: 'peaceful_growth',
+    name: 'Phát triển yên bình',
+    description: 'MC tiến bộ trong khoảng thời gian yên bình giữa các sự kiện lớn',
+    frequency: 'every_3_chapters',
+    intensity: 'medium',
+    setup: 'Khoảng thời gian yên bình giữa các sự kiện lớn',
+    payoff: 'MC tiến bộ qua training/quan hệ/khám phá nhỏ — không cần kẻ thù tạo áp lực',
+  },
 };
 
 // ============================================================================
@@ -247,36 +275,30 @@ export const GENRE_STYLES: Record<GenreType, StyleBible> = {
     actionRatio: [10, 20],
     pacingStyle: 'fast',
     genreConventions: [
-      // Nhân vật mẫu
-      'MC bắt đầu từ vị trí thấp nhất (phế vật, cô nhi, bị khinh thường) nhưng ẩn chứa tiềm năng vô hạn',
-      'Villain thiếu gia kiêu ngạo xuất hiện mỗi arc để bị đánh mặt, mỗi lần cấp bậc cao hơn',
-      'Lão quái/tiền bối ẩn thân chỉ điểm MC tại thời khắc quan trọng, rồi biến mất bí ẩn',
-      'Nữ chính kiêu ngạo ban đầu khinh thường MC, dần bị thu phục bởi tài năng và nhân cách',
-      // Tiến trình cốt truyện
-      'Mỗi 5-10 chương MC phải đột phá 1 tiểu cảnh giới, mỗi 20-30 chương đột phá đại cảnh giới',
-      'Cứ 3 chương phải có 1 trận chiến hoặc xung đột, mỗi arc kết thúc bằng đại chiến',
-      'Bí cảnh/phế tích chứa cơ duyên xuất hiện mỗi arc, bên trong có thử thách + bảo vật',
-      // Hệ thống sức mạnh
-      'Tu luyện tuân theo quy luật: tích lũy → gặp nguy → lĩnh ngộ → đột phá, mỗi lần đột phá có thiên tượng dị thường',
-      'Golden finger (hệ thống, lão gia trong nhẫn, huyết mạch thần thú) là động lực chính cho sự phát triển',
-      // Leo thang xung đột
-      'Kẻ thù leo thang: thiếu gia → gia tộc → tông phái → đế quốc → thần giới, mỗi cấp mạnh hơn vạn lần',
-      'Đấu giá/thi đấu tournament là cơ hội để MC tỏa sáng trước đám đông và tạo thù oán mới',
-      // Phụ tuyến & hook
-      'Harem ngầm: mỗi arc giới thiệu 1 nữ nhân vật mới có background đặc biệt, tạo tình cảm mơ hồ',
-      'Thân phận bí ẩn của MC được hint dần dần: manh mối nhỏ → tiết lộ sốc → thân phận chấn động thiên hạ',
-      'Kết chương bằng cliffhanger: kẻ thù mới xuất hiện, bí mật lộ ra, nguy hiểm ập đến bất ngờ',
-      'Thế giới mở rộng theo cảnh giới MC: thôn → thành → quốc → đại lục → tinh giới → thần giới',
-      // Bổ sung: yếu tố còn thiếu
-      'Phế vật → thiên tài setup phải dài tối thiểu 3 chương: bị khinh → tích lũy → bùng nổ, KHÔNG đột ngột',
-      'Foreshadowing: mỗi arc plant ít nhất 2 seed cho arc tiếp theo (manh mối nhỏ về kẻ thù/bí mật lớn hơn)',
-      'Side character phải có diễn biến riêng: huynh đệ có thể phản bội, sư muội có thể hy sinh, không chỉ phục vụ MC',
-      'Đấu giá scene: miêu tả chi tiết giá cả, phản ứng đám đông, MC flex tiền/quyền lực khiến mọi người sốc',
-      'Ngược → Sảng ratio: mỗi 5 chương có 1-2 chương MC gặp khó khăn thực sự trước khi chiến thắng ngoạn mục',
-      // Exposition thông minh
-      'Worldbuilding qua trải nghiệm: hệ thống sức mạnh, quy tắc thế giới phải được giải thích qua hành động, đối thoại, khám phá — KHÔNG dùng đoạn văn giải thích dài (info-dump)',
-      // Multi-POV
-      'Đa góc nhìn khi cần: scene phản diện bày mưu (POV villain), đám đông chứng kiến MC tỏa sáng (POV bystander), đồng minh phản ứng — tạo chiều sâu thế giới',
+      // ── 2026 META: Anti-cliché tien-hiep ──
+      'GHI CHÚ THỜI ĐẠI 2024-2026: Đọc giả TQ đã chán "phế vật → thiên tài" + "hệ thống cheat" + "vô địch từ chương 1" + "harem". Hits 2024 (《十日终焉》, 《玄鉴仙族》, 《谁让他修仙的！》) là anti-trope: intelligent MC, gia tộc multi-gen, hài phản set. VN reader lag 2-3 năm nhưng cũng đang chuyển — engine ưu tiên VARIATIONS, KHÔNG ép mọi truyện theo formula.',
+      // ── Nhân vật mẫu (đa dạng, không cứng "phế vật") ──
+      'MC archetype có thể là: (a) phế vật → thiên tài (cliché classic, dùng cho 30% project); (b) intelligent MC (như Qixia 《十日终焉》: thắng bằng tâm lý, mưu kế, không qua power-up); (c) gia tộc successor (huyền giám tiên tộc style: trách nhiệm gia tộc thay vì lone wolf); (d) coward smart MC (yếu nhưng cẩn thận, mưu trí); (e) tu tiên đời thường (thường dân giả tu, không bá đạo). Genre engine NÊN chọn ngẫu nhiên/theo seed, KHÔNG mặc định "phế vật".',
+      'Villain KHÔNG cứ "thiếu gia kiêu ngạo" — có thể là rival cùng thế hệ phát triển song song, đại năng có lý tưởng đối lập (không evil), hệ phái kẻ thù tổ chức tốt, hoặc thiên đạo/quy luật vũ trụ (impersonal villain). CẤM mặc định "thiếu gia khinh thường MC".',
+      'Nữ chính KHÔNG cứ "kiêu ngạo ban đầu khinh MC" — có thể là đồng môn cùng tu, sư phụ hoặc đệ tử của MC, đối tác đan dược, hoặc 无CP (không love interest, MC tu đạo độc lập).',
+      // ── Tiến trình cốt truyện ──
+      'Đột phá KHÔNG cứng nhắc "5-10 chương 1 tiểu cảnh giới" — tu luyện có thể kéo dài tự nhiên theo arc plan; có arc tập trung cơ duyên/khám phá thay vì power-up. CẤM tu tiên grind chapter machine.',
+      'Sự kiện ngược KHÔNG ép "3 chương 1 trận chiến" — cho phép arc gia tộc/đời thường/khám phá không có chiến đấu. Sub-arc 5-10 chương resolve theo theme đa dạng (cơ duyên, mưu kế, quan hệ, gia tộc, đan đạo).',
+      'Bí cảnh/phế tích KHÔNG cứ mỗi arc — có thể skip, hoặc thay bằng explore vùng đất mới, gặp gỡ tông phái mới, hoặc gia tộc affair.',
+      // ── Hệ thống sức mạnh ──
+      'Tu luyện không nhất thiết theo formula "tích lũy → gặp nguy → lĩnh ngộ → đột phá" — có thể là quan sát cảm ngộ qua đời sống, đan dược, trận pháp, hoặc gia tộc bí truyền. Đa dạng path.',
+      'Golden finger TÙY CHỌN — KHÔNG ép mỗi project có hệ thống/lão gia trong nhẫn. Anti-trope project có thể explicit "không hệ thống" như 《十日终焉》 (winning marketing 2024).',
+      // ── Leo thang xung đột (proactive options) ──
+      'Conflict scale linear KHÔNG bắt buộc "thiếu gia → gia tộc → tông phái → thần giới". Có thể horizontal (đấu trí, ngoại giao, thương đạo trong giới tu) hoặc internal (đột phá tâm cảnh, ma chướng nội tâm) thay vì vertical power escalation.',
+      'Tournament arc KHÔNG ép mỗi arc — chỉ dùng khi arc plan rõ ràng yêu cầu. Modern hits ưu tiên gia tộc affair, đan đạo, mưu kế hơn tournament cliché.',
+      // ── Phụ tuyến ──
+      'Harem KHÔNG mặc định — có thể single love interest, slow burn, hoặc 无CP. Nếu có harem cũng nên có chemistry rõ ràng từng người, KHÔNG "mỗi arc 1 girl".',
+      'Thân phận bí ẩn cực khủng KHÔNG bắt buộc — không phải mọi MC phải là "con rơi gia tộc đỉnh". Có thể là ordinary cultivator với câu chuyện ordinary nhưng kể hay.',
+      // ── Pattern còn giữ (hợp 2026) ──
+      'Foreshadowing network: plant seeds sớm (chương 5), harvest muộn (chương 30+), tạo "aha moment". Đặc biệt cho project gia tộc multi-gen.',
+      'Side character có diễn biến riêng — không chỉ phục vụ MC. 2024+ readers đặc biệt thích huynh đệ/bằng hữu phát triển song song với MC.',
+      'Worldbuilding emerge từ ACTION + cảm xúc nhân vật — KHÔNG info-dump. Quy tắc thế giới khám phá qua thử thách thực, KHÔNG đoạn giảng giải dài.',
+      'Multi-POV: rival cùng thế hệ cũng nỗ lực (POV rival), gia tộc affair (POV trưởng bối), bystander kinh ngạc — tạo chiều sâu thế giới.',
     ],
   },
   'huyen-huyen': {
@@ -290,34 +312,32 @@ export const GENRE_STYLES: Record<GenreType, StyleBible> = {
     actionRatio: [15, 25],
     pacingStyle: 'fast',
     genreConventions: [
-      // Nhân vật mẫu
-      'MC có thể chất đặc biệt hoặc linh hồn chuyển sinh, mang tri thức/kinh nghiệm vượt trội',
-      'Villain là thiên tài cùng thế hệ hoặc tà ma đạo cường giả, tạo áp lực liên tục cho MC',
-      'Sư phụ/tiền bối ban đầu mạnh mẽ nhưng dần yếu đi hoặc hy sinh, MC phải tự lập',
-      'Nữ chính là thiên kiêu nữ, có background tông phái/gia tộc khủng, bảo hộ MC giai đoạn đầu',
-      // Tiến trình cốt truyện
-      'Hệ sức mạnh rõ ràng với nhiều nhánh: thể tu, pháp tu, kiếm tu, đan sư, trận sư, luyện khí sư',
-      'Tournament arc mỗi 15-25 chương: thi đấu tông phái, đại hội đan dược, tranh đoạt bí cảnh',
-      'Mỗi arc có boss battle cuối cùng, quy mô tăng dần: 1v1 → nhóm chiến → đại chiến vạn người',
-      // Hệ thống sức mạnh
-      'Chiến đấu epic scale: miêu tả chiêu thức bằng hình ảnh vũ trụ, thiên địa đổi sắc, sơn hà chấn động',
-      'MC có khả năng việt cấp chiến đấu: đánh thắng kẻ cao hơn 1-2 cảnh giới nhờ ngộ tính và cơ duyên',
-      // Leo thang xung đột
-      'Thế lực thù địch mở rộng: cá nhân → tông phái → vương triều → cổ tộc → thần tộc → thiên đạo',
-      'Bí mật thế giới hé lộ dần: thế giới hiện tại chỉ là góc nhỏ, có thượng giới/thần giới đang quan sát',
-      // Phụ tuyến & hook
-      'Huynh đệ kết nghĩa giai đoạn đầu, sau này trở thành cường giả các phương, hội ngộ hoặc đối đầu',
-      'Mỗi 10 chương giới thiệu 1 loại tài nguyên/bảo vật mới kích thích ham muốn sưu tập của người đọc',
-      'Prophecy/lời tiên tri bí ẩn liên quan MC được hint từ đầu, giải mã dần qua các arc',
-      'Kết chương bằng phát hiện sốc: kẻ thù thật sự, bí mật thân phận, nguy cơ mới lớn hơn',
-      // Bổ sung
-      'Rival phát triển song song MC: có đối thủ cùng thế hệ cũng mạnh lên, không chỉ villain tĩnh',
-      'Foreshadowing network: plant seeds sớm (chương 5), harvest muộn (chương 30+), tạo "aha moment"',
-      'Side character arc: ít nhất 1 nhân vật phụ có diễn biến riêng (phản bội, hy sinh, trưởng thành)',
-      // Exposition thông minh
-      'Worldbuilding qua khám phá: hệ thống ma pháp, quy tắc thế giới được MC và người đọc khám phá cùng lúc qua thử thách, đối thoại, không dùng đoạn văn giải thích',
-      // Multi-POV
-      'Đa góc nhìn khi cần: scene rival cùng thế hệ cũng đang nỗ lực (POV rival), hội trưởng bàn mưu đối phó (POV villain), quần chúng kinh ngạc (POV bystander)',
+      // ── 2026 META: Anti-cliché huyen-huyen ──
+      'GHI CHÚ THỜI ĐẠI 2024-2026: Hits 2024 (《宿命之环》Cthulhu+Đạo gia, genre blending) là cross-cultural hybrid. Tournament arc / sect war / faction rivalry đã old-white. Engine ƯU TIÊN: hệ phái sức mạnh đa dạng (không cứ tu tiên TQ), worldbuilding cross-cultural, mưu kế thay tournament.',
+      // ── Nhân vật mẫu (đa dạng archetype) ──
+      'MC archetype có thể là: (a) thể chất đặc biệt/chuyển sinh (cliché classic, dùng cho 30% project); (b) intelligent MC thắng bằng kiến thức/mưu kế (modern hit pattern); (c) gia tộc successor; (d) anti-hero với động cơ phức tạp; (e) ordinary protagonist climbing slow. Engine NÊN chọn theo seed/anti-trope flag.',
+      'Villain KHÔNG cứ "thiên tài cùng thế hệ + tà ma đạo cường giả" — có thể là rival có lý tưởng đối lập (không evil), thế lực impersonal (thiên đạo, quy luật), gia tộc đối thủ tổ chức tốt, hoặc internal demon (ma chướng tâm cảnh).',
+      'Nữ chính KHÔNG cứ "thiên kiêu nữ background tông phái khủng" — đa dạng: đồng môn, đối tác, sư phụ-đệ tử, hoặc 无CP nếu MC focus tu đạo độc lập.',
+      // ── Tiến trình cốt truyện ──
+      'Hệ sức mạnh rõ ràng KHÔNG cứ TQ template (thể/pháp/kiếm/đan/trận/luyện khí) — có thể tự tạo system (ma pháp Tây, rune, blood magic, cosmology) hoặc cross-cultural blend.',
+      'Tournament arc TÙY CHỌN — modern hits ưu tiên mưu kế / khám phá / family affair hơn. Chỉ dùng khi arc plan rõ ràng yêu cầu, KHÔNG mặc định "mỗi 15-25 chương 1 tournament".',
+      'Boss battle cuối arc TÙY CHỌN — có thể thay bằng emotional/intellectual climax (revelation lớn, mưu kế thành công, quan hệ đột phá) thay vì combat.',
+      // ── Hệ thống sức mạnh ──
+      'Chiến đấu epic scale ĐƯỢC khuyến khích NHƯNG KHÔNG ép mỗi chương — có thể có chương không combat. Modern reader thích combat đậm + chương đời thường xen kẽ.',
+      'Việt cấp chiến đấu CẦN lý do hợp lý (chiến thuật, địa hình, đạo cụ, đồng đội), KHÔNG phải "ngộ tính + cơ duyên" lười biếng.',
+      // ── Leo thang xung đột ──
+      'Conflict scale KHÔNG cứ "cá nhân → tông phái → vương triều → thần tộc" linear. Có thể horizontal (mưu kế đa thế lực), internal (tâm cảnh, ma chướng), hoặc family (multi-generation gia tộc).',
+      'Bí mật thế giới hé lộ dần — pattern này GIỮ vì là core appeal của huyen-huyen, NHƯNG seed phải gieo từ chương sớm, KHÔNG bịa vào giữa truyện.',
+      // ── Phụ tuyến (modern emphasis) ──
+      'Huynh đệ kết nghĩa nên có background + động cơ riêng từ đầu — KHÔNG chỉ là "side kick phục vụ MC". Có thể trưởng thành thành rival hoặc đồng cường giả.',
+      'Tài nguyên/bảo vật KHÔNG cần "mỗi 10 chương 1 loại mới" — quá tải cho reader. Chỉ giới thiệu khi plot cần, integrate vào worldbuilding tự nhiên.',
+      'Prophecy/lời tiên tri TÙY CHỌN — modern reader thích MC chủ động hơn là "destined hero". Có thể bỏ hoặc subvert (prophecy được MC phá vỡ).',
+      // ── Pattern còn giữ ──
+      'Rival phát triển song song MC (POV rival nỗ lực) — modern reader đặc biệt thích.',
+      'Foreshadowing network: plant seeds sớm, harvest muộn, "aha moment" — core craft, giữ.',
+      'Side character có diễn biến riêng (phản bội, hy sinh, trưởng thành) — modern reader đòi hỏi.',
+      'Worldbuilding emerge từ action + cảm xúc, KHÔNG info-dump.',
+      'Multi-POV ưu tiên: rival, gia tộc/sư môn affair, bystander reaction.',
     ],
   },
   'do-thi': {
@@ -331,35 +351,31 @@ export const GENRE_STYLES: Record<GenreType, StyleBible> = {
     actionRatio: [10, 15],
     pacingStyle: 'fast',
     genreConventions: [
-      // Nhân vật mẫu
-      'MC có thân phận bí ẩn cực khủng: con rơi gia tộc đỉnh, binh vương trở về, thần y ẩn thế',
-      'Villain là phú nhị đại/thiếu gia kiêu ngạo, dựa thế gia đình ức hiếp người, bị MC dạy dỗ',
-      'Nữ chính là nữ tổng tài lạnh lùng hoặc mỹ nữ kiêu ngạo, dần phát hiện MC không đơn giản',
-      'Nhạc phụ/nhạc mẫu ban đầu khinh thường MC, sau phải nể phục khi biết thân phận thật',
-      // Tiến trình cốt truyện
-      'Mỗi 3-5 chương có 1 tình huống đánh mặt: tiệc tùng, họp lớp, tiệc gia tộc, đấu thầu kinh doanh',
-      'MC thể hiện tài năng đa dạng: y thuật thần kỳ, quyền cước siêu phàm, kinh doanh thiên tài, đầu tư bách phát bách trúng',
-      'Plot mở rộng từ thành phố nhỏ → thủ đô → quốc tế, kẻ thù và stakes ngày càng lớn',
-      // Hệ thống sức mạnh (đô thị style)
-      'Sức mạnh MC đến từ chuyển sinh/hệ thống/tu luyện bí mật, giấu kín trong xã hội hiện đại',
-      'MC có mạng lưới quan hệ khủng khiếp: quân đội, hắc đạo, tài phiệt đều nể mặt',
-      // Leo thang xung đột
-      'Kẻ thù leo thang: cá nhân vô lại → gia tộc địa phương → tập đoàn lớn → thế lực quốc gia → tổ chức quốc tế',
-      'Mỗi lần MC giải quyết 1 kẻ thù, lộ ra kẻ đứng sau mạnh hơn, tạo chuỗi xung đột không ngừng',
-      // Phụ tuyến & hook
-      'Harem: mỗi nữ nhân vật có nghề nghiệp khác nhau (bác sĩ, cảnh sát, minh tinh, nữ sinh), tạo đa dạng',
-      'Tiệc tùng/sự kiện xã hội là sân khấu để MC tỏa sáng, khiến kẻ khinh thường câm lặng',
-      'Bí mật thân phận MC hé lộ từng phần: manh mối → nghi ngờ → xác nhận → chấn động',
-      'Đời sống xa hoa miêu tả chi tiết: siêu xe, biệt thự, nhà hàng 5 sao, du thuyền, tạo cảm giác sảng',
-      // Bổ sung
-      'Status flex mỗi 10 chương: scene MC thể hiện tài sản/quyền lực trước mặt kẻ khinh thường, miêu tả chi tiết',
-      'Nhạc phụ/nhạc mẫu arc: từ khinh thường → nghi ngờ → kinh ngạc → nể phục → tự hào, kéo dài 10-15 chương',
-      'Foreshadowing cho thân phận: mỗi 5 chương drop 1 hint nhỏ (vết sẹo, kỹ năng lạ, quen biết bí ẩn)',
-      'Ngược → Sảng: mỗi tiệc/sự kiện MC bị khinh trước → flex sau, KHÔNG cho MC flex ngay từ đầu',
-      // Exposition thông minh
-      'Kiến thức kinh doanh, y thuật, võ công được phổ cập tự nhiên qua đối thoại, hành động, tranh luận — KHÔNG có đoạn giải thích dài kiểu sách giáo khoa',
-      // Multi-POV
-      'Đa góc nhìn khi cần: scene thiếu gia bàn mưu hại MC (POV villain), nữ tổng tài quan sát MC (POV love interest), bạn bè/nhạc phụ kinh ngạc (POV bystander)',
+      // ── PROACTIVE NARRATIVE (business-cycle-driven, KHÔNG villain-first) ──
+      'CHU TRÌNH KINH DOANH (xương sống do-thi/thương chiến): MC nhận diện cơ hội → đầu tư hành động → đạt KẾT QUẢ THỰC (doanh thu/sản phẩm/khách hàng) → đối thủ/đồng nghiệp QUAN SÁT từ ngoài → kinh ngạc/thán phục/cố phản ứng → MC tiếp tục mở rộng. Đây là PATTERN GỐC — KHÔNG được thay bằng "villain xuất hiện dập MC trước rồi MC chống đỡ".',
+      'CẤM TUYỆT ĐỐI villain-first: KHÔNG cho đối thủ/villain xuất hiện đe dọa/uy hiếp/dập MC khi MC chưa hành động kinh doanh gì. Đối thủ chỉ được REACT sau khi MC đã có kết quả/thành tựu cụ thể.',
+      'Đối thủ trong do-thi là COMPETITOR (đối thủ kinh doanh có lý do hợp lý: thị phần, khách hàng, deal), KHÔNG phải ANTAGONIST (kẻ thù chủ động hãm hại). Competitor có thể trở thành đồng minh sau khi nể phục MC.',
+      // ── Nhân vật mẫu ──
+      'MC có background đặc biệt: trọng sinh, kinh nghiệm thị trường tương lai, hệ thống kinh doanh, hoặc thiên tài quan sát thị trường — KHÔNG nhất thiết "thân phận bí ẩn cực khủng"',
+      'Nữ chính là đối tác/đồng nghiệp/khách hàng quan sát MC kinh doanh, dần thán phục — KHÔNG bắt buộc "tổng tài lạnh lùng" cliché',
+      'Người thân/bạn bè ban đầu hoài nghi quyết định kinh doanh của MC, sau phải nể phục khi thấy kết quả — không phải khi "biết thân phận thật"',
+      // ── Tiến trình cốt truyện (proactive milestones) ──
+      'MC liên tục có MILESTONE kinh doanh cụ thể: cửa hàng đầu tiên → thương hiệu → chuỗi → tập đoàn → đa quốc gia. Mỗi arc 1-2 milestone rõ ràng (con số doanh thu, lượng khách, market share).',
+      'Tài năng MC thể hiện qua HÀNH ĐỘNG kinh doanh: chọn ngách thị trường, định giá, đàm phán, tuyển nhân tài, marketing — KHÔNG chỉ qua "đánh mặt villain".',
+      'Plot mở rộng theo SCALE DOANH NGHIỆP (thành phố → khu vực → quốc gia → quốc tế), KHÔNG phải theo "kẻ thù mạnh dần".',
+      // ── Đối thủ leo thang (REACTIVE only) ──
+      'Đối thủ kinh doanh xuất hiện ONLY KHI MC đã chiếm thị phần đủ lớn để gây áp lực lên họ. Họ phản ứng (ép giá, cướp khách, lobby chính trị) → MC dùng chiến lược tốt hơn → họ thua.',
+      'CẤM "kẻ thù chủ động hãm hại MC vô cớ" — mọi đối thủ phải có lý do kinh doanh rõ ràng (mất deal, mất khách, bị chiếm thị phần).',
+      // ── Sảng văn proactive ──
+      'Sảng văn đến từ KẾT QUẢ KINH DOANH (chốt deal lớn, sản phẩm bán chạy, doanh thu vượt kỳ vọng, được công nhận trong ngành), không phải từ "đánh bại villain".',
+      'Status flex mỗi 10 chương qua THÀNH TỰU thực (con số doanh thu, ký kết hợp đồng, được lên báo, đối tác quốc tế tìm đến) — KHÔNG qua "khoe siêu xe trước mặt kẻ khinh thường".',
+      'Người thân/đối tác arc: từ hoài nghi → quan sát → kinh ngạc → nể phục → tự hào, theo từng milestone kinh doanh của MC.',
+      // ── Đời sống xa hoa (giữ nhưng không villain-bait) ──
+      'Đời sống nâng cấp dần theo doanh thu: căn hộ thuê → căn hộ riêng → biệt thự, miêu tả chi tiết để tạo dopamine "thu hoạch", KHÔNG để khoe trước villain.',
+      // ── Exposition kinh doanh ──
+      'Kiến thức kinh doanh, marketing, đầu tư phổ cập tự nhiên qua quyết định + hành động + đối thoại — KHÔNG giải thích dài kiểu sách giáo khoa.',
+      // ── Multi-POV ưu tiên đồng minh/competitor quan sát ──
+      'Đa góc nhìn ưu tiên: POV competitor quan sát MC từ xa và kinh ngạc, POV nhân viên thán phục lãnh đạo MC, POV khách hàng hài lòng. POV "villain bàn mưu hại MC" chỉ dùng KHI arc plan cần — KHÔNG mặc định.',
     ],
   },
   'kiem-hiep': {
@@ -702,32 +718,38 @@ export const GENRE_STYLES: Record<GenreType, StyleBible> = {
     actionRatio: [5, 10],
     pacingStyle: 'medium',
     genreConventions: [
-      // Nhân vật mẫu
-      'Nữ chính kiên cường nhưng dịu dàng, có nội tâm phong phú, không phải hoa bình yếu đuối',
-      'Nam chính lạnh lùng bá đạo bề ngoài nhưng chỉ dịu dàng với nữ chính, sủng chiều vô điều kiện',
-      'Nữ phụ xấu xa ghen tỵ tạo drama, hoặc bạn thân nữ chính tạo comic relief',
-      'Tình địch nam là thiếu gia/hoàng tử si tình, theo đuổi nữ chính tạo tam giác tình cảm',
-      // Tiến trình cốt truyện
-      'Gặp gỡ → hiểu lầm → xung đột → hòa giải → yêu → thử thách → HE, mỗi giai đoạn 5-10 chương',
-      'Mỗi 3-5 chương có 1 khoảnh khắc ngọt ngào (sweet moment) khiến người đọc rung động',
-      'Hiểu lầm/chia ly tạm thời mỗi 15-20 chương để kéo tension, nhưng PHẢI giải quyết thỏa đáng',
-      // Relationship dynamics
-      'Tình cảm phát triển qua chi tiết nhỏ: ánh mắt, cử chỉ vô tình, lời nói hai nghĩa, bảo hộ thầm lặng',
-      'Cảnh lãng mạn miêu tả tinh tế: không explicit nhưng gợi cảm, tập trung vào cảm xúc nội tâm',
-      // Leo thang xung đột
-      'Xung đột từ hiểu lầm cá nhân → gia đình phản đối → thế lực chia rẽ → sinh ly tử biệt → đoàn viên',
-      'Mỗi lần giải quyết xung đột, tình cảm sâu đậm hơn, nhưng thử thách mới cũng nặng hơn',
-      // Phụ tuyến & hook
-      'Gia đình/sự nghiệp là phụ tuyến quan trọng: nữ chính phải chứng minh bản thân, không chỉ yêu đương',
-      'Bí mật thân phận: nữ chính/nam chính có quá khứ bí ẩn ảnh hưởng đến mối quan hệ hiện tại',
-      'Cảnh sủng (pampering): nam chính bảo hộ/chiều chuộng nữ chính trước mặt mọi người, tạo cảm giác sảng',
-      'Kết chương bằng hiểu lầm mới, xuất hiện tình địch, hoặc tin sốc về quá khứ ảnh hưởng tình yêu',
-      // Bổ sung
-      'Nữ chính phải có depth: có sự nghiệp riêng, quyết định riêng, không chỉ xoay quanh nam chính',
-      'Side character có arc riêng: bạn thân có tình yêu riêng, nữ phụ có kết cục rõ ràng (không bỏ lửng)',
-      'Emotional variety: không chỉ ngọt ngào, cần xen kẽ căng thẳng, đau lòng, hài hước, rung động',
-      // Multi-POV
-      'Đa góc nhìn khi cần: scene nam chính suy nghĩ về nữ chính (POV male lead), nữ phụ ghen tuông bày mưu (POV rival), bạn thân quan sát tình cảm (POV friend)',
+      // ── 2026 META: 大女主 + sự nghiệp + 无CP options ──
+      'GHI CHÚ THỜI ĐẠI 2024-2026: TQ 女频 đã chuyển dịch — "tổng tài lạnh lùng + nữ chính ngây thơ" cliché bị chế giễu. Top labels: 大女主 (career female lead), 反恋爱脑 (anti-love-brain), 无CP (no romance — top 3 label trên 晋江/番茄), nữ tổng tài, sự nghiệp đặt trước romance. VN reader lag 2-3 năm nhưng "Sam Sam Đến Đây Ăn Nào" pattern (đời thường ngọt sủng, không drama) đang lên — engine ưu tiên VARIATIONS, KHÔNG ép tổng tài bá đạo formula.',
+      // ── Variant types — chọn theo seed ──
+      'NGON-TINH có 4 variant chính (chọn theo project seed/anti-trope flag):',
+      '  (a) 大女主 sự nghiệp (CAREER FEMALE LEAD): nữ chính tự xây sự nghiệp/danh tiếng, romance là phụ. Nam chính (nếu có) = đối tác/đồng nghiệp ngang tầm, KHÔNG phải tổng tài bảo hộ. Tone: empowering, pragmatic.',
+      '  (b) Đời thường ngọt sủng (DAILY SWEET): cặp đôi đã hiểu nhau, không drama, tập trung khoảnh khắc ngọt ngào hàng ngày (nấu ăn, đi làm, trêu chọc). Tone: cozy, low-stakes, comfort.',
+      '  (c) Cưới trước yêu sau / hợp đồng hôn nhân: cặp đôi bắt đầu từ vị trí kỳ lạ, dần dần phát triển tình cảm thật. Tone: slow burn realistic.',
+      '  (d) Tổng tài bá đạo (CLASSIC, dùng cho 30% project): nam chính lạnh lùng + nữ chính dịu dàng. CHỈ DÙNG khi project explicit chọn variant này. KHÔNG mặc định.',
+      '  (e) 无CP / friendship-focused: nữ chính không có love interest chính, focus career/friendship/family. Tone: independent, mature.',
+      // ── Nhân vật mẫu ──
+      'Nữ chính KHÔNG cứ "kiên cường nhưng dịu dàng" — đa dạng: tham vọng quyết liệt, tinh ranh thực dụng, lạnh lùng tự lập, hài hước thông minh, hoặc nhẹ nhàng ấm áp. KHÔNG mặc định "không hoa bình yếu đuối" như default — có nữ chính thực sự dịu dàng vẫn ok.',
+      'Nam chính (NẾU CÓ) KHÔNG cứ "tổng tài lạnh lùng bá đạo" — có thể là đồng nghiệp tự nhiên, bạn cùng lớp, đối tác kinh doanh ngang tầm, hoặc người chăm sóc nhẹ nhàng. CẤM ép nam chính sủng chiều vô điều kiện cho mọi project.',
+      'Nữ phụ KHÔNG cứ "xấu xa ghen tỵ tạo drama" — modern reader chán "nữ phụ ác cần". Có thể là đồng minh, rival lành mạnh trong sự nghiệp, hoặc bạn thân tốt.',
+      'Tình địch nam KHÔNG mặc định — chỉ dùng khi project chọn tam giác tình cảm.',
+      // ── Tiến trình cốt truyện ──
+      'Pattern "Gặp gỡ → hiểu lầm → xung đột → hòa giải → yêu → thử thách → HE" KHÔNG cứng nhắc — có thể skip hiểu lầm, hoặc mở đầu khi đã yêu nhau (variant b daily sweet).',
+      'Sweet moment KHÔNG ép "mỗi 3-5 chương" — daily sweet variant có thể có sweet moment mỗi chương; 大女主 variant có thể chỉ vài chương 1 sweet moment.',
+      'Hiểu lầm/chia ly TÙY CHỌN — modern reader đặc biệt 24+ chán "drama for drama sake". Slow burn realistic + đời thường ngọt sủng đang lên.',
+      // ── Relationship dynamics ──
+      'Tình cảm phát triển qua chi tiết nhỏ (ánh mắt, cử chỉ, lời nói hai nghĩa) — GIỮ vì là core craft.',
+      'Cảnh lãng mạn tinh tế, gợi cảm xúc nội tâm — GIỮ.',
+      // ── Leo thang xung đột (đa dạng) ──
+      'Xung đột KHÔNG cứ "hiểu lầm → gia đình phản đối → thế lực chia rẽ → sinh ly tử biệt" linear. Có thể horizontal (career challenges, social pressure, internal growth) thay vì vertical drama.',
+      // ── Phụ tuyến (modern emphasis) ──
+      'Sự nghiệp KHÔNG là phụ tuyến nữa — với 大女主 variant, sự nghiệp là MAIN tuyến, romance là phụ. Engine cần phân biệt rõ.',
+      'Bí mật thân phận TÙY CHỌN — không phải mọi ngon-tinh cần "quá khứ bí ẩn".',
+      'Cảnh sủng (pampering) chỉ dùng cho variant tổng tài bá đạo — KHÔNG ép cho variant 大女主 hoặc daily sweet.',
+      // ── Pattern còn giữ ──
+      'Nữ chính có depth: sự nghiệp riêng, quyết định riêng, không chỉ xoay quanh nam chính. Đặc biệt cần với 大女主 + 无CP variants.',
+      'Side character có arc riêng (không bỏ lửng) — modern reader đòi hỏi.',
+      'Emotional variety: ngọt + căng + đau lòng + hài + rung động — GIỮ vì là core craft.',
+      'Multi-POV ưu tiên: nam chính suy nghĩ (nếu có), bạn thân quan sát, đồng nghiệp/đối tác trong sự nghiệp. POV "nữ phụ ghen tuông bày mưu" CHỈ dùng cho variant tổng tài cliché — KHÔNG mặc định.',
     ],
   },
 };
@@ -1025,18 +1047,23 @@ export const ENGAGEMENT_CHECKLIST = {
   // Yếu tố BẮT BUỘC mỗi chương
   perChapter: [
     'Có ít nhất 1 micro-hook (gợi tò mò nhỏ) trong 500 từ đầu',
-    'Cliffhanger hoặc strong ending cuối chương',
+    'Ending hợp lý — KHÔNG bắt buộc cliffhanger nguy hiểm mỗi chương. Có 4 loại ending:',
+    '  • Plot cliffhanger (chỉ ~1/3 chương): tình huống nguy hiểm/bất ngờ — dùng cho chương climax/villain_focus/revelation',
+    '  • Emotional ending: nội tâm sâu / quyết định nhân vật / cảm xúc rõ — dùng cho aftermath/breathing/calm_before_storm',
+    '  • Reveal/seed ending: hé lộ thông tin nhỏ hoặc gieo manh mối cho chương sau — dùng cho buildup/training/transition',
+    '  • Comfort/resolution ending: đóng nhẹ scene với note ấm áp/hài hước — dùng cho comedic_break/breathing',
+    'CẤM dùng cliffhanger nguy hiểm 3 chương liên tiếp — gây cliffhanger fatigue (đọc giả 2024+ phản đối)',
     'Duy trì độ hấp dẫn qua tension, mystery, phát triển nhân vật hoặc worldbuilding (KHÔNG bắt buộc dopamine mỗi chương)',
     'MC phải có ít nhất 1 khoảnh khắc đáng nhớ (quyết định chiến lược, khám phá, đối thoại sâu hoặc tiến triển nhỏ)',
-    'Ít nhất 1 chi tiết worldbuilding nhỏ (mở rộng thế giới)',
+    'Ít nhất 1 chi tiết worldbuilding nhỏ (mở rộng thế giới) — ưu tiên emerge từ action/cảm xúc, KHÔNG info-dump',
     'Emotional contrast: cảm xúc phải thay đổi ít nhất 1 lần trong chương',
   ],
 
   // Yếu tố BẮT BUỘC mỗi 5 chương
   per5Chapters: [
     'MC phải có tiến bộ rõ ràng (sức mạnh, địa vị, hoặc relationship)',
-    'Ít nhất 1 face-slap hoặc power reveal moment',
-    'Không được có chuỗi 3 chương liên tiếp chỉ thua thiệt hoặc bị đè nén',
+    'Ít nhất 1 face-slap, power reveal, smooth opportunity, hoặc casual competence moment (KHÔNG bắt buộc qua confront kẻ thù)',
+    'CẤM TUYỆT ĐỐI 2 GIAI ĐOẠN ngược liên tiếp không có breathing ở giữa — sau khi 1 sự kiện ngược kết thúc PHẢI có ≥1-3 chương breathing trước sự kiện ngược tiếp theo',
     'Giới thiệu ít nhất 1 yếu tố mới (nhân vật, địa danh, kỹ thuật)',
     'Ít nhất 1 hint/foreshadowing cho plot lớn hơn',
   ],
@@ -1055,9 +1082,9 @@ export const ENGAGEMENT_CHECKLIST = {
   addictiveElements: {
     faceSlapFormula: {
       name: 'Công Thức Tát Mặt',
-      description: 'Setup: kẻ thù coi thường → MC ẩn nhẫn → Kẻ thù ra tay → MC nghiền nát → Bàng quan kinh ngạc',
-      frequency: 'Mỗi 2-3 chương có 1 lần minor, mỗi arc có 1 lần major',
-      escalation: 'Quy mô tăng dần: cá nhân → nhóm → gia tộc → tông phái → quốc gia',
+      description: 'PROACTIVE (ưu tiên cho do-thi/quan-truong/kinh-doanh): MC hành động → đạt kết quả → đối thủ kinh ngạc → cố phản kháng nhưng quá muộn → câm lặng nể phục. REACTIVE (cho fantasy/wuxia): kẻ thù coi thường → MC ẩn nhẫn → kẻ thù ra tay → MC nghiền nát → bàng quan kinh ngạc.',
+      frequency: 'KHÔNG bắt buộc mỗi 2-3 chương — chỉ khi arc plan có "đối thủ" tự nhiên xuất hiện. Ép tần suất sẽ tạo villain-first narrative giả tạo.',
+      escalation: 'Quy mô tăng dần (cá nhân → nhóm → quốc gia) ONLY KHI arc plan yêu cầu. Truyện kinh doanh có thể leo thang qua scale doanh nghiệp (cửa hàng → chuỗi → tập đoàn → đa quốc gia) thay vì kẻ thù.',
     },
     businessEmpire: {
       name: 'Đế Chế Kinh Doanh',
@@ -1096,12 +1123,44 @@ export const ENGAGEMENT_CHECKLIST = {
     },
   },
 
-  // Nguyên tắc "ngược trước sảng sau"
+  // Nguyên tắc "ngược trước sảng sau" — anti-self-torture (CHỐNG TỰ NGƯỢC)
+  // QUAN TRỌNG: Tư duy theo GIAI ĐOẠN/SỰ KIỆN, không đếm theo chương.
+  // 1 giai đoạn ngược (event) có thể trải dài 1-3 chương — diễn biến tự nhiên, KHÔNG cắt vụn.
+  // Sau mỗi giai đoạn ngược kết thúc → BẮT BUỘC giai đoạn breathing trước khi sự kiện ngược tiếp theo.
   adversityToTriumphRatio: {
-    description: 'Mỗi victory phải được build bằng adversity trước đó',
-    idealRatio: '20% ngược (MC gặp khó) → 80% sảng (MC tiến bộ/chiến thắng/được tôn trọng)',
-    rule: 'Ưu tiên tránh chuỗi thua kéo dài; nếu có adversity thì nên có minor win hoặc cửa thoát sớm',
-    antiPattern: 'MC thắng liên tục không gặp khó khăn = nhàm chán, mất tension',
+    description: 'Conflict phải GIÃN RA giữa các GIAI ĐOẠN/SỰ KIỆN. Trong cùng 1 sự kiện thì cứ để diễn biến tự nhiên. MC vượt qua không quá đau khổ. Dopamine không cần adversity setup.',
+    idealRatio: '15% chương thuộc giai đoạn ngược → 85% chương thuộc giai đoạn breathing/sảng. Không phải mỗi victory đều cần adversity build-up.',
+    hardRules: [
+      'TƯ DUY THEO GIAI ĐOẠN: 1 sự kiện ngược (MC bị truy sát, bị bắt, đối đầu villain, gặp tai nạn) có thể trải 1-3 chương — diễn biến tự nhiên, KHÔNG ép cắt giữa sự kiện để chèn breathing.',
+      'CẤM 2 GIAI ĐOẠN ngược liên tiếp KHÔNG có giai đoạn breathing ở giữa. Sau khi 1 sự kiện ngược kết thúc (resolution) → ≥1-3 chương breathing trước khi mở sự kiện ngược mới.',
+      'Mỗi GIAI ĐOẠN ngược phải resolve trong tối đa 3-5 chương — KHÔNG kéo dài 6+ chương lê thê. Resolution có thể là MC thắng, MC thua nhưng sống, hoặc MC tìm được lối thoát.',
+      'Mỗi arc có ≥40% chương thuộc giai đoạn breathing — MC small wins, casual competence, peaceful growth, recognition, slice of life, world-building.',
+      'Mỗi chương dù thuộc giai đoạn ngược cũng PHẢI có ≥2 breathing moments (đối thoại ấm, observation đời thường, recognition nhỏ, hài hước nhẹ) để cân bằng.',
+    ],
+    antiPattern: 'TỰ NGƯỢC — chuỗi nhiều giai đoạn ngược liên tiếp không có breathing ở giữa, hoặc 1 giai đoạn ngược kéo dài 5+ chương lê thê. Đây là pattern reader Việt Nam ghét.',
+  },
+
+  // Density cap theo GIAI ĐOẠN — KHÔNG đếm theo chương (vì 1 sự kiện có thể span nhiều chương)
+  conflictDensityCap: {
+    description: 'Giới hạn tần suất GIAI ĐOẠN ngược — không đếm chương. Giữa 2 giai đoạn ngược cần giai đoạn breathing.',
+    perGenre: {
+      // breathingChaptersBetweenEvents: số chương breathing TỐI THIỂU giữa 2 giai đoạn ngược
+      // maxEventLengthChapters: chiều dài tối đa của 1 giai đoạn ngược (chương)
+      'do-thi':       { breathingChaptersBetweenEvents: 2, maxEventLengthChapters: 3 },
+      'ngon-tinh':    { breathingChaptersBetweenEvents: 2, maxEventLengthChapters: 3 },
+      'quan-truong':  { breathingChaptersBetweenEvents: 2, maxEventLengthChapters: 3 },
+      'tien-hiep':    { breathingChaptersBetweenEvents: 1, maxEventLengthChapters: 4 },
+      'huyen-huyen':  { breathingChaptersBetweenEvents: 1, maxEventLengthChapters: 4 },
+      'kiem-hiep':    { breathingChaptersBetweenEvents: 1, maxEventLengthChapters: 4 },
+      'khoa-huyen':   { breathingChaptersBetweenEvents: 1, maxEventLengthChapters: 4 },
+      'vong-du':      { breathingChaptersBetweenEvents: 1, maxEventLengthChapters: 4 },
+      'dong-nhan':    { breathingChaptersBetweenEvents: 1, maxEventLengthChapters: 4 },
+      'di-gioi':      { breathingChaptersBetweenEvents: 1, maxEventLengthChapters: 4 },
+      'lich-su':      { breathingChaptersBetweenEvents: 1, maxEventLengthChapters: 4 },
+      'mat-the':      { breathingChaptersBetweenEvents: 1, maxEventLengthChapters: 5 },
+      'linh-di':      { breathingChaptersBetweenEvents: 1, maxEventLengthChapters: 5 },
+    },
+    hardCap: 'KHÔNG genre nào được phép 1 giai đoạn ngược kéo dài 6+ chương, hoặc 2 giai đoạn ngược back-to-back không có breathing ở giữa.',
   },
 
   // Ngân sách sức mạnh — chống power creep trong truyện dài
@@ -1164,8 +1223,9 @@ export const GENRE_ENGAGEMENT: Record<GenreType, string[]> = {
   ],
   'do-thi': [
     'Flex tài sản/quyền lực phải cụ thể (con số, thương hiệu, vị trí) — KHÔNG chỉ nói "giàu"',
-    'Mỗi 5 chương phải có 1 scene đối đầu xã hội (đàm phán, lật kèo, chốt deal)',
-    'Tình cảm phải có tension (tam giác, hiểu lầm, khoảng cách giai cấp)',
+    'Mỗi 5 chương CÓ THỂ có 1 scene đối đầu xã hội (đàm phán, lật kèo, chốt deal) — phần lớn chương ưu tiên smooth wins (chốt deal mượt, tìm được nhân tài, khoảnh khắc gia đình ấm áp, flex không gặp resistance)',
+    'Tình cảm có thể smooth progression (gặp gỡ → ấn tượng tốt → gần gũi tự nhiên), KHÔNG bắt buộc tam giác/hiểu lầm/khoảng cách giai cấp',
+    'MC tránh confront đối thủ chính diện trừ khi arc plan yêu cầu — ưu tiên thắng bằng tài năng/quan hệ/thông tin',
   ],
   'khoa-huyen': [
     'Công nghệ/hệ thống phải có chi tiết kỹ thuật hấp dẫn — không quá khô nhưng phải "có vẻ thật"',
@@ -1213,17 +1273,122 @@ export const GENRE_ENGAGEMENT: Record<GenreType, string[]> = {
     'Dân bản địa phải có văn hóa riêng — KHÔNG chỉ là NPC vô hồn',
   ],
   'ngon-tinh': [
-    'Tình cảm phải có push-pull (tiến 1 bước, lùi 2 bước) — KHÔNG yêu ngay',
-    'Mỗi 3-5 chương phải có 1 sweet moment hoặc heart-fluttering scene',
+    'Tình cảm có thể có push-pull nhẹ — KHÔNG bắt buộc tiến 1 lùi 2; smooth progression cũng được nếu hợp ngữ cảnh',
+    'Mỗi 2-3 chương phải có 1 sweet moment hoặc heart-fluttering scene (tăng tần suất so với trước)',
     'Side couples phải có câu chuyện riêng — không chỉ là background',
   ],
 };
 
 /**
+ * Universal anti-self-torture rules — appended to EVERY genre via getGenreEngagement().
+ * Triết lý: Tư duy theo GIAI ĐOẠN/SỰ KIỆN, không đếm chương. Giữa các giai đoạn ngược cần breathing.
+ */
+export const ANTI_SELF_TORTURE_RULES: string[] = [
+  'TƯ DUY THEO GIAI ĐOẠN: 1 sự kiện ngược (truy sát, đối đầu villain, tai nạn) có thể trải 1-3 chương theo diễn biến tự nhiên — KHÔNG cắt vụn giữa sự kiện để chèn breathing',
+  'CẤM 2 GIAI ĐOẠN ngược liên tiếp không có breathing ở giữa. Sau khi sự kiện ngược kết thúc → ≥1-3 chương breathing trước sự kiện ngược mới',
+  'Giai đoạn ngược resolve trong tối đa 3-5 chương. KHÔNG kéo dài 6+ chương lê thê',
+  'Mỗi chương dù thuộc giai đoạn ngược cũng PHẢI có ≥2 breathing moments để cân bằng',
+  'Dopamine không cần adversity setup — smooth opportunity, casual competence, peaceful growth đều hợp lệ',
+];
+
+/**
  * Get genre-specific engagement items to inject into Architect prompt.
+ * Always appends ANTI_SELF_TORTURE_RULES — these apply cross-genre.
  */
 export function getGenreEngagement(genre: GenreType): string[] {
-  return GENRE_ENGAGEMENT[genre] || [];
+  const genreItems = GENRE_ENGAGEMENT[genre] || [];
+  return [...genreItems, ...ANTI_SELF_TORTURE_RULES];
+}
+
+/**
+ * Genre blending — merge engagement items from primary + sub-genres.
+ * Modern hits 2024-2026 are cross-genre (urban+xianxia, Cthulhu+Đạo gia, etc.).
+ * De-duplicates exact-match items.
+ */
+export function getBlendedGenreEngagement(primary: GenreType, subGenres: GenreType[] = []): string[] {
+  const allGenres = [primary, ...subGenres.filter(g => g !== primary)];
+  const items: string[] = [];
+  const seen = new Set<string>();
+
+  for (const g of allGenres) {
+    const genreItems = GENRE_ENGAGEMENT[g] || [];
+    for (const item of genreItems) {
+      if (!seen.has(item)) {
+        seen.add(item);
+        items.push(item);
+      }
+    }
+  }
+
+  // Anti-self-torture rules apply cross-genre
+  for (const rule of ANTI_SELF_TORTURE_RULES) {
+    if (!seen.has(rule)) {
+      seen.add(rule);
+      items.push(rule);
+    }
+  }
+
+  return items;
+}
+
+/**
+ * Genre blending — merge dopamine patterns from primary + sub-genres.
+ * Primary genre's patterns appear first, then unique patterns from sub-genres.
+ */
+export function getBlendedDopaminePatterns(primary: GenreType, subGenres: GenreType[] = []): DopaminePattern[] {
+  const seen = new Set<DopamineType>();
+  const result: DopaminePattern[] = [];
+
+  // Primary genre first (its patterns dominate)
+  for (const p of getDopaminePatternsByGenre(primary)) {
+    if (!seen.has(p.type)) {
+      seen.add(p.type);
+      result.push(p);
+    }
+  }
+
+  // Sub-genre patterns appended (skip duplicates)
+  for (const sub of subGenres) {
+    if (sub === primary) continue;
+    for (const p of getDopaminePatternsByGenre(sub)) {
+      if (!seen.has(p.type)) {
+        seen.add(p.type);
+        result.push(p);
+      }
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Build a hint string warning Architect about the current event/phase status.
+ * Tư duy theo GIAI ĐOẠN, không đếm chương.
+ *
+ * @param genre - The story genre
+ * @param currentEventLength - Số chương consecutive đang trong cùng 1 giai đoạn ngược (0 nếu chương trước là breathing)
+ * @param chaptersSinceLastEventEnded - Số chương breathing kể từ khi giai đoạn ngược gần nhất kết thúc (Infinity nếu chưa từng có event)
+ * @returns String warning or empty string if no constraint applies
+ */
+export function getConflictDensityHint(
+  genre: GenreType,
+  currentEventLength: number,
+  chaptersSinceLastEventEnded: number,
+): string {
+  const cap = (ENGAGEMENT_CHECKLIST as { conflictDensityCap?: { perGenre: Record<string, { breathingChaptersBetweenEvents: number; maxEventLengthChapters: number }> } }).conflictDensityCap?.perGenre?.[genre];
+  if (!cap) return '';
+
+  // Trường hợp 1: Đang trong giai đoạn ngược kéo dài quá lâu
+  if (currentEventLength >= cap.maxEventLengthChapters) {
+    return `⚠️ EVENT QUÁ DÀI: Giai đoạn ngược hiện tại đã kéo dài ${currentEventLength} chương (max ${cap.maxEventLengthChapters}). Chương này BẮT BUỘC bắt đầu RESOLUTION — MC thắng, thua nhưng sống, hoặc tìm được lối thoát. KHÔNG được tiếp tục dập.`;
+  }
+
+  // Trường hợp 2: Vừa mới hết giai đoạn ngược, chưa đủ breathing chapters
+  if (chaptersSinceLastEventEnded >= 0 && chaptersSinceLastEventEnded < cap.breathingChaptersBetweenEvents) {
+    return `⚠️ THIẾU BREATHING: Mới ${chaptersSinceLastEventEnded} chương breathing kể từ giai đoạn ngược trước (cần ≥${cap.breathingChaptersBetweenEvents}). Chương này PHẢI là breathing/easy-win, CẤM mở giai đoạn ngược mới.`;
+  }
+
+  return '';
 }
 
 /**
@@ -1307,35 +1472,43 @@ export function getPowerSystemByGenre(genre: GenreType): PowerSystem {
 }
 
 export function getDopaminePatternsByGenre(genre: GenreType): DopaminePattern[] {
+  // Anti-self-torture: smooth_opportunity + casual_competence + peaceful_growth are
+  // available cross-genre as alternatives that don't require adversity setup.
+  const SMOOTH_HEAD = [DOPAMINE_PATTERNS.smooth_opportunity, DOPAMINE_PATTERNS.casual_competence, DOPAMINE_PATTERNS.peaceful_growth];
+
   switch (genre) {
     case 'tien-hiep':
-      return [DOPAMINE_PATTERNS.face_slap, DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.breakthrough, DOPAMINE_PATTERNS.treasure_gain, DOPAMINE_PATTERNS.secret_identity];
+      return [...SMOOTH_HEAD, DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.breakthrough, DOPAMINE_PATTERNS.treasure_gain, DOPAMINE_PATTERNS.secret_identity, DOPAMINE_PATTERNS.face_slap];
     case 'huyen-huyen':
-      return [DOPAMINE_PATTERNS.face_slap, DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.breakthrough, DOPAMINE_PATTERNS.treasure_gain, DOPAMINE_PATTERNS.revenge];
+      return [...SMOOTH_HEAD, DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.breakthrough, DOPAMINE_PATTERNS.treasure_gain, DOPAMINE_PATTERNS.face_slap, DOPAMINE_PATTERNS.revenge];
     case 'do-thi':
-      return [DOPAMINE_PATTERNS.face_slap, DOPAMINE_PATTERNS.flex_wealth, DOPAMINE_PATTERNS.beauty_encounter, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.secret_identity, DOPAMINE_PATTERNS.business_success];
+      // Proactive business genre — business_success/recognition là core, KHÔNG dùng face_slap.
+      // Face_slap chỉ generate "đối thủ xuất hiện coi thường MC" → trái proactive narrative.
+      return [...SMOOTH_HEAD, DOPAMINE_PATTERNS.business_success, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.flex_wealth, DOPAMINE_PATTERNS.beauty_encounter, DOPAMINE_PATTERNS.comfort, DOPAMINE_PATTERNS.harvest, DOPAMINE_PATTERNS.secret_identity];
     case 'kiem-hiep':
-      return [DOPAMINE_PATTERNS.face_slap, DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.revenge, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.secret_identity];
+      return [...SMOOTH_HEAD, DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.face_slap, DOPAMINE_PATTERNS.revenge, DOPAMINE_PATTERNS.secret_identity];
     case 'lich-su':
-      return [DOPAMINE_PATTERNS.face_slap, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.revenge, DOPAMINE_PATTERNS.business_success, DOPAMINE_PATTERNS.secret_identity];
+      return [...SMOOTH_HEAD, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.business_success, DOPAMINE_PATTERNS.secret_identity, DOPAMINE_PATTERNS.face_slap, DOPAMINE_PATTERNS.revenge];
     case 'khoa-huyen':
-      return [DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.breakthrough, DOPAMINE_PATTERNS.treasure_gain, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.secret_identity];
+      return [...SMOOTH_HEAD, DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.breakthrough, DOPAMINE_PATTERNS.treasure_gain, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.secret_identity];
     case 'vong-du':
-      return [DOPAMINE_PATTERNS.face_slap, DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.breakthrough, DOPAMINE_PATTERNS.treasure_gain, DOPAMINE_PATTERNS.player_exploitation];
+      return [...SMOOTH_HEAD, DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.breakthrough, DOPAMINE_PATTERNS.treasure_gain, DOPAMINE_PATTERNS.player_exploitation, DOPAMINE_PATTERNS.face_slap];
     case 'dong-nhan':
-      return [DOPAMINE_PATTERNS.face_slap, DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.steal_luck, DOPAMINE_PATTERNS.secret_identity, DOPAMINE_PATTERNS.recognition];
+      return [...SMOOTH_HEAD, DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.steal_luck, DOPAMINE_PATTERNS.secret_identity, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.face_slap];
     case 'mat-the':
-      return [DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.treasure_gain, DOPAMINE_PATTERNS.monster_evolution, DOPAMINE_PATTERNS.revenge, DOPAMINE_PATTERNS.recognition];
+      return [...SMOOTH_HEAD, DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.treasure_gain, DOPAMINE_PATTERNS.monster_evolution, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.revenge];
     case 'linh-di':
-      return [DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.secret_identity, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.revenge, DOPAMINE_PATTERNS.breakthrough];
+      return [...SMOOTH_HEAD, DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.secret_identity, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.breakthrough, DOPAMINE_PATTERNS.revenge];
     case 'quan-truong':
-      return [DOPAMINE_PATTERNS.face_slap, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.business_success, DOPAMINE_PATTERNS.flex_wealth, DOPAMINE_PATTERNS.secret_identity];
+      // Proactive political genre — recognition/business_success là core, KHÔNG dùng face_slap.
+      return [...SMOOTH_HEAD, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.business_success, DOPAMINE_PATTERNS.flex_wealth, DOPAMINE_PATTERNS.harvest, DOPAMINE_PATTERNS.secret_identity];
     case 'di-gioi':
-      return [DOPAMINE_PATTERNS.face_slap, DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.treasure_gain, DOPAMINE_PATTERNS.two_world_shock, DOPAMINE_PATTERNS.breakthrough];
+      return [...SMOOTH_HEAD, DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.treasure_gain, DOPAMINE_PATTERNS.two_world_shock, DOPAMINE_PATTERNS.breakthrough, DOPAMINE_PATTERNS.face_slap];
     case 'ngon-tinh':
-      return [DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.beauty_encounter, DOPAMINE_PATTERNS.comfort, DOPAMINE_PATTERNS.comedy_misunderstanding, DOPAMINE_PATTERNS.tears_of_regret];
+      // Smooth-leaning genre
+      return [...SMOOTH_HEAD, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.beauty_encounter, DOPAMINE_PATTERNS.comfort, DOPAMINE_PATTERNS.comedy_misunderstanding, DOPAMINE_PATTERNS.tears_of_regret];
     default:
-      return [DOPAMINE_PATTERNS.face_slap, DOPAMINE_PATTERNS.power_reveal];
+      return [...SMOOTH_HEAD, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.power_reveal];
   }
 }
 

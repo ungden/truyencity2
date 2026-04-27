@@ -187,8 +187,9 @@ export async function getPowerContext(
   parts.push('\n🚫 QUY TẮC:');
   parts.push('  - KHÔNG cho MC dùng chiêu thức chưa học');
   parts.push('  - KHÔNG đột phá nếu bottleneck chưa giải quyết');
-  parts.push('  - Nếu MC thắng đối thủ mạnh hơn 2 bậc → PHẢI có lý do hợp lý (chiến thuật, địa hình, trợ giúp)');
-  parts.push('  - Mỗi lần dùng sức mạnh lớn → PHẢI có hệ quả (mệt, mất tài nguyên, bị thương)');
+  parts.push('  - Nếu MC thắng đối thủ mạnh hơn 2 bậc → CẦN lý do hợp lý (chiến thuật, địa hình, trợ giúp, đạo cụ, kinh nghiệm). KHÔNG nhất thiết MC phải bị thương để "cân bằng".');
+  parts.push('  - Mỗi lần dùng sức mạnh lớn CÓ THỂ có hệ quả nhỏ (mệt nhẹ, tốn chút tài nguyên), KHÔNG bắt buộc hệ quả nặng. Nếu MC đã có chuẩn bị/kinh nghiệm/đồng đội → có thể giải quyết tự tin không bị thương.');
+  parts.push('  - MC PHẢI thắng ≥1 trận lớn mỗi arc một cách dứt khoát (không bị thương nặng/mất nhiều tài nguyên) — anti-self-torture, tránh "thắng nhưng tả tơi".');
 
   return parts.join('\n');
 }

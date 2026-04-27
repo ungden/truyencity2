@@ -39,10 +39,19 @@ interface SynopsisAIResponse {
   open_threads?: string[];
 }
 
+interface ArcSubArcEntry {
+  sub_arc_number: number;
+  start_chapter: number;
+  end_chapter: number;
+  theme: string;
+  mini_payoff: string;
+}
+
 interface ArcPlanAIResponse {
   arc_theme?: string;
   plan_text?: string;
-  chapter_briefs?: Array<{ chapterNumber: number; brief: string }>;
+  sub_arcs?: ArcSubArcEntry[];
+  chapter_briefs?: Array<{ chapterNumber: number; brief: string; sub_arc_number?: number }>;
   threads_to_advance?: string[];
   threads_to_resolve?: string[];
   new_threads?: string[];
@@ -86,10 +95,10 @@ export async function loadContext(
     // Full text of recent chapters is expensive (~9-25K chars). Summaries are ~200-400 chars each.
     // For early chapters (<10), still load 1 full recent chapter for richer context.
     db.from('chapter_summaries').select('chapter_number,title,summary,mc_state,cliffhanger').eq('project_id', projectId).lt('chapter_number', chapterNumber).order('chapter_number', { ascending: false }).limit(chapterNumber > 50 ? 5 : 8),
-    // Layer 4: Arc Plan
-    db.from('arc_plans').select('arc_number,start_chapter,end_chapter,arc_theme,plan_text,chapter_briefs,threads_to_advance,threads_to_resolve,new_threads').eq('project_id', projectId).order('arc_number', { ascending: false }).limit(1).maybeSingle(),
+    // Layer 4: Arc Plan (incl. hyperpop sub-arcs from migration 0149)
+    db.from('arc_plans').select('arc_number,start_chapter,end_chapter,arc_theme,plan_text,sub_arcs,chapter_briefs,threads_to_advance,threads_to_resolve,new_threads').eq('project_id', projectId).order('arc_number', { ascending: false }).limit(1).maybeSingle(),
     // Master Outline + Story Outline
-    db.from('ai_story_projects').select('master_outline,story_outline').eq('id', projectId).maybeSingle(),
+    db.from('ai_story_projects').select('master_outline,story_outline,sub_genres,mc_archetype,anti_tropes,style_directives').eq('id', projectId).maybeSingle(),
     // Anti-repetition: titles (cap at 50 most recent to reduce context size)
     db.from('chapters').select('title').eq('novel_id', novelId).order('chapter_number', { ascending: false }).limit(50),
     // Anti-repetition: openings
@@ -114,6 +123,14 @@ export async function loadContext(
     ? (typeof rawMasterOutline === 'string' ? rawMasterOutline : JSON.stringify(rawMasterOutline))
     : undefined;
   const storyOutline = masterOutlineResult?.data?.story_outline;
+
+  // Modern narrative metadata (migration 0149)
+  const projectMeta = masterOutlineResult?.data as {
+    sub_genres?: string[];
+    mc_archetype?: string;
+    anti_tropes?: string[];
+    style_directives?: Record<string, unknown>;
+  } | null;
 
   // Build structured synopsis fields
   const synopsisStructured = synopsis ? {
@@ -166,17 +183,45 @@ export async function loadContext(
 
   // Chapter brief from arc plan
   let chapterBrief: string | undefined;
+  let currentSubArc: string | undefined;
   if (arc?.chapter_briefs && Array.isArray(arc.chapter_briefs)) {
-    const brief = (arc.chapter_briefs as Array<{ chapterNumber: number; brief: string }>)
+    const brief = (arc.chapter_briefs as Array<{ chapterNumber: number; brief: string; sub_arc_number?: number }>)
       .find(b => b.chapterNumber === chapterNumber);
     chapterBrief = brief?.brief;
+
+    // Hyperpop sub-arc context: find the sub-arc containing this chapter
+    if (arc?.sub_arcs && Array.isArray(arc.sub_arcs)) {
+      const subArc = (arc.sub_arcs as ArcSubArcEntry[])
+        .find(sa => chapterNumber >= sa.start_chapter && chapterNumber <= sa.end_chapter);
+      if (subArc) {
+        const chaptersIntoSubArc = chapterNumber - subArc.start_chapter + 1;
+        const subArcLength = subArc.end_chapter - subArc.start_chapter + 1;
+        const isClosing = chapterNumber === subArc.end_chapter;
+        const closingNote = isClosing ? ' ← CHƯƠNG CUỐI SUB-ARC: BẮT BUỘC PAYOFF cho mini-payoff này.' : '';
+        currentSubArc = `Sub-arc ${subArc.sub_arc_number} (${subArc.start_chapter}-${subArc.end_chapter}, chương ${chaptersIntoSubArc}/${subArcLength}): "${subArc.theme}"\n  Mini-payoff cuối sub-arc: ${subArc.mini_payoff}${closingNote}`;
+      }
+    }
   }
+
+  // Anti-self-torture: build recent_beat_history from last 3 chapter summaries.
+  // Heuristic: scan summary/mc_state/cliffhanger for setback signals to flag chapters
+  // that beat down MC, so Architect can avoid back-to-back beat-downs.
+  const SETBACK_PATTERNS = /(thất bại|bại trận|bị thương|bị đánh|bị dập|bị bắt|bị giam|tuyệt vọng|đau khổ|tủi nhục|nhục nhã|bế tắc|nguy kịch|hấp hối|sắp chết|kẻ thù chèn ép|bị truy sát|thua thiệt|bất lực|phẫn uất|tan vỡ|sụp đổ|mất hết|cướp mất)/i;
+  const recentBeatHistoryLines: string[] = [];
+  const last3 = recentSummaries.slice(-3) as Array<{ chapter_number: number; title: string; summary: string; mc_state?: string; cliffhanger?: string }>;
+  for (const ch of last3) {
+    const blob = `${ch.summary || ''} ${ch.mc_state || ''} ${ch.cliffhanger || ''}`;
+    const isSetback = SETBACK_PATTERNS.test(blob);
+    recentBeatHistoryLines.push(`Ch.${ch.chapter_number}: ${isSetback ? '⚠️ SETBACK/CONFLICT' : '✓ ổn/tích cực'} — ${(ch.cliffhanger || ch.mc_state || ch.summary || '').slice(0, 100)}`);
+  }
+  const recentBeatHistory = recentBeatHistoryLines.length > 0 ? recentBeatHistoryLines.join('\n') : undefined;
 
   return {
     previousSummary: bridge?.summary,
     previousMcState: bridge?.mc_state,
     previousCliffhanger: bridge?.cliffhanger,
     previousEnding: ending?.content ? ending.content.slice(-500) : undefined,
+    recentBeatHistory,
     storyBible: bible,
     hasStoryBible: !!bible,
     synopsis: synopsis?.synopsis_text,
@@ -190,6 +235,7 @@ export async function loadContext(
     }),
     arcPlan: arc?.plan_text,
     chapterBrief,
+    currentSubArc,
     arcPlanThreads,
     previousTitles: (titlesResult?.data || []).map((t: { title: string }) => t.title).filter(Boolean),
     recentOpenings: (openingsResult?.data || []).map((o: { opening_sentence: string }) => o.opening_sentence).filter(Boolean),
@@ -201,6 +247,11 @@ export async function loadContext(
     arcChapterSummaries: undefined, // loaded separately for synopsis generation
     masterOutline: typeof masterOutline === 'string' ? masterOutline : (masterOutline ? JSON.stringify(masterOutline) : undefined),
     storyOutline: storyOutline || undefined,
+    // Modern narrative metadata (migration 0149)
+    subGenres: (projectMeta?.sub_genres || []) as ContextPayload['subGenres'],
+    mcArchetype: projectMeta?.mc_archetype as ContextPayload['mcArchetype'],
+    antiTropes: (projectMeta?.anti_tropes || []) as ContextPayload['antiTropes'],
+    styleDirectives: (projectMeta?.style_directives || undefined) as ContextPayload['styleDirectives'],
   };
 }
 
@@ -242,6 +293,56 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
     parts.push(outlineParts.join('\n'));
   }
 
+  // ── Modern narrative metadata (migration 0149) — INJECTED EARLY (high priority) ──
+  const hasMeta = (payload.subGenres?.length || payload.mcArchetype || payload.antiTropes?.length || payload.styleDirectives);
+  if (hasMeta) {
+    const metaParts: string[] = ['[NARRATIVE DIRECTIVES — TUYỆT ĐỐI BẮT BUỘC]'];
+
+    if (payload.subGenres?.length) {
+      metaParts.push(`Genre blending: PRIMARY + sub-genres = [${payload.subGenres.join(', ')}]. Truyện này blend conventions từ MULTIPLE genres — KHÔNG ép theo single-genre formula. Đặc biệt khi nội dung overlap (vd: do-thi+trong-sinh+kinh-doanh thì phải có yếu tố trọng sinh advantage + business cycle proactive cùng lúc).`);
+    }
+
+    if (payload.mcArchetype) {
+      const archetypeGuide: Record<string, string> = {
+        power_fantasy: 'POWER_FANTASY: MC leveling-grinding, classic Qidian-style. Power-up moments, breakthroughs, escalating combat.',
+        intelligent: 'INTELLIGENT MC (Qixia 《十日终焉》-style): MC THẮNG BẰNG KIẾN THỨC, MƯU KẾ, TÂM LÝ — KHÔNG qua power-up/hệ thống. Mỗi conflict resolve qua observation + deduction + manipulation. CẤM cho MC dùng "ngộ tính siêu phàm" hoặc "đột phá lực" làm key. Phải show thinking process explicit.',
+        pragmatic: 'PRAGMATIC MC: tính toán, risk-averse, business-minded. KHÔNG impulsive. Mọi quyết định có cost-benefit analysis. Thắng bằng strategy + resource management.',
+        coward_smart: 'COWARD-SMART MC: yếu sức mạnh nhưng cunning. CẤM heroics; MC chọn trốn/lừa/bargain trước khi đối đầu. Hài hước qua self-aware "tôi sống là chính".',
+        family_pillar: 'FAMILY PILLAR MC: gia tộc multi-gen focus, trách nhiệm với người thân là động cơ chính. Side characters (cha mẹ, huynh đệ, con cháu) có arc riêng. KHÔNG lone-wolf.',
+        career_driven: 'CAREER-DRIVEN MC (大女主-style): sự nghiệp/danh tiếng là MAIN tuyến, romance là phụ. MC tự đưa quyết định lớn, không cần "tổng tài bảo hộ". Empowering + pragmatic tone.',
+      };
+      metaParts.push(`MC ARCHETYPE: ${archetypeGuide[payload.mcArchetype] || payload.mcArchetype}`);
+    }
+
+    if (payload.antiTropes?.length) {
+      const antiTropeGuide: Record<string, string> = {
+        no_system: 'CẤM "hệ thống cheat" / "lão gia trong nhẫn" / "system báo nhiệm vụ" — MC không có golden finger.',
+        no_harem: 'CẤM harem — single love interest hoặc no romance.',
+        no_invincible: 'CẤM MC vô địch — MC có thể thua, gặp thất bại thực tế. Power không tự động giải quyết mọi việc.',
+        no_face_slap: 'CẤM pattern "kẻ thù coi thường → MC nghiền nát" — đối thủ không tồn tại để bị đánh mặt.',
+        no_rebirth_advantage: 'CẤM dùng kiến thức tương lai trắng trợn — trọng sinh có thể có nhưng MC phải có lý do hợp lý cho quyết định, không phải "tôi biết tương lai nên...".',
+        no_misery_porn: 'CẤM tự ngược — MC vượt qua khó khăn không quá đau khổ, không khóc lóc lê thê.',
+        no_secret_identity: 'CẤM "thân phận bí ẩn cực khủng" — MC là MC, không phải "con rơi gia tộc đỉnh / binh vương trở về".',
+        no_tournament: 'CẤM tournament arc / sect war / faction rivalry cliché.',
+        no_cliffhanger_mandate: 'KHÔNG ép cliffhanger nguy hiểm mọi chương — emotional/reveal/comfort endings được khuyến khích.',
+      };
+      const activeFlags = payload.antiTropes.map(f => `• ${antiTropeGuide[f] || f}`).join('\n');
+      metaParts.push(`ANTI-TROPE FLAGS (TUYỆT ĐỐI BẮT BUỘC):\n${activeFlags}`);
+    }
+
+    if (payload.styleDirectives) {
+      const sd = payload.styleDirectives;
+      const directives: string[] = [];
+      if (sd.cliffhanger_density) directives.push(`Cliffhanger density: ${sd.cliffhanger_density}`);
+      if (sd.sub_arc_length) directives.push(`Sub-arc length: ${sd.sub_arc_length} chương resolve`);
+      if (sd.target_chapter_length_override) directives.push(`Chapter target length override: ${sd.target_chapter_length_override} từ`);
+      if (sd.variant_id) directives.push(`Variant: ${sd.variant_id}`);
+      if (directives.length) metaParts.push(`STYLE DIRECTIVES: ${directives.join(' | ')}`);
+    }
+
+    parts.push(metaParts.join('\n'));
+  }
+
   // Layer 0: Chapter Bridge (highest priority)
   if (payload.previousCliffhanger || payload.previousSummary) {
     parts.push('[CẦU NỐI CHƯƠNG — BẮT BUỘC TUÂN THỦ]');
@@ -252,6 +353,16 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
     if (payload.previousMcState) parts.push(`Trạng thái MC: ${payload.previousMcState}`);
     if (payload.previousSummary) parts.push(`Tóm tắt: ${payload.previousSummary}`);
     if (payload.previousEnding) parts.push(`300 ký tự cuối: ...${payload.previousEnding.slice(-300)}`);
+  }
+
+  // Anti-self-torture: recent beat history (last 3 chapters)
+  if (payload.recentBeatHistory) {
+    parts.push('[TRẠNG THÁI 3 CHƯƠNG GẦN ĐÂY — CHỐNG TỰ NGƯỢC, TƯ DUY THEO GIAI ĐOẠN]');
+    parts.push(payload.recentBeatHistory);
+    parts.push('→ Phân tích: chuỗi SETBACK liên tiếp = đang ở giữa 1 GIAI ĐOẠN ngược (cùng 1 sự kiện). Nếu giai đoạn đó đã 4+ chương → chương này PHẢI bắt đầu resolution.');
+    parts.push('→ Nếu chương N-1 là SETBACK NHƯNG đã RESOLVE (kết thúc sự kiện) → chương này PHẢI là breathing, CẤM mở giai đoạn ngược mới ngay.');
+    parts.push('→ Nếu chương N-1 là "ổn/tích cực" → có thể tiếp tục breathing, hoặc khởi đầu giai đoạn ngược mới NẾU đã có ≥1-3 chương breathing trước đó.');
+    parts.push('→ KHÔNG cắt vụn 1 sự kiện đang diễn biến — diễn biến tự nhiên được ưu tiên hơn cắt nhịp cứng nhắc.');
   }
 
   // Character states
@@ -314,6 +425,13 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
   }
 
   // Layer 4: Arc Plan
+  // Sub-arc context (hyperpop 2024-2026 standard) — inject before arc plan
+  if (payload.currentSubArc) {
+    parts.push('[SUB-ARC HIỆN TẠI — TUYỆT ĐỐI BÁM SÁT]');
+    parts.push(payload.currentSubArc);
+    parts.push('→ Hyperpop standard: sub-arc 5-10 chương resolve TỰ THÂN. Chương này phải đóng góp vào mini-payoff của sub-arc.');
+  }
+
   if (payload.arcPlan) {
     parts.push('[KẾ HOẠCH ARC HIỆN TẠI]');
     parts.push(payload.arcPlan.slice(0, 3000));
@@ -692,11 +810,21 @@ ${visionBlock}${synopsis ? `TỔNG QUAN:\n${synopsis}\n\n` : ''}${storyBible ? `
 Lập kế hoạch ARC ${arcNumber} (chương ${startChapter}-${endChapter}) cho ${protagonistName}.
 Tổng dự kiến: ${totalPlanned} chương.${closingInstruction}
 
+CẤU TRÚC SUB-ARC (HYPERPOP 2024-2026 STANDARD):
+- Chia arc 20 chương thành 2-4 SUB-ARCS, mỗi sub-arc 5-10 chương resolve TỰ THÂN.
+- Mỗi sub-arc có "mini-payoff" (kết quả cụ thể MC đạt được, conflict resolve, milestone) ở chương cuối.
+- Sub-arc liên kết tuyến với nhau (cliffhanger cuối sub-arc 1 dẫn vào sub-arc 2) NHƯNG mỗi sub-arc đứng được độc lập như 1 mini-story.
+- Đây là chuẩn modern (微短剧 IP adaptation): reader có thể đọc 5-10 chương 1 lần và cảm thấy có closure, không cần đọc 30 chương mới hiểu.
+
 Trả về JSON:
 {
   "arc_theme": "foundation|conflict|growth|...",
   "plan_text": "mô tả arc 300-500 từ",
-  "chapter_briefs": [{"chapterNumber": ${startChapter}, "brief": "brief ngắn"}...],
+  "sub_arcs": [
+    {"sub_arc_number": 1, "start_chapter": ${startChapter}, "end_chapter": ${startChapter + 6}, "theme": "tên sub-arc (vd: Khởi nghiệp tại quán net Net Việt)", "mini_payoff": "MC đạt được gì cụ thể cuối sub-arc (vd: Quán net có 50 khách/ngày)"},
+    ...
+  ],
+  "chapter_briefs": [{"chapterNumber": ${startChapter}, "brief": "brief ngắn", "sub_arc_number": 1}...],
   "threads_to_advance": ["thread cần đẩy"],
   "threads_to_resolve": ["thread cần giải quyết"],
   "new_threads": ["thread mới"]
@@ -716,6 +844,7 @@ Trả về JSON:
     end_chapter: endChapter,
     arc_theme: parsed.arc_theme || 'growth',
     plan_text: parsed.plan_text || '',
+    sub_arcs: parsed.sub_arcs || [],
     chapter_briefs: parsed.chapter_briefs || [],
     threads_to_advance: parsed.threads_to_advance || [],
     threads_to_resolve: parsed.threads_to_resolve || [],
