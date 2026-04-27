@@ -57,6 +57,13 @@ const OVERLOAD_RESUME_THRESHOLD = clamp(parseIntEnv('WRITE_CHAPTERS_OVERLOAD_RES
 const OVERLOAD_INIT_PREP_CAP = clamp(parseIntEnv('WRITE_CHAPTERS_OVERLOAD_INIT_PREP_CAP', 8), 0, 100);
 const OVERLOAD_INIT_WRITE_CAP = clamp(parseIntEnv('WRITE_CHAPTERS_OVERLOAD_INIT_WRITE_CAP', 6), 0, 100);
 
+// BURST WINDOW: target time to finish all daily chapters from start of VN day.
+// 240 min (4h) for 20/day → 12 min/chapter cadence. Fits cron 5-min tick comfortably.
+// Scaling guidance:
+//   - 50/day: keep 240 min → cadence 5 min (need cron 3-min interval for safety)
+//   - 100/day: expand to 480 min (8h) → cadence 5 min, OR keep 240 min + cron 2-min
+const ACTIVE_WINDOW_MINUTES = clamp(parseIntEnv('WRITE_CHAPTERS_ACTIVE_WINDOW_MINUTES', 240), 60, 1440);
+
 export const maxDuration = 800; // 13.3 minutes (Vercel Pro allows up to 800s) — DeepSeek V4 Flash thinking mode needs more headroom
 export const dynamic = 'force-dynamic';
 
@@ -174,12 +181,8 @@ async function ensureDailyQuotasForActiveProjects(
 
   const dayStartMs = new Date(dayStartIso).getTime();
 
-  // FRONT-LOAD: spread 20 chapters across first 18h (1080 min) → 54 min/chapter target.
-  // Last 6h (1080-1440 min) reserved as catch-up buffer for transient failures.
-  // This way if any chapter stalls, system has 6h to retry before midnight rollover.
-  // Each project gets a deterministic first-slot offset within [0, 54) minutes from VN day start.
-  const ACTIVE_WINDOW_MINUTES = 1080; // 18h working window (was 1440 = 24h)
-  const cadenceMinutes = Math.floor(ACTIVE_WINDOW_MINUTES / DAILY_CHAPTER_QUOTA); // 54 min
+  // BURST WINDOW already defined at module scope. Compute cadence per chapter.
+  const cadenceMinutes = Math.max(2, Math.floor(ACTIVE_WINDOW_MINUTES / DAILY_CHAPTER_QUOTA)); // 12 min for 20/day in 4h
 
   // Check for active boosts — boosted novels get 2x daily quota
   const projectIds = projects.map((p) => p.id);
@@ -320,20 +323,27 @@ async function updateQuotaAfterWrite(
   if (remaining <= 0) {
     status = 'completed';
   } else {
-    const endMs = new Date(endIso).getTime();
+    // BURST PACE: schedule next chapter at flat cadence based on remaining work and
+    // remaining burst window (NOT remaining day). Burst window = ACTIVE_WINDOW_MINUTES from VN day start.
+    // After burst window expires, fall back to "every cron tick" pace until day ends.
+    const dayStartMs = new Date(endIso).getTime() - 86_400_000; // endIso = day_end → day_start = end - 24h
+    const burstWindowEndMs = dayStartMs + ACTIVE_WINDOW_MINUTES * 60_000;
+    const dayEndMs = new Date(endIso).getTime();
     const nowMs = Date.now();
-    const minutesLeft = Math.max(1, Math.floor((endMs - nowMs) / 60000));
 
-    // BURST MODE: when behind schedule (chapters left × 7 min > minutes left in day),
-    // drop cadence floor from 5 to 2 min to fire ASAP next cron tick.
-    // 5-min cron tick + 2-min cadence = effectively "fire next tick" — no artificial wait.
-    const isBehindSchedule = remaining * 7 > minutesLeft;
-    const cadenceFloor = isBehindSchedule ? 2 : 5;
+    const inBurstWindow = nowMs < burstWindowEndMs;
+    const effectiveEndMs = inBurstWindow ? burstWindowEndMs : dayEndMs;
+    const minutesLeft = Math.max(1, Math.floor((effectiveEndMs - nowMs) / 60_000));
 
-    const cadence = clamp(Math.floor(minutesLeft / remaining), cadenceFloor, 120);
-    const jitter = isBehindSchedule ? 0 : (hashStringToInt(`${projectId}:${written}:${vnDate}`) % 11) - 5;
+    // Flat cadence within burst window. Outside burst window → catch-up mode (fire every cron tick).
+    const cadenceFloor = 3;
+    const cadenceCeiling = inBurstWindow
+      ? Math.max(cadenceFloor, Math.floor(ACTIVE_WINDOW_MINUTES / DAILY_CHAPTER_QUOTA)) // 12 min for 20/day in 4h
+      : 5; // outside burst window: fire every cron tick for aggressive catch-up
+    const cadence = clamp(Math.floor(minutesLeft / remaining), cadenceFloor, cadenceCeiling);
+    const jitter = inBurstWindow ? 0 : (hashStringToInt(`${projectId}:${written}:${vnDate}`) % 5) - 2;
     const delayMinutes = Math.max(cadenceFloor, cadence + jitter);
-    nextDueAt = new Date(nowMs + delayMinutes * 60 * 1000).toISOString();
+    nextDueAt = new Date(nowMs + delayMinutes * 60_000).toISOString();
   }
 
   await supabase
