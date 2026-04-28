@@ -465,17 +465,31 @@ export async function writeChapter(
   let rewriteInstructions = '';
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
-    // Step 1: Architect
-    const outline = await runArchitect(
-      chapterNumber,
-      contextString,
-      targetWordCount,
-      previousTitles,
-      rewriteInstructions,
-      config,
-      options,
-      genre,
-    );
+    // Step 1: Architect — throws on placeholder/empty scenes. If we have
+    // retries left, treat throw as a quality failure: feed the error message
+    // back as rewriteInstructions and continue. This keeps the engine from
+    // falling back to silent placeholder scenes.
+    let outline: ChapterOutline;
+    try {
+      outline = await runArchitect(
+        chapterNumber,
+        contextString,
+        targetWordCount,
+        previousTitles,
+        rewriteInstructions,
+        config,
+        options,
+        genre,
+      );
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (attempt < maxRetries - 1) {
+        rewriteInstructions = `Architect lỗi: ${msg}. Lần này phải trả về scenes ĐẦY ĐỦ với setting/conflict/resolution cụ thể, KHÔNG empty placeholder. Tuân thủ brief đã cấp.`;
+        console.warn(`[Architect] attempt ${attempt + 1}/${maxRetries} failed: ${msg}`);
+        continue;
+      }
+      throw err;
+    }
 
     // Step 2: Writer
     let content = await runWriter(
@@ -489,8 +503,19 @@ export async function writeChapter(
       options,
     );
 
-    // Request continuation if truncated
+    // Hard-fail if Writer returned essentially nothing — likely an LLM
+    // error / empty response. Don't ship a stub. Force regen with retry.
     const wordCount = countWords(content);
+    if (wordCount < 200) {
+      if (attempt < maxRetries - 1) {
+        rewriteInstructions = `Writer trả về ${wordCount} từ, gần như trống. Có thể do LLM lỗi. Viết LẠI đầy đủ ${targetWordCount} từ theo outline.`;
+        console.warn(`[Writer] Chapter ${chapterNumber} attempt ${attempt + 1}/${maxRetries}: content too short (${wordCount} words), regen`);
+        continue;
+      }
+      throw new Error(`Writer chapter ${chapterNumber}: returned ${wordCount} words after ${maxRetries} attempts. Refusing to save stub content.`);
+    }
+
+    // Request continuation if truncated
     if (wordCount < targetWordCount * 0.7) {
       const continuation = await requestContinuation(content, outline, targetWordCount, config, options?.projectId);
       if (continuation) content = content + '\n\n' + continuation;
@@ -499,6 +524,25 @@ export async function writeChapter(
     // Clean content
     content = cleanContent(content);
     const finalWordCount = countWords(content);
+
+    // ── Hard-Fail Gate (pre-Critic) ─────────────────────────────────────────
+    // Cheap regex checks that bypass the Critic round-trip. If Writer has
+    // obviously fallen back to repetition padding instead of executing the
+    // chapter brief, force regen with a stronger correction instruction
+    // BEFORE spending tokens on Critic. Two violations are auto-rejectable:
+    //   1. Setup-word density (kiếp trước / 30 năm tương lai / etc.) above
+    //      a hard threshold proves Writer ignored the WRITER_SYSTEM rule.
+    //   2. Golden-finger name density above threshold = same fallback.
+    // If we caught a violation and have retries left, skip Critic and force
+    // a tighter Writer pass with explicit correction.
+    if (attempt < maxRetries - 1) {
+      const hardFailReason = detectHardFallback(content, options);
+      if (hardFailReason) {
+        rewriteInstructions = `HARD-FAIL: ${hardFailReason}. KHÔNG được lặp setup. Chương phải narrate đúng các sự kiện trong outline, KHÔNG chèn padding hồi tưởng. Brief đã liệt kê hành động cụ thể — viết chính xác hành động đó, KHÔNG lan man về kiếp trước / golden finger.`;
+        console.warn(`[Writer] Hard-fail attempt ${attempt + 1}/${maxRetries}: ${hardFailReason}`);
+        continue;
+      }
+    }
 
     // Step 3: Critic
     const critic = await runCritic(
@@ -668,9 +712,20 @@ Trả về JSON ChapterOutline:
     throw new Error(`Architect chapter ${chapterNumber}: JSON parse failed — raw: ${res.content.slice(0, 300)}`);
   }
 
-  // Validate: ensure enough scenes
+  // Validate: ensure enough scenes. Previously silently synthesized empty
+  // placeholder scenes (setting:'', conflict:'', resolution:'') which the
+  // Writer then narrated as filler — Writer fell back to padding from
+  // setup/world_description because the brief was empty. Now throw so the
+  // outer retry loop calls Architect again with the rewriteInstructions.
   if (!parsed.scenes || parsed.scenes.length < minScenes) {
-    parsed.scenes = generateMinimalScenes(minScenes, wordsPerScene, parsed.pov || options?.protagonistName || '');
+    throw new Error(`Architect chapter ${chapterNumber}: returned ${parsed.scenes?.length ?? 0} scenes, need ≥${minScenes}. Refusing to synthesize empty placeholder scenes (would force Writer to pad).`);
+  }
+  // Validate: scenes have non-empty narrative fields. If Architect returned
+  // scenes with empty goal/conflict/resolution, those are essentially
+  // placeholders too — Writer would pad. Force regen.
+  const emptyScenes = parsed.scenes.filter(sc => !sc.goal?.trim() || !sc.setting?.trim());
+  if (emptyScenes.length > parsed.scenes.length / 2) {
+    throw new Error(`Architect chapter ${chapterNumber}: ${emptyScenes.length}/${parsed.scenes.length} scenes have empty goal/setting. Refusing to pass to Writer (would produce padding).`);
   }
 
   // Fix scene word estimates if too low
@@ -1171,15 +1226,28 @@ KIỂM TRA TUÂN THỦ QUALITY MODULES (NẾU CÓ THÔNG TIN):
 }
 
 function createFailClosedCriticOutput(wordCount: number, targetWords: number): CriticOutput {
-  const wordRatio = wordCount / targetWords;
+  // True fail-closed: if Critic couldn't parse, we have ZERO signal about
+  // chapter quality. Previous version only required rewrite when word
+  // count was <60% — meaning a decent-length but flawed chapter (logic
+  // breaks, wrong MC name, fake currency) would ship silently.
+  // User feedback: "cấm fallback hết, vì cứ 1 bộ nó im im nó fallback
+  // là nó sẽ viết bậy nếu không theo đủ quy trình."
+  // → Always force rewrite on Critic parse failure. Caller's retry loop
+  // will burn an extra Writer call but the alternative is silent
+  // bug-shipping. If we exhaust retries the loop throws — better than
+  // saving bad content.
   return {
-    overallScore: 5,
-    dopamineScore: 5,
-    pacingScore: 5,
-    issues: [{ type: 'critic_error', description: 'Critic failed to respond', severity: 'major' }],
+    overallScore: 3,
+    dopamineScore: 3,
+    pacingScore: 3,
+    issues: [{
+      type: 'critic_error',
+      description: `Critic failed to parse output (wordCount=${wordCount}/${targetWords}). Forcing rewrite — no silent approval.`,
+      severity: 'critical',
+    }],
     approved: false,
-    requiresRewrite: wordRatio < 0.6,
-    rewriteInstructions: wordRatio < 0.6 ? `Thiếu từ: ${wordCount}/${targetWords}` : undefined,
+    requiresRewrite: true,
+    rewriteInstructions: `Critic không kiểm tra được chương này (parse failed). Viết lại CHẶT CHẼ theo brief, KHÔNG fallback padding. Đảm bảo: đủ từ ${targetWords}, không lặp setup, không lệch tên nhân vật/tiền tệ/địa danh.`,
   };
 }
 
@@ -1344,6 +1412,85 @@ function buildSignalReport(content: string): string {
 
 function countWords(text: string): number {
   return text.trim().split(/\s+/).filter(Boolean).length;
+}
+
+/**
+ * Hard-fail gate. Cheap regex check that catches the "Writer ignored the
+ * brief and padded with rebirth/golden-finger monologue" failure mode
+ * without spending Critic tokens. Returns a non-empty reason string when
+ * the chapter must be regenerated, or empty string when content passes.
+ *
+ * Caller (writeChapter loop) treats non-empty as a "force regen" signal
+ * and feeds the reason back to Writer as rewriteInstructions before
+ * Critic is even invoked. This is intentionally stricter than the Critic
+ * rule: Critic measures relative quality, this gate measures absolute
+ * floors. Writer can recover by following the brief.
+ *
+ * Floors (per-chapter, not per-arc):
+ *   - rebirth phrases ("kiếp trước", "30 năm tương lai", "ký ức tiền kiếp",
+ *     "tương lai biết trước"): >5 occurrences = fail
+ *   - common golden-finger names: >7 occurrences = fail. We sniff a small
+ *     dictionary of project-specific names from the world_description /
+ *     story_outline so e.g. "Hải Tâm" in a Ngư Dân chapter triggers, not
+ *     all golden fingers everywhere.
+ *
+ * The thresholds are deliberately above the Writer-side rule (3 / 5) so
+ * mild over-shooting still passes; only egregious padding fails.
+ */
+function detectHardFallback(content: string, options?: WriteChapterOptions): string {
+  const REBIRTH_PHRASES = [
+    /\bkiếp trước\b/gi,
+    /\b30 năm tương lai\b/gi,
+    /\bký ức tiền kiếp\b/gi,
+    /\btương lai biết trước\b/gi,
+    /\bba mươi năm tương lai\b/gi,
+  ];
+  let rebirthCount = 0;
+  for (const re of REBIRTH_PHRASES) {
+    rebirthCount += (content.match(re) ?? []).length;
+  }
+  if (rebirthCount > 5) {
+    return `setup repetition (rebirth phrases ${rebirthCount}× in chapter, max 3 allowed in WRITER_SYSTEM, hard fail >5)`;
+  }
+
+  // Sniff golden-finger name from world_description. Common patterns:
+  //   "Bàn Tay Vàng — <Name>" or "golden finger ... <Name>"
+  //   '"<Name>" — passive cảm nhận'
+  //   "Hệ thống <Name>" or "<Name> — <ability>"
+  // Cap at the ones we've seen leak: Hải Tâm, Hệ Thống Nhắc Nhở, etc.
+  // For deterministic check we extract any 1-2 word capitalised phrase
+  // marked with em-dash in the world_description.
+  const world = options?.worldDescription || '';
+  const goldenFingerCandidates = new Set<string>();
+  // pattern: '"Hải Tâm" — passive...' or '"Hệ Thống Nhắc Nhở" cấp...'
+  const quotedRe = /[""]([A-ZÀÁÂÃĐÈÉÊÌÍÒÓÔÕÙÚĂẠ-Ỹ][^""]{2,30})[""]\s*[—\-–:]/g;
+  let m: RegExpExecArray | null;
+  while ((m = quotedRe.exec(world)) !== null) {
+    goldenFingerCandidates.add(m[1].trim());
+  }
+  // pattern: 'Bàn Tay Vàng (...): "Tên đặc biệt"' or 'Cheat: <Name>'
+  const cheatRe = /(?:Bàn Tay Vàng|Cheat|Golden Finger|Hệ thống|Hệ Thống)[^.\n]{0,80}?[""]([^""]{2,30})[""]/g;
+  while ((m = cheatRe.exec(world)) !== null) {
+    goldenFingerCandidates.add(m[1].trim());
+  }
+  // Common literal names that leak across novels — check generically too
+  const COMMON_GF = ['Hệ Thống Nhắc Nhở', 'Bàn Tay Vàng', 'Hệ Thống', 'Hải Tâm', 'Đồ Giám Yêu Ma', 'Sổ Sinh Tử'];
+  for (const name of COMMON_GF) {
+    if (world.includes(name)) goldenFingerCandidates.add(name);
+  }
+
+  for (const name of goldenFingerCandidates) {
+    if (!name || name.length < 3) continue;
+    // Whole-word-ish match to avoid matching substrings
+    const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const re = new RegExp(escapedName, 'g');
+    const count = (content.match(re) ?? []).length;
+    if (count > 7) {
+      return `golden-finger name "${name}" appears ${count}× in chapter (max 5 allowed in WRITER_SYSTEM, hard fail >7)`;
+    }
+  }
+
+  return '';
 }
 
 /**

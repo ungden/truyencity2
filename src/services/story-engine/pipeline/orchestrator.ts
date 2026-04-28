@@ -110,7 +110,14 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
 
   const currentChapter = project.current_chapter || 0;
   const nextChapter = currentChapter + 1;
-  const genre = (project.genre || 'tien-hiep') as GenreType;
+  // No silent default for genre — every project must have one set explicitly.
+  // Previous fallback to 'tien-hiep' would silently write a tu-tien chapter
+  // for a do-thi project missing its genre column, shipping wrong-genre
+  // content. Fail loudly instead.
+  if (!project.genre) {
+    throw new Error(`Project ${options.projectId} has no genre set. Refusing to write chapter — silent fallback to 'tien-hiep' would produce wrong-genre content.`);
+  }
+  const genre = project.genre as GenreType;
 
   // ── Step 1b: Pre-flight metadata validation + auto-repair ──────────────
   // Catches three classes of bug we've seen ship to readers:
@@ -127,7 +134,12 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   //       — extend to cover the outlined story.
   // All repairs are persisted to DB before chapter generation.
   const validationFixes: string[] = [];
-  let resolvedMainCharacter = project.main_character || 'Nhân vật chính';
+  // Default 'Nhân vật chính' is a debugging escape hatch, not a real fallback.
+  // If project.main_character is truly missing we'll catch it in pre-flight
+  // validation (Step 1b) by reading from outline.protagonist.name. If both
+  // missing → throw at end of validation block instead of writing a chapter
+  // with a generic placeholder name.
+  let resolvedMainCharacter = (project.main_character || '').trim();
   try {
     const { data: extra } = await db
       .from('ai_story_projects')
@@ -180,9 +192,24 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     for (const f of validationFixes) console.log(`  ✓ ${f}`);
   }
 
+  // Hard fail if validation block didn't resolve a name. This would happen
+  // only if both project.main_character AND outline.protagonist.name are
+  // empty — a corrupt project. Silent fallback to "Nhân vật chính" would
+  // ship chapters with a placeholder name. Throw instead.
+  if (!resolvedMainCharacter) {
+    throw new Error(`Project ${options.projectId} has neither main_character nor outline.protagonist.name set. Refusing to write — silent fallback to placeholder would ship "Nhân vật chính" as MC name.`);
+  }
   const protagonistName = resolvedMainCharacter;
   const storyTitle = novel.title || project.world_description || `Project ${project.id}`;
-  const totalPlanned = project.total_planned_chapters || 1000;
+  // Hard fail on missing total_planned_chapters. Silent fallback to 1000
+  // would write 1000 chapters of a possibly-finished story or stop arc
+  // logic from triggering at the right point. Project.total_planned_chapters
+  // is set at spawn time (capped at MAX_PLANNED_CHAPTERS=600) — if missing
+  // here, project is corrupt.
+  if (!project.total_planned_chapters || project.total_planned_chapters < 50) {
+    throw new Error(`Project ${options.projectId} has invalid total_planned_chapters (${project.total_planned_chapters}). Refusing to write — silent fallback to 1000 would mis-pace the story.`);
+  }
+  const totalPlanned = project.total_planned_chapters;
   // Base target: explicit option > project setting > default. style_directives override takes precedence over project setting.
   const projectStyleDirectives = (project as { style_directives?: { target_chapter_length_override?: number; disable_chapter_split?: boolean } }).style_directives;
   const directiveOverride = projectStyleDirectives?.target_chapter_length_override;
