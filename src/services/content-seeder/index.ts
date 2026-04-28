@@ -1296,7 +1296,15 @@ Mỗi tiểu thuyết cần:
 2. "premise": Hook 1-2 câu ngắn gọn — PHẢI nêu rõ golden finger của nhân vật chính
 3. "mainCharacter": Tên nhân vật chính (Trung/Việt, 2-3 chữ)
 4. "mainCharacterProfile": Hồ sơ NV chính 120-220 chữ (tuổi/xuất thân/tính cách/năng lực/mục tiêu/điểm yếu)
-5. "description": Giới thiệu truyện 250-500 chữ tiếng Việt. Bao gồm: bối cảnh thế giới, nhân vật chính, xung đột chính, điểm hấp dẫn. Câu đầu phải HOOK. KHÔNG spoil kết.
+5. "description": MÔ TẢ TRUYỆN cho trang chi tiết (back-cover blurb), 200-350 chữ tiếng Việt CÓ DẤU đầy đủ. Format CHUẨN BLURB:
+   - ĐÚNG 3 đoạn (phân cách \\n\\n trong JSON string).
+   - Đoạn 1 (60-90 chữ): Hook mở đầu — bối cảnh CỤ THỂ + nhân vật chính (DÙNG TÊN — KHÔNG dùng "MC" / "nhân vật chính" / "main") + tình huống bất thường.
+   - Đoạn 2 (70-120 chữ): Tease năng lực / xung đột / mục tiêu. KHÔNG spoil cuối truyện.
+   - Đoạn 3 (40-90 chữ): Câu nhử + closing hook khiến reader muốn đọc.
+   - Tên nhân vật chính (giá trị "mainCharacter") PHẢI xuất hiện ÍT NHẤT 2 lần trong description.
+   - CẤM TUYỆT ĐỐI dùng các từ kỹ thuật/spec engine: "Bàn Tay Vàng", "MC", "Hệ thống X" (cụm này, "X" là placeholder), "Vòng lặp", "Sảng văn", "BOM", "out-play", "engine", "vả mặt", "khí vận chi tử", "Cấu trúc 4 hồi", "phế vật", "thiên kiêu" (mức quá meta).
+   - TIỀN TỆ Việt Nam: nếu truyện đặt trong bối cảnh Việt Nam (đô thị / quan trường / lịch sử Đại Nam / Đại Việt), DÙNG VND thật: "đồng / nghìn đồng / triệu đồng / tỷ đồng". KHÔNG dùng "nguyên" làm đơn vị tiền, KHÔNG dùng "xu" trừ khi rõ ràng là cổ đại Trung Hoa. Ví dụ đúng: "5 triệu đồng vốn liếng", "đất 200 nghìn đồng/m²".
+   - THÀNH PHỐ HƯ CẤU Việt Nam (parallel-world Đại Nam) lần đầu xuất hiện trong description PHẢI annotate tên thực ngay sau, dùng dấu ngoặc tròn: "Hải Long Đô (tựa TP. Hồ Chí Minh)", "Phượng Đô (tựa Hà Nội)", "Trung Đô (tựa Huế)" / "Cố Đô Trung Đô (tựa Cố Đô Huế)". Annotate 1 lần ở lần đầu nhắc, các lần sau dùng tên fictional.
 6. "shortSynopsis": Tóm tắt 2-3 câu (không spoil kết)
 7. "worldDescription": Mô tả thế giới 120-220 chữ (địa danh, thế lực, quy tắc)
 8. "${requiredKey || 'required_system'}": Trường BẮT BUỘC cho thể loại này. ${requiredRule} Ví dụ format: ${requiredExample}
@@ -1441,13 +1449,22 @@ CHÚ Ý:
       .filter((item): item is Record<string, unknown> => this.isObjectRecord(item) && !!item.title && !!item.premise)
       .map((item) => {
         const requiredValue = requiredKey && item[requiredKey] ? String(item[requiredKey]).trim() : undefined;
+        const mainCharacter = String(item.mainCharacter || this.randomMCName()).trim();
+
+        // Sanitize description: strip tech terms that leak engine spec voice
+        // (Bàn Tay Vàng, Hệ thống X, MC, Sảng văn, etc.) and patch fake VN
+        // currency to real VND. Annotate fictional VN cities with real names.
+        // We sanitize instead of rejecting because parsed batches are
+        // expensive — better to clean a 90% blurb than throw away.
+        const rawDesc = item.description ? String(item.description).trim() : undefined;
+        const sanitizedDesc = rawDesc ? this.sanitizeBlurb(rawDesc, mainCharacter) : undefined;
 
         return {
           title: String(item.title).trim(),
           premise: String(item.premise).trim(),
-          mainCharacter: String(item.mainCharacter || this.randomMCName()).trim(),
+          mainCharacter,
           mainCharacterProfile: item.mainCharacterProfile ? String(item.mainCharacterProfile).trim() : undefined,
-          description: item.description ? String(item.description).trim() : undefined,
+          description: sanitizedDesc,
           shortSynopsis: item.shortSynopsis ? String(item.shortSynopsis).trim() : undefined,
           worldDescription: item.worldDescription ? String(item.worldDescription).trim() : undefined,
           requiredFieldKey: requiredKey,
@@ -1455,6 +1472,55 @@ CHÚ Ý:
           coverPrompt: item.coverPrompt ? String(item.coverPrompt).trim() : undefined,
         };
       });
+  }
+
+  /**
+   * Post-generation cleanup for novel descriptions.
+   * Removes engine-spec terms (Bàn Tay Vàng / MC / Hệ thống / Sảng văn / vả mặt /
+   * khí vận chi tử) that leak from prompts into reader-facing blurbs, fixes
+   * fake VN currency to real VND, and adds real-city annotations to fictional
+   * Đại Nam place names. Validation logic mirrors what the prompt requires —
+   * defense-in-depth so a single missed instruction doesn't ship to readers.
+   */
+  private sanitizeBlurb(desc: string, mainCharacter: string): string {
+    let s = desc;
+
+    // 1) Replace engine spec terms with reader-friendly alternatives
+    const TECH_TERM_REPLACEMENTS: Array<[RegExp, string]> = [
+      [/\bMC\b/g, mainCharacter],
+      [/\bMain\b/g, mainCharacter],
+      [/Bàn Tay Vàng/gi, 'năng lực đặc biệt'],
+      [/Sảng văn(\s+(\w+))?/gi, ''],
+      [/Cấu trúc 4 hồi/gi, ''],
+      [/Vòng lặp \w+/gi, ''],
+      [/\bvả mặt\b/gi, 'lật mặt'],
+      [/khí vận chi tử/gi, 'kẻ thiên mệnh'],
+      [/\bout-play\b/gi, 'vượt mặt'],
+      [/\bengine\b/gi, ''],
+    ];
+    for (const [re, rep] of TECH_TERM_REPLACEMENTS) {
+      s = s.replace(re, rep);
+    }
+
+    // 2) Fix fake VN currency (only number-prefixed unit, not "nguyên tác")
+    s = s.replace(/(\d[\d.,]*)\s*xu\b/g, '$1 đồng');
+    s = s.replace(/(\d[\d.,]*)\s*nguyên\b/g, '$1 nghìn đồng');
+
+    // 3) Annotate fictional Đại Nam cities at first occurrence only.
+    const CITY_ANNOTATIONS: Array<[RegExp, string]> = [
+      [/Hải Long Đô(?!\s*\(.*?Hồ Chí Minh)/, 'Hải Long Đô (tựa TP. Hồ Chí Minh)'],
+      [/Phượng Đô(?!\s*\(.*?Hà Nội)/, 'Phượng Đô (tựa Hà Nội)'],
+      [/Cố Đô Trung Đô(?!\s*\(.*?Huế)/, 'Cố Đô Trung Đô (tựa Cố Đô Huế)'],
+      [/(?<!Cố Đô )Trung Đô(?!\s*\(.*?Huế)/, 'Trung Đô (tựa Huế)'],
+    ];
+    for (const [re, rep] of CITY_ANNOTATIONS) {
+      s = s.replace(re, rep); // first match only — JS .replace without /g
+    }
+
+    // 4) Collapse double spaces left over from removals
+    s = s.replace(/[ \t]+/g, ' ').replace(/\s+\n/g, '\n').trim();
+
+    return s;
   }
 
   /**
