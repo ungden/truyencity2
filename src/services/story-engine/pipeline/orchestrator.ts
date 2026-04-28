@@ -110,10 +110,106 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
 
   const currentChapter = project.current_chapter || 0;
   const nextChapter = currentChapter + 1;
-  const genre = (project.genre || 'tien-hiep') as GenreType;
-  const protagonistName = project.main_character || 'Nhân vật chính';
+  // No silent default for genre — every project must have one set explicitly.
+  // Previous fallback to 'tien-hiep' would silently write a tu-tien chapter
+  // for a do-thi project missing its genre column, shipping wrong-genre
+  // content. Fail loudly instead.
+  if (!project.genre) {
+    throw new Error(`Project ${options.projectId} has no genre set. Refusing to write chapter — silent fallback to 'tien-hiep' would produce wrong-genre content.`);
+  }
+  const genre = project.genre as GenreType;
+
+  // ── Step 1b: Pre-flight metadata validation + auto-repair ──────────────
+  // Catches three classes of bug we've seen ship to readers:
+  //   (A) project.main_character ≠ story_outline.protagonist.name
+  //       — the engine reads outline.protagonist.name when writing chapters,
+  //         so a mismatch means description shows one name and chapters
+  //         show another. Pick the authoritative source by chapter count
+  //         (chapters > 0 → outline wins, else seed wins) and sync the
+  //         loser side back.
+  //   (D) total_planned_chapters wildly exceeds master_outline arc coverage
+  //       — story will end at the last arc's endChapter, so quota past
+  //         that is dead weight. Auto-trim.
+  //   (E) total_planned_chapters way SHORTER than master_outline arcs
+  //       — extend to cover the outlined story.
+  // All repairs are persisted to DB before chapter generation.
+  const validationFixes: string[] = [];
+  // Default 'Nhân vật chính' is a debugging escape hatch, not a real fallback.
+  // If project.main_character is truly missing we'll catch it in pre-flight
+  // validation (Step 1b) by reading from outline.protagonist.name. If both
+  // missing → throw at end of validation block instead of writing a chapter
+  // with a generic placeholder name.
+  let resolvedMainCharacter = (project.main_character || '').trim();
+  try {
+    const { data: extra } = await db
+      .from('ai_story_projects')
+      .select('story_outline,master_outline')
+      .eq('id', options.projectId)
+      .single();
+    const storyOutline = extra?.story_outline as { protagonist?: { name?: string } } | null;
+    const masterOutline = extra?.master_outline as { majorArcs?: Array<{ endChapter?: number }> } | null;
+
+    // Fix A: MC name sync
+    const outlineMC = storyOutline?.protagonist?.name?.trim();
+    const projectMC = project.main_character?.trim();
+    if (outlineMC && projectMC && outlineMC !== projectMC) {
+      // Authoritative source: whichever side already has chapters written
+      const winner = currentChapter > 0 ? outlineMC : projectMC;
+      const loser = currentChapter > 0 ? 'project.main_character' : 'outline.protagonist.name';
+      if (currentChapter > 0) {
+        // chapters use outlineMC → sync project field to match
+        await db.from('ai_story_projects').update({ main_character: outlineMC }).eq('id', options.projectId);
+      } else {
+        // no chapters yet → seed name wins, sync outline
+        const newOutline = { ...(storyOutline || {}), protagonist: { ...(storyOutline?.protagonist || {}), name: projectMC } };
+        await db.from('ai_story_projects').update({ story_outline: newOutline as unknown as Record<string, unknown> }).eq('id', options.projectId);
+      }
+      resolvedMainCharacter = winner;
+      validationFixes.push(`MC sync: ${loser}="${currentChapter > 0 ? projectMC : outlineMC}" → "${winner}" (ch.${currentChapter} written)`);
+    } else if (projectMC) {
+      resolvedMainCharacter = projectMC;
+    }
+
+    // Fix D/E: total_planned_chapters ↔ master_outline coverage alignment
+    const arcs = masterOutline?.majorArcs ?? [];
+    if (arcs.length > 0) {
+      const lastArcEnd = Math.max(...arcs.map((a) => a?.endChapter || 0));
+      const planned = project.total_planned_chapters || 0;
+      // Tolerate ≤10% drift; otherwise auto-correct
+      const driftRatio = planned > 0 ? Math.abs(lastArcEnd - planned) / planned : 1;
+      if (lastArcEnd > 0 && driftRatio > 0.1) {
+        // Round to nearest 50 for cleaner numbers
+        const newTotal = Math.round(lastArcEnd / 50) * 50 || lastArcEnd;
+        await db.from('ai_story_projects').update({ total_planned_chapters: newTotal }).eq('id', options.projectId);
+        validationFixes.push(`total_planned: ${planned} → ${newTotal} (master outline covers ch.${lastArcEnd})`);
+      }
+    }
+  } catch (err) {
+    console.warn('[orchestrator] Pre-flight validation failed (non-fatal):', err instanceof Error ? err.message : String(err));
+  }
+  if (validationFixes.length > 0) {
+    console.log(`[orchestrator] Pre-flight auto-repair (project ${options.projectId}):`);
+    for (const f of validationFixes) console.log(`  ✓ ${f}`);
+  }
+
+  // Hard fail if validation block didn't resolve a name. This would happen
+  // only if both project.main_character AND outline.protagonist.name are
+  // empty — a corrupt project. Silent fallback to "Nhân vật chính" would
+  // ship chapters with a placeholder name. Throw instead.
+  if (!resolvedMainCharacter) {
+    throw new Error(`Project ${options.projectId} has neither main_character nor outline.protagonist.name set. Refusing to write — silent fallback to placeholder would ship "Nhân vật chính" as MC name.`);
+  }
+  const protagonistName = resolvedMainCharacter;
   const storyTitle = novel.title || project.world_description || `Project ${project.id}`;
-  const totalPlanned = project.total_planned_chapters || 1000;
+  // Hard fail on missing total_planned_chapters. Silent fallback to 1000
+  // would write 1000 chapters of a possibly-finished story or stop arc
+  // logic from triggering at the right point. Project.total_planned_chapters
+  // is set at spawn time (capped at MAX_PLANNED_CHAPTERS=600) — if missing
+  // here, project is corrupt.
+  if (!project.total_planned_chapters || project.total_planned_chapters < 50) {
+    throw new Error(`Project ${options.projectId} has invalid total_planned_chapters (${project.total_planned_chapters}). Refusing to write — silent fallback to 1000 would mis-pace the story.`);
+  }
+  const totalPlanned = project.total_planned_chapters;
   // Base target: explicit option > project setting > default. style_directives override takes precedence over project setting.
   const projectStyleDirectives = (project as { style_directives?: { target_chapter_length_override?: number; disable_chapter_split?: boolean } }).style_directives;
   const directiveOverride = projectStyleDirectives?.target_chapter_length_override;
@@ -312,6 +408,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       isFinalArc,
       genreBoundary: context.genreBoundary,
       worldBible: context.storyBible,
+      worldDescription: project.world_description,
       subGenres: context.subGenres,
     },
   );

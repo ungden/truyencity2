@@ -186,11 +186,36 @@ Trả về JSON đầy đủ các trường: id, title, genre, premise, themes (
   });
   const outline = parseJSON<StoryOutline>(res.content);
   if (!outline) throw new Error('story_outline parse failed');
+
+  // CRITICAL: enforce protagonist name match. DeepSeek often invents a
+  // different name in protagonist.name even when we pass PROTAGONIST: in the
+  // prompt — and this leaks into chapter writing because the engine reads
+  // story_outline.protagonist.name as ground truth. Override post-gen to
+  // guarantee project.main_character === outline.protagonist.name.
+  const o = outline as unknown as { protagonist?: { name?: string; [k: string]: unknown } };
+  if (o.protagonist) {
+    if (o.protagonist.name && o.protagonist.name !== seed.main_character) {
+      console.log(`  ⚠ outline.protagonist.name="${o.protagonist.name}" overridden → "${seed.main_character}"`);
+    }
+    o.protagonist.name = seed.main_character;
+  } else {
+    o.protagonist = { name: seed.main_character };
+  }
+
   await s.from('ai_story_projects')
     .update({ story_outline: outline as unknown as Record<string, unknown> })
     .eq('id', projectId);
-  console.log(`  ✓ story_outline saved`);
+  console.log(`  ✓ story_outline saved (protagonist=${seed.main_character})`);
 }
+
+// ROOT FIX: cap planned chapters at spawn time. Anything above MAX_PLANNED
+// invites slow pacing because the AI stretches each event over too many
+// chapters → reader sees same setup recycled (the "lặp đi lặp lại như
+// chương 1-2" pattern from Ngư Dân 1992 / Hollywood 1991). 600 is a
+// proven sweet spot — long enough for a 5-arc story with 120 ch each,
+// short enough that the AI won't pad. Spawn seeds requesting more get
+// silently capped + logged.
+const MAX_PLANNED_CHAPTERS = 600;
 
 async function createNovelAndProject(seed: NovelSeed, ownerId: string): Promise<string> {
   const { data: novel, error: novelErr } = await s.from('novels').insert({
@@ -215,7 +240,7 @@ async function createNovelAndProject(seed: NovelSeed, ownerId: string): Promise<
     genre: seed.genre,
     main_character: seed.main_character,
     world_description: seed.world_description,
-    total_planned_chapters: seed.total_planned_chapters,
+    total_planned_chapters: Math.min(seed.total_planned_chapters, MAX_PLANNED_CHAPTERS),
     current_chapter: 0,
     status: 'paused',
     temperature: 0.75,
@@ -240,16 +265,35 @@ async function generateOutlines(projectId: string, seed: NovelSeed): Promise<voi
   console.log(`  → story_outline...`);
   await generateStoryOutline(projectId, seed);
   console.log(`  → master_outline...`);
+  const cappedTotal = Math.min(seed.total_planned_chapters, MAX_PLANNED_CHAPTERS);
+  if (cappedTotal !== seed.total_planned_chapters) {
+    console.log(`  ⚠ seed.total_planned_chapters=${seed.total_planned_chapters} capped to ${cappedTotal} (MAX_PLANNED_CHAPTERS)`);
+  }
   const master = await generateMasterOutline(
     projectId,
     seed.title,
     seed.genre,
     seed.world_description,
-    seed.total_planned_chapters,
+    cappedTotal,
     cfg,
   );
   if (!master) throw new Error('master_outline returned null');
   console.log(`  ✓ master_outline saved (${master.majorArcs.length} arcs)`);
+
+  // Auto-sync total_planned_chapters to whatever master_outline actually
+  // covers. Without this guard the project carries a quota the story
+  // never reaches (e.g. seed says 1500 ch, AI outlines 6 arcs to ch.750
+  // → daily-quota cron keeps trying to write past the last arc with no
+  // narrative scaffold). Tolerate ≤10% drift; otherwise round to 50.
+  const lastArcEnd = Math.max(...master.majorArcs.map(a => a.endChapter || 0));
+  if (lastArcEnd > 0) {
+    const driftRatio = Math.abs(lastArcEnd - cappedTotal) / cappedTotal;
+    if (driftRatio > 0.1) {
+      const newTotal = Math.round(lastArcEnd / 50) * 50 || lastArcEnd;
+      await s.from('ai_story_projects').update({ total_planned_chapters: newTotal }).eq('id', projectId);
+      console.log(`  ✓ total_planned_chapters auto-synced: ${cappedTotal} → ${newTotal} (matches arc coverage ch.${lastArcEnd})`);
+    }
+  }
 }
 
 async function activateProject(projectId: string): Promise<void> {

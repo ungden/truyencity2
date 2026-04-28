@@ -31,7 +31,7 @@
 import { callGemini } from '../utils/gemini';
 import { parseJSON } from '../utils/json-repair';
 import { getStyleByGenre, buildTitleRulesPrompt, GOLDEN_CHAPTER_REQUIREMENTS, ENGAGEMENT_CHECKLIST, getGenreEngagement, getGenreAntiCliche } from '../config';
-import { VN_PRONOUN_GUIDE, SUB_GENRE_RULES, isNonCombatGenre } from '../templates';
+import { VN_PRONOUN_GUIDE, SUB_GENRE_RULES, isNonCombatGenre, requiresVndCurrency } from '../templates';
 import { getConstraintExtractor } from '../memory/constraint-extractor';
 import { GENRE_CONFIG } from '../../../lib/types/genre-config';
 import { buildStyleContext, getEnhancedStyleBible, CLIFFHANGER_TECHNIQUES } from '../memory/style-bible';
@@ -237,6 +237,33 @@ TẤU HÀI WEBNOVEL (BẮT BUỘC): Mỗi chương ≥1 khoảnh khắc hài hư
 
 CHỐNG LẶP TỪ: KHÔNG dùng cùng tính từ/màu sắc quá 3 lần trong chương. Sau lần 3 → dùng từ đồng nghĩa. TUYỆT ĐỐI KHÔNG dùng cùng tính từ 2 lần trong 1 đoạn.
 
+CHỐNG NỘI DUNG NHẠY CẢM CHÍNH TRỊ (BẮT BUỘC TUYỆT ĐỐI):
+TruyenCity là nền tảng văn học giải trí cho độc giả Việt Nam — KHÔNG phải báo chí chính trị. Cấm chèn các yếu tố nhạy cảm chính trị vào bất kỳ chương nào, đặc biệt trong truyện có yếu tố Việt Nam / người Việt ở nước ngoài / lịch sử cận đại VN:
+
+CẤM TUYỆT ĐỐI nhắc tên / tham chiếu / xây dựng cốt truyện liên quan:
+- Tên báo chí / tổ chức / đảng phái chính trị có thật của cộng đồng người Việt hải ngoại (vd "Người Việt", "Người Việt Tự Do", "Việt Nam Cộng Hòa", "Mặt Trận", "Sài Gòn Nhỏ Cali", "Văn Bút Hải Ngoại"...).
+- Thuật ngữ ý thức hệ chính trị: "tự do", "cộng sản", "tư bản", "giải phóng", "tháng tư đen", "thuyền nhân", "tỵ nạn chính trị", "vượt biên", "1975" (dùng làm năm sự kiện chính trị).
+- Sự kiện lịch sử chính trị 1945-1995: chiến tranh Việt Nam, đấu tranh giải phóng, cải cách ruộng đất, đổi mới chính trị, biểu tình.
+- Tên nhân vật lãnh đạo có thật: bất kỳ Tổng Bí Thư / Chủ Tịch / Tướng / Tổng Thống VNCH / lãnh đạo cách mạng.
+- Tổ chức quân sự / tình báo có thật (CIA + miền Nam, Cộng Sản miền Bắc, an ninh quốc gia VN hiện đại).
+- Tôn giáo + chính trị (Phật giáo Hòa Hảo, Cao Đài, vấn đề Thiên Chúa giáo Vatican).
+
+THAY THẾ HỢP LỆ (cho truyện có người Việt hải ngoại):
+- Gia đình di cư = "gia đình chuyển đến Mỹ/Pháp/Úc để học/làm việc". KHÔNG nêu lý do chính trị, KHÔNG mention chiến tranh.
+- Khu phố Việt = "khu phố châu Á" / "khu phố cộng đồng Việt" — KHÔNG dùng "Little Saigon" làm chỉ dấu chính trị.
+- Báo chí cộng đồng (nếu cần) = "tờ báo cộng đồng Việt", "tạp chí ẩm thực Việt", "tạp chí học thuật" — KHÔNG dùng tên thật.
+- Năm 1975 (nếu phải nhắc) = nhắc như "đầu thập niên 70" — không gắn với sự kiện chính trị.
+
+LƯU Ý: nếu cốt truyện BẮT BUỘC phải đụng chính trị (vd lich-su novel viết về triều đại cụ thể), DÙNG TÊN ĐẠI NAM / TÂN LỤC / fictional country names đã thiết lập trong world_description, KHÔNG dùng tên Việt Nam / Mỹ / Trung Quốc thật.
+
+CHỐNG LẶP SETUP (TRỌNG SINH / GOLDEN-FINGER NOVELS — CỰC KỲ QUAN TRỌNG):
+Setup gốc của truyện (rebirth, bàn tay vàng, nguyên do MC có lợi thế) đã được thiết lập ở chương 1-3. Reader đã biết. Từ chương 4 trở đi, KHÔNG được dồn nửa chương vào hồi tưởng/giải thích lại setup đó. Cụ thể:
+- Cụm "kiếp trước" / "30 năm tương lai" / "ký ức tiền kiếp" / "tương lai biết trước" — TỐI ĐA 3 lần/chương trong narration. Nếu bắt buộc dùng nhiều hơn (vd flashback bắt buộc theo arc plan) → ghép vào 1 scene flashback duy nhất, KHÔNG rải đều cả chương.
+- Tên golden finger ("Hệ Thống", "Bàn Tay Vàng", "Hải Tâm", "Đồ Giám Yêu Ma", v.v.) — TỐI ĐA 5 lần/chương trong narration. Sau lần 3 → dùng đại từ "nó", "thứ năng lực ấy", "hệ thống trong đầu", v.v.
+- KHÔNG re-narrate cùng 1 flashback đã xuất hiện ở chương trước. Reader nhớ. Nếu cần callback, dùng 1 câu ngắn ("Như đêm tỉnh lại trong căn phòng trọ năm ấy"), KHÔNG kể lại nguyên scene.
+- KHÔNG dồn 50% chương vào nội tâm reflect "kiếp này phải khác kiếp trước". Mỗi chương ƯU TIÊN: hành động cụ thể (đi đâu, làm gì, gặp ai, kết quả ra sao). Nội tâm reflect chỉ nên 10-20% volume chương.
+Mục đích: tránh cảm giác "lặp đi lặp lại như chương 1-2" cho reader.
+
 CHỐNG LẶP CẤU TRÚC AI (CỰC KỲ QUAN TRỌNG):
 - CẤM "X là một Y" quá 3 lần/chương. Thay: "X — Y", "X, tên Y", hoặc diễn đạt khác. VD: thay "Hắn là một kẻ lãnh đạo tàn nhẫn" → "Tên lãnh đạo tàn nhẫn ấy"
 - CẤM "bắt đầu + động từ" quá 3 lần/chương. Thay: dùng trực tiếp động từ. VD: thay "bắt đầu run rẩy" → "run lẩy bẩy", "rung lên từng đợt"
@@ -391,6 +418,16 @@ KIỂM TRA MÂU THUẪN (BẮT BUỘC — coherence chặt cho long-form):
 - Nếu MC ở location A chương trước, location B chương này KHÔNG có scene di chuyển -> type "continuity", severity "major"
 - Nếu economic/resource logic vô lý (do-thi: MC chi tiêu vượt tài chính đã thiết lập) -> type "continuity", severity "major"
 - Nếu nhân vật HÀNH XỬ KHÁC tính cách (50%) nhưng có thể rationalize -> type "continuity", severity "major" (khi không phải personality shift hoàn toàn)
+- MATH SANITY (cho do-thi/quan-truong/lich-su VN/kinh-doanh): nếu MC có X đồng/tỷ + chi Y mà Y > X mà KHÔNG có kênh thu nhập / vay vốn được setup từ trước → type "continuity" severity "critical", REWRITE. KHÔNG để math impossible kiểu "có 5 triệu tiêu 27 triệu".
+- VND CURRENCY (Vietnam-set genres do-thi/quan-truong/lich-su VN/linh-di Dân Quốc): nếu chapter dùng "X xu" / "X nguyên" / "X lượng vàng" làm đơn vị tiền tệ giao dịch hàng ngày (mua bán, vay nợ, lương, giá đất) → type "continuity" severity "critical", REWRITE. CHỈ cho phép "đồng / nghìn đồng / triệu đồng / tỷ đồng" (VND). NGOẠI LỆ duy nhất: tu-tiên/huyen-huyen/kiem-hiep/lich-su cổ đại Hoa Hạ → cho phép "đồng vàng/bạc/linh thạch" theo bối cảnh.
+- ECONOMIC LEDGER ENFORCEMENT: nếu pre-write context có khối "[TÀI CHÍNH / TÀI SẢN]" liệt kê số dư MC, chapter này CẤM cho MC chi tiêu/đầu tư vượt số đó MÀ KHÔNG có deal/vay/thu nhập rõ ràng trong cùng chapter. Vi phạm → "continuity" severity "critical".
+- POLITICAL SAFETY (TRỌNG TÂM): nếu chương chứa bất kỳ tên báo / tổ chức / đảng phái chính trị có thật của cộng đồng người Việt hải ngoại ("Người Việt", "Người Việt Tự Do", "Việt Nam Cộng Hòa", "Mặt Trận Quốc Gia", "Văn Bút Hải Ngoại"), thuật ngữ ý thức hệ chính trị ("tự do" làm slogan, "cộng sản", "giải phóng", "tháng tư đen", "thuyền nhân", "tỵ nạn chính trị", "vượt biên"), tên lãnh đạo có thật (Tổng Bí Thư / Chủ Tịch / Tướng VNCH...), hoặc setup gia đình "di cư 1975 sau chiến tranh" / "tỵ nạn chính trị" → issue type "continuity", severity "critical", REWRITE. Đây là content-safety hard cap, KHÔNG ngoại lệ.
+- ANTI-MONOLOGUE REPETITION: tránh để MC sa đà reflect lại cùng nội dung (rebirth/golden finger origin) mỗi chương.
+  → Nếu chương có ≥4 lần cụm "kiếp trước" / "30 năm tương lai" / "ký ức tiền kiếp" / "tương lai biết trước" trong narration → "quality" severity "moderate".
+  → Nếu ≥6 lần → "quality" severity "major", REVISE.
+  → Nếu cùng 1 nội dung flashback/origin được tái diễn ≥2 lần trong chương khi reader đã biết từ chương trước → "quality" severity "moderate".
+  → Tên golden finger (Hệ Thống / Bàn Tay Vàng / "Hải Tâm" hoặc tên cụ thể của truyện) lặp ≥6 lần trong narration → "quality" severity "moderate".
+  Mục đích: ép Writer narrate progressive content thay vì lặp lại setup. MC có thể NHẮC ngắn 1-2 lần/chương cho reader mới, nhưng KHÔNG dồn toàn chương vào hồi tưởng cùng 1 thông tin.
 
 VERDICT:
 - APPROVE (overallScore >= 6 VÀ đủ từ): approved=true, requiresRewrite=false
@@ -424,6 +461,11 @@ export interface WriteChapterOptions {
   isFinalArc?: boolean;
   genreBoundary?: string;
   worldBible?: string;
+  /** Project's world_description text. Used by Critic to detect Vietnam-set
+   *  novels via regex sniff (Đại Nam / Hà Nội / Sài Gòn / Dân Quốc) so the
+   *  VND currency hard-check fires on linh-di Dân Quốc / lich-su Đại Việt
+   *  novels too, not just genres in VND_CURRENCY_GENRES. */
+  worldDescription?: string | null;
   /** Sub-genres for blending (e.g., ['trong-sinh','kinh-doanh']). Threaded into VN pronoun + sub-genre rules. */
   subGenres?: string[];
 }
@@ -443,17 +485,31 @@ export async function writeChapter(
   let rewriteInstructions = '';
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
-    // Step 1: Architect
-    const outline = await runArchitect(
-      chapterNumber,
-      contextString,
-      targetWordCount,
-      previousTitles,
-      rewriteInstructions,
-      config,
-      options,
-      genre,
-    );
+    // Step 1: Architect — throws on placeholder/empty scenes. If we have
+    // retries left, treat throw as a quality failure: feed the error message
+    // back as rewriteInstructions and continue. This keeps the engine from
+    // falling back to silent placeholder scenes.
+    let outline: ChapterOutline;
+    try {
+      outline = await runArchitect(
+        chapterNumber,
+        contextString,
+        targetWordCount,
+        previousTitles,
+        rewriteInstructions,
+        config,
+        options,
+        genre,
+      );
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (attempt < maxRetries - 1) {
+        rewriteInstructions = `Architect lỗi: ${msg}. Lần này phải trả về scenes ĐẦY ĐỦ với setting/conflict/resolution cụ thể, KHÔNG empty placeholder. Tuân thủ brief đã cấp.`;
+        console.warn(`[Architect] attempt ${attempt + 1}/${maxRetries} failed: ${msg}`);
+        continue;
+      }
+      throw err;
+    }
 
     // Step 2: Writer
     let content = await runWriter(
@@ -467,8 +523,19 @@ export async function writeChapter(
       options,
     );
 
-    // Request continuation if truncated
+    // Hard-fail if Writer returned essentially nothing — likely an LLM
+    // error / empty response. Don't ship a stub. Force regen with retry.
     const wordCount = countWords(content);
+    if (wordCount < 200) {
+      if (attempt < maxRetries - 1) {
+        rewriteInstructions = `Writer trả về ${wordCount} từ, gần như trống. Có thể do LLM lỗi. Viết LẠI đầy đủ ${targetWordCount} từ theo outline.`;
+        console.warn(`[Writer] Chapter ${chapterNumber} attempt ${attempt + 1}/${maxRetries}: content too short (${wordCount} words), regen`);
+        continue;
+      }
+      throw new Error(`Writer chapter ${chapterNumber}: returned ${wordCount} words after ${maxRetries} attempts. Refusing to save stub content.`);
+    }
+
+    // Request continuation if truncated
     if (wordCount < targetWordCount * 0.7) {
       const continuation = await requestContinuation(content, outline, targetWordCount, config, options?.projectId);
       if (continuation) content = content + '\n\n' + continuation;
@@ -477,6 +544,25 @@ export async function writeChapter(
     // Clean content
     content = cleanContent(content);
     const finalWordCount = countWords(content);
+
+    // ── Hard-Fail Gate (pre-Critic) ─────────────────────────────────────────
+    // Cheap regex checks that bypass the Critic round-trip. If Writer has
+    // obviously fallen back to repetition padding instead of executing the
+    // chapter brief, force regen with a stronger correction instruction
+    // BEFORE spending tokens on Critic. Two violations are auto-rejectable:
+    //   1. Setup-word density (kiếp trước / 30 năm tương lai / etc.) above
+    //      a hard threshold proves Writer ignored the WRITER_SYSTEM rule.
+    //   2. Golden-finger name density above threshold = same fallback.
+    // If we caught a violation and have retries left, skip Critic and force
+    // a tighter Writer pass with explicit correction.
+    if (attempt < maxRetries - 1) {
+      const hardFailReason = detectHardFallback(content, options);
+      if (hardFailReason) {
+        rewriteInstructions = `HARD-FAIL: ${hardFailReason}. KHÔNG được lặp setup. Chương phải narrate đúng các sự kiện trong outline, KHÔNG chèn padding hồi tưởng. Brief đã liệt kê hành động cụ thể — viết chính xác hành động đó, KHÔNG lan man về kiếp trước / golden finger.`;
+        console.warn(`[Writer] Hard-fail attempt ${attempt + 1}/${maxRetries}: ${hardFailReason}`);
+        continue;
+      }
+    }
 
     // Step 3: Critic
     const critic = await runCritic(
@@ -488,6 +574,7 @@ export async function writeChapter(
       options?.isFinalArc === true,
       options?.projectId,
       genre,
+      options?.worldDescription,
     );
 
     if (critic.requiresRewrite && attempt < maxRetries - 1) {
@@ -645,9 +732,20 @@ Trả về JSON ChapterOutline:
     throw new Error(`Architect chapter ${chapterNumber}: JSON parse failed — raw: ${res.content.slice(0, 300)}`);
   }
 
-  // Validate: ensure enough scenes
+  // Validate: ensure enough scenes. Previously silently synthesized empty
+  // placeholder scenes (setting:'', conflict:'', resolution:'') which the
+  // Writer then narrated as filler — Writer fell back to padding from
+  // setup/world_description because the brief was empty. Now throw so the
+  // outer retry loop calls Architect again with the rewriteInstructions.
   if (!parsed.scenes || parsed.scenes.length < minScenes) {
-    parsed.scenes = generateMinimalScenes(minScenes, wordsPerScene, parsed.pov || options?.protagonistName || '');
+    throw new Error(`Architect chapter ${chapterNumber}: returned ${parsed.scenes?.length ?? 0} scenes, need ≥${minScenes}. Refusing to synthesize empty placeholder scenes (would force Writer to pad).`);
+  }
+  // Validate: scenes have non-empty narrative fields. If Architect returned
+  // scenes with empty goal/conflict/resolution, those are essentially
+  // placeholders too — Writer would pad. Force regen.
+  const emptyScenes = parsed.scenes.filter(sc => !sc.goal?.trim() || !sc.setting?.trim());
+  if (emptyScenes.length > parsed.scenes.length / 2) {
+    throw new Error(`Architect chapter ${chapterNumber}: ${emptyScenes.length}/${parsed.scenes.length} scenes have empty goal/setting. Refusing to pass to Writer (would produce padding).`);
   }
 
   // Fix scene word estimates if too low
@@ -906,6 +1004,7 @@ async function runCritic(
   isFinalArc: boolean,
   projectId?: string,
   genre?: GenreType,
+  worldDescription?: string | null,
 ): Promise<CriticOutput> {
   const wordCount = countWords(content);
   const wordRatio = wordCount / targetWords;
@@ -1005,7 +1104,19 @@ KIỂM TRA TUÂN THỦ QUALITY MODULES (NẾU CÓ THÔNG TIN):
 - Nếu MC tham gia "giải đấu game/võ thuật" làm trục chính chương trong khi genre "${genre}" là kinh doanh/chính trường/tình cảm → issue "continuity", severity "critical", REWRITE.
 - Conflict cho thể loại này PHẢI là thương chiến/chính trị/tình cảm — KHÔNG vũ lực. Nếu chương resolve conflict bằng vũ lực → REWRITE bằng phương án thương mại/đàm phán/lobby/PR.`
       : '';
-    const res = await callGemini(prompt, { ...config, temperature: 0.2, maxTokens: 4096, systemPrompt: CRITIC_SYSTEM + nonCombatGuard }, { jsonMode: true, tracking: projectId ? { projectId, task: 'critic', chapterNumber: outline.chapterNumber } : undefined });
+    // VND currency hard check — applies to Vietnam-set genres OR any genre
+    // whose world_description contains explicit VN markers (Đại Nam, Hà Nội,
+    // Sài Gòn, Dân Quốc...). Catches "X xu / X nguyên / X lượng" leakage
+    // from TQ webnovel templates into Vietnamese-set business stories.
+    const vndGuard = genre && requiresVndCurrency(genre, worldDescription)
+      ? `\n\nVND CURRENCY HARD CHECK (Vietnam-set genre "${genre}"):
+- Nếu chương có cụm \\d+ kèm "xu", "nguyên", hoặc "lượng vàng/lượng bạc" làm đơn vị tiền giao dịch hàng ngày (mua bán, vay nợ, lương, giá đất) → issue type "continuity", severity "critical", verdict REWRITE.
+- Đơn vị tiền HỢP LỆ DUY NHẤT cho thể loại này: "đồng / nghìn đồng / triệu đồng / tỷ đồng" (VND).
+- Cho phép "lượng vàng" CHỈ khi đề cập như tài sản tích trữ/đầu tư (1 lượng ≈ 4-5 triệu đồng), KHÔNG dùng thanh toán hàng ngày.
+- Nếu phát hiện "tỷ xu" / "triệu nguyên" / "5 ngàn xu" → REWRITE thay bằng số đồng tương đương.
+- MATH SANITY: nếu MC có X đồng đầu chương + chi Y mà Y > X mà KHÔNG có thu nhập / vay vốn được setup rõ ràng → REWRITE.`
+      : '';
+    const res = await callGemini(prompt, { ...config, temperature: 0.2, maxTokens: 4096, systemPrompt: CRITIC_SYSTEM + nonCombatGuard + vndGuard }, { jsonMode: true, tracking: projectId ? { projectId, task: 'critic', chapterNumber: outline.chapterNumber } : undefined });
 
     if (!res.content) {
       // Fail closed: don't approve on error
@@ -1135,15 +1246,28 @@ KIỂM TRA TUÂN THỦ QUALITY MODULES (NẾU CÓ THÔNG TIN):
 }
 
 function createFailClosedCriticOutput(wordCount: number, targetWords: number): CriticOutput {
-  const wordRatio = wordCount / targetWords;
+  // True fail-closed: if Critic couldn't parse, we have ZERO signal about
+  // chapter quality. Previous version only required rewrite when word
+  // count was <60% — meaning a decent-length but flawed chapter (logic
+  // breaks, wrong MC name, fake currency) would ship silently.
+  // User feedback: "cấm fallback hết, vì cứ 1 bộ nó im im nó fallback
+  // là nó sẽ viết bậy nếu không theo đủ quy trình."
+  // → Always force rewrite on Critic parse failure. Caller's retry loop
+  // will burn an extra Writer call but the alternative is silent
+  // bug-shipping. If we exhaust retries the loop throws — better than
+  // saving bad content.
   return {
-    overallScore: 5,
-    dopamineScore: 5,
-    pacingScore: 5,
-    issues: [{ type: 'critic_error', description: 'Critic failed to respond', severity: 'major' }],
+    overallScore: 3,
+    dopamineScore: 3,
+    pacingScore: 3,
+    issues: [{
+      type: 'critic_error',
+      description: `Critic failed to parse output (wordCount=${wordCount}/${targetWords}). Forcing rewrite — no silent approval.`,
+      severity: 'critical',
+    }],
     approved: false,
-    requiresRewrite: wordRatio < 0.6,
-    rewriteInstructions: wordRatio < 0.6 ? `Thiếu từ: ${wordCount}/${targetWords}` : undefined,
+    requiresRewrite: true,
+    rewriteInstructions: `Critic không kiểm tra được chương này (parse failed). Viết lại CHẶT CHẼ theo brief, KHÔNG fallback padding. Đảm bảo: đủ từ ${targetWords}, không lặp setup, không lệch tên nhân vật/tiền tệ/địa danh.`,
   };
 }
 
@@ -1308,6 +1432,117 @@ function buildSignalReport(content: string): string {
 
 function countWords(text: string): number {
   return text.trim().split(/\s+/).filter(Boolean).length;
+}
+
+/**
+ * Hard-fail gate. Cheap regex check that catches the "Writer ignored the
+ * brief and padded with rebirth/golden-finger monologue" failure mode
+ * without spending Critic tokens. Returns a non-empty reason string when
+ * the chapter must be regenerated, or empty string when content passes.
+ *
+ * Caller (writeChapter loop) treats non-empty as a "force regen" signal
+ * and feeds the reason back to Writer as rewriteInstructions before
+ * Critic is even invoked. This is intentionally stricter than the Critic
+ * rule: Critic measures relative quality, this gate measures absolute
+ * floors. Writer can recover by following the brief.
+ *
+ * Floors (per-chapter, not per-arc):
+ *   - rebirth phrases ("kiếp trước", "30 năm tương lai", "ký ức tiền kiếp",
+ *     "tương lai biết trước"): >5 occurrences = fail
+ *   - common golden-finger names: >7 occurrences = fail. We sniff a small
+ *     dictionary of project-specific names from the world_description /
+ *     story_outline so e.g. "Hải Tâm" in a Ngư Dân chapter triggers, not
+ *     all golden fingers everywhere.
+ *
+ * The thresholds are deliberately above the Writer-side rule (3 / 5) so
+ * mild over-shooting still passes; only egregious padding fails.
+ */
+function detectHardFallback(content: string, options?: WriteChapterOptions): string {
+  // Politically charged terms — content-safety hard cap. Any single hit
+  // forces regen; this is not a density check. The list covers Vietnamese
+  // diaspora politics (post-1975 refugee identity / anti-communist press)
+  // and home-country political ideology — neither belongs in entertainment
+  // fiction on this platform. Common false-positives mitigated by case
+  // sensitivity (we match exact phrasing, not loose substrings).
+  const POLITICAL_TERMS = [
+    /\bNgười Việt Tự Do\b/,
+    /\bNgười Việt(?= báo| tạp chí| nhật báo| weekly)/i,  // "Người Việt báo" etc.
+    /\bViệt Nam Cộng Hòa\b/,
+    /\bVNCH\b/,
+    /\bMặt Trận(?:\s+(?:Quốc Gia|Giải Phóng|Tổ Quốc|Dân Tộc))/,
+    /\bVăn Bút Hải Ngoại\b/,
+    /\bSài Gòn Nhỏ\b/,
+    /\bLittle Saigon\b/,
+    /\btỵ nạn chính trị\b/,
+    /\bthuyền nhân\b/i,
+    /\bvượt biên\b/i,
+    /\btháng tư đen\b/i,
+    /\bgiải phóng miền Nam\b/i,
+    /\bcộng sản\b/i,
+    /\b30[\/\.\s\-]?4[\/\.\s\-]?1975\b/,
+    /\b1975(?:[^\d]|$).{0,40}(?:di cư|tỵ nạn|chiến tranh|sụp đổ|giải phóng|chính trị)/i,
+    /\bdi cư\b.{0,60}\b(?:sau chiến tranh|chính trị|1975|tỵ nạn)\b/i,
+  ];
+  for (const re of POLITICAL_TERMS) {
+    const match = content.match(re);
+    if (match) {
+      return `political content (matched "${match[0].slice(0, 50)}") — banned by content-safety guard`;
+    }
+  }
+
+  const REBIRTH_PHRASES = [
+    /\bkiếp trước\b/gi,
+    /\b30 năm tương lai\b/gi,
+    /\bký ức tiền kiếp\b/gi,
+    /\btương lai biết trước\b/gi,
+    /\bba mươi năm tương lai\b/gi,
+  ];
+  let rebirthCount = 0;
+  for (const re of REBIRTH_PHRASES) {
+    rebirthCount += (content.match(re) ?? []).length;
+  }
+  if (rebirthCount > 5) {
+    return `setup repetition (rebirth phrases ${rebirthCount}× in chapter, max 3 allowed in WRITER_SYSTEM, hard fail >5)`;
+  }
+
+  // Sniff golden-finger name from world_description. Common patterns:
+  //   "Bàn Tay Vàng — <Name>" or "golden finger ... <Name>"
+  //   '"<Name>" — passive cảm nhận'
+  //   "Hệ thống <Name>" or "<Name> — <ability>"
+  // Cap at the ones we've seen leak: Hải Tâm, Hệ Thống Nhắc Nhở, etc.
+  // For deterministic check we extract any 1-2 word capitalised phrase
+  // marked with em-dash in the world_description.
+  const world = options?.worldDescription || '';
+  const goldenFingerCandidates = new Set<string>();
+  // pattern: '"Hải Tâm" — passive...' or '"Hệ Thống Nhắc Nhở" cấp...'
+  const quotedRe = /[""]([A-ZÀÁÂÃĐÈÉÊÌÍÒÓÔÕÙÚĂẠ-Ỹ][^""]{2,30})[""]\s*[—\-–:]/g;
+  let m: RegExpExecArray | null;
+  while ((m = quotedRe.exec(world)) !== null) {
+    goldenFingerCandidates.add(m[1].trim());
+  }
+  // pattern: 'Bàn Tay Vàng (...): "Tên đặc biệt"' or 'Cheat: <Name>'
+  const cheatRe = /(?:Bàn Tay Vàng|Cheat|Golden Finger|Hệ thống|Hệ Thống)[^.\n]{0,80}?[""]([^""]{2,30})[""]/g;
+  while ((m = cheatRe.exec(world)) !== null) {
+    goldenFingerCandidates.add(m[1].trim());
+  }
+  // Common literal names that leak across novels — check generically too
+  const COMMON_GF = ['Hệ Thống Nhắc Nhở', 'Bàn Tay Vàng', 'Hệ Thống', 'Hải Tâm', 'Đồ Giám Yêu Ma', 'Sổ Sinh Tử'];
+  for (const name of COMMON_GF) {
+    if (world.includes(name)) goldenFingerCandidates.add(name);
+  }
+
+  for (const name of goldenFingerCandidates) {
+    if (!name || name.length < 3) continue;
+    // Whole-word-ish match to avoid matching substrings
+    const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const re = new RegExp(escapedName, 'g');
+    const count = (content.match(re) ?? []).length;
+    if (count > 7) {
+      return `golden-finger name "${name}" appears ${count}× in chapter (max 5 allowed in WRITER_SYSTEM, hard fail >7)`;
+    }
+  }
+
+  return '';
 }
 
 /**

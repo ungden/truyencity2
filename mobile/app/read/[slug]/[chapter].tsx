@@ -110,6 +110,9 @@ export default function ReadingScreen() {
   const { isTablet, readerPadding, readerMaxWidth } = useDevice();
   const insets = useSafeAreaInsets();
   const scrollRef = useRef<RNScrollView>(null);
+  // Tap detection: track touch start so we can distinguish tap from scroll
+  // without using Pressable wrapping (which competes with ScrollView for responder).
+  const touchStartRef = useRef<{ x: number; y: number; t: number } | null>(null);
   const chapterNumber = parseInt(chapter || "1", 10);
 
   // Keep screen awake while reading
@@ -919,9 +922,34 @@ export default function ReadingScreen() {
         />
       </View>
 
-      {/* ── Content area with tap zones ── */}
-      <Pressable
-        onPress={(e) => handleTapZone(e.nativeEvent.pageX)}
+      {/* ── Content area with tap zones ──
+           Use a plain View + manual touch tracking instead of <Pressable>
+           wrapping. <Pressable>+<ScrollView> causes responder competition on
+           iOS where ScrollView delays scroll-start until Pressable releases
+           the gesture, which manifests as "scroll feels stuck / first drag
+           ignored". Manual tap detection (compare touchStart vs touchEnd)
+           lets ScrollView claim scroll gestures immediately. */}
+      <View
+        onTouchStart={(e) => {
+          touchStartRef.current = {
+            x: e.nativeEvent.pageX,
+            y: e.nativeEvent.pageY,
+            t: Date.now(),
+          };
+        }}
+        onTouchEnd={(e) => {
+          const start = touchStartRef.current;
+          touchStartRef.current = null;
+          if (!start) return;
+          const dx = Math.abs(e.nativeEvent.pageX - start.x);
+          const dy = Math.abs(e.nativeEvent.pageY - start.y);
+          const dt = Date.now() - start.t;
+          // Only treat as tap if finger moved <10px AND lifted within 300ms.
+          // Anything else is a scroll/drag — ignore.
+          if (dx < 10 && dy < 10 && dt < 300) {
+            handleTapZone(e.nativeEvent.pageX);
+          }
+        }}
         style={{ flex: 1, backgroundColor: theme.bg }}
       >
         <RNScrollView
@@ -1011,7 +1039,7 @@ export default function ReadingScreen() {
             </View>
           </View>
         </RNScrollView>
-      </Pressable>
+      </View>
 
       {/* ── Brightness overlay (dims screen without native module) ── */}
       {brightnessOverlayOpacity > 0.01 && (

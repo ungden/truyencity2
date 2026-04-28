@@ -2291,6 +2291,23 @@ export function isNonCombatGenre(genre: GenreType): boolean {
   return NON_COMBAT_GENRES.includes(genre);
 }
 
+// Genres set in modern/parallel-world Vietnam where currency MUST be VND.
+// Used by Critic to flag fake currency ("xu" / "nguyên" / "lượng vàng") that
+// leaks from TQ webnovel templates into Vietnamese-set business stories.
+// Excludes pure-fantasy worlds (huyen-huyen / tien-hiep / kiem-hiep) where
+// "đồng vàng / linh thạch / bạc" are canonical.
+const VND_CURRENCY_GENRES: GenreType[] = ['do-thi', 'quan-truong'];
+
+export function requiresVndCurrency(genre: GenreType, worldDescription?: string | null): boolean {
+  if (VND_CURRENCY_GENRES.includes(genre)) return true;
+  // linh-di / lich-su CAN be Vietnam-set (Dân Quốc / Đại Việt) — sniff
+  // the world description for VN markers to enable VND rule selectively.
+  if (worldDescription && /Đại Nam|Hải Long Đô|Phượng Đô|Trung Đô|Sài Gòn|Hà Nội|Việt Nam|Dân Quốc|Đại Việt/i.test(worldDescription)) {
+    return true;
+  }
+  return false;
+}
+
 export function getDopaminePatternsByGenre(genre: GenreType): DopaminePattern[] {
   // Anti-self-torture + Modern golden-finger patterns: prepended for non-combat genres
   const SMOOTH_HEAD = [DOPAMINE_PATTERNS.smooth_opportunity, DOPAMINE_PATTERNS.casual_competence, DOPAMINE_PATTERNS.peaceful_growth];
