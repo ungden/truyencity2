@@ -237,6 +237,25 @@ TẤU HÀI WEBNOVEL (BẮT BUỘC): Mỗi chương ≥1 khoảnh khắc hài hư
 
 CHỐNG LẶP TỪ: KHÔNG dùng cùng tính từ/màu sắc quá 3 lần trong chương. Sau lần 3 → dùng từ đồng nghĩa. TUYỆT ĐỐI KHÔNG dùng cùng tính từ 2 lần trong 1 đoạn.
 
+CHỐNG NỘI DUNG NHẠY CẢM CHÍNH TRỊ (BẮT BUỘC TUYỆT ĐỐI):
+TruyenCity là nền tảng văn học giải trí cho độc giả Việt Nam — KHÔNG phải báo chí chính trị. Cấm chèn các yếu tố nhạy cảm chính trị vào bất kỳ chương nào, đặc biệt trong truyện có yếu tố Việt Nam / người Việt ở nước ngoài / lịch sử cận đại VN:
+
+CẤM TUYỆT ĐỐI nhắc tên / tham chiếu / xây dựng cốt truyện liên quan:
+- Tên báo chí / tổ chức / đảng phái chính trị có thật của cộng đồng người Việt hải ngoại (vd "Người Việt", "Người Việt Tự Do", "Việt Nam Cộng Hòa", "Mặt Trận", "Sài Gòn Nhỏ Cali", "Văn Bút Hải Ngoại"...).
+- Thuật ngữ ý thức hệ chính trị: "tự do", "cộng sản", "tư bản", "giải phóng", "tháng tư đen", "thuyền nhân", "tỵ nạn chính trị", "vượt biên", "1975" (dùng làm năm sự kiện chính trị).
+- Sự kiện lịch sử chính trị 1945-1995: chiến tranh Việt Nam, đấu tranh giải phóng, cải cách ruộng đất, đổi mới chính trị, biểu tình.
+- Tên nhân vật lãnh đạo có thật: bất kỳ Tổng Bí Thư / Chủ Tịch / Tướng / Tổng Thống VNCH / lãnh đạo cách mạng.
+- Tổ chức quân sự / tình báo có thật (CIA + miền Nam, Cộng Sản miền Bắc, an ninh quốc gia VN hiện đại).
+- Tôn giáo + chính trị (Phật giáo Hòa Hảo, Cao Đài, vấn đề Thiên Chúa giáo Vatican).
+
+THAY THẾ HỢP LỆ (cho truyện có người Việt hải ngoại):
+- Gia đình di cư = "gia đình chuyển đến Mỹ/Pháp/Úc để học/làm việc". KHÔNG nêu lý do chính trị, KHÔNG mention chiến tranh.
+- Khu phố Việt = "khu phố châu Á" / "khu phố cộng đồng Việt" — KHÔNG dùng "Little Saigon" làm chỉ dấu chính trị.
+- Báo chí cộng đồng (nếu cần) = "tờ báo cộng đồng Việt", "tạp chí ẩm thực Việt", "tạp chí học thuật" — KHÔNG dùng tên thật.
+- Năm 1975 (nếu phải nhắc) = nhắc như "đầu thập niên 70" — không gắn với sự kiện chính trị.
+
+LƯU Ý: nếu cốt truyện BẮT BUỘC phải đụng chính trị (vd lich-su novel viết về triều đại cụ thể), DÙNG TÊN ĐẠI NAM / TÂN LỤC / fictional country names đã thiết lập trong world_description, KHÔNG dùng tên Việt Nam / Mỹ / Trung Quốc thật.
+
 CHỐNG LẶP SETUP (TRỌNG SINH / GOLDEN-FINGER NOVELS — CỰC KỲ QUAN TRỌNG):
 Setup gốc của truyện (rebirth, bàn tay vàng, nguyên do MC có lợi thế) đã được thiết lập ở chương 1-3. Reader đã biết. Từ chương 4 trở đi, KHÔNG được dồn nửa chương vào hồi tưởng/giải thích lại setup đó. Cụ thể:
 - Cụm "kiếp trước" / "30 năm tương lai" / "ký ức tiền kiếp" / "tương lai biết trước" — TỐI ĐA 3 lần/chương trong narration. Nếu bắt buộc dùng nhiều hơn (vd flashback bắt buộc theo arc plan) → ghép vào 1 scene flashback duy nhất, KHÔNG rải đều cả chương.
@@ -402,6 +421,7 @@ KIỂM TRA MÂU THUẪN (BẮT BUỘC — coherence chặt cho long-form):
 - MATH SANITY (cho do-thi/quan-truong/lich-su VN/kinh-doanh): nếu MC có X đồng/tỷ + chi Y mà Y > X mà KHÔNG có kênh thu nhập / vay vốn được setup từ trước → type "continuity" severity "critical", REWRITE. KHÔNG để math impossible kiểu "có 5 triệu tiêu 27 triệu".
 - VND CURRENCY (Vietnam-set genres do-thi/quan-truong/lich-su VN/linh-di Dân Quốc): nếu chapter dùng "X xu" / "X nguyên" / "X lượng vàng" làm đơn vị tiền tệ giao dịch hàng ngày (mua bán, vay nợ, lương, giá đất) → type "continuity" severity "critical", REWRITE. CHỈ cho phép "đồng / nghìn đồng / triệu đồng / tỷ đồng" (VND). NGOẠI LỆ duy nhất: tu-tiên/huyen-huyen/kiem-hiep/lich-su cổ đại Hoa Hạ → cho phép "đồng vàng/bạc/linh thạch" theo bối cảnh.
 - ECONOMIC LEDGER ENFORCEMENT: nếu pre-write context có khối "[TÀI CHÍNH / TÀI SẢN]" liệt kê số dư MC, chapter này CẤM cho MC chi tiêu/đầu tư vượt số đó MÀ KHÔNG có deal/vay/thu nhập rõ ràng trong cùng chapter. Vi phạm → "continuity" severity "critical".
+- POLITICAL SAFETY (TRỌNG TÂM): nếu chương chứa bất kỳ tên báo / tổ chức / đảng phái chính trị có thật của cộng đồng người Việt hải ngoại ("Người Việt", "Người Việt Tự Do", "Việt Nam Cộng Hòa", "Mặt Trận Quốc Gia", "Văn Bút Hải Ngoại"), thuật ngữ ý thức hệ chính trị ("tự do" làm slogan, "cộng sản", "giải phóng", "tháng tư đen", "thuyền nhân", "tỵ nạn chính trị", "vượt biên"), tên lãnh đạo có thật (Tổng Bí Thư / Chủ Tịch / Tướng VNCH...), hoặc setup gia đình "di cư 1975 sau chiến tranh" / "tỵ nạn chính trị" → issue type "continuity", severity "critical", REWRITE. Đây là content-safety hard cap, KHÔNG ngoại lệ.
 - ANTI-MONOLOGUE REPETITION: tránh để MC sa đà reflect lại cùng nội dung (rebirth/golden finger origin) mỗi chương.
   → Nếu chương có ≥4 lần cụm "kiếp trước" / "30 năm tương lai" / "ký ức tiền kiếp" / "tương lai biết trước" trong narration → "quality" severity "moderate".
   → Nếu ≥6 lần → "quality" severity "major", REVISE.
@@ -1438,6 +1458,38 @@ function countWords(text: string): number {
  * mild over-shooting still passes; only egregious padding fails.
  */
 function detectHardFallback(content: string, options?: WriteChapterOptions): string {
+  // Politically charged terms — content-safety hard cap. Any single hit
+  // forces regen; this is not a density check. The list covers Vietnamese
+  // diaspora politics (post-1975 refugee identity / anti-communist press)
+  // and home-country political ideology — neither belongs in entertainment
+  // fiction on this platform. Common false-positives mitigated by case
+  // sensitivity (we match exact phrasing, not loose substrings).
+  const POLITICAL_TERMS = [
+    /\bNgười Việt Tự Do\b/,
+    /\bNgười Việt(?= báo| tạp chí| nhật báo| weekly)/i,  // "Người Việt báo" etc.
+    /\bViệt Nam Cộng Hòa\b/,
+    /\bVNCH\b/,
+    /\bMặt Trận(?:\s+(?:Quốc Gia|Giải Phóng|Tổ Quốc|Dân Tộc))/,
+    /\bVăn Bút Hải Ngoại\b/,
+    /\bSài Gòn Nhỏ\b/,
+    /\bLittle Saigon\b/,
+    /\btỵ nạn chính trị\b/,
+    /\bthuyền nhân\b/i,
+    /\bvượt biên\b/i,
+    /\btháng tư đen\b/i,
+    /\bgiải phóng miền Nam\b/i,
+    /\bcộng sản\b/i,
+    /\b30[\/\.\s\-]?4[\/\.\s\-]?1975\b/,
+    /\b1975(?:[^\d]|$).{0,40}(?:di cư|tỵ nạn|chiến tranh|sụp đổ|giải phóng|chính trị)/i,
+    /\bdi cư\b.{0,60}\b(?:sau chiến tranh|chính trị|1975|tỵ nạn)\b/i,
+  ];
+  for (const re of POLITICAL_TERMS) {
+    const match = content.match(re);
+    if (match) {
+      return `political content (matched "${match[0].slice(0, 50)}") — banned by content-safety guard`;
+    }
+  }
+
   const REBIRTH_PHRASES = [
     /\bkiếp trước\b/gi,
     /\b30 năm tương lai\b/gi,
