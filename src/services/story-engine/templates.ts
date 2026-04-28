@@ -753,6 +753,88 @@ export const GENRE_STYLES: Record<GenreType, StyleBible> = {
       'Đa góc nhìn: scene dân bản địa kinh ngạc trước tri thức MC (POV local), thế lực thù địch đánh giá mối đe dọa (POV enemy), đồng hành bối rối vì MC hành xử khác lạ (POV companion)',
     ],
   },
+  'ngu-thu-tien-hoa': {
+    authorVoice: 'Giọng văn năng động, kết hợp data-game (bảng chỉ số, tuyến tiến hóa, BOM nguyên liệu) với phiêu lưu adventure. Tone Sảng văn Bất Đối Xứng Nhận Thức.',
+    narrativeStyle: 'third_person_limited',
+    toneKeywords: ['ngự thú', 'tiến hóa', 'thuần hóa', 'collection', 'bảng chỉ số', 'BOM', 'thần thú'],
+    avoidKeywords: ['tu tiên cảnh giới', 'huyết chiến phàm nhân', 'pháp sư trừ tà'],
+    dialogueRatio: [25, 35],
+    descriptionRatio: [40, 50],
+    innerThoughtRatio: [15, 25],
+    actionRatio: [15, 25],
+    pacingStyle: 'medium',
+    genreConventions: [
+      'GHI CHÚ THỂ LOẠI: Ngự Thú là Pokemon × Tu tiên × RPG. Sảng văn = bất đối xứng nhận thức (đối thủ thấy "phế vật", thực tế là thần thú đột biến). KHÔNG combat tay đôi MC vs đối thủ — combat là pet vs pet.',
+      'MC là ngự thú sư có Bàn Tay Vàng nhìn thấu Tuyến Tiến Hóa Ẩn + công thức BOM. Bản thân MC yếu, sức mạnh đến từ pet đột biến + chiến thuật điều phối đội hình.',
+      'Mỗi pet có DATA RÕ RÀNG: tên, cấp (F→SSS), skill gốc, skill đột biến tiềm năng, công thức tiến hóa (3-5 nguyên liệu), tính cách. Như bộ bài Pokemon — luôn nhất quán xuyên truyện, không "quên skill".',
+      'Đột biến skill theo 3 quy tắc: (1) khuếch đại số/phạm vi, (2) xoá cooldown/cost, (3) bẻ cong logic. Mỗi đột biến = dopamine peak — mô tả CỤ THỂ skill cũ vs skill mới + phản ứng quái vật/đối thủ.',
+      'Đội hình pet đa năng: tank (chịu đòn), DPS (sát thương), healer/buffer (hỗ trợ), khống chế (CC), exploit (skill độc đáo). MC bất bại không vì 1 pet mạnh mà vì điều phối thông minh.',
+      'Mỗi giải đấu / cuộc săn / boss raid = 1 mini-arc 3-15 chương: setup (chuẩn bị, scout, BOM nguyên liệu) → thực chiến (combat pet vs pet với tính toán chiến thuật) → loot (vật phẩm rớt + skill book + tài nguyên đột biến) → harvest (đột biến pet mới hoặc tăng cấp pet cũ).',
+      'NPC reactions = engine sảng văn chính: bạn cùng lớp ngạc nhiên, đối thủ tài phiệt sụp đổ tinh thần, thầy giáo nhìn ra MC giấu nghề, đám fan girl cuồng nhiệt. ≥30% chương phải có scene phản ứng đám đông.',
+      'Pet có nhân cách: con cáo nhỏ tinh nghịch, con đại điểu nghiêm túc, con slime tham ăn — mỗi pet là 1 nhân vật phụ với arc riêng. Mối quan hệ MC-pet = trái tim cảm xúc, không chỉ là "công cụ chiến đấu".',
+      'Multi-POV: scene đối thủ thiên kiêu chuẩn bị giải đấu (POV rival kiêu ngạo trước, sụp đổ sau), scene thầy giáo quan sát đột biến của MC (POV mentor ngạc nhiên), scene pet cảm nhận tình cảm với MC (POV pet ấm áp).',
+    ],
+  },
+  'khoai-xuyen': {
+    authorVoice: 'Giọng văn modular episodic — mỗi 30-50 chương đổi thân phận + thế giới hoàn toàn. MC senior level deadpan humor. Tone tùy thế giới (đô thị / cổ đại / mạt thế / dị giới) nhưng nội tâm MC nhất quán.',
+    narrativeStyle: 'first_person',
+    toneKeywords: ['hệ thống', 'nhiệm vụ', 'cứu vớt', 'đa vũ trụ', 'pháo hôi', 'nguyên chủ', 'KPI', 'đăng xuất'],
+    avoidKeywords: ['tu tiên cảnh giới dài hạn', 'gia tộc 1000 năm bám trụ'],
+    dialogueRatio: [30, 40],
+    descriptionRatio: [25, 35],
+    innerThoughtRatio: [25, 35],
+    actionRatio: [10, 20],
+    pacingStyle: 'fast',
+    genreConventions: [
+      'GHI CHÚ THỂ LOẠI: Khoái Xuyên là episodic — mỗi thế giới 30-50 chương đóng. Reset modular: nhân vật phụ thế giới cũ KHÔNG xuất hiện thế giới mới (trừ cặp đôi xuyên cùng / nguyên chủ tự ý thức).',
+      'MC là nhân viên Hệ Thống Đa Vũ Trụ — có tính cách + voice nhất quán xuyên thế giới (deadpan, professional, đôi khi mệt mỏi với task), KHÁC với pháo hôi/nguyên chủ MC nhập vai.',
+      'Cấu trúc thế giới chuẩn 4 hồi (5+15+15+10 chương cho thế giới 45 chương): Hồi 1 - đồng bộ kịch bản gốc + nhận task + làm quen thân phận; Hồi 2 - lật ngược thiết lập + rời nguyên kịch bản; Hồi 3 - phá vỡ kịch bản + vả mặt khí vận chi tử; Hồi 4 - hoàn thành KPI + thu hoạch + đăng xuất.',
+      'Khí vận chi tử (nguyên chủ chính của các tiểu thuyết MC xuyên vào) phải bị reframe là KẺ ĐẠO ĐỨC GIẢ — bề ngoài thiện lương, thực chất ích kỷ/độc ác/giả nhân. MC vạch trần qua chứng cớ + tình huống lộ chân tướng. Vả mặt nguyên chủ = dopamine chính.',
+      'Pháo hôi / phản phái nguyên chủ MC nhập vai phải có CHIỀU SÂU TÂM LÝ — không phải ác thuần. Có lý do bị tổn thương, có ước nguyện không hoàn thành, có trauma. MC cứu vớt bằng tâm lý + hành động cụ thể.',
+      'Hub Space (1-2 chương giữa 2 thế giới): MC tổng kết điểm, mua kỹ năng, gặp NPC hệ thống (hài hước hoặc bí ẩn), setup thế giới tiếp theo. Đây là nhịp "thở" cho reader + chỗ tích lũy power-up.',
+      'Skill stacking: MC tích lũy kỹ năng từ thế giới trước (y thuật cổ đại + hacker hiện đại + chiến thuật mạt thế + ma pháp dị giới) — thế giới mới có advantage, nhưng KHÔNG được "Mary Sue vô địch". Mỗi thế giới có challenge riêng skill stacking không tự động giải.',
+      'Tone tùy thế giới: thế giới đô thị (sảng văn business/trọng sinh), thế giới cổ đại (cung đấu mưu kế), thế giới mạt thế (sinh tồn căng thẳng), thế giới ngôn tình (slice-of-life ngọt sủng). MC adapt voice nhưng nội tâm professional + deadpan.',
+      'Multi-POV thường xuyên: scene khí vận chi tử bày mưu (trước khi sụp đổ), scene nguyên chủ thật xác hồn (nếu hệ thống cho phép — bonus emotional), scene NPC quan sát MC out-play (vả mặt từ góc bên).',
+    ],
+  },
+  'quy-tac-quai-dam': {
+    authorVoice: 'Giọng văn lạnh, lâm sàng (clinical), pha kinh dị tâm lý. Nhịp chậm tạo Uncanny Valley — chi tiết bình thường lệch nhỏ làm rùng mình. KHÔNG jump scare.',
+    narrativeStyle: 'first_person',
+    toneKeywords: ['quy tắc', 'phó bản', 'quái dị', 'sinh tồn', 'suy luận', 'lạnh sống lưng'],
+    avoidKeywords: ['pháp sư trừ tà cao tay', 'tu tiên đột phá', 'huyết chiến', 'thiên kiếp'],
+    dialogueRatio: [20, 30],
+    descriptionRatio: [35, 45],
+    innerThoughtRatio: [30, 40],
+    actionRatio: [3, 10],
+    pacingStyle: 'slow',
+    genreConventions: [
+      // ── Bản chất thể loại ──
+      'GHI CHÚ THỂ LOẠI 2024-2026: Quy Tắc Quái Đàm là "mỏ vàng" mới của TQ web novel. KHÁC biệt tuyệt đối với linh-di truyền thống: KHÔNG hầm mộ/nghĩa địa/pháp sư, mà là VĂN PHÒNG/TÀU ĐIỆN/SIÊU THỊ/BỆNH VIỆN bình thường biến dị. KHÔNG combat vật lý — MC dùng NÃO thắng quái vật bằng cách tuân thủ + suy luận quy tắc.',
+      // ── Nhân vật mẫu ──
+      'MC là người bình thường (nhân viên mới, sinh viên, lễ tân, ngỗ tác, thực tập sinh) — KHÔNG pháp sư/đạo trưởng/võ lâm cao thủ. MC sinh tồn bằng kiến thức + quan sát + IQ, KHÔNG bằng pháp lực/võ công.',
+      'Bàn tay vàng MC THIÊN VỀ NÃO: (1) "Hệ thống nhắc nhở" — nhìn ra dòng chữ đỏ chỉ quy tắc giả; HOẶC (2) "Mô phỏng tử vong" — chết thử 3 lần trong đầu trước khi quyết định; HOẶC (3) "Lý trí tuyệt đối" — không cảm giác sợ, sinh vật quái dị không ô nhiễm tinh thần MC. CHỈ chọn 1 cheat — không stack.',
+      'Quái vật vô địch về sức mạnh vật lý, KHÔNG thể đánh bại bằng vũ lực. MC CẤM tuyệt đối đánh tay đôi, CẤM cầm vũ khí "diệt ma" kiểu pháp sư. Thắng = né được + tuân thủ đúng + lừa quái vào bẫy quy tắc của chính nó.',
+      'NPC nạn nhân (đồng nghiệp/hành khách/khách hàng) thường chết để DẠY độc giả luật chơi. ≥1 NPC chết trong 5 chương đầu mỗi phó bản vì vi phạm quy tắc số 1. MC quan sát học hỏi, KHÔNG cứu được tất cả.',
+      // ── Tiến trình cốt truyện ──
+      'Mỗi PHÓ BẢN (dungeon) = 1 arc 20 chương theo cấu trúc 4 hồi: (Hồi 1: nhập cuộc + nhặt tờ quy tắc, ch.1-3) → (Hồi 2: thử nghiệm + chạm trán quái dị, ch.4-8) → (Hồi 3: xung đột + ô nhiễm tinh thần + quy tắc đá nhau, ch.9-15) → (Hồi 4: phá giải quy tắc cốt lõi + thoát + bonus, ch.16-20).',
+      'Tờ quy tắc = trái tim mỗi phó bản. 8-14 điều, viết trên giấy note / nội quy / sổ tay người tiền nhiệm / tin nhắn điện thoại. ≥1 điều CỐ TÌNH SAI (do tà thế lực gài bẫy) — MC phải suy luận qua quan sát chi tiết để phát hiện. Phá giải quy tắc giả = dopamine peak chính.',
+      'Overarching mystery: ai tạo ra phó bản? Tại sao chọn MC? Có "Chủ Quái Đàm" hậu trường không? Mỗi 3-4 phó bản hé lộ 1 mảnh ghép. MC dần leo từ "người sống sót mới" → "kẻ phá đảo" → "kẻ nắm giữ quy tắc" → "Chủ Quái Đàm".',
+      // ── Hệ thống sức mạnh ──
+      'Sức mạnh đến từ: (1) thuộc lòng quy tắc của 5-10 phó bản đã qua → bù đắp lẫn nhau khi gặp phó bản mới; (2) đạo cụ quỷ dị (giấy bùa "vé giả" đi tàu ma, hộp quẹt cháy được dưới nước, chìa khoá mở cửa tầng 13); (3) "Mảnh vỡ quy tắc" — đổi lấy quyền chỉnh 1 dòng quy tắc.',
+      'Đơn vị tăng trưởng MC: ĐIỂM SAN TRỊ (Sanity). Mỗi phó bản trừ 10-30 san trị. Hết san = MC trở thành 1 phần phó bản (NPC quái dị). Phục hồi san trị = thoát phó bản + nghỉ ngơi thế giới thực + ăn món bình thường (mì gói nóng, trà sữa, cơm mẹ nấu).',
+      // ── Leo thang xung đột ──
+      'Leo thang phó bản: D-Cấp (Văn phòng / cửa hàng tiện lợi, ≤10 quy tắc, 1 quái vật chính) → C-Cấp (chung cư / bệnh viện, 12-14 quy tắc, 2-3 quái vật) → B-Cấp (trường học khép kín, quy tắc đá nhau) → A-Cấp (toà nhà cổ thành phố, mạng lưới phó bản nối tiếp) → S-Cấp (vô đáp án, MC phải tự viết quy tắc).',
+      'Crossover phó bản: từ ch.150+ MC bắt đầu gặp các "kẻ phá đảo" khác — đôi khi liên minh, đôi khi phản bội. Có "tổ chức Quái Đàm" giấu mặt theo dõi MC. Có thị trường ngầm trao đổi "mảnh vỡ quy tắc" + "đạo cụ quỷ dị".',
+      // ── Phụ tuyến & hook ──
+      'Atmospheric horror qua 5 giác quan: thính giác (tiếng quạt máy lệch nhịp, đồng hồ tích tắc 0.3s chậm), khứu giác (mùi formaldehyde xen mùi nước hoa, mùi thức ăn cũ), thị giác (đèn neon flicker, gương phản chiếu chậm), xúc giác (tay nắm cửa lạnh bất thường, ghế ấm như vừa có ai ngồi), vị giác (cà phê có vị kim loại). KHÔNG dùng "máu", "xương", "ngôi mộ".',
+      'Mô tả Uncanny Valley = chìa khoá: KHÔNG bịa quái vật rồng/yêu, mà miêu tả NGƯỜI BÌNH THƯỜNG sai 1 chi tiết (đồng nghiệp có 6 ngón, không chớp mắt, răng đều quá, bóng đứng yên khi người di chuyển). Đáng sợ vì GẦN GIỐNG.',
+      'Mỗi phó bản lưu lại trong MC 1 "vết tích" — ám ảnh nhỏ ngoài đời (sợ đèn neon, không bao giờ ăn ramen sau 3h sáng, đếm ngón tay người lạ). Tích lũy vết tích = MC ngày càng giống "Chủ Quái Đàm". Internal conflict.',
+      // ── Exposition thông minh ──
+      'Quy tắc + manh mối lộ qua: tờ giấy tìm thấy, sổ tay người tiền nhiệm, đoạn camera CCTV xem được, lời kể NPC ranh giới (lao công 20 năm, chú gác cổng già). KHÔNG info-dump. KHÔNG có "sư phụ" giảng giải.',
+      // ── Multi-POV ──
+      'Đa góc nhìn: scene đồng nghiệp/khách hàng/hành khách bị quy tắc xử tử (POV nạn nhân — kinh hoàng), scene "kẻ phá đảo" cấp cao quan sát MC từ xa (POV ally bí ẩn — tạo nghi ngờ), scene Chủ Quái Đàm hậu trường (POV antagonist — cảm giác bị theo dõi).',
+    ],
+  },
   'ngon-tinh': {
     authorVoice: 'Giọng văn mềm mại, giàu cảm xúc, miêu tả nội tâm tinh tế và lãng mạn',
     narrativeStyle: 'third_person_limited',
@@ -1221,6 +1303,12 @@ export const ENGAGEMENT_CHECKLIST = {
       'lich-su':      { breathingChaptersBetweenEvents: 1, maxEventLengthChapters: 4 },
       'mat-the':      { breathingChaptersBetweenEvents: 1, maxEventLengthChapters: 5 },
       'linh-di':      { breathingChaptersBetweenEvents: 1, maxEventLengthChapters: 5 },
+      // Quy-tac-quai-dam: phó bản 20-chương đóng → mỗi sự kiện căng tối đa 4 chương trong 1 hồi, BẮT BUỘC ≥1 chương breathing giữa 2 hồi để san trị MC hồi phục
+      'quy-tac-quai-dam': { breathingChaptersBetweenEvents: 1, maxEventLengthChapters: 4 },
+      // Ngự Thú: combat pet vs pet, mỗi giải đấu/raid 3-5 chương căng, breathing 1-2 chương sau
+      'ngu-thu-tien-hoa': { breathingChaptersBetweenEvents: 1, maxEventLengthChapters: 4 },
+      // Khoái Xuyên: thế giới mới reset modular, mỗi sự kiện trong thế giới căng tối đa 4 chương
+      'khoai-xuyen':      { breathingChaptersBetweenEvents: 1, maxEventLengthChapters: 4 },
     },
     hardCap: 'KHÔNG genre nào được phép 1 giai đoạn ngược kéo dài 6+ chương, hoặc 2 giai đoạn ngược back-to-back không có breathing ở giữa.',
   },
@@ -1266,6 +1354,9 @@ export const GENRE_TITLE_EXAMPLES: Record<GenreType, string[]> = {
   'quan-truong': ['Ai Đứng Sau Bản Báo Cáo?', 'Cuộc Họp Kín', 'Thăng Chức Hay Bẫy?', 'Nước Cờ Của Kẻ Nhẫn', 'Phong Thanh Từ Tầng Trên', 'Lá Phiếu Quyết Định'],
   'di-gioi': ['Lãnh Chúa Bất Đắc Dĩ', 'Đất Mới, Luật Mới', 'Thổ Dân Quỳ Gối?', 'Xây Thành Từ Hoang Vu', 'Chiến Tranh Đầu Tiên', 'Vương Quốc Phôi Thai'],
   'ngon-tinh': ['Anh Ấy Lại Đến', 'Nụ Cười Và Nước Mắt', 'Đêm Mưa Không Ngủ', 'Ai Đang Giấu Bí Mật?', 'Trái Tim Không Nói Dối', 'Hoa Rơi Trước Cửa Nhà'],
+  'quy-tac-quai-dam': ['Đừng Trả Lời Sau 3h Sáng', 'Tầng 13 Không Tồn Tại', 'Quy Tắc Số 7 Là Giả', 'Đồng Nghiệp Có 6 Ngón', 'Phòng 444 Không Bao Giờ Trống', 'Áo Mưa Đỏ Sau 2h'],
+  'ngu-thu-tien-hoa': ['Slime Của Ta Nuốt Cả Rồng', 'Phế Vật Tiến Hóa Thành Thần', 'Đột Biến Cấp SSS!', 'Ngươi Khinh Con Cáo Của Ta?', 'Hệ Thống Đột Biến Vô Địch', 'Vạn Linh Đồ Thượng Cổ'],
+  'khoai-xuyen': ['Pháo Hôi Phản Công', 'Ta Là Phản Diện Cứu Thế', 'Hệ Thống Lại Phái Ta Đi Cứu', 'Nguyên Tác Đã Sụp Đổ', 'Khí Vận Chi Tử Chết Rồi', 'Đăng Xuất Trước Khi Yêu'],
 };
 
 /**
@@ -1339,6 +1430,30 @@ export const GENRE_ENGAGEMENT: Record<GenreType, string[]> = {
     'Mỗi 2-3 chương phải có 1 sweet moment hoặc heart-fluttering scene (tăng tần suất so với trước)',
     'Side couples phải có câu chuyện riêng — không chỉ là background',
   ],
+  'quy-tac-quai-dam': [
+    'Mỗi PHÓ BẢN = 1 arc 20 chương theo cấu trúc 4 hồi (5+5+7+3). KHÔNG nén phó bản dưới 15 chương — sẽ mất Hồi 3 căng thẳng. KHÔNG kéo trên 25 chương — reader bão hoà.',
+    'Tờ quy tắc đầu tiên xuất hiện CHẬM NHẤT chương 2. Quy tắc giả ≥1 nhưng ≤2 trong mỗi bộ. Phá giải quy tắc giả = dopamine peak BẮT BUỘC ở Hồi 3-4.',
+    '≥1 NPC chết vì vi phạm quy tắc trong 5 chương đầu mỗi phó bản — DẠY độc giả luật chơi. NHƯNG: NPC đó phải có tên + 1-2 dòng tính cách trước khi chết, để cái chết có trọng lượng.',
+    'Quái vật KHÔNG bao giờ bị MC đánh chết bằng vũ lực. Chiến thắng = tuân thủ đúng + né + lừa quái vật vi phạm chính quy tắc của nó. Nếu Critic phát hiện MC vung dao/súng/bùa giết quái → REWRITE.',
+    'San trị MC tracking: mỗi quy tắc vi phạm hoặc gặp Uncanny event nặng = -5 đến -15 san trị. Hồi phục = scene đời thường ngoài phó bản (mì gói nóng, tin nhắn mẹ, ngủ trưa). KHÔNG bỏ qua resource economy này.',
+    'Atmospheric horror qua chi tiết Uncanny Valley nhỏ (đèn neon flicker, đồng hồ chậm 0.3s, đồng nghiệp 6 ngón). KHÔNG dùng máu/xương/quan tài/nghĩa địa cliché.',
+  ],
+  'ngu-thu-tien-hoa': [
+    'Mỗi giải đấu / cuộc săn / boss raid = mini-arc 3-15 chương: setup + thực chiến + loot + harvest. Combat = pet vs pet, KHÔNG MC vs đối thủ tay đôi.',
+    'Mỗi pet phải có DATA RÕ RÀNG xuyên truyện: tên, cấp, skill gốc + đột biến tiềm năng, công thức tiến hóa (3-5 nguyên liệu), tính cách. KHÔNG quên skill / KHÔNG nâng cấp tự phát.',
+    'Đột biến skill theo 3 quy tắc: khuếch đại số/phạm vi, xoá cooldown/cost, bẻ cong logic. Mô tả CỤ THỂ skill cũ vs skill mới + phản ứng đối thủ "không thể tin" — đây là dopamine peak chính.',
+    '≥1 face-slap / casual competence / collection moment per chapter (đồng cấp với Sảng văn cadence). Pet "phế vật" thực chiến đè bẹp pet "huyết mạch quý" của đối thủ.',
+    'NPC reactions ≥30% chương: bạn cùng lớp ngạc nhiên, đối thủ tài phiệt sụp đổ, thầy giáo nhìn ra giấu nghề, fan girl cuồng nhiệt. KHÔNG bỏ qua "phản ứng đám đông".',
+    'Pet có nhân cách rõ + arc cảm xúc riêng. Tránh "công cụ chiến đấu" thuần. Ít nhất 1 pet mỗi 50 chương có moment cảm xúc với MC (pet hi sinh, pet trưởng thành, pet biết ơn).',
+  ],
+  'khoai-xuyen': [
+    'Mỗi thế giới = arc 30-50 chương đóng. Hồi 1 (5-7ch): đồng bộ kịch bản gốc + nhận task + làm quen thân phận. Hồi 2 (12-15ch): lật ngược thiết lập + rời nguyên kịch bản. Hồi 3 (12-15ch): phá vỡ kịch bản + vả mặt khí vận chi tử. Hồi 4 (5-10ch): hoàn thành KPI + thu hoạch + đăng xuất.',
+    'Khí vận chi tử (nguyên chủ chính của tiểu thuyết MC xuyên vào) phải bị vạch trần là KẺ ĐẠO ĐỨC GIẢ qua chứng cớ + tình huống cụ thể. KHÔNG được "ác hiển nhiên từ đầu" — phải reveal qua arc.',
+    'Pháp hôi / phản phái MC nhập vai phải có CHIỀU SÂU + lý do bị tổn thương. KHÔNG phải "phế vật ngu ngốc". Cứu vớt = chữa lành tâm lý + thay đổi quyết định bi thảm cụ thể.',
+    'Hub Space giữa 2 thế giới: 1-2 chương "thở", tổng kết điểm + mua kỹ năng + setup thế giới tiếp theo. KHÔNG bỏ qua — đây là nhịp engine của thể loại.',
+    'Skill stacking = MC senior level: tích lũy y thuật cổ đại + hacker hiện đại + chiến thuật mạt thế. Nhưng MỖI thế giới có challenge mới skill cũ không tự giải. KHÔNG để Mary Sue.',
+    'Tone tùy thế giới: đô thị (sảng văn business), cổ đại (cung đấu mưu kế), mạt thế (sinh tồn căng), ngôn tình (slice-of-life ngọt). MC adapt voice nhưng nội tâm nhất quán deadpan + professional.',
+  ],
 };
 
 /**
@@ -1367,6 +1482,9 @@ export const VN_PRONOUN_GUIDE: Record<string, string> = {
   'kiem-hiep': 'hắn / y / lão / nàng / gã / bà / hảo hán / đại hiệp. CẤM "anh ta".',
   'do-thi': 'anh / cô / chị / em / chú / bác (HIỆN ĐẠI). DÙNG "anh/cô" cho MC + người trẻ; "chú/bác" cho người lớn tuổi. CẤM "hắn/nàng/y" (cổ trang).',
   'ngon-tinh': 'anh / cô / chị / em (HIỆN ĐẠI tổng tài) HOẶC hắn / nàng (cổ trang ngôn tình tùy bối cảnh). KHÔNG mix 2 hệ.',
+  'quy-tac-quai-dam': 'tôi / anh / cô / em / chú / bác (HIỆN ĐẠI). Default first-person "tôi" cho MC. CẤM "hắn / nàng / y / lão" (cổ trang). NPC quái dị xưng hô bình thường nhưng SAI 1 chi tiết (gọi tên MC khi MC chưa giới thiệu, dùng kính ngữ kiểu cũ trong văn phòng hiện đại).',
+  'ngu-thu-tien-hoa': 'hắn / nàng / y / lão / sư phụ (cổ trang ngự thú); hoặc anh / cô / em / thầy (hiện đại học viện). CHỌN 1 hệ theo bối cảnh topic. Pet luôn xưng hô qua tên riêng + tiếng kêu/biểu cảm.',
+  'khoai-xuyen': 'TÙY THẾ GIỚI: thế giới hiện đại đô thị → anh/cô/em/chú/bác; thế giới cổ đại cung đấu → hắn/nàng/y/lão/bệ hạ/công công; thế giới mạt thế → cô/em/đồng đội; thế giới ngôn tình → anh/cô. MC giữ first-person "ta/tôi" trong nội tâm xuyên suốt mọi thế giới (giọng senior nhất quán).',
   'quan-truong': 'anh / cô / chú / bác / đồng chí / lãnh đạo (HIỆN ĐẠI). CẤM "hắn/nàng/y".',
   'lich-su': 'hắn / y / lão / nàng / gã / bệ hạ / công công / nương nương / vương / hầu (theo cấp bậc).',
   'mat-the': 'hắn / cô / em (post-apocalypse mix) — choose by character age + tone.',
@@ -1855,6 +1973,60 @@ export const SUB_GENRE_RULES: Record<string, string[]> = {
     '  • Comedy 30-40%: cynical internal monologue + boast giả vờ thấp profile.',
     '  • Top examples: 《全球高武》, 《全球冰封》, 《全民转职：我有亿万亿亿之力》',
   ],
+
+  'mo-phong': [
+    'MÔ PHỎNG KHÍ (Simulator Gacha) PATTERNS:',
+    '  • Cơ chế: MC có Hệ Thống Mô Phỏng — nạp tài nguyên (tiền/linh thạch/năng lượng) để chạy giả lập tương lai. Mô tả MC có thể xem trước cuộc đời mình ở các nhánh quyết định khác nhau.',
+    '  • Vòng lặp 4 bước CỨNG (mỗi 3-5 chương 1 lần): (1) Setup — MC đứng trước khủng hoảng đời thực; (2) Gacha — rút 3-5 thiên phú ngẫu nhiên (đẹp trai + chỉ thu hút đàn ông = combo lệch hài hước); (3) Simulation Run — kết xuất Text Log nhịp nhanh ("Năm 18 tuổi: bạn gia nhập Thanh Vân Môn / Năm 20 tuổi: bạn bị đại sư huynh hạ độc / Bạn đã chết"); (4) Extraction — chọn 1 trong 3 phần thưởng (tu vi / ký ức / vật phẩm) đem về thực tế; (5) Real Execution — áp dụng bài học mô phỏng vào hiện thực.',
+    '  • Sự sảng khoái = Information Asymmetry: MC biết trước kỳ ngộ + bóc trần âm mưu + tích lũy sống vạn năm trong giả lập. Sáng hôm sau MC bước ra "out trình" toàn bản đồ.',
+    '  • Văn phong Text Log: dùng câu đơn liệt kê + nhịp cực nhanh khi mô phỏng. Đoạn mô phỏng 200-500 chữ. Sau đó back về văn phong bình thường khi MC quay lại đời thực.',
+    '  • Mở rộng bối cảnh chi phí thấp: text log "Năm 30 tuổi, bạn rời đại lục đi thuyền 10 năm đến Nam Vực..." = mở map mới mà KHÔNG cần mô tả 10 chương du lịch.',
+    '  • Anti-pattern: KHÔNG để mô phỏng giải quyết hết mọi vấn đề (otherwise no tension). Mô phỏng cho insight + skill, nhưng đời thực vẫn cần MC hành động + có rủi ro.',
+  ],
+
+  'linh-vuc-tuyet-doi': [
+    'LĨNH VỰC TUYỆT ĐỐI / VÔ ĐỊCH LƯU (Absolute Domain Shop) PATTERNS:',
+    '  • Cơ chế: trong bán kính Lãnh địa (100m² quanh quán ăn / tiệm sách / võ quán), MC là Thần. Bất kể đối thủ là Tiên Đế / Ma Tôn / Thần Linh, vào Lãnh địa đều bị tước sức mạnh + áp chế bằng 1 cái búng tay. Bước ra ngoài, MC chỉ là phàm nhân.',
+    '  • Triết lý hành động: MC tử thủ ở nhà, KHÔNG ra ngoài. Cốt truyện tự "gõ cửa" tiệm — Thánh nữ bị truy sát chạy vào, Thiên tài trọng thương cầu cứu, đám sát thủ vô tình lao vào và bị xoá sổ.',
+    '  • Vật phẩm "hàng chợ" hóa Thần Khí: MC bán lon Coca / mì gói / truyện manga giá rẻ Trái Đất. Trong mắt đại năng tu tiên: uống Coca = đột phá bình cảnh trăm năm; đọc manga = lĩnh ngộ kiếm pháp tuyệt thế. Mô tả CỤ THỂ phản ứng "thần thánh hóa" của khách hàng tu sĩ.',
+    '  • Tăng trưởng theo ROI Lãnh địa: 100m² (1-50ch) → 1 vạn dặm (50-300ch, scale-up khi cần đè bẹp đại quân kẻ địch) → toàn tinh hệ (300+, MC trở thành Sáng Thế Thần).',
+    '  • Cơ chế Gamification: thu thập điểm (qua kinh doanh / thu nạp đệ tử / gây sốc khách) để nâng cấp diện tích Lãnh địa + mở khu vực mới + mua vật phẩm hệ thống.',
+    '  • Cấu trúc NPC dạng "Phiên giao dịch": khách bước vào tiệm (Session Start) → ngạc nhiên trước vật phẩm → mua hàng / bị vả mặt → bước ra (Session End). NPC KHÔNG cần xuất hiện lại — engine giải phóng bộ nhớ. MỖI khách = 1 mini-arc 2-5 chương.',
+    '  • Anti-pattern: KHÔNG để MC chủ động đi tìm cốt truyện ngoài Lãnh địa (mất engine). KHÔNG cho phép Lãnh địa scale chậm hơn 100 chương / cấp.',
+  ],
+
+  'sang-the': [
+    'SÁNG THẾ LƯU / SANDBOX CREATOR PATTERNS:',
+    '  • Cơ chế: MC ở Trái Đất nhận được "Sa bàn" (bể cá / đa chiều trong vỏ hạt / trò chơi mô phỏng máy tính). Trong Sa bàn, MC là Đấng Tạo Hóa tuyệt đối + tua nhanh thời gian (1 ngày Trái Đất = 1 vạn năm trong Sa bàn).',
+    '  • Cơ chế Thu hoạch: sinh vật trong Sa bàn tiến hóa → sáng tạo công pháp / phép thuật / công nghệ → MC trích xuất (copy) thành tựu để cường hóa bản thân ở Trái Đất.',
+    '  • Cấu trúc 4 Kỷ nguyên (mỗi 50-100 chương): (1) Khởi nguyên Tế bào (đơn bào → đa bào → quái vật nguyên thủy); (2) Kỷ nguyên Thần thoại (sinh mệnh trí tuệ + công pháp + sử thi); (3) Xung đột + Reset (đại hồng thủy / thiên thạch quét sạch 99% sinh mệnh, mở Kỷ nguyên mới với hệ thống sức mạnh khác); (4) Đa Sa bàn + Xâm Lăng Hiện Thực.',
+    '  • Văn phong "Biên Niên Sử": KHÔNG tả cảnh hai tên lính đánh nhau; tả "Năm Thánh Lịch thứ 1200, Vua Arthur dẫn kỵ binh rồng san phẳng phương Bắc, máu chảy thành sông". Sử thi, hùng tráng, macro-scale.',
+    '  • Hàng duy đả kích (Dimensional Strike): Đại Đế tu 10 vạn năm trong Sa bàn 1 kiếm chẻ tinh hà → trong mắt MC chỉ to bằng con kiến. MC dùng ngón tay ấn xuống = hủy diệt cả kỷ nguyên. Tương phản kích thước = engine sảng văn.',
+    '  • Quản trị Biến số (Variable Injection): MC bơm biến số vào Sa bàn (bệnh dịch / sách toán học hiện đại / chiếc điện thoại / cọng tóc) → AI nội suy ra sự sụp đổ hoặc thăng hoa văn minh. Mỗi biến số = 1 mini-arc tiến hóa văn minh.',
+    '  • Engine Reset Memory: cứ sau 20-50 chương, MC tua nhanh 1 vạn năm — toàn bộ NPC kỷ nguyên cũ già chết. Engine clear context + nạp Prompt "Kỷ nguyên mới bắt đầu" → AI tự do sáng tạo lứa nhân vật mới mà không sợ hổng logic.',
+  ],
+
+  'hac-am-luu': [
+    'HẮC ÁM LƯU / VILLAIN PROTAGONIST PATTERNS:',
+    '  • MC định vị bản thân ở ĐỈNH chuỗi thức ăn. KHÔNG tình bạn đơn thuần — chỉ quan hệ lợi ích + trao đổi đồng giá. Trí tuệ + mưu mô luôn đi trước sức mạnh cơ bắp.',
+    '  • Bàn tay vàng: "Hệ thống Cướp đoạt Khí Vận" hoặc "Hệ thống Bồi dưỡng Trùm Phản Diện". MC nhìn thấu các "Khí vận chi tử" (nhân vật được định mệnh sắp đặt làm anh hùng) + thấy điểm yếu của chúng.',
+    '  • Triết lý "Trảm Thảo Trừ Căn": MC tuyệt đối không để lại hậu họa. KHÔNG cứu nhân độ thế bừa bãi. KHÔNG tha thứ kẻ đã gây hại.',
+    '  • Khí vận chi tử (con mồi) phải được module hóa: Mẫu 1 (thiếu niên phế vật bị từ hôn nhặt được nhẫn lão gia gia) → MC chặn đường cướp nhẫn ngày đầu. Mẫu 2 (binh vương đô thị về làm vệ sĩ nữ tổng tài) → MC dùng tài chính + pháp lý nghiền nát thay vì đấu võ. Mẫu 3 (chuyển sinh giả) → MC dùng tư duy ép kẻ này khai bí mật tương lai rồi thủ tiêu.',
+    '  • Hành động bằng tổ chức, không phải cá nhân: MC ngồi ghế sau xe đen, ra lệnh sát thủ / hacker dưới quyền xử lý. Sử dụng chiến tranh kinh tế / cắt chuỗi cung ứng / thao túng truyền thông để nội bộ kẻ thù tự tàn sát.',
+    '  • Phong cách Minimalism: KHÔNG tả cảnh đánh nhau dông dài. Chuộng "Một kích tất sát" (One-hit kill) hoặc thủ tiêu trong im lặng. Cấu trúc văn bản gọn gàng, tối ưu token.',
+    '  • Personality Lock cứng: MC tuyệt đối không "thánh mẫu hóa". Dù đối phương khóc lóc / quỳ gối / tự tử, phản ứng MC luôn là thờ ơ + dùng logic lợi ích để từ chối. Critic phát hiện vi phạm → REWRITE.',
+    '  • Thiết kế Đế Chế: MC vận hành tổ chức kỷ luật cao (Yakuza / lính đánh thuê tư nhân / mafia syndicate). Cấp bậc rõ ràng. Quản trị tài nguyên tuyến tính: dòng tiền + nhân sự + cấp vũ khí + lãnh thổ kiểm soát.',
+  ],
+
+  'kim-bang-bo-quang': [
+    'THIÊN ĐẠO KIM BẢNG / BỘC QUANG LƯU (Heavenly Dao Leaderboard / Exposure) PATTERNS:',
+    '  • Cơ chế: MC đã cày "Cẩu Đạo" trong bóng tối đến mức vô địch vũ trụ, nhưng tuyệt đối không khoe. "Thiên Đạo" đột ngột giáng "Kim Bảng" (Bảng Xếp Hạng vàng) lên bầu trời cho toàn thế giới chiêm ngưỡng → bộc lộ thân phận MC ngoài ý muốn.',
+    '  • Cấu trúc Listicle JSON: mỗi Bảng (Bảng Vũ Khí / Bảng Thú Cưỡi / Bảng Sát Thủ / Bảng Thế Lực Ngầm) là 1 mảng 10 mục. Top 100-11 = lão quái vật / hoàng đế / tông sư nổi tiếng. Top 10-1 = vô danh + toàn của MC.',
+    '  • Vòng lặp tĩnh 3 bước (mỗi 5-15 chương): (1) Thiên Đạo Update Bảng Mới; (2) Thế Giới Reaction (chấn động ở Hoàng Cung / cảm thán ở Tửu lâu / tức giận của các môn phái); (3) Main Than Vãn ("Hệ thống rác rưởi lại bộc quang thẻ tẩy của ta"). Engine giải trí cao + chi phí compute thấp.',
+    '  • Reaction Engine = 80% dung lượng truyện: cứ mỗi vị trí Top được công bố, sinh ra góc nhìn của 5-10 NPC (Kiếm Tôn sụp đổ đạo tâm, Thiếu nữ ngưỡng mộ, Thái tử ghen tị, Lão sư phụ thán phục). Tận dụng AI sinh content đa dạng nhân vật từ pre-trained knowledge.',
+    '  • Cấu trúc 4 giai đoạn: (1) Bảng đầu tiên + bắt đầu nghi ngờ (1-50, manh mối nhỏ dẫn đến khu MC); (2) Bảng liên hoàn + bão táp (50-150, thiên tài liên minh tìm MC); (3) Bị ép xuất thủ (150-300, đại quân bao vây → MC phẩy tay = bốc hơi); (4) Kim Bảng Đa Vũ Trụ (300+).',
+    '  • Anti-pattern: MC TUYỆT ĐỐI không chủ động khoe khoang. Bộc quang luôn là do Thiên Đạo / hệ thống / kẻ ngoài → MC chỉ phàn nàn thụ động. Đây là Personality Lock — Critic enforce.',
+  ],
 };
 
 /**
@@ -2056,6 +2228,14 @@ export function getPowerSystemByGenre(genre: GenreType): PowerSystem {
       return POWER_SYSTEMS.urban_system;
     case 'linh-di':
       return POWER_SYSTEMS.rules_horror;
+    case 'quy-tac-quai-dam':
+      return POWER_SYSTEMS.rules_horror;
+    case 'ngu-thu-tien-hoa':
+      // Ngự thú: pet evolution là power system. Chưa có dedicated power system, dùng cultivation_standard với mô tả qua prompt
+      return POWER_SYSTEMS.cultivation_standard;
+    case 'khoai-xuyen':
+      // Khoái xuyên: power system theo từng thế giới (modular). Default urban_system cho thế giới hiện đại, override qua prompt cho cổ đại/dị giới
+      return POWER_SYSTEMS.urban_system;
     case 'di-gioi':
       return POWER_SYSTEMS.lord_building;
     case 'dong-nhan':
@@ -2080,7 +2260,7 @@ const COMBAT_PATTERN_TYPES: DopamineType[] = [
 
 // Non-combat genres: do-thi (urban), ngon-tinh (romance), quan-truong (office politics)
 // — these should NEVER receive combat-based dopamine unless arc plan explicitly requires.
-const NON_COMBAT_GENRES: GenreType[] = ['do-thi', 'ngon-tinh', 'quan-truong'];
+const NON_COMBAT_GENRES: GenreType[] = ['do-thi', 'ngon-tinh', 'quan-truong', 'quy-tac-quai-dam'];
 
 export function isNonCombatGenre(genre: GenreType): boolean {
   return NON_COMBAT_GENRES.includes(genre);
@@ -2119,6 +2299,15 @@ export function getDopaminePatternsByGenre(genre: GenreType): DopaminePattern[] 
       return [...SMOOTH_HEAD, DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.treasure_gain, DOPAMINE_PATTERNS.monster_evolution, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.revenge];
     case 'linh-di':
       return [...SMOOTH_HEAD, DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.secret_identity, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.breakthrough, DOPAMINE_PATTERNS.revenge];
+    case 'quy-tac-quai-dam':
+      // NON-COMBAT: dopamine = phá giải quy tắc giả + thoát phó bản + sống sót. ZERO combat.
+      return [...SMOOTH_HEAD, DOPAMINE_PATTERNS.knowledge_leverage, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.secret_identity, DOPAMINE_PATTERNS.harvest];
+    case 'ngu-thu-tien-hoa':
+      // Pet evolution + collection: face_slap qua pet (chứ không phải MC), recognition khi pet đột biến trước đám đông
+      return [...SMOOTH_HEAD, DOPAMINE_PATTERNS.power_reveal, DOPAMINE_PATTERNS.breakthrough, DOPAMINE_PATTERNS.treasure_gain, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.face_slap, DOPAMINE_PATTERNS.harvest];
+    case 'khoai-xuyen':
+      // Modular reset: dopamine = vạch trần khí vận chi tử + cứu vớt nguyên chủ + thu hoạch điểm Hub
+      return [...SMOOTH_HEAD, DOPAMINE_PATTERNS.knowledge_leverage, DOPAMINE_PATTERNS.face_slap, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.tears_of_regret, DOPAMINE_PATTERNS.secret_identity, DOPAMINE_PATTERNS.harvest];
     case 'quan-truong':
       // NON-COMBAT genre: political mưu kế thắng bằng kiến thức/quan hệ, KHÔNG combat.
       return [...SMOOTH_HEAD, ...GOLDEN_FINGER, DOPAMINE_PATTERNS.recognition, DOPAMINE_PATTERNS.business_success, DOPAMINE_PATTERNS.flex_wealth, DOPAMINE_PATTERNS.harvest];
@@ -2492,6 +2681,68 @@ export const GENRE_BOUNDARIES: Record<GenreType, GenreBoundary> = {
       'Tình cảm biến mất, thành action thuần',
     ],
   },
+  'ngu-thu-tien-hoa': {
+    coreIdentity: 'Ngự Thú Tiến Hóa: Pokemon × Tu tiên × RPG. MC ngự thú sư có Bàn Tay Vàng nhìn thấu Tuyến Tiến Hóa Ẩn + công thức BOM, biến pet phế vật thành thần thú. Sảng văn Bất Đối Xứng Nhận Thức.',
+    forbidden: [
+      'MC tự tay đánh nhau như võ sĩ / kiếm khách (combat phải qua pet)',
+      'Pet được "buff vô lý" không có công thức tiến hóa rõ — phải có data nhất quán',
+      'Tu tiên cảnh giới đột phá MC (sai genre — tu tiên không phải ngự thú)',
+      'Pet biến mất hoặc bị nâng cấp không qua công thức → thiếu nhất quán data',
+    ],
+    allowedExpansions: [
+      'Học viện ngự thú / cấm khu thợ săn / gia tộc / thương nhân / VR game / cổ truyền',
+      'Hệ thống đột biến BOM + pet evolution tree đa dạng',
+      'Đa loại pet: thú/cá/chim/côn trùng/thực vật/khoáng/hồn/cơ giới/nguyên tố',
+    ],
+    driftWarnings: [
+      'MC bắt đầu tự đánh nhau thay vì điều phối pet → drift sang tu tiên/võ hiệp',
+      'Pet "thiên thần đẳng" thay vì có data tiến hóa rõ → mất bản sắc thể loại',
+      'Combat tay đôi MC vs villain → đang drift sang fantasy combat',
+    ],
+  },
+  'khoai-xuyen': {
+    coreIdentity: 'Khoái Xuyên: MC nhân viên Hệ Thống Đa Vũ Trụ, mỗi 30-50 chương xuyên vào 1 thân phận mới (pháo hôi/villain) ở 1 thế giới khác để cứu vớt nguyên chủ. Modular episodic, reset cao.',
+    forbidden: [
+      'Nhân vật phụ thế giới cũ xuất hiện thế giới mới (trừ cặp đôi xuyên cùng / nguyên chủ tự ý thức)',
+      'Khí vận chi tử (nguyên chủ chính nguyên tác) là "kẻ tốt thuần" — phải vạch trần đạo đức giả',
+      'MC quên skill stacking giữa các thế giới → mất tính progression',
+      'Thế giới kéo dài >55 chương → mất tính modular episodic',
+    ],
+    allowedExpansions: [
+      'Đa thể loại thế giới: đô thị tổng tài, cung đấu cổ đại, mạt thế zombie, dị giới ma pháp, võng du VR',
+      'Hub Space giữa các thế giới với NPC hệ thống có cá tính',
+      'Cặp đôi xuyên cùng (linh hồn nhận ra linh hồn qua nhiều thân phận)',
+      'Bù đắp tiếc nuối (slice-of-life cảm xúc, không vả mặt)',
+    ],
+    driftWarnings: [
+      'Thế giới biến thành arc dài >60 chương → mất tính modular',
+      'MC mất voice senior nhất quán, bị "đồng hóa" thành nguyên chủ → drift bản sắc',
+      'Khí vận chi tử thành "đồng minh sau cùng" → mất engine sảng văn vả mặt',
+    ],
+  },
+  'quy-tac-quai-dam': {
+    coreIdentity: 'Quy Tắc Quái Đàm: phó bản đời thường biến dị, MC sinh tồn bằng tuân thủ + suy luận quy tắc thật/giả. Atmospheric horror, Uncanny Valley, KHÔNG combat vật lý.',
+    forbidden: [
+      'Pháp sư / đạo trưởng / thiên sư cao tay vung bùa giết ma',
+      'Tu tiên cảnh giới / đột phá / luyện đan',
+      'Kiếm khách / võ lâm / chiến đấu vật lý tay đôi',
+      'Hầm mộ / nghĩa địa / quan tài / xác sống cổ điển',
+      'Jump scare máu me, miêu tả "máu / xương / nội tạng" gratuitous',
+      'MC dùng vũ khí (kiếm, dao, súng, bùa diệt ma) đánh chết quái vật',
+    ],
+    allowedExpansions: [
+      'Đa dạng phó bản đời thường (văn phòng / metro / bệnh viện / chung cư / siêu thị / khách sạn / trường học / quán ăn đêm)',
+      'Hệ thống điểm san trị (Sanity) + đạo cụ quỷ dị + mảnh vỡ quy tắc',
+      'Crossover các "kẻ phá đảo" khác, tổ chức Quái Đàm hậu trường',
+      'Yếu tố trinh thám / suy luận khi MC ghép manh mối quy tắc giả/thật',
+    ],
+    driftWarnings: [
+      'MC bắt đầu vung kiếm/súng đánh quái vật → đang drift sang fantasy/horror combat',
+      'Phó bản biến thành hầm mộ cổ / nghĩa địa → đang drift sang linh-di truyền thống',
+      'MC tu luyện đột phá cảnh giới → đang drift sang tu-tiên',
+      'Quái vật được mô tả như rồng / yêu / quỷ thay vì người-bình-thường-sai-1-chi-tiết → mất Uncanny Valley',
+    ],
+  },
 };
 
 /**
@@ -2596,6 +2847,22 @@ export const GENRE_ANTI_CLICHE: Record<GenreType, string[]> = {
     'tim đập thình thịch', 'má ửng hồng', 'cảm giác lạ lùng',
     'anh ấy thật khác biệt', 'nụ cười ấm áp', 'không hiểu sao lại',
     'trái tim rung động', 'đêm đó không ngủ được', 'tình yêu sét đánh',
+  ],
+  'ngu-thu-tien-hoa': [
+    'tiến hóa hoàn mỹ', 'huyết mạch viễn cổ thức tỉnh', 'cấp SSS bạo kích',
+    'ngươi thật sự là phế vật', 'một con slime nhỏ nuốt rồng', 'thiên phú ẩn lộ ra',
+    'nhìn xuyên quy luật vạn vật', 'pet của ta là vô địch', 'đột biến vượt khái niệm',
+  ],
+  'khoai-xuyen': [
+    'hệ thống lại giáng task', 'khí vận chi tử lộ chân tướng', 'kịch bản nguyên tác đã sụp đổ',
+    'đăng xuất khỏi thế giới này', 'pháo hôi không bao giờ đáng pháo hôi', 'cứu vớt thành công 100%',
+    'đa vũ trụ thật là phiền', 'điểm hệ thống tăng vọt', 'tâm nguyện cuối cùng đã hoàn thành',
+  ],
+  'quy-tac-quai-dam': [
+    'lạnh sống lưng', 'gáy tóc dựng đứng', 'một luồng khí lạnh chạy dọc',
+    'không khí như đông cứng', 'thời gian như ngừng trôi', 'tim đập thình thịch trong lồng ngực',
+    'cảm giác bị theo dõi', 'một dự cảm chẳng lành', 'âm thanh kỳ lạ vang lên',
+    'bóng đen lướt qua khóe mắt', 'thứ gì đó không đúng', 'mọi thứ trông bình thường nhưng',
   ],
 };
 

@@ -16,7 +16,8 @@ export type GenreType =
   | 'tien-hiep' | 'huyen-huyen' | 'do-thi' | 'kiem-hiep'
   | 'lich-su' | 'khoa-huyen' | 'vong-du' | 'dong-nhan'
   | 'mat-the' | 'linh-di' | 'quan-truong' | 'di-gioi'
-  | 'ngon-tinh';
+  | 'ngon-tinh' | 'quy-tac-quai-dam'
+  | 'ngu-thu-tien-hoa' | 'khoai-xuyen';
 
 export type AIProviderType = 'openrouter' | 'deepseek' | 'openai' | 'claude' | 'gemini';
 

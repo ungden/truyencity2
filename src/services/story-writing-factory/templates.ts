@@ -445,6 +445,54 @@ export const GENRE_STYLES: Record<GenreType, StyleBible> = {
       'Đa góc nhìn khi cần: scene nam chính suy nghĩ về nữ chính (POV male lead), nữ phụ ghen tuông bày mưu (POV rival), bạn thân quan sát tình cảm (POV friend)',
     ],
   },
+  'quy-tac-quai-dam': {
+    authorVoice: 'Lâm sàng, lạnh, first-person hiện đại — Uncanny Valley',
+    narrativeStyle: 'first_person',
+    toneKeywords: ['quy tắc', 'phó bản', 'quái dị', 'sinh tồn', 'suy luận'],
+    avoidKeywords: ['pháp sư trừ tà', 'tu tiên', 'huyết chiến'],
+    dialogueRatio: [20, 30],
+    descriptionRatio: [35, 45],
+    innerThoughtRatio: [30, 40],
+    actionRatio: [3, 10],
+    pacingStyle: 'slow',
+    genreConventions: [
+      'Mỗi phó bản 20 chương, cấu trúc 4 hồi',
+      'Tờ quy tắc 8-14 điều, có quy tắc giả phải suy luận',
+      'KHÔNG combat vật lý — thắng bằng tuân thủ + né + lừa quái',
+    ],
+  },
+  'ngu-thu-tien-hoa': {
+    authorVoice: 'Năng động, data-driven, kết hợp Pokemon × Tu tiên × RPG',
+    narrativeStyle: 'third_person_limited',
+    toneKeywords: ['ngự thú', 'tiến hóa', 'thuần hóa', 'BOM', 'thần thú'],
+    avoidKeywords: ['MC tay đôi combat', 'tu tiên cảnh giới đột phá MC'],
+    dialogueRatio: [25, 35],
+    descriptionRatio: [40, 50],
+    innerThoughtRatio: [15, 25],
+    actionRatio: [15, 25],
+    pacingStyle: 'medium',
+    genreConventions: [
+      'Combat là pet vs pet, không MC vs đối thủ tay đôi',
+      'Mỗi pet có data nhất quán: tên, cấp, skill, công thức tiến hóa',
+      'Đột biến skill theo 3 quy tắc: khuếch đại / xoá cooldown / bẻ logic',
+    ],
+  },
+  'khoai-xuyen': {
+    authorVoice: 'Modular episodic, MC senior voice deadpan + professional, mỗi thế giới adapt tone',
+    narrativeStyle: 'first_person',
+    toneKeywords: ['hệ thống', 'nhiệm vụ', 'cứu vớt', 'đa vũ trụ', 'pháo hôi'],
+    avoidKeywords: ['arc dài hạn', 'gia tộc bám trụ'],
+    dialogueRatio: [30, 40],
+    descriptionRatio: [25, 35],
+    innerThoughtRatio: [25, 35],
+    actionRatio: [10, 20],
+    pacingStyle: 'fast',
+    genreConventions: [
+      'Mỗi thế giới 30-50 chương, cấu trúc 4 hồi modular',
+      'Khí vận chi tử là kẻ đạo đức giả, vạch trần qua chứng cớ',
+      'Hub Space giữa các thế giới, skill stacking xuyên đa vũ trụ',
+    ],
+  },
 };
 
 // ============================================================================
@@ -1221,6 +1269,36 @@ export const GENRE_BOUNDARIES: Record<GenreType, GenreBoundary> = {
       'MC bắt đầu đánh nhau nhiều hơn yêu đương',
       'Tình cảm biến mất, thành action thuần',
     ],
+  },
+  'quy-tac-quai-dam': {
+    coreIdentity: 'Quy Tắc Quái Đàm: phó bản đời thường biến dị, sinh tồn bằng tuân thủ + suy luận. Atmospheric horror, KHÔNG combat.',
+    forbidden: [
+      'Pháp sư / đạo trưởng cao tay vung bùa',
+      'Tu tiên cảnh giới đột phá',
+      'Combat vật lý tay đôi',
+      'Hầm mộ / nghĩa địa cổ điển',
+    ],
+    allowedExpansions: [
+      'Đa dạng phó bản đời thường',
+      'Đạo cụ quỷ dị + mảnh vỡ quy tắc',
+      'Suy luận trinh thám',
+    ],
+    driftWarnings: [
+      'MC vung kiếm/súng/bùa giết quái → drift sang fantasy',
+      'Phó bản biến thành hầm mộ → drift sang linh-di',
+    ],
+  },
+  'ngu-thu-tien-hoa': {
+    coreIdentity: 'Ngự Thú Tiến Hóa: Pokemon × Tu tiên × RPG, MC ngự thú sư biến pet phế vật thành thần thú',
+    forbidden: ['MC tự tay combat', 'Pet được buff vô lý không công thức', 'Tu tiên đột phá MC'],
+    allowedExpansions: ['Học viện / cấm khu / gia tộc / thương nhân / VR / cổ truyền', 'BOM + evolution tree đa dạng', 'Đa loại pet'],
+    driftWarnings: ['MC bắt đầu combat thay vì điều phối pet', 'Pet thiếu nhất quán data'],
+  },
+  'khoai-xuyen': {
+    coreIdentity: 'Khoái Xuyên: nhân viên Hệ Thống Đa Vũ Trụ, mỗi 30-50 chương xuyên thân phận mới cứu nguyên chủ',
+    forbidden: ['Nhân vật phụ thế giới cũ tái xuất', 'Khí vận chi tử là người tốt thuần', 'Thế giới >55 chương'],
+    allowedExpansions: ['Đa thể loại thế giới', 'Hub Space + NPC hệ thống', 'Cặp đôi xuyên cùng', 'Bù đắp tiếc nuối'],
+    driftWarnings: ['Thế giới biến arc dài → mất modular', 'MC mất voice senior nhất quán'],
   },
 };
 

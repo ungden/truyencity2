@@ -731,6 +731,61 @@ export const GENRE_TEMPLATES: Record<GenreType, GenreTemplate> = {
     toneKeywords: ['kinh dị', 'ma quỷ', 'huyền bí', 'rùng rợn'],
     avoidKeywords: ['vui vẻ', 'hài hước'],
     compositionRatio: { dialogue: 30, description: 40, innerThoughts: 25, action: 5 }
+  },
+
+  'quy-tac-quai-dam': {
+    genre: 'quy-tac-quai-dam',
+    name: 'Quy Tắc Quái Đàm',
+    description: 'Phó bản đời thường biến dị, sinh tồn bằng tuân thủ + suy luận quy tắc thật/giả. Atmospheric horror, KHÔNG combat vật lý.',
+    typicalArcs: [],
+    chapterFormula: { targetWordCount: 2800, minDialogueSegments: 2, requiredElements: [], forbiddenElements: ['combat vật lý'], openingHookType: 'mystery', cliffhangerIntensity: 'intense' },
+    pacingGuide: { chapterRanges: [] },
+    protagonistTypes: [],
+    antagonistTypes: [],
+    supportingTypes: [],
+    settingTemplates: [],
+    powerSystems: [],
+    dopaminePatterns: [],
+    cliffhangerTypes: [],
+    toneKeywords: ['quy tắc', 'phó bản', 'quái dị', 'sinh tồn', 'lạnh sống lưng'],
+    avoidKeywords: ['pháp sư trừ tà', 'tu tiên', 'huyết chiến'],
+    compositionRatio: { dialogue: 25, description: 40, innerThoughts: 30, action: 5 }
+  },
+  'ngu-thu-tien-hoa': {
+    genre: 'ngu-thu-tien-hoa',
+    name: 'Ngự Thú Tiến Hóa',
+    description: 'Pokemon × Tu tiên × RPG. MC biến pet phế vật thành thần thú qua hệ thống đột biến BOM. Sảng văn Bất Đối Xứng Nhận Thức.',
+    typicalArcs: [],
+    chapterFormula: { targetWordCount: 2800, minDialogueSegments: 4, requiredElements: [], forbiddenElements: ['MC combat tay đôi'], openingHookType: 'mystery', cliffhangerIntensity: 'intense' },
+    pacingGuide: { chapterRanges: [] },
+    protagonistTypes: [],
+    antagonistTypes: [],
+    supportingTypes: [],
+    settingTemplates: [],
+    powerSystems: [],
+    dopaminePatterns: [],
+    cliffhangerTypes: [],
+    toneKeywords: ['ngự thú', 'tiến hóa', 'thuần hóa', 'BOM', 'thần thú'],
+    avoidKeywords: ['MC tay đôi combat'],
+    compositionRatio: { dialogue: 30, description: 45, innerThoughts: 20, action: 5 }
+  },
+  'khoai-xuyen': {
+    genre: 'khoai-xuyen',
+    name: 'Khoái Xuyên',
+    description: 'MC nhân viên Hệ Thống Đa Vũ Trụ, mỗi 30-50 chương xuyên thân phận mới cứu nguyên chủ. Modular episodic.',
+    typicalArcs: [],
+    chapterFormula: { targetWordCount: 2800, minDialogueSegments: 5, requiredElements: [], forbiddenElements: [], openingHookType: 'mystery', cliffhangerIntensity: 'intense' },
+    pacingGuide: { chapterRanges: [] },
+    protagonistTypes: [],
+    antagonistTypes: [],
+    supportingTypes: [],
+    settingTemplates: [],
+    powerSystems: [],
+    dopaminePatterns: [],
+    cliffhangerTypes: [],
+    toneKeywords: ['hệ thống', 'nhiệm vụ', 'cứu vớt', 'đa vũ trụ', 'pháo hôi'],
+    avoidKeywords: ['arc dài hạn'],
+    compositionRatio: { dialogue: 35, description: 30, innerThoughts: 30, action: 5 }
   }
 };
 

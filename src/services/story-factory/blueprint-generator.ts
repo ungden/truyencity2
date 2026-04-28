@@ -228,7 +228,10 @@ export class BlueprintGenerator {
       'vong-du': ['Thế Giới Thần Vực Online', 'Huyền Ảo Kỷ Nguyên', 'Bất Diệt Chi Vương'],
       'di-gioi': ['Dị Giới', 'Nguyên Giới', 'Thần Giới'],
       'mat-the': ['Tân Kỷ Nguyên', 'Hậu Tận Thế', 'Địa Ngục Trần Gian'],
-      'linh-di': ['Âm Dương Giới', 'U Minh', 'Nhân Gian']
+      'linh-di': ['Âm Dương Giới', 'U Minh', 'Nhân Gian'],
+      'quy-tac-quai-dam': ['Phó Bản Đời Thường', 'Toà Nhà Số 0', 'Tầng 13', 'Tuyến Đêm'],
+      'ngu-thu-tien-hoa': ['Vạn Linh Đại Lục', 'Học Viện Ngự Thú', 'Cấm Khu Thượng Cổ', 'Đảo Tinh Linh'],
+      'khoai-xuyen': ['Đa Vũ Trụ', 'Hệ Thống Khoái Xuyên', 'Hub Space', 'Vạn Thế Giới']
     };
 
     const names = worldNames[genre] || ['Thế Giới'];

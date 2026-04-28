@@ -737,4 +737,66 @@ When working with the story engine:
 **Phases 11-16 complete** — Monetization, mobile features, SEO, analytics, infra hardening, ad integration audit fix
 **Phase 17 complete** — RevenueCat payment integration (mobile IAP + server webhook)
 **Phase 18 complete** — SePay web payment integration (bank transfer + VietQR)
-**Phase 19 complete** — Sảng Văn pacing overhaul (warm baseline, dopamine cadence, kìm-nén detection) + chapter split + mobile v1.0.5 (TTS auto-resume, interstitial recovery, missing usage RPCs)
+**Phase 19 complete** — Sảng Văn pacing overhaul (warm baseline, dopamine cadence, kìm-nén detection) + chapter split + mobile v1.0.5
+**Phase 20A complete** — Genre architecture expansion: 3 new top-level genres + 12 new topics + 5 new SUB_GENRE_RULES + disable_chapter_split flag
+
+## Phase 20A Details (2026-04-28) — Genre Architecture Expansion
+
+User-supplied research dump of 19+ TQ web-novel genre briefs (Quy Tắc Quái Đàm, Ngự Thú Tiến Hóa, Khoái Xuyên, Mô Phỏng Khí, Hắc Ám Lưu, Sáng Thế Lưu, Lĩnh Vực Tuyệt Đối, Cẩu Đạo Trường Sinh, Lão Tổ Lưu, Đoạn Tuyệt Quan Hệ, Giải Trí Lưu, Group Chat Vạn Giới, Thành Chủ Lưu, Toàn Dân Lãnh Chúa, Toàn Dân Chuyển Chức, Võng Du Đả Kim Dung Hợp, Nho Đạo, Đánh Cắp Tiếng Lòng, Dân Tục Quái Đàm / Ngỗ Tác, Thiên Đạo Kim Bảng, Mạt Thế Độn Vật Tư, Tri Thức Hiện Đại Cải Biến, Man Hoang). Synthesized into 3-tier engine architecture:
+
+### 20A-1 — 3 New Top-Level Genres
+Each has full GENRE_CONFIG entry (8 topics with detailed `topicPromptHints`), all strict Records (GENRE_STYLES, conflictDensityCap, GENRE_TITLE_EXAMPLES, GENRE_ENGAGEMENT, VN_PRONOUN_GUIDE, GENRE_BOUNDARIES, GENRE_ANTI_CLICHE, GENRE_VOCABULARY, GENRE_WRITING_GUIDES), getPowerSystemByGenre + getDopaminePatternsByGenre cases, plus legacy file Records (story-factory + story-writing-factory).
+
+- **`quy-tac-quai-dam`** (Rules Horror, NON_COMBAT) — Uncanny Valley horror, phó bản đời thường (văn phòng/metro/bệnh viện/siêu thị/chung cư/quán ăn đêm/trường học/khách sạn) biến dị. MC sinh tồn bằng tuân thủ + suy luận quy tắc thật/giả. POWER_SYSTEMS.rules_horror (đã có sẵn). Cấu trúc 4 hồi 20 chương / phó bản. KHÔNG combat vật lý.
+- **`ngu-thu-tien-hoa`** (Beast Evolution / Pokemon-style) — MC ngự thú sư có Bàn Tay Vàng nhìn thấu Tuyến Tiến Hóa Ẩn + công thức BOM. Sảng văn Bất Đối Xứng Nhận Thức. 8 topics: học viện, cấm khu, gia tộc, thương nhân, trọng sinh, dị thú cuồng loạn, cổ truyền, võng du. Combat = pet vs pet, không MC tay đôi.
+- **`khoai-xuyen`** (Quick Transmigration, modular episodic) — MC nhân viên Hệ Thống Đa Vũ Trụ, mỗi 30-50 chương xuyên thân phận mới (pháo hôi/villain/nữ phụ) cứu nguyên chủ. Cấu trúc 4 hồi modular (5+15+15+10). 8 topics: cứu vớt phản phái, bù đắp pháo hôi, đại nữ chủ, lỗi hệ thống, đa bối cảnh, bù đắp tiếc nuối, tân nguyên chủ, cặp đôi xuyên cùng. Hub Space giữa các thế giới.
+
+### 20A-2 — 12 New Topics in Existing Genres
+- **`do-thi`** (4): `do-thi-doan-tuyet-quan-he` (Hỏa Táng Tràng), `do-thi-giai-tri-luu` (Media Empire), `do-thi-thanh-chu-luu` (Domain Building), `do-thi-group-chat-vu-tru` (Multiverse Trading Admin)
+- **`tien-hiep`** (2): `tien-hiep-cau-dao-truong-sinh` (Lay Flat / Longevity), `tien-hiep-lao-to-luu` (Idle Sect Ancestor Simulator)
+- **`linh-di`** (1): `linh-di-dan-tuc-ngo-tac` (Folk Horror / Coroner)
+- **`di-gioi`** (3): `di-gioi-toan-dan-lanh-chua` (Global Lord), `di-gioi-tri-thuc-cai-bien` (Tech Uplift), `di-gioi-man-hoang` (Prehistoric Survival)
+- **`mat-the`** (1): `mat-the-don-vat-tu` (Doomsday Hoarding)
+- **`lich-su`** (1): `lich-su-nho-dao` (Literary Cultivation / Cultural Plagiarism)
+- **`dong-nhan`** (1): `dong-nhan-doc-tieng-long` (Eavesdropping Heart Diary)
+
+Note: `vong-du-toan-dan-chuyen-chuc` and `vong-du-vao-hien-thuc` already existed — briefs #15 and #19 enhance via existing topics, no duplication.
+
+### 20A-3 — 5 New SUB_GENRE_RULES (Cross-Cutting Overlays)
+Áp được lên BẤT KỲ genre nào qua project `sub_genres[]` array:
+- **`mo-phong`** (Simulator Gacha) — vòng lặp 4 bước: Setup → Gacha thiên phú → Text Log mô phỏng → Extraction → Real Execution
+- **`linh-vuc-tuyet-doi`** (Absolute Domain Shop) — MC tử thủ trong tiệm 100m², cốt truyện tự gõ cửa, vật phẩm "hàng chợ" hoá thần khí
+- **`sang-the`** (Sandbox Creator / Macro Time-skip) — Sa bàn tua nhanh thời gian, văn phong Biên Niên Sử, Hàng duy đả kích
+- **`hac-am-luu`** (Villain Protagonist) — Personality Lock cứng, không thánh mẫu, hành động bằng tổ chức + chiến tranh kinh tế
+- **`kim-bang-bo-quang`** (Heavenly Dao Leaderboard / Exposure) — Listicle JSON Top 10, vòng lặp Update Bảng → World Reaction → Main Than Vãn
+
+### 20A-4 — disable_chapter_split Flag
+- `style_directives.disable_chapter_split = true` → orchestrator giữ AI output ~2800 từ làm 1 reader chapter (KHÔNG split thành 2). Cho representative novels ở Phase 20 — user muốn "độ dài gốc chưa cut".
+- Mặc định (cho novels cũ + future novels) vẫn split 2 reader chapters per AI write như Phase 19A.
+
+### 20A-5 — Spawn Script
+`scripts/spawn-phase20-representatives.ts` — tạo 10 representative novels (3 top-level genres + 7 priority topics) với:
+- Hand-crafted seeds (title/slug/premise/world_description chi tiết theo brief)
+- Outlines auto-generated qua DeepSeek (story_outline + master_outline)
+- `style_directives.disable_chapter_split = true`
+- status='active' sau khi outlines OK → cron tự pickup
+
+Sau spawn, cron `write-chapters-cron` ghi 20 ch/ngày/novel theo DAILY_CHAPTER_QUOTA. Initial 20 chương đến trong ngày đầu, steady state tiếp tục.
+
+Run: `./node_modules/.bin/tsx scripts/spawn-phase20-representatives.ts`
+
+### Files Changed in Phase 20A
+- `src/lib/types/genre-config.ts` — 3 new top-level GENRE_CONFIG entries (~24 topics) + 12 new topics in existing genres
+- `src/services/story-engine/types.ts` — GenreType union + 2 new entries
+- `src/services/story-engine/templates.ts` — GENRE_STYLES + conflictDensityCap + GENRE_TITLE_EXAMPLES + GENRE_ENGAGEMENT + VN_PRONOUN_GUIDE + NON_COMBAT_GENRES + GENRE_BOUNDARIES + GENRE_ANTI_CLICHE + getPowerSystemByGenre + getDopaminePatternsByGenre + 5 new SUB_GENRE_RULES
+- `src/services/story-engine/memory/style-bible.ts` — GENRE_VOCABULARY + GENRE_WRITING_GUIDES (3 new entries each)
+- `src/services/story-engine/pipeline/orchestrator.ts` — disable_chapter_split flag in style_directives, SPLIT_PARTS dynamic
+- `src/services/author-generator/index.ts` — GenreType union
+- `src/services/story-writing-factory/types.ts` — GenreType union (legacy)
+- `src/services/story-writing-factory/templates.ts` — GENRE_STYLES + GENRE_BOUNDARIES (legacy minimal entries)
+- `src/services/story-writing-factory/qc-gating.ts` — genreWordCounts (legacy)
+- `src/services/story-factory/types.ts` — GenreType union (legacy)
+- `src/services/story-factory/blueprint-generator.ts` — worldNames (legacy)
+- `src/services/story-factory/genre-templates.ts` — GENRE_TEMPLATES Record (legacy)
+- `src/services/content-seeder/index.ts` — SOURCE_TOPIC_SEEDS + VARIANTS_BY_GENRE + prefixByGenre + suffixByGenre (3 new entries each)
+- `scripts/spawn-phase20-representatives.ts` — new script, 10 representative seeds with hand-crafted detail per brief

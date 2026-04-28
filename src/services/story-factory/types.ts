@@ -54,7 +54,10 @@ export type GenreType =
   | 'vong-du'        // Võng du
   | 'di-gioi'        // Dị giới
   | 'mat-the'        // Mạt thế
-  | 'linh-di';       // Linh dị
+  | 'linh-di'        // Linh dị
+  | 'quy-tac-quai-dam' // Quy Tắc Quái Đàm (Rules Horror)
+  | 'ngu-thu-tien-hoa' // Ngự Thú Tiến Hóa (Beast Evolution / Pokemon-style)
+  | 'khoai-xuyen';    // Khoái Xuyên (Quick Transmigration)
 
 export interface GenreTemplate {
   genre: GenreType;

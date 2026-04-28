@@ -10,7 +10,8 @@
 export type GenreType =
   | 'tien-hiep' | 'huyen-huyen' | 'do-thi' | 'kiem-hiep' | 'lich-su'
   | 'khoa-huyen' | 'vong-du' | 'dong-nhan' | 'mat-the' | 'linh-di'
-  | 'quan-truong' | 'di-gioi' | 'ngon-tinh';
+  | 'quan-truong' | 'di-gioi' | 'ngon-tinh' | 'quy-tac-quai-dam'
+  | 'ngu-thu-tien-hoa' | 'khoai-xuyen';
 
 // ── Agent Roles ──────────────────────────────────────────────────────────────
 

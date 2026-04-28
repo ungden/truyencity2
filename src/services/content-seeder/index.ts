@@ -236,6 +236,36 @@ const SOURCE_TOPIC_SEEDS: Record<string, string[]> = {
     'phục thù xong rồi mới yêu: nữ chính mạnh mẽ chinh phục nam chính',
     'tình yêu office: đồng nghiệp ghét nhau rồi yêu nhau ngọt lịm',
   ],
+  'quy-tac-quai-dam': [
+    'nhân viên mới đi làm ngày đầu, nhận sổ tay nội quy 12 điều, phát hiện công ty không có cổng ra sau 6h tối',
+    'sinh viên lỡ chuyến tàu cuối, lên chuyến 23:47 không có trên bảng giờ, bảng quy tắc dán trên thành ghế',
+    'bác sĩ thực tập ca trực đầu tiên, tờ hướng dẫn 9 điều dán sau cửa phòng nghỉ, phòng 444 không bao giờ trống',
+    'sinh viên làm part-time cửa hàng tiện lợi ca đêm, ca trước để lại tờ hướng dẫn về khách áo mưa đỏ',
+    'MC chuyển vào căn hộ chung cư giá rẻ bất thường, ban quản lý phát 11 quy tắc ép plastic, tầng 4 không có nút thang máy',
+    'MC mở quán mì đêm thừa kế từ ông nội, menu cũ 14 quy tắc bồi bàn, khách lúc 1h sáng yêu cầu món không có trong menu',
+    'giáo viên thực tập nhận lớp chủ nhiệm, sổ điểm ghi 13 học sinh nhưng chỉ thấy 12, sau giờ học nhận nội quy giáo viên ban đêm',
+    'MC nhận việc lễ tân khách sạn 4 sao, ngày đầu nhận sổ tay 12 quy tắc lễ tân ca đêm, phòng 1408 luôn báo bận',
+  ],
+  'ngu-thu-tien-hoa': [
+    'MC nhặt được hệ thống Bảng Chỉ Số, nhìn thấu tuyến tiến hóa ẩn của vạn vật, thuần hóa con khỉ đá tiến hóa thành Tề Thiên Đại Thánh',
+    'sinh viên năm cuối Học Viện Ngự Thú nhận con slime "phế vật" miễn phí, slime tiến hóa thành Thôn Phệ Tinh Không Cự Thú',
+    'thợ săn nghèo trong Cấm Khu, chuyên đãi cát tìm vàng — nhặt thú con cấp F về luyện thành thần thú SSS',
+    'lữ khách dị giới có hệ thống dung hợp BOM, ghép 2 vật phẩm rác thành thần khí, nuôi đội ngũ pet đa năng',
+    'tiểu thư gia tộc bị chê là phế vật vì bắt được con kiến vô dụng, kiến tiến hóa thành Thực Quân chinh phục đại lục',
+    'thầy giáo Học Viện Ngự Thú vô danh, dạy đám học sinh "phế vật" nhưng đệ tử nào của ông cũng chinh phục đấu trường',
+    'thợ rèn thuần hóa thú nhỏ trong rừng cấm, mỗi con đều ẩn chứa huyết mạch viễn cổ chờ giải phóng',
+    'nhà nghiên cứu sinh học dị giới phối giống thần thú, tạo ra giống lai mở khóa skill vượt khái niệm',
+  ],
+  'khoai-xuyen': [
+    'nhân viên Hệ Thống Đa Vũ Trụ nhận KPI: cứu vớt trùm phản diện trong các tiểu thuyết bị thiên mệnh hủy hoại',
+    'MC xuyên vào pháo hôi (vai phụ rác) ở 100 thế giới khác nhau, mỗi thế giới đảo ngược kết cục bi thảm của nguyên chủ',
+    'người chơi cấp cao Hệ Thống Khoái Xuyên chuyên trang điểm bù đắp tâm nguyện cho các nữ phụ phản diện bị nguyên tác bỏ rơi',
+    'sát thủ Hệ Thống nhận task xử lý các "khí vận chi tử" đạo đức giả ở từng thế giới song song',
+    'MC gặp lỗi hệ thống, mỗi lần xuyên không lại bị sai vai (đáng ra làm tổng tài lại thành tiểu hồ ly), phải lách kịch bản',
+    'sinh viên trẻ ký hợp đồng với hệ thống "Bù Đắp Tiếc Nuối", giúp nguyên chủ thực hiện ước nguyện cuối cùng ở mỗi thế giới',
+    'mẹ đơn thân cấp Senior trong tổ chức Khoái Xuyên, đi qua 50+ thế giới gom kỹ năng để phục sinh đứa con đã mất',
+    'MC ban đầu là nguyên chủ chính của một thế giới, sau bị hệ thống chiêu mộ đi cứu các nguyên chủ khác cùng cảnh ngộ',
+  ],
 };
 
 // Vietnamese main character name components
@@ -386,6 +416,22 @@ const VARIANTS_BY_GENRE: Record<string, NarrativeVariant[]> = {
     { mc_archetype: 'coward_smart', anti_tropes: ['no_invincible'], style_directives: { variant_id: 'kiem-hiep:coward-smart', starting_archetype: 'phe-vat', tone_profile: 'cynical' } },
     { mc_archetype: 'family_pillar', style_directives: { variant_id: 'kiem-hiep:revenge-family', starting_archetype: 'family-pillar', tone_profile: 'bi-revenge' } },
     { mc_archetype: 'power_fantasy', style_directives: { variant_id: 'kiem-hiep:classic', starting_archetype: 'phe-vat', tone_profile: 'bi-revenge' } },
+  ],
+  'quy-tac-quai-dam': [
+    { mc_archetype: 'intelligent', anti_tropes: ['no_combat', 'no_invincible'], style_directives: { variant_id: 'quy-tac-quai-dam:newcomer', starting_archetype: 'quasi-normal', tone_profile: 'pragmatic', cliffhanger_density: 'high' } },
+    { mc_archetype: 'coward_smart', anti_tropes: ['no_combat'], style_directives: { variant_id: 'quy-tac-quai-dam:paranoid-survivor', starting_archetype: 'quasi-normal', tone_profile: 'cynical', cliffhanger_density: 'high' } },
+    { mc_archetype: 'pragmatic', anti_tropes: ['no_combat', 'no_harem'], style_directives: { variant_id: 'quy-tac-quai-dam:veteran-clearer', starting_archetype: 'professional', tone_profile: 'pragmatic' } },
+  ],
+  'ngu-thu-tien-hoa': [
+    { mc_archetype: 'intelligent', anti_tropes: ['no_invincible'], style_directives: { variant_id: 'ngu-thu:underdog-collector', starting_archetype: 'phe-vat', tone_profile: 'pragmatic' } },
+    { mc_archetype: 'pragmatic', sub_genres: ['kinh-doanh' as string], style_directives: { variant_id: 'ngu-thu:business-tamer', starting_archetype: 'professional', tone_profile: 'empowering' } },
+    { mc_archetype: 'family_pillar', style_directives: { variant_id: 'ngu-thu:gia-toc-tamer', starting_archetype: 'family-pillar', tone_profile: 'empowering' } },
+    { mc_archetype: 'power_fantasy', style_directives: { variant_id: 'ngu-thu:classic', starting_archetype: 'phe-vat', tone_profile: 'bi-revenge' } },
+  ],
+  'khoai-xuyen': [
+    { mc_archetype: 'intelligent', anti_tropes: ['no_harem'], style_directives: { variant_id: 'khoai-xuyen:savior', starting_archetype: 'professional', tone_profile: 'pragmatic', cliffhanger_density: 'low' } },
+    { mc_archetype: 'pragmatic', anti_tropes: ['no_invincible'], style_directives: { variant_id: 'khoai-xuyen:realistic-fixer', starting_archetype: 'quasi-normal', tone_profile: 'cynical' } },
+    { mc_archetype: 'career_driven', anti_tropes: ['no_harem'], style_directives: { variant_id: 'khoai-xuyen:da-nu-chu-traveler', starting_archetype: 'professional', tone_profile: 'empowering' } },
   ],
 };
 
@@ -1781,6 +1827,9 @@ CHÚ Ý:
       'quan-truong': ['Quyền Mưu', 'Quan Trường', 'Mưu Triều', 'Thăng Tiến'],
       'di-gioi': ['Dị Giới', 'Xuyên Không', 'Lãnh Chúa', 'Đa Giới'],
       'ngon-tinh': ['Sủng Thê', 'Ngọt Ngào', 'Tình Yêu', 'Khuynh Thành'],
+      'quy-tac-quai-dam': ['Phó Bản', 'Quy Tắc', 'Tầng 13', 'Đêm Thứ'],
+      'ngu-thu-tien-hoa': ['Vạn Thú', 'Ngự Linh', 'Thần Thú', 'Tiến Hóa'],
+      'khoai-xuyen': ['Vạn Giới', 'Khoái Xuyên', 'Cứu Vớt', 'Hệ Thống'],
     };
     const suffixByGenre: Record<string, string[]> = {
       'tien-hiep': ['Thần Đế', 'Kiếm Chủ', 'Tiên Tôn', 'Bất Diệt'],
@@ -1796,6 +1845,9 @@ CHÚ Ý:
       'quan-truong': ['Phong Vân', 'Đại Nghiệp', 'Quyền Lộ', 'Mưu Lược Gia'],
       'di-gioi': ['Bá Chủ', 'Chinh Phạt', 'Vương Quốc', 'Truyền Kỳ'],
       'ngon-tinh': ['Mộng Uyển', 'Tình Thâm', 'Phong Hoa', 'Kỷ Niên'],
+      'quy-tac-quai-dam': ['Sinh Tồn Ký', 'Quy Tắc Đỏ', 'Phó Bản Đêm', 'Bóng Tối Sau Cửa'],
+      'ngu-thu-tien-hoa': ['Bá Chủ', 'Đại Thiên Thú', 'Vạn Linh Đồ', 'Sư Phụ'],
+      'khoai-xuyen': ['Lữ Hành Ký', 'Cứu Thế Ký', 'Đa Vũ Trụ', 'Vạn Thế'],
     };
 
     const prefixes = prefixByGenre[genre] || ['Chí Tôn'];

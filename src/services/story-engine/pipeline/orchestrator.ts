@@ -115,8 +115,9 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   const storyTitle = novel.title || project.world_description || `Project ${project.id}`;
   const totalPlanned = project.total_planned_chapters || 1000;
   // Base target: explicit option > project setting > default. style_directives override takes precedence over project setting.
-  const projectStyleDirectives = (project as { style_directives?: { target_chapter_length_override?: number } }).style_directives;
+  const projectStyleDirectives = (project as { style_directives?: { target_chapter_length_override?: number; disable_chapter_split?: boolean } }).style_directives;
   const directiveOverride = projectStyleDirectives?.target_chapter_length_override;
+  const disableChapterSplit = projectStyleDirectives?.disable_chapter_split === true;
   const baseTargetWordCount = options.targetWordCount ?? directiveOverride ?? project.target_chapter_length ?? DEFAULT_CONFIG.targetWordCount;
 
   // Mood-adjusted: lookup mood from pacing blueprint (if exists) and scale (climax→long, breathing→short).
@@ -319,7 +320,8 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   // AI writes 1 logical chapter (~2800 từ). Split into 2 reader-friendly chapters
   // (~1400 từ each) at natural paragraph boundary. This keeps narrative coherence
   // for the AI write while delivering shorter mobile-friendly chapters to readers.
-  const SPLIT_PARTS = 2;
+  // Per-project override: style_directives.disable_chapter_split = true → keep AI output as 1 reader chapter.
+  const SPLIT_PARTS = disableChapterSplit ? 1 : 2;
   const splitResults = splitChapterContent(result.content, result.title, SPLIT_PARTS);
   const lastChapterNumber = nextChapter + splitResults.length - 1;
 

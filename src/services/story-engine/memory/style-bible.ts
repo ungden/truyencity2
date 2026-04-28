@@ -390,6 +390,78 @@ const GENRE_VOCABULARY: Record<GenreType, VocabularyGuide> = {
       enemy: ['con bé kia', 'tình địch', 'nữ phụ', 'kẻ thứ ba', 'đối thủ'],
     },
   },
+
+  'ngu-thu-tien-hoa': {
+    emotions: {
+      anger: ['phẫn nộ', 'siết chặt vòng triệu pet', 'sát khí ngầm', 'tức giận đến cười', 'cắn môi điều khiển pet'],
+      shock: ['kinh ngạc nhìn bảng chỉ số', 'không tin nổi tuyến tiến hóa', 'mắt đỏ ngầu trước thần thú', 'chấn động đạo tâm', 'trợn tròn mắt'],
+      contempt: ['khinh khỉnh nhìn pet đối thủ', 'lạnh giọng đánh giá', 'bĩu môi chê pet rác', 'nhếch mép khinh thường'],
+      determination: ['quyết tâm đột biến pet', 'phải đứng top 1', 'không lùi trước thiên kiêu', 'thuần hóa bằng được', 'cùng pet xông pha'],
+    },
+    powerExpressions: {
+      techniques: ['hệ thống đột biến', 'bảng chỉ số quét pet', 'công thức BOM', 'dung hợp linh thú', 'điều phối đội hình'],
+      weakToStrong: ['từ pet cấp F lên SSS', 'phế vật biến thần thú', 'lột xác qua đột biến', 'thuần hóa từ con số 0', 'leo top bảng xếp hạng'],
+      breakthrough: ['đột biến cấp', 'thức tỉnh huyết mạch viễn cổ', 'mở khóa skill ẩn', 'tiến hóa hoàn mỹ', 'phá vỡ giới hạn loài'],
+    },
+    atmosphere: {
+      tense: ['đấu trường im phăng phắc', 'mùi máu pet vương trên cát', 'tiếng gầm thần thú vang khắp', 'không khí đặc đến nghẹt thở', 'năng lượng tiến hóa nổ tung'],
+      mysterious: ['cấm khu thâm xứ', 'hang động thần thú viễn cổ', 'sa mạc pet biến dị', 'tuyến tiến hóa ẩn chưa từng được khám phá', 'công thức cổ tịch thất truyền'],
+      dangerous: ['boss raid SSS', 'thú triều cuồng loạn', 'thợ săn liên minh đối thủ', 'pet đột biến mất kiểm soát', 'đại tộc dòm ngó công thức'],
+    },
+    honorifics: {
+      superior: ['sư phụ', 'đại sư', 'tông sư ngự thú', 'lão tổ', 'hội trưởng phường săn'],
+      peer: ['bạn ngự thú sư', 'đồng môn học viện', 'huynh đệ thợ săn', 'liên minh chủ nhân', 'partner'],
+      enemy: ['đối thủ thiên kiêu', 'tài phiệt liên minh', 'thợ săn tham lam', 'sư phụ tà phái', 'đại tộc kiêu ngạo'],
+    },
+  },
+
+  'khoai-xuyen': {
+    emotions: {
+      anger: ['nuốt tức vì task khó', 'ngầm chửi hệ thống', 'cắn răng nhập vai', 'kiềm chế trước khí vận chi tử', 'lạnh giọng vạch mặt'],
+      shock: ['ngẩn người trước plot twist', 'không tin task này', 'bàng hoàng nhận ra thân phận', 'đứng hình giữa cảnh quen thuộc', 'tim đập trước nguyên chủ'],
+      contempt: ['nhếch mép trước khí vận chi tử', 'khinh khỉnh nhìn đám đạo đức giả', 'cười nhạt vạch trần', 'lạnh nhạt phớt lờ kẻ giả nhân'],
+      determination: ['hoàn thành KPI', 'cứu vớt nguyên chủ bằng mọi giá', 'không để pháo hôi chết oan', 'đăng xuất với điểm SSS', 'sửa lại số phận này'],
+    },
+    powerExpressions: {
+      techniques: ['skill stacking đa thế giới', 'kiến thức cổ đại + hiện đại', 'kinh nghiệm 50 thế giới', 'mượn vai diễn thông thạo', 'lừa hệ thống lách quy tắc'],
+      weakToStrong: ['từ tân binh đến senior traveler', 'tích lũy skill qua từng thế giới', 'tăng cấp Hub Space', 'unlock thế giới khó hơn', 'nâng tier nhân viên'],
+      breakthrough: ['hoàn thành rank SSS', 'mở khóa thế giới cấp cao', 'unlock skill Premium', 'trở thành senior agent', 'bẻ ngược nguyên tác hoàn toàn'],
+    },
+    atmosphere: {
+      tense: ['hệ thống đếm ngược', 'kịch bản gốc đang sắp ứng nghiệm', 'khí vận chi tử đang gài bẫy', 'thời gian nhập vai gấp gáp', 'task fail = 1 mạng'],
+      mysterious: ['Hub Space đầy nhân viên ẩn danh', 'NPC hệ thống có cá tính dị', 'thế giới song song chưa từng đến', 'nguyên chủ thật đang bí mật ý thức', 'liên minh khí vận chi tử ẩn'],
+      dangerous: ['kịch bản gốc đang reset', 'nguyên chủ chính phản kích', 'task fail bị xoá', 'trừng phạt vi phạm hệ thống', 'thế giới sụp đổ vì can thiệp'],
+    },
+    honorifics: {
+      superior: ['quản lý cấp cao', 'admin hệ thống', 'agent senior', 'tổ chức Khoái Xuyên', 'mentor xuyên đa vũ trụ'],
+      peer: ['đồng nghiệp xuyên', 'partner hệ thống', 'agent đồng cấp', 'lữ khách đa vũ trụ', 'cặp đôi xuyên cùng'],
+      enemy: ['khí vận chi tử', 'nguyên chủ nguyên tác', 'kẻ đạo đức giả', 'liên minh phản phái', 'tài khoản hack hệ thống'],
+    },
+  },
+
+  'quy-tac-quai-dam': {
+    emotions: {
+      anger: ['nén giận', 'siết chặt nắm tay', 'cố giữ bình tĩnh', 'cắn răng', 'nuốt tức xuống'],
+      shock: ['lạnh sống lưng', 'gáy tóc dựng đứng', 'một luồng khí lạnh chạy dọc', 'tim đập trong cổ họng', 'thở ra một làn hơi mỏng'],
+      contempt: ['nhếch khóe miệng', 'lạnh nhạt', 'không thèm liếc', 'nhìn thấu trò bịp', 'thầm cười'],
+      determination: ['ghi nhớ quy tắc', 'phải sống sót', 'không phạm sai', 'tỉnh táo từng giây', 'đếm từng hơi thở'],
+    },
+    powerExpressions: {
+      techniques: ['suy luận quy tắc', 'phát hiện điều bất thường', 'mô phỏng tử vong', 'đọc nhật ký người tiền nhiệm', 'lắng nghe Uncanny detail'],
+      weakToStrong: ['từ tân binh đến kẻ phá đảo', 'tích lũy mảnh vỡ quy tắc', 'sống sót thêm một phó bản', 'đọc thấu lớp lừa', 'đếm chính xác hành vi quái vật'],
+      breakthrough: ['phá giải quy tắc giả', 'thoát phó bản', 'tăng san trị giới hạn', 'mở khóa đạo cụ quỷ dị', 'lên cấp Kẻ Nắm Giữ Quy Tắc'],
+    },
+    atmosphere: {
+      tense: ['đèn neon flicker', 'tiếng quạt máy lệch nhịp', 'đồng hồ tích tắc chậm 0.3s', 'mùi formaldehyde xen mùi nước hoa', 'gương phản chiếu chậm nửa giây'],
+      mysterious: ['tờ giấy nhăn nhúm trong ngăn kéo', 'bản nội quy bị tẩy xoá một dòng', 'hành lang không có camera', 'tầng không xuất hiện trên thang máy', 'phòng số 444 luôn báo bận'],
+      dangerous: ['vi phạm quy tắc số 7', 'bóng dưới ghế biến mất', 'đồng nghiệp có 6 ngón', 'NPC gọi tên MC khi MC chưa giới thiệu', 'cửa toa tàu mở ra hầm tối'],
+    },
+    honorifics: {
+      superior: ['kẻ phá đảo cấp cao', 'người gác đầu tiên', 'lao công 20 năm', 'chú gác cổng già', 'cô lễ tân ca đêm'],
+      peer: ['đồng nghiệp', 'người sống sót', 'tân binh phó bản', 'bạn cùng ca', 'người ký hợp đồng cùng đợt'],
+      enemy: ['Chủ Quái Đàm', 'NPC quái dị', 'sếp giả', 'soát vé đỏ', 'khách hàng áo mưa', 'bệnh nhân phòng 444'],
+    },
+  },
 };
 
 // ============================================================================
@@ -496,6 +568,27 @@ const GENRE_WRITING_GUIDES: Record<GenreType, GenreWritingGuide> = {
     descriptionFocus: 'Cảm xúc nội tâm: tim đập, má đỏ, hơi thở, ánh mắt. Chi tiết lãng mạn: quà tặng, khoảnh khắc bất ngờ, cử chỉ nhỏ. Sự nghiệp nữ chính: công việc, thành tựu, nỗ lực.',
     emotionalTone: 'Giàu cảm xúc, tinh tế. Ngọt ngào xen kẽ đau lòng. Rung động nhẹ nhàng, không quá dramatic. Hiểu lầm tạo đau khổ nhưng hòa giải tạo cảm động.',
     narrativeStrength: 'Rung động tình cảm, sweet moment, nội tâm sâu sắc, sủng chiều.',
+  },
+  'ngu-thu-tien-hoa': {
+    sentenceStyle: 'Năng động, kết hợp data-game (bảng chỉ số, tuyến tiến hóa, BOM) với phiêu lưu adventure. Câu ngắn khi pet combat (nhịp nhanh, combo skill liên tục). Câu dài khi mô tả pet đột biến (chi tiết visual hoành tráng). Dùng số cụ thể: HP, ATK, DEF, level, drop rate.',
+    dialogueStyle: 'MC điềm tĩnh khi điều phối pet, năng động khi tương tác với pet (gọi tên, ra lệnh, khen thưởng). NPC adversary kiêu ngạo trước, sụp đổ sau. Đám đông khán giả ồn ào, comment liên tục như livestream. Pet "nói" qua tiếng kêu + biểu cảm cụ thể.',
+    descriptionFocus: 'Pet design CHI TIẾT: ngoại hình, màu sắc, kích thước, skill visual effect (luồng sáng, sương mù, tiếng gầm). Đấu trường + cấm khu + học viện ngự thú miêu tả epic scale. Bảng chỉ số + tuyến tiến hóa hiển thị rõ qua góc nhìn MC.',
+    emotionalTone: 'Sảng văn nhanh + phiêu lưu khám phá. Ấm áp khi pet trưởng thành, đoàn kết. Phấn khích khi đột biến hoặc thắng giải. Bittersweet khi pet hi sinh (hiếm nhưng phải có để có depth).',
+    narrativeStrength: 'Bất Đối Xứng Nhận Thức (đối thủ khinh phế vật, thực tế thần thú đột biến), data-driven progression rõ ràng, collection + evolution loop gây nghiện, NPC reactions liên tục.',
+  },
+  'khoai-xuyen': {
+    sentenceStyle: 'Modular episodic — câu văn adapt theo thế giới hiện tại (đô thị nhanh + ngắn, cổ đại trang nhã + dài hơn, mạt thế thô ráp + dứt khoát, ngôn tình mềm mại + nhiều nội tâm). Nhưng MC nội tâm GIỮ giọng deadpan + professional + đôi khi mỉa mai xuyên thế giới.',
+    dialogueStyle: 'MC adapt voice nhập vai (phải thuyết phục là pháo hôi/villain), nội tâm vẫn senior. Khí vận chi tử (nguyên chủ chính) lúc đầu nói lời nhân nghĩa giả tạo, dần lộ chân tướng. Pháo hôi/phản phái nguyên chủ MC đang nhập vai có nội tâm tổn thương sâu.',
+    descriptionFocus: 'Mỗi thế giới mở ra bằng 1-2 đoạn establish bối cảnh nhanh (đô thị tân ngàn tỷ / cung điện Tống triều / city zombie hậu apocalypse). Hub Space giữa các thế giới: khoảng trắng + NPC hệ thống + bảng chỉ số. Mỗi thế giới có aesthetic riêng nhưng UI hệ thống nhất quán.',
+    emotionalTone: 'Tone tùy thế giới (đô thị sảng văn, cổ đại bi tráng, mạt thế cô độc, ngôn tình ngọt sủng). Nhưng MC nội tâm có lớp cảm xúc nhất quán: mệt mỏi đôi khi (đã đi 50+ thế giới), cảm thông với nguyên chủ (như nhìn chính mình), professional khi vạch trần khí vận chi tử.',
+    narrativeStrength: 'Modular episodic không bão hoà, đa thể loại trong 1 truyện, cứu vớt cảm xúc + vả mặt sướng tay + skill stacking, MC senior voice tạo identity nhất quán xuyên đa vũ trụ.',
+  },
+  'quy-tac-quai-dam': {
+    sentenceStyle: 'Lâm sàng (clinical) + first-person hiện đại. Câu ngắn khi MC quan sát chi tiết Uncanny ("Đèn neon. Flicker. Đồng hồ chỉ 3:15."). Câu dài khi MC suy luận quy tắc thật/giả. Tránh hoa mỹ. KHÔNG ẩn dụ thiên nhiên cổ trang.',
+    dialogueStyle: 'Đối thoại CỰC ÍT với NPC quái dị (vì mỗi câu đều có thể vi phạm quy tắc). NPC nói nửa vời, ẩn ý, hoặc câu lặp đi lặp lại. MC nội tâm tự đối thoại với chính mình ("Quy tắc 7 nói gì... ờ, không trả lời nếu được hỏi giờ. Cô gái này đang hỏi giờ. Im lặng.").',
+    descriptionFocus: 'Bối cảnh ĐỜI THƯỜNG quen thuộc (văn phòng, metro, siêu thị, chung cư) miêu tả CHI TIẾT đến độ độc giả nhận ra ngay đồ vật + không gian thường ngày. Sau đó CHI TIẾT SAI LỆCH NHỎ tạo Uncanny Valley. KHÔNG miêu tả quái vật cliché (rồng, yêu, ma) — chỉ miêu tả "người bình thường sai 1 chi tiết".',
+    emotionalTone: 'Kìm nén, lạnh, lý trí. Sợ hãi không bộc lộ thành la hét — chỉ là tay run nhẹ, hơi thở chậm 1 nhịp, mồ hôi lạnh sau gáy. MC dùng kỷ luật não bộ để đè nén cảm xúc, vì cảm xúc mạnh = vi phạm quy tắc tinh thần.',
+    narrativeStrength: 'Atmospheric horror qua chi tiết Uncanny, suy luận logic phá quy tắc giả, sinh tồn bằng IQ thay vì bạo lực, dopamine từ "phá giải" thay vì "đánh thắng".',
   },
 };
 

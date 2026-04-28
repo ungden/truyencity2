@@ -1201,6 +1201,9 @@ export function validateChapterFlexible(
     'linh-di': { min: 2000, max: 4500 },
     'quan-truong': { min: 2500, max: 5000 },
     'di-gioi': { min: 2000, max: 4500 },
+    'quy-tac-quai-dam': { min: 2000, max: 4500 },
+    'ngu-thu-tien-hoa': { min: 2000, max: 4500 },
+    'khoai-xuyen': { min: 2000, max: 4500 },
   };
   
   const wordRange = genreWordCounts[genre] || { min: 2000, max: 4000 };
