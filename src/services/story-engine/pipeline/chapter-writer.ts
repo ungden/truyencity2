@@ -237,6 +237,14 @@ TẤU HÀI WEBNOVEL (BẮT BUỘC): Mỗi chương ≥1 khoảnh khắc hài hư
 
 CHỐNG LẶP TỪ: KHÔNG dùng cùng tính từ/màu sắc quá 3 lần trong chương. Sau lần 3 → dùng từ đồng nghĩa. TUYỆT ĐỐI KHÔNG dùng cùng tính từ 2 lần trong 1 đoạn.
 
+CHỐNG LẶP SETUP (TRỌNG SINH / GOLDEN-FINGER NOVELS — CỰC KỲ QUAN TRỌNG):
+Setup gốc của truyện (rebirth, bàn tay vàng, nguyên do MC có lợi thế) đã được thiết lập ở chương 1-3. Reader đã biết. Từ chương 4 trở đi, KHÔNG được dồn nửa chương vào hồi tưởng/giải thích lại setup đó. Cụ thể:
+- Cụm "kiếp trước" / "30 năm tương lai" / "ký ức tiền kiếp" / "tương lai biết trước" — TỐI ĐA 3 lần/chương trong narration. Nếu bắt buộc dùng nhiều hơn (vd flashback bắt buộc theo arc plan) → ghép vào 1 scene flashback duy nhất, KHÔNG rải đều cả chương.
+- Tên golden finger ("Hệ Thống", "Bàn Tay Vàng", "Hải Tâm", "Đồ Giám Yêu Ma", v.v.) — TỐI ĐA 5 lần/chương trong narration. Sau lần 3 → dùng đại từ "nó", "thứ năng lực ấy", "hệ thống trong đầu", v.v.
+- KHÔNG re-narrate cùng 1 flashback đã xuất hiện ở chương trước. Reader nhớ. Nếu cần callback, dùng 1 câu ngắn ("Như đêm tỉnh lại trong căn phòng trọ năm ấy"), KHÔNG kể lại nguyên scene.
+- KHÔNG dồn 50% chương vào nội tâm reflect "kiếp này phải khác kiếp trước". Mỗi chương ƯU TIÊN: hành động cụ thể (đi đâu, làm gì, gặp ai, kết quả ra sao). Nội tâm reflect chỉ nên 10-20% volume chương.
+Mục đích: tránh cảm giác "lặp đi lặp lại như chương 1-2" cho reader.
+
 CHỐNG LẶP CẤU TRÚC AI (CỰC KỲ QUAN TRỌNG):
 - CẤM "X là một Y" quá 3 lần/chương. Thay: "X — Y", "X, tên Y", hoặc diễn đạt khác. VD: thay "Hắn là một kẻ lãnh đạo tàn nhẫn" → "Tên lãnh đạo tàn nhẫn ấy"
 - CẤM "bắt đầu + động từ" quá 3 lần/chương. Thay: dùng trực tiếp động từ. VD: thay "bắt đầu run rẩy" → "run lẩy bẩy", "rung lên từng đợt"
