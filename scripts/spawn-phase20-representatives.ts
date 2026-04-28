@@ -186,10 +186,26 @@ Trả về JSON đầy đủ các trường: id, title, genre, premise, themes (
   });
   const outline = parseJSON<StoryOutline>(res.content);
   if (!outline) throw new Error('story_outline parse failed');
+
+  // CRITICAL: enforce protagonist name match. DeepSeek often invents a
+  // different name in protagonist.name even when we pass PROTAGONIST: in the
+  // prompt — and this leaks into chapter writing because the engine reads
+  // story_outline.protagonist.name as ground truth. Override post-gen to
+  // guarantee project.main_character === outline.protagonist.name.
+  const o = outline as unknown as { protagonist?: { name?: string; [k: string]: unknown } };
+  if (o.protagonist) {
+    if (o.protagonist.name && o.protagonist.name !== seed.main_character) {
+      console.log(`  ⚠ outline.protagonist.name="${o.protagonist.name}" overridden → "${seed.main_character}"`);
+    }
+    o.protagonist.name = seed.main_character;
+  } else {
+    o.protagonist = { name: seed.main_character };
+  }
+
   await s.from('ai_story_projects')
     .update({ story_outline: outline as unknown as Record<string, unknown> })
     .eq('id', projectId);
-  console.log(`  ✓ story_outline saved`);
+  console.log(`  ✓ story_outline saved (protagonist=${seed.main_character})`);
 }
 
 async function createNovelAndProject(seed: NovelSeed, ownerId: string): Promise<string> {
