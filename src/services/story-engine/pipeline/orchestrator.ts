@@ -111,7 +111,76 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   const currentChapter = project.current_chapter || 0;
   const nextChapter = currentChapter + 1;
   const genre = (project.genre || 'tien-hiep') as GenreType;
-  const protagonistName = project.main_character || 'Nhân vật chính';
+
+  // ── Step 1b: Pre-flight metadata validation + auto-repair ──────────────
+  // Catches three classes of bug we've seen ship to readers:
+  //   (A) project.main_character ≠ story_outline.protagonist.name
+  //       — the engine reads outline.protagonist.name when writing chapters,
+  //         so a mismatch means description shows one name and chapters
+  //         show another. Pick the authoritative source by chapter count
+  //         (chapters > 0 → outline wins, else seed wins) and sync the
+  //         loser side back.
+  //   (D) total_planned_chapters wildly exceeds master_outline arc coverage
+  //       — story will end at the last arc's endChapter, so quota past
+  //         that is dead weight. Auto-trim.
+  //   (E) total_planned_chapters way SHORTER than master_outline arcs
+  //       — extend to cover the outlined story.
+  // All repairs are persisted to DB before chapter generation.
+  const validationFixes: string[] = [];
+  let resolvedMainCharacter = project.main_character || 'Nhân vật chính';
+  try {
+    const { data: extra } = await db
+      .from('ai_story_projects')
+      .select('story_outline,master_outline')
+      .eq('id', options.projectId)
+      .single();
+    const storyOutline = extra?.story_outline as { protagonist?: { name?: string } } | null;
+    const masterOutline = extra?.master_outline as { majorArcs?: Array<{ endChapter?: number }> } | null;
+
+    // Fix A: MC name sync
+    const outlineMC = storyOutline?.protagonist?.name?.trim();
+    const projectMC = project.main_character?.trim();
+    if (outlineMC && projectMC && outlineMC !== projectMC) {
+      // Authoritative source: whichever side already has chapters written
+      const winner = currentChapter > 0 ? outlineMC : projectMC;
+      const loser = currentChapter > 0 ? 'project.main_character' : 'outline.protagonist.name';
+      if (currentChapter > 0) {
+        // chapters use outlineMC → sync project field to match
+        await db.from('ai_story_projects').update({ main_character: outlineMC }).eq('id', options.projectId);
+      } else {
+        // no chapters yet → seed name wins, sync outline
+        const newOutline = { ...(storyOutline || {}), protagonist: { ...(storyOutline?.protagonist || {}), name: projectMC } };
+        await db.from('ai_story_projects').update({ story_outline: newOutline as unknown as Record<string, unknown> }).eq('id', options.projectId);
+      }
+      resolvedMainCharacter = winner;
+      validationFixes.push(`MC sync: ${loser}="${currentChapter > 0 ? projectMC : outlineMC}" → "${winner}" (ch.${currentChapter} written)`);
+    } else if (projectMC) {
+      resolvedMainCharacter = projectMC;
+    }
+
+    // Fix D/E: total_planned_chapters ↔ master_outline coverage alignment
+    const arcs = masterOutline?.majorArcs ?? [];
+    if (arcs.length > 0) {
+      const lastArcEnd = Math.max(...arcs.map((a) => a?.endChapter || 0));
+      const planned = project.total_planned_chapters || 0;
+      // Tolerate ≤10% drift; otherwise auto-correct
+      const driftRatio = planned > 0 ? Math.abs(lastArcEnd - planned) / planned : 1;
+      if (lastArcEnd > 0 && driftRatio > 0.1) {
+        // Round to nearest 50 for cleaner numbers
+        const newTotal = Math.round(lastArcEnd / 50) * 50 || lastArcEnd;
+        await db.from('ai_story_projects').update({ total_planned_chapters: newTotal }).eq('id', options.projectId);
+        validationFixes.push(`total_planned: ${planned} → ${newTotal} (master outline covers ch.${lastArcEnd})`);
+      }
+    }
+  } catch (err) {
+    console.warn('[orchestrator] Pre-flight validation failed (non-fatal):', err instanceof Error ? err.message : String(err));
+  }
+  if (validationFixes.length > 0) {
+    console.log(`[orchestrator] Pre-flight auto-repair (project ${options.projectId}):`);
+    for (const f of validationFixes) console.log(`  ✓ ${f}`);
+  }
+
+  const protagonistName = resolvedMainCharacter;
   const storyTitle = novel.title || project.world_description || `Project ${project.id}`;
   const totalPlanned = project.total_planned_chapters || 1000;
   // Base target: explicit option > project setting > default. style_directives override takes precedence over project setting.
@@ -312,6 +381,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       isFinalArc,
       genreBoundary: context.genreBoundary,
       worldBible: context.storyBible,
+      worldDescription: project.world_description,
       subGenres: context.subGenres,
     },
   );

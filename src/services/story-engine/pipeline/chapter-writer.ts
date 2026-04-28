@@ -31,7 +31,7 @@
 import { callGemini } from '../utils/gemini';
 import { parseJSON } from '../utils/json-repair';
 import { getStyleByGenre, buildTitleRulesPrompt, GOLDEN_CHAPTER_REQUIREMENTS, ENGAGEMENT_CHECKLIST, getGenreEngagement, getGenreAntiCliche } from '../config';
-import { VN_PRONOUN_GUIDE, SUB_GENRE_RULES, isNonCombatGenre } from '../templates';
+import { VN_PRONOUN_GUIDE, SUB_GENRE_RULES, isNonCombatGenre, requiresVndCurrency } from '../templates';
 import { getConstraintExtractor } from '../memory/constraint-extractor';
 import { GENRE_CONFIG } from '../../../lib/types/genre-config';
 import { buildStyleContext, getEnhancedStyleBible, CLIFFHANGER_TECHNIQUES } from '../memory/style-bible';
@@ -391,6 +391,9 @@ KIỂM TRA MÂU THUẪN (BẮT BUỘC — coherence chặt cho long-form):
 - Nếu MC ở location A chương trước, location B chương này KHÔNG có scene di chuyển -> type "continuity", severity "major"
 - Nếu economic/resource logic vô lý (do-thi: MC chi tiêu vượt tài chính đã thiết lập) -> type "continuity", severity "major"
 - Nếu nhân vật HÀNH XỬ KHÁC tính cách (50%) nhưng có thể rationalize -> type "continuity", severity "major" (khi không phải personality shift hoàn toàn)
+- MATH SANITY (cho do-thi/quan-truong/lich-su VN/kinh-doanh): nếu MC có X đồng/tỷ + chi Y mà Y > X mà KHÔNG có kênh thu nhập / vay vốn được setup từ trước → type "continuity" severity "critical", REWRITE. KHÔNG để math impossible kiểu "có 5 triệu tiêu 27 triệu".
+- VND CURRENCY (Vietnam-set genres do-thi/quan-truong/lich-su VN/linh-di Dân Quốc): nếu chapter dùng "X xu" / "X nguyên" / "X lượng vàng" làm đơn vị tiền tệ giao dịch hàng ngày (mua bán, vay nợ, lương, giá đất) → type "continuity" severity "critical", REWRITE. CHỈ cho phép "đồng / nghìn đồng / triệu đồng / tỷ đồng" (VND). NGOẠI LỆ duy nhất: tu-tiên/huyen-huyen/kiem-hiep/lich-su cổ đại Hoa Hạ → cho phép "đồng vàng/bạc/linh thạch" theo bối cảnh.
+- ECONOMIC LEDGER ENFORCEMENT: nếu pre-write context có khối "[TÀI CHÍNH / TÀI SẢN]" liệt kê số dư MC, chapter này CẤM cho MC chi tiêu/đầu tư vượt số đó MÀ KHÔNG có deal/vay/thu nhập rõ ràng trong cùng chapter. Vi phạm → "continuity" severity "critical".
 
 VERDICT:
 - APPROVE (overallScore >= 6 VÀ đủ từ): approved=true, requiresRewrite=false
@@ -424,6 +427,11 @@ export interface WriteChapterOptions {
   isFinalArc?: boolean;
   genreBoundary?: string;
   worldBible?: string;
+  /** Project's world_description text. Used by Critic to detect Vietnam-set
+   *  novels via regex sniff (Đại Nam / Hà Nội / Sài Gòn / Dân Quốc) so the
+   *  VND currency hard-check fires on linh-di Dân Quốc / lich-su Đại Việt
+   *  novels too, not just genres in VND_CURRENCY_GENRES. */
+  worldDescription?: string | null;
   /** Sub-genres for blending (e.g., ['trong-sinh','kinh-doanh']). Threaded into VN pronoun + sub-genre rules. */
   subGenres?: string[];
 }
@@ -488,6 +496,7 @@ export async function writeChapter(
       options?.isFinalArc === true,
       options?.projectId,
       genre,
+      options?.worldDescription,
     );
 
     if (critic.requiresRewrite && attempt < maxRetries - 1) {
@@ -906,6 +915,7 @@ async function runCritic(
   isFinalArc: boolean,
   projectId?: string,
   genre?: GenreType,
+  worldDescription?: string | null,
 ): Promise<CriticOutput> {
   const wordCount = countWords(content);
   const wordRatio = wordCount / targetWords;
@@ -1005,7 +1015,19 @@ KIỂM TRA TUÂN THỦ QUALITY MODULES (NẾU CÓ THÔNG TIN):
 - Nếu MC tham gia "giải đấu game/võ thuật" làm trục chính chương trong khi genre "${genre}" là kinh doanh/chính trường/tình cảm → issue "continuity", severity "critical", REWRITE.
 - Conflict cho thể loại này PHẢI là thương chiến/chính trị/tình cảm — KHÔNG vũ lực. Nếu chương resolve conflict bằng vũ lực → REWRITE bằng phương án thương mại/đàm phán/lobby/PR.`
       : '';
-    const res = await callGemini(prompt, { ...config, temperature: 0.2, maxTokens: 4096, systemPrompt: CRITIC_SYSTEM + nonCombatGuard }, { jsonMode: true, tracking: projectId ? { projectId, task: 'critic', chapterNumber: outline.chapterNumber } : undefined });
+    // VND currency hard check — applies to Vietnam-set genres OR any genre
+    // whose world_description contains explicit VN markers (Đại Nam, Hà Nội,
+    // Sài Gòn, Dân Quốc...). Catches "X xu / X nguyên / X lượng" leakage
+    // from TQ webnovel templates into Vietnamese-set business stories.
+    const vndGuard = genre && requiresVndCurrency(genre, worldDescription)
+      ? `\n\nVND CURRENCY HARD CHECK (Vietnam-set genre "${genre}"):
+- Nếu chương có cụm \\d+ kèm "xu", "nguyên", hoặc "lượng vàng/lượng bạc" làm đơn vị tiền giao dịch hàng ngày (mua bán, vay nợ, lương, giá đất) → issue type "continuity", severity "critical", verdict REWRITE.
+- Đơn vị tiền HỢP LỆ DUY NHẤT cho thể loại này: "đồng / nghìn đồng / triệu đồng / tỷ đồng" (VND).
+- Cho phép "lượng vàng" CHỈ khi đề cập như tài sản tích trữ/đầu tư (1 lượng ≈ 4-5 triệu đồng), KHÔNG dùng thanh toán hàng ngày.
+- Nếu phát hiện "tỷ xu" / "triệu nguyên" / "5 ngàn xu" → REWRITE thay bằng số đồng tương đương.
+- MATH SANITY: nếu MC có X đồng đầu chương + chi Y mà Y > X mà KHÔNG có thu nhập / vay vốn được setup rõ ràng → REWRITE.`
+      : '';
+    const res = await callGemini(prompt, { ...config, temperature: 0.2, maxTokens: 4096, systemPrompt: CRITIC_SYSTEM + nonCombatGuard + vndGuard }, { jsonMode: true, tracking: projectId ? { projectId, task: 'critic', chapterNumber: outline.chapterNumber } : undefined });
 
     if (!res.content) {
       // Fail closed: don't approve on error

@@ -266,6 +266,21 @@ async function generateOutlines(projectId: string, seed: NovelSeed): Promise<voi
   );
   if (!master) throw new Error('master_outline returned null');
   console.log(`  ✓ master_outline saved (${master.majorArcs.length} arcs)`);
+
+  // Auto-sync total_planned_chapters to whatever master_outline actually
+  // covers. Without this guard the project carries a quota the story
+  // never reaches (e.g. seed says 1500 ch, AI outlines 6 arcs to ch.750
+  // → daily-quota cron keeps trying to write past the last arc with no
+  // narrative scaffold). Tolerate ≤10% drift; otherwise round to 50.
+  const lastArcEnd = Math.max(...master.majorArcs.map(a => a.endChapter || 0));
+  if (lastArcEnd > 0) {
+    const driftRatio = Math.abs(lastArcEnd - seed.total_planned_chapters) / seed.total_planned_chapters;
+    if (driftRatio > 0.1) {
+      const newTotal = Math.round(lastArcEnd / 50) * 50 || lastArcEnd;
+      await s.from('ai_story_projects').update({ total_planned_chapters: newTotal }).eq('id', projectId);
+      console.log(`  ✓ total_planned_chapters auto-synced: ${seed.total_planned_chapters} → ${newTotal} (matches arc coverage ch.${lastArcEnd})`);
+    }
+  }
 }
 
 async function activateProject(projectId: string): Promise<void> {
