@@ -14,6 +14,7 @@
  */
 import * as dotenv from 'dotenv';
 dotenv.config({ path: '/Users/alexle/Documents/truyencity/.env.runtime' });
+process.env.DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || 'sk-ef7b0c18ca9d4270921ddabc191a19c3';
 
 import { createClient } from '@supabase/supabase-js';
 import { generateMasterOutline } from '@/services/story-engine/pipeline/master-outline';
