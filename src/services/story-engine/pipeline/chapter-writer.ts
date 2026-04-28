@@ -394,6 +394,12 @@ KIỂM TRA MÂU THUẪN (BẮT BUỘC — coherence chặt cho long-form):
 - MATH SANITY (cho do-thi/quan-truong/lich-su VN/kinh-doanh): nếu MC có X đồng/tỷ + chi Y mà Y > X mà KHÔNG có kênh thu nhập / vay vốn được setup từ trước → type "continuity" severity "critical", REWRITE. KHÔNG để math impossible kiểu "có 5 triệu tiêu 27 triệu".
 - VND CURRENCY (Vietnam-set genres do-thi/quan-truong/lich-su VN/linh-di Dân Quốc): nếu chapter dùng "X xu" / "X nguyên" / "X lượng vàng" làm đơn vị tiền tệ giao dịch hàng ngày (mua bán, vay nợ, lương, giá đất) → type "continuity" severity "critical", REWRITE. CHỈ cho phép "đồng / nghìn đồng / triệu đồng / tỷ đồng" (VND). NGOẠI LỆ duy nhất: tu-tiên/huyen-huyen/kiem-hiep/lich-su cổ đại Hoa Hạ → cho phép "đồng vàng/bạc/linh thạch" theo bối cảnh.
 - ECONOMIC LEDGER ENFORCEMENT: nếu pre-write context có khối "[TÀI CHÍNH / TÀI SẢN]" liệt kê số dư MC, chapter này CẤM cho MC chi tiêu/đầu tư vượt số đó MÀ KHÔNG có deal/vay/thu nhập rõ ràng trong cùng chapter. Vi phạm → "continuity" severity "critical".
+- ANTI-MONOLOGUE REPETITION: tránh để MC sa đà reflect lại cùng nội dung (rebirth/golden finger origin) mỗi chương.
+  → Nếu chương có ≥4 lần cụm "kiếp trước" / "30 năm tương lai" / "ký ức tiền kiếp" / "tương lai biết trước" trong narration → "quality" severity "moderate".
+  → Nếu ≥6 lần → "quality" severity "major", REVISE.
+  → Nếu cùng 1 nội dung flashback/origin được tái diễn ≥2 lần trong chương khi reader đã biết từ chương trước → "quality" severity "moderate".
+  → Tên golden finger (Hệ Thống / Bàn Tay Vàng / "Hải Tâm" hoặc tên cụ thể của truyện) lặp ≥6 lần trong narration → "quality" severity "moderate".
+  Mục đích: ép Writer narrate progressive content thay vì lặp lại setup. MC có thể NHẮC ngắn 1-2 lần/chương cho reader mới, nhưng KHÔNG dồn toàn chương vào hồi tưởng cùng 1 thông tin.
 
 VERDICT:
 - APPROVE (overallScore >= 6 VÀ đủ từ): approved=true, requiresRewrite=false
