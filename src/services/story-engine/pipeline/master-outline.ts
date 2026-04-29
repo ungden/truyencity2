@@ -164,6 +164,14 @@ Quy tắc:
       return null;
     }
 
+    // DeepSeek sometimes returns shape without majorArcs (truncated / incomplete
+    // structured output). Validate before sanitization to avoid downstream
+    // .map() on undefined that swallows the real cause via outer try/catch.
+    if (!Array.isArray(parsed.majorArcs) || parsed.majorArcs.length === 0) {
+      console.error('Master outline missing majorArcs array — DeepSeek returned incomplete shape, skipping DB save');
+      return null;
+    }
+
     // Genre-aware validation: detect combat/villain leakage in non-combat genres
     const validationIssues = validateMasterOutlineForGenre(parsed, genre);
     if (validationIssues.length > 0) {

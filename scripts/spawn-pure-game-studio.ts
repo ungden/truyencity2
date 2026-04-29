@@ -239,15 +239,14 @@ async function generateOutlines(projectId: string, seed: NovelSeed): Promise<voi
   await generateStoryOutline(projectId, seed);
   console.log(`  → master_outline...`);
   const cappedTotal = Math.min(seed.total_planned_chapters, MAX_PLANNED_CHAPTERS);
-  const master = await generateMasterOutline(
-    projectId,
-    seed.title,
-    seed.genre,
-    seed.world_description,
-    cappedTotal,
-    cfg,
-  );
-  if (!master) throw new Error('master_outline returned null');
+  // DeepSeek occasionally returns shape without majorArcs — retry up to 3 times.
+  let master = null;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    master = await generateMasterOutline(projectId, seed.title, seed.genre, seed.world_description, cappedTotal, cfg);
+    if (master?.majorArcs?.length) break;
+    console.warn(`  ⚠ master_outline attempt ${attempt}/3 incomplete — retrying`);
+  }
+  if (!master?.majorArcs?.length) throw new Error('master_outline failed after 3 attempts');
   console.log(`  ✓ master_outline saved (${master.majorArcs.length} arcs)`);
 
   const lastArcEnd = Math.max(...master.majorArcs.map(a => a.endChapter || 0));
