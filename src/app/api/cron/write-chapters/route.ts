@@ -67,7 +67,7 @@ const OVERLOAD_INIT_WRITE_CAP = clamp(parseIntEnv('WRITE_CHAPTERS_OVERLOAD_INIT_
 // Scaling guidance:
 //   - 50/day: keep 240 min → cadence 5 min (need cron 3-min interval for safety)
 //   - 100/day: expand to 480 min (8h) → cadence 5 min, OR keep 240 min + cron 2-min
-const ACTIVE_WINDOW_MINUTES = clamp(parseIntEnv('WRITE_CHAPTERS_ACTIVE_WINDOW_MINUTES', 240), 60, 1440);
+const ACTIVE_WINDOW_MINUTES = clamp(parseIntEnv('WRITE_CHAPTERS_ACTIVE_WINDOW_MINUTES', 1440), 60, 1440);
 
 export const maxDuration = 800; // 13.3 minutes (Vercel Pro allows up to 800s) — DeepSeek V4 Flash thinking mode needs more headroom
 export const dynamic = 'force-dynamic';
