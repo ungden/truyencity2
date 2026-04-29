@@ -10,35 +10,36 @@
  * novel that's ~$525 extra. Worth it for "đại thần grade" quality.
  */
 
+// Pro tier: ONLY rare, novel-trajectory-defining tasks.
+// Per-chapter Pro × 1000 chapters = cost explosion. Architect/Critic/Guardian
+// dropped to Flash — at 12× cost they would dominate the budget.
 const PRO_TASKS = new Set([
-  // Story-level planning — set the entire trajectory
-  'master_outline',
-  'story_outline',
-  'arc_plan',
-  'story_bible',
-  // Per-chapter reasoning
-  'architect',           // Plans every scene structure
-  'critic',              // Editorial review
-  'continuity_guardian', // 4th-agent biên tập viên
-  // Phase 22 Stage 4 Lever F: auto_revision moved to Flash. Auto-revise runs <10% of
-  // chapters, and the prompt is highly structured (explicit instructions per issue type).
-  // Flash handles structured editing well. Saves marginal cost without quality loss.
+  // Story-level planning — set the entire trajectory (called 1-50 times / 1000 chapters)
+  'master_outline',      // 1× per novel
+  'story_outline',       // 1× per novel
+  'story_bible',         // ch.3 + every 150ch ≈ 7× per 1000 chapters
+  'arc_plan',            // ~50× per 1000 chapters (every 20 ch)
 ]);
 
 const FLASH_TASKS = new Set([
-  'writer',              // Volume play; Vietnamese prose; Pro overkill
+  // Per-chapter agents — high volume, must stay cheap
+  'architect',
+  'critic',
+  'continuity_guardian',
+  'writer',
   'writer_continuation',
-  'auto_revision',       // Stage 4 Lever F — structured edit, Flash sufficient
-  'synopsis',            // Recap data, low stakes
-  'chapter_summary',     // Recap data
-  'combined_summary',    // Recap + character extraction
-  'character_bible_refresh',     // Bible assembly from existing data
-  'volume_summary',              // Macro recap
+  'auto_revision',
+  // Recap / extraction tasks
+  'synopsis',
+  'chapter_summary',
+  'combined_summary',
+  'character_bible_refresh',
+  'volume_summary',
   'character_arc',
   'voice_fingerprint',
   'mc_power',
   'foreshadowing_agenda',
-  'plot_tracker',        // Finance check is rule-based mostly
+  'plot_tracker',
   'character_knowledge',
   'relationships',
   'economic',
@@ -46,7 +47,7 @@ const FLASH_TASKS = new Set([
   'pacing_blueprint',
 ]);
 
-export const MODEL_PRO = 'deepseek-v4-pro';
+export const MODEL_PRO = 'gemini-3.1-pro-preview';
 export const MODEL_FLASH = 'deepseek-v4-flash';
 
 declare global {

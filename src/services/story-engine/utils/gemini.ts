@@ -15,6 +15,8 @@ const RETRY_DELAYS = [2000, 5000, 10000];
 // Pricing per 1M tokens (Google AI docs, Standard tier)
 const PRICING: Record<string, { inputPerMillion: number; outputPerMillion: number }> = {
   'gemini-3-flash-preview':       { inputPerMillion: 0.50, outputPerMillion: 3.00 },
+  'gemini-3-pro-preview':         { inputPerMillion: 2.00, outputPerMillion: 12.00 },
+  'gemini-3.1-pro-preview':       { inputPerMillion: 2.00, outputPerMillion: 12.00 },
   'gemini-3-pro-image-preview':   { inputPerMillion: 2.00, outputPerMillion: 12.00 },
   'gemini-embedding-001':         { inputPerMillion: 0.15, outputPerMillion: 0 },
   // Fallback for unknown models
