@@ -16,6 +16,12 @@ import { startSession, updateSessionDuration, endSession, markChapterRead } from
 import { READING } from '@/lib/config';
 import { AdPlacement } from '@/components/ads/AdPlacement';
 import { CopyProtect } from '@/components/reader/copy-protect';
+import { AppLockGate } from '@/components/reader/app-lock-gate';
+
+// Latest N chapters of every novel are LOCKED on web — must read on app.
+// Mobile native app fetches via direct supabase query and naturally bypasses
+// (no React web code runs on mobile). Drives mobile install + ad/IAP revenue.
+const APP_LOCK_WINDOW = 10;
 
 const Comments = dynamic(
   () => import('@/components/comments').then((mod) => mod.Comments),
@@ -95,7 +101,7 @@ export default function ReadingPageClient({ novelSlug, chapterNumber }: ReadingP
       try {
         const { data: novelData } = await supabase
           .from('novels')
-          .select('id, title, slug')
+          .select('id, title, slug, chapter_count')
           .eq('slug', novelSlug)
           .single();
 
@@ -105,9 +111,21 @@ export default function ReadingPageClient({ novelSlug, chapterNumber }: ReadingP
         setNovelTitle(novelData.title);
         setIsBookmarked(bookmarks.includes(novelData.id));
 
+        // App lock pre-check: don't fetch content if chapter is in last N
+        // window. Web users see <AppLockGate> stub instead. Prevents content
+        // leaking through DevTools/network tab even though render is gated.
+        // Mobile native app uses its own supabase client and bypasses this.
+        const totalCount = (novelData.chapter_count as number) || 0;
+        const isLocked = totalCount > APP_LOCK_WINDOW
+          && chapterNumber > totalCount - APP_LOCK_WINDOW;
+
+        const chapterSelect = isLocked
+          ? 'id, novel_id, chapter_number, title, created_at'  // omit content
+          : '*';
+
         const { data: chapterData, error: chapterError } = await supabase
           .from('chapters')
-          .select('*')
+          .select(chapterSelect)
           .eq('novel_id', novelData.id)
           .eq('chapter_number', chapterNumber)
           .maybeSingle();
@@ -115,7 +133,12 @@ export default function ReadingPageClient({ novelSlug, chapterNumber }: ReadingP
         if (chapterError) throw new Error('Không thể tải chương này. Vui lòng thử lại.');
         if (!chapterData) throw new Error('Không tìm thấy chương này.');
 
-        setCurrentChapter(chapterData);
+        // For locked chapters, ensure content is empty in state (defense-in-depth).
+        if (isLocked && 'content' in chapterData) {
+          (chapterData as { content?: string }).content = '';
+        }
+
+        setCurrentChapter(chapterData as unknown as Chapter);
 
         const { data: chaptersList, error: listError } = await supabase
           .from('chapters')
@@ -445,30 +468,49 @@ export default function ReadingPageClient({ novelSlug, chapterNumber }: ReadingP
           </p>
         </div>
 
-        <CopyProtect chapterUrl={`/truyen/${novelSlug}/read/${chapterNumber}`}>
-          <article
-            className={cn(
-              'max-w-none whitespace-pre-wrap text-inherit',
-              articleToneClasses[settings.theme],
-              '[&_p]:mb-5 [&_p]:leading-relaxed',
-              '[&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-4 [&_h1]:mt-8',
-              '[&_h2]:text-xl [&_h2]:font-semibold [&_h2]:mb-3 [&_h2]:mt-6',
-              '[&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mb-2 [&_h3]:mt-4',
-              '[&_blockquote]:border-l-4 [&_blockquote]:border-current/30 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:opacity-80',
-              '[&_hr]:my-8 [&_hr]:border-current/20',
-              !isMobile && settings.twoColumnsDesktop ? 'lg:columns-2 lg:gap-12' : ''
-            )}
-            style={{
-              fontSize: `${settings.fontSize}px`,
-              lineHeight: settings.lineHeight,
-              fontFamily: settings.fontFamily,
-              letterSpacing: `${settings.letterSpacing}em`,
-              textAlign: settings.justify ? ('justify' as const) : ('start' as const),
-              color: 'inherit',
-            }}
-            dangerouslySetInnerHTML={{ __html: sanitizedContent }}
-          />
-        </CopyProtect>
+        {/* App lock gate: latest N chapters of every novel locked on web. */}
+        {(() => {
+          const totalChapters = allChapters.length;
+          const isLocked = totalChapters > APP_LOCK_WINDOW
+            && currentChapter.chapter_number > totalChapters - APP_LOCK_WINDOW;
+          if (isLocked) {
+            return (
+              <AppLockGate
+                novelSlug={novelSlug}
+                lastUnlockedChapterNumber={Math.max(1, totalChapters - APP_LOCK_WINDOW)}
+                currentChapterNumber={currentChapter.chapter_number}
+                currentChapterTitle={currentChapter.title}
+                lockWindow={APP_LOCK_WINDOW}
+              />
+            );
+          }
+          return (
+            <CopyProtect chapterUrl={`/truyen/${novelSlug}/read/${chapterNumber}`}>
+              <article
+                className={cn(
+                  'max-w-none whitespace-pre-wrap text-inherit',
+                  articleToneClasses[settings.theme],
+                  '[&_p]:mb-5 [&_p]:leading-relaxed',
+                  '[&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-4 [&_h1]:mt-8',
+                  '[&_h2]:text-xl [&_h2]:font-semibold [&_h2]:mb-3 [&_h2]:mt-6',
+                  '[&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mb-2 [&_h3]:mt-4',
+                  '[&_blockquote]:border-l-4 [&_blockquote]:border-current/30 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:opacity-80',
+                  '[&_hr]:my-8 [&_hr]:border-current/20',
+                  !isMobile && settings.twoColumnsDesktop ? 'lg:columns-2 lg:gap-12' : ''
+                )}
+                style={{
+                  fontSize: `${settings.fontSize}px`,
+                  lineHeight: settings.lineHeight,
+                  fontFamily: settings.fontFamily,
+                  letterSpacing: `${settings.letterSpacing}em`,
+                  textAlign: settings.justify ? ('justify' as const) : ('start' as const),
+                  color: 'inherit',
+                }}
+                dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+              />
+            </CopyProtect>
+          );
+        })()}
 
         <AdPlacement placement="chapter" slot="chapter-post-content" />
 
