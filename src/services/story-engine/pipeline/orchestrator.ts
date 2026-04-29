@@ -575,6 +575,19 @@ Trả về JSON:
     throw new Error(`Chapter upsert failed: ${upsertErr.message}`);
   }
 
+  // ── Step 5b: Bump current_chapter IMMEDIATELY after chapter upsert ──
+  // Phase 23 race-fix: previously current_chapter was updated AFTER 17 post-write tasks (Step 7).
+  // If Vercel timed out mid-post-write, chapters were saved but current_chapter stayed stale →
+  // next cron tick re-wrote ch.N+1 onto the same row, or saw 0 chapters and thought nothing
+  // had been written. Post-write tasks are all non-fatal so they don't need to block this.
+  const { error: bumpErr } = await db
+    .from('ai_story_projects')
+    .update({ current_chapter: lastChapterNumber, updated_at: new Date().toISOString() })
+    .eq('id', project.id);
+  if (bumpErr) {
+    console.warn(`[Orchestrator] CRITICAL: Failed to bump current_chapter to ${lastChapterNumber} for project ${project.id}: ${bumpErr.message}`);
+  }
+
   // ── Step 6: 7 parallel post-write tasks (all non-fatal) ───────────────
   const arcNumber = Math.ceil(nextChapter / 20);
   // 2026-04-29 audit fix: aiWriteCount tracks the number of AI writes (vs reader chapters).
@@ -913,15 +926,9 @@ Trả về JSON:
     ] : []),
   ]);
 
-  // ── Step 7: Update project current_chapter (use LAST chapter of split) ──
-  const { error: stepSevenErr } = await db
-    .from('ai_story_projects')
-    .update({ current_chapter: lastChapterNumber, updated_at: new Date().toISOString() })
-    .eq('id', project.id);
-
-  if (stepSevenErr) {
-    console.warn(`[Orchestrator] CRITICAL: Failed to update current_chapter to ${lastChapterNumber} for project ${project.id}: ${stepSevenErr.message}`);
-  }
+  // Step 7 removed: current_chapter is bumped right after chapter upsert (Step 5b).
+  // Keeping the bump there guarantees DB consistency even if a post-write task throws past
+  // the parallel-task boundary or Vercel kills the function mid-task.
 
   return {
     chapterNumber: nextChapter,
