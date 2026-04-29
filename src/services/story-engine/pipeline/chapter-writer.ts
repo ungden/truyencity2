@@ -955,7 +955,22 @@ ${buildGenreAntiClicheSection(genre)}
 Bắt đầu viết:`;
 
   const writerSuffix = buildGenreSpecificSuffix(genre, options?.subGenres || []);
-  const res = await callGemini(prompt, { ...config, systemPrompt: WRITER_SYSTEM + VN_PLACE_LOCK + writerSuffix }, { tracking: options?.projectId ? { projectId: options.projectId, task: 'writer', chapterNumber: outline.chapterNumber } : undefined });
+  // VND CURRENCY proactive rule (added 2026-04-29): Critic-side rule alone
+  // wasn't enough — "X xu" / "X nguyên" leaks were appearing in 30+ chapters
+  // across many do-thi/quan-truong novels. Add to Writer system prompt so AI
+  // generates correct currency from the start instead of depending on Critic
+  // to catch and rewrite (which sometimes accepts the leak with low score).
+  const writerVndGuard = genre && requiresVndCurrency(genre, options?.worldDescription)
+    ? `\n\n[CURRENCY RULE — BẮT BUỘC, KHÔNG ĐƯỢC LEAK]
+- Truyện đặt ở Việt Nam (genre "${genre}"). Đơn vị tiền DUY NHẤT khi nhân vật giao dịch hàng ngày: ĐỒNG (đồng / nghìn đồng / triệu đồng / tỷ đồng).
+- TUYỆT ĐỐI CẤM dùng "xu" hoặc "nguyên" làm đơn vị tiền — đây là từ Trung Quốc leak vào (元/源币), không phải tiếng Việt thực tế. Người Việt KHÔNG dùng "5 triệu xu" hay "100 nguyên" — chỉ dùng "5 triệu đồng" hoặc "100 đồng".
+- Sai: "127.000 xu", "5 triệu xu", "350 nghìn xu", "1000 nguyên", "tài khoản 2 triệu nguyên".
+- Đúng: "127.000 đồng", "5 triệu đồng", "350 nghìn đồng", "1000 đồng", "tài khoản 2 triệu đồng" (hoặc viết tắt "2 triệu / 350 nghìn" KHÔNG kèm "xu").
+- "Lượng vàng" CHỈ cho tài sản tích trữ/đầu tư (1 lượng ≈ 4-5 triệu đồng). KHÔNG dùng cho mua bán hàng ngày.
+- "Xu" CHO PHÉP duy nhất khi: từ ghép "xu nịnh" (flatter), tên riêng (vd "Tô Châu Xu"), hoặc đơn vị nhỏ trong game/hệ thống (HỆ THỐNG ban X xu thưởng — virtual currency, KHÔNG phải tiền thật).
+- Khi nhân vật cầm tiền thật → ĐỒNG. Hệ thống thưởng điểm → có thể dùng "điểm" / "credit" / hoặc đơn vị riêng của hệ thống nhưng KHÔNG dùng "xu" để tránh nhầm lẫn.`
+    : '';
+  const res = await callGemini(prompt, { ...config, systemPrompt: WRITER_SYSTEM + VN_PLACE_LOCK + writerSuffix + writerVndGuard }, { tracking: options?.projectId ? { projectId: options.projectId, task: 'writer', chapterNumber: outline.chapterNumber } : undefined });
 
   // Check finishReason
   if (res.finishReason === 'length' || res.finishReason === 'MAX_TOKENS') {
@@ -1505,6 +1520,30 @@ function detectHardFallback(content: string, options?: WriteChapterOptions): str
   }
   if (rebirthCount > 5) {
     return `setup repetition (rebirth phrases ${rebirthCount}× in chapter, max 3 allowed in WRITER_SYSTEM, hard fail >5)`;
+  }
+
+  // VND CURRENCY hard check (added 2026-04-29 sweep): for VN-set genres,
+  // any "X xu" / "X nguyên" pattern (digit + currency unit) is a deterministic
+  // fail. AI-side Critic was missing some leaks; this regex check is independent
+  // of AI verdict and forces Writer regen with explicit instruction.
+  // KEEP: "xu nịnh" (flatter), "nguyên tử/thủy/tắc/liệu" (Vietnamese compounds).
+  // BLOCK: "127.000 xu", "5 triệu xu", "350 nghìn xu", "1000 nguyên".
+  if (options?.worldDescription) {
+    const isVnSet = /Đại Nam|Hải Long Đô|Phượng Đô|Trung Đô|Sài Gòn|Hà Nội|Việt Nam|Dân Quốc|Đại Việt/i.test(options.worldDescription);
+    if (isVnSet) {
+      // Match digit (with optional commas/dots) immediately followed by xu OR
+      // numeric quantifier (triệu/nghìn/trăm/tỷ/ngàn) followed by xu.
+      const xuLeak = content.match(/\d[\d.,]*\s*xu\b|(?:triệu|nghìn|trăm|tỷ|ngàn)\s+xu\b/);
+      if (xuLeak) {
+        return `VND currency leak: "${xuLeak[0]}" — VN-set novel must use "đồng" not "xu" for daily transactions. Banned for do-thi/quan-truong + VN-marker world_description.`;
+      }
+      // Match digit + nguyên but exclude common Vietnamese compounds
+      // (nguyên tử / nguyên thủy / nguyên tắc / nguyên liệu / nguyên chất / nguyên bản / nguyên nhân / nguyên thái / nguyên thủ / nguyên hình / nguyên sơ).
+      const nguyenLeak = content.match(/\d[\d.,]*\s*nguyên(?!\s*(?:tử|thủy|tắc|liệu|chất|bản|nhân|thái|thủ|hình|sơ|tháng|năm|đán|tiêu))/);
+      if (nguyenLeak) {
+        return `VND currency leak: "${nguyenLeak[0]}" — VN-set novel must use "đồng" not "nguyên" for currency.`;
+      }
+    }
   }
 
   // Sniff golden-finger name from world_description. Common patterns:
