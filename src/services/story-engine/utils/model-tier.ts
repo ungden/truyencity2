@@ -11,11 +11,18 @@
  */
 
 const PRO_TASKS = new Set([
-  // Phase 23 fix: V4 thinking Pro is too slow for production (60-300s/call → cron timeout).
-  // ALL outline + planning tasks moved to Flash. Pro retained only for Critic + Continuity
-  // Guardian where deep reasoning value is highest (catching contradictions across whole story).
-  'critic',              // Editorial review (60K context, deep)
+  // Story-level planning — set the entire trajectory
+  'master_outline',
+  'story_outline',
+  'arc_plan',
+  'story_bible',
+  // Per-chapter reasoning
+  'architect',           // Plans every scene structure
+  'critic',              // Editorial review
   'continuity_guardian', // 4th-agent biên tập viên
+  // Phase 22 Stage 4 Lever F: auto_revision moved to Flash. Auto-revise runs <10% of
+  // chapters, and the prompt is highly structured (explicit instructions per issue type).
+  // Flash handles structured editing well. Saves marginal cost without quality loss.
 ]);
 
 const FLASH_TASKS = new Set([
