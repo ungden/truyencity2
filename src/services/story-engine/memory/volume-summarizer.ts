@@ -19,12 +19,14 @@ import { callGemini } from '../utils/gemini';
 import { parseJSON } from '../utils/json-repair';
 import type { GeminiConfig } from '../types';
 
-// Phase 22 Stage 2 Q5: tightened from 100 → 25 chapter volumes.
-// Smaller volumes = denser macro memory available earlier in novel life.
-// Each volume summary captures 25 chapters; injected list grows with novel.
+// Phase 22 Stage 4 Lever D: cost-tuned volume injection.
+// Generate every 25 ch (kept — denser macro memory). Inject only 3 most recent volumes
+// (was 8) + cap total at 6000 chars. The 3 most recent cover ~75 chapters of macro
+// memory which is sufficient for current arc + 1 past arc context. Older volumes
+// rarely needed for live writing — accessible via RAG if specifically relevant.
 const VOLUME_LENGTH = 25;
-const MAX_INJECTION_CHARS = 12000;  // bumped from 6000 — more volumes warrants more space
-const MAX_VOLUMES_INJECTED = 8;     // bumped from 4 — show last 8 volumes (= last 200 chapters of macro memory)
+const MAX_INJECTION_CHARS = 6000;
+const MAX_VOLUMES_INJECTED = 3;
 
 export async function getVolumeSummaryContext(
   projectId: string,

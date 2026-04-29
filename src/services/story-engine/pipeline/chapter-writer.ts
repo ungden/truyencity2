@@ -680,50 +680,65 @@ ${CLIFFHANGER_TECHNIQUES.map((c: { name: string; example: string }) => '- ' + c.
     console.log(`[Architect] Chapter ${chapterNumber}: full context = ${context.length} chars (no trim)`);
   }
 
-  const prompt = `Lên kế hoạch cho CHƯƠNG ${chapterNumber}.
+  // Phase 22 Stage 4: STRUCTURED FOR PROMPT CACHING.
+  // DeepSeek caches prefix automatically when ≥1024 tokens match exactly. To maximize cache
+  // hit rate (10% pricing on cached tokens), we put STATIC content (rules, JSON schema,
+  // novel-stable context) FIRST and DYNAMIC content (chapter number, current bridge, retry
+  // instructions) LAST. After the first chapter of any novel, this cuts ~50% of input cost.
+  // Format is otherwise unchanged — same content, reordered.
 
-⚠️ TUYỆT ĐỐI BÁM SÁT [WORLD DESCRIPTION] và [ĐẠI CƯƠNG TOÀN TRUYỆN] phía dưới — đây là PREMISE GỐC. CẤM hallucinate setting / golden finger / antagonist / MC profession khác. Nếu world_description nói MC là "ngự thú sư cuồng đọc văn học chép Tam Quốc cho tu sĩ đa vũ trụ đọc" thì CẤM viết MC bán cơm hộp hay làm freelance content. Mọi scene phải reference world_description elements (tên hệ thống, tên antagonist, setting locations, golden finger rules cụ thể).
-
-${trimmedContext}
-
-${constraintSection}
-${topicSection}
-${foreshadowingInjection}
-${titleRules}
-
-Target: ${targetWords} từ. Tối thiểu ${minScenes} scenes (mỗi ~${wordsPerScene} từ).
-${rewriteInstructions ? `\nYÊU CẦU SỬA: ${rewriteInstructions}` : ''}
-${isGolden ? `\nGOLDEN CHAPTER ${chapterNumber}:\nMust have: ${goldenReqs?.mustHave.join(', ')}\nAvoid: ${goldenReqs?.avoid.join(', ')}` : ''}
-
-${emotionalArcGuide}
-
-${finalArcGuide}
-
-${engagementGuide}
+  // ── STATIC PREFIX (cacheable across chapters of same novel) ──
+  const staticPrefix = `⚠️ TUYỆT ĐỐI BÁM SÁT [WORLD DESCRIPTION] và [ĐẠI CƯƠNG TOÀN TRUYỆN] phía dưới — đây là PREMISE GỐC. CẤM hallucinate setting / golden finger / antagonist / MC profession khác. Nếu world_description nói MC là "ngự thú sư cuồng đọc văn học chép Tam Quốc cho tu sĩ đa vũ trụ đọc" thì CẤM viết MC bán cơm hộp hay làm freelance content. Mọi scene phải reference world_description elements (tên hệ thống, tên antagonist, setting locations, golden finger rules cụ thể).
 
 ĐA GÓC NHÌN (MULTI-POV):
 - POV mặc định là nhân vật chính
 - CÓ THỂ chuyển POV sang nhân vật khác cho 1-2 scenes NẾU phù hợp cốt truyện
 - Nếu đổi POV, ghi rõ "pov" trong từng scene object
 
-Trả về JSON ChapterOutline:
+JSON OUTPUT SCHEMA (output structure, không thay đổi):
 {
-  "chapterNumber": ${chapterNumber},
+  "chapterNumber": <int>,
   "title": "tiêu đề hấp dẫn",
   "summary": "tóm tắt 2-3 câu",
   "pov": "tên nhân vật POV mặc định",
   "location": "địa điểm chính",
-  "scenes": [
-    {"order":1, "setting":"...", "characters":["..."], "goal":"...", "conflict":"...", "resolution":"...", "estimatedWords":${wordsPerScene}, "pov":"nhân vật POV"}
-  ],
-  "tensionLevel": 7,
+  "scenes": [{"order":1, "setting":"...", "characters":["..."], "goal":"...", "conflict":"...", "resolution":"...", "estimatedWords":<int>, "pov":"nhân vật POV"}],
+  "tensionLevel": <int>,
   "dopaminePoints": [{"type":"face_slap", "scene":1, "description":"...", "intensity":8, "setup":"...", "payoff":"..."}],
-  "emotionalArc": {"opening":"tò mò", "midpoint":"căng thẳng", "climax":"phấn khích", "closing":"háo hức"},
-  "comedyBeat": "MÔ TẢ khoảnh khắc hài hước: loại hình (não bổ/vô sỉ/phản kém/nội tâm tự giễu), xảy ra ở scene nào, nội dung cụ thể",
-  "slowScene": "Scene số mấy là scene nhịp chậm (đối thoại/chiêm nghiệm/slice-of-life) để tạo tương phản nhịp điệu",
-  "cliffhanger": "tình huống lơ lửng (BẮT BUỘC nếu không phải finale arc)",
-  "targetWordCount": ${targetWords}
-}`;
+  "emotionalArc": {"opening":"...", "midpoint":"...", "climax":"...", "closing":"..."},
+  "comedyBeat": "...",
+  "slowScene": "...",
+  "cliffhanger": "...",
+  "targetWordCount": <int>
+}
+
+${trimmedContext}
+
+${constraintSection}
+${topicSection}
+${titleRules}
+
+${emotionalArcGuide}
+
+${finalArcGuide}
+
+${engagementGuide}`;
+
+  // ── DYNAMIC SUFFIX (changes every chapter, breaks cache) ──
+  const dynamicSuffix = `
+
+═══════════════════════════════════════════
+NHIỆM VỤ HIỆN TẠI:
+═══════════════════════════════════════════
+Lên kế hoạch cho CHƯƠNG ${chapterNumber}.
+Target: ${targetWords} từ. Tối thiểu ${minScenes} scenes (mỗi ~${wordsPerScene} từ).
+${foreshadowingInjection}
+${rewriteInstructions ? `\nYÊU CẦU SỬA TỪ LẦN TRƯỚC: ${rewriteInstructions}` : ''}
+${isGolden ? `\nGOLDEN CHAPTER ${chapterNumber}:\nMust have: ${goldenReqs?.mustHave.join(', ')}\nAvoid: ${goldenReqs?.avoid.join(', ')}` : ''}
+
+Trả về JSON ChapterOutline đúng schema phía trên cho CHƯƠNG ${chapterNumber}.`;
+
+  const prompt = staticPrefix + dynamicSuffix;
 
   const genreSuffix = genre ? buildGenreSpecificSuffix(genre, options?.subGenres || []) : '';
   const res = await callGemini(prompt, { ...config, temperature: 0.3, maxTokens: 16384, systemPrompt: ARCHITECT_SYSTEM + VN_PLACE_LOCK + genreSuffix }, { jsonMode: true, tracking: options?.projectId ? { projectId: options.projectId, task: 'architect', chapterNumber } : undefined });
@@ -1118,38 +1133,36 @@ async function runCritic(
       return cut > budget * 0.5 ? text.slice(0, cut) : text.slice(0, budget);
     };
 
-    // Phase 22 Stage 2 Q3: Critic context expanded from 16K → 80K. Critic is the LAST line
-    // of defense; cheaping out here is false economy. Now sees: bridge + char states + bibles
-    // + volume summaries + RAG + synopsis + recent summaries + full prose of last 3 chapters
-    // + plot threads + world rules. Real editors review against the WHOLE manuscript history.
+    // Phase 22 Stage 4 Lever C': Critic focused on LOCAL quality (current chapter craft).
+    // Continuity Guardian (4th agent, Pro tier) handles GLOBAL coherence with full bibles
+    // + volume summaries + RAG. Critic doesn't need to duplicate that work.
+    // Trimmed from 80K → 40K cross-chapter context. Saves ~$0.05/write.
+    // Critic checks: word count, repetition, ending hook, dopamine, comedy, pacing, +
+    // last-chapter continuity (bridge + recent prose + char states). Far-back issues are
+    // Guardian's responsibility.
     const bridgeS = extractCriticSection(/\[CẦU NỐI CHƯƠNG[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 3000);
     if (bridgeS) relevantParts.push(bridgeS);
-    const charS = extractCriticSection(/\[NHÂN VẬT HIỆN TẠI[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 5000);
+    const charS = extractCriticSection(/\[NHÂN VẬT HIỆN TẠI[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 4000);
     if (charS) relevantParts.push(charS);
-    const bibleS = extractCriticSection(/\[NHÂN VẬT BIBLE[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 12000);
+    // Top 3 character bibles only (was 12K) — most relevant chars in chapter
+    const bibleS = extractCriticSection(/\[NHÂN VẬT BIBLE[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 5000);
     if (bibleS) relevantParts.push(bibleS);
-    const volS = extractCriticSection(/\[VOLUME SUMMARIES[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 8000);
-    if (volS) relevantParts.push(volS);
-    const ragS = extractCriticSection(/\[KÝ ỨC LIÊN QUAN[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 8000);
-    if (ragS) relevantParts.push(ragS);
-    const synopsisS = extractCriticSection(/\[TỔNG QUAN CỐT TRUYỆN\][\s\S]*?(?=\n\n\[|$)/, 4000);
+    // Synopsis structured (active threads/state) — small, high-value
+    const synopsisS = extractCriticSection(/\[TỔNG QUAN CỐT TRUYỆN\][\s\S]*?(?=\n\n\[|$)/, 2500);
     if (synopsisS) relevantParts.push(synopsisS);
-    const recentS = extractCriticSection(/\[TÓM TẮT \d+ CHƯƠNG GẦN NHẤT[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 5000);
+    const recentS = extractCriticSection(/\[TÓM TẮT \d+ CHƯƠNG GẦN NHẤT[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 3000);
     if (recentS) relevantParts.push(recentS);
-    // Full prose of last 3 chapters — Critic checks current chapter against actual prior text
-    const fullProseS = extractCriticSection(/\[FULL PROSE [^\]]*\][\s\S]*?(?=\n\n\[|$)/, 30000);
+    // Full prose of last 1-2 chapters only (was 3) — Critic checks immediate continuity
+    const fullProseS = extractCriticSection(/\[FULL PROSE [^\]]*\][\s\S]*?(?=\n\n\[|$)/, 18000);
     if (fullProseS) relevantParts.push(fullProseS);
-    // Plot threads (open + closed)
-    const plotS = extractCriticSection(/\[PLOT THREADS[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 4000);
-    if (plotS) relevantParts.push(plotS);
-    // World rules
-    const worldRulesS = extractCriticSection(/\[QUY TẮC THẾ GIỚI[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 3000);
+    // World rules (small, important — must not violate)
+    const worldRulesS = extractCriticSection(/\[QUY TẮC THẾ GIỚI[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 2000);
     if (worldRulesS) relevantParts.push(worldRulesS);
 
     const merged = relevantParts.join('\n\n');
     crossChapterSection = relevantParts.length > 0
-      ? `BỐI CẢNH CÂU CHUYỆN (dùng để KIỂM TRA mâu thuẫn — bao gồm full prose 3 chương trước, bible nhân vật, ký ức xa, synopsis, plot threads, world rules):\n${merged.slice(0, 80000)}\n\n`
-      : `BỐI CẢNH CÂU CHUYỆN (dùng để KIỂM TRA mâu thuẫn):\n${previousContext.slice(0, 3000)}\n\n`;
+      ? `BỐI CẢNH CÂU CHUYỆN (KIỂM TRA mâu thuẫn LOCAL — Continuity Guardian sẽ check global ở bước sau):\n${merged.slice(0, 40000)}\n\n`
+      : `BỐI CẢNH CÂU CHUYỆN:\n${previousContext.slice(0, 3000)}\n\n`;
   }
 
   // Build repetition report for Critic

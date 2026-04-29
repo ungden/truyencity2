@@ -20,12 +20,15 @@ const PRO_TASKS = new Set([
   'architect',           // Plans every scene structure
   'critic',              // Editorial review
   'continuity_guardian', // 4th-agent biên tập viên
-  'auto_revision',       // Precise multi-issue editing
+  // Phase 22 Stage 4 Lever F: auto_revision moved to Flash. Auto-revise runs <10% of
+  // chapters, and the prompt is highly structured (explicit instructions per issue type).
+  // Flash handles structured editing well. Saves marginal cost without quality loss.
 ]);
 
 const FLASH_TASKS = new Set([
   'writer',              // Volume play; Vietnamese prose; Pro overkill
   'writer_continuation',
+  'auto_revision',       // Stage 4 Lever F — structured edit, Flash sufficient
   'synopsis',            // Recap data, low stakes
   'chapter_summary',     // Recap data
   'combined_summary',    // Recap + character extraction

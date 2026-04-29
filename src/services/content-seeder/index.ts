@@ -496,8 +496,11 @@ export class ContentSeeder {
       authorCount = 200,
       novelsPerAuthor = 20,
       activatePerAuthor = 5,
-      minChapters = 1000,
-      maxChapters = 2000,
+      // 2026-04-30: standardized novel length to ~1000 chapters (was 1000-2000 random).
+      // Quality concerns: 2000-chapter novels were too long to maintain coherence;
+      // 1000 is the sweet spot for đại thần grade with current pipeline budget.
+      minChapters = 950,
+      maxChapters = 1050,
     } = config;
 
     const totalNovels = authorCount * novelsPerAuthor;
@@ -579,7 +582,7 @@ export class ContentSeeder {
   async seedNovelsOnly(config: Partial<SeedConfig> = {}): Promise<SeedResult> {
     const startTime = Date.now();
     const errors: string[] = [];
-    const { novelsPerAuthor = 20, minChapters = 1000, maxChapters = 2000 } = config;
+    const { novelsPerAuthor = 20, minChapters = 950, maxChapters = 1050 } = config;
 
     this.userId = await this.getSystemUserId();
     if (!this.userId) {
@@ -793,7 +796,7 @@ export class ContentSeeder {
         ai_model: DEFAULT_AI_MODEL,
         temperature: 1.0,
         current_chapter: 0,
-        total_planned_chapters: this.randomInt(1000, 2000),
+        total_planned_chapters: this.randomInt(950, 1050),
         status: 'active',
         // Narrative metadata (migration 0149)
         sub_genres: variant.sub_genres || [],
@@ -851,7 +854,7 @@ export class ContentSeeder {
           const novel = novelRows.find(n => n.id === pRow.novel_id);
           const title = novel?.title || 'Unknown';
           const desc = novel?.description || '';
-          const totalCh = pRow.total_planned_chapters || 1500;
+          const totalCh = pRow.total_planned_chapters || 1000;
 
           // 1. Master outline
           try {
