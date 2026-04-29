@@ -106,7 +106,7 @@ export async function loadContext(
     // Anti-repetition: cliffhangers
     db.from('chapter_summaries').select('cliffhanger').eq('project_id', projectId).order('chapter_number', { ascending: false }).limit(10),
     // Character states
-    db.from('character_states').select('character_name,status,power_level,power_realm_index,location,notes,chapter_number').eq('project_id', projectId).order('chapter_number', { ascending: false }).limit(50),
+    db.from('character_states').select('character_name,status,power_level,power_realm_index,location,personality_quirks,notes,chapter_number').eq('project_id', projectId).order('chapter_number', { ascending: false }).limit(50),
   ]);
 
   // Build payload
@@ -158,6 +158,7 @@ export async function loadContext(
     power_level: string | null;
     power_realm_index: number | null;
     location: string | null;
+    personality_quirks: string | null;
     notes: string | null;
     chapter_number: number;
   }
@@ -176,6 +177,10 @@ export async function loadContext(
       let line = `• ${c.character_name} (${c.status})`;
       if (c.power_level) line += ` — ${c.power_level}`;
       if (c.location) line += ` tại ${c.location}`;
+      // 2026-04-29 audit fix: personality_quirks was saved by character-tracker
+      // but never rendered into context. Engine had character speech consistency
+      // signals it was throwing away. Now included before generic notes.
+      if (c.personality_quirks) line += ` | quirks: ${c.personality_quirks}`;
       if (c.notes) line += ` | ${c.notes}`;
       parts.push(line);
     }
@@ -835,6 +840,7 @@ export async function generateArcPlan(
   totalPlanned: number,
   config: GeminiConfig,
   storyVision?: { endingVision?: string; majorPlotPoints?: string[]; mainConflict?: string; endGoal?: string },
+  worldDescription?: string,  // 2026-04-29 audit fix: anchor arc plan to canonical premise (same pattern as chapter-writer Layer -1).
 ): Promise<void> {
   const startChapter = (arcNumber - 1) * 20 + 1;
   const endChapter = Math.min(arcNumber * 20, totalPlanned);
@@ -846,6 +852,15 @@ Yêu cầu:
 - BẮT ĐẦU ĐÓNG CÁC PLOT THREADS: Đưa các tuyến truyện phụ, ân oán cũ vào danh sách "threads_to_resolve".
 - KHÔNG MỞ THÊM THREAD MỚI LỚN ("new_threads" chỉ nên là các tình tiết dẫn tới final boss/climax).
 - Gom các nhân vật lại gần nhau để chuẩn bị cho đại chiến/sự kiện cuối cùng.` : '';
+
+  // 2026-04-29 audit fix: WORLD DESCRIPTION anchor (Layer -1) — same defense as
+  // chapter-writer pipeline. If synopsis is shallow or storyBible missing or
+  // storyVision is empty (story_outline schema bug), this guarantees arc plan
+  // still has the canonical premise to ground future chapter_briefs against.
+  let worldBlock = '';
+  if (worldDescription?.trim()) {
+    worldBlock = `[WORLD DESCRIPTION — PREMISE GỐC, ARC PLAN PHẢI BÁM SÁT]\n${worldDescription.slice(0, 4000)}\n\n`;
+  }
 
   // StoryVision injection for directional coherence
   let visionBlock = '';
@@ -862,7 +877,7 @@ Yêu cầu:
 
   const prompt = `Bạn là Story Architect cho truyện ${genre}.
 
-${visionBlock}${synopsis ? `TỔNG QUAN:\n${synopsis}\n\n` : ''}${storyBible ? `STORY BIBLE:\n${storyBible.slice(0, 2000)}\n\n` : ''}
+${worldBlock}${visionBlock}${synopsis ? `TỔNG QUAN:\n${synopsis}\n\n` : ''}${storyBible ? `STORY BIBLE:\n${storyBible.slice(0, 2000)}\n\n` : ''}
 Lập kế hoạch ARC ${arcNumber} (chương ${startChapter}-${endChapter}) cho ${protagonistName}.
 Tổng dự kiến: ${totalPlanned} chương.${closingInstruction}
 

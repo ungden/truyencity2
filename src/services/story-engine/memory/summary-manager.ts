@@ -203,10 +203,11 @@ async function tryGenerateArcPlan(
       .eq('arc_number', arcNumber)
       .maybeSingle();
 
-    // Load synopsis, bible, story_outline, and master_outline in one batch (B4 fix: no duplicate queries)
+    // Load synopsis, bible, story_outline, master_outline, and world_description in one batch
+    // (B4 fix: no duplicate queries; world_description added 2026-04-29 audit fix to anchor arc plan to canonical premise)
     const [{ data: synRow }, { data: projectRow }] = await Promise.all([
       db.from('story_synopsis').select('synopsis_text,open_threads').eq('project_id', projectId).order('last_updated_chapter', { ascending: false }).limit(1).maybeSingle(),
-      db.from('ai_story_projects').select('story_bible,story_outline,master_outline').eq('id', projectId).maybeSingle(),
+      db.from('ai_story_projects').select('story_bible,story_outline,master_outline,world_description').eq('id', projectId).maybeSingle(),
     ]);
 
     if (!existing) {
@@ -230,6 +231,7 @@ async function tryGenerateArcPlan(
         synRow?.synopsis_text, projectRow?.story_bible,
         totalPlanned, config,
         storyVision,
+        (projectRow as { world_description?: string } | null)?.world_description,
       );
     }
 
