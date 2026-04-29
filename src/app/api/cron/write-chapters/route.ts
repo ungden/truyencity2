@@ -49,7 +49,10 @@ const INIT_PREP_BATCH_SIZE = clamp(parseIntEnv('WRITE_CHAPTERS_INIT_PREP_BATCH',
 const INIT_WRITE_BATCH_SIZE = clamp(parseIntEnv('WRITE_CHAPTERS_INIT_WRITE_BATCH', 10), 0, 100);  // Chapter 1 writing (arc plan already exists)
 const CANDIDATE_POOL_SIZE = clamp(parseIntEnv('WRITE_CHAPTERS_CANDIDATE_POOL', 1600), 200, 5000);
 const PROJECT_TIMEOUT_MS = clamp(parseIntEnv('WRITE_CHAPTERS_RESUME_TIMEOUT_MS', 240_000), 30_000, 300_000);     // 240s per resume project (was 180s — increased for chapters past 400 with rich context)
-const INIT_PREP_TIMEOUT_MS = clamp(parseIntEnv('WRITE_CHAPTERS_INIT_PREP_TIMEOUT_MS', 120_000), 30_000, 300_000); // 120s for arc plan generation only
+// Phase 23 fix: bumped 120s → 250s. Init-prep now regen master_outline (Pro, ~30-60s) +
+// story_outline (Pro, ~20-40s) + arc_plan (Pro, ~30-60s) = up to 160s per project. Plus
+// retries on flaky DeepSeek responses. 250s gives safety margin within Vercel maxDuration=800s.
+const INIT_PREP_TIMEOUT_MS = clamp(parseIntEnv('WRITE_CHAPTERS_INIT_PREP_TIMEOUT_MS', 250_000), 30_000, 600_000);
 const INIT_WRITE_TIMEOUT_MS = clamp(parseIntEnv('WRITE_CHAPTERS_INIT_WRITE_TIMEOUT_MS', 240_000), 30_000, 300_000); // 240s for chapter 1 write (no arc plan gen)
 const RUN_CONCURRENCY = clamp(parseIntEnv('WRITE_CHAPTERS_CONCURRENCY', 20), 1, 32); // Tier-3 Gemini is effectively unlimited; bottleneck is orchestration
 const TICKS_PER_DAY = clamp(parseIntEnv('WRITE_CHAPTERS_TICKS_PER_DAY', 288), 60, 1440); // 5m cron => 288, 3m cron => 480
@@ -414,30 +417,35 @@ async function prepareInitProject(
     .eq('id', project.id)
     .maybeSingle();
 
-  // Phase 23 fix: regen master_outline + story_outline FIRST if NULL.
-  // Without this, init-prep generates arc_plan from world_description only —
-  // misses the structural anchor (5-arc plan, plot points) that arc_plan needs.
+  // Phase 23 fix: regen master_outline + story_outline IN PARALLEL if NULL.
+  // Sequential calls = 60-180s; parallel = 60-90s, fits within 250s timeout.
   if (!projRow?.master_outline || !projRow?.story_outline) {
     const worldDesc = projRow?.world_description || '';
 
-    if (!projRow?.master_outline) {
-      try {
-        const { generateMasterOutline } = await import('@/services/story-engine/pipeline/master-outline');
-        await generateMasterOutline(project.id, novel.title, genre, worldDesc.slice(0, 6000), totalPlanned, { ...geminiConfig, model: 'deepseek-v4-pro' });
-      } catch (e) { console.warn(`[init-prep] master_outline regen failed for ${project.id}:`, e instanceof Error ? e.message : String(e)); }
-    }
+    const masterPromise = !projRow?.master_outline
+      ? (async () => {
+          try {
+            const { generateMasterOutline } = await import('@/services/story-engine/pipeline/master-outline');
+            await generateMasterOutline(project.id, novel.title, genre, worldDesc.slice(0, 6000), totalPlanned, { ...geminiConfig, model: 'deepseek-v4-pro' });
+          } catch (e) { console.warn(`[init-prep] master_outline regen failed for ${project.id}:`, e instanceof Error ? e.message : String(e)); }
+        })()
+      : Promise.resolve();
 
-    if (!projRow?.story_outline) {
-      try {
-        const { callGemini } = await import('@/services/story-engine/utils/gemini');
-        const { parseJSON } = await import('@/services/story-engine/utils/json-repair');
-        const arcs = 5; const mid = Math.ceil(arcs / 2);
-        const prompt = `Lập Story Outline cho "${novel.title}" (${genre}).\nNHÂN VẬT CHÍNH: ${protagonistName}\nWORLD/BỐI CẢNH:\n${worldDesc.slice(0, 6000)}\n\nTrả về JSON:\n{"id":"story_${Date.now()}","title":"${novel.title}","genre":"${genre}","premise":"...","themes":[],"mainConflict":"...","targetChapters":${totalPlanned},"targetArcs":${arcs},"protagonist":{"name":"${protagonistName}","startingState":"...","endGoal":"...","characterArc":"..."},"majorPlotPoints":[{"id":"pp1","name":"Khởi đầu","targetArc":1,"type":"inciting_incident","importance":"critical"},{"id":"pp3","name":"Midpoint","targetArc":${mid},"type":"midpoint","importance":"critical"},{"id":"pp5","name":"Climax","targetArc":${arcs - 1},"type":"climax","importance":"critical"},{"id":"pp6","name":"Resolution","targetArc":${arcs},"type":"resolution","importance":"critical"}],"endingVision":"...","uniqueHooks":[]}`;
-        const res = await callGemini(prompt, { model: 'deepseek-v4-pro', temperature: 0.7, maxTokens: 4096, systemPrompt: 'Bạn là STORY ARCHITECT. CHỈ trả về JSON.' }, { jsonMode: true, tracking: { projectId: project.id, task: 'story_outline' } });
-        const outline = parseJSON(res.content);
-        if (outline) await supabase.from('ai_story_projects').update({ story_outline: outline as Record<string, unknown> }).eq('id', project.id);
-      } catch (e) { console.warn(`[init-prep] story_outline regen failed for ${project.id}:`, e instanceof Error ? e.message : String(e)); }
-    }
+    const storyPromise = !projRow?.story_outline
+      ? (async () => {
+          try {
+            const { callGemini } = await import('@/services/story-engine/utils/gemini');
+            const { parseJSON } = await import('@/services/story-engine/utils/json-repair');
+            const arcs = 5; const mid = Math.ceil(arcs / 2);
+            const prompt = `Lập Story Outline cho "${novel.title}" (${genre}).\nNHÂN VẬT CHÍNH: ${protagonistName}\nWORLD/BỐI CẢNH:\n${worldDesc.slice(0, 6000)}\n\nTrả về JSON:\n{"id":"story_${Date.now()}","title":"${novel.title}","genre":"${genre}","premise":"...","themes":[],"mainConflict":"...","targetChapters":${totalPlanned},"targetArcs":${arcs},"protagonist":{"name":"${protagonistName}","startingState":"...","endGoal":"...","characterArc":"..."},"majorPlotPoints":[{"id":"pp1","name":"Khởi đầu","targetArc":1,"type":"inciting_incident","importance":"critical"},{"id":"pp3","name":"Midpoint","targetArc":${mid},"type":"midpoint","importance":"critical"},{"id":"pp5","name":"Climax","targetArc":${arcs - 1},"type":"climax","importance":"critical"},{"id":"pp6","name":"Resolution","targetArc":${arcs},"type":"resolution","importance":"critical"}],"endingVision":"...","uniqueHooks":[]}`;
+            const res = await callGemini(prompt, { model: 'deepseek-v4-pro', temperature: 0.7, maxTokens: 4096, systemPrompt: 'Bạn là STORY ARCHITECT. CHỈ trả về JSON.' }, { jsonMode: true, tracking: { projectId: project.id, task: 'story_outline' } });
+            const outline = parseJSON(res.content);
+            if (outline) await supabase.from('ai_story_projects').update({ story_outline: outline as Record<string, unknown> }).eq('id', project.id);
+          } catch (e) { console.warn(`[init-prep] story_outline regen failed for ${project.id}:`, e instanceof Error ? e.message : String(e)); }
+        })()
+      : Promise.resolve();
+
+    await Promise.all([masterPromise, storyPromise]);
 
     // Re-fetch after regen
     const refetch = await supabase
