@@ -685,7 +685,7 @@ export async function GET(request: NextRequest) {
     // This prevents concurrent cron invocations from processing the same projects.
     // Each invocation only picks projects whose updated_at is older than 4 minutes,
     // then immediately bumps updated_at to "claim" them.
-    const fourMinutesAgo = new Date(Date.now() - 4 * 60 * 1000).toISOString();
+    const fourMinutesAgo = new Date(Date.now() - 90 * 1000).toISOString();
 
     const [activeCountQuery, candidateQuery] = await Promise.all([
       supabase
