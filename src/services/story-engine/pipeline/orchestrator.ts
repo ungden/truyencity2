@@ -170,6 +170,20 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       resolvedMainCharacter = projectMC;
     }
 
+    // Fix F: story_outline canonical schema check (defense-in-depth, post 2026-04-29 incident).
+    // If story_outline lacks the fields context-assembler reads, the engine
+    // silently produces off-premise content. Detect early and warn loudly so
+    // operator notices BEFORE 10 chapters of drift ship to readers.
+    if (storyOutline) {
+      const outlineObj = storyOutline as Record<string, unknown>;
+      const canonicalFields = ['premise', 'mainConflict', 'themes', 'majorPlotPoints'];
+      const presentCount = canonicalFields.filter(f => outlineObj[f] !== undefined && outlineObj[f] !== null).length;
+      if (presentCount < 2) {
+        const wrongSchemaFields = ['antagonists', 'powerSystem', 'openingHook', 'majorThemes', 'settingDetails'].filter(f => f in outlineObj);
+        validationFixes.push(`⚠ story_outline schema thin: only ${presentCount}/4 canonical fields present${wrongSchemaFields.length ? ` (legacy schema detected: ${wrongSchemaFields.join(',')} — should be premise/mainConflict/themes/majorPlotPoints)` : ''}. Engine will fall back to world_description but coverage will be reduced.`);
+      }
+    }
+
     // Fix D/E: total_planned_chapters ↔ master_outline coverage alignment
     const arcs = masterOutline?.majorArcs ?? [];
     if (arcs.length > 0) {

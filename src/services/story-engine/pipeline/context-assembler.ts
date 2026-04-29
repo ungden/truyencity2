@@ -304,6 +304,15 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
     }
     if (outline.endingVision) outlineParts.push(`Kết cục: ${outline.endingVision}`);
     if (outline.uniqueHooks?.length) outlineParts.push(`Hooks: ${outline.uniqueHooks.join(', ')}`);
+
+    // Diagnostic: warn if story_outline yielded only the header (schema-mismatch
+    // signature). This was the silent-bug pattern from the 2026-04-29 incident
+    // where 2 spawn scripts saved wrong-schema outlines → context-assembler
+    // dropped every field. With validator at spawn time this should never
+    // happen, but the runtime warning is a safety net for legacy data.
+    if (outlineParts.length <= 2) {
+      console.warn(`[context-assembler] story_outline yielded ${outlineParts.length - 1} fields (only header). Schema may be wrong — check fields: premise/mainConflict/themes/majorPlotPoints. Falling back to world_description for premise grounding.`);
+    }
     parts.push(outlineParts.join('\n'));
   }
 

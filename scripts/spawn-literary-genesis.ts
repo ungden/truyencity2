@@ -25,6 +25,7 @@ import { createClient } from '@supabase/supabase-js';
 import { generateMasterOutline } from '@/services/story-engine/pipeline/master-outline';
 import { callGemini } from '@/services/story-engine/utils/gemini';
 import { parseJSON } from '@/services/story-engine/utils/json-repair';
+import { validateStoryOutlineOrThrow } from '@/services/story-engine/utils/story-outline-validator';
 import type { GeminiConfig, GenreType, StoryOutline } from '@/services/story-engine/types';
 
 const s = createClient(
@@ -181,8 +182,9 @@ YÊU CẦU CỨNG:
 
 Trả JSON thuần (không markdown).`;
   const res = await callGemini(prompt, cfg);
-  const outline = parseJSON<StoryOutline>(res.content);
-  if (!outline) throw new Error('story_outline parseJSON returned null');
+  const parsed = parseJSON<StoryOutline>(res.content);
+  if (!parsed) throw new Error('story_outline parseJSON returned null');
+  const outline = validateStoryOutlineOrThrow(parsed, `spawn-literary-genesis[${seed.slug}]`);
   if (outline.protagonist) outline.protagonist.name = seed.main_character;
   const { error } = await s.from('ai_story_projects').update({ story_outline: outline }).eq('id', projectId);
   if (error) throw new Error(`save story_outline failed: ${error.message}`);

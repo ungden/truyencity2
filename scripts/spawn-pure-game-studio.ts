@@ -32,6 +32,7 @@ import { createClient } from '@supabase/supabase-js';
 import { generateMasterOutline } from '@/services/story-engine/pipeline/master-outline';
 import { callGemini } from '@/services/story-engine/utils/gemini';
 import { parseJSON } from '@/services/story-engine/utils/json-repair';
+import { validateStoryOutlineOrThrow } from '@/services/story-engine/utils/story-outline-validator';
 import type { GeminiConfig, GenreType, StoryOutline } from '@/services/story-engine/types';
 
 const s = createClient(
@@ -199,9 +200,11 @@ YÊU CẦU CỨNG:
 
 Trả JSON thuần (không markdown).`;
   const res = await callGemini(prompt, cfg);
-  const outline = parseJSON<StoryOutline>(res.content);
-  if (!outline) throw new Error('story_outline parseJSON returned null');
-  // Force protagonist name override
+  const parsed = parseJSON<StoryOutline>(res.content);
+  if (!parsed) throw new Error('story_outline parseJSON returned null');
+  // Defensive validator: fails LOUDLY at spawn time if schema drifts back to wrong fields.
+  // Prevents the 2026-04-29 incident (10 chapters of off-premise content) from recurring.
+  const outline = validateStoryOutlineOrThrow(parsed, `spawn-pure-game-studio[${seed.slug}]`);
   if (outline.protagonist) outline.protagonist.name = seed.main_character;
   const { error } = await s.from('ai_story_projects').update({ story_outline: outline }).eq('id', projectId);
   if (error) throw new Error(`save story_outline failed: ${error.message}`);

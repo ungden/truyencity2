@@ -20,6 +20,7 @@ import { createClient } from '@supabase/supabase-js';
 import { generateMasterOutline } from '@/services/story-engine/pipeline/master-outline';
 import { callGemini } from '@/services/story-engine/utils/gemini';
 import { parseJSON } from '@/services/story-engine/utils/json-repair';
+import { validateStoryOutlineOrThrow } from '@/services/story-engine/utils/story-outline-validator';
 import type { GeminiConfig, GenreType, StoryOutline } from '@/services/story-engine/types';
 
 const s = createClient(
@@ -184,8 +185,11 @@ Trả về JSON đầy đủ các trường: id, title, genre, premise, themes (
     jsonMode: true,
     tracking: { projectId, task: 'story_outline' },
   });
-  const outline = parseJSON<StoryOutline>(res.content);
-  if (!outline) throw new Error('story_outline parse failed');
+  const parsed = parseJSON<StoryOutline>(res.content);
+  if (!parsed) throw new Error('story_outline parse failed');
+  // Defensive validator (added 2026-04-29 after schema-mismatch drift incident).
+  // Fails LOUDLY if generated outline lacks canonical fields the chapter pipeline reads.
+  const outline = validateStoryOutlineOrThrow(parsed, `spawn-phase20[${seed.slug}]`);
 
   // CRITICAL: enforce protagonist name match. DeepSeek often invents a
   // different name in protagonist.name even when we pass PROTAGONIST: in the
