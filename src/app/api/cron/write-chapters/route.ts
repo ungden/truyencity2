@@ -48,12 +48,14 @@ const MAX_RESUME_BATCH_SIZE = clamp(parseIntEnv('WRITE_CHAPTERS_MAX_RESUME_BATCH
 const INIT_PREP_BATCH_SIZE = clamp(parseIntEnv('WRITE_CHAPTERS_INIT_PREP_BATCH', 20), 0, 100);   // Arc plan generation only (fast)
 const INIT_WRITE_BATCH_SIZE = clamp(parseIntEnv('WRITE_CHAPTERS_INIT_WRITE_BATCH', 10), 0, 100);  // Chapter 1 writing (arc plan already exists)
 const CANDIDATE_POOL_SIZE = clamp(parseIntEnv('WRITE_CHAPTERS_CANDIDATE_POOL', 1600), 200, 5000);
-const PROJECT_TIMEOUT_MS = clamp(parseIntEnv('WRITE_CHAPTERS_RESUME_TIMEOUT_MS', 240_000), 30_000, 300_000);     // 240s per resume project (was 180s — increased for chapters past 400 with rich context)
-// Phase 23 fix: bumped 120s → 250s. Init-prep now regen master_outline (Pro, ~30-60s) +
-// story_outline (Pro, ~20-40s) + arc_plan (Pro, ~30-60s) = up to 160s per project. Plus
-// retries on flaky DeepSeek responses. 250s gives safety margin within Vercel maxDuration=800s.
-const INIT_PREP_TIMEOUT_MS = clamp(parseIntEnv('WRITE_CHAPTERS_INIT_PREP_TIMEOUT_MS', 250_000), 30_000, 600_000);
-const INIT_WRITE_TIMEOUT_MS = clamp(parseIntEnv('WRITE_CHAPTERS_INIT_WRITE_TIMEOUT_MS', 240_000), 30_000, 300_000); // 240s for chapter 1 write (no arc plan gen)
+// Phase 23 fix: bumped 240s → 400s. Pro tier Architect/Critic/Guardian per chapter
+// = 90-120s + 60-90s + 60-90s = 210-300s sequential. Plus retries.
+const PROJECT_TIMEOUT_MS = clamp(parseIntEnv('WRITE_CHAPTERS_RESUME_TIMEOUT_MS', 400_000), 30_000, 700_000);
+// Phase 23 fix: bumped 250s → 400s. V4 thinking model slower than measured:
+// master_outline ~90-120s, story_outline ~60-90s, arc_plan ~90-120s.
+// Parallel master+story = ~120s, then sequential arc_plan = total ~240s. +safety = 400s.
+const INIT_PREP_TIMEOUT_MS = clamp(parseIntEnv('WRITE_CHAPTERS_INIT_PREP_TIMEOUT_MS', 400_000), 30_000, 700_000);
+const INIT_WRITE_TIMEOUT_MS = clamp(parseIntEnv('WRITE_CHAPTERS_INIT_WRITE_TIMEOUT_MS', 400_000), 30_000, 700_000); // bumped for Pro tier writeOneChapter
 const RUN_CONCURRENCY = clamp(parseIntEnv('WRITE_CHAPTERS_CONCURRENCY', 20), 1, 32); // Tier-3 Gemini is effectively unlimited; bottleneck is orchestration
 const TICKS_PER_DAY = clamp(parseIntEnv('WRITE_CHAPTERS_TICKS_PER_DAY', 288), 60, 1440); // 5m cron => 288, 3m cron => 480
 const OVERLOAD_RESUME_THRESHOLD = clamp(parseIntEnv('WRITE_CHAPTERS_OVERLOAD_RESUME_THRESHOLD', 120), 0, 2000);
