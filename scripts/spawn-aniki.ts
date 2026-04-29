@@ -39,6 +39,7 @@ import { generateMasterOutline } from '@/services/story-engine/pipeline/master-o
 import { callGemini } from '@/services/story-engine/utils/gemini';
 import { parseJSON } from '@/services/story-engine/utils/json-repair';
 import { validateStoryOutlineOrThrow } from '@/services/story-engine/utils/story-outline-validator';
+import { generateNovelDescription } from '@/services/story-engine/utils/description-generator';
 import type { GeminiConfig, GenreType, StoryOutline } from '@/services/story-engine/types';
 
 const s = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { autoRefreshToken: false, persistSession: false } });
@@ -51,7 +52,10 @@ interface NovelSeed {
   genre: GenreType;
   sub_genres?: string[];
   main_character: string;
-  description: string;
+  /** OPTIONAL — left for documentation. Real description is auto-generated
+   *  from world_description via generateNovelDescription() to avoid jargon
+   *  leak (post-2026-04-29 standard). Hand-typed value here is IGNORED. */
+  description?: string;
   world_description: string;
   total_planned_chapters: number;
 }
@@ -250,11 +254,24 @@ Trả JSON thuần (không markdown).`;
 }
 
 async function createNovelAndProject(seed: NovelSeed, ownerId: string): Promise<string> {
+  // Generate reader-facing description via shared utility (post-2026-04-29 standard).
+  // No more hand-typed seed.description with engineering jargon. Validator inside
+  // generator throws if jargon leaks; auto-retries up to 3× with feedback.
+  console.log(`  → Generating reader-facing description...`);
+  const description = await generateNovelDescription({
+    title: seed.title,
+    genre: seed.genre,
+    subGenres: seed.sub_genres,
+    mainCharacter: seed.main_character,
+    worldDescription: seed.world_description,
+  });
+  console.log(`  ✓ Description: ${description.length} chars`);
+
   const { data: novel, error: novelErr } = await s.from('novels').insert({
     title: seed.title,
     slug: seed.slug,
     author: 'Truyện City',
-    description: seed.description,
+    description,
     genres: [seed.genre],
     status: 'Đang ra',
   }).select('id').single();

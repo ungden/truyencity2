@@ -21,6 +21,7 @@ import { generateMasterOutline } from '@/services/story-engine/pipeline/master-o
 import { callGemini } from '@/services/story-engine/utils/gemini';
 import { parseJSON } from '@/services/story-engine/utils/json-repair';
 import { validateStoryOutlineOrThrow } from '@/services/story-engine/utils/story-outline-validator';
+import { generateNovelDescription } from '@/services/story-engine/utils/description-generator';
 import type { GeminiConfig, GenreType, StoryOutline } from '@/services/story-engine/types';
 
 const s = createClient(
@@ -222,11 +223,24 @@ Trả về JSON đầy đủ các trường: id, title, genre, premise, themes (
 const MAX_PLANNED_CHAPTERS = 600;
 
 async function createNovelAndProject(seed: NovelSeed, ownerId: string): Promise<string> {
+  // 2026-04-29 standard: shared description generator. seed.description from
+  // these representatives was hand-typed (mostly fine but inconsistent style)
+  // — now route through generator for unified voice + jargon validator.
+  console.log(`  → Generating reader-facing description...`);
+  const description = await generateNovelDescription({
+    title: seed.title,
+    genre: seed.genre,
+    subGenres: seed.sub_genres,
+    mainCharacter: seed.main_character,
+    worldDescription: seed.world_description,
+  });
+  console.log(`  ✓ Description: ${description.length} chars`);
+
   const { data: novel, error: novelErr } = await s.from('novels').insert({
     title: seed.title,
     slug: seed.slug,
     author: 'Truyện City',
-    description: seed.description,
+    description,
     genres: [seed.genre],
     status: 'Đang ra',  // VN canonical — homepage/browse filters exact-match this string
   }).select('id').single();
