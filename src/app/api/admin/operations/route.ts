@@ -157,6 +157,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         'character_knowledge', 'character_relationships',
         'character_bibles', 'location_timeline', 'quality_metrics',
         'failed_memory_tasks',
+        'project_daily_quotas',  // 2026-04-30 fix: cron skips novels with completed quotas
       ];
       for (const tbl of memoryTables) {
         await supabase.from(tbl).delete().in('project_id', projectIds);

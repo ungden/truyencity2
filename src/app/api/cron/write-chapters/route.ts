@@ -624,6 +624,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
   }
 
+  // Phase 23 fix: install Pro-tier routing at cron entry so init-prep tier (arc_plan
+  // generation called BEFORE writeOneChapter) also gets Pro tier. Without this, init-prep
+  // arc_plan was running on Flash and truncating at 4096 tokens with the new richer schema.
+  const { installModelTierRouting } = await import('@/services/story-engine/utils/model-tier');
+  installModelTierRouting();
+
     if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json({ success: false, error: 'GEMINI_API_KEY missing' }, { status: 500 });
     }

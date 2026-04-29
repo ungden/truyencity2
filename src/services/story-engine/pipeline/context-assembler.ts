@@ -965,7 +965,10 @@ Trả về JSON:
   "new_threads": ["thread mới"]
 }`;
 
-  const res = await callGemini(prompt, { ...config, temperature: 0.3, maxTokens: 4096 }, { jsonMode: true, tracking: { projectId, task: 'arc_plan' } });
+  // Phase 23 fix: bumped 4096 → 16384. Q4 scene-level schema (chapter_briefs with scenes[],
+  // callbacks, foreshadow_plant/payoff per chapter) easily exceeds 4096 tokens for 20-chapter
+  // arc → JSON parse error from truncated output. 16K fits comfortably.
+  const res = await callGemini(prompt, { ...config, temperature: 0.3, maxTokens: 16384 }, { jsonMode: true, tracking: { projectId, task: 'arc_plan' } });
   const parsed = parseJSON<ArcPlanAIResponse>(res.content);
   if (!parsed || !parsed.plan_text?.trim()) {
     throw new Error(`Arc plan generation failed: JSON parse error — raw: ${res.content.slice(0, 200)}`);
