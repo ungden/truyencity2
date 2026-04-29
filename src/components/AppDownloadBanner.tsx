@@ -3,9 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { X, Smartphone } from "lucide-react";
-
-const APP_STORE_URL =
-  "https://apps.apple.com/us/app/truy%E1%BB%87n-city-truy%E1%BB%87n-ch%E1%BB%AF/id6759160705";
+import { APP_STORE_URL } from "@/lib/config/app-stores";
 
 export function AppDownloadBanner() {
   const [dismissed, setDismissed] = React.useState(false);

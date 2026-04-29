@@ -21,10 +21,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Lock, Smartphone, Volume2, Download, Bell } from 'lucide-react';
-
-const APP_STORE_URL = 'https://apps.apple.com/us/app/truy%E1%BB%87n-city-truy%E1%BB%87n-ch%E1%BB%AF/id6759160705';
-// TODO: Update with real Google Play URL when launched. Hidden until set.
-const PLAY_STORE_URL = '';
+import { APP_STORE_URL, PLAY_STORE_URL, ANDROID_AVAILABLE } from '@/lib/config/app-stores';
 
 interface AppLockGateProps {
   /** Slug to send user back to "đọc chương cũ" — defaults to novel detail page */
@@ -94,7 +91,7 @@ export function AppLockGate({
               className="h-12 w-auto"
             />
           </a>
-          {PLAY_STORE_URL ? (
+          {ANDROID_AVAILABLE ? (
             <a
               href={PLAY_STORE_URL}
               target="_blank"
@@ -103,9 +100,20 @@ export function AppLockGate({
               aria-label="Tải trên Google Play"
             >
               <Smartphone className="h-5 w-5" />
-              Google Play (sắp ra)
+              Google Play
             </a>
-          ) : null}
+          ) : (
+            <div
+              className="inline-flex h-12 cursor-not-allowed items-center gap-2 rounded-xl bg-white/5 px-5 text-sm font-medium text-zinc-400 ring-1 ring-white/10"
+              aria-label="Android — sắp ra mắt"
+              title="Phiên bản Android đang được phát triển"
+            >
+              <Smartphone className="h-5 w-5" />
+              <span>
+                Android <span className="text-xs text-zinc-500">— sắp ra</span>
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Fallback link */}

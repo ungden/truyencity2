@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ThemeToggle from '@/components/theme-toggle';
+import { APP_STORE_URL } from '@/lib/config/app-stores';
 
 const navigationItems = [
   {
@@ -91,7 +92,7 @@ export const DesktopSidebar = () => {
       {/* App Download */}
       <div className="px-3 pb-2">
         <a
-          href="https://apps.apple.com/us/app/truy%E1%BB%87n-city-truy%E1%BB%87n-ch%E1%BB%AF/id6759160705"
+          href={APP_STORE_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
