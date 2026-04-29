@@ -69,6 +69,18 @@ const OVERLOAD_INIT_WRITE_CAP = clamp(parseIntEnv('WRITE_CHAPTERS_OVERLOAD_INIT_
 //   - 100/day: expand to 480 min (8h) → cadence 5 min, OR keep 240 min + cron 2-min
 const ACTIVE_WINDOW_MINUTES = clamp(parseIntEnv('WRITE_CHAPTERS_ACTIVE_WINDOW_MINUTES', 1440), 60, 1440);
 
+// SAFETY: circuit breaker + per-project daily cost cap.
+// Without these, a seed landmine that fails every attempt burns ~288 retries/day silently.
+// Default 5 consecutive failures = ~25 min of cron ticks before auto-pause.
+const MAX_CONSECUTIVE_FAILURES = clamp(parseIntEnv('WRITE_CHAPTERS_MAX_CONSECUTIVE_FAILURES', 5), 2, 50);
+// Default $5/project/day. Catches runaway loops without affecting healthy novels (~$0.50-1/day each).
+const PER_PROJECT_DAILY_USD_CAP = (() => {
+  const raw = process.env.WRITE_CHAPTERS_PER_PROJECT_DAILY_USD;
+  if (!raw) return 5;
+  const n = Number.parseFloat(raw);
+  return Number.isFinite(n) && n > 0 ? n : 5;
+})();
+
 export const maxDuration = 800; // 13.3 minutes (Vercel Pro allows up to 800s) — DeepSeek V4 Flash thinking mode needs more headroom
 export const dynamic = 'force-dynamic';
 
@@ -370,10 +382,20 @@ async function updateQuotaAfterError(
   vnDate: string,
   errorMsg: string,
 ): Promise<void> {
+  // Read prior retry_count so we can increment (not reset to 1).
+  // Cross-cron-tick failure tracking is the basis for the circuit breaker below.
+  const { data: prior } = await supabase
+    .from('project_daily_quotas')
+    .select('retry_count')
+    .eq('project_id', projectId)
+    .eq('vn_date', vnDate)
+    .maybeSingle();
+  const newRetryCount = (prior?.retry_count ?? 0) + 1;
+
   await supabase
     .from('project_daily_quotas')
     .update({
-      retry_count: 1,
+      retry_count: newRetryCount,
       last_error: errorMsg.slice(0, 500),
       // Retry in 3 min instead of 10 — 5-min cron tick means we'll catch the very next tick.
       // Faster recovery from transient DeepSeek failures.
@@ -382,6 +404,66 @@ async function updateQuotaAfterError(
     })
     .eq('project_id', projectId)
     .eq('vn_date', vnDate);
+
+  // Circuit breaker: after MAX consecutive failures in a single VN day, auto-pause.
+  // Prevents seed landmines (e.g. currency hard-fail loop) from burning ~288 retries/day.
+  // User unpauses manually via admin/operations action `resume_novel` after fixing root cause.
+  if (newRetryCount >= MAX_CONSECUTIVE_FAILURES) {
+    const reason = `auto_paused_after_${newRetryCount}_consecutive_failures: ${errorMsg.slice(0, 200)}`;
+    await supabase
+      .from('ai_story_projects')
+      .update({
+        status: 'paused',
+        pause_reason: reason,
+        paused_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', projectId)
+      .eq('status', 'active');
+    console.warn(`[circuit-breaker] Project ${projectId.slice(0, 8)} auto-paused after ${newRetryCount} failures: ${errorMsg.slice(0, 100)}`);
+  }
+}
+
+/**
+ * Per-project daily cost cap. Returns the dollar amount spent today; the caller
+ * compares to PER_PROJECT_DAILY_USD_CAP and skips/pauses if exceeded.
+ *
+ * Healthy novels burn ~$0.50-1/day. A runaway loop (writer retrying every 5 min
+ * with full context) can hit $5+ before circuit breaker fires. This is the
+ * second line of defense.
+ */
+async function getProjectDailyCostUsd(
+  supabase: ReturnType<typeof getSupabaseAdmin>,
+  projectId: string,
+): Promise<number> {
+  const dayStartUtc = new Date();
+  dayStartUtc.setUTCHours(0, 0, 0, 0);
+  const { data } = await supabase
+    .from('cost_tracking')
+    .select('cost')
+    .eq('project_id', projectId)
+    .gte('created_at', dayStartUtc.toISOString());
+  if (!data) return 0;
+  return data.reduce((sum, row) => sum + (Number(row.cost) || 0), 0);
+}
+
+async function autoPauseForCost(
+  supabase: ReturnType<typeof getSupabaseAdmin>,
+  projectId: string,
+  spentUsd: number,
+): Promise<void> {
+  const reason = `auto_paused_daily_cost_cap: spent $${spentUsd.toFixed(2)} > $${PER_PROJECT_DAILY_USD_CAP.toFixed(2)} cap`;
+  await supabase
+    .from('ai_story_projects')
+    .update({
+      status: 'paused',
+      pause_reason: reason,
+      paused_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', projectId)
+    .eq('status', 'active');
+  console.warn(`[cost-cap] Project ${projectId.slice(0, 8)} auto-paused: ${reason}`);
 }
 
 function computeDynamicResumeBatchSize(activeCount: number): number {
@@ -509,6 +591,25 @@ async function writeOneChapter(
 ): Promise<RunResult> {
   const novel = Array.isArray(project.novels) ? project.novels[0] : project.novels;
   if (!novel?.id) throw new Error('No novel linked');
+
+  // ====== PRE-WRITE DAILY COST CAP ======
+  // Skip + auto-pause if today's cost already exceeded the per-project cap.
+  // Catches runaway loops where the circuit breaker hasn't fired yet (e.g. each
+  // attempt fails late, deep into the writer pipeline, having spent real tokens).
+  try {
+    const spent = await getProjectDailyCostUsd(supabase, project.id);
+    if (spent > PER_PROJECT_DAILY_USD_CAP) {
+      await autoPauseForCost(supabase, project.id, spent);
+      return {
+        id: project.id,
+        title: novel.title,
+        tier,
+        success: false,
+        error: `daily_cost_cap_exceeded: $${spent.toFixed(2)}`,
+        chapterWritten: false,
+      };
+    }
+  } catch { /* non-fatal: never let cost-check failure block writes */ }
 
   const currentCh = project.current_chapter || 0;
   let latestWrittenTitle: string | null = null;

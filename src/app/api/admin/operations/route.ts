@@ -63,6 +63,89 @@ async function getStatus() {
   };
 }
 
+/**
+ * List novels currently in trouble: auto-paused (circuit breaker / cost cap), or
+ * active but logging consecutive failures today. Each row includes the last
+ * error message so the user can fix the root cause without SQL.
+ */
+async function getStuckNovels(supabase: ReturnType<typeof getSupabaseAdmin>) {
+  const dayStartUtc = new Date();
+  dayStartUtc.setUTCHours(0, 0, 0, 0);
+  const todayIso = dayStartUtc.toISOString();
+
+  // Auto-paused projects (circuit breaker or cost cap fired).
+  const { data: pausedRows } = await supabase
+    .from('ai_story_projects')
+    .select('id,status,pause_reason,paused_at,current_chapter,total_planned_chapters,novel_id,novels(title)')
+    .not('paused_at', 'is', null)
+    .order('paused_at', { ascending: false })
+    .limit(50);
+
+  // Active projects with retry_count > 0 today (failing but not yet paused).
+  const vnDate = new Date(Date.now() + 7 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const { data: failingQuotas } = await supabase
+    .from('project_daily_quotas')
+    .select('project_id,retry_count,last_error,updated_at,vn_date')
+    .eq('vn_date', vnDate)
+    .gt('retry_count', 0)
+    .order('retry_count', { ascending: false })
+    .limit(50);
+
+  const failingProjectIds = (failingQuotas || []).map(q => q.project_id);
+  const { data: failingProjects } = failingProjectIds.length
+    ? await supabase
+        .from('ai_story_projects')
+        .select('id,status,current_chapter,total_planned_chapters,novel_id,novels(title)')
+        .in('id', failingProjectIds)
+    : { data: [] };
+  const projectMap = new Map((failingProjects || []).map(p => [p.id, p]));
+
+  // Cost-spike projects: top 5 by today's cost (helps spot near-cap novels).
+  const { data: costRows } = await supabase
+    .from('cost_tracking')
+    .select('project_id,cost')
+    .gte('created_at', todayIso);
+  const costByProject = new Map<string, number>();
+  for (const row of costRows || []) {
+    costByProject.set(row.project_id, (costByProject.get(row.project_id) || 0) + (Number(row.cost) || 0));
+  }
+  const topCost = Array.from(costByProject.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10);
+
+  return {
+    auto_paused: (pausedRows || []).map(p => {
+      const novel = Array.isArray(p.novels) ? p.novels[0] : p.novels;
+      return {
+        project_id: p.id,
+        title: (novel as { title?: string } | null)?.title || '?',
+        pause_reason: p.pause_reason,
+        paused_at: p.paused_at,
+        progress: `${p.current_chapter || 0} / ${p.total_planned_chapters || 0}`,
+        cost_today_usd: Number((costByProject.get(p.id) || 0).toFixed(4)),
+      };
+    }),
+    failing_today: (failingQuotas || []).map(q => {
+      const proj = projectMap.get(q.project_id);
+      const novel = proj ? (Array.isArray(proj.novels) ? proj.novels[0] : proj.novels) : null;
+      return {
+        project_id: q.project_id,
+        title: (novel as { title?: string } | null)?.title || '?',
+        retry_count: q.retry_count,
+        last_error: q.last_error,
+        last_attempt: q.updated_at,
+        progress: proj ? `${proj.current_chapter || 0} / ${proj.total_planned_chapters || 0}` : '?',
+        status: proj?.status || '?',
+        cost_today_usd: Number((costByProject.get(q.project_id) || 0).toFixed(4)),
+      };
+    }),
+    top_cost_today: topCost.map(([id, cost]) => ({
+      project_id: id,
+      cost_today_usd: Number(cost.toFixed(4)),
+    })),
+  };
+}
+
 async function setCronActive(active: boolean) {
   // Cron management requires direct SQL via cron.alter_job. Not exposed via PostgREST.
   // Operator must use Supabase SQL editor / MCP. This endpoint is informational only.
@@ -87,6 +170,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   switch (action) {
     case 'status':
       return NextResponse.json(await getStatus());
+
+    case 'stuck_novels':
+      return NextResponse.json(await getStuckNovels(supabase));
 
     case 'pause_cron':
       return NextResponse.json(await setCronActive(false));
