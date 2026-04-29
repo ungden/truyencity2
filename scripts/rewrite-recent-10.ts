@@ -73,6 +73,7 @@ const MEMORY_TABLES = [
   'character_bibles',
   'location_timeline',
   'quality_metrics',
+  'project_daily_quotas',  // 2026-04-30 fix: cron skips novels with completed quotas
 ];
 
 (async () => {
