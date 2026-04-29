@@ -12,9 +12,9 @@ import { drainRetryQueue } from '@/services/story-engine/utils/retry-queue';
 export const maxDuration = 120;
 export const dynamic = 'force-dynamic';
 
-export async function GET(req: NextRequest) {
-  const authError = verifyCronAuth(req);
-  if (authError) return authError;
+export async function GET(req: NextRequest): Promise<NextResponse> {
+  const isCron = verifyCronAuth(req);
+  if (!isCron) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
     const stats = await drainRetryQueue(20);
@@ -31,4 +31,6 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export const POST = GET;
+export async function POST(req: NextRequest): Promise<NextResponse> {
+  return GET(req);
+}

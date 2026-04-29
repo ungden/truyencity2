@@ -53,17 +53,15 @@ async function listAppliedMigrations(): Promise<string[]> {
   return applied;
 }
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest): Promise<NextResponse> {
   const auth = await isAuthorizedAdmin(req);
   if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const local = await listLocalMigrations();
   const applied = await listAppliedMigrations();
 
-  // Pending = files in repo but probe table missing
   const localBaseNames = local.map(f => f.replace(/\.sql$/, ''));
   const pending = localBaseNames.filter(n => {
-    // Only check Phase 22+ migrations; older are presumed applied
     const num = parseInt(n.split('_')[0], 10);
     if (num < 153) return false;
     return !applied.includes(n);
@@ -79,4 +77,6 @@ export async function GET(req: NextRequest) {
   });
 }
 
-export const POST = GET;
+export async function POST(req: NextRequest): Promise<NextResponse> {
+  return GET(req);
+}
