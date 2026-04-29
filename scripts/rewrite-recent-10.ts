@@ -134,18 +134,47 @@ const MEMORY_TABLES = [
   if (chErr) console.warn('   ✗', chErr.message);
   else console.log(`   ✓ chapters: ${chCount ?? 0} rows\n`);
 
-  // 5. Reset current_chapter and reactivate
-  console.log('🔄 Resetting current_chapter=0 + reactivating...');
+  // 5. Reset state: wipe outlines, set total=1000, current=0. KEEP status='paused' until
+  //    outlines regenerated (else cron picks up and writes with null outlines = degraded).
+  console.log('🔄 Resetting state (total=1000, wipe outlines, current=0, still paused)...');
   const { error: resetErr } = await supabase
     .from('ai_story_projects')
     .update({
+      total_planned_chapters: 1000,
+      master_outline: null,
+      story_outline: null,
+      story_bible: null,
       current_chapter: 0,
-      status: 'active',
       updated_at: new Date().toISOString(),
     })
     .in('id', projectIds);
   if (resetErr) { console.error('Reset failed:', resetErr.message); process.exit(1); }
-  console.log('   ✓ All reactivated.\n');
+  console.log('   ✓ State reset. Outlines NULL, total=1000.\n');
+
+  // 6. Regenerate master_outline + story_outline at 1000-chapter target via existing script
+  console.log('📝 Regenerating master_outline + story_outline at 1000 chương...');
+  const { execSync } = require('child_process');
+  process.env.TARGET_PROJECTS = projectIds.join(',');
+  try {
+    execSync(
+      `${process.cwd()}/node_modules/.bin/tsx scripts/generate-outlines-for-novels.ts`,
+      { stdio: 'inherit', env: process.env },
+    );
+    console.log('   ✓ Outlines regenerated.\n');
+  } catch (e) {
+    console.error('Outline regen failed:', e instanceof Error ? e.message : String(e));
+    console.error('Novels remain paused. Inspect logs and rerun outline gen manually.');
+    process.exit(1);
+  }
+
+  // 7. Activate (only after outlines confirmed)
+  console.log('🚀 Activating projects...');
+  const { error: activateErr } = await supabase
+    .from('ai_story_projects')
+    .update({ status: 'active', updated_at: new Date().toISOString() })
+    .in('id', projectIds);
+  if (activateErr) { console.error('Activate failed:', activateErr.message); process.exit(1); }
+  console.log('   ✓ All active.\n');
 
   // 6. Verification queries
   console.log('🔍 Verifying...');
@@ -157,23 +186,19 @@ const MEMORY_TABLES = [
 
   const { data: verifyState } = await supabase
     .from('ai_story_projects')
-    .select('id,status,current_chapter,master_outline,story_outline')
+    .select('id,status,current_chapter,total_planned_chapters,master_outline,story_outline')
     .in('id', projectIds);
 
   const allActive = verifyState?.every(s => s.status === 'active' && s.current_chapter === 0);
-  const allHaveOutlines = verifyState?.every(s => s.master_outline && s.story_outline);
+  const allTarget1000 = verifyState?.every(s => s.total_planned_chapters === 1000);
+  const allOutlinesNull = verifyState?.every(s => !s.master_outline && !s.story_outline);
 
   console.log(`   chapters remaining: ${chapterCount ?? '?'}`);
   console.log(`   all active + ch=0: ${allActive ? '✓' : '✗'}`);
-  console.log(`   all have outlines: ${allHaveOutlines ? '✓' : '✗'}`);
-
-  if (!allHaveOutlines) {
-    const missing = (verifyState || []).filter(s => !s.master_outline || !s.story_outline);
-    console.warn(`\n⚠️  ${missing.length} novels missing outlines:`);
-    for (const m of missing) console.warn(`     ${m.id}`);
-    console.warn('     Run: TARGET_PROJECTS="<ids>" ./node_modules/.bin/tsx scripts/generate-outlines-for-novels.ts');
-  }
+  console.log(`   all total=1000: ${allTarget1000 ? '✓' : '✗'}`);
+  console.log(`   all outlines wiped (will regen): ${allOutlinesNull ? '✓' : '✗'}`);
 
   console.log('\n✅ Done. Cron will pick up and start writing from ch.1 within 5 minutes.');
-  console.log('   Monitor: SELECT id, current_chapter FROM ai_story_projects WHERE id IN (...);');
+  console.log('   First write triggers master_outline + story_outline regen (DeepSeek Pro tier).');
+  console.log('   Monitor: SELECT id, current_chapter, master_outline IS NOT NULL AS has_outline FROM ai_story_projects WHERE id IN (...);');
 })();

@@ -192,18 +192,25 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       }
     }
 
-    // Fix D/E: total_planned_chapters ↔ master_outline coverage alignment
+    // Fix D/E: total_planned_chapters ↔ master_outline coverage alignment.
+    // 2026-04-30: standardized novel target ~1000 chương. Validation now only auto-EXPANDS
+    // total_planned (when outline plans MORE than declared) — never auto-CONTRACTS. If user
+    // sets total=1000 but old master_outline plans 1500, leave total alone and let arc-plan
+    // generation cap arcs at total. This way: setting total=1000 + wiping master_outline
+    // (or just setting total) gracefully truncates the story without auto-revert to 1500.
     const arcs = masterOutline?.majorArcs ?? [];
     if (arcs.length > 0) {
       const lastArcEnd = Math.max(...arcs.map((a) => a?.endChapter || 0));
       const planned = project.total_planned_chapters || 0;
-      // Tolerate ≤10% drift; otherwise auto-correct
-      const driftRatio = planned > 0 ? Math.abs(lastArcEnd - planned) / planned : 1;
-      if (lastArcEnd > 0 && driftRatio > 0.1) {
-        // Round to nearest 50 for cleaner numbers
+      // Only auto-expand total_planned if master_outline goes >10% BEYOND it (user wants
+      // the longer plan). Don't auto-contract — that overrides explicit total_planned.
+      if (lastArcEnd > 0 && planned > 0 && lastArcEnd > planned * 1.1) {
         const newTotal = Math.round(lastArcEnd / 50) * 50 || lastArcEnd;
         await db.from('ai_story_projects').update({ total_planned_chapters: newTotal }).eq('id', options.projectId);
         validationFixes.push(`total_planned: ${planned} → ${newTotal} (master outline covers ch.${lastArcEnd})`);
+      } else if (lastArcEnd > planned * 1.05) {
+        // Mild drift (5-10%) — log only, don't change. Arc plan generator will cap at total.
+        validationFixes.push(`note: master outline ends at ch.${lastArcEnd} but total_planned=${planned}; story will gracefully wind down at total.`);
       }
     }
   } catch (err) {

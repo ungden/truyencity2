@@ -92,12 +92,13 @@ Trả về JSON:
 }
 
 QUY TẮC:
-- 5 arcs tổng (300 chương/arc)
+- 5 arcs tổng (~${Math.round(totalChapters / 5)} chương/arc — tổng KHÔNG vượt ${totalChapters})
 - DÙNG tên địa danh trong world description (KHÔNG bịa)
 - DÙNG concept golden finger trong world (KHÔNG thay)
 - KHÔNG inject "Net Việt", "Phượng Đô modern" nếu world không có
 - KHÔNG thêm yếu tố combat MC nếu world chỉ rõ MC = vendor/creator
-- TUÂN THỦ ANTI-TROPES trong world (no_system, no_harem, etc.)`;
+- TUÂN THỦ ANTI-TROPES trong world (no_system, no_harem, etc.)
+- Cộng dồn endChapter của arc cuối cùng PHẢI bằng ${totalChapters}.`;
 
   const txt = await callGemini(prompt, true);
   return JSON.parse(txt);
