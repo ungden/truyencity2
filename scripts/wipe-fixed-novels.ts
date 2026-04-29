@@ -126,6 +126,29 @@ async function wipe(slug: string): Promise<void> {
 
   await s.from('ai_story_projects').update(updates).eq('id', projectId);
   console.log(`  ✓ current_chapter=0, status=active — cron will rewrite from ch.1`);
+
+  // 5. Reset today's daily quota row — wipe leaves stale "20/20 completed" → cron skips novel.
+  //    Reset written_chapters to 0 + status to 'active' so cron picks up immediately.
+  //    (Constraint: status ∈ {'active','completed','failed'}, NOT 'pending'.)
+  //    VN date = UTC+7 today.
+  const vnDate = new Date(Date.now() + 7 * 3600 * 1000).toISOString().slice(0, 10);
+  const { error: quotaErr } = await s
+    .from('project_daily_quotas')
+    .update({
+      written_chapters: 0,
+      status: 'active',
+      next_due_at: new Date().toISOString(),
+      retry_count: 0,
+      last_error: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('project_id', projectId)
+    .eq('vn_date', vnDate);
+  if (quotaErr) {
+    console.log(`  ⚠ quota reset failed (${quotaErr.message}) — cron may skip novel today`);
+  } else {
+    console.log(`  ✓ daily quota for ${vnDate} reset to 0/20 — cron will pick up next tick`);
+  }
 }
 
 async function main(): Promise<void> {
