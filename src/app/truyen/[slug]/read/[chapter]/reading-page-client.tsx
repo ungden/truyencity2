@@ -15,6 +15,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { startSession, updateSessionDuration, endSession, markChapterRead } from '@/services/reading-sessions';
 import { READING } from '@/lib/config';
 import { AdPlacement } from '@/components/ads/AdPlacement';
+import { CopyProtect } from '@/components/reader/copy-protect';
 
 const Comments = dynamic(
   () => import('@/components/comments').then((mod) => mod.Comments),
@@ -444,28 +445,30 @@ export default function ReadingPageClient({ novelSlug, chapterNumber }: ReadingP
           </p>
         </div>
 
-        <article
-          className={cn(
-            'max-w-none whitespace-pre-wrap text-inherit',
-            articleToneClasses[settings.theme],
-            '[&_p]:mb-5 [&_p]:leading-relaxed',
-            '[&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-4 [&_h1]:mt-8',
-            '[&_h2]:text-xl [&_h2]:font-semibold [&_h2]:mb-3 [&_h2]:mt-6',
-            '[&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mb-2 [&_h3]:mt-4',
-            '[&_blockquote]:border-l-4 [&_blockquote]:border-current/30 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:opacity-80',
-            '[&_hr]:my-8 [&_hr]:border-current/20',
-            !isMobile && settings.twoColumnsDesktop ? 'lg:columns-2 lg:gap-12' : ''
-          )}
-          style={{
-            fontSize: `${settings.fontSize}px`,
-            lineHeight: settings.lineHeight,
-            fontFamily: settings.fontFamily,
-            letterSpacing: `${settings.letterSpacing}em`,
-            textAlign: settings.justify ? ('justify' as const) : ('start' as const),
-            color: 'inherit',
-          }}
-          dangerouslySetInnerHTML={{ __html: sanitizedContent }}
-        />
+        <CopyProtect chapterUrl={`/truyen/${novelSlug}/read/${chapterNumber}`}>
+          <article
+            className={cn(
+              'max-w-none whitespace-pre-wrap text-inherit',
+              articleToneClasses[settings.theme],
+              '[&_p]:mb-5 [&_p]:leading-relaxed',
+              '[&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-4 [&_h1]:mt-8',
+              '[&_h2]:text-xl [&_h2]:font-semibold [&_h2]:mb-3 [&_h2]:mt-6',
+              '[&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mb-2 [&_h3]:mt-4',
+              '[&_blockquote]:border-l-4 [&_blockquote]:border-current/30 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:opacity-80',
+              '[&_hr]:my-8 [&_hr]:border-current/20',
+              !isMobile && settings.twoColumnsDesktop ? 'lg:columns-2 lg:gap-12' : ''
+            )}
+            style={{
+              fontSize: `${settings.fontSize}px`,
+              lineHeight: settings.lineHeight,
+              fontFamily: settings.fontFamily,
+              letterSpacing: `${settings.letterSpacing}em`,
+              textAlign: settings.justify ? ('justify' as const) : ('start' as const),
+              color: 'inherit',
+            }}
+            dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+          />
+        </CopyProtect>
 
         <AdPlacement placement="chapter" slot="chapter-post-content" />
 

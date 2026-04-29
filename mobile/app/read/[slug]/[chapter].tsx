@@ -985,7 +985,11 @@ export default function ReadingScreen() {
               source={htmlSource}
               tagsStyles={tagsStyles}
               defaultTextProps={{
-                selectable: true,
+                // 2026-04-29 copy protection: disable text selection on mobile.
+                // iOS long-press → no copy menu. Android long-press → no select.
+                // Determined scrapers can still screenshot or use accessibility
+                // services, but this raises the bar for casual copy-paste piracy.
+                selectable: false,
               }}
               enableExperimentalMarginCollapsing
             />
