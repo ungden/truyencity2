@@ -15,7 +15,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isAuthorizedAdmin } from '@/lib/auth/admin-auth';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
 
-export const maxDuration = 60;
+export const maxDuration = 800;
 export const dynamic = 'force-dynamic';
 
 async function getStatus() {
