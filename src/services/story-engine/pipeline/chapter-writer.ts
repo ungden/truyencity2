@@ -882,15 +882,45 @@ async function runWriter(
     style.genreConventions.slice(0, 10).join('\n'),
   ].join('\n');
 
-  // Build lean Writer context: only bridge + character states + quality modules
-  // (Architect already consumed full context and distilled it into the outline)
+  // Build lean Writer context: bridge + character states + RAG + synopsis + recent chapters + quality modules
+  // 2026-04-29 continuity overhaul: Writer now also receives RAG context (was Architect-only),
+  // synopsis structured fields, and recent-chapter summaries. Architect's outline cannot carry every
+  // detail; Writer needs raw memory + recent state to maintain continuity over long novels (>50ch).
   const writerContextParts: string[] = [];
+  // Helper: extract a tagged section, soft-truncate to budget at line boundary
+  const extractSection = (regex: RegExp, budget: number): string | null => {
+    const match = context.match(regex);
+    if (!match) return null;
+    const text = match[0];
+    if (text.length <= budget) return text;
+    const cut = text.lastIndexOf('\n', budget);
+    return cut > budget * 0.5 ? text.slice(0, cut) : text.slice(0, budget);
+  };
+
   // Bridge: cliffhanger + MC state (critical for continuity)
-  const bridgeMatch = context.match(/\[CẦU NỐI CHƯƠNG[^\]]*\][\s\S]*?(?=\n\n\[|$)/);
-  if (bridgeMatch) writerContextParts.push(bridgeMatch[0]);
+  const bridge = extractSection(/\[CẦU NỐI CHƯƠNG[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 2000);
+  if (bridge) writerContextParts.push(bridge);
   // Character states
-  const charMatch = context.match(/\[NHÂN VẬT HIỆN TẠI[^\]]*\][\s\S]*?(?=\n\n\[|$)/);
-  if (charMatch) writerContextParts.push(charMatch[0]);
+  const charSection = extractSection(/\[NHÂN VẬT HIỆN TẠI[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 3000);
+  if (charSection) writerContextParts.push(charSection);
+  // Character bibles (Phase 22 — durable consolidated bibles, refreshed every 50 ch)
+  const bibleSection = extractSection(/\[NHÂN VẬT BIBLE[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 4000);
+  if (bibleSection) writerContextParts.push(bibleSection);
+  // Volume summaries (Phase 22 — durable macro recaps, every 100 ch)
+  const volSection = extractSection(/\[VOLUME SUMMARIES[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 3000);
+  if (volSection) writerContextParts.push(volSection);
+  // Geography (Phase 22 — MC current location)
+  const geoSection = extractSection(/\[GEOGRAPHY[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 600);
+  if (geoSection) writerContextParts.push(geoSection);
+  // RAG memory (events from far chapters — critical for long-novel continuity)
+  const ragSection = extractSection(/\[KÝ ỨC LIÊN QUAN[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 2000);
+  if (ragSection) writerContextParts.push(ragSection);
+  // Synopsis (active threads, allies, enemies — high-value continuity signal)
+  const synopsisSection = extractSection(/\[TỔNG QUAN CỐT TRUYỆN\][\s\S]*?(?=\n\n\[|$)/, 1500);
+  if (synopsisSection) writerContextParts.push(synopsisSection);
+  // Recent chapter summaries (last 12 chapters condensed — Writer needs this to avoid contradicting just-written events)
+  const recentSection = extractSection(/\[TÓM TẮT \d+ CHƯƠNG GẦN NHẤT\][\s\S]*?(?=\n\n\[|$)/, 2500);
+  if (recentSection) writerContextParts.push(recentSection);
   // Quality modules (foreshadowing, character arc, pacing, voice, power, world)
   // Per-module budgets: foreshadowing/character-arc need more space (per-hint/per-character data)
   const qualityModuleBudgets: Record<string, number> = {
@@ -1038,21 +1068,50 @@ async function runCritic(
     console.warn(`[Critic] Chapter content trimmed from ${content.length} to ${contentPreview.length} chars (head+tail)`);
   }
 
-  // Cross-chapter context for contradiction detection (token-optimized: bridge + chars only, no synopsis)
-  // Critic only needs: previous cliffhanger/MC state + character states for continuity checks.
-  // Synopsis is redundant here — Architect/Writer already used it.
+  // Cross-chapter context for contradiction detection.
+  // 2026-04-29 continuity overhaul: expanded from bridge+chars (3K cap) to bridge + chars + RAG +
+  // synopsis + recent summaries (8K cap). Critic must catch contradictions across ENTIRE story,
+  // not just last chapter — old cap let dead-character-reappearance, power-regression, and
+  // forgotten-subplot bugs slip through because Critic literally couldn't see those events.
   let crossChapterSection = '';
   if (previousContext) {
     const relevantParts: string[] = [];
-    // Extract bridge section (cliffhanger + MC state)
-    const bridgeMatch = previousContext.match(/\[CẦU NỐI CHƯƠNG[^\]]*\][\s\S]*?(?=\n\n\[|$)/);
-    if (bridgeMatch) relevantParts.push(bridgeMatch[0]);
-    // Extract character states
-    const charMatch = previousContext.match(/\[NHÂN VẬT HIỆN TẠI[^\]]*\][\s\S]*?(?=\n\n\[|$)/);
-    if (charMatch) relevantParts.push(charMatch[0]);
+    const extractCriticSection = (regex: RegExp, budget: number): string | null => {
+      const match = previousContext.match(regex);
+      if (!match) return null;
+      const text = match[0];
+      if (text.length <= budget) return text;
+      const cut = text.lastIndexOf('\n', budget);
+      return cut > budget * 0.5 ? text.slice(0, cut) : text.slice(0, budget);
+    };
 
+    // Extract bridge section (cliffhanger + MC state)
+    const bridgeS = extractCriticSection(/\[CẦU NỐI CHƯƠNG[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 2000);
+    if (bridgeS) relevantParts.push(bridgeS);
+    // Extract character states (incl. dead characters that must NOT reappear)
+    const charS = extractCriticSection(/\[NHÂN VẬT HIỆN TẠI[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 3000);
+    if (charS) relevantParts.push(charS);
+    // Extract character bibles (Phase 22 — Critic must check chapter content against bibles)
+    const bibleS = extractCriticSection(/\[NHÂN VẬT BIBLE[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 4000);
+    if (bibleS) relevantParts.push(bibleS);
+    // Extract volume summaries (Phase 22)
+    const volS = extractCriticSection(/\[VOLUME SUMMARIES[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 2500);
+    if (volS) relevantParts.push(volS);
+    // Extract RAG memory (far-chapter events Critic must check current chapter against)
+    const ragS = extractCriticSection(/\[KÝ ỨC LIÊN QUAN[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 2500);
+    if (ragS) relevantParts.push(ragS);
+    // Extract synopsis (active threads, allies, enemies — high-value continuity signal)
+    const synopsisS = extractCriticSection(/\[TỔNG QUAN CỐT TRUYỆN\][\s\S]*?(?=\n\n\[|$)/, 1500);
+    if (synopsisS) relevantParts.push(synopsisS);
+    // Extract recent chapter summaries (last 12 chapters condensed)
+    const recentS = extractCriticSection(/\[TÓM TẮT \d+ CHƯƠNG GẦN NHẤT\][\s\S]*?(?=\n\n\[|$)/, 2500);
+    if (recentS) relevantParts.push(recentS);
+
+    const merged = relevantParts.join('\n\n');
+    // 16K total cap — fits bibles (4K) + char states (3K) + RAG (2.5K) + recent (2.5K) + synopsis (1.5K) + bridge (2K).
+    // DeepSeek 1M context easily handles this; cost negligible vs the value of catching cross-arc contradictions.
     crossChapterSection = relevantParts.length > 0
-      ? `BỐI CẢNH CÂU CHUYỆN (dùng để KIỂM TRA mâu thuẫn):\n${relevantParts.join('\n\n').slice(0, 3000)}\n\n`
+      ? `BỐI CẢNH CÂU CHUYỆN (dùng để KIỂM TRA mâu thuẫn — bao gồm bible nhân vật, ký ức xa, synopsis, chương gần đây):\n${merged.slice(0, 16000)}\n\n`
       : `BỐI CẢNH CÂU CHUYỆN (dùng để KIỂM TRA mâu thuẫn):\n${previousContext.slice(0, 3000)}\n\n`;
   }
 

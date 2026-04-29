@@ -18,9 +18,10 @@ import { getGenreBoundaryText } from '../config';
 import { loadContext, assembleContext } from './context-assembler';
 import { writeChapter } from './chapter-writer';
 import { retrieveRAGContext, chunkAndStoreChapter, retrieveEntityContext, retrieveThemeContext } from '../memory/rag-store';
-import { saveCharacterStatesFromCombined, detectCharacterContradictions } from '../memory/character-tracker';
+import { saveCharacterStatesFromCombined, detectCharacterContradictions, type CharacterContradiction } from '../memory/character-tracker';
 import { extractCharacterKnowledge, getCharacterKnowledgeContext } from '../memory/character-knowledge';
 import { autoReviseChapter } from './auto-reviser';
+import { runContinuityGuardian } from './continuity-guardian';
 import {
   buildPlotThreadContext,
   buildBeatContext,
@@ -28,6 +29,7 @@ import {
   detectAndRecordBeats,
   extractRulesFromChapter,
   checkConsistency,
+  checkConsistencyFast,
 } from '../memory/plot-tracker';
 import { runSummaryTasks } from '../memory/summary-manager';
 import { generateArcPlan } from './context-assembler';
@@ -296,10 +298,18 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       ? context.knownCharacterNames
       : [protagonistName];
 
+    // 2026-04-29 continuity overhaul: pass richer search context to buildRuleContext.
+    // Was 300 chars of arcPlan only — too thin for keyword scoring against rule texts.
+    // Now combines cliffhanger + chapterBrief + arcPlan for better rule recall.
+    const ruleSearchCtx = [
+      context.previousCliffhanger || '',
+      context.chapterBrief || '',
+      (context.arcPlan || '').slice(0, 800),
+    ].filter(Boolean).join('\n').slice(0, 2000);
     const [plotCtx, beatCtx, ruleCtx] = await Promise.all([
       buildPlotThreadContext(project.id, nextChapter, characters, arcNumber),
       buildBeatContext(project.id, nextChapter, arcNumber),
-      buildRuleContext(project.id, nextChapter, context.arcPlan?.slice(0, 300) || '', characters),
+      buildRuleContext(project.id, nextChapter, ruleSearchCtx, characters),
     ]);
 
     if (plotCtx) context.plotThreads = plotCtx;
@@ -313,9 +323,12 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   try {
     const { getRelationshipContext } = await import('../memory/relationship-tracker');
     const { getEconomicContext } = await import('../memory/economic-ledger');
+    const { getCharacterBibleContext } = await import('../memory/character-bible');
+    const { getVolumeSummaryContext } = await import('../memory/volume-summarizer');
+    const { getGeographyContext } = await import('../memory/geography-tracker');
     const subGenres = context.subGenres || [];
 
-    const [foreshadowCtx, charArcCtx, pacingCtx, voiceCtx, powerCtx, worldCtx, knowledgeCtx, relationshipCtx, economicCtx] = await Promise.all([
+    const [foreshadowCtx, charArcCtx, pacingCtx, voiceCtx, powerCtx, worldCtx, knowledgeCtx, relationshipCtx, economicCtx, bibleCtx, volSummaryCtx, geoCtx] = await Promise.all([
       getForeshadowingContext(project.id, nextChapter).catch(() => null),
       getCharacterArcContext(project.id, nextChapter, context.knownCharacterNames).catch(() => null),
       getChapterPacingContext(project.id, nextChapter).catch(() => null),
@@ -325,6 +338,9 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       getCharacterKnowledgeContext(project.id, nextChapter, context.knownCharacterNames).catch(() => null),
       getRelationshipContext(project.id, context.knownCharacterNames).catch(() => null),
       getEconomicContext(project.id, genre, subGenres).catch(() => null),
+      getCharacterBibleContext(project.id, nextChapter).catch(() => null),
+      getVolumeSummaryContext(project.id, nextChapter).catch(() => null),
+      getGeographyContext(project.id, nextChapter, protagonistName).catch(() => null),
     ]);
 
     // Smart truncation: per-module budgets
@@ -337,6 +353,9 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     if (knowledgeCtx) context.characterKnowledgeContext = smartTruncate(knowledgeCtx, 2000);
     if (relationshipCtx) context.relationshipContext = smartTruncate(relationshipCtx, 1200);
     if (economicCtx) context.economicContext = smartTruncate(economicCtx, 1200);
+    if (bibleCtx) context.characterBibleContext = smartTruncate(bibleCtx, 8000);
+    if (volSummaryCtx) context.volumeSummaryContext = smartTruncate(volSummaryCtx, 6000);
+    if (geoCtx) context.geographyContext = smartTruncate(geoCtx, 800);
   } catch {
     // Non-fatal
   }
@@ -455,6 +474,12 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
 
   // ── Step 6: 7 parallel post-write tasks (all non-fatal) ───────────────
   const arcNumber = Math.ceil(nextChapter / 20);
+  // 2026-04-29 audit fix: aiWriteCount tracks the number of AI writes (vs reader chapters).
+  // With chapter splits enabled, 1 AI write = 2 reader chapters, so nextChapter is always odd.
+  // Tasks gated on `nextChapter % 2 === 0` would NEVER fire (e.g. Task 13 char knowledge),
+  // and `nextChapter % 3 === 0` would fire half-frequency. Use aiWriteCount for cadence gates
+  // that are about *AI write frequency* rather than reader-chapter milestones.
+  const aiWriteCount = Math.ceil(lastChapterNumber / SPLIT_PARTS);
 
   // Extract all unique character names from the Architect outline
   const outlineChars = new Set<string>();
@@ -477,15 +502,51 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     project.world_description || storyTitle, geminiConfig,
   ).catch(() => null);
 
-  // Task 2: Detect contradictions + auto-revise + save character states
+  // Task 2: Detect contradictions + fast consistency check + auto-revise + save character states
   if (combinedResult?.characters && combinedResult.characters.length > 0) {
     // 2a: Detect contradictions BEFORE saving (compare new vs previous states)
-    const contradictions = await detectCharacterContradictions(
+    const contradictions: CharacterContradiction[] = await detectCharacterContradictions(
       project.id, nextChapter, combinedResult.characters,
     ).catch(e => {
       console.warn('[Orchestrator] Task 2a contradiction detection failed:', e instanceof Error ? e.message : String(e));
-      return [];
+      return [] as CharacterContradiction[];
     });
+
+    // 2a': Fast consistency regex check — runs every chapter, feeds critical issues into auto-revise.
+    // 2026-04-29 continuity overhaul: was Task 6 (every 3 chapters, advisory only). Now blocks via
+    // auto-revise pipeline so dead-character resurrections are fixed pre-save instead of slipping
+    // through to readers.
+    const fastIssues = await checkConsistencyFast(project.id, nextChapter, result.content).catch(() => []);
+    if (fastIssues.length > 0) {
+      for (const issue of fastIssues) {
+        if (issue.severity === 'critical' && issue.type === 'dead_character') {
+          // Map ConsistencyIssue → CharacterContradiction shape so auto-reviser can fix it.
+          // Greedy match for full character name (e.g. "Lâm Phong" not just "Lâm") since
+          // checkConsistencyFast formats description as "<full name> đã chết ở chương ...".
+          const charNameMatch = issue.description.match(/^(\S+(?:\s\S+)*)\s+đã chết/);
+          const charName = charNameMatch?.[1] || 'unknown';
+          contradictions.push({
+            characterName: charName,
+            type: 'resurrection',
+            severity: 'critical',
+            description: issue.description,
+            previousChapter: 0,
+            currentChapter: nextChapter,
+          });
+        }
+      }
+    }
+
+    // 2a'': Continuity Guardian — 4th agent doing biên-tập-viên pass.
+    // 2026-04-29 Phase 22: looks for power contradictions, location teleport, personality flip,
+    // info leak, subplot reopen across the WHOLE story (not just last chapter). Critical issues
+    // feed into auto-revise. Skipped for ch.1-10 (not enough history). Cost: ~$0.005/chapter.
+    const guardian = await runContinuityGuardian(
+      project.id, nextChapter, result.title, result.content, characters, geminiConfig,
+    );
+    if (guardian.contradictions.length > 0) {
+      for (const c of guardian.contradictions) contradictions.push(c);
+    }
 
     if (contradictions.length > 0) {
       const criticals = contradictions.filter(c => c.severity === 'critical');
@@ -511,6 +572,24 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
             } else {
               result.content = revision.content;
               console.warn(`[Orchestrator] Auto-revised Ch.${nextChapter}: fixed ${revision.fixedIssues.length} issues`);
+
+              // 2026-04-29 audit fix: characters were extracted from PRE-revise content. If revise
+              // removed dead-char appearances or fixed power regressions, the extracted state list
+              // still has stale data. Override to preserve previous-chapter truth: for any
+              // resurrection contradiction, force status='dead' so saved state stays 'dead'.
+              // For power_regression critical, drop the new state entry so latest stays as last DB row.
+              const namesToForceDead = new Set(
+                criticals.filter(c => c.type === 'resurrection').map(c => c.characterName)
+              );
+              const namesToDropPowerDowngrade = new Set(
+                criticals.filter(c => c.type === 'power_regression').map(c => c.characterName)
+              );
+              combinedResult.characters = combinedResult.characters
+                .filter(c => !namesToDropPowerDowngrade.has(c.character_name))
+                .map(c => namesToForceDead.has(c.character_name)
+                  ? { ...c, status: 'dead' as const }
+                  : c
+                );
             }
           }
         } catch (e) {
@@ -544,7 +623,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
 
     // Task 6: Consistency check — every 3 chapters to reduce AI calls
     // (dead character regex runs every chapter; business logic AI check runs every 3)
-    ...(nextChapter % 3 === 0 ? [
+    ...(aiWriteCount % 3 === 0 ? [
       checkConsistency(
         project.id, nextChapter, result.content, characters,
       ).catch(e => console.warn('[Orchestrator] Task 6 consistency check failed:', e instanceof Error ? e.message : String(e))),
@@ -558,7 +637,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     ).catch((e) => console.warn(`[Orchestrator] Task 7 foreshadowing status failed:`, e instanceof Error ? e.message : String(e))),
 
     // Task 8: Update character arcs (every 3 chapters to save tokens — arcs evolve slowly)
-    ...(nextChapter % 3 === 0 ? [
+    ...(aiWriteCount % 3 === 0 ? [
       updateCharacterArcs(
         project.id, nextChapter, characters, geminiConfig, genre, protagonistName,
       ).catch((e) => console.warn(`[Orchestrator] Task 8 character arcs failed:`, e instanceof Error ? e.message : String(e))),
@@ -577,28 +656,28 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     ]),
 
     // Task 11: Update location exploration (every 3 chapters to save tokens)
-    ...(nextChapter % 3 === 0 ? [
+    ...(aiWriteCount % 3 === 0 ? [
       updateLocationExploration(
         project.id, nextChapter,
       ).catch((e) => console.warn(`[Orchestrator] Task 11 location exploration failed:`, e instanceof Error ? e.message : String(e))),
     ] : []),
 
     // Task 12: Pre-generate upcoming location bible (every 3 chapters to save tokens)
-    ...(nextChapter % 3 === 0 ? [
+    ...(aiWriteCount % 3 === 0 ? [
       prepareUpcomingLocation(
         project.id, nextChapter, genre, context.synopsis, context.masterOutline, geminiConfig,
       ).catch((e) => console.warn(`[Orchestrator] Task 12 upcoming location failed:`, e instanceof Error ? e.message : String(e))),
     ] : []),
 
     // Task 13: Extract character knowledge (every 2 chapters to save tokens)
-    ...(nextChapter % 2 === 0 ? [
+    ...(aiWriteCount % 2 === 0 ? [
       extractCharacterKnowledge(
         project.id, nextChapter, result.content, characters, geminiConfig,
       ).catch((e) => console.warn(`[Orchestrator] Task 13 character knowledge failed:`, e instanceof Error ? e.message : String(e))),
     ] : []),
 
     // Task 14: Extract relationships (every 3 chapters — new in 0150)
-    ...(nextChapter % 3 === 0 ? [
+    ...(aiWriteCount % 3 === 0 ? [
       (async () => {
         const { extractRelationships } = await import('../memory/relationship-tracker');
         return extractRelationships(project.id, nextChapter, result.content, characters, geminiConfig);
@@ -611,6 +690,38 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
         const { extractEconomicState } = await import('../memory/economic-ledger');
         return extractEconomicState(project.id, nextChapter, result.content, protagonistName, geminiConfig);
       })().catch((e) => console.warn(`[Orchestrator] Task 15 economic ledger failed:`, e instanceof Error ? e.message : String(e))),
+    ] : []),
+
+    // Task 15b: Record geography timeline (Phase 22 continuity overhaul)
+    ...(combinedResult?.characters && combinedResult.characters.length > 0 ? [
+      (async () => {
+        const { recordLocationFromCharacters } = await import('../memory/geography-tracker');
+        return recordLocationFromCharacters(
+          project.id, nextChapter, result.content,
+          combinedResult.characters.map(c => ({ character_name: c.character_name, location: c.location })),
+        );
+      })().catch((e) => console.warn(`[Orchestrator] Task 15b geography timeline failed:`, e instanceof Error ? e.message : String(e))),
+    ] : []),
+
+    // Task 16: Refresh character bibles every 50 chapters (Phase 22 continuity overhaul).
+    // CRITICAL: gate on lastChapterNumber (not nextChapter) — with chapter splits enabled,
+    // nextChapter is the FIRST half of a 2-chapter split (always odd in 2-split mode), so
+    // `nextChapter % 50 === 0` would NEVER fire for split novels. lastChapterNumber is the
+    // LAST reader chapter of the split which lands on the actual milestone (50, 100, 150...).
+    ...(lastChapterNumber % 50 === 0 && lastChapterNumber >= 50 ? [
+      (async () => {
+        const { refreshCharacterBibles } = await import('../memory/character-bible');
+        return refreshCharacterBibles(project.id, lastChapterNumber, geminiConfig);
+      })().catch((e) => console.warn(`[Orchestrator] Task 16 character bible refresh failed:`, e instanceof Error ? e.message : String(e))),
+    ] : []),
+
+    // Task 17: Generate volume summary every 100 chapters (Phase 22 continuity overhaul).
+    // Same lastChapterNumber gating as Task 16 — see comment there.
+    ...(lastChapterNumber % 100 === 0 && lastChapterNumber >= 100 ? [
+      (async () => {
+        const { generateVolumeSummary } = await import('../memory/volume-summarizer');
+        return generateVolumeSummary(project.id, lastChapterNumber, geminiConfig);
+      })().catch((e) => console.warn(`[Orchestrator] Task 17 volume summary failed:`, e instanceof Error ? e.message : String(e))),
     ] : []),
   ]);
 

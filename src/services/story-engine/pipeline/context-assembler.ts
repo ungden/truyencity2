@@ -93,8 +93,11 @@ export async function loadContext(
     db.from('story_synopsis').select('synopsis_text,mc_current_state,active_allies,active_enemies,open_threads,last_updated_chapter').eq('project_id', projectId).order('last_updated_chapter', { ascending: false }).limit(1).maybeSingle(),
     // Layer 3: Recent Chapter Summaries — use summaries instead of full text to save tokens
     // Full text of recent chapters is expensive (~9-25K chars). Summaries are ~200-400 chars each.
-    // For early chapters (<10), still load 1 full recent chapter for richer context.
-    db.from('chapter_summaries').select('chapter_number,title,summary,mc_state,cliffhanger').eq('project_id', projectId).lt('chapter_number', chapterNumber).order('chapter_number', { ascending: false }).limit(chapterNumber > 50 ? 5 : 8),
+    // 2026-04-29 continuity overhaul: removed ch.50 cliff (was 5 vs 8). DeepSeek 1M context
+    // makes 8 summaries (~2.4K chars total) trivial; the cliff was dropping continuity at exactly
+    // the point novels start needing it most. Keeping 12 here so Architect sees ~12 chapter
+    // window — enough to catch mid-arc setups that would otherwise be forgotten.
+    db.from('chapter_summaries').select('chapter_number,title,summary,mc_state,cliffhanger').eq('project_id', projectId).lt('chapter_number', chapterNumber).order('chapter_number', { ascending: false }).limit(12),
     // Layer 4: Arc Plan (incl. hyperpop sub-arcs from migration 0149)
     db.from('arc_plans').select('arc_number,start_chapter,end_chapter,arc_theme,plan_text,sub_arcs,chapter_briefs,threads_to_advance,threads_to_resolve,new_threads').eq('project_id', projectId).order('arc_number', { ascending: false }).limit(1).maybeSingle(),
     // Master Outline + Story Outline + WORLD DESCRIPTION (canonical premise source)
@@ -430,26 +433,44 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
   // Genre boundary
   if (payload.genreBoundary) parts.push(payload.genreBoundary);
 
-  // RAG context
-  if (payload.ragContext) parts.push(payload.ragContext);
+  // RAG context — wrap with stable header tag so Writer can extract it from full context.
+  // 2026-04-29 continuity overhaul: Writer now reads RAG too (was Architect-only before).
+  if (payload.ragContext) {
+    parts.push(`[KÝ ỨC LIÊN QUAN — TỪ CÁC CHƯƠNG XA, BẮT BUỘC GIỮ NHẤT QUÁN]\n${payload.ragContext}`);
+  }
 
   // Scalability modules
-  if (payload.plotThreads) parts.push(payload.plotThreads);
-  if (payload.beatGuidance) parts.push(payload.beatGuidance);
+  // 2026-04-29 audit fix: wrap with [TAG] headers so the assembled context has consistent
+  // section boundaries. Without [TAG] prefix, regex extraction in Writer/Critic (terminator
+  // `\n\n[`) extends past these sections into following content, causing leakage. The original
+  // `═══ TUYẾN TRUYỆN ĐANG MỞ ═══` heading is now redundant but harmless inside the wrapped block.
+  if (payload.plotThreads) parts.push(`[PLOT THREADS — TUYẾN TRUYỆN ĐANG MỞ + ĐÃ ĐÓNG]\n${payload.plotThreads}`);
+  if (payload.beatGuidance) parts.push(`[BEAT GUIDANCE — NHỊP & COOLDOWN]\n${payload.beatGuidance}`);
   if (payload.worldRules) parts.push(payload.worldRules);
 
+  // 2026-04-29 audit fix: wrap all context modules with [TAG] headers so Writer/Critic regex
+  // extraction (`\[TAG[^\]]*\]...(?=\n\n\[|$)`) can both find them AND properly terminate at
+  // section boundaries. Previously these returned with `═══ ... ═══` or freeform headers, so
+  // Writer's quality-module extraction (looking for `[FORESHADOWING]` etc.) NEVER matched.
+  // This is a major pre-existing bug — Writer was getting empty quality-module context all along.
   // Character knowledge graph
-  if (payload.characterKnowledgeContext) parts.push(payload.characterKnowledgeContext);
-  if (payload.relationshipContext) parts.push(payload.relationshipContext);
-  if (payload.economicContext) parts.push(payload.economicContext);
+  if (payload.characterKnowledgeContext) parts.push(`[CHARACTER KNOWLEDGE — AI ĐÃ BIẾT GÌ]\n${payload.characterKnowledgeContext}`);
+  if (payload.relationshipContext) parts.push(`[RELATIONSHIPS — TRẠNG THÁI MỐI QUAN HỆ]\n${payload.relationshipContext}`);
+  if (payload.economicContext) parts.push(`[ECONOMIC LEDGER — TÀI CHÍNH]\n${payload.economicContext}`);
 
   // Quality modules (Qidian Master Level)
-  if (payload.foreshadowingContext) parts.push(payload.foreshadowingContext);
-  if (payload.characterArcContext) parts.push(payload.characterArcContext);
-  if (payload.pacingContext) parts.push(payload.pacingContext);
-  if (payload.voiceContext) parts.push(payload.voiceContext);
-  if (payload.powerContext) parts.push(payload.powerContext);
-  if (payload.worldContext) parts.push(payload.worldContext);
+  if (payload.foreshadowingContext) parts.push(`[FORESHADOWING — GIEO/PAYOFF HINT]\n${payload.foreshadowingContext}`);
+  if (payload.characterArcContext) parts.push(`[CHARACTER ARC — XUNG ĐỘT NỘI TÂM]\n${payload.characterArcContext}`);
+  if (payload.pacingContext) parts.push(`[PACING — NHỊP CHƯƠNG]\n${payload.pacingContext}`);
+  if (payload.voiceContext) parts.push(`[VOICE — GIỌNG VĂN]\n${payload.voiceContext}`);
+  if (payload.powerContext) parts.push(`[POWER — CẢNH GIỚI MC]\n${payload.powerContext}`);
+  if (payload.worldContext) parts.push(`[WORLD — LOCATION + WORLD STATE]\n${payload.worldContext}`);
+
+  // Phase 22 continuity overhaul: durable bibles (refreshed every 50ch / 100ch).
+  // Injected high — these are the consolidated truth Architect should anchor against.
+  if (payload.characterBibleContext) parts.push(payload.characterBibleContext);
+  if (payload.volumeSummaryContext) parts.push(payload.volumeSummaryContext);
+  if (payload.geographyContext) parts.push(payload.geographyContext);
 
   // Layer 1: Story Bible
   if (payload.storyBible) {

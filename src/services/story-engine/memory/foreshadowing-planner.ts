@@ -204,7 +204,7 @@ export async function getForeshadowingContext(
     }
   }
 
-  // Add overdue hint warnings
+  // Add overdue hint warnings (approaching deadline)
   try {
     const overdue = await getOverdueHints(projectId, chapterNumber);
     if (overdue.length > 0) {
@@ -215,7 +215,60 @@ export async function getForeshadowingContext(
     // Non-fatal
   }
 
+  // 2026-04-29 continuity overhaul: surface PAST-DEADLINE hints as urgent payoff demands.
+  // Previous getOverdueHints only caught approaching deadlines; hints whose deadline already
+  // passed (5+ chapters late) silently rotted in DB. Now they're loud and demand resolution
+  // this arc — or get auto-abandoned if extremely late so they stop polluting future contexts.
+  try {
+    const overdueLate = await getPastDeadlineHints(projectId, chapterNumber);
+    if (overdueLate.length > 0) {
+      parts.push('═══ ⚠️ FORESHADOWING ĐÃ QUÁ HẠN — PHẢI PAYOFF NGAY TRONG ARC NÀY ═══');
+      parts.push(...overdueLate);
+    }
+  } catch {
+    // Non-fatal
+  }
+
   return parts.length > 0 ? parts.join('\n') : null;
+}
+
+/**
+ * 2026-04-29: hints whose payoff_chapter < currentChapter - 5 are PAST DEADLINE.
+ * Surface them as urgent demands. Auto-abandon hints that are >30 chapters past deadline
+ * so the engine isn't perpetually badgering Architect about hints that'll never pay off.
+ */
+async function getPastDeadlineHints(
+  projectId: string,
+  chapterNumber: number,
+): Promise<string[]> {
+  const db = getSupabase();
+  const { data } = await db
+    .from('foreshadowing_plans')
+    .select('id,hint_text,payoff_chapter,payoff_description')
+    .eq('project_id', projectId)
+    .eq('status', 'planted')
+    .lt('payoff_chapter', chapterNumber - 5)
+    .order('payoff_chapter', { ascending: true })
+    .limit(8);
+
+  if (!data?.length) return [];
+
+  // Auto-abandon hints that are extremely late (>30 chapters past deadline) to keep DB clean
+  const veryLate = data.filter(h => h.payoff_chapter < chapterNumber - 30);
+  if (veryLate.length > 0) {
+    await db
+      .from('foreshadowing_plans')
+      .update({ status: 'abandoned' })
+      .in('id', veryLate.map(h => h.id))
+      .then(() => undefined, () => undefined);
+  }
+
+  return data
+    .filter(h => h.payoff_chapter >= chapterNumber - 30)
+    .map(h => {
+      const overdueBy = chapterNumber - h.payoff_chapter;
+      return `⚠️ QUÁ HẠN ${overdueBy} chương (deadline ch.${h.payoff_chapter}): "${h.hint_text}" → CALLBACK: "${h.payoff_description}". BẮT BUỘC payoff trong vòng 5 chương tới.`;
+    });
 }
 
 // ── Post-Write: Mark Hints as Planted/Paid Off ───────────────────────────────

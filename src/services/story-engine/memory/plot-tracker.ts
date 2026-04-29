@@ -109,6 +109,33 @@ export async function buildPlotThreadContext(
       lines.push(`\n⚠️ Tuyến bị bỏ rơi: ${abandoned.map(t => t.name).join(', ')}`);
     }
 
+    // 2026-04-29 continuity overhaul: Subplot Resurrection Guard.
+    // Surface most-recently-resolved threads so Architect/Writer don't accidentally
+    // re-open them. If a closed thread MUST come back, it should do so via explicit
+    // [CALLBACK] flag, not silent resurrection.
+    try {
+      const { data: closed } = await db
+        .from('plot_threads')
+        .select('name,description,last_active_chapter')
+        .eq('project_id', projectId)
+        .eq('status', 'resolved')
+        .order('last_active_chapter', { ascending: false })
+        .limit(10);
+      if (closed?.length) {
+        // 2026-04-29 audit fix: removed `[🔒 ...]` brackets — was creating `\n\n[` inside the plot
+        // threads section, which then confused regex extraction in Writer/Critic (RAG section
+        // extraction would terminate prematurely at this internal bracketed marker, leaking RAG
+        // boundary into plot-threads content). Use plain emoji prefix instead.
+        lines.push(`\n🔒 TUYẾN ĐÃ ĐÓNG — KHÔNG ĐƯỢC MỞ LẠI TRỪ KHI CALLBACK CHỦ ĐỘNG:`);
+        for (const t of closed) {
+          lines.push(`• "${t.name}" (đóng ch.${t.last_active_chapter ?? '?'}): ${(t.description || '').slice(0, 150)}`);
+        }
+        lines.push(`→ Nếu chương này tự nhiên kéo lại nhân vật/sự kiện thuộc các tuyến trên, BẮT BUỘC viết rõ "callback có chủ đích" với lý do narrative — không phải lỗi continuity.`);
+      }
+    } catch {
+      // Non-fatal
+    }
+
     return lines.join('\n');
   } catch {
     return null;
@@ -429,17 +456,29 @@ export async function buildRuleContext(
       return { rule, score };
     });
 
-    // Filter and sort
-    const relevant = scored
-      .filter(s => s.score >= 20)
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 5);
+    // 2026-04-29 continuity overhaul: previous logic returned null when no rule scored ≥20,
+    // which was the common case (rules need explicit tag matches that contextSnippet rarely has).
+    // Result: world_rules_index was effectively write-only. Now always surface top 8 rules:
+    // first the relevance-scored matches, then top-importance fallbacks to fill the slate.
+    const matched = scored
+      .filter(s => s.score >= 15)
+      .sort((a, b) => b.score - a.score);
 
-    if (relevant.length === 0) return null;
+    const matchedIds = new Set(matched.map(s => s.rule.id));
+    const fallback = rules
+      .filter(r => !matchedIds.has(r.id))
+      .sort((a, b) => b.importance - a.importance);
 
-    const lines: string[] = ['═══ QUY TẮC THẾ GIỚI LIÊN QUAN ═══'];
-    for (const { rule } of relevant) {
-      lines.push(`• [${rule.category}] ${rule.ruleText.slice(0, 200)}`);
+    const top: WorldRule[] = [
+      ...matched.slice(0, 5).map(s => s.rule),
+      ...fallback.slice(0, 8 - Math.min(matched.length, 5)),
+    ];
+
+    if (top.length === 0) return null;
+
+    const lines: string[] = ['[QUY TẮC THẾ GIỚI ĐÃ THIẾT LẬP — TUYỆT ĐỐI KHÔNG VI PHẠM]'];
+    for (const rule of top) {
+      lines.push(`• [${rule.category}] ${rule.ruleText.slice(0, 240)}`);
     }
 
     return lines.join('\n');
@@ -514,37 +553,84 @@ interface ConsistencyIssue {
  * AI-based checks (character traits, world rules) are skipped for speed.
  * Returns issues array (empty = all clear).
  */
-export async function checkConsistency(
+/**
+ * 2026-04-29 continuity overhaul: split into fast (regex) + deep (LLM) variants.
+ * Fast variant runs every chapter pre-save; deep variant runs every 3 chapters.
+ */
+export async function checkConsistencyFast(
   projectId: string,
   chapterNumber: number,
   content: string,
-  characters: string[],
 ): Promise<ConsistencyIssue[]> {
   try {
     const issues: ConsistencyIssue[] = [];
     const db = getSupabase();
 
-    // 1. Quick regex checks: Dead characters
+    // Dead character regex check — must catch every chapter
     const { data: deadChars } = await db
       .from('character_states')
-      .select('character_name')
+      .select('character_name, chapter_number')
       .eq('project_id', projectId)
       .eq('status', 'dead');
 
     if (deadChars) {
-      const FLASHBACK_WORDS = /nhớ lại|hồi tưởng|trước đây|ngày xưa|từng|đã mất/i;
-      const hasFlashback = FLASHBACK_WORDS.test(content);
+      // Stricter flashback check: must contain explicit time-jump markers near the dead char's name.
+      // 2026-04-29 audit fix: scan ALL mentions of the dead char (not just first). A char might
+      // legitimately appear in flashback in scene 1 but illegally appear alive in scene 4 — we must
+      // flag any mention without a nearby flashback marker. Also flag bare dialogue/action mentions
+      // that lack a time-jump context cue.
+      const TIME_JUMP_PATTERNS = /(nhớ lại|hồi tưởng|ký ức|trước đây \d+|năm xưa|hồi đó|kiếp trước|trước khi (chết|qua đời|mất)|trong giấc mơ|trong mơ|tưởng tượng|hình bóng)/i;
+      // Action/dialogue verbs near the mention indicate the char is being treated as ALIVE
+      // (speaking, moving, fighting, deciding). These are red flags — a flashback narration
+      // doesn't have the dead char taking present-tense actions.
+      const LIVING_ACTION_PATTERNS = /(nói|hỏi|đáp|cười|cau mày|gật đầu|lắc đầu|đứng dậy|ngồi xuống|đi tới|bước|vung tay|ra lệnh|quyết định|nhìn thấy)/i;
 
-      for (const { character_name } of deadChars) {
-        if (content.includes(character_name) && !hasFlashback) {
-          issues.push({
-            type: 'dead_character',
-            severity: 'critical',
-            description: `${character_name} đã chết nhưng xuất hiện trong chương (không phải flashback)`,
-          });
+      for (const { character_name, chapter_number: deathChapter } of deadChars) {
+        if (!character_name || !content.includes(character_name)) continue;
+
+        // Find ALL mentions of this dead char (not just first)
+        let searchFrom = 0;
+        let flagged = false;
+        while (!flagged) {
+          const idx = content.indexOf(character_name, searchFrom);
+          if (idx < 0) break;
+          // 200-char window around this specific mention
+          const windowStart = Math.max(0, idx - 200);
+          const windowEnd = Math.min(content.length, idx + character_name.length + 200);
+          const window = content.slice(windowStart, windowEnd);
+          const hasFlashback = TIME_JUMP_PATTERNS.test(window);
+          const hasLivingAction = LIVING_ACTION_PATTERNS.test(window);
+
+          // Flag if: no flashback context, OR has explicit living-action verb (even with flashback marker —
+          // dead char shouldn't be taking present actions in any context).
+          if (!hasFlashback || hasLivingAction) {
+            issues.push({
+              type: 'dead_character',
+              severity: 'critical',
+              description: `${character_name} đã chết ở chương ${deathChapter ?? '?'} nhưng xuất hiện ở chương ${chapterNumber}${hasLivingAction ? ' với hành động sống (nói/đi/quyết định)' : ' không có ngữ cảnh flashback rõ ràng'}`,
+            });
+            flagged = true; // One issue per dead char per chapter is enough
+            break;
+          }
+          searchFrom = idx + character_name.length;
         }
       }
     }
+
+    return issues;
+  } catch {
+    return [];
+  }
+}
+
+export async function checkConsistency(
+  projectId: string,
+  chapterNumber: number,
+  content: string,
+  _characters: string[],
+): Promise<ConsistencyIssue[]> {
+  try {
+    const issues: ConsistencyIssue[] = await checkConsistencyFast(projectId, chapterNumber, content);
 
     // 2. Fast LLM check for logic/world rules if business/finance context detected
     const BUSINESS_WORDS = /tỷ|triệu|công ty|cổ phần|doanh thu|lợi nhuận|giá|mua|bán|đầu tư|tài sản/i;

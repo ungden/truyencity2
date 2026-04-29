@@ -315,6 +315,11 @@ export interface ContextPayload {
   powerContext?: string;
   worldContext?: string;
 
+  // Phase 22 continuity overhaul: durable consolidated bibles
+  characterBibleContext?: string;
+  volumeSummaryContext?: string;
+  geographyContext?: string;
+
   // Character knowledge graph (MemPalace-inspired)
   characterKnowledgeContext?: string;
   /** Per-pair latest relationship state (love/hate/ally/enemy/etc.) — coherence guard */

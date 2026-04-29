@@ -170,16 +170,25 @@ export async function detectCharacterContradictions(
       }
 
       // 2. Power regression: realm index went down
+      // 2026-04-29 continuity overhaul: severity scaled by drop magnitude.
+      // 1-level drops (which sometimes have valid reasons like sealing/curse) → warning.
+      // ≥2-level drops are almost always AI errors → critical, triggers auto-revise.
+      // Notes containing seal/curse/loss markers are downgraded to warning even at 2+ levels.
       if (
         typeof prev.power_realm_index === 'number' &&
         typeof newChar.power_realm_index === 'number' &&
         newChar.power_realm_index < prev.power_realm_index
       ) {
+        const drop = prev.power_realm_index - newChar.power_realm_index;
+        const NARRATIVE_LOSS_PATTERNS = /(phong ấn|trúng độc|bị thương|bị nguyền|tự phế|hủy|tổn hao|đoạt mất|bị cướp|chân nguyên tổn thương|tu vi tan vỡ)/i;
+        const hasNarrativeReason = (newChar.notes && NARRATIVE_LOSS_PATTERNS.test(newChar.notes)) ||
+          (newChar.power_level && NARRATIVE_LOSS_PATTERNS.test(newChar.power_level));
+        const severity: 'warning' | 'critical' = (drop >= 2 && !hasNarrativeReason) ? 'critical' : 'warning';
         contradictions.push({
           characterName: name,
           type: 'power_regression',
-          severity: 'warning',
-          description: `${name} bị tụt cảnh giới từ index ${prev.power_realm_index} (Ch.${prev.chapter_number}) xuống ${newChar.power_realm_index} (Ch.${currentChapter})`,
+          severity,
+          description: `${name} bị tụt cảnh giới ${drop} bậc: index ${prev.power_realm_index} (Ch.${prev.chapter_number}) → ${newChar.power_realm_index} (Ch.${currentChapter})${hasNarrativeReason ? ' [có lý do narrative trong notes]' : ' [KHÔNG có lý do giải thích]'}`,
           previousChapter: prev.chapter_number,
           currentChapter,
         });
