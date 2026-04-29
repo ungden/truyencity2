@@ -309,14 +309,14 @@ async function createNovelAndProject(
   seed: NovelSeed,
   ownerId: string,
 ): Promise<{ projectId: string; novelId: string }> {
-  // 1. Insert novel (status='ongoing' initially — public will see it)
+  // 1. Insert novel (status='Đang ra' VN canonical — homepage/browse filters exact-match this)
   const { data: novel, error: novelErr } = await s.from('novels').insert({
     title: seed.title,
     slug: seed.slug,
     author: 'Truyện City',
     description: seed.description,
     genres: [seed.genre],
-    status: 'ongoing',
+    status: 'Đang ra',
   }).select('id').single();
 
   if (novelErr || !novel) throw new Error(`novel insert failed: ${novelErr?.message}`);

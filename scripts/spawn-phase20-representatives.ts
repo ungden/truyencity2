@@ -224,7 +224,7 @@ async function createNovelAndProject(seed: NovelSeed, ownerId: string): Promise<
     author: 'Truyện City',
     description: seed.description,
     genres: [seed.genre],
-    status: 'ongoing',
+    status: 'Đang ra',  // VN canonical — homepage/browse filters exact-match this string
   }).select('id').single();
   if (novelErr || !novel) throw new Error(`novel insert failed: ${novelErr?.message}`);
   console.log(`  ✓ Novel created: ${novel.id}`);
