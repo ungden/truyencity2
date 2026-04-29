@@ -95,6 +95,12 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   const startTime = Date.now();
   const db = getSupabase();
 
+  // Phase 22 Stage 3: install tier-based model routing (Pro for critical reasoning,
+  // Flash for volume/low-stakes). Idempotent — safe to call every chapter.
+  // Disable via DISABLE_PRO_TIER=1 env var to A/B test against all-Flash baseline.
+  const { installModelTierRouting } = await import('../utils/model-tier');
+  installModelTierRouting();
+
   // ── Step 1: Load project ───────────────────────────────────────────────
   const { data: projectData, error: projectError } = await db
     .from('ai_story_projects')
@@ -744,9 +750,13 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
 
     // Task 16b: Record quality metrics (Phase 22 Stage 2 Q8) — runs every chapter.
     // Captures: critic scores, continuity counts, revision actions, context sizes.
+    // Phase 22 Stage 3: also runs post-write health check to detect silent memory drift.
     // Non-fatal — used for monitoring + A/B testing.
     (async () => {
       const { recordQualityMetrics } = await import('../memory/quality-metrics');
+      const { postWriteHealthCheck } = await import('../utils/post-write-health-check');
+      // Run health check first so we can include results in metrics meta
+      const health = await postWriteHealthCheck(project.id, nextChapter).catch(() => null);
       const critic = result.criticReport;
       return recordQualityMetrics({
         projectId: project.id,
@@ -773,6 +783,13 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
           ai_write_count: aiWriteCount,
           last_chapter_number: lastChapterNumber,
           split_parts: SPLIT_PARTS,
+          health: health ? {
+            ok: health.warnings.length === 0,
+            character_states: health.characterStateCount,
+            has_summary: health.hasChapterSummary,
+            rag_chunks: health.ragChunkCount,
+            warnings: health.warnings,
+          } : null,
         },
       });
     })().catch(e => console.warn('[Orchestrator] Task 16b quality metrics failed:', e instanceof Error ? e.message : String(e))),
