@@ -79,6 +79,7 @@ export async function loadContext(
     openingsResult,
     cliffhangersResult,
     charStatesResult,
+    recentFullTextResult,
   ] = await Promise.all([
     // Layer 0: Chapter Bridge
     prevChapter > 0
@@ -91,10 +92,9 @@ export async function loadContext(
     db.from('ai_story_projects').select('story_bible').eq('id', projectId).maybeSingle(),
     // Layer 2: Synopsis
     db.from('story_synopsis').select('synopsis_text,mc_current_state,active_allies,active_enemies,open_threads,last_updated_chapter').eq('project_id', projectId).order('last_updated_chapter', { ascending: false }).limit(1).maybeSingle(),
-    // Layer 3: Recent Chapter Summaries — use summaries instead of full text to save tokens
-    // Full text of recent chapters is expensive (~9-25K chars). Summaries are ~200-400 chars each.
-    // For early chapters (<10), still load 1 full recent chapter for richer context.
-    db.from('chapter_summaries').select('chapter_number,title,summary,mc_state,cliffhanger').eq('project_id', projectId).lt('chapter_number', chapterNumber).order('chapter_number', { ascending: false }).limit(chapterNumber > 50 ? 5 : 8),
+    // Layer 3: Recent Chapter Summaries — keep summaries for the 12-chapter look-back window.
+    // Full prose of last 3 chapters is loaded separately below (Q1 Stage 2).
+    db.from('chapter_summaries').select('chapter_number,title,summary,mc_state,cliffhanger').eq('project_id', projectId).lt('chapter_number', chapterNumber).order('chapter_number', { ascending: false }).limit(12),
     // Layer 4: Arc Plan (incl. hyperpop sub-arcs from migration 0149)
     db.from('arc_plans').select('arc_number,start_chapter,end_chapter,arc_theme,plan_text,sub_arcs,chapter_briefs,threads_to_advance,threads_to_resolve,new_threads').eq('project_id', projectId).order('arc_number', { ascending: false }).limit(1).maybeSingle(),
     // Master Outline + Story Outline + WORLD DESCRIPTION (canonical premise source)
@@ -107,6 +107,8 @@ export async function loadContext(
     db.from('chapter_summaries').select('cliffhanger').eq('project_id', projectId).order('chapter_number', { ascending: false }).limit(10),
     // Character states
     db.from('character_states').select('character_name,status,power_level,power_realm_index,location,personality_quirks,notes,chapter_number').eq('project_id', projectId).order('chapter_number', { ascending: false }).limit(50),
+    // Phase 22 Q1: full prose of last 3 chapters for Writer voice/detail anchor
+    db.from('chapters').select('chapter_number,title,content').eq('novel_id', novelId).lt('chapter_number', chapterNumber).order('chapter_number', { ascending: false }).limit(3),
   ]);
 
   // Build payload
@@ -254,6 +256,7 @@ export async function loadContext(
     genreBoundary: undefined, // set by orchestrator
     ragContext: undefined,    // set by orchestrator
     arcChapterSummaries: undefined, // loaded separately for synopsis generation
+    recentChapterFullText: ((recentFullTextResult?.data as Array<{ chapter_number: number; title: string; content: string }> | null) || []).reverse(),
     masterOutline: typeof masterOutline === 'string' ? masterOutline : (masterOutline ? JSON.stringify(masterOutline) : undefined),
     storyOutline: storyOutline || undefined,
     worldDescription: worldDescription || undefined,
@@ -430,26 +433,44 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
   // Genre boundary
   if (payload.genreBoundary) parts.push(payload.genreBoundary);
 
-  // RAG context
-  if (payload.ragContext) parts.push(payload.ragContext);
+  // RAG context — wrap with stable header tag so Writer can extract it from full context.
+  // 2026-04-29 continuity overhaul: Writer now reads RAG too (was Architect-only before).
+  if (payload.ragContext) {
+    parts.push(`[KÝ ỨC LIÊN QUAN — TỪ CÁC CHƯƠNG XA, BẮT BUỘC GIỮ NHẤT QUÁN]\n${payload.ragContext}`);
+  }
 
   // Scalability modules
-  if (payload.plotThreads) parts.push(payload.plotThreads);
-  if (payload.beatGuidance) parts.push(payload.beatGuidance);
+  // 2026-04-29 audit fix: wrap with [TAG] headers so the assembled context has consistent
+  // section boundaries. Without [TAG] prefix, regex extraction in Writer/Critic (terminator
+  // `\n\n[`) extends past these sections into following content, causing leakage. The original
+  // `═══ TUYẾN TRUYỆN ĐANG MỞ ═══` heading is now redundant but harmless inside the wrapped block.
+  if (payload.plotThreads) parts.push(`[PLOT THREADS — TUYẾN TRUYỆN ĐANG MỞ + ĐÃ ĐÓNG]\n${payload.plotThreads}`);
+  if (payload.beatGuidance) parts.push(`[BEAT GUIDANCE — NHỊP & COOLDOWN]\n${payload.beatGuidance}`);
   if (payload.worldRules) parts.push(payload.worldRules);
 
+  // 2026-04-29 audit fix: wrap all context modules with [TAG] headers so Writer/Critic regex
+  // extraction (`\[TAG[^\]]*\]...(?=\n\n\[|$)`) can both find them AND properly terminate at
+  // section boundaries. Previously these returned with `═══ ... ═══` or freeform headers, so
+  // Writer's quality-module extraction (looking for `[FORESHADOWING]` etc.) NEVER matched.
+  // This is a major pre-existing bug — Writer was getting empty quality-module context all along.
   // Character knowledge graph
-  if (payload.characterKnowledgeContext) parts.push(payload.characterKnowledgeContext);
-  if (payload.relationshipContext) parts.push(payload.relationshipContext);
-  if (payload.economicContext) parts.push(payload.economicContext);
+  if (payload.characterKnowledgeContext) parts.push(`[CHARACTER KNOWLEDGE — AI ĐÃ BIẾT GÌ]\n${payload.characterKnowledgeContext}`);
+  if (payload.relationshipContext) parts.push(`[RELATIONSHIPS — TRẠNG THÁI MỐI QUAN HỆ]\n${payload.relationshipContext}`);
+  if (payload.economicContext) parts.push(`[ECONOMIC LEDGER — TÀI CHÍNH]\n${payload.economicContext}`);
 
   // Quality modules (Qidian Master Level)
-  if (payload.foreshadowingContext) parts.push(payload.foreshadowingContext);
-  if (payload.characterArcContext) parts.push(payload.characterArcContext);
-  if (payload.pacingContext) parts.push(payload.pacingContext);
-  if (payload.voiceContext) parts.push(payload.voiceContext);
-  if (payload.powerContext) parts.push(payload.powerContext);
-  if (payload.worldContext) parts.push(payload.worldContext);
+  if (payload.foreshadowingContext) parts.push(`[FORESHADOWING — GIEO/PAYOFF HINT]\n${payload.foreshadowingContext}`);
+  if (payload.characterArcContext) parts.push(`[CHARACTER ARC — XUNG ĐỘT NỘI TÂM]\n${payload.characterArcContext}`);
+  if (payload.pacingContext) parts.push(`[PACING — NHỊP CHƯƠNG]\n${payload.pacingContext}`);
+  if (payload.voiceContext) parts.push(`[VOICE — GIỌNG VĂN]\n${payload.voiceContext}`);
+  if (payload.powerContext) parts.push(`[POWER — CẢNH GIỚI MC]\n${payload.powerContext}`);
+  if (payload.worldContext) parts.push(`[WORLD — LOCATION + WORLD STATE]\n${payload.worldContext}`);
+
+  // Phase 22 continuity overhaul: durable bibles (refreshed every 50ch / 100ch).
+  // Injected high — these are the consolidated truth Architect should anchor against.
+  if (payload.characterBibleContext) parts.push(payload.characterBibleContext);
+  if (payload.volumeSummaryContext) parts.push(payload.volumeSummaryContext);
+  if (payload.geographyContext) parts.push(payload.geographyContext);
 
   // Layer 1: Story Bible
   if (payload.storyBible) {
@@ -477,9 +498,26 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
     }
   }
 
-  // Layer 3: Recent Chapter Summaries (token-optimized: summaries instead of full text)
+  // Layer 3a: Full prose of last 3 chapters (Phase 22 Stage 2 Q1).
+  // Writer/Critic must see actual prose to maintain voice consistency, capture micro-details
+  // (callbacks, character mannerisms, specific items mentioned), and avoid contradicting
+  // recent events. Summaries lose ~90% of detail — only full prose preserves the human-novel
+  // quality bar where ch.800 reads like ch.8.
+  if (payload.recentChapterFullText && payload.recentChapterFullText.length > 0) {
+    parts.push(`[FULL PROSE ${payload.recentChapterFullText.length} CHƯƠNG GẦN NHẤT — ĐỌC VERBATIM ĐỂ GIỮ GIỌNG VĂN + CHI TIẾT]`);
+    for (const ch of payload.recentChapterFullText) {
+      // Cap at 15K chars per chapter to bound prompt size while preserving full narrative.
+      const content = ch.content.length > 15000
+        ? ch.content.slice(0, 7500) + '\n\n[...phần giữa lược...]\n\n' + ch.content.slice(-7500)
+        : ch.content;
+      parts.push(`### Chương ${ch.chapter_number}: "${ch.title}"\n${content}`);
+    }
+  }
+
+  // Layer 3b: Recent Chapter Summaries (12-chapter look-back). Complements full-prose layer
+  // by giving longer context window at lower fidelity.
   if (payload.recentChapters.length > 0) {
-    parts.push(`[TÓM TẮT ${payload.recentChapters.length} CHƯƠNG GẦN NHẤT]`);
+    parts.push(`[TÓM TẮT ${payload.recentChapters.length} CHƯƠNG GẦN NHẤT — DÒNG THỜI GIAN]`);
     for (const ch of payload.recentChapters) {
       parts.push(ch);
     }
@@ -893,15 +931,35 @@ THREAD RETIREMENT QUOTA (LONG-FORM SUSTAINABILITY):
 - "new_threads" tối đa 2-3 mỗi arc (không quá load).
 - Reader fatigue compounds nếu thread cứ open mà không close — engine phải force closure.
 
+Phase 22 Stage 2 Q4: chapter_briefs phải SCENE-LEVEL không chỉ 1 dòng.
+Mỗi chapter brief phải liệt kê 3-5 scenes với goal/conflict cụ thể, callbacks tới hint cũ,
+và mini-payoff dự kiến. Đây là blueprint Architect dùng từng chương.
+
 Trả về JSON:
 {
   "arc_theme": "foundation|conflict|growth|...",
-  "plan_text": "mô tả arc 300-500 từ",
+  "plan_text": "mô tả arc 500-800 từ — gồm hook arc, escalation curve, climax, payoff",
   "sub_arcs": [
     {"sub_arc_number": 1, "start_chapter": ${startChapter}, "end_chapter": ${startChapter + 6}, "theme": "tên sub-arc (vd: Khởi nghiệp tại quán net Net Việt)", "mini_payoff": "MC đạt được gì cụ thể cuối sub-arc (vd: Quán net có 50 khách/ngày)"},
     ...
   ],
-  "chapter_briefs": [{"chapterNumber": ${startChapter}, "brief": "brief ngắn", "sub_arc_number": 1}...],
+  "chapter_briefs": [
+    {
+      "chapterNumber": ${startChapter},
+      "brief": "1-2 câu high-level summary",
+      "sub_arc_number": 1,
+      "scenes": [
+        {"order": 1, "goal": "MC làm gì", "conflict": "đối kháng từ ai/cái gì", "resolution": "kết quả scene", "estimated_words": 700, "characters": ["MC", "X"]},
+        {"order": 2, "goal": "...", "conflict": "...", "resolution": "...", "estimated_words": 700, "characters": [...]},
+        ...
+      ],
+      "callbacks": ["nhắc về scene/sự kiện ch.X (nếu có)"],
+      "foreshadow_plant": ["hint mới gieo (nếu có)"],
+      "foreshadow_payoff": ["hint cũ payoff (nếu có)"],
+      "mini_dopamine": "1 face-slap / harvest / recognition / breakthrough"
+    },
+    ...
+  ],
   "threads_to_advance": ["thread cần đẩy"],
   "threads_to_resolve": ["thread cần giải quyết"],
   "new_threads": ["thread mới"]

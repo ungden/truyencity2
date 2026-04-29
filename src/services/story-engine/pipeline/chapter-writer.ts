@@ -665,14 +665,19 @@ ${CLIFFHANGER_TECHNIQUES.map((c: { name: string; example: string }) => '- ' + c.
   // Extract foreshadowing hints for forceful injection into Architect prompt
   const foreshadowingInjection = extractForeshadowingForArchitect(context);
 
-  // Token budget: progressively trim context if total prompt exceeds ~120K chars (~30K tokens)
-  const MAX_PROMPT_CHARS = 120_000;
+  // Phase 22 Stage 2 Q2: Architect budget bumped 120K → 400K. DeepSeek 1M context handles
+  // this trivially (~100K tokens at most). Old cap was a token-saving artifact from
+  // pre-DeepSeek era; head-tail trim was DROPPING THE MIDDLE of synopsis/arc plan/character
+  // bibles — exactly the scaffolding Architect needs for long-novel coherence. Real
+  // long-form authors plan with ALL their notes open, not just the head + tail.
+  const MAX_PROMPT_CHARS = 400_000;
   let trimmedContext = context;
-  const staticParts = [constraintSection, topicSection, titleRules, emotionalArcGuide, finalArcGuide, engagementGuide, foreshadowingInjection].join('').length + 2000; // overhead
+  const staticParts = [constraintSection, topicSection, titleRules, emotionalArcGuide, finalArcGuide, engagementGuide, foreshadowingInjection].join('').length + 2000;
   if (trimmedContext.length + staticParts > MAX_PROMPT_CHARS) {
-    // Trim context to fit budget
     trimmedContext = trimmedContext.slice(0, MAX_PROMPT_CHARS - staticParts);
-    console.warn(`[Architect] Chapter ${chapterNumber}: context trimmed from ${context.length} to ${trimmedContext.length} chars`);
+    console.warn(`[Architect] Chapter ${chapterNumber}: context trimmed from ${context.length} to ${trimmedContext.length} chars (above 400K — investigate)`);
+  } else if (process.env.DEBUG_ARCHITECT_CONTEXT === '1') {
+    console.log(`[Architect] Chapter ${chapterNumber}: full context = ${context.length} chars (no trim)`);
   }
 
   const prompt = `Lên kế hoạch cho CHƯƠNG ${chapterNumber}.
@@ -882,20 +887,74 @@ async function runWriter(
     style.genreConventions.slice(0, 10).join('\n'),
   ].join('\n');
 
-  // Build lean Writer context: only bridge + character states + quality modules
-  // (Architect already consumed full context and distilled it into the outline)
+  // ─────────────────────────────────────────────────────────────────────────
+  // PHASE 22 STAGE 2 Q1: Full-Evidence Writer Context
+  // ─────────────────────────────────────────────────────────────────────────
+  // Old design: Writer got "lean" ~5-10K context with Architect outline distilled.
+  // Problem: Architect's outline cannot carry every nuance (voice, callbacks, micro-details);
+  // Writer was forced to invent details that contradicted prior chapters.
+  //
+  // New design: Writer gets FULL EVIDENCE PACK (~80-120K). DeepSeek 1M context handles this
+  // trivially. Cost ~$0.012 extra per chapter — meaningless vs quality gain. Real "đại thần"
+  // novelists re-read recent prose + open their character bible + check foreshadowing ledger
+  // BEFORE writing the next chapter. We give the AI the same advantage.
+  //
+  // Caps below are GENEROUS — only there to prevent runaway prompts, not to optimize tokens.
   const writerContextParts: string[] = [];
-  // Bridge: cliffhanger + MC state (critical for continuity)
-  const bridgeMatch = context.match(/\[CẦU NỐI CHƯƠNG[^\]]*\][\s\S]*?(?=\n\n\[|$)/);
-  if (bridgeMatch) writerContextParts.push(bridgeMatch[0]);
-  // Character states
-  const charMatch = context.match(/\[NHÂN VẬT HIỆN TẠI[^\]]*\][\s\S]*?(?=\n\n\[|$)/);
-  if (charMatch) writerContextParts.push(charMatch[0]);
-  // Quality modules (foreshadowing, character arc, pacing, voice, power, world)
-  // Per-module budgets: foreshadowing/character-arc need more space (per-hint/per-character data)
+  const extractSection = (regex: RegExp, budget: number): string | null => {
+    const match = context.match(regex);
+    if (!match) return null;
+    const text = match[0];
+    if (text.length <= budget) return text;
+    const cut = text.lastIndexOf('\n', budget);
+    return cut > budget * 0.5 ? text.slice(0, cut) : text.slice(0, budget);
+  };
+
+  // World/premise grounding (every chapter must respect)
+  const worldDesc = extractSection(/\[WORLD DESCRIPTION[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 6000);
+  if (worldDesc) writerContextParts.push(worldDesc);
+  // Bridge: cliffhanger + MC state
+  const bridge = extractSection(/\[CẦU NỐI CHƯƠNG[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 3000);
+  if (bridge) writerContextParts.push(bridge);
+  // Character states (snapshot — current truth)
+  const charSection = extractSection(/\[NHÂN VẬT HIỆN TẠI[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 6000);
+  if (charSection) writerContextParts.push(charSection);
+  // Character bibles (durable consolidated profiles)
+  const bibleSection = extractSection(/\[NHÂN VẬT BIBLE[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 12000);
+  if (bibleSection) writerContextParts.push(bibleSection);
+  // Volume summaries (macro memory)
+  const volSection = extractSection(/\[VOLUME SUMMARIES[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 8000);
+  if (volSection) writerContextParts.push(volSection);
+  // Geography state
+  const geoSection = extractSection(/\[GEOGRAPHY[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 1500);
+  if (geoSection) writerContextParts.push(geoSection);
+  // RAG memory (far-chapter callbacks)
+  const ragSection = extractSection(/\[KÝ ỨC LIÊN QUAN[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 8000);
+  if (ragSection) writerContextParts.push(ragSection);
+  // Synopsis structured (active threads + state)
+  const synopsisSection = extractSection(/\[TỔNG QUAN CỐT TRUYỆN\][\s\S]*?(?=\n\n\[|$)/, 4000);
+  if (synopsisSection) writerContextParts.push(synopsisSection);
+  // FULL PROSE of last 3 chapters — voice anchor, the BIG quality lever
+  const fullProseSection = extractSection(/\[FULL PROSE [^\]]*\][\s\S]*?(?=\n\n\[|$)/, 50000);
+  if (fullProseSection) writerContextParts.push(fullProseSection);
+  // Recent summaries (12-chapter look-back)
+  const recentSection = extractSection(/\[TÓM TẮT \d+ CHƯƠNG GẦN NHẤT[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 5000);
+  if (recentSection) writerContextParts.push(recentSection);
+  // Plot threads (open + closed)
+  const plotSection = extractSection(/\[PLOT THREADS[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 4000);
+  if (plotSection) writerContextParts.push(plotSection);
+  // World rules (established laws — must not violate)
+  const worldRulesSection = extractSection(/\[QUY TẮC THẾ GIỚI[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 3000);
+  if (worldRulesSection) writerContextParts.push(worldRulesSection);
+  // Arc plan (current arc + chapter brief)
+  const arcSection = extractSection(/\[KẾ HOẠCH ARC[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 6000);
+  if (arcSection) writerContextParts.push(arcSection);
+  // Quality modules — generous caps (was 600-1500, now 2500-4000) so per-character/per-hint
+  // data isn't truncated. Architect saw same data; Writer needs it too for execution-level fidelity.
   const qualityModuleBudgets: Record<string, number> = {
-    'FORESHADOWING': 1500, 'CHARACTER ARC': 1500,
-    'PACING': 600, 'VOICE': 600, 'POWER': 600, 'WORLD': 600, 'LOCATION': 600,
+    'FORESHADOWING': 4000, 'CHARACTER ARC': 4000,
+    'PACING': 2500, 'VOICE': 2500, 'POWER': 2500, 'WORLD': 2500, 'LOCATION': 2500,
+    'CHARACTER KNOWLEDGE': 3000, 'RELATIONSHIPS': 3000, 'ECONOMIC LEDGER': 3000,
   };
   for (const tag of Object.keys(qualityModuleBudgets)) {
     const regex = new RegExp(`\\[${tag}[^\\]]*\\][\\s\\S]*?(?=\\n\\n\\[|$)`);
@@ -912,6 +971,9 @@ async function runWriter(
     }
   }
   const writerContext = writerContextParts.join('\n\n');
+  if (process.env.DEBUG_WRITER_CONTEXT === '1') {
+    console.log(`[Writer] Chapter ${outline.chapterNumber}: full-evidence context = ${writerContext.length} chars (${writerContextParts.length} sections)`);
+  }
 
   const prompt = `Viết CHƯƠNG ${outline.chapterNumber}: "${outline.title}"
 
@@ -1026,10 +1088,11 @@ async function runCritic(
   const wordCount = countWords(content);
   const wordRatio = wordCount / targetWords;
 
-  // Size guard: reduced from 60K to 30K chars (~7.5K tokens) — Critic only needs
-  // enough text to check repetition, pacing, ending hook, and continuity.
-  // A typical chapter is 8-15K chars so most chapters won't be trimmed.
-  const MAX_CRITIC_CONTENT_CHARS = 30_000;
+  // Phase 22 Stage 2 Q3: bumped to 60K so Critic sees full chapter prose without truncation.
+  // A typical chapter (~10-15K) fits without trim. Long chapters (~30K) fit fully too.
+  // Was 30K — meant Critic missed the middle of long chapters, blind to mid-chapter
+  // contradictions. DeepSeek 1M makes this a non-cost.
+  const MAX_CRITIC_CONTENT_CHARS = 60_000;
   let contentPreview = content;
   if (content.length > MAX_CRITIC_CONTENT_CHARS) {
     const headSize = Math.floor(MAX_CRITIC_CONTENT_CHARS * 0.6);
@@ -1038,21 +1101,54 @@ async function runCritic(
     console.warn(`[Critic] Chapter content trimmed from ${content.length} to ${contentPreview.length} chars (head+tail)`);
   }
 
-  // Cross-chapter context for contradiction detection (token-optimized: bridge + chars only, no synopsis)
-  // Critic only needs: previous cliffhanger/MC state + character states for continuity checks.
-  // Synopsis is redundant here — Architect/Writer already used it.
+  // Cross-chapter context for contradiction detection.
+  // 2026-04-29 continuity overhaul: expanded from bridge+chars (3K cap) to bridge + chars + RAG +
+  // synopsis + recent summaries (8K cap). Critic must catch contradictions across ENTIRE story,
+  // not just last chapter — old cap let dead-character-reappearance, power-regression, and
+  // forgotten-subplot bugs slip through because Critic literally couldn't see those events.
   let crossChapterSection = '';
   if (previousContext) {
     const relevantParts: string[] = [];
-    // Extract bridge section (cliffhanger + MC state)
-    const bridgeMatch = previousContext.match(/\[CẦU NỐI CHƯƠNG[^\]]*\][\s\S]*?(?=\n\n\[|$)/);
-    if (bridgeMatch) relevantParts.push(bridgeMatch[0]);
-    // Extract character states
-    const charMatch = previousContext.match(/\[NHÂN VẬT HIỆN TẠI[^\]]*\][\s\S]*?(?=\n\n\[|$)/);
-    if (charMatch) relevantParts.push(charMatch[0]);
+    const extractCriticSection = (regex: RegExp, budget: number): string | null => {
+      const match = previousContext.match(regex);
+      if (!match) return null;
+      const text = match[0];
+      if (text.length <= budget) return text;
+      const cut = text.lastIndexOf('\n', budget);
+      return cut > budget * 0.5 ? text.slice(0, cut) : text.slice(0, budget);
+    };
 
+    // Phase 22 Stage 2 Q3: Critic context expanded from 16K → 80K. Critic is the LAST line
+    // of defense; cheaping out here is false economy. Now sees: bridge + char states + bibles
+    // + volume summaries + RAG + synopsis + recent summaries + full prose of last 3 chapters
+    // + plot threads + world rules. Real editors review against the WHOLE manuscript history.
+    const bridgeS = extractCriticSection(/\[CẦU NỐI CHƯƠNG[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 3000);
+    if (bridgeS) relevantParts.push(bridgeS);
+    const charS = extractCriticSection(/\[NHÂN VẬT HIỆN TẠI[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 5000);
+    if (charS) relevantParts.push(charS);
+    const bibleS = extractCriticSection(/\[NHÂN VẬT BIBLE[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 12000);
+    if (bibleS) relevantParts.push(bibleS);
+    const volS = extractCriticSection(/\[VOLUME SUMMARIES[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 8000);
+    if (volS) relevantParts.push(volS);
+    const ragS = extractCriticSection(/\[KÝ ỨC LIÊN QUAN[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 8000);
+    if (ragS) relevantParts.push(ragS);
+    const synopsisS = extractCriticSection(/\[TỔNG QUAN CỐT TRUYỆN\][\s\S]*?(?=\n\n\[|$)/, 4000);
+    if (synopsisS) relevantParts.push(synopsisS);
+    const recentS = extractCriticSection(/\[TÓM TẮT \d+ CHƯƠNG GẦN NHẤT[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 5000);
+    if (recentS) relevantParts.push(recentS);
+    // Full prose of last 3 chapters — Critic checks current chapter against actual prior text
+    const fullProseS = extractCriticSection(/\[FULL PROSE [^\]]*\][\s\S]*?(?=\n\n\[|$)/, 30000);
+    if (fullProseS) relevantParts.push(fullProseS);
+    // Plot threads (open + closed)
+    const plotS = extractCriticSection(/\[PLOT THREADS[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 4000);
+    if (plotS) relevantParts.push(plotS);
+    // World rules
+    const worldRulesS = extractCriticSection(/\[QUY TẮC THẾ GIỚI[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 3000);
+    if (worldRulesS) relevantParts.push(worldRulesS);
+
+    const merged = relevantParts.join('\n\n');
     crossChapterSection = relevantParts.length > 0
-      ? `BỐI CẢNH CÂU CHUYỆN (dùng để KIỂM TRA mâu thuẫn):\n${relevantParts.join('\n\n').slice(0, 3000)}\n\n`
+      ? `BỐI CẢNH CÂU CHUYỆN (dùng để KIỂM TRA mâu thuẫn — bao gồm full prose 3 chương trước, bible nhân vật, ký ức xa, synopsis, plot threads, world rules):\n${merged.slice(0, 80000)}\n\n`
       : `BỐI CẢNH CÂU CHUYỆN (dùng để KIỂM TRA mâu thuẫn):\n${previousContext.slice(0, 3000)}\n\n`;
   }
 

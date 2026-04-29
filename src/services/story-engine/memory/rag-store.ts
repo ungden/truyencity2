@@ -12,9 +12,12 @@ import { embedTexts } from '../utils/gemini';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
-const MAX_CHUNKS = 8;
-const SIMILARITY_THRESHOLD = 0.55; // Lowered: hybrid scoring compensates with keyword+temporal
-const MAX_RAG_CHARS = 6000;
+// 2026-04-29 continuity overhaul: bumped retrieval breadth for long-novel coverage.
+// Was MAX_CHUNKS=8 / threshold=0.55 / MAX_RAG_CHARS=6000 — too tight for 100+ chapter novels
+// where critical events live 50-200+ chapters back. DeepSeek 1M context easily handles 10K chars.
+const MAX_CHUNKS = 10;
+const SIMILARITY_THRESHOLD = 0.5; // Lowered further: long-range queries have weaker keyword overlap
+const MAX_RAG_CHARS = 8000;
 const CHUNK_TARGET_WORDS = 400;
 const CHUNK_MAX_CHARS = 2000;
 const PARAGRAPH_MIN_CHARS = 50;
@@ -272,12 +275,14 @@ export async function retrieveRAGContext(
     if (!queryEmbedding) return null;
 
     // Vector search via RPC — fetch more candidates for re-ranking
+    // 2026-04-29: bumped pool from 2x → 3x to give re-ranker more candidates,
+    // crucial when query has weak keyword overlap with old chapters.
     const db = getSupabase();
     const { data: chunks, error } = await db.rpc('match_story_chunks', {
       query_embedding: JSON.stringify(queryEmbedding),
       match_project_id: projectId,
       match_threshold: SIMILARITY_THRESHOLD,
-      match_count: MAX_CHUNKS * 2, // Fetch 2x for hybrid re-ranking pool
+      match_count: MAX_CHUNKS * 3,
     });
 
     if (error || !chunks || chunks.length === 0) return null;
@@ -327,7 +332,11 @@ function formatRAGContext(chunks: MatchedChunk[], currentChapter: number): strin
       if (totalChars >= MAX_RAG_CHARS) break;
       const label = typeLabels[type] || type;
       const ago = currentChapter - chunk.chapter_number;
-      const line = `[Ch.${chunk.chapter_number}, ${ago} chương trước] (${label}) ${chunk.content.slice(0, 800)}`;
+      // 2026-04-29 continuity overhaul: leading "→ Ch.X" instead of "[Ch.X...]" because
+      // downstream prompt assembly uses `\n\n[` as section terminator regex (Writer/Critic
+      // lean-context extraction). Bracketed chunk separators were causing extraction to
+      // truncate after the first chunk, dropping ~50% of RAG content.
+      const line = `→ Ch.${chunk.chapter_number} (${ago} chương trước, ${label}): ${chunk.content.slice(0, 800)}`;
       if (totalChars + line.length > MAX_RAG_CHARS) break;
       lines.push(line);
       totalChars += line.length;
@@ -356,17 +365,17 @@ export async function retrieveEntityContext(
     const db = getSupabase();
     const recentCutoff = Math.max(1, chapterNumber - 5);
 
-    // Query key event chunks, bounded to last 200 chapters to prevent unbounded scan
-    const chapterFloor = Math.max(1, chapterNumber - 200);
+    // 2026-04-29 continuity overhaul: removed 200-chapter floor. At ch.300+, the most
+    // valuable references are often 100-250 chapters back (origin events, character introductions).
+    // Order DESC + limit 80 already bounds work; the floor was causing entity amnesia past 200ch.
     const { data: chunks } = await db
       .from('story_memory_chunks')
       .select('chapter_number, chunk_type, content, metadata')
       .eq('project_id', projectId)
-      .gte('chapter_number', chapterFloor)
       .lt('chapter_number', recentCutoff)
       .in('chunk_type', ['key_event', 'character_event', 'plot_point'])
       .order('chapter_number', { ascending: false })
-      .limit(50);
+      .limit(80);
 
     if (!chunks || chunks.length === 0) return null;
 
@@ -412,7 +421,8 @@ export async function retrieveEntityContext(
 
     for (const chunk of top) {
       const ago = chapterNumber - chunk.chapter_number;
-      const line = `[Ch.${chunk.chapter_number}, ${ago} chương trước] ${chunk.content.slice(0, 500)}`;
+      // 2026-04-29: leading "→" instead of "[Ch...]" — see formatRAGContext comment.
+      const line = `→ Ch.${chunk.chapter_number} (${ago} chương trước): ${chunk.content.slice(0, 500)}`;
       if (totalChars + line.length > MAX_ENTITY_CHARS) break;
       lines.push(line);
       totalChars += line.length;
@@ -478,7 +488,8 @@ export async function retrieveThemeContext(
 
     for (const chunk of top) {
       const ago = chapterNumber - chunk.chapter_number;
-      const line = `[Ch.${chunk.chapter_number}, ${ago} chương trước] ${chunk.content.slice(0, 500)}`;
+      // 2026-04-29: leading "→" — see formatRAGContext comment.
+      const line = `→ Ch.${chunk.chapter_number} (${ago} chương trước): ${chunk.content.slice(0, 500)}`;
       if (totalChars + line.length > MAX_THEME_CHARS) break;
       lines.push(line);
       totalChars += line.length;
