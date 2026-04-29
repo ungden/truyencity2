@@ -19,10 +19,13 @@ import { getSupabase } from '../utils/supabase';
 import { callGemini } from '../utils/gemini';
 import type { GeminiConfig } from '../types';
 
-const REFRESH_INTERVAL = 50;
-const MAX_BIBLES_PER_CONTEXT = 6;
-const MAX_BIBLE_CHARS = 2500;
-const MAX_TOTAL_INJECTION = 8000;
+// Phase 22 Stage 2 Q5: tightened 50 → 20 chapter refresh.
+// Quality first: stale bibles miss recent character development. ~3 extra AI calls per 60-chapter
+// window; trivial cost for tight character coherence.
+const REFRESH_INTERVAL = 20;
+const MAX_BIBLES_PER_CONTEXT = 10;       // bumped 6 → 10 (top 10 important characters)
+const MAX_BIBLE_CHARS = 3500;            // bumped 2500 → 3500 (more detail per bible)
+const MAX_TOTAL_INJECTION = 20000;       // bumped 8K → 20K (Architect/Writer can handle, DeepSeek 1M)
 
 export interface CharacterBible {
   id: string;

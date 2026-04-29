@@ -92,7 +92,9 @@ export async function saveCharacterStatesFromCombined(
 
 export interface CharacterContradiction {
   characterName: string;
-  type: 'resurrection' | 'power_regression' | 'status_flip';
+  // Phase 22 Stage 2 Q7: expanded type set so Continuity Guardian can flag all 6 issue classes
+  // (was 3) and route them all through autoReviseChapter for fix.
+  type: 'resurrection' | 'power_regression' | 'status_flip' | 'location_teleport' | 'personality_flip' | 'info_leak' | 'subplot_reopen';
   severity: 'warning' | 'critical';
   description: string;
   previousChapter: number;

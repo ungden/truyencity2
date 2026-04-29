@@ -27,8 +27,10 @@ import { getSupabase } from '../utils/supabase';
 import type { GeminiConfig } from '../types';
 import type { CharacterContradiction } from '../memory/character-tracker';
 
+// Phase 22 Stage 2 Q7: bumped 30K → 80K content cap. Guardian must read FULL chapter
+// (not head+tail) to catch mid-chapter contradictions. DeepSeek 1M context handles it.
 const SKIP_BEFORE_CHAPTER = 10;
-const MAX_CONTENT_CHARS = 30000;
+const MAX_CONTENT_CHARS = 80000;
 
 export interface GuardianIssue {
   type: 'power_contradiction' | 'dead_character' | 'location_teleport' | 'personality_flip' | 'info_leak' | 'subplot_reopen' | 'other';
@@ -75,7 +77,7 @@ export async function runContinuityGuardian(
         .select('character_name,bible_text,status,power_realm_index,current_location')
         .eq('project_id', projectId)
         .order('importance', { ascending: false })
-        .limit(6),
+        .limit(15),  // Phase 22 Q7: bumped 6 → 15 — Guardian sees more of the cast for cross-checks
     ]);
 
     const charStates = characterStatesRes.data || [];
@@ -100,7 +102,7 @@ export async function runContinuityGuardian(
       .join('\n');
 
     const bibleDigest = bibles
-      .map(b => `▶ ${b.character_name} [${b.status}, realm idx ${b.power_realm_index ?? '?'}, @${b.current_location ?? '?'}]: ${(b.bible_text || '').slice(0, 600)}`)
+      .map(b => `▶ ${b.character_name} [${b.status}, realm idx ${b.power_realm_index ?? '?'}, @${b.current_location ?? '?'}]: ${(b.bible_text || '').slice(0, 1500)}`)  // Phase 22 Q7: 600 → 1500 chars per bible
       .join('\n\n');
 
     const charactersInChapter = characters.slice(0, 15).join(', ');
@@ -181,31 +183,31 @@ Trả về JSON:
       return span.trim() || 'unknown';
     };
 
-    // Convert critical issues into CharacterContradiction shape so auto-reviser can pick them up
+    // Phase 22 Stage 2 Q7: route ALL 6 issue types through auto-revise (was only 2).
+    // The expanded reviser prompt handles location_teleport, personality_flip, info_leak,
+    // subplot_reopen with explicit instructions per class.
+    const typeMap: Record<string, CharacterContradiction['type']> = {
+      'dead_character': 'resurrection',
+      'power_contradiction': 'power_regression',
+      'location_teleport': 'location_teleport',
+      'personality_flip': 'personality_flip',
+      'info_leak': 'info_leak',
+      'subplot_reopen': 'subplot_reopen',
+    };
+
     const contradictions: CharacterContradiction[] = [];
     for (const issue of issues) {
       if (issue.severity !== 'critical') continue;
-      if (issue.type === 'dead_character') {
-        contradictions.push({
-          characterName: extractCharName(issue.description),
-          type: 'resurrection',
-          severity: 'critical',
-          description: issue.description,
-          previousChapter: 0,
-          currentChapter: chapterNumber,
-        });
-      } else if (issue.type === 'power_contradiction') {
-        contradictions.push({
-          characterName: extractCharName(issue.description),
-          type: 'power_regression',
-          severity: 'critical',
-          description: issue.description,
-          previousChapter: 0,
-          currentChapter: chapterNumber,
-        });
-      }
-      // Other types (location_teleport, personality_flip, info_leak, subplot_reopen) are not auto-revisable
-      // by the existing reviser prompt. They're logged for monitoring but won't trigger rewrite.
+      const mappedType = typeMap[issue.type];
+      if (!mappedType) continue; // 'other' is not auto-revisable
+      contradictions.push({
+        characterName: extractCharName(issue.description),
+        type: mappedType,
+        severity: 'critical',
+        description: issue.description,
+        previousChapter: 0,
+        currentChapter: chapterNumber,
+      });
     }
 
     if (issues.length > 0) {

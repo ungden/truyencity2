@@ -360,6 +360,25 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     // Non-fatal
   }
 
+  // ── Step 2d++: Pre-Write Q&A Pass (Phase 22 Stage 2 Q6) ─────────────────
+  // Proactively answer "what does the engine know about each entity in the upcoming chapter?"
+  // Deterministic DB queries — no AI cost. Output injected as [STATE CHECK] block.
+  try {
+    const { runPreWriteQA } = await import('./pre-write-qa');
+    const qaBlock = await runPreWriteQA(project.id, nextChapter, {
+      chapterBrief: context.chapterBrief,
+      arcPlanText: context.arcPlan,
+      knownCharacterNames: context.knownCharacterNames,
+      protagonistName,
+    });
+    if (qaBlock) {
+      // Append to ragContext so it lands high in the assembled context (before quality modules)
+      context.ragContext = (context.ragContext || '') + '\n\n' + qaBlock;
+    }
+  } catch (e) {
+    console.warn('[Orchestrator] Pre-Write QA failed:', e instanceof Error ? e.message : String(e));
+  }
+
   // ── Step 2e: Inject progressive finale wind-down ───────────────────────
   const finaleContext = buildFinaleContext(nextChapter, totalPlanned);
   if (finaleContext) {
@@ -480,6 +499,11 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   // and `nextChapter % 3 === 0` would fire half-frequency. Use aiWriteCount for cadence gates
   // that are about *AI write frequency* rather than reader-chapter milestones.
   const aiWriteCount = Math.ceil(lastChapterNumber / SPLIT_PARTS);
+
+  // Phase 22 Stage 2 Q8: hoist metrics-relevant variables to outer scope so quality_metrics
+  // task can read them. Initialized empty; populated inside the contradiction-detection block.
+  let allContradictions: CharacterContradiction[] = [];
+  let allGuardianIssues: import('./continuity-guardian').GuardianIssue[] = [];
 
   // Extract all unique character names from the Architect outline
   const outlineChars = new Set<string>();
@@ -602,6 +626,10 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     await saveCharacterStatesFromCombined(
       project.id, nextChapter, combinedResult.characters,
     ).catch(e => console.warn('[Orchestrator] Task 2b character state save failed:', e instanceof Error ? e.message : String(e)));
+
+    // Phase 22 Stage 2 Q8: capture for metrics task in Promise.all below
+    allContradictions = contradictions;
+    allGuardianIssues = guardian.issues;
   }
 
   await Promise.all([
@@ -703,21 +731,56 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       })().catch((e) => console.warn(`[Orchestrator] Task 15b geography timeline failed:`, e instanceof Error ? e.message : String(e))),
     ] : []),
 
-    // Task 16: Refresh character bibles every 50 chapters (Phase 22 continuity overhaul).
-    // CRITICAL: gate on lastChapterNumber (not nextChapter) — with chapter splits enabled,
-    // nextChapter is the FIRST half of a 2-chapter split (always odd in 2-split mode), so
-    // `nextChapter % 50 === 0` would NEVER fire for split novels. lastChapterNumber is the
-    // LAST reader chapter of the split which lands on the actual milestone (50, 100, 150...).
-    ...(lastChapterNumber % 50 === 0 && lastChapterNumber >= 50 ? [
+    // Task 16: Refresh character bibles every 20 chapters (Phase 22 Stage 2 Q5).
+    // Was every 50 — too sparse for fast-evolving casts. Bibles consolidate state +
+    // RAG into a durable profile; refreshing every 20 keeps each character's recorded
+    // truth never more than ~20 chapters stale.
+    ...(lastChapterNumber % 20 === 0 && lastChapterNumber >= 20 ? [
       (async () => {
         const { refreshCharacterBibles } = await import('../memory/character-bible');
         return refreshCharacterBibles(project.id, lastChapterNumber, geminiConfig);
       })().catch((e) => console.warn(`[Orchestrator] Task 16 character bible refresh failed:`, e instanceof Error ? e.message : String(e))),
     ] : []),
 
-    // Task 17: Generate volume summary every 100 chapters (Phase 22 continuity overhaul).
-    // Same lastChapterNumber gating as Task 16 — see comment there.
-    ...(lastChapterNumber % 100 === 0 && lastChapterNumber >= 100 ? [
+    // Task 16b: Record quality metrics (Phase 22 Stage 2 Q8) — runs every chapter.
+    // Captures: critic scores, continuity counts, revision actions, context sizes.
+    // Non-fatal — used for monitoring + A/B testing.
+    (async () => {
+      const { recordQualityMetrics } = await import('../memory/quality-metrics');
+      const critic = result.criticReport;
+      return recordQualityMetrics({
+        projectId: project.id,
+        novelId: novel.id,
+        chapterNumber: nextChapter,
+        overallScore: critic?.overallScore ?? null,
+        dopamineScore: critic?.dopamineScore ?? null,
+        pacingScore: critic?.pacingScore ?? null,
+        endingHookScore: critic?.endingHookScore ?? null,
+        wordCount: result.content ? result.content.split(/\s+/).filter(Boolean).length : null,
+        wordRatio: targetWordCount > 0 && result.content
+          ? Number((result.content.split(/\s+/).filter(Boolean).length / targetWordCount).toFixed(2))
+          : null,
+        contradictionsCritical: allContradictions.filter(c => c.severity === 'critical').length,
+        contradictionsWarning: allContradictions.filter(c => c.severity === 'warning').length,
+        guardianIssuesCritical: allGuardianIssues.filter(i => i.severity === 'critical').length,
+        guardianIssuesMajor: allGuardianIssues.filter(i => i.severity === 'major').length,
+        guardianIssuesModerate: allGuardianIssues.filter(i => i.severity === 'moderate').length,
+        rewritesAttempted: 0, // WriteChapterResult doesn't expose attempt count yet; future enhancement
+        autoRevised: allContradictions.filter(c => c.severity === 'critical').length > 0,
+        contextSizeChars: contextString.length,
+        meta: {
+          arc_number: arcNumber,
+          ai_write_count: aiWriteCount,
+          last_chapter_number: lastChapterNumber,
+          split_parts: SPLIT_PARTS,
+        },
+      });
+    })().catch(e => console.warn('[Orchestrator] Task 16b quality metrics failed:', e instanceof Error ? e.message : String(e))),
+
+    // Task 17: Generate volume summary every 25 chapters (Phase 22 Stage 2 Q5).
+    // Was every 100 — too sparse; macro memory of arc 1-100 wasn't available until ch.100.
+    // Now ch.25, 50, 75, 100... so Architect at ch.50 can reference the ch.1-25 volume.
+    ...(lastChapterNumber % 25 === 0 && lastChapterNumber >= 25 ? [
       (async () => {
         const { generateVolumeSummary } = await import('../memory/volume-summarizer');
         return generateVolumeSummary(project.id, lastChapterNumber, geminiConfig);

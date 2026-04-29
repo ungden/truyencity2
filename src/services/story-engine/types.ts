@@ -272,6 +272,13 @@ export interface ContextPayload {
 
   // Layer 3: Recent Chapters
   recentChapters: string[];
+  /**
+   * Phase 22 Stage 2 (Q1): full prose of last 3 chapters. Writer reads previous prose verbatim
+   * (not just summaries) to maintain voice consistency, capture nuance, and reference precise
+   * details. Real "đại thần" novelists re-read the previous chapter before writing the next —
+   * this gives the AI the same advantage. ~30-45K chars total.
+   */
+  recentChapterFullText?: Array<{ chapter_number: number; title: string; content: string }>;
 
   // Layer 4: Arc Plan
   arcPlan?: string;
