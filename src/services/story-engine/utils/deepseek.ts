@@ -31,17 +31,27 @@ const PRICING: Record<string, { inputPerMillion: number; outputPerMillion: numbe
   '_default':          { inputPerMillion: 0.14, outputPerMillion: 0.28 },
 };
 
+// DeepSeek cache pricing (cache hits charged ~10% of cache miss).
+// Source: https://api-docs.deepseek.com/quick_start/pricing
+const CACHE_HIT_DISCOUNT = 0.1;
+
 function trackCost(
   model: string,
   inputTokens: number,
   outputTokens: number,
+  cacheHitTokens: number,
   tracking: TrackingContext,
 ): void {
   const p = PRICING[model] || PRICING['_default'];
-  const cost = (inputTokens * p.inputPerMillion + outputTokens * p.outputPerMillion) / 1_000_000;
+  // Cache miss tokens (full price) + cache hit tokens (10% price)
+  const cacheMissTokens = Math.max(0, inputTokens - cacheHitTokens);
+  const inputCost = (cacheMissTokens * p.inputPerMillion + cacheHitTokens * p.inputPerMillion * CACHE_HIT_DISCOUNT) / 1_000_000;
+  const outputCost = (outputTokens * p.outputPerMillion) / 1_000_000;
+  const cost = inputCost + outputCost;
 
   if (process.env.DEBUG_ROUTING === '1') {
-    console.warn(`[TRACK-DEEPSEEK] task=${tracking.task} ch=${tracking.chapterNumber ?? 'none'} model=${model} in=${inputTokens} out=${outputTokens}`);
+    const hitPct = inputTokens > 0 ? Math.round((cacheHitTokens / inputTokens) * 100) : 0;
+    console.warn(`[TRACK-DEEPSEEK] task=${tracking.task} ch=${tracking.chapterNumber ?? 'none'} model=${model} in=${inputTokens} (cache:${hitPct}%) out=${outputTokens} cost=$${cost.toFixed(4)}`);
   }
 
   getSupabase().from('cost_tracking').insert({
@@ -52,6 +62,7 @@ function trackCost(
     input_tokens: inputTokens,
     output_tokens: outputTokens,
     cost,
+    metadata: { cache_hit_tokens: cacheHitTokens },
   }).then(({ error }) => {
     if (error) console.warn('[DeepSeekCost] Insert failed:', error.message);
   });
@@ -121,9 +132,12 @@ export async function callDeepSeek(
 
       const promptTokens = data?.usage?.prompt_tokens || 0;
       const completionTokens = data?.usage?.completion_tokens || 0;
+      // DeepSeek reports prompt_cache_hit_tokens for prefix-cached requests.
+      // 10% discount applied to these tokens. Available since V3.
+      const cacheHitTokens = data?.usage?.prompt_cache_hit_tokens || 0;
 
       if (options?.tracking) {
-        trackCost(config.model, promptTokens, completionTokens, options.tracking);
+        trackCost(config.model, promptTokens, completionTokens, cacheHitTokens, options.tracking);
       }
 
       return {

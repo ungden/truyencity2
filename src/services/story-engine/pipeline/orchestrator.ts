@@ -568,12 +568,15 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     }
 
     // 2a'': Continuity Guardian — 4th agent doing biên-tập-viên pass.
-    // 2026-04-29 Phase 22: looks for power contradictions, location teleport, personality flip,
-    // info leak, subplot reopen across the WHOLE story (not just last chapter). Critical issues
-    // feed into auto-revise. Skipped for ch.1-10 (not enough history). Cost: ~$0.005/chapter.
-    const guardian = await runContinuityGuardian(
-      project.id, nextChapter, result.title, result.content, characters, geminiConfig,
-    );
+    // Phase 22 Stage 4 Lever E: runs every 2 chapters (was every 1). Drift catch delay is
+    // 1 chapter max — acceptable since Critic + fast consistency check still run every chapter.
+    // Saves ~$0.025/chapter without significantly hurting continuity.
+    const skipGuardian = nextChapter % 2 !== 0;
+    const guardian = skipGuardian
+      ? { issues: [], contradictions: [] }
+      : await runContinuityGuardian(
+          project.id, nextChapter, result.title, result.content, characters, geminiConfig,
+        );
     if (guardian.contradictions.length > 0) {
       for (const c of guardian.contradictions) contradictions.push(c);
     }
