@@ -72,7 +72,7 @@ async function setCronActive(active: boolean) {
   };
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<NextResponse> {
   const auth = await isAuthorizedAdmin(req);
   if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -190,7 +190,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest): Promise<NextResponse> {
   const auth = await isAuthorizedAdmin(req);
   if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   return NextResponse.json(await getStatus());
