@@ -192,6 +192,77 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       }
     }
 
+    // Phase 23 S1: SELF-HEALING — auto-regenerate missing outlines.
+    // If master_outline OR story_outline is null AND we're at the start of the novel
+    // (current_chapter < 5), regen them in place before the chapter writes. This unblocks
+    // novels that were reset (e.g. via rewrite-recent-10) without requiring a separate
+    // outline-gen script pass. Skipped for chapters >5 because by then the cron already
+    // reads outline several times; missing means a deliberate reset that's our job to fix.
+    const needsMasterRegen = !extra?.master_outline && currentChapter < 5;
+    const needsStoryRegen = !extra?.story_outline && currentChapter < 5;
+    if (needsMasterRegen || needsStoryRegen) {
+      try {
+        const { data: full } = await db
+          .from('ai_story_projects')
+          .select('genre,main_character,world_description,total_planned_chapters,novels!ai_story_projects_novel_id_fkey(title)')
+          .eq('id', options.projectId)
+          .single();
+        const novelTitle = (full?.novels as unknown as { title: string } | null)?.title || 'Unknown';
+        const totalCh = full?.total_planned_chapters || 1000;
+        const worldDesc = full?.world_description || '';
+        const mc = full?.main_character || resolvedMainCharacter;
+
+        if (needsMasterRegen) {
+          const { generateMasterOutline } = await import('./master-outline');
+          // synopsis input = world description (used by master outline as world grounding)
+          await generateMasterOutline(
+            options.projectId,
+            novelTitle,
+            (full?.genre || 'do-thi') as GenreType,
+            worldDesc.slice(0, 6000),
+            totalCh,
+            { ...DEFAULT_CONFIG, model: 'deepseek-v4-pro', systemPrompt: '' },
+          );
+          validationFixes.push(`✓ master_outline auto-regenerated (was null, current_chapter=${currentChapter})`);
+        }
+
+        if (needsStoryRegen) {
+          // Inline story_outline gen — same prompt used by content-seeder
+          const { callGemini } = await import('../utils/gemini');
+          const { parseJSON } = await import('../utils/json-repair');
+          const arcs = 5;
+          const mid = Math.ceil(arcs / 2);
+          const prompt = `Lập Story Outline cho truyện "${novelTitle}" (${full?.genre || 'do-thi'}).
+NHÂN VẬT CHÍNH: ${mc}
+WORLD/BỐI CẢNH (BẮT BUỘC TUÂN THỦ):
+${worldDesc.slice(0, 6000)}
+Trả về JSON:
+{"id":"story_${Date.now()}","title":"${novelTitle}","genre":"${full?.genre || 'do-thi'}","premise":"...","themes":[],"mainConflict":"...","targetChapters":${totalCh},"targetArcs":${arcs},"protagonist":{"name":"${mc}","startingState":"...","endGoal":"...","characterArc":"..."},"majorPlotPoints":[{"id":"pp1","name":"Khởi đầu","description":"...","targetArc":1,"type":"inciting_incident","importance":"critical"},{"id":"pp3","name":"Midpoint","description":"...","targetArc":${mid},"type":"midpoint","importance":"critical"},{"id":"pp5","name":"Climax","description":"...","targetArc":${arcs - 1},"type":"climax","importance":"critical"},{"id":"pp6","name":"Resolution","description":"...","targetArc":${arcs},"type":"resolution","importance":"critical"}],"endingVision":"...","uniqueHooks":[]}`;
+          const res = await callGemini(prompt, {
+            model: 'deepseek-v4-flash', temperature: 0.7, maxTokens: 4096,
+            systemPrompt: 'Bạn là STORY ARCHITECT. CHỈ trả về JSON hợp lệ.',
+          }, { jsonMode: true, tracking: { projectId: options.projectId, task: 'story_outline' } });
+          const outline = parseJSON(res.content);
+          if (outline) {
+            await db.from('ai_story_projects').update({ story_outline: outline as Record<string, unknown> }).eq('id', options.projectId);
+            validationFixes.push(`✓ story_outline auto-regenerated (was null)`);
+          }
+        }
+
+        // After regen, throw a soft error so cron retries this chapter on next tick (with outlines now present).
+        // This avoids using stale `extra` reference in subsequent code paths.
+        if (needsMasterRegen || needsStoryRegen) {
+          throw new Error(`OUTLINE_REGEN_DONE: novels self-heal complete; cron will pick up next tick`);
+        }
+      } catch (regenErr) {
+        if (regenErr instanceof Error && regenErr.message.startsWith('OUTLINE_REGEN_DONE:')) {
+          // Re-throw so orchestrator re-triggers on next cron tick with regen'd outlines
+          throw regenErr;
+        }
+        validationFixes.push(`⚠ outline auto-regen failed: ${regenErr instanceof Error ? regenErr.message : String(regenErr)}`);
+      }
+    }
+
     // Fix D/E: total_planned_chapters ↔ master_outline coverage alignment.
     // 2026-04-30: standardized novel target ~1000 chương. Validation now only auto-EXPANDS
     // total_planned (when outline plans MORE than declared) — never auto-CONTRACTS. If user
@@ -638,10 +709,21 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       }
     }
 
-    // 2b: Save character states
+    // 2b: Save character states (Phase 23 S2: record failures to retry queue)
     await saveCharacterStatesFromCombined(
       project.id, nextChapter, combinedResult.characters,
-    ).catch(e => console.warn('[Orchestrator] Task 2b character state save failed:', e instanceof Error ? e.message : String(e)));
+    ).catch(async (e) => {
+      console.warn('[Orchestrator] Task 2b character state save failed:', e instanceof Error ? e.message : String(e));
+      const { recordFailedTask } = await import('../utils/retry-queue');
+      await recordFailedTask({
+        projectId: project.id,
+        novelId: novel.id,
+        chapterNumber: nextChapter,
+        taskName: 'character_states_save',
+        payload: { characters: combinedResult.characters },
+        error: e,
+      });
+    });
 
     // Phase 22 Stage 2 Q8: capture for metrics task in Promise.all below
     allContradictions = contradictions;
@@ -649,11 +731,27 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   }
 
   await Promise.all([
-    // Task 3: RAG chunking + embedding
+    // Task 3: RAG chunking + embedding (Phase 23 S2: record failures)
     chunkAndStoreChapter(
       project.id, nextChapter, result.content, result.title,
       `Chương ${nextChapter}: ${result.title}`, characters,
-    ).catch(e => console.warn('[Orchestrator] Task 3 RAG chunking failed:', e instanceof Error ? e.message : String(e))),
+    ).catch(async (e) => {
+      console.warn('[Orchestrator] Task 3 RAG chunking failed:', e instanceof Error ? e.message : String(e));
+      const { recordFailedTask } = await import('../utils/retry-queue');
+      await recordFailedTask({
+        projectId: project.id,
+        novelId: novel.id,
+        chapterNumber: nextChapter,
+        taskName: 'rag_chunking',
+        payload: {
+          content: result.content,
+          title: result.title,
+          summary: `Chương ${nextChapter}: ${result.title}`,
+          characters,
+        },
+        error: e,
+      });
+    }),
 
     // Task 4: Beat detection + recording
     detectAndRecordBeats(
