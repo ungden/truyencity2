@@ -48,8 +48,8 @@ interface NovelSeed {
 }
 
 const SEED: NovelSeed = {
-  title: 'Đại Văn Hào Đa Vũ Trụ: Tu Sĩ Quỳ Cầu Ta Update Chương Mới',
-  slug: 'dai-van-hao-da-vu-tru-tu-si-quy-cau-ta-update-chuong-moi',
+  title: 'Văn Sĩ Toàn Năng: Tu Sĩ Vạn Giới Đọc Tam Quốc Đột Phá Cảnh Giới',
+  slug: 'van-si-toan-nang-tu-si-van-gioi-doc-tam-quoc-dot-pha-canh-gioi',
   genre: 'do-thi',
   sub_genres: ['viet-van-sang-the'],
   main_character: 'Lê Mạnh Khang',
@@ -147,22 +147,37 @@ NHÂN VẬT CHÍNH: ${seed.main_character}
 GENRE: ${seed.genre}${seed.sub_genres?.length ? ` (sub: ${seed.sub_genres.join(', ')})` : ''}
 WORLD: ${seed.world_description.slice(0, 2500)}
 
-Trả về JSON với schema:
+Trả về JSON đầy đủ các trường (CANONICAL SCHEMA — dùng đúng tên field, KHÔNG đổi):
 {
-  "protagonist": { "name": "...", "background": "...", "motivation": "..." },
-  "supportingCast": [{"name":"...", "role":"...", "personality":"..."}],
-  "powerSystem": { "name": "...", "rules": "..." },
-  "antagonists": [{"name":"...", "role":"...", "scale":"..."}],
-  "openingHook": "Ch.1 mở thế nào để hook reader trong 3 trang đầu",
-  "majorThemes": ["...", "..."],
-  "settingDetails": "..."
+  "id": "string",
+  "title": "${seed.title}",
+  "genre": "${seed.genre}",
+  "premise": "1-2 câu premise cốt lõi (Thiên Đạo Thư Viện + MC chép văn Earth + tu sĩ đa vũ trụ nhập tâm đột phá)",
+  "themes": ["theme1", "theme2", "theme3"],
+  "mainConflict": "Xung đột chính xuyên suốt truyện",
+  "targetChapters": ${seed.total_planned_chapters},
+  "protagonist": {
+    "name": "${seed.main_character}",
+    "startingState": "MC sinh viên Văn khoa NEET Hà Nội + nghề/tài sản/quan hệ chương 1",
+    "endGoal": "Trở thành Thiên Đạo Văn Khố Quản Lý — gác cổng văn học đa vũ trụ",
+    "characterArc": "Hành trình từ NEET → đại văn hào đa vũ trụ qua 4 phase"
+  },
+  "majorPlotPoints": [
+    {"chapter": 1, "event": "MC kích hoạt Thiên Đạo Thư Viện qua laptop cũ, viết chương đầu Tam Quốc, tu sĩ Cửu Châu nhập tâm Triệu Vân"},
+    {"chapter": 50, "event": "Hoàn thành Tam Quốc, cộng đồng tu sĩ Cửu Châu tôn MC Đại Văn Thần"},
+    {"chapter": 200, "event": "Multi-work expansion (Tây Du + Harry Potter + Tiếu Ngạo) — kiếm khách Hắc Sa + pháp sư Aurelia tham gia"},
+    {"chapter": 400, "event": "Rival author đa vũ trụ + đạo tặc văn học crisis"},
+    {"chapter": 600, "event": "Cổ thần forced ascension threat resolved, MC = Thiên Đạo Văn Khố"}
+  ],
+  "endingVision": "MC ở Earth nhưng kiểm soát kho văn học đa vũ trụ, tu sĩ vạn giới đột phá nhờ tác phẩm Earth chép qua",
+  "uniqueHooks": ["dramatic irony tu sĩ Kim Đan quỳ chờ MC update chương", "multi-cultural fusion Đông-Tây Cổ-Kim", "MC = AUTHOR thuần KHÔNG combat"]
 }
 
 YÊU CẦU CỨNG:
-- protagonist.name PHẢI là "Lê Mạnh Khang" (KHÔNG đổi tên)
-- antagonists đúng theo world_description (Rival author + Đạo tặc văn học + Cổ thần threat)
+- protagonist.name PHẢI là "${seed.main_character}" (KHÔNG đổi tên)
+- premise + mainConflict + majorPlotPoints PHẢI reflect đúng world_description (Thiên Đạo Thư Viện + Cửu Châu/Hắc Sa/Aurelia/Tây Vực/Thần Giới Thượng Cổ + Tam Quốc/Tây Du/Harry Potter catalog)
 - KHÔNG combat / KHÔNG MC thực sự tu luyện / KHÔNG harem
-- powerSystem = Thiên Đạo Thư Viện theo world_description
+- majorPlotPoints theo đúng 4-phase roadmap trong world_description
 
 Trả JSON thuần (không markdown).`;
   const res = await callGemini(prompt, cfg);

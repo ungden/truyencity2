@@ -97,8 +97,8 @@ export async function loadContext(
     db.from('chapter_summaries').select('chapter_number,title,summary,mc_state,cliffhanger').eq('project_id', projectId).lt('chapter_number', chapterNumber).order('chapter_number', { ascending: false }).limit(chapterNumber > 50 ? 5 : 8),
     // Layer 4: Arc Plan (incl. hyperpop sub-arcs from migration 0149)
     db.from('arc_plans').select('arc_number,start_chapter,end_chapter,arc_theme,plan_text,sub_arcs,chapter_briefs,threads_to_advance,threads_to_resolve,new_threads').eq('project_id', projectId).order('arc_number', { ascending: false }).limit(1).maybeSingle(),
-    // Master Outline + Story Outline
-    db.from('ai_story_projects').select('master_outline,story_outline,sub_genres,mc_archetype,anti_tropes,style_directives').eq('id', projectId).maybeSingle(),
+    // Master Outline + Story Outline + WORLD DESCRIPTION (canonical premise source)
+    db.from('ai_story_projects').select('master_outline,story_outline,world_description,sub_genres,mc_archetype,anti_tropes,style_directives').eq('id', projectId).maybeSingle(),
     // Anti-repetition: titles (cap at 50 most recent to reduce context size)
     db.from('chapters').select('title').eq('novel_id', novelId).order('chapter_number', { ascending: false }).limit(50),
     // Anti-repetition: openings
@@ -123,6 +123,10 @@ export async function loadContext(
     ? (typeof rawMasterOutline === 'string' ? rawMasterOutline : JSON.stringify(rawMasterOutline))
     : undefined;
   const storyOutline = masterOutlineResult?.data?.story_outline;
+  // Layer -1: world_description — canonical premise source (hand-crafted at spawn).
+  // CRITICAL: even if story_outline schema is wrong/incomplete, this guarantees Architect sees
+  // the actual premise (golden finger, antagonists, setting). Was missing pre-Phase-21 fix.
+  const worldDescription = (masterOutlineResult?.data as { world_description?: string } | null)?.world_description;
 
   // Modern narrative metadata (migration 0149)
   const projectMeta = masterOutlineResult?.data as {
@@ -247,6 +251,7 @@ export async function loadContext(
     arcChapterSummaries: undefined, // loaded separately for synopsis generation
     masterOutline: typeof masterOutline === 'string' ? masterOutline : (masterOutline ? JSON.stringify(masterOutline) : undefined),
     storyOutline: storyOutline || undefined,
+    worldDescription: worldDescription || undefined,
     // Modern narrative metadata (migration 0149)
     subGenres: (projectMeta?.sub_genres || []) as ContextPayload['subGenres'],
     mcArchetype: projectMeta?.mc_archetype as ContextPayload['mcArchetype'],
@@ -259,6 +264,15 @@ export async function loadContext(
 
 export function assembleContext(payload: ContextPayload, chapterNumber: number): string {
   const parts: string[] = [];
+
+  // Layer -1: WORLD DESCRIPTION (canonical premise — HIGHEST PRIORITY)
+  // Hand-crafted at spawn time, contains golden finger rules, antagonist details, setting,
+  // MC starting state. CRITICAL guarantee: even if story_outline schema is wrong or
+  // master_outline is generic, world_description anchors every chapter to the real premise.
+  if (payload.worldDescription) {
+    parts.push('[WORLD DESCRIPTION — PREMISE GỐC, BÁM SÁT TUYỆT ĐỐI, KHÔNG ĐƯỢC LẠC ĐỀ]');
+    parts.push(payload.worldDescription.slice(0, 8000));  // Cap to keep prompt budget; trim from end if needed
+  }
 
   // Layer 0.5: Master Outline
   if (payload.masterOutline) {

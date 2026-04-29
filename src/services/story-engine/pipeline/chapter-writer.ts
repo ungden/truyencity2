@@ -677,6 +677,8 @@ ${CLIFFHANGER_TECHNIQUES.map((c: { name: string; example: string }) => '- ' + c.
 
   const prompt = `Lên kế hoạch cho CHƯƠNG ${chapterNumber}.
 
+⚠️ TUYỆT ĐỐI BÁM SÁT [WORLD DESCRIPTION] và [ĐẠI CƯƠNG TOÀN TRUYỆN] phía dưới — đây là PREMISE GỐC. CẤM hallucinate setting / golden finger / antagonist / MC profession khác. Nếu world_description nói MC là "ngự thú sư cuồng đọc văn học chép Tam Quốc cho tu sĩ đa vũ trụ đọc" thì CẤM viết MC bán cơm hộp hay làm freelance content. Mọi scene phải reference world_description elements (tên hệ thống, tên antagonist, setting locations, golden finger rules cụ thể).
+
 ${trimmedContext}
 
 ${constraintSection}

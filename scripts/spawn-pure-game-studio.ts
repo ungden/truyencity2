@@ -55,8 +55,8 @@ interface NovelSeed {
 }
 
 const SEED: NovelSeed = {
-  title: 'Studio Indie Của Ta Khiến Streamer Toàn Cầu Đập Nát Bàn Phím',
-  slug: 'studio-indie-cua-ta-khien-streamer-toan-cau-dap-nat-ban-phim',
+  title: 'Lập Trình Game Cứu Thế Giới: Cơn Ác Mộng Của Tập Đoàn P2W',
+  slug: 'lap-trinh-game-cuu-the-gioi-con-ac-mong-cua-tap-doan-p2w',
   genre: 'do-thi',
   // KHÔNG dùng topic_id 'do-thi-giai-tri-luu' (entertainment IP carry — phim/nhạc/sách)
   // Vì game-parallel-world là pure game dev, narrower scope
@@ -165,22 +165,37 @@ NHÂN VẬT CHÍNH: ${seed.main_character}
 GENRE: ${seed.genre}${seed.sub_genres?.length ? ` (sub: ${seed.sub_genres.join(', ')})` : ''}
 WORLD: ${seed.world_description.slice(0, 2500)}
 
-Trả về JSON với schema:
+Trả về JSON đầy đủ các trường (CANONICAL SCHEMA — dùng đúng tên field, KHÔNG đổi):
 {
-  "protagonist": { "name": "...", "background": "...", "motivation": "..." },
-  "supportingCast": [{"name":"...", "role":"...", "personality":"..."}],
-  "powerSystem": { "name": "...", "rules": "..." },
-  "antagonists": [{"name":"...", "role":"...", "scale":"..."}],
-  "openingHook": "Ch.1 mở thế nào để hook reader trong 3 trang đầu",
-  "majorThemes": ["...", "..."],
-  "settingDetails": "..."
+  "id": "string",
+  "title": "${seed.title}",
+  "genre": "${seed.genre}",
+  "premise": "1-2 câu tóm tắt premise cốt lõi của truyện (golden finger + setting + protagonist + main conflict trong 1 đoạn ngắn)",
+  "themes": ["theme1", "theme2", "theme3"],
+  "mainConflict": "Xung đột chính xuyên suốt truyện",
+  "targetChapters": ${seed.total_planned_chapters},
+  "protagonist": {
+    "name": "${seed.main_character}",
+    "startingState": "Tình trạng + nghề nghiệp + tài sản + quan hệ MC ở chương 1",
+    "endGoal": "Mục tiêu cuối cùng của MC ở cuối truyện",
+    "characterArc": "Hành trình growth của MC qua 4 phase"
+  },
+  "majorPlotPoints": [
+    {"chapter": 1, "event": "Sự kiện chương 1 — kích hoạt golden finger / hook"},
+    {"chapter": 50, "event": "..."},
+    {"chapter": 200, "event": "..."},
+    {"chapter": 400, "event": "..."},
+    {"chapter": 600, "event": "..."}
+  ],
+  "endingVision": "Tầm nhìn kết thúc truyện — MC đạt được gì, world thay đổi ra sao",
+  "uniqueHooks": ["hook1 đặc trưng cho truyện", "hook2", "hook3"]
 }
 
 YÊU CẦU CỨNG:
-- protagonist.name PHẢI khớp NGUYỄN/TRẦN/VŨ trên (KHÔNG đổi tên)
-- antagonists đúng theo world_description (Hằng Nguyên Group + Vạn Giới Entertainment)
+- protagonist.name PHẢI là "${seed.main_character}" (KHÔNG đổi tên)
+- premise + mainConflict + majorPlotPoints PHẢI reflect đúng world_description (Hằng Nguyên Group + Vạn Giới Entertainment, Hệ Thống Thu Thập Cảm Xúc, FNAF/Getting Over It/Undertale catalog)
 - KHÔNG combat / KHÔNG tu-tiên / KHÔNG harem (single love interest slow-burn)
-- powerSystem = Hệ Thống Thu Thập Cảm Xúc theo world_description
+- majorPlotPoints PHẢI có ≥6 events theo phase roadmap trong world_description
 
 Trả JSON thuần (không markdown).`;
   const res = await callGemini(prompt, cfg);

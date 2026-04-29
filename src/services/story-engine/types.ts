@@ -233,6 +233,12 @@ export interface WorldConstraint {
 // ── Context Payload (assembled before writing) ───────────────────────────────
 
 export interface ContextPayload {
+  // Layer -1: World Description (canonical premise source, hand-crafted at spawn time)
+  /** Project's world_description text — the source of truth for setting, golden finger, antagonists, MC archetype.
+   *  When story_outline schema is incomplete or master_outline is too high-level, world_description is the
+   *  fallback that grounds every chapter in the actual premise. ALWAYS injected early in context. */
+  worldDescription?: string;
+
   // Layer 0: Chapter Bridge
   previousSummary?: string;
   previousMcState?: string;
