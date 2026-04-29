@@ -153,7 +153,10 @@ Quy tắc:
     const res = await callGemini(prompt, {
       ...config,
       temperature: 0.7,
-      maxTokens: 2048,
+      // Phase 23 fix: bumped 2048 → 8192. With 5-arc majorArcs + worldMapProgression +
+      // mainPlotline + finalBossOrGoal, JSON output exceeded 2048 tokens → truncated →
+      // parseJSON failed → master_outline never saved. Pro tier handles 8K easily.
+      maxTokens: 8192,
       systemPrompt: "Bạn là Master Architect chuyên lập Đại cương tổng thể cho tiểu thuyết mạng.",
     }, { jsonMode: true, tracking: { projectId, task: 'master_outline' } });
 
