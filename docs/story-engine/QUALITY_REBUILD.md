@@ -529,3 +529,92 @@ phase progression, scene types, quality floor, common failures) đều genre-loc
 ---
 
 **Last Updated v3**: 2026-04-30 (per-genre process blueprints shipped)
+
+---
+
+## Phần 9 — v4 Update: Systemic Refactor (2026-04-30)
+
+User: "phải thực sự nghiêm túc trau chuốt toàn bộ logic dự án đi chứ cứ lâu lâu lại phát sinh bug thì bao giờ mới xong"
+
+3 explore agents mapped issue space → 5-phase refactor (P1-P5) shipped trong 5 PRs:
+
+### P1 — Type system enforcement (PR #21)
+- 5 Records tightened to `Record<GenreType, T>` (or `Partial<>`) — TypeScript catches missing genre keys at compile time
+- 11 jest assertions pass cho genre coverage (`npm test -- genre-coverage`)
+- `npm run lint:prompts` script catches placeholder leaks (FORBIDDEN_LITERAL_NAMES)
+
+### P2 — Critical state fixes (PR #22)
+- **P2.1**: orchestrator MC sync hard-validate post-DB-update (re-fetch + verify, throw on mismatch)
+- **P2.2**: deterministic detectMcNameFlip() in Critic — counts expected MC vs competing candidates, REWRITE if drift detected
+- **P2.3**: castRoster + worldRules + antiTropes injected into context (was generated but never read)
+- **P2.4**: synopsis regen MC name lock — prompt prepend hard rule + post-gen verify; throw if synopsis missing expected name
+- **P2.5**: 14 post-write tasks now persist failures to `failed_memory_tasks` via `recordTaskFailure()` helper instead of silent swallow
+
+### P3 — Branching alignment (PR #23)
+- PROACTIVE_GENRES + isProactiveGenre exported from templates.ts (master-outline.ts now imports — no duplication)
+- NON_COMBAT_GENRES exported (helper still works, list now public)
+- validateSubGenreKeys() in context-assembler — typos in style_directives.sub_genres logged + dropped, không silent fall through
+- Fixed types.ts ContextPayload.subGenres mistyped as GenreType[] (actually sub-genre tag strings)
+
+### P4 — Hardening (PR #24)
+- **P4.1**: hard-reject seeds failing blueprint check — was soft-warn, now `.filter()` step drops failing seeds; daily-spawn retries fresh
+- **P4.2**: per-chapter quality canary in orchestrator Step 5c — regex check for placeholder leaks / MC name absence / VND currency leak; persists to failed_memory_tasks
+- **P4.3**: `POST /api/admin/operations` action `regression_audit` — samples last N chapters across active projects, returns per-project score 0-100 + overall_score
+
+### P5 — Doc + verification harness (this PR)
+- `docs/story-engine/PLACEHOLDER_CONVENTION.md` — formal convention + enforcement runbook
+- This Phần 9 evolution log
+
+### Bug classes eliminated by P1-P5
+
+| Bug class | Defense layer |
+|---|---|
+| Forget genre Record entry | P1 (compile-time + test) |
+| Voice anchor literal name leak | P1 lint + P2.2 Critic check + P4.2 canary + P4.3 audit |
+| MC name flip across chapters | P2.1 sync verify + P2.2 Critic check + P2.4 synopsis lock + P4.2 canary |
+| Cast invent / Khánh→Khang drift | P2.3 castRoster injection + antiTropes injection |
+| Silent post-write task failure | P2.5 failed_memory_tasks persistence + admin UI |
+| Branching list drift (3 isVN places, 2 non-combat places) | P3.1 single source of truth |
+| Sub-genre typo silent fall-through | P3.3 validateSubGenreKeys |
+| Bad seed shipped | P4.1 blueprint hard-reject |
+| Drift not detected for days | P4.2 canary + P4.3 weekly regression audit |
+
+### Verification harness post-refactor
+
+```bash
+# Full local check
+npm run typecheck       # TS strict
+npm run lint:prompts    # placeholder leak audit
+npm test -- genre-coverage  # 11 assertions
+
+# Production smoke
+curl -X POST -H "Authorization: Bearer $CRON_SECRET" \
+  https://truyencity2.vercel.app/api/admin/operations \
+  -d '{"action":"regression_audit","sampleSize":20,"perProjectChapters":3}'
+# Returns overall_score 0-100. Aim ≥90 baseline.
+```
+
+### Files added/changed in P1-P5 (cumulative)
+
+NEW:
+- `scripts/audit-prompts-for-leaks.ts` (P1)
+- `src/__tests__/story-engine/genre-coverage.test.ts` (P1)
+- `docs/story-engine/PLACEHOLDER_CONVENTION.md` (P5)
+
+CHANGED:
+- `src/services/story-engine/templates.ts` (P1 Record types, P3 export predicates)
+- `src/services/story-engine/templates/genre-voice-anchors.ts` (P1 lint clean)
+- `src/services/story-engine/memory/style-bible.ts` (P1 export Records)
+- `src/services/story-engine/types.ts` (P3 subGenres type)
+- `src/services/story-engine/seed-blueprint.ts` (kept as-is)
+- `src/services/story-engine/pipeline/orchestrator.ts` (P2.1 MC sync verify, P2.5 recordTaskFailure helper, P4.2 canary)
+- `src/services/story-engine/pipeline/chapter-writer.ts` (P2.2 detectMcNameFlip)
+- `src/services/story-engine/pipeline/context-assembler.ts` (P2.3 castRoster, P2.4 synopsis lock, P3.3 validateSubGenreKeys)
+- `src/services/story-engine/pipeline/master-outline.ts` (P3 import predicates)
+- `src/services/content-seeder/index.ts` (P1 Record types, P4.1 hard-reject)
+- `src/app/api/admin/operations/route.ts` (P4.3 regression_audit)
+- `package.json` (lint:prompts script)
+
+---
+
+**Last Updated v4**: 2026-04-30 (systemic refactor P1-P5 shipped)
