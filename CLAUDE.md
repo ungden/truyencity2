@@ -1,5 +1,7 @@
 # CLAUDE.md - TruyenCity AI Story Writer
 
+> **Story Engine reference hub**: tất cả tài liệu về Story Engine v2 (research, per-genre patterns, version log, common-tasks lookup) ở [`docs/story-engine/README.md`](docs/story-engine/README.md). Bắt đầu từ đó khi cần audit chất lượng, thêm genre, hoặc onboard.
+
 ## Project Overview
 
 TruyenCity la nen tang viet truyen tu dong bang AI, ho tro viet truyen dai 1000-2000 chuong voi kha nang "1 Click = 1 Chuong hoan chinh".
