@@ -8,6 +8,8 @@
 import { getSupabase } from '../utils/supabase';
 import { callGemini } from '../utils/gemini';
 import { parseJSON } from '../utils/json-repair';
+import { GOLDEN_CHAPTER_REQUIREMENTS, UNIVERSAL_ANTI_SEEDS } from '../templates';
+import { getArchitectVoiceHint } from '../templates/genre-voice-anchors';
 
 import type {
   ContextPayload, ChapterSummary, GenreType, GeminiConfig,
@@ -883,6 +885,39 @@ export async function generateArcPlan(
   const startChapter = (arcNumber - 1) * 20 + 1;
   const endChapter = Math.min(arcNumber * 20, totalPlanned);
 
+  // 2026-04-30 fix: Arc 1 plan covers chương 1-20 — without warm-baseline rule
+  // injection, AI was emitting rock-bottom openings (chủ nhà giục trả tiền, MC
+  // bế tắc, etc.) that conflict with WRITER_SYSTEM warm-baseline rule. Inject
+  // golden chapter requirements + universal anti-seeds + voice anchor when
+  // arc 1 is being planned so chapter 1-3 briefs are bestseller-grade.
+  let openingRulesBlock = '';
+  if (arcNumber === 1) {
+    const ch1Must = GOLDEN_CHAPTER_REQUIREMENTS.chapter1.mustHave.map(r => `  • ${r}`).join('\n');
+    const ch1Avoid = GOLDEN_CHAPTER_REQUIREMENTS.chapter1.avoid.map(r => `  ✗ ${r}`).join('\n');
+    const ch2Must = GOLDEN_CHAPTER_REQUIREMENTS.chapter2.mustHave.map(r => `  • ${r}`).join('\n');
+    const ch3Must = GOLDEN_CHAPTER_REQUIREMENTS.chapter3.mustHave.map(r => `  • ${r}`).join('\n');
+    const antiSeeds = UNIVERSAL_ANTI_SEEDS.slice(0, 12).map(s => `  ✗ ${s}`).join('\n');
+    const voiceHint = getArchitectVoiceHint(genre);
+    openingRulesBlock = `\n[GOLDEN CHAPTER REQUIREMENTS — ARC 1 ONLY, BẮT BUỘC ALIGN]
+Chương 1 PHẢI tuân thủ:
+${ch1Must}
+Chương 1 CẤM:
+${ch1Avoid}
+Chương 2 PHẢI:
+${ch2Must}
+Chương 3 PHẢI:
+${ch3Must}
+
+[UNIVERSAL ANTI-SEEDS — CẤM TUYỆT ĐỐI cho mọi chapter brief trong arc 1]:
+${antiSeeds}
+${voiceHint}
+
+→ chapter_briefs cho chương 1-3 PHẢI propose scenes thỏa mãn các rule trên.
+   CẤM TUYỆT ĐỐI brief mở chương 1 với "MC nghèo đói / chủ nhà giục / bế tắc / tự tử".
+   MC PHẢI mở chương 1 với golden finger ACTIVE + competence visible + opportunity-driven hook.
+\n`;
+  }
+
   const isClosingPhase = endChapter >= totalPlanned * 0.8;
   const closingInstruction = isClosingPhase ? 
     `\n\nCHÚ Ý QUAN TRỌNG (GIAI ĐOẠN ĐÓNG TRUYỆN): Truyện đang ở ${Math.round((endChapter/totalPlanned)*100)}% tiến độ.
@@ -915,7 +950,7 @@ Yêu cầu:
 
   const prompt = `Bạn là Story Architect cho truyện ${genre}.
 
-${worldBlock}${visionBlock}${synopsis ? `TỔNG QUAN:\n${synopsis}\n\n` : ''}${storyBible ? `STORY BIBLE:\n${storyBible.slice(0, 2000)}\n\n` : ''}
+${worldBlock}${visionBlock}${synopsis ? `TỔNG QUAN:\n${synopsis}\n\n` : ''}${storyBible ? `STORY BIBLE:\n${storyBible.slice(0, 2000)}\n\n` : ''}${openingRulesBlock}
 Lập kế hoạch ARC ${arcNumber} (chương ${startChapter}-${endChapter}) cho ${protagonistName}.
 Tổng dự kiến: ${totalPlanned} chương.${closingInstruction}
 

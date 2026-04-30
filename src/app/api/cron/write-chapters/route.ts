@@ -518,13 +518,13 @@ async function prepareInitProject(
     const storyPromise = !projRow?.story_outline
       ? (async () => {
           try {
-            const { callGemini } = await import('@/services/story-engine/utils/gemini');
-            const { parseJSON } = await import('@/services/story-engine/utils/json-repair');
-            const arcs = 5; const mid = Math.ceil(arcs / 2);
-            const prompt = `Lập Story Outline cho "${novel.title}" (${genre}).\nNHÂN VẬT CHÍNH: ${protagonistName}\nWORLD/BỐI CẢNH:\n${worldDesc.slice(0, 6000)}\n\nTrả về JSON:\n{"id":"story_${Date.now()}","title":"${novel.title}","genre":"${genre}","premise":"...","themes":[],"mainConflict":"...","targetChapters":${totalPlanned},"targetArcs":${arcs},"protagonist":{"name":"${protagonistName}","startingState":"...","endGoal":"...","characterArc":"..."},"majorPlotPoints":[{"id":"pp1","name":"Khởi đầu","targetArc":1,"type":"inciting_incident","importance":"critical"},{"id":"pp3","name":"Midpoint","targetArc":${mid},"type":"midpoint","importance":"critical"},{"id":"pp5","name":"Climax","targetArc":${arcs - 1},"type":"climax","importance":"critical"},{"id":"pp6","name":"Resolution","targetArc":${arcs},"type":"resolution","importance":"critical"}],"endingVision":"...","uniqueHooks":[]}`;
-            const res = await callGemini(prompt, { model: 'deepseek-v4-pro', temperature: 0.7, maxTokens: 4096, systemPrompt: 'Bạn là STORY ARCHITECT. CHỈ trả về JSON.' }, { jsonMode: true, tracking: { projectId: project.id, task: 'story_outline' } });
-            const outline = parseJSON(res.content);
-            if (outline) await supabase.from('ai_story_projects').update({ story_outline: outline as Record<string, unknown> }).eq('id', project.id);
+            const { generateStoryOutline } = await import('@/services/story-engine/pipeline/story-outline');
+            const outline = await generateStoryOutline(
+              project.id, novel.title, genre, protagonistName,
+              worldDesc, totalPlanned,
+              { ...geminiConfig, model: 'deepseek-v4-flash' },
+            );
+            if (outline) await supabase.from('ai_story_projects').update({ story_outline: outline as unknown as Record<string, unknown> }).eq('id', project.id);
           } catch (e) { console.warn(`[init-prep] story_outline regen failed for ${project.id}:`, e instanceof Error ? e.message : String(e)); }
         })()
       : Promise.resolve();

@@ -227,24 +227,18 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
         }
 
         if (needsStoryRegen) {
-          // Inline story_outline gen — same prompt used by content-seeder
-          const { callGemini } = await import('../utils/gemini');
-          const { parseJSON } = await import('../utils/json-repair');
-          const arcs = 5;
-          const mid = Math.ceil(arcs / 2);
-          const prompt = `Lập Story Outline cho truyện "${novelTitle}" (${full?.genre || 'do-thi'}).
-NHÂN VẬT CHÍNH: ${mc}
-WORLD/BỐI CẢNH (BẮT BUỘC TUÂN THỦ):
-${worldDesc.slice(0, 6000)}
-Trả về JSON:
-{"id":"story_${Date.now()}","title":"${novelTitle}","genre":"${full?.genre || 'do-thi'}","premise":"...","themes":[],"mainConflict":"...","targetChapters":${totalCh},"targetArcs":${arcs},"protagonist":{"name":"${mc}","startingState":"...","endGoal":"...","characterArc":"..."},"majorPlotPoints":[{"id":"pp1","name":"Khởi đầu","description":"...","targetArc":1,"type":"inciting_incident","importance":"critical"},{"id":"pp3","name":"Midpoint","description":"...","targetArc":${mid},"type":"midpoint","importance":"critical"},{"id":"pp5","name":"Climax","description":"...","targetArc":${arcs - 1},"type":"climax","importance":"critical"},{"id":"pp6","name":"Resolution","description":"...","targetArc":${arcs},"type":"resolution","importance":"critical"}],"endingVision":"...","uniqueHooks":[]}`;
-          const res = await callGemini(prompt, {
-            model: 'deepseek-v4-flash', temperature: 0.7, maxTokens: 4096,
-            systemPrompt: 'Bạn là STORY ARCHITECT. CHỈ trả về JSON hợp lệ.',
-          }, { jsonMode: true, tracking: { projectId: options.projectId, task: 'story_outline' } });
-          const outline = parseJSON(res.content);
+          const { generateStoryOutline } = await import('./story-outline');
+          const outline = await generateStoryOutline(
+            options.projectId,
+            novelTitle,
+            (full?.genre || 'do-thi') as GenreType,
+            mc,
+            worldDesc,
+            totalCh,
+            { ...DEFAULT_CONFIG, model: 'deepseek-v4-flash' },
+          );
           if (outline) {
-            await db.from('ai_story_projects').update({ story_outline: outline as Record<string, unknown> }).eq('id', options.projectId);
+            await db.from('ai_story_projects').update({ story_outline: outline as unknown as Record<string, unknown> }).eq('id', options.projectId);
             validationFixes.push(`✓ story_outline auto-regenerated (was null)`);
           }
         }
