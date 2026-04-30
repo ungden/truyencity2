@@ -2,6 +2,7 @@ import { getSupabase } from '../utils/supabase';
 import { callGemini } from '../utils/gemini';
 import { parseJSON } from '../utils/json-repair';
 import type { GeminiConfig, GenreType } from '../types';
+import { getGenreSetupRequirements, getGenreArchitectGuide } from '../templates/genre-process-blueprints';
 
 export interface MasterOutline {
   mainPlotline: string;
@@ -129,10 +130,14 @@ export async function generateMasterOutline(
     ? `\n4. PROACTIVE NARRATIVE: Mỗi Arc tập trung vào HÀNH ĐỘNG + KẾT QUẢ của MC (xây dựng, đạt được, mở rộng), KHÔNG dựa vào "kẻ thù xuất hiện đe dọa MC". Đối thủ kinh doanh/chính trị chỉ REACT sau khi MC đã có thành tựu cụ thể, KHÔNG chủ động hãm hại MC trước.`
     : '';
 
+  const genreSetup = getGenreSetupRequirements(genre);
+  const genreArchGuide = getGenreArchitectGuide(genre);
+
   const prompt = `Bạn là Trưởng Biên Tập (Chief Editor) chuyên quy hoạch Đại cương truyện dài kỳ (Master Outline) cho một bộ Webnovel Trung Quốc.
 
 Nhiệm vụ của bạn là quy hoạch lộ trình tổng thể cho bộ truyện: "${title}"
 Thể loại: ${genre}
+${genreSetup}${genreArchGuide}
 Độ dài dự kiến: ${totalPlannedChapters} chương
 Tóm tắt ý tưởng gốc (Synopsis): ${synopsis}
 

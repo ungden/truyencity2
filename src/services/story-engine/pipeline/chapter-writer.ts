@@ -33,6 +33,7 @@ import { parseJSON } from '../utils/json-repair';
 import { getStyleByGenre, buildTitleRulesPrompt, GOLDEN_CHAPTER_REQUIREMENTS, ENGAGEMENT_CHECKLIST, getGenreEngagement, getGenreAntiCliche } from '../config';
 import { VN_PRONOUN_GUIDE, SUB_GENRE_RULES, isNonCombatGenre, requiresVndCurrency } from '../templates';
 import { getVoiceAnchor, getArchitectVoiceHint } from '../templates/genre-voice-anchors';
+import { getGenreArchitectGuide } from '../templates/genre-process-blueprints';
 import { getConstraintExtractor } from '../memory/constraint-extractor';
 import { GENRE_CONFIG } from '../../../lib/types/genre-config';
 import { buildStyleContext, getEnhancedStyleBible, CLIFFHANGER_TECHNIQUES } from '../memory/style-bible';
@@ -745,7 +746,10 @@ Trả về JSON ChapterOutline đúng schema phía trên cho CHƯƠNG ${chapterN
   // Architect gets compact voice hint (notes + opening pattern + dopamine pattern only).
   // Full prose anchor goes to Writer where voice matching matters most.
   const architectVoiceHint = genre ? getArchitectVoiceHint(genre) : '';
-  const res = await callGemini(prompt, { ...config, temperature: 0.3, maxTokens: 16384, systemPrompt: ARCHITECT_SYSTEM + VN_PLACE_LOCK + genreSuffix + architectVoiceHint }, { jsonMode: true, tracking: options?.projectId ? { projectId: options.projectId, task: 'architect', chapterNumber } : undefined });
+  // Genre process blueprint — scene types + arc template + quality floor + common failures.
+  // Helps Architect plan scenes using genre-specific scene types instead of generic.
+  const architectGenreGuide = genre ? getGenreArchitectGuide(genre) : '';
+  const res = await callGemini(prompt, { ...config, temperature: 0.3, maxTokens: 16384, systemPrompt: ARCHITECT_SYSTEM + VN_PLACE_LOCK + genreSuffix + architectVoiceHint + architectGenreGuide }, { jsonMode: true, tracking: options?.projectId ? { projectId: options.projectId, task: 'architect', chapterNumber } : undefined });
 
   // Check finishReason for truncation
   if (res.finishReason === 'length' || res.finishReason === 'MAX_TOKENS') {

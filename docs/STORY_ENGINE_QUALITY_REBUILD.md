@@ -439,3 +439,93 @@ File: \`src/services/story-engine/pipeline/context-assembler.ts\`
 Tất cả 4 layer setup + execution giờ đã consistent với bestseller standard. Sau deploy,
 chương 1-3 của novel mới sẽ KHÔNG còn rock-bottom opening, arc_plan briefs sẽ propose
 warm baseline scenes, và voice match anchor của top webnovel.
+
+---
+
+## Phần 8 — v3 Update: Per-Genre Process Blueprints (2026-04-30)
+
+User feedback v3: "research kĩ cho từng genre, cái quan trọng là quy trình viết, set up làm sao để bảo đảm chất lượng và số lượng chương truyện … nhưng vẫn có không gian để AI sáng tạo."
+
+Diagnosis: voice anchors (v1) + outline layer fixes (v2) đã anchor PROSE và STRUCTURE chung,
+nhưng KHÔNG customize per-genre. Each genre có "rules of the game" khác nhau.
+
+### v3 Solution: 16-genre process blueprint module
+
+`src/services/story-engine/templates/genre-process-blueprints.ts` — mỗi genre có:
+
+1. **essence** — one-line genre essence
+2. **setup**: requiredCastRoles (≥4-6), goldenFingerType, phaseFramework, worldRulesFocus, openingPattern
+3. **process**: qualityFloor, quantitySustainability, commonFailures, creativeSpace
+4. **sceneTypes** — 7-8 scene types specific cho genre
+5. **arcTemplate** — 50-150 chapter arc structure
+6. **stakesLadder** — escalation framework
+
+### Per-genre research synthesis
+
+| Genre | Quality Bottleneck | Sustainability (1000ch) | Creative Space |
+|---|---|---|---|
+| tien-hiep | Power inflation 100ch đầu | Cảnh giới progression: Luyện Khí → Trúc Cơ → Kim Đan → Nguyên Anh → ... | Tên đan dược/bí cảnh tự do |
+| kiem-hiep | Battle scenes repetitive | 100ch = 1 đại sự kiện giang hồ | Tên chiêu thức / quán trọ tự do |
+| huyen-huyen | MC ch.50 đã solo cổ tộc | 5-6 cấp bậc thần ma × 2-3 sub-arc | Tên đại đế / cổ tộc tự do |
+| do-thi | Combat drift (gangster ambush) | 5-6 phases business scale | Tên brand / dish / customer tự do |
+| quan-truong | Subtext mất → flatten | 5-6 cấp quan × 3-4 sub-arc | Tên dự án / scandal tự do |
+| lich-su | Slip into modern dialogue | 5-6 cấp quan × 2-3 đời hoàng đế | Tên cải cách / scandal tự do |
+| khoa-huyen | Tech vague theo arc | 5-6 tech tier × 3-4 problem | Tên dự án / lab tự do |
+| vong-du | IRL bị bỏ rơi | 5-6 ranking tier × 3-4 raid + 2 PvP | Tên guild / player / item tự do |
+| dong-nhan | OOC canon characters | Canon arc cycle | Original characters / AU tự do |
+| mat-the | Resource math broken | 5-6 stages × 3-4 community arc | Tên survivor / mutation tự do |
+| linh-di | Jumpscare cliché thay atmosphere | 5-6 supernatural tier × 4-5 case | Tên ma / case / pháp khí tự do |
+| di-gioi | MC instant master | Scope ladder × tech tier ladder | Tên local cities / factions tự do |
+| ngon-tinh | Tổng tài lạnh lùng cliché | Career arc parallel relationship | Tên brand / cafe / friend tự do |
+| quy-tac-quai-dam | Rule arbitrary → unfair | 5-6 phó bản tier × 3-4 instance | Rule cụ thể từng phó bản tự do |
+| ngu-thu-tien-hoa | Pet trở thành unit | 5-6 tier × pet count expand | Pet names / lineage tự do |
+| khoai-xuyen | Nhiệm vụ kéo dài >50ch | 25-30 nhiệm vụ × 30-50ch/nv | Từng thế giới setting tự do |
+
+### Layer flow with v3
+
+```
+SPAWN TIME
+└── content-seeder asks AI for world_description
+    └── prompt: blueprint 9 sections + GENRE setup (cast roles + GF type + phase + opening)
+
+GENERATE OUTLINES TIME
+├── master-outline.ts → prompt: GENRE setup + GENRE architect guide
+│   (8-12 arcs × multi-axis × genre arc template + stakes ladder)
+└── story-outline.ts → prompt: GENRE setup
+    (cast roster matches genre cast roles + world rules per genre focus)
+
+WRITE TIME
+├── arc_plan → GENRE architect guide + golden chapter rules (arc 1)
+│   (scene types from genre-specific list + arc template + quality floor)
+├── architect → GENRE architect guide + voice anchor compact
+└── writer → voice anchor full (per-genre prose voice)
+```
+
+### v3 Files Changed
+
+- NEW: `templates/genre-process-blueprints.ts` (16 genres × 50-line blueprint each)
+- M: `seed-blueprint.ts` (buildSeedBlueprintInstructions(genre))
+- M: `pipeline/master-outline.ts` (inject genre setup + architect guide)
+- M: `pipeline/story-outline.ts` (inject genre setup)
+- M: `pipeline/context-assembler.ts` (inject genre architect guide vào arc_plan)
+- M: `pipeline/chapter-writer.ts` (inject genre architect guide vào Architect)
+- M: `services/content-seeder/index.ts` (use builder + pass genre)
+
+### Impact summary (v1 + v2 + v3)
+
+| Layer | v0 | v1 voice | v2 outline | v3 per-genre |
+|---|---|---|---|---|
+| world_description | Vague 200 từ | 9-section blueprint | — | + per-genre cast/GF/phase |
+| master_outline | 4×1-axis | — | 8-12×6-axis | + per-genre arc template |
+| story_outline | premise+plot | — | + cast/rules/tone | + per-genre cast roles |
+| arc_plan | generic | — | + warm-baseline | + per-genre scene types |
+| architect | generic | + voice hint | — | + per-genre guide |
+| writer | generic | + voice full | — | — |
+
+Mỗi genre giờ có "rules of the game" riêng từ seed → outline → arc plan → chapter write.
+Creative space được preserve (tên brand/dish/cụ thể) nhưng structural decisions (cast roles,
+phase progression, scene types, quality floor, common failures) đều genre-locked.
+
+---
+
+**Last Updated v3**: 2026-04-30 (per-genre process blueprints shipped)
