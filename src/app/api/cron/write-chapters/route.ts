@@ -63,11 +63,14 @@ const OVERLOAD_INIT_PREP_CAP = clamp(parseIntEnv('WRITE_CHAPTERS_OVERLOAD_INIT_P
 const OVERLOAD_INIT_WRITE_CAP = clamp(parseIntEnv('WRITE_CHAPTERS_OVERLOAD_INIT_WRITE_CAP', 6), 0, 100);
 
 // BURST WINDOW: target time to finish all daily chapters from start of VN day.
-// 240 min (4h) for 20/day → 12 min/chapter cadence. Fits cron 5-min tick comfortably.
+// 2026-04-30: dropped 1440 → 120 (2h burst). With 10 novels × 20 ch/day = 200 ch and
+// cron tick every 5 min processing all 10 novels in parallel (concurrency 20), 200 chapters
+// burst out in ~1h40m. Cadence floor 3 min means each novel schedules its next chapter 3 min
+// after success — cron picks up on the very next tick.
 // Scaling guidance:
-//   - 50/day: keep 240 min → cadence 5 min (need cron 3-min interval for safety)
-//   - 100/day: expand to 480 min (8h) → cadence 5 min, OR keep 240 min + cron 2-min
-const ACTIVE_WINDOW_MINUTES = clamp(parseIntEnv('WRITE_CHAPTERS_ACTIVE_WINDOW_MINUTES', 1440), 60, 1440);
+//   - 20-30 active novels: keep 120 min default
+//   - 100+ active novels: bump to 240-480 min if cron concurrency saturates
+const ACTIVE_WINDOW_MINUTES = clamp(parseIntEnv('WRITE_CHAPTERS_ACTIVE_WINDOW_MINUTES', 120), 60, 1440);
 
 // SAFETY: circuit breaker + per-project daily cost cap.
 // Without these, a seed landmine that fails every attempt burns ~288 retries/day silently.
