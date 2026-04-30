@@ -8,7 +8,27 @@
 import { getSupabase } from '../utils/supabase';
 import { callGemini } from '../utils/gemini';
 import { parseJSON } from '../utils/json-repair';
-import { GOLDEN_CHAPTER_REQUIREMENTS, UNIVERSAL_ANTI_SEEDS } from '../templates';
+import { GOLDEN_CHAPTER_REQUIREMENTS, UNIVERSAL_ANTI_SEEDS, SUB_GENRE_RULES } from '../templates';
+
+/**
+ * P3.3: Validate sub_genres keys against known SUB_GENRE_RULES.
+ * Unknown keys (typos, deprecated tags) get logged + dropped so they don't
+ * silently fall through. Returns the filtered list.
+ */
+function validateSubGenreKeys(rawKeys: string[], projectId: string): string[] {
+  if (!rawKeys || rawKeys.length === 0) return [];
+  const known = Object.keys(SUB_GENRE_RULES);
+  const valid: string[] = [];
+  const unknown: string[] = [];
+  for (const k of rawKeys) {
+    if (known.includes(k)) valid.push(k);
+    else unknown.push(k);
+  }
+  if (unknown.length > 0) {
+    console.warn(`[context-assembler] project ${projectId.slice(0, 8)} has unknown sub_genres: ${unknown.join(', ')}. Known keys: ${known.join(', ')}. Typos? Dropping unknown keys.`);
+  }
+  return valid;
+}
 import { getArchitectVoiceHint } from '../templates/genre-voice-anchors';
 import { getGenreArchitectGuide } from '../templates/genre-process-blueprints';
 
@@ -264,7 +284,7 @@ export async function loadContext(
     storyOutline: storyOutline || undefined,
     worldDescription: worldDescription || undefined,
     // Modern narrative metadata (migration 0149)
-    subGenres: (projectMeta?.sub_genres || []) as ContextPayload['subGenres'],
+    subGenres: validateSubGenreKeys((projectMeta?.sub_genres || []) as string[], projectId),
     mcArchetype: projectMeta?.mc_archetype as ContextPayload['mcArchetype'],
     antiTropes: (projectMeta?.anti_tropes || []) as ContextPayload['antiTropes'],
     styleDirectives: (projectMeta?.style_directives || undefined) as ContextPayload['styleDirectives'],

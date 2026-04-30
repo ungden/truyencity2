@@ -2436,7 +2436,15 @@ const COMBAT_PATTERN_TYPES: DopamineType[] = [
 
 // Non-combat genres: do-thi (urban), ngon-tinh (romance), quan-truong (office politics)
 // — these should NEVER receive combat-based dopamine unless arc plan explicitly requires.
-const NON_COMBAT_GENRES: GenreType[] = ['do-thi', 'ngon-tinh', 'quan-truong', 'quy-tac-quai-dam'];
+// Single source of truth for genre predicates. P3 alignment 2026-04-30:
+// previously NON_COMBAT_GENRES + PROACTIVE_GENRES were defined separately
+// across templates.ts + master-outline.ts and risked drift. Now consolidated.
+export const NON_COMBAT_GENRES: GenreType[] = ['do-thi', 'ngon-tinh', 'quan-truong', 'quy-tac-quai-dam'];
+export const PROACTIVE_GENRES: GenreType[] = ['do-thi', 'quan-truong', 'ngon-tinh'];
+
+export function isProactiveGenre(genre: GenreType): boolean {
+  return PROACTIVE_GENRES.includes(genre);
+}
 
 export function isNonCombatGenre(genre: GenreType): boolean {
   return NON_COMBAT_GENRES.includes(genre);

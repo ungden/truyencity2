@@ -248,8 +248,9 @@ export interface ContextPayload {
   recentBeatHistory?: string;
 
   // ── Modern narrative metadata (from ai_story_projects, migration 0149) ──
-  /** Secondary genres for genre blending (e.g., do-thi + trong-sinh). Engine merges conventions. */
-  subGenres?: GenreType[];
+  /** Sub-genre tag keys (NOT GenreType — these are SUB_GENRE_RULES keys like 'trong-sinh',
+   *  'cau-dao-truong-sinh', 'mo-phong'). Validated against SUB_GENRE_RULES at load. */
+  subGenres?: string[];
   /** MC archetype — overrides default power-fantasy framing */
   mcArchetype?: MCArchetype;
   /** Anti-trope flags — engine injects explicit prohibitions */
