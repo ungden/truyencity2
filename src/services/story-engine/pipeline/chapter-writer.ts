@@ -329,10 +329,26 @@ DIALOGUE BEAT STRUCTURE (BẮT BUỘC):
 - CẤM dialogue chain >4 lines liên tiếp không có beat (gây confusing, "bắn dialogue").
 - Dialogue tag variety: KHÔNG chỉ "nói" — dùng action tag thay thế ("Hắn đặt chén trà xuống" + dialogue trên dòng kế).
 
-SENTENCE-LENGTH RHYTHM:
-- Action scenes: mix câu ngắn 3-7 từ + câu dài 15-25 từ ratio ~3:1 (punchy + descriptive).
-- Introspection scenes: lật ngược ratio 1:3 (câu dài chiếm ưu thế, dùng câu ngắn để punctuate).
-- CẤM 5 đoạn liên tiếp có avg sentence length giống nhau (±3 chars) — gây boring rhythm.
+SENTENCE-LENGTH RHYTHM (BEAT-BEAT-BREATH):
+- Pattern chuẩn của top TQ webnovels (詭秘之主, 凡人, 大奉打更人): "2-3 câu NGẮN 4-8 từ (sensory beats) → 1 câu DÀI 25-40 từ (context/interior)" — KHÔNG phải mix random short/long.
+- Mở scene PHẢI bắt đầu bằng beat-beat-breath: 2-3 câu ngắn liên tiếp về cảm giác/hành động cụ thể, RỒI 1 câu dài bối cảnh.
+- VD đúng: "Klein mở mắt. Trần nhà gỗ. Mùi nến tắt còn vương. Anh chậm rãi quay đầu, nhận ra mình đang nằm trong căn phòng xa lạ với bức tường giấy hoa văn đã ngả vàng."
+- VD sai (AI-smooth, bị reader chán): toàn câu 12-18 từ uniform.
+- CẤM mở scene bằng câu 12-20 từ — đó là nhịp AI generic.
+- Action scenes overall: ratio short:long ~3:1. Introspection: 1:3. CẤM 5 đoạn liên tiếp avg sentence length ±3 chars same.
+
+EM-DASH INTERIOR PUNCH (revelation/investigation/face-slap):
+- Khi MC suy luận/nhận ra/quan sát chi tiết, dùng em-dash nội tâm pattern:
+  "[quan sát X] — [suy luận từ X]. [quan sát Y mới] — [suy luận từ Y]."
+- Tối thiểu 2 cặp em-dash liên tiếp tạo nhịp "reader watching MC think real-time".
+- VD: "Vết cắt quá sạch — đao pháp, không phải kiếm. Hung thủ thuận tay trái — vết hằn nghiêng phải. Là người trong nha môn."
+- KHÔNG: "Hắn thấy vết cắt và biết đó là đao. Hắn cũng thấy vết hằn và đoán hung thủ thuận tay trái." (lưới logic, không có nhịp)
+
+ELLIPTICAL EMOTION (CẤM TUYỆT ĐỐI raw emotion-naming trong scene shock/phản bội/face-slap):
+- Top TQ pattern: show 3 physical beats + silence/pause → reader tự infer cảm xúc. KHÔNG nói thẳng.
+- VD đúng: "<MC> nhặt thanh kiếm gãy. Lau máu trên lưỡi. Không nói gì." (3 physical beat + silence — reader cảm giận)
+- VD sai (AI bệnh): "<MC> cảm thấy giận dữ. Hắn không tin nổi mình lại bị chính sư huynh phản bội."
+- CẤM trong scene shock: "cảm thấy [emotion]", "không tin nổi", "trong lòng đau như cắt", "tức giận tột độ", "kinh ngạc tột cùng" — replace bằng physical beats + im lặng.
 
 SHOW-DON'T-TELL RATIO:
 - Tối đa 25% chương là narrative summary (past tense recap).

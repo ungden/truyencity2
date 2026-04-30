@@ -504,6 +504,54 @@ async function prepareInitProject(
     .eq('id', project.id)
     .maybeSingle();
 
+  // Phase 22 self-heal: regen world_description if NULL.
+  // Used by clear-and-reset op: novels reset to {title, genre} only — cron regens setup.
+  // Calls content-seeder-style AI prompt with v3 blueprint to produce 9-section world_description.
+  if (!projRow?.world_description || projRow.world_description.trim().length === 0) {
+    try {
+      const { callGemini } = await import('@/services/story-engine/utils/gemini');
+      const { buildSeedBlueprintInstructions } = await import('@/services/story-engine/seed-blueprint');
+      const { GENRE_CONFIG } = await import('@/lib/types/genre-config');
+      const genreConfig = (GENRE_CONFIG as unknown as Record<string, { label?: string }>)[genre] || {};
+      const genreLabel = genreConfig.label || genre;
+      const blueprintInstructions = buildSeedBlueprintInstructions(genre);
+
+      const prompt = `Bạn là tác giả webnovel chuyên nghiệp. Tạo lại world_description (setup truyện) cho tiểu thuyết hiện có.
+
+THÔNG TIN ĐÃ CÓ (giữ nguyên):
+- Tên truyện: "${novel.title}"
+- Thể loại: ${genreLabel} (${genre})
+- Nhân vật chính: ${protagonistName}
+
+${blueprintInstructions}
+
+Trả về JSON:
+{"worldDescription":"<world_description 800-1500 từ theo blueprint 9-section ở trên>"}
+
+QUY TẮC:
+- Phải tuân thủ blueprint 9-section CHẶT CHẼ — output thiếu section sẽ bị reject.
+- Cast roster ≥4 named, antagonists ≥2 named, phase roadmap 4 phase.
+- KHÔNG dùng tên/concept của truyện nổi tiếng có thật.`;
+
+      const res = await callGemini(prompt, {
+        model: 'deepseek-v4-flash',
+        temperature: 0.7,
+        maxTokens: 8192,
+        systemPrompt: 'Bạn là Worldbuilder chuyên nghiệp. CHỈ trả về JSON hợp lệ với field worldDescription.',
+      }, { jsonMode: true, tracking: { projectId: project.id, task: 'world_description_regen' } });
+
+      const parsed = JSON.parse(res.content);
+      const newWorldDesc = (parsed.worldDescription || '').trim();
+      if (newWorldDesc && newWorldDesc.length >= 500) {
+        await supabase.from('ai_story_projects').update({ world_description: newWorldDesc }).eq('id', project.id);
+        // Refresh local copy so master/story regen use it
+        projRow = { ...projRow, world_description: newWorldDesc, story_outline: projRow?.story_outline ?? null, story_bible: projRow?.story_bible ?? null, master_outline: projRow?.master_outline ?? null };
+      }
+    } catch (e) {
+      console.warn(`[init-prep] world_description regen failed for ${project.id}:`, e instanceof Error ? e.message : String(e));
+    }
+  }
+
   // Phase 23 fix: regen master_outline + story_outline IN PARALLEL if NULL.
   // Sequential calls = 60-180s; parallel = 60-90s, fits within 250s timeout.
   if (!projRow?.master_outline || !projRow?.story_outline) {
