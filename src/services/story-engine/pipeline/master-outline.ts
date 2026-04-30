@@ -31,7 +31,8 @@ export interface MasterOutline {
 
 // Genre-aware framing for master outline. Urban/business genres use proactive
 // goal-driven framing (achievement, market scale) instead of villain-first.
-const PROACTIVE_GENRES: GenreType[] = ['do-thi', 'quan-truong', 'ngon-tinh'];
+// P3 alignment: imported from templates.ts (single source of truth).
+import { PROACTIVE_GENRES, isProactiveGenre } from '../templates';
 
 // Combat-leaning vocabulary that LEAKS into non-combat genres — flag and sanitize.
 const COMBAT_LEAK_PATTERNS = [
@@ -50,7 +51,7 @@ const POWER_LEAK_PATTERNS = [
  * Returns list of issues (empty = clean).
  */
 function validateMasterOutlineForGenre(outline: MasterOutline, genre: GenreType): string[] {
-  if (!PROACTIVE_GENRES.includes(genre)) return []; // combat genres can have these
+  if (!isProactiveGenre(genre)) return []; // combat genres can have these
 
   const issues: string[] = [];
   const allText = JSON.stringify(outline).toLowerCase();
@@ -108,7 +109,7 @@ export async function generateMasterOutline(
   totalPlannedChapters: number,
   config: GeminiConfig
 ): Promise<MasterOutline | null> {
-  const isProactive = PROACTIVE_GENRES.includes(genre);
+  const isProactive = isProactiveGenre(genre);
 
   const goalGuidance = isProactive
     ? `MỤC TIÊU TỐI THƯỢỢNG cho thể loại proactive (do-thi/kinh-doanh/quan-truong/ngon-tinh): tập trung vào MILESTONE/ACHIEVEMENT của MC (xây đế chế kinh doanh đa quốc gia, leo lên đỉnh chính trường, đạt được người yêu trọn vẹn). KHÔNG ép define "kẻ thù cuối cùng" — đối thủ chỉ là COMPETITOR phản ứng theo từng giai đoạn, KHÔNG phải antagonist xuyên suốt.`
