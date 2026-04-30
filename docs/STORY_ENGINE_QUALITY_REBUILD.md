@@ -353,6 +353,89 @@ Nếu cần expand research/genre sau này, đây là reading list:
 
 ---
 
-**Last Updated**: 2026-04-30
-**Status**: v1 shipped — voice anchors + seed blueprint live in production
+**Last Updated**: 2026-04-30 (v2 update — outline layer fixes)
+**Status**: v2 shipped — voice anchors + seed blueprint + outline-layer fixes live
 **Next action**: monitor blueprint pass rate + chapter quality_metrics over 7 days
+
+---
+
+## Phần 7 — v2 Update: Outline Layer Fixes (2026-04-30)
+
+Diagnosis sau khi v1 ship phát hiện 3 bugs còn lại ở outline layer:
+
+### Bug 1: master_outline arcs quá rộng
+
+Cũ: 4 arcs × 100-300 chương, prose summary 1-paragraph.
+
+Hậu quả: arc spans quá rộng → nhịp arc mất, không có pacing rõ. Bestseller modern chia
+arc 50-100 chương với multi-axis description.
+
+**Fix**:
+- Bumped arc count → 8-12 arcs × 50-100 chương
+- Multi-axis description (6 axes per arc):
+  - theme (thematic register)
+  - mood (warm-buildup / tense-conflict / triumphant / etc.)
+  - biggestSetpiece (cinematic centerpiece scene)
+  - characterArcBeat (internal change, NOT skill upgrade)
+  - worldExpansion (new region/faction unlocked)
+  - pacingTarget (fast-action / balanced / introspective-slow / climax-dense)
+- maxTokens 8K → 16K to fit expanded schema
+
+File: \`src/services/story-engine/pipeline/master-outline.ts\`
+
+### Bug 2: story_outline thiếu cast / world_rules / tone flags
+
+Cũ: \`{ premise, themes, mainConflict, protagonist, majorPlotPoints }\`. Architect không có cast roster → invent ad-hoc → drift.
+
+**Fix**: extracted into shared module \`pipeline/story-outline.ts\` with new fields:
+- \`castRoster\` (≥4 named, mỗi nhân vật có role + relationToMC + introduceArc + archeType)
+- \`worldRules\` (≥4 concrete rules — Constraint Extractor index từ đây)
+- \`toneFlags\` ({ proactiveRatio, comedyDensity, pacingTarget })
+- \`antiTropes\` (≥3 concrete bans cho genre)
+
+Both call sites (orchestrator.ts S1 self-heal + cron init-prep) now use the shared
+\`generateStoryOutline()\` — eliminates the duplicated bare-bones prompt.
+
+File: \`src/services/story-engine/pipeline/story-outline.ts\` (NEW)
+
+### Bug 3: arc_plan ch.1-3 propose rock-bottom opening
+
+Cũ: \`generateArcPlan()\` prompt KHÔNG inject GOLDEN_CHAPTER_REQUIREMENTS hay
+UNIVERSAL_ANTI_SEEDS. Result: arc_plan briefs cho chương 1 contain "Chủ nhà giục trả tiền,
+MC bế tắc" — vi phạm warm-baseline rule mà WRITER_SYSTEM bắt phải tuân.
+
+Architect chương 1 sau đó phải chọn: (a) follow arc_plan → vi phạm warm-baseline, (b) override
+arc_plan → drift sang scene khác. Cả 2 đều dở.
+
+**Fix**: inject 4 blocks vào generateArcPlan prompt khi \`arcNumber === 1\`:
+- GOLDEN_CHAPTER_REQUIREMENTS.chapter1/chapter2/chapter3 (mustHave + avoid)
+- UNIVERSAL_ANTI_SEEDS (12 most critical bans)
+- getArchitectVoiceHint(genre) (compact voice notes + opening pattern + dopamine pattern)
+- Hard rule: "CẤM TUYỆT ĐỐI brief mở chương 1 với MC nghèo đói / chủ nhà giục / bế tắc / tự tử"
+
+File: \`src/services/story-engine/pipeline/context-assembler.ts\`
+
+### v2 Files Changed
+
+| File | Change |
+|---|---|
+| \`pipeline/master-outline.ts\` | Multi-axis arcs (6 axes) + 8-12 arc count |
+| \`pipeline/story-outline.ts\` | NEW shared module with cast/rules/tone/anti-tropes |
+| \`pipeline/orchestrator.ts\` | Use shared generateStoryOutline (was inline) |
+| \`api/cron/write-chapters/route.ts\` | Use shared generateStoryOutline (was inline) |
+| \`pipeline/context-assembler.ts\` | Inject golden-chapter rules + anti-seeds into arc_plan ch.1 |
+
+### Impact summary (v1 + v2 combined)
+
+| Layer | Before | After v1 | After v2 |
+|---|---|---|---|
+| world_description | 120-220 từ vague | 9-section blueprint, validate | (no further change) |
+| master_outline | 4 arcs × 100-300 ch, 1-axis | (no change) | 8-12 arcs × 50-100 ch, 6-axis |
+| story_outline | premise + plot points | (no change) | + cast + world_rules + tone + anti-tropes |
+| arc_plan ch.1-3 | rock-bottom OK | (no change) | warm-baseline ENFORCED |
+| writer voice | rule-only | sample-anchored per genre | (no change) |
+| architect voice | rule-only | compact hint per genre | (no change) |
+
+Tất cả 4 layer setup + execution giờ đã consistent với bestseller standard. Sau deploy,
+chương 1-3 của novel mới sẽ KHÔNG còn rock-bottom opening, arc_plan briefs sẽ propose
+warm baseline scenes, và voice match anchor của top webnovel.

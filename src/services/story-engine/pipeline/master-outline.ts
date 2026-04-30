@@ -13,6 +13,18 @@ export interface MasterOutline {
     endChapter: number;
     description: string;
     keyMilestone: string;
+    /** Multi-axis: thematic register driving the arc — vd "khám phá", "đối kháng", "trưởng thành", "phục thù". */
+    theme?: string;
+    /** Multi-axis: dominant mood of the arc — vd "warm-buildup", "tense-conflict", "tragic", "triumphant", "melancholic". */
+    mood?: string;
+    /** Biggest setpiece of the arc (1-2 sentences): the cinematic centerpiece scene readers will remember. */
+    biggestSetpiece?: string;
+    /** What does MC change about themselves during this arc — internal arc beat. */
+    characterArcBeat?: string;
+    /** What new region/faction/world layer is revealed or unlocked in this arc. */
+    worldExpansion?: string;
+    /** Pacing target — vd "fast-action", "balanced", "introspective-slow", "climax-dense". */
+    pacingTarget?: string;
   }>;
 }
 
@@ -126,7 +138,16 @@ Tóm tắt ý tưởng gốc (Synopsis): ${synopsis}
 
 ${goalGuidance}
 
-Hãy lập ra Master Outline bao gồm mục tiêu tối thượng, Cột mốc tối thượng, Lộ trình di chuyển (Bản đồ) và chia nhỏ thành các Đại Cốt Truyện (Major Arcs) từ chương 1 đến chương ${totalPlannedChapters}.
+Hãy lập ra Master Outline bao gồm mục tiêu tối thượng, Cột mốc tối thượng, Lộ trình di chuyển (Bản đồ) và chia nhỏ thành 8-12 Đại Cốt Truyện (Major Arcs), mỗi arc 50-100 chương, từ chương 1 đến chương ${totalPlannedChapters}.
+
+CHẤT LƯỢNG ĐẠI THẦN — MULTI-AXIS ARC DESCRIPTION:
+Mỗi arc PHẢI mô tả theo 6 trục, KHÔNG được summary 1 paragraph chung:
+1. theme: Thematic register dẫn dắt arc — vd "khám phá", "đối kháng đầu tiên", "phản phục thù", "trưởng thành cảm xúc", "thử thách niềm tin", "tái tạo".
+2. mood: Sắc thái chủ đạo — vd "warm-buildup", "tense-conflict", "tragic-loss", "triumphant", "melancholic", "comedic-relief".
+3. biggestSetpiece: SCENE ĐINH 1-2 câu — cinematic centerpiece reader sẽ nhớ (KHÔNG generic "MC chiến thắng" — phải concrete như "MC ký hợp đồng 100 tỷ trước mặt 50 đối tác trong khi đối thủ đập bàn bỏ về").
+4. characterArcBeat: MC thay đổi gì BÊN TRONG trong arc — internal arc (vd "từ tự ti chuyển sang chủ động lãnh đạo team", "học chấp nhận quá khứ"). KHÔNG chỉ skill upgrade.
+5. worldExpansion: Vùng/thế lực/tầng thế giới mới được mở ra trong arc (vd "Quận Phú Mỹ Hưng — chuỗi nhà hàng cao cấp", "Hội đồng Quảng cáo Đại Nam — rào cản pháp lý").
+6. pacingTarget: Nhịp arc — "fast-action" (climax dense), "balanced" (default), "introspective-slow" (character-focused), "buildup" (early arc), "climax-dense" (final arc).
 
 Trả về ĐÚNG định dạng JSON sau:
 {
@@ -137,26 +158,35 @@ Trả về ĐÚNG định dạng JSON sau:
     {
       "arcName": "Tên Arc lớn (VD: Khởi nghiệp tại quê nhà / Quật khởi tại gia tộc)",
       "startChapter": 1,
-      "endChapter": 100,
-      "description": "Nội dung chính của Arc này",
-      "keyMilestone": ${milestoneExample}
+      "endChapter": 80,
+      "description": "Nội dung chính của Arc 100-150 từ — KHÔNG chỉ tóm tắt mà concrete events: ai làm gì, gặp ai, đạt được gì.",
+      "keyMilestone": ${milestoneExample},
+      "theme": "khám phá / đối kháng / trưởng thành / etc.",
+      "mood": "warm-buildup / tense-conflict / etc.",
+      "biggestSetpiece": "SCENE đinh cụ thể, 1-2 câu cinematic.",
+      "characterArcBeat": "MC thay đổi gì BÊN TRONG.",
+      "worldExpansion": "Vùng/thế lực mới được mở ra.",
+      "pacingTarget": "fast-action / balanced / introspective-slow / buildup / climax-dense"
     }
   ]
 }
 
 Quy tắc:
-1. Độ dài mỗi Arc từ 50-200 chương tùy tổng số chương. Cộng dồn endChapter của Arc cuối cùng phải bằng ${totalPlannedChapters}.
+1. SỐ ARC: 8-12 arc cho ${totalPlannedChapters} chương (vd 1000ch → 10 arc × 100ch hoặc 12 arc × 80ch). Cộng dồn endChapter của Arc cuối cùng phải bằng ${totalPlannedChapters}. KHÔNG được tạo arc 200-300 chương — bestseller modern chia arc 50-100 ch để mỗi arc có pacing rõ.
 2. Lộ trình bản đồ (worldMapProgression) phải tương ứng với sự tiến cấp của MC.
-3. Không lan man, tập trung vào plot chính.${proactiveRule}`;
+3. Không lan man, tập trung vào plot chính.
+4. ARC EARLY (1-3): warm-buildup hoặc balanced mood — KHÔNG tragic/loss làm mood mở chính. Reader cần engagement trước khi tin loss.
+5. ARC FINAL: climax-dense pacing, mood triumphant hoặc bittersweet-final.
+6. character_arc_beat của 8-12 arc PHẢI form 1 đường cong character development chính thống, KHÔNG random emotional state mỗi arc.${proactiveRule}`;
 
   try {
     const res = await callGemini(prompt, {
       ...config,
       temperature: 0.7,
-      // Phase 23 fix: bumped 2048 → 8192. With 5-arc majorArcs + worldMapProgression +
-      // mainPlotline + finalBossOrGoal, JSON output exceeded 2048 tokens → truncated →
-      // parseJSON failed → master_outline never saved. Pro tier handles 8K easily.
-      maxTokens: 8192,
+      // Phase 23 fix: bumped 2048 → 8192. 2026-04-30 multi-axis upgrade: bumped
+      // to 16384 to fit 8-12 arcs × 6 axes (theme/mood/setpiece/charArcBeat/
+      // worldExpansion/pacingTarget) without truncation. Pro tier handles 16K easily.
+      maxTokens: 16384,
       systemPrompt: "Bạn là Master Architect chuyên lập Đại cương tổng thể cho tiểu thuyết mạng.",
     }, { jsonMode: true, tracking: { projectId, task: 'master_outline' } });
 
