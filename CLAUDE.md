@@ -733,7 +733,7 @@ When working with the story engine:
 
 ---
 
-**Last Updated**: 2026-04-28
+**Last Updated**: 2026-04-30
 **All 5 quality phases complete** — Phases 1-5 shipped to production
 **Phase 10 complete** — 6 missing genres + ratings RPC migration
 **Phases 11-16 complete** — Monetization, mobile features, SEO, analytics, infra hardening, ad integration audit fix
@@ -741,6 +741,86 @@ When working with the story engine:
 **Phase 18 complete** — SePay web payment integration (bank transfer + VietQR)
 **Phase 19 complete** — Sảng Văn pacing overhaul (warm baseline, dopamine cadence, kìm-nén detection) + chapter split + mobile v1.0.5
 **Phase 20A complete** — Genre architecture expansion: 3 new top-level genres + 12 new topics + 5 new SUB_GENRE_RULES + disable_chapter_split flag
+**Phase 21-22 complete (2026-04-30)** — Story Engine quality rebuild — see [docs/story-engine/](docs/story-engine/README.md) hub:
+  - **v1**: voice anchors per genre + 9-section seed blueprint
+  - **v2**: outline layer fixes (8-12 arcs × 6-axis, cast/rules/tone, warm-baseline arc 1)
+  - **v3**: per-genre process blueprints (16 genres × setup/process/scenes/arc)
+  - **wave 1 P1-P5**: type system enforcement + state defenses + branching alignment + hardening + docs
+  - **wave 2 P6-P7**: DeepSeek empty content guard + lock duration vs timeout + critical missing index
+  - **V1+V4 verification**: quality_trend cron + supreme_goals dashboard at `/admin/supreme-goals`
+  - 10 novel reset + spawn fresh với pipeline mới (đa genre: tien-hiep/huyen-huyen/do-thi/kiem-hiep/linh-di/lich-su/khoa-huyen/vong-du/mat-the/dong-nhan)
+
+## Phase 21-22 Details (2026-04-30) — Story Engine Quality Rebuild + Verification
+
+User feedback: "phải thực sự nghiêm túc trau chuốt toàn bộ logic dự án đi chứ cứ lâu lâu lại phát sinh bug thì bao giờ mới xong" + "bạn có nhớ mục tiêu tối thượng của chúng ta không? Hiện nay hệ thống có đạt được mục tiêu đó không"
+
+### Wave 1 (P1-P5) — bug-class elimination
+
+| Bug class | Defense layer |
+|---|---|
+| Forget genre Record entry | P1 compile-time + P1 jest test |
+| Voice anchor literal name leak | P1 lint + P2.2 Critic check + P4.2 canary + P4.3 audit |
+| MC name flip across chapters | P2.1 sync verify + P2.2 Critic check + P2.4 synopsis lock + P4.2 canary |
+| Cast invent / Khánh→Khang drift | P2.3 castRoster injection |
+| Silent post-write task failure | P2.5 failed_memory_tasks persistence |
+| Branching list drift | P3.1 single source of truth |
+| Sub-genre typo silent fall-through | P3.3 validateSubGenreKeys |
+| Bad seed shipped | P4.1 blueprint hard-reject |
+| Drift not detected for days | P4.2 canary + P4.3 weekly regression audit |
+
+### Wave 2 (P6-P7) — failure mode fixes from systematic audit
+
+- **P6.1**: DeepSeek `content || reasoning_content || ''` could return empty silently → empty chapter saved. Now throws explicit error.
+- **P6.3**: 90s distributed lock < 400s PROJECT_TIMEOUT_MS → race possible. Lock now = `PROJECT_TIMEOUT_MS + 60s buffer (~7.7min)`.
+- **P7.1**: missing partial index on `ai_story_projects(status, current_chapter, updated_at)` — full table scan at 1000+ projects. Migration 0159 applied.
+
+### V1+V4 — supreme goals verification
+
+- **V1**: `quality-trend-cron` daily 00:30 VN → `quality_trends` table (early avg vs recent avg drift + alert_level ok/watch/warn/critical)
+- **V4**: `/admin/supreme-goals` dashboard with 5 traffic lights per novel (coherence / character consist / directional / ending / uniform quality) + aggregate summary
+- **V2 + V3 deferred**: deeper regression checks + bestseller calibration — when measurement data shows specific gaps
+
+### Verification harness (every PR)
+
+```bash
+npm run typecheck          # TS strict
+npm run lint:prompts       # placeholder leak audit
+npm test -- genre-coverage # 11/11 pass
+
+# Production smoke
+POST /api/admin/operations { action: 'regression_audit' }
+POST /api/admin/operations { action: 'supreme_goals' }
+POST /api/admin/operations { action: 'stuck_novels' }
+```
+
+### Status mục tiêu tối thượng (CLAUDE.md Supreme Goals)
+
+| Goal | Defense | Verified? |
+|---|---|---|
+| 1. Coherence ch.1→cuối | Bridge, synopsis, arc plan, foreshadowing, plot threads, continuity guardian, critic | ❌ chưa novel ≥ch.100 với pipeline mới |
+| 2. Character consistency | character_states, detectMcNameFlip, dead_character, auto-revise | ⚠️ MC defense complete; supporting chars chưa test scale |
+| 3. Directional plot | 8-12 arcs × 6-axis, arc plans, plot threads tracker | ❌ chưa verify escalation curve |
+| 4. Natural ending 1000-2000ch | Soft ending logic 4-phase | ❌ chưa novel nào reach ending |
+| 5. Uniform quality ch.8 vs ch.800 | Voice fingerprints, quality_metrics, V1 trend cron | ❌ HARDEST — needs ≥200ch novel |
+
+→ **Defense ≠ achievement**. Wave 3 ngày tới khi 10 novels reach ch.50+ sẽ có data đầu tiên qua `/admin/supreme-goals` dashboard.
+
+### Files added/changed (cumulative wave 1 + wave 2 + verification)
+
+NEW:
+- `scripts/audit-prompts-for-leaks.ts` (P1)
+- `src/__tests__/story-engine/genre-coverage.test.ts` (P1)
+- `docs/story-engine/PLACEHOLDER_CONVENTION.md` (P5)
+- `src/services/story-engine/templates/genre-voice-anchors.ts` (v1)
+- `src/services/story-engine/templates/genre-process-blueprints.ts` (v3)
+- `src/services/story-engine/seed-blueprint.ts` (v1)
+- `src/services/story-engine/pipeline/story-outline.ts` (v2 — extracted from inline duplicates)
+- `src/app/admin/stuck-novels/page.tsx` (P4)
+- `src/app/admin/supreme-goals/page.tsx` (V4)
+- `src/app/api/cron/quality-trend/route.ts` (V1)
+- 5 migrations: 0156 cost_tracking_metadata, 0157 failed_memory_tasks, 0158 pause_reason, 0159 ai_story_projects index, 0160 quality_trends
+
+PRs: #14 #15 #16 #17 #18 #19 #20 #21 #22 #23 #24 #25 #26 #27 (14 PRs in this rebuild session, all merged to main).
 
 ## Phase 20A Details (2026-04-28) — Genre Architecture Expansion
 
