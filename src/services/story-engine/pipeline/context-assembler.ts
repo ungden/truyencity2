@@ -316,6 +316,37 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
     if (outline.endingVision) outlineParts.push(`Kết cục: ${outline.endingVision}`);
     if (outline.uniqueHooks?.length) outlineParts.push(`Hooks: ${outline.uniqueHooks.join(', ')}`);
 
+    // P2.3: Cast roster — Architect/Writer DÙNG TÊN NÀY thay vì invent. Without this,
+    // Architect tự sáng tạo supporting characters mỗi chương (Khánh ch.1 → Khang ch.3).
+    const castRoster = (outline as { castRoster?: Array<{ name?: string; role?: string; relationToMC?: string; introduceArc?: number; archeType?: string }> }).castRoster;
+    if (castRoster && castRoster.length > 0) {
+      outlineParts.push('');
+      outlineParts.push('[CAST ROSTER — DÙNG ĐÚNG TÊN NÀY, KHÔNG INVENT]');
+      for (const c of castRoster) {
+        if (!c.name) continue;
+        const role = c.role || '';
+        const rel = c.relationToMC || '';
+        const arc = c.introduceArc ? ` (xuất hiện từ arc ${c.introduceArc})` : '';
+        const type = c.archeType ? ` [${c.archeType}]` : '';
+        outlineParts.push(`  • ${c.name} — ${role}${rel ? ' / ' + rel : ''}${arc}${type}`);
+      }
+      outlineParts.push('→ KHI cần named NPC trong scene, chọn từ roster trên. CHỈ invent NPC nhỏ (vd "anh shipper", "chị bán cá") khi roster không có vai phù hợp.');
+    }
+
+    // World rules + tone flags + anti-tropes — Architect/Critic dùng để enforce.
+    const worldRules = (outline as { worldRules?: string[] }).worldRules;
+    if (worldRules && worldRules.length > 0) {
+      outlineParts.push('');
+      outlineParts.push('[WORLD RULES — TUÂN THỦ XUYÊN SUỐT]');
+      for (const r of worldRules) outlineParts.push(`  • ${r}`);
+    }
+    const antiTropes = (outline as { antiTropes?: string[] }).antiTropes;
+    if (antiTropes && antiTropes.length > 0) {
+      outlineParts.push('');
+      outlineParts.push('[ANTI-TROPES — CẤM TUYỆT ĐỐI]');
+      for (const t of antiTropes) outlineParts.push(`  ✗ ${t}`);
+    }
+
     // Diagnostic: warn if story_outline yielded only the header (schema-mismatch
     // signature). This was the silent-bug pattern from the 2026-04-29 incident
     // where 2 spawn scripts saved wrong-schema outlines → context-assembler
@@ -834,13 +865,24 @@ export async function generateSynopsis(
     .map(s => `Ch.${s.chapter_number} "${s.title}": ${s.summary}`)
     .join('\n');
 
-  const prompt = `Bạn là biên tập viên truyện ${genre}. Viết TỔNG QUAN CỐT TRUYỆN cập nhật.
+  // P2.4: MC name lock prepended to prompt — prevents synopsis regen drifting MC name
+  // when chapter summaries contain wrong name (e.g. due to upstream Writer bug).
+  // Synopsis is the canonical "what happened" used by future chapter contexts; if
+  // synopsis says "Trần Vũ" instead of "Lê Minh", the drift propagates indefinitely.
+  const mcLock = `[QUY TẮC TUYỆT ĐỐI — MC NAME LOCK]
+Nhân vật chính của truyện này TÊN = "${protagonistName}". KHÔNG dùng bất kỳ tên nào khác để chỉ MC.
+Nếu chapter summaries phía dưới có tên khác (do bug chương trước drift), SỬA về "${protagonistName}" khi viết synopsis.
+Synopsis output PHẢI chứa "${protagonistName}" ít nhất 5 lần và KHÔNG chứa tên khác như nhân vật chính.
+
+`;
+
+  const prompt = `${mcLock}Bạn là biên tập viên truyện ${genre}. Viết TỔNG QUAN CỐT TRUYỆN cập nhật.
 
 ${oldSynopsis ? `Synopsis cũ:\n${oldSynopsis}\n\n` : ''}Các chương mới:\n${summaryText}
 
 Trả về JSON:
 {
-  "synopsis_text": "tổng quan 500-800 từ, bao gồm tất cả sự kiện quan trọng",
+  "synopsis_text": "tổng quan 500-800 từ, bao gồm tất cả sự kiện quan trọng — gọi MC bằng '${protagonistName}'",
   "mc_current_state": "trạng thái hiện tại của ${protagonistName}",
   "active_allies": ["danh sách đồng minh"],
   "active_enemies": ["danh sách kẻ thù"],
@@ -851,6 +893,14 @@ Trả về JSON:
   const parsed = parseJSON<SynopsisAIResponse>(res.content);
   if (!parsed || !parsed.synopsis_text?.trim()) {
     throw new Error(`Synopsis generation failed: JSON parse error — raw: ${res.content.slice(0, 200)}`);
+  }
+
+  // P2.4 verification: synopsis MUST contain the expected MC name. If it doesn't,
+  // the AI ignored the MC lock — likely drift in upstream summaries propagated.
+  // Don't save the bad synopsis; throw to surface the issue + retry on next cron tick.
+  const synopsisText = parsed.synopsis_text;
+  if (!synopsisText.includes(protagonistName)) {
+    throw new Error(`Synopsis missing MC name "${protagonistName}" — possible name drift; not saving. First 200 chars: ${synopsisText.slice(0, 200)}`);
   }
 
   const db = getSupabase();

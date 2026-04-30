@@ -84,6 +84,41 @@ export interface OrchestratorOptions {
   model?: string;
 }
 
+// ── P2.5: Failed task persistence helper ────────────────────────────────────
+//
+// Post-write tasks (synopsis / character states / arc plan / etc.) are non-fatal:
+// failure of one shouldn't block chapter from saving. But silent .catch(() => null)
+// swallow means failures are invisible — engine reads stale state on next chapter.
+// Persist failures to failed_memory_tasks so cron retry routine can pick up + admin
+// UI can surface.
+async function recordTaskFailure(
+  db: ReturnType<typeof getSupabase>,
+  projectId: string,
+  novelId: string | null,
+  chapterNumber: number,
+  taskName: string,
+  error: unknown,
+): Promise<void> {
+  const errorMessage = error instanceof Error ? error.message : String(error);
+  console.warn(`[Orchestrator] Task ${taskName} failed (ch.${chapterNumber}): ${errorMessage}`);
+  try {
+    await db.from('failed_memory_tasks').insert({
+      project_id: projectId,
+      novel_id: novelId,
+      chapter_number: chapterNumber,
+      task_name: taskName,
+      error_message: errorMessage.slice(0, 1000),
+      attempts: 1,
+      status: 'pending',
+      // Retry in ~5 minutes (next cron tick) with exponential backoff for retries.
+      next_retry_at: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+    });
+  } catch (insertErr) {
+    // Last-resort log if even the insert fails — don't recurse / re-throw.
+    console.error(`[Orchestrator] Could not persist task failure to failed_memory_tasks:`, insertErr);
+  }
+}
+
 // ── Public: Write One Chapter ────────────────────────────────────────────────
 
 /**
@@ -166,14 +201,29 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       const loser = currentChapter > 0 ? 'project.main_character' : 'outline.protagonist.name';
       if (currentChapter > 0) {
         // chapters use outlineMC → sync project field to match
-        await db.from('ai_story_projects').update({ main_character: outlineMC }).eq('id', options.projectId);
+        const { error: syncErr } = await db.from('ai_story_projects').update({ main_character: outlineMC }).eq('id', options.projectId);
+        if (syncErr) throw new Error(`MC sync (project.main_character ← outline) failed: ${syncErr.message}`);
       } else {
         // no chapters yet → seed name wins, sync outline
         const newOutline = { ...(storyOutline || {}), protagonist: { ...(storyOutline?.protagonist || {}), name: projectMC } };
-        await db.from('ai_story_projects').update({ story_outline: newOutline as unknown as Record<string, unknown> }).eq('id', options.projectId);
+        const { error: syncErr } = await db.from('ai_story_projects').update({ story_outline: newOutline as unknown as Record<string, unknown> }).eq('id', options.projectId);
+        if (syncErr) throw new Error(`MC sync (story_outline.protagonist.name ← project) failed: ${syncErr.message}`);
+      }
+      // P2.1: HARD-VALIDATE post-sync. Re-fetch and confirm both sides match `winner`.
+      // Without this, silent DB write failures (rare but possible under load / RLS edge
+      // cases) leave mismatch in DB → next cron tick re-syncs, infinite loop possible.
+      const { data: verify } = await db
+        .from('ai_story_projects')
+        .select('main_character,story_outline')
+        .eq('id', options.projectId)
+        .single();
+      const verifyProj = (verify?.main_character || '').trim();
+      const verifyOutline = (verify?.story_outline as { protagonist?: { name?: string } } | null)?.protagonist?.name?.trim() || '';
+      if (verifyProj !== winner || verifyOutline !== winner) {
+        throw new Error(`MC sync verification FAILED: expected "${winner}" on both sides; got project="${verifyProj}", outline="${verifyOutline}". Aborting chapter write to prevent name flip.`);
       }
       resolvedMainCharacter = winner;
-      validationFixes.push(`MC sync: ${loser}="${currentChapter > 0 ? projectMC : outlineMC}" → "${winner}" (ch.${currentChapter} written)`);
+      validationFixes.push(`MC sync: ${loser}="${currentChapter > 0 ? projectMC : outlineMC}" → "${winner}" (ch.${currentChapter} written, verified)`);
     } else if (projectMC) {
       resolvedMainCharacter = projectMC;
     }
@@ -763,19 +813,19 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     // Task 4: Beat detection + recording
     detectAndRecordBeats(
       project.id, nextChapter, arcNumber, result.content,
-    ).catch(e => console.warn('[Orchestrator] Task 4 beat detection failed:', e instanceof Error ? e.message : String(e))),
+    ).catch(e => recordTaskFailure(db, project.id, novel.id, nextChapter, 'task_4_beat_detection', e)),
 
     // Task 5: Rule extraction
     extractRulesFromChapter(
       project.id, nextChapter, result.content,
-    ).catch(e => console.warn('[Orchestrator] Task 5 rule extraction failed:', e instanceof Error ? e.message : String(e))),
+    ).catch(e => recordTaskFailure(db, project.id, novel.id, nextChapter, 'task_5_rule_extraction', e)),
 
     // Task 6: Consistency check — every 3 chapters to reduce AI calls
     // (dead character regex runs every chapter; business logic AI check runs every 3)
     ...(aiWriteCount % 3 === 0 ? [
       checkConsistency(
         project.id, nextChapter, result.content, characters,
-      ).catch(e => console.warn('[Orchestrator] Task 6 consistency check failed:', e instanceof Error ? e.message : String(e))),
+      ).catch(e => recordTaskFailure(db, project.id, novel.id, nextChapter, 'task_6_consistency_check', e)),
     ] : []),
 
     // ── Quality modules post-write (Tasks 7-12, all non-fatal) ──────────
@@ -783,46 +833,46 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     // Task 7: Update foreshadowing status
     updateForeshadowingStatus(
       project.id, nextChapter,
-    ).catch((e) => console.warn(`[Orchestrator] Task 7 foreshadowing status failed:`, e instanceof Error ? e.message : String(e))),
+    ).catch(e => recordTaskFailure(db, project.id, novel.id, nextChapter, 'task_7_foreshadowing_status', e)),
 
     // Task 8: Update character arcs (every 3 chapters to save tokens — arcs evolve slowly)
     ...(aiWriteCount % 3 === 0 ? [
       updateCharacterArcs(
         project.id, nextChapter, characters, geminiConfig, genre, protagonistName,
-      ).catch((e) => console.warn(`[Orchestrator] Task 8 character arcs failed:`, e instanceof Error ? e.message : String(e))),
+      ).catch(e => recordTaskFailure(db, project.id, novel.id, nextChapter, 'task_8_character_arcs', e)),
     ] : []),
 
     // Task 9: Update voice fingerprint (every 10 chapters)
     updateVoiceFingerprint(
       project.id, novel.id, nextChapter, geminiConfig,
-    ).catch((e) => console.warn(`[Orchestrator] Task 9 voice fingerprint failed:`, e instanceof Error ? e.message : String(e))),
+    ).catch(e => recordTaskFailure(db, project.id, novel.id, nextChapter, 'task_9_voice_fingerprint', e)),
 
     // Task 10: Update MC power state (every 3 chapters or on breakthrough) — SKIP for non-combat genres
     ...(['do-thi','ngon-tinh','quan-truong'].includes(genre) ? [] : [
       updateMCPowerState(
         project.id, nextChapter, result.content, protagonistName, genre, geminiConfig,
-      ).catch((e) => console.warn(`[Orchestrator] Task 10 MC power failed:`, e instanceof Error ? e.message : String(e))),
+      ).catch(e => recordTaskFailure(db, project.id, novel.id, nextChapter, 'task_10_mc_power', e)),
     ]),
 
     // Task 11: Update location exploration (every 3 chapters to save tokens)
     ...(aiWriteCount % 3 === 0 ? [
       updateLocationExploration(
         project.id, nextChapter,
-      ).catch((e) => console.warn(`[Orchestrator] Task 11 location exploration failed:`, e instanceof Error ? e.message : String(e))),
+      ).catch(e => recordTaskFailure(db, project.id, novel.id, nextChapter, 'task_11_location_exploration', e)),
     ] : []),
 
     // Task 12: Pre-generate upcoming location bible (every 3 chapters to save tokens)
     ...(aiWriteCount % 3 === 0 ? [
       prepareUpcomingLocation(
         project.id, nextChapter, genre, context.synopsis, context.masterOutline, geminiConfig,
-      ).catch((e) => console.warn(`[Orchestrator] Task 12 upcoming location failed:`, e instanceof Error ? e.message : String(e))),
+      ).catch(e => recordTaskFailure(db, project.id, novel.id, nextChapter, 'task_12_upcoming_location', e)),
     ] : []),
 
     // Task 13: Extract character knowledge (every 2 chapters to save tokens)
     ...(aiWriteCount % 2 === 0 ? [
       extractCharacterKnowledge(
         project.id, nextChapter, result.content, characters, geminiConfig,
-      ).catch((e) => console.warn(`[Orchestrator] Task 13 character knowledge failed:`, e instanceof Error ? e.message : String(e))),
+      ).catch(e => recordTaskFailure(db, project.id, novel.id, nextChapter, 'task_13_character_knowledge', e)),
     ] : []),
 
     // Task 14: Extract relationships (every 3 chapters — new in 0150)
@@ -830,7 +880,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       (async () => {
         const { extractRelationships } = await import('../memory/relationship-tracker');
         return extractRelationships(project.id, nextChapter, result.content, characters, geminiConfig);
-      })().catch((e) => console.warn(`[Orchestrator] Task 14 relationships failed:`, e instanceof Error ? e.message : String(e))),
+      })().catch(e => recordTaskFailure(db, project.id, novel.id, nextChapter, 'task_14_relationships', e)),
     ] : []),
 
     // Task 15: Extract economic ledger (every 3 chapters, only do-thi/quan-truong — new in 0150)
@@ -838,7 +888,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       (async () => {
         const { extractEconomicState } = await import('../memory/economic-ledger');
         return extractEconomicState(project.id, nextChapter, result.content, protagonistName, geminiConfig);
-      })().catch((e) => console.warn(`[Orchestrator] Task 15 economic ledger failed:`, e instanceof Error ? e.message : String(e))),
+      })().catch(e => recordTaskFailure(db, project.id, novel.id, nextChapter, 'task_15_economic_ledger', e)),
     ] : []),
 
     // Task 15b: Record geography timeline (Phase 22 continuity overhaul)
@@ -860,7 +910,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       (async () => {
         const { refreshCharacterBibles } = await import('../memory/character-bible');
         return refreshCharacterBibles(project.id, lastChapterNumber, geminiConfig);
-      })().catch((e) => console.warn(`[Orchestrator] Task 16 character bible refresh failed:`, e instanceof Error ? e.message : String(e))),
+      })().catch(e => recordTaskFailure(db, project.id, novel.id, nextChapter, 'task_16_character_bible_refresh', e)),
     ] : []),
 
     // Task 16b: Record quality metrics (Phase 22 Stage 2 Q8) — runs every chapter.
@@ -916,7 +966,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       (async () => {
         const { generateVolumeSummary } = await import('../memory/volume-summarizer');
         return generateVolumeSummary(project.id, lastChapterNumber, geminiConfig);
-      })().catch((e) => console.warn(`[Orchestrator] Task 17 volume summary failed:`, e instanceof Error ? e.message : String(e))),
+      })().catch(e => recordTaskFailure(db, project.id, novel.id, nextChapter, 'task_17_volume_summary', e)),
     ] : []),
   ]);
 
