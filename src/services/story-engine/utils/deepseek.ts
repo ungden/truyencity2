@@ -130,6 +130,22 @@ export async function callDeepSeek(
       const content = choice?.message?.content || choice?.message?.reasoning_content || '';
       const finishReason = choice?.finish_reason || 'stop';
 
+      // P6.1: explicit empty-content guard. Without this, an empty response (rare but happens
+      // when DeepSeek V4 thinking model emits only reasoning then truncates) returned silently
+      // → caller saves empty chapter to DB. Throw so retry loop or upstream handler kicks in.
+      if (!content || content.trim().length === 0) {
+        // Don't retry on truncation (length cause) — that's a maxTokens issue, not transient.
+        if (finishReason === 'length' || finishReason === 'LENGTH') {
+          throw new Error(`DeepSeek truncation: empty content with finish_reason=${finishReason}. Increase maxTokens.`);
+        }
+        // Otherwise treat as transient and retry
+        if (attempt < RETRY_DELAYS.length) {
+          await new Promise((r) => setTimeout(r, RETRY_DELAYS[attempt]));
+          continue;
+        }
+        throw new Error(`DeepSeek empty content after ${RETRY_DELAYS.length} retries (finish_reason=${finishReason})`);
+      }
+
       const promptTokens = data?.usage?.prompt_tokens || 0;
       const completionTokens = data?.usage?.completion_tokens || 0;
       // DeepSeek reports prompt_cache_hit_tokens for prefix-cached requests.

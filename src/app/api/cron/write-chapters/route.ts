@@ -789,7 +789,11 @@ export async function GET(request: NextRequest) {
     // This prevents concurrent cron invocations from processing the same projects.
     // Each invocation only picks projects whose updated_at is older than 4 minutes,
     // then immediately bumps updated_at to "claim" them.
-    const fourMinutesAgo = new Date(Date.now() - 90 * 1000).toISOString();
+    // P6.3: Lock window must be ≥ PROJECT_TIMEOUT_MS to prevent tick A still writing
+    // while tick B picks the same project up. Cũ = 90s + timeout=400s → race possible.
+    // Mới: PROJECT_TIMEOUT_MS + 60s safety buffer (covers post-write tasks + cleanup).
+    const lockWindowMs = PROJECT_TIMEOUT_MS + 60_000;
+    const lockBoundary = new Date(Date.now() - lockWindowMs).toISOString();
 
     const [activeCountQuery, candidateQuery] = await Promise.all([
       supabase
@@ -806,7 +810,7 @@ export async function GET(request: NextRequest) {
           novels!ai_story_projects_novel_id_fkey (id, title)
         `)
         .eq('status', 'active')
-        .lt('updated_at', fourMinutesAgo)
+        .lt('updated_at', lockBoundary)
         .order('updated_at', { ascending: true })
         .limit(CANDIDATE_POOL_SIZE),
     ]);
@@ -926,7 +930,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Atomic claim: only rows that are still older than fourMinutesAgo are claimed.
+    // Atomic claim: only rows that are still older than lockBoundary are claimed.
     console.log(`[Cron] Step 5: Claiming ${totalProjects} projects (resume=${filteredResumeProjects.length}, init-prep=${filteredInitPrepProjects.length}, init-write=${filteredInitWriteProjects.length})...`);
     const allIds = [...filteredResumeProjects, ...filteredInitPrepProjects, ...filteredInitWriteProjects].map(p => p.id);
     const claimTimestamp = new Date().toISOString();
@@ -938,7 +942,7 @@ export async function GET(request: NextRequest) {
         .from('ai_story_projects')
         .update({ updated_at: claimTimestamp })
         .in('id', batch)
-        .lt('updated_at', fourMinutesAgo)
+        .lt('updated_at', lockBoundary)
         .select('id');
       if (claimError) { console.error(`[Cron] Step 5 claim batch ${i} failed:`, claimError); throw claimError; }
       if (claimedRows) allClaimedIds.push(...claimedRows.map((r: { id: string }) => r.id));
