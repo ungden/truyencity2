@@ -21,6 +21,7 @@ import { AIProviderService } from '../ai-provider';
 import { GENRE_CONFIG } from '@/lib/types/genre-config';
 import { buildSeedBlueprintInstructions, validateSeedStructure } from '@/services/story-engine/seed-blueprint';
 import type { GenreType as StoryGenreType } from '@/services/story-engine/types';
+import { isVnSettingGenre } from '@/services/story-engine/templates';
 
 // ============================================================================
 // CONSTANTS
@@ -1308,8 +1309,9 @@ Mỗi tiểu thuyết cần:
    - Đoạn 3 (40-90 chữ): Câu nhử + closing hook khiến reader muốn đọc.
    - Tên nhân vật chính (giá trị "mainCharacter") PHẢI xuất hiện ÍT NHẤT 2 lần trong description.
    - CẤM TUYỆT ĐỐI dùng các từ kỹ thuật/spec engine: "Bàn Tay Vàng", "MC", "Hệ thống X" (cụm này, "X" là placeholder), "Vòng lặp", "Sảng văn", "BOM", "out-play", "engine", "vả mặt", "khí vận chi tử", "Cấu trúc 4 hồi", "phế vật", "thiên kiêu" (mức quá meta).
-   - TIỀN TỆ Việt Nam: nếu truyện đặt trong bối cảnh Việt Nam (đô thị / quan trường / lịch sử Đại Nam / Đại Việt), DÙNG VND thật: "đồng / nghìn đồng / triệu đồng / tỷ đồng". KHÔNG dùng "nguyên" làm đơn vị tiền, KHÔNG dùng "xu" trừ khi rõ ràng là cổ đại Trung Hoa. Ví dụ đúng: "5 triệu đồng vốn liếng", "đất 200 nghìn đồng/m²".
-   - THÀNH PHỐ HƯ CẤU Việt Nam (parallel-world Đại Nam) lần đầu xuất hiện trong description PHẢI annotate tên thực ngay sau, dùng dấu ngoặc tròn: "Hải Long Đô (tựa TP. Hồ Chí Minh)", "Phượng Đô (tựa Hà Nội)", "Trung Đô (tựa Huế)" / "Cố Đô Trung Đô (tựa Cố Đô Huế)". Annotate 1 lần ở lần đầu nhắc, các lần sau dùng tên fictional.
+${isVnSettingGenre(genre as StoryGenreType) ? `   - TIỀN TỆ Việt Nam: nếu truyện đặt trong bối cảnh Việt Nam (đô thị / quan trường / lịch sử Đại Nam / Đại Việt), DÙNG VND thật: "đồng / nghìn đồng / triệu đồng / tỷ đồng". KHÔNG dùng "nguyên" làm đơn vị tiền, KHÔNG dùng "xu" trừ khi rõ ràng là cổ đại Trung Hoa. Ví dụ đúng: "5 triệu đồng vốn liếng", "đất 200 nghìn đồng/m²".
+   - THÀNH PHỐ HƯ CẤU Việt Nam (parallel-world Đại Nam) lần đầu xuất hiện trong description PHẢI annotate tên thực ngay sau, dùng dấu ngoặc tròn: "Hải Long Đô (tựa TP. Hồ Chí Minh)", "Phượng Đô (tựa Hà Nội)", "Trung Đô (tựa Huế)" / "Cố Đô Trung Đô (tựa Cố Đô Huế)". Annotate 1 lần ở lần đầu nhắc, các lần sau dùng tên fictional.` : `   - THẾ GIỚI KHÁC (genre "${genre}"): truyện này KHÔNG đặt ở Việt Nam. Mô tả thế giới khác hoàn toàn — đại lục/cosmos/dị giới/IP gốc tùy genre. KHÔNG dùng tên thành phố Việt Nam (Hà Nội, Sài Gòn, Phượng Đô, Hải Long Đô) hoặc Đại Nam. Tên địa danh PHẢI fictional / canon từ IP gốc / tên đại lục cổ phong Trung Hoa tu tiên — KHÔNG annotate "tựa Việt Nam".
+   - CURRENCY: dùng đơn vị phù hợp world (linh thạch / đồng vàng / cố vũ tệ / canon currency) — KHÔNG dùng VND.`}
 6. "shortSynopsis": Tóm tắt 2-3 câu (không spoil kết)
 7. "worldDescription": Khối seed blueprint 800-1500 từ theo schema 9-section CỤ THỂ ở phần BLUEPRINT bên dưới (PHẢI tuân thủ — output thiếu section sẽ bị reject + regen)
 8. "${requiredKey || 'required_system'}": Trường BẮT BUỘC cho thể loại này. ${requiredRule} Ví dụ format: ${requiredExample}
@@ -1415,7 +1417,7 @@ CHÚ Ý:
       }
 
       // Parse JSON from response
-      const ideas = this.parseNovelIdeas(response.content, count, requiredKey);
+      const ideas = this.parseNovelIdeas(response.content, count, requiredKey, genre);
       if (ideas.length === 0) {
         throw new Error(`Gemini returned unparseable JSON for ${genre} (expected ${count} novels)`);
       }
@@ -1429,7 +1431,7 @@ CHÚ Ý:
   /**
    * Parse JSON array of novel ideas from Gemini response
    */
-  private parseNovelIdeas(content: string, expectedCount: number, requiredKey?: string): NovelIdea[] {
+  private parseNovelIdeas(content: string, expectedCount: number, requiredKey?: string, genre?: string): NovelIdea[] {
     try {
       // Extract JSON array from response
       const jsonMatch = content.match(/\[[\s\S]*\]/);
@@ -1439,18 +1441,18 @@ CHÚ Ý:
         const repairedMatch = repaired.match(/\[[\s\S]*\]/);
         if (!repairedMatch) return [];
         const parsed = JSON.parse(repairedMatch[0]);
-        return this.validateNovelIdeas(parsed, requiredKey);
+        return this.validateNovelIdeas(parsed, requiredKey, genre);
       }
 
       const parsed = JSON.parse(jsonMatch[0]);
-      return this.validateNovelIdeas(parsed, requiredKey);
+      return this.validateNovelIdeas(parsed, requiredKey, genre);
     } catch (error) {
       console.error('[Seeder] JSON parse error:', error);
       return [];
     }
   }
 
-  private validateNovelIdeas(parsed: unknown, requiredKey?: string): NovelIdea[] {
+  private validateNovelIdeas(parsed: unknown, requiredKey?: string, genre?: string): NovelIdea[] {
     if (!Array.isArray(parsed)) return [];
 
     return parsed
@@ -1476,7 +1478,7 @@ CHÚ Ý:
         // We sanitize instead of rejecting because parsed batches are
         // expensive — better to clean a 90% blurb than throw away.
         const rawDesc = item.description ? String(item.description).trim() : undefined;
-        const sanitizedDesc = rawDesc ? this.sanitizeBlurb(rawDesc, mainCharacter) : undefined;
+        const sanitizedDesc = rawDesc ? this.sanitizeBlurb(rawDesc, mainCharacter, genre as string) : undefined;
 
         return {
           title: String(item.title).trim(),
@@ -1501,7 +1503,9 @@ CHÚ Ý:
    * Đại Nam place names. Validation logic mirrors what the prompt requires —
    * defense-in-depth so a single missed instruction doesn't ship to readers.
    */
-  private sanitizeBlurb(desc: string, mainCharacter: string): string {
+  private sanitizeBlurb(desc: string, mainCharacter: string, genre?: string): string {
+    // Skip VN city annotation for non-VN genres (di-gioi/tien-hiep/etc.)
+    const skipVnAnnotation = genre ? !isVnSettingGenre(genre as StoryGenreType) : false;
     let s = desc;
 
     // 1) Replace engine spec terms with reader-friendly alternatives
@@ -1526,14 +1530,17 @@ CHÚ Ý:
     s = s.replace(/(\d[\d.,]*)\s*nguyên\b/g, '$1 nghìn đồng');
 
     // 3) Annotate fictional Đại Nam cities at first occurrence only.
-    const CITY_ANNOTATIONS: Array<[RegExp, string]> = [
-      [/Hải Long Đô(?!\s*\(.*?Hồ Chí Minh)/, 'Hải Long Đô (tựa TP. Hồ Chí Minh)'],
-      [/Phượng Đô(?!\s*\(.*?Hà Nội)/, 'Phượng Đô (tựa Hà Nội)'],
-      [/Cố Đô Trung Đô(?!\s*\(.*?Huế)/, 'Cố Đô Trung Đô (tựa Cố Đô Huế)'],
-      [/(?<!Cố Đô )Trung Đô(?!\s*\(.*?Huế)/, 'Trung Đô (tựa Huế)'],
-    ];
-    for (const [re, rep] of CITY_ANNOTATIONS) {
-      s = s.replace(re, rep); // first match only — JS .replace without /g
+    //    Skip for non-VN genres (di-gioi/tien-hiep/etc.) — those describe other worlds.
+    if (!skipVnAnnotation) {
+      const CITY_ANNOTATIONS: Array<[RegExp, string]> = [
+        [/Hải Long Đô(?!\s*\(.*?Hồ Chí Minh)/, 'Hải Long Đô (tựa TP. Hồ Chí Minh)'],
+        [/Phượng Đô(?!\s*\(.*?Hà Nội)/, 'Phượng Đô (tựa Hà Nội)'],
+        [/Cố Đô Trung Đô(?!\s*\(.*?Huế)/, 'Cố Đô Trung Đô (tựa Cố Đô Huế)'],
+        [/(?<!Cố Đô )Trung Đô(?!\s*\(.*?Huế)/, 'Trung Đô (tựa Huế)'],
+      ];
+      for (const [re, rep] of CITY_ANNOTATIONS) {
+        s = s.replace(re, rep); // first match only — JS .replace without /g
+      }
     }
 
     // 4) Collapse double spaces left over from removals
