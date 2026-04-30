@@ -618,3 +618,39 @@ CHANGED:
 ---
 
 **Last Updated v4**: 2026-04-30 (systemic refactor P1-P5 shipped)
+
+---
+
+## Phần 10 — Wave 2 Audit (P6-P7) 2026-04-30
+
+3 explore agents tìm các failure mode P1-P5 chưa cover:
+
+### P6.1 — DeepSeek empty content guard (deepseek.ts)
+Cũ: `content || reasoning_content || ''` → both empty trả về empty silently → save chương trống.
+Mới: throw nếu content empty + finish_reason='length' → maxTokens issue surfaced;
+     transient empty → retry within RETRY_DELAYS budget; final failure throws explicit error.
+
+### P6.3 — Distributed lock vs project timeout (cron/write-chapters/route.ts)
+Cũ: 90s lock window, PROJECT_TIMEOUT_MS=400s → tick A viết 100s, tick B (5min sau) thấy lockBoundary
+     đã pass, pickup cùng project → race write 2x.
+Mới: lockWindowMs = PROJECT_TIMEOUT_MS + 60s buffer (460s = ~7.7min). Lock ≥ timeout đảm bảo
+     tick A xong (or aborted by Vercel maxDuration 800s) trước tick B claim.
+
+### P7.1 — ai_story_projects(status, current_chapter) partial index
+Cũ: cron query `WHERE status IN ('active','paused')` full table scan ở 1000+ projects.
+Mới: migration 0159 — partial index `(status, current_chapter, updated_at) WHERE status IN ('active','paused')`.
+     Cron pickup chuyển từ O(n) → O(log n) lookup.
+
+### Deferred (low impact / out of scope)
+
+- **P7.2 quota double-count**: theoretical race; chưa hit production. Defer until observed.
+- **P7.3 summary-before-revise drift**: auto-revise rare (~5% chương), drift bounded to 1 ch.
+     Synopsis regen self-corrects. Defer.
+- **P8.1 Gemini prompt caching**: DeepSeek đã auto-cache (tracked via prompt_cache_hit_tokens).
+     Per-chapter agents chạy DeepSeek Flash → caching đã realize. Gemini caching cần stateful
+     lifecycle (POST /v1beta/cachedContents) — defer.
+- **P8.2 per-task maxTokens**: cosmetic optimization, không affect correctness.
+
+---
+
+**Last Updated v5**: 2026-04-30 (Wave 2 — P6.1 + P6.3 + P7.1 shipped)
