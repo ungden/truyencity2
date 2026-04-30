@@ -1008,6 +1008,7 @@ export const POWER_SYSTEMS: Record<string, PowerSystem> = {
 export const GOLDEN_CHAPTER_REQUIREMENTS = {
   chapter1: {
     mustHave: [
+      '5-BEAT OPENING (BẮT BUỘC — pattern audit 8 top TQ webnovels 2026): scene 1 trong ~400 từ đầu PHẢI đi đúng 5 beat theo thứ tự: (1) sensory anchor 1 câu NGẮN 4-7 từ — thị/khứu/thính giác cụ thể; (2) MC physical action/position 1-2 câu — show MC trong cảnh; (3) MC voice/interior 1 câu — worldview leak ngắn; (4) world friction 1-2 câu — điều gì OFF/lạ/khác; (5) hook entity (vật/người/event) xuất hiện trước từ 400 — pull MC vào plot. CẤM mở chương bằng dialogue. CẤM mở bằng exposition rộng. CẤM câu mở > 10 từ.',
       'WARM BASELINE OPENING (BẮT BUỘC — TQ trend 2024-2026 "稳健流/暖开局"): MC mở chương ở trạng thái CÓ functional baseline rồi — đã có shop/studio/squad/skill/golden finger ĐANG VẬN HÀNH, KHÔNG phải rock bottom. MC đang LÀM CHỦ domain nhỏ của mình ngay trang 1.',
       'MC trong domain CỦA MÌNH = competence-leader (vô địch trong phạm vi nhỏ): chủ quán net biết mọi PC, dev biết mọi engine, lãnh chúa biết mọi thuộc hạ. Thiếu chỉ là quy mô (small ops), KHÔNG phải competence.',
       'FIRST WOW BY SCENE 2 (BẮT BUỘC — retain reader): Scene 2 PHẢI có dopamine event đầu tiên — small face-slap (1 customer khinh thường → MC giải quyết → choáng), casual competence shock (MC fix vấn đề người thường thấy khó), smooth opportunity grabbed (deal nhỏ ký nhanh), hoặc recognition (1 nhân vật uy tín nhận ra MC). KHÔNG để reader đọc 50% chương 1 mới có payoff.',
