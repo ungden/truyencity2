@@ -1457,20 +1457,26 @@ CHÚ Ý:
 
     return parsed
       .filter((item): item is Record<string, unknown> => this.isObjectRecord(item) && !!item.title && !!item.premise)
+      .filter((item) => {
+        // P4.1: HARD-REJECT seeds failing blueprint check (was soft-warn).
+        // Novels với world_description không tuân blueprint sẽ tạo ra generic
+        // outlines → Architect phải invent missing pieces → drift class of bug.
+        // Skip failing seed; daily-spawn retries next tick.
+        const rawWorldDesc = item.worldDescription ? String(item.worldDescription).trim() : '';
+        if (!rawWorldDesc) {
+          console.warn(`[Seeder] REJECT "${String(item.title)}": empty worldDescription`);
+          return false;
+        }
+        const validation = validateSeedStructure(rawWorldDesc);
+        if (!validation.passed) {
+          console.warn(`[Seeder] REJECT "${String(item.title)}" (score=${validation.score}/100): missing=${validation.missingSections.join(',')}; issues=${validation.issues.join('; ')}`);
+          return false;
+        }
+        return true;
+      })
       .map((item) => {
         const requiredValue = requiredKey && item[requiredKey] ? String(item[requiredKey]).trim() : undefined;
         const mainCharacter = String(item.mainCharacter || this.randomMCName()).trim();
-
-        // Blueprint quality check: log seeds that fail. Don't reject yet — first
-        // production batch will reveal AI compliance rate. Once stable, switch to
-        // hard reject + regen for failing seeds.
-        const rawWorldDesc = item.worldDescription ? String(item.worldDescription).trim() : '';
-        if (rawWorldDesc) {
-          const validation = validateSeedStructure(rawWorldDesc);
-          if (!validation.passed) {
-            console.warn(`[Seeder] Blueprint check FAILED for "${String(item.title)}" (score=${validation.score}): missing=${validation.missingSections.join(',')}; issues=${validation.issues.join('; ')}`);
-          }
-        }
 
         // Sanitize description: strip tech terms that leak engine spec voice
         // (Bàn Tay Vàng, Hệ thống X, MC, Sảng văn, etc.) and patch fake VN

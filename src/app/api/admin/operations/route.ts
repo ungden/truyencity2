@@ -146,6 +146,112 @@ async function getStuckNovels(supabase: ReturnType<typeof getSupabaseAdmin>) {
   };
 }
 
+/**
+ * P4.3: Regression audit — sample recent chapters across active novels and check for
+ * known drift patterns. Surfaces issues per-project with score 0-100 so user spots
+ * regressions ngay khi chúng xuất hiện thay vì chờ user phát hiện.
+ *
+ * Patterns checked per chapter:
+ *   - <MC>/<LOVE>/<CITY> placeholder literal leaks (voice anchor escape)
+ *   - MC name absent (suggests 100% name drift)
+ *   - "xu" / "nguyên" digit-currency on VN-set genres
+ *
+ * Score: 100 - (10 * issues_found_per_sample)
+ */
+async function runRegressionAudit(
+  supabase: ReturnType<typeof getSupabaseAdmin>,
+  body: { sampleSize?: number; perProjectChapters?: number },
+) {
+  const sampleSize = Math.min(50, Math.max(5, body.sampleSize || 20));
+  const perProjectChapters = Math.min(10, Math.max(1, body.perProjectChapters || 3));
+
+  const { data: projects } = await supabase
+    .from('ai_story_projects')
+    .select('id,main_character,genre,world_description,novel_id,novels(title)')
+    .eq('status', 'active')
+    .order('updated_at', { ascending: false })
+    .limit(sampleSize);
+
+  if (!projects?.length) return { audited: 0, results: [] };
+
+  const results: Array<{
+    project_id: string;
+    title: string;
+    genre: string | null;
+    chapters_sampled: number;
+    issues: Array<{ chapter: number; issues: string[] }>;
+    score: number;
+  }> = [];
+
+  for (const p of projects) {
+    const novel = Array.isArray(p.novels) ? p.novels[0] : p.novels;
+    const novelId = p.novel_id;
+    const { data: chapters } = await supabase
+      .from('chapters')
+      .select('chapter_number,content')
+      .eq('novel_id', novelId)
+      .order('chapter_number', { ascending: false })
+      .limit(perProjectChapters);
+
+    const chapterIssues: Array<{ chapter: number; issues: string[] }> = [];
+    let totalIssues = 0;
+
+    for (const ch of chapters || []) {
+      const issues: string[] = [];
+      const c = ch.content || '';
+
+      const placeholders = c.match(/<(MC|LOVE|CITY|COMPANY|NUMBER|TITLE|SKILL)>/g);
+      if (placeholders) issues.push(`placeholder_leak:${[...new Set(placeholders)].join(',')}`);
+
+      const expectedMC = (p.main_character || '').trim();
+      if (expectedMC && expectedMC.length >= 2) {
+        if (!c.includes(expectedMC)) {
+          const tokens = expectedMC.split(/\s+/).filter((t: string) => t.length >= 2);
+          const tokenFound = tokens.some((t: string) => c.includes(t));
+          if (!tokenFound) issues.push(`mc_name_absent:${expectedMC}`);
+        }
+      }
+
+      const isVnSet = ['do-thi', 'quan-truong'].includes(p.genre || '') ||
+        /Đại Nam|Phượng Đô|Hải Long Đô|Sài Gòn|Hà Nội|Việt Nam/i.test(p.world_description || '');
+      if (isVnSet) {
+        const xuLeak = c.match(/\d[\d.,]*\s*xu\b/);
+        if (xuLeak) issues.push(`xu_leak:${xuLeak[0].slice(0, 30)}`);
+        const nguyenLeak = c.match(/\d[\d.,]*\s*nguyên(?!\s*(?:tử|thủy|tắc|liệu))/);
+        if (nguyenLeak) issues.push(`nguyen_leak:${nguyenLeak[0].slice(0, 30)}`);
+      }
+
+      if (issues.length > 0) {
+        chapterIssues.push({ chapter: ch.chapter_number, issues });
+        totalIssues += issues.length;
+      }
+    }
+
+    const score = Math.max(0, 100 - 10 * totalIssues);
+    results.push({
+      project_id: p.id,
+      title: (novel as { title?: string } | null)?.title || '?',
+      genre: p.genre,
+      chapters_sampled: chapters?.length || 0,
+      issues: chapterIssues,
+      score,
+    });
+  }
+
+  // Sort by score ascending — worst first
+  results.sort((a, b) => a.score - b.score);
+
+  const overall = results.length > 0
+    ? Math.round(results.reduce((s, r) => s + r.score, 0) / results.length)
+    : 100;
+
+  return {
+    audited: results.length,
+    overall_score: overall,
+    results,
+  };
+}
+
 async function setCronActive(active: boolean) {
   // Cron management requires direct SQL via cron.alter_job. Not exposed via PostgREST.
   // Operator must use Supabase SQL editor / MCP. This endpoint is informational only.
@@ -173,6 +279,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     case 'stuck_novels':
       return NextResponse.json(await getStuckNovels(supabase));
+
+    case 'regression_audit':
+      return NextResponse.json(await runRegressionAudit(supabase, body as { sampleSize?: number; perProjectChapters?: number }));
 
     case 'pause_cron':
       return NextResponse.json(await setCronActive(false));

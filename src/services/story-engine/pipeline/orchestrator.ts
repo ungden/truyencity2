@@ -119,6 +119,58 @@ async function recordTaskFailure(
   }
 }
 
+// ── P4.2: Per-chapter quality canary ────────────────────────────────────────
+//
+// Deterministic regex check on saved chapter for forbidden patterns. NOT blocking;
+// just surfaces drift to admin UI via failed_memory_tasks. Catches:
+//   - <MC> / <LOVE> / <CITY> placeholder literal leaks (voice anchor escape)
+//   - VND currency leak (digit + xu / digit + nguyên) on VN-set chapters
+//   - MC name absent from chapter (suggests 100% drift to a different name)
+function runChapterCanary(args: {
+  chapterContent: string;
+  protagonistName: string;
+  genre: GenreType;
+  worldDescription?: string;
+}): string[] {
+  const issues: string[] = [];
+  const c = args.chapterContent;
+
+  // 1. Placeholder leak — should never happen if voice anchor instructions followed
+  const placeholderMatches = c.match(/<(MC|LOVE|CITY|COMPANY|NUMBER|TITLE|SKILL)>/g);
+  if (placeholderMatches && placeholderMatches.length > 0) {
+    issues.push(`placeholder leak: ${[...new Set(placeholderMatches)].join(', ')}`);
+  }
+
+  // 2. MC name absence — if chapter doesn't contain MC name even ONCE, likely drift
+  if (args.protagonistName && args.protagonistName.length >= 2) {
+    const tokens = args.protagonistName.split(/\s+/).filter(t => t.length >= 2);
+    let found = c.includes(args.protagonistName);
+    if (!found) {
+      for (const t of tokens) {
+        if (c.includes(t)) { found = true; break; }
+      }
+    }
+    if (!found) {
+      issues.push(`MC name "${args.protagonistName}" absent from entire chapter (full + tokens)`);
+    }
+  }
+
+  // 3. VND currency leak (only for VN-set genres + worlds — uses templates predicate)
+  // Imported lazily to avoid circular dep risk
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { requiresVndCurrency } = require('../templates') as { requiresVndCurrency: (g: GenreType, w?: string | null) => boolean };
+    if (requiresVndCurrency(args.genre, args.worldDescription)) {
+      const xuLeak = c.match(/\d[\d.,]*\s*xu\b|(?:triệu|nghìn|trăm|tỷ|ngàn)\s+xu\b/);
+      if (xuLeak) issues.push(`VND currency leak: "${xuLeak[0].slice(0, 40)}"`);
+      const nguyenLeak = c.match(/\d[\d.,]*\s*nguyên(?!\s*(?:tử|thủy|tắc|liệu|chất|bản|nhân))/);
+      if (nguyenLeak) issues.push(`VND currency leak: "${nguyenLeak[0].slice(0, 40)}"`);
+    }
+  } catch { /* templates not loaded — skip */ }
+
+  return issues;
+}
+
 // ── Public: Write One Chapter ────────────────────────────────────────────────
 
 /**
@@ -630,6 +682,28 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     .eq('id', project.id);
   if (bumpErr) {
     console.warn(`[Orchestrator] CRITICAL: Failed to bump current_chapter to ${lastChapterNumber} for project ${project.id}: ${bumpErr.message}`);
+  }
+
+  // ── Step 5c: Quality canary — deterministic post-save check ───────────
+  // P4.2: scan saved chapter content for forbidden patterns and persist to
+  // failed_memory_tasks if any caught. NOT blocking — chapter already saved —
+  // but surfaces drift to admin UI for manual investigation.
+  try {
+    const canaryIssues = runChapterCanary({
+      chapterContent: result.content,
+      protagonistName,
+      genre,
+      worldDescription: project.world_description || undefined,
+    });
+    if (canaryIssues.length > 0) {
+      await recordTaskFailure(
+        db, project.id, novel.id, nextChapter, 'quality_canary',
+        new Error(`Canary triggered: ${canaryIssues.join('; ')}`)
+      );
+    }
+  } catch (e) {
+    // Canary itself failed — log but don't block.
+    console.warn(`[Orchestrator] canary check failed:`, e instanceof Error ? e.message : String(e));
   }
 
   // ── Step 6: 7 parallel post-write tasks (all non-fatal) ───────────────
