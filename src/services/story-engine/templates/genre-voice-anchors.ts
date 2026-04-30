@@ -182,8 +182,8 @@ ${a.voiceNotes}
 ‼️ PLACEHOLDER SEMANTICS — ĐỌC KỸ TRƯỚC KHI VIẾT:
    - <MC> = placeholder cho TÊN nhân vật chính. PHẢI THAY bằng tên MC THỰC TẾ
      trong context (project.main_character / world_description). KHÔNG ĐƯỢC
-     để literal "<MC>" xuất hiện trong output. KHÔNG copy "Tô Mục" / "Trần Vũ"
-     / "Lý Tầm Hoan" — đó là placeholder cũ, đã được thay bằng <MC>.
+     để literal "<MC>" xuất hiện trong output. Bất kỳ tên ví dụ nào trong sample
+     prose phải được thay bằng tên thực tế của MC từ context.
    - <LOVE> = placeholder cho love interest. THAY bằng tên thực tế.
    - <CITY> = placeholder cho thành phố. THAY bằng tên từ world_description.
    - Voice anchor cung cấp: rhythm câu + register + vocabulary + dopamine pattern.
@@ -216,7 +216,8 @@ ${a.voiceNotes}
 
 ‼️ <MC> / <LOVE> / <CITY> = PLACEHOLDERS. Trong scene goals/conflicts/resolutions
    PHẢI dùng tên THỰC TẾ từ world_description (project.main_character / cast roster /
-   địa danh world). KHÔNG copy literal "<MC>" hay tên placeholder cũ ("Tô Mục" / "Trần Vũ" / etc.)
+   địa danh world). KHÔNG copy literal "<MC>"; bất kỳ tên ví dụ nào phải replace
+   bằng tên thực từ context.
 
 CHƯƠNG 1 OPENING PATTERN: ${a.chapterOneHook}
 

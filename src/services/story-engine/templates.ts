@@ -1476,7 +1476,7 @@ export const AI_CLICHE_BLACKLIST_SOFT: string[] = [
  * Vietnamese pronoun whitelist per genre cluster.
  * Forces appropriate pronouns: hắn/y/lão/nàng for cổ trang, anh/cô for hiện đại.
  */
-export const VN_PRONOUN_GUIDE: Record<string, string> = {
+export const VN_PRONOUN_GUIDE: Record<GenreType, string> = {
   'tien-hiep': 'hắn (MC + nam đồng cấp), y (nam đối thủ), lão (cao niên), nàng (nữ MC/nữ chính), gã (nam phản diện khinh miệt), bà (nữ cao niên). CẤM "anh ta", "cô ta".',
   'huyen-huyen': 'hắn / y / lão / nàng / gã / bà. CẤM "anh ta", "cô ta".',
   'kiem-hiep': 'hắn / y / lão / nàng / gã / bà / hảo hán / đại hiệp. CẤM "anh ta".',
