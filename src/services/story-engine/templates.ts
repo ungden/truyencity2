@@ -2449,10 +2449,34 @@ export function isNonCombatGenre(genre: GenreType): boolean {
 // "đồng vàng / linh thạch / bạc" are canonical.
 const VND_CURRENCY_GENRES: GenreType[] = ['do-thi', 'quan-truong'];
 
+// Pure non-VN genres — story is intentionally set in another world / cosmos /
+// fantasy realm. Even if world_description contains VN markers (which can leak
+// from voice anchor templates or careless seeding), VN currency lock should
+// NEVER apply. di-gioi = isekai (other world), tien-hiep / huyen-huyen =
+// cultivation cosmos, khoai-xuyen = multi-world, dong-nhan = per-IP canon,
+// ngu-thu-tien-hoa = beast world.
+export const NON_VN_GENRES: GenreType[] = [
+  'di-gioi', 'tien-hiep', 'huyen-huyen', 'kiem-hiep',
+  'khoai-xuyen', 'dong-nhan', 'ngu-thu-tien-hoa',
+];
+
+/**
+ * Whether this genre is a Vietnamese setting where VN city annotation +
+ * VND currency apply. Returns false for pure-fantasy / other-world genres.
+ */
+export function isVnSettingGenre(genre: GenreType): boolean {
+  return !NON_VN_GENRES.includes(genre);
+}
+
 export function requiresVndCurrency(genre: GenreType, worldDescription?: string | null): boolean {
+  // 2026-04-30 fix: pure-fantasy genres are NEVER VN-locked, regardless of any
+  // VN markers leaked into world_description. di-gioi/tien-hiep/etc. should
+  // describe another world entirely.
+  if (NON_VN_GENRES.includes(genre)) return false;
   if (VND_CURRENCY_GENRES.includes(genre)) return true;
-  // linh-di / lich-su CAN be Vietnam-set (Dân Quốc / Đại Việt) — sniff
-  // the world description for VN markers to enable VND rule selectively.
+  // linh-di / lich-su / mat-the / khoa-huyen CAN be Vietnam-set (Dân Quốc /
+  // Đại Việt / VN modern) — sniff world description for VN markers to enable
+  // VND rule selectively.
   if (worldDescription && /Đại Nam|Hải Long Đô|Phượng Đô|Trung Đô|Sài Gòn|Hà Nội|Việt Nam|Dân Quốc|Đại Việt/i.test(worldDescription)) {
     return true;
   }

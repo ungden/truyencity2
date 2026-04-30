@@ -278,6 +278,14 @@ CHỐNG LẶP CẤU TRÚC AI (CỰC KỲ QUAN TRỌNG):
 - Cũng dùng chức danh/biệt hiệu thay tên: "tên thiếu niên", "vị tông chủ trẻ", "kẻ mới đến"
 - MỤC TIÊU: Tên MC không quá 20 lần/10.000 chữ. Nếu vượt → thay bằng đại từ
 
+TÊN MC CỐ ĐỊNH XUYÊN SUỐT (BẮT BUỘC TUYỆT ĐỐI — chống name flip):
+- Tên MC = project.main_character (đã set ở context). Đây là SINGLE SOURCE OF TRUTH.
+- Mỗi chương MC chỉ có DUY NHẤT 1 tên. KHÔNG bao giờ tự sáng tạo tên mới cho MC giữa chương.
+- Nếu context có MC tên "Lê Minh", thì chương 3 PHẢI vẫn là "Lê Minh" — KHÔNG được đổi sang "Trần Vũ" / "Lý Phong" / etc. CỰC KỲ NGHIÊM TRỌNG nếu name flip.
+- Nếu voice anchor mẫu có <MC> hoặc tên placeholder ("Tô Mục" / "Trần Vũ" / "Lâm Hạo"), THAY thế bằng tên MC thực tế của truyện này.
+- Khi không chắc tên (hiếm khi xảy ra với context loading đúng), dùng đại từ (hắn/anh/cô/nàng/y) cho safe — KHÔNG bịa tên mới.
+- TẤT CẢ supporting characters cũng phải consistent với cast roster trong story_outline. KHÔNG đổi tên Khánh thành Khang giữa các chương.
+
 TÊN ĐẦY ĐỦ (BẮT BUỘC, CHỐNG GIẢM TÊN):
 - Trong văn TƯỜNG THUẬT (không phải dialogue), khi gọi tên nhân vật → DÙNG TÊN ĐẦY ĐỦ ("Lý Quang Vinh", "Trần Quốc Hùng", "Tô Lăng"), KHÔNG cắt cụt thành "Vinh", "Hùng", "Lăng".
 - Tên cụt CHỈ dùng trong DIALOGUE giữa người thân (bạn bè, gia đình, người yêu) — vd "— Vinh, em ổn không?" / "— Hùng à!".
