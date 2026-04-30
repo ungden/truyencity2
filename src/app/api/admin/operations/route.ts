@@ -252,6 +252,182 @@ async function runRegressionAudit(
   };
 }
 
+/**
+ * V1: Surface quality trends from quality_trends table — most recent snapshot per project,
+ * sorted by alert level (critical first).
+ */
+async function getQualityTrends(supabase: ReturnType<typeof getSupabaseAdmin>) {
+  const { data: trends } = await supabase
+    .from('quality_trends')
+    .select('*,ai_story_projects(novel_id,novels(title))')
+    .order('snapshot_date', { ascending: false })
+    .limit(200);
+
+  // Dedupe to most-recent per project
+  const seen = new Set<string>();
+  const latest: Array<Record<string, unknown>> = [];
+  for (const t of trends || []) {
+    if (seen.has(t.project_id)) continue;
+    seen.add(t.project_id);
+    const proj = (t as { ai_story_projects?: { novels?: { title?: string } | { title?: string }[] } }).ai_story_projects;
+    const novel = Array.isArray(proj?.novels) ? proj?.novels[0] : proj?.novels;
+    latest.push({
+      project_id: t.project_id,
+      title: (novel as { title?: string } | undefined)?.title || '?',
+      snapshot_date: t.snapshot_date,
+      current_chapter: t.current_chapter,
+      early_avg: t.early_avg_score,
+      recent_avg: t.recent_avg_score,
+      drift: t.drift,
+      alert_level: t.alert_level,
+      critical_issues_total: t.critical_issues_total,
+    });
+  }
+
+  const order = { critical: 0, warn: 1, watch: 2, ok: 3 };
+  latest.sort((a, b) =>
+    (order[a.alert_level as keyof typeof order] ?? 4) - (order[b.alert_level as keyof typeof order] ?? 4));
+
+  const counts: Record<string, number> = {};
+  for (const t of latest) {
+    const lvl = t.alert_level as string;
+    counts[lvl] = (counts[lvl] || 0) + 1;
+  }
+
+  return { count: latest.length, alerts: counts, trends: latest };
+}
+
+/**
+ * V4: Supreme goals dashboard data. For each active novel, derive 5 traffic lights
+ * from existing signals.
+ */
+async function getSupremeGoalsStatus(supabase: ReturnType<typeof getSupabaseAdmin>) {
+  const { data: projects } = await supabase
+    .from('ai_story_projects')
+    .select('id,novel_id,current_chapter,total_planned_chapters,novels(title)')
+    .eq('status', 'active')
+    .order('updated_at', { ascending: false });
+
+  if (!projects?.length) return { count: 0, projects: [] };
+
+  // Bulk fetch latest quality_trends + failed_memory_tasks counts
+  const projectIds = projects.map(p => p.id);
+  const { data: trends } = await supabase
+    .from('quality_trends')
+    .select('project_id,alert_level,drift,recent_avg_score,critical_issues_total')
+    .in('project_id', projectIds)
+    .order('snapshot_date', { ascending: false });
+  const trendByProject = new Map<string, { alert: string; drift: number | null; recent: number | null; criticals: number }>();
+  for (const t of trends || []) {
+    if (trendByProject.has(t.project_id)) continue; // first match = most recent due to order
+    trendByProject.set(t.project_id, {
+      alert: t.alert_level,
+      drift: t.drift,
+      recent: t.recent_avg_score,
+      criticals: t.critical_issues_total || 0,
+    });
+  }
+
+  const { data: failedTasks } = await supabase
+    .from('failed_memory_tasks')
+    .select('project_id')
+    .in('project_id', projectIds)
+    .eq('status', 'pending');
+  const failedByProject = new Map<string, number>();
+  for (const f of failedTasks || []) {
+    failedByProject.set(f.project_id, (failedByProject.get(f.project_id) || 0) + 1);
+  }
+
+  // Bulk fetch open plot threads
+  const { data: threads } = await supabase
+    .from('plot_threads')
+    .select('project_id,status')
+    .in('project_id', projectIds);
+  const threadStats = new Map<string, { open: number; resolved: number }>();
+  for (const t of threads || []) {
+    const cur = threadStats.get(t.project_id) || { open: 0, resolved: 0 };
+    if (t.status === 'open') cur.open++;
+    else if (t.status === 'resolved') cur.resolved++;
+    threadStats.set(t.project_id, cur);
+  }
+
+  function gradeFromAlert(alert: string): 'green' | 'yellow' | 'red' {
+    if (alert === 'critical' || alert === 'warn') return 'red';
+    if (alert === 'watch') return 'yellow';
+    return 'green';
+  }
+
+  const result = projects.map(p => {
+    const trend = trendByProject.get(p.id);
+    const failedCount = failedByProject.get(p.id) || 0;
+    const tStats = threadStats.get(p.id) || { open: 0, resolved: 0 };
+    const novel = Array.isArray(p.novels) ? p.novels[0] : p.novels;
+    const total = p.total_planned_chapters || 1000;
+    const current = p.current_chapter || 0;
+    const progressPct = Math.round((current / total) * 100);
+
+    // Goal 1: Coherence — use trend alert + failed task count + open thread ratio
+    const openRatio = tStats.open + tStats.resolved > 0
+      ? tStats.open / (tStats.open + tStats.resolved)
+      : 1;
+    let coherence: 'green' | 'yellow' | 'red';
+    if (failedCount > 5 || (trend && trend.alert === 'critical')) coherence = 'red';
+    else if (failedCount > 2 || openRatio > 0.7 || (trend && trend.alert === 'warn')) coherence = 'yellow';
+    else coherence = 'green';
+
+    // Goal 2: Character consistency — based on critical_issues_total in trend
+    let charConsist: 'green' | 'yellow' | 'red';
+    const crits = trend?.criticals || 0;
+    if (crits > 5) charConsist = 'red';
+    else if (crits > 1) charConsist = 'yellow';
+    else charConsist = 'green';
+
+    // Goal 3: Directional plot — derived from open vs resolved thread ratio + chapter progress
+    let directional: 'green' | 'yellow' | 'red';
+    if (current < 20) directional = 'green'; // too early to judge
+    else if (openRatio > 0.8) directional = 'red'; // nothing resolves
+    else if (openRatio > 0.6) directional = 'yellow';
+    else directional = 'green';
+
+    // Goal 4: Ending readiness — progress % + status
+    let ending: 'green' | 'yellow' | 'red';
+    if (progressPct >= 100) ending = 'green';
+    else if (progressPct >= 80) ending = 'yellow';
+    else ending = 'green'; // not yet at ending phase, OK
+
+    // Goal 5: Uniform quality — directly from trend alert level
+    const uniform: 'green' | 'yellow' | 'red' = trend ? gradeFromAlert(trend.alert) : 'green';
+
+    return {
+      project_id: p.id,
+      title: (novel as { title?: string } | null)?.title || '?',
+      current_chapter: current,
+      total_planned_chapters: total,
+      progress_pct: progressPct,
+      goals: { coherence, charConsist, directional, ending, uniform },
+      signals: {
+        failed_tasks: failedCount,
+        open_threads: tStats.open,
+        resolved_threads: tStats.resolved,
+        trend_drift: trend?.drift || null,
+        trend_recent_avg: trend?.recent || null,
+        trend_alert: trend?.alert || 'no_data',
+      },
+    };
+  });
+
+  // Aggregate counts per goal
+  const aggregate = { coherence: { green: 0, yellow: 0, red: 0 }, charConsist: { green: 0, yellow: 0, red: 0 }, directional: { green: 0, yellow: 0, red: 0 }, ending: { green: 0, yellow: 0, red: 0 }, uniform: { green: 0, yellow: 0, red: 0 } };
+  for (const r of result) {
+    for (const k of Object.keys(aggregate) as (keyof typeof aggregate)[]) {
+      const lvl = r.goals[k];
+      aggregate[k][lvl]++;
+    }
+  }
+
+  return { count: result.length, aggregate, projects: result };
+}
+
 async function setCronActive(active: boolean) {
   // Cron management requires direct SQL via cron.alter_job. Not exposed via PostgREST.
   // Operator must use Supabase SQL editor / MCP. This endpoint is informational only.
@@ -282,6 +458,12 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     case 'regression_audit':
       return NextResponse.json(await runRegressionAudit(supabase, body as { sampleSize?: number; perProjectChapters?: number }));
+
+    case 'quality_trends':
+      return NextResponse.json(await getQualityTrends(supabase));
+
+    case 'supreme_goals':
+      return NextResponse.json(await getSupremeGoalsStatus(supabase));
 
     case 'pause_cron':
       return NextResponse.json(await setCronActive(false));

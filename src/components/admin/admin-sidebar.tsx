@@ -21,6 +21,7 @@ import {
   ClipboardList,
   DollarSign,
   AlertCircle,
+  Target,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -98,6 +99,11 @@ const menuItems: MenuItem[] = [
     title: 'Stuck Novels',
     href: '/admin/stuck-novels',
     icon: AlertCircle,
+  },
+  {
+    title: 'Mục tiêu tối thượng',
+    href: '/admin/supreme-goals',
+    icon: Target,
   },
   {
     title: 'Chi phi AI',
