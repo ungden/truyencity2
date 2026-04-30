@@ -19,6 +19,7 @@ import { generateQuickAuthor, GenreType } from '@/services/author-generator';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { AIProviderService } from '../ai-provider';
 import { GENRE_CONFIG } from '@/lib/types/genre-config';
+import { SEED_BLUEPRINT_INSTRUCTIONS, validateSeedStructure } from '@/services/story-engine/seed-blueprint';
 
 // ============================================================================
 // CONSTANTS
@@ -1309,7 +1310,7 @@ Mỗi tiểu thuyết cần:
    - TIỀN TỆ Việt Nam: nếu truyện đặt trong bối cảnh Việt Nam (đô thị / quan trường / lịch sử Đại Nam / Đại Việt), DÙNG VND thật: "đồng / nghìn đồng / triệu đồng / tỷ đồng". KHÔNG dùng "nguyên" làm đơn vị tiền, KHÔNG dùng "xu" trừ khi rõ ràng là cổ đại Trung Hoa. Ví dụ đúng: "5 triệu đồng vốn liếng", "đất 200 nghìn đồng/m²".
    - THÀNH PHỐ HƯ CẤU Việt Nam (parallel-world Đại Nam) lần đầu xuất hiện trong description PHẢI annotate tên thực ngay sau, dùng dấu ngoặc tròn: "Hải Long Đô (tựa TP. Hồ Chí Minh)", "Phượng Đô (tựa Hà Nội)", "Trung Đô (tựa Huế)" / "Cố Đô Trung Đô (tựa Cố Đô Huế)". Annotate 1 lần ở lần đầu nhắc, các lần sau dùng tên fictional.
 6. "shortSynopsis": Tóm tắt 2-3 câu (không spoil kết)
-7. "worldDescription": Mô tả thế giới 120-220 chữ (địa danh, thế lực, quy tắc)
+7. "worldDescription": Khối seed blueprint 800-1500 từ theo schema 9-section CỤ THỂ ở phần BLUEPRINT bên dưới (PHẢI tuân thủ — output thiếu section sẽ bị reject + regen)
 8. "${requiredKey || 'required_system'}": Trường BẮT BUỘC cho thể loại này. ${requiredRule} Ví dụ format: ${requiredExample}
 9. "coverPrompt": Prompt tiếng Anh 3-5 câu để AI tạo ảnh bìa. BẮT BUỘC chứa: Title text must be exactly: "<TITLE>", At the bottom-center include small text: "Truyencity.com", No other text.
 
@@ -1384,10 +1385,13 @@ Câu 4-5: Nhân vật chính + xuất thân + golden finger
 Câu 6-7: Xung đột chính + mục tiêu
 Câu cuối: Teaser "Liệu anh ta có thể...?" (NO spoil kết cục)
 
+${SEED_BLUEPRINT_INSTRUCTIONS}
+
 Trả về JSON array:
 [{"title":"...","premise":"...","mainCharacter":"...","mainCharacterProfile":"...","description":"...","shortSynopsis":"...","worldDescription":"...","${requiredKey || 'required_system'}":"...","coverPrompt":"..."},...]
 
 CHÚ Ý:
+- worldDescription PHẢI là chuỗi 800-1500 từ tuân thủ 9-section blueprint phía trên. Output thiếu section sẽ bị reject.
 - Mỗi truyện PHẢI có description dài 250+ chữ, có shortSynopsis + worldDescription + mainCharacterProfile
 - Trường "${requiredKey || 'required_system'}" là BẮT BUỘC, không được để trống
 - coverPrompt phải chứa: Title text must be exactly: "<TITLE>" và "At the bottom-center, include small text: Truyencity.com" và "No other text besides the title and Truyencity.com"
@@ -1453,6 +1457,17 @@ CHÚ Ý:
       .map((item) => {
         const requiredValue = requiredKey && item[requiredKey] ? String(item[requiredKey]).trim() : undefined;
         const mainCharacter = String(item.mainCharacter || this.randomMCName()).trim();
+
+        // Blueprint quality check: log seeds that fail. Don't reject yet — first
+        // production batch will reveal AI compliance rate. Once stable, switch to
+        // hard reject + regen for failing seeds.
+        const rawWorldDesc = item.worldDescription ? String(item.worldDescription).trim() : '';
+        if (rawWorldDesc) {
+          const validation = validateSeedStructure(rawWorldDesc);
+          if (!validation.passed) {
+            console.warn(`[Seeder] Blueprint check FAILED for "${String(item.title)}" (score=${validation.score}): missing=${validation.missingSections.join(',')}; issues=${validation.issues.join('; ')}`);
+          }
+        }
 
         // Sanitize description: strip tech terms that leak engine spec voice
         // (Bàn Tay Vàng, Hệ thống X, MC, Sảng văn, etc.) and patch fake VN
@@ -1833,9 +1848,17 @@ CHÚ Ý:
    * Includes character profiles, world details, and genre-specific systems.
    */
   private formatWorldDescription(idea: NovelIdea): string {
-    const blocks: string[] = [];
-
     const world = (idea.worldDescription || '').trim();
+
+    // If world_description already follows the 9-section blueprint, it subsumes
+    // both mainCharacterProfile and the required system field — return as-is to
+    // preserve structure. Architect/Writer rely on the blueprint headings to
+    // index cast/golden-finger/phase-roadmap deterministically.
+    const isBlueprint = /###\s*(NHÂN\s*VẬT\s*CHÍNH|GOLDEN\s*FINGER|PHASE\s*ROADMAP)/i.test(world);
+    if (isBlueprint) return world;
+
+    // Legacy/fallback path: AI didn't follow blueprint → merge separate blocks.
+    const blocks: string[] = [];
     if (world) blocks.push(world);
 
     const mcProfile = (idea.mainCharacterProfile || '').trim();

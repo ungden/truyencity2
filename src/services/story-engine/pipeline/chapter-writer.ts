@@ -32,6 +32,7 @@ import { callGemini } from '../utils/gemini';
 import { parseJSON } from '../utils/json-repair';
 import { getStyleByGenre, buildTitleRulesPrompt, GOLDEN_CHAPTER_REQUIREMENTS, ENGAGEMENT_CHECKLIST, getGenreEngagement, getGenreAntiCliche } from '../config';
 import { VN_PRONOUN_GUIDE, SUB_GENRE_RULES, isNonCombatGenre, requiresVndCurrency } from '../templates';
+import { getVoiceAnchor, getArchitectVoiceHint } from '../templates/genre-voice-anchors';
 import { getConstraintExtractor } from '../memory/constraint-extractor';
 import { GENRE_CONFIG } from '../../../lib/types/genre-config';
 import { buildStyleContext, getEnhancedStyleBible, CLIFFHANGER_TECHNIQUES } from '../memory/style-bible';
@@ -741,7 +742,10 @@ Trả về JSON ChapterOutline đúng schema phía trên cho CHƯƠNG ${chapterN
   const prompt = staticPrefix + dynamicSuffix;
 
   const genreSuffix = genre ? buildGenreSpecificSuffix(genre, options?.subGenres || []) : '';
-  const res = await callGemini(prompt, { ...config, temperature: 0.3, maxTokens: 16384, systemPrompt: ARCHITECT_SYSTEM + VN_PLACE_LOCK + genreSuffix }, { jsonMode: true, tracking: options?.projectId ? { projectId: options.projectId, task: 'architect', chapterNumber } : undefined });
+  // Architect gets compact voice hint (notes + opening pattern + dopamine pattern only).
+  // Full prose anchor goes to Writer where voice matching matters most.
+  const architectVoiceHint = genre ? getArchitectVoiceHint(genre) : '';
+  const res = await callGemini(prompt, { ...config, temperature: 0.3, maxTokens: 16384, systemPrompt: ARCHITECT_SYSTEM + VN_PLACE_LOCK + genreSuffix + architectVoiceHint }, { jsonMode: true, tracking: options?.projectId ? { projectId: options.projectId, task: 'architect', chapterNumber } : undefined });
 
   // Check finishReason for truncation
   if (res.finishReason === 'length' || res.finishReason === 'MAX_TOKENS') {
@@ -1032,6 +1036,9 @@ ${buildGenreAntiClicheSection(genre)}
 Bắt đầu viết:`;
 
   const writerSuffix = buildGenreSpecificSuffix(genre, options?.subGenres || []);
+  // Full voice anchor (prose sample + opening pattern + dopamine pattern) — Writer
+  // needs this to match register/rhythm/vocabulary. Architect gets a compact version.
+  const writerVoiceAnchor = getVoiceAnchor(genre);
   // VND CURRENCY proactive rule (added 2026-04-29): Critic-side rule alone
   // wasn't enough — "X xu" / "X nguyên" leaks were appearing in 30+ chapters
   // across many do-thi/quan-truong novels. Add to Writer system prompt so AI
@@ -1047,7 +1054,7 @@ Bắt đầu viết:`;
 - "Xu" CHO PHÉP duy nhất khi: từ ghép "xu nịnh" (flatter), tên riêng (vd "Tô Châu Xu"), hoặc đơn vị nhỏ trong game/hệ thống (HỆ THỐNG ban X xu thưởng — virtual currency, KHÔNG phải tiền thật).
 - Khi nhân vật cầm tiền thật → ĐỒNG. Hệ thống thưởng điểm → có thể dùng "điểm" / "credit" / hoặc đơn vị riêng của hệ thống nhưng KHÔNG dùng "xu" để tránh nhầm lẫn.`
     : '';
-  const res = await callGemini(prompt, { ...config, systemPrompt: WRITER_SYSTEM + VN_PLACE_LOCK + writerSuffix + writerVndGuard }, { tracking: options?.projectId ? { projectId: options.projectId, task: 'writer', chapterNumber: outline.chapterNumber } : undefined });
+  const res = await callGemini(prompt, { ...config, systemPrompt: WRITER_SYSTEM + VN_PLACE_LOCK + writerSuffix + writerVndGuard + writerVoiceAnchor }, { tracking: options?.projectId ? { projectId: options.projectId, task: 'writer', chapterNumber: outline.chapterNumber } : undefined });
 
   // Check finishReason
   if (res.finishReason === 'length' || res.finishReason === 'MAX_TOKENS') {
