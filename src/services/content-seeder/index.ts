@@ -19,7 +19,8 @@ import { generateQuickAuthor, GenreType } from '@/services/author-generator';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { AIProviderService } from '../ai-provider';
 import { GENRE_CONFIG } from '@/lib/types/genre-config';
-import { SEED_BLUEPRINT_INSTRUCTIONS, validateSeedStructure } from '@/services/story-engine/seed-blueprint';
+import { buildSeedBlueprintInstructions, validateSeedStructure } from '@/services/story-engine/seed-blueprint';
+import type { GenreType as StoryGenreType } from '@/services/story-engine/types';
 
 // ============================================================================
 // CONSTANTS
@@ -1385,7 +1386,7 @@ Câu 4-5: Nhân vật chính + xuất thân + golden finger
 Câu 6-7: Xung đột chính + mục tiêu
 Câu cuối: Teaser "Liệu anh ta có thể...?" (NO spoil kết cục)
 
-${SEED_BLUEPRINT_INSTRUCTIONS}
+${buildSeedBlueprintInstructions(genre as StoryGenreType)}
 
 Trả về JSON array:
 [{"title":"...","premise":"...","mainCharacter":"...","mainCharacterProfile":"...","description":"...","shortSynopsis":"...","worldDescription":"...","${requiredKey || 'required_system'}":"...","coverPrompt":"..."},...]

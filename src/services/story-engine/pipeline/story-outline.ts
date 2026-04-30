@@ -12,6 +12,7 @@
 import { callGemini } from '../utils/gemini';
 import { parseJSON } from '../utils/json-repair';
 import type { GeminiConfig, GenreType } from '../types';
+import { getGenreSetupRequirements } from '../templates/genre-process-blueprints';
 
 export interface StoryOutline {
   id: string;
@@ -69,10 +70,14 @@ export async function generateStoryOutline(
 ): Promise<StoryOutline | null> {
   const arcs = 5;
   const mid = Math.ceil(arcs / 2);
+  const genreSetup = getGenreSetupRequirements(genre);
+
   const prompt = `Lập Story Outline cho truyện "${novelTitle}" (${genre}).
 NHÂN VẬT CHÍNH: ${protagonistName}
 WORLD/BỐI CẢNH (BẮT BUỘC TUÂN THỦ):
 ${worldDescription.slice(0, 6000)}
+
+${genreSetup}
 
 CHẤT LƯỢNG ĐẠI THẦN — required fields:
 1. premise: hook 2-3 câu gói ghém golden finger + stakes + opening situation

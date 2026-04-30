@@ -10,6 +10,7 @@ import { callGemini } from '../utils/gemini';
 import { parseJSON } from '../utils/json-repair';
 import { GOLDEN_CHAPTER_REQUIREMENTS, UNIVERSAL_ANTI_SEEDS } from '../templates';
 import { getArchitectVoiceHint } from '../templates/genre-voice-anchors';
+import { getGenreArchitectGuide } from '../templates/genre-process-blueprints';
 
 import type {
   ContextPayload, ChapterSummary, GenreType, GeminiConfig,
@@ -948,9 +949,13 @@ Yêu cầu:
     visionBlock = vParts.join('\n') + '\n\n';
   }
 
+  // Per-genre process blueprint — scene types + arc template + quality floor + creative space.
+  // Always inject for arc plans regardless of arc number, since these are stable per-genre rules.
+  const genreArchGuide = getGenreArchitectGuide(genre);
+
   const prompt = `Bạn là Story Architect cho truyện ${genre}.
 
-${worldBlock}${visionBlock}${synopsis ? `TỔNG QUAN:\n${synopsis}\n\n` : ''}${storyBible ? `STORY BIBLE:\n${storyBible.slice(0, 2000)}\n\n` : ''}${openingRulesBlock}
+${worldBlock}${visionBlock}${synopsis ? `TỔNG QUAN:\n${synopsis}\n\n` : ''}${storyBible ? `STORY BIBLE:\n${storyBible.slice(0, 2000)}\n\n` : ''}${genreArchGuide}${openingRulesBlock}
 Lập kế hoạch ARC ${arcNumber} (chương ${startChapter}-${endChapter}) cho ${protagonistName}.
 Tổng dự kiến: ${totalPlanned} chương.${closingInstruction}
 

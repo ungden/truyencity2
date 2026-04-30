@@ -7,13 +7,26 @@
  * golden finger + 0 named cast. Architect/Writer then had to invent missing
  * pieces ad-hoc, producing the "ngây ngô" execution the user complained about.
  *
- * Solution: enforce 9-section blueprint with concrete required fields. World
- * descriptions become 800-1500 từ structured docs that the engine can index
- * deterministically (cast names, golden finger mechanics, phase milestones).
+ * Solution: enforce 9-section blueprint with concrete required fields, plus
+ * per-genre addendum from genre-process-blueprints module. World descriptions
+ * become 800-1500 từ structured docs that the engine can index deterministically.
  *
  * Validation: validateSeedStructure(text) returns { score, missingSections,
  * issues } so the seeder can regen if score < threshold.
  */
+
+import type { GenreType } from './types';
+import { getGenreSetupRequirements } from './templates/genre-process-blueprints';
+
+/**
+ * Returns the seed blueprint instructions, optionally augmented with
+ * genre-specific cast roles + golden finger type + phase framework + world
+ * rules focus. Seeder calls this with the active genre.
+ */
+export function buildSeedBlueprintInstructions(genre?: GenreType): string {
+  const genreAddendum = genre ? getGenreSetupRequirements(genre) : '';
+  return SEED_BLUEPRINT_INSTRUCTIONS + genreAddendum;
+}
 
 export const SEED_BLUEPRINT_INSTRUCTIONS = `
 WORLD_DESCRIPTION BLUEPRINT (BẮT BUỘC — Nếu thiếu bất kỳ section nào, output sẽ bị reject):
