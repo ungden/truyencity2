@@ -31,6 +31,7 @@ Key innovations (2026-04-30 quality rebuild):
 | Doc | Purpose | When to read |
 |---|---|---|
 | [`README.md`](./README.md) | This index — bắt đầu từ đây | Always |
+| [`PLACEHOLDER_CONVENTION.md`](./PLACEHOLDER_CONVENTION.md) | **Convention `<MC>`/`<LOVE>`/`<CITY>` + enforcement runbook (lint:prompts)** | Trước khi sửa voice anchors / templates / prompts |
 | [`QUALITY_REBUILD.md`](./QUALITY_REBUILD.md) | **Research synthesis + 16-genre patterns + 4-version evolution log** | Khi mở rộng/debug quality, thêm genre, hoặc audit per-genre |
 | [`QUALITY_AUDIT_V1.md`](./QUALITY_AUDIT_V1.md) | Audit 2026-02 — sample chapters vs đại thần level (chapters 160-163) | Reference baseline: hệ thống đã từng tệ thế nào, fix nào đã apply |
 | [`LEGACY_STORY_FACTORY.md`](./LEGACY_STORY_FACTORY.md) | Legacy v1 architecture (`story-writing-factory/`) | Khi đụng v1 code paths (ai-editor, daily-spawn còn dùng v1) |
@@ -153,6 +154,7 @@ Các tài liệu root level (đã tồn tại trước rebuild) vẫn còn relev
 
 | Date | Version | Change |
 |---|---|---|
+| 2026-04-30 | v4 | Systemic refactor P1-P5 — type system + state defenses + branching alignment + hardening + docs — PR #21-25 |
 | 2026-04-30 | v3 | Per-genre process blueprints (16 genres × setup/process/scenes/arc) — PR #17 |
 | 2026-04-30 | v2 | Outline layer fixes — master_outline 6-axis, story_outline cast/rules/tone, arc_plan warm-baseline — PR #16 |
 | 2026-04-30 | v1 | Voice anchors + seed blueprint — 16-genre prose samples + 9-section world_description — PR #15 |
