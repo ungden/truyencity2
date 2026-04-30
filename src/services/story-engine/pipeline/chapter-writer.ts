@@ -585,6 +585,7 @@ export async function writeChapter(
       options?.projectId,
       genre,
       options?.worldDescription,
+      options?.protagonistName,
     );
 
     if (critic.requiresRewrite && attempt < maxRetries - 1) {
@@ -1118,6 +1119,7 @@ async function runCritic(
   projectId?: string,
   genre?: GenreType,
   worldDescription?: string | null,
+  protagonistName?: string,
 ): Promise<CriticOutput> {
   const wordCount = countWords(content);
   const wordRatio = wordCount / targetWords;
@@ -1295,6 +1297,28 @@ KIỂM TRA TUÂN THỦ QUALITY MODULES (NẾU CÓ THÔNG TIN):
       parsed.approved = false;
       if (!parsed.rewriteInstructions) {
         parsed.rewriteInstructions = `Chương quá ngắn (${wordCount}/${targetWords} từ). Phải viết đầy đủ.`;
+      }
+    }
+
+    // P2.2: Hard MC name-flip detection (deterministic, doesn't rely on Critic AI).
+    // Checks if expected MC name appears ≥3 times in content. If a DIFFERENT name
+    // is used as narrator subject more than expected name, force rewrite. Catches
+    // the "Băng Hà Tận Thế" bug class where chương 3 emits "Trần Vũ" instead of
+    // "Lê Minh" despite project.main_character = "Lê Minh".
+    if (protagonistName && protagonistName.trim().length >= 2) {
+      const nameFlipDetection = detectMcNameFlip(content, protagonistName.trim());
+      if (nameFlipDetection.severity === 'critical') {
+        parsed.requiresRewrite = true;
+        parsed.approved = false;
+        parsed.overallScore = Math.min(parsed.overallScore || 10, 2);
+        parsed.rewriteInstructions = `[MC NAME FLIP — CRITICAL] ${nameFlipDetection.message}\n\n` +
+          (parsed.rewriteInstructions ? `Cộng với: ${parsed.rewriteInstructions}` : '');
+      } else if (nameFlipDetection.severity === 'major') {
+        parsed.requiresRewrite = true;
+        parsed.approved = false;
+        parsed.overallScore = Math.min(parsed.overallScore || 10, 4);
+        parsed.rewriteInstructions = `[MC NAME DRIFT] ${nameFlipDetection.message}\n\n` +
+          (parsed.rewriteInstructions ? `Cộng với: ${parsed.rewriteInstructions}` : '');
       }
     }
 
@@ -1722,6 +1746,88 @@ function detectHardFallback(content: string, options?: WriteChapterOptions): str
  * - 'generic': colors, adjectives, emotions — strict thresholds (5=moderate, 8=critical)
  * - 'plot_element': words that may naturally recur as plot elements — relaxed thresholds (8=moderate, 12=critical)
  */
+/**
+ * P2.2: Detect MC name flip — chapter content uses a DIFFERENT name as primary MC
+ * than what project.main_character specifies. Returns severity + message.
+ *
+ * Heuristic:
+ *   - Count occurrences of expected MC name + each token thereof (full name + last name + first name).
+ *   - Find any other name candidate (Vietnamese 2-3 word capitalised proper noun, repeated ≥3 times).
+ *   - If candidate count > expected name occurrences → name flip detected.
+ *
+ * Severity:
+ *   - critical: candidate appears ≥5 times AND expected appears ≤2 times → DEFINITELY drifted
+ *   - major: candidate appears ≥3 times AND > expected count → likely drift
+ *   - none: expected name dominates
+ */
+function detectMcNameFlip(
+  content: string,
+  expectedName: string,
+): { severity: 'none' | 'major' | 'critical'; message: string } {
+  // Build expected name variants: full name + first-name + last-name
+  const tokens = expectedName.split(/\s+/).filter(t => t.length >= 2);
+  const expectedVariants = new Set<string>([expectedName]);
+  if (tokens.length >= 2) {
+    expectedVariants.add(tokens[tokens.length - 1]); // last token = personal name (e.g. "Vũ")
+    expectedVariants.add(tokens[0]); // first = surname (e.g. "Trần")
+  }
+
+  let expectedCount = 0;
+  for (const v of expectedVariants) {
+    const re = new RegExp(`\\b${escapeRegex(v)}\\b`, 'g');
+    expectedCount += (content.match(re) || []).length;
+  }
+
+  // Vietnamese capitalised 2-3 word names (potential MC candidates).
+  // Match patterns like "Trần Vũ", "Lý Tầm Hoan" — capitalised tokens with diacritics.
+  const candidatePattern = /\b[A-ZĐ][a-zà-ỹĐđ]{1,15}(?:\s+[A-ZĐ][a-zà-ỹĐđ]{1,15}){1,2}\b/g;
+  const counts = new Map<string, number>();
+  let match: RegExpExecArray | null;
+  while ((match = candidatePattern.exec(content)) !== null) {
+    const name = match[0];
+    if (expectedVariants.has(name)) continue;
+    // Skip 2-word geographical / common phrases
+    if (/^(Đại|Trung|Hà|Sài|Bắc|Nam|Đông|Tây|Phượng|Hải|Cố|Hoàng|Vạn|Thiên|Hệ|Cấm|Núi|Đường|Phố|Vực|Khu|Tập|Công|Văn|Quân|Sảng|Chương|Mã|Thần)/.test(name.split(/\s+/)[0])) {
+      continue;
+    }
+    counts.set(name, (counts.get(name) || 0) + 1);
+  }
+
+  // Find top candidate
+  let topCandidate = '';
+  let topCount = 0;
+  for (const [name, c] of counts) {
+    if (c > topCount) {
+      topCandidate = name;
+      topCount = c;
+    }
+  }
+
+  if (!topCandidate || topCount < 3) {
+    return { severity: 'none', message: '' };
+  }
+
+  if (topCount >= 5 && expectedCount <= 2) {
+    return {
+      severity: 'critical',
+      message: `Tên MC dự kiến "${expectedName}" chỉ xuất hiện ${expectedCount} lần, nhưng "${topCandidate}" xuất hiện ${topCount} lần như nhân vật chính. Đây là NAME FLIP nghiêm trọng. PHẢI viết lại với tên MC = "${expectedName}" — đây là tên đã thiết lập từ chương trước, không được tự ý đổi.`,
+    };
+  }
+
+  if (topCount >= 3 && topCount > expectedCount) {
+    return {
+      severity: 'major',
+      message: `Tên "${topCandidate}" xuất hiện ${topCount} lần (≥ tên MC dự kiến "${expectedName}" = ${expectedCount} lần). Có khả năng name drift. Sửa: dùng "${expectedName}" làm tên MC consistently — chỉ dùng tên khác khi đó là supporting character đã được giới thiệu.`,
+    };
+  }
+
+  return { severity: 'none', message: '' };
+}
+
+function escapeRegex(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function detectSevereRepetition(content: string): CriticIssue[] {
   const text = content.toLowerCase();
   const issues: CriticIssue[] = [];
