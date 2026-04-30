@@ -10,7 +10,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint:prompts": "tsx scripts/audit-prompts-for-leaks.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",

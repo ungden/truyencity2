@@ -281,8 +281,8 @@ CHỐNG LẶP CẤU TRÚC AI (CỰC KỲ QUAN TRỌNG):
 TÊN MC CỐ ĐỊNH XUYÊN SUỐT (BẮT BUỘC TUYỆT ĐỐI — chống name flip):
 - Tên MC = project.main_character (đã set ở context). Đây là SINGLE SOURCE OF TRUTH.
 - Mỗi chương MC chỉ có DUY NHẤT 1 tên. KHÔNG bao giờ tự sáng tạo tên mới cho MC giữa chương.
-- Nếu context có MC tên "Lê Minh", thì chương 3 PHẢI vẫn là "Lê Minh" — KHÔNG được đổi sang "Trần Vũ" / "Lý Phong" / etc. CỰC KỲ NGHIÊM TRỌNG nếu name flip.
-- Nếu voice anchor mẫu có <MC> hoặc tên placeholder ("Tô Mục" / "Trần Vũ" / "Lâm Hạo"), THAY thế bằng tên MC thực tế của truyện này.
+- Tên MC ở chương N PHẢI khớp tên ở chương N-1, N-2, ... — đọc context bridge / synopsis / character_states để xác nhận tên đúng. CỰC KỲ NGHIÊM TRỌNG nếu name flip.
+- Voice anchor có placeholder <MC> — PHẢI replace bằng tên MC thực tế từ context, KHÔNG bao giờ output literal "<MC>".
 - Khi không chắc tên (hiếm khi xảy ra với context loading đúng), dùng đại từ (hắn/anh/cô/nàng/y) cho safe — KHÔNG bịa tên mới.
 - TẤT CẢ supporting characters cũng phải consistent với cast roster trong story_outline. KHÔNG đổi tên Khánh thành Khang giữa các chương.
 

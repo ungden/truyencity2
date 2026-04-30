@@ -78,7 +78,7 @@ export const CLIFFHANGER_TECHNIQUES = [
 // 13 genres × 4 categories × 3-5 terms each
 // ============================================================================
 
-const GENRE_VOCABULARY: Record<GenreType, VocabularyGuide> = {
+export const GENRE_VOCABULARY: Record<GenreType, VocabularyGuide> = {
   'tien-hiep': {
     emotions: {
       anger: ['phẫn nộ', 'lôi đình đại nộ', 'sát khí đằng đằng', 'căm phẫn', 'thịnh nộ'],
@@ -477,7 +477,7 @@ interface GenreWritingGuide {
   narrativeStrength: string;
 }
 
-const GENRE_WRITING_GUIDES: Record<GenreType, GenreWritingGuide> = {
+export const GENRE_WRITING_GUIDES: Record<GenreType, GenreWritingGuide> = {
   'tien-hiep': {
     sentenceStyle: 'Câu văn cổ kính, trang trọng. Chiến đấu: câu ngắn dứt khoát. Tu luyện: câu dài miêu tả thiên địa dị tượng. Dùng cấu trúc Hán-Việt khi mô tả tu luyện.',
     dialogueStyle: 'Hội thoại trang trọng, cổ phong. Tiền bối nói ít, ngụ ý sâu. Thiếu niên có thể bộc trực hơn. Dùng ngữ khí từ: "ngươi", "bản tọa", "lão phu".',

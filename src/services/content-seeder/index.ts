@@ -37,7 +37,7 @@ const GENRE_LABELS: Record<string, string> = Object.fromEntries(
 
 const PLATFORM_BLEND_RULE = 'Blend 50% Qidian + 30% Zongheng + 20% Faloo (BFALOO)';
 
-const SOURCE_TOPIC_SEEDS: Record<string, string[]> = {
+const SOURCE_TOPIC_SEEDS: Record<StoryGenreType, string[]> = {
   'tien-hiep': [
     'tông môn suy tàn được vực dậy từ ngoại môn',
     'phàm nhân có ngọc giản cổ đế',
@@ -383,7 +383,7 @@ interface NarrativeVariant {
 // can inject these into Architect prompt for tone-consistent generation.
 // Distribution: TQ 2024-2026 — phế vật giảm 55→25%, professional/privileged tăng.
 
-const VARIANTS_BY_GENRE: Record<string, NarrativeVariant[]> = {
+const VARIANTS_BY_GENRE: Partial<Record<StoryGenreType, NarrativeVariant[]>> = {
   'tien-hiep': [
     { mc_archetype: 'intelligent', anti_tropes: ['no_system', 'no_invincible'], style_directives: { variant_id: 'tien-hiep:intelligent-mc', starting_archetype: 'phe-vat', tone_profile: 'pragmatic' } },
     { mc_archetype: 'family_pillar', sub_genres: [], style_directives: { variant_id: 'tien-hiep:gia-toc', starting_archetype: 'family-pillar', tone_profile: 'empowering' } },
@@ -450,7 +450,7 @@ const DEFAULT_VARIANTS: NarrativeVariant[] = [
  * (70% non-classic) to seed market diversity — modern reader trend 2024-2026.
  */
 function pickNarrativeVariant(genre: string): NarrativeVariant {
-  const variants = VARIANTS_BY_GENRE[genre] || DEFAULT_VARIANTS;
+  const variants = VARIANTS_BY_GENRE[genre as StoryGenreType] || DEFAULT_VARIANTS;
   // Last variant in each list is "classic" — give it 30% weight
   const classicIdx = variants.length - 1;
   const isClassic = Math.random() < 0.30;
@@ -1907,13 +1907,13 @@ CHÚ Ý:
   }
 
   private pickTopicSeeds(genre: string, count: number): string[] {
-    const pool = SOURCE_TOPIC_SEEDS[genre] || [];
+    const pool = SOURCE_TOPIC_SEEDS[genre as StoryGenreType] || [];
     if (pool.length <= count) return pool;
     return [...pool].sort(() => Math.random() - 0.5).slice(0, count);
   }
 
   private buildFallbackTitle(genre: string, seed: number): string {
-    const prefixByGenre: Record<string, string[]> = {
+    const prefixByGenre: Partial<Record<StoryGenreType, string[]>> = {
       'tien-hiep': ['Vạn Cổ', 'Cửu Thiên', 'Nghịch Thiên', 'Đế Tôn'],
       'huyen-huyen': ['Quỷ Bí', 'Thần Vực', 'Huyền Môn', 'Vạn Linh'],
       'do-thi': ['Nghịch Tập', 'Đỉnh Lưu', 'Ẩn Long', 'Thương Vương'],
@@ -1931,7 +1931,7 @@ CHÚ Ý:
       'ngu-thu-tien-hoa': ['Vạn Thú', 'Ngự Linh', 'Thần Thú', 'Tiến Hóa'],
       'khoai-xuyen': ['Vạn Giới', 'Khoái Xuyên', 'Cứu Vớt', 'Hệ Thống'],
     };
-    const suffixByGenre: Record<string, string[]> = {
+    const suffixByGenre: Partial<Record<StoryGenreType, string[]>> = {
       'tien-hiep': ['Thần Đế', 'Kiếm Chủ', 'Tiên Tôn', 'Bất Diệt'],
       'huyen-huyen': ['Chi Chủ', 'Ma Tôn', 'Thánh Vương', 'Cấm Điển'],
       'do-thi': ['Toàn Năng', 'Chiến Thần', 'Trùm Đô Thị', 'Siêu Cấp'],
@@ -1950,8 +1950,8 @@ CHÚ Ý:
       'khoai-xuyen': ['Lữ Hành Ký', 'Cứu Thế Ký', 'Đa Vũ Trụ', 'Vạn Thế'],
     };
 
-    const prefixes = prefixByGenre[genre] || ['Chí Tôn'];
-    const suffixes = suffixByGenre[genre] || ['Truyền Kỳ'];
+    const prefixes = prefixByGenre[genre as StoryGenreType] || ['Chí Tôn'];
+    const suffixes = suffixByGenre[genre as StoryGenreType] || ['Truyền Kỳ'];
     const prefix = prefixes[seed % prefixes.length];
     const suffix = suffixes[Math.floor(seed / Math.max(1, prefixes.length)) % suffixes.length];
     return `${prefix} ${suffix}`.trim();
