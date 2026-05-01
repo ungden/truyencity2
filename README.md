@@ -2,6 +2,12 @@
 
 Nền tảng viết truyện tự động bằng AI với khả năng "1 Click = 1 Chương hoàn chỉnh". Hỗ trợ viết truyện dài 1000-2000 chương với hệ thống quản lý cốt truyện thông minh.
 
+> **Story Engine v2 (Phase 24-28, 2026-05-01)**: 5-layer architecture (canon/plan/state/memory/quality/context/pipeline) với full đại thần workflow simulation cho 1000-chương novels. 26 modules + 9 migrations + 81 tests. See [CLAUDE.md](CLAUDE.md) + [src/services/story-engine/ARCHITECTURE.md](src/services/story-engine/ARCHITECTURE.md) for design + module catalog.
+>
+> **Cost**: ~\$15-22 per 1000-chapter novel (DeepSeek V4 Flash + 70% prompt cache hit).
+>
+> **Đại thần practices covered (19/19)**: 卷宗 volume / 伏笔表 foreshadowing / 悬念三层 climax ladder / 角色档案 cast database / 时间线 timeline / 物品系统 inventory / 修炼体系 power-system canon / 势力档案 factions / 反转表 plot twists / 主题 themes / 设定集 worldbuilding / 声音锚 voice anchor / 日大纲 rolling briefs / POV / sensory / hook / rubric judge / first-10 gate.
+
 ## 🚀 Tính năng chính
 
 ### ✅ Đã hoàn thành (90%)
@@ -400,6 +406,45 @@ MIT License - see [LICENSE](LICENSE) file for details.
 - Email: support@example.com
 - Discord: [Join our server](https://discord.gg/example)
 - Docs: [Read the docs](https://docs.example.com)
+
+---
+
+## Story Engine — Story Engine v2 (Phase 24-28)
+
+Pipeline rebuild dùng cho 1000-chương novels. Single PR ([#38](https://github.com/ungden/truyencity2/pull/38)) — 19 commits, ~5500 LOC.
+
+### 5-layer architecture
+- `canon/` — IMMUTABLE worldbuilding (cosmology, power-system rules, factions, world rules)
+- `plan/` — STORY ARCHITECTURE (master outline với volume hierarchy, foreshadowing, plot twists, themes, climax ladder, rolling briefs)
+- `state/` — LIVING STATE per chapter (cast database, character states, timeline, items, relationships, geography, power state)
+- `memory/` — HISTORICAL RECORD (chapter summaries, RAG, beats, voice fingerprints, voice anchors, volume summaries, character bibles)
+- `quality/` — ASSESSMENT layer (continuity guardian, first-10 evaluator, consistency check, rubric judge, POV/sensory/hook checks, canon enforcement, quality metrics)
+- `context/` — SMART CONTEXT ASSEMBLY (assembler, relevance-rank, pre-write QA)
+- `pipeline/` — ORCHESTRATION (Architect+Writer+Critic, auto-reviser, outline-reviser, summary-orchestrator)
+- `templates/` — GENRE-SPECIFIC blueprints + voice anchors + style bible
+- `utils/` — infra (DeepSeek/Gemini, retry-queue, cost tracking, alerts, model tier)
+
+### Post-merge actions
+
+```bash
+# 1. Apply migrations 0162-0170 (Supabase)
+# 2. Backfill canons cho existing novels
+./node_modules/.bin/tsx scripts/backfill-canons.ts                # all active
+./node_modules/.bin/tsx scripts/backfill-canons.ts <projectId>     # single project
+./node_modules/.bin/tsx scripts/backfill-canons.ts --limit=20
+
+# 3. Stress test trước khi reach scale
+./node_modules/.bin/tsx scripts/stress-test-1000.ts <projectId> 800
+
+# 4. Verify pipeline
+npm run typecheck
+npm test                # 81/81 tests
+```
+
+### Dashboards
+- `/admin/quality` — canon coverage, weak openings, outline revisions, cost
+- `/admin/supreme-goals` — 5 traffic lights per project (coherence / character consistency / directional plot / ending / uniform quality)
+- `/admin/stuck-novels` — paused projects + setup pipeline failures
 
 ---
 
