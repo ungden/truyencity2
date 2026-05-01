@@ -986,6 +986,14 @@ ${voiceHint}
 → chapter_briefs cho chương 1-3 PHẢI propose scenes thỏa mãn các rule trên.
    CẤM TUYỆT ĐỐI brief mở chương 1 với "MC nghèo đói / chủ nhà giục / bế tắc / tự tử".
    MC PHẢI mở chương 1 với golden finger ACTIVE + competence visible + opportunity-driven hook.
+
+[SẢNG VĂN ARC 1 HARD BANS — TUYỆT ĐỐI]:
+   ✗ ZERO mysterious organization tracking MC trong arc 1. Tổ chức bí ẩn defer arc 4+.
+   ✗ KHÔNG "MC vừa làm X đã bị Y phát hiện". Mỗi MC milestone scale 1 tầng nhận thức world (xã→huyện→tỉnh→quốc — KHÔNG SKIP TẦNG).
+   ✗ MAX 1 antagonist active arc 1 (LOCAL scale: hàng xóm/đồng nghiệp/chợ). Antagonist mới chỉ unlock sau khi MC kết thúc xung đột với cái cũ.
+   ✗ KHÔNG "world full of trọng sinh khác". MC trọng sinh là DUY NHẤT — world NGÂY THƠ về golden finger MC.
+   ✗ WARM BASELINE 5 chương đầu: ZERO active threat. MC làm việc routine trong domain nhỏ. KHÔNG có stalker / sát thủ / tổ chức bí ẩn / kẻ thù kiếp trước follow-through ở chương 1-5.
+   ✗ "Vừa mua sắm ít đồ đã bị 5 thằng chú ý" = REJECT. Reader cần warm-up time để root for MC.
 \n`;
   }
 
