@@ -2004,17 +2004,45 @@ QUY TẮC: description blurb phải tone đúng genre + ám chỉ 1 trong các t
 }
 
 /**
+ * Vietnamese stopwords + connectives that are too generic to count as hook signal.
+ * Keep this list conservative — only words that appear in EVERY world description.
+ */
+const HOOK_STOPWORDS = new Set([
+  'và', 'của', 'là', 'có', 'không', 'đã', 'đang', 'sẽ', 'để', 'trong', 'ngoài',
+  'với', 'từ', 'cho', 'này', 'kia', 'những', 'các', 'một', 'hai', 'ba', 'bốn',
+  'năm', 'sáu', 'bảy', 'tám', 'chín', 'mười', 'một số', 'nhiều', 'ít',
+  'rất', 'khá', 'cũng', 'còn', 'lại', 'bị', 'được', 'mà', 'nhưng', 'hoặc',
+  'khi', 'lúc', 'thì', 'nếu', 'vì', 'vào', 'theo', 'mỗi', 'một', 'dù',
+  'mc', 'ch', 'phase', 'arc',
+]);
+
+/**
+ * Extract content keywords from a hook string — drop stopwords + connectives,
+ * keep meaningful nouns/verbs ≥4 chars. Used as fuzzy match signal vs raw substring.
+ */
+function extractHookKeywords(hook: string): string[] {
+  const norm = hook.toLowerCase().replace(/[—,.\-/()"]/g, ' ');
+  const tokens = norm.split(/\s+/).filter(t => t.length >= 4 && !HOOK_STOPWORDS.has(t));
+  return tokens;
+}
+
+/**
  * Validate world_description chứa ≥minHooks hooks từ playbook.
- * Returns { passed, missing } — caller dùng để retry stage.
+ * Phase 29 hotfix v2: substring-of-chunk match was too strict (paraphrase didn't survive).
+ * New approach: token-overlap — a hook is "matched" if ≥40% of its content keywords
+ * appear in world_description. Keeps signal strong without forcing literal copy-paste.
  */
 export function validateWorldHooks(genre: GenreType, worldDescription: string): { passed: boolean; matchedCount: number; minRequired: number } {
   const pb = getGenreSetupPlaybook(genre);
   const text = worldDescription.toLowerCase();
   let matched = 0;
   for (const hook of pb.worldbuildingHooks) {
-    // Heuristic: extract key noun phrases (split by — or .) — match if any chunk appears
-    const chunks = hook.split(/[—,.]/).map(c => c.trim().toLowerCase()).filter(c => c.length >= 8);
-    if (chunks.some(c => text.includes(c.slice(0, Math.min(c.length, 25))))) {
+    const keywords = extractHookKeywords(hook);
+    if (keywords.length === 0) continue;
+    const present = keywords.filter(k => text.includes(k)).length;
+    const ratio = present / keywords.length;
+    // ≥40% keyword overlap OR ≥3 absolute keywords present (whichever easier)
+    if (ratio >= 0.4 || present >= 3) {
       matched++;
     }
   }
