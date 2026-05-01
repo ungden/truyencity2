@@ -83,6 +83,14 @@ CHẤT LƯỢNG ĐẠI THẦN — required fields:
 1. premise: hook 2-3 câu gói ghém golden finger + stakes + opening situation
 2. themes: 4-6 themes concrete (KHÔNG generic "growth/love/success")
 3. mainConflict: 1-2 câu xung đột TRỤC (KHÔNG vague — phải có actor + stake)
+   ‼️ ANTAGONIST PROGRESSION (modern sảng văn — vượt qua tân thủ → maps lớn dần):
+   - Phase 1 mainConflict PHẢI LOCAL antagonist (hàng xóm/đồng nghiệp/đối thủ chợ).
+   - KHÔNG cosmic-tier Phase 1: "Tối Thượng", "Đại Đế", "Tổ Tiên", "Cố Vấn Tối Cao",
+     "Thừa Tướng", "AI Tối Thượng", "Trưởng Lão Ma giáo", "Tử Thần".
+   - KHÔNG cosmic stake: "đe dọa phá hủy thế giới", "tru di tam tộc", "xóa sổ ký ức",
+     "săn lùng khắp thiên hạ", "deadline 3 năm sống/chết", "tiêu hao sinh mệnh".
+   - GROWTH framing: "MC theo đuổi X gặp Y phản ứng", KHÔNG "MC phải sống sót khỏi X".
+   - Cosmic-tier antagonist CHỈ unlock arc 6+ (đặt vào endingVision, không phải mainConflict).
 4. protagonist: name, startingState (concrete: nghề + tài sản + tình cảm + weakness), endGoal, characterArc (internal change concrete)
 5. majorPlotPoints: 4 plot points (inciting/midpoint/climax/resolution), MỖI cái có description 1-2 câu CỤ THỂ (KHÔNG chỉ "Cơ hội đầu tiên" — phải nêu tên nhân vật + scene cụ thể)
 6. castRoster: 4-6 nhân vật phụ NAMED — Architect dùng để build scenes:
