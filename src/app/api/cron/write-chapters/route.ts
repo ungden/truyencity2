@@ -488,6 +488,40 @@ async function prepareInitProject(
   const novel = Array.isArray(project.novels) ? project.novels[0] : project.novels;
   if (!novel?.id) throw new Error('No novel linked');
 
+  // 2026-05-01 STAGE PIPELINE: User feedback "không được fallback mà phải đi qua đầy
+  // đủ các bước". Replaced lump regen with explicit stage state machine — 1 stage per
+  // cron tick, validate per-stage, advance on success, retry on fail. NO FALLBACK.
+  const { setup_stage, setup_stage_attempts } = await (async () => {
+    const { data } = await supabase
+      .from('ai_story_projects')
+      .select('setup_stage,setup_stage_attempts')
+      .eq('id', project.id)
+      .maybeSingle();
+    return { setup_stage: (data?.setup_stage || 'idea') as string, setup_stage_attempts: data?.setup_stage_attempts || 0 };
+  })();
+
+  const STAGED_STATES = new Set(['idea', 'world', 'character', 'description']);
+  if (STAGED_STATES.has(setup_stage)) {
+    const { runOneStage } = await import('@/services/story-engine/pipeline/setup-pipeline');
+    const { data: stageProj } = await supabase
+      .from('ai_story_projects')
+      .select('id,novel_id,genre,main_character,world_description,master_outline,story_outline,setup_stage,setup_stage_attempts,novels!ai_story_projects_novel_id_fkey(id,title)')
+      .eq('id', project.id)
+      .single();
+    if (!stageProj) {
+      return { id: project.id, title: novel.title, tier: 'init-prep', success: false, error: 'project not found' };
+    }
+    const advanced = await runOneStage(stageProj as Parameters<typeof runOneStage>[0]);
+    return {
+      id: project.id, title: novel.title, tier: 'init-prep',
+      success: advanced,
+      error: advanced ? undefined : `stage ${setup_stage} failed (attempt ${setup_stage_attempts + 1}/5)`,
+    };
+  }
+
+  // Stages master_outline / story_outline / arc_plan / ready_to_write fall through
+  // to legacy flow below (which also advances state via existing logic).
+
   const genre = (project.genre || 'tien-hiep') as GenreType;
   const protagonistName = project.main_character || '';
   const totalPlanned = project.total_planned_chapters || 1000;
@@ -619,6 +653,21 @@ ${needsMcRegen ? '- mainCharacter PHẢI đa dạng — không dùng tên clich�
       : Promise.resolve();
 
     await Promise.all([masterPromise, storyPromise]);
+
+    // Advance setup_stage to arc_plan if both regen succeeded
+    const { data: postRegen } = await supabase
+      .from('ai_story_projects')
+      .select('master_outline,story_outline')
+      .eq('id', project.id)
+      .maybeSingle();
+    if (postRegen?.master_outline && postRegen?.story_outline) {
+      await supabase.from('ai_story_projects').update({
+        setup_stage: 'arc_plan',
+        setup_stage_updated_at: new Date().toISOString(),
+        setup_stage_error: null,
+        setup_stage_attempts: 0,
+      }).eq('id', project.id);
+    }
 
     // Re-fetch after regen
     const refetch = await supabase
