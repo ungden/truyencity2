@@ -33,6 +33,8 @@ export default async function QualityDashboardPage() {
     weakOpenings,
     costByTask,
     budget,
+    canonCoverage,
+    revisedNovels,
   ] = await Promise.all([
     supabase.from('ai_story_projects').select('id', { count: 'exact', head: true }).eq('status', 'active'),
     supabase.from('ai_story_projects').select('id', { count: 'exact', head: true }).eq('status', 'paused'),
@@ -53,6 +55,16 @@ export default async function QualityDashboardPage() {
       .gte('created_at', new Date(Date.now() - 24 * 3600 * 1000).toISOString())
       .limit(10000),
     checkMonthlyBudget(),
+    // Phase 28 TIER 4: canon coverage — how many active projects have each canon
+    supabase.from('ai_story_projects')
+      .select('id,power_system_canon,worldbuilding_canon')
+      .eq('status', 'active'),
+    // Phase 28 TIER 3.1: outline revisions — surface recently revised novels
+    supabase.from('ai_story_projects')
+      .select('id,pause_reason,paused_at,current_chapter,novels!ai_story_projects_novel_id_fkey(title)')
+      .ilike('pause_reason', 'outline_auto_revision%')
+      .order('paused_at', { ascending: false })
+      .limit(10),
   ]);
 
   // Quality average over last 7 days
@@ -70,6 +82,15 @@ export default async function QualityDashboardPage() {
     t.cacheHits += (r.metadata?.cache_hit_tokens) || 0;
   }
   const tasksSorted = Object.entries(taskAgg).sort((a, b) => b[1].cost - a[1].cost);
+
+  // Phase 28 TIER 4: canon coverage stats
+  const canonProjects = (canonCoverage.data || []) as Array<{ power_system_canon: unknown; worldbuilding_canon: unknown }>;
+  const totalActive = canonProjects.length;
+  const withPowerCanon = canonProjects.filter(p => !!p.power_system_canon).length;
+  const withWorldCanon = canonProjects.filter(p => !!p.worldbuilding_canon).length;
+  const canonCoveragePct = totalActive > 0
+    ? Math.round(((withPowerCanon + withWorldCanon) / (totalActive * 2)) * 100)
+    : 0;
 
   return (
     <div className="space-y-6">
@@ -101,7 +122,56 @@ export default async function QualityDashboardPage() {
           sub={(failedTasks.count || 0) > 50 ? '⚠ replay falling behind' : 'pending'}
         />
         <Card label="Bad chapters" value={String(badChapters.data?.length || 0)} sub="last 20 with issues" />
+        <Card
+          label="Canon coverage"
+          value={`${canonCoveragePct}%`}
+          sub={`${withPowerCanon}/${totalActive} power, ${withWorldCanon}/${totalActive} world`}
+        />
       </div>
+
+      {/* Phase 28 TIER 3.1: Outline revisions surface */}
+      {revisedNovels.data && revisedNovels.data.length > 0 && (
+        <section>
+          <h2 className="text-lg font-semibold mb-2">
+            🔄 Outline auto-revisions (paused for revision)
+          </h2>
+          <p className="text-xs text-gray-500 mb-2">
+            Quality drift triggered automatic outline revision. These projects are mid-revision OR have just been revised. Inspect pause_reason for details.
+          </p>
+          <div className="overflow-x-auto rounded border border-gray-200 dark:border-gray-700">
+            <table className="min-w-full text-sm">
+              <thead className="bg-gray-100 dark:bg-gray-800">
+                <tr>
+                  <th className="px-3 py-2 text-left">Project</th>
+                  <th className="px-3 py-2 text-left">Title</th>
+                  <th className="px-3 py-2 text-right">Current ch.</th>
+                  <th className="px-3 py-2 text-left">Pause reason</th>
+                  <th className="px-3 py-2 text-left">Paused at</th>
+                </tr>
+              </thead>
+              <tbody>
+                {revisedNovels.data.map((row: {
+                  id: string;
+                  pause_reason: string | null;
+                  paused_at: string | null;
+                  current_chapter: number;
+                  novels?: Array<{ title: string }>;
+                }) => (
+                  <tr key={row.id} className="border-t border-gray-200 dark:border-gray-700">
+                    <td className="px-3 py-2 font-mono text-xs">{row.id.slice(0, 8)}</td>
+                    <td className="px-3 py-2">{row.novels?.[0]?.title || '—'}</td>
+                    <td className="px-3 py-2 text-right">{row.current_chapter}</td>
+                    <td className="px-3 py-2 text-xs">{row.pause_reason?.slice(0, 100) || '—'}</td>
+                    <td className="px-3 py-2 text-xs text-gray-500">
+                      {row.paused_at ? new Date(row.paused_at).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) : '—'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
 
       {/* Bad chapters detail */}
       {badChapters.data && badChapters.data.length > 0 && (
