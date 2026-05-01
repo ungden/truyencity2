@@ -25,7 +25,7 @@ import { callGemini } from '../utils/gemini';
 import { parseJSON } from '../utils/json-repair';
 import { getSupabase } from '../utils/supabase';
 import type { GeminiConfig } from '../types';
-import type { CharacterContradiction } from '../memory/character-tracker';
+import type { CharacterContradiction } from '../state/character-state';
 
 // Phase 22 Stage 2 Q7: bumped 30K → 80K content cap. Guardian must read FULL chapter
 // (not head+tail) to catch mid-chapter contradictions. DeepSeek 1M context handles it.
@@ -195,15 +195,26 @@ Trả về JSON:
       'subplot_reopen': 'subplot_reopen',
     };
 
+    // Phase 24: route MAJOR issues into auto-revise for the two highest-impact
+    // continuity classes (resurrection, power_regression). Was critical-only — major
+    // dead-character revivals or significant power downgrades silently shipped.
+    // Other types (location_teleport, personality_flip, info_leak, subplot_reopen)
+    // still require severity=critical to trigger revise (cost vs noise trade-off).
+    const REVISE_AT_MAJOR: ReadonlySet<CharacterContradiction['type']> = new Set([
+      'resurrection',
+      'power_regression',
+    ]);
     const contradictions: CharacterContradiction[] = [];
     for (const issue of issues) {
-      if (issue.severity !== 'critical') continue;
       const mappedType = typeMap[issue.type];
       if (!mappedType) continue; // 'other' is not auto-revisable
+      const isCritical = issue.severity === 'critical';
+      const isMajorReviseClass = issue.severity === 'major' && REVISE_AT_MAJOR.has(mappedType);
+      if (!isCritical && !isMajorReviseClass) continue;
       contradictions.push({
         characterName: extractCharName(issue.description),
         type: mappedType,
-        severity: 'critical',
+        severity: isCritical ? 'critical' : 'critical', // promote major→critical so auto-reviser fires
         description: issue.description,
         previousChapter: 0,
         currentChapter: chapterNumber,

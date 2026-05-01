@@ -29,7 +29,7 @@ import { getVietnamDayBounds } from '@/lib/utils/vietnam-time';
 
 // Story Engine v2 — sole engine for all tiers (init + resume)
 import { writeOneChapter as writeOneChapterV2 } from '@/services/story-engine';
-import { generateArcPlan } from '@/services/story-engine/pipeline/context-assembler';
+import { generateArcPlan } from '@/services/story-engine/context/assembler';
 import type { GenreType, GeminiConfig } from '@/services/story-engine/types';
 import { DEFAULT_CONFIG } from '@/services/story-engine/types';
 
@@ -547,7 +547,7 @@ async function prepareInitProject(
   if (needsWorldRegen) {
     try {
       const { callGemini } = await import('@/services/story-engine/utils/gemini');
-      const { buildSeedBlueprintInstructions } = await import('@/services/story-engine/seed-blueprint');
+      const { buildSeedBlueprintInstructions } = await import('@/services/story-engine/plan/seed-blueprint');
       const { GENRE_CONFIG } = await import('@/lib/types/genre-config');
       const genreConfig = (GENRE_CONFIG as unknown as Record<string, { label?: string }>)[genre] || {};
       const genreLabel = genreConfig.label || genre;
@@ -632,7 +632,7 @@ ${needsMcRegen ? '- mainCharacter PHẢI đa dạng — không dùng tên clich�
     const masterPromise = !projRow?.master_outline
       ? (async () => {
           try {
-            const { generateMasterOutline } = await import('@/services/story-engine/pipeline/master-outline');
+            const { generateMasterOutline } = await import('@/services/story-engine/plan/master-outline');
             await generateMasterOutline(project.id, novel.title, genre, worldDesc.slice(0, 6000), totalPlanned, { ...geminiConfig, model: 'deepseek-v4-pro' });
           } catch (e) { console.warn(`[init-prep] master_outline regen failed for ${project.id}:`, e instanceof Error ? e.message : String(e)); }
         })()
@@ -641,7 +641,7 @@ ${needsMcRegen ? '- mainCharacter PHẢI đa dạng — không dùng tên clich�
     const storyPromise = !projRow?.story_outline
       ? (async () => {
           try {
-            const { generateStoryOutline } = await import('@/services/story-engine/pipeline/story-outline');
+            const { generateStoryOutline } = await import('@/services/story-engine/plan/story-outline');
             const outline = await generateStoryOutline(
               project.id, novel.title, genre, protagonistName,
               worldDesc, totalPlanned,

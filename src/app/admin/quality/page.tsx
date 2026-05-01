@@ -30,8 +30,11 @@ export default async function QualityDashboardPage() {
     qualityAvg,
     failedTasks,
     badChapters,
+    weakOpenings,
     costByTask,
     budget,
+    canonCoverage,
+    revisedNovels,
   ] = await Promise.all([
     supabase.from('ai_story_projects').select('id', { count: 'exact', head: true }).eq('status', 'active'),
     supabase.from('ai_story_projects').select('id', { count: 'exact', head: true }).eq('status', 'paused'),
@@ -42,10 +45,26 @@ export default async function QualityDashboardPage() {
       .or('overall_score.lt.6,guardian_issues_critical.gt.0,contradictions_critical.gt.0')
       .order('created_at', { ascending: false })
       .limit(20),
+    // Phase 25: first-10 evaluations — surface marginal/fail openings
+    supabase.from('first_10_evaluations')
+      .select('project_id,novel_id,verdict,overall_score,usp_clarity,hook_strength,payoff_cadence,core_loop,genre_fidelity,issues,recommendations,created_at')
+      .in('verdict', ['marginal', 'fail'])
+      .order('created_at', { ascending: false })
+      .limit(20),
     supabase.from('cost_tracking').select('task,cost,input_tokens,output_tokens,metadata')
       .gte('created_at', new Date(Date.now() - 24 * 3600 * 1000).toISOString())
       .limit(10000),
     checkMonthlyBudget(),
+    // Phase 28 TIER 4: canon coverage — how many active projects have each canon
+    supabase.from('ai_story_projects')
+      .select('id,power_system_canon,worldbuilding_canon')
+      .eq('status', 'active'),
+    // Phase 28 TIER 3.1: outline revisions — surface recently revised novels
+    supabase.from('ai_story_projects')
+      .select('id,pause_reason,paused_at,current_chapter,novels!ai_story_projects_novel_id_fkey(title)')
+      .ilike('pause_reason', 'outline_auto_revision%')
+      .order('paused_at', { ascending: false })
+      .limit(10),
   ]);
 
   // Quality average over last 7 days
@@ -63,6 +82,15 @@ export default async function QualityDashboardPage() {
     t.cacheHits += (r.metadata?.cache_hit_tokens) || 0;
   }
   const tasksSorted = Object.entries(taskAgg).sort((a, b) => b[1].cost - a[1].cost);
+
+  // Phase 28 TIER 4: canon coverage stats
+  const canonProjects = (canonCoverage.data || []) as Array<{ power_system_canon: unknown; worldbuilding_canon: unknown }>;
+  const totalActive = canonProjects.length;
+  const withPowerCanon = canonProjects.filter(p => !!p.power_system_canon).length;
+  const withWorldCanon = canonProjects.filter(p => !!p.worldbuilding_canon).length;
+  const canonCoveragePct = totalActive > 0
+    ? Math.round(((withPowerCanon + withWorldCanon) / (totalActive * 2)) * 100)
+    : 0;
 
   return (
     <div className="space-y-6">
@@ -94,7 +122,56 @@ export default async function QualityDashboardPage() {
           sub={(failedTasks.count || 0) > 50 ? '⚠ replay falling behind' : 'pending'}
         />
         <Card label="Bad chapters" value={String(badChapters.data?.length || 0)} sub="last 20 with issues" />
+        <Card
+          label="Canon coverage"
+          value={`${canonCoveragePct}%`}
+          sub={`${withPowerCanon}/${totalActive} power, ${withWorldCanon}/${totalActive} world`}
+        />
       </div>
+
+      {/* Phase 28 TIER 3.1: Outline revisions surface */}
+      {revisedNovels.data && revisedNovels.data.length > 0 && (
+        <section>
+          <h2 className="text-lg font-semibold mb-2">
+            🔄 Outline auto-revisions (paused for revision)
+          </h2>
+          <p className="text-xs text-gray-500 mb-2">
+            Quality drift triggered automatic outline revision. These projects are mid-revision OR have just been revised. Inspect pause_reason for details.
+          </p>
+          <div className="overflow-x-auto rounded border border-gray-200 dark:border-gray-700">
+            <table className="min-w-full text-sm">
+              <thead className="bg-gray-100 dark:bg-gray-800">
+                <tr>
+                  <th className="px-3 py-2 text-left">Project</th>
+                  <th className="px-3 py-2 text-left">Title</th>
+                  <th className="px-3 py-2 text-right">Current ch.</th>
+                  <th className="px-3 py-2 text-left">Pause reason</th>
+                  <th className="px-3 py-2 text-left">Paused at</th>
+                </tr>
+              </thead>
+              <tbody>
+                {revisedNovels.data.map((row: {
+                  id: string;
+                  pause_reason: string | null;
+                  paused_at: string | null;
+                  current_chapter: number;
+                  novels?: Array<{ title: string }>;
+                }) => (
+                  <tr key={row.id} className="border-t border-gray-200 dark:border-gray-700">
+                    <td className="px-3 py-2 font-mono text-xs">{row.id.slice(0, 8)}</td>
+                    <td className="px-3 py-2">{row.novels?.[0]?.title || '—'}</td>
+                    <td className="px-3 py-2 text-right">{row.current_chapter}</td>
+                    <td className="px-3 py-2 text-xs">{row.pause_reason?.slice(0, 100) || '—'}</td>
+                    <td className="px-3 py-2 text-xs text-gray-500">
+                      {row.paused_at ? new Date(row.paused_at).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) : '—'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
 
       {/* Bad chapters detail */}
       {badChapters.data && badChapters.data.length > 0 && (
@@ -121,6 +198,73 @@ export default async function QualityDashboardPage() {
                     <td className={`px-3 py-2 ${r.contradictions_critical > 0 ? 'text-red-600' : ''}`}>{r.contradictions_critical}</td>
                   </tr>
                 ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
+      {/* First-10 evaluations — Phase 25 opening-quality gate */}
+      {weakOpenings.data && weakOpenings.data.length > 0 && (
+        <section>
+          <h2 className="text-lg font-semibold mb-2">
+            ⚠ Weak openings (first-10 evaluator)
+          </h2>
+          <p className="text-xs text-gray-500 mb-2">
+            Marginal/fail verdicts on the opening 10 chapters. May need outline regeneration.
+          </p>
+          <div className="overflow-x-auto rounded border border-gray-200 dark:border-gray-700">
+            <table className="min-w-full text-sm">
+              <thead className="bg-gray-100 dark:bg-gray-800">
+                <tr>
+                  <th className="px-3 py-2 text-left">Project</th>
+                  <th className="px-3 py-2 text-center">Verdict</th>
+                  <th className="px-3 py-2 text-right">Overall</th>
+                  <th className="px-3 py-2 text-right">USP</th>
+                  <th className="px-3 py-2 text-right">Hook</th>
+                  <th className="px-3 py-2 text-right">Payoff</th>
+                  <th className="px-3 py-2 text-right">Loop</th>
+                  <th className="px-3 py-2 text-right">Genre</th>
+                  <th className="px-3 py-2 text-left">Top issue</th>
+                </tr>
+              </thead>
+              <tbody>
+                {weakOpenings.data.map((row: {
+                  project_id: string;
+                  verdict: string;
+                  overall_score: number;
+                  usp_clarity: number;
+                  hook_strength: number;
+                  payoff_cadence: number;
+                  core_loop: number;
+                  genre_fidelity: number;
+                  issues?: Array<{ dimension?: string; severity?: string; description?: string }> | null;
+                }) => {
+                  const topIssue = (row.issues || [])[0];
+                  return (
+                    <tr key={row.project_id} className="border-t border-gray-200 dark:border-gray-700">
+                      <td className="px-3 py-2 font-mono text-xs">{row.project_id.slice(0, 8)}</td>
+                      <td className="px-3 py-2 text-center">
+                        <span className={
+                          row.verdict === 'fail'
+                            ? 'text-red-600 font-bold'
+                            : 'text-amber-600 font-semibold'
+                        }>
+                          {row.verdict}
+                        </span>
+                      </td>
+                      <td className="px-3 py-2 text-right">{row.overall_score}</td>
+                      <td className="px-3 py-2 text-right">{row.usp_clarity}</td>
+                      <td className="px-3 py-2 text-right">{row.hook_strength}</td>
+                      <td className="px-3 py-2 text-right">{row.payoff_cadence}</td>
+                      <td className="px-3 py-2 text-right">{row.core_loop}</td>
+                      <td className="px-3 py-2 text-right">{row.genre_fidelity}</td>
+                      <td className="px-3 py-2 text-xs text-gray-600 dark:text-gray-400">
+                        {topIssue ? `${topIssue.dimension}/${topIssue.severity}: ${topIssue.description?.slice(0, 80) || ''}` : '—'}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

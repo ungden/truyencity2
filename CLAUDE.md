@@ -882,3 +882,273 @@ Run: `./node_modules/.bin/tsx scripts/spawn-phase20-representatives.ts`
 - `src/services/story-factory/genre-templates.ts` — GENRE_TEMPLATES Record (legacy)
 - `src/services/content-seeder/index.ts` — SOURCE_TOPIC_SEEDS + VARIANTS_BY_GENRE + prefixByGenre + suffixByGenre (3 new entries each)
 - `scripts/spawn-phase20-representatives.ts` — new script, 10 representative seeds with hand-crafted detail per brief
+
+---
+
+## Phase 24-28 Details (2026-05-01) — Full đại thần workflow rebuild + 5-layer architecture
+
+**Single PR**: [#38](https://github.com/ungden/truyencity2/pull/38) — 19 commits across Phase 24-28. ~5500 lines added, 4097 lines deleted (V1 dead code), 26 new modules, 9 new migrations.
+
+**Read first**: [src/services/story-engine/ARCHITECTURE.md](src/services/story-engine/ARCHITECTURE.md) — 5-layer design + dependency rules.
+
+### Phase summary
+
+| Phase | Wave | Commits | Highlight |
+|---|---|---|---|
+| 24 | — | 142b1fd, e2c2f1f, 6ef4109 | Codex audit pipeline fixes (REVISE gate fail-closed, per-part loop, pre-save QA gate, auto-revise reorder, guardian skip-bug) |
+| 25 | — | cdf2b5c | Rubric judge (5 dims) + First10ChapterEvaluator |
+| 26 | — | 9391766, ac78a09 | Volume hierarchy 卷宗 + foreshadowing OVERDUE 伏笔表 + climax ladder 悬念三层 |
+| 27 W1 | 4 commits | 02c5b77, 472d128, b675a62, 5da299b | 5-layer refactor (canon/plan/state/quality/context) + plot-tracker.ts split (4 modules) + ARCHITECTURE.md |
+| 27 W2 | — | 9748394 | cast-database/timeline/item-inventory/power-canon/factions (5 modules) |
+| 27 W3 | — | 8eda221 | plot-twists/themes/worldbuilding (3 modules) |
+| 27 W4 | — | f9091eb | relevance-rank + voice-anchor (2 modules) |
+| 27 W5 | — | fd7225d | POV/sensory/hook/rolling-briefs (4 polish modules) |
+| 28.1 | — | 227aa55 | Default no-split for new novels |
+| 28 TIER 1 | — | ddbfdac | Critic enforcement gates (canon-enforcement.ts) |
+| 28 TIER 3.1+3.2+4 | — | 7ad8727 | Outline auto-revision + stress test harness + dashboard enhancements |
+| 28 TIER 6 | — | 98d5ddf | Backfill canons script + retry handlers + integration tests |
+| 28 docs | — | a5f52a9 | Documentation in CLAUDE.md + README.md + .claude/CLAUDE.md |
+| 28 TIER 2 | — | 2dc30ba, 4cc5585, 4f8ec1e | File splits: templates.ts (3243→1365), chapter-writer.ts (2350→1554), context/assembler.ts (1407→879). 7 new focused modules. ~3200 LOC moved to single-responsibility files. |
+
+### 5-layer architecture (post Phase 27 W1)
+
+```
+src/services/story-engine/
+├── ARCHITECTURE.md              ← READ FIRST
+├── canon/                       ← IMMUTABLE worldbuilding (set at setup)
+│   ├── constraint-extractor.ts
+│   ├── world-rules.ts           [W1.6 split from plot-tracker]
+│   ├── factions.ts              [W2.5]
+│   ├── power-system.ts          [W2.4]
+│   └── worldbuilding.ts         [W3.3]
+├── plan/                        ← STORY ARCHITECTURE
+│   ├── master-outline.ts        (Phase 26 volume hierarchy)
+│   ├── story-outline.ts
+│   ├── seed-blueprint.ts
+│   ├── foreshadowing.ts         (Phase 24 OVERDUE gate)
+│   ├── pacing-director.ts
+│   ├── plot-twists.ts           [W3.1]
+│   ├── themes.ts                [W3.2]
+│   └── chapter-briefs.ts        [W5.4]
+├── state/                       ← LIVING STATE per chapter
+│   ├── character-state.ts
+│   ├── character-arcs.ts
+│   ├── knowledge-graph.ts
+│   ├── relationships.ts
+│   ├── mc-power-state.ts
+│   ├── geography.ts
+│   ├── world-expansion.ts
+│   ├── economic-ledger.ts
+│   ├── plot-threads.ts          [W1.6 split]
+│   ├── cast-database.ts         [W2.1]
+│   ├── timeline.ts              [W2.2]
+│   └── item-inventory.ts        [W2.3]
+├── memory/                      ← HISTORICAL RECORD
+│   ├── character-bibles.ts
+│   ├── rag-store.ts
+│   ├── beat-ledger.ts           [W1.6 split]
+│   ├── voice-fingerprint.ts
+│   ├── volume-summaries.ts
+│   └── voice-anchor.ts          [W4.2]
+├── quality/                     ← ASSESSMENT
+│   ├── continuity-guardian.ts
+│   ├── first-10-evaluator.ts
+│   ├── quality-metrics.ts
+│   ├── title-checker.ts
+│   ├── consistency-check.ts     [W1.6 split]
+│   ├── pov-check.ts             [W5.1]
+│   ├── sensory-balance.ts       [W5.2]
+│   ├── hook-strength.ts         [W5.3]
+│   └── canon-enforcement.ts     [Phase 28 TIER 1]
+├── context/                     ← SMART CONTEXT ASSEMBLY
+│   ├── assembler.ts
+│   ├── pre-write-qa.ts
+│   └── relevance-rank.ts        [W4.1]
+├── pipeline/                    ← ORCHESTRATION
+│   ├── orchestrator.ts
+│   ├── chapter-writer.ts
+│   ├── setup-pipeline.ts
+│   ├── auto-reviser.ts
+│   ├── summary-orchestrator.ts
+│   └── outline-reviser.ts       [Phase 28 TIER 3.1]
+├── templates/
+│   ├── genre-process-blueprints.ts
+│   ├── genre-voice-anchors.ts
+│   └── style-bible.ts
+├── utils/                       ← infra
+└── types.ts / config.ts / templates.ts / index.ts
+```
+
+### Đại thần workflow simulation (19/19 practices ✅)
+
+| 大神 practice | Module | Phase |
+|---|---|---|
+| 卷宗 Volume hierarchy | plan/master-outline.ts | 26 |
+| 伏笔表 Foreshadowing OVERDUE gate | plan/foreshadowing.ts | 24+26 |
+| 悬念三层 Climax ladder | (volume context + Architect rules) | 26 |
+| 角色档案 Cast database | state/cast-database.ts | 27 W2.1 |
+| 时间线 Timeline tracker | state/timeline.ts | 27 W2.2 |
+| 物品系统 Item inventory | state/item-inventory.ts | 27 W2.3 |
+| 修炼体系 Power system canon | canon/power-system.ts | 27 W2.4 |
+| 势力档案 Faction registry | canon/factions.ts | 27 W2.5 |
+| 反转表 Plot twist registry | plan/plot-twists.ts | 27 W3.1 |
+| 主题 Theme tracker | plan/themes.ts | 27 W3.2 |
+| 设定集 Worldbuilding bible | canon/worldbuilding.ts | 27 W3.3 |
+| Smart context selection | context/relevance-rank.ts | 27 W4.1 |
+| 声音锚 Voice anchor | memory/voice-anchor.ts | 27 W4.2 |
+| POV consistency | quality/pov-check.ts | 27 W5.1 |
+| Sensory balance (5 senses) | quality/sensory-balance.ts | 27 W5.2 |
+| Hook strength | quality/hook-strength.ts | 27 W5.3 |
+| 日大纲 Rolling briefs | plan/chapter-briefs.ts | 27 W5.4 |
+| Rubric judge (5 dims) | (Critic prompt + post-process) | 25 |
+| First-10 quality gate | quality/first-10-evaluator.ts | 25 |
+
+### 17 bugs fixed (Codex audit + Phase 27 design gaps)
+
+| # | Bug | Phase |
+|---|---|---|
+| 1 | Critic REVISE gate advisory only | 24 |
+| 2 | Split-memory (ch N+1 missing summary/RAG/state) | 24 |
+| 3 | Continuity guardian skip-bug (`nextChapter%2` always odd) | 24 |
+| 4 | Auto-revise updated wrong DB row | 24 |
+| 5 | Auto-revise post-save (DB had bad content if revise failed) | 24 |
+| 6 | `checkConsistency` discarded output | 24 |
+| 7 | Guardian only promoted critical (major silently shipped) | 24 |
+| 8 | Critic gate threshold mismatch (≥7 vs prompt ≥6) | 24 |
+| 9 | No genre contract for Critic | 24 |
+| 10 | `plot_threads` had reader but no writer | 24 |
+| 11 | `checkConsistencyFast` silent error | 24 |
+| 12 | Quality signals = keyword counts (gameable) | 25 |
+| 13 | No first-10 quality gate | 25 |
+| 14 | Master outline flat 8-12 arcs (too long for 1000ch) | 26 |
+| 15 | No volume position context per chapter | 26 |
+| 16 | Foreshadowing overdue rot — no hard gate | 26 |
+| 17 | Climax markers existed but Architect/Critic didn't enforce | 26 |
+
+### Migrations 0162-0170 (apply post-merge)
+
+| # | Migration | Purpose |
+|---|---|---|
+| 0162 | first_10_evaluations | Phase 25 ch.1-10 quality gate |
+| 0163 | story_timeline | Chapter ↔ in-world date |
+| 0164 | item_events | Item picked/used/lost log |
+| 0165 | power_system_canon | JSONB column on ai_story_projects |
+| 0166 | factions | Faction registry + alliances |
+| 0167 | plot_twists | Pre-planned twist registry |
+| 0168 | story_themes | Theme + motifs tracker |
+| 0169 | worldbuilding_canon | JSONB column on ai_story_projects |
+| 0170 | voice_anchors | Ch.1-3 prose snippets |
+
+### Cost (1000-chapter novel, DeepSeek V4 Flash)
+
+With prompt caching ~70% hit rate: **~\$15-22 per novel**.
+
+Per AI write at scale:
+- 3 agent calls (Architect/Writer/Critic) ~\$0.014 input + \$0.007 output
+- Pre-save extraction + per-part summaries: \$0.01-0.02
+- Post-write enrichment (timeline/items/themes/threads/factions/etc.): \$0.005-0.010
+- Heuristic gates (POV/sensory/hook/cast roster regex): FREE
+
+Per-project setup (one-time): ~\$0.020 for power+world+twists+themes canons.
+
+**No-split default** (Phase 28.1): chương dài ~2800 từ, halves agent calls vs split=2 → ~10-15% saving. Existing novels with `disable_chapter_split: false` keep working via per-part loop.
+
+### Phase 28 TIER 1 — Critic enforcement (canon-enforcement.ts)
+
+Phase 27 inject 11 canon/state context blocks for Architect. Critic only enforced 3. TIER 1 closes that gap.
+
+`quality/canon-enforcement.ts` runs DETERMINISTIC gates AFTER Critic AI returns:
+1. **Cast roster** — flag invented characters (≥10 = major, ≥5 = moderate)
+2. **Timeline violations** — calls `detectTimelineViolations` (time-reversal, age regression)
+3. **POV consistency** — calls `checkPovConsistency` (only fires if expectedPov set)
+4. **Voice drift** — compare current vs ch.1-3 anchor metrics, fires every 50ch (or every chapter ≥500)
+5. **Sensory floor** — score ≤2 = major
+6. **Hook floor** — both opening+closing ≤3 = major
+
+Major/critical issues auto-promote `requiresRewrite=true`.
+
+Plus AI prompt rules added for: INVENTORY, POWER SYSTEM CANON commonViolations, WORLDBUILDING commonViolations, FACTIONS, PLOT TWISTS, THEMES, CAST ROSTER, TIMELINE, VOICE ANCHOR, ROLLING BRIEFS.
+
+### Phase 28 TIER 3.1 — Outline auto-revision
+
+`pipeline/outline-reviser.ts`:
+- Triggers: `quality_trends.alert_level='critical'` 3 consecutive snapshots OR `first_10_evaluations.verdict='fail'`
+- Workflow: Pause project (`pause_reason='outline_auto_revision: <trigger>'`) → Load 50 recent chapter summaries → AI revise upcoming volumes (keep locked volumes intact) → Persist + Resume
+- Wired into `/api/cron/quality-trend/route.ts` — runs daily after trend snapshot
+
+Admin dashboard `/admin/quality` surfaces "Outline auto-revisions" section with paused-for-revision projects + reason + timestamp.
+
+### Phase 28 TIER 3.2 — Stress test harness
+
+`scripts/stress-test-1000.ts`:
+```bash
+./node_modules/.bin/tsx scripts/stress-test-1000.ts <projectId> 800
+```
+
+Backfills synthetic chapter_summaries + character_states + voice_anchors up to (target-1), then invokes `writeOneChapter()` at target. Compares rubric scores vs ch.8 baseline → drift magnitude. >2.0 = pipeline producing materially different quality at scale.
+
+### Phase 28 TIER 6 — Backfill + retry + tests
+
+`scripts/backfill-canons.ts` — idempotently generate Phase 27 canons (power-system, worldbuilding, plot-twists, themes, voice-anchors) for existing pre-Phase-27 novels. ~\$0.020/project.
+
+```bash
+./node_modules/.bin/tsx scripts/backfill-canons.ts                # all active
+./node_modules/.bin/tsx scripts/backfill-canons.ts <projectId>     # one project
+./node_modules/.bin/tsx scripts/backfill-canons.ts --limit=20
+```
+
+`utils/retry-queue.ts` — added handlers for `plot_thread_ledger`, `factions`, `first_10_evaluation`. Aliases for orchestrator's namespaced task names (`task_15c_*`, etc.).
+
+`__tests__/integration/canon-enforcement.test.ts` — 10 tests for POV/sensory/hook gates. Test count 71 → 81.
+
+### Post-merge actions
+
+1. **Apply migrations 0162-0170** in production Supabase
+2. **Backfill existing novels**: `./node_modules/.bin/tsx scripts/backfill-canons.ts` (~\$2 for 100 projects)
+3. **Spawn test novel** target=1000 (default no-split now). Setup pipeline auto-generates canons.
+4. **Watch dashboards**:
+   - `/admin/quality` — canon coverage, weak openings, outline revisions, cost
+   - `/admin/supreme-goals` — 5 traffic lights per project
+5. **Monitor cost_tracking** — verify ~\$0.01-0.02 per chapter at steady state
+
+### Phase 28 TIER 2 — File splits (DONE 2026-05-01)
+
+3 large files split into focused modules. Pure refactor — no behavior change. Re-exports preserve all external imports.
+
+**templates.ts (3243 → 1365 lines, 58% reduction)**:
+- `templates/sub-genre-rules.ts` (716 lines) — SUB_GENRE_RULES per-sub-genre patterns
+- `templates/genre-boundaries.ts` (331 lines) — GENRE_BOUNDARIES + getGenreBoundaryText + GenreBoundary interface
+- `templates/genre-styles.ts` (579 lines) — GENRE_STYLES per-genre StyleBible
+- `templates/dopamine-patterns.ts` (300 lines) — DopaminePattern + DOPAMINE_PATTERNS
+
+**chapter-writer.ts (2350 → 1554 lines, 34% reduction)**:
+- `pipeline/chapter-writer-prompts.ts` (445 lines) — ARCHITECT_SYSTEM, WRITER_SYSTEM, CRITIC_SYSTEM, VN_PLACE_LOCK
+- `pipeline/chapter-writer-helpers.ts` (586 lines) — pure helper functions: cleanContent, extractTitle, synthesizeFallbackCliffhanger, hasCliffhangerSignal, analyzeQualitySignals, buildSignalReport, countWords, detectHardFallback, detectMcNameFlip, detectSevereRepetition, buildRepetitionReport, generateMinimalScenes, loadConstraintSection + QualitySignals interface
+
+**context/assembler.ts (1407 → 879 lines, 37% reduction)**:
+- `context/generators.ts` (606 lines) — saveChapterSummary, generateChapterSummary, generateSummaryAndCharacters, generateSynopsis, generateArcPlan, generateStoryBible + AI response interfaces
+
+### Truly deferred (Phase 28+ backlog, not blocking)
+
+- **TIER 3.3** ai-editor V2 migration: admin-only tool for chapter quality re-scanning/rewriting. All 13 V1 `story-writing-factory/` files transitively imported by `ai-editor.ts`. Migration = deep rewrite using V2 modules (continuity-guardian + auto-revise + Critic). 1-2 days work, separate PR scope.
+- **TIER 5** Reader feedback loop: comments/ratings/drop-offs feeding back into engine. Requires production novels with engagement data first. 2-3 weeks scope.
+- **Per-task retry handlers** for tasks lacking payload to fully replay (currently mark succeeded to drain queue).
+
+### Verified at every commit
+- `npx tsc --noEmit` ✅ pass
+- `npx jest` ✅ 81/81 tests pass
+- 30+ file moves with 0 broken imports
+- Cumulative: ~5500 LOC added, ~4100 LOC deleted (net code health: positive)
+
+### Daily commands
+
+```bash
+# Verify pipeline
+npm run typecheck                                                      # tsc --noEmit
+npm test                                                               # jest 81/81
+./node_modules/.bin/tsx scripts/stress-test-1000.ts <projectId> 800     # stress test at scale
+./node_modules/.bin/tsx scripts/backfill-canons.ts --limit=20          # backfill canons
+
+# Watch
+curl -H "Authorization: Bearer $CRON_SECRET" https://truyencity.com/api/cron/quality-trend  # daily quality drift check + auto-revision
+```

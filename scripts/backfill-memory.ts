@@ -16,8 +16,8 @@ import * as dotenv from 'dotenv';
 dotenv.config({ path: '.env.local' });
 
 import { createClient } from '@supabase/supabase-js';
-import { refreshCharacterBibles } from '../src/services/story-engine/memory/character-bible';
-import { generateVolumeSummary } from '../src/services/story-engine/memory/volume-summarizer';
+import { refreshCharacterBibles } from '../src/services/story-engine/memory/character-bibles';
+import { generateVolumeSummary } from '../src/services/story-engine/memory/volume-summaries';
 import { DEFAULT_CONFIG } from '../src/services/story-engine/types';
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;

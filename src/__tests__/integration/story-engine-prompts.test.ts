@@ -66,7 +66,11 @@ describe('Story Engine Prompts', () => {
             pov: "Trần Phong",
             location: "Khu ổ chuột",
             scenes: [
-              { order: 1, setting: "Phòng trọ", characters: ["Trần Phong"], goal: "Tìm cách kiếm tiền", conflict: "Không có vốn", resolution: "Nghĩ ra ý tưởng", estimatedWords: 2800, pov: "Trần Phong" }
+              { order: 1, setting: "Phòng trọ", characters: ["Trần Phong"], goal: "Kiểm tra sổ nợ và xác định vấn đề tiền mặt", conflict: "Không có vốn khởi đầu", resolution: "Chọn hướng kinh doanh nhỏ có thể làm ngay", estimatedWords: 560, pov: "Trần Phong" },
+              { order: 2, setting: "Quán nước đầu ngõ", characters: ["Trần Phong", "Bạn cũ"], goal: "Thăm dò nhu cầu thị trường quanh khu trọ", conflict: "Bạn cũ nghi ngờ kế hoạch quá liều", resolution: "Trần Phong chứng minh bằng số liệu đơn giản", estimatedWords: 560, pov: "Trần Phong" },
+              { order: 3, setting: "Chợ đêm", characters: ["Trần Phong", "Tiểu thương"], goal: "Tìm nguồn hàng thử nghiệm", conflict: "Giá nhập cao hơn dự tính", resolution: "Đàm phán được lô nhỏ ký gửi", estimatedWords: 560, pov: "Trần Phong" },
+              { order: 4, setting: "Phòng trọ", characters: ["Trần Phong"], goal: "Chốt kế hoạch bán thử sáng mai", conflict: "Rủi ro thất bại vẫn còn", resolution: "Chuẩn bị bảng giá và kịch bản tiếp khách", estimatedWords: 560, pov: "Trần Phong" },
+              { order: 5, setting: "Hành lang khu trọ", characters: ["Trần Phong", "Hàng xóm"], goal: "Tạo khách hàng đầu tiên", conflict: "Hàng xóm chỉ nửa tin nửa ngờ", resolution: "Một lời hẹn mua thử mở ra cơ hội", estimatedWords: 560, pov: "Trần Phong" }
             ],
             tensionLevel: 6,
             dopaminePoints: [{type: "business_success", scene: 1, description: "Nghĩ ra ý tưởng tỉ đô", intensity: 7, setup: "Nghèo", payoff: "Có hi vọng"}],

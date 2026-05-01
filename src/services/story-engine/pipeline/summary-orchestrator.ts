@@ -15,12 +15,12 @@ import {
   generateSynopsis,
   generateArcPlan,
   generateStoryBible,
-} from '../pipeline/context-assembler';
-import type { CombinedSummaryAndCharacters } from '../pipeline/context-assembler';
+} from '../context/assembler';
+import type { CombinedSummaryAndCharacters } from '../context/assembler';
 import { getSupabase } from '../utils/supabase';
-import { generateForeshadowingAgenda } from './foreshadowing-planner';
-import { generatePacingBlueprint } from './pacing-director';
-import { initializeWorldMap } from './world-expansion-tracker';
+import { generateForeshadowingAgenda } from '../plan/foreshadowing';
+import { generatePacingBlueprint } from '../plan/pacing-director';
+import { initializeWorldMap } from '../state/world-expansion';
 import type { GeminiConfig, GenreType } from '../types';
 
 // ── Trigger Thresholds ───────────────────────────────────────────────────────

@@ -203,6 +203,23 @@ export interface CriticOutput {
   dopamineScore: number;
   pacingScore: number;
   endingHookScore?: number;
+  /**
+   * Phase 25 rubric judge — replaces keyword-counting signals as the primary
+   * quality measure. Each dimension scored 1-10 by Critic. Used to compute /
+   * sanity-check overallScore and flag dimension-specific weaknesses.
+   *  - promiseClarity: chapter advance genre promise / core loop?
+   *  - sceneSpecificity: concrete objects/events/numbers vs vague abstraction
+   *  - mcAgency: MC drives decisions vs being reactively pushed
+   *  - payoffConsequence: events change status/resource/relationship (not throwaway)
+   *  - voiceDistinction: characters sound different (vocab, cadence, quirks)
+   */
+  rubricScores?: {
+    promiseClarity: number;
+    sceneSpecificity: number;
+    mcAgency: number;
+    payoffConsequence: number;
+    voiceDistinction: number;
+  };
   issues: CriticIssue[];
   approved: boolean;
   requiresRewrite: boolean;
@@ -291,6 +308,48 @@ export interface ContextPayload {
   };
   /** Hyperpop sub-arc context: which sub-arc this chapter belongs to + mini-payoff */
   currentSubArc?: string;
+
+  /**
+   * Phase 26: compact volume + sub-arc metadata block for the current chapter.
+   * Built from MasterOutline.volumes hierarchy. Tells Architect "where in the
+   * 1000-chapter map are we?" — current volume theme/conflict/villain, sub-arc
+   * milestones, distance to medium/major climax, position in volume.
+   */
+  volumeContext?: string;
+
+  /**
+   * Phase 27 W2.1: comprehensive cast roster — every named character with
+   * latest known state. Solves long-tail cast drift in 1000+ chapter novels
+   * (pre-Phase-27 limit of 50 character_states ROWS missed ~80% of named cast).
+   */
+  castRoster?: string;
+
+  /** Phase 27 W2.2: chapter ↔ in-world date timeline with MC age tracking. */
+  timelineContext?: string;
+
+  /** Phase 27 W2.3: current MC + key char inventory + recently lost items. */
+  inventoryContext?: string;
+
+  /** Phase 27 W2.4: comprehensive power-system rules generated at setup. */
+  powerSystemCanonContext?: string;
+
+  /** Phase 27 W2.5: top-N active factions with current alliances/rivalries. */
+  factionsContext?: string;
+
+  /** Phase 27 W3.1: upcoming plot twists in seeding/imminent state. */
+  plotTwistsContext?: string;
+
+  /** Phase 27 W3.2: themes registry with reinforcement status + drift flags. */
+  themesContext?: string;
+
+  /** Phase 27 W3.3: comprehensive worldbuilding canon (cosmology + history + cultures + regions). */
+  worldbuildingCanonContext?: string;
+
+  /** Phase 27 W4.2: voice anchor snippets from ch.1-3, re-fed every 50ch to combat drift. */
+  voiceAnchorContext?: string;
+
+  /** Phase 27 W5.4: detailed briefs for next 1-3 chapters (rolling outline ahead). */
+  rollingBriefsContext?: string;
 
   // Anti-repetition
   previousTitles: string[];

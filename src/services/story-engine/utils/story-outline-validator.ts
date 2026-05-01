@@ -19,7 +19,7 @@
  * message → user knows immediately, doesn't wait for cron drift.
  *
  * The CANONICAL schema is whatever assembleContext() in
- * pipeline/context-assembler.ts actually reads. Keep this validator
+ * context/assembler.ts actually reads. Keep this validator
  * synced with that consumer.
  */
 import type { StoryOutline } from '../types';

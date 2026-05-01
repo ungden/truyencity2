@@ -155,26 +155,81 @@ async function replayTask(row: FailedTaskRow): Promise<void> {
       return;
     }
     case 'character_states_save': {
-      const { saveCharacterStatesFromCombined } = await import('../memory/character-tracker');
+      const { saveCharacterStatesFromCombined } = await import('../state/character-state');
       const p = payload as { characters?: Array<{ character_name: string; status: 'alive' | 'dead' | 'missing' | 'unknown'; power_level: string | null; power_realm_index: number | null; location: string | null; personality_quirks: string | null; notes: string | null }> };
       if (!p.characters || chapter === null) throw new Error('character_states_save: missing payload');
       await saveCharacterStatesFromCombined(projectId, chapter, p.characters);
       return;
     }
     case 'character_bible_refresh': {
-      const { refreshCharacterBibles } = await import('../memory/character-bible');
+      const { refreshCharacterBibles } = await import('../memory/character-bibles');
       const { DEFAULT_CONFIG } = await import('../types');
       if (chapter === null) throw new Error('character_bible_refresh: missing chapter');
       await refreshCharacterBibles(projectId, chapter, DEFAULT_CONFIG);
       return;
     }
     case 'volume_summary': {
-      const { generateVolumeSummary } = await import('../memory/volume-summarizer');
+      const { generateVolumeSummary } = await import('../memory/volume-summaries');
       const { DEFAULT_CONFIG } = await import('../types');
       if (chapter === null) throw new Error('volume_summary: missing chapter');
       await generateVolumeSummary(projectId, chapter, DEFAULT_CONFIG);
       return;
     }
+    // Phase 27 W3.1: Plot thread ledger.
+    case 'task_15c_plot_thread_ledger':
+    case 'plot_thread_ledger': {
+      const { extractAndUpdatePlotThreads } = await import('../state/plot-threads');
+      const { DEFAULT_CONFIG } = await import('../types');
+      if (chapter === null || !novelId) throw new Error('plot_thread_ledger: missing chapter/novelId');
+      // Re-fetch chapter content + characters from DB.
+      const { data: ch } = await getSupabase().from('chapters')
+        .select('content').eq('novel_id', novelId).eq('chapter_number', chapter).maybeSingle();
+      if (!ch?.content) throw new Error('plot_thread_ledger: chapter content not found');
+      const { data: charRows } = await getSupabase().from('character_states')
+        .select('character_name').eq('project_id', projectId).eq('chapter_number', chapter);
+      const characters = (charRows || []).map(r => r.character_name);
+      await extractAndUpdatePlotThreads(projectId, chapter, ch.content, characters, DEFAULT_CONFIG);
+      return;
+    }
+
+    // Phase 27 W2.5: Factions extractor.
+    case 'task_15f_factions':
+    case 'factions': {
+      const { extractAndUpdateFactions } = await import('../canon/factions');
+      const { DEFAULT_CONFIG } = await import('../types');
+      if (chapter === null || !novelId) throw new Error('factions: missing chapter/novelId');
+      const { data: ch } = await getSupabase().from('chapters')
+        .select('content').eq('novel_id', novelId).eq('chapter_number', chapter).maybeSingle();
+      if (!ch?.content) throw new Error('factions: chapter content not found');
+      const { data: charRows } = await getSupabase().from('character_states')
+        .select('character_name').eq('project_id', projectId).eq('chapter_number', chapter);
+      const characters = (charRows || []).map(r => r.character_name);
+      await extractAndUpdateFactions(projectId, chapter, ch.content, characters, DEFAULT_CONFIG);
+      return;
+    }
+
+    // Phase 25: First-10 evaluation (idempotent — UNIQUE constraint on project_id).
+    case 'task_16c_first_10_evaluation':
+    case 'first_10_evaluation_fail':
+    case 'first_10_evaluation_marginal':
+    case 'first_10_evaluation_pass': {
+      const { runFirst10Evaluation } = await import('../quality/first-10-evaluator');
+      const { DEFAULT_CONFIG } = await import('../types');
+      if (!novelId) throw new Error('first_10_evaluation: missing novelId');
+      // Re-fetch project metadata.
+      const { data: proj } = await getSupabase().from('ai_story_projects')
+        .select('genre,main_character').eq('id', projectId).maybeSingle();
+      if (!proj) throw new Error('first_10_evaluation: project not found');
+      await runFirst10Evaluation(projectId, novelId, proj.genre, proj.main_character || 'MC', DEFAULT_CONFIG);
+      return;
+    }
+
+    // Quality canary — pure logging, mark succeeded.
+    case 'quality_canary':
+      return;
+
+    // Tasks that don't carry enough payload to replay deterministically.
+    // Marked succeeded so queue doesn't grow. Future: store full inputs.
     case 'beat_detection':
     case 'rule_extraction':
     case 'foreshadowing_status':
@@ -187,10 +242,22 @@ async function replayTask(row: FailedTaskRow): Promise<void> {
     case 'relationships':
     case 'economic_state':
     case 'geography_timeline':
-      // These are post-write enrichment tasks. Replay = re-run on the saved chapter content.
-      // Skip for now if we can't easily reconstruct — mark as succeeded so queue doesn't grow.
-      // Future: store full inputs in payload to enable true replay.
+    case 'task_4_beat_detection':
+    case 'task_5_rule_extraction':
+    case 'task_6_consistency_check':
+    case 'task_7_foreshadowing_status':
+    case 'task_8_character_arcs':
+    case 'task_9_voice_fingerprint':
+    case 'task_10_mc_power':
+    case 'task_11_location_exploration':
+    case 'task_12_upcoming_location':
+    case 'task_13_character_knowledge':
+    case 'task_14_relationships':
+    case 'task_15_economic_ledger':
+    case 'task_16_character_bible_refresh':
+    case 'task_17_volume_summary':
       return;
+
     default:
       throw new Error(`Unknown task_name: ${name}`);
   }

@@ -29,7 +29,7 @@
 import { getSupabase } from '../utils/supabase';
 import { callGemini } from '../utils/gemini';
 import { parseJSON } from '../utils/json-repair';
-import { buildSeedBlueprintInstructions, validateSeedStructure } from '../seed-blueprint';
+import { buildSeedBlueprintInstructions, validateSeedStructure } from '../plan/seed-blueprint';
 import type { GenreType } from '../types';
 
 /**

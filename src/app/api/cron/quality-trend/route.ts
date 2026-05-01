@@ -142,11 +142,24 @@ export async function GET(request: NextRequest) {
     return acc;
   }, {} as Record<string, number>);
 
+  // Phase 28 TIER 3.1: Auto-revise outlines for projects in critical drift.
+  // Runs AFTER trend snapshot is persisted so revision trigger detection sees
+  // today's snapshot. Expensive AI work — done sequentially to control cost.
+  let revisionStats = { scanned: 0, triggered: 0, revised: 0 };
+  try {
+    const { scanAndReviseDriftedProjects } = await import('@/services/story-engine/pipeline/outline-reviser');
+    const { DEFAULT_CONFIG } = await import('@/services/story-engine/types');
+    revisionStats = await scanAndReviseDriftedProjects({ ...DEFAULT_CONFIG, model: 'deepseek-v4-flash' });
+  } catch (e) {
+    console.warn('[quality-trend cron] outline auto-revision scan threw:', e instanceof Error ? e.message : String(e));
+  }
+
   return NextResponse.json({
     success: true,
     processed,
     skipped,
     alerts: alertCounts,
     snapshot_date: today,
+    outline_revision: revisionStats,
   });
 }

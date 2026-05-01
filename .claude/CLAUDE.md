@@ -411,5 +411,32 @@ Old novels may have metadata blocks but `cleanNovelDescription()` in `src/lib/ut
 
 ---
 
-**Last Updated**: 2026-04-28
-**Complements**: Root `CLAUDE.md` (Story Engine v2 architecture, Phase 1-19 details, known issues)
+**Last Updated**: 2026-05-01 (Phase 24-28 rebuild complete)
+**Complements**: Root `CLAUDE.md` (Story Engine v2 architecture, Phase 1-28 details).
+
+## Phase 24-28 quick reference (added 2026-05-01)
+
+**PR**: [#38](https://github.com/ungden/truyencity2/pull/38) — 19 commits, ~5500 LOC, 26 modules, 9 migrations, 81 tests.
+
+**Read first**: [src/services/story-engine/ARCHITECTURE.md](../../src/services/story-engine/ARCHITECTURE.md) — 5-layer design + dependency rules.
+
+**Key decision points for future sessions**:
+1. **No-split default** for new novels (Phase 28.1) — chương dài ~2800 từ, halves agent calls. Existing novels with split=2 keep working via per-part loop.
+2. **5-layer directory structure** — `canon/plan/state/memory/quality/context/pipeline/templates/utils`. Each layer has single responsibility — see ARCHITECTURE.md for dependency rules.
+3. **9 new migrations** (0162-0170) need to be applied: first_10_evaluations, story_timeline, item_events, power_system_canon (column), factions, plot_twists, story_themes, worldbuilding_canon (column), voice_anchors.
+4. **Backfill script** for existing pre-Phase-27 novels: `./node_modules/.bin/tsx scripts/backfill-canons.ts`.
+5. **Stress test harness**: `./node_modules/.bin/tsx scripts/stress-test-1000.ts <projectId> 800` — synthetic backfill + run real chapter, compute drift vs ch.8 baseline.
+6. **Cost ~\$15-22 per 1000-ch novel** (DeepSeek V4 Flash + 70% prompt cache hit).
+
+**Đại thần workflow simulation (19/19 covered)**: Volume hierarchy 卷宗 / Foreshadowing OVERDUE 伏笔表 / Climax ladder 悬念三层 / Cast database 角色档案 / Timeline 时间线 / Item inventory 物品系统 / Power system canon 修炼体系 / Factions 势力档案 / Plot twists 反转表 / Themes 主题 / Worldbuilding 设定集 / Voice anchor 声音锚 / POV consistency / Sensory balance / Hook strength / Rolling briefs 日大纲 / Rubric judge / First-10 quality gate / Smart context selection.
+
+**Phase 28 TIER 2 — DONE (2026-05-01)**:
+- templates.ts: 3243 → 1365 lines (4 modules extracted)
+- chapter-writer.ts: 2350 → 1554 lines (prompts + helpers extracted)
+- context/assembler.ts: 1407 → 879 lines (generators extracted)
+
+**Truly deferred (multi-day scope, not blocking)**:
+- TIER 3.3: ai-editor V2 migration (admin-only tool, all 13 V1 story-writing-factory files transitively imported by ai-editor.ts — needs full rewrite using V2 continuity-guardian + auto-revise + Critic)
+- TIER 5: Reader feedback loop integration (requires production novels with engagement data first)
+
+**If stuck**: Read root CLAUDE.md "Phase 24-28 Details" section — it lists all 17 bugs fixed, all 19 đại thần practices covered, all 26 modules + their phase, all migrations.

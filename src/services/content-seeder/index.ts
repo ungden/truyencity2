@@ -19,7 +19,7 @@ import { generateQuickAuthor, GenreType } from '@/services/author-generator';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { AIProviderService } from '../ai-provider';
 import { GENRE_CONFIG } from '@/lib/types/genre-config';
-import { buildSeedBlueprintInstructions, validateSeedStructure } from '@/services/story-engine/seed-blueprint';
+import { buildSeedBlueprintInstructions, validateSeedStructure } from '@/services/story-engine/plan/seed-blueprint';
 import type { GenreType as StoryGenreType } from '@/services/story-engine/types';
 import { isVnSettingGenre } from '@/services/story-engine/templates';
 
@@ -805,7 +805,10 @@ export class ContentSeeder {
         sub_genres: variant.sub_genres || [],
         mc_archetype: variant.mc_archetype || null,
         anti_tropes: variant.anti_tropes || [],
-        style_directives: variant.style_directives || {},
+        // Phase 27 W1+: default no-split. Single chapter = single AI write.
+        // Cleaner state machine, fewer post-write doubling, ~10-15% cost saving.
+        // To opt INTO split=2 for mobile-first novels, set disable_chapter_split=false explicitly.
+        style_directives: { disable_chapter_split: true, ...(variant.style_directives || {}) },
       };
 
       if (requiredKey && requiredValue) {
@@ -846,7 +849,7 @@ export class ContentSeeder {
     // These are required by V2 Engine before writing Chapter 1.
     // Run in parallel batches of 5 to stay within rate limits.
     try {
-      const { generateMasterOutline } = await import('../story-engine/pipeline/master-outline');
+      const { generateMasterOutline } = await import('../story-engine/plan/master-outline');
       const { callGemini } = await import('../story-engine/utils/gemini');
       const { parseJSON } = await import('../story-engine/utils/json-repair');
 
@@ -1696,7 +1699,8 @@ CHÚ Ý:
           sub_genres: variant.sub_genres || [],
           mc_archetype: variant.mc_archetype || null,
           anti_tropes: variant.anti_tropes || [],
-          style_directives: variant.style_directives || {},
+          // Phase 27 W1+: default no-split. See content-seeder line ~810 comment.
+          style_directives: { disable_chapter_split: true, ...(variant.style_directives || {}) },
         };
 
         // Fill genre-required system field (AI Writer relies on this)
@@ -1718,7 +1722,7 @@ CHÚ Ý:
       const { data: insertedProjects, error: projectError } = await this.supabase.from('ai_story_projects').insert(projectRows).select('id, novel_id, genre, novel:novels(title)');
       if (!projectError && insertedProjects) {
         // Trigger master outline generation in background
-        import('../story-engine/pipeline/master-outline').then(({ generateMasterOutline }) => {
+        import('../story-engine/plan/master-outline').then(({ generateMasterOutline }) => {
           for (const p of insertedProjects) {
             generateMasterOutline(
               p.id,

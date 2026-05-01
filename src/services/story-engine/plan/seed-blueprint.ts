@@ -15,8 +15,8 @@
  * issues } so the seeder can regen if score < threshold.
  */
 
-import type { GenreType } from './types';
-import { getGenreSetupRequirements } from './templates/genre-process-blueprints';
+import type { GenreType } from '../types';
+import { getGenreSetupRequirements } from '../templates/genre-process-blueprints';
 
 /**
  * Returns the seed blueprint instructions, optionally augmented with

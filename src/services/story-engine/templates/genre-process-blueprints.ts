@@ -856,6 +856,29 @@ STAKES LADDER:
 }
 
 /**
+ * Compact genre contract for Critic — promise / loop / taboos / opening_must
+ * derived from the existing blueprint. Critic is verbose (~14K-token prompt
+ * already) so we compress to ~600 chars: essence, opening pattern (truncated),
+ * top-3 commonFailures, stakes ladder. Used to detect genre drift WITHOUT
+ * re-injecting the entire blueprint.
+ */
+export function getGenreContractForCritic(genre: GenreType): string {
+  const bp = BLUEPRINTS[genre];
+  if (!bp) return '';
+  const trimmedOpening = bp.setup.openingPattern.length > 220
+    ? bp.setup.openingPattern.slice(0, 220) + '...'
+    : bp.setup.openingPattern;
+  const topFailures = bp.process.commonFailures.slice(0, 3);
+  return `\n[GENRE CONTRACT — "${genre}" — gu tổng biên tập, BẮT BUỘC kiểm tra drift]
+PROMISE: ${bp.essence}
+OPENING PATTERN (ch.1-3 phải bám sát): ${trimmedOpening}
+TABOOS / LỖI THƯỜNG GẶP (CẤM):
+${topFailures.map(f => `  ✗ ${f}`).join('\n')}
+STAKES LADDER: ${bp.stakesLadder.join(' → ')}
+[/GENRE CONTRACT]`;
+}
+
+/**
  * Inject genre process blueprint into Architect/Critic prompts.
  * Includes scene types + arc template + quality floor + creative space.
  */
