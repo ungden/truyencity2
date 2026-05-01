@@ -33,7 +33,7 @@ import { parseJSON } from '../utils/json-repair';
 import { getStyleByGenre, buildTitleRulesPrompt, GOLDEN_CHAPTER_REQUIREMENTS, ENGAGEMENT_CHECKLIST, getGenreEngagement, getGenreAntiCliche } from '../config';
 import { VN_PRONOUN_GUIDE, SUB_GENRE_RULES, isNonCombatGenre, requiresVndCurrency } from '../templates';
 import { getVoiceAnchor, getArchitectVoiceHint } from '../templates/genre-voice-anchors';
-import { getGenreArchitectGuide } from '../templates/genre-process-blueprints';
+import { getGenreArchitectGuide, getGenreContractForCritic } from '../templates/genre-process-blueprints';
 import { getConstraintExtractor } from '../memory/constraint-extractor';
 import { GENRE_CONFIG } from '../../../lib/types/genre-config';
 import { buildStyleContext, getEnhancedStyleBible, CLIFFHANGER_TECHNIQUES } from '../memory/style-bible';
@@ -456,10 +456,10 @@ KIỂM TRA MÂU THUẪN (BẮT BUỘC — coherence chặt cho long-form):
   → Tên golden finger (Hệ Thống / Bàn Tay Vàng / "Hải Tâm" hoặc tên cụ thể của truyện) lặp ≥6 lần trong narration → "quality" severity "moderate".
   Mục đích: ép Writer narrate progressive content thay vì lặp lại setup. MC có thể NHẮC ngắn 1-2 lần/chương cho reader mới, nhưng KHÔNG dồn toàn chương vào hồi tưởng cùng 1 thông tin.
 
-VERDICT:
-- APPROVE (overallScore >= 6 VÀ đủ từ): approved=true, requiresRewrite=false
-- REVISE (4-5): approved=false, requiresRewrite=false
-- REWRITE (<=3 HOẶC <60% target words HOẶC continuity critical/major HOẶC thiếu ending hook ở non-finale): approved=false, requiresRewrite=true
+VERDICT (ngưỡng nâng từ 6 → 7 ở Phase 24 — gate downstream cũng ≥7):
+- APPROVE (overallScore >= 7 VÀ đủ từ): approved=true, requiresRewrite=false
+- REVISE (5-6): approved=false, requiresRewrite=false
+- REWRITE (<=4 HOẶC <60% target words HOẶC continuity critical/major HOẶC thiếu ending hook ở non-finale): approved=false, requiresRewrite=true
 - LƯU Ý: Nếu có ≥3 issues severity "major" hoặc ≥1 "critical" → overallScore giảm tối thiểu 1 điểm. Issues severity "moderate" KHÔNG ảnh hưởng overallScore — chỉ ghi nhận để cải thiện dần.
 
 LƯU Ý THỂ LOẠI:
@@ -1230,8 +1230,12 @@ async function runCritic(
   // Extract quality module expectations for compliance verification
   const qualityComplianceSection = buildQualityComplianceSection(previousContext);
 
-  const prompt = `Đánh giá chương nghiêm túc:
+  // Phase 24: compact genre contract — Critic checks drift against the genre
+  // promise/opening pattern/taboos derived from genre-process-blueprints.
+  const genreContractSection = genre ? getGenreContractForCritic(genre) : '';
 
+  const prompt = `Đánh giá chương nghiêm túc:
+${genreContractSection}
 ${crossChapterSection}OUTLINE: ${outline.title} — ${outline.summary}
 TARGET DOPAMINE: ${outline.dopaminePoints.map(dp => `${dp.type}: ${dp.description}`).join('; ')}
 TARGET WORDS: ${targetWords}
@@ -1257,8 +1261,8 @@ ${contentPreview}
   "pacingScore": <1-10>,
   "endingHookScore": <1-10>,
   "issues": [{"type": "word_count|pacing|logic|detail|continuity|quality|dialogue", "description": "...", "severity": "minor|moderate|major|critical"}],
-  "approved": <true nếu overallScore >= 6 VÀ wordRatio >= 70%>,
-  "requiresRewrite": <true nếu overallScore <= 3 HOẶC wordRatio < 60% HOẶC có lỗi continuity major/critical>,
+  "approved": <true nếu overallScore >= 7 VÀ wordRatio >= 70%>,
+  "requiresRewrite": <true nếu overallScore <= 4 HOẶC wordRatio < 60% HOẶC có lỗi continuity major/critical>,
   "rewriteInstructions": "hướng dẫn cụ thể nếu cần rewrite — PHẢI nêu rõ từ bị lặp cần thay thế, scene nào thiếu comedy, scene nào thiếu nội tâm đa lớp"
 }
 
@@ -1267,6 +1271,11 @@ KIỂM TRA MÂU THUẪN (BẮT BUỘC):
 - Nếu sức mạnh/cảnh giới MC bị THOÁI LUI vô lý -> type "continuity", severity "critical", requiresRewrite=true
 - Nếu vi phạm quy tắc thế giới đã thiết lập -> type "continuity", severity "critical", requiresRewrite=true
 - Nếu nhân vật hành xử trái ngược hoàn toàn với tính cách -> type "continuity", severity "major", requiresRewrite=true
+
+KIỂM TRA GENRE CONTRACT (xem block "[GENRE CONTRACT]" ở đầu prompt nếu có):
+- Nếu chương vi phạm 1 trong các TABOOS đã liệt kê → type "quality", severity "major", requiresRewrite=true. Nêu rõ taboo bị vi phạm trong description.
+- Nếu chương sai lệch hoàn toàn so với PROMISE / OPENING PATTERN của genre (ví dụ: do-thi/quan-truong mà MC đánh nhau bằng võ công, ngon-tinh mà thiếu emotional contract, linh-di mà không có rule puzzle, kiem-hiep mà tu tiên jargon nặng) → type "quality", severity "critical", requiresRewrite=true.
+- Nếu STAKES escalation đi LẠC HƯỚNG so với stakes ladder (ví dụ tien-hiep arc 1 đã đẩy lên "tinh không" thay vì "cá nhân/sư môn") → type "quality", severity "major".
 
 KIỂM TRA CHẤT LƯỢNG BỔ SUNG (BẮT BUỘC):
 - COMEDY: Nếu KHÔNG có hài hước → issue severity "moderate". CHỈ "major" nếu chương sinh hoạt/đối thoại mà không hài.

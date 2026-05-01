@@ -207,6 +207,186 @@ function mapThreadRow(row: PlotThreadRow): PlotThread {
   };
 }
 
+// ── Plot Thread Ledger Writer (Phase 24) ─────────────────────────────────────
+// Phase 24: V2 had a plot_threads READER (buildPlotThreadContext) but NO writer.
+// Threads were planted by arc plans then went stale. This extractor reads the
+// just-finished AI write, asks the model what threads were advanced/resolved/
+// opened, and upserts plot_threads so context-assembler can ground the next
+// chapter in actual thread state instead of stale arc-plan promises.
+
+interface PlotThreadAIResponse {
+  updates?: Array<{
+    id?: string;
+    name?: string;
+    status?: PlotThread['status'];
+    description?: string;
+    targetPayoffChapter?: number;
+    importance?: number;
+    payoffDescription?: string;
+    relatedCharacters?: string[];
+  }>;
+  newThreads?: Array<{
+    name?: string;
+    description?: string;
+    priority?: PlotThread['priority'];
+    status?: PlotThread['status'];
+    targetPayoffChapter?: number;
+    relatedCharacters?: string[];
+    importance?: number;
+  }>;
+}
+
+export async function extractAndUpdatePlotThreads(
+  projectId: string,
+  chapterNumber: number,
+  content: string,
+  characters: string[],
+  config: import('../types').GeminiConfig,
+): Promise<{ created: number; updated: number }> {
+  try {
+    const db = getSupabase();
+    const { data: activeRows, error: activeErr } = await db
+      .from('plot_threads')
+      .select('*')
+      .eq('project_id', projectId)
+      .not('status', 'in', '("resolved","legacy")')
+      .order('importance', { ascending: false })
+      .limit(12);
+
+    if (activeErr) {
+      console.warn(`[plot-tracker] Load active threads failed for Ch.${chapterNumber}: ${activeErr.message}`);
+    }
+
+    const active = (activeRows || []).map(mapThreadRow);
+    const activeBrief = active.length > 0
+      ? active
+          .map(t => `- id=${t.id}; name=${t.name}; status=${t.status}; priority=${t.priority}; last=${t.lastActiveChapter}; desc=${t.description.slice(0, 160)}`)
+          .join('\n')
+      : '(chưa có thread đang mở)';
+
+    const prompt = `Bạn là plot-thread ledger cho truyện dài kỳ. Đọc chương vừa viết và cập nhật TUYẾN TRUYỆN dài hạn (KHÔNG ghi beat nhỏ một-chương).
+
+CHARACTERS XUẤT HIỆN: ${characters.slice(0, 12).join(', ')}
+
+ACTIVE THREADS:
+${activeBrief}
+
+CHƯƠNG ${chapterNumber}:
+${content.slice(0, 9000)}
+
+Trả về JSON. Update thread cũ nếu chương vừa rồi đẩy/đóng nó. Tạo thread mới nếu chương vừa MỞ rõ một promise dài hạn (>10 chương). KHÔNG tạo thread cho beat ngắn.
+
+{
+  "updates": [
+    {
+      "id": "<id thread cũ>",
+      "name": "<dùng tên cũ>",
+      "status": "open|developing|climax|resolved|legacy",
+      "description": "<nếu thay đổi mô tả>",
+      "targetPayoffChapter": <số chương>,
+      "importance": <0-100>,
+      "payoffDescription": "<chỉ điền nếu status=resolved>",
+      "relatedCharacters": ["..."]
+    }
+  ],
+  "newThreads": [
+    {
+      "name": "<tên cụ thể, không generic>",
+      "description": "<thread này hứa payoff gì trong tương lai>",
+      "priority": "critical|main|sub|background",
+      "status": "open",
+      "targetPayoffChapter": <số chương>,
+      "relatedCharacters": ["..."],
+      "importance": <0-100>
+    }
+  ]
+}
+
+QUY TẮC:
+- KHÔNG bịa thread không có trong chương.
+- name PHẢI cụ thể (vd "Tìm di vật của tổ phụ" KHÔNG phải "tìm kiếm").
+- description ngắn gọn, mô tả PROMISE chứ không phải tóm tắt.
+- Trả JSON rỗng {"updates":[],"newThreads":[]} nếu chương không thay đổi tuyến nào.`;
+
+    const { callGemini } = await import('../utils/gemini');
+    const { parseJSON } = await import('../utils/json-repair');
+    const res = await callGemini(
+      prompt,
+      { ...config, temperature: 0.2, maxTokens: 4096 },
+      { jsonMode: true, tracking: { projectId, task: 'plot_thread_ledger', chapterNumber } },
+    );
+
+    const parsed = parseJSON<PlotThreadAIResponse>(res.content);
+    if (!parsed) return { created: 0, updated: 0 };
+
+    let created = 0;
+    let updated = 0;
+
+    // Apply updates to existing threads.
+    for (const u of parsed.updates || []) {
+      const target = active.find(t => (u.id && t.id === u.id) || (u.name && t.name === u.name));
+      if (!target) continue;
+      const updateRow: Record<string, unknown> = {
+        last_active_chapter: chapterNumber,
+        updated_at: new Date().toISOString(),
+      };
+      if (u.status && u.status !== target.status) updateRow.status = u.status;
+      if (u.description && u.description !== target.description) updateRow.description = u.description;
+      if (typeof u.targetPayoffChapter === 'number') updateRow.target_payoff_chapter = u.targetPayoffChapter;
+      if (typeof u.importance === 'number') updateRow.importance = Math.max(0, Math.min(100, u.importance));
+      if (Array.isArray(u.relatedCharacters) && u.relatedCharacters.length > 0) {
+        updateRow.related_characters = u.relatedCharacters;
+      }
+
+      const { error: upErr } = await db
+        .from('plot_threads')
+        .update(updateRow)
+        .eq('id', target.id);
+      if (upErr) {
+        console.warn(`[plot-tracker] Update thread ${target.id} failed: ${upErr.message}`);
+      } else {
+        updated++;
+      }
+    }
+
+    // Insert new threads — bound to 3 per chapter so model can't spam.
+    const newThreads = (parsed.newThreads || []).slice(0, 3);
+    for (const nt of newThreads) {
+      if (!nt.name || nt.name.length < 3) continue;
+      // Skip if a thread with the same name already exists.
+      if (active.some(t => t.name.toLowerCase() === nt.name!.toLowerCase())) continue;
+      const insertRow = {
+        project_id: projectId,
+        name: nt.name,
+        description: nt.description || '',
+        priority: nt.priority || 'sub',
+        status: nt.status || 'open',
+        start_chapter: chapterNumber,
+        target_payoff_chapter: nt.targetPayoffChapter ?? null,
+        last_active_chapter: chapterNumber,
+        related_characters: Array.isArray(nt.relatedCharacters) ? nt.relatedCharacters : [],
+        foreshadowing_hints: [],
+        importance: typeof nt.importance === 'number' ? Math.max(0, Math.min(100, nt.importance)) : 50,
+      };
+      const { error: insErr } = await db.from('plot_threads').insert(insertRow);
+      if (insErr) {
+        console.warn(`[plot-tracker] Insert thread "${nt.name}" failed: ${insErr.message}`);
+      } else {
+        created++;
+      }
+    }
+
+    if (created > 0 || updated > 0) {
+      console.log(`[plot-tracker] Ch.${chapterNumber}: created ${created}, updated ${updated} threads`);
+    }
+
+    return { created, updated };
+  } catch (e) {
+    console.warn(`[plot-tracker] extractAndUpdatePlotThreads failed for Ch.${chapterNumber}:`, e instanceof Error ? e.message : String(e));
+    return { created: 0, updated: 0 };
+  }
+}
+
 // ══════════════════════════════════════════════════════════════════════════════
 // SECTION 2: BEAT LEDGER
 // ══════════════════════════════════════════════════════════════════════════════

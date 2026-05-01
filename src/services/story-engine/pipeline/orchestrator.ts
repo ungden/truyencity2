@@ -30,6 +30,7 @@ import {
   extractRulesFromChapter,
   checkConsistency,
   checkConsistencyFast,
+  extractAndUpdatePlotThreads,
 } from '../memory/plot-tracker';
 import { runSummaryTasks } from '../memory/summary-manager';
 import { generateArcPlan } from './context-assembler';
@@ -645,6 +646,172 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     },
   );
 
+  // ── Step 4.5: Pre-save QA — contradictions, fast consistency, guardian ──
+  // Phase 24 reorder: auto-revise must run BEFORE the chapter row hits the
+  // database. Previously revise ran AFTER upsert + UPDATE rows in place;
+  // if revise failed (truncation, JSON parse error, model error, content too
+  // short), the original (contradictory) chapter stayed in DB. Now: detect
+  // criticals on the full logical chapter, revise, then split + upsert with
+  // the revised content. If criticals found AND revise fails, throw — the
+  // chapter is NOT saved and cron retries on next tick.
+  const SPLIT_PARTS_PRE = disableChapterSplit ? 1 : 2;
+  const lastChapterNumberPre = nextChapter + SPLIT_PARTS_PRE - 1;
+
+  // Outline character names — used by guardian + downstream per-part tasks.
+  const outlineCharsPre = new Set<string>();
+  if (result.outline?.scenes) {
+    for (const scene of result.outline.scenes) {
+      for (const char of scene.characters || []) {
+        outlineCharsPre.add(char);
+      }
+    }
+  }
+  outlineCharsPre.add(protagonistName);
+  const charactersPre = Array.from(outlineCharsPre);
+
+  // Pre-save contradiction extraction on full logical content.
+  const preReviseCombined = await generateSummaryAndCharacters(
+    lastChapterNumberPre, result.title, result.content, protagonistName, geminiConfig,
+    { allowEmptyCliffhanger: isFinalArc, projectId: project.id },
+  ).catch((e) => {
+    console.warn(`[Orchestrator] Pre-save character extraction failed for Ch.${lastChapterNumberPre}:`, e instanceof Error ? e.message : String(e));
+    return null;
+  });
+
+  let preSaveContradictions: CharacterContradiction[] = [];
+  let preSaveGuardianIssues: import('./continuity-guardian').GuardianIssue[] = [];
+
+  if (preReviseCombined?.characters && preReviseCombined.characters.length > 0) {
+    preSaveContradictions = await detectCharacterContradictions(
+      project.id, lastChapterNumberPre, preReviseCombined.characters,
+    ).catch((e) => {
+      console.warn('[Orchestrator] Pre-save contradiction detection failed:', e instanceof Error ? e.message : String(e));
+      return [] as CharacterContradiction[];
+    });
+  }
+
+  // Fast consistency regex (dead-character resurrection). Phase 24: log error
+  // explicitly instead of silent `.catch(() => [])` so DB-query failures don't
+  // hide undetected resurrections.
+  const fastIssuesPre = await checkConsistencyFast(
+    project.id, lastChapterNumberPre, result.content,
+  ).catch((e) => {
+    console.warn(`[Orchestrator] Pre-save fast consistency check failed for Ch.${lastChapterNumberPre}:`, e instanceof Error ? e.message : String(e));
+    return [];
+  });
+  for (const issue of fastIssuesPre) {
+    if (issue.severity === 'critical' && issue.type === 'dead_character') {
+      const charNameMatch = issue.description.match(/^(\S+(?:\s\S+)*)\s+đã chết/);
+      const charName = charNameMatch?.[1] || 'unknown';
+      preSaveContradictions.push({
+        characterName: charName,
+        type: 'resurrection',
+        severity: 'critical',
+        description: issue.description,
+        previousChapter: 0,
+        currentChapter: lastChapterNumberPre,
+      });
+    }
+  }
+
+  // checkConsistency (AI business-logic check) — Phase 24: was running once per
+  // 3 AI writes with output discarded. Now critical/major issues throw to abort
+  // the save (auto-reviser is character-focused and can't fix finance-logic
+  // errors meaningfully — better to reject and let cron retry).
+  let businessLogicBlock: string | null = null;
+  if (charactersPre.length > 0) {
+    const businessIssues = await checkConsistency(
+      project.id, lastChapterNumberPre, result.content, charactersPre,
+    ).catch((e) => {
+      console.warn(`[Orchestrator] Pre-save business consistency check failed for Ch.${lastChapterNumberPre}:`, e instanceof Error ? e.message : String(e));
+      return [];
+    });
+    const blocking = businessIssues.filter(
+      i => (i.severity === 'critical' || i.severity === 'major') && i.type !== 'dead_character',
+    );
+    if (blocking.length > 0) {
+      businessLogicBlock = blocking
+        .map(i => `[${i.type}/${i.severity}] ${i.description}`)
+        .join('; ');
+    }
+  }
+
+  // Continuity Guardian — every 2 AI writes. Promoted to pre-save so its
+  // critical (and major-promoted) findings can block via auto-revise.
+  const aiWriteCountPre = Math.ceil(lastChapterNumberPre / SPLIT_PARTS_PRE);
+  const skipGuardianPre = aiWriteCountPre % 2 !== 0;
+  const guardianPre = skipGuardianPre
+    ? { issues: [], contradictions: [] }
+    : await runContinuityGuardian(
+        project.id, lastChapterNumberPre, result.title, result.content, charactersPre, geminiConfig,
+      ).catch((e) => {
+        console.warn('[Orchestrator] Pre-save continuity guardian failed:', e instanceof Error ? e.message : String(e));
+        return { issues: [], contradictions: [] };
+      });
+  if (guardianPre.contradictions.length > 0) {
+    for (const c of guardianPre.contradictions) preSaveContradictions.push(c);
+  }
+  preSaveGuardianIssues = guardianPre.issues;
+
+  // Auto-revise on logical content if criticals exist. Phase 24: throw if
+  // criticals found AND revise fails — refuse to ship contradictory content.
+  const preCriticals = preSaveContradictions.filter(c => c.severity === 'critical');
+  let preReviseSucceeded = preCriticals.length === 0; // vacuously true if no criticals
+  if (preCriticals.length > 0) {
+    console.warn(
+      `[Orchestrator] Pre-save criticals for Ch.${nextChapter}-${lastChapterNumberPre}: ${preCriticals.length}`,
+      preCriticals.map(c => c.description),
+    );
+    try {
+      const revision = await autoReviseChapter(
+        lastChapterNumberPre, result.content, preSaveContradictions, geminiConfig, project.id,
+      );
+      if (revision.revised) {
+        result.content = revision.content;
+        result.wordCount = result.content.trim().split(/\s+/).filter(Boolean).length;
+        preReviseSucceeded = true;
+        console.warn(`[Orchestrator] Pre-save auto-revised Ch.${nextChapter}-${lastChapterNumberPre}: fixed ${revision.fixedIssues.length} issues`);
+
+        // Override stale character extraction so saved character_states preserve
+        // dead-character truth and drop spurious power downgrades.
+        const namesToForceDead = new Set(
+          preCriticals.filter(c => c.type === 'resurrection').map(c => c.characterName)
+        );
+        const namesToDropPowerDowngrade = new Set(
+          preCriticals.filter(c => c.type === 'power_regression').map(c => c.characterName)
+        );
+        if (preReviseCombined) {
+          preReviseCombined.characters = preReviseCombined.characters
+            .filter(c => !namesToDropPowerDowngrade.has(c.character_name))
+            .map(c => namesToForceDead.has(c.character_name)
+              ? { ...c, status: 'dead' as const }
+              : c
+            );
+        }
+      } else {
+        // Revision attempted but produced too-short / empty content.
+        preReviseSucceeded = false;
+      }
+    } catch (e) {
+      console.warn('[Orchestrator] Pre-save auto-revision threw:', e instanceof Error ? e.message : String(e));
+      preReviseSucceeded = false;
+    }
+
+    if (!preReviseSucceeded) {
+      throw new Error(
+        `Chapter ${nextChapter}-${lastChapterNumberPre}: ${preCriticals.length} critical contradictions detected and auto-revise failed. Refusing to publish — cron will retry. Issues: ${preCriticals.slice(0, 3).map(c => c.description).join('; ')}`,
+      );
+    }
+  }
+
+  // Business-logic consistency: throw without trying to revise (auto-reviser
+  // is character-focused). Cron retries on next tick.
+  if (businessLogicBlock) {
+    throw new Error(
+      `Chapter ${nextChapter}-${lastChapterNumberPre}: blocking business-logic consistency issues. Refusing to publish — cron will retry. Issues: ${businessLogicBlock}`,
+    );
+  }
+
   // ── Step 5: Split AI content into N reader chapters + save to DB ─────────
   // AI writes 1 logical chapter (~2800 từ). Split into 2 reader-friendly chapters
   // (~1400 từ each) at natural paragraph boundary. This keeps narrative coherence
@@ -707,160 +874,22 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   }
 
   // ── Step 6: Post-write tasks (Phase 24 — per-reader-chapter loop) ─────
-  // Every reader chapter gets its own summary, character_states, RAG chunks,
-  // beats, rules, foreshadowing/voice/MC-power update. Pre-Phase-24 the entire
-  // post-write block keyed off nextChapter + result.content (= logical chapter,
-  // pre-split), so when SPLIT_PARTS=2 the second reader chapter (nextChapter+1)
-  // had no summary/RAG/state row — the next AI write's bridge read from the
-  // first part, losing the actual cliffhanger readers saw.
-  //
-  // Layout:
-  //   1. Compute aiWriteCount + characters list
-  //   2. Detect contradictions on the FULL logical chapter (single AI call —
-  //      character extraction) so we can run guardian + auto-revise + re-split
-  //      BEFORE per-part summaries reflect stale (pre-revise) content.
-  //   3. Per-part: summary + character_states + RAG + beats + rules +
+  // Pre-save QA already ran in Step 4.5 (auto-revise on full logical content
+  // + throw on critical revise-fail). What remains here:
+  //   1. Per-part: summary + character_states + RAG + beats + rules +
   //      foreshadowing + voice + MC power + knowledge + geography
-  //   4. Once-per-AI-write cadence: char arcs (every 3), location (every 3),
+  //   2. Once-per-AI-write cadence: char arcs (every 3), location (every 3),
   //      upcoming location (every 3), relationships (every 3),
   //      economic (every 3, do-thi/quan-truong), char bible (every 20),
   //      volume summary (every 25), quality metrics (every write).
   const arcNumber = Math.ceil(nextChapter / 20);
-  // 2026-04-29 audit fix: aiWriteCount tracks the number of AI writes (vs reader chapters).
-  // With chapter splits enabled, 1 AI write = 2 reader chapters, so nextChapter is always odd.
-  // Tasks gated on `nextChapter % 2 === 0` would NEVER fire; use aiWriteCount for cadence
-  // gates that are about *AI write frequency* rather than reader-chapter milestones.
   const aiWriteCount = Math.ceil(lastChapterNumber / SPLIT_PARTS);
 
-  // Hoisted for quality_metrics aggregation at end of post-write block.
-  let allContradictions: CharacterContradiction[] = [];
-  let allGuardianIssues: import('./continuity-guardian').GuardianIssue[] = [];
-
-  // Extract all unique character names from the Architect outline.
-  const outlineChars = new Set<string>();
-  if (result.outline?.scenes) {
-    for (const scene of result.outline.scenes) {
-      for (const char of scene.characters || []) {
-        outlineChars.add(char);
-      }
-    }
-  }
-  outlineChars.add(protagonistName);
-  const characters = Array.from(outlineChars);
-
-  // ── Step 6a: Logical-level contradiction detection + auto-revise ──────
-  // Run ONCE on the full pre-split logical chapter so a revise can operate on
-  // coherent content (cross-split issues like "char dies in part 1 then walks
-  // alive in part 2" need to see both halves). After revise, we re-split and
-  // update DB rows for every part before per-part work begins.
-  const logicalCombined = await generateSummaryAndCharacters(
-    lastChapterNumber, result.title, result.content, protagonistName, geminiConfig,
-    { allowEmptyCliffhanger: isFinalArc, projectId: project.id },
-  ).catch((e) => {
-    console.warn(`[Orchestrator] Logical character extraction failed for Ch.${lastChapterNumber}:`, e instanceof Error ? e.message : String(e));
-    return null;
-  });
-
-  if (logicalCombined?.characters && logicalCombined.characters.length > 0) {
-    const contradictions: CharacterContradiction[] = await detectCharacterContradictions(
-      project.id, lastChapterNumber, logicalCombined.characters,
-    ).catch(e => {
-      console.warn('[Orchestrator] Logical contradiction detection failed:', e instanceof Error ? e.message : String(e));
-      return [] as CharacterContradiction[];
-    });
-
-    // Fast consistency regex (dead-character resurrection) on full content.
-    const fastIssues = await checkConsistencyFast(project.id, lastChapterNumber, result.content).catch(() => []);
-    for (const issue of fastIssues) {
-      if (issue.severity === 'critical' && issue.type === 'dead_character') {
-        const charNameMatch = issue.description.match(/^(\S+(?:\s\S+)*)\s+đã chết/);
-        const charName = charNameMatch?.[1] || 'unknown';
-        contradictions.push({
-          characterName: charName,
-          type: 'resurrection',
-          severity: 'critical',
-          description: issue.description,
-          previousChapter: 0,
-          currentChapter: lastChapterNumber,
-        });
-      }
-    }
-
-    // Continuity Guardian — 4th-agent biên-tập-viên pass.
-    // Phase 24 fix: was `nextChapter % 2 !== 0`; with SPLIT_PARTS=2 nextChapter is
-    // always odd → guardian NEVER ran in split mode. Switched to aiWriteCount so
-    // the every-2-AI-writes cadence (≈ every 4 reader chapters) actually fires.
-    const skipGuardian = aiWriteCount % 2 !== 0;
-    const guardian = skipGuardian
-      ? { issues: [], contradictions: [] }
-      : await runContinuityGuardian(
-          project.id, lastChapterNumber, result.title, result.content, characters, geminiConfig,
-        ).catch((e) => {
-          console.warn('[Orchestrator] Continuity guardian failed:', e instanceof Error ? e.message : String(e));
-          return { issues: [], contradictions: [] };
-        });
-    if (guardian.contradictions.length > 0) {
-      for (const c of guardian.contradictions) contradictions.push(c);
-    }
-
-    if (contradictions.length > 0) {
-      const criticals = contradictions.filter(c => c.severity === 'critical');
-      const warnings = contradictions.filter(c => c.severity === 'warning');
-      console.warn(
-        `[Orchestrator] Contradictions in Ch.${nextChapter}-${lastChapterNumber}: ${criticals.length} critical, ${warnings.length} warnings`,
-        contradictions.map(c => c.description),
-      );
-
-      if (criticals.length > 0) {
-        try {
-          const revision = await autoReviseChapter(
-            lastChapterNumber, result.content, contradictions, geminiConfig, project.id,
-          );
-          if (revision.revised) {
-            // Re-split the revised content and update DB rows for every part.
-            const newSplits = splitChapterContent(revision.content, result.title, SPLIT_PARTS);
-            // Replace splitResults in place so the per-part block below uses revised content.
-            splitResults.length = 0;
-            splitResults.push(...newSplits);
-            result.content = revision.content;
-            result.wordCount = result.content.trim().split(/\s+/).filter(Boolean).length;
-
-            // Update DB rows for every reader chapter (not just the first).
-            for (let i = 0; i < newSplits.length; i++) {
-              const partCh = nextChapter + i;
-              const { error: revErr } = await db.from('chapters')
-                .update({ content: newSplits[i].content })
-                .eq('novel_id', novel.id).eq('chapter_number', partCh);
-              if (revErr) {
-                console.warn(`[Orchestrator] Auto-revision DB update failed for Ch.${partCh}: ${revErr.message}`);
-              }
-            }
-            console.warn(`[Orchestrator] Auto-revised Ch.${nextChapter}-${lastChapterNumber}: fixed ${revision.fixedIssues.length} issues, re-split + updated ${newSplits.length} reader chapter rows`);
-
-            // Override stale character extraction so saved character_states preserve
-            // dead-character truth and drop spurious power downgrades.
-            const namesToForceDead = new Set(
-              criticals.filter(c => c.type === 'resurrection').map(c => c.characterName)
-            );
-            const namesToDropPowerDowngrade = new Set(
-              criticals.filter(c => c.type === 'power_regression').map(c => c.characterName)
-            );
-            logicalCombined.characters = logicalCombined.characters
-              .filter(c => !namesToDropPowerDowngrade.has(c.character_name))
-              .map(c => namesToForceDead.has(c.character_name)
-                ? { ...c, status: 'dead' as const }
-                : c
-              );
-          }
-        } catch (e) {
-          console.warn('[Orchestrator] Auto-revision failed:', e instanceof Error ? e.message : String(e));
-        }
-      }
-    }
-
-    allContradictions = contradictions;
-    allGuardianIssues = guardian.issues;
-  }
+  // Re-use pre-save outputs for downstream consumers + quality_metrics.
+  const characters = charactersPre;
+  const logicalCombined = preReviseCombined;
+  const allContradictions: CharacterContradiction[] = preSaveContradictions;
+  const allGuardianIssues: import('./continuity-guardian').GuardianIssue[] = preSaveGuardianIssues;
 
   // ── Step 6b: Per-reader-chapter post-write tasks ──────────────────────
   // Each part gets its own chapter_summaries row (via runSummaryTasks),
@@ -1026,6 +1055,14 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
         return extractEconomicState(project.id, lastChapterNumber, result.content, protagonistName, geminiConfig);
       })().catch(e => recordTaskFailure(db, project.id, novel.id, lastChapterNumber, 'task_15_economic_ledger', e)),
     ] : []),
+
+    // Task 15c: Plot Thread Ledger update (every AI write — Phase 24)
+    // Reads finished AI write, extracts thread advances/resolutions/new threads,
+    // upserts plot_threads. Closes the read/write loop on plot threads
+    // (V2 previously had reader but no writer).
+    extractAndUpdatePlotThreads(
+      project.id, lastChapterNumber, result.content, characters, geminiConfig,
+    ).catch(e => recordTaskFailure(db, project.id, novel.id, lastChapterNumber, 'task_15c_plot_thread_ledger', e)),
 
     // Task 16: Character bible refresh (every 20 reader chapters)
     ...(lastChapterNumber % 20 === 0 && lastChapterNumber >= 20 ? [
