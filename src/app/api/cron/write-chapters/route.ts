@@ -968,8 +968,17 @@ export async function GET(request: NextRequest) {
         .eq('arc_number', 1);
 
       const hasArcPlan = new Set((arcRows || []).map((r: { project_id: string }) => r.project_id));
-      initPrepCandidates = initCandidates.filter(p => !hasArcPlan.has(p.id));
-      initWriteCandidates = initCandidates.filter(p => hasArcPlan.has(p.id));
+      // HARD GATE 2026-05-01: init-write chỉ qualify khi có ĐỦ setup (world_description
+      // + main_character). Bug observed: 4 novels viết được 2 chương dù world_description
+      // NULL + main_character='' (arc_plan tồn tại từ trước wipe) → chapters rác. Force
+      // novel chưa có setup back to init-prep tier để self-heal regen.
+      const hasFullSetup = (p: ProjectRow): boolean => {
+        const wd = (p.world_description || '').trim();
+        const mc = (p.main_character || '').trim();
+        return wd.length >= 500 && mc.length >= 2;
+      };
+      initPrepCandidates = initCandidates.filter(p => !hasArcPlan.has(p.id) || !hasFullSetup(p));
+      initWriteCandidates = initCandidates.filter(p => hasArcPlan.has(p.id) && hasFullSetup(p));
     }
 
     const overloadMode = resumeCandidates.length >= OVERLOAD_RESUME_THRESHOLD;
