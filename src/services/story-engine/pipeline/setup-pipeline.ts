@@ -30,6 +30,16 @@ import { getSupabase } from '../utils/supabase';
 import { callGemini } from '../utils/gemini';
 import { parseJSON } from '../utils/json-repair';
 import { buildSeedBlueprintInstructions, validateSeedStructure } from '../plan/seed-blueprint';
+import {
+  formatPlaybookForIdeaStage,
+  formatPlaybookForWorldStage,
+  formatPlaybookForCharacterStage,
+  formatPlaybookForDescriptionStage,
+  validateWorldHooks,
+  validateMcArchetype,
+  getGenreSetupPlaybook,
+} from '../templates/genre-setup-playbooks';
+import { getDopaminePatternsByGenre, GENRE_ANTI_CLICHE, GENRE_TITLE_EXAMPLES } from '../templates';
 import type { GenreType } from '../types';
 
 /**
@@ -92,6 +102,8 @@ export interface IdeaPayload {
   premise: string;
   themes: string[];
   mainConflict: string;
+  /** Phase 29: tension axis name picked from playbook (optional, AI returns) */
+  tensionAxis?: string;
 }
 
 const NEXT_STAGE: Record<SetupStage, SetupStage> = {
@@ -141,16 +153,29 @@ async function runStageIdea(p: ProjectStageRow): Promise<{ success: boolean; err
   if (!novel) return { success: false, error: 'no novel linked' };
   const genre = (p.genre || 'tien-hiep') as GenreType;
 
+  // Phase 29: thread genre-specific tension axes + dopamine patterns + anti-cliché
+  const playbookSection = formatPlaybookForIdeaStage(genre);
+  const dopamine = getDopaminePatternsByGenre(genre).slice(0, 5).map(p => p.name).join(', ');
+  const antiCliche = (GENRE_ANTI_CLICHE[genre] || []).slice(0, 6).map(c => `- ${c}`).join('\n');
+
   const prompt = `Tạo IDEA gốc cho tiểu thuyết.
 
 Tên truyện: "${novel.title}"
 Thể loại: ${genre}
 
+${playbookSection}
+
+DOPAMINE PATTERNS phải hứa hẹn (premise nên ám chỉ ≥3): ${dopamine}
+
+GENRE ANTI-CLICHÉ — KHÔNG dùng những điều sau:
+${antiCliche || '- (không có ban list cho genre này)'}
+
 Trả về JSON:
 {
-  "premise": "<2-3 câu hook GROWTH-driven: bối cảnh + golden finger CỤ THỂ + opportunity opening>",
+  "premise": "<2-3 câu hook GROWTH-driven: bối cảnh + golden finger CỤ THỂ + opportunity opening; rõ ràng ám chỉ 1 tension axis từ playbook>",
   "themes": ["<theme 1>","<theme 2>","<theme 3>","<theme 4>"],
-  "mainConflict": "<1-2 câu — actor Phase 1 LOCAL + stake cá nhân — proactive framing>"
+  "mainConflict": "<1-2 câu — actor Phase 1 LOCAL + stake cá nhân — proactive framing — link với tension axis đã chọn>",
+  "tensionAxis": "<tên 1 axis từ list trên>"
 }`;
 
   try {
@@ -216,6 +241,9 @@ async function runStageWorld(p: ProjectStageRow): Promise<{ success: boolean; er
   if (!idea) return { success: false, error: 'idea stage output missing — re-run idea' };
 
   const blueprintInstructions = buildSeedBlueprintInstructions(genre);
+  // Phase 29: thread playbook hooks (mandatory ≥3 hooks must appear)
+  const playbookSection = formatPlaybookForWorldStage(genre);
+
   const prompt = `Tạo world_description cho tiểu thuyết DỰA TRÊN IDEA đã có.
 
 Tên truyện: "${novel.title}"
@@ -223,10 +251,13 @@ Thể loại: ${genre}
 Premise: ${idea.premise}
 Themes: ${idea.themes.join(', ')}
 MainConflict: ${idea.mainConflict}
+${idea.tensionAxis ? `TensionAxis: ${idea.tensionAxis}` : ''}
+
+${playbookSection}
 
 ${blueprintInstructions}
 
-Trả về JSON: {"worldDescription":"<800-1500 từ tuân blueprint 9-section>"}`;
+Trả về JSON: {"worldDescription":"<800-1500 từ tuân blueprint 9-section, BẮT BUỘC inject ≥3 worldbuilding hooks từ playbook>"}`;
 
   try {
     const res = await callGemini(prompt, {
@@ -242,6 +273,15 @@ Trả về JSON: {"worldDescription":"<800-1500 từ tuân blueprint 9-section>"
     const validation = validateSeedStructure(wd);
     if (!validation.passed) {
       return { success: false, error: `world blueprint score ${validation.score}/100 — issues: ${validation.issues.slice(0, 3).join('; ')}` };
+    }
+
+    // Phase 29: validate ≥minHooks worldbuilding hooks from playbook present
+    const hookCheck = validateWorldHooks(genre, wd);
+    if (!hookCheck.passed) {
+      return {
+        success: false,
+        error: `world hooks insufficient: matched ${hookCheck.matchedCount}/${hookCheck.minRequired} from playbook`,
+      };
     }
 
     await getSupabase().from('ai_story_projects').update({
@@ -261,18 +301,28 @@ async function runStageCharacter(p: ProjectStageRow): Promise<{ success: boolean
   const wd = (p.world_description || '').trim();
   if (wd.length < 500) return { success: false, error: 'world stage incomplete — cannot derive character' };
 
-  const prompt = `Đặt tên MC + xác nhận character sheet dựa trên world_description.
+  // Phase 29: thread MC archetype menu — AI picks 1 instead of generic
+  const playbookSection = formatPlaybookForCharacterStage(genre);
+
+  const prompt = `Đặt tên MC + chọn archetype + voice/signature dựa trên world_description.
 
 Tên truyện: "${novel.title}"
 Thể loại: ${genre}
+
+${playbookSection}
 
 WORLD CONTEXT:
 ${wd.slice(0, 4000)}
 
 Trả về JSON:
-{"mainCharacter":"<họ + tên đầy đủ tiếng Việt 2-3 chữ — đa dạng, KHÔNG dùng cliché Lâm Phong/Lê Minh/Trần Vũ/Trần Hạo/Lý Phong/Lăng Thiên>"}
+{
+  "mainCharacter": "<họ + tên đầy đủ tiếng Việt 2-3 chữ — đa dạng, KHÔNG dùng cliché Lâm Phong/Lê Minh/Trần Vũ/Trần Hạo/Lý Phong/Lăng Thiên>",
+  "mcArchetype": "<tên 1 archetype từ playbook list>",
+  "mcVoice": "<1-2 câu mô tả voice/personality, paraphrase từ archetype>",
+  "mcSignature": "<1 câu signature trait/move của MC>"
+}
 
-QUY TẮC: tên phù hợp genre + bối cảnh; phải 2-3 từ Vietnamese hoặc Hán-Việt.`;
+QUY TẮC: tên phù hợp genre + bối cảnh; phải 2-3 từ Vietnamese hoặc Hán-Việt. Archetype CHÍNH XÁC 1 trong list playbook.`;
 
   try {
     const res = await callGemini(prompt, {
@@ -280,7 +330,12 @@ QUY TẮC: tên phù hợp genre + bối cảnh; phải 2-3 từ Vietnamese ho�
       systemPrompt: SANG_VAN_DNA + '\n\n[ROLE-SPECIFIC] Stage: CHARACTER. Đặt tên MC đa dạng phù hợp genre + bối cảnh. KHÔNG dùng cliché names.',
     }, { jsonMode: true, tracking: { projectId: p.id, task: 'stage_character' } });
 
-    const parsed = parseJSON<{ mainCharacter?: string }>(res.content);
+    const parsed = parseJSON<{
+      mainCharacter?: string;
+      mcArchetype?: string;
+      mcVoice?: string;
+      mcSignature?: string;
+    }>(res.content);
     const mc = (parsed?.mainCharacter || '').trim();
     if (mc.length < 2 || mc.split(/\s+/).length > 4) {
       return { success: false, error: `mc invalid (length ${mc.length}, words ${mc.split(/\s+/).length})` };
@@ -290,7 +345,32 @@ QUY TẮC: tên phù hợp genre + bối cảnh; phải 2-3 từ Vietnamese ho�
       return { success: false, error: `mc is cliché name "${mc}" — must regen` };
     }
 
-    await getSupabase().from('ai_story_projects').update({ main_character: mc }).eq('id', p.id);
+    // Phase 29: validate archetype matches playbook list
+    const archetypeName = (parsed?.mcArchetype || '').trim();
+    if (archetypeName) {
+      const archCheck = validateMcArchetype(genre, archetypeName);
+      if (!archCheck.passed) {
+        return {
+          success: false,
+          error: `mc archetype "${archetypeName}" not in playbook. Suggested: ${archCheck.suggested.slice(0, 3).join(' / ')}`,
+        };
+      }
+    }
+
+    // Stash archetype + voice + signature in story_outline JSON for downstream stages
+    // (existing pattern from idea stage). These feed into character bibles + voice anchor later.
+    const existingStash = (p.story_outline as Record<string, unknown> | null) || {};
+    await getSupabase().from('ai_story_projects').update({
+      main_character: mc,
+      story_outline: {
+        ...existingStash,
+        __stage_character: {
+          archetype: archetypeName || null,
+          voice: (parsed?.mcVoice || '').trim() || null,
+          signature: (parsed?.mcSignature || '').trim() || null,
+        },
+      } as unknown as Record<string, unknown>,
+    }).eq('id', p.id);
     return { success: true };
   } catch (e) {
     return { success: false, error: e instanceof Error ? e.message : String(e) };
@@ -306,11 +386,20 @@ async function runStageDescription(p: ProjectStageRow): Promise<{ success: boole
   const mc = (p.main_character || '').trim();
   if (wd.length < 500 || mc.length < 2) return { success: false, error: 'world/character incomplete' };
 
+  // Phase 29: thread tension reference + title examples for blurb tone
+  const playbookSection = formatPlaybookForDescriptionStage(genre);
+  const titleExamples = (GENRE_TITLE_EXAMPLES[genre] || []).slice(0, 5).map(t => `"${t}"`).join(', ');
+
   const prompt = `Viết giới thiệu/back-cover blurb (description) cho novel detail page.
 
 Tên truyện: "${novel.title}"
 Thể loại: ${genre}
 MC: ${mc}
+
+${playbookSection}
+
+GENRE TITLE EXAMPLES (tham khảo tone, KHÔNG copy):
+${titleExamples}
 
 WORLD:
 ${wd.slice(0, 4000)}

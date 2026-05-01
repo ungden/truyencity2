@@ -100,6 +100,30 @@ describe('Genre coverage — memory + voice + process modules', () => {
       expect(bp?.sceneTypes.length).toBeGreaterThan(0);
     }
   });
+
+  test('setup playbooks module (Phase 29)', async () => {
+    const { GENRE_SETUP_PLAYBOOKS, getGenreSetupPlaybook } = await import(
+      '@/services/story-engine/templates/genre-setup-playbooks'
+    );
+    for (const g of ALL_GENRES) {
+      const pb = getGenreSetupPlaybook(g);
+      expect(GENRE_SETUP_PLAYBOOKS[g]).toBeDefined();
+      // sanity: each genre has substantive content (not stub)
+      expect(pb.worldbuildingHooks.length).toBeGreaterThanOrEqual(8);
+      expect(pb.mcArchetypes.length).toBeGreaterThanOrEqual(5);
+      expect(pb.openingScenes.length).toBeGreaterThanOrEqual(5);
+      expect(pb.tensionAxes.length).toBeGreaterThanOrEqual(3);
+      // hookChecklist sanity
+      expect(pb.hookChecklist.minHooks).toBeGreaterThanOrEqual(2);
+      expect(pb.hookChecklist.hookTypes.length).toBeGreaterThan(0);
+      // archetype shape
+      for (const a of pb.mcArchetypes) {
+        expect(a.name.length).toBeGreaterThan(0);
+        expect(a.voice.length).toBeGreaterThan(20);
+        expect(a.signature.length).toBeGreaterThan(20);
+      }
+    }
+  });
 });
 
 describe('Genre coverage — content-seeder records', () => {
