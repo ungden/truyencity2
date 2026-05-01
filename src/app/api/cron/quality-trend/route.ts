@@ -106,6 +106,25 @@ export async function GET(request: NextRequest) {
 
     const alertLevel = classifyAlert(drift, recentAvg);
 
+    // Phase 29 Feature 1: 10-chapter meta-diagnosis. Runs when chapter is on
+    // a 10-chapter boundary OR when the trend is flagged. Per-chapter Critic
+    // can't catch arc-level issues like "MC won 4 fights in a row" or "cast
+    // member missing for 12 chapters" — this fills that gap.
+    let diagnosisMeta: Record<string, unknown> | null = null;
+    const shouldDiagnose = currentCh % 10 === 0 || alertLevel !== 'ok';
+    if (shouldDiagnose) {
+      try {
+        const { diagnoseRecent10Chapters } = await import('@/services/story-engine/quality/chapter-diagnosis');
+        const { DEFAULT_CONFIG } = await import('@/services/story-engine/types');
+        const diagnosis = await diagnoseRecent10Chapters(p.id, currentCh, DEFAULT_CONFIG);
+        if (diagnosis) {
+          diagnosisMeta = diagnosis as unknown as Record<string, unknown>;
+        }
+      } catch (e) {
+        console.warn(`[quality-trend cron] diagnosis failed for ${p.id}:`, e instanceof Error ? e.message : String(e));
+      }
+    }
+
     trends.push({
       project_id: p.id,
       novel_id: p.novel_id,
@@ -122,6 +141,7 @@ export async function GET(request: NextRequest) {
       meta: {
         recent_window_start: recentStart,
         recent_window_end: currentCh,
+        ...(diagnosisMeta ? { diagnosis: diagnosisMeta } : {}),
       },
     });
     processed++;

@@ -58,6 +58,11 @@ declare global {
 /**
  * Install tier routing globally. Idempotent — safe to call multiple times.
  * Call once at the top of any orchestrator entrypoint.
+ *
+ * Env overrides (Phase 29 Feature 3):
+ *   CRITIC_MODEL_OVERRIDE — replaces 'critic' task model. Useful for A/B testing
+ *     a different model as Critic (e.g. Gemini reviewing DeepSeek's output) to
+ *     reduce self-bias. Example: CRITIC_MODEL_OVERRIDE=gemini-3-flash-preview
  */
 export function installModelTierRouting(): void {
   if (process.env.DISABLE_PRO_TIER === '1') {
@@ -69,6 +74,18 @@ export function installModelTierRouting(): void {
   for (const task of FLASH_TASKS) routing[task] = MODEL_FLASH;
   // _default fallback to flash when task is undefined
   routing['_default'] = MODEL_FLASH;
+
+  // Phase 29 Feature 3: per-task env override for A/B testing.
+  // Currently only Critic is exposed — expand to other tasks (architect/writer)
+  // only after Critic A/B proves the routing change improves quality.
+  const criticOverride = process.env.CRITIC_MODEL_OVERRIDE?.trim();
+  if (criticOverride) {
+    routing['critic'] = criticOverride;
+    if (process.env.DEBUG_ROUTING === '1') {
+      console.warn(`[ModelTier] CRITIC_MODEL_OVERRIDE active — critic task → ${criticOverride}`);
+    }
+  }
+
   globalThis.__MODEL_ROUTING__ = routing;
   if (process.env.DEBUG_ROUTING === '1') {
     console.warn(`[ModelTier] Installed routing: ${PRO_TASKS.size} Pro tasks, ${FLASH_TASKS.size} Flash tasks`);

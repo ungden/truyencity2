@@ -280,10 +280,12 @@ export interface CriticOutput {
 }
 
 export interface CriticIssue {
-  type: 'pacing' | 'consistency' | 'continuity' | 'dopamine' | 'quality' | 'word_count' | 'dialogue' | 'critic_error' | 'logic' | 'detail';
+  type: 'pacing' | 'consistency' | 'continuity' | 'dopamine' | 'quality' | 'word_count' | 'dialogue' | 'critic_error' | 'logic' | 'detail' | 'reader_persona';
   severity: 'minor' | 'moderate' | 'major' | 'critical';
   description: string;
   suggestion?: string;
+  /** Phase 29 Feature 2: which reader persona flagged this (only set when type='reader_persona') */
+  persona?: 'sangvan' | 'logic' | 'emotion';
 }
 
 // ── World Constraints ────────────────────────────────────────────────────────

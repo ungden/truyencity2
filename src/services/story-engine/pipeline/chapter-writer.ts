@@ -175,6 +175,28 @@ export async function writeChapter(
       options?.protagonistName,
     );
 
+    // Step 3b: Reader persona Critic (Phase 29 Feature 2) — gated by env.
+    // Adds non-blocking reader-perspective issues to the pool. Does NOT change
+    // approval gate; main Critic remains the authority on requiresRewrite.
+    if (process.env.ENABLE_READER_PERSONA_CRITIC === 'true') {
+      try {
+        const { runReaderPersonaCritic } = await import('../quality/reader-persona-critic');
+        const personaIssues = await runReaderPersonaCritic(
+          content,
+          genre,
+          config,
+          options?.projectId,
+          chapterNumber,
+        );
+        if (personaIssues.length > 0) {
+          critic.issues = [...(critic.issues || []), ...personaIssues];
+          console.log(`[ReaderPersona] ch.${chapterNumber}: +${personaIssues.length} persona issues appended`);
+        }
+      } catch (e) {
+        console.warn(`[ReaderPersona] ch.${chapterNumber} threw:`, e instanceof Error ? e.message : String(e));
+      }
+    }
+
     const qualityScore = critic.overallScore || 0;
     const failedQualityGate =
       critic.requiresRewrite ||
