@@ -432,19 +432,32 @@ QUY TẮC:
 
   try {
     const res = await callGemini(prompt, {
-      // Phase 29: bumped 1024→2048 — playbook content + DeepSeek reasoning overhead.
-      model: 'deepseek-v4-flash', temperature: 0.7, maxTokens: 2048,
+      // Phase 29 v4: 2048→4096 — lich-su hit exact 2048 ceiling repeatedly with
+      // playbook content. DeepSeek reasoning overhead eats ~1500 tokens, leaves
+      // <600 for 250-400-char blurb output → premature truncation.
+      model: 'deepseek-v4-flash', temperature: 0.7, maxTokens: 4096,
       systemPrompt: SANG_VAN_DNA + '\n\n[ROLE-SPECIFIC] Stage: DESCRIPTION. Viết back-cover blurb 3 đoạn 250-400 chữ — hook GROWTH-driven, KHÔNG spoil cuối truyện, KHÔNG cosmic stake Phase 1.',
     }, { jsonMode: true, tracking: { projectId: p.id, task: 'stage_description' } });
 
     const parsed = parseJSON<{ description?: string }>(res.content);
     const desc = (parsed?.description || '').trim();
-    if (desc.length < 200) return { success: false, error: `description too short (${desc.length} chars)` };
+    if (desc.length < 200) {
+      const contentLen = (res.content || '').length;
+      return { success: false, error: `description too short (desc=${desc.length}, raw_content=${contentLen})` };
+    }
     const mcCount = (desc.match(new RegExp(mc.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
     if (mcCount < 2) return { success: false, error: `MC name "${mc}" appears ${mcCount}× (need ≥2)` };
     const paragraphs = desc.split(/\n\n+/).filter(p => p.trim().length > 0);
     if (paragraphs.length < 3) return { success: false, error: `description has ${paragraphs.length} paragraphs (need 3)` };
 
+    // Phase 29 v4 CRITICAL FIX: clear story_outline temp stash so the next stage
+    // (init-prep regen path) sees story_outline as NULL and properly calls
+    // generateStoryOutline. Previously the temp stash from runStageIdea/Character
+    // (`{__stage_idea, __stage_character}`) blocked the route's `!story_outline`
+    // check, leaving setup stuck at master_outline forever even when AI calls ran.
+    await getSupabase().from('ai_story_projects').update({
+      story_outline: null,
+    }).eq('id', p.id);
     await getSupabase().from('novels').update({ description: desc }).eq('id', novel.id);
     return { success: true };
   } catch (e) {
