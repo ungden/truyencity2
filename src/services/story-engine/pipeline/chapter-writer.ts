@@ -1260,11 +1260,28 @@ ${contentPreview}
   "dopamineScore": <1-10>,
   "pacingScore": <1-10>,
   "endingHookScore": <1-10>,
+  "rubricScores": {
+    "promiseClarity": <1-10 — chương có advance promise/core loop của genre không? (vd tien-hiep: có tu luyện/tài nguyên/cảnh giới? do-thi: có deal/recognition/tiền? linh-di: có rule/dread/mystery?)>,
+    "sceneSpecificity": <1-10 — scenes có vật thể/số liệu/setting cụ thể không, hay vague abstraction? Cụ thể (Diablo 2, 50 linh thạch, quán net 30 PC, M&A deal 200 tỷ) = 8-10. Vague ("tài nguyên", "đối thủ", "công ty lớn") = 3-5>,
+    "mcAgency": <1-10 — MC chủ động ra quyết định chiến lược không? Hay chỉ phản ứng theo sự kiện/người khác? Active+plan = 8-10. Reactive only = 3-5>,
+    "payoffConsequence": <1-10 — events trong chương có thực sự THAY ĐỔI status/resource/relationship/world của MC không? Hay chỉ là throwaway scene không để lại consequence? Real change = 8-10. No change = 3-5>,
+    "voiceDistinction": <1-10 — các nhân vật khác nhau có cách nói/quirk/cadence khác nhau không? 3+ nhân vật phân biệt được giọng = 8-10. Tất cả nói cùng style = 3-5>
+  },
   "issues": [{"type": "word_count|pacing|logic|detail|continuity|quality|dialogue", "description": "...", "severity": "minor|moderate|major|critical"}],
   "approved": <true nếu overallScore >= 7 VÀ wordRatio >= 70%>,
   "requiresRewrite": <true nếu overallScore <= 4 HOẶC wordRatio < 60% HOẶC có lỗi continuity major/critical>,
   "rewriteInstructions": "hướng dẫn cụ thể nếu cần rewrite — PHẢI nêu rõ từ bị lặp cần thay thế, scene nào thiếu comedy, scene nào thiếu nội tâm đa lớp"
 }
+
+QUY TẮC RUBRIC SCORING (BẮT BUỘC):
+- 5 rubric scores trên là PRIMARY signal cho chất lượng. Keyword counters (BÁO CÁO TÍN HIỆU) chỉ là defense layer.
+- overallScore PHẢI ≤ min(rubricScores) + 2. Nếu sceneSpecificity=4 thì overallScore ≤ 6.
+- Nếu BẤT KỲ rubric ≤ 4 → tạo issue type="quality" severity="major" describing dimension yếu.
+- Nếu rubric promiseClarity ≤ 4 → "quality" critical + requiresRewrite=true (chương lệch genre).
+- Nếu sceneSpecificity ≤ 3 → "detail" critical + requiresRewrite=true (chương quá vague).
+- Nếu mcAgency ≤ 4 → "quality" major (MC bị động).
+- Nếu payoffConsequence ≤ 4 → "quality" major (chương rỗng, không có hậu quả).
+- Nếu voiceDistinction ≤ 4 → "dialogue" moderate (nhân vật giống giọng).
 
 KIỂM TRA MÂU THUẪN (BẮT BUỘC):
 - Nếu nhân vật đã CHẾT mà xuất hiện lại sống -> type "continuity", severity "critical", requiresRewrite=true
@@ -1387,7 +1404,73 @@ KIỂM TRA TUÂN THỦ QUALITY MODULES (NẾU CÓ THÔNG TIN):
       // Moderate repetition: just log, don't penalize score (Critic already sees report)
     }
 
-    // Hard enforcement: quality signal floor
+    // Phase 25: Rubric judge enforcement.
+    // Critic prompt asks for 5 rubric scores (promiseClarity, sceneSpecificity,
+    // mcAgency, payoffConsequence, voiceDistinction). Apply hard floors + cap
+    // overallScore by min(rubricScores) + 2 (chương không thể tốt hơn dimension yếu nhất).
+    parsed.issues = parsed.issues || [];
+    if (parsed.rubricScores) {
+      const r = parsed.rubricScores;
+      // Sanity-check: clamp rubric scores to 1-10 in case model returned out-of-range.
+      r.promiseClarity = Math.max(1, Math.min(10, r.promiseClarity || 5));
+      r.sceneSpecificity = Math.max(1, Math.min(10, r.sceneSpecificity || 5));
+      r.mcAgency = Math.max(1, Math.min(10, r.mcAgency || 5));
+      r.payoffConsequence = Math.max(1, Math.min(10, r.payoffConsequence || 5));
+      r.voiceDistinction = Math.max(1, Math.min(10, r.voiceDistinction || 5));
+
+      const minRubric = Math.min(
+        r.promiseClarity, r.sceneSpecificity, r.mcAgency, r.payoffConsequence, r.voiceDistinction,
+      );
+
+      // Cap overallScore: chương không thể trên min(rubric) + 2.
+      if (parsed.overallScore > minRubric + 2) {
+        parsed.overallScore = minRubric + 2;
+      }
+
+      // Hard floor enforcement per dimension.
+      if (r.promiseClarity <= 4) {
+        parsed.requiresRewrite = true;
+        parsed.approved = false;
+        parsed.issues.push({
+          type: 'quality',
+          severity: 'critical',
+          description: `Rubric promiseClarity = ${r.promiseClarity}/10 — chương lệch khỏi promise/core loop của genre.`,
+        });
+      }
+      if (r.sceneSpecificity <= 3) {
+        parsed.requiresRewrite = true;
+        parsed.approved = false;
+        parsed.issues.push({
+          type: 'detail',
+          severity: 'critical',
+          description: `Rubric sceneSpecificity = ${r.sceneSpecificity}/10 — chương quá vague (thiếu vật thể/số liệu/setting cụ thể).`,
+        });
+      }
+      if (r.mcAgency <= 4) {
+        parsed.issues.push({
+          type: 'quality',
+          severity: 'major',
+          description: `Rubric mcAgency = ${r.mcAgency}/10 — MC bị động, không drive decisions.`,
+        });
+      }
+      if (r.payoffConsequence <= 4) {
+        parsed.issues.push({
+          type: 'quality',
+          severity: 'major',
+          description: `Rubric payoffConsequence = ${r.payoffConsequence}/10 — chương rỗng, events không đổi status/resource/relationship.`,
+        });
+      }
+      if (r.voiceDistinction <= 4) {
+        parsed.issues.push({
+          type: 'dialogue',
+          severity: 'moderate',
+          description: `Rubric voiceDistinction = ${r.voiceDistinction}/10 — nhân vật giống giọng.`,
+        });
+      }
+    }
+
+    // Hard enforcement: quality signal floor (legacy keyword counters — kept as
+    // defense layer beneath rubric judge until rubric proves stable).
     const signal = analyzeQualitySignals(content);
     const missingQualityAxes: string[] = [];
     parsed.issues = parsed.issues || [];

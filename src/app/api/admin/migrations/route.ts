@@ -44,6 +44,7 @@ async function listAppliedMigrations(): Promise<string[]> {
     { name: '0155_quality_metrics', table: 'quality_metrics' },
     { name: '0156_cost_tracking_metadata', table: 'cost_tracking', column: 'metadata' },
     { name: '0157_failed_memory_tasks', table: 'failed_memory_tasks' },
+    { name: '0162_first_10_evaluations', table: 'first_10_evaluations' },
   ];
   const applied: string[] = [];
   for (const p of probes) {

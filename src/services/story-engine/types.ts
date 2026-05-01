@@ -203,6 +203,23 @@ export interface CriticOutput {
   dopamineScore: number;
   pacingScore: number;
   endingHookScore?: number;
+  /**
+   * Phase 25 rubric judge — replaces keyword-counting signals as the primary
+   * quality measure. Each dimension scored 1-10 by Critic. Used to compute /
+   * sanity-check overallScore and flag dimension-specific weaknesses.
+   *  - promiseClarity: chapter advance genre promise / core loop?
+   *  - sceneSpecificity: concrete objects/events/numbers vs vague abstraction
+   *  - mcAgency: MC drives decisions vs being reactively pushed
+   *  - payoffConsequence: events change status/resource/relationship (not throwaway)
+   *  - voiceDistinction: characters sound different (vocab, cadence, quirks)
+   */
+  rubricScores?: {
+    promiseClarity: number;
+    sceneSpecificity: number;
+    mcAgency: number;
+    payoffConsequence: number;
+    voiceDistinction: number;
+  };
   issues: CriticIssue[];
   approved: boolean;
   requiresRewrite: boolean;

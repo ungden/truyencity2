@@ -30,6 +30,7 @@ export default async function QualityDashboardPage() {
     qualityAvg,
     failedTasks,
     badChapters,
+    weakOpenings,
     costByTask,
     budget,
   ] = await Promise.all([
@@ -40,6 +41,12 @@ export default async function QualityDashboardPage() {
     supabase.from('failed_memory_tasks').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
     supabase.from('quality_metrics').select('chapter_number,overall_score,guardian_issues_critical,contradictions_critical,project_id')
       .or('overall_score.lt.6,guardian_issues_critical.gt.0,contradictions_critical.gt.0')
+      .order('created_at', { ascending: false })
+      .limit(20),
+    // Phase 25: first-10 evaluations — surface marginal/fail openings
+    supabase.from('first_10_evaluations')
+      .select('project_id,novel_id,verdict,overall_score,usp_clarity,hook_strength,payoff_cadence,core_loop,genre_fidelity,issues,recommendations,created_at')
+      .in('verdict', ['marginal', 'fail'])
       .order('created_at', { ascending: false })
       .limit(20),
     supabase.from('cost_tracking').select('task,cost,input_tokens,output_tokens,metadata')
@@ -121,6 +128,73 @@ export default async function QualityDashboardPage() {
                     <td className={`px-3 py-2 ${r.contradictions_critical > 0 ? 'text-red-600' : ''}`}>{r.contradictions_critical}</td>
                   </tr>
                 ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
+      {/* First-10 evaluations — Phase 25 opening-quality gate */}
+      {weakOpenings.data && weakOpenings.data.length > 0 && (
+        <section>
+          <h2 className="text-lg font-semibold mb-2">
+            ⚠ Weak openings (first-10 evaluator)
+          </h2>
+          <p className="text-xs text-gray-500 mb-2">
+            Marginal/fail verdicts on the opening 10 chapters. May need outline regeneration.
+          </p>
+          <div className="overflow-x-auto rounded border border-gray-200 dark:border-gray-700">
+            <table className="min-w-full text-sm">
+              <thead className="bg-gray-100 dark:bg-gray-800">
+                <tr>
+                  <th className="px-3 py-2 text-left">Project</th>
+                  <th className="px-3 py-2 text-center">Verdict</th>
+                  <th className="px-3 py-2 text-right">Overall</th>
+                  <th className="px-3 py-2 text-right">USP</th>
+                  <th className="px-3 py-2 text-right">Hook</th>
+                  <th className="px-3 py-2 text-right">Payoff</th>
+                  <th className="px-3 py-2 text-right">Loop</th>
+                  <th className="px-3 py-2 text-right">Genre</th>
+                  <th className="px-3 py-2 text-left">Top issue</th>
+                </tr>
+              </thead>
+              <tbody>
+                {weakOpenings.data.map((row: {
+                  project_id: string;
+                  verdict: string;
+                  overall_score: number;
+                  usp_clarity: number;
+                  hook_strength: number;
+                  payoff_cadence: number;
+                  core_loop: number;
+                  genre_fidelity: number;
+                  issues?: Array<{ dimension?: string; severity?: string; description?: string }> | null;
+                }) => {
+                  const topIssue = (row.issues || [])[0];
+                  return (
+                    <tr key={row.project_id} className="border-t border-gray-200 dark:border-gray-700">
+                      <td className="px-3 py-2 font-mono text-xs">{row.project_id.slice(0, 8)}</td>
+                      <td className="px-3 py-2 text-center">
+                        <span className={
+                          row.verdict === 'fail'
+                            ? 'text-red-600 font-bold'
+                            : 'text-amber-600 font-semibold'
+                        }>
+                          {row.verdict}
+                        </span>
+                      </td>
+                      <td className="px-3 py-2 text-right">{row.overall_score}</td>
+                      <td className="px-3 py-2 text-right">{row.usp_clarity}</td>
+                      <td className="px-3 py-2 text-right">{row.hook_strength}</td>
+                      <td className="px-3 py-2 text-right">{row.payoff_cadence}</td>
+                      <td className="px-3 py-2 text-right">{row.core_loop}</td>
+                      <td className="px-3 py-2 text-right">{row.genre_fidelity}</td>
+                      <td className="px-3 py-2 text-xs text-gray-600 dark:text-gray-400">
+                        {topIssue ? `${topIssue.dimension}/${topIssue.severity}: ${topIssue.description?.slice(0, 80) || ''}` : '—'}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

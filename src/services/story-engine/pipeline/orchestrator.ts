@@ -1103,6 +1103,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
           ai_write_count: aiWriteCount,
           last_chapter_number: lastChapterNumber,
           split_parts: SPLIT_PARTS,
+          rubric_scores: result.criticReport?.rubricScores ?? null,
           health: health ? {
             ok: health.warnings.length === 0,
             character_states: health.characterStateCount,
@@ -1113,6 +1114,16 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
         },
       });
     })().catch(e => console.warn('[Orchestrator] Quality metrics failed:', e instanceof Error ? e.message : String(e))),
+
+    // Task 16c: First-10 evaluation (Phase 25) — runs ONCE per project when
+    // an AI write spans/reaches ch.10. Idempotent (UNIQUE constraint on
+    // project_id), so cron retries skip if already done.
+    ...(nextChapter <= 10 && lastChapterNumber >= 10 ? [
+      (async () => {
+        const { runFirst10Evaluation } = await import('./first-10-evaluator');
+        return runFirst10Evaluation(project.id, novel.id, genre, protagonistName, geminiConfig);
+      })().catch(e => recordTaskFailure(db, project.id, novel.id, lastChapterNumber, 'task_16c_first_10_evaluation', e)),
+    ] : []),
 
     // Task 17: Volume summary (every 25 reader chapters)
     ...(lastChapterNumber % 25 === 0 && lastChapterNumber >= 25 ? [
