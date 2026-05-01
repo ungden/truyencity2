@@ -297,7 +297,8 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     // reads outline several times; missing means a deliberate reset that's our job to fix.
     const needsMasterRegen = !extra?.master_outline && currentChapter < 5;
     const needsStoryRegen = !extra?.story_outline && currentChapter < 5;
-    if (needsMasterRegen || needsStoryRegen) {
+    const needsPowerCanon = !(extra as { power_system_canon?: unknown } | null)?.power_system_canon && currentChapter < 5;
+    if (needsMasterRegen || needsStoryRegen || needsPowerCanon) {
       try {
         const { data: full } = await db
           .from('ai_story_projects')
@@ -340,9 +341,26 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
           }
         }
 
+        // Phase 27 W2.4: power-system canon — generate ONCE per project at setup.
+        // Comprehensive ladder + breakthrough rules + commonViolations for Critic.
+        if (needsPowerCanon) {
+          const { generatePowerSystemCanon } = await import('../canon/power-system');
+          const storyOutlineStr = extra?.story_outline ? JSON.stringify(extra.story_outline) : null;
+          const canon = await generatePowerSystemCanon(
+            options.projectId,
+            (full?.genre || 'do-thi') as GenreType,
+            worldDesc,
+            storyOutlineStr,
+            { ...DEFAULT_CONFIG, model: 'deepseek-v4-flash' },
+          );
+          if (canon) {
+            validationFixes.push(`✓ power_system_canon generated (${canon.ladder?.length ?? 0} tiers)`);
+          }
+        }
+
         // After regen, throw a soft error so cron retries this chapter on next tick (with outlines now present).
         // This avoids using stale `extra` reference in subsequent code paths.
-        if (needsMasterRegen || needsStoryRegen) {
+        if (needsMasterRegen || needsStoryRegen || needsPowerCanon) {
           throw new Error(`OUTLINE_REGEN_DONE: novels self-heal complete; cron will pick up next tick`);
         }
       } catch (regenErr) {
@@ -999,6 +1017,18 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
           );
         })().catch((e) => console.warn(`[Orchestrator] Geography timeline failed for Ch.${partCh}:`, e instanceof Error ? e.message : String(e))),
       ] : []),
+
+      // Task 15d (Phase 27 W2.2): Story timeline — chapter ↔ in-world date.
+      (async () => {
+        const { recordChapterTime } = await import('../state/timeline');
+        return recordChapterTime(project.id, partCh, part.content, protagonistName, geminiConfig);
+      })().catch((e) => console.warn(`[Orchestrator] Timeline record failed for Ch.${partCh}:`, e instanceof Error ? e.message : String(e))),
+
+      // Task 15e (Phase 27 W2.3): Item events — picked/used/lost/equipped.
+      (async () => {
+        const { recordItemEvents } = await import('../state/item-inventory');
+        return recordItemEvents(project.id, partCh, part.content, characters, geminiConfig);
+      })().catch((e) => console.warn(`[Orchestrator] Item events failed for Ch.${partCh}:`, e instanceof Error ? e.message : String(e))),
     ]);
   }
 
@@ -1051,12 +1081,18 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     ] : []),
 
     // Task 15c: Plot Thread Ledger update (every AI write — Phase 24)
-    // Reads finished AI write, extracts thread advances/resolutions/new threads,
-    // upserts plot_threads. Closes the read/write loop on plot threads
-    // (V2 previously had reader but no writer).
     extractAndUpdatePlotThreads(
       project.id, lastChapterNumber, result.content, characters, geminiConfig,
     ).catch(e => recordTaskFailure(db, project.id, novel.id, lastChapterNumber, 'task_15c_plot_thread_ledger', e)),
+
+    // Task 15f (Phase 27 W2.5): Factions extractor — every 3 AI writes.
+    // Factions evolve slowly; per-write is too expensive.
+    ...(aiWriteCount % 3 === 0 ? [
+      (async () => {
+        const { extractAndUpdateFactions } = await import('../canon/factions');
+        return extractAndUpdateFactions(project.id, lastChapterNumber, result.content, characters, geminiConfig);
+      })().catch(e => recordTaskFailure(db, project.id, novel.id, lastChapterNumber, 'task_15f_factions', e)),
+    ] : []),
 
     // Task 16: Character bible refresh (every 20 reader chapters)
     ...(lastChapterNumber % 20 === 0 && lastChapterNumber >= 20 ? [

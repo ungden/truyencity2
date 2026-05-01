@@ -430,6 +430,29 @@ export async function loadContext(
     recentChapterFullText: ((recentFullTextResult?.data as Array<{ chapter_number: number; title: string; content: string }> | null) || []).reverse(),
     masterOutline: typeof masterOutline === 'string' ? masterOutline : (masterOutline ? JSON.stringify(masterOutline) : undefined),
     volumeContext: buildVolumeContextBlock(rawMasterOutline, chapterNumber),
+    castRoster: await (async () => {
+      const { getCastRosterContext } = await import('../state/cast-database');
+      return getCastRosterContext(projectId, chapterNumber).catch(() => null);
+    })() || undefined,
+    timelineContext: await (async () => {
+      const { getTimelineContext } = await import('../state/timeline');
+      return getTimelineContext(projectId, chapterNumber).catch(() => null);
+    })() || undefined,
+    inventoryContext: await (async () => {
+      const { getInventoryContext } = await import('../state/item-inventory');
+      // Use protagonist from project meta — fallback to first character if missing.
+      const { data: projectRow } = await db.from('ai_story_projects').select('main_character').eq('id', projectId).maybeSingle();
+      const protagonist = (projectRow as { main_character?: string } | null)?.main_character || characters[0]?.character_name || 'MC';
+      return getInventoryContext(projectId, chapterNumber, protagonist).catch(() => null);
+    })() || undefined,
+    powerSystemCanonContext: await (async () => {
+      const { getPowerSystemCanonContext } = await import('../canon/power-system');
+      return getPowerSystemCanonContext(projectId).catch(() => null);
+    })() || undefined,
+    factionsContext: await (async () => {
+      const { getFactionsContext } = await import('../canon/factions');
+      return getFactionsContext(projectId, chapterNumber).catch(() => null);
+    })() || undefined,
     storyOutline: storyOutline || undefined,
     worldDescription: worldDescription || undefined,
     // Modern narrative metadata (migration 0149)
@@ -464,6 +487,32 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
   // Compact ~2K block telling Architect where in the 1000-chapter map we are.
   if (payload.volumeContext) {
     parts.push(payload.volumeContext);
+  }
+
+  // Layer 0.5c: Phase 27 W2.1 — Comprehensive cast roster (đại thần 角色档案)
+  if (payload.castRoster) {
+    parts.push(payload.castRoster);
+  }
+
+  // Layer 0.5d: Phase 27 W2.4 — Power system canon (đại thần 修炼体系)
+  // Generated ONCE at project setup. Comprehensive ladder + breakthrough rules.
+  if (payload.powerSystemCanonContext) {
+    parts.push(payload.powerSystemCanonContext);
+  }
+
+  // Layer 0.5e: Phase 27 W2.5 — Active factions registry (đại thần 势力档案)
+  if (payload.factionsContext) {
+    parts.push(payload.factionsContext);
+  }
+
+  // Layer 0.5f: Phase 27 W2.2 — Story timeline (đại thần 时间线)
+  if (payload.timelineContext) {
+    parts.push(payload.timelineContext);
+  }
+
+  // Layer 0.5g: Phase 27 W2.3 — Item inventory (đại thần 物品系统)
+  if (payload.inventoryContext) {
+    parts.push(payload.inventoryContext);
   }
 
   // Layer 0.6: Story Outline (premise, protagonist, plot points, ending vision)

@@ -317,6 +317,25 @@ export interface ContextPayload {
    */
   volumeContext?: string;
 
+  /**
+   * Phase 27 W2.1: comprehensive cast roster — every named character with
+   * latest known state. Solves long-tail cast drift in 1000+ chapter novels
+   * (pre-Phase-27 limit of 50 character_states ROWS missed ~80% of named cast).
+   */
+  castRoster?: string;
+
+  /** Phase 27 W2.2: chapter ↔ in-world date timeline with MC age tracking. */
+  timelineContext?: string;
+
+  /** Phase 27 W2.3: current MC + key char inventory + recently lost items. */
+  inventoryContext?: string;
+
+  /** Phase 27 W2.4: comprehensive power-system rules generated at setup. */
+  powerSystemCanonContext?: string;
+
+  /** Phase 27 W2.5: top-N active factions with current alliances/rivalries. */
+  factionsContext?: string;
+
   // Anti-repetition
   previousTitles: string[];
   recentOpenings: string[];
