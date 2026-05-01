@@ -13,6 +13,23 @@ import { useDevice } from "@/hooks/use-device";
 import type { Novel } from "@/lib/types";
 import { AdBanner } from "@/components/ads/ad-banner";
 
+// Genre catalogue chips for "Khám phá theo thể loại" section.
+// Mirrors web genre-config but mobile-friendly subset (12 most popular).
+const GENRE_CATALOGUE: Array<{ slug: string; label: string; color: string }> = [
+  { slug: "tien-hiep", label: "Tiên Hiệp", color: "#e67e22" },
+  { slug: "huyen-huyen", label: "Huyền Huyễn", color: "#e74c3c" },
+  { slug: "do-thi", label: "Đô Thị", color: "#2ecc71" },
+  { slug: "kiem-hiep", label: "Kiếm Hiệp", color: "#d35400" },
+  { slug: "khoa-huyen", label: "Khoa Huyễn", color: "#3498db" },
+  { slug: "lich-su", label: "Lịch Sử", color: "#f39c12" },
+  { slug: "vong-du", label: "Võng Du", color: "#9b59b6" },
+  { slug: "mat-the", label: "Mạt Thế", color: "#34495e" },
+  { slug: "linh-di", label: "Linh Dị", color: "#7f8c8d" },
+  { slug: "ngon-tinh", label: "Ngôn Tình", color: "#e91e63" },
+  { slug: "di-gioi", label: "Dị Giới", color: "#1abc9c" },
+  { slug: "quan-truong", label: "Quan Trường", color: "#16a085" },
+];
+
 export default function DiscoverScreen() {
   const { width, isTablet, isLargeTablet, gridColumns, centeredStyle } = useDevice();
   const [heroNovels, setHeroNovels] = useState<Novel[]>([]);
@@ -224,6 +241,36 @@ export default function DiscoverScreen() {
           </View>
         </View>
       )}
+
+      {/* Theo thể loại — genre catalogue (added 2026-05-01: missing per user feedback) */}
+      <View className="mt-4">
+        <SectionHeader title="Khám phá theo thể loại" />
+        <FlatList
+          data={GENRE_CATALOGUE}
+          keyExtractor={(item) => item.slug}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingHorizontal: 16, gap: 10 }}
+          renderItem={({ item }) => (
+            <Link href={`/(discover)/latest?genre=${item.slug}`} asChild>
+              <Pressable
+                style={{
+                  paddingHorizontal: 16,
+                  paddingVertical: 10,
+                  borderRadius: 999,
+                  backgroundColor: item.color + '22',
+                  borderWidth: 1,
+                  borderColor: item.color + '44',
+                }}
+              >
+                <Text style={{ fontSize: 14, fontWeight: '600', color: item.color }}>
+                  {item.label}
+                </Text>
+              </Pressable>
+            </Link>
+          )}
+        />
+      </View>
 
       {/* New posts section */}
       {newPosts.length > 0 && (
