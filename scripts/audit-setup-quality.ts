@@ -70,7 +70,7 @@ async function resetUnwritten(row: ProjectRow): Promise<void> {
     status: 'paused',
     pause_reason: 'setup quality audit reset before chapter 1',
     world_description: null,
-    main_character: null,
+    main_character: '',
     master_outline: null,
     story_outline: null,
     story_bible: null,
