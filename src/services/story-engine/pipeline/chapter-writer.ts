@@ -1351,7 +1351,29 @@ KIỂM TRA TUÂN THỦ QUALITY MODULES (NẾU CÓ THÔNG TIN):
 - FORESHADOWING: Nếu mục "YÊU CẦU TUÂN THỦ" có hint cần gieo (GIEO HINT BẮT BUỘC) mà chương KHÔNG chứa chi tiết tương ứng → type "quality", severity "major", description nêu rõ hint bị bỏ qua.
   Nếu có hint cần PAYOFF mà chương không callback → type "quality", severity "major".
 - CHARACTER VOICE: Nếu có "signature traits" (câu cửa miệng, thói quen, cách nói) cho nhân vật xuất hiện trong chương mà nhân vật đó KHÔNG thể hiện bất kỳ trait nào → type "quality", severity "moderate".
-- PACING BLUEPRINT: Nếu pacing blueprint chỉ định mood (VD: "CALM BEFORE STORM", "CLIMAX") mà chương viết hoàn toàn ngược (VD: blueprint là calm nhưng toàn action cao trào) → type "pacing", severity "moderate".`;
+- PACING BLUEPRINT: Nếu pacing blueprint chỉ định mood (VD: "CALM BEFORE STORM", "CLIMAX") mà chương viết hoàn toàn ngược (VD: blueprint là calm nhưng toàn action cao trào) → type "pacing", severity "moderate".
+
+KIỂM TRA CANON & STATE (Phase 27/28 — xem các block trong context có sẵn):
+
+- INVENTORY (xem block "[INVENTORY]"): Nếu chương reference vật phẩm KHÔNG nằm trong roster MC's currently held items, HOẶC reference vật phẩm trong "ĐÃ MẤT/CHO" mà không có narrative reason → type "continuity", severity "critical", requiresRewrite=true. Vd MC vung kiếm Hỏa Long mà inventory không có Hỏa Long → CRITICAL.
+
+- POWER SYSTEM CANON (xem block "[POWER SYSTEM CANON]"): commonViolations[] liệt kê những lỗi cần catch. Nếu chương vi phạm 1 trong commonViolations → type "continuity", severity "critical", requiresRewrite=true. Vd "MC skip cảnh giới mà không có lý do narrative", "Đột phá liên tục không có cooldown".
+
+- WORLDBUILDING CANON (xem block "[WORLDBUILDING CANON]"): commonViolations[] tương tự — nếu chương mâu thuẫn cosmology/history/cultures/economy → type "continuity", severity "major", requiresRewrite=true. Vd "Linh thạch giá trị thay đổi giữa các chương", "văn hóa Đại Tấn nhầm với Đại Đường".
+
+- FACTIONS (xem block "[FACTIONS]"): Nếu chương đột ngột flip alliance/rivalry mà không có narrative event setup → type "continuity", severity "major". Vd phe X xưa nay là enemy MC, chương này tự nhiên thành ally không có lý do.
+
+- PLOT TWISTS (xem block "[PLOT TWISTS]"): Nếu chương được mark "HINT TO PLANT" nào trong "imminent" twists, mà chương không chứa hint đó → type "quality", severity "major", requiresRewrite=true. Plant hint TINH TẾ — KHÔNG được spoiler twist.
+
+- THEMES (xem block "[THEMES]"): Nếu MAIN theme có "DRIFT" flag (chưa reinforce >30 chương) mà chương này KHÔNG reinforce theme đó → type "quality", severity "moderate". Encourage motif weaving.
+
+- CAST ROSTER (xem block "[CAST ROSTER]"): Nếu chương invent ≥5 tên nhân vật MỚI không có trong roster + không có lý do narrative (vd 1 đám đông giới thiệu) → type "continuity", severity "major". Đại thần không invent NPCs random.
+
+- TIMELINE (xem block "[STORY TIMELINE]"): Nếu chương viết "X năm sau" mà thông tin trong block báo MC mới ở vùng A vài chương trước → type "continuity", severity "major". Nếu MC age được nhắc < age trong timeline → CRITICAL.
+
+- VOICE ANCHOR (xem block "[VOICE ANCHOR]" nếu có): Sample prose từ ch.1-3 cho thấy giọng văn cốt lõi. Nếu chương hiện tại drift xa khỏi cadence/style đó (vd 1-3 nhiều dialogue + dense paragraphs, chương này toàn description ngắn) → type "quality", severity "moderate".
+
+- ROLLING BRIEFS (xem block "[CHƯƠNG TIẾP THEO — DỰ KIẾN]"): Nếu chương HIỆN TẠI viết hoàn toàn không setup gì cho chương kế tiếp đã planned → type "quality", severity "moderate". Plant 1-2 seeds.`;
 
   try {
     const nonCombatGuard = genre && isNonCombatGenre(genre)
@@ -1641,6 +1663,45 @@ KIỂM TRA TUÂN THỦ QUALITY MODULES (NẾU CÓ THÔNG TIN):
       parsed.overallScore = Math.min(parsed.overallScore || 10, 5);
       if (!parsed.rewriteInstructions || parsed.rewriteInstructions.trim().length === 0) {
         parsed.rewriteInstructions = 'Viết lại đoạn kết để có cliffhanger/hook rõ ràng, tạo lý do đọc tiếp ngay chương sau.';
+      }
+    }
+
+    // Phase 28 TIER 1: Centralized canon enforcement gates.
+    // Runs deterministic checks (cast roster, timeline, POV, voice drift,
+    // sensory floor, hook floor) and merges issues into Critic output.
+    if (projectId) {
+      try {
+        const { enforceCanonGates } = await import('../quality/canon-enforcement');
+        const expectedCharacters = (outline.scenes || [])
+          .flatMap(s => s.characters || [])
+          .filter(Boolean);
+        const canonIssues = await enforceCanonGates({
+          projectId,
+          chapterNumber: outline.chapterNumber,
+          content,
+          protagonistName: protagonistName || 'MC',
+          expectedCharacters: [...new Set(expectedCharacters)],
+          // expectedPov: project may set this in style_directives.pov in future
+        });
+        if (canonIssues.length > 0) {
+          parsed.issues = parsed.issues || [];
+          parsed.issues.push(...canonIssues);
+          // Auto-promote: critical/major canon issues force rewrite.
+          const hasMajorOrCritical = canonIssues.some(i => i.severity === 'critical' || i.severity === 'major');
+          if (hasMajorOrCritical) {
+            parsed.requiresRewrite = true;
+            parsed.approved = false;
+            parsed.overallScore = Math.min(parsed.overallScore || 10, 5);
+            const guideText = canonIssues
+              .filter(i => i.severity === 'critical' || i.severity === 'major')
+              .map(i => `[${i.severity}/${i.type}] ${i.description.slice(0, 200)}`)
+              .join(' | ');
+            parsed.rewriteInstructions = (parsed.rewriteInstructions || '') +
+              ` CANON GATES: ${guideText}`;
+          }
+        }
+      } catch (e) {
+        console.warn(`[Critic] Canon enforcement gates threw:`, e instanceof Error ? e.message : String(e));
       }
     }
 
