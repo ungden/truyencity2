@@ -7,7 +7,7 @@
 import type { SceneOutline, ChapterOutline, ContextPayload } from '@/services/story-engine/types';
 import { getEnhancedStyleBible } from '@/services/story-engine/templates/style-bible';
 import { titleChecker } from '@/services/story-engine/quality/title-checker';
-import { shouldBeFinaleArc } from '@/services/story-engine/memory/summary-manager';
+import { shouldBeFinaleArc } from '@/services/story-engine/pipeline/summary-orchestrator';
 
 describe('Story Engine v2', () => {
   describe('Types', () => {

@@ -22,17 +22,11 @@ import { saveCharacterStatesFromCombined, detectCharacterContradictions, type Ch
 import { extractCharacterKnowledge, getCharacterKnowledgeContext } from '../state/knowledge-graph';
 import { autoReviseChapter } from './auto-reviser';
 import { runContinuityGuardian } from '../quality/continuity-guardian';
-import {
-  buildPlotThreadContext,
-  buildBeatContext,
-  buildRuleContext,
-  detectAndRecordBeats,
-  extractRulesFromChapter,
-  checkConsistency,
-  checkConsistencyFast,
-  extractAndUpdatePlotThreads,
-} from '../memory/plot-tracker';
-import { runSummaryTasks } from '../memory/summary-manager';
+import { buildPlotThreadContext, extractAndUpdatePlotThreads } from '../state/plot-threads';
+import { buildBeatContext, detectAndRecordBeats } from '../memory/beat-ledger';
+import { buildRuleContext, extractRulesFromChapter } from '../canon/world-rules';
+import { checkConsistency, checkConsistencyFast } from '../quality/consistency-check';
+import { runSummaryTasks } from '../pipeline/summary-orchestrator';
 import { generateArcPlan } from '../context/assembler';
 // Quality modules (Qidian Master Level)
 import { getForeshadowingContext, updateForeshadowingStatus, generateForeshadowingAgenda } from '../plan/foreshadowing';
