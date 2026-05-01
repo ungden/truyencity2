@@ -180,13 +180,19 @@ Trả về JSON:
 
   try {
     const res = await callGemini(prompt, {
-      model: 'deepseek-v4-flash', temperature: 0.85, maxTokens: 1024,
+      // Phase 29: bumped maxTokens 1024→3072 because Phase 29 idea prompt is larger
+      // (playbook tension axes + dopamine + anti-cliche injected). DeepSeek V4 thinking
+      // burns reasoning_content tokens before emitting structured `content` — 1024 was
+      // truncating the JSON output for half the genres.
+      model: 'deepseek-v4-flash', temperature: 0.85, maxTokens: 3072,
       systemPrompt: SANG_VAN_DNA + '\n\n[ROLE-SPECIFIC] Stage: IDEA. Output premise + themes + mainConflict cho tiểu thuyết. premise GROWTH-driven. mainConflict actor LOCAL Phase 1. Cosmic-tier antagonist deferred Phase 3+.',
     }, { jsonMode: true, tracking: { projectId: p.id, task: 'stage_idea' } });
 
     const parsed = parseJSON<IdeaPayload>(res.content);
     if (!parsed?.premise || parsed.premise.length < 80) {
-      return { success: false, error: `idea premise too short (${parsed?.premise?.length || 0})` };
+      const contentLen = (res.content || '').length;
+      const preview = (res.content || '').slice(0, 80).replace(/\n/g, ' ');
+      return { success: false, error: `idea premise too short (premise=${parsed?.premise?.length || 0}, raw_content=${contentLen}, preview="${preview}")` };
     }
     if (!parsed.themes || parsed.themes.length < 3) {
       return { success: false, error: `idea themes count ${parsed?.themes?.length || 0} < 3` };
@@ -326,8 +332,10 @@ QUY TẮC: tên phù hợp genre + bối cảnh; phải 2-3 từ Vietnamese ho�
 
   try {
     const res = await callGemini(prompt, {
-      model: 'deepseek-v4-flash', temperature: 0.9, maxTokens: 256,
-      systemPrompt: SANG_VAN_DNA + '\n\n[ROLE-SPECIFIC] Stage: CHARACTER. Đặt tên MC đa dạng phù hợp genre + bối cảnh. KHÔNG dùng cliché names.',
+      // Phase 29: bumped 256→1536 because output now includes archetype/voice/signature
+      // (was just MC name) + DeepSeek thinking reasoning overhead.
+      model: 'deepseek-v4-flash', temperature: 0.9, maxTokens: 1536,
+      systemPrompt: SANG_VAN_DNA + '\n\n[ROLE-SPECIFIC] Stage: CHARACTER. Đặt tên MC đa dạng phù hợp genre + bối cảnh. KHÔNG dùng cliché names. Output thêm archetype/voice/signature từ playbook.',
     }, { jsonMode: true, tracking: { projectId: p.id, task: 'stage_character' } });
 
     const parsed = parseJSON<{
@@ -418,7 +426,8 @@ QUY TẮC:
 
   try {
     const res = await callGemini(prompt, {
-      model: 'deepseek-v4-flash', temperature: 0.7, maxTokens: 1024,
+      // Phase 29: bumped 1024→2048 — playbook content + DeepSeek reasoning overhead.
+      model: 'deepseek-v4-flash', temperature: 0.7, maxTokens: 2048,
       systemPrompt: SANG_VAN_DNA + '\n\n[ROLE-SPECIFIC] Stage: DESCRIPTION. Viết back-cover blurb 3 đoạn 250-400 chữ — hook GROWTH-driven, KHÔNG spoil cuối truyện, KHÔNG cosmic stake Phase 1.',
     }, { jsonMode: true, tracking: { projectId: p.id, task: 'stage_description' } });
 
