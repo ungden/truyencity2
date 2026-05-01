@@ -108,17 +108,58 @@ async function runStageIdea(p: ProjectStageRow): Promise<{ success: boolean; err
 Tên truyện: "${novel.title}"
 Thể loại: ${genre}
 
+‼️ MODERN SẢNG VĂN — IDEA HARD BANS (TUYỆT ĐỐI VI PHẠM = REJECT):
+
+1. premise + mainConflict PHẢI GROWTH-driven, KHÔNG survival-driven:
+   ✓ "MC dùng <golden finger> để xây <Y>, vượt qua <Z challenges> scale dần lên"
+   ✗ "MC phải sống sót khỏi X / cứu Y / ngăn Z / đánh bại W"
+
+2. ANTAGONIST PROGRESSION LADDER — CÓ đối thủ nhưng phải SCALE TỪ NHỎ TỚI LỚN:
+   Phase 1 (arc 1, ch.1-100) = TÂN THỦ MAP — antagonist LOCAL scale only:
+     ✓ Hàng xóm cạnh tranh, đồng nghiệp khinh thường, đối thủ chợ/khu phố,
+       sư huynh đố kỵ, supplier ép giá, customer khó tính, anh em họ ganh ghét
+     ✗ Tập đoàn độc quyền toàn quốc, Thừa Tướng, Hokage advisor, AI Tối Thượng,
+       Ma giáo trưởng lão, Đại Đế cổ tộc, Tử Thần — Phase 1 KHÔNG được mention.
+   Phase 2 (arc 2-3, ch.100-300) = HUYỆN/CITY MAP — mid-tier antagonist:
+     ✓ Đối thủ kinh doanh cấp huyện, quan huyện, tông phái nhỏ, gangster khu phố
+   Phase 3 (arc 4-5, ch.300-700) = TỈNH/NATIONAL MAP — institutional:
+     ✓ Tập đoàn lớn, quan tỉnh, sect chính, cosmic-tier hint xuất hiện
+   Phase 4 (arc 6+, ch.700+) = COSMIC/WORLD MAP — endgame:
+     ✓ Đại đế, Tổ tiên, AI Tối Thượng, World-ending threats (giờ MỚI unlock)
+
+   Logic: vượt qua tân thủ → tỉnh thành → quốc gia → vũ trụ. KHÔNG nhảy cóc.
+
+3. KHÔNG cosmic stake từ ch.1 — Phase 1 stake cá nhân scale only:
+   ✓ Tiền (cứu công ty cá nhân, mua nhà, học phí), sự nghiệp (thăng chức, mở shop),
+     tình cảm (cưa người yêu, hàn gắn gia đình), danh dự cá nhân (chứng minh giá trị)
+   ✗ "Sụp đổ vũ trụ" / "xóa sổ ký ức" / "tru di tam tộc" / "diệt thế giới"
+   ✗ "Trong N tháng/năm phải hoàn thành nếu không sẽ X" — countdown survival
+   ✗ "Săn lùng MC khắp thiên hạ / khắp đại lục"
+
+4. KHÔNG "MC bị X hãm hại trọng sinh để báo thù" làm trigger DUY NHẤT:
+   ✓ MC trọng sinh để nắm bắt cơ hội kiếp trước bỏ lỡ (tích cực)
+   ✗ Premise xoay quanh "trả thù kẻ hãm hại kiếp trước" personal vendetta
+
+5. KHÔNG "MC tiêu hao sinh mệnh / tuổi thọ / cơn nghiện" — self-imposed countdown
+   là tự ngược cao cấp.
+
+6. premise PHẢI hướng UP not DOWN:
+   ✓ "Nhận golden finger → mở studio nhỏ → mở rộng dần → leo lên top"
+   ✗ "Bị X tấn công → phải dùng golden finger để sống sót"
+
+7. mainConflict KHÔNG mở "phải đối đầu / phải đánh bại / phải ngăn chặn" —
+   too survival-framed. Frame thành "MC theo đuổi X thì gặp Y phản ứng" — proactive.
+
 Trả về JSON:
 {
-  "premise": "<2-3 câu hook chứa setup + golden finger + stakes opening>",
+  "premise": "<2-3 câu hook GROWTH-driven: bối cảnh MC + golden finger + opportunity opening (KHÔNG survival)>",
   "themes": ["<theme 1>","<theme 2>","<theme 3>","<theme 4>"],
-  "mainConflict": "<1-2 câu xung đột TRỤC — actor + stake cụ thể>"
+  "mainConflict": "<1-2 câu — actor LOCAL scale + stake cá nhân (tiền/sự nghiệp/tình cảm) — KHÔNG cosmic>"
 }
 
-QUY TẮC:
+QUY TẮC bổ sung:
 - premise mention golden finger CỤ THỂ (KHÔNG vague "anh ta nhận sức mạnh kỳ lạ")
-- themes 4-6 concrete, KHÔNG generic ("growth", "love", "success" alone)
-- mainConflict KHÔNG mở 3 phe đối kháng cùng lúc — TỐI ĐA 1 antagonist arc 1`;
+- themes 4-6 concrete, KHÔNG generic ("growth", "love", "success" alone)`;
 
   try {
     const res = await callGemini(prompt, {
@@ -135,6 +176,31 @@ QUY TẮC:
     }
     if (!parsed.mainConflict || parsed.mainConflict.length < 20) {
       return { success: false, error: 'idea mainConflict missing/too short' };
+    }
+
+    // Fix 2: cosmic-threat validator. Reject premises that encode tự ngược pattern.
+    // User feedback 2026-05-01: every novel had "thế lực thần bí vùi dập từ đầu".
+    const checkText = `${parsed.premise} ${parsed.mainConflict}`;
+    const COSMIC_THREAT_PATTERNS: Array<{ regex: RegExp; reason: string }> = [
+      { regex: /\bđe dọa\s+(phá hủy|tiêu diệt|xóa sổ)/i, reason: 'cosmic threat: "đe dọa phá hủy"' },
+      { regex: /\btru di\s+(tam|cửu)\s+tộc/i, reason: 'cosmic threat: "tru di tam/cửu tộc"' },
+      { regex: /\b(xóa sổ|sụp đổ|hủy diệt|phá hủy)\s+(vũ trụ|thế giới|ký ức|làng|đại lục)/i, reason: 'cosmic-scale destruction stake' },
+      { regex: /\bsăn lùng\s+(khắp|toàn|cả)\s+(thiên hạ|đại lục|thế giới)/i, reason: 'world-wide manhunt' },
+      { regex: /\btrong\s+(\d+|ba|năm|bảy|mười|một)\s+(năm|tháng|ngày)\s+phải/i, reason: 'survival countdown deadline' },
+      { regex: /\b(tối thượng|cố vấn tối cao|đại đế|tử thần|trưởng lão ma giáo|thừa tướng|hokage)\b/i, reason: 'cosmic/national-tier antagonist Phase 1' },
+      { regex: /(hao tổn|tiêu hao)\s+(sinh mệnh|tuổi thọ)/i, reason: 'self-imposed countdown / lifespan drain' },
+      { regex: /\bphải\s+(đánh bại|đối đầu|ngăn chặn|tiêu diệt|chống lại)\b/i, reason: 'survival framing "phải đánh bại"' },
+      { regex: /\b(tập đoàn|công ty)\s+(độc quyền|thống trị)\s+(toàn quốc|cả nước|thị trường)/i, reason: 'monopoly-scale antagonist Phase 1' },
+    ];
+    const violations: string[] = [];
+    for (const p of COSMIC_THREAT_PATTERNS) {
+      if (p.regex.test(checkText)) violations.push(p.reason);
+    }
+    if (violations.length > 0) {
+      return {
+        success: false,
+        error: `tự-ngược violations (${violations.length}): ${violations.slice(0, 3).join('; ')}`,
+      };
     }
 
     // Stash idea into world_description as a marker until world stage runs
