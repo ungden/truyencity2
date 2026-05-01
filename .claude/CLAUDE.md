@@ -430,9 +430,13 @@ Old novels may have metadata blocks but `cleanNovelDescription()` in `src/lib/ut
 
 **Đại thần workflow simulation (19/19 covered)**: Volume hierarchy 卷宗 / Foreshadowing OVERDUE 伏笔表 / Climax ladder 悬念三层 / Cast database 角色档案 / Timeline 时间线 / Item inventory 物品系统 / Power system canon 修炼体系 / Factions 势力档案 / Plot twists 反转表 / Themes 主题 / Worldbuilding 设定集 / Voice anchor 声音锚 / POV consistency / Sensory balance / Hook strength / Rolling briefs 日大纲 / Rubric judge / First-10 quality gate / Smart context selection.
 
-**Deferred work (not blocking)**:
-- TIER 2: Split chapter-writer.ts (2350 lines), context/assembler.ts (~1300 lines), templates.ts (2000+ lines) — risk regression, separate PR
-- TIER 3.3: ai-editor V2 migration (story-writing-factory still has 13 V1 files transitively imported)
+**Phase 28 TIER 2 — DONE (2026-05-01)**:
+- templates.ts: 3243 → 1365 lines (4 modules extracted)
+- chapter-writer.ts: 2350 → 1554 lines (prompts + helpers extracted)
+- context/assembler.ts: 1407 → 879 lines (generators extracted)
+
+**Truly deferred (multi-day scope, not blocking)**:
+- TIER 3.3: ai-editor V2 migration (admin-only tool, all 13 V1 story-writing-factory files transitively imported by ai-editor.ts — needs full rewrite using V2 continuity-guardian + auto-revise + Critic)
 - TIER 5: Reader feedback loop integration (requires production novels with engagement data first)
 
 **If stuck**: Read root CLAUDE.md "Phase 24-28 Details" section — it lists all 17 bugs fixed, all 19 đại thần practices covered, all 26 modules + their phase, all migrations.

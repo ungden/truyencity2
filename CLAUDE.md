@@ -907,6 +907,8 @@ Run: `./node_modules/.bin/tsx scripts/spawn-phase20-representatives.ts`
 | 28 TIER 1 | — | ddbfdac | Critic enforcement gates (canon-enforcement.ts) |
 | 28 TIER 3.1+3.2+4 | — | 7ad8727 | Outline auto-revision + stress test harness + dashboard enhancements |
 | 28 TIER 6 | — | 98d5ddf | Backfill canons script + retry handlers + integration tests |
+| 28 docs | — | a5f52a9 | Documentation in CLAUDE.md + README.md + .claude/CLAUDE.md |
+| 28 TIER 2 | — | 2dc30ba, 4cc5585, 4f8ec1e | File splits: templates.ts (3243→1365), chapter-writer.ts (2350→1554), context/assembler.ts (1407→879). 7 new focused modules. ~3200 LOC moved to single-responsibility files. |
 
 ### 5-layer architecture (post Phase 27 W1)
 
@@ -1109,10 +1111,26 @@ Backfills synthetic chapter_summaries + character_states + voice_anchors up to (
    - `/admin/supreme-goals` — 5 traffic lights per project
 5. **Monitor cost_tracking** — verify ~\$0.01-0.02 per chapter at steady state
 
+### Phase 28 TIER 2 — File splits (DONE 2026-05-01)
+
+3 large files split into focused modules. Pure refactor — no behavior change. Re-exports preserve all external imports.
+
+**templates.ts (3243 → 1365 lines, 58% reduction)**:
+- `templates/sub-genre-rules.ts` (716 lines) — SUB_GENRE_RULES per-sub-genre patterns
+- `templates/genre-boundaries.ts` (331 lines) — GENRE_BOUNDARIES + getGenreBoundaryText + GenreBoundary interface
+- `templates/genre-styles.ts` (579 lines) — GENRE_STYLES per-genre StyleBible
+- `templates/dopamine-patterns.ts` (300 lines) — DopaminePattern + DOPAMINE_PATTERNS
+
+**chapter-writer.ts (2350 → 1554 lines, 34% reduction)**:
+- `pipeline/chapter-writer-prompts.ts` (445 lines) — ARCHITECT_SYSTEM, WRITER_SYSTEM, CRITIC_SYSTEM, VN_PLACE_LOCK
+- `pipeline/chapter-writer-helpers.ts` (586 lines) — pure helper functions: cleanContent, extractTitle, synthesizeFallbackCliffhanger, hasCliffhangerSignal, analyzeQualitySignals, buildSignalReport, countWords, detectHardFallback, detectMcNameFlip, detectSevereRepetition, buildRepetitionReport, generateMinimalScenes, loadConstraintSection + QualitySignals interface
+
+**context/assembler.ts (1407 → 879 lines, 37% reduction)**:
+- `context/generators.ts` (606 lines) — saveChapterSummary, generateChapterSummary, generateSummaryAndCharacters, generateSynopsis, generateArcPlan, generateStoryBible + AI response interfaces
+
 ### Truly deferred (Phase 28+ backlog, not blocking)
 
-- **TIER 2** file splits: chapter-writer.ts (2350 lines), context/assembler.ts (~1300 lines), templates.ts (2000+ lines) — risk regression, do in dedicated PR
-- **TIER 3.3** ai-editor V2 migration: all 13 V1 story-writing-factory files imported transitively. Not blocking pipeline. Separate refactor scope.
+- **TIER 3.3** ai-editor V2 migration: admin-only tool for chapter quality re-scanning/rewriting. All 13 V1 `story-writing-factory/` files transitively imported by `ai-editor.ts`. Migration = deep rewrite using V2 modules (continuity-guardian + auto-revise + Critic). 1-2 days work, separate PR scope.
 - **TIER 5** Reader feedback loop: comments/ratings/drop-offs feeding back into engine. Requires production novels with engagement data first. 2-3 weeks scope.
 - **Per-task retry handlers** for tasks lacking payload to fully replay (currently mark succeeded to drain queue).
 
