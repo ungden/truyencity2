@@ -345,6 +345,9 @@ export interface ContextPayload {
   /** Phase 27 W3.3: comprehensive worldbuilding canon (cosmology + history + cultures + regions). */
   worldbuildingCanonContext?: string;
 
+  /** Phase 27 W4.2: voice anchor snippets from ch.1-3, re-fed every 50ch to combat drift. */
+  voiceAnchorContext?: string;
+
   // Anti-repetition
   previousTitles: string[];
   recentOpenings: string[];

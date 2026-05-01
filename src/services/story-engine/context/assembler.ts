@@ -465,6 +465,10 @@ export async function loadContext(
       const { getWorldbuildingCanonContext } = await import('../canon/worldbuilding');
       return getWorldbuildingCanonContext(projectId).catch(() => null);
     })() || undefined,
+    voiceAnchorContext: await (async () => {
+      const { getVoiceAnchorContext } = await import('../memory/voice-anchor');
+      return getVoiceAnchorContext(projectId, chapterNumber).catch(() => null);
+    })() || undefined,
     storyOutline: storyOutline || undefined,
     worldDescription: worldDescription || undefined,
     // Modern narrative metadata (migration 0149)
@@ -540,6 +544,12 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
   // Layer 0.5j: Phase 27 W3.2 — Themes (đại thần 主题)
   if (payload.themesContext) {
     parts.push(payload.themesContext);
+  }
+
+  // Layer 0.5k: Phase 27 W4.2 — Voice anchor (đại thần 声音锚)
+  // Re-fed every 50ch to combat drift over long-form novels.
+  if (payload.voiceAnchorContext) {
+    parts.push(payload.voiceAnchorContext);
   }
 
   // Layer 0.6: Story Outline (premise, protagonist, plot points, ending vision)

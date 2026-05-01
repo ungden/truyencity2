@@ -1201,6 +1201,23 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       });
     })().catch(e => console.warn('[Orchestrator] Quality metrics failed:', e instanceof Error ? e.message : String(e))),
 
+    // Task 15i (Phase 27 W4.2): Voice anchor capture — fires when lastChapterNumber >= 3.
+    // Idempotent (UNIQUE constraint on project_id+chapter_number+snippet_type).
+    ...(lastChapterNumber >= 3 ? [
+      (async () => {
+        const { captureVoiceAnchors } = await import('../memory/voice-anchor');
+        const { data: ch13 } = await db
+          .from('chapters')
+          .select('chapter_number,content')
+          .eq('novel_id', novel.id)
+          .lte('chapter_number', 3)
+          .order('chapter_number', { ascending: true });
+        if (ch13?.length) {
+          await captureVoiceAnchors(project.id, ch13);
+        }
+      })().catch(e => console.warn('[Orchestrator] Voice anchor capture failed:', e instanceof Error ? e.message : String(e))),
+    ] : []),
+
     // Task 16c: First-10 evaluation (Phase 25) — runs ONCE per project when
     // an AI write spans/reaches ch.10. Idempotent (UNIQUE constraint on
     // project_id), so cron retries skip if already done.
