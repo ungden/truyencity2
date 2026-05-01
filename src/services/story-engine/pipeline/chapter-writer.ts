@@ -38,6 +38,7 @@ import { getConstraintExtractor } from '../memory/constraint-extractor';
 import { GENRE_CONFIG } from '../../../lib/types/genre-config';
 import { buildStyleContext, getEnhancedStyleBible, CLIFFHANGER_TECHNIQUES } from '../memory/style-bible';
 import { titleChecker } from '../memory/title-checker';
+import { getOverdueForeshadowingForCritic, type OverdueForeshadowingRecord } from '../memory/foreshadowing-planner';
 import { DEFAULT_CONFIG } from '../types';
 import type {
   WriteChapterResult, ChapterOutline, CriticOutput, CriticIssue,
@@ -129,6 +130,13 @@ QUY TẮC:
      • Breakthrough (insight mới, capability mới, network mới)
    - CẤM "ức chế → bùng nổ" làm template mặc định — chỉ áp dụng ~20% chương climax/villain_focus. 80% chương là pure dopamine flow.
    - Chuỗi 5+ chương dopamine flow liên tiếp KHÔNG phải lỗi pacing — đây là Sảng Văn chính thống.
+1b. CLIMAX LADDER (Phase 26 — đại thần workflow 悬念三层):
+   3 cấp độ climax phải honor THEO MARKER trong [VOLUME CONTEXT] block:
+   - SMALL CLIMAX (mỗi 3-5 chương): scene-level dopamine peak — đã xử lý ở rule #1 (mỗi chương ≥2 dopamine peaks).
+   - MEDIUM CLIMAX (sub-arc level, ~mỗi 20-30 chương): nếu [VOLUME CONTEXT] báo "CHƯƠNG NÀY = MEDIUM CLIMAX sub-arc" → chương PHẢI có scene reveal/turn/major-payoff đủ lớn để đóng sub-arc. tensionLevel ≥7. dopaminePoints có ≥1 entry type "breakthrough" hoặc "recognition" hoặc "revelation".
+   - MAJOR CLIMAX (volume level, ~mỗi 50-150 chương): nếu [VOLUME CONTEXT] báo "CHƯƠNG NÀY = VOLUME CLIMAX" → đây là setpiece LỚN NHẤT của volume. tensionLevel ≥9. biggestSetpiece scene PHẢI explicit. Chuẩn bị wind-down cho volume sau climax.
+   - Khi build-up đến climax (distance ≤10 chương): tensionLevel tăng dần — KHÔNG flat baseline tới phút cuối.
+   - Khi đã qua climax (wind-down): tensionLevel hạ, đóng các thread mở của volume.
 2. TỐI THIỂU 4-5 scenes, mỗi scene có động lực/mục tiêu rõ ràng (tương tác, xây dựng, khám phá, kinh doanh, sinh hoạt; mâu thuẫn LÀ TÙY CHỌN, không bắt buộc mỗi scene).
 3. Consistency tuyệt đối với context (nhân vật, sức mạnh/tài chính, vị trí).
 4. Kết chương phải có lực kéo đọc tiếp (Ending Hook) NHƯNG ĐA DẠNG — KHÔNG ép cliffhanger nguy hiểm mỗi chương (gây cliffhanger fatigue). Chọn 1 trong 4 loại theo mood của chương:
@@ -1234,8 +1242,25 @@ async function runCritic(
   // promise/opening pattern/taboos derived from genre-process-blueprints.
   const genreContractSection = genre ? getGenreContractForCritic(genre) : '';
 
+  // Phase 26 Module C: deterministic overdue foreshadowing list for Critic gate.
+  // Loaded from foreshadowing_plans (status='planted', payoff_chapter <= currentChapter).
+  // If chapter content doesn't reference overdue hints by phrase, Critic raises
+  // critical issue + requiresRewrite. Forces long-range payoff debt to be paid.
+  let overdueForeshadowingRecords: OverdueForeshadowingRecord[] = [];
+  if (projectId) {
+    overdueForeshadowingRecords = await getOverdueForeshadowingForCritic(projectId, outline.chapterNumber);
+  }
+  const overdueForeshadowingBlock = overdueForeshadowingRecords.length === 0
+    ? ''
+    : `\n[FORESHADOWING OVERDUE — CRITIC HARD GATE — payoff BẮT BUỘC trong vòng 5 chương tới]\n${overdueForeshadowingRecords
+        .map((h, i) =>
+          `${i + 1}. (overdue ${h.overdueBy}ch — deadline ch.${h.payoffChapter}) ` +
+          `HINT: "${h.hintText}" → CALLBACK PHẢI: "${h.payoffDescription}"`,
+        )
+        .join('\n')}\n[/FORESHADOWING OVERDUE]`;
+
   const prompt = `Đánh giá chương nghiêm túc:
-${genreContractSection}
+${genreContractSection}${overdueForeshadowingBlock}
 ${crossChapterSection}OUTLINE: ${outline.title} — ${outline.summary}
 TARGET DOPAMINE: ${outline.dopaminePoints.map(dp => `${dp.type}: ${dp.description}`).join('; ')}
 TARGET WORDS: ${targetWords}
@@ -1293,6 +1318,17 @@ KIỂM TRA GENRE CONTRACT (xem block "[GENRE CONTRACT]" ở đầu prompt nếu 
 - Nếu chương vi phạm 1 trong các TABOOS đã liệt kê → type "quality", severity "major", requiresRewrite=true. Nêu rõ taboo bị vi phạm trong description.
 - Nếu chương sai lệch hoàn toàn so với PROMISE / OPENING PATTERN của genre (ví dụ: do-thi/quan-truong mà MC đánh nhau bằng võ công, ngon-tinh mà thiếu emotional contract, linh-di mà không có rule puzzle, kiem-hiep mà tu tiên jargon nặng) → type "quality", severity "critical", requiresRewrite=true.
 - Nếu STAKES escalation đi LẠC HƯỚNG so với stakes ladder (ví dụ tien-hiep arc 1 đã đẩy lên "tinh không" thay vì "cá nhân/sư môn") → type "quality", severity "major".
+
+KIỂM TRA CLIMAX LADDER (Phase 26 — xem block "[VOLUME CONTEXT]" trong cross-chapter section):
+- Nếu block báo "CHƯƠNG NÀY = MEDIUM CLIMAX sub-arc" → tensionLevel chương PHẢI ≥7 và phải có scene reveal/turn rõ ràng. Nếu chương yên ổn / tension thấp → type "pacing", severity "major", requiresRewrite=true.
+- Nếu block báo "CHƯƠNG NÀY = VOLUME CLIMAX" → tensionLevel ≥9, có setpiece lớn nhất volume, dopamine peak loại "breakthrough"/"victory"/"revelation" cuối chương. Nếu thiếu → type "pacing", severity "critical", requiresRewrite=true.
+- Nếu block báo "Volume climax đã qua... wind-down phase" mà chương lại mở conflict mới quy mô lớn → type "pacing", severity "major" (vi phạm wind-down — nên đóng thread của volume thay vì mở mới).
+
+KIỂM TRA FORESHADOWING OVERDUE (xem block "[FORESHADOWING OVERDUE]" ở đầu prompt nếu có):
+- Mỗi hint trong block đều có "CALLBACK PHẢI" — đó là nội dung scene cần xảy ra để đóng promise.
+- Nếu chương HOÀN TOÀN KHÔNG đề cập / không có scene callback cho hint OVERDUE >0 chương → type "quality", severity "critical", requiresRewrite=true. Mô tả: "Foreshadowing hint X (overdue Y chương) chưa được payoff trong chương này".
+- Nếu hint chỉ overdue 1-3 chương VÀ chương có hint khác đang phát triển → có thể defer 1-2 chương nữa, severity "moderate".
+- Nếu hint overdue >5 chương MÀ chương không payoff → CRITICAL + requiresRewrite. KHÔNG được tha — đại thần không bỏ promise.
 
 KIỂM TRA CHẤT LƯỢNG BỔ SUNG (BẮT BUỘC):
 - COMEDY: Nếu KHÔNG có hài hước → issue severity "moderate". CHỈ "major" nếu chương sinh hoạt/đối thoại mà không hài.
@@ -1402,6 +1438,67 @@ KIỂM TRA TUÂN THỦ QUALITY MODULES (NẾU CÓ THÔNG TIN):
         parsed.rewriteInstructions = (parsed.rewriteInstructions || '') + ` Sửa lặp từ: ${repetitionGuide}`;
       }
       // Moderate repetition: just log, don't penalize score (Critic already sees report)
+    }
+
+    // Phase 26 Module C: Foreshadowing OVERDUE deterministic gate.
+    // For every record in overdueForeshadowingRecords, check whether content
+    // references the hint text OR payoff description (loose substring).
+    // If overdue >5ch AND no reference found → force critical + rewrite.
+    // If overdue 1-5ch AND no reference → moderate (logged, not force rewrite).
+    parsed.issues = parsed.issues || [];
+    if (overdueForeshadowingRecords.length > 0) {
+      const lowerContent = content.toLowerCase();
+      // Build keyword set from each hint: take first 4 words of hint + first 4 words of payoff.
+      // If ANY of those fragments appears in content, treat as referenced (loose check —
+      // Critic AI is the authoritative judge, this is a hard floor).
+      const wordFragmentLength = 4;
+      const extractFragments = (s: string): string[] => {
+        if (!s) return [];
+        const cleaned = s.toLowerCase().replace(/[.,;:!?"'()[\]{}]/g, ' ').trim();
+        const words = cleaned.split(/\s+/).filter(w => w.length >= 3);
+        const frags: string[] = [];
+        for (let i = 0; i + wordFragmentLength <= words.length; i++) {
+          frags.push(words.slice(i, i + wordFragmentLength).join(' '));
+        }
+        return frags.slice(0, 5);
+      };
+
+      const unpaid: OverdueForeshadowingRecord[] = [];
+      for (const rec of overdueForeshadowingRecords) {
+        const fragments = [
+          ...extractFragments(rec.hintText),
+          ...extractFragments(rec.payoffDescription),
+        ];
+        const referenced = fragments.some(f => f.length >= 6 && lowerContent.includes(f));
+        if (!referenced) unpaid.push(rec);
+      }
+
+      const severelyOverdue = unpaid.filter(r => r.overdueBy >= 5);
+      if (severelyOverdue.length > 0) {
+        parsed.requiresRewrite = true;
+        parsed.approved = false;
+        parsed.overallScore = Math.min(parsed.overallScore || 10, 4);
+        for (const rec of severelyOverdue) {
+          parsed.issues.push({
+            type: 'quality',
+            severity: 'critical',
+            description: `Foreshadowing OVERDUE ${rec.overdueBy}ch chưa payoff: "${rec.hintText}" — callback "${rec.payoffDescription}". Chapter content KHÔNG đề cập hint này. ĐẠI THẦN KHÔNG BỎ PROMISE.`,
+          });
+        }
+        const guideText = severelyOverdue
+          .map(r => `Payoff: "${r.payoffDescription}" (callback hint "${r.hintText.slice(0, 60)}")`)
+          .join(' | ');
+        parsed.rewriteInstructions = (parsed.rewriteInstructions || '') +
+          ` ƯU TIÊN: thêm scene payoff cho foreshadowing overdue: ${guideText}`;
+      } else if (unpaid.length > 0) {
+        for (const rec of unpaid) {
+          parsed.issues.push({
+            type: 'quality',
+            severity: 'moderate',
+            description: `Foreshadowing overdue ${rec.overdueBy}ch chưa payoff: "${rec.hintText}". Tha lần này nhưng phải payoff trong vòng 5 chương tới.`,
+          });
+        }
+      }
     }
 
     // Phase 25: Rubric judge enforcement.

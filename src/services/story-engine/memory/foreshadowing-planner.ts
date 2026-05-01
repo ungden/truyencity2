@@ -271,6 +271,51 @@ async function getPastDeadlineHints(
     });
 }
 
+/**
+ * Phase 26 Module C: deterministic OVERDUE list for Critic hard gate.
+ * Returns structured records (not formatted strings) so Critic prompt can
+ * inject as a discrete block + post-process can verify each hint was paid off.
+ *
+ * "Overdue" = planted, status='planted', and payoff_chapter <= chapterNumber.
+ * (Strict: deadline is now-or-past, not "within window of 5".)
+ */
+export interface OverdueForeshadowingRecord {
+  hintId: string;
+  hintText: string;
+  payoffDescription: string;
+  payoffChapter: number;
+  overdueBy: number;
+}
+
+export async function getOverdueForeshadowingForCritic(
+  projectId: string,
+  chapterNumber: number,
+): Promise<OverdueForeshadowingRecord[]> {
+  try {
+    const db = getSupabase();
+    const { data } = await db
+      .from('foreshadowing_plans')
+      .select('hint_id,hint_text,payoff_chapter,payoff_description')
+      .eq('project_id', projectId)
+      .eq('status', 'planted')
+      .lte('payoff_chapter', chapterNumber)
+      .gt('payoff_chapter', chapterNumber - 30) // skip hints already auto-abandoned
+      .order('payoff_chapter', { ascending: true })
+      .limit(6);
+    if (!data?.length) return [];
+    return data.map(h => ({
+      hintId: h.hint_id,
+      hintText: h.hint_text,
+      payoffDescription: h.payoff_description || '',
+      payoffChapter: h.payoff_chapter,
+      overdueBy: chapterNumber - h.payoff_chapter,
+    }));
+  } catch (e) {
+    console.warn('[Foreshadowing] getOverdueForeshadowingForCritic failed:', e instanceof Error ? e.message : String(e));
+    return [];
+  }
+}
+
 // ── Post-Write: Mark Hints as Planted/Paid Off ───────────────────────────────
 
 export async function updateForeshadowingStatus(
