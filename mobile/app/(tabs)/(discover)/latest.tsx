@@ -1,15 +1,18 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { FlatList, ActivityIndicator } from "react-native";
 import { View, Text } from "@/tw";
+import { useLocalSearchParams } from "expo-router";
 import { supabase } from "@/lib/supabase";
 import NovelCard from "@/components/novel-card";
 import { useDevice } from "@/hooks/use-device";
+import { getGenreLabel } from "@/lib/genre";
 import type { Novel } from "@/lib/types";
 
 const PAGE_SIZE = 20;
 
 export default function LatestScreen() {
   const { centeredStyle } = useDevice();
+  const { genre } = useLocalSearchParams<{ genre?: string }>();
   const [novels, setNovels] = useState<Novel[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -23,10 +26,15 @@ export default function LatestScreen() {
 
       try {
         const NOVEL_LIST_FIELDS = "id,title,slug,author,cover_url,genres,status,ai_author_id,created_at,updated_at,chapter_count";
-        const { data, error } = await supabase
+        let query = supabase
           .from("novels")
           .select(NOVEL_LIST_FIELDS)
-          .order("updated_at", { ascending: false })
+          .order("updated_at", { ascending: false });
+        // Genre filter (added 2026-05-01): when navigated from "Khám phá theo thể loại" chip
+        if (genre) {
+          query = query.contains("genres", [genre]);
+        }
+        const { data, error } = await query
           .range(pageNum * PAGE_SIZE, (pageNum + 1) * PAGE_SIZE - 1);
 
         if (error) throw error;
@@ -46,7 +54,7 @@ export default function LatestScreen() {
         setLoadingMore(false);
       }
     },
-    []
+    [genre]
   );
 
   useEffect(() => {
@@ -63,6 +71,13 @@ export default function LatestScreen() {
 
   return (
     <View className="flex-1 bg-background">
+      {genre && (
+        <View style={{ paddingHorizontal: 16, paddingTop: 12, paddingBottom: 4 }}>
+          <Text className="text-foreground" style={{ fontSize: 18, fontWeight: '700' }}>
+            Thể loại: {getGenreLabel(genre)}
+          </Text>
+        </View>
+      )}
       <FlatList
         data={novels}
         keyExtractor={(item) => item.id}
