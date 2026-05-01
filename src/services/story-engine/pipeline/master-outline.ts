@@ -4,29 +4,68 @@ import { parseJSON } from '../utils/json-repair';
 import type { GeminiConfig, GenreType } from '../types';
 import { getGenreSetupRequirements, getGenreArchitectGuide } from '../templates/genre-process-blueprints';
 
+/** Sub-arc within a volume — matches the old "majorArc" granularity (~20-30 chapters). */
+export interface SubArcOutline {
+  arcName: string;
+  arcNumber?: number;
+  startChapter: number;
+  endChapter: number;
+  description: string;
+  keyMilestone: string;
+  /** Multi-axis: thematic register driving the arc — vd "khám phá", "đối kháng", "trưởng thành", "phục thù". */
+  theme?: string;
+  /** Multi-axis: dominant mood of the arc — vd "warm-buildup", "tense-conflict", "tragic", "triumphant", "melancholic". */
+  mood?: string;
+  /** Biggest setpiece of the arc (1-2 sentences): the cinematic centerpiece scene readers will remember. */
+  biggestSetpiece?: string;
+  /** What does MC change about themselves during this arc — internal arc beat. */
+  characterArcBeat?: string;
+  /** What new region/faction/world layer is revealed or unlocked in this arc. */
+  worldExpansion?: string;
+  /** Pacing target — vd "fast-action", "balanced", "introspective-slow", "climax-dense". */
+  pacingTarget?: string;
+  /** Phase 26: medium-climax chapter (sub-arc-level reveal/turn). Defaults to last 1/3 of arc. */
+  mediumClimaxAt?: number;
+}
+
+/**
+ * Phase 26: Volume — đại thần workflow's organizing unit (卷宗) for 1000+ chapter novels.
+ * Each volume ~50-150 chapters, has its own theme/conflict/villain/climax. The novel's
+ * 1000-chapter arc is divided into 5-15 volumes; each volume into 4-6 sub-arcs.
+ */
+export interface VolumeOutline {
+  volumeNumber: number;          // 1-indexed
+  name: string;                  // vd "Cuốn 1: Sơ Nhập Sư Môn"
+  startChapter: number;
+  endChapter: number;
+  theme: string;                 // overall theme of the volume
+  primaryConflict: string;       // what MC is fighting / building / chasing this volume
+  primaryVillain?: string;       // optional, only if combat/antagonist genre
+  keyPayoffsOpened: string[];    // promises planted in this volume that pay off later
+  keyPayoffsClosed: string[];    // promises (planted earlier) that resolve in this volume
+  volumeClimaxAt: number;        // chapter of the volume's major-climax setpiece
+  subArcs: SubArcOutline[];      // 4-6 sub-arcs within this volume
+}
+
+/** Backward-compat alias: legacy code reads `majorArcs` as a flat list. */
+export type MajorArc = SubArcOutline;
+
 export interface MasterOutline {
   mainPlotline: string;
   finalBossOrGoal: string;
   worldMapProgression: string[];
-  majorArcs: Array<{
-    arcName: string;
-    startChapter: number;
-    endChapter: number;
-    description: string;
-    keyMilestone: string;
-    /** Multi-axis: thematic register driving the arc — vd "khám phá", "đối kháng", "trưởng thành", "phục thù". */
-    theme?: string;
-    /** Multi-axis: dominant mood of the arc — vd "warm-buildup", "tense-conflict", "tragic", "triumphant", "melancholic". */
-    mood?: string;
-    /** Biggest setpiece of the arc (1-2 sentences): the cinematic centerpiece scene readers will remember. */
-    biggestSetpiece?: string;
-    /** What does MC change about themselves during this arc — internal arc beat. */
-    characterArcBeat?: string;
-    /** What new region/faction/world layer is revealed or unlocked in this arc. */
-    worldExpansion?: string;
-    /** Pacing target — vd "fast-action", "balanced", "introspective-slow", "climax-dense". */
-    pacingTarget?: string;
-  }>;
+  /**
+   * Phase 26 hierarchical structure: 5-15 volumes, each with 4-6 sub-arcs.
+   * For backward compat, `majorArcs` (below) is auto-populated as a flat list of
+   * all sub-arcs across all volumes.
+   */
+  volumes?: VolumeOutline[];
+  /**
+   * Legacy flat list of arcs. Pre-Phase-26 novels have this populated directly.
+   * Phase 26+ novels: auto-derived from volumes (flattened sub-arcs).
+   * Always present so downstream code that reads `majorArcs` keeps working.
+   */
+  majorArcs: MajorArc[];
 }
 
 // Genre-aware framing for master outline. Urban/business genres use proactive
@@ -134,6 +173,11 @@ export async function generateMasterOutline(
   const genreSetup = getGenreSetupRequirements(genre);
   const genreArchGuide = getGenreArchitectGuide(genre);
 
+  // Phase 26: volume hierarchy. Recommend 5-15 volumes × 50-150ch each, sub-divided into 4-6 sub-arcs of 20-30ch.
+  const targetVolumeCount = Math.max(5, Math.min(15, Math.round(totalPlannedChapters / 100)));
+  const targetSubArcsPerVolume = totalPlannedChapters >= 1000 ? '4-6 sub-arcs' : '3-5 sub-arcs';
+  const targetVolumeChapters = totalPlannedChapters >= 1000 ? '80-150 chương' : '50-100 chương';
+
   const prompt = `Bạn là Trưởng Biên Tập (Chief Editor) chuyên quy hoạch Đại cương truyện dài kỳ (Master Outline) cho một bộ Webnovel Trung Quốc.
 
 Nhiệm vụ của bạn là quy hoạch lộ trình tổng thể cho bộ truyện: "${title}"
@@ -144,59 +188,99 @@ Tóm tắt ý tưởng gốc (Synopsis): ${synopsis}
 
 ${goalGuidance}
 
-Hãy lập ra Master Outline bao gồm mục tiêu tối thượng, Cột mốc tối thượng, Lộ trình di chuyển (Bản đồ) và chia nhỏ thành 8-12 Đại Cốt Truyện (Major Arcs), mỗi arc 50-100 chương, từ chương 1 đến chương ${totalPlannedChapters}.
+╔══════════════════════════════════════════════════════════════════════╗
+║ ĐẠI THẦN WORKFLOW — VOLUME STRUCTURE (卷宗) cho 1000-chương novels  ║
+╚══════════════════════════════════════════════════════════════════════╝
 
-CHẤT LƯỢNG ĐẠI THẦN — MULTI-AXIS ARC DESCRIPTION:
-Mỗi arc PHẢI mô tả theo 6 trục, KHÔNG được summary 1 paragraph chung:
-1. theme: Thematic register dẫn dắt arc — vd "khám phá", "đối kháng đầu tiên", "phản phục thù", "trưởng thành cảm xúc", "thử thách niềm tin", "tái tạo".
-2. mood: Sắc thái chủ đạo — vd "warm-buildup", "tense-conflict", "tragic-loss", "triumphant", "melancholic", "comedic-relief".
-3. biggestSetpiece: SCENE ĐINH 1-2 câu — cinematic centerpiece reader sẽ nhớ (KHÔNG generic "MC chiến thắng" — phải concrete như "MC ký hợp đồng 100 tỷ trước mặt 50 đối tác trong khi đối thủ đập bàn bỏ về").
-4. characterArcBeat: MC thay đổi gì BÊN TRONG trong arc — internal arc (vd "từ tự ti chuyển sang chủ động lãnh đạo team", "học chấp nhận quá khứ"). KHÔNG chỉ skill upgrade.
-5. worldExpansion: Vùng/thế lực/tầng thế giới mới được mở ra trong arc (vd "Quận Phú Mỹ Hưng — chuỗi nhà hàng cao cấp", "Hội đồng Quảng cáo Đại Nam — rào cản pháp lý").
-6. pacingTarget: Nhịp arc — "fast-action" (climax dense), "balanced" (default), "introspective-slow" (character-focused), "buildup" (early arc), "climax-dense" (final arc).
+Top web novel đại thần (Mèo Béo / Phàm Nhân Tu Tiên, Nhĩ Căn / Quỷ Bí Chi Chủ,
+Thiên Tằm Thổ Đậu / Đấu Phá, Ất Bí / Toàn Chức Cao Thủ) KHÔNG plan flat 8-12 arcs.
+Họ tổ chức truyện thành **CUỐN (Volume)** — đơn vị tự nhiên cho narrative arc:
+
+  - Mỗi VOLUME (Cuốn) ~${targetVolumeChapters}, có theme/conflict/villain/climax riêng
+  - Mỗi volume chia thành ${targetSubArcsPerVolume} (story unit ~20-30ch)
+  - Volume mở conflict mới + đóng promise cũ — biến truyện dài thành chuỗi mini-novel có closure
+
+Hãy quy hoạch ${totalPlannedChapters} chương thành **${targetVolumeCount} volumes** với hierarchy:
+  Volume 1 (~${Math.round(totalPlannedChapters / targetVolumeCount)}ch) → 4-6 sub-arcs → ...
+  Volume 2 → ...
+  ...
+  Volume ${targetVolumeCount} → climax + finale
+
+CHẤT LƯỢNG ĐẠI THẦN — MULTI-AXIS SUB-ARC DESCRIPTION:
+Mỗi SUB-ARC PHẢI mô tả theo 6 trục:
+1. theme: "khám phá", "đối kháng đầu tiên", "phản phục thù", "trưởng thành cảm xúc", "thử thách niềm tin"
+2. mood: "warm-buildup", "tense-conflict", "tragic-loss", "triumphant", "melancholic", "comedic-relief"
+3. biggestSetpiece: SCENE ĐINH 1-2 câu cinematic (CỤ THỂ, không generic)
+4. characterArcBeat: MC thay đổi gì BÊN TRONG (internal arc, không chỉ skill upgrade)
+5. worldExpansion: Vùng/thế lực/tầng thế giới mới mở ra
+6. pacingTarget: "fast-action" / "balanced" / "introspective-slow" / "buildup" / "climax-dense"
+7. mediumClimaxAt: Chương trong sub-arc nơi medium-climax xảy ra (sub-arc-level reveal/turn)
+
+VOLUME-LEVEL FIELDS (NEW):
+- name: tên volume nghe đại thần ("Cuốn 1: Sơ Nhập Sư Môn", "Cuốn 2: Sấm Trời Bí Cảnh")
+- theme: chủ đề tổng thể volume
+- primaryConflict: xung đột chính volume (concrete)
+- primaryVillain: đối thủ chính volume (chỉ nếu combat/antagonist genre — non-combat genre có thể null)
+- keyPayoffsOpened: 2-4 promise/foreshadowing planted in volume này, payoff ở volumes sau
+- keyPayoffsClosed: 1-3 promise (planted volumes trước) RESOLVED trong volume này
+- volumeClimaxAt: chương major-climax của volume (thường ~85-95% volume length)
 
 Trả về ĐÚNG định dạng JSON sau:
 {
-  "mainPlotline": "Mục tiêu tối thượng xuyên suốt truyện của MC (VD: Xây đế chế kinh doanh, Phục thù, Thành Thần, Tìm người thân)",
+  "mainPlotline": "Mục tiêu tối thượng xuyên suốt truyện của MC",
   "finalBossOrGoal": ${finalGoalExample},
   "worldMapProgression": ${worldMapExample},
-  "majorArcs": [
+  "volumes": [
     {
-      "arcName": "Tên Arc lớn (VD: Khởi nghiệp tại quê nhà / Quật khởi tại gia tộc)",
+      "volumeNumber": 1,
+      "name": "Cuốn 1: <tên đại thần style>",
       "startChapter": 1,
       "endChapter": 80,
-      "description": "Nội dung chính của Arc 100-150 từ — KHÔNG chỉ tóm tắt mà concrete events: ai làm gì, gặp ai, đạt được gì.",
-      "keyMilestone": ${milestoneExample},
-      "theme": "khám phá / đối kháng / trưởng thành / etc.",
-      "mood": "warm-buildup / tense-conflict / etc.",
-      "biggestSetpiece": "SCENE đinh cụ thể, 1-2 câu cinematic.",
-      "characterArcBeat": "MC thay đổi gì BÊN TRONG.",
-      "worldExpansion": "Vùng/thế lực mới được mở ra.",
-      "pacingTarget": "fast-action / balanced / introspective-slow / buildup / climax-dense"
+      "theme": "<chủ đề volume>",
+      "primaryConflict": "<conflict chính volume, concrete>",
+      "primaryVillain": "<chỉ nếu có villain xuyên suốt volume; non-combat = null>",
+      "keyPayoffsOpened": ["promise 1 planted volume này", "promise 2"],
+      "keyPayoffsClosed": [],
+      "volumeClimaxAt": 75,
+      "subArcs": [
+        {
+          "arcName": "Sub-arc 1.1: <tên>",
+          "arcNumber": 1,
+          "startChapter": 1,
+          "endChapter": 20,
+          "description": "Nội dung sub-arc 80-120 từ — concrete events.",
+          "keyMilestone": ${milestoneExample},
+          "theme": "khám phá",
+          "mood": "warm-buildup",
+          "biggestSetpiece": "...",
+          "characterArcBeat": "...",
+          "worldExpansion": "...",
+          "pacingTarget": "balanced",
+          "mediumClimaxAt": 18
+        }
+      ]
     }
   ]
 }
 
-Quy tắc:
-1. SỐ ARC: 8-12 arc cho ${totalPlannedChapters} chương (vd 1000ch → 10 arc × 100ch hoặc 12 arc × 80ch). Cộng dồn endChapter của Arc cuối cùng phải bằng ${totalPlannedChapters}. KHÔNG được tạo arc 200-300 chương — bestseller modern chia arc 50-100 ch để mỗi arc có pacing rõ.
-2. Lộ trình bản đồ (worldMapProgression) phải tương ứng với sự tiến cấp của MC.
-3. Không lan man, tập trung vào plot chính.
-4. ARC EARLY (1-3): warm-buildup hoặc balanced mood — KHÔNG tragic/loss làm mood mở chính. Reader cần engagement trước khi tin loss.
-4b. SẢNG VĂN ARC 1 HARD RULES (BẮT BUỘC — vi phạm = REJECT):
-   - ARC 1 description chỉ MAX 1 antagonist active LOCAL scale (hàng xóm/đồng nghiệp/chợ).
-   - ZERO mysterious organization tracking MC trong arc 1-3. Tổ chức bí ẩn defer arc 4+.
-   - KHÔNG "MC vừa làm X đã bị Y phát hiện". Mỗi MC milestone scale 1 tầng nhận thức world.
-   - KHÔNG "world full of trọng sinh cùng MC" — MC trọng sinh là DUY NHẤT trong world.
+QUY TẮC PHÂN VOLUME (BẮT BUỘC):
+1. SỐ VOLUME: ${targetVolumeCount} volumes cho ${totalPlannedChapters} chương. Cộng dồn endChapter của volume cuối phải = ${totalPlannedChapters}.
+2. MỖI VOLUME ${targetSubArcsPerVolume}. Sub-arcs trong 1 volume nối liền: subArc[0].endChapter + 1 = subArc[1].startChapter.
+3. Volume KHÔNG được dài quá 150 chương — bestseller modern không có "volume 200ch". Chia thêm volume nếu cần.
+4. VOLUME 1 (early): warm-buildup hoặc balanced mood — KHÔNG tragic/loss. Reader cần engagement trước khi tin loss.
+5. VOLUME CUỐI: climax-dense pacing, mood triumphant hoặc bittersweet-final.
+6. characterArcBeat xuyên ${targetVolumeCount} volumes PHẢI form 1 đường cong character development chính thống.
+7. keyPayoffsOpened ở volume sớm phải có volume sau closes — KHÔNG được orphan promise (mở mà không bao giờ đóng).
+8. ARC 1 SẢNG VĂN HARD RULES:
+   - Volume 1 description chỉ MAX 1 antagonist active LOCAL scale.
+   - ZERO mysterious organization tracking MC trong volume 1-2. Tổ chức bí ẩn defer volume 3+.
    - WARM BASELINE 5 chương đầu: ZERO active threat, MC làm việc routine trong domain nhỏ.
-   - ANTAGONIST PROGRESSION LADDER (vượt qua tân thủ → bigger maps gradually):
-     * Phase 1 (arc 1-2): TÂN THỦ MAP — local antagonist (hàng xóm/khu phố/sư huynh)
-     * Phase 2 (arc 3-5): HUYỆN/CITY — mid-tier (đối thủ kinh doanh huyện/quan huyện)
-     * Phase 3 (arc 6-8): TỈNH/NATIONAL — institutional (tập đoàn lớn/quan tỉnh)
-     * Phase 4 (arc 9+): COSMIC/WORLD — endgame (Đại đế/AI Tối Thượng/world threat)
-     KHÔNG NHẢY CÓC. Cosmic tier (Tối Thượng/Đại Đế/Thừa Tướng/Trưởng Lão Ma giáo)
-     CHỈ unlock từ Phase 3+, KHÔNG được mention trong Arc 1.
-5. ARC FINAL: climax-dense pacing, mood triumphant hoặc bittersweet-final.
-6. character_arc_beat của 8-12 arc PHẢI form 1 đường cong character development chính thống, KHÔNG random emotional state mỗi arc.${proactiveRule}`;
+   - ANTAGONIST PROGRESSION LADDER (volume by volume — KHÔNG NHẢY CÓC):
+     * Volume 1-2: TÂN THỦ MAP — local antagonist (hàng xóm/khu phố/sư huynh)
+     * Volume 3-5: HUYỆN/CITY — mid-tier (đối thủ kinh doanh huyện/quan huyện)
+     * Volume 6-8: TỈNH/NATIONAL — institutional (tập đoàn lớn/quan tỉnh)
+     * Volume 9+: COSMIC/WORLD — endgame (Đại đế/AI Tối Thượng/world threat)
+     Cosmic tier CHỈ unlock từ volume 6+, KHÔNG mention volume 1-2.${proactiveRule}`;
 
   try {
     const res = await callGemini(prompt, {
@@ -216,11 +300,39 @@ Quy tắc:
       return null;
     }
 
-    // DeepSeek sometimes returns shape without majorArcs (truncated / incomplete
-    // structured output). Validate before sanitization to avoid downstream
-    // .map() on undefined that swallows the real cause via outer try/catch.
+    // Phase 26: validate volume hierarchy. Either `volumes` (new) or `majorArcs`
+    // (legacy fallback if model returned old shape) must be present + non-empty.
+    const hasVolumes = Array.isArray(parsed.volumes) && parsed.volumes.length > 0;
+    const hasFlatArcs = Array.isArray(parsed.majorArcs) && parsed.majorArcs.length > 0;
+
+    if (!hasVolumes && !hasFlatArcs) {
+      console.error('Master outline missing both `volumes` and `majorArcs` — DeepSeek returned incomplete shape, skipping DB save');
+      return null;
+    }
+
+    // Phase 26: backward compat — flatten volumes' sub-arcs into top-level
+    // majorArcs so legacy code that reads `masterOutline.majorArcs` keeps working.
+    if (hasVolumes) {
+      const flattened: MajorArc[] = [];
+      let globalArcNumber = 1;
+      for (const vol of parsed.volumes!) {
+        if (!Array.isArray(vol.subArcs)) continue;
+        for (const sub of vol.subArcs) {
+          flattened.push({
+            ...sub,
+            arcNumber: sub.arcNumber ?? globalArcNumber,
+          });
+          globalArcNumber++;
+        }
+      }
+      // Only overwrite majorArcs if model didn't already emit it AND we successfully flattened.
+      if (flattened.length > 0) {
+        parsed.majorArcs = flattened;
+      }
+    }
+
     if (!Array.isArray(parsed.majorArcs) || parsed.majorArcs.length === 0) {
-      console.error('Master outline missing majorArcs array — DeepSeek returned incomplete shape, skipping DB save');
+      console.error('Master outline has volumes but flatten produced no majorArcs — skipping DB save');
       return null;
     }
 

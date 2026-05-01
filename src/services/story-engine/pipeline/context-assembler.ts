@@ -80,6 +80,154 @@ interface ArcPlanAIResponse {
   new_threads?: string[];
 }
 
+// ── Phase 26: Volume context block (đại thần workflow simulation) ───────────
+//
+// MasterOutline (post-Phase-26) carries `volumes` hierarchy: 5-15 volumes ×
+// 4-6 sub-arcs each. At any chapter we inject a compact ~2K-char block telling
+// the Architect:
+//   - Where in the overall novel are we (volume index, % through novel)?
+//   - What's THIS volume's theme/conflict/villain/payoffs?
+//   - What sub-arc are we in + its medium-climax target?
+//   - Distance to next medium-climax + this volume's major-climax
+//   - Brief preview of the next volume (so transitions don't surprise readers)
+//
+// Returns null if outline doesn't have volumes (legacy pre-Phase-26 novels).
+
+interface RawVolume {
+  volumeNumber?: number;
+  name?: string;
+  startChapter?: number;
+  endChapter?: number;
+  theme?: string;
+  primaryConflict?: string;
+  primaryVillain?: string | null;
+  keyPayoffsOpened?: string[];
+  keyPayoffsClosed?: string[];
+  volumeClimaxAt?: number;
+  subArcs?: Array<{
+    arcName?: string;
+    arcNumber?: number;
+    startChapter?: number;
+    endChapter?: number;
+    description?: string;
+    keyMilestone?: string;
+    theme?: string;
+    mood?: string;
+    biggestSetpiece?: string;
+    characterArcBeat?: string;
+    worldExpansion?: string;
+    pacingTarget?: string;
+    mediumClimaxAt?: number;
+  }>;
+}
+
+function buildVolumeContextBlock(
+  rawMasterOutline: unknown,
+  chapterNumber: number,
+): string | undefined {
+  if (!rawMasterOutline || typeof rawMasterOutline !== 'object') return undefined;
+  const mo = rawMasterOutline as { volumes?: RawVolume[]; mainPlotline?: string };
+  if (!Array.isArray(mo.volumes) || mo.volumes.length === 0) return undefined;
+
+  const volumes = mo.volumes;
+  const currentVol = volumes.find(
+    v => typeof v.startChapter === 'number' &&
+         typeof v.endChapter === 'number' &&
+         chapterNumber >= v.startChapter &&
+         chapterNumber <= v.endChapter,
+  );
+  if (!currentVol) return undefined;
+
+  const currentSubArc = (currentVol.subArcs || []).find(
+    s => typeof s.startChapter === 'number' &&
+         typeof s.endChapter === 'number' &&
+         chapterNumber >= s.startChapter &&
+         chapterNumber <= s.endChapter,
+  );
+
+  const totalVolumes = volumes.length;
+  const volStart = currentVol.startChapter || 0;
+  const volEnd = currentVol.endChapter || 0;
+  const volLen = Math.max(1, volEnd - volStart + 1);
+  const positionPct = Math.round(((chapterNumber - volStart) / volLen) * 100);
+
+  let positionLabel = 'mid';
+  if (positionPct < 25) positionLabel = 'early (setup)';
+  else if (positionPct < 60) positionLabel = 'mid (escalation)';
+  else if (positionPct < 85) positionLabel = 'late (pre-climax)';
+  else positionLabel = 'climax / wind-down';
+
+  const distanceToVolumeClimax = currentVol.volumeClimaxAt
+    ? currentVol.volumeClimaxAt - chapterNumber
+    : null;
+  const distanceToMediumClimax = currentSubArc?.mediumClimaxAt
+    ? currentSubArc.mediumClimaxAt - chapterNumber
+    : null;
+  const distanceToVolumeEnd = volEnd - chapterNumber;
+
+  const nextVol = volumes.find(v => (v.volumeNumber || 0) === ((currentVol.volumeNumber || 0) + 1));
+
+  const lines: string[] = [
+    '[VOLUME CONTEXT — VỊ TRÍ TRONG ĐẠI CƯƠNG, BẮT BUỘC GIỮ NHẤT QUÁN VỚI VOLUME ARC]',
+    `📚 Truyện chia ${totalVolumes} cuốn. Đang ở: Cuốn ${currentVol.volumeNumber}/${totalVolumes} — "${currentVol.name || ''}"`,
+    `   • Chương ${chapterNumber} — ${positionPct}% qua volume (${positionLabel})`,
+    `   • Volume range: ch.${volStart} → ch.${volEnd} (${volLen} chương). Còn ${distanceToVolumeEnd} chương đến hết volume.`,
+  ];
+
+  if (currentVol.theme) lines.push(`   • Theme cuốn: ${currentVol.theme}`);
+  if (currentVol.primaryConflict) lines.push(`   • Xung đột chính cuốn: ${currentVol.primaryConflict}`);
+  if (currentVol.primaryVillain) lines.push(`   • Đối thủ chính cuốn: ${currentVol.primaryVillain}`);
+
+  if (currentVol.keyPayoffsOpened?.length) {
+    lines.push(`   • Promise volume này MỞ (cần payoff sau): ${currentVol.keyPayoffsOpened.slice(0, 4).join(' | ')}`);
+  }
+  if (currentVol.keyPayoffsClosed?.length) {
+    lines.push(`   • Promise volume này ĐÓNG (đã hoặc sẽ resolve trong volume): ${currentVol.keyPayoffsClosed.slice(0, 4).join(' | ')}`);
+  }
+
+  if (distanceToVolumeClimax !== null) {
+    if (distanceToVolumeClimax > 0) {
+      lines.push(`   ⚡ Volume CLIMAX (setpiece lớn) ở ch.${currentVol.volumeClimaxAt} — còn ${distanceToVolumeClimax} chương. ${distanceToVolumeClimax <= 10 ? 'BUILD-UP intensify ngay từ bây giờ.' : 'Còn xa — KHÔNG triển climax sớm.'}`);
+    } else if (distanceToVolumeClimax === 0) {
+      lines.push(`   ⚡ CHƯƠNG NÀY = VOLUME CLIMAX. Setpiece lớn nhất volume PHẢI xảy ra trong chương này.`);
+    } else {
+      lines.push(`   ⚡ Volume climax đã qua (ch.${currentVol.volumeClimaxAt}). Đang ở wind-down phase — đóng các thread của volume.`);
+    }
+  }
+
+  if (currentSubArc) {
+    lines.push('');
+    lines.push(`📖 Sub-arc hiện tại: "${currentSubArc.arcName || ''}" (ch.${currentSubArc.startChapter}-${currentSubArc.endChapter})`);
+    if (currentSubArc.theme) lines.push(`   • Theme: ${currentSubArc.theme}`);
+    if (currentSubArc.mood) lines.push(`   • Mood: ${currentSubArc.mood}`);
+    if (currentSubArc.pacingTarget) lines.push(`   • Pacing: ${currentSubArc.pacingTarget}`);
+    if (currentSubArc.biggestSetpiece) lines.push(`   • Setpiece sub-arc: ${currentSubArc.biggestSetpiece}`);
+    if (currentSubArc.characterArcBeat) lines.push(`   • MC inner arc: ${currentSubArc.characterArcBeat}`);
+    if (currentSubArc.keyMilestone) lines.push(`   • Milestone đạt được cuối sub-arc: ${currentSubArc.keyMilestone}`);
+    if (distanceToMediumClimax !== null) {
+      if (distanceToMediumClimax > 0) {
+        lines.push(`   • Medium climax sub-arc ở ch.${currentSubArc.mediumClimaxAt} — còn ${distanceToMediumClimax} chương.`);
+      } else if (distanceToMediumClimax === 0) {
+        lines.push(`   • CHƯƠNG NÀY = MEDIUM CLIMAX sub-arc. Reveal/turn quan trọng trong sub-arc PHẢI xảy ra.`);
+      }
+    }
+  }
+
+  if (nextVol && distanceToVolumeEnd <= 15) {
+    lines.push('');
+    lines.push(`🔮 Cuốn kế: ${nextVol.volumeNumber}/${totalVolumes} — "${nextVol.name || ''}"${nextVol.theme ? ` (theme: ${nextVol.theme})` : ''}`);
+    lines.push(`   → Còn ${distanceToVolumeEnd} chương đến volume transition. KHÔNG mở plot thread mới quá lớn — wind down volume hiện tại trước.`);
+  }
+
+  if (mo.mainPlotline) {
+    lines.push('');
+    lines.push(`🎯 Mục tiêu xuyên suốt truyện: ${mo.mainPlotline}`);
+  }
+
+  lines.push('[/VOLUME CONTEXT]');
+  return lines.join('\n');
+}
+
 // ── Load Context ─────────────────────────────────────────────────────────────
 
 export async function loadContext(
@@ -281,6 +429,7 @@ export async function loadContext(
     arcChapterSummaries: undefined, // loaded separately for synopsis generation
     recentChapterFullText: ((recentFullTextResult?.data as Array<{ chapter_number: number; title: string; content: string }> | null) || []).reverse(),
     masterOutline: typeof masterOutline === 'string' ? masterOutline : (masterOutline ? JSON.stringify(masterOutline) : undefined),
+    volumeContext: buildVolumeContextBlock(rawMasterOutline, chapterNumber),
     storyOutline: storyOutline || undefined,
     worldDescription: worldDescription || undefined,
     // Modern narrative metadata (migration 0149)
@@ -309,6 +458,12 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
   if (payload.masterOutline) {
     parts.push('[ĐẠI CƯƠNG TOÀN TRUYỆN - BẮT BUỘC BÁM SÁT LỘ TRÌNH ĐỂ TRÁNH LAN MAN]');
     parts.push(payload.masterOutline.slice(0, 5000));
+  }
+
+  // Layer 0.5b: Phase 26 — Volume + Sub-arc context (đại thần workflow)
+  // Compact ~2K block telling Architect where in the 1000-chapter map we are.
+  if (payload.volumeContext) {
+    parts.push(payload.volumeContext);
   }
 
   // Layer 0.6: Story Outline (premise, protagonist, plot points, ending vision)

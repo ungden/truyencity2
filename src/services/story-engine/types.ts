@@ -309,6 +309,14 @@ export interface ContextPayload {
   /** Hyperpop sub-arc context: which sub-arc this chapter belongs to + mini-payoff */
   currentSubArc?: string;
 
+  /**
+   * Phase 26: compact volume + sub-arc metadata block for the current chapter.
+   * Built from MasterOutline.volumes hierarchy. Tells Architect "where in the
+   * 1000-chapter map are we?" — current volume theme/conflict/villain, sub-arc
+   * milestones, distance to medium/major climax, position in volume.
+   */
+  volumeContext?: string;
+
   // Anti-repetition
   previousTitles: string[];
   recentOpenings: string[];
