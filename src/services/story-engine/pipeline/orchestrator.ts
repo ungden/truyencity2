@@ -869,10 +869,15 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   }
 
   // ── Step 5: Split AI content into N reader chapters + save to DB ─────────
-  // AI writes 1 logical chapter (~2800 từ). Split into 2 reader-friendly chapters
-  // (~1400 từ each) at natural paragraph boundary. This keeps narrative coherence
-  // for the AI write while delivering shorter mobile-friendly chapters to readers.
-  // Per-project override: style_directives.disable_chapter_split = true → keep AI output as 1 reader chapter.
+  // AI writes 1 logical chapter (~2800 từ). HISTORICALLY split into 2 reader chapters
+  // (~1400 từ each) for mobile-friendly UX. Phase 27+: NEW novels default to NO-split
+  // (style_directives.disable_chapter_split=true is now set by content-seeder for new
+  // projects). Reasons:
+  //   - No-split has fewer post-write doubling → ~10-15% cost saving
+  //   - Cleaner state machine (1 chapter = 1 row across all tables)
+  //   - Less moving parts → fewer edge cases to handle in 30+ tracking dimensions
+  // Existing novels with split=2 continue to work via per-part loop fallback (Phase 24).
+  // To opt into split=2 explicitly: set style_directives.disable_chapter_split=false.
   const SPLIT_PARTS = disableChapterSplit ? 1 : 2;
   const splitResults = splitChapterContent(result.content, result.title, SPLIT_PARTS);
   const lastChapterNumber = nextChapter + splitResults.length - 1;

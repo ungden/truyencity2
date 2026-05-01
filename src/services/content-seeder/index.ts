@@ -805,7 +805,10 @@ export class ContentSeeder {
         sub_genres: variant.sub_genres || [],
         mc_archetype: variant.mc_archetype || null,
         anti_tropes: variant.anti_tropes || [],
-        style_directives: variant.style_directives || {},
+        // Phase 27 W1+: default no-split. Single chapter = single AI write.
+        // Cleaner state machine, fewer post-write doubling, ~10-15% cost saving.
+        // To opt INTO split=2 for mobile-first novels, set disable_chapter_split=false explicitly.
+        style_directives: { disable_chapter_split: true, ...(variant.style_directives || {}) },
       };
 
       if (requiredKey && requiredValue) {
@@ -1696,7 +1699,8 @@ CHÚ Ý:
           sub_genres: variant.sub_genres || [],
           mc_archetype: variant.mc_archetype || null,
           anti_tropes: variant.anti_tropes || [],
-          style_directives: variant.style_directives || {},
+          // Phase 27 W1+: default no-split. See content-seeder line ~810 comment.
+          style_directives: { disable_chapter_split: true, ...(variant.style_directives || {}) },
         };
 
         // Fill genre-required system field (AI Writer relies on this)
