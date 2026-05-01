@@ -336,6 +336,15 @@ export interface ContextPayload {
   /** Phase 27 W2.5: top-N active factions with current alliances/rivalries. */
   factionsContext?: string;
 
+  /** Phase 27 W3.1: upcoming plot twists in seeding/imminent state. */
+  plotTwistsContext?: string;
+
+  /** Phase 27 W3.2: themes registry with reinforcement status + drift flags. */
+  themesContext?: string;
+
+  /** Phase 27 W3.3: comprehensive worldbuilding canon (cosmology + history + cultures + regions). */
+  worldbuildingCanonContext?: string;
+
   // Anti-repetition
   previousTitles: string[];
   recentOpenings: string[];

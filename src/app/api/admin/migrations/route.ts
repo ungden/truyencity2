@@ -49,6 +49,9 @@ async function listAppliedMigrations(): Promise<string[]> {
     { name: '0164_item_events', table: 'item_events' },
     { name: '0165_power_system_canon', table: 'ai_story_projects', column: 'power_system_canon' },
     { name: '0166_factions', table: 'factions' },
+    { name: '0167_plot_twists', table: 'plot_twists' },
+    { name: '0168_story_themes', table: 'story_themes' },
+    { name: '0169_worldbuilding_canon', table: 'ai_story_projects', column: 'worldbuilding_canon' },
   ];
   const applied: string[] = [];
   for (const p of probes) {

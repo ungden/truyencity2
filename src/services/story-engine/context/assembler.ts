@@ -453,6 +453,18 @@ export async function loadContext(
       const { getFactionsContext } = await import('../canon/factions');
       return getFactionsContext(projectId, chapterNumber).catch(() => null);
     })() || undefined,
+    plotTwistsContext: await (async () => {
+      const { getPlotTwistsContext } = await import('../plan/plot-twists');
+      return getPlotTwistsContext(projectId, chapterNumber).catch(() => null);
+    })() || undefined,
+    themesContext: await (async () => {
+      const { getThemesContext } = await import('../plan/themes');
+      return getThemesContext(projectId, chapterNumber).catch(() => null);
+    })() || undefined,
+    worldbuildingCanonContext: await (async () => {
+      const { getWorldbuildingCanonContext } = await import('../canon/worldbuilding');
+      return getWorldbuildingCanonContext(projectId).catch(() => null);
+    })() || undefined,
     storyOutline: storyOutline || undefined,
     worldDescription: worldDescription || undefined,
     // Modern narrative metadata (migration 0149)
@@ -513,6 +525,21 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
   // Layer 0.5g: Phase 27 W2.3 — Item inventory (đại thần 物品系统)
   if (payload.inventoryContext) {
     parts.push(payload.inventoryContext);
+  }
+
+  // Layer 0.5h: Phase 27 W3.3 — Worldbuilding canon (đại thần 设定集)
+  if (payload.worldbuildingCanonContext) {
+    parts.push(payload.worldbuildingCanonContext);
+  }
+
+  // Layer 0.5i: Phase 27 W3.1 — Plot twists (đại thần 反转表)
+  if (payload.plotTwistsContext) {
+    parts.push(payload.plotTwistsContext);
+  }
+
+  // Layer 0.5j: Phase 27 W3.2 — Themes (đại thần 主题)
+  if (payload.themesContext) {
+    parts.push(payload.themesContext);
   }
 
   // Layer 0.6: Story Outline (premise, protagonist, plot points, ending vision)

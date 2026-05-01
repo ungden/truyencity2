@@ -298,7 +298,8 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     const needsMasterRegen = !extra?.master_outline && currentChapter < 5;
     const needsStoryRegen = !extra?.story_outline && currentChapter < 5;
     const needsPowerCanon = !(extra as { power_system_canon?: unknown } | null)?.power_system_canon && currentChapter < 5;
-    if (needsMasterRegen || needsStoryRegen || needsPowerCanon) {
+    const needsWorldbuildingCanon = !(extra as { worldbuilding_canon?: unknown } | null)?.worldbuilding_canon && currentChapter < 5;
+    if (needsMasterRegen || needsStoryRegen || needsPowerCanon || needsWorldbuildingCanon) {
       try {
         const { data: full } = await db
           .from('ai_story_projects')
@@ -342,7 +343,6 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
         }
 
         // Phase 27 W2.4: power-system canon — generate ONCE per project at setup.
-        // Comprehensive ladder + breakthrough rules + commonViolations for Critic.
         if (needsPowerCanon) {
           const { generatePowerSystemCanon } = await import('../canon/power-system');
           const storyOutlineStr = extra?.story_outline ? JSON.stringify(extra.story_outline) : null;
@@ -358,9 +358,53 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
           }
         }
 
+        // Phase 27 W3.3: worldbuilding canon — comprehensive bible.
+        if (needsWorldbuildingCanon) {
+          const { generateWorldbuildingCanon } = await import('../canon/worldbuilding');
+          const storyOutlineStr = extra?.story_outline ? JSON.stringify(extra.story_outline) : null;
+          const wcanon = await generateWorldbuildingCanon(
+            options.projectId,
+            (full?.genre || 'do-thi') as GenreType,
+            worldDesc,
+            storyOutlineStr,
+            { ...DEFAULT_CONFIG, model: 'deepseek-v4-flash' },
+          );
+          if (wcanon) {
+            validationFixes.push(`✓ worldbuilding_canon generated (${wcanon.regions?.length ?? 0} regions, ${wcanon.cultures?.length ?? 0} cultures)`);
+          }
+        }
+
+        // Phase 27 W3.1+W3.2: plot twists + themes — generate AFTER master_outline.
+        // Always check (no needsX flag) — idempotent, skip if already present.
+        try {
+          const { generatePlotTwists } = await import('../plan/plot-twists');
+          await generatePlotTwists(
+            options.projectId,
+            (full?.genre || 'do-thi') as GenreType,
+            totalCh,
+            worldDesc,
+            extra?.master_outline ? JSON.stringify(extra.master_outline).slice(0, 4000) : null,
+            { ...DEFAULT_CONFIG, model: 'deepseek-v4-flash' },
+          );
+        } catch (e) {
+          console.warn('[orchestrator] generatePlotTwists at setup failed:', e instanceof Error ? e.message : String(e));
+        }
+
+        try {
+          const { generateStoryThemes } = await import('../plan/themes');
+          await generateStoryThemes(
+            options.projectId,
+            (full?.genre || 'do-thi') as GenreType,
+            worldDesc,
+            extra?.story_outline ? JSON.stringify(extra.story_outline).slice(0, 3000) : null,
+            { ...DEFAULT_CONFIG, model: 'deepseek-v4-flash' },
+          );
+        } catch (e) {
+          console.warn('[orchestrator] generateStoryThemes at setup failed:', e instanceof Error ? e.message : String(e));
+        }
+
         // After regen, throw a soft error so cron retries this chapter on next tick (with outlines now present).
-        // This avoids using stale `extra` reference in subsequent code paths.
-        if (needsMasterRegen || needsStoryRegen || needsPowerCanon) {
+        if (needsMasterRegen || needsStoryRegen || needsPowerCanon || needsWorldbuildingCanon) {
           throw new Error(`OUTLINE_REGEN_DONE: novels self-heal complete; cron will pick up next tick`);
         }
       } catch (regenErr) {
@@ -1029,6 +1073,18 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
         const { recordItemEvents } = await import('../state/item-inventory');
         return recordItemEvents(project.id, partCh, part.content, characters, geminiConfig);
       })().catch((e) => console.warn(`[Orchestrator] Item events failed for Ch.${partCh}:`, e instanceof Error ? e.message : String(e))),
+
+      // Task 15g (Phase 27 W3.1): Auto-advance plot twist statuses (planned → seeding → imminent → revealed).
+      (async () => {
+        const { advanceTwistStatuses } = await import('../plan/plot-twists');
+        return advanceTwistStatuses(project.id, partCh);
+      })().catch((e) => console.warn(`[Orchestrator] Twist status advance failed for Ch.${partCh}:`, e instanceof Error ? e.message : String(e))),
+
+      // Task 15h (Phase 27 W3.2): Theme reinforcement detection.
+      (async () => {
+        const { detectThemeReinforcement } = await import('../plan/themes');
+        return detectThemeReinforcement(project.id, partCh, part.content, geminiConfig);
+      })().catch((e) => console.warn(`[Orchestrator] Theme reinforcement failed for Ch.${partCh}:`, e instanceof Error ? e.message : String(e))),
     ]);
   }
 
