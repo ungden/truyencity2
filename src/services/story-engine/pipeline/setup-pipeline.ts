@@ -212,7 +212,10 @@ Trả về JSON:
       { regex: /\btrong\s+(\d+|ba|năm|bảy|mười|một)\s+(năm|tháng|ngày)\s+phải/i, reason: 'survival countdown deadline' },
       { regex: /\b(tối thượng|cố vấn tối cao|đại đế|tử thần|trưởng lão ma giáo|thừa tướng|hokage)\b/i, reason: 'cosmic/national-tier antagonist Phase 1' },
       { regex: /(hao tổn|tiêu hao)\s+(sinh mệnh|tuổi thọ)/i, reason: 'self-imposed countdown / lifespan drain' },
-      { regex: /\bphải\s+(đánh bại|đối đầu|ngăn chặn|tiêu diệt|chống lại)\b/i, reason: 'survival framing "phải đánh bại"' },
+      // Phase 29 hotfix v2: narrow this from any "phải đánh bại" to "phải đánh bại + cosmic-tier target".
+      // Was catching legitimate Phase 1 LOCAL business/historical conflicts ("phải đánh bại đối thủ thương mại").
+      // Cosmic intent only fires when target is national/cosmic tier within ~30 chars.
+      { regex: /\bphải\s+(đánh bại|đối đầu|ngăn chặn|tiêu diệt|chống lại)\s+[^.,;]{0,40}(tối thượng|đại đế|tổ tiên|tử thần|thừa tướng|hoàng đế|vũ trụ|đại lục|toàn quốc|cả thế giới|toàn cầu|ma giáo|thiên đạo)\b/i, reason: 'survival framing "phải đánh bại + cosmic-tier"' },
       { regex: /\b(tập đoàn|công ty)\s+(độc quyền|thống trị)\s+(toàn quốc|cả nước|thị trường)/i, reason: 'monopoly-scale antagonist Phase 1' },
     ];
     const violations: string[] = [];
