@@ -489,7 +489,7 @@ async function prepareInitProject(
   if (!novel?.id) throw new Error('No novel linked');
 
   const genre = (project.genre || 'tien-hiep') as GenreType;
-  const protagonistName = project.main_character || 'Nhân vật chính';
+  const protagonistName = project.main_character || '';
   const totalPlanned = project.total_planned_chapters || 1000;
   const geminiConfig: GeminiConfig = {
     model: DEFAULT_CONFIG.model,
@@ -504,10 +504,13 @@ async function prepareInitProject(
     .eq('id', project.id)
     .maybeSingle();
 
-  // Phase 22 self-heal: regen world_description if NULL.
-  // Used by clear-and-reset op: novels reset to {title, genre} only — cron regens setup.
-  // Calls content-seeder-style AI prompt with v3 blueprint to produce 9-section world_description.
-  if (!projRow?.world_description || projRow.world_description.trim().length === 0) {
+  // Phase 22 self-heal: regen main_character + world_description if missing.
+  // Used by clear-and-reset op: novels reset to {title, genre} only — cron regens
+  // both MC name AND setup từ scratch. AI có toàn quyền invent MC name + concept
+  // dựa trên title + genre, KHÔNG bị anchor vào MC name cũ.
+  const needsMcRegen = !protagonistName || protagonistName.trim().length === 0 || protagonistName === '';
+  const needsWorldRegen = !projRow?.world_description || projRow.world_description.trim().length === 0;
+  if (needsWorldRegen) {
     try {
       const { callGemini } = await import('@/services/story-engine/utils/gemini');
       const { buildSeedBlueprintInstructions } = await import('@/services/story-engine/seed-blueprint');
@@ -516,39 +519,57 @@ async function prepareInitProject(
       const genreLabel = genreConfig.label || genre;
       const blueprintInstructions = buildSeedBlueprintInstructions(genre);
 
-      const prompt = `Bạn là tác giả webnovel chuyên nghiệp. Tạo lại world_description (setup truyện) cho tiểu thuyết hiện có.
+      const prompt = `Bạn là tác giả webnovel chuyên nghiệp. ${needsMcRegen ? 'Tạo MỚI HOÀN TOÀN' : 'Tạo lại'} setup + giới thiệu cho tiểu thuyết.
 
-THÔNG TIN ĐÃ CÓ (giữ nguyên):
+THÔNG TIN GIỮ NGUYÊN (KHÔNG được đổi):
 - Tên truyện: "${novel.title}"
 - Thể loại: ${genreLabel} (${genre})
-- Nhân vật chính: ${protagonistName}
+${needsMcRegen ? '- Nhân vật chính: HÃY TỰ SÁNG TẠO TÊN MỚI dựa trên tên truyện + genre. KHÔNG dùng tên cliché kiểu Lâm Phong / Lê Minh / Trần Vũ.' : `- Nhân vật chính (đã có, giữ nguyên): ${protagonistName}`}
 
 ${blueprintInstructions}
 
 Trả về JSON:
-{"worldDescription":"<world_description 800-1500 từ theo blueprint 9-section ở trên>"}
+{
+  ${needsMcRegen ? '"mainCharacter":"<tên MC mới — họ + tên đầy đủ tiếng Việt 2-3 chữ>",' : ''}
+  "worldDescription":"<world_description 800-1500 từ theo blueprint 9-section ở trên>",
+  "description":"<giới thiệu/back-cover blurb 250-400 chữ tiếng Việt CÓ DẤU đầy đủ. ĐÚNG 3 đoạn (\\n\\n giữa các đoạn): đoạn 1 hook bối cảnh + tình huống bất thường (60-90 chữ); đoạn 2 tease năng lực/xung đột/mục tiêu (70-120 chữ); đoạn 3 closing hook khiến reader muốn đọc (40-90 chữ). Tên MC PHẢI xuất hiện ≥2 lần. KHÔNG dùng từ kỹ thuật engine (MC, Bàn Tay Vàng, Hệ thống X, Sảng văn, vả mặt, BOM, engine).>"
+}
 
 QUY TẮC:
-- Phải tuân thủ blueprint 9-section CHẶT CHẼ — output thiếu section sẽ bị reject.
+- worldDescription phải tuân thủ blueprint 9-section CHẶT CHẼ.
 - Cast roster ≥4 named, antagonists ≥2 named, phase roadmap 4 phase.
-- KHÔNG dùng tên/concept của truyện nổi tiếng có thật.`;
+- description: ĐÚNG 3 đoạn, ≥250 chữ, KHÔNG spoil cuối truyện.
+- KHÔNG dùng tên/concept của truyện nổi tiếng có thật.
+${needsMcRegen ? '- mainCharacter PHẢI đa dạng — không dùng tên cliché phổ biến (Lâm Phong, Lê Minh, Trần Vũ, Trần Hạo, Lý Phong). Tùy theo genre + bối cảnh, chọn họ + tên hợp lý.' : ''}`;
 
       const res = await callGemini(prompt, {
         model: 'deepseek-v4-flash',
-        temperature: 0.7,
+        temperature: 0.85,
         maxTokens: 8192,
-        systemPrompt: 'Bạn là Worldbuilder chuyên nghiệp. CHỈ trả về JSON hợp lệ với field worldDescription.',
+        systemPrompt: 'Bạn là Worldbuilder + Character Architect. CHỈ trả về JSON hợp lệ.',
       }, { jsonMode: true, tracking: { projectId: project.id, task: 'world_description_regen' } });
 
       const parsed = JSON.parse(res.content);
       const newWorldDesc = (parsed.worldDescription || '').trim();
-      if (newWorldDesc && newWorldDesc.length >= 500) {
-        await supabase.from('ai_story_projects').update({ world_description: newWorldDesc }).eq('id', project.id);
-        // Refresh local copy so master/story regen use it
-        projRow = { ...projRow, world_description: newWorldDesc, story_outline: projRow?.story_outline ?? null, story_bible: projRow?.story_bible ?? null, master_outline: projRow?.master_outline ?? null };
+      const newMc = (parsed.mainCharacter || '').trim();
+      const newDescription = (parsed.description || '').trim();
+
+      const projUpdates: Record<string, unknown> = {};
+      if (newWorldDesc && newWorldDesc.length >= 500) projUpdates.world_description = newWorldDesc;
+      if (needsMcRegen && newMc && newMc.length >= 2) projUpdates.main_character = newMc;
+
+      if (Object.keys(projUpdates).length > 0) {
+        await supabase.from('ai_story_projects').update(projUpdates).eq('id', project.id);
+        if (projUpdates.world_description) projRow = { ...projRow, world_description: newWorldDesc, story_outline: projRow?.story_outline ?? null, story_bible: projRow?.story_bible ?? null, master_outline: projRow?.master_outline ?? null };
+      }
+
+      // Also update novels.description (giới thiệu blurb shown trên novel detail page).
+      // Was old text from previous setup → user reads "y chang cũ".
+      if (newDescription && newDescription.length >= 200) {
+        await supabase.from('novels').update({ description: newDescription }).eq('id', novel.id);
       }
     } catch (e) {
-      console.warn(`[init-prep] world_description regen failed for ${project.id}:`, e instanceof Error ? e.message : String(e));
+      console.warn(`[init-prep] setup regen failed for ${project.id}:`, e instanceof Error ? e.message : String(e));
     }
   }
 
