@@ -11,7 +11,7 @@
 
 import { callGemini } from '../utils/gemini';
 import { parseJSON } from '../utils/json-repair';
-import type { GeminiConfig, GenreType } from '../types';
+import type { GeminiConfig, GenreType, StoryKernel } from '../types';
 import { getGenreSetupRequirements } from '../templates/genre-process-blueprints';
 
 export interface StoryOutline {
@@ -85,6 +85,8 @@ export interface StoryOutline {
   };
   /** Anti-trope bans — concrete things story will NOT do. */
   antiTropes?: string[];
+  /** Compact setup DNA generated at idea stage; copied through unchanged. */
+  setupKernel?: StoryKernel;
 }
 
 export async function generateStoryOutline(
@@ -95,13 +97,21 @@ export async function generateStoryOutline(
   worldDescription: string,
   totalChapters: number,
   config: GeminiConfig,
+  setupKernel?: StoryKernel | null,
 ): Promise<StoryOutline | null> {
   const arcs = Math.max(4, Math.ceil(totalChapters / 20));
   const mid = Math.ceil(arcs / 2);
   const genreSetup = getGenreSetupRequirements(genre);
+  const kernelBlock = setupKernel ? `[STORY KERNEL — NGUỒN QUYẾT ĐỊNH, CHỈ EXPAND KHÔNG REWRITE]
+${JSON.stringify(setupKernel, null, 2)}
+
+Story outline PHẢI map readerFantasy/pleasureLoop/systemMechanic/phase1Playground/noveltyLadder vào roadmap. Không đổi engine, không đổi MC.
+
+` : '';
 
   const prompt = `Lập Story Outline cho truyện "${novelTitle}" (${genre}).
 NHÂN VẬT CHÍNH: ${protagonistName}
+${kernelBlock}
 WORLD/BỐI CẢNH (BẮT BUỘC TUÂN THỦ):
 ${worldDescription.slice(0, 6000)}
 
@@ -137,9 +147,10 @@ CHẤT LƯỢNG ĐẠI THẦN — required fields:
 12. recurringCast: 4-6 nhân vật sẽ quay lại theo cadence, không phải chỉ xuất hiện để đủ checklist.
 13. dopamineContract: coreLoop + số payoff/chương + payoffTypes đúng genre.
 14. conflictLadder: 4 phase rõ local → regional → national/world, Phase 1 chỉ local.
+15. setupKernel: nếu input có StoryKernel thì copy nguyên object vào output, không paraphrase.
 
 Trả về JSON:
-{"id":"story_${Date.now()}","title":"${novelTitle}","genre":"${genre}","premise":"...","themes":["...","..."],"mainConflict":"...","targetChapters":${totalChapters},"targetArcs":${arcs},"protagonist":{"name":"${protagonistName}","startingState":"...","endGoal":"...","characterArc":"..."},"readerPromise":"...","openingExperience":{"chapters1To3":"...","chapters4To10":"...","firstPayoff":"..."},"majorPlotPoints":[{"id":"pp1","name":"...","description":"...","targetArc":1,"type":"inciting_incident","importance":"critical"},{"id":"pp3","name":"...","description":"...","targetArc":${mid},"type":"midpoint","importance":"critical"},{"id":"pp5","name":"...","description":"...","targetArc":${Math.max(1, arcs - 1)},"type":"climax","importance":"critical"},{"id":"pp6","name":"...","description":"...","targetArc":${arcs},"type":"resolution","importance":"critical"}],"castRoster":[{"name":"...","role":"...","relationToMC":"...","introduceArc":1,"archeType":"..."}],"recurringCast":[{"name":"...","recurringFunction":"...","cadence":"mỗi 3-5 chương / mỗi sub-arc / mỗi business milestone"}],"worldRules":["...","..."],"toneFlags":{"proactiveRatio":80,"comedyDensity":"medium","pacingTarget":"medium"},"dopamineContract":{"coreLoop":"...","expectedPayoffsPerChapter":2,"payoffTypes":["...","..."]},"conflictLadder":[{"phase":1,"chapterRange":"1-100","scale":"local","antagonistType":"...","readerPayoff":"..."},{"phase":2,"chapterRange":"101-300","scale":"regional","antagonistType":"...","readerPayoff":"..."},{"phase":3,"chapterRange":"301-700","scale":"national/institutional","antagonistType":"...","readerPayoff":"..."},{"phase":4,"chapterRange":"701-${totalChapters}","scale":"world/endgame","antagonistType":"...","readerPayoff":"..."}],"antiTropes":["...","..."],"endingVision":"...","uniqueHooks":[]}
+{"id":"story_${Date.now()}","title":"${novelTitle}","genre":"${genre}","premise":"...","themes":["...","..."],"mainConflict":"...","targetChapters":${totalChapters},"targetArcs":${arcs},"protagonist":{"name":"${protagonistName}","startingState":"...","endGoal":"...","characterArc":"..."},"readerPromise":"...","openingExperience":{"chapters1To3":"...","chapters4To10":"...","firstPayoff":"..."},"majorPlotPoints":[{"id":"pp1","name":"...","description":"...","targetArc":1,"type":"inciting_incident","importance":"critical"},{"id":"pp3","name":"...","description":"...","targetArc":${mid},"type":"midpoint","importance":"critical"},{"id":"pp5","name":"...","description":"...","targetArc":${Math.max(1, arcs - 1)},"type":"climax","importance":"critical"},{"id":"pp6","name":"...","description":"...","targetArc":${arcs},"type":"resolution","importance":"critical"}],"castRoster":[{"name":"...","role":"...","relationToMC":"...","introduceArc":1,"archeType":"..."}],"recurringCast":[{"name":"...","recurringFunction":"...","cadence":"mỗi 3-5 chương / mỗi sub-arc / mỗi business milestone"}],"worldRules":["...","..."],"toneFlags":{"proactiveRatio":80,"comedyDensity":"medium","pacingTarget":"medium"},"dopamineContract":{"coreLoop":"...","expectedPayoffsPerChapter":2,"payoffTypes":["...","..."]},"conflictLadder":[{"phase":1,"chapterRange":"1-100","scale":"local","antagonistType":"...","readerPayoff":"..."},{"phase":2,"chapterRange":"101-300","scale":"regional","antagonistType":"...","readerPayoff":"..."},{"phase":3,"chapterRange":"301-700","scale":"national/institutional","antagonistType":"...","readerPayoff":"..."},{"phase":4,"chapterRange":"701-${totalChapters}","scale":"world/endgame","antagonistType":"...","readerPayoff":"..."}],"antiTropes":["...","..."],"endingVision":"...","uniqueHooks":[],"setupKernel":${setupKernel ? JSON.stringify(setupKernel) : 'null'}}
 
 QUY TẮC:
 - premise PHẢI mention golden finger từ world_description (KHÔNG vague "anh ta nhận được sức mạnh kỳ lạ")

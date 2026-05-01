@@ -9,6 +9,7 @@
  */
 
 import { validateSeedStructure } from './seed-blueprint';
+import type { StoryKernel } from '../types';
 
 export interface SetupGateIssue {
   severity: 'error' | 'warning';
@@ -21,6 +22,7 @@ export interface SetupGateInput {
   mainCharacter?: string | null;
   storyOutline?: unknown;
   masterOutline?: unknown;
+  setupKernel?: StoryKernel | null;
   requireStoryOutline?: boolean;
   requireMasterOutline?: boolean;
   strictContract?: boolean;
@@ -47,6 +49,7 @@ interface StoryOutlineLike {
   openingExperience?: unknown;
   dopamineContract?: unknown;
   conflictLadder?: unknown;
+  setupKernel?: StoryKernel;
 }
 
 interface MasterOutlineLike {
@@ -93,6 +96,61 @@ function getStoryOutline(input: unknown): StoryOutlineLike | undefined {
   return input as StoryOutlineLike;
 }
 
+function getSetupKernel(input: SetupGateInput, story?: StoryOutlineLike): StoryKernel | undefined {
+  return input.setupKernel || story?.setupKernel;
+}
+
+function validateSetupKernel(kernel: StoryKernel | undefined, strict: boolean | undefined, issues: SetupGateIssue[]): void {
+  const severity = strict ? 'error' : 'warning';
+  if (!kernel || typeof kernel !== 'object') {
+    issues.push({ severity, code: 'setup_kernel_missing', message: 'StoryKernel missing from story_outline.setupKernel' });
+    return;
+  }
+
+  const requiredStrings: Array<[keyof Pick<StoryKernel, 'readerFantasy' | 'protagonistEngine'>, string]> = [
+    ['readerFantasy', 'StoryKernel.readerFantasy is required'],
+    ['protagonistEngine', 'StoryKernel.protagonistEngine is required'],
+  ];
+  for (const [key, message] of requiredStrings) {
+    if (typeof kernel[key] !== 'string' || kernel[key].trim().length < 20) {
+      issues.push({ severity, code: `setup_kernel_${key}_missing`, message });
+    }
+  }
+
+  if (!Array.isArray(kernel.pleasureLoop) || kernel.pleasureLoop.filter(Boolean).length < 4) {
+    issues.push({ severity: 'error', code: 'setup_kernel_pleasure_loop_missing', message: 'StoryKernel.pleasureLoop must contain at least 4 repeatable beats' });
+  }
+
+  const mechanic = kernel.systemMechanic;
+  if (!mechanic || typeof mechanic !== 'object'
+    || !mechanic.input || !mechanic.output || !mechanic.limit || !mechanic.reward) {
+    issues.push({ severity: 'error', code: 'setup_kernel_system_mechanic_missing', message: 'StoryKernel.systemMechanic must define input/output/limit/reward' });
+  }
+
+  const playground = kernel.phase1Playground;
+  if (!playground || typeof playground !== 'object'
+    || !Array.isArray(playground.locations) || playground.locations.length < 2
+    || !Array.isArray(playground.cast) || playground.cast.length < 2
+    || !Array.isArray(playground.localAntagonists) || playground.localAntagonists.length < 1
+    || !Array.isArray(playground.repeatableSceneTypes) || playground.repeatableSceneTypes.length < 3) {
+    issues.push({ severity: 'error', code: 'setup_kernel_phase1_playground_missing', message: 'StoryKernel.phase1Playground must define local locations, cast, antagonist, and repeatable scene types' });
+  }
+
+  if (!kernel.socialReactor || !Array.isArray(kernel.socialReactor.witnesses) || kernel.socialReactor.witnesses.length < 2) {
+    issues.push({ severity, code: 'setup_kernel_social_reactor_missing', message: 'StoryKernel.socialReactor must define witnesses/reactions/report-back' });
+  }
+
+  if (!Array.isArray(kernel.noveltyLadder) || kernel.noveltyLadder.length < 3) {
+    issues.push({ severity: 'error', code: 'setup_kernel_novelty_ladder_missing', message: 'StoryKernel.noveltyLadder must contain at least 3 controlled expansion steps' });
+  }
+
+  if (!kernel.controlRules?.payoffCadence || !kernel.controlRules?.attentionGradient
+    || typeof kernel.controlRules.openThreadsPerArc !== 'number'
+    || typeof kernel.controlRules.closeThreadsPerArc !== 'number') {
+    issues.push({ severity, code: 'setup_kernel_control_rules_missing', message: 'StoryKernel.controlRules must define payoff cadence, attention gradient, and thread quotas' });
+  }
+}
+
 function rejectIf(pattern: RegExp, text: string, issues: SetupGateIssue[], code: string, message: string): void {
   if (pattern.test(text)) issues.push({ severity: 'error', code, message });
 }
@@ -114,6 +172,7 @@ export function validateSetupCanon(input: SetupGateInput): SetupGateResult {
   const projectName = normalizeName(input.mainCharacter);
   const story = getStoryOutline(input.storyOutline);
   const strict = input.strictContract;
+  const setupKernel = getSetupKernel(input, story);
 
   if (!world || world.length < 500) {
     issues.push({
@@ -180,24 +239,24 @@ export function validateSetupCanon(input: SetupGateInput): SetupGateResult {
     });
   }
 
-  const storyEngine = getSection(world, /###\s*STORY\s*ENGINE/i);
+  const storyEngine = getSection(world, /###\s*(?:STORY\s*ENGINE|STORY\s*KERNEL\s*SUMMARY)/i);
   if (world) {
     requireIfMissing(
       storyEngine.length > 0,
       strict,
       issues,
       'story_engine_missing',
-      'world_description must include STORY ENGINE: reader promise, core loop, dopamine cadence, and novelty plan',
+      'world_description must include STORY KERNEL SUMMARY: reader fantasy, pleasure loop, social reactor, and novelty ladder',
     );
     requireIfMissing(
-      /(reader\s*promise|lời\s*hứa|đọc\s+để|reader\s+đọc)/i.test(storyEngine),
+      /(reader\s*(promise|fantasy)|lời\s*hứa|đọc\s+để|reader\s+đọc)/i.test(storyEngine),
       strict,
       issues,
       'reader_promise_missing',
       'setup must state a concrete reader promise, not just lore',
     );
     requireIfMissing(
-      /(core\s*loop|vòng\s*lặp|hành\s*động.*feedback|feedback.*payoff|mỗi\s+2-3\s+chương)/i.test(storyEngine),
+      /(core\s*loop|pleasure\s*loop|vòng\s*lặp|hành\s*động.*feedback|feedback.*payoff|mỗi\s+2-3\s+chương)/i.test(storyEngine),
       strict,
       issues,
       'core_loop_missing',
@@ -218,6 +277,8 @@ export function validateSetupCanon(input: SetupGateInput): SetupGateResult {
       'setup must define how the same premise stays fresh across long-form arcs',
     );
   }
+
+  validateSetupKernel(setupKernel, strict, issues);
 
   const phase1 = getSection(world, /PHASE\s*1\s*\([^)]*\)\s*:/i);
   const phase1Text = `${phase1} ${story?.mainConflict || ''}`;

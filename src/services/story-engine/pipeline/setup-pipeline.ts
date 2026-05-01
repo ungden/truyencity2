@@ -14,8 +14,8 @@
  * NO FALLBACK to defaults. Stage MUST succeed to advance.
  *
  * Stages:
- *   idea          → premise + theme + concept (prerequisite for world)
- *   world         → world_description với 9-section blueprint
+ *   idea          → premise + StoryKernel (prerequisite for world)
+ *   world         → world_description với StoryKernel summary + blueprint
  *   character     → main_character + cast roster (uses world for grounding)
  *   description   → novels.description blurb 3-paragraph 250-400 chữ
  *   master_outline → 8-12 arcs × 6-axis
@@ -43,7 +43,8 @@ import { getDopaminePatternsByGenre, GENRE_ANTI_CLICHE, GENRE_TITLE_EXAMPLES } f
 import { generateMasterOutline } from '../plan/master-outline';
 import { generateStoryOutline } from '../plan/story-outline';
 import { generateArcPlan } from '../context/generators';
-import { DEFAULT_CONFIG, type GeminiConfig, type GenreType } from '../types';
+import { DEFAULT_CONFIG, type GeminiConfig, type GenreType, type StoryKernel } from '../types';
+import { formatAuthorPatternDnaForSetup } from '../templates/author-pattern-dna';
 import {
   assertSetupGate,
   extractMainCharacterNameFromWorld,
@@ -113,10 +114,7 @@ export interface IdeaPayload {
   premise: string;
   themes: string[];
   mainConflict: string;
-  readerPromise?: string;
-  coreLoop?: string;
-  systemFantasy?: string;
-  phase1Playground?: string;
+  setupKernel: StoryKernel;
   /** Phase 29: tension axis name picked from playbook (optional, AI returns) */
   tensionAxis?: string;
 }
@@ -164,6 +162,38 @@ function getNovel(p: ProjectStageRow): { id: string; title: string } | null {
   return Array.isArray(p.novels) ? p.novels[0] : p.novels;
 }
 
+function getSetupKernelFromOutline(storyOutline: unknown): StoryKernel | undefined {
+  if (!storyOutline || typeof storyOutline !== 'object') return undefined;
+  const outline = storyOutline as { setupKernel?: StoryKernel; __stage_idea?: { setupKernel?: StoryKernel } };
+  return outline.setupKernel || outline.__stage_idea?.setupKernel;
+}
+
+function validateStoryKernel(kernel: StoryKernel | undefined): string | null {
+  if (!kernel || typeof kernel !== 'object') return 'setupKernel missing';
+  if (!kernel.readerFantasy || kernel.readerFantasy.length < 30) return 'setupKernel.readerFantasy too short';
+  if (!kernel.protagonistEngine || kernel.protagonistEngine.length < 30) return 'setupKernel.protagonistEngine too short';
+  if (!Array.isArray(kernel.pleasureLoop) || kernel.pleasureLoop.length < 4 || kernel.pleasureLoop.length > 6) {
+    return 'setupKernel.pleasureLoop must have 4-6 beats';
+  }
+  if (!kernel.systemMechanic?.input || !kernel.systemMechanic?.output || !kernel.systemMechanic?.limit || !kernel.systemMechanic?.reward) {
+    return 'setupKernel.systemMechanic must define input/output/limit/reward';
+  }
+  if (!kernel.phase1Playground?.locations?.length || !kernel.phase1Playground?.cast?.length || !kernel.phase1Playground?.repeatableSceneTypes?.length) {
+    return 'setupKernel.phase1Playground incomplete';
+  }
+  if (!kernel.socialReactor?.witnesses?.length || !kernel.socialReactor?.reactionModes?.length || !kernel.socialReactor?.reportBackCadence) {
+    return 'setupKernel.socialReactor incomplete';
+  }
+  if (!Array.isArray(kernel.noveltyLadder) || kernel.noveltyLadder.length < 3) return 'setupKernel.noveltyLadder too short';
+  if (!kernel.controlRules?.payoffCadence || !kernel.controlRules?.attentionGradient) return 'setupKernel.controlRules incomplete';
+  if (!Array.isArray(kernel.patternCards) || kernel.patternCards.length < 3) return 'setupKernel.patternCards must pick at least 3 DNA cards';
+  return null;
+}
+
+function formatStoryKernelForPrompt(kernel: StoryKernel): string {
+  return JSON.stringify(kernel, null, 2);
+}
+
 // ── Stage 1: IDEA ──────────────────────────────────────────────────────────
 async function runStageIdea(p: ProjectStageRow): Promise<{ success: boolean; error?: string }> {
   const novel = getNovel(p);
@@ -174,6 +204,7 @@ async function runStageIdea(p: ProjectStageRow): Promise<{ success: boolean; err
   const playbookSection = formatPlaybookForIdeaStage(genre);
   const dopamine = getDopaminePatternsByGenre(genre).slice(0, 5).map(p => p.name).join(', ');
   const antiCliche = (GENRE_ANTI_CLICHE[genre] || []).slice(0, 6).map(c => `- ${c}`).join('\n');
+  const patternDna = formatAuthorPatternDnaForSetup();
 
   const prompt = `Tạo IDEA gốc cho tiểu thuyết.
 
@@ -181,6 +212,9 @@ Tên truyện: "${novel.title}"
 Thể loại: ${genre}
 
 ${playbookSection}
+
+PATTERN DNA CARDS (chọn 4-6 card phối vào setupKernel.patternCards, không mô phỏng tác giả cụ thể):
+${patternDna}
 
 DOPAMINE PATTERNS phải hứa hẹn (premise nên ám chỉ ≥3): ${dopamine}
 
@@ -190,10 +224,42 @@ ${antiCliche || '- (không có ban list cho genre này)'}
 Trả về JSON:
 {
   "premise": "<2-3 câu hook GROWTH-driven: bối cảnh + golden finger CỤ THỂ + opportunity opening; rõ ràng ám chỉ 1 tension axis từ playbook>",
-  "readerPromise": "<1 câu: reader đọc truyện này để được hưởng cảm giác gì lặp lại qua 100 chương đầu>",
-  "coreLoop": "<vòng lặp 4 bước sinh dopamine mỗi 2-3 chương: hành động → feedback → nâng cấp → payoff>",
-  "systemFantasy": "<hệ thống/năng lực cụ thể thỏa mãn fantasy gì, output ra sao, vì sao reader muốn xem nó vận hành>",
-  "phase1Playground": "<sân chơi local ch.1-100: địa điểm, người, nguồn tài nguyên, kiểu scene lặp được>",
+  "setupKernel": {
+    "readerFantasy": "<cảm giác sướng chính reader nhận được, cụ thể theo genre/title>",
+    "protagonistEngine": "<MC thắng bằng lợi thế gì, tính cách gì, kiểu hành động gì>",
+    "pleasureLoop": ["<beat 1>", "<beat 2>", "<beat 3>", "<beat 4>"],
+    "systemMechanic": {
+      "name": "<tên hệ thống/năng lực/golden finger>",
+      "input": "<MC phải đưa gì/làm gì để kích hoạt>",
+      "output": "<nó trả về insight/tool/resource gì>",
+      "limit": "<giới hạn/cost/cooldown/chống omnipotent>",
+      "reward": "<payoff reader thấy được mỗi 1-3 chương>"
+    },
+    "phase1Playground": {
+      "locations": ["<địa điểm local 1>", "<địa điểm local 2>"],
+      "cast": ["<người chứng kiến/phản ứng 1>", "<người chứng kiến/phản ứng 2>"],
+      "resources": ["<tài nguyên local 1>", "<tài nguyên local 2>"],
+      "localAntagonists": ["<đối thủ/cản trở local>"],
+      "repeatableSceneTypes": ["<scene type 1>", "<scene type 2>", "<scene type 3>"]
+    },
+    "socialReactor": {
+      "witnesses": ["<ai thấy MC làm được việc>", "<ai lan tin>"],
+      "reactionModes": ["<khen/đặt hàng/rank/comment/report>", "<phản ứng thứ 2>"],
+      "reportBackCadence": "<mỗi mấy chương thành quả quay lại thành công nhận/cơ hội>"
+    },
+    "noveltyLadder": [
+      {"chapterRange": "1-20", "newToy": "<món/tool/case/map đầu>", "keepsSameLane": "<vì sao vẫn đúng promise>"},
+      {"chapterRange": "21-50", "newToy": "<mở rộng kế>", "keepsSameLane": "<vì sao vẫn đúng promise>"},
+      {"chapterRange": "51-100", "newToy": "<mở rộng cuối Phase 1>", "keepsSameLane": "<vì sao vẫn đúng promise>"}
+    ],
+    "controlRules": {
+      "payoffCadence": "<payoff nhỏ mỗi 1-3 chương, payoff lớn mỗi sub-arc>",
+      "attentionGradient": "<ai chú ý trước/sau theo tầng scale>",
+      "openThreadsPerArc": 2,
+      "closeThreadsPerArc": 1
+    },
+    "patternCards": ["smooth_opportunity", "casual_competence", "audience_reaction", "resource_unlock"]
+  },
   "themes": ["<theme 1>","<theme 2>","<theme 3>","<theme 4>"],
   "mainConflict": "<1-2 câu — actor Phase 1 LOCAL + stake cá nhân — proactive framing — link với tension axis đã chọn>",
   "tensionAxis": "<tên 1 axis từ list trên>"
@@ -206,7 +272,7 @@ Trả về JSON:
       // burns reasoning_content tokens before emitting structured `content` — 1024 was
       // truncating the JSON output for half the genres.
       model: 'deepseek-v4-flash', temperature: 0.85, maxTokens: 3072,
-      systemPrompt: SANG_VAN_DNA + '\n\n[ROLE-SPECIFIC] Stage: IDEA. Output premise + themes + mainConflict cho tiểu thuyết. premise GROWTH-driven. mainConflict actor LOCAL Phase 1. Cosmic-tier antagonist deferred Phase 3+.',
+      systemPrompt: SANG_VAN_DNA + '\n\n[ROLE-SPECIFIC] Stage: IDEA. Sinh StoryKernel trung tâm cho tiểu thuyết. Không nhồi ban-list; thiết kế reader fantasy + pleasure loop + system mechanic + phase1 playground đủ đẻ 100 chương đầu.',
     }, { jsonMode: true, tracking: { projectId: p.id, task: 'stage_idea' } });
 
     const parsed = parseJSON<IdeaPayload>(res.content);
@@ -221,18 +287,8 @@ Trả về JSON:
     if (!parsed.mainConflict || parsed.mainConflict.length < 20) {
       return { success: false, error: 'idea mainConflict missing/too short' };
     }
-    if (!parsed.readerPromise || parsed.readerPromise.length < 40) {
-      return { success: false, error: 'idea readerPromise missing/too short' };
-    }
-    if (!parsed.coreLoop || parsed.coreLoop.length < 40) {
-      return { success: false, error: 'idea coreLoop missing/too short' };
-    }
-    if (!parsed.systemFantasy || parsed.systemFantasy.length < 40) {
-      return { success: false, error: 'idea systemFantasy missing/too short' };
-    }
-    if (!parsed.phase1Playground || parsed.phase1Playground.length < 40) {
-      return { success: false, error: 'idea phase1Playground missing/too short' };
-    }
+    const kernelIssue = validateStoryKernel(parsed.setupKernel);
+    if (kernelIssue) return { success: false, error: `idea ${kernelIssue}` };
 
     // Fix 2: cosmic-threat validator. Reject premises that encode tự ngược pattern.
     // User feedback 2026-05-01: every novel had "thế lực thần bí vùi dập từ đầu".
@@ -267,7 +323,7 @@ Trả về JSON:
 
     // Stash idea into world_description as a marker until world stage runs
     // OR persist to a temp column. Use story_outline JSON briefly.
-    const tempStash = { __stage_idea: parsed };
+    const tempStash = { __stage_idea: parsed, setupKernel: parsed.setupKernel };
     await getSupabase().from('ai_story_projects').update({
       story_outline: tempStash as unknown as Record<string, unknown>,
     }).eq('id', p.id);
@@ -284,6 +340,9 @@ async function runStageWorld(p: ProjectStageRow): Promise<{ success: boolean; er
   const genre = (p.genre || 'tien-hiep') as GenreType;
   const idea = (p.story_outline as { __stage_idea?: IdeaPayload } | null)?.__stage_idea;
   if (!idea) return { success: false, error: 'idea stage output missing — re-run idea' };
+  const setupKernel = idea.setupKernel || getSetupKernelFromOutline(p.story_outline);
+  const kernelIssue = validateStoryKernel(setupKernel);
+  if (kernelIssue) return { success: false, error: `world preflight ${kernelIssue}` };
 
   const blueprintInstructions = buildSeedBlueprintInstructions(genre);
   // Phase 29: thread playbook hooks (mandatory ≥3 hooks must appear)
@@ -294,24 +353,23 @@ async function runStageWorld(p: ProjectStageRow): Promise<{ success: boolean; er
 Tên truyện: "${novel.title}"
 Thể loại: ${genre}
 Premise: ${idea.premise}
-ReaderPromise: ${idea.readerPromise || ''}
-CoreLoop: ${idea.coreLoop || ''}
-SystemFantasy: ${idea.systemFantasy || ''}
-Phase1Playground: ${idea.phase1Playground || ''}
 Themes: ${idea.themes.join(', ')}
 MainConflict: ${idea.mainConflict}
 ${idea.tensionAxis ? `TensionAxis: ${idea.tensionAxis}` : ''}
+
+STORY KERNEL (CANON, KHÔNG REWRITE ENGINE — chỉ expand thành world):
+${formatStoryKernelForPrompt(setupKernel!)}
 
 ${playbookSection}
 
 ${blueprintInstructions}
 
-Trả về JSON: {"worldDescription":"<800-1500 từ tuân blueprint 9-section, BẮT BUỘC inject ≥3 worldbuilding hooks từ playbook>"}`;
+Trả về JSON: {"worldDescription":"<800-1500 từ tuân blueprint 10-section, mở đầu BẮT BUỘC bằng ### STORY KERNEL SUMMARY, BẮT BUỘC inject ≥3 worldbuilding hooks từ playbook>"}`;
 
   try {
     const res = await callGemini(prompt, {
       model: 'deepseek-v4-flash', temperature: 0.8, maxTokens: 8192,
-      systemPrompt: SANG_VAN_DNA + '\n\n[ROLE-SPECIFIC] Stage: WORLD. Build world_description theo 9-section blueprint. World ngây thơ về MC, antagonist Phase 1 LOCAL only.',
+      systemPrompt: SANG_VAN_DNA + '\n\n[ROLE-SPECIFIC] Stage: WORLD. Build world_description theo StoryKernel + 10-section blueprint. Section đầu là ### STORY KERNEL SUMMARY. World ngây thơ về MC, antagonist Phase 1 LOCAL only.',
     }, { jsonMode: true, tracking: { projectId: p.id, task: 'stage_world' } });
 
     const parsed = parseJSON<{ worldDescription?: string }>(res.content);
@@ -323,7 +381,7 @@ Trả về JSON: {"worldDescription":"<800-1500 từ tuân blueprint 9-section, 
     if (!validation.passed) {
       return { success: false, error: `world blueprint score ${validation.score}/100 — issues: ${validation.issues.slice(0, 3).join('; ')}` };
     }
-    const semantic = validateSetupCanon({ worldDescription: wd, strictContract: true });
+    const semantic = validateSetupCanon({ worldDescription: wd, setupKernel, strictContract: true });
     if (!semantic.passed) {
       return { success: false, error: `world semantic gate failed: ${formatSetupGateIssues(semantic)}` };
     }
@@ -355,6 +413,9 @@ async function runStageCharacter(p: ProjectStageRow): Promise<{ success: boolean
   if (wd.length < 500) return { success: false, error: 'world stage incomplete — cannot derive character' };
   const worldMc = extractMainCharacterNameFromWorld(wd);
   if (!worldMc) return { success: false, error: 'world protagonist name missing — cannot lock canon MC' };
+  const setupKernel = getSetupKernelFromOutline(p.story_outline);
+  const kernelIssue = validateStoryKernel(setupKernel);
+  if (kernelIssue) return { success: false, error: `character preflight ${kernelIssue}` };
 
   // Phase 29: thread MC archetype menu — AI picks 1 instead of generic
   const playbookSection = formatPlaybookForCharacterStage(genre);
@@ -364,6 +425,9 @@ async function runStageCharacter(p: ProjectStageRow): Promise<{ success: boolean
 Tên truyện: "${novel.title}"
 Thể loại: ${genre}
 MC CANON (KHÔNG ĐỔI TÊN): ${worldMc}
+
+STORY KERNEL (CANON — voice/archetype phải phục vụ engine này):
+${formatStoryKernelForPrompt(setupKernel!)}
 
 ${playbookSection}
 
@@ -435,7 +499,8 @@ async function runStageDescription(p: ProjectStageRow): Promise<{ success: boole
   const wd = (p.world_description || '').trim();
   const mc = (p.main_character || '').trim();
   if (wd.length < 500 || mc.length < 2) return { success: false, error: 'world/character incomplete' };
-  const semantic = validateSetupCanon({ worldDescription: wd, mainCharacter: mc });
+  const setupKernel = getSetupKernelFromOutline(p.story_outline);
+  const semantic = validateSetupCanon({ worldDescription: wd, mainCharacter: mc, setupKernel });
   if (!semantic.passed) {
     return { success: false, error: `description preflight gate failed: ${formatSetupGateIssues(semantic)}` };
   }
@@ -490,13 +555,10 @@ QUY TẮC:
     const paragraphs = desc.split(/\n\n+/).filter(p => p.trim().length > 0);
     if (paragraphs.length < 3) return { success: false, error: `description has ${paragraphs.length} paragraphs (need 3)` };
 
-    // Phase 29 v4 CRITICAL FIX: clear story_outline temp stash so the next stage
-    // (init-prep regen path) sees story_outline as NULL and properly calls
-    // generateStoryOutline. Previously the temp stash from runStageIdea/Character
-    // (`{__stage_idea, __stage_character}`) blocked the route's `!story_outline`
-    // check, leaving setup stuck at master_outline forever even when AI calls ran.
+    // Preserve StoryKernel while clearing temporary stage stash. The kernel is
+    // now the one setup artifact downstream stages must expand, not rewrite.
     await getSupabase().from('ai_story_projects').update({
-      story_outline: null,
+      story_outline: setupKernel ? { setupKernel } as unknown as Record<string, unknown> : null,
     }).eq('id', p.id);
     await getSupabase().from('novels').update({ description: desc }).eq('id', novel.id);
     return { success: true };
@@ -520,9 +582,10 @@ async function runStageMasterOutline(p: ProjectStageRow): Promise<{ success: boo
   const genre = (p.genre || 'tien-hiep') as GenreType;
   const wd = (p.world_description || '').trim();
   const mc = (p.main_character || '').trim();
+  const setupKernel = getSetupKernelFromOutline(p.story_outline);
 
   try {
-    assertSetupGate({ worldDescription: wd, mainCharacter: mc });
+    assertSetupGate({ worldDescription: wd, mainCharacter: mc, setupKernel, strictContract: true });
     const outline = await generateMasterOutline(
       p.id,
       novel.title,
@@ -547,9 +610,10 @@ async function runStageStoryOutline(p: ProjectStageRow): Promise<{ success: bool
   const genre = (p.genre || 'tien-hiep') as GenreType;
   const wd = (p.world_description || '').trim();
   const mc = (p.main_character || '').trim();
+  const setupKernel = getSetupKernelFromOutline(p.story_outline);
 
   try {
-    assertSetupGate({ worldDescription: wd, mainCharacter: mc, masterOutline: p.master_outline, requireMasterOutline: true });
+    assertSetupGate({ worldDescription: wd, mainCharacter: mc, setupKernel, masterOutline: p.master_outline, requireMasterOutline: true, strictContract: true });
     const outline = await generateStoryOutline(
       p.id,
       novel.title,
@@ -558,16 +622,20 @@ async function runStageStoryOutline(p: ProjectStageRow): Promise<{ success: bool
       wd,
       p.total_planned_chapters || 1000,
       { ...stageConfig(), model: 'deepseek-v4-flash' },
+      setupKernel,
     );
     if (!outline) return { success: false, error: 'story_outline generation returned null' };
+    const outlineWithKernel = { ...outline, setupKernel };
 
     const semantic = validateSetupCanon({
       worldDescription: wd,
       mainCharacter: mc,
-      storyOutline: outline,
+      storyOutline: outlineWithKernel,
+      setupKernel,
       masterOutline: p.master_outline,
       requireMasterOutline: true,
       requireStoryOutline: true,
+      strictContract: true,
     });
     if (!semantic.passed) {
       return { success: false, error: `story_outline gate failed: ${formatSetupGateIssues(semantic)}` };
@@ -575,7 +643,7 @@ async function runStageStoryOutline(p: ProjectStageRow): Promise<{ success: bool
 
     await getSupabase()
       .from('ai_story_projects')
-      .update({ story_outline: outline as unknown as Record<string, unknown> })
+      .update({ story_outline: outlineWithKernel as unknown as Record<string, unknown> })
       .eq('id', p.id);
     return { success: true };
   } catch (e) {
@@ -588,15 +656,18 @@ async function runStageArcPlan(p: ProjectStageRow): Promise<{ success: boolean; 
   const genre = (p.genre || 'tien-hiep') as GenreType;
   const wd = (p.world_description || '').trim();
   const mc = (p.main_character || '').trim();
+  const setupKernel = getSetupKernelFromOutline(p.story_outline);
 
   try {
     assertSetupGate({
       worldDescription: wd,
       mainCharacter: mc,
       storyOutline: p.story_outline,
+      setupKernel,
       masterOutline: p.master_outline,
       requireStoryOutline: true,
       requireMasterOutline: true,
+      strictContract: true,
     });
 
     const outline = p.story_outline as {
@@ -605,6 +676,7 @@ async function runStageArcPlan(p: ProjectStageRow): Promise<{ success: boolean; 
       endingVision?: string;
       protagonist?: { name?: string; startingState?: string; endGoal?: string };
       majorPlotPoints?: Array<{ name?: string; description?: string } | string>;
+      setupKernel?: StoryKernel;
     } | null;
     const outlineSynopsis = outline ? [
       outline.premise ? `Premise: ${outline.premise}` : '',
@@ -620,6 +692,7 @@ async function runStageArcPlan(p: ProjectStageRow): Promise<{ success: boolean; 
       majorPlotPoints: outline.majorPlotPoints
         ?.map(p => typeof p === 'string' ? p : p.description || p.name || JSON.stringify(p))
         ?.slice(0, 6),
+      setupKernel,
     } : undefined;
 
     await generateArcPlan(

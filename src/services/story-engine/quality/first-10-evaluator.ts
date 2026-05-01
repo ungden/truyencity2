@@ -35,7 +35,7 @@ import { callGemini } from '../utils/gemini';
 import { parseJSON } from '../utils/json-repair';
 import { getSupabase } from '../utils/supabase';
 import { getGenreContractForCritic } from '../templates/genre-process-blueprints';
-import type { GeminiConfig, GenreType } from '../types';
+import type { GeminiConfig, GenreType, StoryKernel } from '../types';
 
 const EVAL_AT_CHAPTER = 10;
 const PER_CHAPTER_DIGEST_CHARS = 4000;
@@ -101,6 +101,27 @@ export async function runFirst10Evaluation(
     return null;
   }
 
+  const { data: projectRow } = await db
+    .from('ai_story_projects')
+    .select('story_outline')
+    .eq('id', projectId)
+    .maybeSingle();
+  const setupKernel = projectRow?.story_outline && typeof projectRow.story_outline === 'object'
+    ? (projectRow.story_outline as { setupKernel?: StoryKernel }).setupKernel
+    : undefined;
+  const kernelBlock = setupKernel ? `[STORY KERNEL — CH.1-10 PHẢI CHỨNG MINH MÁY TRUYỆN NÀY]
+Reader fantasy: ${setupKernel.readerFantasy}
+Protagonist engine: ${setupKernel.protagonistEngine}
+Pleasure loop: ${setupKernel.pleasureLoop?.join(' → ')}
+System: ${setupKernel.systemMechanic?.name} | input ${setupKernel.systemMechanic?.input} | output ${setupKernel.systemMechanic?.output} | limit ${setupKernel.systemMechanic?.limit} | reward ${setupKernel.systemMechanic?.reward}
+Social reactor: ${setupKernel.socialReactor?.witnesses?.join(', ')} | ${setupKernel.socialReactor?.reactionModes?.join(', ')}
+Novelty ladder: ${setupKernel.noveltyLadder?.map(n => `${n.chapterRange}: ${n.newToy}`).join(' / ')}
+Control: ${setupKernel.controlRules?.payoffCadence}; ${setupKernel.controlRules?.attentionGradient}
+
+Đánh giá thêm: reader fantasy có hiện không, pleasureLoop có được demo trước ch.3 không, social reactor có hoạt động trước ch.10 không, novelty có seed mà không drift không.
+
+` : '';
+
   const digest = chapters
     .map(c => `--- CHƯƠNG ${c.chapter_number}: ${c.title} ---\n${(c.content || '').slice(0, PER_CHAPTER_DIGEST_CHARS)}`)
     .join('\n\n');
@@ -110,6 +131,7 @@ export async function runFirst10Evaluation(
   const prompt = `Bạn là biên tập viên web-novel hàng đầu. Đánh giá 10 CHƯƠNG ĐẦU của một truyện ${genre} theo 5 dimension cốt lõi quyết định truyện có giữ chân được reader hay không.
 ${genreContract}
 NHÂN VẬT CHÍNH: ${protagonistName}
+${kernelBlock}
 
 10 CHƯƠNG ĐẦU (mỗi chương cắt đầu ${PER_CHAPTER_DIGEST_CHARS} chars):
 ${digest}

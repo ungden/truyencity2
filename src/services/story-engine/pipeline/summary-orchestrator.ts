@@ -213,13 +213,14 @@ async function tryGenerateArcPlan(
     if (!existing) {
       // Generate arc plan if it doesn't exist yet
       // Extract StoryVision from story_outline for directional coherence
-      let storyVision: { endingVision?: string; majorPlotPoints?: string[]; mainConflict?: string; endGoal?: string } | undefined;
+      let storyVision: { endingVision?: string; majorPlotPoints?: string[]; mainConflict?: string; endGoal?: string; setupKernel?: any } | undefined;
       const outline = projectRow?.story_outline;
       if (outline && typeof outline === 'object') {
         storyVision = {
           endingVision: outline.endingVision,
           mainConflict: outline.mainConflict,
           endGoal: outline.protagonist?.endGoal,
+          setupKernel: outline.setupKernel,
           majorPlotPoints: outline.majorPlotPoints
             ?.map((p: any) => typeof p === 'string' ? p : p.description || p.name || JSON.stringify(p))
             ?.slice(0, 6),
@@ -441,4 +442,3 @@ export function shouldBeFinaleArc(
 
   return false;
 }
-

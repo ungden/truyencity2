@@ -33,7 +33,7 @@ import { getArchitectVoiceHint } from '../templates/genre-voice-anchors';
 import { getGenreArchitectGuide } from '../templates/genre-process-blueprints';
 
 import type {
-  ContextPayload, ChapterSummary, GenreType, GeminiConfig,
+  ContextPayload, ChapterSummary, GenreType, GeminiConfig, StoryKernel,
 } from '../types';
 
 // ── AI Response Interfaces ───────────────────────────────────────────────────
@@ -52,6 +52,34 @@ interface CombinedAIResponse {
     personality_quirks: string | null;
     notes: string | null;
   }>;
+}
+
+function formatStoryKernelContext(kernel: StoryKernel): string {
+  const parts: string[] = ['[STORY KERNEL — MÁY TRUYỆN PHẢI PHỤC VỤ]'];
+  parts.push(`Reader fantasy: ${kernel.readerFantasy}`);
+  parts.push(`Protagonist engine: ${kernel.protagonistEngine}`);
+  if (kernel.pleasureLoop?.length) parts.push(`Pleasure loop: ${kernel.pleasureLoop.join(' → ')}`);
+  if (kernel.systemMechanic) {
+    parts.push(`System mechanic: ${kernel.systemMechanic.name} | input: ${kernel.systemMechanic.input} | output: ${kernel.systemMechanic.output} | limit: ${kernel.systemMechanic.limit} | reward: ${kernel.systemMechanic.reward}`);
+  }
+  if (kernel.phase1Playground) {
+    parts.push(`Phase 1 playground: ${[
+      kernel.phase1Playground.locations?.join(', '),
+      kernel.phase1Playground.cast?.join(', '),
+      kernel.phase1Playground.repeatableSceneTypes?.join(', '),
+    ].filter(Boolean).join(' | ')}`);
+  }
+  if (kernel.socialReactor) {
+    parts.push(`Social reactor: ${kernel.socialReactor.witnesses?.join(', ')} | reactions: ${kernel.socialReactor.reactionModes?.join(', ')} | cadence: ${kernel.socialReactor.reportBackCadence}`);
+  }
+  if (kernel.noveltyLadder?.length) {
+    parts.push(`Novelty ladder: ${kernel.noveltyLadder.map(n => `${n.chapterRange}: ${n.newToy}`).join(' / ')}`);
+  }
+  if (kernel.controlRules) {
+    parts.push(`Control rules: payoff ${kernel.controlRules.payoffCadence}; attention ${kernel.controlRules.attentionGradient}; open ${kernel.controlRules.openThreadsPerArc}/arc, close ${kernel.controlRules.closeThreadsPerArc}/arc.`);
+  }
+  parts.push('→ Chapter này phải phục vụ pleasureLoop + noveltyLadder + controlRules; mở rộng scene nhưng không đổi engine.');
+  return parts.join('\n');
 }
 
 interface SynopsisAIResponse {
@@ -296,6 +324,9 @@ export async function loadContext(
     ? (typeof rawMasterOutline === 'string' ? rawMasterOutline : JSON.stringify(rawMasterOutline))
     : undefined;
   const storyOutline = masterOutlineResult?.data?.story_outline;
+  const setupKernel = storyOutline && typeof storyOutline === 'object'
+    ? (storyOutline as { setupKernel?: StoryKernel }).setupKernel
+    : undefined;
   // Layer -1: world_description — canonical premise source (hand-crafted at spawn).
   // CRITICAL: even if story_outline schema is wrong/incomplete, this guarantees Architect sees
   // the actual premise (golden finger, antagonists, setting). Was missing pre-Phase-21 fix.
@@ -474,6 +505,7 @@ export async function loadContext(
       return getRollingBriefsContext(projectId, chapterNumber).catch(() => null);
     })() || undefined,
     storyOutline: storyOutline || undefined,
+    setupKernel,
     worldDescription: worldDescription || undefined,
     // Modern narrative metadata (migration 0149)
     subGenres: validateSubGenreKeys((projectMeta?.sub_genres || []) as string[], projectId),
@@ -487,6 +519,10 @@ export async function loadContext(
 
 export function assembleContext(payload: ContextPayload, chapterNumber: number): string {
   const parts: string[] = [];
+
+  if (payload.setupKernel) {
+    parts.push(formatStoryKernelContext(payload.setupKernel));
+  }
 
   // Layer -1: WORLD DESCRIPTION (canonical premise — HIGHEST PRIORITY)
   // Hand-crafted at spawn time, contains golden finger rules, antagonist details, setting,
@@ -876,4 +912,3 @@ export {
   generateStoryBible,
 } from "./generators";
 export type { CombinedSummaryAndCharacters } from "./generators";
-

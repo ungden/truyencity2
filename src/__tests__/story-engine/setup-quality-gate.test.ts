@@ -20,12 +20,15 @@ function makeWorld(overrides: Partial<Record<'name' | 'opening' | 'phase1' | 'go
     `Chi tiết vận hành ${i + 1}: khu chợ có nhịp khách rõ ràng, người bán nhớ mặt nhau, mỗi quyết định của ${name} đều tạo phản hồi nhỏ trong phạm vi một con phố.`
   ).join(' ');
 
-  return `### STORY ENGINE
-- Reader Promise: reader đọc để xem ${name} biến một quầy bánh nhỏ thành thương hiệu tử tế bằng món ngon, dữ kiện khách quen và các payoff kinh doanh hữu hình.
-- Core Loop: ${name} phục vụ khách thật → nhận feedback từ Sổ Tay Cơ Hội → tối ưu món hoặc quy trình → thấy doanh thu/công nhận tăng ngay trong vài chương.
+  return `### STORY KERNEL SUMMARY
+- Reader Fantasy: reader đọc để xem ${name} biến một quầy bánh nhỏ thành thương hiệu tử tế bằng món ngon, dữ kiện khách quen và các payoff kinh doanh hữu hình.
+- Protagonist Engine: ${name} thắng bằng tay nghề phụ bếp, trí nhớ khách quen và thói quen thử/sai/sửa rất nhanh.
+- Pleasure Loop: ${name} phục vụ khách thật → nhận feedback từ Sổ Tay Cơ Hội → tối ưu món hoặc quy trình → khách/chợ phản ứng → thấy doanh thu/công nhận tăng ngay trong vài chương.
+- System Mechanic: input là giao dịch thật, output là dữ kiện nhu cầu, limit ba giao dịch/ngày, reward là insight tăng doanh thu.
 - Phase 1 Playground: quầy bánh trước chợ Bình Minh, phòng kế toán tòa Lạc Việt, bãi xe của chú Tâm, nguồn hàng thịt nguội của anh Dũng.
-- Dopamine Cadence: mỗi 2-3 chương có một đơn hàng, một món được tối ưu, một khách quen công nhận, hoặc một chỉ số doanh thu tăng.
-- Novelty Plan: mỗi 20 chương mở thêm khách mới, khung giờ mới, món mới, đối thủ cùng phố, hoặc một vấn đề vận hành mới.
+- Social Reactor: khách quen, cô Hòa và phòng kế toán chứng kiến, kể lại, đặt thêm đơn và kéo người mới tới quầy.
+- Novelty Ladder: mỗi 20 chương mở thêm khách mới, khung giờ mới, món mới, đối thủ cùng phố, hoặc một vấn đề vận hành mới.
+- Control Rules: payoff nhỏ mỗi 1-3 chương, chú ý tăng từ khách quen tới cả phố, mỗi arc mở tối đa 2 thread và đóng ít nhất 1 thread.
 
 ### BỐI CẢNH
 Năm 2026, phố Bình Minh nằm giữa khu văn phòng và chợ dân sinh của Phượng Đô. ${name} thuê một quầy bánh mì tám mét vuông, mở cửa từ sáng sớm đến đầu giờ chiều, cạnh tiệm trà đá của cô Hòa và bãi gửi xe của chú Tâm. ${filler}
@@ -91,6 +94,51 @@ const storyOutline = {
   conflictLadder: [{ phase: 1, chapterRange: '1-100', scale: 'local' }],
 };
 
+const setupKernel = {
+  readerFantasy: 'Reader xem một quầy bánh nhỏ tăng trưởng bằng tay nghề, dữ kiện khách quen và các payoff kinh doanh thấy ngay.',
+  protagonistEngine: 'Nguyễn An Bình thắng bằng kinh nghiệm phụ bếp, quan sát khẩu vị và thói quen thử/sai/sửa trong cùng một ngày.',
+  pleasureLoop: [
+    'phục vụ khách thật',
+    'ghi nhận feedback vào sổ tay',
+    'nhận insight nhỏ về món/quy trình',
+    'tối ưu ngay ở quầy',
+    'khách/chợ phản ứng bằng đơn hàng hoặc lời giới thiệu',
+  ],
+  systemMechanic: {
+    name: 'Sổ Tay Cơ Hội Phố Cũ',
+    input: 'một giao dịch thật và ghi chú kết quả của An Bình',
+    output: 'ba dữ kiện nhỏ về nhu cầu khách, biên lợi nhuận và lỗi vận hành',
+    limit: 'mỗi ngày tối đa ba giao dịch, sai nếu An Bình không trực tiếp phục vụ',
+    reward: 'insight giúp tăng doanh thu/công nhận trong 1-3 chương',
+  },
+  phase1Playground: {
+    locations: ['quầy bánh chợ Bình Minh', 'phòng kế toán tòa Lạc Việt', 'bãi xe chú Tâm'],
+    cast: ['Lê Hoài Thu', 'Cô Hòa', 'Trần Minh Khánh'],
+    resources: ['nguồn thịt nguội sạch', 'khách văn phòng', 'khung giờ sáng'],
+    localAntagonists: ['Bánh Mì Nóng 24h'],
+    repeatableSceneTypes: ['test món mới', 'giao đơn văn phòng', 'khách quen report-back'],
+  },
+  socialReactor: {
+    witnesses: ['khách quen', 'cô Hòa', 'phòng kế toán'],
+    reactionModes: ['đặt thêm đơn', 'kể trong chợ', 'giới thiệu khách mới'],
+    reportBackCadence: 'mỗi 2-3 chương có phản ứng quay lại thành cơ hội mới',
+  },
+  noveltyLadder: [
+    { chapterRange: '1-20', newToy: 'đơn phòng kế toán', keepsSameLane: 'vẫn là F&B local' },
+    { chapterRange: '21-50', newToy: 'món ăn sáng mới', keepsSameLane: 'vẫn tối ưu món/quy trình' },
+    { chapterRange: '51-100', newToy: 'thuê phụ bếp và chống tăng giá thuê', keepsSameLane: 'vẫn mở rộng quầy nhỏ' },
+  ],
+  controlRules: {
+    payoffCadence: 'payoff nhỏ mỗi 1-3 chương, payoff lớn cuối sub-arc',
+    attentionGradient: 'khách quen trước, cả phố sau, ngành F&B muộn hơn',
+    openThreadsPerArc: 2,
+    closeThreadsPerArc: 1,
+  },
+  patternCards: ['smooth_opportunity', 'casual_competence', 'audience_reaction', 'resource_unlock'],
+};
+
+const storyOutlineWithKernel = { ...storyOutline, setupKernel };
+
 describe('setup quality gate', () => {
   it('extracts canonical MC from world_description', () => {
     expect(extractMainCharacterNameFromWorld(makeWorld())).toBe('Nguyễn An Bình');
@@ -135,7 +183,7 @@ describe('setup quality gate', () => {
     const result = validateSetupCanon({
       worldDescription: makeWorld(),
       mainCharacter: 'Nguyễn An Bình',
-      storyOutline,
+      storyOutline: storyOutlineWithKernel,
       requireMasterOutline: true,
     });
     expect(result.passed).toBe(false);
@@ -146,12 +194,37 @@ describe('setup quality gate', () => {
     const result = validateSetupCanon({
       worldDescription: makeWorld(),
       mainCharacter: 'Nguyễn An Bình',
-      storyOutline,
+      storyOutline: storyOutlineWithKernel,
       masterOutline: { volumes: [{ title: 'Quầy nhỏ' }], majorArcs: [{ name: 'Mở quầy' }] },
       requireStoryOutline: true,
       requireMasterOutline: true,
       strictContract: true,
     });
     expect(result.passed).toBe(true);
+  });
+
+  it('rejects strict setup missing StoryKernel', () => {
+    const result = validateSetupCanon({
+      worldDescription: makeWorld(),
+      mainCharacter: 'Nguyễn An Bình',
+      storyOutline,
+      strictContract: true,
+    });
+    expect(result.passed).toBe(false);
+    expect(result.issues.some(i => i.code === 'setup_kernel_missing')).toBe(true);
+  });
+
+  it('rejects StoryKernel with missing pleasure loop', () => {
+    const result = validateSetupCanon({
+      worldDescription: makeWorld(),
+      mainCharacter: 'Nguyễn An Bình',
+      storyOutline: {
+        ...storyOutline,
+        setupKernel: { ...setupKernel, pleasureLoop: ['phục vụ khách'] },
+      },
+      strictContract: true,
+    });
+    expect(result.passed).toBe(false);
+    expect(result.issues.some(i => i.code === 'setup_kernel_pleasure_loop_missing')).toBe(true);
   });
 });

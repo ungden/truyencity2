@@ -81,6 +81,59 @@ export interface StyleDirectives {
   anti_seeds?: string[];
 }
 
+// ── Story Kernel (compact setup DNA) ─────────────────────────────────────────
+
+/**
+ * Central setup artifact for modern sảng văn. Stored in story_outline.setupKernel
+ * so rollout does not require a migration. Prompts may expand this artifact, but
+ * should not rewrite its engine after the idea stage.
+ */
+export interface StoryKernel {
+  /** The exact satisfaction readers come back for. */
+  readerFantasy: string;
+  /** How the MC wins: advantage + temperament + action style. */
+  protagonistEngine: string;
+  /** 4-6 repeatable beats that create payoff every 1-3 chapters. */
+  pleasureLoop: string[];
+  /** Golden finger/system as an operating model, not a magic solve button. */
+  systemMechanic: {
+    name: string;
+    input: string;
+    output: string;
+    limit: string;
+    reward: string;
+  };
+  /** Ch.1-100 local sandbox that can keep generating scenes. */
+  phase1Playground: {
+    locations: string[];
+    cast: string[];
+    resources: string[];
+    localAntagonists: string[];
+    repeatableSceneTypes: string[];
+  };
+  /** People and channels that create witness/reaction/report-back dopamine. */
+  socialReactor: {
+    witnesses: string[];
+    reactionModes: string[];
+    reportBackCadence: string;
+  };
+  /** What opens every 20-50 chapters while staying in the same genre lane. */
+  noveltyLadder: Array<{
+    chapterRange: string;
+    newToy: string;
+    keepsSameLane: string;
+  }>;
+  /** Runtime control rules for arcs and chapter briefs. */
+  controlRules: {
+    payoffCadence: string;
+    attentionGradient: string;
+    openThreadsPerArc: number;
+    closeThreadsPerArc: number;
+  };
+  /** Pattern cards selected from author-pattern-dna.ts. */
+  patternCards: string[];
+}
+
 // ── Dopamine ─────────────────────────────────────────────────────────────────
 
 export type DopamineType =
@@ -256,6 +309,9 @@ export interface ContextPayload {
    *  fallback that grounds every chapter in the actual premise. ALWAYS injected early in context. */
   worldDescription?: string;
 
+  /** StoryKernel from story_outline.setupKernel — compact machine-truyen contract. */
+  setupKernel?: StoryKernel;
+
   // Layer 0: Chapter Bridge
   previousSummary?: string;
   previousMcState?: string;
@@ -425,6 +481,7 @@ export interface StoryOutline {
   majorPlotPoints: Array<{ chapter: number; event: string; name?: string; description?: string }>;
   uniqueHooks?: string[];
   endingVision: string;
+  setupKernel?: StoryKernel;
 }
 
 export interface ArcOutline {

@@ -650,6 +650,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
         endingVision: context.storyOutline.endingVision,
         mainConflict: context.storyOutline.mainConflict,
         endGoal: context.storyOutline.protagonist?.endGoal,
+        setupKernel: context.setupKernel || context.storyOutline.setupKernel,
         majorPlotPoints: context.storyOutline.majorPlotPoints
           ?.map(p => typeof p === 'string' ? p : p.description || p.name || JSON.stringify(p))
           ?.slice(0, 6),

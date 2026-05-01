@@ -7,7 +7,7 @@
  * golden finger + 0 named cast. Architect/Writer then had to invent missing
  * pieces ad-hoc, producing the "ngây ngô" execution the user complained about.
  *
- * Solution: enforce 9-section blueprint with concrete required fields, plus
+ * Solution: enforce 10-section blueprint with concrete required fields, plus
  * per-genre addendum from genre-process-blueprints module. World descriptions
  * become 800-1500 từ structured docs that the engine can index deterministically.
  *
@@ -54,7 +54,7 @@ SẢNG VĂN SETUP CONTRACT (ưu tiên thiết kế dương, không dựa vào ba
 - Năng lực/hệ thống cần trigger, input, output, giới hạn/cost, đường nâng cấp, và loại payoff nó tạo ra mỗi vài chương.
 - Golden finger phục vụ core loop của truyện, ví dụ: phục vụ khách → nhận dữ kiện → tối ưu món → tăng doanh thu; hoặc luyện bài → mở insight → thắng bài test → unlock tài nguyên.
 
-6. STORY ENGINE
+6. STORY KERNEL SUMMARY
 - Setup phải chỉ ra truyện "đẻ chương" bằng gì: scene types lặp được, cast nào tạo phản ứng, reward cadence, novelty sau mỗi 20 chương.
 - Nếu bỏ section này, world_description dễ thành bách khoa setting nhưng không tạo được chương hay.
 
@@ -63,12 +63,15 @@ WORLD_DESCRIPTION BLUEPRINT (BẮT BUỘC — Nếu thiếu section chính, outp
 
 worldDescription PHẢI là chuỗi 800-1600 từ chia thành 10 section đánh dấu rõ ràng bằng tiêu đề viết hoa:
 
-### STORY ENGINE
-- Reader Promise: [1 câu cụ thể: reader đọc để hưởng fantasy gì, ví dụ "xem một quầy nhỏ tăng trưởng bằng món ngon + số liệu + khách quen"]
-- Core Loop: [4 bước lặp mỗi 2-3 chương: MC hành động → world feedback → hệ thống/năng lực unlock insight → payoff hữu hình]
+### STORY KERNEL SUMMARY
+- Reader Fantasy: [1 câu cụ thể: reader đọc để hưởng fantasy gì, ví dụ "xem một quầy nhỏ tăng trưởng bằng món ngon + số liệu + khách quen"]
+- Protagonist Engine: [MC thắng bằng lợi thế gì + tính cách gì + kiểu hành động gì]
+- Pleasure Loop: [4-6 bước lặp mỗi 1-3 chương: MC hành động → world feedback → hệ thống/năng lực unlock insight → social reaction → payoff hữu hình]
+- System Mechanic: [input/output/limit/reward của golden finger]
 - Phase 1 Playground: [3-5 địa điểm/người/tài nguyên local sinh scene được trong 100 chương đầu]
-- Dopamine Cadence: [mỗi chương hoặc mỗi 2-3 chương có payoff gì: đơn hàng, đột phá, công nhận, item, clue, relationship shift]
-- Novelty Plan: [mỗi 20 chương mở cái mới gì nhưng vẫn cùng lane: khách mới, bí cảnh mới, case mới, công thức mới, dungeon mới]
+- Social Reactor: [ai chứng kiến, ai phản ứng, ai report-back để tạo sảng văn]
+- Novelty Ladder: [mỗi 20-50 chương mở cái mới gì nhưng vẫn cùng lane: khách mới, bí cảnh mới, case mới, công thức mới, dungeon mới]
+- Control Rules: [payoff cadence + attention gradient + mỗi arc mở/đóng thread ra sao]
 
 ### BỐI CẢNH
 [2-3 câu: Thời gian + địa điểm cụ thể. Vd: "Năm 2025, Phượng Đô (tựa Hà Nội), MC sống trong căn trọ tầng 2 đường Nguyễn Huệ."]
@@ -128,7 +131,7 @@ Vd cho do-thi:
   • Ví dụ học bá: không biến thành chiến đấu thế giới sớm, payoff nằm ở đề bài/dự án/công nhận học thuật.
 
 CRITICAL CHECKS:
-1. STORY ENGINE có reader promise + core loop + dopamine cadence + novelty plan.
+1. STORY KERNEL SUMMARY có reader fantasy + pleasure loop + system mechanic + social reactor + novelty ladder.
 2. CAST ≥4 named, mỗi người có concrete intersect với core loop.
 3. ANTAGONISTS ≥2 named, mỗi đối thủ có timing escalation cụ thể.
 4. PHASE ROADMAP có 4 phase, mỗi phase có goal + milestone + stakes.
@@ -152,7 +155,7 @@ export interface SeedValidationResult {
 }
 
 const REQUIRED_SECTION_PATTERNS: Array<{ name: string; pattern: RegExp }> = [
-  { name: 'STORY ENGINE', pattern: /###\s*STORY\s*ENGINE/i },
+  { name: 'STORY KERNEL SUMMARY', pattern: /###\s*(?:STORY\s*ENGINE|STORY\s*KERNEL\s*SUMMARY)/i },
   { name: 'BỐI CẢNH', pattern: /###\s*BỐI\s*CẢNH/i },
   { name: 'NHÂN VẬT CHÍNH', pattern: /###\s*NHÂN\s*VẬT\s*CHÍNH/i },
   { name: 'GOLDEN FINGER', pattern: /###\s*GOLDEN\s*FINGER/i },

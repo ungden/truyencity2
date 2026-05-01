@@ -19,7 +19,8 @@ import { parseJSON } from '../utils/json-repair';
 import { getArchitectVoiceHint } from '../templates/genre-voice-anchors';
 import { getGenreArchitectGuide } from '../templates/genre-process-blueprints';
 import { GOLDEN_CHAPTER_REQUIREMENTS, UNIVERSAL_ANTI_SEEDS, SUB_GENRE_RULES } from '../templates';
-import type { ChapterSummary, GenreType, GeminiConfig } from '../types';
+import { extractMainCharacterNameFromWorld } from '../plan/setup-quality-gate';
+import type { ChapterSummary, GenreType, GeminiConfig, StoryKernel } from '../types';
 
 // AI response interfaces (used internally by generators)
 interface CombinedAIResponse {
@@ -399,7 +400,7 @@ export async function generateArcPlan(
   storyBible: string | undefined,
   totalPlanned: number,
   config: GeminiConfig,
-  storyVision?: { endingVision?: string; majorPlotPoints?: string[]; mainConflict?: string; endGoal?: string },
+  storyVision?: { endingVision?: string; majorPlotPoints?: string[]; mainConflict?: string; endGoal?: string; setupKernel?: StoryKernel },
   worldDescription?: string,  // 2026-04-29 audit fix: anchor arc plan to canonical premise (same pattern as chapter-writer Layer -1).
   masterOutline?: unknown,
 ): Promise<void> {
@@ -408,6 +409,10 @@ export async function generateArcPlan(
 
   if (!worldDescription?.trim() || worldDescription.trim().length < 500) {
     throw new Error(`Arc plan generation refused: world_description missing/incomplete for project ${projectId}`);
+  }
+  const worldMc = extractMainCharacterNameFromWorld(worldDescription);
+  if (worldMc && protagonistName.trim() && worldMc !== protagonistName.trim()) {
+    throw new Error(`Arc plan generation refused: protagonist mismatch world="${worldMc}" project="${protagonistName.trim()}"`);
   }
   const parsedMasterOutline = typeof masterOutline === 'string'
     ? parseJSON<{ volumes?: unknown[]; majorArcs?: unknown[] }>(masterOutline)
@@ -418,6 +423,9 @@ export async function generateArcPlan(
   );
   if (!hasMasterOutline) {
     throw new Error(`Arc plan generation refused: master_outline missing/incomplete for project ${projectId}`);
+  }
+  if (arcNumber === 1 && !storyVision?.setupKernel) {
+    throw new Error(`Arc plan generation refused: StoryKernel missing for project ${projectId}`);
   }
 
   // 2026-04-30 fix: Arc 1 plan covers chương 1-20 — without warm-baseline rule
@@ -484,6 +492,17 @@ Yêu cầu:
   let visionBlock = '';
   if (storyVision) {
     const vParts: string[] = ['[STORY VISION — HƯỚNG ĐI TỔNG THỂ]'];
+    if (storyVision.setupKernel) {
+      const kernel = storyVision.setupKernel;
+      vParts.push('[STORY KERNEL — ARC PLAN PHẢI ĐẺ BRIEFS THEO LOOP NÀY]');
+      vParts.push(`Reader fantasy: ${kernel.readerFantasy}`);
+      vParts.push(`Protagonist engine: ${kernel.protagonistEngine}`);
+      vParts.push(`Pleasure loop: ${kernel.pleasureLoop?.join(' → ')}`);
+      vParts.push(`System: ${kernel.systemMechanic?.name} | input ${kernel.systemMechanic?.input} | output ${kernel.systemMechanic?.output} | limit ${kernel.systemMechanic?.limit} | reward ${kernel.systemMechanic?.reward}`);
+      vParts.push(`Social reactor: ${kernel.socialReactor?.witnesses?.join(', ')} | ${kernel.socialReactor?.reactionModes?.join(', ')}`);
+      vParts.push(`Novelty ladder: ${kernel.noveltyLadder?.map(n => `${n.chapterRange}: ${n.newToy}`).join(' / ')}`);
+      vParts.push(`Control: ${kernel.controlRules?.payoffCadence}; ${kernel.controlRules?.attentionGradient}; open ${kernel.controlRules?.openThreadsPerArc}, close ${kernel.controlRules?.closeThreadsPerArc}/arc.`);
+    }
     if (storyVision.mainConflict) vParts.push(`Xung đột chính: ${storyVision.mainConflict}`);
     if (storyVision.endGoal) vParts.push(`Mục tiêu cuối: ${storyVision.endGoal}`);
     if (storyVision.endingVision) vParts.push(`Kết cục: ${storyVision.endingVision}`);
