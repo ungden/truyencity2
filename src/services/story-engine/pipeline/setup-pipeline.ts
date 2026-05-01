@@ -113,6 +113,10 @@ export interface IdeaPayload {
   premise: string;
   themes: string[];
   mainConflict: string;
+  readerPromise?: string;
+  coreLoop?: string;
+  systemFantasy?: string;
+  phase1Playground?: string;
   /** Phase 29: tension axis name picked from playbook (optional, AI returns) */
   tensionAxis?: string;
 }
@@ -186,6 +190,10 @@ ${antiCliche || '- (không có ban list cho genre này)'}
 Trả về JSON:
 {
   "premise": "<2-3 câu hook GROWTH-driven: bối cảnh + golden finger CỤ THỂ + opportunity opening; rõ ràng ám chỉ 1 tension axis từ playbook>",
+  "readerPromise": "<1 câu: reader đọc truyện này để được hưởng cảm giác gì lặp lại qua 100 chương đầu>",
+  "coreLoop": "<vòng lặp 4 bước sinh dopamine mỗi 2-3 chương: hành động → feedback → nâng cấp → payoff>",
+  "systemFantasy": "<hệ thống/năng lực cụ thể thỏa mãn fantasy gì, output ra sao, vì sao reader muốn xem nó vận hành>",
+  "phase1Playground": "<sân chơi local ch.1-100: địa điểm, người, nguồn tài nguyên, kiểu scene lặp được>",
   "themes": ["<theme 1>","<theme 2>","<theme 3>","<theme 4>"],
   "mainConflict": "<1-2 câu — actor Phase 1 LOCAL + stake cá nhân — proactive framing — link với tension axis đã chọn>",
   "tensionAxis": "<tên 1 axis từ list trên>"
@@ -212,6 +220,18 @@ Trả về JSON:
     }
     if (!parsed.mainConflict || parsed.mainConflict.length < 20) {
       return { success: false, error: 'idea mainConflict missing/too short' };
+    }
+    if (!parsed.readerPromise || parsed.readerPromise.length < 40) {
+      return { success: false, error: 'idea readerPromise missing/too short' };
+    }
+    if (!parsed.coreLoop || parsed.coreLoop.length < 40) {
+      return { success: false, error: 'idea coreLoop missing/too short' };
+    }
+    if (!parsed.systemFantasy || parsed.systemFantasy.length < 40) {
+      return { success: false, error: 'idea systemFantasy missing/too short' };
+    }
+    if (!parsed.phase1Playground || parsed.phase1Playground.length < 40) {
+      return { success: false, error: 'idea phase1Playground missing/too short' };
     }
 
     // Fix 2: cosmic-threat validator. Reject premises that encode tự ngược pattern.
@@ -274,6 +294,10 @@ async function runStageWorld(p: ProjectStageRow): Promise<{ success: boolean; er
 Tên truyện: "${novel.title}"
 Thể loại: ${genre}
 Premise: ${idea.premise}
+ReaderPromise: ${idea.readerPromise || ''}
+CoreLoop: ${idea.coreLoop || ''}
+SystemFantasy: ${idea.systemFantasy || ''}
+Phase1Playground: ${idea.phase1Playground || ''}
 Themes: ${idea.themes.join(', ')}
 MainConflict: ${idea.mainConflict}
 ${idea.tensionAxis ? `TensionAxis: ${idea.tensionAxis}` : ''}
@@ -299,7 +323,7 @@ Trả về JSON: {"worldDescription":"<800-1500 từ tuân blueprint 9-section, 
     if (!validation.passed) {
       return { success: false, error: `world blueprint score ${validation.score}/100 — issues: ${validation.issues.slice(0, 3).join('; ')}` };
     }
-    const semantic = validateSetupCanon({ worldDescription: wd });
+    const semantic = validateSetupCanon({ worldDescription: wd, strictContract: true });
     if (!semantic.passed) {
       return { success: false, error: `world semantic gate failed: ${formatSetupGateIssues(semantic)}` };
     }

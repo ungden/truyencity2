@@ -23,6 +23,7 @@ export interface SetupGateInput {
   masterOutline?: unknown;
   requireStoryOutline?: boolean;
   requireMasterOutline?: boolean;
+  strictContract?: boolean;
 }
 
 export interface SetupGateResult {
@@ -96,12 +97,23 @@ function rejectIf(pattern: RegExp, text: string, issues: SetupGateIssue[], code:
   if (pattern.test(text)) issues.push({ severity: 'error', code, message });
 }
 
+function requireIfMissing(
+  ok: boolean,
+  strict: boolean | undefined,
+  issues: SetupGateIssue[],
+  code: string,
+  message: string,
+): void {
+  if (!ok) issues.push({ severity: strict ? 'error' : 'warning', code, message });
+}
+
 export function validateSetupCanon(input: SetupGateInput): SetupGateResult {
   const issues: SetupGateIssue[] = [];
   const world = (input.worldDescription || '').trim();
   const worldName = extractMainCharacterNameFromWorld(world);
   const projectName = normalizeName(input.mainCharacter);
   const story = getStoryOutline(input.storyOutline);
+  const strict = input.strictContract;
 
   if (!world || world.length < 500) {
     issues.push({
@@ -166,6 +178,45 @@ export function validateSetupCanon(input: SetupGateInput): SetupGateResult {
       code: 'opening_promise_weak',
       message: 'opening scene does not clearly state the early opportunity/routine hook',
     });
+  }
+
+  const storyEngine = getSection(world, /###\s*STORY\s*ENGINE/i);
+  if (world) {
+    requireIfMissing(
+      storyEngine.length > 0,
+      strict,
+      issues,
+      'story_engine_missing',
+      'world_description must include STORY ENGINE: reader promise, core loop, dopamine cadence, and novelty plan',
+    );
+    requireIfMissing(
+      /(reader\s*promise|lời\s*hứa|đọc\s+để|reader\s+đọc)/i.test(storyEngine),
+      strict,
+      issues,
+      'reader_promise_missing',
+      'setup must state a concrete reader promise, not just lore',
+    );
+    requireIfMissing(
+      /(core\s*loop|vòng\s*lặp|hành\s*động.*feedback|feedback.*payoff|mỗi\s+2-3\s+chương)/i.test(storyEngine),
+      strict,
+      issues,
+      'core_loop_missing',
+      'setup must define a repeatable chapter engine/core loop',
+    );
+    requireIfMissing(
+      /(dopamine|payoff|thưởng|công\s*nhận|đột\s*phá|đơn\s*hàng|clue|item|relationship\s*shift)/i.test(storyEngine),
+      strict,
+      issues,
+      'dopamine_cadence_missing',
+      'setup must define the payoff cadence readers will feel every few chapters',
+    );
+    requireIfMissing(
+      /(novelty|mở\s+(cái|thứ|sân|map|case|khách|bí\s*cảnh|công\s*thức|dungeon)\s+mới|mỗi\s+20\s+chương)/i.test(storyEngine),
+      strict,
+      issues,
+      'novelty_plan_missing',
+      'setup must define how the same premise stays fresh across long-form arcs',
+    );
   }
 
   const phase1 = getSection(world, /PHASE\s*1\s*\([^)]*\)\s*:/i);

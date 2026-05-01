@@ -20,7 +20,14 @@ function makeWorld(overrides: Partial<Record<'name' | 'opening' | 'phase1' | 'go
     `Chi tiết vận hành ${i + 1}: khu chợ có nhịp khách rõ ràng, người bán nhớ mặt nhau, mỗi quyết định của ${name} đều tạo phản hồi nhỏ trong phạm vi một con phố.`
   ).join(' ');
 
-  return `### BỐI CẢNH
+  return `### STORY ENGINE
+- Reader Promise: reader đọc để xem ${name} biến một quầy bánh nhỏ thành thương hiệu tử tế bằng món ngon, dữ kiện khách quen và các payoff kinh doanh hữu hình.
+- Core Loop: ${name} phục vụ khách thật → nhận feedback từ Sổ Tay Cơ Hội → tối ưu món hoặc quy trình → thấy doanh thu/công nhận tăng ngay trong vài chương.
+- Phase 1 Playground: quầy bánh trước chợ Bình Minh, phòng kế toán tòa Lạc Việt, bãi xe của chú Tâm, nguồn hàng thịt nguội của anh Dũng.
+- Dopamine Cadence: mỗi 2-3 chương có một đơn hàng, một món được tối ưu, một khách quen công nhận, hoặc một chỉ số doanh thu tăng.
+- Novelty Plan: mỗi 20 chương mở thêm khách mới, khung giờ mới, món mới, đối thủ cùng phố, hoặc một vấn đề vận hành mới.
+
+### BỐI CẢNH
 Năm 2026, phố Bình Minh nằm giữa khu văn phòng và chợ dân sinh của Phượng Đô. ${name} thuê một quầy bánh mì tám mét vuông, mở cửa từ sáng sớm đến đầu giờ chiều, cạnh tiệm trà đá của cô Hòa và bãi gửi xe của chú Tâm. ${filler}
 
 ### NHÂN VẬT CHÍNH
@@ -143,6 +150,7 @@ describe('setup quality gate', () => {
       masterOutline: { volumes: [{ title: 'Quầy nhỏ' }], majorArcs: [{ name: 'Mở quầy' }] },
       requireStoryOutline: true,
       requireMasterOutline: true,
+      strictContract: true,
     });
     expect(result.passed).toBe(true);
   });

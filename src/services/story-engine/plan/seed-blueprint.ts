@@ -54,10 +54,21 @@ SẢNG VĂN SETUP CONTRACT (ưu tiên thiết kế dương, không dựa vào ba
 - Năng lực/hệ thống cần trigger, input, output, giới hạn/cost, đường nâng cấp, và loại payoff nó tạo ra mỗi vài chương.
 - Golden finger phục vụ core loop của truyện, ví dụ: phục vụ khách → nhận dữ kiện → tối ưu món → tăng doanh thu; hoặc luyện bài → mở insight → thắng bài test → unlock tài nguyên.
 
+6. STORY ENGINE
+- Setup phải chỉ ra truyện "đẻ chương" bằng gì: scene types lặp được, cast nào tạo phản ứng, reward cadence, novelty sau mỗi 20 chương.
+- Nếu bỏ section này, world_description dễ thành bách khoa setting nhưng không tạo được chương hay.
+
 
 WORLD_DESCRIPTION BLUEPRINT (BẮT BUỘC — Nếu thiếu section chính, output sẽ bị reject):
 
-worldDescription PHẢI là chuỗi 800-1500 từ chia thành 9 section đánh dấu rõ ràng bằng tiêu đề viết hoa:
+worldDescription PHẢI là chuỗi 800-1600 từ chia thành 10 section đánh dấu rõ ràng bằng tiêu đề viết hoa:
+
+### STORY ENGINE
+- Reader Promise: [1 câu cụ thể: reader đọc để hưởng fantasy gì, ví dụ "xem một quầy nhỏ tăng trưởng bằng món ngon + số liệu + khách quen"]
+- Core Loop: [4 bước lặp mỗi 2-3 chương: MC hành động → world feedback → hệ thống/năng lực unlock insight → payoff hữu hình]
+- Phase 1 Playground: [3-5 địa điểm/người/tài nguyên local sinh scene được trong 100 chương đầu]
+- Dopamine Cadence: [mỗi chương hoặc mỗi 2-3 chương có payoff gì: đơn hàng, đột phá, công nhận, item, clue, relationship shift]
+- Novelty Plan: [mỗi 20 chương mở cái mới gì nhưng vẫn cùng lane: khách mới, bí cảnh mới, case mới, công thức mới, dungeon mới]
 
 ### BỐI CẢNH
 [2-3 câu: Thời gian + địa điểm cụ thể. Vd: "Năm 2025, Phượng Đô (tựa Hà Nội), MC sống trong căn trọ tầng 2 đường Nguyễn Huệ."]
@@ -117,13 +128,14 @@ Vd cho do-thi:
   • Ví dụ học bá: không biến thành chiến đấu thế giới sớm, payoff nằm ở đề bài/dự án/công nhận học thuật.
 
 CRITICAL CHECKS:
-1. CAST ≥4 named, mỗi người có concrete intersect với core loop.
-2. ANTAGONISTS ≥2 named, mỗi đối thủ có timing escalation cụ thể.
-3. PHASE ROADMAP có 4 phase, mỗi phase có goal + milestone + stakes.
-4. GOLDEN FINGER có cơ chế CỤ THỂ + trigger + tier growth + weakness/cost.
-5. OPENING SCENE có routine + competence + opportunity đầu tiên.
-6. NEGATIVE SPACE có ít nhất 3 dòng định lane để tránh drift genre.
-7. Tổng độ dài 800-1500 từ. Nếu < 800 → reject.
+1. STORY ENGINE có reader promise + core loop + dopamine cadence + novelty plan.
+2. CAST ≥4 named, mỗi người có concrete intersect với core loop.
+3. ANTAGONISTS ≥2 named, mỗi đối thủ có timing escalation cụ thể.
+4. PHASE ROADMAP có 4 phase, mỗi phase có goal + milestone + stakes.
+5. GOLDEN FINGER có cơ chế CỤ THỂ + trigger + tier growth + weakness/cost.
+6. OPENING SCENE có routine + competence + opportunity đầu tiên.
+7. NEGATIVE SPACE có ít nhất 3 dòng định lane để tránh drift genre.
+8. Tổng độ dài 800-1600 từ. Nếu < 800 → reject.
 
 CẤM:
 - KHÔNG dùng tên truyện nổi tiếng có thật làm reference (Quỷ Bí Chi Chủ, Đấu Phá Thương Khung, etc.)
@@ -140,6 +152,7 @@ export interface SeedValidationResult {
 }
 
 const REQUIRED_SECTION_PATTERNS: Array<{ name: string; pattern: RegExp }> = [
+  { name: 'STORY ENGINE', pattern: /###\s*STORY\s*ENGINE/i },
   { name: 'BỐI CẢNH', pattern: /###\s*BỐI\s*CẢNH/i },
   { name: 'NHÂN VẬT CHÍNH', pattern: /###\s*NHÂN\s*VẬT\s*CHÍNH/i },
   { name: 'GOLDEN FINGER', pattern: /###\s*GOLDEN\s*FINGER/i },
@@ -173,7 +186,7 @@ export function validateSeedStructure(worldDescription: string): SeedValidationR
   const text = worldDescription.trim();
   const wordCount = text.split(/\s+/).filter(w => w.length > 0).length;
 
-  // Section presence: 9 sections, 5 points each = 45 max from structure.
+  // Section presence: 10 sections, 5 points each = 50 max from structure.
   let structureScore = 0;
   for (const sec of REQUIRED_SECTION_PATTERNS) {
     if (sec.pattern.test(text)) {
