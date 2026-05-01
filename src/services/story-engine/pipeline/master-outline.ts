@@ -182,6 +182,12 @@ Quy tắc:
 2. Lộ trình bản đồ (worldMapProgression) phải tương ứng với sự tiến cấp của MC.
 3. Không lan man, tập trung vào plot chính.
 4. ARC EARLY (1-3): warm-buildup hoặc balanced mood — KHÔNG tragic/loss làm mood mở chính. Reader cần engagement trước khi tin loss.
+4b. SẢNG VĂN ARC 1 HARD RULES (BẮT BUỘC — vi phạm = REJECT):
+   - ARC 1 description chỉ MAX 1 antagonist active. KHÔNG mở 3 phe đối kháng cùng arc 1.
+   - ZERO mysterious organization tracking MC trong arc 1-3. Tổ chức bí ẩn defer arc 4+.
+   - KHÔNG "MC vừa làm X đã bị Y phát hiện". Mỗi MC milestone scale 1 tầng nhận thức world.
+   - KHÔNG "world full of trọng sinh cùng MC" — MC trọng sinh là DUY NHẤT trong world.
+   - WARM BASELINE 5 chương đầu: ZERO active threat, MC làm việc routine trong domain nhỏ.
 5. ARC FINAL: climax-dense pacing, mood triumphant hoặc bittersweet-final.
 6. character_arc_beat của 8-12 arc PHẢI form 1 đường cong character development chính thống, KHÔNG random emotional state mỗi arc.${proactiveRule}`;
 

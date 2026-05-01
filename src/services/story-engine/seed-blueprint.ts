@@ -29,6 +29,23 @@ export function buildSeedBlueprintInstructions(genre?: GenreType): string {
 }
 
 export const SEED_BLUEPRINT_INSTRUCTIONS = `
+‼️ SẢNG VĂN — ANTI-TỰ-NGƯỢC HARD BANS (TUYỆT ĐỐI — VI PHẠM = REJECT):
+- MC trọng sinh/xuyên không là DUY NHẤT. KHÔNG có "đám trọng sinh khác", KHÔNG "5 đồng hương xuyên không cùng MC". World NGÂY THƠ về golden finger MC.
+- Phase 1 (ch.1-100) MAX 1 antagonist active. Antagonist mới chỉ unlock sau khi conflict cũ xong. KHÔNG mở 3 phe đối kháng cùng arc 1.
+- KHÔNG "tổ chức bí ẩn theo dõi MC" từ ch.1-50. Tổ chức notice MC chỉ sau MC có thành tựu visible (≥arc 2). Trước đó world IGNORES MC hoàn toàn.
+- KHÔNG "MC vừa làm X đã bị Y phát hiện ngay". Mỗi MC action scale 1 tầng nhận thức world (xã → huyện → tỉnh → quốc):
+  * Mua đồ cấp xã → KHÔNG ai ngoài chợ biết.
+  * Mở shop cấp huyện → vài người notice (hàng xóm, supplier).
+  * Ký hợp đồng cấp tỉnh → tầng 1 enemy bắt đầu react.
+  KHÔNG SKIP TẦNG. KHÔNG có "MC mới mua sắm ít đồ đã bị 5 thằng chú ý".
+- ANTAGONIST trong CAST roster phải distribute introduceArc theo timeline:
+  * 30% antagonists arc 1-2 (LOCAL scale: hàng xóm, đồng nghiệp, chợ)
+  * 30% antagonists arc 3-5 (REGIONAL: tỉnh, ngành)
+  * 40% antagonists arc 6+ (NATIONAL/COSMIC). KHÔNG được all introduce arc 1.
+- KHÔNG "kẻ thù kiếp trước theo MC qua thời gian/không gian". Kiếp trước enemy là KÝ ỨC MC, KHÔNG follow physically sang kiếp này.
+- WARM BASELINE 5 chương đầu: MC flex skill OK, nhưng KHÔNG ai ACTIVE đe dọa MC. Reader cần warm-up time để root for MC. Chương 1-5 = MC trong domain nhỏ của mình, làm việc routine, ZERO stalker / ZERO bí ẩn / ZERO sát thủ.
+
+
 WORLD_DESCRIPTION BLUEPRINT (BẮT BUỘC — Nếu thiếu bất kỳ section nào, output sẽ bị reject):
 
 worldDescription PHẢI là chuỗi 800-1500 từ chia thành 9 section đánh dấu rõ ràng bằng tiêu đề viết hoa:
@@ -194,7 +211,31 @@ export function validateSeedStructure(worldDescription: string): SeedValidationR
   else if (phaseMatches.length >= 2) phaseScore = 2;
   else issues.push(`PHASE ROADMAP missing or has only ${phaseMatches.length} phases (need 4)`);
 
-  const score = Math.min(100, structureScore + lengthScore + castScore + antagScore + phaseScore);
+  // P-A3: Sảng văn anti-tự-ngược pattern detection. Each violation = -15 score penalty.
+  // Catches setups encoding tự ngược that bypass blueprint structural checks.
+  let tunguocPenalty = 0;
+  const TU_NGUOC_PATTERNS: Array<{ regex: RegExp; reason: string }> = [
+    { regex: /(các|nhiều|đám|một số|vài)\s+(người|nhân vật|kẻ)\s+(trọng sinh|xuyên không)/i,
+      reason: 'multiple trọng sinh in world (only MC should be unique)' },
+    { regex: /(tổ chức|thế lực|phe phái|hội|liên minh)\s+(bí ẩn|ẩn|ngầm|đen|đặc biệt).{0,50}(theo dõi|chú ý|nhắm|săn|săn lùng).{0,50}(MC|nhân vật chính|chủ)/i,
+      reason: 'mysterious organization tracking MC from start' },
+    { regex: /vừa\s+\w{1,15}\s+(đã|liền|bị)\s+\w{1,15}\s+(phát hiện|chú ý|theo dõi|nhắm)/i,
+      reason: '"vừa X đã bị Y" — instant attention pattern' },
+    { regex: /\d+\s+(thằng|kẻ|tên|người|nhân vật|đối thủ).{0,60}(theo dõi|chú ý|nhắm|săn).{0,30}(ngay|từ đầu|chương 1|đầu truyện)/i,
+      reason: 'multiple attackers from chapter 1' },
+    { regex: /(stalker|sát thủ|ám sát|truy sát).{0,50}(chương 1|đầu truyện|từ đầu|ngay)/i,
+      reason: 'stalker/assassin in opening chapters' },
+    { regex: /(kẻ thù|enemy)\s+(kiếp trước|tiền kiếp).{0,30}(theo|đuổi|truy)/i,
+      reason: 'past-life enemy following MC physically' },
+  ];
+  for (const p of TU_NGUOC_PATTERNS) {
+    if (p.regex.test(text)) {
+      tunguocPenalty += 15;
+      issues.push(`SẢNG VĂN VIOLATION: ${p.reason}`);
+    }
+  }
+
+  const score = Math.max(0, Math.min(100, structureScore + lengthScore + castScore + antagScore + phaseScore - tunguocPenalty));
 
   return {
     score,
