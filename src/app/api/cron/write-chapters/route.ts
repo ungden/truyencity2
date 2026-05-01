@@ -573,6 +573,23 @@ ${needsMcRegen ? '- mainCharacter PHẢI đa dạng — không dùng tên clich�
     }
   }
 
+  // 2026-05-01 SAFETY GATE: if world_description STILL missing after self-heal attempt
+  // (world regen call may have failed silently), DO NOT proceed to master/story regen.
+  // Reason: master/story regen with empty worldDesc generates GENERIC outlines, then
+  // arc_plan generation creates arc_plan, then init-write tier writes chapters WITHOUT
+  // proper setup grounding → garbage chapters (4 novels hit this 2026-05-01).
+  // Bail here; next cron tick will retry world regen.
+  if (!projRow?.world_description || projRow.world_description.trim().length < 500) {
+    console.warn(`[init-prep] ABORT for ${project.id.slice(0, 8)}: world_description regen failed/incomplete (length=${projRow?.world_description?.length || 0}). Skipping master/story regen — will retry next tick.`);
+    return {
+      id: project.id,
+      title: novel.title,
+      tier: 'init-prep',
+      success: false,
+      error: 'world_description regen incomplete — retrying next tick',
+    };
+  }
+
   // Phase 23 fix: regen master_outline + story_outline IN PARALLEL if NULL.
   // Sequential calls = 60-180s; parallel = 60-90s, fits within 250s timeout.
   if (!projRow?.master_outline || !projRow?.story_outline) {
@@ -968,8 +985,17 @@ export async function GET(request: NextRequest) {
         .eq('arc_number', 1);
 
       const hasArcPlan = new Set((arcRows || []).map((r: { project_id: string }) => r.project_id));
-      initPrepCandidates = initCandidates.filter(p => !hasArcPlan.has(p.id));
-      initWriteCandidates = initCandidates.filter(p => hasArcPlan.has(p.id));
+      // HARD GATE 2026-05-01: init-write chỉ qualify khi có ĐỦ setup (world_description
+      // + main_character). Bug observed: 4 novels viết được 2 chương dù world_description
+      // NULL + main_character='' (arc_plan tồn tại từ trước wipe) → chapters rác. Force
+      // novel chưa có setup back to init-prep tier để self-heal regen.
+      const hasFullSetup = (p: ProjectRow): boolean => {
+        const wd = (p.world_description || '').trim();
+        const mc = (p.main_character || '').trim();
+        return wd.length >= 500 && mc.length >= 2;
+      };
+      initPrepCandidates = initCandidates.filter(p => !hasArcPlan.has(p.id) || !hasFullSetup(p));
+      initWriteCandidates = initCandidates.filter(p => hasArcPlan.has(p.id) && hasFullSetup(p));
     }
 
     const overloadMode = resumeCandidates.length >= OVERLOAD_RESUME_THRESHOLD;
