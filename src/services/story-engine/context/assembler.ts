@@ -469,6 +469,10 @@ export async function loadContext(
       const { getVoiceAnchorContext } = await import('../memory/voice-anchor');
       return getVoiceAnchorContext(projectId, chapterNumber).catch(() => null);
     })() || undefined,
+    rollingBriefsContext: await (async () => {
+      const { getRollingBriefsContext } = await import('../plan/chapter-briefs');
+      return getRollingBriefsContext(projectId, chapterNumber).catch(() => null);
+    })() || undefined,
     storyOutline: storyOutline || undefined,
     worldDescription: worldDescription || undefined,
     // Modern narrative metadata (migration 0149)
@@ -547,9 +551,14 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
   }
 
   // Layer 0.5k: Phase 27 W4.2 — Voice anchor (đại thần 声音锚)
-  // Re-fed every 50ch to combat drift over long-form novels.
   if (payload.voiceAnchorContext) {
     parts.push(payload.voiceAnchorContext);
+  }
+
+  // Layer 0.5l: Phase 27 W5.4 — Rolling chapter briefs (đại thần 日大纲)
+  // Detailed briefs for next 1-3 chapters; Architect plants seeds + avoids dead-ends.
+  if (payload.rollingBriefsContext) {
+    parts.push(payload.rollingBriefsContext);
   }
 
   // Layer 0.6: Story Outline (premise, protagonist, plot points, ending vision)

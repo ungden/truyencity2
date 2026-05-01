@@ -348,6 +348,9 @@ export interface ContextPayload {
   /** Phase 27 W4.2: voice anchor snippets from ch.1-3, re-fed every 50ch to combat drift. */
   voiceAnchorContext?: string;
 
+  /** Phase 27 W5.4: detailed briefs for next 1-3 chapters (rolling outline ahead). */
+  rollingBriefsContext?: string;
+
   // Anti-repetition
   previousTitles: string[];
   recentOpenings: string[];

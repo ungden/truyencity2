@@ -1275,6 +1275,16 @@ ${repetitionReport}
 
 BÁO CÁO TÍN HIỆU CHẤT LƯỢNG (tự động phân tích):
 ${buildSignalReport(content)}
+
+${(() => {
+  const { analyzeSensoryBalance, formatSensoryReport } = require('../quality/sensory-balance') as typeof import('../quality/sensory-balance');
+  return formatSensoryReport(analyzeSensoryBalance(content));
+})()}
+
+${(() => {
+  const { evaluateHooks, formatHookReport } = require('../quality/hook-strength') as typeof import('../quality/hook-strength');
+  return formatHookReport(evaluateHooks(content));
+})()}
 ${qualityComplianceSection}
 NỘI DUNG CHƯƠNG (FULL):
 ${contentPreview}

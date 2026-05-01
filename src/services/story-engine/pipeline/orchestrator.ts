@@ -1201,6 +1201,15 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       });
     })().catch(e => console.warn('[Orchestrator] Quality metrics failed:', e instanceof Error ? e.message : String(e))),
 
+    // Task 15j (Phase 27 W5.4): Rolling chapter briefs — generate next 1-3 detailed
+    // briefs every 5 chapters. Idempotent (skip if briefs already exist).
+    ...(lastChapterNumber % 5 === 0 ? [
+      (async () => {
+        const { generateRollingBriefs } = await import('../plan/chapter-briefs');
+        return generateRollingBriefs(project.id, lastChapterNumber, geminiConfig);
+      })().catch(e => console.warn('[Orchestrator] Rolling briefs failed:', e instanceof Error ? e.message : String(e))),
+    ] : []),
+
     // Task 15i (Phase 27 W4.2): Voice anchor capture — fires when lastChapterNumber >= 3.
     // Idempotent (UNIQUE constraint on project_id+chapter_number+snippet_type).
     ...(lastChapterNumber >= 3 ? [
