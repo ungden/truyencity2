@@ -15,7 +15,7 @@
 
 import { getSupabase } from '../utils/supabase';
 import { getGenreBoundaryText } from '../config';
-import { loadContext, assembleContext } from './context-assembler';
+import { loadContext, assembleContext, generateSummaryAndCharacters, saveChapterSummary } from './context-assembler';
 import { writeChapter } from './chapter-writer';
 import { retrieveRAGContext, chunkAndStoreChapter, retrieveEntityContext, retrieveThemeContext } from '../memory/rag-store';
 import { saveCharacterStatesFromCombined, detectCharacterContradictions, type CharacterContradiction } from '../memory/character-tracker';
@@ -1047,6 +1047,40 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   // Step 7 removed: current_chapter is bumped right after chapter upsert (Step 5b).
   // Keeping the bump there guarantees DB consistency even if a post-write task throws past
   // the parallel-task boundary or Vercel kills the function mid-task.
+
+  // ── Step 8: Per-additional-part summary + RAG (split-memory fix) ──────
+  // Main post-write block runs on logical (pre-split) content keyed to nextChapter.
+  // When SPLIT_PARTS > 1, parts at nextChapter+1, nextChapter+2... had no
+  // chapter_summaries row + no RAG chunks, so the next AI write's context-assembler
+  // pulled the bridge/cliffhanger from the FIRST part instead of the LAST one
+  // readers actually saw. This loop backfills summary + RAG per additional part
+  // so the bridge for chapter N+SPLIT_PARTS+1 reflects the true last chapter.
+  if (splitResults.length > 1) {
+    for (let idx = 1; idx < splitResults.length; idx++) {
+      const part = splitResults[idx];
+      const partChapter = nextChapter + idx;
+
+      const partSummaryResult = await generateSummaryAndCharacters(
+        partChapter, part.title, part.content, protagonistName, geminiConfig,
+        { allowEmptyCliffhanger: isFinalArc, projectId: project.id },
+      ).catch((e) => {
+        console.warn(`[Orchestrator] Per-part summary failed for Ch.${partChapter}:`, e instanceof Error ? e.message : String(e));
+        return null;
+      });
+
+      if (partSummaryResult?.summary) {
+        await saveChapterSummary(
+          project.id, partChapter, part.title, partSummaryResult.summary,
+        ).catch((e) => console.warn(`[Orchestrator] Per-part saveChapterSummary failed for Ch.${partChapter}:`, e instanceof Error ? e.message : String(e)));
+      }
+
+      await chunkAndStoreChapter(
+        project.id, partChapter, part.content, part.title,
+        `Chương ${partChapter}: ${part.title}`,
+        characters,
+      ).catch((e) => console.warn(`[Orchestrator] Per-part RAG chunking failed for Ch.${partChapter}:`, e instanceof Error ? e.message : String(e)));
+    }
+  }
 
   return {
     chapterNumber: nextChapter,

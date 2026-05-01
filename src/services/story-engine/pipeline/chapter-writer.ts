@@ -38,6 +38,7 @@ import { getConstraintExtractor } from '../memory/constraint-extractor';
 import { GENRE_CONFIG } from '../../../lib/types/genre-config';
 import { buildStyleContext, getEnhancedStyleBible, CLIFFHANGER_TECHNIQUES } from '../memory/style-bible';
 import { titleChecker } from '../memory/title-checker';
+import { DEFAULT_CONFIG } from '../types';
 import type {
   WriteChapterResult, ChapterOutline, CriticOutput, CriticIssue,
   GenreType, GeminiConfig, EmotionalArc, SceneOutline,
@@ -604,9 +605,30 @@ export async function writeChapter(
       options?.protagonistName,
     );
 
-    if (critic.requiresRewrite && attempt < maxRetries - 1) {
-      rewriteInstructions = critic.rewriteInstructions || 'Cải thiện chất lượng tổng thể.';
-      continue;
+    const qualityScore = critic.overallScore || 0;
+    const failedQualityGate =
+      critic.requiresRewrite ||
+      !critic.approved ||
+      qualityScore < DEFAULT_CONFIG.minQualityScore;
+
+    if (failedQualityGate) {
+      const gateReason = [
+        critic.requiresRewrite ? 'requiresRewrite=true' : null,
+        !critic.approved ? 'approved=false' : null,
+        qualityScore < DEFAULT_CONFIG.minQualityScore
+          ? `overallScore ${qualityScore} < ${DEFAULT_CONFIG.minQualityScore}`
+          : null,
+      ].filter(Boolean).join(', ');
+
+      if (attempt < maxRetries - 1) {
+        rewriteInstructions = critic.rewriteInstructions ||
+          `Quality gate failed (${gateReason}). Viết lại để đạt tối thiểu ${DEFAULT_CONFIG.minQualityScore}/10, sửa toàn bộ issue major/critical và đảm bảo Critic approved=true.`;
+        continue;
+      }
+
+      throw new Error(
+        `Chapter ${chapterNumber}: failed quality gate after ${maxRetries} attempts (${gateReason || 'unknown reason'}). Refusing to publish REVISE/unapproved content.`,
+      );
     }
 
     // Extract title with similarity check
