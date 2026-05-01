@@ -12,7 +12,7 @@ dotenv.config({ path: '/Users/alexle/Documents/truyencity/.env.runtime' });
 process.env.DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || 'sk-ef7b0c18ca9d4270921ddabc191a19c3';
 
 import { createClient } from '@supabase/supabase-js';
-import { generateMasterOutline } from '@/services/story-engine/pipeline/master-outline';
+import { generateMasterOutline } from '@/services/story-engine/plan/master-outline';
 import type { GeminiConfig } from '@/services/story-engine/types';
 
 const s = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { autoRefreshToken: false, persistSession: false } });

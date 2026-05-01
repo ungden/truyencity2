@@ -25,7 +25,7 @@ import { callGemini } from '../utils/gemini';
 import { parseJSON } from '../utils/json-repair';
 import { getSupabase } from '../utils/supabase';
 import type { GeminiConfig } from '../types';
-import type { CharacterContradiction } from '../memory/character-tracker';
+import type { CharacterContradiction } from '../state/character-state';
 
 // Phase 22 Stage 2 Q7: bumped 30K → 80K content cap. Guardian must read FULL chapter
 // (not head+tail) to catch mid-chapter contradictions. DeepSeek 1M context handles it.

@@ -15,13 +15,13 @@
 
 import { getSupabase } from '../utils/supabase';
 import { getGenreBoundaryText } from '../config';
-import { loadContext, assembleContext, generateSummaryAndCharacters } from './context-assembler';
+import { loadContext, assembleContext, generateSummaryAndCharacters } from '../context/assembler';
 import { writeChapter } from './chapter-writer';
 import { retrieveRAGContext, chunkAndStoreChapter, retrieveEntityContext, retrieveThemeContext } from '../memory/rag-store';
-import { saveCharacterStatesFromCombined, detectCharacterContradictions, type CharacterContradiction } from '../memory/character-tracker';
-import { extractCharacterKnowledge, getCharacterKnowledgeContext } from '../memory/character-knowledge';
+import { saveCharacterStatesFromCombined, detectCharacterContradictions, type CharacterContradiction } from '../state/character-state';
+import { extractCharacterKnowledge, getCharacterKnowledgeContext } from '../state/knowledge-graph';
 import { autoReviseChapter } from './auto-reviser';
-import { runContinuityGuardian } from './continuity-guardian';
+import { runContinuityGuardian } from '../quality/continuity-guardian';
 import {
   buildPlotThreadContext,
   buildBeatContext,
@@ -33,14 +33,14 @@ import {
   extractAndUpdatePlotThreads,
 } from '../memory/plot-tracker';
 import { runSummaryTasks } from '../memory/summary-manager';
-import { generateArcPlan } from './context-assembler';
+import { generateArcPlan } from '../context/assembler';
 // Quality modules (Qidian Master Level)
-import { getForeshadowingContext, updateForeshadowingStatus, generateForeshadowingAgenda } from '../memory/foreshadowing-planner';
-import { getCharacterArcContext, updateCharacterArcs } from '../memory/character-arc-engine';
-import { getChapterPacingContext, generatePacingBlueprint } from '../memory/pacing-director';
+import { getForeshadowingContext, updateForeshadowingStatus, generateForeshadowingAgenda } from '../plan/foreshadowing';
+import { getCharacterArcContext, updateCharacterArcs } from '../state/character-arcs';
+import { getChapterPacingContext, generatePacingBlueprint } from '../plan/pacing-director';
 import { getVoiceContext, updateVoiceFingerprint } from '../memory/voice-fingerprint';
-import { getPowerContext, updateMCPowerState } from '../memory/power-system-tracker';
-import { getWorldContext, updateLocationExploration, prepareUpcomingLocation, initializeWorldMap } from '../memory/world-expansion-tracker';
+import { getPowerContext, updateMCPowerState } from '../state/mc-power-state';
+import { getWorldContext, updateLocationExploration, prepareUpcomingLocation, initializeWorldMap } from '../state/world-expansion';
 import type {
   WriteChapterInput, WriteChapterResult, GeminiConfig, GenreType,
 } from '../types';
@@ -316,7 +316,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
         const mc = full?.main_character || resolvedMainCharacter;
 
         if (needsMasterRegen) {
-          const { generateMasterOutline } = await import('./master-outline');
+          const { generateMasterOutline } = await import('../plan/master-outline');
           // synopsis input = world description (used by master outline as world grounding)
           await generateMasterOutline(
             options.projectId,
@@ -330,7 +330,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
         }
 
         if (needsStoryRegen) {
-          const { generateStoryOutline } = await import('./story-outline');
+          const { generateStoryOutline } = await import('../plan/story-outline');
           const outline = await generateStoryOutline(
             options.projectId,
             novelTitle,
@@ -417,7 +417,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   // This is non-fatal — falls back to baseTargetWordCount if no blueprint.
   let targetWordCount = baseTargetWordCount;
   try {
-    const { getChapterMood, adjustWordCountForMood } = await import('../memory/pacing-director');
+    const { getChapterMood, adjustWordCountForMood } = await import('../plan/pacing-director');
     const mood = await getChapterMood(project.id, nextChapter);
     if (mood) {
       targetWordCount = adjustWordCountForMood(baseTargetWordCount, mood);
@@ -502,11 +502,11 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
 
   // ── Step 2d+: Inject quality modules + character knowledge (all non-fatal, parallel) ──
   try {
-    const { getRelationshipContext } = await import('../memory/relationship-tracker');
-    const { getEconomicContext } = await import('../memory/economic-ledger');
-    const { getCharacterBibleContext } = await import('../memory/character-bible');
-    const { getVolumeSummaryContext } = await import('../memory/volume-summarizer');
-    const { getGeographyContext } = await import('../memory/geography-tracker');
+    const { getRelationshipContext } = await import('../state/relationships');
+    const { getEconomicContext } = await import('../state/economic-ledger');
+    const { getCharacterBibleContext } = await import('../memory/character-bibles');
+    const { getVolumeSummaryContext } = await import('../memory/volume-summaries');
+    const { getGeographyContext } = await import('../state/geography');
     const subGenres = context.subGenres || [];
 
     const [foreshadowCtx, charArcCtx, pacingCtx, voiceCtx, powerCtx, worldCtx, knowledgeCtx, relationshipCtx, economicCtx, bibleCtx, volSummaryCtx, geoCtx] = await Promise.all([
@@ -545,7 +545,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   // Proactively answer "what does the engine know about each entity in the upcoming chapter?"
   // Deterministic DB queries — no AI cost. Output injected as [STATE CHECK] block.
   try {
-    const { runPreWriteQA } = await import('./pre-write-qa');
+    const { runPreWriteQA } = await import('../context/pre-write-qa');
     const qaBlock = await runPreWriteQA(project.id, nextChapter, {
       chapterBrief: context.chapterBrief,
       arcPlanText: context.arcPlan,
@@ -679,7 +679,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   });
 
   let preSaveContradictions: CharacterContradiction[] = [];
-  let preSaveGuardianIssues: import('./continuity-guardian').GuardianIssue[] = [];
+  let preSaveGuardianIssues: import('../quality/continuity-guardian').GuardianIssue[] = [];
 
   if (preReviseCombined?.characters && preReviseCombined.characters.length > 0) {
     preSaveContradictions = await detectCharacterContradictions(
@@ -889,7 +889,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   const characters = charactersPre;
   const logicalCombined = preReviseCombined;
   const allContradictions: CharacterContradiction[] = preSaveContradictions;
-  const allGuardianIssues: import('./continuity-guardian').GuardianIssue[] = preSaveGuardianIssues;
+  const allGuardianIssues: import('../quality/continuity-guardian').GuardianIssue[] = preSaveGuardianIssues;
 
   // ── Step 6b: Per-reader-chapter post-write tasks ──────────────────────
   // Each part gets its own chapter_summaries row (via runSummaryTasks),
@@ -998,7 +998,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       // Task 15b: Geography timeline (uses this part's character locations).
       ...(charsForThisPart.length > 0 ? [
         (async () => {
-          const { recordLocationFromCharacters } = await import('../memory/geography-tracker');
+          const { recordLocationFromCharacters } = await import('../state/geography');
           return recordLocationFromCharacters(
             project.id, partCh, part.content,
             charsForThisPart.map(c => ({ character_name: c.character_name, location: c.location })),
@@ -1043,7 +1043,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     // Task 14: Relationships (every 3 AI writes)
     ...(aiWriteCount % 3 === 0 ? [
       (async () => {
-        const { extractRelationships } = await import('../memory/relationship-tracker');
+        const { extractRelationships } = await import('../state/relationships');
         return extractRelationships(project.id, lastChapterNumber, result.content, characters, geminiConfig);
       })().catch(e => recordTaskFailure(db, project.id, novel.id, lastChapterNumber, 'task_14_relationships', e)),
     ] : []),
@@ -1051,7 +1051,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     // Task 15: Economic ledger (every 3 AI writes, only do-thi/quan-truong)
     ...(aiWriteCount % 3 === 0 && ['do-thi','quan-truong'].includes(genre) ? [
       (async () => {
-        const { extractEconomicState } = await import('../memory/economic-ledger');
+        const { extractEconomicState } = await import('../state/economic-ledger');
         return extractEconomicState(project.id, lastChapterNumber, result.content, protagonistName, geminiConfig);
       })().catch(e => recordTaskFailure(db, project.id, novel.id, lastChapterNumber, 'task_15_economic_ledger', e)),
     ] : []),
@@ -1067,14 +1067,14 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     // Task 16: Character bible refresh (every 20 reader chapters)
     ...(lastChapterNumber % 20 === 0 && lastChapterNumber >= 20 ? [
       (async () => {
-        const { refreshCharacterBibles } = await import('../memory/character-bible');
+        const { refreshCharacterBibles } = await import('../memory/character-bibles');
         return refreshCharacterBibles(project.id, lastChapterNumber, geminiConfig);
       })().catch(e => recordTaskFailure(db, project.id, novel.id, lastChapterNumber, 'task_16_character_bible_refresh', e)),
     ] : []),
 
     // Task 16b: Quality metrics + post-write health check (every AI write)
     (async () => {
-      const { recordQualityMetrics } = await import('../memory/quality-metrics');
+      const { recordQualityMetrics } = await import('../quality/quality-metrics');
       const { postWriteHealthCheck } = await import('../utils/post-write-health-check');
       const health = await postWriteHealthCheck(project.id, lastChapterNumber).catch(() => null);
       const critic = result.criticReport;
@@ -1120,7 +1120,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     // project_id), so cron retries skip if already done.
     ...(nextChapter <= 10 && lastChapterNumber >= 10 ? [
       (async () => {
-        const { runFirst10Evaluation } = await import('./first-10-evaluator');
+        const { runFirst10Evaluation } = await import('../quality/first-10-evaluator');
         return runFirst10Evaluation(project.id, novel.id, genre, protagonistName, geminiConfig);
       })().catch(e => recordTaskFailure(db, project.id, novel.id, lastChapterNumber, 'task_16c_first_10_evaluation', e)),
     ] : []),
@@ -1128,7 +1128,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     // Task 17: Volume summary (every 25 reader chapters)
     ...(lastChapterNumber % 25 === 0 && lastChapterNumber >= 25 ? [
       (async () => {
-        const { generateVolumeSummary } = await import('../memory/volume-summarizer');
+        const { generateVolumeSummary } = await import('../memory/volume-summaries');
         return generateVolumeSummary(project.id, lastChapterNumber, geminiConfig);
       })().catch(e => recordTaskFailure(db, project.id, novel.id, lastChapterNumber, 'task_17_volume_summary', e)),
     ] : []),

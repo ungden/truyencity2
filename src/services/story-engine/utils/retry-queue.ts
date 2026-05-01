@@ -155,21 +155,21 @@ async function replayTask(row: FailedTaskRow): Promise<void> {
       return;
     }
     case 'character_states_save': {
-      const { saveCharacterStatesFromCombined } = await import('../memory/character-tracker');
+      const { saveCharacterStatesFromCombined } = await import('../state/character-state');
       const p = payload as { characters?: Array<{ character_name: string; status: 'alive' | 'dead' | 'missing' | 'unknown'; power_level: string | null; power_realm_index: number | null; location: string | null; personality_quirks: string | null; notes: string | null }> };
       if (!p.characters || chapter === null) throw new Error('character_states_save: missing payload');
       await saveCharacterStatesFromCombined(projectId, chapter, p.characters);
       return;
     }
     case 'character_bible_refresh': {
-      const { refreshCharacterBibles } = await import('../memory/character-bible');
+      const { refreshCharacterBibles } = await import('../memory/character-bibles');
       const { DEFAULT_CONFIG } = await import('../types');
       if (chapter === null) throw new Error('character_bible_refresh: missing chapter');
       await refreshCharacterBibles(projectId, chapter, DEFAULT_CONFIG);
       return;
     }
     case 'volume_summary': {
-      const { generateVolumeSummary } = await import('../memory/volume-summarizer');
+      const { generateVolumeSummary } = await import('../memory/volume-summaries');
       const { DEFAULT_CONFIG } = await import('../types');
       if (chapter === null) throw new Error('volume_summary: missing chapter');
       await generateVolumeSummary(projectId, chapter, DEFAULT_CONFIG);

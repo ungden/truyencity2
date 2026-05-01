@@ -69,14 +69,14 @@ describe('Genre coverage — all 16 genres present in every Record', () => {
 
 describe('Genre coverage — memory + voice + process modules', () => {
   test('GENRE_VOCABULARY', async () => {
-    const { GENRE_VOCABULARY } = await import('@/services/story-engine/memory/style-bible');
+    const { GENRE_VOCABULARY } = await import('@/services/story-engine/templates/style-bible');
     for (const g of ALL_GENRES) {
       expect((GENRE_VOCABULARY as Record<GenreType, unknown>)[g]).toBeDefined();
     }
   });
 
   test('GENRE_WRITING_GUIDES', async () => {
-    const { GENRE_WRITING_GUIDES } = await import('@/services/story-engine/memory/style-bible');
+    const { GENRE_WRITING_GUIDES } = await import('@/services/story-engine/templates/style-bible');
     for (const g of ALL_GENRES) {
       expect((GENRE_WRITING_GUIDES as Record<GenreType, unknown>)[g]).toBeDefined();
     }

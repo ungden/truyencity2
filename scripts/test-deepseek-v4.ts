@@ -31,7 +31,7 @@ for (const k of REQUIRED) {
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { writeOneChapter } from '@/services/story-engine/pipeline/orchestrator';
-import { generateMasterOutline } from '@/services/story-engine/pipeline/master-outline';
+import { generateMasterOutline } from '@/services/story-engine/plan/master-outline';
 import { callGemini } from '@/services/story-engine/utils/gemini';
 import { parseJSON } from '@/services/story-engine/utils/json-repair';
 import type { GeminiConfig, GenreType, StoryOutline } from '@/services/story-engine/types';

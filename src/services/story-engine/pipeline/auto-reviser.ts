@@ -13,7 +13,7 @@
 
 import { callGemini } from '../utils/gemini';
 import type { GeminiConfig } from '../types';
-import type { CharacterContradiction } from '../memory/character-tracker';
+import type { CharacterContradiction } from '../state/character-state';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 

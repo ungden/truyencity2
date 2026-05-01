@@ -34,17 +34,17 @@ import { getStyleByGenre, buildTitleRulesPrompt, GOLDEN_CHAPTER_REQUIREMENTS, EN
 import { VN_PRONOUN_GUIDE, SUB_GENRE_RULES, isNonCombatGenre, requiresVndCurrency } from '../templates';
 import { getVoiceAnchor, getArchitectVoiceHint } from '../templates/genre-voice-anchors';
 import { getGenreArchitectGuide, getGenreContractForCritic } from '../templates/genre-process-blueprints';
-import { getConstraintExtractor } from '../memory/constraint-extractor';
+import { getConstraintExtractor } from '../canon/constraint-extractor';
 import { GENRE_CONFIG } from '../../../lib/types/genre-config';
-import { buildStyleContext, getEnhancedStyleBible, CLIFFHANGER_TECHNIQUES } from '../memory/style-bible';
-import { titleChecker } from '../memory/title-checker';
-import { getOverdueForeshadowingForCritic, type OverdueForeshadowingRecord } from '../memory/foreshadowing-planner';
+import { buildStyleContext, getEnhancedStyleBible, CLIFFHANGER_TECHNIQUES } from '../templates/style-bible';
+import { titleChecker } from '../quality/title-checker';
+import { getOverdueForeshadowingForCritic, type OverdueForeshadowingRecord } from '../plan/foreshadowing';
 import { DEFAULT_CONFIG } from '../types';
 import type {
   WriteChapterResult, ChapterOutline, CriticOutput, CriticIssue,
   GenreType, GeminiConfig, EmotionalArc, SceneOutline,
 } from '../types';
-import type { SceneType, VocabularyGuide } from '../memory/style-bible';
+import type { SceneType, VocabularyGuide } from '../templates/style-bible';
 
 // ── System Prompts ───────────────────────────────────────────────────────────
 

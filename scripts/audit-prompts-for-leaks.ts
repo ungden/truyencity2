@@ -47,9 +47,9 @@ const SCAN_GLOB = [
   'src/services/story-engine/templates/genre-voice-anchors.ts',
   'src/services/story-engine/templates/genre-process-blueprints.ts',
   'src/services/story-engine/pipeline/chapter-writer.ts',
-  'src/services/story-engine/pipeline/master-outline.ts',
-  'src/services/story-engine/pipeline/story-outline.ts',
-  'src/services/story-engine/pipeline/context-assembler.ts',
+  'src/services/story-engine/plan/master-outline.ts',
+  'src/services/story-engine/plan/story-outline.ts',
+  'src/services/story-engine/context/assembler.ts',
 ];
 
 interface Leak {
