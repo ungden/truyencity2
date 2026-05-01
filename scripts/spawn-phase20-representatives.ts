@@ -2,10 +2,12 @@
  * Phase 20A: Spawn 1 representative novel for each new genre / topic / sub-rule.
  *
  * Each novel is created with:
- *  - status='paused' initially
- *  - outlines (story_outline + master_outline) generated via DeepSeek
+ *  - status='paused'
+ *  - setup_stage='idea'
  *  - style_directives.disable_chapter_split = true (uncut original AI length)
- *  - then status='active' so cron picks up
+ *
+ * The setup state machine is now the only path allowed to generate world,
+ * canon, description, master/story outline, and arc plan.
  *
  * After spawn, cron writes up to DAILY_CHAPTER_QUOTA=20 ch/day per project.
  * Initial 20 chapters arrive within 1 day; then steady state continues.
@@ -261,6 +263,8 @@ async function createNovelAndProject(seed: NovelSeed, ownerId: string): Promise<
     total_planned_chapters: Math.min(seed.total_planned_chapters, MAX_PLANNED_CHAPTERS),
     current_chapter: 0,
     status: 'paused',
+    setup_stage: 'idea',
+    setup_stage_attempts: 0,
     temperature: 0.75,
     target_chapter_length: 2800,
     ai_model: 'deepseek-v4-flash',
@@ -333,9 +337,7 @@ async function main(): Promise<void> {
   for (const seed of SEEDS) {
     console.log(`▶ [${seed.genre}${seed.topic_id ? ` / ${seed.topic_id}` : ''}] ${seed.title}`);
     try {
-      const projectId = await createNovelAndProject(seed, ownerId);
-      await generateOutlines(projectId, seed);
-      await activateProject(projectId);
+      await createNovelAndProject(seed, ownerId);
     } catch (e) {
       console.error(`  ✗ Failed: ${e instanceof Error ? e.message : String(e)}`);
     }
@@ -344,18 +346,19 @@ async function main(): Promise<void> {
 
   // Verify
   const { data: created } = await s.from('ai_story_projects')
-    .select('id,status,genre,topic_id,style_directives,novels!ai_story_projects_novel_id_fkey(title)')
+    .select('id,status,setup_stage,genre,topic_id,style_directives,novels!ai_story_projects_novel_id_fkey(title)')
     .in('topic_id', SEEDS.map(s => s.topic_id).filter(Boolean) as string[])
-    .eq('status', 'active');
+    .eq('status', 'paused')
+    .eq('setup_stage', 'idea');
 
   console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-  console.log(`  ACTIVATED: ${created?.length || 0} new representative novels`);
+  console.log(`  CREATED FOR SETUP PIPELINE: ${created?.length || 0} representative novels`);
   console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
   for (const p of created || []) {
     const novel = Array.isArray(p.novels) ? p.novels[0] : p.novels;
     console.log(`  • ${novel?.title || 'unknown'} [${p.genre}/${p.topic_id || '-'}]`);
   }
-  console.log(`\nNext: cron sẽ ghi 20 ch/ngày/novel theo DAILY_CHAPTER_QUOTA. Disable_chapter_split=true → mỗi AI write = 1 reader chapter (~2800 từ uncut).`);
+  console.log(`\nNext: setup state machine must advance them to ready_to_write before any chapter is written.`);
 }
 
 main().catch((e) => {

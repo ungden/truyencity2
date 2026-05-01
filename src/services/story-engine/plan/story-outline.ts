@@ -37,6 +37,34 @@ export interface StoryOutline {
     type: string;
     importance: string;
   }>;
+  /** Concrete reason readers should keep reading this exact story. */
+  readerPromise?: string;
+  /** Ch.1-10 opening contract: what the reader experiences before long-form sprawl. */
+  openingExperience?: {
+    chapters1To3: string;
+    chapters4To10: string;
+    firstPayoff: string;
+  };
+  /** Recurring cast usage plan — prevents setup characters disappearing after ch.3. */
+  recurringCast?: Array<{
+    name: string;
+    recurringFunction: string;
+    cadence: string;
+  }>;
+  /** Dopamine contract — genre-specific satisfaction rhythm. */
+  dopamineContract?: {
+    coreLoop: string;
+    expectedPayoffsPerChapter: number;
+    payoffTypes: string[];
+  };
+  /** Long-form conflict ladder — local → regional → national/cosmic. */
+  conflictLadder?: Array<{
+    phase: number;
+    chapterRange: string;
+    scale: string;
+    antagonistType: string;
+    readerPayoff: string;
+  }>;
   endingVision: string;
   uniqueHooks: string[];
   /** Named cast roster — Architect uses to seed scenes without inventing characters. */
@@ -68,7 +96,7 @@ export async function generateStoryOutline(
   totalChapters: number,
   config: GeminiConfig,
 ): Promise<StoryOutline | null> {
-  const arcs = 5;
+  const arcs = Math.max(4, Math.ceil(totalChapters / 20));
   const mid = Math.ceil(arcs / 2);
   const genreSetup = getGenreSetupRequirements(genre);
 
@@ -104,9 +132,14 @@ CHẤT LƯỢNG ĐẠI THẦN — required fields:
    - pacingTarget: "slow" / "medium" / "fast"
 9. antiTropes: 3-5 things story KHÔNG làm — concrete bans cho genre này.
    - VD: ["KHÔNG combat (MC = đầu bếp + doanh nhân)", "KHÔNG harem (single love interest)", "KHÔNG instant master skill"]
+10. readerPromise: 1-2 câu cực cụ thể: độc giả đọc truyện này để được sướng ở core loop nào?
+11. openingExperience: ch.1-10 phải có warm baseline, competence visible, first payoff cụ thể; KHÔNG threat-driven.
+12. recurringCast: 4-6 nhân vật sẽ quay lại theo cadence, không phải chỉ xuất hiện để đủ checklist.
+13. dopamineContract: coreLoop + số payoff/chương + payoffTypes đúng genre.
+14. conflictLadder: 4 phase rõ local → regional → national/world, Phase 1 chỉ local.
 
 Trả về JSON:
-{"id":"story_${Date.now()}","title":"${novelTitle}","genre":"${genre}","premise":"...","themes":["...","..."],"mainConflict":"...","targetChapters":${totalChapters},"targetArcs":${arcs},"protagonist":{"name":"${protagonistName}","startingState":"...","endGoal":"...","characterArc":"..."},"majorPlotPoints":[{"id":"pp1","name":"...","description":"...","targetArc":1,"type":"inciting_incident","importance":"critical"},{"id":"pp3","name":"...","description":"...","targetArc":${mid},"type":"midpoint","importance":"critical"},{"id":"pp5","name":"...","description":"...","targetArc":${arcs - 1},"type":"climax","importance":"critical"},{"id":"pp6","name":"...","description":"...","targetArc":${arcs},"type":"resolution","importance":"critical"}],"castRoster":[{"name":"...","role":"...","relationToMC":"...","introduceArc":1,"archeType":"..."}],"worldRules":["...","..."],"toneFlags":{"proactiveRatio":80,"comedyDensity":"medium","pacingTarget":"medium"},"antiTropes":["...","..."],"endingVision":"...","uniqueHooks":[]}
+{"id":"story_${Date.now()}","title":"${novelTitle}","genre":"${genre}","premise":"...","themes":["...","..."],"mainConflict":"...","targetChapters":${totalChapters},"targetArcs":${arcs},"protagonist":{"name":"${protagonistName}","startingState":"...","endGoal":"...","characterArc":"..."},"readerPromise":"...","openingExperience":{"chapters1To3":"...","chapters4To10":"...","firstPayoff":"..."},"majorPlotPoints":[{"id":"pp1","name":"...","description":"...","targetArc":1,"type":"inciting_incident","importance":"critical"},{"id":"pp3","name":"...","description":"...","targetArc":${mid},"type":"midpoint","importance":"critical"},{"id":"pp5","name":"...","description":"...","targetArc":${Math.max(1, arcs - 1)},"type":"climax","importance":"critical"},{"id":"pp6","name":"...","description":"...","targetArc":${arcs},"type":"resolution","importance":"critical"}],"castRoster":[{"name":"...","role":"...","relationToMC":"...","introduceArc":1,"archeType":"..."}],"recurringCast":[{"name":"...","recurringFunction":"...","cadence":"mỗi 3-5 chương / mỗi sub-arc / mỗi business milestone"}],"worldRules":["...","..."],"toneFlags":{"proactiveRatio":80,"comedyDensity":"medium","pacingTarget":"medium"},"dopamineContract":{"coreLoop":"...","expectedPayoffsPerChapter":2,"payoffTypes":["...","..."]},"conflictLadder":[{"phase":1,"chapterRange":"1-100","scale":"local","antagonistType":"...","readerPayoff":"..."},{"phase":2,"chapterRange":"101-300","scale":"regional","antagonistType":"...","readerPayoff":"..."},{"phase":3,"chapterRange":"301-700","scale":"national/institutional","antagonistType":"...","readerPayoff":"..."},{"phase":4,"chapterRange":"701-${totalChapters}","scale":"world/endgame","antagonistType":"...","readerPayoff":"..."}],"antiTropes":["...","..."],"endingVision":"...","uniqueHooks":[]}
 
 QUY TẮC:
 - premise PHẢI mention golden finger từ world_description (KHÔNG vague "anh ta nhận được sức mạnh kỳ lạ")

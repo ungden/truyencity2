@@ -29,9 +29,6 @@ import { getVietnamDayBounds } from '@/lib/utils/vietnam-time';
 
 // Story Engine v2 — sole engine for all tiers (init + resume)
 import { writeOneChapter as writeOneChapterV2 } from '@/services/story-engine';
-import { generateArcPlan } from '@/services/story-engine/context/assembler';
-import type { GenreType, GeminiConfig } from '@/services/story-engine/types';
-import { DEFAULT_CONFIG } from '@/services/story-engine/types';
 
 // CONFIGURATION
 function parseIntEnv(name: string, fallback: number): number {
@@ -130,6 +127,8 @@ type ProjectRow = {
   main_character: string | null;
   genre: string | null;
   status: string;
+  setup_stage?: string | null;
+  setup_stage_attempts?: number | null;
   current_chapter: number | null;
   total_planned_chapters: number | null;
   world_description: string | null;
@@ -500,12 +499,12 @@ async function prepareInitProject(
     return { setup_stage: (data?.setup_stage || 'idea') as string, setup_stage_attempts: data?.setup_stage_attempts || 0 };
   })();
 
-  const STAGED_STATES = new Set(['idea', 'world', 'character', 'description']);
+  const STAGED_STATES = new Set(['idea', 'world', 'character', 'description', 'master_outline', 'story_outline', 'arc_plan']);
   if (STAGED_STATES.has(setup_stage)) {
     const { runOneStage } = await import('@/services/story-engine/pipeline/setup-pipeline');
     const { data: stageProj } = await supabase
       .from('ai_story_projects')
-      .select('id,novel_id,genre,main_character,world_description,master_outline,story_outline,setup_stage,setup_stage_attempts,novels!ai_story_projects_novel_id_fkey(id,title)')
+      .select('id,novel_id,genre,main_character,world_description,master_outline,story_outline,story_bible,total_planned_chapters,setup_stage,setup_stage_attempts,novels!ai_story_projects_novel_id_fkey(id,title)')
       .eq('id', project.id)
       .single();
     if (!stageProj) {
@@ -519,203 +518,14 @@ async function prepareInitProject(
     };
   }
 
-  // Stages master_outline / story_outline / arc_plan / ready_to_write fall through
-  // to legacy flow below (which also advances state via existing logic).
-
-  const genre = (project.genre || 'tien-hiep') as GenreType;
-  const protagonistName = project.main_character || '';
-  const totalPlanned = project.total_planned_chapters || 1000;
-  const geminiConfig: GeminiConfig = {
-    model: DEFAULT_CONFIG.model,
-    temperature: 0.3,
-    maxTokens: DEFAULT_CONFIG.maxTokens,
-  };
-
-  // Load story_outline for StoryVision injection
-  let { data: projRow } = await supabase
-    .from('ai_story_projects')
-    .select('story_outline,story_bible,master_outline,world_description')
-    .eq('id', project.id)
-    .maybeSingle();
-
-  // Phase 22 self-heal: regen main_character + world_description if missing.
-  // Used by clear-and-reset op: novels reset to {title, genre} only — cron regens
-  // both MC name AND setup từ scratch. AI có toàn quyền invent MC name + concept
-  // dựa trên title + genre, KHÔNG bị anchor vào MC name cũ.
-  const needsMcRegen = !protagonistName || protagonistName.trim().length === 0 || protagonistName === '';
-  const needsWorldRegen = !projRow?.world_description || projRow.world_description.trim().length === 0;
-  if (needsWorldRegen) {
-    try {
-      const { callGemini } = await import('@/services/story-engine/utils/gemini');
-      const { buildSeedBlueprintInstructions } = await import('@/services/story-engine/plan/seed-blueprint');
-      const { GENRE_CONFIG } = await import('@/lib/types/genre-config');
-      const genreConfig = (GENRE_CONFIG as unknown as Record<string, { label?: string }>)[genre] || {};
-      const genreLabel = genreConfig.label || genre;
-      const blueprintInstructions = buildSeedBlueprintInstructions(genre);
-
-      const prompt = `Bạn là tác giả webnovel chuyên nghiệp. ${needsMcRegen ? 'Tạo MỚI HOÀN TOÀN' : 'Tạo lại'} setup + giới thiệu cho tiểu thuyết.
-
-THÔNG TIN GIỮ NGUYÊN (KHÔNG được đổi):
-- Tên truyện: "${novel.title}"
-- Thể loại: ${genreLabel} (${genre})
-${needsMcRegen ? '- Nhân vật chính: HÃY TỰ SÁNG TẠO TÊN MỚI dựa trên tên truyện + genre. KHÔNG dùng tên cliché kiểu Lâm Phong / Lê Minh / Trần Vũ.' : `- Nhân vật chính (đã có, giữ nguyên): ${protagonistName}`}
-
-${blueprintInstructions}
-
-Trả về JSON:
-{
-  ${needsMcRegen ? '"mainCharacter":"<tên MC mới — họ + tên đầy đủ tiếng Việt 2-3 chữ>",' : ''}
-  "worldDescription":"<world_description 800-1500 từ theo blueprint 9-section ở trên>",
-  "description":"<giới thiệu/back-cover blurb 250-400 chữ tiếng Việt CÓ DẤU đầy đủ. ĐÚNG 3 đoạn (\\n\\n giữa các đoạn): đoạn 1 hook bối cảnh + tình huống bất thường (60-90 chữ); đoạn 2 tease năng lực/xung đột/mục tiêu (70-120 chữ); đoạn 3 closing hook khiến reader muốn đọc (40-90 chữ). Tên MC PHẢI xuất hiện ≥2 lần. KHÔNG dùng từ kỹ thuật engine (MC, Bàn Tay Vàng, Hệ thống X, Sảng văn, vả mặt, BOM, engine).>"
-}
-
-QUY TẮC:
-- worldDescription phải tuân thủ blueprint 9-section CHẶT CHẼ.
-- Cast roster ≥4 named, antagonists ≥2 named, phase roadmap 4 phase.
-- description: ĐÚNG 3 đoạn, ≥250 chữ, KHÔNG spoil cuối truyện.
-- KHÔNG dùng tên/concept của truyện nổi tiếng có thật.
-${needsMcRegen ? '- mainCharacter PHẢI đa dạng — không dùng tên cliché phổ biến (Lâm Phong, Lê Minh, Trần Vũ, Trần Hạo, Lý Phong). Tùy theo genre + bối cảnh, chọn họ + tên hợp lý.' : ''}`;
-
-      const res = await callGemini(prompt, {
-        model: 'deepseek-v4-flash',
-        temperature: 0.85,
-        maxTokens: 8192,
-        systemPrompt: 'Bạn là Worldbuilder + Character Architect. CHỈ trả về JSON hợp lệ.',
-      }, { jsonMode: true, tracking: { projectId: project.id, task: 'world_description_regen' } });
-
-      const parsed = JSON.parse(res.content);
-      const newWorldDesc = (parsed.worldDescription || '').trim();
-      const newMc = (parsed.mainCharacter || '').trim();
-      const newDescription = (parsed.description || '').trim();
-
-      const projUpdates: Record<string, unknown> = {};
-      if (newWorldDesc && newWorldDesc.length >= 500) projUpdates.world_description = newWorldDesc;
-      if (needsMcRegen && newMc && newMc.length >= 2) projUpdates.main_character = newMc;
-
-      if (Object.keys(projUpdates).length > 0) {
-        await supabase.from('ai_story_projects').update(projUpdates).eq('id', project.id);
-        if (projUpdates.world_description) projRow = { ...projRow, world_description: newWorldDesc, story_outline: projRow?.story_outline ?? null, story_bible: projRow?.story_bible ?? null, master_outline: projRow?.master_outline ?? null };
-      }
-
-      // Also update novels.description (giới thiệu blurb shown trên novel detail page).
-      // Was old text from previous setup → user reads "y chang cũ".
-      if (newDescription && newDescription.length >= 200) {
-        await supabase.from('novels').update({ description: newDescription }).eq('id', novel.id);
-      }
-    } catch (e) {
-      console.warn(`[init-prep] setup regen failed for ${project.id}:`, e instanceof Error ? e.message : String(e));
-    }
-  }
-
-  // 2026-05-01 SAFETY GATE: if world_description STILL missing after self-heal attempt
-  // (world regen call may have failed silently), DO NOT proceed to master/story regen.
-  // Reason: master/story regen with empty worldDesc generates GENERIC outlines, then
-  // arc_plan generation creates arc_plan, then init-write tier writes chapters WITHOUT
-  // proper setup grounding → garbage chapters (4 novels hit this 2026-05-01).
-  // Bail here; next cron tick will retry world regen.
-  if (!projRow?.world_description || projRow.world_description.trim().length < 500) {
-    console.warn(`[init-prep] ABORT for ${project.id.slice(0, 8)}: world_description regen failed/incomplete (length=${projRow?.world_description?.length || 0}). Skipping master/story regen — will retry next tick.`);
-    return {
-      id: project.id,
-      title: novel.title,
-      tier: 'init-prep',
-      success: false,
-      error: 'world_description regen incomplete — retrying next tick',
-    };
-  }
-
-  // Phase 23 fix: regen master_outline + story_outline IN PARALLEL if NULL.
-  // Sequential calls = 60-180s; parallel = 60-90s, fits within 250s timeout.
-  if (!projRow?.master_outline || !projRow?.story_outline) {
-    const worldDesc = projRow?.world_description || '';
-
-    const masterPromise = !projRow?.master_outline
-      ? (async () => {
-          try {
-            const { generateMasterOutline } = await import('@/services/story-engine/plan/master-outline');
-            // Phase 29 v4: was 'deepseek-v4-pro' but CLAUDE.md notes it's "currently
-            // unused" → silent failures observed (no cost_tracking entry, master
-            // stays NULL). Switch to deepseek-v4-flash which is the verified
-            // working model for the engine.
-            await generateMasterOutline(project.id, novel.title, genre, worldDesc.slice(0, 6000), totalPlanned, { ...geminiConfig, model: 'deepseek-v4-flash' });
-          } catch (e) { console.warn(`[init-prep] master_outline regen failed for ${project.id}:`, e instanceof Error ? e.message : String(e)); }
-        })()
-      : Promise.resolve();
-
-    const storyPromise = !projRow?.story_outline
-      ? (async () => {
-          try {
-            const { generateStoryOutline } = await import('@/services/story-engine/plan/story-outline');
-            const outline = await generateStoryOutline(
-              project.id, novel.title, genre, protagonistName,
-              worldDesc, totalPlanned,
-              { ...geminiConfig, model: 'deepseek-v4-flash' },
-            );
-            if (outline) await supabase.from('ai_story_projects').update({ story_outline: outline as unknown as Record<string, unknown> }).eq('id', project.id);
-          } catch (e) { console.warn(`[init-prep] story_outline regen failed for ${project.id}:`, e instanceof Error ? e.message : String(e)); }
-        })()
-      : Promise.resolve();
-
-    await Promise.all([masterPromise, storyPromise]);
-
-    // Advance setup_stage to arc_plan if both regen succeeded
-    const { data: postRegen } = await supabase
-      .from('ai_story_projects')
-      .select('master_outline,story_outline')
-      .eq('id', project.id)
-      .maybeSingle();
-    if (postRegen?.master_outline && postRegen?.story_outline) {
-      await supabase.from('ai_story_projects').update({
-        setup_stage: 'arc_plan',
-        setup_stage_updated_at: new Date().toISOString(),
-        setup_stage_error: null,
-        setup_stage_attempts: 0,
-      }).eq('id', project.id);
-    }
-
-    // Re-fetch after regen
-    const refetch = await supabase
-      .from('ai_story_projects')
-      .select('story_outline,story_bible,master_outline,world_description')
-      .eq('id', project.id)
-      .maybeSingle();
-    projRow = refetch.data;
-  }
-
-  let outlineSynopsis: string | undefined;
-  let storyVision: { endingVision?: string; majorPlotPoints?: string[]; mainConflict?: string; endGoal?: string } | undefined;
-
-  if (projRow?.story_outline) {
-    const o = typeof projRow.story_outline === 'string' ? JSON.parse(projRow.story_outline) : projRow.story_outline;
-    const parts: string[] = [];
-    if (o.premise) parts.push(`Premise: ${o.premise}`);
-    if (o.mainConflict) parts.push(`Xung đột: ${o.mainConflict}`);
-    if (o.protagonist?.name) parts.push(`MC: ${o.protagonist.name} — ${o.protagonist.startingState || ''}`);
-    if (o.endingVision) parts.push(`Kết cục: ${o.endingVision}`);
-    outlineSynopsis = parts.join('\n');
-
-    storyVision = {
-      endingVision: o.endingVision,
-      majorPlotPoints: o.majorPlotPoints,
-      mainConflict: o.mainConflict,
-      endGoal: o.endGoal,
-    };
-  }
-
-  await generateArcPlan(
-    project.id, 1, genre, protagonistName,
-    outlineSynopsis || projRow?.master_outline || undefined,
-    projRow?.story_bible || undefined,
-    totalPlanned, geminiConfig, storyVision,
-  );
-
   return {
     id: project.id,
     title: novel.title,
     tier: 'init-prep',
-    success: true,
+    success: false,
     chapterWritten: false,
-    arcPlanGenerated: true,
+    arcPlanGenerated: false,
+    error: `project at setup_stage=${setup_stage} is not eligible for init-prep; expected staged setup or ready_to_write with existing arc_plan`,
   };
 }
 
@@ -801,6 +611,17 @@ async function writeOneChapter(
 
   // ====== STORY ENGINE V2 — sole engine for all tiers ======
   try {
+    if (tier === 'init-write' && project.setup_stage === 'ready_to_write') {
+      await supabase.from('ai_story_projects')
+        .update({
+          setup_stage: 'writing',
+          setup_stage_updated_at: new Date().toISOString(),
+          setup_stage_error: null,
+          setup_stage_attempts: 0,
+        })
+        .eq('id', project.id);
+    }
+
     const v2Result = await writeOneChapterV2({
       projectId: project.id,
       temperature: project.temperature || undefined,
@@ -933,8 +754,9 @@ export async function GET(request: NextRequest) {
     // Mới: PROJECT_TIMEOUT_MS + 60s safety buffer (covers post-write tasks + cleanup).
     const lockWindowMs = PROJECT_TIMEOUT_MS + 60_000;
     const lockBoundary = new Date(Date.now() - lockWindowMs).toISOString();
+    const STAGED_SETUP_STATES = ['idea', 'world', 'character', 'description', 'master_outline', 'story_outline', 'arc_plan'];
 
-    const [activeCountQuery, candidateQuery] = await Promise.all([
+    const [activeCountQuery, candidateQuery, setupCandidateQuery] = await Promise.all([
       supabase
         .from('ai_story_projects')
         .select('id', { count: 'exact', head: true })
@@ -943,6 +765,7 @@ export async function GET(request: NextRequest) {
         .from('ai_story_projects')
         .select(`
           id, main_character, genre, status,
+          setup_stage, setup_stage_attempts,
           current_chapter, total_planned_chapters,
           world_description, writing_style, temperature,
           target_chapter_length,
@@ -952,16 +775,34 @@ export async function GET(request: NextRequest) {
         .lt('updated_at', lockBoundary)
         .order('updated_at', { ascending: true })
         .limit(CANDIDATE_POOL_SIZE),
+      supabase
+        .from('ai_story_projects')
+        .select(`
+          id, main_character, genre, status,
+          setup_stage, setup_stage_attempts,
+          current_chapter, total_planned_chapters,
+          world_description, writing_style, temperature,
+          target_chapter_length,
+          novels!ai_story_projects_novel_id_fkey (id, title)
+        `)
+        .eq('status', 'paused')
+        .eq('current_chapter', 0)
+        .in('setup_stage', STAGED_SETUP_STATES)
+        .lt('updated_at', lockBoundary)
+        .order('updated_at', { ascending: true })
+        .limit(INIT_PREP_BATCH_SIZE),
     ]);
 
     if (activeCountQuery.error) { console.error('[Cron] Step 1 activeCount failed:', activeCountQuery.error); throw activeCountQuery.error; }
     if (candidateQuery.error) { console.error('[Cron] Step 1 candidates failed:', candidateQuery.error); throw candidateQuery.error; }
+    if (setupCandidateQuery.error) { console.error('[Cron] Step 1 setup candidates failed:', setupCandidateQuery.error); throw setupCandidateQuery.error; }
 
     const activeCount = activeCountQuery.count || 0;
     const dynamicResumeBatchSize = computeDynamicResumeBatchSize(activeCount);
 
     const rawCandidates = (candidateQuery.data || []) as ProjectRow[];
-    console.log(`[Cron] Step 1 OK: ${activeCount} active, ${rawCandidates.length} candidates fetched`);
+    const setupOnlyCandidates = (setupCandidateQuery.data || []) as ProjectRow[];
+    console.log(`[Cron] Step 1 OK: ${activeCount} active, ${rawCandidates.length} active candidates, ${setupOnlyCandidates.length} setup candidates fetched`);
 
     // Filter candidates eligible for processing (respect soft-ending grace buffer)
     const GRACE_BUFFER_FILTER = 20;
@@ -1047,9 +888,14 @@ export async function GET(request: NextRequest) {
         const mc = (p.main_character || '').trim();
         return wd.length >= 500 && mc.length >= 2;
       };
-      initPrepCandidates = initCandidates.filter(p => !hasArcPlan.has(p.id) || !hasFullSetup(p));
-      initWriteCandidates = initCandidates.filter(p => hasArcPlan.has(p.id) && hasFullSetup(p));
+      const isReadyToWrite = (p: ProjectRow): boolean => {
+        const stage = p.setup_stage || 'idea';
+        return stage === 'ready_to_write' || stage === 'writing';
+      };
+      initPrepCandidates = initCandidates.filter(p => !hasArcPlan.has(p.id) || !hasFullSetup(p) || !isReadyToWrite(p));
+      initWriteCandidates = initCandidates.filter(p => hasArcPlan.has(p.id) && hasFullSetup(p) && isReadyToWrite(p));
     }
+    initPrepCandidates = [...initPrepCandidates, ...setupOnlyCandidates];
 
     const overloadMode = resumeCandidates.length >= OVERLOAD_RESUME_THRESHOLD;
     const effectiveInitPrepBatch = overloadMode

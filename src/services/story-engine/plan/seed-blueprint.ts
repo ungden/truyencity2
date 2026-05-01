@@ -29,24 +29,33 @@ export function buildSeedBlueprintInstructions(genre?: GenreType): string {
 }
 
 export const SEED_BLUEPRINT_INSTRUCTIONS = `
-‼️ SẢNG VĂN — ANTI-TỰ-NGƯỢC HARD BANS (TUYỆT ĐỐI — VI PHẠM = REJECT):
-- MC trọng sinh/xuyên không là DUY NHẤT. KHÔNG có "đám trọng sinh khác", KHÔNG "5 đồng hương xuyên không cùng MC". World NGÂY THƠ về golden finger MC.
-- Phase 1 (ch.1-100) MAX 1 antagonist active. Antagonist mới chỉ unlock sau khi conflict cũ xong. KHÔNG mở 3 phe đối kháng cùng arc 1.
-- KHÔNG "tổ chức bí ẩn theo dõi MC" từ ch.1-50. Tổ chức notice MC chỉ sau MC có thành tựu visible (≥arc 2). Trước đó world IGNORES MC hoàn toàn.
-- KHÔNG "MC vừa làm X đã bị Y phát hiện ngay". Mỗi MC action scale 1 tầng nhận thức world (xã → huyện → tỉnh → quốc):
-  * Mua đồ cấp xã → KHÔNG ai ngoài chợ biết.
-  * Mở shop cấp huyện → vài người notice (hàng xóm, supplier).
-  * Ký hợp đồng cấp tỉnh → tầng 1 enemy bắt đầu react.
-  KHÔNG SKIP TẦNG. KHÔNG có "MC mới mua sắm ít đồ đã bị 5 thằng chú ý".
-- ANTAGONIST trong CAST roster phải distribute introduceArc theo timeline:
-  * 30% antagonists arc 1-2 (LOCAL scale: hàng xóm, đồng nghiệp, chợ)
-  * 30% antagonists arc 3-5 (REGIONAL: tỉnh, ngành)
-  * 40% antagonists arc 6+ (NATIONAL/COSMIC). KHÔNG được all introduce arc 1.
-- KHÔNG "kẻ thù kiếp trước theo MC qua thời gian/không gian". Kiếp trước enemy là KÝ ỨC MC, KHÔNG follow physically sang kiếp này.
-- WARM BASELINE 5 chương đầu: MC flex skill OK, nhưng KHÔNG ai ACTIVE đe dọa MC. Reader cần warm-up time để root for MC. Chương 1-5 = MC trong domain nhỏ của mình, làm việc routine, ZERO stalker / ZERO bí ẩn / ZERO sát thủ.
+SẢNG VĂN SETUP CONTRACT (ưu tiên thiết kế dương, không dựa vào ban-list):
+
+1. CANON SEED
+- Chọn đúng 1 protagonist làm tâm truyện. Tên, nghề/trạng thái, năng lực, điểm yếu và mục tiêu đầu truyện phải đủ cụ thể để mọi outline/chapter sau dùng lại được.
+- Nếu là trọng sinh/xuyên không, lợi thế của MC nằm ở ký ức/góc nhìn/khả năng hành động của MC; world ban đầu vẫn vận hành bình thường và chưa tự biết MC đặc biệt.
+
+2. WARM BASELINE
+- Chương 1-5 là vùng làm quen: MC ở domain nhỏ của mình, đang làm một việc cụ thể, thể hiện competence sớm, gặp một cơ hội đủ hấp dẫn để reader muốn theo.
+- Conflict mở đầu nên là job/customer/deal/bài test/nhiệm vụ nhỏ/đối thủ cùng tầng; áp lực có thể có nhưng không được nuốt mất cảm giác "đọc để thấy MC đi lên".
+
+3. ESCALATION LADDER
+- Phase 1 (ch.1-100): local/tân thủ map, 1 antagonist hoặc một nguồn cản trở chính, milestone hữu hình cuối phase.
+- Phase 2 (101-300): community/city/industry, mở rộng network và consequence.
+- Phase 3 (301-700): regional/institutional, conflict có hệ thống.
+- Phase 4 (701-1000): national/world/endgame, payoff lời hứa lớn của truyện.
+- Mỗi phase cần Goal + Milestone + Stakes + Reader Payoff. Scale tăng theo thành tựu nhìn thấy của MC.
+
+4. ATTENTION GRADIENT
+- Người xung quanh notice MC theo đúng tầng: khách quen/hàng xóm/bạn học trước, đối thủ ngành/huyện sau, thế lực lớn rất muộn.
+- Setup tốt tạo cảm giác "công nhận tăng dần": MC làm được việc nhỏ → được thêm cơ hội → mở thêm sân chơi.
+
+5. GOLDEN FINGER OPERATING MODEL
+- Năng lực/hệ thống cần trigger, input, output, giới hạn/cost, đường nâng cấp, và loại payoff nó tạo ra mỗi vài chương.
+- Golden finger phục vụ core loop của truyện, ví dụ: phục vụ khách → nhận dữ kiện → tối ưu món → tăng doanh thu; hoặc luyện bài → mở insight → thắng bài test → unlock tài nguyên.
 
 
-WORLD_DESCRIPTION BLUEPRINT (BẮT BUỘC — Nếu thiếu bất kỳ section nào, output sẽ bị reject):
+WORLD_DESCRIPTION BLUEPRINT (BẮT BUỘC — Nếu thiếu section chính, output sẽ bị reject):
 
 worldDescription PHẢI là chuỗi 800-1500 từ chia thành 9 section đánh dấu rõ ràng bằng tiêu đề viết hoa:
 
@@ -90,8 +99,8 @@ PHASE 4 (701-1000): [Tên phase] — Goal: [...] — Milestone cuối truyện: 
 
 ### OPENING SCENE (Chương 1 cụ thể)
 - Location: [địa điểm cụ thể, không generic]
-- MC đang làm gì khi mở chương: [hành động cụ thể — phải show competence ngay, KHÔNG rock-bottom]
-- Hook event đầu chương: [opportunity-driven — KHÔNG threat-driven]
+- MC đang làm gì khi mở chương: [hành động cụ thể show competence/routine ngay]
+- Hook event đầu chương: [cơ hội nhỏ tạo core loop đầu tiên: khách/deal/task/bài test/tài nguyên]
 - Câu mở đầu mẫu (1 câu): [câu cụ thể anchor voice]
 
 ### WORLD RULES (3-5 quy tắc thế giới)
@@ -103,20 +112,17 @@ Vd cho do-thi:
 
 ### TONE & ANTI-PATTERNS
 - TONE: [proactive ratio %, comedy density: low/med/high, pacing: slow/med/fast]
-- ANTI-PATTERNS (3-5 dòng — những gì truyện này KHÔNG làm):
-  • KHÔNG combat (MC = đầu bếp + doanh nhân, không võ sĩ)
-  • KHÔNG harem (single love interest)
-  • KHÔNG tu tiên / linh thạch / cảnh giới
-  • KHÔNG instant master — skill cần thời gian + nhiệm vụ
-  • KHÔNG copy paste công thức Earth → MC adapt + thử + sửa
+- NEGATIVE SPACE (3-5 dòng): nêu rõ truyện này không theo lane nào để writer khỏi lạc genre.
+  • Ví dụ do-thi F&B: không combat, không tu tiên, tình cảm đi chậm, skill cần thử/sai/sửa, công thức phải adapt vào khách Việt.
+  • Ví dụ học bá: không biến thành chiến đấu thế giới sớm, payoff nằm ở đề bài/dự án/công nhận học thuật.
 
 CRITICAL CHECKS:
-1. CAST ≥4 named, mỗi người có concrete intersect (KHÔNG generic "bạn thân").
-2. ANTAGONISTS ≥2 named, mỗi đối thủ có timing escalation cụ thể (KHÔNG generic "kẻ thù").
+1. CAST ≥4 named, mỗi người có concrete intersect với core loop.
+2. ANTAGONISTS ≥2 named, mỗi đối thủ có timing escalation cụ thể.
 3. PHASE ROADMAP có 4 phase, mỗi phase có goal + milestone + stakes.
-4. GOLDEN FINGER có cơ chế CỤ THỂ + trigger + tier growth + weakness (KHÔNG omnipotent).
-5. OPENING SCENE warm baseline (MC đã có golden finger active + competence visible) — KHÔNG rock-bottom.
-6. ANTI-PATTERNS có ít nhất 3 dòng concrete bans cho genre này.
+4. GOLDEN FINGER có cơ chế CỤ THỂ + trigger + tier growth + weakness/cost.
+5. OPENING SCENE có routine + competence + opportunity đầu tiên.
+6. NEGATIVE SPACE có ít nhất 3 dòng định lane để tránh drift genre.
 7. Tổng độ dài 800-1500 từ. Nếu < 800 → reject.
 
 CẤM:

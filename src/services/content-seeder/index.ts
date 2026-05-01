@@ -360,6 +360,8 @@ interface ProjectInsertRow {
   current_chapter: number;
   total_planned_chapters: number;
   status: string;
+  setup_stage?: string;
+  setup_stage_attempts?: number;
   // Modern narrative metadata (migration 0149) — optional, set per-project to vary output
   sub_genres?: string[];
   mc_archetype?: string | null;
@@ -800,7 +802,9 @@ export class ContentSeeder {
         temperature: 1.0,
         current_chapter: 0,
         total_planned_chapters: this.randomInt(950, 1050),
-        status: 'active',
+        status: 'paused',
+        setup_stage: 'idea',
+        setup_stage_attempts: 0,
         // Narrative metadata (migration 0149)
         sub_genres: variant.sub_genres || [],
         mc_archetype: variant.mc_archetype || null,
@@ -844,67 +848,6 @@ export class ContentSeeder {
     }
 
     created = projectRows.length;
-
-    // ── Generate master_outline + story_outline for each new project ──
-    // These are required by V2 Engine before writing Chapter 1.
-    // Run in parallel batches of 5 to stay within rate limits.
-    try {
-      const { generateMasterOutline } = await import('../story-engine/plan/master-outline');
-      const { callGemini } = await import('../story-engine/utils/gemini');
-      const { parseJSON } = await import('../story-engine/utils/json-repair');
-
-      const OUTLINE_BATCH = 5;
-      for (let i = 0; i < projectRows.length; i += OUTLINE_BATCH) {
-        const batch = projectRows.slice(i, i + OUTLINE_BATCH);
-        await Promise.all(batch.map(async (pRow) => {
-          const novel = novelRows.find(n => n.id === pRow.novel_id);
-          const title = novel?.title || 'Unknown';
-          const desc = novel?.description || '';
-          const totalCh = pRow.total_planned_chapters || 1000;
-
-          // 1. Master outline
-          try {
-            await generateMasterOutline(
-              pRow.id, title, pRow.genre as any, desc.substring(0, 500),
-              totalCh,
-              { model: 'gemini-2.0-flash', temperature: 0.7, maxTokens: 2048 }
-            );
-          } catch (e) {
-            errors.push(`Master outline failed for "${title}": ${e instanceof Error ? e.message : String(e)}`);
-          }
-
-          // 2. Story outline
-          try {
-            const arcs = Math.ceil(totalCh / 20);
-            const mid = Math.ceil(arcs / 2);
-            const prompt = `Tạo dàn ý tổng thể cho truyện:
-TITLE: ${title}
-GENRE: ${pRow.genre}
-PROTAGONIST: ${pRow.main_character}
-PREMISE: ${desc.substring(0, 400)}
-TARGET: ${totalCh} chương, ${arcs} arcs
-
-Trả về JSON:
-{"id":"story_${Date.now()}","title":"${title}","genre":"${pRow.genre}","premise":"...","themes":[],"mainConflict":"...","targetChapters":${totalCh},"targetArcs":${arcs},"protagonist":{"name":"${pRow.main_character}","startingState":"...","endGoal":"...","characterArc":"..."},"majorPlotPoints":[{"id":"pp1","name":"Khởi đầu","description":"...","targetArc":1,"type":"inciting_incident","importance":"critical"},{"id":"pp3","name":"Midpoint","description":"...","targetArc":${mid},"type":"midpoint","importance":"critical"},{"id":"pp5","name":"Climax","description":"...","targetArc":${arcs - 1},"type":"climax","importance":"critical"},{"id":"pp6","name":"Resolution","description":"...","targetArc":${arcs},"type":"resolution","importance":"critical"}],"endingVision":"...","uniqueHooks":[]}`;
-            const res = await callGemini(prompt, {
-              model: 'gemini-2.0-flash', temperature: 0.7, maxTokens: 4096,
-              systemPrompt: 'Bạn là STORY ARCHITECT. CHỈ trả về JSON.',
-            });
-            const outline = parseJSON(res.content);
-            if (outline) {
-              await this.supabase
-                .from('ai_story_projects')
-                .update({ story_outline: outline as any })
-                .eq('id', pRow.id);
-            }
-          } catch (e) {
-            errors.push(`Story outline failed for "${title}": ${e instanceof Error ? e.message : String(e)}`);
-          }
-        }));
-      }
-    } catch (e) {
-      errors.push(`Outline generation module failed: ${e instanceof Error ? e.message : String(e)}`);
-    }
 
     return {
       created,
@@ -1695,6 +1638,8 @@ CHÚ Ý:
           current_chapter: 0,
           total_planned_chapters: totalChapters,
           status: 'paused', // Start paused, activate later
+          setup_stage: 'idea',
+          setup_stage_attempts: 0,
           // Narrative metadata (migration 0149)
           sub_genres: variant.sub_genres || [],
           mc_archetype: variant.mc_archetype || null,
@@ -1719,22 +1664,7 @@ CHÚ Ý:
       }
 
       // Then insert projects
-      const { data: insertedProjects, error: projectError } = await this.supabase.from('ai_story_projects').insert(projectRows).select('id, novel_id, genre, novel:novels(title)');
-      if (!projectError && insertedProjects) {
-        // Trigger master outline generation in background
-        import('../story-engine/plan/master-outline').then(({ generateMasterOutline }) => {
-          for (const p of insertedProjects) {
-            generateMasterOutline(
-              p.id,
-              p.novel?.[0]?.title || 'Unknown',
-              p.genre as any,
-              'Truyện tự động tạo từ Seeder',
-              2000,
-              { model: 'deepseek-v4-flash', temperature: 0.7, maxTokens: 2048 }
-            ).catch(e => console.error('Seeder outline error:', e));
-          }
-        }).catch(e => console.error('Failed to import outline gen:', e));
-      }
+      const { error: projectError } = await this.supabase.from('ai_story_projects').insert(projectRows);
       if (projectError) {
         errors.push(`Project batch ${batch}-${batchEnd} failed: ${projectError.message}`);
         // Clean up orphaned novels
@@ -1808,12 +1738,15 @@ CHÚ Ý:
 
         const novelIds = novels.map(n => n.id);
 
-        // Get paused projects for these novels, limit to perAuthor
+        // Get paused projects that have completed setup, limit to perAuthor.
+        // Fresh seeds stay paused/setup_stage=idea until the setup state machine
+        // advances them to ready_to_write.
         const { data: projects } = await this.supabase
           .from('ai_story_projects')
           .select('id')
           .in('novel_id', novelIds)
           .eq('status', 'paused')
+          .eq('setup_stage', 'ready_to_write')
           .limit(perAuthor);
 
         if (!projects || projects.length === 0) return 0;

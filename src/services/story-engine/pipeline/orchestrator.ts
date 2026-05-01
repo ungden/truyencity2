@@ -646,11 +646,23 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
         outlineSynopsis = parts.join('\n');
       }
 
+      const storyVision = context.storyOutline ? {
+        endingVision: context.storyOutline.endingVision,
+        mainConflict: context.storyOutline.mainConflict,
+        endGoal: context.storyOutline.protagonist?.endGoal,
+        majorPlotPoints: context.storyOutline.majorPlotPoints
+          ?.map(p => typeof p === 'string' ? p : p.description || p.name || JSON.stringify(p))
+          ?.slice(0, 6),
+      } : undefined;
+
       await generateArcPlan(
         project.id, arcNumber, genre, protagonistName,
         outlineSynopsis || context.masterOutline,
         context.storyBible,
         totalPlanned, geminiConfig,
+        storyVision,
+        project.world_description || context.worldDescription,
+        context.masterOutline,
       );
 
       // Reload arc plan from DB
@@ -671,8 +683,12 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
           new_threads: arcRow.new_threads || [],
         };
       }
-    } catch {
-      // Non-fatal: arc plan generation failure shouldn't block chapter writing
+    } catch (e) {
+      // Before chapter 1, an arc plan is a hard setup artifact, not a nice-to-have.
+      if (nextChapter === 1) {
+        throw e;
+      }
+      // Existing partially written projects may continue; audit/report handles repair.
     }
   }
 

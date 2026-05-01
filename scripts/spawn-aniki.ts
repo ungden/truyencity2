@@ -291,6 +291,8 @@ async function createNovelAndProject(seed: NovelSeed, ownerId: string): Promise<
     total_planned_chapters: Math.min(seed.total_planned_chapters, MAX_PLANNED_CHAPTERS),
     current_chapter: 0,
     status: 'paused',
+    setup_stage: 'idea',
+    setup_stage_attempts: 0,
     temperature: 0.75,
     target_chapter_length: 2800,
     ai_model: 'deepseek-v4-flash',
@@ -358,9 +360,8 @@ async function main(): Promise<void> {
 
   try {
     const projectId = await createNovelAndProject(SEED, ownerId);
-    await generateOutlines(projectId, SEED);
-    await activateAndQuota(projectId);
-    console.log(`\n✓ Done. Cron viết ch.1 ở */5 tick tiếp theo.`);
+    console.log(`\n✓ Done. Project ${projectId} is paused/setup_stage=idea.`);
+    console.log(`  Setup state machine must reach ready_to_write before chapter 1.`);
     console.log(`  URL: https://truyencity.com/truyen/${SEED.slug}`);
   } catch (e) {
     console.error(`✗ Failed: ${e instanceof Error ? e.message : String(e)}`);

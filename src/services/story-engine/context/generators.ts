@@ -401,9 +401,24 @@ export async function generateArcPlan(
   config: GeminiConfig,
   storyVision?: { endingVision?: string; majorPlotPoints?: string[]; mainConflict?: string; endGoal?: string },
   worldDescription?: string,  // 2026-04-29 audit fix: anchor arc plan to canonical premise (same pattern as chapter-writer Layer -1).
+  masterOutline?: unknown,
 ): Promise<void> {
   const startChapter = (arcNumber - 1) * 20 + 1;
   const endChapter = Math.min(arcNumber * 20, totalPlanned);
+
+  if (!worldDescription?.trim() || worldDescription.trim().length < 500) {
+    throw new Error(`Arc plan generation refused: world_description missing/incomplete for project ${projectId}`);
+  }
+  const parsedMasterOutline = typeof masterOutline === 'string'
+    ? parseJSON<{ volumes?: unknown[]; majorArcs?: unknown[] }>(masterOutline)
+    : masterOutline;
+  const hasMasterOutline = !!parsedMasterOutline && typeof parsedMasterOutline === 'object' && (
+    (Array.isArray((parsedMasterOutline as { volumes?: unknown[] }).volumes) && (parsedMasterOutline as { volumes?: unknown[] }).volumes!.length > 0)
+    || (Array.isArray((parsedMasterOutline as { majorArcs?: unknown[] }).majorArcs) && (parsedMasterOutline as { majorArcs?: unknown[] }).majorArcs!.length > 0)
+  );
+  if (!hasMasterOutline) {
+    throw new Error(`Arc plan generation refused: master_outline missing/incomplete for project ${projectId}`);
+  }
 
   // 2026-04-30 fix: Arc 1 plan covers chương 1-20 — without warm-baseline rule
   // injection, AI was emitting rock-bottom openings (chủ nhà giục trả tiền, MC
@@ -463,6 +478,8 @@ Yêu cầu:
     worldBlock = `[WORLD DESCRIPTION — PREMISE GỐC, ARC PLAN PHẢI BÁM SÁT]\n${worldDescription.slice(0, 4000)}\n\n`;
   }
 
+  const masterBlock = `[MASTER OUTLINE — KHUNG TOÀN TRUYỆN, ARC PLAN PHẢI KHỚP]\n${JSON.stringify(parsedMasterOutline).slice(0, 4000)}\n\n`;
+
   // StoryVision injection for directional coherence
   let visionBlock = '';
   if (storyVision) {
@@ -482,7 +499,7 @@ Yêu cầu:
 
   const prompt = `Bạn là Story Architect cho truyện ${genre}.
 
-${worldBlock}${visionBlock}${synopsis ? `TỔNG QUAN:\n${synopsis}\n\n` : ''}${storyBible ? `STORY BIBLE:\n${storyBible.slice(0, 2000)}\n\n` : ''}${genreArchGuide}${openingRulesBlock}
+${worldBlock}${masterBlock}${visionBlock}${synopsis ? `TỔNG QUAN:\n${synopsis}\n\n` : ''}${storyBible ? `STORY BIBLE:\n${storyBible.slice(0, 2000)}\n\n` : ''}${genreArchGuide}${openingRulesBlock}
 Lập kế hoạch ARC ${arcNumber} (chương ${startChapter}-${endChapter}) cho ${protagonistName}.
 Tổng dự kiến: ${totalPlanned} chương.${closingInstruction}
 

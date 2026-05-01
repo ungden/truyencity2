@@ -2,10 +2,10 @@
  * Setup script:
  * 1. Pause 17 of the 20 active projects (keep top 3)
  * 2. Create 2 new VN-themed novels with hand-crafted seeds
- * 3. Generate master_outline + story_outline via DeepSeek (router auto-dispatches)
- * 4. Set new projects status='active' (cron picks up next tick)
+ * 3. Insert new projects as paused/setup_stage=idea
+ * 4. Let the setup state machine generate canon/outline/arc plan
  *
- * Result: 5 active projects (3 originals + 2 new VN-themed)
+ * Result: 3 original active projects + 2 paused projects waiting for setup
  *
  * Usage: ./node_modules/.bin/tsx scripts/setup-vn-novels.ts
  */
@@ -322,7 +322,7 @@ async function createNovelAndProject(
   if (novelErr || !novel) throw new Error(`novel insert failed: ${novelErr?.message}`);
   console.log(`  ✓ Novel created: ${novel.id}`);
 
-  // 2. Insert project — start as 'paused' so cron doesn't pick up before outlines exist
+  // 2. Insert project — start as setup_stage=idea so the unified setup pipeline owns canon.
   const { data: project, error: projErr } = await s.from('ai_story_projects').insert({
     novel_id: novel.id,
     user_id: ownerId,
@@ -331,7 +331,9 @@ async function createNovelAndProject(
     world_description: seed.world_description,
     total_planned_chapters: seed.total_planned_chapters,
     current_chapter: 0,
-    status: 'paused', // activated after outlines generate
+    status: 'paused',
+    setup_stage: 'idea',
+    setup_stage_attempts: 0,
     temperature: 0.75,
     target_chapter_length: 2800,
     ai_model: 'deepseek-v4-flash',
@@ -384,7 +386,7 @@ async function main(): Promise<void> {
   // Step 1: Pause others
   await pauseProjects();
 
-  // Step 2-4: For each seed, create novel + project + outlines + activate
+  // Step 2-4: For each seed, create novel + paused setup-stage project.
   const ownerId = await getOwnerId();
   console.log(`Owner: ${ownerId}\n`);
 
@@ -393,31 +395,24 @@ async function main(): Promise<void> {
   for (const seed of SEEDS) {
     console.log(`▶ ${seed.title}`);
     const { projectId, novelId } = await createNovelAndProject(seed, ownerId);
-    try {
-      await generateOutlines(projectId, seed);
-      await activateProject(projectId);
-      created.push({ seed, projectId, novelId });
-    } catch (e) {
-      console.error(`  ✗ Outline/activate failed: ${e instanceof Error ? e.message : String(e)}`);
-      console.error(`    Project ${projectId} left in paused state — fix and rerun activation`);
-    }
+    created.push({ seed, projectId, novelId });
     console.log();
   }
 
   // Step 5: Verify
   const { data: final } = await s.from('ai_story_projects')
-    .select('id,status,ai_model,current_chapter,total_planned_chapters,novels!ai_story_projects_novel_id_fkey(title)')
-    .eq('status', 'active');
+    .select('id,status,setup_stage,ai_model,current_chapter,total_planned_chapters,novels!ai_story_projects_novel_id_fkey(title)')
+    .in('id', created.map(c => c.projectId));
 
   console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-  console.log(`  FINAL ACTIVE STATE: ${final?.length || 0} projects`);
+  console.log(`  CREATED FOR SETUP PIPELINE: ${final?.length || 0} projects`);
   console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
   for (const p of final || []) {
     const novel = Array.isArray(p.novels) ? p.novels[0] : p.novels;
-    console.log(`  • ${novel?.title || 'unknown'} — ${p.current_chapter}/${p.total_planned_chapters} (${p.ai_model})`);
+    console.log(`  • ${novel?.title || 'unknown'} — ${p.status}/${p.setup_stage} — ${p.current_chapter}/${p.total_planned_chapters} (${p.ai_model})`);
   }
 
-  console.log(`\n  ✓ Done. Cron picks up new projects in next 5-min tick.\n`);
+  console.log(`\n  ✓ Done. Setup pipeline must reach ready_to_write before cron writes chapter 1.\n`);
 }
 
 main().catch(e => {

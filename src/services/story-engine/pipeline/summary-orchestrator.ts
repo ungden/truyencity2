@@ -232,6 +232,7 @@ async function tryGenerateArcPlan(
         totalPlanned, config,
         storyVision,
         (projectRow as { world_description?: string } | null)?.world_description,
+        projectRow?.master_outline,
       );
     }
 
@@ -440,5 +441,4 @@ export function shouldBeFinaleArc(
 
   return false;
 }
-
 
