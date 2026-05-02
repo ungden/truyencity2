@@ -32,6 +32,7 @@ dotenv.config({ path: '/Users/alexle/Documents/truyencity/.env.runtime' });
 const SINGLE_PROJECT = process.argv.slice(2).find(a => !a.startsWith('--'));
 const LIMIT = Number(process.argv.find(a => a.startsWith('--limit='))?.split('=')[1] || 100);
 const DRY_RUN = process.argv.includes('--dry-run');
+const CONCURRENCY = Math.max(1, Number(process.argv.find(a => a.startsWith('--concurrency='))?.split('=')[1] || 1));
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -251,7 +252,7 @@ async function main(): Promise<void> {
   let failed = 0;
   const failures: Array<{ id: string; title: string; reason: string }> = [];
 
-  for (const row of candidates) {
+  async function processRow(row: ProjectRow): Promise<void> {
     const title = novelTitle(row);
     const tag = `${row.id.slice(0, 8)} "${title}" ch=${row.current_chapter}`;
     try {
@@ -260,12 +261,12 @@ async function main(): Promise<void> {
         failed += 1;
         failures.push({ id: row.id, title, reason: result.reason || 'unknown' });
         console.warn(`[skip] ${tag} — ${result.reason}`);
-        continue;
+        return;
       }
       derived += 1;
       if (DRY_RUN) {
         console.log(`[dry-run] ${tag} — would patch kernel (readerFantasy="${result.kernel.readerFantasy.slice(0, 60)}…")`);
-        continue;
+        return;
       }
       await patchKernelIntoProject(row, result.kernel);
       patched += 1;
@@ -277,6 +278,17 @@ async function main(): Promise<void> {
       console.error(`[fail] ${tag} — ${reason}`);
     }
   }
+
+  // Concurrency-limited workers: pull from a shared queue index. Avoids
+  // 6-hour serial runs without bursting beyond CONCURRENCY parallel calls.
+  let cursor = 0;
+  const workers = Array.from({ length: CONCURRENCY }, async () => {
+    while (cursor < candidates.length) {
+      const idx = cursor++;
+      await processRow(candidates[idx]);
+    }
+  });
+  await Promise.all(workers);
 
   console.log(`\nSummary: candidates=${candidates.length} derived=${derived} patched=${patched} failed=${failed}`);
   if (failures.length > 0) {
