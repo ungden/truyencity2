@@ -22,6 +22,29 @@ export const dynamic = 'force-dynamic';
 const TARGET_ACTIVE_PER_AUTHOR = 5;
 const DAILY_EXPANSION = 20;
 
+// Pause reasons that indicate human intervention required — daily-rotate must
+// NOT auto-unpause these or it will undo the safety pause set by another flow.
+//   - setup_kernel_*: write-chapters cron paused project because story_outline
+//     lacks setupKernel (pre-flight reset for ch0, manual review for ch>0).
+//   - StoryKernel*: same intent, older copy left by inline cron pre-flight.
+//   - outline_auto_revision: outline-reviser owns the unpause via its own flow.
+//   - setup_stage *_failed * — admin investigate: setup-pipeline gave up.
+//   - auto_paused_after_*: circuit breaker — admin must clear root cause first.
+//   - auto_paused_daily_cost_cap: cost cap — admin must investigate cost spike.
+const MANUAL_REVIEW_PAUSE_PREFIXES = [
+  'setup_kernel_',
+  'StoryKernel',
+  'outline_auto_revision',
+  'setup_stage ',
+  'auto_paused_after_',
+  'auto_paused_daily_cost_cap',
+];
+
+function isManualReviewPause(pauseReason: string | null | undefined): boolean {
+  if (!pauseReason) return false;
+  return MANUAL_REVIEW_PAUSE_PREFIXES.some(prefix => pauseReason.startsWith(prefix));
+}
+
 interface AuthorActiveCount {
   authorId: string;
   activeCount: number;
@@ -81,7 +104,7 @@ export async function GET(request: NextRequest) {
 
       const { data: projects } = await supabase
         .from('ai_story_projects')
-        .select('id, novel_id, status')
+        .select('id, novel_id, status, pause_reason')
         .in('novel_id', allNovelIds);
 
       if (!projects) continue;
@@ -92,8 +115,11 @@ export async function GET(request: NextRequest) {
         const authorProjects = projects.filter(p => authorNovelIds.has(p.novel_id));
 
         const activeCount = authorProjects.filter(p => p.status === 'active').length;
+        // Exclude paused-for-manual-review projects from the activation pool.
+        // Otherwise this cron undoes the safety pauses set by write-chapters
+        // pre-flight (setup_kernel), outline-reviser, circuit breaker, etc.
         const pausedProjectIds = authorProjects
-          .filter(p => p.status === 'paused')
+          .filter(p => p.status === 'paused' && !isManualReviewPause(p.pause_reason))
           .map(p => p.id);
 
         authorStats.push({ authorId, activeCount, pausedProjectIds });

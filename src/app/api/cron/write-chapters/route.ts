@@ -739,6 +739,30 @@ async function writeOneChapter(
     const errorMsg = err instanceof Error ? err.message : String(err);
     console.error(`[${tier}][${project.id.slice(0, 8)}] V2 engine failed:`, errorMsg);
 
+    // ====== KERNEL-MISSING SAFETY PAUSE ======
+    // Orchestrator throws PUBLISHED_SETUP_KERNEL_MISSING for projects with
+    // chapters but no story_outline.setupKernel. Without an immediate pause
+    // every cron tick re-throws the same error → log spam + wasted scheduling.
+    // Pause now and let scripts/backfill-setup-kernels.ts derive the kernel
+    // from existing canon before resume.
+    if (errorMsg.startsWith('PUBLISHED_SETUP_KERNEL_MISSING')) {
+      try {
+        await supabase
+          .from('ai_story_projects')
+          .update({
+            status: 'paused',
+            pause_reason: 'setup_kernel_missing_manual_review: published project lacks story_outline.setupKernel; run scripts/backfill-setup-kernels.ts',
+            paused_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', project.id)
+          .eq('status', 'active');
+        console.warn(`[${tier}][${project.id.slice(0, 8)}] Paused for manual kernel backfill`);
+      } catch (pauseErr) {
+        console.error(`[${tier}][${project.id.slice(0, 8)}] Failed to pause kernel-missing project:`, pauseErr);
+      }
+    }
+
     // ====== QUOTA ERROR — IMMEDIATELY after failure ======
     try {
       await updateQuotaAfterError(supabase, project.id, vnDate, errorMsg);
