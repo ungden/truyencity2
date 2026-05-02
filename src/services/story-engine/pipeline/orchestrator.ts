@@ -28,6 +28,7 @@ import { buildRuleContext, extractRulesFromChapter } from '../canon/world-rules'
 import { checkConsistency, checkConsistencyFast } from '../quality/consistency-check';
 import { runSummaryTasks } from '../pipeline/summary-orchestrator';
 import { generateArcPlan } from '../context/assembler';
+import { hasValidSetupKernel } from './setup-kernel-guards';
 // Quality modules (Qidian Master Level)
 import { getForeshadowingContext, updateForeshadowingStatus, generateForeshadowingAgenda } from '../plan/foreshadowing';
 import { getCharacterArcContext, updateCharacterArcs } from '../state/character-arcs';
@@ -239,6 +240,13 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     const storyOutline = extra?.story_outline as { protagonist?: { name?: string } } | null;
     const masterOutline = extra?.master_outline as { majorArcs?: Array<{ endChapter?: number }> } | null;
 
+    if (!hasValidSetupKernel(extra?.story_outline)) {
+      if (currentChapter === 0) {
+        throw new Error('SETUP_KERNEL_MISSING: refusing to write chapter 1 before setup state machine creates story_outline.setupKernel');
+      }
+      throw new Error('PUBLISHED_SETUP_KERNEL_MISSING: project has chapters but lacks story_outline.setupKernel; pause for manual review, do not auto-rewrite canon');
+    }
+
     // Fix A: MC name sync
     const outlineMC = storyOutline?.protagonist?.name?.trim();
     const projectMC = project.main_character?.trim();
@@ -289,14 +297,16 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       }
     }
 
-    // Phase 23 S1: SELF-HEALING — auto-regenerate missing outlines.
+    // Phase 23 S1: SELF-HEALING — auto-regenerate missing support artifacts.
+    // StoryKernel projects must not regenerate story_outline here. Ch.0 setup is
+    // owned by setup-pipeline; published projects require manual canon review.
     // If master_outline OR story_outline is null AND we're at the start of the novel
     // (current_chapter < 5), regen them in place before the chapter writes. This unblocks
     // novels that were reset (e.g. via rewrite-recent-10) without requiring a separate
     // outline-gen script pass. Skipped for chapters >5 because by then the cron already
     // reads outline several times; missing means a deliberate reset that's our job to fix.
     const needsMasterRegen = !extra?.master_outline && currentChapter < 5;
-    const needsStoryRegen = !extra?.story_outline && currentChapter < 5;
+    const needsStoryRegen = false;
     const needsPowerCanon = !(extra as { power_system_canon?: unknown } | null)?.power_system_canon && currentChapter < 5;
     const needsWorldbuildingCanon = !(extra as { worldbuilding_canon?: unknown } | null)?.worldbuilding_canon && currentChapter < 5;
     if (needsMasterRegen || needsStoryRegen || needsPowerCanon || needsWorldbuildingCanon) {
@@ -309,7 +319,6 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
         const novelTitle = (full?.novels as unknown as { title: string } | null)?.title || 'Unknown';
         const totalCh = full?.total_planned_chapters || 1000;
         const worldDesc = full?.world_description || '';
-        const mc = full?.main_character || resolvedMainCharacter;
 
         if (needsMasterRegen) {
           const { generateMasterOutline } = await import('../plan/master-outline');
@@ -323,23 +332,6 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
             { ...DEFAULT_CONFIG, model: 'deepseek-v4-pro', systemPrompt: '' },
           );
           validationFixes.push(`✓ master_outline auto-regenerated (was null, current_chapter=${currentChapter})`);
-        }
-
-        if (needsStoryRegen) {
-          const { generateStoryOutline } = await import('../plan/story-outline');
-          const outline = await generateStoryOutline(
-            options.projectId,
-            novelTitle,
-            (full?.genre || 'do-thi') as GenreType,
-            mc,
-            worldDesc,
-            totalCh,
-            { ...DEFAULT_CONFIG, model: 'deepseek-v4-flash' },
-          );
-          if (outline) {
-            await db.from('ai_story_projects').update({ story_outline: outline as unknown as Record<string, unknown> }).eq('id', options.projectId);
-            validationFixes.push(`✓ story_outline auto-regenerated (was null)`);
-          }
         }
 
         // Phase 27 W2.4: power-system canon — generate ONCE per project at setup.

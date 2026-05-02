@@ -26,6 +26,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyCronAuth } from '@/lib/auth/cron-auth';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { getVietnamDayBounds } from '@/lib/utils/vietnam-time';
+import {
+  hasValidSetupKernel,
+  shouldResetUnwrittenMissingKernel,
+} from '@/services/story-engine/pipeline/setup-kernel-guards';
 
 // Story Engine v2 — sole engine for all tiers (init + resume)
 import { writeOneChapter as writeOneChapterV2 } from '@/services/story-engine';
@@ -132,12 +136,38 @@ type ProjectRow = {
   current_chapter: number | null;
   total_planned_chapters: number | null;
   world_description: string | null;
+  story_outline?: unknown;
   writing_style: string | null;
   temperature: number | null;
   target_chapter_length: number | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   novels: any;
 };
+
+async function resetUnwrittenSetupForKernelRepair(
+  supabase: ReturnType<typeof getSupabaseAdmin>,
+  projectId: string,
+  reason: string,
+): Promise<void> {
+  const { error: arcErr } = await supabase.from('arc_plans').delete().eq('project_id', projectId);
+  if (arcErr) throw arcErr;
+
+  const { error } = await supabase.from('ai_story_projects').update({
+    status: 'paused',
+    pause_reason: reason.slice(0, 500),
+    world_description: null,
+    main_character: '',
+    master_outline: null,
+    story_outline: null,
+    story_bible: null,
+    setup_stage: 'idea',
+    setup_stage_attempts: 0,
+    setup_stage_error: null,
+    setup_stage_updated_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  }).eq('id', projectId);
+  if (error) throw error;
+}
 
 type DailyQuotaRow = {
   project_id: string;
@@ -767,7 +797,7 @@ export async function GET(request: NextRequest) {
           id, main_character, genre, status,
           setup_stage, setup_stage_attempts,
           current_chapter, total_planned_chapters,
-          world_description, writing_style, temperature,
+          world_description, story_outline, writing_style, temperature,
           target_chapter_length,
           novels!ai_story_projects_novel_id_fkey (id, title)
         `)
@@ -781,7 +811,7 @@ export async function GET(request: NextRequest) {
           id, main_character, genre, status,
           setup_stage, setup_stage_attempts,
           current_chapter, total_planned_chapters,
-          world_description, writing_style, temperature,
+          world_description, story_outline, writing_style, temperature,
           target_chapter_length,
           novels!ai_story_projects_novel_id_fkey (id, title)
         `)
@@ -892,8 +922,31 @@ export async function GET(request: NextRequest) {
         const stage = p.setup_stage || 'idea';
         return stage === 'ready_to_write' || stage === 'writing';
       };
-      initPrepCandidates = initCandidates.filter(p => !hasArcPlan.has(p.id) || !hasFullSetup(p) || !isReadyToWrite(p));
-      initWriteCandidates = initCandidates.filter(p => hasArcPlan.has(p.id) && hasFullSetup(p) && isReadyToWrite(p));
+      const missingKernelReady = initCandidates.filter(p => shouldResetUnwrittenMissingKernel({
+        currentChapter: p.current_chapter,
+        setupStage: p.setup_stage,
+        storyOutline: p.story_outline,
+      }));
+      if (missingKernelReady.length > 0) {
+        console.warn(`[Cron] Resetting ${missingKernelReady.length} ch0 ready projects missing StoryKernel before init-write`);
+        await Promise.all(missingKernelReady.map(p => resetUnwrittenSetupForKernelRepair(
+          supabase,
+          p.id,
+          'StoryKernel preflight reset: ready_to_write project missing story_outline.setupKernel before chapter 1',
+        )));
+      }
+      const missingKernelIds = new Set(missingKernelReady.map(p => p.id));
+      initPrepCandidates = initCandidates.filter(p =>
+        !missingKernelIds.has(p.id)
+        && (!hasArcPlan.has(p.id) || !hasFullSetup(p) || !isReadyToWrite(p) || !hasValidSetupKernel(p.story_outline))
+      );
+      initWriteCandidates = initCandidates.filter(p =>
+        !missingKernelIds.has(p.id)
+        && hasArcPlan.has(p.id)
+        && hasFullSetup(p)
+        && isReadyToWrite(p)
+        && hasValidSetupKernel(p.story_outline)
+      );
     }
     initPrepCandidates = [...initPrepCandidates, ...setupOnlyCandidates];
 

@@ -19,6 +19,7 @@ import {
   formatSetupGateIssues,
   validateSetupCanon,
 } from '@/services/story-engine/plan/setup-quality-gate';
+import { hasValidSetupKernel } from '@/services/story-engine/pipeline/setup-kernel-guards';
 
 dotenv.config({ path: '/Users/alexle/Documents/truyencity/.env.runtime' });
 
@@ -104,9 +105,27 @@ async function main(): Promise<void> {
 
   const rows = (data || []) as ProjectRow[];
   const findings: Array<{ row: ProjectRow; reason: string }> = [];
+  const counters = {
+    ch0ReadyMissingKernel: 0,
+    activeStaged: 0,
+    writtenMissingKernel: 0,
+    mcMismatch: 0,
+  };
 
   for (const row of rows) {
     const stage = row.setup_stage || 'idea';
+    const readyOrWriting = stage === 'ready_to_write' || stage === 'writing';
+    const chapters = row.current_chapter || 0;
+    const validKernel = hasValidSetupKernel(row.story_outline);
+    if (row.status === 'active' && chapters === 0 && ['idea', 'world', 'character', 'description', 'master_outline', 'story_outline', 'arc_plan'].includes(stage)) {
+      counters.activeStaged += 1;
+    }
+    if (chapters === 0 && readyOrWriting && !validKernel) {
+      counters.ch0ReadyMissingKernel += 1;
+    }
+    if (chapters > 0 && !validKernel) {
+      counters.writtenMissingKernel += 1;
+    }
     const shouldGate = stage !== 'idea' || !!row.world_description || !!row.main_character || !!row.story_outline || !!row.master_outline;
     const gate = shouldGate
       ? validateSetupCanon({
@@ -114,19 +133,23 @@ async function main(): Promise<void> {
           mainCharacter: row.main_character,
           storyOutline: row.story_outline,
           masterOutline: row.master_outline,
-          requireStoryOutline: stage === 'ready_to_write' || stage === 'writing',
-          requireMasterOutline: stage === 'ready_to_write' || stage === 'writing',
+          requireStoryOutline: readyOrWriting,
+          requireMasterOutline: readyOrWriting,
+          strictContract: readyOrWriting,
         })
       : { passed: true, issues: [] };
 
-    const missingArcForReady = (stage === 'ready_to_write' || stage === 'writing')
-      && !row.story_outline;
+    if ('issues' in gate && gate.issues.some(i => i.code === 'mc_world_mismatch' || i.code === 'mc_story_mismatch' || i.code === 'world_story_mismatch')) {
+      counters.mcMismatch += 1;
+    }
 
-    if (!gate.passed || isStuck(row) || missingArcForReady) {
+    const missingKernelForReady = readyOrWriting && !validKernel;
+
+    if (!gate.passed || isStuck(row) || missingKernelForReady) {
       const reason = [
         !gate.passed ? formatSetupGateIssues(gate) : '',
         isStuck(row) ? `stuck/error stage=${row.setup_stage || '(null)'} err=${row.setup_stage_error || '(none)'}` : '',
-        missingArcForReady ? 'ready/writing project missing story outline' : '',
+        missingKernelForReady ? 'ready/writing project missing valid StoryKernel' : '',
       ].filter(Boolean).join(' | ');
       findings.push({ row, reason });
     }
@@ -135,6 +158,7 @@ async function main(): Promise<void> {
   console.log(`Setup quality audit ${APPLY ? '(APPLY)' : '(read-only)'}`);
   console.log(`Scanned: ${rows.length}`);
   console.log(`Findings: ${findings.length}`);
+  console.log(`Counters: ${JSON.stringify(counters)}`);
 
   let reset = 0;
   let paused = 0;
