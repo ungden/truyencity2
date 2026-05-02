@@ -358,7 +358,12 @@ QUY TẮC PHÂN VOLUME (BẮT BUỘC):
 
     return parsed;
   } catch (error) {
-    console.error('Failed to generate master outline:', error);
+    // 2026-05-02: include error message + stack so failures surface in cron logs.
+    // Previously the silent return null masked Gemini Pro thinking-model truncation
+    // and other transient failures — caller saw "no volumes/majorArcs" with 0
+    // cost_tracking row, no clue what actually failed.
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error(`[master-outline] Failed for project ${projectId}: ${msg}`);
     return null;
   }
 }
