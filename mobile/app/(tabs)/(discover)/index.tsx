@@ -293,9 +293,13 @@ export default function DiscoverScreen() {
                     className="object-cover"
                   />
                   <Text
-                    className="text-foreground font-medium mt-1.5"
                     numberOfLines={2}
-                    style={{ fontSize: isTablet ? 14 : 12 }}
+                    style={{
+                      fontSize: isTablet ? 14 : 12,
+                      fontWeight: "500",
+                      color: "#e8e6f0",
+                      marginTop: 6,
+                    }}
                   >
                     {item.title}
                   </Text>
