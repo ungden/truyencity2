@@ -9,11 +9,15 @@ const DEBOUNCE_MS = 300;
 const NOVEL_LIST_FIELDS =
   "id,title,slug,author,cover_url,genres,status,chapter_count,created_at";
 
+/** novels.status DB values are Vietnamese strings — match exactly. */
+export const NOVEL_STATUS_VALUES = ["Đang ra", "Hoàn thành", "Tạm dừng"] as const;
+export type NovelStatusValue = (typeof NOVEL_STATUS_VALUES)[number];
+
 export interface SearchFilters {
   /** Genre filter — match novels.genres array (any match) */
   genres?: string[];
-  /** Status filter — 'completed' / 'ongoing' / null for all */
-  status?: "completed" | "ongoing" | null;
+  /** Status filter — multi-select; empty array = all */
+  statuses?: NovelStatusValue[];
   /** Minimum chapter count */
   minChapters?: number;
   /** Maximum chapter count */
@@ -26,7 +30,7 @@ export interface SearchFilters {
 
 const DEFAULT_FILTERS: SearchFilters = {
   genres: [],
-  status: null,
+  statuses: [],
   minChapters: undefined,
   maxChapters: undefined,
   sortBy: "chapter_count",
@@ -57,7 +61,7 @@ export function useSearch() {
     const trimmed = text.trim();
     const hasFilters =
       (currentFilters.genres && currentFilters.genres.length > 0) ||
-      currentFilters.status ||
+      (currentFilters.statuses && currentFilters.statuses.length > 0) ||
       currentFilters.minChapters != null ||
       currentFilters.maxChapters != null;
 
@@ -79,8 +83,8 @@ export function useSearch() {
       if (currentFilters.genres && currentFilters.genres.length > 0) {
         q = q.overlaps("genres", currentFilters.genres);
       }
-      if (currentFilters.status) {
-        q = q.eq("status", currentFilters.status === "completed" ? "completed" : "Đang ra");
+      if (currentFilters.statuses && currentFilters.statuses.length > 0) {
+        q = q.in("status", currentFilters.statuses);
       }
       if (currentFilters.minChapters != null) {
         q = q.gte("chapter_count", currentFilters.minChapters);
@@ -117,7 +121,7 @@ export function useSearch() {
 
       const hasFilters =
         (filters.genres && filters.genres.length > 0) ||
-        filters.status ||
+        (filters.statuses && filters.statuses.length > 0) ||
         filters.minChapters != null ||
         filters.maxChapters != null;
 
