@@ -35,6 +35,7 @@ export default async function QualityDashboardPage() {
     budget,
     canonCoverage,
     revisedNovels,
+    recentDiagnoses,
   ] = await Promise.all([
     supabase.from('ai_story_projects').select('id', { count: 'exact', head: true }).eq('status', 'active'),
     supabase.from('ai_story_projects').select('id', { count: 'exact', head: true }).eq('status', 'paused'),
@@ -65,6 +66,12 @@ export default async function QualityDashboardPage() {
       .ilike('pause_reason', 'outline_auto_revision%')
       .order('paused_at', { ascending: false })
       .limit(10),
+    // Phase 29 Feature 1: latest 10-chapter meta-diagnoses with non-empty issues
+    supabase.from('quality_trends')
+      .select('project_id,current_chapter,snapshot_date,alert_level,meta')
+      .not('meta->diagnosis', 'is', null)
+      .order('snapshot_date', { ascending: false })
+      .limit(15),
   ]);
 
   // Quality average over last 7 days
@@ -169,6 +176,96 @@ export default async function QualityDashboardPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+        </section>
+      )}
+
+      {/* Phase 29 Feature 1: 10-chapter meta-diagnoses */}
+      {recentDiagnoses.data && recentDiagnoses.data.length > 0 && (
+        <section>
+          <h2 className="text-lg font-semibold mb-2">
+            🩺 10-chapter meta-diagnoses (latest)
+          </h2>
+          <p className="text-xs text-gray-500 mb-2">
+            Arc-level pacing/character/plot/engagement issues that per-chapter Critic can&apos;t see. Stuffed into <code>quality_trends.meta.diagnosis</code>.
+          </p>
+          <div className="space-y-2">
+            {recentDiagnoses.data.map((row: {
+              project_id: string;
+              current_chapter: number;
+              snapshot_date: string;
+              alert_level: string;
+              meta: { diagnosis?: {
+                windowStart?: number;
+                windowEnd?: number;
+                oneLineSummary?: string;
+                pacingIssues?: Array<{ severity?: string; description?: string }>;
+                characterIssues?: Array<{ severity?: string; description?: string }>;
+                plotIssues?: Array<{ severity?: string; description?: string }>;
+                readerEngagementIssues?: Array<{ severity?: string; description?: string }>;
+                suggestions?: string[];
+              } | null } | null;
+            }) => {
+              const d = row.meta?.diagnosis;
+              if (!d) return null;
+              const buckets = [
+                { label: 'Pacing', items: d.pacingIssues || [] },
+                { label: 'Character', items: d.characterIssues || [] },
+                { label: 'Plot', items: d.plotIssues || [] },
+                { label: 'Engagement', items: d.readerEngagementIssues || [] },
+              ];
+              const totalIssues = buckets.reduce((s, b) => s + b.items.length, 0);
+              return (
+                <div key={`${row.project_id}-${row.snapshot_date}`} className="rounded border border-gray-200 dark:border-gray-700 p-3">
+                  <div className="flex items-center justify-between mb-2 gap-2">
+                    <div className="text-xs font-mono text-gray-500">{row.project_id.slice(0, 8)} · ch.{d.windowStart}-{d.windowEnd}</div>
+                    <div className="flex items-center gap-2">
+                      <span className={
+                        row.alert_level === 'critical' ? 'text-red-600 font-bold text-xs' :
+                        row.alert_level === 'warn' ? 'text-amber-600 font-semibold text-xs' :
+                        row.alert_level === 'watch' ? 'text-yellow-600 text-xs' :
+                        'text-gray-500 text-xs'
+                      }>
+                        {row.alert_level}
+                      </span>
+                      <span className="text-xs text-gray-500">{totalIssues} issue{totalIssues === 1 ? '' : 's'}</span>
+                      <span className="text-xs text-gray-400">{row.snapshot_date}</span>
+                    </div>
+                  </div>
+                  <div className="text-sm font-medium mb-2">{d.oneLineSummary || '—'}</div>
+                  {totalIssues > 0 && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                      {buckets.filter(b => b.items.length > 0).map(b => (
+                        <div key={b.label}>
+                          <div className="font-semibold text-gray-700 dark:text-gray-300 mb-1">{b.label} ({b.items.length})</div>
+                          <ul className="space-y-1">
+                            {b.items.slice(0, 3).map((it, i) => (
+                              <li key={i} className="flex gap-1">
+                                <span className={
+                                  it.severity === 'critical' ? 'text-red-600 font-semibold' :
+                                  it.severity === 'major' ? 'text-amber-600' :
+                                  it.severity === 'moderate' ? 'text-yellow-600' :
+                                  'text-gray-500'
+                                }>[{it.severity?.[0]?.toUpperCase() || '?'}]</span>
+                                <span className="text-gray-600 dark:text-gray-400">{it.description?.slice(0, 160) || '—'}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {d.suggestions && d.suggestions.length > 0 && (
+                    <details className="mt-2 text-xs">
+                      <summary className="cursor-pointer text-gray-500">{d.suggestions.length} suggestion{d.suggestions.length === 1 ? '' : 's'}</summary>
+                      <ul className="mt-1 space-y-1 pl-4 list-disc text-gray-600 dark:text-gray-400">
+                        {d.suggestions.map((s, i) => <li key={i}>{s}</li>)}
+                      </ul>
+                    </details>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </section>
       )}
