@@ -63,22 +63,30 @@ async function checkChapterProduction(supabase: ReturnType<typeof getSupabaseAdm
 }
 
 async function checkStuckNovels(supabase: ReturnType<typeof getSupabaseAdmin>): Promise<CheckResult & { stuckCount: number }> {
+  // Only count "stuck" if active + ch=0 + setup_stage hasn't progressed in >1h.
+  // Newly-spawned projects normally take 5-15 min to walk through idea → world →
+  // character → description → master_outline → story_outline → arc_plan stages.
+  // Counting them as "stuck" produces false positives during the daily-spawn
+  // window. The 1-hour threshold catches projects whose setup-pipeline has
+  // genuinely stalled (typically waiting on retries that already exhausted).
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
   const { count } = await supabase
     .from('ai_story_projects')
     .select('id', { count: 'exact', head: true })
     .eq('status', 'active')
-    .eq('current_chapter', 0);
+    .eq('current_chapter', 0)
+    .or(`setup_stage_updated_at.lt.${oneHourAgo},setup_stage_updated_at.is.null`);
 
   const stuck = count ?? 0;
   let status: CheckResult['status'] = 'pass';
-  let message = `${stuck} novels at chapter 0`;
+  let message = `${stuck} novels at chapter 0 (idle ≥1h)`;
 
   if (stuck > 20) {
     status = 'fail';
-    message = `${stuck} novels stuck at chapter 0 — factory init may be broken`;
+    message = `${stuck} novels stuck at chapter 0 for ≥1h — setup-pipeline regression likely`;
   } else if (stuck > 5) {
     status = 'warn';
-    message = `${stuck} novels still at chapter 0 — init queue backlog`;
+    message = `${stuck} novels still at chapter 0 ≥1h — init queue backlog`;
   }
 
   return { name: 'Stuck Novels (ch=0)', status, message, value: stuck, stuckCount: stuck };
@@ -261,17 +269,24 @@ async function checkWordQuality(supabase: ReturnType<typeof getSupabaseAdmin>): 
 
   const wordCounts = chapters.map(ch => (ch.content || '').split(/\s+/).length);
   const avg = Math.round(wordCounts.reduce((a, b) => a + b, 0) / wordCounts.length);
-  const under2500 = wordCounts.filter(w => w < 2500).length;
+  // Phase 19A introduced chapter split: AI writes ~2800 words and orchestrator
+  // halves into 2 reader chapters (~1400 each). Threshold updated accordingly.
+  // Reader chapter target: 1200-1800 words. <800 = AI write was too short.
+  // Novels with disable_chapter_split=true still produce ~2400-2800 word chapters,
+  // so the upper "above target" status doesn't flag them.
+  const READER_TARGET_MIN = 1200;
+  const READER_TARGET_FAIL = 800;
+  const underTarget = wordCounts.filter(w => w < READER_TARGET_MIN).length;
 
   let status: CheckResult['status'] = 'pass';
-  let message = `Avg ${avg} words/chapter (${under2500}/${chapters.length} under 2500)`;
+  let message = `Avg ${avg} words/reader chapter (${underTarget}/${chapters.length} under ${READER_TARGET_MIN})`;
 
-  if (avg < 2000) {
+  if (avg < READER_TARGET_FAIL) {
     status = 'fail';
-    message = `Low quality — avg only ${avg} words (target: 2500+)`;
-  } else if (avg < 2500) {
+    message = `Low quality — avg only ${avg} words (target: ${READER_TARGET_MIN}+ for split chapters)`;
+  } else if (avg < READER_TARGET_MIN) {
     status = 'warn';
-    message = `Below target — avg ${avg} words (target: 2500+)`;
+    message = `Below target — avg ${avg} words (target: ${READER_TARGET_MIN}+ for split chapters)`;
   }
 
   return { name: 'Word Quality', status, message, value: avg, avgWords: avg };
@@ -326,10 +341,14 @@ async function checkQualityDrift(supabase: ReturnType<typeof getSupabaseAdmin>):
   let status: CheckResult['status'] = 'pass';
   let message = `1h avg: ${avgWords1h}, 6h avg: ${avgWords6h} (drift ${driftPct}%)`;
 
-  if (avgWords1h < 2200 || driftPct <= -20) {
+  // Drift check: relative drop matters more than absolute floor — split chapters
+  // average ~1400 words; non-split novels ~2400. Use percentage drift as primary
+  // signal; absolute floor only catches catastrophic truncation (<700 = AI returning
+  // half-output).
+  if (avgWords1h < 700 || driftPct <= -25) {
     status = 'fail';
     message = `Quality dropped sharply — 1h avg ${avgWords1h}, 6h baseline ${avgWords6h} (${driftPct}%)`;
-  } else if (avgWords1h < 2500 || driftPct <= -12) {
+  } else if (avgWords1h < 1100 || driftPct <= -15) {
     status = 'warn';
     message = `Quality drift detected — 1h avg ${avgWords1h}, baseline ${avgWords6h} (${driftPct}%)`;
   }

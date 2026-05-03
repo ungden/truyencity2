@@ -144,11 +144,30 @@ type ProjectRow = {
   novels: any;
 };
 
+// Cap repeated kernel-repair resets at 3 to prevent infinite loops where IDEA
+// stage keeps failing for a bad genre + seed combination. Beyond this cap the
+// project is dead-lettered with a pause_reason that admin must clear manually.
+const MAX_KERNEL_REPAIR_ATTEMPTS = 3;
+
 async function resetUnwrittenSetupForKernelRepair(
   supabase: ReturnType<typeof getSupabaseAdmin>,
   projectId: string,
   reason: string,
+  currentRepairAttempts = 0,
 ): Promise<void> {
+  // Dead-letter path: too many failed kernel repairs → admin must clear.
+  if (currentRepairAttempts >= MAX_KERNEL_REPAIR_ATTEMPTS) {
+    const { error } = await supabase.from('ai_story_projects').update({
+      status: 'paused',
+      pause_reason: `setup_kernel_dead_letter: ${MAX_KERNEL_REPAIR_ATTEMPTS}× kernel repair attempts failed. Admin must inspect genre/seed combination and either reseed or delete project.`.slice(0, 500),
+      paused_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }).eq('id', projectId);
+    if (error) throw error;
+    console.warn(`[Cron] Project ${projectId.slice(0, 8)} dead-lettered after ${currentRepairAttempts} kernel repair attempts`);
+    return;
+  }
+
   const { error: arcErr } = await supabase.from('arc_plans').delete().eq('project_id', projectId);
   if (arcErr) throw arcErr;
 
@@ -164,6 +183,7 @@ async function resetUnwrittenSetupForKernelRepair(
     setup_stage_attempts: 0,
     setup_stage_error: null,
     setup_stage_updated_at: new Date().toISOString(),
+    kernel_repair_attempts: currentRepairAttempts + 1,
     updated_at: new Date().toISOString(),
   }).eq('id', projectId);
   if (error) throw error;
@@ -739,6 +759,30 @@ async function writeOneChapter(
     const errorMsg = err instanceof Error ? err.message : String(err);
     console.error(`[${tier}][${project.id.slice(0, 8)}] V2 engine failed:`, errorMsg);
 
+    // ====== KERNEL-MISSING SAFETY PAUSE ======
+    // Orchestrator throws PUBLISHED_SETUP_KERNEL_MISSING for projects with
+    // chapters but no story_outline.setupKernel. Without an immediate pause
+    // every cron tick re-throws the same error → log spam + wasted scheduling.
+    // Pause now and let scripts/backfill-setup-kernels.ts derive the kernel
+    // from existing canon before resume.
+    if (errorMsg.startsWith('PUBLISHED_SETUP_KERNEL_MISSING')) {
+      try {
+        await supabase
+          .from('ai_story_projects')
+          .update({
+            status: 'paused',
+            pause_reason: 'setup_kernel_missing_manual_review: published project lacks story_outline.setupKernel; run scripts/backfill-setup-kernels.ts',
+            paused_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', project.id)
+          .eq('status', 'active');
+        console.warn(`[${tier}][${project.id.slice(0, 8)}] Paused for manual kernel backfill`);
+      } catch (pauseErr) {
+        console.error(`[${tier}][${project.id.slice(0, 8)}] Failed to pause kernel-missing project:`, pauseErr);
+      }
+    }
+
     // ====== QUOTA ERROR — IMMEDIATELY after failure ======
     try {
       await updateQuotaAfterError(supabase, project.id, vnDate, errorMsg);
@@ -929,10 +973,20 @@ export async function GET(request: NextRequest) {
       }));
       if (missingKernelReady.length > 0) {
         console.warn(`[Cron] Resetting ${missingKernelReady.length} ch0 ready projects missing StoryKernel before init-write`);
+        // Pull existing kernel_repair_attempts in one query so we can pass to
+        // dead-letter check inside the helper. Avoids per-project SELECT.
+        const { data: repairRows } = await supabase
+          .from('ai_story_projects')
+          .select('id,kernel_repair_attempts')
+          .in('id', missingKernelReady.map(p => p.id));
+        const repairAttempts = new Map<string, number>(
+          (repairRows || []).map((r: { id: string; kernel_repair_attempts: number | null }) => [r.id, r.kernel_repair_attempts ?? 0]),
+        );
         await Promise.all(missingKernelReady.map(p => resetUnwrittenSetupForKernelRepair(
           supabase,
           p.id,
           'StoryKernel preflight reset: ready_to_write project missing story_outline.setupKernel before chapter 1',
+          repairAttempts.get(p.id) ?? 0,
         )));
       }
       const missingKernelIds = new Set(missingKernelReady.map(p => p.id));

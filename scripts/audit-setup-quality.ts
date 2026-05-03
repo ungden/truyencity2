@@ -47,6 +47,7 @@ interface ProjectRow {
   story_outline: unknown;
   current_chapter: number | null;
   status: string | null;
+  pause_reason: string | null;
   setup_stage: string | null;
   setup_stage_error: string | null;
   novels?: { title?: string | null } | { title?: string | null }[] | null;
@@ -94,10 +95,23 @@ async function pausePublished(row: ProjectRow, reason: string): Promise<void> {
   if (error) throw error;
 }
 
+async function pausePublishedMissingKernel(row: ProjectRow): Promise<void> {
+  // Use the canonical pause_reason recognized by:
+  //   - daily-rotate-cron's MANUAL_REVIEW_PAUSE_PREFIXES (will not auto-unpause)
+  //   - scripts/backfill-setup-kernels.ts (will auto-resume after kernel patch)
+  const { error } = await db.from('ai_story_projects').update({
+    status: 'paused',
+    pause_reason: 'setup_kernel_missing_manual_review: published project lacks story_outline.setupKernel; run scripts/backfill-setup-kernels.ts',
+    paused_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  }).eq('id', row.id);
+  if (error) throw error;
+}
+
 async function main(): Promise<void> {
   const { data, error } = await db
     .from('ai_story_projects')
-    .select('id,novel_id,genre,main_character,world_description,master_outline,story_outline,current_chapter,status,setup_stage,setup_stage_error,novels!ai_story_projects_novel_id_fkey(title)')
+    .select('id,novel_id,genre,main_character,world_description,master_outline,story_outline,current_chapter,status,pause_reason,setup_stage,setup_stage_error,novels!ai_story_projects_novel_id_fkey(title)')
     .order('created_at', { ascending: false })
     .limit(LIMIT);
 
@@ -144,12 +158,18 @@ async function main(): Promise<void> {
     }
 
     const missingKernelForReady = readyOrWriting && !validKernel;
+    // Published novels without kernel: orchestrator throws every cron tick.
+    // Surface as findings so APPLY mode can pause them under the standard
+    // tag that scripts/backfill-setup-kernels.ts recognizes for resume.
+    const publishedMissingKernel = chapters > 0 && !validKernel
+      && !(row.status === 'paused' && row.pause_reason?.startsWith('setup_kernel_missing_manual_review'));
 
-    if (!gate.passed || isStuck(row) || missingKernelForReady) {
+    if (!gate.passed || isStuck(row) || missingKernelForReady || publishedMissingKernel) {
       const reason = [
         !gate.passed ? formatSetupGateIssues(gate) : '',
         isStuck(row) ? `stuck/error stage=${row.setup_stage || '(null)'} err=${row.setup_stage_error || '(none)'}` : '',
         missingKernelForReady ? 'ready/writing project missing valid StoryKernel' : '',
+        publishedMissingKernel ? 'published project missing valid StoryKernel — backfill required' : '',
       ].filter(Boolean).join(' | ');
       findings.push({ row, reason });
     }
@@ -162,6 +182,7 @@ async function main(): Promise<void> {
 
   let reset = 0;
   let paused = 0;
+  let pausedForKernel = 0;
   for (const { row, reason } of findings) {
     const chapters = row.current_chapter || 0;
     console.log([
@@ -180,6 +201,10 @@ async function main(): Promise<void> {
     if (chapters === 0) {
       await resetUnwritten(row);
       reset += 1;
+    } else if (chapters > 0 && !hasValidSetupKernel(row.story_outline)) {
+      // Kernel-missing → standard tag the backfill script recognizes.
+      await pausePublishedMissingKernel(row);
+      pausedForKernel += 1;
     } else {
       await pausePublished(row, reason);
       paused += 1;
@@ -187,7 +212,10 @@ async function main(): Promise<void> {
   }
 
   if (APPLY) {
-    console.log(`Applied repair: reset=${reset}, paused_for_manual_review=${paused}`);
+    console.log(`Applied repair: reset=${reset}, paused_for_manual_review=${paused}, paused_for_kernel_backfill=${pausedForKernel}`);
+    if (pausedForKernel > 0) {
+      console.log(`Next step: ./node_modules/.bin/tsx scripts/backfill-setup-kernels.ts`);
+    }
   }
 }
 
