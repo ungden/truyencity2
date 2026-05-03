@@ -410,6 +410,13 @@ KIỂM TRA MÂU THUẪN (BẮT BUỘC — coherence chặt cho long-form):
 - Nếu nhân vật BIẾT thông tin chưa từng được tiết lộ trong các chương trước -> type "continuity", severity "critical", REWRITE
 - Nếu RELATIONSHIP giữa 2 nhân vật flip vô lý (yêu→thù, thù→yêu) không có lý do -> type "continuity", severity "critical", REWRITE
 - Nếu MC ở location A chương trước, location B chương này KHÔNG có scene di chuyển -> type "continuity", severity "major"
+- PRONOUN SYSTEM CONSISTENCY (CRITICAL — kiểm tra với "VN PRONOUN WHITELIST" trong context):
+  → Genre ARCHAIC (tien-hiep / huyen-huyen / kiem-hiep / lich-su / di-gioi): grep dialogue MC cho "tôi", "anh", "em", "cô", "chú", "bác", "cậu", "mày", "tớ", "mình", "nhóc con", "bạn". Nếu xuất hiện ≥1 lần trong dialogue MC → type "consistency", severity "critical", REWRITE. Đây là drift sang hệ MODERN, phá tone genre.
+  → Genre MODERN (do-thi / quan-truong / mat-the / vong-du / quy-tac-quai-dam / khoa-huyen sci-fi gần): grep dialogue MC cho "ta" (xưng), "ngươi", "tại hạ", "lão phu", "bản tọa", "bản công tử", "tiểu tử", "vãn bối", "tiền bối", "đạo hữu", "sư phụ", "sư huynh", "sư đệ". Nếu xuất hiện ≥1 lần → type "consistency", severity "critical", REWRITE.
+  → "ta" làm SELF-PRONOUN của MC trong dialogue thì kiểm: nếu genre là MODERN cluster → critical. Nếu là ARCHAIC cluster → ĐÚNG (chỉ flag nếu MC mix với "tôi" trong cùng chương → moderate).
+  → Genre dong-nhan + canon modern (Naruto / Bleach / shonen): "ta/ngươi" trong dialogue MC = critical REWRITE. Genre dong-nhan + canon archaic (Đấu La / tu tiên fanfic): "tôi/anh/em" trong dialogue MC = critical REWRITE.
+  → MC SELF mix 2 hệ trong cùng chương (1 chỗ "ta", 1 chỗ "tôi"; hoặc 1 chỗ "anh", 1 chỗ "ta") → critical REWRITE bất kể genre. Đây là personality drift.
+  → 3rd-person narrator: archaic genres dùng "anh ta / cô ta" → moderate. Modern genres dùng "hắn / nàng / y / lão / gã" → moderate.
 - BRIDGE CONTINUITY (chương >1, kiểm tra với "[NGUYÊN VĂN ĐOẠN KẾT CHƯƠNG TRƯỚC]" trong context):
   → 100 từ đầu của scene 1 PHẢI reference ÍT NHẤT 2 micro-detail (vị trí cụ thể, vật MC đang cầm, dialogue line cuối, cảm xúc/trạng thái cơ thể) từ đoạn kết đó.
   → Nếu scene 1 mở bằng "Sáng hôm sau, MC tỉnh dậy…" / "Vài ngày sau…" / "MC bước vào căn phòng [khác]…" mà chương trước KHÔNG kết bằng MC ngủ/ngất/di chuyển → type "continuity", severity "critical", REWRITE.

@@ -615,22 +615,87 @@ export const AI_CLICHE_BLACKLIST_SOFT: string[] = [
  * Forces appropriate pronouns: hắn/y/lão/nàng for cổ trang, anh/cô for hiện đại.
  */
 export const VN_PRONOUN_GUIDE: Record<GenreType, string> = {
-  'tien-hiep': 'hắn (MC + nam đồng cấp), y (nam đối thủ), lão (cao niên), nàng (nữ MC/nữ chính), gã (nam phản diện khinh miệt), bà (nữ cao niên). CẤM "anh ta", "cô ta".',
-  'huyen-huyen': 'hắn / y / lão / nàng / gã / bà. CẤM "anh ta", "cô ta".',
-  'kiem-hiep': 'hắn / y / lão / nàng / gã / bà / hảo hán / đại hiệp. CẤM "anh ta".',
-  'do-thi': 'anh / cô / chị / em / chú / bác (HIỆN ĐẠI). DÙNG "anh/cô" cho MC + người trẻ; "chú/bác" cho người lớn tuổi. CẤM "hắn/nàng/y" (cổ trang).',
-  'ngon-tinh': 'anh / cô / chị / em (HIỆN ĐẠI tổng tài) HOẶC hắn / nàng (cổ trang ngôn tình tùy bối cảnh). KHÔNG mix 2 hệ.',
-  'quy-tac-quai-dam': 'tôi / anh / cô / em / chú / bác (HIỆN ĐẠI). Default first-person "tôi" cho MC. CẤM "hắn / nàng / y / lão" (cổ trang). NPC quái dị xưng hô bình thường nhưng SAI 1 chi tiết (gọi tên MC khi MC chưa giới thiệu, dùng kính ngữ kiểu cũ trong văn phòng hiện đại).',
-  'ngu-thu-tien-hoa': 'hắn / nàng / y / lão / sư phụ (cổ trang ngự thú); hoặc anh / cô / em / thầy (hiện đại học viện). CHỌN 1 hệ theo bối cảnh topic. Pet luôn xưng hô qua tên riêng + tiếng kêu/biểu cảm.',
-  'khoai-xuyen': 'TÙY THẾ GIỚI: thế giới hiện đại đô thị → anh/cô/em/chú/bác; thế giới cổ đại cung đấu → hắn/nàng/y/lão/bệ hạ/công công; thế giới mạt thế → cô/em/đồng đội; thế giới ngôn tình → anh/cô. MC giữ first-person "ta/tôi" trong nội tâm xuyên suốt mọi thế giới (giọng senior nhất quán).',
-  'quan-truong': 'anh / cô / chú / bác / đồng chí / lãnh đạo (HIỆN ĐẠI). CẤM "hắn/nàng/y".',
-  'lich-su': 'hắn / y / lão / nàng / gã / bệ hạ / công công / nương nương / vương / hầu (theo cấp bậc).',
-  'mat-the': 'hắn / cô / em (post-apocalypse mix) — choose by character age + tone.',
-  'linh-di': 'hắn / cô / anh / em (hiện đại horror) — flexible.',
-  'di-gioi': 'hắn / nàng / lãnh chúa / chủ nhân (tuỳ vai vế trong dị giới).',
-  'khoa-huyen': 'anh / cô / hắn / nàng (sci-fi mix). Default modern: "anh/cô"; future-far: "hắn/nàng".',
-  'vong-du': 'anh / cô / em / hắn (game mix) — modern player default "anh/cô".',
-  'dong-nhan': 'theo nguyên tác. Tu tiên: hắn/nàng/y; modern fanfic: anh/cô.',
+  'tien-hiep': `HỆ ARCHAIC (cổ trang tu tiên) — KHÔNG ĐƯỢC MIX với hệ MODERN.
+- Narrator (3rd person): hắn (MC + nam đồng cấp), y (nam đối thủ), lão (cao niên), nàng (nữ MC/nữ chính), gã (nam phản diện khinh miệt), bà (nữ cao niên).
+- Dialogue MC SELF (xưng): "ta" với mọi người. Cao thâm thì "lão phu / bản tọa / bản công tử / lão tử".
+- Dialogue MC ADDRESS (hô): "ngươi" cho đồng cấp/người lạ; "tiểu tử" cho hậu bối; "lão / sư phụ / sư huynh / sư đệ" cho cao niên/sư môn; "đạo hữu" lịch sự với người tu cùng đạo; "vãn bối / tiền bối" theo cấp bậc.
+- CẤM TUYỆT ĐỐI trong dialogue MC: "tôi", "anh", "em", "cô", "chú", "bác", "cậu", "mày", "tớ", "mình", "nhóc con", "bạn". Đây là hệ HIỆN ĐẠI, drift = bug.
+- CẤM 3rd-person: "anh ta", "cô ta", "chị ấy".`,
+  'huyen-huyen': `HỆ ARCHAIC (huyền huyễn / dị giới fantasy) — KHÔNG ĐƯỢC MIX với hệ MODERN.
+- Narrator: hắn / y / lão / nàng / gã / bà.
+- Dialogue MC SELF: "ta". Cao thâm "lão phu / bản tọa / bản công tử".
+- Dialogue MC ADDRESS: "ngươi" / "tiểu tử" / "lão" / "sư phụ".
+- CẤM TUYỆT ĐỐI dialogue MC: "tôi / anh / em / cô / chú / bác / cậu / mày / tớ / mình / nhóc con / bạn".
+- CẤM 3rd-person: "anh ta", "cô ta".`,
+  'kiem-hiep': `HỆ ARCHAIC (võ hiệp) — strict archaic.
+- Narrator: hắn / y / lão / nàng / gã / bà / hảo hán / đại hiệp.
+- Dialogue MC SELF: "ta" / "tại hạ" (lịch sự võ lâm).
+- Dialogue MC ADDRESS: "ngươi" / "các hạ" / "tiền bối" / "đại hiệp" / "huynh đài".
+- CẤM dialogue MC: "tôi / anh / em / cô / chú / bác / mày / cậu".`,
+  'do-thi': `HỆ MODERN (đô thị hiện đại) — KHÔNG ĐƯỢC MIX với hệ ARCHAIC.
+- Narrator: anh / cô / chị / em / chú / bác.
+- Dialogue MC SELF: "tôi" (formal/business/người lạ) HOẶC "anh / em" (theo tuổi vs đối tượng).
+- Dialogue MC ADDRESS: "anh" / "cô" / "chị" / "em" / "chú" / "bác" / "cậu" (bạn cùng tuổi); với cấp dưới có thể "cậu / em"; với cấp trên "anh / chú / sếp / giám đốc".
+- CẤM TUYỆT ĐỐI dialogue MC: "ta / ngươi / tại hạ / lão phu / bản tọa / tiểu tử / vãn bối / tiền bối / sư phụ / đạo hữu". Đây là hệ ARCHAIC, drift = bug.
+- CẤM narrator: "hắn / nàng / y / lão / gã / bà".`,
+  'ngon-tinh': `HỆ MODERN (mặc định tổng tài đô thị) hoặc ARCHAIC (cung đấu cổ trang) — CHỌN 1 HỆ theo bối cảnh topic, KHÔNG MIX.
+- Modern: narrator anh/cô; MC SELF "tôi/anh/em"; MC ADDRESS "anh/cô/em/chị". CẤM "ta/ngươi/hắn/nàng".
+- Archaic cung đấu: narrator hắn/nàng; MC SELF "ta / thiếp / bản cung"; MC ADDRESS "ngươi / chàng / công tử / hoàng thượng". CẤM "tôi/anh/em/cô".`,
+  'quy-tac-quai-dam': `HỆ MODERN strict (Rules Horror đời thường).
+- Default first-person POV: MC narrate "Tôi…".
+- Dialogue MC SELF: "tôi".
+- Dialogue MC ADDRESS: "anh / cô / em / chú / bác / cậu" theo tuổi.
+- NPC quái dị xưng hô BÌNH THƯỜNG nhưng SAI 1 chi tiết tinh vi (gọi tên MC khi MC chưa giới thiệu, dùng kính ngữ kiểu cũ trong văn phòng hiện đại).
+- CẤM TUYỆT ĐỐI: "ta / ngươi / hắn / nàng / y / lão / tại hạ / bản tọa".`,
+  'ngu-thu-tien-hoa': `2 SUB-MODE — chọn theo topic, KHÔNG mix:
+- Cổ trang ngự thú: narrator hắn/nàng/y/lão; MC SELF "ta"; MC ADDRESS "ngươi / sư phụ / tiểu tử". Pet xưng tên riêng + tiếng kêu.
+- Hiện đại học viện: narrator anh/cô; MC SELF "tôi"; MC ADDRESS "anh / cô / thầy / em". Pet xưng tên riêng.
+- CẤM mix 2 hệ trong cùng truyện.`,
+  'khoai-xuyen': `TÙY THẾ GIỚI — ĐỔI HỆ MỖI ARC theo bối cảnh:
+- Hiện đại đô thị → MC SELF "tôi"; MC ADDRESS "anh/cô/em/chú/bác"; narrator anh/cô.
+- Cổ đại cung đấu → MC SELF "ta / thần thiếp"; MC ADDRESS "ngươi / công tử / bệ hạ / công công"; narrator hắn/nàng/y.
+- Mạt thế → MC SELF "tôi"; MC ADDRESS "anh/cô/đồng đội/em".
+- Ngôn tình → MC SELF "tôi/em"; MC ADDRESS "anh/chàng".
+- NỘI TÂM MC (không phải dialogue): luôn first-person "tôi" (giọng senior xuyên suốt mọi thế giới).
+- Khi chuyển arc: PHẢI chuyển hệ pronoun đồng bộ. Lẫn 2 hệ trong 1 arc = bug.`,
+  'quan-truong': `HỆ MODERN strict (chính trị/cơ quan VN).
+- Narrator: anh / cô / chú / bác.
+- Dialogue MC SELF: "tôi" (formal mọi tình huống công vụ); "anh / em" trong giao tiếp đồng nghiệp thân.
+- Dialogue MC ADDRESS: "anh / cô / chú / bác / đồng chí / lãnh đạo / sếp / thủ trưởng / chủ tịch".
+- CẤM TUYỆT ĐỐI: "ta / ngươi / hắn / nàng / y / lão / tại hạ / bản tọa".`,
+  'lich-su': `HỆ ARCHAIC strict (lịch sử/cổ đại).
+- Narrator: hắn / y / lão / nàng / gã.
+- Dialogue MC SELF: "ta" (thường); "thần / hạ thần / vi thần" trước vua; "trẫm / quả nhân" nếu MC là vua; "lão phu / bản tướng / bản quan" theo chức vụ.
+- Dialogue MC ADDRESS: "ngươi" (đồng cấp); "bệ hạ / hoàng thượng / vương gia" cho hoàng tộc; "tướng quân / đại nhân / lão / công công / nương nương" theo cấp bậc.
+- CẤM TUYỆT ĐỐI dialogue MC: "tôi / anh / em / cô / cậu / chú".`,
+  'mat-the': `HỆ MODERN (post-apocalypse hiện đại).
+- Narrator: anh / cô / em / chú.
+- Dialogue MC SELF: "tôi" (mọi người); "anh / em" với đồng đội.
+- Dialogue MC ADDRESS: "anh / cô / em / đồng đội / cậu / chú".
+- CẤM dialogue MC: "ta / ngươi / hắn / nàng / lão / tại hạ".`,
+  'linh-di': `HỆ MODERN (horror hiện đại) MẶC ĐỊNH; cho phép ARCHAIC nếu setting Dân Quốc/cổ đại.
+- Modern: narrator anh/cô/em; MC SELF "tôi"; MC ADDRESS "anh/cô/em/chú/bác".
+- Dân Quốc/cổ: narrator hắn/y/nàng; MC SELF "ta"; MC ADDRESS "ngươi/lão".
+- KHÔNG mix 2 hệ trong cùng truyện. Lock 1 hệ ngay từ ch.1.`,
+  'di-gioi': `HỆ ARCHAIC (dị giới fantasy) — KHÔNG mix MODERN.
+- Narrator: hắn / nàng / y / lão.
+- Dialogue MC SELF: "ta"; nếu MC là lãnh chúa thì "bản tọa / bản công tử / bản lãnh chúa".
+- Dialogue MC ADDRESS: "ngươi / tiểu tử / lãnh chúa / chủ nhân / sư phụ" tùy vai vế.
+- CẤM dialogue MC: "tôi / anh / em / cô / cậu / chú / mày".`,
+  'khoa-huyen': `2 SUB-MODE — chọn theo bối cảnh sci-fi:
+- Sci-fi gần (Trái Đất hiện đại + tech): narrator anh/cô; MC SELF "tôi"; MC ADDRESS "anh/cô/em". CẤM "ta/ngươi".
+- Sci-fi xa (vũ trụ cổ đại / tinh tế đế quốc): narrator hắn/nàng; MC SELF "ta"; MC ADDRESS "ngươi/lãnh chúa/bệ hạ". CẤM "tôi/anh/em".
+- Lock hệ tại ch.1, không drift.`,
+  'vong-du': `HỆ MODERN (game/network player hiện đại).
+- Narrator: anh / cô / em.
+- Dialogue MC SELF: "tôi" (chat nghiêm túc); "anh / em / mình" (chat thân mật party).
+- Dialogue MC ADDRESS: "anh / cô / em / cậu / đồng đội / boss / leader".
+- In-game NPC quest có thể dùng "ngươi/ta" archaic (đó là NPC, không phải MC self).
+- CẤM MC SELF dùng "ta / ngươi / lão phu" trong dialogue ngoài game.`,
+  'dong-nhan': `THEO NGUYÊN TÁC fanfic — CHỌN HỆ NGAY CH.1 dựa trên canon:
+- Naruto / Bleach / One Piece / Dragon Ball / modern shonen: HỆ MODERN. MC SELF "tôi"; MC ADDRESS "anh/cô/em/cậu/sensei". CẤM "ta/ngươi".
+- Đấu La Đại Lục / cổ đại tu tiên dong-nhan: HỆ ARCHAIC. MC SELF "ta"; MC ADDRESS "ngươi/sư phụ/tiểu tử".
+- Lock theo canon, không mix giữa các thế giới fanfic khác nhau.`,
 };
 
 
