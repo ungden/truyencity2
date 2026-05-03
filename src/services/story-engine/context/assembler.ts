@@ -433,7 +433,12 @@ export async function loadContext(
     previousSummary: bridge?.summary,
     previousMcState: bridge?.mc_state,
     previousCliffhanger: bridge?.cliffhanger,
-    previousEnding: ending?.content ? ending.content.slice(-500) : undefined,
+    // Cache 2000 chars of previous chapter ending. Prompt formatter takes the
+    // last 1500 of these. Was 500 (with prompt sliced to 300) — too thin to
+    // anchor opening scene, AI lost micro-details (last dialogue line, what
+    // characters were holding, exact location, partial action) and restarted
+    // the scene instead of continuing it.
+    previousEnding: ending?.content ? ending.content.slice(-2000) : undefined,
     recentBeatHistory,
     storyBible: bible,
     hasStoryBible: !!bible,
@@ -750,11 +755,22 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
     parts.push('[CẦU NỐI CHƯƠNG — BẮT BUỘC TUÂN THỦ]');
     if (payload.previousCliffhanger) {
       parts.push(`Cliffhanger chương trước: ${payload.previousCliffhanger}`);
-      parts.push('→ PHẢI bắt đầu NGAY SAU tình huống này. KHÔNG skip, KHÔNG tóm tắt lại.');
     }
-    if (payload.previousMcState) parts.push(`Trạng thái MC: ${payload.previousMcState}`);
-    if (payload.previousSummary) parts.push(`Tóm tắt: ${payload.previousSummary}`);
-    if (payload.previousEnding) parts.push(`300 ký tự cuối: ...${payload.previousEnding.slice(-300)}`);
+    if (payload.previousMcState) parts.push(`Trạng thái MC cuối chương trước: ${payload.previousMcState}`);
+    if (payload.previousSummary) parts.push(`Tóm tắt chương trước: ${payload.previousSummary}`);
+    if (payload.previousEnding) {
+      // 1500 chars (≈250 từ Vietnamese) covers the entire ending scene including
+      // last 2-3 paragraphs, last dialogue lines, micro-details (what characters
+      // were holding, exact spatial position, last sensory beat). Was 300 chars
+      // → AI restarted the scene instead of continuing it.
+      parts.push(`[NGUYÊN VĂN ĐOẠN KẾT CHƯƠNG TRƯỚC — 1500 KÝ TỰ CUỐI]\n…${payload.previousEnding.slice(-1500)}`);
+      parts.push('→ Cảnh đầu chương này PHẢI tiếp diễn TRỰC TIẾP từ chính khoảnh khắc, vị trí, hành động, dialogue cuối. KHÔNG được:');
+      parts.push('  • Cho MC fade-out / time-skip / cắt sang scene khác trong scene 1.');
+      parts.push('  • Restart cảnh ("Sáng hôm sau, MC tỉnh dậy…") nếu chương trước không kết bằng MC ngủ/ngất.');
+      parts.push('  • Tóm tắt lại sự kiện chương trước qua narration / nội tâm.');
+      parts.push('  • Cho MC ở vị trí khác/trang phục khác/vũ khí khác mà không có transition rõ ràng.');
+      parts.push('→ Trong 100 từ đầu của scene 1: phải reference ÍT NHẤT 2 micro-detail (vị trí cụ thể, vật MC đang cầm, dialogue line cuối, trạng thái cảm xúc) từ đoạn kết trên.');
+    }
   }
 
   // Anti-self-torture: recent beat history (last 3 chapters)

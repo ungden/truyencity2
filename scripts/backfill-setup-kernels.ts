@@ -185,8 +185,11 @@ async function deriveKernelForProject(row: ProjectRow): Promise<{ ok: boolean; r
   const res = await callGemini(prompt, {
     model: 'deepseek-v4-flash',
     temperature: 0.5,
-    maxTokens: 4096,
-    systemPrompt: '[ROLE-SPECIFIC] Derive StoryKernel from EXISTING canon. Reverse-engineer only. Do NOT invent new plot, do NOT change MC, do NOT change tone.',
+    // 4096 truncated mid-JSON for ~2% of novels (DeepSeek V4 thinking model
+    // burns reasoning_content before emitting structured output). 8192 gives
+    // headroom without meaningfully bumping cost.
+    maxTokens: 8192,
+    systemPrompt: '[ROLE-SPECIFIC] Derive StoryKernel from EXISTING canon. Reverse-engineer only. Do NOT invent new plot, do NOT change MC, do NOT change tone. Output MUST include all required fields per the schema, including socialReactor.witnesses/reactionModes/reportBackCadence and at least 3 noveltyLadder rows.',
   }, { jsonMode: true, tracking: { projectId: row.id, task: 'backfill_setup_kernel' } });
 
   const parsed = parseJSON<{ setupKernel?: StoryKernel }>(res.content);

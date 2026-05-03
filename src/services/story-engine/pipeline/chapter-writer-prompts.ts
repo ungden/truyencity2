@@ -143,6 +143,8 @@ QUY TẮC:
       • CẤM TUYỆT ĐỐI rock-bottom opening: MC nghèo đói + bị đuổi việc + bị bỏ + nợ ngập đầu + ngất xỉu + mất trí nhớ + khóc lóc tủi thân → đây là 凄惨开局 đã chán.
       • CẤM "MC vừa xuyên không/trọng sinh, không có gì, không biết gì, phải tự lực từ con số 0" — modern isekai 2024-2026 MC arrive WITH inventory + skills + golden finger ACTIVATED ngay chương 1.
       • Nếu world description đặt MC ở context đặc biệt (xuyên không quán net / studio game / lãnh chúa) → MC mở chương ĐÃ trong cơ sở đó vận hành, KHÔNG bắt đầu bằng cảnh MC tỉnh dậy chưa biết gì.
+      • DONG-NHAN / CANON-LOCKED EXEMPTION: nếu genre = dong-nhan VÀ canon source (Naruto / Đấu La / Hỏa Ảnh / One Piece...) ép MC entry tại sự kiện đẫm máu (Cửu Vĩ Attack, Đấu La phế vật, Vũ Hồn Điện thí luyện…) → ALLOW dark opening backdrop, NHƯNG MC PHẢI: (a) đã có golden finger ACTIVE trong scene 1 (system, hồi quy, knowledge-from-canon), (b) đạt 1 small win NGAY trong scene 1-2 (cướp được chakra / đánh giá được hệ thống / xác định mục tiêu cụ thể), (c) voice tỉnh táo/tính toán, KHÔNG whining/hoảng loạn.
+      • Tóm lại: warm baseline = MC có agency + competence + opportunity-driven mindset từ scene 1, KHÔNG đồng nghĩa với "không có cảnh máu". Cảnh canon dark được phép NHƯ BACKDROP, không được phép biến MC thành nạn nhân thụ động.
 
 17. EARLY-ARC RULE (chapterNumber ≤ 10):
     - 5-10 chương đầu PHẢI giữ MC trong domain expertise — show competence growth + revenue/network expansion + opportunity-driven plot.
@@ -408,6 +410,12 @@ KIỂM TRA MÂU THUẪN (BẮT BUỘC — coherence chặt cho long-form):
 - Nếu nhân vật BIẾT thông tin chưa từng được tiết lộ trong các chương trước -> type "continuity", severity "critical", REWRITE
 - Nếu RELATIONSHIP giữa 2 nhân vật flip vô lý (yêu→thù, thù→yêu) không có lý do -> type "continuity", severity "critical", REWRITE
 - Nếu MC ở location A chương trước, location B chương này KHÔNG có scene di chuyển -> type "continuity", severity "major"
+- BRIDGE CONTINUITY (chương >1, kiểm tra với "[NGUYÊN VĂN ĐOẠN KẾT CHƯƠNG TRƯỚC]" trong context):
+  → 100 từ đầu của scene 1 PHẢI reference ÍT NHẤT 2 micro-detail (vị trí cụ thể, vật MC đang cầm, dialogue line cuối, cảm xúc/trạng thái cơ thể) từ đoạn kết đó.
+  → Nếu scene 1 mở bằng "Sáng hôm sau, MC tỉnh dậy…" / "Vài ngày sau…" / "MC bước vào căn phòng [khác]…" mà chương trước KHÔNG kết bằng MC ngủ/ngất/di chuyển → type "continuity", severity "critical", REWRITE.
+  → Nếu MC ở vị trí khác / cầm vật khác / mặc trang phục khác đoạn kết mà KHÔNG có 1-2 câu transition giải thích → type "continuity", severity "major".
+  → Nếu scene 1 dành ≥80 từ để tóm tắt lại sự kiện chương trước qua narration / nội tâm → type "quality", severity "major" (recap bloat — reader vừa đọc xong).
+  → Nếu dialogue line cuối chương trước CHƯA được phản hồi mà scene 1 đã chuyển topic → type "continuity", severity "major".
 - Nếu economic/resource logic vô lý (do-thi: MC chi tiêu vượt tài chính đã thiết lập) -> type "continuity", severity "major"
 - Nếu nhân vật HÀNH XỬ KHÁC tính cách (50%) nhưng có thể rationalize -> type "continuity", severity "major" (khi không phải personality shift hoàn toàn)
 - MATH SANITY (cho do-thi/quan-truong/lich-su VN/kinh-doanh): nếu MC có X đồng/tỷ + chi Y mà Y > X mà KHÔNG có kênh thu nhập / vay vốn được setup từ trước → type "continuity" severity "critical", REWRITE. KHÔNG để math impossible kiểu "có 5 triệu tiêu 27 triệu".
