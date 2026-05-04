@@ -1259,12 +1259,32 @@ KIỂM TRA CANON & STATE (Phase 27/28 — xem các block trong context có sẵn
         const expectedCharacters = (outline.scenes || [])
           .flatMap(s => s.characters || [])
           .filter(Boolean);
+
+        // Phase 30 G7 — pull antagonist_schedule from master_outline so the
+        // antagonist-scale gate can verify whether a major-tier marker has
+        // pre-planned justification for this chapter index.
+        let antagonistSchedule: Array<{ ch: number; tier: string }> | undefined;
+        try {
+          const { getSupabase } = await import('../utils/supabase');
+          const db = getSupabase();
+          const { data: row } = await db
+            .from('ai_story_projects')
+            .select('master_outline')
+            .eq('id', projectId)
+            .maybeSingle();
+          const mo = row?.master_outline as { antagonist_schedule?: Array<{ ch: number; tier: string }> } | null;
+          if (mo?.antagonist_schedule && Array.isArray(mo.antagonist_schedule)) {
+            antagonistSchedule = mo.antagonist_schedule;
+          }
+        } catch { /* non-fatal — gate falls back to empty schedule */ }
+
         const canonIssues = await enforceCanonGates({
           projectId,
           chapterNumber: outline.chapterNumber,
           content,
           protagonistName: protagonistName || 'MC',
           expectedCharacters: [...new Set(expectedCharacters)],
+          antagonistSchedule,
           // expectedPov: project may set this in style_directives.pov in future
         });
         if (canonIssues.length > 0) {
