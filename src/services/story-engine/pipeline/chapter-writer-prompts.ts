@@ -154,6 +154,43 @@ QUY TẮC:
 18. EMOTIONAL ARC PER CHAPTER: opening emotion B → midpoint rise to peak P (60-70% mark) → small fall → ending emotion B' ≠ B. Ghi rõ "emotionalArc" JSON với opening / midpoint / climax / closing emotions cụ thể.
 19. ARC BOUNDARY (chapter đầu sub-arc / arc): nếu chương này là start-of-arc (ch.1, hoặc khi sub_arc_number trong context tăng) → giới thiệu ≥2 yếu tố mới (nhân vật, location, threat) MƯỢT MÀ trong scene, KHÔNG exposition dump.
 
+20. BÍ MẬT MC PROTECTION (CRITICAL — cross-genre, mọi thể loại):
+    - Bí mật cốt lõi của MC (trọng sinh / hệ thống / golden finger / kiến thức tương lai / danh tính ẩn / xuyên không) PHẢI được giữ kín trong dialogue MC + hành động trước public.
+    - CẤM NPC thường (đệ tử cùng tông, khách hàng, đồng nghiệp, đối thủ peer-level) tự nhiên đoán/biết bí mật MC trong 50 chương đầu. Chỉ characters có justification rõ ràng mới được biết:
+      • Cùng trọng sinh / cùng hệ thống (đã ghi trong master_outline)
+      • Antagonist level cao đã ghi trong master_outline có lý do để biết
+      • Mentor/ally đã build trust ≥20 chương + scene reveal có justification
+    - CẤM major villain (sect master cấp cao, tổ chức bí mật xuyên thiên, công ty đa quốc gia bí ẩn, Thiên Đạo Kim Bảng level) xuất hiện đe dọa/giám sát/dò xét MC trong 30 chương đầu. Major threat phải leo dần theo antagonist progression ladder: peer-level (chương 1-15) → faction-level (15-50) → region-level (50-150) → world-level (150+).
+    - MC sử dụng năng lực trước public: KHÔNG flex full power. Dùng ở mức 'có thể giải thích bằng talent thường' — cultivation tiến nhanh = 'thiên phú/cơ duyên', kiến thức tương lai = 'thông minh/phán đoán giỏi', system insight = 'kinh nghiệm/quan sát kỹ'. Full reveal CHỈ trong arc plan đã ghi rõ.
+    - CẤM cliffhanger 'kẻ lạ biết bí mật MC nhắn tin/gọi điện/xuất hiện' nếu master_outline không có entry này.
+
+21. NGUYÊN TẮC MC HÀNH ĐỘNG CÓ MỤC TIÊU (CRITICAL — chống 'MC chõ mồm vô lợi'):
+    - MC chỉ can thiệp vào sự việc khi đạt ÍT NHẤT 1 trong 5 lợi ích rõ ràng:
+      (a) Resource/tài sản (tiền, vật phẩm, đan dược, deal kinh doanh, level-up, exp)
+      (b) Network/quan hệ (ally mới có giá trị tương lai, ân tình, mentor, faction support)
+      (c) Information (manh mối plot, bí mật arc, intel đối thủ, world rule)
+      (d) Face-slap dopamine (đối tượng đã được setup làm đối thủ MC trong 1-3 chương trước)
+      (e) Người thân/gia tộc (gia đình MC, vợ con, đệ tử trực tiếp, faction MC sở hữu)
+    - CẤM 4 patterns 'MC chõ mồm':
+      • MC bênh vực người lạ ngẫu nhiên (đường phố, quán ăn, chợ búa) không liên quan tới mục tiêu
+      • MC dạy đời / lecture NPC bất kỳ về đạo lý/thế giới quan/kinh nghiệm sống
+      • MC tự ý mở miệng bình luận/giúp đỡ vấn đề người khác mà chưa được nhờ + không có lợi
+      • MC đánh giá/phán xét tình huống không liên quan tới scope MC
+    - ĐÚNG: MC bỏ qua / quan sát từ xa / tiếp tục việc của mình. Can thiệp CHỈ khi: sự việc chặn đường MC, opportunity hé lộ (linh dược / cơ duyên / manh mối / customer giàu), hoặc 1 trong 5 lợi ích trên xuất hiện.
+    - TEST mỗi scene MC can thiệp: 'MC nhận được gì cụ thể?' Nếu không trả lời được bằng 1 trong (a)-(e) → bỏ scene hoặc chuyển MC thành observer.
+
+22. GOLDEN FINGER PHẢI BUFF MC THẤY ĐƯỢC (CRITICAL — chống 'system yếu, main vẫn vất vả'):
+    - Mỗi 5-10 chương, MC PHẢI có ≥1 cải tiến đo được nhờ system/golden finger/lợi thế cốt lõi:
+      • Cultivation/realm tăng (tu tiên), skill mới unlocked, capability mới expose
+      • Resource breakthrough (rare item gained, technique mastered, knowledge tier unlocked)
+      • Capability multiplier rõ rệt (cùng việc nhanh hơn / lớn hơn / hiệu quả hơn so với 5-10 chương trước)
+      • Wealth tier-up (do-thi: doanh thu vượt mốc mới, bắt đầu chi nhánh mới, partner tier cao hơn)
+    - CẤM 10 chương liên tiếp MC vẫn vất vả như cũ — đây là 'system fail' pattern reader ghét nhất Sảng Văn.
+    - Mỗi chương MC dùng system/golden finger PHẢI có IMPACT cụ thể: deal closed faster / opponent overwhelmed / problem solved / insight gained. CẤM narrate system mà MC vẫn không tiến tới gì.
+    - CẤM pattern 'system gợi ý mà MC bỏ qua' / 'system warning mà MC không hành động' kéo dài >2 chương — feature đã có thì PHẢI được dùng, không phải decoration.
+    - POWER SCALING NON-DECREASING: MC ở chương N PHẢI >= MC ở chương N-10 trên ≥1 axis (cultivation, wealth, network, knowledge, skill, faction). KHÔNG flat 10+ chương, KHÔNG downgrade vô lý.
+    - Khi MC gặp khó khăn: phải có scene MC dùng system/golden finger để VƯỢT — không phải MC vất vả mà system silent. System CHÍNH LÀ lợi thế core của MC.
+
 UNIVERSAL ANTI-SEEDS (CẤM TUYỆT ĐỐI cross-genre — TQ 2024-2026 đã chán):
 - CẤM "Mẹ MC ung thư cần tiền cứu" làm trigger động lực — sến
 - CẤM "Bạn gái/người yêu bỏ MC vì nghèo" chương 1 — overused, đã thành meme
@@ -399,6 +436,25 @@ KIỂM TRA BỔ SUNG (BẮT BUỘC):
     - Common drift patterns to flag: MC pragmatic chuyển nóng vội, MC family-pillar bỏ rơi gia tộc, MC career-driven ngừng quan tâm sự nghiệp.
 21. DIALOGUE CHAIN >4 LINES: Nếu có dialogue chain >4 lines liên tiếp KHÔNG có action/reaction beat → issue "dialogue" severity "moderate".
 22. SENSORY DENSITY: Mỗi scene chính cần ≥2 giác quan. Nếu cả chương chỉ có visual + auditory (thiếu khứu/vị/xúc giác cho ≥3 scenes) → issue "quality" severity "minor".
+23. SECRET PROTECTION CHECK (CRITICAL — chống 'kẻ thần bí xuất hiện ngay'):
+    - Đọc context để biết bí mật cốt lõi của MC: trọng sinh / hệ thống / golden finger / kiến thức tương lai / danh tính ẩn / xuyên không.
+    - Nếu chương có ≥1 NPC thường (đệ tử cùng tông, customer ngẫu nhiên, đồng nghiệp, peer-level) tự nhiên BIẾT/ĐOÁN/DÒ ra bí mật MC mà KHÔNG có justification từ context (chương trước build trust + mentor/ally đã đủ điều kiện, hoặc master_outline đề cập NPC đó biết) → issue type "continuity", severity "critical", REWRITE.
+    - Nếu MC TỰ TIẾT LỘ bí mật cốt lõi cho NPC thường trong dialogue mà không có lý do rõ trong arc plan → issue type "continuity", severity "critical", REWRITE.
+    - Nếu major villain (sect master, tổ chức bí mật xuyên thiên, công ty đa quốc gia bí ẩn, Thiên Đạo Kim Bảng level) xuất hiện đe dọa/giám sát/dò xét MC trước chương 30 mà KHÔNG có trong master_outline → issue "pacing" severity "critical", REWRITE.
+    - Cliffhanger kiểu "kẻ lạ biết bí mật MC nhắn tin/gọi điện/xuất hiện ngẫu nhiên" mà master_outline không setup → issue "pacing" severity "critical", REWRITE.
+    - MC flex full power trước public mà không có thiết lập từ trước → issue "continuity" severity "major".
+24. MC ACTION PROFITABILITY CHECK (chống 'MC chõ mồm vô lợi'):
+    - Với mỗi scene MC chủ động can thiệp vào sự việc người khác (không phải sự việc của MC), kiểm tra MC NHẬN được gì cụ thể: resource / network có giá trị / info plot / face-slap có setup / người thân/gia tộc.
+    - Nếu chương có ≥1 scene MC can thiệp KHÔNG có lợi rõ + KHÔNG liên quan người thân + đối tượng được giúp KHÔNG có giá trị tương lai → issue type "quality", severity "moderate", flag là "MC chõ mồm vô lợi".
+    - Nếu chương có ≥2 scene MC chõ mồm giúp người lạ vô nghĩa → issue type "quality", severity "major".
+    - Nếu MC dạy đời / lecture NPC bất kỳ về đạo lý/thế giới quan mà không có context (NPC không phải đệ tử MC, không phải người thân) → issue type "quality", severity "moderate".
+    - LƯU Ý: ngoại lệ là MC kiểu 'bồ tát/cứu thế' nếu archetype đã specify rõ — đọc MC archetype trong directives. Đa số archetype (intelligent / pragmatic / career_driven / power_fantasy) → enforce strict.
+25. SYSTEM PROGRESSION SANITY (chống 'hệ thống yếu, main vất vả' — áp dụng cho chương ≥5):
+    - Đọc context [SYSTEM/GOLDEN FINGER STATE] hoặc [MC POWER STATE] hoặc character_states nếu có.
+    - Nếu chương nhắc system/golden finger/lợi thế cốt lõi ≥3 lần mà MC KHÔNG có thay đổi gì cụ thể (cùng level, cùng resource, cùng vấn đề chưa giải quyết, cùng vất vả) → issue "pacing" severity "moderate" (system narrate decoration, không impact reality).
+    - Nếu MC vất vả vượt qua thử thách trong chương climax/villain_focus mà system/golden finger SILENT (không được dùng dù rõ ràng có thể giúp) → issue "continuity" severity "major" — system chính là lợi thế core của MC, không thể bỏ rơi khi cần nhất.
+    - Nếu so với context của 5-10 chương trước, MC ở chương này ngang hoặc kém hơn về MỌI axis (cultivation/wealth/network/knowledge/skill) → issue "pacing" severity "moderate", flag "power scaling stall ≥10 chương".
+    - LƯU Ý: chương breathing/training/comedic_break KHÔNG yêu cầu progression visible — chỉ flag rule này nếu chương climax / villain_focus / revelation mà system silent.
 
 ISSUES: Liệt kê vấn đề (pacing/consistency/dopamine/quality/word_count/dialogue/continuity)
 
