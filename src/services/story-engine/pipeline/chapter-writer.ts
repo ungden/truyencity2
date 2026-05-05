@@ -46,7 +46,7 @@ import type {
 } from '../types';
 import type { SceneType, VocabularyGuide } from '../templates/style-bible';
 import { VN_PLACE_LOCK, ARCHITECT_SYSTEM, WRITER_SYSTEM, CRITIC_SYSTEM } from './chapter-writer-prompts';
-import { cleanContent, extractTitle, synthesizeFallbackCliffhanger, hasCliffhangerSignal, analyzeQualitySignals, buildSignalReport, countWords, detectHardFallback, detectMcNameFlip, detectSevereRepetition, buildRepetitionReport, generateMinimalScenes, loadConstraintSection, type QualitySignals } from './chapter-writer-helpers';
+import { cleanContent, extractTitle, synthesizeFallbackCliffhanger, hasCliffhangerSignal, analyzeQualitySignals, buildSignalReport, countWords, detectHardFallback, detectMcNameFlip, detectSevereRepetition, buildRepetitionReport, generateMinimalScenes, loadConstraintSection, safeStringTrim, type QualitySignals } from './chapter-writer-helpers';
 
 
 // ── Write Chapter ────────────────────────────────────────────────────────────
@@ -433,7 +433,7 @@ Trả về JSON ChapterOutline đúng schema phía trên cho CHƯƠNG ${chapterN
   // Only synthesize fallback IF outline has no cliffhanger AND chapter doesn't have an
   // intentional emotional/reveal/comfort ending. Modern guidance (P0.1 cliffhanger detoxify):
   // emotional/reveal/comfort endings are valid alternatives for breathing/aftermath/comedic chapters.
-  if (!options?.isFinalArc && !parsed.cliffhanger?.trim()) {
+  if (!options?.isFinalArc && !safeStringTrim(parsed.cliffhanger)) {
     // Check emotional arc closing intent — if intentionally calm/resolution, skip synthesis
     const closingIntent = (parsed.emotionalArc?.closing || '').toLowerCase();
     const isIntentionalSoftEnding = /resolution|aftermath|breath|peace|reflection|comfort|warm|reveal|seed/.test(closingIntent);

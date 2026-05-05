@@ -88,6 +88,25 @@ SETUP CONTRACT:
   Năng lực/hệ thống phải có trigger, input, output, giới hạn, đường nâng cấp, và kiểu payoff.
   Nó là vòng lặp vận hành của truyện, không phải nút giải quyết mọi vấn đề.
 
+★ MC OPENING IDENTITY TIER (HARD CAP — Sảng văn 2026 cross-genre):
+  MC ở chương 1 PHẢI ở identity tier "established competent in domain":
+  - Đệ tử nội môn / chủ tiệm / công tử nhỏ / nhân viên có vị trí ổn định
+  - Võ giả với kỹ năng đã thiết lập / shop owner / studio operator
+  - Professional (luật sư / bác sĩ / kỹ sư) / chủ doanh nghiệp nhỏ
+  - Tướng quân / quan chức cấp dưới / freelancer có client base
+  Golden finger active từ TRƯỚC story start, KHÔNG phải "vừa awakening ở chương 1".
+
+  CẤM identity tier "rock bottom" (cross-genre — 2024-2026 đã từ chối "凄惨开局"):
+  - Phế vật / "tên phế vật" / đệ tử ngoại môn nhặt rác / cuốc xẻng / lao động bậc thấp
+  - Nô lệ / tù binh / ăn xin / "lão ăn mày" / vô gia cư
+  - "MC từ con số 0" / "MC tự lực bootstrap từ phế vật / nhặt rác"
+  - "Fake phế vật" CŨNG vi phạm scene 1-3 — dù MC giấu thực lực, KHÔNG được tả MC nhặt rác / cuốc xẻng / "lão ăn mày" trong scene đầu. Reveal-of-power phải xảy ra scene 1-2.
+  - Modern genres (do-thi/quan-truong/khoa-huyen): cấm MC nghèo đói ngập đầu, mất việc + đói lả, nợ nần ngập đầu, sống lay lắt, ngất xỉu/amnesia ở chương 1.
+
+  CARVE-OUT EXEMPTION duy nhất: dong-nhan với canon-locked entry tại sự kiện đẫm máu (Đấu La phế vật của Tang Sansan, Naruto Cửu Vĩ Attack…). Trường hợp đó MC vẫn PHẢI: golden finger ACTIVE scene 1, đạt 1 small win scene 1-2, voice tỉnh táo/tính toán không whining.
+
+  Reason: Reader bỏ trong 3 chương đầu nếu MC mở chương ở rock-bottom — kể cả "fake phế vật" pattern. Sảng văn = MC dominance từ scene 1, KHÔNG underdog rise.
+
 OUTPUT: CHỈ trả về JSON hợp lệ với fields được yêu cầu.`;
 
 export type SetupStage =
@@ -145,6 +164,45 @@ async function advanceStage(projectId: string, currentStage: SetupStage): Promis
     update.pause_reason = null;
   }
   await getSupabase().from('ai_story_projects').update(update).eq('id', projectId);
+}
+
+/**
+ * Validate MC opening identity tier against Sảng văn 2026 hard cap.
+ * Reject "rock-bottom" patterns (phế vật / nhặt rác / cuốc xẻng / ăn mày /
+ * nô lệ / tù binh / "từ con số 0") cross-genre. Carve-out: dong-nhan only.
+ *
+ * Wired into both world stage (scanning worldDescription) and character
+ * stage (scanning mcArchetype + mcVoice + mcSignature).
+ */
+function validateMcOpeningIdentityTier(
+  text: string,
+  genre: GenreType,
+): { passed: boolean; reason?: string } {
+  // dong-nhan exemption — canon-locked entries (Đấu La phế vật, Naruto Cửu Vĩ)
+  // legitimately require MC entry at adverse event. Architect rule C3 still
+  // requires golden finger active + small win + tỉnh táo voice for these.
+  if (genre === 'dong-nhan') return { passed: true };
+
+  const FORBIDDEN_PATTERNS: Array<{ re: RegExp; label: string }> = [
+    { re: /\bphế\s+vật\b/i, label: '"phế vật" identity' },
+    { re: /\bđệ\s+tử\s+ngoại\s+môn\s+(?:nhặt|cuốc|làm\s+thuê|lao\s+động|dọn\s+dẹp)/i, label: '"đệ tử ngoại môn nhặt rác/lao động" pattern' },
+    { re: /\b(?:nhặt\s+rác|cuốc\s+xẻng|nhặt\s+phế\s+liệu)\b/i, label: 'menial labor MC opening' },
+    { re: /\b(?:nô\s+lệ|tù\s+binh|ăn\s+xin|ăn\s+mày|lão\s+ăn\s+mày)\b/i, label: 'slave/beggar identity' },
+    { re: /(?:mc|nhân\s+vật\s+chính|chủ\s+nhân|nam\s+chính|nữ\s+chính).{0,40}(?:từ\s+con\s+số\s+0|bootstrap\s+từ|tự\s+lực\s+từ\s+phế|đi\s+lên\s+từ\s+phế)/i, label: '"từ con số 0" trajectory' },
+    { re: /(?:nghèo\s+đói\s+ngập\s+đầu|mất\s+việc\s+đói\s+lả|nợ\s+nần\s+ngập\s+đầu|vô\s+gia\s+cư|sống\s+lay\s+lắt)/i, label: 'modern genre rock-bottom (do-thi/khoa-huyen)' },
+    { re: /(?:amnesia|mất\s+trí\s+nhớ|ngất\s+xỉu)\s+(?:ở|tại)\s+(?:chương\s+1|đầu\s+truyện|scene\s+1)/i, label: 'amnesia/faint opening' },
+  ];
+
+  for (const { re, label } of FORBIDDEN_PATTERNS) {
+    const m = text.match(re);
+    if (m) {
+      return {
+        passed: false,
+        reason: `MC identity vi phạm Sảng văn 2026 "rock-bottom" hard cap: ${label} (matched "${m[0]}"). Identity phải "established competent": chủ tiệm/đệ tử nội môn/công tử/professional/võ giả với kỹ năng thiết lập. Regenerate stage này — chọn archetype khác từ playbook.`,
+      };
+    }
+  }
+  return { passed: true };
 }
 
 async function recordStageError(projectId: string, error: string, attempts: number): Promise<void> {
@@ -395,6 +453,12 @@ Trả về JSON: {"worldDescription":"<800-1500 từ tuân blueprint 10-section,
       };
     }
 
+    // Sảng văn 2026 hard cap — reject MC rock-bottom identity in worldDescription.
+    const identityCheck = validateMcOpeningIdentityTier(wd, genre);
+    if (!identityCheck.passed) {
+      return { success: false, error: `world identity gate: ${identityCheck.reason}` };
+    }
+
     await getSupabase().from('ai_story_projects').update({
       world_description: wd,
     }).eq('id', p.id);
@@ -467,6 +531,15 @@ QUY TẮC: KHÔNG đặt lại tên MC. Archetype CHÍNH XÁC 1 trong list playb
           error: `mc archetype "${archetypeName}" not in playbook. Suggested: ${archCheck.suggested.slice(0, 3).join(' / ')}`,
         };
       }
+    }
+
+    // Sảng văn 2026 hard cap — reject MC rock-bottom identity in archetype/voice/signature.
+    const identityScanText = [archetypeName, parsed?.mcVoice, parsed?.mcSignature]
+      .filter(Boolean)
+      .join(' \n ');
+    const identityCheck = validateMcOpeningIdentityTier(identityScanText, genre);
+    if (!identityCheck.passed) {
+      return { success: false, error: `character identity gate: ${identityCheck.reason}` };
     }
 
     // Stash archetype + voice + signature in story_outline JSON for downstream stages

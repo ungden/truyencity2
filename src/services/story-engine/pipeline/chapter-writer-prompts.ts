@@ -184,6 +184,13 @@ C3. WARM BASELINE OPENING (ch.1):
 - Hook = OPPORTUNITY (customer giàu / deal hé lộ / cơ hội), KHÔNG threat (MC bị đánh / mất việc / đói lả / sắp chết / mất trí nhớ).
 - CẤM rock-bottom: ngất xỉu, đói lạnh, nô lệ, amnesia, "MC tự lực từ con số 0", "5-10 chương đầu MC chỉ ăn cơm cám trước khi golden finger kích hoạt".
 - Mở đầu ≤150 từ: (a) MC trong action/decision, (b) stakes-shift hoặc hook, (c) 1 sensory detail cụ thể. CẤM info-dump (worldbuilding lecture / nội tâm dài).
+- IDENTITY TIER HARD CAP (Sảng văn 2026 cross-genre — bổ sung Setup pipeline rule):
+  • CẤM tả MC ở rock-bottom identity scene 1: "tên phế vật", "đệ tử ngoại môn nhặt rác/cuốc xẻng", "lão ăn mày", "kho phế phẩm", "nhặt phế liệu", nô lệ, tù binh.
+  • Modern genre (do-thi/quan-truong/khoa-huyen): CẤM MC nghèo đói ngập đầu, mất việc + đói lả, nợ nần ngập đầu, vô gia cư, sống lay lắt.
+  • CẤM "Hai năm cầm cuốc xẻng" / "ba năm dọn dẹp" / "đệ tử ngoại môn làm thuê" làm backstory MC.
+  • Identity tier mở chương PHẢI là 1 trong: chủ tiệm / đệ tử nội môn (vị trí định) / công tử nhỏ / nhân viên có job / võ giả với kỹ năng đã thiết lập / shop owner / studio operator / professional (luật sư/bác sĩ/kỹ sư) / chủ doanh nghiệp nhỏ / freelancer có client base.
+  • "Fake phế vật" archetype CŨNG vi phạm scene 1 — dù MC giấu thực lực, scene 1 KHÔNG được tả MC nhặt rác / cuốc xẻng / lao động bậc thấp. Reveal-of-power phải trong scene 1-2.
+  • Golden finger active từ TRƯỚC story start. CẤM "MC mới awakening / vừa thử nghiệm thành công lần đầu" — đó setup MC chưa có lợi thế.
 - DONG-NHAN/CANON-LOCKED EXEMPTION: nếu canon ép MC entry tại sự kiện đẫm máu (Cửu Vĩ Attack / Đấu La phế vật / Vũ Hồn Điện thí luyện…) → ALLOW dark backdrop NHƯNG MC PHẢI: golden finger ACTIVE scene 1, đạt 1 small win scene 1-2, voice tỉnh táo/tính toán không whining/hoảng loạn.
 
 C4. CONFLICT VIA CHANNEL (theo genre):

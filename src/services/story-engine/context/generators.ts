@@ -20,6 +20,7 @@ import { getArchitectVoiceHint } from '../templates/genre-voice-anchors';
 import { getGenreArchitectGuide } from '../templates/genre-process-blueprints';
 import { GOLDEN_CHAPTER_REQUIREMENTS, UNIVERSAL_ANTI_SEEDS, SUB_GENRE_RULES } from '../templates';
 import { extractMainCharacterNameFromWorld } from '../plan/setup-quality-gate';
+import { safeStringTrim } from '../pipeline/chapter-writer-helpers';
 import type { ChapterSummary, GenreType, GeminiConfig, StoryKernel } from '../types';
 
 // AI response interfaces (used internally by generators)
@@ -137,12 +138,12 @@ QUY TẮC CLIFFHANGER:
     parsed.openingSentence = content.slice(0, 160).trim();
   }
 
-  if (!parsed.mcState?.trim()) {
+  if (!safeStringTrim(parsed.mcState)) {
     // Fallback: extract MC state from the tail of the chapter
     parsed.mcState = extractFallbackMcState(content, protagonistName);
   }
 
-  if (!allowEmptyCliffhanger && !parsed.cliffhanger?.trim()) {
+  if (!allowEmptyCliffhanger && !safeStringTrim(parsed.cliffhanger)) {
     parsed.cliffhanger = extractFallbackCliffhanger(content);
   }
 
@@ -303,12 +304,13 @@ QUY TẮC:
 
   const allowEmptyCliffhanger = options?.allowEmptyCliffhanger === true;
 
-  // Build summary
+  // Build summary — use safeStringTrim because AI may return non-string values
+  // for fields typed as string (object/array/null) which would crash .trim().
   const summary: ChapterSummary = {
     summary: parsed.summary,
-    openingSentence: parsed.openingSentence?.trim() || content.slice(0, 160).trim(),
-    mcState: parsed.mcState?.trim() || extractFallbackMcState(content, protagonistName),
-    cliffhanger: parsed.cliffhanger?.trim() || (allowEmptyCliffhanger ? '' : extractFallbackCliffhanger(content)),
+    openingSentence: safeStringTrim(parsed.openingSentence) || content.slice(0, 160).trim(),
+    mcState: safeStringTrim(parsed.mcState) || extractFallbackMcState(content, protagonistName),
+    cliffhanger: safeStringTrim(parsed.cliffhanger) || (allowEmptyCliffhanger ? '' : extractFallbackCliffhanger(content)),
   };
 
   return {
