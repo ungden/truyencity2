@@ -88,6 +88,11 @@ SETUP CONTRACT:
   Năng lực/hệ thống phải có trigger, input, output, giới hạn, đường nâng cấp, và kiểu payoff.
   Nó là vòng lặp vận hành của truyện, không phải nút giải quyết mọi vấn đề.
 
+★ MC secret + benefit logic:
+  Trọng sinh/hệ thống/bàn tay vàng là bí mật lớn nhất của MC. Người ngoài chỉ thấy kết quả,
+  không ai bí ẩn biết nguồn gốc trong Phase 1-2. MC chỉ can thiệp chuyện ngoài khi có lợi ích
+  rõ: tài nguyên, tiền, thông tin, quan hệ, uy tín, skill, hoặc bảo vệ circle đã thiết lập.
+
 OUTPUT: CHỈ trả về JSON hợp lệ với fields được yêu cầu.`;
 
 export type SetupStage =
@@ -178,6 +183,15 @@ function validateStoryKernel(kernel: StoryKernel | undefined): string | null {
   if (!kernel.systemMechanic?.input || !kernel.systemMechanic?.output || !kernel.systemMechanic?.limit || !kernel.systemMechanic?.reward) {
     return 'setupKernel.systemMechanic must define input/output/limit/reward';
   }
+  if (!kernel.mcSecret?.secret || !kernel.mcSecret?.outsideWorldKnowledge || !kernel.mcSecret?.revealRule) {
+    return 'setupKernel.mcSecret must define secret/outsideWorldKnowledge/revealRule';
+  }
+  if (!kernel.benefitLoop?.goal || !kernel.benefitLoop?.action || !kernel.benefitLoop?.benefit || !kernel.benefitLoop?.cadence) {
+    return 'setupKernel.benefitLoop must define goal/action/benefit/cadence';
+  }
+  if (!kernel.interventionRule || kernel.interventionRule.length < 30) {
+    return 'setupKernel.interventionRule too short';
+  }
   if (!kernel.phase1Playground?.locations?.length || !kernel.phase1Playground?.cast?.length || !kernel.phase1Playground?.repeatableSceneTypes?.length) {
     return 'setupKernel.phase1Playground incomplete';
   }
@@ -235,6 +249,18 @@ Trả về JSON:
       "limit": "<giới hạn/cost/cooldown/chống omnipotent>",
       "reward": "<payoff reader thấy được mỗi 1-3 chương>"
     },
+    "mcSecret": {
+      "secret": "<trọng sinh/hệ thống/bàn tay vàng/năng lực thật của MC là bí mật gì>",
+      "outsideWorldKnowledge": "<người ngoài chỉ được thấy kết quả gì, KHÔNG biết nguồn gốc>",
+      "revealRule": "<chỉ reveal muộn khi outline chỉ định rõ; Phase 1-2 tuyệt đối không ai biết>"
+    },
+    "benefitLoop": {
+      "goal": "<mục tiêu nhỏ MC chủ động theo đuổi trong 1-3 chương>",
+      "action": "<hành động cụ thể MC làm>",
+      "benefit": "<lợi ích cụ thể MC nhận: tài nguyên/tiền/thông tin/quan hệ/uy tín/skill/bảo vệ circle>",
+      "cadence": "<mỗi chương hoặc 1-3 chương phải thấy benefit/payoff>"
+    },
+    "interventionRule": "<MC chỉ can thiệp chuyện ngoài nếu có lợi ích cụ thể hoặc bảo vệ người thuộc circle đã thiết lập; KHÔNG chõ mồm vô cớ>",
     "phase1Playground": {
       "locations": ["<địa điểm local 1>", "<địa điểm local 2>"],
       "cast": ["<người chứng kiến/phản ứng 1>", "<người chứng kiến/phản ứng 2>"],

@@ -12,6 +12,9 @@ export function hasValidSetupKernel(storyOutline: unknown): boolean {
   if (!kernel.protagonistEngine || kernel.protagonistEngine.trim().length < 20) return false;
   if (!Array.isArray(kernel.pleasureLoop) || kernel.pleasureLoop.filter(Boolean).length < 4) return false;
   if (!kernel.systemMechanic?.input || !kernel.systemMechanic?.output || !kernel.systemMechanic?.limit || !kernel.systemMechanic?.reward) return false;
+  if (!kernel.mcSecret?.secret || !kernel.mcSecret?.outsideWorldKnowledge || !kernel.mcSecret?.revealRule) return false;
+  if (!kernel.benefitLoop?.goal || !kernel.benefitLoop?.action || !kernel.benefitLoop?.benefit || !kernel.benefitLoop?.cadence) return false;
+  if (!kernel.interventionRule || kernel.interventionRule.trim().length < 30) return false;
   if (!Array.isArray(kernel.phase1Playground?.locations) || kernel.phase1Playground.locations.length < 2) return false;
   if (!Array.isArray(kernel.phase1Playground?.cast) || kernel.phase1Playground.cast.length < 2) return false;
   if (!Array.isArray(kernel.phase1Playground?.localAntagonists) || kernel.phase1Playground.localAntagonists.length < 1) return false;

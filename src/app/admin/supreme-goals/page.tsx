@@ -12,6 +12,7 @@ type Grade = 'green' | 'yellow' | 'red';
 type ProjectGoals = {
   project_id: string;
   title: string;
+  status?: string;
   current_chapter: number;
   total_planned_chapters: number;
   progress_pct: number;
@@ -29,11 +30,17 @@ type ProjectGoals = {
     trend_drift: number | null;
     trend_recent_avg: number | null;
     trend_alert: string;
+    quality_score?: number;
+    quality_pass_rate?: number;
+    quality_revise?: number;
+    quality_block?: number;
+    codex_manual?: boolean;
   };
 };
 
 type Aggregate = {
   count: number;
+  statuses?: string[];
   aggregate: Record<keyof ProjectGoals['goals'], { green: number; yellow: number; red: number }>;
   projects: ProjectGoals[];
 };
@@ -105,7 +112,7 @@ export default function SupremeGoalsPage() {
           {/* Aggregate */}
           <Card>
             <CardHeader>
-              <CardTitle>Tổng quan {data.count} novel active</CardTitle>
+              <CardTitle>Tổng quan {data.count} novel ({data.statuses?.join(', ') || 'active, paused'})</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -140,7 +147,7 @@ export default function SupremeGoalsPage() {
             </CardHeader>
             <CardContent>
               {data.projects.length === 0 ? (
-                <p className="text-muted-foreground text-sm">Không có novel active.</p>
+                <p className="text-muted-foreground text-sm">Không có novel trong phạm vi QA.</p>
               ) : (
                 <div className="space-y-2">
                   {data.projects.map(p => (
@@ -148,7 +155,7 @@ export default function SupremeGoalsPage() {
                       <div className="flex items-center justify-between gap-2">
                         <div className="font-semibold truncate flex-1">{p.title}</div>
                         <div className="text-xs text-muted-foreground whitespace-nowrap">
-                          ch. {p.current_chapter}/{p.total_planned_chapters} ({p.progress_pct}%)
+                          {p.status || 'unknown'} · ch. {p.current_chapter}/{p.total_planned_chapters} ({p.progress_pct}%)
                         </div>
                       </div>
                       <div className="flex items-center gap-3 text-xs">
@@ -161,6 +168,10 @@ export default function SupremeGoalsPage() {
                       </div>
                       <div className="text-xs text-muted-foreground">
                         Failed tasks: {p.signals.failed_tasks} · Threads open/resolved: {p.signals.open_threads}/{p.signals.resolved_threads} · Trend: {p.signals.trend_alert}
+                        {p.signals.quality_score !== undefined && (
+                          <> · Quality spine: {p.signals.quality_score}/100 ({Math.round((p.signals.quality_pass_rate || 0) * 100)}% pass)</>
+                        )}
+                        {p.signals.codex_manual && <> · Codex manual</>}
                         {p.signals.trend_drift !== null && (
                           <> · Drift: <span className={p.signals.trend_drift < -0.5 ? 'text-red-600' : ''}>{p.signals.trend_drift}</span></>
                         )}

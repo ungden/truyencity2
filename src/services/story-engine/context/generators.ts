@@ -59,11 +59,14 @@ interface ArcPlanAIResponse {
   arc_theme?: string;
   plan_text?: string;
   sub_arcs?: ArcSubArcEntry[];
-  chapter_briefs?: Array<{ chapterNumber: number; brief: string; sub_arc_number?: number }>;
+  chapter_briefs?: Array<{ chapterNumber: number; brief: string; sub_arc_number?: number; mcBenefit?: string }>;
   threads_to_advance?: string[];
   threads_to_resolve?: string[];
   new_threads?: string[];
 }
+
+const ARC_SECRET_LEAK_RE = /(tổ\s*chức|thế\s*lực|người\s*lạ|kẻ\s*lạ|đối\s*thủ|nhân\s*vật\s+bí\s*ẩn)[^.!?\n]{0,100}(theo\s*dõi|biết|phát\s*hiện|nhận\s*ra|săn\s*lùng)[^.!?\n]{0,100}(trọng\s*sinh|hệ\s*thống|bàn\s*tay\s*vàng|golden\s*finger|bí\s*mật|năng\s*lực\s+thật)/i;
+const CONCRETE_BENEFIT_RE = /(tiền|doanh\s*thu|tài\s*nguyên|skill|kỹ\s*năng|công\s*nhận|uy\s*tín|quan\s*hệ|network|thông\s*tin|insight|manh\s*mối|đột\s*phá|level|cảnh\s*giới|khách|đơn\s*hàng|hợp\s*đồng|vật\s*phẩm|item|kinh\s*nghiệm|bảo\s*vệ)/i;
 
 // ── Post-Write: Save Chapter Summary ─────────────────────────────────────────
 
@@ -466,6 +469,7 @@ ${voiceHint}
    ✗ KHÔNG "world full of trọng sinh khác". MC trọng sinh là DUY NHẤT — world NGÂY THƠ về golden finger MC.
    ✗ WARM BASELINE 5 chương đầu: ZERO active threat. MC làm việc routine trong domain nhỏ. KHÔNG có stalker / sát thủ / tổ chức bí ẩn / kẻ thù kiếp trước follow-through ở chương 1-5.
    ✗ "Vừa mua sắm ít đồ đã bị 5 thằng chú ý" = REJECT. Reader cần warm-up time để root for MC.
+   ✗ KHÔNG ai ngoài MC biết trọng sinh/hệ thống/golden finger trong arc 1. Người ngoài chỉ thấy kết quả MC tạo ra.
 \n`;
   }
 
@@ -499,6 +503,9 @@ Yêu cầu:
       vParts.push(`Protagonist engine: ${kernel.protagonistEngine}`);
       vParts.push(`Pleasure loop: ${kernel.pleasureLoop?.join(' → ')}`);
       vParts.push(`System: ${kernel.systemMechanic?.name} | input ${kernel.systemMechanic?.input} | output ${kernel.systemMechanic?.output} | limit ${kernel.systemMechanic?.limit} | reward ${kernel.systemMechanic?.reward}`);
+      vParts.push(`MC secret: ${kernel.mcSecret?.secret} | outside only knows ${kernel.mcSecret?.outsideWorldKnowledge} | reveal ${kernel.mcSecret?.revealRule}`);
+      vParts.push(`Benefit loop: goal ${kernel.benefitLoop?.goal} | action ${kernel.benefitLoop?.action} | benefit ${kernel.benefitLoop?.benefit} | cadence ${kernel.benefitLoop?.cadence}`);
+      vParts.push(`Intervention rule: ${kernel.interventionRule}`);
       vParts.push(`Social reactor: ${kernel.socialReactor?.witnesses?.join(', ')} | ${kernel.socialReactor?.reactionModes?.join(', ')}`);
       vParts.push(`Novelty ladder: ${kernel.noveltyLadder?.map(n => `${n.chapterRange}: ${n.newToy}`).join(' / ')}`);
       vParts.push(`Control: ${kernel.controlRules?.payoffCadence}; ${kernel.controlRules?.attentionGradient}; open ${kernel.controlRules?.openThreadsPerArc}, close ${kernel.controlRules?.closeThreadsPerArc}/arc.`);
@@ -537,6 +544,9 @@ THREAD RETIREMENT QUOTA (LONG-FORM SUSTAINABILITY):
 Phase 22 Stage 2 Q4: chapter_briefs phải SCENE-LEVEL không chỉ 1 dòng.
 Mỗi chapter brief phải liệt kê 3-5 scenes với goal/conflict cụ thể, callbacks tới hint cũ,
 và mini-payoff dự kiến. Đây là blueprint Architect dùng từng chương.
+Mỗi chapter brief BẮT BUỘC có "mcBenefit": lợi ích cụ thể MC nhận trong chương
+(tài nguyên/tiền/thông tin/quan hệ/uy tín/skill/bảo vệ circle). Nếu không có lợi ích,
+đổi brief thành opportunity/payoff local; KHÔNG tạo threat bí ẩn để kéo chương.
 
 Trả về JSON:
 {
@@ -551,6 +561,7 @@ Trả về JSON:
       "chapterNumber": ${startChapter},
       "brief": "1-2 câu high-level summary",
       "sub_arc_number": 1,
+      "mcBenefit": "Lợi ích cụ thể MC nhận trong chương này: tài nguyên/tiền/thông tin/quan hệ/uy tín/skill/bảo vệ circle",
       "scenes": [
         {"order": 1, "goal": "MC làm gì", "conflict": "đối kháng từ ai/cái gì", "resolution": "kết quả scene", "estimated_words": 700, "characters": ["MC", "X"]},
         {"order": 2, "goal": "...", "conflict": "...", "resolution": "...", "estimated_words": 700, "characters": [...]},
@@ -575,6 +586,17 @@ Trả về JSON:
   const parsed = parseJSON<ArcPlanAIResponse>(res.content);
   if (!parsed || !parsed.plan_text?.trim()) {
     throw new Error(`Arc plan generation failed: JSON parse error — raw: ${res.content.slice(0, 200)}`);
+  }
+  const arcPlanText = JSON.stringify(parsed);
+  if (arcNumber === 1 && ARC_SECRET_LEAK_RE.test(arcPlanText)) {
+    throw new Error('Arc plan generation refused: arc 1 leaks MC secret or adds mysterious tracking organization');
+  }
+  const missingBenefit = (parsed.chapter_briefs || []).find((brief) => {
+    const benefit = (brief.mcBenefit || '').trim();
+    return benefit.length < 12 || !CONCRETE_BENEFIT_RE.test(benefit);
+  });
+  if (missingBenefit) {
+    throw new Error(`Arc plan generation refused: chapter ${missingBenefit.chapterNumber} brief missing concrete mcBenefit`);
   }
 
   const db = getSupabase();

@@ -30,6 +30,12 @@ import {
   hasValidSetupKernel,
   shouldResetUnwrittenMissingKernel,
 } from '@/services/story-engine/pipeline/setup-kernel-guards';
+import {
+  FOCUS_MODE_ENABLED,
+  FOCUSED_PROJECT_IDS,
+  STORY_PRODUCTION_PAUSED,
+  filterFocusedProjects,
+} from '@/lib/story-production-focus';
 
 // Story Engine v2 — sole engine for all tiers (init + resume)
 import { writeOneChapter as writeOneChapterV2 } from '@/services/story-engine';
@@ -762,6 +768,15 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
   }
 
+  if (STORY_PRODUCTION_PAUSED) {
+    return NextResponse.json({
+      success: true,
+      skipped: true,
+      reason: 'STORY_PRODUCTION_PAUSED enabled: legacy chapter writer is paused',
+      durationSeconds: Math.round((Date.now() - startTime) / 1000),
+    });
+  }
+
   // Phase 23 fix: install Pro-tier routing at cron entry so init-prep tier (arc_plan
   // generation called BEFORE writeOneChapter) also gets Pro tier. Without this, init-prep
   // arc_plan was running on Flash and truncating at 4096 tokens with the new richer schema.
@@ -786,12 +801,11 @@ export async function GET(request: NextRequest) {
     const lockBoundary = new Date(Date.now() - lockWindowMs).toISOString();
     const STAGED_SETUP_STATES = ['idea', 'world', 'character', 'description', 'master_outline', 'story_outline', 'arc_plan'];
 
-    const [activeCountQuery, candidateQuery, setupCandidateQuery] = await Promise.all([
-      supabase
+    let activeCountBuilder = supabase
         .from('ai_story_projects')
         .select('id', { count: 'exact', head: true })
-        .eq('status', 'active'),
-      supabase
+        .eq('status', 'active');
+    let candidateBuilder = supabase
         .from('ai_story_projects')
         .select(`
           id, main_character, genre, status,
@@ -804,8 +818,8 @@ export async function GET(request: NextRequest) {
         .eq('status', 'active')
         .lt('updated_at', lockBoundary)
         .order('updated_at', { ascending: true })
-        .limit(CANDIDATE_POOL_SIZE),
-      supabase
+        .limit(CANDIDATE_POOL_SIZE);
+    let setupCandidateBuilder = supabase
         .from('ai_story_projects')
         .select(`
           id, main_character, genre, status,
@@ -820,7 +834,18 @@ export async function GET(request: NextRequest) {
         .in('setup_stage', STAGED_SETUP_STATES)
         .lt('updated_at', lockBoundary)
         .order('updated_at', { ascending: true })
-        .limit(INIT_PREP_BATCH_SIZE),
+        .limit(INIT_PREP_BATCH_SIZE);
+
+    if (FOCUS_MODE_ENABLED) {
+      activeCountBuilder = activeCountBuilder.in('id', FOCUSED_PROJECT_IDS);
+      candidateBuilder = candidateBuilder.in('id', FOCUSED_PROJECT_IDS);
+      setupCandidateBuilder = setupCandidateBuilder.in('id', FOCUSED_PROJECT_IDS);
+    }
+
+    const [activeCountQuery, candidateQuery, setupCandidateQuery] = await Promise.all([
+      activeCountBuilder,
+      candidateBuilder,
+      setupCandidateBuilder,
     ]);
 
     if (activeCountQuery.error) { console.error('[Cron] Step 1 activeCount failed:', activeCountQuery.error); throw activeCountQuery.error; }
@@ -830,8 +855,8 @@ export async function GET(request: NextRequest) {
     const activeCount = activeCountQuery.count || 0;
     const dynamicResumeBatchSize = computeDynamicResumeBatchSize(activeCount);
 
-    const rawCandidates = (candidateQuery.data || []) as ProjectRow[];
-    const setupOnlyCandidates = (setupCandidateQuery.data || []) as ProjectRow[];
+    const rawCandidates = filterFocusedProjects((candidateQuery.data || []) as ProjectRow[]);
+    const setupOnlyCandidates = filterFocusedProjects((setupCandidateQuery.data || []) as ProjectRow[]);
     console.log(`[Cron] Step 1 OK: ${activeCount} active, ${rawCandidates.length} active candidates, ${setupOnlyCandidates.length} setup candidates fetched`);
 
     // Filter candidates eligible for processing (respect soft-ending grace buffer)

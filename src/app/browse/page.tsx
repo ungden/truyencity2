@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Header } from '@/components/header';
 import { NovelCard } from '@/components/novel-card';
 import { GenreFilter } from '@/components/genre-filter';
@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Grid3X3, List, ArrowUpDown, Filter, X, SlidersHorizontal } from 'lucide-react';
+import { Grid3X3, List, ArrowUpDown, Filter, X, SlidersHorizontal, RotateCcw } from 'lucide-react';
 import { AppContainer, TwoColumnLayout, ContentCard } from '@/components/layout';
 import { cn } from '@/lib/utils';
 import { GENRE_CONFIG } from '@/lib/types/genre-config';
@@ -79,20 +79,22 @@ const chapterRangeOptions = [
 ];
 
 const sortOptions = [
-  { value: 'updated', label: 'Mới cập nhật' },
-  { value: 'newest', label: 'Truyện mới ra mắt' },
+  { value: 'newest', label: 'Mới nhất' },
+  { value: 'released', label: 'Truyện mới ra mắt' },
   { value: 'chapters_desc', label: 'Nhiều chương nhất' },
   { value: 'title', label: 'Tên A-Z' },
 ];
 
-const PAGE_SIZE = 30;
+const statusParamToValue = new Map(statusOptions.map((status) => [status.id, status.value]));
+const statusValueToParam = new Map(statusOptions.map((status) => [status.value, status.id]));
 
 export default function BrowsePage() {
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
   const [chapterRange, setChapterRange] = useState('all');
-  const [sortBy, setSortBy] = useState('updated');
+  const [sortBy, setSortBy] = useState('newest');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [hasHydratedFilters, setHasHydratedFilters] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -100,7 +102,43 @@ export default function BrowsePage() {
     if (sort && sortOptions.some((s) => s.value === sort)) {
       setSortBy(sort);
     }
+    const genreParam = params.get('genre') || params.get('genres');
+    if (genreParam) {
+      setSelectedGenres(genreParam.split(',').map((item) => item.trim()).filter(Boolean));
+    }
+    const statusParam = params.get('status');
+    if (statusParam) {
+      setSelectedStatus(statusParam
+        .split(',')
+        .map((item) => statusParamToValue.get(item.trim()) || item.trim())
+        .filter(Boolean));
+    }
+    const range = params.get('range');
+    if (range && chapterRangeOptions.some((option) => option.id === range)) {
+      setChapterRange(range);
+    }
+    const view = params.get('view');
+    if (view === 'grid' || view === 'list') {
+      setViewMode(view);
+    }
+    setHasHydratedFilters(true);
   }, []);
+
+  useEffect(() => {
+    if (!hasHydratedFilters) return;
+
+    const params = new URLSearchParams();
+    if (sortBy !== 'newest') params.set('sort', sortBy);
+    if (selectedGenres.length > 0) params.set('genre', selectedGenres.join(','));
+    if (selectedStatus.length > 0) {
+      params.set('status', selectedStatus.map((status) => statusValueToParam.get(status) || status).join(','));
+    }
+    if (chapterRange !== 'all') params.set('range', chapterRange);
+    if (viewMode !== 'grid') params.set('view', viewMode);
+
+    const nextUrl = params.toString() ? `/browse?${params.toString()}` : '/browse';
+    window.history.replaceState(null, '', nextUrl);
+  }, [chapterRange, hasHydratedFilters, selectedGenres, selectedStatus, sortBy, viewMode]);
 
   // Use React Query infinite query hook
   const {
@@ -165,6 +203,16 @@ export default function BrowsePage() {
   };
 
   const hasFilters = selectedGenres.length > 0 || selectedStatus.length > 0 || chapterRange !== 'all';
+  const currentSort = useMemo(
+    () => sortOptions.find((option) => option.value === sortBy) || sortOptions[0],
+    [sortBy],
+  );
+  const pageTitle = sortBy === 'released' ? 'Truyện mới ra mắt' : sortBy === 'newest' || sortBy === 'updated' ? 'Mới nhất' : 'Duyệt truyện';
+  const pageSubtitle = sortBy === 'released'
+    ? 'Những bộ vừa được tạo trong hệ thống'
+    : sortBy === 'newest' || sortBy === 'updated'
+      ? 'Các bộ vừa có chương mới, ưu tiên truyện đọc được ngay'
+      : 'Khám phá kho truyện phong phú';
 
   // Desktop Sidebar Filters
   const FilterSidebar = (
@@ -176,8 +224,9 @@ export default function BrowsePage() {
             Bộ lọc
           </h3>
           {hasFilters && (
-            <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs h-7">
-              Xóa tất cả
+            <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs h-7 gap-1.5">
+              <RotateCcw size={13} />
+              Xóa
             </Button>
           )}
         </div>
@@ -301,16 +350,33 @@ export default function BrowsePage() {
 
   // Main content
   const MainContent = (
-    <div className="space-y-4">
+    <div className="space-y-5">
+      <div className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
+        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-normal">{pageTitle}</h1>
+            <p className="mt-1 text-sm text-muted-foreground">{pageSubtitle}</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+            <span className="rounded-full border bg-background px-3 py-1.5">
+              Sắp xếp: <span className="font-medium text-foreground">{currentSort.label}</span>
+            </span>
+            <span className="rounded-full border bg-background px-3 py-1.5">
+              {isLoading ? 'Đang tải...' : `${novels.length} truyện đã tải`}
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* Toolbar */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">
-          {isLoading ? 'Đang tải...' : `Hiển thị ${novels.length} truyện`}
+          {isLoading ? 'Đang tải danh sách...' : hasFilters ? 'Đang áp dụng bộ lọc' : 'Tất cả truyện phù hợp'}
         </p>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-44 rounded-xl">
+            <SelectTrigger className="w-[180px] rounded-xl">
               <ArrowUpDown size={14} className="mr-2" />
               <SelectValue />
             </SelectTrigger>
@@ -321,7 +387,7 @@ export default function BrowsePage() {
             </SelectContent>
           </Select>
 
-          <div className="hidden sm:flex border rounded-xl overflow-hidden">
+          <div className="hidden sm:flex border rounded-xl overflow-hidden bg-background">
             <Button
               variant={viewMode === 'grid' ? 'default' : 'ghost'}
               size="sm"
@@ -444,10 +510,6 @@ export default function BrowsePage() {
       <AppContainer className="py-6 lg:py-8">
         {/* Desktop: Two Column with Sidebar */}
         <div className="hidden lg:block">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold">Duyệt Truyện</h1>
-            <p className="text-muted-foreground">Khám phá kho truyện phong phú</p>
-          </div>
           <TwoColumnLayout
             sidebar={FilterSidebar}
             sidebarPosition="left"
@@ -459,18 +521,33 @@ export default function BrowsePage() {
 
         {/* Mobile Layout */}
         <div className="lg:hidden space-y-4">
+          <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+            <h1 className="text-2xl font-bold tracking-normal">{pageTitle}</h1>
+            <p className="mt-1 text-sm text-muted-foreground">{pageSubtitle}</p>
+            <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
+              <span className="rounded-full border bg-background px-3 py-1.5">
+                {currentSort.label}
+              </span>
+              <span className="rounded-full border bg-background px-3 py-1.5">
+                {isLoading ? 'Đang tải...' : `${novels.length} truyện`}
+              </span>
+            </div>
+          </div>
+
           {/* Mobile Filter Bar */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <GenreFilter
               selectedGenres={selectedGenres}
               onGenreChange={setSelectedGenres}
               selectedStatus={selectedStatus}
               onStatusChange={setSelectedStatus}
+              chapterRange={chapterRange}
+              onChapterRangeChange={setChapterRange}
             />
 
             <div className="flex items-center gap-2">
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-32 rounded-xl">
+                <SelectTrigger className="w-[150px] rounded-xl">
                   <ArrowUpDown size={14} className="mr-1" />
                   <SelectValue />
                 </SelectTrigger>

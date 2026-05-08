@@ -47,6 +47,8 @@ scripts/trigger-write-chapters.ts
 
 # generated story output
 /chapters/
+.codex/story-runs/
+.codex/automation-runs/
 
 # typescript
 *.tsbuildinfo

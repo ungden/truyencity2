@@ -14,9 +14,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAuthorizedAdmin } from '@/lib/auth/admin-auth';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
+import { evaluateChapterQuality, evaluateWindowQuality } from '@/services/story-engine/quality/quality-contract';
 
 export const maxDuration = 800;
 export const dynamic = 'force-dynamic';
+
+function parseStatuses(raw: unknown): string[] {
+  if (Array.isArray(raw)) {
+    const statuses = raw.map(String).map((item) => item.trim()).filter(Boolean);
+    return statuses.length > 0 ? statuses : ['active', 'paused'];
+  }
+  if (typeof raw === 'string') {
+    const statuses = raw.split(',').map((item) => item.trim()).filter(Boolean);
+    return statuses.length > 0 ? statuses : ['active', 'paused'];
+  }
+  return ['active', 'paused'];
+}
 
 async function getStatus() {
   const supabase = getSupabaseAdmin();
@@ -160,19 +173,21 @@ async function getStuckNovels(supabase: ReturnType<typeof getSupabaseAdmin>) {
  */
 async function runRegressionAudit(
   supabase: ReturnType<typeof getSupabaseAdmin>,
-  body: { sampleSize?: number; perProjectChapters?: number },
+  body: { sampleSize?: number; perProjectChapters?: number; status?: string | string[] },
 ) {
   const sampleSize = Math.min(50, Math.max(5, body.sampleSize || 20));
   const perProjectChapters = Math.min(10, Math.max(1, body.perProjectChapters || 3));
+  const statuses = parseStatuses(body.status);
 
   const { data: projects } = await supabase
     .from('ai_story_projects')
-    .select('id,main_character,genre,world_description,novel_id,novels(title)')
-    .eq('status', 'active')
+    .select('id,status,main_character,genre,world_description,novel_id,target_chapter_length,style_directives,novels(title)')
+    .in('status', statuses)
+    .gt('current_chapter', 0)
     .order('updated_at', { ascending: false })
     .limit(sampleSize);
 
-  if (!projects?.length) return { audited: 0, results: [] };
+  if (!projects?.length) return { audited: 0, statuses, results: [] };
 
   const results: Array<{
     project_id: string;
@@ -181,6 +196,7 @@ async function runRegressionAudit(
     chapters_sampled: number;
     issues: Array<{ chapter: number; issues: string[] }>;
     score: number;
+    verdicts: Record<string, number>;
   }> = [];
 
   for (const p of projects) {
@@ -188,46 +204,34 @@ async function runRegressionAudit(
     const novelId = p.novel_id;
     const { data: chapters } = await supabase
       .from('chapters')
-      .select('chapter_number,content')
+      .select('chapter_number,title,content')
       .eq('novel_id', novelId)
       .order('chapter_number', { ascending: false })
       .limit(perProjectChapters);
 
     const chapterIssues: Array<{ chapter: number; issues: string[] }> = [];
-    let totalIssues = 0;
+    let totalScore = 0;
+    const verdicts: Record<string, number> = { pass: 0, revise: 0, block: 0 };
 
     for (const ch of chapters || []) {
-      const issues: string[] = [];
-      const c = ch.content || '';
-
-      const placeholders = c.match(/<(MC|LOVE|CITY|COMPANY|NUMBER|TITLE|SKILL)>/g);
-      if (placeholders) issues.push(`placeholder_leak:${[...new Set(placeholders)].join(',')}`);
-
-      const expectedMC = (p.main_character || '').trim();
-      if (expectedMC && expectedMC.length >= 2) {
-        if (!c.includes(expectedMC)) {
-          const tokens = expectedMC.split(/\s+/).filter((t: string) => t.length >= 2);
-          const tokenFound = tokens.some((t: string) => c.includes(t));
-          if (!tokenFound) issues.push(`mc_name_absent:${expectedMC}`);
-        }
-      }
-
-      const isVnSet = ['do-thi', 'quan-truong'].includes(p.genre || '') ||
-        /Đại Nam|Phượng Đô|Hải Long Đô|Sài Gòn|Hà Nội|Việt Nam/i.test(p.world_description || '');
-      if (isVnSet) {
-        const xuLeak = c.match(/\d[\d.,]*\s*xu\b/);
-        if (xuLeak) issues.push(`xu_leak:${xuLeak[0].slice(0, 30)}`);
-        const nguyenLeak = c.match(/\d[\d.,]*\s*nguyên(?!\s*(?:tử|thủy|tắc|liệu))/);
-        if (nguyenLeak) issues.push(`nguyen_leak:${nguyenLeak[0].slice(0, 30)}`);
-      }
+      const report = evaluateChapterQuality(ch.content || '', {
+        title: ch.title,
+        protagonistName: p.main_character,
+        targetWords: p.target_chapter_length || 2200,
+        minWords: 1800,
+        genre: p.genre,
+        worldDescription: p.world_description,
+      });
+      totalScore += report.score;
+      verdicts[report.verdict] = (verdicts[report.verdict] || 0) + 1;
+      const issues = report.issues.map((issue) => `${issue.code}:${issue.severity}`);
 
       if (issues.length > 0) {
         chapterIssues.push({ chapter: ch.chapter_number, issues });
-        totalIssues += issues.length;
       }
     }
 
-    const score = Math.max(0, 100 - 10 * totalIssues);
+    const score = chapters?.length ? Math.round(totalScore / chapters.length) : 0;
     results.push({
       project_id: p.id,
       title: (novel as { title?: string } | null)?.title || '?',
@@ -235,6 +239,7 @@ async function runRegressionAudit(
       chapters_sampled: chapters?.length || 0,
       issues: chapterIssues,
       score,
+      verdicts,
     });
   }
 
@@ -247,6 +252,7 @@ async function runRegressionAudit(
 
   return {
     audited: results.length,
+    statuses,
     overall_score: overall,
     results,
   };
@@ -301,14 +307,20 @@ async function getQualityTrends(supabase: ReturnType<typeof getSupabaseAdmin>) {
  * V4: Supreme goals dashboard data. For each active novel, derive 5 traffic lights
  * from existing signals.
  */
-async function getSupremeGoalsStatus(supabase: ReturnType<typeof getSupabaseAdmin>) {
+async function getSupremeGoalsStatus(
+  supabase: ReturnType<typeof getSupabaseAdmin>,
+  body: { status?: string | string[]; perProjectChapters?: number } = {},
+) {
+  const statuses = parseStatuses(body.status);
+  const perProjectChapters = Math.min(10, Math.max(3, body.perProjectChapters || 5));
   const { data: projects } = await supabase
     .from('ai_story_projects')
-    .select('id,novel_id,current_chapter,total_planned_chapters,novels(title)')
-    .eq('status', 'active')
+    .select('id,status,novel_id,genre,main_character,world_description,current_chapter,total_planned_chapters,target_chapter_length,style_directives,novels(title)')
+    .in('status', statuses)
+    .gt('current_chapter', 0)
     .order('updated_at', { ascending: false });
 
-  if (!projects?.length) return { count: 0, projects: [] };
+  if (!projects?.length) return { count: 0, statuses, projects: [] };
 
   // Bulk fetch latest quality_trends + failed_memory_tasks counts
   const projectIds = projects.map(p => p.id);
@@ -357,7 +369,7 @@ async function getSupremeGoalsStatus(supabase: ReturnType<typeof getSupabaseAdmi
     return 'green';
   }
 
-  const result = projects.map(p => {
+  const result = await Promise.all(projects.map(async (p) => {
     const trend = trendByProject.get(p.id);
     const failedCount = failedByProject.get(p.id) || 0;
     const tStats = threadStats.get(p.id) || { open: 0, resolved: 0 };
@@ -366,28 +378,59 @@ async function getSupremeGoalsStatus(supabase: ReturnType<typeof getSupabaseAdmi
     const current = p.current_chapter || 0;
     const progressPct = Math.round((current / total) * 100);
 
-    // Goal 1: Coherence — use trend alert + failed task count + open thread ratio
+    const { data: chapters } = await supabase
+      .from('chapters')
+      .select('chapter_number,title,content')
+      .eq('novel_id', p.novel_id)
+      .order('chapter_number', { ascending: false })
+      .limit(perProjectChapters);
+    const windowQuality = evaluateWindowQuality(
+      p.id,
+      (chapters || []).slice().reverse().map((chapter) => ({
+        chapterNumber: chapter.chapter_number,
+        title: chapter.title,
+        content: chapter.content || '',
+      })),
+      {
+        protagonistName: p.main_character,
+        targetWords: p.target_chapter_length || 2200,
+        minWords: 1800,
+        genre: p.genre,
+        worldDescription: p.world_description,
+      },
+    );
+
+    const combineGrade = (...grades: Array<'green' | 'yellow' | 'red'>): 'green' | 'yellow' | 'red' => {
+      if (grades.includes('red')) return 'red';
+      if (grades.includes('yellow')) return 'yellow';
+      return 'green';
+    };
+
+    // Goal 1: Coherence — latest chapter text + trend alert + failed task count + open thread ratio
     const openRatio = tStats.open + tStats.resolved > 0
       ? tStats.open / (tStats.open + tStats.resolved)
       : 1;
-    let coherence: 'green' | 'yellow' | 'red';
-    if (failedCount > 5 || (trend && trend.alert === 'critical')) coherence = 'red';
-    else if (failedCount > 2 || openRatio > 0.7 || (trend && trend.alert === 'warn')) coherence = 'yellow';
-    else coherence = 'green';
+    let historicalCoherence: 'green' | 'yellow' | 'red';
+    if (failedCount > 5 || (trend && trend.alert === 'critical')) historicalCoherence = 'red';
+    else if (failedCount > 2 || openRatio > 0.7 || (trend && trend.alert === 'warn')) historicalCoherence = 'yellow';
+    else historicalCoherence = 'green';
+    const coherence = combineGrade(historicalCoherence, windowQuality.supremeGoals.coherence);
 
     // Goal 2: Character consistency — based on critical_issues_total in trend
-    let charConsist: 'green' | 'yellow' | 'red';
+    let historicalChar: 'green' | 'yellow' | 'red';
     const crits = trend?.criticals || 0;
-    if (crits > 5) charConsist = 'red';
-    else if (crits > 1) charConsist = 'yellow';
-    else charConsist = 'green';
+    if (crits > 5) historicalChar = 'red';
+    else if (crits > 1) historicalChar = 'yellow';
+    else historicalChar = 'green';
+    const charConsist = combineGrade(historicalChar, windowQuality.supremeGoals.character_consistency);
 
     // Goal 3: Directional plot — derived from open vs resolved thread ratio + chapter progress
-    let directional: 'green' | 'yellow' | 'red';
-    if (current < 20) directional = 'green'; // too early to judge
-    else if (openRatio > 0.8) directional = 'red'; // nothing resolves
-    else if (openRatio > 0.6) directional = 'yellow';
-    else directional = 'green';
+    let historicalDirectional: 'green' | 'yellow' | 'red';
+    if (current < 20) historicalDirectional = 'green'; // too early to judge
+    else if (openRatio > 0.8) historicalDirectional = 'red'; // nothing resolves
+    else if (openRatio > 0.6) historicalDirectional = 'yellow';
+    else historicalDirectional = 'green';
+    const directional = combineGrade(historicalDirectional, windowQuality.supremeGoals.directional_plot);
 
     // Goal 4: Ending readiness — progress % + status
     let ending: 'green' | 'yellow' | 'red';
@@ -396,11 +439,12 @@ async function getSupremeGoalsStatus(supabase: ReturnType<typeof getSupabaseAdmi
     else ending = 'green'; // not yet at ending phase, OK
 
     // Goal 5: Uniform quality — directly from trend alert level
-    const uniform: 'green' | 'yellow' | 'red' = trend ? gradeFromAlert(trend.alert) : 'green';
+    const uniform: 'green' | 'yellow' | 'red' = combineGrade(trend ? gradeFromAlert(trend.alert) : 'green', windowQuality.supremeGoals.uniform_quality);
 
     return {
       project_id: p.id,
       title: (novel as { title?: string } | null)?.title || '?',
+      status: p.status,
       current_chapter: current,
       total_planned_chapters: total,
       progress_pct: progressPct,
@@ -412,9 +456,14 @@ async function getSupremeGoalsStatus(supabase: ReturnType<typeof getSupabaseAdmi
         trend_drift: trend?.drift || null,
         trend_recent_avg: trend?.recent || null,
         trend_alert: trend?.alert || 'no_data',
+        quality_score: windowQuality.trend.averageScore,
+        quality_pass_rate: windowQuality.trend.passRate,
+        quality_revise: windowQuality.trend.reviseCount,
+        quality_block: windowQuality.trend.blockCount,
+        codex_manual: p.style_directives?.codex_manual_pipeline === true,
       },
     };
-  });
+  }));
 
   // Aggregate counts per goal
   const aggregate = { coherence: { green: 0, yellow: 0, red: 0 }, charConsist: { green: 0, yellow: 0, red: 0 }, directional: { green: 0, yellow: 0, red: 0 }, ending: { green: 0, yellow: 0, red: 0 }, uniform: { green: 0, yellow: 0, red: 0 } };
@@ -425,7 +474,7 @@ async function getSupremeGoalsStatus(supabase: ReturnType<typeof getSupabaseAdmi
     }
   }
 
-  return { count: result.length, aggregate, projects: result };
+  return { count: result.length, statuses, aggregate, projects: result };
 }
 
 async function setCronActive(active: boolean) {
@@ -457,13 +506,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       return NextResponse.json(await getStuckNovels(supabase));
 
     case 'regression_audit':
-      return NextResponse.json(await runRegressionAudit(supabase, body as { sampleSize?: number; perProjectChapters?: number }));
+      return NextResponse.json(await runRegressionAudit(supabase, body as { sampleSize?: number; perProjectChapters?: number; status?: string | string[] }));
 
     case 'quality_trends':
       return NextResponse.json(await getQualityTrends(supabase));
 
     case 'supreme_goals':
-      return NextResponse.json(await getSupremeGoalsStatus(supabase));
+      return NextResponse.json(await getSupremeGoalsStatus(supabase, body as { status?: string | string[]; perProjectChapters?: number }));
 
     case 'pause_cron':
       return NextResponse.json(await setCronActive(false));

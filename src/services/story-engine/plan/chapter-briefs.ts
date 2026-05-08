@@ -32,6 +32,7 @@ interface BriefAIResponse {
     chapterNumber?: number;
     brief?: string;
     sceneDirection?: string; // 1-2 sentences direction
+    mcBenefit?: string;
   }>;
 }
 
@@ -39,6 +40,7 @@ interface RollingBrief {
   chapterNumber: number;
   brief: string;
   sceneDirection?: string;
+  mcBenefit?: string;
 }
 
 // ── Generate rolling briefs (post-write, fires every 5 chapters) ─────────────
@@ -116,7 +118,8 @@ Trả về JSON:
     {
       "chapterNumber": ${targetChapters[0]},
       "brief": "<150-250 từ describing scene direction. Cụ thể: WHERE (location), WHO (cast), WHAT happens (events), WHY (motivations), HOOK (ending direction). KHÔNG generic.>",
-      "sceneDirection": "<1-2 câu high-level direction — vd 'MC encounters villain at marketplace, escalation, reveal twist about brother'>"
+      "sceneDirection": "<1-2 câu high-level direction — vd 'MC encounters local rival at marketplace, resolves pricing problem, earns supplier trust'>",
+      "mcBenefit": "<lợi ích cụ thể MC nhận: tài nguyên/tiền/thông tin/quan hệ/uy tín/skill/bảo vệ circle>"
     }
     ...
   ]
@@ -126,7 +129,8 @@ QUY TẮC:
 1. Briefs phải BUILD ON nhau — chương N+1 phải tiếp nối cliffhanger N. Chương N+2 phải có mention/seed gì đó từ N+1.
 2. Mỗi brief phải fit ARC THEME + plan.
 3. KHÔNG bịa events không có trong arc plan.
-4. brief phải concrete — có thể write Architect outline từ brief này.`;
+4. brief phải concrete — có thể write Architect outline từ brief này.
+5. Mỗi brief PHẢI có mcBenefit cụ thể; MC không can thiệp chuyện ngoài nếu không có lợi ích rõ.`;
 
     const res = await callGemini(
       prompt,
@@ -145,6 +149,7 @@ QUY TẮC:
         chapterNumber: b.chapterNumber!,
         brief: b.brief!.slice(0, 1200),
         sceneDirection: b.sceneDirection?.slice(0, 300),
+        mcBenefit: b.mcBenefit?.slice(0, 300),
       }));
 
     if (newBriefs.length === 0) return { generated: 0 };
@@ -200,7 +205,7 @@ export async function getRollingBriefsContext(
       .maybeSingle();
     if (!arcPlan) return null;
 
-    const briefs = (arcPlan.chapter_briefs || []) as Array<{ chapterNumber: number; brief: string; sceneDirection?: string }>;
+    const briefs = (arcPlan.chapter_briefs || []) as Array<{ chapterNumber: number; brief: string; sceneDirection?: string; mcBenefit?: string }>;
     const futureBriefs = briefs
       .filter(b => b.chapterNumber > currentChapter && b.chapterNumber <= currentChapter + 3)
       .sort((a, b) => a.chapterNumber - b.chapterNumber);
@@ -214,6 +219,7 @@ export async function getRollingBriefsContext(
     for (const b of futureBriefs) {
       lines.push(`\n📋 Ch.${b.chapterNumber}:`);
       if (b.sceneDirection) lines.push(`   Direction: ${b.sceneDirection}`);
+      if (b.mcBenefit) lines.push(`   MC benefit: ${b.mcBenefit}`);
       lines.push(`   Brief: ${b.brief.slice(0, 400)}`);
     }
 

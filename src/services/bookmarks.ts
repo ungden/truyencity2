@@ -7,10 +7,13 @@ export type BookmarkItem = {
   created_at: string;
   novel: {
     id: string;
+    slug: string | null;
     title: string;
     author: string | null;
     cover_url: string | null;
     status: string | null;
+    total_chapters: number | null;
+    updated_at: string | null;
   };
 };
 
@@ -25,7 +28,7 @@ export async function listBookmarks(): Promise<BookmarkItem[]> {
   // Thanks to FK, we can select nested novel
   const { data, error } = await supabase
     .from("bookmarks")
-    .select("id, created_at, novels:novel_id ( id, title, author, cover_url, status )")
+    .select("id, created_at, novels:novel_id ( id, slug, title, author, cover_url, status, total_chapters, updated_at )")
     .eq("user_id", userId)
     .order("created_at", { ascending: false })
     .limit(200);
@@ -37,10 +40,13 @@ export async function listBookmarks(): Promise<BookmarkItem[]> {
     created_at: row.created_at,
     novel: {
       id: row.novels?.id,
+      slug: row.novels?.slug ?? null,
       title: row.novels?.title,
       author: row.novels?.author ?? null,
       cover_url: row.novels?.cover_url ?? null,
       status: row.novels?.status ?? null,
+      total_chapters: row.novels?.total_chapters ?? null,
+      updated_at: row.novels?.updated_at ?? null,
     },
   }));
 }

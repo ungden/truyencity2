@@ -172,6 +172,7 @@ NARRATIVE DIRECTIVES TUÂN THEO CONTEXT (TUYỆT ĐỐI BẮT BUỘC):
 FIDELITY VỚI CHAPTER_BRIEF (TUYỆT ĐỐI BẮT BUỘC):
 - Nếu context có "CHAPTER BRIEF" hoặc "Brief chương N" → bắt buộc TÔN TRỌNG nội dung brief làm xương sống chương
 - Sự kiện chính trong brief PHẢI xảy ra (nếu brief mô tả 1 sự kiện cụ thể, MC phải hoàn thành sự kiện đó trong chương — KHÔNG skip, KHÔNG thay bằng sự kiện khác)
+- Nếu brief có "mcBenefit" → mọi scene chính phải phục vụ lợi ích đó. Nếu brief thiếu "mcBenefit" → Architect PHẢI tự chọn lợi ích local hợp lệ cho MC (tài nguyên/tiền/thông tin/quan hệ/uy tín/skill/bảo vệ circle) và ghi vào summary/dopaminePoints; KHÔNG biến thiếu benefit thành threat bí ẩn.
 - TUYỆT ĐỐI KHÔNG inject địa danh / nhân vật / scenario từ ví dụ trong prompt này vào nội dung chương — chỉ dùng những gì có trong CONTEXT (world_description, master_outline, arc_plan, chapter_brief)
 - CẤM tự sáng tạo plot lớn không có trong brief / arc plan / master outline:
   * KHÔNG thêm nhân vật bí ẩn biết bí mật MC (xuyên không, identity, năng lực)
@@ -181,6 +182,11 @@ FIDELITY VỚI CHAPTER_BRIEF (TUYỆT ĐỐI BẮT BUỘC):
 - Chỉ được tự sáng tạo các CHI TIẾT TRONG SCOPE: tên NPC nhỏ, lời thoại cụ thể, tả cảnh, micro-conflict trong scene
 - Nếu cảm thấy brief "thiếu hấp dẫn" → KHÔNG được thay thế plot; thay vào đó AMPLIFY brief bằng tả chi tiết, nội tâm, dopamine moments
 - TEST: nếu reader đọc xong chương rồi đọc brief, phải khớp ≥80% sự kiện chính
+
+MC SECRET + BENEFIT LOCK:
+- Trọng sinh / hệ thống / bàn tay vàng là bí mật lớn nhất của MC. Người ngoài chỉ thấy kết quả MC tạo ra, không biết nguồn gốc.
+- MC chỉ chủ động xen vào chuyện ngoài khi có lợi ích cụ thể: tài nguyên, tiền, thông tin, quan hệ, uy tín, skill, hoặc bảo vệ người thuộc circle đã thiết lập.
+- Hệ thống/golden finger PHẢI tạo visible advantage trong chương; khó khăn được có nhưng không được biến hệ thống thành vô dụng nhiều chương liên tiếp.
 
 OUTPUT: JSON theo format ChapterOutline.`;
 
@@ -198,6 +204,9 @@ QUY TẮC BẮT BUỘC:
 - BREATHING MOMENTS: Mỗi chương PHẢI có ≥2 khoảnh khắc êm dịu (đối thoại ấm, observation chi tiết đời thường, recognition nhỏ, hài hước nhẹ) — kể cả chương climax/giai đoạn ngược.
 - Tiếng Việt tự nhiên: dùng thành ngữ, xưng hô đúng vai vế.
 - KHÔNG viết "Cliffhanger:" hay bất kỳ chỉ dẫn tiếng Anh nào.
+- MC SECRET LOCK: Trọng sinh/hệ thống/bàn tay vàng là bí mật của MC. Người ngoài chỉ được phản ứng với thành quả nhìn thấy, KHÔNG tự biết nguồn gốc năng lực.
+- MC BENEFIT LOCK: MC không chõ mồm vào chuyện ngoài nếu không có lợi ích rõ (tài nguyên/tiền/thông tin/quan hệ/uy tín/skill/bảo vệ circle đã thiết lập). Mỗi hành động chủ động phải tạo payoff hoặc mở opportunity cụ thể.
+- GOLDEN FINGER STRENGTH: Hệ thống/năng lực phải giúp MC mạnh lên qua insight/tool/resource/payoff thấy được. Khó khăn hợp lệ, nhưng CẤM viết nhiều scene liên tiếp như hệ thống vô dụng hoặc chỉ làm MC khổ thêm.
 
 HỘI THOẠI KẸP DAO (SUBTEXT): Không nói thẳng tuột. Kỹ thuật: Nói A hiểu B, trả lời bằng hành động, im lặng có nghĩa, lời nói VS hành động mâu thuẫn, hỏi để đe dọa.
 

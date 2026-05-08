@@ -4,11 +4,21 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
 
-const supabase = createClient(
-  'https://jxhpejyowuihvjpqwarm.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4aHBlanlvd3VpaHZqcHF3YXJtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjU5MjU3NiwiZXhwIjoyMDcyMTY4NTc2fQ.Xcc1Izxn1e2U2SBTb09Mhis9KJ1QV0OelQK4QyHHNqY'
-);
+dotenv.config({ path: '.env.runtime', quiet: true });
+dotenv.config({ path: '.env.local', quiet: true });
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl || !serviceRoleKey) {
+  throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
+}
+
+const supabase = createClient(supabaseUrl, serviceRoleKey, {
+  auth: { autoRefreshToken: false, persistSession: false },
+});
 
 async function main() {
   console.log('Quality Check v2 — ' + new Date().toISOString());

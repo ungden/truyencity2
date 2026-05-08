@@ -15,6 +15,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyCronAuth } from '@/lib/auth/cron-auth';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { MAX_ACTIVE_PROJECTS } from '@/lib/constants/project-limits';
+import {
+  FOCUS_MODE_ENABLED,
+  FOCUSED_PROJECT_IDS,
+  STORY_PRODUCTION_PAUSED,
+  isFocusedProject,
+} from '@/lib/story-production-focus';
 
 export const maxDuration = 60; // 1 minute max
 export const dynamic = 'force-dynamic';
@@ -35,9 +41,73 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
   }
 
+  if (STORY_PRODUCTION_PAUSED) {
+    return NextResponse.json({
+      success: true,
+      skipped: true,
+      reason: 'STORY_PRODUCTION_PAUSED enabled: legacy daily rotation is paused',
+      durationSeconds: Math.round((Date.now() - startTime) / 1000),
+    });
+  }
+
   const supabase = getSupabaseAdmin();
 
   try {
+    if (FOCUS_MODE_ENABLED) {
+      const { data: activeProjects, error: activeErr } = await supabase
+        .from('ai_story_projects')
+        .select('id')
+        .eq('status', 'active');
+      if (activeErr) throw activeErr;
+
+      const outsideFocusIds = (activeProjects || [])
+        .map((p) => p.id)
+        .filter((id) => !isFocusedProject(id));
+
+      let pausedOutsideFocus = 0;
+      if (outsideFocusIds.length > 0) {
+        for (let i = 0; i < outsideFocusIds.length; i += 100) {
+          const chunk = outsideFocusIds.slice(i, i + 100);
+          const { error } = await supabase
+            .from('ai_story_projects')
+            .update({
+              status: 'paused',
+              pause_reason: 'outside_focus_allowlist',
+              paused_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            })
+            .in('id', chunk)
+            .eq('status', 'active');
+          if (error) throw error;
+          pausedOutsideFocus += chunk.length;
+        }
+      }
+
+      const { count: focusedActive } = await supabase
+        .from('ai_story_projects')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'active')
+        .in('id', FOCUSED_PROJECT_IDS);
+
+      const { count: focusedPaused } = await supabase
+        .from('ai_story_projects')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'paused')
+        .in('id', FOCUSED_PROJECT_IDS);
+
+      return NextResponse.json({
+        success: true,
+        skipped: true,
+        reason: `Story production focus mode enabled: daily rotation disabled outside ${FOCUSED_PROJECT_IDS.length} allowlisted projects`,
+        focusedProjectIds: FOCUSED_PROJECT_IDS,
+        focusedActive: focusedActive || 0,
+        focusedPaused: focusedPaused || 0,
+        pausedOutsideFocus,
+        effectiveMaxActiveProjects: FOCUSED_PROJECT_IDS.length,
+        durationSeconds: Math.round((Date.now() - startTime) / 1000),
+      });
+    }
+
     // ====== STEP 1: Get all authors with their novel/project counts ======
 
     const { data: authors, error: authorsError } = await supabase

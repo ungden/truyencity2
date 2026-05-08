@@ -11,7 +11,12 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "typecheck": "tsc --noEmit",
-    "lint:prompts": "tsx scripts/audit-prompts-for-leaks.ts"
+    "lint:prompts": "tsx scripts/audit-prompts-for-leaks.ts",
+    "security:secrets": "node scripts/scan-secrets.js",
+    "audit:stories": "tsx scripts/audit-recent-story-quality.ts",
+    "backfill:quality-metrics": "tsx scripts/backfill-published-quality-metrics.ts",
+    "codex:story": "tsx scripts/codex-story-pipeline.ts",
+    "codex:automation": "tsx scripts/codex-automation-pipeline.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",

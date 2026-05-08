@@ -21,6 +21,18 @@ const validKernel = {
     limit: 'tối đa ba lần mỗi ngày',
     reward: 'doanh thu/công nhận/tài nguyên mới',
   },
+  mcSecret: {
+    secret: 'hệ thống trong đầu MC',
+    outsideWorldKnowledge: 'người ngoài chỉ thấy MC xử lý việc tốt hơn bình thường',
+    revealRule: 'không reveal trong Phase 1-2 trừ khi outline chỉ định muộn',
+  },
+  benefitLoop: {
+    goal: 'đạt mục tiêu local có payoff rõ',
+    action: 'xử lý việc thật trong domain nhỏ',
+    benefit: 'doanh thu, tài nguyên, thông tin, quan hệ và uy tín',
+    cadence: 'mỗi 1-3 chương',
+  },
+  interventionRule: 'MC chỉ can thiệp khi có tài nguyên, tiền, thông tin, quan hệ, uy tín, skill hoặc bảo vệ circle đã thiết lập.',
   phase1Playground: {
     locations: ['quầy nhỏ', 'khu văn phòng'],
     cast: ['khách quen', 'người cung ứng'],

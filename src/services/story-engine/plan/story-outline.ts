@@ -148,12 +148,18 @@ CHẤT LƯỢNG ĐẠI THẦN — required fields:
 13. dopamineContract: coreLoop + số payoff/chương + payoffTypes đúng genre.
 14. conflictLadder: 4 phase rõ local → regional → national/world, Phase 1 chỉ local.
 15. setupKernel: nếu input có StoryKernel thì copy nguyên object vào output, không paraphrase.
+16. MC SECRET + BENEFIT LOGIC:
+   - trọng sinh/hệ thống/golden finger là bí mật của MC; Phase 1-2 không ai ngoài MC biết nguồn gốc.
+   - world chỉ phản ứng với KẾT QUẢ MC tạo ra, không phản ứng với bí mật bên trong.
+   - mọi majorPlotPoint/cast conflict phải có lợi ích cụ thể cho MC; MC không chõ mồm vào chuyện ngoài nếu không có tài nguyên/thông tin/quan hệ/tiền/uy tín/skill hoặc bảo vệ circle.
 
 Trả về JSON:
 {"id":"story_${Date.now()}","title":"${novelTitle}","genre":"${genre}","premise":"...","themes":["...","..."],"mainConflict":"...","targetChapters":${totalChapters},"targetArcs":${arcs},"protagonist":{"name":"${protagonistName}","startingState":"...","endGoal":"...","characterArc":"..."},"readerPromise":"...","openingExperience":{"chapters1To3":"...","chapters4To10":"...","firstPayoff":"..."},"majorPlotPoints":[{"id":"pp1","name":"...","description":"...","targetArc":1,"type":"inciting_incident","importance":"critical"},{"id":"pp3","name":"...","description":"...","targetArc":${mid},"type":"midpoint","importance":"critical"},{"id":"pp5","name":"...","description":"...","targetArc":${Math.max(1, arcs - 1)},"type":"climax","importance":"critical"},{"id":"pp6","name":"...","description":"...","targetArc":${arcs},"type":"resolution","importance":"critical"}],"castRoster":[{"name":"...","role":"...","relationToMC":"...","introduceArc":1,"archeType":"..."}],"recurringCast":[{"name":"...","recurringFunction":"...","cadence":"mỗi 3-5 chương / mỗi sub-arc / mỗi business milestone"}],"worldRules":["...","..."],"toneFlags":{"proactiveRatio":80,"comedyDensity":"medium","pacingTarget":"medium"},"dopamineContract":{"coreLoop":"...","expectedPayoffsPerChapter":2,"payoffTypes":["...","..."]},"conflictLadder":[{"phase":1,"chapterRange":"1-100","scale":"local","antagonistType":"...","readerPayoff":"..."},{"phase":2,"chapterRange":"101-300","scale":"regional","antagonistType":"...","readerPayoff":"..."},{"phase":3,"chapterRange":"301-700","scale":"national/institutional","antagonistType":"...","readerPayoff":"..."},{"phase":4,"chapterRange":"701-${totalChapters}","scale":"world/endgame","antagonistType":"...","readerPayoff":"..."}],"antiTropes":["...","..."],"endingVision":"...","uniqueHooks":[],"setupKernel":${setupKernel ? JSON.stringify(setupKernel) : 'null'}}
 
 QUY TẮC:
 - premise PHẢI mention golden finger từ world_description (KHÔNG vague "anh ta nhận được sức mạnh kỳ lạ")
+- KHÔNG thêm tổ chức bí ẩn/đối thủ thần bí biết MC trọng sinh/hệ thống/bàn tay vàng trong premise/mainConflict/majorPlotPoints.
+- Phase 1 chỉ có đối thủ local phản ứng sau khi MC tạo thành tựu nhìn thấy; không ai theo dõi MC từ trước.
 - castRoster ≥4 named, MỖI người có concrete intersect (KHÔNG generic "người bạn")
 - worldRules ≥4 cụ thể (KHÔNG generic "thế giới có pháp thuật")
 - antiTropes ≥3 concrete bans

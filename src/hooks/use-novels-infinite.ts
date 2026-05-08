@@ -72,12 +72,15 @@ async function fetchNovels({
     case 'chapters_desc':
       query = query.order('total_chapters', { ascending: false, nullsFirst: false });
       break;
-    case 'newest':
+    case 'released':
       query = query.order('created_at', { ascending: false, nullsFirst: false });
       break;
+    case 'newest':
     case 'updated':
     default:
-      query = query.order('updated_at', { ascending: false, nullsFirst: false });
+      query = query
+        .gt('total_chapters', 0)
+        .order('updated_at', { ascending: false, nullsFirst: false });
       break;
   }
 

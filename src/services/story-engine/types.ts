@@ -79,6 +79,8 @@ export interface StyleDirectives {
   tone_profile?: ToneProfile;
   /** Anti-pattern flags — explicit prohibition prompts beyond anti_tropes */
   anti_seeds?: string[];
+  /** Store one AI write as one reader-facing chapter instead of splitting it into two rows */
+  disable_chapter_split?: boolean;
 }
 
 // ── Story Kernel (compact setup DNA) ─────────────────────────────────────────
@@ -103,6 +105,21 @@ export interface StoryKernel {
     limit: string;
     reward: string;
   };
+  /** What must stay secret about rebirth/system/golden finger and when it may reveal. */
+  mcSecret: {
+    secret: string;
+    outsideWorldKnowledge: string;
+    revealRule: string;
+  };
+  /** Concrete goal → action → benefit loop that prevents random meddling. */
+  benefitLoop: {
+    goal: string;
+    action: string;
+    benefit: string;
+    cadence: string;
+  };
+  /** Rule for when MC may intervene in external problems. */
+  interventionRule: string;
   /** Ch.1-100 local sandbox that can keep generating scenes. */
   phase1Playground: {
     locations: string[];

@@ -111,6 +111,18 @@ const setupKernel = {
     limit: 'mỗi ngày tối đa ba giao dịch, sai nếu An Bình không trực tiếp phục vụ',
     reward: 'insight giúp tăng doanh thu/công nhận trong 1-3 chương',
   },
+  mcSecret: {
+    secret: 'Sổ Tay Cơ Hội là năng lực riêng trong đầu Nguyễn An Bình',
+    outsideWorldKnowledge: 'người ngoài chỉ thấy Nguyễn An Bình quan sát tốt và xử lý đơn hàng hiệu quả',
+    revealRule: 'Phase 1-2 tuyệt đối không ai biết nguồn gốc; chỉ reveal muộn nếu outline chỉ định rõ',
+  },
+  benefitLoop: {
+    goal: 'tăng doanh thu và uy tín của quầy qua từng đơn hàng thật',
+    action: 'phục vụ, ghi nhận feedback, tối ưu món hoặc quy trình',
+    benefit: 'doanh thu, thông tin khách hàng, quan hệ nhà cung cấp và uy tín trong phố',
+    cadence: 'mỗi 1-3 chương phải có một lợi ích thấy được',
+  },
+  interventionRule: 'Nguyễn An Bình chỉ can thiệp chuyện ngoài khi nhận tài nguyên, thông tin, quan hệ, uy tín, tiền, skill hoặc bảo vệ người thuộc circle đã thiết lập.',
   phase1Playground: {
     locations: ['quầy bánh chợ Bình Minh', 'phòng kế toán tòa Lạc Việt', 'bãi xe chú Tâm'],
     cast: ['Lê Hoài Thu', 'Cô Hòa', 'Trần Minh Khánh'],
@@ -226,5 +238,55 @@ describe('setup quality gate', () => {
     });
     expect(result.passed).toBe(false);
     expect(result.issues.some(i => i.code === 'setup_kernel_pleasure_loop_missing')).toBe(true);
+  });
+
+  it('rejects early outsiders knowing MC rebirth/system secret', () => {
+    const result = validateSetupCanon({
+      worldDescription: makeWorld({
+        phase1: 'PHASE 1 (1-100): Quầy nhỏ bị theo dõi — một tổ chức bí ẩn theo dõi Nguyễn An Bình và phát hiện hệ thống trong đầu anh ngay từ chương 3.',
+      }),
+      mainCharacter: 'Nguyễn An Bình',
+      storyOutline: storyOutlineWithKernel,
+      strictContract: true,
+    });
+    expect(result.passed).toBe(false);
+    expect(result.issues.some(i => i.code === 'early_mysterious_org_tracking' || i.code === 'early_mc_secret_leak')).toBe(true);
+  });
+
+  it('rejects weak system reward that does not help MC', () => {
+    const result = validateSetupCanon({
+      worldDescription: makeWorld(),
+      mainCharacter: 'Nguyễn An Bình',
+      storyOutline: {
+        ...storyOutline,
+        setupKernel: {
+          ...setupKernel,
+          systemMechanic: {
+            ...setupKernel.systemMechanic,
+            output: 'chỉ gợi ý chung chung mơ hồ',
+            reward: 'chưa giúp gì ngay',
+          },
+        },
+      },
+      strictContract: true,
+    });
+    expect(result.passed).toBe(false);
+    expect(result.issues.some(i => i.code === 'setup_kernel_system_mechanic_weak')).toBe(true);
+  });
+
+  it('rejects chapter briefs without mcBenefit', () => {
+    const result = validateSetupCanon({
+      worldDescription: makeWorld(),
+      mainCharacter: 'Nguyễn An Bình',
+      storyOutline: {
+        ...storyOutlineWithKernel,
+        chapter_briefs: [
+          { chapterNumber: 1, brief: 'Nguyễn An Bình thấy một người lạ gặp rắc rối và tự dưng xen vào.', scenes: [] },
+        ],
+      },
+      strictContract: true,
+    });
+    expect(result.passed).toBe(false);
+    expect(result.issues.some(i => i.code === 'chapter_brief_mc_benefit_missing')).toBe(true);
   });
 });
