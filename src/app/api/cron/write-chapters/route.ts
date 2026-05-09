@@ -30,6 +30,19 @@ import {
   hasValidSetupKernel,
   shouldResetUnwrittenMissingKernel,
 } from '@/services/story-engine/pipeline/setup-kernel-guards';
+import {
+  FOCUS_MODE_ENABLED,
+  FOCUSED_PROJECT_IDS,
+  STORY_PRODUCTION_PAUSED,
+  filterFocusedProjects,
+} from '@/lib/story-production-focus';
+import {
+  computeDynamicResumeBatchSizeForQuota,
+  computeQuotaCadenceCeiling,
+  computeQuotaInitialCadenceMinutes,
+  getDefaultDailyChapterQuota,
+  getProjectDailyChapterQuota,
+} from '@/lib/story-production-quota';
 
 // Story Engine v2 — sole engine for all tiers (init + resume)
 import { writeOneChapter as writeOneChapterV2 } from '@/services/story-engine';
@@ -42,7 +55,7 @@ function parseIntEnv(name: string, fallback: number): number {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
-const DAILY_CHAPTER_QUOTA = 20; // Hard exact target per active novel per Vietnam day (5 active × 20 = 100/day)
+const DAILY_CHAPTER_QUOTA = getDefaultDailyChapterQuota(); // Default target per active novel per Vietnam day; project override may win.
 
 const MIN_RESUME_BATCH_SIZE = clamp(parseIntEnv('WRITE_CHAPTERS_MIN_RESUME_BATCH', 30), 10, 300);
 const MAX_RESUME_BATCH_SIZE = clamp(parseIntEnv('WRITE_CHAPTERS_MAX_RESUME_BATCH', 220), MIN_RESUME_BATCH_SIZE, 400);
@@ -140,6 +153,7 @@ type ProjectRow = {
   writing_style: string | null;
   temperature: number | null;
   target_chapter_length: number | null;
+  style_directives?: Record<string, unknown> | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   novels: any;
 };
@@ -251,8 +265,6 @@ async function ensureDailyQuotasForActiveProjects(
   const dayStartMs = new Date(dayStartIso).getTime();
 
   // BURST WINDOW already defined at module scope. Compute cadence per chapter.
-  const cadenceMinutes = Math.max(2, Math.floor(ACTIVE_WINDOW_MINUTES / DAILY_CHAPTER_QUOTA)); // 12 min for 20/day in 4h
-
   // Check for active boosts — boosted novels get 2x daily quota
   const projectIds = projects.map((p) => p.id);
   const { data: activeBoosts } = await supabase
@@ -295,6 +307,8 @@ async function ensureDailyQuotasForActiveProjects(
 
   const rows = projects.map((p) => {
     const seed = hashStringToInt(`${p.id}:${vnDate}`);
+    const projectDailyQuota = getProjectDailyChapterQuota(p);
+    const cadenceMinutes = computeQuotaInitialCadenceMinutes(ACTIVE_WINDOW_MINUTES, projectDailyQuota);
     const offsetMinutes = seed % cadenceMinutes;
     const nextDueMs = dayStartMs + offsetMinutes * 60 * 1000;
     const boostMultiplier = boostMap.get(p.id) || 1;
@@ -302,7 +316,7 @@ async function ensureDailyQuotasForActiveProjects(
     return {
       project_id: p.id,
       vn_date: vnDate,
-      target_chapters: DAILY_CHAPTER_QUOTA * boostMultiplier + carryover,
+      target_chapters: projectDailyQuota * boostMultiplier + carryover,
       written_chapters: 0,
       status: 'active' as const,
       retry_count: 0,
@@ -406,9 +420,7 @@ async function updateQuotaAfterWrite(
 
     // Flat cadence within burst window. Outside burst window → catch-up mode (fire every cron tick).
     const cadenceFloor = 3;
-    const cadenceCeiling = inBurstWindow
-      ? Math.max(cadenceFloor, Math.floor(ACTIVE_WINDOW_MINUTES / DAILY_CHAPTER_QUOTA)) // 12 min for 20/day in 4h
-      : 5; // outside burst window: fire every cron tick for aggressive catch-up
+    const cadenceCeiling = computeQuotaCadenceCeiling(ACTIVE_WINDOW_MINUTES, target, inBurstWindow);
     const cadence = clamp(Math.floor(minutesLeft / remaining), cadenceFloor, cadenceCeiling);
     const jitter = inBurstWindow ? 0 : (hashStringToInt(`${projectId}:${written}:${vnDate}`) % 5) - 2;
     const delayMinutes = Math.max(cadenceFloor, cadence + jitter);
@@ -519,9 +531,13 @@ async function autoPauseForCost(
 }
 
 function computeDynamicResumeBatchSize(activeCount: number): number {
-  const requiredPerTick = Math.ceil((activeCount * DAILY_CHAPTER_QUOTA) / TICKS_PER_DAY);
-  const buffered = Math.ceil(requiredPerTick * 1.2);
-  return clamp(buffered, MIN_RESUME_BATCH_SIZE, MAX_RESUME_BATCH_SIZE);
+  return computeDynamicResumeBatchSizeForQuota({
+    activeCount,
+    dailyQuota: DAILY_CHAPTER_QUOTA,
+    ticksPerDay: TICKS_PER_DAY,
+    minBatch: MIN_RESUME_BATCH_SIZE,
+    maxBatch: MAX_RESUME_BATCH_SIZE,
+  });
 }
 
 /**
@@ -806,6 +822,15 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
   }
 
+  if (STORY_PRODUCTION_PAUSED) {
+    return NextResponse.json({
+      success: true,
+      skipped: true,
+      reason: 'STORY_PRODUCTION_PAUSED enabled: legacy chapter writer is paused',
+      durationSeconds: Math.round((Date.now() - startTime) / 1000),
+    });
+  }
+
   // Phase 23 fix: install Pro-tier routing at cron entry so init-prep tier (arc_plan
   // generation called BEFORE writeOneChapter) also gets Pro tier. Without this, init-prep
   // arc_plan was running on Flash and truncating at 4096 tokens with the new richer schema.
@@ -830,33 +855,32 @@ export async function GET(request: NextRequest) {
     const lockBoundary = new Date(Date.now() - lockWindowMs).toISOString();
     const STAGED_SETUP_STATES = ['idea', 'world', 'character', 'description', 'master_outline', 'story_outline', 'arc_plan'];
 
-    const [activeCountQuery, candidateQuery, setupCandidateQuery] = await Promise.all([
-      supabase
+    let activeCountBuilder = supabase
         .from('ai_story_projects')
         .select('id', { count: 'exact', head: true })
-        .eq('status', 'active'),
-      supabase
+        .eq('status', 'active');
+    let candidateBuilder = supabase
         .from('ai_story_projects')
         .select(`
           id, main_character, genre, status,
           setup_stage, setup_stage_attempts,
           current_chapter, total_planned_chapters,
           world_description, story_outline, writing_style, temperature,
-          target_chapter_length,
+          target_chapter_length, style_directives,
           novels!ai_story_projects_novel_id_fkey (id, title)
         `)
         .eq('status', 'active')
         .lt('updated_at', lockBoundary)
         .order('updated_at', { ascending: true })
-        .limit(CANDIDATE_POOL_SIZE),
-      supabase
+        .limit(CANDIDATE_POOL_SIZE);
+    let setupCandidateBuilder = supabase
         .from('ai_story_projects')
         .select(`
           id, main_character, genre, status,
           setup_stage, setup_stage_attempts,
           current_chapter, total_planned_chapters,
           world_description, story_outline, writing_style, temperature,
-          target_chapter_length,
+          target_chapter_length, style_directives,
           novels!ai_story_projects_novel_id_fkey (id, title)
         `)
         .eq('status', 'paused')
@@ -864,7 +888,18 @@ export async function GET(request: NextRequest) {
         .in('setup_stage', STAGED_SETUP_STATES)
         .lt('updated_at', lockBoundary)
         .order('updated_at', { ascending: true })
-        .limit(INIT_PREP_BATCH_SIZE),
+        .limit(INIT_PREP_BATCH_SIZE);
+
+    if (FOCUS_MODE_ENABLED) {
+      activeCountBuilder = activeCountBuilder.in('id', FOCUSED_PROJECT_IDS);
+      candidateBuilder = candidateBuilder.in('id', FOCUSED_PROJECT_IDS);
+      setupCandidateBuilder = setupCandidateBuilder.in('id', FOCUSED_PROJECT_IDS);
+    }
+
+    const [activeCountQuery, candidateQuery, setupCandidateQuery] = await Promise.all([
+      activeCountBuilder,
+      candidateBuilder,
+      setupCandidateBuilder,
     ]);
 
     if (activeCountQuery.error) { console.error('[Cron] Step 1 activeCount failed:', activeCountQuery.error); throw activeCountQuery.error; }
@@ -874,8 +909,8 @@ export async function GET(request: NextRequest) {
     const activeCount = activeCountQuery.count || 0;
     const dynamicResumeBatchSize = computeDynamicResumeBatchSize(activeCount);
 
-    const rawCandidates = (candidateQuery.data || []) as ProjectRow[];
-    const setupOnlyCandidates = (setupCandidateQuery.data || []) as ProjectRow[];
+    const rawCandidates = filterFocusedProjects((candidateQuery.data || []) as ProjectRow[]);
+    const setupOnlyCandidates = filterFocusedProjects((setupCandidateQuery.data || []) as ProjectRow[]);
     console.log(`[Cron] Step 1 OK: ${activeCount} active, ${rawCandidates.length} active candidates, ${setupOnlyCandidates.length} setup candidates fetched`);
 
     // Filter candidates eligible for processing (respect soft-ending grace buffer)
@@ -1146,6 +1181,7 @@ export async function GET(request: NextRequest) {
         effectiveInitWriteBatch,
         ticksPerDay: TICKS_PER_DAY,
         candidatePoolSize: CANDIDATE_POOL_SIZE,
+        dailyChapterQuota: DAILY_CHAPTER_QUOTA,
       },
       runConcurrency: RUN_CONCURRENCY,
       timeoutSeconds: PROJECT_TIMEOUT_MS / 1000,

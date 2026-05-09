@@ -65,6 +65,31 @@ export interface WriteChapterOptions {
   worldDescription?: string | null;
   /** Sub-genres for blending (e.g., ['trong-sinh','kinh-doanh']). Threaded into VN pronoun + sub-genre rules. */
   subGenres?: string[];
+  /** Override the global quality score floor for this write. */
+  qualityGateMinScore?: number;
+  /**
+   * Routine bulk mode for cheap models: allow soft style/pacing revise notes to
+   * ship, while still blocking hard continuity/canon/logic failures.
+   */
+  qualityGateMode?: 'standard' | 'routine_soft';
+}
+
+function isHardBlockingIssue(issue: CriticIssue): boolean {
+  if (issue.severity === 'critical') return true;
+  if (issue.severity !== 'major') return false;
+  return [
+    'continuity',
+    'consistency',
+    'logic',
+    'word_count',
+    'critic_error',
+    'detail',
+  ].includes(issue.type);
+}
+
+function canAcceptRoutineSoftGate(critic: CriticOutput, qualityScore: number, minScore: number): boolean {
+  if (qualityScore < minScore) return false;
+  return !(critic.issues || []).some(isHardBlockingIssue);
 }
 
 export async function writeChapter(
@@ -198,28 +223,52 @@ export async function writeChapter(
     }
 
     const qualityScore = critic.overallScore || 0;
+    const minQualityScore = options?.qualityGateMinScore ?? DEFAULT_CONFIG.minQualityScore;
+    const softGateAccepted =
+      options?.qualityGateMode === 'routine_soft' &&
+      canAcceptRoutineSoftGate(critic, qualityScore, minQualityScore);
+
+    if (softGateAccepted && (critic.requiresRewrite || !critic.approved)) {
+      critic.issues = critic.issues || [];
+      critic.issues.push({
+        type: 'quality',
+        severity: 'minor',
+        description: `Routine Flash soft gate accepted score ${qualityScore}/${minQualityScore}: no hard continuity/canon/logic blocker.`,
+      });
+      critic.approved = true;
+      critic.requiresRewrite = false;
+    }
+
     const failedQualityGate =
-      critic.requiresRewrite ||
-      !critic.approved ||
-      qualityScore < DEFAULT_CONFIG.minQualityScore;
+      !softGateAccepted && (
+        critic.requiresRewrite ||
+        !critic.approved ||
+        qualityScore < minQualityScore
+      );
 
     if (failedQualityGate) {
       const gateReason = [
         critic.requiresRewrite ? 'requiresRewrite=true' : null,
         !critic.approved ? 'approved=false' : null,
-        qualityScore < DEFAULT_CONFIG.minQualityScore
-          ? `overallScore ${qualityScore} < ${DEFAULT_CONFIG.minQualityScore}`
+        qualityScore < minQualityScore
+          ? `overallScore ${qualityScore} < ${minQualityScore}`
           : null,
       ].filter(Boolean).join(', ');
 
       if (attempt < maxRetries - 1) {
         rewriteInstructions = critic.rewriteInstructions ||
-          `Quality gate failed (${gateReason}). Viết lại để đạt tối thiểu ${DEFAULT_CONFIG.minQualityScore}/10, sửa toàn bộ issue major/critical và đảm bảo Critic approved=true.`;
+          `Quality gate failed (${gateReason}). Viết lại để đạt tối thiểu ${minQualityScore}/10, sửa toàn bộ issue major/critical và đảm bảo Critic approved=true.`;
         continue;
       }
 
+      const blockingIssueSummary = (critic.issues || [])
+        .filter(isHardBlockingIssue)
+        .slice(0, 5)
+        .map(issue => `[${issue.type}/${issue.severity}] ${issue.description.slice(0, 220)}`)
+        .join(' | ');
+
       throw new Error(
-        `Chapter ${chapterNumber}: failed quality gate after ${maxRetries} attempts (${gateReason || 'unknown reason'}). Refusing to publish REVISE/unapproved content.`,
+        `Chapter ${chapterNumber}: failed quality gate after ${maxRetries} attempts (${gateReason || 'unknown reason'}). Refusing to publish REVISE/unapproved content.${blockingIssueSummary ? ` Blocking issues: ${blockingIssueSummary}` : ''}`,
       );
     }
 

@@ -17,6 +17,7 @@ import { getSupabase } from '../utils/supabase';
 import { getGenreBoundaryText } from '../config';
 import { loadContext, assembleContext, generateSummaryAndCharacters } from '../context/assembler';
 import { writeChapter } from './chapter-writer';
+import { shouldUseFlashBulkCheapMode, writeFlashCheapRoutineChapter } from './flash-cheap-routine';
 import { retrieveRAGContext, chunkAndStoreChapter, retrieveEntityContext, retrieveThemeContext } from '../memory/rag-store';
 import { saveCharacterStatesFromCombined, detectCharacterContradictions, type CharacterContradiction } from '../state/character-state';
 import { extractCharacterKnowledge, getCharacterKnowledgeContext } from '../state/knowledge-graph';
@@ -37,7 +38,7 @@ import { getVoiceContext, updateVoiceFingerprint } from '../memory/voice-fingerp
 import { getPowerContext, updateMCPowerState } from '../state/mc-power-state';
 import { getWorldContext, updateLocationExploration, prepareUpcomingLocation, initializeWorldMap } from '../state/world-expansion';
 import type {
-  WriteChapterInput, WriteChapterResult, GeminiConfig, GenreType,
+  WriteChapterInput, WriteChapterResult, GeminiConfig, GenreType, StyleDirectives,
 } from '../types';
 import { DEFAULT_CONFIG } from '../types';
 
@@ -55,6 +56,7 @@ interface ProjectRow {
   target_chapter_length: number | null;
   ai_model: string | null;
   topic_id: string | null;
+  style_directives: StyleDirectives | null;
   novels: { id: string; title: string } | { id: string; title: string }[] | null;
 }
 
@@ -127,9 +129,13 @@ function runChapterCanary(args: {
   protagonistName: string;
   genre: GenreType;
   worldDescription?: string;
+  chapterNumber?: number;
+  wordCount?: number;
+  targetWordCount?: number;
 }): string[] {
   const issues: string[] = [];
   const c = args.chapterContent;
+  const chapterLabel = args.chapterNumber ? `ch.${args.chapterNumber}` : 'chapter';
 
   // 1. Placeholder leak — should never happen if voice anchor instructions followed
   const placeholderMatches = c.match(/<(MC|LOVE|CITY|COMPANY|NUMBER|TITLE|SKILL)>/g);
@@ -147,7 +153,14 @@ function runChapterCanary(args: {
       }
     }
     if (!found) {
-      issues.push(`MC name "${args.protagonistName}" absent from entire chapter (full + tokens)`);
+      issues.push(`${chapterLabel}: MC name "${args.protagonistName}" absent from entire chapter (full + tokens)`);
+    }
+  }
+
+  if (args.wordCount != null && args.targetWordCount && args.targetWordCount > 0) {
+    const ratio = args.wordCount / args.targetWordCount;
+    if (ratio < 0.8) {
+      issues.push(`${chapterLabel}: published word count ${args.wordCount}/${args.targetWordCount} (${Math.round(ratio * 100)}%) is below target`);
     }
   }
 
@@ -165,6 +178,10 @@ function runChapterCanary(args: {
   } catch { /* templates not loaded — skip */ }
 
   return issues;
+}
+
+function countWords(text: string): number {
+  return text.trim().split(/\s+/).filter(Boolean).length;
 }
 
 // ── Public: Write One Chapter ────────────────────────────────────────────────
@@ -187,7 +204,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   // ── Step 1: Load project ───────────────────────────────────────────────
   const { data: projectData, error: projectError } = await db
     .from('ai_story_projects')
-    .select('id,novel_id,main_character,genre,current_chapter,total_planned_chapters,world_description,temperature,target_chapter_length,ai_model,topic_id,novels!ai_story_projects_novel_id_fkey(id,title)')
+    .select('id,novel_id,main_character,genre,current_chapter,total_planned_chapters,world_description,temperature,target_chapter_length,ai_model,topic_id,style_directives,novels!ai_story_projects_novel_id_fkey(id,title)')
     .eq('id', options.projectId)
     .single();
 
@@ -430,6 +447,12 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       }
     }
   } catch (err) {
+    if (err instanceof Error && (
+      err.message.startsWith('SETUP_KERNEL_MISSING:') ||
+      err.message.startsWith('PUBLISHED_SETUP_KERNEL_MISSING:')
+    )) {
+      throw err;
+    }
     console.warn('[orchestrator] Pre-flight validation failed (non-fatal):', err instanceof Error ? err.message : String(err));
   }
   if (validationFixes.length > 0) {
@@ -456,9 +479,26 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   }
   const totalPlanned = project.total_planned_chapters;
   // Base target: explicit option > project setting > default. style_directives override takes precedence over project setting.
-  const projectStyleDirectives = (project as { style_directives?: { target_chapter_length_override?: number; disable_chapter_split?: boolean } }).style_directives;
+  const projectStyleDirectives = project.style_directives;
   const directiveOverride = projectStyleDirectives?.target_chapter_length_override;
   const disableChapterSplit = projectStyleDirectives?.disable_chapter_split === true;
+  const directorOnlyFlash =
+    projectStyleDirectives?.codex_director_only === true &&
+    projectStyleDirectives?.flash_writer_enabled === true &&
+    (options.model || project.ai_model || DEFAULT_CONFIG.model) === 'deepseek-v4-flash';
+  const flashRoutineSoftGate =
+    projectStyleDirectives?.flash_routine_soft_gate === true || directorOnlyFlash;
+  const flashRoutineMinQualityScore = Number(
+    projectStyleDirectives?.flash_routine_min_quality_score ??
+    (flashRoutineSoftGate ? 5 : DEFAULT_CONFIG.minQualityScore),
+  );
+  const flashRoutineMaxRetries = Number(
+    projectStyleDirectives?.flash_routine_max_retries ??
+    (flashRoutineSoftGate ? 1 : DEFAULT_CONFIG.maxRetries),
+  );
+  const deepseekThinkingTasks = Array.isArray(projectStyleDirectives?.deepseek_thinking_tasks)
+    ? projectStyleDirectives.deepseek_thinking_tasks.filter((task): task is string => typeof task === 'string')
+    : undefined;
   const baseTargetWordCount = options.targetWordCount ?? directiveOverride ?? project.target_chapter_length ?? DEFAULT_CONFIG.targetWordCount;
 
   // Mood-adjusted: lookup mood from pacing blueprint (if exists) and scale (climax→long, breathing→short).
@@ -478,7 +518,27 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     model: options.model || project.ai_model || DEFAULT_CONFIG.model,
     temperature: options.temperature ?? project.temperature ?? DEFAULT_CONFIG.temperature,
     maxTokens: DEFAULT_CONFIG.maxTokens,
+    deepseekThinkingEnabled: projectStyleDirectives?.deepseek_thinking_enabled === true,
+    deepseekReasoningEffort: projectStyleDirectives?.deepseek_reasoning_effort === 'max' ? 'max' : 'high',
+    deepseekThinkingTasks,
   };
+
+  if (shouldUseFlashBulkCheapMode(projectStyleDirectives, geminiConfig.model, nextChapter, totalPlanned)) {
+    console.log(`[orchestrator] flash_bulk_cheap_mode active: ch.${nextChapter} via DS Flash compact routine path`);
+    return writeFlashCheapRoutineChapter({
+      project,
+      novel,
+      genre,
+      protagonistName,
+      storyTitle,
+      nextChapter,
+      targetWordCount,
+      totalPlanned,
+      customPrompt: options.customPrompt,
+      config: geminiConfig,
+      startTime,
+    });
+  }
 
   // ── Step 2: Load context (4 layers from DB) ────────────────────────────
   const context = await loadContext(project.id, novel.id, nextChapter);
@@ -698,7 +758,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     targetWordCount,
     context.previousTitles,
     geminiConfig,
-    DEFAULT_CONFIG.maxRetries,
+    flashRoutineMaxRetries,
     {
       projectId: project.id,
       protagonistName,
@@ -708,6 +768,8 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       worldBible: context.storyBible,
       worldDescription: project.world_description,
       subGenres: context.subGenres,
+      qualityGateMinScore: flashRoutineMinQualityScore,
+      qualityGateMode: flashRoutineSoftGate ? 'routine_soft' : 'standard',
     },
   );
 
@@ -921,27 +983,8 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     console.warn(`[Orchestrator] CRITICAL: Failed to bump current_chapter to ${lastChapterNumber} for project ${project.id}: ${bumpErr.message}`);
   }
 
-  // ── Step 5c: Quality canary — deterministic post-save check ───────────
-  // P4.2: scan saved chapter content for forbidden patterns and persist to
-  // failed_memory_tasks if any caught. NOT blocking — chapter already saved —
-  // but surfaces drift to admin UI for manual investigation.
-  try {
-    const canaryIssues = runChapterCanary({
-      chapterContent: result.content,
-      protagonistName,
-      genre,
-      worldDescription: project.world_description || undefined,
-    });
-    if (canaryIssues.length > 0) {
-      await recordTaskFailure(
-        db, project.id, novel.id, nextChapter, 'quality_canary',
-        new Error(`Canary triggered: ${canaryIssues.join('; ')}`)
-      );
-    }
-  } catch (e) {
-    // Canary itself failed — log but don't block.
-    console.warn(`[Orchestrator] canary check failed:`, e instanceof Error ? e.message : String(e));
-  }
+  // Step 5c quality canary runs per saved reader chapter below. Running it on
+  // result.content would hide split-related published chapter issues.
 
   // ── Step 6: Post-write tasks (Phase 24 — per-reader-chapter loop) ─────
   // Pre-save QA already ran in Step 4.5 (auto-revise on full logical content
@@ -960,6 +1003,8 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   const logicalCombined = preReviseCombined;
   const allContradictions: CharacterContradiction[] = preSaveContradictions;
   const allGuardianIssues: import('../quality/continuity-guardian').GuardianIssue[] = preSaveGuardianIssues;
+  const logicalWordCount = countWords(result.content);
+  const publishedTargetWordCount = Math.max(1, Math.round(targetWordCount / Math.max(splitResults.length, 1)));
 
   // ── Step 6b: Per-reader-chapter post-write tasks ──────────────────────
   // Each part gets its own chapter_summaries row (via runSummaryTasks),
@@ -1100,6 +1145,81 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
         return detectThemeReinforcement(project.id, partCh, part.content, geminiConfig);
       })().catch((e) => console.warn(`[Orchestrator] Theme reinforcement failed for Ch.${partCh}:`, e instanceof Error ? e.message : String(e))),
     ]);
+
+    // Task 16b: published-chapter quality metrics + canary. This must run per
+    // saved row. The Critic scores still describe the full logical write, while
+    // word_count/word_ratio and health reflect the reader-facing chapter.
+    const publishedWordCount = countWords(part.content);
+    try {
+      const canaryIssues = runChapterCanary({
+        chapterContent: part.content,
+        protagonistName,
+        genre,
+        worldDescription: project.world_description || undefined,
+        chapterNumber: partCh,
+        wordCount: publishedWordCount,
+        targetWordCount: publishedTargetWordCount,
+      });
+      if (canaryIssues.length > 0) {
+        await recordTaskFailure(
+          db, project.id, novel.id, partCh, 'quality_canary',
+          new Error(`Canary triggered: ${canaryIssues.join('; ')}`),
+        );
+      }
+    } catch (e) {
+      console.warn(`[Orchestrator] canary check failed for Ch.${partCh}:`, e instanceof Error ? e.message : String(e));
+    }
+
+    try {
+      const { recordQualityMetrics } = await import('../quality/quality-metrics');
+      const { postWriteHealthCheck } = await import('../utils/post-write-health-check');
+      const health = await postWriteHealthCheck(project.id, partCh).catch(() => null);
+      const critic = result.criticReport;
+      await recordQualityMetrics({
+        projectId: project.id,
+        novelId: novel.id,
+        chapterNumber: partCh,
+        overallScore: critic?.overallScore ?? null,
+        dopamineScore: critic?.dopamineScore ?? null,
+        pacingScore: critic?.pacingScore ?? null,
+        endingHookScore: critic?.endingHookScore ?? null,
+        wordCount: publishedWordCount,
+        wordRatio: Number((publishedWordCount / publishedTargetWordCount).toFixed(2)),
+        contradictionsCritical: allContradictions.filter(c => c.severity === 'critical').length,
+        contradictionsWarning: allContradictions.filter(c => c.severity === 'warning').length,
+        guardianIssuesCritical: allGuardianIssues.filter(i => i.severity === 'critical').length,
+        guardianIssuesMajor: allGuardianIssues.filter(i => i.severity === 'major').length,
+        guardianIssuesModerate: allGuardianIssues.filter(i => i.severity === 'moderate').length,
+        rewritesAttempted: 0,
+        autoRevised: allContradictions.filter(c => c.severity === 'critical').length > 0,
+        contextSizeChars: contextString.length,
+        meta: {
+          arc_number: partArc,
+          ai_write_count: aiWriteCount,
+          logical_chapter_number: nextChapter,
+          reader_chapter_number: partCh,
+          last_chapter_number: lastChapterNumber,
+          split_index: idx + 1,
+          split_parts: splitResults.length,
+          requested_split_parts: SPLIT_PARTS,
+          score_scope: 'logical_write',
+          logical_word_count: logicalWordCount,
+          logical_target_words: targetWordCount,
+          published_word_count: publishedWordCount,
+          published_target_words: publishedTargetWordCount,
+          rubric_scores: result.criticReport?.rubricScores ?? null,
+          health: health ? {
+            ok: health.warnings.length === 0,
+            character_states: health.characterStateCount,
+            has_summary: health.hasChapterSummary,
+            rag_chunks: health.ragChunkCount,
+            warnings: health.warnings,
+          } : null,
+        },
+      });
+    } catch (e) {
+      console.warn(`[Orchestrator] Quality metrics failed for Ch.${partCh}:`, e instanceof Error ? e.message : String(e));
+    }
   }
 
   // ── Step 6c: Once-per-AI-write aggregate tasks (cadence-gated) ────────
@@ -1171,49 +1291,6 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
         return refreshCharacterBibles(project.id, lastChapterNumber, geminiConfig);
       })().catch(e => recordTaskFailure(db, project.id, novel.id, lastChapterNumber, 'task_16_character_bible_refresh', e)),
     ] : []),
-
-    // Task 16b: Quality metrics + post-write health check (every AI write)
-    (async () => {
-      const { recordQualityMetrics } = await import('../quality/quality-metrics');
-      const { postWriteHealthCheck } = await import('../utils/post-write-health-check');
-      const health = await postWriteHealthCheck(project.id, lastChapterNumber).catch(() => null);
-      const critic = result.criticReport;
-      return recordQualityMetrics({
-        projectId: project.id,
-        novelId: novel.id,
-        chapterNumber: lastChapterNumber,
-        overallScore: critic?.overallScore ?? null,
-        dopamineScore: critic?.dopamineScore ?? null,
-        pacingScore: critic?.pacingScore ?? null,
-        endingHookScore: critic?.endingHookScore ?? null,
-        wordCount: result.content ? result.content.split(/\s+/).filter(Boolean).length : null,
-        wordRatio: targetWordCount > 0 && result.content
-          ? Number((result.content.split(/\s+/).filter(Boolean).length / targetWordCount).toFixed(2))
-          : null,
-        contradictionsCritical: allContradictions.filter(c => c.severity === 'critical').length,
-        contradictionsWarning: allContradictions.filter(c => c.severity === 'warning').length,
-        guardianIssuesCritical: allGuardianIssues.filter(i => i.severity === 'critical').length,
-        guardianIssuesMajor: allGuardianIssues.filter(i => i.severity === 'major').length,
-        guardianIssuesModerate: allGuardianIssues.filter(i => i.severity === 'moderate').length,
-        rewritesAttempted: 0,
-        autoRevised: allContradictions.filter(c => c.severity === 'critical').length > 0,
-        contextSizeChars: contextString.length,
-        meta: {
-          arc_number: arcNumber,
-          ai_write_count: aiWriteCount,
-          last_chapter_number: lastChapterNumber,
-          split_parts: SPLIT_PARTS,
-          rubric_scores: result.criticReport?.rubricScores ?? null,
-          health: health ? {
-            ok: health.warnings.length === 0,
-            character_states: health.characterStateCount,
-            has_summary: health.hasChapterSummary,
-            rag_chunks: health.ragChunkCount,
-            warnings: health.warnings,
-          } : null,
-        },
-      });
-    })().catch(e => console.warn('[Orchestrator] Quality metrics failed:', e instanceof Error ? e.message : String(e))),
 
     // Task 15j (Phase 27 W5.4): Rolling chapter briefs — generate next 1-3 detailed
     // briefs every 5 chapters. Idempotent (skip if briefs already exist).

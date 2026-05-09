@@ -188,7 +188,7 @@ export default async function HomePage() {
                   href="/browse?sort=newest"
                   className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1"
                 >
-                  Truyện mới ra mắt
+                  Xem trang Mới nhất
                   <ChevronRight size={16} />
                 </Link>
               </div>
@@ -207,7 +207,7 @@ export default async function HomePage() {
                     <h2 className="text-lg font-semibold">Truyện mới ra mắt</h2>
                   </div>
                   <Link
-                    href="/browse?sort=newest"
+                    href="/browse?sort=released"
                     className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1"
                   >
                     Xem tất cả

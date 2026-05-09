@@ -58,6 +58,26 @@ interface MasterOutlineLike {
 }
 
 const SECTION_BOUNDARY = /(?:^|\n)###\s+/;
+const MC_SECRET_LEAK_PATTERNS: Array<{ regex: RegExp; code: string; message: string }> = [
+  {
+    regex: /(tổ\s*chức|thế\s*lực|hội|cục|viện|tập\s*đoàn)\s+(bí\s*ẩn|ẩn\s*mật|thần\s*bí)[^.!?\n]{0,80}(theo\s*dõi|giám\s*sát|để\s*ý|săn\s*lùng|biết|phát\s*hiện)/i,
+    code: 'early_mysterious_org_tracking',
+    message: 'early setup must not add a mysterious organization tracking MC',
+  },
+  {
+    regex: /(người\s*lạ|kẻ\s*lạ|đối\s*thủ|nhân\s*vật\s+bí\s*ẩn|thế\s*lực\s+bí\s*ẩn)[^.!?\n]{0,80}(biết|phát\s*hiện|nhận\s*ra|nắm)[^.!?\n]{0,80}(trọng\s*sinh|hệ\s*thống|bàn\s*tay\s*vàng|golden\s*finger|bí\s*mật|năng\s*lực\s+thật)/i,
+    code: 'early_mc_secret_leak',
+    message: 'rebirth/system/golden finger is MC secret; outsiders cannot know it in Phase 1',
+  },
+  {
+    regex: /(trọng\s*sinh|hệ\s*thống|bàn\s*tay\s*vàng|golden\s*finger|năng\s*lực\s+thật)[^.!?\n]{0,80}(bị\s+lộ|bị\s+phát\s+hiện|đã\s+bị\s+biết|lọt\s+vào\s+tầm\s+mắt)/i,
+    code: 'early_mc_secret_leak',
+    message: 'setup cannot leak MC secret before the story earns a late reveal',
+  },
+];
+
+const WEAK_SYSTEM_PATTERNS = /(mơ\s*hồ|không\s+rõ|chưa\s+giúp|không\s+giúp|không\s+có\s+lợi|hên\s+xui|ngẫu\s*nhiên|vô\s*dụng|không\s+đáng\s+kể|chỉ\s+gợi\s+ý\s+chung)/i;
+const BENEFIT_KEYWORDS = /(tiền|doanh\s*thu|tài\s*nguyên|skill|kỹ\s*năng|công\s*nhận|uy\s*tín|quan\s*hệ|network|thông\s*tin|insight|manh\s*mối|đột\s*phá|level|cảnh\s*giới|khách|đơn\s*hàng|hợp\s*đồng|vật\s*phẩm|item|kinh\s*nghiệm)/i;
 
 function normalizeName(value?: string | null): string {
   return (value || '')
@@ -125,6 +145,46 @@ function validateSetupKernel(kernel: StoryKernel | undefined, strict: boolean | 
   if (!mechanic || typeof mechanic !== 'object'
     || !mechanic.input || !mechanic.output || !mechanic.limit || !mechanic.reward) {
     issues.push({ severity: 'error', code: 'setup_kernel_system_mechanic_missing', message: 'StoryKernel.systemMechanic must define input/output/limit/reward' });
+  } else {
+    const mechanicText = `${mechanic.output} ${mechanic.reward}`;
+    if (WEAK_SYSTEM_PATTERNS.test(mechanicText) || !BENEFIT_KEYWORDS.test(mechanicText)) {
+      issues.push({
+        severity: 'error',
+        code: 'setup_kernel_system_mechanic_weak',
+        message: 'StoryKernel.systemMechanic output/reward must create concrete benefit every 1-3 chapters',
+      });
+    }
+  }
+
+  if (!kernel.mcSecret?.secret || !kernel.mcSecret?.outsideWorldKnowledge || !kernel.mcSecret?.revealRule) {
+    issues.push({
+      severity: 'error',
+      code: 'setup_kernel_mc_secret_missing',
+      message: 'StoryKernel.mcSecret must define secret, outside-world knowledge, and reveal rule',
+    });
+  }
+
+  const benefit = kernel.benefitLoop;
+  if (!benefit?.goal || !benefit?.action || !benefit?.benefit || !benefit?.cadence) {
+    issues.push({
+      severity: 'error',
+      code: 'setup_kernel_benefit_loop_missing',
+      message: 'StoryKernel.benefitLoop must define goal/action/benefit/cadence',
+    });
+  } else if (WEAK_SYSTEM_PATTERNS.test(`${benefit.benefit} ${benefit.cadence}`) || !BENEFIT_KEYWORDS.test(benefit.benefit)) {
+    issues.push({
+      severity: 'error',
+      code: 'setup_kernel_benefit_loop_weak',
+      message: 'StoryKernel.benefitLoop.benefit must be concrete: resource, money, relation, information, skill, reputation, or protection',
+    });
+  }
+
+  if (!kernel.interventionRule || kernel.interventionRule.trim().length < 30 || !BENEFIT_KEYWORDS.test(kernel.interventionRule)) {
+    issues.push({
+      severity: 'error',
+      code: 'setup_kernel_intervention_rule_weak',
+      message: 'StoryKernel.interventionRule must state MC only intervenes when there is concrete benefit or established-circle protection',
+    });
   }
 
   const playground = kernel.phase1Playground;
@@ -134,6 +194,12 @@ function validateSetupKernel(kernel: StoryKernel | undefined, strict: boolean | 
     || !Array.isArray(playground.localAntagonists) || playground.localAntagonists.length < 1
     || !Array.isArray(playground.repeatableSceneTypes) || playground.repeatableSceneTypes.length < 3) {
     issues.push({ severity: 'error', code: 'setup_kernel_phase1_playground_missing', message: 'StoryKernel.phase1Playground must define local locations, cast, antagonist, and repeatable scene types' });
+  } else if (playground.localAntagonists.some(a => /(tổ\s*chức|thế\s*lực|hội|cục|viện|đại\s*đế|tối\s*thượng|toàn\s*cầu|toàn\s*quốc|bí\s*ẩn|thần\s*bí|ẩn\s*mật)/i.test(String(a)))) {
+    issues.push({
+      severity: 'error',
+      code: 'setup_kernel_phase1_antagonist_too_large',
+      message: 'Phase 1 localAntagonists must be local and visible, not mysterious organizations or high-scale forces',
+    });
   }
 
   if (!kernel.socialReactor || !Array.isArray(kernel.socialReactor.witnesses) || kernel.socialReactor.witnesses.length < 2) {
@@ -153,6 +219,24 @@ function validateSetupKernel(kernel: StoryKernel | undefined, strict: boolean | 
 
 function rejectIf(pattern: RegExp, text: string, issues: SetupGateIssue[], code: string, message: string): void {
   if (pattern.test(text)) issues.push({ severity: 'error', code, message });
+}
+
+function rejectSecretLeaks(text: string, issues: SetupGateIssue[]): void {
+  for (const rule of MC_SECRET_LEAK_PATTERNS) {
+    rejectIf(rule.regex, text, issues, rule.code, rule.message);
+  }
+}
+
+function hasBriefWithoutMcBenefit(value: unknown): boolean {
+  if (!value || typeof value !== 'object') return false;
+  if (Array.isArray(value)) return value.some(hasBriefWithoutMcBenefit);
+
+  const record = value as Record<string, unknown>;
+  const looksLikeChapterBrief = typeof record.brief === 'string'
+    && (typeof record.chapterNumber === 'number' || Array.isArray(record.scenes));
+  if (looksLikeChapterBrief && typeof record.mcBenefit !== 'string') return true;
+
+  return Object.values(record).some(hasBriefWithoutMcBenefit);
 }
 
 function requireIfMissing(
@@ -224,6 +308,7 @@ export function validateSetupCanon(input: SetupGateInput): SetupGateResult {
 
   const opening = getSection(world, /###\s*OPENING\s*SCENE/i);
   const openingText = opening || world.slice(0, 1500);
+  rejectSecretLeaks(openingText, issues);
   rejectIf(
     /(bị\s+(trục\s*xuất|đuổi|bắt|truy\s*sát|ám\s*sát|săn\s*lùng)|ngất\s*xỉu|tự\s*tử|chết\s+đói|chủ\s+nhà\s+giục|nợ\s+trọ\s+3\s+tháng)/i,
     openingText,
@@ -282,6 +367,7 @@ export function validateSetupCanon(input: SetupGateInput): SetupGateResult {
 
   const phase1 = getSection(world, /PHASE\s*1\s*\([^)]*\)\s*:/i);
   const phase1Text = `${phase1} ${story?.mainConflict || ''}`;
+  rejectSecretLeaks(phase1Text, issues);
   rejectIf(
     /\b(tối\s*thượng|đại\s*đế|tổ\s*tiên|tử\s*thần|trưởng\s*lão\s+ma\s+giáo|ai\s+tối\s+thượng|hỗn\s*độn\s+ma\s*thần)\b/i,
     phase1Text,
@@ -314,6 +400,14 @@ export function validateSetupCanon(input: SetupGateInput): SetupGateResult {
     issues.push({ severity: 'error', code: 'story_outline_missing', message: 'story_outline is required before this stage' });
   }
   if (story) {
+    rejectSecretLeaks(JSON.stringify(story), issues);
+    if (hasBriefWithoutMcBenefit(story)) {
+      issues.push({
+        severity: 'error',
+        code: 'chapter_brief_mc_benefit_missing',
+        message: 'chapter/arc briefs must include mcBenefit so MC never meddles without concrete gain',
+      });
+    }
     if (!story.premise || story.premise.length < 80) {
       issues.push({ severity: 'error', code: 'story_premise_weak', message: 'story_outline premise is missing or too short' });
     }

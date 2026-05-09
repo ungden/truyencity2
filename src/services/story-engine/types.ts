@@ -79,6 +79,46 @@ export interface StyleDirectives {
   tone_profile?: ToneProfile;
   /** Anti-pattern flags — explicit prohibition prompts beyond anti_tropes */
   anti_seeds?: string[];
+  /** Store one AI write as one reader-facing chapter instead of splitting it into two rows */
+  disable_chapter_split?: boolean;
+  /** Codex should act as high-level director only; routine text is written by configured provider. */
+  codex_director_only?: boolean;
+  /** Enables provider-side routine chapter generation without Codex manual authoring. */
+  flash_writer_enabled?: boolean;
+  /** Cheap bulk mode: routine chapters may pass a softer gate if no hard continuity/canon issue is present. */
+  flash_routine_soft_gate?: boolean;
+  /** Minimum score for flash_routine_soft_gate. Defaults to 5 in director-only Flash mode. */
+  flash_routine_min_quality_score?: number;
+  /** Retry count for routine Flash writes. Defaults to 1 in director-only Flash mode to avoid paid rewrite loops. */
+  flash_routine_max_retries?: number;
+  /** Allow one cheap continuation pass when Flash undershoots min words or ends without a hook. Defaults to true. */
+  flash_routine_extend_on_short?: boolean;
+  /** Max cheap continuation passes for undershot routine chapters. Defaults to 2. */
+  flash_routine_max_extensions?: number;
+  /** Cheapest stable routine path: compact DB brief + one DS Flash thinking writer call + deterministic hard gates. */
+  flash_bulk_cheap_mode?: boolean;
+  /** Maximum compact routine context size in characters. Defaults to 32000. */
+  flash_bulk_context_max_chars?: number;
+  /** Hard minimum published word count for cheap routine chapters. Defaults to 1500. */
+  flash_bulk_min_words?: number;
+  /** Per-project production daily chapter quota for cron writing. Overrides WRITE_CHAPTERS_DAILY_QUOTA. */
+  production_daily_chapter_quota?: number;
+  /** Cadence for optional AI memory tasks in cheap mode. Defaults to 5 chapters. */
+  flash_bulk_optional_task_cadence?: number;
+  /** Cadence for strict AI critic sampling in cheap mode. Reserved for audit runners. Defaults to 10 chapters. */
+  flash_bulk_critic_cadence?: number;
+  /** Force cheap mode even near the final arc. Use only for experiments. */
+  flash_bulk_force_all?: boolean;
+  /** Focus preset key used by Codex/cron director flows. */
+  focus_key?: string | null;
+  /** Optional per-project routine writer instructions appended to compact Flash prompts. */
+  routine_prompt_context?: string;
+  /** Enable DeepSeek V4 thinking mode for selected story-engine calls. */
+  deepseek_thinking_enabled?: boolean;
+  /** DeepSeek V4 thinking effort. API maps low/medium to high; supported useful values are high/max. */
+  deepseek_reasoning_effort?: 'high' | 'max';
+  /** Optional task allow-list for thinking mode, e.g. architect/writer/critic. Empty means all DeepSeek calls. */
+  deepseek_thinking_tasks?: string[];
 }
 
 // ── Story Kernel (compact setup DNA) ─────────────────────────────────────────
@@ -103,6 +143,21 @@ export interface StoryKernel {
     limit: string;
     reward: string;
   };
+  /** What must stay secret about rebirth/system/golden finger and when it may reveal. */
+  mcSecret: {
+    secret: string;
+    outsideWorldKnowledge: string;
+    revealRule: string;
+  };
+  /** Concrete goal → action → benefit loop that prevents random meddling. */
+  benefitLoop: {
+    goal: string;
+    action: string;
+    benefit: string;
+    cadence: string;
+  };
+  /** Rule for when MC may intervene in external problems. */
+  interventionRule: string;
   /** Ch.1-100 local sandbox that can keep generating scenes. */
   phase1Playground: {
     locations: string[];
@@ -572,4 +627,7 @@ export interface GeminiConfig {
   temperature: number;
   maxTokens: number;
   systemPrompt?: string;
+  deepseekThinkingEnabled?: boolean;
+  deepseekReasoningEffort?: 'high' | 'max';
+  deepseekThinkingTasks?: string[];
 }

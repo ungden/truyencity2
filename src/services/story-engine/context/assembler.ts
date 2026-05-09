@@ -62,6 +62,15 @@ function formatStoryKernelContext(kernel: StoryKernel): string {
   if (kernel.systemMechanic) {
     parts.push(`System mechanic: ${kernel.systemMechanic.name} | input: ${kernel.systemMechanic.input} | output: ${kernel.systemMechanic.output} | limit: ${kernel.systemMechanic.limit} | reward: ${kernel.systemMechanic.reward}`);
   }
+  if (kernel.mcSecret) {
+    parts.push(`MC secret lock: ${kernel.mcSecret.secret} | outsiders only know: ${kernel.mcSecret.outsideWorldKnowledge} | reveal rule: ${kernel.mcSecret.revealRule}`);
+  }
+  if (kernel.benefitLoop) {
+    parts.push(`Benefit loop: goal ${kernel.benefitLoop.goal} | action ${kernel.benefitLoop.action} | benefit ${kernel.benefitLoop.benefit} | cadence ${kernel.benefitLoop.cadence}`);
+  }
+  if (kernel.interventionRule) {
+    parts.push(`Intervention rule: ${kernel.interventionRule}`);
+  }
   if (kernel.phase1Playground) {
     parts.push(`Phase 1 playground: ${[
       kernel.phase1Playground.locations?.join(', '),
@@ -78,7 +87,7 @@ function formatStoryKernelContext(kernel: StoryKernel): string {
   if (kernel.controlRules) {
     parts.push(`Control rules: payoff ${kernel.controlRules.payoffCadence}; attention ${kernel.controlRules.attentionGradient}; open ${kernel.controlRules.openThreadsPerArc}/arc, close ${kernel.controlRules.closeThreadsPerArc}/arc.`);
   }
-  parts.push('→ Chapter này phải phục vụ pleasureLoop + noveltyLadder + controlRules; mở rộng scene nhưng không đổi engine.');
+  parts.push('→ Chapter này phải phục vụ pleasureLoop + benefitLoop + noveltyLadder + controlRules; MC không can thiệp việc ngoài nếu không có lợi ích cụ thể.');
   return parts.join('\n');
 }
 

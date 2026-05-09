@@ -1,8 +1,15 @@
 const { Client } = require('pg');
+require('dotenv').config({ path: '.env.runtime', quiet: true });
+require('dotenv').config({ path: '.env.local', quiet: true });
 
 async function run() {
+  const connectionString = process.env.DATABASE_URL || process.env.SUPABASE_DB_URL;
+  if (!connectionString) {
+    throw new Error('Missing DATABASE_URL or SUPABASE_DB_URL');
+  }
+
   const client = new Client({
-    connectionString: "postgres://postgres.eizkmyewemebhpxiunhe:95xZ22H4wTjQkZ6E@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres"
+    connectionString,
   });
   try {
     await client.connect();

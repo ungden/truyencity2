@@ -1967,7 +1967,8 @@ CHÚ Ý:
       `Title text must be exactly: "${title}". Place at the top-center in large bold serif font, high contrast, perfectly readable.`,
       `At the bottom-center, include small text: "Truyencity.com"`,
       `No other text besides the title and Truyencity.com.`,
-      `Vertical 3:4 composition, cinematic lighting, high-detail illustration, premium publishing quality.`,
+      `Vertical 3:4 composition, editorial-realistic lighting, clean neutral white balance, clear air, natural skin tones, sharp details, premium publishing quality.`,
+      `Avoid yellow/orange/amber color cast, sepia tint, muddy shadows, greasy glow, over-saturated gold, smoky haze, blur, and low contrast.`,
       `No watermark, no signature, no logos besides Truyencity.com.`,
     ].join(' ');
   }

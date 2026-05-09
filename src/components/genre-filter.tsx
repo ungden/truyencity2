@@ -20,20 +20,32 @@ interface GenreFilterProps {
   onGenreChange: (genres: string[]) => void;
   selectedStatus: string[];
   onStatusChange: (status: string[]) => void;
+  chapterRange?: string;
+  onChapterRangeChange?: (range: string) => void;
 }
 
 const statuses = [
-  { id: 'dang-ra', name: 'Đang ra' },
-  { id: 'hoan-thanh', name: 'Hoàn thành' },
-  { id: 'tam-dung', name: 'Tạm dừng' },
-  { id: 'drop', name: 'Drop' }
+  { id: 'dang-ra', name: 'Đang ra', value: 'Đang ra' },
+  { id: 'hoan-thanh', name: 'Hoàn thành', value: 'Hoàn thành' },
+  { id: 'tam-dung', name: 'Tạm dừng', value: 'Tạm dừng' },
+  { id: 'drop', name: 'Drop', value: 'Drop' }
+];
+
+const chapterRanges = [
+  { id: 'all', name: 'Tất cả' },
+  { id: '0-50', name: '0-50 chương' },
+  { id: '50-200', name: '50-200 chương' },
+  { id: '200-500', name: '200-500 chương' },
+  { id: '500+', name: '500+ chương' },
 ];
 
 export const GenreFilter: React.FC<GenreFilterProps> = ({
   selectedGenres,
   onGenreChange,
   selectedStatus,
-  onStatusChange
+  onStatusChange,
+  chapterRange = 'all',
+  onChapterRangeChange,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -44,19 +56,20 @@ export const GenreFilter: React.FC<GenreFilterProps> = ({
     onGenreChange(newGenres);
   };
 
-  const handleStatusToggle = (statusId: string) => {
-    const newStatus = selectedStatus.includes(statusId)
-      ? selectedStatus.filter(id => id !== statusId)
-      : [...selectedStatus, statusId];
+  const handleStatusToggle = (statusValue: string) => {
+    const newStatus = selectedStatus.includes(statusValue)
+      ? selectedStatus.filter(id => id !== statusValue)
+      : [...selectedStatus, statusValue];
     onStatusChange(newStatus);
   };
 
   const clearAllFilters = () => {
     onGenreChange([]);
     onStatusChange([]);
+    onChapterRangeChange?.('all');
   };
 
-  const activeFiltersCount = selectedGenres.length + selectedStatus.length;
+  const activeFiltersCount = selectedGenres.length + selectedStatus.length + (chapterRange !== 'all' ? 1 : 0);
 
   return (
     <>
@@ -124,8 +137,8 @@ export const GenreFilter: React.FC<GenreFilterProps> = ({
                   <div key={status.id} className="flex items-center space-x-2 p-3 border rounded-lg">
                     <Checkbox
                       id={status.id}
-                      checked={selectedStatus.includes(status.id)}
-                      onCheckedChange={() => handleStatusToggle(status.id)}
+                      checked={selectedStatus.includes(status.value)}
+                      onCheckedChange={() => handleStatusToggle(status.value)}
                     />
                     <label
                       htmlFor={status.id}
@@ -137,6 +150,28 @@ export const GenreFilter: React.FC<GenreFilterProps> = ({
                 ))}
               </div>
             </div>
+
+            {onChapterRangeChange && (
+              <div>
+                <h3 className="font-semibold mb-4">Số chương</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {chapterRanges.map((range) => (
+                    <button
+                      key={range.id}
+                      type="button"
+                      onClick={() => onChapterRangeChange(range.id)}
+                      className={`rounded-lg border p-3 text-left text-sm font-medium transition-colors ${
+                        chapterRange === range.id
+                          ? 'border-primary bg-primary text-primary-foreground'
+                          : 'hover:bg-accent'
+                      }`}
+                    >
+                      {range.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Action Buttons */}

@@ -11,6 +11,11 @@ import { verifyCronAuth } from '@/lib/auth/cron-auth';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { ContentSeeder } from '@/services/content-seeder';
 import { MAX_TOTAL_PROJECTS } from '@/lib/constants/project-limits';
+import {
+  FOCUS_MODE_ENABLED,
+  FOCUSED_PROJECT_IDS,
+  STORY_PRODUCTION_PAUSED,
+} from '@/lib/story-production-focus';
 
 export const maxDuration = 300;
 export const dynamic = 'force-dynamic';
@@ -20,9 +25,26 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
   }
 
+  if (STORY_PRODUCTION_PAUSED) {
+    return NextResponse.json({
+      success: true,
+      skipped: true,
+      reason: 'STORY_PRODUCTION_PAUSED enabled: legacy daily spawn is paused',
+    });
+  }
+
   const geminiKey = process.env.GEMINI_API_KEY;
   if (!geminiKey) {
     return NextResponse.json({ success: false, error: 'GEMINI_API_KEY missing' }, { status: 500 });
+  }
+
+  if (FOCUS_MODE_ENABLED) {
+    return NextResponse.json({
+      success: true,
+      skipped: true,
+      reason: `Story production focus mode enabled: daily spawn disabled while ${FOCUSED_PROJECT_IDS.length} projects are allowlisted`,
+      focusedProjectIds: FOCUSED_PROJECT_IDS,
+    });
   }
 
   const targetParam = Number(request.nextUrl.searchParams.get('target') || '5');
