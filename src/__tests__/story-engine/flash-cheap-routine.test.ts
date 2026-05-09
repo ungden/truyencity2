@@ -1,6 +1,7 @@
 import {
   buildRoutineBrief,
   getRoutinePromptContext,
+  isFlashCheapHardCanonIssue,
   isFlashCheapHardIssue,
   parseFlashCheapWriterResponse,
   shouldUseFlashBulkCheapMode,
@@ -71,6 +72,19 @@ describe('flash cheap routine', () => {
     expect(isFlashCheapHardIssue({ type: 'quality', severity: 'moderate', description: 'style issue' })).toBe(false);
   });
 
+  it('keeps cast-roster heuristic soft in cheap routine while blocking real continuity errors', () => {
+    expect(isFlashCheapHardCanonIssue({
+      type: 'continuity',
+      severity: 'major',
+      description: '17 tên nhân vật MỚI xuất hiện trong chương này không có trong cast roster: Mưu Dưới Ánh Trăng, Tần Vân, Phục Ma Thập.',
+    })).toBe(false);
+    expect(isFlashCheapHardCanonIssue({
+      type: 'continuity',
+      severity: 'critical',
+      description: 'dead character returned with no established mechanism',
+    })).toBe(true);
+  });
+
   it('filters world terms that look like capitalized character names', () => {
     expect(isLikelyWorldTermCandidate('Vạn Tượng Ký Ức')).toBe(true);
     expect(isLikelyWorldTermCandidate('Thần Vực')).toBe(true);
@@ -88,5 +102,7 @@ describe('flash cheap routine', () => {
     expect(isLikelyWorldTermCandidate('Tác Gia')).toBe(true);
     expect(isLikelyWorldTermCandidate('Trái Đất')).toBe(true);
     expect(isLikelyWorldTermCandidate('Sơn Hà Xạ Nhật')).toBe(true);
+    expect(isLikelyWorldTermCandidate('Mưu Dưới Ánh Trăng')).toBe(true);
+    expect(isLikelyWorldTermCandidate('Phục Ma Thập Bát Chưởng')).toBe(true);
   });
 });

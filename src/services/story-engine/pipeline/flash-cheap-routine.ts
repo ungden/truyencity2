@@ -138,6 +138,25 @@ export function isFlashCheapHardIssue(issue: CriticIssue | ChapterQualityIssue):
   return false;
 }
 
+export function isFlashCheapHardCanonIssue(issue: CriticIssue): boolean {
+  const description = issue.description || '';
+  // Cast-roster extraction is heuristic and often catches book titles,
+  // in-story fictional characters, techniques, or crowd NPCs. In cheap routine
+  // this remains an audit signal, while true blockers still fail closed.
+  if (
+    issue.type === 'continuity'
+    && issue.severity === 'major'
+    && (
+      description.includes('tên nhân vật MỚI')
+      || description.includes('cast roster')
+      || description.includes('có thể là nhân vật mới')
+    )
+  ) {
+    return false;
+  }
+  return isFlashCheapHardIssue(issue);
+}
+
 function shouldAttemptCheapExtension(issues: ChapterQualityIssue[], styleDirectives: StyleDirectives | null | undefined): boolean {
   if (styleDirectives?.flash_routine_extend_on_short === false) return false;
   return issues.some((issue) => issue.code === 'word_count_low' || issue.code === 'weak_ending_hook');
@@ -391,7 +410,7 @@ export async function writeFlashCheapRoutineChapter(input: FlashCheapRoutineInpu
   const hardBlockers = [
     ...contradictions.filter((c) => c.severity === 'critical').map((c): CriticIssue => ({ type: 'continuity', severity: 'critical', description: c.description })),
     ...consistencyIssues.filter((i) => i.severity === 'critical' || i.severity === 'major').map((i): CriticIssue => ({ type: i.type === 'dead_character' ? 'continuity' : 'consistency', severity: i.severity, description: i.description })),
-    ...canonIssues.filter(isFlashCheapHardIssue),
+    ...canonIssues.filter(isFlashCheapHardCanonIssue),
   ];
 
   if (hardBlockers.length > 0) {

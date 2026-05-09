@@ -191,6 +191,8 @@ const WORLD_TERM_WORDS = [
   'Thiên Đạo Thư Viện', 'Thiên Đạo', 'Thư Viện', 'Vạn Văn', 'Trái Đất',
   'Đại Diễn', 'Diễn Giới', 'Tác Gia', 'Bạch Bút', 'Thanh Bút', 'Kim Bút',
   'Văn Thánh', 'Thiên Đạo Tác Gia', 'Bảng Tân Tác Gia', 'Sơn Hà Xạ Nhật',
+  'Mưu Dưới Ánh Trăng', 'Phục Ma Thập Bát Chưởng', 'Phục Ma Thập', 'Bát Chưởng',
+  'Loạn Thế Mưu Vương', 'Cửu Thiên Hỏa Chủng', 'Huyết Án Bạch Ngọc Lâu',
   'Hoang Mạc', 'Khai Sơn', 'Thập Nhị', 'Phá Vân Chưởng',
   'Anh Hùng Xạ Điêu', 'Quách Tĩnh', 'Thất Quái', 'Võ Lâm', 'Võ Lâm Xạ Điêu',
   'Tam Quốc', 'Cửu Âm Chân Kinh', 'Huyền Âm Chân Giải', 'Thượng Hải', 'Hy Lạp',
