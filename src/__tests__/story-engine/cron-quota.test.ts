@@ -40,6 +40,13 @@ describe('story production quota', () => {
       target_chapters: 55,
       next_due_at: '2026-05-09T18:14:48.083+00:00',
     }, now)).toBe(true);
+
+    expect(isDailyQuotaDue({
+      status: 'active',
+      written_chapters: '2' as unknown as number,
+      target_chapters: '55' as unknown as number,
+      next_due_at: '2026-05-09T18:14:48.083+00:00',
+    }, now)).toBe(true);
   });
 
   it('does not mark future or completed quotas as due', () => {

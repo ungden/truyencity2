@@ -60,7 +60,10 @@ export function isDailyQuotaDue(
   now: Date = new Date(),
 ): boolean {
   if (quota.status === 'completed') return false;
-  if ((quota.written_chapters ?? 0) >= (quota.target_chapters ?? 0)) return false;
+  const written = Number(quota.written_chapters ?? 0);
+  const target = Number(quota.target_chapters ?? 0);
+  if (!Number.isFinite(written) || !Number.isFinite(target)) return true;
+  if (written >= target) return false;
   if (!quota.next_due_at) return true;
 
   const nextDueMs = Date.parse(quota.next_due_at);

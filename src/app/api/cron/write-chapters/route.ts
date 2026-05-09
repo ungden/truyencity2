@@ -954,6 +954,17 @@ export async function GET(request: NextRequest) {
       console.log(`[Cron] Step 3 OK: ${quotaRows.length} quota rows fetched`);
     }
 
+    const quotaDueStates = quotaRows.map((q) => ({
+      project_id: q.project_id,
+      vn_date: q.vn_date,
+      status: q.status,
+      written_chapters: q.written_chapters,
+      target_chapters: q.target_chapters,
+      next_due_at: q.next_due_at,
+      due: isDailyQuotaDue(q, now),
+    }));
+    console.log(`[Cron] Step 4 quota due states: ${JSON.stringify(quotaDueStates)}`);
+
     const dueQuotaByProject = new Map(
       quotaRows
         .filter((q) => isDailyQuotaDue(q, now))
