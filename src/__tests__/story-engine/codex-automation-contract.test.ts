@@ -4,8 +4,10 @@ import path from 'path';
 import {
   assertCoverImageFile,
   parseCoverApplyInput,
+  parseContinuityExtractionPayload,
   parseStoryFactoryPayload,
 } from '@/services/story-engine/codex-automation/contract';
+import { evaluateContinuityExtraction } from '@/services/story-engine/codex-automation/continuity';
 
 function validStoryPayload() {
   return {
@@ -101,5 +103,96 @@ describe('codex automation contract', () => {
     writeFileSync(imagePath, Buffer.alloc(2048, 1));
     expect(assertCoverImageFile(imagePath)).toMatchObject({ mimeType: 'image/png', sizeBytes: 2048 });
     rmSync(dir, { recursive: true, force: true });
+  });
+
+  it('rejects continuity payloads without summary state spine', () => {
+    expect(() => parseContinuityExtractionPayload({
+      summary: 'ngắn',
+      openingSentence: 'Một câu mở đầu đủ dài.',
+      mcState: '',
+      cliffhanger: 'Một hook đủ dài cho chương sau.',
+      characters: [{ characterName: 'Lâm Việt', status: 'alive' }],
+    })).toThrow();
+  });
+
+  it('blocks continuity when MC is missing from character state', () => {
+    const payload = parseContinuityExtractionPayload({
+      summary: 'Lâm Việt phát hiện đơn hàng mới có biên lợi nhuận sai và chọn tự kiểm lại dữ liệu trước khi ký.',
+      openingSentence: 'Mưa rơi xuống mái tôn xưởng cơ khí từ lúc trời còn chưa sáng.',
+      mcState: 'Lâm Việt đang ở xưởng, có thêm manh mối về đơn hàng nhưng vẫn phải đối mặt áp lực nợ.',
+      cliffhanger: 'Điện thoại của chủ kho vang lên đúng lúc Lâm Việt nhìn thấy con số bị sửa.',
+      characters: [{ characterName: 'Chủ kho Minh', status: 'alive' }],
+    });
+    const report = evaluateContinuityExtraction(payload, {
+      projectId: 'p',
+      chapterNumber: 2,
+      protagonistName: 'Lâm Việt',
+    });
+    expect(report.verdict).toBe('block');
+    expect(report.issues.some((issue) => issue.code === 'mc_missing_from_character_state')).toBe(true);
+  });
+
+  it('blocks dead character resurrection without explanation', () => {
+    const payload = parseContinuityExtractionPayload({
+      summary: 'Lâm Việt gặp lại Trương Hải trong kho cũ và dùng cuộc gặp này để ép chủ kho nói thật.',
+      openingSentence: 'Cánh cửa kho cũ mở ra trong tiếng bản lề kéo dài.',
+      mcState: 'Lâm Việt đứng trong kho, giữ được quyền chủ động nhưng phát hiện một mâu thuẫn mới.',
+      cliffhanger: 'Trương Hải bước ra khỏi bóng tối như chưa từng có chuyện gì xảy ra.',
+      characters: [
+        { characterName: 'Lâm Việt', status: 'alive' },
+        { characterName: 'Trương Hải', status: 'alive' },
+      ],
+    });
+    const report = evaluateContinuityExtraction(payload, {
+      projectId: 'p',
+      chapterNumber: 8,
+      protagonistName: 'Lâm Việt',
+      previousCharacters: [{ character_name: 'Trương Hải', status: 'dead', chapter_number: 6 }],
+    });
+    expect(report.verdict).toBe('block');
+    expect(report.issues.some((issue) => issue.code === 'dead_character_resurrection')).toBe(true);
+  });
+
+  it('blocks timeline rollback', () => {
+    const payload = parseContinuityExtractionPayload({
+      summary: 'Lâm Việt kết thúc buổi đàm phán sau một tuần chuẩn bị và nhận được cơ hội giao hàng thử.',
+      openingSentence: 'Buổi sáng thứ bảy, xưởng cơ khí sáng đèn sớm hơn thường lệ.',
+      mcState: 'Lâm Việt đang ở xưởng sau buổi đàm phán, có thêm một cơ hội giao hàng thử.',
+      cliffhanger: 'Tin nhắn xác nhận đơn thử vừa hiện lên thì một số lạ gọi tới.',
+      characters: [{ characterName: 'Lâm Việt', status: 'alive' }],
+      timeline: { daysElapsedSinceStart: 2, explicitInChapter: true },
+    });
+    const report = evaluateContinuityExtraction(payload, {
+      projectId: 'p',
+      chapterNumber: 9,
+      protagonistName: 'Lâm Việt',
+      previousTimeline: { days_elapsed_since_start: 6 },
+    });
+    expect(report.verdict).toBe('block');
+    expect(report.issues.some((issue) => issue.code === 'timeline_rollback')).toBe(true);
+  });
+
+  it('blocks impossible item events', () => {
+    const payload = parseContinuityExtractionPayload({
+      summary: 'Lâm Việt dùng cuốn sổ nợ cũ để đối chiếu khoản lãi bị thổi phồng và giành lại thế nói chuyện.',
+      openingSentence: 'Lâm Việt đặt cuốn sổ lên bàn inox vẫn còn vệt dầu máy.',
+      mcState: 'Lâm Việt đang giữ thế chủ động sau khi đối chiếu được khoản nợ sai.',
+      cliffhanger: 'Trang cuối cuốn sổ lại có một chữ ký mà hắn không ngờ tới.',
+      characters: [{ characterName: 'Lâm Việt', status: 'alive' }],
+      itemEvents: [{
+        characterName: 'Lâm Việt',
+        itemName: 'sổ nợ cũ',
+        eventType: 'used',
+        description: 'Dùng để đối chiếu khoản nợ.',
+      }],
+    });
+    const report = evaluateContinuityExtraction(payload, {
+      projectId: 'p',
+      chapterNumber: 3,
+      protagonistName: 'Lâm Việt',
+      currentItems: new Set(),
+    });
+    expect(report.verdict).toBe('block');
+    expect(report.issues.some((issue) => issue.code === 'impossible_item_event')).toBe(true);
   });
 });

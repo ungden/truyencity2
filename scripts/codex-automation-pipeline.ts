@@ -1,43 +1,100 @@
-import dotenv from 'dotenv';
+import './codex-env';
 import { createClient } from '@supabase/supabase-js';
 import { randomUUID } from 'crypto';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'fs';
 import path from 'path';
+import { createOfflineSupabaseClient, shouldUseOfflineSupabase } from '../src/services/story-engine/utils/offline-supabase';
 import {
   assertCoverImageFile,
   parseCoverApplyInput,
+  parseContinuityExtractionPayload,
   parseStoryFactoryPayload,
   type CodexAutomationManifest,
   type CodexAutomationTask,
+  type ContinuityHealthReport,
   type CoverApplyInput,
   type StoryFactoryPayload,
 } from '../src/services/story-engine/codex-automation/contract';
+import {
+  auditContinuityWindow,
+  buildHeuristicContinuityPayload,
+  evaluateContinuityExtraction,
+  loadContinuityEvaluationContext,
+  persistContinuityMemory,
+} from '../src/services/story-engine/codex-automation/continuity';
 import { assembleContext, loadContext } from '../src/services/story-engine/context/assembler';
+import { retrieveEntityContext, retrieveRAGContext, retrieveThemeContext } from '../src/services/story-engine/memory/rag-store';
+import { buildBeatContext } from '../src/services/story-engine/memory/beat-ledger';
+import { buildRuleContext } from '../src/services/story-engine/canon/world-rules';
+import { buildPlotThreadContext } from '../src/services/story-engine/state/plot-threads';
+import { postWriteHealthCheck } from '../src/services/story-engine/utils/post-write-health-check';
 import { evaluateChapterQuality, type ChapterQualityReport } from '../src/services/story-engine/quality/quality-contract';
 import { getVietnamDayBounds } from '../src/lib/utils/vietnam-time';
+import type { GenreType } from '../src/services/story-engine/types';
+import {
+  buildGenreKnowledgeContext,
+  formatKnowledgeAlignmentReport,
+  GENRE_KNOWLEDGE_PACK_VERSION,
+  validateKnowledgeCoverage,
+} from '../src/services/story-engine/codex-automation/genre-knowledge';
+import {
+  appendForecastHistory,
+  DEFAULT_FOCUS_PROJECT_TITLE,
+  evaluateCompletionReadinessFacts,
+  type CompletionReadinessReport,
+} from '../src/services/story-engine/codex-automation/completion-readiness';
+import {
+  applyFocusPresetTemplate,
+  buildFocusPresetContext,
+  formatFocusPresetReport,
+  getFocusPreset,
+  isFocusKey,
+  validateFocusPresetContinuity,
+  validateFocusPresetStorySetup,
+} from '../src/services/story-engine/codex-automation/focus-presets';
 
-dotenv.config({ path: '.env.runtime', quiet: true });
-dotenv.config({ path: '.env.local', quiet: true });
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-if (!supabaseUrl || !serviceRoleKey) {
-  throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
+const explicitOfflineMode = process.argv.includes('--offline');
+if (explicitOfflineMode) {
+  process.env.CODEX_AUTOMATION_OFFLINE = '1';
+  process.env.STORY_ENGINE_OFFLINE = '1';
+} else if (
+  process.env.NEXT_PUBLIC_SUPABASE_URL
+  && process.env.SUPABASE_SERVICE_ROLE_KEY
+) {
+  process.env.CODEX_AUTOMATION_OFFLINE = '0';
+  process.env.STORY_ENGINE_OFFLINE = '0';
 }
 
-const db = createClient(supabaseUrl, serviceRoleKey, {
-  auth: { autoRefreshToken: false, persistSession: false },
-});
+const DB_MODE = shouldUseOfflineSupabase() ? 'offline' : 'live';
+
+const db = (() => {
+  if (DB_MODE === 'offline') {
+    return createOfflineSupabaseClient({ rootDir: process.cwd() }) as any;
+  }
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
+  }
+  return createClient(supabaseUrl, serviceRoleKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+})();
+
+console.log(`db_mode=${DB_MODE}`);
 
 type Command =
   | 'plan'
+  | 'rescue-rewrite'
   | 'prepare-new-story'
   | 'apply-new-story'
   | 'prepare-cover'
   | 'apply-cover'
   | 'prepare-chapter'
-  | 'apply-chapter';
+  | 'apply-chapter'
+  | 'focus-bulk'
+  | 'audit-continuity'
+  | 'repair-continuity';
 
 type AutomationMode = 'qa-slow' | 'production';
 
@@ -80,6 +137,8 @@ interface ChapterRunMeta {
   preparedAt: string;
   sourceProjectStatus: string;
   sourceAiModel?: string | null;
+  focusKey?: string | null;
+  lockToken?: string | null;
 }
 
 interface AutomationQuotas {
@@ -102,7 +161,7 @@ function hasFlag(name: string): boolean {
 
 function command(): Command {
   const raw = process.argv[2] as Command | undefined;
-  const commands: Command[] = ['plan', 'prepare-new-story', 'apply-new-story', 'prepare-cover', 'apply-cover', 'prepare-chapter', 'apply-chapter'];
+  const commands: Command[] = ['plan', 'rescue-rewrite', 'prepare-new-story', 'apply-new-story', 'prepare-cover', 'apply-cover', 'prepare-chapter', 'apply-chapter', 'focus-bulk', 'audit-continuity', 'repair-continuity'];
   if (raw && commands.includes(raw)) return raw;
   throw new Error(`Usage: npm run codex:automation -- <${commands.join('|')}> [options]`);
 }
@@ -132,7 +191,7 @@ function normalizeRunDir(raw: string): string {
 }
 
 function outputRoot(): string {
-  return path.resolve(process.cwd(), arg('out') || '.codex/automation-runs');
+  return path.resolve(process.cwd(), arg('out') || '.automation/automation-runs');
 }
 
 function makeRunDir(label: string): string {
@@ -140,6 +199,110 @@ function makeRunDir(label: string): string {
   const runDir = path.join(outputRoot(), `${label}-${stamp}`);
   mkdirSync(runDir, { recursive: true });
   return runDir;
+}
+
+function archiveRoot(): string {
+  const dir = path.resolve(process.cwd(), '.automation/archives');
+  mkdirSync(dir, { recursive: true });
+  return dir;
+}
+
+type FocusRunLock = {
+  focusKey: string;
+  token: string;
+  projectId: string;
+  novelTitle: string;
+  runDir: string;
+  pid: number;
+  acquiredAt: string;
+  expiresAt: string;
+};
+
+const CANONICAL_FOCUS_TITLES: Record<string, string> = {
+  'song-xuyen-trade': 'Thương Lộ Song Giới',
+  'sang-the-than-minh': 'Thần Vực Khởi Nguyên: Ta Nuôi Ra Vạn Giới Thiên Đạo',
+};
+
+function lockRoot(): string {
+  const dir = path.resolve(process.cwd(), '.automation/locks');
+  mkdirSync(dir, { recursive: true });
+  return dir;
+}
+
+function focusLockPath(focusKey: string): string {
+  return path.join(lockRoot(), `${slugify(focusKey)}.json`);
+}
+
+function focusLockTtlMs(): number {
+  const raw = Number(process.env.CODEX_AUTOMATION_FOCUS_LOCK_TTL_MS);
+  return Number.isFinite(raw) && raw > 0 ? raw : 2 * 60 * 60 * 1000;
+}
+
+function readFocusLock(focusKey: string): FocusRunLock | null {
+  const filePath = focusLockPath(focusKey);
+  if (!existsSync(filePath)) return null;
+  try {
+    return JSON.parse(readFileSync(filePath, 'utf-8')) as FocusRunLock;
+  } catch {
+    return null;
+  }
+}
+
+function isFocusLockActive(lock: FocusRunLock | null): lock is FocusRunLock {
+  if (!lock?.expiresAt) return false;
+  return new Date(lock.expiresAt).getTime() > Date.now();
+}
+
+function removeFocusLock(focusKey: string): void {
+  const filePath = focusLockPath(focusKey);
+  if (!existsSync(filePath)) return;
+  try {
+    unlinkSync(filePath);
+  } catch {
+    // Best-effort cleanup; stale locks expire automatically.
+  }
+}
+
+function acquireFocusLock(
+  focusKey: string,
+  project: ProjectRow,
+  novel: NovelRow,
+  runDir: string,
+): { acquired: true; lock: FocusRunLock } | { acquired: false; activeLock: FocusRunLock } {
+  const existing = readFocusLock(focusKey);
+  if (isFocusLockActive(existing)) return { acquired: false, activeLock: existing };
+  if (existing) removeFocusLock(focusKey);
+
+  const now = Date.now();
+  const lock: FocusRunLock = {
+    focusKey,
+    token: randomUUID(),
+    projectId: project.id,
+    novelTitle: novel.title,
+    runDir,
+    pid: process.pid,
+    acquiredAt: new Date(now).toISOString(),
+    expiresAt: new Date(now + focusLockTtlMs()).toISOString(),
+  };
+
+  try {
+    writeFileSync(focusLockPath(focusKey), safeJson(lock), { encoding: 'utf-8', flag: 'wx' });
+    return { acquired: true, lock };
+  } catch {
+    const activeLock = readFocusLock(focusKey);
+    if (isFocusLockActive(activeLock)) return { acquired: false, activeLock };
+    removeFocusLock(focusKey);
+    writeFileSync(focusLockPath(focusKey), safeJson(lock), { encoding: 'utf-8', flag: 'wx' });
+    return { acquired: true, lock };
+  }
+}
+
+function releaseFocusLock(focusKey: string | null | undefined, token: string | null | undefined): void {
+  if (!focusKey || !token) return;
+  const existing = readFocusLock(focusKey);
+  if (existing?.token !== token) return;
+  removeFocusLock(focusKey);
+  console.log(`focus_lock=released focus_key=${focusKey}`);
 }
 
 function wordCount(text: string): number {
@@ -165,23 +328,13 @@ function extractTitleAndContent(raw: string): { title: string; content: string }
   return { title, content };
 }
 
-function buildSummary(content: string): string {
-  return content.replace(/\s+/g, ' ').trim().slice(0, 700);
-}
-
-function firstSentence(content: string): string {
-  const compact = content.replace(/\s+/g, ' ').trim();
-  const match = compact.match(/^(.{40,220}?[.!?。！？])/);
-  return (match?.[1] || compact.slice(0, 180)).trim();
-}
-
-function lastParagraph(content: string): string {
-  const paragraphs = content.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
-  return (paragraphs.at(-1) || content.slice(-500)).slice(0, 700);
-}
-
 function score10(report: ChapterQualityReport): number {
   return Math.round(report.score / 10);
+}
+
+function smartTruncate(value: string, maxChars: number): string {
+  if (value.length <= maxChars) return value;
+  return `${value.slice(0, Math.floor(maxChars * 0.58))}\n\n[...lược bớt...]\n\n${value.slice(-Math.floor(maxChars * 0.38))}`;
 }
 
 async function getSystemUserId(): Promise<string> {
@@ -257,14 +410,317 @@ function singleNovel(value: unknown): NovelRow | null {
   return (value as NovelRow | null) || null;
 }
 
-async function findCodexProjectNeedingCover(): Promise<{ project: ProjectRow; novel: NovelRow } | null> {
+function metricScore100(metric: { overall_score?: number | null; meta?: Record<string, unknown> | null }): number | null {
+  const contract = metric.meta?.quality_contract as { score?: number; verdict?: string } | undefined;
+  if (typeof contract?.score === 'number') return contract.score;
+  if (typeof metric.overall_score === 'number') return metric.overall_score * 10;
+  return null;
+}
+
+function metricQualityVerdict(metric: { meta?: Record<string, unknown> | null }): 'pass' | 'revise' | 'block' | null {
+  const contract = metric.meta?.quality_contract as { verdict?: string } | undefined;
+  return contract?.verdict === 'pass' || contract?.verdict === 'revise' || contract?.verdict === 'block'
+    ? contract.verdict
+    : null;
+}
+
+function metricContinuityVerdict(metric: { meta?: Record<string, unknown> | null }): 'pass' | 'revise' | 'block' | null {
+  const continuity = metric.meta?.continuity_health as { verdict?: string } | undefined;
+  return continuity?.verdict === 'pass' || continuity?.verdict === 'revise' || continuity?.verdict === 'block'
+    ? continuity.verdict
+    : null;
+}
+
+type RescueArchiveTable =
+  | 'chapters'
+  | 'quality_metrics'
+  | 'chapter_summaries'
+  | 'character_states'
+  | 'story_memory_chunks'
+  | 'story_timeline'
+  | 'item_events'
+  | 'plot_threads'
+  | 'character_relationships'
+  | 'economic_ledger'
+  | 'factions';
+
+const RESCUE_TABLES: Array<{ table: RescueArchiveTable; column: 'novel_id' | 'project_id' }> = [
+  { table: 'chapters', column: 'novel_id' },
+  { table: 'quality_metrics', column: 'project_id' },
+  { table: 'chapter_summaries', column: 'project_id' },
+  { table: 'character_states', column: 'project_id' },
+  { table: 'story_memory_chunks', column: 'project_id' },
+  { table: 'story_timeline', column: 'project_id' },
+  { table: 'item_events', column: 'project_id' },
+  { table: 'plot_threads', column: 'project_id' },
+  { table: 'character_relationships', column: 'project_id' },
+  { table: 'economic_ledger', column: 'project_id' },
+  { table: 'factions', column: 'project_id' },
+];
+
+function asRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
+}
+
+function songXuyenRewriteContract() {
+  return {
+    version: 'song-xuyen-trade-payoff-v2-2026-05-09',
+    readerFantasy: 'Nguyen Khai khai thac chenh lech gia tri giua Sai Gon va Aram de giau len, co quyen hon, co nhieu nguon hang/khach hang hon, va ngay cang kiem soat duoc cong.',
+    chapterLoop: [
+      'phat hien chenh lech gia tri/nhu cau',
+      'gom nguon hang hoac thong tin co gia von ro',
+      'giai mot rang buoc logistics bang su thong minh cua MC',
+      'chot trade/route/right/contract va an dividend cu the',
+      'the gioi phan ung va mo co hoi loi nhuan lon hon',
+    ],
+    measurableLadders: ['capital', 'inventory', 'supply', 'customers', 'route_rights', 'faction_trust', 'team_capability', 'gate_capability'],
+    hardRules: [
+      'Moi chuong phai co readerPayoff.tradeDividend va readerPayoff.progressionDelta.',
+      'Khong pure suffering: neu co nguy co thi nguy co phai doi duoc loi the trong chapter/window.',
+      'Moi 3 chuong tang it nhat mot measurable ladder.',
+      'Security/continuity puzzle khong duoc thay the trade fantasy qua nhieu chuong lien tiep.',
+      'Mini-arc ket bang profitable deal/status upgrade, khong chi song sot.',
+    ],
+    openingRewritePlan: [
+      'Ch.1: ap luc kho/no la setup, payoff phai la arbitrage dau tien co loi/asset that.',
+      'Ch.2: Mai An nhin ra so lieu, bo doi bien bi mat thanh business system.',
+      'Ch.3: deal dau voi Vay Dong co price lock/route right/nguon hang ky ro.',
+      'Ch.4-6: scale hang thanh package lap lai, blocker nao cung bien thanh paid service hoac quyen moi.',
+      'Ch.7-10: faction reaction dau tien, Khai dung ledger data de lay bao ho/khach hang/quyen route.',
+    ],
+  };
+}
+
+function withSongXuyenRewriteBible(project: ProjectRow): {
+  worldDescription: string | null;
+  storyOutline: unknown;
+  masterOutline: unknown;
+  styleDirectives: Record<string, unknown>;
+} {
+  const contract = songXuyenRewriteContract();
+  const worldBase = project.world_description || '';
+  const contractBlock = [
+    '[SONG XUYEN TRADE PAYOFF CONTRACT V2]',
+    'Truyen phai doc nhu sang van thuong mai hien dai: Nguyen Khai khong bi keo kho lien tuc.',
+    'Moi chuong bat buoc co mot khoan lai hoac tien bo cu the: tien, hang, nguon cung, khach hang, quyen route, du lieu gia, uy tin phe phai, giay phep, hop dong, don bay xa hoi, hoac nang cap cong.',
+    'Nguy co/leak/thu tuc chi la gia vi va phai doi duoc leverage/payoff trong chapter/window; neu chi them ap luc thi revise, khong publish.',
+    'Moi 3 chuong phai tang it nhat mot ladder: capital, inventory, supply, customers, route_rights, faction_trust, team_capability, gate_capability.',
+  ].join('\n');
+  const worldDescription = worldBase.includes('[SONG XUYEN TRADE PAYOFF CONTRACT V2]')
+    ? worldBase
+    : `${worldBase.trim()}\n\n${contractBlock}`.trim();
+  const storyOutline = {
+    ...asRecord(project.story_outline),
+    rescueRewriteContract: contract,
+    tone: 'sang van trade/progression, competent, profit-forward, main ngay cang co quyen chu dong; risk phuc vu payoff, khong de main bi hanh lien tuc',
+  };
+  const masterOutline = {
+    ...asRecord(project.master_outline),
+    rescueRewriteContract: contract,
+  };
+  const previousStyle = project.style_directives || {};
+  const styleDirectives = {
+    ...previousStyle,
+    focus_rescue_status: 'rewriting',
+    focus_rewrite_started_at: new Date().toISOString(),
+    focus_rewrite_from_chapter: 1,
+    production_blocked_reason: null,
+    song_xuyen_trade_payoff_contract_version: contract.version,
+    song_xuyen_rewrite_contract: contract,
+    disable_chapter_split: true,
+    codex_automation_pipeline: true,
+    codex_writer_replacement: true,
+    provider: 'codex_automation',
+  };
+  return { worldDescription, storyOutline, masterOutline, styleDirectives };
+}
+
+async function resolveFocusProject(): Promise<{ project: ProjectRow; novel: NovelRow }> {
+  const projectId = arg('project-id');
+  if (projectId) return loadProject(projectId);
+  const focusKey = arg('focus-key');
+  if (focusKey) {
+    const preset = getFocusPreset(focusKey);
+    if (!preset) throw new Error(`Unsupported focus-key: ${focusKey}`);
+    const { data, error } = await db
+      .from('ai_story_projects')
+      .select('id,novel_id,status,genre,current_chapter,total_planned_chapters,target_chapter_length,ai_model,main_character,world_description,story_outline,master_outline,style_directives,updated_at,novels!ai_story_projects_novel_id_fkey(id,title,description,genres,cover_url,cover_prompt)')
+      .contains('style_directives', { focus_key: preset.key })
+      .in('status', ['paused', 'active'])
+      .order('updated_at', { ascending: false });
+    if (error) throw error;
+
+    if (DB_MODE === 'live' && (data?.length || 0) > 1) {
+      const candidates = (data || [])
+        .map((row: unknown) => {
+          const novel = singleNovel((row as { novels?: unknown }).novels);
+          const project = row as ProjectRow;
+          return `${project.id} | ${novel?.title || 'unknown title'} | current=${project.current_chapter || 0} | status=${project.status}`;
+        })
+        .join('\n');
+      throw new Error(`Duplicate live focus projects for focus-key=${preset.key}. Refusing to auto-pick:\n${candidates}`);
+    }
+
+    const row = data?.[0];
+    const novel = singleNovel((row as { novels?: unknown } | undefined)?.novels);
+    if (!row || !novel) {
+      throw new Error(`No project found for focus-key=${preset.key}. Run prepare-new-story --focus-key=${preset.key} first.`);
+    }
+    const canonicalTitle = CANONICAL_FOCUS_TITLES[preset.key];
+    if (DB_MODE === 'live' && canonicalTitle && novel.title !== canonicalTitle) {
+      throw new Error(`Live focus-key=${preset.key} resolved to "${novel.title}", expected canonical "${canonicalTitle}". Refusing to use offline/duplicate focus.`);
+    }
+    return { project: row as ProjectRow, novel };
+  }
+
+  const { data: novels, error: novelError } = await db
+    .from('novels')
+    .select('id,title,description,genres,cover_url,cover_prompt')
+    .eq('title', DEFAULT_FOCUS_PROJECT_TITLE)
+    .limit(1);
+  if (novelError) throw novelError;
+  const novel = novels?.[0] as NovelRow | undefined;
+  if (!novel) throw new Error(`Default focus novel not found: ${DEFAULT_FOCUS_PROJECT_TITLE}. Pass --project-id=<id>.`);
+
+  const { data: project, error: projectError } = await db
+    .from('ai_story_projects')
+    .select('id,novel_id,status,genre,current_chapter,total_planned_chapters,target_chapter_length,ai_model,main_character,world_description,story_outline,master_outline,style_directives,updated_at')
+    .eq('novel_id', novel.id)
+    .order('updated_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (projectError) throw projectError;
+  if (!project) throw new Error(`No project found for default focus novel: ${DEFAULT_FOCUS_PROJECT_TITLE}`);
+  return { project: project as ProjectRow, novel };
+}
+
+async function fetchScopedRows(table: RescueArchiveTable, column: 'novel_id' | 'project_id', value: string): Promise<unknown[]> {
   const { data, error } = await db
+    .from(table)
+    .select('*')
+    .eq(column, value);
+  if (error) throw new Error(`Failed to fetch ${table}: ${error.message}`);
+  return data || [];
+}
+
+async function countScopedRows(table: RescueArchiveTable, column: 'novel_id' | 'project_id', value: string): Promise<number> {
+  const { count, error } = await db
+    .from(table)
+    .select('*', { count: 'exact', head: true })
+    .eq(column, value);
+  if (error) throw new Error(`Failed to count ${table}: ${error.message}`);
+  return count || 0;
+}
+
+async function deleteScopedRows(table: RescueArchiveTable, column: 'novel_id' | 'project_id', value: string): Promise<void> {
+  const { error } = await db.from(table).delete().eq(column, value);
+  if (error) throw new Error(`Failed to delete ${table}: ${error.message}`);
+}
+
+async function rescueRewrite(): Promise<void> {
+  const projectId = arg('project-id');
+  if (!projectId) throw new Error('rescue-rewrite requires --project-id=<project-id>');
+  const dryRun = hasFlag('dry-run');
+  const shouldArchive = hasFlag('archive');
+  const shouldWipe = hasFlag('wipe-live');
+  const shouldReset = hasFlag('reset');
+  if (!shouldArchive && !shouldWipe && !shouldReset) {
+    throw new Error('rescue-rewrite needs at least one of --archive, --wipe-live, or --reset');
+  }
+
+  const { project, novel } = await loadProject(projectId);
+  const tableValues = new Map<'novel_id' | 'project_id', string>([
+    ['novel_id', novel.id],
+    ['project_id', project.id],
+  ]);
+  const beforeCounts: Record<string, number> = {};
+  const archiveTables: Record<string, unknown[]> = {};
+
+  for (const scoped of RESCUE_TABLES) {
+    const value = tableValues.get(scoped.column);
+    if (!value) throw new Error(`Missing ${scoped.column} value for ${scoped.table}`);
+    beforeCounts[scoped.table] = await countScopedRows(scoped.table, scoped.column, value);
+    if (shouldArchive) {
+      archiveTables[scoped.table] = await fetchScopedRows(scoped.table, scoped.column, value);
+    }
+  }
+
+  let archivePath: string | null = null;
+  if (shouldArchive) {
+    archivePath = path.join(archiveRoot(), `${slugify(novel.title)}-${new Date().toISOString().replace(/[:.]/g, '-')}.json`);
+    writeFileSync(archivePath, safeJson({
+      archivedAt: new Date().toISOString(),
+      dbMode: DB_MODE,
+      reason: 'rescue-rewrite-before-live-wipe',
+      project,
+      novel,
+      counts: beforeCounts,
+      tables: archiveTables,
+    }), 'utf-8');
+  }
+
+  const bible = withSongXuyenRewriteBible(project);
+  console.log(`Rescue rewrite ${dryRun ? '(DRY RUN)' : '(APPLY)'} project=${project.id} title=${novel.title}`);
+  console.log(`archive=${archivePath || 'no'} wipe_live=${shouldWipe} reset=${shouldReset}`);
+  console.log(`before_counts=${JSON.stringify(beforeCounts)}`);
+
+  if (!dryRun && shouldWipe) {
+    for (const scoped of RESCUE_TABLES) {
+      const value = tableValues.get(scoped.column);
+      if (!value) throw new Error(`Missing ${scoped.column} value for ${scoped.table}`);
+      await deleteScopedRows(scoped.table, scoped.column, value);
+    }
+  }
+
+  if (!dryRun && shouldReset) {
+    const resetHistory = [
+      ...((project.style_directives?.focus_rewrite_history as unknown[] | undefined) || []),
+      {
+        at: new Date().toISOString(),
+        action: 'archive_wipe_reset',
+        archivePath,
+        beforeCounts,
+        reason: 'risk-heavy live draft failed Song Xuyen payoff contract',
+      },
+    ];
+    const { error: resetError } = await db.from('ai_story_projects').update({
+      current_chapter: 0,
+      status: 'paused',
+      ai_model: 'codex_automation',
+      world_description: bible.worldDescription,
+      story_outline: bible.storyOutline,
+      master_outline: bible.masterOutline,
+      style_directives: {
+        ...bible.styleDirectives,
+        focus_rewrite_history: resetHistory,
+      },
+      updated_at: new Date().toISOString(),
+    }).eq('id', project.id);
+    if (resetError) throw new Error(`Failed to reset project: ${resetError.message}`);
+  }
+
+  const afterCounts: Record<string, number> = {};
+  for (const scoped of RESCUE_TABLES) {
+    const value = tableValues.get(scoped.column);
+    if (!value) throw new Error(`Missing ${scoped.column} value for ${scoped.table}`);
+    afterCounts[scoped.table] = await countScopedRows(scoped.table, scoped.column, value);
+  }
+  const { project: afterProject } = await loadProject(project.id);
+  console.log(`after_counts=${JSON.stringify(afterCounts)}`);
+  console.log(`current_chapter=${afterProject.current_chapter || 0} status=${afterProject.status} focus_rescue_status=${afterProject.style_directives?.focus_rescue_status || 'none'}`);
+  if (archivePath) console.log(`archive_path=${archivePath}`);
+}
+
+async function findCodexProjectNeedingCover(focusKey?: string): Promise<{ project: ProjectRow; novel: NovelRow } | null> {
+  let query = db
     .from('ai_story_projects')
     .select('id,novel_id,status,genre,current_chapter,total_planned_chapters,target_chapter_length,ai_model,main_character,world_description,story_outline,master_outline,style_directives,updated_at,novels!ai_story_projects_novel_id_fkey(id,title,description,genres,cover_url,cover_prompt)')
     .contains('style_directives', { codex_automation_pipeline: true })
     .in('status', ['paused', 'active'])
     .order('updated_at', { ascending: false })
     .limit(20);
+  if (focusKey) query = query.contains('style_directives', { focus_key: focusKey });
+  const { data, error } = await query;
   if (error) throw error;
   for (const row of data || []) {
     const novel = singleNovel((row as { novels?: unknown }).novels);
@@ -310,15 +766,46 @@ async function findProjectForCodexChapter(excludeProjectIds: Set<string> = new S
     const novel = singleNovel((row as { novels?: unknown }).novels);
     if (!novel || current >= total) continue;
     if (!project.main_character || !project.world_description || !project.story_outline) continue;
+    const blocker = await latestContinuityBlocker(project, novel);
+    if (blocker) {
+      console.log(`Skip "${novel.title}" for continuity repair: ${blocker}`);
+      continue;
+    }
     return { project, novel };
   }
   return null;
 }
 
-function writeNewStoryFiles(runDir: string, genre = 'do-thi'): CodexAutomationTask {
+async function latestContinuityBlocker(project: ProjectRow, novel: NovelRow): Promise<string | null> {
+  const current = project.current_chapter || 0;
+  if (current <= 0) return null;
+
+  const [summaryRes, charactersRes, chunksRes, metricsRes] = await Promise.all([
+    db.from('chapter_summaries').select('chapter_number').eq('project_id', project.id).eq('chapter_number', current).maybeSingle(),
+    db.from('character_states').select('character_name', { count: 'exact', head: false }).eq('project_id', project.id).eq('chapter_number', current),
+    db.from('story_memory_chunks').select('id', { count: 'exact', head: false }).eq('project_id', project.id).eq('chapter_number', current),
+    db.from('quality_metrics').select('meta').eq('project_id', project.id).eq('chapter_number', current).maybeSingle(),
+  ]);
+
+  const missing: string[] = [];
+  if (!summaryRes.data) missing.push('chapter_summaries');
+  if ((charactersRes.data?.length || 0) === 0) missing.push('character_states');
+  if ((chunksRes.data?.length || 0) === 0) missing.push('story_memory_chunks');
+
+  const meta = metricsRes.data?.meta as { blocked_next_chapter_reason?: string; continuity_health?: ContinuityHealthReport } | null | undefined;
+  if (meta?.blocked_next_chapter_reason) return meta.blocked_next_chapter_reason;
+  if (meta?.continuity_health?.verdict && meta.continuity_health.verdict !== 'pass') {
+    return meta.continuity_health.blockedNextChapterReason || `latest continuity verdict=${meta.continuity_health.verdict}`;
+  }
+  if (missing.length > 0) return `latest chapter ${current} missing ${missing.join(', ')}`;
+  void novel;
+  return null;
+}
+
+function writeNewStoryFiles(runDir: string, genre = 'do-thi', focusKey?: string): CodexAutomationTask {
   const storyPath = path.join(runDir, 'story.json');
   const promptPath = path.join(runDir, 'prompt.md');
-  const template = {
+  const template = applyFocusPresetTemplate({
     title: '',
     genres: [genre],
     description: '',
@@ -343,28 +830,37 @@ function writeNewStoryFiles(runDir: string, genre = 'do-thi'): CodexAutomationTa
     storyOutline: {},
     arcPlan: [],
     totalPlannedChapters: 1000,
-  };
+  }, focusKey);
+  const preset = getFocusPreset(focusKey);
   writeFileSync(storyPath, safeJson(template), 'utf-8');
-  writeFileSync(promptPath, buildNewStoryPrompt(genre, runDir), 'utf-8');
+  writeFileSync(promptPath, buildNewStoryPrompt((preset?.primaryGenre || genre), runDir, focusKey), 'utf-8');
   return {
     type: 'new_story',
     runDir,
     status: 'prepared',
     promptPath,
     inputPath: storyPath,
-    dryRunCommand: `npm run codex:automation -- apply-new-story --run-dir=${runDir}`,
-    applyCommand: `npm run codex:automation -- apply-new-story --run-dir=${runDir} --apply`,
+    dryRunCommand: `npm run codex:automation -- apply-new-story --run-dir=${runDir}${focusKey ? ` --focus-key=${focusKey}` : ''}`,
+    applyCommand: `npm run codex:automation -- apply-new-story --run-dir=${runDir}${focusKey ? ` --focus-key=${focusKey}` : ''} --apply`,
   };
 }
 
-function buildNewStoryPrompt(genre: string, runDir: string): string {
+function buildNewStoryPrompt(genre: string, runDir: string, focusKey?: string): string {
+  const preset = getFocusPreset(focusKey);
+  const genreKnowledgeContext = buildGenreKnowledgeContext(genre as GenreType, preset?.subGenres || []);
+  const focusPresetContext = buildFocusPresetContext(focusKey);
   return [
     '# Codex Automation: tạo truyện mới',
     '',
     'Điền file `story.json` trong thư mục này. Không gọi DeepSeek/Gemini/text API ngoài.',
     '',
+    genreKnowledgeContext,
+    focusPresetContext ? ['', focusPresetContext].join('\n') : '',
+    '',
     'Yêu cầu:',
-    `- Thể loại chính: ${genre}. Có thể thêm tối đa 3 subgenre hợp lý.`,
+    `- Thể loại chính: ${genre}. ${preset ? `Bắt buộc subgenres: ${preset.subGenres.join(', ')}.` : 'Có thể thêm tối đa 3 subgenre hợp lý.'}`,
+    `- BẮT BUỘC bám GENRE KNOWLEDGE CORE version ${GENRE_KNOWLEDGE_PACK_VERSION}: topic, setup, worldbuilding, MC archetype, opening engine, ladder dài hạn.`,
+    preset ? `- BẮT BUỘC metadata focusKey="${preset.key}" trong story.json và setup bám preset Song Xuyên.` : '',
     '- Viết tiếng Việt, webnovel hiện đại, đọc cuốn ngay từ setup.',
     '- Phải có reader fantasy cụ thể, MC chủ động, benefit loop rõ, phase 1 playground đủ cảnh lặp.',
     '- Description là giới thiệu public 250-500 chữ, hấp dẫn nhưng không leak prompt.',
@@ -374,16 +870,20 @@ function buildNewStoryPrompt(genre: string, runDir: string): string {
     '- Cover prompt bằng tiếng Anh, dành cho ảnh bìa 3:4, không dùng watermark ngoài title và Truyencity.com.',
     '',
     'Sau khi điền xong:',
-    `npm run codex:automation -- apply-new-story --run-dir=${runDir}`,
-    `npm run codex:automation -- apply-new-story --run-dir=${runDir} --apply`,
+    `npm run codex:automation -- apply-new-story --run-dir=${runDir}${focusKey ? ` --focus-key=${focusKey}` : ''}`,
+    `npm run codex:automation -- apply-new-story --run-dir=${runDir}${focusKey ? ` --focus-key=${focusKey}` : ''} --apply`,
     '',
     'Lưu ý: command thật sẽ được in trong manifest; dùng đúng run-dir của task.',
   ].join('\n');
 }
 
 async function prepareNewStory(): Promise<void> {
-  const runDir = makeRunDir(`new-story-${slugify(arg('genre') || 'do-thi')}`);
-  const task = writeNewStoryFiles(runDir, arg('genre') || 'do-thi');
+  const focusKey = arg('focus-key');
+  const preset = getFocusPreset(focusKey);
+  if (focusKey && !preset) throw new Error(`Unsupported focus-key: ${focusKey}`);
+  const genre = preset?.primaryGenre || arg('genre') || 'do-thi';
+  const runDir = makeRunDir(`new-story-${slugify(focusKey || genre)}`);
+  const task = writeNewStoryFiles(runDir, genre, focusKey);
   console.log(`Prepared new story task: ${runDir}`);
   console.log(`Prompt: ${task.promptPath}`);
   console.log(`Fill: ${task.inputPath}`);
@@ -398,11 +898,24 @@ async function applyNewStory(): Promise<void> {
   const storyPath = path.join(runDir, 'story.json');
   if (!existsSync(storyPath)) throw new Error(`Missing ${storyPath}`);
   const apply = hasFlag('apply');
-  const payload = parseStoryFactoryPayload(JSON.parse(readFileSync(storyPath, 'utf-8')));
+  const rawStory = JSON.parse(readFileSync(storyPath, 'utf-8'));
+  const payload = parseStoryFactoryPayload(rawStory);
+  const focusKey = arg('focus-key') || payload.focusKey;
+  if (focusKey && !isFocusKey(focusKey)) throw new Error(`Unsupported focus-key: ${focusKey}`);
+  const knowledgeReport = validateKnowledgeCoverage(payload);
+  const focusReport = validateFocusPresetStorySetup(payload, focusKey);
   console.log(`Codex new story ${apply ? '(APPLY)' : '(DRY RUN)'}: ${payload.title}`);
   console.log(`genres=${payload.genres.join(',')} chapters=${payload.totalPlannedChapters}`);
+  console.log(formatKnowledgeAlignmentReport(knowledgeReport));
+  if (focusKey) console.log(formatFocusPresetReport(focusReport));
+  if (knowledgeReport.verdict !== 'pass') {
+    throw new Error(`Story setup failed genre knowledge alignment: ${knowledgeReport.verdict}`);
+  }
+  if (focusReport.verdict !== 'pass') {
+    throw new Error(`Story setup failed focus preset alignment: ${focusReport.verdict}`);
+  }
   if (!apply) {
-    console.log('Dry run passed story factory contract. Add --apply to insert novel + project.');
+    console.log('Dry run passed story factory + genre knowledge contracts. Add --apply to insert novel + project.');
     return;
   }
 
@@ -432,6 +945,15 @@ async function applyNewStory(): Promise<void> {
       provider: 'codex_automation',
       createdAt: now,
       runDir,
+      focusKey: focusKey || null,
+      genreKnowledge: {
+        packVersion: knowledgeReport.packVersion,
+        primaryGenre: knowledgeReport.genre,
+        subGenres: knowledgeReport.subGenres,
+        benchmarkFamilies: knowledgeReport.benchmarkFamilies,
+        riskNotes: knowledgeReport.riskNotes,
+        alignmentReport: knowledgeReport,
+      },
     },
   };
 
@@ -462,6 +984,12 @@ async function applyNewStory(): Promise<void> {
       codex_manual_pipeline: false,
       provider: 'codex_automation',
       run_dir: runDir,
+      focus_key: focusKey || null,
+      focus_preset_report: focusKey ? focusReport : null,
+      genre_knowledge_pack_version: knowledgeReport.packVersion,
+      genre_knowledge_primary: knowledgeReport.genre,
+      genre_knowledge_benchmark_families: knowledgeReport.benchmarkFamilies,
+      knowledge_alignment: knowledgeReport.verdict,
     },
     updated_at: now,
   };
@@ -518,8 +1046,10 @@ function writeCoverFiles(runDir: string, project: ProjectRow, novel: NovelRow): 
 
 function buildCleanCoverPrompt(novel: NovelRow, project: ProjectRow): string {
   const base = novel.cover_prompt || `Premium Vietnamese webnovel cover for "${novel.title}", genre ${(novel.genres || [project.genre || 'webnovel']).join(', ')}, 3:4 cover art, title text area, Truyencity.com small footer.`;
+  const preset = getFocusPreset(project.style_directives?.focus_key as string | undefined);
   return [
     base,
+    ...(preset ? ['', 'FOCUS PRESET COVER HINTS:', ...preset.coverPromptHints.map((hint) => `- ${hint}`)] : []),
     '',
     'STYLE OVERRIDE FOR CLEAN PREMIUM COVER:',
     '- Editorial-realistic, crisp, beautiful, modern commercial book cover.',
@@ -533,6 +1063,7 @@ function buildCleanCoverPrompt(novel: NovelRow, project: ProjectRow): string {
 
 async function prepareCover(): Promise<void> {
   const novelId = arg('novel-id');
+  const focusKey = arg('focus-key');
   let candidate: { project: ProjectRow; novel: NovelRow } | null = null;
   if (novelId) {
     const { data, error } = await db
@@ -544,7 +1075,7 @@ async function prepareCover(): Promise<void> {
     const novel = singleNovel((data as { novels?: unknown } | null)?.novels);
     if (data && novel) candidate = { project: data as ProjectRow, novel };
   } else {
-    candidate = await findCodexProjectNeedingCover();
+    candidate = await findCodexProjectNeedingCover(focusKey);
   }
   if (!candidate) throw new Error('No Codex automation novel needing cover found');
   const runDir = makeRunDir(`cover-${slugify(candidate.novel.title)}`);
@@ -624,7 +1155,138 @@ async function loadProject(projectId: string): Promise<{ project: ProjectRow; no
   return { project: project as ProjectRow, novel: novel as NovelRow };
 }
 
+async function evaluateCompletionReadiness(project: ProjectRow, novel: NovelRow): Promise<CompletionReadinessReport> {
+  const styleDirectives = project.style_directives || {};
+  const forecastChapters = Number(styleDirectives.forecast_chapters || project.total_planned_chapters || 1000);
+  const [metricsRes, threadsRes] = await Promise.all([
+    db
+      .from('quality_metrics')
+      .select('chapter_number,overall_score,ending_hook_score,meta')
+      .eq('project_id', project.id)
+      .order('chapter_number', { ascending: false })
+      .limit(20),
+    db
+      .from('plot_threads')
+      .select('priority,status,target_payoff_chapter,payoff_description')
+      .eq('project_id', project.id),
+  ]);
+  if (metricsRes.error) throw metricsRes.error;
+  if (threadsRes.error) throw threadsRes.error;
+
+  const metrics = (metricsRes.data || []) as Array<{
+    chapter_number: number;
+    overall_score: number | null;
+    ending_hook_score: number | null;
+    meta: Record<string, unknown> | null;
+  }>;
+  const latestMetric = metrics[0];
+  const scores = metrics.map(metricScore100).filter((score): score is number => typeof score === 'number');
+  const verdicts = metrics.map(metricQualityVerdict).filter(Boolean);
+  const recentPassCount = verdicts.filter((verdict) => verdict === 'pass').length;
+  const recentBlockCount = verdicts.filter((verdict) => verdict === 'block').length;
+  const recentReviseCount = verdicts.filter((verdict) => verdict === 'revise').length;
+  const recentAverageScore = scores.length ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length) : null;
+  const recentPassRate = verdicts.length ? Number((recentPassCount / verdicts.length).toFixed(2)) : null;
+  const windows = [metrics.slice(0, 5), metrics.slice(5, 10), metrics.slice(10, 15), metrics.slice(15, 20)].filter((window) => window.length >= 5);
+  const recentEndingGreenWindows = windows.filter((window) =>
+    window.every((metric) => (metric.ending_hook_score ?? 0) >= 7 && metricQualityVerdict(metric) === 'pass')
+  ).length;
+
+  const threads = (threadsRes.data || []) as Array<{
+    status: string | null;
+    priority: string | null;
+    target_payoff_chapter: number | null;
+    payoff_description: string | null;
+  }>;
+  const openThreads = threads.filter((thread) => thread.status !== 'resolved' && thread.status !== 'legacy');
+  const openCriticalThreads = openThreads.filter((thread) => thread.priority === 'critical').length;
+  const openMainThreads = openThreads.filter((thread) => thread.priority === 'main').length;
+  const openSubThreads = openThreads.filter((thread) => thread.priority !== 'critical' && thread.priority !== 'main').length;
+  const majorThreadsWithPayoffPlan = openThreads.filter((thread) =>
+    (thread.priority === 'critical' || thread.priority === 'main') &&
+    (thread.target_payoff_chapter || thread.payoff_description)
+  ).length;
+
+  void novel;
+  return evaluateCompletionReadinessFacts({
+    projectId: project.id,
+    currentChapter: project.current_chapter || 0,
+    forecastChapters,
+    finaleMode: styleDirectives.focus_bulk_stage === 'finale' || styleDirectives.finale_mode === true,
+    finalChapterClosed: styleDirectives.final_chapter_closed === true,
+    latestContinuityVerdict: latestMetric ? metricContinuityVerdict(latestMetric) : null,
+    latestMemoryOk: latestMetric ? ((latestMetric.meta?.health as { ok?: boolean } | undefined)?.ok ?? null) : null,
+    latestQualityVerdict: latestMetric ? metricQualityVerdict(latestMetric) : null,
+    recentPassRate,
+    recentAverageScore,
+    recentBlockCount,
+    recentReviseCount,
+    recentEndingGreenWindows,
+    openCriticalThreads,
+    openMainThreads,
+    openSubThreads,
+    majorThreadsWithPayoffPlan,
+    unresolvedCliffhanger: styleDirectives.unresolved_cliffhanger === true,
+  });
+}
+
+async function applyCompletionDirectives(
+  project: ProjectRow,
+  novel: NovelRow,
+  report: CompletionReadinessReport,
+  dryRun: boolean,
+): Promise<ProjectRow> {
+  const now = new Date().toISOString();
+  let styleDirectives = appendForecastHistory(project.style_directives, report, now);
+  styleDirectives = {
+    ...styleDirectives,
+    codex_focus_bulk: true,
+    focus_bulk_last_readiness: report,
+    focus_bulk_last_checked_at: now,
+  };
+  if (report.shouldEnterFinale) {
+    styleDirectives = {
+      ...styleDirectives,
+      focus_bulk_stage: 'finale',
+      finale_mode: true,
+      finale_entered_at: (styleDirectives.finale_entered_at as string | undefined) || now,
+    };
+  }
+
+  if (dryRun) return { ...project, style_directives: styleDirectives };
+
+  const projectUpdate: Record<string, unknown> = {
+    style_directives: styleDirectives,
+    updated_at: now,
+  };
+  if (report.shouldExtendForecast && report.nextForecastChapters) {
+    projectUpdate.total_planned_chapters = report.nextForecastChapters;
+  }
+  if (report.shouldMarkCompleted) {
+    projectUpdate.status = 'completed';
+    projectUpdate.setup_stage = 'completed';
+  }
+  const { data: updatedProject, error: projectError } = await db
+    .from('ai_story_projects')
+    .update(projectUpdate)
+    .eq('id', project.id)
+    .select('id,novel_id,status,genre,current_chapter,total_planned_chapters,target_chapter_length,ai_model,main_character,world_description,story_outline,master_outline,style_directives,updated_at')
+    .maybeSingle();
+  if (projectError) throw projectError;
+  if (report.shouldMarkCompleted) {
+    const { error: novelError } = await db.from('novels').update({ status: 'Hoàn thành' }).eq('id', novel.id);
+    if (novelError) throw novelError;
+  }
+  return (updatedProject as ProjectRow | null) || { ...project, ...projectUpdate };
+}
+
 function buildChapterPrompt(meta: ChapterRunMeta, novel: NovelRow, project: ProjectRow, context: string): string {
+  const finaleMode = project.style_directives?.focus_bulk_stage === 'finale' || project.style_directives?.finale_mode === true;
+  const focusKey = project.style_directives?.focus_key as string | undefined;
+  const focusPresetContext = buildFocusPresetContext(focusKey);
+  const rescueStatus = project.style_directives?.focus_rescue_status;
+  const rescue = project.style_directives?.focus_rescue as { reason?: string; new_supreme_contract?: unknown; openingRewriteDirection?: unknown } | undefined;
+  const rewriteContract = project.style_directives?.song_xuyen_rewrite_contract || project.style_directives?.focus_rescue;
   return [
     '# Codex Automation: viết chương truyện',
     '',
@@ -648,6 +1310,91 @@ function buildChapterPrompt(meta: ChapterRunMeta, novel: NovelRow, project: Proj
     '- Không leak marker context như [WORLD DESCRIPTION], [STORY KERNEL], [VOLUME CONTEXT].',
     '- Đây là drop-in replacement cho writer API cũ: giữ canon, arc, summaries, state và nhịp truyện từ context; chỉ thay người viết bằng Codex.',
     '- Nếu truyện cũ đang ở chương sâu, tiếp tục đúng mạch hiện tại, không reset premise, không đổi MC, không giới thiệu lại từ đầu.',
+    finaleMode
+      ? '- FOCUS BULK FINALE MODE: gom tuyến đã gieo, trả payoff có thứ tự, không mở đại tuyến mới trừ khi cần cho epilogue.'
+      : '- FOCUS BULK CONTINUE MODE: tiếp tục mở rộng tuyến đang có, không ép kết chỉ vì chạm forecast chapter.',
+    rescueStatus === 'needs_rewrite' || rescueStatus === 'rewriting'
+      ? '- RESCUE REWRITE MODE: viết lại từ chương 1 theo contract mới; không tiếp tục nhịp procedural/risk-heavy của bản cũ.'
+      : '',
+    '',
+    'CONTINUITY ARTIFACT BẮT BUỘC:',
+    '- Sau khi viết `chapter.md`, điền file `continuity.json` trong cùng thư mục.',
+    '- Artifact này thay cho semantic extraction API cũ; không gọi DeepSeek/Gemini.',
+    '- Ghi đủ summary, openingSentence, mcState, cliffhanger, characters, timeline, itemEvents, plotThreads, relationships, economicLedger, factions.',
+    '- Ghi readerPayoff: tradeDividend/progressionDelta/comfortOrSwaggerBeat/nextProfitHook để quality gate nhìn thấy chương này trả sảng gì cho độc giả.',
+    '- characters BẮT BUỘC có MC và các nhân vật có tên xuất hiện trong chương.',
+    '- itemEvents chỉ ghi vật phẩm/tài nguyên thật sự quan trọng; nếu dùng/mất item thì ledger phải có nguồn sở hữu.',
+    '- plotThreads chỉ ghi promise dài hạn hoặc tuyến được đóng/mở rõ, không ghi beat nhỏ một chương.',
+    focusKey === 'song-xuyen-trade'
+      ? '- SONG XUYEN: mọi giao dịch/vận chuyển/bù trừ giá trị PHẢI ghi itemEvents + economicLedger + tradeLedger + worldStateDeltas; không để hàng hóa/tài nguyên xuất hiện không nguồn.'
+      : '',
+    focusKey === 'song-xuyen-trade'
+      ? '- SONG XUYEN SẢNG PAYOFF: mỗi chương phải cho MC lãi rõ một thứ cụ thể (tiền/hàng/khách/quyền route/dữ liệu giá/uy tín faction/giấy phép/hợp đồng/đòn bẩy). Không viết chuỗi chương chỉ khổ, chỉ bị dí, chỉ dập cháy.'
+      : '',
+    focusKey === 'song-xuyen-trade'
+      ? '- SONG XUYEN MODERN WEBNOVEL: nguy cơ chỉ là gia vị. Core chapter loop phải là: phát hiện chênh lệch -> thao tác logistics/thông tin -> ăn lợi ích -> bị thế giới phản ứng -> mở cơ hội kiếm lợi lớn hơn. Không viết kiểu ngược văn nơi main càng làm càng khổ mà không lãi.'
+      : '',
+    focusKey === 'sang-the-than-minh'
+      ? '- SANG THE: mọi thay đổi về Thần Vực/tiểu thế giới, pháp tắc, sinh thái, chủng tộc/quyến thuộc, tín ngưỡng, tài nguyên và cấp bậc PHẢI ghi worldStateDeltas + factions/plotThreads + itemEvents/economicLedger nếu có tài nguyên; không nâng cấp thế giới vô nguồn.'
+      : '',
+    focusKey === 'thien-dao-thu-vien'
+      ? '- THIEN DAO THU VIEN: khi đăng chương/sách hoặc có độc giả lĩnh ngộ, continuity.json PHẢI ghi tác phẩm đang viết, võ học/công pháp phát sinh, độc giả/faction phản ứng, danh vọng/điểm công nhận/quyền đăng và payoff cho MC.'
+      : '',
+    focusKey === 'thien-dao-thu-vien'
+      ? '- THIEN DAO TAC GIA SẢNG PAYOFF: mỗi chương phải có dopamine loop Tác Gia: viết/đăng -> độc giả nhập tâm/lĩnh ngộ -> bảng xếp hạng/thư bình/Thiên Đạo công nhận -> Lâm Mặc có lợi ích cụ thể. Không biến thành thuần combat võ giả.'
+      : '',
+    focusPresetContext ? ['', focusPresetContext].join('\n') : '',
+    rewriteContract
+      ? [
+          '',
+          '[FOCUS RESCUE CONTRACT]',
+          rescue?.reason ? `Reason: ${rescue.reason}` : '',
+          JSON.stringify(rewriteContract, null, 2),
+          '[/FOCUS RESCUE CONTRACT]',
+        ].filter(Boolean).join('\n')
+      : '',
+    '',
+    'continuity.json schema mẫu:',
+    '```json',
+    JSON.stringify({
+      summary: '2-5 câu, có tên MC, nêu sự kiện và payoff chính của chương.',
+      openingSentence: 'Câu mở đầu chương, nguyên văn hoặc gần nguyên văn.',
+      mcState: 'Trạng thái cuối chương của MC: vị trí, mục tiêu, tài nguyên, quan hệ, vấn đề còn mở.',
+      cliffhanger: 'Tình huống hoặc câu hỏi kéo chương sau.',
+      readerPayoff: {
+        tradeDividend: 'MC lãi cụ thể gì trong chương: tiền, hàng, khách, quyền route, dữ liệu giá, uy tín, giấy phép, hợp đồng, nguồn cung, đòn bẩy.',
+        progressionDelta: 'MC mạnh lên/giàu lên/kiểm soát tốt hơn ở điểm nào, đo được ra sao.',
+        comfortOrSwaggerBeat: 'Khoảnh khắc sảng/đã: chốt deal, người khác công nhận, main xử lý gọn, lợi thế hiện ra.',
+        nextProfitHook: 'Cơ hội kiếm lợi kế tiếp, không chỉ nguy cơ kế tiếp.',
+      },
+      characters: [
+        {
+          characterName: meta.protagonistName,
+          status: 'alive',
+          powerLevel: null,
+          powerRealmIndex: null,
+          location: null,
+          personalityQuirks: null,
+          notes: 'Biến động trạng thái quan trọng trong chương.',
+        },
+      ],
+      timeline: {
+        inWorldDateText: null,
+        daysElapsedSinceStart: null,
+        season: null,
+        mcAge: null,
+        explicitInChapter: false,
+        notes: null,
+      },
+      itemEvents: [],
+      plotThreads: [],
+      relationships: [],
+      economicLedger: [],
+      tradeLedger: [],
+      worldStateDeltas: [],
+      factions: [],
+    }, null, 2),
+    '```',
     '',
     'CONTEXT:',
     '```text',
@@ -656,11 +1403,57 @@ function buildChapterPrompt(meta: ChapterRunMeta, novel: NovelRow, project: Proj
   ].join('\n');
 }
 
-async function writeChapterFiles(runDir: string, project: ProjectRow, novel: NovelRow): Promise<CodexAutomationTask> {
+async function writeChapterFiles(
+  runDir: string,
+  project: ProjectRow,
+  novel: NovelRow,
+  options: { focusKey?: string | null; lockToken?: string | null } = {},
+): Promise<CodexAutomationTask> {
   const chapterNumber = numberArg('chapter', (project.current_chapter || 0) + 1);
   const targetWords = numberArg('target-words', Math.max(2200, project.target_chapter_length || 2400));
   const minWords = numberArg('min-words', Math.min(2000, Math.floor(targetWords * 0.82)));
   const contextPayload = await loadContext(project.id, novel.id, chapterNumber);
+  const characters = contextPayload.knownCharacterNames.length > 0
+    ? contextPayload.knownCharacterNames
+    : [project.main_character || 'nhan vat chinh'];
+  const arcNumber = Math.ceil(chapterNumber / 20);
+  try {
+    const [ragCtx, entityCtx, themeCtx, plotCtx, beatCtx, ruleCtx] = await Promise.all([
+      retrieveRAGContext(
+        project.id,
+        chapterNumber,
+        contextPayload.arcPlan?.slice(0, 300) || null,
+        contextPayload.previousCliffhanger || null,
+        project.main_character || 'nhan vat chinh',
+      ).catch(() => null),
+      retrieveEntityContext(project.id, chapterNumber, characters).catch(() => null),
+      retrieveThemeContext(
+        project.id,
+        chapterNumber,
+        contextPayload.arcPlan?.slice(0, 200) || null,
+        contextPayload.synopsis?.slice(0, 200) || null,
+      ).catch(() => null),
+      buildPlotThreadContext(project.id, chapterNumber, characters, arcNumber).catch(() => null),
+      buildBeatContext(project.id, chapterNumber, arcNumber).catch(() => null),
+      buildRuleContext(
+        project.id,
+        chapterNumber,
+        [
+          contextPayload.previousCliffhanger || '',
+          contextPayload.chapterBrief || '',
+          (contextPayload.arcPlan || '').slice(0, 800),
+        ].filter(Boolean).join('\n').slice(0, 2000),
+        characters,
+      ).catch(() => null),
+    ]);
+    const ragParts = [ragCtx, entityCtx, themeCtx].filter(Boolean) as string[];
+    if (ragParts.length > 0) contextPayload.ragContext = smartTruncate(ragParts.join('\n\n'), 6000);
+    if (plotCtx) contextPayload.plotThreads = plotCtx;
+    if (beatCtx) contextPayload.beatGuidance = beatCtx;
+    if (ruleCtx) contextPayload.worldRules = ruleCtx;
+  } catch {
+    // Non-fatal; base context is still enough for dry-run repair flows.
+  }
   const context = assembleContext(contextPayload, chapterNumber);
   const meta: ChapterRunMeta = {
     projectId: project.id,
@@ -675,13 +1468,52 @@ async function writeChapterFiles(runDir: string, project: ProjectRow, novel: Nov
     preparedAt: new Date().toISOString(),
     sourceProjectStatus: project.status,
     sourceAiModel: project.ai_model || null,
+    focusKey: options.focusKey || (project.style_directives?.focus_key as string | undefined) || null,
+    lockToken: options.lockToken || null,
   };
   const metaPath = path.join(runDir, 'meta.json');
   const promptPath = path.join(runDir, 'prompt.md');
   const chapterPath = path.join(runDir, 'chapter.md');
+  const continuityPath = path.join(runDir, 'continuity.json');
   writeFileSync(metaPath, safeJson(meta), 'utf-8');
   writeFileSync(path.join(runDir, 'context.txt'), context, 'utf-8');
   writeFileSync(chapterPath, `# ${novel.title} - Chương ${chapterNumber}\n\n`, 'utf-8');
+  writeFileSync(continuityPath, safeJson({
+    summary: '',
+    openingSentence: '',
+      mcState: '',
+      cliffhanger: '',
+      readerPayoff: {
+        tradeDividend: null,
+        progressionDelta: null,
+        comfortOrSwaggerBeat: null,
+        nextProfitHook: null,
+      },
+      characters: [{
+      characterName: meta.protagonistName,
+      status: 'alive',
+      powerLevel: null,
+      powerRealmIndex: null,
+      location: null,
+      personalityQuirks: null,
+      notes: '',
+    }],
+    timeline: {
+      inWorldDateText: null,
+      daysElapsedSinceStart: null,
+      season: null,
+      mcAge: null,
+      explicitInChapter: false,
+      notes: null,
+    },
+    itemEvents: [],
+    plotThreads: [],
+    relationships: [],
+    economicLedger: [],
+    tradeLedger: [],
+    worldStateDeltas: [],
+    factions: [],
+  }), 'utf-8');
   writeFileSync(promptPath, buildChapterPrompt(meta, novel, project, context), 'utf-8');
   return {
     type: 'chapter',
@@ -706,6 +1538,7 @@ async function prepareChapter(): Promise<void> {
   console.log(`Prepared chapter task: ${runDir}`);
   console.log(`Prompt: ${task.promptPath}`);
   console.log(`Write: ${task.inputPath}`);
+  console.log(`Fill continuity: ${path.join(runDir, 'continuity.json')}`);
   console.log(`Dry run: ${task.dryRunCommand}`);
   console.log(`Apply: ${task.applyCommand}`);
 }
@@ -726,18 +1559,30 @@ function printQualityReport(report: ChapterQualityReport): void {
   for (const fix of report.suggestedFixes) console.log(`fix: ${fix}`);
 }
 
+function printContinuityReport(report: ContinuityHealthReport): void {
+  console.log(`continuity_verdict=${report.verdict}`);
+  if (Object.keys(report.memoryRowsWritten).length > 0) {
+    console.log(`memory_rows=${JSON.stringify(report.memoryRowsWritten)}`);
+  }
+  for (const issue of report.issues) console.log(`- [${issue.severity}] ${issue.code}: ${issue.message}`);
+  if (report.blockedNextChapterReason) console.log(`blocked_next_chapter_reason=${report.blockedNextChapterReason}`);
+}
+
 async function applyChapter(): Promise<void> {
   const runDirArg = arg('run-dir');
   if (!runDirArg) throw new Error('apply-chapter requires --run-dir=<path>');
   const runDir = normalizeRunDir(runDirArg);
   const metaPath = path.join(runDir, 'meta.json');
   const chapterPath = path.join(runDir, 'chapter.md');
+  const continuityPath = path.join(runDir, 'continuity.json');
   if (!existsSync(metaPath)) throw new Error(`Missing ${metaPath}`);
   if (!existsSync(chapterPath)) throw new Error(`Missing ${chapterPath}`);
+  if (!existsSync(continuityPath)) throw new Error(`Missing ${continuityPath}. Codex apply now requires continuity.json.`);
   const apply = hasFlag('apply');
   const meta = JSON.parse(readFileSync(metaPath, 'utf-8')) as ChapterRunMeta;
   const { project, novel } = await loadProject(meta.projectId);
   const { title, content } = extractTitleAndContent(readFileSync(chapterPath, 'utf-8'));
+  const continuityPayload = parseContinuityExtractionPayload(JSON.parse(readFileSync(continuityPath, 'utf-8')));
   const words = wordCount(content);
   const qualityReport = evaluateChapterQuality(content, {
     title,
@@ -747,16 +1592,35 @@ async function applyChapter(): Promise<void> {
     genre: meta.genre,
     worldDescription: project.world_description,
   });
+  const continuityContext = await loadContinuityEvaluationContext(
+    db,
+    meta.projectId,
+    meta.chapterNumber,
+    meta.protagonistName,
+  );
+  const continuityReport = evaluateContinuityExtraction(continuityPayload, continuityContext);
+  const focusKey = project.style_directives?.focus_key as string | undefined;
+  const focusContinuityReport = validateFocusPresetContinuity(continuityPayload, focusKey);
 
   console.log(`Codex automation chapter ${apply ? '(APPLY)' : '(DRY RUN)'}\nproject=${meta.projectId}\nnovel=${novel.title}\nchapter=${meta.chapterNumber}\ntitle=${title}\nwords=${words}`);
   printQualityReport(qualityReport);
+  printContinuityReport(continuityReport);
+  if (focusKey) console.log(formatFocusPresetReport(focusContinuityReport));
 
   if (qualityReport.verdict !== 'pass') {
     console.error(`Quality contract failed with verdict=${qualityReport.verdict}. Chapter was NOT written to DB.`);
     process.exit(1);
   }
+  if (continuityReport.verdict !== 'pass') {
+    console.error(`Continuity contract failed with verdict=${continuityReport.verdict}. Chapter was NOT written to DB.`);
+    process.exit(1);
+  }
+  if (focusContinuityReport.verdict !== 'pass') {
+    console.error(`Focus continuity contract failed with verdict=${focusContinuityReport.verdict}. Chapter was NOT written to DB.`);
+    process.exit(1);
+  }
   if (!apply) {
-    console.log('Dry run passed quality contract. Add --apply to write chapter, summary, quality_metrics, and current_chapter.');
+    console.log('Dry run passed quality + continuity contracts. Add --apply to write chapter, memory spine, quality_metrics, and current_chapter.');
     return;
   }
 
@@ -770,16 +1634,33 @@ async function applyChapter(): Promise<void> {
   }, { onConflict: 'novel_id,chapter_number' });
   if (chapterError) throw chapterError;
 
-  const { error: summaryError } = await db.from('chapter_summaries').upsert({
-    project_id: meta.projectId,
-    chapter_number: meta.chapterNumber,
+  const memoryRowsWritten = await persistContinuityMemory({
+    db,
+    projectId: meta.projectId,
+    novelId: meta.novelId,
+    chapterNumber: meta.chapterNumber,
     title,
-    summary: buildSummary(content),
-    opening_sentence: firstSentence(content),
-    mc_state: `${meta.protagonistName} đã tiến thêm một bước sau chương ${meta.chapterNumber}.`,
-    cliffhanger: lastParagraph(content),
-  }, { onConflict: 'project_id,chapter_number' });
-  if (summaryError) throw summaryError;
+    content,
+    protagonistName: meta.protagonistName,
+    payload: continuityPayload,
+  });
+  const memoryHealth = await postWriteHealthCheck(meta.projectId, meta.chapterNumber);
+  const appliedContinuityHealth: ContinuityHealthReport = {
+    ...continuityReport,
+    memoryRowsWritten,
+    issues: [
+      ...continuityReport.issues,
+      ...memoryHealth.warnings.map((warning) => ({
+        code: 'post_write_memory_missing',
+        severity: 'major' as const,
+        message: warning,
+      })),
+    ],
+    verdict: memoryHealth.warnings.length > 0 ? 'revise' : continuityReport.verdict,
+    blockedNextChapterReason: memoryHealth.warnings.length > 0
+      ? memoryHealth.warnings.join('; ')
+      : continuityReport.blockedNextChapterReason || null,
+  };
 
   const { error: metricsError } = await db.from('quality_metrics').upsert({
     project_id: meta.projectId,
@@ -811,6 +1692,17 @@ async function applyChapter(): Promise<void> {
       target_words: meta.targetWords,
       min_words: meta.minWords,
       quality_contract: qualityReport,
+      continuity_health: appliedContinuityHealth,
+      focus_continuity: focusKey ? focusContinuityReport : null,
+      memory_rows_written: memoryRowsWritten,
+      blocked_next_chapter_reason: appliedContinuityHealth.blockedNextChapterReason || null,
+      health: {
+        ok: memoryHealth.warnings.length === 0,
+        character_states: memoryHealth.characterStateCount,
+        has_summary: memoryHealth.hasChapterSummary,
+        rag_chunks: memoryHealth.ragChunkCount,
+        warnings: memoryHealth.warnings,
+      },
     },
   }, { onConflict: 'project_id,chapter_number' });
   if (metricsError) throw metricsError;
@@ -832,6 +1724,10 @@ async function applyChapter(): Promise<void> {
     })
     .eq('id', meta.projectId);
   if (projectError) throw projectError;
+
+  const { project: refreshedProject } = await loadProject(meta.projectId);
+  console.log(`refreshed_current_chapter=${refreshedProject.current_chapter || 0}`);
+  releaseFocusLock(meta.focusKey, meta.lockToken);
   console.log(`Applied Codex automation chapter ${meta.chapterNumber} to "${novel.title}".`);
 }
 
@@ -862,7 +1758,8 @@ async function plan(): Promise<void> {
     tasks.push(writeNewStoryFiles(storyRunDir, arg('genre') || 'do-thi'));
   }
 
-  for (let i = 0; i < quotas.maxChapters; i++) {
+  const remainingChapterSlots = Math.max(0, quotas.maxChapters - quotas.chaptersToday);
+  for (let i = 0; i < remainingChapterSlots; i++) {
     const chapterCandidate = await findProjectForCodexChapter(plannedProjectIds);
     if (chapterCandidate) {
       plannedProjectIds.add(chapterCandidate.project.id);
@@ -902,15 +1799,330 @@ async function plan(): Promise<void> {
   if (tasks.length === 0) console.log('No task selected; QA-slow quotas are filled or no eligible Codex project exists.');
 }
 
+function printCompletionReadiness(report: CompletionReadinessReport): void {
+  console.log(`completion_readiness=${report.verdict} current=${report.currentChapter} forecast=${report.forecastChapters}`);
+  console.log(`metrics=${JSON.stringify(report.metrics)}`);
+  if (report.shouldExtendForecast) console.log(`forecast_extend=${report.forecastChapters}->${report.nextForecastChapters}`);
+  if (report.shouldEnterFinale) console.log('finale_mode=enter');
+  if (report.shouldMarkCompleted) console.log('completion=mark_completed');
+  for (const reason of report.reasons) console.log(`reason: ${reason}`);
+  for (const blocker of report.blockers) console.log(`blocker: ${blocker}`);
+}
+
+async function focusBulk(): Promise<void> {
+  const dryRun = hasFlag('dry-run') || !hasFlag('apply');
+  const maxChapters = numberArg('max-chapters', 1);
+  const stopMode = arg('stop') || 'ending-ready';
+  const initial = await resolveFocusProject();
+  const focusKey = arg('focus-key') || (initial.project.style_directives?.focus_key as string | undefined);
+  const rewriteFromStart = hasFlag('rewrite-from-start');
+  const runDir = makeRunDir(`focus-bulk-${slugify(initial.novel.title)}`);
+  console.log(`focus_project=${initial.project.id} title=${initial.novel.title} current_chapter=${initial.project.current_chapter || 0}`);
+  if (initial.project.style_directives?.focus_rescue_status === 'needs_rewrite' && !rewriteFromStart) {
+    const reportPath = path.join(runDir, 'focus-report.json');
+    writeFileSync(reportPath, safeJson({
+      projectId: initial.project.id,
+      novelId: initial.novel.id,
+      title: initial.novel.title,
+      blocked: true,
+      reason: 'focus rescue requires rewrite from chapter 1 before continuing',
+      rescue: initial.project.style_directives?.focus_rescue,
+    }), 'utf-8');
+    console.log(`Focus bulk blocked: focus_rescue_status=needs_rewrite report=${reportPath}`);
+    console.log('Use: npm run codex:automation -- focus-bulk --focus-key=song-xuyen-trade --rewrite-from-start --max-chapters=1 --dry-run');
+    return;
+  }
+
+  let lock: FocusRunLock | null = null;
+  let lockTransferredToChapter = false;
+  if (!dryRun && focusKey) {
+    const lockResult = acquireFocusLock(focusKey, initial.project, initial.novel, runDir);
+    if (!lockResult.acquired) {
+      const reportPath = path.join(runDir, 'focus-report.json');
+      writeFileSync(reportPath, safeJson({
+        projectId: initial.project.id,
+        novelId: initial.novel.id,
+        title: initial.novel.title,
+        skipped: true,
+        reason: 'focus run already active',
+        activeLock: lockResult.activeLock,
+      }), 'utf-8');
+      console.log(`skipped=focus_run_already_active focus_key=${focusKey} report=${reportPath}`);
+      console.log(`active_lock=${JSON.stringify(lockResult.activeLock)}`);
+      return;
+    }
+    lock = lockResult.lock;
+    console.log(`focus_lock=acquired focus_key=${focusKey} token=${lock.token} expires_at=${lock.expiresAt}`);
+  }
+
+  try {
+  const readiness = await evaluateCompletionReadiness(initial.project, initial.novel);
+  printCompletionReadiness(readiness);
+
+  if (readiness.verdict === 'repair') {
+    const reportPath = path.join(runDir, 'focus-report.json');
+    writeFileSync(reportPath, safeJson({ projectId: initial.project.id, novelId: initial.novel.id, stopMode, maxChapters, readiness }), 'utf-8');
+    console.log(`Focus bulk blocked for repair. Report: ${reportPath}`);
+    console.log(`Repair: npm run codex:automation -- audit-continuity --project-id=${initial.project.id} --recent=10`);
+    if (lock) releaseFocusLock(focusKey, lock.token);
+    process.exit(1);
+  }
+
+  const project = await applyCompletionDirectives(initial.project, initial.novel, readiness, dryRun);
+  if (readiness.verdict === 'complete') {
+    const reportPath = path.join(runDir, 'focus-report.json');
+    writeFileSync(reportPath, safeJson({ projectId: project.id, novelId: initial.novel.id, stopMode, maxChapters, readiness, completed: !dryRun }), 'utf-8');
+    console.log(`${dryRun ? 'Dry run would mark' : 'Marked'} "${initial.novel.title}" as completed. Report: ${reportPath}`);
+    return;
+  }
+
+  if (stopMode === 'ending-ready' && readiness.verdict === 'enter_finale') {
+    console.log('Story is ending-ready; focus-bulk will prepare the next chapter in finale mode.');
+  }
+
+  const currentChapter = project.current_chapter || 0;
+  const isRewriteFirstChapter = rewriteFromStart && currentChapter === 0;
+  const projectForChapter = isRewriteFirstChapter
+    ? { ...project, current_chapter: 0, style_directives: { ...(project.style_directives || {}), focus_rescue_status: 'rewriting', focus_bulk_rewrite_from_start: true } }
+    : project;
+  const nextChapterNumber = currentChapter + 1;
+  const chapterRunDir = path.join(runDir, `${slugify(initial.novel.title)}-ch${nextChapterNumber}`);
+  mkdirSync(chapterRunDir, { recursive: true });
+  const task = await writeChapterFiles(chapterRunDir, projectForChapter, initial.novel, {
+    focusKey,
+    lockToken: lock?.token || null,
+  });
+  if (lock) lockTransferredToChapter = true;
+  const manifest: CodexAutomationManifest = {
+    runId: path.basename(runDir),
+    mode: 'focus-bulk',
+    vnDate: getVietnamDayBounds().vnDate,
+    createdAt: new Date().toISOString(),
+    quotas: {
+      maxNewStories: 0,
+      maxCovers: 0,
+      maxChapters,
+      newStoriesToday: 0,
+      coversToday: 0,
+      chaptersToday: 0,
+    },
+    tasks: [task],
+  };
+  const report = {
+    projectId: project.id,
+    novelId: initial.novel.id,
+    title: initial.novel.title,
+    dryRun,
+    dbMode: DB_MODE,
+    focusKey: focusKey || null,
+    lock: lock ? {
+      token: lock.token,
+      acquiredAt: lock.acquiredAt,
+      expiresAt: lock.expiresAt,
+    } : null,
+    stopMode,
+    maxChaptersRequested: maxChapters,
+    rewriteFromStart,
+    preparedSequentialTasks: 1,
+    note: 'Focus bulk does not pre-generate multiple chapters from stale context. Rerun after apply to continue fast.',
+    readiness,
+    nextTask: task,
+    auditEveryFive: ((project.current_chapter || 0) + 1) % 5 === 0,
+  };
+  const manifestPath = path.join(runDir, 'manifest.json');
+  const reportPath = path.join(runDir, 'focus-report.json');
+  writeFileSync(manifestPath, safeJson(manifest), 'utf-8');
+  writeFileSync(reportPath, safeJson(report), 'utf-8');
+
+  console.log(`Focus bulk ${dryRun ? '(DRY RUN)' : '(APPLY DIRECTIVES)'}: ${initial.novel.title}`);
+  console.log(`Run dir: ${runDir}`);
+  console.log(`Prepared next sequential chapter task: ${task.runDir}`);
+  console.log(`Prompt: ${task.promptPath}`);
+  console.log(`Write: ${task.inputPath}`);
+  console.log(`Fill continuity: ${path.join(task.runDir, 'continuity.json')}`);
+  console.log(`Dry run chapter: ${task.dryRunCommand}`);
+  console.log(`Apply chapter: ${task.applyCommand}`);
+  console.log(`Report: ${reportPath}`);
+  if (report.auditEveryFive) {
+    console.log(`After apply, run: npm run audit:stories -- --project-id=${project.id} --recent=5`);
+    console.log(`After apply, run: npm run codex:automation -- audit-continuity --project-id=${project.id} --recent=10`);
+  }
+  } finally {
+    if (lock && !lockTransferredToChapter) releaseFocusLock(focusKey, lock.token);
+  }
+}
+
+async function loadAuditProjects(): Promise<Array<{ project: ProjectRow; novel: NovelRow }>> {
+  const projectId = arg('project-id');
+  if (projectId) {
+    const loaded = await loadProject(projectId);
+    return [loaded];
+  }
+  const statuses = parseStatusFilter();
+  const limit = numberArg('limit', 6);
+  const { data, error } = await db
+    .from('ai_story_projects')
+    .select('id,novel_id,status,genre,current_chapter,total_planned_chapters,target_chapter_length,ai_model,main_character,world_description,story_outline,master_outline,style_directives,updated_at,novels!ai_story_projects_novel_id_fkey(id,title,description,genres,cover_url,cover_prompt)')
+    .in('status', statuses)
+    .order('updated_at', { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return (data || [])
+    .map((row: unknown) => {
+      const novel = singleNovel((row as { novels?: unknown }).novels);
+      return novel ? { project: row as ProjectRow, novel } : null;
+    })
+    .filter(Boolean) as Array<{ project: ProjectRow; novel: NovelRow }>;
+}
+
+async function auditContinuity(): Promise<void> {
+  const recent = numberArg('recent', 10);
+  const projects = await loadAuditProjects();
+  console.log(`Codex continuity audit — projects=${projects.length} recent=${recent}`);
+  for (const { project, novel } of projects) {
+    const report = await auditContinuityWindow(db, project.id, novel.id, recent);
+    console.log(`\n${novel.title}`);
+    console.log(`  Project: ${project.id} | status=${project.status} | current=${project.current_chapter || 0} | verdict=${report.verdict}`);
+    if (report.checkedChapters.length === 0) {
+      console.log('  No chapters to audit.');
+      continue;
+    }
+    console.log(`  Checked chapters: ${report.checkedChapters.join(', ')}`);
+    if (Object.keys(report.missingByChapter).length === 0) {
+      console.log('  Memory spine: OK');
+    } else {
+      for (const [chapter, missing] of Object.entries(report.missingByChapter)) {
+        console.log(`  Ch.${chapter}: missing ${missing.join(', ')}`);
+      }
+    }
+    for (const item of report.issues.slice(0, 8)) {
+      console.log(`  - [${item.severity}] ${item.message}`);
+    }
+  }
+}
+
+async function repairContinuity(): Promise<void> {
+  const projectId = arg('project-id');
+  if (!projectId) throw new Error('repair-continuity requires --project-id=<id>');
+  const { project, novel } = await loadProject(projectId);
+  const from = numberArg('from', Math.max(1, project.current_chapter || 1));
+  const to = numberArg('to', project.current_chapter || from);
+  const apply = hasFlag('apply');
+  const { data: chapters, error } = await db
+    .from('chapters')
+    .select('chapter_number,title,content')
+    .eq('novel_id', novel.id)
+    .gte('chapter_number', from)
+    .lte('chapter_number', to)
+    .order('chapter_number', { ascending: true });
+  if (error) throw error;
+  if (!chapters?.length) throw new Error(`No chapters found for ${novel.title} ch.${from}-${to}`);
+
+  console.log(`Codex continuity repair ${apply ? '(APPLY)' : '(DRY RUN)'} — ${novel.title} ch.${from}-${to}`);
+  for (const chapter of chapters) {
+    const payload = buildHeuristicContinuityPayload(chapter.title, chapter.content, project.main_character || 'nhan vat chinh');
+    const context = await loadContinuityEvaluationContext(db, project.id, chapter.chapter_number, project.main_character || 'nhan vat chinh');
+    const continuity = evaluateContinuityExtraction(payload, context);
+    const quality = evaluateChapterQuality(chapter.content, {
+      title: chapter.title,
+      protagonistName: project.main_character,
+      targetWords: project.target_chapter_length,
+      minWords: Math.min(2000, Math.floor((project.target_chapter_length || 2400) * 0.82)),
+      genre: project.genre,
+      worldDescription: project.world_description,
+    });
+    console.log(`  Ch.${chapter.chapter_number} "${chapter.title}": quality=${quality.verdict}/${quality.score} continuity=${continuity.verdict}`);
+    if (continuity.verdict !== 'pass') {
+      printContinuityReport(continuity);
+      if (apply) throw new Error(`Refusing to repair Ch.${chapter.chapter_number}: continuity=${continuity.verdict}`);
+      continue;
+    }
+    if (!apply) continue;
+
+    const memoryRowsWritten = await persistContinuityMemory({
+      db,
+      projectId: project.id,
+      novelId: novel.id,
+      chapterNumber: chapter.chapter_number,
+      title: chapter.title,
+      content: chapter.content,
+      protagonistName: project.main_character || 'nhan vat chinh',
+      payload,
+    });
+    const memoryHealth = await postWriteHealthCheck(project.id, chapter.chapter_number);
+    const appliedContinuityHealth: ContinuityHealthReport = {
+      ...continuity,
+      memoryRowsWritten,
+      issues: [
+        ...continuity.issues,
+        ...memoryHealth.warnings.map((warning) => ({
+          code: 'post_write_memory_missing',
+          severity: 'major' as const,
+          message: warning,
+        })),
+      ],
+      verdict: memoryHealth.warnings.length > 0 ? 'revise' : continuity.verdict,
+      blockedNextChapterReason: memoryHealth.warnings.length > 0 ? memoryHealth.warnings.join('; ') : null,
+    };
+    const { data: existingMetric } = await db
+      .from('quality_metrics')
+      .select('meta,overall_score,dopamine_score,pacing_score,ending_hook_score,word_count,word_ratio')
+      .eq('project_id', project.id)
+      .eq('chapter_number', chapter.chapter_number)
+      .maybeSingle();
+    const existingMeta = (existingMetric?.meta && typeof existingMetric.meta === 'object') ? existingMetric.meta : {};
+    const { error: metricsError } = await db.from('quality_metrics').upsert({
+      project_id: project.id,
+      novel_id: novel.id,
+      chapter_number: chapter.chapter_number,
+      overall_score: existingMetric?.overall_score ?? score10(quality),
+      dopamine_score: existingMetric?.dopamine_score ?? (quality.metrics.payoffHits >= 2 ? 8 : 6),
+      pacing_score: existingMetric?.pacing_score ?? (quality.metrics.dialogueLines >= 3 ? 8 : 6),
+      ending_hook_score: existingMetric?.ending_hook_score ?? (quality.metrics.endingHook ? 8 : 5),
+      word_count: existingMetric?.word_count ?? quality.metrics.wordCount,
+      word_ratio: existingMetric?.word_ratio ?? quality.metrics.wordRatio,
+      contradictions_critical: quality.issues.filter((item) => item.severity === 'critical').length,
+      contradictions_warning: quality.issues.filter((item) => item.severity !== 'critical').length,
+      guardian_issues_critical: 0,
+      guardian_issues_major: appliedContinuityHealth.verdict === 'revise' ? 1 : 0,
+      guardian_issues_moderate: 0,
+      rewrites_attempted: 0,
+      auto_revised: false,
+      meta: {
+        ...existingMeta,
+        provider: 'codex_automation',
+        score_scope: 'published_chapter',
+        continuity_repaired_at: new Date().toISOString(),
+        continuity_health: appliedContinuityHealth,
+        memory_rows_written: memoryRowsWritten,
+        blocked_next_chapter_reason: appliedContinuityHealth.blockedNextChapterReason || null,
+        health: {
+          ok: memoryHealth.warnings.length === 0,
+          character_states: memoryHealth.characterStateCount,
+          has_summary: memoryHealth.hasChapterSummary,
+          rag_chunks: memoryHealth.ragChunkCount,
+          warnings: memoryHealth.warnings,
+        },
+      },
+    }, { onConflict: 'project_id,chapter_number' });
+    if (metricsError) throw metricsError;
+    console.log(`    repaired memory rows=${JSON.stringify(memoryRowsWritten)}`);
+  }
+}
+
 async function main(): Promise<void> {
   const cmd = command();
   if (cmd === 'plan') return plan();
+  if (cmd === 'rescue-rewrite') return rescueRewrite();
   if (cmd === 'prepare-new-story') return prepareNewStory();
   if (cmd === 'apply-new-story') return applyNewStory();
   if (cmd === 'prepare-cover') return prepareCover();
   if (cmd === 'apply-cover') return applyCover();
   if (cmd === 'prepare-chapter') return prepareChapter();
-  return applyChapter();
+  if (cmd === 'apply-chapter') return applyChapter();
+  if (cmd === 'focus-bulk') return focusBulk();
+  if (cmd === 'audit-continuity') return auditContinuity();
+  return repairContinuity();
 }
 
 main().catch((error) => {

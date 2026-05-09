@@ -41,6 +41,7 @@ function trackCost(
   outputTokens: number,
   cacheHitTokens: number,
   tracking: TrackingContext,
+  metadata?: Record<string, unknown>,
 ): void {
   const p = PRICING[model] || PRICING['_default'];
   // Cache miss tokens (full price) + cache hit tokens (10% price)
@@ -62,7 +63,7 @@ function trackCost(
     input_tokens: inputTokens,
     output_tokens: outputTokens,
     cost,
-    metadata: { cache_hit_tokens: cacheHitTokens },
+    metadata: { cache_hit_tokens: cacheHitTokens, ...(metadata || {}) },
   }).then(({ error }) => {
     if (error) console.warn('[DeepSeekCost] Insert failed:', error.message);
   });
@@ -82,13 +83,25 @@ export async function callDeepSeek(
   }
   messages.push({ role: 'user', content: userPrompt });
 
+  const thinkingTasks = config.deepseekThinkingTasks;
+  const taskName = options?.tracking?.task;
+  const shouldUseThinking =
+    config.deepseekThinkingEnabled === true &&
+    (!thinkingTasks || thinkingTasks.length === 0 || (taskName ? thinkingTasks.includes(taskName) : false));
+
   const body: Record<string, unknown> = {
     model: config.model,
     messages,
-    temperature: config.temperature,
     max_tokens: Math.min(config.maxTokens, 32768), // V4 supports 384K; 32K is plenty for any one call
-    top_p: 0.95,
   };
+
+  if (shouldUseThinking) {
+    body.thinking = { type: 'enabled' };
+    body.reasoning_effort = config.deepseekReasoningEffort || 'high';
+  } else {
+    body.temperature = config.temperature;
+    body.top_p = 0.95;
+  }
 
   // JSON mode — DeepSeek supports OpenAI-compatible response_format
   if (options?.jsonMode) {
@@ -126,8 +139,9 @@ export async function callDeepSeek(
       const choice = data?.choices?.[0];
       // DeepSeek V4 thinking models may split output into reasoning_content + content.
       // The final answer is in content; reasoning is thinking scratch. Use content only.
-      // Fall back to reasoning_content if content is empty (some endpoints behave differently).
-      const content = choice?.message?.content || choice?.message?.reasoning_content || '';
+      // In non-thinking compatibility mode only, keep the old fallback for odd endpoints.
+      const reasoningContent = choice?.message?.reasoning_content || '';
+      const content = choice?.message?.content || (shouldUseThinking ? '' : reasoningContent);
       const finishReason = choice?.finish_reason || 'stop';
 
       // P6.1: explicit empty-content guard. Without this, an empty response (rare but happens
@@ -153,7 +167,10 @@ export async function callDeepSeek(
       const cacheHitTokens = data?.usage?.prompt_cache_hit_tokens || 0;
 
       if (options?.tracking) {
-        trackCost(config.model, promptTokens, completionTokens, cacheHitTokens, options.tracking);
+        trackCost(config.model, promptTokens, completionTokens, cacheHitTokens, options.tracking, {
+          thinking_enabled: shouldUseThinking,
+          reasoning_effort: shouldUseThinking ? (config.deepseekReasoningEffort || 'high') : null,
+        });
       }
 
       return {

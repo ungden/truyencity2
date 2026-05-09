@@ -36,6 +36,13 @@ import {
   STORY_PRODUCTION_PAUSED,
   filterFocusedProjects,
 } from '@/lib/story-production-focus';
+import {
+  computeDynamicResumeBatchSizeForQuota,
+  computeQuotaCadenceCeiling,
+  computeQuotaInitialCadenceMinutes,
+  getDefaultDailyChapterQuota,
+  getProjectDailyChapterQuota,
+} from '@/lib/story-production-quota';
 
 // Story Engine v2 — sole engine for all tiers (init + resume)
 import { writeOneChapter as writeOneChapterV2 } from '@/services/story-engine';
@@ -48,7 +55,7 @@ function parseIntEnv(name: string, fallback: number): number {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
-const DAILY_CHAPTER_QUOTA = 20; // Hard exact target per active novel per Vietnam day (5 active × 20 = 100/day)
+const DAILY_CHAPTER_QUOTA = getDefaultDailyChapterQuota(); // Default target per active novel per Vietnam day; project override may win.
 
 const MIN_RESUME_BATCH_SIZE = clamp(parseIntEnv('WRITE_CHAPTERS_MIN_RESUME_BATCH', 30), 10, 300);
 const MAX_RESUME_BATCH_SIZE = clamp(parseIntEnv('WRITE_CHAPTERS_MAX_RESUME_BATCH', 220), MIN_RESUME_BATCH_SIZE, 400);
@@ -146,6 +153,7 @@ type ProjectRow = {
   writing_style: string | null;
   temperature: number | null;
   target_chapter_length: number | null;
+  style_directives?: Record<string, unknown> | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   novels: any;
 };
@@ -237,8 +245,6 @@ async function ensureDailyQuotasForActiveProjects(
   const dayStartMs = new Date(dayStartIso).getTime();
 
   // BURST WINDOW already defined at module scope. Compute cadence per chapter.
-  const cadenceMinutes = Math.max(2, Math.floor(ACTIVE_WINDOW_MINUTES / DAILY_CHAPTER_QUOTA)); // 12 min for 20/day in 4h
-
   // Check for active boosts — boosted novels get 2x daily quota
   const projectIds = projects.map((p) => p.id);
   const { data: activeBoosts } = await supabase
@@ -281,6 +287,8 @@ async function ensureDailyQuotasForActiveProjects(
 
   const rows = projects.map((p) => {
     const seed = hashStringToInt(`${p.id}:${vnDate}`);
+    const projectDailyQuota = getProjectDailyChapterQuota(p);
+    const cadenceMinutes = computeQuotaInitialCadenceMinutes(ACTIVE_WINDOW_MINUTES, projectDailyQuota);
     const offsetMinutes = seed % cadenceMinutes;
     const nextDueMs = dayStartMs + offsetMinutes * 60 * 1000;
     const boostMultiplier = boostMap.get(p.id) || 1;
@@ -288,7 +296,7 @@ async function ensureDailyQuotasForActiveProjects(
     return {
       project_id: p.id,
       vn_date: vnDate,
-      target_chapters: DAILY_CHAPTER_QUOTA * boostMultiplier + carryover,
+      target_chapters: projectDailyQuota * boostMultiplier + carryover,
       written_chapters: 0,
       status: 'active' as const,
       retry_count: 0,
@@ -392,9 +400,7 @@ async function updateQuotaAfterWrite(
 
     // Flat cadence within burst window. Outside burst window → catch-up mode (fire every cron tick).
     const cadenceFloor = 3;
-    const cadenceCeiling = inBurstWindow
-      ? Math.max(cadenceFloor, Math.floor(ACTIVE_WINDOW_MINUTES / DAILY_CHAPTER_QUOTA)) // 12 min for 20/day in 4h
-      : 5; // outside burst window: fire every cron tick for aggressive catch-up
+    const cadenceCeiling = computeQuotaCadenceCeiling(ACTIVE_WINDOW_MINUTES, target, inBurstWindow);
     const cadence = clamp(Math.floor(minutesLeft / remaining), cadenceFloor, cadenceCeiling);
     const jitter = inBurstWindow ? 0 : (hashStringToInt(`${projectId}:${written}:${vnDate}`) % 5) - 2;
     const delayMinutes = Math.max(cadenceFloor, cadence + jitter);
@@ -505,9 +511,13 @@ async function autoPauseForCost(
 }
 
 function computeDynamicResumeBatchSize(activeCount: number): number {
-  const requiredPerTick = Math.ceil((activeCount * DAILY_CHAPTER_QUOTA) / TICKS_PER_DAY);
-  const buffered = Math.ceil(requiredPerTick * 1.2);
-  return clamp(buffered, MIN_RESUME_BATCH_SIZE, MAX_RESUME_BATCH_SIZE);
+  return computeDynamicResumeBatchSizeForQuota({
+    activeCount,
+    dailyQuota: DAILY_CHAPTER_QUOTA,
+    ticksPerDay: TICKS_PER_DAY,
+    minBatch: MIN_RESUME_BATCH_SIZE,
+    maxBatch: MAX_RESUME_BATCH_SIZE,
+  });
 }
 
 /**
@@ -812,7 +822,7 @@ export async function GET(request: NextRequest) {
           setup_stage, setup_stage_attempts,
           current_chapter, total_planned_chapters,
           world_description, story_outline, writing_style, temperature,
-          target_chapter_length,
+          target_chapter_length, style_directives,
           novels!ai_story_projects_novel_id_fkey (id, title)
         `)
         .eq('status', 'active')
@@ -826,7 +836,7 @@ export async function GET(request: NextRequest) {
           setup_stage, setup_stage_attempts,
           current_chapter, total_planned_chapters,
           world_description, story_outline, writing_style, temperature,
-          target_chapter_length,
+          target_chapter_length, style_directives,
           novels!ai_story_projects_novel_id_fkey (id, title)
         `)
         .eq('status', 'paused')
@@ -1117,6 +1127,7 @@ export async function GET(request: NextRequest) {
         effectiveInitWriteBatch,
         ticksPerDay: TICKS_PER_DAY,
         candidatePoolSize: CANDIDATE_POOL_SIZE,
+        dailyChapterQuota: DAILY_CHAPTER_QUOTA,
       },
       runConcurrency: RUN_CONCURRENCY,
       timeoutSeconds: PROJECT_TIMEOUT_MS / 1000,

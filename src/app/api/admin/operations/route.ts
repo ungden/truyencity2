@@ -461,6 +461,11 @@ async function getSupremeGoalsStatus(
         quality_revise: windowQuality.trend.reviseCount,
         quality_block: windowQuality.trend.blockCount,
         codex_manual: p.style_directives?.codex_manual_pipeline === true,
+        codex_automation: p.style_directives?.codex_automation_pipeline === true,
+        genre_knowledge_pack: p.style_directives?.genre_knowledge_pack_version || null,
+        genre_knowledge_primary: p.style_directives?.genre_knowledge_primary || p.genre || null,
+        knowledge_alignment: p.style_directives?.knowledge_alignment || null,
+        benchmark_families: p.style_directives?.genre_knowledge_benchmark_families || [],
       },
     };
   }));

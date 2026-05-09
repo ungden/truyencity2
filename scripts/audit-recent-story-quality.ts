@@ -49,6 +49,15 @@ const genericEndingSignals = [
   'trò chơi thực sự mới bắt đầu',
   'đêm dài còn ở phía trước',
 ];
+const tradeWinSignals = [
+  'lãi', 'lợi nhuận', 'doanh thu', 'vốn', 'khách hàng', 'hợp đồng',
+  'giấy phép', 'quyền', 'uy tín', 'nguồn cung', 'đòn bẩy', 'dữ liệu giá',
+  'chốt giá', 'khóa giá', 'thẻ bạc', 'mộc', 'bảo hộ', 'ưu tiên',
+];
+const tradeRiskSignals = [
+  'bị', 'nguy cơ', 'rủi ro', 'áp lực', 'đe dọa', 'bẩn', 'leak',
+  'chưa sạch', 'trì hoãn', 'mất', 'không được', 'không thể', 'nghi ngờ',
+];
 
 function argValue(name: string, fallback: number): number {
   const raw = process.argv.find((arg) => arg.startsWith(`--${name}=`))?.split('=')[1];
@@ -62,22 +71,36 @@ function statusArg(): string[] {
   return statuses.length > 0 ? statuses : ['active', 'paused'];
 }
 
+function stringArg(name: string): string | undefined {
+  return process.argv.find((arg) => arg.startsWith(`--${name}=`))?.split('=')[1];
+}
+
 function pct(part: number, total: number): string {
   return total ? `${Math.round((part / total) * 100)}%` : '0%';
+}
+
+function countSignalGroups(text: string, signals: string[]): number {
+  const lower = text.toLowerCase();
+  return signals.reduce((sum, signal) => sum + (lower.includes(signal) ? 1 : 0), 0);
 }
 
 async function main(): Promise<void> {
   const limit = argValue('limit', DEFAULT_LIMIT);
   const recentWindow = argValue('recent', DEFAULT_RECENT_WINDOW);
   const statuses = statusArg();
+  const projectId = stringArg('project-id');
 
-  const { data: projects, error: projectError } = await db
+  let query = db
     .from('ai_story_projects')
     .select('id,novel_id,status,genre,current_chapter,target_chapter_length,style_directives,main_character,world_description,updated_at,novels!ai_story_projects_novel_id_fkey(title)')
-    .in('status', statuses)
-    .gt('current_chapter', 0)
-    .order('updated_at', { ascending: false })
-    .limit(limit);
+    .gt('current_chapter', 0);
+  if (projectId) {
+    query = query.eq('id', projectId);
+  } else {
+    query = query.in('status', statuses).order('updated_at', { ascending: false }).limit(limit);
+  }
+
+  const { data: projects, error: projectError } = await query;
 
   if (projectError) throw projectError;
 
@@ -132,6 +155,16 @@ async function main(): Promise<void> {
     const lowInnerCount = reports.filter(({ report }) => report.metrics.innerHits < TARGETS.minInnerSignals).length;
     const lowSensoryCount = reports.filter(({ report }) => report.metrics.sensoryHits < TARGETS.minSensorySignals).length;
     const lowDialogueCount = reports.filter(({ report }) => report.metrics.dialogueLines < TARGETS.minDialogueLines).length;
+    const focusKey = project.style_directives?.focus_key as string | undefined;
+    const songXuyenPayoff = focusKey === 'song-xuyen-trade'
+      ? recent.map((chapter) => {
+          const content = chapter.content || '';
+          const win = countSignalGroups(content, tradeWinSignals);
+          const risk = countSignalGroups(content, tradeRiskSignals);
+          return { chapterNumber: chapter.chapter_number, title: chapter.title, win, risk, riskOnly: risk >= 5 && win < 3 };
+        })
+      : [];
+    const riskOnlyCount = songXuyenPayoff.filter((entry) => entry.riskOnly).length;
 
     const { data: metrics } = await db
       .from('quality_metrics')
@@ -157,26 +190,39 @@ async function main(): Promise<void> {
     if (lowInnerCount / Math.max(recent.length, 1) > 0.5) failures.push(`low inner monologue ${lowInnerCount}/${recent.length}`);
     if (lowSensoryCount / Math.max(recent.length, 1) > 0.3) failures.push(`low sensory ${lowSensoryCount}/${recent.length}`);
     if (lowDialogueCount / Math.max(recent.length, 1) > 0.2) failures.push(`low dialogue ${lowDialogueCount}/${recent.length}`);
+    if (riskOnlyCount > 0) failures.push(`song-xuyen risk-only chapters ${riskOnlyCount}/${recent.length}`);
     if (lowMetricScores > 0) failures.push(`low metric scores ${lowMetricScores}/${metricRows.length}`);
     if (legacyMetricRows > 0) failures.push(`legacy split metrics ${legacyMetricRows}/${metricRows.length}`);
 
     const avgWords = words.length ? Math.round(words.reduce((sum, count) => sum + count, 0) / words.length) : 0;
     const minWords = words.length ? Math.min(...words) : 0;
     const maxWords = words.length ? Math.max(...words) : 0;
-    const auditVerdict = windowReport.trend.blockCount > 0 ? 'pause' : windowReport.trend.reviseCount > 0 ? 'revise' : 'ship';
+    const auditVerdict = windowReport.trend.blockCount > 0 ? 'pause' : windowReport.trend.reviseCount > 0 || riskOnlyCount > 0 ? 'revise' : 'ship';
 
     console.log(`\n${title}`);
     console.log(`  Verdict: ${auditVerdict} — score=${windowReport.trend.averageScore}/100 passRate=${Math.round(windowReport.trend.passRate * 100)}%${failures.length ? ` — ${failures.join('; ')}` : ''}`);
     console.log(`  Project: ${project.id} | status=${project.status} | genre=${project.genre} | ch=${project.current_chapter} | splitDisabled=${project.style_directives?.disable_chapter_split === true} | codexManual=${project.style_directives?.codex_manual_pipeline === true}`);
+    if (project.style_directives?.genre_knowledge_pack_version) {
+      console.log(`  Knowledge: pack=${project.style_directives.genre_knowledge_pack_version} | primary=${project.style_directives.genre_knowledge_primary || project.genre} | alignment=${project.style_directives.knowledge_alignment || 'unknown'} | benchmarks=${((project.style_directives.genre_knowledge_benchmark_families as string[] | undefined) || []).join('; ') || 'n/a'}`);
+    }
     console.log(`  Goals: coherence=${windowReport.supremeGoals.coherence}, character=${windowReport.supremeGoals.character_consistency}, plot=${windowReport.supremeGoals.directional_plot}, ending=${windowReport.supremeGoals.ending_readiness}, uniform=${windowReport.supremeGoals.uniform_quality}`);
     console.log(`  Recent ${recent.length}: avg=${avgWords}, min=${minWords}, max=${maxWords}, short=${shortCount}/${recent.length}, weakEnding=${weakEndingCount}/${recent.length}, lowInner=${lowInnerCount}/${recent.length}`);
+    if (songXuyenPayoff.length > 0) {
+      const avgWin = Math.round(songXuyenPayoff.reduce((sum, item) => sum + item.win, 0) / Math.max(1, songXuyenPayoff.length));
+      const avgRisk = Math.round(songXuyenPayoff.reduce((sum, item) => sum + item.risk, 0) / Math.max(1, songXuyenPayoff.length));
+      console.log(`  SongXuyen payoff: avgWinSignals=${avgWin}, avgRiskSignals=${avgRisk}, riskOnly=${riskOnlyCount}/${songXuyenPayoff.length}`);
+    }
     console.log(`  Metrics: rows=${metricRows.length}, logicalTagged=${logicalMetricRows}, legacySplit=${legacyMetricRows}, lowScores=${lowMetricScores}`);
     console.log('  Latest chapters:');
     for (const { chapter, report } of reports.slice(-3)) {
       const issueSummary = report.issues.slice(0, 2).map((issue) => issue.code).join(', ') || 'ok';
       console.log(`    Ch.${chapter.chapter_number} "${chapter.title}" — ${report.verdict}, score=${report.score}, ${report.metrics.wordCount}w, hook=${report.metrics.endingHook ? 'yes' : 'no'}, inner=${report.metrics.innerHits}, dialogue=${report.metrics.dialogueLines}, issues=${issueSummary}`);
     }
-    console.log(`  Next: ${windowReport.nextActions.join(' | ')}`);
+    const nextActions = [...windowReport.nextActions];
+    if (riskOnlyCount > 0) {
+      nextActions.unshift('Song Xuyên: viết lại risk-only chapters thành profit/progression-first; không tiếp tục arc cũ.');
+    }
+    console.log(`  Next: ${nextActions.join(' | ')}`);
   }
 }
 
