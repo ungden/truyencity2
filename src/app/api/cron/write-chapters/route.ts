@@ -42,6 +42,7 @@ import {
   computeQuotaInitialCadenceMinutes,
   getDefaultDailyChapterQuota,
   getProjectDailyChapterQuota,
+  isDailyQuotaDue,
 } from '@/lib/story-production-quota';
 
 // Story Engine v2 — sole engine for all tiers (init + resume)
@@ -953,10 +954,9 @@ export async function GET(request: NextRequest) {
       console.log(`[Cron] Step 3 OK: ${quotaRows.length} quota rows fetched`);
     }
 
-    const nowIso = now.toISOString();
     const dueQuotaByProject = new Map(
       quotaRows
-        .filter((q) => q.status !== 'completed' && q.written_chapters < q.target_chapters && (!!q.next_due_at ? q.next_due_at <= nowIso : true))
+        .filter((q) => isDailyQuotaDue(q, now))
         .map((q) => [q.project_id, q])
     );
 

@@ -3,6 +3,7 @@ import {
   computeQuotaInitialCadenceMinutes,
   getDefaultDailyChapterQuota,
   getProjectDailyChapterQuota,
+  isDailyQuotaDue,
 } from '@/lib/story-production-quota';
 
 describe('story production quota', () => {
@@ -28,5 +29,34 @@ describe('story production quota', () => {
     expect(computeQuotaCadenceCeiling(120, 50, true)).toBe(3);
     expect(computeQuotaCadenceCeiling(120, 20, true)).toBe(6);
     expect(computeQuotaCadenceCeiling(120, 50, false)).toBe(5);
+  });
+
+  it('parses database timestamptz offsets when checking due quotas', () => {
+    const now = new Date('2026-05-09T18:16:00.000Z');
+
+    expect(isDailyQuotaDue({
+      status: 'active',
+      written_chapters: 2,
+      target_chapters: 55,
+      next_due_at: '2026-05-09T18:14:48.083+00:00',
+    }, now)).toBe(true);
+  });
+
+  it('does not mark future or completed quotas as due', () => {
+    const now = new Date('2026-05-09T18:16:00.000Z');
+
+    expect(isDailyQuotaDue({
+      status: 'active',
+      written_chapters: 2,
+      target_chapters: 55,
+      next_due_at: '2026-05-09T18:20:00.000+00:00',
+    }, now)).toBe(false);
+
+    expect(isDailyQuotaDue({
+      status: 'completed',
+      written_chapters: 55,
+      target_chapters: 55,
+      next_due_at: '2026-05-09T18:14:48.083+00:00',
+    }, now)).toBe(false);
   });
 });
