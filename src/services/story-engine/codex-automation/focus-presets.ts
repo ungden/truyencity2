@@ -1,7 +1,7 @@
 import type { ContinuityExtractionPayload } from './contract';
 import type { GenreType } from '../types';
 
-export type FocusKey = 'song-xuyen-trade' | 'sang-the-than-minh' | 'thien-dao-thu-vien';
+export type FocusKey = 'song-xuyen-trade' | 'sang-the-than-minh' | 'thien-dao-thu-vien' | 'van-linh-pho-gia-toc';
 export type FocusPresetVerdict = 'pass' | 'revise' | 'block';
 
 export interface FocusPreset {
@@ -197,10 +197,93 @@ export const FOCUS_PRESETS: Record<FocusKey, FocusPreset> = {
       { code: 'world_state', label: 'world-state drift', keywords: ['world-state', 'trạng thái thế giới', 'giá biến động', 'nguồn cung', 'phe phái', 'thương hội'] },
     ],
   },
+  'van-linh-pho-gia-toc': {
+    key: 'van-linh-pho-gia-toc',
+    label: 'Van Linh Pho Beast Evolution Family Revival',
+    primaryGenre: 'ngu-thu-tien-hoa',
+    subGenres: ['ngu-thu-gia-toc', 'lao-luc-mode', 'pet-evolution-bom'],
+    mcArchetype: 'sleeper transmigrator beast-evolution master reviving fallen clan',
+    antiTropes: [
+      'no_miserable_start',
+      'no_mc_combat',
+      'no_pet_unsourced_powerup',
+      'no_publicly_revealed_advantage',
+      'no_continuous_antagonist_pressure',
+      'no_secret_leak_to_outsiders',
+      'no_mc_meddling_for_strangers',
+      'no_random_outside_force_knows_mc',
+    ],
+    promptContext: [
+      '[FOCUS PRESET: van-linh-pho-gia-toc]',
+      'Premise lock:',
+      '- MC Cố Diệp 18 tuổi kiếp trước là sinh viên năm cuối Học Viện Ngự Thú Trái Đất 2126, đang viết luận văn về Tuyến Tiến Hóa Ẩn của yêu thú dùng pattern matching + bio-genome simulation. Tai nạn lab nổ → xuyên hồn vào thân Cố Diệp 16 tuổi đại lục Thiên Linh Đại Lục, là đứa con trưởng họ Cố ở Linh Châu Thành.',
+      '- Tỉnh dậy thấy gia tộc Cố từ đại tộc sa sút thành tiểu tộc: tổ phụ Cố Lập Khải Đại Sư mất 5 năm trước, bố Cố Hành mẹ Lưu Tiêm Nhi mất tích 1 năm trước trong Bắc Vực, kho pet bị các trưởng lão biển thủ, chú Cố Trường Khải nắm quyền ép MC ký từ bỏ thừa kế.',
+      '- Bàn tay vàng Vạn Linh Phổ là di sản tổ phụ chỉ MC dùng được vì xuyên hồn synergy. Khi nhìn pet → thấy HUD ẩn gồm cấp + thuộc tính hiện tại + 3-5 tuyến tiến hóa khả thi (mỗi tuyến có sequence feed concrete + thời gian + risk + final tier) + cảnh báo nếu feed sai sequence sẽ mutate sai/downgrade. Vạn Linh Phổ tự cập nhật khi MC observe pet mới. Cap: chỉ MC thấy, không transfer.',
+      '- Core fantasy là MC dùng Vạn Linh Phổ + công thức BOM tiến hóa pet phế vật thành thần thú trong bí mật, dùng pet đột biến vực dậy gia tộc, từ phế gia tộc → tiểu tộc → trung tộc → đại tộc → bá tộc đại lục.',
+      '',
+      '*** MODE LÃO LỤC (HARD RULE — KHÔNG ĐƯỢC VI PHẠM) ***',
+      '- MC tuyệt đối GIẤU Vạn Linh Phổ. Không ai được biết MC có golden finger, kể cả em gái, quản gia, đệ tử.',
+      '- MC tuyệt đối GIẤU bí mật xuyên hồn. Kiến thức Trái Đất giải thích bằng tổ phụ truyền lại / đọc cổ thư trong kho gia tộc / thiên phú đặc biệt.',
+      '- Pet evolution PHẢI làm trong bí mật (kho riêng, phòng kín, hậu sơn gia tộc). KHÔNG evolve công khai, KHÔNG có ai chứng kiến quá trình.',
+      '- Pet đã evolve được giấu cấp thật. MC dùng pet ở public chỉ ở mức năng lực có thể giải thích được — pet lộ ra ở mức cấp thấp hơn 1-2 tier so với cấp thật bằng cách MC bảo pet kìm chế.',
+      '- MC chỉ TIẾT LỘ pet evolved khi đã invincible trong context đó (đối thủ không thể phản kích, không thể trả thù trong window ngắn). Reveal kiểu demonstrate quá rõ ràng để bịt miệng rồi quay lại giấu.',
+      '- Cultivation MC tiến nhanh = lý giải thiên phú / cơ duyên / di sản tổ phụ. KHÔNG để bị nghi xuyên hồn / golden finger / hệ thống.',
+      '- CẤM cliffhanger kẻ lạ biết bí mật MC / tin nhắn từ trái đất / thế lực ngoài đột nhiên đến tìm MC trừ khi master_outline đã ghi rõ.',
+      '- CẤM NPC thường (đệ tử, customer, đồng môn, đối thủ peer-level) khám phá bí mật MC ngẫu nhiên.',
+      '- Mỗi chương MC có scene tương tác với người ngoài: PHẢI có ý thức kiểm soát thông tin — lựa lời, deflect câu hỏi, chỉ tiết lộ cần thiết.',
+      '',
+      '*** ĐỐI THỦ NGẮT QUÃNG (HARD RULE) ***',
+      '- Đối thủ KHÔNG xuất hiện liên tục. Mỗi 3-5 chương có 1 đợt confront ngắn (1-2 chương) → MC ăn thưởng + face-slap đè bẹp ngay → 2-3 chương breathing/training/family scenes/pet evolution bí mật → đợt confront tiếp theo.',
+      '- KHÔNG để MC bị truy đuổi/dí 5+ chương liên tục bởi 1 đối thủ. Conflict nội tộc ch.1-50 cũng phải có break: MC làm gia tộc internal task (tổng kê kho, dạy đệ tử trẻ, chuẩn bị pet), em gái scene ấm áp, quản gia kể chuyện gia phả, observe pet mới khám phá Vạn Linh Phổ.',
+      '- Đối thủ định nghĩa LÀM NỀN — tồn tại để MC ăn thưởng + được public reaction. Đối thủ KHÔNG chiếm sân khấu lâu hơn MC.',
+      '',
+      '*** DOPAMINE QUA PHẢN ỨNG XÃ HỘI (HARD RULE) ***',
+      '- Dopamine source PHẢI ưu tiên: (a) bystander shock thầm trước pet phế đột nhiên thắng pet quý, (b) đối thủ kinh ngạc câm họng, (c) NPC cấp cao bí mật khen MC, (d) giá trị pet tăng phi mã trên thị trường, (e) gia tộc nội bộ ngầm phục MC. KHÔNG dùng MC tự khoe / MC tuyên bố / MC đắc ý nói nhiều.',
+      '- MC tone phải lạnh đạm, ít lời, internal monologue tính toán. Public face = thiếu niên 16 tuổi bình thường, may mắn.',
+      '- Thưởng phải hữu hình mỗi chương: tài nguyên (pet egg/công thức tiến hóa/nguyên liệu/thuốc/linh thạch), thông tin (tin tức gia phả/âm mưu của chú/vị trí cấm địa), uy tín nội tộc (1 trưởng lão/1 đệ tử nghiêng về MC), hoặc setup-payoff (pet phế hôm nay → đột biến chương sau).',
+      '',
+      'Setup bắt buộc:',
+      '- Có gia tộc Cố ở Linh Châu Thành với gia phả chi tiết: tổ phụ Cố Lập Khải mất, bố Cố Hành mẹ Lưu Tiêm Nhi mất tích, em gái Cố Tiểu Đào, chú Cố Trường Khải antagonist, em họ Cố Vân Kiếm rival, quản gia Hà Thúc trung thành, trưởng lão Cố Già Tâm trung lập.',
+      '- Có power system Ngự Thú Sư 7 tier: Ngự Thú Đồ Tể (1-9 sub) → Sơ Cấp → Trung Cấp → Cao Cấp → Đại Sư → Truyền Thuyết → Thần Thoại. MC start: Đồ Tể tầng 3.',
+      '- Có beast tier system: F → E → D → C → B → A → S → SS → SSS theo độ hiếm + sức mạnh.',
+      '- Có 3 signature pet đầu game: (1) Tro Bụi slime cấp F kho lưu trữ, evolution path Slime Tro → Lửa Tro → Phượng Linh → Hỏa Phụng Tế → Vạn Lửa Thiên Phụng → Hồng Hoang Phụng Tổ. (2) Cơ Niệm mech bug cấp E. (3) Lục Vũ sparrow cấp F.',
+      '- Có Vạn Linh Phổ với cơ chế HUD ẩn cụ thể (cấp + tuyến tiến hóa + feed sequence + risk).',
+      '- Có world map 4 tầng: Linh Châu Thành (early arcs) → Bắc Vực (mid arcs) → Trung Châu (mid-late) → Vạn Thú Lĩnh (endgame).',
+      '- Có 7-arc antagonist ladder escalating: nội tộc ch.1-50 → tiểu tộc ch.51-150 → liên minh trung tộc ch.151-300 → đại tộc Bắc Châu (kẻ gài bẫy bố mẹ) ch.301-500 → liên hợp đại lục ch.501-700 → hệ tộc thượng cổ ch.701-900 → thiên đạo ch.901-1000.',
+      '',
+      'Chapter continuity bắt buộc:',
+      '- Khi pet evolve, continuity.json phải ghi pet trước-sau (tên + cấp + path stage), feed sequence dùng (concrete items + quantity), location (kho riêng/phòng kín — KHÔNG public), người chứng kiến (chỉ MC, hoặc 0 người).',
+      '- Khi MC reveal pet ở public, ghi rõ pet hiển thị cấp gì (lower tier than real), ai chứng kiến, phản ứng họ thế nào, MC giấu cấp thật bằng cách nào.',
+      '- Mỗi chương phải có dopamine event hữu hình cho MC: tài nguyên / thông tin / uy tín / setup-payoff. Nếu chỉ có pressure không có payoff → revise.',
+      '- KHÔNG để pet được buff vô lý không có công thức tiến hóa rõ.',
+      '- KHÔNG để pet biến mất / bị nâng cấp không qua công thức.',
+      '- KHÔNG để bí mật MC bị NPC thường khám phá. Nếu cần reveal cho 1 character, phải có justification dài: cùng xuyên hồn / antagonist cao đã setup / mentor build trust ≥20 chương.',
+      '- KHÔNG kéo MC khổ liên tục: max 1-2 chương ngược trước khi face-slap + payoff.',
+      '[/FOCUS PRESET]',
+    ].join('\n'),
+    coverPromptHints: [
+      'premium Chinese webnovel cover, young calm Asian male in dark Tang-style robe holding a glowing translucent ledger with pet evolution diagrams floating around',
+      'background of an ancient family compound with pet kennels and a mythic phoenix-spirit silhouette emerging from a small slime pet',
+      'cool moonlit cinematic light, indigo and ink-gold accents, sharp mobile thumbnail, 3:4 Vietnamese webnovel cover, no muddy orange cast',
+    ],
+    requiredSetupKeywords: [
+      { code: 'beast_tamer_class', label: 'Ngự Thú Sư', keywords: ['ngự thú sư', 'ngự thú đồ tể', 'sơ cấp ngự thú', 'trung cấp ngự thú', 'đại sư ngự thú'] },
+      { code: 'evolution_hud', label: 'Vạn Linh Phổ', keywords: ['vạn linh phổ', 'tuyến tiến hóa', 'tuyến tiến hóa ẩn', 'công thức bom', 'feed sequence'] },
+      { code: 'pet_tier_system', label: 'beast tier F-SSS', keywords: ['cấp f', 'cấp e', 'cấp d', 'cấp c', 'cấp b', 'cấp a', 'cấp s', 'cấp ss', 'cấp sss'] },
+      { code: 'co_clan', label: 'gia tộc Cố', keywords: ['gia tộc cố', 'họ cố', 'cố lập khải', 'cố hành', 'cố tiểu đào', 'cố trường khải', 'cố vân kiếm'] },
+      { code: 'world_map', label: 'thế giới Thiên Linh', keywords: ['thiên linh đại lục', 'linh châu thành', 'bắc vực', 'trung châu', 'vạn thú lĩnh'] },
+      { code: 'lao_luc_mode', label: 'Mode lão lục giấu thực lực', keywords: ['giấu', 'kín', 'bí mật', 'lão lục', 'kìm chế', 'lặng lẽ', 'âm thầm', 'không lộ'] },
+      { code: 'family_revival_ladder', label: 'phục hưng gia tộc', keywords: ['phục hưng', 'gia tộc suy tàn', 'thừa kế', 'tiểu tộc', 'trung tộc', 'đại tộc', 'bá tộc'] },
+      { code: 'signature_pets', label: '3 pet đầu game', keywords: ['tro bụi', 'slime', 'cơ niệm', 'mech bug', 'lục vũ', 'sparrow', 'phế vật'] },
+    ],
+  },
 };
 
 export function isFocusKey(value: string | undefined): value is FocusKey {
-  return value === 'song-xuyen-trade' || value === 'sang-the-than-minh' || value === 'thien-dao-thu-vien';
+  return value === 'song-xuyen-trade'
+    || value === 'sang-the-than-minh'
+    || value === 'thien-dao-thu-vien'
+    || value === 'van-linh-pho-gia-toc';
 }
 
 export function getFocusPreset(focusKey: string | undefined): FocusPreset | null {

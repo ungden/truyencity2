@@ -288,6 +288,81 @@ describe('focus presets', () => {
     expect(report.issues.some((issue) => issue.code === 'focus_skill_delta_missing')).toBe(true);
   });
 
+  it('accepts the van-linh-pho-gia-toc focus preset', () => {
+    const preset = getFocusPreset('van-linh-pho-gia-toc');
+    expect(preset).toMatchObject({
+      primaryGenre: 'ngu-thu-tien-hoa',
+      subGenres: ['ngu-thu-gia-toc', 'lao-luc-mode', 'pet-evolution-bom'],
+    });
+    const ctx = buildFocusPresetContext('van-linh-pho-gia-toc');
+    expect(ctx).toContain('FOCUS PRESET: van-linh-pho-gia-toc');
+    expect(ctx).toContain('MODE LÃO LỤC');
+    expect(ctx).toContain('Vạn Linh Phổ');
+    expect(applyFocusPresetTemplate({ genres: ['di-gioi'], coverPrompt: '' }, 'van-linh-pho-gia-toc').focusKey).toBe('van-linh-pho-gia-toc');
+  });
+
+  it('passes a van-linh-pho-gia-toc setup with full beast-evolution kernel', () => {
+    const setup = {
+      genres: ['ngu-thu-tien-hoa'],
+      subGenres: ['ngu-thu-gia-toc', 'lao-luc-mode', 'pet-evolution-bom'],
+      worldDescription: [
+        'Thiên Linh Đại Lục là đại lục cổ trang nơi ngự thú sư là tầng lớp chủ đạo.',
+        'Linh Châu Thành là một thành lớn thuộc Trung Châu, có gia tộc Cố sa sút từ đại tộc xuống tiểu tộc.',
+        'Power system Ngự Thú Sư có 7 tier: Ngự Thú Đồ Tể, Sơ Cấp, Trung Cấp, Cao Cấp, Đại Sư, Truyền Thuyết, Thần Thoại.',
+        'Beast tier system phân loại pet theo cấp F, cấp E, cấp D, cấp C, cấp B, cấp A, cấp S, cấp SS, cấp SSS.',
+        'MC bí mật giấu Vạn Linh Phổ và mode lão lục, kìm chế pet trước người ngoài, lặng lẽ phục hưng gia tộc Cố từ tiểu tộc đến trung tộc rồi đại tộc.',
+        'Map mở rộng theo arc: Linh Châu Thành → Bắc Vực → Trung Châu → Vạn Thú Lĩnh.',
+      ].join('\n'),
+      setupKernel: {
+        readerFantasy: 'MC dùng Vạn Linh Phổ tuyến tiến hóa ẩn + công thức BOM tiến hóa pet phế vật thành thần thú trong bí mật, dùng pet đột biến vực dậy gia tộc Cố từ phế tộc đến bá tộc đại lục.',
+        protagonistEngine: 'MC thắng bằng feed sequence chính xác, kiểm soát thông tin, kìm chế pet ở public, ăn thưởng tài nguyên + uy tín nội tộc, KHÔNG đánh nhau trực tiếp.',
+        pleasureLoop: ['nhìn pet phế thấy tuyến tiến hóa', 'feed bí mật ở kho riêng', 'pet evolve đột biến', 'mang ra public ở mức kìm chế', 'bystander shock', 'ăn thưởng tài nguyên + uy tín'],
+      },
+      masterOutline: {
+        arcs: [
+          { name: 'Phục hưng nội tộc', range: '1-50', payoff: 'Cố Diệp lấy lại quyền thừa kế từ chú Cố Trường Khải, đẩy lùi đám trưởng lão biển thủ, gia tộc Cố từ phế tộc thành tiểu tộc lại' },
+          { name: 'Tranh đoạt tiểu tộc', range: '51-150', payoff: 'Cố tộc đè bẹp Vương thị + Lý thị, leo lên trung tộc Linh Châu Thành' },
+          { name: 'Liên minh trung tộc Linh Châu', range: '151-300', payoff: 'Cố tộc thành đại tộc thành' },
+          { name: 'Đại tộc Bắc Châu trả thù bố mẹ', range: '301-500', payoff: 'cứu bố mẹ + diệt đại tộc Bắc Châu' },
+          { name: 'Liên hợp đại lục clan', range: '501-700', payoff: 'Cố tộc thành bá tộc đại lục' },
+          { name: 'Hệ tộc thượng cổ thần thú', range: '701-900', payoff: 'thần thú lập minh ước với Cố tộc' },
+          { name: 'Thiên đạo bá chủ Vạn Linh', range: '901-1000', payoff: 'Cố Diệp trở thành bá chủ Vạn Linh' },
+        ],
+      },
+      storyOutline: {
+        premise: 'Cố Diệp xuyên hồn vào thân con trưởng họ Cố sa sút, dùng Vạn Linh Phổ di sản tổ phụ tiến hóa pet phế vật trong bí mật, lặng lẽ phục hưng gia tộc Cố trong mode lão lục.',
+        ladders: ['Ngự Thú Sư 7 tier', 'Pet tier F-SSS', 'Gia tộc rank phế tộc/tiểu tộc/trung tộc/đại tộc/bá tộc'],
+        ledgers: ['pet portfolio (cấp ẩn vs cấp public)', 'feed sequence + risk per evolution path', 'gia tộc nội bộ uy tín'],
+        signaturePets: ['Tro Bụi slime cấp F kho lưu trữ', 'Cơ Niệm mech bug cấp E', 'Lục Vũ sparrow cấp F'],
+        rules: ['MC giấu Vạn Linh Phổ, không ai biết', 'pet evolve trong kho riêng/phòng kín', 'pet public ở mức kìm chế thấp hơn cấp thật 1-2 tier', 'đối thủ ngắt quãng 3-5 chương', 'dopamine qua phản ứng xã hội bystander/đối thủ shock thầm'],
+      },
+      arcPlan: [
+        { chapter: 1, goal: 'Cố Diệp tỉnh dậy, diagnose gia tộc Cố nát, plant first seed bí mật ở kho riêng', conflict: 'chú Cố Trường Khải ép ký từ bỏ thừa kế', payoff: 'MC từ chối ký, lừa chú vài ngày, observe Tro Bụi thấy tuyến tiến hóa Phượng Linh', hook: 'em gái Cố Tiểu Đào kể chuyện kho lưu trữ có pet phế bị bỏ' },
+        { chapter: 2, goal: 'feed Tro Bụi bí mật ở hậu sơn, evolve sang Lửa Tro cấp E', conflict: 'em họ Cố Vân Kiếm khinh MC, đố MC chọn pet ở giải đấu nội tộc', payoff: 'Tro Bụi evolve thành công ở phòng kín, MC giấu cấp thật, đem ra public ở mức cấp F kìm chế', hook: 'giải đấu nội tộc còn 3 ngày' },
+        { chapter: 3, goal: 'giải đấu nội tộc vòng 1, MC thắng bằng pet Tro Bụi kìm chế', conflict: 'Cố Vân Kiếm + 2 đệ tử khác chế nhạo MC trước trận', payoff: 'MC thắng nhanh, đối thủ shock thầm, trưởng lão Cố Già Tâm nghiêng về MC + cho MC kho di sản tổ phụ', hook: 'kho di sản có sách công thức tiến hóa cổ' },
+      ],
+    };
+    const report = validateFocusPresetStorySetup(setup, 'van-linh-pho-gia-toc');
+    expect(report.verdict).toBe('pass');
+    expect(report.issues).toHaveLength(0);
+  });
+
+  it('rejects van-linh-pho-gia-toc setup missing beast-evolution ladder', () => {
+    const report = validateFocusPresetStorySetup({
+      genres: ['ngu-thu-tien-hoa'],
+      subGenres: ['ngu-thu-gia-toc', 'lao-luc-mode', 'pet-evolution-bom'],
+      worldDescription: 'MC xuyên qua một dị giới phục hưng gia tộc.',
+      setupKernel: { readerFantasy: 'MC mạnh dần', protagonistEngine: 'may mắn', pleasureLoop: ['gặp chuyện', 'thắng', 'nhận thưởng', 'đi tiếp'] },
+      storyOutline: { premise: 'phiêu lưu' },
+      masterOutline: { arcs: [{ name: 'phiêu lưu' }] },
+      arcPlan: [{ chapter: 1, summary: 'khởi đầu' }],
+    }, 'van-linh-pho-gia-toc');
+    expect(report.verdict).toBe('revise');
+    expect(report.issues.some((issue) => issue.code === 'focus_missing_beast_tamer_class')).toBe(true);
+    expect(report.issues.some((issue) => issue.code === 'focus_missing_evolution_hud')).toBe(true);
+    expect(report.issues.some((issue) => issue.code === 'focus_missing_signature_pets')).toBe(true);
+  });
+
   it('requires a visible trade/progression dividend for song-xuyen chapters', () => {
     const payload = parseContinuityExtractionPayload({
       summary: 'Lâm Việt bị thương hội nghi ngờ, bị tuần phòng hỏi giấy, bị khách ép giá và phải trì hoãn chuyến hàng.',
