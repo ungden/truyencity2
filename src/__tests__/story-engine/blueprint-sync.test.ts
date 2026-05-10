@@ -2,14 +2,39 @@ import { syncBlueprintToDb } from '@/services/story-engine/blueprint/sync';
 import { UNIVERSAL_BANNED_PATTERNS, UNIVERSAL_TONE_DIRECTIVES } from '@/services/story-engine/blueprint/universal-bans';
 import type { NovelBlueprint } from '@/services/story-engine/blueprint/types';
 
-function fakeDb(captured: { rows: any[] }) {
+interface CapturedRows {
+  arc_plans: any[];
+  chapter_blueprints: any[];
+  story_blueprint_runs: any[];
+  ai_story_projects: any[];
+  coverageRows: Array<{ chapter_number: number; status: string }>;
+}
+
+function fakeDb(captured: CapturedRows) {
   return {
-    from: () => ({
-      select: () => ({ eq: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null }) }) }) }),
-      upsert: async (row: any) => {
-        captured.rows.push(row);
+    from: (table: string) => ({
+      select: (_columns?: string) => ({
+        eq: (..._args: unknown[]) => ({
+          eq: (..._args2: unknown[]) => ({
+            gte: (..._args3: unknown[]) => ({
+              lte: async () => ({ data: captured.coverageRows, error: null }),
+            }),
+            maybeSingle: async () => ({ data: null, error: null }),
+          }),
+          maybeSingle: async () => ({ data: { style_directives: {} }, error: null }),
+        }),
+      }),
+      upsert: async (rowOrRows: any) => {
+        const arr = Array.isArray(rowOrRows) ? rowOrRows : [rowOrRows];
+        for (const r of arr) captured[table as keyof CapturedRows].push(r);
         return { error: null };
       },
+      update: (patch: any) => ({
+        eq: async () => {
+          captured.ai_story_projects.push(patch);
+          return { error: null };
+        },
+      }),
     }),
   } as any;
 }
@@ -36,15 +61,19 @@ const minimalBlueprint: NovelBlueprint = {
         {
           n: 1,
           beat: 'setup',
-          brief: 'MC arrives in new world',
+          goal: 'MC arrives in new world',
+          payoff: 'mentor introduction + first network connection',
           scenes: ['scene 1', 'scene 2', 'scene 3', 'scene 4'],
           mcBenefit: 'tài nguyên — gặp người mentor lần đầu',
           threadsAdvance: ['mc origin'],
+          authorityConstraints: 'must register at academy gate',
+          forbiddenTerms: ['novel-specific term to ban'],
         },
         {
           n: 2,
           beat: 'breathing',
-          brief: 'MC observes surroundings',
+          goal: 'MC observes surroundings',
+          payoff: 'gathered intel about world structure',
           scenes: ['s1', 's2', 's3', 's4'],
           mcBenefit: 'thông tin về thế giới mới',
         },
@@ -62,62 +91,121 @@ const minimalBlueprint: NovelBlueprint = {
     },
   ],
   extraBannedPatterns: ['CẤM novel-specific pattern X'],
+  extraForbiddenTerms: ['novel-extra forbidden literal'],
   toneDirectives: ['Tone: lạnh đạm + tự tin'],
 };
 
-describe('syncBlueprintToDb', () => {
-  it('upserts only arcs with non-empty briefs', async () => {
-    const captured = { rows: [] as any[] };
+function freshCaptured(): CapturedRows {
+  return {
+    arc_plans: [],
+    chapter_blueprints: [],
+    story_blueprint_runs: [],
+    ai_story_projects: [],
+    coverageRows: [],
+  };
+}
+
+describe('syncBlueprintToDb (unified)', () => {
+  it('upserts only arcs with non-empty briefs into chapter_blueprints', async () => {
+    const captured = freshCaptured();
     const result = await syncBlueprintToDb(fakeDb(captured), 'project-1', minimalBlueprint);
     expect(result.arcsSynced).toBe(1);
     expect(result.arcsSkipped).toBe(1);
-    expect(result.briefsTotal).toBe(2);
-    expect(captured.rows).toHaveLength(1);
-    expect(captured.rows[0].arc_number).toBe(1);
-    expect(captured.rows[0].project_id).toBe('project-1');
+    expect(result.briefsSynced).toBe(2);
+    expect(captured.chapter_blueprints).toHaveLength(2);
+    expect(captured.chapter_blueprints[0].project_id).toBe('project-1');
+    expect(captured.chapter_blueprints[0].chapter_number).toBe(1);
+    expect(captured.chapter_blueprints[1].chapter_number).toBe(2);
   });
 
-  it('builds chapter_briefs with chapterNumber, scenes, mcBenefit, sub_arc_number, sceneDirection', async () => {
-    const captured = { rows: [] as any[] };
+  it('writes Codex column-level fields (goal, payoff, conflict, cast, authority)', async () => {
+    const captured = freshCaptured();
     await syncBlueprintToDb(fakeDb(captured), 'p1', minimalBlueprint);
-    const briefs = captured.rows[0].chapter_briefs;
-    expect(briefs).toHaveLength(2);
-    expect(briefs[0].chapterNumber).toBe(1);
-    expect(briefs[0].sub_arc_number).toBe(1); // ch.1 in sub-arc 1 (ch.1-5)
-    expect(briefs[0].scenes).toEqual(['scene 1', 'scene 2', 'scene 3', 'scene 4']);
-    expect(briefs[0].mcBenefit).toContain('tài nguyên');
-    expect(briefs[0].sceneDirection).toContain('UNIVERSAL BANS:');
-    expect(briefs[1].sub_arc_number).toBe(1); // ch.2 falls in sub-arc 1 (range [1,5])
+    const row = captured.chapter_blueprints[0];
+    expect(row.goal).toBe('MC arrives in new world');
+    expect(row.payoff).toBe('mentor introduction + first network connection');
+    expect(row.authority_constraints).toBe('must register at academy gate');
+    expect(row.arc_number).toBe(1);
+    expect(row.sub_arc_number).toBe(1);
+    expect(row.status).toBe('planned');
+    expect(row.version).toBe(1);
   });
 
-  it('injects UNIVERSAL_BANNED_PATTERNS + tone in sceneDirection', async () => {
-    const captured = { rows: [] as any[] };
+  it('forbidden_terms = universal + per-novel + per-chapter', async () => {
+    const captured = freshCaptured();
     await syncBlueprintToDb(fakeDb(captured), 'p1', minimalBlueprint);
-    const sceneDirection = captured.rows[0].chapter_briefs[0].sceneDirection;
-    for (const ban of UNIVERSAL_BANNED_PATTERNS) {
-      expect(sceneDirection).toContain(ban);
-    }
-    for (const tone of UNIVERSAL_TONE_DIRECTIVES) {
-      expect(sceneDirection).toContain(tone);
-    }
+    const row = captured.chapter_blueprints[0];
+    expect(row.forbidden_terms).toContain('novel-extra forbidden literal');
+    expect(row.forbidden_terms).toContain('novel-specific term to ban');
+    // (no UNIVERSAL_FORBIDDEN_TERMS by default — that array is empty in v1)
   });
 
-  it('appends per-novel extraBannedPatterns + toneDirectives', async () => {
-    const captured = { rows: [] as any[] };
+  it('meta JSONB carries Claude additions (beat, scenes, mcBenefit, sceneDirection)', async () => {
+    const captured = freshCaptured();
     await syncBlueprintToDb(fakeDb(captured), 'p1', minimalBlueprint);
-    const sceneDirection = captured.rows[0].chapter_briefs[0].sceneDirection;
-    expect(sceneDirection).toContain('CẤM novel-specific pattern X');
-    expect(sceneDirection).toContain('Tone: lạnh đạm + tự tin');
+    const row = captured.chapter_blueprints[0];
+    expect(row.meta.beat).toBe('setup');
+    expect(row.meta.scenes).toEqual(['scene 1', 'scene 2', 'scene 3', 'scene 4']);
+    expect(row.meta.mcBenefit).toContain('tài nguyên');
+    expect(row.meta.sceneDirection).toContain('UNIVERSAL BANS:');
+    expect(row.meta.sceneDirection).toContain('CẤM novel-specific pattern X');
+    expect(row.meta.sceneDirection).toContain('Tone: lạnh đạm');
   });
 
-  it('plan_text contains arc theme + sub-arcs + universal bans', async () => {
-    const captured = { rows: [] as any[] };
+  it('also syncs arc_plans (plan_text + sub_arcs) for arc-level context', async () => {
+    const captured = freshCaptured();
     await syncBlueprintToDb(fakeDb(captured), 'p1', minimalBlueprint);
-    const planText = captured.rows[0].plan_text;
-    expect(planText).toContain('opening arc');
-    expect(planText).toContain('foundation set');
-    expect(planText).toContain('Sub-arc 1');
-    expect(planText).toContain('warm baseline');
-    expect(planText).toContain('UNIVERSAL BANS');
+    expect(captured.arc_plans).toHaveLength(1);
+    expect(captured.arc_plans[0].arc_number).toBe(1);
+    expect(captured.arc_plans[0].plan_text).toContain('opening arc');
+    expect(captured.arc_plans[0].plan_text).toContain('UNIVERSAL BANS');
+    expect(captured.arc_plans[0].chapter_briefs).toEqual([]); // legacy field cleared
+  });
+
+  it('upserts story_blueprint_runs with coverage status', async () => {
+    const captured = freshCaptured();
+    captured.coverageRows = [
+      { chapter_number: 1, status: 'planned' },
+      { chapter_number: 2, status: 'planned' },
+    ];
+    const result = await syncBlueprintToDb(fakeDb(captured), 'p1', minimalBlueprint);
+    expect(captured.story_blueprint_runs).toHaveLength(1);
+    expect(captured.story_blueprint_runs[0].project_id).toBe('p1');
+    expect(captured.story_blueprint_runs[0].target_chapters).toBe(100);
+    expect(captured.story_blueprint_runs[0].generated_chapters).toBe(2);
+    // 2 of 100 → coverage NOT ok
+    expect(result.coverageOk).toBe(false);
+    expect(captured.story_blueprint_runs[0].status).toBe('invalid');
+  });
+
+  it('refuses --activate when coverage incomplete', async () => {
+    const captured = freshCaptured();
+    captured.coverageRows = [{ chapter_number: 1, status: 'planned' }];
+    await expect(
+      syncBlueprintToDb(fakeDb(captured), 'p1', minimalBlueprint, { activate: true })
+    ).rejects.toThrow(/coverage incomplete/i);
+  });
+
+  it('activates project flags when coverage complete + activate flag', async () => {
+    const captured = freshCaptured();
+    // Simulate 100 of 100 chapters covered
+    captured.coverageRows = Array.from({ length: 100 }, (_, i) => ({
+      chapter_number: i + 1,
+      status: 'planned',
+    }));
+    const result = await syncBlueprintToDb(fakeDb(captured), 'p1', minimalBlueprint, { activate: true, version: 2 });
+    expect(result.coverageOk).toBe(true);
+    expect(captured.ai_story_projects).toHaveLength(1);
+    const patch = captured.ai_story_projects[0];
+    expect(patch.style_directives.require_full_chapter_blueprint).toBe(true);
+    expect(patch.style_directives.chapter_blueprint_version).toBe(2);
+  });
+
+  it('preserves arc 2 placeholder (empty briefs[]) without inserting fake rows', async () => {
+    const captured = freshCaptured();
+    await syncBlueprintToDb(fakeDb(captured), 'p1', minimalBlueprint);
+    // Only arc 1's 2 chapters should be inserted; arc 2 (briefs:[]) is skipped
+    expect(captured.chapter_blueprints).toHaveLength(2);
+    expect(captured.arc_plans).toHaveLength(1); // also skipped arc 2 plan_text upsert
   });
 });

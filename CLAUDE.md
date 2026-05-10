@@ -176,16 +176,24 @@ All admin/internal API routes require auth:
 
 ## Common Tasks
 
-### Tạo Novel Mới (Blueprint Workflow — BẮT BUỘC từ 2026-05-10)
+### Tạo Novel Mới (Unified Blueprint Workflow — BẮT BUỘC từ 2026-05-10)
 
 Mọi novel ≥1000 chương target PHẢI dùng blueprint pre-plan approach.
 Tác giả (Claude/Codex) plan toàn bộ chương trước khi AI viết bất kỳ
 chương nào. Drift impossible.
 
+**Unified system kết hợp Codex's DB-backed `chapter_blueprints` table
+(migration 0169) với Claude's file-based authoring + 5-cluster pattern.
+Cả 2 dùng chung từ 2026-05-10.**
+
 **Vị trí:**
+- Full runbook: [docs/story-engine/CHAPTER_BLUEPRINT_UNIFIED.md](docs/story-engine/CHAPTER_BLUEPRINT_UNIFIED.md)
 - Generic infrastructure: `src/services/story-engine/blueprint/`
+- Writer integration: `src/services/story-engine/plan/chapter-blueprints.ts`
 - Per-novel blueprints: `blueprints/<novel-id>/`
-- Runbook: `src/services/story-engine/blueprint/README.md`
+- Storage: `chapter_blueprints` + `story_blueprint_runs` tables (DB)
+- Sync CLI: `scripts/sync-blueprint.ts`
+- Legacy heuristic generator (fallback): `scripts/generate-chapter-blueprints.ts`
 
 **Workflow tóm tắt** (full ở README):
 1. Design focus preset (`src/services/story-engine/codex-automation/focus-presets.ts`)
@@ -196,31 +204,46 @@ chương nào. Drift impossible.
 3. Spawn DB rows (`scripts/spawn-novel.ts` hoặc novel-specific spawn)
 4. **Cover via Codex CLI** — `npm run codex:automation -- prepare-cover --novel-id=X`
    → `codex exec "..."` → `apply-cover --apply`
-5. Sync blueprint to arc_plans:
+5. Sync blueprint to chapter_blueprints DB:
    ```bash
    PROJECT_ID=<uuid> BLUEPRINT=<novel-id> npx tsx scripts/sync-blueprint.ts
+   # Sau khi all 1..totalChapters covered:
+   PROJECT_ID=<uuid> BLUEPRINT=<novel-id> npx tsx scripts/sync-blueprint.ts --activate
    ```
 6. Manual write ch.1-3 (`scripts/write-chapter-flash.ts`) + audit deep
    per chapter — đọc FULL content, không peek 500 chars
 7. Promote sang cron — add project vào `FOCUSED_PROJECT_IDS` Vercel env
 
-**Chapter brief shape** (xem types.ts):
+**Chapter brief shape** (unified — xem `types.ts` + runbook):
 ```ts
 {
   n: 6, beat: 'breathing',
-  brief: 'one-line goal',
+  // Story (Codex rich → DB columns):
+  titleHint, goal, conflict, payoff, endingHook,
+  cast, location,
+  // Mechanics (Codex):
+  resourceLedgerDelta, worldStateDelta, speciesDelta,
+  templateInspiration, authorityConstraints,
+  forbiddenTerms,  // literal strings auto-checked post-write
+  // Authoring (Claude → DB meta JSONB):
   scenes: ['scene 1', ...],   // 4-7 phrases
-  mcBenefit: 'concrete benefit (tài nguyên/uy tín/manh mối/network/...)',
-  threadsAdvance, threadsResolve, newThreads,  // optional
-  risks: ['CẤM pattern X for this chapter'],   // optional
+  mcBenefit: 'concrete benefit (tài nguyên/uy tín/manh mối/...)',
+  threadsAdvance, threadsResolve, newThreads,
+  risks: ['CẤM pattern X for this chapter'],  // high-level guidance
 }
 ```
+Legacy briefs có chỉ `brief` + `mcBenefit` vẫn work — sync fallback:
+`goal ← brief`, `payoff ← mcBenefit`.
 
 5-cluster pattern: setup / breathing / confront / big_wow / resolution.
 
-**Universal bans** (`universal-bans.ts`) auto-injected vào sceneDirection
-mỗi chương. Catch default AI drift: paranoia cliffhanger, MC chõ mồm,
-double-evolve, cosmic-tier antagonist quá sớm.
+**3 layer của universal bans** (`universal-bans.ts`):
+- `UNIVERSAL_FORBIDDEN_TERMS` — literal strings auto-checked post-write
+- `UNIVERSAL_BANNED_PATTERNS` — high-level guidance vào prompt
+- `UNIVERSAL_TONE_DIRECTIVES` — tone instructions vào prompt
+
+Per-novel `extraForbiddenTerms` + `extraBannedPatterns` + `toneDirectives`
+extend các array trên.
 
 ### Them Feature Moi vao Chapter Writer
 

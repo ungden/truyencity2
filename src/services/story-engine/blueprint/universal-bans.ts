@@ -1,10 +1,39 @@
 /**
- * Universal banned patterns — applied to EVERY chapter brief of EVERY novel
- * using the blueprint approach. Catches default AI drift patterns observed
- * across multiple novels (paranoia cliffhanger, MC chõ mồm, double-evolve,
- * cosmic-tier antagonist too early).
+ * Universal banned content — applied to EVERY chapter brief of EVERY novel
+ * using the blueprint approach. Two distinct mechanisms:
  *
- * Per-novel `extraBannedPatterns` (in NovelBlueprint) extend this list.
+ * 1. UNIVERSAL_FORBIDDEN_TERMS — literal strings auto-checked post-write
+ *    by `evaluateBlueprintAlignment` (regex contains). If a chapter contains
+ *    any of these, it's flagged as critical/blueprint_forbidden_term.
+ *    These get composed into chapter_blueprints.forbidden_terms TEXT[].
+ *
+ * 2. UNIVERSAL_BANNED_PATTERNS — high-level guidance instructions injected
+ *    into the writer prompt (sceneDirection + plan_text). Not auto-checked,
+ *    relies on AI compliance.
+ *
+ * 3. UNIVERSAL_TONE_DIRECTIVES — tone instructions injected into prompt.
+ *
+ * Per-novel `extraBannedPatterns` / `extraForbiddenTerms` (in NovelBlueprint)
+ * extend these.
+ */
+
+/**
+ * Literal strings auto-checked post-write. Add cautiously — false positives
+ * block chapters at the gate.
+ *
+ * Catches default AI drift patterns:
+ *   - Paranoia cliffhanger — "có người theo dõi", "kẻ rình mò"
+ *   - Drama-pile-on cliché phrases that signal AI default
+ */
+export const UNIVERSAL_FORBIDDEN_TERMS: string[] = [
+  // (Empty by default — universal forbidden terms cause hard fails. Per-novel
+  // forbiddenTerms are the safer default. Add here only after observing the
+  // pattern across 3+ novels.)
+];
+
+/**
+ * High-level guidance — instructions for the writer. Injected into prompt
+ * as sceneDirection BAN list. Compliance via AI prompt-following, not regex.
  */
 export const UNIVERSAL_BANNED_PATTERNS: string[] = [
   'CẤM cliffhanger "có người theo dõi/rình mò/biết bí mật MC" — MC TỰ TIN, KHÔNG paranoid',

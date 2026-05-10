@@ -15,30 +15,95 @@
 
 export type BeatType = 'setup' | 'breathing' | 'confront' | 'big_wow' | 'resolution';
 
+/**
+ * Unified chapter brief — combines Codex's rich DB schema (chapter_blueprints
+ * table, migration 0169) with Claude's authoring/cluster-pattern fields.
+ *
+ * Storage: 1 row per chapter in `chapter_blueprints` table.
+ *   - DB columns: position + story + mechanics + lifecycle + forbidden_terms[]
+ *   - JSONB `meta`: beat, scenes, mcBenefit, threads*, riskGuidance, toneDirectives
+ *
+ * Writer reads via `assertChapterBlueprintReady` + `formatChapterBlueprintContext`
+ * (see src/services/story-engine/plan/chapter-blueprints.ts).
+ */
 export interface ChapterBrief {
-  /** 1-indexed chapter number within the novel. */
+  // ── Position ────────────────────────────────────────────────────────────
+  /** 1-indexed chapter number within the novel. (DB: chapter_number) */
   n: number;
+  /** 5-cluster beat — Claude's authoring pattern. (DB: meta.beat) */
   beat: BeatType;
-  /** One-line goal of the chapter. */
-  brief: string;
-  /** 4-7 short scene descriptions. Writer expands each into a real scene. */
+  /** Volume number — for novels with volume hierarchy. (DB: volume_number) */
+  volumeNumber?: number;
+  /** Arc number 1..N. (DB: arc_number) */
+  arcNumber?: number;
+  /** Sub-arc number within arc. (DB: sub_arc_number) */
+  subArcNumber?: number;
+
+  // ── Story (rich, from Codex schema) ─────────────────────────────────────
+  /** Optional title hint — writer may polish. (DB: title_hint) */
+  titleHint?: string;
+  /**
+   * Concrete chapter goal. (DB: goal)
+   * Falls back to `brief` if missing — at least one of {goal, brief} required.
+   */
+  goal?: string;
+  /** Conflict / friction in the chapter. (DB: conflict) */
+  conflict?: string;
+  /**
+   * Concrete payoff. (DB: payoff)
+   * Falls back to `mcBenefit` if missing — at least one of {payoff, mcBenefit} required.
+   */
+  payoff?: string;
+  /** Ending hook for next-chapter setup. (DB: ending_hook) */
+  endingHook?: string;
+  /** Cast members appearing in chapter. (DB: cast TEXT[]) */
+  cast?: string[];
+  /** Primary location. (DB: location) */
+  location?: string;
+
+  // ── Mechanics (Codex schema — domain-specific deltas) ───────────────────
+  /** Resource ledger change. (DB: resource_ledger_delta) */
+  resourceLedgerDelta?: string;
+  /** Visible world-state change. (DB: world_state_delta) */
+  worldStateDelta?: string;
+  /** Species / dependent-race change (for ngu-thu, sang-the genres). (DB: species_delta) */
+  speciesDelta?: string;
+  /** Memory/template inspiration source. (DB: template_inspiration) */
+  templateInspiration?: string;
+  /** Authority/access constraints (academy, faction, log). (DB: authority_constraints) */
+  authorityConstraints?: string;
+
+  // ── Bans ────────────────────────────────────────────────────────────────
+  /**
+   * Literal strings auto-checked post-write by `evaluateBlueprintAlignment`.
+   * Composed by sync = UNIVERSAL_FORBIDDEN_TERMS + per-novel extra +
+   * per-chapter chapter-specific. (DB: forbidden_terms TEXT[])
+   */
+  forbiddenTerms?: string[];
+
+  // ── Authoring / writer guidance (Claude's additions) ────────────────────
+  /**
+   * Legacy field — kept for backward compat with old briefs that don't have
+   * goal/payoff explicit. Writers use goal+payoff for unified prompts.
+   */
+  brief?: string;
+  /** 4-7 short scene phrases. (DB: meta.scenes) */
   scenes: string[];
   /**
-   * Concrete benefit phrase — must contain at least one of the keywords in
-   * `CONCRETE_BENEFIT_RE` (tài nguyên / uy tín / manh mối / network / ...).
-   * Validated by `arc plan` writer at chapter time.
+   * Concrete benefit phrase — must contain CONCRETE_BENEFIT_RE keyword
+   * (tài nguyên / uy tín / manh mối / network / ...). (DB: meta.mcBenefit)
    */
   mcBenefit: string;
-  /** Plot threads to advance in this chapter (optional). */
+  /** Plot threads to advance. (DB: meta.threadsAdvance) */
   threadsAdvance?: string[];
-  /** Plot threads to resolve in this chapter (optional). */
+  /** Plot threads to resolve. (DB: meta.threadsResolve) */
   threadsResolve?: string[];
-  /** New plot threads introduced in this chapter (optional). */
+  /** New plot threads introduced. (DB: meta.newThreads) */
   newThreads?: string[];
   /**
-   * Per-chapter ban list + tone directives. Injected into `sceneDirection`
-   * field which writer reads. Universal bans (UNIVERSAL_BANNED_PATTERNS)
-   * are auto-appended by sync — risks here are chapter-specific overrides.
+   * High-level guidance instructions (NOT literal terms — for prompt only).
+   * Per-chapter overrides; universal patterns auto-appended by sync.
+   * (DB: meta.riskGuidance)
    */
   risks?: string[];
 }
@@ -82,10 +147,15 @@ export interface NovelBlueprint {
   /** All arcs covering ch.1 → totalChapters. */
   arcs: ArcBlueprint[];
   /**
-   * Optional — extra ban patterns specific to this novel's genre/preset
-   * appended after UNIVERSAL_BANNED_PATTERNS.
+   * Optional — high-level guidance ban patterns specific to this novel,
+   * appended after UNIVERSAL_BANNED_PATTERNS. Goes into prompt only.
    */
   extraBannedPatterns?: string[];
+  /**
+   * Optional — literal forbidden terms specific to this novel, appended after
+   * UNIVERSAL_FORBIDDEN_TERMS. Auto-checked post-write by evaluateBlueprintAlignment.
+   */
+  extraForbiddenTerms?: string[];
   /**
    * Optional — extra tone directives (1-2 lines) appended to plan_text + every
    * chapter's sceneDirection.
