@@ -9,6 +9,7 @@ import type { NovelBlueprint } from '../../src/services/story-engine/blueprint/t
 import { VAN_LINH_PHO_ARC_SKELETON } from './arc-skeleton';
 import { ARC1_BRIEFS_CH6_50 } from './arc-1-detail';
 import { ARC2_BRIEFS_CH51_150 } from './arc-2-detail';
+import { ARC3_BRIEFS_CH151_300 } from './arc-3-detail';
 
 export const VAN_LINH_PHO_BLUEPRINT: NovelBlueprint = {
   id: 'van-linh-pho-gia-toc',
@@ -19,8 +20,8 @@ export const VAN_LINH_PHO_BLUEPRINT: NovelBlueprint = {
   arcs: [
     { arc: VAN_LINH_PHO_ARC_SKELETON[0], briefs: ARC1_BRIEFS_CH6_50 },
     { arc: VAN_LINH_PHO_ARC_SKELETON[1], briefs: ARC2_BRIEFS_CH51_150 },
-    // Arc 3-7 briefs pending.
-    { arc: VAN_LINH_PHO_ARC_SKELETON[2], briefs: [] },
+    { arc: VAN_LINH_PHO_ARC_SKELETON[2], briefs: ARC3_BRIEFS_CH151_300 },
+    // Arc 4-7 briefs pending.
     { arc: VAN_LINH_PHO_ARC_SKELETON[3], briefs: [] },
     { arc: VAN_LINH_PHO_ARC_SKELETON[4], briefs: [] },
     { arc: VAN_LINH_PHO_ARC_SKELETON[5], briefs: [] },
