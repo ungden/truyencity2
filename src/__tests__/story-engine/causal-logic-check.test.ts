@@ -2,6 +2,13 @@ import {
   buildCausalLogicHealth,
   evaluateCausalLogic,
 } from '../../services/story-engine/quality/causal-logic-check';
+import {
+  evaluateBlueprintAlignment,
+  formatChapterBlueprintContext,
+  shouldRequireChapterBlueprint,
+  validateChapterBlueprintCoverage,
+  type ChapterBlueprint,
+} from '../../services/story-engine/plan/chapter-blueprints';
 
 const baseContext = {
   chapterNumber: 43,
@@ -92,5 +99,75 @@ describe('causal logic check', () => {
     expect(issues).toEqual(expect.arrayContaining([
       expect.objectContaining({ code: 'unscheduled_rival_intrusion', severity: 'major' }),
     ]));
+  });
+
+  it('blocks chapter content that violates blueprint forbidden terms/resource/authority', () => {
+    const blueprint: ChapterBlueprint = {
+      project_id: 'p',
+      chapter_number: 43,
+      goal: 'Lâm Duy vào phòng mô phỏng hợp pháp.',
+      payoff: 'Nhận điểm công và mẫu Băng Lộ hợp pháp.',
+      resource_ledger_delta: 'Điểm công và Băng Lộ phải có nguồn/chi phí.',
+      authority_constraints: 'Học Viện/phòng mô phỏng cần đăng ký, hợp đồng hoặc giám sát.',
+      forbidden_terms: ['Thần Cách'],
+      status: 'planned',
+      version: 1,
+    };
+
+    const issues = evaluateBlueprintAlignment(
+      'Lâm Duy bước vào Học Viện, nhặt một mảnh Thần Cách rồi đem Băng Lộ về Thần Vực.',
+      blueprint,
+    );
+
+    expect(issues).toEqual(expect.arrayContaining([
+      expect.objectContaining({ code: 'blueprint_forbidden_term', severity: 'critical' }),
+      expect.objectContaining({ code: 'authority_access_violation', severity: 'major' }),
+      expect.objectContaining({ code: 'blueprint_resource_mismatch', severity: 'major' }),
+    ]));
+  });
+
+  it('formats blueprint as writer rail and toggles requirement from style directives', () => {
+    const context = formatChapterBlueprintContext({
+      project_id: 'p',
+      chapter_number: 36,
+      goal: 'Đăng ký khảo hạch hợp pháp.',
+      payoff: 'Có quyền vào phòng mô phỏng sơ cấp.',
+      status: 'planned',
+      version: 2,
+    });
+
+    expect(context).toContain('FULL CHAPTER BLUEPRINT');
+    expect(context).toContain('Đăng ký khảo hạch');
+    expect(shouldRequireChapterBlueprint({ require_full_chapter_blueprint: true })).toBe(true);
+    expect(shouldRequireChapterBlueprint({ chapter_blueprint_version: 2 })).toBe(true);
+    expect(shouldRequireChapterBlueprint({ flash_bulk_cheap_mode: true })).toBe(false);
+  });
+
+  it('requires full blueprint coverage from 1 to target chapter', async () => {
+    const rows = [
+      { chapter_number: 1, status: 'used' },
+      { chapter_number: 3, status: 'planned' },
+      { chapter_number: 4, status: 'invalid' },
+    ];
+    const fakeDb = {
+      from: () => ({
+        select: () => ({
+          eq: () => ({
+            eq: () => ({
+              gte: () => ({
+                lte: async () => ({ data: rows, error: null }),
+              }),
+            }),
+          }),
+        }),
+      }),
+    };
+
+    const coverage = await validateChapterBlueprintCoverage('p', 4, 1, fakeDb as never);
+
+    expect(coverage.ok).toBe(false);
+    expect(coverage.generatedChapters).toBe(3);
+    expect(coverage.missingChapters).toEqual([2]);
+    expect(coverage.invalidChapters).toEqual([4]);
   });
 });

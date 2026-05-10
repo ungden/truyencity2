@@ -31,6 +31,7 @@ function validateSubGenreKeys(rawKeys: string[], projectId: string): string[] {
 }
 import { getArchitectVoiceHint } from '../templates/genre-voice-anchors';
 import { getGenreArchitectGuide } from '../templates/genre-process-blueprints';
+import { formatChapterBlueprintContext, loadChapterBlueprint } from '../plan/chapter-blueprints';
 
 import type {
   ContextPayload, ChapterSummary, GenreType, GeminiConfig, StoryKernel,
@@ -514,6 +515,9 @@ export async function loadContext(
       const { getVoiceAnchorContext } = await import('../memory/voice-anchor');
       return getVoiceAnchorContext(projectId, chapterNumber).catch(() => null);
     })() || undefined,
+    chapterBlueprintContext: await loadChapterBlueprint(projectId, chapterNumber)
+      .then((blueprint) => formatChapterBlueprintContext(blueprint))
+      .catch(() => undefined),
     rollingBriefsContext: await (async () => {
       const { getRollingBriefsContext } = await import('../plan/chapter-briefs');
       return getRollingBriefsContext(projectId, chapterNumber).catch(() => null);
@@ -603,6 +607,11 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
   // Layer 0.5k: Phase 27 W4.2 — Voice anchor (đại thần 声音锚)
   if (payload.voiceAnchorContext) {
     parts.push(payload.voiceAnchorContext);
+  }
+
+  // Layer 0.5k.1: Full-novel chapter blueprint, generated before routine production.
+  if (payload.chapterBlueprintContext) {
+    parts.push(payload.chapterBlueprintContext);
   }
 
   // Layer 0.5l: Phase 27 W5.4 — Rolling chapter briefs (đại thần 日大纲)

@@ -800,6 +800,24 @@ async function writeOneChapter(
       }
     }
 
+    if (errorMsg.startsWith('CHAPTER_BLUEPRINT_MISSING_OR_INVALID')) {
+      try {
+        await supabase
+          .from('ai_story_projects')
+          .update({
+            status: 'paused',
+            pause_reason: `chapter_blueprint_missing_or_invalid: ${errorMsg}`.slice(0, 500),
+            paused_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', project.id)
+          .eq('status', 'active');
+        console.warn(`[${tier}][${project.id.slice(0, 8)}] Paused for missing/invalid chapter blueprint`);
+      } catch (pauseErr) {
+        console.error(`[${tier}][${project.id.slice(0, 8)}] Failed to pause blueprint-invalid project:`, pauseErr);
+      }
+    }
+
     // ====== QUOTA ERROR — IMMEDIATELY after failure ======
     try {
       await updateQuotaAfterError(supabase, project.id, vnDate, errorMsg);

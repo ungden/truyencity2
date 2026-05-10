@@ -15,6 +15,7 @@
     "security:secrets": "node scripts/scan-secrets.js",
     "audit:stories": "node --import tsx scripts/audit-recent-story-quality.ts",
     "audit:logic": "node --import tsx scripts/audit-story-logic.ts",
+    "blueprint:generate": "node --import tsx scripts/generate-chapter-blueprints.ts",
     "backfill:quality-metrics": "node --import tsx scripts/backfill-published-quality-metrics.ts",
     "codex:story": "node --import tsx scripts/codex-story-pipeline.ts",
     "codex:automation": "node --import tsx scripts/codex-automation-pipeline.ts"

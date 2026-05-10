@@ -7,6 +7,7 @@
  */
 
 import { getSupabase } from '../utils/supabase';
+import { evaluateBlueprintAlignment, formatChapterBlueprintContext, loadChapterBlueprint } from '../plan/chapter-blueprints';
 import type { CriticIssue } from '../types';
 
 export type CausalLogicIssueCode =
@@ -17,7 +18,10 @@ export type CausalLogicIssueCode =
   | 'arc_rail_violation'
   | 'thread_jump'
   | 'unscheduled_rival_intrusion'
-  | 'literal_artifact_leak';
+  | 'literal_artifact_leak'
+  | 'blueprint_goal_mismatch'
+  | 'blueprint_forbidden_term'
+  | 'blueprint_resource_mismatch';
 
 export interface CausalLogicIssue {
   code: CausalLogicIssueCode;
@@ -143,7 +147,7 @@ export async function checkCausalLogicFast(
   options: { protagonistName?: string; focusKey?: string | null } = {},
 ): Promise<CausalLogicIssue[]> {
   const db = getSupabase();
-  const [{ data: projectRow }, { data: arcRow }, { data: threadRows }, { data: stateRows }] = await Promise.all([
+  const [{ data: projectRow }, { data: arcRow }, { data: threadRows }, { data: stateRows }, blueprint] = await Promise.all([
     db.from('ai_story_projects')
       .select('style_directives')
       .eq('id', projectId)
@@ -168,6 +172,7 @@ export async function checkCausalLogicFast(
       .lt('chapter_number', chapterNumber)
       .order('chapter_number', { ascending: false })
       .limit(40),
+    loadChapterBlueprint(projectId, chapterNumber).catch(() => null),
   ]);
 
   const arc = arcRow as ArcRow | null;
@@ -176,7 +181,7 @@ export async function checkCausalLogicFast(
     : undefined;
   const styleDirectives = projectRow?.style_directives as { focus_key?: string | null } | null | undefined;
 
-  return evaluateCausalLogic(content, {
+  const issues = evaluateCausalLogic(content, {
     projectId,
     chapterNumber,
     protagonistName: options.protagonistName,
@@ -186,6 +191,7 @@ export async function checkCausalLogicFast(
       currentBrief?.brief,
       currentBrief?.sceneDirection,
       currentBrief?.mcBenefit,
+      formatChapterBlueprintContext(blueprint),
     ].filter(Boolean).join('\n'),
     activeThreads: (threadRows || []).map((thread) => [
       thread.name,
@@ -195,6 +201,8 @@ export async function checkCausalLogicFast(
     ].filter(Boolean).join(': ')),
     characterStates: stateRows || [],
   });
+  issues.push(...evaluateBlueprintAlignment(content, blueprint));
+  return issues;
 }
 
 function detectAcademyAccessViolation(content: string): CausalLogicIssue | null {

@@ -113,6 +113,10 @@ export interface StyleDirectives {
   focus_key?: string | null;
   /** Optional per-project routine writer instructions appended to compact Flash prompts. */
   routine_prompt_context?: string;
+  /** Require full chapter_blueprints coverage before routine writer can publish next chapter. */
+  require_full_chapter_blueprint?: boolean;
+  /** Active chapter_blueprints version expected by writer/audit gates. */
+  chapter_blueprint_version?: number;
   /** Enable DeepSeek V4 thinking mode for selected story-engine calls. */
   deepseek_thinking_enabled?: boolean;
   /** DeepSeek V4 thinking effort. API maps low/medium to high; supported useful values are high/max. */
@@ -463,6 +467,9 @@ export interface ContextPayload {
 
   /** Phase 27 W5.4: detailed briefs for next 1-3 chapters (rolling outline ahead). */
   rollingBriefsContext?: string;
+
+  /** Full-novel chapter blueprint row for this exact chapter. Highest-level hard rail. */
+  chapterBlueprintContext?: string;
 
   // Anti-repetition
   previousTitles: string[];

@@ -25,6 +25,13 @@ import { recordQualityMetrics } from '../quality/quality-metrics';
 import { postWriteHealthCheck } from '../utils/post-write-health-check';
 import { buildFocusPresetContext, validateFocusPresetChapterContent } from '../codex-automation/focus-presets';
 import { UNIVERSAL_SANG_VAN_DIRECTIVE } from '../templates/sang-van-directives';
+import {
+  assertChapterBlueprintReady,
+  evaluateBlueprintAlignment,
+  formatChapterBlueprintContext,
+  markChapterBlueprintUsed,
+  type ChapterBlueprint,
+} from '../plan/chapter-blueprints';
 import type { CriticIssue, GeminiConfig, GenreType, StyleDirectives } from '../types';
 import type { OrchestratorResult } from './orchestrator';
 
@@ -367,7 +374,7 @@ export function buildRoutineBrief(input: FlashCheapRoutineInput): string {
   return lines.join('\n');
 }
 
-export async function buildFlashCheapRoutineContext(input: FlashCheapRoutineInput): Promise<string> {
+export async function buildFlashCheapRoutineContext(input: FlashCheapRoutineInput, blueprint?: ChapterBlueprint | null): Promise<string> {
   const db = getSupabase();
   const maxChars = Number(input.project.style_directives?.flash_bulk_context_max_chars || DEFAULT_CONTEXT_CHARS);
   const routinePromptContext = getRoutinePromptContext(input.project.style_directives);
@@ -440,6 +447,11 @@ export async function buildFlashCheapRoutineContext(input: FlashCheapRoutineInpu
       content: (input.project.world_description || '').slice(0, 7000),
     },
     {
+      label: 'FULL CHAPTER BLUEPRINT',
+      priority: 94,
+      content: formatChapterBlueprintContext(blueprint),
+    },
+    {
       label: 'PREVIOUS CHAPTER',
       priority: 90,
       content: previousSummary
@@ -494,7 +506,13 @@ export async function buildFlashCheapRoutineContext(input: FlashCheapRoutineInpu
 
 export async function writeFlashCheapRoutineChapter(input: FlashCheapRoutineInput): Promise<OrchestratorResult> {
   const db = getSupabase();
-  const context = await buildFlashCheapRoutineContext(input);
+  const blueprint = await assertChapterBlueprintReady({
+    projectId: input.project.id,
+    chapterNumber: input.nextChapter,
+    targetChapters: input.totalPlanned,
+    styleDirectives: input.project.style_directives,
+  }, db);
+  const context = await buildFlashCheapRoutineContext(input, blueprint);
   const minWords = Math.max(
     1200,
     Number(input.project.style_directives?.flash_bulk_min_words || Math.max(1800, Math.floor(input.targetWordCount * 0.72))),
@@ -549,6 +567,9 @@ export async function writeFlashCheapRoutineChapter(input: FlashCheapRoutineInpu
       focusKey: input.project.style_directives?.focus_key,
     });
     causalHardIssues = causalIssues.filter(isHardCausalIssue);
+    const blueprintIssues = evaluateBlueprintAlignment(chapter.content, blueprint);
+    causalIssues.push(...blueprintIssues);
+    causalHardIssues.push(...blueprintIssues.filter(isHardCausalIssue));
     if (!chapter.title.trim() || !chapter.content.trim()) {
       qualityHardIssues.push({
         code: 'empty_content',
@@ -605,6 +626,9 @@ export async function writeFlashCheapRoutineChapter(input: FlashCheapRoutineInpu
       focusKey: input.project.style_directives?.focus_key,
     });
     causalHardIssues = causalIssues.filter(isHardCausalIssue);
+    const blueprintIssues = evaluateBlueprintAlignment(chapter.content, blueprint);
+    causalIssues.push(...blueprintIssues);
+    causalHardIssues.push(...blueprintIssues.filter(isHardCausalIssue));
     // Keep ending hook as a soft audit signal; do not convert it to a hard blocker.
   }
   causalIssues = await checkCausalLogicFast(input.project.id, input.nextChapter, chapter.content, {
@@ -614,6 +638,9 @@ export async function writeFlashCheapRoutineChapter(input: FlashCheapRoutineInpu
     throw new Error(`FLASH_CHEAP_CAUSAL_GATE_FAILED: ${e instanceof Error ? e.message : String(e)}`);
   });
   causalHardIssues = causalIssues.filter(isHardCausalIssue);
+  const finalBlueprintIssues = evaluateBlueprintAlignment(chapter.content, blueprint);
+  causalIssues.push(...finalBlueprintIssues);
+  causalHardIssues.push(...finalBlueprintIssues.filter(isHardCausalIssue));
 
   if (qualityHardIssues.length > 0 || causalHardIssues.length > 0) {
     const qualityText = qualityHardIssues.map((i) => `${i.code}:${i.message}`);
@@ -686,6 +713,9 @@ export async function writeFlashCheapRoutineChapter(input: FlashCheapRoutineInpu
 
   await saveCharacterStatesFromCombined(input.project.id, input.nextChapter, combined.characters);
   await chunkAndStoreChapter(input.project.id, input.nextChapter, chapter.content, chapter.title, combined.summary.summary, characters);
+  if (blueprint) {
+    await markChapterBlueprintUsed(input.project.id, input.nextChapter, combined.summary.summary, db);
+  }
   await runCadencedOptionalTasks(input, chapter.content, characters, writerConfig);
 
   const health = await postWriteHealthCheck(input.project.id, input.nextChapter);
@@ -728,6 +758,14 @@ export async function writeFlashCheapRoutineChapter(input: FlashCheapRoutineInpu
       cheap_quality_verdict: quality.verdict,
       cheap_quality_issues: quality.issues,
       causal_logic_health: buildCausalLogicHealth(causalIssues),
+      chapter_blueprint: blueprint ? {
+        version: blueprint.version,
+        status: 'used',
+        title_hint: blueprint.title_hint,
+        goal: blueprint.goal,
+        payoff: blueprint.payoff,
+        actual_summary_delta: combined.summary.summary,
+      } : null,
       continuity_health: continuityHealth,
       health,
       compact_context_chars: context.length,
@@ -798,6 +836,7 @@ KHUNG CHƯƠNG:
 - Nếu dùng văn minh Trái Đất, Vạn Văn Ký Ức/inner monologue phải ghi rõ template gốc, nhân vật/cảnh gốc và vì sao dùng nó; không đổi hết 100% làm mất hồi ức.
 - Không leak prompt/context/model/API. Không tự tạo canon lớn mâu thuẫn chương trước. Không hồi sinh nhân vật chết nếu không có cơ chế đã establish.
 - Hard causal logic: không để rival/nhân vật yếu tự nhiên vào Học Viện/khu cấm/lấy đồ nếu chưa có quyền hạn hợp pháp; mọi bản đồ/tọa độ/vật phẩm/tài nguyên cao cấp phải có nguồn, giá, chi phí hoặc ledger; không mở thread vượt cấp trái CURRENT ARC RAIL.
+- Full blueprint map là đường ray chính: goal/payoff/resource/authority/forbidden terms trong FULL CHAPTER BLUEPRINT phải được giữ. Có thể đổi văn phong/cảnh phụ, không được đổi mục tiêu chương.
 - Không tự kéo named rival/faction vào chương nếu CURRENT ARC RAIL hoặc ACTIVE THREADS không yêu cầu. Nếu rival xuất hiện, phải có động cơ, quyền hạn, lợi ích/áp lực và giới hạn hành động ngay trong cảnh.
 - Không dùng nhãn meta/nhãn dàn ý trong content; kết chương phải là văn xuôi/cảnh truyện tự nhiên.
 - TUYỆT ĐỐI không viết tóm tắt/outline. "content" phải là toàn văn truyện, tối thiểu ${minWords} từ, có scene nối tiếp nhau.
