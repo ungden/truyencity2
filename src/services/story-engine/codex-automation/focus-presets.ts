@@ -45,35 +45,55 @@ export const FOCUS_PRESETS: Record<FocusKey, FocusPreset> = {
     primaryGenre: 'di-gioi',
     subGenres: ['viet-van-sang-the', 'nho-dao', 'thien-dao-luu', 'vo-dao'],
     mcArchetype: 'author-dao transmigrator with Earth cultural memory',
-    antiTropes: ['no_miserable_start', 'no_primitive_copy_paste', 'no_mc_combat_only', 'no_reader_payoff_missing', 'no_empty_ranking_reaction'],
+    antiTropes: [
+      'no_miserable_start',
+      'no_primitive_copy_paste',
+      'no_mc_combat_only',
+      'no_reader_payoff_missing',
+      'no_empty_ranking_reaction',
+      'no_physical_manuscript_submission',
+      'no_early_identity_exposure',
+      'no_dark_org_investigation_loop',
+      'no_pressure_stack_without_reward',
+    ],
     promptContext: [
       '[FOCUS PRESET: thien-dao-thu-vien]',
       'Premise lock:',
       '- MC xuyên qua Đại Diễn Giới, một dị giới võ đạo nơi ai cũng là võ giả, nhưng Tác Gia là tầng lớp VIP được Thiên Đạo Thư Viện công nhận.',
-      '- Tác Gia viết sách, đăng lên Thiên Đạo Thư Viện; độc giả đọc/nhập tâm/lĩnh ngộ để học võ công, công pháp, thân pháp, trận pháp, binh pháp hoặc ý cảnh.',
+      '- Thiên Đạo Thư Viện do Thiên Đạo tạo ra, là thư viện tinh thần/cosmic interface trong thức hải; mọi người gọi bằng ý niệm trong đầu, không phải một phân lâu vật lý.',
+      '- Tác Gia dùng thần niệm/bút danh/ý niệm văn chương để khắc tác phẩm vào Thiên Đạo Thư Viện; tuyệt đối không có cảnh đi nộp bản thảo hoặc xếp hàng đăng bản thảo vật lý.',
+      '- Độc giả gọi Thiên Đạo Thư Viện trong đầu để đọc/nhập tâm/lĩnh ngộ võ công, công pháp, thân pháp, trận pháp, binh pháp hoặc ý cảnh.',
       '- MC Lâm Mặc có kho văn minh Trái Đất: văn học, phim ảnh, game, thần thoại, lịch sử, kiếm hiệp, huyền huyễn và webnovel.',
-      '- Bàn tay vàng Vạn Văn Ký Ức tái cấu trúc tác phẩm/ký ức Trái Đất thành bản thảo hợp luật Thiên Đạo, có chi phí, độ tương thích độc giả, rủi ro hiểu sai và phản hồi danh vọng.',
+      '- Bàn tay vàng Vạn Văn Ký Ức tái hiện các tác phẩm/ký ức Trái Đất theo kiểu "giữ hồn nguyên tác, đổi vỏ dị giới": giữ xương sống cốt truyện, archetype nhân vật, đại cảnh, nhịp cao trào và payoff; chỉ đổi tên/địa danh/pháp môn để hợp luật Thiên Đạo.',
       '- Core fantasy là dùng kỹ thuật kể chuyện hiện đại + kho văn minh Trái Đất để nghiền ép văn phong sơ khai của bản địa, khiến thiên hạ đọc mê, ngộ đạo, leo bảng và công nhận MC.',
       '- Mode Tác gia chủ đạo: MC thắng bằng sách, danh vọng, độc giả, Thiên Đạo công nhận và proxy võ học; võ đạo tự vệ chỉ tăng nhờ phản hồi độc giả, không biến thành thuần combat.',
-      '- Sảng văn cadence: setback ngắn, face-slap bằng tác phẩm/chương mới/bảng xếp hạng/phản ứng độc giả; mỗi chương phải có payoff hữu hình cho MC.',
+      '- Lâm Mặc cực kỳ cẩn thận: giai đoạn đầu dùng bút danh/ảo ảnh thư viện/false trail, không lộ diện thật, không gặp địch trực tiếp, không tự chui vào âm mưu.',
+      '- Sảng văn cadence kiểu đại thần: MC nắm quyền chủ động, đối thủ chỉ làm nền để tôn hắn; setback ngắn, face-slap bằng tác phẩm/chương mới/bảng xếp hạng/phản ứng độc giả; mỗi chương phải có payoff hữu hình cho MC.',
+      '- Không stack áp lực lên MC. Mỗi chương cần ít nhất một đoạn độc giả/faction reaction làm người đọc sướng: kinh ngạc, tranh luận, lĩnh ngộ, bảng nhảy hạng, Thiên Đạo thưởng.',
       '',
       'Setup bắt buộc:',
-      '- Có Thiên Đạo Thư Viện như hạ tầng xuất bản/đánh giá/trao thưởng: bảng tân tác gia, điểm công nhận, ấn ký tác phẩm, quyền đăng, thư bình và reaction độc giả.',
+      '- Có Thiên Đạo Thư Viện như hạ tầng tinh thần do Thiên Đạo tạo ra: gọi trong thức hải, bảng tân tác gia, điểm công nhận, ấn ký tác phẩm, quyền khắc tác phẩm, thư bình và reaction độc giả.',
       '- Có ladder Tác Gia: Bạch Bút -> Thanh Bút -> Kim Bút -> Tông Sư -> Văn Thánh -> Thiên Đạo Tác Gia.',
       '- Có cơ chế độc giả nhập tâm/lĩnh ngộ: tác phẩm nào sinh ra võ học/công pháp gì, ai đọc, phe nào phản ứng, danh vọng/tài nguyên nào quay về MC.',
       '- Có văn hóa bản địa viết sách còn sơ khai, đơn tuyến, thiếu nhân vật/nhịp hồi hộp/plot twist, để MC có lợi thế kể chuyện chính đáng.',
       '- Có ít nhất 3 dòng tác phẩm dài hạn: kiếm hiệp, chiến tranh/binh pháp, huyền huyễn/thần thoại, trinh thám võ đạo hoặc học viện pháp môn.',
+      '- Có luật ẩn danh sớm: trước ch.100, MC không được lộ thân phận thật hoặc trực tiếp điều tra/đối đầu tổ chức đen nếu không có director override.',
+      '- Có template ledger cho mỗi tác phẩm Trái Đất: nguồn cảm hứng, xương sống nguyên tác, các đại cảnh phải giữ, yếu tố đổi tên, võ học/công pháp dự kiến sinh ra.',
       '',
       'Chapter continuity bắt buộc:',
       '- Khi đăng chương/sách hoặc có độc giả lĩnh ngộ, continuity.json phải ghi tác phẩm đang viết, võ học/công pháp phát sinh, độc giả/faction phản ứng, danh vọng/tài nguyên Thiên Đạo và payoff cho MC.',
+      '- Khi công bố tác phẩm, phải thể hiện đường đi tinh thần: thần niệm/bút danh -> Thiên Đạo Thư Viện trong thức hải -> độc giả gọi trong đầu -> nhập tâm/lĩnh ngộ.',
+      '- Khi viết tác phẩm dựa trên nguyên tác Trái Đất, chương phải bám template ledger: không tự bẻ sang truyện mới nếu chưa có lý do trong Vạn Văn Ký Ức.',
       '- Không để tác phẩm tạo skill vô nguồn: phải có tác phẩm -> cảnh đọc/nhập tâm -> lĩnh ngộ -> phản ứng -> phần thưởng/danh vọng.',
       '- Không copy thô tên/plot nguyên bản quá lộ; tác phẩm công bố trong dị giới phải dùng tên mới, địa danh mới, võ học mới. Chỉ được nhắc tên nguyên bản Trái Đất cực ngắn trong nội tâm/Vạn Văn Ký Ức nếu cần.',
       '- Không kéo main khổ lâu; nếu bị nghi ngờ/chèn ép, phải có chương mới, bảng xếp hạng, thư bình hoặc độc giả ngộ võ phản đòn ngay trong window ngắn.',
+      '- Không dùng các beat mở đầu kiểu Hắc Ám Văn Đàn, ám sát, đi trà quán điều tra, hoặc lão lục nối tiếp; conflict chính là văn đàn, độc giả, bảng xếp hạng và cách kể chuyện.',
+      '- Không để đối thủ dồn dập. Early arc ưu tiên MC chủ động farm danh vọng ẩn danh; mỗi trở ngại phải bị hóa giải trong cùng chương hoặc tối đa 1-2 chương kèm thưởng.',
       '[/FOCUS PRESET]',
     ].join('\n'),
     coverPromptHints: [
-      'premium Chinese webnovel cover, young author in otherworld martial academy holding a glowing heavenly manuscript',
-      'behind him a celestial library of floating books, martial artists entering story illusions and learning sword energy',
+      'premium Chinese webnovel cover, anonymous young author in simple robes before a celestial mental library of floating books',
+      'readers meditate with glowing books inside their minds while martial arts silhouettes form from story illusions',
       'clear cool-neutral cinematic light, elegant ink-gold accents, crisp mobile thumbnail, 3:4 Vietnamese webnovel cover',
     ],
     requiredSetupKeywords: [
@@ -84,6 +104,9 @@ export const FOCUS_PRESETS: Record<FocusKey, FocusPreset> = {
       { code: 'earth_culture', label: 'kho văn minh Trái Đất', keywords: ['trái đất', 'văn minh trái đất', 'văn học', 'phim ảnh', 'game', 'thần thoại', 'kiếp trước'] },
       { code: 'primitive_local_books', label: 'văn hóa viết sách sơ khai', keywords: ['sơ khai', 'đơn nhất', 'nhàm chán', 'thiếu hấp dẫn', 'văn phong bản địa'] },
       { code: 'recognition_ladder', label: 'bảng xếp hạng/điểm công nhận', keywords: ['bảng xếp hạng', 'điểm công nhận', 'danh vọng', 'ấn ký', 'tân tác gia'] },
+      { code: 'mental_library_access', label: 'thư viện tinh thần/gọi trong đầu', keywords: ['thức hải', 'ý niệm', 'thần niệm', 'gọi trong đầu', 'thư viện tinh thần'] },
+      { code: 'anonymous_author', label: 'MC ẩn danh/bút danh', keywords: ['ẩn danh', 'bút danh', 'không lộ diện', 'false trail', 'giấu thân phận'] },
+      { code: 'earth_template_spine', label: 'xương sống nguyên tác Trái Đất', keywords: ['template ledger', 'xương sống', 'nguyên tác', 'giữ hồn', 'đại cảnh'] },
     ],
   },
   'sang-the-than-minh': {
@@ -221,6 +244,132 @@ function countMatches(text: string, keywords: string[]): number {
   return keywords.reduce((sum, keyword) => sum + (text.includes(keyword.toLowerCase()) ? 1 : 0), 0);
 }
 
+const THIEN_DAO_PHYSICAL_SUBMISSION_TERMS = [
+  'nộp bản thảo',
+  'đi nộp',
+  'xếp hàng nộp',
+  'quầy nộp',
+  'đăng bản thảo lên thiên đạo thư viện',
+  'thiên đạo thư viện phân lâu',
+  'phân lâu thành',
+  'quảng trường bảng',
+  'trà lâu thư bình',
+];
+
+const THIEN_DAO_MENTAL_ACCESS_TERMS = [
+  'thức hải',
+  'ý niệm',
+  'thần niệm',
+  'gọi trong đầu',
+  'trong đầu',
+  'thư viện tinh thần',
+  'thư viện trong tâm',
+  'cosmic interface',
+];
+
+const THIEN_DAO_STEALTH_TERMS = [
+  'ẩn danh',
+  'bút danh',
+  'không lộ diện',
+  'giấu thân phận',
+  'false trail',
+  'ảo ảnh thư viện',
+  'không để lộ',
+];
+
+const THIEN_DAO_EARLY_CONSPIRACY_TERMS = [
+  'hắc ám văn đàn',
+  'ám sát',
+  'sát thủ',
+  'trà quán',
+  'điều tra quán',
+  'lão giả áo đen',
+  'tổ chức đen',
+  'mật hội',
+];
+
+const THIEN_DAO_TEMPLATE_SPINE_TERMS = [
+  'template ledger',
+  'xương sống',
+  'nguyên tác',
+  'giữ hồn',
+  'đại cảnh',
+  'archetype',
+  'nguồn cảm hứng',
+];
+
+export function validateFocusPresetChapterContent(
+  payload: {
+    chapterNumber: number;
+    content: string;
+    protagonistName?: string;
+  },
+  focusKey: string | undefined,
+): FocusPresetValidationReport {
+  const preset = getFocusPreset(focusKey);
+  if (!preset) return { verdict: 'pass', focusKey: 'song-xuyen-trade', issues: [] };
+  const issues: FocusPresetIssue[] = [];
+
+  if (preset.key !== 'thien-dao-thu-vien') {
+    return { verdict: 'pass', focusKey: preset.key, issues };
+  }
+
+  const text = normalize(payload.content);
+  const isEarly = payload.chapterNumber <= 100;
+  const hasLibraryEvent = hasAny(text, ['thiên đạo thư viện', 'tác gia', 'độc giả', 'lĩnh ngộ', 'tác phẩm', 'bút danh']);
+
+  for (const term of THIEN_DAO_PHYSICAL_SUBMISSION_TERMS) {
+    if (text.includes(term)) {
+      issues.push({
+        code: 'focus_physical_submission_forbidden',
+        severity: 'critical',
+        message: `Thiên Đạo Thư Viện is a mental/cosmic interface; forbidden physical-submission term found: ${term}.`,
+      });
+      break;
+    }
+  }
+
+  if (hasLibraryEvent && !hasAny(text, THIEN_DAO_MENTAL_ACCESS_TERMS)) {
+    issues.push({
+      code: 'focus_mental_library_access_missing',
+      severity: 'critical',
+      message: 'Chapter uses Thiên Đạo Thư Viện but does not show mental access through thức hải/ý niệm/thần niệm/gọi trong đầu.',
+    });
+  }
+
+  if (isEarly && !hasAny(text, THIEN_DAO_STEALTH_TERMS)) {
+    issues.push({
+      code: 'focus_early_anonymity_missing',
+      severity: 'major',
+      message: 'Early Thiên Đạo Thư Viện chapters must keep Lâm Mặc anonymous through bút danh/false trail/no identity reveal.',
+    });
+  }
+
+  if (isEarly && hasAny(text, THIEN_DAO_EARLY_CONSPIRACY_TERMS)) {
+    issues.push({
+      code: 'focus_early_conspiracy_loop_forbidden',
+      severity: 'critical',
+      message: 'Early arc must not drift into dark-org assassination/investigation beats; conflict should come from writing, readers, rankings, and enlightenment.',
+    });
+  }
+
+  if (hasAny(text, ['vạn văn ký ức', 'trái đất', 'kiếm hiệp', 'tam quốc', 'huyền huyễn']) && !hasAny(text, THIEN_DAO_TEMPLATE_SPINE_TERMS)) {
+    issues.push({
+      code: 'focus_earth_template_spine_missing',
+      severity: 'major',
+      message: 'When Earth works inspire a book, chapter should preserve a template ledger/source spine instead of inventing a drifting story from scratch.',
+    });
+  }
+
+  const critical = issues.some((issue) => issue.severity === 'critical');
+  const major = issues.some((issue) => issue.severity === 'major');
+  return {
+    verdict: critical ? 'block' : major ? 'revise' : 'pass',
+    focusKey: preset.key,
+    issues,
+  };
+}
+
 export function validateFocusPresetStorySetup(
   payload: StorySetupForFocusPreset,
   focusKey: string | undefined,
@@ -260,6 +409,37 @@ export function validateFocusPresetStorySetup(
         code: `focus_missing_${group.code}`,
         severity: 'major',
         message: `${preset.label} setup must define ${group.label}: ${group.keywords.join(', ')}.`,
+      });
+    }
+  }
+  if (preset.key === 'thien-dao-thu-vien') {
+    const physicalMatches = THIEN_DAO_PHYSICAL_SUBMISSION_TERMS.filter((term) => text.includes(term));
+    if (physicalMatches.length > 0) {
+      issues.push({
+        code: 'focus_physical_submission_forbidden',
+        severity: 'critical',
+        message: `Thiên Đạo Thư Viện setup must not treat the library as a physical manuscript office: ${physicalMatches.slice(0, 3).join(', ')}.`,
+      });
+    }
+    if (!hasAny(text, THIEN_DAO_MENTAL_ACCESS_TERMS)) {
+      issues.push({
+        code: 'focus_mental_library_access_missing',
+        severity: 'critical',
+        message: 'Thiên Đạo Thư Viện setup must define mental access through thức hải/ý niệm/thần niệm/gọi trong đầu.',
+      });
+    }
+    if (!hasAny(text, THIEN_DAO_STEALTH_TERMS)) {
+      issues.push({
+        code: 'focus_anonymous_author_missing',
+        severity: 'major',
+        message: 'Thiên Đạo Thư Viện setup must define Lâm Mặc as an anonymous/hidden author in the early arc.',
+      });
+    }
+    if (!hasAny(text, THIEN_DAO_TEMPLATE_SPINE_TERMS)) {
+      issues.push({
+        code: 'focus_earth_template_spine_missing',
+        severity: 'major',
+        message: 'Setup must define how Vạn Văn Ký Ức preserves Earth source-template spines instead of inventing disconnected new books.',
       });
     }
   }

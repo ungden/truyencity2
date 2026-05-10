@@ -73,6 +73,8 @@ describe('flash cheap routine', () => {
     expect(context).toContain('Thiên Đạo Thư Viện');
     expect(context).toContain('Tác Gia');
     expect(context).toContain('độc giả');
+    expect(context).toContain('thức hải');
+    expect(context).toContain('template ledger');
     expect(context).not.toContain('world-state Thần Vực');
 
     const brief = buildRoutineBrief({
@@ -94,6 +96,8 @@ describe('flash cheap routine', () => {
     });
     expect(brief).toContain('Vạn Văn Ký Ức');
     expect(brief).toContain('độc giả nhập tâm');
+    expect(brief).toContain('giữ xương sống nguyên tác');
+    expect(brief).toContain('Không nộp bản thảo vật lý');
     expect(brief).not.toContain('Khởi Nguyên Biên Niên');
   });
 

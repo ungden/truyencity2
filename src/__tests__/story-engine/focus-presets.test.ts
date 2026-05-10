@@ -2,6 +2,7 @@ import {
   applyFocusPresetTemplate,
   buildFocusPresetContext,
   getFocusPreset,
+  validateFocusPresetChapterContent,
   validateFocusPresetContinuity,
   validateFocusPresetStorySetup,
 } from '@/services/story-engine/codex-automation/focus-presets';
@@ -41,16 +42,16 @@ function validThienDaoThuVienSetup() {
     subGenres: ['viet-van-sang-the', 'nho-dao', 'thien-dao-luu', 'vo-dao'],
     worldDescription: [
       'Đại Diễn Giới là dị giới võ đạo nơi ai cũng là võ giả, từ tiểu thương đến học sinh đều luyện khí huyết và công pháp cơ sở.',
-      'Thiên Đạo Thư Viện treo trên chín tầng mây, công nhận Tác Gia qua Bạch Bút, Thanh Bút, Kim Bút, Tông Sư, Văn Thánh và Thiên Đạo Tác Gia.',
-      'Sách được đăng lên thư viện; độc giả đọc sách rồi nhập tâm vào cảnh truyện để lĩnh ngộ võ công, công pháp, thân pháp, trận pháp, kiếm ý và binh pháp.',
-      'Lâm Mặc xuyên qua với Vạn Văn Ký Ức, dùng kho văn minh Trái Đất gồm văn học, phim ảnh, game, thần thoại và lịch sử để tái cấu trúc bản thảo hợp luật Thiên Đạo.',
+      'Thiên Đạo Thư Viện do Thiên Đạo tạo ra, là thư viện tinh thần trong thức hải; mọi người có thể gọi trong đầu bằng ý niệm, công nhận Tác Gia qua Bạch Bút, Thanh Bút, Kim Bút, Tông Sư, Văn Thánh và Thiên Đạo Tác Gia.',
+      'Tác Gia dùng thần niệm và bút danh ẩn danh để khắc tác phẩm; độc giả đọc sách rồi nhập tâm vào cảnh truyện để lĩnh ngộ võ công, công pháp, thân pháp, trận pháp, kiếm ý và binh pháp.',
+      'Lâm Mặc xuyên qua với Vạn Văn Ký Ức, dùng kho văn minh Trái Đất gồm văn học, phim ảnh, game, thần thoại và lịch sử để lập template ledger, giữ hồn nguyên tác, xương sống đại cảnh rồi dị giới hóa hợp luật Thiên Đạo.',
       'Văn hóa viết sách bản địa còn sơ khai, đơn nhất, văn phong bản địa thiếu hấp dẫn nên bảng xếp hạng Tân Tác Gia dễ bị chấn động bởi kỹ thuật kể chuyện hiện đại.',
       'Thiên Đạo phát điểm công nhận, danh vọng, ấn ký tác phẩm, quyền đăng và thư bình độc giả cho mỗi tác phẩm có người lĩnh ngộ.',
     ].join('\n'),
     setupKernel: {
       readerFantasy: 'Lâm Mặc dùng văn minh Trái Đất và kỹ thuật kể chuyện để làm Tác Gia được Thiên Đạo Thư Viện công nhận, khiến độc giả lĩnh ngộ võ đạo rồi trả lại danh vọng và tài nguyên.',
-      protagonistEngine: 'MC thắng bằng Vạn Văn Ký Ức, chọn đúng tác phẩm, dị giới hóa bản thảo, đọc phản ứng độc giả và leo bảng Tân Tác Gia thay vì đánh nhau kéo dài.',
-      pleasureLoop: ['chọn template Trái Đất', 'viết bản thảo hợp luật', 'đăng Thiên Đạo Thư Viện', 'độc giả nhập tâm lĩnh ngộ', 'bảng xếp hạng đổi', 'MC nhận điểm công nhận'],
+      protagonistEngine: 'MC thắng bằng Vạn Văn Ký Ức, chọn đúng tác phẩm, giữ xương sống nguyên tác, dị giới hóa bằng thần niệm, đọc phản ứng độc giả và leo bảng Tân Tác Gia thay vì đánh nhau kéo dài.',
+      pleasureLoop: ['chọn template Trái Đất', 'lập template ledger', 'khắc tác phẩm bằng bút danh ẩn danh trong thức hải', 'độc giả nhập tâm lĩnh ngộ', 'bảng xếp hạng đổi', 'MC nhận điểm công nhận'],
     },
     masterOutline: {
       arcs: [
@@ -62,6 +63,8 @@ function validThienDaoThuVienSetup() {
       premise: 'Tác Gia là VIP của võ đạo vì tác phẩm được Thiên Đạo Thư Viện công nhận có thể sinh võ học cho độc giả.',
       ledgers: ['tác phẩm đang viết', 'độc giả lĩnh ngộ', 'võ học phát sinh', 'danh vọng Thiên Đạo', 'bảng xếp hạng'],
       ladder: ['Bạch Bút', 'Thanh Bút', 'Kim Bút', 'Tông Sư', 'Văn Thánh', 'Thiên Đạo Tác Gia'],
+      mcSecret: 'Lâm Mặc dùng bút danh, false trail và giấu thân phận trong early arc.',
+      templateRules: ['template ledger', 'xương sống nguyên tác', 'đại cảnh', 'giữ hồn'],
     },
     arcPlan: [
       { chapter: 1, goal: 'Lâm Mặc đăng hồi đầu tiên', conflict: 'văn phong bản địa coi thường người mới', payoff: 'độc giả đầu tiên nhập tâm và ngộ chưởng pháp', hook: 'bảng Tân Tác Gia nhảy hạng' },
@@ -117,9 +120,41 @@ describe('focus presets', () => {
       masterOutline: { arcs: [{ name: 'phiêu lưu' }] },
       arcPlan: [{ chapter: 1, summary: 'khởi đầu' }],
     }, 'thien-dao-thu-vien');
-    expect(report.verdict).toBe('revise');
+    expect(report.verdict).toBe('block');
     expect(report.issues.some((issue) => issue.code === 'focus_missing_heavenly_library')).toBe(true);
     expect(report.issues.some((issue) => issue.code === 'focus_missing_reader_enlightenment')).toBe(true);
+  });
+
+  it('blocks thien-dao-thu-vien setup that treats the library as physical manuscript submission', () => {
+    const report = validateFocusPresetStorySetup({
+      ...validThienDaoThuVienSetup(),
+      worldDescription: `${validThienDaoThuVienSetup().worldDescription}\nMột Tác Gia phải nộp bản thảo ở quầy rồi chờ phân lâu duyệt.`,
+    }, 'thien-dao-thu-vien');
+    expect(report.verdict).toBe('block');
+    expect(report.issues.some((issue) => issue.code === 'focus_physical_submission_forbidden')).toBe(true);
+  });
+
+  it('blocks early thien-dao-thu-vien chapters that miss mental access and drift into conspiracy pressure', () => {
+    const report = validateFocusPresetChapterContent({
+      chapterNumber: 6,
+      content: 'Lâm Mặc đến trà quán để điều tra Hắc Ám Văn Đàn. Một sát thủ áo đen ám sát hắn, trong lúc Thiên Đạo Thư Viện chờ hắn nộp bản thảo.',
+    }, 'thien-dao-thu-vien');
+    expect(report.verdict).toBe('block');
+    expect(report.issues.some((issue) => issue.code === 'focus_physical_submission_forbidden')).toBe(true);
+    expect(report.issues.some((issue) => issue.code === 'focus_early_conspiracy_loop_forbidden')).toBe(true);
+  });
+
+  it('passes early thien-dao-thu-vien chapters with mental library, anonymity, source spine, and payoff loop', () => {
+    const report = validateFocusPresetChapterContent({
+      chapterNumber: 1,
+      content: [
+        'Lâm Mặc mở Vạn Văn Ký Ức trong thức hải, dùng bút danh Vô Danh Khách để giấu thân phận.',
+        'Template ledger khóa xương sống nguyên tác, đại cảnh kéo cung và archetype thiếu niên nghĩa hiệp trước khi đổi tên thành Sơn Hà Xạ Nhật.',
+        'Hắn dùng thần niệm khắc tác phẩm vào Thiên Đạo Thư Viện, độc giả gọi trong đầu rồi nhập tâm lĩnh ngộ Phá Vân Chưởng.',
+        'Bảng Tân Tác Gia tăng hạng, điểm công nhận rơi xuống thức hải khiến hắn nhận payoff đầu tiên.',
+      ].join('\n'),
+    }, 'thien-dao-thu-vien');
+    expect(report.verdict).toBe('pass');
   });
 
   it('rejects setup missing the trade/world-state/inventory ladder', () => {

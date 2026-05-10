@@ -77,6 +77,23 @@ describe('quality contract', () => {
     expect(report.issues.some((issue) => issue.code === 'severe_repetition')).toBe(true);
   });
 
+  it('marks pressure stacking without enough reward as revise', () => {
+    const pressure = repeatSentence('Nguyễn An Bình bị ép, bị dồn, bị đe dọa, bị theo dõi, bị uy hiếp bởi một tổ chức bí mật khiến hắn gần như hết cách.', 12);
+    const content = [
+      pressure,
+      '— Chúng ta còn đường nào không?',
+      '— Chưa rõ.',
+      '— Vậy cứ chờ.',
+      repeatSentence('Mùi mưa lạnh và tiếng còi xa xa phủ lên căn phòng tối.', 18),
+      'Điện thoại lại rung lên bằng một câu hỏi mới.',
+    ].join('\n');
+
+    const report = evaluateChapterQuality(content, baseContext);
+
+    expect(report.verdict).toBe('revise');
+    expect(report.issues.some((issue) => issue.code === 'pressure_stack_without_reward')).toBe(true);
+  });
+
   it('summarizes window-level supreme goals', () => {
     const passContent = [
       repeatSentence('Nguyễn An Bình quyết định đổi quy trình, nhận đơn hàng, tạo kết quả, tăng doanh thu và được khách công nhận.', 40),

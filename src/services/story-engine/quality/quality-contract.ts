@@ -86,6 +86,12 @@ const PAYOFF_SIGNALS = [
   'đơn hàng', 'doanh thu', 'tài nguyên', 'uy tín',
 ];
 
+const PRESSURE_STACK_SIGNALS = [
+  'bị ép', 'bị dồn', 'bị đe dọa', 'bị theo dõi', 'bị truy sát', 'ám sát',
+  'sát thủ', 'tổ chức bí mật', 'mật hội', 'hắc ám', 'đe dọa', 'uy hiếp',
+  'bất lực', 'tuyệt vọng', 'không còn đường', 'hết cách', 'lâm vào nguy',
+];
+
 const ENDING_HOOK_SIGNALS = [
   '?!', '!!!', 'liệu', 'không ngờ', 'bất ngờ', 'rốt cuộc', 'sẽ ra sao',
   'vang lên', 'cánh cửa', 'tin nhắn', 'ngày mai', 'chờ đợi', 'bí mật',
@@ -265,6 +271,15 @@ export function evaluateChapterQuality(
   }
   if (metrics.payoffHits < 2) {
     add({ code: 'low_payoff', severity: 'major', message: 'Chương thiếu payoff/lợi ích/hậu quả cụ thể.', goal: 'directional_plot' });
+  }
+  const pressureHits = countHits(content, PRESSURE_STACK_SIGNALS);
+  if (pressureHits >= 8 && metrics.payoffHits < 4) {
+    add({
+      code: 'pressure_stack_without_reward',
+      severity: 'major',
+      message: `Áp lực/đe dọa bị stack quá nhiều (${pressureHits} tín hiệu) nhưng payoff chưa đủ dày (${metrics.payoffHits}). Sảng văn cần MC kiểm soát nhịp và ăn thưởng trong chương.`,
+      goal: 'directional_plot',
+    });
   }
   if (metrics.aiPhraseHits > 0) {
     add({ code: 'ai_phrase_hits', severity: metrics.aiPhraseHits >= 3 ? 'moderate' : 'minor', message: `Có ${metrics.aiPhraseHits} cụm văn mẫu AI/cliche.`, goal: 'uniform_quality' });

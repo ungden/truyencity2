@@ -14,6 +14,8 @@
  * See plan: docs/story-engine/PHASE_30_4_AXIS.md (TBD).
  */
 
+import { UNIVERSAL_SANG_VAN_DIRECTIVE } from '../templates/sang-van-directives';
+
 // ── VN_PLACE_LOCK ────────────────────────────────────────────────────────────
 
 /**
@@ -90,6 +92,8 @@ AXIS A — SẢNG VĂN PACING
 ═══════════════════════════════════════════════════════════════════════════
 
 A1. DOPAMINE CADENCE (BẮT BUỘC mỗi chương):
+${UNIVERSAL_SANG_VAN_DIRECTIVE}
+
 - ≥2 dopamine peaks rõ rệt; peak đầu ≤50% chương, peak cuối ≥70%
 - ≥3/5 chương trong arc PHẢI có ≥1 big wow (recognition / harvest / breakthrough visible với public/competitor)
 - Dopamine types đa dạng (KHÔNG bắt buộc face-slap mỗi chương):
@@ -304,6 +308,8 @@ MC CHECKLIST (BẮT BUỘC — Trước khi viết bất kỳ scene nào MC tham
 3 câu hỏi PHẢI trả lời được:
 
 QUY TẮC BẮT BUỘC:
+${UNIVERSAL_SANG_VAN_DIRECTIVE}
+
 - KHÔNG dùng markdown. Văn xuôi thuần túy.
 - PHẢI đủ số từ yêu cầu. CẤM tóm tắt. Nếu thiếu từ → viết thêm chi tiết 5 giác quan, nội tâm nhiều lớp, phản ứng người xung quanh.
 - SƯỚNG VĂN CÓ KIỂM SOÁT: ưu tiên tiến triển tích cực qua chiến lược, trí tuệ, quan hệ, thu hoạch — KHÔNG chỉ bằng power-up.
@@ -484,6 +490,7 @@ SCORING (1-10 each — overallScore = weighted average)
 ═══════════════════════════════════════════════════════════════════════════
 
 A. pacingScore (Axis A — SẢNG VĂN PACING):
+   - Apply UNIVERSAL SANG VAN DIRECTIVE: MC controls rhythm, reward density beats pressure density, no pressure stacking without same-chapter gain.
    - Dopamine ≥2 peaks/chương, peak đầu ≤50% (kiểm trong content + dopaminePoints[])
    - Climax ladder honored (small/medium/major theo VOLUME CONTEXT)
    - Setup:payoff ≤2:1 same chapter (kìm nén = trừ điểm)

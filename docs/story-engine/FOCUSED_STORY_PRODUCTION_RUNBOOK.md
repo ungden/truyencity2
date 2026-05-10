@@ -295,3 +295,19 @@ Final healthy state after repair:
 - quota `written_chapters=1`, `retry_count=0`, `last_error=null`
 - project `status='active'`, `pause_reason=null`
 
+### Kernel rewrite lesson: 2026-05-10 Thiên Đạo Thư Viện reset
+
+The first live draft passed cheap quality scores but read badly because the setup kernel was wrong:
+
+- It treated `Thiên Đạo Thư Viện` like a physical office where authors submit manuscripts, instead of a Heavenly-Dao-created mental library that everyone calls inside their mind.
+- It pushed Lâm Mặc into public exposure, dark-org investigation, assassination pressure, and repeated schemer NPCs too early.
+- It asked for "do not copy Earth works too directly" but did not provide a source-spine/template ledger, so the writer invented new plots and drifted from the classic works the premise promised.
+- It stacked pressure instead of giving top-tier sảng văn cadence: MC controls rhythm, opponents make him look good, rewards are dense, and conflict resolves quickly.
+
+For future new stories, especially any story using previous-life memory/Earth culture:
+
+1. Define the core institution literally before spawning chapters. If a system is mental/cosmic, forbid physical submission, queues, branch offices, and street-level investigation beats unless the premise explicitly wants them.
+2. Add a source-spine/template ledger when the MC recreates Earth classics: source inspiration, original spine, archetypes, landmark scenes, renamed surface details, and expected payoff.
+3. Keep MC secrets protected by default. Outsiders react to results, not the real source of the cheat.
+4. Use sảng văn reward density: each routine chapter needs visible gain, reaction dopamine, rank/resource/status change, or opened opportunity. Do not stack humiliation, pursuit, debt, injuries, or conspiracies without same-chapter leverage for MC.
+5. Before enabling cron, run the first 3 chapters through strict focus gates and inspect actual content, not only `overall_score`.

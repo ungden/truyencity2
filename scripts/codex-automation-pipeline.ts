@@ -29,6 +29,7 @@ import { buildRuleContext } from '../src/services/story-engine/canon/world-rules
 import { buildPlotThreadContext } from '../src/services/story-engine/state/plot-threads';
 import { postWriteHealthCheck } from '../src/services/story-engine/utils/post-write-health-check';
 import { evaluateChapterQuality, type ChapterQualityReport } from '../src/services/story-engine/quality/quality-contract';
+import { UNIVERSAL_SANG_VAN_DIRECTIVE } from '../src/services/story-engine/templates/sang-van-directives';
 import { getVietnamDayBounds } from '../src/lib/utils/vietnam-time';
 import type { GenreType } from '../src/services/story-engine/types';
 import {
@@ -49,6 +50,7 @@ import {
   formatFocusPresetReport,
   getFocusPreset,
   isFocusKey,
+  validateFocusPresetChapterContent,
   validateFocusPresetContinuity,
   validateFocusPresetStorySetup,
 } from '../src/services/story-engine/codex-automation/focus-presets';
@@ -1303,6 +1305,7 @@ function buildChapterPrompt(meta: ChapterRunMeta, novel: NovelRow, project: Proj
     '- Viết tiếng Việt thuần, chỉ nội dung chương.',
     '- Dòng đầu là tiêu đề dạng "# <tên chương>".',
     '- Một chương đầy đủ, không chia đôi, không meta-commentary, không nhắc prompt/model/API.',
+    UNIVERSAL_SANG_VAN_DIRECTIVE,
     '- MC có lựa chọn chủ động, lợi ích cụ thể, payoff rõ.',
     '- Ít nhất 3 dòng thoại có action/reaction beat.',
     '- Có nội tâm, cảm giác thân thể/không gian, chi tiết cụ thể.',
@@ -1338,10 +1341,10 @@ function buildChapterPrompt(meta: ChapterRunMeta, novel: NovelRow, project: Proj
       ? '- SANG THE: mọi thay đổi về Thần Vực/tiểu thế giới, pháp tắc, sinh thái, chủng tộc/quyến thuộc, tín ngưỡng, tài nguyên và cấp bậc PHẢI ghi worldStateDeltas + factions/plotThreads + itemEvents/economicLedger nếu có tài nguyên; không nâng cấp thế giới vô nguồn.'
       : '',
     focusKey === 'thien-dao-thu-vien'
-      ? '- THIEN DAO THU VIEN: khi đăng chương/sách hoặc có độc giả lĩnh ngộ, continuity.json PHẢI ghi tác phẩm đang viết, võ học/công pháp phát sinh, độc giả/faction phản ứng, danh vọng/điểm công nhận/quyền đăng và payoff cho MC.'
+      ? '- THIEN DAO THU VIEN: khi khắc/công bố chương/sách hoặc có độc giả lĩnh ngộ, continuity.json PHẢI ghi tác phẩm đang viết, template ledger/xương sống nguyên tác, võ học/công pháp phát sinh, độc giả/faction phản ứng, danh vọng/điểm công nhận/quyền đăng và payoff cho MC.'
       : '',
     focusKey === 'thien-dao-thu-vien'
-      ? '- THIEN DAO TAC GIA SẢNG PAYOFF: mỗi chương phải có dopamine loop Tác Gia: viết/đăng -> độc giả nhập tâm/lĩnh ngộ -> bảng xếp hạng/thư bình/Thiên Đạo công nhận -> Lâm Mặc có lợi ích cụ thể. Không biến thành thuần combat võ giả.'
+      ? '- THIEN DAO TAC GIA SẢNG PAYOFF: mỗi chương phải có dopamine loop Tác Gia: template Trái Đất -> bút danh ẩn danh khắc trong thức hải -> độc giả gọi trong đầu nhập tâm/lĩnh ngộ -> bảng xếp hạng/thư bình/Thiên Đạo công nhận -> Lâm Mặc có lợi ích cụ thể. Không biến thành thuần combat võ giả, không nộp giấy tờ vật lý, không điều tra tổ chức đen.'
       : '',
     focusPresetContext ? ['', focusPresetContext].join('\n') : '',
     rewriteContract
@@ -1600,12 +1603,20 @@ async function applyChapter(): Promise<void> {
   );
   const continuityReport = evaluateContinuityExtraction(continuityPayload, continuityContext);
   const focusKey = project.style_directives?.focus_key as string | undefined;
+  const focusChapterReport = validateFocusPresetChapterContent({
+    chapterNumber: meta.chapterNumber,
+    content,
+    protagonistName: meta.protagonistName,
+  }, focusKey);
   const focusContinuityReport = validateFocusPresetContinuity(continuityPayload, focusKey);
 
   console.log(`Codex automation chapter ${apply ? '(APPLY)' : '(DRY RUN)'}\nproject=${meta.projectId}\nnovel=${novel.title}\nchapter=${meta.chapterNumber}\ntitle=${title}\nwords=${words}`);
   printQualityReport(qualityReport);
   printContinuityReport(continuityReport);
-  if (focusKey) console.log(formatFocusPresetReport(focusContinuityReport));
+  if (focusKey) {
+    console.log(formatFocusPresetReport(focusChapterReport));
+    console.log(formatFocusPresetReport(focusContinuityReport));
+  }
 
   if (qualityReport.verdict !== 'pass') {
     console.error(`Quality contract failed with verdict=${qualityReport.verdict}. Chapter was NOT written to DB.`);
@@ -1617,6 +1628,10 @@ async function applyChapter(): Promise<void> {
   }
   if (focusContinuityReport.verdict !== 'pass') {
     console.error(`Focus continuity contract failed with verdict=${focusContinuityReport.verdict}. Chapter was NOT written to DB.`);
+    process.exit(1);
+  }
+  if (focusChapterReport.verdict !== 'pass') {
+    console.error(`Focus chapter content contract failed with verdict=${focusChapterReport.verdict}. Chapter was NOT written to DB.`);
     process.exit(1);
   }
   if (!apply) {
@@ -1693,6 +1708,7 @@ async function applyChapter(): Promise<void> {
       min_words: meta.minWords,
       quality_contract: qualityReport,
       continuity_health: appliedContinuityHealth,
+      focus_chapter_content: focusKey ? focusChapterReport : null,
       focus_continuity: focusKey ? focusContinuityReport : null,
       memory_rows_written: memoryRowsWritten,
       blocked_next_chapter_reason: appliedContinuityHealth.blockedNextChapterReason || null,

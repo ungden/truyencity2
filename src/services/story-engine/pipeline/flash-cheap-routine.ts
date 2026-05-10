@@ -17,7 +17,8 @@ import { enforceCanonGates } from '../quality/canon-enforcement';
 import { evaluateChapterQuality, type ChapterQualityIssue } from '../quality/quality-contract';
 import { recordQualityMetrics } from '../quality/quality-metrics';
 import { postWriteHealthCheck } from '../utils/post-write-health-check';
-import { buildFocusPresetContext } from '../codex-automation/focus-presets';
+import { buildFocusPresetContext, validateFocusPresetChapterContent } from '../codex-automation/focus-presets';
+import { UNIVERSAL_SANG_VAN_DIRECTIVE } from '../templates/sang-van-directives';
 import type { CriticIssue, GeminiConfig, GenreType, StyleDirectives } from '../types';
 import type { OrchestratorResult } from './orchestrator';
 
@@ -176,6 +177,17 @@ function shouldAttemptCheapExtension(issues: ChapterQualityIssue[], styleDirecti
   return issues.some((issue) => issue.code === 'word_count_low' || issue.code === 'weak_ending_hook');
 }
 
+function focusPresetIssuesAsQualityIssues(
+  focusIssues: ReturnType<typeof validateFocusPresetChapterContent>['issues'],
+): ChapterQualityIssue[] {
+  return focusIssues.map((issue) => ({
+    code: issue.code,
+    severity: issue.severity === 'critical' ? 'critical' : issue.severity === 'major' ? 'major' : 'moderate',
+    message: issue.message,
+    goal: 'coherence',
+  }));
+}
+
 export function hasFlashCheapChapterBrief(arc: FlashCheapArcRow | null | undefined, nextChapter: number): boolean {
   return Array.isArray(arc?.chapter_briefs)
     && arc.chapter_briefs.some((brief) => brief.chapterNumber === nextChapter && typeof brief.brief === 'string' && brief.brief.trim().length >= 20);
@@ -304,6 +316,7 @@ export function buildRoutineBrief(input: FlashCheapRoutineInput): string {
     `Chương cần viết: ${input.nextChapter}/${input.totalPlanned}`,
     `Nhân vật chính: ${input.protagonistName}`,
     `Target: ${input.targetWordCount} từ, sảng văn, có payoff cụ thể, không hành hạ MC quá mức.`,
+    UNIVERSAL_SANG_VAN_DIRECTIVE,
     `Focus key: ${focusKey || 'generic'}`,
   ];
 
@@ -314,8 +327,10 @@ export function buildRoutineBrief(input: FlashCheapRoutineInput): string {
     );
   } else if (focusKey === 'thien-dao-thu-vien') {
     lines.push(
-      'Bàn tay vàng: Vạn Văn Ký Ức tái cấu trúc văn học/phim/game/thần thoại Trái Đất thành bản thảo hợp luật Thiên Đạo, có ledger chi phí, độ tương thích độc giả, rủi ro hiểu sai và phản hồi danh vọng.',
-      'Chapter loop: Lâm Mặc viết/đăng tác phẩm -> độc giả nhập tâm/lĩnh ngộ võ học/công pháp -> faction/bảng xếp hạng phản ứng -> MC nhận danh vọng/điểm công nhận/tài nguyên và hook tiếp.',
+      'Bàn tay vàng: Vạn Văn Ký Ức tái hiện văn học/phim/game/thần thoại Trái Đất theo template ledger: giữ xương sống nguyên tác, archetype, đại cảnh và payoff; chỉ đổi tên/địa danh/pháp môn cho hợp luật Thiên Đạo.',
+      'Thiên Đạo Thư Viện là thư viện tinh thần do Thiên Đạo tạo ra; Lâm Mặc dùng thần niệm/bút danh/ý niệm để khắc tác phẩm, độc giả gọi trong đầu để đọc. Không nộp bản thảo vật lý, không phân lâu, không xếp hàng.',
+      'Chapter loop: Lâm Mặc ẩn danh viết/khắc tác phẩm -> độc giả nhập tâm/lĩnh ngộ võ học/công pháp -> faction/bảng xếp hạng phản ứng -> MC nhận danh vọng/điểm công nhận/tài nguyên và hook tiếp.',
+      'Early arc taboo: không lộ thân phận thật, không gặp địch trực tiếp, không điều tra quán trà/tổ chức đen, không ám sát sớm; conflict chính là tác phẩm, độc giả, bảng và cách kể chuyện.',
     );
   } else {
     lines.push(
@@ -497,6 +512,12 @@ export async function writeFlashCheapRoutineChapter(input: FlashCheapRoutineInpu
     });
 
     qualityHardIssues = quality.issues.filter(isFlashCheapHardIssue);
+    const focusReport = validateFocusPresetChapterContent({
+      chapterNumber: input.nextChapter,
+      content: chapter.content,
+      protagonistName: input.protagonistName,
+    }, input.project.style_directives?.focus_key || undefined);
+    qualityHardIssues.push(...focusPresetIssuesAsQualityIssues(focusReport.issues).filter(isFlashCheapHardIssue));
     if (!chapter.title.trim() || !chapter.content.trim()) {
       qualityHardIssues.push({
         code: 'empty_content',
@@ -534,6 +555,12 @@ export async function writeFlashCheapRoutineChapter(input: FlashCheapRoutineInpu
       worldDescription: input.project.world_description,
     });
     qualityHardIssues = quality.issues.filter(isFlashCheapHardIssue);
+    const focusReport = validateFocusPresetChapterContent({
+      chapterNumber: input.nextChapter,
+      content: chapter.content,
+      protagonistName: input.protagonistName,
+    }, input.project.style_directives?.focus_key || undefined);
+    qualityHardIssues.push(...focusPresetIssuesAsQualityIssues(focusReport.issues).filter(isFlashCheapHardIssue));
     // Keep ending hook as a soft audit signal; do not convert it to a hard blocker.
   }
   if (qualityHardIssues.length > 0) {
@@ -711,6 +738,7 @@ KHUNG CHƯƠNG:
 - Độ dài ưu tiên: ${preferredMin}-${preferredMax} từ; hard minimum ${minWords} từ. Không viết ngắn kiểu tóm tắt.
 - Main: ${input.protagonistName}. MC có trí nhớ kiếp trước về văn học, phim ảnh, game, thần thoại, webnovel.
 - Tone: sảng văn. MC có thể gặp trở ngại nhỏ nhưng phải xử lý gọn, thông minh, có tiến triển mạnh lên, có payoff cụ thể trong chính chương.
+- Áp dụng universal sảng văn directive: MC nắm nhịp, thưởng dày hơn áp lực, không stack đối thủ/âm mưu/kìm nén nếu chưa trả lợi ích trong cùng chương.
 - Không leak prompt/context/model/API. Không tự tạo canon lớn mâu thuẫn chương trước. Không hồi sinh nhân vật chết nếu không có cơ chế đã establish.
 - TUYỆT ĐỐI không viết tóm tắt/outline. "content" phải là toàn văn truyện, tối thiểu ${minWords} từ, có scene nối tiếp nhau.
 

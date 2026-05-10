@@ -4,6 +4,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import path from 'path';
 import { assembleContext, loadContext } from '../src/services/story-engine/context/assembler';
 import { evaluateChapterQuality, type ChapterQualityReport } from '../src/services/story-engine/quality/quality-contract';
+import { UNIVERSAL_SANG_VAN_DIRECTIVE } from '../src/services/story-engine/templates/sang-van-directives';
 
 dotenv.config({ path: '.env.runtime', quiet: true });
 dotenv.config({ path: '.env.local', quiet: true });
@@ -236,6 +237,7 @@ function buildCodexPrompt(
     '- Viết truyện tiếng Việt thuần, chỉ nội dung chương.',
     '- Dòng đầu là tiêu đề dạng "# <tên chương>", không có "(Tiếp)" hoặc split part.',
     '- Một chương đầy đủ, không chia đôi, không meta-commentary, không nhắc prompt/model/API.',
+    UNIVERSAL_SANG_VAN_DIRECTIVE,
     '- MC phải có lựa chọn chủ động, lợi ích cụ thể, payoff rõ trong chương. Reader phải thấy trạng thái/tài nguyên/quan hệ/uy tín thay đổi.',
     '- Có ít nhất 3 dòng thoại có action/reaction beat, không hỏi-đáp thẳng tuột.',
     '- Có nội tâm, cảm giác thân thể/không gian, chi tiết cụ thể, không chỉ tóm tắt.',
