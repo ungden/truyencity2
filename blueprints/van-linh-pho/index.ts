@@ -8,6 +8,7 @@
 import type { NovelBlueprint } from '../../src/services/story-engine/blueprint/types';
 import { VAN_LINH_PHO_ARC_SKELETON } from './arc-skeleton';
 import { ARC1_BRIEFS_CH6_50 } from './arc-1-detail';
+import { ARC2_BRIEFS_CH51_150 } from './arc-2-detail';
 
 export const VAN_LINH_PHO_BLUEPRINT: NovelBlueprint = {
   id: 'van-linh-pho-gia-toc',
@@ -17,8 +18,8 @@ export const VAN_LINH_PHO_BLUEPRINT: NovelBlueprint = {
   totalChapters: 1000,
   arcs: [
     { arc: VAN_LINH_PHO_ARC_SKELETON[0], briefs: ARC1_BRIEFS_CH6_50 },
-    // Arc 2-7 briefs pending (placeholder — sync skips arcs with empty briefs).
-    { arc: VAN_LINH_PHO_ARC_SKELETON[1], briefs: [] },
+    { arc: VAN_LINH_PHO_ARC_SKELETON[1], briefs: ARC2_BRIEFS_CH51_150 },
+    // Arc 3-7 briefs pending.
     { arc: VAN_LINH_PHO_ARC_SKELETON[2], briefs: [] },
     { arc: VAN_LINH_PHO_ARC_SKELETON[3], briefs: [] },
     { arc: VAN_LINH_PHO_ARC_SKELETON[4], briefs: [] },
