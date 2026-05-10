@@ -12,6 +12,91 @@ import {
 import { TIEN_HIEP_RETURNING_EXPERT_TEMPLATE } from '../../../blueprints/_templates/tien-hiep-returning-expert';
 import { DO_THI_REBORN_GENIUS_TEMPLATE } from '../../../blueprints/_templates/do-thi-modern-reborn-genius';
 import { HUYEN_HUYEN_BLOODLINE_TEMPLATE } from '../../../blueprints/_templates/huyen-huyen-bloodline-war';
+import { LICH_SU_QUAN_TRUONG_TEMPLATE } from '../../../blueprints/_templates/lich-su-xuyen-quan-truong';
+import { KHOA_HUYEN_TECH_FUSION_TEMPLATE } from '../../../blueprints/_templates/khoa-huyen-tech-fusion';
+import { DONG_NHAN_REWRITE_TEMPLATE } from '../../../blueprints/_templates/dong-nhan-author-rewrite';
+import { VONG_DU_TOP_PLAYER_TEMPLATE } from '../../../blueprints/_templates/vong-du-top-player-rebirth';
+import { DI_GIOI_LORD_BUILDER_TEMPLATE } from '../../../blueprints/_templates/di-gioi-lord-builder';
+import { LINH_DI_CORONER_TEMPLATE } from '../../../blueprints/_templates/linh-di-folk-horror-coroner';
+import { MAT_THE_HOARDER_TEMPLATE } from '../../../blueprints/_templates/mat-the-doomsday-hoarder';
+import { KIEM_HIEP_SWORD_SAINT_TEMPLATE } from '../../../blueprints/_templates/kiem-hiep-sword-saint';
+import { NGON_TINH_CEO_SOFT_TEMPLATE } from '../../../blueprints/_templates/ngon-tinh-ceo-soft';
+import { QUAN_TRUONG_BUREAUCRAT_TEMPLATE } from '../../../blueprints/_templates/quan-truong-modern-bureaucrat';
+
+const SAMPLE_VARS: Record<string, Record<string, string>> = {
+  'lich-su-xuyen-quan-truong': {
+    MC_NAME: 'Triệu Tử Long', MC_FAMILY: 'Triệu', MC_PAST_NAME: 'Lý Văn Minh', HOMETOWN: 'Lâm An phủ',
+    DYNASTY_NAME: 'Đại Tống', CAPITAL_CITY: 'Biện Kinh', ANTAGONIST_FAMILY: 'Tần', FOREIGN_ENEMY: 'Kim quốc',
+    CONSORT_NAME: 'Vân Linh công chúa', REFORM_BANNER: 'Tân Pháp Phú Quốc', LOYAL_GENERAL: 'Trần Khánh Dư',
+    ENDING_GOAL: 'thống nhất thiên hạ',
+  },
+  'khoa-huyen-tech-fusion': {
+    MC_NAME: 'Lý Tinh Vũ', MC_FAMILY: 'Lý', HOMETOWN: 'Tinh Hà thành',
+    LAB_NAME: 'Tinh Vũ Lab', AI_FAMILIAR: 'Linh Tâm AI',
+    ANTAGONIST_CORP: 'Hắc Tinh Corp', ANCIENT_ENEMY: 'Hỗn Độn Cổ Trí',
+    SIGNATURE_DEVICE: 'Linh Khí Quantum Generator', ACADEMY_NAME: 'Tinh Hà Học Viện',
+    COMPANION_NAME: 'Tô Linh', WORLD_NAME: 'Tinh Hà Liên Bang',
+    ENDING_GOAL: 'Cosmic Architect đỉnh',
+  },
+  'dong-nhan-author-rewrite': {
+    MC_NAME: 'Diệp Phong', MC_PAST_NAME: 'Lý Khang',
+    SOURCE_NOVEL: 'Vạn Cổ Thần Vương', ORIGINAL_PROTAGONIST: 'Diệp Phàm',
+    FAVORITE_CHARACTER: 'Tô Lăng', ANTAGONIST_CANON: 'Hắc Đế',
+    POWER_SYSTEM: 'Võ đạo cửu tầng', HUB_SPACE_NAME: 'Vô Hạn Thư Viện',
+    SECONDARY_NOVEL: 'Linh Vực Đại Đế', COMPANION_NAME: 'Tô Linh',
+    ENDING_GOAL: 'multi-world author đỉnh',
+  },
+  'vong-du-top-player-rebirth': {
+    MC_NAME: 'Lý Phong', MC_FAMILY: 'Lý', HOMETOWN: 'Hà Nội',
+    GAME_NAME: 'Cửu Châu Online', MC_GAME_CLASS: 'Kiếm sĩ', MC_GAME_NAME: 'Vô Cực Kiếm',
+    REBIRTH_YEAR: '2025', GUILD_NAME: 'Vô Cực Hội', RIVAL_GUILD: 'Hắc Long Hội',
+    ANTAGONIST_PRO: 'Hắc Long', COMPANION_NAME: 'Tô Linh',
+    ANCIENT_LORE_NAME: 'Cửu Châu Tổ Tiên', ENDING_GOAL: 'World champion + cosmic admin lord',
+  },
+  'di-gioi-lord-builder': {
+    MC_NAME: 'Lý Phong', MC_FAMILY: 'Lý', HOMETOWN: 'Hà Nội',
+    TERRITORY_NAME: 'Vô Cực Lãnh', SYSTEM_NAME: 'Lãnh Chúa Vô Hạn System',
+    ANTAGONIST_KINGDOM: 'Hắc Long Quốc', ANCIENT_DEMON: 'Cổ Ma Vương',
+    HERO_RECRUIT: 'Thánh Kỵ Sĩ Arthur', COMPANION_NAME: 'Elaine',
+    CONTINENT_NAME: 'Aetheria', ENDING_GOAL: 'Cosmic Lord overlord',
+  },
+  'linh-di-folk-horror-coroner': {
+    MC_NAME: 'Cố Diệp', MC_FAMILY: 'Cố', HOMETOWN: 'Cố thị làng',
+    ANCESTOR_NAME: 'Cố Tổ', LINEAGE_NAME: 'Cố thị Âm Dương',
+    SIGNATURE_TOOL: 'Tử La Bàn', ANTAGONIST_LINEAGE: 'Hắc Liên giáo',
+    ANCIENT_EVIL: 'Cửu U Tà Đế', COMPANION_NAME: 'Tô Linh',
+    CITY_NAME: 'Lâm An phủ', ENDING_GOAL: 'Thiên sư cosmic guardian',
+  },
+  'mat-the-doomsday-hoarder': {
+    MC_NAME: 'Trần Phong', MC_FAMILY: 'Trần', HOMETOWN: 'Hà Nội',
+    DOOMSDAY_DATE: '20/6/2025', SAFE_ZONE_NAME: 'Vô Cực Cứ Điểm',
+    ANTAGONIST_FACTION: 'Hắc Long Hội', COSMIC_THREAT: 'Cổ Ma Tinh Tộc',
+    COMPANION_NAME: 'Tô Linh', CITY_NAME: 'Sài Gòn',
+    ENDING_GOAL: 'Cosmic Guardian + nhân loại reborn',
+  },
+  'kiem-hiep-sword-saint': {
+    MC_NAME: 'Lý Tiêu Dao', MC_FAMILY: 'Lý', HOMETOWN: 'Lâm An phủ',
+    SECT_NAME: 'Thanh Vân Phái', SIGNATURE_SWORD: 'Cửu Kiếm Quyết',
+    ANTAGONIST_SECT: 'Hắc Long Bang', ANCIENT_DEMON: 'Vạn Cổ Ma Tổ',
+    LIFE_PARTNER: 'Tô Linh', LOYAL_FRIEND: 'Trương Khải',
+    JIANGHU_REGION: 'Trung Nguyên', ENDING_GOAL: 'Kiếm thánh đỉnh + võ lâm minh chủ',
+  },
+  'ngon-tinh-ceo-soft': {
+    FEMALE_MC: 'Tô Tử Linh', FEMALE_MC_FAMILY: 'Tô',
+    MALE_MC: 'Trần Mộ Dao', MALE_MC_FAMILY: 'Trần',
+    COMPANY_NAME: 'Mộ Dao Tập Đoàn', HOMETOWN: 'Hà Nội', CITY_NAME: 'Sài Gòn',
+    RIVAL_LOVER: 'Lý Vy', INTERFERING_FAMILY: 'Lý gia',
+    PAST_TRAUMA: 'MC bị fiancé phản bội năm 18', ENDING_GOAL: 'vợ chồng bá đạo + family empire stable',
+  },
+  'quan-truong-modern-bureaucrat': {
+    MC_NAME: 'Trần Văn Minh', MC_FAMILY: 'Trần', HOMETOWN: 'Hà Tĩnh — xã Vĩnh Lộc',
+    PROVINCE_NAME: 'Hà Tĩnh', CAPITAL_CITY: 'Hà Nội',
+    ANTAGONIST_FAMILY: 'Lý phái', CORRUPT_OFFICIAL: 'Hoàng X',
+    LIFE_PARTNER: 'Phạm Lan', REFORM_BANNER: 'Thanh Liêm Tân Chính',
+    LOYAL_FRIEND: 'Trương Đại', COUNTRY_NAME: 'Việt Nam',
+    ENDING_GOAL: 'Tổng bí thư + cải cách quốc gia thành công',
+  },
+};
 
 const minimalTemplate: TemplateBlueprint = {
   templateId: 'test-minimal',
@@ -262,5 +347,46 @@ describe('HUYEN_HUYEN_BLOODLINE_TEMPLATE end-to-end', () => {
     expect(totalBriefs).toBe(1000);
     expect(JSON.stringify(novel)).not.toMatch(/\{\{[A-Z_][A-Z0-9_]*\}\}/);
     expect(novel.genre).toBe('huyen-huyen');
+  });
+});
+
+describe.each([
+  ['lich-su-xuyen-quan-truong', LICH_SU_QUAN_TRUONG_TEMPLATE, 'lich-su'],
+  ['khoa-huyen-tech-fusion', KHOA_HUYEN_TECH_FUSION_TEMPLATE, 'khoa-huyen'],
+  ['dong-nhan-author-rewrite', DONG_NHAN_REWRITE_TEMPLATE, 'dong-nhan'],
+  ['vong-du-top-player-rebirth', VONG_DU_TOP_PLAYER_TEMPLATE, 'vong-du'],
+  ['di-gioi-lord-builder', DI_GIOI_LORD_BUILDER_TEMPLATE, 'di-gioi'],
+  ['linh-di-folk-horror-coroner', LINH_DI_CORONER_TEMPLATE, 'linh-di'],
+  ['mat-the-doomsday-hoarder', MAT_THE_HOARDER_TEMPLATE, 'mat-the'],
+  ['kiem-hiep-sword-saint', KIEM_HIEP_SWORD_SAINT_TEMPLATE, 'kiem-hiep'],
+  ['ngon-tinh-ceo-soft', NGON_TINH_CEO_SOFT_TEMPLATE, 'ngon-tinh'],
+  ['quan-truong-modern-bureaucrat', QUAN_TRUONG_BUREAUCRAT_TEMPLATE, 'quan-truong'],
+])('%s end-to-end', (templateId, template, expectedGenre) => {
+  it('declares all placeholders it actually uses', () => {
+    const used = findUsedPlaceholders(template);
+    const declared = new Set([
+      ...template.requiredVars,
+      ...Object.keys(template.optionalVars || {}),
+    ]);
+    const undeclared = used.filter((t) => !declared.has(t));
+    expect(undeclared).toEqual([]);
+  });
+
+  it('instantiates into 1000-chapter NovelBlueprint with no leaked placeholders', () => {
+    const vars = SAMPLE_VARS[templateId];
+    expect(vars).toBeDefined();
+    const novel = instantiateTemplate(template, {
+      novelId: `sample-${templateId}`,
+      title: `Sample ${templateId}`,
+      slug: `sample-${templateId}`,
+      vars,
+    });
+
+    expect(novel.totalChapters).toBe(1000);
+    expect(novel.arcs.length).toBe(7);
+    const totalBriefs = novel.arcs.reduce((sum, a) => sum + a.briefs.length, 0);
+    expect(totalBriefs).toBe(1000);
+    expect(JSON.stringify(novel)).not.toMatch(/\{\{[A-Z_][A-Z0-9_]*\}\}/);
+    expect(novel.genre).toBe(expectedGenre);
   });
 });
