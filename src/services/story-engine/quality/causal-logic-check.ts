@@ -54,6 +54,7 @@ const ILLEGAL_ACCESS_RE = /đột nhập|lẻn vào|xông vào|lọt vào|bẻ k
 const LEGAL_ACCESS_RE = /hợp đồng|giấy phép|ủy quyền|chấp thuận|cho phép|giám sát|công khai|khu giao dịch|vòng ngoài|nhiệm vụ học viện|điểm công|được mời|theo quy trình|đăng ký/i;
 const SOURCE_COST_RE = /chi phí|giá|đổi lấy|khấu trừ|tiêu hao|nguồn gốc|nguồn tin|hợp đồng|nhiệm vụ|phần thưởng|điểm công|ledger|sổ|bảng giá|giao dịch|đặt cọc|bồi hoàn|giám sát|thẩm định/i;
 const FREE_WITHOUT_COST_RE = /không cần (?:trả )?giá|không mất gì|miễn phí|tự nhiên có|bỗng nhiên|vô duyên vô cớ/i;
+const COST_NEGATION_RE = /không có gì miễn phí|không miễn phí|chẳng có gì miễn phí/i;
 const MOTIVE_RE = /vì|để|nhằm|muốn|cần|đổi lấy|lợi ích|áp lực|bị ép|được trả|hợp đồng|mục tiêu|sợ|tham|cứu|bảo vệ|đánh cược/i;
 const HIGH_TIER_TERMS = [
   'Thần Cách',
@@ -67,7 +68,8 @@ const HIGH_TIER_TERMS = [
   'lõi pháp tắc',
 ];
 const HIGH_VALUE_ITEM_RE = /mảnh Thần Cách|Thần Cách|lõi pháp tắc|chìa khóa|bản đồ|tọa độ|cổ vật|thần vật|tàn tích|tháp đen/i;
-const OBTAIN_RE = /nhận|lấy|được|trao|đưa|giao|cướp|đánh cắp|mở ra|kích hoạt|nhặt|chiếm/i;
+const OBTAIN_RE = /nhận|lấy|được\s+(?:trao|giao|nhận|cấp|mở|phép)|trao|đưa|giao|cướp|đánh cắp|mở ra|kích hoạt|nhặt|chiếm|mua|đổi/i;
+const NEGATED_OR_DEFERRED_RE = /không cần|không mở|không có|không phải|chưa|cấm|tránh|đừng|thay vì/i;
 const RIVAL_NAMES = ['Lăng Hạo', 'Hạ Vân Chu'];
 const PLOT_MOVING_RIVAL_NAMES = ['Lăng Hạo'];
 
@@ -215,10 +217,15 @@ function detectAcademyAccessViolation(content: string): CausalLogicIssue | null 
 function detectResourceWithoutSource(content: string): CausalLogicIssue[] {
   const issues: CausalLogicIssue[] = [];
   const matches = matchTerms(content, HIGH_VALUE_ITEM_RE);
+  const seenTerms = new Set<string>();
   for (const match of matches) {
+    const normalizedTerm = match.value.toLowerCase();
+    if (seenTerms.has(normalizedTerm)) continue;
     const window = sliceAround(content, match.index, 420);
     if (!OBTAIN_RE.test(window)) continue;
-    if (SOURCE_COST_RE.test(window) && !FREE_WITHOUT_COST_RE.test(window)) continue;
+    if (isNegatedOrDeferredMention(window, match.value)) continue;
+    if (SOURCE_COST_RE.test(window) && !hasUnpaidFreeClaim(window)) continue;
+    seenTerms.add(normalizedTerm);
     issues.push({
       code: 'resource_without_source',
       severity: /Thần Cách|thần vật|lõi pháp tắc/i.test(window) ? 'critical' : 'major',
@@ -235,6 +242,8 @@ function detectThreadJumps(content: string, arcText: string, activeThreads: stri
   for (const term of HIGH_TIER_TERMS) {
     if (!includesLoose(content, term)) continue;
     if (includesLoose(known, term)) continue;
+    const windows = windowsAround(content, term, 220);
+    if (windows.length > 0 && windows.every((window) => isNegatedOrDeferredMention(window, term))) continue;
     issues.push({
       code: 'thread_jump',
       severity: 'major',
@@ -243,6 +252,19 @@ function detectThreadJumps(content: string, arcText: string, activeThreads: stri
     });
   }
   return issues;
+}
+
+function hasUnpaidFreeClaim(window: string): boolean {
+  if (COST_NEGATION_RE.test(window)) return false;
+  return FREE_WITHOUT_COST_RE.test(window);
+}
+
+function isNegatedOrDeferredMention(window: string, term: string): boolean {
+  if (hasUnpaidFreeClaim(window)) return false;
+  const termIndex = window.toLowerCase().indexOf(term.toLowerCase());
+  if (termIndex < 0) return false;
+  const before = window.slice(Math.max(0, termIndex - 90), termIndex + term.length + 20);
+  return NEGATED_OR_DEFERRED_RE.test(before);
 }
 
 function detectUnscheduledRivalIntrusion(content: string, context: CausalLogicContext): CausalLogicIssue[] {
