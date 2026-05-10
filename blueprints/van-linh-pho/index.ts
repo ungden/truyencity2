@@ -7,9 +7,14 @@
 
 import type { NovelBlueprint } from '../../src/services/story-engine/blueprint/types';
 import { VAN_LINH_PHO_ARC_SKELETON } from './arc-skeleton';
+import { ARC1_BRIEFS_PRELUDE_CH1_5 } from './arc-1-prelude';
 import { ARC1_BRIEFS_CH6_50 } from './arc-1-detail';
 import { ARC2_BRIEFS_CH51_150 } from './arc-2-detail';
 import { ARC3_BRIEFS_CH151_300 } from './arc-3-detail';
+import { ARC4_BRIEFS_CH301_500 } from './arc-4-detail';
+import { ARC5_BRIEFS_CH501_700 } from './arc-5-detail';
+import { ARC6_BRIEFS_CH701_900 } from './arc-6-detail';
+import { ARC7_BRIEFS_CH901_1000 } from './arc-7-detail';
 
 export const VAN_LINH_PHO_BLUEPRINT: NovelBlueprint = {
   id: 'van-linh-pho-gia-toc',
@@ -18,14 +23,13 @@ export const VAN_LINH_PHO_BLUEPRINT: NovelBlueprint = {
   genre: 'ngu-thu-tien-hoa',
   totalChapters: 1000,
   arcs: [
-    { arc: VAN_LINH_PHO_ARC_SKELETON[0], briefs: ARC1_BRIEFS_CH6_50 },
+    { arc: VAN_LINH_PHO_ARC_SKELETON[0], briefs: [...ARC1_BRIEFS_PRELUDE_CH1_5, ...ARC1_BRIEFS_CH6_50] },
     { arc: VAN_LINH_PHO_ARC_SKELETON[1], briefs: ARC2_BRIEFS_CH51_150 },
     { arc: VAN_LINH_PHO_ARC_SKELETON[2], briefs: ARC3_BRIEFS_CH151_300 },
-    // Arc 4-7 briefs pending.
-    { arc: VAN_LINH_PHO_ARC_SKELETON[3], briefs: [] },
-    { arc: VAN_LINH_PHO_ARC_SKELETON[4], briefs: [] },
-    { arc: VAN_LINH_PHO_ARC_SKELETON[5], briefs: [] },
-    { arc: VAN_LINH_PHO_ARC_SKELETON[6], briefs: [] },
+    { arc: VAN_LINH_PHO_ARC_SKELETON[3], briefs: ARC4_BRIEFS_CH301_500 },
+    { arc: VAN_LINH_PHO_ARC_SKELETON[4], briefs: ARC5_BRIEFS_CH501_700 },
+    { arc: VAN_LINH_PHO_ARC_SKELETON[5], briefs: ARC6_BRIEFS_CH701_900 },
+    { arc: VAN_LINH_PHO_ARC_SKELETON[6], briefs: ARC7_BRIEFS_CH901_1000 },
   ],
   extraBannedPatterns: [
     'CẤM em gái Cố Tiểu Đào / quản gia Hà Thúc / đệ tử trẻ biết về Vạn Linh Phổ',
