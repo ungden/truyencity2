@@ -3,6 +3,7 @@ import {
   buildRoutineBrief,
   getRoutinePromptContext,
   hasFlashCheapChapterBrief,
+  isInvalidFlashCheapTitle,
   isFlashCheapHardCanonIssue,
   isFlashCheapHardIssue,
   parseFlashCheapWriterResponse,
@@ -22,6 +23,12 @@ describe('flash cheap routine', () => {
     }));
     expect(parsed.title).toBe('Lưới Sương Thức Tỉnh');
     expect(parsed.content).toContain('Lâm Duy');
+  });
+
+  it('rejects malformed cheap writer titles before publish', () => {
+    expect(isInvalidFlashCheapTitle('{')).toBe(true);
+    expect(isInvalidFlashCheapTitle('title')).toBe(true);
+    expect(isInvalidFlashCheapTitle('Lưới Sương Thức Tỉnh')).toBe(false);
   });
 
   it('keeps compact context within budget and preserves priority sections first', () => {

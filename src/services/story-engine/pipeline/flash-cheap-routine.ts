@@ -14,6 +14,12 @@ import { chunkAndStoreChapter } from '../memory/rag-store';
 import { saveCharacterStatesFromCombined, detectCharacterContradictions } from '../state/character-state';
 import { checkConsistencyFast } from '../quality/consistency-check';
 import { enforceCanonGates } from '../quality/canon-enforcement';
+import {
+  buildCausalLogicHealth,
+  checkCausalLogicFast,
+  isHardCausalIssue,
+  type CausalLogicIssue,
+} from '../quality/causal-logic-check';
 import { evaluateChapterQuality, type ChapterQualityIssue } from '../quality/quality-contract';
 import { recordQualityMetrics } from '../quality/quality-metrics';
 import { postWriteHealthCheck } from '../utils/post-write-health-check';
@@ -114,7 +120,7 @@ export function trimFlashCheapContextSections(sections: ContextSection[], maxCha
     used += header.length + content.length;
   }
 
-  return chunks.join('').trim().slice(0, budget);
+  return scrubFlashCheapMetaLabels(chunks.join('').trim().slice(0, budget));
 }
 
 export function parseFlashCheapWriterResponse(raw: string): { title: string; content: string } {
@@ -132,6 +138,15 @@ export function parseFlashCheapWriterResponse(raw: string): { title: string; con
   const title = firstLine.replace(/^#+\s*/, '').replace(/^["“]|["”]$/g, '').trim() || 'Chương mới';
   const content = lines.slice(1).join('\n\n').trim() || cleaned;
   return { title, content };
+}
+
+export function isInvalidFlashCheapTitle(title: string): boolean {
+  const clean = title.trim();
+  if (!clean) return true;
+  if (/^[{}\[\],:"']+$/.test(clean)) return true;
+  if (/^(json|content|title|chapter|chương mới)$/i.test(clean)) return true;
+  if (clean.length > 120) return true;
+  return false;
 }
 
 export function isFlashCheapHardIssue(issue: CriticIssue | ChapterQualityIssue): boolean {
@@ -302,9 +317,18 @@ export async function ensureFlashCheapArcRail(input: FlashCheapRoutineInput, db:
 
 export function getRoutinePromptContext(styleDirectives: StyleDirectives | null | undefined): string {
   if (typeof styleDirectives?.routine_prompt_context === 'string' && styleDirectives.routine_prompt_context.trim()) {
-    return styleDirectives.routine_prompt_context.trim();
+    return scrubFlashCheapMetaLabels(styleDirectives.routine_prompt_context.trim());
   }
-  return buildFocusPresetContext(styleDirectives?.focus_key || undefined).trim();
+  return scrubFlashCheapMetaLabels(buildFocusPresetContext(styleDirectives?.focus_key || undefined).trim());
+}
+
+function scrubFlashCheapMetaLabels(value: string | null | undefined): string {
+  return (value || '')
+    .replace(/(^|\n)\s*Hook\s*:/gi, '$1Dư âm:')
+    .replace(/(^|\n)\s*Outline\s*:/gi, '$1Dàn ý:')
+    .replace(/(^|\n)\s*Tóm tắt\s*:/gi, '$1Tóm lược:')
+    .replace(/(^|\n)\s*Yêu cầu\s*:/gi, '$1Gợi ý:')
+    .trim();
 }
 
 export function buildRoutineBrief(input: FlashCheapRoutineInput): string {
@@ -323,19 +347,19 @@ export function buildRoutineBrief(input: FlashCheapRoutineInput): string {
   if (focusKey === 'sang-the-than-minh') {
     lines.push(
       'Bàn tay vàng: Khởi Nguyên Biên Niên / Vạn Tượng Ký Ức chuyển hóa trí nhớ kiếp trước thành template thế giới có chi phí, tài nguyên, quy luật, loài phụ thuộc, tín ngưỡng và rủi ro.',
-      'Chapter loop: world-state Thần Vực, tiến triển loài/quyến thuộc, template inspiration, tài nguyên tiêu hao/thu được, lợi ích rõ, ending hook.',
+      'Chapter loop: world-state Thần Vực, tiến triển loài/quyến thuộc, template inspiration, tài nguyên tiêu hao/thu được, lợi ích rõ, dư âm đọc tiếp.',
     );
   } else if (focusKey === 'thien-dao-thu-vien') {
     lines.push(
       'Bàn tay vàng: Vạn Văn Ký Ức tái hiện văn học/phim/game/thần thoại Trái Đất theo template ledger: giữ xương sống nguyên tác, archetype, đại cảnh và payoff; chỉ đổi tên/địa danh/pháp môn cho hợp luật Thiên Đạo.',
       'Thiên Đạo Thư Viện là thư viện tinh thần do Thiên Đạo tạo ra; Lâm Mặc dùng thần niệm/bút danh/ý niệm để khắc tác phẩm, độc giả gọi trong đầu để đọc. Không nộp bản thảo vật lý, không phân lâu, không xếp hàng.',
-      'Chapter loop: Lâm Mặc ẩn danh viết/khắc tác phẩm -> độc giả nhập tâm/lĩnh ngộ võ học/công pháp -> faction/bảng xếp hạng phản ứng -> MC nhận danh vọng/điểm công nhận/tài nguyên và hook tiếp.',
+      'Chapter loop: Lâm Mặc ẩn danh viết/khắc tác phẩm -> độc giả nhập tâm/lĩnh ngộ võ học/công pháp -> faction/bảng xếp hạng phản ứng -> MC nhận danh vọng/điểm công nhận/tài nguyên và dư âm đọc tiếp.',
       'Early arc taboo: không lộ thân phận thật, không gặp địch trực tiếp, không điều tra quán trà/tổ chức đen, không ám sát sớm; conflict chính là tác phẩm, độc giả, bảng và cách kể chuyện.',
     );
   } else {
     lines.push(
       'MC có trí nhớ/lợi thế cốt lõi đã ghi trong world_description và story_outline; mọi payoff phải có nguyên nhân, chi phí hoặc phản ứng xã hội rõ.',
-      'Chapter loop: mục tiêu cụ thể -> trở ngại ngắn -> lựa chọn chủ động của MC -> lợi ích đo được -> phản ứng thế giới -> hook tiếp.',
+      'Chapter loop: mục tiêu cụ thể -> trở ngại ngắn -> lựa chọn chủ động của MC -> lợi ích đo được -> phản ứng thế giới -> dư âm đọc tiếp.',
     );
   }
 
@@ -421,9 +445,9 @@ export async function buildFlashCheapRoutineContext(input: FlashCheapRoutineInpu
       content: previousSummary
         ? [
             `Ch.${previousSummary.chapter_number} "${previousSummary.title}"`,
-            `Tóm tắt: ${previousSummary.summary}`,
-            `MC state: ${previousSummary.mc_state || '(missing)'}`,
-            `Hook: ${previousSummary.cliffhanger || '(missing)'}`,
+            `Tóm lược: ${scrubFlashCheapMetaLabels(previousSummary.summary)}`,
+            `MC state: ${scrubFlashCheapMetaLabels(previousSummary.mc_state) || '(missing)'}`,
+            `Dư âm cuối chương trước: ${scrubFlashCheapMetaLabels(previousSummary.cliffhanger) || '(missing)'}`,
           ].join('\n')
         : '(chưa có summary trước)',
     },
@@ -446,7 +470,7 @@ export async function buildFlashCheapRoutineContext(input: FlashCheapRoutineInpu
     {
       label: 'RECENT SUMMARIES',
       priority: 80,
-      content: summaries.map((s) => `Ch.${s.chapter_number} "${s.title}": ${s.summary} | MC: ${s.mc_state || '-'} | Hook: ${s.cliffhanger || '-'}`).join('\n'),
+      content: summaries.map((s) => `Ch.${s.chapter_number} "${s.title}": ${scrubFlashCheapMetaLabels(s.summary)} | MC: ${scrubFlashCheapMetaLabels(s.mc_state) || '-'} | Dư âm cuối: ${scrubFlashCheapMetaLabels(s.cliffhanger) || '-'}`).join('\n'),
     },
     {
       label: 'CHARACTER STATES',
@@ -490,13 +514,15 @@ export async function writeFlashCheapRoutineChapter(input: FlashCheapRoutineInpu
   let chapter: { title: string; content: string } | null = null;
   let quality: ReturnType<typeof evaluateChapterQuality> | null = null;
   let qualityHardIssues: ChapterQualityIssue[] = [];
+  let causalIssues: CausalLogicIssue[] = [];
+  let causalHardIssues: CausalLogicIssue[] = [];
   let extensionResponse: Awaited<ReturnType<typeof callGemini>> | null = null;
   let extensionsAttempted = 0;
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     const prompt = attempt === 0
       ? buildWriterPrompt(input, context, minWords)
-      : buildRetryWriterPrompt(input, context, minWords, chapter, qualityHardIssues);
+      : buildRetryWriterPrompt(input, context, minWords, chapter, qualityHardIssues, causalHardIssues);
     response = await callGemini(prompt, writerConfig, {
       jsonMode: true,
       tracking: { projectId: input.project.id, task: attempt === 0 ? 'writer' : 'writer_retry', chapterNumber: input.nextChapter },
@@ -518,6 +544,11 @@ export async function writeFlashCheapRoutineChapter(input: FlashCheapRoutineInpu
       protagonistName: input.protagonistName,
     }, input.project.style_directives?.focus_key || undefined);
     qualityHardIssues.push(...focusPresetIssuesAsQualityIssues(focusReport.issues).filter(isFlashCheapHardIssue));
+    causalIssues = await checkCausalLogicFast(input.project.id, input.nextChapter, chapter.content, {
+      protagonistName: input.protagonistName,
+      focusKey: input.project.style_directives?.focus_key,
+    });
+    causalHardIssues = causalIssues.filter(isHardCausalIssue);
     if (!chapter.title.trim() || !chapter.content.trim()) {
       qualityHardIssues.push({
         code: 'empty_content',
@@ -526,9 +557,17 @@ export async function writeFlashCheapRoutineChapter(input: FlashCheapRoutineInpu
         goal: 'coherence',
       });
     }
+    if (isInvalidFlashCheapTitle(chapter.title)) {
+      qualityHardIssues.push({
+        code: 'model_or_prompt_leak',
+        severity: 'critical',
+        message: `Writer returned invalid reader-facing title: "${chapter.title}".`,
+        goal: 'coherence',
+      });
+    }
     // Cheap routine uses a soft style gate: weak hook may trigger an extension
     // when the quality contract reports it, but it must not block publish alone.
-    if (qualityHardIssues.length === 0) break;
+    if (qualityHardIssues.length === 0 && causalHardIssues.length === 0) break;
   }
 
   if (!response || !chapter || !quality) {
@@ -561,10 +600,25 @@ export async function writeFlashCheapRoutineChapter(input: FlashCheapRoutineInpu
       protagonistName: input.protagonistName,
     }, input.project.style_directives?.focus_key || undefined);
     qualityHardIssues.push(...focusPresetIssuesAsQualityIssues(focusReport.issues).filter(isFlashCheapHardIssue));
+    causalIssues = await checkCausalLogicFast(input.project.id, input.nextChapter, chapter.content, {
+      protagonistName: input.protagonistName,
+      focusKey: input.project.style_directives?.focus_key,
+    });
+    causalHardIssues = causalIssues.filter(isHardCausalIssue);
     // Keep ending hook as a soft audit signal; do not convert it to a hard blocker.
   }
-  if (qualityHardIssues.length > 0) {
-    throw new Error(`FLASH_CHEAP_GATE_BLOCKED: ${qualityHardIssues.map((i) => `${i.code}:${i.message}`).join(' | ')}`);
+  causalIssues = await checkCausalLogicFast(input.project.id, input.nextChapter, chapter.content, {
+    protagonistName: input.protagonistName,
+    focusKey: input.project.style_directives?.focus_key,
+  }).catch((e) => {
+    throw new Error(`FLASH_CHEAP_CAUSAL_GATE_FAILED: ${e instanceof Error ? e.message : String(e)}`);
+  });
+  causalHardIssues = causalIssues.filter(isHardCausalIssue);
+
+  if (qualityHardIssues.length > 0 || causalHardIssues.length > 0) {
+    const qualityText = qualityHardIssues.map((i) => `${i.code}:${i.message}`);
+    const causalText = causalHardIssues.map((i) => `${i.code}:${i.message}`);
+    throw new Error(`FLASH_CHEAP_GATE_BLOCKED: ${[...qualityText, ...causalText].join(' | ')}`);
   }
 
   const summaryConfig: GeminiConfig = {
@@ -604,6 +658,7 @@ export async function writeFlashCheapRoutineChapter(input: FlashCheapRoutineInpu
   const hardBlockers = [
     ...contradictions.filter((c) => c.severity === 'critical').map((c): CriticIssue => ({ type: 'continuity', severity: 'critical', description: c.description })),
     ...consistencyIssues.filter((i) => i.severity === 'critical' || i.severity === 'major').map((i): CriticIssue => ({ type: i.type === 'dead_character' ? 'continuity' : 'consistency', severity: i.severity, description: i.description })),
+    ...causalHardIssues.map((i): CriticIssue => ({ type: 'logic', severity: i.severity, description: `[${i.code}] ${i.message}${i.evidence ? ` Evidence: ${i.evidence}` : ''}` })),
     ...canonIssues.filter(isFlashCheapHardCanonIssue),
   ];
 
@@ -672,6 +727,7 @@ export async function writeFlashCheapRoutineChapter(input: FlashCheapRoutineInpu
       cheap_quality_score: quality.score,
       cheap_quality_verdict: quality.verdict,
       cheap_quality_issues: quality.issues,
+      causal_logic_health: buildCausalLogicHealth(causalIssues),
       continuity_health: continuityHealth,
       health,
       compact_context_chars: context.length,
@@ -740,6 +796,9 @@ KHUNG CHƯƠNG:
 - Tone: sảng văn. MC có thể gặp trở ngại nhỏ nhưng phải xử lý gọn, thông minh, có tiến triển mạnh lên, có payoff cụ thể trong chính chương.
 - Áp dụng universal sảng văn directive: MC nắm nhịp, thưởng dày hơn áp lực, không stack đối thủ/âm mưu/kìm nén nếu chưa trả lợi ích trong cùng chương.
 - Không leak prompt/context/model/API. Không tự tạo canon lớn mâu thuẫn chương trước. Không hồi sinh nhân vật chết nếu không có cơ chế đã establish.
+- Hard causal logic: không để rival/nhân vật yếu tự nhiên vào Học Viện/khu cấm/lấy đồ nếu chưa có quyền hạn hợp pháp; mọi bản đồ/tọa độ/vật phẩm/tài nguyên cao cấp phải có nguồn, giá, chi phí hoặc ledger; không mở thread vượt cấp trái CURRENT ARC RAIL.
+- Không tự kéo named rival/faction vào chương nếu CURRENT ARC RAIL hoặc ACTIVE THREADS không yêu cầu. Nếu rival xuất hiện, phải có động cơ, quyền hạn, lợi ích/áp lực và giới hạn hành động ngay trong cảnh.
+- Không dùng nhãn meta/nhãn dàn ý trong content; kết chương phải là văn xuôi/cảnh truyện tự nhiên.
 - TUYỆT ĐỐI không viết tóm tắt/outline. "content" phải là toàn văn truyện, tối thiểu ${minWords} từ, có scene nối tiếp nhau.
 
 FOCUS REQUIREMENTS:
@@ -755,17 +814,25 @@ function buildRetryWriterPrompt(
   minWords: number,
   previous: { title: string; content: string } | null,
   issues: ChapterQualityIssue[],
+  causalIssues: CausalLogicIssue[] = [],
 ): string {
   return `${buildWriterPrompt(input, context, minWords)}
 
 BẢN TRƯỚC BỊ CHẶN BỞI GATE:
-${issues.map((i) => `- ${i.code}: ${i.message}`).join('\n')}
+${[
+  ...issues.map((i) => `- ${i.code}: ${i.message}`),
+  ...causalIssues.map((i) => `- ${i.code}: ${i.message}${i.evidence ? ` (${i.evidence})` : ''}`),
+].join('\n')}
 
 YÊU CẦU SỬA:
 - Viết lại hoàn toàn, không tóm tắt.
 - Độ dài tối thiểu ${minWords} từ, ưu tiên quanh ${input.targetWordCount} từ.
 - Thêm payoff rõ trong chương: tài nguyên/ledger/law/species/world-state phải thay đổi thấy được.
-- Kết chương phải có hook cụ thể.
+- Kết chương phải có lực kéo đọc tiếp cụ thể.
+- Mọi nhân vật phụ/rival chỉ được vào khu vực, lấy vật phẩm, đưa bản đồ/tọa độ hoặc mở thread mới nếu có quyền hạn, nguồn tin, động cơ và chi phí rõ trong chương.
+- Không đưa high-tier thread trái arc rail; nếu arc chưa seed Thần Cách/sát thủ Hư Không/tàn tích cấp cao thì không tự mở.
+- Nếu brief chương không cần rival/faction cụ thể, bỏ họ khỏi chương; tập trung vào mục tiêu/payoff của brief.
+- Không ghi literal nhãn dàn ý hoặc nhãn prompt nào trong truyện; hãy viết cảnh kết tự nhiên.
 
 BẢN NGẮN BỊ LOẠI ĐỂ THAM KHẢO, KHÔNG COPY NGUYÊN:
 ${previous ? `${previous.title}\n${previous.content.slice(0, 2500)}` : '(không có)'}`;
@@ -793,7 +860,7 @@ ${issues.map((i) => `- ${i.code}: ${i.message}`).join('\n')}
 NHIỆM VỤ:
 - KHÔNG viết lại từ đầu. Chỉ viết phần nối thêm ${needed}-${needed + 450} từ để gắn trực tiếp sau bản hiện có.
 - Phần nối thêm phải mở rộng cảnh hiện tại bằng hành động cụ thể, ledger tài nguyên/danh vọng/trạng thái thế giới, phản ứng nhân vật/faction và payoff rõ theo đúng focus preset.
-- Kết thúc phần nối thêm bằng hook cụ thể đủ mạnh để đọc tiếp.
+- Kết thúc phần nối thêm bằng lực kéo cụ thể đủ mạnh để đọc tiếp.
 - Tránh lặp cụm đang bị cảnh báo; dùng chi tiết vật thể, phản ứng sinh vật, luật thế giới và lựa chọn chủ động của ${input.protagonistName}.
 - Không leak prompt/context/model/API.
 

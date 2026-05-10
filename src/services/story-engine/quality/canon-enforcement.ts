@@ -35,6 +35,7 @@ import { detectTimelineViolations } from '../state/timeline';
 import { checkPovConsistency } from './pov-check';
 import { analyzeSensoryBalance } from './sensory-balance';
 import { evaluateHooks } from './hook-strength';
+import { causalIssuesToCriticIssues, checkCausalLogicFast } from './causal-logic-check';
 import type { CriticIssue } from '../types';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -94,10 +95,19 @@ export async function enforceCanonGates(
   promises.push(checkMcProfitability(input).catch(() => []));
   // 9. System cadence — golden finger silent / power scaling stall.
   promises.push(checkSystemCadence(input).catch(() => []));
+  // 10. Hard causal logic — authority/access/resource/arc-rail violations.
+  promises.push(checkCausalLogicGate(input).catch(() => []));
 
   const results = await Promise.all(promises);
   for (const r of results) issues.push(...r);
   return issues;
+}
+
+async function checkCausalLogicGate(input: CanonEnforcementInput): Promise<CriticIssue[]> {
+  const issues = await checkCausalLogicFast(input.projectId, input.chapterNumber, input.content, {
+    protagonistName: input.protagonistName,
+  });
+  return causalIssuesToCriticIssues(issues);
 }
 
 // ── Gate 1: Cast roster ──────────────────────────────────────────────────────
