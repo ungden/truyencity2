@@ -347,7 +347,9 @@ QUY TẮC:
     for (const nt of newThreads) {
       if (!nt.name || nt.name.length < 3) continue;
       if (active.some(t => t.name.toLowerCase() === nt.name!.toLowerCase())) continue;
+      const threadId = `${projectId.slice(0, 8)}-${chapterNumber}-${slugifyThreadName(nt.name)}`;
       const insertRow = {
+        id: threadId,
         project_id: projectId,
         name: nt.name,
         description: nt.description || '',
@@ -377,4 +379,15 @@ QUY TẮC:
     console.warn(`[plot-threads] extractAndUpdatePlotThreads failed for Ch.${chapterNumber}:`, e instanceof Error ? e.message : String(e));
     return { created: 0, updated: 0 };
   }
+}
+
+function slugifyThreadName(name: string): string {
+  return name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/đ/g, 'd')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 48) || 'thread';
 }
