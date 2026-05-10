@@ -150,11 +150,12 @@ async function checkCastRoster(input: CanonEnforcementInput): Promise<CriticIssu
 
   const allowedLower = new Set([...allowed].map(s => s.toLowerCase()));
   const novel = [...candidates].filter(c => !allowedLower.has(c.toLowerCase()));
+  const softCastRosterOnly = await shouldTreatCastRosterAsSoft(input.projectId);
 
   // Tolerance: ≥5 new named entities = sus; ≥10 = major.
   // Chapter 1 naturally introduces institutions, places, skill names and cast,
   // so keep this as a soft warning unless the extraction goes wildly off-track.
-  if (input.chapterNumber > 1 && novel.length >= 10) {
+  if (input.chapterNumber > 1 && novel.length >= 10 && !softCastRosterOnly) {
     issues.push({
       type: 'continuity',
       severity: 'major',
@@ -169,6 +170,25 @@ async function checkCastRoster(input: CanonEnforcementInput): Promise<CriticIssu
   }
 
   return issues;
+}
+
+export function shouldSoftCastRosterForFocusKey(focusKey?: string | null): boolean {
+  return focusKey === 'thien-dao-thu-vien' || focusKey === 'sang-the-than-minh';
+}
+
+async function shouldTreatCastRosterAsSoft(projectId: string): Promise<boolean> {
+  try {
+    const db = getSupabase();
+    const { data } = await db
+      .from('ai_story_projects')
+      .select('style_directives')
+      .eq('id', projectId)
+      .maybeSingle();
+    const styleDirectives = data?.style_directives as { focus_key?: string | null } | null | undefined;
+    return shouldSoftCastRosterForFocusKey(styleDirectives?.focus_key);
+  } catch {
+    return false;
+  }
 }
 
 const PLACE_PREFIXES = [

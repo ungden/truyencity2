@@ -7,7 +7,10 @@ import {
   shouldUseFlashBulkCheapMode,
   trimFlashCheapContextSections,
 } from '../../services/story-engine/pipeline/flash-cheap-routine';
-import { isLikelyWorldTermCandidate } from '../../services/story-engine/quality/canon-enforcement';
+import {
+  isLikelyWorldTermCandidate,
+  shouldSoftCastRosterForFocusKey,
+} from '../../services/story-engine/quality/canon-enforcement';
 
 describe('flash cheap routine', () => {
   it('parses writer JSON output', () => {
@@ -83,6 +86,12 @@ describe('flash cheap routine', () => {
       severity: 'critical',
       description: 'dead character returned with no established mechanism',
     })).toBe(true);
+  });
+
+  it('keeps cast-roster heuristic soft for focused long-form routine projects', () => {
+    expect(shouldSoftCastRosterForFocusKey('thien-dao-thu-vien')).toBe(true);
+    expect(shouldSoftCastRosterForFocusKey('sang-the-than-minh')).toBe(true);
+    expect(shouldSoftCastRosterForFocusKey('song-xuyen-trade')).toBe(false);
   });
 
   it('filters world terms that look like capitalized character names', () => {
