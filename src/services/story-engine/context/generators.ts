@@ -24,10 +24,10 @@ import type { ChapterSummary, GenreType, GeminiConfig, StoryKernel } from '../ty
 
 // AI response interfaces (used internally by generators)
 interface CombinedAIResponse {
-  summary?: string;
-  openingSentence?: string;
-  mcState?: string;
-  cliffhanger?: string;
+  summary?: unknown;
+  openingSentence?: unknown;
+  mcState?: unknown;
+  cliffhanger?: unknown;
   characters?: Array<{
     character_name: string;
     status: string;
@@ -67,6 +67,18 @@ interface ArcPlanAIResponse {
 
 const ARC_SECRET_LEAK_RE = /(tổ\s*chức|thế\s*lực|người\s*lạ|kẻ\s*lạ|đối\s*thủ|nhân\s*vật\s+bí\s*ẩn)[^.!?\n]{0,100}(theo\s*dõi|biết|phát\s*hiện|nhận\s*ra|săn\s*lùng)[^.!?\n]{0,100}(trọng\s*sinh|hệ\s*thống|bàn\s*tay\s*vàng|golden\s*finger|bí\s*mật|năng\s*lực\s+thật)/i;
 const CONCRETE_BENEFIT_RE = /(tiền|doanh\s*thu|tài\s*nguyên|skill|kỹ\s*năng|công\s*nhận|uy\s*tín|quan\s*hệ|network|thông\s*tin|insight|manh\s*mối|đột\s*phá|level|cảnh\s*giới|khách|đơn\s*hàng|hợp\s*đồng|vật\s*phẩm|item|kinh\s*nghiệm|bảo\s*vệ)/i;
+
+function coerceText(value: unknown): string {
+  if (typeof value === 'string') return value.trim();
+  if (value == null) return '';
+  if (Array.isArray(value)) {
+    return value.map(coerceText).filter(Boolean).join('; ').trim();
+  }
+  if (typeof value === 'object') {
+    return Object.values(value as Record<string, unknown>).map(coerceText).filter(Boolean).join('; ').trim();
+  }
+  return String(value).trim();
+}
 
 // ── Post-Write: Save Chapter Summary ─────────────────────────────────────────
 
@@ -300,18 +312,22 @@ QUY TẮC:
   const res = await callGemini(prompt, { ...config, temperature: 0.1, maxTokens: 2048 }, { jsonMode: true, tracking: options?.projectId ? { projectId: options.projectId, task: 'combined_summary', chapterNumber } : undefined });
   const parsed = parseJSON<CombinedAIResponse>(res.content);
 
-  if (!parsed || !parsed.summary?.trim()) {
+  const parsedSummary = coerceText(parsed?.summary);
+  if (!parsed || !parsedSummary) {
     throw new Error(`Chapter ${chapterNumber} combined summary: JSON parse failed — raw: ${res.content.slice(0, 200)}`);
   }
 
   const allowEmptyCliffhanger = options?.allowEmptyCliffhanger === true;
+  const openingSentence = coerceText(parsed.openingSentence);
+  const mcState = coerceText(parsed.mcState);
+  const cliffhanger = coerceText(parsed.cliffhanger);
 
   // Build summary
   const summary: ChapterSummary = {
-    summary: parsed.summary,
-    openingSentence: parsed.openingSentence?.trim() || content.slice(0, 160).trim(),
-    mcState: parsed.mcState?.trim() || extractFallbackMcState(content, protagonistName),
-    cliffhanger: parsed.cliffhanger?.trim() || (allowEmptyCliffhanger ? '' : extractFallbackCliffhanger(content)),
+    summary: parsedSummary,
+    openingSentence: openingSentence || content.slice(0, 160).trim(),
+    mcState: mcState || extractFallbackMcState(content, protagonistName),
+    cliffhanger: cliffhanger || (allowEmptyCliffhanger ? '' : extractFallbackCliffhanger(content)),
   };
 
   return {
@@ -423,6 +439,13 @@ export async function generateArcPlan(
   const hasMasterOutline = !!parsedMasterOutline && typeof parsedMasterOutline === 'object' && (
     (Array.isArray((parsedMasterOutline as { volumes?: unknown[] }).volumes) && (parsedMasterOutline as { volumes?: unknown[] }).volumes!.length > 0)
     || (Array.isArray((parsedMasterOutline as { majorArcs?: unknown[] }).majorArcs) && (parsedMasterOutline as { majorArcs?: unknown[] }).majorArcs!.length > 0)
+    || Object.values(parsedMasterOutline as Record<string, unknown>).some((entry) => (
+      !!entry
+      && typeof entry === 'object'
+      && typeof (entry as { chapters?: unknown }).chapters === 'string'
+      && typeof (entry as { coreProblem?: unknown }).coreProblem === 'string'
+      && typeof (entry as { payoff?: unknown }).payoff === 'string'
+    ))
   );
   if (!hasMasterOutline) {
     throw new Error(`Arc plan generation refused: master_outline missing/incomplete for project ${projectId}`);

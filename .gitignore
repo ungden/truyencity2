@@ -49,6 +49,9 @@ scripts/trigger-write-chapters.ts
 /chapters/
 .codex/story-runs/
 .codex/automation-runs/
+.automation/
+/automation-runs/
+public/covers/
 
 # typescript
 *.tsbuildinfo

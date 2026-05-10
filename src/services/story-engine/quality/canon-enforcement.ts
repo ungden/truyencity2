@@ -94,7 +94,7 @@ async function checkCastRoster(input: CanonEnforcementInput): Promise<CriticIssu
 
   // Extract candidate names from content via Vietnamese capitalized noun pattern.
   // Match 2-4 capitalized words (Đào Lệ Băng, Nguyễn Văn A, Lý Phong, ...).
-  const NAME_RE = /\b[A-ZÀÁẢÃẠĂẰẮẲẴẶÂẦẤẨẪẬÈÉẺẼẸÊỀẾỂỄỆÌÍỈĨỊÒÓỎÕỌÔỒỐỔỖỘƠỜỚỞỠỢÙÚỦŨỤƯỪỨỬỮỰỲÝỶỸỴĐ][a-zàáảãạăắằẳẵặâấầẩẫậèéẻẽẹêếềểễệìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵđ]+(?:\s+[A-ZÀÁẢÃẠĂẰẮẲẴẶÂẦẤẨẪẬÈÉẺẼẸÊỀẾỂỄỆÌÍỈĨỊÒÓỎÕỌÔỒỐỔỖỘƠỜỚỞỠỢÙÚỦŨỤƯỪỨỬỮỰỲÝỶỸỴĐ][a-zàáảãạăắằẳẵặâấầẩẫậèéẻẽẹêếềểễệìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵđ]+){1,3}\b/g;
+  const NAME_RE = /\b[A-ZÀÁẢÃẠĂẰẮẲẴẶÂẦẤẨẪẬÈÉẺẼẸÊỀẾỂỄỆÌÍỈĨỊÒÓỎÕỌÔỒỐỔỖỘƠỜỚỞỠỢÙÚỦŨỤƯỪỨỬỮỰỲÝỶỸỴĐ][a-zàáảãạăắằẳẵặâấầẩẫậèéẻẽẹêếềểễệìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵđ]+(?:[ \t]+[A-ZÀÁẢÃẠĂẰẮẲẴẶÂẦẤẨẪẬÈÉẺẼẸÊỀẾỂỄỆÌÍỈĨỊÒÓỎÕỌÔỒỐỔỖỘƠỜỚỞỠỢÙÚỦŨỤƯỪỨỬỮỰỲÝỶỸỴĐ][a-zàáảãạăắằẳẵặâấầẩẫậèéẻẽẹêếềểễệìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵđ]+){1,3}\b/g;
 
   const candidates = new Set<string>();
   let m: RegExpExecArray | null;
@@ -102,8 +102,10 @@ async function checkCastRoster(input: CanonEnforcementInput): Promise<CriticIssu
     const name = m[0].trim();
     // Filter out 1-word matches and likely place names / titles.
     if (name.split(/\s+/).length < 2) continue;
+    if (NON_NAME_START_WORDS.some(w => name.startsWith(`${w} `))) continue;
     if (PLACE_PREFIXES.some(p => name.startsWith(p))) continue;
     if (TITLE_WORDS.some(t => name.includes(t))) continue;
+    if (isLikelyWorldTermCandidate(name)) continue;
     candidates.add(name);
   }
 
@@ -147,13 +149,49 @@ async function checkCastRoster(input: CanonEnforcementInput): Promise<CriticIssu
 
 const PLACE_PREFIXES = [
   'Đại Lục', 'Sơn', 'Thành', 'Quận', 'Phường', 'Xã', 'Phố',
-  'Đường', 'Hồ', 'Sông', 'Núi', 'Đảo', 'Tầng',
+  'Đường', 'Hồ', 'Sông', 'Núi', 'Đảo', 'Tầng', 'Hang', 'Động',
+  'Học Viện', 'Liên Minh', 'Lớp',
   'Đông', 'Tây', 'Nam', 'Bắc', 'Trung', 'Hà Nội', 'Sài Gòn', 'TP',
+];
+const NON_NAME_START_WORDS = [
+  'Nhưng', 'Và', 'Còn', 'Khi', 'Nếu', 'Vì', 'Do', 'Từ', 'Trong', 'Ngoài',
+  'Trên', 'Dưới', 'Việc', 'Một', 'Mỗi', 'Các', 'Có', 'Không',
+  'Giọng', 'Mặt', 'Ánh', 'Bóng', 'Tiếng', 'Hơi',
 ];
 const TITLE_WORDS = [
   'Sư Phụ', 'Đại Sư', 'Tổ Sư', 'Trưởng Lão', 'Trưởng Tộc', 'Gia Chủ', 'Chủ Tịch',
   'Tổng Giám Đốc', 'Bộ Trưởng', 'Thị Trưởng', 'Sở Trưởng',
 ];
+const WORLD_TERM_WORDS = [
+  'Thần Vực', 'Vạn Tượng', 'Biên Niên', 'Khởi Nguyên', 'Ký Ức',
+  'Lưới Sương', 'Bẫy Sương', 'Mạch Sương', 'Hạt Bụi', 'Mộc Linh',
+  'Thanh Nha', 'Hốc Tro', 'Long Tích', 'Kiến Đá', 'Thiết Sa',
+  'Đất Sống', 'Vạt Rêu', 'Rêu Thử', 'Hồ Mặn', 'Kết Tinh Sương',
+  'Sa Tinh', 'Mảnh Đất', 'Phù Sa', 'Hỏa Văn', 'Luyện Hỏa',
+  'Tường Đá', 'Bẫy Hắc', 'Hỏa Lô', 'Khiên Hợp Kim',
+  'Tinh Thể Băng', 'Lõi Pháp Tắc', 'Pháp Tắc Băng', 'Thiên Đình',
+  'Băng Nguyên', 'Sơ Thủy', 'Xương Thú Băng',
+  'Thần Cách', 'Thời Không', 'Hư Không', 'State Ledger', 'Tuyết Phong',
+  'Hỏa Diễm', 'Rêu Lam', 'Thời Gian', 'Đảo Lưu', 'Không Gian',
+];
+const WORLD_MARKER_WORDS = new Set([
+  'Thần', 'Vực', 'Tượng', 'Ký', 'Ức', 'Biên', 'Niên', 'Sương', 'Mạch',
+  'Luật', 'Tín', 'Ngưỡng', 'Loài', 'Chủng', 'Sinh', 'Thái', 'Hang',
+  'Động', 'Đất', 'Phù', 'Sa', 'Tinh', 'Tính', 'Hỏa', 'Văn', 'Luyện',
+  'Linh', 'Long', 'Rêu', 'Hồ', 'Mặn', 'Cấp', 'Mầm', 'Hạt', 'Đá',
+  'Kiên', 'Bẫy', 'Hắc', 'Diện', 'Lô', 'Cộng', 'Đồng', 'Khiên',
+  'Hợp', 'Kim', 'Bán', 'Thể', 'Băng', 'Lõi', 'Pháp', 'Tắc',
+  'Thiên', 'Đình', 'Nguyên', 'Sơ', 'Thủy', 'Xương', 'Thú',
+  'Cách', 'Thời', 'Không', 'State', 'Ledger', 'Tuyết', 'Phong',
+  'Diễm', 'Gian', 'Đảo', 'Lưu',
+]);
+
+export function isLikelyWorldTermCandidate(name: string): boolean {
+  if (WORLD_TERM_WORDS.some(t => name.includes(t))) return true;
+  const words = name.split(/\s+/);
+  const markerHits = words.filter((word) => WORLD_MARKER_WORDS.has(word)).length;
+  return markerHits >= 2;
+}
 
 // ── Gate 2: Timeline violations ──────────────────────────────────────────────
 

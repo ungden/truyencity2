@@ -17,6 +17,7 @@ import { getSupabase } from '../utils/supabase';
 import { getGenreBoundaryText } from '../config';
 import { loadContext, assembleContext, generateSummaryAndCharacters } from '../context/assembler';
 import { writeChapter } from './chapter-writer';
+import { shouldUseFlashBulkCheapMode, writeFlashCheapRoutineChapter } from './flash-cheap-routine';
 import { retrieveRAGContext, chunkAndStoreChapter, retrieveEntityContext, retrieveThemeContext } from '../memory/rag-store';
 import { saveCharacterStatesFromCombined, detectCharacterContradictions, type CharacterContradiction } from '../state/character-state';
 import { extractCharacterKnowledge, getCharacterKnowledgeContext } from '../state/knowledge-graph';
@@ -481,6 +482,23 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   const projectStyleDirectives = project.style_directives;
   const directiveOverride = projectStyleDirectives?.target_chapter_length_override;
   const disableChapterSplit = projectStyleDirectives?.disable_chapter_split === true;
+  const directorOnlyFlash =
+    projectStyleDirectives?.codex_director_only === true &&
+    projectStyleDirectives?.flash_writer_enabled === true &&
+    (options.model || project.ai_model || DEFAULT_CONFIG.model) === 'deepseek-v4-flash';
+  const flashRoutineSoftGate =
+    projectStyleDirectives?.flash_routine_soft_gate === true || directorOnlyFlash;
+  const flashRoutineMinQualityScore = Number(
+    projectStyleDirectives?.flash_routine_min_quality_score ??
+    (flashRoutineSoftGate ? 5 : DEFAULT_CONFIG.minQualityScore),
+  );
+  const flashRoutineMaxRetries = Number(
+    projectStyleDirectives?.flash_routine_max_retries ??
+    (flashRoutineSoftGate ? 1 : DEFAULT_CONFIG.maxRetries),
+  );
+  const deepseekThinkingTasks = Array.isArray(projectStyleDirectives?.deepseek_thinking_tasks)
+    ? projectStyleDirectives.deepseek_thinking_tasks.filter((task): task is string => typeof task === 'string')
+    : undefined;
   const baseTargetWordCount = options.targetWordCount ?? directiveOverride ?? project.target_chapter_length ?? DEFAULT_CONFIG.targetWordCount;
 
   // Mood-adjusted: lookup mood from pacing blueprint (if exists) and scale (climax→long, breathing→short).
@@ -500,7 +518,27 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     model: options.model || project.ai_model || DEFAULT_CONFIG.model,
     temperature: options.temperature ?? project.temperature ?? DEFAULT_CONFIG.temperature,
     maxTokens: DEFAULT_CONFIG.maxTokens,
+    deepseekThinkingEnabled: projectStyleDirectives?.deepseek_thinking_enabled === true,
+    deepseekReasoningEffort: projectStyleDirectives?.deepseek_reasoning_effort === 'max' ? 'max' : 'high',
+    deepseekThinkingTasks,
   };
+
+  if (shouldUseFlashBulkCheapMode(projectStyleDirectives, geminiConfig.model, nextChapter, totalPlanned)) {
+    console.log(`[orchestrator] flash_bulk_cheap_mode active: ch.${nextChapter} via DS Flash compact routine path`);
+    return writeFlashCheapRoutineChapter({
+      project,
+      novel,
+      genre,
+      protagonistName,
+      storyTitle,
+      nextChapter,
+      targetWordCount,
+      totalPlanned,
+      customPrompt: options.customPrompt,
+      config: geminiConfig,
+      startTime,
+    });
+  }
 
   // ── Step 2: Load context (4 layers from DB) ────────────────────────────
   const context = await loadContext(project.id, novel.id, nextChapter);
@@ -720,7 +758,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     targetWordCount,
     context.previousTitles,
     geminiConfig,
-    DEFAULT_CONFIG.maxRetries,
+    flashRoutineMaxRetries,
     {
       projectId: project.id,
       protagonistName,
@@ -730,6 +768,8 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       worldBible: context.storyBible,
       worldDescription: project.world_description,
       subGenres: context.subGenres,
+      qualityGateMinScore: flashRoutineMinQualityScore,
+      qualityGateMode: flashRoutineSoftGate ? 'routine_soft' : 'standard',
     },
   );
 
