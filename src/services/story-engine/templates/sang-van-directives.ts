@@ -5,7 +5,9 @@ export const UNIVERSAL_SANG_VAN_DIRECTIVE = [
   '- No pressure stacking: do not add a new threat, conspiracy, humiliation, debt, injury, or pursuit unless the same chapter also pays MC back with a win or leverage.',
   '- Opponents are ladders, not walls. Early opponents should be peer/local scale and be resolved, embarrassed, bypassed, or converted within 1-2 chapters unless an outline explicitly marks a longer climax.',
   '- MC secrets and golden fingers stay protected. Outsiders react to results, not the real source.',
-  '- If the story uses previous-life memory, Earth culture, films, games, myths, or novels, keep a source-spine/template ledger: preserve the original work spirit, archetypes, landmark scenes, escalation, and payoff while renaming surface details for canon safety.',
+  '- If the story uses previous-life memory, Earth culture, films, games, myths, or novels, keep a source-spine/template ledger: explicitly name the Earth source template in MC inner monologue/system ledger, preserve the original work spirit, character names/roles, archetypes, landmark scenes, escalation, and payoff. Do not rename everything by default.',
+  '- Do not hide the Earth nostalgia from the real reader. The in-world published book can adapt title/surface setting when needed, but the narration/Vạn Văn ledger should name the source work and can directly mention source characters, factions, and famous scenes so readers recognize the classic being revived.',
+  '- Avoid verbatim copyrighted prose. Recreate structure, characters, emotional beats, and iconic scenes in fresh Vietnamese narration instead of copying paragraphs.',
   '- Do not make the writer/model invent a disconnected replacement when the premise promises copying or recreating Earth classics; adapt faithfully, then let the world reaction create novelty.',
   '[/UNIVERSAL SANG VAN DIRECTIVE]',
 ].join('\n');

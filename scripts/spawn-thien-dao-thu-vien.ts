@@ -40,7 +40,7 @@ const worldDescription = `Đại Diễn Giới là một dị giới võ đạo 
 
 Tác Gia được chia cấp Bạch Bút -> Thanh Bút -> Kim Bút -> Tông Sư -> Văn Thánh -> Thiên Đạo Tác Gia. Mỗi cấp mở quyền khác nhau: số hồi được đăng mỗi ngày, quyền lập thư hội độc giả, quyền mở diễn võ trong sách, quyền nhận phản hồi tu vi và quyền để tác phẩm thành truyền thừa bán công khai. Văn hóa viết sách bản địa còn sơ khai và đơn nhất: nhân vật thường chỉ là thiên tài đánh liên tục, tình tiết thiếu hồi hộp, tuyến phụ cứng, phản diện hô khẩu hiệu. Vì vậy độc giả Đại Diễn Giới biết đọc để học võ, nhưng chưa từng thấy kỹ thuật kể chuyện hiện đại như phục bút, cao trào nhiều tuyến, nhân vật trưởng thành, chiến tranh mưu lược, bí ẩn trinh thám hay thế giới quan lớn.
 
-Lâm Mặc xuyên qua thân phận thư sinh nghèo vừa bị một bảng kiểm định Tác Gia đánh rớt vì văn phong bản địa cứng nhắc. Hắn mang theo Vạn Văn Ký Ức, bàn tay vàng lưu trữ văn minh Trái Đất: kiếm hiệp, lịch sử, Tam Quốc style, Anh Hùng Xạ Điêu/Tiếu Ngạo style, huyền huyễn, thần thoại, phim ảnh, game, trinh thám, chiến tranh và webnovel. Vạn Văn Ký Ức không bắt hắn tự sáng tác lệch khỏi nguyên gốc; nó lập template ledger cho từng tác phẩm: nguồn cảm hứng, xương sống nguyên tác, archetype nhân vật, đại cảnh phải giữ, cao trào/payoff, yếu tố cần đổi tên và võ học/công pháp có thể sinh ra. Nó giữ hồn nguyên tác nhưng đổi vỏ dị giới, tự đổi tên, đổi địa lý, đổi pháp môn, tính chi phí tinh thần, độ tương thích độc giả, rủi ro hiểu sai và phần thưởng danh vọng. Nếu Lâm Mặc viết đủ hay, độc giả lĩnh ngộ càng nhiều, hắn càng nhận điểm công nhận, phản hồi khí huyết, quyền khắc tác phẩm và danh vọng Tác Gia.
+Lâm Mặc xuyên qua thân phận thư sinh nghèo vừa bị một bảng kiểm định Tác Gia đánh rớt vì văn phong bản địa cứng nhắc. Hắn mang theo Vạn Văn Ký Ức, bàn tay vàng lưu trữ văn minh Trái Đất: kiếm hiệp, lịch sử, Tam Quốc style, Anh Hùng Xạ Điêu/Tiếu Ngạo style, huyền huyễn, thần thoại, phim ảnh, game, trinh thám, chiến tranh và webnovel. Vạn Văn Ký Ức không bắt hắn tự sáng tác lệch khỏi nguyên gốc; nó lập template ledger cho từng tác phẩm: tên template gốc Trái Đất, nhân vật gốc/role gốc, họ làm gì trong đại cảnh, xương sống nguyên tác, cao trào/payoff, yếu tố giữ nguyên, yếu tố cần đổi tên và võ học/công pháp có thể sinh ra. Nó giữ hồn nguyên tác và cho phép Lâm Mặc nói rõ trong nội tâm: đang dùng Anh Hùng Xạ Điêu, Quách Tĩnh, Hoàng Dung, Hồng Thất Công hay một template tương tự; bản công bố dị giới chỉ đổi vừa đủ để hợp luật Thiên Đạo, không đổi hết 100% làm mất hồi ức. Nếu Lâm Mặc viết đủ hay, độc giả lĩnh ngộ càng nhiều, hắn càng nhận điểm công nhận, phản hồi khí huyết, quyền khắc tác phẩm và danh vọng Tác Gia.
 
 Loop cốt lõi: Lâm Mặc chọn template Trái Đất -> Vạn Văn Ký Ức khóa xương sống nguyên tác và dị giới hóa hợp luật Thiên Đạo -> hắn dùng bút danh ẩn danh khắc tác phẩm vào Thiên Đạo Thư Viện trong thức hải -> độc giả gọi trong đầu, nhập tâm/lĩnh ngộ võ học -> thư bình, bảng Tân Tác Gia, học viện/tông môn/triều đình phản ứng -> MC nhận danh vọng/tài nguyên/tu vi tự vệ -> mở tác phẩm tiếp theo. Đây là sảng văn Tác Gia chủ đạo: trở ngại chỉ là người bản địa coi thường, văn đàn chèn ép, độc giả hiểu sai hoặc đối thủ bắt chước; MC dùng chương mới, plot twist, bảng xếp hạng và độc giả ngộ võ để phản đòn nhanh. Trước ch.100, Lâm Mặc luôn giấu thân phận bằng bút danh, false trail và ảo ảnh thư viện; hắn không lộ diện thật, không gặp địch trực tiếp, không chủ động lao vào âm mưu ngoài đời.
 
@@ -50,10 +50,10 @@ const description = 'Lâm Mặc xuyên qua Đại Diễn Giới, nơi ai cũng l
 
 const setupKernel: StoryKernel = {
   readerFantasy: 'Lâm Mặc dùng kho văn minh Trái Đất và kỹ thuật kể chuyện hiện đại để trở thành Tác Gia được Thiên Đạo Thư Viện công nhận, khiến độc giả lĩnh ngộ võ đạo rồi trả lại danh vọng, điểm công nhận và tài nguyên cho hắn.',
-  protagonistEngine: 'MC thắng bằng Vạn Văn Ký Ức, khả năng chọn template đúng lúc, giữ xương sống nguyên tác Trái Đất khi dị giới hóa, đọc phản ứng độc giả và leo bảng Tác Gia thay vì lao vào đánh nhau kéo dài.',
+  protagonistEngine: 'MC thắng bằng Vạn Văn Ký Ức, khả năng chọn template đúng lúc, gọi rõ tên truyện/nhân vật/cảnh gốc Trái Đất trong ledger, giữ xương sống nguyên tác khi dị giới hóa, đọc phản ứng độc giả và leo bảng Tác Gia thay vì lao vào đánh nhau kéo dài.',
   pleasureLoop: [
     'chọn một template văn học/phim/game Trái Đất phù hợp bài toán hiện tại',
-    'Vạn Văn Ký Ức lập template ledger: nguồn cảm hứng, xương sống nguyên tác, đại cảnh, archetype, payoff và yếu tố đổi tên',
+    'Vạn Văn Ký Ức lập template ledger: tên template gốc, nhân vật/cảnh gốc, xương sống nguyên tác, đại cảnh, payoff, phần giữ nguyên và yếu tố đổi tên',
     'dùng bút danh ẩn danh khắc tác phẩm vào Thiên Đạo Thư Viện trong thức hải',
     'độc giả nhập tâm vào cảnh truyện rồi lĩnh ngộ võ học/công pháp cụ thể',
     'faction bản địa chấn động, đối thủ bị face-slap bằng số liệu đọc và lĩnh ngộ',
@@ -62,8 +62,8 @@ const setupKernel: StoryKernel = {
   systemMechanic: {
     name: 'Vạn Văn Ký Ức',
     input: 'ký ức văn học, phim ảnh, game, thần thoại, lịch sử và webnovel Trái Đất cộng với nhu cầu võ đạo hiện tại của độc giả Đại Diễn Giới',
-    output: 'template ledger và tác phẩm dị giới hóa hợp luật Thiên Đạo, giữ hồn nguyên tác, kèm dự báo độ tương thích độc giả, võ học có thể phát sinh, chi phí tinh thần và rủi ro hiểu sai',
-    limit: 'không được bê nguyên tên/địa danh/pháp môn Trái Đất ra công khai, nhưng phải giữ xương sống nguyên tác, đại cảnh và payoff; cần phản ứng độc giả thật để đổi thành điểm công nhận',
+    output: 'template ledger và tác phẩm dị giới hóa hợp luật Thiên Đạo, ghi rõ tên template gốc + nhân vật/cảnh gốc trong nội tâm, giữ hồn nguyên tác, kèm dự báo độ tương thích độc giả, võ học có thể phát sinh, chi phí tinh thần và rủi ro hiểu sai',
+    limit: 'không được bê nguyên văn từng đoạn có bản quyền, nhưng được ghi rõ tên truyện/nhân vật/cảnh gốc trong Vạn Văn Ký Ức; bản công bố dị giới chỉ đổi vừa đủ, cần phản ứng độc giả thật để đổi thành điểm công nhận',
     reward: 'điểm công nhận, danh vọng Tác Gia, quyền khắc tác phẩm, thư bình, phản hồi khí huyết và tài nguyên Thiên Đạo',
   },
   mcSecret: {
@@ -133,7 +133,7 @@ const storyOutline = {
   setupKernel,
   ledgers: ['template ledger nguyên tác', 'tác phẩm đang viết', 'độc giả nhập tâm', 'võ học/công pháp phát sinh', 'điểm công nhận', 'danh vọng Tác Gia', 'faction phản ứng'],
   canonRules: [
-    'Không bê nguyên tên/địa danh/pháp môn Trái Đất ra công khai, nhưng phải giữ xương sống nguyên tác, archetype, đại cảnh và payoff trong template ledger.',
+    'Không bê nguyên văn từng đoạn có bản quyền, nhưng template ledger phải gọi rõ tên truyện/nhân vật/cảnh gốc Trái Đất; bản công bố dị giới chỉ đổi vừa đủ và phải giữ xương sống nguyên tác, archetype, đại cảnh và payoff.',
     'Nếu độc giả lĩnh ngộ, phải có tác phẩm/cảnh đọc/skill/phản ứng/phần thưởng.',
     'MC có thể tăng võ đạo tự vệ nhờ phản hồi độc giả nhưng không chuyển thành truyện combat thuần.',
     'Trước ch.100, MC không lộ real identity, không gặp địch trực tiếp, không bị đối thủ dồn dập; đối thủ chỉ làm nền cho dopamine và face-slap.',
@@ -163,7 +163,7 @@ const chapterBriefs = Array.from({ length: 20 }, (_, idx) => {
   const chapterNumber = idx + 1;
   const beats = [
     'Lâm Mặc tỉnh trong phòng thuê nhỏ, nhận ra văn đàn bản địa viết truyện sơ khai và mở Vạn Văn Ký Ức trong thức hải.',
-    'Hắn chọn template anh hùng kiếm hiệp, khóa xương sống nguyên tác trong template ledger, dị giới hóa thành Sơn Hà Xạ Nhật rồi trả chi phí tinh thần đầu tiên.',
+    'Hắn chọn template gốc Anh Hùng Xạ Điêu style, gọi rõ Quách Tĩnh/Hoàng Dung/Hồng Thất Công trong Vạn Văn Ký Ức như mốc hồi ức, khóa xương sống nguyên tác trong template ledger, dị giới hóa thành Sơn Hà Xạ Nhật rồi trả chi phí tinh thần đầu tiên.',
     'Hồi đầu được bút danh Vô Danh Khách khắc vào Thiên Đạo Thư Viện bằng thần niệm, độc giả võ sinh bình dân gọi trong đầu và nhập tâm vào cảnh kéo cung.',
     'Độc giả lĩnh ngộ Phá Vân Chưởng, thư bình đầu tiên làm bảng Tân Tác Gia dao động.',
     'Cố Nham cười nhạo nhiều tuyến nhân vật, nhưng số liệu đọc và điểm công nhận phản đòn ngay.',
@@ -171,7 +171,7 @@ const chapterBriefs = Array.from({ length: 20 }, (_, idx) => {
   return {
     chapterNumber,
     brief: beats[idx] || `Tiếp tục Sơn Hà Xạ Nhật: Lâm Mặc dùng hồi ${chapterNumber} để bám xương sống template kiếm hiệp, mở đại cảnh mới, độc giả nhập tâm sâu hơn, sinh một mảnh võ học nhỏ và kéo phản ứng bảng xếp hạng.`,
-    sceneDirection: `Ch.${chapterNumber} phải giữ loop template ledger -> bút danh ẩn danh -> khắc trong thức hải -> độc giả lĩnh ngộ -> reaction sảng -> phản ứng bảng.`,
+    sceneDirection: `Ch.${chapterNumber} phải giữ loop template ledger có tên template/nhân vật/cảnh gốc Trái Đất -> bút danh ẩn danh -> khắc trong thức hải -> độc giả lĩnh ngộ -> reaction sảng -> phản ứng bảng.`,
     mcBenefit: `Lâm Mặc nhận payoff hữu hình: điểm công nhận, thư bình, danh vọng hoặc quyền đăng liên quan Sơn Hà Xạ Nhật ch.${chapterNumber}.`,
   };
 });

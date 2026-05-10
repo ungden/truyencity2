@@ -351,7 +351,7 @@ export function buildRoutineBrief(input: FlashCheapRoutineInput): string {
     );
   } else if (focusKey === 'thien-dao-thu-vien') {
     lines.push(
-      'Bàn tay vàng: Vạn Văn Ký Ức tái hiện văn học/phim/game/thần thoại Trái Đất theo template ledger: giữ xương sống nguyên tác, archetype, đại cảnh và payoff; chỉ đổi tên/địa danh/pháp môn cho hợp luật Thiên Đạo.',
+      'Bàn tay vàng: Vạn Văn Ký Ức tái hiện văn học/phim/game/thần thoại Trái Đất theo template ledger: phải ghi rõ template gốc là bộ nào và nhân vật/cảnh gốc nào đang dùng; giữ xương sống nguyên tác, vai trò nhân vật, đại cảnh và payoff. Không đổi 100%; chỉ đổi những phần cần hợp luật Thiên Đạo.',
       'Thiên Đạo Thư Viện là thư viện tinh thần do Thiên Đạo tạo ra; Lâm Mặc dùng thần niệm/bút danh/ý niệm để khắc tác phẩm, độc giả gọi trong đầu để đọc. Không nộp bản thảo vật lý, không phân lâu, không xếp hàng.',
       'Chapter loop: Lâm Mặc ẩn danh viết/khắc tác phẩm -> độc giả nhập tâm/lĩnh ngộ võ học/công pháp -> faction/bảng xếp hạng phản ứng -> MC nhận danh vọng/điểm công nhận/tài nguyên và dư âm đọc tiếp.',
       'Early arc taboo: không lộ thân phận thật, không gặp địch trực tiếp, không điều tra quán trà/tổ chức đen, không ám sát sớm; conflict chính là tác phẩm, độc giả, bảng và cách kể chuyện.',
@@ -795,6 +795,7 @@ KHUNG CHƯƠNG:
 - Main: ${input.protagonistName}. MC có trí nhớ kiếp trước về văn học, phim ảnh, game, thần thoại, webnovel.
 - Tone: sảng văn. MC có thể gặp trở ngại nhỏ nhưng phải xử lý gọn, thông minh, có tiến triển mạnh lên, có payoff cụ thể trong chính chương.
 - Áp dụng universal sảng văn directive: MC nắm nhịp, thưởng dày hơn áp lực, không stack đối thủ/âm mưu/kìm nén nếu chưa trả lợi ích trong cùng chương.
+- Nếu dùng văn minh Trái Đất, Vạn Văn Ký Ức/inner monologue phải ghi rõ template gốc, nhân vật/cảnh gốc và vì sao dùng nó; không đổi hết 100% làm mất hồi ức.
 - Không leak prompt/context/model/API. Không tự tạo canon lớn mâu thuẫn chương trước. Không hồi sinh nhân vật chết nếu không có cơ chế đã establish.
 - Hard causal logic: không để rival/nhân vật yếu tự nhiên vào Học Viện/khu cấm/lấy đồ nếu chưa có quyền hạn hợp pháp; mọi bản đồ/tọa độ/vật phẩm/tài nguyên cao cấp phải có nguồn, giá, chi phí hoặc ledger; không mở thread vượt cấp trái CURRENT ARC RAIL.
 - Không tự kéo named rival/faction vào chương nếu CURRENT ARC RAIL hoặc ACTIVE THREADS không yêu cầu. Nếu rival xuất hiện, phải có động cơ, quyền hạn, lợi ích/áp lực và giới hạn hành động ngay trong cảnh.
