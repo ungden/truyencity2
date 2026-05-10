@@ -20,6 +20,7 @@
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { UNIVERSAL_COSMIC_PATTERNS, DEFAULT_COSMIC_ARC_START_FRACTION } from './universal-bans';
 
 export type DeltaSeverity = 'soft' | 'medium' | 'hard';
 
@@ -63,15 +64,9 @@ interface PlotThreadRow {
   description?: string | null;
 }
 
-const COSMIC_TIER_PATTERNS: RegExp[] = [
-  /thần\s*cách/i,
-  /thần\s*vật/i,
-  /lõi\s*pháp\s*tắc/i,
-  /thượng\s*cổ/i,
-  /huyết\s*mạch\s*thức\s*tỉnh/i,
-  /cánh\s*cửa\s*đá\s*cổ/i,
-  /thiên\s*đạo/i,
-];
+function compilePatterns(patterns: string[]): RegExp[] {
+  return patterns.map((p) => new RegExp(p, 'i'));
+}
 
 function normalizeName(name: string): string {
   return name.toLowerCase().trim().replace(/\s+/g, ' ');
@@ -95,17 +90,21 @@ function extractEntityNames(text: string | null | undefined): string[] {
   return Array.from(new Set(cleaned));
 }
 
-function detectCosmicPullForward(content: string, currentChapter: number, novelTotalChapters: number): BlueprintDelta[] {
+function detectCosmicPullForward(
+  content: string,
+  currentChapter: number,
+  cosmicArcStart: number,
+  patterns: RegExp[],
+): BlueprintDelta[] {
   const deltas: BlueprintDelta[] = [];
-  const cosmicArcStart = Math.floor(novelTotalChapters * 0.7); // arc 6+ for 1000-ch novel = ch.701+
   if (currentChapter >= cosmicArcStart) return deltas; // ok in cosmic arc
-  for (const pattern of COSMIC_TIER_PATTERNS) {
+  for (const pattern of patterns) {
     const match = pattern.exec(content);
     if (match) {
       deltas.push({
         type: 'cosmic_pull_forward',
         severity: 'medium',
-        description: `Cosmic-tier pattern "${match[0]}" appears at ch.${currentChapter} (planned arc ${Math.ceil(cosmicArcStart / 100)}+ at ch.${cosmicArcStart}+)`,
+        description: `Cosmic-tier pattern "${match[0]}" appears at ch.${currentChapter} (cosmic arc starts ch.${cosmicArcStart}+)`,
         evidence: match[0],
       });
     }
@@ -228,7 +227,13 @@ export async function runDeltaDetection(
   chapterNumber: number,
   novelTotalChapters: number,
   novelId: string,
-  options?: { projectWideCast?: string[] },
+  options?: {
+    projectWideCast?: string[];
+    /** Override cosmic arc start chapter. Default: 70% of novelTotalChapters. */
+    cosmicArcStartChapter?: number;
+    /** Override cosmic patterns. Default: UNIVERSAL_COSMIC_PATTERNS. */
+    cosmicTierPatterns?: string[];
+  },
 ): Promise<DeltaReport> {
   const [
     { data: blueprint },
@@ -275,8 +280,10 @@ export async function runDeltaDetection(
     const summaryText = [summary?.summary, summary?.mc_state, summary?.cliffhanger].filter(Boolean).join('\n');
     const content = chapter?.content || '';
 
+    const cosmicStart = options?.cosmicArcStartChapter ?? Math.floor(novelTotalChapters * DEFAULT_COSMIC_ARC_START_FRACTION);
+    const cosmicPatterns = compilePatterns(options?.cosmicTierPatterns ?? UNIVERSAL_COSMIC_PATTERNS);
     deltas.push(
-      ...detectCosmicPullForward(content, chapterNumber, novelTotalChapters),
+      ...detectCosmicPullForward(content, chapterNumber, cosmicStart, cosmicPatterns),
       ...detectForbiddenTermsUsed(content, blueprint.forbidden_terms || []),
       ...detectNewCast(summaryText, characterStates || [], [...(blueprint.cast || []), ...(options?.projectWideCast || [])]),
       ...detectNewThreads(newThreads || [], []),

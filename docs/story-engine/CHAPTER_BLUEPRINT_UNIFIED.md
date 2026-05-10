@@ -174,14 +174,54 @@ Sau mỗi chương:
 - [ ] `evaluateBlueprintAlignment` returned no critical issues (forbidden_terms, authority, ledger, payoff_mismatch)
 - [ ] `chapter_summaries.cliffhanger` khớp expected next-chapter setup (chapter_blueprints[n+1].goal)
 
+## Auto-derived item bans (itemLedger)
+
+Mọi novel có items đặc biệt sẽ được introduce ở chương cụ thể (vd
+"Vòng Linh Tinh" giới thiệu ch.10). AI có thể nhắc các items này SỚM
+hơn khi không có source ledger → trigger `resource_without_source` gate
++ false positive.
+
+`NovelBlueprint.itemLedger[]` declare items + introduction chapter:
+
+```ts
+itemLedger: [
+  { name: 'Vòng Linh Tinh', introChapter: 10, aliases: ['vòng đeo tổ phụ'] },
+  { name: 'bản đồ Bắc Vực', introChapter: 50 },
+],
+```
+
+Sync auto-adds các items này vào `forbidden_terms[]` + `sceneDirection`
+của MỌI chương `< introChapter`. Sau introChapter, item established —
+no ban. Replaces hardcoded `BAN_RESOURCES` whack-a-mole pattern.
+
+## Cosmic-tier config
+
+Cosmic-tier elements (god lore, primordial origin, pháp tắc) chỉ nên
+xuất hiện ở 70%+ novel length. AI hay invent sớm.
+
+`NovelBlueprint.cosmicArcStartChapter` (default 70% × totalChapters)
++ `NovelBlueprint.cosmicTierPatterns` (default UNIVERSAL_COSMIC_PATTERNS)
+được persist vào `project.style_directives.cosmic_arc_start_chapter` +
+`cosmic_tier_patterns` khi sync. Delta-detector + future engine gates
+read từ đó.
+
 ## Maintenance
 
 Khi tìm thấy 1 drift pattern mới (qua audit hoặc reader feedback):
 
-- **Literal banned phrase** (e.g., "có ai theo dõi") → add vào `UNIVERSAL_FORBIDDEN_TERMS` (universal-bans.ts) → auto-checked post-write
-- **High-level guidance** (e.g., "MC không tự khoe") → add vào `UNIVERSAL_BANNED_PATTERNS` → into prompt
-- **Tone shift** (e.g., "lạnh đạm + tự tin") → add vào `UNIVERSAL_TONE_DIRECTIVES`
-- **Per-novel only** → add vào `blueprints/<id>/index.ts` `extraForbiddenTerms` / `extraBannedPatterns` / `toneDirectives`
+- **Literal banned phrase** (e.g., "có ai theo dõi") → add vào
+  `UNIVERSAL_FORBIDDEN_TERMS` (universal-bans.ts) → auto-checked post-write
+- **High-level guidance** (e.g., "MC không tự khoe") → add vào
+  `UNIVERSAL_BANNED_PATTERNS` → into prompt
+- **Tone shift** (e.g., "lạnh đạm + tự tin") → add vào
+  `UNIVERSAL_TONE_DIRECTIVES`
+- **Cosmic pattern** (e.g., "thần điển") → add vào `UNIVERSAL_COSMIC_PATTERNS`
+- **Per-novel only ban guidance** → `blueprints/<id>/index.ts`
+  `extraBannedPatterns` / `extraForbiddenTerms`
+- **Item not yet introduced** → `blueprints/<id>/index.ts` `itemLedger[]`
+  with introChapter
+- **Different cosmic timing** → `blueprints/<id>/index.ts`
+  `cosmicArcStartChapter` + `cosmicTierPatterns`
 
 Re-sync: `PROJECT_ID=X BLUEPRINT=Y npx tsx scripts/sync-blueprint.ts` → áp dụng cho mọi chương `status='planned'` chưa viết.
 

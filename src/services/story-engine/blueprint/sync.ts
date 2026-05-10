@@ -67,6 +67,14 @@ function composeForbiddenTerms(brief: ChapterBrief, blueprint: NovelBlueprint): 
   for (const t of UNIVERSAL_FORBIDDEN_TERMS) merged.add(t);
   for (const t of blueprint.extraForbiddenTerms || []) merged.add(t);
   for (const t of brief.forbiddenTerms || []) merged.add(t);
+  // Auto-derive item bans from itemLedger: items not yet introduced
+  // (chapter < introChapter) get banned in this chapter's forbidden_terms.
+  for (const item of blueprint.itemLedger || []) {
+    if (brief.n < item.introChapter) {
+      merged.add(item.name);
+      for (const alias of item.aliases || []) merged.add(alias);
+    }
+  }
   return Array.from(merged);
 }
 
@@ -77,6 +85,13 @@ function buildSceneDirection(brief: ChapterBrief, blueprint: NovelBlueprint): st
   lines.push('', 'UNIVERSAL BANS:', ...UNIVERSAL_BANNED_PATTERNS.map((b) => `- ${b}`));
   if (blueprint.extraBannedPatterns?.length) {
     lines.push('', `${blueprint.id.toUpperCase()} EXTRA BANS:`, ...blueprint.extraBannedPatterns.map((b) => `- ${b}`));
+  }
+  // Auto-derived item bans from itemLedger
+  const upcomingItems = (blueprint.itemLedger || [])
+    .filter((item) => brief.n < item.introChapter)
+    .map((item) => `${item.name}${item.aliases?.length ? ` (aliases: ${item.aliases.join(', ')})` : ''} — sẽ giới thiệu ở ch.${item.introChapter}, KHÔNG nhắc trong chương này`);
+  if (upcomingItems.length > 0) {
+    lines.push('', 'ITEM LEDGER BANS (chưa giới thiệu):', ...upcomingItems.map((i) => `- ${i}`));
   }
   lines.push('', 'TONE:', ...UNIVERSAL_TONE_DIRECTIVES.map((t) => `- ${t}`));
   if (blueprint.toneDirectives?.length) {
@@ -309,6 +324,37 @@ async function activateProject(
 }
 
 /**
+ * Persist blueprint config (cosmic threshold + patterns) into project's
+ * style_directives so engine can read at write time without loading the
+ * blueprint TS module. Called even when not activating.
+ */
+async function persistBlueprintConfig(
+  db: SupabaseClient,
+  projectId: string,
+  blueprint: NovelBlueprint,
+): Promise<void> {
+  const { data: project, error: getErr } = await db
+    .from('ai_story_projects')
+    .select('style_directives')
+    .eq('id', projectId)
+    .maybeSingle();
+  if (getErr) throw new Error(`project fetch failed: ${getErr.message}`);
+  const styleDirectives = (project?.style_directives as Record<string, unknown>) || {};
+  const updated = {
+    ...styleDirectives,
+    blueprint_id: blueprint.id,
+    blueprint_total_chapters: blueprint.totalChapters,
+    cosmic_arc_start_chapter: blueprint.cosmicArcStartChapter ?? null,
+    cosmic_tier_patterns: blueprint.cosmicTierPatterns ?? null,
+  };
+  const { error } = await db
+    .from('ai_story_projects')
+    .update({ style_directives: updated, updated_at: new Date().toISOString() })
+    .eq('id', projectId);
+  if (error) throw new Error(`persistBlueprintConfig failed: ${error.message}`);
+}
+
+/**
  * Sync entire blueprint to DB.
  *
  * @param db Supabase client (service-role)
@@ -367,6 +413,11 @@ export async function syncBlueprintToDb(
     coverage.missingChapters,
     coverage.invalidChapters,
   );
+
+  // Always persist blueprint config (cosmic threshold + patterns + id) into
+  // project's style_directives so write-time code can read without loading
+  // the blueprint TS module.
+  await persistBlueprintConfig(db, projectId, blueprint);
 
   if (options.activate) {
     if (!coverage.ok) {

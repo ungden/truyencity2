@@ -208,10 +208,45 @@ describe('syncBlueprintToDb (unified)', () => {
     }));
     const result = await syncBlueprintToDb(fakeDb(captured), 'p1', minimalBlueprint, { activate: true, version: 2 });
     expect(result.coverageOk).toBe(true);
-    expect(captured.ai_story_projects).toHaveLength(1);
-    const patch = captured.ai_story_projects[0];
-    expect(patch.style_directives.require_full_chapter_blueprint).toBe(true);
-    expect(patch.style_directives.chapter_blueprint_version).toBe(2);
+    // 2 patches: persistBlueprintConfig (cosmic+id) + activateProject (require flag)
+    expect(captured.ai_story_projects.length).toBeGreaterThanOrEqual(1);
+    const activatePatch = captured.ai_story_projects.find((p) => p.style_directives?.require_full_chapter_blueprint === true);
+    expect(activatePatch).toBeDefined();
+    expect(activatePatch.style_directives.chapter_blueprint_version).toBe(2);
+  });
+
+  it('auto-derives forbidden_terms from itemLedger for chapters before introChapter', async () => {
+    const captured = freshCaptured();
+    const blueprintWithLedger: NovelBlueprint = {
+      ...minimalBlueprint,
+      itemLedger: [
+        { name: 'Cosmic Sword', introChapter: 50, aliases: ['holy blade'] },
+        { name: 'Magic Amulet', introChapter: 1, aliases: [] }, // already introduced
+      ],
+    };
+    await syncBlueprintToDb(fakeDb(captured), 'p1', blueprintWithLedger);
+    // ch.1 brief — Cosmic Sword introChapter=50, ch.1 < 50 → banned
+    // Magic Amulet introChapter=1, ch.1 NOT < 1 → not banned
+    const ch1 = captured.chapter_blueprints[0];
+    expect(ch1.forbidden_terms).toContain('Cosmic Sword');
+    expect(ch1.forbidden_terms).toContain('holy blade');
+    expect(ch1.forbidden_terms).not.toContain('Magic Amulet');
+  });
+
+  it('persists blueprint config (cosmic + id) into project style_directives', async () => {
+    const captured = freshCaptured();
+    const blueprintWithConfig: NovelBlueprint = {
+      ...minimalBlueprint,
+      cosmicArcStartChapter: 750,
+      cosmicTierPatterns: ['custom\\s*pattern'],
+    };
+    await syncBlueprintToDb(fakeDb(captured), 'p1', blueprintWithConfig);
+    // The persistBlueprintConfig path writes to ai_story_projects (one of the patches)
+    expect(captured.ai_story_projects.length).toBeGreaterThan(0);
+    const patch = captured.ai_story_projects.find((p) => p.style_directives?.cosmic_arc_start_chapter === 750);
+    expect(patch).toBeDefined();
+    expect(patch.style_directives.blueprint_id).toBe('test-novel');
+    expect(patch.style_directives.cosmic_tier_patterns).toEqual(['custom\\s*pattern']);
   });
 
   it('preserves arc 2 placeholder (empty briefs[]) without inserting fake rows', async () => {

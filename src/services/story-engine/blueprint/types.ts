@@ -135,6 +135,24 @@ export interface ArcBlueprint {
 }
 
 /**
+ * Item with source-ledger introduction chapter. Sync auto-derives a
+ * "ban this item before introChapter" rule + adds to forbidden_terms[]
+ * of every chapter < introChapter. After introChapter, item is established
+ * and can appear freely.
+ *
+ * Eliminates the manual BAN_RESOURCES whack-a-mole pattern (which novels
+ * had to hand-craft per item per chapter).
+ */
+export interface ItemLedgerEntry {
+  /** Canonical item name. */
+  name: string;
+  /** Chapter where this item is first introduced with explicit source. */
+  introChapter: number;
+  /** Alternative names / aliases that should also trigger the ban. */
+  aliases?: string[];
+}
+
+/**
  * Top-level novel blueprint. Used by sync script + spawn script.
  */
 export interface NovelBlueprint {
@@ -154,6 +172,7 @@ export interface NovelBlueprint {
   /**
    * Optional — literal forbidden terms specific to this novel, appended after
    * UNIVERSAL_FORBIDDEN_TERMS. Auto-checked post-write by evaluateBlueprintAlignment.
+   * Applied to ALL chapters.
    */
   extraForbiddenTerms?: string[];
   /**
@@ -161,4 +180,21 @@ export interface NovelBlueprint {
    * chapter's sceneDirection.
    */
   toneDirectives?: string[];
+  /**
+   * Optional — items with introduction chapter. Sync auto-bans them in
+   * earlier chapters via forbidden_terms (chapters < introChapter).
+   * Replaces manual hardcoded BAN_RESOURCES patterns.
+   */
+  itemLedger?: ItemLedgerEntry[];
+  /**
+   * Optional — chapter at which cosmic-tier elements (god-level lore reveal,
+   * pháp tắc, primordial powers) become permitted. Defaults to ~70% of
+   * totalChapters. Delta detector flags cosmic patterns appearing before this.
+   */
+  cosmicArcStartChapter?: number;
+  /**
+   * Optional — cosmic-tier patterns specific to this novel's genre/world.
+   * Falls back to UNIVERSAL_COSMIC_PATTERNS if not set.
+   */
+  cosmicTierPatterns?: string[];
 }

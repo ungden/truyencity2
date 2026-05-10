@@ -37,4 +37,20 @@ export const VAN_LINH_PHO_BLUEPRINT: NovelBlueprint = {
     'MC Cố Diệp tone: lạnh đạm + tự tin + tính toán. Public face thiếu niên 16 tuổi may mắn.',
     'Mode lão lục tuyệt đối: giấu Vạn Linh Phổ, giấu xuyên hồn, giấu cấp pet thật.',
   ],
+  // Auto-derived item bans — sync auto-adds these to forbidden_terms[] of
+  // every chapter < introChapter. Replaces manual BAN_RESOURCES whack-a-mole.
+  itemLedger: [
+    { name: 'Vòng Linh Tinh', introChapter: 10, aliases: ['vòng đeo tổ phụ', 'vòng linh'] },
+    { name: 'bản đồ Bắc Vực', introChapter: 50, aliases: ['mảnh bản đồ', 'bản đồ tổ phụ'] },
+    { name: 'sách Vạn Linh Hỏa Pháp', introChapter: 50, aliases: ['Vạn Linh Hỏa Pháp Quyết'] },
+    { name: 'Linh Tinh Ngọc', introChapter: 35, aliases: ['mảnh ngọc Linh Tinh'] },
+    { name: 'Phượng Linh Đan', introChapter: 14, aliases: ['Phượng Linh Đan cấp B'] },
+    // chìa khóa = generic but caught in early chapters; introduce officially ch.50 (kho di sản)
+    { name: 'chìa khóa kho di sản', introChapter: 50, aliases: ['chìa khóa kho', 'chìa khóa tổ phụ'] },
+  ],
+  // Cosmic-tier elements (Vạn Linh Phổ origin Trái Đất, thần thú thượng cổ)
+  // are planned for arc 6 (ch.701+). Default 70% × 1000 = ch.701 — explicit.
+  cosmicArcStartChapter: 701,
+  // Use UNIVERSAL_COSMIC_PATTERNS default (Vietnamese tu-tiên cosmology
+  // matches this novel's setting). No override needed.
 };
