@@ -10,17 +10,32 @@ import {
   type TemplateBlueprint,
 } from '../../services/story-engine/blueprint/template-instantiate';
 import { TIEN_HIEP_RETURNING_EXPERT_TEMPLATE } from '../../../blueprints/_templates/tien-hiep-returning-expert';
+import { TIEN_HIEP_PHAM_NHAN_TEMPLATE } from '../../../blueprints/_templates/tien-hiep-pham-nhan-slow-burn';
+import { TIEN_HIEP_LAO_TO_TEMPLATE } from '../../../blueprints/_templates/tien-hiep-lao-to-simulator';
 import { DO_THI_REBORN_GENIUS_TEMPLATE } from '../../../blueprints/_templates/do-thi-modern-reborn-genius';
+import { DO_THI_THAP_NIEN_TEMPLATE } from '../../../blueprints/_templates/do-thi-thap-nien-80';
+import { DO_THI_THAN_HAO_TEMPLATE } from '../../../blueprints/_templates/do-thi-than-hao-system';
+import { DO_THI_PHUC_THU_TEMPLATE } from '../../../blueprints/_templates/do-thi-trong-sinh-phuc-thu';
 import { HUYEN_HUYEN_BLOODLINE_TEMPLATE } from '../../../blueprints/_templates/huyen-huyen-bloodline-war';
+import { HUYEN_HUYEN_HAC_AM_TEMPLATE } from '../../../blueprints/_templates/huyen-huyen-hac-am-villain';
+import { HUYEN_HUYEN_MO_PHONG_TEMPLATE } from '../../../blueprints/_templates/huyen-huyen-mo-phong-gacha';
 import { LICH_SU_QUAN_TRUONG_TEMPLATE } from '../../../blueprints/_templates/lich-su-xuyen-quan-truong';
+import { LICH_SU_TUONG_QUAN_TEMPLATE } from '../../../blueprints/_templates/lich-su-tuong-quan-chinh-chien';
 import { KHOA_HUYEN_TECH_FUSION_TEMPLATE } from '../../../blueprints/_templates/khoa-huyen-tech-fusion';
+import { KHOA_HUYEN_TINH_TE_TEMPLATE } from '../../../blueprints/_templates/khoa-huyen-tinh-te-galactic';
 import { DONG_NHAN_REWRITE_TEMPLATE } from '../../../blueprints/_templates/dong-nhan-author-rewrite';
+import { DONG_NHAN_NARUTO_TEMPLATE } from '../../../blueprints/_templates/dong-nhan-naruto-system';
 import { VONG_DU_TOP_PLAYER_TEMPLATE } from '../../../blueprints/_templates/vong-du-top-player-rebirth';
+import { VONG_DU_TOAN_DAN_TEMPLATE } from '../../../blueprints/_templates/vong-du-toan-dan-chuyen-chuc';
 import { DI_GIOI_LORD_BUILDER_TEMPLATE } from '../../../blueprints/_templates/di-gioi-lord-builder';
 import { LINH_DI_CORONER_TEMPLATE } from '../../../blueprints/_templates/linh-di-folk-horror-coroner';
+import { LINH_DI_QUY_TAC_TEMPLATE } from '../../../blueprints/_templates/linh-di-quy-tac-quai-dam';
 import { MAT_THE_HOARDER_TEMPLATE } from '../../../blueprints/_templates/mat-the-doomsday-hoarder';
+import { MAT_THE_THIEN_TAI_TEMPLATE } from '../../../blueprints/_templates/mat-the-thien-tai-trong-cay';
 import { KIEM_HIEP_SWORD_SAINT_TEMPLATE } from '../../../blueprints/_templates/kiem-hiep-sword-saint';
 import { NGON_TINH_CEO_SOFT_TEMPLATE } from '../../../blueprints/_templates/ngon-tinh-ceo-soft';
+import { NGON_TINH_PHUC_THU_TEMPLATE } from '../../../blueprints/_templates/ngon-tinh-trong-sinh-phuc-thu';
+import { NGON_TINH_KHOAI_XUYEN_TEMPLATE } from '../../../blueprints/_templates/ngon-tinh-khoai-xuyen';
 import { QUAN_TRUONG_BUREAUCRAT_TEMPLATE } from '../../../blueprints/_templates/quan-truong-modern-bureaucrat';
 
 const SAMPLE_VARS: Record<string, Record<string, string>> = {
@@ -95,6 +110,87 @@ const SAMPLE_VARS: Record<string, Record<string, string>> = {
     LIFE_PARTNER: 'Phạm Lan', REFORM_BANNER: 'Thanh Liêm Tân Chính',
     LOYAL_FRIEND: 'Trương Đại', COUNTRY_NAME: 'Việt Nam',
     ENDING_GOAL: 'Tổng bí thư + cải cách quốc gia thành công',
+  },
+  'tien-hiep-pham-nhan-slow-burn': {
+    MC_NAME: 'Hàn Lập', MC_FAMILY: 'Hàn', HOMETOWN: 'Bảy Tinh Trấn',
+    SECT_NAME: 'Hoàng Phong Cốc', SECT_REGION: 'Đông Nhạc',
+    LOW_RIVAL_NAME: 'Mặc Đại Vũ', MID_RIVAL_NAME: 'Vương Hư', HIGH_RIVAL_NAME: 'Hắc Sơn Lão Tổ',
+    SIGNATURE_TECHNIQUE: 'Đại Diễn Quyết', HIDDEN_TREASURE: 'Hồ Lô Tổ Tiên',
+    COMPANION_NAME: 'Mặc Lan Sương', ENDING_GOAL: 'phi thăng tiên giới',
+  },
+  'tien-hiep-lao-to-simulator': {
+    MC_NAME: 'Lăng Hoàn Tổ', MC_TITLE: 'Vạn Cổ Tổ', SECT_NAME: 'Vạn Cổ Tông',
+    FIRST_DISCIPLE_NAME: 'Lăng Phong', FAVORITE_GENERATION: 'gen 7',
+    ANCIENT_ENEMY: 'Hắc Hoàn Đế Tổ', COMPANION_NAME: 'Sương Ngọc Tổ',
+    ENDING_GOAL: 'Vạn Cổ tổ peak + đại lục cosmic peace',
+  },
+  'do-thi-thap-nien-80': {
+    MC_NAME: 'Trần Đông Hải', MC_FAMILY: 'Trần', HOMETOWN: 'Hà Tĩnh',
+    REBIRTH_YEAR: '1992', DECADE_2: 'cuối 1990s', DECADE_3: '2005', DECADE_4: '2010',
+    DECADE_5: '2015', DECADE_6: '2020',
+    ANTAGONIST_FAMILY: 'Lý phái', COMPETITION_BRAND: 'Đại Phát',
+    LIFE_PARTNER: 'Phạm Lan', COUNTRY_NAME: 'Việt Nam',
+    ENDING_GOAL: 'tài phiệt #1 thế giới',
+  },
+  'do-thi-than-hao-system': {
+    MC_NAME: 'Lý Phong', MC_FAMILY: 'Lý', HOMETOWN: 'Sài Gòn',
+    COUNTRY_NAME: 'Việt Nam', ANTAGONIST_FAMILY: 'Trần phái',
+    LIFE_PARTNER: 'Phạm Lan Anh', ENDING_GOAL: 'cosmic-tier philanthropist',
+  },
+  'do-thi-trong-sinh-phuc-thu': {
+    MC_NAME: 'Trần Đông', MC_FAMILY: 'Trần', HOMETOWN: 'Hà Nội',
+    COUNTRY_NAME: 'Việt Nam',
+    TRAITOR_FRIEND: 'Lý Khang', TRAITOR_FIANCEE: 'Phạm Vi', TRAITOR_BOSS: 'Hoàng Đại Lão',
+    LIFE_PARTNER_REAL: 'Nguyễn Lan Anh', ENDING_GOAL: 'tài phiệt #1 + cosmic philanthropist',
+  },
+  'huyen-huyen-hac-am-villain': {
+    MC_NAME: 'Mặc Hắc Ảnh', MC_FAMILY: 'Mặc',
+    TA_PHAI_NAME: 'Hắc Liên giáo',
+    COMPANION_NAME: 'Cô Cô Hắc Sương', ENDING_GOAL: 'Tà Đạo Đại Đế cosmic peak',
+  },
+  'huyen-huyen-mo-phong-gacha': {
+    MC_NAME: 'Lý Toán Tử', MC_FAMILY: 'Lý',
+    SIMULATOR_NAME: 'Vạn Đạo Mô Phỏng Bàn', SECT_NAME: 'Cổ Đạo Tông',
+    COMPANION_NAME: 'Lăng Sương', ENDING_GOAL: 'vạn giới Đại Đạo Tổ',
+  },
+  'lich-su-tuong-quan-chinh-chien': {
+    MC_NAME: 'Triệu Tử Long', MC_FAMILY: 'Triệu', DYNASTY_NAME: 'Đại Đường', CAPITAL_CITY: 'Trường An',
+    ANTAGONIST_FAMILY: 'Tần', FOREIGN_ENEMY: 'Đột Quyết', LOYAL_OFFICER: 'Trần Khánh Dư',
+    ENDING_GOAL: 'đại đế thống nhất thiên hạ',
+  },
+  'khoa-huyen-tinh-te-galactic': {
+    MC_NAME: 'Lý Tinh Vũ', MC_FAMILY: 'Lý',
+    COMPANION_NAME: 'Tô Linh', LOW_RIVAL: 'Hắc Vũ', ANTAGONIST_CORP: 'Hắc Tinh Corp',
+    ENDING_GOAL: 'multi-galaxy emperor + cosmic peace',
+  },
+  'dong-nhan-naruto-system': {
+    MC_NAME: 'Trục Vũ', VILLAGE_NAME: 'Konoha', CANON_MENTOR: 'Hatake Kakashi',
+    FAVORITE_CHARACTER: 'Uchiha Itachi', COMPANION_NAME: 'Hayate Tsuki',
+    ENDING_GOAL: 'multi-canon shinobi cosmic peace',
+  },
+  'vong-du-toan-dan-chuyen-chuc': {
+    MC_NAME: 'Lý Phong', MC_FAMILY: 'Lý', HOMETOWN: 'Hà Nội', COUNTRY_NAME: 'Việt Nam',
+    HIDDEN_CLASS: 'Vô Hạn Sword Saint', NATIONAL_RIVAL: 'Hắc Vũ',
+    COMPANION_NAME: 'Tô Linh', ENDING_GOAL: 'cosmic-tier divine class + multi-realm peace',
+  },
+  'linh-di-quy-tac-quai-dam': {
+    MC_NAME: 'Trần Vũ', MC_FAMILY: 'Trần',
+    COMPANION_NAME: 'Tô Linh', ANTAGONIST_NPC: 'Hắc Y NPC',
+    ENDING_GOAL: 'system escape + true freedom',
+  },
+  'mat-the-thien-tai-trong-cay': {
+    MC_NAME: 'Lý Hân', MC_FAMILY: 'Lý', HOMETOWN: 'Hà Tĩnh',
+    ANTAGONIST_FACTION: 'Hắc Long Hội', COMPANION_NAME: 'Tô Linh',
+    ENDING_GOAL: 'đại lục cooperation peace + nhân loại reborn',
+  },
+  'ngon-tinh-trong-sinh-phuc-thu': {
+    FEMALE_MC: 'Tô Tử Linh', FEMALE_MC_FAMILY: 'Tô', HOMETOWN: 'Hà Nội', COUNTRY_NAME: 'Việt Nam',
+    TRAITOR_FEMALE: 'Lý Vy', TRAITOR_HUSBAND: 'Trần Hắc', TRAITOR_FAMILY: 'Lý gia',
+    TRUE_LOVE: 'Nguyễn Minh', ENDING_GOAL: 'vợ chồng bá đạo + family empire stable + cosmic peace',
+  },
+  'ngon-tinh-khoai-xuyen': {
+    FEMALE_MC: 'Tô Linh', FEMALE_MC_FAMILY: 'Tô',
+    ENDING_GOAL: 'system escape + chọn world favorite to retire với male lead',
   },
 };
 
@@ -361,6 +457,21 @@ describe.each([
   ['kiem-hiep-sword-saint', KIEM_HIEP_SWORD_SAINT_TEMPLATE, 'kiem-hiep'],
   ['ngon-tinh-ceo-soft', NGON_TINH_CEO_SOFT_TEMPLATE, 'ngon-tinh'],
   ['quan-truong-modern-bureaucrat', QUAN_TRUONG_BUREAUCRAT_TEMPLATE, 'quan-truong'],
+  ['tien-hiep-pham-nhan-slow-burn', TIEN_HIEP_PHAM_NHAN_TEMPLATE, 'tien-hiep'],
+  ['tien-hiep-lao-to-simulator', TIEN_HIEP_LAO_TO_TEMPLATE, 'tien-hiep'],
+  ['do-thi-thap-nien-80', DO_THI_THAP_NIEN_TEMPLATE, 'do-thi'],
+  ['do-thi-than-hao-system', DO_THI_THAN_HAO_TEMPLATE, 'do-thi'],
+  ['do-thi-trong-sinh-phuc-thu', DO_THI_PHUC_THU_TEMPLATE, 'do-thi'],
+  ['huyen-huyen-hac-am-villain', HUYEN_HUYEN_HAC_AM_TEMPLATE, 'huyen-huyen'],
+  ['huyen-huyen-mo-phong-gacha', HUYEN_HUYEN_MO_PHONG_TEMPLATE, 'huyen-huyen'],
+  ['lich-su-tuong-quan-chinh-chien', LICH_SU_TUONG_QUAN_TEMPLATE, 'lich-su'],
+  ['khoa-huyen-tinh-te-galactic', KHOA_HUYEN_TINH_TE_TEMPLATE, 'khoa-huyen'],
+  ['dong-nhan-naruto-system', DONG_NHAN_NARUTO_TEMPLATE, 'dong-nhan'],
+  ['vong-du-toan-dan-chuyen-chuc', VONG_DU_TOAN_DAN_TEMPLATE, 'vong-du'],
+  ['linh-di-quy-tac-quai-dam', LINH_DI_QUY_TAC_TEMPLATE, 'linh-di'],
+  ['mat-the-thien-tai-trong-cay', MAT_THE_THIEN_TAI_TEMPLATE, 'mat-the'],
+  ['ngon-tinh-trong-sinh-phuc-thu', NGON_TINH_PHUC_THU_TEMPLATE, 'ngon-tinh'],
+  ['ngon-tinh-khoai-xuyen', NGON_TINH_KHOAI_XUYEN_TEMPLATE, 'ngon-tinh'],
 ])('%s end-to-end', (templateId, template, expectedGenre) => {
   it('declares all placeholders it actually uses', () => {
     const used = findUsedPlaceholders(template);

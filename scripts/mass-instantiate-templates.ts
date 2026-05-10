@@ -153,7 +153,7 @@ async function processProject(
     ok: false,
   };
 
-  const template = pickTemplateForGenre(project.genre || '');
+  const template = pickTemplateForGenre(project.genre || '', project.title);
   if (!template) {
     result.error = `no template for genre=${project.genre}`;
     return result;
