@@ -1,8 +1,10 @@
 import {
   computeQuotaCadenceCeiling,
   computeQuotaInitialCadenceMinutes,
+  computeRecoverableRoutineRetryDelayMinutes,
   getDefaultDailyChapterQuota,
   getProjectDailyChapterQuota,
+  isRecoverableRoutineWriteError,
   isDailyQuotaDue,
 } from '@/lib/story-production-quota';
 
@@ -65,5 +67,23 @@ describe('story production quota', () => {
       target_chapters: 55,
       next_due_at: '2026-05-09T18:14:48.083+00:00',
     }, now)).toBe(false);
+  });
+
+  it('treats routine writer gate failures as recoverable but keeps setup/blueprint faults hard', () => {
+    expect(isRecoverableRoutineWriteError(
+      'FLASH_CHEAP_GATE_BLOCKED: word_count_low:Chuong 2160 tu | unscheduled_rival_intrusion',
+    )).toBe(true);
+    expect(isRecoverableRoutineWriteError('timeout calling deepseek')).toBe(true);
+    expect(isRecoverableRoutineWriteError('CHAPTER_BLUEPRINT_MISSING_OR_INVALID: missing ch43')).toBe(false);
+    expect(isRecoverableRoutineWriteError('PUBLISHED_SETUP_KERNEL_MISSING')).toBe(false);
+  });
+
+  it('backs off recoverable routine retries without making them permanent stops', () => {
+    expect(computeRecoverableRoutineRetryDelayMinutes(1, 5)).toBe(3);
+    expect(computeRecoverableRoutineRetryDelayMinutes(4, 5)).toBe(3);
+    expect(computeRecoverableRoutineRetryDelayMinutes(5, 5)).toBe(15);
+    expect(computeRecoverableRoutineRetryDelayMinutes(6, 5)).toBe(30);
+    expect(computeRecoverableRoutineRetryDelayMinutes(8, 5)).toBe(120);
+    expect(computeRecoverableRoutineRetryDelayMinutes(12, 5)).toBe(180);
   });
 });

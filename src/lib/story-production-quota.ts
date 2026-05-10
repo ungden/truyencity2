@@ -50,6 +50,37 @@ export function computeDynamicResumeBatchSizeForQuota(input: {
   return clamp(buffered, input.minBatch, input.maxBatch);
 }
 
+export function isRecoverableRoutineWriteError(errorMsg: string): boolean {
+  const normalized = errorMsg.toLowerCase();
+  if (
+    errorMsg.startsWith('PUBLISHED_SETUP_KERNEL_MISSING') ||
+    errorMsg.startsWith('CHAPTER_BLUEPRINT_MISSING_OR_INVALID') ||
+    errorMsg.startsWith('SETUP_KERNEL_DEAD_LETTER') ||
+    normalized.includes('cost cap')
+  ) {
+    return false;
+  }
+
+  return (
+    errorMsg.startsWith('FLASH_CHEAP_GATE_BLOCKED') ||
+    errorMsg.startsWith('FLASH_CHEAP_CAUSAL_GATE_FAILED') ||
+    normalized.includes('rate limit') ||
+    normalized.includes('timeout') ||
+    normalized.includes('fetch failed') ||
+    normalized.includes('network') ||
+    normalized.includes('temporarily unavailable')
+  );
+}
+
+export function computeRecoverableRoutineRetryDelayMinutes(
+  retryCount: number,
+  maxFastRetries: number,
+): number {
+  if (retryCount < maxFastRetries) return 3;
+  const slowRetryIndex = Math.max(0, retryCount - maxFastRetries);
+  return Math.min(180, 15 * (2 ** Math.min(slowRetryIndex, 4)));
+}
+
 export function isDailyQuotaDue(
   quota: {
     status?: string | null;

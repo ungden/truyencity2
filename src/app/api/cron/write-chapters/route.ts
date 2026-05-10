@@ -40,8 +40,10 @@ import {
   computeDynamicResumeBatchSizeForQuota,
   computeQuotaCadenceCeiling,
   computeQuotaInitialCadenceMinutes,
+  computeRecoverableRoutineRetryDelayMinutes,
   getDefaultDailyChapterQuota,
   getProjectDailyChapterQuota,
+  isRecoverableRoutineWriteError,
   isDailyQuotaDue,
 } from '@/lib/story-production-quota';
 
@@ -89,7 +91,8 @@ const ACTIVE_WINDOW_MINUTES = clamp(parseIntEnv('WRITE_CHAPTERS_ACTIVE_WINDOW_MI
 
 // SAFETY: circuit breaker + per-project daily cost cap.
 // Without these, a seed landmine that fails every attempt burns ~288 retries/day silently.
-// Default 5 consecutive failures = ~25 min of cron ticks before auto-pause.
+// Default 5 consecutive hard failures = auto-pause. Recoverable writer/gate failures
+// switch to slower self-retry instead, so a routine chapter cannot die silently.
 const MAX_CONSECUTIVE_FAILURES = clamp(parseIntEnv('WRITE_CHAPTERS_MAX_CONSECUTIVE_FAILURES', 5), 2, 50);
 // Default $5/project/day. Catches runaway loops without affecting healthy novels (~$0.50-1/day each).
 const PER_PROJECT_DAILY_USD_CAP = (() => {
@@ -456,24 +459,31 @@ async function updateQuotaAfterError(
     .eq('vn_date', vnDate)
     .maybeSingle();
   const newRetryCount = (prior?.retry_count ?? 0) + 1;
+  const recoverableRoutineError = isRecoverableRoutineWriteError(errorMsg);
+  const retryDelayMinutes = recoverableRoutineError
+    ? computeRecoverableRoutineRetryDelayMinutes(newRetryCount, MAX_CONSECUTIVE_FAILURES)
+    : 3;
+  const lastError = recoverableRoutineError && newRetryCount >= MAX_CONSECUTIVE_FAILURES
+    ? `AUTO_COOLDOWN_RETRY_${retryDelayMinutes}M_AFTER_${newRetryCount}_FAILURES: ${errorMsg}`
+    : errorMsg;
 
   await supabase
     .from('project_daily_quotas')
     .update({
       retry_count: newRetryCount,
-      last_error: errorMsg.slice(0, 500),
-      // Retry in 3 min instead of 10 — 5-min cron tick means we'll catch the very next tick.
-      // Faster recovery from transient DeepSeek failures.
-      next_due_at: new Date(Date.now() + 3 * 60 * 1000).toISOString(),
+      last_error: lastError.slice(0, 500),
+      // Fast-retry early failures. If a cheap writer/gate issue keeps failing,
+      // back off instead of pausing forever or burning every cron tick.
+      next_due_at: new Date(Date.now() + retryDelayMinutes * 60 * 1000).toISOString(),
       updated_at: new Date().toISOString(),
     })
     .eq('project_id', projectId)
     .eq('vn_date', vnDate);
 
-  // Circuit breaker: after MAX consecutive failures in a single VN day, auto-pause.
-  // Prevents seed landmines (e.g. currency hard-fail loop) from burning ~288 retries/day.
-  // User unpauses manually via admin/operations action `resume_novel` after fixing root cause.
-  if (newRetryCount >= MAX_CONSECUTIVE_FAILURES) {
+  // Circuit breaker: after MAX consecutive non-recoverable failures in a single
+  // VN day, auto-pause. Recoverable routine writer/gate failures keep retrying
+  // on a slower cooldown so active long-form novels do not stop forever.
+  if (newRetryCount >= MAX_CONSECUTIVE_FAILURES && !recoverableRoutineError) {
     const reason = `auto_paused_after_${newRetryCount}_consecutive_failures: ${errorMsg.slice(0, 200)}`;
     await supabase
       .from('ai_story_projects')
@@ -486,6 +496,10 @@ async function updateQuotaAfterError(
       .eq('id', projectId)
       .eq('status', 'active');
     console.warn(`[circuit-breaker] Project ${projectId.slice(0, 8)} auto-paused after ${newRetryCount} failures: ${errorMsg.slice(0, 100)}`);
+  } else if (newRetryCount >= MAX_CONSECUTIVE_FAILURES) {
+    console.warn(
+      `[cooldown-retry] Project ${projectId.slice(0, 8)} kept active after ${newRetryCount} recoverable failures; next retry in ${retryDelayMinutes}m: ${errorMsg.slice(0, 100)}`,
+    );
   }
 }
 
