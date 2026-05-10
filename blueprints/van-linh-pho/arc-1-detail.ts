@@ -109,7 +109,13 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     ],
     mcBenefit: 'pet Lửa Tro confirm chiến đấu được (skill validate), 11 đệ tử + em gái niềm tin (network + quan hệ), em gái relationship đỉnh',
     threadsAdvance: ['phục hưng gia tộc'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC + Lửa Tro trong phòng kín đêm yên tĩnh.'],
+    risks: [
+      BAN_BASE,
+      TONE_LAO_LUC,
+      'END: MC + Lửa Tro trong phòng kín đêm yên tĩnh.',
+      'CẤM nhắc "bản đồ", "chìa khóa", "vòng đeo" hoặc bất kỳ vật phẩm cấp B+ nào trong chương này — chương training thuần. Vật phẩm cấp cao reveal ở ch.10 (Vòng Linh Tinh đã có) hoặc ch.15+ (bản đồ Bắc Vực sau).',
+      'KHÔNG giới thiệu resource/item mới ngoài: pet Lửa Tro, Tro Lửa Linh đã có, đệ tử Tro Linh Phái 11 người. CẤM kho di sản scene ở chương này.',
+    ],
   },
   {
     n: 12, beat: 'breathing',

@@ -181,7 +181,7 @@ async function syncArcPlanContext(
         chapterNumber: b.n,
         sub_arc_number: b.subArcNumber ?? null,
         brief: b.brief || b.goal || `Ch.${b.n}: ${arc.theme}`,
-        sceneDirection: '',
+        sceneDirection: buildSceneDirection(b, blueprint),
         scenes: b.scenes,
         mcBenefit: b.mcBenefit,
         beat: b.beat,
