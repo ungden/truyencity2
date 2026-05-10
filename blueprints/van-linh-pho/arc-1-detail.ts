@@ -9,6 +9,7 @@ import type { ChapterBrief } from './arc-skeleton';
 
 const TONE_LAO_LUC = 'TONE: MC Cố Diệp lạnh đạm + tự tin + tính toán. Public face thiếu niên 16 tuổi may mắn. KHÔNG paranoid. KHÔNG tự khoe.';
 const BAN_BASE = 'BAN: cliffhanger "có người theo dõi/rình mò"; pet evolve công khai; em gái biết Vạn Linh Phổ; MC chõ mồm bênh người lạ; lặp scene Tro Bụi evolve (đã xong ở ch.4-5).';
+const BAN_RESOURCES = 'CẤM nhắc "chìa khóa", "bản đồ", "vòng đeo" trong content trừ khi explicit declare source ledger trong cùng chương ("Hà Thúc trao", "lấy từ kho", "tổ phụ để lại"). Items này có source ở ch.10 (Vòng Linh Tinh) + ch.15 (bản đồ Bắc Vực) — chương khác KHÔNG được nhắc nếu không có source declaration.';
 
 export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
   // ─── Sub-arc 2 (ch.6-10): Cố Già Tâm mentor + đệ tử trẻ network ──────────
@@ -26,7 +27,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     ],
     mcBenefit: 'sách tiến hóa cổ + 50g Linh Mạch + 2 viên Hỏa Diễm Thạch (tài nguyên), 5 đệ tử trẻ ngầm phục (network), uy tín với Già Tâm + Hà Thúc (quan hệ)',
     threadsAdvance: ['phục hưng gia tộc', 'Vạn Linh Phổ tuyến tiến hóa expand'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: scene MC + Lửa Tro yên tĩnh, KHÔNG cliffhanger paranoia.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: scene MC + Lửa Tro yên tĩnh, KHÔNG cliffhanger paranoia.'],
   },
   {
     n: 7, beat: 'setup',
@@ -42,7 +43,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     ],
     mcBenefit: 'manh mối Bạch Ngân Lang weakness (thông tin), kỹ năng kìm chế Lửa Tro (skill), confirm chiến thuật giải đấu',
     threadsAdvance: ['phục hưng gia tộc'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: scene MC viết sổ trong phòng yên tĩnh.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: scene MC viết sổ trong phòng yên tĩnh.'],
   },
   {
     n: 8, beat: 'confront',
@@ -58,7 +59,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     ],
     mcBenefit: 'deflect cáo buộc thành công (uy tín nội tộc tăng), Già Tâm tăng đứng phe MC (quan hệ), Khiếu mất uy tín hội đồng (face-slap nhỏ), Trường Khải mất thế (đột phá quyền lực)',
     threadsAdvance: ['phục hưng gia tộc', 'đoạt thừa kế'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: scene MC + Hà Thúc thảo luận, KHÔNG cliffhanger paranoia.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: scene MC + Hà Thúc thảo luận, KHÔNG cliffhanger paranoia.'],
   },
   {
     n: 9, beat: 'big_wow',
@@ -75,7 +76,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     ],
     mcBenefit: 'Già Tâm bystander shock thầm + tăng đứng phe MC (uy tín lớn), 10 đệ tử trẻ chính thức theo MC (network mạnh), face-slap Vân Kiếm thầm (đối thủ kinh ngạc), authority về tuyến tiến hóa (skill recognition)',
     threadsAdvance: ['phục hưng gia tộc', 'Vạn Linh Phổ tuyến tiến hóa expand'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: scene 10 đệ tử trẻ ngoài vườn cùng MC + Già Tâm.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: scene 10 đệ tử trẻ ngoài vườn cùng MC + Già Tâm.'],
   },
   {
     n: 10, beat: 'resolution',
@@ -93,7 +94,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     mcBenefit: 'Vòng Linh Tinh cấp B (vật phẩm + tăng skill 30%), Tro Linh Phái formed (network 11 đệ tử + em gái), tổ phụ link tăng từ Hà Thúc (manh mối + cảm xúc)',
     threadsAdvance: ['phục hưng gia tộc', 'Vạn Linh Phổ tuyến tiến hóa expand'],
     newThreads: ['Tro Linh Phái nhánh đệ tử riêng'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: scene MC trong phòng kín đeo vòng, scan pet — yên tĩnh tích cực.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: scene MC trong phòng kín đeo vòng, scan pet — yên tĩnh tích cực.'],
   },
   // ─── Sub-arc 3 (ch.11-15): Giải đấu Vân Kiếm — first BIG WOW mass face-slap ─
   {
@@ -131,7 +132,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     ],
     mcBenefit: 'thắng vòng 1+2 giải đấu (uy tín nội tộc), bystander đám đệ tử shock thầm (face-slap tier 1), Già Tâm khen công khai (quan hệ)',
     threadsAdvance: ['phục hưng gia tộc'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: scene MC chuẩn bị vòng 3 — yên tĩnh.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: scene MC chuẩn bị vòng 3 — yên tĩnh.'],
   },
   {
     n: 13, beat: 'big_wow',
@@ -151,7 +152,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     mcBenefit: 'thắng giải đấu vòng 3 (uy tín nội tộc lớn), face-slap Vân Kiếm + đám đệ tử mass (face-slap tier 2), Già Tâm khen công khai (quan hệ + tổ phụ link), Cố Trường Lệ tái mặt (đột phá quyền lực)',
     threadsAdvance: ['phục hưng gia tộc', 'đoạt thừa kế'],
     threadsResolve: ['Vân Kiếm thách giải đấu'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: scene Già Tâm khen + đám đệ tử shock — KHÔNG cliffhanger paranoia.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: scene Già Tâm khen + đám đệ tử shock — KHÔNG cliffhanger paranoia.'],
   },
   {
     n: 14, beat: 'resolution',
@@ -169,7 +170,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     mcBenefit: 'tiền thưởng 30 đồng + 5 viên Hồi Khí Đan + 200g Linh Mạch + sách Linh Tinh Đoạt Thiên Đan Phương + 1 viên Phượng Linh Đan (tài nguyên + skill book + vật phẩm cấp C), 10 đệ tử mới (network → Tro Linh Phái 21 thành viên), Già Tâm dẫn vào phần niêm phong (đột phá quan hệ)',
     threadsAdvance: ['phục hưng gia tộc', 'Vạn Linh Phổ tuyến tiến hóa expand'],
     threadsResolve: ['kho di sản tạm thời mở'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: scene MC scan Phượng Linh Đan trong phòng kín — yên tĩnh tích cực.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: scene MC scan Phượng Linh Đan trong phòng kín — yên tĩnh tích cực.'],
   },
   {
     n: 15, beat: 'breathing',
@@ -187,7 +188,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     mcBenefit: 'Tro Linh Phái chính thức (network institutional), Cố Khang trưởng nhánh (network leadership), Vân Kiếm redemption seed (đối thủ chuyển), bản đồ Bắc Vực bố để lại (manh mối arc 4)',
     threadsAdvance: ['phục hưng gia tộc', 'bố Cố Hành Bắc Vực mất tích'],
     newThreads: ['di tích cổ Bắc Vực', 'cánh cửa Vạn Linh Phổ'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: scene MC ghi sổ trong phòng — yên tĩnh tích cực, KHÔNG paranoia.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: scene MC ghi sổ trong phòng — yên tĩnh tích cực, KHÔNG paranoia.'],
   },
   // ─── Sub-arc 4 (ch.16-20): Bằng chứng Cố Trường Lệ biển thủ ─────────────
   {
@@ -205,7 +206,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     mcBenefit: 'chứng cứ biển thủ Trường Lệ (3 pet B + 5000 linh thạch) (manh mối + leverage cực lớn), sổ đối chiếu Hà Thúc (vật phẩm chứng cứ), kế hoạch face-slap hội đồng (setup-payoff)',
     threadsAdvance: ['phục hưng gia tộc', 'đoạt thừa kế'],
     newThreads: ['Cố Trường Lệ biển thủ 3 pet B'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: scene MC viết kế hoạch trong phòng kín đêm.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: scene MC viết kế hoạch trong phòng kín đêm.'],
   },
   {
     n: 17, beat: 'breathing',
@@ -221,7 +222,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     ],
     mcBenefit: '3 nhánh Tro Linh Phái formal (network institutional 23 thành viên), Vân Kiếm redemption seed advance, Già Tâm pre-commit ủng hộ cuộc họp tuần sau (quan hệ)',
     threadsAdvance: ['phục hưng gia tộc'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: scene MC + Lửa Tro tiến triển feed.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: scene MC + Lửa Tro tiến triển feed.'],
   },
   {
     n: 18, beat: 'confront',
@@ -238,7 +239,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     ],
     mcBenefit: 'từ chối tạm hoãn thừa kế thành công (uy tín lớn), Già Tâm công khai ủng hộ thừa kế (quan hệ), Trường Khải mất thế tiếp (đột phá quyền lực), manh mối Trường Khải đang chuẩn bị đòn lớn (thông tin)',
     threadsAdvance: ['phục hưng gia tộc', 'đoạt thừa kế'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC + Hà Thúc thảo luận thông tin — KHÔNG paranoia, MC tự tin.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: MC + Hà Thúc thảo luận thông tin — KHÔNG paranoia, MC tự tin.'],
   },
   {
     n: 19, beat: 'big_wow',
@@ -258,7 +259,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     mcBenefit: 'Trường Lệ rút hội đồng + bồi hoàn 5000 linh thạch + 3 pet B (tài nguyên cực lớn), Trường Khải mất 1 ally cứng (đột phá quyền lực), uy tín hội đồng tăng (uy tín)',
     threadsAdvance: ['phục hưng gia tộc', 'đoạt thừa kế'],
     threadsResolve: ['Cố Trường Lệ biển thủ 3 pet B'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: scene MC ngồi yên, hội đồng vẫn đang xôn xao về Trường Lệ.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: scene MC ngồi yên, hội đồng vẫn đang xôn xao về Trường Lệ.'],
   },
   {
     n: 20, beat: 'resolution',
@@ -276,7 +277,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     mcBenefit: '5000 linh thạch + 3 pet B (3500 giữ + 1500 chia cho nhánh) (tài nguyên cực lớn), Tro Linh Phái 3 trưởng nhánh có pet B (network upgrade), uy tín nhánh trưởng (quan hệ), manh mối Trường Khải sắp tung Vương thị (thông tin)',
     threadsAdvance: ['phục hưng gia tộc', 'đoạt thừa kế'],
     newThreads: ['Vương thị tiểu tộc sắp tham chiến'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC + Lửa Tro phòng kín đêm yên tĩnh.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: MC + Lửa Tro phòng kín đêm yên tĩnh.'],
   },
   // ─── Sub-arc 5 (ch.21-25): Acquire Cơ Niệm + face-slap Cố Khiếu ──────────
   {
@@ -294,7 +295,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     mcBenefit: 'Cơ Niệm pet thứ 2 (vật phẩm, pet portfolio expand), tuyến tiến hóa Cơ Niệm (manh mối + skill), kinh nghiệm thị trường pet (kinh nghiệm)',
     threadsAdvance: ['Vạn Linh Phổ tuyến tiến hóa expand', 'phục hưng gia tộc'],
     newThreads: ['Cơ Niệm pet thứ 2'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC + 2 pet (Lửa Tro + Cơ Niệm) trong phòng kín — yên tĩnh tích cực.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: MC + 2 pet (Lửa Tro + Cơ Niệm) trong phòng kín — yên tĩnh tích cực.'],
   },
   {
     n: 22, beat: 'breathing',
@@ -310,7 +311,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     ],
     mcBenefit: 'Cơ Niệm bắt đầu feed (pet stage advance), 50g Cơ Linh Tinh + 5 viên Linh Đan từ kho hợp pháp (tài nguyên), 23 đệ tử kỹ năng feed counter (skill teaching expand), em gái háo hức về pet đầu (quan hệ)',
     threadsAdvance: ['phục hưng gia tộc', 'Vạn Linh Phổ tuyến tiến hóa expand'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC feed Cơ Niệm yên tĩnh, em gái háo hức.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: MC feed Cơ Niệm yên tĩnh, em gái háo hức.'],
   },
   {
     n: 23, beat: 'confront',
@@ -328,7 +329,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     ],
     mcBenefit: 'Cố Khiếu nghỉ hội đồng 1 tháng (face-slap đối thủ + đột phá quyền lực), Trường Khải mất 2 ally cứng (Trường Lệ + Khiếu) (đột phá quyền lực lớn), manh mối Vương thị sắp tung sớm (thông tin)',
     threadsAdvance: ['phục hưng gia tộc', 'đoạt thừa kế'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC + Hà Thúc thảo luận chuẩn bị Vương thị — KHÔNG paranoia, MC tự tin.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: MC + Hà Thúc thảo luận chuẩn bị Vương thị — KHÔNG paranoia, MC tự tin.'],
   },
   {
     n: 24, beat: 'big_wow',
@@ -345,7 +346,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     ],
     mcBenefit: 'Cơ Niệm evolve Cơ Khí Vũ Sĩ D (đột phá pet level, pet thứ 2 cấp D), pet portfolio Lửa Tro E + Cơ Khí Vũ Sĩ D (skill expand), kế hoạch đối phó Vương thị (setup-payoff)',
     threadsAdvance: ['Vạn Linh Phổ tuyến tiến hóa expand', 'Vương thị tiểu tộc sắp tham chiến'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC + 2 pet evolve trong phòng kín — yên tĩnh tích cực.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: MC + 2 pet evolve trong phòng kín — yên tĩnh tích cực.'],
   },
   {
     n: 25, beat: 'resolution',
@@ -365,7 +366,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     threadsAdvance: ['phục hưng gia tộc'],
     threadsResolve: ['Vân Kiếm rival chuyển đồng minh'],
     newThreads: ['em gái Tiểu Đào pet đầu Tiểu Mèo Linh'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC + 2 pet phòng kín đêm — sẵn sàng Vương thị.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: MC + 2 pet phòng kín đêm — sẵn sàng Vương thị.'],
   },
   // ─── Sub-arc 6 (ch.26-30): Activate Lục Vũ + Tro Bụi → Phượng Linh C path ─
   {
@@ -383,7 +384,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     mcBenefit: 'Lục Vũ pet thứ 3 acquired (vật phẩm + pet portfolio expand), tuyến Phong tier (manh mối + skill), kế hoạch chuẩn bị Vương thị (setup)',
     threadsAdvance: ['Vạn Linh Phổ tuyến tiến hóa expand', 'phục hưng gia tộc'],
     newThreads: ['Lục Vũ pet thứ 3 — tuyến Phong'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC + 3 pet trong phòng kín đêm.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: MC + 3 pet trong phòng kín đêm.'],
   },
   {
     n: 27, beat: 'breathing',
@@ -399,7 +400,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     ],
     mcBenefit: 'Vân Kiếm chính thức tham gia Tro Linh Phái (quan hệ + network), em gái Tiểu Đào talent feed lộ (manh mối future), manh mối tổ phụ Bắc Vực 50 năm trước (thông tin)',
     threadsAdvance: ['phục hưng gia tộc', 'di tích cổ Bắc Vực', 'cánh cửa Vạn Linh Phổ'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC + 3 pet phòng kín đêm — feed yên tĩnh.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: MC + 3 pet phòng kín đêm — feed yên tĩnh.'],
   },
   {
     n: 28, beat: 'confront',
@@ -417,7 +418,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     ],
     mcBenefit: 'từ chối hợp đồng Vương thị bất lợi (uy tín nội tộc + đột phá quyền lực), Trường Khải mất 1 cơ hội ép MC (đột phá quyền lực), Già Tâm khen + cảnh báo Vương thị tung đòn lớn (quan hệ + thông tin)',
     threadsAdvance: ['Vương thị tiểu tộc sắp tham chiến', 'phục hưng gia tộc'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC + Già Tâm thảo luận chuẩn bị — KHÔNG paranoia.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: MC + Già Tâm thảo luận chuẩn bị — KHÔNG paranoia.'],
   },
   {
     n: 29, beat: 'big_wow',
@@ -437,7 +438,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     mcBenefit: 'thắng giải đấu liên tộc 5/5 (uy tín thành lớn), 5000 linh thạch + 3 pet B + 5 pet C + sách kỹ năng cấp B (tài nguyên cực lớn), face-slap Vương thị + 5 tiểu tộc mass (face-slap tier 3 — thành level), Vương Đại Hoàng tái mặt (đột phá quyền lực)',
     threadsAdvance: ['phục hưng gia tộc'],
     threadsResolve: ['Vương thị tiểu tộc sắp tham chiến'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: scene Cố tộc về phủ với tài sản — KHÔNG paranoia, MC vỏ bình thản.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: scene Cố tộc về phủ với tài sản — KHÔNG paranoia, MC vỏ bình thản.'],
   },
   {
     n: 30, beat: 'resolution',
@@ -455,7 +456,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     ],
     mcBenefit: '2000 linh thạch riêng + 1 viên Phượng Linh Đan giữ kín (tài nguyên), Cố tộc + Tro Linh Phái 3000 linh thạch + 3 pet B mới (tài nguyên gia tộc), Vân Kiếm + Cố Lan Nhi học sách cấp B (skill expand), Trường Khải giả vờ thay đổi (manh mối âm mưu)',
     threadsAdvance: ['phục hưng gia tộc'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC + 3 pet phòng kín đêm — feed yên tĩnh tích cực.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: MC + 3 pet phòng kín đêm — feed yên tĩnh tích cực.'],
   },
   // ─── Sub-arc 7 (ch.31-35): Cố Trường Khải tung Vương thị đợt 2 ──────────
   {
@@ -474,7 +475,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     mcBenefit: 'manh mối ám sát + bắt cóc của Trường Khải (thông tin cực lớn), kế hoạch bẫy ngược (setup-payoff), nội ứng Hà Thúc (network + thông tin), em gái di chuyển an toàn (bảo vệ family)',
     threadsAdvance: ['phục hưng gia tộc', 'đoạt thừa kế'],
     newThreads: ['Trường Khải ám sát + bắt cóc Tiểu Đào'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC + em gái + 2 pet phòng kín tổ phụ — yên tĩnh, KHÔNG paranoia.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: MC + em gái + 2 pet phòng kín tổ phụ — yên tĩnh, KHÔNG paranoia.'],
   },
   {
     n: 32, beat: 'breathing',
@@ -491,7 +492,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     ],
     mcBenefit: 'em gái an toàn (bảo vệ family), Tro Linh Phái 25 thành viên xếp đội phục kích (network institutional), Vân Kiếm tin tưởng tham gia (quan hệ), kế hoạch chi tiết bẫy ngược (setup-payoff)',
     threadsAdvance: ['Trường Khải ám sát + bắt cóc Tiểu Đào'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC giường giả ngủ đêm khuya — chuẩn bị bẫy ngược.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: MC giường giả ngủ đêm khuya — chuẩn bị bẫy ngược.'],
   },
   {
     n: 33, beat: 'confront',
@@ -511,7 +512,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     ],
     mcBenefit: 'thắng 3 sát thủ Sơ Cấp peak với 3 pet C (face-slap đối thủ), nhân chứng sát thủ confirm Lý thị + Trường Khải làm trung gian (chứng cứ cực lớn), bảo vệ em gái thành công (family safe), Tro Linh Phái 25 thành viên thử lửa thật (skill validate)',
     threadsAdvance: ['Trường Khải ám sát + bắt cóc Tiểu Đào'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC + sát thủ bị giam — chuẩn bị cuộc họp sáng mai.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: MC + sát thủ bị giam — chuẩn bị cuộc họp sáng mai.'],
   },
   {
     n: 34, beat: 'big_wow',
@@ -532,7 +533,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     mcBenefit: 'Trường Khải bị giam + tước hết quyền lực (đột phá quyền lực CỰC LỚN), MC tiếp quản quyền lực Cố tộc lâm thời (uy tín tối thượng), 7/8 phiếu hội đồng ủng hộ MC (network institutional), gần đoạt trưởng tộc danh phận (path to climax)',
     threadsAdvance: ['phục hưng gia tộc', 'đoạt thừa kế'],
     threadsResolve: ['Trường Khải ám sát + bắt cóc Tiểu Đào'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC tiếp quản quyền lực Cố tộc lâm thời — KHÔNG paranoia, MC tự tin.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: MC tiếp quản quyền lực Cố tộc lâm thời — KHÔNG paranoia, MC tự tin.'],
   },
   {
     n: 35, beat: 'resolution',
@@ -550,7 +551,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     ],
     mcBenefit: '5000 linh thạch + sách kỹ năng cấp A + 3 viên Phượng Linh Đan + Linh Tinh Ngọc cấp B (tài nguyên CỰC lớn), kho di sản tổ phụ phần niêm phong sâu (đột phá), Linh Tinh Ngọc tăng 50% tốc độ Vạn Linh Phổ (skill upgrade lớn), Tro Bụi Phượng Linh C tiến độ 60% (path to climax)',
     threadsAdvance: ['phục hưng gia tộc', 'đoạt thừa kế'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC + 3 pet phòng kín đêm — yên tĩnh tích cực.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: MC + 3 pet phòng kín đêm — yên tĩnh tích cực.'],
   },
   // ─── Sub-arc 8 (ch.36-40): Bằng chứng cuối cùng + cuộc họp đại trưởng lão ─
   {
@@ -568,7 +569,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     mcBenefit: 'manh mối biển thủ Cố Lâm + Cố Hảo (chứng cứ + leverage), kế hoạch face-slap đại trưởng lão (setup-payoff), Tro Bụi Phượng Linh C 70% (path to climax)',
     threadsAdvance: ['phục hưng gia tộc', 'đoạt thừa kế'],
     newThreads: ['Cố Lâm + Cố Hảo biển thủ minor'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC + 3 pet phòng kín — feed yên tĩnh.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: MC + 3 pet phòng kín — feed yên tĩnh.'],
   },
   {
     n: 37, beat: 'breathing',
@@ -585,7 +586,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     ],
     mcBenefit: 'Tro Linh Phái 25 + em gái kỹ năng group combat (skill expand), em gái Tiểu Đào talent feed lộ (manh mối future), Tro Bụi 80% Phượng Linh C (path to climax), tin đại trưởng lão đến 5 ngày (thông tin)',
     threadsAdvance: ['phục hưng gia tộc'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC + 3 pet phòng kín đêm — feed yên tĩnh.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: MC + 3 pet phòng kín đêm — feed yên tĩnh.'],
   },
   {
     n: 38, beat: 'confront',
@@ -604,7 +605,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     mcBenefit: 'Cố Lâm + Cố Hảo bồi hoàn 1800 linh thạch + 1 pet C + bị cảnh cáo (tài nguyên + face-slap nhẹ), uy tín hội đồng tăng tiếp (uy tín)',
     threadsAdvance: ['phục hưng gia tộc', 'đoạt thừa kế'],
     threadsResolve: ['Cố Lâm + Cố Hảo biển thủ minor'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC + Già Tâm thảo luận đại trưởng lão — KHÔNG paranoia.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: MC + Già Tâm thảo luận đại trưởng lão — KHÔNG paranoia.'],
   },
   {
     n: 39, beat: 'big_wow',
@@ -622,7 +623,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     ],
     mcBenefit: 'Tro Bụi Phượng Linh Cấp C (đột phá pet level + pet đầu tiên C), kỹ năng Phượng Linh Hỏa AOE + Phượng Linh Hồi Phục (skill cực lớn), pet portfolio C + D + E (skill expand), kế hoạch show B+ tại đại trưởng lão (setup-payoff)',
     threadsAdvance: ['Vạn Linh Phổ tuyến tiến hóa expand', 'phục hưng gia tộc'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC + Phượng Linh trong phòng kín đêm — yên tĩnh tích cực.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: MC + Phượng Linh trong phòng kín đêm — yên tĩnh tích cực.'],
   },
   {
     n: 40, beat: 'resolution',
@@ -639,7 +640,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     ],
     mcBenefit: 'pet portfolio Phượng Linh C + Cơ Khí Vũ Sĩ D + Lục Vũ E (60%) (skill expand stable), Tro Linh Phái 25 + em gái + Vân Kiếm trung thành (network institutional), Già Tâm + Hà Thúc tin tưởng tối đa (quan hệ), chuẩn bị đại trưởng lão (setup-payoff)',
     threadsAdvance: ['phục hưng gia tộc', 'đoạt thừa kế'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC + 3 pet phòng kín đêm — yên tĩnh tích cực.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: MC + 3 pet phòng kín đêm — yên tĩnh tích cực.'],
   },
   // ─── Sub-arc 9 (ch.41-45): Trường Khải bắt cóc Tiểu Đào — climax setup ───
   {
@@ -658,7 +659,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     mcBenefit: 'manh mối Lý thị đợt cuối + 6 cao thủ (thông tin cực lớn), kế hoạch bẫy ngược lần 2 (setup-payoff), em gái an toàn ở phòng tu luyện cũ (bảo vệ family), Già Tâm tham gia phục kích đối phó Trung Cấp (quan hệ + skill)',
     threadsAdvance: ['đoạt thừa kế'],
     newThreads: ['Lý thị đợt cuối cùng — 6 cao thủ'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC + em gái + 3 pet phòng tu luyện cũ — yên tĩnh, KHÔNG paranoia.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: MC + em gái + 3 pet phòng tu luyện cũ — yên tĩnh, KHÔNG paranoia.'],
   },
   {
     n: 42, beat: 'breathing',
@@ -674,7 +675,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     ],
     mcBenefit: 'kỹ năng "Linh Tinh Khoá" cấp B từ Già Tâm (skill upgrade lớn), 3 nhánh trưởng kỹ năng nâng cao (skill expand), Vân Kiếm Phong + Lôi Hợp Bích cấp B (skill upgrade), kế hoạch chi tiết phục kích đợt cuối',
     threadsAdvance: ['Lý thị đợt cuối cùng — 6 cao thủ'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC + em gái + 3 pet phòng tu luyện cũ — yên tĩnh.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: MC + em gái + 3 pet phòng tu luyện cũ — yên tĩnh.'],
   },
   {
     n: 43, beat: 'confront',
@@ -695,7 +696,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     ],
     mcBenefit: 'thắng 5 cao thủ Sơ Cấp + đánh đuổi 1 cao thủ Trung Cấp với hỗ trợ Già Tâm (face-slap đối thủ + skill validate), 5 cao thủ Sơ Cấp Lý thị + 5 pet Sơ Cấp giam (chứng cứ + tài nguyên), Già Tâm + MC phối hợp thành công (quan hệ đỉnh), bảo vệ em gái lần 2 thành công (family safe)',
     threadsAdvance: ['Lý thị đợt cuối cùng — 6 cao thủ'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC + Già Tâm + 5 cao thủ giam — chuẩn bị cuộc họp đại trưởng lão.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: MC + Già Tâm + 5 cao thủ giam — chuẩn bị cuộc họp đại trưởng lão.'],
   },
   {
     n: 44, beat: 'big_wow',
@@ -715,7 +716,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     mcBenefit: 'Trường Khải bị tử hình theo gia pháp (đột phá quyền lực CỰC LỚN — kẻ thù chính arc 1 hết), MC chính thức trưởng tộc lâm thời tuyệt đối (uy tín tối thượng), 5 cao thủ Sơ Cấp Lý thị giam + chứng cứ (chứng cứ + leverage cho arc 2), tin lan Linh Châu Thành (uy tín thành)',
     threadsAdvance: ['phục hưng gia tộc', 'đoạt thừa kế'],
     threadsResolve: ['Lý thị đợt cuối cùng — 6 cao thủ', 'Trường Khải antagonist arc 1'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC + 28 thành viên Tro Linh Phái + Già Tâm bữa tối tinh thần phục hưng — yên tĩnh tích cực.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: MC + 28 thành viên Tro Linh Phái + Già Tâm bữa tối tinh thần phục hưng — yên tĩnh tích cực.'],
   },
   {
     n: 45, beat: 'resolution',
@@ -733,7 +734,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     ],
     mcBenefit: 'Lục Vũ Phong Yến Cấp E (đột phá pet level + pet thứ 3 cấp E), pet portfolio đủ 3 cấp (C + D + E), Già Tâm pre-commit hỗ trợ đại trưởng lão (quan hệ), tin về Cố Trường Hành đại trưởng lão (thông tin), em gái về phòng riêng (family safe)',
     threadsAdvance: ['phục hưng gia tộc', 'đoạt thừa kế'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC + 3 pet phòng kín đêm — yên tĩnh tích cực.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: MC + 3 pet phòng kín đêm — yên tĩnh tích cực.'],
   },
   // ─── Sub-arc 10 (ch.46-50): CLIMAX arc 1 — đoạt trưởng tộc + vào kho di sản ─
   {
@@ -753,7 +754,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     mcBenefit: 'đại trưởng lão Cố Trường Hành đến (path to climax), uy tín nội tộc tăng (đại trưởng lão dự cuộc họp), thông tin về Cố Trường Hành Cao Cấp tầng 3 + pet A (thông tin), Già Tâm pre-commit ủng hộ (quan hệ)',
     threadsAdvance: ['phục hưng gia tộc', 'đoạt thừa kế'],
     newThreads: ['Cố Trường Hành đại trưởng lão chủ trì'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: bữa ăn welcome — yên tĩnh tích cực.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: bữa ăn welcome — yên tĩnh tích cực.'],
   },
   {
     n: 47, beat: 'breathing',
@@ -770,7 +771,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     ],
     mcBenefit: 'thử thách công khai chính thức (path to climax), Cố Lâm Tử đại biểu Sơ Cấp peak (thông tin đối thủ), kế hoạch show Phượng Linh kìm chế B (setup-payoff), Phượng Linh Hỏa Phụng Tế A path start (skill expand)',
     threadsAdvance: ['phục hưng gia tộc', 'đoạt thừa kế'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC + Phượng Linh phòng kín đêm — yên tĩnh.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: MC + Phượng Linh phòng kín đêm — yên tĩnh.'],
   },
   {
     n: 48, beat: 'confront',
@@ -789,7 +790,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     ],
     mcBenefit: 'thử thách công khai pass (path to climax đỉnh), Phượng Linh kìm chế B thắng pet C peak (face-slap đối thủ public), 5 trưởng lão Cố tộc Linh Châu khác chứng kiến (uy tín thành), pre-công nhận trưởng tộc (uy tín tối thượng)',
     threadsAdvance: ['phục hưng gia tộc', 'đoạt thừa kế'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC + Phượng Linh trở về phòng kín — yên tĩnh tích cực.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: MC + Phượng Linh trở về phòng kín — yên tĩnh tích cực.'],
   },
   {
     n: 49, beat: 'big_wow',
@@ -809,7 +810,7 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     mcBenefit: 'CỐ DIỆP CHÍNH THỨC TRƯỞNG TỘC CỐ TỘC LINH CHÂU THÀNH SUB-BRANCH (uy tín tối thượng), ấn trưởng tộc + chìa khóa kho di sản tổ phụ phần niêm phong toàn bộ (vật phẩm + đột phá), đại trưởng lão Cố Trường Hành đặc biệt khen (quan hệ), tin Cố tộc trưởng tộc trẻ lan Linh Châu Thành (uy tín thành)',
     threadsAdvance: ['phục hưng gia tộc'],
     threadsResolve: ['đoạt thừa kế', 'Cố Trường Hành đại trưởng lão chủ trì'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: MC + ấn trưởng tộc + chìa khóa — yên tĩnh tích cực, tinh thần phục hưng đỉnh.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: MC + ấn trưởng tộc + chìa khóa — yên tĩnh tích cực, tinh thần phục hưng đỉnh.'],
   },
   {
     n: 50, beat: 'resolution',
@@ -832,6 +833,6 @@ export const ARC1_BRIEFS_CH6_50: ChapterBrief[] = [
     threadsAdvance: ['phục hưng gia tộc', 'di tích cổ Bắc Vực', 'cánh cửa Vạn Linh Phổ', 'bố Cố Hành Bắc Vực mất tích'],
     threadsResolve: ['Lý thị đợt cuối cùng — 6 cao thủ'],
     newThreads: ['tổ phụ Cố Lập Khải xuyên hồn Trái Đất 1000 năm', 'Vạn Linh Phổ origin Trái Đất'],
-    risks: [BAN_BASE, TONE_LAO_LUC, 'END: arc 1 hoàn thành — MC + 3 pet phòng kín đêm — yên tĩnh tích cực.'],
+    risks: [BAN_BASE, BAN_RESOURCES, TONE_LAO_LUC, 'END: arc 1 hoàn thành — MC + 3 pet phòng kín đêm — yên tĩnh tích cực.'],
   },
 ];
