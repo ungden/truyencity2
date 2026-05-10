@@ -37,36 +37,12 @@
  *   Vạn Linh Phổ origin: revealed arc 6 (ch.750-800) — tổ phụ Cố Lập Khải xuyên hồn từ Trái Đất ngàn năm trước.
  */
 
-export type BeatType = 'setup' | 'breathing' | 'confront' | 'big_wow' | 'resolution';
+// Re-export shared types so existing arc-1-detail import keeps working.
+export type { BeatType, ChapterBrief, SubArc, ArcSkeleton } from '../../src/services/story-engine/blueprint/types';
 
-export interface ChapterBrief {
-  n: number;
-  beat: BeatType;
-  brief: string;
-  scenes: string[];
-  mcBenefit: string;
-  threadsAdvance?: string[];
-  threadsResolve?: string[];
-  newThreads?: string[];
-  risks?: string[];
-}
+import type { ArcSkeleton as ArcSkeletonType } from '../../src/services/story-engine/blueprint/types';
 
-export interface SubArc {
-  number: number;
-  range: [number, number];
-  theme: string;
-  payoff: string;
-}
-
-export interface ArcSkeleton {
-  arcNumber: number;
-  range: [number, number];
-  theme: string;
-  corePayoff: string;
-  subArcs: SubArc[];
-}
-
-export const VAN_LINH_PHO_ARC_SKELETON: ArcSkeleton[] = [
+export const VAN_LINH_PHO_ARC_SKELETON: ArcSkeletonType[] = [
   // ─── ARC 1 (ch.1-50): Phục hưng nội tộc ─────────────────────────────────
   {
     arcNumber: 1,
@@ -196,18 +172,5 @@ export const VAN_LINH_PHO_ARC_SKELETON: ArcSkeleton[] = [
   },
 ];
 
-/**
- * Universal canon block enforced on EVERY chapter brief.
- * Banned patterns auto-injected as `risks` array on each brief by sync script.
- */
-export const UNIVERSAL_BANNED_PATTERNS: string[] = [
-  'CẤM cliffhanger "có người theo dõi/rình mò/biết bí mật MC" — MC lão lục TỰ TIN, KHÔNG paranoid',
-  'CẤM cliffhanger "kẻ lạ/thế lực ngoài đột nhiên đến tìm MC" trừ khi blueprint ghi rõ',
-  'CẤM "MC chõ mồm bênh người lạ ngẫu nhiên" — MC chỉ can thiệp khi đạt 1 trong 5 lợi ích (resource/network/info/setup-payoff/family-faction)',
-  'CẤM tone paranoia tổng quát — tone MC lạnh đạm + tự tin + tính toán',
-  'CẤM pet evolve công khai trước người khác — pet evolution PHẢI trong phòng kín hậu sơn dưới gốc bồ đề (phòng tu luyện cũ tổ phụ)',
-  'CẤM em gái Cố Tiểu Đào / quản gia Hà Thúc / đệ tử trẻ biết về Vạn Linh Phổ',
-  'CẤM "feed cường hóa rủi ro cao" — MC lão lục thường tránh rủi ro, chỉ làm khi 100% chắc',
-  'CẤM lặp scene đã có (ví dụ: pet Tro Bụi đã evolve Lửa Tro ở ch.4-5, KHÔNG re-evolve trong chương sau)',
-  'CẤM cosmic-tier antagonist trước arc 6 (ch.701+)',
-];
+// UNIVERSAL_BANNED_PATTERNS moved to src/services/story-engine/blueprint/universal-bans.ts.
+// Per-novel extras live in blueprints/van-linh-pho/index.ts under extraBannedPatterns.

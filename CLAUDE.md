@@ -176,6 +176,52 @@ All admin/internal API routes require auth:
 
 ## Common Tasks
 
+### Tạo Novel Mới (Blueprint Workflow — BẮT BUỘC từ 2026-05-10)
+
+Mọi novel ≥1000 chương target PHẢI dùng blueprint pre-plan approach.
+Tác giả (Claude/Codex) plan toàn bộ chương trước khi AI viết bất kỳ
+chương nào. Drift impossible.
+
+**Vị trí:**
+- Generic infrastructure: `src/services/story-engine/blueprint/`
+- Per-novel blueprints: `blueprints/<novel-id>/`
+- Runbook: `src/services/story-engine/blueprint/README.md`
+
+**Workflow tóm tắt** (full ở README):
+1. Design focus preset (`src/services/story-engine/codex-automation/focus-presets.ts`)
+2. Plan blueprint:
+   - `blueprints/<novel-id>/arc-skeleton.ts` — 7+ arcs × sub-arcs
+   - `blueprints/<novel-id>/arc-N-detail.ts` — chapter briefs (5-7 lines each)
+   - `blueprints/<novel-id>/index.ts` — `NovelBlueprint` export
+3. Spawn DB rows (`scripts/spawn-novel.ts` hoặc novel-specific spawn)
+4. **Cover via Codex CLI** — `npm run codex:automation -- prepare-cover --novel-id=X`
+   → `codex exec "..."` → `apply-cover --apply`
+5. Sync blueprint to arc_plans:
+   ```bash
+   PROJECT_ID=<uuid> BLUEPRINT=<novel-id> npx tsx scripts/sync-blueprint.ts
+   ```
+6. Manual write ch.1-3 (`scripts/write-chapter-flash.ts`) + audit deep
+   per chapter — đọc FULL content, không peek 500 chars
+7. Promote sang cron — add project vào `FOCUSED_PROJECT_IDS` Vercel env
+
+**Chapter brief shape** (xem types.ts):
+```ts
+{
+  n: 6, beat: 'breathing',
+  brief: 'one-line goal',
+  scenes: ['scene 1', ...],   // 4-7 phrases
+  mcBenefit: 'concrete benefit (tài nguyên/uy tín/manh mối/network/...)',
+  threadsAdvance, threadsResolve, newThreads,  // optional
+  risks: ['CẤM pattern X for this chapter'],   // optional
+}
+```
+
+5-cluster pattern: setup / breathing / confront / big_wow / resolution.
+
+**Universal bans** (`universal-bans.ts`) auto-injected vào sceneDirection
+mỗi chương. Catch default AI drift: paranoia cliffhanger, MC chõ mồm,
+double-evolve, cosmic-tier antagonist quá sớm.
+
 ### Them Feature Moi vao Chapter Writer
 
 1. **Update types.ts** - Them field vao interface neu can
