@@ -18,4 +18,3 @@ describe('getVietnamDayBounds', () => {
     expect(bounds.startIso).toBe('2026-05-08T17:00:00.000Z');
   });
 });
-

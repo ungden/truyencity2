@@ -46,7 +46,7 @@ import type {
 } from '../types';
 import type { SceneType, VocabularyGuide } from '../templates/style-bible';
 import { VN_PLACE_LOCK, ARCHITECT_SYSTEM, WRITER_SYSTEM, CRITIC_SYSTEM } from './chapter-writer-prompts';
-import { cleanContent, extractTitle, synthesizeFallbackCliffhanger, hasCliffhangerSignal, analyzeQualitySignals, buildSignalReport, countWords, detectHardFallback, detectMcNameFlip, detectSevereRepetition, buildRepetitionReport, generateMinimalScenes, loadConstraintSection, type QualitySignals } from './chapter-writer-helpers';
+import { cleanContent, extractTitle, synthesizeFallbackCliffhanger, hasCliffhangerSignal, analyzeQualitySignals, buildSignalReport, countWords, detectHardFallback, detectMcNameFlip, detectSevereRepetition, buildRepetitionReport, generateMinimalScenes, loadConstraintSection, safeStringTrim, type QualitySignals } from './chapter-writer-helpers';
 
 
 // ── Write Chapter ────────────────────────────────────────────────────────────
@@ -482,7 +482,7 @@ Trả về JSON ChapterOutline đúng schema phía trên cho CHƯƠNG ${chapterN
   // Only synthesize fallback IF outline has no cliffhanger AND chapter doesn't have an
   // intentional emotional/reveal/comfort ending. Modern guidance (P0.1 cliffhanger detoxify):
   // emotional/reveal/comfort endings are valid alternatives for breathing/aftermath/comedic chapters.
-  if (!options?.isFinalArc && !parsed.cliffhanger?.trim()) {
+  if (!options?.isFinalArc && !safeStringTrim(parsed.cliffhanger)) {
     // Check emotional arc closing intent — if intentionally calm/resolution, skip synthesis
     const closingIntent = (parsed.emotionalArc?.closing || '').toLowerCase();
     const isIntentionalSoftEnding = /resolution|aftermath|breath|peace|reflection|comfort|warm|reveal|seed/.test(closingIntent);
@@ -1308,12 +1308,32 @@ KIỂM TRA CANON & STATE (Phase 27/28 — xem các block trong context có sẵn
         const expectedCharacters = (outline.scenes || [])
           .flatMap(s => s.characters || [])
           .filter(Boolean);
+
+        // Phase 30 G7 — pull antagonist_schedule from master_outline so the
+        // antagonist-scale gate can verify whether a major-tier marker has
+        // pre-planned justification for this chapter index.
+        let antagonistSchedule: Array<{ ch: number; tier: string }> | undefined;
+        try {
+          const { getSupabase } = await import('../utils/supabase');
+          const db = getSupabase();
+          const { data: row } = await db
+            .from('ai_story_projects')
+            .select('master_outline')
+            .eq('id', projectId)
+            .maybeSingle();
+          const mo = row?.master_outline as { antagonist_schedule?: Array<{ ch: number; tier: string }> } | null;
+          if (mo?.antagonist_schedule && Array.isArray(mo.antagonist_schedule)) {
+            antagonistSchedule = mo.antagonist_schedule;
+          }
+        } catch { /* non-fatal — gate falls back to empty schedule */ }
+
         const canonIssues = await enforceCanonGates({
           projectId,
           chapterNumber: outline.chapterNumber,
           content,
           protagonistName: protagonistName || 'MC',
           expectedCharacters: [...new Set(expectedCharacters)],
+          antagonistSchedule,
           // expectedPov: project may set this in style_directives.pov in future
         });
         if (canonIssues.length > 0) {

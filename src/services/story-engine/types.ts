@@ -95,8 +95,6 @@ export interface StyleDirectives {
   flash_routine_extend_on_short?: boolean;
   /** Max cheap continuation passes for undershot routine chapters. Defaults to 2. */
   flash_routine_max_extensions?: number;
-  /** Keep weak hook as a hard blocker after retries. Defaults to false for long cheap routine runs. */
-  flash_routine_hard_block_weak_hook?: boolean;
   /** Cheapest stable routine path: compact DB brief + one DS Flash thinking writer call + deterministic hard gates. */
   flash_bulk_cheap_mode?: boolean;
   /** Maximum compact routine context size in characters. Defaults to 32000. */
@@ -111,6 +109,10 @@ export interface StyleDirectives {
   flash_bulk_critic_cadence?: number;
   /** Force cheap mode even near the final arc. Use only for experiments. */
   flash_bulk_force_all?: boolean;
+  /** Focus preset key used by Codex/cron director flows. */
+  focus_key?: string | null;
+  /** Optional per-project routine writer instructions appended to compact Flash prompts. */
+  routine_prompt_context?: string;
   /** Enable DeepSeek V4 thinking mode for selected story-engine calls. */
   deepseek_thinking_enabled?: boolean;
   /** DeepSeek V4 thinking effort. API maps low/medium to high; supported useful values are high/max. */

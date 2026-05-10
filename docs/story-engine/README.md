@@ -32,6 +32,7 @@ Key innovations (2026-04-30 quality rebuild):
 |---|---|---|
 | [`README.md`](./README.md) | This index — bắt đầu từ đây | Always |
 | [`PLACEHOLDER_CONVENTION.md`](./PLACEHOLDER_CONVENTION.md) | **Convention `<MC>`/`<LOVE>`/`<CITY>` + enforcement runbook (lint:prompts)** | Trước khi sửa voice anchors / templates / prompts |
+| [`FOCUSED_STORY_PRODUCTION_RUNBOOK.md`](./FOCUSED_STORY_PRODUCTION_RUNBOOK.md) | **Runbook thêm bộ truyện mới chạy song song bằng DS Flash cron rẻ** | Khi tạo focus key/project mới, sửa cron focus env, hoặc debug bộ mới không viết tiếp |
 | [`QUALITY_REBUILD.md`](./QUALITY_REBUILD.md) | **Research synthesis + 16-genre patterns + 4-version evolution log** | Khi mở rộng/debug quality, thêm genre, hoặc audit per-genre |
 | [`QUALITY_AUDIT_V1.md`](./QUALITY_AUDIT_V1.md) | Audit 2026-02 — sample chapters vs đại thần level (chapters 160-163) | Reference baseline: hệ thống đã từng tệ thế nào, fix nào đã apply |
 | [`LEGACY_STORY_FACTORY.md`](./LEGACY_STORY_FACTORY.md) | Legacy v1 architecture (`story-writing-factory/`) | Khi đụng v1 code paths (ai-editor, daily-spawn còn dùng v1) |
@@ -124,6 +125,7 @@ Các tài liệu root level (đã tồn tại trước rebuild) vẫn còn relev
 | Add new world rule per genre | [`templates/genre-process-blueprints.ts`](../../src/services/story-engine/templates/genre-process-blueprints.ts) → `setup.worldRulesFocus` |
 | Thêm scene type cho genre | [`templates/genre-process-blueprints.ts`](../../src/services/story-engine/templates/genre-process-blueprints.ts) → `sceneTypes` array |
 | Tune cron config (timeout, concurrency, cost cap) | [`src/app/api/cron/write-chapters/route.ts`](../../src/app/api/cron/write-chapters/route.ts) → top constants (line 36-72) |
+| Thêm bộ truyện mới chạy song song bằng cron rẻ | [`FOCUSED_STORY_PRODUCTION_RUNBOOK.md`](./FOCUSED_STORY_PRODUCTION_RUNBOOK.md) |
 | Add admin ops action | [`src/app/api/admin/operations/route.ts`](../../src/app/api/admin/operations/route.ts) → switch statement |
 | Verify seed blueprint compliance | [`seed-blueprint.ts`](../../src/services/story-engine/seed-blueprint.ts) → `validateSeedStructure()` |
 | Reset 10 novels test | [`scripts/rewrite-recent-10.ts`](../../scripts/rewrite-recent-10.ts) |
@@ -186,5 +188,5 @@ A: Check [`/admin`](../../src/app/admin/) → Production Report. Verify status='
 
 ---
 
-**Last Updated**: 2026-04-30
+**Last Updated**: 2026-05-10
 **Maintainer**: When you ship something story-engine related, update version log + cross-reference here.

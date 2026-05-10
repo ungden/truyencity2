@@ -44,4 +44,3 @@ describe('story production focus helper', () => {
     ]);
   });
 });
-

@@ -35,6 +35,42 @@ function validSongXuyenSetup() {
   };
 }
 
+function validThienDaoThuVienSetup() {
+  return {
+    genres: ['di-gioi'],
+    subGenres: ['viet-van-sang-the', 'nho-dao', 'thien-dao-luu', 'vo-dao'],
+    worldDescription: [
+      'Đại Diễn Giới là dị giới võ đạo nơi ai cũng là võ giả, từ tiểu thương đến học sinh đều luyện khí huyết và công pháp cơ sở.',
+      'Thiên Đạo Thư Viện treo trên chín tầng mây, công nhận Tác Gia qua Bạch Bút, Thanh Bút, Kim Bút, Tông Sư, Văn Thánh và Thiên Đạo Tác Gia.',
+      'Sách được đăng lên thư viện; độc giả đọc sách rồi nhập tâm vào cảnh truyện để lĩnh ngộ võ công, công pháp, thân pháp, trận pháp, kiếm ý và binh pháp.',
+      'Lâm Mặc xuyên qua với Vạn Văn Ký Ức, dùng kho văn minh Trái Đất gồm văn học, phim ảnh, game, thần thoại và lịch sử để tái cấu trúc bản thảo hợp luật Thiên Đạo.',
+      'Văn hóa viết sách bản địa còn sơ khai, đơn nhất, văn phong bản địa thiếu hấp dẫn nên bảng xếp hạng Tân Tác Gia dễ bị chấn động bởi kỹ thuật kể chuyện hiện đại.',
+      'Thiên Đạo phát điểm công nhận, danh vọng, ấn ký tác phẩm, quyền đăng và thư bình độc giả cho mỗi tác phẩm có người lĩnh ngộ.',
+    ].join('\n'),
+    setupKernel: {
+      readerFantasy: 'Lâm Mặc dùng văn minh Trái Đất và kỹ thuật kể chuyện để làm Tác Gia được Thiên Đạo Thư Viện công nhận, khiến độc giả lĩnh ngộ võ đạo rồi trả lại danh vọng và tài nguyên.',
+      protagonistEngine: 'MC thắng bằng Vạn Văn Ký Ức, chọn đúng tác phẩm, dị giới hóa bản thảo, đọc phản ứng độc giả và leo bảng Tân Tác Gia thay vì đánh nhau kéo dài.',
+      pleasureLoop: ['chọn template Trái Đất', 'viết bản thảo hợp luật', 'đăng Thiên Đạo Thư Viện', 'độc giả nhập tâm lĩnh ngộ', 'bảng xếp hạng đổi', 'MC nhận điểm công nhận'],
+    },
+    masterOutline: {
+      arcs: [
+        { name: 'Bạch Bút chấn động', range: '1-50', payoff: 'Anh Hùng Xạ Điêu/Tam Quốc style giúp độc giả ngộ chưởng pháp, kiếm ý, binh pháp' },
+        { name: 'Tân Tác Gia leo bảng', range: '51-150', payoff: 'Lâm Mặc có bút danh, thư bình và quyền đăng cấp cao' },
+      ],
+    },
+    storyOutline: {
+      premise: 'Tác Gia là VIP của võ đạo vì tác phẩm được Thiên Đạo Thư Viện công nhận có thể sinh võ học cho độc giả.',
+      ledgers: ['tác phẩm đang viết', 'độc giả lĩnh ngộ', 'võ học phát sinh', 'danh vọng Thiên Đạo', 'bảng xếp hạng'],
+      ladder: ['Bạch Bút', 'Thanh Bút', 'Kim Bút', 'Tông Sư', 'Văn Thánh', 'Thiên Đạo Tác Gia'],
+    },
+    arcPlan: [
+      { chapter: 1, goal: 'Lâm Mặc đăng hồi đầu tiên', conflict: 'văn phong bản địa coi thường người mới', payoff: 'độc giả đầu tiên nhập tâm và ngộ chưởng pháp', hook: 'bảng Tân Tác Gia nhảy hạng' },
+      { chapter: 20, goal: 'mở tuyến kiếm hiệp', conflict: 'Tác Gia cũ chê truyện quá nhiều nhân vật', payoff: 'độc giả ngộ kiếm ý', hook: 'Thiên Đạo cấp ấn ký Thanh Bút' },
+      { chapter: 60, goal: 'mở binh pháp chiến tranh', conflict: 'học viện võ đạo tranh quyền diễn giải', payoff: 'faction quân viện xin quyền đọc', hook: 'bút danh của MC bị săn tìm' },
+    ],
+  };
+}
+
 describe('focus presets', () => {
   it('selects the song-xuyen-trade genre/subgenre preset', () => {
     const preset = getFocusPreset('song-xuyen-trade');
@@ -52,9 +88,38 @@ describe('focus presets', () => {
     expect(template.focusKey).toBe('song-xuyen-trade');
   });
 
+  it('accepts the thien-dao-thu-vien focus preset', () => {
+    const preset = getFocusPreset('thien-dao-thu-vien');
+    expect(preset).toMatchObject({
+      primaryGenre: 'di-gioi',
+      subGenres: ['viet-van-sang-the', 'nho-dao', 'thien-dao-luu', 'vo-dao'],
+    });
+    expect(buildFocusPresetContext('thien-dao-thu-vien')).toContain('Thiên Đạo Thư Viện');
+    expect(applyFocusPresetTemplate({ genres: ['do-thi'], coverPrompt: '' }, 'thien-dao-thu-vien').focusKey).toBe('thien-dao-thu-vien');
+  });
+
   it('passes a setup with two worlds, trade, logistics, inventory and world-state drift', () => {
     const report = validateFocusPresetStorySetup(validSongXuyenSetup(), 'song-xuyen-trade');
     expect(report.verdict).toBe('pass');
+  });
+
+  it('passes a thien-dao-thu-vien setup with author, library, reader enlightenment and martial ladders', () => {
+    const report = validateFocusPresetStorySetup(validThienDaoThuVienSetup(), 'thien-dao-thu-vien');
+    expect(report.verdict).toBe('pass');
+  });
+
+  it('rejects thien-dao-thu-vien setup missing library/author/reader enlightenment', () => {
+    const report = validateFocusPresetStorySetup({
+      ...validThienDaoThuVienSetup(),
+      worldDescription: 'Lâm Mặc xuyên qua một dị giới rộng lớn rồi nhờ may mắn mạnh dần trong võ đạo.',
+      setupKernel: { readerFantasy: 'MC mạnh dần', protagonistEngine: 'may mắn', pleasureLoop: ['gặp chuyện', 'thắng', 'nhận thưởng', 'đi tiếp'] },
+      storyOutline: { premise: 'phiêu lưu' },
+      masterOutline: { arcs: [{ name: 'phiêu lưu' }] },
+      arcPlan: [{ chapter: 1, summary: 'khởi đầu' }],
+    }, 'thien-dao-thu-vien');
+    expect(report.verdict).toBe('revise');
+    expect(report.issues.some((issue) => issue.code === 'focus_missing_heavenly_library')).toBe(true);
+    expect(report.issues.some((issue) => issue.code === 'focus_missing_reader_enlightenment')).toBe(true);
   });
 
   it('rejects setup missing the trade/world-state/inventory ladder', () => {
@@ -144,6 +209,48 @@ describe('focus presets', () => {
       }],
     });
     expect(validateFocusPresetContinuity(payload, 'song-xuyen-trade').verdict).toBe('pass');
+  });
+
+  it('passes thien-dao-thu-vien continuity when publication causes reader enlightenment and reputation payoff', () => {
+    const payload = parseContinuityExtractionPayload({
+      summary: 'Lâm Mặc đăng hồi đầu của Sơn Hà Xạ Nhật lên Thiên Đạo Thư Viện, khiến độc giả nhập tâm vào cảnh thiếu niên kéo cung và lĩnh ngộ Phá Vân Chưởng.',
+      openingSentence: 'Chuông đồng của Thiên Đạo Thư Viện vang đúng lúc Lâm Mặc đặt bút xuống.',
+      mcState: 'Lâm Mặc từ Bạch Bút vô danh nhận điểm công nhận đầu tiên, danh vọng tăng và có quyền đăng hồi tiếp theo.',
+      cliffhanger: 'Bảng Tân Tác Gia nhảy tên Lâm Mặc lên vị trí thứ chín mươi chín.',
+      readerPayoff: {
+        tradeDividend: 'Lâm Mặc nhận điểm công nhận, danh vọng Bạch Bút và thư bình đầu tiên từ độc giả.',
+        progressionDelta: 'Tác phẩm đầu tiên sinh ra võ học Phá Vân Chưởng, chứng minh Vạn Văn Ký Ức có thể tạo tác phẩm hợp luật Thiên Đạo.',
+        comfortOrSwaggerBeat: 'Tác Gia cũ vừa chê văn phong nhiều tuyến đã thấy độc giả thật sự lĩnh ngộ.',
+        nextProfitHook: 'Bảng Tân Tác Gia mở cửa cho hồi tiếp theo và kéo học viện võ đạo chú ý.',
+      },
+      characters: [{ characterName: 'Lâm Mặc', status: 'alive' }],
+      itemEvents: [{ characterName: 'Lâm Mặc', itemName: 'Sơn Hà Xạ Nhật', eventType: 'mentioned', description: 'Tác phẩm đầu tiên được đăng lên Thiên Đạo Thư Viện.', importance: 90 }],
+      economicLedger: [{ entityName: 'Lâm Mặc', assets: ['điểm công nhận', 'danh vọng Bạch Bút', 'quyền đăng hồi tiếp'], deltaSummary: 'Thiên Đạo công nhận tác phẩm đầu tiên và trao điểm công nhận.', cashEstimate: null, monthlyRevenue: null, teamSize: 0 }],
+      plotThreads: [{ name: 'Sơn Hà Xạ Nhật mở màn', description: 'Tác phẩm kiếm hiệp/binh pháp đầu tiên của Lâm Mặc bắt đầu kéo độc giả nhập tâm.', priority: 'main', status: 'developing', relatedCharacters: ['Lâm Mặc'], importance: 80 }],
+      worldStateDeltas: [{ worldName: 'Thiên Đạo Thư Viện', deltaType: 'culture', description: 'Một tác phẩm nhiều tuyến đầu tiên tạo lĩnh ngộ Phá Vân Chưởng cho độc giả.', pressureChange: 'văn đàn sơ khai bị chấn động', relatedResources: ['Phá Vân Chưởng', 'điểm công nhận'] }],
+      factions: [{ factionName: 'Bảng Tân Tác Gia', factionType: 'guild', powerLevel: 60, description: 'Bảng xếp hạng ghi nhận tên Lâm Mặc sau lượt đọc đầu tiên.', alliances: [], rivalries: [], status: 'active', importance: 70 }],
+    });
+    expect(validateFocusPresetContinuity(payload, 'thien-dao-thu-vien').verdict).toBe('pass');
+  });
+
+  it('blocks thien-dao-thu-vien continuity when publication lacks reader/skill/reputation ledgers', () => {
+    const payload = parseContinuityExtractionPayload({
+      summary: 'Lâm Mặc đăng một tác phẩm mới lên Thiên Đạo Thư Viện rồi chờ đợi.',
+      openingSentence: 'Lâm Mặc mở cửa thư viện.',
+      mcState: 'Lâm Mặc vẫn là người mới chưa có phản hồi rõ.',
+      cliffhanger: 'Một ánh sáng lạ hiện lên.',
+      characters: [{ characterName: 'Lâm Mặc', status: 'alive' }],
+      itemEvents: [],
+      economicLedger: [],
+      plotThreads: [],
+      worldStateDeltas: [],
+      factions: [],
+    });
+    const report = validateFocusPresetContinuity(payload, 'thien-dao-thu-vien');
+    expect(report.verdict).toBe('block');
+    expect(report.issues.some((issue) => issue.code === 'focus_work_delta_missing')).toBe(true);
+    expect(report.issues.some((issue) => issue.code === 'focus_reader_reaction_missing')).toBe(true);
+    expect(report.issues.some((issue) => issue.code === 'focus_skill_delta_missing')).toBe(true);
   });
 
   it('requires a visible trade/progression dividend for song-xuyen chapters', () => {

@@ -1,7 +1,7 @@
 import type { ContinuityExtractionPayload } from './contract';
 import type { GenreType } from '../types';
 
-export type FocusKey = 'song-xuyen-trade' | 'sang-the-than-minh';
+export type FocusKey = 'song-xuyen-trade' | 'sang-the-than-minh' | 'thien-dao-thu-vien';
 export type FocusPresetVerdict = 'pass' | 'revise' | 'block';
 
 export interface FocusPreset {
@@ -39,6 +39,53 @@ interface StorySetupForFocusPreset {
 }
 
 export const FOCUS_PRESETS: Record<FocusKey, FocusPreset> = {
+  'thien-dao-thu-vien': {
+    key: 'thien-dao-thu-vien',
+    label: 'Thien Dao Thu Vien Author Progression',
+    primaryGenre: 'di-gioi',
+    subGenres: ['viet-van-sang-the', 'nho-dao', 'thien-dao-luu', 'vo-dao'],
+    mcArchetype: 'author-dao transmigrator with Earth cultural memory',
+    antiTropes: ['no_miserable_start', 'no_primitive_copy_paste', 'no_mc_combat_only', 'no_reader_payoff_missing', 'no_empty_ranking_reaction'],
+    promptContext: [
+      '[FOCUS PRESET: thien-dao-thu-vien]',
+      'Premise lock:',
+      '- MC xuyên qua Đại Diễn Giới, một dị giới võ đạo nơi ai cũng là võ giả, nhưng Tác Gia là tầng lớp VIP được Thiên Đạo Thư Viện công nhận.',
+      '- Tác Gia viết sách, đăng lên Thiên Đạo Thư Viện; độc giả đọc/nhập tâm/lĩnh ngộ để học võ công, công pháp, thân pháp, trận pháp, binh pháp hoặc ý cảnh.',
+      '- MC Lâm Mặc có kho văn minh Trái Đất: văn học, phim ảnh, game, thần thoại, lịch sử, kiếm hiệp, huyền huyễn và webnovel.',
+      '- Bàn tay vàng Vạn Văn Ký Ức tái cấu trúc tác phẩm/ký ức Trái Đất thành bản thảo hợp luật Thiên Đạo, có chi phí, độ tương thích độc giả, rủi ro hiểu sai và phản hồi danh vọng.',
+      '- Core fantasy là dùng kỹ thuật kể chuyện hiện đại + kho văn minh Trái Đất để nghiền ép văn phong sơ khai của bản địa, khiến thiên hạ đọc mê, ngộ đạo, leo bảng và công nhận MC.',
+      '- Mode Tác gia chủ đạo: MC thắng bằng sách, danh vọng, độc giả, Thiên Đạo công nhận và proxy võ học; võ đạo tự vệ chỉ tăng nhờ phản hồi độc giả, không biến thành thuần combat.',
+      '- Sảng văn cadence: setback ngắn, face-slap bằng tác phẩm/chương mới/bảng xếp hạng/phản ứng độc giả; mỗi chương phải có payoff hữu hình cho MC.',
+      '',
+      'Setup bắt buộc:',
+      '- Có Thiên Đạo Thư Viện như hạ tầng xuất bản/đánh giá/trao thưởng: bảng tân tác gia, điểm công nhận, ấn ký tác phẩm, quyền đăng, thư bình và reaction độc giả.',
+      '- Có ladder Tác Gia: Bạch Bút -> Thanh Bút -> Kim Bút -> Tông Sư -> Văn Thánh -> Thiên Đạo Tác Gia.',
+      '- Có cơ chế độc giả nhập tâm/lĩnh ngộ: tác phẩm nào sinh ra võ học/công pháp gì, ai đọc, phe nào phản ứng, danh vọng/tài nguyên nào quay về MC.',
+      '- Có văn hóa bản địa viết sách còn sơ khai, đơn tuyến, thiếu nhân vật/nhịp hồi hộp/plot twist, để MC có lợi thế kể chuyện chính đáng.',
+      '- Có ít nhất 3 dòng tác phẩm dài hạn: kiếm hiệp, chiến tranh/binh pháp, huyền huyễn/thần thoại, trinh thám võ đạo hoặc học viện pháp môn.',
+      '',
+      'Chapter continuity bắt buộc:',
+      '- Khi đăng chương/sách hoặc có độc giả lĩnh ngộ, continuity.json phải ghi tác phẩm đang viết, võ học/công pháp phát sinh, độc giả/faction phản ứng, danh vọng/tài nguyên Thiên Đạo và payoff cho MC.',
+      '- Không để tác phẩm tạo skill vô nguồn: phải có tác phẩm -> cảnh đọc/nhập tâm -> lĩnh ngộ -> phản ứng -> phần thưởng/danh vọng.',
+      '- Không copy thô tên/plot nguyên bản quá lộ; tác phẩm công bố trong dị giới phải dùng tên mới, địa danh mới, võ học mới. Chỉ được nhắc tên nguyên bản Trái Đất cực ngắn trong nội tâm/Vạn Văn Ký Ức nếu cần.',
+      '- Không kéo main khổ lâu; nếu bị nghi ngờ/chèn ép, phải có chương mới, bảng xếp hạng, thư bình hoặc độc giả ngộ võ phản đòn ngay trong window ngắn.',
+      '[/FOCUS PRESET]',
+    ].join('\n'),
+    coverPromptHints: [
+      'premium Chinese webnovel cover, young author in otherworld martial academy holding a glowing heavenly manuscript',
+      'behind him a celestial library of floating books, martial artists entering story illusions and learning sword energy',
+      'clear cool-neutral cinematic light, elegant ink-gold accents, crisp mobile thumbnail, 3:4 Vietnamese webnovel cover',
+    ],
+    requiredSetupKeywords: [
+      { code: 'heavenly_library', label: 'Thiên Đạo Thư Viện', keywords: ['thiên đạo thư viện', 'thư viện thiên đạo', 'thiên đạo', 'thư viện'] },
+      { code: 'author_class', label: 'Tác Gia VIP', keywords: ['tác gia', 'bạch bút', 'thanh bút', 'kim bút', 'văn thánh', 'thiên đạo tác gia'] },
+      { code: 'reader_enlightenment', label: 'độc giả nhập tâm/lĩnh ngộ', keywords: ['độc giả', 'nhập tâm', 'lĩnh ngộ', 'đọc sách', 'thư bình'] },
+      { code: 'martial_skills', label: 'võ đạo/công pháp', keywords: ['võ giả', 'võ đạo', 'võ công', 'công pháp', 'thân pháp', 'trận pháp', 'kiếm ý'] },
+      { code: 'earth_culture', label: 'kho văn minh Trái Đất', keywords: ['trái đất', 'văn minh trái đất', 'văn học', 'phim ảnh', 'game', 'thần thoại', 'kiếp trước'] },
+      { code: 'primitive_local_books', label: 'văn hóa viết sách sơ khai', keywords: ['sơ khai', 'đơn nhất', 'nhàm chán', 'thiếu hấp dẫn', 'văn phong bản địa'] },
+      { code: 'recognition_ladder', label: 'bảng xếp hạng/điểm công nhận', keywords: ['bảng xếp hạng', 'điểm công nhận', 'danh vọng', 'ấn ký', 'tân tác gia'] },
+    ],
+  },
   'sang-the-than-minh': {
     key: 'sang-the-than-minh',
     label: 'Sang The Than Minh World-Creation Progression',
@@ -130,7 +177,7 @@ export const FOCUS_PRESETS: Record<FocusKey, FocusPreset> = {
 };
 
 export function isFocusKey(value: string | undefined): value is FocusKey {
-  return value === 'song-xuyen-trade' || value === 'sang-the-than-minh';
+  return value === 'song-xuyen-trade' || value === 'sang-the-than-minh' || value === 'thien-dao-thu-vien';
 }
 
 export function getFocusPreset(focusKey: string | undefined): FocusPreset | null {
@@ -212,7 +259,7 @@ export function validateFocusPresetStorySetup(
       issues.push({
         code: `focus_missing_${group.code}`,
         severity: 'major',
-        message: `Song Xuyen setup must define ${group.label}: ${group.keywords.join(', ')}.`,
+        message: `${preset.label} setup must define ${group.label}: ${group.keywords.join(', ')}.`,
       });
     }
   }
@@ -262,6 +309,89 @@ export function validateFocusPresetContinuity(
         code: 'focus_species_progress_missing',
         severity: 'major',
         message: 'Sang The chapter should track species/dependent-race progress.',
+      });
+    }
+    const critical = issues.some((issue) => issue.severity === 'critical');
+    const major = issues.some((issue) => issue.severity === 'major');
+    return {
+      verdict: critical ? 'block' : major ? 'revise' : 'pass',
+      focusKey: preset.key,
+      issues,
+    };
+  }
+  if (preset.key === 'thien-dao-thu-vien') {
+    const text = normalize([
+      payload.summary,
+      payload.mcState,
+      payload.cliffhanger,
+      payload.readerPayoff?.tradeDividend || '',
+      payload.readerPayoff?.progressionDelta || '',
+      payload.readerPayoff?.comfortOrSwaggerBeat || '',
+      payload.readerPayoff?.nextProfitHook || '',
+      ...payload.itemEvents.map((entry) => `${entry.itemName} ${entry.eventType} ${entry.description || ''}`),
+      ...payload.economicLedger.map((entry) => `${entry.entityName} ${entry.assets.join(' ')} ${entry.deltaSummary} ${entry.notes || ''}`),
+      ...payload.plotThreads.map((entry) => `${entry.name} ${entry.description} ${entry.payoffDescription || ''}`),
+      ...(payload.worldStateDeltas || []).map((entry) => `${entry.worldName} ${entry.deltaType} ${entry.description} ${entry.pressureChange || ''} ${entry.relatedResources.join(' ')}`),
+      ...(payload.factions || []).map((entry) => `${entry.factionName} ${entry.description || ''}`),
+    ].join('\n'));
+    const hasPublishOrEnlightenment = hasAny(text, [
+      'thiên đạo thư viện',
+      'tác gia',
+      'đăng sách',
+      'đăng chương',
+      'bản thảo',
+      'tác phẩm',
+      'độc giả',
+      'nhập tâm',
+      'lĩnh ngộ',
+      'thư bình',
+      'bảng xếp hạng',
+      'điểm công nhận',
+    ]);
+    if (!hasPublishOrEnlightenment) return { verdict: 'pass', focusKey: preset.key, issues };
+
+    if (!hasAny(text, ['thiên đạo thư viện', 'tác gia', 'bạch bút', 'thanh bút', 'văn thánh', 'tân tác gia'])) {
+      issues.push({
+        code: 'focus_author_library_missing',
+        severity: 'major',
+        message: 'Thiên Đạo Thư Viện chapter should record the author/library institution affected by the event.',
+      });
+    }
+    const hasPersistedWorkDelta = payload.itemEvents.length > 0
+      || payload.plotThreads.some((entry) => hasAny(normalize(`${entry.name} ${entry.description}`), ['tác phẩm', 'bản thảo', 'sách', 'hồi truyện', 'sơn hà', 'loạn thế', 'cửu thiên', 'huyết án']));
+    if (!hasAny(text, ['tác phẩm', 'bản thảo', 'đăng sách', 'đăng chương', 'quyển', 'hồi truyện', 'ấn ký tác phẩm']) || !hasPersistedWorkDelta) {
+      issues.push({
+        code: 'focus_work_delta_missing',
+        severity: 'critical',
+        message: 'Publish/enlightenment chapter must name and persist the work or manuscript being written/published.',
+      });
+    }
+    if (!hasAny(text, ['độc giả', 'nhập tâm', 'lĩnh ngộ', 'thư bình', 'người đọc', 'fan', 'bình luận'])) {
+      issues.push({
+        code: 'focus_reader_reaction_missing',
+        severity: 'critical',
+        message: 'Publish/enlightenment chapter must record reader immersion/reaction.',
+      });
+    }
+    if (!hasAny(text, ['võ công', 'công pháp', 'thân pháp', 'trận pháp', 'kiếm ý', 'chưởng pháp', 'binh pháp', 'ý cảnh'])) {
+      issues.push({
+        code: 'focus_skill_delta_missing',
+        severity: 'critical',
+        message: 'Reader enlightenment must produce a concrete martial skill/cultivation/formation/strategy delta.',
+      });
+    }
+    if (!hasAny(text, ['danh vọng', 'điểm công nhận', 'thiên đạo công nhận', 'bảng xếp hạng', 'tân tác gia', 'ấn ký', 'quyền đăng', 'thưởng'])) {
+      issues.push({
+        code: 'focus_reputation_reward_missing',
+        severity: 'major',
+        message: 'Chapter should record Heavenly Dao reputation/ranking/resource reward for MC.',
+      });
+    }
+    if ((payload.worldStateDeltas || []).length === 0 && (payload.factions || []).length === 0 && payload.economicLedger.length === 0) {
+      issues.push({
+        code: 'focus_publish_delta_ledger_missing',
+        severity: 'critical',
+        message: 'Publish/enlightenment chapter must persist a world/faction/economic delta so the author progression is not invisible.',
       });
     }
     const critical = issues.some((issue) => issue.severity === 'critical');

@@ -49,3 +49,24 @@ export function computeDynamicResumeBatchSizeForQuota(input: {
   const buffered = Math.ceil(requiredPerTick * 1.2);
   return clamp(buffered, input.minBatch, input.maxBatch);
 }
+
+export function isDailyQuotaDue(
+  quota: {
+    status?: string | null;
+    written_chapters?: number | null;
+    target_chapters?: number | null;
+    next_due_at?: string | null;
+  },
+  now: Date = new Date(),
+): boolean {
+  if (quota.status === 'completed') return false;
+  const written = Number(quota.written_chapters ?? 0);
+  const target = Number(quota.target_chapters ?? 0);
+  if (!Number.isFinite(written) || !Number.isFinite(target)) return true;
+  if (written >= target) return false;
+  if (!quota.next_due_at) return true;
+
+  const nextDueMs = Date.parse(quota.next_due_at);
+  if (!Number.isFinite(nextDueMs)) return true;
+  return nextDueMs <= now.getTime();
+}

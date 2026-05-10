@@ -17,6 +17,7 @@ import { enforceCanonGates } from '../quality/canon-enforcement';
 import { evaluateChapterQuality, type ChapterQualityIssue } from '../quality/quality-contract';
 import { recordQualityMetrics } from '../quality/quality-metrics';
 import { postWriteHealthCheck } from '../utils/post-write-health-check';
+import { buildFocusPresetContext } from '../codex-automation/focus-presets';
 import type { CriticIssue, GeminiConfig, GenreType, StyleDirectives } from '../types';
 import type { OrchestratorResult } from './orchestrator';
 
@@ -151,6 +152,25 @@ export function isFlashCheapHardIssue(issue: CriticIssue | ChapterQualityIssue):
   return false;
 }
 
+export function isFlashCheapHardCanonIssue(issue: CriticIssue): boolean {
+  const description = issue.description || '';
+  // Cast-roster extraction is heuristic and often catches book titles,
+  // in-story fictional characters, techniques, or crowd NPCs. In cheap routine
+  // this remains an audit signal, while true blockers still fail closed.
+  if (
+    issue.type === 'continuity'
+    && issue.severity === 'major'
+    && (
+      description.includes('tên nhân vật MỚI')
+      || description.includes('cast roster')
+      || description.includes('có thể là nhân vật mới')
+    )
+  ) {
+    return false;
+  }
+  return isFlashCheapHardIssue(issue);
+}
+
 function shouldAttemptCheapExtension(issues: ChapterQualityIssue[], styleDirectives: StyleDirectives | null | undefined): boolean {
   if (styleDirectives?.flash_routine_extend_on_short === false) return false;
   return issues.some((issue) => issue.code === 'word_count_low' || issue.code === 'weak_ending_hook');
@@ -268,9 +288,50 @@ export async function ensureFlashCheapArcRail(input: FlashCheapRoutineInput, db:
   return repaired;
 }
 
+export function getRoutinePromptContext(styleDirectives: StyleDirectives | null | undefined): string {
+  if (typeof styleDirectives?.routine_prompt_context === 'string' && styleDirectives.routine_prompt_context.trim()) {
+    return styleDirectives.routine_prompt_context.trim();
+  }
+  return buildFocusPresetContext(styleDirectives?.focus_key || undefined).trim();
+}
+
+export function buildRoutineBrief(input: FlashCheapRoutineInput): string {
+  const styleDirectives = input.project.style_directives;
+  const focusKey = styleDirectives?.focus_key || null;
+  const lines = [
+    `Truyện: ${input.storyTitle}`,
+    `Thể loại: ${input.genre}`,
+    `Chương cần viết: ${input.nextChapter}/${input.totalPlanned}`,
+    `Nhân vật chính: ${input.protagonistName}`,
+    `Target: ${input.targetWordCount} từ, sảng văn, có payoff cụ thể, không hành hạ MC quá mức.`,
+    `Focus key: ${focusKey || 'generic'}`,
+  ];
+
+  if (focusKey === 'sang-the-than-minh') {
+    lines.push(
+      'Bàn tay vàng: Khởi Nguyên Biên Niên / Vạn Tượng Ký Ức chuyển hóa trí nhớ kiếp trước thành template thế giới có chi phí, tài nguyên, quy luật, loài phụ thuộc, tín ngưỡng và rủi ro.',
+      'Chapter loop: world-state Thần Vực, tiến triển loài/quyến thuộc, template inspiration, tài nguyên tiêu hao/thu được, lợi ích rõ, ending hook.',
+    );
+  } else if (focusKey === 'thien-dao-thu-vien') {
+    lines.push(
+      'Bàn tay vàng: Vạn Văn Ký Ức tái cấu trúc văn học/phim/game/thần thoại Trái Đất thành bản thảo hợp luật Thiên Đạo, có ledger chi phí, độ tương thích độc giả, rủi ro hiểu sai và phản hồi danh vọng.',
+      'Chapter loop: Lâm Mặc viết/đăng tác phẩm -> độc giả nhập tâm/lĩnh ngộ võ học/công pháp -> faction/bảng xếp hạng phản ứng -> MC nhận danh vọng/điểm công nhận/tài nguyên và hook tiếp.',
+    );
+  } else {
+    lines.push(
+      'MC có trí nhớ/lợi thế cốt lõi đã ghi trong world_description và story_outline; mọi payoff phải có nguyên nhân, chi phí hoặc phản ứng xã hội rõ.',
+      'Chapter loop: mục tiêu cụ thể -> trở ngại ngắn -> lựa chọn chủ động của MC -> lợi ích đo được -> phản ứng thế giới -> hook tiếp.',
+    );
+  }
+
+  if (input.customPrompt) lines.push(`Yêu cầu riêng operator: ${input.customPrompt}`);
+  return lines.join('\n');
+}
+
 export async function buildFlashCheapRoutineContext(input: FlashCheapRoutineInput): Promise<string> {
   const db = getSupabase();
   const maxChars = Number(input.project.style_directives?.flash_bulk_context_max_chars || DEFAULT_CONTEXT_CHARS);
+  const routinePromptContext = getRoutinePromptContext(input.project.style_directives);
   const arc = await ensureFlashCheapArcRail(input, db);
   const [summariesRes, statesRes, chunksRes, threadsRes] = await Promise.all([
     db.from('chapter_summaries')
@@ -312,10 +373,10 @@ export async function buildFlashCheapRoutineContext(input: FlashCheapRoutineInpu
   const chunks = [...(chunksRes.data || [])].reverse();
   const threads = threadsRes.data || [];
   const previousSummary = summaries[summaries.length - 1];
-  const currentBrief = Array.isArray(arc?.chapter_briefs)
+  const currentBrief = Array.isArray(arc.chapter_briefs)
     ? arc.chapter_briefs.find((brief) => brief.chapterNumber === input.nextChapter)
     : undefined;
-  const currentSubArc = Array.isArray(arc?.sub_arcs)
+  const currentSubArc = Array.isArray(arc.sub_arcs)
     ? arc.sub_arcs.find((subArc) =>
         typeof subArc.start_chapter === 'number'
         && typeof subArc.end_chapter === 'number'
@@ -327,15 +388,12 @@ export async function buildFlashCheapRoutineContext(input: FlashCheapRoutineInpu
     {
       label: 'ROUTINE BRIEF',
       priority: 100,
-      content: [
-        `Truyện: ${input.storyTitle}`,
-        `Thể loại: ${input.genre}`,
-        `Chương cần viết: ${input.nextChapter}/${input.totalPlanned}`,
-        `Nhân vật chính: ${input.protagonistName}`,
-        `Target: ${input.targetWordCount} từ, sảng văn, có payoff cụ thể, không hành hạ MC quá mức.`,
-        `Golden finger: Khởi Nguyên Biên Niên / Vạn Tượng Ký Ức chuyển hóa trí nhớ kiếp trước thành template thế giới có chi phí, tài nguyên, quy luật, loài phụ thuộc, tín ngưỡng và rủi ro.`,
-        input.customPrompt ? `Yêu cầu riêng operator: ${input.customPrompt}` : '',
-      ].filter(Boolean).join('\n'),
+      content: buildRoutineBrief(input),
+    },
+    {
+      label: 'FOCUS REQUIREMENTS',
+      priority: 98,
+      content: routinePromptContext,
     },
     {
       label: 'WORLD CORE',
@@ -357,20 +415,18 @@ export async function buildFlashCheapRoutineContext(input: FlashCheapRoutineInpu
     {
       label: 'CURRENT ARC RAIL',
       priority: 88,
-      content: arc
-        ? [
-            `Arc ${arc.arc_number} (${arc.start_chapter}-${arc.end_chapter}) — ${arc.arc_theme || 'growth'}`,
-            arc.plan_text ? `Plan: ${arc.plan_text.slice(0, 1800)}` : '',
-            currentSubArc ? `Sub-arc ${currentSubArc.sub_arc_number}: ${currentSubArc.theme || ''} (${currentSubArc.start_chapter}-${currentSubArc.end_chapter}); mini-payoff: ${currentSubArc.mini_payoff || ''}` : '',
-            currentBrief ? `Brief ch.${input.nextChapter}: ${currentBrief.brief || ''}` : '',
-            currentBrief?.sceneDirection ? `Scene direction: ${currentBrief.sceneDirection}` : '',
-            currentBrief?.mcBenefit ? `MC benefit: ${currentBrief.mcBenefit}` : '',
-            Array.isArray(currentBrief?.scenes) && currentBrief.scenes.length > 0 ? `Scenes: ${JSON.stringify(currentBrief.scenes).slice(0, 1500)}` : '',
-            arc.threads_to_advance?.length ? `Advance threads: ${arc.threads_to_advance.join('; ')}` : '',
-            arc.threads_to_resolve?.length ? `Resolve threads: ${arc.threads_to_resolve.join('; ')}` : '',
-            arc.new_threads?.length ? `New threads: ${arc.new_threads.join('; ')}` : '',
-          ].filter(Boolean).join('\n')
-        : 'NO ARC PLAN COVERING THIS CHAPTER. Cron should generate/repair arc_plans before long routine continuation.',
+      content: [
+        `Arc ${arc.arc_number} (${arc.start_chapter}-${arc.end_chapter}) — ${arc.arc_theme || 'growth'}`,
+        arc.plan_text ? `Plan: ${arc.plan_text.slice(0, 1800)}` : '',
+        currentSubArc ? `Sub-arc ${currentSubArc.sub_arc_number}: ${currentSubArc.theme || ''} (${currentSubArc.start_chapter}-${currentSubArc.end_chapter}); mini-payoff: ${currentSubArc.mini_payoff || ''}` : '',
+        currentBrief ? `Brief ch.${input.nextChapter}: ${currentBrief.brief || ''}` : '',
+        currentBrief?.sceneDirection ? `Scene direction: ${currentBrief.sceneDirection}` : '',
+        currentBrief?.mcBenefit ? `MC benefit: ${currentBrief.mcBenefit}` : '',
+        Array.isArray(currentBrief?.scenes) && currentBrief.scenes.length > 0 ? `Scenes: ${JSON.stringify(currentBrief.scenes).slice(0, 1500)}` : '',
+        arc.threads_to_advance?.length ? `Advance threads: ${arc.threads_to_advance.join('; ')}` : '',
+        arc.threads_to_resolve?.length ? `Resolve threads: ${arc.threads_to_resolve.join('; ')}` : '',
+        arc.new_threads?.length ? `New threads: ${arc.new_threads.join('; ')}` : '',
+      ].filter(Boolean).join('\n'),
     },
     {
       label: 'RECENT SUMMARIES',
@@ -449,14 +505,8 @@ export async function writeFlashCheapRoutineChapter(input: FlashCheapRoutineInpu
         goal: 'coherence',
       });
     }
-    if (!quality.metrics.endingHook) {
-      qualityHardIssues.push({
-        code: 'weak_ending_hook',
-        severity: 'moderate',
-        message: 'Kết chương thiếu hook đọc tiếp rõ.',
-        goal: 'ending_readiness',
-      });
-    }
+    // Cheap routine uses a soft style gate: weak hook may trigger an extension
+    // when the quality contract reports it, but it must not block publish alone.
     if (qualityHardIssues.length === 0) break;
   }
 
@@ -484,17 +534,7 @@ export async function writeFlashCheapRoutineChapter(input: FlashCheapRoutineInpu
       worldDescription: input.project.world_description,
     });
     qualityHardIssues = quality.issues.filter(isFlashCheapHardIssue);
-    if (!quality.metrics.endingHook) {
-      qualityHardIssues.push({
-        code: 'weak_ending_hook',
-        severity: 'moderate',
-        message: 'Kết chương thiếu hook đọc tiếp rõ.',
-        goal: 'ending_readiness',
-      });
-    }
-  }
-  if (input.project.style_directives?.flash_routine_hard_block_weak_hook !== true) {
-    qualityHardIssues = qualityHardIssues.filter((issue) => issue.code !== 'weak_ending_hook');
+    // Keep ending hook as a soft audit signal; do not convert it to a hard blocker.
   }
   if (qualityHardIssues.length > 0) {
     throw new Error(`FLASH_CHEAP_GATE_BLOCKED: ${qualityHardIssues.map((i) => `${i.code}:${i.message}`).join(' | ')}`);
@@ -537,7 +577,7 @@ export async function writeFlashCheapRoutineChapter(input: FlashCheapRoutineInpu
   const hardBlockers = [
     ...contradictions.filter((c) => c.severity === 'critical').map((c): CriticIssue => ({ type: 'continuity', severity: 'critical', description: c.description })),
     ...consistencyIssues.filter((i) => i.severity === 'critical' || i.severity === 'major').map((i): CriticIssue => ({ type: i.type === 'dead_character' ? 'continuity' : 'consistency', severity: i.severity, description: i.description })),
-    ...canonIssues.filter(isFlashCheapHardIssue),
+    ...canonIssues.filter(isFlashCheapHardCanonIssue),
   ];
 
   if (hardBlockers.length > 0) {
@@ -657,7 +697,8 @@ function mergeFlashCheapExtension(
 function buildWriterPrompt(input: FlashCheapRoutineInput, context: string, minWords: number): string {
   const preferredMin = Math.max(minWords, Math.floor(input.targetWordCount * 0.93));
   const preferredMax = Math.max(preferredMin + 300, Math.ceil(input.targetWordCount * 1.1));
-  return `Bạn là writer chính của một bộ sảng văn sáng thế/thần minh dài kỳ.
+  const focusInstructions = getRoutinePromptContext(input.project.style_directives);
+  return `Bạn là writer chính của một bộ sảng văn dài kỳ.
 
 YÊU CẦU OUTPUT: chỉ trả về JSON object hợp lệ:
 {
@@ -669,11 +710,12 @@ KHUNG CHƯƠNG:
 - Viết chương ${input.nextChapter} của "${input.storyTitle}", mục tiêu khoảng ${input.targetWordCount} từ.
 - Độ dài ưu tiên: ${preferredMin}-${preferredMax} từ; hard minimum ${minWords} từ. Không viết ngắn kiểu tóm tắt.
 - Main: ${input.protagonistName}. MC có trí nhớ kiếp trước về văn học, phim ảnh, game, thần thoại, webnovel.
-- Bàn tay vàng: Khởi Nguyên Biên Niên / Vạn Tượng Ký Ức. Nó biến ký ức thành template thế giới khả thi, hiển thị ledger chi phí/tài nguyên/quy luật/loài phụ thuộc/tín ngưỡng/rủi ro.
 - Tone: sảng văn. MC có thể gặp trở ngại nhỏ nhưng phải xử lý gọn, thông minh, có tiến triển mạnh lên, có payoff cụ thể trong chính chương.
-- Mỗi chương phải có: world-state Thần Vực, tiến triển loài/phụ thuộc, template inspiration, tài nguyên tiêu hao/thu được, lợi ích rõ, ending hook.
 - Không leak prompt/context/model/API. Không tự tạo canon lớn mâu thuẫn chương trước. Không hồi sinh nhân vật chết nếu không có cơ chế đã establish.
 - TUYỆT ĐỐI không viết tóm tắt/outline. "content" phải là toàn văn truyện, tối thiểu ${minWords} từ, có scene nối tiếp nhau.
+
+FOCUS REQUIREMENTS:
+${focusInstructions || '- Bám world_description/story_outline hiện có; payoff phải hữu hình, có ledger hoặc phản ứng thế giới rõ.'}
 
 CONTEXT COMPACT:
 ${context}`;
@@ -710,7 +752,7 @@ function buildExtensionPrompt(
 ): string {
   const currentWords = previous.content.trim().split(/\s+/).filter(Boolean).length;
   const needed = Math.max(450, minWords - currentWords + 350);
-  return `Bạn đang sửa một chương routine của sảng văn sáng thế/thần minh.
+  return `Bạn đang sửa một chương routine của sảng văn dài kỳ.
 
 YÊU CẦU OUTPUT: chỉ trả về JSON object hợp lệ:
 {
@@ -722,7 +764,7 @@ ${issues.map((i) => `- ${i.code}: ${i.message}`).join('\n')}
 
 NHIỆM VỤ:
 - KHÔNG viết lại từ đầu. Chỉ viết phần nối thêm ${needed}-${needed + 450} từ để gắn trực tiếp sau bản hiện có.
-- Phần nối thêm phải mở rộng cảnh hiện tại bằng hành động cụ thể, ledger tài nguyên, world-state Thần Vực, tiến triển loài/phụ thuộc và payoff rõ.
+- Phần nối thêm phải mở rộng cảnh hiện tại bằng hành động cụ thể, ledger tài nguyên/danh vọng/trạng thái thế giới, phản ứng nhân vật/faction và payoff rõ theo đúng focus preset.
 - Kết thúc phần nối thêm bằng hook cụ thể đủ mạnh để đọc tiếp.
 - Tránh lặp cụm đang bị cảnh báo; dùng chi tiết vật thể, phản ứng sinh vật, luật thế giới và lựa chọn chủ động của ${input.protagonistName}.
 - Không leak prompt/context/model/API.

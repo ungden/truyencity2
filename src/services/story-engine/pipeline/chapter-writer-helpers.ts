@@ -19,6 +19,18 @@ export interface QualitySignals {
   dialogueRatio: number;
 }
 
+// ── Type-safe utilities ──────────────────────────────────────────────────────
+
+/**
+ * Safely trim a value that may be a string. AI sometimes returns non-string
+ * values (object, array, null, number) for fields typed as string. Calling
+ * `.trim()` on those crashes the pipeline (e.g., "N.cliffhanger?.trim is not
+ * a function"). This helper returns empty string for non-string inputs.
+ */
+export function safeStringTrim(v: unknown): string {
+  return typeof v === 'string' ? v.trim() : '';
+}
+
 // ── Content Cleaning ─────────────────────────────────────────────────────────
 
 export function cleanContent(content: string): string {

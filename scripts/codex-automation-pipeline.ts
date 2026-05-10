@@ -1337,6 +1337,12 @@ function buildChapterPrompt(meta: ChapterRunMeta, novel: NovelRow, project: Proj
     focusKey === 'sang-the-than-minh'
       ? '- SANG THE: mọi thay đổi về Thần Vực/tiểu thế giới, pháp tắc, sinh thái, chủng tộc/quyến thuộc, tín ngưỡng, tài nguyên và cấp bậc PHẢI ghi worldStateDeltas + factions/plotThreads + itemEvents/economicLedger nếu có tài nguyên; không nâng cấp thế giới vô nguồn.'
       : '',
+    focusKey === 'thien-dao-thu-vien'
+      ? '- THIEN DAO THU VIEN: khi đăng chương/sách hoặc có độc giả lĩnh ngộ, continuity.json PHẢI ghi tác phẩm đang viết, võ học/công pháp phát sinh, độc giả/faction phản ứng, danh vọng/điểm công nhận/quyền đăng và payoff cho MC.'
+      : '',
+    focusKey === 'thien-dao-thu-vien'
+      ? '- THIEN DAO TAC GIA SẢNG PAYOFF: mỗi chương phải có dopamine loop Tác Gia: viết/đăng -> độc giả nhập tâm/lĩnh ngộ -> bảng xếp hạng/thư bình/Thiên Đạo công nhận -> Lâm Mặc có lợi ích cụ thể. Không biến thành thuần combat võ giả.'
+      : '',
     focusPresetContext ? ['', focusPresetContext].join('\n') : '',
     rewriteContract
       ? [

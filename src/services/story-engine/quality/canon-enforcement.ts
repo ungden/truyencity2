@@ -1,5 +1,5 @@
 /**
- * Story Engine v2 — Canon Enforcement (Phase 28 TIER 1)
+ * Story Engine v2 — Canon Enforcement (Phase 28 TIER 1, extended Phase 30).
  *
  * Centralizes all DETERMINISTIC post-Critic gates that verify chapter content
  * against canon/state. Phase 27 added 11 canon/state context blocks for the
@@ -17,6 +17,13 @@
  *   2. Timeline violations — time reversal / age regression
  *   3. POV consistency — wrong-viewpoint thoughts in 3rd-limited
  *   4. Voice drift — fingerprint deviation from ch.1-3 anchor
+ *   5. Sensory floor — sensory balance score
+ *   6. Hook floor — opening/closing hook strength
+ *
+ * Phase 30 — 3 new gates pre-empting the 3 user-reported reader-killing patterns:
+ *   7. Antagonist scale — major villain marker before ch.30 not in master_outline
+ *   8. MC profitability — MC chõ mồm vô lợi (intervene without 5-profit benefit)
+ *   9. System cadence — golden finger silent ≥10 chương / power scaling stall
  *
  * Items, themes, factions, plot twists, worldbuilding/power-system common
  * violations are handled in Critic AI prompt rules (added separately) —
@@ -41,6 +48,13 @@ export interface CanonEnforcementInput {
   expectedCharacters: string[];
   /** Optional POV setting from project (vd '1st' / '3rd-limited' / '3rd-omniscient'). */
   expectedPov?: '1st' | '3rd-limited' | '3rd-omniscient';
+  /**
+   * Phase 30 G7 — antagonist scale gate. master_outline.antagonist_schedule
+   * lists pre-planned antagonist tier appearances. If chapter introduces a
+   * major-tier marker (sect master, secret org) before ch.30 with no entry
+   * in this schedule, gate flags critical.
+   */
+  antagonistSchedule?: Array<{ ch: number; tier: string }>;
 }
 
 // ── Public API ───────────────────────────────────────────────────────────────
@@ -72,6 +86,14 @@ export async function enforceCanonGates(
   // 5. Sensory + hook gates — soft (moderate) issues only.
   promises.push(checkSensoryFloor(input).catch(() => []));
   promises.push(checkHookFloor(input).catch(() => []));
+
+  // Phase 30 — 3 new gates for user-reported pain points.
+  // 7. Antagonist scale — major villain before ch.30 not in master_outline.
+  promises.push(checkAntagonistScale(input).catch(() => []));
+  // 8. MC profitability — MC interferes in random affairs without 5-profit benefit.
+  promises.push(checkMcProfitability(input).catch(() => []));
+  // 9. System cadence — golden finger silent / power scaling stall.
+  promises.push(checkSystemCadence(input).catch(() => []));
 
   const results = await Promise.all(promises);
   for (const r of results) issues.push(...r);
@@ -128,9 +150,12 @@ async function checkCastRoster(input: CanonEnforcementInput): Promise<CriticIssu
 
   const allowedLower = new Set([...allowed].map(s => s.toLowerCase()));
   const novel = [...candidates].filter(c => !allowedLower.has(c.toLowerCase()));
+  const softCastRosterOnly = await shouldTreatCastRosterAsSoft(input.projectId);
 
   // Tolerance: ≥5 new named entities = sus; ≥10 = major.
-  if (novel.length >= 10) {
+  // Chapter 1 naturally introduces institutions, places, skill names and cast,
+  // so keep this as a soft warning unless the extraction goes wildly off-track.
+  if (input.chapterNumber > 1 && novel.length >= 10 && !softCastRosterOnly) {
     issues.push({
       type: 'continuity',
       severity: 'major',
@@ -145,6 +170,25 @@ async function checkCastRoster(input: CanonEnforcementInput): Promise<CriticIssu
   }
 
   return issues;
+}
+
+export function shouldSoftCastRosterForFocusKey(focusKey?: string | null): boolean {
+  return focusKey === 'thien-dao-thu-vien' || focusKey === 'sang-the-than-minh';
+}
+
+async function shouldTreatCastRosterAsSoft(projectId: string): Promise<boolean> {
+  try {
+    const db = getSupabase();
+    const { data } = await db
+      .from('ai_story_projects')
+      .select('style_directives')
+      .eq('id', projectId)
+      .maybeSingle();
+    const styleDirectives = data?.style_directives as { focus_key?: string | null } | null | undefined;
+    return shouldSoftCastRosterForFocusKey(styleDirectives?.focus_key);
+  } catch {
+    return false;
+  }
 }
 
 const PLACE_PREFIXES = [
@@ -164,6 +208,14 @@ const TITLE_WORDS = [
 ];
 const WORLD_TERM_WORDS = [
   'Thần Vực', 'Vạn Tượng', 'Biên Niên', 'Khởi Nguyên', 'Ký Ức',
+  'Thiên Đạo Thư Viện', 'Thiên Đạo', 'Thư Viện', 'Vạn Văn', 'Trái Đất',
+  'Đại Diễn', 'Diễn Giới', 'Tác Gia', 'Bạch Bút', 'Thanh Bút', 'Kim Bút',
+  'Văn Thánh', 'Thiên Đạo Tác Gia', 'Bảng Tân Tác Gia', 'Sơn Hà Xạ Nhật',
+  'Mưu Dưới Ánh Trăng', 'Phục Ma Thập Bát Chưởng', 'Phục Ma Thập', 'Bát Chưởng',
+  'Loạn Thế Mưu Vương', 'Cửu Thiên Hỏa Chủng', 'Huyết Án Bạch Ngọc Lâu',
+  'Hoang Mạc', 'Khai Sơn', 'Thập Nhị', 'Phá Vân Chưởng',
+  'Anh Hùng Xạ Điêu', 'Quách Tĩnh', 'Thất Quái', 'Võ Lâm', 'Võ Lâm Xạ Điêu',
+  'Tam Quốc', 'Cửu Âm Chân Kinh', 'Huyền Âm Chân Giải', 'Thượng Hải', 'Hy Lạp',
   'Lưới Sương', 'Bẫy Sương', 'Mạch Sương', 'Hạt Bụi', 'Mộc Linh',
   'Thanh Nha', 'Hốc Tro', 'Long Tích', 'Kiến Đá', 'Thiết Sa',
   'Đất Sống', 'Vạt Rêu', 'Rêu Thử', 'Hồ Mặn', 'Kết Tinh Sương',
@@ -171,8 +223,6 @@ const WORLD_TERM_WORDS = [
   'Tường Đá', 'Bẫy Hắc', 'Hỏa Lô', 'Khiên Hợp Kim',
   'Tinh Thể Băng', 'Lõi Pháp Tắc', 'Pháp Tắc Băng', 'Thiên Đình',
   'Băng Nguyên', 'Sơ Thủy', 'Xương Thú Băng',
-  'Thần Cách', 'Thời Không', 'Hư Không', 'State Ledger', 'Tuyết Phong',
-  'Hỏa Diễm', 'Rêu Lam', 'Thời Gian', 'Đảo Lưu', 'Không Gian',
 ];
 const WORLD_MARKER_WORDS = new Set([
   'Thần', 'Vực', 'Tượng', 'Ký', 'Ức', 'Biên', 'Niên', 'Sương', 'Mạch',
@@ -182,8 +232,10 @@ const WORLD_MARKER_WORDS = new Set([
   'Kiên', 'Bẫy', 'Hắc', 'Diện', 'Lô', 'Cộng', 'Đồng', 'Khiên',
   'Hợp', 'Kim', 'Bán', 'Thể', 'Băng', 'Lõi', 'Pháp', 'Tắc',
   'Thiên', 'Đình', 'Nguyên', 'Sơ', 'Thủy', 'Xương', 'Thú',
-  'Cách', 'Thời', 'Không', 'State', 'Ledger', 'Tuyết', 'Phong',
-  'Diễm', 'Gian', 'Đảo', 'Lưu',
+  'Thư', 'Viện', 'Vạn', 'Đạo', 'Trái', 'Đất', 'Đại', 'Diễn', 'Giới',
+  'Tác', 'Gia', 'Bạch', 'Bút', 'Thanh', 'Kim', 'Văn', 'Thánh',
+  'Bảng', 'Tân', 'Sơn', 'Hà', 'Xạ', 'Nhật', 'Hoang', 'Mạc',
+  'Khai', 'Thập', 'Nhị', 'Phá', 'Vân', 'Chưởng',
 ]);
 
 export function isLikelyWorldTermCandidate(name: string): boolean {
@@ -338,6 +390,196 @@ async function checkSensoryFloor(input: CanonEnforcementInput): Promise<CriticIs
 }
 
 // ── Gate 6: Hook floor ───────────────────────────────────────────────────────
+
+// ── Gate 7: Antagonist scale (Phase 30) ──────────────────────────────────────
+
+/**
+ * Pre-empt "kẻ thần bí" / major villain appearing in early chapters knowing
+ * MC's secrets. Architect rule C1 forbids major-tier antagonists before ch.30
+ * unless master_outline.antagonist_schedule lists them.
+ *
+ * Implementation: regex scan content for major-tier markers. If chapter < 30
+ * and any marker hits, check schedule. If no schedule entry covers this
+ * chapter, fire critical.
+ */
+const MAJOR_VILLAIN_MARKERS = [
+  // Cultivation/wuxia hierarchy
+  /\b(đại\s+tông\s+chủ|tông\s+môn\s+chủ|môn\s+chủ\s+thượng\s+vị)\b/i,
+  /\b(thái\s+thượng\s+trưởng\s+lão|trưởng\s+lão\s+tối\s+cao|cố\s+vấn\s+tối\s+cao)\b/i,
+  /\b(thiên\s+đạo\s+kim\s+bảng|thiên\s+ý\s+kim\s+bảng)\b/i,
+  /\b(ma\s+giáo\s+giáo\s+chủ|tà\s+giáo\s+chủ|thái\s+thượng\s+ma\s+tôn)\b/i,
+  // Modern hidden orgs
+  /\b(tổ\s+chức\s+bí\s+mật\s+(toàn\s+cầu|xuyên\s+thiên|toàn\s+thế\s+giới))\b/i,
+  /\b(tập\s+đoàn\s+xuyên\s+thiên|tập\s+đoàn\s+đa\s+quốc\s+gia\s+bí\s+ẩn)\b/i,
+  /\b(hội\s+kín\s+(toàn\s+cầu|quốc\s+tế|huyền\s+bí))\b/i,
+  /\b(cơ\s+quan\s+tình\s+báo\s+(siêu\s+nhiên|huyền\s+bí|bí\s+mật))\b/i,
+  // Mystery-knower pattern (the canonical "kẻ thần bí biết bí mật MC")
+  /\b(kẻ\s+(thần\s+bí|bí\s+ẩn|lạ\s+mặt))\s+(biết|đã\s+biết|hiểu\s+rõ|nắm\s+rõ)\s+(bí\s+mật|thân\s+phận|trọng\s+sinh|hệ\s+thống)/i,
+];
+
+async function checkAntagonistScale(input: CanonEnforcementInput): Promise<CriticIssue[]> {
+  // Only enforce in early chapters — ladder allows major after ch.30.
+  if (input.chapterNumber >= 30) return [];
+
+  const matches: string[] = [];
+  for (const re of MAJOR_VILLAIN_MARKERS) {
+    const m = input.content.match(re);
+    if (m) matches.push(m[0]);
+  }
+  if (matches.length === 0) return [];
+
+  // Check if master_outline.antagonist_schedule allows it.
+  const schedule = input.antagonistSchedule || [];
+  const allowedTiers = new Set(['major', 'world', 'region', 'cosmic']);
+  const matchingEntry = schedule.find(s =>
+    s.ch <= input.chapterNumber && allowedTiers.has(s.tier?.toLowerCase()),
+  );
+  if (matchingEntry) return [];
+
+  // Not allowed by schedule — fire critical.
+  return [{
+    type: 'pacing',
+    severity: 'critical',
+    description: `Major villain marker xuất hiện tại ch.${input.chapterNumber} không có trong master_outline.antagonist_schedule (Axis C1 — antagonist phải leo dần peer→faction→region→world). Markers detected: ${matches.slice(0, 3).join(' | ')}. Phase 1 (ch.1-15) chỉ peer-level; Phase 2 (ch.15-50) faction-level. Major villain trước ch.30 cần master_outline justify.`,
+    suggestion: 'Hạ scale antagonist xuống peer-level (đệ tử cùng tông / customer khó tính / peer competitor) hoặc remove khỏi chương này.',
+  }];
+}
+
+// ── Gate 8: MC profitability (Phase 30) ──────────────────────────────────────
+
+/**
+ * Pre-empt "MC chõ mồm vô lợi" — MC bênh vực/cứu/dạy NPC mà không có 1 trong
+ * 5 lợi ích (resource/network/info/setup'd-payoff/family). Heuristic regex:
+ * detect altruistic action verbs paired with unknown NPCs (not in cast roster).
+ *
+ * Implementation: count altruistic-verb sentences where the target appears to
+ * be a stranger (no proper name OR proper name not in expectedCharacters/cast).
+ * Threshold: ≥2 instances per chapter = moderate, ≥3 = major.
+ */
+const MC_NOSY_VERB_PATTERNS = [
+  // MC actively intervenes in stranger's affairs
+  /(?:bênh\s+vực|đứng\s+ra\s+bênh|ra\s+tay\s+cứu|cứu\s+giúp|giúp\s+đỡ|chỉ\s+dẫn|dạy\s+bảo|khuyên\s+nhủ|chỉ\s+điểm)\s+(?:cho\s+)?(?:một|gã|tên|cô|bà|ông|đứa|người|vị|kẻ)\s+(?:lạ|qua\s+đường|nghèo|ăn\s+xin|ăn\s+mày|tủi\s+thân|đáng\s+thương|tội\s+nghiệp)/i,
+  // MC lectures/preaches to random NPCs
+  /(?:thuyết\s+giảng|giảng\s+đạo|răn\s+dạy|lên\s+lớp|chỉ\s+giáo)\s+(?:cho\s+)?(?:một|gã|tên|đám|bọn|người|kẻ)\s+(?:lạ|qua\s+đường|tầm\s+thường|bình\s+thường)/i,
+  // MC unprompted helps random with no setup
+  /(?:tự\s+nhiên|đột\s+nhiên|bất\s+chợt|tình\s+cờ)\s+.{0,30}\s+(?:bênh\s+vực|cứu\s+giúp|ra\s+tay|chen\s+vào|xen\s+vào|can\s+thiệp)/i,
+];
+
+async function checkMcProfitability(input: CanonEnforcementInput): Promise<CriticIssue[]> {
+  let hits = 0;
+  const samples: string[] = [];
+  for (const re of MC_NOSY_VERB_PATTERNS) {
+    // Use global flag scan — count all matches.
+    const globalRe = new RegExp(re.source, re.flags.includes('g') ? re.flags : re.flags + 'g');
+    let m: RegExpExecArray | null;
+    while ((m = globalRe.exec(input.content)) !== null) {
+      hits++;
+      if (samples.length < 3) samples.push(m[0].slice(0, 80));
+      if (hits >= 6) break; // cap
+    }
+    if (hits >= 6) break;
+  }
+
+  if (hits === 0) return [];
+
+  if (hits >= 3) {
+    return [{
+      type: 'quality',
+      severity: 'major',
+      description: `MC chõ mồm vô lợi pattern: ${hits} scenes MC can thiệp giúp người lạ random (Axis B2 violation — MC chỉ can thiệp khi đạt ≥1 trong 5 lợi ích: resource/network/info/setup'd-payoff/family). Samples: ${samples.join(' | ')}.`,
+      suggestion: 'Mỗi scene MC can thiệp PHẢI trả lời "MC nhận được gì cụ thể từ (a)-(e)?" — không trả lời được → bỏ scene hoặc chuyển MC sang observer.',
+    }];
+  }
+
+  if (hits >= 2) {
+    return [{
+      type: 'quality',
+      severity: 'moderate',
+      description: `MC chõ mồm pattern detected: ${hits} scene MC can thiệp giúp người lạ. Verify mỗi scene có 1 trong 5 lợi ích (resource/network/info/setup'd-payoff/family). Samples: ${samples.join(' | ')}.`,
+    }];
+  }
+
+  return [];
+}
+
+// ── Gate 9: System cadence (Phase 30) ────────────────────────────────────────
+
+/**
+ * Pre-empt "system yếu, MC vẫn vất vả 10+ chương". Architect rule B3 requires
+ * golden finger to buff MC visibly every 5-10 chapters. Track power_state
+ * deltas over the last 10 chapters via mc_power_states table. If MC's tier /
+ * resource / capability didn't improve on ANY axis in the last 10 chapters,
+ * fire moderate (or major if regressed).
+ *
+ * Skip for chapters <10 (not enough history to measure cadence).
+ */
+async function checkSystemCadence(input: CanonEnforcementInput): Promise<CriticIssue[]> {
+  if (input.chapterNumber < 10) return [];
+
+  try {
+    const db = getSupabase();
+    // Pull MC power state at current and 10-chapters-ago marks.
+    const { data: states } = await db
+      .from('mc_power_states')
+      .select('chapter_number,cultivation_tier,wealth_tier,network_size,skill_count,knowledge_tier,faction_tier')
+      .eq('project_id', input.projectId)
+      .lte('chapter_number', input.chapterNumber)
+      .gte('chapter_number', Math.max(1, input.chapterNumber - 12))
+      .order('chapter_number', { ascending: true });
+
+    if (!states || states.length < 2) return []; // Not enough data.
+
+    const baseline = states[0];
+    const current = states[states.length - 1];
+
+    // Compare numeric tiers across all axes; check if ANY improved.
+    const axes: Array<keyof typeof baseline> = [
+      'cultivation_tier', 'wealth_tier', 'network_size',
+      'skill_count', 'knowledge_tier', 'faction_tier',
+    ];
+    let anyImproved = false;
+    let anyRegressed = false;
+    const deltas: string[] = [];
+    for (const axis of axes) {
+      const b = Number(baseline[axis] || 0);
+      const c = Number(current[axis] || 0);
+      if (c > b) {
+        anyImproved = true;
+        deltas.push(`${axis}: ${b}→${c}`);
+      } else if (c < b) {
+        anyRegressed = true;
+        deltas.push(`${axis}: ${b}→${c} (REGRESSED)`);
+      }
+    }
+
+    const span = current.chapter_number - baseline.chapter_number;
+    if (span < 5) return []; // Need ≥5 chapters span to be meaningful.
+
+    if (anyRegressed) {
+      return [{
+        type: 'continuity',
+        severity: 'major',
+        description: `MC power state REGRESSED giữa ch.${baseline.chapter_number} và ch.${current.chapter_number} (${span} chương). Axis B3 violation — power scaling NON-DECREASING. Deltas: ${deltas.join(', ')}.`,
+        suggestion: 'Khôi phục power state bị mất hoặc giải thích reasonable trong narrative (vd: tu vi tạm phong ấn vì plot reason ghi rõ trong outline).',
+      }];
+    }
+
+    if (!anyImproved && span >= 10) {
+      return [{
+        type: 'pacing',
+        severity: 'moderate',
+        description: `Power scaling stall — ${span} chương liên tiếp không tier-up bất kỳ axis (cultivation/wealth/network/skill/knowledge/faction). Axis B3 violation — golden finger phải buff MC visible mỗi 5-10 chương. Reader sẽ cảm thấy "system yếu, MC vẫn vất vả".`,
+        suggestion: 'Thêm 1 cải tiến đo được trong 1-2 chương tới: tier-up cultivation, skill mới, deal kinh doanh tier mới, network tier-up.',
+      }];
+    }
+
+    return [];
+  } catch {
+    return []; // Non-fatal — table missing or query failed.
+  }
+}
+
+// ── Hook floor (existing) ────────────────────────────────────────────────────
 
 /**
  * Soft gate: opening hook score ≤3 OR closing ≤3 = moderate. Both ≤3 = major.

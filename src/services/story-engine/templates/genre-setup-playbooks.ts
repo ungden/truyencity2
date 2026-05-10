@@ -98,11 +98,19 @@ const TIEN_HIEP: GenreSetupPlaybook = {
       antiPatterns: ['nội tâm độc thoại dài lê thê', 'giải thích kế hoạch trước với địch'],
     },
     {
+      // SẢNG VĂN 2026 GUIDANCE: archetype này HIGH RISK với reader hiện đại — TQ
+      // 2024-2026 đã từ chối "凄惨开局" (rock-bottom opening). Setup-pipeline hard
+      // cap (validateMcOpeningIdentityTier) sẽ REJECT nếu world_description hoặc
+      // mcVoice/mcSignature chứa "phế vật / nhặt rác / cuốc xẻng". Nếu chọn
+      // archetype này, MC PHẢI: (1) reveal-of-power scene 1-2 (KHÔNG kéo dài
+      // outsider perception qua scene 3+), (2) voice tỉnh táo/tính toán (KHÔNG
+      // self-pity), (3) competence visible từ scene 1 dù bystander chưa thấy.
+      // Recommended fallback: chọn 'silent-OP' hoặc 'trọng sinh kiến thức hiện đại'.
       name: 'phế vật giả phế',
       voice: 'Khiêm nhường lúc đầu, phản công khi cần. Không phô trương, nhưng có nguyên tắc thép.',
       signature: 'Bị xem là phế vật vì che giấu thực lực — đại biểu đột phá khi gia tộc/sư môn cần',
       fits: ['tien-hiep', 'huyen-huyen', 'kiem-hiep'],
-      antiPatterns: ['tự thương cảm số phận', 'than vãn bị bắt nạt'],
+      antiPatterns: ['tự thương cảm số phận', 'than vãn bị bắt nạt', 'tả MC nhặt rác / cuốc xẻng / "lão ăn mày" trong scene 1-3'],
     },
     {
       name: 'trọng sinh kiến thức hiện đại',
@@ -167,9 +175,14 @@ const TIEN_HIEP: GenreSetupPlaybook = {
   ],
   tensionAxes: [
     {
+      // SẢNG VĂN 2026 GUIDANCE: arcShape "ngoại môn → nội môn" KHÔNG có nghĩa MC mở
+      // chương = phế vật nhặt rác. MC ở Phase 1 ngoại môn vẫn PHẢI là "đệ tử ngoại
+      // môn có vị trí ổn định + skill thiết lập" — KHÔNG phải nhặt rác / cuốc xẻng /
+      // lao động bậc thấp. Phase 1 = MC consolidate domain ngoại môn (nhiệm vụ
+      // hợp lý, deal kinh doanh, peer rivalry); Phase 2 promotion lên nội môn.
       name: 'nội môn rivalry — ngoại môn thi đấu',
       description: 'Đệ tử trẻ trong sư môn cạnh tranh tài nguyên/cảnh giới — bên ngoài có đại hội liên tông môn',
-      arcShape: 'Phase 1 ngoại môn → Phase 2 nội môn lên đỉnh → Phase 3 đại hội liên tông → Phase 4 đỉnh đại lục',
+      arcShape: 'Phase 1 ngoại môn (đệ tử có vị trí, KHÔNG nhặt rác) → Phase 2 nội môn lên đỉnh → Phase 3 đại hội liên tông → Phase 4 đỉnh đại lục',
     },
     {
       name: 'huyết mạch bí mật + truyền thừa cổ',
@@ -330,11 +343,17 @@ const DO_THI: GenreSetupPlaybook = {
       antiPatterns: ['báo thù người yêu cũ ngay ch.1', 'showcase tương lai quá rõ làm mọi người nghi'],
     },
     {
+      // SẢNG VĂN 2026 GUIDANCE: "xây dựng từ con số 0" KHÔNG đồng nghĩa với MC
+      // mở chương ở rock-bottom (mất việc / vô gia cư / nợ ngập đầu). MC scene 1
+      // PHẢI đã có shop / studio / startup / consultancy ĐANG VẬN HÀNH dù scale
+      // nhỏ — "từ con số 0" nghĩa là KHÔNG dùng tiền/connection của gia tộc, NOT
+      // nghĩa là sống lay lắt. Setup-pipeline hard cap (validateMcOpeningIdentityTier)
+      // sẽ REJECT nếu signature dùng cụm "từ con số 0" gắn với MC kèm rock-bottom.
       name: 'thiếu gia ẩn thân',
       voice: 'Thoải mái, hơi cynical, biết đời. Không khoe khoang nhưng có gu sang.',
-      signature: 'Là thiếu gia gia tộc lớn nhưng chọn ẩn thân để xây dựng từ con số 0 — chứng minh năng lực',
+      signature: 'Thiếu gia gia tộc lớn ẩn thân, tự xây sự nghiệp riêng (shop/studio/startup) bằng năng lực — KHÔNG dùng quyền lực gia tộc',
       fits: ['do-thi'],
-      antiPatterns: ['lộ thân phận quá sớm để được giúp', 'không có lý do thuyết phục để ẩn'],
+      antiPatterns: ['lộ thân phận quá sớm để được giúp', 'không có lý do thuyết phục để ẩn', 'tả MC nghèo đói / mất việc / sống lay lắt scene 1-3'],
     },
     {
       name: 'tay ngang đột phá',
