@@ -160,7 +160,9 @@ async function syncArcPlanContext(
   db: SupabaseClient,
   projectId: string,
   arc: ArcSkeleton,
+  briefs: ChapterBrief[],
   blueprint: NovelBlueprint,
+  options: { clearLegacyBriefs: boolean },
 ): Promise<void> {
   const subArcs = arc.subArcs.map((s) => ({
     sub_arc_number: s.number,
@@ -170,6 +172,21 @@ async function syncArcPlanContext(
     start_chapter: s.range[0],
     end_chapter: s.range[1],
   }));
+  // During transition (writer not yet flipped to chapter_blueprints), keep
+  // legacy arc_plans.chapter_briefs[] populated so legacy code path works.
+  // At activation, sync clears the array (single source of truth = chapter_blueprints).
+  const legacyBriefs = options.clearLegacyBriefs
+    ? []
+    : briefs.map((b) => ({
+        chapterNumber: b.n,
+        sub_arc_number: b.subArcNumber ?? null,
+        brief: b.brief || b.goal || `Ch.${b.n}: ${arc.theme}`,
+        sceneDirection: '',
+        scenes: b.scenes,
+        mcBenefit: b.mcBenefit,
+        beat: b.beat,
+        // Note: legacy code path also reads these fields if present.
+      }));
   const row = {
     project_id: projectId,
     arc_number: arc.arcNumber,
@@ -178,8 +195,7 @@ async function syncArcPlanContext(
     arc_theme: arc.theme,
     plan_text: buildArcPlanText(arc, blueprint),
     sub_arcs: subArcs,
-    // chapter_briefs[] DEPRECATED — single source of truth is chapter_blueprints table
-    chapter_briefs: [],
+    chapter_briefs: legacyBriefs,
     threads_to_advance: [],
     threads_to_resolve: [],
     new_threads: [],
@@ -319,7 +335,14 @@ export async function syncBlueprintToDb(
       continue;
     }
     if (syncArcContext) {
-      await syncArcPlanContext(db, projectId, arcBlueprint.arc, blueprint);
+      await syncArcPlanContext(
+        db,
+        projectId,
+        arcBlueprint.arc,
+        arcBlueprint.briefs,
+        blueprint,
+        { clearLegacyBriefs: options.activate === true },
+      );
     }
     const count = await syncChapterBlueprints(
       db,

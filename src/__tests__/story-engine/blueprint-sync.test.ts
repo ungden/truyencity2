@@ -159,7 +159,20 @@ describe('syncBlueprintToDb (unified)', () => {
     expect(captured.arc_plans[0].arc_number).toBe(1);
     expect(captured.arc_plans[0].plan_text).toContain('opening arc');
     expect(captured.arc_plans[0].plan_text).toContain('UNIVERSAL BANS');
-    expect(captured.arc_plans[0].chapter_briefs).toEqual([]); // legacy field cleared
+    // Pre-activation: keeps legacy arc_plans.chapter_briefs[] populated for
+    // backward compat with running writers/cron jobs.
+    expect(captured.arc_plans[0].chapter_briefs).toHaveLength(2);
+    expect(captured.arc_plans[0].chapter_briefs[0].chapterNumber).toBe(1);
+  });
+
+  it('clears legacy arc_plans.chapter_briefs[] at --activate (single source of truth)', async () => {
+    const captured = freshCaptured();
+    captured.coverageRows = Array.from({ length: 100 }, (_, i) => ({
+      chapter_number: i + 1,
+      status: 'planned',
+    }));
+    await syncBlueprintToDb(fakeDb(captured), 'p1', minimalBlueprint, { activate: true });
+    expect(captured.arc_plans[0].chapter_briefs).toEqual([]);
   });
 
   it('upserts story_blueprint_runs with coverage status', async () => {
