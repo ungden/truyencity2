@@ -236,7 +236,12 @@ function detectResourceWithoutSource(content: string): CausalLogicIssue[] {
     seenTerms.add(normalizedTerm);
     issues.push({
       code: 'resource_without_source',
-      severity: /Thần Cách|thần vật|lõi pháp tắc/i.test(window) ? 'critical' : 'major',
+      // 2026-05-10: cosmic-tier items still hard-block; common items (chìa
+      // khóa/bản đồ/vòng đeo/etc) downgraded to moderate (warning) because
+      // gate has no past-chapter ledger awareness — flagged items often
+      // were sourced in earlier chapters. Blueprint per-chapter forbiddenTerms
+      // + BAN_RESOURCES are the proper enforcement layer.
+      severity: /Thần Cách|thần vật|lõi pháp tắc/i.test(window) ? 'critical' : 'moderate',
       message: `High-value item/resource "${match.value}" appears without a clear source, cost, or ledger.`,
       evidence: compact(window),
     });
