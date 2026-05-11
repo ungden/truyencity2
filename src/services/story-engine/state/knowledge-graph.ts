@@ -50,6 +50,8 @@ interface KnowledgeExtractionResult {
     source_character: string | null;
     is_secret: boolean;
     revealed_to: string[];
+    /** Phase N.1: DOME-inspired causal chain — tags định danh WHY char biết. */
+    causal_chain?: string[];
   }>;
 }
 
@@ -95,7 +97,8 @@ Trả về JSON:
       "knowledge": "Mô tả ngắn gọn điều nhân vật biết được (1-2 câu)",
       "source_character": "Ai tiết lộ / null nếu tự phát hiện",
       "is_secret": true/false,
-      "revealed_to": ["Danh sách nhân vật khác cũng biết điều này"]
+      "revealed_to": ["Danh sách nhân vật khác cũng biết điều này"],
+      "causal_chain": ["event:tên sự kiện kích hoạt", "char:nhân vật trung gian (nếu có)", "scene:bối cảnh"]
     }
   ]
 }
@@ -105,7 +108,12 @@ QUY TẮC:
 - KHÔNG liệt kê những gì nhân vật đã biết từ trước
 - is_secret=true nếu chỉ 1-2 người biết, false nếu ai cũng biết
 - Tối đa 8 knowledge events quan trọng nhất
-- Trả về [] rỗng nếu không có kiến thức mới nào đáng ghi nhận`;
+- Trả về [] rỗng nếu không có kiến thức mới nào đáng ghi nhận
+- causal_chain (Phase N.1): mảng 1-4 entries định danh CÁCH nhân vật biết được. Format:
+  * "event:<tên sự kiện>" (vd "event:uchiha_massacre_reveal")
+  * "char:<người trung gian>" (vd "char:Itachi_told_MC")
+  * "scene:<bối cảnh>" (vd "scene:cave_meeting", "scene:tournament_finale")
+  Mục đích: context-assembler có thể truy ngược "tại sao biết" khi chương sau nhắc lại fact.`;
 
     const response = await callGemini(prompt, {
       ...config,
@@ -135,6 +143,10 @@ QUY TẮC:
         source_character: k.source_character?.trim() || null,
         is_secret: !!k.is_secret,
         revealed_to: Array.isArray(k.revealed_to) ? k.revealed_to : [],
+        // Phase N.1: causal chain — sanitize tags (limit 4 entries, 80 chars each)
+        causal_chain: Array.isArray(k.causal_chain)
+          ? k.causal_chain.filter((c) => typeof c === 'string' && c.length > 0).slice(0, 4).map((c) => c.slice(0, 80))
+          : [],
       }));
 
     if (rows.length === 0) return;

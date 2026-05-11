@@ -277,6 +277,33 @@ export interface ChapterOutline {
   slowScene?: string;
   cliffhanger: string;
   targetWordCount: number;
+  /**
+   * Phase M.4 (2026-05-12) — Optional chapter intent doc emitted by Architect.
+   * Condensed 500-800 chars summarizing chapter primary goal, cliffhanger
+   * target, MC state delta, threads to close/open, distilled creative
+   * constraints. Used by Writer + Critic instead of re-loading full context
+   * (30-50% token saving khi feature flag use_intent_doc_pipeline=true).
+   */
+  chapterIntent?: ChapterIntent;
+}
+
+export interface ChapterIntent {
+  /** Primary goal of the chapter (1-2 sentences) */
+  primaryGoal: string;
+  /** Target cliffhanger / hook ending (1 sentence) */
+  cliffhangerTarget: string;
+  /** MC state delta — what changes về MC state (power/relationship/resources) */
+  mcStateDelta: string;
+  /** Plot threads to close in this chapter (thread names) */
+  threadsToClose: string[];
+  /** Plot threads to open / advance in this chapter */
+  threadsToAdvance: string[];
+  /**
+   * Distilled creative constraints — combined from 6 quality modules
+   * (foreshadowing, character arc, pacing, voice, power, world).
+   * ≤500 chars total, structured by label vd "[Voice] MC dùng 'ta' với ...".
+   */
+  creativeConstraints: string;
 }
 
 export interface SceneOutline {

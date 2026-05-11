@@ -547,14 +547,46 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   context.genreBoundary = getGenreBoundaryText(genre);
 
   // ── Step 2c: Inject RAG context — 3-level retrieval (non-fatal) ────────
+  // Phase N.2 (2026-05-12): build eventFocus từ "what's expected to resolve
+  // around this chapter" — plot_threads active high-priority + foreshadowing
+  // about to pay off. Pass vào retrieveRAGContext để StoryWriter-style
+  // history compression focus theo event hiện tại thay vì semantic broad.
+  let eventFocus: string[] = [];
+  try {
+    const [{ data: threads }, { data: hints }] = await Promise.all([
+      db
+        .from('plot_threads')
+        .select('name, description')
+        .eq('project_id', project.id)
+        .eq('status', 'active')
+        .order('priority', { ascending: false })
+        .limit(3),
+      db
+        .from('foreshadowing_plans')
+        .select('hint_text, payoff_chapter')
+        .eq('project_id', project.id)
+        .in('status', ['planted', 'seeding'])
+        .lte('payoff_chapter', nextChapter + 10)
+        .gte('payoff_chapter', nextChapter - 20)
+        .limit(3),
+    ]);
+    eventFocus = [
+      ...((threads || []).map((t: { name?: string }) => t.name).filter(Boolean) as string[]),
+      ...((hints || []).map((h: { hint_text?: string }) => h.hint_text?.slice(0, 60)).filter(Boolean) as string[]),
+    ].slice(0, 5);
+  } catch {
+    eventFocus = [];
+  }
+
   try {
     const [ragCtx, entityCtx, themeCtx] = await Promise.all([
-      // Level 0: Hybrid vector search (existing)
+      // Level 0: Hybrid vector search (existing) + Phase N.2 event focus
       retrieveRAGContext(
         project.id, nextChapter,
         context.arcPlan?.slice(0, 300) || null,
         context.previousCliffhanger || null,
         protagonistName,
+        eventFocus.length > 0 ? eventFocus : null,
       ).catch(() => null),
       // Level 1: Entity-level retrieval (character-specific events)
       retrieveEntityContext(
@@ -751,6 +783,14 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   // ── Step 4: Write chapter via 3-agent pipeline ─────────────────────────
   const isFinalArc = nextChapter >= totalPlanned - 20;
 
+  // Phase M.6 (2026-05-12): compute soft-ending phase guidance injected vào
+  // Architect. 4 phases: normal / wrapup / grace / hardstop.
+  const { getEndingPhase, getArchitectGuidance } = await import('../quality/soft-ending-enforcer');
+  const endingPhase = getEndingPhase(currentChapter, project.total_planned_chapters);
+  const softEndingGuidance = endingPhase === 'phase_1_normal'
+    ? ''
+    : getArchitectGuidance(endingPhase, project.total_planned_chapters || 1000, currentChapter);
+
   const result: WriteChapterResult = await writeChapter(
     nextChapter,
     contextString,
@@ -770,6 +810,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       subGenres: context.subGenres,
       qualityGateMinScore: flashRoutineMinQualityScore,
       qualityGateMode: flashRoutineSoftGate ? 'routine_soft' : 'standard',
+      softEndingGuidance,
     },
   );
 
@@ -970,6 +1011,38 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     throw new Error(`Chapter upsert failed: ${upsertErr.message}`);
   }
 
+  // Phase N.3 (2026-05-12): Git-style chapter version audit log.
+  // Insert version row into existing `chapter_versions` table (created
+  // pre-story-engine-v2, reused). Non-fatal — version log failure không
+  // block chapter save. Source = 'engine_v2_write' để distinguish với
+  // ai-editor's 'auto_rewrite' source.
+  try {
+    const { data: savedChapters } = await db
+      .from('chapters')
+      .select('id, chapter_number, title, content')
+      .eq('novel_id', novel.id)
+      .in('chapter_number', chapterRows.map((r) => r.chapter_number));
+    if (savedChapters && savedChapters.length > 0) {
+      const versionRows = savedChapters.map((ch) => ({
+        chapter_id: ch.id,
+        chapter_number: ch.chapter_number,
+        source: 'engine_v2_write',
+        title: ch.title,
+        content: ch.content,
+        quality_score: result.qualityScore || null,
+        metadata: {
+          project_id: project.id,
+          word_count: ch.content?.length || 0,
+          attempt: 'initial',
+          phase: 'N.3_audit_log',
+        },
+      }));
+      await db.from('chapter_versions').insert(versionRows);
+    }
+  } catch (versionErr) {
+    console.warn(`[Orchestrator] N.3 chapter_versions audit log failed (non-fatal): ${versionErr instanceof Error ? versionErr.message : String(versionErr)}`);
+  }
+
   // ── Step 5b: Bump current_chapter IMMEDIATELY after chapter upsert ──
   // Phase 23 race-fix: previously current_chapter was updated AFTER 17 post-write tasks (Step 7).
   // If Vercel timed out mid-post-write, chapters were saved but current_chapter stayed stale →
@@ -981,6 +1054,44 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     .eq('id', project.id);
   if (bumpErr) {
     console.warn(`[Orchestrator] CRITICAL: Failed to bump current_chapter to ${lastChapterNumber} for project ${project.id}: ${bumpErr.message}`);
+  }
+
+  // Phase M.6 (2026-05-12): Soft-ending check — mark project completed nếu
+  // (a) phase_4_hardstop (vượt target +20 chương), HOẶC
+  // (b) phase_3_grace + chương vừa viết là arc boundary của master_outline.
+  try {
+    const { getEndingPhase, isAtArcBoundary, shouldMarkCompleted } =
+      await import('../quality/soft-ending-enforcer');
+    const phaseAfter = getEndingPhase(lastChapterNumber, project.total_planned_chapters);
+    if (phaseAfter !== 'phase_1_normal' && phaseAfter !== 'phase_2_wrapup') {
+      const { data: moRow } = await db
+        .from('ai_story_projects')
+        .select('master_outline')
+        .eq('id', project.id)
+        .maybeSingle();
+      const masterOutline = moRow?.master_outline as {
+        volumes?: Array<{ subArcs?: Array<{ endChapter: number }> }>;
+        majorArcs?: Array<{ endChapter: number }>;
+      } | null;
+      const atBoundary = isAtArcBoundary(lastChapterNumber, masterOutline);
+      if (shouldMarkCompleted(phaseAfter, atBoundary)) {
+        const { error: completeErr } = await db
+          .from('ai_story_projects')
+          .update({
+            status: 'completed',
+            pause_reason: `soft_ending_completed_${phaseAfter}_ch${lastChapterNumber}`,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', project.id);
+        if (completeErr) {
+          console.warn(`[Orchestrator] Soft-ending mark-completed failed for project ${project.id}: ${completeErr.message}`);
+        } else {
+          console.log(`[Orchestrator] Project ${project.id} marked completed at ch.${lastChapterNumber} (phase=${phaseAfter}, atBoundary=${atBoundary})`);
+        }
+      }
+    }
+  } catch (e) {
+    console.warn(`[Orchestrator] Soft-ending enforcer threw: ${e instanceof Error ? e.message : String(e)}`);
   }
 
   // Step 5c quality canary runs per saved reader chapter below. Running it on
@@ -1226,12 +1337,10 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   // These run on lastChapterNumber + result.content because they aggregate or
   // fire at chapter-count milestones, not per reader chapter.
   await Promise.all([
-    // Task 6: Consistency check (every 3 AI writes — business logic AI check)
-    ...(aiWriteCount % 3 === 0 ? [
-      checkConsistency(
-        project.id, lastChapterNumber, result.content, characters,
-      ).catch(e => recordTaskFailure(db, project.id, novel.id, lastChapterNumber, 'task_6_consistency_check', e)),
-    ] : []),
+    // Task 6 REMOVED (Phase M.1, 2026-05-12): checkConsistency() đã chạy pre-save
+    // ở line 850 với blocking behavior. Lần thứ 2 ở đây fire-and-forget không
+    // giúp gì — same call, output discarded. Drop duplicate, save ~333 DeepSeek
+    // calls/novel (~$1-2/novel).
 
     // Task 8: Character arcs (every 3 AI writes — arcs evolve slowly)
     ...(aiWriteCount % 3 === 0 ? [

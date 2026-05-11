@@ -30,9 +30,11 @@ const ARC_SIZE = 20;            // Chapters per arc
 const BIBLE_TRIGGER = 3;        // Generate bible after chapter 3
 
 // Tiered bible refresh — denser early when world rules being established,
-// sparser late when story is stable. Old behavior: every 150 = only 3-4 refreshes
-// for 500-chapter novel → bible drifts. New: 7-9 refreshes covers early growth + late stability.
-const BIBLE_REFRESH_CHAPTERS: number[] = [30, 75, 150, 250, 350, 450, 600, 800, 1000];
+// sparser late when story is stable.
+// Phase M.7 (2026-05-12) — tightened tiers. Old [30,75,150,250,350,450,600,800,1000]
+// có gap up to 150 chương → bible stale, Architect/Writer đọc world rules cũ.
+// New tiers thêm 50/100/200/300 → max gap 100 chương early-mid, 200 late.
+const BIBLE_REFRESH_CHAPTERS: number[] = [30, 50, 75, 100, 150, 200, 250, 300, 350, 450, 600, 800, 1000];
 
 function shouldRefreshBible(chapterNumber: number): boolean {
   return BIBLE_REFRESH_CHAPTERS.includes(chapterNumber)

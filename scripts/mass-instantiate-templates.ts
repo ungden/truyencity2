@@ -33,7 +33,8 @@ import { instantiateTemplate } from '../src/services/story-engine/blueprint/temp
 import { generateVarsForTemplate } from '../src/services/story-engine/blueprint/var-generator';
 import { syncBlueprintToDb } from '../src/services/story-engine/blueprint/sync';
 
-const RESET_REASON_PREFIX = 'reset_for_re_blueprint';
+const PAUSE_REASON_OVERRIDE = process.argv.find((x) => x.startsWith('--pause-reason='))?.split('=').slice(1).join('=');
+const RESET_REASON_PREFIX = PAUSE_REASON_OVERRIDE ?? 'reset_for_re_blueprint';
 
 const EXEMPT_IDS = new Set([
   '2bfd2a90-1e05-4d5f-a1e8-90f6ec2a6e1c',

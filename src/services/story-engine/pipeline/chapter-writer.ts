@@ -72,6 +72,10 @@ export interface WriteChapterOptions {
    * ship, while still blocking hard continuity/canon/logic failures.
    */
   qualityGateMode?: 'standard' | 'routine_soft';
+  /** Phase M.6 (2026-05-12): soft-ending phase guidance injected vào Architect prompt.
+   * Computed orchestrator-side từ total_planned_chapters + currentChapter.
+   * Empty string for Phase 1 normal mode. */
+  softEndingGuidance?: string;
 }
 
 function isHardBlockingIssue(issue: CriticIssue): boolean {
@@ -399,7 +403,15 @@ JSON OUTPUT SCHEMA (output structure, không thay đổi):
   "comedyBeat": "...",
   "slowScene": "...",
   "cliffhanger": "...",
-  "targetWordCount": <int>
+  "targetWordCount": <int>,
+  "chapterIntent": {
+    "primaryGoal": "<1-2 câu mục tiêu chính chương — actor + action + stake>",
+    "cliffhangerTarget": "<1 câu hook ending>",
+    "mcStateDelta": "<MC state changes — power/relationship/resources delta>",
+    "threadsToClose": ["thread name 1", "thread name 2"],
+    "threadsToAdvance": ["thread name 1", "thread name 2"],
+    "creativeConstraints": "<≤500 chars distilled constraints structured by label. Vd: [Voice] MC ngạo nghễ + sarcastic. [Pacing] 2 dopamine peaks, peak 1 trước scene 2. [Character Arc] MC accept role leader. [Foreshadowing] Hint xx planted ch.20 đến lúc payoff. [Power] MC ch.50 = Nguyên Anh trung kỳ, không đột phá. [World] Location = Vạn Hoa village.>"
+  }
 }
 
 ${trimmedContext}
@@ -425,6 +437,7 @@ Target: ${targetWords} từ. Tối thiểu ${minScenes} scenes (mỗi ~${wordsPe
 ${foreshadowingInjection}
 ${rewriteInstructions ? `\nYÊU CẦU SỬA TỪ LẦN TRƯỚC: ${rewriteInstructions}` : ''}
 ${isGolden ? `\nGOLDEN CHAPTER ${chapterNumber}:\nMust have: ${goldenReqs?.mustHave.join(', ')}\nAvoid: ${goldenReqs?.avoid.join(', ')}` : ''}
+${options?.softEndingGuidance || ''}
 
 Trả về JSON ChapterOutline đúng schema phía trên cho CHƯƠNG ${chapterNumber}.`;
 
@@ -1355,6 +1368,40 @@ KIỂM TRA CANON & STATE (Phase 27/28 — xem các block trong context có sẵn
         }
       } catch (e) {
         console.warn(`[Critic] Canon enforcement gates threw:`, e instanceof Error ? e.message : String(e));
+      }
+
+      // Phase M.5 (2026-05-12): Arc enforcement gates — Supreme Goal 3
+      // (directional plot progression). Deterministic checks against
+      // master_outline volumes/sub-arcs. Plug-in after canon-enforcement
+      // because canon focuses on character/world; arc focuses on plot
+      // trajectory.
+      try {
+        const { enforceArcGates } = await import('../quality/arc-enforcement');
+        const arcIssues = await enforceArcGates({
+          projectId,
+          chapterNumber: outline.chapterNumber,
+          content,
+        });
+        if (arcIssues.length > 0) {
+          parsed.issues = parsed.issues || [];
+          parsed.issues.push(...arcIssues);
+          const hasMajorOrCritical = arcIssues.some(
+            (i) => i.severity === 'critical' || i.severity === 'major',
+          );
+          if (hasMajorOrCritical) {
+            parsed.requiresRewrite = true;
+            parsed.approved = false;
+            parsed.overallScore = Math.min(parsed.overallScore || 10, 5);
+            const guideText = arcIssues
+              .filter((i) => i.severity === 'critical' || i.severity === 'major')
+              .map((i) => `[${i.severity}/${i.type}] ${i.description.slice(0, 200)}`)
+              .join(' | ');
+            parsed.rewriteInstructions =
+              (parsed.rewriteInstructions || '') + ` ARC GATES: ${guideText}`;
+          }
+        }
+      } catch (e) {
+        console.warn(`[Critic] Arc enforcement gates threw:`, e instanceof Error ? e.message : String(e));
       }
     }
 

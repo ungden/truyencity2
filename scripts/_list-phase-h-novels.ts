@@ -9,7 +9,7 @@ async function main() {
   const { data: projects } = await db
     .from('ai_story_projects')
     .select('novel_id, novels!ai_story_projects_novel_id_fkey(id, title, cover_url, created_at)')
-    .eq('pause_reason', 'phase_h_archetype_spawn_2026-05-11');
+    .eq('pause_reason', process.env.PAUSE_REASON!);
   if (!projects) return;
   const rows = projects.map((p: { novels: { id: string; title: string; cover_url: string | null; created_at: string } | { id: string; title: string; cover_url: string | null; created_at: string }[] }) => {
     const n = Array.isArray(p.novels) ? p.novels[0] : p.novels;
