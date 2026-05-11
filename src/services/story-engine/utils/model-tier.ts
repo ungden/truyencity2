@@ -14,17 +14,28 @@
 // Per-chapter Pro × 1000 chapters = cost explosion. Architect/Critic/Guardian
 // dropped to Flash — at 12× cost they would dominate the budget.
 //
-// 2026-05-02 master_outline removed from Pro tier: gemini-3.1-pro-preview is
-// a "thinking" model that burns reasoning_tokens BEFORE emitting content.
-// At maxTokens=16384, thinking ate 12K+ → content truncated → JSON malformed
-// → parseJSON returns null → caller silently returns null. Symptom in DB:
-// "master_outline generation returned no volumes/majorArcs" with 0 cost_tracking
-// entries (callGemini threw before tracking). Flash (DeepSeek V4) has 384K
-// output ceiling and no thinking burn — handles 8-12 arc × 6 axis JSON easily.
+// Phase O (2026-05-12) — switch MODEL_PRO từ gemini-3.1-pro-preview sang
+// deepseek-v4-pro. Lý do:
+//   1. Gemini 3.1 Pro là "thinking" model — burns reasoning_tokens trước
+//      emit content. master_outline 16K output → thinking ăn 12K → content
+//      truncated → parseJSON returns null silent fail.
+//   2. DeepSeek v4 Pro: 384K output ceiling, NO thinking burn, $1.74/$3.48
+//      per 1M (12× Flash but creative-tier reasoning).
+//   3. User feedback 2026-05-12: "DeepSeek flash không đủ trình để setup
+//      truyện hay". Setup pipeline cần creative reasoning, Flash optimize
+//      cho cost+speed không phù hợp.
+//
+// Expanded PRO_TASKS (Phase O) — toàn bộ creative setup stages:
 const PRO_TASKS = new Set([
-  // Story-level planning — set the entire trajectory (called 1-50 times / 1000 chapters)
-  'story_outline',       // 1× per novel
-  'story_bible',         // ch.3 + every 150ch ≈ 7× per 1000 chapters
+  // Setup pipeline creative stages (Phase O 2026-05-12)
+  'stage_idea',          // StoryKernel — readerFantasy/pleasureLoop/systemMechanic creative DNA
+  'stage_world',         // World rules + magic system architecture
+  'stage_character',     // MC archetype + voice signature
+  'master_outline',      // 5-15 volumes × 4-6 sub-arcs × 6-axis (Pro now handles 16K output)
+  'story_outline',       // premise + cast + worldRules + dopamineContract + conflictLadder
+
+  // Existing Pro tasks
+  'story_bible',         // ch.3 + every 150ch refresh ≈ 7× per 1000 chapters
   'arc_plan',            // ~50× per 1000 chapters (every 20 ch)
 ]);
 
@@ -36,7 +47,9 @@ const FLASH_TASKS = new Set([
   'writer',
   'writer_continuation',
   'auto_revision',
-  'master_outline',      // Moved from Pro 2026-05-02 — see PRO_TASKS comment
+
+  // Setup pipeline cheap stages (low creative stake)
+  'stage_description',   // Reader pitch 200 từ — okay generic
 
   // Recap / extraction tasks
   'synopsis',
@@ -56,7 +69,7 @@ const FLASH_TASKS = new Set([
   'pacing_blueprint',
 ]);
 
-export const MODEL_PRO = 'gemini-3.1-pro-preview';
+export const MODEL_PRO = 'deepseek-v4-pro';
 export const MODEL_FLASH = 'deepseek-v4-flash';
 
 declare global {

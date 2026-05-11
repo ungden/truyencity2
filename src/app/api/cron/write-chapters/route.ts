@@ -582,6 +582,13 @@ async function prepareInitProject(
 
   const STAGED_STATES = new Set(['idea', 'world', 'character', 'description', 'master_outline', 'story_outline', 'arc_plan']);
   if (STAGED_STATES.has(setup_stage)) {
+    // Phase O (2026-05-12): install model tier routing trước runOneStage để
+    // setup stages (stage_idea/world/character/master_outline/story_outline)
+    // route lên deepseek-v4-pro thay vì flash. Setup creative tasks cần
+    // reasoning depth — Flash không đủ trình.
+    const { installModelTierRouting } = await import('@/services/story-engine/utils/model-tier');
+    installModelTierRouting();
+
     const { runOneStage } = await import('@/services/story-engine/pipeline/setup-pipeline');
     const { data: stageProj } = await supabase
       .from('ai_story_projects')

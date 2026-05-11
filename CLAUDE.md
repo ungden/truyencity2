@@ -93,7 +93,16 @@ writeOneChapter() [orchestrator.ts]
   - Auto-routed by `callGemini()` whenever `config.model` starts with `deepseek-` (router in `src/services/story-engine/utils/gemini.ts`)
   - V4 thinking models split output into `reasoning_content` + `content` — adapter falls back to `reasoning_content` when `content` is empty
   - Adapter: `src/services/story-engine/utils/deepseek.ts` (OpenAI-compatible, 5 retries with backoff up to 90s for transient failures)
-- **Premium tier**: `deepseek-v4-pro` ($1.74/$3.48 per 1M) — 12× cost; reserved for tasks where quality justifies (currently unused)
+- **Premium tier**: `deepseek-v4-pro` ($1.74/$3.48 per 1M) — 12× cost. **Phase O (2026-05-12)** routes 7 creative-setup tasks lên Pro:
+  - `stage_idea` (StoryKernel: readerFantasy/pleasureLoop/systemMechanic/mcSecret)
+  - `stage_world` (world rules + magic system)
+  - `stage_character` (MC archetype + voice signature)
+  - `master_outline` (5-15 volumes × 4-6 sub-arcs × 6-axis)
+  - `story_outline` (premise + cast + worldRules + dopamineContract)
+  - `story_bible` (ch.3 + every 150ch refresh)
+  - `arc_plan` (every 20 ch refresh)
+  - Routing config: `src/services/story-engine/utils/model-tier.ts`
+  - Cost impact: +$0.10/novel setup (negligible vs $25 chapter writing total). Tổng cost 1000-ch novel: $25.10 (silver tier) vs $25 (flash-only)
 - **Backup**: `gemini-3-flash-preview` — kept as a UI option but not selected by default
 - **Embeddings**: `gemini-embedding-001`, 768 dims, `outputDimensionality` param (DeepSeek has no embedding API → embeddings stay on Gemini)
 - **Image gen**: `gemini-3-pro-image-preview` (covers; DeepSeek doesn't generate images)
