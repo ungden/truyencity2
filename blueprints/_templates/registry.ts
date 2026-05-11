@@ -78,7 +78,7 @@ export const ARCHETYPES_BY_GENRE: Record<string, ArchetypeRoute[]> = {
     { template: TIEN_HIEP_LAO_TO_TEMPLATE,
       titleKeywords: ['lão tổ', 'tổ sư', 'khai phái', 'gia tộc', 'chưởng môn', 'tông môn kinh doanh', 'sư tổ'] },
     { template: TIEN_HIEP_META_COMEDY_TEMPLATE,
-      titleKeywords: ['bịa', 'hài', 'hiểu lầm', 'tưởng', 'eminence', 'meta', 'phản sáo lộ', 'shadow', 'comedy tu tiên'] },
+      titleKeywords: ['bịa', 'hài', 'hiểu lầm', 'tưởng', 'eminence', 'meta', 'phản sáo lộ', 'shadow', 'comedy tu tiên', 'tin sái', 'đệ tử tin', 'bịa cosmic', 'ai ngờ', 'ngộ nhận'] },
   ],
   'do-thi': [
     { template: DO_THI_REBORN_GENIUS_TEMPLATE, isDefault: true,
@@ -96,7 +96,7 @@ export const ARCHETYPES_BY_GENRE: Record<string, ArchetypeRoute[]> = {
     { template: DO_THI_PHUC_THU_TEMPLATE,
       titleKeywords: ['phục thù', 'báo thù', 'phản bội', 'bị hãm', 'revenge', 'hối hận'] },
     { template: DO_THI_Y_TE_TEMPLATE,
-      titleKeywords: ['y tế', 'bác sĩ', 'thần y', 'medical', 'phẫu thuật', 'bệnh viện', 'doctor'] },
+      titleKeywords: ['y tế', 'bác sĩ', 'thần y', 'medical', 'phẫu thuật', 'bệnh viện', 'doctor', 'y đạo', 'hệ thống y', 'cấp nobel'] },
     { template: FALOO_QUOC_VAN_TEMPLATE,
       titleKeywords: ['quốc vận', 'prompt', 'hint', 'gợi ý', 'national event', 'tournament prompt'] },
   ],
@@ -110,7 +110,7 @@ export const ARCHETYPES_BY_GENRE: Record<string, ArchetypeRoute[]> = {
     { template: HUYEN_HUYEN_OCCULT_TEMPLATE,
       titleKeywords: ['quỷ bí', 'lord of mysteries', 'occult', 'cthulhu', 'steampunk', 'sequence', 'tà thần', 'cosmic horror', 'đạo đoàn', 'ritual'] },
     { template: ROMANTASY_THRILLER_TEMPLATE,
-      titleKeywords: ['romantasy', 'lãng mạn pháp thuật', 'romance magic', 'romance thriller', 'pháp sư yêu nữ', 'magic mystery'] },
+      titleKeywords: ['romantasy', 'lãng mạn pháp thuật', 'romance magic', 'romance thriller', 'pháp sư yêu nữ', 'magic mystery', 'stormwind', 'castor', 'argentum', 'silverhold', 'pháp sư điều tra', 'bí mật của'] },
   ],
   'lich-su': [
     { template: LICH_SU_QUAN_TRUONG_TEMPLATE, isDefault: true,
@@ -128,7 +128,7 @@ export const ARCHETYPES_BY_GENRE: Record<string, ArchetypeRoute[]> = {
     { template: KHOA_HUYEN_TIME_LOOP_TEMPLATE,
       titleKeywords: ['vòng lặp', 'time loop', 'thời gian', 'time travel', 'thriller', 'thiên tài câu lạc bộ'] },
     { template: COZY_SCIFI_TEMPLATE,
-      titleKeywords: ['cozy', 'space bakery', 'tiệm vũ trụ', 'trạm vũ trụ', 'cosy sci-fi'] },
+      titleKeywords: ['cozy', 'space bakery', 'tiệm vũ trụ', 'trạm vũ trụ', 'cosy sci-fi', 'tea house', 'cosmic tea', 'lữ khách', 'AI companion', 'cosmic tea house'] },
   ],
   'dong-nhan': [
     { template: DONG_NHAN_REWRITE_TEMPLATE, isDefault: true,
@@ -150,7 +150,7 @@ export const ARCHETYPES_BY_GENRE: Record<string, ArchetypeRoute[]> = {
     { template: DI_GIOI_MUSHOKU_TEMPLATE,
       titleKeywords: ['tái sinh', 'reincarnation', 'mushoku', 'slow growth', 'từ nhỏ', 'isekai childhood'] },
     { template: COZY_FANTASY_TEMPLATE,
-      titleKeywords: ['cozy fantasy', 'tiệm bánh', 'tiệm trà', 'bakery', 'tea house', 'slice of life', 'healing'] },
+      titleKeywords: ['cozy fantasy', 'tiệm bánh', 'tiệm trà', 'bakery', 'tea house', 'slice of life', 'healing', 'quán trà', 'làng', 'tiệm', 'khách lạ'] },
   ],
   'linh-di': [
     { template: LINH_DI_CORONER_TEMPLATE, isDefault: true,
@@ -178,7 +178,7 @@ export const ARCHETYPES_BY_GENRE: Record<string, ArchetypeRoute[]> = {
     { template: NGON_TINH_MA_GIAP_TEMPLATE,
       titleKeywords: ['mã giáp', 'rớt giáp', 'phu nhân', '马甲', 'hidden identity', 'identity reveal'] },
     { template: NGON_TINH_CO_NGON_TEMPLATE,
-      titleKeywords: ['cổ ngôn', 'cung đấu', 'trạch đấu', 'điền văn', 'cung đình', 'hoàng hậu', 'phi tử', 'cổ đại trọng sinh'] },
+      titleKeywords: ['cổ ngôn', 'cung đấu', 'trạch đấu', 'điền văn', 'cung đình', 'hoàng hậu', 'phi tử', 'cổ đại trọng sinh', 'trọng sinh cổ đại', 'đích nữ', 'họa mi', 'cõi chết'] },
   ],
   'quan-truong': [
     { template: QUAN_TRUONG_BUREAUCRAT_TEMPLATE, isDefault: true,
