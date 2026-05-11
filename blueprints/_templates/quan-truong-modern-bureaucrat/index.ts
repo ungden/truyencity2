@@ -84,4 +84,7 @@ export const QUAN_TRUONG_BUREAUCRAT_TEMPLATE: TemplateBlueprint = {
     'CẤM scandal politic vô lý',
   ],
   cosmicArcStartChapter: 901,
+  mood: ['sang-khoai', 'kich-tinh'],
+  tempo: 'medium',
+  spiceLevel: 1,
 };

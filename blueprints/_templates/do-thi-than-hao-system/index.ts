@@ -72,4 +72,7 @@ export const DO_THI_THAN_HAO_TEMPLATE: TemplateBlueprint = {
   ],
   extraBannedPatterns: ['CẤM bạo lực', 'CẤM reveal hệ thống cosmic origin sớm'],
   cosmicArcStartChapter: 401,
+  mood: ['sang-khoai', 'hai-huoc'],
+  tempo: 'fast-paced',
+  spiceLevel: 1,
 };

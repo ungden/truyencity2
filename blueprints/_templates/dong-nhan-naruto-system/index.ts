@@ -72,4 +72,7 @@ export const DONG_NHAN_NARUTO_TEMPLATE: TemplateBlueprint = {
   ],
   extraBannedPatterns: ['CẤM canon OOC', 'CẤM reveal spoiler trắng trợn'],
   cosmicArcStartChapter: 401,
+  mood: ['sang-khoai', 'kich-tinh'],
+  tempo: 'fast-paced',
+  spiceLevel: 1,
 };

@@ -82,4 +82,7 @@ export const VONG_DU_TOP_PLAYER_TEMPLATE: TemplateBlueprint = {
     'CẤM reveal MC trọng sinh trắng trợn',
   ],
   cosmicArcStartChapter: 701,
+  mood: ['sang-khoai', 'kich-tinh'],
+  tempo: 'fast-paced',
+  spiceLevel: 1,
 };

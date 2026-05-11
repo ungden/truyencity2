@@ -85,4 +85,7 @@ export const KHOA_HUYEN_TECH_FUSION_TEMPLATE: TemplateBlueprint = {
     'CẤM AI familiar lộ cosmic capabilities cho người ngoài',
   ],
   cosmicArcStartChapter: 701,
+  mood: ['sang-khoai', 'kich-tinh'],
+  tempo: 'medium',
+  spiceLevel: 1,
 };

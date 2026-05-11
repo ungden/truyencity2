@@ -77,4 +77,7 @@ export const HUYEN_HUYEN_BLOODLINE_TEMPLATE: TemplateBlueprint = {
     'CẤM tổ tiên di niệm xuất hiện ngẫu nhiên — phải có trigger (di vật / mật cảnh / huyết mạch tầng).',
   ],
   cosmicArcStartChapter: 701, // Arc 6 thượng cổ ruins là cosmic-tier reveal
+  mood: ['sang-khoai', 'kich-tinh'],
+  tempo: 'medium',
+  spiceLevel: 1,
 };

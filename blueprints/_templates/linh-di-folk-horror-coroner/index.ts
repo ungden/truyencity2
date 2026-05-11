@@ -80,4 +80,7 @@ export const LINH_DI_CORONER_TEMPLATE: TemplateBlueprint = {
     'CẤM bùa chú không ledger từ tổ tiên',
   ],
   cosmicArcStartChapter: 701,
+  mood: ['bi-an', 'u-am', 'ky-la'],
+  tempo: 'medium',
+  spiceLevel: 2,
 };

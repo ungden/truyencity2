@@ -76,4 +76,7 @@ export const DO_THI_REBORN_GENIUS_TEMPLATE: TemplateBlueprint = {
     'CẤM dùng kiến thức tương lai trắng trợn (vd nhắc tên brand sẽ ra mắt) — phải gián tiếp.',
   ],
   cosmicArcStartChapter: 901, // Arc 7 endgame mới có cosmic-tier (black swan event lore)
+  mood: ['sang-khoai', 'kich-tinh'],
+  tempo: 'fast-paced',
+  spiceLevel: 1,
 };

@@ -84,4 +84,7 @@ export const DO_THI_THAP_NIEN_TEMPLATE: TemplateBlueprint = {
   ],
   extraBannedPatterns: ['CẤM bạo lực', 'CẤM brand reveal sớm', 'CẤM family ngẫu nhiên giàu'],
   cosmicArcStartChapter: 901,
+  mood: ['sang-khoai'],
+  tempo: 'medium',
+  spiceLevel: 1,
 };

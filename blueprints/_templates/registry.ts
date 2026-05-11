@@ -42,6 +42,20 @@ import { NGON_TINH_CEO_SOFT_TEMPLATE } from './ngon-tinh-ceo-soft';
 import { NGON_TINH_PHUC_THU_TEMPLATE } from './ngon-tinh-trong-sinh-phuc-thu';
 import { NGON_TINH_KHOAI_XUYEN_TEMPLATE } from './ngon-tinh-khoai-xuyen';
 import { QUAN_TRUONG_BUREAUCRAT_TEMPLATE } from './quan-truong-modern-bureaucrat';
+// Phase H batch 1-3 — 13 new archetype templates spanning 8 narrative patterns
+import { FALOO_QUOC_VAN_TEMPLATE } from './faloo-quoc-van-prompt';
+import { FALOO_TONG_MAN_TEMPLATE } from './faloo-tong-man-reaction';
+import { HUYEN_HUYEN_OCCULT_TEMPLATE } from './huyen-huyen-occult-steampunk';
+import { TIEN_HIEP_META_COMEDY_TEMPLATE } from './tien-hiep-meta-comedy';
+import { LICH_SU_CORONER_TEMPLATE } from './lich-su-coroner-mystery';
+import { KHOA_HUYEN_TIME_LOOP_TEMPLATE } from './khoa-huyen-time-loop-thriller';
+import { NGON_TINH_MA_GIAP_TEMPLATE } from './ngon-tinh-ma-giap-reveal';
+import { NGON_TINH_CO_NGON_TEMPLATE } from './ngon-tinh-co-ngon-trach-dau';
+import { DO_THI_Y_TE_TEMPLATE } from './do-thi-y-te-he-thong';
+import { COZY_FANTASY_TEMPLATE } from './cozy-fantasy-slice-of-life';
+import { COZY_SCIFI_TEMPLATE } from './cozy-sci-fi-space-bakery';
+import { DI_GIOI_MUSHOKU_TEMPLATE } from './di-gioi-mushoku-slow-growth';
+import { ROMANTASY_THRILLER_TEMPLATE } from './romantasy-thriller-hybrid';
 
 interface ArchetypeRoute {
   template: TemplateBlueprint;
@@ -63,6 +77,8 @@ export const ARCHETYPES_BY_GENRE: Record<string, ArchetypeRoute[]> = {
       titleKeywords: ['phàm nhân', 'phàm nhập tu tiên', 'cẩu đạo', 'trường sinh', 'phàm tu', 'tản tu'] },
     { template: TIEN_HIEP_LAO_TO_TEMPLATE,
       titleKeywords: ['lão tổ', 'tổ sư', 'khai phái', 'gia tộc', 'chưởng môn', 'tông môn kinh doanh', 'sư tổ'] },
+    { template: TIEN_HIEP_META_COMEDY_TEMPLATE,
+      titleKeywords: ['bịa', 'hài', 'hiểu lầm', 'tưởng', 'eminence', 'meta', 'phản sáo lộ', 'shadow', 'comedy tu tiên'] },
   ],
   'do-thi': [
     { template: DO_THI_REBORN_GENIUS_TEMPLATE, isDefault: true,
@@ -78,7 +94,11 @@ export const ARCHETYPES_BY_GENRE: Record<string, ArchetypeRoute[]> = {
     { template: DO_THI_THAN_HAO_TEMPLATE,
       titleKeywords: ['thần hào', 'tỷ tiền', 'sô số', 'sign-in', 'check-in', 'đại lão tiêu tiền', 'consumption'] },
     { template: DO_THI_PHUC_THU_TEMPLATE,
-      titleKeywords: ['phục thù', 'báo thù', 'phản bội', 'bị hãm', 'revenge'] },
+      titleKeywords: ['phục thù', 'báo thù', 'phản bội', 'bị hãm', 'revenge', 'hối hận'] },
+    { template: DO_THI_Y_TE_TEMPLATE,
+      titleKeywords: ['y tế', 'bác sĩ', 'thần y', 'medical', 'phẫu thuật', 'bệnh viện', 'doctor'] },
+    { template: FALOO_QUOC_VAN_TEMPLATE,
+      titleKeywords: ['quốc vận', 'prompt', 'hint', 'gợi ý', 'national event', 'tournament prompt'] },
   ],
   'huyen-huyen': [
     { template: HUYEN_HUYEN_BLOODLINE_TEMPLATE, isDefault: true,
@@ -87,24 +107,36 @@ export const ARCHETYPES_BY_GENRE: Record<string, ArchetypeRoute[]> = {
       titleKeywords: ['phản phái', 'hắc ám', 'tà đạo', 'ma đạo', 'villain', 'đại phản phái', 'tà phái'] },
     { template: HUYEN_HUYEN_MO_PHONG_TEMPLATE,
       titleKeywords: ['mô phỏng', 'suy diễn', 'simulation', 'simulator', 'dự đoán', 'predict'] },
+    { template: HUYEN_HUYEN_OCCULT_TEMPLATE,
+      titleKeywords: ['quỷ bí', 'lord of mysteries', 'occult', 'cthulhu', 'steampunk', 'sequence', 'tà thần', 'cosmic horror', 'đạo đoàn', 'ritual'] },
+    { template: ROMANTASY_THRILLER_TEMPLATE,
+      titleKeywords: ['romantasy', 'lãng mạn pháp thuật', 'romance magic', 'romance thriller', 'pháp sư yêu nữ', 'magic mystery'] },
   ],
   'lich-su': [
     { template: LICH_SU_QUAN_TRUONG_TEMPLATE, isDefault: true,
       titleKeywords: ['quan trường', 'thư sinh', 'khoa cử', 'đệ nhất quán'] },
     { template: LICH_SU_TUONG_QUAN_TEMPLATE,
       titleKeywords: ['tướng quân', 'chiến thần', 'binh', 'chinh chiến', 'biên cương', 'tam quốc', 'general'] },
+    { template: LICH_SU_CORONER_TEMPLATE,
+      titleKeywords: ['ngỗ tác', 'phá án', 'đả canh', 'detective cổ', 'cẩm y vệ', 'điều tra triều', 'forensics'] },
   ],
   'khoa-huyen': [
     { template: KHOA_HUYEN_TECH_FUSION_TEMPLATE, isDefault: true,
       titleKeywords: ['tech', 'AI', 'lab', 'kỹ sư', 'engineer', 'tu chân hệ thống'] },
     { template: KHOA_HUYEN_TINH_TE_TEMPLATE,
       titleKeywords: ['tinh tế', 'cơ giáp', 'mech', 'galactic', 'space', 'vũ trụ', 'pilot'] },
+    { template: KHOA_HUYEN_TIME_LOOP_TEMPLATE,
+      titleKeywords: ['vòng lặp', 'time loop', 'thời gian', 'time travel', 'thriller', 'thiên tài câu lạc bộ'] },
+    { template: COZY_SCIFI_TEMPLATE,
+      titleKeywords: ['cozy', 'space bakery', 'tiệm vũ trụ', 'trạm vũ trụ', 'cosy sci-fi'] },
   ],
   'dong-nhan': [
     { template: DONG_NHAN_REWRITE_TEMPLATE, isDefault: true,
       titleKeywords: ['đồng nhân', 'fanfic', 'tổng mạn', 'multiverse', 'chư thiên'] },
     { template: DONG_NHAN_NARUTO_TEMPLATE,
       titleKeywords: ['naruto', 'hỏa ảnh', 'ninja', 'uchiha', 'senju', 'konoha', 'sharingan'] },
+    { template: FALOO_TONG_MAN_TEMPLATE,
+      titleKeywords: ['tổng mạn', 'phơi bày', '曝光', 'reaction', 'phá phòng', 'tổng cảm', 'reveal canon'] },
   ],
   'vong-du': [
     { template: VONG_DU_TOP_PLAYER_TEMPLATE, isDefault: true,
@@ -115,6 +147,10 @@ export const ARCHETYPES_BY_GENRE: Record<string, ArchetypeRoute[]> = {
   'di-gioi': [
     { template: DI_GIOI_LORD_BUILDER_TEMPLATE, isDefault: true,
       titleKeywords: ['lãnh chúa', 'territory', 'đệ tứ thiên tai', 'lord', 'kingdom builder'] },
+    { template: DI_GIOI_MUSHOKU_TEMPLATE,
+      titleKeywords: ['tái sinh', 'reincarnation', 'mushoku', 'slow growth', 'từ nhỏ', 'isekai childhood'] },
+    { template: COZY_FANTASY_TEMPLATE,
+      titleKeywords: ['cozy fantasy', 'tiệm bánh', 'tiệm trà', 'bakery', 'tea house', 'slice of life', 'healing'] },
   ],
   'linh-di': [
     { template: LINH_DI_CORONER_TEMPLATE, isDefault: true,
@@ -139,6 +175,10 @@ export const ARCHETYPES_BY_GENRE: Record<string, ArchetypeRoute[]> = {
       titleKeywords: ['phục thù', 'trọng sinh phục thù', 'báo thù', 'đích nữ trọng sinh'] },
     { template: NGON_TINH_KHOAI_XUYEN_TEMPLATE,
       titleKeywords: ['khoái xuyên', 'pháo hôi', 'nữ phụ', 'phản phái nữ chủ', 'cứu nguyên chủ'] },
+    { template: NGON_TINH_MA_GIAP_TEMPLATE,
+      titleKeywords: ['mã giáp', 'rớt giáp', 'phu nhân', '马甲', 'hidden identity', 'identity reveal'] },
+    { template: NGON_TINH_CO_NGON_TEMPLATE,
+      titleKeywords: ['cổ ngôn', 'cung đấu', 'trạch đấu', 'điền văn', 'cung đình', 'hoàng hậu', 'phi tử', 'cổ đại trọng sinh'] },
   ],
   'quan-truong': [
     { template: QUAN_TRUONG_BUREAUCRAT_TEMPLATE, isDefault: true,

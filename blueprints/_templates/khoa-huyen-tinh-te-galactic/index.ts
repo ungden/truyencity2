@@ -71,4 +71,7 @@ export const KHOA_HUYEN_TINH_TE_TEMPLATE: TemplateBlueprint = {
   ],
   extraBannedPatterns: ['CẤM tech random', 'CẤM time-skip phá continuity'],
   cosmicArcStartChapter: 401,
+  mood: ['sang-khoai', 'kich-tinh'],
+  tempo: 'medium',
+  spiceLevel: 1,
 };

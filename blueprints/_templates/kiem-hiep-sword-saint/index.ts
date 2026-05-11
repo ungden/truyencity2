@@ -80,4 +80,7 @@ export const KIEM_HIEP_SWORD_SAINT_TEMPLATE: TemplateBlueprint = {
     'CẤM cosmic threat trước arc 6',
   ],
   cosmicArcStartChapter: 701,
+  mood: ['sang-khoai', 'kich-tinh'],
+  tempo: 'medium',
+  spiceLevel: 1,
 };

@@ -88,4 +88,7 @@ export const TIEN_HIEP_RETURNING_EXPERT_TEMPLATE: TemplateBlueprint = {
   // Cosmic-tier elements (chân tướng kiếp trước, thượng cổ ruins, pháp tắc
   // thiên đạo) plant ở arc 6 (ch.701+). Default 70% × 1000 = 701.
   cosmicArcStartChapter: 701,
+  mood: ['sang-khoai', 'kich-tinh'],
+  tempo: 'medium',
+  spiceLevel: 1,
 };

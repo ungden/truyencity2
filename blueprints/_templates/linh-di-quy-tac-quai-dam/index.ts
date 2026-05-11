@@ -72,4 +72,7 @@ export const LINH_DI_QUY_TAC_TEMPLATE: TemplateBlueprint = {
   ],
   extraBannedPatterns: ['CẤM rules reveal đầy đủ đầu', 'CẤM MC OP từ đầu'],
   cosmicArcStartChapter: 401,
+  mood: ['bi-an', 'kich-tinh', 'u-am'],
+  tempo: 'medium',
+  spiceLevel: 2,
 };

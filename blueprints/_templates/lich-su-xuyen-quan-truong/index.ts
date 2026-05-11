@@ -98,4 +98,7 @@ export const LICH_SU_QUAN_TRUONG_TEMPLATE: TemplateBlueprint = {
     'CẤM MC tay đôi đánh đấm — battle ở cấp tướng / quân, MC chỉ huy',
   ],
   cosmicArcStartChapter: 701,
+  mood: ['sang-khoai', 'kich-tinh'],
+  tempo: 'medium',
+  spiceLevel: 1,
 };

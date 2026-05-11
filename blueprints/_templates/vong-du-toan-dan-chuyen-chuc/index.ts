@@ -72,4 +72,7 @@ export const VONG_DU_TOAN_DAN_TEMPLATE: TemplateBlueprint = {
   ],
   extraBannedPatterns: ['CẤM gear random', 'CẤM reveal hidden class sớm'],
   cosmicArcStartChapter: 401,
+  mood: ['sang-khoai', 'kich-tinh'],
+  tempo: 'fast-paced',
+  spiceLevel: 1,
 };

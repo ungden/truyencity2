@@ -84,4 +84,7 @@ export const TIEN_HIEP_PHAM_NHAN_TEMPLATE: TemplateBlueprint = {
     'CẤM MC OP từ đầu',
   ],
   cosmicArcStartChapter: 701,
+  mood: ['kich-tinh'],
+  tempo: 'slow-burn',
+  spiceLevel: 1,
 };

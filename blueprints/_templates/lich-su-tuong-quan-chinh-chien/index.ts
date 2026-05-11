@@ -72,4 +72,7 @@ export const LICH_SU_TUONG_QUAN_TEMPLATE: TemplateBlueprint = {
   ],
   extraBannedPatterns: ['CẤM bạo lực vô cớ', 'CẤM reveal xuyên không'],
   cosmicArcStartChapter: 401,
+  mood: ['sang-khoai', 'kich-tinh'],
+  tempo: 'medium',
+  spiceLevel: 1,
 };

@@ -78,4 +78,7 @@ export const MAT_THE_HOARDER_TEMPLATE: TemplateBlueprint = {
     'CẤM cosmic threat xuất hiện sớm trước arc 4',
   ],
   cosmicArcStartChapter: 701,
+  mood: ['kich-tinh', 'sang-khoai'],
+  tempo: 'fast-paced',
+  spiceLevel: 2,
 };

@@ -81,4 +81,7 @@ export const NGON_TINH_CEO_SOFT_TEMPLATE: TemplateBlueprint = {
     'CẤM rival hành xử cực đoan (giết / bắt cóc)',
   ],
   cosmicArcStartChapter: 901,
+  mood: ['lang-man', 'sang-khoai'],
+  tempo: 'medium',
+  spiceLevel: 2,
 };

@@ -81,4 +81,7 @@ export const TIEN_HIEP_LAO_TO_TEMPLATE: TemplateBlueprint = {
     'CẤM gen sau yếu hơn gen trước',
   ],
   cosmicArcStartChapter: 701,
+  mood: ['sang-khoai', 'hai-huoc'],
+  tempo: 'medium',
+  spiceLevel: 1,
 };

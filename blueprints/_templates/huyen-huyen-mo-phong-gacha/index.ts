@@ -71,4 +71,7 @@ export const HUYEN_HUYEN_MO_PHONG_TEMPLATE: TemplateBlueprint = {
   ],
   extraBannedPatterns: ['CẤM sim không có cost', 'CẤM reveal simulator'],
   cosmicArcStartChapter: 401,
+  mood: ['sang-khoai', 'bi-an'],
+  tempo: 'medium',
+  spiceLevel: 1,
 };

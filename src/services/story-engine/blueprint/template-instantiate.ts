@@ -30,6 +30,20 @@ import type {
   ItemLedgerEntry,
 } from './types';
 
+/** Reader-facing mood — multi-valued (1+ tag per template). */
+export type TemplateMood =
+  | 'chua-lanh'      // healing / cosy
+  | 'sang-khoai'     // satisfying power fantasy
+  | 'kich-tinh'      // tense / thriller
+  | 'hai-huoc'       // comedy / lighthearted
+  | 'u-am'           // dark / grimdark
+  | 'ky-la'          // weird / surreal
+  | 'lang-man'       // romantic
+  | 'bi-an';         // mystery / occult
+
+/** Reader-facing tempo — single-valued per template. */
+export type TemplateTempo = 'slow-burn' | 'medium' | 'fast-paced';
+
 export interface TemplateBlueprint extends Omit<NovelBlueprint, 'id' | 'title' | 'slug'> {
   /** Template identifier, e.g. 'tien-hiep-returning-expert'. */
   templateId: string;
@@ -41,6 +55,12 @@ export interface TemplateBlueprint extends Omit<NovelBlueprint, 'id' | 'title' |
   description: string;
   /** Brief recommendations for filling each required var. */
   varGuidance?: Record<string, string>;
+  /** Reader-facing mood tags (multi). Used for discovery / recommendation. */
+  mood?: TemplateMood[];
+  /** Reader-facing tempo (single). */
+  tempo?: TemplateTempo;
+  /** Spice level 0 (clean) → 5 (explicit). Default 1. */
+  spiceLevel?: 0 | 1 | 2 | 3 | 4 | 5;
 }
 
 export interface InstantiateInput {

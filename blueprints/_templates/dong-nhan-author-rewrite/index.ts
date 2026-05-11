@@ -79,4 +79,7 @@ export const DONG_NHAN_REWRITE_TEMPLATE: TemplateBlueprint = {
     'CẤM MC reveal canon spoiler trắng trợn',
   ],
   cosmicArcStartChapter: 701,
+  mood: ['sang-khoai', 'hai-huoc'],
+  tempo: 'medium',
+  spiceLevel: 1,
 };

@@ -47,14 +47,14 @@ const briefsByArc = buildTemplateBriefs(NGON_TINH_PHUC_THU_ARC_SKELETON, {
 
 export const NGON_TINH_PHUC_THU_TEMPLATE: TemplateBlueprint = {
   templateId: 'ngon-tinh-trong-sinh-phuc-thu',
-  description: 'Female trọng sinh phục thù archetype — Female MC kiếp trước bị phản bội (vợ chồng + gia đình + cosmic conspiracy), trọng sinh báo thù qua cluster-dopamine.',
+  description: 'Female trọng sinh phục thù archetype — Female MC kiếp trước bị phản bội. Hỗ trợ 3 REVENGE_MODE: passive (Hối Hận Văn) / active (mass face-slap) / extreme (ruthless).',
   genre: 'ngon-tinh',
   totalChapters: 1000,
   arcs: NGON_TINH_PHUC_THU_ARC_SKELETON.map((arc, i) => ({ arc, briefs: briefsByArc[i] })),
   requiredVars: [
     'FEMALE_MC', 'FEMALE_MC_FAMILY', 'HOMETOWN', 'COUNTRY_NAME',
     'TRAITOR_FEMALE', 'TRAITOR_HUSBAND', 'TRAITOR_FAMILY',
-    'TRUE_LOVE', 'ENDING_GOAL',
+    'TRUE_LOVE', 'REVENGE_MODE', 'ENDING_GOAL',
   ],
   optionalVars: {},
   varGuidance: {
@@ -66,6 +66,7 @@ export const NGON_TINH_PHUC_THU_TEMPLATE: TemplateBlueprint = {
     TRAITOR_HUSBAND: 'Male traitor (chồng cũ kiếp trước) — vd "Trần Hắc"',
     TRAITOR_FAMILY: 'Gia đình thâm độc — vd "Lý gia"',
     TRUE_LOVE: 'True love mới — vd "Nguyễn Minh"',
+    REVENGE_MODE: '"passive" (hối hận văn — MC rời đi, traitors hối hận) / "active" (mass face-slap) / "extreme" (ruthless)',
     ENDING_GOAL: 'Đích cuối — vd "vợ chồng bá đạo + family empire stable + cosmic peace"',
   },
   toneDirectives: [
@@ -75,4 +76,7 @@ export const NGON_TINH_PHUC_THU_TEMPLATE: TemplateBlueprint = {
   ],
   extraBannedPatterns: ['CẤM bạo lực', 'CẤM forced romance', 'CẤM forgive mềm'],
   cosmicArcStartChapter: 401,
+  mood: ['sang-khoai', 'lang-man', 'u-am'],
+  tempo: 'fast-paced',
+  spiceLevel: 2,
 };

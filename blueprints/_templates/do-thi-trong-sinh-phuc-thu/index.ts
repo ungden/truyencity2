@@ -47,14 +47,14 @@ const briefsByArc = buildTemplateBriefs(DO_THI_PHUC_THU_ARC_SKELETON, {
 
 export const DO_THI_PHUC_THU_TEMPLATE: TemplateBlueprint = {
   templateId: 'do-thi-trong-sinh-phuc-thu',
-  description: 'Trọng Sinh Phục Thù archetype — MC kiếp trước bị phản bội, trọng sinh báo thù 3 traitors qua cluster-dopamine. Cosmic-tier conspiracy reveal late.',
+  description: 'Trọng Sinh Phục Thù archetype — MC kiếp trước bị phản bội, trọng sinh báo thù 3 traitors. Hỗ trợ 3 REVENGE_MODE: passive (Hối Hận Văn — MC rời đi, traitors hối hận) / active (mass face-slap) / extreme (ruthless takedown).',
   genre: 'do-thi',
   totalChapters: 1000,
   arcs: DO_THI_PHUC_THU_ARC_SKELETON.map((arc, i) => ({ arc, briefs: briefsByArc[i] })),
   requiredVars: [
     'MC_NAME', 'MC_FAMILY', 'HOMETOWN', 'COUNTRY_NAME',
     'TRAITOR_FRIEND', 'TRAITOR_FIANCEE', 'TRAITOR_BOSS',
-    'LIFE_PARTNER_REAL', 'ENDING_GOAL',
+    'LIFE_PARTNER_REAL', 'REVENGE_MODE', 'ENDING_GOAL',
   ],
   optionalVars: {},
   varGuidance: {
@@ -66,6 +66,7 @@ export const DO_THI_PHUC_THU_TEMPLATE: TemplateBlueprint = {
     TRAITOR_FIANCEE: 'Fiancée kiếp trước phản bội — vd "Phạm Vi"',
     TRAITOR_BOSS: 'Mafia / step-father kiếp trước — vd "Hoàng Đại Lão"',
     LIFE_PARTNER_REAL: 'True love mới — vd "Nguyễn Lan Anh"',
+    REVENGE_MODE: 'Loại revenge — "passive" (hối hận văn — MC rời đi, traitors hối hận từ xa) / "active" (mass face-slap chuẩn) / "extreme" (ruthless takedown dark)',
     ENDING_GOAL: 'Đích cuối — vd "tài phiệt #1 + cosmic philanthropist"',
   },
   toneDirectives: [
@@ -75,4 +76,7 @@ export const DO_THI_PHUC_THU_TEMPLATE: TemplateBlueprint = {
   ],
   extraBannedPatterns: ['CẤM bạo lực', 'CẤM forgive traitors mềm'],
   cosmicArcStartChapter: 501,
+  mood: ['sang-khoai', 'u-am'],
+  tempo: 'fast-paced',
+  spiceLevel: 2,
 };

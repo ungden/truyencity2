@@ -76,4 +76,7 @@ export const HUYEN_HUYEN_HAC_AM_TEMPLATE: TemplateBlueprint = {
     'CẤM thánh mẫu moments',
   ],
   cosmicArcStartChapter: 401,
+  mood: ['sang-khoai', 'u-am'],
+  tempo: 'medium',
+  spiceLevel: 2,
 };

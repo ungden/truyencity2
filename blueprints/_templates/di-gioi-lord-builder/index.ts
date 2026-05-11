@@ -79,4 +79,7 @@ export const DI_GIOI_LORD_BUILDER_TEMPLATE: TemplateBlueprint = {
     'CẤM hero recruit không lý do (quest / event / gacha)',
   ],
   cosmicArcStartChapter: 701,
+  mood: ['sang-khoai', 'kich-tinh'],
+  tempo: 'medium',
+  spiceLevel: 1,
 };

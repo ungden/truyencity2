@@ -67,4 +67,7 @@ export const NGON_TINH_KHOAI_XUYEN_TEMPLATE: TemplateBlueprint = {
   ],
   extraBannedPatterns: ['CẤM cross-world memory leak', 'CẤM kill nguyên chủ'],
   cosmicArcStartChapter: 401,
+  mood: ['sang-khoai', 'lang-man'],
+  tempo: 'fast-paced',
+  spiceLevel: 1,
 };

@@ -71,4 +71,7 @@ export const MAT_THE_THIEN_TAI_TEMPLATE: TemplateBlueprint = {
   ],
   extraBannedPatterns: ['CẤM zombie', 'CẤM bạo lực bừa'],
   cosmicArcStartChapter: 401,
+  mood: ['chua-lanh', 'kich-tinh'],
+  tempo: 'slow-burn',
+  spiceLevel: 1,
 };

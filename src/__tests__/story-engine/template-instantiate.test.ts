@@ -37,6 +37,19 @@ import { NGON_TINH_CEO_SOFT_TEMPLATE } from '../../../blueprints/_templates/ngon
 import { NGON_TINH_PHUC_THU_TEMPLATE } from '../../../blueprints/_templates/ngon-tinh-trong-sinh-phuc-thu';
 import { NGON_TINH_KHOAI_XUYEN_TEMPLATE } from '../../../blueprints/_templates/ngon-tinh-khoai-xuyen';
 import { QUAN_TRUONG_BUREAUCRAT_TEMPLATE } from '../../../blueprints/_templates/quan-truong-modern-bureaucrat';
+import { FALOO_QUOC_VAN_TEMPLATE } from '../../../blueprints/_templates/faloo-quoc-van-prompt';
+import { FALOO_TONG_MAN_TEMPLATE } from '../../../blueprints/_templates/faloo-tong-man-reaction';
+import { HUYEN_HUYEN_OCCULT_TEMPLATE } from '../../../blueprints/_templates/huyen-huyen-occult-steampunk';
+import { TIEN_HIEP_META_COMEDY_TEMPLATE } from '../../../blueprints/_templates/tien-hiep-meta-comedy';
+import { LICH_SU_CORONER_TEMPLATE } from '../../../blueprints/_templates/lich-su-coroner-mystery';
+import { KHOA_HUYEN_TIME_LOOP_TEMPLATE } from '../../../blueprints/_templates/khoa-huyen-time-loop-thriller';
+import { NGON_TINH_MA_GIAP_TEMPLATE } from '../../../blueprints/_templates/ngon-tinh-ma-giap-reveal';
+import { NGON_TINH_CO_NGON_TEMPLATE } from '../../../blueprints/_templates/ngon-tinh-co-ngon-trach-dau';
+import { DO_THI_Y_TE_TEMPLATE } from '../../../blueprints/_templates/do-thi-y-te-he-thong';
+import { COZY_FANTASY_TEMPLATE } from '../../../blueprints/_templates/cozy-fantasy-slice-of-life';
+import { COZY_SCIFI_TEMPLATE } from '../../../blueprints/_templates/cozy-sci-fi-space-bakery';
+import { DI_GIOI_MUSHOKU_TEMPLATE } from '../../../blueprints/_templates/di-gioi-mushoku-slow-growth';
+import { ROMANTASY_THRILLER_TEMPLATE } from '../../../blueprints/_templates/romantasy-thriller-hybrid';
 
 const SAMPLE_VARS: Record<string, Record<string, string>> = {
   'lich-su-xuyen-quan-truong': {
@@ -141,7 +154,8 @@ const SAMPLE_VARS: Record<string, Record<string, string>> = {
     MC_NAME: 'Trần Đông', MC_FAMILY: 'Trần', HOMETOWN: 'Hà Nội',
     COUNTRY_NAME: 'Việt Nam',
     TRAITOR_FRIEND: 'Lý Khang', TRAITOR_FIANCEE: 'Phạm Vi', TRAITOR_BOSS: 'Hoàng Đại Lão',
-    LIFE_PARTNER_REAL: 'Nguyễn Lan Anh', ENDING_GOAL: 'tài phiệt #1 + cosmic philanthropist',
+    LIFE_PARTNER_REAL: 'Nguyễn Lan Anh', REVENGE_MODE: 'active',
+    ENDING_GOAL: 'tài phiệt #1 + cosmic philanthropist',
   },
   'huyen-huyen-hac-am-villain': {
     MC_NAME: 'Mặc Hắc Ảnh', MC_FAMILY: 'Mặc',
@@ -186,11 +200,80 @@ const SAMPLE_VARS: Record<string, Record<string, string>> = {
   'ngon-tinh-trong-sinh-phuc-thu': {
     FEMALE_MC: 'Tô Tử Linh', FEMALE_MC_FAMILY: 'Tô', HOMETOWN: 'Hà Nội', COUNTRY_NAME: 'Việt Nam',
     TRAITOR_FEMALE: 'Lý Vy', TRAITOR_HUSBAND: 'Trần Hắc', TRAITOR_FAMILY: 'Lý gia',
-    TRUE_LOVE: 'Nguyễn Minh', ENDING_GOAL: 'vợ chồng bá đạo + family empire stable + cosmic peace',
+    TRUE_LOVE: 'Nguyễn Minh', REVENGE_MODE: 'active',
+    ENDING_GOAL: 'vợ chồng bá đạo + family empire stable + cosmic peace',
   },
   'ngon-tinh-khoai-xuyen': {
     FEMALE_MC: 'Tô Linh', FEMALE_MC_FAMILY: 'Tô',
     ENDING_GOAL: 'system escape + chọn world favorite to retire với male lead',
+  },
+  'faloo-quoc-van-prompt': {
+    MC_NAME: 'Lý Phong', MC_FAMILY: 'Lý', HOMETOWN: 'Sài Gòn', COUNTRY_NAME: 'Việt Nam',
+    ANTAGONIST_NPC: 'Hắc Vũ', COMPANION_NAME: 'Tô Linh',
+    ENDING_GOAL: 'cosmic-tier prompt master + multi-realm peace',
+  },
+  'faloo-tong-man-reaction': {
+    MC_NAME: 'Diệp Phong', COMPANION_NAME: 'Tô Linh',
+    ENDING_GOAL: 'cosmic author tier + multi-canon peace',
+  },
+  'huyen-huyen-occult-steampunk': {
+    MC_NAME: 'Chu Minh Thụy', MC_FAMILY: 'Chu', CITY_NAME: 'Bắc Ngạn',
+    ORDER_NAME: 'Đêm Thánh Đoàn', ANTAGONIST_NPC: 'Aurora Order leader',
+    COMPANION_NAME: 'Audrey', ENDING_GOAL: 'Sequence 0 Divinity guardian',
+  },
+  'tien-hiep-meta-comedy': {
+    MC_NAME: 'Lý Phong', MC_FAMILY: 'Lý', HOMETOWN: 'Lâm An phủ',
+    FAKE_ORG_NAME: 'Vạn Cổ Thiên Đạo Tông', FIRST_FOLLOWER_NAME: 'Tiểu Lý',
+    COMPANION_NAME: 'Tô Linh',
+    ENDING_GOAL: 'cosmic comedic peak + multi-realm tu tiên peace',
+  },
+  'lich-su-coroner-mystery': {
+    MC_NAME: 'Hứa Thất An', MC_FAMILY: 'Hứa', CAPITAL_CITY: 'Đại Phụng',
+    DYNASTY_NAME: 'Đại Phụng', INSTITUTION_NAME: 'Đả Canh Tự',
+    ANTAGONIST_FAMILY: 'Nguỵ', COMPANION_NAME: 'Trần Hữu',
+    ENDING_GOAL: 'Tổ tỳ + triều đường an',
+  },
+  'khoa-huyen-time-loop-thriller': {
+    MC_NAME: 'Lý Vinh', MC_FAMILY: 'Lý', CITY_NAME: 'Bắc Kinh',
+    ORGANIZATION_NAME: 'Thiên Tài Câu Lạc Bộ', ADVERSARY_NAME: 'Tổ Thời Gian Đế',
+    COMPANION_NAME: 'Tô Linh',
+    ENDING_GOAL: 'Loop closed + multi-realm peace',
+  },
+  'ngon-tinh-ma-giap-reveal': {
+    FEMALE_MC: 'Tô Tô', FEMALE_MC_FAMILY: 'Tô', HOMETOWN: 'Hà Nội', COUNTRY_NAME: 'Việt Nam',
+    MALE_LEAD: 'Trần Mộ Dao', RIVAL_FEMALE: 'Lý Vy', RIVAL_MALE: 'Hắc Vũ',
+    ENDING_GOAL: 'cosmic-tier family empire + wedding + all mã giáp revealed warmly',
+  },
+  'ngon-tinh-co-ngon-trach-dau': {
+    FEMALE_MC: 'Tô Nhược', FEMALE_MC_FAMILY: 'Tô', FAMILY_NAME: 'Tô gia',
+    DYNASTY_NAME: 'Đại Đường', MALE_LEAD: 'Lý Mộ Bạch',
+    ENDING_GOAL: 'Hoàng hậu + thái tử kế thừa + thiên hạ thái bình',
+  },
+  'do-thi-y-te-he-thong': {
+    MC_NAME: 'Lý Tinh Vũ', MC_FAMILY: 'Lý',
+    HOSPITAL_NAME: 'Bệnh viện 108 Hà Nội', COUNTRY_NAME: 'Việt Nam',
+    COMPANION_NAME: 'Tô Linh', LIFE_PARTNER: 'Phạm Lan',
+    ENDING_GOAL: 'Nobel + cosmic medical pioneer + retire to teach',
+  },
+  'cozy-fantasy-slice-of-life': {
+    MC_NAME: 'Lan', SHOP_NAME: 'Bakery Ánh Sáng', VILLAGE_NAME: 'Cây Trắc Bá',
+    COMPANION_NAME: 'Mèo Sương',
+    ENDING_GOAL: 'Shop legacy + multi-kingdom community + peaceful retirement',
+  },
+  'cozy-sci-fi-space-bakery': {
+    MC_NAME: 'Lin', SHOP_NAME: 'Space Bakery Ánh Sao',
+    STATION_NAME: 'Trạm Vũ Trụ Aurora', COMPANION_NAME: 'AURA-7 AI',
+    ENDING_GOAL: 'Multi-galaxy shop legacy + peaceful retirement',
+  },
+  'di-gioi-mushoku-slow-growth': {
+    MC_NAME: 'Rudeus', MC_FAMILY: 'Greyrat', HOMETOWN: 'Buena Village',
+    COMPANION_NAME: 'Eris', LIFE_PARTNER: 'Sylphiette',
+    ENDING_GOAL: 'Legacy + peaceful death + apprentice inheritance',
+  },
+  'romantasy-thriller-hybrid': {
+    FEMALE_MC: 'Aria Stormwind', LOVE_INTEREST: 'Lord Castor',
+    CITY_NAME: 'Argentum', KINGDOM_NAME: 'Kingdom of Silverhold',
+    ENDING_GOAL: 'Kingdom peace + cosmic conspiracy defeated + happy ending với love',
   },
 };
 
@@ -472,6 +555,19 @@ describe.each([
   ['mat-the-thien-tai-trong-cay', MAT_THE_THIEN_TAI_TEMPLATE, 'mat-the'],
   ['ngon-tinh-trong-sinh-phuc-thu', NGON_TINH_PHUC_THU_TEMPLATE, 'ngon-tinh'],
   ['ngon-tinh-khoai-xuyen', NGON_TINH_KHOAI_XUYEN_TEMPLATE, 'ngon-tinh'],
+  ['faloo-quoc-van-prompt', FALOO_QUOC_VAN_TEMPLATE, 'do-thi'],
+  ['faloo-tong-man-reaction', FALOO_TONG_MAN_TEMPLATE, 'dong-nhan'],
+  ['huyen-huyen-occult-steampunk', HUYEN_HUYEN_OCCULT_TEMPLATE, 'huyen-huyen'],
+  ['tien-hiep-meta-comedy', TIEN_HIEP_META_COMEDY_TEMPLATE, 'tien-hiep'],
+  ['lich-su-coroner-mystery', LICH_SU_CORONER_TEMPLATE, 'lich-su'],
+  ['khoa-huyen-time-loop-thriller', KHOA_HUYEN_TIME_LOOP_TEMPLATE, 'khoa-huyen'],
+  ['ngon-tinh-ma-giap-reveal', NGON_TINH_MA_GIAP_TEMPLATE, 'ngon-tinh'],
+  ['ngon-tinh-co-ngon-trach-dau', NGON_TINH_CO_NGON_TEMPLATE, 'ngon-tinh'],
+  ['do-thi-y-te-he-thong', DO_THI_Y_TE_TEMPLATE, 'do-thi'],
+  ['cozy-fantasy-slice-of-life', COZY_FANTASY_TEMPLATE, 'di-gioi'],
+  ['cozy-sci-fi-space-bakery', COZY_SCIFI_TEMPLATE, 'khoa-huyen'],
+  ['di-gioi-mushoku-slow-growth', DI_GIOI_MUSHOKU_TEMPLATE, 'di-gioi'],
+  ['romantasy-thriller-hybrid', ROMANTASY_THRILLER_TEMPLATE, 'huyen-huyen'],
 ])('%s end-to-end', (templateId, template, expectedGenre) => {
   it('declares all placeholders it actually uses', () => {
     const used = findUsedPlaceholders(template);
