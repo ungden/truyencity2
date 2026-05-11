@@ -74,34 +74,58 @@ Trả về DUY NHẤT 1 JSON object với ${template.requiredVars.length} keys: 
 
 Bắt đầu ngay bằng "{" — không có text trước.`;
 
-  // Try up to 2 attempts (first temperature 0.5, retry temperature 0.3)
+  // Try up to 3 attempts. Attempt 1: standard. Attempt 2: lower temp +
+  // higher tokens. Attempt 3: explicit missing-fields completion prompt
+  // when partial JSON returned in attempt 2.
   let promptTokens = 0;
   let completionTokens = 0;
   let parsed: Record<string, string> | null = null;
   let lastRaw = '';
-  for (let attempt = 1; attempt <= 2; attempt++) {
-    const response = await callGemini(userPrompt, {
+  let lastMissingMsg = '';
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    let prompt = userPrompt;
+    let temperature = 0.5;
+    if (attempt === 2) temperature = 0.3;
+    if (attempt === 3) {
+      temperature = 0.2;
+      // Explicit completion prompt with missing fields
+      const missingNow = parsed
+        ? template.requiredVars.filter((v) => !parsed![v] || !parsed![v].trim())
+        : template.requiredVars;
+      const partial = parsed
+        ? `\nĐầu ra trước thiếu fields: ${missingNow.join(', ')}\nĐây là partial: ${JSON.stringify(parsed)}\n\nVUI LÒNG trả về JSON ĐẦY ĐỦ với TẤT CẢ ${template.requiredVars.length} keys, không bỏ sót.`
+        : `\nVUI LÒNG trả về JSON đầy đủ ${template.requiredVars.length} keys: ${template.requiredVars.join(', ')}.`;
+      prompt = userPrompt + partial;
+    }
+
+    const response = await callGemini(prompt, {
       model: 'deepseek-v4-flash',
-      temperature: attempt === 1 ? 0.5 : 0.3,
-      maxTokens: 2000,
+      temperature,
+      maxTokens: attempt === 1 ? 2000 : 4000,
       systemPrompt: SYSTEM_PROMPT,
     }, { jsonMode: true, tracking: { projectId: input.projectId, task: 'template_var_gen' } });
     lastRaw = response.content;
     promptTokens = response.promptTokens;
     completionTokens = response.completionTokens;
-    parsed = parseJSON<Record<string, string>>(response.content);
-    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) break;
-    parsed = null;
+    const newParsed = parseJSON<Record<string, string>>(response.content);
+    if (newParsed && typeof newParsed === 'object' && !Array.isArray(newParsed)) {
+      // Merge with previous partial (in case attempt 3 fills gaps)
+      parsed = { ...(parsed || {}), ...newParsed };
+      // Check if all required vars present + non-empty
+      const stillMissing = template.requiredVars.filter((v) => !parsed![v] || !parsed![v].trim());
+      if (stillMissing.length === 0) break;
+      lastMissingMsg = stillMissing.join(', ');
+    }
   }
 
   if (!parsed) {
-    throw new Error(`var-gen: failed to parse JSON after 2 attempts. Raw: ${lastRaw.slice(0, 500)}`);
+    throw new Error(`var-gen: failed to parse JSON after 3 attempts. Raw: ${lastRaw.slice(0, 500)}`);
   }
 
   // Validate every required var present + non-empty
-  const missing = template.requiredVars.filter((v) => !parsed[v] || !parsed[v].trim());
+  const missing = template.requiredVars.filter((v) => !parsed![v] || !parsed![v].trim());
   if (missing.length > 0) {
-    throw new Error(`var-gen: missing required vars: ${missing.join(', ')}. Got: ${JSON.stringify(parsed)}`);
+    throw new Error(`var-gen: missing required vars after 3 attempts: ${missing.join(', ')} (last: ${lastMissingMsg}). Got: ${JSON.stringify(parsed)}`);
   }
 
   // Strip out non-required keys (in case AI included optional)
