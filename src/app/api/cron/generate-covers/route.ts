@@ -33,6 +33,19 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
   }
 
+  // 2026-05-12: Gemini Image cover cron retired. All cover generation
+  // goes through Codex CLI (scripts/codex-bulk-cover.sh). Cron returns
+  // a no-op success so pg_cron job_run_details stays green; flip
+  // ALLOW_GEMINI_IMAGE=1 in env for emergency re-enable.
+  if (process.env.ALLOW_GEMINI_IMAGE !== '1') {
+    return NextResponse.json({
+      success: true,
+      skipped: true,
+      reason: 'Gemini Image cover cron disabled — generate via Codex CLI (bash scripts/codex-bulk-cover.sh --apply). Set ALLOW_GEMINI_IMAGE=1 to re-enable.',
+      elapsedMs: Date.now() - startTime,
+    });
+  }
+
   const geminiKey = process.env.GEMINI_API_KEY;
   if (!geminiKey) {
     return NextResponse.json({ success: false, error: 'GEMINI_API_KEY missing' }, { status: 500 });
