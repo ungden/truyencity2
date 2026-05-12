@@ -412,11 +412,70 @@ export function escapeRegex(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+/**
+ * Vietnamese webnovel convention: narration uses FULL name (họ + tên — "Lương Hạo"),
+ * not just personal name ("Hạo"). Helps reader memorize cast over 1000+ chapters.
+ *
+ * Detects short-form usage of MC name:
+ *   - Counts occurrences of "Lương Hạo" (full) vs standalone "Hạo" (last token alone).
+ *   - Flags if standalone last-token usage is ≥30% of total mentions — indicates
+ *     Writer drifted to natural Vietnamese pattern instead of webnovel convention.
+ *
+ * Returns: { severity, message } — feed into Critic as moderate issue.
+ *
+ * Skips if MC name is single-word (no "họ tên" structure to enforce).
+ */
+export function detectShortFormCharacterName(
+  content: string,
+  fullName: string,
+): { severity: 'none' | 'minor' | 'moderate'; message: string } {
+  const tokens = fullName.trim().split(/\s+/).filter(t => t.length >= 2);
+  if (tokens.length < 2) return { severity: 'none', message: '' };
+
+  const lastToken = tokens[tokens.length - 1];
+
+  // Full-name occurrences ("Lương Hạo")
+  const fullRe = new RegExp(`\\b${escapeRegex(fullName)}\\b`, 'g');
+  const fullCount = (content.match(fullRe) || []).length;
+
+  // Last-token alone occurrences ("Hạo" NOT preceded by another part of the name)
+  // Match "Hạo" with word boundary on both sides, but exclude when previous word is part of fullName.
+  const precedingTokenLookbehind = tokens.slice(0, -1).map(escapeRegex).join('|');
+  const standaloneRe = new RegExp(`(?<!\\b(?:${precedingTokenLookbehind})\\s+)\\b${escapeRegex(lastToken)}\\b`, 'g');
+  let standaloneCount = 0;
+  try {
+    standaloneCount = (content.match(standaloneRe) || []).length;
+  } catch {
+    // Older Node may not support lookbehind — fallback: subtract fullCount from total "last token" matches.
+    const totalLast = (content.match(new RegExp(`\\b${escapeRegex(lastToken)}\\b`, 'g')) || []).length;
+    standaloneCount = Math.max(0, totalLast - fullCount);
+  }
+
+  const totalMentions = fullCount + standaloneCount;
+  if (totalMentions < 10) return { severity: 'none', message: '' };
+
+  const shortRatio = standaloneCount / totalMentions;
+  if (shortRatio >= 0.5) {
+    return {
+      severity: 'moderate',
+      message: `Tên "${fullName}" bị cắt ngắn thành "${lastToken}" trong ${standaloneCount}/${totalMentions} lần (${Math.round(shortRatio * 100)}%). Webnovel convention: dùng họ+tên đầy đủ trong narration để reader nhớ tên qua 1000+ chương. Replace "${lastToken}" lone references trong narration bằng "${fullName}" (giữ tên cụt CHỈ trong dialogue thân mật vợ/anh em ruột moment cảm xúc cao).`,
+    };
+  }
+  if (shortRatio >= 0.3) {
+    return {
+      severity: 'minor',
+      message: `Tên "${fullName}" bị cắt ngắn thành "${lastToken}" trong ${standaloneCount}/${totalMentions} lần (${Math.round(shortRatio * 100)}%). Ưu tiên dùng họ+tên đầy đủ trong narration.`,
+    };
+  }
+  return { severity: 'none', message: '' };
+}
+
 export function detectSevereRepetition(content: string): CriticIssue[] {
   const text = content.toLowerCase();
   const issues: CriticIssue[] = [];
 
-  const tracked: Record<string, { variants: string[]; category: 'generic' | 'plot_element' }> = {
+  type Cat = 'generic' | 'plot_element' | 'structural_connective';
+  const tracked: Record<string, { variants: string[]; category: Cat }> = {
     'tím sẫm': { variants: ['tím sẫm', 'tím đen', 'sắc tím'], category: 'generic' },
     'vàng kim': { variants: ['vàng kim', 'ánh vàng kim'], category: 'generic' },
     'đỏ rực': { variants: ['đỏ rực', 'đỏ thẫm'], category: 'generic' },
@@ -427,16 +486,22 @@ export function detectSevereRepetition(content: string): CriticIssue[] {
     'đặc quánh': { variants: ['đặc quánh'], category: 'generic' },
     'bùng phát': { variants: ['bùng phát', 'bùng nổ'], category: 'generic' },
     'ken két': { variants: ['ken két'], category: 'generic' },
-    // AI structural patterns — overused sentence constructions
-    'là một': { variants: ['là một'], category: 'generic' },
-    'bắt đầu': { variants: ['bắt đầu'], category: 'generic' },
-    'mang theo': { variants: ['mang theo'], category: 'generic' },
+    // 2026-05-12: split structural Vietnamese connectives into their own category.
+    // "là một", "bắt đầu", "mang theo" etc. are legitimate prose connectives that
+    // recur naturally in any well-written 2800-word chapter. The previous
+    // generic threshold (8 = critical) auto-rejected anything that wasn't actively
+    // varied — too strict and hits valid Vietnamese narration. New threshold 16/22
+    // catches real overuse without false-positive against natural prose.
+    'là một': { variants: ['là một'], category: 'structural_connective' },
+    'bắt đầu': { variants: ['bắt đầu'], category: 'structural_connective' },
+    'mang theo': { variants: ['mang theo'], category: 'structural_connective' },
+    'tỏa ra': { variants: ['tỏa ra'], category: 'structural_connective' },
+    'đôi mắt': { variants: ['đôi mắt'], category: 'structural_connective' },
+    'như thể': { variants: ['như thể'], category: 'structural_connective' },
+    'dường như': { variants: ['dường như'], category: 'structural_connective' },
+    // Real AI-tell cues — keep strict
     'lạnh lẽo': { variants: ['lạnh lẽo', 'lạnh buốt', 'lạnh lùng'], category: 'generic' },
     'run rẩy': { variants: ['run rẩy', 'run lên', 'run bần bật'], category: 'generic' },
-    'tỏa ra': { variants: ['tỏa ra'], category: 'generic' },
-    'đôi mắt': { variants: ['đôi mắt'], category: 'generic' },
-    'như thể': { variants: ['như thể'], category: 'generic' },
-    'dường như': { variants: ['dường như'], category: 'generic' },
     // Plot element words — naturally recur more often
     'pixel hóa': { variants: ['pixel hóa', 'pixel'], category: 'plot_element' },
     'rỉ sét': { variants: ['rỉ sét'], category: 'plot_element' },
@@ -452,8 +517,8 @@ export function detectSevereRepetition(content: string): CriticIssue[] {
       if (matches) total += matches.length;
     }
 
-    const criticalThreshold = category === 'plot_element' ? 12 : 8;
-    const moderateThreshold = category === 'plot_element' ? 8 : 5;
+    const criticalThreshold = category === 'structural_connective' ? 22 : category === 'plot_element' ? 12 : 8;
+    const moderateThreshold = category === 'structural_connective' ? 16 : category === 'plot_element' ? 8 : 5;
 
     if (total >= criticalThreshold) {
       issues.push({

@@ -20,6 +20,7 @@ APPLY=false
 LIMIT=0
 START=1
 END=999
+PAUSE_REASON='phase_h_archetype_spawn_2026-05-11'
 
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -27,13 +28,14 @@ while [[ $# -gt 0 ]]; do
     --limit) LIMIT="$2"; shift 2;;
     --start) START="$2"; shift 2;;
     --end) END="$2"; shift 2;;
+    --pause-reason) PAUSE_REASON="$2"; shift 2;;
     *) echo "Unknown arg: $1"; exit 1;;
   esac
 done
 
-# Query Phase J novels (pause_reason='phase_h_archetype_spawn_2026-05-11')
-echo "Querying Phase J novels..."
-QUERY="SELECT novels.id || '|' || replace(novels.title, '|', '-') FROM ai_story_projects p JOIN novels ON p.novel_id = novels.id WHERE p.pause_reason = 'phase_h_archetype_spawn_2026-05-11' AND novels.cover_url IS NULL ORDER BY novels.created_at ASC;"
+# Query novels by pause_reason
+echo "Querying novels (pause_reason='$PAUSE_REASON')..."
+# (QUERY constant unused — actual fetch via heredoc TS below)
 
 cat > /Users/alexle/Documents/truyencity/scripts/_list-phase-h-novels.ts <<'EOF'
 import * as dotenv from 'dotenv';
@@ -47,7 +49,7 @@ async function main() {
   const { data: projects } = await db
     .from('ai_story_projects')
     .select('novel_id, novels!ai_story_projects_novel_id_fkey(id, title, cover_url, created_at)')
-    .eq('pause_reason', 'phase_h_archetype_spawn_2026-05-11');
+    .eq('pause_reason', process.env.PAUSE_REASON!);
   if (!projects) return;
   const rows = projects.map((p: { novels: { id: string; title: string; cover_url: string | null; created_at: string } | { id: string; title: string; cover_url: string | null; created_at: string }[] }) => {
     const n = Array.isArray(p.novels) ? p.novels[0] : p.novels;
@@ -58,7 +60,7 @@ async function main() {
 main().catch(console.error);
 EOF
 
-NOVELS=$(npx tsx /Users/alexle/Documents/truyencity/scripts/_list-phase-h-novels.ts 2>/dev/null)
+NOVELS=$(PAUSE_REASON="$PAUSE_REASON" npx tsx /Users/alexle/Documents/truyencity/scripts/_list-phase-h-novels.ts 2>/dev/null)
 COUNT=$(echo "$NOVELS" | grep -c "|" || true)
 echo "Found $COUNT Phase J novels without covers"
 

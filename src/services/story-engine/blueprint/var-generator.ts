@@ -99,7 +99,7 @@ Bắt đầu ngay bằng "{" — không có text trước.`;
     }
 
     const response = await callGemini(prompt, {
-      model: 'deepseek-v4-flash',
+      model: 'gemini-3.1-flash-lite',
       temperature,
       maxTokens: attempt === 1 ? 2000 : 4000,
       systemPrompt: SYSTEM_PROMPT,

@@ -440,3 +440,69 @@ Old novels may have metadata blocks but `cleanNovelDescription()` in `src/lib/ut
 - TIER 5: Reader feedback loop integration (requires production novels with engagement data first)
 
 **If stuck**: Read root CLAUDE.md "Phase 24-28 Details" section — it lists all 17 bugs fixed, all 19 đại thần practices covered, all 26 modules + their phase, all migrations.
+
+## Phase Q quick reference (2026-05-12, supplementary)
+
+**PR**: [#54](https://github.com/ungden/truyencity2/pull/54) on branch `codex/story-production-automation` — DeepSeek→Gemini swap + 50 ch/day flag-based automation + admin UI. **Not merged to main yet at session end.** Until merged, only novels already in legacy `FOCUSED_PROJECT_IDS` env are picked up by Vercel cron.
+
+**Models locked in production**:
+- Setup creative (Pro role): `gemini-3-flash-preview` thinking=high
+- Chapter volume (Flash role): `gemini-3.1-flash-lite` (non-thinking; thinking=low for the rare thinking-eligible tasks)
+- Covers: **Codex CLI built-in image tool ONLY** (Gemini Image API hard-disabled via `GeminiImageService.generateImage()` short-circuit + `/api/cron/generate-covers` skip; `ALLOW_GEMINI_IMAGE=1` env to bypass for one-off)
+- Embeddings: `gemini-embedding-001` (unchanged)
+
+**Production opt-in**: `style_directives.production_enabled = true` on the project row. Toggle via:
+- CLI: `npx tsx scripts/toggle-production.ts <id> on|off|list`
+- Admin UI: `/admin/production-toggle` (sidebar "Quản lý sản xuất")
+- API: `POST /api/admin/production-toggle { projectId, enabled }`
+
+Side effects on toggle-on: status=active, clear pause_reason, ai_model → flash-lite if was deepseek, seed today's `project_daily_quotas` row at target=50.
+
+**4 novels currently enabled** (Phase Q test set):
+
+| ID | Title | Status |
+|---|---|---|
+| `c97b1d28` | Mạt Thế: Ta Có Hầm Trú Ẩn Vạn Năng | ch.5 written (Gemini Flash Lite proven path) |
+| `d0b02bf3` | Xuyên Việt Lãnh Chúa: Khai Cục Mở Mỏ Muối | setup pending |
+| `f783a0ae` | Hoang Cổ Bộ Lạc: Ta Làm Tù Trưởng Cách Mạng | setup pending |
+| `cf63c678` | Văn Đạo Phong Thần: Ta Viết Tiểu Thuyết, Cả Dị Giới Lĩnh Ngộ Tuyệt Kỹ | setup at world stage (reset of Thiên Đạo Thư Viện) |
+
+**Webnovel full-name convention** enforced (2026-05-12 reversal of prior rule):
+- Writer prompt target: 60-100 lần họ+tên/10K chữ in narration AND dialogue.
+- Critic NO LONGER flags MC name repetition; flags only short-form usage ("Hạo" alone) ≥50% of mentions → moderate.
+- Detector: `detectShortFormCharacterName()` in chapter-writer-helpers.ts.
+
+**Critic recalibration** for natural Vietnamese (don't fight what Gemini Flash Lite produces well):
+- Structural connectives (`là một / bắt đầu / mang theo / tỏa ra / đôi mắt / như thể / dường như`) → threshold 22/16 (was 8/5).
+- AI-tell từ (`tím sẫm / vàng kim / kinh hoàng / rực rỡ / lạnh lẽo / run rẩy / ken két / mờ ảo / đặc quánh / bùng phát`) → stay strict 8/5.
+- VND `xu` regex: negative-lookahead carve-out for `xu hướng / thế / nịnh / hào / chiến / cách`.
+- BENEFIT_KEYWORDS expanded for survival/cultivation/magic vocabulary.
+- Cast roster filter: brand suffixes, country tokens, familial honorifics, verb prefixes, English-only compounds all dropped.
+- `evaluateBlueprintAlignment` gated by `shouldRequireChapterBlueprint`.
+
+**Defaults flipped**:
+- `FALLBACK_DAILY_CHAPTER_QUOTA`: 20 → **50**
+- `STORY_PRODUCTION_PAUSED`: defaults **false** (set `=1` to pause)
+- `DEFAULT_FOCUSED_PROJECT_IDS`: **empty** (legacy env override still works as emergency allowlist)
+- `MODEL_PRO`/`MODEL_FLASH`/`DEFAULT_CONFIG.model`: all Gemini
+
+**Open issues** (carry to next session):
+1. `story_outline` schema thin warning — stage_idea kernel doesn't populate canonical fields (premise/mainConflict/themes/majorPlotPoints); engine falls back to world_description. Either pre-flight `runStageStoryOutline` before writing or accept setupKernel as canonical.
+2. `cost_tracking` rows missing for Gemini path — `trackCost` fires but DB rows don't appear; suspect silent insert failure. Needs investigation.
+3. PR #54 not merged → 3 Phase Q novels stuck pre-writing. Once merged + Vercel redeploys, cron will pick them up via `production_enabled` flag.
+4. `gemini-3-flash-preview` Architect JSON truncation at ~500 chars on large prompts. Workaround = `gemini-3.1-flash-lite` for chapter tasks. Root cause needs response-shape logging diagnosis.
+
+**Daily commands (Phase Q)**:
+```bash
+npx tsx scripts/toggle-production.ts list                      # show enabled
+npx tsx scripts/toggle-production.ts <projectId> on            # add
+npx tsx scripts/toggle-production.ts <projectId> off           # remove
+npm run codex:automation -- prepare-cover --novel-id=<id>      # cover step 1
+codex exec --skip-git-repo-check --sandbox workspace-write \
+  "Đọc <runDir>/prompt.md, tạo cover.png 3:4 1086×1448"        # cover step 2
+npm run codex:automation -- apply-cover --run-dir=<dir> --apply # cover step 3
+```
+
+**Spawn scripts shipped**: `spawn-mat-the-ham-tru-an.ts`, `spawn-phase-q-trio.ts`, `_migrate-to-gemini.ts`, `_setup-mat-the-quota.ts`. Drive scripts (debugging): `_drive-mat-the-gemini.ts`, `_continue-mat-the-write.ts`, `_drive-deepseek-chapters.ts` (parity test — DeepSeek failed), `_drive-gemini-setup.ts`, `_drive-test-setup.ts`, `_audit-mat-the.ts`.
+
+**Tests**: 291/291 pass at session end.

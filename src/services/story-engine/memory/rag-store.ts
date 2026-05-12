@@ -247,6 +247,11 @@ function hybridRerank(
  * Retrieve semantically relevant past events for a chapter being written.
  * Uses hybrid scoring (vector + keyword + temporal) for better recall.
  * Returns null if any step fails or not enough history.
+ *
+ * Phase N.2 (2026-05-12): event-relevant query — nếu caller pass
+ * `eventFocus` (thread names từ chapter_intent.threadsToClose), build
+ * query bằng các thread tags thay vì chỉ cliffhanger + arc plan.
+ * StoryWriter-inspired history compression by current event focus.
  */
 export async function retrieveRAGContext(
   projectId: string,
@@ -254,6 +259,7 @@ export async function retrieveRAGContext(
   arcPlanSummary: string | null,
   lastCliffhanger: string | null,
   protagonistName: string,
+  eventFocus?: string[] | null,
 ): Promise<string | null> {
   try {
     // Skip for early chapters (not enough history)
@@ -263,6 +269,12 @@ export async function retrieveRAGContext(
     const parts: string[] = [];
     if (lastCliffhanger) parts.push(`Tiếp tục từ: ${lastCliffhanger.slice(0, 500)}`);
     if (arcPlanSummary) parts.push(`Arc hiện tại: ${arcPlanSummary.slice(0, 500)}`);
+    // Phase N.2: prioritize event focus tags từ chapter_intent.threadsToClose.
+    // Khi có focus, query embedding sẽ surface past events directly relevant
+    // thay vì semantic top-K rộng.
+    if (eventFocus && eventFocus.length > 0) {
+      parts.push(`Threads cần resolve trong chương này: ${eventFocus.slice(0, 5).join('; ')}`);
+    }
     parts.push(`Nhân vật chính: ${protagonistName}`);
     parts.push(`Chương hiện tại: ${chapterNumber}`);
     const query = parts.join('\n');

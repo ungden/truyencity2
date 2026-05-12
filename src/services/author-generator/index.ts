@@ -98,7 +98,7 @@ export class AuthorGenerator {
   private model: string;
   private aiService: AIProviderService;
 
-  constructor(provider: AIProviderType = 'deepseek', model: string = 'deepseek-v4-flash') {
+  constructor(provider: AIProviderType = 'deepseek', model: string = 'gemini-3.1-flash-lite') {
     this.provider = provider;
     this.model = model;
     this.aiService = new AIProviderService({
@@ -400,7 +400,7 @@ export function generateQuickAuthor(genre: string): Omit<GeneratedAuthor, 'avata
 
 export function createAuthorGenerator(
   provider: AIProviderType = 'deepseek',
-  model: string = 'deepseek-v4-flash'
+  model: string = 'gemini-3.1-flash-lite'
 ): AuthorGenerator {
   return new AuthorGenerator(provider, model);
 }

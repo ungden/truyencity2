@@ -465,7 +465,7 @@ function pickNarrativeVariant(genre: string): NarrativeVariant {
 
 // Default model assigned to newly seeded projects. Router auto-dispatches to
 // DeepSeek for any model name starting with `deepseek-`.
-const DEFAULT_AI_MODEL = 'deepseek-v4-flash';
+const DEFAULT_AI_MODEL = 'gemini-3.1-flash-lite';
 
 // ============================================================================
 // CONTENT SEEDER CLASS
@@ -1350,7 +1350,7 @@ CHÚ Ý:
     try {
       const response = await this.aiService.chat({
         provider: 'deepseek',
-        model: 'deepseek-v4-flash',
+        model: 'gemini-3.1-flash-lite',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.8,
         maxTokens: 60000,

@@ -33,6 +33,7 @@ import {
 import {
   FOCUS_MODE_ENABLED,
   FOCUSED_PROJECT_IDS,
+  filterProductionEnabled,
   STORY_PRODUCTION_PAUSED,
   filterFocusedProjects,
 } from '@/lib/story-production-focus';
@@ -582,6 +583,13 @@ async function prepareInitProject(
 
   const STAGED_STATES = new Set(['idea', 'world', 'character', 'description', 'master_outline', 'story_outline', 'arc_plan']);
   if (STAGED_STATES.has(setup_stage)) {
+    // Phase O (2026-05-12): install model tier routing trước runOneStage để
+    // setup stages (stage_idea/world/character/master_outline/story_outline)
+    // route lên deepseek-v4-pro thay vì flash. Setup creative tasks cần
+    // reasoning depth — Flash không đủ trình.
+    const { installModelTierRouting } = await import('@/services/story-engine/utils/model-tier');
+    installModelTierRouting();
+
     const { runOneStage } = await import('@/services/story-engine/pipeline/setup-pipeline');
     const { data: stageProj } = await supabase
       .from('ai_story_projects')
@@ -923,10 +931,17 @@ export async function GET(request: NextRequest) {
         .order('updated_at', { ascending: true })
         .limit(INIT_PREP_BATCH_SIZE);
 
+    // Phase Q (2026-05-12): production gate is style_directives.production_enabled=true
+    // OR (legacy) project id in FOCUSED_PROJECT_IDS env allowlist. The PostgREST
+    // `or()` filter combines them; if FOCUS_MODE is off, no filter applied.
     if (FOCUS_MODE_ENABLED) {
-      activeCountBuilder = activeCountBuilder.in('id', FOCUSED_PROJECT_IDS);
-      candidateBuilder = candidateBuilder.in('id', FOCUSED_PROJECT_IDS);
-      setupCandidateBuilder = setupCandidateBuilder.in('id', FOCUSED_PROJECT_IDS);
+      const idList = FOCUSED_PROJECT_IDS.length > 0 ? FOCUSED_PROJECT_IDS.join(',') : null;
+      const orExpr = idList
+        ? `style_directives->>production_enabled.eq.true,id.in.(${idList})`
+        : `style_directives->>production_enabled.eq.true`;
+      activeCountBuilder = activeCountBuilder.or(orExpr);
+      candidateBuilder = candidateBuilder.or(orExpr);
+      setupCandidateBuilder = setupCandidateBuilder.or(orExpr);
     }
 
     const [activeCountQuery, candidateQuery, setupCandidateQuery] = await Promise.all([
@@ -942,8 +957,8 @@ export async function GET(request: NextRequest) {
     const activeCount = activeCountQuery.count || 0;
     const dynamicResumeBatchSize = computeDynamicResumeBatchSize(activeCount);
 
-    const rawCandidates = filterFocusedProjects((candidateQuery.data || []) as ProjectRow[]);
-    const setupOnlyCandidates = filterFocusedProjects((setupCandidateQuery.data || []) as ProjectRow[]);
+    const rawCandidates = filterProductionEnabled((candidateQuery.data || []) as ProjectRow[]);
+    const setupOnlyCandidates = filterProductionEnabled((setupCandidateQuery.data || []) as ProjectRow[]);
     console.log(`[Cron] Step 1 OK: ${activeCount} active, ${rawCandidates.length} active candidates, ${setupOnlyCandidates.length} setup candidates fetched`);
 
     // Filter candidates eligible for processing (respect soft-ending grace buffer)

@@ -169,7 +169,7 @@ export async function GET(request: NextRequest) {
   try {
     const { scanAndReviseDriftedProjects } = await import('@/services/story-engine/pipeline/outline-reviser');
     const { DEFAULT_CONFIG } = await import('@/services/story-engine/types');
-    revisionStats = await scanAndReviseDriftedProjects({ ...DEFAULT_CONFIG, model: 'deepseek-v4-flash' });
+    revisionStats = await scanAndReviseDriftedProjects({ ...DEFAULT_CONFIG, model: 'gemini-3.1-flash-lite' });
   } catch (e) {
     console.warn('[quality-trend cron] outline auto-revision scan threw:', e instanceof Error ? e.message : String(e));
   }

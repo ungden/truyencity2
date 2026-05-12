@@ -1,0 +1,133 @@
+═══ Ch.3: Biến Số Phạm Đăng Linh ═══
+
+Chương 3: Biến Số Phạm Đăng Linh
+
+Đường vành đai 3 trên cao đêm muộn vắng bóng phương tiện. Chiếc Ford Ranger của Lương Hạo lao đi trong màn đêm, ánh đèn pha cắt đôi khoảng không tĩnh lặng của Phượng Đô. Phía trước, ánh đèn cao áp từ cụm kho vận ICD Mỹ Đình hắt lên bầu trời một quầng sáng vàng đục, cô tịch và lạnh lẽo. Lương Hạo nắm chặt vô lăng, gân xanh trên mu bàn tay hơi nổi lên. Anh biết, ở cuối con đường đó, một trong những mắt xích quan trọng nhất của kế hoạch đang chờ đợi. Phạm Đăng Linh. Trong ký ức tan tác của kiếp trước, Linh là người cuối cùng ngã xuống để chắn cho anh một phát đạn từ nhóm cướp lương thực tại cửa ngõ Hải Long Đô. Một gã cuồng công việc, nguyên tắc đến mức cực đoan nhưng lại mang một trái tim nóng bỏng sau lớp vỏ bọc khô khan.
+
+Chiếc xe bán tải chậm dần rồi dừng hẳn trước cổng sắt khổng lồ của kho ICD. Phạm Đăng Linh đã đứng đó từ bao giờ. Gã mặc chiếc áo sơ mi đồng phục Yusen Logistics nhăn nhúm, hai cúc cổ buông lỏng, kẹp giữa ngón tay là một điếu thuốc đang cháy dở, tàn thuốc dài ngoẵng chực chờ rơi xuống đôi giày da bụi bặm. Vừa thấy bóng xe của Lương Hạo, Linh vứt điếu thuốc xuống đất, dùng mũi giày di nát rồi bước tới. Gã không chào hỏi, chỉ đập mạnh tập hồ sơ lên nắp capo xe, tiếng vang khô khốc xé toạc bầu không khí tĩnh mịch.
+
+— Lương Hạo, anh giải thích thế nào về con số này? Một trăm tấn thực phẩm khô và đồ đóng hộp từ kho Vinmart B1 bốc hơi khỏi hệ thống chỉ trong vòng bốn tiếng đồng hồ. Mã QR bị vô hiệu hóa toàn bộ ở khâu kiểm kê cuối. Anh nghĩ mình đang làm ảo thuật à?
+
+Lương Hạo bước xuống xe, đóng cửa một tiếng rầm dứt khoát. Anh không lùi lại, trái lại còn tiến lên một bước, thu hẹp khoảng cách với Linh. Khí thế từ một kẻ từng lăn lộn mười năm trong mạt thế toát ra khiến Linh hơi khựng lại. Đôi mắt Hạo bình thản đến lạ lùng, không có chút gì là lo lắng hay sợ hãi của một kẻ vừa tham ô tài sản lớn.
+
+— Linh, cậu làm nghề này bao lâu rồi? — Hạo hỏi, giọng trầm và lạnh.
+
+Linh cau mày, sự nghi ngờ trong mắt càng đậm đặc:
+
+— Tám năm. Nhưng điều đó không liên quan đến việc anh đang phá nát uy tín của chúng ta.
+
+Lương Hạo bật cười, một nụ cười không chạm đến đáy mắt. Anh giật lấy tập hồ sơ trên nắp xe, lướt nhanh qua những dòng mã vận đơn bị báo lỗi đỏ rực. Anh chỉ tay vào một dãy số dài dằng dặc phía dưới:
+
+— Tám năm mà cậu không nhận ra lỗ hổng của API phiên bản mới sao? Nhìn kỹ đi. Toàn bộ mã QR này đều được mã hóa theo chuẩn cũ của đối tác Tân Lục. Khi hệ thống trung tâm thực hiện lệnh quét đồng bộ vào lúc hai mươi hai giờ, một xung đột logic đã xảy ra. Hàng hóa không mất đi, nó chỉ bị đẩy vào trạng thái "chờ xác minh" trong một máy chủ ảo mà chỉ những người nắm quyền root cấp cao mới thấy được. Tôi đã dùng quyền đó để chuyển toàn bộ lô hàng về kho dự phòng kín để tránh việc bị niêm phong do lỗi phần mềm. Cậu muốn báo cáo lên trên? Được thôi, nhưng chuẩn bị tinh thần giải trình tại sao một chuyên gia như cậu lại không phát hiện ra lỗi code sơ đẳng này đi.
+
+Linh nhìn chằm chằm vào dãy số, mồ hôi hột bắt đầu lấm tấm trên trán. Gã là một kỹ thuật viên tài năng, và những thuật ngữ chuyên môn mà Lương Hạo vừa ném ra cực kỳ logic, cực kỳ hợp lý. Sự tự tin của Hạo đã đánh gục hoàn toàn hàng rào phòng thủ cuối cùng của Linh. Gã bắt đầu hoang mang, tự hỏi liệu mình có thực sự bỏ lỡ điều gì đó quan trọng đến mức có thể hủy hoại sự nghiệp hay không.
+
+Lương Hạo thấy con cá đã cắn câu, liền hạ thấp giọng, đặt tay lên vai đồng đội cũ:
+
+— Linh, nghe này. Thế giới sắp thay đổi rồi. Những con số trên máy tính sẽ sớm trở nên vô nghĩa. Tôi cần cậu, không phải để đối đầu, mà để giúp tôi bảo vệ những gì thực sự quan trọng. Cậu có tin vào một cuộc sụp đổ toàn diện không?
+
+Linh ngước nhìn Hạo, sự kiêu ngạo thường thấy biến mất, thay vào đó là một sự bàng hoàng khó tả. Gã không hiểu "cuộc sụp đổ" mà Hạo nói là gì, nhưng nhìn vào đôi mắt sâu thẳm của người đàn ông trước mặt, gã cảm nhận được một luồng áp lực vô hình, một lời cảnh báo từ tương lai mà gã không đủ sức chối từ.
+
+— Vào trong đi. Tôi sẽ cho cậu thấy "ảo thuật" thực sự là như thế nào. — Hạo nói rồi lách qua người Linh, tiến thẳng vào cổng kho ICD Mỹ Đình.
+
+Bên trong kho hàng trung tâm ICD Mỹ Đình là một không gian khổng lồ, cao tới gần hai mươi mét với những dãy kệ thép chạy dài tít tắp đến tận cuối tầm mắt. Mùi dầu máy, mùi cao su nóng và hơi ẩm từ những kiện hàng tạo nên một bầu không khí đặc trưng của thế giới công nghiệp. Đèn cao áp trên trần nhà thỉnh thoảng lại phát ra tiếng kêu xè xè nhỏ vụn. Linh dẫn Hạo đi sâu vào khu vực kiểm kê, nơi những chiếc xe nâng tự động đang nằm im lìm như những con thú sắt đang ngủ say.
+
+— Đây là Zone 4, nơi hệ thống báo mất hàng. — Linh chỉ vào một khoảng trống mênh mông trên sàn kho, nơi lẽ ra phải là những pallet chất đầy nhu yếu phẩm — Anh bảo anh chuyển vào kho dự phòng, nhưng toàn bộ camera ở đây đều không ghi nhận bất kỳ chuyển động bốc xếp nào trong ba tiếng qua. Giải thích đi, Lương Hạo. Anh không thể bay qua các cảm biến hồng ngoại được.
+
+Lương Hạo không vội trả lời. Anh đi vòng quanh khu vực trống, đôi mắt sắc lẹm quan sát từng góc trần và chân tường. Bất chợt, anh dừng lại trước một tủ điện trung tâm, gõ nhẹ vào lớp vỏ kim loại:
+
+— Sơ đồ bảo an của cậu có ba điểm chết. Một ở góc bốn mươi lăm độ phía dưới camera số 09, hai ở khoảng hở giữa cảm biến nhiệt và cảm biến chuyển động tại cột số 12, và ba... chính là cái tủ điện này. — Hạo vừa nói vừa thao tác cực nhanh trên bảng điều khiển — Nếu cậu biết cách can thiệp vào tần số quét của cảm biến trong vòng mười lăm giây, cậu có thể di chuyển cả một chiếc xe tải mà không để lại một pixel ảnh nào trên màn hình giám sát. Cậu quá tin vào công nghệ, Linh ạ. Trong khi đó, con người mới là thứ dễ bị thao túng nhất.
+
+Linh sững sờ. Gã chính là người trực tiếp tham gia thiết kế hệ thống bảo an này hai năm trước. Những điểm yếu mà Hạo vừa chỉ ra, gã chưa từng nghĩ tới, hoặc đúng hơn là chưa bao giờ tin rằng có ai đó đủ trình độ để khai thác chúng một cách tinh vi như vậy. Sự nể phục bắt đầu nhen nhóm trong lòng Linh. Gã nhận ra người đứng trước mặt mình dường như đã lột xác hoàn toàn, không còn là gã kỹ sư chỉ biết đến giấy tờ mà đã trở thành một bóng ma lão luyện, am tường mọi ngóc ngách của bóng tối.
+
+— Anh... anh làm thế nào mà biết những điều này? — Linh lắp bắp, giọng nói không còn vẻ gay gắt ban đầu.
+
+— Học phí rất đắt đấy, Linh. Có những thứ cậu phải đánh đổi bằng cả mạng sống mới nhìn thấy được. — Hạo trả lời đầy ẩn ý, rồi quay lưng bước về phía phòng điều hành kỹ thuật — Đi thôi, chúng ta không có nhiều thời gian. Sáu ngày nữa, Phượng Đô sẽ không còn là nơi để cậu ngồi soi mã QR nữa đâu.
+
+Trong phòng điều hành kỹ thuật, không gian hẹp và nồng mùi nhựa cháy từ các linh kiện điện tử. Những màn hình máy tính nhấp nháy ánh sáng xanh lạnh lẽo, hiển thị các biểu đồ lưu lượng vận tải của cả thành phố. Hạo ngồi xuống chiếc ghế xoay, tay lướt trên bàn phím với sự thành thục đáng kinh sợ. Linh đứng bên cạnh, im lặng quan sát.
+
+— Linh, nhớ mùa đông năm hai nghìn hai mươi bốn không? Khi trạm biến áp của kho bị nổ giữa đêm giao thừa, chỉ có tôi và cậu thức trắng để chuyển hàng bằng tay. — Hạo đột ngột nhắc lại chuyện cũ, giọng anh dịu lại, mang theo một chút hơi ấm hiếm hoi.
+
+Linh khẽ gật đầu, ký ức về những ngày gian khổ nhưng bình yên ấy hiện về:
+
+— Nhớ chứ. Lúc đó anh còn bảo, sau này có tiền sẽ mua một cái hầm trú ẩn rồi anh em mình nghỉ hưu sớm.
+
+— Tôi không đùa đâu. — Hạo quay lại nhìn thẳng vào mắt Linh — Hệ thống viễn thông sẽ sụp đổ sớm hơn cậu nghĩ. Khi thiên thạch xanh đó va chạm, toàn bộ vệ tinh sẽ bị nhiễu loạn điện từ. Mạng internet, điện thoại, tất cả sẽ trở thành phế thải. Chúng ta đang đứng trên một quả bom hẹn giờ. Tôi cần cậu gia nhập kế hoạch này. Tôi có nguồn lực, tôi có sự chuẩn bị, nhưng tôi cần một cái đầu logistics nhạy bén để điều phối mạng lưới thu mua mà không bị chính quyền chú ý.
+
+Linh vẫn còn do dự. Gã là người của luật pháp, của quy tắc. Việc lén lút tích trữ hàng hóa quy mô lớn như thế này là phạm pháp nghiêm trọng.
+
+— Anh lấy cơ sở nào để khẳng định thảm họa sẽ xảy ra? — Linh hỏi, giọng vẫn còn chút cứng cỏi cuối cùng.
+
+Lương Hạo không giải thích thêm bằng lời. Anh đứng dậy, bước đến cạnh một kiện hàng nhỏ chứa linh kiện điện tử đặt trên bàn. Anh nhìn Linh, ra hiệu cho gã quan sát thật kỹ.
+
+— Nhìn cho rõ này. Đây là cách mà thế giới cũ biến mất.
+
+Bàn tay Hạo chạm nhẹ vào kiện hàng. Anh nhấn nút Quét ngầm trong túi quần. Trong nháy mắt, kiện hàng biến mất ngay dưới tầm mắt của Linh. Không có tiếng động, không có ánh sáng chói lòa, chỉ đơn giản là không gian nơi đó trở nên trống rỗng. Ngay lập tức, Hạo thực hiện một động tác giả như thể vừa gạt kiện hàng xuống dưới gầm bàn với tốc độ cực nhanh, rồi lại "rút" nó ra ở một vị trí khác cách đó hai mét.
+
+Linh chết lặng. Gã lao đến vị trí kiện hàng vừa biến mất, quỳ xuống sàn nhà, tay sờ soạn khắp mặt đất như thể đang tìm kiếm một cái hầm ngầm hay một tấm gương phản chiếu nào đó. Gã không tin vào mắt mình.
+
+— Anh... anh làm thế nào? Thủ thuật đánh tráo sao? Không thể nào, tôi không hề thấy anh cử động mạnh. Đồ đâu rồi?
+
+Hạo thầm cười trong lòng. Đây chính là "não bổ của chuyên gia" mà anh mong đợi. Linh sẽ tự tìm ra một lời giải thích khoa học nào đó để trấn an bản thân, thay vì tin vào một thứ siêu nhiên như hệ thống.
+
+— Đó là công nghệ vận chuyển vật chất đang được thử nghiệm mà tôi có quyền tiếp cận. — Hạo bịa ra một lý do đầy vẻ bí mật quốc gia — Cậu thấy đấy, chúng ta có công cụ để làm những điều không tưởng. Giờ thì, cậu chọn đi. Tiếp tục làm một con ốc vít trong bộ máy sắp hỏng, hay trở thành người điều hành của một thế giới mới?
+
+Linh đứng dậy, phủi bụi trên đầu gối. Sự kinh ngạc ban nãy dần chuyển thành một loại hưng phấn điên cuồng. Một chuyên gia kỹ thuật như gã luôn khao khát được chạm vào những thứ công nghệ vượt tầm thời đại.
+
+— Tôi theo anh. Nhưng tôi muốn biết, chúng ta sẽ lấy gì tiếp theo?
+
+— Zone 7. — Hạo lạnh lùng đáp — Lô hàng drone trinh sát của Đại Phong và chip cảm biến nhiệt Tân Lục. Đó là đôi mắt của chúng ta trong mạt thế.
+
+Khu vực Zone 7 nằm ở cuối dãy ICD, được bảo vệ bởi hai lớp cửa thép và hệ thống nhận diện khuôn mặt riêng biệt. Đây là nơi chứa những mặt hàng công nghệ cao, giá trị cực lớn, thường là linh kiện quân sự hoặc thiết bị viễn thông chiến lược. Ánh đèn ở đây không vàng vọt như bên ngoài mà mang một sắc trắng xanh tái tê, lạnh lẽo.
+
+— Lô hàng này đang bị kẹt do tranh chấp thủ tục giữa tập đoàn Đại Phong và đối tác Tân Lục. — Linh thì thầm khi hai người đi qua dãy hành lang hẹp — Một trăm chiếc drone trinh sát mẫu mới nhất, có khả năng bay liên tục tám tiếng và trang bị camera hồng ngoại độ phân giải cực cao. Giá trị thực tế trên thị trường đen không dưới hai triệu đô la Tân Lục. Anh thực sự định lấy nó sao? Nếu bị phát hiện, chúng ta sẽ rũ xương trong tù đấy.
+
+Lương Hạo dừng lại trước lớp cửa thép cuối cùng. Anh nhìn vào ô cửa kính nhỏ, thấy những thùng gỗ được đóng dấu "Ưu tiên quân sự" xếp chồng lên nhau gọn gàng.
+
+— Linh, sáu ngày nữa, những thứ này chỉ là sắt vụn nếu nằm trong tay kẻ không biết dùng. Nhưng nếu nằm trong tay chúng ta, nó sẽ là thứ cứu mạng hàng nghìn người. Cậu nghĩ tù tội còn có nghĩa lý gì khi ngoài kia người ta ăn thịt lẫn nhau để sống?
+
+Linh hít một hơi thật sâu, gã lấy ra chiếc thẻ quyền hạn đặc biệt của mình, áp vào máy quét. Tiếng cơ chế thủy lực rít lên, cánh cửa thép nặng nề từ từ mở ra. Hơi lạnh từ hệ thống điều hòa chuyên dụng phả vào mặt họ. Hạo bước vào, cảm giác hưng phấn lan tỏa khắp cơ thể. Đây chính là món quà lớn nhất trong đêm nay.
+
+— Kiểm tra xem có thiết bị định vị GPS chủ động nào không. — Hạo ra lệnh.
+
+Linh nhanh chóng mở một thùng hàng, lấy ra một chiếc drone có thiết kế khí động học tinh xảo, sơn màu đen nhám. Gã kết nối máy tính bảng vào cổng kỹ thuật của nó:
+
+— Có chip định vị tích hợp, nhưng tôi có thể vô hiệu hóa chúng hàng loạt bằng lệnh reset hệ thống. Đợi tôi năm phút.
+
+Linh làm việc với một sự tập trung cao độ, các ngón tay lướt trên màn hình cảm ứng nhanh như múa. Hạo đứng canh cửa, tay nắm chặt cán con dao gấp trong túi. Anh không sợ hệ thống an ninh, anh sợ biến số từ lòng người. Nhưng Linh đã không làm anh thất vọng.
+
+— Xong rồi. Toàn bộ một trăm chiếc drone và một nghìn chip cảm biến nhiệt đã ngắt kết nối với máy chủ trung tâm. Giờ chúng là "đồ vô chủ" trên hệ thống rồi.
+
+Lương Hạo tiến lại gần các dãy kệ. Quét.
+
+Mỗi khi anh đi qua một dãy thùng gỗ, chúng lại biến mất vào kho không gian của hệ thống. Linh đứng bên cạnh, mỗi lần thấy một kiện hàng khổng lồ bỗng nhiên bốc hơi, gã lại rùng mình một cái. Gã không nhịn được, đưa tay sờ vào khoảng không nơi chiếc thùng gỗ vừa tọa lạc, rồi lại nhìn xuống sàn nhà xem có vết nứt nào không.
+
+— Anh... chiếc máy vận chuyển của anh thật đáng sợ. Nó không hề có độ trễ, cũng không phát ra tiếng động nào. — Linh lẩm bẩm, sự sùng bái trong mắt gã giờ đây đã vượt xa sự nể phục thông thường. Gã tin chắc rằng Hạo đang nắm giữ một bí mật tầm cỡ thế giới, một công nghệ mà nhân loại chưa từng được công bố.
+
+Chỉ trong vòng chưa đầy mười phút, khu vực Zone 7 rộng lớn đã trở nên trống rỗng hoàn toàn. Một trăm chiếc drone trinh sát, một nghìn chip cảm biến nhiệt, và hàng loạt linh kiện thay thế đã nằm gọn trong Inventory của Hạo. Anh nhìn vào màn hình điện thoại: Milestone 1500 món hàng đã đạt được. Một cảm giác thỏa mãn tràn ngập. Với số drone này, anh có thể thiết lập một mạng lưới giám sát toàn bộ khu vực Thanh Xuân, biến Royal City thành một pháo đài bất khả xâm phạm.
+
+Trời bắt đầu hửng sáng ở phía chân trời xa tắp. Không khí rạng sáng tại cổng kho ICD Mỹ Đình mang theo hơi sương ẩm ướt và cái lạnh se sắt của buổi sớm Phượng Đô. Lương Hạo đứng bên cạnh chiếc Ford Ranger, nhìn Linh, người lúc này trông mệt mỏi nhưng ánh mắt lại rạng rỡ một thứ niềm tin mới mẻ.
+
+— Cầm lấy. — Hạo lấy từ trong kho không gian ra một túi nhu yếu phẩm lớn, đặt vào tay Linh.
+
+Linh mở túi ra, bên trong là thịt hộp cao cấp, thuốc kháng sinh, vài chai nước lọc tinh khiết và một khẩu súng điện. Gã hơi bất ngờ:
+
+— Anh đưa tôi cái này làm gì?
+
+— Đem về nhà, dặn vợ con chuẩn bị sẵn sàng. Trong vòng ba ngày tới, nếu thấy tôi gọi, dù đang làm gì cũng phải bỏ hết mà chạy đến Royal City. Nhớ kỹ, tuyệt đối không được ăn thức ăn lạ và tránh xa những người có biểu hiện sốt cao hoặc da dẻ xanh xao bất thường. — Hạo dặn dò, giọng đanh thép như một vị chỉ huy quân sự.
+
+Linh siết chặt túi đồ, gật đầu dứt khoát:
+
+— Tôi hiểu rồi, đại ca. Tôi sẽ sắp xếp công việc ở đây ổn thỏa để sẵn sàng cho lệnh của anh.
+
+Hạo nhìn Linh quay lưng đi vào trong để xóa dấu vết kiểm kê lần cuối. Anh bước lên xe, nổ máy. Tiếng động cơ Ford Ranger gầm lên đầy uy lực trong không gian tĩnh lặng. Anh nhìn gương chiếu hậu, thấy bóng dáng nhỏ bé của Linh khuất dần sau cánh cổng kho khổng lồ. Anh đã có đồng minh đầu tiên, một chuyên gia có thể giúp anh vận hành cả một hệ thống sinh tồn phức tạp sau này.
+
+Bất chợt, một vệt sáng màu xanh nhạt xẹt ngang qua bầu trời phía Đông Anh, xa về phía Bắc thành phố. Nó nhanh đến mức nếu không phải là một người luôn cảnh giác như Hạo, chắc chắn sẽ nghĩ đó là một ngôi sao băng bình thường. Nhưng Hạo biết rõ đó là gì. Những mảnh vụn đầu tiên của thiên thạch chứa virus T-Aurora đang bắt đầu tiến vào bầu khí quyển.
+
+Anh nhìn đồng hồ taplo: bốn giờ ba mươi phút sáng. Sớm hơn kiếp trước mười hai tiếng.
+
+Tim Lương Hạo hẫng đi một nhịp. Bàn tay anh siết chặt lấy vô lăng đến mức các đốt ngón tay trắng bệch. Dòng thời gian đã thay đổi. Sự can thiệp của anh vào các kho hàng, hay chính sự hiện diện của "Hầm Trú Ẩn Vạn Năng" đã đẩy nhanh tiến trình của thảm họa?
+
+— Thời gian lại bị đẩy nhanh sao? — Hạo lẩm bẩm, đôi mắt rực lên một tia nhìn sắc lạnh và đầy quyết tâm.
+
+Chiếc xe bán tải lao vút đi trên con đường vành đai, hướng về phía Royal City. Anh không còn nhiều thời gian để nghỉ ngơi nữa. Pháo đài tầng hai mươi hai cần phải được hoàn thiện ngay trong hôm nay. Cuộc đua với cái chết đã thực sự bắt đầu, sớm hơn bất kỳ dự tính nào của anh. Phía sau lưng anh, Phượng Đô vẫn còn đang say ngủ, không hề hay biết rằng cơn ác mộng tồi tệ nhất của nhân loại đang lao xuống từ hư không.

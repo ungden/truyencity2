@@ -6,7 +6,7 @@ describe('story production focus helper', () => {
     process.env = { ...originalEnv };
   });
 
-  it('enables focus mode by default with 10 default project ids', async () => {
+  it('Phase Q (2026-05-12): default UUID allowlist empty; flag-based opt-in', async () => {
     delete process.env.STORY_FOCUS_MODE;
     delete process.env.FOCUSED_PROJECT_IDS;
     jest.resetModules();
@@ -14,9 +14,24 @@ describe('story production focus helper', () => {
     const focus = await import('@/lib/story-production-focus');
 
     expect(focus.FOCUS_MODE_ENABLED).toBe(true);
-    expect(focus.FOCUSED_PROJECT_IDS).toHaveLength(10);
-    expect(focus.isFocusedProject('6c281b11-95ad-4346-8bee-f3a94fdfa60d')).toBe(true);
+    expect(focus.FOCUSED_PROJECT_IDS).toEqual([]);
+    // Legacy id-only check returns false for any id (allowlist empty).
     expect(focus.isFocusedProject('not-on-the-list')).toBe(false);
+    // Flag-based opt-in: project with style_directives.production_enabled passes.
+    expect(focus.isProductionEnabled({ id: 'some-id', style_directives: { production_enabled: true } })).toBe(true);
+    expect(focus.isProductionEnabled({ id: 'some-id', style_directives: { production_enabled: false } })).toBe(false);
+    expect(focus.isProductionEnabled({ id: 'some-id', style_directives: null })).toBe(false);
+  });
+
+  it('legacy env FOCUSED_PROJECT_IDS still allowlists by id (emergency override)', async () => {
+    process.env.FOCUSED_PROJECT_IDS = 'legacy-uuid-1';
+    jest.resetModules();
+
+    const focus = await import('@/lib/story-production-focus');
+
+    expect(focus.FOCUSED_PROJECT_IDS).toEqual(['legacy-uuid-1']);
+    expect(focus.isProductionEnabled({ id: 'legacy-uuid-1', style_directives: null })).toBe(true);
+    expect(focus.isProductionEnabled({ id: 'other-id', style_directives: null })).toBe(false);
   });
 
   it('supports env override for focused ids', async () => {

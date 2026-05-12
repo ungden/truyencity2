@@ -103,6 +103,8 @@ export interface StyleDirectives {
   flash_bulk_min_words?: number;
   /** Per-project production daily chapter quota for cron writing. Overrides WRITE_CHAPTERS_DAILY_QUOTA. */
   production_daily_chapter_quota?: number;
+  /** Phase Q (2026-05-12): flip true to opt the project into the production cron's daily-quota pipeline. */
+  production_enabled?: boolean;
   /** Cadence for optional AI memory tasks in cheap mode. Defaults to 5 chapters. */
   flash_bulk_optional_task_cadence?: number;
   /** Cadence for strict AI critic sampling in cheap mode. Reserved for audit runners. Defaults to 10 chapters. */
@@ -218,7 +220,7 @@ export interface EngineConfig {
 }
 
 export const DEFAULT_CONFIG: EngineConfig = {
-  model: 'deepseek-v4-flash',
+  model: 'gemini-3.1-flash-lite',
   temperature: 0.75,
   maxTokens: 32768,
   // 2800 từ AI write target — narrative coherence intact.
@@ -277,6 +279,33 @@ export interface ChapterOutline {
   slowScene?: string;
   cliffhanger: string;
   targetWordCount: number;
+  /**
+   * Phase M.4 (2026-05-12) — Optional chapter intent doc emitted by Architect.
+   * Condensed 500-800 chars summarizing chapter primary goal, cliffhanger
+   * target, MC state delta, threads to close/open, distilled creative
+   * constraints. Used by Writer + Critic instead of re-loading full context
+   * (30-50% token saving khi feature flag use_intent_doc_pipeline=true).
+   */
+  chapterIntent?: ChapterIntent;
+}
+
+export interface ChapterIntent {
+  /** Primary goal of the chapter (1-2 sentences) */
+  primaryGoal: string;
+  /** Target cliffhanger / hook ending (1 sentence) */
+  cliffhangerTarget: string;
+  /** MC state delta — what changes về MC state (power/relationship/resources) */
+  mcStateDelta: string;
+  /** Plot threads to close in this chapter (thread names) */
+  threadsToClose: string[];
+  /** Plot threads to open / advance in this chapter */
+  threadsToAdvance: string[];
+  /**
+   * Distilled creative constraints — combined from 6 quality modules
+   * (foreshadowing, character arc, pacing, voice, power, world).
+   * ≤500 chars total, structured by label vd "[Voice] MC dùng 'ta' với ...".
+   */
+  creativeConstraints: string;
 }
 
 export interface SceneOutline {

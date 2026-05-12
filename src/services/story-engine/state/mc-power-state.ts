@@ -8,6 +8,17 @@
  * DB table: mc_power_states
  *   project_id UUID (PK), power_state JSONB,
  *   last_updated_chapter INT, created_at TIMESTAMPTZ, updated_at TIMESTAMPTZ
+ *
+ * ── OWNERSHIP NOTE (Phase M.3, 2026-05-12) ──
+ * Đây là CANONICAL source for MC's semantic power state (realm name,
+ * breakthrough conditions, plot armor flags, ceiling). character_states.power_level
+ * (int scalar) is COMPLEMENTARY — dùng cho generic monotonic sort across all
+ * characters including non-MC. Two tables intentional, NOT duplicate:
+ *   - Architect reads BOTH for full MC profile (realm string từ here, int sort
+ *     index từ character_states).
+ *   - arc-enforcement.ts uses character_states.power_realm_index INT for fast
+ *     monotonic gate; mc_power_states for richer reveal context.
+ * Không merge — đã evaluate phase M.3 audit + reject (medium risk, low save).
  */
 
 import { getSupabase } from '../utils/supabase';

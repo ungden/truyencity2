@@ -1,0 +1,143 @@
+═══ Ch.2: Ảo Thuật Tại Vinmart B1 ═══
+
+Chương 2: Ảo Thuật Tại Vinmart B1
+
+Chiếc Ford Ranger màu xám tro lao đi trên đường vành đai Phượng Đô, hơi nóng hầm hập bốc lên từ mặt đường nhựa khiến không gian phía trước bị biến dạng, nhòe nhoẹt như một bức tranh sơn dầu đang tan chảy. Lương Hạo tấp xe vào một lề đường vắng, tắt máy nhưng vẫn giữ cho hệ thống điều hòa chạy ở mức tối đa. Tiếng quạt gió rít lên nhè nhẹ, nỗ lực đẩy lùi cái nóng ba mươi chín độ C của buổi trưa hè oi ả. Anh tựa lưng vào ghế lái, những ngón tay gõ nhịp đều đặn lên vô lăng bọc da, đôi mắt chăm chú nhìn vào màn hình điện thoại đang sáng rực.
+
+Biểu tượng Hầm Trú Ẩn Vạn Năng hiện lên trên nền xám tối giản. Lương Hạo nhấn vào mục Kho Chứa. Một danh sách dài dặc hiện ra, khiến lồng ngực anh đập nhanh hơn một nhịp. Thành quả từ kho Yusen Logistics vượt xa những gì anh mong đợi ở bước khởi đầu.
+
+Năm container thực phẩm khô. Hai mươi ngàn hộp thịt bò hầm Tây Âu Liên Minh. Mười ngàn liều kháng sinh phổ rộng cùng hàng tấn bông băng y tế. Bảy mươi tấn gạo tám thơm. Thậm chí còn có cả ba chiếc máy phát điện công nghiệp chạy bằng dầu diesel mà anh đã "tiện tay" quét được ở khu vực chờ xuất khẩu. Tất cả nằm gọn trong những ô vuông của ứng dụng, trạng thái hiển thị là "Đóng gói hoàn hảo". Không chiếm diện tích, không lo hỏng hóc, và quan trọng nhất là không ai biết chúng đang hiện diện ở đây, ngay trong túi quần của một gã kỹ sư logistics bình thường.
+
+Một trăm sáu mươi tám giờ.
+
+Con số đếm ngược đỏ rực trên góc màn hình như một lời nhắc nhở tàn khốc về thời gian. Kiếp trước, chính vào giờ này bảy ngày sau, bầu trời Phượng Đô sẽ chuyển sang một màu xanh lục ma quái trước khi những giọt mưa axit đầu tiên trút xuống, mang theo cái chết và sự biến dị. Lương Hạo siết chặt tay lái đến mức các khớp ngón tay trắng bệch. Anh không thể dừng lại ở đây. Số nhu yếu phẩm này có thể nuôi sống anh và em gái trong vài năm, nhưng nếu mạt thế kéo dài hàng thập kỷ như anh đã từng chứng kiến, bấy nhiêu vẫn chỉ là muối bỏ bể.
+
+Anh cần thực phẩm tươi sống, cần nguồn nước sạch bền vững và quan trọng hơn cả là một hệ thống phòng thủ không thể xuyên thủng. Ánh mắt Lương Hạo hướng về phía những tòa tháp chọc trời của Royal City đang sừng sững ở phía xa. Nơi đó, dưới hầm B1, là siêu thị Vinmart lớn nhất khu vực phía Nam Phượng Đô. Đó là mục tiêu tiếp theo.
+
+— Năm container là chưa đủ. — Lương Hạo lẩm bẩm, giọng nói khản đặc vì thiếu ngủ nhưng tràn đầy quyết tâm. — Mình cần biến căn hộ tầng hai mươi hai thành một pháo đài đúng nghĩa. Hệ thống lọc nước, pin năng lượng mặt trời, drone giám sát... tất cả phải được lắp đặt xong trước ngày D.
+
+Anh khởi động xe, tiếng động cơ diesel gầm lên mạnh mẽ. Chiếc Ford Ranger nhập vào dòng xe cộ đông đúc, hướng thẳng về phía hầm gửi xe của Royal City. Phượng Đô vẫn đang quay cuồng trong nhịp sống hối hả, người ta vẫn mải mê với những giao dịch nghìn tỷ, những cuộc vui thâu đêm mà không hề biết rằng lưỡi hái tử thần đã kề sát cổ. Lương Hạo nhìn những gương mặt tươi cười qua cửa kính xe, lòng dâng lên một sự thương hại lạnh lùng. Họ đang sống những ngày cuối cùng của nền văn minh, còn anh, anh đang chuẩn bị để làm chủ nhân của đống tro tàn đó.
+
+Khu vực kho trung chuyển Vinmart B1 nằm sâu trong lòng đất, tách biệt hẳn với không khí náo nhiệt của khu mua sắm phía trên. Mùi không khí ẩm mốc, mùi nilon mới và tiếng động cơ của xe nâng hàng tạo nên một không gian đặc quánh, nặng nề. Lương Hạo bước xuống xe, khoác lên mình chiếc áo bảo hộ của kỹ sư giám sát Yusen, tay cầm bảng kẹp hồ sơ điện tử, bước chân dứt khoát hướng về phía văn phòng quản lý kho.
+
+Đứng sau lớp cửa kính là Mạnh, quản lý kho Vinmart B1. Hắn là một gã đàn ông ngoài bốn mươi, bụng phệ, khuôn mặt lúc nào cũng cau có như thể cả thế giới đang nợ tiền hắn. Mạnh đang gào thét vào điện thoại, những thớ thịt trên mặt rung lên theo từng tiếng chửi thề thô thiển. Thấy Lương Hạo đẩy cửa bước vào, hắn dập máy cái rầm, ánh mắt khinh khỉnh quét qua bộ đồng phục của anh.
+
+— Lại là bên Yusen à? Tôi đã bảo rồi, lô hàng lỗi hôm nay không nhận trả. Các anh làm ăn kiểu gì mà để mã vận đơn sai lệch hết cả lên thế hả? — Mạnh đập tay xuống bàn, giọng cao vút đầy hách dịch.
+
+Lương Hạo không vội trả lời. Anh thong dong kéo một chiếc ghế, ngồi xuống đối diện với gã quản lý đang bốc hỏa. Anh đặt bảng hồ sơ lên bàn, đẩy nhẹ về phía Mạnh.
+
+— Anh Mạnh, tôi đến đây không phải để cãi nhau về mã vận đơn. Tôi đến để giúp anh dọn sạch đống rác mà anh đang định "tẩu tán" vào đêm nay trước khi đoàn thanh tra tập đoàn xuống vào sáng mai.
+
+Cái tên "đoàn thanh tra" vừa thốt ra, sắc mặt Mạnh lập tức chuyển từ đỏ gay sang trắng bệch. Hắn lắp bắp, cố giữ lấy chút uy phong cuối cùng:
+
+— Cậu... cậu nói cái quái gì thế? Thanh tra nào? Tôi làm ăn minh bạch, rác nào ở đây?
+
+Lương Hạo khẽ dựa lưng vào ghế, nụ cười trên môi anh không chút hơi ấm:
+
+— Anh Mạnh, đừng diễn kịch với tôi. Theo dữ liệu logistics từ hệ thống trung tâm mà Yusen liên kết, kho B1 của anh đang tồn đọng hơn một trăm tấn thực phẩm tươi sống và đồ khô quá hạn hoặc sai quy cách đóng gói. Theo quy định, số hàng này phải được tiêu hủy tại bãi rác Nam Sơn và có biên bản xác nhận. Nhưng anh lại đang định bán tháo cho các đầu nậu chợ đen để bù vào khoản thâm hụt quỹ cuối quý đúng không?
+
+Mạnh mồ hôi vã ra như tắm, hắn nhìn trân trân vào Lương Hạo, đôi môi run rẩy không nói nên lời. Những chi tiết kỹ thuật mà Lương Hạo đưa ra quá chính xác, chính xác đến mức đáng sợ.
+
+— Anh nghĩ mình xóa được dấu vết sao? — Lương Hạo bồi thêm một đòn chí mạng. — Mã SKU của lô hàng này vẫn đang "treo" trên hệ thống vận hành. Chỉ cần tôi nhấn nút báo cáo sai lệch luồng hàng, mười lăm phút sau an ninh sẽ có mặt ở đây. Lúc đó thì không chỉ mất việc đâu, mà là vài cuốn lịch đấy anh Mạnh ạ.
+
+Gã quản lý béo ú đột nhiên đứng dậy, nhưng thay vì phản kháng, hắn vội vàng đi vòng qua bàn, nắm lấy tay Lương Hạo, giọng nói giờ đây đã chuyển sang tông khúm núm đến phát tởm:
+
+— Cậu Hạo... em Hạo... anh biết cậu là người có tiếng trong ngành. Cậu giúp anh chuyến này. Anh lỡ tay... cậu biết đấy, cuộc sống ở Phượng Đô này đắt đỏ quá. Cậu muốn bao nhiêu? Anh chia cho cậu một nửa chỗ tiền bán được.
+
+Lương Hạo gạt tay hắn ra, vẻ mặt đầy sự ghê tởm:
+
+— Tôi không cần tiền của anh. Tôi cần xử lý số hàng đó theo đúng "quy trình riêng" của Yusen. Anh chỉ cần cho tôi mười lăm phút một mình trong kho lưu trữ hàng chờ hủy. Toàn bộ camera ở khu vực đó phải được tắt đi trong thời gian đó vì lý do "bảo mật quy trình". Sau mười lăm phút, kho sẽ trống rỗng, không một hạt bụi. Anh sẽ có một biên bản tiêu hủy sạch sẽ để đối phó với thanh tra.
+
+Mạnh ngẩn người. Hắn không hiểu tại sao Lương Hạo lại đưa ra một yêu cầu kỳ quặc như vậy, nhưng trong tình thế ngàn cân treo sợi tóc, đây giống như một chiếc phao cứu sinh từ trên trời rơi xuống.
+
+— Chỉ thế thôi sao? Không cần tiền? Cậu chắc chắn là kho sẽ trống chứ? Một trăm tấn đấy em trai à, xe tải nào chở cho hết trong mười lăm phút?
+
+Lương Hạo đứng dậy, thu hồi bảng hồ sơ, ánh mắt sắc lạnh nhìn thẳng vào mắt Mạnh:
+
+— Đó là việc của tôi. Anh có mười giây để quyết định. Hoặc là cùng tôi "xử lý", hoặc là đợi an ninh đến.
+
+Mạnh không chần chừ thêm một giây nào. Hắn vồ lấy bộ đàm, hét vào trong đó:
+
+— Đội bảo vệ nghe rõ, tắt toàn bộ camera khu vực Zone 4 kho B1 ngay lập tức. Có xe chuyên dụng của tập đoàn vào lấy hàng đặc biệt. Cấm người ngoài lại gần trong mười lăm phút. Làm ngay!
+
+Lương Hạo bước ra khỏi văn phòng, bước chân anh vang lên khô khốc trên nền xi măng. Anh tiến về phía Zone 4, khu vực tối tăm và ẩm thấp nhất của kho B1, nơi hàng trăm tấn thực phẩm đang được xếp chồng chất như những ngọn núi nhỏ. Mùi thịt bắt đầu biến chất, mùi rau củ thối rữa quyện với mùi bột mì tạo thành một hỗn hợp mùi vị lợm giọng.
+
+Nhưng trong mắt Lương Hạo, đây không phải là rác thải. Đây là sự sống.
+
+Những bao bột mì năm mươi cân, những thùng dầu ăn năm lít xếp san sát, hàng ngàn lốc sữa, và cả những kệ thịt đông lạnh vừa mới chớm hết hạn. Anh đứng giữa đống hàng hóa khổng lồ, bóng tối của kho hàng bao trùm lấy bóng hình cô độc của anh. Điện thoại trong tay anh nháy sáng. Nút Quét được kích hoạt.
+
+Một luồng sáng xanh mờ ảo, nhỏ đến mức mắt thường khó lòng nhận ra nếu không quan sát kỹ, bắt đầu lan tỏa từ cảm biến camera của điện thoại. Lương Hạo di chuyển nhanh như một bóng ma giữa các kệ hàng. Anh không cần chạm vào chúng, chỉ cần lướt qua trong phạm vi hai mét.
+
+Biến mất.
+
+Dãy kệ đầu tiên chứa hai mươi tấn bột mì bốc hơi trong chưa đầy hai phút. Không gian vừa rồi còn chật chội đến mức khó thở đột ngột trở nên trống trải, để lộ ra những mảng tường loang lổ vết ẩm. Lương Hạo tiếp tục tiến về phía khu vực thực phẩm đông lạnh. Những thùng ức gà, sườn heo, cá phi lê... tất cả cuộn vào một vòng xoáy không gian vô hình rồi nằm gọn trong kho chứa của ứng dụng.
+
+Tốc độ quét của app Hầm Trú Ẩn Vạn Năng ở kiếp này dường như còn mạnh mẽ hơn những gì anh nhớ. Có lẽ vì đây là giai đoạn khởi đầu, khi "hệ thống" chưa bị quá tải bởi dữ liệu của hàng triệu người dùng. Cảm giác nhìn thấy hàng tấn nhu yếu phẩm nằm chắc chắn trong tầm tay mình tạo ra một sự thỏa mãn tột độ, một luồng dopamine chạy thẳng lên não bộ, khiến Lương Hạo cảm thấy mình như một vị thần đang thu thập tế phẩm.
+
+Mười phút trôi qua. Khu Zone 4 rộng lớn giờ đây chỉ còn là một khoảng sân trống hoắc. Chỉ còn lại vài chiếc pallet gỗ mục nát nằm rải rác trên sàn. Lương Hạo kiểm tra lại Inventory: Tổng trọng lượng thực phẩm vừa thu giữ là một trăm lẻ tám tấn. Đủ để nuôi sống một tiểu đoàn trong vòng một năm.
+
+Anh hít một hơi thật sâu, điều chỉnh lại nhịp thở rồi thong dong bước ra ngoài. Đúng lúc đó, Mạnh cùng hai nhân viên bốc xếp đang hớt hải chạy tới. Mạnh cầm trên tay một xấp giấy tờ, mồ hôi vẫn còn nhễ nhại trên trán.
+
+— Xong chưa em Hạo? Xe tải của cậu... kìa... cái gì thế này? — Mạnh đứng khựng lại ở cửa Zone 4.
+
+Chiếc bộ đàm trên tay gã quản lý rơi xuống sàn xi măng, phát ra tiếng "cộp" khô khốc. Hai nhân viên bốc xếp phía sau cũng há hốc mồm, dụi mắt liên tục như không tin vào những gì đang hiện ra trước mắt. Một căn kho rộng cả ngàn mét vuông, vừa mười phút trước còn đầy ắp hàng hóa chất cao đến tận trần nhà, giờ đây trống rỗng đến mức có thể nghe thấy tiếng gió rít qua khe thông gió.
+
+Không có xe tải. Không có tiếng động cơ. Không có dấu vết của hàng chục người bốc xếp. Chỉ có một mình Lương Hạo đang đứng đó, tay đút túi quần, vẻ mặt bình thản đến mức kỳ dị.
+
+— Ma... ma làm à? — Một nhân viên bốc xếp lắp bắp, chân run lẩy bẩy lùi lại phía sau.
+
+Mạnh chạy nhào vào trong kho, hắn sờ tay lên sàn nhà, sờ lên những chiếc kệ sắt trống trơn, rồi quay lại nhìn Lương Hạo với ánh mắt kinh hoàng. Đối với một người bình thường sống trong thế giới duy vật này, đây không phải là logistics, đây là ma thuật, là một điều gì đó vượt ra ngoài sự hiểu biết của nhân loại.
+
+— Cậu... cậu làm thế nào? Một trăm tấn hàng... biến mất trong mười phút? Xe của cậu đâu? — Mạnh gào lên, giọng lạc đi vì sợ hãi.
+
+Lương Hạo tiến lại gần, ghé sát tai Mạnh, thì thầm bằng một giọng lạnh lẽo:
+
+— Đừng hỏi những điều anh không nên biết. Chẳng phải anh muốn kho trống để đối phó thanh tra sao? Tôi đã làm xong việc của mình. Bây giờ, ký vào biên bản xác nhận tiêu hủy đi. Và nhớ kỹ, nếu có bất kỳ ai hỏi về lô hàng này, câu trả lời duy nhất là: "Nó đã được xe chuyên dụng của Yusen chở đi tiêu hủy theo đúng quy trình". Rõ chưa?
+
+Mạnh gật đầu lia lịa như một chiếc máy đã được lập trình sẵn. Hắn run rẩy ký tên vào bản hồ sơ điện tử của Lương Hạo. Trong thâm tâm gã quản lý lúc này, Lương Hạo không còn là một kỹ sư logistics nữa, mà là một thực thể đáng sợ, một kẻ nắm giữ những bí mật đen tối mà gã không bao giờ muốn chạm tới.
+
+Đúng lúc đó, chú Vinh bảo vệ từ sảnh tầng G đi ngang qua để kiểm tra cửa hầm. Thấy Mạnh đang quỳ sụp dưới sàn kho trống rỗng, miệng lẩm bẩm cầu khấn, chú Vinh ngơ ngác dừng lại:
+
+— Ô kìa anh Mạnh, sao lại quỳ giữa kho thế này? Bộ bị mất trộm hay sao mà kho sạch sành sanh thế kia?
+
+Mạnh ngẩng lên, đôi mắt dại đi, lắp bắp trả lời:
+
+— Chú Vinh... thần linh... thần linh hiển linh rồi chú ơi. Có ngài đại sư logistics nào đó vừa quét một cái là rác biến sạch... tôi phải lạy, phải lạy để tạ ơn không ngài ấy lại quét luôn cả tôi đi thì khốn!
+
+Lương Hạo không nhịn được, khẽ lắc đầu trước sự suy diễn của Mạnh. Anh lướt qua chú Vinh, dành cho ông một cái gật đầu nhẹ rồi bước thẳng về phía thang máy. Mục tiêu tiếp theo: Căn hộ tầng hai mươi hai, Tòa R1.
+
+Căn hộ của Lương Hạo rộng một trăm hai mươi mét vuông, được thiết kế theo phong cách tối giản với tông màu xám chủ đạo. Từ cửa sổ sát đất, có thể nhìn thấy toàn cảnh quảng trường Royal City với những bức tượng đá trắng kiêu hãnh. Nhưng đối với một người đã trải qua mạt thế, vẻ đẹp này thật mỏng manh. Chỉ cần lưới điện thành phố sụp đổ và hệ thống cấp nước bị nhiễm độc, nơi này sẽ biến thành một nấm mồ xa xỉ.
+
+Lương Hạo lập tức bắt tay vào công việc. Anh khóa chặt cửa chính bằng một ổ khóa thông minh đã được gia cố bằng lõi thép mà anh quét được từ một cửa hàng cơ khí trên đường về. Anh bước vào gian bếp, nhìn vào hệ thống lọc nước RO hiện đại nhưng vô dụng trước virus T-Aurora.
+
+— Rút: Module lọc nước Nano-Bio Mark III. — Lương Hạo ra lệnh cho ứng dụng.
+
+Một chiếc hộp kim loại sáng bóng, to bằng chiếc va li du lịch, đột ngột xuất hiện trên bàn bếp. Đây là thiết bị y tế quân sự mà anh đã "mượn" từ lô hàng viện trợ của Tây Âu Liên Minh trong kho Yusen sáng nay. Nó có khả năng lọc sạch mọi loại tạp chất, vi khuẩn và thậm chí là các ion kim loại nặng ở cấp độ phân tử.
+
+Anh nhanh chóng tháo dỡ hệ thống lọc cũ, thay thế bằng module mới. Những ống dẫn nước bằng nhựa được thay bằng ống thép không gỉ. Lương Hạo làm việc với sự chính xác tuyệt đối của một kỹ sư lâu năm. Anh đấu nối module này trực tiếp vào bồn chứa nước dự phòng hai ngàn lít mà anh đã lắp đặt âm trần từ trước đó. Với hệ thống này, ngay cả khi mưa axit làm ô nhiễm nguồn nước ngầm của thành phố, anh vẫn có nước sạch để dùng trong ít nhất sáu tháng.
+
+Tiếp theo là vấn đề năng lượng.
+
+Lương Hạo di chuyển ra ban công rộng khoảng mười mét vuông. Anh nhìn lên bầu trời Phượng Đô đang dần chuyển sang màu tím hoàng hôn. Anh lấy ra mười tấm pin năng lượng mặt trời màng mỏng, loại công nghệ mới nhất có khả năng hấp thụ cả ánh sáng yếu. Anh dán chúng lên lớp kính ban công và một phần tường ngoài của tòa nhà. Hệ thống dây dẫn được giấu kín kẽ dưới lớp sàn gỗ nhân tạo, dẫn thẳng vào bộ lưu trữ điện Lithium-Ion công suất lớn đặt trong kho chứa đồ.
+
+Khi chiếc công tắc cuối cùng được bật lên, một tiếng "tít" nhẹ vang lên. Bảng điều khiển năng lượng hiển thị trạng thái: Độc lập 100%. Toàn bộ đèn trong nhà sáng lên bằng nguồn điện tự cấp. Lương Hạo thở phào nhẹ nhõm. Một pháo đài công nghệ không thể thiếu "đôi mắt".
+
+Anh rút ra ba chiếc drone giám sát siêu nhỏ, kích thước chỉ bằng một con chuồn chuồn. Đây là sản phẩm của tập đoàn Thiên Long Tech, trang bị cảm biến hồng ngoại và nhận diện khuôn mặt.
+
+— Kích hoạt chế độ tuần tra hành lang tầng hai mươi hai. — Anh thao tác trên điện thoại.
+
+Ba chiếc drone khẽ rung cánh, bay vút qua khe cửa thông gió rồi tỏa ra các góc hành lang. Hình ảnh từ chúng được truyền trực tiếp về màn hình máy tính trong phòng làm việc của anh. Từ giờ, bất kỳ ai bước ra khỏi thang máy hay có ý định tiếp cận căn hộ của anh đều sẽ bị phát hiện từ khoảng cách năm mươi mét.
+
+Khi những công đoạn kỹ thuật cuối cùng hoàn tất, bóng tối đã bao trùm lấy Phượng Đô. Lương Hạo đứng ở ban công, tay cầm một ly rượu vang đỏ đắt tiền mà anh đã quét được từ kho rượu của một đại gia nào đó trong danh sách ký gửi của chú Vinh. Anh nhấp một ngụm nhỏ, vị chát của rượu quyện với hương gỗ sồi lan tỏa trong khoang miệng.
+
+Phía dưới kia, Royal City vẫn rực rỡ ánh đèn. Những cặp tình nhân đi dạo dưới chân các bức tượng, tiếng nhạc từ các quán cà phê vọng lại du dương. Họ không hề hay biết rằng đây là buổi tối bình yên cuối cùng. Sự cô độc bao trùm lấy Lương Hạo. Anh biết sự thật, nhưng anh không thể cứu tất cả. Anh chỉ có thể cứu những người anh yêu thương nhất.
+
+Anh lấy điện thoại ra, định gọi cho Hương để kiểm tra xem cô bé đã mua thêm đồ ăn chưa, thì màn hình bất ngờ rung lên. Một tin nhắn từ một số máy không có trong danh bạ hiện lên.
+
+"Hạo, là Linh đây. Tôi vừa thấy lô hàng thực phẩm tươi sống của Vinmart B1 bị báo cáo tiêu hủy bất thường trên hệ thống vận hành nội bộ. Một trăm tấn hàng bốc hơi không dấu vết? Ông vừa mới ở đó đúng không? Đừng nói với tôi là ông định làm 'ảo thuật' đấy nhé. Gặp nhau ở cổng kho Mỹ Đình ngay bây giờ. Tôi cần nói chuyện."
+
+Ly rượu trên tay Lương Hạo khựng lại giữa không trung. Phạm Đăng Linh. Người đồng đội cũ đã từng hy sinh để bảo vệ anh trong đống đổ nát của Phượng Đô ở kiếp trước. Tại sao Linh lại xuất hiện sớm như vậy? Và tại sao Linh lại để ý đến lô hàng này nhanh đến thế?
+
+Biến số đã xuất hiện. Lương Hạo nhìn chằm chằm vào tin nhắn, đôi mắt nheo lại đầy tính toán. Quá khứ và hiện tại đang bắt đầu va chạm vào nhau nhanh hơn anh tưởng. Anh đặt ly rượu xuống thành ban công, quay vào trong lấy chiếc áo khoác gió.
+
+Trò chơi sinh tồn này, xem ra không chỉ có mình anh là người nắm giữ quân bài.

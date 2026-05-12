@@ -73,10 +73,10 @@ export const AI_PROVIDERS: Record<AIProviderType, AIProviderConfig> = {
     requiresApiKey: true,
     supportsStreaming: true,
     maxTokens: 32768,
-    defaultModel: 'deepseek-v4-flash',
+    defaultModel: 'gemini-3.1-flash-lite',
     models: [
       {
-        id: 'deepseek-v4-flash',
+        id: 'gemini-3.1-flash-lite',
         name: 'DeepSeek V4 Flash',
         description: 'Primary production model — 1M context, 384K output, thinking mode, low cost',
         contextWindow: 1000000,
@@ -86,7 +86,7 @@ export const AI_PROVIDERS: Record<AIProviderType, AIProviderConfig> = {
         recommended: true,
       },
       {
-        id: 'deepseek-v4-pro',
+        id: 'gemini-3-flash-preview',
         name: 'DeepSeek V4 Pro',
         description: 'Premium tier — stronger reasoning for planning/critic tasks',
         contextWindow: 1000000,

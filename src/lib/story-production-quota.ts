@@ -1,4 +1,7 @@
-const FALLBACK_DAILY_CHAPTER_QUOTA = 20;
+// 2026-05-12: bumped 20 → 50 default. Gemini Flash Lite writes ~1-2 min/chapter
+// reliably; 50 ch/day per active focused project fits in cron tick budget.
+// Override via WRITE_CHAPTERS_DAILY_QUOTA env or per-project style_directives.
+const FALLBACK_DAILY_CHAPTER_QUOTA = 50;
 
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));

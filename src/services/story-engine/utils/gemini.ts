@@ -14,6 +14,7 @@ const RETRY_DELAYS = [2000, 5000, 10000];
 // ── Cost Tracking ───────────────────────────────────────────────────────────
 // Pricing per 1M tokens (Google AI docs, Standard tier)
 const PRICING: Record<string, { inputPerMillion: number; outputPerMillion: number }> = {
+  'gemini-3.1-flash-lite':        { inputPerMillion: 0.25, outputPerMillion: 1.50 },
   'gemini-3-flash-preview':       { inputPerMillion: 0.50, outputPerMillion: 3.00 },
   'gemini-3-pro-preview':         { inputPerMillion: 2.00, outputPerMillion: 12.00 },
   'gemini-3.1-pro-preview':       { inputPerMillion: 2.00, outputPerMillion: 12.00 },
@@ -88,7 +89,7 @@ export async function callGemini(
 ): Promise<GeminiResponse> {
   // 1. Per-task routing override (set via globalThis.__MODEL_ROUTING__)
   // 2. Otherwise, model name itself decides: anything starting with `deepseek-`
-  //    routes to DeepSeek. This makes DEFAULT_CONFIG.model = 'deepseek-v4-flash'
+  //    routes to DeepSeek. This makes DEFAULT_CONFIG.model = 'gemini-3.1-flash-lite'
   //    enough to switch the whole pipeline.
   const routed = resolveRoute(options?.tracking?.task);
   const targetModel = routed || config.model;
@@ -107,14 +108,42 @@ export async function callGemini(
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('GEMINI_API_KEY not set');
 
+  // Gemini 3 family recommends temperature=1.0 (lower temps cause looping per docs).
+  // We force 1.0 when target model matches `gemini-3*`. Gemini 1/2 family keeps caller temp.
+  const isGemini3 = config.model.startsWith('gemini-3');
+  const effectiveTemperature = isGemini3 ? 1.0 : config.temperature;
+
   const generationConfig: Record<string, unknown> = {
-    temperature: config.temperature,
+    temperature: effectiveTemperature,
     maxOutputTokens: config.maxTokens,
     topP: 0.95,
     topK: 40,
     // NOTE: frequencyPenalty/presencePenalty NOT supported by thinking models
     // (gemini-3-flash-preview). Sending them causes empty content response.
   };
+
+  // Thinking control for Gemini 3 thinking models (gemini-3-flash-preview, gemini-3-pro-*).
+  // Per-task tier:
+  //   - Chapter-writing volume tasks → GEMINI_CHAPTER_THINKING_LEVEL || 'low'.
+  //     'low' avoids the failure mode where hidden thinking tokens consume the
+  //     maxOutputTokens budget and truncate JSON output (caused Architect retries).
+  //   - Setup creative stages → GEMINI_THINKING_LEVEL || 'high'.
+  if (isGemini3) {
+    const task = options?.tracking?.task || '';
+    const isChapterTask = ['architect', 'writer', 'writer_continuation', 'critic', 'continuity_guardian', 'auto_revision'].includes(task);
+    const valid = (v: string): v is 'low' | 'medium' | 'high' => ['low', 'medium', 'high'].includes(v);
+    let level: string | undefined;
+    if (isChapterTask) {
+      const envChapter = (process.env.GEMINI_CHAPTER_THINKING_LEVEL || '').toLowerCase();
+      level = valid(envChapter) ? envChapter : 'low';
+    } else {
+      const envSetup = (process.env.GEMINI_THINKING_LEVEL || '').toLowerCase();
+      level = valid(envSetup) ? envSetup : (config.model === 'gemini-3-flash-preview' ? 'high' : undefined);
+    }
+    if (level) {
+      generationConfig.thinkingConfig = { thinkingLevel: level };
+    }
+  }
 
   // JSON mode: force Gemini to return raw JSON (no markdown wrapping)
   if (options?.jsonMode) {
@@ -143,7 +172,10 @@ export async function callGemini(
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
         body: JSON.stringify(body),
-        signal: AbortSignal.timeout(120000),
+        // 2026-05-12: bumped 120s → 240s for Gemini 3 thinking models — thinking_level
+        // high can spend 60-180s reasoning before emitting tokens; old 120s timeout
+        // truncated JSON mid-string. 240s gives headroom on chapter-scale prompts.
+        signal: AbortSignal.timeout(240000),
       });
 
       if (res.status === 429 || res.status === 503) {

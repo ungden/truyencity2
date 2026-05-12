@@ -625,6 +625,16 @@ Trả về JSON:
   }
 
   const db = getSupabase();
+
+  // Phase M.2 (2026-05-12): nếu project có chapter_blueprints rows, đó là
+  // source of truth cho chapter_briefs — skip ghi đè qua arc_plan.
+  // Chỉ giữ plan_text / sub_arcs / threads_to_* trong arc_plans (high-level).
+  const { count: blueprintCount } = await db
+    .from('chapter_blueprints')
+    .select('*', { count: 'exact', head: true })
+    .eq('project_id', projectId);
+  const hasBlueprints = (blueprintCount ?? 0) > 0;
+
   const { error: arcErr } = await db.from('arc_plans').upsert({
     project_id: projectId,
     arc_number: arcNumber,
@@ -633,7 +643,9 @@ Trả về JSON:
     arc_theme: parsed.arc_theme || 'growth',
     plan_text: parsed.plan_text || '',
     sub_arcs: parsed.sub_arcs || [],
-    chapter_briefs: parsed.chapter_briefs || [],
+    // chapter_briefs: chỉ write khi không có chapter_blueprints. Khi có,
+    // chapter_blueprints (template-instantiate, 1000 briefs/novel) là canonical.
+    chapter_briefs: hasBlueprints ? [] : (parsed.chapter_briefs || []),
     threads_to_advance: parsed.threads_to_advance || [],
     threads_to_resolve: parsed.threads_to_resolve || [],
     new_threads: parsed.new_threads || [],

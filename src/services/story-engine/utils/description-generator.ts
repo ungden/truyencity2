@@ -172,7 +172,7 @@ CHỈ TRẢ VỀ phần giới thiệu (text thuần). KHÔNG meta comment, KHÔ
  */
 export async function generateNovelDescription(input: DescriptionGeneratorInput): Promise<string> {
   const cfg: GeminiConfig = {
-    model: 'deepseek-v4-flash',
+    model: 'gemini-3.1-flash-lite',
     temperature: 0.75,
     maxTokens: 2048,
     systemPrompt: SYSTEM_PROMPT,

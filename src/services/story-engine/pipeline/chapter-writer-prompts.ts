@@ -386,7 +386,7 @@ CHỐNG LẶP (3 layer)
 LẶP TỪ:
 - Cùng tính từ/màu sắc ≤3 lần/chương; lần 4+ → từ đồng nghĩa.
 - TUYỆT ĐỐI KHÔNG cùng tính từ 2 lần trong 1 đoạn.
-- Tên MC ≤25 lần/10K chữ; mỗi 3-4 lần xen 1 đại từ (hắn/anh/nàng/gã/y) hoặc chức danh ("tên thiếu niên", "vị tông chủ trẻ", "kẻ mới đến").
+- Tên MC (HỌ + TÊN ĐẦY ĐỦ) lặp nhiều LÀ ĐÚNG convention webnovel — giúp reader nhớ tên. Mục tiêu 60-100 lần/10K chữ. KHÔNG cắt thành "Hạo" rồi thay "anh/hắn" để né lặp. Đại từ chỉ dùng ở câu kế tiếp ngay sau khi vừa nhắc tên đầy đủ, để tránh chuỗi 3 câu liên tiếp toàn "Lương Hạo... Lương Hạo... Lương Hạo".
 
 LẶP CẤU TRÚC AI:
 - "X là một Y" ≤3 lần/chương → thay "X — Y", "X, tên Y"
@@ -413,11 +413,14 @@ CỐ ĐỊNH XUYÊN SUỐT (chống name flip):
 - Khi không chắc tên → đại từ (hắn/anh/cô/nàng/y) — KHÔNG bịa.
 - Supporting characters consistent với cast roster trong story_outline. KHÔNG đổi Khánh→Khang.
 
-TÊN ĐẦY ĐỦ TRONG NARRATIVE:
-- Văn tường thuật → DÙNG họ + tên ("Lý Quang Vinh", "Trần Quốc Hùng", "Tô Lăng")
-- Cắt cụt CHỈ trong dialogue thân mật (bạn/gia đình/người yêu): "— Vinh, em ổn không?"
-- Mẫu chuẩn: "Lý Quang Vinh nghiến răng" ✅ thay vì "Vinh nghiến răng" ❌
-- Lý do: webnovel 1000+ chương, độc giả mới gặp nhân vật ở chương N sẽ quên nếu chỉ thấy tên cụt.
+TÊN ĐẦY ĐỦ TRONG NARRATIVE (CONVENTION QUAN TRỌNG):
+- Văn tường thuật BẮT BUỘC DÙNG HỌ + TÊN ("Lương Hạo", "Lý Quang Vinh", "Trần Quốc Hùng")
+- Trong DIALOGUE giữa các nhân vật cũng dùng họ + tên: "— Lương Hạo, anh đang làm gì đấy?" thay vì "— Hạo, anh đang làm gì đấy?"
+- Cắt thành tên cụt CHỈ trong dialogue thân mật (vợ/người yêu/anh em ruột/mẹ con) và CHỈ khi đó là moment cảm xúc cao: "— Hạo... anh đừng đi" (vợ nói với chồng lúc chia tay).
+- Mẫu chuẩn narration: "Lương Hạo nghiến răng" ✅ KHÔNG dùng "Hạo nghiến răng" ❌
+- Mẫu chuẩn dialogue thường: "— Lương Hạo, lô hàng đã sẵn sàng chưa?" ✅ KHÔNG "— Hạo, lô hàng đã sẵn sàng chưa?" ❌
+- Áp dụng cho TOÀN BỘ named characters 2-3 chữ (MC + cast roster), không riêng MC.
+- Lý do: webnovel 1000+ chương, reader mới gặp character ở chương N sẽ quên nếu chỉ thấy tên cụt; full name lặp lại = mnemonic device cố ý của tác giả văn học mạng TQ/VN.
 
 ═══════════════════════════════════════════════════════════════════════════
 EMOTION QUA MICRO-ACTION (3-tier)
@@ -569,11 +572,10 @@ SOFT FLAGS (severity moderate / major)
 
 S1. COMEDY MISSING: 0 khoảnh khắc hài → moderate (major nếu chương đối thoại/sinh hoạt vẫn không có).
 
-S2. REPETITION:
-- Bất kỳ từ >8 lần → severity critical (counts toward gate threshold)
-- Bất kỳ từ >5 lần → moderate (major nếu ≥3 nhóm từ đều >5)
-- "là một / bắt đầu / mang theo / tỏa ra / dường như / như thể" >5 lần → moderate; >8 lần → major
-- Tên MC >25 lần/10K chữ + ít đại từ → moderate
+S2. REPETITION (recalibrated 2026-05-12):
+- AI-tell từ (tím sẫm / vàng kim / kinh hoàng / rực rỡ / mờ ảo / đặc quánh / lạnh lẽo / run rẩy / ken két …) >8 lần → critical; >5 → moderate.
+- Vietnamese structural connectives ("là một / bắt đầu / mang theo / tỏa ra / dường như / như thể / đôi mắt") >22 lần → critical; >16 lần → moderate. ≤15 lần ACCEPTABLE — đây là từ nối tự nhiên, KHÔNG flag.
+- TÊN MC + named characters lặp NHIỀU LÀ ĐÚNG webnovel convention. Mục tiêu 60-100 lần họ-tên đầy đủ/10K chữ. KHÔNG flag "tên MC lặp nhiều" — đây là mnemonic. CHỈ flag khi: (a) tác giả dùng tên cụt "Hạo" trong narration thay vì "Lương Hạo" → moderate; (b) ≥3 câu liên tiếp lặp y nguyên "Lương Hạo" không xen đại từ nào → minor; (c) name flip (đổi từ "Lương Hạo" sang tên khác giữa chương) → critical.
 
 S3. AI-CLICHE TIER 1 (Writer prompt list "khẽ nhếch mép/không khỏi/ánh mắt phức tạp/v.v."): ≥1 occurrence → moderate per occurrence.
 

@@ -7,8 +7,8 @@
  */
 
 import { getSupabase } from '../utils/supabase';
-import { evaluateBlueprintAlignment, formatChapterBlueprintContext, loadChapterBlueprint } from '../plan/chapter-blueprints';
-import type { CriticIssue } from '../types';
+import { evaluateBlueprintAlignment, formatChapterBlueprintContext, loadChapterBlueprint, shouldRequireChapterBlueprint } from '../plan/chapter-blueprints';
+import type { CriticIssue, StyleDirectives } from '../types';
 
 export type CausalLogicIssueCode =
   | 'authority_access_violation'
@@ -201,7 +201,14 @@ export async function checkCausalLogicFast(
     ].filter(Boolean).join(': ')),
     characterStates: stateRows || [],
   });
-  issues.push(...evaluateBlueprintAlignment(content, blueprint));
+  // 2026-05-12: gate blueprint alignment behind shouldRequireChapterBlueprint.
+  // Projects that opt out (style_directives.require_full_chapter_blueprint=false)
+  // typically have stale template-instantiated briefs that don't match the
+  // current master_outline; running goal-mismatch against them produces false
+  // positives that block valid chapters from publishing.
+  if (shouldRequireChapterBlueprint(styleDirectives as StyleDirectives | null | undefined)) {
+    issues.push(...evaluateBlueprintAlignment(content, blueprint));
+  }
   return issues;
 }
 

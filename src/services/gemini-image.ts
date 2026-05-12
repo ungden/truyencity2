@@ -83,8 +83,19 @@ export class GeminiImageService {
 
   /**
    * Generate image using Gemini 3 Pro Image Preview
+   *
+   * 2026-05-12: Gemini Image API DISABLED by default. All cover generation
+   * goes through Codex CLI (`scripts/codex-bulk-cover.sh` or
+   * `npm run codex:automation -- prepare-cover/apply-cover`). Set env
+   * ALLOW_GEMINI_IMAGE=1 to re-enable for one-off debugging.
    */
   async generateImage(request: ImageGenerationRequest): Promise<ServiceResult<GeminiImageResult>> {
+    if (process.env.ALLOW_GEMINI_IMAGE !== '1') {
+      const msg = 'Gemini Image API disabled — generate covers via Codex CLI (npm run codex:automation -- prepare-cover --novel-id=<id>). Set ALLOW_GEMINI_IMAGE=1 to bypass.';
+      console.warn('[GeminiImage] BLOCKED:', msg);
+      return { success: false, error: msg };
+    }
+
     const { prompt, negativePrompt, options } = request;
 
     try {
