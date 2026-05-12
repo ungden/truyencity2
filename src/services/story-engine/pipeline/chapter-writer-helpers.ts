@@ -707,3 +707,121 @@ export function detectChapterTemplatePatterns(content: string): string {
 
   return reasons.join(' | ');
 }
+
+/**
+ * Deterministic content surgery for template chapter-ending + static opening.
+ *
+ * Phase Q 2026-05-13: PR #67 added detection + retry but Gemini Flash Lite's
+ * template attractor is too strong — Writer reproduces same pattern across
+ * 3 retries 92% of the time. This function applies surgical repair AFTER
+ * Writer succeeds (regardless of retry count) so template patterns never
+ * reach the published chapter.
+ *
+ * Strategy:
+ *  1. ENDING REPAIR — strip last N consecutive sentences that match template
+ *     ego-declaration pattern. Chapter ends 1-3 sentences earlier with the
+ *     concrete event that came before the templated coda.
+ *  2. OPENING REPAIR — if first paragraph matches static template, locate
+ *     the first action sentence (MC + concrete verb) within first 1500 chars
+ *     and START the chapter from there. Discards leading establishing shots
+ *     + static reflection.
+ *
+ * Returns { content, endingRepaired, openingRepaired, lostChars }.
+ */
+export function repairChapterTemplatePatterns(content: string): {
+  content: string;
+  endingRepaired: boolean;
+  openingRepaired: boolean;
+  lostChars: number;
+} {
+  if (!content) return { content, endingRepaired: false, openingRepaired: false, lostChars: 0 };
+
+  // Lazy require to avoid module cycle.
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const gen = require('../context/generators') as {
+    isTemplateCliffhanger: (s: string) => boolean;
+    isTemplateOpening: (s: string) => boolean;
+  };
+
+  const original = content;
+  let repaired = content;
+  let endingRepaired = false;
+  let openingRepaired = false;
+
+  // ─── ENDING REPAIR ───────────────────────────────────────────────────────
+  // Strip template sentences ANYWHERE in last 2000 chars (template may be
+  // sandwich-buried — concrete sentence → template → concrete sentence as
+  // wrap). User perceives buried template same as trailing template. Scan
+  // all tail sentences, remove matches, rejoin keeping originals.
+  const tailWindow = 2000;
+  const preTail = repaired.length > tailWindow ? repaired.slice(0, repaired.length - tailWindow) : '';
+  const tail = repaired.slice(-Math.min(tailWindow, repaired.length));
+  const tailMatches = tail.match(/[^.!?。！？\n]+[.!?。！？]/g) || [];
+  if (tailMatches.length > 0) {
+    const wrapperGestureRe = /^[^.!?\n]{0,80}(?:hắn|y|cô|nàng|anh|chàng|gã|ta|[A-ZÀ-Ỵ][a-zà-ỹ]+(?:\s+[A-ZÀ-Ỵ][a-zà-ỹ]+){1,3})\s+(?:siết|nhếch|nắm|nghiến|cười\s+nhẹ|nhìn\s+(?:xa|về)|hít\s+(?:một\s+)?hơi|đặt\s+tay|gật\s+đầu)\s*[^.!?\n]{0,60}[.!?]?\s*$/i;
+
+    const keptIndices: number[] = [];
+    const stripIndices = new Set<number>();
+    for (let i = 0; i < tailMatches.length; i++) {
+      const s = tailMatches[i].trim();
+      if (gen.isTemplateCliffhanger(s)) { stripIndices.add(i); continue; }
+      // Strip wrapper-gesture sentence if NEXT sentence is template (preamble).
+      const next = tailMatches[i + 1]?.trim() || '';
+      if (next && gen.isTemplateCliffhanger(next) && wrapperGestureRe.test(s)) {
+        stripIndices.add(i);
+        continue;
+      }
+      keptIndices.push(i);
+    }
+    if (stripIndices.size > 0) {
+      const newTail = keptIndices.map(i => tailMatches[i].trim()).join(' ').trim();
+      repaired = (preTail + (preTail ? ' ' : '') + newTail).trimEnd();
+      endingRepaired = true;
+    }
+  }
+
+  // ─── OPENING REPAIR ──────────────────────────────────────────────────────
+  // If first 500 chars match static template, locate the first sentence in
+  // the first 2000 chars that contains MC + concrete action verb, and
+  // restart the chapter from that sentence. The lost lead-in is purely
+  // establishing scene description + MC static reflection — narrative loses
+  // nothing by skipping it.
+  if (gen.isTemplateOpening(repaired)) {
+    const head = repaired.slice(0, 2000);
+    const headMatches = head.match(/[^.!?。！？\n]+[.!?。！？]/g) || [];
+    const headSents = headMatches.map(s => s.trim()).filter(Boolean);
+
+    const concreteActionRe = /[A-ZÀ-Ỵ][a-zà-ỹ]+(?:\s+[A-ZÀ-Ỵ][a-zà-ỹ]+){0,3}\s+(?:đẩy|mở|đóng|kéo|gõ|bấm|nhấn|ký|viết|đưa|nhận|trao|móc|rút|bắn|đâm|nhảy|chạy|bước|đi\s+(?:tới|đến|vào|ra)|nói|hỏi|đáp|gọi|kêu|hét|gào|ra\s+lệnh|tuyên\s+bố|ném|đập|cầm|nắm|chỉ\s+vào|chìa|với\s+tay|đưa\s+tay|hạ\s+(?:xuống|tay)|thì\s+thầm|móc\s+ra|rút\s+ra|đặt\s+xuống|tỉnh\s+lại|ngẩng\s+lên|cúi\s+xuống|quỳ\s+xuống|nhảy\s+lên|lao\s+(?:tới|về)|tắt|bật|chộp|lướt|siết|tóm|kẹp|chạm|đặt|chỉ|hướng|thả|lùi|tiến|đáp|ra\s+hiệu|gật|lắc|xoay|quay|liếc|nhìn\s+thẳng|gạt|đè|đếm|ngừng|dừng|trao|kéo\s+ra|kéo\s+đến|kéo\s+về|chuyển)/i;
+
+    // Find first sentence with concrete action, skip the first 1-2 establishing
+    // sentences (those are the template). Keep at least sentence 3+ for safety.
+    let restartIdx = -1;
+    for (let i = 0; i < headSents.length; i++) {
+      const s = headSents[i];
+      // Skip pure scene-setting (no MC verb)
+      if (!concreteActionRe.test(s)) continue;
+      // Skip if this concrete action is itself static like "ngồi"/"đứng"
+      if (/\s(?:ngồi|đứng|nằm|tựa)(?:\s+(?:bất\s+động|im\s+lặng|lặng|trầm))/i.test(s)) continue;
+      restartIdx = i;
+      break;
+    }
+
+    // Only repair if we found a concrete action AT LEAST 1 sentence in (so we
+    // skip the templated lead-in) and not so deep that we lose plot content.
+    if (restartIdx >= 1 && restartIdx <= 4) {
+      const restartSentence = headSents[restartIdx];
+      const idx = repaired.indexOf(restartSentence);
+      if (idx > 50 && idx < 1800) {
+        repaired = repaired.slice(idx).trimStart();
+        openingRepaired = true;
+      }
+    }
+  }
+
+  return {
+    content: repaired,
+    endingRepaired,
+    openingRepaired,
+    lostChars: original.length - repaired.length,
+  };
+}
