@@ -297,7 +297,7 @@ export async function generateSummaryAndCharacters(
       "power_realm_index": null,
       "location": "vị trí cuối chương hoặc null",
       "personality_quirks": "đặc điểm tính cách nổi bật hoặc null",
-      "notes": "ghi chú quan trọng hoặc null"
+      "notes": "TRỌNG TÂM: trust/relationship state đối với MC ở cuối chương + bất kỳ thay đổi trong chương này. VD đúng: 'Vừa convinced bởi MC ở scene 4, chuyển từ skeptical sang tin tưởng', 'Đệ tử trung thành đã build trust 5 chương, mới swear loyalty', 'Đối thủ thương trường vừa bị MC face-slap, hostility tăng'. CẤM ghi chung chung kiểu 'Thủ hạ' / 'Bạn MC' / 'Đồng minh'."
     }
   ]
 }

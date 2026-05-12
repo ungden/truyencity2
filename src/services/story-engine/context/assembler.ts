@@ -787,6 +787,8 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
       parts.push('  • Restart cảnh ("Sáng hôm sau, MC tỉnh dậy…") nếu chương trước không kết bằng MC ngủ/ngất.');
       parts.push('  • Tóm tắt lại sự kiện chương trước qua narration / nội tâm.');
       parts.push('  • Cho MC ở vị trí khác/trang phục khác/vũ khí khác mà không có transition rõ ràng.');
+      parts.push('  • REGRESS trust/relationship của nhân vật phụ — nếu X đã tin tưởng/quy phục/giao ước/được MC thuyết phục ở cuối chương trước, X PHẢI giữ trạng thái đó (KHÔNG reset về skeptical/cảnh giác/hostile để re-establish). Tham khảo [NHÂN VẬT HIỆN TẠI] notes phía dưới.');
+      parts.push('  • Re-introduce / re-establish supporting characters đã có scene trong chương trước — relationship đã build PHẢI được preserved + EXPANDED forward, không phải reset.');
       parts.push('→ Trong 100 từ đầu của scene 1: phải reference ÍT NHẤT 2 micro-detail (vị trí cụ thể, vật MC đang cầm, dialogue line cuối, trạng thái cảm xúc) từ đoạn kết trên.');
     }
   }
