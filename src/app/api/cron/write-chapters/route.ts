@@ -531,8 +531,9 @@ async function autoPauseForCost(
   supabase: ReturnType<typeof getSupabaseAdmin>,
   projectId: string,
   spentUsd: number,
+  capUsd: number = PER_PROJECT_DAILY_USD_CAP,
 ): Promise<void> {
-  const reason = `auto_paused_daily_cost_cap: spent $${spentUsd.toFixed(2)} > $${PER_PROJECT_DAILY_USD_CAP.toFixed(2)} cap`;
+  const reason = `auto_paused_daily_cost_cap: spent $${spentUsd.toFixed(2)} > $${capUsd.toFixed(2)} cap`;
   await supabase
     .from('ai_story_projects')
     .update({
@@ -637,10 +638,19 @@ async function writeOneChapter(
   // Skip + auto-pause if today's cost already exceeded the per-project cap.
   // Catches runaway loops where the circuit breaker hasn't fired yet (e.g. each
   // attempt fails late, deep into the writer pipeline, having spent real tokens).
+  //
+  // Phase Q (2026-05-12): production_enabled novels target 50 ch/day. At
+  // ~$0.07-0.10/chapter on Flash Lite that's $3.50-5/day baseline — the
+  // default $1-5 cap pauses them mid-day. Bump production novels to $10
+  // ceiling so the legit 50/day workload doesn't trip the cap.
+  const isProductionEnabled = (project.style_directives as Record<string, unknown> | null)?.production_enabled === true;
+  const effectiveCap = isProductionEnabled
+    ? Math.max(PER_PROJECT_DAILY_USD_CAP, 10)
+    : PER_PROJECT_DAILY_USD_CAP;
   try {
     const spent = await getProjectDailyCostUsd(supabase, project.id);
-    if (spent > PER_PROJECT_DAILY_USD_CAP) {
-      await autoPauseForCost(supabase, project.id, spent);
+    if (spent > effectiveCap) {
+      await autoPauseForCost(supabase, project.id, spent, effectiveCap);
       return {
         id: project.id,
         title: novel.title,
