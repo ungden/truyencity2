@@ -87,7 +87,13 @@ const WEAK_SYSTEM_PATTERNS = /(mơ\s*hồ|không\s+rõ|chưa\s+giúp|không\s+gi
 // benefit terms so the validator works across mat-the / linh-di / kiem-hiep /
 // di-gioi genres. The list intentionally errs broad — any of these counts as a
 // concrete, repeatable reader payoff per chapter.
-const BENEFIT_KEYWORDS = /(tiền|doanh\s*thu|doanh\s*số|lợi\s*nhuận|tài\s*nguyên|tài\s*sản|wealth|gold|vàng|skill|kỹ\s*năng|công\s*nhận|uy\s*tín|danh\s*tiếng|fame|quan\s*hệ|network|thông\s*tin|insight|manh\s*mối|đột\s*phá|level|cảnh\s*giới|khách|đơn\s*hàng|hợp\s*đồng|hàng\s*hóa|sản\s*phẩm|thị\s*trường|vật\s*phẩm|item|kinh\s*nghiệm|lương\s*thực|nhu\s*yếu\s*phẩm|đồ\s*ăn|thuốc|vũ\s*khí|đạn|súng|nước\s+sạch|năng\s*lượng|lãnh\s*thổ|lãnh\s*địa|lương\s*dân|trung\s*thành|loyalty|đệ\s*tử|đồ\s*đệ|độc\s*giả|fan|fanbase|kho|hầm|công\s*nghệ|drone|cảm\s*biến|linh\s*lực|nội\s*lực|pháp\s*bảo|công\s*pháp|huyết\s*mạch|đan\s*dược|linh\s*thạch|tinh\s*thạch|quặng|khoáng|văn\s*khí|văn\s*đạo|văn\s*chương|sách|spirit|mana|aura)/i;
+// 2026-05-12 (Phase Q round 3): added more concrete-benefit synonyms that
+// AI keeps generating in di-gioi/do-thi/dong-nhan novels but were missing:
+// lợi ích / tín nhiệm / bảo hộ / thù lao / cửa hàng / kinh tế / an toàn /
+// mảnh đất / địa vị / địa bàn / chức vụ / kỹ thuật / công thức / bản đồ /
+// tin tức / quan chức / đan / linh khí / khí vận. Keep in sync with
+// CONCRETE_BENEFIT_RE in src/services/story-engine/context/generators.ts.
+const BENEFIT_KEYWORDS = /(tiền|doanh\s*thu|doanh\s*số|lợi\s*nhuận|lợi\s*ích|thù\s*lao|tài\s*nguyên|tài\s*sản|wealth|gold|vàng|skill|kỹ\s*năng|kỹ\s*thuật|công\s*thức|bản\s*đồ|tin\s*tức|công\s*nhận|tín\s*nhiệm|uy\s*tín|danh\s*tiếng|fame|quan\s*hệ|quan\s*chức|chức\s*vụ|địa\s*vị|network|thông\s*tin|insight|manh\s*mối|đột\s*phá|level|cảnh\s*giới|khách|cửa\s*hàng|đơn\s*hàng|hợp\s*đồng|hàng\s*hóa|sản\s*phẩm|thị\s*trường|kinh\s*tế|vật\s*phẩm|item|kinh\s*nghiệm|lương\s*thực|nhu\s*yếu\s*phẩm|đồ\s*ăn|thuốc|vũ\s*khí|đạn|súng|nước\s+sạch|năng\s*lượng|an\s*toàn|bảo\s*hộ|bảo\s*vệ|lãnh\s*thổ|lãnh\s*địa|địa\s*bàn|mảnh\s*đất|lương\s*dân|trung\s*thành|loyalty|đệ\s*tử|đồ\s*đệ|độc\s*giả|fan|fanbase|kho|hầm|công\s*nghệ|drone|cảm\s*biến|linh\s*khí|linh\s*lực|nội\s*lực|pháp\s*bảo|công\s*pháp|huyết\s*mạch|đan\s*dược|đan|linh\s*thạch|tinh\s*thạch|khí\s*vận|quặng|khoáng|văn\s*khí|văn\s*đạo|văn\s*chương|sách|spirit|mana|aura)/i;
 
 // 2026-05-12: Phase 1 antagonist scale check — only flag mysterious / cosmic /
 // kingdom-level forces, not bare "hội/cục/viện" which match local guilds and
@@ -333,7 +339,12 @@ export function validateSetupCanon(input: SetupGateInput): SetupGateResult {
     'opening_not_warm',
     'opening scene does not satisfy warm-baseline contract: routine + competence + first opportunity',
   );
-  if (opening && !/(cơ\s*hội|khách|deal|nhiệm\s*vụ\s+nhỏ|routine|đang\s+làm|mở\s+quán|luyện|thử|phát\s+hiện)/i.test(opening)) {
+  // Phase Q round 3 (2026-05-12): widened opportunity keywords. The previous
+  // narrow set rejected legit openings like "MC đạp xe đến chợ mua đồng hồ Pôljốt
+  // 4 chỉ vàng" because none of the words happened to be in the list — even
+  // though the opportunity is concrete. Added: mua/bán/tìm/thu/tích/đầu tư/
+  // chợ/buổi sáng/sáng sớm/công việc/nhiệm vụ/tem phiếu/quẻ/bài học/cứu/giúp.
+  if (opening && !/(cơ\s*hội|khách|deal|nhiệm\s*vụ|routine|đang\s+làm|mở\s+quán|luyện|thử|phát\s+hiện|mua|bán|tìm|thu|tích|đầu\s+tư|chợ|buổi\s*sáng|sáng\s*sớm|công\s*việc|tem\s*phiếu|quẻ|cứu|giúp|săn|kiếm|đào|bắt|nuôi)/i.test(opening)) {
     issues.push({
       severity: 'warning',
       code: 'opening_promise_weak',
