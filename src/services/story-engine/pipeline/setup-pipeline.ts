@@ -423,6 +423,37 @@ Trả về JSON:
 }
 
 // ── Stage 2: WORLD ─────────────────────────────────────────────────────────
+
+/**
+ * Validate an existing world_description against every gate the regen path
+ * checks (length, structure blueprint, semantic canon, playbook hooks, MC
+ * identity tier). Returns `{ passed: true }` if all gates pass — in that case
+ * the caller may SKIP the Gemini regen step entirely and preserve the
+ * existing world_description (admin-curated, or already AI-generated last run).
+ *
+ * Added 2026-05-12 (Phase Q) after the world stage handler kept overwriting
+ * a manually-rebuilt world_description with empty Gemini output, causing
+ * "world too short (0 chars)" failures even though the saved field had 8k+
+ * valid chars.
+ */
+function evaluateExistingWorld(
+  wd: string | null | undefined,
+  genre: GenreType,
+  setupKernel: StoryKernel,
+): { passed: boolean; reason?: string } {
+  const text = (wd || '').trim();
+  if (text.length < 500) return { passed: false, reason: 'too short' };
+  const structure = validateSeedStructure(text);
+  if (!structure.passed) return { passed: false, reason: `blueprint ${structure.score}/100` };
+  const semantic = validateSetupCanon({ worldDescription: text, setupKernel, strictContract: true });
+  if (!semantic.passed) return { passed: false, reason: `semantic ${formatSetupGateIssues(semantic).slice(0, 80)}` };
+  const hookCheck = validateWorldHooks(genre, text);
+  if (!hookCheck.passed) return { passed: false, reason: `hooks ${hookCheck.matchedCount}/${hookCheck.minRequired}` };
+  const identityCheck = validateMcOpeningIdentityTier(text, genre);
+  if (!identityCheck.passed) return { passed: false, reason: `identity ${identityCheck.reason}` };
+  return { passed: true };
+}
+
 async function runStageWorld(p: ProjectStageRow): Promise<{ success: boolean; error?: string }> {
   const novel = getNovel(p);
   if (!novel) return { success: false, error: 'no novel linked' };
@@ -432,6 +463,16 @@ async function runStageWorld(p: ProjectStageRow): Promise<{ success: boolean; er
   const setupKernel = idea.setupKernel || getSetupKernelFromOutline(p.story_outline);
   const kernelIssue = validateStoryKernel(setupKernel);
   if (kernelIssue) return { success: false, error: `world preflight ${kernelIssue}` };
+
+  // Phase Q (2026-05-12): if world_description already passes every gate the
+  // regen path would check, skip the Gemini call. Lets admins curate the world
+  // manually (or preserve a prior good generation) instead of having the
+  // handler clobber it on each retry. Saves an AI call too.
+  const preexisting = evaluateExistingWorld(p.world_description, genre, setupKernel!);
+  if (preexisting.passed) {
+    console.log(`[setup-pipeline] ${p.id.slice(0, 8)} world stage: keeping existing world_description (passes all gates)`);
+    return { success: true };
+  }
 
   const blueprintInstructions = buildSeedBlueprintInstructions(genre);
   // Phase 29: thread playbook hooks (mandatory ≥3 hooks must appear)
