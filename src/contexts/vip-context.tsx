@@ -10,6 +10,10 @@ interface VipContextValue {
   showAds: boolean;
   loading: boolean;
   boostCardsRemaining: number;
+  /** Tier name from get_reader_status — 'free' | 'vip' | 'super_vip' */
+  tier: 'free' | 'vip' | 'super_vip';
+  /** ISO timestamp of VIP/super_vip expiration; null if free or no expiration */
+  expiresAt: string | null;
   refresh: () => Promise<void>;
 }
 
@@ -19,6 +23,8 @@ const VipContext = createContext<VipContextValue>({
   showAds: true,
   loading: true,
   boostCardsRemaining: 0,
+  tier: 'free',
+  expiresAt: null,
   refresh: async () => {},
 });
 
@@ -27,6 +33,8 @@ export function VipProvider({ children }: { children: ReactNode }) {
   const [isSuperVip, setIsSuperVip] = useState(false);
   const [showAds, setShowAds] = useState(true);
   const [boostCardsRemaining, setBoostCardsRemaining] = useState(0);
+  const [tier, setTier] = useState<'free' | 'vip' | 'super_vip'>('free');
+  const [expiresAt, setExpiresAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
@@ -51,19 +59,30 @@ export function VipProvider({ children }: { children: ReactNode }) {
         setIsSuperVip(false);
         setShowAds(true);
         setBoostCardsRemaining(0);
+        setTier('free');
+        setExpiresAt(null);
       } else {
-        const status = data as { reader_tier: string; show_ads: boolean; boost_cards_remaining?: number };
-        const tier = status.reader_tier;
-        setIsVip(tier === "vip" || tier === "super_vip");
-        setIsSuperVip(tier === "super_vip");
+        const status = data as {
+          reader_tier: string;
+          show_ads: boolean;
+          boost_cards_remaining?: number;
+          expires_at?: string | null;
+        };
+        const t = status.reader_tier as 'free' | 'vip' | 'super_vip';
+        setIsVip(t === 'vip' || t === 'super_vip');
+        setIsSuperVip(t === 'super_vip');
         setShowAds(status.show_ads !== false);
         setBoostCardsRemaining(status.boost_cards_remaining || 0);
+        setTier(t || 'free');
+        setExpiresAt(status.expires_at ?? null);
       }
     } catch {
       setIsVip(false);
       setIsSuperVip(false);
       setShowAds(true);
       setBoostCardsRemaining(0);
+      setTier('free');
+      setExpiresAt(null);
     } finally {
       setLoading(false);
     }
@@ -83,7 +102,7 @@ export function VipProvider({ children }: { children: ReactNode }) {
   }, [refresh]);
 
   return (
-    <VipContext.Provider value={{ isVip, isSuperVip, showAds, loading, boostCardsRemaining, refresh }}>
+    <VipContext.Provider value={{ isVip, isSuperVip, showAds, loading, boostCardsRemaining, tier, expiresAt, refresh }}>
       {children}
     </VipContext.Provider>
   );

@@ -15,6 +15,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { startSession, updateSessionDuration, endSession, markChapterRead } from '@/services/reading-sessions';
 import { READING } from '@/lib/config';
 import { AdPlacement } from '@/components/ads/AdPlacement';
+import { ReaderInterstitial } from '@/components/ads/ReaderInterstitial';
 import { CopyProtect } from '@/components/reader/copy-protect';
 import { AppLockGate } from '@/components/reader/app-lock-gate';
 
@@ -513,6 +514,7 @@ export default function ReadingPageClient({ novelSlug, chapterNumber }: ReadingP
         })()}
 
         <AdPlacement placement="chapter" slot="chapter-post-content" />
+        <ReaderInterstitial chapterKey={`${novelSlug}:${chapterNumber}`} />
 
         <div className="flex justify-between items-center mt-12 pt-8 border-t border-current/12">
           <button
