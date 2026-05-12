@@ -412,6 +412,64 @@ export function escapeRegex(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+/**
+ * Vietnamese webnovel convention: narration uses FULL name (họ + tên — "Lương Hạo"),
+ * not just personal name ("Hạo"). Helps reader memorize cast over 1000+ chapters.
+ *
+ * Detects short-form usage of MC name:
+ *   - Counts occurrences of "Lương Hạo" (full) vs standalone "Hạo" (last token alone).
+ *   - Flags if standalone last-token usage is ≥30% of total mentions — indicates
+ *     Writer drifted to natural Vietnamese pattern instead of webnovel convention.
+ *
+ * Returns: { severity, message } — feed into Critic as moderate issue.
+ *
+ * Skips if MC name is single-word (no "họ tên" structure to enforce).
+ */
+export function detectShortFormCharacterName(
+  content: string,
+  fullName: string,
+): { severity: 'none' | 'minor' | 'moderate'; message: string } {
+  const tokens = fullName.trim().split(/\s+/).filter(t => t.length >= 2);
+  if (tokens.length < 2) return { severity: 'none', message: '' };
+
+  const lastToken = tokens[tokens.length - 1];
+
+  // Full-name occurrences ("Lương Hạo")
+  const fullRe = new RegExp(`\\b${escapeRegex(fullName)}\\b`, 'g');
+  const fullCount = (content.match(fullRe) || []).length;
+
+  // Last-token alone occurrences ("Hạo" NOT preceded by another part of the name)
+  // Match "Hạo" with word boundary on both sides, but exclude when previous word is part of fullName.
+  const precedingTokenLookbehind = tokens.slice(0, -1).map(escapeRegex).join('|');
+  const standaloneRe = new RegExp(`(?<!\\b(?:${precedingTokenLookbehind})\\s+)\\b${escapeRegex(lastToken)}\\b`, 'g');
+  let standaloneCount = 0;
+  try {
+    standaloneCount = (content.match(standaloneRe) || []).length;
+  } catch {
+    // Older Node may not support lookbehind — fallback: subtract fullCount from total "last token" matches.
+    const totalLast = (content.match(new RegExp(`\\b${escapeRegex(lastToken)}\\b`, 'g')) || []).length;
+    standaloneCount = Math.max(0, totalLast - fullCount);
+  }
+
+  const totalMentions = fullCount + standaloneCount;
+  if (totalMentions < 10) return { severity: 'none', message: '' };
+
+  const shortRatio = standaloneCount / totalMentions;
+  if (shortRatio >= 0.5) {
+    return {
+      severity: 'moderate',
+      message: `Tên "${fullName}" bị cắt ngắn thành "${lastToken}" trong ${standaloneCount}/${totalMentions} lần (${Math.round(shortRatio * 100)}%). Webnovel convention: dùng họ+tên đầy đủ trong narration để reader nhớ tên qua 1000+ chương. Replace "${lastToken}" lone references trong narration bằng "${fullName}" (giữ tên cụt CHỈ trong dialogue thân mật vợ/anh em ruột moment cảm xúc cao).`,
+    };
+  }
+  if (shortRatio >= 0.3) {
+    return {
+      severity: 'minor',
+      message: `Tên "${fullName}" bị cắt ngắn thành "${lastToken}" trong ${standaloneCount}/${totalMentions} lần (${Math.round(shortRatio * 100)}%). Ưu tiên dùng họ+tên đầy đủ trong narration.`,
+    };
+  }
+  return { severity: 'none', message: '' };
+}
+
 export function detectSevereRepetition(content: string): CriticIssue[] {
   const text = content.toLowerCase();
   const issues: CriticIssue[] = [];

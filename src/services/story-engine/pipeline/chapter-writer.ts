@@ -46,7 +46,7 @@ import type {
 } from '../types';
 import type { SceneType, VocabularyGuide } from '../templates/style-bible';
 import { VN_PLACE_LOCK, ARCHITECT_SYSTEM, WRITER_SYSTEM, CRITIC_SYSTEM } from './chapter-writer-prompts';
-import { cleanContent, extractTitle, synthesizeFallbackCliffhanger, hasCliffhangerSignal, analyzeQualitySignals, buildSignalReport, countWords, detectHardFallback, detectMcNameFlip, detectSevereRepetition, buildRepetitionReport, generateMinimalScenes, loadConstraintSection, safeStringTrim, type QualitySignals } from './chapter-writer-helpers';
+import { cleanContent, extractTitle, synthesizeFallbackCliffhanger, hasCliffhangerSignal, analyzeQualitySignals, buildSignalReport, countWords, detectHardFallback, detectMcNameFlip, detectSevereRepetition, detectShortFormCharacterName, buildRepetitionReport, generateMinimalScenes, loadConstraintSection, safeStringTrim, type QualitySignals } from './chapter-writer-helpers';
 
 
 // ── Write Chapter ────────────────────────────────────────────────────────────
@@ -988,7 +988,7 @@ KIỂM TRA FORESHADOWING OVERDUE (xem block "[FORESHADOWING OVERDUE]" ở đầu
 
 KIỂM TRA CHẤT LƯỢNG BỔ SUNG (BẮT BUỘC):
 - COMEDY: Nếu KHÔNG có hài hước → issue severity "moderate". CHỈ "major" nếu chương sinh hoạt/đối thoại mà không hài.
-- LẶP TỪ (recalibrated 2026-05-12): AI-tell từ (tím sẫm / vàng kim / rực rỡ / kinh hoàng / mờ ảo / lạnh lẽo / run rẩy …) >8 → critical, requiresRewrite=true; >5 → moderate. Vietnamese structural connectives ("là một / bắt đầu / mang theo / tỏa ra / dường như / như thể / đôi mắt") chỉ >22 → critical; >16 → moderate. ≤15 lần là tự nhiên, KHÔNG flag. CHỈ "major" nếu ≥3 nhóm AI-tell đều >5.
+- LẶP TỪ (recalibrated 2026-05-12): AI-tell từ (tím sẫm / vàng kim / rực rỡ / kinh hoàng / mờ ảo / lạnh lẽo / run rẩy …) >8 → critical, requiresRewrite=true; >5 → moderate. Vietnamese structural connectives ("là một / bắt đầu / mang theo / tỏa ra / dường như / như thể / đôi mắt") chỉ >22 → critical; >16 → moderate. ≤15 lần là tự nhiên, KHÔNG flag. CHỈ "major" nếu ≥3 nhóm AI-tell đều >5. TÊN MC + named characters: webnovel convention dùng họ+tên đầy đủ (60-100/10K chữ là MỤC TIÊU, KHÔNG flag lặp). FLAG khi: dùng tên cụt "Hạo" thay vì "Lương Hạo" trong narration → moderate; name flip giữa chương → critical.
 - NỘI TÂM: Nếu thiếu nội tâm đa lớp → severity "minor". CHỈ "moderate" nếu toàn bộ chương không có.
 - GIỌNG NÓI: ≥3 nhân vật giống nhau → severity "moderate". 2 nhân vật → "minor".
 - NHỊP ĐIỆU: Toàn bộ scenes cùng cường độ → pacingScore tối đa 5
@@ -1097,6 +1097,26 @@ KIỂM TRA CANON & STATE (Phase 27/28 — xem các block trong context có sẵn
         parsed.overallScore = Math.min(parsed.overallScore || 10, 4);
         parsed.rewriteInstructions = `[MC NAME DRIFT] ${nameFlipDetection.message}\n\n` +
           (parsed.rewriteInstructions ? `Cộng với: ${parsed.rewriteInstructions}` : '');
+      }
+
+      // 2026-05-12: Webnovel convention check — narration must use full họ+tên,
+      // not just personal name. Soft (moderate) issue, doesn't force rewrite,
+      // but counts toward overall quality score.
+      const shortFormDetection = detectShortFormCharacterName(content, protagonistName.trim());
+      if (shortFormDetection.severity === 'moderate') {
+        parsed.issues = parsed.issues || [];
+        parsed.issues.push({
+          type: 'quality',
+          severity: 'moderate',
+          description: shortFormDetection.message,
+        });
+      } else if (shortFormDetection.severity === 'minor') {
+        parsed.issues = parsed.issues || [];
+        parsed.issues.push({
+          type: 'quality',
+          severity: 'minor',
+          description: shortFormDetection.message,
+        });
       }
     }
 
