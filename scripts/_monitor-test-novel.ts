@@ -7,8 +7,8 @@ import { createClient } from '@supabase/supabase-js';
 dotenv.config({ path: '/Users/alexle/Documents/truyencity/.env.runtime', quiet: true });
 dotenv.config({ path: '/Users/alexle/Documents/truyencity/.env.local', quiet: true, override: true });
 
-const PROJECT_ID = 'e0723bd9-bfec-4bc4-939a-37e12e784ca0';
-const NOVEL_TITLE = 'Đại Việt Án Bộ: Pháp Y Vợ Tể Tướng Thăng Long';
+const PROJECT_ID = '1ef4aba8-12b3-4b42-bf8d-15d19f04804b';
+const NOVEL_TITLE = 'Toàn Cầu Thủ Hộ: Khai Cục Nhận Được Thần Cấp Lãnh Địa';
 
 const db = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,

@@ -42,9 +42,9 @@ describe('flash cheap routine', () => {
   });
 
   it('routes only enabled DS Flash routine chapters into cheap mode', () => {
-    expect(shouldUseFlashBulkCheapMode({ flash_bulk_cheap_mode: true }, 'deepseek-v4-flash', 33, 600)).toBe(true);
-    expect(shouldUseFlashBulkCheapMode({ flash_bulk_cheap_mode: true }, 'deepseek-v4-pro', 33, 600)).toBe(false);
-    expect(shouldUseFlashBulkCheapMode({ flash_bulk_cheap_mode: true }, 'deepseek-v4-flash', 590, 600)).toBe(false);
+    expect(shouldUseFlashBulkCheapMode({ flash_bulk_cheap_mode: true }, 'gemini-3.1-flash-lite', 33, 600)).toBe(true);
+    expect(shouldUseFlashBulkCheapMode({ flash_bulk_cheap_mode: true }, 'gemini-3-flash-preview', 33, 600)).toBe(false);
+    expect(shouldUseFlashBulkCheapMode({ flash_bulk_cheap_mode: true }, 'gemini-3.1-flash-lite', 590, 600)).toBe(false);
   });
 
   it('blocks cheap mode when current arc rail is missing', () => {
@@ -98,7 +98,7 @@ describe('flash cheap routine', () => {
       nextChapter: 1,
       targetWordCount: 3000,
       totalPlanned: 1000,
-      config: { model: 'deepseek-v4-flash', temperature: 0.75, maxTokens: 20000 },
+      config: { model: 'gemini-3.1-flash-lite', temperature: 0.75, maxTokens: 20000 },
       startTime: 0,
     });
     expect(brief).toContain('Vạn Văn Ký Ức');

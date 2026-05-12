@@ -126,7 +126,7 @@ Nội dung:
 ${content.slice(0, 5000)}`;
 
       try {
-        const res = await callGemini(prompt, { model: 'deepseek-v4-flash', temperature: 0.1, maxTokens: 1024 }, { jsonMode: true, tracking: { projectId, task: 'consistency_check', chapterNumber } });
+        const res = await callGemini(prompt, { model: 'gemini-3.1-flash-lite', temperature: 0.1, maxTokens: 1024 }, { jsonMode: true, tracking: { projectId, task: 'consistency_check', chapterNumber } });
         if (res.content && res.content.trim().length > 5) {
           const parsedIssues = parseJSON<ConsistencyIssue[]>(res.content);
           if (Array.isArray(parsedIssues)) {

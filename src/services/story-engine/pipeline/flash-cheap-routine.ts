@@ -104,7 +104,7 @@ export function shouldUseFlashBulkCheapMode(
   totalPlanned: number,
 ): boolean {
   if (styleDirectives?.flash_bulk_cheap_mode !== true) return false;
-  if (model !== 'deepseek-v4-flash') return false;
+  if (model !== 'gemini-3.1-flash-lite') return false;
   if (styleDirectives.flash_bulk_force_all === true) return true;
   return chapterNumber < Math.max(1, totalPlanned - 20);
 }
@@ -519,7 +519,7 @@ export async function writeFlashCheapRoutineChapter(input: FlashCheapRoutineInpu
   );
   const writerConfig: GeminiConfig = {
     ...input.config,
-    model: 'deepseek-v4-flash',
+    model: 'gemini-3.1-flash-lite',
     temperature: 0.75,
     maxTokens: Math.max(input.config.maxTokens || 0, 20000),
     deepseekThinkingEnabled: true,

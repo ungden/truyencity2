@@ -77,7 +77,11 @@ const MC_SECRET_LEAK_PATTERNS: Array<{ regex: RegExp; code: string; message: str
 ];
 
 const WEAK_SYSTEM_PATTERNS = /(mơ\s*hồ|không\s+rõ|chưa\s+giúp|không\s+giúp|không\s+có\s+lợi|hên\s+xui|ngẫu\s*nhiên|vô\s*dụng|không\s+đáng\s+kể|chỉ\s+gợi\s+ý\s+chung)/i;
-const BENEFIT_KEYWORDS = /(tiền|doanh\s*thu|tài\s*nguyên|skill|kỹ\s*năng|công\s*nhận|uy\s*tín|quan\s*hệ|network|thông\s*tin|insight|manh\s*mối|đột\s*phá|level|cảnh\s*giới|khách|đơn\s*hàng|hợp\s*đồng|vật\s*phẩm|item|kinh\s*nghiệm)/i;
+// 2026-05-12: expanded with survival/apocalypse + magic/cultivation benefit terms so
+// the validator works across mat-the / linh-di / kiem-hiep / di-gioi genres, not
+// only business / cultivation. The list intentionally errs broad — any of these
+// counts as a concrete, repeatable reader payoff per chapter.
+const BENEFIT_KEYWORDS = /(tiền|doanh\s*thu|tài\s*nguyên|skill|kỹ\s*năng|công\s*nhận|uy\s*tín|quan\s*hệ|network|thông\s*tin|insight|manh\s*mối|đột\s*phá|level|cảnh\s*giới|khách|đơn\s*hàng|hợp\s*đồng|vật\s*phẩm|item|kinh\s*nghiệm|lương\s*thực|nhu\s*yếu\s*phẩm|đồ\s*ăn|thuốc|vũ\s*khí|đạn|súng|nước\s+sạch|năng\s*lượng|lãnh\s*thổ|kho|hầm|công\s*nghệ|drone|cảm\s*biến|linh\s*lực|nội\s*lực|pháp\s*bảo|công\s*pháp|huyết\s*mạch|đan\s*dược|linh\s*thạch|spirit|mana|aura)/i;
 
 function normalizeName(value?: string | null): string {
   return (value || '')

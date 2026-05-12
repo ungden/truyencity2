@@ -355,7 +355,12 @@ Trả về JSON:
       // (playbook tension axes + dopamine + anti-cliche injected). DeepSeek V4 thinking
       // burns reasoning_content tokens before emitting structured `content` — 1024 was
       // truncating the JSON output for half the genres.
-      model: 'deepseek-v4-flash', temperature: 0.85, maxTokens: 3072,
+      // Phase O (2026-05-12): bumped 3072→8192. Pro tier emits richer prose per field,
+      // hits 3072 cap before themes/mainConflict/tensionAxis (which come AFTER setupKernel
+      // patternCards in the JSON template). Symptom: "idea themes count 0 < 3" — json-repair
+      // closes truncated braces, leaving themes absent. 8192 gives Pro headroom; Flash still
+      // typically uses ~2.5K so no cost regression for Flash path.
+      model: 'gemini-3.1-flash-lite', temperature: 0.85, maxTokens: 8192,
       systemPrompt: SANG_VAN_DNA + '\n\n[ROLE-SPECIFIC] Stage: IDEA. Sinh StoryKernel trung tâm cho tiểu thuyết. Không nhồi ban-list; thiết kế reader fantasy + pleasure loop + system mechanic + phase1 playground đủ đẻ 100 chương đầu.',
     }, { jsonMode: true, tracking: { projectId: p.id, task: 'stage_idea' } });
 
@@ -452,7 +457,7 @@ Trả về JSON: {"worldDescription":"<800-1500 từ tuân blueprint 10-section,
 
   try {
     const res = await callGemini(prompt, {
-      model: 'deepseek-v4-flash', temperature: 0.8, maxTokens: 8192,
+      model: 'gemini-3.1-flash-lite', temperature: 0.8, maxTokens: 8192,
       systemPrompt: SANG_VAN_DNA + '\n\n[ROLE-SPECIFIC] Stage: WORLD. Build world_description theo StoryKernel + 10-section blueprint. Section đầu là ### STORY KERNEL SUMMARY. World ngây thơ về MC, antagonist Phase 1 LOCAL only.',
     }, { jsonMode: true, tracking: { projectId: p.id, task: 'stage_world' } });
 
@@ -537,7 +542,9 @@ QUY TẮC: KHÔNG đặt lại tên MC. Archetype CHÍNH XÁC 1 trong list playb
     const res = await callGemini(prompt, {
       // Phase 29: bumped 256→1536 because output now includes archetype/voice/signature
       // (was just MC name) + DeepSeek thinking reasoning overhead.
-      model: 'deepseek-v4-flash', temperature: 0.9, maxTokens: 1536,
+      // Phase O (2026-05-12): bumped 1536→4096 to give Pro tier headroom (Pro emits
+      // richer paragraphs for archetype/voice/signature fields).
+      model: 'gemini-3.1-flash-lite', temperature: 0.9, maxTokens: 4096,
       systemPrompt: SANG_VAN_DNA + '\n\n[ROLE-SPECIFIC] Stage: CHARACTER. Tên MC đã khóa từ world_description; KHÔNG đổi tên. Chỉ chọn archetype/voice/signature từ playbook.',
     }, { jsonMode: true, tracking: { projectId: p.id, task: 'stage_character' } });
 
@@ -639,7 +646,7 @@ QUY TẮC:
       // Phase 29 v4: 2048→4096 — lich-su hit exact 2048 ceiling repeatedly with
       // playbook content. DeepSeek reasoning overhead eats ~1500 tokens, leaves
       // <600 for 250-400-char blurb output → premature truncation.
-      model: 'deepseek-v4-flash', temperature: 0.7, maxTokens: 4096,
+      model: 'gemini-3.1-flash-lite', temperature: 0.7, maxTokens: 4096,
       systemPrompt: SANG_VAN_DNA + '\n\n[ROLE-SPECIFIC] Stage: DESCRIPTION. Viết back-cover blurb 3 đoạn 250-400 chữ — hook GROWTH-driven, KHÔNG spoil cuối truyện, KHÔNG cosmic stake Phase 1.',
     }, { jsonMode: true, tracking: { projectId: p.id, task: 'stage_description' } });
 
@@ -691,7 +698,7 @@ async function runStageMasterOutline(p: ProjectStageRow): Promise<{ success: boo
       genre,
       wd.slice(0, 6000),
       p.total_planned_chapters || 1000,
-      { ...stageConfig(), model: 'deepseek-v4-flash' },
+      { ...stageConfig(), model: 'gemini-3.1-flash-lite' },
     );
     if (!outline?.majorArcs?.length && !outline?.volumes?.length) {
       return { success: false, error: 'master_outline generation returned no volumes/majorArcs' };
@@ -720,7 +727,7 @@ async function runStageStoryOutline(p: ProjectStageRow): Promise<{ success: bool
       mc,
       wd,
       p.total_planned_chapters || 1000,
-      { ...stageConfig(), model: 'deepseek-v4-flash' },
+      { ...stageConfig(), model: 'gemini-3.1-flash-lite' },
       setupKernel,
     );
     if (!outline) return { success: false, error: 'story_outline generation returned null' };

@@ -23,8 +23,8 @@ const RETRY_DELAYS = [3000, 8000, 20000, 45000, 90000]; // 5 retries, up to 90s 
 
 // Pricing per 1M tokens (cache miss — conservative)
 const PRICING: Record<string, { inputPerMillion: number; outputPerMillion: number }> = {
-  'deepseek-v4-pro':   { inputPerMillion: 1.74, outputPerMillion: 3.48 },
-  'deepseek-v4-flash': { inputPerMillion: 0.14, outputPerMillion: 0.28 },
+  'gemini-3-flash-preview':   { inputPerMillion: 1.74, outputPerMillion: 3.48 },
+  'gemini-3.1-flash-lite': { inputPerMillion: 0.14, outputPerMillion: 0.28 },
   // Legacy aliases
   'deepseek-reasoner': { inputPerMillion: 0.14, outputPerMillion: 0.28 },
   'deepseek-chat':     { inputPerMillion: 0.14, outputPerMillion: 0.28 },

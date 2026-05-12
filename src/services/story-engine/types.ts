@@ -218,7 +218,7 @@ export interface EngineConfig {
 }
 
 export const DEFAULT_CONFIG: EngineConfig = {
-  model: 'deepseek-v4-flash',
+  model: 'gemini-3.1-flash-lite',
   temperature: 0.75,
   maxTokens: 32768,
   // 2800 từ AI write target — narrative coherence intact.

@@ -69,8 +69,8 @@ const FLASH_TASKS = new Set([
   'pacing_blueprint',
 ]);
 
-export const MODEL_PRO = 'deepseek-v4-pro';
-export const MODEL_FLASH = 'deepseek-v4-flash';
+export const MODEL_PRO = 'gemini-3-flash-preview';
+export const MODEL_FLASH = 'gemini-3.1-flash-lite';
 
 declare global {
   // eslint-disable-next-line no-var

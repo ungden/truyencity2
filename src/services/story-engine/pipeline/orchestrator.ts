@@ -170,8 +170,14 @@ function runChapterCanary(args: {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { requiresVndCurrency } = require('../templates') as { requiresVndCurrency: (g: GenreType, w?: string | null) => boolean };
     if (requiresVndCurrency(args.genre, args.worldDescription)) {
-      const xuLeak = c.match(/\d[\d.,]*\s*xu\b|(?:triệu|nghìn|trăm|tỷ|ngàn)\s+xu\b/);
-      if (xuLeak) issues.push(`VND currency leak: "${xuLeak[0].slice(0, 40)}"`);
+      // Negative lookahead carves out "xu hướng", "xu thế", "xu nịnh", "xu cách",
+      // "xu hào" etc. — common Vietnamese compounds where "xu" is the first
+      // syllable, not a currency unit. (2026-05-12)
+      const xuFollowup = /(?:\s+(?:hướng|thế|nịnh|chiến|cách|hào|hoàng|hư|niêng))/i;
+      const xuLeakRaw = c.match(/\d[\d.,]*\s*xu\b[^.,!?;:]{0,20}|(?:triệu|nghìn|trăm|tỷ|ngàn)\s+xu\b[^.,!?;:]{0,20}/);
+      if (xuLeakRaw && !xuFollowup.test(xuLeakRaw[0])) {
+        issues.push(`VND currency leak: "${xuLeakRaw[0].slice(0, 40)}"`);
+      }
       const nguyenLeak = c.match(/\d[\d.,]*\s*nguyên(?!\s*(?:tử|thủy|tắc|liệu|chất|bản|nhân))/);
       if (nguyenLeak) issues.push(`VND currency leak: "${nguyenLeak[0].slice(0, 40)}"`);
     }
@@ -346,7 +352,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
             (full?.genre || 'do-thi') as GenreType,
             worldDesc.slice(0, 6000),
             totalCh,
-            { ...DEFAULT_CONFIG, model: 'deepseek-v4-pro', systemPrompt: '' },
+            { ...DEFAULT_CONFIG, model: 'gemini-3-flash-preview', systemPrompt: '' },
           );
           validationFixes.push(`✓ master_outline auto-regenerated (was null, current_chapter=${currentChapter})`);
         }
@@ -360,7 +366,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
             (full?.genre || 'do-thi') as GenreType,
             worldDesc,
             storyOutlineStr,
-            { ...DEFAULT_CONFIG, model: 'deepseek-v4-flash' },
+            { ...DEFAULT_CONFIG, model: 'gemini-3.1-flash-lite' },
           );
           if (canon) {
             validationFixes.push(`✓ power_system_canon generated (${canon.ladder?.length ?? 0} tiers)`);
@@ -376,7 +382,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
             (full?.genre || 'do-thi') as GenreType,
             worldDesc,
             storyOutlineStr,
-            { ...DEFAULT_CONFIG, model: 'deepseek-v4-flash' },
+            { ...DEFAULT_CONFIG, model: 'gemini-3.1-flash-lite' },
           );
           if (wcanon) {
             validationFixes.push(`✓ worldbuilding_canon generated (${wcanon.regions?.length ?? 0} regions, ${wcanon.cultures?.length ?? 0} cultures)`);
@@ -393,7 +399,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
             totalCh,
             worldDesc,
             extra?.master_outline ? JSON.stringify(extra.master_outline).slice(0, 4000) : null,
-            { ...DEFAULT_CONFIG, model: 'deepseek-v4-flash' },
+            { ...DEFAULT_CONFIG, model: 'gemini-3.1-flash-lite' },
           );
         } catch (e) {
           console.warn('[orchestrator] generatePlotTwists at setup failed:', e instanceof Error ? e.message : String(e));
@@ -406,7 +412,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
             (full?.genre || 'do-thi') as GenreType,
             worldDesc,
             extra?.story_outline ? JSON.stringify(extra.story_outline).slice(0, 3000) : null,
-            { ...DEFAULT_CONFIG, model: 'deepseek-v4-flash' },
+            { ...DEFAULT_CONFIG, model: 'gemini-3.1-flash-lite' },
           );
         } catch (e) {
           console.warn('[orchestrator] generateStoryThemes at setup failed:', e instanceof Error ? e.message : String(e));
@@ -485,7 +491,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   const directorOnlyFlash =
     projectStyleDirectives?.codex_director_only === true &&
     projectStyleDirectives?.flash_writer_enabled === true &&
-    (options.model || project.ai_model || DEFAULT_CONFIG.model) === 'deepseek-v4-flash';
+    (options.model || project.ai_model || DEFAULT_CONFIG.model) === 'gemini-3.1-flash-lite';
   const flashRoutineSoftGate =
     projectStyleDirectives?.flash_routine_soft_gate === true || directorOnlyFlash;
   const flashRoutineMinQualityScore = Number(

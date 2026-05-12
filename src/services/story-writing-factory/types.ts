@@ -47,7 +47,7 @@ export interface FactoryConfig {
 
 export const DEFAULT_CONFIG: FactoryConfig = {
   provider: 'deepseek',
-  model: 'deepseek-v4-flash',
+  model: 'gemini-3.1-flash-lite',
   temperature: 0.75,
   maxTokens: 32768,
   targetWordCount: 2800,

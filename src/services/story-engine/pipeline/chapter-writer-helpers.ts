@@ -416,7 +416,8 @@ export function detectSevereRepetition(content: string): CriticIssue[] {
   const text = content.toLowerCase();
   const issues: CriticIssue[] = [];
 
-  const tracked: Record<string, { variants: string[]; category: 'generic' | 'plot_element' }> = {
+  type Cat = 'generic' | 'plot_element' | 'structural_connective';
+  const tracked: Record<string, { variants: string[]; category: Cat }> = {
     'tím sẫm': { variants: ['tím sẫm', 'tím đen', 'sắc tím'], category: 'generic' },
     'vàng kim': { variants: ['vàng kim', 'ánh vàng kim'], category: 'generic' },
     'đỏ rực': { variants: ['đỏ rực', 'đỏ thẫm'], category: 'generic' },
@@ -427,16 +428,22 @@ export function detectSevereRepetition(content: string): CriticIssue[] {
     'đặc quánh': { variants: ['đặc quánh'], category: 'generic' },
     'bùng phát': { variants: ['bùng phát', 'bùng nổ'], category: 'generic' },
     'ken két': { variants: ['ken két'], category: 'generic' },
-    // AI structural patterns — overused sentence constructions
-    'là một': { variants: ['là một'], category: 'generic' },
-    'bắt đầu': { variants: ['bắt đầu'], category: 'generic' },
-    'mang theo': { variants: ['mang theo'], category: 'generic' },
+    // 2026-05-12: split structural Vietnamese connectives into their own category.
+    // "là một", "bắt đầu", "mang theo" etc. are legitimate prose connectives that
+    // recur naturally in any well-written 2800-word chapter. The previous
+    // generic threshold (8 = critical) auto-rejected anything that wasn't actively
+    // varied — too strict and hits valid Vietnamese narration. New threshold 16/22
+    // catches real overuse without false-positive against natural prose.
+    'là một': { variants: ['là một'], category: 'structural_connective' },
+    'bắt đầu': { variants: ['bắt đầu'], category: 'structural_connective' },
+    'mang theo': { variants: ['mang theo'], category: 'structural_connective' },
+    'tỏa ra': { variants: ['tỏa ra'], category: 'structural_connective' },
+    'đôi mắt': { variants: ['đôi mắt'], category: 'structural_connective' },
+    'như thể': { variants: ['như thể'], category: 'structural_connective' },
+    'dường như': { variants: ['dường như'], category: 'structural_connective' },
+    // Real AI-tell cues — keep strict
     'lạnh lẽo': { variants: ['lạnh lẽo', 'lạnh buốt', 'lạnh lùng'], category: 'generic' },
     'run rẩy': { variants: ['run rẩy', 'run lên', 'run bần bật'], category: 'generic' },
-    'tỏa ra': { variants: ['tỏa ra'], category: 'generic' },
-    'đôi mắt': { variants: ['đôi mắt'], category: 'generic' },
-    'như thể': { variants: ['như thể'], category: 'generic' },
-    'dường như': { variants: ['dường như'], category: 'generic' },
     // Plot element words — naturally recur more often
     'pixel hóa': { variants: ['pixel hóa', 'pixel'], category: 'plot_element' },
     'rỉ sét': { variants: ['rỉ sét'], category: 'plot_element' },
@@ -452,8 +459,8 @@ export function detectSevereRepetition(content: string): CriticIssue[] {
       if (matches) total += matches.length;
     }
 
-    const criticalThreshold = category === 'plot_element' ? 12 : 8;
-    const moderateThreshold = category === 'plot_element' ? 8 : 5;
+    const criticalThreshold = category === 'structural_connective' ? 22 : category === 'plot_element' ? 12 : 8;
+    const moderateThreshold = category === 'structural_connective' ? 16 : category === 'plot_element' ? 8 : 5;
 
     if (total >= criticalThreshold) {
       issues.push({

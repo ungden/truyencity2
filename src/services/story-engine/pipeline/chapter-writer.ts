@@ -988,7 +988,7 @@ KIỂM TRA FORESHADOWING OVERDUE (xem block "[FORESHADOWING OVERDUE]" ở đầu
 
 KIỂM TRA CHẤT LƯỢNG BỔ SUNG (BẮT BUỘC):
 - COMEDY: Nếu KHÔNG có hài hước → issue severity "moderate". CHỈ "major" nếu chương sinh hoạt/đối thoại mà không hài.
-- LẶP TỪ: Dùng BÁO CÁO LẶP TỪ ở trên. >8 lần → severity "critical", requiresRewrite=true. >5 lần → severity "moderate". CHỈ "major" nếu ≥3 nhóm từ đều >5.
+- LẶP TỪ (recalibrated 2026-05-12): AI-tell từ (tím sẫm / vàng kim / rực rỡ / kinh hoàng / mờ ảo / lạnh lẽo / run rẩy …) >8 → critical, requiresRewrite=true; >5 → moderate. Vietnamese structural connectives ("là một / bắt đầu / mang theo / tỏa ra / dường như / như thể / đôi mắt") chỉ >22 → critical; >16 → moderate. ≤15 lần là tự nhiên, KHÔNG flag. CHỈ "major" nếu ≥3 nhóm AI-tell đều >5.
 - NỘI TÂM: Nếu thiếu nội tâm đa lớp → severity "minor". CHỈ "moderate" nếu toàn bộ chương không có.
 - GIỌNG NÓI: ≥3 nhân vật giống nhau → severity "moderate". 2 nhân vật → "minor".
 - NHỊP ĐIỆU: Toàn bộ scenes cùng cường độ → pacingScore tối đa 5

@@ -17,6 +17,9 @@ export const DEFAULT_FOCUSED_PROJECT_IDS = [
   '37b9b877-e524-4957-b365-f3e98dd7d7da',
   'c8d72480-6355-49a7-b4a7-c53c3a675cb0',
   'a38b1bfd-3350-4fc1-8158-c37947b2cc1c',
+  // 2026-05-12: Mạt Thế: Ta Có Hầm Trú Ẩn Vạn Năng — first production
+  // novel on Gemini-only pipeline (Phase Q). Cron writes 50 ch/day.
+  'c97b1d28-3421-44bb-bcfe-98055c44943a',
 ] as const;
 
 function parseFocusedIds(raw?: string): string[] {
@@ -27,7 +30,9 @@ function parseFocusedIds(raw?: string): string[] {
 }
 
 export const FOCUS_MODE_ENABLED = process.env.STORY_FOCUS_MODE !== '0';
-export const STORY_PRODUCTION_PAUSED = process.env.STORY_PRODUCTION_PAUSED !== '0';
+// 2026-05-12: Default switched OFF (was ON for engine-repair freeze).
+// Pipeline now uses Gemini-only routing; set STORY_PRODUCTION_PAUSED=1 explicitly to pause.
+export const STORY_PRODUCTION_PAUSED = process.env.STORY_PRODUCTION_PAUSED === '1';
 
 export const FOCUSED_PROJECT_IDS = parseFocusedIds(process.env.FOCUSED_PROJECT_IDS);
 if (FOCUSED_PROJECT_IDS.length === 0) {

@@ -569,11 +569,10 @@ SOFT FLAGS (severity moderate / major)
 
 S1. COMEDY MISSING: 0 khoảnh khắc hài → moderate (major nếu chương đối thoại/sinh hoạt vẫn không có).
 
-S2. REPETITION:
-- Bất kỳ từ >8 lần → severity critical (counts toward gate threshold)
-- Bất kỳ từ >5 lần → moderate (major nếu ≥3 nhóm từ đều >5)
-- "là một / bắt đầu / mang theo / tỏa ra / dường như / như thể" >5 lần → moderate; >8 lần → major
-- Tên MC >25 lần/10K chữ + ít đại từ → moderate
+S2. REPETITION (recalibrated 2026-05-12 — Vietnamese structural connectives recur naturally in 2800-word chapters):
+- AI-tell từ (tím sẫm / vàng kim / kinh hoàng / rực rỡ / mờ ảo / đặc quánh / lạnh lẽo / run rẩy / ken két …) >8 lần → critical; >5 → moderate.
+- Vietnamese structural connectives ("là một / bắt đầu / mang theo / tỏa ra / dường như / như thể / đôi mắt") >22 lần → critical; >16 lần → moderate. ≤15 lần ACCEPTABLE — đây là từ nối tự nhiên, KHÔNG flag.
+- Tên MC >25 lần/10K chữ + ít đại từ → moderate.
 
 S3. AI-CLICHE TIER 1 (Writer prompt list "khẽ nhếch mép/không khỏi/ánh mắt phức tạp/v.v."): ≥1 occurrence → moderate per occurrence.
 

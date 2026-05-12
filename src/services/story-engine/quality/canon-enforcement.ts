@@ -162,20 +162,26 @@ async function checkCastRoster(input: CanonEnforcementInput): Promise<CriticIssu
   const novel = [...candidates].filter(c => !allowedLower.has(c.toLowerCase()));
   const softCastRosterOnly = await shouldTreatCastRosterAsSoft(input.projectId);
 
+  // Drop English-only "names" (e.g. Military Grade, Blue Mountain, System Check,
+  // Offline Mode) — Vietnamese fiction often uses uppercased English technical
+  // terms or product labels that are NOT characters. (2026-05-12)
+  const looksEnglishOnly = (s: string): boolean => /^[A-Za-z][A-Za-z0-9\s'-]+$/.test(s);
+  const filteredNovel = novel.filter(n => !looksEnglishOnly(n));
+
   // Tolerance: ≥5 new named entities = sus; ≥10 = major.
   // Chapter 1 naturally introduces institutions, places, skill names and cast,
   // so keep this as a soft warning unless the extraction goes wildly off-track.
-  if (input.chapterNumber > 1 && novel.length >= 10 && !softCastRosterOnly) {
+  if (input.chapterNumber > 1 && filteredNovel.length >= 10 && !softCastRosterOnly) {
     issues.push({
       type: 'continuity',
       severity: 'major',
-      description: `${novel.length} tên nhân vật MỚI xuất hiện trong chương này không có trong cast roster: ${novel.slice(0, 8).join(', ')}. Có thể AI đang invent characters drift khỏi canon. Verify: chỉ giữ characters đã establish + characters MỚI có narrative reason.`,
+      description: `${filteredNovel.length} tên nhân vật MỚI xuất hiện trong chương này không có trong cast roster: ${filteredNovel.slice(0, 8).join(', ')}. Có thể AI đang invent characters drift khỏi canon. Verify: chỉ giữ characters đã establish + characters MỚI có narrative reason.`,
     });
-  } else if (novel.length >= 5) {
+  } else if (filteredNovel.length >= 5) {
     issues.push({
       type: 'quality',
       severity: 'moderate',
-      description: `${novel.length} tên có thể là nhân vật mới (chưa từng appear): ${novel.slice(0, 5).join(', ')}. Verify cần thiết hay drift.`,
+      description: `${filteredNovel.length} tên có thể là nhân vật mới (chưa từng appear): ${filteredNovel.slice(0, 5).join(', ')}. Verify cần thiết hay drift.`,
     });
   }
 
@@ -206,15 +212,38 @@ const PLACE_PREFIXES = [
   'Đường', 'Hồ', 'Sông', 'Núi', 'Đảo', 'Tầng', 'Hang', 'Động',
   'Học Viện', 'Liên Minh', 'Lớp',
   'Đông', 'Tây', 'Nam', 'Bắc', 'Trung', 'Hà Nội', 'Sài Gòn', 'TP',
+  // Modern + apocalypse settings (mat-the/do-thi):
+  'Royal', 'Times', 'Vincom', 'KĐT', 'Khu', 'Trại', 'Sảnh', 'Hầm', 'Bệnh Viện',
+  'Sân Bay', 'Cảng', 'Nhà Máy', 'Kho', 'Trạm', 'Quảng Trường', 'Hệ Phái', 'Bộ Tư',
+  // Countries / regions:
+  'Phù Tang', 'Tây Âu', 'Đông Á', 'Đại Hàn', 'Hoa Kỳ', 'Trung Quốc', 'Nhật Bản',
+  // Plans / concepts (capitalised noun phrases that are NOT characters):
+  'Kế Hoạch', 'Chiến Dịch', 'Phương Án', 'Dự Án', 'Phiên Bản', 'Mã Hiệu',
+  'Hầm Trú', 'Hầm Trú Ẩn', 'Apocalypse',
 ];
 const NON_NAME_START_WORDS = [
   'Nhưng', 'Và', 'Còn', 'Khi', 'Nếu', 'Vì', 'Do', 'Từ', 'Trong', 'Ngoài',
   'Trên', 'Dưới', 'Việc', 'Một', 'Mỗi', 'Các', 'Có', 'Không',
   'Giọng', 'Mặt', 'Ánh', 'Bóng', 'Tiếng', 'Hơi',
+  // 2026-05-12: Vietnamese verbs/quantifiers often capitalised at sentence start —
+  // they prefix a real proper noun (Thấy Lương Hạo = "Saw Lương Hạo") and got
+  // miscounted as a 2-word character name. Strip the leading capitalised verb so
+  // the inner name re-extracts cleanly elsewhere.
+  'Thấy', 'Nhìn', 'Nghe', 'Gặp', 'Hỏi', 'Đáp', 'Gọi', 'Nói', 'Trông', 'Chạy',
+  'Đi', 'Đến', 'Tới', 'Bước', 'Ngồi', 'Đứng', 'Lại', 'Quay', 'Theo', 'Cùng',
+  'Nhân Vật', 'Bạn', 'Người',
+  // Familial/honorific prefixes — speaker addressing established character:
+  'Cậu', 'Chú', 'Bác', 'Anh', 'Chị', 'Em', 'Cô', 'Ông', 'Bà',
+  'Cha', 'Mẹ', 'Bố',
 ];
 const TITLE_WORDS = [
   'Sư Phụ', 'Đại Sư', 'Tổ Sư', 'Trưởng Lão', 'Trưởng Tộc', 'Gia Chủ', 'Chủ Tịch',
   'Tổng Giám Đốc', 'Bộ Trưởng', 'Thị Trưởng', 'Sở Trưởng',
+  // Modern brand / corp suffixes — phrase like "Yusen Logistics" / "Ford Ranger"
+  // is product/company, never a character. Match by inclusion.
+  'Logistics', 'Ranger', 'Submariner', 'Hermle', 'Hermès', 'Rolex',
+  'Inc', 'Ltd', 'Corp', 'Group', 'Vinmart', 'Apple', 'Samsung',
+  'Đảo Quốc', 'Liên Minh', 'Vương Quốc', 'Đế Quốc', 'Cộng Hòa',
 ];
 const WORLD_TERM_WORDS = [
   'Thần Vực', 'Vạn Tượng', 'Biên Niên', 'Khởi Nguyên', 'Ký Ức',
