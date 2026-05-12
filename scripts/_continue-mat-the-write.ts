@@ -84,7 +84,8 @@ async function main() {
       const ok = (result.chaptersCreated ?? 0) > 0;
       console.log(`[chapter] ok=${ok} chaptersCreated=${result.chaptersCreated} ch=${result.lastChapterNumber} words=${result.wordCount} title="${result.title?.slice(0, 70)}" (${dt}s)`);
       if (!ok) {
-        console.log(`[chapter] FAIL: ${result.error ?? '(no error field)'}`);
+        const maybeError = (result as { error?: unknown }).error;
+        console.log(`[chapter] FAIL: ${maybeError ?? '(no error field)'}`);
         break;
       }
     } catch (e) {
