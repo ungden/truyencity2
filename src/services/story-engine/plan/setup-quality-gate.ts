@@ -77,11 +77,24 @@ const MC_SECRET_LEAK_PATTERNS: Array<{ regex: RegExp; code: string; message: str
 ];
 
 const WEAK_SYSTEM_PATTERNS = /(mơ\s*hồ|không\s+rõ|chưa\s+giúp|không\s+giúp|không\s+có\s+lợi|hên\s+xui|ngẫu\s*nhiên|vô\s*dụng|không\s+đáng\s+kể|chỉ\s+gợi\s+ý\s+chung)/i;
-// 2026-05-12: expanded with survival/apocalypse + magic/cultivation benefit terms so
-// the validator works across mat-the / linh-di / kiem-hiep / di-gioi genres, not
-// only business / cultivation. The list intentionally errs broad — any of these
-// counts as a concrete, repeatable reader payoff per chapter.
-const BENEFIT_KEYWORDS = /(tiền|doanh\s*thu|tài\s*nguyên|skill|kỹ\s*năng|công\s*nhận|uy\s*tín|quan\s*hệ|network|thông\s*tin|insight|manh\s*mối|đột\s*phá|level|cảnh\s*giới|khách|đơn\s*hàng|hợp\s*đồng|vật\s*phẩm|item|kinh\s*nghiệm|lương\s*thực|nhu\s*yếu\s*phẩm|đồ\s*ăn|thuốc|vũ\s*khí|đạn|súng|nước\s+sạch|năng\s*lượng|lãnh\s*thổ|kho|hầm|công\s*nghệ|drone|cảm\s*biến|linh\s*lực|nội\s*lực|pháp\s*bảo|công\s*pháp|huyết\s*mạch|đan\s*dược|linh\s*thạch|spirit|mana|aura)/i;
+// 2026-05-12 (round 2): expanded again to cover writer/lord/territory/cultivation
+// flavors that Pro setup model produces. Adds: lợi nhuận/doanh số/sản phẩm/hàng
+// hóa/thị trường (business), văn khí/văn đạo/văn chương/sách/danh tiếng (writer),
+// tinh thạch/quặng/khoáng (mining), lãnh địa/lương dân (lord), đệ tử/đồ đệ/độc
+// giả/fan (follower base), tài sản/vàng/wealth/gold (asset).
+//
+// 2026-05-12 (round 1): expanded with survival/apocalypse + magic/cultivation
+// benefit terms so the validator works across mat-the / linh-di / kiem-hiep /
+// di-gioi genres. The list intentionally errs broad — any of these counts as a
+// concrete, repeatable reader payoff per chapter.
+const BENEFIT_KEYWORDS = /(tiền|doanh\s*thu|doanh\s*số|lợi\s*nhuận|tài\s*nguyên|tài\s*sản|wealth|gold|vàng|skill|kỹ\s*năng|công\s*nhận|uy\s*tín|danh\s*tiếng|fame|quan\s*hệ|network|thông\s*tin|insight|manh\s*mối|đột\s*phá|level|cảnh\s*giới|khách|đơn\s*hàng|hợp\s*đồng|hàng\s*hóa|sản\s*phẩm|thị\s*trường|vật\s*phẩm|item|kinh\s*nghiệm|lương\s*thực|nhu\s*yếu\s*phẩm|đồ\s*ăn|thuốc|vũ\s*khí|đạn|súng|nước\s+sạch|năng\s*lượng|lãnh\s*thổ|lãnh\s*địa|lương\s*dân|trung\s*thành|loyalty|đệ\s*tử|đồ\s*đệ|độc\s*giả|fan|fanbase|kho|hầm|công\s*nghệ|drone|cảm\s*biến|linh\s*lực|nội\s*lực|pháp\s*bảo|công\s*pháp|huyết\s*mạch|đan\s*dược|linh\s*thạch|tinh\s*thạch|quặng|khoáng|văn\s*khí|văn\s*đạo|văn\s*chương|sách|spirit|mana|aura)/i;
+
+// 2026-05-12: Phase 1 antagonist scale check — only flag mysterious / cosmic /
+// kingdom-level forces, not bare "hội/cục/viện" which match local guilds and
+// associations (e.g. "Hắc thương Hội" is a local crime guild, not a too-large
+// antagonist). Modifiers like "bí ẩn / thần bí / toàn cầu / tối thượng" are the
+// true signal that the antagonist is too big for Phase 1.
+const ANTAGONIST_TOO_LARGE = /(bí\s*ẩn|thần\s*bí|ẩn\s*mật|toàn\s*cầu|toàn\s*quốc|tối\s*thượng|đại\s*đế|hoàng\s*đế|hoàng\s*gia|hoàng\s*tộc|tiên\s*vương|tà\s*thần|cổ\s*thần|thần\s*linh|quốc\s*sư)/i;
 
 function normalizeName(value?: string | null): string {
   return (value || '')
@@ -198,7 +211,7 @@ function validateSetupKernel(kernel: StoryKernel | undefined, strict: boolean | 
     || !Array.isArray(playground.localAntagonists) || playground.localAntagonists.length < 1
     || !Array.isArray(playground.repeatableSceneTypes) || playground.repeatableSceneTypes.length < 3) {
     issues.push({ severity: 'error', code: 'setup_kernel_phase1_playground_missing', message: 'StoryKernel.phase1Playground must define local locations, cast, antagonist, and repeatable scene types' });
-  } else if (playground.localAntagonists.some(a => /(tổ\s*chức|thế\s*lực|hội|cục|viện|đại\s*đế|tối\s*thượng|toàn\s*cầu|toàn\s*quốc|bí\s*ẩn|thần\s*bí|ẩn\s*mật)/i.test(String(a)))) {
+  } else if (playground.localAntagonists.some(a => ANTAGONIST_TOO_LARGE.test(String(a)))) {
     issues.push({
       severity: 'error',
       code: 'setup_kernel_phase1_antagonist_too_large',
