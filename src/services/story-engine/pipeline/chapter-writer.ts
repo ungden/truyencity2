@@ -46,7 +46,7 @@ import type {
 } from '../types';
 import type { SceneType, VocabularyGuide } from '../templates/style-bible';
 import { VN_PLACE_LOCK, ARCHITECT_SYSTEM, WRITER_SYSTEM, CRITIC_SYSTEM } from './chapter-writer-prompts';
-import { cleanContent, extractTitle, synthesizeFallbackCliffhanger, hasCliffhangerSignal, analyzeQualitySignals, buildSignalReport, countWords, detectHardFallback, detectMcNameFlip, detectSevereRepetition, detectShortFormCharacterName, detectChapterTemplatePatterns, buildRepetitionReport, generateMinimalScenes, loadConstraintSection, safeStringTrim, type QualitySignals } from './chapter-writer-helpers';
+import { cleanContent, extractTitle, synthesizeFallbackCliffhanger, hasCliffhangerSignal, analyzeQualitySignals, buildSignalReport, countWords, detectHardFallback, detectMcNameFlip, detectSevereRepetition, detectShortFormCharacterName, detectChapterTemplatePatterns, repairChapterTemplatePatterns, buildRepetitionReport, generateMinimalScenes, loadConstraintSection, safeStringTrim, type QualitySignals } from './chapter-writer-helpers';
 
 
 // ── Write Chapter ────────────────────────────────────────────────────────────
@@ -169,6 +169,20 @@ export async function writeChapter(
 
     // Clean content
     content = cleanContent(content);
+
+    // Phase Q 2026-05-13 Layer 6 — DETERMINISTIC TEMPLATE REPAIR.
+    // PR #67 added detection + retry but Gemini Flash Lite's template attractor
+    // is too strong (1/12 clean after 3 retries = 92% slip-through). This
+    // surgery strips template ending sentences + repairs static opening
+    // UNCONDITIONALLY after Writer succeeds. Lost content is purely AI tics
+    // ("ván cờ sinh tử bắt đầu" / static establishing shots) — narrative
+    // information is preserved in the concrete sentences that bookend them.
+    const repair = repairChapterTemplatePatterns(content);
+    if (repair.endingRepaired || repair.openingRepaired) {
+      content = repair.content;
+      console.log(`[Writer] Template surgery ch.${chapterNumber}: ending=${repair.endingRepaired} opening=${repair.openingRepaired} lost=${repair.lostChars}ch`);
+    }
+
     const finalWordCount = countWords(content);
 
     // ── Hard-Fail Gate (pre-Critic) ─────────────────────────────────────────
