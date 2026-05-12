@@ -661,3 +661,49 @@ export async function loadConstraintSection(projectId: string, context: string, 
     return '';
   }
 }
+
+/**
+ * Detect template chapter-ending ("ego declaration") + template static opening
+ * in finished chapter content. Returns a non-empty reason string when caught,
+ * empty string when content passes.
+ *
+ * Why: even with Architect rules + Critic gates, Gemini Flash Lite slides
+ * back to the dominant TQ webnovel template ("X mới thật sự bắt đầu" +
+ * "MC đứng bất động + quan sát + suy ngẫm") because training data is
+ * saturated with this pattern. Deterministic post-write detection forces
+ * a rewrite before content reaches the publish step.
+ *
+ * Implementation lives in context/generators.ts (regex shared with summary
+ * sanitizer to keep template definitions in one place).
+ */
+export function detectChapterTemplatePatterns(content: string): string {
+  if (!content || content.length < 200) return '';
+
+  // Lazy require to avoid cycle with context/generators.ts at module load.
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { isTemplateCliffhanger, isTemplateOpening } = require('../context/generators') as {
+    isTemplateCliffhanger: (s: string) => boolean;
+    isTemplateOpening: (s: string) => boolean;
+  };
+
+  const reasons: string[] = [];
+
+  // Check ending: last 500 chars contain ego declaration?
+  const tail = content.slice(-500);
+  // Split into last sentences, check each — match if ANY of the last 3 sentences fires.
+  const tailSentences = (tail.match(/[^.!?。！？\n]+[.!?。！？]/g) || []).map(s => s.trim()).filter(Boolean);
+  const lastThree = tailSentences.slice(-3);
+  for (const s of lastThree) {
+    if (isTemplateCliffhanger(s)) {
+      reasons.push(`Ending câu "${s.slice(0, 80)}..." match template "ego declaration" (ván cờ / cuộc chiến / kỷ nguyên / cái tên / bản hùng ca / sẵn sàng cho ... mới thật sự / chính thức / chuẩn bị bắt đầu).`);
+      break;
+    }
+  }
+
+  // Check opening: first 500 chars match static template (setting + MC + static verb)?
+  if (isTemplateOpening(content)) {
+    reasons.push('Opening 100-150 từ đầu match template TĨNH: [Ánh sáng/không khí/đồng hồ/phòng tả thiết lập] + [MC] ngồi/đứng/tựa bất động/lặng + quan sát/suy ngẫm. Opening PHẢI ACTIVE — MC đang làm action cụ thể (đi/gọi/mở/ra lệnh/viết).');
+  }
+
+  return reasons.join(' | ');
+}

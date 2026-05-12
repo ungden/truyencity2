@@ -87,6 +87,209 @@ function coerceText(value: unknown): string {
   return String(value).trim();
 }
 
+// ── Template Pattern Detection (Phase Q 2026-05-13 root-cause fix) ───────────
+//
+// Why: AI summarizers happily captured "ego declaration" endings ("ván cờ sinh
+// tử bắt đầu", "hắn là X, đây là thế giới của hắn") as cliffhanger, and
+// "static reflection" states ("MC đang chuẩn bị tâm thế") as mcState. These
+// then got fed forward into next chapter's bridge context, telling the next
+// Architect "MC is in reflection mode, has to resolve abstract hook" — which
+// produced static openings. Cycle compounds.
+//
+// Fix layer 1: prompts now require concrete physical extraction (see below).
+// Fix layer 2 (this section): if AI still returns template, detect + scrub.
+
+// Widened 2026-05-13 round 3 — calibrated against 16 production chapter audit.
+// Single OR'd alternation covering all observed "ego declaration" patterns.
+const TEMPLATE_CLIFFHANGER_RE = new RegExp([
+  // "mới chính thức bắt đầu / khai màn / mở ra / bước vào"
+  '(?:mới|chính\\s+thức|giờ\\s+(?:đây|này)?\\s*mới|bây\\s+giờ\\s+mới|giờ\\s+này\\s+mới)\\s+(?:chính\\s+thức\\s+)?(?:bắt\\s+đầu|khai\\s+(?:màn|mở)|mở\\s+ra|bước\\s+vào)',
+  // "là X, đây là thế giới của hắn"
+  'là\\s+[A-ZÀ-Ỵ][^,.!?\\n]{0,40},?\\s+(?:và\\s+)?đây\\s+là\\s+(?:thế\\s+giới|cuộc\\s+đời|tương\\s+lai|vận\\s+mệnh|sân\\s+chơi|lãnh\\s+thổ)\\s+của\\s+(?:hắn|y|cô|nàng|anh|chàng|gã|ta)',
+  // "đối với X, đây chỉ mới là khởi đầu"
+  'đối\\s+với\\s+[A-ZÀ-Ỵ][^,.!?\\n]{0,40},?\\s+(?:đây|tất\\s+cả|chuyện\\s+này)\\s+(?:chỉ\\s+)?mới\\s+(?:là|chỉ\\s+là)\\s+(?:khởi\\s+đầu|bắt\\s+đầu|sự\\s+khởi\\s+đầu)',
+  // "tương lai còn dài"
+  'tương\\s+lai\\s+(?:còn\\s+dài|vẫn\\s+còn\\s+dài|vẫn\\s+ở\\s+phía\\s+trước|đang\\s+chờ)',
+  // "ván cờ / trò chơi / cuộc chiến (sinh tử) [đã/mới/giờ đây mới] (chính thức) bắt đầu / khai mở / chuyển sang"
+  '(?:ván\\s+cờ|trò\\s+chơi|cuộc\\s+chiến|cuộc\\s+phiêu\\s+lưu|hành\\s+trình|bước\\s+đi|cuộc\\s+chơi|chiến\\s+tranh)\\s+(?:sinh\\s+tử|thật\\s+sự|thực\\s+sự|lớn|đích\\s+thực|văn\\s+học|này|vĩ\\s+đại)?\\s*(?:của\\s+\\S+\\s+)?(?:(?:đã|vừa|mới|bây\\s+giờ\\s+mới|giờ\\s+đây\\s+mới)\\s+)?(?:chính\\s+thức\\s+)?(?:bắt\\s+đầu|khai\\s+(?:màn|mở)|mở\\s+ra|chuyển\\s+sang)',
+  // "kỷ nguyên mới ... bắt đầu / được viết"
+  'kỷ\\s+nguyên\\s+mới(?:[^.!?\\n]{0,80})(?:bắt\\s+đầu|chính\\s+thức|được\\s+viết)',
+  // "một chương / kỷ nguyên / thời đại mới ... chuẩn bị bắt đầu / sắp đến"
+  'một\\s+(?:chương|kỷ\\s+nguyên|thời\\s+đại)\\s+mới(?:[^.!?\\n]{0,100})(?:chuẩn\\s+bị\\s+bắt\\s+đầu|sắp\\s+bắt\\s+đầu|đang\\s+đến|sắp\\s+đến)',
+  // "thời đại mới ... sẽ được viết nên / được mở ra"
+  'thời\\s+đại\\s+mới(?:[^.!?\\n]{0,60})(?:sẽ\\s+được\\s+viết|sắp\\s+đến|sắp\\s+bắt\\s+đầu|đang\\s+đến|được\\s+mở\\s+ra)',
+  // "(thời đại / kỷ nguyên) mới ... sẽ được viết nên" (broader, reversed)
+  '(?:thời\\s+đại|kỷ\\s+nguyên|trang\\s+sử)(?:[^.!?\\n]{0,30})(?:sẽ\\s+được\\s+viết\\s+nên|sẽ\\s+ra\\s+đời|đang\\s+đến)',
+  // "cái tên sẽ sớm trở thành biểu tượng / truyền thuyết / huyền thoại"
+  'cái\\s+tên\\s+(?:sẽ\\s+)?(?:sớm\\s+)?(?:trở\\s+thành|được\\s+ghi\\s+nhớ\\s+là)\\s+(?:biểu\\s+tượng|truyền\\s+thuyết|huyền\\s+thoại)',
+  // "X – cái tên sẽ trở thành biểu tượng" — match noun even without "cái tên"
+  '[A-ZÀ-Ỵ][a-zà-ỹ]+(?:\\s+[A-ZÀ-Ỵ][a-zà-ỹ]+){1,3}\\s*[–-]\\s*cái\\s+tên',
+  // "sẵn sàng cho [những/cuộc/trận] X [lớn hơn/cuối cùng/sắp tới/mới]"
+  'sẵn\\s+sàng\\s+cho\\s+(?:những\\s+|cuộc\\s+|trận\\s+|một\\s+)?[a-zà-ỹ]+(?:\\s+[a-zà-ỹ]+){0,4}\\s+(?:cuối\\s+cùng|lớn(?:\\s+hơn)?|hơn|mới|kế\\s+tiếp|sắp\\s+tới|tiếp\\s+theo|kinh\\s+hoàng|vĩ\\s+đại|khốc\\s+liệt(?:\\s+hơn)?)',
+  // "X sẽ là người định đoạt / đặt ra luật lệ / viết tiếp"
+  '(?:\\S+)\\s+(?:sẽ\\s+)?là\\s+người\\s+(?:định\\s+đoạt|đặt\\s+(?:ra\\s+)?luật\\s+lệ|viết\\s+tiếp|viết\\s+nên|làm\\s+chủ\\s+cuộc\\s+chơi)',
+  // "bây giờ, chỉ cần chờ đợi thời điểm"
+  'bây\\s+giờ,?\\s+chỉ\\s+(?:cần\\s+)?chờ\\s+(?:đợi\\s+)?thời\\s+điểm',
+  // "bản hùng ca / giao hưởng / sử thi ... sẽ được viết"
+  'bản\\s+(?:hùng\\s+ca|giao\\s+hưởng|sử\\s+thi|anh\\s+hùng\\s+ca)(?:[^.!?\\n]{0,40})(?:sẽ|đang|đã)\\s+(?:được\\s+)?(?:viết|cất\\s+lên|bắt\\s+đầu)',
+  // "kẻ săn mồi / kẻ thù / đối thủ ... cuối cùng đã lộ diện"
+  '(?:kẻ\\s+săn\\s+mồi|kẻ\\s+thù|đối\\s+thủ|kẻ\\s+địch|đối\\s+phương)[^.!?\\n]{0,40}(?:cuối\\s+cùng\\s+)?(?:đã|vừa)\\s+lộ\\s+diện',
+  // "cuối cùng đã lộ diện" (bare)
+  'cuối\\s+cùng\\s+(?:đã|cũng|cũng\\s+đã)\\s+lộ\\s+diện',
+].join('|'), 'i');
+
+const TEMPLATE_MCSTATE_RE = new RegExp([
+  'chuẩn\\s+bị\\s+tâm\\s+thế',
+  'sẵn\\s+sàng\\s+(?:bước\\s+vào|đối\\s+mặt|nghênh\\s+đón|chiến\\s+đấu)',
+  'nhếch\\s+(?:mép|môi)\\s+(?:cười)?\\s*[—,.]',
+  'nhìn\\s+(?:xa\\s+xăm|về\\s+phía\\s+xa|về\\s+phía\\s+chân\\s+trời)',
+  'trong\\s+lòng\\s+(?:thầm\\s+)?(?:tự\\s+nhủ|biết\\s+rằng|hiểu\\s+rằng|hạ\\s+quyết\\s+tâm)',
+  'ánh\\s+mắt\\s+(?:sâu\\s+thẳm|kiên\\s+định|lạnh\\s+lùng|sắc\\s+lạnh|sắc\\s+bén|trở\\s+nên\\s+sắc)\\s+(?:nhìn|hướng|nhìn\\s+về)',
+  'tâm\\s+(?:thế|trạng)\\s+(?:sẵn\\s+sàng|cảnh\\s+giác|hưng\\s+phấn|làm\\s+chủ|chủ\\s+động)',
+  'trạng\\s+thái\\s+(?:sẵn\\s+sàng|tâm\\s+lý|tinh\\s+thần)\\s+(?:chiến\\s+đấu|hưng\\s+phấn|quyết\\s+đoán|cảnh\\s+giác)',
+].join('|'), 'i');
+
+// Static-opening detection — composed of TWO separate checks, both must hit
+// within first 400 chars (covers ~80 từ Vietnamese — the "100 từ đầu" window).
+// 1. Setting establishment: opening sentence is scenery/weather/space/sound,
+//    NOT MC action.
+// 2. Static MC pose: MC name followed by ngồi/đứng/tựa/nằm + optional adverb
+//    (bất động/im lặng/lặng yên/lẽ/đó/thẳng tắp).
+const OPENING_SETTING_RE = new RegExp([
+  '^.{0,300}(?:',
+  [
+    'ánh\\s+(?:nắng|sáng|mặt\\s+trời|trăng|đèn|hoàng\\s+hôn|bình\\s+minh)',
+    'không\\s+khí',
+    'làn\\s+gió',
+    'gió\\s+(?:đêm|sớm|lạnh|nhẹ|chiều|sáng)',
+    'tia\\s+(?:nắng|sáng)',
+    'buổi\\s+(?:sáng|chiều|tối|đêm)',
+    'trời\\s+(?:đã|vừa|còn|mới)',
+    'đồng\\s+hồ',
+    'sương',
+    'mùi\\s+(?:dầu|khói|máu|cá|gỗ|đặc\\s+trưng|của)',
+    'tiếng\\s+(?:gió|còi|máy|chuông|tích\\s+tắc|động|hú)',
+    'phòng\\s+\\S+',
+    'thư\\s+phòng',
+    'sảnh',
+    'gian\\s+(?:phòng|nhà)',
+    'sáu\\s+giờ',
+    'năm\\s+giờ',
+    'bốn\\s+giờ',
+    'ngày\\s+thứ',
+    'đêm\\s+(?:hôm|đó)',
+  ].join('|'),
+  ')',
+].join(''), 'i');
+
+const OPENING_STATIC_MC_RE = /[A-ZÀ-Ỵ][a-zà-ỹ]+(?:\s+[A-ZÀ-Ỵ][a-zà-ỹ]+){1,3}\s+(?:ngồi|đứng|nằm|tựa|dựa|nép|cúi)(?:\s+(?:bất\s+động|im\s+lặng|lặng\s+(?:yên|lẽ|im)|trầm\s+(?:mặc|ngâm)|yên\s+lặng|đó|thẳng\s+(?:tắp|đó)?|lẳng\s+lặng|chết\s+lặng))?/i;
+
+/** True if string looks like the "ego declaration" template pattern. */
+export function isTemplateCliffhanger(s: string | null | undefined): boolean {
+  if (!s) return false;
+  return TEMPLATE_CLIFFHANGER_RE.test(s);
+}
+
+/** True if string looks like static "reflection mode" mcState pattern. */
+export function isTemplateMcState(s: string | null | undefined): boolean {
+  if (!s) return false;
+  return TEMPLATE_MCSTATE_RE.test(s);
+}
+
+/** True if opening sentence(s) match static "MC observes/reflects" template.
+ *  Two-stage detection: setting-establishment phrase + static MC pose, both
+ *  within first 400 chars (~80 từ — the "100 từ đầu" window).
+ */
+export function isTemplateOpening(s: string | null | undefined): boolean {
+  if (!s) return false;
+  const head = s.slice(0, 500);
+  return OPENING_SETTING_RE.test(head) && OPENING_STATIC_MC_RE.test(head);
+}
+
+/**
+ * Scan chapter tail for the LAST CONCRETE EVENT (action verb + named entity /
+ * concrete object / specific sound/sight). Returns a usable cliffhanger string
+ * derived from real events, not abstract narration.
+ *
+ * Used when AI returns an "ego declaration" cliffhanger we want to replace.
+ */
+export function extractConcreteEventFromTail(content: string): string | null {
+  const tail = content.slice(-3000).trim();
+  if (!tail) return null;
+
+  // Split into sentences, walk BACKWARD looking for concrete event before any
+  // template/abstract declarations.
+  const sentenceMatches = tail.match(/[^.!?。！？\n]+[.!?。！？]/g) || [];
+  const sentences = sentenceMatches.map(s => s.trim()).filter(Boolean);
+  if (sentences.length === 0) return null;
+
+  // Concrete-event signals (priority order):
+  // 1. Named entity + action verb (someone DID something specific)
+  // 2. Specific external sound/sight/object appearing
+  // 3. Quoted dialogue (— "...")
+  // 4. Specific time + location commitment
+  const concreteVerbs = /(nói|hỏi|đáp|gọi|kêu|hét|gào|thì\s+thầm|cười|gật|lắc|đứng\s+dậy|ngồi\s+xuống|bước|chạy|đi\s+tới|đi\s+đến|đẩy\s+cửa|mở\s+cửa|đóng\s+cửa|cầm|nắm|đặt|ném|đập|gõ|bấm|nhấn|ký|viết|đưa|nhận|trao|móc|rút|bắn|đâm|nhảy|té|ngã|ôm|kéo|đẩy|chỉ|chìa|với\s+tay|đưa\s+tay|giơ\s+lên|hạ\s+xuống|chìa\s+ra|chia\s+sẻ|tuyên\s+bố|công\s+bố|ra\s+lệnh|hô|báo|nhắn|gửi|đặt\s+xuống|tỉnh\s+lại|ngất\s+đi|kéo\s+xuống|kéo\s+lên|đẩy\s+mạnh)/i;
+  const externalSignal = /(điện\s+thoại|chuông|tiếng\s+(động|gõ|đập|hét|cười|chuông|kêu|nổ|súng|còi|còn|nói)|bóng\s+(đen|người|dáng)|cánh\s+cửa|cửa\s+sổ|màn\s+hình|tin\s+nhắn|email|thư|gói\s+hàng|hộp|chìa\s+khóa|giấy\s+tờ|hợp\s+đồng|văn\s+kiện|báo\s+cáo|file)/i;
+  const dialogueMarker = /^—|^"|^"|^"/;
+  const timeCommit = /(ngày\s+mai|sáng\s+mai|tối\s+nay|chiều\s+nay|tuần\s+sau|tháng\s+sau|\d+\s*h(?:\s+sáng|\s+chiều|\s+tối)?|\d+\s+giờ)[^.!?\n]{0,100}(gặp|đến|tới|đi|sẽ\s+đi|sẽ\s+tới|sẽ\s+gặp|hẹn|chờ)/i;
+
+  // Walk last 8 sentences (ignore the final 1-2 if they're template).
+  const candidates = sentences.slice(-8);
+  // Score each: dialogue 4, timeCommit 4, externalSignal 3, concreteVerb 2.
+  let best: { sentence: string; score: number; idx: number } | null = null;
+  for (let i = 0; i < candidates.length; i++) {
+    const s = candidates[i];
+    if (isTemplateCliffhanger(s)) continue; // skip the ego-declaration sentence
+    let score = 0;
+    if (dialogueMarker.test(s)) score += 4;
+    if (timeCommit.test(s)) score += 4;
+    if (externalSignal.test(s)) score += 3;
+    if (concreteVerbs.test(s)) score += 2;
+    // Prefer LATER concrete events
+    if (score > 0 && (!best || score >= best.score)) best = { sentence: s, score, idx: i };
+  }
+
+  if (best) return best.sentence;
+
+  // No concrete signal — return last non-template sentence as last resort.
+  for (let i = candidates.length - 1; i >= 0; i--) {
+    if (!isTemplateCliffhanger(candidates[i])) return candidates[i];
+  }
+  return null;
+}
+
+/**
+ * Scan chapter tail for MC's CONCRETE PHYSICAL STATE (location, what holding,
+ * recent action) at end of chapter. Returns a usable mcState string.
+ *
+ * Used when AI returns abstract "reflection mode" mcState.
+ */
+export function extractConcreteMcStateFromTail(content: string, protagonistName: string): string | null {
+  const tail = content.slice(-2000);
+  if (!tail) return null;
+
+  const mcRe = new RegExp(protagonistName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+  const sentenceMatches = tail.match(/[^.!?。！？\n]+[.!?。！？]/g) || [];
+  const sentences = sentenceMatches.map(s => s.trim()).filter(Boolean);
+
+  // Physical-state signals: location prep + concrete action verb + concrete object
+  const locationPrep = /(tại|trong|ngoài|trên|dưới|trước|sau|cạnh|bên|ở|đứng\s+trong|ngồi\s+trong|đi\s+vào|đi\s+ra|về|đến|rời\s+khỏi|trở\s+về)/i;
+  const concreteObject = /(bàn|ghế|cửa|phòng|sảnh|xe|văn\s+phòng|toà\s+nhà|lầu|tầng|hành\s+lang|ban\s+công|sân|đường|tiệm|cửa\s+hàng|kho|hầm|hợp\s+đồng|tài\s+liệu|máy|điện\s+thoại|laptop|màn\s+hình|tách|chén|ly|cốc|bút|sách|giấy|ấm\s+trà|cốc\s+cà\s+phê|vũ\s+khí|kiếm|đao|súng|đạn|đan|linh\s+thạch|tiền|vàng|chứng\s+từ)/i;
+
+  // Walk backward, find sentence with MC + physical signal (NOT template)
+  for (let i = sentences.length - 1; i >= 0; i--) {
+    const s = sentences[i];
+    if (isTemplateMcState(s)) continue;
+    if (!mcRe.test(s)) continue;
+    if (locationPrep.test(s) || concreteObject.test(s)) {
+      // Trim to first 150 chars + protagonist prefix
+      const cleaned = s.replace(/^\s*[—-]\s*/, '').slice(0, 150).trim();
+      return cleaned;
+    }
+  }
+  return null;
+}
+
 // ── Post-Write: Save Chapter Summary ─────────────────────────────────────────
 
 export async function saveChapterSummary(
@@ -129,8 +332,8 @@ export async function generateChapterSummary(
 {
   "summary": "tóm tắt 2-3 câu",
   "openingSentence": "câu mở đầu chương (nguyên văn từ nội dung)",
-  "mcState": "trạng thái ${protagonistName} cuối chương (cảnh giới, vị trí, tình trạng)",
-  "cliffhanger": "tình huống chưa giải quyết cuối chương"
+  "mcState": "VẬT LÝ — ${protagonistName} ĐANG Ở ĐÂU + ĐANG CẦM/LÀM GÌ + AI ĐỨNG CẠNH (cuối chương). KHÔNG mô tả tâm trạng/cảm xúc/suy nghĩ — chỉ position + active object/action.",
+  "cliffhanger": "SỰ KIỆN BÊN NGOÀI cụ thể vừa xảy ra ở cuối chương: ai vừa nói/làm gì cụ thể, hoặc vật/sound/sight bất ngờ xuất hiện, hoặc MC vừa quyết định hành động với thời gian+địa điểm+người cụ thể, hoặc tin nhắn/cú điện thoại nội dung gì."
 }
 
 Chương ${chapterNumber}: "${title}"
@@ -141,10 +344,22 @@ ${headSnippet}
 [KẾT CHƯƠNG]
 ${tailSnippet}
 
-QUY TẮC CLIFFHANGER:
-- Nếu không phải chương kết/finale, KHÔNG ĐƯỢC để rỗng
-- Trích đúng tình huống căng thẳng hoặc câu chốt mở ở cuối chương
-- Chỉ cho phép rỗng khi chương đã khép hoàn toàn theo chủ đích finale`;
+QUY TẮC mcState (CONCRETE PHYSICAL):
+- ĐÚNG: "${protagonistName} đang đứng trong phòng họp tầng 32 toà Vạn Thái, tay cầm hợp đồng vừa ký, đối diện CEO Phạm An đang gật đầu."
+- ĐÚNG: "${protagonistName} ngồi trên giường bệnh viện, băng tay trái, mẹ ngồi ghế cạnh giường, bác sĩ vừa rời phòng."
+- SAI: "${protagonistName} đang chuẩn bị tâm thế bước vào cuộc chiến mới." (tâm trạng, không phải vật lý)
+- SAI: "${protagonistName} nhìn xa xăm, trong lòng tự nhủ sẽ thành công." (nội tâm, không phải vị trí)
+
+QUY TẮC cliffhanger (CONCRETE EVENT):
+- Nếu không phải finale, KHÔNG để rỗng.
+- ĐÚNG: "Trợ lý gõ cửa, đưa ra phong bì niêm phong từ chủ tịch Lý Vạn Lâm."
+- ĐÚNG: "Điện thoại reo. Trên màn hình hiện tên 'Phụng' — vợ ${protagonistName} đã 3 năm không liên lạc."
+- ĐÚNG: "${protagonistName} quyết định 7h sáng mai sẽ tới biệt thự Lý gia gặp lão Lý để chốt deal."
+- SAI: "Ván cờ sinh tử bây giờ mới thật sự bắt đầu." (tuyên ngôn trừu tượng — KHÔNG được lấy làm cliffhanger)
+- SAI: "Hắn là ${protagonistName}, đây là thế giới của hắn." (ego declaration — KHÔNG lấy)
+- SAI: "Đối với ${protagonistName}, đây chỉ mới là khởi đầu." (abstract — KHÔNG lấy)
+- Nếu chương kết bằng tuyên ngôn trừu tượng → trích sự kiện cụ thể TRƯỚC tuyên ngôn đó (đoạn 2-3 trên cùng).
+- Chỉ cho phép rỗng khi chương đã khép hoàn toàn theo chủ đích finale.`;
 
   const res = await callGemini(prompt, { ...config, temperature: 0.1, maxTokens: 1024 }, { jsonMode: true, tracking: options?.projectId ? { projectId: options.projectId, task: 'chapter_summary', chapterNumber } : undefined });
   const parsed = parseJSON<ChapterSummary>(res.content);
@@ -162,10 +377,20 @@ QUY TẮC CLIFFHANGER:
   if (!safeStringTrim(parsed.mcState)) {
     // Fallback: extract MC state from the tail of the chapter
     parsed.mcState = extractFallbackMcState(content, protagonistName);
+  } else if (isTemplateMcState(parsed.mcState)) {
+    // AI returned abstract reflection — replace with concrete physical extract
+    const concrete = extractConcreteMcStateFromTail(content, protagonistName);
+    if (concrete) parsed.mcState = concrete;
+    else parsed.mcState = extractFallbackMcState(content, protagonistName);
   }
 
   if (!allowEmptyCliffhanger && !safeStringTrim(parsed.cliffhanger)) {
     parsed.cliffhanger = extractFallbackCliffhanger(content);
+  } else if (!allowEmptyCliffhanger && isTemplateCliffhanger(parsed.cliffhanger)) {
+    // AI returned ego-declaration — replace with concrete event from tail
+    const concrete = extractConcreteEventFromTail(content);
+    if (concrete) parsed.cliffhanger = concrete;
+    else parsed.cliffhanger = extractFallbackCliffhanger(content);
   }
 
   return parsed;
@@ -287,8 +512,8 @@ export async function generateSummaryAndCharacters(
 {
   "summary": "tóm tắt 2-3 câu",
   "openingSentence": "câu mở đầu chương (nguyên văn)",
-  "mcState": "trạng thái ${protagonistName} cuối chương (cảnh giới, vị trí, tình trạng)",
-  "cliffhanger": "tình huống chưa giải quyết cuối chương",
+  "mcState": "VẬT LÝ — ${protagonistName} ĐANG Ở ĐÂU + ĐANG CẦM/LÀM GÌ + AI ĐỨNG CẠNH (cuối chương). KHÔNG mô tả tâm trạng/cảm xúc/suy nghĩ — chỉ position + active object/action.",
+  "cliffhanger": "SỰ KIỆN BÊN NGOÀI cụ thể vừa xảy ra ở cuối chương: ai vừa nói/làm gì cụ thể, hoặc vật/sound/sight bất ngờ xuất hiện, hoặc MC vừa quyết định hành động với thời gian+địa điểm+người cụ thể, hoặc tin nhắn/cú điện thoại nội dung gì.",
   "characters": [
     {
       "character_name": "TÊN RIÊNG đầy đủ (VD: 'Lâm Phong', 'Aria'). CẤM số, mã code, nhãn chung",
@@ -312,9 +537,23 @@ ${midSnippet ? `\n[GIỮA CHƯƠNG]\n${midSnippet}` : ''}
 [KẾT CHƯƠNG]
 ${tailSnippet}
 
-QUY TẮC:
-- CLIFFHANGER: Nếu không phải finale, KHÔNG để rỗng. Trích đúng tình huống căng thẳng cuối chương.
-- CHARACTERS: Chỉ nhân vật CÓ TÊN RIÊNG thực sự. CẤM số, mã code, mô tả chung.`;
+QUY TẮC mcState (CONCRETE PHYSICAL):
+- ĐÚNG: "${protagonistName} đang đứng trong phòng họp tầng 32 toà Vạn Thái, tay cầm hợp đồng vừa ký, đối diện CEO Phạm An gật đầu."
+- ĐÚNG: "${protagonistName} ngồi giường bệnh viện, băng tay trái, mẹ ngồi ghế cạnh giường, bác sĩ vừa rời phòng."
+- SAI: "${protagonistName} đang chuẩn bị tâm thế bước vào cuộc chiến mới." (tâm trạng — KHÔNG được lấy)
+- SAI: "${protagonistName} nhìn xa xăm, trong lòng tự nhủ..." (nội tâm — KHÔNG được lấy)
+
+QUY TẮC cliffhanger (CONCRETE EVENT):
+- Nếu không phải finale, KHÔNG để rỗng.
+- ĐÚNG: "Trợ lý gõ cửa, đưa phong bì niêm phong từ chủ tịch Lý Vạn Lâm."
+- ĐÚNG: "Điện thoại reo, màn hình hiện tên 'Phụng' — vợ ${protagonistName} đã 3 năm không liên lạc."
+- ĐÚNG: "${protagonistName} quyết định 7h sáng mai sẽ tới biệt thự Lý gia gặp lão Lý chốt deal."
+- SAI: "Ván cờ sinh tử bây giờ mới thật sự bắt đầu." (tuyên ngôn trừu tượng — KHÔNG được lấy)
+- SAI: "Hắn là ${protagonistName}, đây là thế giới của hắn." (ego declaration — KHÔNG lấy)
+- SAI: "Đối với ${protagonistName}, đây chỉ mới là khởi đầu." (abstract — KHÔNG lấy)
+- Nếu chương kết bằng tuyên ngôn trừu tượng → trích sự kiện cụ thể 2-3 đoạn TRƯỚC tuyên ngôn đó.
+
+CHARACTERS: Chỉ nhân vật CÓ TÊN RIÊNG thực sự. CẤM số, mã code, mô tả chung.`;
 
   const res = await callGemini(prompt, { ...config, temperature: 0.1, maxTokens: 2048 }, { jsonMode: true, tracking: options?.projectId ? { projectId: options.projectId, task: 'combined_summary', chapterNumber } : undefined });
   const parsed = parseJSON<CombinedAIResponse>(res.content);
@@ -326,16 +565,37 @@ QUY TẮC:
 
   const allowEmptyCliffhanger = options?.allowEmptyCliffhanger === true;
   const openingSentence = coerceText(parsed.openingSentence);
-  const mcState = coerceText(parsed.mcState);
-  const cliffhanger = coerceText(parsed.cliffhanger);
+  const rawMcState = coerceText(parsed.mcState);
+  const rawCliffhanger = coerceText(parsed.cliffhanger);
+
+  // Phase Q 2026-05-13 root-cause fix: sanitize template patterns so they don't
+  // propagate forward into next chapter's bridge context. Without this, AI's
+  // tendency to write "ego declaration" endings + capture them as cliffhanger
+  // creates a compounding cycle (template ending → template cliffhanger →
+  // bridge tells next architect to continue reflection → static opening).
+  let finalMcState = rawMcState;
+  if (!rawMcState) {
+    finalMcState = extractFallbackMcState(content, protagonistName);
+  } else if (isTemplateMcState(rawMcState)) {
+    const concrete = extractConcreteMcStateFromTail(content, protagonistName);
+    finalMcState = concrete || extractFallbackMcState(content, protagonistName);
+  }
+
+  let finalCliffhanger = rawCliffhanger;
+  if (!rawCliffhanger) {
+    finalCliffhanger = allowEmptyCliffhanger ? '' : extractFallbackCliffhanger(content);
+  } else if (!allowEmptyCliffhanger && isTemplateCliffhanger(rawCliffhanger)) {
+    const concrete = extractConcreteEventFromTail(content);
+    finalCliffhanger = concrete || extractFallbackCliffhanger(content);
+  }
 
   // Build summary — use safeStringTrim because AI may return non-string values
   // for fields typed as string (object/array/null) which would crash .trim().
   const summary: ChapterSummary = {
     summary: parsedSummary,
     openingSentence: openingSentence || content.slice(0, 160).trim(),
-    mcState: mcState || extractFallbackMcState(content, protagonistName),
-    cliffhanger: cliffhanger || (allowEmptyCliffhanger ? '' : extractFallbackCliffhanger(content)),
+    mcState: finalMcState,
+    cliffhanger: finalCliffhanger,
   };
 
   return {

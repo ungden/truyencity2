@@ -46,7 +46,7 @@ import type {
 } from '../types';
 import type { SceneType, VocabularyGuide } from '../templates/style-bible';
 import { VN_PLACE_LOCK, ARCHITECT_SYSTEM, WRITER_SYSTEM, CRITIC_SYSTEM } from './chapter-writer-prompts';
-import { cleanContent, extractTitle, synthesizeFallbackCliffhanger, hasCliffhangerSignal, analyzeQualitySignals, buildSignalReport, countWords, detectHardFallback, detectMcNameFlip, detectSevereRepetition, detectShortFormCharacterName, buildRepetitionReport, generateMinimalScenes, loadConstraintSection, safeStringTrim, type QualitySignals } from './chapter-writer-helpers';
+import { cleanContent, extractTitle, synthesizeFallbackCliffhanger, hasCliffhangerSignal, analyzeQualitySignals, buildSignalReport, countWords, detectHardFallback, detectMcNameFlip, detectSevereRepetition, detectShortFormCharacterName, detectChapterTemplatePatterns, buildRepetitionReport, generateMinimalScenes, loadConstraintSection, safeStringTrim, type QualitySignals } from './chapter-writer-helpers';
 
 
 // ── Write Chapter ────────────────────────────────────────────────────────────
@@ -186,6 +186,21 @@ export async function writeChapter(
       if (hardFailReason) {
         rewriteInstructions = `HARD-FAIL: ${hardFailReason}. KHÔNG được lặp setup. Chương phải narrate đúng các sự kiện trong outline, KHÔNG chèn padding hồi tưởng. Brief đã liệt kê hành động cụ thể — viết chính xác hành động đó, KHÔNG lan man về kiếp trước / golden finger.`;
         console.warn(`[Writer] Hard-fail attempt ${attempt + 1}/${maxRetries}: ${hardFailReason}`);
+        continue;
+      }
+
+      // Phase Q 2026-05-13 root-cause fix: post-write deterministic gate that
+      // rejects template chapter-endings ("ván cờ sinh tử bắt đầu", "hắn là X,
+      // đây là thế giới của hắn", "một bản hùng ca sẽ được viết", v.v.) AND
+      // template static openings ("[setting tả thiết lập] + MC bất động + quan
+      // sát + suy ngẫm"). User audit confirmed these patterns are baseline
+      // every chapter despite Architect/Critic prompt rules — Gemini Flash
+      // Lite's training data is saturated with TQ webnovel chapters ending
+      // this way. Hard regex catches them before publishing.
+      const templateReason = detectChapterTemplatePatterns(content);
+      if (templateReason) {
+        rewriteInstructions = `TEMPLATE PATTERN HARD-FAIL: ${templateReason} VIẾT LẠI:\n• ENDING (3 câu cuối): KHÔNG dùng "ván cờ / trò chơi / cuộc chiến / kỷ nguyên / bản hùng ca / cái tên ... mới thật sự / chính thức / chuẩn bị bắt đầu". KHÔNG "hắn là X, đây là thế giới của hắn". KẾT bằng EVENT cụ thể (điện thoại reo + tên người gọi, tin nhắn nội dung, vật xuất hiện trên bàn) HOẶC DECISION cụ thể ("sáng mai 7h tới X gặp Y").\n• OPENING (100 từ đầu): KHÔNG bắt đầu bằng tả thiết lập tĩnh + MC bất động + quan sát + suy ngẫm. MỞ bằng action concrete — MC đang đi/gọi/mở/ra lệnh/viết/gõ/cầm vật cụ thể.`;
+        console.warn(`[Writer] Template-pattern hard-fail attempt ${attempt + 1}/${maxRetries}: ${templateReason.slice(0, 200)}`);
         continue;
       }
     }

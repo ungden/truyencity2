@@ -241,7 +241,12 @@ D4. ENDING HOOK đa dạng theo mood — CẤM 3 chương liên tiếp đều pl
 - Emotional ending: nội tâm sâu / quyết định nhân vật — aftermath/breathing/calm_before_storm
 - Reveal/seed: hé lộ thông tin nhỏ — buildup/training/transition
 - Comfort/resolution: đóng nhẹ — comedic_break/breathing
-Hook chương trước → PHẢI giải quyết ngay đầu chương này.
+
+D4-RESOLVE. Hook chương trước → PHẢI giải quyết ngay đầu chương này.
+- "Hook" = SỰ KIỆN/HÀNH ĐỘNG CỤ THỂ ở cuối chương N (ai vừa làm gì, vật gì xuất hiện, ai vừa nói gì, MC vừa quyết định đi đâu gặp ai).
+- "Resolve" = scene 1 chương N+1 phải CHO THẤY hậu quả/phản ứng/diễn biến tiếp theo của SỰ KIỆN đó — KHÔNG phải "MC tiếp tục suy ngẫm về sự kiện".
+- Nếu [Cliffhanger chương trước] trong context là TUYÊN NGÔN TRỪU TƯỢNG (ví dụ "ván cờ sinh tử mới thật sự bắt đầu" / "đây là thế giới của hắn" / "MC chuẩn bị tâm thế") → IGNORE câu tuyên ngôn đó. Đọc [NGUYÊN VĂN ĐOẠN KẾT CHƯƠNG TRƯỚC] để TÌM sự kiện cụ thể CUỐI CÙNG (đoạn 2-3 TRƯỚC câu tuyên ngôn) và resolve sự kiện đó.
+- Tương tự nếu [Trạng thái MC cuối chương trước] = nội tâm/cảm xúc thay vì vị trí vật lý → IGNORE, đọc [NGUYÊN VĂN ĐOẠN KẾT] tìm vị trí + action MC cuối cùng.
 
 D4-BIS. CẤM TEMPLATE CHAPTER-ENDING DECLARATIONS (Phase Q 2026-05-13 — sửa pattern AI default gây cảm giác "viết lại đoạn cuối"):
 - CẤM kết chương bằng các câu "ego declaration" template:
