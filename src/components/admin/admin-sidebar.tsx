@@ -22,6 +22,7 @@ import {
   DollarSign,
   AlertCircle,
   Target,
+  Power,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -94,6 +95,11 @@ const menuItems: MenuItem[] = [
     title: 'Production Report',
     href: '/admin/production-report',
     icon: ClipboardList,
+  },
+  {
+    title: 'Quản lý sản xuất',
+    href: '/admin/production-toggle',
+    icon: Power,
   },
   {
     title: 'Stuck Novels',
