@@ -1230,3 +1230,201 @@ npm test                                                               # jest 81
 # Watch
 curl -H "Authorization: Bearer $CRON_SECRET" https://truyencity.com/api/cron/quality-trend  # daily quality drift check + auto-revision
 ```
+
+---
+
+## Phase Q Details (2026-05-12) — DeepSeek → Gemini swap + flag-based 50 ch/day automation
+
+Branch: `codex/story-production-automation` → PR [#54](https://github.com/ungden/truyencity2/pull/54).
+Commits in order: `9927022 f2a50e8 81f4094 2ab59f7 805eca2 c31b70a 8a6eda6` (+ further work).
+
+### Production model stack — GEMINI ONLY
+
+| Tier | Model | Use |
+|---|---|---|
+| Creative setup (Pro) | `gemini-3-flash-preview` (thinking=high) | stage_idea / stage_world / stage_character / master_outline / story_outline / story_bible / arc_plan |
+| Volume writer (Flash) | `gemini-3.1-flash-lite` (non-thinking) | architect / writer / writer_continuation / critic / continuity_guardian / auto_revision + setup_description + every memory/state extraction task |
+| Cover generator | **Codex CLI built-in image tool** (NOT Gemini Image) | All cover generation flows |
+| Embeddings | `gemini-embedding-001` (unchanged) | RAG vectors 768d |
+
+**DeepSeek removed from production routing.** The DeepSeek adapter (`utils/deepseek.ts`) and `deepseek-` prefixed model strings in `lib/types/ai-providers.ts` are kept as UI options + emergency fallback only — no default code path reaches them.
+
+Reason for swap (validated head-to-head on identical Gemini-Pro-generated setup):
+- DeepSeek Flash chapter writer: 0/5 chapters published after 3 retries each, overallScore=3, persistent `xu/nguyên` TQ-style currency Critic could not correct.
+- DeepSeek Pro setup: world stage hung 20.8 min → fetch timeout (unusable).
+- Gemini Pro setup: 3.5 min full 7-stage pipeline.
+- Gemini Flash Lite chapter writer: 5/5 chapters published, 16,857 words, clean Vietnamese.
+
+### Thinking control (Gemini 3 only)
+
+Per-task `thinkingConfig` in `utils/gemini.ts`:
+- Setup creative tasks → `GEMINI_THINKING_LEVEL` env || `high`.
+- Chapter-writing tasks (architect/writer/writer_continuation/critic/continuity_guardian/auto_revision) → `GEMINI_CHAPTER_THINKING_LEVEL` env || `low`.
+- `low` is correct default for chapter volume: thinking model burns hidden reasoning tokens against `maxOutputTokens`; with `high` we observed Architect JSON truncating at ~500 chars on every retry. `low` finishes cleanly with full JSON.
+- Gemini 3 temperature pinned at 1.0 regardless of caller (per Google guidance — lower temps cause looping).
+- Fetch timeout bumped 120s → 240s for thinking-model latency.
+
+### Critic recalibration for natural Vietnamese (don't fight what the model produces well)
+
+1. **Structural connectives** (`là một / bắt đầu / mang theo / tỏa ra / dường như / như thể / đôi mắt`) reclassified `structural_connective` with threshold **22 critical / 16 moderate** (was generic 8/5). These recur naturally in 2800-word chapters; treating them as AI-tells was over-strict.
+2. **AI-tell từ** kept strict (`tím sẫm / vàng kim / kinh hoàng / rực rỡ / lạnh lẽo / run rẩy / ken két / mờ ảo / đặc quánh / bùng phát`): 8 critical / 5 moderate.
+3. **VND `xu` regex** now ignores `xu hướng / xu thế / xu nịnh / xu hào / xu chiến / xu cách / xu hoàng / xu hư / xu niêng` via negative-lookahead carve-out (was false-positive blocking valid Vietnamese phrases).
+4. **BENEFIT_KEYWORDS** expanded to cover survival/cultivation/magic vocabulary (`lương thực / nhu yếu phẩm / đồ ăn / thuốc / vũ khí / đạn / súng / nước sạch / năng lượng / lãnh thổ / kho / hầm / công nghệ / drone / cảm biến / linh lực / nội lực / pháp bảo / công pháp / huyết mạch / đan dược / linh thạch / spirit / mana / aura`) so non-business genres pass setup gate.
+5. **Cast roster detector** filters added: brand suffixes (`Logistics / Ranger / Submariner / Inc / Ltd / Corp / Group / Vinmart / Apple / Samsung`), country/region tokens (`Phù Tang / Tây Âu / Đại Hàn / Hoa Kỳ / Trung Quốc / Đảo Quốc / Vương Quốc / Đế Quốc / Cộng Hòa`), familial honorifics (`Cậu / Chú / Bác / Anh / Chị / Em / Cô / Ông / Bà / Cha / Mẹ / Bố`), verb prefixes (`Thấy / Nhìn / Nghe / Gặp / Hỏi / Đáp / Gọi / Nói / Trông / Chạy / Đi / Đến / Tới / Bước / Ngồi / Đứng / Lại / Quay / Theo / Cùng`), and English-only compound names. Stops the gate from flagging "Ford Ranger" / "Vành Đai Ba" / "Cậu Hạo" / "Thấy Lương Hạo" as invented characters.
+6. **`evaluateBlueprintAlignment`** now gated by `shouldRequireChapterBlueprint` in `causal-logic-check.ts`. Projects with `style_directives.require_full_chapter_blueprint=false` skip the goal-mismatch check (mass-instantiated template briefs don't match individually-crafted master_outlines).
+
+### Webnovel full-name convention (Vietnamese-specific)
+
+Vietnamese natural speech uses personal name only (`Hạo`); webnovel authors deliberately use full họ+tên (`Lương Hạo`) for reader memory over 1000+ chapters. Engine was previously enforcing the OPPOSITE — that rule is now reversed:
+
+- Writer prompt: target **60-100 lần họ+tên/10K chữ**. Dialogue thường also uses full name (`— Lương Hạo, anh đang làm gì?` not `— Hạo, anh đang làm gì?`). Tên cụt CHỈ trong moment cảm xúc cao vợ/anh em ruột.
+- Critic prompt: tên MC lặp nhiều = mục tiêu, KHÔNG flag. Only flag (a) dùng tên cụt trong narration → moderate, (b) ≥3 câu liên tiếp y nguyên không xen đại từ → minor, (c) name flip giữa chương → critical.
+- Deterministic detector `detectShortFormCharacterName()` in `chapter-writer-helpers.ts`: compares full-name vs standalone last-token occurrences via negative-lookbehind; flags moderate at ≥50% short-form ratio, minor at ≥30%.
+
+### Production opt-in: `style_directives.production_enabled` flag (Phase Q gate)
+
+Switched from hardcoded UUID allowlist (`DEFAULT_FOCUSED_PROJECT_IDS`) → per-project JSONB flag. Adding a novel to production = one CLI call or one click in admin UI; no source edit / no deploy.
+
+**Cron filter** in `/api/cron/write-chapters`:
+```ts
+.or('style_directives->>production_enabled.eq.true,id.in.(<legacyFocusedIds>)')
+```
+Legacy `FOCUSED_PROJECT_IDS` env still works as an emergency-only allowlist (OR'd with the flag). Default list empty post-Phase-Q.
+
+**Toggle on side-effects** (CLI + admin API + drive scripts share this):
+- `status='active'`, clear `pause_reason`
+- `ai_model='gemini-3.1-flash-lite'` (if currently a deepseek-* model)
+- `style_directives.production_daily_chapter_quota=50` (if not already set)
+- `style_directives.production_enabled=true`
+- Seed today's `project_daily_quotas` row at `target=50, written=current_chapter, status='active'` (idempotent)
+
+**Toggle off**: just flips `production_enabled=false`; cron ignores on next tick.
+
+### CLI: `scripts/toggle-production.ts`
+
+```bash
+npx tsx scripts/toggle-production.ts list                     # show all enabled
+npx tsx scripts/toggle-production.ts list --status=active     # filter by status
+npx tsx scripts/toggle-production.ts <projectId> on           # opt in (+ side effects)
+npx tsx scripts/toggle-production.ts <projectId> off          # opt out
+```
+
+### Admin UI: `/admin/production-toggle` (sidebar: "Quản lý sản xuất")
+
+- Form to enable a project by UUID (Enter to submit) → cron pickup next tick.
+- Aggregate progress bar (total written/total target today across all enabled novels).
+- Per-project card: title + UUID, status + ai_model badges, chapter progress, quota progress, last error preview, pause_reason warning, Switch toggle to disable.
+- API:
+  - `GET  /api/admin/production-toggle` → list enabled + today's quota
+  - `POST /api/admin/production-toggle { projectId, enabled }` → flip flag
+- Auth: standard `isAuthorizedAdmin`.
+
+### Defaults flipped (Phase Q)
+
+| Setting | Old | New |
+|---|---|---|
+| `FALLBACK_DAILY_CHAPTER_QUOTA` | 20 | **50** |
+| `STORY_PRODUCTION_PAUSED` (default) | true (engine-repair freeze) | **false** (set `=1` to pause) |
+| `DEFAULT_FOCUSED_PROJECT_IDS` | 10 hardcoded UUIDs | **empty array** (use flag instead) |
+| `MODEL_PRO` | `deepseek-v4-pro` | **`gemini-3-flash-preview`** (thinking=high) |
+| `MODEL_FLASH` | `deepseek-v4-flash` | **`gemini-3.1-flash-lite`** (non-thinking) |
+| `DEFAULT_CONFIG.model` | `deepseek-v4-flash` | **`gemini-3.1-flash-lite`** |
+
+### DB migration
+
+`scripts/_migrate-to-gemini.ts` flipped 773 projects: `ai_model deepseek-* → gemini-3.1-flash-lite`. After-state: 773 on flash-lite + 227 on flash-preview (legacy from earlier tests). No null `ai_model` rows on active projects.
+
+### Cover generation: Codex CLI only
+
+User bought full Codex package. **Gemini Image API hard-disabled** at two layers:
+
+1. `GeminiImageService.generateImage()` short-circuits with `{success:false, error:'...use Codex CLI...'}`. Every caller (novel-enricher, ai-image jobs, generate-covers cron) gets the structured failure and handles gracefully.
+2. `/api/cron/generate-covers` GET returns `{success:true, skipped:true}` on every tick — pg_cron stays green, no API call.
+
+Emergency override: `ALLOW_GEMINI_IMAGE=1` env bypasses both gates (one-off debugging only).
+
+**Cover workflow** (only path supported now):
+
+```bash
+# Single
+npm run codex:automation -- prepare-cover --novel-id=<id>
+codex exec --skip-git-repo-check --sandbox workspace-write \
+  "Đọc <runDir>/prompt.md, tạo cover.png 3:4 1086×1448"
+npm run codex:automation -- apply-cover --run-dir=<runDir> --apply
+
+# Bulk by pause_reason
+bash scripts/codex-bulk-cover.sh --apply --pause-reason=<reason>
+```
+
+### Phase Q novels in production (as of 2026-05-12)
+
+4 projects with `production_enabled=true`:
+
+| Project | Novel | Genre | Status |
+|---|---|---|---|
+| `c97b1d28` | Mạt Thế: Ta Có Hầm Trú Ẩn Vạn Năng | mat-the | writing, ch.5/1000 (16,857w) |
+| `d0b02bf3` | Xuyên Việt Lãnh Chúa: Khai Cục Mở Mỏ Muối | di-gioi | idea (waiting for cron after PR merge) |
+| `f783a0ae` | Hoang Cổ Bộ Lạc: Ta Làm Tù Trưởng Cách Mạng | di-gioi | idea (waiting for cron) |
+| `cf63c678` | Văn Đạo Phong Thần: Ta Viết Tiểu Thuyết, Cả Dị Giới Lĩnh Ngộ Tuyệt Kỹ | di-gioi | world (reset of "Thiên Đạo Thư Viện: Ta Dùng Văn Minh Trái Đất Phong Thần") |
+
+All 4 have Codex-generated covers (3:4 ratio 1086×1448 PNG, uploaded to Supabase Storage). Mạt Thế retains its original Gemini-Image cover from before the disable.
+
+### Spawn scripts shipped Phase Q
+
+- `scripts/spawn-mat-the-ham-tru-an.ts` — single-novel spawn, idempotent slug-check
+- `scripts/spawn-phase-q-trio.ts` — 3-novel batch (2 spawn + 1 reset of cf63c678); each seed has 600-700 char description + ~3000 char world_description with explicit Phase 1-4 playground roadmap, cosmic reveal endgame, VN MC names
+- `scripts/_migrate-to-gemini.ts` — DB ai_model flip
+- `scripts/_setup-mat-the-quota.ts` — today's quota row seed (template for one-off bootstraps)
+
+### Drive scripts shipped Phase Q (debugging / manual override)
+
+- `scripts/_drive-mat-the-gemini.ts` — end-to-end: seed → setup pipeline → write N chapters, all via Gemini routing
+- `scripts/_continue-mat-the-write.ts` — chapter-only continuation after setup done
+- `scripts/_drive-deepseek-chapters.ts` — DeepSeek chapter writer (parity test; produced 0/5 chapters due to xu/nguyên leak)
+- `scripts/_drive-gemini-setup.ts` — setup-only via Gemini
+- `scripts/_drive-test-setup.ts` — setup-only via DeepSeek (timed out at world stage; preserved for diagnostic)
+- `scripts/_audit-mat-the.ts` — dump all chapters + run aggregate repetition metrics
+
+### Verification checklist
+
+```bash
+npx tsc --noEmit                                              # ✓ pass
+npx jest                                                       # ✓ 291/291
+npx tsx scripts/toggle-production.ts list                      # show enabled novels
+curl https://truyencity.com/admin/production-toggle            # admin UI
+```
+
+### Open questions / known issues
+
+1. **`story_outline` schema thin warning** fires for all 4 Phase Q novels (`yielded 0 fields (only header)`). Engine falls back to `world_description` for premise grounding. The Pro stage_idea kernel only populates `setupKernel`, not `premise/mainConflict/themes/majorPlotPoints` fields the assembler expects. Either pre-flight `runStageStoryOutline` needs to run BEFORE chapter writing, or the assembler should accept `setupKernel` as canonical premise.
+2. **`cost_tracking` rows not appearing for Gemini path** — `trackCost` fires but writes appear empty in DB queries. Pricing table has Gemini models; suspect insert is silently failing. Needs investigation.
+3. **3 Phase Q novels stuck pre-writing** until PR #54 merges to main and Vercel redeploys. The `production_enabled` JSONB filter is only on the branch; main's cron still uses the legacy hardcoded UUID gate.
+4. **`gemini-3-flash-preview` truncates Architect JSON ~500 chars** on chapters past ch.3 with full context (thinking=high or low). Workaround: chapter-writing tasks routed to `gemini-3.1-flash-lite` (non-thinking). Root cause unknown — likely model-side quirk specific to large multi-step prompts. If using thinking model for chapter tasks in future, add response-shape logging in `callGemini` to capture `finishReason` + raw response for diagnosis.
+
+### Daily commands (Phase Q)
+
+```bash
+# Add a novel to 50 ch/day pipeline
+npx tsx scripts/toggle-production.ts <projectId> on
+
+# Remove
+npx tsx scripts/toggle-production.ts <projectId> off
+
+# Status
+npx tsx scripts/toggle-production.ts list
+npx tsx scripts/toggle-production.ts list --status=active
+
+# Cover (single)
+npm run codex:automation -- prepare-cover --novel-id=<id>
+codex exec --skip-git-repo-check --sandbox workspace-write "Đọc <runDir>/prompt.md, tạo cover.png 3:4 1086×1448"
+npm run codex:automation -- apply-cover --run-dir=<runDir> --apply
+
+# Watch production
+# /admin/production-toggle  (manual handle)
+# /admin/production-report  (historical metrics)
+```
+
+---
+
+**Last Updated**: 2026-05-12 (Phase Q — DeepSeek→Gemini swap + flag-based production)
+
