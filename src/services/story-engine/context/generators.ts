@@ -67,7 +67,13 @@ interface ArcPlanAIResponse {
 }
 
 const ARC_SECRET_LEAK_RE = /(tổ\s*chức|thế\s*lực|người\s*lạ|kẻ\s*lạ|đối\s*thủ|nhân\s*vật\s+bí\s*ẩn)[^.!?\n]{0,100}(theo\s*dõi|biết|phát\s*hiện|nhận\s*ra|săn\s*lùng)[^.!?\n]{0,100}(trọng\s*sinh|hệ\s*thống|bàn\s*tay\s*vàng|golden\s*finger|bí\s*mật|năng\s*lực\s+thật)/i;
-const CONCRETE_BENEFIT_RE = /(tiền|doanh\s*thu|tài\s*nguyên|skill|kỹ\s*năng|công\s*nhận|uy\s*tín|quan\s*hệ|network|thông\s*tin|insight|manh\s*mối|đột\s*phá|level|cảnh\s*giới|khách|đơn\s*hàng|hợp\s*đồng|vật\s*phẩm|item|kinh\s*nghiệm|bảo\s*vệ)/i;
+// 2026-05-12 (Phase Q): widened to match BENEFIT_KEYWORDS in
+// setup-quality-gate.ts (PR #57). Previous narrow set was rejecting valid
+// chapter briefs for di-gioi/writer/lord/mat-the novels where Pro setup
+// model uses terms like "lợi nhuận / văn khí / tinh thạch / lãnh địa /
+// danh tiếng" that weren't matched. Same root cause as the setup kernel
+// validator — keep the two regexes in sync.
+const CONCRETE_BENEFIT_RE = /(tiền|doanh\s*thu|doanh\s*số|lợi\s*nhuận|tài\s*nguyên|tài\s*sản|wealth|gold|vàng|skill|kỹ\s*năng|công\s*nhận|uy\s*tín|danh\s*tiếng|fame|quan\s*hệ|network|thông\s*tin|insight|manh\s*mối|đột\s*phá|level|cảnh\s*giới|khách|đơn\s*hàng|hợp\s*đồng|hàng\s*hóa|sản\s*phẩm|thị\s*trường|vật\s*phẩm|item|kinh\s*nghiệm|lương\s*thực|nhu\s*yếu\s*phẩm|đồ\s*ăn|thuốc|vũ\s*khí|đạn|súng|nước\s+sạch|năng\s*lượng|lãnh\s*thổ|lãnh\s*địa|lương\s*dân|trung\s*thành|loyalty|đệ\s*tử|đồ\s*đệ|độc\s*giả|fan|fanbase|kho|hầm|công\s*nghệ|drone|cảm\s*biến|linh\s*lực|nội\s*lực|pháp\s*bảo|công\s*pháp|huyết\s*mạch|đan\s*dược|linh\s*thạch|tinh\s*thạch|quặng|khoáng|văn\s*khí|văn\s*đạo|văn\s*chương|sách|spirit|mana|aura|bảo\s*vệ)/i;
 
 function coerceText(value: unknown): string {
   if (typeof value === 'string') return value.trim();
@@ -607,7 +613,10 @@ Trả về JSON:
   // Phase 23 fix: bumped 4096 → 16384. Q4 scene-level schema (chapter_briefs with scenes[],
   // callbacks, foreshadow_plant/payoff per chapter) easily exceeds 4096 tokens for 20-chapter
   // arc → JSON parse error from truncated output. 16K fits comfortably.
-  const res = await callGemini(prompt, { ...config, temperature: 0.3, maxTokens: 16384 }, { jsonMode: true, tracking: { projectId, task: 'arc_plan' } });
+  // Phase Q (2026-05-12): bumped 16384 → 32768 — saw Hoang Cổ truncate mid
+  // plan_text at ~16K with gemini-3.1-flash-lite. Flash Lite supports 65K
+  // output so 32K gives 2x headroom for verbose Vietnamese arc descriptions.
+  const res = await callGemini(prompt, { ...config, temperature: 0.3, maxTokens: 32768 }, { jsonMode: true, tracking: { projectId, task: 'arc_plan' } });
   const parsed = parseJSON<ArcPlanAIResponse>(res.content);
   if (!parsed || !parsed.plan_text?.trim()) {
     throw new Error(`Arc plan generation failed: JSON parse error — raw: ${res.content.slice(0, 200)}`);
