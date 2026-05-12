@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAuthorizedAdmin } from '@/lib/auth/admin-auth';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
+import { computeRevenue, roundBucket, round4 } from '@/lib/admin/revenue';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
+
+type CostBucket = { today: number; week: number; month: number; total: number };
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,123 +17,142 @@ export async function GET(request: NextRequest) {
 
     const supabase = getSupabaseAdmin();
 
-    // Run 4 queries in parallel
-    const [dailyResult, taskResult, totalsResult, chapterCostResult] = await Promise.all([
-      // 1. Daily totals (last 30 days) — RPC may not exist, handle gracefully
-      supabase.rpc('get_daily_cost' as never).then(
-        (r: { data: unknown; error: unknown }) => r,
-        () => ({ data: null, error: null }),
-      ),
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayStartIso = todayStart.toISOString();
+    const weekAgoIso = new Date(Date.now() - 7 * 86_400_000).toISOString();
+    const monthAgoIso = new Date(Date.now() - 30 * 86_400_000).toISOString();
 
-      // 2. Task breakdown (last 7 days) — raw SQL via cost_tracking
+    const [
+      taskResult,
+      totalCostResult,
+      todayCostResult,
+      weekCostResult,
+      monthCostResult,
+      chapterCostResult,
+      chaptersTodayResult,
+      revenue,
+    ] = await Promise.all([
       supabase
         .from('cost_tracking')
         .select('task, input_tokens, output_tokens, cost')
-        .gte('created_at', new Date(Date.now() - 7 * 86400000).toISOString()),
+        .gte('created_at', weekAgoIso),
 
-      // 3. Running totals
       supabase
         .from('cost_tracking')
         .select('input_tokens, output_tokens, cost'),
 
-      // 4. Chapter count last 7 days (for cost-per-chapter)
+      supabase
+        .from('cost_tracking')
+        .select('cost')
+        .gte('created_at', todayStartIso),
+
+      supabase
+        .from('cost_tracking')
+        .select('cost')
+        .gte('created_at', weekAgoIso),
+
+      supabase
+        .from('cost_tracking')
+        .select('cost')
+        .gte('created_at', monthAgoIso),
+
       supabase
         .from('chapters')
         .select('id', { count: 'exact', head: true })
-        .gte('created_at', new Date(Date.now() - 7 * 86400000).toISOString()),
+        .gte('created_at', weekAgoIso),
+
+      supabase
+        .from('chapters')
+        .select('id', { count: 'exact', head: true })
+        .gte('created_at', todayStartIso),
+
+      computeRevenue(supabase),
     ]);
 
-    // Aggregate task breakdown manually
-    const taskMap = new Map<string, { calls: number; input_tokens: number; output_tokens: number; cost: number }>();
+    const taskMap = new Map<
+      string,
+      { calls: number; input_tokens: number; output_tokens: number; cost: number }
+    >();
     if (taskResult.data) {
       for (const row of taskResult.data) {
-        const existing = taskMap.get(row.task) || { calls: 0, input_tokens: 0, output_tokens: 0, cost: 0 };
+        const k = row.task as string;
+        const existing = taskMap.get(k) || {
+          calls: 0,
+          input_tokens: 0,
+          output_tokens: 0,
+          cost: 0,
+        };
         existing.calls++;
-        existing.input_tokens += row.input_tokens || 0;
-        existing.output_tokens += row.output_tokens || 0;
+        existing.input_tokens += (row.input_tokens as number) || 0;
+        existing.output_tokens += (row.output_tokens as number) || 0;
         existing.cost += parseFloat(String(row.cost)) || 0;
-        taskMap.set(row.task, existing);
+        taskMap.set(k, existing);
       }
     }
     const taskBreakdown = Array.from(taskMap.entries())
       .map(([task, stats]) => ({ task, ...stats }))
       .sort((a, b) => b.cost - a.cost);
 
-    // Aggregate totals
+    const sumCost = (rows: Array<{ cost: unknown }> | null): number =>
+      (rows || []).reduce((s, r) => s + (parseFloat(String(r.cost)) || 0), 0);
+
     let totalInputTokens = 0;
     let totalOutputTokens = 0;
     let totalCost = 0;
     let totalCalls = 0;
-    if (totalsResult.data) {
-      for (const row of totalsResult.data) {
-        totalInputTokens += row.input_tokens || 0;
-        totalOutputTokens += row.output_tokens || 0;
+    if (totalCostResult.data) {
+      for (const row of totalCostResult.data) {
+        totalInputTokens += (row.input_tokens as number) || 0;
+        totalOutputTokens += (row.output_tokens as number) || 0;
         totalCost += parseFloat(String(row.cost)) || 0;
         totalCalls++;
       }
     }
 
-    // Today and period costs from task data
-    const now = new Date();
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
-    const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString();
-    const monthAgo = new Date(Date.now() - 30 * 86400000).toISOString();
+    const costBucket: CostBucket = {
+      today: round4(sumCost(todayCostResult.data)),
+      week: round4(sumCost(weekCostResult.data)),
+      month: round4(sumCost(monthCostResult.data)),
+      total: round4(totalCost),
+    };
 
-    let todayCost = 0;
-    let weekCost = 0;
-    let monthCost = 0;
-    if (totalsResult.data) {
-      for (const row of totalsResult.data) {
-        const cost = parseFloat(String(row.cost)) || 0;
-        // We don't have created_at in the select, so use taskResult data for period breakdown
-        // For simplicity, use taskResult (7-day window) for week cost
-      }
-    }
-    // Use taskResult for week cost
-    weekCost = taskBreakdown.reduce((sum, t) => sum + t.cost, 0);
-
-    // For today cost, we need a separate query
-    const { data: todayData } = await supabase
-      .from('cost_tracking')
-      .select('cost')
-      .gte('created_at', todayStart);
-
-    if (todayData) {
-      todayCost = todayData.reduce((sum, r) => sum + (parseFloat(String(r.cost)) || 0), 0);
-    }
-
-    // Month cost
-    const { data: monthData } = await supabase
-      .from('cost_tracking')
-      .select('cost')
-      .gte('created_at', monthAgo);
-
-    if (monthData) {
-      monthCost = monthData.reduce((sum, r) => sum + (parseFloat(String(r.cost)) || 0), 0);
-    }
-
-    // Cost per chapter (7 days)
     const chaptersLast7Days = chapterCostResult.count || 0;
-    const costPerChapter = chaptersLast7Days > 0 ? weekCost / chaptersLast7Days : 0;
+    const costPerChapter = chaptersLast7Days > 0 ? costBucket.week / chaptersLast7Days : 0;
+    const chaptersToday = chaptersTodayResult.count || 0;
 
-    // Daily breakdown from RPC or manual aggregation
-    const dailyData = dailyResult.data || [];
+    const revenueTotal = roundBucket(revenue.totalUsd);
+    const profit: CostBucket = {
+      today: round4(revenueTotal.today - costBucket.today),
+      week: round4(revenueTotal.week - costBucket.week),
+      month: round4(revenueTotal.month - costBucket.month),
+      total: round4(revenueTotal.total - costBucket.total),
+    };
 
     return NextResponse.json({
       success: true,
       summary: {
-        todayCost: Math.round(todayCost * 10000) / 10000,
-        weekCost: Math.round(weekCost * 10000) / 10000,
-        monthCost: Math.round(monthCost * 10000) / 10000,
-        totalCost: Math.round(totalCost * 10000) / 10000,
+        todayCost: costBucket.today,
+        weekCost: costBucket.week,
+        monthCost: costBucket.month,
+        totalCost: costBucket.total,
         totalCalls,
         totalInputTokens,
         totalOutputTokens,
-        costPerChapter: Math.round(costPerChapter * 10000) / 10000,
+        costPerChapter: round4(costPerChapter),
         chaptersLast7Days,
+        chaptersToday,
       },
+      cost: costBucket,
+      revenue: {
+        rate: revenue.rate,
+        total: revenueTotal,
+        vipOrders: roundBucket(revenue.vipOrdersUsd),
+        creditTx: roundBucket(revenue.creditTxUsd),
+        manualAds: roundBucket(revenue.manualAdsUsd),
+      },
+      profit,
       taskBreakdown,
-      dailyData,
     });
   } catch (error) {
     console.error('[CostTracking] API error:', error);
