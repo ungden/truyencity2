@@ -782,14 +782,18 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
       // were holding, exact spatial position, last sensory beat). Was 300 chars
       // → AI restarted the scene instead of continuing it.
       parts.push(`[NGUYÊN VĂN ĐOẠN KẾT CHƯƠNG TRƯỚC — 1500 KÝ TỰ CUỐI]\n…${payload.previousEnding.slice(-1500)}`);
-      parts.push('→ Cảnh đầu chương này PHẢI tiếp diễn TRỰC TIẾP từ chính khoảnh khắc, vị trí, hành động, dialogue cuối. KHÔNG được:');
-      parts.push('  • Cho MC fade-out / time-skip / cắt sang scene khác trong scene 1.');
-      parts.push('  • Restart cảnh ("Sáng hôm sau, MC tỉnh dậy…") nếu chương trước không kết bằng MC ngủ/ngất.');
-      parts.push('  • Tóm tắt lại sự kiện chương trước qua narration / nội tâm.');
+      parts.push('→ Cảnh đầu chương này PHẢI tiếp diễn FORWARD (tiến lên về thời gian/hành động), KHÔNG được:');
+      parts.push('  • REPEAT / RESTATE / RE-FEEL trạng thái cuối ch.N. Nếu ch.N kết MC quyết định X, ch.N+1 PHẢI cho thấy HẬU QUẢ / EXECUTION của X (action thực, không phải MC suy ngẫm về quyết định đó).');
+      parts.push('  • Mở chương bằng template TĨNH: "MC đứng bất động / ngồi bất động + nhìn / quan sát + suy ngẫm + ánh sáng / không khí + mô tả thiết lập". Đây là pattern AI default mà reader CỰC GHÉT vì cảm thấy "viết lại đoạn cuối ch.N".');
+      parts.push('  • Restart cảnh ("Sáng hôm sau, MC tỉnh dậy…") nếu ch.N không kết bằng MC ngủ/ngất.');
+      parts.push('  • Tóm tắt lại sự kiện ch.N qua narration / nội tâm.');
       parts.push('  • Cho MC ở vị trí khác/trang phục khác/vũ khí khác mà không có transition rõ ràng.');
-      parts.push('  • REGRESS trust/relationship của nhân vật phụ — nếu X đã tin tưởng/quy phục/giao ước/được MC thuyết phục ở cuối chương trước, X PHẢI giữ trạng thái đó (KHÔNG reset về skeptical/cảnh giác/hostile để re-establish). Tham khảo [NHÂN VẬT HIỆN TẠI] notes phía dưới.');
-      parts.push('  • Re-introduce / re-establish supporting characters đã có scene trong chương trước — relationship đã build PHẢI được preserved + EXPANDED forward, không phải reset.');
-      parts.push('→ Trong 100 từ đầu của scene 1: phải reference ÍT NHẤT 2 micro-detail (vị trí cụ thể, vật MC đang cầm, dialogue line cuối, trạng thái cảm xúc) từ đoạn kết trên.');
+      parts.push('  • REGRESS trust/relationship của nhân vật phụ — nếu X đã tin tưởng/quy phục/giao ước/được MC thuyết phục ở cuối ch.N, X PHẢI giữ trạng thái đó (KHÔNG reset về skeptical/cảnh giác/hostile để re-establish). Tham khảo [NHÂN VẬT HIỆN TẠI] notes phía dưới.');
+      parts.push('  • Re-introduce / re-establish supporting characters đã có scene trong ch.N — relationship đã build PHẢI preserved + EXPANDED forward, không phải reset.');
+      parts.push('→ OPENING ACTIVE — trong 100 từ đầu:');
+      parts.push('  • MC PHẢI đang ACTIVELY làm gì đó (nói chuyện, thao tác, di chuyển, ra lệnh, viết, đánh, mở khóa, đặt câu hỏi). KHÔNG "đứng bất động + quan sát + suy ngẫm".');
+      parts.push('  • Có time-skip CỤ THỂ (vài phút/giờ/ngày sau) HOẶC scene-change (địa điểm khác / nhân vật mới) HOẶC continuation through ACTION (tiếp scene cuối ch.N bằng hành động kế).');
+      parts.push('  • Reference ÍT NHẤT 1 micro-detail (vị trí cụ thể, vật MC đang cầm, dialogue line cuối, trạng thái cảm xúc) từ đoạn kết ch.N để continuity rõ.');
     }
   }
 
