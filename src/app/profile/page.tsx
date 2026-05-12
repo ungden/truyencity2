@@ -24,6 +24,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useRouter } from 'next/navigation';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 import StatsTile from '@/components/profile/stats-tile';
+import { VipStatusCard } from '@/components/profile/vip-status-card';
 import { useTheme } from 'next-themes';
 
 function formatDuration(totalSeconds: number): string {
@@ -216,6 +217,8 @@ export default function ProfilePage() {
             </Badge>
           </div>
         </Card>
+
+        <VipStatusCard />
 
         <Card className="p-6">
           <h3 className="text-lg font-semibold mb-4">Thống kê đọc truyện</h3>

@@ -108,9 +108,35 @@ export function AdBanner({ slot, format = "auto", className }: AdBannerProps) {
   // Don't render if VIP or ads disabled
   if (loading || isVip || !showAds) return null;
   if (!ADSENSE_PUB_ID) return null;
-  // No real slot configured (placeholder rejected) — skip entirely instead of
-  // rendering a slot-less <ins> that AdSense rejects with HTTP 400.
-  if (!resolvedSlot) return null;
+  // No real slot configured (placeholder IDs rejected by AdSense) — fall back
+  // to House Ad (VIP upsell) so free users still see a CTA instead of nothing.
+  // Once real SLOT_MAP IDs are configured from AdSense dashboard, this branch
+  // will pass through and render real AdSense unit.
+  if (!resolvedSlot) {
+    return (
+      <div className={cn("flex flex-col items-center", className)}>
+        <Link
+          href="/pricing"
+          className={cn(
+            "w-full max-w-[600px] rounded-lg p-4 border border-purple-700/40 bg-gradient-to-r from-purple-900/30 to-pink-900/30 hover:from-purple-900/50 hover:to-pink-900/50 transition-colors block",
+            FORMAT_STYLES[format],
+          )}
+        >
+          <div className="flex items-center gap-3 h-full">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
+              <span className="text-white text-xl">👑</span>
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-purple-100">Nâng cấp VIP — Bỏ toàn bộ quảng cáo</p>
+              <p className="text-xs text-zinc-300 mt-0.5">99K/tháng · TTS không giới hạn · Tải offline · Early access</p>
+            </div>
+            <span className="text-purple-200 text-sm">&rarr;</span>
+          </div>
+        </Link>
+        <span className="mt-1.5 text-[10px] text-muted-foreground/50">Quảng cáo nội bộ</span>
+      </div>
+    );
+  }
 
   return (
     <div className={cn("flex flex-col items-center", className)}>
