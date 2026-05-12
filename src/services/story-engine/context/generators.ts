@@ -625,12 +625,25 @@ Trả về JSON:
   if (arcNumber === 1 && ARC_SECRET_LEAK_RE.test(arcPlanText)) {
     throw new Error('Arc plan generation refused: arc 1 leaks MC secret or adds mysterious tracking organization');
   }
-  const missingBenefit = (parsed.chapter_briefs || []).find((brief) => {
+  // Phase Q (2026-05-12): the mcBenefit gate previously threw and forced a
+  // retry on ANY brief with short/unrecognized benefit text. With 20 briefs
+  // per arc that's 20 chances to fail; AI variance pushes legit novels to
+  // attempts=5 → pause despite 19/20 briefs being fine. Relaxed to:
+  //   (a) shorter floor (6 chars vs 12)
+  //   (b) soft warning instead of throw — imperfect briefs still saved and
+  //       downstream writer agent handles missing context fine
+  // Hard rejection only if EVERY brief lacks mcBenefit (clear sign AI
+  // ignored the prompt entirely).
+  const weakBenefits = (parsed.chapter_briefs || []).filter((brief) => {
     const benefit = (brief.mcBenefit || '').trim();
-    return benefit.length < 12 || !CONCRETE_BENEFIT_RE.test(benefit);
+    return benefit.length < 6 || !CONCRETE_BENEFIT_RE.test(benefit);
   });
-  if (missingBenefit) {
-    throw new Error(`Arc plan generation refused: chapter ${missingBenefit.chapterNumber} brief missing concrete mcBenefit`);
+  const totalBriefs = (parsed.chapter_briefs || []).length;
+  if (totalBriefs > 0 && weakBenefits.length === totalBriefs) {
+    throw new Error(`Arc plan generation refused: ALL ${totalBriefs} briefs missing concrete mcBenefit — AI ignored mcBenefit field`);
+  }
+  if (weakBenefits.length > 0) {
+    console.warn(`[arc_plan] ${projectId.slice(0, 8)} arc ${arcNumber}: ${weakBenefits.length}/${totalBriefs} briefs have weak mcBenefit (chapters: ${weakBenefits.map((b) => b.chapterNumber).join(',')}). Continuing anyway.`);
   }
 
   const db = getSupabase();
