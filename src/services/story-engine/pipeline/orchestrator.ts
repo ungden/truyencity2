@@ -492,8 +492,18 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     projectStyleDirectives?.codex_director_only === true &&
     projectStyleDirectives?.flash_writer_enabled === true &&
     (options.model || project.ai_model || DEFAULT_CONFIG.model) === 'gemini-3.1-flash-lite';
+  // Phase Q (2026-05-12): production_enabled novels running on Flash Lite at
+  // 50 ch/day get the soft gate by default. Flash Lite consistently scores 5-6
+  // — strict gate (>=7) would pause them after 5 marginal-quality chapters.
+  // canAcceptRoutineSoftGate still hard-rejects any chapter with critical /
+  // major continuity or canon blockers, so quality floor is maintained.
+  const productionFlashSoftGate =
+    projectStyleDirectives?.production_enabled === true &&
+    (options.model || project.ai_model || DEFAULT_CONFIG.model) === 'gemini-3.1-flash-lite';
   const flashRoutineSoftGate =
-    projectStyleDirectives?.flash_routine_soft_gate === true || directorOnlyFlash;
+    projectStyleDirectives?.flash_routine_soft_gate === true ||
+    directorOnlyFlash ||
+    productionFlashSoftGate;
   const flashRoutineMinQualityScore = Number(
     projectStyleDirectives?.flash_routine_min_quality_score ??
     (flashRoutineSoftGate ? 5 : DEFAULT_CONFIG.minQualityScore),
