@@ -103,6 +103,8 @@ export interface StyleDirectives {
   flash_bulk_min_words?: number;
   /** Per-project production daily chapter quota for cron writing. Overrides WRITE_CHAPTERS_DAILY_QUOTA. */
   production_daily_chapter_quota?: number;
+  /** Phase Q (2026-05-12): flip true to opt the project into the production cron's daily-quota pipeline. */
+  production_enabled?: boolean;
   /** Cadence for optional AI memory tasks in cheap mode. Defaults to 5 chapters. */
   flash_bulk_optional_task_cadence?: number;
   /** Cadence for strict AI critic sampling in cheap mode. Reserved for audit runners. Defaults to 10 chapters. */
