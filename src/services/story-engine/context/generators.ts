@@ -518,7 +518,11 @@ Yêu cầu:
   // still has the canonical premise to ground future chapter_briefs against.
   let worldBlock = '';
   if (worldDescription?.trim()) {
-    worldBlock = `[WORLD DESCRIPTION — PREMISE GỐC, ARC PLAN PHẢI BÁM SÁT]\n${worldDescription.slice(0, 4000)}\n\n`;
+    // Phase Q (2026-05-12): bumped 4000 → 8000 to match assembler.ts chapter
+    // writing slice. Some world_descriptions (esp. with power-system canon
+    // sections appended) exceed 4000 and were getting truncated at arc_plan
+    // gen, so subsequent chapter briefs missed the power-progression hints.
+    worldBlock = `[WORLD DESCRIPTION — PREMISE GỐC, ARC PLAN PHẢI BÁM SÁT]\n${worldDescription.slice(0, 8000)}\n\n`;
   }
 
   const masterBlock = `[MASTER OUTLINE — KHUNG TOÀN TRUYỆN, ARC PLAN PHẢI KHỚP]\n${JSON.stringify(parsedMasterOutline).slice(0, 4000)}\n\n`;
