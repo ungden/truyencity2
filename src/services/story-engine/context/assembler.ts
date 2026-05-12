@@ -32,6 +32,7 @@ function validateSubGenreKeys(rawKeys: string[], projectId: string): string[] {
 import { getArchitectVoiceHint } from '../templates/genre-voice-anchors';
 import { getGenreArchitectGuide } from '../templates/genre-process-blueprints';
 import { formatChapterBlueprintContext, loadChapterBlueprint } from '../plan/chapter-blueprints';
+import { isTemplateCliffhanger, isTemplateOpening } from './generators';
 
 import type {
   ContextPayload, ChapterSummary, GenreType, GeminiConfig, StoryKernel,
@@ -927,11 +928,23 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
   }
 
   // Anti-repetition
-  if (payload.recentOpenings.length > 0) {
-    parts.push(`[CÂU MỞ ĐẦU ĐÃ DÙNG — KHÔNG LẶP]: ${payload.recentOpenings.slice(0, 10).join(' | ')}`);
+  // Phase Q 2026-05-13 root-cause fix: DROP template entries before injecting.
+  // Without this filter, AI sees 5-10 template examples as few-shot context and
+  // in-context learns the pattern despite the "KHÔNG LẶP" label — LLMs are
+  // strongly biased toward mimicking visible exemplars even when explicitly
+  // told not to. Filtering out template lines starves the few-shot of bad
+  // examples, allowing the model to default to natural variation.
+  const cleanOpenings = payload.recentOpenings
+    .filter(s => !!s && !isTemplateOpening(s))
+    .slice(0, 10);
+  if (cleanOpenings.length > 0) {
+    parts.push(`[CÂU MỞ ĐẦU ĐÃ DÙNG — KHÔNG LẶP]: ${cleanOpenings.join(' | ')}`);
   }
-  if (payload.recentCliffhangers.length > 0) {
-    parts.push(`[CLIFFHANGER ĐÃ DÙNG — KHÔNG LẶP]: ${payload.recentCliffhangers.slice(0, 5).join(' | ')}`);
+  const cleanCliffhangers = payload.recentCliffhangers
+    .filter(s => !!s && !isTemplateCliffhanger(s))
+    .slice(0, 5);
+  if (cleanCliffhangers.length > 0) {
+    parts.push(`[CLIFFHANGER ĐÃ DÙNG — KHÔNG LẶP]: ${cleanCliffhangers.join(' | ')}`);
   }
 
   return parts.join('\n\n');
