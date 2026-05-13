@@ -183,6 +183,112 @@ export async function writeChapter(
       console.log(`[Writer] Template surgery ch.${chapterNumber}: ending=${repair.endingRepaired} opening=${repair.openingRepaired} lost=${repair.lostChars}ch`);
     }
 
+    // Phase Q 2026-05-13 Layer 7 — AI REWRITE for stubborn templates.
+    // After Layer 6 deterministic surgery, some chapters still have template
+    // patterns that Layer 6 can't strip without losing plot content (e.g.
+    // static opening with plot-relevant setup, ego-declaration ending with
+    // novel-variant phrasing not in regex). Layer 7 calls AI for surgical
+    // rewrite of ONLY the offending bookend (last 300 từ / first 300 từ),
+    // preserving plot info but replacing template phrasing with concrete
+    // action/event. Cheap: 1 extra AI call per detected case, ~200 output
+    // tokens. Skip if first 3 retries already failed (avoid cost on edge cases).
+    const tail500 = content.slice(-500);
+    const tailSents = (tail500.match(/[^.!?。！？\n]+[.!?。！？]/g) || []).map(s => s.trim());
+    const lastSent = tailSents[tailSents.length - 1] || '';
+    const stillTemplateEnding = lastSent && (() => {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { isTemplateCliffhanger } = require('../context/generators');
+      return isTemplateCliffhanger(lastSent);
+    })();
+    const stillTemplateOpening = (() => {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { isTemplateOpening } = require('../context/generators');
+      return isTemplateOpening(content);
+    })();
+
+    if (stillTemplateEnding || stillTemplateOpening) {
+      try {
+        if (stillTemplateEnding) {
+          const last600 = content.slice(-600);
+          const beforeTail = content.slice(0, -600);
+          const cliffhangerHint = outline.cliffhanger || '';
+          const rewritePrompt = `Bạn là biên tập viên. Hãy VIẾT LẠI đoạn kết chương sau cho ngắn hơn (200-300 từ), CẤM:
+- "trò chơi/cuộc chiến/ván cờ ... mới thật sự bắt đầu / chính thức bắt đầu / mới là kẻ làm chủ"
+- "hắn là X, đây là thế giới của hắn" / "thế giới này không còn là của chúng"
+- "đã sẵn sàng để đối mặt với tất cả / mọi thứ"
+- "X chưa bao giờ chấp nhận thua cuộc"
+- "cuộc chơi đã chính thức vượt ra khỏi tầm kiểm soát"
+- Bất kỳ tuyên ngôn vĩ mô trừu tượng về vận mệnh/thế giới/cuộc chơi.
+
+THAY VÀO ĐÓ kết bằng:
+(a) EVENT cụ thể vừa xảy ra (điện thoại reo + tên người, tin nhắn nội dung gì, nhân vật mới gõ cửa, vật phẩm rơi xuống bàn), HOẶC
+(b) DECISION cụ thể MC vừa quyết với thời gian+địa điểm+người ("Sáng mai 7h tới X gặp Y").
+
+Cliffhanger hint từ outline: ${cliffhangerHint}
+
+ĐOẠN KẾT CẦN VIẾT LẠI (giữ nguyên các sự kiện, chỉ thay câu/đoạn cuối abstract bằng concrete event/decision):
+"""
+${last600}
+"""
+
+Chỉ trả về phần text mới (không quote, không metadata). Tiếng Việt tự nhiên, em-dash dialogue.`;
+
+          const rewritten = await callGemini(rewritePrompt, { ...config, temperature: 0.7, maxTokens: 1024 }, { tracking: options?.projectId ? { projectId: options.projectId, task: 'layer7_ending_rewrite', chapterNumber } : undefined });
+          const newEnding = rewritten.content?.trim();
+          if (newEnding && newEnding.length > 100) {
+            // Re-validate: did AI produce non-template ending?
+            const newTailSents = (newEnding.slice(-500).match(/[^.!?。！？\n]+[.!?。！？]/g) || []).map(s => s.trim());
+            const newLast = newTailSents[newTailSents.length - 1] || '';
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const { isTemplateCliffhanger: check } = require('../context/generators');
+            if (!check(newLast)) {
+              content = beforeTail.trimEnd() + '\n\n' + newEnding;
+              console.log(`[Writer] Layer 7 AI ending rewrite ch.${chapterNumber}: replaced template ending`);
+            } else {
+              console.log(`[Writer] Layer 7 AI ending rewrite ch.${chapterNumber}: AI still produced template — kept original`);
+            }
+          }
+        }
+
+        if (stillTemplateOpening) {
+          const first600 = content.slice(0, 600);
+          const afterHead = content.slice(600);
+          const briefHint = outline.scenes?.[0]?.goal || outline.scenes?.[0]?.conflict || '';
+          const rewritePrompt = `Bạn là biên tập viên. Hãy VIẾT LẠI đoạn mở đầu chương sau cho ngắn hơn (200-300 từ), CẤM:
+- "[Ánh sáng/không khí/đồng hồ/phòng tả thiết lập] + [MC] ngồi/đứng/tựa BẤT ĐỘNG + nhìn/quan sát/lặng lẽ + suy ngẫm/nhớ lại"
+- Mở chương bằng tả cảnh tĩnh + MC observe + nội tâm reflection.
+
+THAY VÀO ĐÓ mở bằng:
+- MC đang ACTIVELY làm gì cụ thể trong 100 từ đầu (đi/gọi điện/mở cửa/gõ bàn phím/cầm vật/ra lệnh/viết/tính toán/bước vào phòng).
+- Có thể có 1 câu setting ngắn TRƯỚC khi MC active, nhưng MC PHẢI là chủ ngữ của ≥1 verb action trong 100 từ đầu.
+
+Scene 1 goal/conflict hint từ outline: ${briefHint}
+
+ĐOẠN MỞ ĐẦU CẦN VIẾT LẠI (giữ nguyên các sự kiện, characters, location, chỉ thay câu mô tả tĩnh + MC observe bằng MC active action):
+"""
+${first600}
+"""
+
+Chỉ trả về phần text mới (không quote, không metadata). Tiếng Việt tự nhiên, em-dash dialogue.`;
+
+          const rewritten = await callGemini(rewritePrompt, { ...config, temperature: 0.7, maxTokens: 1024 }, { tracking: options?.projectId ? { projectId: options.projectId, task: 'layer7_opening_rewrite', chapterNumber } : undefined });
+          const newOpening = rewritten.content?.trim();
+          if (newOpening && newOpening.length > 100) {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const { isTemplateOpening: check } = require('../context/generators');
+            if (!check(newOpening)) {
+              content = newOpening + '\n\n' + afterHead.trimStart();
+              console.log(`[Writer] Layer 7 AI opening rewrite ch.${chapterNumber}: replaced static opening`);
+            } else {
+              console.log(`[Writer] Layer 7 AI opening rewrite ch.${chapterNumber}: AI still produced template — kept original`);
+            }
+          }
+        }
+      } catch (e) {
+        console.warn(`[Writer] Layer 7 AI rewrite failed ch.${chapterNumber}:`, e instanceof Error ? e.message : String(e));
+      }
+    }
+
     const finalWordCount = countWords(content);
 
     // ── Hard-Fail Gate (pre-Critic) ─────────────────────────────────────────

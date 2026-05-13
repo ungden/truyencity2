@@ -110,8 +110,9 @@ const TEMPLATE_CLIFFHANGER_RE = new RegExp([
   'đối\\s+với\\s+[A-ZÀ-Ỵ][^,.!?\\n]{0,40},?\\s+(?:đây|tất\\s+cả|chuyện\\s+này)\\s+(?:chỉ\\s+)?mới\\s+(?:là|chỉ\\s+là)\\s+(?:khởi\\s+đầu|bắt\\s+đầu|sự\\s+khởi\\s+đầu)',
   // "tương lai còn dài"
   'tương\\s+lai\\s+(?:còn\\s+dài|vẫn\\s+còn\\s+dài|vẫn\\s+ở\\s+phía\\s+trước|đang\\s+chờ)',
-  // "ván cờ / trò chơi / cuộc chiến (sinh tử) [đã/mới/giờ đây mới] (chính thức) bắt đầu / khai mở / chuyển sang"
-  '(?:ván\\s+cờ|trò\\s+chơi|cuộc\\s+chiến|cuộc\\s+phiêu\\s+lưu|hành\\s+trình|bước\\s+đi|cuộc\\s+chơi|chiến\\s+tranh)\\s+(?:sinh\\s+tử|thật\\s+sự|thực\\s+sự|lớn|đích\\s+thực|văn\\s+học|này|vĩ\\s+đại)?\\s*(?:của\\s+\\S+\\s+)?(?:(?:đã|vừa|mới|bây\\s+giờ\\s+mới|giờ\\s+đây\\s+mới)\\s+)?(?:chính\\s+thức\\s+)?(?:bắt\\s+đầu|khai\\s+(?:màn|mở)|mở\\s+ra|chuyển\\s+sang)',
+  // "ván cờ / trò chơi / cuộc chiến (sinh tử/này) [bất kỳ adverb] (chính thức/thật sự) bắt đầu / khai mở"
+  // Flexible adverb stack: "giờ mới thực sự bắt đầu", "đã chính thức bắt đầu", "mới chính thức khai mở"
+  '(?:ván\\s+cờ|trò\\s+chơi|cuộc\\s+chiến|cuộc\\s+phiêu\\s+lưu|hành\\s+trình|bước\\s+đi|cuộc\\s+chơi|chiến\\s+tranh)[,.]?\\s+(?:sinh\\s+tử|thật\\s+sự|thực\\s+sự|lớn|đích\\s+thực|văn\\s+học|này|vĩ\\s+đại)?[,.]?\\s*(?:của\\s+\\S+\\s+)?(?:(?:đã|vừa|mới|bây\\s+giờ\\s+mới|giờ\\s+đây\\s+mới|giờ\\s+mới|giờ\\s+này\\s+mới)\\s+)?(?:(?:thật\\s+sự|thực\\s+sự|chính\\s+thức)\\s+)?(?:bắt\\s+đầu|khai\\s+(?:màn|mở)|mở\\s+ra|chuyển\\s+sang)',
   // "kỷ nguyên mới ... bắt đầu / được viết"
   'kỷ\\s+nguyên\\s+mới(?:[^.!?\\n]{0,80})(?:bắt\\s+đầu|chính\\s+thức|được\\s+viết)',
   // "một chương / kỷ nguyên / thời đại mới ... chuẩn bị bắt đầu / sắp đến"
@@ -136,6 +137,25 @@ const TEMPLATE_CLIFFHANGER_RE = new RegExp([
   '(?:kẻ\\s+săn\\s+mồi|kẻ\\s+thù|đối\\s+thủ|kẻ\\s+địch|đối\\s+phương)[^.!?\\n]{0,40}(?:cuối\\s+cùng\\s+)?(?:đã|vừa)\\s+lộ\\s+diện',
   // "cuối cùng đã lộ diện" (bare)
   'cuối\\s+cùng\\s+(?:đã|cũng|cũng\\s+đã)\\s+lộ\\s+diện',
+  // 2026-05-13 Round 2 — biến thể mới catch từ audit thực tế:
+  // "trò chơi/cuộc chơi/ván cờ này, [actor] mới là kẻ làm chủ / kẻ thắng / kẻ quyết định"
+  '(?:trò\\s+chơi|cuộc\\s+chơi|ván\\s+cờ|cuộc\\s+chiến|cuộc\\s+phiêu\\s+lưu)\\s+này[,.][^.!?\\n]{0,80}(?:mới\\s+là\\s+(?:kẻ|người)|sẽ\\s+là\\s+(?:kẻ|người)|chỉ\\s+có\\s+một\\s+(?:kẻ|người))',
+  // "thế giới này, [predicate] không (bao giờ) còn là... của chúng/họ/X"
+  'thế\\s+giới\\s+này[,.][^.!?\\n]{0,60}(?:không\\s+(?:bao\\s+giờ\\s+)?còn|sẽ\\s+không\\s+(?:bao\\s+giờ\\s+)?còn|đã\\s+không\\s+còn|sẽ\\s+(?:không\\s+bao\\s+giờ|chẳng\\s+bao\\s+giờ))[^.!?\\n]{0,40}(?:của\\s+(?:chúng|họ|hắn|y|cô|nàng|ta))',
+  // "chính thức vượt ra khỏi / vượt khỏi / thoát khỏi tầm kiểm soát/dự tính"
+  '(?:đã|chính\\s+thức|giờ\\s+đây\\s+đã)\\s+(?:vượt\\s+(?:ra\\s+)?khỏi|thoát\\s+(?:ra\\s+)?khỏi|đi\\s+chệch\\s+(?:ra\\s+)?khỏi)\\s+(?:tầm\\s+kiểm\\s+soát|dự\\s+tính|quỹ\\s+đạo|kế\\s+hoạch\\s+ban\\s+đầu)',
+  // "X chưa bao giờ chấp nhận / X không bao giờ lùi bước"
+  '(?:[A-ZÀ-Ỵ][a-zà-ỹ]+(?:\\s+[A-ZÀ-Ỵ][a-zà-ỹ]+){0,3}|hắn|y|cô|nàng)[,.]?\\s+(?:chưa|không)\\s+bao\\s+giờ\\s+(?:chấp\\s+nhận|lùi\\s+bước|từ\\s+bỏ|đầu\\s+hàng|nhân\\s+nhượng)',
+  // "X đã sẵn sàng để đối mặt / đối diện / chấp nhận / nghênh đón tất cả"
+  '(?:[A-ZÀ-Ỵ][a-zà-ỹ]+(?:\\s+[A-ZÀ-Ỵ][a-zà-ỹ]+){0,3}|hắn|y|cô|nàng|anh)\\s+(?:đã|giờ\\s+đây\\s+đã|sẽ)\\s+sẵn\\s+sàng\\s+(?:để\\s+)?(?:đối\\s+mặt|đối\\s+diện|nghênh\\s+đón|chấp\\s+nhận|chào\\s+đón)\\s+(?:với\\s+)?(?:tất\\s+cả|mọi\\s+thứ|tương\\s+lai|tất\\s+thảy)',
+  // "đã đến lúc + verb concrete future"
+  'đã\\s+đến\\s+lúc\\s+(?:hắn|y|[A-ZÀ-Ỵ][a-zà-ỹ]+)\\s+(?:phải|sẽ|cần)\\s+(?:ra\\s+tay|hành\\s+động|đối\\s+đầu|lên\\s+tiếng)',
+  // "bước ngoặt + chính thức/đã/sắp xảy ra"
+  'bước\\s+ngoặt\\s+(?:lớn\\s+)?(?:của\\s+(?:cuộc\\s+đời|đời|sự\\s+nghiệp|lịch\\s+sử))?(?:[^.!?\\n]{0,20})(?:đã|chính\\s+thức|sắp)\\s+(?:đến|xảy\\s+ra|bắt\\s+đầu)',
+  // "kẻ làm chủ + cuộc chơi / số phận / vận mệnh"
+  'kẻ\\s+làm\\s+chủ\\s+(?:cuộc\\s+chơi|số\\s+phận|vận\\s+mệnh|trận\\s+đấu|cuộc\\s+chiến)',
+  // "(đêm/ngày/giây phút) này, (predicate) ... thay đổi mọi thứ"
+  '(?:đêm|ngày|giây\\s+phút|thời\\s+khắc)\\s+(?:nay|này|hôm\\s+nay)[,.][^.!?\\n]{0,80}(?:thay\\s+đổi|định\\s+đoạt|quyết\\s+định)\\s+(?:mọi\\s+thứ|tất\\s+cả|cục\\s+diện|số\\s+phận|vận\\s+mệnh)',
 ].join('|'), 'i');
 
 const TEMPLATE_MCSTATE_RE = new RegExp([
