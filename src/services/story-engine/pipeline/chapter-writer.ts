@@ -184,14 +184,11 @@ export async function writeChapter(
     }
 
     // Phase Q 2026-05-13 Layer 7 — AI REWRITE for stubborn templates.
-    // After Layer 6 deterministic surgery, some chapters still have template
-    // patterns that Layer 6 can't strip without losing plot content (e.g.
-    // static opening with plot-relevant setup, ego-declaration ending with
-    // novel-variant phrasing not in regex). Layer 7 calls AI for surgical
-    // rewrite of ONLY the offending bookend (last 300 từ / first 300 từ),
-    // preserving plot info but replacing template phrasing with concrete
-    // action/event. Cheap: 1 extra AI call per detected case, ~200 output
-    // tokens. Skip if first 3 retries already failed (avoid cost on edge cases).
+    // After ROOT FIX (Architect schema + validator + Writer safe-cliffhanger),
+    // template generation rate at source should drop ~80%. Layer 7 is now
+    // LAST RESORT safety net for the ~5-10% edge cases that slip through all
+    // prior layers. Only triggers on ENDING template (opening now handled at
+    // root via emotionalArc.opening schema + D2-EXEC rule + Architect validator).
     const tail500 = content.slice(-500);
     const tailSents = (tail500.match(/[^.!?。！？\n]+[.!?。！？]/g) || []).map(s => s.trim());
     const lastSent = tailSents[tailSents.length - 1] || '';
@@ -200,11 +197,11 @@ export async function writeChapter(
       const { isTemplateCliffhanger } = require('../context/generators');
       return isTemplateCliffhanger(lastSent);
     })();
-    const stillTemplateOpening = (() => {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { isTemplateOpening } = require('../context/generators');
-      return isTemplateOpening(content);
-    })();
+    // Layer 7 opening trigger REMOVED — root fix at Architect.emotionalArc.opening
+    // (D2-EXEC schema rule) prevents AI from generating "abstract emotion" that
+    // Writer would render as static template. If still static opening reaches
+    // here, Layer 6 surgery should have stripped or Critic flags.
+    const stillTemplateOpening = false;
 
     if (stillTemplateEnding || stillTemplateOpening) {
       try {
@@ -534,14 +531,19 @@ JSON OUTPUT SCHEMA (output structure, không thay đổi):
   "scenes": [{"order":1, "setting":"...", "characters":["..."], "goal":"...", "conflict":"...", "resolution":"...", "estimatedWords":<int>, "pov":"nhân vật POV"}],
   "tensionLevel": <int>,
   "dopaminePoints": [{"type":"face_slap", "scene":1, "description":"...", "intensity":8, "setup":"...", "payoff":"..."}],
-  "emotionalArc": {"opening":"...", "midpoint":"...", "climax":"...", "closing":"..."},
+  "emotionalArc": {
+    "opening": "<MC physical position + emotion 1 câu: WHERE+WHAT_DOING+FEELING. ĐÚNG 'MC bước vào phòng họp tầng 32, tay cầm hợp đồng, hồi hộp'. SAI 'quyết tâm' (abstract emotion alone — CẤM).>",
+    "midpoint": "<emotional turn point — event trigger gì làm cảm xúc shift>",
+    "climax": "<peak emotion tied to specific event happening in scene>",
+    "closing": "<MC ending emotional state TIED TO concrete action MC vừa làm. ĐÚNG 'MC mỉm cười nhận hợp đồng từ tay CEO Phạm An'. SAI 'quyết tâm' / 'trầm tư' (abstract emotion alone — CẤM).>"
+  },
   "comedyBeat": "...",
   "slowScene": "...",
-  "cliffhanger": "...",
+  "cliffhanger": "<SỰ KIỆN BÊN NGOÀI cụ thể vừa xảy ra ở câu cuối chương — bắt buộc 1 trong 4 forms: (a) [Actor named] + verb action + object (vd 'Phụng — vợ cũ 3 năm — đẩy cửa bước vào, tay cầm phong bì niêm phong'); (b) [Specific object/sound/sight] xuất hiện (vd 'Trên màn hình hiện tin nhắn từ số ẩn: \\\"Tôi biết bí mật năm 2018\\\"'); (c) [MC name] decides verb action at TIME at PLACE với PERSON (vd 'Lê Hữu Tuấn quyết định 7h sáng mai sẽ đến biệt thự Reinhardt với 2 vệ sĩ chốt deal muối'); (d) [Channel] from [name] content '[exact words]'. CẤM TUYỆT ĐỐI: 'ván cờ/trò chơi/cuộc chiến mới bắt đầu', 'hắn là X đây là thế giới', 'X chưa bao giờ chấp nhận thua cuộc', 'sẵn sàng đối mặt với tất cả', 'cuộc chơi chính thức vượt ra khỏi tầm kiểm soát', 'thế giới này không còn là của chúng', 'kỷ nguyên mới được viết nên', 'cái tên sẽ trở thành biểu tượng'. Bất kỳ tuyên ngôn vĩ mô trừu tượng về vận mệnh/thế giới = REJECTED.>",
   "targetWordCount": <int>,
   "chapterIntent": {
     "primaryGoal": "<1-2 câu mục tiêu chính chương — actor + action + stake>",
-    "cliffhangerTarget": "<1 câu hook ending>",
+    "cliffhangerTarget": "<concrete event/decision dạng (a)-(d) như field cliffhanger phía trên. CẤM abstract hook / tuyên ngôn trừu tượng.>",
     "mcStateDelta": "<MC state changes — power/relationship/resources delta>",
     "threadsToClose": ["thread name 1", "thread name 2"],
     "threadsToAdvance": ["thread name 1", "thread name 2"],
@@ -592,10 +594,50 @@ Trả về JSON ChapterOutline đúng schema phía trên cho CHƯƠNG ${chapterN
     console.warn(`[Architect] Chapter ${chapterNumber}: output truncated (finishReason=${res.finishReason})`);
   }
 
-  const parsed = parseJSON<ChapterOutline>(res.content);
+  let parsed = parseJSON<ChapterOutline>(res.content);
 
   if (!parsed || !parsed.scenes?.length) {
     throw new Error(`Architect chapter ${chapterNumber}: JSON parse failed — raw: ${res.content.slice(0, 300)}`);
+  }
+
+  // Phase Q 2026-05-13 ROOT FIX — Architect template validator.
+  // PR #66-#69 patched Writer OUTPUT with regex/AI rewrite (Layers 1-7).
+  // Real root cause: Architect produces template `cliffhanger` field, then
+  // Writer faithfully renders it as the chapter ending (Writer prompt injects
+  // "CLIFFHANGER: ${outline.cliffhanger}" verbatim as instruction). Patches
+  // downstream can never beat poisoned upstream input.
+  // This validator checks the Architect's cliffhanger + chapterIntent fields
+  // immediately after JSON parse. If template detected → force ONE regen with
+  // corrective instruction, citing the exact bad output back to AI. Cheap
+  // (~$0.01 extra per affected chapter), eliminates poisoning at source.
+  if (parsed.cliffhanger || parsed.chapterIntent?.cliffhangerTarget) {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { isTemplateCliffhanger } = require('../context/generators');
+    const badCliffhanger = parsed.cliffhanger && isTemplateCliffhanger(parsed.cliffhanger);
+    const badIntent = parsed.chapterIntent?.cliffhangerTarget && isTemplateCliffhanger(parsed.chapterIntent.cliffhangerTarget);
+    if (badCliffhanger || badIntent) {
+      console.warn(`[Architect] ch.${chapterNumber} produced template cliffhanger — forcing regen. cliffhanger="${(parsed.cliffhanger || '').slice(0, 80)}" intent="${(parsed.chapterIntent?.cliffhangerTarget || '').slice(0, 80)}"`);
+      const correctionSuffix = `\n\n⚠️ CẢNH BÁO — LẦN OUTPUT VỪA RỒI BẠN ĐÃ VI PHẠM D4-EXEC:
+- cliffhanger = "${(parsed.cliffhanger || '').slice(0, 200)}"
+- cliffhangerTarget = "${(parsed.chapterIntent?.cliffhangerTarget || '').slice(0, 200)}"
+
+Đây là TUYÊN NGÔN TRỪU TƯỢNG bị cấm tuyệt đối. Viết lại JSON với cliffhanger/cliffhangerTarget = CONCRETE EVENT/DECISION đúng D4-EXEC forms (a)-(d). Reader phải biết NGAY ch.N+1 mở bằng action gì cụ thể.`;
+      try {
+        const retry = await callGemini(prompt + correctionSuffix, { ...config, temperature: 0.3, maxTokens: 16384, systemPrompt: ARCHITECT_SYSTEM + VN_PLACE_LOCK + genreSuffix + architectVoiceHint + architectGenreGuide }, { jsonMode: true, tracking: options?.projectId ? { projectId: options.projectId, task: 'architect_template_regen', chapterNumber } : undefined });
+        const reparsed = parseJSON<ChapterOutline>(retry.content);
+        if (reparsed && reparsed.scenes?.length && reparsed.cliffhanger) {
+          const stillBad = isTemplateCliffhanger(reparsed.cliffhanger) || (reparsed.chapterIntent?.cliffhangerTarget && isTemplateCliffhanger(reparsed.chapterIntent.cliffhangerTarget));
+          if (!stillBad) {
+            parsed = reparsed;
+            console.log(`[Architect] ch.${chapterNumber} regen succeeded — concrete cliffhanger`);
+          } else {
+            console.warn(`[Architect] ch.${chapterNumber} regen still template — Writer-side sanitizer + Layer 6 will handle`);
+          }
+        }
+      } catch (e) {
+        console.warn(`[Architect] ch.${chapterNumber} template regen failed:`, e instanceof Error ? e.message : String(e));
+      }
+    }
   }
 
   // Validate: ensure enough scenes. Previously silently synthesized empty
@@ -834,6 +876,28 @@ async function runWriter(
     console.log(`[Writer] Chapter ${outline.chapterNumber}: full-evidence context = ${writerContext.length} chars (${writerContextParts.length} sections)`);
   }
 
+  // Phase Q 2026-05-13 ROOT FIX — safe-cliffhanger sanitizer before injection.
+  // If Architect-regen validator above didn't catch a template cliffhanger (or
+  // chapterIntent.cliffhangerTarget got polluted), strip it here so Writer
+  // doesn't faithfully render template as the chapter ending. Fallback ladder:
+  //   1. Use outline.cliffhanger if not template.
+  //   2. Else use chapterIntent.cliffhangerTarget if not template.
+  //   3. Else inject generic "concrete event/decision" instruction.
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { isTemplateCliffhanger: __isTplCliff } = require('../context/generators');
+  const cliffhangerCandidate = outline.cliffhanger || '';
+  const intentCandidate = outline.chapterIntent?.cliffhangerTarget || '';
+  let safeCliffhanger: string;
+  if (cliffhangerCandidate && !__isTplCliff(cliffhangerCandidate)) {
+    safeCliffhanger = cliffhangerCandidate;
+  } else if (intentCandidate && !__isTplCliff(intentCandidate)) {
+    safeCliffhanger = intentCandidate;
+    console.warn(`[Writer] ch.${outline.chapterNumber} fallback to chapterIntent.cliffhangerTarget (outline.cliffhanger was template)`);
+  } else {
+    safeCliffhanger = 'KẾT BẰNG CONCRETE EVENT hoặc DECISION cụ thể từ scene cuối — named character action / external signal (điện thoại reo + tên / tin nhắn nội dung / vật phẩm xuất hiện) / time-bound decision (sáng mai 7h MC tới X gặp Y). CẤM tuyên ngôn vĩ mô về vận mệnh / thế giới / cuộc chơi. CẤM "ván cờ sinh tử bắt đầu" / "hắn là X đây là thế giới" / "đã sẵn sàng đối mặt" / "X chưa bao giờ chấp nhận thua cuộc".';
+    console.warn(`[Writer] ch.${outline.chapterNumber} BOTH outline.cliffhanger AND chapterIntent.cliffhangerTarget template — generic fallback instruction`);
+  }
+
   const prompt = `Viết CHƯƠNG ${outline.chapterNumber}: "${outline.title}"
 
 ${rewriteSection}BLUEPRINT:
@@ -856,7 +920,7 @@ ${outline.comedyBeat ? `Kế hoạch: ${outline.comedyBeat}` : 'Tự chọn 1 kh
 SCENE NHỊP CHẬM (BẮT BUỘC):
 ${outline.slowScene ? `Scene nhịp chậm: ${outline.slowScene}` : 'Chọn 1 scene để giảm nhịp.'}
 
-CLIFFHANGER: ${outline.cliffhanger}
+CLIFFHANGER: ${safeCliffhanger}
 ${topicSection}
 PHONG CÁCH:
 ${styleGuide}

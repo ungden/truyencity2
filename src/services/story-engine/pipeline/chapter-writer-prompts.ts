@@ -228,6 +228,18 @@ D2. EMOTIONAL ARC PER CHAPTER:
 opening B → midpoint rise to peak P (60-70% mark) → small fall → ending B' ≠ B.
 Ghi rõ "emotionalArc" JSON với opening/midpoint/climax/closing emotions cụ thể.
 
+D2-EXEC. EMOTIONAL ARC FIELD FORMAT (ràng buộc cứng cho JSON output, Phase Q 2026-05-13):
+
+- "emotionalArc.opening" / "closing" BẮT BUỘC tie emotion với CONCRETE ACTION + PHYSICAL position:
+  ĐÚNG: "MC bước vào phòng họp tầng 32 toà Vạn Thái, tay cầm hợp đồng, hồi hộp"
+  ĐÚNG: "MC mỉm cười nhận hợp đồng từ tay CEO Phạm An, vai trùng xuống nhẹ nhõm"
+  SAI:  "quyết tâm" (abstract emotion alone)
+  SAI:  "trầm tư suy nghĩ" (no concrete action)
+  SAI:  "phấn khích" / "lạnh lùng" / "sẵn sàng" (raw emotion words)
+- "midpoint" / "climax" = emotion + event trigger gây shift cảm xúc, không phải abstract emotion alone.
+
+Lý do: Writer prompt sẽ inject "Mở đầu: \${emotionalArc.opening}" và "Kết thúc: \${emotionalArc.closing}" trực tiếp làm instruction. Nếu emotionalArc.opening = "quyết tâm" alone, Writer auto-default render thành "MC đứng bất động + suy ngẫm về điều gì đó" → STATIC TEMPLATE OPENING. Phải force concrete-action emotion để Writer có context cụ thể render scene MC active.
+
 D3. SCENE STRUCTURE:
 - Tối thiểu 4-5 scenes, mỗi scene có động lực/mục tiêu rõ.
 - Pacing rhythm: S1 slow setup → S2-S3 escalate → S4 peak (60-70%) → S5 breathe + ending hook. CẤM mở chương bằng action cao trào.
@@ -264,6 +276,44 @@ D4-TER. CẤM TEMPLATE STATIC OPENING (mở chương N+1):
 - Đây là pattern AI default mà reader CỰC GHÉT vì cộng với D4-BIS template ending tạo cảm giác "chương N+1 chỉ là viết lại đoạn cuối ch.N".
 - Opening 100 từ đầu PHẢI: MC đang ACTIVELY làm gì đó cụ thể — đi bước nào đó / mở cửa / gọi điện / gõ bàn phím / cầm vật gì / ra lệnh cho ai / viết câu nào / tính toán số gì / nhận điện thoại của ai / bước vào phòng nào.
 - Tả cảnh tĩnh + nội tâm reflection CHỈ được xuất hiện SAU khi có ≥1 action concrete trong scene 1.
+
+D4-EXEC. CLIFFHANGER FIELD FORMAT (ràng buộc cứng cho JSON output, Phase Q 2026-05-13 — ROOT FIX):
+
+Lý do tồn tại: Writer prompt sẽ inject "CLIFFHANGER: \${outline.cliffhanger}" trực tiếp làm instruction. Nếu Architect output template ("ván cờ sinh tử bắt đầu"), Writer faithfully render template làm câu cuối chương — đây là CHAIN OF POISONED INPUT, không phải Writer hallucinate. Phải force Architect output concrete cliffhanger.
+
+Khi populate "cliffhanger" field VÀ "chapterIntent.cliffhangerTarget" field, BẮT BUỘC chọn 1 trong 4 forms:
+
+(a) EVENT — câu mô tả ai vừa làm gì cụ thể KÈM TÊN:
+    ĐÚNG: "Phụng — vợ cũ Lê Quang Khôi đã 3 năm — đẩy cửa bước vào, tay cầm phong bì niêm phong đỏ."
+    ĐÚNG: "Trợ lý Trần Văn Long gõ cửa, đưa ra tờ điện báo từ chủ tịch Lý Vạn Lâm."
+
+(b) ITEM/SIGHT — vật/sound/sight bất ngờ xuất hiện KÈM chi tiết:
+    ĐÚNG: "Trên màn hình laptop hiện dòng tin nhắn từ số ẩn: 'Tôi biết bí mật năm 2018 của anh.'"
+    ĐÚNG: "Tiếng chuông cửa vang lên lúc 11 giờ đêm. Qua khe nhìn, là Phạm Minh Đức — đối thủ thương trường — đứng dưới mưa."
+
+(c) DECISION — MC quyết định hành động cụ thể với THỜI GIAN + ĐỊA ĐIỂM + NGƯỜI:
+    ĐÚNG: "Lê Hữu Tuấn quyết định: 7h sáng mai sẽ đến biệt thự Reinhardt với 2 vệ sĩ Roderick + Bertrand để chốt thỏa thuận muối."
+    ĐÚNG: "MC chọn đường: 5h sáng mai theo xe của Tổng giám đốc đến nhà máy Quang Trung, gặp chú út Tâm chốt deal."
+
+(d) MESSAGE/CALL — tin nhắn/cú điện thoại với NỘI DUNG GÌ:
+    ĐÚNG: "Điện thoại reo. Màn hình hiện tên 'Mẹ' — bà chưa gọi từ khi MC rời quê 5 năm trước."
+    ĐÚNG: "Email mới từ legal@VanThaiGroup.com: 'Hợp đồng đã được CEO Phạm An ký. Vui lòng tới gặp lúc 9h sáng mai.'"
+
+CẤM TUYỆT ĐỐI populate cliffhanger/cliffhangerTarget với:
+- "Ván cờ / Trò chơi / Cuộc chiến / Cuộc phiêu lưu này (sinh tử/thực sự) mới bắt đầu / chính thức khai mở"
+- "Hắn là X, đây là thế giới của hắn"
+- "X đã sẵn sàng để đối mặt với tất cả / mọi thứ"
+- "X chưa bao giờ chấp nhận thua cuộc / lùi bước"
+- "Cuộc chơi đã chính thức vượt ra khỏi tầm kiểm soát"
+- "Thế giới này không còn là của chúng"
+- "Kỷ nguyên mới ... được viết nên"
+- "Cái tên sẽ sớm trở thành biểu tượng / truyền thuyết"
+- "Bản hùng ca / giao hưởng ... sẽ được viết"
+- "Bây giờ, chỉ cần chờ đợi thời điểm"
+- "Đêm/Ngày này, ... thay đổi mọi thứ"
+- Bất kỳ tuyên ngôn vĩ mô trừu tượng về vận mệnh/thế giới/cuộc chơi.
+
+Reader test: đọc cliffhanger value, người ta phải BIẾT NGAY ch.N+1 sẽ mở bằng action gì cụ thể trong 100 từ đầu. Nếu reader đoán không ra → cliffhanger fail concrete test → REJECTED.
 
 D5. COMEDY BEAT (BẮT BUỘC):
 Mỗi chương ≥1 khoảnh khắc hài tự nhiên. Ghi rõ "comedyBeat" JSON. Dùng Não Bổ (bystander suy diễn cao siêu), Vô Sỉ (MC lật lọng), Phản Kém (gap moe), nội tâm tự giễu khô khan. CẤM hài phương Tây, CẤM nhân vật kể chuyện cười.
