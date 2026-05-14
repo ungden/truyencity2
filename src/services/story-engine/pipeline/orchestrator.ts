@@ -22,6 +22,8 @@ import { retrieveRAGContext, chunkAndStoreChapter, retrieveEntityContext, retrie
 import { saveCharacterStatesFromCombined, detectCharacterContradictions, type CharacterContradiction } from '../state/character-state';
 import { extractCharacterKnowledge, getCharacterKnowledgeContext } from '../state/knowledge-graph';
 import { autoReviseChapter } from './auto-reviser';
+import { normalizeChapterLength } from './length-normalizer';
+import { defaultLengthSpec, chooseNormalizeMode } from '../utils/length-metrics';
 import { runContinuityGuardian } from '../quality/continuity-guardian';
 import { buildPlotThreadContext, extractAndUpdatePlotThreads } from '../state/plot-threads';
 import { buildBeatContext, detectAndRecordBeats } from '../memory/beat-ledger';
@@ -993,6 +995,44 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   if (businessLogicBlock) {
     throw new Error(
       `Chapter ${nextChapter}-${lastChapterNumberPre}: blocking business-logic consistency issues. Refusing to publish — cron will retry. Issues: ${businessLogicBlock}`,
+    );
+  }
+
+  // ── Step 4.7: Length-Normalizer (Phase R+1, 2026-05-15) ─────────────────
+  // Single-pass length adjustment if word count outside soft range. Preserves
+  // plot, dialogue, character names. Cheaper + safer than retry loops.
+  // Skips entirely if chapter already within ±15% of target.
+  try {
+    const lengthSpec = defaultLengthSpec(targetWordCount);
+    const currentWords = result.content.trim().split(/\s+/).filter(Boolean).length;
+    const mode = chooseNormalizeMode(currentWords, lengthSpec);
+    if (mode !== 'none') {
+      const normResult = await normalizeChapterLength(
+        {
+          chapterNumber: lastChapterNumberPre,
+          chapterContent: result.content,
+          lengthSpec,
+          chapterIntent: result.outline?.summary || result.title,
+        },
+        geminiConfig,
+        project.id,
+      );
+      if (normResult.applied) {
+        result.content = normResult.normalizedContent;
+        result.wordCount = normResult.finalCount;
+        console.warn(
+          `[Orchestrator] Length-normalize Ch.${nextChapter}-${lastChapterNumberPre}: ${normResult.mode} ${normResult.originalCount}→${normResult.finalCount} (target ${lengthSpec.target})${normResult.warning ? ' | ' + normResult.warning : ''}`,
+        );
+      } else if (normResult.warning) {
+        console.warn(
+          `[Orchestrator] Length-normalize skipped Ch.${nextChapter}-${lastChapterNumberPre}: ${normResult.warning}`,
+        );
+      }
+    }
+  } catch (e) {
+    console.warn(
+      `[Orchestrator] Length-normalize threw for Ch.${nextChapter}-${lastChapterNumberPre}:`,
+      e instanceof Error ? e.message : String(e),
     );
   }
 
