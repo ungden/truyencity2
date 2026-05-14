@@ -1467,6 +1467,36 @@ KIỂM TRA CANON & STATE (Phase 27/28 — xem các block trong context có sẵn
       // Moderate repetition: just log, don't penalize score (Critic already sees report)
     }
 
+    // Phase R+1 (2026-05-15): post-write-validator deterministic gate.
+    // 8 InkOS-derived rules adapted to Vietnamese: paragraph uniformity,
+    // hedge density, meta-narration ban, analysis-report terms ban,
+    // author-sermon, crowd-shock, chapter-number-ref, surprise density.
+    try {
+      const { runPostWriteValidator } = await import('../quality/post-write-validator');
+      const validatorIssues = runPostWriteValidator({ content });
+      if (validatorIssues.length > 0) {
+        parsed.issues = parsed.issues || [];
+        for (const vi of validatorIssues) {
+          parsed.issues.push(vi);
+        }
+        const hasCritical = validatorIssues.some(vi => vi.severity === 'critical');
+        const hasMajor = validatorIssues.some(vi => vi.severity === 'major');
+        if (hasCritical || hasMajor) {
+          parsed.requiresRewrite = true;
+          parsed.approved = false;
+          parsed.overallScore = Math.min(parsed.overallScore || 10, hasCritical ? 4 : 5);
+          const guide = validatorIssues
+            .filter(vi => vi.severity === 'critical' || vi.severity === 'major')
+            .map(vi => `[${vi.severity}] ${vi.description.slice(0, 200)}`)
+            .join(' | ');
+          parsed.rewriteInstructions = (parsed.rewriteInstructions || '') +
+            ` POST-WRITE: ${guide}`;
+        }
+      }
+    } catch (e) {
+      console.warn('[Critic] post-write-validator threw:', e instanceof Error ? e.message : String(e));
+    }
+
     // Phase 26 Module C: Foreshadowing OVERDUE deterministic gate.
     // For every record in overdueForeshadowingRecords, check whether content
     // references the hint text OR payoff description (loose substring).

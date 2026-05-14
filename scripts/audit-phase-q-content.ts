@@ -27,6 +27,7 @@ import {
   detectSevereRepetition,
   countWords,
 } from '../src/services/story-engine/pipeline/chapter-writer-helpers';
+import { runPostWriteValidator } from '../src/services/story-engine/quality/post-write-validator';
 
 dotenv.config({ path: '/Users/alexle/Documents/truyencity/.env.runtime', quiet: true });
 dotenv.config({ path: '/Users/alexle/Documents/truyencity/.env.local', quiet: true, override: true });
@@ -134,6 +135,24 @@ async function main() {
       for (const r of repetition) {
         if (r.severity === 'critical') flags.push(`REP-CRIT`);
         else if (r.severity === 'moderate') flags.push(`REP-MOD`);
+      }
+
+      // Phase R+1 — post-write-validator (8 InkOS-derived rules)
+      const validatorIssues = runPostWriteValidator({ content });
+      for (const vi of validatorIssues) {
+        // Derive short tag from description prefix
+        const desc = vi.description.toLowerCase();
+        let tag = 'PWV';
+        if (desc.includes('độ dài đoạn')) tag = 'PARA-UNIFORM';
+        else if (desc.includes('hedge density')) tag = 'HEDGE';
+        else if (desc.includes('meta-narration')) tag = 'META-NARR';
+        else if (desc.includes('phrase phân tích')) tag = 'REPORT-TERMS';
+        else if (desc.includes('author-sermon')) tag = 'SERMON';
+        else if (desc.includes('crowd-shock')) tag = 'CROWD-SHOCK';
+        else if (desc.includes('chapter number reference')) tag = 'CHAPTER-REF';
+        else if (desc.includes('surprise marker')) tag = 'SURPRISE';
+        const sevTag = vi.severity === 'critical' ? 'CRIT' : vi.severity === 'major' ? 'MAJ' : 'MOD';
+        flags.push(`${tag}-${sevTag}`);
       }
 
       if (flags.length === 0) continue;
