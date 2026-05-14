@@ -24,6 +24,8 @@ import { extractCharacterKnowledge, getCharacterKnowledgeContext } from '../stat
 import { autoReviseChapter } from './auto-reviser';
 import { normalizeChapterLength } from './length-normalizer';
 import { defaultLengthSpec, chooseNormalizeMode } from '../utils/length-metrics';
+import { polishChapter } from './polisher';
+import { runPostWriteValidator } from '../quality/post-write-validator';
 import { runContinuityGuardian } from '../quality/continuity-guardian';
 import { buildPlotThreadContext, extractAndUpdatePlotThreads } from '../state/plot-threads';
 import { buildBeatContext, detectAndRecordBeats } from '../memory/beat-ledger';
@@ -1032,6 +1034,49 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   } catch (e) {
     console.warn(
       `[Orchestrator] Length-normalize threw for Ch.${nextChapter}-${lastChapterNumberPre}:`,
+      e instanceof Error ? e.message : String(e),
+    );
+  }
+
+  // ── Step 4.8: Polisher (Phase R+1, 2026-05-15) ──────────────────────────
+  // Surface-only polish — sentence variety, externalize emotion, distinct
+  // character voice, kill narrator conclusions + AI-tell vocab. Cannot
+  // change plot/structure/dialogue content. Runs after length-normalizer
+  // so length is already in soft range.
+  //
+  // Gating: skip polish if post-write-validator finds ZERO critical/major
+  // prose-layer issues — chapter is already clean at surface, no value
+  // burning a polish call.
+  try {
+    const prePolishIssues = runPostWriteValidator({ content: result.content });
+    const hasPolishWorthyIssue = prePolishIssues.some(
+      i => i.severity === 'critical' || i.severity === 'major',
+    );
+    if (hasPolishWorthyIssue) {
+      const polishResult = await polishChapter(
+        {
+          chapterNumber: lastChapterNumberPre,
+          chapterContent: result.content,
+          chapterIntent: result.outline?.summary || result.title,
+        },
+        geminiConfig,
+        project.id,
+      );
+      if (polishResult.changed) {
+        result.content = polishResult.polishedContent;
+        result.wordCount = result.content.trim().split(/\s+/).filter(Boolean).length;
+        console.warn(
+          `[Orchestrator] Polish Ch.${nextChapter}-${lastChapterNumberPre}: ${polishResult.originalLength}→${polishResult.polishedLength} chars (${prePolishIssues.filter(i => i.severity === 'critical' || i.severity === 'major').length} crit/major issues addressed)${polishResult.warning ? ' | ' + polishResult.warning : ''}`,
+        );
+      } else if (polishResult.warning) {
+        console.warn(
+          `[Orchestrator] Polish skipped Ch.${nextChapter}-${lastChapterNumberPre}: ${polishResult.warning}`,
+        );
+      }
+    }
+  } catch (e) {
+    console.warn(
+      `[Orchestrator] Polish threw for Ch.${nextChapter}-${lastChapterNumberPre}:`,
       e instanceof Error ? e.message : String(e),
     );
   }
