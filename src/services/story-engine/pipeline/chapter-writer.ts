@@ -46,7 +46,7 @@ import type {
 } from '../types';
 import type { SceneType, VocabularyGuide } from '../templates/style-bible';
 import { VN_PLACE_LOCK, ARCHITECT_SYSTEM, WRITER_SYSTEM, CRITIC_SYSTEM } from './chapter-writer-prompts';
-import { cleanContent, extractTitle, synthesizeFallbackCliffhanger, hasCliffhangerSignal, analyzeQualitySignals, buildSignalReport, countWords, detectHardFallback, detectMcNameFlip, detectSevereRepetition, detectShortFormCharacterName, detectMcNameRate, detectEyeTemplateOveruse, detectInspirationalCluster, detectMonologueTail, detectChapterTemplatePatterns, repairChapterTemplatePatterns, buildRepetitionReport, generateMinimalScenes, loadConstraintSection, safeStringTrim, type QualitySignals } from './chapter-writer-helpers';
+import { cleanContent, extractTitle, synthesizeFallbackCliffhanger, hasCliffhangerSignal, analyzeQualitySignals, buildSignalReport, countWords, detectHardFallback, detectMcNameFlip, detectSevereRepetition, detectShortFormCharacterName, detectMcNameRate, detectEyeTemplateOveruse, detectInspirationalCluster, detectMonologueTail, detectCrossChapterRepetition, detectChapterTemplatePatterns, repairChapterTemplatePatterns, buildRepetitionReport, generateMinimalScenes, loadConstraintSection, safeStringTrim, type QualitySignals } from './chapter-writer-helpers';
 
 
 // ── Write Chapter ────────────────────────────────────────────────────────────
@@ -1495,6 +1495,51 @@ KIỂM TRA CANON & STATE (Phase 27/28 — xem các block trong context có sẵn
       }
     } catch (e) {
       console.warn('[Critic] post-write-validator threw:', e instanceof Error ? e.message : String(e));
+    }
+
+    // Phase R+1 (2026-05-15): cross-chapter 3-gram repetition.
+    // Catches AI re-using identical phrasing across chapters — invisible
+    // to single-chapter detectors. Loads last 3 chapter contents via DB
+    // (one-off query, ~10ms).
+    if (projectId && outline.chapterNumber > 1) {
+      try {
+        const { getSupabase } = await import('../utils/supabase');
+        const db = getSupabase();
+        // Look up novel_id for this project
+        const { data: projectRow } = await db
+          .from('ai_story_projects')
+          .select('novel_id')
+          .eq('id', projectId)
+          .maybeSingle();
+        const novelId = projectRow?.novel_id as string | undefined;
+        if (novelId) {
+          const { data: recentRows } = await db
+            .from('chapters')
+            .select('content')
+            .eq('novel_id', novelId)
+            .lt('chapter_number', outline.chapterNumber)
+            .order('chapter_number', { ascending: false })
+            .limit(3);
+          if (recentRows && recentRows.length > 0) {
+            const recentText = recentRows.map(r => (r.content as string) || '').join('\n\n');
+            const crossIssues = detectCrossChapterRepetition(content, recentText);
+            if (crossIssues.length > 0) {
+              parsed.issues = parsed.issues || [];
+              for (const ci of crossIssues) parsed.issues.push(ci);
+              const hasMajor = crossIssues.some(ci => ci.severity === 'major');
+              if (hasMajor) {
+                parsed.requiresRewrite = true;
+                parsed.approved = false;
+                parsed.overallScore = Math.min(parsed.overallScore || 10, 5);
+                parsed.rewriteInstructions = (parsed.rewriteInstructions || '') +
+                  ` CROSS-CHAPTER REPETITION: ${crossIssues[0].description.slice(0, 200)}`;
+              }
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('[Critic] cross-chapter repetition check threw:', e instanceof Error ? e.message : String(e));
+      }
     }
 
     // Phase 26 Module C: Foreshadowing OVERDUE deterministic gate.

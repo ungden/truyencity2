@@ -719,6 +719,99 @@ export function detectMonologueTail(
   return { severity: 'none', message: '', tailDensity, bodyDensity };
 }
 
+/**
+ * Phase R+1 (2026-05-15) — cross-chapter 3-gram repetition detector.
+ *
+ * Inspired by InkOS detectCrossChapterRepetition: extract 3-word phrases
+ * from current chapter, check which ones also appear in 3 most recent
+ * chapters' content. Catches AI re-using identical phrasing across
+ * chapters (invisible to single-chapter detection).
+ *
+ * Threshold:
+ *   - 3+ phrases repeated ≥2× in current AND appearing in recent → moderate
+ *   - 6+ such phrases → major
+ *
+ * Phrase filtering:
+ *   - 3 words minimum length (less reliable below)
+ *   - Skip phrases with only stop words / pronouns
+ *   - Skip very common phrases (e.g. "trong lòng hắn", "đôi mắt của")
+ *
+ * Returns CriticIssue[].
+ */
+export function detectCrossChapterRepetition(
+  currentContent: string,
+  recentChaptersText: string,
+): CriticIssue[] {
+  if (!currentContent || currentContent.length < 500) return [];
+  if (!recentChaptersText || recentChaptersText.length < 500) return [];
+
+  // Tokenize Vietnamese — whitespace + simple punctuation split.
+  const tokenize = (s: string): string[] =>
+    s
+      .toLowerCase()
+      .replace(/[.,;:!?"'()[\]{}—–\-_/\\*“”‘’«»…]/g, ' ')
+      .split(/\s+/)
+      .filter(w => w.length >= 2);
+
+  const STOP_PHRASES = new Set<string>([
+    // Common pronouns + structural fillers (3-grams that are too common to flag)
+    'của hắn là', 'của hắn không', 'của anh là', 'của cô là',
+    'trong lòng hắn', 'trong lòng anh', 'trong lòng cô',
+    'một lúc sau', 'một lúc lâu', 'ngay lúc đó', 'lúc này đây',
+    'không thể nào', 'không thể không', 'không thể nói', 'có thể nào',
+    'là một người', 'là một kẻ', 'là một con',
+  ]);
+
+  const currentTokens = tokenize(currentContent);
+  if (currentTokens.length < 30) return [];
+
+  // Build 3-gram counts from current chapter.
+  const currentNgrams = new Map<string, number>();
+  for (let i = 0; i < currentTokens.length - 2; i++) {
+    const ng = `${currentTokens[i]} ${currentTokens[i + 1]} ${currentTokens[i + 2]}`;
+    if (STOP_PHRASES.has(ng)) continue;
+    currentNgrams.set(ng, (currentNgrams.get(ng) || 0) + 1);
+  }
+
+  // Filter to phrases repeated ≥2× in current.
+  const repeatedInCurrent: string[] = [];
+  for (const [ng, count] of currentNgrams) {
+    if (count >= 2) repeatedInCurrent.push(ng);
+  }
+  if (repeatedInCurrent.length === 0) return [];
+
+  // Check which of those phrases also appear in recent chapters' content.
+  const recentLower = recentChaptersText.toLowerCase();
+  const repeatedInBoth: string[] = [];
+  for (const ng of repeatedInCurrent) {
+    if (recentLower.includes(ng)) repeatedInBoth.push(ng);
+  }
+
+  if (repeatedInBoth.length < 3) return [];
+
+  const sample = repeatedInBoth.slice(0, 5).map(p => `"${p}"`).join(', ');
+
+  if (repeatedInBoth.length >= 6) {
+    return [
+      {
+        type: 'quality',
+        severity: 'major',
+        description: `Cross-chapter repetition: ${repeatedInBoth.length} cụm 3-gram lặp trong chương này AND xuất hiện trong 3 chương gần nhất. Sample: ${sample}. AI đang dùng lại pattern phrasing — reader nhận ra immediately.`,
+        suggestion: 'Reword 3-5 cụm lặp — đa dạng hoá cách mô tả cùng action/state. Đặc biệt là dialogue tag + scene transition + body language description.',
+      },
+    ];
+  }
+
+  return [
+    {
+      type: 'quality',
+      severity: 'moderate',
+      description: `Cross-chapter repetition: ${repeatedInBoth.length} cụm 3-gram tái sử dụng từ chương cũ. Sample: ${sample}.`,
+      suggestion: 'Reword vài cụm để tránh phrasing pattern lặp xuyên chương.',
+    },
+  ];
+}
+
 export function detectSevereRepetition(content: string): CriticIssue[] {
   const text = content.toLowerCase();
   const issues: CriticIssue[] = [];
