@@ -404,12 +404,24 @@ Chỉ trả về phần text mới (không quote, không metadata). Tiếng Vi�
         .join(' | ');
 
       // Phase T (2026-05-15): Golden chapter (ch.1-3) recovery fallback.
-      // Instead of throwing after 3 retries on a golden chapter, save the
-      // best attempt if score ≥4 AND no hard-blocking continuity issue.
-      // Flag for admin polish review. Reasoning: fresh chapters NEED to
-      // publish so cron can advance; throw causes infinite retry loop.
+      // Instead of throwing after retries on a golden chapter, save the
+      // best attempt if score ≥4 AND no STRUCTURAL hard blocker. Detector-
+      // critical (quality type) is acceptable — Phase R detectors can
+      // false-positive on fresh chapter prose. Continuity/logic critical
+      // still blocks. Flag for admin polish review.
       const isGoldenChapter = chapterNumber <= 3;
-      const hasHardBlocker = (critic.issues || []).some(isHardBlockingIssue);
+      const isStructuralBlocker = (issue: CriticIssue): boolean => {
+        // Only block on continuity/logic/word_count/consistency/critic_error
+        // criticals AND on majors of those types. Quality-type "critical"
+        // from Phase R detectors (MC-rate, eye, insp, tail, PWV) does NOT
+        // block golden fallback — Polisher + admin review handle those.
+        const structuralTypes = ['continuity', 'consistency', 'logic', 'word_count', 'critic_error'];
+        if (!structuralTypes.includes(issue.type)) return false;
+        return issue.severity === 'critical' || issue.severity === 'major';
+      };
+      const hasHardBlocker = (critic.issues || []).some(
+        isGoldenChapter ? isStructuralBlocker : isHardBlockingIssue,
+      );
       if (isGoldenChapter && qualityScore >= 4 && !hasHardBlocker) {
         console.warn(
           `[ChapterWriter] Golden chapter ${chapterNumber} recovery fallback: score=${qualityScore} below ${minQualityScore}, no hard blocker. Saving + flagging admin_polish_needed.`,
