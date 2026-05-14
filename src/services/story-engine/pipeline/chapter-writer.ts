@@ -46,7 +46,7 @@ import type {
 } from '../types';
 import type { SceneType, VocabularyGuide } from '../templates/style-bible';
 import { VN_PLACE_LOCK, ARCHITECT_SYSTEM, WRITER_SYSTEM, CRITIC_SYSTEM } from './chapter-writer-prompts';
-import { cleanContent, extractTitle, synthesizeFallbackCliffhanger, hasCliffhangerSignal, analyzeQualitySignals, buildSignalReport, countWords, detectHardFallback, detectMcNameFlip, detectSevereRepetition, detectShortFormCharacterName, detectChapterTemplatePatterns, repairChapterTemplatePatterns, buildRepetitionReport, generateMinimalScenes, loadConstraintSection, safeStringTrim, type QualitySignals } from './chapter-writer-helpers';
+import { cleanContent, extractTitle, synthesizeFallbackCliffhanger, hasCliffhangerSignal, analyzeQualitySignals, buildSignalReport, countWords, detectHardFallback, detectMcNameFlip, detectSevereRepetition, detectShortFormCharacterName, detectMcNameRate, detectEyeTemplateOveruse, detectInspirationalCluster, detectMonologueTail, detectChapterTemplatePatterns, repairChapterTemplatePatterns, buildRepetitionReport, generateMinimalScenes, loadConstraintSection, safeStringTrim, type QualitySignals } from './chapter-writer-helpers';
 
 
 // ── Write Chapter ────────────────────────────────────────────────────────────
@@ -1317,6 +1317,136 @@ KIỂM TRA CANON & STATE (Phase 27/28 — xem các block trong context có sẵn
           description: shortFormDetection.message,
         });
       }
+
+      // Phase R (2026-05-14): Absolute MC-name rate — short-form ratio detector
+      // misses high-density full-name spam (e.g. "Lê Quang Khôi" 97 lần / 4680
+      // từ = 20.7/1K, target webnovel = 6-10/1K). Force rewrite at critical
+      // (>16/1K), flag moderate at >12/1K.
+      const mcNameRate = detectMcNameRate(content, protagonistName.trim());
+      if (mcNameRate.severity === 'critical') {
+        parsed.requiresRewrite = true;
+        parsed.approved = false;
+        parsed.overallScore = Math.min(parsed.overallScore || 10, 4);
+        parsed.issues = parsed.issues || [];
+        parsed.issues.push({
+          type: 'quality',
+          severity: 'critical',
+          description: mcNameRate.message,
+        });
+        parsed.rewriteInstructions = `[MC NAME OVERUSE] ${mcNameRate.message}\n\n` +
+          (parsed.rewriteInstructions ? `Cộng với: ${parsed.rewriteInstructions}` : '');
+      } else if (mcNameRate.severity === 'moderate') {
+        parsed.issues = parsed.issues || [];
+        parsed.issues.push({
+          type: 'quality',
+          severity: 'moderate',
+          description: mcNameRate.message,
+        });
+      }
+    }
+
+    // Phase R (2026-05-14): Eye-template overuse — combined "đôi mắt" + "ánh
+    // mắt" count catches the AI tic that detectSevereRepetition misses (it
+    // tracks "đôi mắt" alone with structural_connective threshold 16/22, but
+    // novels split across "đôi mắt" + "ánh mắt" stay under each threshold).
+    const eyeOveruse = detectEyeTemplateOveruse(content);
+    if (eyeOveruse.severity === 'critical') {
+      parsed.requiresRewrite = true;
+      parsed.approved = false;
+      parsed.overallScore = Math.min(parsed.overallScore || 10, 5);
+      parsed.issues = parsed.issues || [];
+      parsed.issues.push({
+        type: 'quality',
+        severity: 'critical',
+        description: eyeOveruse.message,
+      });
+      parsed.rewriteInstructions = (parsed.rewriteInstructions || '') +
+        ` EYE TEMPLATE: ${eyeOveruse.message}`;
+    } else if (eyeOveruse.severity === 'moderate') {
+      parsed.issues = parsed.issues || [];
+      parsed.issues.push({
+        type: 'quality',
+        severity: 'moderate',
+        description: eyeOveruse.message,
+      });
+    }
+
+    // Phase R (2026-05-14): Inspirational vocabulary cluster — combo of
+    // "huyền thoại / vinh quang / huy hoàng / rực rỡ / định sẵn" across
+    // chapter (esp. concentrated in tail) = AI inspirational closer spam.
+    const inspirational = detectInspirationalCluster(content);
+    if (inspirational.severity === 'critical') {
+      parsed.requiresRewrite = true;
+      parsed.approved = false;
+      parsed.overallScore = Math.min(parsed.overallScore || 10, 4);
+      parsed.issues = parsed.issues || [];
+      parsed.issues.push({
+        type: 'quality',
+        severity: 'critical',
+        description: inspirational.message,
+      });
+      parsed.rewriteInstructions = (parsed.rewriteInstructions || '') +
+        ` INSPIRATIONAL CLOSER SPAM: ${inspirational.message}`;
+    } else if (inspirational.severity === 'moderate') {
+      parsed.issues = parsed.issues || [];
+      parsed.issues.push({
+        type: 'quality',
+        severity: 'moderate',
+        description: inspirational.message,
+      });
+    }
+
+    // Phase R (2026-05-14): Tail-monologue density — last 20% of chapter
+    // ≥2× body density of MC-name + future-tense + abstract-noun signals
+    // = model exhausted plot and looped MC inspirational tail.
+    if (protagonistName && protagonistName.trim().length >= 2) {
+      const tailLoop = detectMonologueTail(content, protagonistName.trim());
+      if (tailLoop.severity === 'major') {
+        parsed.requiresRewrite = true;
+        parsed.approved = false;
+        parsed.overallScore = Math.min(parsed.overallScore || 10, 5);
+        parsed.issues = parsed.issues || [];
+        parsed.issues.push({
+          type: 'pacing',
+          severity: 'major',
+          description: tailLoop.message,
+        });
+        parsed.rewriteInstructions = (parsed.rewriteInstructions || '') +
+          ` MONOLOGUE TAIL: ${tailLoop.message}`;
+      } else if (tailLoop.severity === 'moderate') {
+        parsed.issues = parsed.issues || [];
+        parsed.issues.push({
+          type: 'pacing',
+          severity: 'moderate',
+          description: tailLoop.message,
+        });
+      }
+    }
+
+    // Phase R (2026-05-14): Hard upper word-count cap. Existing wordRatio<0.6
+    // catches under-shoot but no defense against over-shoot. With
+    // disable_chapter_split, Writer can run 5K+ words on a 2800-target chapter
+    // and burn budget on MC monologue tail. Force REWRITE at >1.6× target.
+    if (wordRatio > 1.6) {
+      parsed.requiresRewrite = true;
+      parsed.approved = false;
+      parsed.overallScore = Math.min(parsed.overallScore || 10, 5);
+      parsed.issues = parsed.issues || [];
+      const msg = `Chương vượt ${Math.round(wordRatio * 100)}% target (${wordCount}/${targetWords} từ). Cắt phần dư — bám causally outline brief, KHÔNG dùng word budget cho inspirational monologue, paraphrase chain, hay mở rộng MC tâm tư. Giữ kết thúc bằng scene/cliffhanger cụ thể, không "huy hoàng / vinh quang / huyền thoại" closer.`;
+      parsed.issues.push({
+        type: 'pacing',
+        severity: wordRatio > 2.0 ? 'critical' : 'major',
+        description: msg,
+      });
+      parsed.rewriteInstructions = `[WORD OVERSHOOT] ${msg}\n\n` +
+        (parsed.rewriteInstructions ? `Cộng với: ${parsed.rewriteInstructions}` : '');
+    } else if (wordRatio > 1.3) {
+      parsed.issues = parsed.issues || [];
+      parsed.issues.push({
+        type: 'pacing',
+        severity: 'moderate',
+        description: `Chương dài hơn target (${Math.round(wordRatio * 100)}%, ${wordCount}/${targetWords} từ). Cắt ngắn nếu có monologue / paraphrase / inspirational closer.`,
+      });
     }
 
     // Hard enforcement: severe word repetition triggers rewrite

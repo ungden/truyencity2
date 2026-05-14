@@ -470,6 +470,255 @@ export function detectShortFormCharacterName(
   return { severity: 'none', message: '' };
 }
 
+/**
+ * Audit findings 2026-05-14 (Phase R): detect 4 repetition modes that
+ * `detectSevereRepetition` doesn't catch but reader perceives as "viết lặp
+ * cực kì tệ". All 4 are deterministic, no AI calls, fast (sub-ms).
+ *
+ *  1. detectMcNameRate — absolute MC name density (mentions per 1K words).
+ *     `detectShortFormCharacterName` only flags when % short-form ≥ 50%.
+ *     But novels using 100% full-name still leaked 14-20 mentions/1K (e.g.
+ *     Bao Cấp ch.5: 97 mentions in 4680 words = 20.7/1K). Webnovel target
+ *     is 60-100 mentions per 10K = 6-10 per 1K. Flag moderate at >12/1K,
+ *     critical at >16/1K.
+ *
+ *  2. detectEyeTemplateOveruse — combined "đôi mắt" + "ánh mắt" count.
+ *     `detectSevereRepetition` tracks "đôi mắt" alone with threshold 16/22
+ *     (structural_connective). But Bao Cấp ch.5 had 14× "ánh mắt" + 2×
+ *     "đôi mắt" = 16 eye descriptors — the template "[poss] [đôi/ánh] mắt
+ *     + verb/adj" is the AI tic. Flag moderate at ≥12 combined,
+ *     critical at ≥18.
+ *
+ *  3. detectInspirationalCluster — combined hot-list of inspirational
+ *     vocabulary ('huyền thoại','vinh quang','huy hoàng','rực rỡ','định
+ *     sẵn','vĩ đại','thiên mệnh','huyết mạch','vương quốc','vĩnh hằng').
+ *     Each individually < threshold but combo of 10+ in 1 chapter (esp.
+ *     concentrated in last 500 chars) = AI inspirational closer spam.
+ *     Flag moderate ≥10 total, critical ≥6 in tail (last 500 chars).
+ *
+ *  4. detectMonologueTail — measures whether last 20% of chapter has
+ *     ≥2× the density of MC-name + future-tense + abstract-noun compared
+ *     to first 60%. Catches "tail loop" where model exhausts plot then
+ *     fills remaining length with MC inspirational monologue.
+ */
+
+export function detectMcNameRate(
+  content: string,
+  fullName: string,
+): { severity: 'none' | 'moderate' | 'critical'; message: string; rate: number; count: number } {
+  if (!fullName || fullName.trim().length < 2) {
+    return { severity: 'none', message: '', rate: 0, count: 0 };
+  }
+  const wordCount = content.trim().split(/\s+/).filter(Boolean).length;
+  if (wordCount < 500) {
+    return { severity: 'none', message: '', rate: 0, count: 0 };
+  }
+  const tokens = fullName.trim().split(/\s+/).filter(t => t.length >= 2);
+  const lastToken = tokens.length >= 2 ? tokens[tokens.length - 1] : '';
+
+  // Count full-name occurrences.
+  const fullRe = new RegExp(`\\b${escapeRegex(fullName.trim())}\\b`, 'g');
+  const fullCount = (content.match(fullRe) || []).length;
+
+  // Count standalone last-token occurrences (not preceded by surname tokens).
+  let standaloneCount = 0;
+  if (lastToken) {
+    const precedingTokenLookbehind = tokens.slice(0, -1).map(escapeRegex).join('|');
+    try {
+      const standaloneRe = new RegExp(`(?<!\\b(?:${precedingTokenLookbehind})\\s+)\\b${escapeRegex(lastToken)}\\b`, 'g');
+      standaloneCount = (content.match(standaloneRe) || []).length;
+    } catch {
+      const totalLast = (content.match(new RegExp(`\\b${escapeRegex(lastToken)}\\b`, 'g')) || []).length;
+      standaloneCount = Math.max(0, totalLast - fullCount);
+    }
+  }
+
+  const totalMentions = fullCount + standaloneCount;
+  const rate = (totalMentions / wordCount) * 1000;
+
+  if (rate >= 16) {
+    return {
+      severity: 'critical',
+      message: `Tên MC "${fullName}" xuất hiện ${totalMentions} lần / ${wordCount} từ = ${rate.toFixed(1)} mentions/1K từ. Vượt xa target webnovel (6-10/1K từ). Dùng đại từ ("hắn"/"y"/"anh ta") hoặc context-referent thay vì lặp tên — KHÔNG dùng tên MC trong 2-3 câu liên tiếp.`,
+      rate,
+      count: totalMentions,
+    };
+  }
+  if (rate >= 12) {
+    return {
+      severity: 'moderate',
+      message: `Tên MC "${fullName}" xuất hiện ${totalMentions} lần / ${wordCount} từ = ${rate.toFixed(1)} mentions/1K từ (target webnovel 6-10/1K). Giảm bằng cách xen đại từ giữa các đoạn.`,
+      rate,
+      count: totalMentions,
+    };
+  }
+  return { severity: 'none', message: '', rate, count: totalMentions };
+}
+
+export function detectEyeTemplateOveruse(
+  content: string,
+): { severity: 'none' | 'moderate' | 'critical'; message: string; count: number } {
+  // Don't use \b — JS regex \b doesn't recognize Vietnamese diacritics
+  // (đ/á/ấ are not [a-zA-Z0-9_]). Use whitespace/punctuation boundary instead.
+  const doiMat = (content.match(/(?:^|[^\p{L}])đôi\s+mắt(?![\p{L}])/giu) || []).length;
+  const anhMat = (content.match(/(?:^|[^\p{L}])ánh\s+mắt(?![\p{L}])/giu) || []).length;
+  const total = doiMat + anhMat;
+
+  if (total >= 18) {
+    return {
+      severity: 'critical',
+      message: `Cụm "đôi mắt" (${doiMat}) + "ánh mắt" (${anhMat}) = ${total} lần. Pattern "[possessive] [đôi/ánh] mắt + verb/adj" lặp như công thức. Thay bằng mô tả gián tiếp (cử chỉ, biểu cảm cơ mặt, body language, dialogue).`,
+      count: total,
+    };
+  }
+  if (total >= 12) {
+    return {
+      severity: 'moderate',
+      message: `Cụm "đôi mắt"+"ánh mắt" tổng ${total} lần — mô tả mắt lặp công thức. Đa dạng hóa: thay vài lần bằng action ("hắn nhíu mày" / "cô bặm môi" / "ông gập tay") hoặc dialogue tiết lộ cảm xúc.`,
+      count: total,
+    };
+  }
+  return { severity: 'none', message: '', count: total };
+}
+
+const INSPIRATIONAL_HOT_LIST = [
+  'huyền thoại',
+  'vinh quang',
+  'huy hoàng',
+  'rực rỡ',
+  'định sẵn',
+  'vĩ đại',
+  'thiên mệnh',
+  'huyết mạch',
+  'vương quốc',
+  'vĩnh hằng',
+  'sứ mệnh',
+  'biểu tượng',
+];
+
+export function detectInspirationalCluster(
+  content: string,
+): { severity: 'none' | 'moderate' | 'critical'; message: string; total: number; tailCount: number } {
+  const lower = content.toLowerCase();
+  const tail = lower.slice(Math.max(0, lower.length - 500));
+
+  let total = 0;
+  let tailCount = 0;
+  const hits: string[] = [];
+  for (const w of INSPIRATIONAL_HOT_LIST) {
+    const re = new RegExp(`\\b${escapeRegex(w)}\\b`, 'g');
+    const m = lower.match(re);
+    const tm = tail.match(re);
+    if (m && m.length > 0) {
+      total += m.length;
+      hits.push(`${w}(${m.length})`);
+    }
+    if (tm) tailCount += tm.length;
+  }
+
+  // Critical: ≥6 inspirational hits in last 500 chars (concentrated closer spam)
+  // OR ≥14 total across chapter.
+  if (tailCount >= 6 || total >= 14) {
+    return {
+      severity: 'critical',
+      message: `Inspirational cluster: ${total} hits từ hot-list [${hits.join(', ')}], trong đó ${tailCount} ở 500 chars cuối. Đoạn kết KHÔNG được spam "huyền thoại/vinh quang/huy hoàng/định sẵn" — kết chương bằng SCENE/CLIFFHANGER cụ thể, không monologue ca tụng MC.`,
+      total,
+      tailCount,
+    };
+  }
+  if (total >= 10 || tailCount >= 4) {
+    return {
+      severity: 'moderate',
+      message: `Inspirational vocab dày: ${total} hits (tail ${tailCount}) từ [${hits.join(', ')}]. Cắt bớt vocab "huyền thoại/vinh quang/huy hoàng/rực rỡ" và thay bằng concrete scene detail.`,
+      total,
+      tailCount,
+    };
+  }
+  return { severity: 'none', message: '', total, tailCount };
+}
+
+export function detectMonologueTail(
+  content: string,
+  protagonistName: string,
+): { severity: 'none' | 'moderate' | 'major'; message: string; tailDensity: number; bodyDensity: number } {
+  const wordCount = content.trim().split(/\s+/).filter(Boolean).length;
+  if (wordCount < 1500) {
+    return { severity: 'none', message: '', tailDensity: 0, bodyDensity: 0 };
+  }
+
+  // Split into body (first 70%) and tail (last 20%) by char position.
+  const total = content.length;
+  const bodyEnd = Math.floor(total * 0.7);
+  const tailStart = Math.floor(total * 0.8);
+  const body = content.slice(0, bodyEnd);
+  const tail = content.slice(tailStart);
+  if (tail.length < 400) {
+    return { severity: 'none', message: '', tailDensity: 0, bodyDensity: 0 };
+  }
+
+  // Density signals: MC name mentions + future-tense modals + abstract nouns.
+  const MONOLOGUE_TOKENS = [
+    'tương lai',
+    'vận mệnh',
+    'huyền thoại',
+    'vinh quang',
+    'huy hoàng',
+    'rực rỡ',
+    'định sẵn',
+    'sứ mệnh',
+    'thiên mệnh',
+    'biểu tượng',
+    'sẽ',
+    'đã định',
+    'sắp',
+    'đã chính thức',
+    'một chương mới',
+    'thời đại',
+    'bước sang',
+    'rẽ sang',
+  ];
+  const countSignals = (text: string) => {
+    const lower = text.toLowerCase();
+    let n = 0;
+    for (const t of MONOLOGUE_TOKENS) {
+      const re = new RegExp(`\\b${escapeRegex(t)}\\b`, 'g');
+      const m = lower.match(re);
+      if (m) n += m.length;
+    }
+    if (protagonistName && protagonistName.length >= 2) {
+      const nameRe = new RegExp(`\\b${escapeRegex(protagonistName)}\\b`, 'gi');
+      const nm = text.match(nameRe);
+      if (nm) n += nm.length;
+    }
+    return n;
+  };
+
+  const tailHits = countSignals(tail);
+  const bodyHits = countSignals(body);
+  // Normalize per 1000 chars.
+  const tailDensity = (tailHits / tail.length) * 1000;
+  const bodyDensity = (bodyHits / Math.max(1, body.length)) * 1000;
+
+  // Tail must be ≥2× body density AND tail hits ≥10 to fire.
+  if (bodyDensity > 0 && tailDensity >= bodyDensity * 2.5 && tailHits >= 12) {
+    return {
+      severity: 'major',
+      message: `Monologue tail detected: 20% cuối chương có ${tailHits} signal (density ${tailDensity.toFixed(1)}/1K chars) vs body ${bodyHits} (${bodyDensity.toFixed(1)}/1K). Tail = ${(tailDensity / Math.max(0.1, bodyDensity)).toFixed(1)}× body — model spam inspirational monologue ở cuối thay vì advance plot. Cắt đoạn cuối, thay bằng scene/cliffhanger cụ thể.`,
+      tailDensity,
+      bodyDensity,
+    };
+  }
+  if (bodyDensity > 0 && tailDensity >= bodyDensity * 2 && tailHits >= 8) {
+    return {
+      severity: 'moderate',
+      message: `Tail density (${tailDensity.toFixed(1)}/1K) cao ${(tailDensity / Math.max(0.1, bodyDensity)).toFixed(1)}× body (${bodyDensity.toFixed(1)}/1K). Kiểm tra: 20% cuối có lặp "vận mệnh/tương lai/huyền thoại/sẽ" với MC làm subject? Thay bằng scene cụ thể.`,
+      tailDensity,
+      bodyDensity,
+    };
+  }
+  return { severity: 'none', message: '', tailDensity, bodyDensity };
+}
+
 export function detectSevereRepetition(content: string): CriticIssue[] {
   const text = content.toLowerCase();
   const issues: CriticIssue[] = [];
