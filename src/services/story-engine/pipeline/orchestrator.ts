@@ -504,10 +504,18 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   const productionFlashSoftGate =
     projectStyleDirectives?.production_enabled === true &&
     (options.model || project.ai_model || DEFAULT_CONFIG.model) === 'gemini-3.1-flash-lite';
+  // Phase T (2026-05-15): fresh chapter (ch.1-3) of a brand new novel
+  // auto-enables soft-gate. Steady-state production threshold (≥7) is
+  // calibrated for ch.50+ context-rich writing; fresh chapters naturally
+  // score 5-6 due to limited cross-chapter context + Gemini Flash Lite
+  // template attractor. Soft-gate still hard-rejects continuity/logic
+  // criticals so quality floor preserved.
+  const isFreshNovel = (project.current_chapter || 0) < 3;
   const flashRoutineSoftGate =
     projectStyleDirectives?.flash_routine_soft_gate === true ||
     directorOnlyFlash ||
-    productionFlashSoftGate;
+    productionFlashSoftGate ||
+    isFreshNovel;
   const flashRoutineMinQualityScore = Number(
     projectStyleDirectives?.flash_routine_min_quality_score ??
     (flashRoutineSoftGate ? 5 : DEFAULT_CONFIG.minQualityScore),
@@ -1047,12 +1055,17 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   // Gating: skip polish if post-write-validator finds ZERO critical/major
   // prose-layer issues — chapter is already clean at surface, no value
   // burning a polish call.
+  //
+  // Phase T (2026-05-15): FORCE polish on golden chapters (ch.1-3 of a
+  // new novel). Fresh chapters need maximum surface quality for reader
+  // first-impression, regardless of PWV findings.
   try {
     const prePolishIssues = runPostWriteValidator({ content: result.content });
     const hasPolishWorthyIssue = prePolishIssues.some(
       i => i.severity === 'critical' || i.severity === 'major',
     );
-    if (hasPolishWorthyIssue) {
+    const isGoldenChapter = lastChapterNumberPre <= 3;
+    if (hasPolishWorthyIssue || isGoldenChapter) {
       const polishResult = await polishChapter(
         {
           chapterNumber: lastChapterNumberPre,
