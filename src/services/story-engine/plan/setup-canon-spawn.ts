@@ -33,6 +33,18 @@ import { parseJSON } from '../utils/json-repair';
 import { getSupabase } from '../utils/supabase';
 import type { GeminiConfig, GenreType } from '../types';
 
+function importanceToInt(s: unknown): number {
+  const v = String(s || '').toLowerCase();
+  if (v === 'critical' || v === 'cosmic' || v.includes('crit')) return 10;
+  if (v === 'major' || v.includes('major')) return 7;
+  if (v === 'moderate' || v.includes('mod')) return 5;
+  if (v === 'minor' || v.includes('minor')) return 3;
+  // Already number?
+  const n = Number(s);
+  if (Number.isFinite(n)) return Math.max(1, Math.min(10, n));
+  return 5;
+}
+
 const SPAWN_SYSTEM = `Bạn là Setup Canon Architect cho TruyenCity. Đọc story outline + world description + master outline rồi tạo 1 artifact JSON cụ thể được yêu cầu.
 
 Quy tắc:
@@ -155,16 +167,20 @@ Trả về JSON:
     const db = getSupabase();
     const rows = parsed.factions.map(f => ({
       project_id: data.projectId,
-      name: String(f.name || ''),
-      type: String(f.type || 'unknown'),
-      summary: String(f.summary || ''),
-      territory: String(f.territory || ''),
-      mc_relation: String(f.mc_relation || 'unknown'),
-      key_members: f.key_members || [],
-      conflicts: f.conflicts || [],
-      introduce_arc: Number(f.introduce_arc) || 1,
-      first_seen_chapter: null,
-      last_seen_chapter: null,
+      faction_name: String(f.name || f.faction_name || ''),
+      faction_type: String(f.type || f.faction_type || 'unknown'),
+      power_level: 5,
+      description: [
+        String(f.summary || f.description || ''),
+        f.territory ? `Lãnh thổ: ${f.territory}` : '',
+        f.mc_relation ? `MC: ${f.mc_relation}` : '',
+        f.key_members && Array.isArray(f.key_members) ? `Thành viên chính: ${JSON.stringify(f.key_members).slice(0, 200)}` : '',
+      ].filter(Boolean).join(' | '),
+      alliances: Array.isArray(f.alliances) ? f.alliances : [],
+      rivalries: Array.isArray(f.conflicts) ? f.conflicts : (Array.isArray(f.rivalries) ? f.rivalries : []),
+      status: 'active',
+      importance: 7,
+      first_seen_chapter: Number(f.introduce_arc) * 30 || null,
     }));
     const { error } = await db.from('factions').insert(rows);
     if (error) return { generated: false, count: 0, error: error.message };
@@ -319,17 +335,29 @@ Trả về JSON:
       return { generated: false, count: 0, error: 'No foreshadowing returned' };
     }
     const db = getSupabase();
+    // Use crypto.randomUUID for hint_id (Phase 9D fix — sequential IDs caused
+    // collisions). Table is foreshadowing_plans (not foreshadowing_agenda).
+    // hint_type CHECK enum: dialogue / object / event / character_behavior / environmental
+    const normHintType = (s: unknown): string => {
+      const v = String(s || '').toLowerCase();
+      if (v.includes('dialog')) return 'dialogue';
+      if (v.includes('item') || v.includes('object') || v.includes('artifact')) return 'object';
+      if (v.includes('behav') || v.includes('character')) return 'character_behavior';
+      if (v.includes('env') || v.includes('world') || v.includes('place') || v.includes('rule')) return 'environmental';
+      return 'event';
+    };
     const rows = parsed.entries.map(e => ({
       project_id: data.projectId,
-      plant_chapter: Number(e.plantCh) || 1,
-      pickup_chapter: Number(e.pickupCh) || 30,
+      hint_id: globalThis.crypto?.randomUUID?.() || `hint_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
       hint_text: String(e.hintText || ''),
+      hint_type: normHintType(e.category),
+      plant_chapter: Number(e.plantCh) || 1,
+      payoff_chapter: Number(e.pickupCh) || 30,
       payoff_description: String(e.payoffDescription || ''),
-      category: String(e.category || 'minor'),
-      importance: String(e.importance || 'minor'),
       status: 'planned',
+      arc_number: Math.max(1, Math.ceil((Number(e.plantCh) || 1) / 100)),
     }));
-    const { error } = await db.from('foreshadowing_agenda').insert(rows);
+    const { error } = await db.from('foreshadowing_plans').insert(rows);
     if (error) return { generated: false, count: 0, error: error.message };
     return { generated: true, count: rows.length };
   } catch (e) {
@@ -378,13 +406,14 @@ Trả về JSON:
     const db = getSupabase();
     const rows = parsed.twists.map(t => ({
       project_id: data.projectId,
-      arc_number: Number(t.arc_number) || 1,
-      twist_chapter: Number(t.twist_chapter) || 1,
-      summary: String(t.summary || ''),
+      twist_name: String(t.summary || t.twist_name || '').slice(0, 200),
+      twist_type: String(t.payoff_type || t.twist_type || 'unknown'),
+      description: String(t.summary || t.description || ''),
       setup_chapters: (t.setup_chapters as number[]) || [],
-      payoff_type: String(t.payoff_type || 'unknown'),
-      reader_impact: String(t.reader_impact || 'minor'),
+      reveal_chapter: Number(t.twist_chapter) || 1,
       status: 'planned',
+      importance: importanceToInt(t.reader_impact || t.importance),
+      volume_number: Number(t.arc_number) || 1,
     }));
     const { error } = await db.from('plot_twists').insert(rows);
     if (error) return { generated: false, count: 0, error: error.message };
@@ -433,11 +462,19 @@ Trả về JSON:
       return { generated: false, count: 0, error: 'No themes returned' };
     }
     const db = getSupabase();
+    // theme_role CHECK enum: 'main' | 'supporting' (NOT 'motif')
+    const normThemeRole = (s: unknown): string => {
+      const v = String(s || '').toLowerCase();
+      if (v === 'main' || v.includes('main')) return 'main';
+      return 'supporting';
+    };
     const rows = parsed.themes.map(t => ({
       project_id: data.projectId,
-      name: String(t.name || ''),
+      theme_name: String(t.name || t.theme_name || ''),
+      theme_role: normThemeRole(t.type || t.theme_role),
       description: String(t.description || ''),
-      type: String(t.type || 'motif'),
+      motifs: [],
+      importance: 7,
     }));
     const { error } = await db.from('story_themes').insert(rows);
     if (error) return { generated: false, count: 0, error: error.message };
@@ -503,12 +540,12 @@ Trả về JSON:
         chapter_number: 0, // setup-time anchor, not tied to a specific chapter
         snippet_type: String(a.snippet_type || 'opening'),
         snippet_text: proseText,
-        key_traits: (a.key_traits as string[]) || [],
         voice_metrics: {
           avgSentenceLength: Math.round(avgSentenceLength),
           emDashCount,
           dialogueRatio: proseText.includes('—') ? 0.5 : 0,
           exclamationRatio: (proseText.match(/!/g) || []).length / Math.max(1, sentences.length),
+          keyTraits: (a.key_traits as string[]) || [], // stored in voice_metrics JSONB
         },
       };
     });
