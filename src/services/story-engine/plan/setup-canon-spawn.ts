@@ -53,7 +53,7 @@ Quy tắc:
 - KHÔNG copy benchmark Trung Quốc verbatim — tạo names riêng phù hợp setting.
 - Trả về JSON EXACT theo schema đề bài, không markdown wrap.`;
 
-interface ProjectSetupData {
+export interface ProjectSetupData {
   projectId: string;
   novelId: string;
   genre: string | null;
@@ -105,7 +105,7 @@ export async function spawnSetupCanon(
   return result;
 }
 
-function buildSetupContext(data: ProjectSetupData): string {
+export function buildSetupContext(data: ProjectSetupData): string {
   const parts: string[] = [];
   parts.push(`## Genre: ${data.genre || 'unknown'}`);
   if (data.mainCharacter) parts.push(`## MC: ${data.mainCharacter}`);
@@ -486,7 +486,7 @@ Trả về JSON:
 
 // ── 7. Voice anchors ─────────────────────────────────────────────────────────
 
-async function spawnVoiceAnchors(
+export async function spawnVoiceAnchors(
   data: ProjectSetupData,
   context: string,
   config: GeminiConfig,

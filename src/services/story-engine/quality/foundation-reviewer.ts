@@ -243,9 +243,26 @@ Trả về JSON chính xác theo schema trên.`;
     // Phase F (2026-05-15) — validate AI returned 14 dimensions in expected
     // order. AI sometimes drops or merges dims → silent partial scoring would
     // pass projects with incomplete review. Add 0-score for missing dims.
+    //
+    // EXCEPTION: dims with stage='trial' require an actual ch.1 trial chapter
+    // to evaluate (warmth check, opening hook). When the review runs pre-trial
+    // (canon_spawn → foundation_review → ready_to_write order, no trial stage
+    // in between), AI correctly omits these dims. Treat as N/A — exclude from
+    // total/avg/min calculations instead of fail-closing at 0.
+    const hasTrialContent = Boolean(input.artifacts.trialChapters && input.artifacts.trialChapters.length > 0);
     const dimensions: FoundationDimension[] = DIMENSION_DEFS.map(def => {
       const found = parsed.dimensions.find(d => d.name === def.name);
       if (!found) {
+        const isTrialOnlyDim = def.stage === 'trial';
+        if (isTrialOnlyDim && !hasTrialContent) {
+          return {
+            name: def.name,
+            score: -1, // sentinel: N/A — excluded from aggregation
+            weight: 0,
+            feedback: `Dim "${def.name}" skipped: no trial chapter content available pre-write`,
+            stage: def.stage,
+          };
+        }
         return {
           name: def.name,
           score: 0, // missing dim = 0 — fail-closed
@@ -263,10 +280,15 @@ Trả về JSON chính xác theo schema trên.`;
       };
     });
 
-    const totalScore = dimensions.reduce((s, d) => s + d.score, 0);
-    const avgScore = totalScore / dimensions.length;
-    const minDimScore = Math.min(...dimensions.map(d => d.score));
-    const passed = totalScore >= PASS_THRESHOLD && minDimScore >= DIMENSION_FLOOR;
+    // Aggregate only over scored dims (exclude N/A sentinels).
+    const scoredDims = dimensions.filter(d => d.score >= 0);
+    const totalScore = scoredDims.reduce((s, d) => s + d.score, 0);
+    const avgScore = scoredDims.length > 0 ? totalScore / scoredDims.length : 0;
+    const minDimScore = scoredDims.length > 0 ? Math.min(...scoredDims.map(d => d.score)) : 0;
+    // Scale threshold proportionally when some dims are N/A (e.g. 13/14 scored
+    // → 80 * 13/14 ≈ 74). Floor stays absolute per-dim.
+    const scaledThreshold = Math.round((PASS_THRESHOLD * scoredDims.length) / DIMENSION_DEFS.length);
+    const passed = totalScore >= scaledThreshold && minDimScore >= DIMENSION_FLOOR;
 
     let retryRecommendation = parsed.retryRecommendation;
     if (!passed && !retryRecommendation) {
