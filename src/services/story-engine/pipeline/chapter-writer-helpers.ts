@@ -48,7 +48,95 @@ export function cleanContent(content: string): string {
   cleaned = cleaned.replace(/(\S+(?:\s+\S+){1,5}?)(?:\s+\1){2,}/g, '$1');
   cleaned = cleaned.replace(/(\S{2,})(?:\s+\1){2,}/g, '$1');
 
+  // Phase 2026-05-16 root-cause fix: Gemini Flash Lite intermittently emits
+  // hyphen (U+002D) or en-dash (U+2013) at dialogue line start instead of the
+  // required em-dash (U+2014). Audit showed Đại Ca Xuyên Việt used hyphen for
+  // ~30% of chapters systematically. Normalize before saving — deterministic,
+  // not a prompt rule.
+  cleaned = normalizeDialogueMarkers(cleaned);
+
   return cleaned;
+}
+
+/**
+ * Normalize dialogue line markers to em-dash (—, U+2014).
+ *
+ * Replaces leading hyphen `-` (U+002D) or en-dash `–` (U+2013) followed by
+ * a space + dialogue-like content with em-dash + space. Idempotent.
+ *
+ * Conservative: only acts on lines that look like dialogue (next character
+ * is a letter, quote, or Vietnamese-uppercase). Skips list markers like
+ * `- Note`, `- Lưu ý`, `- Ghi chú`, numeric items, code fragments.
+ */
+export function normalizeDialogueMarkers(content: string): string {
+  // Skip-words that indicate the line is a list/instruction marker, not dialogue.
+  // No \b: JS regex word boundary is ASCII-only, so it won't fire after Vietnamese
+  // diacritic letters like "ý". Require explicit terminator (whitespace, colon, end).
+  const skipWords = /^(?:Note|Lưu\s+ý|Ghi\s+chú|TODO|FIXME|NOTE)(?:\s|:|$)/i;
+
+  return content.split('\n').map((line) => {
+    // Match leading hyphen or en-dash + whitespace + remainder
+    const m = /^([-–])\s+(.+)$/.exec(line);
+    if (!m) return line;
+
+    const rest = m[2];
+
+    // Skip if the line is plainly not dialogue:
+    //   - starts with a digit (math, list item)
+    //   - starts with an instruction skip-word
+    //   - is too short (likely a separator/list marker)
+    if (/^\d/.test(rest)) return line;
+    if (skipWords.test(rest)) return line;
+    if (rest.length < 3) return line;
+
+    // Heuristic: dialogue content starts with a letter (incl. Vietnamese
+    // diacritics) or a quotation-like character. If the next non-space char
+    // doesn't match, leave the line alone.
+    if (!/^["'"'"'(\p{L})]/u.test(rest)) return line;
+
+    return `— ${rest}`;
+  }).join('\n');
+}
+
+/**
+ * Detect when a chapter has lost em-dash dialogue formatting catastrophically.
+ *
+ * Two failure modes covered:
+ *   1. Total fusion: dialogue merged into narration paragraphs, no em-dash at
+ *      all despite chapter being long enough to have many speech turns.
+ *   2. Relative regression: em-dash count dropped >80% vs the previous chapter
+ *      written by the same novel.
+ *
+ * Returns a short reason string for the retry instruction, or null when no
+ * critical regression is detected. Designed to be called AFTER cleanContent
+ * (which already normalizes hyphen → em-dash). Anything still missing here
+ * is a real fusion failure, not just a character substitution.
+ */
+export function detectEmDashFormatBreak(
+  content: string,
+  options?: { previousEmDashCount?: number; minChars?: number; minParagraphs?: number },
+): string | null {
+  const minChars = options?.minChars ?? 3000;
+  const minParagraphs = options?.minParagraphs ?? 15;
+  if (!content || content.length < minChars) return null;
+
+  const paragraphs = content.split(/\n\n+/).map(p => p.trim()).filter(Boolean);
+  if (paragraphs.length < minParagraphs) return null;
+
+  const emDashCount = (content.match(/—/g) || []).length;
+
+  // Mode 1: total fusion — long chapter with effectively zero em-dash markers.
+  if (emDashCount <= 3) {
+    return `chapter has ${paragraphs.length} paragraphs and ${content.length} chars but only ${emDashCount} em-dash markers — dialogue likely fused into narration prose instead of using em-dash format`;
+  }
+
+  // Mode 2: relative regression vs previous chapter baseline.
+  const prev = options?.previousEmDashCount ?? 0;
+  if (prev >= 15 && emDashCount < prev * 0.2) {
+    return `em-dash count dropped from ${prev} (previous chapter) to ${emDashCount} (>80% drop) — dialogue format regression detected`;
+  }
+
+  return null;
 }
 
 // ── Title Extraction ─────────────────────────────────────────────────────────
