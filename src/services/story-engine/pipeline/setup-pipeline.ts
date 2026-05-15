@@ -535,15 +535,28 @@ ${blueprintInstructions}
 Trả về JSON: {"worldDescription":"<800-1500 từ tuân blueprint 10-section, mở đầu BẮT BUỘC bằng ### STORY KERNEL SUMMARY, BẮT BUỘC inject ≥3 worldbuilding hooks từ playbook>"}`;
 
   try {
+    // Phase T+1 (2026-05-15): adapt model + temp based on kernel_repair_attempts.
+    // Gemini Flash Lite returns empty content on specific kernel/genre combos
+    // (zombie virus / showbiz / mass casualty / etc.) — safety filter false-positive.
+    // After 3 repair attempts, switch to gemini-3-flash-preview (different filter
+    // baseline) + lower temp + higher maxTokens for more deterministic output.
+    const { data: projectRow } = await getSupabase()
+      .from('ai_story_projects').select('kernel_repair_attempts').eq('id', p.id).maybeSingle();
+    const repairAttempts = (projectRow?.kernel_repair_attempts as number) || 0;
+    const useProModel = repairAttempts >= 3;
+    const worldModel = useProModel ? 'gemini-3-flash-preview' : 'gemini-3.1-flash-lite';
+    const worldTemp = repairAttempts >= 2 ? 0.4 : 0.8;
+    const worldMaxTokens = repairAttempts >= 2 ? 16384 : 8192;
+
     const res = await callGemini(prompt, {
-      model: 'gemini-3.1-flash-lite', temperature: 0.8, maxTokens: 8192,
+      model: worldModel, temperature: worldTemp, maxTokens: worldMaxTokens,
       systemPrompt: SANG_VAN_DNA + '\n\n[ROLE-SPECIFIC] Stage: WORLD. Build world_description theo StoryKernel + 10-section blueprint. Section đầu là ### STORY KERNEL SUMMARY. World ngây thơ về MC, antagonist Phase 1 LOCAL only.',
     }, { jsonMode: true, tracking: { projectId: p.id, task: 'stage_world' } });
 
     const parsed = parseJSON<{ worldDescription?: string }>(res.content);
     const wd = (parsed?.worldDescription || '').trim();
     if (wd.length < 500) {
-      return { success: false, error: `world too short (${wd.length} chars, need ≥500)` };
+      return { success: false, error: `world too short (${wd.length} chars, need ≥500). Model=${worldModel} temp=${worldTemp} maxTokens=${worldMaxTokens} repair_attempts=${repairAttempts}.` };
     }
     const validation = validateSeedStructure(wd);
     if (!validation.passed) {
