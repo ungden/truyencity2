@@ -240,15 +240,26 @@ Trả về JSON chính xác theo schema trên.`;
       return createFailClosedResult('AI returned invalid foundation review output');
     }
 
-    // Build dimensions with stage info
-    const dimensions: FoundationDimension[] = parsed.dimensions.map(d => {
-      const def = DIMENSION_DEFS.find(x => x.name === d.name);
+    // Phase F (2026-05-15) — validate AI returned 14 dimensions in expected
+    // order. AI sometimes drops or merges dims → silent partial scoring would
+    // pass projects with incomplete review. Add 0-score for missing dims.
+    const dimensions: FoundationDimension[] = DIMENSION_DEFS.map(def => {
+      const found = parsed.dimensions.find(d => d.name === def.name);
+      if (!found) {
+        return {
+          name: def.name,
+          score: 0, // missing dim = 0 — fail-closed
+          weight: 1,
+          feedback: `Dim "${def.name}" missing from AI response — fail-closed at score 0`,
+          stage: def.stage,
+        };
+      }
       return {
-        name: d.name,
-        score: Math.max(0, Math.min(10, d.score || 0)),
+        name: def.name,
+        score: Math.max(0, Math.min(10, found.score || 0)),
         weight: 1,
-        feedback: d.feedback || '',
-        stage: def?.stage || 'unknown',
+        feedback: found.feedback || '',
+        stage: def.stage,
       };
     });
 
