@@ -38,6 +38,18 @@ scripts/audit-pipeline.ts
 scripts/check-results.ts
 scripts/trigger-write-chapters.ts
 
+# Phase R/S/T (2026-05-15) — debug + trace scripts not for production CI
+scripts/_*.ts
+
+# Temporary audit + backfill output directories
+/tmp/backfill/
+/tmp/backfill-orch/
+/tmp/backfill-length/
+/tmp/setup-v3/
+/tmp/mat-the-audit/
+/tmp/probe/
+/tmp/title-audit/
+
 # env files (can opt-in for committing if needed)
 .env*
 !.env.example

@@ -22,6 +22,10 @@ import { retrieveRAGContext, chunkAndStoreChapter, retrieveEntityContext, retrie
 import { saveCharacterStatesFromCombined, detectCharacterContradictions, type CharacterContradiction } from '../state/character-state';
 import { extractCharacterKnowledge, getCharacterKnowledgeContext } from '../state/knowledge-graph';
 import { autoReviseChapter } from './auto-reviser';
+import { normalizeChapterLength } from './length-normalizer';
+import { defaultLengthSpec, chooseNormalizeMode } from '../utils/length-metrics';
+import { polishChapter } from './polisher';
+import { runPostWriteValidator } from '../quality/post-write-validator';
 import { runContinuityGuardian } from '../quality/continuity-guardian';
 import { buildPlotThreadContext, extractAndUpdatePlotThreads } from '../state/plot-threads';
 import { buildBeatContext, detectAndRecordBeats } from '../memory/beat-ledger';
@@ -500,10 +504,18 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   const productionFlashSoftGate =
     projectStyleDirectives?.production_enabled === true &&
     (options.model || project.ai_model || DEFAULT_CONFIG.model) === 'gemini-3.1-flash-lite';
+  // Phase T (2026-05-15): fresh chapter (ch.1-3) of a brand new novel
+  // auto-enables soft-gate. Steady-state production threshold (≥7) is
+  // calibrated for ch.50+ context-rich writing; fresh chapters naturally
+  // score 5-6 due to limited cross-chapter context + Gemini Flash Lite
+  // template attractor. Soft-gate still hard-rejects continuity/logic
+  // criticals so quality floor preserved.
+  const isFreshNovel = (project.current_chapter || 0) < 3;
   const flashRoutineSoftGate =
     projectStyleDirectives?.flash_routine_soft_gate === true ||
     directorOnlyFlash ||
-    productionFlashSoftGate;
+    productionFlashSoftGate ||
+    isFreshNovel;
   const flashRoutineMinQualityScore = Number(
     projectStyleDirectives?.flash_routine_min_quality_score ??
     (flashRoutineSoftGate ? 5 : DEFAULT_CONFIG.minQualityScore),
@@ -993,6 +1005,92 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   if (businessLogicBlock) {
     throw new Error(
       `Chapter ${nextChapter}-${lastChapterNumberPre}: blocking business-logic consistency issues. Refusing to publish — cron will retry. Issues: ${businessLogicBlock}`,
+    );
+  }
+
+  // ── Step 4.7: Length-Normalizer (Phase R+1, 2026-05-15) ─────────────────
+  // Single-pass length adjustment if word count outside soft range. Preserves
+  // plot, dialogue, character names. Cheaper + safer than retry loops.
+  // Skips entirely if chapter already within ±15% of target.
+  try {
+    const lengthSpec = defaultLengthSpec(targetWordCount);
+    const currentWords = result.content.trim().split(/\s+/).filter(Boolean).length;
+    const mode = chooseNormalizeMode(currentWords, lengthSpec);
+    if (mode !== 'none') {
+      const normResult = await normalizeChapterLength(
+        {
+          chapterNumber: lastChapterNumberPre,
+          chapterContent: result.content,
+          lengthSpec,
+          chapterIntent: result.outline?.summary || result.title,
+        },
+        geminiConfig,
+        project.id,
+      );
+      if (normResult.applied) {
+        result.content = normResult.normalizedContent;
+        result.wordCount = normResult.finalCount;
+        console.warn(
+          `[Orchestrator] Length-normalize Ch.${nextChapter}-${lastChapterNumberPre}: ${normResult.mode} ${normResult.originalCount}→${normResult.finalCount} (target ${lengthSpec.target})${normResult.warning ? ' | ' + normResult.warning : ''}`,
+        );
+      } else if (normResult.warning) {
+        console.warn(
+          `[Orchestrator] Length-normalize skipped Ch.${nextChapter}-${lastChapterNumberPre}: ${normResult.warning}`,
+        );
+      }
+    }
+  } catch (e) {
+    console.warn(
+      `[Orchestrator] Length-normalize threw for Ch.${nextChapter}-${lastChapterNumberPre}:`,
+      e instanceof Error ? e.message : String(e),
+    );
+  }
+
+  // ── Step 4.8: Polisher (Phase R+1, 2026-05-15) ──────────────────────────
+  // Surface-only polish — sentence variety, externalize emotion, distinct
+  // character voice, kill narrator conclusions + AI-tell vocab. Cannot
+  // change plot/structure/dialogue content. Runs after length-normalizer
+  // so length is already in soft range.
+  //
+  // Gating: skip polish if post-write-validator finds ZERO critical/major
+  // prose-layer issues — chapter is already clean at surface, no value
+  // burning a polish call.
+  //
+  // Phase T (2026-05-15): FORCE polish on golden chapters (ch.1-3 of a
+  // new novel). Fresh chapters need maximum surface quality for reader
+  // first-impression, regardless of PWV findings.
+  try {
+    const prePolishIssues = runPostWriteValidator({ content: result.content });
+    const hasPolishWorthyIssue = prePolishIssues.some(
+      i => i.severity === 'critical' || i.severity === 'major',
+    );
+    const isGoldenChapter = lastChapterNumberPre <= 3;
+    if (hasPolishWorthyIssue || isGoldenChapter) {
+      const polishResult = await polishChapter(
+        {
+          chapterNumber: lastChapterNumberPre,
+          chapterContent: result.content,
+          chapterIntent: result.outline?.summary || result.title,
+        },
+        geminiConfig,
+        project.id,
+      );
+      if (polishResult.changed) {
+        result.content = polishResult.polishedContent;
+        result.wordCount = result.content.trim().split(/\s+/).filter(Boolean).length;
+        console.warn(
+          `[Orchestrator] Polish Ch.${nextChapter}-${lastChapterNumberPre}: ${polishResult.originalLength}→${polishResult.polishedLength} chars (${prePolishIssues.filter(i => i.severity === 'critical' || i.severity === 'major').length} crit/major issues addressed)${polishResult.warning ? ' | ' + polishResult.warning : ''}`,
+        );
+      } else if (polishResult.warning) {
+        console.warn(
+          `[Orchestrator] Polish skipped Ch.${nextChapter}-${lastChapterNumberPre}: ${polishResult.warning}`,
+        );
+      }
+    }
+  } catch (e) {
+    console.warn(
+      `[Orchestrator] Polish threw for Ch.${nextChapter}-${lastChapterNumberPre}:`,
+      e instanceof Error ? e.message : String(e),
     );
   }
 

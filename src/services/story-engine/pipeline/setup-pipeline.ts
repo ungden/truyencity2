@@ -43,6 +43,9 @@ import { getDopaminePatternsByGenre, GENRE_ANTI_CLICHE, GENRE_TITLE_EXAMPLES } f
 import { generateMasterOutline } from '../plan/master-outline';
 import { generateStoryOutline } from '../plan/story-outline';
 import { generateArcPlan } from '../context/generators';
+import { runTopicPositioning } from '../plan/topic-positioning';
+import { spawnSetupCanon } from '../plan/setup-canon-spawn';
+import { runFoundationReview, persistFoundationReview } from '../quality/foundation-reviewer';
 import { DEFAULT_CONFIG, type GeminiConfig, type GenreType, type StoryKernel } from '../types';
 import { formatAuthorPatternDnaForSetup } from '../templates/author-pattern-dna';
 import {
@@ -116,7 +119,10 @@ OUTPUT: CHỈ trả về JSON hợp lệ với fields được yêu cầu.`;
 
 export type SetupStage =
   | 'idea' | 'world' | 'character' | 'description'
-  | 'master_outline' | 'story_outline' | 'arc_plan'
+  | 'master_outline' | 'story_outline'
+  | 'canon_spawn'     // Phase S — modular canon (factions / world / power / foreshadowing / twists / themes / voice)
+  | 'arc_plan'
+  | 'foundation_review' // Phase S — scored 14-dim review, loop on fail
   | 'ready_to_write' | 'writing' | 'completed';
 
 export interface ProjectStageRow {
@@ -149,8 +155,10 @@ const NEXT_STAGE: Record<SetupStage, SetupStage> = {
   character: 'description',
   description: 'master_outline',
   master_outline: 'story_outline',
-  story_outline: 'arc_plan',
-  arc_plan: 'ready_to_write',
+  story_outline: 'canon_spawn',
+  canon_spawn: 'arc_plan',
+  arc_plan: 'foundation_review',
+  foundation_review: 'ready_to_write',
   ready_to_write: 'writing',
   writing: 'completed',
   completed: 'completed',
@@ -271,6 +279,36 @@ async function runStageIdea(p: ProjectStageRow): Promise<{ success: boolean; err
   const novel = getNovel(p);
   if (!novel) return { success: false, error: 'no novel linked' };
   const genre = (p.genre || 'tien-hiep') as GenreType;
+
+  // Phase S — run topic positioning if not already done. Stores
+  // benchmarks + differentiation contract + reader expectations into
+  // style_directives.positioning. Subsequent IDEA prompt injects.
+  try {
+    const { data: existingRow } = await getSupabase()
+      .from('ai_story_projects')
+      .select('style_directives')
+      .eq('id', p.id)
+      .maybeSingle();
+    const styleDir = (existingRow?.style_directives as Record<string, unknown>) || {};
+    if (!styleDir.positioning) {
+      await runTopicPositioning(
+        {
+          projectId: p.id,
+          genre,
+          subGenres: (existingRow as { sub_genres?: string[] })?.sub_genres,
+          targetChapters: p.total_planned_chapters || 1000,
+          userHint: novel.title,
+        },
+        stageConfig(),
+      );
+    }
+  } catch (e) {
+    console.warn(
+      `[setup-pipeline] topic positioning threw for ${p.id}:`,
+      e instanceof Error ? e.message : String(e),
+    );
+    // Non-fatal — IDEA stage continues without positioning context
+  }
 
   // Phase 29: thread genre-specific tension axes + dopamine patterns + anti-cliché
   const playbookSection = formatPlaybookForIdeaStage(genre);
@@ -497,15 +535,35 @@ ${blueprintInstructions}
 Trả về JSON: {"worldDescription":"<800-1500 từ tuân blueprint 10-section, mở đầu BẮT BUỘC bằng ### STORY KERNEL SUMMARY, BẮT BUỘC inject ≥3 worldbuilding hooks từ playbook>"}`;
 
   try {
+    // Phase T+2 (2026-05-15): adapt model + temp + ROUTING BYPASS based on
+    // kernel_repair_attempts. Two failure modes observed:
+    //   1. Pro thinking model (gemini-3-flash-preview) burns output tokens via
+    //      hidden reasoning, leaving no budget for content → empty response.
+    //      installModelTierRouting routes 'stage_world' → Pro by default.
+    //   2. Gemini 3 family at temp 1.0 (forced by callGemini for gemini-3*)
+    //      can be stochastic empty on certain content. Caller temp < 0.7 now
+    //      respected.
+    // Solution after 2+ repair attempts: use task name 'stage_world_retry'
+    // which is NOT in PRO_TASKS → router falls back to MODEL_FLASH = flash-lite.
+    // Pass temp 0.4 explicitly (below 0.7 threshold) so it's actually used.
+    const { data: projectRow } = await getSupabase()
+      .from('ai_story_projects').select('kernel_repair_attempts').eq('id', p.id).maybeSingle();
+    const repairAttempts = (projectRow?.kernel_repair_attempts as number) || 0;
+    const useRetryPath = repairAttempts >= 2;
+    const worldTaskName = useRetryPath ? 'stage_world_retry' : 'stage_world';
+    const worldModel = 'gemini-3.1-flash-lite'; // routing may override on first path
+    const worldTemp = useRetryPath ? 0.4 : 0.8;
+    const worldMaxTokens = useRetryPath ? 16384 : 8192;
+
     const res = await callGemini(prompt, {
-      model: 'gemini-3.1-flash-lite', temperature: 0.8, maxTokens: 8192,
+      model: worldModel, temperature: worldTemp, maxTokens: worldMaxTokens,
       systemPrompt: SANG_VAN_DNA + '\n\n[ROLE-SPECIFIC] Stage: WORLD. Build world_description theo StoryKernel + 10-section blueprint. Section đầu là ### STORY KERNEL SUMMARY. World ngây thơ về MC, antagonist Phase 1 LOCAL only.',
-    }, { jsonMode: true, tracking: { projectId: p.id, task: 'stage_world' } });
+    }, { jsonMode: true, tracking: { projectId: p.id, task: worldTaskName } });
 
     const parsed = parseJSON<{ worldDescription?: string }>(res.content);
     const wd = (parsed?.worldDescription || '').trim();
     if (wd.length < 500) {
-      return { success: false, error: `world too short (${wd.length} chars, need ≥500)` };
+      return { success: false, error: `world too short (${wd.length} chars, need ≥500). Task=${worldTaskName} temp=${worldTemp} maxTokens=${worldMaxTokens} repair_attempts=${repairAttempts}.` };
     }
     const validation = validateSeedStructure(wd);
     if (!validation.passed) {
@@ -861,6 +919,170 @@ async function runStageArcPlan(p: ProjectStageRow): Promise<{ success: boolean; 
   }
 }
 
+// ── Stage 8 (Phase S): CANON SPAWN ──────────────────────────────────────────
+async function runStageCanonSpawn(p: ProjectStageRow): Promise<{ success: boolean; error?: string }> {
+  const wd = (p.world_description || '').trim();
+  const mc = (p.main_character || '').trim();
+
+  try {
+    assertSetupGate({
+      worldDescription: wd,
+      mainCharacter: mc,
+      storyOutline: p.story_outline,
+      masterOutline: p.master_outline,
+      requireStoryOutline: true,
+      requireMasterOutline: true,
+    });
+
+    const result = await spawnSetupCanon(
+      {
+        projectId: p.id,
+        novelId: p.novel_id,
+        genre: p.genre,
+        mainCharacter: mc,
+        worldDescription: wd,
+        storyOutline: p.story_outline,
+        masterOutline: p.master_outline,
+        storyBible: p.story_bible || null,
+      },
+      stageConfig(),
+    );
+
+    // Persist result summary to style_directives for admin visibility
+    const { data: row } = await getSupabase()
+      .from('ai_story_projects')
+      .select('style_directives')
+      .eq('id', p.id)
+      .maybeSingle();
+    const sd = (row?.style_directives as Record<string, unknown>) || {};
+    await getSupabase()
+      .from('ai_story_projects')
+      .update({
+        style_directives: {
+          ...sd,
+          canon_spawn_result: result,
+          canon_spawn_at: new Date().toISOString(),
+        },
+      })
+      .eq('id', p.id);
+
+    // Stage passes if at least 4 of 7 canon types generated successfully.
+    const generatedCount = [
+      result.factions.generated,
+      result.worldCanon.generated,
+      result.powerSystem.generated,
+      result.foreshadowing.generated,
+      result.plotTwists.generated,
+      result.themes.generated,
+      result.voiceAnchors.generated,
+    ].filter(Boolean).length;
+
+    if (generatedCount < 4) {
+      const errors = [
+        result.factions.error && `factions: ${result.factions.error}`,
+        result.worldCanon.error && `worldCanon: ${result.worldCanon.error}`,
+        result.powerSystem.error && `powerSystem: ${result.powerSystem.error}`,
+        result.foreshadowing.error && `foreshadowing: ${result.foreshadowing.error}`,
+        result.plotTwists.error && `plotTwists: ${result.plotTwists.error}`,
+        result.themes.error && `themes: ${result.themes.error}`,
+        result.voiceAnchors.error && `voiceAnchors: ${result.voiceAnchors.error}`,
+      ].filter(Boolean).join(' | ');
+      return {
+        success: false,
+        error: `Canon spawn coverage too low (${generatedCount}/7): ${errors.slice(0, 400)}`,
+      };
+    }
+
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : String(e) };
+  }
+}
+
+// ── Stage 9 (Phase S): FOUNDATION REVIEW ────────────────────────────────────
+async function runStageFoundationReview(
+  p: ProjectStageRow,
+): Promise<{ success: boolean; error?: string }> {
+  const wd = (p.world_description || '').trim();
+
+  try {
+    const { data: project } = await getSupabase()
+      .from('ai_story_projects')
+      .select('style_directives, worldbuilding_canon, power_system_canon')
+      .eq('id', p.id)
+      .maybeSingle();
+    const styleDir = (project?.style_directives as Record<string, unknown>) || {};
+    const positioning = styleDir.positioning;
+    const setupKernel = getSetupKernelFromOutline(p.story_outline);
+
+    // Load supporting canon for review
+    const db = getSupabase();
+    const [factions, voiceAnchors] = await Promise.all([
+      db.from('factions').select('*').eq('project_id', p.id),
+      db.from('voice_anchors').select('*').eq('project_id', p.id),
+    ]);
+
+    const result = await runFoundationReview(
+      {
+        projectId: p.id,
+        artifacts: {
+          positioning,
+          kernel: setupKernel,
+          worldDescription: wd,
+          worldCanon: project?.worldbuilding_canon,
+          castRoster: factions.data,
+          masterOutline: p.master_outline,
+          storyOutline: p.story_outline,
+          voiceAnchors: voiceAnchors.data,
+        },
+      },
+      stageConfig(),
+    );
+
+    await persistFoundationReview(p.id, result);
+
+    if (!result.passed) {
+      const retry = result.retryRecommendation;
+      const errMsg = `Foundation review FAILED total=${result.totalScore}/140 avg=${result.avgScore} min=${result.minDimScore}/10. ${retry ? `[retry stage=${retry.stage} priority=${retry.priority}] ${retry.instruction.slice(0, 300)}` : ''}`;
+
+      // If retry recommendation points to earlier stage, rewind setup_stage
+      if (retry && retry.stage && retry.stage !== 'foundation_review') {
+        const rewindToStage = retry.stage as SetupStage;
+        // Validate the stage is a valid SetupStage
+        const validStages: SetupStage[] = ['idea', 'world', 'character', 'description', 'master_outline', 'story_outline', 'canon_spawn'];
+        if (validStages.includes(rewindToStage)) {
+          // Cap rewinds — kernel_repair_attempts gates max 3 rewinds total
+          const { data: row } = await getSupabase()
+            .from('ai_story_projects')
+            .select('kernel_repair_attempts')
+            .eq('id', p.id)
+            .maybeSingle();
+          const attempts = (row?.kernel_repair_attempts as number) || 0;
+          if (attempts < 3) {
+            await getSupabase()
+              .from('ai_story_projects')
+              .update({
+                setup_stage: rewindToStage,
+                setup_stage_attempts: 0,
+                setup_stage_error: errMsg,
+                kernel_repair_attempts: attempts + 1,
+              })
+              .eq('id', p.id);
+            return { success: false, error: `Rewound to stage=${rewindToStage} (foundation review attempt ${attempts + 1}/3): ${errMsg}` };
+          }
+          // Exceeded max rewinds — pause for admin
+          return { success: false, error: `${errMsg} [Max 3 foundation review rewinds exceeded — admin must intervene]` };
+        }
+      }
+      return { success: false, error: errMsg };
+    }
+
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : String(e) };
+  }
+}
+
 // ── Stage Handler dispatch ─────────────────────────────────────────────────
 type StageHandler = (p: ProjectStageRow) => Promise<{ success: boolean; error?: string }>;
 
@@ -871,7 +1093,9 @@ const STAGE_HANDLERS: Partial<Record<SetupStage, StageHandler>> = {
   description: runStageDescription,
   master_outline: runStageMasterOutline,
   story_outline: runStageStoryOutline,
+  canon_spawn: runStageCanonSpawn,
   arc_plan: runStageArcPlan,
+  foundation_review: runStageFoundationReview,
 };
 
 /**

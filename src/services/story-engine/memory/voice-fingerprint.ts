@@ -15,6 +15,7 @@ import { getSupabase } from '../utils/supabase';
 import { callGemini } from '../utils/gemini';
 import { parseJSON } from '../utils/json-repair';
 import type { GeminiConfig } from '../types';
+import { computeStyleStats, detectStyleDrift, type StyleStats } from '../utils/style-stats';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -30,6 +31,12 @@ export interface VoiceFingerprint {
   openingPatterns: string[];    // How chapters typically open
   transitionStyle: string;     // How scenes transition
   dialogueStyle: string;       // How characters speak (formal, casual, mixed)
+  /**
+   * Phase R+1 (2026-05-15) — pure-stats metrics computed from sampled
+   * chapters, alongside AI qualitative analysis. Stored in same JSONB
+   * column so no schema migration needed.
+   */
+  styleStats?: StyleStats;
 }
 
 // ── Constants ────────────────────────────────────────────────────────────────
@@ -118,6 +125,13 @@ Trả về JSON:
   const parsed = parseJSON<VoiceFingerprint>(res.content);
   if (!parsed) return;
 
+  // Phase R+1 — pure-stats analysis on combined sampled content. Ground
+  // the qualitative AI fingerprint in measurable numbers + add stats
+  // drift detection alongside AI drift.
+  const combinedSampleText = chapters.map(c => c.content || '').join('\n\n');
+  const newStats = computeStyleStats(combinedSampleText);
+  parsed.styleStats = newStats;
+
   // Detect drift across 7 dimensions and add anti-patterns
   const antiPatterns: string[] = [];
   if (existing?.fingerprint) {
@@ -173,6 +187,14 @@ Trả về JSON:
       if (lost.length >= 2) {
         antiPatterns.push(`Đang MẤT cụm từ đặc trưng: "${lost.slice(0, 3).join('", "')}" — DUY TRÌ các cụm từ này`);
       }
+    }
+
+    // Phase R+1 — stats-based drift detection (paragraph CV, vocab
+    // diversity, em-dash density). Complements the AI qualitative checks
+    // above with measurable numerical bands.
+    if (old.styleStats && parsed.styleStats) {
+      const statsWarnings = detectStyleDrift(old.styleStats, parsed.styleStats);
+      for (const w of statsWarnings) antiPatterns.push(w);
     }
   }
 

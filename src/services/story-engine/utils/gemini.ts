@@ -109,9 +109,17 @@ export async function callGemini(
   if (!apiKey) throw new Error('GEMINI_API_KEY not set');
 
   // Gemini 3 family recommends temperature=1.0 (lower temps cause looping per docs).
-  // We force 1.0 when target model matches `gemini-3*`. Gemini 1/2 family keeps caller temp.
+  // We force 1.0 when target model matches `gemini-3*` AND caller didn't explicitly
+  // override below 0.7. Caller can still send temp 0.2-0.6 for deterministic stages
+  // (length-normalizer, setup-pipeline retries on stuck novels).
+  //
+  // Phase T+1 (2026-05-15): force-1.0 override caused Gia Tộc Tu Tiên world stage
+  // to return empty content. Direct API call with temp=0.4 returns 5342 chars
+  // valid JSON; wrapper at forced temp=1.0 returns 0. Now respect caller temp if
+  // explicitly set <0.7 (signals "deterministic stage needed").
   const isGemini3 = config.model.startsWith('gemini-3');
-  const effectiveTemperature = isGemini3 ? 1.0 : config.temperature;
+  const callerTemp = config.temperature ?? 1.0;
+  const effectiveTemperature = isGemini3 && callerTemp >= 0.7 ? 1.0 : callerTemp;
 
   const generationConfig: Record<string, unknown> = {
     temperature: effectiveTemperature,
@@ -128,7 +136,14 @@ export async function callGemini(
   //     'low' avoids the failure mode where hidden thinking tokens consume the
   //     maxOutputTokens budget and truncate JSON output (caused Architect retries).
   //   - Setup creative stages → GEMINI_THINKING_LEVEL || 'high'.
-  if (isGemini3) {
+  //
+  // Phase T+1 (2026-05-15) — flash-lite is NOT a thinking model. Setting
+  // thinkingConfig on gemini-3.1-flash-lite caused empty-content returns on
+  // specific prompt combinations (Gia Tộc Tu Tiên + tu-tiên-gia-tộc kernel).
+  // Gate to ONLY actual thinking models (gemini-3-flash-preview, gemini-3-pro-*).
+  const isThinkingModel = config.model === 'gemini-3-flash-preview'
+    || config.model.startsWith('gemini-3-pro');
+  if (isGemini3 && isThinkingModel) {
     const task = options?.tracking?.task || '';
     const isChapterTask = ['architect', 'writer', 'writer_continuation', 'critic', 'continuity_guardian', 'auto_revision'].includes(task);
     const valid = (v: string): v is 'low' | 'medium' | 'high' => ['low', 'medium', 'high'].includes(v);
@@ -138,7 +153,7 @@ export async function callGemini(
       level = valid(envChapter) ? envChapter : 'low';
     } else {
       const envSetup = (process.env.GEMINI_THINKING_LEVEL || '').toLowerCase();
-      level = valid(envSetup) ? envSetup : (config.model === 'gemini-3-flash-preview' ? 'high' : undefined);
+      level = valid(envSetup) ? envSetup : 'high';
     }
     if (level) {
       generationConfig.thinkingConfig = { thinkingLevel: level };
