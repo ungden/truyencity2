@@ -535,28 +535,35 @@ ${blueprintInstructions}
 Trả về JSON: {"worldDescription":"<800-1500 từ tuân blueprint 10-section, mở đầu BẮT BUỘC bằng ### STORY KERNEL SUMMARY, BẮT BUỘC inject ≥3 worldbuilding hooks từ playbook>"}`;
 
   try {
-    // Phase T+1 (2026-05-15): adapt model + temp based on kernel_repair_attempts.
-    // Gemini Flash Lite returns empty content on specific kernel/genre combos
-    // (zombie virus / showbiz / mass casualty / etc.) — safety filter false-positive.
-    // After 3 repair attempts, switch to gemini-3-flash-preview (different filter
-    // baseline) + lower temp + higher maxTokens for more deterministic output.
+    // Phase T+2 (2026-05-15): adapt model + temp + ROUTING BYPASS based on
+    // kernel_repair_attempts. Two failure modes observed:
+    //   1. Pro thinking model (gemini-3-flash-preview) burns output tokens via
+    //      hidden reasoning, leaving no budget for content → empty response.
+    //      installModelTierRouting routes 'stage_world' → Pro by default.
+    //   2. Gemini 3 family at temp 1.0 (forced by callGemini for gemini-3*)
+    //      can be stochastic empty on certain content. Caller temp < 0.7 now
+    //      respected.
+    // Solution after 2+ repair attempts: use task name 'stage_world_retry'
+    // which is NOT in PRO_TASKS → router falls back to MODEL_FLASH = flash-lite.
+    // Pass temp 0.4 explicitly (below 0.7 threshold) so it's actually used.
     const { data: projectRow } = await getSupabase()
       .from('ai_story_projects').select('kernel_repair_attempts').eq('id', p.id).maybeSingle();
     const repairAttempts = (projectRow?.kernel_repair_attempts as number) || 0;
-    const useProModel = repairAttempts >= 3;
-    const worldModel = useProModel ? 'gemini-3-flash-preview' : 'gemini-3.1-flash-lite';
-    const worldTemp = repairAttempts >= 2 ? 0.4 : 0.8;
-    const worldMaxTokens = repairAttempts >= 2 ? 16384 : 8192;
+    const useRetryPath = repairAttempts >= 2;
+    const worldTaskName = useRetryPath ? 'stage_world_retry' : 'stage_world';
+    const worldModel = 'gemini-3.1-flash-lite'; // routing may override on first path
+    const worldTemp = useRetryPath ? 0.4 : 0.8;
+    const worldMaxTokens = useRetryPath ? 16384 : 8192;
 
     const res = await callGemini(prompt, {
       model: worldModel, temperature: worldTemp, maxTokens: worldMaxTokens,
       systemPrompt: SANG_VAN_DNA + '\n\n[ROLE-SPECIFIC] Stage: WORLD. Build world_description theo StoryKernel + 10-section blueprint. Section đầu là ### STORY KERNEL SUMMARY. World ngây thơ về MC, antagonist Phase 1 LOCAL only.',
-    }, { jsonMode: true, tracking: { projectId: p.id, task: 'stage_world' } });
+    }, { jsonMode: true, tracking: { projectId: p.id, task: worldTaskName } });
 
     const parsed = parseJSON<{ worldDescription?: string }>(res.content);
     const wd = (parsed?.worldDescription || '').trim();
     if (wd.length < 500) {
-      return { success: false, error: `world too short (${wd.length} chars, need ≥500). Model=${worldModel} temp=${worldTemp} maxTokens=${worldMaxTokens} repair_attempts=${repairAttempts}.` };
+      return { success: false, error: `world too short (${wd.length} chars, need ≥500). Task=${worldTaskName} temp=${worldTemp} maxTokens=${worldMaxTokens} repair_attempts=${repairAttempts}.` };
     }
     const validation = validateSeedStructure(wd);
     if (!validation.passed) {
