@@ -16,6 +16,7 @@
  */
 
 import { getSupabase } from '../utils/supabase';
+import { jaroWinkler, normalizeName, sharedTokenRatio } from '@/lib/utils/string-similarity';
 import type { GeminiConfig } from '../types';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -239,22 +240,34 @@ export async function extractAndUpdatePlotThreads(
 ): Promise<{ created: number; updated: number }> {
   try {
     const db = getSupabase();
+    // Phase 2026-05-16 root-cause fix: load ALL active threads (was capped at
+    // 12 by importance — caused AI to re-create thread #20+ because it
+    // didn't know it existed). Cluster by name similarity for compact AI
+    // presentation; per-cluster representation keeps token budget similar.
     const { data: activeRows, error: activeErr } = await db
       .from('plot_threads')
       .select('*')
       .eq('project_id', projectId)
       .not('status', 'in', '("resolved","legacy")')
-      .order('importance', { ascending: false })
-      .limit(12);
+      .order('importance', { ascending: false });
 
     if (activeErr) {
       console.warn(`[plot-threads] Load active threads failed for Ch.${chapterNumber}: ${activeErr.message}`);
     }
 
     const active = (activeRows || []).map(mapThreadRow);
-    const activeBrief = active.length > 0
-      ? active
-          .map(t => `- id=${t.id}; name=${t.name}; status=${t.status}; priority=${t.priority}; last=${t.lastActiveChapter}; desc=${t.description.slice(0, 160)}`)
+    const clusters = clusterThreadsByName(active);
+    const activeBrief = clusters.length > 0
+      ? clusters
+          .map(c => {
+            if (c.threads.length === 1) {
+              const t = c.threads[0];
+              return `- id=${t.id}; name=${t.name}; status=${t.status}; priority=${t.priority}; last=${t.lastActiveChapter}; desc=${t.description.slice(0, 160)}`;
+            }
+            const head = c.threads[0];
+            const others = c.threads.slice(1).map(t => `id=${t.id} (${t.status}/last ${t.lastActiveChapter})`).join(', ');
+            return `- [cluster "${c.label}", ${c.threads.length} threads — KHÔNG tạo thread mới cùng cụm]\n  primary: id=${head.id}; status=${head.status}; priority=${head.priority}; last=${head.lastActiveChapter}; desc=${head.description.slice(0, 160)}\n  also: ${others}`;
+          })
           .join('\n')
       : '(chưa có thread đang mở)';
 
@@ -343,10 +356,19 @@ QUY TẮC:
     }
 
     // Insert new threads — bound to 3 per chapter so model can't spam.
+    // Phase 2026-05-16: semantic dedup using Jaro-Winkler against ALL active
+    // (not just exact name match) to stop "Vương Khải đòi nợ" + "Vương Khải
+    // truy sát" duplicate accumulation.
     const newThreads = (parsed.newThreads || []).slice(0, 3);
+    let skippedAsDup = 0;
     for (const nt of newThreads) {
       if (!nt.name || nt.name.length < 3) continue;
-      if (active.some(t => t.name.toLowerCase() === nt.name!.toLowerCase())) continue;
+      const dup = findDuplicateThread(nt.name, active);
+      if (dup) {
+        skippedAsDup++;
+        console.log(`[plot-threads] Ch.${chapterNumber}: skipped new thread "${nt.name}" — semantic dup of existing "${dup.name}" (sim ${dup.similarity.toFixed(2)})`);
+        continue;
+      }
       const threadId = `${projectId.slice(0, 8)}-${chapterNumber}-${slugifyThreadName(nt.name)}`;
       const insertRow = {
         id: threadId,
@@ -370,8 +392,14 @@ QUY TẮC:
       }
     }
 
-    if (created > 0 || updated > 0) {
-      console.log(`[plot-threads] Ch.${chapterNumber}: created ${created}, updated ${updated} threads`);
+    // Phase 2026-05-16: soft cap with stale demotion. Audit found Ngự Thú
+    // Tiến Hóa accumulated 70+ active threads at ch.85; AI sees only top-N
+    // and re-creates duplicates. Demote stale low-priority threads to
+    // 'legacy' so context budget stays sane and dedup remains effective.
+    const demoted = await demoteStaleThreads(projectId, chapterNumber);
+
+    if (created > 0 || updated > 0 || skippedAsDup > 0 || demoted > 0) {
+      console.log(`[plot-threads] Ch.${chapterNumber}: created ${created}, updated ${updated}, skipped(dup) ${skippedAsDup}, demoted(stale) ${demoted}`);
     }
 
     return { created, updated };
@@ -390,4 +418,101 @@ function slugifyThreadName(name: string): string {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
     .slice(0, 48) || 'thread';
+}
+
+// ── Phase 2026-05-16: dedup + cluster + stale demotion helpers ───────────────
+
+/**
+ * Cluster active threads by name similarity. Uses Jaro-Winkler ≥0.75 OR
+ * shared-token ratio ≥0.6 as the cluster predicate.
+ */
+export function clusterThreadsByName(threads: PlotThread[]): Array<{ label: string; threads: PlotThread[] }> {
+  const clusters: Array<{ label: string; threads: PlotThread[] }> = [];
+  for (const t of threads) {
+    let placed = false;
+    for (const c of clusters) {
+      const head = c.threads[0];
+      const sim = jaroWinkler(normalizeName(head.name), normalizeName(t.name));
+      const tok = sharedTokenRatio(head.name, t.name);
+      if (sim >= 0.75 || tok >= 0.6) {
+        c.threads.push(t);
+        placed = true;
+        break;
+      }
+    }
+    if (!placed) {
+      clusters.push({ label: t.name, threads: [t] });
+    }
+  }
+  for (const c of clusters) {
+    c.threads.sort((a, b) => b.importance - a.importance);
+  }
+  clusters.sort((a, b) => b.threads[0].importance - a.threads[0].importance);
+  return clusters;
+}
+
+/**
+ * Find a duplicate of `candidateName` among `existing` threads using
+ * Jaro-Winkler ≥0.75 OR shared-token ratio ≥0.6.
+ */
+export function findDuplicateThread(
+  candidateName: string,
+  existing: PlotThread[],
+): { name: string; similarity: number } | null {
+  if (!candidateName || candidateName.length < 3) return null;
+  const candNorm = normalizeName(candidateName);
+  for (const t of existing) {
+    const sim = jaroWinkler(candNorm, normalizeName(t.name));
+    const tok = sharedTokenRatio(candidateName, t.name);
+    if (sim >= 0.75 || tok >= 0.6) {
+      return { name: t.name, similarity: Math.max(sim, tok) };
+    }
+  }
+  return null;
+}
+
+/**
+ * Soft cap with stale demotion — when active count > 25, demote sub/background
+ * threads inactive for 30+ chapters to status='legacy'. Never touches
+ * critical/main priority or in-flight climaxes.
+ */
+export async function demoteStaleThreads(
+  projectId: string,
+  currentChapter: number,
+): Promise<number> {
+  const db = getSupabase();
+  const { count } = await db
+    .from('plot_threads')
+    .select('*', { count: 'exact', head: true })
+    .eq('project_id', projectId)
+    .not('status', 'in', '("resolved","legacy")');
+  if ((count || 0) <= 25) return 0;
+
+  const staleBefore = currentChapter - 30;
+  if (staleBefore < 1) return 0;
+
+  const { data: candidates, error } = await db
+    .from('plot_threads')
+    .select('id, name')
+    .eq('project_id', projectId)
+    .in('priority', ['sub', 'background'])
+    .lt('last_active_chapter', staleBefore)
+    .not('status', 'in', '("resolved","legacy","climax")');
+
+  if (error || !candidates || candidates.length === 0) return 0;
+
+  const overflow = (count || 0) - 25;
+  const toDemote = candidates.slice(0, overflow);
+  if (toDemote.length === 0) return 0;
+
+  const ids = toDemote.map(c => c.id as string);
+  const { error: updErr } = await db
+    .from('plot_threads')
+    .update({ status: 'legacy', updated_at: new Date().toISOString() })
+    .in('id', ids);
+  if (updErr) {
+    console.warn(`[plot-threads] demoteStaleThreads failed: ${updErr.message}`);
+    return 0;
+  }
+  return toDemote.length;
 }

@@ -46,6 +46,13 @@ interface SynopsisAIResponse {
   active_allies?: string[];
   active_enemies?: string[];
   open_threads?: string[];
+  /**
+   * Phase 2026-05-16: explicit ledger of major resolved events tagged by
+   * chapter. Gives downstream arc planner + Architect a structured "this
+   * already happened" anchor so they don't re-stage events from earlier arcs.
+   * Stored as TEXT[] in `story_synopsis.major_events_resolved`.
+   */
+  major_events_resolved?: string[];
 }
 
 interface ArcSubArcEntry {
@@ -653,20 +660,37 @@ Synopsis output PHẢI chứa "${protagonistName}" ít nhất 5 lần và KHÔNG
 
 `;
 
+  // Phase 2026-05-16: load prior major_events_resolved so synopsis AI can
+  // append new resolved events to the ledger (carry-forward) instead of
+  // overwriting. Defense-in-depth against arc plan event repetition.
+  const dbForLedger = getSupabase();
+  const { data: prevSynopsisRow } = await dbForLedger
+    .from('story_synopsis')
+    .select('major_events_resolved')
+    .eq('project_id', projectId)
+    .maybeSingle();
+  const priorEventsLedger = (prevSynopsisRow?.major_events_resolved as string[] | undefined) || [];
+  const priorEventsBlock = priorEventsLedger.length > 0
+    ? `\n[MAJOR EVENTS RESOLVED LEDGER — KHÔNG VIẾT LẠI sự kiện đã có. Chỉ APPEND event mới resolved trong các chương mới ở dưới]:\n${priorEventsLedger.slice(-30).map(e => `- ${e}`).join('\n')}\n`
+    : '';
+
   const prompt = `${mcLock}Bạn là biên tập viên truyện ${genre}. Viết TỔNG QUAN CỐT TRUYỆN cập nhật.
 
 ${oldSynopsis ? `Synopsis cũ:\n${oldSynopsis}\n\n` : ''}Các chương mới:\n${summaryText}
-
+${priorEventsBlock}
 Trả về JSON:
 {
   "synopsis_text": "tổng quan 500-800 từ, bao gồm tất cả sự kiện quan trọng — gọi MC bằng '${protagonistName}'",
   "mc_current_state": "trạng thái hiện tại của ${protagonistName}",
   "active_allies": ["danh sách đồng minh"],
   "active_enemies": ["danh sách kẻ thù"],
-  "open_threads": ["các tuyến truyện đang mở"]
+  "open_threads": ["các tuyến truyện đang mở"],
+  "major_events_resolved": [
+    "Định dạng: 'ch.N: <event tag ngắn 80-150 ký tự>'. CHỈ liệt kê event LỚN đã DỨT KHOÁT đóng (vd: nhân vật X cứu xong/chết, nợ trả xong, đối thủ Y bị hạ, milestone Z đạt được). KHÔNG list beat nhỏ. Mỗi event 1 dòng, prefix bằng số chương cụ thể trong 'Các chương mới' ở trên."
+  ]
 }`;
 
-  const res = await callGemini(prompt, { ...config, temperature: 0.2, maxTokens: 2048 }, { jsonMode: true, tracking: { projectId, task: 'synopsis' } });
+  const res = await callGemini(prompt, { ...config, temperature: 0.2, maxTokens: 3072 }, { jsonMode: true, tracking: { projectId, task: 'synopsis' } });
   const parsed = parseJSON<SynopsisAIResponse>(res.content);
   if (!parsed || !parsed.synopsis_text?.trim()) {
     throw new Error(`Synopsis generation failed: JSON parse error — raw: ${res.content.slice(0, 200)}`);
@@ -680,6 +704,19 @@ Trả về JSON:
     throw new Error(`Synopsis missing MC name "${protagonistName}" — possible name drift; not saving. First 200 chars: ${synopsisText.slice(0, 200)}`);
   }
 
+  // Phase 2026-05-16: merge new resolved events into prior ledger (carry-forward).
+  // AI returns only NEW events for the current synopsis window; we append them
+  // to the historical list and dedupe by exact tag match. Cap at 200 to avoid
+  // unbounded growth on 1000-chapter novels.
+  const newEvents = (parsed.major_events_resolved || [])
+    .map(e => (typeof e === 'string' ? e.trim() : ''))
+    .filter(e => e.length >= 8 && /^ch\.\d+/i.test(e));
+  const mergedEvents = [...priorEventsLedger];
+  for (const e of newEvents) {
+    if (!mergedEvents.includes(e)) mergedEvents.push(e);
+  }
+  const cappedEvents = mergedEvents.slice(-200);
+
   const db = getSupabase();
   const { error: synopsisErr } = await db.from('story_synopsis').upsert({
     project_id: projectId,
@@ -688,12 +725,157 @@ Trả về JSON:
     active_allies: parsed.active_allies || [],
     active_enemies: parsed.active_enemies || [],
     open_threads: parsed.open_threads || [],
+    major_events_resolved: cappedEvents,
     last_updated_chapter: lastChapter,
   }, { onConflict: 'project_id' });
 
   if (synopsisErr) {
     console.warn(`[ContextAssembler] Failed to save synopsis for project ${projectId}: ${synopsisErr.message}`);
   }
+}
+
+// ── Helper: load memory blocks for arc plan generation ───────────────────────
+
+/**
+ * Phase 2026-05-16 root-cause fix: arc plan generator was amnesic — it had no
+ * visibility into prior arcs' chapter_briefs, recent chapter_summaries, or
+ * resolved plot_threads. Result: Arc N could re-invent events that already
+ * happened in arc 1..N-1 (audit found Ngự Thú Tiến Hóa Arc 5 brief literally
+ * copied ch.1's "Tô Mạt mang Băng Tinh Yến đến cầu cứu" event).
+ *
+ * This helper loads the missing memory blocks so the arc plan AI sees what
+ * the novel has actually covered. NOT a new prompt rule — just feeding the
+ * data the generator was missing.
+ *
+ * Returns rendered string blocks, capped to keep total prompt budget sane:
+ *   - priorArcsRecap: theme + sub-arc themes + sample briefs per arc
+ *   - recentChapterRecap: last 12 chapter summaries (title + cliffhanger)
+ *   - resolvedThreadsList: deduped resolved/developing thread descriptions
+ *   - majorEventsResolvedList: structured event ledger from synopsis (if present)
+ */
+async function loadArcPlanMemory(
+  projectId: string,
+  currentArcNumber: number,
+): Promise<{
+  priorArcsRecap: string;
+  recentChapterRecap: string;
+  resolvedThreadsList: string;
+  majorEventsResolvedList: string;
+}> {
+  if (currentArcNumber <= 1) {
+    return {
+      priorArcsRecap: '',
+      recentChapterRecap: '',
+      resolvedThreadsList: '',
+      majorEventsResolvedList: '',
+    };
+  }
+
+  const db = getSupabase();
+  const [arcsRes, chaptersRes, threadsRes, synopsisRes] = await Promise.all([
+    db.from('arc_plans')
+      .select('arc_number, arc_theme, sub_arcs, chapter_briefs, threads_to_resolve')
+      .eq('project_id', projectId)
+      .lt('arc_number', currentArcNumber)
+      .order('arc_number'),
+    db.from('chapter_summaries')
+      .select('chapter_number, title, cliffhanger')
+      .eq('project_id', projectId)
+      .order('chapter_number', { ascending: false })
+      .limit(12),
+    db.from('plot_threads')
+      .select('name, status, priority, importance, last_active_chapter, payoff_description, description')
+      .eq('project_id', projectId)
+      .in('status', ['resolved', 'developing'])
+      .order('importance', { ascending: false })
+      .limit(40),
+    db.from('story_synopsis')
+      .select('major_events_resolved')
+      .eq('project_id', projectId)
+      .maybeSingle(),
+  ]);
+
+  // Render prior arcs (~3-5K chars). For each arc: theme, sub-arc themes,
+  // resolved threads, sample briefs (first 12 chapters' brief text trimmed).
+  const arcLines: string[] = [];
+  for (const a of (arcsRes.data || []) as Array<{
+    arc_number: number;
+    arc_theme: string | null;
+    sub_arcs: unknown;
+    chapter_briefs: unknown;
+    threads_to_resolve: string[] | null;
+  }>) {
+    const subArcThemes = Array.isArray(a.sub_arcs)
+      ? (a.sub_arcs as Array<{ theme?: string; mini_payoff?: string }>)
+          .map(s => `${s.theme || ''}${s.mini_payoff ? ` → ${s.mini_payoff}` : ''}`)
+          .filter(Boolean)
+          .slice(0, 6)
+          .join(' | ')
+      : '';
+    const briefs = Array.isArray(a.chapter_briefs)
+      ? (a.chapter_briefs as Array<{ chapterNumber?: number; brief?: string }>)
+          .filter(b => typeof b.brief === 'string' && b.brief.trim().length >= 8)
+          .slice(0, 12)
+          .map(b => `   • ch.${b.chapterNumber ?? '?'}: ${(b.brief as string).slice(0, 140).replace(/\s+/g, ' ').trim()}`)
+          .join('\n')
+      : '';
+    const resolvedNote = (a.threads_to_resolve && a.threads_to_resolve.length > 0)
+      ? `   resolved: ${a.threads_to_resolve.slice(0, 4).join(' | ')}`
+      : '';
+    arcLines.push(`[Arc ${a.arc_number} — theme: ${a.arc_theme || '?'}]
+   sub-arcs: ${subArcThemes || '(không có)'}
+${briefs || '   (không có brief)'}
+${resolvedNote}`.trim());
+  }
+  const priorArcsRecap = arcLines.length > 0
+    ? arcLines.join('\n\n')
+    : '';
+
+  // Recent chapters (~2K chars).
+  const chapterLines = ((chaptersRes.data || []) as Array<{
+    chapter_number: number;
+    title: string | null;
+    cliffhanger: string | null;
+  }>)
+    .reverse() // oldest → newest within the recent window
+    .map(c => `Ch.${c.chapter_number} "${c.title || '?'}" — ${(c.cliffhanger || '').slice(0, 220).replace(/\s+/g, ' ').trim()}`)
+    .filter(line => line.length > 8);
+  const recentChapterRecap = chapterLines.length > 0
+    ? chapterLines.join('\n')
+    : '';
+
+  // Resolved + developing threads (deduped by name normalization, ~1K chars).
+  const seen = new Set<string>();
+  const threadLines: string[] = [];
+  for (const t of (threadsRes.data || []) as Array<{
+    name: string;
+    status: string;
+    priority: string;
+    importance: number | null;
+    last_active_chapter: number | null;
+    payoff_description: string | null;
+    description: string | null;
+  }>) {
+    const key = t.name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const tail = t.status === 'resolved'
+      ? (t.payoff_description || t.description || '').slice(0, 140)
+      : (t.description || '').slice(0, 140);
+    threadLines.push(`[${t.status}] ${t.name} (last ch.${t.last_active_chapter ?? '?'}) — ${tail.replace(/\s+/g, ' ').trim()}`);
+    if (threadLines.length >= 30) break;
+  }
+  const resolvedThreadsList = threadLines.length > 0
+    ? threadLines.join('\n')
+    : '';
+
+  // Major events resolved ledger from synopsis (Fix 3, ~500 chars).
+  const synopsisRow = synopsisRes.data as { major_events_resolved?: string[] } | null;
+  const majorEventsResolvedList = synopsisRow?.major_events_resolved && synopsisRow.major_events_resolved.length > 0
+    ? synopsisRow.major_events_resolved.slice(0, 30).map(e => `• ${e}`).join('\n')
+    : '';
+
+  return { priorArcsRecap, recentChapterRecap, resolvedThreadsList, majorEventsResolvedList };
 }
 
 // ── Post-Write: Generate Arc Plan ────────────────────────────────────────────
@@ -838,9 +1020,34 @@ Yêu cầu:
   // Always inject for arc plans regardless of arc number, since these are stable per-genre rules.
   const genreArchGuide = getGenreArchitectGuide(genre);
 
+  // Phase 2026-05-16 root-cause fix: feed prior-arcs / recent-chapters /
+  // resolved-threads memory to the AI so it doesn't re-invent events that
+  // already happened. Empty for arc 1 — only fires from arc 2+.
+  const memory = await loadArcPlanMemory(projectId, arcNumber);
+  const memoryParts: string[] = [];
+  if (memory.priorArcsRecap) {
+    memoryParts.push(`[PRIOR ARCS — ĐÃ DIỄN RA, CẤM REPEAT]\n${memory.priorArcsRecap}`);
+  }
+  if (memory.recentChapterRecap) {
+    memoryParts.push(`[CHƯƠNG GẦN NHẤT (12 chương cuối) — ĐÃ DIỄN RA]\n${memory.recentChapterRecap}`);
+  }
+  if (memory.resolvedThreadsList) {
+    memoryParts.push(`[PLOT THREADS — RESOLVED + DEVELOPING]\n${memory.resolvedThreadsList}`);
+  }
+  if (memory.majorEventsResolvedList) {
+    memoryParts.push(`[MAJOR EVENTS RESOLVED — sự kiện lớn đã đóng, KHÔNG re-stage]\n${memory.majorEventsResolvedList}`);
+  }
+  const memoryBlock = memoryParts.length > 0
+    ? memoryParts.join('\n\n') + `\n\n[ALREADY-HAPPENED HARD RULE — ARC ${arcNumber}]\n` +
+      `Mọi sự kiện trong các block trên đã DIỄN RA trong arc 1..${arcNumber - 1}. Briefs cho arc ${arcNumber} PHẢI là EVENTS MỚI tiếp nối state hiện tại.\n` +
+      `CẤM TUYỆT ĐỐI: brief "X mang Y đến cầu cứu" / "MC cứu lần đầu Y" / "MC lần đầu gặp X" nếu X-Y đã có trong block trên.\n` +
+      `Nếu cần follow-up cho thread đã resolved → reframe là CONSEQUENCE/ESCALATION (vd: "X quay lại đòi đền ơn lớn hơn", "Y đã chữa nhưng nay biến chứng"), KHÔNG re-run cảnh gốc.\n\n`
+    : '';
+  console.log(`[arc_plan] ${projectId.slice(0, 8)} arc ${arcNumber}: memory loaded — priorArcs=${memory.priorArcsRecap.length}c recentCh=${memory.recentChapterRecap.length}c threads=${memory.resolvedThreadsList.length}c events=${memory.majorEventsResolvedList.length}c`);
+
   const prompt = `Bạn là Story Architect cho truyện ${genre}.
 
-${worldBlock}${masterBlock}${visionBlock}${synopsis ? `TỔNG QUAN:\n${synopsis}\n\n` : ''}${storyBible ? `STORY BIBLE:\n${storyBible.slice(0, 2000)}\n\n` : ''}${genreArchGuide}${openingRulesBlock}
+${worldBlock}${masterBlock}${visionBlock}${synopsis ? `TỔNG QUAN:\n${synopsis}\n\n` : ''}${storyBible ? `STORY BIBLE:\n${storyBible.slice(0, 2000)}\n\n` : ''}${memoryBlock}${genreArchGuide}${openingRulesBlock}
 Lập kế hoạch ARC ${arcNumber} (chương ${startChapter}-${endChapter}) cho ${protagonistName}.
 Tổng dự kiến: ${totalPlanned} chương.${closingInstruction}
 
