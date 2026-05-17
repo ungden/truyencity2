@@ -583,10 +583,12 @@ async function prepareInitProject(
   })();
 
   // Phase S 2026-05-15 added 'foundation_review' between arc_plan → ready_to_write
-  // for 14-dim quality scoring. Cron's prepareInitProject was never updated and
-  // projects at 'foundation_review' silently fell through this if-block with
-  // error "not eligible for init-prep", blocking the entire production pipeline.
-  const STAGED_STATES = new Set(['idea', 'world', 'character', 'description', 'master_outline', 'story_outline', 'arc_plan', 'foundation_review']);
+  // for 14-dim quality scoring. PR #74 added 'foundation_review' to this set but
+  // missed 'canon_spawn' (story_outline → canon_spawn → arc_plan), so projects
+  // promoted past story_outline silently fell through here with error
+  // "not eligible for init-prep" — same silent failure as #74, different stage.
+  // Keep this list in sync with NEXT_STAGE in services/story-engine/pipeline/setup-pipeline.ts.
+  const STAGED_STATES = new Set(['idea', 'world', 'character', 'description', 'master_outline', 'story_outline', 'canon_spawn', 'arc_plan', 'foundation_review']);
   if (STAGED_STATES.has(setup_stage)) {
     // Phase O (2026-05-12): install model tier routing trước runOneStage để
     // setup stages (stage_idea/world/character/master_outline/story_outline)
@@ -910,7 +912,10 @@ export async function GET(request: NextRequest) {
     const lockBoundary = new Date(Date.now() - lockWindowMs).toISOString();
     // Phase S 2026-05-15 added 'foundation_review' — must be picked up by
     // setupCandidateBuilder so paused projects at this stage can resume.
-    const STAGED_SETUP_STATES = ['idea', 'world', 'character', 'description', 'master_outline', 'story_outline', 'arc_plan', 'foundation_review'];
+    // 'canon_spawn' (story_outline → canon_spawn → arc_plan) was also missing — same root
+    // cause as PR #74. Keep this list in sync with STAGED_STATES above and NEXT_STAGE in
+    // services/story-engine/pipeline/setup-pipeline.ts.
+    const STAGED_SETUP_STATES = ['idea', 'world', 'character', 'description', 'master_outline', 'story_outline', 'canon_spawn', 'arc_plan', 'foundation_review'];
 
     let activeCountBuilder = supabase
         .from('ai_story_projects')
