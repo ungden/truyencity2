@@ -571,6 +571,21 @@ Trả về JSON: {"worldDescription":"<800-1500 từ tuân blueprint 10-section,
     }
     const semantic = validateSetupCanon({ worldDescription: wd, setupKernel, strictContract: true });
     if (!semantic.passed) {
+      // The kernel comes from the 'idea' stage. When validateSetupCanon flags a
+      // weak kernel field (system_mechanic / benefit_loop / intervention_rule),
+      // re-running 'world' with the same setupKernel will fail identically every
+      // time → 5× pause. Rewind to 'idea' to regenerate the kernel.
+      // Cap via kernel_repair_attempts so we don't loop idea→world→idea forever.
+      const kernelWeak = semantic.issues.some(i => /^setup_kernel_.*_weak$/.test(i.code));
+      if (kernelWeak && repairAttempts < 3) {
+        await getSupabase().from('ai_story_projects').update({
+          setup_stage: 'idea',
+          setup_stage_attempts: 0,
+          setup_stage_error: `world rewound to idea: kernel weak (${semantic.issues.filter(i => /weak/.test(i.code)).map(i => i.code).join(', ')})`,
+          kernel_repair_attempts: repairAttempts + 1,
+        }).eq('id', p.id);
+        return { success: false, error: `Rewound to stage=idea (kernel repair ${repairAttempts + 1}/3): world semantic gate failed: ${formatSetupGateIssues(semantic)}` };
+      }
       return { success: false, error: `world semantic gate failed: ${formatSetupGateIssues(semantic)}` };
     }
 
@@ -1045,12 +1060,29 @@ async function runStageFoundationReview(
       const retry = result.retryRecommendation;
       const errMsg = `Foundation review FAILED total=${result.totalScore}/140 avg=${result.avgScore} min=${result.minDimScore}/10. ${retry ? `[retry stage=${retry.stage} priority=${retry.priority}] ${retry.instruction.slice(0, 300)}` : ''}`;
 
-      // If retry recommendation points to earlier stage, rewind setup_stage
+      // If retry recommendation points to earlier stage, rewind setup_stage.
+      // Foundation reviewer dimension stages: 'idea' | 'world' | 'cast' | 'master_outline' |
+      // 'story_outline' | 'voice_anchor' | 'trial'. The non-SetupStage values must map to the
+      // SetupStage that actually generates that artifact, otherwise rewind silently no-ops and
+      // cron retries foundation_review with the same data → 5× pause loop.
+      //   - 'cast' / 'voice_anchor' artifacts are created in 'canon_spawn' stage (factions +
+      //     voice_anchors tables seeded there)
+      //   - 'trial' is pre-write only, skipped in the reviewer pre-trial anyway
       if (retry && retry.stage && retry.stage !== 'foundation_review') {
-        const rewindToStage = retry.stage as SetupStage;
-        // Validate the stage is a valid SetupStage
-        const validStages: SetupStage[] = ['idea', 'world', 'character', 'description', 'master_outline', 'story_outline', 'canon_spawn'];
-        if (validStages.includes(rewindToStage)) {
+        const STAGE_REWIND_MAP: Record<string, SetupStage> = {
+          idea: 'idea',
+          world: 'world',
+          character: 'character',
+          description: 'description',
+          master_outline: 'master_outline',
+          story_outline: 'story_outline',
+          canon_spawn: 'canon_spawn',
+          cast: 'canon_spawn',
+          voice_anchor: 'canon_spawn',
+          trial: 'canon_spawn',
+        };
+        const rewindToStage = STAGE_REWIND_MAP[retry.stage];
+        if (rewindToStage) {
           // Cap rewinds — kernel_repair_attempts gates max 3 rewinds total
           const { data: row } = await getSupabase()
             .from('ai_story_projects')
