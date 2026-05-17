@@ -582,11 +582,11 @@ async function prepareInitProject(
     return { setup_stage: (data?.setup_stage || 'idea') as string, setup_stage_attempts: data?.setup_stage_attempts || 0 };
   })();
 
-  // Phase S 2026-05-15 added 'foundation_review' between arc_plan → ready_to_write
-  // for 14-dim quality scoring. Cron's prepareInitProject was never updated and
-  // projects at 'foundation_review' silently fell through this if-block with
-  // error "not eligible for init-prep", blocking the entire production pipeline.
-  const STAGED_STATES = new Set(['idea', 'world', 'character', 'description', 'master_outline', 'story_outline', 'arc_plan', 'foundation_review']);
+  // Phase S 2026-05-15 inserted 'canon_spawn' (story_outline → arc_plan) AND
+  // 'foundation_review' (arc_plan → ready_to_write). PR #74 added foundation_review
+  // but missed canon_spawn — 4 active production novels silently fell through this
+  // if-block ("not eligible for init-prep") and stopped writing chapters.
+  const STAGED_STATES = new Set(['idea', 'world', 'character', 'description', 'master_outline', 'story_outline', 'canon_spawn', 'arc_plan', 'foundation_review']);
   if (STAGED_STATES.has(setup_stage)) {
     // Phase O (2026-05-12): install model tier routing trước runOneStage để
     // setup stages (stage_idea/world/character/master_outline/story_outline)
@@ -908,9 +908,9 @@ export async function GET(request: NextRequest) {
     // Mới: PROJECT_TIMEOUT_MS + 60s safety buffer (covers post-write tasks + cleanup).
     const lockWindowMs = PROJECT_TIMEOUT_MS + 60_000;
     const lockBoundary = new Date(Date.now() - lockWindowMs).toISOString();
-    // Phase S 2026-05-15 added 'foundation_review' — must be picked up by
-    // setupCandidateBuilder so paused projects at this stage can resume.
-    const STAGED_SETUP_STATES = ['idea', 'world', 'character', 'description', 'master_outline', 'story_outline', 'arc_plan', 'foundation_review'];
+    // Phase S 2026-05-15 added 'canon_spawn' AND 'foundation_review' — both
+    // must be picked up by setupCandidateBuilder. PR #74 missed canon_spawn.
+    const STAGED_SETUP_STATES = ['idea', 'world', 'character', 'description', 'master_outline', 'story_outline', 'canon_spawn', 'arc_plan', 'foundation_review'];
 
     let activeCountBuilder = supabase
         .from('ai_story_projects')
