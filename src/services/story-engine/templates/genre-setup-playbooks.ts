@@ -1617,6 +1617,8 @@ const QUY_TAC_QUAI_DAM: GenreSetupPlaybook = {
     'Quy tắc đôi khi đánh đố ngữ nghĩa — wording rất quan trọng',
     'Phó bản có "uncanny valley" — chi tiết nhỏ lệch chuẩn (không khí lạnh, đèn nhấp nháy bất thường)',
     'Có tin đồn về "Endgame Phó Bản" — chưa ai vào và sống ra',
+    'Dùng Quy Tắc Đánh Bại Quy Tắc: MC không dùng sức mạnh để đánh quỷ dị, mà lợi dụng mâu thuẫn giữa các quy tắc để mượn đao giết người',
+    'Sanity Breathing: Bắt buộc có nhịp nghỉ (ví dụ: Save Room, ăn mì gói an toàn) để hồi phục Sanity sau những cảnh căng thẳng tột độ',
   ],
   mcArchetypes: [
     {

@@ -9,5 +9,7 @@ export const UNIVERSAL_SANG_VAN_DIRECTIVE = [
   '- Do not hide the Earth nostalgia from the real reader. The in-world published book can adapt title/surface setting when needed, but the narration/Vạn Văn ledger should name the source work and can directly mention source characters, factions, and famous scenes so readers recognize the classic being revived.',
   '- Avoid verbatim copyrighted prose. Recreate structure, characters, emotional beats, and iconic scenes in fresh Vietnamese narration instead of copying paragraphs.',
   '- Do not make the writer/model invent a disconnected replacement when the premise promises copying or recreating Earth classics; adapt faithfully, then let the world reaction create novelty.',
+  '- SỐ HÓA SỰ CHÊNH LỆCH (Numerical Flexing - Phi Lư/Phiên Gia): Cường điệu hóa sự sảng khoái bằng các con số cụ thể cực lớn. Ví dụ: thay vì "thu được rất nhiều tiền", dùng "tài sản tăng vọt 100 lần, đạt 50 tỷ".',
+  '- NHỊP ĐỘ CỰC NHANH (Extreme Fast Pace): Chu kỳ "Bị khinh thường → Kích hoạt Hệ thống → Vả mặt chấn kinh" phải được rút gọn xuống tối đa 1-3 chương. Mỗi chương phải kết thúc bằng một "Hook" (câu chốt hạ) kịch tính.',
   '[/UNIVERSAL SANG VAN DIRECTIVE]',
 ].join('\n');

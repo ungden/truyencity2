@@ -113,6 +113,23 @@ export async function runSummaryTasks(
       await tryGenerateArcPlan(
         projectId, arcNumber, genre, protagonistName, totalPlannedChapters, config,
       );
+
+      // ── Human-in-the-Loop: Pause for admin to review the new arc plan ──
+      // Arc 1 is handled by setup-pipeline's arc_approval stage, so we only
+      // pause here for arc 2+ (runtime arcs generated at chapter boundaries).
+      if (arcNumber >= 2) {
+        try {
+          const db = getSupabase();
+          await db.from('ai_story_projects').update({
+            status: 'paused',
+            pause_reason: `awaiting_arc_approval:arc_${arcNumber}`,
+            paused_at: new Date().toISOString(),
+          }).eq('id', projectId);
+          console.log(`[SummaryManager] Project ${projectId.slice(0, 8)} paused for arc ${arcNumber} approval`);
+        } catch {
+          // Non-fatal: if pause fails, project continues (fail-open for safety)
+        }
+      }
     }
 
     // 3b. Quality module catch-up: on the first chapter of each arc (ch 21, 41, 61...),

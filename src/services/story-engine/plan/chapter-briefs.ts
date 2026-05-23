@@ -130,7 +130,10 @@ QUY TẮC:
 2. Mỗi brief phải fit ARC THEME + plan.
 3. KHÔNG bịa events không có trong arc plan.
 4. brief phải concrete — có thể write Architect outline từ brief này.
-5. Mỗi brief PHẢI có mcBenefit cụ thể; MC không can thiệp chuyện ngoài nếu không có lợi ích rõ.`;
+5. Mỗi brief PHẢI có mcBenefit cụ thể; MC không can thiệp chuyện ngoài nếu không có lợi ích rõ.
+6. THANG ĐO NHÂN QUẢ ĐỐI THỦ: Trong 30 chương đầu, chỉ cho phép các nhân vật nhỏ ở địa phương (đồng nghiệp, đối thủ cùng phố) phản ứng tương xứng với thành quả MC tạo ra. Tránh việc cho các thế lực lớn hoặc nhân vật bí ẩn can thiệp điều tra khi MC mới chỉ có những hành động vi mô.
+7. XUNG ĐỘT KÊNH HỢP LÝ: Ở các thể loại phi chiến đấu, xung đột phải diễn ra trên sân chơi thương mại, uy tín hoặc pháp lý, tuyệt đối không lạm dụng các cảnh bạo lực hay hành hung vô lý.
+8. BẢO MẬT BÀN TAY VÀNG: Giữ kín 100% bí mật trọng sinh/hệ thống. MC luôn diễn giải năng lực thành tài năng hoặc sự nhạy bén cá nhân để NPC chỉ xem MC là người giỏi, không nghi ngờ bất kỳ yếu tố phi tự nhiên nào.`;
 
     const res = await callGemini(
       prompt,

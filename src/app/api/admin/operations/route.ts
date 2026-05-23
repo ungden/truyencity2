@@ -617,6 +617,101 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       });
     }
 
+    case 'approve_arc': {
+      const projectId = body.projectId as string;
+      if (!projectId) return NextResponse.json({ error: 'projectId required' }, { status: 400 });
+
+      // Load current project state
+      const { data: proj } = await supabase
+        .from('ai_story_projects')
+        .select('id,status,pause_reason,setup_stage')
+        .eq('id', projectId)
+        .maybeSingle();
+
+      if (!proj) return NextResponse.json({ error: 'project_not_found' }, { status: 404 });
+      if (!proj.pause_reason?.startsWith('awaiting_arc_approval')) {
+        return NextResponse.json({
+          error: 'not_awaiting_approval',
+          current_pause_reason: proj.pause_reason,
+        }, { status: 400 });
+      }
+
+      // Two paths: setup pipeline vs runtime
+      if (proj.setup_stage === 'arc_approval') {
+        // Setup pipeline: advance stage to foundation_review
+        const { error } = await supabase
+          .from('ai_story_projects')
+          .update({
+            setup_stage: 'foundation_review',
+            setup_stage_updated_at: new Date().toISOString(),
+            setup_stage_error: null,
+            setup_stage_attempts: 0,
+            status: 'active',
+            pause_reason: null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', projectId);
+        if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+        return NextResponse.json({ success: true, path: 'setup_pipeline', next_stage: 'foundation_review' });
+      } else {
+        // Runtime: just resume the project
+        const { error } = await supabase
+          .from('ai_story_projects')
+          .update({
+            status: 'active',
+            pause_reason: null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', projectId);
+        if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+        return NextResponse.json({ success: true, path: 'runtime', resumed: true });
+      }
+    }
+
+    case 'list_pending_approvals': {
+      const { data: pending } = await supabase
+        .from('ai_story_projects')
+        .select('id,status,pause_reason,paused_at,current_chapter,total_planned_chapters,setup_stage,novel_id,novels(title)')
+        .eq('status', 'paused')
+        .ilike('pause_reason', 'awaiting_arc_approval%')
+        .order('paused_at', { ascending: false });
+
+      if (!pending?.length) return NextResponse.json({ count: 0, approvals: [] });
+
+      // Enrich with arc plan data
+      const enriched = await Promise.all((pending || []).map(async (p) => {
+        const novel = Array.isArray(p.novels) ? p.novels[0] : p.novels;
+        // Extract arc number from pause_reason (e.g., "awaiting_arc_approval:arc_2")
+        const arcMatch = p.pause_reason?.match(/arc_(\d+)/);
+        const arcNumber = arcMatch ? parseInt(arcMatch[1], 10) : 1;
+
+        const { data: arcPlan } = await supabase
+          .from('arc_plans')
+          .select('arc_number,arc_theme,plan_text,chapter_briefs,created_at')
+          .eq('project_id', p.id)
+          .eq('arc_number', arcNumber)
+          .maybeSingle();
+
+        return {
+          project_id: p.id,
+          title: (novel as { title?: string } | null)?.title || '?',
+          pause_reason: p.pause_reason,
+          paused_at: p.paused_at,
+          setup_stage: p.setup_stage,
+          progress: `${p.current_chapter || 0} / ${p.total_planned_chapters || 0}`,
+          arc_number: arcNumber,
+          arc_plan: arcPlan ? {
+            theme: arcPlan.arc_theme,
+            plan_text: arcPlan.plan_text,
+            chapter_briefs: arcPlan.chapter_briefs,
+            created_at: arcPlan.created_at,
+          } : null,
+        };
+      }));
+
+      return NextResponse.json({ count: enriched.length, approvals: enriched });
+    }
+
     default:
       return NextResponse.json({ error: `unknown action: ${action}` }, { status: 400 });
   }

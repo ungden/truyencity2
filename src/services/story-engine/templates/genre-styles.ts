@@ -486,6 +486,8 @@ export const GENRE_STYLES: Record<GenreType, StyleBible> = {
       'MC là nhân viên Hệ Thống Đa Vũ Trụ — có tính cách + voice nhất quán xuyên thế giới (deadpan, professional, đôi khi mệt mỏi với task), KHÁC với pháo hôi/nguyên chủ MC nhập vai.',
       'Cấu trúc thế giới chuẩn 4 hồi (5+15+15+10 chương cho thế giới 45 chương): Hồi 1 - đồng bộ kịch bản gốc + nhận task + làm quen thân phận; Hồi 2 - lật ngược thiết lập + rời nguyên kịch bản; Hồi 3 - phá vỡ kịch bản + vả mặt khí vận chi tử; Hồi 4 - hoàn thành KPI + thu hoạch + đăng xuất.',
       'Khí vận chi tử (nguyên chủ chính của các tiểu thuyết MC xuyên vào) phải bị reframe là KẺ ĐẠO ĐỨC GIẢ — bề ngoài thiện lương, thực chất ích kỷ/độc ác/giả nhân. MC vạch trần qua chứng cớ + tình huống lộ chân tướng. Vả mặt nguyên chủ = dopamine chính.',
+      'Áp dụng Lệch pha thông tin (Information Asymmetry): Tạo mâu thuẫn/hài hước qua việc MC và NPC có thông tin hoàn toàn trái ngược về một sự kiện.',
+      'Bạo lực cảm xúc: Khi vả mặt Khí vận chi tử / Trà xanh (Green tea), ưu tiên tước đoạt danh tiếng, thể diện và bóp nát niềm tự hào của họ thay vì bạo lực vật lý.',
       'Pháo hôi / phản phái nguyên chủ MC nhập vai phải có CHIỀU SÂU TÂM LÝ — không phải ác thuần. Có lý do bị tổn thương, có ước nguyện không hoàn thành, có trauma. MC cứu vớt bằng tâm lý + hành động cụ thể.',
       'Hub Space (1-2 chương giữa 2 thế giới): MC tổng kết điểm, mua kỹ năng, gặp NPC hệ thống (hài hước hoặc bí ẩn), setup thế giới tiếp theo. Đây là nhịp "thở" cho reader + chỗ tích lũy power-up.',
       'Skill stacking: MC tích lũy kỹ năng từ thế giới trước (y thuật cổ đại + hacker hiện đại + chiến thuật mạt thế + ma pháp dị giới) — thế giới mới có advantage, nhưng KHÔNG được "Mary Sue vô địch". Mỗi thế giới có challenge riêng skill stacking không tự động giải.',
@@ -563,6 +565,8 @@ export const GENRE_STYLES: Record<GenreType, StyleBible> = {
       // ── Relationship dynamics ──
       'Tình cảm phát triển qua chi tiết nhỏ (ánh mắt, cử chỉ, lời nói hai nghĩa) — GIỮ vì là core craft.',
       'Cảnh lãng mạn tinh tế, gợi cảm xúc nội tâm — GIỮ.',
+      'Lệch pha thông tin (Information Asymmetry): Tình cảm và mâu thuẫn sinh ra do nam/nữ chính có suy nghĩ hoàn toàn trái ngược về một sự kiện, tạo sự "kéo đẩy" (Push-Pull) tự nhiên thay vì mâu thuẫn khiên cưỡng.',
+      'Bạo lực cảm xúc: "Vả mặt" (Face-slap) "Trà xanh" (Green tea bitch) bằng cách đánh vào mặt mũi, danh dự, và cảm xúc của họ thay vì dùng vũ lực.',
       // ── Leo thang xung đột (đa dạng) ──
       'Xung đột KHÔNG cứ "hiểu lầm → gia đình phản đối → thế lực chia rẽ → sinh ly tử biệt" linear. Có thể horizontal (career challenges, social pressure, internal growth) thay vì vertical drama.',
       // ── Phụ tuyến (modern emphasis) ──

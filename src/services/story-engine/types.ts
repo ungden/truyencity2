@@ -204,7 +204,8 @@ export type DopamineType =
   | 'steal_luck' | 'simulate_success' | 'tears_of_regret' | 'flex_power_casual'
   | 'civilization_harvest' | 'player_exploitation' | 'two_world_shock' | 'master_flex' | 'book_manifestation' | 'monster_evolution'
   | 'smooth_opportunity' | 'casual_competence' | 'peaceful_growth'
-  | 'knowledge_leverage' | 'network_payoff' | 'business_pivot' | 'quiet_competence' | 'insider_advantage';
+  | 'knowledge_leverage' | 'network_payoff' | 'business_pivot' | 'quiet_competence' | 'insider_advantage'
+  | 'mass_witnessed_shock';
 
 // ── Engine Config ────────────────────────────────────────────────────────────
 

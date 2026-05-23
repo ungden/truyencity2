@@ -492,6 +492,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   const projectStyleDirectives = project.style_directives;
   const directiveOverride = projectStyleDirectives?.target_chapter_length_override;
   const disableChapterSplit = projectStyleDirectives?.disable_chapter_split === true;
+  const isSplitDisabled = true; // Always disable chapter splitting to simplify the project
   const directorOnlyFlash =
     projectStyleDirectives?.codex_director_only === true &&
     projectStyleDirectives?.flash_writer_enabled === true &&
@@ -850,7 +851,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   // criticals on the full logical chapter, revise, then split + upsert with
   // the revised content. If criticals found AND revise fails, throw — the
   // chapter is NOT saved and cron retries on next tick.
-  const SPLIT_PARTS_PRE = disableChapterSplit ? 1 : 2;
+  const SPLIT_PARTS_PRE = isSplitDisabled ? 1 : 2;
   const lastChapterNumberPre = nextChapter + SPLIT_PARTS_PRE - 1;
 
   // Outline character names — used by guardian + downstream per-part tasks.
@@ -1104,7 +1105,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   //   - Less moving parts → fewer edge cases to handle in 30+ tracking dimensions
   // Existing novels with split=2 continue to work via per-part loop fallback (Phase 24).
   // To opt into split=2 explicitly: set style_directives.disable_chapter_split=false.
-  const SPLIT_PARTS = disableChapterSplit ? 1 : 2;
+  const SPLIT_PARTS = isSplitDisabled ? 1 : 2;
   const splitResults = splitChapterContent(result.content, result.title, SPLIT_PARTS);
   const lastChapterNumber = nextChapter + splitResults.length - 1;
 

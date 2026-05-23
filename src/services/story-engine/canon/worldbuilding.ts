@@ -96,57 +96,57 @@ ${worldDescription.slice(0, 5000)}
 
 ${storyOutlineSummary ? `STORY OUTLINE:\n${storyOutlineSummary.slice(0, 2000)}\n\n` : ''}Trả về JSON:
 {
-  "cosmology": "<2-3 paragraph mô tả vũ trụ vận hành thế nào — dimensions, metaphysics, fundamental laws. Cụ thể với genre: cultivation = đạo lý ngũ hành thiên địa; do-thi = bối cảnh kinh tế VN/TQ hiện đại; ngon-tinh = social structure; linh-di = supernatural rules.>",
+  "cosmology": "<Mô tả chi tiết 2-3 đoạn về vũ trụ quan. Với truyện tu tiên/fantasy, phải bao gồm: cấu trúc đa tầng thế giới (Nhân giới/Linh giới/Tiên giới), các rào cản và quy tắc thăng thiên (lôi kiếp, phi thăng), các nguồn năng lượng cốt lõi (Linh khí, Ma khí, Nguyên khí) và quy luật tự nhiên (Thiên đạo, nhân quả, vận mệnh). Với đô thị/thương chiến, mô tả cấu trúc giai tầng xã hội, các thế lực ngầm và quy tắc vận hành ngầm của nền kinh tế/chính trị.>",
   "history": [
     {
-      "age": "<tên age — vd 'Thượng Cổ Thời Đại', 'Triều Đại Đại Tấn', 'Era 1985-2010'>",
-      "description": "<2-3 câu mô tả era>",
-      "keyEvents": ["<event 1>", "<event 2>", "<event 3>"]
+      "age": "<tên era/kỷ nguyên cổ đại — vd 'Thái Cổ Hồng Hoang', 'Hạ Cổ Tiên Ma Đại Chiến', 'Kỷ Nguyên Mạt Pháp'>",
+      "description": "<Mô tả chi tiết 2-3 câu về thời kỳ này, bao gồm sự hưng vong của các đại năng cổ đại và di sản để lại>",
+      "keyEvents": ["<event 1 - di chỉ cổ đại được hình thành>", "<event 2 - pháp tắc thế giới thay đổi>", "<event 3>"]
     }
     // 3-5 historical ages
   ],
   "cultures": [
     {
-      "name": "<tên văn hóa — vd 'Tu Tiên Giới', 'Phàm Tục Thế Tục', 'Vùng Đông Bắc'>",
-      "customs": "<2-3 câu mô tả phong tục>",
-      "taboos": ["<taboo 1>", "<taboo 2>"],
-      "religion": "<tôn giáo/tín ngưỡng nếu có>",
-      "socialStructure": "<vd 'gia trưởng', 'phong kiến', 'meritocratic'>"
+      "name": "<tên văn hóa/quy tắc ứng xử thế giới — vd 'Tu Tiên Giới (Nhược Nhục Cường Thực)', 'Phàm Nhân Thế Tục', 'Thế Gia Vọng Tộc'>",
+      "customs": "<Quy tắc ứng xử và lối sống, ví dụ: 'Người tu hành coi trọng lợi ích và tu vi, xem nhẹ phàm nhân, hành sự thực dụng và tàn khốc. Gia tộc coi trọng dòng máu đích-thứ.'>",
+      "taboos": ["<điều cấm kỵ cốt lõi - ví dụ: phản bội tông môn, giết người đoạt bảo công khai tại thành trì phàm nhân>", "<taboo 2>"],
+      "religion": "<tôn giáo/tín ngưỡng/pháp tắc thờ phụng>",
+      "socialStructure": "<Hệ thống cấp bậc chi tiết: Ngoại môn / Nội môn / Chân truyền / Trưởng lão / Thái thượng trưởng lão hoặc cấp bậc hào môn gia tộc>"
     }
     // 2-4 cultures
   ],
   "regions": [
     {
-      "name": "<tên vùng — vd 'Đại Châu Cửu Hoa', 'Quận Phú Mỹ Hưng', 'Đảo Bắc Cực'>",
-      "description": "<1-2 câu mô tả vùng>",
-      "climate": "<khí hậu>",
-      "dominantFactions": ["<faction 1>", "<faction 2>"],
-      "characteristics": "<đặc trưng vùng — vd 'giàu linh khí', 'quan trường', 'biên giới hỗn loạn'>"
+      "name": "<tên vùng đất/linh địa/mật cảnh — vd 'Thiên Vân Lĩnh', 'Mật Cảnh Hoang Cổ', 'Phượng Đô Thương Nghiệp Khu'>",
+      "description": "<Mô tả chi tiết 2-3 câu về vị trí địa lý, độ đậm đặc của linh khí hoặc tài nguyên thương mại>",
+      "climate": "<khí hậu và môi trường sống>",
+      "dominantFactions": ["<faction 1 kiểm soát>", "<faction 2>"],
+      "characteristics": "<Mô tả các tài nguyên cốt lõi tại vùng này — linh mạch cấp bậc nào, dược viên nuôi cấy linh thảo gì, mỏ khoáng linh thạch hay huyết mạch gia tộc khống chế>"
     }
     // 4-8 regions covering MC's likely travel + key locations
   ],
   "economy": {
-    "currency": "<đơn vị tiền chính — vd 'Linh Thạch (hạ/trung/thượng phẩm)', 'Đồng Việt Nam', 'Vàng + Bạc + Đồng'>",
-    "currencyTiers": ["<tier 1>", "<tier 2>"],
-    "tradeRoutes": "<mô tả mạng lưới thương mại>",
-    "keyResources": ["<resource 1>", "<resource 2>"]
+    "currency": "<Đơn vị tiền tệ chính. Với tu tiên: Linh Thạch. Với đô thị: Đồng Việt Nam (VND).>",
+    "currencyTiers": ["<Quy đổi rõ ràng, ví dụ: '1 Trung phẩm Linh Thạch = 100 Hạ phẩm Linh Thạch', '1 Thượng phẩm = 100 Trung phẩm Linh Thạch'>"],
+    "tradeRoutes": "<Các tuyến đường thương mại liên khu vực, chợ đen, phường thị tu tiên hoặc hệ sinh thái giao dịch thương nghiệp lớn>",
+    "keyResources": ["<Tài nguyên kinh tế cốt lõi — vd: Linh thạch, Trúc Cơ Đan linh thảo, đan dược thăng giai, linh mạch khống chế quyền>"]
   },
-  "dailyLife": "<1-2 paragraph mô tả cuộc sống thường nhật của người dân — họ ăn gì, mặc gì, làm gì hàng ngày>",
+  "dailyLife": "<Mô tả sinh động về đời sống của phàm nhân hoặc tu sĩ cấp thấp — họ ăn linh cốc gì, mặc y phục gì phù hợp với thân phận cấp bậc, và làm công việc gì (gieo trồng linh thảo, khai khoáng linh thạch, làm chân sai vặt) để sinh tồn.>",
   "commonViolations": [
     "<lỗi AI thường mắc khi viết, để Critic flag>",
-    // vd: "Linh thạch giá trị thay đổi tùy chương", "Vùng A khí hậu khác nhau giữa các chương", "Văn hóa Đại Tấn nhầm với Đại Đường"
+    // vd: "Linh thạch giá trị thay đổi tùy chương", "Vùng A khí hậu khác nhau giữa các chương", "Văn hóa Đại Tấn nhầm với Đại Đường", "Tu sĩ cấp thấp hành sự không kiêng dè tu sĩ cấp cao vô lý"
   ]
 }
 
 QUY TẮC:
 1. CONSISTENCY: mọi chi tiết PHẢI fit với genre + world_description gốc. KHÔNG mâu thuẫn.
-2. DEPTH: cosmology + history phải có depth — KHÔNG chỉ "thế giới có ma pháp". Cụ thể về ai/gì/khi nào/tại sao.
-3. CULTURES diverse: ít nhất 2 văn hóa khác biệt. Genre cultivation = sect culture vs phàm tục; do-thi = quê vs thành phố; ngon-tinh = MC's family vs love interest's family.
-4. REGIONS PHỦ KÍN MC's journey: nếu MC sẽ đi từ "ngôi làng" đến "Đế Đô" qua 1000 chương, list tất cả major regions.
-5. ECONOMY có TIER cụ thể: KHÔNG abstract "tiền". Cụ thể số đơn vị + tỷ giá tương đối.
+2. DEPTH: cosmology + history phải có depth — KHÔNG chỉ "thế giới có ma pháp". Cụ thể về quy luật thế giới, di tích, và các thế lực khống chế tài nguyên.
+3. CULTURES diverse & HIERARCHICAL: Thể hiện rõ tư duy thực dụng, hệ thống cấp bậc nghiêm ngặt (sect hierarchy, clan code) của văn học mạng Trung Quốc.
+4. REGIONS PHỦ KÍN MC's journey: Lập bản đồ các tài nguyên và linh mạch/mật cảnh để tạo động lực tranh đoạt.
+5. ECONOMY có TIER và tỉ giá quy đổi rõ ràng, tránh để lạm phát hoặc thay đổi tỉ giá vô lý giữa các chương.
 6. commonViolations[] dùng cho Critic gate — list những lỗi inconsistency dễ mắc.
 
-Đại thần Phàm Nhân Tu Tiên có 200-page setting bible. Hãy thiết kế comprehensive canon cho truyện này.`;
+Đại thần Phàm Nhân Tu Tiên có 200-page setting bible. Hãy thiết kế comprehensive canon cho truyện này theo tiêu chuẩn Qidian cao nhất.`;
 
     const res = await callGemini(
       prompt,

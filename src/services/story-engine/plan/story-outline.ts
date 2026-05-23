@@ -158,8 +158,8 @@ Trả về JSON:
 
 QUY TẮC:
 - premise PHẢI mention golden finger từ world_description (KHÔNG vague "anh ta nhận được sức mạnh kỳ lạ")
-- KHÔNG thêm tổ chức bí ẩn/đối thủ thần bí biết MC trọng sinh/hệ thống/bàn tay vàng trong premise/mainConflict/majorPlotPoints.
-- Phase 1 chỉ có đối thủ local phản ứng sau khi MC tạo thành tựu nhìn thấy; không ai theo dõi MC từ trước.
+- BẢO MẬT BÀN TAY VÀNG: Trọng sinh/hệ thống/golden finger luôn là bí mật nội tâm của MC. MC luôn hợp thức hóa năng lực của mình thành "thiên phú", "quan sát kỹ" hoặc "kinh nghiệm phán đoán", giúp NPC chỉ xem MC là người thông minh, xuất sắc mà không có bất kỳ cơ sở logic nào để nghi ngờ thế lực siêu nhiên hay bám đuôi điều tra.
+- QUY LUẬT NHÂN QUẢ CỦA PHẢN ỨNG THẾ GIỚI: Thế giới xung quanh phản ứng tỷ lệ thuận với hành động thực tế của MC. Giao dịch mua thảo dược hoặc nguyên liệu nhỏ đầu truyện chỉ được phép làm các nhân vật nhỏ tại chỗ (tiểu thương, đối thủ cùng phố) chú ý ghen ghét. Các đại tông môn, thế lực lớn hay tập đoàn lớn chỉ phản ứng khi MC đạt được thành tựu đủ lớn đe dọa đến lợi ích trực tiếp của họ ở các arc sau. Tránh xung đột bạo lực vô cớ ở đầu các thể loại phi chiến đấu.
 - castRoster ≥4 named, MỖI người có concrete intersect (KHÔNG generic "người bạn")
 - worldRules ≥4 cụ thể (KHÔNG generic "thế giới có pháp thuật")
 - antiTropes ≥3 concrete bans

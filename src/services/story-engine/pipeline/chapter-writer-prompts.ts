@@ -175,12 +175,12 @@ C1. ANTAGONIST LADDER — major threat leo dần:
 - Phase 3 (ch.50-150): region-level — tông môn lớn, công ty toàn quốc, hoàng thất.
 - Phase 4 (ch.150+): world-level — đại tông, tổ chức xuyên thiên, đa quốc gia, Thiên Đạo Kim Bảng.
 
-CẤM major villain (sect master cấp cao, secret org, Thiên Đạo Kim Bảng level, công ty đa quốc gia bí mật, trưởng lão tối cao, tổ chức xuyên thiên) xuất hiện đe dọa/giám sát/dò xét MC trước ch.30 — TRỪ master_outline.antagonist_schedule đặt rõ.
+- TƯƠNG THÍCH QUY MÔ XUNG ĐỘT: Đại tông môn, thế lực lớn hay tập đoàn lớn chỉ xuất hiện tương tác/đối kháng khi MC đạt được thành tựu đủ lớn ở các arc sau. Trong 30 chương đầu, thế giới xung quanh phản ứng giới hạn ở cấp độ vi mô, tỷ lệ thuận với hành động thực tế của MC (mua bán nguyên liệu chỉ thu hút tiểu thương cùng phố ghen ghét, hoàn toàn không có dữ liệu để các thế lực lớn bám đuôi điều tra).
 
-C2. ATTENTION GRADIENT (REACTIVE, KHÔNG PREDICT):
-- World ban đầu chỉ biết MC trong phạm vi nhỏ. Người/phe lớn chú ý SAU khi MC tạo thành tích visible ở scale phù hợp.
-- CẤM "tổ chức bí mật từ lâu đã theo dõi MC" trong 30 chương đầu trừ master_outline.
-- Recognition tier-up phải có thành tích cụ thể trước, không phải fate/destiny calling.
+C2. LUẬT NHÂN QUẢ KHI XUẤT HIỆN ĐỐI THỦ:
+- Xung đột phi chiến đấu (đô thị/kinh doanh/ngôn tình) phải được giải quyết qua thương thuyết, cạnh tranh thị trường hoặc pháp lý. Tránh các cảnh hành hung thể xác hoặc truy đuổi đường phố trừ khi bối cảnh bắt buộc.
+- Giữ kín bí mật: MC luôn chuyển hóa kiến thức tương lai hoặc hệ thống thành "thiên phú", "sự nhạy bén" giúp NPC chỉ xem MC là người giỏi, không nghi ngờ yếu tố phi tự nhiên.
+- Sự công nhận (Attention Gradient): Danh tiếng và sự chú ý phải đi sau thành tích thực tế cụ thể, không dựa vào định mệnh.
 
 C3. WARM BASELINE OPENING (ch.1):
 - MC mở chương ở functional baseline RỒI — đã có shop/studio/squad/skill/golden finger ĐANG VẬN HÀNH ngay scene 1.
@@ -209,7 +209,11 @@ EARLY-ARC (chapterNumber ≤ 10):
 - Giữ MC trong domain expertise — show competence growth + opportunity-driven plot.
 - CẤM truy sát ngoài hẻm / gangster ambush / hành hung MC trong 10 chương đầu (non-combat genres).
 - Conflict đầu arc = COMMERCIAL/POLITICAL, KHÔNG vũ lực.
-- Golden finger ACTIVE từ chương 1 (Axis C3 + B3).
+C5. QIDIAN-STYLE WORLD DEPTH:
+- Faction Hierarchies: Khi lập kế hoạch cho tông môn, gia tộc hoặc doanh nghiệp lớn, các scene phải tôn trọng hệ thống cấp bậc rõ rệt (Ngoại môn -> Nội môn -> Chân truyền -> Trưởng lão -> Thái thượng trưởng lão; Nhân viên -> Trưởng phòng -> CEO -> Hội đồng quản trị). Hành vi của NPC phải tương xứng với địa vị của họ. NPC cấp thấp phải kính sợ hoặc kiêng dè, NPC cấp cao phải sâu sắc, mưu mô và có toan tính riêng, KHÔNG hành xử như những kẻ côn đồ vô não.
+- Resource-driven Conflict: Mọi xung đột giữa các thế lực, nhân vật phải bắt nguồn từ tranh đoạt tài nguyên thực tế (Linh thạch, linh địa, đan dược, công pháp; Thị phần, hợp đồng, bí mật công nghệ, thế lực bảo kê chính trị), KHÔNG để nhân vật đấu đá chỉ vì những mâu thuẫn cảm xúc hay câu chữ nhỏ nhặt. Tu tiên giới phải mang tính chất "nhược nhục cường thực" (cá lớn nuốt cá bé) thực dụng.
+- No Handwaving Cultivation: Mô tả chi tiết kỹ thuật/chiêu thức tu luyện hoặc nước đi kinh doanh thực tế thay vì viết chung chung "MC dùng sức mạnh/hệ thống vượt qua".
+- Climax & Breakthrough Setpieces: Đột phá cảnh giới phải là cột mốc lớn, tạo ra chấn động thiên địa (linh khí triều tịch, lôi kiếp, dị tượng) hoặc chấn động giới kinh doanh, kèm theo rủi ro thất bại thực tế.
 
 ═══════════════════════════════════════════════════════════════════════════
 AXIS D — SAFETY & VOICE
@@ -258,7 +262,9 @@ D4-RESOLVE. Hook chương trước → PHẢI giải quyết ngay đầu chươn
 - "Hook" = SỰ KIỆN/HÀNH ĐỘNG CỤ THỂ ở cuối chương N (ai vừa làm gì, vật gì xuất hiện, ai vừa nói gì, MC vừa quyết định đi đâu gặp ai).
 - "Resolve" = scene 1 chương N+1 phải CHO THẤY hậu quả/phản ứng/diễn biến tiếp theo của SỰ KIỆN đó — KHÔNG phải "MC tiếp tục suy ngẫm về sự kiện".
 - Nếu [Cliffhanger chương trước] trong context là TUYÊN NGÔN TRỪU TƯỢNG (ví dụ "ván cờ sinh tử mới thật sự bắt đầu" / "đây là thế giới của hắn" / "MC chuẩn bị tâm thế") → IGNORE câu tuyên ngôn đó. Đọc [NGUYÊN VĂN ĐOẠN KẾT CHƯƠNG TRƯỚC] để TÌM sự kiện cụ thể CUỐI CÙNG (đoạn 2-3 TRƯỚC câu tuyên ngôn) và resolve sự kiện đó.
-- Tương tự nếu [Trạng thái MC cuối chương trước] = nội tâm/cảm xúc thay vì vị trí vật lý → IGNORE, đọc [NGUYÊN VĂN ĐOẠN KẾT] tìm vị trí + action MC cuối cùng.
+- Tương tự nếu [Trạng thái MC cuối chương trước] = nội tâm/cảm xúc thay vị trí vật lý → IGNORE, đọc [NGUYÊN VĂN ĐOẠN KẾT] tìm vị trí + action MC cuối cùng.
+- BẮT BUỘC KHÔNG ĐƯỢC lùi thời gian hoặc nhảy địa điểm ở Scene 1. Nếu chương trước kết thúc lúc nửa đêm trong rừng, Scene 1 phải bắt đầu ngay tại rừng đó lúc nửa đêm, không thể nhảy sang 'Sáng hôm sau tại khách sạn' trừ khi đã viết cảnh di chuyển mượt mà.
+- BẮT BUỘC KHÔNG ĐƯỢC lặp lại bất kỳ câu thoại, suy nghĩ, hoặc hành động cụ thể nào đã xảy ra trong [NGUYÊN VĂN ĐOẠN KẾT CHƯƠNG TRƯỚC]. Scene 1 phải tiếp tục trực tiếp từ câu tiếp theo, không viết lại.
 
 D4-BIS. CẤM TEMPLATE CHAPTER-ENDING DECLARATIONS (Phase Q 2026-05-13 — sửa pattern AI default gây cảm giác "viết lại đoạn cuối"):
 - CẤM kết chương bằng các câu "ego declaration" template:
@@ -389,9 +395,10 @@ ${UNIVERSAL_SANG_VAN_DIRECTIVE}
 - BREATHING MOMENTS: Mỗi chương PHẢI có ≥2 khoảnh khắc êm dịu (đối thoại ấm, observation chi tiết đời thường, recognition nhỏ, hài hước nhẹ) — kể cả chương climax/giai đoạn ngược.
 - Tiếng Việt tự nhiên: dùng thành ngữ, xưng hô đúng vai vế.
 - KHÔNG viết "Cliffhanger:" hay bất kỳ chỉ dẫn tiếng Anh nào.
-- MC SECRET LOCK: Trọng sinh/hệ thống/bàn tay vàng là bí mật của MC. Người ngoài chỉ được phản ứng với thành quả nhìn thấy, KHÔNG tự biết nguồn gốc năng lực.
-- MC BENEFIT LOCK: MC không chõ mồm vào chuyện ngoài nếu không có lợi ích rõ (tài nguyên/tiền/thông tin/quan hệ/uy tín/skill/bảo vệ circle đã thiết lập). Mỗi hành động chủ động phải tạo payoff hoặc mở opportunity cụ thể.
-- GOLDEN FINGER STRENGTH: Hệ thống/năng lực phải giúp MC mạnh lên qua insight/tool/resource/payoff thấy được. Khó khăn hợp lệ, nhưng CẤM viết nhiều scene liên tiếp như hệ thống vô dụng hoặc chỉ làm MC khổ thêm.
+- MC SECRET LOCK: Trọng sinh/hệ thống/bàn tay vàng luôn là bí mật nội tâm của MC. MC luôn diễn giải năng lực thành sự nhạy bén cá nhân hoặc kinh nghiệm, giúp NPC chỉ coi MC là người thông minh, xuất sắc mà không có dữ liệu để hoài nghi yếu tố phi tự nhiên.
+- MC BENEFIT LOCK: MC không can thiệp chuyện ngoài nếu không có lợi ích rõ (tài nguyên/tiền/thông tin/quan hệ/uy tín/skill/bảo vệ circle đã thiết lập). Mỗi hành động chủ động phải tạo payoff hoặc mở cơ hội cụ thể.
+- ĐỒNG BỘ QUY MÔ XUNG ĐỘT: Sự phản ứng của các thế lực phải tỷ lệ thuận với hành động thực tế của MC. Trong 30 chương đầu, xung đột chỉ giới hạn ở mức cục bộ vi mô với đối thủ cùng cấp (cạnh tranh nhỏ); không đưa các tổ chức lớn bí ẩn hoặc nhân vật cấp cao bám đuôi điều tra MC. Tránh các cảnh bạo lực thể xác hoặc truy đuổi vô lý ở đầu các truyện phi chiến đấu.
+- GOLDEN FINGER STRENGTH: Hệ thống/năng lực phải giúp MC mạnh lên qua insight/tool/resource/payoff thấy được. Khó khăn hợp lệ, nhưng tránh viết nhiều scene liên tiếp như hệ thống vô dụng hoặc chỉ làm MC khổ thêm.
 
 □ [SECRET] Bí mật cốt lõi MC (rebirth/system/golden finger/identity) có nguy cơ lộ trong scene này không?
   - Nếu CÓ và outline KHÔNG cho phép reveal → MC dùng năng lực ngầm, narrate qua "thiên phú/cơ duyên/thông minh"; NPC observe mà không hiểu rõ.
@@ -411,7 +418,7 @@ ${UNIVERSAL_SANG_VAN_DIRECTIVE}
   - KHÔNG narrate system mà MC vẫn vất vả không tiến tới gì.
 
 ═══════════════════════════════════════════════════════════════════════════
-PHONG CÁCH
+PHONG CÁCH & CẤU TRÚC THẾ GIỚI CHUẨN QIDIAN
 ═══════════════════════════════════════════════════════════════════════════
 
 - Chi tiết sống động. SHOW, don't tell. Đúng giọng văn thể loại.
@@ -420,6 +427,11 @@ PHONG CÁCH
 - PHẢI đủ word count yêu cầu. CẤM tóm tắt. Thiếu từ → viết thêm chi tiết 5 giác quan, nội tâm đa lớp, phản ứng người xung quanh.
 - Tiếng Việt tự nhiên: thành ngữ, xưng hô đúng vai vế.
 - KHÔNG viết "Cliffhanger:" hay chỉ dẫn tiếng Anh.
+- QIDIAN-STYLE DEPTH:
+  • Tôn trọng tuyệt đối hệ thống cấp bậc trong tông môn, gia tộc hoặc giới kinh doanh. NPC cấp dưới phải có thái độ kính sợ/phục tùng tương xứng; NPC cấp cao phải có khẩu khí uy nghiêm, toan tính sâu xa, không nói nhảm hay kích động trẻ con.
+  • Động lực xung đột phải là tranh đoạt tài nguyên cụ thể (linh thạch, đan dược, địa bàn kinh doanh, lợi ích cốt lõi), tránh các cuộc đấu võ mồm/đánh nhau vô cớ chỉ vì thể diện hay cảm xúc đơn thuần.
+  • Mô tả chi tiết tiến trình vận chuyển công pháp, luồng linh lực/năng lượng khi thi triển chiêu thức hoặc cấu trúc/điều khoản của một giao dịch kinh doanh để tăng độ chân thực chuyên môn.
+  • Cảnh đột phá phải được miêu tả hoành tráng, có sức nặng vật lý và môi trường (thiên địa biến sắc, linh khí dao động mãnh liệt) kèm theo áp lực tinh thần rõ rệt lên MC.
 
 ═══════════════════════════════════════════════════════════════════════════
 SẢNG VĂN — KHÔNG TỰ NGƯỢC (mirror Architect Axis D1)
@@ -472,6 +484,14 @@ LẶP SETUP (TRỌNG SINH/GOLDEN FINGER):
 - Tên golden finger ("Hệ Thống", "Bàn Tay Vàng", v.v.) ≤5 lần/chương. Sau lần 3 dùng đại từ "nó", "thứ năng lực ấy".
 - KHÔNG re-narrate flashback đã xuất hiện ở chương trước (callback 1 câu ngắn ok).
 - KHÔNG dồn 50% chương vào nội tâm reflect "kiếp này phải khác kiếp trước". Mỗi chương ƯU TIÊN hành động cụ thể; nội tâm reflect ≤10-20% volume.
+
+═══════════════════════════════════════════════════════════════════════════
+LIÊN KẾT LIÊN TỤC & CẤM LẶP ĐOẠN KẾT (Phase R 2026-05-23)
+═══════════════════════════════════════════════════════════════════════════
+
+- BẮT BUỘC LIÊN KẾT CHẶT CHẼ: Scene 1 phải tiếp tục trực tiếp từ cliffhanger của chương trước (về cả thời gian, địa điểm, nhân vật). Tuyệt đối không nhảy cảnh hoặc nhảy thời gian một cách đột ngột/chớt quớt trừ khi có cảnh di chuyển cụ thể.
+- TUYỆT ĐỐI CẤM LẶP LẠI: Không được viết lại hoặc lặp lại bất kỳ câu thoại, suy nghĩ, hoặc hành động cụ thể nào đã xảy ra trong [NGUYÊN VĂN ĐOẠN KẾT CHƯƠNG TRƯỚC]. Scene 1 phải tiếp tục trực tiếp từ câu tiếp theo, đẩy diễn biến tiến tới (forward momentum) từ câu đầu tiên.
+  • Ví dụ: Nếu chương trước kết thúc bằng việc nhân vật phụ hỏi MC một câu, chương này phải mở đầu bằng câu trả lời hoặc phản ứng trực tiếp của MC, KHÔNG được để nhân vật phụ hỏi lại câu đó hay mô tả lại việc nhân vật phụ hỏi.
 
 ═══════════════════════════════════════════════════════════════════════════
 CẤM TEMPLATE ENDING + STATIC OPENING (Phase Q 2026-05-13)
@@ -620,9 +640,9 @@ G1. SECRET LEAK (Axis B1):
 - Cliffhanger "kẻ lạ biết bí mật MC nhắn tin/gọi điện/xuất hiện" mà master_outline không setup → REWRITE.
 - MC flex full power public không có thiết lập từ trước → severity major.
 
-G2. MAJOR VILLAIN EARLY (Axis C1):
-- chapterNumber<30 + major villain marker (sect master cấp cao, Thiên Đạo Kim Bảng, tổ chức bí mật xuyên thiên, công ty đa quốc gia bí ẩn, trưởng lão tối cao) đe dọa/giám sát/dò xét MC → REWRITE TRỪ KHI master_outline.antagonist_schedule liệt kê.
-- "Tổ chức bí mật từ lâu đã theo dõi MC" trong 30 chương đầu mà master_outline không setup → REWRITE.
+G2. ANTAGONIST SCALING & STALKER BAN (Axis C1+C2):
+- Xung đột không tương thích quy mô: Dưới chương 30 mà thế lực ngầm lớn/sát thủ xuất hiện theo dõi, đe dọa MC, hoặc MC bị bám đuôi điều tra chỉ vì giao dịch nhỏ đầu truyện → REWRITE.
+- Lệch bối cảnh xung đột: Kẻ địch liên tục đánh đập/hành hung/truy sát MC bằng vũ lực vô lý hoặc vô duyên vô cớ ở các chương đầu của các thể loại phi chiến đấu (đô thị/kinh doanh/ngôn tình) → REWRITE.
 
 G3. CONTINUITY:
 - Nhân vật đã CHẾT mà xuất hiện sống lại → REWRITE
@@ -632,6 +652,8 @@ G3. CONTINUITY:
 - RELATIONSHIP giữa 2 nhân vật flip (yêu→thù, thù→yêu) không có lý do → REWRITE
 - MC ở location A chương trước, location B chương này KHÔNG có scene di chuyển → major (REWRITE nếu jump xa vô lý)
 - BRIDGE BROKEN: chương trước cliffhanger không resolve trong 100 từ đầu chương này → critical
+- LẶP ĐOẠN KẾT (DUPLICATE ENDING): Chương mới lặp lại/viết lại các câu thoại, suy nghĩ, hoặc hành động cụ thể ở [NGUYÊN VĂN ĐOẠN KẾT CHƯƠNG TRƯỚC] → REWRITE
+- MẤT KẾT NỐI (DISCONNECT): Scene 1 không tiếp tục trực tiếp từ cliffhanger chương trước, hoặc bỏ qua/nhảy cảnh thời gian/địa điểm đột ngột không có transition giải quyết sự kiện → REWRITE
 - MATH SANITY: MC chi vượt số dư mà không có deal/vay/thu nhập setup từ trước → REWRITE
 - ECONOMIC LEDGER: nếu pre-write context có "[TÀI CHÍNH / TÀI SẢN]" liệt kê số dư MC, chapter này CẤM cho MC chi vượt mà không có deal/vay/thu nhập trong cùng chapter → REWRITE.
 
