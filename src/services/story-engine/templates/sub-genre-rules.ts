@@ -713,4 +713,12 @@ export const SUB_GENRE_RULES: Record<string, string[]> = {
     '  • Cấu trúc 4 giai đoạn: (1) Bảng đầu tiên + bắt đầu nghi ngờ (1-50, manh mối nhỏ dẫn đến khu MC); (2) Bảng liên hoàn + bão táp (50-150, thiên tài liên minh tìm MC); (3) Bị ép xuất thủ (150-300, đại quân bao vây → MC phẩy tay = bốc hơi); (4) Kim Bảng Đa Vũ Trụ (300+).',
     '  • Anti-pattern: MC TUYỆT ĐỐI không chủ động khoe khoang. Bộc quang luôn là do Thiên Đạo / hệ thống / kẻ ngoài → MC chỉ phàn nàn thụ động. Đây là Personality Lock — Critic enforce.',
   ],
+
+  'nu-tan': [
+    'NỮ TẦN / JINJIANG PATTERNS:',
+    '  • Nhân thiết (Character Tags) tuyệt đối: Nhân vật phải tuân thủ nghiêm ngặt tag tính cách ban đầu (ví dụ: Thanh lãnh sư tôn, Cố chấp cuồng, Ôn nhu nam phụ). Hành động không bao giờ được OOC (Out of Character). Sự mâu thuẫn phải phát sinh từ giới hạn của nhân thiết chứ không phải do phá vỡ nhân thiết.',
+    '  • Kéo đẩy tình cảm (Push-pull): Tạo tension không qua drama gia tộc cấm đoán, mà qua Lệch pha thông tin (nhân vật A nghĩ B ghét mình, B lại đang tìm cách bảo vệ A) tạo ra các tình huống hiểu lầm vừa ngọt vừa ngược.',
+    '  • Trừng phạt Trà xanh (Green tea): Trừng phạt không bằng vũ lực mà bằng bạo lực cảm xúc. MC bóc trần bộ mặt giả tạo trước công chúng, cướp đi tài nguyên, sự sủng ái và danh tiếng mà kẻ địch khao khát nhất, khiến kẻ địch sụp đổ tinh thần.',
+    '  • Hỗ trợ lẫn nhau (Girls help girls): Tăng cường các tuyến nhân vật nữ phụ có chiều sâu, trở thành đồng minh vững chắc của nữ chính trong sự nghiệp, thay vì luôn là tình địch ác độc.',
+  ],
 };

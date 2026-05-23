@@ -297,4 +297,13 @@ export const DOPAMINE_PATTERNS: Record<DopamineType, DopaminePattern> = {
     setup: 'Cơ hội/nguy cơ chỉ MC biết trước (dựa rebirth memory, insider info, expert knowledge)',
     payoff: 'MC ra quyết định trước — đầu tư đúng, tránh bẫy, ký deal đúng thời điểm. Sau đó người khác mới nhận ra MC "biết trước" như thế nào.',
   },
+  mass_witnessed_shock: {
+    type: 'mass_witnessed_shock',
+    name: 'Chấn Kinh Lưu (Shock Flow)',
+    description: 'Nhiều người chứng kiến MC bộc lộ tài năng/tài phú, tạo hiệu ứng vinh quang đám đông',
+    frequency: 'every_3_chapters',
+    intensity: 'high',
+    setup: 'Đám đông đang hoài nghi hoặc không ai chú ý tới MC, có 1 sự kiện cần tài năng xuất chúng giải quyết',
+    payoff: 'MC ra tay, miêu tả chi tiết biểu cảm "há hốc mồm", "chân nhũn ra" của ít nhất 3 nhân vật phụ. Đám đông hoàn toàn chấn kinh.',
+  },
 };

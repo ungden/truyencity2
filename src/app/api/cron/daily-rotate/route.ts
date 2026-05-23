@@ -44,6 +44,7 @@ const MANUAL_REVIEW_PAUSE_PREFIXES = [
   'setup_stage ',
   'auto_paused_after_',
   'auto_paused_daily_cost_cap',
+  'awaiting_arc_approval',
 ];
 
 function isManualReviewPause(pauseReason: string | null | undefined): boolean {

@@ -94,11 +94,11 @@ ${storyOutline ? `STORY OUTLINE:\n${storyOutline.slice(0, 2000)}\n\n` : ''}Trả
   "ladder": [
     {
       "tierIndex": 1,
-      "name": "<tên tier — vd 'Luyện Khí Sơ Kỳ' (cultivation), 'Khởi Nghiệp Cá Thể' (do-thi), 'Tổ Trưởng' (quan-truong)>",
-      "description": "<mô tả 1-2 câu>",
-      "requirements": "<điều kiện đạt tier — vd 'thông mạch + linh khí 100' / 'doanh thu 500tr/tháng'>",
-      "ceiling": "<max khả năng tại tier — vd 'sát thương vật lý cấp đan dược' / 'quản lý 10-20 nhân viên'>",
-      "typicalDuration": "<thường mất bao lâu — vd '2-5 năm tu luyện', '6 tháng-1 năm'>"
+      "name": "<tên tier kèm các tiểu cảnh giới rõ ràng — vd 'Luyện Khí Sơ Kỳ / Trung Kỳ / Hậu Kỳ / Viên Mãn'>",
+      "description": "<mô tả chi tiết biến đổi cơ thể/năng lượng và giới hạn sức mạnh chiến đấu của cảnh giới này (ví dụ: phạm vi khống chế, tốc độ di chuyển, lực phá hoại)>",
+      "requirements": "<điều kiện/nguyên liệu cần để tích lũy tu vi hoặc đạt tới đỉnh phong của tier này>",
+      "ceiling": "<max khả năng tại tier — vd 'Không thể chịu được một đòn của Trúc Cơ kỳ, tuổi thọ tối đa 120 năm'>",
+      "typicalDuration": "<thời gian tích lũy trung bình cần thiết — vd '5-10 năm khổ tu'>"
     }
     // SỐ LƯỢNG TIERS: 6-10 cho cultivation/fantasy. 4-6 cho do-thi/business. 5-8 cho quan-truong.
   ],
@@ -106,32 +106,33 @@ ${storyOutline ? `STORY OUTLINE:\n${storyOutline.slice(0, 2000)}\n\n` : ''}Trả
     {
       "from": "<tên tier>",
       "to": "<tên tier kế>",
-      "conditions": "<điều kiện đột phá cụ thể — vd 'tích đủ linh khí + ngộ ra Đạo Tâm'>",
-      "sideEffects": "<hậu quả/side-effect — vd 'tổn hao 30% kinh mạch nếu ép', 'mệt mỏi 7 ngày'>",
-      "failureMode": "<hậu quả nếu đột phá thất bại — vd 'tẩu hỏa nhập ma', 'tu vi giảm 1 cấp'>"
+      "conditions": "<điều kiện đột phá cực kỳ cụ thể — đan dược trợ giúp bắt buộc (ví dụ: Trúc Cơ Đan để bảo hộ kinh mạch), yêu cầu ngộ tính tinh thần (đạo tâm, ý cảnh), linh địa thích hợp (linh mạch cấp cao)>",
+      "sideEffects": "<hậu quả/tổn thương cơ thể khi cố gắng đột phá cưỡng ép>",
+      "failureMode": "<hậu quả thảm khốc nếu đột phá thất bại — tẩu hỏa nhập ma, đan điền vỡ nát, tu vi tụt lùi về cảnh giới trước, hoặc tử vong>"
     }
   ],
   "itemTiers": [
     {
-      "tierName": "<vd 'Phàm Khí / Linh Khí / Pháp Khí / Bảo Vật / Thần Khí' hoặc 'Cấp đầu vào / Cấp doanh nghiệp / Cấp tập đoàn'>",
-      "description": "<mô tả tier vật phẩm>",
-      "powerExample": "<ví dụ vật phẩm cụ thể>"
+      "tierName": "<vd 'Pháp Khí / Bảo Khí / Linh Bảo / Thông Thiên Linh Bảo' (phù hợp với cảnh giới nào sử dụng)>",
+      "description": "<mô tả phân cấp bảo vật, đan dược, trận pháp tương ứng với cảnh giới tu luyện>",
+      "powerExample": "<ví dụ cụ thể về uy lực vật phẩm>"
     }
   ],
-  "coreRules": "<2-3 đoạn paragraph mô tả CORE RULES của hệ thống — không thể vi phạm. Vd cultivation: 'Tu luyện theo trình tự, không thể nhảy cóc cảnh giới. Mỗi cảnh giới phải tích đủ linh khí + ngộ Đạo Tâm. Đột phá ép → tẩu hỏa nhập ma không thể quay lại.'>",
+  "coreRules": "<2-3 đoạn paragraph mô tả CORE RULES của hệ thống — không thể vi phạm. Vd cultivation: 'Cảnh giới thâm nghiêm, chênh lệch thực lực giữa các đại cảnh giới là tuyệt đối (người Trúc Cơ hoàn toàn nghiền nát Luyện Khí). Không thể nhảy cóc cảnh giới. Đột phá bắt buộc phải có đan dược phụ trợ phù hợp và ngộ đạo tâm, không có chuyện tự nhiên đột phá.'>",
   "commonViolations": [
     "<những lỗi AI thường mắc khi viết — để Critic flag>",
-    // vd: "MC skip cảnh giới mà không có lý do narrative", "MC dùng skill cấp cao hơn tier hiện tại", "Đột phá liên tục không có cooldown"
+    // vd: "MC đột phá liên tục không có thời gian cooldown", "MC skip cảnh giới mà không giải thích đan dược/linh địa sử dụng", "Pháp bảo cấp cao được sử dụng bởi tu sĩ cấp thấp mà không gặp phản phệ"
   ],
   "genreNotes": "<lưu ý đặc thù genre — vd 'do-thi: power = business scale + network. KHÔNG phải combat. KHÔNG có cảnh giới.'>"
 }
 
 QUY TẮC THIẾT KẾ:
 1. Hệ thống PHẢI cohesive với genre. Cultivation/fantasy → cảnh giới ladder rõ. Do-thi/business → revenue/scale tier. Quan-truong → chính trị rank.
-2. Mỗi tier có CEILING rõ — KHÔNG để tier 1 có thể giết tier 5 dễ dàng.
-3. Breakthroughs có ĐIỀU KIỆN cụ thể — KHÔNG handwave "MC ngộ ra rồi đột phá".
-4. CommonViolations → list những lỗi AI hay mắc khi viết, để Critic catch.
-5. Genre-specific: NGON-TINH có thể không có power ladder formal — describe 'social standing' / 'emotional bond level' ladder thay thế. LINH-DI có thể là 'ma lực level / curse intensity' ladder.`;
+2. Mỗi tier có CEILING rõ — KHÔNG để tier thấp đánh bại dễ dàng tier cao hơn.
+3. Breakthroughs có ĐIỀU KIỆN và RỦI RO cụ thể — yêu cầu các yếu tố đan dược trợ giúp và ngộ tính để tạo tính căng thẳng kịch tính chuẩn truyện mạng Trung Quốc.
+4. Tỷ lệ phân cấp vật phẩm/đan dược phải tương ứng khớp nối hoàn hảo với cảnh giới nhân vật.
+5. CommonViolations -> list những lỗi AI hay mắc khi viết, để Critic catch.
+6. Genre-specific: NGON-TINH có thể mô tả 'social standing' / 'influence' ladder. LINH-DI có thể là 'curse intensity' / 'supernatural resistance' ladder.`;
 
     const res = await callGemini(
       prompt,

@@ -271,16 +271,15 @@ QUY TẮC PHÂN VOLUME (BẮT BUỘC):
 5. VOLUME CUỐI: climax-dense pacing, mood triumphant hoặc bittersweet-final.
 6. characterArcBeat xuyên ${targetVolumeCount} volumes PHẢI form 1 đường cong character development chính thống.
 7. keyPayoffsOpened ở volume sớm phải có volume sau closes — KHÔNG được orphan promise (mở mà không bao giờ đóng).
-8. ARC 1 SẢNG VĂN HARD RULES:
-   - Volume 1 description chỉ MAX 1 antagonist active LOCAL scale.
-   - ZERO mysterious organization tracking MC trong volume 1-2. Tổ chức bí ẩn defer volume 3+.
-   - WARM BASELINE 5 chương đầu: ZERO active threat, MC làm việc routine trong domain nhỏ.
-   - ANTAGONIST PROGRESSION LADDER (volume by volume — KHÔNG NHẢY CÓC):
-     * Volume 1-2: TÂN THỦ MAP — local antagonist (hàng xóm/khu phố/sư huynh)
-     * Volume 3-5: HUYỆN/CITY — mid-tier (đối thủ kinh doanh huyện/quan huyện)
-     * Volume 6-8: TỈNH/NATIONAL — institutional (tập đoàn lớn/quan tỉnh)
-     * Volume 9+: COSMIC/WORLD — endgame (Đại đế/AI Tối Thượng/world threat)
-     Cosmic tier CHỈ unlock từ volume 6+, KHÔNG mention volume 1-2.${proactiveRule}`;
+8. LUẬT PHÂN PHỐI XUNG ĐỘT THEO CUỐN (VOLUME PROGRESSION):
+    - Volume 1-2 (Tân thủ): Thiết lập cuộc sống thường nhật ổn định, MC tối ưu hóa lợi thế ban đầu trong phạm vi nhỏ. Chỉ thiết lập xung đột cục bộ với đối thủ cùng cấp (đồng nghiệp, tiểu thương cạnh tranh). Tuyệt đối không đưa thế lực ngầm hay nhân vật bí ẩn vào theo dõi MC để đảm bảo tính logic nhân quả.
+    - Phát triển xung đột phi bạo lực: Ở các thể loại phi chiến đấu, xung đột giai đoạn đầu được giải quyết hoàn toàn bằng mưu trí, cạnh tranh thương mại hoặc uy tín cá nhân, tránh xa các tình tiết hành hung thể xác hoặc truy đuổi vô lý.
+    - ANTAGONIST PROGRESSION LADDER (volume by volume — KHÔNG NHẢY CÓC):
+      * Volume 1-2: TÂN THỦ MAP — local antagonist (hàng xóm/khu phố/sư huynh)
+      * Volume 3-5: HUYỆN/CITY — mid-tier (đối thủ kinh doanh huyện/quan huyện)
+      * Volume 6-8: TỈNH/NATIONAL — institutional (tập đoàn lớn/quan tỉnh)
+      * Volume 9+: COSMIC/WORLD — endgame (Đại đế/AI Tối Thượng/world threat)
+    Cosmic tier CHỈ unlock từ volume 6+, KHÔNG mention volume 1-2.${proactiveRule}`;
 
   try {
     const res = await callGemini(prompt, {

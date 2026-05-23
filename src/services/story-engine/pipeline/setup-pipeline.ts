@@ -122,6 +122,7 @@ export type SetupStage =
   | 'master_outline' | 'story_outline'
   | 'canon_spawn'     // Phase S — modular canon (factions / world / power / foreshadowing / twists / themes / voice)
   | 'arc_plan'
+  | 'arc_approval'    // Human-in-the-Loop gate — pause for admin to review arc plan before proceeding
   | 'foundation_review' // Phase S — scored 14-dim review, loop on fail
   | 'ready_to_write' | 'writing' | 'completed';
 
@@ -157,7 +158,8 @@ const NEXT_STAGE: Record<SetupStage, SetupStage> = {
   master_outline: 'story_outline',
   story_outline: 'canon_spawn',
   canon_spawn: 'arc_plan',
-  arc_plan: 'foundation_review',
+  arc_plan: 'arc_approval',
+  arc_approval: 'foundation_review',
   foundation_review: 'ready_to_write',
   ready_to_write: 'writing',
   writing: 'completed',
@@ -934,6 +936,37 @@ async function runStageArcPlan(p: ProjectStageRow): Promise<{ success: boolean; 
   }
 }
 
+// ── Stage 7b: ARC APPROVAL (Human-in-the-Loop Gate) ─────────────────────────
+/**
+ * Pause the project for human review of the Arc 1 plan generated in the
+ * previous stage. The admin must approve (or edit) the arc plan before
+ * the pipeline continues to foundation_review.
+ *
+ * This handler is special: it always "succeeds" immediately so that
+ * advanceStage can transition to the next stage — but advanceStage itself
+ * is NOT called because runOneStage sees a paused project. Instead, we
+ * pause here and wait for the approve_arc admin API to advance the stage.
+ */
+async function runStageArcApproval(p: ProjectStageRow): Promise<{ success: boolean; error?: string }> {
+  const novel = Array.isArray(p.novels) ? p.novels[0] : p.novels;
+  const novelTitle = novel?.title || 'Unknown';
+
+  await getSupabase()
+    .from('ai_story_projects')
+    .update({
+      status: 'paused',
+      pause_reason: `awaiting_arc_approval:arc_1_setup:${novelTitle}`,
+      paused_at: new Date().toISOString(),
+    })
+    .eq('id', p.id);
+
+  console.log(`[SetupPipeline] Project ${p.id.slice(0, 8)} paused for arc approval (${novelTitle})`);
+
+  // Return false so runOneStage does NOT call advanceStage.
+  // The approve_arc API will advance the stage when admin approves.
+  return { success: false, error: 'awaiting_arc_approval' };
+}
+
 // ── Stage 8 (Phase S): CANON SPAWN ──────────────────────────────────────────
 async function runStageCanonSpawn(p: ProjectStageRow): Promise<{ success: boolean; error?: string }> {
   const wd = (p.world_description || '').trim();
@@ -1127,6 +1160,7 @@ const STAGE_HANDLERS: Partial<Record<SetupStage, StageHandler>> = {
   story_outline: runStageStoryOutline,
   canon_spawn: runStageCanonSpawn,
   arc_plan: runStageArcPlan,
+  arc_approval: runStageArcApproval,
   foundation_review: runStageFoundationReview,
 };
 
@@ -1156,6 +1190,10 @@ export async function runOneStage(p: ProjectStageRow): Promise<boolean> {
   if (result.success) {
     await advanceStage(p.id, p.setup_stage);
     return true;
+  } else if (result.error === 'awaiting_arc_approval') {
+    // arc_approval stage paused the project directly — do NOT increment
+    // attempts or record error; admin will resume via approve_arc API.
+    return false;
   } else {
     await recordStageError(p.id, result.error || 'unknown', p.setup_stage_attempts);
     return false;
