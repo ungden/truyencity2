@@ -678,6 +678,7 @@ export async function writeFlashCheapRoutineChapter(input: FlashCheapRoutineInpu
       chapterNumber: input.nextChapter,
       content: chapter.content,
       protagonistName: input.protagonistName,
+      genre: input.genre,
       expectedCharacters: [input.protagonistName, ...characters],
     }),
   ]);
