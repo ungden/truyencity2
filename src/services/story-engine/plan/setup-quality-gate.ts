@@ -179,11 +179,11 @@ function validateSetupKernel(kernel: StoryKernel | undefined, strict: boolean | 
     }
   }
 
-  if (!kernel.mcSecret?.secret || !kernel.mcSecret?.outsideWorldKnowledge || !kernel.mcSecret?.revealRule) {
+  if (!kernel.mcSecret?.secret || !kernel.mcSecret?.outsideWorldKnowledge || !kernel.mcSecret?.revealRule || !kernel.mcSecret?.coverStory) {
     issues.push({
       severity: 'error',
       code: 'setup_kernel_mc_secret_missing',
-      message: 'StoryKernel.mcSecret must define secret, outside-world knowledge, and reveal rule',
+      message: 'StoryKernel.mcSecret must define secret, outside-world knowledge, reveal rule, and cover story',
     });
   }
 

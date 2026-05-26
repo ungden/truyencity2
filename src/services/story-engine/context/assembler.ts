@@ -65,7 +65,7 @@ function formatStoryKernelContext(kernel: StoryKernel): string {
     parts.push(`System mechanic: ${kernel.systemMechanic.name} | input: ${kernel.systemMechanic.input} | output: ${kernel.systemMechanic.output} | limit: ${kernel.systemMechanic.limit} | reward: ${kernel.systemMechanic.reward}`);
   }
   if (kernel.mcSecret) {
-    parts.push(`MC secret lock: ${kernel.mcSecret.secret} | outsiders only know: ${kernel.mcSecret.outsideWorldKnowledge} | reveal rule: ${kernel.mcSecret.revealRule}`);
+    parts.push(`MC secret lock: ${kernel.mcSecret.secret} | cover story: ${kernel.mcSecret.coverStory || 'N/A'} | outsiders only know: ${kernel.mcSecret.outsideWorldKnowledge} | reveal rule: ${kernel.mcSecret.revealRule}`);
   }
   if (kernel.benefitLoop) {
     parts.push(`Benefit loop: goal ${kernel.benefitLoop.goal} | action ${kernel.benefitLoop.action} | benefit ${kernel.benefitLoop.benefit} | cadence ${kernel.benefitLoop.cadence}`);

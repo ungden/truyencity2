@@ -113,8 +113,31 @@ SETUP CONTRACT:
 
 ★ MC secret + benefit logic:
   Trọng sinh/hệ thống/bàn tay vàng là bí mật lớn nhất của MC. Người ngoài chỉ thấy kết quả,
-  không ai bí ẩn biết nguồn gốc trong Phase 1-2. MC chỉ can thiệp chuyện ngoài khi có lợi ích
+  không ai biết nguồn gốc trong Phase 1-2. MC chỉ can thiệp chuyện ngoài khi có lợi ích
   rõ: tài nguyên, tiền, thông tin, quan hệ, uy tín, skill, hoặc bảo vệ circle đã thiết lập.
+
+  BẮT BUỘC THIẾT LẬP VỎ BỌC (COVER STORY) CHO MC:
+  Tại setup, AI phải thiết lập một "coverStory" (vỏ bọc thực tế) để giải thích cho năng lực
+  phi thường của MC. Ví dụ: "được thế ngoại cao nhân truyền dạy", "kỳ ngộ nhặt được cổ thư/đan dược",
+  "ngộ tính thiên tài tự giác ngộ", "mắt nhìn nhạy bén bẩm sinh". MC tuyệt đối KHÔNG bao giờ thừa nhận
+  thân phận xuyên việt/hệ thống/bàn tay vàng với bất kỳ ai, kể cả người thân. NPCs chỉ được phép
+  biết về vỏ bọc này và xem MC là thiên tài xuất sắc, tuyệt đối không nghi ngờ siêu nhiên.
+
+  ĐỒNG NHÂN (FANFICTION) — THIẾT LẬP LỘ TRÌNH CANON & CALLBACK:
+  Setup cho truyện Đồng Nhân PHẢI xác định rõ: tác phẩm gốc, mốc thời gian bắt đầu, tuyến cốt truyện (route),
+  danh sách các nhân vật canon chính, và ít nhất 5 sự kiện canon kinh điển mà MC biết trước sẽ diễn ra.
+  Mô tả rõ cách MC dùng 'biết trước kịch bản' (meta-knowledge) để nẫng tay trên cơ duyên hoặc tránh nguy hiểm.
+  Thế giới và kịch bản chương phải liên tục có các đoạn MC hồi tưởng/so sánh/đối chiếu với nguyên tác gốc
+  để gợi nhớ lại hồi ức cho độc giả, tạo cảm giác thỏa mãn khi MC thay đổi cốt truyện gốc theo hướng có lợi.
+
+  KIM THỦ CHỈ / BÓI TOÁN / HỆ THỐNG — IM LẶNG GIẤU TÀI:
+  Đối với các thể loại huyền học (bói toán/quẻ bói), hệ thống chế tạo, hoặc các bàn tay vàng khác,
+  mục tiêu hàng đầu là giúp MC nhanh chóng thu thập tài nguyên và phát triển trong âm thầm ("im lặng giấu tài").
+  CẤM thiết lập MC làm từ thiện công ích vô ích, bày sạp bói toán ngoài đường, bói miễn phí/giá rẻ cho người lạ.
+  MC chỉ bói toán/cung cấp thông tin trong bóng tối hoặc giao dịch với các khách hàng có tầm ảnh hưởng lớn
+  (đại gia, KOL, quyền thế) để đổi lấy tài nguyên lớn, sự bảo hộ hoặc cổ phần thế lực lớn.
+  Xung đột chỉ xuất hiện thỉnh thoảng để làm bàn đạp cho MC vả mặt thế lực coi thường mình, còn lại MC tập trung
+  tích lũy tài nguyên cá nhân và củng cố thế lực riêng.
 
 OUTPUT: CHỈ trả về JSON hợp lệ với fields được yêu cầu.`;
 
@@ -376,8 +399,11 @@ function validateStoryKernel(kernel: StoryKernel | undefined): string | null {
   if (!kernel.systemMechanic?.input || !kernel.systemMechanic?.output || !kernel.systemMechanic?.limit || !kernel.systemMechanic?.reward) {
     return 'setupKernel.systemMechanic must define input/output/limit/reward';
   }
-  if (!kernel.mcSecret?.secret || !kernel.mcSecret?.outsideWorldKnowledge || !kernel.mcSecret?.revealRule) {
-    return 'setupKernel.mcSecret must define secret/outsideWorldKnowledge/revealRule';
+  if (!kernel.mcSecret?.secret || !kernel.mcSecret?.outsideWorldKnowledge || !kernel.mcSecret?.revealRule || !kernel.mcSecret?.coverStory) {
+    return 'setupKernel.mcSecret must define secret/outsideWorldKnowledge/revealRule/coverStory';
+  }
+  if (kernel.mcSecret.coverStory.length < 15) {
+    return 'setupKernel.mcSecret.coverStory too short (must be >= 15 chars)';
   }
   if (!kernel.benefitLoop?.goal || !kernel.benefitLoop?.action || !kernel.benefitLoop?.benefit || !kernel.benefitLoop?.cadence) {
     return 'setupKernel.benefitLoop must define goal/action/benefit/cadence';
@@ -475,7 +501,8 @@ Trả về JSON:
     "mcSecret": {
       "secret": "<trọng sinh/hệ thống/bàn tay vàng/năng lực thật của MC là bí mật gì>",
       "outsideWorldKnowledge": "<người ngoài chỉ được thấy kết quả gì, KHÔNG biết nguồn gốc>",
-      "revealRule": "<chỉ reveal muộn khi outline chỉ định rõ; Phase 1-2 tuyệt đối không ai biết>"
+      "revealRule": "<chỉ reveal muộn khi outline chỉ định rõ; Phase 1-2 tuyệt đối không ai biết>",
+      "coverStory": "<vỏ bọc cụ thể trong thế giới thực để giải thích năng lực siêu phàm của MC, vd: sư phụ bí ẩn truyền dạy, ngộ tính thiên tài bộc phát, gia truyền cổ thư>"
     },
     "benefitLoop": {
       "goal": "<mục tiêu nhỏ MC chủ động theo đuổi trong 1-3 chương>",

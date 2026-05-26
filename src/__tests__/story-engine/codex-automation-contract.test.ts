@@ -32,6 +32,7 @@ function validStoryPayload() {
         secret: 'Kinh nghiệm dữ liệu từ tương lai nghề nghiệp của Lâm Việt',
         outsideWorldKnowledge: 'Người ngoài chỉ thấy hắn tính nhanh và làm chắc',
         revealRule: 'Không ai biết toàn bộ năng lực trong 200 chương đầu',
+        coverStory: 'Lâm Việt dùng vỏ bọc là nghiên cứu kỹ báo cáo tài chính và thị trường thực tế',
       },
       benefitLoop: {
         goal: 'giữ xưởng và trả nợ',

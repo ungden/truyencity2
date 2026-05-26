@@ -819,7 +819,7 @@ function writeNewStoryFiles(runDir: string, genre = 'do-thi', focusKey?: string)
       protagonistEngine: '',
       pleasureLoop: ['', '', '', ''],
       systemMechanic: { name: '', input: '', output: '', limit: '', reward: '' },
-      mcSecret: { secret: '', outsideWorldKnowledge: '', revealRule: '' },
+      mcSecret: { secret: '', outsideWorldKnowledge: '', revealRule: '', coverStory: '' },
       benefitLoop: { goal: '', action: '', benefit: '', cadence: '' },
       interventionRule: '',
       phase1Playground: { locations: [], cast: [], resources: [], localAntagonists: [], repeatableSceneTypes: [] },

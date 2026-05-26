@@ -25,6 +25,7 @@ const validKernel = {
     secret: 'hệ thống trong đầu MC',
     outsideWorldKnowledge: 'người ngoài chỉ thấy MC xử lý việc tốt hơn bình thường',
     revealRule: 'không reveal trong Phase 1-2 trừ khi outline chỉ định muộn',
+    coverStory: 'MC giải thích là được một vị cao nhân bí ẩn truyền thụ kỹ năng',
   },
   benefitLoop: {
     goal: 'đạt mục tiêu local có payoff rõ',

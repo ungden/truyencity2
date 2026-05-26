@@ -20,6 +20,7 @@ const storyKernelSchema = z.object({
     secret: nonEmptyString,
     outsideWorldKnowledge: nonEmptyString,
     revealRule: nonEmptyString,
+    coverStory: z.string().trim().optional(),
   }),
   benefitLoop: z.object({
     goal: nonEmptyString,

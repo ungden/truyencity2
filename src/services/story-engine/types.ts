@@ -154,6 +154,7 @@ export interface StoryKernel {
     secret: string;
     outsideWorldKnowledge: string;
     revealRule: string;
+    coverStory?: string;
   };
   /** Concrete goal → action → benefit loop that prevents random meddling. */
   benefitLoop: {

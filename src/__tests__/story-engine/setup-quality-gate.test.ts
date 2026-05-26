@@ -115,6 +115,7 @@ const setupKernel = {
     secret: 'Sổ Tay Cơ Hội là năng lực riêng trong đầu Nguyễn An Bình',
     outsideWorldKnowledge: 'người ngoài chỉ thấy Nguyễn An Bình quan sát tốt và xử lý đơn hàng hiệu quả',
     revealRule: 'Phase 1-2 tuyệt đối không ai biết nguồn gốc; chỉ reveal muộn nếu outline chỉ định rõ',
+    coverStory: 'Nguyễn An Bình dùng vỏ bọc là ngộ tính quan sát nhạy bén bẩm sinh và kinh nghiệm học lỏm từ các đại sư',
   },
   benefitLoop: {
     goal: 'tăng doanh thu và uy tín của quầy qua từng đơn hàng thật',
@@ -288,5 +289,23 @@ describe('setup quality gate', () => {
     });
     expect(result.passed).toBe(false);
     expect(result.issues.some(i => i.code === 'chapter_brief_mc_benefit_missing')).toBe(true);
+  });
+
+  it('rejects StoryKernel with missing coverStory', () => {
+    const { coverStory, ...badMcSecret } = setupKernel.mcSecret;
+    const result = validateSetupCanon({
+      worldDescription: makeWorld(),
+      mainCharacter: 'Nguyễn An Bình',
+      storyOutline: {
+        ...storyOutline,
+        setupKernel: {
+          ...setupKernel,
+          mcSecret: badMcSecret as any,
+        },
+      },
+      strictContract: true,
+    });
+    expect(result.passed).toBe(false);
+    expect(result.issues.some(i => i.code === 'setup_kernel_mc_secret_missing')).toBe(true);
   });
 });

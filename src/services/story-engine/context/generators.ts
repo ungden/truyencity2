@@ -1000,7 +1000,7 @@ Yêu cầu:
       vParts.push(`Protagonist engine: ${kernel.protagonistEngine}`);
       vParts.push(`Pleasure loop: ${kernel.pleasureLoop?.join(' → ')}`);
       vParts.push(`System: ${kernel.systemMechanic?.name} | input ${kernel.systemMechanic?.input} | output ${kernel.systemMechanic?.output} | limit ${kernel.systemMechanic?.limit} | reward ${kernel.systemMechanic?.reward}`);
-      vParts.push(`MC secret: ${kernel.mcSecret?.secret} | outside only knows ${kernel.mcSecret?.outsideWorldKnowledge} | reveal ${kernel.mcSecret?.revealRule}`);
+      vParts.push(`MC secret: ${kernel.mcSecret?.secret} | cover story: ${kernel.mcSecret?.coverStory || 'N/A'} | outside only knows ${kernel.mcSecret?.outsideWorldKnowledge} | reveal ${kernel.mcSecret?.revealRule}`);
       vParts.push(`Benefit loop: goal ${kernel.benefitLoop?.goal} | action ${kernel.benefitLoop?.action} | benefit ${kernel.benefitLoop?.benefit} | cadence ${kernel.benefitLoop?.cadence}`);
       vParts.push(`Intervention rule: ${kernel.interventionRule}`);
       vParts.push(`Social reactor: ${kernel.socialReactor?.witnesses?.join(', ')} | ${kernel.socialReactor?.reactionModes?.join(', ')}`);
