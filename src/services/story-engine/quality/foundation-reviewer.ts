@@ -87,6 +87,7 @@ export interface FoundationReviewInput {
   /** Setup artifacts to review */
   readonly artifacts: {
     readonly positioning?: unknown;
+    readonly genreContractReport?: string;
     readonly kernel?: unknown;
     readonly worldDescription?: string;
     readonly worldCanon?: unknown;     // factions / power-system / etc.
@@ -324,6 +325,11 @@ function summarizeArtifacts(artifacts: FoundationReviewInput['artifacts']): stri
   if (artifacts.positioning) {
     parts.push('### Positioning');
     parts.push(JSON.stringify(artifacts.positioning, null, 2).slice(0, 4000));
+    parts.push('');
+  }
+  if (artifacts.genreContractReport) {
+    parts.push('### Deterministic genre contract report');
+    parts.push(artifacts.genreContractReport.slice(0, 3000));
     parts.push('');
   }
   if (artifacts.kernel) {

@@ -36,7 +36,9 @@ import { checkPovConsistency } from './pov-check';
 import { analyzeSensoryBalance } from './sensory-balance';
 import { evaluateHooks } from './hook-strength';
 import { causalIssuesToCriticIssues, checkCausalLogicFast } from './causal-logic-check';
+import { genreContractIssuesToCriticIssues, validateGenreChapterContract } from './genre-contract-validator';
 import type { CriticIssue } from '../types';
+import type { GenreType } from '../types';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -45,6 +47,8 @@ export interface CanonEnforcementInput {
   chapterNumber: number;
   content: string;
   protagonistName: string;
+  /** Primary genre enables typed genre-contract gates. */
+  genre?: GenreType;
   /** Cast names allowed to appear (from Architect outline + recent activity). */
   expectedCharacters: string[];
   /** Optional POV setting from project (vd '1st' / '3rd-limited' / '3rd-omniscient'). */
@@ -97,10 +101,24 @@ export async function enforceCanonGates(
   promises.push(checkSystemCadence(input).catch(() => []));
   // 10. Hard causal logic — authority/access/resource/arc-rail violations.
   promises.push(checkCausalLogicGate(input).catch(() => []));
+  // 11. Typed genre contract — root-level genre grammar gates.
+  if (input.genre) {
+    promises.push(checkGenreContractGate(input).catch(() => []));
+  }
 
   const results = await Promise.all(promises);
   for (const r of results) issues.push(...r);
   return issues;
+}
+
+async function checkGenreContractGate(input: CanonEnforcementInput): Promise<CriticIssue[]> {
+  if (!input.genre) return [];
+  const issues = validateGenreChapterContract({
+    genre: input.genre,
+    chapterNumber: input.chapterNumber,
+    content: input.content,
+  });
+  return genreContractIssuesToCriticIssues(issues);
 }
 
 async function checkCausalLogicGate(input: CanonEnforcementInput): Promise<CriticIssue[]> {

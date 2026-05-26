@@ -46,6 +46,7 @@ import { generateArcPlan } from '../context/generators';
 import { runTopicPositioning } from '../plan/topic-positioning';
 import { spawnSetupCanon } from '../plan/setup-canon-spawn';
 import { runFoundationReview, persistFoundationReview } from '../quality/foundation-reviewer';
+import { formatGenreContractReport, validateGenreSetupContract } from '../quality/genre-contract-validator';
 import { DEFAULT_CONFIG, type GeminiConfig, type GenreType, type StoryKernel } from '../types';
 import { formatAuthorPatternDnaForSetup } from '../templates/author-pattern-dna';
 import {
@@ -1062,6 +1063,7 @@ async function runStageFoundationReview(
     const styleDir = (project?.style_directives as Record<string, unknown>) || {};
     const positioning = styleDir.positioning;
     const setupKernel = getSetupKernelFromOutline(p.story_outline);
+    const genre = (p.genre || 'tien-hiep') as GenreType;
 
     // Load supporting canon for review
     const db = getSupabase();
@@ -1070,11 +1072,28 @@ async function runStageFoundationReview(
       db.from('voice_anchors').select('*').eq('project_id', p.id),
     ]);
 
+    const genreContractIssues = validateGenreSetupContract({
+      genre,
+      worldDescription: wd,
+      setupKernel,
+      masterOutline: p.master_outline,
+      storyOutline: p.story_outline,
+    });
+
+    const hardGenreFailures = genreContractIssues.filter((issue) => issue.severity === 'critical' || issue.severity === 'major');
+    if (hardGenreFailures.length > 0) {
+      return {
+        success: false,
+        error: formatGenreContractReport(hardGenreFailures).slice(0, 900),
+      };
+    }
+
     const result = await runFoundationReview(
       {
         projectId: p.id,
         artifacts: {
           positioning,
+          genreContractReport: formatGenreContractReport(genreContractIssues),
           kernel: setupKernel,
           worldDescription: wd,
           worldCanon: project?.worldbuilding_canon,

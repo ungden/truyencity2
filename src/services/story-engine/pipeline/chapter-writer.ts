@@ -1911,6 +1911,7 @@ Mỗi dim ≥6 → pass. Tổng overallScore = avg(5 dim) ± 1.`
           chapterNumber: outline.chapterNumber,
           content,
           protagonistName: protagonistName || 'MC',
+          genre,
           expectedCharacters: [...new Set(expectedCharacters)],
           antagonistSchedule,
           // expectedPov: project may set this in style_directives.pov in future
