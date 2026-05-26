@@ -51,16 +51,17 @@ export interface GenreContract {
 }
 
 const SECRET_PATTERNS: RegExp[] = [
-  /(?:nói|kể|tiết lộ|thú nhận|cho biết|giải thích)[^.!?\n]{0,80}(?:hệ thống|bàn tay vàng|xuyên việt|trọng sinh|kiếp trước|thiên cơ bàn|lộ tuyến ẩn|thần nhãn)/i,
-  /(?:ta|tôi|anh|hắn)[^.!?\n]{0,40}(?:có|sở hữu)[^.!?\n]{0,50}(?:hệ thống|bàn tay vàng|thiên cơ bàn|thần nhãn|vô hạn lộ tuyến)/i,
-  /(?:ngươi|ông|bà|cô|anh|em)[^.!?\n]{0,80}(?:biết|đã biết|phát hiện)[^.!?\n]{0,50}(?:hệ thống|xuyên việt|trọng sinh|bí mật của ta|bàn tay vàng)/i,
+  /(?:nói|kể|tiết lộ|thú nhận|cho biết|giải thích|thừa nhận|chia sẻ)[^.!?\n]{0,100}(?:hệ thống|bàn tay vàng|kim thủ chỉ|xuyên việt|xuyên không|trọng sinh|kiếp trước|tiền kiếp|thiên cơ bàn|lộ tuyến ẩn|thần nhãn|địa cầu|trái đất|thế giới khác|người tương lai|biết trước)/i,
+  /(?:ta|tôi|anh|hắn|y)[^.!?\n]{0,40}(?:có|sở hữu|mang theo)[^.!?\n]{0,60}(?:hệ thống|bàn tay vàng|kim thủ chỉ|thiên cơ bàn|thần nhãn|vô hạn lộ tuyến|ký ức kiếp trước|ký ức tương lai)/i,
+  /(?:ngươi|ông|bà|cô|anh|em|họ|bọn họ)[^.!?\n]{0,80}(?:biết|đã biết|phát hiện|nghi ngờ)[^.!?\n]{0,60}(?:hệ thống|xuyên việt|xuyên không|trọng sinh|bí mật của ta|bàn tay vàng|kim thủ chỉ|đến từ địa cầu|đến từ trái đất|thế giới khác|người tương lai)/i,
 ];
 
 const ORACLE_SERVICE_PATTERNS: RegExp[] = [
-  /(?:xem quẻ|gieo quẻ|bói|phán quẻ|xem vận)[^.!?\n]{0,60}(?:cho|giúp)[^.!?\n]{0,30}(?:người lạ|khách qua đường|bà lão|ông lão|người nghèo|miễn phí)/i,
-  /(?:mở sạp|lập quầy|ngồi quầy)[^.!?\n]{0,50}(?:bói|xem quẻ|xem vận)/i,
-  /(?:cứu giúp|giúp đỡ|ra tay giúp)[^.!?\n]{0,70}(?:người lạ|khách qua đường|người xa lạ)[^.!?\n]{0,80}(?:không lấy|miễn phí|không cần báo đáp)/i,
+  /(?:xem quẻ|gieo quẻ|bói|bói toán|xem bói|phán quẻ|xem vận|xem mệnh|xem phong thủy|bấm quẻ)[^.!?\n]{0,60}(?:cho|giúp)[^.!?\n]{0,40}(?:người lạ|khách qua đường|người qua đường|người đi đường|bà lão|ông lão|người nghèo|miễn phí|không lấy tiền|không lấy phí)/i,
+  /(?:mở sạp|lập quầy|ngồi sạp|bày sạp|ngồi quầy)[^.!?\n]{0,60}(?:bói|xem quẻ|xem vận|xem mệnh|xem bói|phong thủy)/i,
+  /(?:cứu giúp|giúp đỡ|ra tay giúp|bói quẻ|xem quẻ)[^.!?\n]{0,80}(?:người lạ|khách qua đường|người qua đường|người xa lạ)[^.!?\n]{0,80}(?:không lấy|miễn phí|không lấy tiền|không lấy phí|không cần báo đáp)/i,
 ];
+
 
 const NON_COMBAT_DRIFT_PATTERNS: RegExp[] = [
   /huyết chiến|tử chiến|đấu sinh tử|mở đường máu|đánh nhau trong hẻm|truy sát ngoài hẻm/i,

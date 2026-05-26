@@ -395,10 +395,11 @@ ${UNIVERSAL_SANG_VAN_DIRECTIVE}
 - BREATHING MOMENTS: Mỗi chương PHẢI có ≥2 khoảnh khắc êm dịu (đối thoại ấm, observation chi tiết đời thường, recognition nhỏ, hài hước nhẹ) — kể cả chương climax/giai đoạn ngược.
 - Tiếng Việt tự nhiên: dùng thành ngữ, xưng hô đúng vai vế.
 - KHÔNG viết "Cliffhanger:" hay bất kỳ chỉ dẫn tiếng Anh nào.
-- MC SECRET LOCK: Trọng sinh/hệ thống/bàn tay vàng luôn là bí mật nội tâm của MC. MC luôn diễn giải năng lực thành sự nhạy bén cá nhân hoặc kinh nghiệm, giúp NPC chỉ coi MC là người thông minh, xuất sắc mà không có dữ liệu để hoài nghi yếu tố phi tự nhiên.
+- MC SECRET LOCK: Trọng sinh/xuyên không/hệ thống/bàn tay vàng/biết trước tương lai luôn là bí mật tuyệt đối của MC. MC tuyệt đối KHÔNG bao giờ nói ra bí mật này cho bất kỳ ai (kể cả cha mẹ, người thân). MC luôn dùng các vỏ bọc ngụy trang hợp lý (sư phụ truyền dạy, cơ duyên kỳ ngộ, thiên phú) để giải thích cho năng lực của mình.
 - MC BENEFIT LOCK: MC không can thiệp chuyện ngoài nếu không có lợi ích rõ (tài nguyên/tiền/thông tin/quan hệ/uy tín/skill/bảo vệ circle đã thiết lập). Mỗi hành động chủ động phải tạo payoff hoặc mở cơ hội cụ thể.
 - ĐỒNG BỘ QUY MÔ XUNG ĐỘT: Sự phản ứng của các thế lực phải tỷ lệ thuận với hành động thực tế của MC. Trong 30 chương đầu, xung đột chỉ giới hạn ở mức cục bộ vi mô với đối thủ cùng cấp (cạnh tranh nhỏ); không đưa các tổ chức lớn bí ẩn hoặc nhân vật cấp cao bám đuôi điều tra MC. Tránh các cảnh bạo lực thể xác hoặc truy đuổi vô lý ở đầu các truyện phi chiến đấu.
-- GOLDEN FINGER STRENGTH: Hệ thống/năng lực phải giúp MC mạnh lên qua insight/tool/resource/payoff thấy được. Khó khăn hợp lệ, nhưng tránh viết nhiều scene liên tiếp như hệ thống vô dụng hoặc chỉ làm MC khổ thêm.
+- GOLDEN FINGER STRENGTH & IM LẶNG GIẤU TÀI: Hệ thống/năng lực/quẻ bói phải phục vụ mục tiêu giúp MC nhanh chóng thu thập tài nguyên và phát triển trong âm thầm ("im lặng giấu tài"), không đi làm từ thiện bói toán công ích cho người lạ vô duyên vô cớ. Khó khăn hợp lệ, nhưng tránh viết nhiều scene liên tiếp như hệ thống vô dụng hoặc chỉ làm MC khổ thêm.
+
 
 □ [SECRET] Bí mật cốt lõi MC (rebirth/system/golden finger/identity) có nguy cơ lộ trong scene này không?
   - Nếu CÓ và outline KHÔNG cho phép reveal → MC dùng năng lực ngầm, narrate qua "thiên phú/cơ duyên/thông minh"; NPC observe mà không hiểu rõ.
@@ -635,14 +636,16 @@ HARD GATES → REWRITE (severity critical, requiresRewrite=true)
 ═══════════════════════════════════════════════════════════════════════════
 
 G1. SECRET LEAK (Axis B1):
+- MC TỰ TIẾT LỘ hoặc để lộ bí mật cốt lõi (Hệ thống, Bàn tay vàng, Xuyên không, Trọng sinh, biết trước tương lai) cho bất kỳ ai (kể cả người thân, bạn bè) khi outline không cho phép → BẮT BUỘC REWRITE. MC phải luôn dùng vỏ bọc ngụy trang (sư phụ truyền dạy, cơ duyên, kỳ ngộ, thiên phú).
 - NPC thường (đệ tử cùng tông, customer, đồng nghiệp peer-level) BIẾT/ĐOÁN bí mật cốt lõi MC mà context (chương trước build trust + master_outline) KHÔNG justify → REWRITE.
-- MC TỰ TIẾT LỘ bí mật cho NPC thường trong dialogue không có lý do arc → REWRITE.
 - Cliffhanger "kẻ lạ biết bí mật MC nhắn tin/gọi điện/xuất hiện" mà master_outline không setup → REWRITE.
 - MC flex full power public không có thiết lập từ trước → severity major.
 
-G2. ANTAGONIST SCALING & STALKER BAN (Axis C1+C2):
+G2. ANTAGONIST SCALING & PUBLIC HERO BAN (Axis C1+C2):
+- LÀM TỪ THIỆN QUẺ BÓI / PUBLIC HERO: MC gieo quẻ, xem phong thủy, xem bói hoặc làm việc không công miễn phí cho người lạ vô cớ mà không thu lại tài nguyên khổng lồ hoặc nằm trong kế hoạch lớn thu phục thế lực cực mạnh → BẮT BUỘC REWRITE. (Thể loại đô thị/huyền học/bói toán phải giúp MC nhanh chóng thu thập tài nguyên và phát triển trong âm thầm "im lặng giấu tài").
 - Xung đột không tương thích quy mô: Dưới chương 30 mà thế lực ngầm lớn/sát thủ xuất hiện theo dõi, đe dọa MC, hoặc MC bị bám đuôi điều tra chỉ vì giao dịch nhỏ đầu truyện → REWRITE.
 - Lệch bối cảnh xung đột: Kẻ địch liên tục đánh đập/hành hung/truy sát MC bằng vũ lực vô lý hoặc vô duyên vô cớ ở các chương đầu của các thể loại phi chiến đấu (đô thị/kinh doanh/ngôn tình) → REWRITE.
+
 
 G3. CONTINUITY:
 - Nhân vật đã CHẾT mà xuất hiện sống lại → REWRITE
