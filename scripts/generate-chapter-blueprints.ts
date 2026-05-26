@@ -92,7 +92,206 @@ function defaultForbidden(focusKey?: string | null): string[] {
   if (focusKey === 'sang-the-than-minh') {
     return ['Thần Cách', 'kẻ săn Thần Cách', 'sát thủ Hư Không', 'tháp đen', 'tàn tích Thần Cách'];
   }
+  if (focusKey === 'thien-dao-thu-vien') {
+    return [
+      'nộp bản thảo',
+      'phân lâu',
+      'xếp hàng',
+      'quán trà',
+      'ta biết ngươi là ai',
+      'dấu vết tinh thần',
+      'Hắc Ám Văn Đàn',
+      'sát thủ',
+      'áo choàng',
+      'góc phố',
+      'Hook:',
+      'không chỉ có người tốt',
+      'CONTEXT COMPACT',
+      'YÊU CẦU OUTPUT',
+    ];
+  }
   return ['CONTEXT COMPACT', 'Hook:', 'YÊU CẦU OUTPUT'];
+}
+
+type ThienDaoSourcePlan = {
+  source: string;
+  sourceCharacters: string;
+  landmarkScene: string;
+  inWorldWork: string;
+  skillPayoff: string;
+  readerFaction: string;
+  craftGoal: string;
+};
+
+function thienDaoSourcePlan(chapter: number): ThienDaoSourcePlan {
+  if (chapter <= 50) {
+    return {
+      source: 'Anh Hùng Xạ Điêu',
+      sourceCharacters: 'Quách Tĩnh, Hoàng Dung, Hồng Thất Công',
+      landmarkScene: chapter < 25 ? 'Quách Tĩnh từ vụng thành chính, độc giả học chính khí quyền cước' : 'Hồng Thất Công truyền chưởng, Hoàng Dung dùng trí mở khóa cao trào',
+      inWorldWork: 'Sơn Hà Xạ Nhật',
+      skillPayoff: chapter < 25 ? 'Phá Vân Chưởng và chính khí căn cơ' : 'Phục Ma Thập Bát Chưởng bản sơ giải',
+      readerFaction: 'võ sinh bình dân và thư hội Vạn Văn Hội',
+      craftGoal: 'dùng nhân vật trưởng thành + võ học có cảm xúc để nghiền văn phong bản địa đơn tuyến',
+    };
+  }
+  if (chapter <= 100) {
+    return {
+      source: 'Tiếu Ngạo Giang Hồ',
+      sourceCharacters: 'Lệnh Hồ Xung, Phong Thanh Dương, Nhậm Doanh Doanh',
+      landmarkScene: chapter < 75 ? 'Lệnh Hồ Xung học kiếm ý tự do, Phong Thanh Dương truyền Độc Cô Cửu Kiếm' : 'giang hồ chính tà va chạm, tiếng đàn và kiếm ý hóa giải giáo điều',
+      inWorldWork: 'Kiếm Ca Tiêu Dao',
+      skillPayoff: 'Tiêu Dao Kiếm Ý và phá chiêu căn bản',
+      readerFaction: 'kiếm tu trẻ, đệ tử học viện và thư bình bảng Tân Tác Gia',
+      craftGoal: 'mở nhịp tự do/kiếm ý, face-slap tác gia bắt chước chỉ biết liệt kê chiêu thức',
+    };
+  }
+  if (chapter <= 150) {
+    return {
+      source: 'Tam Quốc Diễn Nghĩa',
+      sourceCharacters: 'Gia Cát Lượng, Lưu Bị, Quan Vũ, Tào Tháo',
+      landmarkScene: chapter < 125 ? 'thảo thuyền mượn tên và Long Trung đối' : 'Xích Bích, không thành kế và binh pháp dùng thế thắng lực',
+      inWorldWork: 'Binh Thư Sơn Hà',
+      skillPayoff: 'Vân Mưu Binh Pháp, trận ý hợp kích và tâm pháp thống soái',
+      readerFaction: 'võ quán, quân viện, thế gia học binh pháp',
+      craftGoal: 'đưa chiến tranh/mưu lược nhiều tuyến vào Thiên Đạo Thư Viện để mở dopamine bảng lớn',
+    };
+  }
+
+  const cycle: ThienDaoSourcePlan[] = [
+    {
+      source: 'Sherlock Holmes',
+      sourceCharacters: 'Sherlock Holmes, Dr. Watson, Moriarty',
+      landmarkScene: 'suy luận từ dấu vết nhỏ, Watson làm góc nhìn nhập tâm, đối thủ trí tuệ tạo thế cân não',
+      inWorldWork: 'Án Kiếm Trong Sương',
+      skillPayoff: 'Minh Tâm Quan Sát, bộ pháp truy tung và phá trận bằng suy luận',
+      readerFaction: 'chấp pháp đường, học viện trinh thám võ đạo, độc giả thích giải đố',
+      craftGoal: 'biến trinh thám thành võ học quan sát, không kéo MC ra điều tra ngoài đời',
+    },
+    {
+      source: 'Tây Du Ký',
+      sourceCharacters: 'Tôn Ngộ Không, Đường Tăng, Trư Bát Giới, Sa Tăng',
+      landmarkScene: 'Đại Náo Thiên Cung, ba lần thử tâm, đường thỉnh kinh vượt kiếp nạn',
+      inWorldWork: 'Vạn Kiếp Hành Giả',
+      skillPayoff: 'Tâm Viên Thân Pháp, định tâm pháp và ý chí phá kiếp',
+      readerFaction: 'khổ tu võ giả, tăng viện, độc giả thích thần thoại',
+      craftGoal: 'mở thần thoại tu tâm nhưng vẫn giữ sảng văn, mỗi kiếp nạn trả thưởng rõ',
+    },
+    {
+      source: 'Harry Potter',
+      sourceCharacters: 'Harry Potter, Hermione Granger, Dumbledore, Voldemort',
+      landmarkScene: 'thư nhập học, học viện phân viện, tình bạn giải bí mật và trận cuối chống hắc ám',
+      inWorldWork: 'Học Cung Pháp Văn',
+      skillPayoff: 'Pháp văn phòng hộ, ký ức chú thuật và cộng minh học viện',
+      readerFaction: 'học sinh võ viện, trận pháp sư trẻ, thư hội học cung',
+      craftGoal: 'dùng học viện + bí mật tầng tầng để tạo cộng đồng độc giả, không để MC lộ danh',
+    },
+    {
+      source: 'Lord of the Rings',
+      sourceCharacters: 'Frodo, Gandalf, Aragorn, Legolas',
+      landmarkScene: 'đoàn hộ nhẫn, Minas Tirith, hành trình nhỏ gánh vận mệnh lớn',
+      inWorldWork: 'Vương Miện Và Trường Lộ',
+      skillPayoff: 'Thủ Hộ Ý Chí, chiến trận đồng minh và kiếm ý vương giả',
+      readerFaction: 'tông môn liên minh, độc giả chiến tranh sử thi',
+      craftGoal: 'đẩy sử thi đồng đội để thế giới cảm thấy rộng mà không làm MC bị cuốn vào âm mưu đời thật',
+    },
+    {
+      source: 'Naruto',
+      sourceCharacters: 'Naruto, Sasuke, Sakura, Kakashi',
+      landmarkScene: 'đội bảy, kỳ thi trung nhẫn, ý chí không bỏ cuộc và thầy trò truyền thừa',
+      inWorldWork: 'Nhẫn Võ Thiếu Niên',
+      skillPayoff: 'Ảnh Bộ Phân Thân, khống khí tinh vi và ý chí đồng đội',
+      readerFaction: 'thiếu niên võ sinh, võ quán bình dân, bảng thiếu niên',
+      craftGoal: 'dùng nhiệt huyết thiếu niên tạo độc giả đại chúng và phản hồi khí huyết dày',
+    },
+    {
+      source: 'One Piece',
+      sourceCharacters: 'Luffy, Zoro, Nami, Sanji',
+      landmarkScene: 'ra khơi lập đồng đội, tuyên ngôn tự do, mỗi đảo một payoff lớn',
+      inWorldWork: 'Hải Lộ Vạn Tượng',
+      skillPayoff: 'Hải Triều Thân Pháp, đao ý đồng đội và khí phách tự do',
+      readerFaction: 'tán tu, thương hội đường biển, thư bình phiêu lưu',
+      craftGoal: 'mở phiêu lưu từng đảo để mỗi mini-arc có reader reaction rõ',
+    },
+    {
+      source: 'Phong Thần Diễn Nghĩa',
+      sourceCharacters: 'Khương Tử Nha, Na Tra, Dương Tiễn, Văn Trọng',
+      landmarkScene: 'bảng phong thần, Na Tra tái tạo thân, tiên phàm đại chiến có quy tắc',
+      inWorldWork: 'Phong Thần Bút Lục',
+      skillPayoff: 'Hương Hỏa Pháp Thân, thần thông sơ giải và trận pháp phong danh',
+      readerFaction: 'đạo viện, thần miếu võ tu, tác gia nghiên cứu Thiên Đạo công nhận',
+      craftGoal: 'đưa thần thoại phương Đông vào ladder tác gia, mở quyền năng danh vọng nhưng giữ ledger',
+    },
+    {
+      source: 'Đấu Phá Thương Khung',
+      sourceCharacters: 'Tiêu Viêm, Dược Lão, Nạp Lan Yên Nhiên, Mỹ Đỗ Toa',
+      landmarkScene: 'ba năm ước hẹn, lão sư trong giới chỉ, dị hỏa và luyện dược nghịch tập',
+      inWorldWork: 'Viêm Đạo Nghịch Thiên',
+      skillPayoff: 'Hỏa Ý Luyện Thể, luyện đan nhập môn và nghịch tập tâm pháp',
+      readerFaction: 'luyện đan sư, thiếu niên bị khinh thường, bảng nhiệt huyết',
+      craftGoal: 'dùng webnovel nghịch tập chuẩn để tăng dopamine, không để MC chịu nhục kéo dài',
+    },
+  ];
+
+  return cycle[Math.floor((chapter - 151) / 50) % cycle.length];
+}
+
+function thienDaoPhase(chapter: number): string {
+  const pos = ((chapter - 1) % 10) + 1;
+  if (pos <= 2) return 'khóa template và mở hồi mới';
+  if (pos <= 4) return 'đẩy độc giả nhập tâm';
+  if (pos <= 6) return 'cho nhóm độc giả lĩnh ngộ';
+  if (pos <= 8) return 'kéo thư bình/bảng xếp hạng phản ứng';
+  return 'payoff danh vọng và hook tác phẩm kế tiếp';
+}
+
+function thienDaoForbidden(chapter: number): string[] {
+  void chapter;
+  return defaultForbidden('thien-dao-thu-vien');
+}
+
+function thienDaoBlueprint(chapter: number, projectId: string, version: number): BlueprintRow | null {
+  if (chapter <= 10) return null;
+  const plan = thienDaoSourcePlan(chapter);
+  const phase = thienDaoPhase(chapter);
+  const arcNumber = Math.ceil(chapter / 20);
+  const local = ((chapter - 1) % 20) + 1;
+  const recognition = chapter < 50 ? 'Bạch Bút/Tân Tác Gia' : chapter < 150 ? 'Thanh Bút sơ kỳ' : chapter < 300 ? 'Thanh Bút ổn định' : chapter < 600 ? 'Kim Bút dự bị' : 'Kim Bút trở lên';
+  const ch11FalseTrail = chapter === 11
+    ? ' Mở đầu phải hóa giải hook ch.10 thành phản hồi tinh thần theo bút danh: độc giả chỉ nhận ra Vô Danh Khách trên bảng thư bình, không biết Lâm Mặc ngoài đời.'
+    : '';
+  return {
+    project_id: projectId,
+    chapter_number: chapter,
+    volume_number: Math.ceil(chapter / 100),
+    arc_number: arcNumber,
+    sub_arc_number: Math.ceil(chapter / 10),
+    title_hint: `${plan.inWorldWork} - ${phase}`.slice(0, 180),
+    goal: `Ch.${chapter} ${phase}: Lâm Mặc dùng Vạn Văn Ký Ức gọi rõ template gốc "${plan.source}" (${plan.sourceCharacters}), giữ cảnh ${plan.landmarkScene}, rồi ẩn danh khắc hồi mới của "${plan.inWorldWork}" vào Thiên Đạo Thư Viện bằng thần niệm.${ch11FalseTrail}`.slice(0, 900),
+    conflict: `Trở ngại chỉ ở văn đàn/độc giả/bảng: tác gia bản địa chưa hiểu ${plan.craftGoal}; Lâm Mặc không lộ diện, không gặp địch trực tiếp, dùng dữ liệu thư bình và chương mới xử lý trong cùng nhịp.${ch11FalseTrail}`.slice(0, 500),
+    payoff: `Độc giả ${plan.readerFaction} nhập tâm và lĩnh ngộ ${plan.skillPayoff}; Lâm Mặc nhận điểm công nhận, phản hồi khí huyết/danh vọng ${recognition}, thêm dữ liệu để tối ưu hồi sau.`.slice(0, 500),
+    ending_hook: local === 20
+      ? `Bảng Thiên Đạo mở ngưỡng kế tiếp cho bút danh Vô Danh Khách và gợi ý source template mới sau "${plan.source}".`
+      : `Thư bình/điểm công nhận chỉ ra độc giả đang chờ cảnh kế tiếp của "${plan.source}" mà vẫn không biết Lâm Mặc là Vô Danh Khách.`,
+    cast: ['Lâm Mặc', 'Vạn Văn Ký Ức', 'Vô Danh Khách', ...plan.readerFaction.split(/,| và /).map((s) => s.trim()).filter(Boolean).slice(0, 2)],
+    location: 'Phòng thuê của Lâm Mặc / thức hải Thiên Đạo Thư Viện / khu đọc tinh thần của độc giả',
+    resource_ledger_delta: `Ghi rõ điểm công nhận Thiên Đạo, chi phí tinh thần khi khắc "${plan.inWorldWork}", phản hồi khí huyết/danh vọng nhận được và dữ liệu thư bình dùng cho hồi sau.`,
+    world_state_delta: `Thiên Đạo Thư Viện xuất hiện làn sóng đọc mới: ${plan.readerFaction} bàn luận, bảng ${recognition} dao động, văn đàn bản địa bị ép học narrative craft.`,
+    species_delta: 'Không áp dụng loài phụ thuộc; thay bằng reader/faction delta: nhóm độc giả mới, kỹ năng lĩnh ngộ mới, thư hội/bảng xếp hạng phản ứng rõ.',
+    template_inspiration: `Nguồn Trái Đất bắt buộc nêu trong nội tâm/ledger: "${plan.source}"; nhân vật/cảnh gốc: ${plan.sourceCharacters}; ${plan.landmarkScene}. Bản dị giới "${plan.inWorldWork}" chỉ đổi vừa đủ để hợp luật Thiên Đạo, không đổi sạch 100%.`,
+    authority_constraints: 'Thiên Đạo Thư Viện là thư viện tinh thần gọi trong thức hải/ý niệm; chỉ dùng bút danh/thần niệm/ledger. Không nộp bản thảo vật lý, không phân lâu, không xếp hàng, không điều tra ngoài đời, không để lộ thân phận thật trước ch.100.',
+    forbidden_terms: thienDaoForbidden(chapter),
+    status: 'planned',
+    version,
+    meta: {
+      generated_by: 'thien_dao_source_blueprint_map',
+      earth_source: plan.source,
+      earth_source_characters: plan.sourceCharacters,
+      in_world_work: plan.inWorldWork,
+      skill_payoff: plan.skillPayoff,
+      phase,
+    },
+  };
 }
 
 function sangTheRepairBlueprint(chapter: number, projectId: string, version: number): BlueprintRow | null {
@@ -280,6 +479,9 @@ function makeCanonBlueprint(input: {
   mainCharacter: string;
   focusKey?: string | null;
 }): BlueprintRow {
+  const thienDaoCanonTemplate = input.focusKey === 'thien-dao-thu-vien'
+    ? 'Locked published canon; preserve Thiên Đạo Thư Viện mental-library kernel and any explicit Earth source ledger already present (Anh Hùng Xạ Điêu/Tiếu Ngạo/Tam Quốc etc.). Future chapters must not contradict this canon.'
+    : null;
   return {
     project_id: input.projectId,
     chapter_number: input.chapter,
@@ -296,7 +498,7 @@ function makeCanonBlueprint(input: {
     resource_ledger_delta: 'Locked by published canon.',
     world_state_delta: 'Locked by published canon.',
     species_delta: input.focusKey === 'sang-the-than-minh' ? 'Locked dependent-species progress from canon.' : 'Locked by canon.',
-    template_inspiration: input.focusKey === 'sang-the-than-minh' ? 'Locked Vạn Tượng Ký Ức/Khởi Nguyên Biên Niên usage from canon.' : 'Locked by canon.',
+    template_inspiration: input.focusKey === 'sang-the-than-minh' ? 'Locked Vạn Tượng Ký Ức/Khởi Nguyên Biên Niên usage from canon.' : (thienDaoCanonTemplate || 'Locked by canon.'),
     authority_constraints: 'Do not rewrite or contradict published canon.',
     forbidden_terms: defaultForbidden(input.focusKey),
     status: 'used',
@@ -368,6 +570,7 @@ async function main(): Promise<void> {
     }
     rows.push(
       sangTheRepairBlueprint(chapter, PROJECT_ID, VERSION)
+      || (focusKey === 'thien-dao-thu-vien' ? thienDaoBlueprint(chapter, PROJECT_ID, VERSION) : null)
       || (arcBriefByChapter.has(chapter)
         ? makeArcBriefBlueprint({
             projectId: PROJECT_ID,
