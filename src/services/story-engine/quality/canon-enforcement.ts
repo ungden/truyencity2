@@ -243,16 +243,21 @@ const NON_NAME_START_WORDS = [
   'Nhưng', 'Và', 'Còn', 'Khi', 'Nếu', 'Vì', 'Do', 'Từ', 'Trong', 'Ngoài',
   'Trên', 'Dưới', 'Việc', 'Một', 'Mỗi', 'Các', 'Có', 'Không',
   'Giọng', 'Mặt', 'Ánh', 'Bóng', 'Tiếng', 'Hơi',
-  // 2026-05-12: Vietnamese verbs/quantifiers often capitalised at sentence start —
-  // they prefix a real proper noun (Thấy Lương Hạo = "Saw Lương Hạo") and got
-  // miscounted as a 2-word character name. Strip the leading capitalised verb so
-  // the inner name re-extracts cleanly elsewhere.
   'Thấy', 'Nhìn', 'Nghe', 'Gặp', 'Hỏi', 'Đáp', 'Gọi', 'Nói', 'Trông', 'Chạy',
   'Đi', 'Đến', 'Tới', 'Bước', 'Ngồi', 'Đứng', 'Lại', 'Quay', 'Theo', 'Cùng',
   'Nhân Vật', 'Bạn', 'Người',
   // Familial/honorific prefixes — speaker addressing established character:
   'Cậu', 'Chú', 'Bác', 'Anh', 'Chị', 'Em', 'Cô', 'Ông', 'Bà',
   'Cha', 'Mẹ', 'Bố',
+  // Grammatical words / sentence starters (Phase 30 tuning)
+  'Là', 'Kiểm', 'Kiểm Tra', 'Sau', 'Sau Khi', 'Trước', 'Trước Khi', 'Trong Khi',
+  'Cho Dù', 'Tuy Nhiên', 'Bởi Vì', 'Chúng Ta', 'Không Chỉ', 'Tại Sao', 'Như Thế',
+  'Thậm Chí', 'Ngay Cả', 'Có Thể', 'Cần', 'Phải', 'Nên', 'Hãy', 'Đã', 'Đang',
+  'Sẽ', 'Vừa', 'Mới', 'Tự', 'Chỉ', 'Cũng', 'Đều', 'Hầu Như', 'Rất', 'Quá',
+  'Lắm', 'Cực Kỳ', 'Vô Cùng', 'Bản Thân', 'Chúng', 'Họ', 'Nó', 'Tôi', 'Ta',
+  'Mình', 'Ai', 'Gì', 'Nào', 'Sao', 'Bao Giờ', 'Đâu',
+  // Faction/species classifiers at sentence start
+  'Bầy', 'Đám', 'Lũ', 'Đàn', 'Nhà', 'Họ'
 ];
 const TITLE_WORDS = [
   'Sư Phụ', 'Đại Sư', 'Tổ Sư', 'Trưởng Lão', 'Trưởng Tộc', 'Gia Chủ', 'Chủ Tịch',
@@ -280,6 +285,14 @@ const WORLD_TERM_WORDS = [
   'Tường Đá', 'Bẫy Hắc', 'Hỏa Lô', 'Khiên Hợp Kim',
   'Tinh Thể Băng', 'Lõi Pháp Tắc', 'Pháp Tắc Băng', 'Thiên Đình',
   'Băng Nguyên', 'Sơ Thủy', 'Xương Thú Băng',
+  // Phase 30 additional terms to ignore
+  'Thiên Cơ Bàn', 'U Minh Ảnh Kiến', 'Minh Ảnh Kiến', 'Thiết Giáp Tê Ngưu',
+  'Thiết Giáp Khuyển', 'Nhất Quẻ Thông Huyền', 'Trạch Thủy Khốn', 'Thượng Đoài',
+  'Quẻ Trạch Thủy Khốn', 'Quẻ Khốn', 'Cửu Khúc Trận', 'Lộ Trình Siêu Việt',
+  'Lâm Phong Ngộ Đạo', 'Tết Trung Thu', 'Nhà Hàng Hải Sản', 'Vô Hạn Lộ Tuyến',
+  'Lộ Tuyến Ẩn', 'Thập Bát Chưởng', 'Băng Tủy Thạch', 'Linh Sủng Các',
+  'Vũ Hồn Điện', 'Hải Long', 'Lang Sát', 'Bang Lang Sát', 'Lâm Gia', 'Đại Ca Xuyên Việt',
+  'Xuyên Việt Lãnh Chúa', 'Ngự Thú Tiến Hóa', 'Gia Tộc Tu Tiên'
 ];
 const WORLD_MARKER_WORDS = new Set([
   'Thần', 'Vực', 'Tượng', 'Ký', 'Ức', 'Biên', 'Niên', 'Sương', 'Mạch',
@@ -293,11 +306,45 @@ const WORLD_MARKER_WORDS = new Set([
   'Tác', 'Gia', 'Bạch', 'Bút', 'Thanh', 'Kim', 'Văn', 'Thánh',
   'Bảng', 'Tân', 'Sơn', 'Hà', 'Xạ', 'Nhật', 'Hoang', 'Mạc',
   'Khai', 'Thập', 'Nhị', 'Phá', 'Vân', 'Chưởng',
+  // Phase 30 markers
+  'Bàn', 'Quẻ', 'Trận', 'Khốn', 'Đoài', 'Càn', 'Khôn', 'Chấn', 'Tốn', 'Khảm',
+  'Ly', 'Thông', 'Huyền', 'Tê', 'Ngưu', 'Kiến', 'Khuyển', 'Lang', 'Ảnh', 'Tủy',
+  'Thạch', 'Sủng', 'Độn', 'Giáp', 'Vũ', 'Hồn', 'Điện', 'Các', 'Đường', 'Trung',
+  'Thu', 'Hải', 'Sản', 'Tuyển', 'Lộ', 'Tuyến', 'Siêu', 'Việt'
 ]);
 
 export function isLikelyWorldTermCandidate(name: string): boolean {
   if (WORLD_TERM_WORDS.some(t => name.includes(t))) return true;
+  
   const words = name.split(/\s+/);
+  if (words.length === 0) return false;
+  
+  const lastWord = words[words.length - 1];
+  const firstWord = words[0];
+
+  // Prefix: common martial/system terms that are never human names
+  const prefixTerms = ['Kiếm Khí', 'Kiếm Tâm', 'Phế Vật', 'Thần Nhãn', 'Trạng Thái', 'Luyện Khí', 'Luyện Kh', 'Đột Phá', 'Điều Kiện', 'Kiện Đột'];
+  if (prefixTerms.some(p => name.startsWith(p))) return true;
+
+  // Suffix: Faction / Place
+  const factionSuffixes = ['Gia', 'Tộc', 'Bang', 'Phái', 'Môn', 'Điện', 'Các', 'Đường', 'Viện', 'Tiệm', 'Quán', 'Lâu', 'Phủ', 'Cung', 'Thành', 'Trấn', 'Thôn', 'Trại', 'Đoàn', 'Doanh', 'Quân', 'Sảnh', 'Tự', 'Hội', 'Hiệu', 'Trang', 'Tổ'];
+  if (factionSuffixes.includes(lastWord)) return true;
+
+  // Suffix: Item / Weapon / Skill / Concept
+  const itemSuffixes = ['Bàn', 'Thạch', 'Đan', 'Dược', 'Thảo', 'Khí', 'Kiếm', 'Đao', 'Thương', 'Cung', 'Trượng', 'Thuẫn', 'Khiên', 'Kính', 'Châm', 'Giáp', 'Bào', 'Đế', 'Lô', 'Đỉnh', 'Ấn', 'Châu', 'Kích', 'Tiễn', 'Trận', 'Pháp', 'Công', 'Kỹ', 'Thuật', 'Độn', 'Khốn', 'Đoài', 'Chấn', 'Tốn', 'Ly', 'Khảm', 'Càn', 'Khôn', 'Quẻ', 'Chưởng', 'Quyền', 'Quyển', 'Bản', 'Kinh', 'Giải', 'Quyết', 'Thể', 'Căn', 'Cốt', 'Mạch', 'Cảnh', 'Tầng', 'Cơ', 'Phả'];
+  if (itemSuffixes.includes(lastWord)) return true;
+
+  // Suffix: Beast / Animal / Race
+  const beastSuffixes = ['Thú', 'Yêu', 'Trùng', 'Xà', 'Mãng', 'Ngưu', 'Khuyển', 'Lang', 'Hổ', 'Báo', 'Sư', 'Tượng', 'Viên', 'Điểu', 'Hạc', 'Ưng', 'Phụng', 'Long', 'Quy', 'Kiến', 'Nhện', 'Rết', 'Mèo', 'Chuột', 'Độc', 'Kê', 'Trư', 'Mã', 'Dương', 'Hầu'];
+  if (beastSuffixes.includes(lastWord)) return true;
+  if (words.length >= 2 && beastSuffixes.includes(words[words.length - 2])) {
+    // E.g. "Tê Ngưu"
+    if (words[words.length - 2] === 'Tê' && lastWord === 'Ngưu') return true;
+  }
+
+  // Prefix checks
+  if (['Quẻ', 'Bang', 'Phái', 'Môn', 'Trận'].includes(firstWord)) return true;
+
   const markerHits = words.filter((word) => WORLD_MARKER_WORDS.has(word)).length;
   return markerHits >= 2;
 }

@@ -935,8 +935,6 @@ export function detectSevereRepetition(content: string): CriticIssue[] {
     // Plot element words — naturally recur more often
     'pixel hóa': { variants: ['pixel hóa', 'pixel'], category: 'plot_element' },
     'rỉ sét': { variants: ['rỉ sét'], category: 'plot_element' },
-    'linh khí': { variants: ['linh khí'], category: 'plot_element' },
-    'đan điền': { variants: ['đan điền'], category: 'plot_element' },
   };
 
   for (const [groupName, { variants, category }] of Object.entries(tracked)) {

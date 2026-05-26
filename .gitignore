@@ -92,3 +92,5 @@ next-env.d.ts
 mobile/test-*.js
 mobile/expo_output.log
 .claude/
+/scratch/
+

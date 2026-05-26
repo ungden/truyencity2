@@ -15,6 +15,7 @@ const RETRY_DELAYS = [2000, 5000, 10000];
 // Pricing per 1M tokens (Google AI docs, Standard tier)
 const PRICING: Record<string, { inputPerMillion: number; outputPerMillion: number }> = {
   'gemini-3.1-flash-lite':        { inputPerMillion: 0.25, outputPerMillion: 1.50 },
+  'gemini-3.5-flash':             { inputPerMillion: 0.75, outputPerMillion: 4.50 },
   'gemini-3-flash-preview':       { inputPerMillion: 0.50, outputPerMillion: 3.00 },
   'gemini-3-pro-preview':         { inputPerMillion: 2.00, outputPerMillion: 12.00 },
   'gemini-3.1-pro-preview':       { inputPerMillion: 2.00, outputPerMillion: 12.00 },
@@ -75,7 +76,8 @@ function resolveRoute(task: string | undefined): string | null {
   if (!task) return null;
   const routing = globalThis.__MODEL_ROUTING__;
   if (!routing) return null;
-  return routing[task] || routing['_default'] || null;
+  const cleanTask = task.endsWith('_retry') ? task.slice(0, -6) : task;
+  return routing[cleanTask] || routing[task] || routing['_default'] || null;
 }
 
 // ── Core API Call ────────────────────────────────────────────────────────────
@@ -118,17 +120,24 @@ export async function callGemini(
   // valid JSON; wrapper at forced temp=1.0 returns 0. Now respect caller temp if
   // explicitly set <0.7 (signals "deterministic stage needed").
   const isGemini3 = config.model.startsWith('gemini-3');
+  const isGemini35 = config.model === 'gemini-3.5-flash';
   const callerTemp = config.temperature ?? 1.0;
   const effectiveTemperature = isGemini3 && callerTemp >= 0.7 ? 1.0 : callerTemp;
 
   const generationConfig: Record<string, unknown> = {
-    temperature: effectiveTemperature,
     maxOutputTokens: config.maxTokens,
-    topP: 0.95,
-    topK: 40,
-    // NOTE: frequencyPenalty/presencePenalty NOT supported by thinking models
-    // (gemini-3-flash-preview). Sending them causes empty content response.
   };
+
+  // Google recommends removing temperature/topP/topK for Gemini 3.5 Flash to optimize reasoning/thinking
+  if (isGemini35) {
+    if (callerTemp < 0.7) {
+      generationConfig.temperature = callerTemp;
+    }
+  } else {
+    generationConfig.temperature = effectiveTemperature;
+    generationConfig.topP = 0.95;
+    generationConfig.topK = 40;
+  }
 
   // Thinking control for Gemini 3 thinking models (gemini-3-flash-preview, gemini-3-pro-*).
   // Per-task tier:
@@ -141,9 +150,10 @@ export async function callGemini(
   // thinkingConfig on gemini-3.1-flash-lite caused empty-content returns on
   // specific prompt combinations (Gia Tộc Tu Tiên + tu-tiên-gia-tộc kernel).
   // Gate to ONLY actual thinking models (gemini-3-flash-preview, gemini-3-pro-*).
-  const isThinkingModel = config.model === 'gemini-3-flash-preview'
+  const isThinkingModel = config.model === 'gemini-3.5-flash'
+    || config.model === 'gemini-3-flash-preview'
     || config.model.startsWith('gemini-3-pro');
-  if (isGemini3 && isThinkingModel) {
+  if ((isGemini3 || isGemini35) && isThinkingModel) {
     const task = options?.tracking?.task || '';
     const isChapterTask = ['architect', 'writer', 'writer_continuation', 'critic', 'continuity_guardian', 'auto_revision'].includes(task);
     const valid = (v: string): v is 'low' | 'medium' | 'high' => ['low', 'medium', 'high'].includes(v);

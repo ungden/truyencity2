@@ -922,7 +922,7 @@ const DONG_NHAN: GenreSetupPlaybook = {
   ],
   mcArchetypes: [
     {
-      name: 'self-insert (đọc giả) thông minh',
+      name: 'self-insert (độc giả) thông minh',
       voice: 'Tự ý thức mình là độc giả của canon — biết tương lai, tận dụng kiến thức.',
       signature: 'Hành động dựa trên metadata canon — pre-empt drama trước khi xảy ra',
       fits: ['dong-nhan'],

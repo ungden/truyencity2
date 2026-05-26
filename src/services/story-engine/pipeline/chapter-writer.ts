@@ -551,6 +551,13 @@ ${CLIFFHANGER_TECHNIQUES.map((c: { name: string; example: string }) => '- ' + c.
   // Extract foreshadowing hints for forceful injection into Architect prompt
   const foreshadowingInjection = extractForeshadowingForArchitect(context);
 
+  // Extract previous cliffhanger and MC state for direct reinforcement in current task
+  const cliffhangerMatch = context.match(/Cliffhanger chương trước:\s*([^\n]*)/);
+  const previousCliffhanger = cliffhangerMatch ? cliffhangerMatch[1].trim() : '';
+
+  const mcStateMatch = context.match(/Trạng thái MC cuối chương trước:\s*([^\n]*)/);
+  const previousMcState = mcStateMatch ? mcStateMatch[1].trim() : '';
+
   // Phase 22 Stage 2 Q2: Architect budget bumped 120K → 400K. DeepSeek 1M context handles
   // this trivially (~100K tokens at most). Old cap was a token-saving artifact from
   // pre-DeepSeek era; head-tail trim was DROPPING THE MIDDLE of synopsis/arc plan/character
@@ -631,6 +638,10 @@ NHIỆM VỤ HIỆN TẠI:
 ═══════════════════════════════════════════
 Lên kế hoạch cho CHƯƠNG ${chapterNumber}.
 Target: ${targetWords} từ. Tối thiểu ${minScenes} scenes (mỗi ~${wordsPerScene} từ).
+${previousCliffhanger ? `\n⚠️ BẮT BUỘC KHỞI ĐẦU CHƯƠNG MỚI (D4-RESOLVE):
+- Cliffhanger chương trước: "${previousCliffhanger}"
+- Trạng thái MC cuối chương trước: "${previousMcState}"
+- Yêu cầu: Cảnh đầu tiên (Scene 1 trong "scenes" và "emotionalArc.opening") PHẢI bắt đầu ngay tại địa điểm/thời điểm của Cliffhanger và tiếp tục trực tiếp hành động từ đó. CẤM nhảy địa điểm/thời gian tự do ở Scene 1 khi chưa có transition di chuyển hợp lý.\n` : ''}
 ${foreshadowingInjection}
 ${rewriteInstructions ? `\nYÊU CẦU SỬA TỪ LẦN TRƯỚC: ${rewriteInstructions}` : ''}
 ${isGolden ? `\nGOLDEN CHAPTER ${chapterNumber}:\nMust have: ${goldenReqs?.mustHave.join(', ')}\nAvoid: ${goldenReqs?.avoid.join(', ')}
@@ -707,6 +718,42 @@ Trả về JSON ChapterOutline đúng schema phía trên cho CHƯƠNG ${chapterN
       } catch (e) {
         console.warn(`[Architect] ch.${chapterNumber} template regen failed:`, e instanceof Error ? e.message : String(e));
       }
+    }
+  }
+
+  // Bridge validation check: check if Scene 1 connects to cliffhanger
+  if (previousCliffhanger && parsed.scenes && parsed.scenes.length > 0) {
+    const verifyPrompt = `Bạn là trợ lý biên tập. Hãy kiểm tra xem kế hoạch Cảnh 1 dưới đây có tiếp nối trực tiếp và logic từ Cliffhanger chương trước hay không.
+
+Cliffhanger chương trước: "${previousCliffhanger}"
+Trạng thái MC cuối chương trước: "${previousMcState}"
+
+Kế hoạch Cảnh 1:
+- Địa điểm/Bối cảnh (setting): "${parsed.scenes[0].setting || ''}"
+- Mục tiêu cảnh (goal): "${parsed.scenes[0].goal || ''}"
+- Mở đầu cảm xúc (emotionalArc.opening): "${parsed.emotionalArc?.opening || ''}"
+
+Trả về đúng một trong hai định dạng:
+- "OK" nếu Cảnh 1 tiếp diễn trực tiếp từ cliffhanger (ví dụ: cảnh xử lý tin nhắn đe dọa, cảnh lái xe tiếp, cảnh phản ứng ngay tại địa điểm cuối chương trước).
+- "ERR: [Lý do ngắn bằng tiếng Việt]" nếu Cảnh 1 bị nhảy địa điểm/thời gian đột ngột mà không giải quyết hay transition từ cliffhanger (ví dụ: chương trước đang ở trong xe nhận tin đe dọa, chương này tự nhiên đang ở cửa hàng bán khách mà không nói gì về việc di chuyển hay giải quyết tin nhắn).`;
+
+    try {
+      // Use Flash model for cheap/fast verification
+      const verifyRes = await callGemini(
+        verifyPrompt,
+        { ...config, model: 'gemini-3.1-flash-lite', temperature: 0, maxTokens: 100 },
+        { tracking: options?.projectId ? { projectId: options.projectId, task: 'architect_bridge_verify', chapterNumber } : undefined }
+      );
+      const verdict = verifyRes.content?.trim();
+      if (verdict && verdict.startsWith('ERR:')) {
+        const errorMsg = verdict.replace('ERR:', '').trim();
+        throw new Error(`Bridge broken: ${errorMsg}`);
+      }
+    } catch (e) {
+      if (e instanceof Error && e.message.startsWith('Bridge broken:')) {
+        throw e;
+      }
+      // Non-fatal fallback for other errors (e.g. rate limit, connection) so it doesn't block writing
     }
   }
 
@@ -1002,9 +1049,9 @@ ${charVoiceGuide}
 ${richStyleContext}
 ${buildGenreAntiClicheSection(genre)}
 ĐỘ DÀI YÊU CẦU (BẮT BUỘC):
-- Viết TỐI THIỂU ${totalTargetWords} từ
-- CẤM TÓM TẮT. Phải kéo dài thời gian và không gian của từng cảnh.
-- Chương dưới ${Math.round(totalTargetWords * 0.7)} từ sẽ bị từ chối
+- Khoảng độ dài tối ưu: từ ${Math.round(totalTargetWords * 0.85)} từ đến ${Math.round(totalTargetWords * 1.35)} từ.
+- Giới hạn cứng: KHÔNG vượt quá ${Math.round(totalTargetWords * 1.5)} từ (sẽ bị lỗi kiểm duyệt và phải viết lại).
+- CẤM TÓM TẮT nhưng phải cô đọng chi tiết, tránh lan man nói nhảm, không lặp từ và không dùng các câu hội thoại vô bổ kéo dài.
 - Tổng ${outline.scenes.length} scenes x ~${Math.round(totalTargetWords / outline.scenes.length)} từ/scene
 
 Bắt đầu viết:`;
@@ -1378,6 +1425,8 @@ Mỗi dim ≥6 → pass. Tổng overallScore = avg(5 dim) ± 1.`
     const parsed = parseJSON<CriticOutput>(res.content);
 
     if (!parsed) {
+      console.error(`[Critic Error] Failed to parse Critic JSON response. Raw content (length=${res.content.length}):`);
+      console.error(res.content);
       return createFailClosedCriticOutput(wordCount, targetWords);
     }
 

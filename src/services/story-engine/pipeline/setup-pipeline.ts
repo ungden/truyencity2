@@ -183,6 +183,124 @@ async function advanceStage(projectId: string, currentStage: SetupStage): Promis
 }
 
 /**
+ * Cascade-deletes all generated setup artifacts on database tables and resets
+ * project fields when a project setup is rewound to an earlier stage.
+ * Prevent stale, mismatched context (e.g. old characters, locations, timelines)
+ * from polluting the prompt context of subsequent regenerated stages.
+ */
+async function cleanupStageArtifacts(projectId: string, rewindToStage: SetupStage): Promise<void> {
+  const db = getSupabase();
+
+  // Define which tables to clear based on the target rewind stage.
+  // When rewinding to a stage, we delete all artifacts produced by that stage and any stage AFTER it.
+  const tablesToClear: string[] = [];
+
+  const SETUP_STAGES_ORDER: SetupStage[] = [
+    'idea', 'world', 'character', 'description', 'master_outline', 
+    'story_outline', 'canon_spawn', 'arc_plan', 'arc_approval', 'foundation_review'
+  ];
+
+  const currentStageIndex = SETUP_STAGES_ORDER.indexOf(rewindToStage);
+  if (currentStageIndex === -1) return;
+
+  // Map tables to their producing stages
+  const stageTables: Record<string, string[]> = {
+    world: ['world_locations', 'location_bibles'],
+    character: ['character_states', 'character_arcs', 'character_signature_traits', 'voice_fingerprints', 'voice_anchors', 'mc_power_states'],
+    master_outline: ['volume_summaries'],
+    story_outline: ['plot_threads', 'story_memory_chunks'],
+    canon_spawn: ['foreshadowing_plans', 'pacing_blueprints'],
+    arc_plan: ['arc_plans'],
+    foundation_review: ['first_10_evaluations', 'chapter_blueprints', 'failed_memory_tasks']
+  };
+
+  // Identify all tables that belong to stages >= rewindToStage
+  for (let i = currentStageIndex; i < SETUP_STAGES_ORDER.length; i++) {
+    const stage = SETUP_STAGES_ORDER[i];
+    const tables = stageTables[stage];
+    if (tables) {
+      tablesToClear.push(...tables);
+    }
+  }
+
+  // Also include general tables if rewinding back to idea
+  if (rewindToStage === 'idea') {
+    tablesToClear.push(
+      'character_states', 'character_arcs', 'character_signature_traits',
+      'foreshadowing_plans', 'pacing_blueprints', 'voice_fingerprints', 'voice_anchors',
+      'mc_power_states', 'world_locations', 'location_bibles', 'story_memory_chunks',
+      'plot_threads', 'volume_summaries', 'failed_memory_tasks', 'chapter_blueprints',
+      'arc_plans'
+    );
+  }
+
+  // Deduplicate table list
+  const uniqueTables = [...new Set(tablesToClear)];
+
+  console.log(`[cleanup] Rewound to stage "${rewindToStage}". Cleaning up ${uniqueTables.length} tables for project ${projectId.slice(0, 8)}...`);
+
+  // Delete records from Supabase in parallel
+  const deletePromises = uniqueTables.map(async (table) => {
+    try {
+      await db.from(table).delete().eq('project_id', projectId);
+    } catch (e) {
+      console.warn(`  [cleanup-warn] failed to clear table ${table}:`, e instanceof Error ? e.message : String(e));
+    }
+  });
+
+  await Promise.all(deletePromises);
+
+  // 2. Reset fields in ai_story_projects record
+  const resetFields: Record<string, unknown> = {};
+  
+  if (currentStageIndex <= SETUP_STAGES_ORDER.indexOf('world')) {
+    resetFields.world_description = null;
+    resetFields.worldbuilding_canon = null;
+    resetFields.power_system_canon = null;
+    resetFields.cultivation_system = null;
+    resetFields.magic_system = null;
+    resetFields.martial_arts_system = null;
+    resetFields.apocalypse_type = null;
+    resetFields.supernatural_system = null;
+    resetFields.political_system = null;
+    resetFields.world_system = null;
+    resetFields.romance_type = null;
+    resetFields.game_system = null;
+  }
+  if (currentStageIndex <= SETUP_STAGES_ORDER.indexOf('character')) {
+    resetFields.main_character = null;
+  }
+  if (currentStageIndex <= SETUP_STAGES_ORDER.indexOf('master_outline')) {
+    resetFields.master_outline = null;
+  }
+  if (currentStageIndex <= SETUP_STAGES_ORDER.indexOf('story_outline')) {
+    resetFields.story_outline = null;
+    resetFields.story_bible = null;
+  }
+
+  if (Object.keys(resetFields).length > 0) {
+    try {
+      await db.from('ai_story_projects').update(resetFields).eq('id', projectId);
+      console.log(`  ✓ reset ${Object.keys(resetFields).join(', ')} on ai_story_projects`);
+    } catch (e) {
+      console.error(`  [cleanup-error] failed to update project record:`, e instanceof Error ? e.message : String(e));
+    }
+  }
+
+  // 3. Delete written chapters if any exist (since we are rewinding to setup)
+  try {
+    const { data: proj } = await db.from('ai_story_projects').select('novel_id').eq('id', projectId).maybeSingle();
+    const novelId = proj?.novel_id;
+    if (novelId) {
+      const { error } = await db.from('chapters').delete().eq('novel_id', novelId);
+      if (!error) console.log(`  ✓ deleted all chapters for novel ${novelId}`);
+    }
+  } catch (e) {
+    // ignore
+  }
+}
+
+/**
  * Validate MC opening identity tier against Sảng văn 2026 hard cap.
  * Reject "rock-bottom" patterns (phế vật / nhặt rác / cuốc xẻng / ăn mày /
  * nô lệ / tù binh / "từ con số 0") cross-genre. Carve-out: dong-nhan only.
@@ -193,20 +311,26 @@ async function advanceStage(projectId: string, currentStage: SetupStage): Promis
 function validateMcOpeningIdentityTier(
   text: string,
   genre: GenreType,
+  mcName?: string,
 ): { passed: boolean; reason?: string } {
   // dong-nhan exemption — canon-locked entries (Đấu La phế vật, Naruto Cửu Vĩ)
   // legitimately require MC entry at adverse event. Architect rule C3 still
   // requires golden finger active + small win + tỉnh táo voice for these.
   if (genre === 'dong-nhan') return { passed: true };
 
+  const escapedMc = mcName ? mcName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') : '';
+  const mcRefs = ['mc', 'nam chính', 'nhân vật chính', 'chủ nhân', 'hắn', 'y', 'ta', 'đế'];
+  if (escapedMc) mcRefs.push(escapedMc.toLowerCase());
+  const mcRefPattern = `(?:${mcRefs.join('|')})`;
+
   const FORBIDDEN_PATTERNS: Array<{ re: RegExp; label: string }> = [
-    { re: /\bphế\s+vật\b/i, label: '"phế vật" identity' },
-    { re: /\bđệ\s+tử\s+ngoại\s+môn\s+(?:nhặt|cuốc|làm\s+thuê|lao\s+động|dọn\s+dẹp)/i, label: '"đệ tử ngoại môn nhặt rác/lao động" pattern' },
-    { re: /\b(?:nhặt\s+rác|cuốc\s+xẻng|nhặt\s+phế\s+liệu)\b/i, label: 'menial labor MC opening' },
-    { re: /\b(?:nô\s+lệ|tù\s+binh|ăn\s+xin|ăn\s+mày|lão\s+ăn\s+mày)\b/i, label: 'slave/beggar identity' },
-    { re: /(?:mc|nhân\s+vật\s+chính|chủ\s+nhân|nam\s+chính|nữ\s+chính).{0,40}(?:từ\s+con\s+số\s+0|bootstrap\s+từ|tự\s+lực\s+từ\s+phế|đi\s+lên\s+từ\s+phế)/i, label: '"từ con số 0" trajectory' },
-    { re: /(?:nghèo\s+đói\s+ngập\s+đầu|mất\s+việc\s+đói\s+lả|nợ\s+nần\s+ngập\s+đầu|vô\s+gia\s+cư|sống\s+lay\s+lắt)/i, label: 'modern genre rock-bottom (do-thi/khoa-huyen)' },
-    { re: /(?:amnesia|mất\s+trí\s+nhớ|ngất\s+xỉu)\s+(?:ở|tại)\s+(?:chương\s+1|đầu\s+truyện|scene\s+1)/i, label: 'amnesia/faint opening' },
+    { re: new RegExp(`${mcRefPattern}\\s*(?:vốn\\s+là|bị\\s+coi\\s+là|chỉ\\s+là|là\\s+một)?\\s*phế\\s+vật`, 'i'), label: '"phế vật" identity' },
+    { re: new RegExp(`${mcRefPattern}\\s*(?:vốn\\s+là|bị\\s+coi\\s+là|chỉ\\s+là|là\\s+một)?\\s*đệ\\s+tử\\s+ngoại\\s+môn\\s+(?:nhặt|cuốc|làm\\s+thuê|lao\\s+động|dọn\\s+dẹp)`, 'i'), label: '"đệ tử ngoại môn nhặt rác/lao động" pattern' },
+    { re: new RegExp(`${mcRefPattern}\\s*(?:phải|chuyên)?\\s*(?:nhặt\\s+rác|cuốc\\s+xẻng|nhặt\\s+phế\\s+liệu)`, 'i'), label: 'menial labor MC opening' },
+    { re: new RegExp(`${mcRefPattern}\\s*(?:vốn\\s+là|bị\\s+coi\\s+là|chỉ\\s+là|là\\s+một|sống\\s+như|trở\\s+thành)?\\s*(?:nô\\s+lệ|tù\\s+binh|ăn\\s+xin|ăn\\s+mày|lão\\s+ăn\\s+mày)`, 'i'), label: 'slave/beggar identity' },
+    { re: new RegExp(`${mcRefPattern}\\s*.{0,40}(?:từ\\s+con\\s+số\\s+0|bootstrap\\s+từ|tự\\s+lực\\s+từ\\s+phế|đi\\s+lên\\s+từ\\s+phế)`, 'i'), label: '"từ con số 0" trajectory' },
+    { re: new RegExp(`${mcRefPattern}\\s*.{0,40}(?:nghèo\\s+đói\\s+ngập\\s+đầu|mất\\s+việc\\s+đói\\s+lả|nợ\\s+nần\\s+ngập\\s+đầu|vô\\s+gia\\s+cư|sống\\s+lay\\s+lắt)`, 'i'), label: 'modern genre rock-bottom (do-thi/khoa-huyen)' },
+    { re: new RegExp(`${mcRefPattern}\\s*.{0,40}(?:amnesia|mất\\s+trí\\s+nhớ|ngất\\s+xỉu)\\s+(?:ở|tại)\\s+(?:chương\\s+1|đầu\\s+truyện|scene\\s+1)`, 'i'), label: 'amnesia/faint opening' },
   ];
 
   for (const { re, label } of FORBIDDEN_PATTERNS) {
@@ -490,7 +614,8 @@ function evaluateExistingWorld(
   if (!semantic.passed) return { passed: false, reason: `semantic ${formatSetupGateIssues(semantic).slice(0, 80)}` };
   const hookCheck = validateWorldHooks(genre, text);
   if (!hookCheck.passed) return { passed: false, reason: `hooks ${hookCheck.matchedCount}/${hookCheck.minRequired}` };
-  const identityCheck = validateMcOpeningIdentityTier(text, genre);
+  const worldMc = extractMainCharacterNameFromWorld(text);
+  const identityCheck = validateMcOpeningIdentityTier(text, genre, worldMc);
   if (!identityCheck.passed) return { passed: false, reason: `identity ${identityCheck.reason}` };
   return { passed: true };
 }
@@ -566,6 +691,7 @@ Trả về JSON: {"worldDescription":"<800-1500 từ tuân blueprint 10-section,
     const parsed = parseJSON<{ worldDescription?: string }>(res.content);
     const wd = (parsed?.worldDescription || '').trim();
     if (wd.length < 500) {
+      console.error(`[ERROR] runStageWorld failed for project ${p.id}. wd.length = ${wd.length}. parsed is null? ${parsed === null}. Keys of parsed: ${parsed ? Object.keys(parsed).join(', ') : 'none'}. Raw content length: ${res.content.length}. Snippet:\n${res.content.slice(0, 800)}`);
       return { success: false, error: `world too short (${wd.length} chars, need ≥500). Task=${worldTaskName} temp=${worldTemp} maxTokens=${worldMaxTokens} repair_attempts=${repairAttempts}.` };
     }
     const validation = validateSeedStructure(wd);
@@ -581,6 +707,7 @@ Trả về JSON: {"worldDescription":"<800-1500 từ tuân blueprint 10-section,
       // Cap via kernel_repair_attempts so we don't loop idea→world→idea forever.
       const kernelWeak = semantic.issues.some(i => /^setup_kernel_.*_weak$/.test(i.code));
       if (kernelWeak && repairAttempts < 3) {
+        await cleanupStageArtifacts(p.id, 'idea');
         await getSupabase().from('ai_story_projects').update({
           setup_stage: 'idea',
           setup_stage_attempts: 0,
@@ -602,7 +729,8 @@ Trả về JSON: {"worldDescription":"<800-1500 từ tuân blueprint 10-section,
     }
 
     // Sảng văn 2026 hard cap — reject MC rock-bottom identity in worldDescription.
-    const identityCheck = validateMcOpeningIdentityTier(wd, genre);
+    const worldMc = extractMainCharacterNameFromWorld(wd);
+    const identityCheck = validateMcOpeningIdentityTier(wd, genre, worldMc);
     if (!identityCheck.passed) {
       return { success: false, error: `world identity gate: ${identityCheck.reason}` };
     }
@@ -687,7 +815,7 @@ QUY TẮC: KHÔNG đặt lại tên MC. Archetype CHÍNH XÁC 1 trong list playb
     const identityScanText = [archetypeName, parsed?.mcVoice, parsed?.mcSignature]
       .filter(Boolean)
       .join(' \n ');
-    const identityCheck = validateMcOpeningIdentityTier(identityScanText, genre);
+    const identityCheck = validateMcOpeningIdentityTier(identityScanText, genre, worldMc);
     if (!identityCheck.passed) {
       return { success: false, error: `character identity gate: ${identityCheck.reason}` };
     }
@@ -1143,6 +1271,7 @@ async function runStageFoundationReview(
             .maybeSingle();
           const attempts = (row?.kernel_repair_attempts as number) || 0;
           if (attempts < 3) {
+            await cleanupStageArtifacts(p.id, rewindToStage);
             await getSupabase()
               .from('ai_story_projects')
               .update({

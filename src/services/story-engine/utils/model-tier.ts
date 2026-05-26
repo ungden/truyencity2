@@ -37,17 +37,17 @@ const PRO_TASKS = new Set([
   // Existing Pro tasks
   'story_bible',         // ch.3 + every 150ch refresh ≈ 7× per 1000 chapters
   'arc_plan',            // ~50× per 1000 chapters (every 20 ch)
-]);
 
-const FLASH_TASKS = new Set([
-  // Per-chapter agents — high volume, must stay cheap
+  // Per-chapter writing tasks routed to Pro (2026-05-24)
   'architect',
   'critic',
   'continuity_guardian',
   'writer',
   'writer_continuation',
   'auto_revision',
+]);
 
+const FLASH_TASKS = new Set([
   // Setup pipeline cheap stages (low creative stake)
   'stage_description',   // Reader pitch 200 từ — okay generic
 
@@ -69,7 +69,7 @@ const FLASH_TASKS = new Set([
   'pacing_blueprint',
 ]);
 
-export const MODEL_PRO = 'gemini-3-flash-preview';
+export const MODEL_PRO = 'deepseek-v4-pro';
 export const MODEL_FLASH = 'gemini-3.1-flash-lite';
 
 declare global {
@@ -93,6 +93,9 @@ export function installModelTierRouting(): void {
   }
   const routing: Record<string, string> = {};
   for (const task of PRO_TASKS) routing[task] = MODEL_PRO;
+  routing['master_outline'] = 'gemini-3.5-flash'; // Override to Gemini to prevent DeepSeek timeouts on large master outlines
+  routing['arc_plan'] = 'gemini-3.5-flash';       // Override to Gemini — arc_plan also generates large JSON and times out on DeepSeek
+  routing['critic'] = 'gemini-3.5-flash';         // Override to Gemini to prevent DeepSeek formatting issues and reduce self-bias
   for (const task of FLASH_TASKS) routing[task] = MODEL_FLASH;
   // _default fallback to flash when task is undefined
   routing['_default'] = MODEL_FLASH;

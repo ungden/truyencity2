@@ -278,19 +278,13 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     const outlineMC = storyOutline?.protagonist?.name?.trim();
     const projectMC = project.main_character?.trim();
     if (outlineMC && projectMC && outlineMC !== projectMC) {
-      // Authoritative source: whichever side already has chapters written
-      const winner = currentChapter > 0 ? outlineMC : projectMC;
-      const loser = currentChapter > 0 ? 'project.main_character' : 'outline.protagonist.name';
-      if (currentChapter > 0) {
-        // chapters use outlineMC → sync project field to match
-        const { error: syncErr } = await db.from('ai_story_projects').update({ main_character: outlineMC }).eq('id', options.projectId);
-        if (syncErr) throw new Error(`MC sync (project.main_character ← outline) failed: ${syncErr.message}`);
-      } else {
-        // no chapters yet → seed name wins, sync outline
-        const newOutline = { ...(storyOutline || {}), protagonist: { ...(storyOutline?.protagonist || {}), name: projectMC } };
-        const { error: syncErr } = await db.from('ai_story_projects').update({ story_outline: newOutline as unknown as Record<string, unknown> }).eq('id', options.projectId);
-        if (syncErr) throw new Error(`MC sync (story_outline.protagonist.name ← project) failed: ${syncErr.message}`);
-      }
+      // Authoritative source: story_outline.protagonist.name generated during setup is always authoritative.
+      // This prevents a generic placeholder/seed name in project.main_character from overwriting the AI-designed MC name.
+      const winner = outlineMC;
+      const loser = 'project.main_character';
+      const { error: syncErr } = await db.from('ai_story_projects').update({ main_character: outlineMC }).eq('id', options.projectId);
+      if (syncErr) throw new Error(`MC sync (project.main_character ← outline) failed: ${syncErr.message}`);
+      
       // P2.1: HARD-VALIDATE post-sync. Re-fetch and confirm both sides match `winner`.
       // Without this, silent DB write failures (rare but possible under load / RLS edge
       // cases) leave mismatch in DB → next cron tick re-syncs, infinite loop possible.
@@ -305,7 +299,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
         throw new Error(`MC sync verification FAILED: expected "${winner}" on both sides; got project="${verifyProj}", outline="${verifyOutline}". Aborting chapter write to prevent name flip.`);
       }
       resolvedMainCharacter = winner;
-      validationFixes.push(`MC sync: ${loser}="${currentChapter > 0 ? projectMC : outlineMC}" → "${winner}" (ch.${currentChapter} written, verified)`);
+      validationFixes.push(`MC sync: ${loser}="${projectMC}" → "${winner}" (ch.${currentChapter} written, verified)`);
     } else if (projectMC) {
       resolvedMainCharacter = projectMC;
     }
@@ -523,7 +517,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   );
   const flashRoutineMaxRetries = Number(
     projectStyleDirectives?.flash_routine_max_retries ??
-    (flashRoutineSoftGate ? 1 : DEFAULT_CONFIG.maxRetries),
+    (flashRoutineSoftGate ? 3 : DEFAULT_CONFIG.maxRetries),
   );
   const deepseekThinkingTasks = Array.isArray(projectStyleDirectives?.deepseek_thinking_tasks)
     ? projectStyleDirectives.deepseek_thinking_tasks.filter((task): task is string => typeof task === 'string')

@@ -80,7 +80,7 @@ export async function callDeepSeek(
   config: GeminiConfig,
   options?: { jsonMode?: boolean; tracking?: TrackingContext },
 ): Promise<GeminiResponse> {
-  const apiKey = process.env.DEEPSEEK_API_KEY;
+  const apiKey = process.env.DEEPSEEK_API_KEY?.trim();
   if (!apiKey) throw new Error('DEEPSEEK_API_KEY not set');
 
   const messages: Array<{ role: string; content: string }> = [];
@@ -129,7 +129,7 @@ export async function callDeepSeek(
           'Authorization': `Bearer ${apiKey}`,
         },
         body: JSON.stringify(body),
-        signal: AbortSignal.timeout(180000), // 3 min — DeepSeek thinking mode slower
+        signal: AbortSignal.timeout(300000), // 5 min — DeepSeek thinking mode slower
       });
 
       if (res.status === 429 || res.status === 503 || res.status === 502) {
@@ -186,6 +186,7 @@ export async function callDeepSeek(
         finishReason: finishReason.toUpperCase(),
       };
     } catch (e) {
+      console.warn(`  [DeepSeek Warning] Attempt ${attempt + 1}/${RETRY_DELAYS.length + 1} failed: ${e instanceof Error ? e.message : String(e)}`);
       if (attempt >= RETRY_DELAYS.length) throw e;
     }
   }
