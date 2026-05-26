@@ -21,19 +21,25 @@ import type { TrackingContext } from './gemini';
 const API_BASE = 'https://api.deepseek.com';
 const RETRY_DELAYS = [3000, 8000, 20000, 45000, 90000]; // 5 retries, up to 90s backoff for transient failures
 
-// Pricing per 1M tokens (cache miss — conservative)
-const PRICING: Record<string, { inputPerMillion: number; outputPerMillion: number }> = {
-  'gemini-3-flash-preview':   { inputPerMillion: 1.74, outputPerMillion: 3.48 },
-  'gemini-3.1-flash-lite': { inputPerMillion: 0.14, outputPerMillion: 0.28 },
-  // Legacy aliases
-  'deepseek-reasoner': { inputPerMillion: 0.14, outputPerMillion: 0.28 },
-  'deepseek-chat':     { inputPerMillion: 0.14, outputPerMillion: 0.28 },
-  '_default':          { inputPerMillion: 0.14, outputPerMillion: 0.28 },
+// Pricing per 1M tokens. Pricing source: https://api-docs.deepseek.com/quick_start/pricing
+// NOTE: keys MUST be DeepSeek model names. Earlier versions of this file had
+// Gemini model names as keys (`gemini-3-flash-preview` / `gemini-3.1-flash-lite`)
+// — leftover from Phase Q find-replace — which caused every real
+// `deepseek-v4-pro` call to fall through to `_default` (Flash price) and
+// undercount Pro spend by ~12×. Cross-check vs `model-tier.ts` MODEL_PRO/FLASH.
+//
+// DeepSeek-V4-Pro currently sells at 75% off promo: list $1.74/$3.48 → effective
+// $0.435/$0.87. Cache-hit and cache-miss rates are per-model (NOT flat ratio —
+// Flash hit is 2% of miss, Pro hit is 0.83% of miss). Effective prices below.
+// If 75% promo ends, bump Pro back to list ($1.74/$3.48 + $0.0145 cache hit).
+const PRICING: Record<string, { inputCacheMiss: number; inputCacheHit: number; outputPerMillion: number }> = {
+  'deepseek-v4-pro':   { inputCacheMiss: 0.435, inputCacheHit: 0.003625, outputPerMillion: 0.87 },
+  'deepseek-v4-flash': { inputCacheMiss: 0.14,  inputCacheHit: 0.0028,   outputPerMillion: 0.28 },
+  // Legacy aliases (kept for old rows / fallback)
+  'deepseek-reasoner': { inputCacheMiss: 0.14,  inputCacheHit: 0.0028,   outputPerMillion: 0.28 },
+  'deepseek-chat':     { inputCacheMiss: 0.14,  inputCacheHit: 0.0028,   outputPerMillion: 0.28 },
+  '_default':          { inputCacheMiss: 0.14,  inputCacheHit: 0.0028,   outputPerMillion: 0.28 },
 };
-
-// DeepSeek cache pricing (cache hits charged ~10% of cache miss).
-// Source: https://api-docs.deepseek.com/quick_start/pricing
-const CACHE_HIT_DISCOUNT = 0.1;
 
 function trackCost(
   model: string,
@@ -44,9 +50,9 @@ function trackCost(
   metadata?: Record<string, unknown>,
 ): void {
   const p = PRICING[model] || PRICING['_default'];
-  // Cache miss tokens (full price) + cache hit tokens (10% price)
+  // Per-model cache hit rate (not a flat ratio — Flash hit is 2% of miss, Pro hit is 0.83%).
   const cacheMissTokens = Math.max(0, inputTokens - cacheHitTokens);
-  const inputCost = (cacheMissTokens * p.inputPerMillion + cacheHitTokens * p.inputPerMillion * CACHE_HIT_DISCOUNT) / 1_000_000;
+  const inputCost = (cacheMissTokens * p.inputCacheMiss + cacheHitTokens * p.inputCacheHit) / 1_000_000;
   const outputCost = (outputTokens * p.outputPerMillion) / 1_000_000;
   const cost = inputCost + outputCost;
 

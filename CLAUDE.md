@@ -93,7 +93,7 @@ writeOneChapter() [orchestrator.ts]
   - Auto-routed by `callGemini()` whenever `config.model` starts with `deepseek-` (router in `src/services/story-engine/utils/gemini.ts`)
   - V4 thinking models split output into `reasoning_content` + `content` — adapter falls back to `reasoning_content` when `content` is empty
   - Adapter: `src/services/story-engine/utils/deepseek.ts` (OpenAI-compatible, 5 retries with backoff up to 90s for transient failures)
-- **Premium tier**: `deepseek-v4-pro` ($1.74/$3.48 per 1M) — 12× cost. **Phase O (2026-05-12)** routes 7 creative-setup tasks lên Pro:
+- **Premium tier**: `deepseek-v4-pro` (list $1.74/$3.48 per 1M; **75% promo active → effective $0.435/$0.87**, cache hit $0.003625) — 3× Flash cost (was 12× pre-promo). **Phase O (2026-05-12)** routes 7 creative-setup tasks lên Pro:
   - `stage_idea` (StoryKernel: readerFantasy/pleasureLoop/systemMechanic/mcSecret)
   - `stage_world` (world rules + magic system)
   - `stage_character` (MC archetype + voice signature)
@@ -1394,12 +1394,23 @@ npx tsx scripts/toggle-production.ts list                      # show enabled no
 curl https://truyencity.com/admin/production-toggle            # admin UI
 ```
 
-### Open questions / known issues
+### Open questions / known issues — RESOLVED 2026-05-26
 
-1. **`story_outline` schema thin warning** fires for all 4 Phase Q novels (`yielded 0 fields (only header)`). Engine falls back to `world_description` for premise grounding. The Pro stage_idea kernel only populates `setupKernel`, not `premise/mainConflict/themes/majorPlotPoints` fields the assembler expects. Either pre-flight `runStageStoryOutline` needs to run BEFORE chapter writing, or the assembler should accept `setupKernel` as canonical premise.
-2. **`cost_tracking` rows not appearing for Gemini path** — `trackCost` fires but writes appear empty in DB queries. Pricing table has Gemini models; suspect insert is silently failing. Needs investigation.
-3. **3 Phase Q novels stuck pre-writing** until PR #54 merges to main and Vercel redeploys. The `production_enabled` JSONB filter is only on the branch; main's cron still uses the legacy hardcoded UUID gate.
-4. **`gemini-3-flash-preview` truncates Architect JSON ~500 chars** on chapters past ch.3 with full context (thinking=high or low). Workaround: chapter-writing tasks routed to `gemini-3.1-flash-lite` (non-thinking). Root cause unknown — likely model-side quirk specific to large multi-step prompts. If using thinking model for chapter tasks in future, add response-shape logging in `callGemini` to capture `finishReason` + raw response for diagnosis.
+Original Phase Q known-issues list audited 2026-05-26:
+
+1. ~~`story_outline` schema thin warning~~ — **RESOLVED**. All 5 production novels (verified via DB) now have `story_outline` with full canonical schema (`premise`, `mainConflict`, `themes`, `majorPlotPoints`, `setupKernel`). `runStageStoryOutline` runs after `stage_idea` and populates the canonical fields via `generateStoryOutline()` (`pipeline/setup-pipeline.ts:829`). Assembler's `outlineParts.length <= 2` warning remains as a safety net for legacy data.
+2. ~~`cost_tracking` rows not appearing for Gemini path~~ — **RESOLVED**. Verified working: 10,736 `gemini-3.1-flash-lite` rows in last 14 days totaling \$39.36, last write seen <1h before audit. Original report was stale.
+3. ~~3 Phase Q novels stuck pre-writing~~ — **RESOLVED**. PR #54 merged 2026-05-12, all 4 production novels now at ch.20+ (1 at ch.12 paused on quality gate, 4 awaiting Human-in-the-Loop arc 2 approval — both intended behaviors, not bugs).
+4. ~~`gemini-3-flash-preview` truncates Architect JSON~~ — **MITIGATED**. `utils/gemini.ts` already gates `thinkingConfig` to actual thinking models only and routes chapter-writing tasks (architect/writer/critic/etc.) to `thinkingLevel='low'` to prevent reasoning-token budget exhaustion. Caller-explicit `temperature<0.7` is also respected (Phase T+1 fix for setup determinism). Workaround stable; root cause not pursued further.
+
+### Pricing accuracy bug fixed 2026-05-26
+
+`utils/deepseek.ts` PRICING dict had Gemini model names as keys (leftover from Phase Q find-replace). Every real `deepseek-v4-pro` call fell through to `_default` (Flash price) and undercounted Pro spend significantly. Fixed by replacing keys with `deepseek-v4-pro` / `deepseek-v4-flash`.
+
+While fixing, also corrected:
+- **Pro effective price**: $0.435 input / $0.87 output (DeepSeek currently runs **75% off promo** on Pro; list $1.74/$3.48). If promo ends, bump back to list prices.
+- **Per-model cache hit rate**: was flat 10% of miss for both tiers. Actual rates per DeepSeek docs are Flash 2% ($0.0028/$0.14) and Pro 0.83% ($0.003625/$0.435). Replaced `CACHE_HIT_DISCOUNT` constant with per-model `inputCacheHit` field.
+- Historical cost_tracking rows are NOT backfilled — small absolute spend.
 
 ### Daily commands (Phase Q)
 
@@ -1426,5 +1437,5 @@ npm run codex:automation -- apply-cover --run-dir=<runDir> --apply
 
 ---
 
-**Last Updated**: 2026-05-12 (Phase Q — DeepSeek→Gemini swap + flag-based production)
+**Last Updated**: 2026-05-26 (Phase Q known-issues audit: 4/4 resolved + deepseek.ts pricing dict fixed)
 
