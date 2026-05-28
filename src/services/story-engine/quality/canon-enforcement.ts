@@ -383,8 +383,8 @@ async function checkPovGate(input: CanonEnforcementInput): Promise<CriticIssue[]
  * If drift exceeds threshold, flag.
  */
 async function checkVoiceDrift(input: CanonEnforcementInput): Promise<CriticIssue[]> {
-  if (input.chapterNumber < 50) return []; // Need enough writing to expect drift.
-  if (input.chapterNumber % 50 !== 0 && input.chapterNumber < 500) return []; // Cadence.
+  if (input.chapterNumber < 20) return []; // Need enough writing to expect drift.
+  if (input.chapterNumber % 20 !== 0 && input.chapterNumber < 500) return []; // Cadence: every 20ch, then every chapter once ≥500 (Goal 5: uniform quality at scale).
 
   try {
     const db = getSupabase();

@@ -9,6 +9,7 @@ import { getSupabase } from '../utils/supabase';
 import { callGemini } from '../utils/gemini';
 import { parseJSON } from '../utils/json-repair';
 import { GOLDEN_CHAPTER_REQUIREMENTS, UNIVERSAL_ANTI_SEEDS, SUB_GENRE_RULES } from '../templates';
+import { capWorldDescription } from './world-description-cap';
 
 /**
  * P3.3: Validate sub_genres keys against known SUB_GENRE_RULES.
@@ -557,7 +558,9 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
   // master_outline is generic, world_description anchors every chapter to the real premise.
   if (payload.worldDescription) {
     parts.push('[WORLD DESCRIPTION — PREMISE GỐC, BÁM SÁT TUYỆT ĐỐI, KHÔNG ĐƯỢC LẠC ĐỀ]');
-    parts.push(payload.worldDescription.slice(0, 8000));  // Cap to keep prompt budget; trim from end if needed
+    // Rule-aware cap: keep canonical rule lines first, then prose — a blind
+    // slice(0, 8000) would drop late rules on long premises (coherence hazard).
+    parts.push(capWorldDescription(payload.worldDescription, 8000));
   }
 
   // Layer 0.5: Master Outline
