@@ -145,14 +145,23 @@ async function archiveCurrentSetup(
     sub_genres: project.sub_genres,
     mc_archetype: project.mc_archetype,
     anti_tropes: project.anti_tropes,
+    // The foundation verdict attests to the canon we're about to wipe. Archive
+    // it for rollback, then strip it from the live row below so the gate can't
+    // read a stale passed=true against NULL canon (the c97b1d28/f783a0ae case).
+    foundation_review_latest: styleDirectives.foundation_review_latest,
+    foundation_review_history: styleDirectives.foundation_review_history,
   };
 
   if (!apply) return { timestamp, success: true };
 
-  // Store under archived_setups[<timestamp>] — array of archive objects
+  // Store under archived_setups[<timestamp>] — array of archive objects.
+  // Omit foundation_review_latest/_history from the live directives: the canon
+  // they attest to is being NULLed, so a lingering passed=true would falsely
+  // satisfy the Track 1 write gate. They re-generate when the pipeline re-runs.
+  const { foundation_review_latest: _fr, foundation_review_history: _frh, ...keptDirectives } = styleDirectives;
   const existingArchives = (styleDirectives.archived_setups as unknown[]) || [];
   const updatedDirectives = {
-    ...styleDirectives,
+    ...keptDirectives,
     archived_setups: [...existingArchives, archived].slice(-3), // Keep last 3 only
     last_reset_at: new Date().toISOString(),
   };
