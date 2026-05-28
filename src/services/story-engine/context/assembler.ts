@@ -289,7 +289,6 @@ export async function loadContext(
   // Parallel DB queries
   const [
     bridgeResult,
-    bibleResult,
     synopsisResult,
     recentResult,
     arcResult,
@@ -307,8 +306,6 @@ export async function loadContext(
           db.from('chapters').select('content').eq('novel_id', novelId).eq('chapter_number', prevChapter).maybeSingle(),
         ])
       : Promise.resolve([{ data: null }, { data: null }] as const),
-    // Layer 1: Story Bible
-    db.from('ai_story_projects').select('story_bible').eq('id', projectId).maybeSingle(),
     // Layer 2: Synopsis
     db.from('story_synopsis').select('synopsis_text,mc_current_state,active_allies,active_enemies,open_threads,last_updated_chapter').eq('project_id', projectId).order('last_updated_chapter', { ascending: false }).limit(1).maybeSingle(),
     // Layer 3: Recent Chapter Summaries — keep summaries for the 12-chapter look-back window.
@@ -316,8 +313,10 @@ export async function loadContext(
     db.from('chapter_summaries').select('chapter_number,title,summary,mc_state,cliffhanger').eq('project_id', projectId).lt('chapter_number', chapterNumber).order('chapter_number', { ascending: false }).limit(12),
     // Layer 4: Arc Plan (incl. hyperpop sub-arcs from migration 0149)
     db.from('arc_plans').select('arc_number,start_chapter,end_chapter,arc_theme,plan_text,sub_arcs,chapter_briefs,threads_to_advance,threads_to_resolve,new_threads').eq('project_id', projectId).order('arc_number', { ascending: false }).limit(1).maybeSingle(),
-    // Master Outline + Story Outline + WORLD DESCRIPTION (canonical premise source)
-    db.from('ai_story_projects').select('master_outline,story_outline,world_description,sub_genres,mc_archetype,anti_tropes,style_directives').eq('id', projectId).maybeSingle(),
+    // Story Bible (Layer 1) + Master Outline + Story Outline + WORLD DESCRIPTION
+    // (canonical premise source). Merged into one ai_story_projects read — same row,
+    // same key — to drop a redundant round-trip per chapter write.
+    db.from('ai_story_projects').select('story_bible,master_outline,story_outline,world_description,sub_genres,mc_archetype,anti_tropes,style_directives').eq('id', projectId).maybeSingle(),
     // Anti-repetition: titles (cap at 50 most recent to reduce context size)
     db.from('chapters').select('title').eq('novel_id', novelId).order('chapter_number', { ascending: false }).limit(50),
     // Anti-repetition: openings
@@ -335,7 +334,7 @@ export async function loadContext(
   const bridge = summaryData?.data;
   const ending = endingData?.data;
 
-  const bible = bibleResult?.data?.story_bible;
+  const bible = masterOutlineResult?.data?.story_bible;
   const synopsis = synopsisResult?.data;
   const recentSummaries = (recentResult?.data || []).reverse();
   const arc = arcResult?.data;

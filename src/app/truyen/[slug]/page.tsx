@@ -26,7 +26,7 @@ import { NovelActions } from '@/components/novel-actions';
 import { AppContainer, TwoColumnLayout, ContentCard, Section } from '@/components/layout';
 import { Comments } from '@/components/comments';
 import { StarDisplay } from '@/components/star-rating';
-import { RelatedNovels } from '@/components/related-novels';
+import { RelatedNovels, type RelatedNovelRow } from '@/components/related-novels';
 import { AuthorWorks } from '@/components/author-works';
 import { NovelRatingSection } from './rating-section';
 import { cleanNovelDescription } from '@/lib/utils';
@@ -96,6 +96,46 @@ const fetchNovelMeta = unstable_cache(
   { revalidate: 300 },
 );
 
+const REL_COLS = 'id,slug,title,author,cover_url,status,genres';
+
+// Same-genre suggestions, scored by genre overlap. Fetched + cached server-side
+// (was a client round-trip per page load); now part of the ISR HTML, SEO-visible.
+const fetchRelatedNovels = unstable_cache(
+  async (novelId: string, genres: string[], limit: number): Promise<RelatedNovelRow[]> => {
+    if (!genres.length) return [];
+    const { data } = await supabase
+      .from('novels')
+      .select(REL_COLS)
+      .overlaps('genres', [genres[0]])
+      .neq('id', novelId)
+      .not('cover_url', 'is', null)
+      .limit(limit + 5);
+    if (!data) return [];
+    return (data as RelatedNovelRow[])
+      .map(n => ({ n, overlap: (n.genres || []).filter(g => genres.includes(g)).length }))
+      .sort((a, b) => b.overlap - a.overlap)
+      .slice(0, limit)
+      .map(({ n }) => n);
+  },
+  ['novel-detail-related'],
+  { revalidate: 300 },
+);
+
+const fetchAuthorWorks = unstable_cache(
+  async (novelId: string, authorName: string, limit: number): Promise<RelatedNovelRow[]> => {
+    if (!authorName) return [];
+    const { data } = await supabase
+      .from('novels')
+      .select(REL_COLS)
+      .eq('author', authorName)
+      .neq('id', novelId)
+      .limit(limit);
+    return (data as RelatedNovelRow[] | null) ?? [];
+  },
+  ['novel-detail-author-works'],
+  { revalidate: 300 },
+);
+
 // SEO: generateMetadata
 export async function generateMetadata({
   params,
@@ -159,6 +199,15 @@ export default async function NovelDetailPage({
   const totalBookmarks = stats?.bookmark_count ?? 0;
   const ratingCount = stats?.rating_count ?? 0;
   const ratingAvg = stats?.rating_avg ?? 0;
+
+  // Related + author suggestions — cached server-side so they render inside the ISR
+  // HTML (was a client round-trip + skeleton per load, invisible to crawlers).
+  const relatedNovels = novel.genres?.length
+    ? await fetchRelatedNovels(novel.id, novel.genres, 6)
+    : [];
+  const authorWorks = novel.author
+    ? await fetchAuthorWorks(novel.id, novel.author, 6)
+    : [];
 
   let mainGenre: (typeof GENRE_CONFIG)[keyof typeof GENRE_CONFIG] | null = null;
   let topic: Topic | null = null;
@@ -468,14 +517,14 @@ export default async function NovelDetailPage({
               {/* Related Novels */}
               {Array.isArray(novel.genres) && novel.genres.length > 0 && (
                 <Section title="Có thể bạn cũng thích">
-                  <RelatedNovels novelId={novel.id} genres={novel.genres} limit={6} />
+                  <RelatedNovels novels={relatedNovels} />
                 </Section>
               )}
 
               {/* Author's Other Works */}
               {novel.author && (
                 <Section title={`Tác phẩm cùng tác giả`}>
-                  <AuthorWorks novelId={novel.id} authorName={novel.author} limit={6} />
+                  <AuthorWorks novels={authorWorks} />
                 </Section>
               )}
 
@@ -592,7 +641,7 @@ export default async function NovelDetailPage({
           {Array.isArray(novel.genres) && novel.genres.length > 0 && (
             <div>
               <h3 className="text-lg font-semibold mb-3">Có thể bạn cũng thích</h3>
-              <RelatedNovels novelId={novel.id} genres={novel.genres} limit={6} />
+              <RelatedNovels novels={relatedNovels} />
             </div>
           )}
 
@@ -600,7 +649,7 @@ export default async function NovelDetailPage({
           {novel.author && (
             <div>
               <h3 className="text-lg font-semibold mb-3">Tác phẩm cùng tác giả</h3>
-              <AuthorWorks novelId={novel.id} authorName={novel.author} limit={6} />
+              <AuthorWorks novels={authorWorks} />
             </div>
           )}
 
