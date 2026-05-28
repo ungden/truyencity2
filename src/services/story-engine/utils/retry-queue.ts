@@ -68,6 +68,40 @@ export async function safeMemoryTask<T>(
   }
 }
 
+/**
+ * Telemetry-only log for a failed CONTEXT LOADER (foreshadowing, voice, arc, etc.).
+ *
+ * Unlike `recordFailedTask`, these are NOT retried — the loader has a valid empty
+ * fallback and the chapter still ships. We record them as `status='succeeded'` so the
+ * replay cron skips them, but the audit dashboard can surface silent context degradation
+ * (e.g. "foreshadowing loader failed on 30% of chapters → setups go unrecorded").
+ *
+ * Fire-and-forget: never awaited in the hot path, never throws.
+ */
+export function logLoaderFailure(
+  projectId: string,
+  chapterNumber: number,
+  loaderName: string,
+  error: unknown,
+): void {
+  const errMsg = error instanceof Error ? error.message : String(error);
+  void getSupabase()
+    .from('failed_memory_tasks')
+    .insert({
+      project_id: projectId,
+      chapter_number: chapterNumber,
+      task_name: `context_loader:${loaderName}`,
+      error_message: errMsg.slice(0, 500),
+      attempts: 0,
+      status: 'succeeded',
+    })
+    .then(({ error: insertErr }) => {
+      if (insertErr) {
+        console.warn(`[RetryQueue] logLoaderFailure insert failed for ${loaderName}:`, insertErr.message);
+      }
+    });
+}
+
 export interface FailedTaskRow {
   id: string;
   project_id: string;
@@ -221,6 +255,62 @@ async function replayTask(row: FailedTaskRow): Promise<void> {
         .select('genre,main_character').eq('id', projectId).maybeSingle();
       if (!proj) throw new Error('first_10_evaluation: project not found');
       await runFirst10Evaluation(projectId, novelId, proj.genre, proj.main_character || 'MC', DEFAULT_CONFIG);
+      return;
+    }
+
+    // Phase 27 W2.2/W2.3/W3.1/W3.2 + geography: state extractors that re-fetch
+    // chapter content from DB (mirrors plot_thread_ledger / factions replay).
+    case 'task_15b_geography': {
+      const { recordLocationFromCharacters } = await import('../state/geography');
+      if (chapter === null || !novelId) throw new Error('task_15b_geography: missing chapter/novelId');
+      const { data: ch } = await getSupabase().from('chapters')
+        .select('content').eq('novel_id', novelId).eq('chapter_number', chapter).maybeSingle();
+      if (!ch?.content) throw new Error('task_15b_geography: chapter content not found');
+      const { data: charRows } = await getSupabase().from('character_states')
+        .select('character_name,location').eq('project_id', projectId).eq('chapter_number', chapter);
+      const chars = (charRows || []).map(r => ({ character_name: r.character_name, location: r.location }));
+      await recordLocationFromCharacters(projectId, chapter, ch.content, chars);
+      return;
+    }
+    case 'task_15d_timeline': {
+      const { recordChapterTime } = await import('../state/timeline');
+      const { DEFAULT_CONFIG } = await import('../types');
+      if (chapter === null || !novelId) throw new Error('task_15d_timeline: missing chapter/novelId');
+      const { data: ch } = await getSupabase().from('chapters')
+        .select('content').eq('novel_id', novelId).eq('chapter_number', chapter).maybeSingle();
+      if (!ch?.content) throw new Error('task_15d_timeline: chapter content not found');
+      const { data: proj } = await getSupabase().from('ai_story_projects')
+        .select('main_character').eq('id', projectId).maybeSingle();
+      await recordChapterTime(projectId, chapter, ch.content, proj?.main_character || 'MC', DEFAULT_CONFIG);
+      return;
+    }
+    case 'task_15e_item_events': {
+      const { recordItemEvents } = await import('../state/item-inventory');
+      const { DEFAULT_CONFIG } = await import('../types');
+      if (chapter === null || !novelId) throw new Error('task_15e_item_events: missing chapter/novelId');
+      const { data: ch } = await getSupabase().from('chapters')
+        .select('content').eq('novel_id', novelId).eq('chapter_number', chapter).maybeSingle();
+      if (!ch?.content) throw new Error('task_15e_item_events: chapter content not found');
+      const { data: charRows } = await getSupabase().from('character_states')
+        .select('character_name').eq('project_id', projectId).eq('chapter_number', chapter);
+      const characters = (charRows || []).map(r => r.character_name);
+      await recordItemEvents(projectId, chapter, ch.content, characters, DEFAULT_CONFIG);
+      return;
+    }
+    case 'task_15g_twist_advance': {
+      const { advanceTwistStatuses } = await import('../plan/plot-twists');
+      if (chapter === null) throw new Error('task_15g_twist_advance: missing chapter');
+      await advanceTwistStatuses(projectId, chapter);
+      return;
+    }
+    case 'task_15h_theme_reinforcement': {
+      const { detectThemeReinforcement } = await import('../plan/themes');
+      const { DEFAULT_CONFIG } = await import('../types');
+      if (chapter === null || !novelId) throw new Error('task_15h_theme_reinforcement: missing chapter/novelId');
+      const { data: ch } = await getSupabase().from('chapters')
+        .select('content').eq('novel_id', novelId).eq('chapter_number', chapter).maybeSingle();
+      if (!ch?.content) throw new Error('task_15h_theme_reinforcement: chapter content not found');
+      await detectThemeReinforcement(projectId, chapter, ch.content, DEFAULT_CONFIG);
       return;
     }
 

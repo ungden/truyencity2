@@ -33,6 +33,7 @@ import { getArchitectVoiceHint } from '../templates/genre-voice-anchors';
 import { getGenreArchitectGuide } from '../templates/genre-process-blueprints';
 import { formatChapterBlueprintContext, loadChapterBlueprint } from '../plan/chapter-blueprints';
 import { isTemplateCliffhanger, isTemplateOpening } from './generators';
+import { logLoaderFailure } from '../utils/retry-queue';
 
 import type {
   ContextPayload, ChapterSummary, GenreType, GeminiConfig, StoryKernel,
@@ -277,6 +278,14 @@ export async function loadContext(
   const db = getSupabase();
   const prevChapter = chapterNumber - 1;
 
+  // Telemetry for silent canon/state loader failures. Returns null fallback (the
+  // loader's guidance is dropped from the prompt) but records the failure so the
+  // audit dashboard can surface silent context degradation.
+  const loaderFail = (name: string) => (e: unknown) => {
+    logLoaderFailure(projectId, chapterNumber, name, e);
+    return null;
+  };
+
   // Parallel DB queries
   const [
     bridgeResult,
@@ -479,49 +488,49 @@ export async function loadContext(
     volumeContext: buildVolumeContextBlock(rawMasterOutline, chapterNumber),
     castRoster: await (async () => {
       const { getCastRosterContext } = await import('../state/cast-database');
-      return getCastRosterContext(projectId, chapterNumber).catch(() => null);
+      return getCastRosterContext(projectId, chapterNumber).catch(loaderFail('cast_roster'));
     })() || undefined,
     timelineContext: await (async () => {
       const { getTimelineContext } = await import('../state/timeline');
-      return getTimelineContext(projectId, chapterNumber).catch(() => null);
+      return getTimelineContext(projectId, chapterNumber).catch(loaderFail('timeline'));
     })() || undefined,
     inventoryContext: await (async () => {
       const { getInventoryContext } = await import('../state/item-inventory');
       // Use protagonist from project meta — fallback to first character if missing.
       const { data: projectRow } = await db.from('ai_story_projects').select('main_character').eq('id', projectId).maybeSingle();
       const protagonist = (projectRow as { main_character?: string } | null)?.main_character || characters[0]?.character_name || 'MC';
-      return getInventoryContext(projectId, chapterNumber, protagonist).catch(() => null);
+      return getInventoryContext(projectId, chapterNumber, protagonist).catch(loaderFail('inventory'));
     })() || undefined,
     powerSystemCanonContext: await (async () => {
       const { getPowerSystemCanonContext } = await import('../canon/power-system');
-      return getPowerSystemCanonContext(projectId).catch(() => null);
+      return getPowerSystemCanonContext(projectId).catch(loaderFail('power_system_canon'));
     })() || undefined,
     factionsContext: await (async () => {
       const { getFactionsContext } = await import('../canon/factions');
-      return getFactionsContext(projectId, chapterNumber).catch(() => null);
+      return getFactionsContext(projectId, chapterNumber).catch(loaderFail('factions'));
     })() || undefined,
     plotTwistsContext: await (async () => {
       const { getPlotTwistsContext } = await import('../plan/plot-twists');
-      return getPlotTwistsContext(projectId, chapterNumber).catch(() => null);
+      return getPlotTwistsContext(projectId, chapterNumber).catch(loaderFail('plot_twists'));
     })() || undefined,
     themesContext: await (async () => {
       const { getThemesContext } = await import('../plan/themes');
-      return getThemesContext(projectId, chapterNumber).catch(() => null);
+      return getThemesContext(projectId, chapterNumber).catch(loaderFail('themes'));
     })() || undefined,
     worldbuildingCanonContext: await (async () => {
       const { getWorldbuildingCanonContext } = await import('../canon/worldbuilding');
-      return getWorldbuildingCanonContext(projectId).catch(() => null);
+      return getWorldbuildingCanonContext(projectId).catch(loaderFail('worldbuilding_canon'));
     })() || undefined,
     voiceAnchorContext: await (async () => {
       const { getVoiceAnchorContext } = await import('../memory/voice-anchor');
-      return getVoiceAnchorContext(projectId, chapterNumber).catch(() => null);
+      return getVoiceAnchorContext(projectId, chapterNumber).catch(loaderFail('voice_anchor'));
     })() || undefined,
     chapterBlueprintContext: await loadChapterBlueprint(projectId, chapterNumber)
       .then((blueprint) => formatChapterBlueprintContext(blueprint))
       .catch(() => undefined),
     rollingBriefsContext: await (async () => {
       const { getRollingBriefsContext } = await import('../plan/chapter-briefs');
-      return getRollingBriefsContext(projectId, chapterNumber).catch(() => null);
+      return getRollingBriefsContext(projectId, chapterNumber).catch(loaderFail('rolling_briefs'));
     })() || undefined,
     storyOutline: storyOutline || undefined,
     setupKernel,

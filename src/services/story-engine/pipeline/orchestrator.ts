@@ -27,6 +27,8 @@ import { defaultLengthSpec, chooseNormalizeMode } from '../utils/length-metrics'
 import { polishChapter } from './polisher';
 import { runPostWriteValidator } from '../quality/post-write-validator';
 import { runContinuityGuardian } from '../quality/continuity-guardian';
+import { runContinuityGuardianFast } from '../quality/continuity-guardian-fast';
+import { buildCorrectiveDirective } from '../quality/corrective-directive';
 import { buildPlotThreadContext, extractAndUpdatePlotThreads } from '../state/plot-threads';
 import { buildBeatContext, detectAndRecordBeats } from '../memory/beat-ledger';
 import { buildRuleContext, extractRulesFromChapter } from '../canon/world-rules';
@@ -670,21 +672,28 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     const { getCharacterBibleContext } = await import('../memory/character-bibles');
     const { getVolumeSummaryContext } = await import('../memory/volume-summaries');
     const { getGeographyContext } = await import('../state/geography');
+    const { logLoaderFailure } = await import('../utils/retry-queue');
     const subGenres = context.subGenres || [];
+    // Telemetry: a failed loader silently strips its guidance from the Architect/Writer.
+    // Record (don't block — empty fallback is valid) so the audit dashboard sees drift.
+    const onLoaderFail = (name: string) => (e: unknown) => {
+      logLoaderFailure(project.id, nextChapter, name, e);
+      return null;
+    };
 
     const [foreshadowCtx, charArcCtx, pacingCtx, voiceCtx, powerCtx, worldCtx, knowledgeCtx, relationshipCtx, economicCtx, bibleCtx, volSummaryCtx, geoCtx] = await Promise.all([
-      getForeshadowingContext(project.id, nextChapter).catch(() => null),
-      getCharacterArcContext(project.id, nextChapter, context.knownCharacterNames).catch(() => null),
-      getChapterPacingContext(project.id, nextChapter).catch(() => null),
-      getVoiceContext(project.id).catch(() => null),
-      getPowerContext(project.id, genre).catch(() => null),
-      getWorldContext(project.id, nextChapter).catch(() => null),
-      getCharacterKnowledgeContext(project.id, nextChapter, context.knownCharacterNames).catch(() => null),
-      getRelationshipContext(project.id, context.knownCharacterNames).catch(() => null),
-      getEconomicContext(project.id, genre, subGenres).catch(() => null),
-      getCharacterBibleContext(project.id, nextChapter).catch(() => null),
-      getVolumeSummaryContext(project.id, nextChapter).catch(() => null),
-      getGeographyContext(project.id, nextChapter, protagonistName).catch(() => null),
+      getForeshadowingContext(project.id, nextChapter).catch(onLoaderFail('foreshadowing')),
+      getCharacterArcContext(project.id, nextChapter, context.knownCharacterNames).catch(onLoaderFail('character_arc')),
+      getChapterPacingContext(project.id, nextChapter).catch(onLoaderFail('pacing')),
+      getVoiceContext(project.id).catch(onLoaderFail('voice')),
+      getPowerContext(project.id, genre).catch(onLoaderFail('power')),
+      getWorldContext(project.id, nextChapter).catch(onLoaderFail('world')),
+      getCharacterKnowledgeContext(project.id, nextChapter, context.knownCharacterNames).catch(onLoaderFail('character_knowledge')),
+      getRelationshipContext(project.id, context.knownCharacterNames).catch(onLoaderFail('relationship')),
+      getEconomicContext(project.id, genre, subGenres).catch(onLoaderFail('economic')),
+      getCharacterBibleContext(project.id, nextChapter).catch(onLoaderFail('character_bible')),
+      getVolumeSummaryContext(project.id, nextChapter).catch(onLoaderFail('volume_summary')),
+      getGeographyContext(project.id, nextChapter, protagonistName).catch(onLoaderFail('geography')),
     ]);
 
     // Smart truncation: per-module budgets
@@ -724,6 +733,16 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   }
 
   // ── Step 2e: Inject progressive finale wind-down ───────────────────────
+  // ── Step 2e': Corrective feedback from previous chapter (Goal 5) ───────
+  // Deterministic, no AI call. If the previous chapter scored low / had
+  // critical continuity issues / drifted, name the weak dimension(s) so the
+  // Architect + Writer self-correct instead of letting a dip persist.
+  const correctiveDirective = await buildCorrectiveDirective(project.id, nextChapter - 1)
+    .catch(() => '');
+  if (correctiveDirective) {
+    context.ragContext = (context.ragContext || '') + '\n\n' + correctiveDirective;
+  }
+
   const finaleContext = buildFinaleContext(nextChapter, totalPlanned);
   if (finaleContext) {
     context.ragContext = (context.ragContext || '') + '\n\n' + finaleContext;
@@ -932,7 +951,12 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   const aiWriteCountPre = Math.ceil(lastChapterNumberPre / SPLIT_PARTS_PRE);
   const skipGuardianPre = aiWriteCountPre % 2 !== 0;
   const guardianPre = skipGuardianPre
-    ? { issues: [], contradictions: [] }
+    ? await runContinuityGuardianFast(
+        project.id, lastChapterNumberPre, result.content,
+      ).catch((e) => {
+        console.warn('[Orchestrator] Pre-save fast continuity guardian failed:', e instanceof Error ? e.message : String(e));
+        return { issues: [], contradictions: [] };
+      })
     : await runContinuityGuardian(
         project.id, lastChapterNumberPre, result.title, result.content, charactersPre, geminiConfig,
       ).catch((e) => {
@@ -1338,32 +1362,32 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
             project.id, partCh, part.content,
             charsForThisPart.map(c => ({ character_name: c.character_name, location: c.location })),
           );
-        })().catch((e) => console.warn(`[Orchestrator] Geography timeline failed for Ch.${partCh}:`, e instanceof Error ? e.message : String(e))),
+        })().catch(e => recordTaskFailure(db, project.id, novel.id, partCh, 'task_15b_geography', e)),
       ] : []),
 
       // Task 15d (Phase 27 W2.2): Story timeline — chapter ↔ in-world date.
       (async () => {
         const { recordChapterTime } = await import('../state/timeline');
         return recordChapterTime(project.id, partCh, part.content, protagonistName, geminiConfig);
-      })().catch((e) => console.warn(`[Orchestrator] Timeline record failed for Ch.${partCh}:`, e instanceof Error ? e.message : String(e))),
+      })().catch(e => recordTaskFailure(db, project.id, novel.id, partCh, 'task_15d_timeline', e)),
 
       // Task 15e (Phase 27 W2.3): Item events — picked/used/lost/equipped.
       (async () => {
         const { recordItemEvents } = await import('../state/item-inventory');
         return recordItemEvents(project.id, partCh, part.content, characters, geminiConfig);
-      })().catch((e) => console.warn(`[Orchestrator] Item events failed for Ch.${partCh}:`, e instanceof Error ? e.message : String(e))),
+      })().catch(e => recordTaskFailure(db, project.id, novel.id, partCh, 'task_15e_item_events', e)),
 
       // Task 15g (Phase 27 W3.1): Auto-advance plot twist statuses (planned → seeding → imminent → revealed).
       (async () => {
         const { advanceTwistStatuses } = await import('../plan/plot-twists');
         return advanceTwistStatuses(project.id, partCh);
-      })().catch((e) => console.warn(`[Orchestrator] Twist status advance failed for Ch.${partCh}:`, e instanceof Error ? e.message : String(e))),
+      })().catch(e => recordTaskFailure(db, project.id, novel.id, partCh, 'task_15g_twist_advance', e)),
 
       // Task 15h (Phase 27 W3.2): Theme reinforcement detection.
       (async () => {
         const { detectThemeReinforcement } = await import('../plan/themes');
         return detectThemeReinforcement(project.id, partCh, part.content, geminiConfig);
-      })().catch((e) => console.warn(`[Orchestrator] Theme reinforcement failed for Ch.${partCh}:`, e instanceof Error ? e.message : String(e))),
+      })().catch(e => recordTaskFailure(db, project.id, novel.id, partCh, 'task_15h_theme_reinforcement', e)),
     ]);
 
     // Task 16b: published-chapter quality metrics + canary. This must run per
