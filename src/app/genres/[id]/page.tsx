@@ -1,12 +1,15 @@
-"use client";
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import Image from 'next/image';
+import { supabase } from '@/integrations/supabase/client';
+import { unstable_cache } from 'next/cache';
+import { getGenreLabel, getGenreIcon } from '@/lib/utils/genre';
+import { AdPlacement } from '@/components/ads/AdPlacement';
 
-import React from "react";
-import { useParams } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
-import { supabase } from "@/integrations/supabase/client";
-import { getGenreLabel, getGenreIcon } from "@/lib/utils/genre";
-import { AdPlacement } from "@/components/ads/AdPlacement";
+// ISR: public genre listing. Wrapped in unstable_cache (supabase-js fetches are
+// no-store under Next 15) + cookieless anon client so the route can be cached and
+// the listing renders in the initial HTML (crawlable, no skeleton flash).
+export const revalidate = 300;
 
 type Novel = {
   id: string;
@@ -17,34 +20,44 @@ type Novel = {
   genres: string[] | null;
 };
 
-export default function GenrePage() {
-  const params = useParams<{ id: string }>();
-  const genreId = decodeURIComponent(params.id);
-  const [novels, setNovels] = React.useState<Novel[]>([]);
-  const [loading, setLoading] = React.useState(true);
+const fetchGenreNovels = unstable_cache(
+  async (genreId: string): Promise<Novel[]> => {
+    const { data } = await supabase
+      .from('novels')
+      .select('id,slug,title,author,cover_url,genres')
+      .contains('genres', [genreId])
+      .order('updated_at', { ascending: false })
+      .limit(200);
+    return (data as Novel[] | null) ?? [];
+  },
+  ['genre-detail-novels'],
+  { revalidate: 300 },
+);
 
-  React.useEffect(() => {
-    let isMounted = true;
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const genreId = decodeURIComponent(id);
+  const label = getGenreLabel(genreId);
+  const title = `Truyện ${label}`;
+  return {
+    title,
+    description: `Đọc truyện thể loại ${label} mới nhất, cập nhật liên tục trên TruyenCity.`,
+    alternates: { canonical: `/genres/${genreId}` },
+  };
+}
 
-    (async () => {
-      const { data, error } = await supabase
-        .from("novels")
-        .select("id,slug,title,author,cover_url,genres")
-        .contains("genres", [genreId])
-        .order("updated_at", { ascending: false })
-        .limit(200);
-
-      if (!isMounted) return;
-      if (!error) {
-        setNovels((data as Novel[]) || []);
-      }
-      setLoading(false);
-    })();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [genreId]);
+export default async function GenrePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const genreId = decodeURIComponent(id);
+  const novels = await fetchGenreNovels(genreId);
 
   return (
     <div className="container mx-auto px-4 py-6">
@@ -52,9 +65,7 @@ export default function GenrePage() {
         {getGenreIcon(genreId)} Thể loại: {getGenreLabel(genreId)}
       </h1>
 
-      {loading ? (
-        <p>Đang tải...</p>
-      ) : novels.length === 0 ? (
+      {novels.length === 0 ? (
         <p>Chưa có truyện nào cho thể loại này.</p>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">

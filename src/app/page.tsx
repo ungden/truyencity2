@@ -44,8 +44,11 @@ export default async function HomePage() {
   const supabase = await createServerClient();
 
   // Only select columns needed for display — avoids fetching large text fields
-  // (description, master_outline, story_outline, story_bible) that can be 10-50KB each
-  const NOVEL_LIST_COLS = 'id,slug,title,author,cover_url,status,genres,total_chapters,updated_at,created_at,description';
+  // (description, master_outline, story_outline, story_bible) that can be 10-50KB each.
+  // `description` is dropped from list cols (cards/carousels never read it) and kept
+  // ONLY on the featured query, since the hero is the sole consumer (line ~136).
+  const NOVEL_LIST_COLS = 'id,slug,title,author,cover_url,status,genres,total_chapters,updated_at,created_at';
+  const FEATURED_COLS = `${NOVEL_LIST_COLS},description`;
 
   // Parallel fetch all data
   const [latestResult, newestResult, featuredResult, tienHiepResult, doThiResult] = await Promise.all([
@@ -61,10 +64,10 @@ export default async function HomePage() {
       .select(NOVEL_LIST_COLS)
       .order('created_at', { ascending: false })
       .limit(12),
-    // Featured: novels with covers, most chapters
+    // Featured: novels with covers, most chapters (carries `description` for the hero)
     supabase
       .from('novels')
-      .select(NOVEL_LIST_COLS)
+      .select(FEATURED_COLS)
       .not('cover_url', 'is', null)
       .order('updated_at', { ascending: false })
       .limit(10),

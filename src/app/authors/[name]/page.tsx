@@ -1,16 +1,21 @@
-"use client";
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { supabase } from '@/integrations/supabase/client';
+import { unstable_cache } from 'next/cache';
+import { Header } from '@/components/header';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { NovelCard } from '@/components/novel-card';
+import { User, BookOpen } from 'lucide-react';
+import { GENRE_CONFIG } from '@/lib/types/genre-config';
+import { AdPlacement } from '@/components/ads/AdPlacement';
 
-import React, { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import { supabase } from "@/integrations/supabase/client";
-import { Header } from "@/components/header";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { NovelCard } from "@/components/novel-card";
-import { Loader2, User, BookOpen } from "lucide-react";
-import { GENRE_CONFIG } from "@/lib/types/genre-config";
-import { AdPlacement } from "@/components/ads/AdPlacement";
+// ISR: public author page. Wrapped in unstable_cache (supabase-js fetches are
+// no-store under Next 15) + cookieless anon client so it renders in the initial
+// HTML (crawlable, no loader spinner). notFound() is called by the page body, not
+// inside the cache (unstable_cache cannot contain dynamic functions).
+export const revalidate = 300;
 
 type AuthorDetails = {
   id: string;
@@ -26,90 +31,69 @@ type NovelBrief = {
   author: string | null;
   cover_url: string | null;
   status: string | null;
-  rating?: number;
-  views?: number;
 };
 
-export default function AuthorPage() {
-  const params = useParams<{ name: string }>();
-  const authorName = decodeURIComponent(params.name);
+const fetchAuthorPage = unstable_cache(
+  async (
+    authorName: string,
+  ): Promise<{ author: AuthorDetails | null; novels: NovelBrief[] }> => {
+    const { data: authorData } = await supabase
+      .from('ai_authors')
+      .select('id, name, bio, avatar_url, specialized_genres')
+      .eq('name', authorName)
+      .maybeSingle();
 
-  const [author, setAuthor] = useState<AuthorDetails | null>(null);
-  const [novels, setNovels] = useState<NovelBrief[]>([]);
-  const [loading, setLoading] = useState(true);
+    if (!authorData) {
+      return { author: null, novels: [] };
+    }
 
-  useEffect(() => {
-    if (!authorName) return;
+    const { data: novelData } = await supabase
+      .from('novels')
+      .select('id, title, author, cover_url, status')
+      .eq('author', authorName)
+      .order('updated_at', { ascending: false })
+      .limit(100);
 
-    let isMounted = true;
-    setLoading(true);
-
-    const fetchData = async () => {
-      // Fetch author details
-      const { data: authorData, error: authorError } = await supabase
-        .from("ai_authors")
-        .select("id, name, bio, avatar_url, specialized_genres")
-        .eq("name", authorName)
-        .single();
-
-      if (!isMounted) return;
-      if (authorError || !authorData) {
-        console.error("Error fetching author:", authorError);
-        setLoading(false);
-        return;
-      }
-      setAuthor(authorData as AuthorDetails);
-
-      // Fetch novels by this author (with limit to prevent unbounded queries)
-      const { data: novelData, error: novelError } = await supabase
-        .from("novels")
-        .select("id, title, author, cover_url, status")
-        .eq("author", authorName)
-        .order("updated_at", { ascending: false })
-        .limit(100);
-      
-      if (!isMounted) return;
-      if (novelError) {
-        console.error("Error fetching novels:", novelError);
-      } else {
-        // Skip individual RPC calls per novel — the list view doesn't critically need
-        // per-novel stats. This eliminates N+1 RPC calls (was 1 call per novel).
-        setNovels((novelData || []) as NovelBrief[]);
-      }
-      
-      setLoading(false);
+    return {
+      author: authorData as AuthorDetails,
+      novels: (novelData as NovelBrief[] | null) ?? [],
     };
+  },
+  ['author-page'],
+  { revalidate: 300 },
+);
 
-    fetchData();
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ name: string }>;
+}): Promise<Metadata> {
+  const { name } = await params;
+  const authorName = decodeURIComponent(name);
+  return {
+    title: `Tác giả ${authorName}`,
+    description: `Các tác phẩm của tác giả ${authorName} trên TruyenCity.`,
+    alternates: { canonical: `/authors/${encodeURIComponent(authorName)}` },
+  };
+}
 
-    return () => {
-      isMounted = false;
-    };
-  }, [authorName]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
-      </div>
-    );
-  }
+export default async function AuthorPage({
+  params,
+}: {
+  params: Promise<{ name: string }>;
+}) {
+  const { name } = await params;
+  const authorName = decodeURIComponent(name);
+  const { author, novels } = await fetchAuthorPage(authorName);
 
   if (!author) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header title="Không tìm thấy tác giả" showBack />
-        <main className="px-4 py-6 text-center">
-          <p className="text-muted-foreground">Không thể tìm thấy thông tin cho tác giả "{authorName}".</p>
-        </main>
-      </div>
-    );
+    notFound();
   }
 
   return (
     <div className="min-h-screen bg-background">
       <Header title="Tác giả" showBack />
-      
+
       <main className="px-4 py-6 space-y-6">
         <Card className="p-6">
           <div className="flex flex-col sm:flex-row items-center gap-6">
@@ -119,7 +103,7 @@ export default function AuthorPage() {
                 <User size={40} />
               </AvatarFallback>
             </Avatar>
-            
+
             <div className="flex-1 text-center sm:text-left">
               <h1 className="text-2xl font-bold">{author.name}</h1>
               {author.bio && (
@@ -162,8 +146,6 @@ export default function AuthorPage() {
                     title={novel.title}
                     author={novel.author || 'N/A'}
                     cover={novel.cover_url || ''}
-                    rating={novel.rating}
-                    views={novel.views}
                     status={novel.status || 'Đang ra'}
                   />
                 ))}

@@ -3,7 +3,8 @@ import Link from 'next/link';
 import { Header } from '@/components/header';
 import { Card } from '@/components/ui/card';
 import { GENRE_CONFIG } from '@/lib/types/genre-config';
-import { createServerClient } from '@/integrations/supabase/server';
+import { supabase } from '@/integrations/supabase/client';
+import { unstable_cache } from 'next/cache';
 import { AdPlacement } from '@/components/ads/AdPlacement';
 
 export const metadata: Metadata = {
@@ -12,28 +13,37 @@ export const metadata: Metadata = {
   alternates: { canonical: "/genres" },
 };
 
-export const dynamic = 'force-dynamic';
+// ISR: genre counts change slowly. Wrapped in unstable_cache because supabase-js
+// fetches are no-store under Next 15 and would otherwise force dynamic rendering.
+// Cookieless anon client keeps the route statically generatable.
+export const revalidate = 3600;
 
-export default async function GenresPage() {
-  const supabase = await createServerClient();
+// TODO: Replace with DB-level RPC `get_genre_counts()` when novel count exceeds 10K
+const getGenreCounts = unstable_cache(
+  async (): Promise<Record<string, number>> => {
+    const { data: novels } = await supabase
+      .from('novels')
+      .select('genres')
+      .not('genres', 'is', null)
+      .limit(10000);
 
-  // Get count per genre — only select genres column, cap at 10K rows
-  // TODO: Replace with DB-level RPC `get_genre_counts()` when novel count exceeds 10K
-  const { data: novels } = await supabase
-    .from('novels')
-    .select('genres')
-    .not('genres', 'is', null)
-    .limit(10000);
-
-  const genreCounts: Record<string, number> = {};
-  for (const n of novels || []) {
-    const genres = n.genres as string[] | null;
-    if (genres) {
-      for (const g of genres) {
-        genreCounts[g] = (genreCounts[g] || 0) + 1;
+    const counts: Record<string, number> = {};
+    for (const n of novels || []) {
+      const genres = n.genres as string[] | null;
+      if (genres) {
+        for (const g of genres) {
+          counts[g] = (counts[g] || 0) + 1;
+        }
       }
     }
-  }
+    return counts;
+  },
+  ['genre-counts'],
+  { revalidate: 3600 },
+);
+
+export default async function GenresPage() {
+  const genreCounts = await getGenreCounts();
 
   const genres = Object.entries(GENRE_CONFIG).map(([key, config]) => ({
     id: key,
