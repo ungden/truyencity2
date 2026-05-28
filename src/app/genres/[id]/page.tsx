@@ -4,12 +4,18 @@ import Image from 'next/image';
 import { supabase } from '@/integrations/supabase/client';
 import { unstable_cache } from 'next/cache';
 import { getGenreLabel, getGenreIcon } from '@/lib/utils/genre';
+import { GENRE_CONFIG } from '@/lib/types/genre-config';
 import { AdPlacement } from '@/components/ads/AdPlacement';
 
 // ISR: public genre listing. Wrapped in unstable_cache (supabase-js fetches are
 // no-store under Next 15) + cookieless anon client so the route can be cached and
 // the listing renders in the initial HTML (crawlable, no skeleton flash).
 export const revalidate = 300;
+
+// Prerender every known genre at build so the route is full-page ISR, not on-demand.
+export function generateStaticParams() {
+  return Object.keys(GENRE_CONFIG).map((id) => ({ id }));
+}
 
 type Novel = {
   id: string;

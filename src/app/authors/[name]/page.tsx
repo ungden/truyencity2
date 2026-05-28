@@ -17,6 +17,11 @@ import { AdPlacement } from '@/components/ads/AdPlacement';
 // inside the cache (unstable_cache cannot contain dynamic functions).
 export const revalidate = 300;
 
+// Author set is unbounded; emit none at build and ISR-cache each page on first hit.
+export function generateStaticParams() {
+  return [];
+}
+
 type AuthorDetails = {
   id: string;
   name: string;
