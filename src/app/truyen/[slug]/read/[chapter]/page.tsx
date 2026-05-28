@@ -1,40 +1,50 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { createServerClient } from '@/integrations/supabase/server';
+import { supabase } from '@/integrations/supabase/client';
+import { unstable_cache } from 'next/cache';
 import ReadingPageClient from './reading-page-client';
 
-export const dynamic = 'force-dynamic';
+// ISR: cache rendered chapter pages for 5 minutes. Metadata reads use the
+// cookieless anon client so the route can be statically generated (the SSR
+// cookie client would force dynamic rendering and defeat caching). All
+// personalized reader state is fetched client-side in ReadingPageClient.
+export const revalidate = 300;
 
 type PageParams = {
   slug: string;
   chapter: string;
 };
 
-async function getReaderMetadata(slug: string, chapterNumber: number) {
-  const supabase = await createServerClient();
+// Wrapped in unstable_cache: supabase-js fetches are no-store under Next 15, so
+// without this the metadata reads re-run on every request and force the route
+// dynamic. Cached 5 min, matching the page-level revalidate. Public data only.
+const getReaderMetadata = unstable_cache(
+  async (slug: string, chapterNumber: number) => {
+    const { data: novel } = await supabase
+      .from('novels')
+      .select('id, title, author, slug')
+      .eq('slug', slug)
+      .maybeSingle();
 
-  const { data: novel } = await supabase
-    .from('novels')
-    .select('id, title, author, slug')
-    .eq('slug', slug)
-    .maybeSingle();
+    if (!novel) {
+      return null;
+    }
 
-  if (!novel) {
-    return null;
-  }
+    const { data: chapter } = await supabase
+      .from('chapters')
+      .select('title, chapter_number')
+      .eq('novel_id', novel.id)
+      .eq('chapter_number', chapterNumber)
+      .maybeSingle();
 
-  const { data: chapter } = await supabase
-    .from('chapters')
-    .select('title, chapter_number')
-    .eq('novel_id', novel.id)
-    .eq('chapter_number', chapterNumber)
-    .maybeSingle();
-
-  return {
-    novel,
-    chapter,
-  };
-}
+    return {
+      novel,
+      chapter,
+    };
+  },
+  ['reader-metadata'],
+  { revalidate: 300 },
+);
 
 export async function generateMetadata({
   params,

@@ -14,7 +14,8 @@ import {
   ChevronRight,
   Bookmark,
 } from 'lucide-react';
-import { createServerClient } from '@/integrations/supabase/server';
+import { supabase } from '@/integrations/supabase/client';
+import { unstable_cache } from 'next/cache';
 import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
 import { GENRE_CONFIG, type Topic } from '@/lib/types/genre-config';
@@ -32,42 +33,68 @@ import { cleanNovelDescription } from '@/lib/utils';
 import { BookJsonLd, BreadcrumbJsonLd } from '@/components/seo/JsonLd';
 import type { Metadata } from 'next';
 
-export const dynamic = 'force-dynamic';
+// ISR: cache the rendered page for 5 minutes. Public reads use the cookieless
+// anon client below so the route can be statically generated (touching cookies
+// via the SSR client would force dynamic rendering and defeat this).
+export const revalidate = 300;
 
-// Helper: lookup novel by slug (or fallback to UUID for backwards compat)
-async function getNovelBySlug(slug: string) {
-  const supabase = await createServerClient();
+// Only select columns needed for the detail page — skip large internal fields
+// (master_outline, story_outline, story_bible can be 10-50KB each)
+const NOVEL_DETAIL_COLS = 'id,slug,title,author,cover_url,status,genres,total_chapters,updated_at,created_at,description';
 
-  // Only select columns needed for the detail page — skip large internal fields
-  // (master_outline, story_outline, story_bible can be 10-50KB each)
-  const NOVEL_DETAIL_COLS = 'id,slug,title,author,cover_url,status,genres,total_chapters,updated_at,created_at,description';
-
-  // Try slug first
-  const { data: novel, error } = await supabase
-    .from('novels')
-    .select(`${NOVEL_DETAIL_COLS}, chapters(id, title, chapter_number)`)
-    .eq('slug', slug)
-    .single();
-
-  if (!error && novel) return novel;
-
-  // Fallback: if slug looks like a UUID, try by id
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  if (uuidRegex.test(slug)) {
-    const { data: novelById } = await supabase
+// Pure data fetch, wrapped in unstable_cache so the DB read is cached for 5
+// minutes in the shared data cache. supabase-js issues a plain fetch which
+// Next 15 treats as no-store; without this wrapper every request to a popular
+// novel would re-run the query. Returns data only — redirect/notFound are
+// dynamic functions and must be called by the caller, not inside the cache.
+const fetchNovelBySlug = unstable_cache(
+  async (slug: string) => {
+    const { data: novel } = await supabase
       .from('novels')
       .select(`${NOVEL_DETAIL_COLS}, chapters(id, title, chapter_number)`)
-      .eq('id', slug)
+      .eq('slug', slug)
       .single();
 
-    if (novelById) {
-      // Redirect to canonical slug URL
-      redirect(`/truyen/${novelById.slug}`);
-    }
-  }
+    if (novel) return { novel, matchedById: false as const };
 
-  return null;
-}
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (uuidRegex.test(slug)) {
+      const { data: novelById } = await supabase
+        .from('novels')
+        .select(`${NOVEL_DETAIL_COLS}, chapters(id, title, chapter_number)`)
+        .eq('id', slug)
+        .single();
+
+      if (novelById) return { novel: novelById, matchedById: true as const };
+    }
+
+    return { novel: null, matchedById: false as const };
+  },
+  ['novel-detail-by-slug'],
+  { revalidate: 300 },
+);
+
+const fetchNovelStats = unstable_cache(
+  async (novelId: string) => {
+    const { data } = await supabase.rpc('get_novel_stats', { p_novel_id: novelId });
+    return data ?? null;
+  },
+  ['novel-detail-stats'],
+  { revalidate: 300 },
+);
+
+const fetchNovelMeta = unstable_cache(
+  async (slug: string) => {
+    const { data } = await supabase
+      .from('novels')
+      .select('title, description, author, cover_url, genres')
+      .eq('slug', slug)
+      .single();
+    return data ?? null;
+  },
+  ['novel-detail-meta'],
+  { revalidate: 300 },
+);
 
 // SEO: generateMetadata
 export async function generateMetadata({
@@ -76,13 +103,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const supabase = await createServerClient();
 
-  const { data: novel } = await supabase
-    .from('novels')
-    .select('title, description, author, cover_url, genres')
-    .eq('slug', slug)
-    .single();
+  const novel = await fetchNovelMeta(slug);
 
   if (!novel) {
     return { title: 'Truyện không tồn tại - TruyenCity' };
@@ -118,8 +140,11 @@ export default async function NovelDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const novel = await getNovelBySlug(slug);
+  const { novel, matchedById } = await fetchNovelBySlug(slug);
 
+  if (matchedById && novel) {
+    redirect(`/truyen/${novel.slug}`);
+  }
   if (!novel) {
     notFound();
   }
@@ -127,11 +152,8 @@ export default async function NovelDetailPage({
   const chapters = Array.isArray(novel.chapters) ? novel.chapters : [];
   const chapterCount = chapters.length;
 
-  // Get stats from database
-  const supabase = await createServerClient();
-  
   // Fetch all stats via single DB RPC call (views, bookmarks, ratings, comments, chapters)
-  const { data: statsData } = await supabase.rpc('get_novel_stats', { p_novel_id: novel.id });
+  const statsData = await fetchNovelStats(novel.id);
   const stats = statsData ? (typeof statsData === 'string' ? JSON.parse(statsData) : statsData) : null;
   const totalViews = stats?.view_count ?? 0;
   const totalBookmarks = stats?.bookmark_count ?? 0;

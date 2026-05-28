@@ -72,6 +72,10 @@ export default function ReadingPageClient({ novelSlug, chapterNumber }: ReadingP
   const [novelId, setNovelId] = useState<string>('');
   const [currentChapter, setCurrentChapter] = useState<Chapter | null>(null);
   const [allChapters, setAllChapters] = useState<ChapterListItem[]>([]);
+  // Total comes from novels.chapter_count (one denormalized int) so prev/next
+  // gating, the "x / N" count, and the app-lock window all work the moment the
+  // chapter loads — without waiting on the full chapter-list fetch below.
+  const [totalChapters, setTotalChapters] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [novelTitle, setNovelTitle] = useState<string>('');
@@ -112,11 +116,13 @@ export default function ReadingPageClient({ novelSlug, chapterNumber }: ReadingP
         setNovelTitle(novelData.title);
         setIsBookmarked(bookmarks.includes(novelData.id));
 
+        const totalCount = (novelData.chapter_count as number) || 0;
+        setTotalChapters(totalCount);
+
         // App lock pre-check: don't fetch content if chapter is in last N
         // window. Web users see <AppLockGate> stub instead. Prevents content
         // leaking through DevTools/network tab even though render is gated.
         // Mobile native app uses its own supabase client and bypasses this.
-        const totalCount = (novelData.chapter_count as number) || 0;
         const isLocked = totalCount > APP_LOCK_WINDOW
           && chapterNumber > totalCount - APP_LOCK_WINDOW;
 
@@ -140,21 +146,6 @@ export default function ReadingPageClient({ novelSlug, chapterNumber }: ReadingP
         }
 
         setCurrentChapter(chapterData as unknown as Chapter);
-
-        const { data: chaptersList, error: listError } = await supabase
-          .from('chapters')
-          .select('id, title, chapter_number')
-          .eq('novel_id', novelData.id)
-          .order('chapter_number', { ascending: true });
-
-        if (listError) throw new Error('Không thể tải danh sách chương.');
-
-        const formattedChapters = (chaptersList || []).map((c) => ({
-          id: c.id,
-          title: c.title,
-          chapterNumber: c.chapter_number,
-        }));
-        setAllChapters(formattedChapters);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -164,6 +155,36 @@ export default function ReadingPageClient({ novelSlug, chapterNumber }: ReadingP
 
     void fetchData();
   }, [novelSlug, chapterNumber, bookmarks]);
+
+  // Chapter list for the sidebar/drawer jump-to UI. Keyed on novelId only, so
+  // it runs ONCE per novel instead of refetching the full (1000+ row) list on
+  // every chapter navigation. Non-blocking: the reader renders from
+  // currentChapter + totalChapters above; the list just populates the jump UI.
+  useEffect(() => {
+    if (!novelId) return;
+    let cancelled = false;
+
+    void (async () => {
+      const { data: chaptersList } = await supabase
+        .from('chapters')
+        .select('id, title, chapter_number')
+        .eq('novel_id', novelId)
+        .order('chapter_number', { ascending: true });
+
+      if (cancelled) return;
+
+      const formattedChapters = (chaptersList || []).map((c) => ({
+        id: c.id,
+        title: c.title,
+        chapterNumber: c.chapter_number,
+      }));
+      setAllChapters(formattedChapters);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [novelId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -205,14 +226,14 @@ export default function ReadingPageClient({ novelSlug, chapterNumber }: ReadingP
 
       if (e.key === 'ArrowLeft' && chapterNumber > 1) {
         handlePrevChapter();
-      } else if (e.key === 'ArrowRight' && chapterNumber < allChapters.length) {
+      } else if (e.key === 'ArrowRight' && chapterNumber < totalChapters) {
         handleNextChapter();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [chapterNumber, allChapters.length]);
+  }, [chapterNumber, totalChapters]);
 
   const toggleFullscreen = useCallback(() => {
     if (!document.fullscreenElement) {
@@ -371,7 +392,7 @@ export default function ReadingPageClient({ novelSlug, chapterNumber }: ReadingP
   };
 
   const handleNextChapter = () => {
-    if (chapterNumber < allChapters.length) {
+    if (chapterNumber < totalChapters) {
       router.push(`/truyen/${novelSlug}/read/${chapterNumber + 1}`);
       window.scrollTo({ top: 0 });
     }
@@ -465,13 +486,12 @@ export default function ReadingPageClient({ novelSlug, chapterNumber }: ReadingP
             {currentChapter.title}
           </h1>
           <p className="text-sm opacity-75 font-medium">
-            Chương {currentChapter.chapter_number} / {allChapters.length}
+            Chương {currentChapter.chapter_number} / {totalChapters}
           </p>
         </div>
 
         {/* App lock gate: latest N chapters of every novel locked on web. */}
         {(() => {
-          const totalChapters = allChapters.length;
           const isLocked = totalChapters > APP_LOCK_WINDOW
             && currentChapter.chapter_number > totalChapters - APP_LOCK_WINDOW;
           if (isLocked) {
@@ -529,15 +549,15 @@ export default function ReadingPageClient({ novelSlug, chapterNumber }: ReadingP
           </button>
 
           <span className="text-sm opacity-75 font-medium">
-            {chapterNumber} / {allChapters.length}
+            {chapterNumber} / {totalChapters}
           </span>
 
           <button
             onClick={handleNextChapter}
-            disabled={chapterNumber >= allChapters.length}
+            disabled={chapterNumber >= totalChapters}
             className={cn(
               'px-4 py-2 rounded-lg transition-colors',
-              chapterNumber >= allChapters.length ? 'opacity-50 cursor-not-allowed' : settings.theme === 'sepia' ? 'hover:bg-[#eadfcb]' : 'hover:bg-accent'
+              chapterNumber >= totalChapters ? 'opacity-50 cursor-not-allowed' : settings.theme === 'sepia' ? 'hover:bg-[#eadfcb]' : 'hover:bg-accent'
             )}
           >
             Chương sau &rarr;
@@ -561,7 +581,7 @@ export default function ReadingPageClient({ novelSlug, chapterNumber }: ReadingP
             novelTitle={novelTitle}
             theme={settings.theme}
             currentChapter={chapterNumber}
-            totalChapters={allChapters.length}
+            totalChapters={totalChapters}
             chapters={allChapters}
             onChapterSelect={handleChapterSelect}
             onPrevChapter={handlePrevChapter}
@@ -578,7 +598,7 @@ export default function ReadingPageClient({ novelSlug, chapterNumber }: ReadingP
               chapterTitle={currentChapter.title}
               theme={settings.theme}
               currentChapter={chapterNumber}
-              totalChapters={allChapters.length}
+              totalChapters={totalChapters}
               onPrevChapter={handlePrevChapter}
               onNextChapter={handleNextChapter}
               onBookmark={handleBookmark}
@@ -600,7 +620,7 @@ export default function ReadingPageClient({ novelSlug, chapterNumber }: ReadingP
 
       <ReadingControls
         currentChapter={chapterNumber}
-        totalChapters={allChapters.length}
+        totalChapters={totalChapters}
         onPrevChapter={handlePrevChapter}
         onNextChapter={handleNextChapter}
         onChapterSelect={handleChapterSelect}
