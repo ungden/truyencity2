@@ -158,6 +158,8 @@ type ProjectRow = {
   writing_style: string | null;
   temperature: number | null;
   target_chapter_length: number | null;
+  power_system_canon?: unknown;
+  worldbuilding_canon?: unknown;
   style_directives?: Record<string, unknown> | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   novels: any;
@@ -923,7 +925,7 @@ export async function GET(request: NextRequest) {
           setup_stage, setup_stage_attempts,
           current_chapter, total_planned_chapters,
           world_description, story_outline, writing_style, temperature,
-          target_chapter_length, style_directives,
+          target_chapter_length, power_system_canon, worldbuilding_canon, style_directives,
           novels!ai_story_projects_novel_id_fkey (id, title)
         `)
         .eq('status', 'active')
@@ -937,7 +939,7 @@ export async function GET(request: NextRequest) {
           setup_stage, setup_stage_attempts,
           current_chapter, total_planned_chapters,
           world_description, story_outline, writing_style, temperature,
-          target_chapter_length, style_directives,
+          target_chapter_length, power_system_canon, worldbuilding_canon, style_directives,
           novels!ai_story_projects_novel_id_fkey (id, title)
         `)
         .eq('status', 'paused')
@@ -1075,6 +1077,18 @@ export async function GET(request: NextRequest) {
         const stage = p.setup_stage || 'idea';
         return stage === 'ready_to_write' || stage === 'writing';
       };
+      // HARD GATE (Track 1, 2026-05-29): chương 1 KHÔNG được viết trừ khi project có
+      // power_system_canon + worldbuilding_canon (đại-thần canon layer) VÀ foundation
+      // review đã PASS. Defends the stale/reset bug (setup_stage='ready_to_write'|'writing'
+      // nhưng canon columns bị wipe sau reset → foundation_review_latest.passed=true cũ
+      // còn sót). Project nào qualify cấu trúc nhưng thiếu canon/passed sẽ bị rewind về
+      // canon_spawn để staged pipeline regen canon + chạy lại foundation review.
+      const hasCanonAndPassedReview = (p: ProjectRow): boolean => {
+        const hasPower = p.power_system_canon != null;
+        const hasWorld = p.worldbuilding_canon != null;
+        const fr = (p.style_directives?.foundation_review_latest as { passed?: boolean } | undefined);
+        return hasPower && hasWorld && fr?.passed === true;
+      };
       const missingKernelReady = initCandidates.filter(p => shouldResetUnwrittenMissingKernel({
         currentChapter: p.current_chapter,
         setupStage: p.setup_stage,
@@ -1099,16 +1113,46 @@ export async function GET(request: NextRequest) {
         )));
       }
       const missingKernelIds = new Set(missingKernelReady.map(p => p.id));
-      initPrepCandidates = initCandidates.filter(p =>
-        !missingKernelIds.has(p.id)
-        && (!hasArcPlan.has(p.id) || !hasFullSetup(p) || !isReadyToWrite(p) || !hasValidSetupKernel(p.story_outline))
-      );
-      initWriteCandidates = initCandidates.filter(p =>
+
+      // Self-heal the stale-ready / wiped-canon case: structurally complete + ready_to_write
+      // (or writing) but missing canon or a passed foundation review. Rewind these to
+      // canon_spawn so the staged pipeline regenerates canon and re-runs foundation review
+      // before any chapter ships. They become init-prep candidates next tick.
+      const staleReadyToHeal = initCandidates.filter(p =>
         !missingKernelIds.has(p.id)
         && hasArcPlan.has(p.id)
         && hasFullSetup(p)
         && isReadyToWrite(p)
         && hasValidSetupKernel(p.story_outline)
+        && !hasCanonAndPassedReview(p)
+      );
+      if (staleReadyToHeal.length > 0) {
+        console.warn(`[Cron] Track1 gate: rewinding ${staleReadyToHeal.length} ready/writing projects missing canon or passed foundation review back to canon_spawn`);
+        await supabase
+          .from('ai_story_projects')
+          .update({
+            setup_stage: 'canon_spawn',
+            setup_stage_attempts: 0,
+            setup_stage_error: 'Track1 gate: missing power_system_canon/worldbuilding_canon or foundation_review not passed — regenerating canon + re-review before chapter 1',
+            setup_stage_updated_at: new Date().toISOString(),
+          })
+          .in('id', staleReadyToHeal.map(p => p.id));
+      }
+      const staleReadyIds = new Set(staleReadyToHeal.map(p => p.id));
+
+      initPrepCandidates = initCandidates.filter(p =>
+        !missingKernelIds.has(p.id)
+        && !staleReadyIds.has(p.id)
+        && (!hasArcPlan.has(p.id) || !hasFullSetup(p) || !isReadyToWrite(p) || !hasValidSetupKernel(p.story_outline))
+      );
+      initWriteCandidates = initCandidates.filter(p =>
+        !missingKernelIds.has(p.id)
+        && !staleReadyIds.has(p.id)
+        && hasArcPlan.has(p.id)
+        && hasFullSetup(p)
+        && isReadyToWrite(p)
+        && hasValidSetupKernel(p.story_outline)
+        && hasCanonAndPassedReview(p)
       );
     }
     initPrepCandidates = [...initPrepCandidates, ...setupOnlyCandidates];
