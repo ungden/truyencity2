@@ -41,6 +41,7 @@ import {
 } from '../templates/genre-setup-playbooks';
 import { getDopaminePatternsByGenre, GENRE_ANTI_CLICHE, GENRE_TITLE_EXAMPLES } from '../templates';
 import { generateMasterOutline } from '../plan/master-outline';
+import { detectOriginContradiction } from '../plan/origin-guard';
 import { generateStoryOutline } from '../plan/story-outline';
 import { generateArcPlan } from '../context/generators';
 import { runTopicPositioning } from '../plan/topic-positioning';
@@ -498,8 +499,10 @@ Trả về JSON:
       "limit": "<giới hạn/cost/cooldown/chống omnipotent>",
       "reward": "<payoff reader thấy được mỗi 1-3 chương>"
     },
+    "mcOrigin": "<CHỐT 1 LẦN — gốc gác MC, mọi stage sau PHẢI tuân: native (người bản địa, KHÔNG xuyên không/trọng sinh) | transmigrator (xuyên không từ thế giới khác) | reincarnated (trọng sinh CÙNG thế giới, giữ ký ức kiếp trước) | system-bestowed (bản địa được Hệ Thống ban tặng, nguồn IN-WORLD) | returnee (bản địa hồi quy)>",
+    "originLockNote": "<1 câu khoá: điều TUYỆT ĐỐI không được mâu thuẫn về gốc gác MC ở master_outline/story_outline>",
     "mcSecret": {
-      "secret": "<trọng sinh/hệ thống/bàn tay vàng/năng lực thật của MC là bí mật gì>",
+      "secret": "<bí mật năng lực MC — PHẢI NHẤT QUÁN với mcOrigin: nếu mcOrigin=native/system-bestowed thì nguồn Hệ Thống/golden finger PHẢI in-world (kỳ ngộ/gia truyền/linh mạch/cổ thư), TUYỆT ĐỐI KHÔNG 'kiếp trước'/'tiền kiếp'/'xuyên không'. Chỉ dùng 'kiếp trước' khi mcOrigin=reincarnated; chỉ dùng 'thế giới khác' khi mcOrigin=transmigrator>",
       "outsideWorldKnowledge": "<người ngoài chỉ được thấy kết quả gì, KHÔNG biết nguồn gốc>",
       "revealRule": "<chỉ reveal muộn khi outline chỉ định rõ; Phase 1-2 tuyệt đối không ai biết>",
       "coverStory": "<vỏ bọc cụ thể trong thế giới thực để giải thích năng lực siêu phàm của MC, vd: sư phụ bí ẩn truyền dạy, ngộ tính thiên tài bộc phát, gia truyền cổ thư>"
@@ -600,6 +603,18 @@ Trả về JSON:
         success: false,
         error: `tự-ngược violations (${violations.length}): ${violations.slice(0, 3).join('; ')}`,
       };
+    }
+
+    // Single-source-of-truth: chốt gốc gác MC ngay tại idea stage. Nếu model bỏ trống
+    // hoặc trả giá trị lạ → default 'native' (an toàn cho sảng văn warm-baseline; engine
+    // đã cấm motif xuyên-không-phế-vật). Đảm bảo DB luôn có canonical mcOrigin để các stage
+    // sau (master_outline/story_outline) tuân theo và origin-guard đối chiếu.
+    const VALID_ORIGINS = ['native', 'transmigrator', 'reincarnated', 'system-bestowed', 'returnee'] as const;
+    if (parsed.setupKernel) {
+      const raw = (parsed.setupKernel.mcOrigin as string | undefined)?.trim() as
+        | (typeof VALID_ORIGINS)[number]
+        | undefined;
+      parsed.setupKernel.mcOrigin = raw && VALID_ORIGINS.includes(raw) ? raw : 'native';
     }
 
     // Stash idea into world_description as a marker until world stage runs
@@ -971,9 +986,18 @@ async function runStageMasterOutline(p: ProjectStageRow): Promise<{ success: boo
       wd.slice(0, 6000),
       p.total_planned_chapters || 1000,
       { ...stageConfig(), model: 'gemini-3.1-flash-lite' },
+      setupKernel,
     );
     if (!outline?.majorArcs?.length && !outline?.volumes?.length) {
       return { success: false, error: 'master_outline generation returned no volumes/majorArcs' };
+    }
+
+    // Fix 3: deterministic origin-consistency guard. Fail-closed nếu master_outline
+    // mâu thuẫn gốc gác MC đã chốt ở idea (vd origin=native nhưng outline nói "xuyên không").
+    // NO FALLBACK — trả lỗi để cron retry stage này ở tick sau.
+    const originIssue = detectOriginContradiction(setupKernel, outline);
+    if (originIssue) {
+      return { success: false, error: `mc_origin_contradiction: ${originIssue}` };
     }
     return { success: true };
   } catch (e) {

@@ -1,7 +1,8 @@
 import { getSupabase } from '../utils/supabase';
 import { callGemini } from '../utils/gemini';
 import { parseJSON } from '../utils/json-repair';
-import type { GeminiConfig, GenreType } from '../types';
+import type { GeminiConfig, GenreType, StoryKernel } from '../types';
+import { buildMcOriginLockBlock } from './origin-guard';
 import { getGenreSetupRequirements, getGenreArchitectGuide } from '../templates/genre-process-blueprints';
 
 /** Sub-arc within a volume — matches the old "majorArc" granularity (~20-30 chapters). */
@@ -146,7 +147,8 @@ export async function generateMasterOutline(
   genre: GenreType,
   synopsis: string,
   totalPlannedChapters: number,
-  config: GeminiConfig
+  config: GeminiConfig,
+  setupKernel?: StoryKernel | null,
 ): Promise<MasterOutline | null> {
   const isProactive = isProactiveGenre(genre);
 
@@ -173,6 +175,19 @@ export async function generateMasterOutline(
   const genreSetup = getGenreSetupRequirements(genre);
   const genreArchGuide = getGenreArchitectGuide(genre);
 
+  // Single source of truth: master_outline PHẢI tuân theo StoryKernel do stage_idea chốt.
+  // Trước đây stage này chỉ nhận world_description → Gemini tự do bịa gốc gác MC (vd "xuyên
+  // không") mâu thuẫn với idea/world. kernelBlock + MC-ORIGIN LOCK khoá điều đó lại.
+  const kernelBlock = setupKernel
+    ? `[STORY KERNEL — NGUỒN QUYẾT ĐỊNH, CHỈ EXPAND KHÔNG REWRITE]
+${JSON.stringify(setupKernel, null, 2)}
+
+Master outline PHẢI map readerFantasy/pleasureLoop/systemMechanic/phase1Playground/noveltyLadder
+vào volume roadmap. KHÔNG đổi engine, KHÔNG đổi MC, KHÔNG đổi gốc gác MC.
+${buildMcOriginLockBlock(setupKernel)}
+`
+    : '';
+
   // Phase 26: volume hierarchy. Recommend 5-15 volumes × 50-150ch each, sub-divided into 4-6 sub-arcs of 20-30ch.
   const targetVolumeCount = Math.max(5, Math.min(15, Math.round(totalPlannedChapters / 100)));
   const targetSubArcsPerVolume = totalPlannedChapters >= 1000 ? '4-6 sub-arcs' : '3-5 sub-arcs';
@@ -186,7 +201,7 @@ ${genreSetup}${genreArchGuide}
 Độ dài dự kiến: ${totalPlannedChapters} chương
 Tóm tắt ý tưởng gốc (Synopsis): ${synopsis}
 
-${goalGuidance}
+${kernelBlock}${goalGuidance}
 
 ╔══════════════════════════════════════════════════════════════════════╗
 ║ ĐẠI THẦN WORKFLOW — VOLUME STRUCTURE (卷宗) cho 1000-chương novels  ║

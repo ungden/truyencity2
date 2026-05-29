@@ -149,6 +149,18 @@ export interface StoryKernel {
     limit: string;
     reward: string;
   };
+  /**
+   * Canonical MC origin — the SINGLE SOURCE OF TRUTH chốt một lần ở stage_idea,
+   * mọi stage sau (master_outline, story_outline, character) PHẢI tuân theo.
+   * - native: người bản địa trong thế giới truyện (KHÔNG xuyên không/trọng sinh/kiếp trước)
+   * - transmigrator: xuyên không từ thế giới khác (vd Trái Đất hiện đại)
+   * - reincarnated: trọng sinh/tái sinh trong CÙNG thế giới (giữ ký ức kiếp trước)
+   * - system-bestowed: bản địa được Hệ Thống/golden finger ban tặng (nguồn in-world)
+   * - returnee: bản địa từng rời đi rồi quay lại (hồi quy), không phải xuyên không
+   */
+  mcOrigin?: 'native' | 'transmigrator' | 'reincarnated' | 'system-bestowed' | 'returnee';
+  /** Ghi chú khoá gốc gác (1 câu): điều TUYỆT ĐỐI không được mâu thuẫn ở các stage sau. */
+  originLockNote?: string;
   /** What must stay secret about rebirth/system/golden finger and when it may reveal. */
   mcSecret: {
     secret: string;
