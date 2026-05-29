@@ -35,24 +35,36 @@ Vi du dung:
 
 ## Critical Rules — AI Models
 
-### Model assignments (post-2026-04-25 swap):
+> ⚠️ **SOURCE OF TRUTH = `src/services/story-engine/utils/model-tier.ts`** (verified 2026-05-29).
+> The legacy "ALL text = deepseek-v4-flash" table below is **STALE** — ignore it. Routing is
+> now PER-TASK, not one model for everything.
 
-| Purpose | Model ID | Provider |
-|---------|----------|----------|
-| **ALL text** (chapters, planning, ideas, authors) | `deepseek-v4-flash` | DeepSeek |
-| **Embeddings** (RAG vector search, 768-dim) | `gemini-embedding-001` | Google |
-| **Cover images** (title + branding, 2K, 3:4) | `gemini-3-pro-image-preview` | Google |
+### ACTUAL per-task routing (model-tier.ts, installed live in write-chapters cron + orchestrator):
+
+| Model | Tasks |
+|---|---|
+| `deepseek-v4-pro` (`MODEL_PRO`) | stage_idea, stage_world, stage_character, story_outline, story_bible, architect, writer, writer_continuation, continuity_guardian, auto_revision |
+| `gemini-3.5-flash` (override) | master_outline, arc_plan, critic |
+| `gemini-3.1-flash-lite` (`MODEL_FLASH`, `_default`) | stage_description + all memory/state extraction tasks |
+| `gemini-embedding-001` | embeddings (RAG, 768-dim) |
+| Codex CLI image tool | covers (Gemini Image hard-disabled; `gemini-3-pro-image-preview` only via `ALLOW_GEMINI_IMAGE=1`) |
+
+**`DEEPSEEK_API_KEY` is a HARD production dependency** — `deepseek.ts` throws if unset and
+there is NO fallback (see BANNED). Confirmed present in Vercel prod (2026-05-29).
+`DISABLE_PRO_TIER=1` reverts everything to all-`gemini-3.1-flash-lite` (A/B baseline).
 
 ### BANNED:
-- Any other DeepSeek model (`-pro`, `-chat`, `-reasoner`) without explicit per-task override
-- Any other text provider (OpenRouter, OpenAI, Anthropic) for production
-- **NO FALLBACKS** — if DeepSeek fails, throw error → cron retries on next tick. Never substitute with templates.
+- Any text provider other than the ones in the routing table above (no OpenRouter/OpenAI/Anthropic) for production
+- **NO FALLBACKS** — if the routed model fails, throw → cron retries on next tick. Never substitute with templates.
 - Existing `gemini-3-flash-preview` references in UI dropdowns are kept as a manual backup option only
 
-### How the swap works:
-- The `callGemini()` function in `src/services/story-engine/utils/gemini.ts` is now a router. If `config.model` starts with `deepseek-`, it dispatches to `callDeepSeek()` (OpenAI-compatible). Otherwise it stays on Gemini.
-- `DEFAULT_CONFIG.model = 'deepseek-v4-flash'` so anywhere the engine doesn't explicitly override the model, DeepSeek is used.
-- Project rows have `ai_model` column — passed through to `geminiConfig.model`. Migration on 2026-04-25 switched all `status='active'` projects from `gemini-3-flash-preview` → `deepseek-v4-flash`.
+### How routing works:
+- `callGemini()` in `utils/gemini.ts` is a router: it first checks `globalThis.__MODEL_ROUTING__` (set by `installModelTierRouting()`), then the model name — anything starting with `deepseek-` dispatches to `callDeepSeek()` (OpenAI-compatible); otherwise Gemini.
+- `installModelTierRouting()` (model-tier.ts) populates `__MODEL_ROUTING__` per the table above. Called at write-chapters/route.ts:597/909 and orchestrator.ts:213.
+- `DEFAULT_CONFIG.model = 'gemini-3.1-flash-lite'`; per-project `ai_model` column overrides it, but per-TASK routing (above) takes precedence when installed.
+
+### LEGACY (superseded — kept for history only):
+- ~~ALL text = `deepseek-v4-flash`; DEFAULT_CONFIG.model = deepseek-v4-flash; 2026-04-25 migration switched active projects to deepseek-v4-flash.~~
 
 ---
 

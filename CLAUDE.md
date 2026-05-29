@@ -1238,16 +1238,35 @@ curl -H "Authorization: Bearer $CRON_SECRET" https://truyencity.com/api/cron/qua
 Branch: `codex/story-production-automation` → PR [#54](https://github.com/ungden/truyencity2/pull/54).
 Commits in order: `9927022 f2a50e8 81f4094 2ab59f7 805eca2 c31b70a 8a6eda6` (+ further work).
 
-### Production model stack — GEMINI ONLY
+### Production model stack
 
-| Tier | Model | Use |
+> ⚠️ **CORRECTION (verified 2026-05-29 against `utils/model-tier.ts` — the running code).**
+> The "GEMINI ONLY / DeepSeek removed" claim below is **STALE**. After Phase Q, per-chapter
+> writing tasks (`architect`, `writer`, `continuity_guardian`, `auto_revision`) and the
+> creative setup stages (`stage_idea/world/character`, `story_outline`, `story_bible`) were
+> routed back to **`deepseek-v4-pro`** in `model-tier.ts` (`MODEL_PRO = 'deepseek-v4-pro'`,
+> installed live in the write-chapters cron at route.ts:597/909 + orchestrator.ts:213).
+> **`DEEPSEEK_API_KEY` is therefore a HARD production dependency** — `deepseek.ts` throws if
+> unset and there is NO fallback, so the core write path 500s without it.
+>
+> **ACTUAL per-task routing (source of truth = `model-tier.ts`):**
+> | Model | Tasks |
+> |---|---|
+> | `deepseek-v4-pro` | stage_idea, stage_world, stage_character, story_outline, story_bible, architect, writer, writer_continuation, continuity_guardian, auto_revision |
+> | `gemini-3.5-flash` | master_outline, arc_plan, critic *(overrides — DeepSeek times out on large JSON / self-bias)* |
+> | `gemini-3.1-flash-lite` | stage_description + all extraction tasks + `_default` |
+> | `gemini-embedding-001` | RAG vectors 768d |
+> | Codex CLI image tool | all covers (Gemini Image hard-disabled) |
+>
+> `DISABLE_PRO_TIER=1` reverts everything to all-`gemini-3.1-flash-lite`. The historical
+> "Gemini only" table immediately below is preserved for context but does NOT reflect prod.
+
+| Tier (HISTORICAL — superseded by the box above) | Model | Use |
 |---|---|---|
 | Creative setup (Pro) | `gemini-3-flash-preview` (thinking=high) | stage_idea / stage_world / stage_character / master_outline / story_outline / story_bible / arc_plan |
 | Volume writer (Flash) | `gemini-3.1-flash-lite` (non-thinking) | architect / writer / writer_continuation / critic / continuity_guardian / auto_revision + setup_description + every memory/state extraction task |
 | Cover generator | **Codex CLI built-in image tool** (NOT Gemini Image) | All cover generation flows |
 | Embeddings | `gemini-embedding-001` (unchanged) | RAG vectors 768d |
-
-**DeepSeek removed from production routing.** The DeepSeek adapter (`utils/deepseek.ts`) and `deepseek-` prefixed model strings in `lib/types/ai-providers.ts` are kept as UI options + emergency fallback only — no default code path reaches them.
 
 Reason for swap (validated head-to-head on identical Gemini-Pro-generated setup):
 - DeepSeek Flash chapter writer: 0/5 chapters published after 3 retries each, overallScore=3, persistent `xu/nguyên` TQ-style currency Critic could not correct.
