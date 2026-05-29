@@ -32,6 +32,7 @@ Key innovations (2026-04-30 quality rebuild):
 |---|---|---|
 | [`README.md`](./README.md) | This index — bắt đầu từ đây | Always |
 | [`PLACEHOLDER_CONVENTION.md`](./PLACEHOLDER_CONVENTION.md) | **Convention `<MC>`/`<LOVE>`/`<CITY>` + enforcement runbook (lint:prompts)** | Trước khi sửa voice anchors / templates / prompts |
+| [`STYLE_DIRECTIVES.md`](./STYLE_DIRECTIVES.md) | **Mọi key trong `ai_story_projects.style_directives` JSONB — type/default/ai đọc** (typed interface + untyped runtime keys) | Khi đụng production flag, quota, foundation gate, blueprint version, flash-routine, hoặc thêm key mới |
 | [`FOCUSED_STORY_PRODUCTION_RUNBOOK.md`](./FOCUSED_STORY_PRODUCTION_RUNBOOK.md) | **Runbook thêm bộ truyện mới chạy song song bằng DS Flash cron rẻ** | Khi tạo focus key/project mới, sửa cron focus env, hoặc debug bộ mới không viết tiếp |
 | [`QUALITY_REBUILD.md`](./QUALITY_REBUILD.md) | **Research synthesis + 16-genre patterns + 4-version evolution log** | Khi mở rộng/debug quality, thêm genre, hoặc audit per-genre |
 | [`QUALITY_AUDIT_V1.md`](./QUALITY_AUDIT_V1.md) | Audit 2026-02 — sample chapters vs đại thần level (chapters 160-163) | Reference baseline: hệ thống đã từng tệ thế nào, fix nào đã apply |
