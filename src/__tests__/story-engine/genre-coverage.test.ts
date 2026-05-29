@@ -20,12 +20,18 @@ import {
 } from '@/services/story-engine/templates';
 import type { GenreType } from '@/services/story-engine/types';
 
-const ALL_GENRES: readonly GenreType[] = [
-  'tien-hiep', 'huyen-huyen', 'do-thi', 'kiem-hiep', 'lich-su',
-  'khoa-huyen', 'vong-du', 'dong-nhan', 'mat-the', 'linh-di',
-  'quan-truong', 'di-gioi', 'ngon-tinh', 'quy-tac-quai-dam',
-  'ngu-thu-tien-hoa', 'khoai-xuyen',
-] as const;
+// Exhaustive map keyed by GenreType. If a new member is added to the GenreType
+// union, TS fails to compile this object until the genre is added here — which
+// keeps ALL_GENRES provably complete (no hand-maintained list can drift).
+const GENRE_EXHAUSTIVE: Record<GenreType, true> = {
+  'tien-hiep': true, 'huyen-huyen': true, 'do-thi': true, 'kiem-hiep': true,
+  'lich-su': true, 'khoa-huyen': true, 'vong-du': true, 'dong-nhan': true,
+  'mat-the': true, 'linh-di': true, 'quan-truong': true, 'di-gioi': true,
+  'ngon-tinh': true, 'quy-tac-quai-dam': true, 'ngu-thu-tien-hoa': true,
+  'khoai-xuyen': true,
+};
+
+const ALL_GENRES: readonly GenreType[] = Object.keys(GENRE_EXHAUSTIVE) as GenreType[];
 
 describe('Genre coverage — all 16 genres present in every Record', () => {
   test('GENRE_STYLES', () => {
@@ -137,5 +143,38 @@ describe('Genre coverage — content-seeder records', () => {
     for (const g of ALL_GENRES) {
       expect(configGenres).toContain(g);
     }
+  });
+});
+
+/**
+ * Cross-file genre parity — the §3.2 drift class.
+ *
+ * Two genre sources can silently disagree:
+ *   - `src/lib/types/genre-config.ts` (web/UI canonical: labels, icons, topics)
+ *   - the engine `GenreType` union + its keyed Records (styles, boundaries, …)
+ *
+ * Adding a genre to one file but forgetting the other is a silent fall-through.
+ * These tests enforce BIDIRECTIONAL set equality, so neither file can grow a
+ * genre the other lacks. The engine side is represented by the compile-time-
+ * exhaustive ALL_GENRES (a missing GenreType won't even compile above).
+ */
+describe('Cross-file genre parity — web GENRE_CONFIG ↔ engine GenreType', () => {
+  test('every GENRE_CONFIG key is a valid engine GenreType (no UI-only genre)', async () => {
+    const { GENRE_CONFIG } = await import('@/lib/types/genre-config');
+    const engineSet = new Set<string>(ALL_GENRES);
+    const orphanInConfig = Object.keys(GENRE_CONFIG).filter((g) => !engineSet.has(g));
+    expect(orphanInConfig).toEqual([]);
+  });
+
+  test('every engine GenreType has a GENRE_CONFIG entry (no engine-only genre)', async () => {
+    const { GENRE_CONFIG } = await import('@/lib/types/genre-config');
+    const configSet = new Set(Object.keys(GENRE_CONFIG));
+    const orphanInEngine = ALL_GENRES.filter((g) => !configSet.has(g));
+    expect(orphanInEngine).toEqual([]);
+  });
+
+  test('exact key-set equality (same count, same members)', async () => {
+    const { GENRE_CONFIG } = await import('@/lib/types/genre-config');
+    expect([...Object.keys(GENRE_CONFIG)].sort()).toEqual([...ALL_GENRES].sort());
   });
 });
