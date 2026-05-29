@@ -24,6 +24,7 @@ const getGenreCounts = unstable_cache(
     const { data: novels } = await supabase
       .from('novels')
       .select('genres')
+      .eq('hidden', false)
       .not('genres', 'is', null)
       .limit(10000);
 

@@ -56,6 +56,7 @@ const fetchAuthorPage = unstable_cache(
       .from('novels')
       .select('id, title, author, cover_url, status')
       .eq('author', authorName)
+      .eq('hidden', false)
       .order('updated_at', { ascending: false })
       .limit(100);
 

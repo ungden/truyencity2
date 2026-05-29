@@ -131,6 +131,7 @@ export default function SearchClient() {
       let dbQuery = supabase
         .from('novels')
         .select('id,slug,title,author,cover_url,status,updated_at,genres,total_chapters')
+        .eq('hidden', false)
         .order('updated_at', { ascending: false })
         .limit(120);
 

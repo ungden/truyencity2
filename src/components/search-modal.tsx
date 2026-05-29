@@ -108,6 +108,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
       const { data } = await supabase
         .from('novels')
         .select('id,slug,title,author,cover_url,status,updated_at,genres,chapters(count)')
+        .eq('hidden', false)
         .or(`title.ilike.${q},author.ilike.${q}`)
         .order('updated_at', { ascending: false })
         .limit(50);

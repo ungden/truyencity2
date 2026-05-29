@@ -137,6 +137,7 @@ export default function RankingPage() {
       const { data } = await supabase
         .from('novels')
         .select('id,slug,title,author,cover_url,status,genres,created_at,updated_at,chapters(count)')
+        .eq('hidden', false)
         .order('updated_at', { ascending: false })
         .limit(200);
       if (!cancelled) {

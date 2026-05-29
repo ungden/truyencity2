@@ -31,6 +31,7 @@ const fetchGenreNovels = unstable_cache(
     const { data } = await supabase
       .from('novels')
       .select('id,slug,title,author,cover_url,genres')
+      .eq('hidden', false)
       .contains('genres', [genreId])
       .order('updated_at', { ascending: false })
       .limit(200);

@@ -106,6 +106,7 @@ const fetchRelatedNovels = unstable_cache(
     const { data } = await supabase
       .from('novels')
       .select(REL_COLS)
+      .eq('hidden', false)
       .overlaps('genres', [genres[0]])
       .neq('id', novelId)
       .not('cover_url', 'is', null)
@@ -127,6 +128,7 @@ const fetchAuthorWorks = unstable_cache(
     const { data } = await supabase
       .from('novels')
       .select(REL_COLS)
+      .eq('hidden', false)
       .eq('author', authorName)
       .neq('id', novelId)
       .limit(limit);

@@ -56,18 +56,21 @@ export default async function HomePage() {
     supabase
       .from('novels')
       .select(NOVEL_LIST_COLS)
+      .eq('hidden', false)
       .order('updated_at', { ascending: false })
       .limit(20),
     // Newly launched novels
     supabase
       .from('novels')
       .select(NOVEL_LIST_COLS)
+      .eq('hidden', false)
       .order('created_at', { ascending: false })
       .limit(12),
     // Featured: novels with covers, most chapters (carries `description` for the hero)
     supabase
       .from('novels')
       .select(FEATURED_COLS)
+      .eq('hidden', false)
       .not('cover_url', 'is', null)
       .order('updated_at', { ascending: false })
       .limit(10),
@@ -75,6 +78,7 @@ export default async function HomePage() {
     supabase
       .from('novels')
       .select(NOVEL_LIST_COLS)
+      .eq('hidden', false)
       .overlaps('genres', ['tien-hiep'])
       .not('cover_url', 'is', null)
       .order('updated_at', { ascending: false })
@@ -83,6 +87,7 @@ export default async function HomePage() {
     supabase
       .from('novels')
       .select(NOVEL_LIST_COLS)
+      .eq('hidden', false)
       .overlaps('genres', ['do-thi'])
       .not('cover_url', 'is', null)
       .order('updated_at', { ascending: false })

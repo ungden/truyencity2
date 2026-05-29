@@ -44,7 +44,8 @@ async function fetchNovels({
 
   let query = supabase
     .from('novels')
-    .select('id,slug,title,author,cover_url,status,genres,updated_at,created_at,total_chapters');
+    .select('id,slug,title,author,cover_url,status,genres,updated_at,created_at,total_chapters')
+    .eq('hidden', false);
 
   // Apply filters server-side
   if (selectedGenres.length > 0) {
