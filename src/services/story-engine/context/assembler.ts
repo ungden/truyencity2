@@ -488,7 +488,23 @@ export async function loadContext(
     volumeContext: buildVolumeContextBlock(rawMasterOutline, chapterNumber),
     castRoster: await (async () => {
       const { getCastRosterContext } = await import('../state/cast-database');
-      return getCastRosterContext(projectId, chapterNumber).catch(loaderFail('cast_roster'));
+      // Phase 27 W4.1 — supply scene context so the roster truncation keeps the
+      // characters most relevant to THIS chapter (protagonist + recently/brief-
+      // mentioned) instead of dropping them by raw recency order.
+      const { data: projectRow } = await db
+        .from('ai_story_projects').select('main_character').eq('id', projectId).maybeSingle();
+      const protagonistName =
+        (projectRow as { main_character?: string } | null)?.main_character
+        || characters[0]?.character_name || 'MC';
+      const recentChapterTexts = ((recentFullTextResult?.data as Array<{ content: string }> | null) || [])
+        .map(r => r.content).filter(Boolean);
+      return getCastRosterContext(projectId, chapterNumber, {
+        relevance: {
+          protagonistName,
+          recentChapterTexts,
+          arcBriefText: typeof chapterBrief === 'string' ? chapterBrief : undefined,
+        },
+      }).catch(loaderFail('cast_roster'));
     })() || undefined,
     timelineContext: await (async () => {
       const { getTimelineContext } = await import('../state/timeline');

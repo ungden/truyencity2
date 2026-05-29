@@ -28,6 +28,7 @@
  */
 
 import { getSupabase } from '../utils/supabase';
+import { rankCastByRelevance } from '../context/relevance-rank';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -135,7 +136,22 @@ const VALID_STATUSES = new Set(['alive', 'dead', 'missing', 'unknown']);
 export async function getCastRosterContext(
   projectId: string,
   currentChapter: number,
-  options: { limit?: number; maxChars?: number } = {},
+  options: {
+    limit?: number;
+    maxChars?: number;
+    /**
+     * Phase 27 W4.1 wiring — when provided, the alive/missing groups are
+     * relevance-ranked (protagonist pinned + scene-mention boost) BEFORE the
+     * char-budget truncation, so the characters most likely to appear in this
+     * chapter survive the cap instead of being dropped by raw recency order.
+     * The DEAD-forbidden block is never reordered or dropped.
+     */
+    relevance?: {
+      protagonistName: string;
+      recentChapterTexts?: string[];
+      arcBriefText?: string;
+    };
+  } = {},
 ): Promise<string | null> {
   const limit = options.limit ?? 60;
   const maxChars = options.maxChars ?? 6000;
@@ -143,9 +159,25 @@ export async function getCastRosterContext(
   const cast = await getActiveCast(projectId, currentChapter, limit);
   if (cast.length === 0) return null;
 
-  const alive = cast.filter(c => c.status === 'alive');
-  const missing = cast.filter(c => c.status === 'missing' || c.status === 'unknown');
+  let alive = cast.filter(c => c.status === 'alive');
+  let missing = cast.filter(c => c.status === 'missing' || c.status === 'unknown');
   const dead = cast.filter(c => c.status === 'dead');
+
+  // Relevance-rank the living groups when scene context is supplied. This only
+  // changes ORDERING (which members survive the maxChars cap), never membership
+  // or the dead-character safety block below.
+  if (options.relevance) {
+    const rankInput = {
+      currentChapter,
+      protagonistName: options.relevance.protagonistName,
+      recentChapterTexts: options.relevance.recentChapterTexts,
+      arcBriefText: options.relevance.arcBriefText,
+    };
+    const byRelevance = (members: CastMember[]): CastMember[] =>
+      rankCastByRelevance(members, rankInput).map(r => r.member);
+    alive = byRelevance(alive);
+    missing = byRelevance(missing);
+  }
 
   const lines: string[] = ['[CAST ROSTER — TOÀN BỘ NHÂN VẬT ĐÃ XUẤT HIỆN, BẮT BUỘC GIỮ NHẤT QUÁN]'];
 
