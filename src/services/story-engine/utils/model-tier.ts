@@ -1,42 +1,54 @@
 /**
  * Model Tier Configuration (Phase 22 Stage 3)
  *
- * Routes critical reasoning tasks to deepseek-v4-pro (12x cost, deeper reasoning).
- * Routes high-volume / low-stakes tasks to deepseek-v4-flash.
+ * SOURCE OF TRUTH for per-task model routing. The two CLAUDE.md files mirror this;
+ * if you change the sets below, update the routing tables there too.
  *
- * Set globalThis.__MODEL_ROUTING__ to override per-task model.
+ * Effective routing after installModelTierRouting() (3 tiers):
+ *   1. deepseek-v4-pro   (MODEL_PRO)   — creative setup + per-chapter writing
+ *                                         (see PRO_TASKS; the few large-JSON tasks
+ *                                          below are overridden back to Gemini).
+ *   2. gemini-3.5-flash  (override)    — master_outline, arc_plan, critic
+ *                                         (DeepSeek times out on large JSON / self-bias).
+ *   3. gemini-3.1-flash-lite (MODEL_FLASH, _default) — stage_description + all
+ *                                         extraction/recap tasks + anything undefined.
  *
- * Cost impact: Pro adds ~$0.7/AI write for the 7 critical tasks. For a 1500-chapter
- * novel that's ~$525 extra. Worth it for "đại thần grade" quality.
+ * Set globalThis.__MODEL_ROUTING__ (via installModelTierRouting) to apply.
+ * DISABLE_PRO_TIER=1 reverts EVERYTHING to gemini-3.1-flash-lite (A/B baseline +
+ * the DeepSeek-outage escape hatch — no fallback exists otherwise).
+ *
+ * Cost note: deepseek-v4-pro currently runs a 75% promo (effective $0.435/$0.87 per
+ * 1M, ~3× Flash, not 12×). Per "cost is not a concern — ưu tiên chất lượng tối đa",
+ * per-chapter writing is deliberately on Pro.
  */
 
-// Pro tier: ONLY rare, novel-trajectory-defining tasks.
-// Per-chapter Pro × 1000 chapters = cost explosion. Architect/Critic/Guardian
-// dropped to Flash — at 12× cost they would dominate the budget.
+// Pro tier covers BOTH the rare novel-defining setup stages AND the per-chapter
+// writing tasks (architect/writer/critic/guardian/auto-revision). The latter were
+// promoted to Pro on 2026-05-24 for chapter quality; critic + master_outline +
+// arc_plan are then overridden back to Gemini below (large-JSON timeout / self-bias).
 //
-// Phase O (2026-05-12) — switch MODEL_PRO từ gemini-3.1-pro-preview sang
+// Phase O (2026-05-12) — switched MODEL_PRO từ gemini-3.1-pro-preview sang
 // deepseek-v4-pro. Lý do:
 //   1. Gemini 3.1 Pro là "thinking" model — burns reasoning_tokens trước
 //      emit content. master_outline 16K output → thinking ăn 12K → content
 //      truncated → parseJSON returns null silent fail.
-//   2. DeepSeek v4 Pro: 384K output ceiling, NO thinking burn, $1.74/$3.48
-//      per 1M (12× Flash but creative-tier reasoning).
+//   2. DeepSeek v4 Pro: 384K output ceiling, NO thinking burn, creative-tier reasoning.
 //   3. User feedback 2026-05-12: "DeepSeek flash không đủ trình để setup
 //      truyện hay". Setup pipeline cần creative reasoning, Flash optimize
 //      cho cost+speed không phù hợp.
 //
-// Expanded PRO_TASKS (Phase O) — toàn bộ creative setup stages:
+// PRO_TASKS — creative setup stages + per-chapter writing:
 const PRO_TASKS = new Set([
   // Setup pipeline creative stages (Phase O 2026-05-12)
   'stage_idea',          // StoryKernel — readerFantasy/pleasureLoop/systemMechanic creative DNA
   'stage_world',         // World rules + magic system architecture
   'stage_character',     // MC archetype + voice signature
-  'master_outline',      // 5-15 volumes × 4-6 sub-arcs × 6-axis (Pro now handles 16K output)
+  'master_outline',      // 5-15 volumes × 4-6 sub-arcs × 6-axis — NOTE: overridden to gemini-3.5-flash below (large JSON times out on DeepSeek)
   'story_outline',       // premise + cast + worldRules + dopamineContract + conflictLadder
 
   // Existing Pro tasks
   'story_bible',         // ch.3 + every 150ch refresh ≈ 7× per 1000 chapters
-  'arc_plan',            // ~50× per 1000 chapters (every 20 ch)
+  'arc_plan',            // ~50× per 1000 chapters — NOTE: overridden to gemini-3.5-flash below (large JSON times out on DeepSeek)
 
   // Per-chapter writing tasks routed to Pro (2026-05-24)
   'architect',
