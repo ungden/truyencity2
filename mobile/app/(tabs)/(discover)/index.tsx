@@ -53,11 +53,13 @@ export default function DiscoverScreen() {
         supabase
           .from("novels")
           .select(NOVEL_LIST_FIELDS)
+          .eq("hidden", false)
           .order("updated_at", { ascending: false })
           .limit(300),
         supabase
           .from("novels")
           .select(NOVEL_LIST_FIELDS)
+          .eq("hidden", false)
           .eq("status", "completed")
           .order("updated_at", { ascending: false })
           .limit(30),

@@ -77,7 +77,7 @@ export function useSearch() {
     abortRef.current = controller;
 
     try {
-      let q = supabase.from("novels").select(NOVEL_LIST_FIELDS);
+      let q = supabase.from("novels").select(NOVEL_LIST_FIELDS).eq("hidden", false);
 
       if (trimmed) q = q.ilike("title", `%${trimmed}%`);
       if (currentFilters.genres && currentFilters.genres.length > 0) {

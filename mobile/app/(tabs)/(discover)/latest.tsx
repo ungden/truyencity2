@@ -29,6 +29,7 @@ export default function LatestScreen() {
         let query = supabase
           .from("novels")
           .select(NOVEL_LIST_FIELDS)
+          .eq("hidden", false)
           .order("updated_at", { ascending: false });
         // Genre filter (added 2026-05-01): when navigated from "Khám phá theo thể loại" chip
         if (genre) {

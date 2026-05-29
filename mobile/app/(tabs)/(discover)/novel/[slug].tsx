@@ -221,6 +221,7 @@ export default function NovelDetailScreen() {
         const { data: recData } = await supabase
           .from("novels")
           .select(LIST_FIELDS)
+          .eq("hidden", false)
           .contains("genres", [data.genres[0]])
           .neq("id", data.id)
           .order("updated_at", { ascending: false })
