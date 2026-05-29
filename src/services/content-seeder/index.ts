@@ -343,6 +343,7 @@ interface NovelInsertRow {
   description: string;
   status: string;
   genres: string[];
+  hidden?: boolean;
   cover_prompt: string;
 }
 
@@ -770,6 +771,10 @@ export class ContentSeeder {
         description: formattedDescription,
         status: 'Đang ra',
         genres: [genre],
+        // Track 4: born hidden. A spawned novel earns reader-facing visibility only
+        // after it passes the canon + foundation gate and writes ch.1 (write-chapters
+        // flips hidden=false on the first gated chapter). No thin-seed novel surfaces.
+        hidden: true,
         cover_prompt: idea.coverPrompt || this.buildCoverPrompt(safeTitle, genre, formattedDescription),
       });
 
@@ -1613,6 +1618,8 @@ CHÚ Ý:
           description: formattedDescription,
           status: 'Đang ra',
           genres: [genre],
+          // Track 4: born hidden — earns visibility only after passing the gate + ch.1.
+          hidden: true,
           cover_prompt: idea.coverPrompt || this.buildCoverPrompt(idea.title, genre, formattedDescription),
         });
 

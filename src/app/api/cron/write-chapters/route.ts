@@ -745,6 +745,21 @@ async function writeOneChapter(
 
     latestWrittenTitle = v2Result.title;
 
+    // ====== TRACK 4: EARN VISIBILITY ON FIRST GATED CHAPTER ======
+    // Novels are spawned hidden (ContentSeeder) and only surface to readers once
+    // they pass the canon + foundation gate AND produce ch.1. This write IS that
+    // moment when currentCh was 0 (init-write tier reaches here only after Track 1's
+    // hasCanonAndPassedReview check). Flip the novel visible. Idempotent + cheap
+    // (fires once per novel, on the very first chapter).
+    if (currentCh === 0 && chaptersCreated > 0) {
+      try {
+        await supabase.from('novels')
+          .update({ hidden: false })
+          .eq('id', novel.id)
+          .eq('hidden', true);
+      } catch { /* non-fatal: a still-hidden novel just isn't discoverable yet */ }
+    }
+
     // Load content for natural ending detection
     try {
       const { data: ch } = await supabase.from('chapters')
