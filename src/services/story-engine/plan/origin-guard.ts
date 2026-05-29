@@ -73,8 +73,15 @@ export function buildMcOriginLockBlock(kernel?: StoryKernel | null): string {
   const lockNote = kernel?.originLockNote ? `\nGhi chú khoá: ${kernel.originLockNote}` : '';
   return `[KHOÁ GỐC GÁC MC — TUYỆT ĐỐI TUÂN THỦ]
 Gốc gác MC đã được chốt ở giai đoạn ý tưởng: **${origin}** — ${ORIGIN_LABEL[origin]}.
-Mọi volume/sub-arc/beat PHẢI nhất quán với gốc gác này.
-CẤM dùng các cụm mâu thuẫn: ${forbidden.map((t) => `"${t}"`).join(', ')}.${lockNote}`;
+Mọi volume/sub-arc/beat (kể cả arcName, description, characterArcBeat, keyMilestone)
+PHẢI nhất quán với gốc gác này.
+CẤM TUYỆT ĐỐI dùng các cụm mâu thuẫn ở BẤT KỲ field nào: ${forbidden
+    .map((t) => `"${t}"`)
+    .join(', ')}.
+KHÔNG mô tả MC như người đến từ thế giới khác / mang ký ức kiếp trước nếu điều đó
+trái với gốc gác đã chốt. Nếu cần giải thích nguồn gốc tri thức/golden finger của MC,
+dùng lời giải IN-WORLD (kỳ ngộ, truyền thừa, linh mạch, cổ vật) — KHÔNG viện tới
+xuyên không/trọng sinh.${lockNote}`;
 }
 
 /**

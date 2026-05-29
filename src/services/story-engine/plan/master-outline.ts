@@ -2,7 +2,7 @@ import { getSupabase } from '../utils/supabase';
 import { callGemini } from '../utils/gemini';
 import { parseJSON } from '../utils/json-repair';
 import type { GeminiConfig, GenreType, StoryKernel } from '../types';
-import { buildMcOriginLockBlock } from './origin-guard';
+import { buildMcOriginLockBlock, detectOriginContradiction } from './origin-guard';
 import { getGenreSetupRequirements, getGenreArchitectGuide } from '../templates/genre-process-blueprints';
 
 /** Sub-arc within a volume — matches the old "majorArc" granularity (~20-30 chapters). */
@@ -302,8 +302,13 @@ QUY TẮC PHÂN VOLUME (BẮT BUỘC):
       temperature: 0.7,
       // Phase 23 fix: bumped 2048 → 8192. 2026-04-30 multi-axis upgrade: bumped
       // to 16384 to fit 8-12 arcs × 6 axes (theme/mood/setpiece/charArcBeat/
-      // worldExpansion/pacingTarget) without truncation. Pro tier handles 16K easily.
-      maxTokens: 16384,
+      // worldExpansion/pacingTarget) without truncation.
+      // 2026-05-29: 16384 was still truncating ~80% of 1000-ch outlines (7 volumes
+      // × 4-6 sub-arcs × 6 axes ≈ 40K chars ≈ 16K tokens → JSON cut mid-array). The
+      // master_outline task routes to gemini-3.5-flash (65K output ceiling), so bump
+      // to 32768 for ~2× headroom. NO FALLBACK on truncation — bad parse → null →
+      // cron retries — so undersized cap just burned retries.
+      maxTokens: 32768,
       systemPrompt: "Bạn là Master Architect chuyên lập Đại cương tổng thể cho tiểu thuyết mạng.",
     }, { jsonMode: true, tracking: { projectId, task: 'master_outline' } });
 
@@ -362,6 +367,18 @@ QUY TẮC PHÂN VOLUME (BẮT BUỘC):
           keyMilestone: sanitizeMilestone(a.keyMilestone, genre),
         }));
       }
+    }
+
+    // Origin guard AT THE SOURCE: never persist an outline that contradicts the
+    // MC origin locked at stage_idea (the LOCK prompt is soft — Gemini still leaks
+    // "xuyên không" intermittently). We gate the DB save on the check but STILL
+    // return the parsed outline so the caller (runStageMasterOutline) emits the
+    // specific `mc_origin_contradiction` error and retries the stage — the DB stays
+    // clean. NO FALLBACK: a contradictory generation is simply not saved.
+    const originIssue = setupKernel ? detectOriginContradiction(setupKernel, parsed) : null;
+    if (originIssue) {
+      console.error(`[master-outline] NOT saving — origin contradiction (caller will retry): ${originIssue}`);
+      return parsed;
     }
 
     // Save to DB
