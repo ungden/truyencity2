@@ -41,10 +41,13 @@ describe('flash cheap routine', () => {
     expect(context.indexOf('[HIGH]')).toBeLessThan(context.indexOf('[LOW]'));
   });
 
-  it('routes only enabled DS Flash routine chapters into cheap mode', () => {
-    expect(shouldUseFlashBulkCheapMode({ flash_bulk_cheap_mode: true }, 'gemini-3.1-flash-lite', 33, 600)).toBe(true);
+  it('flash-cheap routine is RETIRED — never activates regardless of flags/model', () => {
+    // Retired 2026-05-29: this path wrote chapters with gemini-3.1-flash-lite ("lởm" vs
+    // deepseek-v4-pro). shouldUseFlashBulkCheapMode now always returns false so every chapter
+    // goes through the standard 3-agent path (writer/architect → deepseek-v4-pro).
+    expect(shouldUseFlashBulkCheapMode({ flash_bulk_cheap_mode: true }, 'gemini-3.1-flash-lite', 33, 600)).toBe(false);
+    expect(shouldUseFlashBulkCheapMode({ flash_bulk_cheap_mode: true, flash_bulk_force_all: true }, 'gemini-3.1-flash-lite', 33, 600)).toBe(false);
     expect(shouldUseFlashBulkCheapMode({ flash_bulk_cheap_mode: true }, 'gemini-3-flash-preview', 33, 600)).toBe(false);
-    expect(shouldUseFlashBulkCheapMode({ flash_bulk_cheap_mode: true }, 'gemini-3.1-flash-lite', 590, 600)).toBe(false);
   });
 
   it('blocks cheap mode when current arc rail is missing', () => {

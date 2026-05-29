@@ -17,7 +17,7 @@ import { getSupabase } from '../utils/supabase';
 import { getGenreBoundaryText } from '../config';
 import { loadContext, assembleContext, generateSummaryAndCharacters } from '../context/assembler';
 import { writeChapter } from './chapter-writer';
-import { shouldUseFlashBulkCheapMode, writeFlashCheapRoutineChapter } from './flash-cheap-routine';
+// flash-cheap-routine RETIRED 2026-05-29 (wrote chapters with flash-lite); standard 3-agent path only.
 import { retrieveRAGContext, chunkAndStoreChapter, retrieveEntityContext, retrieveThemeContext } from '../memory/rag-store';
 import { saveCharacterStatesFromCombined, detectCharacterContradictions, type CharacterContradiction } from '../state/character-state';
 import { extractCharacterKnowledge, getCharacterKnowledgeContext } from '../state/knowledge-graph';
@@ -210,8 +210,11 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   // Phase 22 Stage 3: install tier-based model routing (Pro for critical reasoning,
   // Flash for volume/low-stakes). Idempotent — safe to call every chapter.
   // Disable via DISABLE_PRO_TIER=1 env var to A/B test against all-Flash baseline.
-  const { installModelTierRouting } = await import('../utils/model-tier');
+  const { installModelTierRouting, assertChapterWriterRouting } = await import('../utils/model-tier');
   installModelTierRouting();
+  // Fail loudly if the writer would fall back to flash-lite (quality regression).
+  // No-op under DISABLE_PRO_TIER=1. See model-tier.ts assertChapterWriterRouting.
+  assertChapterWriterRouting();
 
   // ── Step 1: Load project ───────────────────────────────────────────────
   const { data: projectData, error: projectError } = await db
@@ -548,22 +551,10 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     deepseekThinkingTasks,
   };
 
-  if (shouldUseFlashBulkCheapMode(projectStyleDirectives, geminiConfig.model, nextChapter, totalPlanned)) {
-    console.log(`[orchestrator] flash_bulk_cheap_mode active: ch.${nextChapter} via DS Flash compact routine path`);
-    return writeFlashCheapRoutineChapter({
-      project,
-      novel,
-      genre,
-      protagonistName,
-      storyTitle,
-      nextChapter,
-      targetWordCount,
-      totalPlanned,
-      customPrompt: options.customPrompt,
-      config: geminiConfig,
-      startTime,
-    });
-  }
+  // NOTE (2026-05-29): the flash-cheap routine path is RETIRED — it wrote chapters with
+  // gemini-3.1-flash-lite ("lởm" vs deepseek-v4-pro). Every chapter now goes through the
+  // standard 3-agent path below, whose writer/architect tasks route to deepseek-v4-pro via
+  // installModelTierRouting(). See flash-cheap-routine.ts `shouldUseFlashBulkCheapMode`.
 
   // ── Step 2: Load context (4 layers from DB) ────────────────────────────
   const context = await loadContext(project.id, novel.id, nextChapter);

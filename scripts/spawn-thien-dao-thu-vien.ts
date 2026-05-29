@@ -299,7 +299,7 @@ async function main() {
   const userId = await getSystemUserId(db);
   const styleDirectives = {
     disable_chapter_split: true,
-    flash_bulk_cheap_mode: true,
+    // flash_bulk_cheap_mode RETIRED 2026-05-29 — wrote chapters with flash-lite; chapters now via deepseek-v4-pro
     flash_writer_enabled: true,
     flash_routine_soft_gate: true,
     flash_routine_max_retries: 1,

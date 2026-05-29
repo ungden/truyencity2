@@ -21,25 +21,44 @@ import type { TrackingContext } from './gemini';
 const API_BASE = 'https://api.deepseek.com';
 const RETRY_DELAYS = [3000, 8000, 20000, 45000, 90000]; // 5 retries, up to 90s backoff for transient failures
 
-// Pricing per 1M tokens. Pricing source: https://api-docs.deepseek.com/quick_start/pricing
-// NOTE: keys MUST be DeepSeek model names. Earlier versions of this file had
-// Gemini model names as keys (`gemini-3-flash-preview` / `gemini-3.1-flash-lite`)
-// — leftover from Phase Q find-replace — which caused every real
-// `deepseek-v4-pro` call to fall through to `_default` (Flash price) and
-// undercount Pro spend by ~12×. Cross-check vs `model-tier.ts` MODEL_PRO/FLASH.
+// Pricing per 1M tokens. Source: https://api-docs.deepseek.com/quick_start/pricing
+// Verified against docs 2026-05-29.
 //
-// DeepSeek-V4-Pro currently sells at 75% off promo: list $1.74/$3.48 → effective
-// $0.435/$0.87. Cache-hit and cache-miss rates are per-model (NOT flat ratio —
-// Flash hit is 2% of miss, Pro hit is 0.83% of miss). Effective prices below.
-// If 75% promo ends, bump Pro back to list ($1.74/$3.48 + $0.0145 cache hit).
+// Billing facts (from API reference + reasoning_model guide):
+//   - `completion_tokens` ALREADY INCLUDES reasoning/CoT tokens (reasoning_tokens is a
+//     breakdown sub-field of completion_tokens_details, NOT an extra line item). So output
+//     cost = completion_tokens × outputPerMillion already covers thinking-mode CoT.
+//   - `prompt_tokens` = prompt_cache_hit_tokens + prompt_cache_miss_tokens. So
+//     missTokens = prompt_tokens − cacheHitTokens (what trackCost computes).
+//   - `max_tokens` includes the CoT part (default 32K, max 64K).
+//
+// NOTE: keys MUST be DeepSeek model names. Earlier versions had Gemini names as keys
+// (Phase Q find-replace leftover) → every deepseek-v4-pro call fell through to `_default`
+// (Flash price), undercounting Pro ~12×. Cross-check vs `model-tier.ts` MODEL_PRO/FLASH.
+//
+// ⚠️ PROMO EXPIRY: deepseek-v4-pro runs at 75% off (list $1.74/$3.48 → $0.435/$0.87)
+// UNTIL 2026-05-31 15:59 UTC. After that, Pro reverts to LIST (4× higher). pricingFor()
+// switches automatically on that timestamp so cost_tracking stays accurate post-promo.
+// Flash is NOT on promo (price unchanged).
+const PRO_PROMO_END_MS = Date.parse('2026-05-31T15:59:00Z');
+
 const PRICING: Record<string, { inputCacheMiss: number; inputCacheHit: number; outputPerMillion: number }> = {
-  'deepseek-v4-pro':   { inputCacheMiss: 0.435, inputCacheHit: 0.003625, outputPerMillion: 0.87 },
   'deepseek-v4-flash': { inputCacheMiss: 0.14,  inputCacheHit: 0.0028,   outputPerMillion: 0.28 },
-  // Legacy aliases (kept for old rows / fallback)
+  // Legacy aliases — docs: deepseek-chat/deepseek-reasoner map to v4-flash (non-thinking/thinking), same price.
   'deepseek-reasoner': { inputCacheMiss: 0.14,  inputCacheHit: 0.0028,   outputPerMillion: 0.28 },
   'deepseek-chat':     { inputCacheMiss: 0.14,  inputCacheHit: 0.0028,   outputPerMillion: 0.28 },
   '_default':          { inputCacheMiss: 0.14,  inputCacheHit: 0.0028,   outputPerMillion: 0.28 },
 };
+
+/** Pricing for a model, with deepseek-v4-pro promo→list switch at PRO_PROMO_END_MS. */
+function pricingFor(model: string): { inputCacheMiss: number; inputCacheHit: number; outputPerMillion: number } {
+  if (model === 'deepseek-v4-pro') {
+    return Date.now() < PRO_PROMO_END_MS
+      ? { inputCacheMiss: 0.435, inputCacheHit: 0.003625, outputPerMillion: 0.87 }  // 75% promo
+      : { inputCacheMiss: 1.74,  inputCacheHit: 0.0145,   outputPerMillion: 3.48 }; // list (post-promo)
+  }
+  return PRICING[model] || PRICING['_default'];
+}
 
 function trackCost(
   model: string,
@@ -49,7 +68,7 @@ function trackCost(
   tracking: TrackingContext,
   metadata?: Record<string, unknown>,
 ): void {
-  const p = PRICING[model] || PRICING['_default'];
+  const p = pricingFor(model);
   // Per-model cache hit rate (not a flat ratio — Flash hit is 2% of miss, Pro hit is 0.83%).
   const cacheMissTokens = Math.max(0, inputTokens - cacheHitTokens);
   const inputCost = (cacheMissTokens * p.inputCacheMiss + cacheHitTokens * p.inputCacheHit) / 1_000_000;
@@ -150,33 +169,41 @@ export async function callDeepSeek(
       const content = choice?.message?.content || (shouldUseThinking ? '' : reasoningContent);
       const finishReason = choice?.finish_reason || 'stop';
 
-      // P6.1: explicit empty-content guard. Without this, an empty response (rare but happens
-      // when DeepSeek V4 thinking model emits only reasoning then truncates) returned silently
-      // → caller saves empty chapter to DB. Throw so retry loop or upstream handler kicks in.
-      if (!content || content.trim().length === 0) {
-        // Don't retry on truncation (length cause) — that's a maxTokens issue, not transient.
-        if (finishReason === 'length' || finishReason === 'LENGTH') {
-          throw new Error(`DeepSeek truncation: empty content with finish_reason=${finishReason}. Increase maxTokens.`);
-        }
-        // Otherwise treat as transient and retry
-        if (attempt < RETRY_DELAYS.length) {
-          await new Promise((r) => setTimeout(r, RETRY_DELAYS[attempt]));
-          continue;
-        }
-        throw new Error(`DeepSeek empty content after ${RETRY_DELAYS.length} retries (finish_reason=${finishReason})`);
-      }
-
       const promptTokens = data?.usage?.prompt_tokens || 0;
       const completionTokens = data?.usage?.completion_tokens || 0;
-      // DeepSeek reports prompt_cache_hit_tokens for prefix-cached requests.
-      // 10% discount applied to these tokens. Available since V3.
+      // prompt_tokens = prompt_cache_hit_tokens + prompt_cache_miss_tokens (per docs).
       const cacheHitTokens = data?.usage?.prompt_cache_hit_tokens || 0;
+      // reasoning_tokens is a breakdown of completion_tokens (already billed within it) —
+      // record it so we can see how much of the output cost was CoT, the silent burn vector.
+      const reasoningTokens = data?.usage?.completion_tokens_details?.reasoning_tokens || 0;
 
-      if (options?.tracking) {
+      // COST-VISIBILITY FIX (2026-05-29): DeepSeek bills EVERY HTTP-200 response — including
+      // empty-content ones (thinking model nhả reasoning rồi cụt content). reasoning tokens
+      // count vào completion_tokens và bị tính tiền. Trước đây trackCost chỉ chạy SAU empty-guard
+      // (chỉ trên success), nên các response rỗng bị tính tiền nhưng KHÔNG ghi sổ → cost_tracking
+      // mù, balance âm mà DB báo $0. Track NGAY khi có usage, bất kể content rỗng hay không.
+      if (options?.tracking && (promptTokens > 0 || completionTokens > 0)) {
         trackCost(config.model, promptTokens, completionTokens, cacheHitTokens, options.tracking, {
           thinking_enabled: shouldUseThinking,
           reasoning_effort: shouldUseThinking ? (config.deepseekReasoningEffort || 'high') : null,
+          reasoning_tokens: reasoningTokens,
+          empty_content: !content || content.trim().length === 0,
+          finish_reason: finishReason,
         });
+      }
+
+      // P6.1: explicit empty-content guard. Without this, an empty response (rare but happens
+      // when DeepSeek V4 thinking model emits only reasoning then truncates) returned silently
+      // → caller saves empty chapter to DB.
+      // NO RETRY-ON-EMPTY (2026-05-29): retrying an empty HTTP-200 just re-bills full reasoning
+      // tokens with no guarantee of non-empty output — a silent money drain. An empty-on-200 is
+      // NOT a transient network blip; it's a model/config issue. Fail fast → upstream (cron) retries
+      // next tick with backoff, instead of looping 6× here and billing each loop.
+      if (!content || content.trim().length === 0) {
+        if (finishReason === 'length' || finishReason === 'LENGTH') {
+          throw new Error(`DeepSeek truncation: empty content with finish_reason=${finishReason}. Increase maxTokens.`);
+        }
+        throw new Error(`DeepSeek empty content (finish_reason=${finishReason}) — not retrying to avoid re-billing reasoning tokens.`);
       }
 
       return {

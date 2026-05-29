@@ -195,7 +195,7 @@ const styleDirectives = {
   focus_key: 'van-linh-pho-gia-toc',
   codex_director_only: true,
   flash_writer_enabled: true,
-  flash_bulk_cheap_mode: true,
+  // flash_bulk_cheap_mode RETIRED 2026-05-29 — wrote chapters with flash-lite; chapters now via deepseek-v4-pro
   flash_bulk_min_words: 2600,
   flash_bulk_context_max_chars: 32000,
   flash_routine_soft_gate: true,

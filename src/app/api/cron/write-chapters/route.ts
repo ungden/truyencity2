@@ -600,7 +600,7 @@ async function prepareInitProject(
     const { runOneStage } = await import('@/services/story-engine/pipeline/setup-pipeline');
     const { data: stageProj } = await supabase
       .from('ai_story_projects')
-      .select('id,novel_id,genre,main_character,world_description,master_outline,story_outline,story_bible,total_planned_chapters,setup_stage,setup_stage_attempts,novels!ai_story_projects_novel_id_fkey(id,title)')
+      .select('id,novel_id,genre,main_character,world_description,master_outline,story_outline,story_bible,total_planned_chapters,setup_stage,setup_stage_attempts,style_directives,novels!ai_story_projects_novel_id_fkey(id,title)')
       .eq('id', project.id)
       .single();
     if (!stageProj) {

@@ -97,16 +97,24 @@ interface FlashCheapArcRow {
 
 const DEFAULT_CONTEXT_CHARS = 32000;
 
+/**
+ * RETIRED (2026-05-29). This routine path hardcoded `gemini-3.1-flash-lite` as the
+ * chapter writer (see `writeFlashCheapRoutineChapter` → writerConfig.model), which the
+ * user judged "lởm" (noticeably weaker than deepseek-v4-pro). Every chapter now goes
+ * through the standard 3-agent path in the orchestrator, which routes the writer/architect
+ * tasks to deepseek-v4-pro via per-task model routing (`installModelTierRouting`).
+ *
+ * This function now ALWAYS returns false so the cheap path can never activate, regardless
+ * of any leftover `flash_bulk_cheap_mode` flag in DB. The rest of the module's helpers are
+ * kept (they remain unit-tested) but the entry point is dead at runtime.
+ */
 export function shouldUseFlashBulkCheapMode(
-  styleDirectives: StyleDirectives | null | undefined,
-  model: string,
-  chapterNumber: number,
-  totalPlanned: number,
+  _styleDirectives: StyleDirectives | null | undefined,
+  _model: string,
+  _chapterNumber: number,
+  _totalPlanned: number,
 ): boolean {
-  if (styleDirectives?.flash_bulk_cheap_mode !== true) return false;
-  if (model !== 'gemini-3.1-flash-lite') return false;
-  if (styleDirectives.flash_bulk_force_all === true) return true;
-  return chapterNumber < Math.max(1, totalPlanned - 20);
+  return false;
 }
 
 export function trimFlashCheapContextSections(sections: ContextSection[], maxChars: number): string {

@@ -129,6 +129,38 @@ export function installModelTierRouting(): void {
   }
 }
 
+/**
+ * Guard: confirm per-task routing is installed and the chapter WRITER is not
+ * silently falling back to gemini-3.1-flash-lite.
+ *
+ * Background (2026-05-29): flash-lite produced "lởm" chapters vs deepseek-v4-pro,
+ * so per-chapter writing is pinned to MODEL_PRO. The standard 3-agent path only
+ * routes writer/architect → MODEL_PRO when __MODEL_ROUTING__ is installed; WITHOUT
+ * it, callGemini() falls back to the project's ai_model column (= flash-lite for
+ * the ~773 Phase Q projects). This guard fails loudly so a forgotten
+ * installModelTierRouting() can never silently degrade chapter quality.
+ *
+ * When DISABLE_PRO_TIER=1 (A/B baseline / DeepSeek-outage escape hatch), routing
+ * is intentionally absent — the guard is a no-op in that mode.
+ */
+export function assertChapterWriterRouting(): void {
+  if (process.env.DISABLE_PRO_TIER === '1') return; // intentional all-Flash baseline
+  const writerModel = globalThis.__MODEL_ROUTING__?.writer;
+  if (writerModel !== MODEL_PRO) {
+    throw new Error(
+      `[ModelTier] Chapter writer routing not installed (writer→${writerModel ?? 'unset'}). ` +
+      `Expected ${MODEL_PRO}. Call installModelTierRouting() before writeChapter — ` +
+      `refusing to write with a flash-lite fallback (quality regression).`,
+    );
+  }
+  if (process.env.DEBUG_ROUTING === '1') {
+    const r = globalThis.__MODEL_ROUTING__!;
+    console.warn(
+      `[ModelTier] writer→${r.writer} architect→${r.architect} critic→${r.critic} _default→${r._default}`,
+    );
+  }
+}
+
 /** Convenience: get the model that would be used for a given task. */
 export function modelForTask(task: string): string {
   if (PRO_TASKS.has(task)) return MODEL_PRO;

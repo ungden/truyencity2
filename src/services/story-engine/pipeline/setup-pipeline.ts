@@ -163,6 +163,7 @@ export interface ProjectStageRow {
   total_planned_chapters?: number | null;
   setup_stage: SetupStage;
   setup_stage_attempts: number;
+  style_directives?: Record<string, unknown> | null;
   novels: { id: string; title: string } | { id: string; title: string }[] | null;
 }
 
@@ -1368,6 +1369,19 @@ const STAGE_HANDLERS: Partial<Record<SetupStage, StageHandler>> = {
  * Returns true if stage advanced; false if stage failed (will retry next tick).
  */
 export async function runOneStage(p: ProjectStageRow): Promise<boolean> {
+  // Claude Code authoring (2026-05-29): when setup_source='claude_code', the
+  // novel's setup artifacts (idea/world/canon/outline/foundation) are hand-authored
+  // locally by Claude Code and applied via scripts/cc-apply-setup.ts, which pushes
+  // setup_stage straight to 'ready_to_write'. If the cron ever sees such a project
+  // still in a model-API staged state, SKIP — running a model stage here would
+  // overwrite the curated artifacts. cc-apply-setup is the only writer for these.
+  if ((p.style_directives as Record<string, unknown> | null | undefined)?.setup_source === 'claude_code') {
+    if (process.env.DEBUG_ROUTING === '1') {
+      console.warn(`[SetupPipeline] skip stage ${p.setup_stage} for ${p.id} — setup_source=claude_code (cc-apply-setup owns setup)`);
+    }
+    return false;
+  }
+
   const handler = STAGE_HANDLERS[p.setup_stage];
   if (!handler) return false; // Unknown stage — caller fallback
 
