@@ -583,6 +583,23 @@ BIẾT-TRƯỚC / TRỌNG SINH — BẮT BUỘC (origin foreknowledge active):
 - ANTI god-mode: MC KHÔNG biết MỌI THỨ — chỉ key events; nhiều thứ vẫn phải thử + sai. CẤM "MC biết hết, đi 1 nước thắng luôn".`
     : '';
 
+  // Giấu nghề / 藏拙 — active iff the kernel injected a real cover story to maintain
+  // (mcSecret.coverStory non-empty). Recognition dopamine STAYS (MC khoe kết quả → được
+  // tung hô); what we enforce is concealing the SOURCE + keeping a moat, so MC stops "bày
+  // ra trước cả thôn" lộ liễu như một người toàn tri mà không ai thắc mắc.
+  const concealmentActive = context.includes('MC secret lock:') && !context.includes('cover story: N/A');
+  const concealmentRule = concealmentActive
+    ? `
+═══════════════════════════════════════════
+GIẤU NGHỀ / 藏拙 — KỶ LUẬT NGUỒN GỐC (MC có [cover story] phải giữ):
+═══════════════════════════════════════════
+- MC ĐƯỢC khoe KẾT QUẢ để nhận recognition (món ngon, mẻ hàng quý, phán đoán chuẩn) — đây là dopamine, GIỮ NGUYÊN.
+- CHE NGUỒN: mỗi lần MC lộ năng lực hiếm so với thân phận, outline phải gán "vì sao biết" vào [cover story] trong [MC secret lock] (học lỏm / nếm bẩm sinh / thử nhiều lần / đọc sách cũ...). CẤM để MC thể hiện toàn tri lộ liễu mà cả thôn/đám đông không một ai thắc mắc.
+- GIỮ MOAT: CẤM MC trao toàn bộ phương pháp tái lặp (công thức đầy đủ / tọa độ chính xác điểm đánh bắt / kỹ thuật lõi) cho đám đông MIỄN PHÍ. Lộ kết quả — giữ "how"; lộ sâu CÓ KIỂM SOÁT, đúng đối tượng đổi lợi ích.
+- CÓ GIÁ: nếu chương để MC phô tài hiếm công khai, outline PHẢI kèm hệ quả thật (kẻ nhái / ganh ghét / có người rình học lỏm để cướp nghề) và MC chủ động phòng/đón trước — KHÔNG flex vô hậu quả.
+- "reveal rule" trong [MC secret lock] là luật chốt — bám sát, KHÔNG để bí mật nguồn gốc trôi tuột.`
+    : '';
+
   // Phase 22 Stage 2 Q2: Architect budget bumped 120K → 400K. DeepSeek 1M context handles
   // this trivially (~100K tokens at most). Old cap was a token-saving artifact from
   // pre-DeepSeek era; head-tail trim was DROPPING THE MIDDLE of synopsis/arc plan/character
@@ -654,7 +671,8 @@ ${emotionalArcGuide}
 ${finalArcGuide}
 
 ${engagementGuide}
-${foreknowledgeRule}`;
+${foreknowledgeRule}
+${concealmentRule}`;
 
   // ── DYNAMIC SUFFIX (changes every chapter, breaks cache) ──
   const dynamicSuffix = `
@@ -932,6 +950,18 @@ async function runWriter(
 CÁCH VIẾT BẮT BUỘC: (1) trigger cảnh-kích cụ thể → (2) 1-2 câu flashback/nhận-ra (KHÔNG đoạn văn dump dài) → (3) MC QUYẾT ĐỊNH KHÁC vì biết trước → (4) hậu quả có cost. KHÔNG để MC "biết hết đi 1 nước thắng luôn".`
     : '';
 
+  // Concealment discipline (藏拙) — MC có [cover story] thì khi lộ năng lực hiếm phải che NGUỒN,
+  // giữ MOAT, có GIÁ. Vẫn khoe KẾT QUẢ để nhận recognition (dopamine). Đọc [MC secret lock] trong BỐI CẢNH.
+  const concealmentWriterActive =
+    context.includes('MC secret lock:') && !context.includes('cover story: N/A');
+  const concealmentWriterSection = concealmentWriterActive
+    ? `\nGIẤU NGHỀ / 藏拙 (BẮT BUỘC — xem [MC secret lock] + reveal rule trong BỐI CẢNH):
+- Khoe KẾT QUẢ thì được (món ngon, mẻ hàng, phán đoán chuẩn) — nhưng khi ai đó hỏi "sao biết / sao làm được", MC trả lời bằng [cover story] (học lỏm, nếm bẩm sinh, thử nhiều lần, đọc sách cũ), KHÔNG lộ nguồn gốc thật (trọng sinh / hệ thống / tri thức kiếp khác).
+- CẤM viết cảnh MC phô diễn toàn tri lộ liễu trước đám đông/cả thôn mà KHÔNG MỘT AI thắc mắc — phải có người nghi/hỏi và MC đỡ bằng cover story.
+- GIỮ MOAT: CẤM MC đưa trọn phương pháp tái lặp (công thức đầy đủ / tọa độ điểm đánh bắt / kỹ thuật lõi) cho đám đông MIỄN PHÍ. Lộ "how" chỉ có kiểm soát, đúng người, đổi lợi ích.
+- Nếu chương để MC phô tài hiếm công khai → phải gieo hệ quả (kẻ nhái / ganh ghét / rình học lỏm) và MC chủ động phòng.`
+    : '';
+
   // Topic section
   const topicSection = buildTopicSection(options?.topicId);
 
@@ -1009,6 +1039,11 @@ CÁCH VIẾT BẮT BUỘC: (1) trigger cảnh-kích cụ thể → (2) 1-2 câu 
   // Arc plan (current arc + chapter brief)
   const arcSection = extractSection(/\[KẾ HOẠCH ARC[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 6000);
   if (arcSection) writerContextParts.push(arcSection);
+  // Story kernel (carries MC secret lock + cover story + reveal rule) — Writer must honor the
+  // concealment discipline, not just the Architect. Without this the Writer never sees the
+  // cover story and lets MC flex toàn tri lộ liễu trước cả thôn.
+  const kernelSection = extractSection(/\[STORY KERNEL[^\]]*\][\s\S]*?(?=\n\n\[|$)/, 3000);
+  if (kernelSection) writerContextParts.push(kernelSection);
   // Quality modules — generous caps (was 600-1500, now 2500-4000) so per-character/per-hint
   // data isn't truncated. Architect saw same data; Writer needs it too for execution-level fidelity.
   const qualityModuleBudgets: Record<string, number> = {
@@ -1070,6 +1105,7 @@ ${sceneGuidance}
 ${multiPOVGuide}
 ${emotionalArcSection}
 ${foreknowledgeSection}
+${concealmentWriterSection}
 
 DOPAMINE (phải có):
 ${outline.dopaminePoints.map(dp => `- ${dp.type}: Setup: ${dp.setup} → Payoff: ${dp.payoff}`).join('\n')}

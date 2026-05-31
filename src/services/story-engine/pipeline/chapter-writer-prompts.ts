@@ -679,6 +679,13 @@ G7. PRONOUN VIOLATION (Axis D8):
 
 VND CURRENCY (do-thi/quan-truong/lich-su VN/linh-di Dân Quốc): "X xu/nguyên/lượng vàng" làm đơn vị giao dịch hàng ngày → REWRITE. CHỈ "đồng/nghìn đồng/triệu đồng/tỷ đồng" (VND). NGOẠI LỆ: tu-tiên/huyen-huyen/kiem-hiep/lich-su cổ đại Hoa Hạ → "đồng vàng/bạc/linh thạch" theo bối cảnh.
 
+G8. GIẤU NGHỀ / 藏拙 (chỉ áp dụng khi BỐI CẢNH có [MC secret lock] với "cover story" ≠ N/A):
+- LƯU Ý: khoe KẾT QUẢ + nhận recognition (món ngon, mẻ hàng quý, phán đoán chuẩn, được tung hô) là DOPAMINE HỢP LỆ — TUYỆT ĐỐI KHÔNG flag. Chỉ flag khi NGUỒN GỐC lộ liễu hoặc MOAT bị cho không.
+- PHÔ TÀI TOÀN TRI VÔ CỚ: MC thể hiện năng lực/hiểu biết vượt XA thân phận trước đám đông/cả thôn, có người chứng kiến nhưng KHÔNG MỘT AI thắc mắc "sao biết / sao làm được", VÀ MC cũng KHÔNG đỡ bằng cover story → major (continuity/plausibility) → REWRITE.
+- CHO KHÔNG MOAT: MC trao trọn phương pháp tái lặp (công thức đầy đủ / tọa độ chính xác điểm đánh bắt / kỹ thuật lõi) cho đám đông MIỄN PHÍ, không kiểm soát, không đổi lợi ích → major → REWRITE.
+- FLEX VÔ HẬU QUẢ: chương để MC phô tài hiếm công khai nhưng KHÔNG có bất kỳ mầm hệ quả nào (kẻ nhái / ganh ghét / rình học lỏm) và MC không hề phòng → moderate.
+- KHÔNG flag nếu MC đã che nguồn (trả lời bằng cover story khi bị hỏi) HOẶC giữ lại "how" trong khi chỉ lộ kết quả.
+
 ═══════════════════════════════════════════════════════════════════════════
 SOFT FLAGS (severity moderate / major)
 ═══════════════════════════════════════════════════════════════════════════
@@ -734,7 +741,7 @@ Nếu chương mood "breathing" / "comedic_break" / "calm_before_storm" / "comfo
 - Pass at overallScore ≥6 NGANG climax. Sảng Văn breathing chương EQUAL priority.
 - CẤM downgrade vì thiếu plot tension / cliffhanger nguy hiểm — đây là bản chất Sảng Văn flow.
 - CẤM yêu cầu rewrite vì "thiếu conflict" / "thiếu dopamine intensity cao" — small wins / casual competence / observation đời thường / scale-up đều valid main output.
-- Vẫn check: continuity, repetition, character voice, word count, hard gates G1-G7. Bỏ qua "missing stakes/hooks/dopamine intensity".
+- Vẫn check: continuity, repetition, character voice, word count, hard gates G1-G8 (giấu nghề G8 đặc biệt quan trọng ở chương đời thường/slice-of-life). Bỏ qua "missing stakes/hooks/dopamine intensity".
 
 Nếu chương mood "climax" / "villain_focus" / "revelation":
 - ÁP DỤNG STANDARD NGHIÊM. Yêu cầu intensity rõ, dopamine moment, ending hook mạnh. overallScore ≥7 mới approve.
