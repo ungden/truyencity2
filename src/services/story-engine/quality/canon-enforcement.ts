@@ -101,6 +101,8 @@ export async function enforceCanonGates(
   promises.push(checkSystemCadence(input).catch(() => []));
   // 10. Hard causal logic — authority/access/resource/arc-rail violations.
   promises.push(checkCausalLogicGate(input).catch(() => []));
+  // 12. Foreknowledge cadence — trọng sinh/xuyên việt must use biết-trước.
+  promises.push(checkForeknowledgeGate(input).catch(() => []));
   // 11. Typed genre contract — root-level genre grammar gates.
   if (input.genre) {
     promises.push(checkGenreContractGate(input).catch(() => []));
@@ -681,6 +683,108 @@ async function checkSystemCadence(input: CanonEnforcementInput): Promise<CriticI
   } catch {
     return []; // Non-fatal — table missing or query failed.
   }
+}
+
+// ── Gate 12: Foreknowledge (trọng sinh / xuyên việt) ─────────────────────────
+
+/**
+ * Hard gate for rebirth/transmigration novels (Part A5).
+ *
+ * Foreknowledge is an ORIGIN property (orthogonal to genre): a do-thi trọng
+ * sinh, a tien-hiep trọng sinh, a quan-truong trọng sinh all need it. The gate
+ * fires only when the project's foreknowledge is active — either the locked
+ * `mcForeknowledge.active` in the setup kernel, OR sub_genres tagging
+ * trọng-sinh/xuyên-việt/xuyên-không. Old novels lacking the kernel block are a
+ * no-op (new-novels-only scope).
+ *
+ * Cadence: every odd chapter (≈ "mỗi 1-2 chương 1 lần"). On a cadence chapter:
+ *  - ZERO foreknowledge/reminiscence signal → MAJOR (type continuity →
+ *    auto-promotes requiresRewrite). This is the core fix for "thoáng qua như
+ *    mây trôi".
+ *  - Foreknowledge signal present but NO leverage signal (MC reminisces but
+ *    doesn't ACT on the knowledge) → MODERATE — passive nostalgia, not the
+ *    structural advantage rebirth promises.
+ */
+const FOREKNOWLEDGE_SIGNALS = [
+  'kiếp trước', 'tiền kiếp', 'đời trước', 'kiếp này', 'lần này khác',
+  'hồi tưởng', 'nhớ lại', 'ký ức', 'theo trí nhớ', 'trong trí nhớ',
+  'biết trước', 'đoán trước', 'đáng lẽ', 'lẽ ra', 'vốn dĩ sẽ',
+  'tương lai', 'sắp xảy ra', 'sẽ xảy ra', 'trước khi', 'tiên tri',
+];
+const FOREKNOWLEDGE_LEVERAGE_SIGNALS = [
+  'né', 'tránh', 'đề phòng', 'cảnh giác', 'ra tay trước', 'đi trước',
+  'chốt', 'quyết định khác', 'thay đổi', 'chuẩn bị trước', 'phòng bị',
+  'phá bẫy', 'không mắc lại', 'không lặp lại', 'rút kinh nghiệm',
+  'lần này', 'nhờ biết trước', 'tận dụng', 'đón đầu', 'cứu', 'chặn',
+];
+
+interface ForeknowledgeKernel {
+  active?: boolean;
+}
+interface ForeknowledgeStoryOutline {
+  setupKernel?: { mcForeknowledge?: ForeknowledgeKernel };
+}
+
+/**
+ * Pure signal-detection half of the foreknowledge gate (testable without DB).
+ * Caller is responsible for the new-novels-only `active` check; this only runs
+ * the cadence + content scan. Returns the CriticIssue(s) the gate would emit.
+ */
+export function evaluateForeknowledgeBeat(content: string, chapterNumber: number): CriticIssue[] {
+  // Cadence: enforce on odd chapters (≈ every 1-2 chapters).
+  if (chapterNumber % 2 !== 1) return [];
+
+  const lower = content.toLowerCase();
+  const hasForeknowledge = FOREKNOWLEDGE_SIGNALS.some(s => lower.includes(s));
+  const hasLeverage = FOREKNOWLEDGE_LEVERAGE_SIGNALS.some(s => lower.includes(s));
+
+  if (!hasForeknowledge) {
+    return [{
+      type: 'continuity',
+      severity: 'major',
+      description: `Chương ${chapterNumber} (trọng sinh/xuyên việt) KHÔNG có beat biết-trước/hồi-tưởng kiếp trước nào — foreknowledge đang "thoáng qua như mây trôi". Cadence yêu cầu mỗi 1-2 chương phải có ≥1 memory-trigger hoặc hành động dựa-trên-biết-trước.`,
+      suggestion: 'Thêm 1 beat biết-trước: trigger cảnh-kích (mùi/người/ngày) → 1-2 câu hồi tưởng/nhận-ra → MC quyết định khác vì biết trước → hậu quả có cost. KHÔNG god-mode (chỉ key events, vẫn phải thử-sai).',
+    }];
+  }
+
+  if (!hasLeverage) {
+    return [{
+      type: 'quality',
+      severity: 'moderate',
+      description: `Chương ${chapterNumber} có hồi tưởng/biết-trước nhưng MC KHÔNG hành động dựa trên nó (passive nostalgia). Trọng sinh phải biến biết-trước thành lợi thế cụ thể: né bẫy / chốt deal sớm / luyện sớm / cứu đúng người.`,
+      suggestion: 'Cho MC RA QUYẾT ĐỊNH KHÁC nhờ biết trước (né/đề phòng/đón đầu/tận dụng), kèm 1 cost/butterfly để tránh god-mode.',
+    }];
+  }
+
+  return [];
+}
+
+async function checkForeknowledgeGate(input: CanonEnforcementInput): Promise<CriticIssue[]> {
+  // Determine whether foreknowledge is active for this project.
+  let active = false;
+  try {
+    const db = getSupabase();
+    const { data } = await db
+      .from('ai_story_projects')
+      .select('story_outline,sub_genres')
+      .eq('id', input.projectId)
+      .maybeSingle();
+    const kernelActive =
+      (data?.story_outline as ForeknowledgeStoryOutline | null | undefined)
+        ?.setupKernel?.mcForeknowledge?.active === true;
+    const subGenres = (data?.sub_genres as string[] | null | undefined) || [];
+    const subGenreActive = subGenres.some(s =>
+      s === 'trong-sinh' || s === 'xuyen-viet' || s === 'xuyen-khong',
+    );
+    active = kernelActive || subGenreActive;
+  } catch {
+    return []; // Non-fatal — can't determine state, skip gate.
+  }
+
+  // New-novels-only scope: old novels lacking the kernel block are a no-op.
+  if (!active) return [];
+
+  return evaluateForeknowledgeBeat(input.content, input.chapterNumber);
 }
 
 // ── Hook floor (existing) ────────────────────────────────────────────────────

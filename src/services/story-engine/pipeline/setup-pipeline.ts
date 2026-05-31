@@ -407,6 +407,33 @@ function validateStoryKernel(kernel: StoryKernel | undefined): string | null {
   if (kernel.mcSecret.coverStory.length < 15) {
     return 'setupKernel.mcSecret.coverStory too short (must be >= 15 chars)';
   }
+  // Foreknowledge gate (new-novels only): reincarnated/transmigrator/returnee MUST carry a
+  // concrete, leverageable foreknowledge block — otherwise the "biết trước" passes by like
+  // drifting clouds. native/system-bestowed must NOT have an active block.
+  {
+    const FOREKNOWLEDGE_ORIGINS = ['reincarnated', 'transmigrator', 'returnee'];
+    const isForeknowledgeOrigin = FOREKNOWLEDGE_ORIGINS.includes(kernel.mcOrigin || '');
+    const fk = kernel.mcForeknowledge;
+    if (isForeknowledgeOrigin) {
+      if (!fk || fk.active !== true) {
+        return `setupKernel.mcForeknowledge.active must be true for mcOrigin=${kernel.mcOrigin}`;
+      }
+      if (!Array.isArray(fk.futureTimeline) || fk.futureTimeline.filter(e => e && e.trim().length > 0).length < 3) {
+        return 'setupKernel.mcForeknowledge.futureTimeline must list >= 3 concrete foreseen events';
+      }
+      if (!fk.leverageRule || fk.leverageRule.length < 20) {
+        return 'setupKernel.mcForeknowledge.leverageRule too short (how MC acts on foreknowledge)';
+      }
+      if (!fk.costRule || fk.costRule.length < 20) {
+        return 'setupKernel.mcForeknowledge.costRule too short (butterfly/limit cost)';
+      }
+      if (!fk.whatMcKnows || fk.whatMcKnows.length < 15) {
+        return 'setupKernel.mcForeknowledge.whatMcKnows too short';
+      }
+    } else if (fk?.active === true) {
+      return `setupKernel.mcForeknowledge must be inactive for mcOrigin=${kernel.mcOrigin}`;
+    }
+  }
   if (!kernel.benefitLoop?.goal || !kernel.benefitLoop?.action || !kernel.benefitLoop?.benefit || !kernel.benefitLoop?.cadence) {
     return 'setupKernel.benefitLoop must define goal/action/benefit/cadence';
   }
@@ -507,6 +534,17 @@ Trả về JSON:
       "outsideWorldKnowledge": "<người ngoài chỉ được thấy kết quả gì, KHÔNG biết nguồn gốc>",
       "revealRule": "<chỉ reveal muộn khi outline chỉ định rõ; Phase 1-2 tuyệt đối không ai biết>",
       "coverStory": "<vỏ bọc cụ thể trong thế giới thực để giải thích năng lực siêu phàm của MC, vd: sư phụ bí ẩn truyền dạy, ngộ tính thiên tài bộc phát, gia truyền cổ thư>"
+    },
+    "mcForeknowledge": {
+      "_RULE": "CHỈ điền active:true khi mcOrigin ∈ {reincarnated, transmigrator, returnee}. Nếu mcOrigin=native/system-bestowed → active:false và để các field còn lại là chuỗi rỗng/array rỗng (MC KHÔNG biết trước tương lai).",
+      "active": "<true nếu mcOrigin là reincarnated/transmigrator/returnee, ngược lại false>",
+      "knowledgeType": "<past_life_memory (trọng sinh cùng thế giới) | future_events (biết trước diễn biến) | modern_knowledge (xuyên không mang kiến thức hiện đại/thế giới khác) | canon_knowledge (đồng nhân, biết nguyên tác)>",
+      "whatMcKnows": "<lợi thế CỤ THỂ MC mang theo: biết ai sẽ phản bội, biết mỏ tài nguyên ở đâu, biết công thức/kỹ thuật, biết kết cục 1 sự kiện lớn>",
+      "futureTimeline": ["<sự kiện tương lai 1 MC thấy trước & sẽ tận dụng>", "<sự kiện 2>", "<sự kiện 3 — TỐI THIỂU 3 mốc cụ thể, có thể tới 6>"],
+      "leverageRule": "<MC HÀNH ĐỘNG thế nào dựa trên biết-trước: né bẫy sớm, chốt deal trước khi giá lên, luyện/đầu tư sớm, cứu đúng người để có ân tình>",
+      "costRule": "<rủi ro/cost: butterfly effect khiến timeline lệch, biết-trước KHÔNG còn đúng sau khi MC can thiệp, MC vẫn phải thử-sai vì chỉ biết key events chứ không biết MỌI THỨ>",
+      "reminiscenceCadence": "<vd: 1 memory-trigger mỗi 1-2 chương; callback kiếp trước ≥1 lần/arc>",
+      "coverStory": "<cách người ngoài giải thích sự tiên tri của MC mà không biết sự thật — reuse/đồng bộ với mcSecret.coverStory>"
     },
     "benefitLoop": {
       "goal": "<mục tiêu nhỏ MC chủ động theo đuổi trong 1-3 chương>",
@@ -616,6 +654,24 @@ Trả về JSON:
         | (typeof VALID_ORIGINS)[number]
         | undefined;
       parsed.setupKernel.mcOrigin = raw && VALID_ORIGINS.includes(raw) ? raw : 'native';
+
+      // Foreknowledge is an ORIGIN property: only reincarnated/transmigrator/returnee
+      // carry biết-trước. Coerce the block so native/system-bestowed can never leak a
+      // "kiếp trước"/"future timeline" — and strip a stray block the model invented.
+      const FOREKNOWLEDGE_ORIGINS = ['reincarnated', 'transmigrator', 'returnee'];
+      const fk = parsed.setupKernel.mcForeknowledge;
+      if (FOREKNOWLEDGE_ORIGINS.includes(parsed.setupKernel.mcOrigin)) {
+        if (fk && typeof fk === 'object') {
+          fk.active = true;
+          // Fall back to mcSecret.coverStory so outsiders' explanation stays in sync.
+          if (!fk.coverStory && parsed.setupKernel.mcSecret?.coverStory) {
+            fk.coverStory = parsed.setupKernel.mcSecret.coverStory;
+          }
+        }
+      } else if (fk) {
+        // native / system-bestowed must never reference foreknowledge.
+        parsed.setupKernel.mcForeknowledge = undefined;
+      }
     }
 
     // Stash idea into world_description as a marker until world stage runs

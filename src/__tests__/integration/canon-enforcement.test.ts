@@ -9,8 +9,40 @@
 import { checkPovConsistency } from '../../services/story-engine/quality/pov-check';
 import { analyzeSensoryBalance } from '../../services/story-engine/quality/sensory-balance';
 import { evaluateHooks } from '../../services/story-engine/quality/hook-strength';
+import { evaluateForeknowledgeBeat } from '../../services/story-engine/quality/canon-enforcement';
 
 describe('Canon Enforcement Gates', () => {
+  describe('Foreknowledge Gate (trọng sinh / xuyên việt)', () => {
+    const PADDING = 'A'.repeat(1500);
+
+    it('emits MAJOR continuity issue when a cadence chapter has ZERO foreknowledge signal', () => {
+      const content = 'Lương Hạo bước vào sảnh đấu giá, quan sát đám đông rồi ra giá một vật phẩm bình thường. ' + PADDING;
+      const issues = evaluateForeknowledgeBeat(content, 7); // odd = cadence chapter
+      expect(issues).toHaveLength(1);
+      expect(issues[0].type).toBe('continuity');
+      expect(issues[0].severity).toBe('major'); // → auto-promotes requiresRewrite
+    });
+
+    it('emits MODERATE when MC reminisces but does NOT act on the knowledge', () => {
+      const content = 'Lương Hạo nhớ lại kiếp trước mình từng đứng ở đúng nơi này, ký ức ùa về như mây trôi. Anh bồi hồi ngắm hoàng hôn rồi đi tiếp. ' + PADDING;
+      const issues = evaluateForeknowledgeBeat(content, 5);
+      expect(issues).toHaveLength(1);
+      expect(issues[0].severity).toBe('moderate');
+    });
+
+    it('PASSES when MC both recalls AND leverages the foreknowledge', () => {
+      const content = 'Theo trí nhớ kiếp trước, Lương Hạo biết trước cây cầu sẽ sập lúc giữa trưa nên anh né hướng đó, ra tay trước để cứu đứa bé và chốt deal sớm với thương đội. ' + PADDING;
+      const issues = evaluateForeknowledgeBeat(content, 9);
+      expect(issues).toHaveLength(0);
+    });
+
+    it('is a no-op on non-cadence (even) chapters', () => {
+      const content = 'Lương Hạo bước vào sảnh, không có hồi tưởng nào. ' + PADDING;
+      const issues = evaluateForeknowledgeBeat(content, 8); // even → skip
+      expect(issues).toHaveLength(0);
+    });
+  });
+
   describe('POV Consistency', () => {
     it('should detect 1st-person omniscient slip', () => {
       const content = 'Tôi bước vào phòng. Nàng thầm nghĩ trong lòng đau đớn. Nàng cảm thấy buồn. Hắn nghĩ thầm rằng đây là kết thúc. Cô ấy thầm nghĩ về quá khứ. Anh ấy cảm thấy tức giận tột độ.';

@@ -69,6 +69,17 @@ function formatStoryKernelContext(kernel: StoryKernel): string {
   if (kernel.mcSecret) {
     parts.push(`MC secret lock: ${kernel.mcSecret.secret} | cover story: ${kernel.mcSecret.coverStory || 'N/A'} | outsiders only know: ${kernel.mcSecret.outsideWorldKnowledge} | reveal rule: ${kernel.mcSecret.revealRule}`);
   }
+  if (kernel.mcForeknowledge?.active) {
+    const fk = kernel.mcForeknowledge;
+    parts.push(
+      `[BIẾT-TRƯỚC — bắt buộc dùng MỖI 1-2 CHƯƠNG, không cho trôi qua như mây] ` +
+      `loại: ${fk.knowledgeType} | MC biết: ${fk.whatMcKnows} | ` +
+      `timeline thấy trước: ${(fk.futureTimeline || []).join(' → ')} | ` +
+      `cách tận dụng: ${fk.leverageRule} | cost/butterfly: ${fk.costRule} | ` +
+      `nhịp hồi tưởng: ${fk.reminiscenceCadence} | vỏ bọc tiên tri: ${fk.coverStory || kernel.mcSecret?.coverStory || 'N/A'}`,
+    );
+    parts.push('→ Chương phải có ≥1 memory-trigger HOẶC hành động dựa-trên-biết-trước có cost; KHÔNG god-mode (chỉ biết key events, vẫn phải thử-sai).');
+  }
   if (kernel.benefitLoop) {
     parts.push(`Benefit loop: goal ${kernel.benefitLoop.goal} | action ${kernel.benefitLoop.action} | benefit ${kernel.benefitLoop.benefit} | cadence ${kernel.benefitLoop.cadence}`);
   }

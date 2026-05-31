@@ -53,6 +53,18 @@ export interface GenreProcessBlueprint {
   arcTemplate: string;
   /** Stakes ladder — escalation framework for this genre. */
   stakesLadder: string[];
+  /**
+   * The canonical recurring arcs/beats that DEFINE the genre — readers expect
+   * these to show up (e.g. tien-hiep: đại hội tỉ thí, bí cảnh, đan hội face-slap,
+   * thiên kiếp). Architect must schedule them across the outline.
+   */
+  signatureTropes: string[];
+  /**
+   * Concrete vocabulary / rituals / honorifics / item types / etiquette that
+   * make prose feel genre-true (cung-dau-level texture). Writer pulls from here
+   * so chapters don't read generic.
+   */
+  textureDetails: string[];
 }
 
 const BLUEPRINTS: Record<GenreType, GenreProcessBlueprint> = {
@@ -102,6 +114,22 @@ const BLUEPRINTS: Record<GenreType, GenreProcessBlueprint> = {
     ],
     arcTemplate: 'Arc 80-100 chương: ch.1-15 setup mới (cảnh giới mới / thử thách mới) → ch.16-40 escalation (gặp đối thủ + tài nguyên + sub-quest) → ch.41-60 mid-climax (1 đối thủ lớn ngã + tài nguyên đột phá đắc) → ch.61-80 thu hoạch (consolidate + new threats hint) → ch.81-100 arc climax (đột phá cảnh giới + reveal layer thế giới mới).',
     stakesLadder: ['Cá nhân (sống/chết)', 'Sư môn (sect war)', 'Khu vực (vực này / phái này)', 'Đại lục', 'Tinh không'],
+    signatureTropes: [
+      'Đại hội tỉ thí / so tài thiên kiêu cùng thế hệ (lôi đài, bảng xếp hạng đệ tử)',
+      'Bí cảnh / cấm địa khai mở → khám phá đoạt cơ duyên + truyền thừa',
+      'Đan hội / luyện khí đại hội → face-slap qua tay nghề luyện chế',
+      'Đấu giá hội: bảo vật hiếm xuất hiện + tranh mua + lộ thân thế',
+      'Thiên kiếp / độ kiếp — milestone đột phá đại cảnh giới (Nguyên Anh, Hóa Thần...)',
+      'Đạo lữ / hồng nhan tri kỷ subplot (slow-burn, không harem)',
+      'Truy sát từ cổ tộc / ma đạo / phái thù → chạy trốn + phản kích',
+    ],
+    textureDetails: [
+      'Cảnh giới jargon CỤ THỂ: Luyện Khí tầng X, Trúc Cơ sơ/trung/hậu kỳ, kết Kim Đan, ngưng Nguyên Anh',
+      'Xưng hô tu chân: đạo hữu, sư huynh/sư tỷ, tiền bối, vãn bối, đạo tôn, chân nhân',
+      'Vật phẩm phân phẩm cấp: linh thạch hạ/trung/thượng phẩm, đan dược + đan phương, pháp bảo + phẩm giai, phù lục, linh thảo theo niên hạn',
+      'Địa danh tu chân: Tụ Linh trận, động phủ, linh mạch, bí cảnh, tông môn sơn môn',
+      'Nghi thức: bái sư, kết đạo lữ, truyền công, đả tọa điều tức, đột phá quan',
+    ],
   },
 
   // ════════════════════════════════════════════════════════════════════════
@@ -149,6 +177,22 @@ const BLUEPRINTS: Record<GenreType, GenreProcessBlueprint> = {
     ],
     arcTemplate: 'Arc 80-100 ch: ch.1-15 setup ân oán mới → ch.16-40 thu thập đồng minh + tin đồn → ch.41-60 giao đấu mid-tier → ch.61-80 reveal mastermind → ch.81-100 final showdown + new revenge seed for next arc.',
     stakesLadder: ['Bản thân + bằng hữu', 'Bang phái nhỏ', 'Một vùng giang hồ', 'Toàn võ lâm', 'Triều đình + giang hồ + hải ngoại'],
+    signatureTropes: [
+      'Tỉ võ chiêu thân / lôi đài tranh hùng',
+      'Bí kíp / tuyệt học bị võ lâm dòm ngó → tranh đoạt',
+      'Ân oán môn phái / huyết hải thâm cừu báo thù',
+      'Hành hiệp trượng nghĩa cứu người yếu → kết giao bằng hữu',
+      'Tửu lâu / khách điếm nghe tin tức + kết giao + đụng độ',
+      'Minh chủ võ lâm đại hội / quần hùng tụ hội',
+      'Trúng độc / trọng thương → kỳ ngộ liệu thương → võ công tăng tiến',
+    ],
+    textureDetails: [
+      'Võ công terms: nội công tâm pháp, khinh công, kiếm/đao pháp có tên chiêu thức, điểm huyệt, chân khí kinh mạch',
+      'Xưng hô giang hồ: đại hiệp, thiếu hiệp, cô nương, lão phu, tại hạ, các hạ, tiền bối',
+      'Địa danh: khách điếm, tửu lâu, tiêu cục, phân đà / tổng đà, sơn trại',
+      'Vật phẩm: bảo kiếm/đao có tên, ám khí, kim sang dược, giải độc đan, ngân lượng / ngân phiếu',
+      'Giang hồ quy củ: ân oán phân minh, không đánh kẻ ngã ngựa, tỉ võ điểm tới vi chỉ',
+    ],
   },
 
   // ════════════════════════════════════════════════════════════════════════
@@ -196,6 +240,22 @@ const BLUEPRINTS: Record<GenreType, GenreProcessBlueprint> = {
     ],
     arcTemplate: 'Arc 100-150 ch: ch.1-20 reveal cấp mới (mở vực/cổ tộc) → ch.21-50 build alliance + collect cổ tộc tài nguyên → ch.51-80 confrontation mid-tier cổ tộc → ch.81-110 final cổ tộc enemy fall → ch.111-150 đột phá thiên đạo + tease cấp tiếp.',
     stakesLadder: ['Bản thân', 'Một cổ tộc', 'Một vực', 'Một đại lục', 'Tinh không', 'Hỗn độn / thiên đạo'],
+    signatureTropes: [
+      'Thí luyện thiên kiêu — long phượng bảng / thiên kiêu bảng tranh phong',
+      'Viễn cổ di tích / thần ma mộ / đế tàng khai mở',
+      'Huyết mạch giác tỉnh / phản tổ → sức mạnh khủng bố',
+      'Thánh địa / đế tộc kết oán → bị truy sát toàn vực',
+      'Đoạt xá / thôn phệ cơ duyên nguy cơ (kẻ địch ẩn trong cơ duyên)',
+      'Vực ngoại chí tôn / cổ lão giáng lâm áp chế',
+      'Chí bảo / tiên duyên tranh đoạt vạn tộc hỗn chiến',
+    ],
+    textureDetails: [
+      'Cấp bậc khoa trương rõ tier (vd Đấu Giả → Đại Đế → Chí Tôn → Thánh, hoặc thang tự đặt nhưng phải đặt rõ thứ tự)',
+      'Xưng hô: đạo hữu, thánh tử / thánh nữ, thiên kiêu, lão tổ, đế tộc hậu duệ, vô thượng',
+      'Vật phẩm: thần binh + giai phẩm, đế chủng / thánh huyết, viễn cổ truyền thừa, hồng mông tử khí, khí vận chi bảo',
+      'Địa danh: thần tàng, viễn cổ chiến trường, thánh địa, vực giới, tinh vực',
+      'Pháp tắc / đại đạo: đại đạo chi âm, pháp tắc oai áp, đạo vận, khí vận long, thiên địa dị tượng',
+    ],
   },
 
   // ════════════════════════════════════════════════════════════════════════
@@ -246,6 +306,22 @@ const BLUEPRINTS: Record<GenreType, GenreProcessBlueprint> = {
     ],
     arcTemplate: 'Arc 80-120 ch: ch.1-15 mở rộng quy mô tiếp (lên tier mới) → ch.16-40 đối thủ mới phản ứng → ch.41-60 mid-conflict (PR / lobby / phá giá) → ch.61-80 MC counter-strategy + win → ch.81-120 thu hoạch + romance arc beat + tease tier tiếp.',
     stakesLadder: ['Cá nhân (tiền trọ)', 'Gia đình (mẹ chữa bệnh)', 'Cộng đồng (khu phố)', 'Thành phố', 'Quốc gia', 'Quốc tế / IPO'],
+    signatureTropes: [
+      'Deal / hợp đồng lật kèo → face-slap đối thủ thương trường (bằng số liệu, không bạo lực)',
+      'Ra mắt sản phẩm / sự kiện gây chấn động ngành',
+      'Bị khinh thường ban đầu (nhà giàu / đại lão / người cũ) → công nhận ngược',
+      'Thâu tóm / M&A / giành thị phần / chiến giá',
+      'Cứu giúp đúng người (ân nhân / quý nhân) → báo đáp về sau',
+      'Khủng hoảng truyền thông / PR → xử lý cao tay',
+      'Gặp lại người cũ (đồng môn / người yêu cũ / kẻ từng coi thường) đổi vế',
+    ],
+    textureDetails: [
+      'Con số CỤ THỂ: doanh thu, vốn, % thị phần, định giá, lương, KPI — KHÔNG "rất nhiều"',
+      'Brand / địa danh hiện đại: toà nhà văn phòng, khu CBD, nhà hàng cao cấp, xe/đồng hồ hiệu',
+      'Xưng hô đời thường: anh/chị/em, giám đốc, tổng, sếp, đồng nghiệp, đối tác',
+      'Chứng từ / công cụ: hợp đồng, slide pitch, báo cáo tài chính, app/dashboard golden finger',
+      'Nghi thức kinh doanh: họp HĐQT, ký kết, gọi vốn, roadshow, đàm phán. KHÔNG combat vật lý',
+    ],
   },
 
   // ════════════════════════════════════════════════════════════════════════
@@ -293,6 +369,22 @@ const BLUEPRINTS: Record<GenreType, GenreProcessBlueprint> = {
     ],
     arcTemplate: 'Arc 100-150 ch: ch.1-20 nhận chức cấp mới + survey terrain → ch.21-50 phát hiện scandal/cơ hội cải cách → ch.51-80 đối đầu phe đối thủ qua văn bản → ch.81-120 leverage cấp trên neutral → ch.121-150 cải cách success + thăng cấp tease.',
     stakesLadder: ['Cá nhân (sự nghiệp)', 'Gia đình', 'Đơn vị / cơ quan', 'Một tỉnh', 'Trung ương', 'Quốc gia / quốc tế'],
+    signatureTropes: [
+      'Thăng chức / điều động bất ngờ → cục diện mới',
+      'Dự án / chính sách thành tích đột phá ghi điểm',
+      'Phe phái đấu đá (mượn tay, gài bẫy qua văn bản / quy trình)',
+      'Chống tham nhũng / thanh tra / xử lý vụ việc nhạy cảm',
+      'Cứu vãn sự cố dân sinh (thiên tai, sự kiện) → uy tín tăng',
+      'Tiếp đón cấp trên / đoàn khảo sát → màn trình diễn chính trị',
+      'Reveal hậu trường liên minh / thế lực chống lưng',
+    ],
+    textureDetails: [
+      'Chức danh + thứ bậc rõ: khoa viên → phó/chính khoa → huyện → sở → tỉnh → trung ương',
+      'Xưng hô: đồng chí, lãnh đạo, thủ trưởng, tiểu X (cấp dưới), lão X (cấp trên thân)',
+      'Văn bản: báo cáo, công văn, nghị quyết, biên bản họp, chỉ thị',
+      'Bối cảnh: phòng họp, hội nghị, khảo sát thực địa, tiếp khách, bữa cơm chính trị',
+      'SUBTEXT NẶNG: lời nói 2 nghĩa, ẩn ý qua chỗ ngồi / thứ tự phát biểu / cách rót trà. KHÔNG combat',
+    ],
   },
 
   // ════════════════════════════════════════════════════════════════════════
@@ -339,6 +431,22 @@ const BLUEPRINTS: Record<GenreType, GenreProcessBlueprint> = {
     ],
     arcTemplate: 'Arc 150-200 ch: ch.1-30 bổ nhiệm cấp mới + phong cảnh chính trị mới → ch.31-70 cải cách proposal + đối thủ phản kháng → ch.71-120 scandal break + investigation → ch.121-170 leverage hoàng đế / phe trung lập → ch.171-200 cải cách success + power consolidation.',
     stakesLadder: ['Cá nhân', 'Gia tộc', 'Một bộ', 'Triều đình', 'Quốc gia', 'Lưỡng quốc / vạn dân'],
+    signatureTropes: [
+      'Triều nghị / thiết triều tranh biện chính sự',
+      'Khoa cử / đề bạt thăng tiến quan lộ',
+      'Biên quan chiến sự / dẹp loạn / chinh phạt',
+      'Cung đấu hậu cung / ngoại thích tranh quyền',
+      'Cải cách / kế sách chấn động triều đình',
+      'Sứ thần / hoà thân / bang giao lưỡng quốc',
+      'Trung-gian thần ám đấu → reveal phản thần / mưu phản',
+    ],
+    textureDetails: [
+      'Quan chế + xưng hô: bệ hạ, vi thần, ái khanh, thần thiếp, điện hạ, lão phu, vi huynh',
+      'Văn ngôn cổ phong: chiếu chỉ, tấu chương, hịch, biểu, sớ',
+      'Nghi thức triều đình: quỳ bái, sơn hô vạn tuế, ban yến, thượng triều, bãi triều',
+      'THỜI ĐẠI LOCK: chọn 1 triều cụ thể (trang phục / quân chế / tiền tệ / lịch pháp khớp era, CẤM mix)',
+      'Vật phẩm: ngọc tỷ, binh phù, thánh chỉ, ngân lượng / quan tiền, ấn tín',
+    ],
   },
 
   // ════════════════════════════════════════════════════════════════════════
@@ -385,6 +493,22 @@ const BLUEPRINTS: Record<GenreType, GenreProcessBlueprint> = {
     ],
     arcTemplate: 'Arc 100-150 ch: ch.1-20 problem mới reveal + market opportunity → ch.21-50 research breakthrough + corporate notice → ch.51-100 đối thủ phản ứng (espionage / poaching / litigation) → ch.101-130 MC counter + scale → ch.131-150 milestone + government attention.',
     stakesLadder: ['Cá nhân (tenure)', 'Lab', 'Tập đoàn', 'Ngành', 'Quốc gia', 'Văn minh / cosmic'],
+    signatureTropes: [
+      'Đột phá công nghệ / phát minh chấn động ngành',
+      'Thử nghiệm / demo thành công trước hội đồng / nhà đầu tư',
+      'Tranh chấp bản quyền / gián điệp công nghiệp',
+      'AI / hệ thống thức tỉnh hoặc vượt kiểm soát',
+      'Khủng hoảng kỹ thuật → giải cứu bằng tri thức chính xác',
+      'Hội nghị / giải thưởng khoa học công nhận',
+      'Reveal mối đe doạ cosmic / văn minh cấp cao',
+    ],
+    textureDetails: [
+      'Thuật ngữ kỹ thuật CHÍNH XÁC: thông số, đơn vị đo, công thức, kiến trúc hệ thống',
+      'Bối cảnh: lab, phòng sạch, data center, trạm vũ trụ, khu R&D',
+      'Xưng hô: giáo sư, tiến sĩ, kỹ sư, giám đốc công nghệ, trưởng nhóm',
+      'Vật phẩm: prototype, chip, drone, cảm biến, mã nguồn, vật liệu mới',
+      'Con số đo lường: hiệu năng, độ chính xác, ngân sách, timeline. Logic nhân quả khoa học chặt — KHÔNG magic trá hình',
+    ],
   },
 
   // ════════════════════════════════════════════════════════════════════════
@@ -447,6 +571,22 @@ const BLUEPRINTS: Record<GenreType, GenreProcessBlueprint> = {
       'E-sport quốc gia + IRL career-defining contract (corp/club lớn)',
       'World championship + IRL legacy (tỷ phú game / huyền thoại / di sản)',
     ],
+    signatureTropes: [
+      'First clear phó bản / raid boss thế giới (server-first announcement)',
+      'PK / đấu trường / công thành chiến quy mô lớn',
+      'Ẩn nghề / ẩn nhiệm vụ / trang bị thần khí drop hiếm',
+      'Leo bảng xếp hạng server → top + IRL local fame',
+      'Giải đấu e-sport IRL + khán giả + livestream',
+      'Guild war / liên minh chính trị trong game',
+      'IRL identity reveal (cao thủ ẩn danh = người bình thường ngoài đời)',
+    ],
+    textureDetails: [
+      'Game terms: cấp độ, HP/MP, CD kỹ năng, DPS, aggro, drop rate, BUFF/debuff',
+      'UI mô tả: bảng thuộc tính, log chiến đấu, thông báo hệ thống, NPC thoại',
+      'IRL layer song hành: livestream, đội tuyển, hợp đồng, fan, báo chí',
+      'Vật phẩm: trang bị + phẩm cấp theo màu, vật liệu chế tạo, đan/dược in-game, tài khoản/điểm',
+      'Nghi thức: tổ đội, đấu giá hội, công hội, báo danh giải. IRL impact LUÔN đi kèm',
+    ],
   },
 
   // ════════════════════════════════════════════════════════════════════════
@@ -489,6 +629,22 @@ const BLUEPRINTS: Record<GenreType, GenreProcessBlueprint> = {
     ],
     arcTemplate: 'Arc theo canon timeline: setup canon precursor → canon big event approach → MC intervenes/observes → AU divergence consequence → next canon arc setup.',
     stakesLadder: ['Cá nhân', 'Faction trong IP gốc', 'World canon', 'Multi-verse / AU spread'],
+    signatureTropes: [
+      'Nhập vai vào thời điểm canon then chốt → đổi kịch bản gốc',
+      'Gặp + tương tác nhân vật canon nổi tiếng',
+      'Dùng foreknowledge canon đón đầu kiếp nạn / sự kiện',
+      'Reveal thân phận / kim thủ chỉ với nhân vật gốc',
+      'Butterfly làm canon lệch → hệ quả ngoài dự đoán',
+      'Đối đầu nhân vật / thế lực mạnh trong nguyên tác',
+      'AU / multiverse mở rộng vượt canon gốc',
+    ],
+    textureDetails: [
+      'Reference IP gốc ĐÚNG TÊN: nhân vật / chiêu thức / địa danh / tổ chức canon',
+      'Meta voice nhẹ: MC ý thức đang trong tác phẩm nhưng KHÔNG phá không khí',
+      'Timeline canon có mốc: sự kiện gốc xảy ra ở chương/năm nào',
+      'Xưng hô + setting bám theo IP gốc (giữ đúng quy tắc nguyên tác)',
+      'Vật phẩm / năng lực canon giữ đúng cơ chế gốc. Cover story cho khả năng biết trước',
+    ],
   },
 
   // ════════════════════════════════════════════════════════════════════════
@@ -535,6 +691,22 @@ const BLUEPRINTS: Record<GenreType, GenreProcessBlueprint> = {
     ],
     arcTemplate: 'Arc 80-100 ch: ch.1-15 stage mới (cause changes) → ch.16-40 community building / threat scout → ch.41-60 conflict (gang/cult/mutation) → ch.61-80 resource breakthrough + travel → ch.81-100 next stage threat preview.',
     stakesLadder: ['Cá nhân sống/chết', 'Gia đình', 'Bunker (10-50 người)', 'Cộng đồng (vài trăm)', 'Region', 'Cấp quốc gia / civilization'],
+    signatureTropes: [
+      'Ngày tận thế bùng phát / biến dị khởi đầu',
+      'Tranh đoạt / tích trữ vật tư khan hiếm',
+      'Thanh tẩy / phòng thủ căn cứ trước sóng quái',
+      'Nội bộ phản bội / tranh quyền trong bunker',
+      'Gặp nhóm sống sót → thu nạp hoặc loại trừ',
+      'Tiến hoá / dị năng giác tỉnh nâng cấp',
+      'Reveal nguồn gốc thảm hoạ + thế lực sau màn',
+    ],
+    textureDetails: [
+      'Tài nguyên ĐẾM CỤ THỂ: lương thực/nước/đạn/thuốc/nhiên liệu — số ngày còn lại',
+      'Bối cảnh hậu tận thế: đô thị đổ nát, an toàn khu, bunker, trạm tiếp tế',
+      'Quái/zombie phân cấp: cấp độ tiến hoá, type biến dị',
+      'Xưng hô sinh tồn: đội trưởng, người sống sót, kẻ cướp, dị năng giả',
+      'Golden finger: kho không gian, hệ tiến hoá, hệ năng lực. Tension nhân tính: đói khát + đạo đức xám',
+    ],
   },
 
   // ════════════════════════════════════════════════════════════════════════
@@ -582,6 +754,22 @@ const BLUEPRINTS: Record<GenreType, GenreProcessBlueprint> = {
     ],
     arcTemplate: 'Arc 80-100 ch: ch.1-15 case mới + tier hint → ch.16-40 investigation + minor encounter → ch.41-60 mid-reveal + ally betrayal? → ch.61-80 ritual climax + tier boss face-off → ch.81-100 partial resolution + new tier hint.',
     stakesLadder: ['Cá nhân', 'Gia đình / cộng đồng nhỏ', 'Một thành phố', 'Một nước', 'Yin-Yang balance', 'Cosmic order'],
+    signatureTropes: [
+      'Nhận án / uỷ thác điều tra hiện tượng quái dị',
+      'Nghi thức trừ tà / trấn yểm / phong thuỷ',
+      'Ngỗ tác / khám nghiệm thi thể procedural → manh mối',
+      'Truyền thuyết dân gian / cấm kỵ làng quê',
+      'Quỷ / oan hồn báo oán → giải oan',
+      'Nhập mộ / cổ trạch / u minh thám hiểm',
+      'Reveal nguồn gốc lời nguyền + phá giải',
+    ],
+    textureDetails: [
+      'Dụng cụ trừ tà: bùa, chu sa, gạo nếp, mực đen, kiếm đào, đèn dầu, hương',
+      'Thuật ngữ: âm khí/dương khí, hồn phách, trận pháp, long mạch, mệnh cách',
+      'Nghi thức cụ thể: vẽ bùa, niệm chú, bày trận, đặt cấm kỵ',
+      'Bối cảnh không khí: đêm, nghĩa địa, cổ trạch, sương mù, đèn leo lét',
+      'Ngỗ tác chi tiết: tử ban, thi biến, dấu vết khám nghiệm. Atmosphere DREAD > jump-scare',
+    ],
   },
 
   // ════════════════════════════════════════════════════════════════════════
@@ -629,6 +817,22 @@ const BLUEPRINTS: Record<GenreType, GenreProcessBlueprint> = {
     ],
     arcTemplate: 'Arc 100-150 ch: ch.1-20 scope mới (city/region) → ch.21-50 build infrastructure + tech uplift → ch.51-90 politics + faction conflict → ch.91-120 breakthrough + recognition → ch.121-150 next scope tease.',
     stakesLadder: ['Cá nhân sống', 'Village', 'Town', 'County', 'Kingdom', 'Continent / world'],
+    signatureTropes: [
+      'Xây dựng lãnh địa / bộ lạc từ con số không',
+      'Nâng cấp công nghệ / canh tác / luyện kim (tech uplift)',
+      'Chinh phục / liên minh bộ lạc - vương quốc lân cận',
+      'Chống quái thú triều / thiên tai dị giới',
+      'Thương đoàn / giao thương xuyên vương quốc',
+      'Phong hàm / sắc phong leo bậc quý tộc',
+      'Reveal bí mật dị giới / thần linh / nguồn gốc thế giới',
+    ],
+    textureDetails: [
+      'Tri thức hiện đại BẢN ĐỊA HOÁ: muối/sắt/thuốc súng/nông cụ/y học — quy trình cụ thể, có thiếu nguyên liệu (cost)',
+      'Hệ thống lãnh chúa/quý tộc: tước vị, thuế, dân số, tài nguyên lãnh địa',
+      'Chủng tộc dị giới: elf / orc / thú nhân / người lùn + đặc tính riêng',
+      'Xưng hô: lãnh chúa đại nhân, bệ hạ, hiệp sĩ, trưởng lão bộ lạc',
+      'Vật phẩm: ma thạch, vũ khí rèn, nông sản, bản đồ. Cover story nguồn gốc tri thức',
+    ],
   },
 
   // ════════════════════════════════════════════════════════════════════════
@@ -676,6 +880,22 @@ const BLUEPRINTS: Record<GenreType, GenreProcessBlueprint> = {
     ],
     arcTemplate: 'Arc 100-150 ch: ch.1-20 relationship stage mới → ch.21-50 build trust + career parallel → ch.51-90 obstacle (past wound / family / rival) → ch.91-120 breakthrough emotional → ch.121-150 commitment + tease next stage.',
     stakesLadder: ['Cá nhân (career)', 'Family pressure', 'Couple stability', 'Reputation / public', 'Marriage / lifelong'],
+    signatureTropes: [
+      'Gặp gỡ định mệnh / hiểu lầm ban đầu',
+      'Ghen tuông / tình địch xen vào',
+      'Chăm sóc lúc yếu đuối → tim rung động',
+      'Gia đình / môn đăng hộ đối phản đối',
+      'Chia ly do hiểu lầm → đoàn tụ',
+      'Ngọt sủng / độc chiếm khoảnh khắc',
+      'Cầu hôn / cột mốc cam kết lâu dài',
+    ],
+    textureDetails: [
+      'Tâm lý nội tâm tinh tế: mạch cảm xúc, do dự, rung động được miêu tả kỹ',
+      'Ngôn ngữ trữ tình: ẩn dụ, cảnh vật hoà với cảm xúc',
+      'Xưng hô tình cảm: anh/em, tên gọi thân mật, biệt danh riêng',
+      'Cử chỉ nhỏ giàu subtext: ánh mắt, chạm tay, im lặng, hơi thở',
+      'Bối cảnh lãng mạn: mưa, hoàng hôn, cafe, nhà. SLOW-BURN — KHÔNG yêu nhanh tình nhanh. Female POV thường',
+    ],
   },
 
   // ════════════════════════════════════════════════════════════════════════
@@ -722,6 +942,22 @@ const BLUEPRINTS: Record<GenreType, GenreProcessBlueprint> = {
     ],
     arcTemplate: 'Arc 50-80 ch: ch.1-10 phó bản entry + rule reveal → ch.11-30 rule testing + early death (one teammate) → ch.31-50 mid-twist (rule mâu thuẫn / NPC reveal) → ch.51-70 meta layer hint → ch.71-80 phó bản clear + next tier preview.',
     stakesLadder: ['Cá nhân (sống/chết phó bản)', 'Đồng đội (sacrifice)', 'Phó bản tier', 'Multi-phó-bản', 'Meta entity'],
+    signatureTropes: [
+      'Nhập phó bản đời thường biến dị + nhận bảng quy tắc',
+      'Phân biệt quy tắc thật / giả + thử nghiệm',
+      'NPC quái dị tuân / phá quy tắc',
+      'Suy luận tìm điều kiện thoát',
+      'Phản quy tắc đoạt phần thưởng / manh mối',
+      'Reveal cơ chế phó bản + kẻ tạo ra nó',
+      'Sống sót qua đêm / vòng lặp lặp lại',
+    ],
+    textureDetails: [
+      'Bảng quy tắc ĐÁNH SỐ (Quy tắc 1..N) có mâu thuẫn cài cắm thật/giả',
+      'Bối cảnh đời thường nhiễu: văn phòng / metro / bệnh viện / siêu thị / chung cư đêm',
+      'Chi tiết uncanny: sai lệch nhỏ gây bất an (cửa thừa, người thiếu mặt, đồng hồ sai giờ)',
+      'Cơ chế trừng phạt khi phạm quy tắc (chết / biến mất / bị thay thế)',
+      'Xưng hô lạnh / thủ tục. PARANOIA + tuân thủ = sinh tồn, KHÔNG combat vật lý',
+    ],
   },
 
   // ════════════════════════════════════════════════════════════════════════
@@ -769,6 +1005,22 @@ const BLUEPRINTS: Record<GenreType, GenreProcessBlueprint> = {
     ],
     arcTemplate: 'Arc 100-150 ch: ch.1-20 acquire/evolve pet mới → ch.21-50 train + skill build → ch.51-90 thí đấu / battle escalation → ch.91-120 confrontation institutional enemy → ch.121-150 milestone + new tier preview.',
     stakesLadder: ['Cá nhân học viện', 'Gia tộc', 'Khu vực (vùng beast)', 'Quốc gia ngự thú', 'World rare beast preserve'],
+    signatureTropes: [
+      'Bắt / thuần hoá thú khế ước mới',
+      'Tiến hoá / giác tỉnh huyết mạch ẩn của pet',
+      'Thi đấu ngự thú sư đối kháng (pet vs pet)',
+      'Cấm khu / dã ngoại đoạt trứng / thú hiếm',
+      'Học viện thí luyện / xếp hạng',
+      'Thương hội đấu giá thú + vật liệu',
+      'Reveal dòng giống thần thú / cổ chủng',
+    ],
+    textureDetails: [
+      'Thông tin BẤT ĐỐI XỨNG: golden finger nhìn tuyến tiến hoá ẩn + công thức nuôi',
+      'Phân cấp thú: cấp / tinh, hệ năng lực, kỹ năng pet',
+      'Xưng hô: ngự thú sư, huấn luyện sư, thú vương, khế ước giả',
+      'Vật phẩm: đan tiến hoá, thức ăn chuyên biệt, khế ước văn, trang bị chiến đấu cho pet',
+      'Nghi thức: khế ước nghi, tiến hoá nghi, đối chiến quy củ. Combat = pet vs pet, KHÔNG MC tay đôi',
+    ],
   },
 
   // ════════════════════════════════════════════════════════════════════════
@@ -814,6 +1066,22 @@ const BLUEPRINTS: Record<GenreType, GenreProcessBlueprint> = {
     ],
     arcTemplate: 'Mini-arc 30-50 ch: ch.1-3 Hub brief + arrive → ch.4-10 reroute first plot point + show competence → ch.11-25 build alternative path → ch.26-40 confront pháo hôi/villain + climax → ch.41-50 mission complete + Hub return.',
     stakesLadder: ['Nguyên chủ life', 'Một thế giới', 'Multi-world impact', 'Hub Space / system survival'],
+    signatureTropes: [
+      'Nhận nhiệm vụ + nhập thân phận mới mỗi thế giới',
+      'Cứu / bù đắp nguyên chủ + lật ngược kịch bản pháo hôi',
+      'Phản diện / nữ phụ counter-play',
+      'Thu thập điểm / đạo cụ từ hệ thống',
+      'Lỗi / biến số hệ thống reveal',
+      'Hub Space nghỉ ngơi + nâng cấp giữa các thế giới',
+      'Main couple / lord arc xuyên suốt các thế giới',
+    ],
+    textureDetails: [
+      'Cấu trúc MODULAR 4 hồi: nhập vai 5ch + leo 15ch + cao trào 15ch + thu 10ch',
+      'Hệ thống UI: nhiệm vụ, điểm, cửa hàng đạo cụ, độ hảo cảm nguyên chủ',
+      'Mỗi thế giới đổi setting / xưng hô / luật riêng nhưng MC core giữ nguyên',
+      'Nguyên chủ ký ức / oán niệm bàn giao cho MC',
+      'Cover story khả năng "biết kịch bản". Episodic nhưng meta-plot Hub Space xuyên suốt',
+    ],
   },
 
 };
@@ -849,6 +1117,12 @@ ${bp.setup.worldRulesFocus.map(r => `  - ${r}`).join('\n')}
 
 OPENING PATTERN (Chương 1):
   ${bp.setup.openingPattern}
+
+SIGNATURE TROPES (cốt truyện PHẢI lên lịch các trope kinh điển này — đây là thứ reader mua vé để xem):
+${bp.signatureTropes.map(t => `  ★ ${t}`).join('\n')}
+
+TEXTURE DETAILS (từ vựng / nghi thức / xưng hô / vật phẩm đặc trưng — lock cụ thể từ setup, KHÔNG generic):
+${bp.textureDetails.map(d => `  ◦ ${d}`).join('\n')}
 
 STAKES LADDER:
   ${bp.stakesLadder.join(' → ')}
@@ -891,6 +1165,12 @@ ${bp.sceneTypes.map(s => `  • ${s}`).join('\n')}
 
 ARC TEMPLATE (cho 50-150 chương):
   ${bp.arcTemplate}
+
+SIGNATURE TROPES (lên lịch rải đều — reader chờ các beat kinh điển này):
+${bp.signatureTropes.map(t => `  ★ ${t}`).join('\n')}
+
+TEXTURE DETAILS (dùng từ vựng/nghi thức/vật phẩm đặc trưng — KHÔNG generic flavor):
+${bp.textureDetails.map(d => `  ◦ ${d}`).join('\n')}
 
 QUALITY FLOOR (mỗi chương phải đạt):
   ${bp.process.qualityFloor}

@@ -168,6 +168,31 @@ export interface StoryKernel {
     revealRule: string;
     coverStory?: string;
   };
+  /**
+   * Foreknowledge engine — ONLY for reincarnated/transmigrator/returnee origins.
+   * Turns "biết trước / ký ức kiếp trước / kiến thức hiện đại" into a structural,
+   * leverageable advantage instead of throwaway flavor. Chốt một lần ở stage_idea,
+   * injected mỗi chương, enforced bởi checkForeknowledgeGate.
+   * When mcOrigin is native/system-bestowed → undefined (or active:false).
+   */
+  mcForeknowledge?: {
+    /** true only when mcOrigin ∈ {reincarnated, transmigrator, returnee}. */
+    active: boolean;
+    /** Loại tri thức MC mang theo. */
+    knowledgeType: 'past_life_memory' | 'future_events' | 'modern_knowledge' | 'canon_knowledge';
+    /** Lợi thế cụ thể MC nắm (1-2 câu): MC biết/nhớ điều gì mà người khác không. */
+    whatMcKnows: string;
+    /** 3-6 sự kiện/cột mốc tương lai cụ thể MC sẽ gặp và có thể khai thác. */
+    futureTimeline: string[];
+    /** MC DÙNG tri thức đó thế nào: né bẫy / chốt deal sớm / luyện sớm / cứu đúng người. */
+    leverageRule: string;
+    /** Rủi ro/chi phí khi hành động dựa trên biết trước (butterfly: đổi timeline → lệch dự đoán). */
+    costRule: string;
+    /** Nhịp hồi tưởng/khai thác: vd "1 memory-trigger mỗi 1-2 chương; callback kiếp trước ≥1/arc". */
+    reminiscenceCadence: string;
+    /** Người ngoài giải thích sự nhạy bén của MC ra sao (tái dùng mcSecret.coverStory). */
+    coverStory: string;
+  };
   /** Concrete goal → action → benefit loop that prevents random meddling. */
   benefitLoop: {
     goal: string;
@@ -291,6 +316,20 @@ export interface ChapterOutline {
   comedyBeat?: string;
   /** Which scene number is the slow/breathing scene for pacing contrast */
   slowScene?: string;
+  /**
+   * Foreknowledge beat — present only when project foreknowledge is active
+   * (mcOrigin reincarnated/transmigrator/returnee). Architect plans a concrete
+   * memory-trigger / knowledge-action on a 1-2 chapter cadence; Writer renders
+   * it; checkForeknowledgeGate enforces it. See StoryKernel.mcForeknowledge.
+   */
+  foreknowledgeBeat?: {
+    type: 'memory_trigger' | 'knowledge_action' | 'future_avoidance' | 'modern_leverage';
+    sceneNumber?: number;
+    trigger?: string;
+    description: string;
+    benefit?: string;
+    cost?: string;
+  };
   cliffhanger: string;
   targetWordCount: number;
   /**

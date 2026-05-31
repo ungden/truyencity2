@@ -53,6 +53,25 @@ describe('typed genre contract validator', () => {
     }
   });
 
+  it('passes a well-formed named-spine tien-hiep setup without major issues', () => {
+    const issues = validateGenreSetupContract({
+      genre: 'tien-hiep',
+      worldDescription:
+        'Thế giới tu tiên Cửu Châu có thang cảnh giới rõ: Luyện Khí → Trúc Cơ → Kim Đan → Nguyên Anh → Hóa Thần, mỗi cảnh chia chín tầng. ' +
+        'Tông môn Thanh Vân Tông đứng đầu, có tông chủ, các trưởng lão và đệ tử chân truyền phân cấp nghiêm ngặt; bên cạnh là gia tộc Lăng thị thế gia. ' +
+        'Tài nguyên gồm linh thạch, đan dược theo đan phương, linh thảo và pháp bảo phân phẩm cấp từ phàm khí tới linh bảo.',
+      setupKernel: {
+        readerFantasy: 'MC dựa golden finger luyện đan vươn lên đỉnh tông môn',
+        pleasureLoop: ['gặp khó cảnh giới', 'đầu tư tài nguyên', 'đột phá', 'chấn động tông môn'],
+      },
+      masterOutline: { arcs: [{ name: 'Luyện Khí nhập môn Thanh Vân Tông' }] },
+      storyOutline: { premise: 'Đệ tử chân truyền giấu kim đan cảnh, gánh tộc vận Lăng thị' },
+    });
+
+    const major = issues.filter((i) => i.severity === 'critical' || i.severity === 'major');
+    expect(major).toHaveLength(0);
+  });
+
   it('flags golden finger secret leaks as critical', () => {
     const issues = validateGenreChapterContract({
       genre: 'di-gioi',
@@ -93,6 +112,34 @@ describe('typed genre contract validator', () => {
 
     expect(issues.some((issue) => issue.code === 'fanfic_no_canon_recall')).toBe(true);
     expect(issues.some((issue) => issue.code === 'foreknowledge_unused')).toBe(true);
+  });
+
+  it('passes mind-reading dong-nhan chapters and does not hard-block via secret_leak', () => {
+    const issues = validateGenreChapterContract({
+      genre: 'dong-nhan',
+      chapterNumber: 7,
+      content: 'Trần Hạo nghe rõ tiếng lòng của người quản lý: ông ta đang giấu một khoản quỹ đen. Nhờ đọc được suy nghĩ đó, anh biết trước nước đi và âm thầm chuẩn bị. Nội tâm đối phương hoảng loạn trong khi vẻ ngoài vẫn bình thản. Anh giải thích trong đầu vì sao mình luôn đoán trúng, nhưng tuyệt nhiên không nói bí mật này ra.'.repeat(16),
+    });
+
+    // Mind-reading topic (dong-nhan-doc-tieng-long) satisfies chapterMustHave via the
+    // tiếng lòng / nội tâm branch — it must NOT be flagged as generic fantasy.
+    expect(issues.some((issue) => issue.code === 'fanfic_no_canon_recall')).toBe(false);
+    expect(issues.some((issue) => issue.code === 'foreknowledge_unused')).toBe(false);
+    // Internal narration about the power is NOT a leak; even if it fired, dong-nhan
+    // secret_leak is moderate now → never a rewrite-forcing critical.
+    expect(issues.some((issue) => issue.code === 'secret_leak' && issue.severity === 'critical')).toBe(false);
+  });
+
+  it('does not hard-block rules-horror chapters that read and test the ruleset', () => {
+    const issues = validateGenreChapterContract({
+      genre: 'quy-tac-quai-dam',
+      chapterNumber: 6,
+      content: 'Bảng quy tắc dán trên tường ghi rõ điều khoản số ba: sau nửa đêm cấm mở cửa sổ. Lâm Phong phát hiện mâu thuẫn giữa quy tắc hai và quy tắc năm, anh kiểm chứng bằng cách hé cửa và quan sát. Một manh mối mới lộ ra, xác nhận đâu là rule thật. Anh giải thích trong đầu vì sao mình sống sót nhờ tuân thủ điều khoản.'.repeat(16),
+    });
+
+    expect(issues.some((issue) => issue.code === 'mystery_rule_missing')).toBe(false);
+    // Acting on / reasoning about the ruleset is the core mechanic — not a critical leak.
+    expect(issues.some((issue) => issue.code === 'secret_leak' && issue.severity === 'critical')).toBe(false);
   });
 
   it('passes territory-builder chapters with production payoff', () => {

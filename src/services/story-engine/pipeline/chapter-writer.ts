@@ -558,6 +558,31 @@ ${CLIFFHANGER_TECHNIQUES.map((c: { name: string; example: string }) => '- ' + c.
   const mcStateMatch = context.match(/Trạng thái MC cuối chương trước:\s*([^\n]*)/);
   const previousMcState = mcStateMatch ? mcStateMatch[1].trim() : '';
 
+  // Foreknowledge engine — active iff the assembler injected the [BIẾT-TRƯỚC] kernel block
+  // (only for reincarnated/transmigrator/returnee origins). When active, Architect MUST plan a
+  // concrete foreknowledgeBeat on a 1-2 chapter cadence so "biết trước" stops drifting like clouds.
+  const foreknowledgeActive = context.includes('[BIẾT-TRƯỚC');
+  const foreknowledgeSchemaField = foreknowledgeActive
+    ? `\n  "foreknowledgeBeat": {
+    "type": "<memory_trigger (cảnh-kích → flashback kiếp trước) | knowledge_action (hành động vì biết trước) | future_avoidance (né bẫy đã thấy) | modern_leverage (áp dụng kiến thức ngoài)>",
+    "sceneNumber": <int — scene nào trong chương>,
+    "trigger": "<mùi / người / ngày tháng / cảnh lặp / quyết định — cái gì kích hoạt ký ức hoặc nhận ra>",
+    "description": "<1 câu: MC ngửi/thấy/nghe X → nhớ ra/biết trước Y → đổi nước cờ Z>",
+    "benefit": "<lợi thế CỤ THỂ thu được: né bẫy sớm 1 chương / chốt deal trước / cứu đúng người>",
+    "cost": "<butterfly/limit: timeline lệch, đối thủ cũng xê dịch, chỉ biết key event nên vẫn phải thử-sai>"
+  },`
+    : '';
+  const foreknowledgeRule = foreknowledgeActive
+    ? `
+═══════════════════════════════════════════
+BIẾT-TRƯỚC / TRỌNG SINH — BẮT BUỘC (origin foreknowledge active):
+═══════════════════════════════════════════
+- Outline PHẢI có "foreknowledgeBeat" trên nhịp: memory-trigger MỖI 1-2 chương; ngoài trigger, ≥1 hành động dựa-trên-biết-trước có cost mỗi arc.
+- Beat phải tie vào [BIẾT-TRƯỚC] kernel trong context (whatMcKnows + futureTimeline) — KHÔNG bịa ký ức ngoài kernel.
+- Flashback = 1-2 câu cảnh-kích, KHÔNG paragraph dump. MC QUYẾT ĐỊNH KHÁC vì biết trước → có hậu quả/cost.
+- ANTI god-mode: MC KHÔNG biết MỌI THỨ — chỉ key events; nhiều thứ vẫn phải thử + sai. CẤM "MC biết hết, đi 1 nước thắng luôn".`
+    : '';
+
   // Phase 22 Stage 2 Q2: Architect budget bumped 120K → 400K. DeepSeek 1M context handles
   // this trivially (~100K tokens at most). Old cap was a token-saving artifact from
   // pre-DeepSeek era; head-tail trim was DROPPING THE MIDDLE of synopsis/arc plan/character
@@ -605,7 +630,7 @@ JSON OUTPUT SCHEMA (output structure, không thay đổi):
     "closing": "<MC ending emotional state TIED TO concrete action MC vừa làm. ĐÚNG 'MC mỉm cười nhận hợp đồng từ tay CEO Phạm An'. SAI 'quyết tâm' / 'trầm tư' (abstract emotion alone — CẤM).>"
   },
   "comedyBeat": "...",
-  "slowScene": "...",
+  "slowScene": "...",${foreknowledgeSchemaField}
   "cliffhanger": "<SỰ KIỆN BÊN NGOÀI cụ thể vừa xảy ra ở câu cuối chương — bắt buộc 1 trong 4 forms: (a) [Actor named] + verb action + object (vd 'Phụng — vợ cũ 3 năm — đẩy cửa bước vào, tay cầm phong bì niêm phong'); (b) [Specific object/sound/sight] xuất hiện (vd 'Trên màn hình hiện tin nhắn từ số ẩn: \\\"Tôi biết bí mật năm 2018\\\"'); (c) [MC name] decides verb action at TIME at PLACE với PERSON (vd 'Lê Hữu Tuấn quyết định 7h sáng mai sẽ đến biệt thự Reinhardt với 2 vệ sĩ chốt deal muối'); (d) [Channel] from [name] content '[exact words]'. CẤM TUYỆT ĐỐI: 'ván cờ/trò chơi/cuộc chiến mới bắt đầu', 'hắn là X đây là thế giới', 'X chưa bao giờ chấp nhận thua cuộc', 'sẵn sàng đối mặt với tất cả', 'cuộc chơi chính thức vượt ra khỏi tầm kiểm soát', 'thế giới này không còn là của chúng', 'kỷ nguyên mới được viết nên', 'cái tên sẽ trở thành biểu tượng'. Bất kỳ tuyên ngôn vĩ mô trừu tượng về vận mệnh/thế giới = REJECTED.>",
   "targetWordCount": <int>,
   "chapterIntent": {
@@ -628,7 +653,8 @@ ${emotionalArcGuide}
 
 ${finalArcGuide}
 
-${engagementGuide}`;
+${engagementGuide}
+${foreknowledgeRule}`;
 
   // ── DYNAMIC SUFFIX (changes every chapter, breaks cache) ──
   const dynamicSuffix = `
@@ -733,9 +759,13 @@ Kế hoạch Cảnh 1:
 - Mục tiêu cảnh (goal): "${parsed.scenes[0].goal || ''}"
 - Mở đầu cảm xúc (emotionalArc.opening): "${parsed.emotionalArc?.opening || ''}"
 
+QUAN TRỌNG — phân biệt 2 loại cliffhanger:
+1. Cliffhanger LỜI HẸN TƯƠNG LAI (vd "Sáng mai 7h MC sẽ tới biệt thự gặp X", "Chiều nay 2h hẹn gặp ở quán"): Cảnh 1 time-skip TIẾN tới đúng thời điểm/địa điểm đã hẹn (sáng mai tại biệt thự / chiều nay tại quán) chính LÀ cách thực hiện cliffhanger → trả "OK". KHÔNG coi việc nhảy tới mốc-hẹn là lỗi.
+2. Cliffhanger SỰ KIỆN ĐANG DIỄN RA (vd đang bị phục kích trong rừng lúc nửa đêm, vừa nhận tin đe dọa trong xe): Cảnh 1 phải tiếp diễn NGAY tại địa điểm/thời điểm đó.
+
 Trả về đúng một trong hai định dạng:
-- "OK" nếu Cảnh 1 tiếp diễn trực tiếp từ cliffhanger (ví dụ: cảnh xử lý tin nhắn đe dọa, cảnh lái xe tiếp, cảnh phản ứng ngay tại địa điểm cuối chương trước).
-- "ERR: [Lý do ngắn bằng tiếng Việt]" nếu Cảnh 1 bị nhảy địa điểm/thời gian đột ngột mà không giải quyết hay transition từ cliffhanger (ví dụ: chương trước đang ở trong xe nhận tin đe dọa, chương này tự nhiên đang ở cửa hàng bán khách mà không nói gì về việc di chuyển hay giải quyết tin nhắn).`;
+- "OK" nếu Cảnh 1 (a) tiếp diễn trực tiếp từ cliffhanger sự-kiện-đang-diễn-ra, HOẶC (b) time-skip tiến tới đúng mốc thời gian/địa điểm mà cliffhanger lời-hẹn đã đặt ra.
+- "ERR: [Lý do ngắn bằng tiếng Việt]" CHỈ khi Cảnh 1 nhảy sang địa điểm/thời điểm KHÁC với cả cliffhanger lẫn mốc-hẹn của nó, không có transition di chuyển và không phải mốc đã hẹn (ví dụ: chương trước hẹn 7h sáng tới biệt thự, nhưng Cảnh 1 lại đang ở sân bay nước ngoài; hoặc chương trước đang trong xe nhận tin đe dọa, chương này tự nhiên ở cửa hàng bán khách mà không nói gì về di chuyển hay xử lý tin nhắn). KHÔNG báo ERR chỉ vì có time-skip tiến tới mốc đã hẹn.`;
 
     try {
       // Use Flash model for cheap/fast verification
@@ -890,6 +920,18 @@ async function runWriter(
 → Viết sao cho người đọc CẢM NHẬN được sự chuyển đổi cảm xúc rõ ràng.`
     : '';
 
+  // Foreknowledge beat — render the planned biết-trước/trọng-sinh beat concretely.
+  const fk = outline.foreknowledgeBeat;
+  const foreknowledgeSection = fk?.description
+    ? `\nBIẾT-TRƯỚC / HỒI TƯỞNG KIẾP TRƯỚC (BẮT BUỘC viết — KHÔNG cho trôi qua như mây):
+- Loại beat: ${fk.type}${fk.sceneNumber ? ` (scene ${fk.sceneNumber})` : ''}
+- Trigger cảnh-kích: ${fk.trigger || 'tự chọn 1 chi tiết giác quan (mùi/âm thanh/hình ảnh/ngày tháng) trong scene'}
+- Nội dung: ${fk.description}
+- Lợi thế MC thu được: ${fk.benefit || 'thể hiện rõ MC đi trước 1 nước nhờ biết trước'}
+- Cost/hệ quả: ${fk.cost || 'timeline lệch nhẹ vì MC can thiệp'}
+CÁCH VIẾT BẮT BUỘC: (1) trigger cảnh-kích cụ thể → (2) 1-2 câu flashback/nhận-ra (KHÔNG đoạn văn dump dài) → (3) MC QUYẾT ĐỊNH KHÁC vì biết trước → (4) hậu quả có cost. KHÔNG để MC "biết hết đi 1 nước thắng luôn".`
+    : '';
+
   // Topic section
   const topicSection = buildTopicSection(options?.topicId);
 
@@ -1027,6 +1069,7 @@ SCENES (viết ĐẦY ĐỦ cho MỖI scene — KHÔNG bỏ qua scene nào):
 ${sceneGuidance}
 ${multiPOVGuide}
 ${emotionalArcSection}
+${foreknowledgeSection}
 
 DOPAMINE (phải có):
 ${outline.dopaminePoints.map(dp => `- ${dp.type}: Setup: ${dp.setup} → Payoff: ${dp.payoff}`).join('\n')}
