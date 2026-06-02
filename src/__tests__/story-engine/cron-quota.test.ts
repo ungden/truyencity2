@@ -76,6 +76,14 @@ describe('story production quota', () => {
     expect(isRecoverableRoutineWriteError('timeout calling deepseek')).toBe(true);
     expect(isRecoverableRoutineWriteError('CHAPTER_BLUEPRINT_MISSING_OR_INVALID: missing ch43')).toBe(false);
     expect(isRecoverableRoutineWriteError('PUBLISHED_SETUP_KERNEL_MISSING')).toBe(false);
+    // Content-quality blocks cool-down-retry instead of permanently pausing a novel.
+    expect(isRecoverableRoutineWriteError(
+      'Chapter 13: failed quality gate after 3 attempts (requiresRewrite=true, approved=false).',
+    )).toBe(true);
+    expect(isRecoverableRoutineWriteError('Bridge broken: Cảnh 1 nhảy địa điểm khác')).toBe(true);
+    expect(isRecoverableRoutineWriteError(
+      'Chapter 8-9: 2 critical contradictions detected and auto-revise failed.',
+    )).toBe(true);
   });
 
   it('backs off recoverable routine retries without making them permanent stops', () => {

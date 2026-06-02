@@ -71,7 +71,18 @@ export function isRecoverableRoutineWriteError(errorMsg: string): boolean {
     normalized.includes('timeout') ||
     normalized.includes('fetch failed') ||
     normalized.includes('network') ||
-    normalized.includes('temporarily unavailable')
+    normalized.includes('temporarily unavailable') ||
+    // ROOT FIX (2026-06-02): content-quality blocks are RECOVERABLE-ROUTINE, not
+    // novel-killing. A single hard chapter that fails the Critic gate / bridge
+    // check / pre-publish consistency must NOT permanently pause a 1000-chapter
+    // novel — the next fresh generation often passes. These cool down with
+    // exponential backoff (→ 3h) and surface on the dashboard instead of dying.
+    // The truly-unrecoverable cases (missing setup kernel / blueprint / dead
+    // letter / cost cap) are excluded by the early `return false` above.
+    normalized.includes('failed quality gate after') ||
+    normalized.includes('bridge broken') ||
+    normalized.includes('critical contradictions detected') ||
+    normalized.includes('blocking business-logic consistency')
   );
 }
 

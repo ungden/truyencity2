@@ -148,7 +148,7 @@ async function checkCastRoster(input: CanonEnforcementInput): Promise<CriticIssu
   // Match 2-4 capitalized words (Đào Lệ Băng, Nguyễn Văn A, Lý Phong, ...).
   const NAME_RE = /\b[A-ZÀÁẢÃẠĂẰẮẲẴẶÂẦẤẨẪẬÈÉẺẼẸÊỀẾỂỄỆÌÍỈĨỊÒÓỎÕỌÔỒỐỔỖỘƠỜỚỞỠỢÙÚỦŨỤƯỪỨỬỮỰỲÝỶỸỴĐ][a-zàáảãạăắằẳẵặâấầẩẫậèéẻẽẹêếềểễệìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵđ]+(?:[ \t]+[A-ZÀÁẢÃẠĂẰẮẲẴẶÂẦẤẨẪẬÈÉẺẼẸÊỀẾỂỄỆÌÍỈĨỊÒÓỎÕỌÔỒỐỔỖỘƠỜỚỞỠỢÙÚỦŨỤƯỪỨỬỮỰỲÝỶỸỴĐ][a-zàáảãạăắằẳẵặâấầẩẫậèéẻẽẹêếềểễệìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵđ]+){1,3}\b/g;
 
-  const candidates = new Set<string>();
+  const candidateCounts = new Map<string, number>();
   let m: RegExpExecArray | null;
   while ((m = NAME_RE.exec(input.content)) !== null) {
     const name = m[0].trim();
@@ -158,8 +158,9 @@ async function checkCastRoster(input: CanonEnforcementInput): Promise<CriticIssu
     if (PLACE_PREFIXES.some(p => name.startsWith(p))) continue;
     if (TITLE_WORDS.some(t => name.includes(t))) continue;
     if (isLikelyWorldTermCandidate(name)) continue;
-    candidates.add(name);
+    candidateCounts.set(name, (candidateCounts.get(name) ?? 0) + 1);
   }
+  const candidates = new Set<string>(candidateCounts.keys());
 
   // Also subtract: protagonist + expected characters + recent cast roster.
   const allowed = new Set<string>([input.protagonistName, ...input.expectedCharacters]);
@@ -186,21 +187,35 @@ async function checkCastRoster(input: CanonEnforcementInput): Promise<CriticIssu
   // Offline Mode) — Vietnamese fiction often uses uppercased English technical
   // terms or product labels that are NOT characters. (2026-05-12)
   const looksEnglishOnly = (s: string): boolean => /^[A-Za-z][A-Za-z0-9\s'-]+$/.test(s);
-  const filteredNovel = novel.filter(n => !looksEnglishOnly(n));
+  const filteredNovelAll = novel.filter(n => !looksEnglishOnly(n));
 
-  // Tolerance: ≥5 new named entities = sus; ≥10 = major.
-  // Chapter 1 naturally introduces institutions, places, skill names and cast,
-  // so keep this as a soft warning unless the extraction goes wildly off-track.
+  // ROOT FIX (2026-06-02): require RECURRENCE before counting a new name as a
+  // suspected invented character. A genuine new CHARACTER recurs within the same
+  // chapter (≥2 mentions); a capitalized phrase appearing exactly once is almost
+  // always background flavor — a one-off place/role/honorific/minor-NPC that
+  // slipped the place/title filters. Counting one-offs was the dominant
+  // false-positive source that hard-blocked + auto-paused name-heavy genres
+  // (lãnh chúa with vassals/soldiers, tinh hạm with crew/officers, tông môn with
+  // elders/disciples) where a chapter legitimately name-drops many minor entities.
+  const filteredNovel = filteredNovelAll.filter(n => (candidateCounts.get(n) ?? 0) >= 2);
+
+  // Tolerance: ≥5 recurring new names = sus; ≥10 = stronger. ADVISORY ONLY —
+  // emitted as type 'quality' so it informs the Critic/human without auto-forcing
+  // a rewrite (isHardBlockingIssue only blocks on major continuity/consistency/
+  // logic, NOT major quality). Cast-roster count is a drift *risk*, not a canon
+  // *contradiction*; genuine canon breaks (MC name flip, dead char returning) are
+  // caught by dedicated gates + the Critic AI. Over-blocking here was killing
+  // two-thirds of production with no actual continuity error.
   if (input.chapterNumber > 1 && filteredNovel.length >= 10 && !softCastRosterOnly) {
     issues.push({
-      type: 'continuity',
-      severity: 'major',
-      description: `${filteredNovel.length} tên nhân vật MỚI xuất hiện trong chương này không có trong cast roster: ${filteredNovel.slice(0, 8).join(', ')}. Có thể AI đang invent characters drift khỏi canon. Verify: chỉ giữ characters đã establish + characters MỚI có narrative reason.`,
+      type: 'quality',
+      severity: 'moderate',
+      description: `${filteredNovel.length} tên nhân vật lặp lại MỚI xuất hiện trong chương này không có trong cast roster: ${filteredNovel.slice(0, 8).join(', ')}. Có thể AI đang invent characters drift khỏi canon. Verify: chỉ giữ characters đã establish + characters MỚI có narrative reason.`,
     });
   } else if (filteredNovel.length >= 5) {
     issues.push({
       type: 'quality',
-      severity: 'moderate',
+      severity: 'minor',
       description: `${filteredNovel.length} tên có thể là nhân vật mới (chưa từng appear): ${filteredNovel.slice(0, 5).join(', ')}. Verify cần thiết hay drift.`,
     });
   }
@@ -355,9 +370,16 @@ export function isLikelyWorldTermCandidate(name: string): boolean {
 
 async function checkTimelineViolations(input: CanonEnforcementInput): Promise<CriticIssue[]> {
   const violations = await detectTimelineViolations(input.projectId, input.chapterNumber);
+  // ROOT FIX (2026-06-02): ADVISORY, not rewrite-forcing. days_elapsed_since_start
+  // + mc_age are AI-EXTRACTED per chapter and noisy — a single bad extraction in an
+  // earlier chapter poisons every later chapter with a phantom "time-reversal",
+  // hard-blocking + auto-pausing the novel on a metadata artifact rather than a real
+  // content error. Surface it (type 'quality' → never auto-promotes requiresRewrite)
+  // so the Critic/human can sanity-check, but don't kill the write. Genuine in-prose
+  // time reversal is also caught by the Critic bridge/continuity rules.
   return violations.map(desc => ({
-    type: 'continuity' as const,
-    severity: 'major' as const,
+    type: 'quality' as const,
+    severity: 'moderate' as const,
     description: desc,
   }));
 }
