@@ -38,7 +38,7 @@ export async function getVolumeSummaryContext(
     const db = getSupabase();
     const { data } = await db
       .from('volume_summaries')
-      .select('volume_number,start_chapter,end_chapter,title,summary,major_milestones,plot_threads_resolved')
+      .select('volume_number,start_chapter,end_chapter,title,summary,major_milestones,plot_threads_resolved,facts')
       .eq('project_id', projectId)
       .order('volume_number', { ascending: false })
       .limit(MAX_VOLUMES_INJECTED);
@@ -53,7 +53,19 @@ export async function getVolumeSummaryContext(
     for (const v of ordered) {
       const milestones = (v.major_milestones || []).slice(0, 5).join(' • ');
       const resolved = (v.plot_threads_resolved || []).slice(0, 4).join(' • ');
-      const block = `\n📚 Volume ${v.volume_number} (Ch.${v.start_chapter}-${v.end_chapter})${v.title ? ` — ${v.title}` : ''}:\n${(v.summary || '').slice(0, 1800)}${milestones ? `\n  Mốc lớn: ${milestones}` : ''}${resolved ? `\n  Tuyến đã đóng: ${resolved}` : ''}`;
+      // Quality Overhaul 2.6: deterministic facts sub-block — state-table
+      // truth that the LLM prose summary cannot drift away from. If prose
+      // and facts conflict, FACTS win.
+      const f = (v as { facts?: VolumeFacts | null }).facts;
+      const factLines: string[] = [];
+      if (f?.deaths?.length) factLines.push(`Đã chết: ${f.deaths.join(', ')}`);
+      if (f?.mc_realm_end) factLines.push(`MC cảnh giới cuối volume: ${f.mc_realm_end}`);
+      if (f?.threads_resolved?.length) factLines.push(`Threads đóng (DB): ${f.threads_resolved.slice(0, 4).join(' • ')}`);
+      if (f?.timeline_span) factLines.push(`Thời gian in-world: ${f.timeline_span}`);
+      const factBlock = factLines.length
+        ? `\n  🔒 SỰ THẬT KHÓA (deterministic — prose mâu thuẫn thì THEO DÒNG NÀY): ${factLines.join(' | ')}`
+        : '';
+      const block = `\n📚 Volume ${v.volume_number} (Ch.${v.start_chapter}-${v.end_chapter})${v.title ? ` — ${v.title}` : ''}:\n${(v.summary || '').slice(0, 1800)}${milestones ? `\n  Mốc lớn: ${milestones}` : ''}${resolved ? `\n  Tuyến đã đóng: ${resolved}` : ''}${factBlock}`;
       if (totalChars + block.length > MAX_INJECTION_CHARS) break;
       lines.push(block);
       totalChars += block.length;
@@ -63,6 +75,93 @@ export async function getVolumeSummaryContext(
   } catch {
     return null;
   }
+}
+
+/**
+ * Quality Overhaul 2.6 — deterministic facts from state tables for a chapter
+ * range. Exported for unit tests (pass a mocked supabase via getSupabase).
+ */
+export interface VolumeFacts {
+  deaths: string[];
+  mc_realm_end: string | null;
+  threads_resolved: string[];
+  timeline_span: string | null;
+}
+
+async function computeVolumeFacts(
+  projectId: string,
+  startChapter: number,
+  endChapter: number,
+): Promise<VolumeFacts> {
+  const db = getSupabase();
+  const facts: VolumeFacts = { deaths: [], mc_realm_end: null, threads_resolved: [], timeline_span: null };
+
+  try {
+    // Deaths: characters whose state flipped to dead within the range.
+    const { data: deadStates } = await db
+      .from('character_states')
+      .select('character_name,chapter_number')
+      .eq('project_id', projectId)
+      .eq('status', 'dead')
+      .gte('chapter_number', startChapter)
+      .lte('chapter_number', endChapter)
+      .order('chapter_number', { ascending: true })
+      .limit(50);
+    const seen = new Set<string>();
+    for (const s of deadStates || []) {
+      if (seen.has(s.character_name)) continue;
+      seen.add(s.character_name);
+      facts.deaths.push(`${s.character_name} (ch.${s.chapter_number})`);
+    }
+    facts.deaths = facts.deaths.slice(0, 10);
+  } catch { /* non-fatal */ }
+
+  try {
+    // MC power realm — single-row table (PK project_id); only meaningful for
+    // the volume if its last update falls within/before the range end.
+    const { data: power } = await db
+      .from('mc_power_states')
+      .select('power_state,last_updated_chapter')
+      .eq('project_id', projectId)
+      .maybeSingle();
+    const realm = (power?.power_state as { currentRealm?: string } | null)?.currentRealm;
+    if (realm && typeof power?.last_updated_chapter === 'number' && power.last_updated_chapter <= endChapter) {
+      facts.mc_realm_end = `${realm} (cập nhật ch.${power.last_updated_chapter})`;
+    }
+  } catch { /* non-fatal */ }
+
+  try {
+    // Threads resolved in range (deterministic — from plot_threads, not LLM).
+    const { data: resolved } = await db
+      .from('plot_threads')
+      .select('name,last_active_chapter')
+      .eq('project_id', projectId)
+      .eq('status', 'resolved')
+      .gte('last_active_chapter', startChapter)
+      .lte('last_active_chapter', endChapter)
+      .limit(10);
+    facts.threads_resolved = (resolved || []).map(t => `${t.name} (ch.${t.last_active_chapter})`);
+  } catch { /* non-fatal */ }
+
+  try {
+    // In-world timeline span.
+    const { data: timeline } = await db
+      .from('story_timeline')
+      .select('in_world_date_text,chapter_number')
+      .eq('project_id', projectId)
+      .gte('chapter_number', startChapter)
+      .lte('chapter_number', endChapter)
+      .order('chapter_number', { ascending: true });
+    if (timeline?.length) {
+      const first = timeline[0];
+      const last = timeline[timeline.length - 1];
+      if (first.in_world_date_text && last.in_world_date_text) {
+        facts.timeline_span = `${first.in_world_date_text} → ${last.in_world_date_text}`;
+      }
+    }
+  } catch { /* non-fatal */ }
+
+  return facts;
 }
 
 export async function generateVolumeSummary(
@@ -176,6 +275,12 @@ Trả về JSON:
       if (cd.name) charDevObj[cd.name] = cd.change || '';
     }
 
+    // Quality Overhaul 2.6 — deterministic facts straight from state tables
+    // for the volume range. LLM prose summaries accumulate errors over 40+
+    // volume cycles (summary inherits last summary's mistakes); these fields
+    // cannot drift and make prose-vs-fact contradictions detectable.
+    const facts = await computeVolumeFacts(projectId, startChapter, endChapter);
+
     const { error } = await db.from('volume_summaries').upsert({
       project_id: projectId,
       volume_number: volumeNumber,
@@ -188,6 +293,7 @@ Trả về JSON:
       plot_threads_introduced: parsed.plot_threads_introduced || [],
       character_development: charDevObj,
       arcs_included: (arcs || []).map(a => a.arc_number),
+      facts,
       updated_at: new Date().toISOString(),
     }, { onConflict: 'project_id,volume_number' });
 

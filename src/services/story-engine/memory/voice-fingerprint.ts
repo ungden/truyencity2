@@ -83,7 +83,7 @@ export async function updateVoiceFingerprint(
   // Load existing fingerprint for comparison
   const { data: existing } = await db
     .from('voice_fingerprints')
-    .select('fingerprint')
+    .select('fingerprint,consecutive_drift_count')
     .eq('project_id', projectId)
     .maybeSingle();
 
@@ -198,12 +198,24 @@ Trả về JSON:
     }
   }
 
+  // Quality Overhaul 2.5 — drift escalation: ≥2 drifting dimensions in one
+  // refresh counts as a drift event; consecutive events accumulate. At ≥2
+  // consecutive, getVoiceContext switches to corrective mode (slow voice
+  // creep used to be logged-but-never-enforced and compounded over 100+ ch).
+  const driftDetected = antiPatterns.length >= 2;
+  const prevDriftCount = (existing as { consecutive_drift_count?: number } | null)?.consecutive_drift_count ?? 0;
+  const consecutiveDriftCount = driftDetected ? prevDriftCount + 1 : 0;
+  if (driftDetected) {
+    console.warn(`[VoiceFingerprint] drift detected (${antiPatterns.length} dimensions), consecutive=${consecutiveDriftCount} for project ${projectId}`);
+  }
+
   const { error: upsertErr } = await db.from('voice_fingerprints').upsert({
     project_id: projectId,
     fingerprint: parsed,
     sample_chapters: chapters.map(c => c.chapter_number),
     anti_patterns: antiPatterns,
     last_updated_chapter: chapterNumber,
+    consecutive_drift_count: consecutiveDriftCount,
   }, { onConflict: 'project_id' });
   if (upsertErr) console.warn('[VoiceFingerprint] Failed to save voice fingerprint: ' + upsertErr.message);
 }
@@ -216,7 +228,7 @@ export async function getVoiceContext(
   const db = getSupabase();
   const { data } = await db
     .from('voice_fingerprints')
-    .select('fingerprint,anti_patterns')
+    .select('fingerprint,anti_patterns,consecutive_drift_count')
     .eq('project_id', projectId)
     .maybeSingle();
 
@@ -224,8 +236,33 @@ export async function getVoiceContext(
 
   const fp = data.fingerprint as VoiceFingerprint;
   const antiPatterns = (data.anti_patterns || []) as string[];
+  const driftCount = (data as { consecutive_drift_count?: number }).consecutive_drift_count ?? 0;
 
-  const parts: string[] = ['═══ VOICE FINGERPRINT — GIỮ GIỌNG VĂN NHẤT QUÁN ═══'];
+  const parts: string[] = [];
+
+  // Quality Overhaul 2.5 — corrective mode: ≥2 consecutive drift events flips
+  // from descriptive ("đây là giọng văn") to corrective ("giọng văn ĐÃ DRIFT,
+  // sửa lại theo anchor"). Pull 2 ch.1-3 anchor snippets directly — anchors
+  // are the ground-truth cadence to return to.
+  if (driftCount >= 2) {
+    parts.push('═══ ⚠️ VOICE CORRECTION — BẮT BUỘC (giọng văn đã drift qua nhiều lần đo) ═══');
+    parts.push(`Giọng văn hiện tại đã LỆCH khỏi giọng gốc qua ${driftCount} lần đo liên tiếp. Chương này PHẢI viết theo đúng cadence/tone của sample dưới đây, KHÔNG theo giọng các chương gần nhất.`);
+    try {
+      const { data: anchors } = await db
+        .from('voice_anchors')
+        .select('chapter_number,snippet_type,snippet_text')
+        .eq('project_id', projectId)
+        .order('chapter_number', { ascending: true })
+        .limit(2);
+      for (const a of anchors || []) {
+        parts.push(`--- SAMPLE GỐC (${a.snippet_type}, ch.${a.chapter_number}) ---\n${String(a.snippet_text || '').slice(0, 800)}`);
+      }
+    } catch {
+      // Non-fatal — corrective text above still applies
+    }
+  }
+
+  parts.push('═══ VOICE FINGERPRINT — GIỮ GIỌNG VĂN NHẤT QUÁN ═══');
 
   if (fp.emotionalRegister) {
     parts.push(`Tông cảm xúc: ${fp.emotionalRegister}`);

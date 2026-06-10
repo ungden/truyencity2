@@ -458,6 +458,9 @@ export interface WorldConstraint {
 // ── Context Payload (assembled before writing) ───────────────────────────────
 
 export interface ContextPayload {
+  /** Quality Overhaul 2.7: names of context loaders that failed for this chapter (silent context loss telemetry). */
+  loaderFailures?: string[];
+
   // Layer -1: World Description (canonical premise source, hand-crafted at spawn time)
   /** Project's world_description text — the source of truth for setting, golden finger, antagonists, MC archetype.
    *  When story_outline schema is incomplete or master_outline is too high-level, world_description is the

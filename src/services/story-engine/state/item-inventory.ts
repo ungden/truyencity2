@@ -56,6 +56,8 @@ export interface InventorySnapshot {
   lastEventChapter: number;
   lastEventType: ItemEventType;
   description?: string;
+  /** 0-100; ≥70 = key item (pháp bảo/di vật/quest) — never dropped from context. */
+  importance?: number;
 }
 
 // ── Public API ───────────────────────────────────────────────────────────────
@@ -179,7 +181,7 @@ export async function getCurrentInventory(
     const db = getSupabase();
     let query = db
       .from('item_events')
-      .select('character_name,item_name,event_type,chapter_number,description')
+      .select('character_name,item_name,event_type,chapter_number,description,importance')
       .eq('project_id', projectId)
       .lte('chapter_number', upToChapter)
       .order('chapter_number', { ascending: true });
@@ -223,6 +225,9 @@ export async function getCurrentInventory(
         lastEventChapter: row.chapter_number,
         lastEventType: eventType,
         description: row.description ?? undefined,
+        importance: typeof (row as { importance?: number }).importance === 'number'
+          ? (row as { importance?: number }).importance
+          : undefined,
       });
     }
 
@@ -258,9 +263,18 @@ export async function getInventoryContext(
     const lines: string[] = ['[INVENTORY — VẬT PHẨM HIỆN TẠI, KHÔNG ĐƯỢC BỊA THÊM]'];
 
     if (heldByMc.length > 0) {
+      // Quality Overhaul 2.7: key items (importance ≥70 — pháp bảo / di vật /
+      // golden-finger token / quest item) are listed FIRST and never dropped
+      // by the 12-item cap. A forgotten heirloom re-introduced as "new" is
+      // exactly the long-novel incoherence readers catch.
+      const sorted = [...heldByMc].sort((a, b) => (b.importance ?? 50) - (a.importance ?? 50));
+      const keyItems = sorted.filter(i => (i.importance ?? 50) >= 70);
+      const normalItems = sorted.filter(i => (i.importance ?? 50) < 70);
+      const shown = [...keyItems, ...normalItems.slice(0, Math.max(0, 12 - keyItems.length))];
       lines.push(`\n${protagonistName} ĐANG SỞ HỮU:`);
-      for (const item of heldByMc.slice(0, 12)) {
-        lines.push(`  • "${item.itemName}" (lấy ch.${item.lastEventChapter}, ${item.lastEventType})${item.description ? ` — ${item.description.slice(0, 100)}` : ''}`);
+      for (const item of shown) {
+        const keyTag = (item.importance ?? 50) >= 70 ? ' [KEY ITEM]' : '';
+        lines.push(`  • "${item.itemName}"${keyTag} (lấy ch.${item.lastEventChapter}, ${item.lastEventType})${item.description ? ` — ${item.description.slice(0, 100)}` : ''}`);
       }
     } else {
       lines.push(`\n${protagonistName}: chưa có vật phẩm đặc biệt được track.`);
