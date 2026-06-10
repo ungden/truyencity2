@@ -810,8 +810,21 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     }
   }
 
+  // Quality Overhaul 1.6: cross-chapter repetition ban list (deterministic
+  // DB read, non-fatal) — injected into the Architect dynamic suffix.
+  const repetitionBanList = await import('../quality/repetition-tracker')
+    .then(({ getRepetitionBanList }) => getRepetitionBanList(project.id, nextChapter))
+    .catch(() => [] as string[]);
+
   // ── Step 3: Assemble context string ────────────────────────────────────
-  const contextString = assembleContext(context, nextChapter);
+  // Quality Overhaul 1.3: tier-aware budget (replaces blind head-trim in
+  // chapter-writer). 360K leaves ~40K headroom for the Architect's static
+  // prompt sections under its 400K MAX_PROMPT_CHARS guard.
+  let contextTrimInfo: { trimmedTiers: number[]; beforeChars: number; afterChars: number } | null = null;
+  const contextString = assembleContext(context, nextChapter, {
+    maxChars: 360_000,
+    onTrim: info => { contextTrimInfo = info; },
+  });
 
   // ── Step 4: Write chapter via 3-agent pipeline ─────────────────────────
   const isFinalArc = nextChapter >= totalPlanned - 20;
@@ -844,6 +857,10 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       qualityGateMinScore: flashRoutineMinQualityScore,
       qualityGateMode: flashRoutineSoftGate ? 'routine_soft' : 'standard',
       softEndingGuidance,
+      // Quality Overhaul 1.1: default ON; style_directives.critic_revise_pass=false opts out.
+      criticRevisePassEnabled: projectStyleDirectives?.critic_revise_pass !== false,
+      // Quality Overhaul 1.6: [CẤM LẶP] motif ban list for the Architect.
+      repetitionBanList,
     },
   );
 
@@ -1007,6 +1024,36 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       throw new Error(
         `Chapter ${nextChapter}-${lastChapterNumberPre}: ${preCriticals.length} critical contradictions detected and auto-revise failed. Refusing to publish — cron will retry. Issues: ${preCriticals.slice(0, 3).map(c => c.description).join('; ')}`,
       );
+    }
+  }
+
+  // Quality Overhaul 1.2 — warning-tier contradiction revise. High-risk
+  // warning contradictions (resurrection / power_regression / info_leak /
+  // location_teleport) previously shipped unrevised — only criticals got the
+  // auto-reviser. Run a non-fatal targeted revise; on failure ship anyway
+  // (don't break the cron) but flag for admin review.
+  const HIGH_RISK_WARNING_TYPES = new Set(['resurrection', 'power_regression', 'info_leak', 'location_teleport']);
+  const preWarnings = preSaveContradictions.filter(
+    c => c.severity === 'warning' && HIGH_RISK_WARNING_TYPES.has(c.type),
+  );
+  if (preCriticals.length === 0 && preWarnings.length > 0) {
+    let warningReviseFixed = false;
+    try {
+      const revision = await autoReviseChapter(
+        lastChapterNumberPre, result.content, preWarnings, geminiConfig, project.id, 'warning',
+      );
+      if (revision.revised) {
+        result.content = revision.content;
+        result.wordCount = result.content.trim().split(/\s+/).filter(Boolean).length;
+        warningReviseFixed = true;
+        console.warn(`[Orchestrator] Pre-save warning-tier auto-revised Ch.${nextChapter}-${lastChapterNumberPre}: fixed ${revision.fixedIssues.length} issues`);
+      }
+    } catch (e) {
+      console.warn('[Orchestrator] Pre-save warning-tier revision threw:', e instanceof Error ? e.message : String(e));
+    }
+    if (!warningReviseFixed) {
+      result.recoveryFlags = [...(result.recoveryFlags || []), 'major_contradiction_unfixed'];
+      console.warn(`[Orchestrator] Ch.${nextChapter}-${lastChapterNumberPre}: ${preWarnings.length} high-risk warning contradictions shipped unfixed — flagged for admin review`);
     }
   }
 
@@ -1218,6 +1265,35 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     console.warn(`[Orchestrator] Soft-ending enforcer threw: ${e instanceof Error ? e.message : String(e)}`);
   }
 
+  // Quality Overhaul 1.4 — surface degraded-content recovery paths to the
+  // admin review queue (golden fallback / revise-pass failure / unfixed
+  // high-risk contradictions). Non-fatal, post-save.
+  if (result.recoveryFlags?.length) {
+    try {
+      const { enqueueAdminReview } = await import('../quality/admin-review-queue');
+      const validReasons = new Set(['golden_fallback', 'revise_pass_failed', 'major_contradiction_unfixed']);
+      for (const flag of result.recoveryFlags) {
+        if (!validReasons.has(flag)) continue;
+        await enqueueAdminReview({
+          projectId: project.id,
+          novelId: novel.id,
+          chapterNumber: nextChapter,
+          reason: flag as 'golden_fallback' | 'revise_pass_failed' | 'major_contradiction_unfixed',
+          detail: {
+            quality_score: result.qualityScore,
+            title: result.title,
+            gate_issues: (result.criticReport?.issues || [])
+              .filter(i => i.severity === 'critical' || i.severity === 'major')
+              .slice(0, 5)
+              .map(i => `[${i.type}/${i.severity}] ${i.description.slice(0, 200)}`),
+          },
+        });
+      }
+    } catch (e) {
+      console.warn('[Orchestrator] admin review queue enqueue failed:', e instanceof Error ? e.message : String(e));
+    }
+  }
+
   // Step 5c quality canary runs per saved reader chapter below. Running it on
   // result.content would hide split-related published chapter issues.
 
@@ -1321,6 +1397,11 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       extractRulesFromChapter(
         project.id, partCh, part.content,
       ).catch(e => recordTaskFailure(db, project.id, novel.id, partCh, 'task_5_rule_extraction', e)),
+
+      // Task 5b (Quality Overhaul 1.6): cross-chapter motif tracking — deterministic, no LLM
+      import('../quality/repetition-tracker').then(({ recordMotifUsage }) =>
+        recordMotifUsage(project.id, partCh, part.content),
+      ).catch(e => recordTaskFailure(db, project.id, novel.id, partCh, 'task_5b_motif_tracking', e)),
 
       // Task 7: Foreshadowing status update (advance/payoff/abandon hints)
       updateForeshadowingStatus(
@@ -1437,6 +1518,9 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
           split_index: idx + 1,
           split_parts: splitResults.length,
           requested_split_parts: SPLIT_PARTS,
+          critic_revised_pass: result.criticRevisedPass === true,
+          recovery_flags: result.recoveryFlags ?? [],
+          context_trim_tiers: contextTrimInfo ? (contextTrimInfo as { trimmedTiers: number[] }).trimmedTiers : [],
           score_scope: 'logical_write',
           logical_word_count: logicalWordCount,
           logical_target_words: targetWordCount,

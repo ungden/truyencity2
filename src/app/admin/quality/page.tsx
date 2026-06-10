@@ -12,6 +12,7 @@
 
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { checkMonthlyBudget } from '@/services/story-engine/utils/budget-guard';
+import ReviewQueueSection from './review-queue-section';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
@@ -135,6 +136,9 @@ export default async function QualityDashboardPage() {
           sub={`${withPowerCanon}/${totalActive} power, ${withWorldCanon}/${totalActive} world`}
         />
       </div>
+
+      {/* Quality Overhaul 1.4/1.5: review queue + circuit breaker holds */}
+      <ReviewQueueSection />
 
       {/* Phase 28 TIER 3.1: Outline revisions surface */}
       {revisedNovels.data && revisedNovels.data.length > 0 && (

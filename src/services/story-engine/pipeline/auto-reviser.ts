@@ -35,7 +35,9 @@ export interface RevisionResult {
 
 /**
  * Performs a targeted revision of chapter content to fix critical contradictions.
- * Only activates when there are CRITICAL contradictions.
+ * Default activates only on CRITICAL contradictions; pass minSeverity='warning'
+ * to also fix warning-tier contradictions (callers should pre-filter to the
+ * high-risk types worth an AI pass) that previously shipped unrevised.
  * Returns revised content or original if revision fails/unnecessary.
  */
 export async function autoReviseChapter(
@@ -44,10 +46,13 @@ export async function autoReviseChapter(
   contradictions: CharacterContradiction[],
   config: GeminiConfig,
   projectId?: string,
+  minSeverity: 'critical' | 'warning' = 'critical',
 ): Promise<RevisionResult> {
-  const criticals = contradictions.filter(c => c.severity === 'critical');
+  const criticals = contradictions.filter(c =>
+    c.severity === 'critical' || (minSeverity === 'warning' && c.severity === 'warning'),
+  );
 
-  // Only revise for critical issues
+  // Only revise for issues at/above the severity floor
   if (criticals.length === 0) {
     return { revised: false, content: originalContent, fixedIssues: [] };
   }
@@ -137,6 +142,107 @@ Trả về TOÀN BỘ nội dung chương đã sửa. KHÔNG thêm chú thích h
     };
   } catch (err) {
     console.warn(`[AutoReviser] Ch.${chapterNumber} revision failed:`, err instanceof Error ? err.message : String(err));
+    return { revised: false, content: originalContent, fixedIssues: [] };
+  }
+}
+
+// ── Public: Critic-Directed Revise Pass (Quality Overhaul Phase 1.1) ────────
+
+interface CriticNoteIssue {
+  type: string;
+  severity: string;
+  description: string;
+}
+
+export interface CriticNotesInput {
+  rewriteInstructions?: string;
+  issues?: CriticNoteIssue[];
+}
+
+/**
+ * Quality Overhaul 1.1: the Critic's REVISE verdict (score 5-6) used to
+ * promise a "downstream auto-reviser" that never existed — marginal chapters
+ * shipped unrevised via the soft gate. This pass takes the Critic's own
+ * rewriteInstructions + major issues (+ moderates when they pile up ≥4) and
+ * performs one targeted polish, preserving voice/plot/length.
+ *
+ * Non-fatal: returns revised=false on any failure; caller keeps the original.
+ */
+export async function reviseFromCriticNotes(
+  chapterNumber: number,
+  originalContent: string,
+  critic: CriticNotesInput,
+  config: GeminiConfig,
+  projectId?: string,
+): Promise<RevisionResult> {
+  const issues = critic.issues || [];
+  const blocking = issues.filter(i => i.severity === 'critical' || i.severity === 'major');
+  const moderates = issues.filter(i => i.severity === 'moderate');
+  const includeModerates = moderates.length >= 4 ? moderates.slice(0, 8) : [];
+  const instructions = critic.rewriteInstructions?.trim() || '';
+
+  const noteSections = [
+    instructions ? `HƯỚNG DẪN SỬA CỦA CRITIC:\n${instructions}` : '',
+    blocking.length
+      ? `LỖI MAJOR/CRITICAL PHẢI SỬA:\n${blocking.map(i => `- [${i.type}] ${i.description}`).join('\n')}`
+      : '',
+    includeModerates.length
+      ? `LỖI MODERATE (sửa khi không ảnh hưởng cốt truyện):\n${includeModerates.map(i => `- [${i.type}] ${i.description}`).join('\n')}`
+      : '',
+  ].filter(Boolean).join('\n\n');
+
+  if (!noteSections) {
+    return { revised: false, content: originalContent, fixedIssues: [] };
+  }
+
+  try {
+    const content = originalContent.slice(0, MAX_REVISION_CONTENT);
+    const wasTruncated = originalContent.length > MAX_REVISION_CONTENT;
+
+    const prompt = `Bạn là biên tập viên cao cấp. Critic đã chấm chương này ở mức "REVISE" — cần 1 lượt sửa có mục tiêu, KHÔNG viết lại từ đầu.
+
+CHƯƠNG ${chapterNumber} — GHI CHÚ CỦA CRITIC:
+${noteSections}
+
+NỘI DUNG CHƯƠNG:
+${content}${wasTruncated ? '\n[...nội dung bị cắt bớt...]' : ''}
+
+QUY TẮC:
+- Sửa đúng các điểm Critic nêu: pacing chậm thì nén setup / đẩy payoff sớm hơn; thiếu dopamine thì làm rõ khoảnh khắc thắng lợi sẵn có (KHÔNG bịa event mới); lặp từ thì thay bằng từ đồng nghĩa tự nhiên; câu kết/mở template thì thay bằng event/action cụ thể.
+- GIỮ NGUYÊN cốt truyện, sự kiện, hội thoại quan trọng, tên nhân vật, cấu trúc cảnh.
+- Giọng văn GIỐNG HỆT bản gốc. Em-dash — cho dialogue.
+- Độ dài TƯƠNG ĐƯƠNG bản gốc (±5%).
+
+Trả về TOÀN BỘ nội dung chương đã sửa. KHÔNG thêm chú thích hay giải thích.`;
+
+    const response = await callGemini(prompt, {
+      ...config,
+      systemPrompt: REVISER_SYSTEM,
+      temperature: 0.3,
+      maxTokens: 32768,
+    }, {
+      tracking: projectId ? { projectId, task: 'auto_revision', chapterNumber } : undefined,
+    });
+
+    const revisedContent = response.content?.trim();
+    if (!revisedContent || revisedContent.length < originalContent.length * 0.5) {
+      console.warn(`[RevisePass] Ch.${chapterNumber}: revision too short (${revisedContent?.length || 0} vs ${originalContent.length}), keeping original`);
+      return { revised: false, content: originalContent, fixedIssues: [] };
+    }
+
+    const finalContent = wasTruncated
+      ? revisedContent + originalContent.slice(MAX_REVISION_CONTENT)
+      : revisedContent;
+
+    const fixedIssues = [
+      ...(instructions ? ['rewriteInstructions'] : []),
+      ...blocking.map(i => i.description),
+      ...includeModerates.map(i => i.description),
+    ];
+    console.warn(`[RevisePass] Ch.${chapterNumber}: applied critic-directed revision (${fixedIssues.length} notes)`);
+    return { revised: true, content: finalContent, fixedIssues };
+  } catch (err) {
+    console.warn(`[RevisePass] Ch.${chapterNumber} failed:`, err instanceof Error ? err.message : String(err));
     return { revised: false, content: originalContent, fixedIssues: [] };
   }
 }

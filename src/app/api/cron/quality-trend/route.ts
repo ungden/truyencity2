@@ -162,6 +162,17 @@ export async function GET(request: NextRequest) {
     return acc;
   }, {} as Record<string, number>);
 
+  // Quality Overhaul 1.5 — circuit breaker: 2 consecutive critical snapshots
+  // → shadow: review-queue row only; enforce: also style_directives.quality_hold.
+  let breakerResult: { mode: string; evaluated: number; tripped: number; held: number } =
+    { mode: 'off', evaluated: 0, tripped: 0, held: 0 };
+  try {
+    const { applyCircuitBreaker } = await import('@/services/story-engine/quality/circuit-breaker');
+    breakerResult = await applyCircuitBreaker(supabase, trends);
+  } catch (e) {
+    console.warn('[quality-trend cron] circuit breaker threw:', e instanceof Error ? e.message : String(e));
+  }
+
   // Phase 28 TIER 3.1: Auto-revise outlines for projects in critical drift.
   // Runs AFTER trend snapshot is persisted so revision trigger detection sees
   // today's snapshot. Expensive AI work — done sequentially to control cost.
@@ -181,5 +192,6 @@ export async function GET(request: NextRequest) {
     alerts: alertCounts,
     snapshot_date: today,
     outline_revision: revisionStats,
+    circuit_breaker: breakerResult,
   });
 }
