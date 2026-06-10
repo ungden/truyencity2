@@ -285,16 +285,55 @@ Trả về JSON:
 
   const importance = Math.min(100, Math.max(20, parsed.importance ?? Math.min(100, appearances * 5)));
 
+  // Quality Overhaul 2.1 — deterministic post-refresh validation: the state
+  // table is ground truth for status/power. If the LLM's parsed values
+  // contradict the latest character_states row, overwrite with the DB value
+  // and record the correction in grounding (LLM prose can drift; facts can't).
+  const correctedFields: string[] = [];
+  let finalStatus = parsed.status || latest.status || 'alive';
+  if (parsed.status && latest.status && parsed.status !== latest.status) {
+    finalStatus = latest.status;
+    correctedFields.push(`status: llm='${parsed.status}' → state='${latest.status}'`);
+  }
+  let finalRealmIndex = parsed.power_realm_index ?? latest.power_realm_index ?? null;
+  if (
+    typeof parsed.power_realm_index === 'number' &&
+    typeof latest.power_realm_index === 'number' &&
+    parsed.power_realm_index !== latest.power_realm_index
+  ) {
+    finalRealmIndex = latest.power_realm_index;
+    correctedFields.push(`power_realm_index: llm=${parsed.power_realm_index} → state=${latest.power_realm_index}`);
+  }
+  if (correctedFields.length > 0) {
+    console.warn(`[CharacterBible] ${characterName}: corrected LLM drift vs character_states — ${correctedFields.join('; ')}`);
+  }
+
+  // Pedigree: generation counter tracks how many refresh cycles this bible
+  // has survived; grounding records what this refresh actually saw.
+  const { data: prevBible } = await db
+    .from('character_bibles')
+    .select('generation')
+    .eq('project_id', projectId)
+    .eq('character_name', characterName)
+    .maybeSingle();
+
   const { error } = await db.from('character_bibles').upsert({
     project_id: projectId,
     character_name: characterName,
     last_refreshed_chapter: chapterNumber,
     bible_text: parsed.bible_text,
-    power_realm_index: parsed.power_realm_index ?? latest.power_realm_index ?? null,
+    power_realm_index: finalRealmIndex,
     current_location: parsed.current_location ?? latest.location ?? null,
-    status: parsed.status || latest.status || 'alive',
+    status: finalStatus,
     importance,
     key_relationships: parsed.key_relationships || [],
+    generation: ((prevBible?.generation as number | undefined) ?? 0) + 1,
+    grounding: {
+      states_count: stateRows.length,
+      latest_state_chapter: latest.chapter_number,
+      chunks_used: pickedChunks.length,
+      corrected_fields: correctedFields,
+    },
     updated_at: new Date().toISOString(),
   }, { onConflict: 'project_id,character_name' });
 

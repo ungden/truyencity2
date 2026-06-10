@@ -26,7 +26,7 @@ export interface ForeshadowingHint {
   plantChapter: number;
   payoffChapter: number;
   payoffDescription: string;
-  status: 'planned' | 'planted' | 'developing' | 'paid_off' | 'abandoned';
+  status: 'planned' | 'planted' | 'developing' | 'disposing' | 'paid_off' | 'abandoned';
   arcNumber: number;
 }
 
@@ -218,7 +218,7 @@ export async function getForeshadowingContext(
   // 2026-04-29 continuity overhaul: surface PAST-DEADLINE hints as urgent payoff demands.
   // Previous getOverdueHints only caught approaching deadlines; hints whose deadline already
   // passed (5+ chapters late) silently rotted in DB. Now they're loud and demand resolution
-  // this arc — or get auto-abandoned if extremely late so they stop polluting future contexts.
+  // this arc — or enter 2-step disposal if extremely late.
   try {
     const overdueLate = await getPastDeadlineHints(projectId, chapterNumber);
     if (overdueLate.length > 0) {
@@ -229,7 +229,74 @@ export async function getForeshadowingContext(
     // Non-fatal
   }
 
+  // Quality Overhaul 2.2: disposing hints — one-time soft-close directive.
+  // A hint that will never pay off must be CLOSED on-page (1-2 sentences),
+  // not silently dropped: readers notice dangling threads.
+  try {
+    const disposing = await getDisposingDirectives(projectId, chapterNumber);
+    if (disposing.length > 0) {
+      parts.push('═══ FORESHADOWING — ĐÓNG NHẸ THREAD SẮP GÁC LẠI (BẮT BUỘC 1-2 CÂU) ═══');
+      parts.push(...disposing);
+    }
+  } catch {
+    // Non-fatal
+  }
+
   return parts.length > 0 ? parts.join('\n') : null;
+}
+
+/**
+ * Quality Overhaul 2.2: hints in 'disposing' get a soft-close directive for
+ * up to 3 chapters (cap 2 per chapter to bound prompt size). Hints disposing
+ * ≥3 chapters flip to 'abandoned' + land an admin_review_queue row — the
+ * abandonment is no longer invisible.
+ */
+async function getDisposingDirectives(
+  projectId: string,
+  chapterNumber: number,
+): Promise<string[]> {
+  const db = getSupabase();
+  const { data } = await db
+    .from('foreshadowing_plans')
+    .select('id,hint_text,payoff_description,disposing_since_chapter')
+    .eq('project_id', projectId)
+    .eq('status', 'disposing')
+    .order('disposing_since_chapter', { ascending: true })
+    .limit(6);
+
+  if (!data?.length) return [];
+
+  // Expired disposals → abandoned + admin review (non-fatal).
+  const expired = data.filter(h => (h.disposing_since_chapter ?? chapterNumber) <= chapterNumber - 3);
+  if (expired.length > 0) {
+    await db
+      .from('foreshadowing_plans')
+      .update({ status: 'abandoned' })
+      .in('id', expired.map(h => h.id))
+      .then(() => undefined, () => undefined);
+    try {
+      const { enqueueAdminReview } = await import('../quality/admin-review-queue');
+      await enqueueAdminReview({
+        projectId,
+        chapterNumber,
+        reason: 'foreshadowing_abandoned',
+        detail: {
+          count: expired.length,
+          hints: expired.map(h => String(h.hint_text || '').slice(0, 150)),
+        },
+      });
+    } catch {
+      // Non-fatal
+    }
+    console.warn(`[Foreshadowing] ${expired.length} hints abandoned after disposal window (project ${projectId}, ch.${chapterNumber})`);
+  }
+
+  return data
+    .filter(h => (h.disposing_since_chapter ?? chapterNumber) > chapterNumber - 3)
+    .slice(0, 2)
+    .map(h =>
+      `🗂 Thread sẽ gác lại: "${String(h.hint_text || '').slice(0, 150)}" → Viết 1-2 câu cho nhân vật nhắc qua / đóng nhẹ thread này (vd nhân vật kết luận chuyện đó không còn quan trọng, hoặc một câu thoại khép lại). KHÔNG mở rộng thêm.`,
+    );
 }
 
 /**
@@ -253,21 +320,28 @@ async function getPastDeadlineHints(
 
   if (!data?.length) return [];
 
-  // Auto-abandon hints that are extremely late (>30 chapters past deadline) to keep DB clean
+  // Quality Overhaul 2.2: extremely late hints (>30 chapters past deadline)
+  // no longer flip straight to 'abandoned' silently — they enter 2-step
+  // disposal: the Architect gets a soft-close directive for 3 chapters, THEN
+  // they're abandoned with an admin_review_queue row.
   const veryLate = data.filter(h => h.payoff_chapter < chapterNumber - 30);
   if (veryLate.length > 0) {
     await db
       .from('foreshadowing_plans')
-      .update({ status: 'abandoned' })
+      .update({ status: 'disposing', disposing_since_chapter: chapterNumber })
       .in('id', veryLate.map(h => h.id))
       .then(() => undefined, () => undefined);
+    console.warn(`[Foreshadowing] ${veryLate.length} hints entered disposal (>30ch overdue) at ch.${chapterNumber}`);
   }
 
   return data
     .filter(h => h.payoff_chapter >= chapterNumber - 30)
     .map(h => {
       const overdueBy = chapterNumber - h.payoff_chapter;
-      return `⚠️ QUÁ HẠN ${overdueBy} chương (deadline ch.${h.payoff_chapter}): "${h.hint_text}" → CALLBACK: "${h.payoff_description}". BẮT BUỘC payoff trong vòng 5 chương tới.`;
+      const urgency = overdueBy >= 10
+        ? 'KHẨN CẤP — payoff NGAY TRONG CHƯƠNG NÀY (đã trễ quá lâu, reader sắp quên hint).'
+        : 'BẮT BUỘC payoff trong vòng 5 chương tới.';
+      return `⚠️ QUÁ HẠN ${overdueBy} chương (deadline ch.${h.payoff_chapter}): "${h.hint_text}" → CALLBACK: "${h.payoff_description}". ${urgency}`;
     });
 }
 
@@ -352,11 +426,14 @@ export async function updateForeshadowingStatus(
     .eq('status', 'planned')
     .lt('plant_chapter', chapterNumber - 10);
 
-  // Abandon overdue payoff hints: planted hints whose payoff deadline passed by >20 chapters
-  // These were planted but never paid off — mark abandoned so they don't clog context
+  // Quality Overhaul 2.2: planted hints whose payoff deadline passed by >20
+  // chapters enter 2-step DISPOSAL instead of silent abandonment. These were
+  // on the page — readers remember them. The Architect gets a soft-close
+  // directive for 3 chapters via getDisposingDirectives(), then they flip to
+  // 'abandoned' + admin_review_queue row.
   await db
     .from('foreshadowing_plans')
-    .update({ status: 'abandoned' })
+    .update({ status: 'disposing', disposing_since_chapter: chapterNumber })
     .eq('project_id', projectId)
     .eq('status', 'planted')
     .lt('payoff_chapter', chapterNumber - 20);

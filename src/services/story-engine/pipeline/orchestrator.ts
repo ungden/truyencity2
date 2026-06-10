@@ -1521,6 +1521,7 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
           critic_revised_pass: result.criticRevisedPass === true,
           recovery_flags: result.recoveryFlags ?? [],
           context_trim_tiers: contextTrimInfo ? (contextTrimInfo as { trimmedTiers: number[] }).trimmedTiers : [],
+          context_loader_failures: context.loaderFailures ?? [],
           score_scope: 'logical_write',
           logical_word_count: logicalWordCount,
           logical_target_words: targetWordCount,

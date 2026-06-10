@@ -33,6 +33,8 @@ export interface PlotThread {
   relatedCharacters: string[];
   foreshadowingHints: ForeshadowingHint[];
   importance: number; // 0-100
+  /** Quality Overhaul 2.4: set when a resolved/legacy thread was reactivated as an intentional callback. */
+  revivedAtChapter?: number;
 }
 
 export interface ForeshadowingHint {
@@ -56,6 +58,7 @@ interface PlotThreadRow {
   related_characters: string[] | null;
   foreshadowing_hints: ForeshadowingHint[] | null;
   importance: number | null;
+  revived_at_chapter?: number | null;
 }
 
 interface PlotThreadAIResponse {
@@ -97,6 +100,7 @@ function mapThreadRow(row: PlotThreadRow): PlotThread {
     relatedCharacters: row.related_characters || [],
     foreshadowingHints: Array.isArray(row.foreshadowing_hints) ? row.foreshadowing_hints : [],
     importance: row.importance || 50,
+    revivedAtChapter: row.revived_at_chapter ?? undefined,
   };
 }
 
@@ -173,6 +177,9 @@ export async function buildPlotThreadContext(
     const lines: string[] = ['═══ TUYẾN TRUYỆN ĐANG MỞ ═══'];
     for (const { thread: t } of top) {
       lines.push(`• [${t.priority}] ${t.name}: ${t.description.slice(0, 200)}`);
+      if (t.revivedAtChapter) {
+        lines.push(`  ↩️ CALLBACK CÓ CHỦ ĐÍCH: thread gốc từ ch.${t.startChapter}, quay lại ở ch.${t.revivedAtChapter} — viết như reader ĐÃ BIẾT thread này, reference sự kiện gốc rõ ràng.`);
+      }
       if (t.status === 'climax') lines.push(`  → ĐANG Ở CAO TRÀO — cần giải quyết sớm`);
 
       const urgentHints = t.foreshadowingHints
@@ -355,12 +362,28 @@ QUY TẮC:
       }
     }
 
+    // Quality Overhaul 2.4: dormant threads (resolved/legacy, inactive ≥60
+    // chapters) — a "new" thread matching one of these is a deliberate
+    // long-range CALLBACK (ch.800 referencing the ch.200 tomb), not a
+    // duplicate. Reactivate the original with lineage instead of creating a
+    // disconnected copy.
+    const { data: dormantRows } = await db
+      .from('plot_threads')
+      .select('*')
+      .eq('project_id', projectId)
+      .in('status', ['resolved', 'legacy'])
+      .lt('last_active_chapter', chapterNumber - 60)
+      .order('importance', { ascending: false })
+      .limit(100);
+    const dormant = (dormantRows || []).map(mapThreadRow);
+
     // Insert new threads — bound to 3 per chapter so model can't spam.
     // Phase 2026-05-16: semantic dedup using Jaro-Winkler against ALL active
     // (not just exact name match) to stop "Vương Khải đòi nợ" + "Vương Khải
     // truy sát" duplicate accumulation.
     const newThreads = (parsed.newThreads || []).slice(0, 3);
     let skippedAsDup = 0;
+    let revived = 0;
     for (const nt of newThreads) {
       if (!nt.name || nt.name.length < 3) continue;
       const dup = findDuplicateThread(nt.name, active);
@@ -368,6 +391,32 @@ QUY TẮC:
         skippedAsDup++;
         console.log(`[plot-threads] Ch.${chapterNumber}: skipped new thread "${nt.name}" — semantic dup of existing "${dup.name}" (sim ${dup.similarity.toFixed(2)})`);
         continue;
+      }
+
+      // Callback reactivation (2.4): match against dormant threads.
+      const dormantDup = findDuplicateThread(nt.name, dormant);
+      if (dormantDup) {
+        const original = dormant.find(t => t.name === dormantDup.name);
+        if (original) {
+          const callbackNote = `CALLBACK ch.${chapterNumber}: ${(nt.description || nt.name).slice(0, 200)}`;
+          const { error: revErr } = await db
+            .from('plot_threads')
+            .update({
+              status: 'open',
+              last_active_chapter: chapterNumber,
+              revived_at_chapter: chapterNumber,
+              description: `${original.description} | ${callbackNote}`.slice(0, 1000),
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', original.id);
+          if (revErr) {
+            console.warn(`[plot-threads] Reactivate thread "${original.name}" failed: ${revErr.message}`);
+          } else {
+            revived++;
+            console.log(`[plot-threads] Ch.${chapterNumber}: REACTIVATED dormant thread "${original.name}" (last active ch.${original.lastActiveChapter}) as intentional callback`);
+          }
+          continue;
+        }
       }
       const threadId = `${projectId.slice(0, 8)}-${chapterNumber}-${slugifyThreadName(nt.name)}`;
       const insertRow = {

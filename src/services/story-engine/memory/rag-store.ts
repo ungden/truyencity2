@@ -73,6 +73,12 @@ export async function chunkAndStoreChapter(
   try {
     const db = getSupabase();
 
+    // Quality Overhaul 2.3: chunks from ch.1-5 of type key_event/plot_point
+    // are LORE ANCHORS (origin story, golden finger rules, MC secret). They
+    // get reserved retrieval slots with no temporal decay — otherwise by
+    // ch.500 the foundational lore is invisible to the writer.
+    const isAnchorChapter = chapterNumber <= 5;
+
     // 1. Always store the summary as a key_event chunk
     const rows: Array<Record<string, unknown>> = [{
       project_id: projectId,
@@ -80,6 +86,7 @@ export async function chunkAndStoreChapter(
       chunk_type: 'key_event' as ChunkType,
       content: `Ch.${chapterNumber} "${title}": ${summary}`.slice(0, CHUNK_MAX_CHARS),
       metadata: { characters, title },
+      is_anchor: isAnchorChapter,
     }];
 
     // 2. Split content into paragraph groups (~400 words each)
@@ -99,12 +106,14 @@ export async function chunkAndStoreChapter(
         const chunkText = buffer.slice(0, CHUNK_MAX_CHARS);
         const chunkChars = characters.filter(c => chunkText.includes(c));
 
+        const chunkType = detectChunkType(chunkText);
         rows.push({
           project_id: projectId,
           chapter_number: chapterNumber,
-          chunk_type: detectChunkType(chunkText),
+          chunk_type: chunkType,
           content: chunkText,
           metadata: { characters: chunkChars, chunk_index: rows.length },
+          is_anchor: isAnchorChapter && (chunkType === 'key_event' || chunkType === 'plot_point'),
         });
 
         buffer = '';
@@ -114,12 +123,14 @@ export async function chunkAndStoreChapter(
 
     // Flush remaining buffer
     if (buffer.length >= PARAGRAPH_MIN_CHARS) {
+      const tailType = detectChunkType(buffer);
       rows.push({
         project_id: projectId,
         chapter_number: chapterNumber,
-        chunk_type: detectChunkType(buffer),
+        chunk_type: tailType,
         content: buffer.slice(0, CHUNK_MAX_CHARS),
         metadata: { characters: characters.filter(c => buffer.includes(c)), chunk_index: rows.length },
+        is_anchor: isAnchorChapter && (tailType === 'key_event' || tailType === 'plot_point'),
       });
     }
 
@@ -306,7 +317,30 @@ export async function retrieveRAGContext(
 
     // Hybrid re-rank and take top MAX_CHUNKS
     const reranked = hybridRerank(candidates, queryKeywords, chapterNumber);
-    const topChunks = reranked.slice(0, MAX_CHUNKS);
+    let topChunks = reranked.slice(0, MAX_CHUNKS);
+
+    // Quality Overhaul 2.3: reserve 2 slots for LORE ANCHORS — foundational
+    // chunks (ch.1-5 origin story / golden finger / MC secret) matched by
+    // pure vector similarity with NO temporal decay. Without this, temporal
+    // scoring buries them by ch.500 and the writer reinvents the origin.
+    try {
+      const { data: anchors } = await db.rpc('match_anchor_chunks', {
+        query_embedding: JSON.stringify(queryEmbedding),
+        match_project_id: projectId,
+        match_count: 4,
+      });
+      if (anchors?.length) {
+        const seen = new Set(topChunks.map(c => c.id));
+        const freshAnchors = (anchors as MatchedChunk[])
+          .filter(a => !seen.has(a.id) && a.chapter_number < recentCutoff)
+          .slice(0, 2);
+        if (freshAnchors.length > 0) {
+          topChunks = [...freshAnchors, ...topChunks].slice(0, MAX_CHUNKS);
+        }
+      }
+    } catch {
+      // Non-fatal — anchors are best-effort (RPC may not exist pre-migration)
+    }
 
     // Format
     return formatRAGContext(topChunks, chapterNumber);

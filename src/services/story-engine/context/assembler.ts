@@ -293,7 +293,12 @@ export async function loadContext(
   // Telemetry for silent canon/state loader failures. Returns null fallback (the
   // loader's guidance is dropped from the prompt) but records the failure so the
   // audit dashboard can surface silent context degradation.
+  // Quality Overhaul 2.7: failures are also collected into the payload so the
+  // orchestrator can stamp quality_metrics.meta.context_loader_failures —
+  // a chapter written with missing context blocks is no longer invisible.
+  const loaderFailures: string[] = [];
   const loaderFail = (name: string) => (e: unknown) => {
+    loaderFailures.push(name);
     logLoaderFailure(projectId, chapterNumber, name, e);
     return null;
   };
@@ -461,6 +466,7 @@ export async function loadContext(
   const recentBeatHistory = recentBeatHistoryLines.length > 0 ? recentBeatHistoryLines.join('\n') : undefined;
 
   return {
+    loaderFailures,
     previousSummary: bridge?.summary,
     previousMcState: bridge?.mc_state,
     previousCliffhanger: bridge?.cliffhanger,
