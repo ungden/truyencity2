@@ -75,6 +75,47 @@ export default async function QualityDashboardPage() {
       .limit(15),
   ]);
 
+  // Quality Overhaul 4.2 — latest coherence audits + uniformity buckets.
+  // Separate awaits (the table may not exist pre-migration; errors tolerated).
+  const coherenceAudits = await supabase
+    .from('coherence_audits')
+    .select('project_id,novel_id,chapter_start,chapter_end,scores,findings,created_at')
+    .order('created_at', { ascending: false })
+    .limit(10)
+    .then(r => r.data || [], () => []);
+
+  // Uniformity validator: avg overall_score per 100-chapter bucket per project
+  // (supreme goal 5 — ch.8 vs ch.800). Recent 8000 metric rows is enough for
+  // the production fleet at 50 ch/day.
+  const uniformityRows = await supabase
+    .from('quality_metrics')
+    .select('project_id,chapter_number,overall_score')
+    .not('overall_score', 'is', null)
+    .order('created_at', { ascending: false })
+    .limit(8000)
+    .then(r => r.data || [], () => []);
+
+  const uniformityByProject = new Map<string, Map<number, { sum: number; n: number }>>();
+  for (const r of uniformityRows as Array<{ project_id: string; chapter_number: number; overall_score: number }>) {
+    const bucket = Math.floor((r.chapter_number - 1) / 100);
+    const buckets = uniformityByProject.get(r.project_id) || new Map<number, { sum: number; n: number }>();
+    const cell = buckets.get(bucket) || { sum: 0, n: 0 };
+    cell.sum += r.overall_score;
+    cell.n += 1;
+    buckets.set(bucket, cell);
+    uniformityByProject.set(r.project_id, buckets);
+  }
+  // Only show projects with ≥2 buckets (uniformity needs a comparison).
+  const uniformityTable = [...uniformityByProject.entries()]
+    .map(([projectId, buckets]) => ({
+      projectId,
+      buckets: [...buckets.entries()]
+        .sort((a, b) => a[0] - b[0])
+        .map(([bucket, { sum, n }]) => ({ bucket, avg: sum / n, n })),
+    }))
+    .filter(p => p.buckets.length >= 2)
+    .slice(0, 12);
+
   // Quality average over last 7 days
   const qScores = (qualityAvg.data || []).map((r: { overall_score: number | null }) => r.overall_score).filter((s): s is number => typeof s === 'number');
   const avgQuality = qScores.length > 0 ? qScores.reduce((a, b) => a + b, 0) / qScores.length : null;
@@ -175,6 +216,95 @@ export default async function QualityDashboardPage() {
                     <td className="px-3 py-2 text-xs">{row.pause_reason?.slice(0, 100) || '—'}</td>
                     <td className="px-3 py-2 text-xs text-gray-500">
                       {row.paused_at ? new Date(row.paused_at).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) : '—'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
+      {/* Quality Overhaul 4.2: uniformity by chapter bucket — supreme goal 5 validator */}
+      {uniformityTable.length > 0 && (
+        <section>
+          <h2 className="text-lg font-semibold mb-2">📏 Uniformity — avg score theo bucket 100 chương</h2>
+          <p className="text-xs text-gray-500 mb-2">
+            Mục tiêu tối thượng 5: ch.800 giữ chất lượng ngang ch.8. Bucket sau thấp hơn bucket đầu &gt;1.0 điểm = drift.
+          </p>
+          <div className="overflow-x-auto rounded border border-gray-200 dark:border-gray-700">
+            <table className="min-w-full text-sm">
+              <thead className="bg-gray-100 dark:bg-gray-800">
+                <tr>
+                  <th className="px-3 py-2 text-left">Project</th>
+                  <th className="px-3 py-2 text-left">Score theo bucket (ch.1-100, 101-200, …)</th>
+                  <th className="px-3 py-2 text-right">Drift</th>
+                </tr>
+              </thead>
+              <tbody>
+                {uniformityTable.map(p => {
+                  const first = p.buckets[0].avg;
+                  const last = p.buckets[p.buckets.length - 1].avg;
+                  const drift = last - first;
+                  return (
+                    <tr key={p.projectId} className="border-t border-gray-200 dark:border-gray-700">
+                      <td className="px-3 py-2 font-mono text-xs">{p.projectId.slice(0, 8)}</td>
+                      <td className="px-3 py-2 text-xs font-mono">
+                        {p.buckets.map(b => `[${b.bucket * 100 + 1}+] ${b.avg.toFixed(1)}`).join('  →  ')}
+                      </td>
+                      <td className={`px-3 py-2 text-right font-semibold ${drift <= -1 ? 'text-red-600' : drift < -0.5 ? 'text-amber-600' : 'text-green-600'}`}>
+                        {drift >= 0 ? '+' : ''}{drift.toFixed(2)}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
+      {/* Quality Overhaul 4.2: persisted coherence audits */}
+      {coherenceAudits.length > 0 && (
+        <section>
+          <h2 className="text-lg font-semibold mb-2">🧭 Coherence audits (5 chiều, mỗi 50 chương)</h2>
+          <div className="overflow-x-auto rounded border border-gray-200 dark:border-gray-700">
+            <table className="min-w-full text-sm">
+              <thead className="bg-gray-100 dark:bg-gray-800">
+                <tr>
+                  <th className="px-3 py-2 text-left">Project</th>
+                  <th className="px-3 py-2 text-left">Window</th>
+                  <th className="px-3 py-2 text-right">Coherence</th>
+                  <th className="px-3 py-2 text-right">Continuity</th>
+                  <th className="px-3 py-2 text-right">Character</th>
+                  <th className="px-3 py-2 text-right">Progression</th>
+                  <th className="px-3 py-2 text-right">Stability</th>
+                  <th className="px-3 py-2 text-left">Risk</th>
+                  <th className="px-3 py-2 text-left">Issues</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(coherenceAudits as Array<{
+                  project_id: string;
+                  chapter_start: number;
+                  chapter_end: number;
+                  scores: { coherence_score?: number; continuity_score?: number; character_consistency_score?: number; progression_score?: number; quality_stability_score?: number; risk_level?: string } | null;
+                  findings: { key_issues?: string[] } | null;
+                  created_at: string;
+                }>).map(a => (
+                  <tr key={`${a.project_id}-${a.created_at}`} className="border-t border-gray-200 dark:border-gray-700">
+                    <td className="px-3 py-2 font-mono text-xs">{a.project_id.slice(0, 8)}</td>
+                    <td className="px-3 py-2 text-xs">ch.{a.chapter_start}-{a.chapter_end}</td>
+                    <td className="px-3 py-2 text-right">{a.scores?.coherence_score ?? '—'}</td>
+                    <td className="px-3 py-2 text-right">{a.scores?.continuity_score ?? '—'}</td>
+                    <td className="px-3 py-2 text-right">{a.scores?.character_consistency_score ?? '—'}</td>
+                    <td className="px-3 py-2 text-right">{a.scores?.progression_score ?? '—'}</td>
+                    <td className="px-3 py-2 text-right">{a.scores?.quality_stability_score ?? '—'}</td>
+                    <td className={`px-3 py-2 text-xs font-semibold ${a.scores?.risk_level === 'high' ? 'text-red-600' : a.scores?.risk_level === 'medium' ? 'text-amber-600' : 'text-green-600'}`}>
+                      {a.scores?.risk_level || '—'}
+                    </td>
+                    <td className="px-3 py-2 text-xs max-w-sm truncate" title={(a.findings?.key_issues || []).join(' | ')}>
+                      {(a.findings?.key_issues || []).slice(0, 2).join(' | ') || '—'}
                     </td>
                   </tr>
                 ))}

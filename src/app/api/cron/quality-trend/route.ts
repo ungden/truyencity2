@@ -162,6 +162,35 @@ export async function GET(request: NextRequest) {
     return acc;
   }, {} as Record<string, number>);
 
+  // Quality Overhaul 4.2 — persisted coherence audits every 50 chapters per
+  // production novel. Budget cap: 3 audits per tick (each is 1 AI call).
+  // Runs after the trend upsert; results land in coherence_audits for the
+  // /admin/quality dashboard.
+  let auditsRun = 0;
+  try {
+    const { runCoherenceAudit } = await import('@/services/story-engine/quality/audit-runner');
+    const { DEFAULT_CONFIG } = await import('@/services/story-engine/types');
+    // Due = ≥50 chapters written AND no audit covering the last 50 chapters
+    // (cadence-based, not modulo — at 50 ch/day a daily cron can jump past
+    // exact boundaries).
+    const candidates = trends.filter(t => t.current_chapter >= 50);
+    for (const t of candidates) {
+      if (auditsRun >= 3) break;
+      const { data: lastAudit } = await supabase
+        .from('coherence_audits')
+        .select('chapter_end')
+        .eq('project_id', t.project_id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (lastAudit && (lastAudit.chapter_end as number) > t.current_chapter - 50) continue;
+      const audit = await runCoherenceAudit(t.project_id, { ...DEFAULT_CONFIG, model: 'gemini-3.1-flash-lite' });
+      if (audit) auditsRun++;
+    }
+  } catch (e) {
+    console.warn('[quality-trend cron] coherence audit threw:', e instanceof Error ? e.message : String(e));
+  }
+
   // Quality Overhaul 1.5 — circuit breaker: 2 consecutive critical snapshots
   // → shadow: review-queue row only; enforce: also style_directives.quality_hold.
   let breakerResult: { mode: string; evaluated: number; tripped: number; held: number } =
@@ -193,5 +222,6 @@ export async function GET(request: NextRequest) {
     snapshot_date: today,
     outline_revision: revisionStats,
     circuit_breaker: breakerResult,
+    coherence_audits_run: auditsRun,
   });
 }
