@@ -76,6 +76,18 @@ export interface WriteChapterOptions {
    * Computed orchestrator-side từ total_planned_chapters + currentChapter.
    * Empty string for Phase 1 normal mode. */
   softEndingGuidance?: string;
+  /**
+   * Quality Overhaul 1.1: critic-directed revise pass. When a chapter is about
+   * to ship with REVISE-grade quality (score ≤6, major issues, or ≥4 moderates)
+   * run one targeted auto-revision from the Critic's own notes before accepting.
+   * Default ON; style_directives.critic_revise_pass=false opts out.
+   */
+  criticRevisePassEnabled?: boolean;
+  /**
+   * Quality Overhaul 1.6: motifs used ≥3 times in the last 5 chapters —
+   * injected into the Architect dynamic suffix as a [CẤM LẶP] ban list.
+   */
+  repetitionBanList?: string[];
 }
 
 function isHardBlockingIssue(issue: CriticIssue): boolean {
@@ -94,6 +106,41 @@ function isHardBlockingIssue(issue: CriticIssue): boolean {
 function canAcceptRoutineSoftGate(critic: CriticOutput, qualityScore: number, minScore: number): boolean {
   if (qualityScore < minScore) return false;
   return !(critic.issues || []).some(isHardBlockingIssue);
+}
+
+export type GateAction = 'accept' | 'revise_then_accept' | 'retry';
+
+function countSeverity(critic: CriticOutput, severity: string): number {
+  return (critic.issues || []).filter(i => i.severity === severity).length;
+}
+
+/**
+ * Quality Overhaul 1.1 — pure gate decision, extracted for unit testing.
+ *
+ * - 'retry': chapter fails the gate and the soft gate can't accept it →
+ *   existing retry/golden-fallback/throw path.
+ * - 'revise_then_accept': chapter would ship (outright pass OR soft-gate
+ *   accept) but carries REVISE-grade quality — run one critic-directed
+ *   revision before accepting. Closes the trap where the Critic's REVISE
+ *   verdict promised a "downstream auto-reviser" that never existed.
+ * - 'accept': ship as-is.
+ */
+export function decideGateAction(
+  critic: CriticOutput,
+  qualityScore: number,
+  minScore: number,
+  mode: 'standard' | 'routine_soft',
+  revisePassEnabled: boolean,
+): GateAction {
+  const failed = critic.requiresRewrite || !critic.approved || qualityScore < minScore;
+  const softGateOk = mode === 'routine_soft' && canAcceptRoutineSoftGate(critic, qualityScore, minScore);
+  if (failed && !softGateOk) return 'retry';
+
+  if (!revisePassEnabled) return 'accept';
+  const majorCount = countSeverity(critic, 'major');
+  const moderateCount = countSeverity(critic, 'moderate');
+  const needsRevise = failed || !critic.approved || qualityScore <= 6 || majorCount >= 1 || moderateCount >= 4;
+  return needsRevise ? 'revise_then_accept' : 'accept';
 }
 
 export async function writeChapter(
@@ -372,46 +419,120 @@ Chỉ trả về phần text mới (không quote, không metadata). Tiếng Vi�
       }
     }
 
-    const qualityScore = critic.overallScore || 0;
+    let activeCritic = critic;
+    let qualityScore = activeCritic.overallScore || 0;
     const minQualityScore = options?.qualityGateMinScore ?? DEFAULT_CONFIG.minQualityScore;
-    const softGateAccepted =
-      options?.qualityGateMode === 'routine_soft' &&
-      canAcceptRoutineSoftGate(critic, qualityScore, minQualityScore);
+    const gateMode = options?.qualityGateMode === 'routine_soft' ? 'routine_soft' : 'standard';
+    const revisePassEnabled = options?.criticRevisePassEnabled !== false;
+    const recoveryFlags: string[] = [];
+    let criticRevisedPass = false;
+    let reviseEscalated = false;
 
-    if (softGateAccepted && (critic.requiresRewrite || !critic.approved)) {
-      critic.issues = critic.issues || [];
-      critic.issues.push({
+    // Quality Overhaul 1.1 — critic-directed revise pass. Before a marginal
+    // chapter ships (REVISE verdict, major issues, or moderate pile-up), run
+    // one targeted revision from the Critic's notes, re-judge once, and keep
+    // whichever version scores higher without a new hard blocker.
+    const gateAction = decideGateAction(activeCritic, qualityScore, minQualityScore, gateMode, revisePassEnabled);
+    if (gateAction === 'revise_then_accept') {
+      try {
+        const { reviseFromCriticNotes } = await import('./auto-reviser');
+        const revision = await reviseFromCriticNotes(
+          chapterNumber, content, activeCritic, config, options?.projectId,
+        );
+        if (revision.revised) {
+          const revisedCritic = await runCritic(
+            outline, revision.content, targetWordCount, contextString, config,
+            options?.isFinalArc === true, options?.projectId, genre,
+            options?.worldDescription, options?.protagonistName,
+          );
+          const revisedScore = revisedCritic.overallScore || 0;
+          const hadHardBlocker = (activeCritic.issues || []).some(isHardBlockingIssue);
+          const introducedHardBlocker =
+            !hadHardBlocker && (revisedCritic.issues || []).some(isHardBlockingIssue);
+          // Never swap an APPROVED original for an unapproved revision — that
+          // would turn a passing chapter into a retry.
+          const approvalRegression = activeCritic.approved && !revisedCritic.approved;
+          if (revisedScore >= qualityScore && !introducedHardBlocker && !approvalRegression) {
+            content = revision.content;
+            activeCritic = revisedCritic;
+            criticRevisedPass = true;
+            activeCritic.issues = [
+              ...(activeCritic.issues || []),
+              {
+                type: 'quality' as const,
+                severity: 'minor' as const,
+                description: `[RevisePass] critic-directed revision applied: score ${qualityScore} → ${revisedScore} (${revision.fixedIssues.length} notes)`,
+              },
+            ];
+            qualityScore = revisedScore;
+            console.log(`[ChapterWriter] Ch.${chapterNumber} revise pass: score ${critic.overallScore} → ${revisedScore}`);
+          } else {
+            console.log(`[ChapterWriter] Ch.${chapterNumber} revise pass kept original (revised ${revisedScore} vs ${qualityScore}, newHardBlocker=${introducedHardBlocker})`);
+          }
+          // Escalation: if the better version STILL carries ≥3 major issues,
+          // don't soft-accept — consume a retry instead (closes the soft-gate
+          // hole where major pacing/quality issues shipped untouched).
+          if (countSeverity(activeCritic, 'major') >= 3) {
+            reviseEscalated = true;
+          }
+        } else {
+          recoveryFlags.push('revise_pass_failed');
+          activeCritic.issues = [
+            ...(activeCritic.issues || []),
+            {
+              type: 'quality' as const,
+              severity: 'moderate' as const,
+              description: '[RevisePass] critic-directed revision failed — shipped original; flagged for admin review.',
+            },
+          ];
+        }
+      } catch (e) {
+        console.warn(`[ChapterWriter] Ch.${chapterNumber} revise pass threw:`, e instanceof Error ? e.message : String(e));
+      }
+    }
+
+    const softGateAccepted =
+      gateMode === 'routine_soft' &&
+      !reviseEscalated &&
+      canAcceptRoutineSoftGate(activeCritic, qualityScore, minQualityScore);
+
+    if (softGateAccepted && (activeCritic.requiresRewrite || !activeCritic.approved)) {
+      activeCritic.issues = activeCritic.issues || [];
+      activeCritic.issues.push({
         type: 'quality',
         severity: 'minor',
         description: `Routine Flash soft gate accepted score ${qualityScore}/${minQualityScore}: no hard continuity/canon/logic blocker.`,
       });
-      critic.approved = true;
-      critic.requiresRewrite = false;
+      activeCritic.approved = true;
+      activeCritic.requiresRewrite = false;
     }
 
     const failedQualityGate =
-      !softGateAccepted && (
-        critic.requiresRewrite ||
-        !critic.approved ||
-        qualityScore < minQualityScore
+      reviseEscalated || (
+        !softGateAccepted && (
+          activeCritic.requiresRewrite ||
+          !activeCritic.approved ||
+          qualityScore < minQualityScore
+        )
       );
 
     if (failedQualityGate) {
       const gateReason = [
-        critic.requiresRewrite ? 'requiresRewrite=true' : null,
-        !critic.approved ? 'approved=false' : null,
+        reviseEscalated ? `revise pass left ≥3 major issues` : null,
+        activeCritic.requiresRewrite ? 'requiresRewrite=true' : null,
+        !activeCritic.approved ? 'approved=false' : null,
         qualityScore < minQualityScore
           ? `overallScore ${qualityScore} < ${minQualityScore}`
           : null,
       ].filter(Boolean).join(', ');
 
       if (attempt < maxRetries - 1) {
-        rewriteInstructions = critic.rewriteInstructions ||
+        rewriteInstructions = activeCritic.rewriteInstructions ||
           `Quality gate failed (${gateReason}). Viết lại để đạt tối thiểu ${minQualityScore}/10, sửa toàn bộ issue major/critical và đảm bảo Critic approved=true.`;
         continue;
       }
 
-      const blockingIssueSummary = (critic.issues || [])
+      const blockingIssueSummary = (activeCritic.issues || [])
         .filter(isHardBlockingIssue)
         .slice(0, 5)
         .map(issue => `[${issue.type}/${issue.severity}] ${issue.description.slice(0, 220)}`)
@@ -433,7 +554,7 @@ Chỉ trả về phần text mới (không quote, không metadata). Tiếng Vi�
         if (!structuralTypes.includes(issue.type)) return false;
         return issue.severity === 'critical' || issue.severity === 'major';
       };
-      const hasHardBlocker = (critic.issues || []).some(
+      const hasHardBlocker = (activeCritic.issues || []).some(
         isGoldenChapter ? isStructuralBlocker : isHardBlockingIssue,
       );
       if (isGoldenChapter && qualityScore >= 4 && !hasHardBlocker) {
@@ -445,12 +566,12 @@ Chỉ trả về phần text mới (không quote, không metadata). Tiếng Vi�
           chapterNumber,
           title,
           content,
-          wordCount: finalWordCount,
-          qualityScore: critic.overallScore,
+          wordCount: countWords(content),
+          qualityScore: activeCritic.overallScore,
           criticReport: {
-            ...critic,
+            ...activeCritic,
             issues: [
-              ...(critic.issues || []),
+              ...(activeCritic.issues || []),
               {
                 type: 'quality' as const,
                 severity: 'moderate' as const,
@@ -460,6 +581,8 @@ Chỉ trả về phần text mới (không quote, không metadata). Tiếng Vi�
           },
           outline,
           duration: Date.now() - startTime,
+          recoveryFlags: [...recoveryFlags, 'golden_fallback'],
+          criticRevisedPass,
         };
       }
 
@@ -475,11 +598,13 @@ Chỉ trả về phần text mới (không quote, không metadata). Tiếng Vi�
       chapterNumber,
       title,
       content,
-      wordCount: finalWordCount,
-      qualityScore: critic.overallScore,
-      criticReport: critic,
+      wordCount: criticRevisedPass ? countWords(content) : finalWordCount,
+      qualityScore: activeCritic.overallScore,
+      criticReport: activeCritic,
       outline,
       duration: Date.now() - startTime,
+      recoveryFlags: recoveryFlags.length ? recoveryFlags : undefined,
+      criticRevisedPass,
     };
   }
 
@@ -609,8 +734,11 @@ GIẤU NGHỀ / 藏拙 — KỶ LUẬT NGUỒN GỐC (MC có [cover story] phả
   let trimmedContext = context;
   const staticParts = [constraintSection, topicSection, titleRules, emotionalArcGuide, finalArcGuide, engagementGuide, foreshadowingInjection].join('').length + 2000;
   if (trimmedContext.length + staticParts > MAX_PROMPT_CHARS) {
+    // Last-resort only: the orchestrator now budgets context via the tier-aware
+    // applyContextBudget (360K) BEFORE it reaches here, so this blind head-trim
+    // should never fire. If it does, something upstream skipped the budget.
     trimmedContext = trimmedContext.slice(0, MAX_PROMPT_CHARS - staticParts);
-    console.warn(`[Architect] Chapter ${chapterNumber}: context trimmed from ${context.length} to ${trimmedContext.length} chars (above 400K — investigate)`);
+    console.error(`[Architect] Chapter ${chapterNumber}: LAST-RESORT head-trim fired — context ${context.length} → ${trimmedContext.length} chars. Upstream tier budget was bypassed; investigate.`);
   } else if (process.env.DEBUG_ARCHITECT_CONTEXT === '1') {
     console.log(`[Architect] Chapter ${chapterNumber}: full context = ${context.length} chars (no trim)`);
   }
@@ -687,6 +815,7 @@ ${previousCliffhanger ? `\n⚠️ BẮT BUỘC KHỞI ĐẦU CHƯƠNG MỚI (D4-
 - Trạng thái MC cuối chương trước: "${previousMcState}"
 - Yêu cầu: Cảnh đầu tiên (Scene 1 trong "scenes" và "emotionalArc.opening") PHẢI bắt đầu ngay tại địa điểm/thời điểm của Cliffhanger và tiếp tục trực tiếp hành động từ đó. CẤM nhảy địa điểm/thời gian tự do ở Scene 1 khi chưa có transition di chuyển hợp lý.\n` : ''}
 ${foreshadowingInjection}
+${options?.repetitionBanList?.length ? `\n[CẤM LẶP — HÌNH ẢNH/CỤM TỪ ĐÃ DÙNG ≥3 LẦN TRONG 5 CHƯƠNG GẦN NHẤT]\nKHÔNG dùng lại các hình ảnh/cụm từ sau trong chương này (thay bằng chi tiết MỚI, cụ thể cho scene): ${options.repetitionBanList.join(' | ')}\n` : ''}
 ${rewriteInstructions ? `\nYÊU CẦU SỬA TỪ LẦN TRƯỚC: ${rewriteInstructions}` : ''}
 ${isGolden ? `\nGOLDEN CHAPTER ${chapterNumber}:\nMust have: ${goldenReqs?.mustHave.join(', ')}\nAvoid: ${goldenReqs?.avoid.join(', ')}
 

@@ -572,11 +572,80 @@ export async function loadContext(
 
 // ── Assemble Context String ──────────────────────────────────────────────────
 
-export function assembleContext(payload: ContextPayload, chapterNumber: number): string {
+// ── Quality Overhaul 1.3: priority-aware context budget ─────────────────────
+// Replaces the blind head-trim in chapter-writer (slice(0, 400K)) that cut
+// character bibles / volume summaries / foreshadowing from the middle-tail
+// while preserving stale arc-plan history at the head.
+//
+// Tiers: 0 = never trim (kernel, world, bridge, bibles, foreshadowing, briefs,
+// blueprint, inventory) · 1 = halve as last resort (outlines, canon registries,
+// plot threads, synopsis) · 2 = halve then drop (RAG, summaries, timeline,
+// themes, knowledge/relationship/economic) · 3 = drop first (full prose of
+// recent chapters, used-openings/cliffhangers lists).
+
+export type ContextTier = 0 | 1 | 2 | 3;
+
+export interface ContextTrimResult {
+  text: string;
+  trimmedTiers: number[];
+  beforeChars: number;
+  afterChars: number;
+}
+
+export interface ContextBudgetOptions {
+  maxChars: number;
+  onTrim?: (info: Omit<ContextTrimResult, 'text'>) => void;
+}
+
+/** Exported for unit tests. Drops/halves parts by tier until under budget. */
+export function applyContextBudget(
+  parts: string[],
+  tiers: ReadonlyArray<ContextTier>,
+  maxChars: number,
+): ContextTrimResult {
+  const SEP = '\n\n';
+  const working = [...parts];
+  const total = () => working.reduce((s, p) => s + (p ? p.length + SEP.length : 0), 0);
+  const beforeChars = total();
+  const trimmed = new Set<number>();
+  const TRIM_MARK = '\n[...cắt bớt do giới hạn context...]';
+
+  if (beforeChars > maxChars) {
+    // Pass 1: drop Tier 3 — oldest-pushed first (full prose / used-lists are pushed oldest→newest)
+    for (let i = 0; i < working.length && total() > maxChars; i++) {
+      if (tiers[i] === 3 && working[i]) { working[i] = ''; trimmed.add(3); }
+    }
+    // Pass 2: halve large Tier 2 blocks
+    for (let i = 0; i < working.length && total() > maxChars; i++) {
+      if (tiers[i] === 2 && working[i].length > 2000) {
+        working[i] = working[i].slice(0, Math.floor(working[i].length / 2)) + TRIM_MARK;
+        trimmed.add(2);
+      }
+    }
+    // Pass 3: drop Tier 2
+    for (let i = 0; i < working.length && total() > maxChars; i++) {
+      if (tiers[i] === 2 && working[i]) { working[i] = ''; trimmed.add(2); }
+    }
+    // Pass 4: halve large Tier 1 blocks — last resort; Tier 0 is never touched
+    for (let i = 0; i < working.length && total() > maxChars; i++) {
+      if (tiers[i] === 1 && working[i].length > 3000) {
+        working[i] = working[i].slice(0, Math.floor(working[i].length / 2)) + TRIM_MARK;
+        trimmed.add(1);
+      }
+    }
+  }
+
+  const text = working.filter(Boolean).join(SEP);
+  return { text, trimmedTiers: [...trimmed].sort(), beforeChars, afterChars: text.length };
+}
+
+export function assembleContext(payload: ContextPayload, chapterNumber: number, budget?: ContextBudgetOptions): string {
   const parts: string[] = [];
+  const tiers: ContextTier[] = [];
+  const push = (text: string, tier: ContextTier = 0) => { push(text); tiers.push(tier); };
 
   if (payload.setupKernel) {
-    parts.push(formatStoryKernelContext(payload.setupKernel));
+    push(formatStoryKernelContext(payload.setupKernel));
   }
 
   // Layer -1: WORLD DESCRIPTION (canonical premise — HIGHEST PRIORITY)
@@ -584,79 +653,79 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
   // MC starting state. CRITICAL guarantee: even if story_outline schema is wrong or
   // master_outline is generic, world_description anchors every chapter to the real premise.
   if (payload.worldDescription) {
-    parts.push('[WORLD DESCRIPTION — PREMISE GỐC, BÁM SÁT TUYỆT ĐỐI, KHÔNG ĐƯỢC LẠC ĐỀ]');
+    push('[WORLD DESCRIPTION — PREMISE GỐC, BÁM SÁT TUYỆT ĐỐI, KHÔNG ĐƯỢC LẠC ĐỀ]');
     // Rule-aware cap: keep canonical rule lines first, then prose — a blind
     // slice(0, 8000) would drop late rules on long premises (coherence hazard).
-    parts.push(capWorldDescription(payload.worldDescription, 8000));
+    push(capWorldDescription(payload.worldDescription, 8000));
   }
 
   // Layer 0.5: Master Outline
   if (payload.masterOutline) {
-    parts.push('[ĐẠI CƯƠNG TOÀN TRUYỆN - BẮT BUỘC BÁM SÁT LỘ TRÌNH ĐỂ TRÁNH LAN MAN]');
-    parts.push(payload.masterOutline.slice(0, 5000));
+    push('[ĐẠI CƯƠNG TOÀN TRUYỆN - BẮT BUỘC BÁM SÁT LỘ TRÌNH ĐỂ TRÁNH LAN MAN]', 1);
+    push(payload.masterOutline.slice(0, 5000), 1);
   }
 
   // Layer 0.5b: Phase 26 — Volume + Sub-arc context (đại thần workflow)
   // Compact ~2K block telling Architect where in the 1000-chapter map we are.
   if (payload.volumeContext) {
-    parts.push(payload.volumeContext);
+    push(payload.volumeContext, 1);
   }
 
   // Layer 0.5c: Phase 27 W2.1 — Comprehensive cast roster (đại thần 角色档案)
   if (payload.castRoster) {
-    parts.push(payload.castRoster);
+    push(payload.castRoster, 1);
   }
 
   // Layer 0.5d: Phase 27 W2.4 — Power system canon (đại thần 修炼体系)
   // Generated ONCE at project setup. Comprehensive ladder + breakthrough rules.
   if (payload.powerSystemCanonContext) {
-    parts.push(payload.powerSystemCanonContext);
+    push(payload.powerSystemCanonContext, 1);
   }
 
   // Layer 0.5e: Phase 27 W2.5 — Active factions registry (đại thần 势力档案)
   if (payload.factionsContext) {
-    parts.push(payload.factionsContext);
+    push(payload.factionsContext, 1);
   }
 
   // Layer 0.5f: Phase 27 W2.2 — Story timeline (đại thần 时间线)
   if (payload.timelineContext) {
-    parts.push(payload.timelineContext);
+    push(payload.timelineContext, 2);
   }
 
   // Layer 0.5g: Phase 27 W2.3 — Item inventory (đại thần 物品系统)
   if (payload.inventoryContext) {
-    parts.push(payload.inventoryContext);
+    push(payload.inventoryContext);
   }
 
   // Layer 0.5h: Phase 27 W3.3 — Worldbuilding canon (đại thần 设定集)
   if (payload.worldbuildingCanonContext) {
-    parts.push(payload.worldbuildingCanonContext);
+    push(payload.worldbuildingCanonContext, 2);
   }
 
   // Layer 0.5i: Phase 27 W3.1 — Plot twists (đại thần 反转表)
   if (payload.plotTwistsContext) {
-    parts.push(payload.plotTwistsContext);
+    push(payload.plotTwistsContext, 1);
   }
 
   // Layer 0.5j: Phase 27 W3.2 — Themes (đại thần 主题)
   if (payload.themesContext) {
-    parts.push(payload.themesContext);
+    push(payload.themesContext, 2);
   }
 
   // Layer 0.5k: Phase 27 W4.2 — Voice anchor (đại thần 声音锚)
   if (payload.voiceAnchorContext) {
-    parts.push(payload.voiceAnchorContext);
+    push(payload.voiceAnchorContext);
   }
 
   // Layer 0.5k.1: Full-novel chapter blueprint, generated before routine production.
   if (payload.chapterBlueprintContext) {
-    parts.push(payload.chapterBlueprintContext);
+    push(payload.chapterBlueprintContext);
   }
 
   // Layer 0.5l: Phase 27 W5.4 — Rolling chapter briefs (đại thần 日大纲)
   // Detailed briefs for next 1-3 chapters; Architect plants seeds + avoids dead-ends.
   if (payload.rollingBriefsContext) {
-    parts.push(payload.rollingBriefsContext);
+    push(payload.rollingBriefsContext);
   }
 
   // Layer 0.6: Story Outline (premise, protagonist, plot points, ending vision)
@@ -723,7 +792,7 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
     if (outlineParts.length <= 2) {
       console.warn(`[context-assembler] story_outline yielded ${outlineParts.length - 1} fields (only header). Schema may be wrong — check fields: premise/mainConflict/themes/majorPlotPoints. Falling back to world_description for premise grounding.`);
     }
-    parts.push(outlineParts.join('\n'));
+    push(outlineParts.join('\n'), 1);
   }
 
   // ── Modern narrative metadata (migration 0149) — INJECTED EARLY (high priority) ──
@@ -804,58 +873,58 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
       }
     }
 
-    parts.push(metaParts.join('\n'));
+    push(metaParts.join('\n'));
   }
 
   // Layer 0: Chapter Bridge (highest priority)
   if (payload.previousCliffhanger || payload.previousSummary) {
-    parts.push('[CẦU NỐI CHƯƠNG — BẮT BUỘC TUÂN THỦ]');
+    push('[CẦU NỐI CHƯƠNG — BẮT BUỘC TUÂN THỦ]');
     if (payload.previousCliffhanger) {
-      parts.push(`Cliffhanger chương trước: ${payload.previousCliffhanger}`);
+      push(`Cliffhanger chương trước: ${payload.previousCliffhanger}`);
     }
-    if (payload.previousMcState) parts.push(`Trạng thái MC cuối chương trước: ${payload.previousMcState}`);
-    if (payload.previousSummary) parts.push(`Tóm tắt chương trước: ${payload.previousSummary}`);
+    if (payload.previousMcState) push(`Trạng thái MC cuối chương trước: ${payload.previousMcState}`);
+    if (payload.previousSummary) push(`Tóm tắt chương trước: ${payload.previousSummary}`);
     if (payload.previousEnding) {
       // 1500 chars (≈250 từ Vietnamese) covers the entire ending scene including
       // last 2-3 paragraphs, last dialogue lines, micro-details (what characters
       // were holding, exact spatial position, last sensory beat). Was 300 chars
       // → AI restarted the scene instead of continuing it.
-      parts.push(`[NGUYÊN VĂN ĐOẠN KẾT CHƯƠNG TRƯỚC — 1500 KÝ TỰ CUỐI]\n…${payload.previousEnding.slice(-1500)}`);
-      parts.push('→ Cảnh đầu chương này PHẢI tiếp diễn FORWARD (tiến lên về thời gian/hành động), KHÔNG được:');
-      parts.push('  • REPEAT / RESTATE / RE-FEEL trạng thái cuối ch.N. Nếu ch.N kết MC quyết định X, ch.N+1 PHẢI cho thấy HẬU QUẢ / EXECUTION của X (action thực, không phải MC suy ngẫm về quyết định đó).');
-      parts.push('  • Mở chương bằng template TĨNH: "MC đứng bất động / ngồi bất động + nhìn / quan sát + suy ngẫm + ánh sáng / không khí + mô tả thiết lập". Đây là pattern AI default mà reader CỰC GHÉT vì cảm thấy "viết lại đoạn cuối ch.N".');
-      parts.push('  • Restart cảnh ("Sáng hôm sau, MC tỉnh dậy…") nếu ch.N không kết bằng MC ngủ/ngất.');
-      parts.push('  • Tóm tắt lại sự kiện ch.N qua narration / nội tâm.');
-      parts.push('  • Cho MC ở vị trí khác/trang phục khác/vũ khí khác mà không có transition rõ ràng.');
-      parts.push('  • REGRESS trust/relationship của nhân vật phụ — nếu X đã tin tưởng/quy phục/giao ước/được MC thuyết phục ở cuối ch.N, X PHẢI giữ trạng thái đó (KHÔNG reset về skeptical/cảnh giác/hostile để re-establish). Tham khảo [NHÂN VẬT HIỆN TẠI] notes phía dưới.');
-      parts.push('  • Re-introduce / re-establish supporting characters đã có scene trong ch.N — relationship đã build PHẢI preserved + EXPANDED forward, không phải reset.');
-      parts.push('→ OPENING ACTIVE — trong 100 từ đầu:');
-      parts.push('  • MC PHẢI đang ACTIVELY làm gì đó (nói chuyện, thao tác, di chuyển, ra lệnh, viết, đánh, mở khóa, đặt câu hỏi). KHÔNG "đứng bất động + quan sát + suy ngẫm".');
-      parts.push('  • Có time-skip CỤ THỂ (vài phút/giờ/ngày sau) HOẶC scene-change (địa điểm khác / nhân vật mới) HOẶC continuation through ACTION (tiếp scene cuối ch.N bằng hành động kế).');
-      parts.push('  • Reference ÍT NHẤT 1 micro-detail (vị trí cụ thể, vật MC đang cầm, dialogue line cuối, trạng thái cảm xúc) từ đoạn kết ch.N để continuity rõ.');
+      push(`[NGUYÊN VĂN ĐOẠN KẾT CHƯƠNG TRƯỚC — 1500 KÝ TỰ CUỐI]\n…${payload.previousEnding.slice(-1500)}`);
+      push('→ Cảnh đầu chương này PHẢI tiếp diễn FORWARD (tiến lên về thời gian/hành động), KHÔNG được:');
+      push('  • REPEAT / RESTATE / RE-FEEL trạng thái cuối ch.N. Nếu ch.N kết MC quyết định X, ch.N+1 PHẢI cho thấy HẬU QUẢ / EXECUTION của X (action thực, không phải MC suy ngẫm về quyết định đó).');
+      push('  • Mở chương bằng template TĨNH: "MC đứng bất động / ngồi bất động + nhìn / quan sát + suy ngẫm + ánh sáng / không khí + mô tả thiết lập". Đây là pattern AI default mà reader CỰC GHÉT vì cảm thấy "viết lại đoạn cuối ch.N".');
+      push('  • Restart cảnh ("Sáng hôm sau, MC tỉnh dậy…") nếu ch.N không kết bằng MC ngủ/ngất.');
+      push('  • Tóm tắt lại sự kiện ch.N qua narration / nội tâm.');
+      push('  • Cho MC ở vị trí khác/trang phục khác/vũ khí khác mà không có transition rõ ràng.');
+      push('  • REGRESS trust/relationship của nhân vật phụ — nếu X đã tin tưởng/quy phục/giao ước/được MC thuyết phục ở cuối ch.N, X PHẢI giữ trạng thái đó (KHÔNG reset về skeptical/cảnh giác/hostile để re-establish). Tham khảo [NHÂN VẬT HIỆN TẠI] notes phía dưới.');
+      push('  • Re-introduce / re-establish supporting characters đã có scene trong ch.N — relationship đã build PHẢI preserved + EXPANDED forward, không phải reset.');
+      push('→ OPENING ACTIVE — trong 100 từ đầu:');
+      push('  • MC PHẢI đang ACTIVELY làm gì đó (nói chuyện, thao tác, di chuyển, ra lệnh, viết, đánh, mở khóa, đặt câu hỏi). KHÔNG "đứng bất động + quan sát + suy ngẫm".');
+      push('  • Có time-skip CỤ THỂ (vài phút/giờ/ngày sau) HOẶC scene-change (địa điểm khác / nhân vật mới) HOẶC continuation through ACTION (tiếp scene cuối ch.N bằng hành động kế).');
+      push('  • Reference ÍT NHẤT 1 micro-detail (vị trí cụ thể, vật MC đang cầm, dialogue line cuối, trạng thái cảm xúc) từ đoạn kết ch.N để continuity rõ.');
     }
   }
 
   // Anti-self-torture: recent beat history (last 3 chapters)
   if (payload.recentBeatHistory) {
-    parts.push('[TRẠNG THÁI 3 CHƯƠNG GẦN ĐÂY — CHỐNG TỰ NGƯỢC, TƯ DUY THEO GIAI ĐOẠN]');
-    parts.push(payload.recentBeatHistory);
-    parts.push('→ Phân tích: chuỗi SETBACK liên tiếp = đang ở giữa 1 GIAI ĐOẠN ngược (cùng 1 sự kiện). Nếu giai đoạn đó đã 4+ chương → chương này PHẢI bắt đầu resolution.');
-    parts.push('→ Nếu chương N-1 là SETBACK NHƯNG đã RESOLVE (kết thúc sự kiện) → chương này PHẢI là breathing, CẤM mở giai đoạn ngược mới ngay.');
-    parts.push('→ Nếu chương N-1 là "ổn/tích cực" → có thể tiếp tục breathing, hoặc khởi đầu giai đoạn ngược mới NẾU đã có ≥1-3 chương breathing trước đó.');
-    parts.push('→ KHÔNG cắt vụn 1 sự kiện đang diễn biến — diễn biến tự nhiên được ưu tiên hơn cắt nhịp cứng nhắc.');
+    push('[TRẠNG THÁI 3 CHƯƠNG GẦN ĐÂY — CHỐNG TỰ NGƯỢC, TƯ DUY THEO GIAI ĐOẠN]');
+    push(payload.recentBeatHistory);
+    push('→ Phân tích: chuỗi SETBACK liên tiếp = đang ở giữa 1 GIAI ĐOẠN ngược (cùng 1 sự kiện). Nếu giai đoạn đó đã 4+ chương → chương này PHẢI bắt đầu resolution.');
+    push('→ Nếu chương N-1 là SETBACK NHƯNG đã RESOLVE (kết thúc sự kiện) → chương này PHẢI là breathing, CẤM mở giai đoạn ngược mới ngay.');
+    push('→ Nếu chương N-1 là "ổn/tích cực" → có thể tiếp tục breathing, hoặc khởi đầu giai đoạn ngược mới NẾU đã có ≥1-3 chương breathing trước đó.');
+    push('→ KHÔNG cắt vụn 1 sự kiện đang diễn biến — diễn biến tự nhiên được ưu tiên hơn cắt nhịp cứng nhắc.');
   }
 
   // Character states
-  if (payload.characterStates) parts.push(payload.characterStates);
+  if (payload.characterStates) push(payload.characterStates);
 
   // Genre boundary
-  if (payload.genreBoundary) parts.push(payload.genreBoundary);
+  if (payload.genreBoundary) push(payload.genreBoundary);
 
   // RAG context — wrap with stable header tag so Writer can extract it from full context.
   // 2026-04-29 continuity overhaul: Writer now reads RAG too (was Architect-only before).
   if (payload.ragContext) {
-    parts.push(`[KÝ ỨC LIÊN QUAN — TỪ CÁC CHƯƠNG XA, BẮT BUỘC GIỮ NHẤT QUÁN]\n${payload.ragContext}`);
+    push(`[KÝ ỨC LIÊN QUAN — TỪ CÁC CHƯƠNG XA, BẮT BUỘC GIỮ NHẤT QUÁN]\n${payload.ragContext}`, 2);
   }
 
   // Scalability modules
@@ -863,9 +932,9 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
   // section boundaries. Without [TAG] prefix, regex extraction in Writer/Critic (terminator
   // `\n\n[`) extends past these sections into following content, causing leakage. The original
   // `═══ TUYẾN TRUYỆN ĐANG MỞ ═══` heading is now redundant but harmless inside the wrapped block.
-  if (payload.plotThreads) parts.push(`[PLOT THREADS — TUYẾN TRUYỆN ĐANG MỞ + ĐÃ ĐÓNG]\n${payload.plotThreads}`);
-  if (payload.beatGuidance) parts.push(`[BEAT GUIDANCE — NHỊP & COOLDOWN]\n${payload.beatGuidance}`);
-  if (payload.worldRules) parts.push(payload.worldRules);
+  if (payload.plotThreads) push(`[PLOT THREADS — TUYẾN TRUYỆN ĐANG MỞ + ĐÃ ĐÓNG]\n${payload.plotThreads}`, 1);
+  if (payload.beatGuidance) push(`[BEAT GUIDANCE — NHỊP & COOLDOWN]\n${payload.beatGuidance}`);
+  if (payload.worldRules) push(payload.worldRules);
 
   // 2026-04-29 audit fix: wrap all context modules with [TAG] headers so Writer/Critic regex
   // extraction (`\[TAG[^\]]*\]...(?=\n\n\[|$)`) can both find them AND properly terminate at
@@ -873,46 +942,46 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
   // Writer's quality-module extraction (looking for `[FORESHADOWING]` etc.) NEVER matched.
   // This is a major pre-existing bug — Writer was getting empty quality-module context all along.
   // Character knowledge graph
-  if (payload.characterKnowledgeContext) parts.push(`[CHARACTER KNOWLEDGE — AI ĐÃ BIẾT GÌ]\n${payload.characterKnowledgeContext}`);
-  if (payload.relationshipContext) parts.push(`[RELATIONSHIPS — TRẠNG THÁI MỐI QUAN HỆ]\n${payload.relationshipContext}`);
-  if (payload.economicContext) parts.push(`[ECONOMIC LEDGER — TÀI CHÍNH]\n${payload.economicContext}`);
+  if (payload.characterKnowledgeContext) push(`[CHARACTER KNOWLEDGE — AI ĐÃ BIẾT GÌ]\n${payload.characterKnowledgeContext}`, 2);
+  if (payload.relationshipContext) push(`[RELATIONSHIPS — TRẠNG THÁI MỐI QUAN HỆ]\n${payload.relationshipContext}`, 2);
+  if (payload.economicContext) push(`[ECONOMIC LEDGER — TÀI CHÍNH]\n${payload.economicContext}`, 2);
 
   // Quality modules (Qidian Master Level)
-  if (payload.foreshadowingContext) parts.push(`[FORESHADOWING — GIEO/PAYOFF HINT]\n${payload.foreshadowingContext}`);
-  if (payload.characterArcContext) parts.push(`[CHARACTER ARC — XUNG ĐỘT NỘI TÂM]\n${payload.characterArcContext}`);
-  if (payload.pacingContext) parts.push(`[PACING — NHỊP CHƯƠNG]\n${payload.pacingContext}`);
-  if (payload.voiceContext) parts.push(`[VOICE — GIỌNG VĂN]\n${payload.voiceContext}`);
-  if (payload.powerContext) parts.push(`[POWER — CẢNH GIỚI MC]\n${payload.powerContext}`);
-  if (payload.worldContext) parts.push(`[WORLD — LOCATION + WORLD STATE]\n${payload.worldContext}`);
+  if (payload.foreshadowingContext) push(`[FORESHADOWING — GIEO/PAYOFF HINT]\n${payload.foreshadowingContext}`);
+  if (payload.characterArcContext) push(`[CHARACTER ARC — XUNG ĐỘT NỘI TÂM]\n${payload.characterArcContext}`);
+  if (payload.pacingContext) push(`[PACING — NHỊP CHƯƠNG]\n${payload.pacingContext}`);
+  if (payload.voiceContext) push(`[VOICE — GIỌNG VĂN]\n${payload.voiceContext}`);
+  if (payload.powerContext) push(`[POWER — CẢNH GIỚI MC]\n${payload.powerContext}`);
+  if (payload.worldContext) push(`[WORLD — LOCATION + WORLD STATE]\n${payload.worldContext}`);
 
   // Phase 22 continuity overhaul: durable bibles (refreshed every 50ch / 100ch).
   // Injected high — these are the consolidated truth Architect should anchor against.
-  if (payload.characterBibleContext) parts.push(payload.characterBibleContext);
-  if (payload.volumeSummaryContext) parts.push(payload.volumeSummaryContext);
-  if (payload.geographyContext) parts.push(payload.geographyContext);
+  if (payload.characterBibleContext) push(payload.characterBibleContext);
+  if (payload.volumeSummaryContext) push(payload.volumeSummaryContext);
+  if (payload.geographyContext) push(payload.geographyContext);
 
   // Layer 1: Story Bible
   if (payload.storyBible) {
-    parts.push('[STORY BIBLE]');
-    parts.push(payload.storyBible.slice(0, 4000));
+    push('[STORY BIBLE]', 1);
+    push(payload.storyBible.slice(0, 4000), 1);
   }
 
   // Layer 2: Synopsis
   if (payload.synopsis) {
-    parts.push('[TỔNG QUAN CỐT TRUYỆN]');
-    parts.push(payload.synopsis.slice(0, 3000));
+    push('[TỔNG QUAN CỐT TRUYỆN]', 1);
+    push(payload.synopsis.slice(0, 3000), 1);
     if (payload.synopsisStructured) {
       if (payload.synopsisStructured.mc_current_state) {
-        parts.push(`Trạng thái MC: ${payload.synopsisStructured.mc_current_state}`);
+        push(`Trạng thái MC: ${payload.synopsisStructured.mc_current_state}`);
       }
       if (payload.synopsisStructured.active_allies?.length) {
-        parts.push(`Đồng minh: ${payload.synopsisStructured.active_allies.join(', ')}`);
+        push(`Đồng minh: ${payload.synopsisStructured.active_allies.join(', ')}`);
       }
       if (payload.synopsisStructured.active_enemies?.length) {
-        parts.push(`Kẻ thù: ${payload.synopsisStructured.active_enemies.join(', ')}`);
+        push(`Kẻ thù: ${payload.synopsisStructured.active_enemies.join(', ')}`);
       }
       if (payload.synopsisStructured.open_threads?.length) {
-        parts.push(`Tuyến truyện đang mở: ${payload.synopsisStructured.open_threads.join(', ')}`);
+        push(`Tuyến truyện đang mở: ${payload.synopsisStructured.open_threads.join(', ')}`);
       }
     }
   }
@@ -923,48 +992,48 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
   // recent events. Summaries lose ~90% of detail — only full prose preserves the human-novel
   // quality bar where ch.800 reads like ch.8.
   if (payload.recentChapterFullText && payload.recentChapterFullText.length > 0) {
-    parts.push(`[FULL PROSE ${payload.recentChapterFullText.length} CHƯƠNG GẦN NHẤT — ĐỌC VERBATIM ĐỂ GIỮ GIỌNG VĂN + CHI TIẾT]`);
+    push(`[FULL PROSE ${payload.recentChapterFullText.length} CHƯƠNG GẦN NHẤT — ĐỌC VERBATIM ĐỂ GIỮ GIỌNG VĂN + CHI TIẾT]`, 3);
     for (const ch of payload.recentChapterFullText) {
       // Cap at 15K chars per chapter to bound prompt size while preserving full narrative.
       const content = ch.content.length > 15000
         ? ch.content.slice(0, 7500) + '\n\n[...phần giữa lược...]\n\n' + ch.content.slice(-7500)
         : ch.content;
-      parts.push(`### Chương ${ch.chapter_number}: "${ch.title}"\n${content}`);
+      push(`### Chương ${ch.chapter_number}: "${ch.title}"\n${content}`, 3);
     }
   }
 
   // Layer 3b: Recent Chapter Summaries (12-chapter look-back). Complements full-prose layer
   // by giving longer context window at lower fidelity.
   if (payload.recentChapters.length > 0) {
-    parts.push(`[TÓM TẮT ${payload.recentChapters.length} CHƯƠNG GẦN NHẤT — DÒNG THỜI GIAN]`);
+    push(`[TÓM TẮT ${payload.recentChapters.length} CHƯƠNG GẦN NHẤT — DÒNG THỜI GIAN]`);
     for (const ch of payload.recentChapters) {
-      parts.push(ch);
+      push(ch, 2);
     }
   }
 
   // Layer 4: Arc Plan
   // Sub-arc context (hyperpop 2024-2026 standard) — inject before arc plan
   if (payload.currentSubArc) {
-    parts.push('[SUB-ARC HIỆN TẠI — TUYỆT ĐỐI BÁM SÁT]');
-    parts.push(payload.currentSubArc);
-    parts.push('→ Hyperpop standard: sub-arc 5-10 chương resolve TỰ THÂN. Chương này phải đóng góp vào mini-payoff của sub-arc.');
+    push('[SUB-ARC HIỆN TẠI — TUYỆT ĐỐI BÁM SÁT]');
+    push(payload.currentSubArc);
+    push('→ Hyperpop standard: sub-arc 5-10 chương resolve TỰ THÂN. Chương này phải đóng góp vào mini-payoff của sub-arc.');
   }
 
   if (payload.arcPlan) {
-    parts.push('[KẾ HOẠCH ARC HIỆN TẠI]');
-    parts.push(payload.arcPlan.slice(0, 3000));
+    push('[KẾ HOẠCH ARC HIỆN TẠI]', 1);
+    push(payload.arcPlan.slice(0, 3000), 1);
     if (payload.chapterBrief) {
-      parts.push(`[BRIEF CHO CHƯƠNG ${chapterNumber}]: ${payload.chapterBrief}`);
+      push(`[BRIEF CHO CHƯƠNG ${chapterNumber}]: ${payload.chapterBrief}`);
     }
     if (payload.arcPlanThreads) {
       if (payload.arcPlanThreads.threads_to_advance?.length) {
-        parts.push(`Tuyến cần đẩy: ${payload.arcPlanThreads.threads_to_advance.join(', ')}`);
+        push(`Tuyến cần đẩy: ${payload.arcPlanThreads.threads_to_advance.join(', ')}`);
       }
       if (payload.arcPlanThreads.threads_to_resolve?.length) {
-        parts.push(`Tuyến cần giải quyết: ${payload.arcPlanThreads.threads_to_resolve.join(', ')}`);
+        push(`Tuyến cần giải quyết: ${payload.arcPlanThreads.threads_to_resolve.join(', ')}`);
       }
       if (payload.arcPlanThreads.new_threads?.length) {
-        parts.push(`Tuyến mới: ${payload.arcPlanThreads.new_threads.join(', ')}`);
+        push(`Tuyến mới: ${payload.arcPlanThreads.new_threads.join(', ')}`);
       }
     }
   }
@@ -980,13 +1049,27 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number):
     .filter(s => !!s && !isTemplateOpening(s))
     .slice(0, 10);
   if (cleanOpenings.length > 0) {
-    parts.push(`[CÂU MỞ ĐẦU ĐÃ DÙNG — KHÔNG LẶP]: ${cleanOpenings.join(' | ')}`);
+    push(`[CÂU MỞ ĐẦU ĐÃ DÙNG — KHÔNG LẶP]: ${cleanOpenings.join(' | ')}`, 3);
   }
   const cleanCliffhangers = payload.recentCliffhangers
     .filter(s => !!s && !isTemplateCliffhanger(s))
     .slice(0, 5);
   if (cleanCliffhangers.length > 0) {
-    parts.push(`[CLIFFHANGER ĐÃ DÙNG — KHÔNG LẶP]: ${cleanCliffhangers.join(' | ')}`);
+    push(`[CLIFFHANGER ĐÃ DÙNG — KHÔNG LẶP]: ${cleanCliffhangers.join(' | ')}`, 3);
+  }
+
+  // Quality Overhaul 1.3: tier-aware trimming instead of the chapter-writer's
+  // blind head-trim. Tier 0 (kernel/world/bridge/bibles/foreshadowing) is
+  // guaranteed to survive verbatim.
+  if (budget && budget.maxChars > 0) {
+    const result = applyContextBudget(parts, tiers, budget.maxChars);
+    if (result.trimmedTiers.length > 0) {
+      console.error(
+        `[context-assembler] ch.${chapterNumber}: context ${result.beforeChars} chars > budget ${budget.maxChars} — trimmed tiers [${result.trimmedTiers.join(',')}] → ${result.afterChars} chars`,
+      );
+      budget.onTrim?.({ trimmedTiers: result.trimmedTiers, beforeChars: result.beforeChars, afterChars: result.afterChars });
+    }
+    return result.text;
   }
 
   return parts.join('\n\n');

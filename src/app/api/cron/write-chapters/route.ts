@@ -990,8 +990,17 @@ export async function GET(request: NextRequest) {
     const activeCount = activeCountQuery.count || 0;
     const dynamicResumeBatchSize = computeDynamicResumeBatchSize(activeCount);
 
-    const rawCandidates = filterProductionEnabled((candidateQuery.data || []) as ProjectRow[]);
-    const setupOnlyCandidates = filterProductionEnabled((setupCandidateQuery.data || []) as ProjectRow[]);
+    // Quality Overhaul 1.5: circuit-breaker hold (enforce mode only). Held
+    // projects stay 'active' but the write cron skips them until an admin
+    // reviews + clears style_directives.quality_hold on /admin/quality.
+    const filterQualityHold = (rows: ProjectRow[]): ProjectRow[] => rows.filter(p => {
+      const held = (p.style_directives as Record<string, unknown> | null)?.quality_hold === true;
+      if (held) console.warn(`[Cron] Skipping project ${p.id}: quality_hold active (circuit breaker)`);
+      return !held;
+    });
+
+    const rawCandidates = filterQualityHold(filterProductionEnabled((candidateQuery.data || []) as ProjectRow[]));
+    const setupOnlyCandidates = filterQualityHold(filterProductionEnabled((setupCandidateQuery.data || []) as ProjectRow[]));
     console.log(`[Cron] Step 1 OK: ${activeCount} active, ${rawCandidates.length} active candidates, ${setupOnlyCandidates.length} setup candidates fetched`);
 
     // Filter candidates eligible for processing (respect soft-ending grace buffer)

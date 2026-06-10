@@ -87,6 +87,10 @@ export interface StyleDirectives {
   flash_writer_enabled?: boolean;
   /** Cheap bulk mode: routine chapters may pass a softer gate if no hard continuity/canon issue is present. */
   flash_routine_soft_gate?: boolean;
+  /** Quality Overhaul 1.1: critic-directed revise pass before shipping marginal chapters. Default ON; set false to opt out. */
+  critic_revise_pass?: boolean;
+  /** Quality Overhaul 1.5: circuit breaker hold — set by quality-trend cron in enforce mode; write cron skips held projects. */
+  quality_hold?: boolean;
   /** Minimum score for flash_routine_soft_gate. Defaults to 5 in director-only Flash mode. */
   flash_routine_min_quality_score?: number;
   /** Retry count for routine Flash writes. Defaults to 1 in director-only Flash mode to avoid paid rewrite loops. */
@@ -297,6 +301,14 @@ export interface WriteChapterResult {
   /** The Architect's chapter outline — used by post-write tasks for character extraction */
   outline?: ChapterOutline;
   duration: number;
+  /**
+   * Quality Overhaul 1.4: recovery paths that shipped degraded content and
+   * need admin attention ('golden_fallback' | 'revise_pass_failed').
+   * Orchestrator inserts admin_review_queue rows for these post-save.
+   */
+  recoveryFlags?: string[];
+  /** Quality Overhaul 1.1: true when the critic-directed revise pass replaced the content. */
+  criticRevisedPass?: boolean;
 }
 
 // ── Chapter Outline (Architect output) ───────────────────────────────────────

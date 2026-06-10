@@ -753,7 +753,7 @@ VERDICT
 ═══════════════════════════════════════════════════════════════════════════
 
 - APPROVE (overallScore ≥7 + đủ từ + 0 hard gates G1-G7): approved=true, requiresRewrite=false
-- REVISE (overallScore 5-6 + 0 hard gates): approved=false, requiresRewrite=false (downstream auto-reviser handle)
+- REVISE (overallScore 5-6 + 0 hard gates): approved=false, requiresRewrite=false. Hệ thống sẽ chạy 1 lượt auto-revise theo đúng rewriteInstructions của bạn — vì vậy REVISE BẮT BUỘC kèm rewriteInstructions cụ thể, actionable (nêu rõ đoạn/vấn đề cần sửa + cách sửa). rewriteInstructions rỗng khi verdict REVISE = lỗi output.
 - REWRITE: approved=false, requiresRewrite=true. Trigger:
   • overallScore ≤4
   • word count <60% target
