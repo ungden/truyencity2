@@ -859,11 +859,17 @@ async function runStageCharacter(p: ProjectStageRow): Promise<{ success: boolean
   // Phase 29: thread MC archetype menu — AI picks 1 instead of generic
   const playbookSection = formatPlaybookForCharacterStage(genre);
 
+  // Quality Overhaul 3.3 — thread idea-stage premise into the character stage
+  // so archetype/voice choice links back to the reader fantasy (was only
+  // receiving world_description + kernel).
+  const ideaPremise = ((p.story_outline as { premise?: string } | null)?.premise || '').trim();
+
   const prompt = `Chọn archetype + voice/signature cho MC đã được khóa canon trong world_description.
 
 Tên truyện: "${novel.title}"
 Thể loại: ${genre}
 MC CANON (KHÔNG ĐỔI TÊN): ${worldMc}
+${ideaPremise ? `PREMISE (từ idea stage — archetype phải phục vụ premise này): ${ideaPremise.slice(0, 600)}` : ''}
 
 STORY KERNEL (CANON — voice/archetype phải phục vụ engine này):
 ${formatStoryKernelForPrompt(setupKernel!)}
@@ -917,6 +923,21 @@ QUY TẮC: KHÔNG đặt lại tên MC. Archetype CHÍNH XÁC 1 trong list playb
     const identityCheck = validateMcOpeningIdentityTier(identityScanText, genre, worldMc);
     if (!identityCheck.passed) {
       return { success: false, error: `character identity gate: ${identityCheck.reason}` };
+    }
+
+    // Quality Overhaul 3.3 — mcOrigin contradiction check AT the character
+    // stage (was only caught 2 stages later at master_outline, after the
+    // contradiction had already poisoned downstream artifacts). A voice/
+    // signature mentioning rebirth/transmigration tokens for a native MC
+    // fails the stage so the state machine regenerates with the reason named.
+    const { detectOriginContradiction } = await import('../plan/origin-guard');
+    const originIssue = detectOriginContradiction(setupKernel, {
+      archetype: archetypeName,
+      voice: parsed?.mcVoice || '',
+      signature: parsed?.mcSignature || '',
+    });
+    if (originIssue) {
+      return { success: false, error: `character origin gate: ${originIssue}` };
     }
 
     // Stash archetype + voice + signature in story_outline JSON for downstream stages
@@ -1250,6 +1271,23 @@ async function runStageCanonSpawn(p: ProjectStageRow): Promise<{ success: boolea
         },
       })
       .eq('id', p.id);
+
+    // Quality Overhaul 3.2 — required-artifact gate: a project must NOT pass
+    // this stage missing worldbuilding canon / foreshadowing (+ power system
+    // for combat genres), regardless of how many optional artifacts succeeded.
+    // The old 4/7 count gate let exactly that through.
+    const { getRequiredCanonArtifacts } = await import('../plan/setup-canon-spawn');
+    const missingRequired = getRequiredCanonArtifacts(p.genre)
+      .filter(key => !result[key].generated);
+    if (missingRequired.length > 0) {
+      const requiredErrors = missingRequired
+        .map(key => `${key}: ${result[key].error || 'failed'}`)
+        .join(' | ');
+      return {
+        success: false,
+        error: `Required canon artifacts missing after retry: ${requiredErrors.slice(0, 400)}`,
+      };
+    }
 
     // Stage passes if at least 4 of 7 canon types generated successfully.
     const generatedCount = [

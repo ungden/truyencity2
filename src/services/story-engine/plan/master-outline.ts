@@ -51,10 +51,40 @@ export interface VolumeOutline {
 /** Backward-compat alias: legacy code reads `majorArcs` as a flat list. */
 export type MajorArc = SubArcOutline;
 
+/**
+ * Quality Overhaul 3.1 — structured ending plan. finalBossOrGoal was one
+ * string; the final ~100 chapters had no closure structure (climax vs
+ * resolution split, which threads MUST resolve, epilogue beats). Generated
+ * at master-outline time, then REFINED once at 70% progress against the
+ * story actually written (live plot_threads + unresolved foreshadowing).
+ */
+export interface EndgamePlan {
+  climaxArc: {
+    startChapter: number;
+    endChapter: number;
+    description: string;
+    convergingThreads: string[];
+    finalConfrontation: string;
+  };
+  resolutionArc: {
+    startChapter: number;
+    endChapter: number;
+    beats: string[];
+  };
+  finalState: string;
+  mustResolveThreads: string[];
+  epilogueBeats: string[];
+  /** 'initial' = generated with master outline; 'refined' = re-planned at 70% progress. */
+  source?: 'initial' | 'refined';
+  refinedAtChapter?: number;
+}
+
 export interface MasterOutline {
   mainPlotline: string;
   finalBossOrGoal: string;
   worldMapProgression: string[];
+  /** Quality Overhaul 3.1 — explicit closure structure for the final ~10% of the novel. */
+  endgame?: EndgamePlan;
   /**
    * Phase 26 hierarchical structure: 5-15 volumes, each with 4-6 sub-arcs.
    * For backward compat, `majorArcs` (below) is auto-populated as a flat list of

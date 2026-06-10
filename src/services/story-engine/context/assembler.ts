@@ -671,6 +671,13 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number, 
     push(payload.masterOutline.slice(0, 5000), 1);
   }
 
+  // Quality Overhaul 3.1: endgame plan — Tier 0 (never trimmed). Present only
+  // within the final ~120 chapters; steers every chapter toward the planned
+  // climax → resolution → epilogue shape.
+  if (payload.endgameContext) {
+    push(payload.endgameContext);
+  }
+
   // Layer 0.5b: Phase 26 — Volume + Sub-arc context (đại thần workflow)
   // Compact ~2K block telling Architect where in the 1000-chapter map we are.
   if (payload.volumeContext) {
@@ -761,27 +768,44 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number, 
 
     // P2.3: Cast roster — Architect/Writer DÙNG TÊN NÀY thay vì invent. Without this,
     // Architect tự sáng tạo supporting characters mỗi chương (Khánh ch.1 → Khang ch.3).
-    const castRoster = (outline as { castRoster?: Array<{ name?: string; role?: string; relationToMC?: string; introduceArc?: number; archeType?: string }> }).castRoster;
+    const castRoster = (outline as { castRoster?: Array<{ name?: string; role?: string; relationToMC?: string; introduceArc?: number; archeType?: string; importance?: number; recurrenceCadence?: string }> }).castRoster;
     if (castRoster && castRoster.length > 0) {
       outlineParts.push('');
       outlineParts.push('[CAST ROSTER — DÙNG ĐÚNG TÊN NÀY, KHÔNG INVENT]');
+      const importanceLabel: Record<number, string> = { 1: 'CO-PROTAGONIST', 2: 'RECURRING', 3: 'walk-on' };
       for (const c of castRoster) {
         if (!c.name) continue;
         const role = c.role || '';
         const rel = c.relationToMC || '';
         const arc = c.introduceArc ? ` (xuất hiện từ arc ${c.introduceArc})` : '';
         const type = c.archeType ? ` [${c.archeType}]` : '';
-        outlineParts.push(`  • ${c.name} — ${role}${rel ? ' / ' + rel : ''}${arc}${type}`);
+        // Quality Overhaul 3.4: importance + cadence — Architect knows who is
+        // DUE to reappear (secondary cast no longer vanishes after ch.300).
+        const imp = c.importance && importanceLabel[c.importance] ? ` {${importanceLabel[c.importance]}}` : '';
+        const cadence = c.recurrenceCadence ? ` — tần suất: ${c.recurrenceCadence}` : '';
+        outlineParts.push(`  • ${c.name} — ${role}${rel ? ' / ' + rel : ''}${arc}${type}${imp}${cadence}`);
       }
       outlineParts.push('→ KHI cần named NPC trong scene, chọn từ roster trên. CHỈ invent NPC nhỏ (vd "anh shipper", "chị bán cá") khi roster không có vai phù hợp.');
+      outlineParts.push('→ Nhân vật {RECURRING}/{CO-PROTAGONIST} quá hạn tần suất chưa xuất hiện → ưu tiên đưa vào chương này.');
     }
 
     // World rules + tone flags + anti-tropes — Architect/Critic dùng để enforce.
-    const worldRules = (outline as { worldRules?: string[] }).worldRules;
-    if (worldRules && worldRules.length > 0) {
+    // Quality Overhaul 3.4: entries may be plain strings (legacy) or
+    // {rule, introducedAt} provenance objects — normalize on read.
+    const rawWorldRules = (outline as { worldRules?: Array<string | { rule: string; introducedAt?: 'setup' | number }> }).worldRules;
+    if (rawWorldRules && rawWorldRules.length > 0) {
       outlineParts.push('');
       outlineParts.push('[WORLD RULES — TUÂN THỦ XUYÊN SUỐT]');
-      for (const r of worldRules) outlineParts.push(`  • ${r}`);
+      for (const raw of rawWorldRules) {
+        const r = typeof raw === 'string' ? { rule: raw } : raw;
+        if (!r?.rule) continue;
+        const provenance = r.introducedAt === undefined || r.introducedAt === 'setup'
+          ? ''
+          : typeof r.introducedAt === 'number' && r.introducedAt > chapterNumber
+            ? ` (CHƯA HÉ LỘ — rule này chỉ được hint từ ch.${r.introducedAt}; nhân vật KHÔNG ĐƯỢC biết trước)`
+            : ` (đã hé lộ từ ch.${r.introducedAt})`;
+        outlineParts.push(`  • ${r.rule}${provenance}`);
+      }
     }
     const antiTropes = (outline as { antiTropes?: string[] }).antiTropes;
     if (antiTropes && antiTropes.length > 0) {

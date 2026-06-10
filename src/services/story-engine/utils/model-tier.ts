@@ -108,6 +108,7 @@ export function installModelTierRouting(): void {
   routing['master_outline'] = 'gemini-3.5-flash'; // Override to Gemini to prevent DeepSeek timeouts on large master outlines
   routing['arc_plan'] = 'gemini-3.5-flash';       // Override to Gemini — arc_plan also generates large JSON and times out on DeepSeek
   routing['critic'] = 'gemini-3.5-flash';         // Override to Gemini to prevent DeepSeek formatting issues and reduce self-bias
+  routing['endgame_plan'] = 'gemini-3.5-flash';   // Quality Overhaul 3.1 — endgame refinement, same large-JSON family as master_outline
   for (const task of FLASH_TASKS) routing[task] = MODEL_FLASH;
   // _default fallback to flash when task is undefined
   routing['_default'] = MODEL_FLASH;
