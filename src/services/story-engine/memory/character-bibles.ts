@@ -154,6 +154,25 @@ export async function refreshCharacterBibles(
 
 // ── Internal: refresh one character ────────────────────────────────────────
 
+/**
+ * Keep the most recent `recentCount` rows intact and stride-sample the older
+ * history down to `historyCount`, so a long novel's bible sees the full life
+ * arc instead of one contiguous window. Input must be sorted DESC by chapter;
+ * output is chronological (oldest → newest).
+ * Exported for unit tests.
+ */
+export function strideSampleTimeline<T>(rowsDesc: T[], recentCount = 40, historyCount = 60): T[] {
+  const recent = rowsDesc.slice(0, recentCount).reverse();
+  const history = rowsDesc.slice(recentCount).reverse();
+  if (history.length <= historyCount) return [...history, ...recent];
+  const step = history.length / historyCount;
+  const sampled: T[] = [];
+  for (let i = 0; i < historyCount; i++) {
+    sampled.push(history[Math.floor(i * step)]);
+  }
+  return [...sampled, ...recent];
+}
+
 async function refreshOneBible(
   projectId: string,
   characterName: string,
@@ -163,48 +182,61 @@ async function refreshOneBible(
 ): Promise<void> {
   const db = getSupabase();
 
-  // Pull character_states snapshots up to this milestone (max 100).
+  // Pull character_states snapshots up to this milestone.
   // Bound by chapter_number ≤ milestone so backfill produces correct historical bibles
   // (e.g. backfill at milestone=50 for a project at ch.250 must NOT include ch.51+ data).
-  const { data: states } = await db
+  // DESC + stride-sample: ascending+limit silently froze bibles at the OLDEST 100
+  // states for long novels — "latest" was really ~ch.100's state.
+  const { data: stateRows } = await db
     .from('character_states')
     .select('chapter_number,status,power_level,power_realm_index,location,personality_quirks,notes')
     .eq('project_id', projectId)
     .eq('character_name', characterName)
     .lte('chapter_number', chapterNumber)
-    .order('chapter_number', { ascending: true })
-    .limit(100);
+    .order('chapter_number', { ascending: false })
+    .limit(400);
 
-  if (!states?.length) return;
+  if (!stateRows?.length) return;
+
+  const states = strideSampleTimeline(stateRows);
 
   // Build compact timeline string
   const timeline = states.map(s =>
     `Ch.${s.chapter_number}: ${s.status}${s.power_level ? ` | ${s.power_level}` : ''}${s.location ? ` @${s.location}` : ''}${s.personality_quirks ? ` | quirks: ${s.personality_quirks}` : ''}${s.notes ? ` | ${s.notes}` : ''}`
   ).join('\n');
 
-  // Pull RAG character_event chunks (top 8) for richer context — bound by milestone too
+  // Pull RAG character_event chunks (top 8) for richer context — bound by milestone too.
+  // DESC so the fetch window covers the most recent events; pick 2 earliest + 6 newest
+  // relevant chunks for life-arc coverage (origin events + current situation).
   const { data: chunks } = await db
     .from('story_memory_chunks')
     .select('chapter_number,content,chunk_type')
     .eq('project_id', projectId)
     .lte('chapter_number', chapterNumber)
     .in('chunk_type', ['character_event', 'plot_point', 'key_event'])
-    .order('chapter_number', { ascending: true })
+    .order('chapter_number', { ascending: false })
     .limit(200);
 
-  const relevantChunks = (chunks || [])
-    .filter(c => c.content && c.content.includes(characterName))
-    .slice(0, 8)
+  const namedChunks = (chunks || []).filter(c => c.content && c.content.includes(characterName));
+  const pickedChunks = namedChunks.length <= 8
+    ? [...namedChunks].reverse()
+    : [...namedChunks.slice(-2), ...namedChunks.slice(0, 6)].sort((a, b) => a.chapter_number - b.chapter_number);
+  const relevantChunks = pickedChunks
     .map(c => `Ch.${c.chapter_number} (${c.chunk_type}): ${c.content.slice(0, 400)}`)
     .join('\n\n');
 
   const latest = states[states.length - 1];
 
+  // Head+tail truncation: a pure head-cut would drop the NEWEST timeline entries.
+  const timelineText = timeline.length > 5000
+    ? `${timeline.slice(0, 1500)}\n[...lược bớt giai đoạn giữa...]\n${timeline.slice(-3500)}`
+    : timeline;
+
   const prompt = `Bạn là trợ lý biên tập viết hồ sơ nhân vật cho truyện dài. Tổng hợp các snapshot + sự kiện thành 1 BIBLE NHÂN VẬT cô đặc, chính xác.
 
 NHÂN VẬT: ${characterName}
 TIMELINE TRẠNG THÁI (${states.length} điểm dữ liệu):
-${timeline.slice(0, 5000)}
+${timelineText}
 
 ${relevantChunks ? `SỰ KIỆN LIÊN QUAN:\n${relevantChunks.slice(0, 4000)}\n` : ''}
 
