@@ -74,6 +74,22 @@ export interface CanonSpawnResult {
   voiceAnchors: { generated: boolean; count: number; error?: string };
 }
 
+/**
+ * Quality Overhaul 3.2 — required artifacts per genre. A project could pass
+ * the 4/7 count gate while MISSING worldbuilding canon or foreshadowing —
+ * the two artifacts every later chapter depends on. Power system is required
+ * only for combat genres.
+ * Exported for setup-pipeline gate + unit tests.
+ */
+export function getRequiredCanonArtifacts(genre: string | null): Array<keyof CanonSpawnResult> {
+  const required: Array<keyof CanonSpawnResult> = ['worldCanon', 'foreshadowing'];
+  // Combat genres need the power-system ladder; proactive/non-combat don't.
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { isProactiveGenre } = require('../templates');
+  if (genre && !isProactiveGenre(genre)) required.push('powerSystem');
+  return required;
+}
+
 export async function spawnSetupCanon(
   data: ProjectSetupData,
   config: GeminiConfig,
@@ -90,19 +106,63 @@ export async function spawnSetupCanon(
 
   const setupContext = buildSetupContext(data);
 
-  // Run all 7 spawns in parallel — each non-fatal
-  const tasks = [
+  // Quality Overhaul 3.2 — two-stage dependency graph (was 7 fully parallel):
+  // Stage 1: independent artifacts, parallel.
+  // Stage 2: foreshadowing AFTER plot twists — hints can now point at the
+  //          planned twists instead of being generated blind.
+  const stage1 = [
     spawnFactions(data, setupContext, config).then(r => (result.factions = r)),
     spawnWorldCanon(data, setupContext, config).then(r => (result.worldCanon = r)),
     spawnPowerSystem(data, setupContext, config).then(r => (result.powerSystem = r)),
-    spawnForeshadowing(data, setupContext, config).then(r => (result.foreshadowing = r)),
     spawnPlotTwists(data, setupContext, config).then(r => (result.plotTwists = r)),
     spawnThemes(data, setupContext, config).then(r => (result.themes = r)),
     spawnVoiceAnchors(data, setupContext, config).then(r => (result.voiceAnchors = r)),
   ];
+  await Promise.allSettled(stage1);
 
-  await Promise.allSettled(tasks);
+  // Stage 2: foreshadowing sees the persisted twists.
+  const twistContext = await buildTwistContext(data.projectId);
+  await spawnForeshadowing(data, setupContext + twistContext, config)
+    .then(r => (result.foreshadowing = r))
+    .catch(e => {
+      result.foreshadowing = { generated: false, count: 0, error: e instanceof Error ? e.message : String(e) };
+    });
+
+  // Quality Overhaul 3.2 — retry failed REQUIRED artifacts once. Non-fatal
+  // tasks staying failed is acceptable for optional artifacts, but a project
+  // must not reach ready_to_write missing world canon / foreshadowing.
+  for (const key of getRequiredCanonArtifacts(data.genre)) {
+    if (result[key].generated) continue;
+    console.warn(`[CanonSpawn] required artifact '${key}' failed — retrying once`);
+    try {
+      if (key === 'worldCanon') result.worldCanon = await spawnWorldCanon(data, setupContext, config);
+      else if (key === 'powerSystem') result.powerSystem = await spawnPowerSystem(data, setupContext, config);
+      else if (key === 'foreshadowing') result.foreshadowing = await spawnForeshadowing(data, setupContext + twistContext, config);
+    } catch (e) {
+      console.warn(`[CanonSpawn] retry of '${key}' threw:`, e instanceof Error ? e.message : String(e));
+    }
+  }
+
   return result;
+}
+
+/** Stage-2 dependency context: planned twists for the foreshadowing spawner. */
+async function buildTwistContext(projectId: string): Promise<string> {
+  try {
+    const db = getSupabase();
+    const { data: twists } = await db
+      .from('plot_twists')
+      .select('twist_name, description, reveal_chapter')
+      .eq('project_id', projectId)
+      .order('reveal_chapter', { ascending: true })
+      .limit(8);
+    if (!twists?.length) return '';
+    return `\n\n## PLOT TWISTS ĐÃ LÊN KẾ HOẠCH (foreshadowing NÊN gieo hint trỏ về các twist này — hint kín đáo, payoff đúng/trước reveal chapter):\n${twists
+      .map(t => `- "${t.twist_name}" (reveal ~ch.${t.reveal_chapter}): ${(t.description || '').slice(0, 150)}`)
+      .join('\n')}`;
+  } catch {
+    return '';
+  }
 }
 
 export function buildSetupContext(data: ProjectSetupData): string {

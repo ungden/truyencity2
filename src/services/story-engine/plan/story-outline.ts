@@ -74,9 +74,19 @@ export interface StoryOutline {
     relationToMC: string;  // "bạn thân từ cấp 3" / "đối thủ cạnh tranh" / "người dạy MC nghề"
     introduceArc: number;  // Arc nào nhân vật xuất hiện
     archeType?: string;    // "mentor" / "loyal-friend" / "rival" / "love-interest"
+    /** Quality Overhaul 3.4 — 1 = co-protagonist tier (xuất hiện xuyên suốt), 2 = recurring (mỗi arc), 3 = walk-on (vài lần). Without this, secondary cast bloats ch.100-300 then vanishes. */
+    importance?: 1 | 2 | 3;
+    /** Cadence hint — "mỗi 5-10 chương" / "mỗi sub-arc" — Architect knows who is DUE to reappear. */
+    recurrenceCadence?: string;
   }>;
-  /** Concrete world rules — Constraint Extractor indexes from this. */
-  worldRules?: string[];
+  /**
+   * Concrete world rules — Constraint Extractor indexes from this.
+   * Quality Overhaul 3.4: entries may carry provenance — `introducedAt` says
+   * when the rule first surfaces on-page ('setup' = known from ch.1, number =
+   * planted at that chapter). Plain strings remain valid (legacy data);
+   * consumers normalize via normalizeWorldRules().
+   */
+  worldRules?: Array<string | { rule: string; introducedAt?: 'setup' | number }>;
   /** Tone & pacing flags — Critic uses to enforce. */
   toneFlags?: {
     proactiveRatio?: number;       // 0-100, % chương MC chủ động
@@ -87,6 +97,19 @@ export interface StoryOutline {
   antiTropes?: string[];
   /** Compact setup DNA generated at idea stage; copied through unchanged. */
   setupKernel?: StoryKernel;
+}
+
+/**
+ * Quality Overhaul 3.4 — normalize worldRules entries (legacy plain strings
+ * OR provenance objects) into a uniform shape. Exported for consumers + tests.
+ */
+export function normalizeWorldRules(
+  rules: Array<string | { rule: string; introducedAt?: 'setup' | number }> | undefined | null,
+): Array<{ rule: string; introducedAt?: 'setup' | number }> {
+  if (!rules?.length) return [];
+  return rules
+    .map(r => (typeof r === 'string' ? { rule: r } : r))
+    .filter(r => !!r?.rule);
 }
 
 export async function generateStoryOutline(
@@ -132,10 +155,13 @@ CHẤT LƯỢNG ĐẠI THẦN — required fields:
 4. protagonist: name, startingState (concrete: nghề + tài sản + tình cảm + weakness), endGoal, characterArc (internal change concrete)
 5. majorPlotPoints: 4 plot points (inciting/midpoint/climax/resolution), MỖI cái có description 1-2 câu CỤ THỂ (KHÔNG chỉ "Cơ hội đầu tiên" — phải nêu tên nhân vật + scene cụ thể)
 6. castRoster: 4-6 nhân vật phụ NAMED — Architect dùng để build scenes:
-   - mỗi nhân vật: name (full họ tên) + role + relationToMC (concrete intersect) + introduceArc + archeType
-   - VD: { name: "Khánh", role: "bạn cùng quê", relationToMC: "bạn thân từ cấp 3, sau thành đối tác kinh doanh", introduceArc: 1, archeType: "loyal-friend" }
+   - mỗi nhân vật: name (full họ tên) + role + relationToMC (concrete intersect) + introduceArc + archeType + importance + recurrenceCadence
+   - importance: 1 = co-protagonist (xuất hiện xuyên suốt cả truyện), 2 = recurring (mỗi arc đều có scene), 3 = walk-on (vài lần rồi thôi)
+   - recurrenceCadence: tần suất xuất hiện — Architect biết AI ĐẾN HẠN quay lại
+   - VD: { name: "Trần Văn Khánh", role: "bạn cùng quê", relationToMC: "bạn thân từ cấp 3, sau thành đối tác kinh doanh", introduceArc: 1, archeType: "loyal-friend", importance: 2, recurrenceCadence: "mỗi 5-10 chương, mỗi business milestone" }
 7. worldRules: 4-6 quy tắc CỤ THỂ định hình narrative — Constraint Extractor index từ đây.
-   - VD: ["Hệ Thống chỉ active trong bếp", "Tiền thưởng từ HT chỉ đổi skill, không tiền mặt", "Nâng tier cần MC nấu thật 100 lần"]
+   - mỗi rule: { rule, introducedAt } — introducedAt = 'setup' (reader biết từ ch.1) hoặc số chương (rule được hé lộ ở chương đó; arc plan biết KHI NÀO hint)
+   - VD: [{"rule": "Hệ Thống chỉ active trong bếp", "introducedAt": "setup"}, {"rule": "Nâng tier cần MC nấu thật 100 lần", "introducedAt": 15}]
 8. toneFlags:
    - proactiveRatio: 0-100, % chương MC chủ động (do-thi/quan-truong nên 80+, fantasy nên 60+)
    - comedyDensity: "low" / "medium" / "high"
@@ -157,7 +183,7 @@ CHẤT LƯỢNG ĐẠI THẦN — required fields:
    - (Đối với Đô thị/Bói toán/Huyền học/System) MC chỉ dùng quẻ bói/huyền học/hệ thống ngầm để tích lũy tài nguyên cá nhân và củng cố thế lực riêng thông qua các giao dịch cấp cao (với KOL, đại gia, quyền thế). CẤM bói toán công cộng bày sạp ngoài đường làm từ thiện miễn phí cho người lạ.
 
 Trả về JSON:
-{"id":"story_${Date.now()}","title":"${novelTitle}","genre":"${genre}","premise":"...","themes":["...","..."],"mainConflict":"...","targetChapters":${totalChapters},"targetArcs":${arcs},"protagonist":{"name":"${protagonistName}","startingState":"...","endGoal":"...","characterArc":"..."},"readerPromise":"...","openingExperience":{"chapters1To3":"...","chapters4To10":"...","firstPayoff":"..."},"majorPlotPoints":[{"id":"pp1","name":"...","description":"...","targetArc":1,"type":"inciting_incident","importance":"critical"},{"id":"pp3","name":"...","description":"...","targetArc":${mid},"type":"midpoint","importance":"critical"},{"id":"pp5","name":"...","description":"...","targetArc":${Math.max(1, arcs - 1)},"type":"climax","importance":"critical"},{"id":"pp6","name":"...","description":"...","targetArc":${arcs},"type":"resolution","importance":"critical"}],"castRoster":[{"name":"...","role":"...","relationToMC":"...","introduceArc":1,"archeType":"..."}],"recurringCast":[{"name":"...","recurringFunction":"...","cadence":"mỗi 3-5 chương / mỗi sub-arc / mỗi business milestone"}],"worldRules":["...","..."],"toneFlags":{"proactiveRatio":80,"comedyDensity":"medium","pacingTarget":"medium"},"dopamineContract":{"coreLoop":"...","expectedPayoffsPerChapter":2,"payoffTypes":["...","..."]},"conflictLadder":[{"phase":1,"chapterRange":"1-100","scale":"local","antagonistType":"...","readerPayoff":"..."},{"phase":2,"chapterRange":"101-300","scale":"regional","antagonistType":"...","readerPayoff":"..."},{"phase":3,"chapterRange":"301-700","scale":"national/institutional","antagonistType":"...","readerPayoff":"..."},{"phase":4,"chapterRange":"701-${totalChapters}","scale":"world/endgame","antagonistType":"...","readerPayoff":"..."}],"antiTropes":["...","..."],"endingVision":"...","uniqueHooks":[],"setupKernel":${setupKernel ? JSON.stringify(setupKernel) : 'null'}}
+{"id":"story_${Date.now()}","title":"${novelTitle}","genre":"${genre}","premise":"...","themes":["...","..."],"mainConflict":"...","targetChapters":${totalChapters},"targetArcs":${arcs},"protagonist":{"name":"${protagonistName}","startingState":"...","endGoal":"...","characterArc":"..."},"readerPromise":"...","openingExperience":{"chapters1To3":"...","chapters4To10":"...","firstPayoff":"..."},"majorPlotPoints":[{"id":"pp1","name":"...","description":"...","targetArc":1,"type":"inciting_incident","importance":"critical"},{"id":"pp3","name":"...","description":"...","targetArc":${mid},"type":"midpoint","importance":"critical"},{"id":"pp5","name":"...","description":"...","targetArc":${Math.max(1, arcs - 1)},"type":"climax","importance":"critical"},{"id":"pp6","name":"...","description":"...","targetArc":${arcs},"type":"resolution","importance":"critical"}],"castRoster":[{"name":"...","role":"...","relationToMC":"...","introduceArc":1,"archeType":"...","importance":2,"recurrenceCadence":"mỗi 5-10 chương"}],"recurringCast":[{"name":"...","recurringFunction":"...","cadence":"mỗi 3-5 chương / mỗi sub-arc / mỗi business milestone"}],"worldRules":[{"rule":"...","introducedAt":"setup"},{"rule":"...","introducedAt":15}],"toneFlags":{"proactiveRatio":80,"comedyDensity":"medium","pacingTarget":"medium"},"dopamineContract":{"coreLoop":"...","expectedPayoffsPerChapter":2,"payoffTypes":["...","..."]},"conflictLadder":[{"phase":1,"chapterRange":"1-100","scale":"local","antagonistType":"...","readerPayoff":"..."},{"phase":2,"chapterRange":"101-300","scale":"regional","antagonistType":"...","readerPayoff":"..."},{"phase":3,"chapterRange":"301-700","scale":"national/institutional","antagonistType":"...","readerPayoff":"..."},{"phase":4,"chapterRange":"701-${totalChapters}","scale":"world/endgame","antagonistType":"...","readerPayoff":"..."}],"antiTropes":["...","..."],"endingVision":"...","uniqueHooks":[],"setupKernel":${setupKernel ? JSON.stringify(setupKernel) : 'null'}}
 
 QUY TẮC:
 - premise PHẢI mention golden finger từ world_description (KHÔNG vague "anh ta nhận được sức mạnh kỳ lạ")

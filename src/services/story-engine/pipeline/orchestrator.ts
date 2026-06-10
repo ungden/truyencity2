@@ -816,6 +816,13 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     .then(({ getRepetitionBanList }) => getRepetitionBanList(project.id, nextChapter))
     .catch(() => [] as string[]);
 
+  // Quality Overhaul 3.1: [ENDGAME PLAN] context — only loads within the
+  // final ~120 chapters; Tier-0 injection in assembleContext.
+  context.endgameContext = await import('../plan/ending-plan')
+    .then(({ getEndgameContext }) => getEndgameContext(project.id, nextChapter, project.total_planned_chapters))
+    .then(v => v ?? undefined)
+    .catch(() => undefined);
+
   // ── Step 3: Assemble context string ────────────────────────────────────
   // Quality Overhaul 1.3: tier-aware budget (replaces blind head-trim in
   // chapter-writer). 360K leaves ~40K headroom for the Architect's static
@@ -1263,6 +1270,19 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     }
   } catch (e) {
     console.warn(`[Orchestrator] Soft-ending enforcer threw: ${e instanceof Error ? e.message : String(e)}`);
+  }
+
+  // Quality Overhaul 3.1 — one-time endgame refinement at 70% progress.
+  // generateEndgamePlan internally checks the refined-once flag; this outer
+  // gate just avoids a pointless DB read on every chapter. Non-fatal.
+  const totalPlannedForEndgame = project.total_planned_chapters || 0;
+  if (totalPlannedForEndgame > 0 && lastChapterNumber >= totalPlannedForEndgame * 0.7) {
+    try {
+      const { generateEndgamePlan } = await import('../plan/ending-plan');
+      await generateEndgamePlan(project.id, geminiConfig);
+    } catch (e) {
+      console.warn('[Orchestrator] endgame refinement threw:', e instanceof Error ? e.message : String(e));
+    }
   }
 
   // Quality Overhaul 1.4 — surface degraded-content recovery paths to the
