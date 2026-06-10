@@ -91,6 +91,8 @@ export interface StyleDirectives {
   critic_revise_pass?: boolean;
   /** Quality Overhaul 1.5: circuit breaker hold — set by quality-trend cron in enforce mode; write cron skips held projects. */
   quality_hold?: boolean;
+  /** Quality Overhaul 4.1: modular prompt suffix (hard-bans recap at generation point). Default OFF — enable per novel for A/B. */
+  modular_prompts?: boolean;
   /** Minimum score for flash_routine_soft_gate. Defaults to 5 in director-only Flash mode. */
   flash_routine_min_quality_score?: number;
   /** Retry count for routine Flash writes. Defaults to 1 in director-only Flash mode to avoid paid rewrite loops. */

@@ -868,6 +868,8 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       criticRevisePassEnabled: projectStyleDirectives?.critic_revise_pass !== false,
       // Quality Overhaul 1.6: [CẤM LẶP] motif ban list for the Architect.
       repetitionBanList,
+      // Quality Overhaul 4.1: modular prompt suffix (default OFF — per-novel A/B).
+      modularPromptsEnabled: projectStyleDirectives?.modular_prompts === true,
     },
   );
 

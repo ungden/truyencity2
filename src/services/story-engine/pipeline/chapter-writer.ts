@@ -88,6 +88,13 @@ export interface WriteChapterOptions {
    * injected into the Architect dynamic suffix as a [CẤM LẶP] ban list.
    */
   repetitionBanList?: string[];
+  /**
+   * Quality Overhaul 4.1: modular prompt assembly. When ON, the Architect
+   * dynamic suffix ends with the hard-bans recap module (instruction weight
+   * is highest closest to the generation point). Default OFF —
+   * style_directives.modular_prompts=true opts in per novel for A/B.
+   */
+  modularPromptsEnabled?: boolean;
 }
 
 function isHardBlockingIssue(issue: CriticIssue): boolean {
@@ -829,7 +836,24 @@ ${options?.softEndingGuidance || ''}
 
 Trả về JSON ChapterOutline đúng schema phía trên cho CHƯƠNG ${chapterNumber}.`;
 
-  const prompt = staticPrefix + dynamicSuffix;
+  // Quality Overhaul 4.1 — flag-gated modular suffix: hard-bans recap at the
+  // very end of the prompt (closest to generation = highest instruction
+  // weight; fixes late-rule decay in the 25K-token system block).
+  let modularSuffix = '';
+  if (options?.modularPromptsEnabled) {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { assemblePromptModules } = require('./prompt-modules');
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { isNonCombatGenre } = require('../templates');
+    modularSuffix = assemblePromptModules('dynamic_end', {
+      genre,
+      subGenres: options?.subGenres,
+      chapterNumber,
+      flags: { nonCombat: genre ? isNonCombatGenre(genre) : false },
+    });
+  }
+
+  const prompt = staticPrefix + dynamicSuffix + modularSuffix;
 
   const genreSuffix = genre ? buildGenreSpecificSuffix(genre, options?.subGenres || []) : '';
   // Architect gets compact voice hint (notes + opening pattern + dopamine pattern only).
