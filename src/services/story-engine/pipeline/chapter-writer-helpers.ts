@@ -765,6 +765,128 @@ export function detectInspirationalCluster(
   return { severity: 'none', message: '', total, tailCount };
 }
 
+// ── Raw emotion-naming (telly prose) ─────────────────────────────────────────
+
+/**
+ * Named emotions an author should usually SHOW, not state outright in narration.
+ * Kept to unambiguous feeling-words; deliberately excludes "căng thẳng" /
+ * "bình tĩnh" applied to atmosphere (we require a person subject anyway).
+ */
+const TELL_EMOTION_WORDS = [
+  'vui', 'vui mừng', 'vui sướng', 'mừng rỡ', 'hân hoan', 'hạnh phúc',
+  'buồn', 'buồn bã', 'đau khổ', 'đau lòng', 'chua xót', 'tủi thân',
+  'tức giận', 'giận dữ', 'phẫn nộ', 'bực bội', 'bực tức', 'khó chịu', 'cáu',
+  'sợ', 'sợ hãi', 'hoảng sợ', 'khiếp sợ', 'lo lắng', 'lo sợ', 'bất an',
+  'kinh ngạc', 'ngạc nhiên', 'sửng sốt', 'kinh hãi', 'choáng váng',
+  'hồi hộp', 'phấn khích', 'hưng phấn', 'kích động', 'háo hức',
+  'thất vọng', 'tuyệt vọng', 'chán nản', 'bối rối', 'xấu hổ', 'ngượng ngùng',
+  'xúc động', 'cảm động', 'tự hào', 'hài lòng', 'thỏa mãn', 'mãn nguyện',
+  'ghen tị', 'đố kỵ', 'căm hận', 'căm phẫn', 'cô đơn', 'nhẹ nhõm',
+];
+
+/**
+ * Person subjects that anchor a narration sentence to a character (3rd person).
+ * Unicode-aware boundaries (\p{L}) — ASCII \b breaks on Vietnamese diacritics
+ * (e.g. \by\b would match the "y" in "mây"). Bare "y" pronoun dropped as too
+ * collision-prone.
+ */
+const PERSON_SUBJECT_RE = /(?<!\p{L})(hắn|gã|nàng|cô ấy|cô|chàng|anh ấy|anh|ông|bà|cậu|lão|nó|bọn họ|họ)(?!\p{L})/iu;
+
+/**
+ * Physical/behavioral/environmental carriers. If a sentence carries the emotion
+ * through the body, voice, or environment, it is at least partially SHOWN — not
+ * flagged. Mirrors the "WITHOUT physical/behavioral/environmental carrier"
+ * carve-out in CRITIC_SYSTEM S8.
+ */
+const EMOTION_CARRIER_RE = new RegExp(
+  [
+    'tim', 'tay', 'chân', 'ngón', 'mắt', 'mặt', 'môi', 'miệng', 'ngực', 'vai',
+    'lưng', 'gáy', 'cổ', 'trán', 'má', 'da', 'máu', 'mồ hôi', 'nước mắt', 'lệ',
+    'run', 'siết', 'nắm', 'nghiến', 'cắn', 'hít', 'thở', 'đập', 'nhịp', 'nuốt',
+    'cười', 'khóc', 'hét', 'gào', 'rít', 'nghẹn', 'lắp bắp', 'giọng',
+    'tái', 'đỏ bừng', 'đỏ mặt', 'nóng bừng', 'lạnh sống lưng', 'sởn', 'nổi da gà',
+    'bước', 'đứng', 'ngồi', 'quỳ', 'ngã', 'lùi', 'giật', 'khựng', 'cứng đờ',
+    'nắm chặt', 'buông', 'đấm', 'đá', 'ném', 'vung',
+  ].map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'),
+  'i',
+);
+
+/**
+ * Deterministic backstop for CRITIC_SYSTEM S8 (raw emotion-naming). The AI
+ * Critic is asked to count "hắn tức giận / nàng vui mừng" without a carrier,
+ * but that depends on the model self-counting reliably. This hardens the soft
+ * rule into a cheap regex gate — the same treatment given to repetition,
+ * eye-template, inspirational-cluster, and monologue-tail.
+ *
+ * A narration sentence is "telly" when it:
+ *   - is NOT a dialogue line (em-dash lines skipped),
+ *   - names a person subject (hắn / nàng / cô / …),
+ *   - states a feeling via "cảm thấy/cảm nhận + EMOTION" or "rất/vô cùng/cực kỳ/
+ *     quá/thật sự/hết sức + EMOTION",
+ *   - carries the emotion through NO body/voice/environment cue,
+ *   - and is terse (≤18 words — telling is usually short; long sentences tend
+ *     to carry concrete action that shows).
+ *
+ * Thresholds sit one notch above the AI rule (S8 fires at >2): >4 → moderate,
+ * >7 → major, so the deterministic gate only escalates clear offenders.
+ */
+export function detectRawEmotionTelling(
+  content: string,
+): { severity: 'none' | 'moderate' | 'major'; message: string; count: number; samples: string[] } {
+  const emotionAlt = TELL_EMOTION_WORDS
+    .map(escapeRegex)
+    .sort((a, b) => b.length - a.length) // longest first so "vui mừng" wins over "vui"
+    .join('|');
+  // Form A: feeling verb + (≤2 filler words) + emotion. Form B: intensity adverb + emotion.
+  const tellRe = new RegExp(
+    `(?:(?:cảm thấy|cảm nhận(?: được| thấy)?)\\s+(?:\\S+\\s+){0,2}(?:${emotionAlt}))` +
+    `|(?:\\b(?:rất|vô cùng|cực kỳ|quá|thật sự|hết sức|đầy)\\s+(?:${emotionAlt})\\b)`,
+    'i',
+  );
+
+  // Narration only: drop dialogue lines (em-dash or hyphen led).
+  const narration = content
+    .split('\n')
+    .map(l => l.trim())
+    .filter(l => l && !l.startsWith('—') && !l.startsWith('-'))
+    .join(' ');
+
+  const sentences = narration.split(/(?<=[.!?…])\s+/);
+  let count = 0;
+  const samples: string[] = [];
+  for (const raw of sentences) {
+    const sent = raw.trim();
+    if (!sent) continue;
+    const words = sent.split(/\s+/).length;
+    if (words > 18) continue;
+    if (!PERSON_SUBJECT_RE.test(sent)) continue;
+    if (!tellRe.test(sent)) continue;
+    if (EMOTION_CARRIER_RE.test(sent)) continue; // shown through the body — fine
+    count++;
+    if (samples.length < 3) samples.push(sent.length > 80 ? sent.slice(0, 80) + '…' : sent);
+  }
+
+  if (count === 0) return { severity: 'none', message: '', count, samples };
+  const sampleText = samples.map(s => `"${s}"`).join(' · ');
+  if (count > 7) {
+    return {
+      severity: 'major',
+      message: `Kể-lể cảm xúc (telly): ${count} câu narration gọi thẳng tên cảm xúc KHÔNG có carrier cơ thể/giọng/môi trường, vd ${sampleText}. SHOW DON'T TELL — thay "X cảm thấy/rất [cảm xúc]" bằng hành động cơ thể, vi-biểu-cảm, hoặc phản ứng môi trường thể hiện cảm xúc đó.`,
+      count,
+      samples,
+    };
+  }
+  if (count > 4) {
+    return {
+      severity: 'moderate',
+      message: `Kể-lể cảm xúc (telly): ${count} câu gọi thẳng cảm xúc không carrier, vd ${sampleText}. Chuyển sang SHOW: thay bằng cử chỉ/biểu cảm/nhịp thở/phản ứng cụ thể.`,
+      count,
+      samples,
+    };
+  }
+  return { severity: 'none', message: '', count, samples };
+}
+
 export function detectMonologueTail(
   content: string,
   protagonistName: string,

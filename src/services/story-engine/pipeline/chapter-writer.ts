@@ -46,7 +46,7 @@ import type {
 } from '../types';
 import type { SceneType, VocabularyGuide } from '../templates/style-bible';
 import { VN_PLACE_LOCK, ARCHITECT_SYSTEM, WRITER_SYSTEM, CRITIC_SYSTEM } from './chapter-writer-prompts';
-import { cleanContent, extractTitle, synthesizeFallbackCliffhanger, hasCliffhangerSignal, analyzeQualitySignals, buildSignalReport, countWords, detectHardFallback, detectMcNameFlip, detectSevereRepetition, detectShortFormCharacterName, detectMcNameRate, detectEyeTemplateOveruse, detectInspirationalCluster, detectMonologueTail, detectCrossChapterRepetition, detectChapterTemplatePatterns, detectEmDashFormatBreak, repairChapterTemplatePatterns, buildRepetitionReport, generateMinimalScenes, loadConstraintSection, safeStringTrim, formatAuthorDirectives, type QualitySignals } from './chapter-writer-helpers';
+import { cleanContent, extractTitle, synthesizeFallbackCliffhanger, hasCliffhangerSignal, analyzeQualitySignals, buildSignalReport, countWords, detectHardFallback, detectMcNameFlip, detectSevereRepetition, detectShortFormCharacterName, detectMcNameRate, detectEyeTemplateOveruse, detectInspirationalCluster, detectMonologueTail, detectCrossChapterRepetition, detectChapterTemplatePatterns, detectEmDashFormatBreak, repairChapterTemplatePatterns, buildRepetitionReport, generateMinimalScenes, loadConstraintSection, safeStringTrim, formatAuthorDirectives, detectRawEmotionTelling, type QualitySignals } from './chapter-writer-helpers';
 
 
 // ── Write Chapter ────────────────────────────────────────────────────────────
@@ -1854,6 +1854,32 @@ Mỗi dim ≥6 → pass. Tổng overallScore = avg(5 dim) ± 1.`
           description: tailLoop.message,
         });
       }
+    }
+
+    // Phase R+ (2026-06-24): Deterministic backstop for CRITIC_SYSTEM S8
+    // (raw emotion-naming / "show don't tell"). The AI Critic alone counts
+    // telly emotion unreliably; this gate hardens it like the other soft→hard
+    // conversions (repetition / eye-template / inspirational / monologue-tail).
+    const telly = detectRawEmotionTelling(content);
+    if (telly.severity === 'major') {
+      parsed.requiresRewrite = true;
+      parsed.approved = false;
+      parsed.overallScore = Math.min(parsed.overallScore || 10, capForGolden(5));
+      parsed.issues = parsed.issues || [];
+      parsed.issues.push({
+        type: 'quality',
+        severity: 'major',
+        description: telly.message,
+      });
+      parsed.rewriteInstructions = (parsed.rewriteInstructions || '') +
+        ` SHOW-DON'T-TELL: ${telly.message}`;
+    } else if (telly.severity === 'moderate') {
+      parsed.issues = parsed.issues || [];
+      parsed.issues.push({
+        type: 'quality',
+        severity: 'moderate',
+        description: telly.message,
+      });
     }
 
     // Phase R (2026-05-14): Hard upper word-count cap. Existing wordRatio<0.6

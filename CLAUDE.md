@@ -1499,7 +1499,35 @@ export (ainovel-cli has it; we're reader-platform-only) — candidate VIP featur
 The retroactive "rewrite already-written affected sections on steer" half of
 their steering is also deferred; we ship the forward-looking 80%.
 
+### Phase R+ — Show-don't-tell deterministic gate
+
+An audit of the writing pipeline (prose-craft, not infra) found CRITIC_SYSTEM
+**S8** (raw emotion-naming "hắn tức giận / nàng vui mừng" without a physical
+carrier) was the one soft AI-judged rule never hardened into a deterministic
+gate — unlike repetition / eye-template / inspirational-cluster / monologue-tail,
+which all have cheap regex backstops feeding the Critic.
+
+- `detectRawEmotionTelling(content)` in `pipeline/chapter-writer-helpers.ts` —
+  flags terse narration sentences (≤18 words, person subject, "cảm thấy/rất/vô
+  cùng + named emotion") that carry the feeling through NO body/voice/environment
+  cue. Skips dialogue lines (characters may name feelings aloud). Thresholds sit
+  one notch above S8 (>2): **>4 → moderate, >7 → major** (major auto-promotes
+  `requiresRewrite`). Unicode-aware boundaries — ASCII `\b` misfires on Vietnamese
+  diacritics (`\by\b` matched the "y" in "mây").
+- Wired into the post-Critic deterministic block in `chapter-writer.ts`
+  (alongside inspirational-cluster / monologue-tail).
+- Tests: `src/__tests__/story-engine/show-dont-tell.test.ts` (6 cases).
+
+Verified: `tsc --noEmit` clean, `jest` 616/616, `lint:prompts` clean.
+
+The audit also flagged sentence-rhythm monotony, sensory-vividness quality (vs
+mere presence), and per-character dialogue differentiation as remaining
+prose-craft gaps — candidates for follow-up deterministic gates. Note: the
+audit's "dead detector" claims for `evaluateHooks` / `analyzeSensoryBalance` /
+`buildSignalReport` were FALSE — all three are wired into the Critic prompt via
+inline `require()` at `chapter-writer.ts:1497–1507`.
+
 ---
 
-**Last Updated**: 2026-06-24 (Phase R: author steering directives — learned from ainovel-cli)
+**Last Updated**: 2026-06-24 (Phase R+: author steering directives + show-don't-tell gate — learned from ainovel-cli)
 
