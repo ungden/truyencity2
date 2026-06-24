@@ -72,6 +72,57 @@ export function analyzeSensoryBalance(content: string): SensoryBalanceReport {
 }
 
 /**
+ * Bland sensory clichés. analyzeSensoryBalance() scores PRESENCE of each sense
+ * but a chapter with 50 hits of "ánh sáng vàng" / "gió nhẹ thổi qua" passes the
+ * count gate while reading like stock filler. This is the VIVIDNESS layer: a
+ * curated list of overused vague sensory phrases (multi-word so false-positive
+ * risk is low). Eye/gaze clichés are intentionally excluded — detectEyeTemplate
+ * already owns those, so we don't double-jeopardy.
+ */
+const BLAND_SENSORY_CLICHES: string[] = [
+  'ánh sáng vàng', 'ánh nắng vàng', 'ánh sáng chói', 'ánh sáng le lói',
+  'ánh sáng dịu', 'ánh sáng mờ ảo', 'ánh sáng ấm áp', 'tia sáng le lói',
+  'gió nhẹ', 'làn gió nhẹ', 'cơn gió nhẹ', 'gió thổi nhẹ', 'gió lùa qua',
+  'làn gió thoảng', 'hương thơm thoang thoảng', 'mùi hương thoang thoảng',
+  'thoang thoảng hương', 'hương thơm dịu nhẹ', 'âm thanh vang vọng',
+  'tiếng vang vọng', 'vang vọng khắp', 'không khí lạnh lẽo', 'không khí ngột ngạt',
+  'bầu không khí căng thẳng', 'màu sắc rực rỡ', 'rực rỡ sắc màu',
+  'lung linh huyền ảo', 'lấp lánh ánh sáng', 'êm dịu nhẹ nhàng', 'mát lạnh dễ chịu',
+];
+
+export function detectBlandSensoryCliche(
+  content: string,
+): { severity: 'none' | 'moderate' | 'major'; message: string; total: number; hits: string[] } {
+  const lower = content.toLowerCase();
+  let total = 0;
+  const hits: string[] = [];
+  for (const phrase of BLAND_SENSORY_CLICHES) {
+    const re = new RegExp(phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+    const m = lower.match(re);
+    if (m && m.length > 0) {
+      total += m.length;
+      hits.push(`${phrase}(${m.length})`);
+    }
+  }
+
+  if (total >= 10) {
+    return {
+      severity: 'major',
+      message: `Tả giác quan sáo rỗng: ${total} cụm bland [${hits.join(', ')}]. Sensory "đúng" về số lượng nhưng nhạt. Thay bằng chi tiết CỤ THỂ (con số, thời điểm, chất liệu, danh từ riêng) — vd thay "ánh sáng vàng" bằng "nắng 4h chiều xuyên qua kính cường lực", "gió nhẹ" bằng "gió tây nam mang mùi muối từ cửa sông".`,
+      total, hits,
+    };
+  }
+  if (total >= 5) {
+    return {
+      severity: 'moderate',
+      message: `Tả giác quan có dấu hiệu sáo rỗng: ${total} cụm bland [${hits.join(', ')}]. Cụ thể hoá ≥1 nửa số đó bằng chi tiết riêng (con số/chất liệu/danh từ riêng) thay vì vocab chung chung.`,
+      total, hits,
+    };
+  }
+  return { severity: 'none', message: '', total, hits };
+}
+
+/**
  * Format sensory analysis for Critic prompt.
  */
 export function formatSensoryReport(report: SensoryBalanceReport): string {

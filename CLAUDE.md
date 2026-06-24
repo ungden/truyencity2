@@ -1518,16 +1518,34 @@ which all have cheap regex backstops feeding the Critic.
   (alongside inspirational-cluster / monologue-tail).
 - Tests: `src/__tests__/story-engine/show-dont-tell.test.ts` (6 cases).
 
-Verified: `tsc --noEmit` clean, `jest` 616/616, `lint:prompts` clean.
+The remaining three prose-craft gaps the audit flagged were then ALL shipped as
+deterministic gates (high precision, moderate-only unless noted, so good prose is
+never force-rewritten):
 
-The audit also flagged sentence-rhythm monotony, sensory-vividness quality (vs
-mere presence), and per-character dialogue differentiation as remaining
-prose-craft gaps — candidates for follow-up deterministic gates. Note: the
-audit's "dead detector" claims for `evaluateHooks` / `analyzeSensoryBalance` /
-`buildSignalReport` were FALSE — all three are wired into the Critic prompt via
-inline `require()` at `chapter-writer.ts:1497–1507`.
+- `detectSentenceRhythmMonotony(content)` (helpers) — within-chapter metronomic
+  prose (distinct from the cross-chapter voice-drift check). Fires only when CV of
+  sentence length <0.38 AND >70% of sentences cluster within ±3 words of the mean
+  (both signals must agree → punchy action scenes aren't penalized). Moderate-only.
+- `detectFlatDialogue(content)` (helpers) — undifferentiated dialogue texture
+  ("all characters share one voice"). Requires ≥12 dialogue lines AND four weak
+  signals to agree (tight length clustering, <8% questions, <8% exclamations, TTR
+  <0.5). Moderate-only (per-speaker attribution too unreliable to hard-gate).
+- `detectBlandSensoryCliche(content)` (`quality/sensory-balance.ts`) — the
+  VIVIDNESS layer over `analyzeSensoryBalance`'s presence count: a curated list of
+  overused vague sensory phrases ("ánh sáng vàng", "gió nhẹ", …). ≥5 → moderate,
+  ≥10 → major (force-rewrite — literal multi-word phrases = high precision). Eye/
+  gaze clichés excluded (detectEyeTemplate owns those).
+
+All wired into the post-Critic deterministic block in `chapter-writer.ts`. Tests:
+`show-dont-tell.test.ts` (6) + `prose-craft-gates.test.ts` (9).
+
+Verified: `tsc --noEmit` clean, `jest` 625/625, `lint:prompts` clean.
+
+Note: the audit's "dead detector" claims for `evaluateHooks` /
+`analyzeSensoryBalance` / `buildSignalReport` were FALSE — all three are wired
+into the Critic prompt via inline `require()` at `chapter-writer.ts:1497–1507`.
 
 ---
 
-**Last Updated**: 2026-06-24 (Phase R+: author steering directives + show-don't-tell gate — learned from ainovel-cli)
+**Last Updated**: 2026-06-24 (Phase R+: author steering + 4 prose-craft deterministic gates — learned from ainovel-cli)
 

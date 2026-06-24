@@ -887,6 +887,94 @@ export function detectRawEmotionTelling(
   return { severity: 'none', message: '', count, samples };
 }
 
+// ── Sentence-rhythm monotony ─────────────────────────────────────────────────
+
+/**
+ * Within-chapter sentence-length monotony. The voice-anchor drift check
+ * (canon-enforcement) compares avg sentence length vs ch.1-3, but nothing
+ * catches a chapter where EVERY sentence is the same length — metronomic prose
+ * that reads flat regardless of content.
+ *
+ * Deterministic, no AI. Flags ONLY when BOTH signals agree (low coefficient of
+ * variation AND tight clustering around the mean), so an intentionally punchy
+ * action scene (low mean but with occasional long beats) is not penalized.
+ * Moderate-only — informational nudge, never force-rewrites on rhythm alone.
+ */
+export function detectSentenceRhythmMonotony(
+  content: string,
+): { severity: 'none' | 'moderate'; message: string; cv: number; sentenceCount: number; mean: number } {
+  const cleaned = content.replace(/\n+/g, ' ');
+  const lengths = cleaned
+    .split(/(?<=[.!?…])\s+/)
+    .map(s => s.replace(/^[—-]\s*/, '').trim())
+    .filter(Boolean)
+    .map(s => s.split(/\s+/).filter(Boolean).length)
+    .filter(n => n >= 2); // drop labels/fragments
+
+  const n = lengths.length;
+  if (n < 40) return { severity: 'none', message: '', cv: 0, sentenceCount: n, mean: 0 };
+
+  const mean = lengths.reduce((a, b) => a + b, 0) / n;
+  const variance = lengths.reduce((a, b) => a + (b - mean) ** 2, 0) / n;
+  const std = Math.sqrt(variance);
+  const cv = mean > 0 ? std / mean : 0;
+  const clustered = lengths.filter(L => Math.abs(L - mean) <= 3).length / n;
+
+  if (cv < 0.38 && clustered > 0.7) {
+    return {
+      severity: 'moderate',
+      message: `Nhịp câu đơn điệu: ${n} câu, dài TB ${mean.toFixed(1)} từ, lệch chuẩn ${std.toFixed(1)} (CV ${cv.toFixed(2)}), ${Math.round(clustered * 100)}% câu nằm trong ±3 từ quanh TB → văn đều như máy đếm nhịp. Trộn nhịp: xen câu cực ngắn (2-5 từ, dứt khoát) với câu dài cuộn (25-35 từ) để tạo nhịp lên-xuống.`,
+      cv, sentenceCount: n, mean,
+    };
+  }
+  return { severity: 'none', message: '', cv, sentenceCount: n, mean };
+}
+
+// ── Flat / undifferentiated dialogue ─────────────────────────────────────────
+
+/**
+ * Dialogue flatness across a chapter. The Critic scores voiceDistinction (an AI
+ * judgment) but nothing deterministic flags a long stretch of dialogue where
+ * every line is the same length, no one asks questions, no one exclaims, and the
+ * vocabulary barely varies — the texture of "all characters share one voice."
+ *
+ * Conservative: requires ≥12 dialogue lines AND four weak signals to agree
+ * (tight length clustering, almost no questions, almost no exclamations, low
+ * lexical variety). Moderate-only — a nudge toward differentiating speech, never
+ * a forced rewrite (per-speaker attribution is too unreliable to hard-gate).
+ */
+export function detectFlatDialogue(
+  content: string,
+): { severity: 'none' | 'moderate'; message: string; dialogueLines: number } {
+  const dlines = content
+    .split('\n')
+    .map(l => l.trim())
+    .filter(l => l.startsWith('—') || l.startsWith('-'))
+    .map(l => l.replace(/^[—-]\s*/, '').trim())
+    .filter(Boolean);
+
+  const d = dlines.length;
+  if (d < 12) return { severity: 'none', message: '', dialogueLines: d };
+
+  const lengths = dlines.map(l => l.split(/\s+/).filter(Boolean).length);
+  const mean = lengths.reduce((a, b) => a + b, 0) / d;
+  const clustered = lengths.filter(L => Math.abs(L - mean) <= 3).length / d;
+  const qFrac = dlines.filter(l => l.includes('?')).length / d;
+  const exFrac = dlines.filter(l => l.includes('!')).length / d;
+
+  const allWords = dlines.join(' ').toLowerCase().split(/\s+/).filter(Boolean);
+  const ttr = allWords.length > 0 ? new Set(allWords).size / allWords.length : 1;
+
+  if (clustered > 0.8 && qFrac < 0.08 && exFrac < 0.08 && ttr < 0.5) {
+    return {
+      severity: 'moderate',
+      message: `Thoại phẳng: ${d} câu thoại dài gần đều nhau, gần như không có câu hỏi/cảm thán, từ vựng lặp (TTR ${ttr.toFixed(2)}). Mọi nhân vật nói cùng một giọng. Tạo khác biệt: người nói cộc/người vòng vo, người hay hỏi ngược, xưng hô + khẩu ngữ riêng theo tính cách.`,
+      dialogueLines: d,
+    };
+  }
+  return { severity: 'none', message: '', dialogueLines: d };
+}
+
 export function detectMonologueTail(
   content: string,
   protagonistName: string,

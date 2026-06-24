@@ -46,7 +46,7 @@ import type {
 } from '../types';
 import type { SceneType, VocabularyGuide } from '../templates/style-bible';
 import { VN_PLACE_LOCK, ARCHITECT_SYSTEM, WRITER_SYSTEM, CRITIC_SYSTEM } from './chapter-writer-prompts';
-import { cleanContent, extractTitle, synthesizeFallbackCliffhanger, hasCliffhangerSignal, analyzeQualitySignals, buildSignalReport, countWords, detectHardFallback, detectMcNameFlip, detectSevereRepetition, detectShortFormCharacterName, detectMcNameRate, detectEyeTemplateOveruse, detectInspirationalCluster, detectMonologueTail, detectCrossChapterRepetition, detectChapterTemplatePatterns, detectEmDashFormatBreak, repairChapterTemplatePatterns, buildRepetitionReport, generateMinimalScenes, loadConstraintSection, safeStringTrim, formatAuthorDirectives, detectRawEmotionTelling, type QualitySignals } from './chapter-writer-helpers';
+import { cleanContent, extractTitle, synthesizeFallbackCliffhanger, hasCliffhangerSignal, analyzeQualitySignals, buildSignalReport, countWords, detectHardFallback, detectMcNameFlip, detectSevereRepetition, detectShortFormCharacterName, detectMcNameRate, detectEyeTemplateOveruse, detectInspirationalCluster, detectMonologueTail, detectCrossChapterRepetition, detectChapterTemplatePatterns, detectEmDashFormatBreak, repairChapterTemplatePatterns, buildRepetitionReport, generateMinimalScenes, loadConstraintSection, safeStringTrim, formatAuthorDirectives, detectRawEmotionTelling, detectSentenceRhythmMonotony, detectFlatDialogue, type QualitySignals } from './chapter-writer-helpers';
 
 
 // ── Write Chapter ────────────────────────────────────────────────────────────
@@ -1880,6 +1880,42 @@ Mỗi dim ≥6 → pass. Tổng overallScore = avg(5 dim) ± 1.`
         severity: 'moderate',
         description: telly.message,
       });
+    }
+
+    // Phase R+ (2026-06-24): Sentence-rhythm monotony — within-chapter, distinct
+    // from the cross-chapter voice-drift check. Moderate-only (informational
+    // nudge; never force-rewrites on rhythm alone — punchy scenes are valid).
+    const rhythm = detectSentenceRhythmMonotony(content);
+    if (rhythm.severity === 'moderate') {
+      parsed.issues = parsed.issues || [];
+      parsed.issues.push({ type: 'pacing', severity: 'moderate', description: rhythm.message });
+    }
+
+    // Phase R+ (2026-06-24): Flat / undifferentiated dialogue — deterministic
+    // backstop under the voiceDistinction rubric. Moderate-only.
+    const flatDlg = detectFlatDialogue(content);
+    if (flatDlg.severity === 'moderate') {
+      parsed.issues = parsed.issues || [];
+      parsed.issues.push({ type: 'dialogue', severity: 'moderate', description: flatDlg.message });
+    }
+
+    // Phase R+ (2026-06-24): Sensory VIVIDNESS — sensory-balance scores presence;
+    // this catches "correct on count but bland" (e.g. 50× "ánh sáng vàng").
+    // Curated multi-word literal phrases → high precision; major at ≥10 hits.
+    {
+      const { detectBlandSensoryCliche } = require('../quality/sensory-balance') as typeof import('../quality/sensory-balance');
+      const bland = detectBlandSensoryCliche(content);
+      if (bland.severity === 'major') {
+        parsed.requiresRewrite = true;
+        parsed.approved = false;
+        parsed.overallScore = Math.min(parsed.overallScore || 10, capForGolden(5));
+        parsed.issues = parsed.issues || [];
+        parsed.issues.push({ type: 'detail', severity: 'major', description: bland.message });
+        parsed.rewriteInstructions = (parsed.rewriteInstructions || '') + ` SENSORY VIVIDNESS: ${bland.message}`;
+      } else if (bland.severity === 'moderate') {
+        parsed.issues = parsed.issues || [];
+        parsed.issues.push({ type: 'detail', severity: 'moderate', description: bland.message });
+      }
     }
 
     // Phase R (2026-05-14): Hard upper word-count cap. Existing wordRatio<0.6
