@@ -1456,5 +1456,50 @@ npm run codex:automation -- apply-cover --run-dir=<runDir> --apply
 
 ---
 
-**Last Updated**: 2026-05-26 (Phase Q known-issues audit: 4/4 resolved + deepseek.ts pricing dict fixed)
+## Phase R Details (2026-06-24) — Author Steering Directives (learned from ainovel-cli)
+
+Reviewed the trending OSS CLI [`voocel/ainovel-cli`](https://github.com/voocel/ainovel-cli)
+(Go, multi-agent novel engine). Most of its differentiators we already match or
+exceed (cast/power/faction tracking → `state/` + `canon/`; multi-layer
+summarization → volume-summaries + synopsis; relevance-ranked context →
+`rankCastByRelevance` wired via `state/cast-database.ts:177`; robust
+idempotency → distributed lock + upsert + `current_chapter` checkpoint).
+
+The ONE real gap worth porting: its persistent **`user_directives.json` +
+real-time steering** — a free-text instruction every agent honors mid-run. We
+had nothing equivalent reaching the 3-agent pipeline (`routine_prompt_context`
+only fed the retired Flash routine path).
+
+### What shipped
+
+- **`style_directives.author_directives`** (new free-text field, `types.ts`) —
+  injected into Architect, Writer AND Critic prompts on every subsequent chapter.
+  Architect/Writer treat it as a top-priority directive (but cannot break
+  established canon/continuity); Critic treats it as a compliance check
+  (violation → `quality` major/critical + `requiresRewrite`).
+- Formatter `formatAuthorDirectives(text, audience, maxChars=1500)` in
+  `pipeline/chapter-writer-helpers.ts` — empty/whitespace → `''` (no-op
+  interpolation), over-long → truncated so it can't crowd the prompt.
+- Threaded through `WriteChapterOptions.authorDirectives` → `runArchitect` /
+  `runWriter` / `runCritic`; orchestrator reads `style_directives.author_directives`.
+- CLI `scripts/set-author-directive.ts`:
+  ```bash
+  npx tsx scripts/set-author-directive.ts <projectId> set "Giảm tuyến tình cảm phụ, tập trung tu luyện."
+  npx tsx scripts/set-author-directive.ts <projectId> get
+  npx tsx scripts/set-author-directive.ts <projectId> clear
+  npx tsx scripts/set-author-directive.ts list
+  ```
+  Applies from the NEXT cron-written chapter (not retroactive). No code/outline
+  edit, no deploy — set the flag and the running auto-novel course-corrects.
+- Tests: `src/__tests__/story-engine/author-directives.test.ts` (6 cases).
+  `npx tsc --noEmit` clean, `npx jest` 610/610, `npm run lint:prompts` clean.
+
+**Still a deferred backlog idea from the same review** (not built): EPUB/TXT
+export (ainovel-cli has it; we're reader-platform-only) — candidate VIP feature.
+The retroactive "rewrite already-written affected sections on steer" half of
+their steering is also deferred; we ship the forward-looking 80%.
+
+---
+
+**Last Updated**: 2026-06-24 (Phase R: author steering directives — learned from ainovel-cli)
 

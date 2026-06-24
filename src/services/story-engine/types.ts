@@ -131,6 +131,15 @@ export interface StyleDirectives {
   deepseek_reasoning_effort?: 'high' | 'max';
   /** Optional task allow-list for thinking mode, e.g. architect/writer/critic. Empty means all DeepSeek calls. */
   deepseek_thinking_tasks?: string[];
+  /**
+   * Author steering directive — free-text instruction injected into the
+   * Architect, Writer AND Critic prompts on every subsequent chapter. Lets an
+   * admin course-correct a running auto-novel (slow a subplot, ban a topic,
+   * shift tone, set a power milestone) WITHOUT editing code/outlines. Inspired
+   * by ainovel-cli's persistent user_directives + real-time steering. Set/clear
+   * via scripts/set-author-directive.ts. Empty/absent = no-op.
+   */
+  author_directives?: string;
 }
 
 // ── Story Kernel (compact setup DNA) ─────────────────────────────────────────

@@ -870,6 +870,8 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       repetitionBanList,
       // Quality Overhaul 4.1: modular prompt suffix (default OFF — per-novel A/B).
       modularPromptsEnabled: projectStyleDirectives?.modular_prompts === true,
+      // Author steering directive — free-text instruction honored by all 3 agents.
+      authorDirectives: projectStyleDirectives?.author_directives || undefined,
     },
   );
 

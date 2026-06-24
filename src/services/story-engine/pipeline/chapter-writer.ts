@@ -46,7 +46,7 @@ import type {
 } from '../types';
 import type { SceneType, VocabularyGuide } from '../templates/style-bible';
 import { VN_PLACE_LOCK, ARCHITECT_SYSTEM, WRITER_SYSTEM, CRITIC_SYSTEM } from './chapter-writer-prompts';
-import { cleanContent, extractTitle, synthesizeFallbackCliffhanger, hasCliffhangerSignal, analyzeQualitySignals, buildSignalReport, countWords, detectHardFallback, detectMcNameFlip, detectSevereRepetition, detectShortFormCharacterName, detectMcNameRate, detectEyeTemplateOveruse, detectInspirationalCluster, detectMonologueTail, detectCrossChapterRepetition, detectChapterTemplatePatterns, detectEmDashFormatBreak, repairChapterTemplatePatterns, buildRepetitionReport, generateMinimalScenes, loadConstraintSection, safeStringTrim, type QualitySignals } from './chapter-writer-helpers';
+import { cleanContent, extractTitle, synthesizeFallbackCliffhanger, hasCliffhangerSignal, analyzeQualitySignals, buildSignalReport, countWords, detectHardFallback, detectMcNameFlip, detectSevereRepetition, detectShortFormCharacterName, detectMcNameRate, detectEyeTemplateOveruse, detectInspirationalCluster, detectMonologueTail, detectCrossChapterRepetition, detectChapterTemplatePatterns, detectEmDashFormatBreak, repairChapterTemplatePatterns, buildRepetitionReport, generateMinimalScenes, loadConstraintSection, safeStringTrim, formatAuthorDirectives, type QualitySignals } from './chapter-writer-helpers';
 
 
 // ── Write Chapter ────────────────────────────────────────────────────────────
@@ -95,6 +95,13 @@ export interface WriteChapterOptions {
    * style_directives.modular_prompts=true opts in per novel for A/B.
    */
   modularPromptsEnabled?: boolean;
+  /**
+   * Author steering directive (style_directives.author_directives) — free-text
+   * instruction injected into Architect, Writer AND Critic prompts every
+   * chapter. Lets an admin course-correct a running auto-novel without editing
+   * code/outlines. Inspired by ainovel-cli's persistent user_directives + steer.
+   */
+  authorDirectives?: string;
 }
 
 function isHardBlockingIssue(issue: CriticIssue): boolean {
@@ -402,6 +409,7 @@ Chỉ trả về phần text mới (không quote, không metadata). Tiếng Vi�
       genre,
       options?.worldDescription,
       options?.protagonistName,
+      options?.authorDirectives,
     );
 
     // Step 3b: Reader persona Critic (Phase 29 Feature 2) — gated by env.
@@ -451,6 +459,7 @@ Chỉ trả về phần text mới (không quote, không metadata). Tiếng Vi�
             outline, revision.content, targetWordCount, contextString, config,
             options?.isFinalArc === true, options?.projectId, genre,
             options?.worldDescription, options?.protagonistName,
+            options?.authorDirectives,
           );
           const revisedScore = revisedCritic.overallScore || 0;
           const hadHardBlocker = (activeCritic.issues || []).some(isHardBlockingIssue);
@@ -836,7 +845,7 @@ Scene cuối PHẢI chọn 1 trong 3 dạng CONCRETE:
 
 Outline scene 5 PHẢI specify dạng (a/b/c) + character tên + verb + object cụ thể. KHÔNG ghi "cliffhanger" chung chung — phải concretize.` : ''}
 ${options?.softEndingGuidance || ''}
-
+${formatAuthorDirectives(options?.authorDirectives, 'architect')}
 Trả về JSON ChapterOutline đúng schema phía trên cho CHƯƠNG ${chapterNumber}.`;
 
   // Quality Overhaul 4.1 — flag-gated modular suffix: hard-bans recap at the
@@ -1246,7 +1255,7 @@ CÁCH VIẾT BẮT BUỘC: (1) trigger cảnh-kích cụ thể → (2) 1-2 câu 
   }
 
   const prompt = `Viết CHƯƠNG ${outline.chapterNumber}: "${outline.title}"
-
+${formatAuthorDirectives(options?.authorDirectives, 'writer')}
 ${rewriteSection}BLUEPRINT:
 ${JSON.stringify(outline, null, 2)}
 
@@ -1386,6 +1395,7 @@ async function runCritic(
   genre?: GenreType,
   worldDescription?: string | null,
   protagonistName?: string,
+  authorDirectives?: string,
 ): Promise<CriticOutput> {
   const wordCount = countWords(content);
   const wordRatio = wordCount / targetWords;
@@ -1480,7 +1490,7 @@ async function runCritic(
         .join('\n')}\n[/FORESHADOWING OVERDUE]`;
 
   const prompt = `Đánh giá chương nghiêm túc:
-${genreContractSection}${overdueForeshadowingBlock}
+${formatAuthorDirectives(authorDirectives, 'critic')}${genreContractSection}${overdueForeshadowingBlock}
 ${crossChapterSection}OUTLINE: ${outline.title} — ${outline.summary}
 TARGET DOPAMINE: ${outline.dopaminePoints.map(dp => `${dp.type}: ${dp.description}`).join('; ')}
 TARGET WORDS: ${targetWords}

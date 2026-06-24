@@ -31,6 +31,46 @@ export function safeStringTrim(v: unknown): string {
   return typeof v === 'string' ? v.trim() : '';
 }
 
+// ── Author Steering Directives ───────────────────────────────────────────────
+
+/**
+ * Inspired by ainovel-cli's persistent `user_directives.json` + real-time
+ * steering: a free-text instruction an author/admin sets on a RUNNING novel
+ * (style_directives.author_directives) that every agent must honor on every
+ * subsequent chapter — without editing code, outlines, or the master plan.
+ *
+ * Use cases on a 50-ch/day auto-pipeline:
+ *   - "Từ giờ giảm tuyến tình cảm phụ, tập trung tu luyện."
+ *   - "Ngừng giới thiệu phe phái mới — củng cố phe hiện có."
+ *   - "MC phải đạt Kim Đan trước chương 200."
+ *   - "Đổi giọng nhẹ nhàng hơn, bớt máu me."
+ *
+ * Returns '' for empty/whitespace input so callers can interpolate it
+ * unconditionally (no-op when no directive is set). Capped to keep the block
+ * from crowding out the rest of the prompt.
+ */
+export function formatAuthorDirectives(
+  directives: string | null | undefined,
+  audience: 'architect' | 'writer' | 'critic',
+  maxChars = 1500,
+): string {
+  const text = safeStringTrim(directives);
+  if (!text) return '';
+  const body = text.length > maxChars ? text.slice(0, maxChars) + ' …[cắt bớt]' : text;
+
+  const role =
+    audience === 'critic'
+      ? 'KIỂM TRA TUÂN THỦ — nếu chương vi phạm chỉ đạo tác giả dưới đây, tạo issue type "quality" severity "major" và requiresRewrite=true (severity "critical" nếu vi phạm trực diện):'
+      : 'ƯU TIÊN TUYỆT ĐỐI — chỉ đạo trực tiếp của tác giả cho chương này (đè lên hướng dẫn chung, nhưng KHÔNG được phá vỡ canon/continuity đã thiết lập):';
+
+  return `\n═══════════════════════════════════════════
+[CHỈ ĐẠO TÁC GIẢ — AUTHOR DIRECTIVES]
+═══════════════════════════════════════════
+${role}
+${body}
+═══════════════════════════════════════════\n`;
+}
+
 // ── Content Cleaning ─────────────────────────────────────────────────────────
 
 export function cleanContent(content: string): string {
