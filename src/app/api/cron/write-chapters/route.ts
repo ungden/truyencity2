@@ -47,6 +47,7 @@ import {
   isRecoverableRoutineWriteError,
   isDailyQuotaDue,
 } from '@/lib/story-production-quota';
+import { decideNextProductionAction } from '@/lib/story-production-flow';
 
 // Story Engine v2 — sole engine for all tiers (init + resume)
 import { writeOneChapter as writeOneChapterV2 } from '@/services/story-engine';
@@ -1072,6 +1073,28 @@ export async function GET(request: NextRequest) {
 
     const resumeCandidates = sortedDue.filter((p) => (p.current_chapter || 0) > 0);
     const initCandidates = sortedDue.filter((p) => (p.current_chapter || 0) === 0);
+    const resumeFlowCounts = resumeCandidates.reduce<Record<string, number>>((acc, p) => {
+      const q = dueQuotaByProject.get(p.id);
+      const decision = decideNextProductionAction({
+        projectId: p.id,
+        status: p.status,
+        currentChapter: p.current_chapter || 0,
+        totalPlannedChapters: p.total_planned_chapters || 200,
+        hasNovel: !!p.novels,
+        quotaDue: !!q,
+        quotaStatus: q?.status,
+        retryCount: q?.retry_count,
+        maxRetries: MAX_CONSECUTIVE_FAILURES,
+        setupStage: p.setup_stage,
+        hasValidSetupKernel: hasValidSetupKernel(p.story_outline),
+        qualityHold: (p.style_directives as Record<string, unknown> | null)?.quality_hold === true,
+      });
+      acc[decision.action] = (acc[decision.action] || 0) + 1;
+      return acc;
+    }, {});
+    if (resumeCandidates.length > 0) {
+      console.log(`[Cron] Production flow resume decisions: ${JSON.stringify(resumeFlowCounts)}`);
+    }
 
     // ====== TWO-PHASE INIT: Split init candidates by arc plan existence ======
     // Phase 1 (init-prep): No arc plan → generate arc plan only (fast, ~30-60s)
@@ -1113,6 +1136,30 @@ export async function GET(request: NextRequest) {
         const fr = (p.style_directives?.foundation_review_latest as { passed?: boolean } | undefined);
         return hasPower && hasWorld && fr?.passed === true;
       };
+      const initFlowDecisions = initCandidates.map((p) => decideNextProductionAction({
+        projectId: p.id,
+        status: p.status,
+        currentChapter: p.current_chapter || 0,
+        totalPlannedChapters: p.total_planned_chapters || 200,
+        hasNovel: !!p.novels,
+        quotaDue: dueQuotaByProject.has(p.id),
+        quotaStatus: dueQuotaByProject.get(p.id)?.status,
+        retryCount: dueQuotaByProject.get(p.id)?.retry_count,
+        maxRetries: MAX_CONSECUTIVE_FAILURES,
+        setupStage: p.setup_stage,
+        hasArcPlan: hasArcPlan.has(p.id),
+        hasFullSetup: hasFullSetup(p),
+        hasValidSetupKernel: hasValidSetupKernel(p.story_outline),
+        hasCanonAndPassedReview: hasCanonAndPassedReview(p),
+        qualityHold: (p.style_directives as Record<string, unknown> | null)?.quality_hold === true,
+      }));
+      const initFlowCounts = initFlowDecisions.reduce<Record<string, number>>((acc, d) => {
+        acc[d.action] = (acc[d.action] || 0) + 1;
+        return acc;
+      }, {});
+      if (initFlowDecisions.length > 0) {
+        console.log(`[Cron] Production flow init decisions: ${JSON.stringify(initFlowCounts)}`);
+      }
       const missingKernelReady = initCandidates.filter(p => shouldResetUnwrittenMissingKernel({
         currentChapter: p.current_chapter,
         setupStage: p.setup_stage,

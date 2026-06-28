@@ -6,15 +6,21 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 // Singleton instance
 let _instance: SupabaseClient | null = null;
 
+export function hasSupabaseClientConfig(): boolean {
+  return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+}
+
 // Create supabase client with lazy initialization
 // This avoids build-time errors when env vars aren't available
 function createSupabaseClient(): SupabaseClient {
   if (_instance) return _instance;
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY');
+  }
 
-  // During build, env vars might be empty - client will fail at runtime if actually used
   _instance = createClient(supabaseUrl, supabaseKey);
   return _instance;
 }

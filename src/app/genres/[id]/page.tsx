@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { supabase } from '@/integrations/supabase/client';
+import { hasSupabaseClientConfig, supabase } from '@/integrations/supabase/client';
 import { unstable_cache } from 'next/cache';
 import { getGenreLabel, getGenreIcon } from '@/lib/utils/genre';
 import { GENRE_CONFIG } from '@/lib/types/genre-config';
@@ -28,6 +28,8 @@ type Novel = {
 
 const fetchGenreNovels = unstable_cache(
   async (genreId: string): Promise<Novel[]> => {
+    if (!hasSupabaseClientConfig()) return [];
+
     const { data } = await supabase
       .from('novels')
       .select('id,slug,title,author,cover_url,genres')

@@ -121,6 +121,8 @@ export interface StyleDirectives {
   focus_key?: string | null;
   /** Optional per-project routine writer instructions appended to compact Flash prompts. */
   routine_prompt_context?: string;
+  /** Per-project deterministic writing rules merged with defaults before prompt + validation. */
+  story_rules?: StoryRules;
   /** Require full chapter_blueprints coverage before routine writer can publish next chapter. */
   require_full_chapter_blueprint?: boolean;
   /** Active chapter_blueprints version expected by writer/audit gates. */
@@ -131,6 +133,17 @@ export interface StyleDirectives {
   deepseek_reasoning_effort?: 'high' | 'max';
   /** Optional task allow-list for thinking mode, e.g. architect/writer/critic. Empty means all DeepSeek calls. */
   deepseek_thinking_tasks?: string[];
+}
+
+export interface StoryRules {
+  chapter_words?: {
+    min?: number;
+    max?: number;
+  };
+  forbidden_phrases?: string[];
+  fatigue_words?: Record<string, number>;
+  required_currency?: 'VND' | 'auto' | string;
+  preferences?: string;
 }
 
 // ── Story Kernel (compact setup DNA) ─────────────────────────────────────────

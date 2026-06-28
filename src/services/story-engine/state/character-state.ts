@@ -83,6 +83,9 @@ export async function saveCharacterStatesFromCombined(
       onConflict: 'project_id,chapter_number,character_name',
     });
     if (upsertErr) console.warn('[CharacterTracker] Failed to save combined character states: ' + upsertErr.message);
+    await import('./cast-ledger')
+      .then(({ updateCastLedgerFromCharacters }) => updateCastLedgerFromCharacters(projectId, chapterNumber, rows))
+      .catch((e) => console.warn('[CharacterTracker] Cast ledger update failed: ' + (e instanceof Error ? e.message : String(e))));
   } catch {
     // Non-fatal
   }
@@ -242,4 +245,3 @@ export function formatContradictionWarnings(contradictions: CharacterContradicti
 }
 
 // ── Public: Load Latest Character States for Context ─────────────────────────
-

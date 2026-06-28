@@ -18,7 +18,8 @@ export type ReviewReason =
   | 'revise_pass_failed'
   | 'major_contradiction_unfixed'
   | 'quality_circuit_breaker'
-  | 'foreshadowing_abandoned';
+  | 'foreshadowing_abandoned'
+  | 'story_rule_violation';
 
 export interface ReviewQueueEntry {
   projectId: string;

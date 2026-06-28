@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Header } from '@/components/header';
 import { Card } from '@/components/ui/card';
 import { GENRE_CONFIG } from '@/lib/types/genre-config';
-import { supabase } from '@/integrations/supabase/client';
+import { hasSupabaseClientConfig, supabase } from '@/integrations/supabase/client';
 import { unstable_cache } from 'next/cache';
 import { AdPlacement } from '@/components/ads/AdPlacement';
 
@@ -21,6 +21,8 @@ export const revalidate = 3600;
 // TODO: Replace with DB-level RPC `get_genre_counts()` when novel count exceeds 10K
 const getGenreCounts = unstable_cache(
   async (): Promise<Record<string, number>> => {
+    if (!hasSupabaseClientConfig()) return {};
+
     const { data: novels } = await supabase
       .from('novels')
       .select('genres')

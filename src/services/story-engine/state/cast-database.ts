@@ -29,6 +29,7 @@
 
 import { getSupabase } from '../utils/supabase';
 import { rankCastByRelevance } from '../context/relevance-rank';
+import { getCastLedger } from './cast-ledger';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -41,6 +42,8 @@ export interface CastMember {
   personalityQuirks: string | null;
   notes: string | null;
   lastSeenChapter: number;
+  firstSeenChapter?: number;
+  briefRole?: string | null;
   appearanceCount: number; // approximate — based on rows returned
 }
 
@@ -72,6 +75,23 @@ export async function getActiveCast(
   limit = 80,
 ): Promise<CastMember[]> {
   try {
+    const ledger = await getCastLedger(projectId, maxChapter, limit);
+    if (ledger.length > 0) {
+      return ledger.map((entry) => ({
+        characterName: entry.characterName,
+        status: entry.status,
+        powerLevel: null,
+        powerRealmIndex: null,
+        location: entry.lastKnownLocation,
+        personalityQuirks: null,
+        notes: entry.briefRole,
+        firstSeenChapter: entry.firstSeenChapter,
+        briefRole: entry.briefRole,
+        lastSeenChapter: entry.lastSeenChapter,
+        appearanceCount: entry.appearanceCount,
+      }));
+    }
+
     const db = getSupabase();
     const { data, error } = await db
       .from('character_states')
@@ -184,10 +204,13 @@ export async function getCastRosterContext(
   const formatMember = (c: CastMember): string => {
     const power = c.powerLevel ? `${c.powerLevel}${c.powerRealmIndex !== null ? ` (idx ${c.powerRealmIndex})` : ''}` : '';
     const loc = c.location ? `@${c.location}` : '';
-    const seen = `last ch.${c.lastSeenChapter}`;
+    const seen = c.firstSeenChapter
+      ? `first ch.${c.firstSeenChapter}, last ch.${c.lastSeenChapter}, x${c.appearanceCount}`
+      : `last ch.${c.lastSeenChapter}`;
     const parts = [c.characterName, power, loc, seen].filter(Boolean);
     let line = `  • ${parts.join(' | ')}`;
-    if (c.personalityQuirks && line.length < 100) line += ` (${c.personalityQuirks.slice(0, 80)})`;
+    const role = c.briefRole || c.personalityQuirks;
+    if (role && line.length < 130) line += ` (${role.slice(0, 100)})`;
     return line;
   };
 

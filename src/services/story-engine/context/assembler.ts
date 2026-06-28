@@ -35,6 +35,7 @@ import { getGenreArchitectGuide } from '../templates/genre-process-blueprints';
 import { formatChapterBlueprintContext, loadChapterBlueprint } from '../plan/chapter-blueprints';
 import { isTemplateCliffhanger, isTemplateOpening } from './generators';
 import { logLoaderFailure } from '../utils/retry-queue';
+import { formatStoryRulesForPrompt, resolveStoryRules } from '../quality/story-rules';
 
 import type {
   ContextPayload, ChapterSummary, GenreType, GeminiConfig, StoryKernel,
@@ -596,11 +597,21 @@ export interface ContextTrimResult {
   trimmedTiers: number[];
   beforeChars: number;
   afterChars: number;
+  blockDiagnostics?: ContextBlockDiagnostic[];
 }
 
 export interface ContextBudgetOptions {
   maxChars: number;
   onTrim?: (info: Omit<ContextTrimResult, 'text'>) => void;
+  onDiagnostics?: (diagnostics: ContextBlockDiagnostic[]) => void;
+}
+
+export interface ContextBlockDiagnostic {
+  label: string;
+  tier: ContextTier;
+  beforeChars: number;
+  afterChars: number;
+  status: 'kept' | 'trimmed' | 'dropped';
 }
 
 /** Exported for unit tests. Drops/halves parts by tier until under budget. */
@@ -608,9 +619,11 @@ export function applyContextBudget(
   parts: string[],
   tiers: ReadonlyArray<ContextTier>,
   maxChars: number,
+  labels?: ReadonlyArray<string>,
 ): ContextTrimResult {
   const SEP = '\n\n';
   const working = [...parts];
+  const original = [...parts];
   const total = () => working.reduce((s, p) => s + (p ? p.length + SEP.length : 0), 0);
   const beforeChars = total();
   const trimmed = new Set<number>();
@@ -642,13 +655,30 @@ export function applyContextBudget(
   }
 
   const text = working.filter(Boolean).join(SEP);
-  return { text, trimmedTiers: [...trimmed].sort(), beforeChars, afterChars: text.length };
+  const blockDiagnostics = labels
+    ? original.map((part, i) => {
+        const after = working[i] || '';
+        return {
+          label: labels[i] || inferContextBlockLabel(part),
+          tier: tiers[i] ?? 0,
+          beforeChars: part.length,
+          afterChars: after.length,
+          status: after.length === 0 ? 'dropped' as const : after.length < part.length ? 'trimmed' as const : 'kept' as const,
+        };
+      })
+    : undefined;
+  return { text, trimmedTiers: [...trimmed].sort(), beforeChars, afterChars: text.length, blockDiagnostics };
 }
 
 export function assembleContext(payload: ContextPayload, chapterNumber: number, budget?: ContextBudgetOptions): string {
   const parts: string[] = [];
   const tiers: ContextTier[] = [];
-  const push = (text: string, tier: ContextTier = 0) => { push(text); tiers.push(tier); };
+  const labels: string[] = [];
+  const push = (text: string, tier: ContextTier = 0) => {
+    parts.push(text);
+    tiers.push(tier);
+    labels.push(inferContextBlockLabel(text));
+  };
 
   if (payload.setupKernel) {
     push(formatStoryKernelContext(payload.setupKernel));
@@ -906,6 +936,9 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number, 
     push(metaParts.join('\n'));
   }
 
+  const storyRules = resolveStoryRules(payload.styleDirectives);
+  push(formatStoryRulesForPrompt(storyRules), 1);
+
   // Layer 0: Chapter Bridge (highest priority)
   if (payload.previousCliffhanger || payload.previousSummary) {
     push('[CẦU NỐI CHƯƠNG — BẮT BUỘC TUÂN THỦ]');
@@ -1092,7 +1125,8 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number, 
   // blind head-trim. Tier 0 (kernel/world/bridge/bibles/foreshadowing) is
   // guaranteed to survive verbatim.
   if (budget && budget.maxChars > 0) {
-    const result = applyContextBudget(parts, tiers, budget.maxChars);
+    const result = applyContextBudget(parts, tiers, budget.maxChars, labels);
+    if (result.blockDiagnostics) budget.onDiagnostics?.(result.blockDiagnostics);
     if (result.trimmedTiers.length > 0) {
       console.error(
         `[context-assembler] ch.${chapterNumber}: context ${result.beforeChars} chars > budget ${budget.maxChars} — trimmed tiers [${result.trimmedTiers.join(',')}] → ${result.afterChars} chars`,
@@ -1102,7 +1136,20 @@ export function assembleContext(payload: ContextPayload, chapterNumber: number, 
     return result.text;
   }
 
+  budget?.onDiagnostics?.(parts.map((part, i) => ({
+    label: labels[i] || inferContextBlockLabel(part),
+    tier: tiers[i] ?? 0,
+    beforeChars: part.length,
+    afterChars: part.length,
+    status: 'kept' as const,
+  })));
   return parts.join('\n\n');
+}
+
+function inferContextBlockLabel(text: string): string {
+  const first = text.split('\n', 1)[0]?.trim() || 'context_block';
+  const bracket = first.match(/^\[([^\]]+)\]/);
+  return (bracket?.[1] || first).slice(0, 80);
 }
 
 

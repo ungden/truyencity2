@@ -26,6 +26,8 @@ import { normalizeChapterLength } from './length-normalizer';
 import { defaultLengthSpec, chooseNormalizeMode } from '../utils/length-metrics';
 import { polishChapter } from './polisher';
 import { runPostWriteValidator } from '../quality/post-write-validator';
+import { resolveStoryRules, validateStoryRules } from '../quality/story-rules';
+import type { RuleViolation } from '../quality/story-rules';
 import { runContinuityGuardian } from '../quality/continuity-guardian';
 import { runContinuityGuardianFast } from '../quality/continuity-guardian-fast';
 import { buildCorrectiveDirective } from '../quality/corrective-directive';
@@ -47,6 +49,8 @@ import type {
   WriteChapterInput, WriteChapterResult, GeminiConfig, GenreType, StyleDirectives,
 } from '../types';
 import { DEFAULT_CONFIG } from '../types';
+import type { ContextBlockDiagnostic } from '../context/assembler';
+import { finishWriteRun, recordWriteCheckpoint, startWriteRun } from './write-run-ledger';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -194,6 +198,23 @@ function runChapterCanary(args: {
 
 function countWords(text: string): number {
   return text.trim().split(/\s+/).filter(Boolean).length;
+}
+
+function summarizeContextDiagnostics(blocks: ContextBlockDiagnostic[]): ContextBlockDiagnostic[] {
+  return blocks
+    .filter(b => b.beforeChars > 0)
+    .sort((a, b) => {
+      const statusRank = (s: ContextBlockDiagnostic['status']) => s === 'dropped' ? 0 : s === 'trimmed' ? 1 : 2;
+      return statusRank(a.status) - statusRank(b.status) || b.beforeChars - a.beforeChars;
+    })
+    .slice(0, 40)
+    .map(b => ({
+      label: b.label,
+      tier: b.tier,
+      beforeChars: b.beforeChars,
+      afterChars: b.afterChars,
+      status: b.status,
+    }));
 }
 
 // ── Public: Write One Chapter ────────────────────────────────────────────────
@@ -550,6 +571,14 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     deepseekReasoningEffort: projectStyleDirectives?.deepseek_reasoning_effort === 'max' ? 'max' : 'high',
     deepseekThinkingTasks,
   };
+  const storyRules = resolveStoryRules(projectStyleDirectives);
+  const writeRun = await startWriteRun({
+    projectId: project.id,
+    novelId: novel.id,
+    chapterNumber: nextChapter,
+    model: geminiConfig.model,
+    targetWordCount,
+  });
 
   // NOTE (2026-05-29): the flash-cheap routine path is RETIRED — it wrote chapters with
   // gemini-3.1-flash-lite ("lởm" vs deepseek-v4-pro). Every chapter now goes through the
@@ -704,6 +733,16 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     // Non-fatal
   }
 
+  try {
+    const { getStyleHabitContext } = await import('../quality/style-habits');
+    const habitContext = await getStyleHabitContext(project.id, novel.id, nextChapter);
+    if (habitContext) {
+      context.voiceContext = [context.voiceContext, habitContext].filter(Boolean).join('\n\n');
+    }
+  } catch (e) {
+    console.warn('[Orchestrator] Style habit context failed:', e instanceof Error ? e.message : String(e));
+  }
+
   // ── Step 2d++: Pre-Write Q&A Pass (Phase 22 Stage 2 Q6) ─────────────────
   // Proactively answer "what does the engine know about each entity in the upcoming chapter?"
   // Deterministic DB queries — no AI cost. Output injected as [STATE CHECK] block.
@@ -828,9 +867,17 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   // chapter-writer). 360K leaves ~40K headroom for the Architect's static
   // prompt sections under its 400K MAX_PROMPT_CHARS guard.
   let contextTrimInfo: { trimmedTiers: number[]; beforeChars: number; afterChars: number } | null = null;
+  let contextBlockDiagnostics: ContextBlockDiagnostic[] = [];
   const contextString = assembleContext(context, nextChapter, {
     maxChars: 360_000,
     onTrim: info => { contextTrimInfo = info; },
+    onDiagnostics: diagnostics => { contextBlockDiagnostics = diagnostics; },
+  });
+  await recordWriteCheckpoint(writeRun, 'context_assembled', {
+    context_size_chars: contextString.length,
+    trim: contextTrimInfo,
+    blocks: summarizeContextDiagnostics(contextBlockDiagnostics),
+    loader_failures: context.loaderFailures ?? [],
   });
 
   // ── Step 4: Write chapter via 3-agent pipeline ─────────────────────────
@@ -872,6 +919,12 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
       modularPromptsEnabled: projectStyleDirectives?.modular_prompts === true,
     },
   );
+  await recordWriteCheckpoint(writeRun, 'chapter_generated', {
+    title: result.title,
+    word_count: result.wordCount,
+    quality_score: result.qualityScore ?? null,
+    critic_score: result.criticReport?.overallScore ?? null,
+  });
 
   // ── Step 4.5: Pre-save QA — contradictions, fast consistency, guardian ──
   // Phase 24 reorder: auto-revise must run BEFORE the chapter row hits the
@@ -1160,6 +1213,17 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     );
   }
 
+  const storyRuleViolations: RuleViolation[] = validateStoryRules(result.content, storyRules, result.wordCount);
+  if (storyRuleViolations.some(v => v.severity === 'critical')) {
+    result.recoveryFlags = [...(result.recoveryFlags || []), 'story_rule_violation'];
+  }
+  await recordWriteCheckpoint(writeRun, 'pre_save_qa_passed', {
+    contradictions_critical: preSaveContradictions.filter(c => c.severity === 'critical').length,
+    contradictions_warning: preSaveContradictions.filter(c => c.severity === 'warning').length,
+    guardian_issues: preSaveGuardianIssues.length,
+    story_rule_violations: storyRuleViolations,
+  });
+
   // ── Step 5: Split AI content into N reader chapters + save to DB ─────────
   // AI writes 1 logical chapter (~2800 từ). HISTORICALLY split into 2 reader chapters
   // (~1400 từ each) for mobile-friendly UX. Phase 27+: NEW novels default to NO-split
@@ -1188,8 +1252,15 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   );
 
   if (upsertErr) {
+    await recordWriteCheckpoint(writeRun, 'failed', { error: upsertErr.message, step: 'chapter_upsert' });
+    await finishWriteRun(writeRun, 'failed', { errorMessage: upsertErr.message, contextSizeChars: contextString.length });
     throw new Error(`Chapter upsert failed: ${upsertErr.message}`);
   }
+  await recordWriteCheckpoint(writeRun, 'chapter_saved', {
+    first_chapter_number: nextChapter,
+    last_chapter_number: lastChapterNumber,
+    rows: chapterRows.length,
+  });
 
   // Phase N.3 (2026-05-12): Git-style chapter version audit log.
   // Insert version row into existing `chapter_versions` table (created
@@ -1234,6 +1305,15 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
     .eq('id', project.id);
   if (bumpErr) {
     console.warn(`[Orchestrator] CRITICAL: Failed to bump current_chapter to ${lastChapterNumber} for project ${project.id}: ${bumpErr.message}`);
+  } else {
+    await recordWriteCheckpoint(writeRun, 'current_chapter_bumped', {
+      current_chapter: lastChapterNumber,
+    });
+    await finishWriteRun(writeRun, 'saved', {
+      lastChapterNumber,
+      qualityScore: result.qualityScore ?? null,
+      contextSizeChars: contextString.length,
+    });
   }
 
   // Phase M.6 (2026-05-12): Soft-ending check — mark project completed nếu
@@ -1293,17 +1373,18 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   if (result.recoveryFlags?.length) {
     try {
       const { enqueueAdminReview } = await import('../quality/admin-review-queue');
-      const validReasons = new Set(['golden_fallback', 'revise_pass_failed', 'major_contradiction_unfixed']);
+      const validReasons = new Set(['golden_fallback', 'revise_pass_failed', 'major_contradiction_unfixed', 'story_rule_violation']);
       for (const flag of result.recoveryFlags) {
         if (!validReasons.has(flag)) continue;
         await enqueueAdminReview({
           projectId: project.id,
           novelId: novel.id,
           chapterNumber: nextChapter,
-          reason: flag as 'golden_fallback' | 'revise_pass_failed' | 'major_contradiction_unfixed',
+          reason: flag as 'golden_fallback' | 'revise_pass_failed' | 'major_contradiction_unfixed' | 'story_rule_violation',
           detail: {
             quality_score: result.qualityScore,
             title: result.title,
+            rule_violations: storyRuleViolations.filter(v => v.severity === 'critical' || v.severity === 'major').slice(0, 10),
             gate_issues: (result.criticReport?.issues || [])
               .filter(i => i.severity === 'critical' || i.severity === 'major')
               .slice(0, 5)
@@ -1338,6 +1419,12 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   const allGuardianIssues: import('../quality/continuity-guardian').GuardianIssue[] = preSaveGuardianIssues;
   const logicalWordCount = countWords(result.content);
   const publishedTargetWordCount = Math.max(1, Math.round(targetWordCount / Math.max(splitResults.length, 1)));
+  const styleHabits = await import('../quality/style-habits')
+    .then(({ computeProjectStyleHabits }) => computeProjectStyleHabits(project.id, novel.id, lastChapterNumber, 30))
+    .catch((e) => {
+      console.warn('[Orchestrator] Style habit metrics failed:', e instanceof Error ? e.message : String(e));
+      return null;
+    });
 
   // ── Step 6b: Per-reader-chapter post-write tasks ──────────────────────
   // Each part gets its own chapter_summaries row (via runSummaryTasks),
@@ -1544,6 +1631,10 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
           recovery_flags: result.recoveryFlags ?? [],
           context_trim_tiers: contextTrimInfo ? (contextTrimInfo as { trimmedTiers: number[] }).trimmedTiers : [],
           context_loader_failures: context.loaderFailures ?? [],
+          context_loading_summary: summarizeContextDiagnostics(contextBlockDiagnostics),
+          rule_violations: storyRuleViolations,
+          style_habits: styleHabits,
+          write_run_id: writeRun?.id ?? null,
           score_scope: 'logical_write',
           logical_word_count: logicalWordCount,
           logical_target_words: targetWordCount,
@@ -1678,6 +1769,15 @@ export async function writeOneChapter(options: OrchestratorOptions): Promise<Orc
   ]);
 
   // Step 7 removed: current_chapter is bumped right after chapter upsert (Step 5b).
+  await recordWriteCheckpoint(writeRun, 'post_write_tasks_done', {
+    last_chapter_number: lastChapterNumber,
+    chapters_created: splitResults.length,
+  });
+  await finishWriteRun(writeRun, 'post_write_done', {
+    lastChapterNumber,
+    qualityScore: result.qualityScore ?? null,
+    contextSizeChars: contextString.length,
+  });
 
   return {
     chapterNumber: nextChapter,
