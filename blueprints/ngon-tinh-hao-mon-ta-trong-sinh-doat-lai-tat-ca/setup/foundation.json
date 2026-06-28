@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "totalScore": 122,
+  "avgScore": 8.71,
+  "minDimScore": 8,
+  "source": "claude_code",
+  "dimensions": [
+    { "name": "Premise & hook", "score": 9, "note": "Warm-baseline trọng sinh hào môn: ký ức kiếp trước active ngay ch.1, MC tỉnh dậy ở vị trí tiểu thư còn nguyên danh phận trước thời điểm tai họa — opportunity-driven, không mở đầu bằng cảnh khổ cùng cực." },
+    { "name": "Protagonist engine", "score": 9, "note": "Tô Uyển thắng bằng ký ức báo trước + trí tuệ thương trường + đọc người + kiên nhẫn lạnh lùng; tính cách điềm tĩnh, sắc sảo, kiêu hãnh mà vẫn trắc ẩn, nhất quán." },
+    { "name": "System mechanic", "score": 9, "note": "Ký Ức Kiếp Trước - Bản Đồ Thời Điểm có input/output/limit/reward rõ; anti-plot-armor cứng — ký ức chỉ cho biết kịch bản cũ, mất dần giá trị khi dòng đời đổi, mù với âm mưu hậu trường, MC vẫn phải tự rèn năng lực." },
+    { "name": "Conflict ladder", "score": 9, "note": "Leo thang chặn bẫy cá nhân → sự nghiệp độc lập → vạch trần công khai → chiến tranh cổ phần → thế lực giật dây, tất cả NON-combat qua đấu trí và sự thật." },
+    { "name": "World coherence", "score": 9, "note": "Xã hội hào môn hiện đại với cổ phần, truyền thông, hôn nhân liên minh nhất quán; vũ khí là bằng chứng/dư luận/cổ phần, forbidden elements cấm bạo lực và xuyên không rõ ràng." },
+    { "name": "Dopamine cadence", "score": 9, "note": "controlRules ≥2 peak/chương (phản đòn lật kèo + bóc mặt nạ hoặc đoạt thương vụ), cao điểm đầu trước nửa chương; sảng văn hào môn đậm chất hả hê." },
+    { "name": "Origin lock", "score": 9, "note": "mcOrigin=reincarnated khóa chặt; mọi file dùng 'trọng sinh/kiếp trước' hợp lệ và KHÔNG chứa token xuyên không/xuyên việt/đến từ trái đất/từ thế giới hiện đại." },
+    { "name": "Non-combat guardrail", "score": 9, "note": "Genre ngon-tinh NON_COMBAT; xung đột giải quyết bằng đọc người, bằng chứng, cổ phần, dư luận; cấm đánh nhau/hành hung/trả thù phạm pháp trong forbiddenElements." },
+    { "name": "Foreshadowing & twists", "score": 8, "note": "3 twist (Tô Mạn Nghi là quân cờ cài cắm, thế lực tài chính giấu mặt, nguồn gốc lợi thế ký ức) + 3 foreshadowing có plant/payoff chapter cụ thể, kéo dài tới cao trào." },
+    { "name": "Long-form sustainability", "score": 8, "note": "noveltyLadder 5 nấc giữ cùng lane 'đấu trí hào môn đoạt lại', 7 volume cho 1000 chương, endgame hạ thế lực giật dây + di sản công bằng + hôn nhân bình đẳng." },
+    { "name": "Vietnamese voice", "score": 8, "note": "Voice anchors sắc sảo, lạnh lùng mà kiêu hãnh, đúng giọng ngôn tình hào môn, đủ diacritics, không AI-tell." }
+  ],
+  "overallFeedback": "Setup vững cho ngôn tình hào môn trọng sinh NON-combat: warm-baseline opening với ký ức kiếp trước active ch.1, golden finger là bản-đồ-thời-điểm có anti-plot-armor cứng (không tự ký hợp đồng/thắng kiện, mất dần giá trị khi dòng đời lệch, mù với âm mưu hậu trường), conflict ladder leo thang sạch qua 7 volume bằng đấu trí thương trường và phơi bày sự thật, origin lock reincarnated khóa chặt (chỉ dùng trọng sinh/kiếp trước, không token xuyên không), dopamine cadence sảng văn hào môn (phản đòn lật kèo + bóc mặt nạ + đoạt thương vụ), foreshadowing và twist có cấu trúc dài hạn, tuyến tình cảm bình đẳng làm chiều sâu cảm xúc. Sẵn sàng cho DeepSeek V4 Pro viết chương. PASS."
+}

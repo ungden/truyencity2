@@ -1,0 +1,210 @@
+{
+  "power_system": {
+    "name": "Hệ Thống Lãnh Địa & Công Hội Aetheria",
+    "type": "territory-and-organization progression (tiến triển bằng lãnh thổ, tài nguyên và tổ chức, KHÔNG phải cấp độ chiến đấu cá nhân)",
+    "coreResource": "Tài nguyên (gỗ, đá, sắt, muối, lương thực, dân lao động, đồng Aurum) và uy tín — sức mạnh đo bằng diện tích lãnh thổ, độ no đủ kho hàng, số quân thủ thành và quan hệ ngoại giao.",
+    "unlockRule": "Lãnh địa thăng cấp khi đạt ngưỡng dân số, công trình và tài nguyên dự trữ; Công Hội leo bậc Bảng Xếp Hạng theo tổng lãnh thổ, sức mạnh quân và uy tín. Cố Vân không 'lên level' bằng giết quái mà bằng tổ chức và mở rộng.",
+    "territoryTiers": [
+      "Tiền Đồn — lá cờ đầu tiên, vài công trình gỗ, dân số trần thấp",
+      "Thôn Trang — tường rào, ruộng và xưởng cơ bản, tuyến thương mại đầu",
+      "Trấn — chợ, kho lương, quân thường trực, quyền thu thuế vùng",
+      "Thành — tường đá, công trình quân sự, trung tâm kinh tế khu vực",
+      "Thành Bang — nhiều lãnh địa vệ tinh, quyền ký hiệp ước và tuyên chiến",
+      "Vương Quốc / Đế Chế — kiểm soát vùng đại lục, định hình trật tự khu vực"
+    ],
+    "guildRankSystem": {
+      "name": "Bảng Xếp Hạng Công Hội Toàn Server",
+      "factors": ["tổng lãnh thổ kiểm soát", "sức mạnh quân thủ thành", "ngân khố và tài nguyên", "mạng lưới liên minh và uy tín ngoại giao"],
+      "note": "Thứ hạng công khai toàn server, là thước đo quyền lực thật và mục tiêu mà Cố Vân leo dần."
+    },
+    "antiPlotArmor": [
+      "Nhãn Lãnh Chủ CHỈ hiển thị tiềm năng đất đai và điểm yếu — KHÔNG tự xây, KHÔNG ban quân/tài nguyên, KHÔNG thắng trận thay MC.",
+      "Mọi công trình tốn tài nguyên thật và thời gian thật; mọi đạo quân ăn lương mỗi ngày; tính sai hậu cần là thua dù có Nhãn.",
+      "Nhãn không đọc được ý đồ con người (phản bội, mưu kế đối thủ); MC vẫn bị bất ngờ nếu chủ quan.",
+      "Nhãn mờ đi khi thiếu dữ liệu khảo sát hoặc bị đánh úp; không dùng được từ xa hay giữa hỗn loạn cận chiến."
+    ],
+    "signatureBuff": {
+      "name": "Đường Tăng Trưởng Tối Ưu",
+      "effect": "Khi khảo sát kỹ, Nhãn Lãnh Chủ vẽ cho Cố Vân lộ trình phát triển hiệu quả nhất của một lãnh địa hoặc thế trận, giúp anh tránh lãng phí tài nguyên và ra quyết định nhanh hơn đối thủ.",
+      "limit": "Chỉ là gợi ý tối ưu trên dữ liệu hiện có; nếu dữ liệu sai lệch (do địch nguỵ trang, do biến cố) thì lộ trình cũng sai; vẫn cần MC tự gánh rủi ro thực thi."
+    },
+    "progressionAxes": [
+      "Cấp lãnh địa và tổng lãnh thổ kiểm soát",
+      "Độ dày kho tài nguyên và sức mạnh quân thủ thành",
+      "Mạng lưới liên minh, uy tín ngoại giao và thứ hạng Công Hội",
+      "Độ sâu và phạm vi của Nhãn Lãnh Chủ (từ một mảnh đất tới cả vùng, tới tầng dữ liệu nền)"
+    ],
+    "powerCeilingByPhase": {
+      "phase1": "Một tiền đồn rồi thôn trang tự nuôi sống, phòng thủ chống sơn tặc bằng địa hình",
+      "phase2": "Một trấn giàu tài nguyên thắng chiến thương mại và một thành thủ vững trước đại công hội, lập Công Hội",
+      "phase3": "Thành bang đa lãnh địa đứng đầu Bảng Xếp Hạng, thắng đại chiến công hội toàn server bằng kinh tế",
+      "phase4": "Đế chế định hình trật tự vùng đại lục, chạm tới tầng luật nền của Aetheria"
+    }
+  },
+  "worldbuilding": {
+    "tone": "Sảng văn xây dựng đế chế: trí tuệ chiến lược, từng bước trỗi dậy của kẻ tay trắng, thoả mãn khi nước cờ hậu cần và ngoại giao đặt trước bung ra thành chiến thắng áp đảo; có chiến trận công thành kịch tính nhưng trọng tâm là quản trị và mưu lược.",
+    "economy": "Nền kinh tế tài nguyên thật: gỗ, đá, sắt, muối, lương thực, dân lao động và đồng Aurum là tiền tệ in-world; mọi công trình ngốn tài nguyên và thời gian, mọi đạo quân ăn lương; thị trường tài nguyên có thể bị thao túng và phong toả.",
+    "setting": "Bên trong tựa game nhập vai toàn cảm Sáng Thế, trên đại lục Aetheria — một thế giới sống động có lịch sử, chính trị và cư dân bản địa riêng; người chơi đăng nhập sống cuộc đời thứ hai, còn cư dân như Cố Vân coi Aetheria là quê hương.",
+    "geography": {
+      "phase1": "Vùng biên thuỳ hoang vu quanh tiền đồn Vân Lãnh, con đèo Hắc Phong, chợ phiên lưu động và trấn Trác Thành láng giềng",
+      "phase2": "Mạng lưới lãnh địa và tuyến thương mại vùng biên do Vân Lãnh và các thế lực chia nhau",
+      "phase3": "Bàn cờ lãnh thổ toàn server với các đại công hội kỳ cựu và vương quốc NPC cổ",
+      "phase4": "Di tích của những kẻ kiến tạo và tầng luật nền sâu nhất của Aetheria"
+    },
+    "techLevel": "Trung cổ giả tưởng có phép thuật nhẹ và công trình quy mô: tường thành, máy công thành, nông nghiệp, luyện kim, ma pháp hỗ trợ hậu cần và phòng thủ; bao trùm lên đó là lớp giao diện hệ thống của game Sáng Thế (Cờ Khai Phá, bảng lãnh địa, Bảng Xếp Hạng).",
+    "conflictMedium": "Chiến tranh tổ chức quy mô: công thành, bao vây, cắt tiếp tế, chiến tranh tiêu hao và thao túng kinh tế, song song với ngoại giao và liên minh. Cố Vân thắng bằng hậu cần và mưu lược, KHÔNG bằng MC một mình vung kiếm gánh cả đội.",
+    "forbiddenElements": [
+      "MC đến từ một thế giới khác bước vào (gốc gác MC phải là cư dân bản địa Aetheria)",
+      "MC mang ký ức từ một kiếp khác hoặc một nơi khác",
+      "tu luyện cảnh giới / võ công solo kiểu tiên hiệp làm tuyến chính",
+      "MC một mình cân cả đạo quân bằng vũ lực cá nhân thay cho chiến tranh tổ chức",
+      "gore khoái cảm, bạo lực phô trương để giật gân"
+    ]
+  },
+  "factions": [
+    {
+      "name": "Công Hội Vân Lãnh",
+      "type": "công hội của nhân vật chính",
+      "power_level": 4,
+      "summary": "Tổ chức do Cố Vân lập nên từ tiền đồn biên thuỳ, dựa trên quản trị tài nguyên, hậu cần và ngoại giao; quy tụ cư dân bản địa và người chơi ngưỡng mộ tầm nhìn của anh.",
+      "territory": "Khởi từ tiền đồn Vân Lãnh vùng biên, mở rộng dần thành thành bang đa lãnh địa",
+      "mc_relation": "MC là hội trưởng và nhà chiến lược trung tâm",
+      "conflicts": ["Đại Công Hội Thiết Huyết", "Thương Hội Kim Hà"],
+      "alliances": ["Lãnh địa Trác Thành"],
+      "importance": 10,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Thương Hội Kim Hà",
+      "type": "thương hội thao túng tài nguyên",
+      "power_level": 6,
+      "summary": "Thương hội kỳ cựu chuyên độc quyền tuyến tài nguyên vùng biên, ép giá và phong toả những lãnh địa mới nổi để giữ thế độc tôn kinh tế.",
+      "territory": "Kiểm soát các tuyến thương mại chính vùng biên",
+      "mc_relation": "Đối thủ kinh tế đầu tiên của Cố Vân",
+      "conflicts": ["Công Hội Vân Lãnh"],
+      "alliances": [],
+      "importance": 7,
+      "introduce_arc": 2
+    },
+    {
+      "name": "Đại Công Hội Thiết Huyết",
+      "type": "đại công hội quân sự kỳ cựu",
+      "power_level": 8,
+      "summary": "Một trong các đại công hội mạnh nhất server, kiêu ngạo và sùng bái vũ lực số đông; hội trưởng Hạ Vô Cương coi thường mọi thế lực nhỏ và muốn nuốt chửng vùng biên.",
+      "territory": "Nhiều lãnh thổ màu mỡ trung tâm server",
+      "mc_relation": "Đối thủ quân sự lớn đầu tiên rồi kình địch xuyên truyện",
+      "conflicts": ["Công Hội Vân Lãnh"],
+      "alliances": ["Liên quân đại công hội (giữa truyện)"],
+      "importance": 8,
+      "introduce_arc": 3
+    },
+    {
+      "name": "Thế Lực Tầng Nền Aetheria",
+      "type": "thực thể/trí tuệ nắm luật vận hành sâu nhất của thế giới",
+      "power_level": 10,
+      "summary": "Quyền lực ẩn đứng sau cách Aetheria vận hành và lý do một số cư dân bản địa được trao năng lực vượt thường; là bí ẩn trung tâm và đối thủ tối hậu, đối đầu bằng chiến lược và lựa chọn chứ không bằng vũ lực.",
+      "territory": "Tầng luật nền và di tích của những kẻ kiến tạo",
+      "mc_relation": "Bí ẩn tối hậu và đối thủ cuối, quyết định số phận cả đại lục",
+      "conflicts": ["Công Hội Vân Lãnh"],
+      "alliances": [],
+      "importance": 9,
+      "introduce_arc": 6
+    }
+  ],
+  "plot_twists": [
+    {
+      "summary": "Một đồng minh thân tín trong liên minh vùng biên thực ra là gián điệp được một đại công hội cài vào, đã âm thầm tuồn dữ liệu lãnh địa của Vân Lãnh cho địch suốt nhiều arc.",
+      "payoff_type": "phản bội nội bộ",
+      "setup_chapters": [240, 470],
+      "twist_chapter": 540,
+      "reader_impact": "major",
+      "arc_number": 4
+    },
+    {
+      "summary": "Vỉa muối và mạch nước ngầm của lãnh địa khởi điểm không phải tài nguyên ngẫu nhiên — chúng nằm trên một di tích của những kẻ kiến tạo Aetheria, lý do thật khiến mảnh đất 'chết' lại có Nhãn Lãnh Chủ phản ứng mạnh.",
+      "payoff_type": "nguồn gốc địa điểm",
+      "setup_chapters": [20, 360],
+      "twist_chapter": 760,
+      "reader_impact": "major",
+      "arc_number": 6
+    },
+    {
+      "summary": "Thiên phú Nhãn Lãnh Chủ của Cố Vân không phải may mắn ngẫu nhiên — nó là một 'quyền đọc' tầng dữ liệu nền mà thế lực kiến tạo Aetheria cố ý gieo vào một số cư dân, nghĩa là anh được chọn để định hình lại thế giới.",
+      "payoff_type": "nguồn gốc golden finger",
+      "setup_chapters": [120, 750, 840],
+      "twist_chapter": 860,
+      "reader_impact": "cosmic",
+      "arc_number": 6
+    }
+  ],
+  "themes": [
+    {
+      "name": "Trí tuệ thắng cường quyền",
+      "type": "main",
+      "description": "Một kẻ tay trắng dùng đầu óc quản trị và chiến thuật đánh bại những thế lực nắm sẵn tài nguyên và số đông.",
+      "motifs": ["bãi đất chết hoá trù phú", "đạo quân đông vỡ trận trước thành nhỏ", "nước cờ đặt trước bung ra"],
+      "importance": 10
+    },
+    {
+      "name": "Hậu cần và ngoại giao là sức mạnh",
+      "type": "main",
+      "description": "Chiến thắng đến từ kho lương đầy hơn, đường tiếp tế khôn hơn và hiệp ước sắc hơn, chứ không từ thanh kiếm mạnh nhất.",
+      "motifs": ["cắt đường tiếp tế địch", "thao túng giá tài nguyên", "ký hiệp ước đúng lúc"],
+      "importance": 9
+    },
+    {
+      "name": "Tầm nhìn dài hạn thắng lòng tham trước mắt",
+      "type": "supporting",
+      "description": "Cố Vân chọn đầu tư vào nền móng và liên minh bền vững trong khi đối thủ chạy theo lợi ích chớp nhoáng, và thời gian chứng minh ai đúng.",
+      "motifs": ["đầu tư nền móng thay vì cướp nhanh", "giữ chữ tín với đồng minh"],
+      "importance": 8
+    },
+    {
+      "name": "Dám mơ lớn giữa nơi bị coi thường",
+      "type": "supporting",
+      "description": "Giá trị của một người không nằm ở điểm xuất phát mà ở tầm nhìn và ý chí biến điều bất khả thành hiện thực.",
+      "motifs": ["lá cờ trên đất hoang", "lời tuyên bố bị cười nhạo thành hiện thực"],
+      "importance": 8
+    }
+  ],
+  "voice_anchors": [
+    {
+      "snippet_type": "opening",
+      "prose_text": "Mọi người chơi khác đổ về Bình Nguyên Vàng tranh nhau từng tấc đất màu mỡ, còn Cố Vân thì đứng một mình giữa bãi đất biên thuỳ mà bản đồ server đánh dấu là 'vùng chết'. Cỏ cháy, đá lởm chởm, xa tuyến thương mại nửa ngày đường. Một người chơi đi ngang ghé mắt, bật cười: 'Cắm cờ ở đây hả? Đất này nuôi nổi một con gà không đấy.' Cố Vân không đáp. Anh chỉ ngồi xuống, áp lòng bàn tay lên nền đất khô, và trong khoé mắt anh, một lớp dữ liệu mờ hiện lên — đường nước ngầm chạy ngầm dưới chân mười hai thước, một vỉa muối trắng ngủ yên dưới lớp đá, và một thế đèo hẹp phía bắc đủ để một trăm người chặn vạn quân. Nơi kẻ khác thấy đất chết, anh thấy một bàn cờ chưa ai khai cuộc. Anh rút lá Cờ Khai Phá ra, cắm nó xuống, và nói khẽ với chính mình: 'Ở đây sẽ là đế chế.'",
+      "key_traits": ["điềm tĩnh", "tầm nhìn chiến lược", "không bận tâm lời chê", "quyết đoán"]
+    },
+    {
+      "snippet_type": "dialogue",
+      "prose_text": "— Quân Thiết Huyết đông gấp tám lần ta. Mạnh Đồ đặt nắm tay đầy sẹo lên bàn cát. Đánh trực diện là chết. Cố Vân không rời mắt khỏi mô hình con đèo trên bàn cát. — Vậy thì ta không đánh trực diện. Anh chỉ vào điểm hẹp nhất của Hắc Phong. Chúng phải qua đây mới tới được thành. Một đạo quân tám nghìn người đi qua khe này mỗi lần chỉ lọt được hai mươi. Lương của chúng đủ cho sáu ngày hành quân, không hơn. Ta không cần thắng chúng, Mạnh Đồ. Ta chỉ cần làm chúng đói. Anh ngẩng lên, ánh mắt bình thản. Ngày thứ bảy, chúng sẽ tự rút. Và lúc đó, ta mới đánh.",
+      "key_traits": ["tư duy hậu cần", "lạnh lùng tính toán", "biến yếu thế thành lợi thế", "kiên nhẫn"]
+    },
+    {
+      "snippet_type": "action",
+      "prose_text": "Đạo quân Thiết Huyết tới chân thành đúng như Cố Vân đoán, và cũng đói đúng như anh tính. Sáu ngày bao vây, đường tiếp tế bị cắt sạch bởi những toán phục kích nhỏ trong rừng Hắc Phong, kho lương địch cạn dần trong khi trên tường thành Vân Lãnh, khói bếp vẫn lên đều đặn ba bữa mỗi ngày — một sự khiêu khích lặng lẽ và tàn nhẫn. Cố Vân đứng trên vọng lâu, nhìn xuống đạo quân đang rệu rã, không một lần ra lệnh xông ra. Khi lá cờ Thiết Huyết bắt đầu lui về phía bắc trong hỗn loạn, Mạnh Đồ mới thở phào, còn Lý Tố Tố thì lắc đầu cười: 'Ngài chẳng tốn một mũi tên nào.' Cố Vân chỉ khẽ gật. 'Chiến tranh không bắt đầu khi đao chạm đao. Nó bắt đầu từ ngày ta chọn mảnh đất này.'",
+      "key_traits": ["thắng bằng hậu cần", "kiên nhẫn chiến lược", "tự tin điềm đạm", "tầm nhìn dài hạn"]
+    }
+  ],
+  "foreshadowing": [
+    {
+      "hintText": "Lần đầu Nhãn Lãnh Chủ quét qua vỉa muối dưới lãnh địa khởi điểm, lớp dữ liệu rung lên mạnh bất thường, mạnh hơn nhiều so với bất kỳ mỏ tài nguyên nào khác Cố Vân từng khảo sát — anh chỉ thoáng ngạc nhiên rồi bỏ qua.",
+      "category": "environmental",
+      "plantCh": 20,
+      "pickupCh": 760,
+      "payoffDescription": "Mảnh đất khởi điểm nằm trên một di tích của những kẻ kiến tạo Aetheria, lý do thật khiến Nhãn Lãnh Chủ phản ứng mạnh và mảnh đất 'chết' lại đặc biệt."
+    },
+    {
+      "hintText": "Một thương nhân già ở chợ phiên lẩm bẩm rằng 'không phải ai sinh ra ở Aetheria cũng nhìn đất giống nhau đâu, cậu nhỏ', rồi lảng đi không giải thích.",
+      "category": "dialogue",
+      "plantCh": 48,
+      "pickupCh": 780,
+      "payoffDescription": "Hé lộ tồn tại nhiều cư dân bản địa khác mang năng lực bí ẩn như Cố Vân, manh mối về tầng dữ liệu nền của thế giới."
+    },
+    {
+      "hintText": "Một đồng minh vùng biên luôn nhiệt tình hỏi han chi tiết bố phòng và kho tài nguyên của Vân Lãnh, viện cớ 'để phối hợp tốt hơn', nhưng chưa bao giờ chia sẻ ngược lại thông tin của mình.",
+      "category": "character_behavior",
+      "plantCh": 240,
+      "pickupCh": 540,
+      "payoffDescription": "Đồng minh đó là gián điệp của một đại công hội, đã tuồn dữ liệu lãnh địa của Vân Lãnh cho địch suốt nhiều arc."
+    }
+  ]
+}

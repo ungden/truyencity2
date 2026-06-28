@@ -1,0 +1,119 @@
+{
+  "premise": "Hàn Tiêu, một tản tu hạng bét bản địa Vân Mộng Giới chọn con đường cẩu đạo trường sinh, phát hiện trong cơ thể mình ẩn chứa một mảnh Linh Điền — một khoảnh ruộng linh khí dồi dào, có suối linh tuyền và thời gian trôi nhanh, nơi anh có thể trồng linh dược, nuôi linh thú, ủ linh tửu với chất lượng cao bất thường. Lấy việc canh tác linh điền và tích lũy bền bỉ làm gốc, anh thong dong kiếm sống, củng cố nền tảng tu luyện vững như bàn thạch, lặng lẽ vượt qua những kẻ ép cảnh giới rồi chết yểu, hóa giải êm đẹp những kẻ tham lam dòm ngó vườn nhà, từng bước mở rộng Linh Điền thành cả một tiểu thế giới điền viên và bất giác tích lũy thành đại năng trường sinh.",
+  "mainConflict": "Một kẻ chọn lối sống chậm, ôn hòa và kín đáo phải bảo vệ con đường thong dong của mình trước một thế giới tu tiên vẫn còn tham lam và tranh đoạt. Xung đột chủ yếu ở quy mô nhỏ và đời thường — giữ kín bí mật Linh Điền, đối phó thương nhân gian xảo và tu sĩ ngạo mạn, né tránh thế lực lớn dòm ngó — leo thang chậm rãi tới việc bảo vệ cả một cõi điền viên trước một thế lực cổ xưa muốn đoạt di sản. Hàn Tiêu giải quyết bằng trí khôn nhà nông, sự kiên nhẫn, kín đáo và mưu kế khiến kẻ tham tự sa lầy; chiến đấu chỉ là phương án cuối và luôn hạn chế đổ máu.",
+  "themes": [
+    "Sống chậm, sống lâu, sống vui — kẻ kiên nhẫn mới là kẻ cười sau cùng",
+    "Nền tảng vững và sự bền bỉ thắng lối ép cảnh giới vội vã",
+    "Niềm vui mãn nguyện từ gieo trồng, vun đắp và tự cung tự cấp",
+    "Ẩn mình và không tranh giành cũng là một loại trí tuệ và sức mạnh"
+  ],
+  "majorPlotPoints": [
+    "Ch.1: Hàn Tiêu, tản tu nghèo ở thôn Vân Khê, phát hiện mảnh Linh Điền ẩn trong người và gieo gói hạt giống linh dược đầu tiên.",
+    "Arc 1: Học cách canh tác, hiểu linh tính cây và cơ chế thời gian trong ruộng, ổn định sinh kế bằng đặc sản tự trồng, xác lập nguyên tắc sống kín đáo thong dong.",
+    "Arc 2-3: Mở rộng Linh Điền, đa dạng cây trồng và linh thú, kết giao bạn hiền, đột phá Trúc Cơ với nền tảng hoàn mỹ trong khi kẻ ép cảnh giới lần lượt vấp ngã.",
+    "Giữa truyện: Khám phá Linh Điền là mảnh vỡ của một di sản điền viên cổ xưa; ruộng mở thành một tiểu thế giới, và một thế lực cổ từng nắm di sản tìm tới.",
+    "Cao trào cuối: Đột phá Nguyên Anh rồi Hóa Thần, bảo vệ cõi điền viên trước thế lực cổ xưa, và chứng minh con đường gieo trồng thong dong cũng dẫn tới trường sinh đại đạo."
+  ],
+  "setupKernel": {
+    "readerFantasy": "Cảm giác thư giãn, ấm áp và mãn nguyện khi theo dõi một người tự cung tự cấp xây dựng một cõi điền viên trong mơ: gieo một hạt giống và nhìn nó nở thành linh dược quý, nuôi lớn những con linh thú đáng yêu, ủ một vò linh tửu thơm lừng, bán đặc sản được giá hời, và lặng lẽ giàu lên, mạnh lên, sống lâu hơn tất cả mà không cần đổ máu giành giật — niềm vui của việc thấy thành quả lớn dần theo từng mùa gặt.",
+    "protagonistEngine": "Hàn Tiêu thắng nhờ sự kiên nhẫn đến đáng sợ, hiểu biết sâu về linh tính cây trồng và linh thú, óc kinh doanh tỉnh táo và một triết lý sống rõ ràng: không tranh đoạt, ẩn mình, tích lũy bền bỉ. Tính cách điềm đạm, lạc quan, có chút hài hước nhà nông, hào sảng với người tử tế nhưng tinh ranh trước kẻ tham; khi buộc phải đối đầu thì dùng mưu và địa lợi chứ không thích bạo lực phô trương.",
+    "pleasureLoop": [
+      "Hàn Tiêu gieo một loại linh dược / nuôi một linh thú mới trong Linh Điền → chăm bón, học linh tính của nó (setup ấm áp, tò mò).",
+      "Cây/thú lớn nhanh nhờ thời gian và linh khí dồi dào trong ruộng → cho ra thành quả chất lượng cao bất thường (mùa gặt mãn nguyện).",
+      "Anh mang đặc sản xuống phường thị, đổi chác hoặc bán được giá hời mà giấu kín nguồn gốc → thu về linh thạch và tài nguyên, làm giàu thong dong (harvest + lời lãi).",
+      "Một kẻ tham lam hoặc ngạo mạn dòm ngó vườn nhà / khinh thường anh → Hàn Tiêu dùng trí khôn và sự kín đáo khiến kẻ ấy tự vấp lòng tham của mình (kẻ tham tự chuốc họa, sảng nhẹ nhàng).",
+      "Nền tảng tu luyện hoàn mỹ nhờ tài nguyên Linh Điền → anh đột phá êm ả trong khi kẻ ép cảnh giới vấp ngã, lặng lẽ vượt người (vượt người trong âm thầm).",
+      "Linh Điền mở rộng / hé lộ một bí mật mới về nguồn gốc → cảm giác cõi điền viên ngày càng phong phú và sâu sắc hơn (revelation ấm áp)."
+    ],
+    "systemMechanic": {
+      "name": "Linh Điền Tại Thân — Mảnh Ruộng Trong Người",
+      "input": "Hàn Tiêu đưa hạt giống / linh thú con / nguyên liệu vào mảnh Linh Điền ẩn trong cơ thể, rồi bỏ công gieo trồng, chăm bón, điều hòa thời tiết linh khí và hiểu đúng linh tính của từng loài; cần thời gian, công sức và tri thức làm vườn tích lũy.",
+      "output": "Linh dược, linh thực, linh tửu, linh thú nội đan và vật liệu nuôi trong ruộng có chất lượng cao bất thường và lớn nhanh hơn bên ngoài nhờ linh khí dồi dào và thời gian trôi nhanh trong Linh Điền.",
+      "limit": "Anti-plot-armor cứng: Linh Điền là một CÁI RUỘNG, KHÔNG phải vũ khí — nó không đánh nhau thay anh, không ban sức mạnh tức thời, không cho cảnh giới miễn phí. Gieo gì gặt nấy: phải có hạt giống/giống thú thật mới trồng được; trồng sai linh tính thì cây chết hoặc biến chất; ruộng cần thời gian thực để ra thành quả, không có chuyện tức thì. Quy mô ruộng và tốc độ thời gian bị giới hạn theo tu vi của anh, chỉ mở rộng khi anh thật sự tiến cảnh giới. Anh vẫn phải tự tu luyện, tự suy tính kinh doanh, tự đấu trí với kẻ tham — Linh Điền chỉ cho nguyên liệu tốt, không cho thắng lợi.",
+      "reward": "Sinh kế dư dả và bền vững, tài nguyên tu luyện hảo hạng cho nền tảng hoàn mỹ, thọ nguyên dài nhờ tu chậm mà chắc, và một cõi điền viên ngày càng phong phú — phần thưởng luôn là kết quả của kiên nhẫn và hiểu biết, không phải sức mạnh trời cho."
+    },
+    "mcOrigin": "native",
+    "originLockNote": "Hàn Tiêu là người bản địa Vân Mộng Giới, một tản tu sinh ra và lớn lên ngay trong thế giới tu tiên này; anh không mang ký ức của ai khác và không đến từ nơi nào bên ngoài Vân Mộng Giới. Linh Điền là một cơ duyên bẩm sinh IN-WORLD trong cơ thể anh, mọi tri thức làm vườn đều do anh tự học và đúc kết qua năm tháng canh tác.",
+    "mcSecret": {
+      "secret": "Hàn Tiêu sở hữu một mảnh Linh Điền ẩn trong cơ thể — một khoảnh ruộng linh khí có thể trồng linh dược, nuôi linh thú và ủ linh tửu với chất lượng cao bất thường.",
+      "outsideWorldKnowledge": "Bí mật này hoàn toàn IN-WORLD: bản chất, nguồn gốc và giới hạn thật của Linh Điền (mảnh vỡ của một di sản điền viên cổ xưa) là điều chính Hàn Tiêu cũng phải dần khám phá, không phải tri thức từ bất kỳ nơi nào ngoài Vân Mộng Giới.",
+      "revealRule": "Giấu kín tuyệt đối với người ngoài ở các arc đầu; chỉ hé lộ cho một hai người bạn tử tế bậc nhất ở giữa truyện khi đã đủ tin tưởng; nguồn gốc di sản điền viên chỉ reveal đầy đủ ở các volume cuối.",
+      "coverStory": "Anh giải thích đặc sản chất lượng cao của mình bằng 'một mảnh ruộng linh điền bí mật thừa kế ở vùng núi xa' và 'tay nghề trồng trọt gia truyền', che giấu việc ruộng nằm ngay trong cơ thể mình."
+    },
+    "benefitLoop": {
+      "goal": "Sống thong dong, trường sinh và mãn nguyện: xây một cõi điền viên tự cung tự cấp, củng cố nền tảng tu luyện vững chắc và tích lũy bền bỉ thành đại năng mà không cần tranh đoạt.",
+      "action": "Gieo trồng và nuôi dưỡng trong Linh Điền, học linh tính từng loài, mang đặc sản đi đổi chác/bán giấu nguồn gốc, dùng linh dược của ruộng để rửa tủy luyện nền, và đối phó kẻ tham bằng trí khôn và sự kín đáo.",
+      "benefit": "Một mùa gặt linh dược/linh tửu/linh thực chất lượng cao, một khoản linh thạch và tài nguyên, nền tảng tu vi vững thêm một bậc, và Linh Điền mở rộng phong phú hơn.",
+      "cadence": "Mỗi 1-2 chương có ít nhất một vòng trồng-trọt-được-thưởng (một mùa gặt mãn nguyện, một vụ đổi chác có lời, hoặc một lần khiến kẻ tham tự vấp); mỗi 3-5 chương một bước nhảy lớn (Linh Điền mở rộng, đột phá cảnh giới êm ả, hoặc hé lộ một bí mật mới về ruộng)."
+    },
+    "interventionRule": "Hàn Tiêu chỉ ra tay can thiệp khi (a) bí mật Linh Điền hoặc cõi điền viên của anh bị đe dọa trực tiếp, hoặc (b) khi một người bạn tử tế anh trân quý gặp khó mà anh có thể giúp bằng linh dược hay mưu kế, hoặc (c) khi một kẻ tham lam chủ động lấn tới ép anh. Anh tuyệt đối KHÔNG đi 'hành hiệp trượng nghĩa' khắp nơi, KHÔNG khoe của khoe tài, KHÔNG gây hấn trước; anh ưu tiên giữ kín, né tránh và sống yên, dùng trí khôn để hóa giải, chỉ đối đầu trực diện khi không còn đường lùi — và khi đó thì dùng mưu cùng địa lợi chứ không hiếu sát.",
+    "phase1Playground": {
+      "locations": [
+        "Thôn Vân Khê — làng tu tiên nhỏ nơi Hàn Tiêu sống, ruộng đồng và rừng linh quanh thôn",
+        "Linh Điền bên trong cơ thể — khoảnh ruộng linh khí với suối linh tuyền, nơi anh gieo trồng và nuôi thú",
+        "Phường thị Thanh Khê — chợ tu tiên gần nhất, nơi anh bán đặc sản và mua hạt giống",
+        "Linh dược cốc hoang ngoài thôn — nơi anh tìm hạt giống dại và linh thú con để mang về ruộng"
+      ],
+      "cast": [
+        "Hàn Tiêu (tản tu nghèo, MC, chủ Linh Điền và lão nông tiên thong dong)",
+        "Tiểu Lục (con linh thú đầu tiên Hàn Tiêu nuôi trong ruộng, lanh lợi, trợ thủ chăm vườn)",
+        "Tô Vãn Nương (nữ luyện đan sư chính trực ở phường thị, trở thành bạn hợp tác và tri kỷ sớm)",
+        "Lão Trương (lão nông tu tiên già giàu kinh nghiệm ở thôn, chỉ dạy Hàn Tiêu chuyện đời và nghề nông tiên)",
+        "Tiền Đại Phúc (thương nhân gian xảo chuyên ép giá và dò nguồn hàng lạ — local antagonist đời thường)"
+      ],
+      "resources": [
+        "Linh Điền Tại Thân — mảnh ruộng trong người",
+        "Gói hạt giống linh dược và con linh thú đầu tiên",
+        "Quan hệ chớm nở với Tô Vãn Nương và lão Trương",
+        "Vốn linh thạch và uy tín kín đáo từ việc bán đặc sản"
+      ],
+      "localAntagonists": [
+        "Tiền Đại Phúc — thương nhân gian xảo nhiều lần ép giá và dò xét nguồn gốc đặc sản của Hàn Tiêu, bị anh dắt mũi bằng chính lòng tham",
+        "Một tản tu ngạo mạn cùng vùng nghi Hàn Tiêu có bí mật và rình mò vườn, cuối cùng tự rước họa vì hấp tấp"
+      ],
+      "repeatableSceneTypes": [
+        "Gieo trồng / nuôi một loài mới trong Linh Điền và học linh tính của nó",
+        "Một mùa gặt linh dược/linh tửu/linh thực chất lượng cao gây mãn nguyện",
+        "Mang đặc sản xuống phường thị, đổi chác hoặc bán được giá hời mà giấu nguồn gốc",
+        "Khiến một kẻ tham lam hoặc ngạo mạn tự vấp lòng tham bằng trí khôn và sự kín đáo",
+        "Đoạn tu luyện thong dong và đời sống điền viên ấm áp: chăm thú, ủ tửu, trò chuyện với bạn hiền"
+      ]
+    },
+    "socialReactor": {
+      "witnesses": [
+        "Dân thôn Vân Khê và lão nông tu tiên quanh vùng",
+        "Thương nhân và khách sành ở phường thị Thanh Khê",
+        "Tô Vãn Nương và mạng lưới bạn hợp tác ôn hòa",
+        "Các thế lực lớn tinh mắt khi đặc sản của Hàn Tiêu nổi tiếng kín trong giới"
+      ],
+      "reactionModes": [
+        "Trầm trồ và tò mò trước đặc sản linh dược/linh tửu chất lượng lạ thường, đoán già đoán non về nguồn gốc",
+        "Quý mến và tìm tới hợp tác của những người tử tế; tiếng lành đồn kín về 'lão nông có hàng độc'",
+        "Thèm muốn và dò xét của thương nhân gian xảo cùng tu sĩ tham lam muốn độc quyền hoặc đoạt bí mật",
+        "Thế lực lớn lặng lẽ để mắt khi đặc sản và sự bí ẩn của Hàn Tiêu vượt khỏi quy mô thôn dã"
+      ],
+      "reportBackCadence": "Phản ứng tức thì của người mua và hàng xóm trong mỗi chương; tiếng đồn lan trong giới và động thái của các thế lực lớn dồn lại mỗi 3-5 chương sau mỗi mùa gặt hoặc vụ đổi chác đáng chú ý."
+    },
+    "noveltyLadder": [
+      { "chapterRange": "1-130", "newToy": "Phát hiện Linh Điền, học canh tác linh dược cơ bản và nuôi linh thú đầu tiên, ổn định sinh kế ở thôn Vân Khê", "keepsSameLane": "Vẫn là trồng trọt-nuôi thú-đổi chác thong dong, lấy mãn nguyện làm cốt lõi" },
+      { "chapterRange": "131-430", "newToy": "Mở rộng vườn dược, ủ linh tửu, kết bạn hiền, đột phá Trúc Cơ với nền tảng hoàn mỹ", "keepsSameLane": "Vẫn là cẩu đạo trường sinh + canh tác, chỉ nhiều cây-thú hơn và cảnh giới nhích lên" },
+      { "chapterRange": "431-580", "newToy": "Vào phường thị lớn, săn hạt giống quý qua đấu giá, ngưng Kim Đan thong dong giữa nơi đông người", "keepsSameLane": "Vẫn cùng lane trồng trọt-kinh doanh-ẩn mình, chỉ đổi sân khấu sang nơi sầm uất hơn" },
+      { "chapterRange": "581-730", "newToy": "Linh Điền hé lộ là mảnh vỡ di sản cổ, mở rộng thành một tiểu thế giới điền viên", "keepsSameLane": "Vẫn là vun đắp cõi điền viên của riêng mình, nâng lên tầm một tiểu thế giới" },
+      { "chapterRange": "731-1000", "newToy": "Lên Nguyên Anh rồi Hóa Thần, bảo vệ cõi điền viên, đúc kết 'đạo trồng trọt' và thong dong thành tiên", "keepsSameLane": "Vẫn là con đường gieo trồng-trường sinh thong dong, chỉ ở quy mô và cảnh giới đỉnh cao" }
+    ],
+    "controlRules": {
+      "payoffCadence": "Tối thiểu 2 cao điểm dopamine mỗi chương (một mùa gặt/vụ đổi chác mãn nguyện + một lần khiến kẻ tham tự vấp hoặc một bước tiến tu luyện êm ả); cao điểm đầu xuất hiện trước nửa chương; setup không quá 30% và phải có payoff trong cùng hoặc chương kế. Cadence thiên về ấm áp mãn nguyện hơn là căng thẳng sinh tử.",
+      "attentionGradient": "Mở chương bằng một vụ trồng trọt mới, một cơ hội đổi chác, hoặc một kẻ tham lam ló mặt; đóng chương bằng một mùa gặt thỏa mãn, một mẻ thành quả bất ngờ, hoặc một manh mối ấm áp về bí mật Linh Điền.",
+      "openThreadsPerArc": 3,
+      "closeThreadsPerArc": 2
+    },
+    "patternCards": [
+      "warm-baseline-opening",
+      "cozy-farming-harvest",
+      "slow-and-steady-wins",
+      "hide-the-treasure",
+      "greedy-fool-self-sabotage",
+      "outlast-the-hasty"
+    ]
+  }
+}

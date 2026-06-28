@@ -1,0 +1,100 @@
+{
+  "title": "Tinh Hạm Quật Khởi: Ta Là Kỹ Sư Văn Minh",
+  "totalChapters": 1000,
+  "mainPlotline": "Lục Thần, kỹ sư bản địa của hành tinh Thương Khung được Hệ Thống Văn Minh ban tặng, đi từ một xưởng cơ khí 300m² sắp phá sản đến kiến trúc sư trưởng của một nền văn minh tinh vân, đánh bại tài phiệt độc quyền Liên Hiệp Thiết Phủ và quỹ tư bản đứng sau bằng trí tuệ, sáng chế và năng lực kiến tạo — rồi dẫn cả chủng tộc bước ra giữa các vì sao và đối mặt di sản Liên Minh Văn Minh Cổ.",
+  "originLock": "system-bestowed — MC là kỹ sư bản địa sinh ra trên hành tinh Thương Khung trong vũ trụ nguyên bản; tri thức do Hệ Thống (di sản in-world của Liên Minh Văn Minh Cổ) ban tặng; tuyệt đối không có yếu tố mang nguồn gốc từ nơi khác hay ký ức đời trước.",
+  "volumes": [
+    {
+      "volume": 1,
+      "title": "Xưởng Cơ Khí Lật Ngược",
+      "chapterRange": "1-130",
+      "theme": "Sống sót và lật ngược xưởng ven cảng",
+      "summary": "Xưởng Thần Lô sắp phá sản thì Hệ Thống kích hoạt. Lục Thần chinh phục từng đơn hàng khó, hóa giải đòn ép bằng sáng chế của tổ hợp Liên Hiệp Thiết Phủ đối diện do Mặc Hàn quản lý, biến xưởng vắng thành nơi được giới kỹ thuật săn đón.",
+      "subArcs": [
+        { "name": "Bản vẽ đầu tiên", "chapterRange": "1-30", "focus": "Hệ Thống kích hoạt, thiết kế đầu tiên cứu một đơn hàng tưởng đã mất, ổn định xưởng." },
+        { "name": "Đòn ép sáng chế", "chapterRange": "31-65", "focus": "Thiết Phủ ép bằng sáng chế và giành đơn; Lục Thần phản công bằng sáng chế thật và chất lượng." },
+        { "name": "Bị bác bằng sáng chế", "chapterRange": "66-100", "focus": "Thẩm định bị mua chuộc bác đơn; sự thật được lật lại nhờ một màn trình diễn kỹ thuật công khai." },
+        { "name": "Xưởng được săn đón", "chapterRange": "101-130", "focus": "Đơn hàng dồn dập, Diệp Tô gia nhập, đặt nền cho việc lập tập đoàn." }
+      ],
+      "keyMilestone": "Xưởng Thần Lô từ bờ vực phá sản thành xưởng chế tạo uy tín nhất khu công nghiệp Hắc Diêm."
+    },
+    {
+      "volume": 2,
+      "title": "Tập Đoàn Chế Tạo",
+      "chapterRange": "131-280",
+      "theme": "Mở rộng và giữ chuẩn chất lượng",
+      "summary": "Lục Thần lập tập đoàn chế tạo, đối mặt thách thức nhân bản chất lượng và quản lý đội ngũ kỹ sư, trong khi Thiết Phủ leo thang cạnh tranh ở cấp công nghiệp hành tinh.",
+      "subArcs": [
+        { "name": "Nhà máy mới", "chapterRange": "131-180", "focus": "Xây nhà máy, chuẩn hóa quy trình, đào tạo kỹ sư theo cây kỹ thuật mới." },
+        { "name": "Bài toán nhân tài", "chapterRange": "181-230", "focus": "Thu hút và giữ kỹ sư giỏi, xây văn hóa sáng tạo, xử lý khủng hoảng vận hành." },
+        { "name": "Đối đầu công nghiệp", "chapterRange": "231-280", "focus": "Thiết Phủ tung chiến dịch độc quyền lớn; Lục Thần phản công bằng công nghệ vượt trội và cộng đồng kỹ sư." }
+      ],
+      "keyMilestone": "Tập đoàn của Lục Thần trở thành thế lực chế tạo hàng đầu hành tinh, dẫn đầu các tiêu chuẩn kỹ thuật."
+    },
+    {
+      "volume": 3,
+      "title": "Liên Minh Kỹ Sư",
+      "chapterRange": "281-430",
+      "theme": "Người nhỏ liên kết lại",
+      "summary": "Lục Thần tập hợp các xưởng nhỏ và kỹ sư độc lập thành Liên Minh Kỹ Sư để cùng chia sẻ tri thức, đàm phán nguồn vật liệu và chống lại thế độc quyền của Thiết Phủ.",
+      "subArcs": [
+        { "name": "Hạt giống liên minh", "chapterRange": "281-330", "focus": "Thuyết phục các chủ xưởng nhỏ, xây nguyên tắc chia sẻ sáng chế chung." },
+        { "name": "Sức mạnh tập thể", "chapterRange": "331-380", "focus": "Đàm phán nguồn vật liệu và tinh thạch, mở thư viện bản vẽ mở cho liên minh." },
+        { "name": "Phản đòn của tài phiệt", "chapterRange": "381-430", "focus": "Thiết Phủ chèn ép nguồn cung; liên minh phản công bằng đoàn kết và đột phá vật liệu mới." }
+      ],
+      "keyMilestone": "Liên Minh Kỹ Sư đủ mạnh để định hình hướng đi công nghệ của cả hành tinh, ngang hàng tài phiệt cũ."
+    },
+    {
+      "volume": 4,
+      "title": "Vươn Khỏi Khí Quyển",
+      "chapterRange": "431-580",
+      "theme": "Giữ lý tưởng khi cám dỗ lớn dần",
+      "summary": "Quỹ tư bản đứng sau Thiết Phủ đề nghị thâu tóm tập đoàn của Lục Thần với cái giá khổng lồ. Anh từ chối, phản công bằng cách hoàn thiện động cơ phản trọng lực và đưa chủng tộc Thương Khung lên bậc liên hành tinh.",
+      "subArcs": [
+        { "name": "Lời đề nghị thâu tóm", "chapterRange": "431-480", "focus": "Áp lực và cám dỗ của quỹ tư bản, quyết định giữ độc lập và lý tưởng." },
+        { "name": "Động cơ phản trọng lực", "chapterRange": "481-530", "focus": "Đột phá động cơ phản trọng lực, phóng phi thuyền liên hành tinh đầu tiên." },
+        { "name": "Định cư mặt trăng", "chapterRange": "531-580", "focus": "Khai thác vành đai tiểu hành tinh, lập căn cứ mặt trăng đầu tiên của Thương Khung." }
+      ],
+      "keyMilestone": "Văn minh Thương Khung chính thức bước lên bậc liên hành tinh, độc lập khỏi thế độc quyền cũ."
+    },
+    {
+      "volume": 5,
+      "title": "Tinh Hạm Đầu Tiên",
+      "chapterRange": "581-730",
+      "theme": "Kiến tạo ở quy mô tinh vực",
+      "summary": "Lục Thần đóng tinh hạm liên sao đầu tiên; chủng tộc Thương Khung tiến ra Tinh Vực Liệt Hỏa, lần đầu chạm mặt các văn minh ngoài hành tinh — vừa cơ hội, vừa hiểm họa.",
+      "subArcs": [
+        { "name": "Động cơ cong vênh", "chapterRange": "581-630", "focus": "Đột phá động cơ cong vênh không gian, hạ thủy tinh hạm đầu tiên." },
+        { "name": "Tiếp xúc đầu tiên", "chapterRange": "631-680", "focus": "Chạm mặt văn minh ngoài hành tinh, đàm phán và xung đột phòng vệ đầu tiên." },
+        { "name": "Hải chiến Liệt Hỏa", "chapterRange": "681-730", "focus": "Phòng vệ chủng tộc trước một hạm đội thù địch bằng công nghệ và chiến thuật vượt trội." }
+      ],
+      "keyMilestone": "Thương Khung có hạm đội liên sao và chỗ đứng đầu tiên trong Tinh Vực Liệt Hỏa."
+    },
+    {
+      "volume": 6,
+      "title": "Đại Dương Sao Trời",
+      "chapterRange": "731-880",
+      "theme": "Văn minh vươn ra liên sao",
+      "summary": "Lục Thần dẫn dắt văn minh Thương Khung mở rộng giữa các hệ sao, xây liên minh tinh vực với các chủng tộc đồng minh và đối đầu một đế chế công nghệ bá quyền.",
+      "subArcs": [
+        { "name": "Liên minh tinh vực", "chapterRange": "731-780", "focus": "Kết liên minh với các văn minh đồng minh, chia sẻ và bảo vệ công nghệ." },
+        { "name": "Đế chế bá quyền", "chapterRange": "781-830", "focus": "Đối đầu một đế chế công nghệ muốn nô dịch các văn minh non trẻ." },
+        { "name": "Kiến trúc văn minh", "chapterRange": "831-880", "focus": "Xây các kết cấu vĩ mô và chuỗi cung ứng năng lượng sao bền vững." }
+      ],
+      "keyMilestone": "Văn minh Thương Khung trở thành một thế lực được tôn trọng trên bản đồ Tinh Vực Liệt Hỏa."
+    },
+    {
+      "volume": 7,
+      "title": "Di Sản Văn Minh Cổ",
+      "chapterRange": "881-1000",
+      "theme": "Hé lộ nguồn gốc và bậc tinh vân",
+      "summary": "Nguồn gốc Hệ Thống và Liên Minh Văn Minh Cổ được hé lộ. Lục Thần dẫn cả văn minh lên bậc tinh vân, đối mặt mối đe dọa từng hủy diệt liên minh xưa, và khép lại hành trình bằng việc trao lại tri thức cho thế hệ kế cận.",
+      "subArcs": [
+        { "name": "Manh mối Văn Minh Cổ", "chapterRange": "881-930", "focus": "Lần theo di sản của Liên Minh Văn Minh Cổ đã sụp đổ và kẻ hủy diệt nó." },
+        { "name": "Bậc tinh vân", "chapterRange": "931-980", "focus": "Đưa văn minh lên bậc tinh vân, đối mặt mối đe dọa cổ xưa." },
+        { "name": "Trao lại ngọn lửa", "chapterRange": "981-1000", "focus": "Đào tạo thế hệ kỹ sư kế cận, khép lại bằng một bản vẽ truyền nhân." }
+      ],
+      "keyMilestone": "Văn minh Thương Khung bước lên bậc tinh vân; Lục Thần thành kiến trúc sư và người truyền lửa của cả một nền văn minh."
+    }
+  ]
+}

@@ -1,0 +1,198 @@
+{
+  "power_system": {
+    "name": "Tinh Hà Hệ Thống — Bản Đồ Kịch Bản",
+    "type": "self-actualization system ability (năng lực tỏa sáng bằng thực lực và tự định giá trị, KHÔNG phải sức mạnh ban phát)",
+    "coreResource": "Chỉ Số Tự Ngã — mức độ Mạnh Tử Vi sống đúng là chính mình thay vì khuôn mẫu làm nền; hệ thống chỉ mở quyền hạn khi cô vươn lên bằng thực lực đường hoàng, khóa bớt khi cô dùng tiểu xảo bẩn hoặc biến mình thành kẻ bắt nạt mới",
+    "unlockRule": "Mỗi nhiệm vụ hệ thống cấp một thân phận bị an bài làm nền và bản kịch bản; quyền hạn (đọc Chỉ Số Tự Ngã, hé lộ manh mối kịch bản) mở dần theo Độ Lệch Kịch Bản cô đạt được bằng tài năng và bản lĩnh thực tế, không phải bằng cướp hào quang của ai.",
+    "antiPlotArmor": [
+      "Hệ thống KHÔNG cho cướp hào quang nữ chính hay phá hoại người khác để leo lên — chỉ thực lực thật mới lật được vai làm nền.",
+      "KHÔNG trao sẵn sức mạnh nhảy cóc; mỗi thân phận khởi điểm thật sự yếu thế (bị khinh, nghèo, mang tiếng xấu) và cô phải gây dựng lại từ đúng giới hạn đó.",
+      "Tỏa sáng bằng tiểu xảo bẩn, hãm hại hay mạo nhận công lao của người khác làm hệ thống trừng phạt và kịch bản kéo cô về lại vũng bùn.",
+      "Cô không bất khả chiến bại; kiến thức cụ thể về kịch bản chỉ hé lộ dần, buộc cô tự đọc vị tình thế trong từng thân phận yếu thế.",
+      "Nếu cô kiêu ngạo coi thường người yếu và biến mình thành kẻ bắt nạt mới, hệ thống khóa bớt quyền hạn — đại nữ chủ không phải bạo chúa."
+    ],
+    "signatureBuff": {
+      "name": "Bản Lĩnh Cốt Lõi",
+      "effect": "Qua mỗi thế giới được lật kèo, Mạnh Tử Vi tích lũy khả năng đọc vị tình thế và vươn lên nhanh, sắc hơn ở thế giới kế, nhận ra nút thắt kịch bản và cách lật ngược sớm hơn.",
+      "limit": "Chỉ giúp đọc vị nhanh hơn, không thay được công sức gây dựng lại từ thân phận yếu thế; với những kịch bản bị Kẻ Áp Khuôn siết chặt, bản lĩnh cốt lõi chỉ là điểm khởi đầu."
+    },
+    "progressionAxes": [
+      "Độ dày bản lĩnh cốt lõi (đọc vị tình thế và vươn lên sắc bén hơn theo thời gian)",
+      "Chỉ Số Tự Ngã và quyền hạn được mở khi cô sống đúng là chính mình",
+      "Hiểu biết về cơ chế áp khuôn số phận của Kẻ Áp Khuôn và cách phá vỡ nó"
+    ],
+    "powerCeilingByPhase": {
+      "phase1": "Lật được một vai làm nền đơn lẻ trong một thế giới với định kiến rõ ràng (phế vật, bình hoa, tiểu thư phá sản)",
+      "phase2": "Lật vai làm nền trong tình thế phức tạp hơn và nhận ra dấu chữ ký chung giữa các kịch bản",
+      "phase3": "Hiểu sự thật về hệ thống và Kẻ Áp Khuôn, lật ngược kịch bản bị siết khuôn",
+      "phase4": "Lật kèo quy mô lớn và đập bỏ chính cơ chế ép người làm nền"
+    }
+  },
+  "worldbuilding": {
+    "tone": "Rực rỡ, sảng khoái và đầy khí chất: kiêu hãnh mà chính trực, mỗi nhiệm vụ là một sân khấu cô bước lên với cái đầu ngẩng cao và buộc kẻ ngạo mạn phải nuốt lời bằng thực lực thật.",
+    "structure": "Modular episodic: mỗi thế giới kịch bản là một 'quyển' trọn vẹn ~30-50 chương với thân phận làm nền, bối cảnh, kẻ ngạo mạn riêng; giữa các nhiệm vụ là chương Tinh Hà Đình ngắn. Thân phận và bối cảnh đổi mỗi quyển; lõi tỏa sáng bằng thực lực và tuyến bí ẩn nền xuyên suốt.",
+    "economy": "Mỗi thế giới có nền kinh tế riêng theo thể loại của nó; với ký chủ, 'tiền tệ' thật sự là Chỉ Số Tự Ngã (tăng = sống đúng mình), Độ Lệch Kịch Bản và bản lĩnh cốt lõi tích lũy.",
+    "setting": "Vô số thế giới câu chuyện khác nhau (tu tiên, đế quốc tinh tế, giải trí hiện đại, cung đình, học viện pháp thuật...) được nối bởi Tinh Hà Hệ Thống và Tinh Hà Đình — một đài quan sát tĩnh lặng giữa các thế giới.",
+    "geography": {
+      "phase1": "Tông môn tu tiên Thanh Loan (Volume 1) và Tinh Hà Đình giữa các nhiệm vụ",
+      "phase2": "Các thế giới đế quốc tinh tế, giải trí hiện đại, cung đình với bối cảnh đặc trưng riêng",
+      "phase3": "Thế giới học viện pháp thuật + tầng nền của hệ thống nơi lộ ra Kẻ Áp Khuôn",
+      "phase4": "Cội nguồn của luật chơi số phận — nơi diễn ra cuộc lật đổ cuối"
+    },
+    "techLevel": "Thay đổi theo từng thế giới: tu tiên có pháp thuật cảnh giới, đế quốc tinh tế có khoa huyễn liên hành tinh, giải trí hiện đại đô thị, cung đình phong kiến, học viện pháp thuật dị giới — nhưng năng lực cốt lõi của MC luôn là thực lực, đầu óc và khí chất tự định giá trị, không lệ thuộc đặc quyền hay hào quang ban phát.",
+    "conflictMedium": "Lật vai làm nền bằng thực lực và sự đường hoàng: đọc vị tình thế, vươn lên bằng tài năng và bản lĩnh, đáp trả kẻ ngạo mạn công khai minh bạch, lật ngược nút thắt kịch bản vào khoảnh khắc quyết định — KHÔNG bằng tiểu xảo bẩn, hãm hại hay mạo nhận công lao người khác; mọi 'chiến thắng' là một vai làm nền được lật thành nhân vật chính.",
+    "forbiddenElements": [
+      "MC cướp hào quang nữ chính, hãm hại hay mạo nhận công lao của người khác để leo lên",
+      "MC được trao sẵn sức mạnh nhảy cóc thay cho gây dựng lại từ thân phận yếu thế bằng thực lực",
+      "MC là ký chủ xuyên vào từng thế giới (không phải người bản địa, không mang ký ức một đời sống trước trong cùng thế giới đó)",
+      "biến đại nữ chủ thành bạo chúa coi thường người yếu thay vì giữ chính trực",
+      "thắng bằng tiểu xảo bẩn hoặc bôi nhọ đối thủ thay vì thực lực thuần túy"
+    ]
+  },
+  "factions": [
+    {
+      "name": "Mạnh Tử Vi (ký chủ)",
+      "type": "nhân vật chính",
+      "power_level": 4,
+      "summary": "Ký chủ Tinh Hà Hệ Thống, xuyên qua các thế giới lật vai làm nền bằng thực lực và khí chất tự định giá trị; sức mạnh nằm ở tài năng, bản lĩnh và sự đường hoàng chứ không phải hào quang ban phát.",
+      "territory": "Di chuyển qua các thế giới kịch bản, có 'cứ điểm' là Tinh Hà Đình",
+      "mc_relation": "Là MC",
+      "conflicts": ["Kẻ Áp Khuôn Số Phận"],
+      "alliances": ["Những người từng được cô khơi dậy bản lĩnh", "Tinh Hà Hệ Thống (phức tạp)"],
+      "importance": 10,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Tinh Hà Hệ Thống",
+      "type": "thực thể trí tuệ dẫn nhiệm vụ",
+      "power_level": 8,
+      "summary": "Mạng lưới trí tuệ cổ xưa quản lý vô số kịch bản số mệnh, dẫn dắt và cấp nhiệm vụ cho ký chủ; biết nhiều hơn nó nói và có nghị trình riêng chưa rõ.",
+      "territory": "Tinh Hà Đình và tầng nền giữa các thế giới",
+      "mc_relation": "Vừa là mentor vừa là ẩn số MC dần phải dè chừng",
+      "conflicts": [],
+      "alliances": ["Mạnh Tử Vi (phức tạp)"],
+      "importance": 9,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Phong Trào Không Ai Chỉ Là Nền",
+      "type": "tập hợp đồng minh từ các thế giới",
+      "power_level": 7,
+      "summary": "Những người từng bị kịch bản định làm nền mà Mạnh Tử Vi khơi dậy bản lĩnh, về sau quay lại tiếp sức cô khi cuộc đối đầu lớn nổ ra — khí chất tự định giá trị lan tỏa thành lực lượng.",
+      "territory": "Trải khắp các thế giới đã được lật kèo",
+      "mc_relation": "Đồng minh trung thành ở giai đoạn cuối",
+      "conflicts": ["Kẻ Áp Khuôn Số Phận"],
+      "alliances": ["Mạnh Tử Vi"],
+      "importance": 8,
+      "introduce_arc": 7
+    },
+    {
+      "name": "Kẻ Áp Khuôn Số Phận",
+      "type": "thực thể đứng sau cơ chế làm nền",
+      "power_level": 10,
+      "summary": "Thế lực vô hình cố ý áp khuôn số phận, ép vô số con người thành quân tốt thí để nuôi một thứ hào quang hoàn hảo giả tạo; vốn cũng từng là một vai nền bị nghiền nát đến mức tin rằng thế giới phải có kẻ làm nền, là phản diện tối hậu của truyện.",
+      "territory": "Trung tâm guồng máy áp khuôn — cội nguồn của luật chơi số phận",
+      "mc_relation": "Phản diện tối hậu, đối đầu rồi cuối cùng bị cô lật đổ cả cơ chế",
+      "conflicts": ["Mạnh Tử Vi", "Phong Trào Không Ai Chỉ Là Nền"],
+      "alliances": [],
+      "importance": 9,
+      "introduce_arc": 6
+    }
+  ],
+  "plot_twists": [
+    {
+      "summary": "Hào quang của các 'nữ chính vận mệnh/thiên kim hoàn hảo' không tự nhiên mà bị một thế lực vô hình cố ý khuếch đại, đồng thời ép những thân phận quanh họ vào vai làm nền để tôn lên.",
+      "payoff_type": "cơ chế ẩn",
+      "setup_chapters": [40, 90],
+      "twist_chapter": 140,
+      "reader_impact": "major",
+      "arc_number": 3
+    },
+    {
+      "summary": "Tinh Hà Hệ Thống không hoàn toàn trung lập — nó biết về Kẻ Áp Khuôn và vai trò bị giấu của Mạnh Tử Vi từ đầu, nhưng cố tình giấu để cô tự bước vào câu chuyện lớn.",
+      "payoff_type": "phản bội/giấu sự thật",
+      "setup_chapters": [260, 400],
+      "twist_chapter": 490,
+      "reader_impact": "major",
+      "arc_number": 6
+    },
+    {
+      "summary": "Kẻ Áp Khuôn Số Phận chính là một vai nền đầu tiên — một con người từng bị nghiền nát thành nền tuyệt đối mà không ai từng cho cơ hội làm nhân vật chính; nó áp khuôn khắp các thế giới vì tin rằng thế giới buộc phải có kẻ làm nền.",
+      "payoff_type": "nguồn gốc phản diện",
+      "setup_chapters": [560, 720, 880],
+      "twist_chapter": 940,
+      "reader_impact": "cosmic",
+      "arc_number": 9
+    }
+  ],
+  "themes": [
+    {
+      "name": "Không ai sinh ra chỉ để làm nền",
+      "type": "main",
+      "description": "Số phận hay xếp sẵn vai — nữ chính được nâng niu, vô số kẻ bị đẩy làm nền — nhưng không một ai sinh ra chỉ để tôn người khác lên; đời mình, mình mới là nhân vật chính.",
+      "motifs": ["xé toạc một kịch bản định sẵn", "đứng dậy giữa rừng định kiến", "cái đầu ngẩng cao"],
+      "importance": 10
+    },
+    {
+      "name": "Hào quang thật đến từ thực lực",
+      "type": "main",
+      "description": "Mạnh Tử Vi không cần ai ban cho hào quang và không cướp của ai; cô tự thắp sáng đời mình bằng tài năng và bản lĩnh, phơi bày sự rỗng tuếch của hào quang vay mượn.",
+      "motifs": ["để khán giả tự chọn ai là ngôi sao", "kẻ ngạo mạn nuốt lời", "tự thắp sáng đời mình"],
+      "importance": 9
+    },
+    {
+      "name": "Tự định nghĩa giá trị bản thân",
+      "type": "supporting",
+      "description": "Chiến thắng lớn nhất không phải đè bẹp ai mà là khẳng định giá trị của chính mình giữa một thế gian đầy định kiến và khuôn mẫu định sẵn.",
+      "motifs": ["Chỉ Số Tự Ngã tăng", "sống đúng là chính mình", "viết lại kịch bản theo cách của mình"],
+      "importance": 8
+    },
+    {
+      "name": "Đại nữ chủ không phải bạo chúa",
+      "type": "supporting",
+      "description": "Kiêu hãnh mà chính trực: cô lật kẻ ngạo mạn nhưng không trở thành kẻ bắt nạt mới, không coi thường người yếu, giữ sự đường hoàng làm cốt lõi.",
+      "motifs": ["thắng mà không bẩn tay", "đường hoàng giữa quyền mưu", "trao lại quyền làm nhân vật chính"],
+      "importance": 8
+    }
+  ],
+  "voice_anchors": [
+    {
+      "snippet_type": "opening",
+      "prose_text": "Mạnh Tử Vi mở mắt ra trong thân thể một nữ đệ tử mười sáu tuổi đang quỳ giữa Luyện Võ Trường, đầu gối tê dại trên nền đá lạnh, xung quanh là những tiếng cười khẩy. Trong đầu cô, dòng kịch bản lặng lẽ hiện lên: Mạnh Tử Vi, phế vật không một tia linh căn, ba tháng nữa sẽ bị gả thay cho một lão nhân sắp chết để đổi lấy tài nguyên cho 'nữ chính vận mệnh' Tiêu Vận Nhi, rồi bị bỏ rơi không một ai nhớ tên. Cô từ từ đứng dậy, phủi sạch lớp bụi trên đầu gối, sống lưng thẳng lại. Một đệ tử bĩu môi: 'Phế vật cũng đòi đứng à?' Mạnh Tử Vi ngẩng đầu, ánh mắt bình thản quét qua cả sân. Kịch bản viết cô sinh ra để làm nền. Nhưng kịch bản chưa từng hỏi ý cô. — Ta quỳ đủ rồi, cô nói, giọng không lớn mà cả sân lặng đi. Từ hôm nay, ai muốn ta làm nền, cứ thử xem.",
+      "key_traits": ["kiêu hãnh", "bình thản", "khí chất", "không khuất phục"]
+    },
+    {
+      "snippet_type": "dialogue",
+      "prose_text": "Tiêu Vận Nhi cười nhạt, ngón tay lướt qua chuôi kiếm khảm ngọc. — Tỷ tỷ khuyên muội một câu, có những người sinh ra đã đứng dưới ánh sáng, có những người chỉ hợp làm cái bóng dưới chân. Muội an phận làm cái bóng đi, tỷ sẽ cho muội một chỗ tử tế. Mạnh Tử Vi nhìn ả, khóe môi nhếch lên một nụ cười không hề chạm tới mắt. — Tỷ nói đúng một nửa. Có người đứng dưới ánh sáng, có người làm cái bóng. Cô bước lên một bước, ngang hàng. — Nhưng cái ánh sáng của tỷ là người ta thắp hộ. Còn ta, ta tự đốt. Tỷ thử đứng cạnh ta giữa ban ngày mà xem, ai mới là cái bóng.",
+      "key_traits": ["sắc sảo", "tự tin", "đối đáp đường hoàng", "không nao núng"]
+    },
+    {
+      "snippet_type": "action",
+      "prose_text": "Đại Hội Tông Môn, đúng giây kịch bản định cô bị hạ nhục công khai để tôn Tiêu Vận Nhi lên. Trưởng lão Thẩm cao giọng: 'Phế vật không linh căn thì lấy gì mà tranh?' Cả đài quan võ cười rộ. Mạnh Tử Vi không có một tia linh căn — đúng như kịch bản. Nhưng suốt ba tháng, cô đã luyện ra một con đường chưa ai trong Thanh Loan dám nghĩ tới: dẫn linh khí trời đất qua chính thân thể phàm tục, không cần linh căn làm trung gian. Cô bước ra giữa đài, không mượn pháp khí của ai, không cướp công của ai. Một hơi thở. Linh khí cả sân chấn động hội tụ về tay cô, kết thành một đóa sen lửa cháy rực giữa thanh thiên bạch nhật. Tiếng cười tắt ngấm. — Ai vừa nói ta lấy gì mà tranh? Cô hỏi, giọng vang khắp đài. Đây. Ta lấy chính mình mà tranh.",
+      "key_traits": ["thực lực thật", "tỏa sáng công khai", "lật ngược định kiến", "không tiểu xảo"]
+    }
+  ],
+  "foreshadowing": [
+    {
+      "hintText": "Khi nhiệm vụ đầu hoàn tất, hệ thống lướt qua một dòng dữ liệu lạ: hào quang của 'nữ chính vận mệnh' Tiêu Vận Nhi lẽ ra chỉ ở mức bình thường, nhưng có một 'nguồn ngoài' từng cố bơm nó cao bất thường — rồi dòng đó biến mất trước khi Mạnh Tử Vi kịp đọc kỹ.",
+      "category": "event",
+      "plantCh": 38,
+      "pickupCh": 140,
+      "payoffDescription": "Đó là dấu hiệu đầu tiên của Kẻ Áp Khuôn cố ý khuếch đại hào quang giả và áp khuôn vai làm nền ở mọi thế giới."
+    },
+    {
+      "hintText": "Mỗi khi Mạnh Tử Vi hỏi hệ thống vì sao chính cô — một ký chủ dám phá khuôn — lại được chọn, hệ thống đều im lặng một nhịp lâu hơn bình thường rồi lảng sang chuyện khác.",
+      "category": "dialogue",
+      "plantCh": 240,
+      "pickupCh": 490,
+      "payoffDescription": "Hệ thống biết về vai trò bị giấu của cô trong guồng máy Kẻ Áp Khuôn ngay từ đầu nhưng cố tình che giấu."
+    },
+    {
+      "hintText": "Ở mỗi thế giới, ngay trước nút thắt kịch bản định dìm cô, Mạnh Tử Vi luôn thoáng cảm thấy một sự cam chịu xa lạ không thuộc về mình — như thể có ai đó khác cũng từng đứng đúng chỗ này mà tin rằng mình buộc phải làm nền.",
+      "category": "environmental",
+      "plantCh": 200,
+      "pickupCh": 940,
+      "payoffDescription": "Sự cam chịu ấy là của chính Kẻ Áp Khuôn — một vai nền đầu tiên bị nghiền nát đến mức tin rằng thế giới phải có kẻ làm nền."
+    }
+  ]
+}

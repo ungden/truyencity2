@@ -1,0 +1,197 @@
+{
+  "power_system": {
+    "name": "Lợi Thế Nhận Thức — Nhãn Đọc Quy Tắc",
+    "type": "cognitive-perception ability (năng lực nhận thức/giải mã, KHÔNG phải võ lực)",
+    "coreResource": "Sự tỉnh táo và lý trí của Diệp Tranh — nhãn chỉ hoạt động khi đầu óc anh bình tĩnh, không hoảng loạn, không kiệt sức",
+    "unlockRule": "Nhãn tự kích hoạt khi anh đọc một bộ quy tắc thành văn trong phó bản; không cần học, nhưng độ chính xác và tốc độ tăng dần khi anh tích lũy 'mẫu lừa' của Người Viết qua từng phó bản.",
+    "antiPlotArmor": [
+      "Nhãn CHỈ làm dòng quy tắc giả ánh xám lệch nhịp — KHÔNG nói dòng nào phải làm, KHÔNG cho biết hành động đúng, KHÔNG tự cứu MC.",
+      "MC vẫn phải tự suy luận toàn bộ; suy luận sai sau khi đã thấy gợi ý vẫn dẫn tới cái chết.",
+      "Nhãn mờ đi hoặc tắt khi MC hoảng loạn, kiệt sức, bị thương, hoặc khi quy tắc không ở dạng văn bản (truyền miệng, ám hiệu, hình ảnh).",
+      "Phó bản cao cấp có dòng giả ngụy trang khiến sắc xám rất mờ, đòi hỏi suy luận thuần lý chứ không dựa được vào nhãn."
+    ],
+    "signatureBuff": {
+      "name": "Đọc Vết Mực",
+      "effect": "Khi tập trung cao độ, Diệp Tranh nhận ra các dòng giả trong nhiều phó bản mang cùng một 'nét tay' — gợi ý chúng do một Người Viết duy nhất tạo ra, giúp anh đoán trước kiểu lừa.",
+      "limit": "Chỉ là gợi ý mẫu, không phải đáp án; càng gần nguồn quy tắc càng bị ngụy trang chống lại chính khả năng này."
+    },
+    "progressionAxes": [
+      "Độ sắc của nhãn (nhận ra dòng giả tinh vi hơn theo thời gian)",
+      "Kho 'mẫu lừa' đã kiểm chứng (sổ tay quy tắc của MC)",
+      "Khả năng suy luận thuần lý khi nhãn vô hiệu (đối chiếu mâu thuẫn, đọc hiện trường)"
+    ],
+    "powerCeilingByPhase": {
+      "phase1": "Đọc được dòng giả lộ liễu trong một phó bản đơn (tòa nhà, bệnh viện, ga tàu)",
+      "phase2": "Đọc được dòng giả ngụy trang và nhận ra phó bản chia sẻ chữ ký chung",
+      "phase3": "Giải được quy tắc tự viết lại và phó bản lồng nhau, lần ra dấu của Người Viết",
+      "phase4": "Hiểu cách quy tắc được tạo ra ở cấp meta và viết lại được luật chơi"
+    }
+  },
+  "worldbuilding": {
+    "tone": "Kinh dị đời thường uncanny-valley: lạnh sống lưng, tỉnh táo, căng thẳng từ tốn; nỗi sợ đến từ sự bình thường bị bẻ cong một chút và từ việc không biết dòng chữ nào đang nói dối.",
+    "economy": "Kinh tế ngầm của giới sống sót: quy tắc đã kiểm chứng, bản đồ quy tắc, thứ hạng người chơi và vật phẩm mang ra từ phó bản là 'tiền tệ'; thế giới đời thực vẫn dùng tiền bình thường.",
+    "setting": "Một thành phố Việt Nam hiện đại năm 2024, bề ngoài hoàn toàn bình thường, nhưng rải rác các 'phó bản quái đàm' — không gian đời thường (chung cư, bệnh viện, ga tàu, siêu thị, khách sạn) bị một bộ luật lệ phi nhân chiếm lấy và biến dị.",
+    "geography": {
+      "phase1": "Tòa chung cư Mười Hai Tầng, bệnh viện Phúc An, ga tàu điện ngầm tuyến cuối và khu phố đời thực quanh đó",
+      "phase2": "Mạng lưới phó bản khắp thành phố do Hội Biên Mục lập bản đồ",
+      "phase3": "Các phó bản gần 'nguồn' với cấu trúc lồng nhau và quy tắc tự viết lại",
+      "phase4": "Không gian của Người Viết Quy Tắc — tầng nền nơi mọi luật lệ được sinh ra"
+    },
+    "techLevel": "Hiện đại 2024: điện thoại, mạng xã hội, camera, thẻ từ, hệ thống thang máy và tàu điện — nhưng trong phó bản, công nghệ thường trục trặc hoặc phản bội đúng lúc, buộc người chơi dựa vào quan sát và lý trí.",
+    "conflictMedium": "Sinh tồn qua suy luận và tuân thủ quy tắc (NON-combat): đọc hiểu bộ quy tắc, đối chiếu mâu thuẫn, quan sát hiện trường, phân biệt thật/giả, vạch trần bẫy và làm đúng vào giây cận tử — không bao giờ bằng đánh nhau.",
+    "forbiddenElements": [
+      "đánh nhau tay đôi/ẩu đả như nguồn giải quyết xung đột chính",
+      "gore khoái cảm, bạo lực phô trương để giật gân",
+      "xuyên không / xuyên việt",
+      "trọng sinh / ký ức đời trước",
+      "tu luyện / cảnh giới / võ công",
+      "MC tham gia giải đấu chiến đấu làm tuyến chính"
+    ]
+  },
+  "factions": [
+    {
+      "name": "Diệp Tranh và nhóm sống sót",
+      "type": "nhóm nhân vật chính",
+      "power_level": 4,
+      "summary": "Diệp Tranh cùng Lâm Tịch, ông Bảy và những người anh cứu, dựa vào lý trí và sổ tay quy tắc kiểm chứng để sống sót.",
+      "territory": "Di chuyển theo các phó bản, có 'cứ điểm' đời thực là căn hộ của Diệp Tranh",
+      "mc_relation": "MC là trung tâm và người dẫn dắt",
+      "conflicts": ["Phe Thu Hoạch trong Hội Biên Mục", "Người Viết Quy Tắc"],
+      "alliances": ["Hội Biên Mục (phe chính trực)"],
+      "importance": 10,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Hội Biên Mục",
+      "type": "tổ chức ngầm của người sống sót",
+      "power_level": 7,
+      "summary": "Mạng lưới người sống sót chuyên chép lại quy tắc đã kiểm chứng, bán bản đồ quy tắc và xếp hạng người chơi; nội bộ chia phe chính trực và phe trục lợi.",
+      "territory": "Toàn thành phố, hoạt động trong bóng tối",
+      "mc_relation": "Vừa là đồng minh vừa là nơi MC phải dè chừng",
+      "conflicts": ["Phe Thu Hoạch"],
+      "alliances": ["Diệp Tranh và nhóm sống sót"],
+      "importance": 8,
+      "introduce_arc": 3
+    },
+    {
+      "name": "Phe Thu Hoạch",
+      "type": "phe trục lợi trong Hội Biên Mục",
+      "power_level": 8,
+      "summary": "Một phe lén lút đẩy người mới vào phó bản chưa kiểm chứng làm 'máy đọc quy tắc', thu thập luật lệ rồi bỏ mặc họ chết để trục lợi.",
+      "territory": "Ẩn trong cơ cấu Hội Biên Mục",
+      "mc_relation": "Đối thủ trực tiếp giữa truyện",
+      "conflicts": ["Diệp Tranh và nhóm sống sót", "Hội Biên Mục (phe chính trực)"],
+      "alliances": [],
+      "importance": 8,
+      "introduce_arc": 4
+    },
+    {
+      "name": "Người Viết Quy Tắc",
+      "type": "thực thể/trí tuệ đứng sau toàn bộ quái đàm",
+      "power_level": 10,
+      "summary": "Tác giả ẩn danh của mọi bộ quy tắc trong thành phố; gài cửa tử vào đời thường và dường như cố ý chọn Diệp Tranh; động cơ là bí ẩn trung tâm của truyện.",
+      "territory": "Tầng nền nơi mọi luật lệ được sinh ra",
+      "mc_relation": "Phản diện tối hậu, đối đầu bằng đấu trí chứ không bằng vũ lực",
+      "conflicts": ["Diệp Tranh và nhóm sống sót"],
+      "alliances": [],
+      "importance": 9,
+      "introduce_arc": 5
+    }
+  ],
+  "plot_twists": [
+    {
+      "summary": "Một số 'người sống sót' mà Diệp Tranh tin tưởng thật ra là thực thể của phó bản đội lốt người, được tạo ra để dụ anh tuân theo dòng quy tắc giả.",
+      "payoff_type": "danh tính ẩn",
+      "setup_chapters": [40, 180],
+      "twist_chapter": 250,
+      "reader_impact": "major",
+      "arc_number": 2
+    },
+    {
+      "summary": "Hội Biên Mục không phải tổ chức cứu người thuần túy — một phần được lập ra để 'thu hoạch' quy tắc từ những người mới bị đẩy vào phó bản, biến nạn nhân thành công cụ.",
+      "payoff_type": "phản bội tổ chức",
+      "setup_chapters": [300, 430],
+      "twist_chapter": 540,
+      "reader_impact": "major",
+      "arc_number": 4
+    },
+    {
+      "summary": "Lợi thế nhận thức của Diệp Tranh không phải may mắn ngẫu nhiên — nó là 'nét bút' của chính Người Viết, nghĩa là anh được chọn vì anh có thể đọc được tác phẩm của họ; thành phố bị gài cửa tử như một bản thảo đang được viết dở.",
+      "payoff_type": "nguồn gốc golden finger",
+      "setup_chapters": [120, 690, 810],
+      "twist_chapter": 860,
+      "reader_impact": "cosmic",
+      "arc_number": 6
+    }
+  ],
+  "themes": [
+    {
+      "name": "Lý trí là vũ khí sinh tồn",
+      "type": "main",
+      "description": "Trong một thế giới mà sức mạnh thể chất vô dụng, sự bình tĩnh, quan sát và suy luận mới là thứ giữ mạng người.",
+      "motifs": ["đọc lại bộ quy tắc lần thứ ba", "ghi chép vào sổ tay", "đối chiếu hai dòng mâu thuẫn"],
+      "importance": 10
+    },
+    {
+      "name": "Niềm tin mù quáng giết người",
+      "type": "main",
+      "description": "Kẻ tuân thủ quy tắc một cách giáo điều, không chịu nghi ngờ, chết nhanh hơn kẻ dám đặt câu hỏi.",
+      "motifs": ["Trịnh Khôi khăng khăng làm theo dòng giả", "cái giá rợn người giáng xuống kẻ ngoan ngoãn"],
+      "importance": 9
+    },
+    {
+      "name": "Giữ nhân tính khi sinh tồn",
+      "type": "supporting",
+      "description": "Sống sót đòi hỏi sự lạnh lùng, nhưng Diệp Tranh vẫn chọn cứu người khi còn cách, và mang theo gánh nặng của những người anh không cứu được.",
+      "motifs": ["chìa tay cho người sắp phạm quy tắc", "day dứt sau mỗi phó bản"],
+      "importance": 8
+    },
+    {
+      "name": "Sự thật nằm trong mâu thuẫn",
+      "type": "supporting",
+      "description": "Mọi đáp án đều ẩn trong chỗ các quy tắc tự mâu thuẫn nhau; ai chịu nhìn vào khe hở ấy sẽ thấy lối ra và cả gương mặt kẻ viết.",
+      "motifs": ["khe hở giữa dòng 3 và dòng 7", "vết mực chưa khô", "chữ ký lặp lại"],
+      "importance": 8
+    }
+  ],
+  "voice_anchors": [
+    {
+      "snippet_type": "opening",
+      "prose_text": "Thang máy lẽ ra phải dừng ở tầng tám. Diệp Tranh chắc chắn mình đã bấm số tám. Nhưng cái màn hình đỏ phía trên cửa nhảy lên con số mười hai — một tầng mà tòa nhà này không có, vì anh đã ở đây bốn năm và biết rõ nó chỉ cao mười một tầng. Cửa trượt mở, không một tiếng động. Hành lang trước mặt dài hun hút, đèn huỳnh quang nhấp nháy đều đặn như đang đếm nhịp thở của ai đó. Trên bức tường ngay cạnh thang máy, dán một tờ giấy ố vàng, mép cong lại vì ẩm. Anh không bước ra vội. Anh đứng yên trong lồng thang máy, đọc từng dòng một, vì có thứ gì đó trong anh — một bản năng anh chưa từng biết mình có — đang mách rằng dòng chữ nào trên tờ giấy kia đang nói dối.",
+      "key_traits": ["điềm tĩnh", "quan sát kỹ", "không hoảng loạn", "lý trí dẫn đường"]
+    },
+    {
+      "snippet_type": "dialogue",
+      "prose_text": "— Quy tắc số bốn ghi rõ: nghe tiếng gõ cửa thì phải mở. Cậu định cãi cả quy tắc à? Trịnh Khôi gằn giọng, tay đã đặt lên nắm cửa. Diệp Tranh không cao giọng. — Anh đọc lại quy tắc số một đi. 'Sau nửa đêm, mọi cánh cửa ở tầng này đều không nên mở.' Hai dòng chống nhau. Một trong hai là giả. Và cái dòng bảo anh mở cửa — anh nhìn thẳng vào Trịnh Khôi — nó được viết để giết người tin nó. Anh nghe thấy tiếng gõ thứ tư chưa? Quy tắc thật chỉ nhắc tới ba tiếng.",
+      "key_traits": ["bình tĩnh đối chiếu mâu thuẫn", "không tranh cãi cảm tính", "thuyết phục bằng logic"]
+    },
+    {
+      "snippet_type": "action",
+      "prose_text": "Tiếng gõ thứ ba vừa dứt, căn phòng im đến mức Diệp Tranh nghe được nhịp tim của chính mình. Trong khóe mắt anh, dòng quy tắc số bốn vẫn ánh lên cái sắc xám nhợt nhạt ấy — lệch một nhịp, như mực in chưa kịp khô, như một lời nói dối được gài giữa những lời thật. Anh không cần biết sau cánh cửa là gì. Anh chỉ cần biết một điều: không mở. Anh đặt tay lên vai người phụ nữ đang run rẩy bên cạnh, kéo cô lùi lại hai bước, ra xa nắm cửa. Tiếng gõ thứ tư vang lên. Rồi thứ năm. Đều đặn. Kiên nhẫn. Và Diệp Tranh đứng yên, đếm từng tiếng, biết rằng cứ mỗi tiếng gõ không được đáp lại, mình lại sống thêm một giây.",
+      "key_traits": ["lạnh lùng giữa kinh hoàng", "bảo vệ người yếu hơn", "tin vào suy luận của mình"]
+    }
+  ],
+  "foreshadowing": [
+    {
+      "hintText": "Trên tờ giấy ố vàng đầu tiên, ở góc dưới cùng có một nét mực mảnh như chữ ký bị bôi đi — Diệp Tranh chỉ thoáng để ý rồi quên.",
+      "category": "object",
+      "plantCh": 5,
+      "pickupCh": 860,
+      "payoffDescription": "Nét mực ấy là chữ ký của Người Viết; nhãn của Diệp Tranh nhìn được nó vì anh đọc được chính nét bút đó — lý do anh được chọn."
+    },
+    {
+      "hintText": "Ông Bảy bảo vệ già lẩm bẩm rằng 'tòa nhà này không phải chỗ duy nhất có giấy dán tường lạ', rồi lảng đi không giải thích.",
+      "category": "dialogue",
+      "plantCh": 28,
+      "pickupCh": 280,
+      "payoffDescription": "Hé lộ các phó bản khắp thành phố chia sẻ cùng một nguồn và sự tồn tại của Hội Biên Mục cùng bản đồ quy tắc."
+    },
+    {
+      "hintText": "Một 'người sống sót' tốt bụng giúp đỡ nhóm lại không bao giờ tự tay chạm vào bất kỳ tờ quy tắc nào, dù luôn khuyên người khác làm theo.",
+      "category": "character_behavior",
+      "plantCh": 40,
+      "pickupCh": 250,
+      "payoffDescription": "Người đó là thực thể của phó bản đội lốt, không thể đọc quy tắc nên chỉ dụ người khác tuân theo dòng giả."
+    }
+  ]
+}

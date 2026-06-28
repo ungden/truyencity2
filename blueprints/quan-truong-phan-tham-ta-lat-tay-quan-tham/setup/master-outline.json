@@ -1,0 +1,100 @@
+{
+  "title": "Phản Tham Phong Bạo: Ta Lật Tẩy Quan Tham",
+  "totalChapters": 1000,
+  "mainPlotline": "Trình Khải, một cán bộ trẻ liêm chính người bản địa Châu Giang, được điều về vùng đất nơi tham nhũng giăng kín từ cấp xã lên tới cấp châu. Bằng chứng cứ, luật pháp, số liệu và bản lĩnh chính trị — tuyệt đối không bạo lực — anh từng bước lật tẩy các đường dây rút ruột công trình, đấu thầu khép kín và thao túng quy hoạch, lần lượt hạ gục Phe Cảng, Phe Đất và Phe Cũ, làm trong sạch bộ máy và thăng tiến từ chuyên viên lên người đứng đầu công cuộc làm sạch cả châu, để lại một thể chế minh bạch và bền vững.",
+  "originLock": "native — Trình Khải là người bản địa Châu Giang, một cán bộ trẻ bình thường sinh ra, lớn lên và trưởng thành trong chính thế giới truyện. Mọi năng lực của anh đều là sở học, sự rèn giũa nghiệp vụ và bản lĩnh tích lũy trong chính cuộc đời này; anh không có nguồn gốc đặc biệt nào, không mang tri thức hay ký ức từ bất kỳ nơi nào khác.",
+  "volumes": [
+    {
+      "volume": 1,
+      "title": "Người Mới Đến",
+      "chapterRange": "1-130",
+      "theme": "Phát hiện bất thường đầu tiên và sống sót giữa một phòng ban đã bị thao túng",
+      "summary": "Trình Khải nhận công tác tại một phòng ban cấp huyện ở Châu Giang, phát hiện biên bản nghiệm thu khống của một công trình nhỏ. Anh học cách thu thập chứng cứ kín kẽ, đối chiếu hồ sơ, và lật tẩy mắt xích đầu tiên mà không bị phản đòn — đặt nền cho con đường liêm chính.",
+      "subArcs": [
+        { "name": "Báo cáo đẹp quá mức", "chapterRange": "1-30", "focus": "Ngày đầu nhận việc, phát hiện số liệu nghiệm thu không khớp thực địa; ghi chép kín kẽ thay vì manh động." },
+        { "name": "Đối chiếu hồ sơ", "chapterRange": "31-65", "focus": "Lặng lẽ thu thập chứng từ, dòng tiền, biên bản; nhận ra một đường dây nhỏ rút ruột công trình thoát nước." },
+        { "name": "Đòn thử đầu tiên", "chapterRange": "66-100", "focus": "Bị đồng nghiệp thân tham nhũng thử thách và cô lập; Trình Khải dùng đúng quy trình để tự bảo vệ." },
+        { "name": "Mắt xích đầu", "chapterRange": "101-130", "focus": "Lật tẩy một cán bộ kỹ thuật khai khống khối lượng; thắng đầu tay củng cố uy tín và lọt vào tầm ngắm cấp trên." }
+      ],
+      "keyMilestone": "Trình Khải lật tẩy mắt xích tham nhũng đầu tiên bằng chứng cứ, đứng vững trong bộ máy và được chú ý như một cán bộ trẻ có năng lực."
+    },
+    {
+      "volume": 2,
+      "title": "Đường Dây Công Trình",
+      "chapterRange": "131-290",
+      "theme": "Từ một công trình lần ra cả hệ thống đấu thầu khép kín của Phe Cảng",
+      "summary": "Vụ nghiệm thu khống dẫn Trình Khải tới một mô thức rộng hơn: các gói thầu được dàn xếp, doanh nghiệp sân sau luân phiên trúng thầu. Anh tiếp cận khối kiểm toán, tìm đồng minh và bắt đầu chạm tới rìa Phe Cảng.",
+      "subArcs": [
+        { "name": "Gói thầu xoay vòng", "chapterRange": "131-185", "focus": "Phát hiện các doanh nghiệp sân sau luân phiên trúng thầu; lập bảng đối chiếu hồ sơ dự thầu." },
+        { "name": "Đồng minh kiểm toán", "chapterRange": "186-240", "focus": "Bắt tay một kiểm toán viên chính trực; cùng dựng bộ chứng cứ dòng tiền không thể chối cãi." },
+        { "name": "Rìa Phe Cảng", "chapterRange": "241-290", "focus": "Phơi bày một gói thầu logistics bị thổi giá; hạ một cấp phó liên quan, chạm tới rìa Phe Cảng." }
+      ],
+      "keyMilestone": "Trình Khải phá vỡ một mắt xích đấu thầu khép kín và lần đầu khiến Phe Cảng phải để mắt tới mình."
+    },
+    {
+      "volume": 3,
+      "title": "Quy Hoạch Và Đất",
+      "chapterRange": "291-450",
+      "theme": "Đối đầu Phe Đất quanh thu hồi và đấu giá đất",
+      "summary": "Được luân chuyển lên cấp châu phụ trách giám sát, Trình Khải đối mặt Phe Đất — nhóm thao túng quy hoạch, thu hồi đất giá rẻ rồi đấu giá lại. Anh dùng số liệu, đơn thư của dân và pháp lý đất đai để vạch trần, dù bị dựng chuyện bôi nhọ.",
+      "subArcs": [
+        { "name": "Mảnh đất giá rẻ", "chapterRange": "291-345", "focus": "Một khu đất bị thu hồi rẻ mạt rồi đấu giá cao; Trình Khải tiếp nhận đơn thư của dân và vào cuộc đúng thẩm quyền." },
+        { "name": "Bôi nhọ", "chapterRange": "346-400", "focus": "Phe Đất tung tin bôi nhọ và gài 'vi phạm quy trình'; anh hóa giải bằng minh bạch hồ sơ và quy trình chuẩn." },
+        { "name": "Lật bản đồ quy hoạch", "chapterRange": "401-450", "focus": "Phơi bày việc điều chỉnh quy hoạch trục lợi; hạ một nhân vật chủ chốt của Phe Đất bằng pháp lý đất đai." }
+      ],
+      "keyMilestone": "Trình Khải đánh sập một trụ cột của Phe Đất, trả lại quyền lợi cho dân và khẳng định vị thế ở cấp châu."
+    },
+    {
+      "volume": 4,
+      "title": "Ngân Sách Và Số Liệu",
+      "chapterRange": "451-610",
+      "theme": "Truy dòng tiền ngân sách và những báo cáo được làm đẹp",
+      "summary": "Trình Khải nhận thấy gốc rễ tham nhũng nằm ở cách phân bổ và quyết toán ngân sách. Anh xây dựng phương pháp giám sát bằng dữ liệu, lần ra các khoản chi khống và quỹ đen, đồng thời chống lại nỗ lực vô hiệu hóa khối thanh tra.",
+      "subArcs": [
+        { "name": "Chi khống", "chapterRange": "451-505", "focus": "Phát hiện các khoản chi không có đầu ra thực; xây dựng phương pháp đối chiếu dữ liệu liên ngành." },
+        { "name": "Quỹ đen", "chapterRange": "506-560", "focus": "Lần ra một quỹ đen nuôi các đường dây; truy dòng tiền qua nhiều lớp doanh nghiệp." },
+        { "name": "Giữ thanh kiếm", "chapterRange": "561-610", "focus": "Chống lại việc luân chuyển làm rỗng khối thanh tra; bảo vệ và củng cố lực lượng giám sát chính trực." }
+      ],
+      "keyMilestone": "Trình Khải thiết lập một cơ chế giám sát ngân sách bằng dữ liệu, bịt một lỗ hổng cấu trúc nuôi tham nhũng."
+    },
+    {
+      "volume": 5,
+      "title": "Phe Cũ",
+      "chapterRange": "611-770",
+      "theme": "Đối đầu thế lực lão làng bảo kê đằng sau",
+      "summary": "Phía sau Phe Cảng và Phe Đất là Phe Cũ — những cán bộ lão làng giữ ghế lâu năm, lấy ổn định làm khiên. Trình Khải phải đấu trí với những đối thủ tinh vi nhất, không để lại dấu vết, và học cách dùng cả thể chế lẫn dư luận đúng mực để lay chuyển họ.",
+      "subArcs": [
+        { "name": "Bức tường ổn định", "chapterRange": "611-665", "focus": "Phe Cũ ngăn cải cách bằng lý do 'giữ ổn định'; Trình Khải chứng minh minh bạch mới là ổn định bền vững." },
+        { "name": "Không dấu vết", "chapterRange": "666-720", "focus": "Đấu trí với một lão thần ăn chia phía sau, người không trực tiếp nhúng tay; lần theo quan hệ thông gia và đồng hương." },
+        { "name": "Lung lay nền cũ", "chapterRange": "721-770", "focus": "Phơi bày vai trò bảo kê của Phe Cũ; buộc một nhân vật trụ cột rút lui đúng pháp lý." }
+      ],
+      "keyMilestone": "Trình Khải làm lung lay nền tảng của Phe Cũ, phá vỡ thế 'bất khả xâm phạm' của các thế lực lâu năm."
+    },
+    {
+      "volume": 6,
+      "title": "Cơn Bão Lớn",
+      "chapterRange": "771-910",
+      "theme": "Tổng phản công của ba phe và cuộc đối đầu định mệnh",
+      "summary": "Bị dồn vào đường cùng, ba phe tạm bắt tay tổng phản công, dựng một vụ vu cáo lớn nhằm hạ bệ Trình Khải vĩnh viễn. Anh phải chứng minh sự trong sạch của mình, lật ngược thế cờ bằng bộ chứng cứ tích lũy nhiều năm và sự ủng hộ của những người chính trực.",
+      "subArcs": [
+        { "name": "Liên minh bất đắc dĩ", "chapterRange": "771-825", "focus": "Ba phe tạm thỏa hiệp; dựng một vụ vu cáo tinh vi đẩy Trình Khải vào nguy cơ lao lý oan." },
+        { "name": "Tự minh oan", "chapterRange": "826-870", "focus": "Trình Khải chứng minh trong sạch bằng nhật ký công vụ, chứng từ và quy trình; lật lại bằng chứng vu cáo." },
+        { "name": "Phản công", "chapterRange": "871-910", "focus": "Tung bộ chứng cứ tổng hợp nhiều năm; ba phe lần lượt sụp đổ trước pháp luật." }
+      ],
+      "keyMilestone": "Trình Khải lật ngược vụ vu cáo và đánh sập liên minh ba phe, giành thắng lợi quyết định cho công cuộc làm sạch."
+    },
+    {
+      "volume": 7,
+      "title": "Thể Chế Trong Sạch",
+      "chapterRange": "911-1000",
+      "theme": "Từ trừng trị sang kiến tạo một hệ thống bền vững",
+      "summary": "Sau khi các đường dây lớn bị triệt, Trình Khải hiểu rằng trừng trị thôi chưa đủ. Ở vị trí lãnh đạo, anh kiến tạo cơ chế minh bạch — công khai đấu thầu, giám sát dữ liệu, bảo vệ người tố cáo — để Châu Giang không quay lại vết xe cũ, và gánh cái giá của một người đứng đầu công cuộc cải cách.",
+      "subArcs": [
+        { "name": "Sau cơn bão", "chapterRange": "911-945", "focus": "Dọn dẹp tàn dư, ổn định bộ máy, đề bạt người chính trực vào những vị trí then chốt." },
+        { "name": "Xây luật chơi mới", "chapterRange": "946-980", "focus": "Thiết lập cơ chế minh bạch bền vững: công khai đấu thầu, giám sát số liệu, bảo vệ người tố cáo." },
+        { "name": "Đường dài phía trước", "chapterRange": "981-1000", "focus": "Châu Giang chuyển mình; Trình Khải gánh trọng trách và cái giá của người mở đường, khép lại bằng một thể chế sạch hơn." }
+      ],
+      "keyMilestone": "Trình Khải biến Châu Giang thành hình mẫu minh bạch và để lại một thể chế chống tham nhũng bền vững."
+    }
+  ]
+}

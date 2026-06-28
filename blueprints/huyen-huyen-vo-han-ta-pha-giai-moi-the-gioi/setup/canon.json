@@ -1,0 +1,200 @@
+{
+  "power_system": {
+    "name": "Trực Giác Phá Giải — Nốt Lạc Nhịp và cơ chế Thí Luyện",
+    "type": "puzzle/deduction system (sinh tồn bằng đọc thủng quy luật, KHÔNG phải võ lực cá nhân)",
+    "coreResource": "Sự tỉnh táo và tâm lực tập trung của Diệp Phong (điều kiện để trực giác ngân lên); Thí Luyện Điểm thu được sau mỗi phó bản để đổi kỹ năng, vật phẩm, thông tin và lượt nghỉ ở Hư Cảnh.",
+    "cultivationRealms": ["Tân Thủ", "Sơ Khảo", "Trung Khảo", "Cao Khảo", "Phá Giải Sư", "Lão Làng", "Bảng Xếp Hạng", "Tầng Sâu", "Cận Chủ Tể"],
+    "unlockRule": "Trực giác phá giải tự bừng tỉnh trong phó bản đầu khi Diệp Phong đối mặt sinh tử; sau đó độ nhạy và độ sâu của nó tăng dần theo số phó bản đã giải và số 'mô-típ thiết kế' anh tích lũy, KHÔNG nhảy vọt tức thì. Năng lực mua bằng Thí Luyện Điểm đều kèm cái giá hoặc giới hạn.",
+    "antiPlotArmor": [
+      "Trực giác CHỈ gợi ý mắt xích đáng đào sâu (ngân lên như nốt lạc nhịp) — KHÔNG cho biết lời giải, KHÔNG nói phải làm gì, KHÔNG tự cứu MC.",
+      "Diệp Phong vẫn phải tự suy luận toàn bộ và vẫn chết nếu suy luận sai sau khi đã thấy gợi ý; sai một lần trong phó bản sinh tử là chết thật, dấu Khế Văn tắt lịm vĩnh viễn.",
+      "Trực giác mờ đi hoặc tắt khi anh hoảng loạn, kiệt sức, bị thương; phó bản tầng cao cố tình gài thông tin nhiễu khiến nốt lạc nhịp vang lên ở chỗ sai (mồi nhử).",
+      "Năng lực và vật phẩm không tự rơi xuống — phải đổi bằng Thí Luyện Điểm trả giá bằng sinh tử; mỗi năng lực mạnh kèm cái giá hoặc giới hạn.",
+      "Người chơi cùng phó bản có thể phản bội, vì điểm của kẻ chết được chia cho người sống; MC không thể tin ai mù quáng."
+    ],
+    "signatureBuff": {
+      "name": "Nốt Lạc Nhịp",
+      "effect": "Khi Diệp Phong quan sát đủ lâu và đủ tỉnh táo, những chi tiết là mắt xích then chốt của quy luật phó bản khẽ ngân lên trong tâm trí anh như một nốt nhạc lạc khỏi bản hòa âm — thu hẹp đáng kể vùng tìm kiếm và cho phép anh suy luận ra điểm phá giải nhanh hơn người thường, sống sót đúng giây cận tử.",
+      "limit": "Chỉ ngân khi tâm trí tỉnh táo, không hoảng loạn, không kiệt sức; nốt lạc nhịp chỉ trỏ chỗ đáng nhìn chứ không cho đáp án, và có thể bị phó bản gài nhiễu để ngân sai chỗ. Tin nó mù quáng là tự sát."
+    },
+    "progressionAxes": [
+      "Số phó bản đã phá giải và độ khó của chúng (kinh nghiệm đọc quy luật)",
+      "Kho 'mô-típ thiết kế' của Chủ Tể mà Diệp Phong đã kiểm chứng và ghi lại (phá giải sâu và nhanh hơn)",
+      "Thí Luyện Điểm, kỹ năng và vật phẩm tích lũy (công cụ sinh tồn, đều kèm giá)",
+      "Thứ hạng trên bảng xếp hạng cõi vô hạn và mạng lưới cộng sự đáng tin ở Hư Cảnh"
+    ],
+    "powerCeilingByPhase": {
+      "phase1": "Sống sót một phó bản đơn lẻ bằng phá giải quy luật; bước vào cộng đồng người chơi ở Hư Cảnh",
+      "phase2": "Phá giải phó bản nhiễu và phó bản đội nhóm; lên bảng xếp hạng, có nhóm cộng sự minh bạch",
+      "phase3": "Ghép bản đồ phó bản liên kết, nhận ra chúng là một câu đố lớn; đối đầu thế lực độc quyền tri thức",
+      "phase4": "Vượt phó bản quy luật tự đổi và tầng sâu, đối mặt Chủ Tể Thí Luyện và giải Đề Bài tối hậu định đoạt cõi vô hạn"
+    }
+  },
+  "worldbuilding": {
+    "tone": "Huyền huyễn sinh tồn trí tuệ, căng thẳng và lạnh lùng: mỗi phó bản là một thế giới mới với quy luật mới để giải mã, mỗi lần phá giải đúng giây cận tử là một lần sảng khoái; bao trùm là một bí ẩn lớn dần về Chủ Tể Thí Luyện và mục đích thật của cõi vô hạn.",
+    "economy": "Thí Luyện Điểm là tiền tệ cốt lõi — thu từ hoàn thành Đề Bài và sống sót, dùng mua kỹ năng, vật phẩm, thông tin và lượt nghỉ; điểm của người chết được chia cho người sống cùng phó bản, tạo động cơ phản bội. Thông tin phó bản (bí kíp, manh mối quy luật) là hàng hóa đắt giá mà các bang hội độc quyền buôn bán.",
+    "setting": "Vô Hạn Thí Luyện Không Gian — một cõi xám trống rỗng nằm ngoài mọi thế giới, nơi vô số người từ khắp các đại lục, tinh cầu và niên đại bị một thực thể bí ẩn gọi là Chủ Tể Thí Luyện cuốn vào; cứ một khoảng thời gian, dấu Khế Văn trên cổ tay lại lôi họ vào một Phó Bản Thế Giới hoàn chỉnh được dựng như ván cờ sinh tử có lời giải ẩn.",
+    "geography": {
+      "phase1": "Cõi Xám và phó bản đầu (thị trấn khép kín bị quái vật vây hãm); Hư Cảnh sơ kiến với chợ điểm và bảng xếp hạng",
+      "phase2": "Hư Cảnh mở rộng (các bang hội thông tin, đội nhóm) và các phó bản nhiễu/đội nhóm tinh vi hơn",
+      "phase3": "Bản đồ sơ bộ các phó bản liên kết chia chung chữ ký thiết kế; địa bàn các thế lực lão làng độc quyền tri thức",
+      "phase4": "Phó bản quy luật tự đổi, phó bản lồng nhau, các 'phó bản tầng sâu' và ngưỡng cửa nơi Chủ Tể Thí Luyện ẩn mình"
+    },
+    "techLevel": "Không cố định — mỗi phó bản là một thế giới riêng với trình độ riêng (trung cổ bị lời nguyền, tinh cầu cơ giới sụp đổ, cung điện cạm bẫy logic...); khung bao trùm là cơ chế thí luyện siêu nhiên do Chủ Tể vận hành.",
+    "conflictMedium": "Đấu trí và phá giải: quan sát, thử nghiệm, suy luận ra quy luật và tìm điểm phá giải dưới áp lực cận tử; ở Hư Cảnh là đấu trí với người chơi tàn nhẫn, vạch trần âm mưu và quản lý nguồn lực. Combat (nếu có) chỉ là phương tiện sống sót khi đã đọc đúng quy luật, KHÔNG bao giờ là cách quyết định một phó bản bằng vũ lực thuần túy.",
+    "forbiddenElements": [
+      "xuyên không / xuyên việt (Diệp Phong là người bản địa của thế giới truyện)",
+      "trọng sinh / ký ức kiếp trước / đầu thai",
+      "MC đến từ trái đất / thế giới hiện đại",
+      "golden finger cho sẵn lời giải hoặc tự cứu MC (trực giác chỉ gợi ý mắt xích)",
+      "nhân vật đã chết thật trong phó bản sống lại vô lý",
+      "phá giải một phó bản bằng vũ lực thuần túy thay vì đọc thủng quy luật"
+    ]
+  },
+  "factions": [
+    {
+      "name": "Nhóm cộng sự của Diệp Phong",
+      "type": "thế lực nhân vật chính",
+      "power_level": 3,
+      "summary": "Diệp Phong cùng Tô Nhiễm, lão Đỗ và vài người chơi chịu nghe lý lẽ, dựa trên minh bạch lợi ích thay vì tình cảm mù quáng; mạnh nhờ phá giải và đấu trí, không phải đông người hay vũ lực.",
+      "territory": "Không cố định — di chuyển qua các phó bản; có một góc cứ điểm nhỏ ở Hư Cảnh",
+      "mc_relation": "MC là người dẫn dắt và phá giải trung tâm",
+      "conflicts": ["Các bang hội săn người mới", "Thế lực lão làng độc quyền tri thức", "Chủ Tể Thí Luyện"],
+      "alliances": ["Một số người chơi kỳ cựu chính trực", "Bang hội thông tin (quan hệ có điều kiện)"],
+      "importance": 10,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Bang hội thông tin Hư Cảnh",
+      "type": "thế lực buôn tri thức phó bản",
+      "power_level": 6,
+      "summary": "Các bang hội nắm và bán bí kíp, manh mối quy luật phó bản; vừa là nguồn thông tin sống còn vừa sẵn sàng thao túng, gài bẫy và thử người mới để giữ độc quyền.",
+      "territory": "Các khu chợ điểm và trung tâm thông tin trong Hư Cảnh",
+      "mc_relation": "Vừa hợp tác có điều kiện qua Hàn Lệ, vừa dè chừng vì họ xem MC là biến số nguy hiểm",
+      "conflicts": ["Nhóm cộng sự của Diệp Phong (lợi ích thông tin)"],
+      "alliances": [],
+      "importance": 7,
+      "introduce_arc": 2
+    },
+    {
+      "name": "Thế lực lão làng độc quyền tri thức",
+      "type": "thế lực kỳ cựu giấu chân tướng",
+      "power_level": 8,
+      "summary": "Một liên minh người chơi lão làng phát hiện sớm rằng các phó bản chia chung chữ ký thiết kế, nhưng giấu nhẹm để trục lợi và giữ vị thế trên bảng xếp hạng, sẵn sàng loại bỏ kẻ phá giải giỏi đe dọa độc quyền của họ.",
+      "territory": "Tầng cao Hư Cảnh và các phó bản liên kết hiểm hóc",
+      "mc_relation": "Đối thủ chính giữa truyện khi MC bắt đầu ghép bản đồ phó bản liên kết",
+      "conflicts": ["Nhóm cộng sự của Diệp Phong"],
+      "alliances": [],
+      "importance": 8,
+      "introduce_arc": 4
+    },
+    {
+      "name": "Chủ Tể Thí Luyện",
+      "type": "thực thể bí ẩn tối hậu",
+      "power_level": 10,
+      "summary": "Thực thể dựng nên toàn bộ Vô Hạn Thí Luyện Không Gian và mọi phó bản, quan sát người chơi từ sau tấm màn xám; mục đích thật bị giấu kín ở tầng cuối, là câu đố lớn nhất của cả thiên truyện.",
+      "territory": "Tầng cuối của cõi vô hạn, ngoài tầm với mọi người chơi cho tới cao trào",
+      "mc_relation": "Bí ẩn tối hậu và đối thủ trí tuệ cuối cùng; MC đối mặt qua Đề Bài tối hậu chứ không phải vũ lực",
+      "conflicts": ["Mọi người chơi bị cuốn vào"],
+      "alliances": [],
+      "importance": 9,
+      "introduce_arc": 7
+    }
+  ],
+  "plot_twists": [
+    {
+      "summary": "Trực giác phá giải của Diệp Phong không phải kỳ ngộ ngẫu nhiên — nó cảm được chính 'nét thiết kế' mà Chủ Tể dùng để dựng mọi phó bản, như thể anh đọc được bút tích của người tạo ra trò chơi; đó là lý do anh được chọn.",
+      "payoff_type": "nguồn gốc golden finger",
+      "setup_chapters": [50, 540],
+      "twist_chapter": 700,
+      "reader_impact": "cosmic",
+      "arc_number": 5
+    },
+    {
+      "summary": "Các phó bản không hề rời rạc — chúng dùng chung mô-típ, ký hiệu và chữ ký thiết kế, là những mảnh của một câu đố khổng lồ duy nhất; toàn bộ Vô Hạn Thí Luyện là một bài kiểm tra có chủ đích.",
+      "payoff_type": "cấu trúc thế giới",
+      "setup_chapters": [240, 441],
+      "twist_chapter": 560,
+      "reader_impact": "major",
+      "arc_number": 4
+    },
+    {
+      "summary": "Một thế lực lão làng đã sớm biết các phó bản liên kết và bí mật của trò chơi, nhưng cố tình giấu nhẹm để trục lợi và loại bỏ chính những kẻ phá giải giỏi có thể vén màn — biến tri thức cứu mạng thành công cụ độc quyền tàn nhẫn.",
+      "payoff_type": "phản bội/độc quyền tri thức",
+      "setup_chapters": [460, 500],
+      "twist_chapter": 530,
+      "reader_impact": "major",
+      "arc_number": 4
+    }
+  ],
+  "themes": [
+    {
+      "name": "Lý trí là vũ khí sinh tồn",
+      "type": "main",
+      "description": "Trong cõi giết kẻ không đọc nổi quy luật, đầu óc lạnh và quan sát kỹ lưỡng mạnh hơn mọi sức mạnh; kẻ điềm tĩnh suy luận sống sau, kẻ liều lĩnh chết trước.",
+      "motifs": ["nốt lạc nhịp ngân lên đúng mắt xích", "kẻ liều lĩnh lao theo lối giải sai và chết", "phá giải đúng giây cận tử"],
+      "importance": 10
+    },
+    {
+      "name": "Mọi quy luật đều có điểm phá giải",
+      "type": "main",
+      "description": "Không thế giới nào là bất khả giải; điểm phá giải luôn nằm ở mâu thuẫn của chính quy luật, chỉ cần dám nhìn thẳng vào nó.",
+      "motifs": ["mâu thuẫn trong Đề Bài hé lộ lời giải", "mắt xích quy luật bị vạch trần trước nhóm", "ghép mô-típ thiết kế của Chủ Tể"],
+      "importance": 9
+    },
+    {
+      "name": "Niềm tin phải dựa trên minh bạch",
+      "type": "supporting",
+      "description": "Trong cõi mà điểm của kẻ chết chia cho người sống, niềm tin mù quáng giết người; Diệp Phong xây nhóm dựa trên lợi ích minh bạch thay vì cảm tính.",
+      "motifs": ["đoán trước và phá vỡ phản bội", "liên minh dựa trên lợi ích rõ ràng", "lưỡi dao sau lưng bị lật ngược"],
+      "importance": 8
+    },
+    {
+      "name": "Gánh nặng của kẻ tỉnh táo",
+      "type": "supporting",
+      "description": "Lý trí lạnh lùng không có nghĩa vô cảm; Diệp Phong cứu người chịu nghe lý lẽ và mang gánh nặng của những người anh không kịp cứu.",
+      "motifs": ["cứu một mạng tưởng đã chết vào phút chót", "không cứu được người không chịu nghe", "lựa chọn không cho phép sai lần thứ hai"],
+      "importance": 8
+    }
+  ],
+  "voice_anchors": [
+    {
+      "snippet_type": "opening",
+      "prose_text": "Cả thế giới quanh Diệp Phong tan biến thành một cõi xám trống rỗng, và trên cổ tay anh, dấu Khế Văn phát sáng một thứ ánh lạnh chưa từng thấy. Đề Bài hiện ra mơ hồ trong tâm trí: sống sót bảy ngày trong thị trấn bị vây. Những người bị cuốn vào cùng anh kẻ thì gào thét, kẻ thì lao đi tìm vũ khí. Diệp Phong không làm gì cả. Anh đứng yên, đưa mắt quét chậm rãi từng con phố vắng, từng cánh cửa khép hờ, từng vết nứt trên nền đá. Và rồi, giữa hàng trăm chi tiết câm lặng, một thứ khẽ ngân lên trong đầu anh — như một nốt nhạc lạc khỏi bản hòa âm. Cái cối xay gió ở quảng trường vẫn quay, dù không có một ngọn gió nào. Anh chưa biết điều đó nghĩa là gì. Nhưng anh biết: đó là nơi phải bắt đầu.",
+      "key_traits": ["điềm tĩnh tuyệt đối", "quan sát tỉ mỉ", "lý trí lạnh lùng", "nhạy với mâu thuẫn của quy luật"]
+    },
+    {
+      "snippet_type": "dialogue",
+      "prose_text": "— Cậu chắc chưa? Tô Nhiễm hạ giọng, mắt liếc về phía cánh cửa sắt mà Mã Cường đang định phá. Nếu cậu sai, cả nhóm này chết. Diệp Phong không rời mắt khỏi vệt nước rỉ dưới khe cửa. — Tôi không chắc, anh đáp, giọng phẳng lặng. Tôi chỉ biết quy luật nói rằng cánh cửa nào 'mời gọi' ta mở thì đằng sau là cái chết, còn cánh cửa thật thì luôn bị che bằng một thứ khiến ta muốn tránh. Anh chỉ vào vệt nước hôi tanh. Cửa thoát nằm sau chỗ bẩn thỉu nhất này. Mã Cường, đừng phá cửa sắt. Phá nó là cậu tự ký giấy báo tử cho cả sáu người chúng ta.",
+      "key_traits": ["thận trọng", "suy luận từ mâu thuẫn quy luật", "không tự phụ chắc chắn", "đặt lý lẽ lên trên cảm tính"]
+    },
+    {
+      "snippet_type": "action",
+      "prose_text": "Còn ba mươi giây. Quái vật trong gương đã tràn khỏi mặt kính, mọi ngả thoát đều đóng sập. Mã Cường gào lên đòi đập vỡ tất cả các tấm gương, và năm người kia gần như đã nghe theo. Diệp Phong giữ chặt cổ tay anh ta. — Đừng. Gương không phải kẻ thù. Gương là quy luật. Anh chỉ vào tấm gương duy nhất KHÔNG có hình phản chiếu của ai cả. Trong đầu anh, nốt lạc nhịp ngân lên rõ ràng như chuông. Thứ không phản chiếu chúng ta — chính là lối ra. Anh không do dự thêm một giây. Diệp Phong bước thẳng vào tấm gương trống rỗng, kéo theo Tô Nhiễm, và đúng vào khoảnh khắc đồng hồ điểm không, cả nhóm rơi ra Cõi Xám, dấu Khế Văn rực sáng — sống sót.",
+      "key_traits": ["bình tĩnh giữa cửa tử", "đọc quy luật để sinh tồn", "quyết đoán khi đã suy luận xong", "cứu nhóm bằng trí tuệ"]
+    }
+  ],
+  "foreshadowing": [
+    {
+      "hintText": "Ngay phó bản đầu, Diệp Phong nhận ra cái cối xay gió quay không gió và vài chi tiết 'lạc nhịp' khác mang một cảm giác quen thuộc kỳ lạ, như thể được cùng một bàn tay đặt vào.",
+      "category": "object",
+      "plantCh": 5,
+      "pickupCh": 441,
+      "payoffDescription": "Đó là dấu hiệu sớm của 'chữ ký thiết kế' chung — bằng chứng đầu tiên rằng mọi phó bản đều do cùng một Chủ Tể dựng nên theo những mô-típ lặp lại."
+    },
+    {
+      "hintText": "Lão Đỗ nhiều lần nói rằng 'có những kẻ trên đỉnh bảng xếp hạng biết nhiều hơn họ tỏ ra', rồi đổi chủ đề mỗi khi Diệp Phong gặng hỏi.",
+      "category": "dialogue",
+      "plantCh": 200,
+      "pickupCh": 500,
+      "payoffDescription": "Hé lộ thế lực lão làng đã sớm biết các phó bản liên kết và bí mật trò chơi nhưng cố tình giấu để độc quyền trục lợi."
+    },
+    {
+      "hintText": "Mỗi lần phá giải đúng một phó bản khó, Diệp Phong cảm thấy nốt lạc nhịp ngân lên 'gần gũi' hơn một chút, như thể có ai đó ở đầu kia sợi dây đang lắng nghe lại.",
+      "category": "vision",
+      "plantCh": 50,
+      "pickupCh": 700,
+      "payoffDescription": "Trực giác của anh thực ra cảm được nét thiết kế của chính Chủ Tể — mối liên hệ trực tiếp khiến anh được chọn và là chìa khóa tới Đề Bài tối hậu."
+    }
+  ]
+}

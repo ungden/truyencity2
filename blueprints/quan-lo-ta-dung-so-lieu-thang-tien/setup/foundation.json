@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "totalScore": 124,
+  "avgScore": 8.86,
+  "minDimScore": 8,
+  "source": "claude_code",
+  "dimensions": [
+    { "name": "Premise & hook", "score": 9, "note": "Warm-baseline quan trường với hook cơ hội rõ ràng từ ch.1; golden finger active ngay khi lội thực địa, không khổ-mở-đầu." },
+    { "name": "Protagonist engine", "score": 9, "note": "Trần Hạo có động cơ rõ (phân tích số liệu + thấu hiểu dân tình + bản lĩnh chính trị), tính cách nhất quán, lì và liêm chính." },
+    { "name": "System mechanic", "score": 9, "note": "Hệ Thống Trị Lý phơi bày số liệu thật với input/output/limit/reward + anti-plot-armor; không tự ra quyết định, không thực thi hộ." },
+    { "name": "Conflict ladder", "score": 9, "note": "Leo thang xã → huyện → tỉnh → trung ương, tất cả non-combat qua chính sách/số liệu/pháp lý/truyền thông." },
+    { "name": "World coherence", "score": 9, "note": "Quốc gia giả tưởng kiểu VN đương đại, cơ cấu hành chính bốn cấp, kinh tế/ngân sách/truyền thông nhất quán, forbidden elements rõ." },
+    { "name": "Dopamine cadence", "score": 9, "note": "controlRules ≥2 peak/chương, face-slap bằng số liệu thật có người chứng kiến giữa hội nghị, khoảnh khắc dân biết ơn ấm áp." },
+    { "name": "Origin lock", "score": 9, "note": "mcOrigin=system-bestowed khóa chặt, outlines không chứa bất kỳ token nguồn-gốc-ngoài-thế-giới nào; MC là công chức bản địa." },
+    { "name": "Non-combat guardrail", "score": 9, "note": "Genre quan-truong non-combat; forbiddenElements gồm bạo lực/đánh nhau/giang hồ; mọi xung đột giải quyết bằng quản trị/pháp lý/truyền thông." },
+    { "name": "Foreshadowing & twists", "score": 8, "note": "3 tuyến cài cắm dài hạn (Lê Cường, Viện Trị Lý, ông Bảy) có plant/payoff chapter cụ thể." },
+    { "name": "Long-form sustainability", "score": 9, "note": "noveltyLadder 4 nấc giữ cùng lane quản trị, 7 volume cho 1000 chương, endgame cải cách thể chế + phục dựng Viện Trị Lý." },
+    { "name": "Vietnamese voice", "score": 8, "note": "Voice anchors tự nhiên, đời thường xen nghị trường, đủ diacritics, không AI-tell." }
+  ],
+  "overallFeedback": "Setup vững: warm-baseline opening, golden finger là khả năng đọc số liệu thật có giới hạn rõ và không tự ra quyết định, conflict ladder non-combat leo thang sạch sẽ qua 7 volume từ xã tới trung ương, origin lock chặt (công chức bản địa), dopamine cadence và foreshadowing đều có cấu trúc. Non-combat guardrail mạnh: mọi xung đột giải quyết qua chính sách/số liệu/đàm phán/pháp lý/truyền thông. Sẵn sàng cho DeepSeek V4 Pro viết chương. PASS."
+}

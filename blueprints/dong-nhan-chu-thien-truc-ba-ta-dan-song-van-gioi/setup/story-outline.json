@@ -1,0 +1,119 @@
+{
+  "premise": "Tô Hành, một thanh niên bình thường vừa thất nghiệp ở đô thị hiện đại, được Hệ Thống ban tặng tại chỗ một Kênh Trực Tiếp Vạn Giới phát sóng tới muôn vàn thế giới khán giả. Mỗi buổi lên sóng, anh trình diễn tri thức Trái Đất, giải đúng cơn khát của từng thế giới đang xem, nhận về Nhân Khí và Lễ Vật mang theo quy tắc của các thế giới — và dần phi phàm hóa bằng cách học, hấp thụ, phối hợp những gì vạn giới trao cho anh. Kênh chỉ trao cơ hội chứ không trao toàn năng: anh phải tự nghĩ nội dung, tự gánh hậu quả, không thể vươn tay can thiệp vào thế giới khán giả.",
+  "mainConflict": "Một người bình thường cầm cái micro nối liền vạn giới phải dẫn dắt dòng chú ý của muôn vàn thế giới sao cho vừa khuấy động vừa tử tế, giữa lúc những Streamer trục lợi gieo tri thức độc hại đổi lấy Nhân Khí. Xung đột không giải quyết bằng vũ lực mà bằng nội dung tốt hơn, tư duy sắc hơn và đạo đức vững hơn. Leo thang từ buổi sóng đơn lẻ → cạnh tranh kênh đối thủ → điều phối nhiều thế giới giải một bài toán chung → truy ra Kiến Trúc Sư dựng nên Sảnh Phát Sóng.",
+  "themes": [
+    "Tri thức và lòng tử tế là sức mạnh thật sự khi trao đúng người",
+    "Sự chú ý đi kèm trách nhiệm — một lời nói có thể thay đổi cả một thế giới",
+    "Kết nối và hợp tác thắng được chia rẽ và trục lợi",
+    "Người bình thường vẫn có thể phi phàm bằng cách cho đi điều mình biết"
+  ],
+  "majorPlotPoints": [
+    "Ch.1: Kênh Trực Tiếp Vạn Giới được Hệ Thống ban tặng tại chỗ; buổi sóng đầu tiên, một mẹo lọc nước và trồng trọt cứu một làng thế giới mạt thế, Nhân Khí đầu tiên đổ về.",
+    "Arc 1: Tô Hành ghim được các thế giới khán giả ruột, hấp thụ Lễ Vật đầu tiên, phi phàm hóa khởi đầu, đứng vững trước đợt công kích uy tín của một kênh nhỏ.",
+    "Arc 2-3: Mở rộng tới thế giới ma pháp và võ hiệp; cạnh tranh và phơi bày các Streamer trục lợi bằng nội dung tốt hơn; lọt bảng xếp hạng Streamer vạn giới.",
+    "Giữa truyện: Một mối nguy lan qua nhiều thế giới; Tô Hành dùng Kênh làm trung tâm điều phối, để vạn giới hợp tác giải bài toán chung.",
+    "Cao trào cuối: Truy ra Kiến Trúc Sư dựng nên Sảnh Phát Sóng và lý do vạn giới được nối với nhau; Tô Hành chọn định hình lại cách vạn giới kết nối thay vì độc chiếm hay bỏ mặc."
+  ],
+  "setupKernel": {
+    "readerFantasy": "Cảm giác sảng khoái và ấm áp khi một người bình thường, chỉ với cái micro và cái đầu, biến một mẹo đời thường thành kỳ tích làm cả một thế giới xa lạ phải sững sờ ngưỡng mộ — khán giả vạn giới gửi quà tới tấp, bình luận chạy kín màn, và mỗi buổi sóng kết thúc bằng việc anh vừa giúp được một thế giới vừa lặng lẽ mạnh hơn. Độc giả vừa được phiêu lưu qua vô số thế giới, vừa thỏa mãn vì tri thức và lòng tốt được tưởng thưởng xứng đáng.",
+    "protagonistEngine": "Tô Hành thắng nhờ kho tri thức Trái Đất rộng, khả năng đọc đúng cơn khát của từng thế giới khán giả, và sự dí dỏm ấm áp khiến người xem yêu mến; anh biến cái bình thường thành phi thường bằng góc nhìn mới lạ. Tính cách lạc quan, tử tế, lanh lợi, có trách nhiệm — anh cân nhắc hậu quả trước khi nói, và day dứt khi một lời khuyên đi chệch.",
+    "pleasureLoop": [
+      "Một thế giới khán giả bộc lộ cơn khát (hạn linh khí, bế tắc chiến tranh, đói lương thực) → Tô Hành nảy ra một ý tưởng từ tri thức Trái Đất (setup nhanh, gợi tò mò).",
+      "Anh lên sóng trình diễn ý tưởng đó một cách dí dỏm, dễ hiểu → khán giả vạn giới sững sờ, bình luận bùng nổ trên màn (khoảnh khắc bùng nổ chú ý).",
+      "Thế giới khán giả áp dụng và đạt kết quả ngoạn mục → họ gửi về Lễ Vật mang theo quy tắc thế giới + Nhân Khí dồn dập (harvest + công nhận).",
+      "Tô Hành hấp thụ/phối hợp Lễ Vật một cách khôn ngoan → bản thân anh phi phàm hơn một bậc rõ rệt (breakthrough cá nhân).",
+      "Một kênh đối thủ hoặc kẻ trục lợi bị anh phản biện, vạch trần bằng nội dung tốt hơn → khán giả quay sang ủng hộ anh (face-slap nhắm vào kẻ trục lợi, không phải MC).",
+      "Một mảnh sự thật về Sảnh Phát Sóng hoặc Kiến Trúc Sư hé lộ → cảm giác bức màn vạn giới đang được vén lên (revelation payoff)."
+    ],
+    "systemMechanic": {
+      "name": "Kênh Trực Tiếp Vạn Giới — Sảnh Phát Sóng",
+      "input": "Tô Hành lên sóng và trình diễn một nội dung tự nghĩ (kiến thức, kỹ năng, câu chuyện, đạo lý từ Trái Đất) hướng tới các thế giới khán giả đang theo dõi; anh phải tự sáng tạo nội dung và tự chịu trách nhiệm về lời mình nói.",
+      "output": "Khán giả vạn giới phản hồi bằng Bình Lát (lời thoại chạy ngang màn) và Lễ Vật (vật phẩm mang theo quy tắc của thế giới gửi đi: đan dược, ma pháp thư, tinh thể, hạt giống); buổi sóng càng giải đúng cơn khát của thế giới thì Nhân Khí (đơn vị chú ý + lòng tin) đổ về càng nhiều.",
+      "limit": "Anti-plot-armor cứng: Kênh CHỈ là cái micro — Tô Hành KHÔNG thể tự tay can thiệp vào thế giới khán giả, KHÔNG có nút bấm thắng-tất-cả, KHÔNG được hệ thống mách bài. Anh phải tự nghĩ ra nội dung; một lời khuyên sai có thể hại cả một thế giới và Nhân Khí mất đi nhanh như khi đến. Lễ Vật cần được hấp thụ/phối hợp đúng cách mới hữu dụng, nếu vội vàng sẽ phản tác dụng. Khán giả có thể quay lưng nếu anh trục lợi hay dối trá.",
+      "reward": "Nhân Khí mở khóa quyền hạn mới của Kênh (đọc rõ nhu cầu thế giới, gửi vật phẩm ngược, ghim thế giới); Lễ Vật giúp Tô Hành phi phàm hóa dần; phần thưởng sâu nhất luôn là một thế giới được giúp, một mạng lưới khán giả trung thành và một mảnh sự thật về vạn giới — chứ không phải sức mạnh tức thời."
+    },
+    "mcOrigin": "system-bestowed",
+    "originLockNote": "Tô Hành là người bản địa của đô thị hiện đại năm 2024, được Hệ Thống ban tặng tại chỗ Kênh Trực Tiếp Vạn Giới như một golden finger in-world; anh không đến từ thế giới nào khác và không mang ký ức từ một đời nào khác — mọi năng lực đều phát sinh từ Kênh và do anh tự rèn.",
+    "mcSecret": {
+      "secret": "Tô Hành sở hữu Kênh Trực Tiếp Vạn Giới — cái micro duy nhất nối anh tới muôn vàn thế giới khán giả, một thứ chưa người bình thường nào quanh anh biết tới.",
+      "outsideWorldKnowledge": "Bản thân Kênh là một bí ẩn in-world: nó dường như liên hệ với cách Kiến Trúc Sư dựng nên Sảnh Phát Sóng, như thể Tô Hành nhìn thấy được 'kết cấu sóng' của chính người thiết kế; hiểu biết này vượt ngoài tầm của mọi Streamer khác.",
+      "revealRule": "Giấu kín hoàn toàn với người đời thường ở các arc đầu; chỉ hé lộ một phần cho một hai khán giả/đồng minh thân tín giữa truyện; nguồn gốc thật của Kênh (mối liên hệ với Kiến Trúc Sư) chỉ reveal ở cao trào cuối.",
+      "coverStory": "Với người đời thường quanh anh, Tô Hành chỉ nói mình 'làm sáng tạo nội dung trên mạng', che giấu việc thực sự đang phát sóng tới vạn giới."
+    },
+    "benefitLoop": {
+      "goal": "Nuôi lớn Kênh thành cái micro có sức nặng nhất của vạn giới, giúp được nhiều thế giới khán giả, và lần ngược ra sự thật về Sảnh Phát Sóng.",
+      "action": "Đọc cơn khát của từng thế giới, nghĩ ra nội dung từ tri thức Trái Đất, lên sóng trình diễn dí dỏm dễ hiểu, rồi hấp thụ/phối hợp Lễ Vật và quản lý Nhân Khí một cách khôn ngoan.",
+      "benefit": "Giúp thêm một thế giới, thu thêm Lễ Vật và Nhân Khí, phi phàm hóa thêm một bậc, mở rộng mạng lưới khán giả trung thành và thu thêm một mảnh manh mối về vạn giới.",
+      "cadence": "Mỗi 1-2 chương có ít nhất một vòng phát-sóng-được-thưởng (một nội dung khuấy đảo khán giả + một đợt Lễ Vật/Nhân Khí đổ về); mỗi 3-5 chương một bước nhảy lớn (giúp trọn một thế giới, phi phàm hóa rõ rệt, hé lộ một mảnh sự thật, hoặc lên một bậc trong giới Streamer)."
+    },
+    "interventionRule": "Tô Hành chỉ chủ động dùng Kênh khi (a) một thế giới khán giả đang đối mặt cơn khát/mối nguy cụ thể mà tri thức của anh có thể giúp, hoặc (b) khi anh phát hiện một Streamer trục lợi gieo tri thức độc hại làm hại khán giả mà anh có đủ hiểu biết để phản biện; anh không 'cứu cả vạn giới' ngoài tầm với, luôn giải quyết bằng nội dung, tư duy và đạo đức qua làn sóng — tuyệt đối không bằng cách vươn tay can thiệp trực tiếp hay dùng vũ lực vạn giới.",
+    "phase1Playground": {
+      "locations": [
+        "Căn phòng trọ và góc thành phố hiện đại của Tô Hành (cứ điểm đời thực, nơi anh lên sóng)",
+        "Sảnh Phát Sóng — không gian vô hình với vô số khung cửa ánh sáng, mỗi khung một thế giới khán giả",
+        "Thế giới mạt thế của làng sống sót đầu tiên anh giúp (khán giả ruột đầu tiên)",
+        "Thế giới tu tiên đang hạn linh khí của Lão Lâm (nguồn Lễ Vật đan dược sớm)",
+        "Quán cà phê và khu phố đời thực nơi Tô Hành sinh hoạt giữa các buổi sóng"
+      ],
+      "cast": [
+        "Tô Hành (thanh niên thất nghiệp, MC, chủ Kênh Trực Tiếp Vạn Giới)",
+        "Lão Lâm (trưởng lão thế giới tu tiên, khán giả ruột sớm, gửi đan phương và Lễ Vật)",
+        "Bé Mạch (cô bé thế giới mạt thế anh giúp đầu tiên, đại diện cho khán giả anh thay đổi cuộc đời)",
+        "Diệp Tử Hân (cô gái đời thực hàng xóm, tò mò về 'công việc lạ' của Tô Hành, neo đời thường)",
+        "Hắc Mạc (một Streamer đối thủ trục lợi, local antagonist sớm)"
+      ],
+      "resources": [
+        "Kênh Trực Tiếp Vạn Giới và Sảnh Phát Sóng",
+        "Kho tri thức Trái Đất của Tô Hành (nông nghiệp, kỹ thuật, câu chuyện, đạo lý)",
+        "Điểm Nhân Khí tích lũy và quyền hạn Kênh đã mở khóa",
+        "Lễ Vật đầu tiên từ các thế giới khán giả ruột (đan dược, hạt giống, mảnh tri thức)"
+      ],
+      "localAntagonists": [
+        "Hắc Mạc — một Streamer đối thủ chuyên gieo tri thức giật gân, độc hại để cướp Nhân Khí, nhiều lần tung tin xấu về Tô Hành",
+        "Một nhóm khán giả cực đoan ở một thế giới đòi Tô Hành trao bí thuật nguy hiểm, tạo áp lực đạo đức lên anh"
+      ],
+      "repeatableSceneTypes": [
+        "Đọc cơn khát của một thế giới khán giả rồi nghĩ ra nội dung từ tri thức Trái Đất",
+        "Lên sóng trình diễn dí dỏm, khán giả vạn giới sững sờ và bình luận bùng nổ",
+        "Thế giới khán giả áp dụng thành công và gửi về Lễ Vật + Nhân Khí",
+        "Tô Hành hấp thụ/phối hợp Lễ Vật và phi phàm hóa thêm một bậc",
+        "Đoạn đời thực giữa các buổi sóng: nghỉ ngơi, lên ý tưởng, đối phó kênh đối thủ, ghép manh mối về Sảnh Phát Sóng"
+      ]
+    },
+    "socialReactor": {
+      "witnesses": [
+        "Khán giả của từng thế giới đang xem buổi sóng",
+        "Các thế giới khán giả ruột đã được Tô Hành giúp",
+        "Các Streamer khác và mạng lưới đứng sau giới phát sóng vạn giới",
+        "Diệp Tử Hân và một vài người đời thực quanh Tô Hành (chỉ thấy phần đời thường)"
+      ],
+      "reactionModes": [
+        "Sững sờ và ngưỡng mộ khi Tô Hành biến mẹo đời thường thành kỳ tích cho thế giới họ",
+        "Khán giả các thế giới tìm cách gửi Lễ Vật, đặt câu hỏi, đồn thổi về 'cái micro của vạn giới'",
+        "Giới Streamer nâng hạng và để mắt tới Tô Hành như một biến số đáng gờm",
+        "Kẻ trục lợi tung tin, vu khống hoặc lôi kéo để cô lập anh"
+      ],
+      "reportBackCadence": "Phản ứng tức thì trong mỗi buổi sóng (bình luận + Lễ Vật ngay trong chương); làn sóng đồn đại liên giới và động thái của giới Streamer dồn lại mỗi 3-5 chương sau một buổi sóng đáng chú ý."
+    },
+    "noveltyLadder": [
+      { "chapterRange": "1-30", "newToy": "Kênh Trực Tiếp Vạn Giới và buổi sóng đầu tiên — biến tri thức đời thường thành kỳ tích vạn giới", "keepsSameLane": "Vẫn là dùng cái micro + cái đầu để giúp thế giới khán giả và thu Nhân Khí/Lễ Vật" },
+      { "chapterRange": "31-200", "newToy": "Các thế giới khán giả chủ đề khác nhau (tu tiên, ma pháp, võ hiệp, mạt thế) với cơn khát riêng", "keepsSameLane": "Vẫn là đọc-cơn-khát → trình diễn → thu thưởng, chỉ đổi bối cảnh thế giới và loại tri thức" },
+      { "chapterRange": "201-500", "newToy": "Cạnh tranh các Streamer trục lợi + điều phối nhiều thế giới giải bài toán chung", "keepsSameLane": "Vẫn là phát sóng và dẫn dắt chú ý, thêm tầng đấu trí với chủ kênh khác" },
+      { "chapterRange": "501-800", "newToy": "Quyền hạn sâu của Kênh, luật ẩn của Sảnh Phát Sóng, manh mối về Kiến Trúc Sư", "keepsSameLane": "Vẫn cùng lane dẫn-sóng-vạn-giới, nâng lên cấp meta về cách hệ thống vận hành" },
+      { "chapterRange": "801-1000", "newToy": "Đối mặt Kiến Trúc Sư và định hình lại cách vạn giới được kết nối", "keepsSameLane": "Vẫn là cầm cái micro của vạn giới — đỉnh cao của cùng một trò chơi dẫn sóng" }
+    ],
+    "controlRules": {
+      "payoffCadence": "Tối thiểu 2 cao điểm dopamine mỗi chương (một nội dung khuấy đảo khán giả + một đợt Lễ Vật/Nhân Khí đổ về hoặc một kẻ trục lợi bị phản biện); cao điểm đầu xuất hiện trước nửa chương; setup không quá 30% và phải có payoff trong cùng hoặc chương kế.",
+      "attentionGradient": "Mở chương bằng một cơn khát mới của thế giới khán giả, một thử thách nội dung hoặc một động thái của đối thủ; đóng chương bằng một cliffhanger hấp dẫn hoặc một mảnh sự thật vạn giới vừa hé.",
+      "openThreadsPerArc": 3,
+      "closeThreadsPerArc": 2
+    },
+    "patternCards": [
+      "warm-baseline-opening",
+      "knowledge-as-power",
+      "casual-competence-wow",
+      "harvest-and-recognition",
+      "troll-streamer-exposed"
+    ]
+  }
+}

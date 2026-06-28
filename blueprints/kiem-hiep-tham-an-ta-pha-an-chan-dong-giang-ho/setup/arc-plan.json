@@ -1,0 +1,25 @@
+{
+  "arc_number": 1,
+  "start_chapter": 1,
+  "end_chapter": 20,
+  "arc_theme": "Án phòng kín khách điếm — vụ án đầu tiên khẳng định phương pháp tra án và thiên phú quan sát của Tống Từ",
+  "plan_text": "Arc mở màn warm-baseline: Tống Từ đã là một bộ khoái có nghề, thiên phú quan sát kích hoạt ngay ch.1; anh KHÔNG mở đầu bằng cảnh khốn cùng mà bằng một vụ án phòng kín hóc búa được mời tới phá. Mỗi chương xoay quanh một bước điều tra hoặc một tình huống cụ thể, với ít nhất 2 cao điểm dopamine/chương (một manh mối/mâu thuẫn then chốt được vạch ra + một nghi can lộ sơ hở hoặc một mối nguy được hóa giải), cao điểm đầu trước nửa chương. Cụm chương theo 5-cluster: ch.1-5 setup (được mời tới khách điếm Lai Phúc, vào hiện trường phòng cài then từ bên trong, nghiệm thi cao thủ chết không vết thương rõ, thiên phú làm vài điểm bất hợp lý nổi bật, sống sót một cú ám toán đầu tiên trong đêm); ch.6-10 breathing + competence (lập hồ sơ, học nghiệm thi cùng lão Tiền, đối chiếu khẩu cung các nhân chứng, bắt một nhân chứng nói dối giờ giấc); ch.11-15 confront (bộ khoái kỳ cựu Mã Đạt ép bắt một nghi can hiển nhiên, Tống Từ phản bác bằng bằng chứng, suýt để hung thủ thật tẩu thoát vì bị cản); ch.16-18 big_wow (tái dựng cách hung thủ ra vào phòng kín, lật ngược nghi can hiển nhiên, vạch trần hung thủ thật trước cả nha môn vào lúc cao trào, cứu người bị vu oan); ch.19-20 resolution + hook (bắt hung thủ; nhưng tín vật có ký hiệu sợi chỉ đứt và lời khai hé lộ hắn chỉ là tay sai được thuê — mở tuyến tổ chức ngầm Ám Tuyến). Giữ phương pháp NON-thuần-võ: xung đột giải quyết chủ yếu bằng nghiệm thi, nghiệm tích, đối chiếu khẩu cung và suy lý; võ công chỉ dùng khi tính mạng bị đe dọa và Tống Từ thắng nhờ đọc đòn, không nhờ vượt tầng cảnh giới. MC điềm tĩnh, chính trực, sắc bén nhưng nặng lòng với nạn nhân.",
+  "chapter_briefs": [
+    { "n": 1, "beat": "setup", "goal": "Tống Từ được mời tới khách điếm Lai Phúc phá vụ cao thủ chết trong phòng cài then từ bên trong", "payoff": "Thiên phú quan sát kích hoạt, anh nhận ra ngọn nến nghiêng và móng tay người chết sạch — loại bỏ giả thuyết 'trúng tà' và 'giãy giụa'", "endingHook": "Nếu không ai vào được, vì sao ngọn nến lại nghiêng?" },
+    { "n": 3, "beat": "setup", "goal": "Nghiệm thi kỹ và khám hiện trường, đối mặt sức ép phải kết án nhanh cho yên giang hồ", "payoff": "Anh xác định cao thủ chết vì một thủ pháp tinh vi chứ không phải nội thương tự phát, và sống sót một cú ám toán trong đêm", "endingHook": "Có kẻ không muốn vụ án này được phá tới cùng" },
+    { "n": 7, "beat": "breathing", "goal": "Đối chiếu khẩu cung các nhân chứng cùng lão Tiền ngỗ tác", "payoff": "Anh bắt một nhân chứng khai sai giờ giấc, lần ra kẻ này từng vào phòng rót trà cho người chết", "endingHook": "Lão Tiền lẩm bẩm sư phụ Tống Từ năm xưa cũng nhìn xác chết đúng như cách anh nhìn" },
+    { "n": 13, "beat": "confront", "goal": "Ngăn Mã Đạt ép bắt một nghi can hiển nhiên vì cay cú bị qua mặt", "payoff": "Tống Từ phản bác bằng chứng cứ vết thương và lộ trình, chứng minh nghi can hiển nhiên ngoại phạm", "endingHook": "Trong lúc tranh cãi, hung thủ thật suýt rời trấn" },
+    { "n": 17, "beat": "big_wow", "goal": "Tái dựng cách hung thủ ra vào phòng kín và vạch trần kẻ thật sự", "payoff": "Anh chỉ ra thủ pháp đóng then từ ngoài và bắt hung thủ thật trước cả nha môn, rửa oan cho người bị nghi", "endingHook": "Hung thủ cười nhạt: 'Ngươi bắt được ta, nhưng ngươi không bắt được người trả tiền cho ta'" },
+    { "n": 20, "beat": "resolution", "goal": "Khép vụ án khách điếm, lập hồ sơ và giao hung thủ cho nha môn", "payoff": "Vụ án đầu tiên khẳng định danh tiếng Tống Từ; anh giữ tín vật làm chứng cứ", "endingHook": "Trên tín vật có ký hiệu sợi chỉ đứt — manh mối đầu tiên về tổ chức Ám Tuyến" }
+  ],
+  "threads_to_advance": ["Khẳng định phương pháp tra án và thiên phú quan sát", "Quan hệ với lão Tiền và nha môn trấn", "Mâu thuẫn với bộ khoái kỳ cựu Mã Đạt"],
+  "threads_to_resolve": ["Phá vụ án phòng kín khách điếm Lai Phúc (giải quyết: bắt được hung thủ tay sai, rửa oan người bị nghi)"],
+  "new_threads": ["Sự tồn tại của tổ chức ngầm Ám Tuyến", "Ký hiệu sợi chỉ đứt trên tín vật", "Manh mối mơ hồ về cái chết của sư phụ Tống Từ"],
+  "sub_arcs": [
+    { "name": "Chén trà còn ấm", "chapterRange": "1-5", "cluster": "setup" },
+    { "name": "Khẩu cung lệch nhịp", "chapterRange": "6-10", "cluster": "breathing" },
+    { "name": "Nghi can hiển nhiên", "chapterRange": "11-15", "cluster": "confront" },
+    { "name": "Đường vào phòng kín", "chapterRange": "16-18", "cluster": "big_wow" },
+    { "name": "Sợi chỉ đứt", "chapterRange": "19-20", "cluster": "resolution" }
+  ]
+}

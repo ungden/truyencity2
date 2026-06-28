@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "totalScore": 122,
+  "avgScore": 8.71,
+  "minDimScore": 8,
+  "source": "claude_code",
+  "dimensions": [
+    { "name": "Premise & hook", "score": 9, "note": "Warm-baseline thương đạo ngự thú: Đôi Mắt Giám Định active ngay ch.1 khi Cố Bạch thấy tuyến tiến hóa ẩn của con thú bị chê vô dụng — hook là cơ hội/món hời, không mở đầu bằng cảnh MC đói khổ thê thảm." },
+    { "name": "Protagonist engine", "score": 9, "note": "Cố Bạch thắng bằng con mắt định giá + đầu óc tính toán + chữ tín và mưu lược thương trường; điềm tĩnh, lanh lợi, hào sảng đúng lúc, nhất quán; không tự ra tay đánh đấm." },
+    { "name": "System mechanic", "score": 9, "note": "Đôi Mắt Giám Định có input/output/limit/reward rõ; anti-plot-armor cứng — chỉ định giá và chỉ đường, không tự kiếm tiền, không tự nuôi thú, không đảm bảo bán được giá, có tầm giới hạn theo cấp; MC không tự chiến đấu." },
+    { "name": "Conflict ladder", "score": 9, "note": "Leo thang kiếm món hời đầu tiên → khẳng định tên tuổi sàn đấu giá → dựng thương hội mở thương lộ → phá thế độc quyền linh thảo → tầm đại lục chạm thần thú → nguồn gốc đôi mắt và thế lực thao túng tri thức tiến hóa, tất cả qua thương đạo và đấu thú có luật." },
+    { "name": "World coherence", "score": 9, "note": "Đại lục Vạn Linh với thương đạo ngự thú, hệ phẩm cấp thú + cấp ngự thú sư + tuyến tiến hóa ẩn + thương hội/đấu giá, nhất quán; forbidden elements rõ (không MC-combat, không gore, không xuyên/trọng sinh)." },
+    { "name": "Dopamine cadence", "score": 9, "note": "controlRules ≥2 peak/chương (món hời/bước tiến hóa thành công + cú lật kèo thương trường hoặc kẻ ép giá bị đáp trả), cao điểm đầu trước nửa chương; underdog merchant lật kèo đại thương hội." },
+    { "name": "Origin lock", "score": 9, "note": "mcOrigin=system-bestowed khóa chặt; Đôi Mắt Giám Định ban qua kỳ ngộ/truyền thừa cổ in-world; outlines và mọi file scan không chứa token xuyên không/xuyên việt/trọng sinh/kiếp trước/đến từ trái đất." },
+    { "name": "Beast-taming non-MC-combat guardrail", "score": 9, "note": "Xung đột chính giải quyết bằng thương đạo; combat = thú-vs-thú trong đấu thú có luật; MC đứng ngoài chỉ huy đọc thế trận; cấm MC đánh tay đôi và gore trong forbiddenElements." },
+    { "name": "Foreshadowing & twists", "score": 8, "note": "3 twist (nguồn gốc Tiểu Hồ Ly bị cố ý dìm, Hoàng Kim Hội độc quyền linh thảo có chủ ý, đôi mắt = dấu tích truyền thừa cổ) + 3 foreshadowing có plant/payoff chapter cụ thể kéo dài tới cao trào." },
+    { "name": "Long-form sustainability", "score": 8, "note": "noveltyLadder 5 nấc giữ cùng lane 'giám-định-mua-rẻ-dưỡng-bán-đắt-dựng-cơ-nghiệp', 7 volume cho 1000 chương, endgame thương đạo công bằng cho muôn loài thay vì độc quyền." },
+    { "name": "Vietnamese voice", "score": 8, "note": "Voice anchors hả hê underdog thương trường, đúng giọng huyền huyễn ngự thú cổ phong pha thương đạo, đủ diacritics, không AI-tell, em-dash đối thoại đúng quy ước." }
+  ],
+  "overallFeedback": "Setup vững cho beast-taming/evolution sảng văn thương đạo NON-MC-combat: warm-baseline opening với Đôi Mắt Giám Định active ch.1, golden finger là đôi-mắt-định-giá-nhìn-thấu-tiến-hóa có anti-plot-armor cứng (không tự kiếm tiền, không tự nuôi thú, giới hạn theo cấp, mua hớ vẫn lỗ), conflict ladder leo thang sạch qua 7 volume bằng thương đạo và đấu thú, origin lock system-bestowed chặt (ban qua kỳ ngộ in-world), dopamine cadence underdog (món hời lật kèo + face-slap kẻ ép giá), foreshadowing và twist có cấu trúc dài hạn. Hai tuyến cốt lõi (thương nhân buôn thần thú dựng thương hội + đôi mắt giám định được ban) phân biệt rõ với novel vực dậy gia tộc ngự thú. Sẵn sàng cho DeepSeek V4 Pro viết chương. PASS."
+}

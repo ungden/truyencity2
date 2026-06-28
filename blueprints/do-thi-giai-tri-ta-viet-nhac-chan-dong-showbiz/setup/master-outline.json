@@ -1,0 +1,100 @@
+{
+  "title": "Giải Trí Đỉnh Phong: Ta Viết Nhạc Chấn Động Showbiz",
+  "totalChapters": 1000,
+  "mainPlotline": "Cố Thanh Trạch, một nhạc sĩ thất bại, trọng sinh trở về thời sinh viên với trọn vẹn ký ức của cả một kiếp người đã sống; lần này anh dùng ký ức về những giai điệu, ca từ và xu hướng cùng bản lĩnh tự rèn để viết lại cuộc đời, từng bước bước vào ngành giải trí, nâng đỡ những tài năng bị vùi dập, vả mặt kẻ cướp công và các ông lớn quen thao túng, xây dựng đế chế âm nhạc của riêng mình, rồi cuối cùng trở thành huyền thoại định hình cả một thời đại.",
+  "originLock": "reincarnated — Cố Thanh Trạch trọng sinh trở lại thời sinh viên của chính cuộc đời mình trong cùng một thế giới hiện đại; anh mang theo ký ức và bài học của kiếp trước (cũng ở thế giới này), nơi anh từng là nhạc sĩ thất bại bị vùi dập và cướp công. Đây là một kiếp người làm lại trong cùng thế giới — KHÔNG phải tới từ một thế giới khác; lợi thế đến từ ký ức và trải nghiệm của chính anh.",
+  "volumes": [
+    {
+      "volume": 1,
+      "title": "Khúc Dạo Đầu",
+      "chapterRange": "1-130",
+      "theme": "Trở về thời sinh viên, viết bài hát đầu tiên và đặt chân vào ngành",
+      "summary": "Cố Thanh Trạch tỉnh lại ở thời sinh viên với ký ức kiếp trước. Anh viết bài hát đầu tiên khiến mọi người sửng sốt, nâng đỡ một ca sĩ trẻ bị xem thường, và lần đầu nếm trải cạm bẫy của ngành khi có kẻ tìm cách cướp công.",
+      "subArcs": [
+        { "name": "Giai điệu trong trí nhớ", "chapterRange": "1-30", "focus": "Trở về thời sinh viên, viết bài hát đầu tiên từ ký ức và khiến cả giảng đường lặng đi." },
+        { "name": "Người bạn đầu tiên", "chapterRange": "31-65", "focus": "Nâng đỡ một ca sĩ trẻ bị vùi dập, biến bài hát thành màn trình diễn chạm tới khán giả." },
+        { "name": "Cạm bẫy đầu đời", "chapterRange": "66-100", "focus": "Một kẻ trong ngành tìm cách cướp công sáng tác; Cố Thanh Trạch phản đòn bằng bằng chứng và tác phẩm vượt trội." },
+        { "name": "Cánh cửa mở ra", "chapterRange": "101-130", "focus": "Tên tuổi anh bắt đầu được giới chuyên môn chú ý, anh chính thức bước chân vào ngành giải trí." }
+      ],
+      "keyMilestone": "Cố Thanh Trạch viết được bài hát thành công đầu tiên, bảo vệ được quyền tác giả và đặt chân vào ngành."
+    },
+    {
+      "volume": 2,
+      "title": "Bảng Xếp Hạng",
+      "chapterRange": "131-280",
+      "theme": "Chinh phục bảng xếp hạng và đối đầu thế lực thao túng đầu tiên",
+      "summary": "Cố Thanh Trạch tung ra những tác phẩm leo lên bảng xếp hạng, nhưng vấp phải các ông lớn quen thao túng thứ hạng và dư luận. Anh dùng tài năng và mưu lược để chứng minh giá trị thật của tác phẩm.",
+      "subArcs": [
+        { "name": "Leo hạng", "chapterRange": "131-180", "focus": "Một bài hát của anh leo lên bảng xếp hạng, thu hút sự chú ý lớn và cả sự đố kỵ." },
+        { "name": "Bàn tay trong bóng tối", "chapterRange": "181-230", "focus": "Phát hiện một thế lực thao túng bảng xếp hạng để dìm tác phẩm của anh." },
+        { "name": "Sự thật lên tiếng", "chapterRange": "231-280", "focus": "Cố Thanh Trạch vạch trần trò thao túng và để công chúng tự quyết định bằng lượt nghe thật." }
+      ],
+      "keyMilestone": "Cố Thanh Trạch khẳng định vị thế trên bảng xếp hạng và phá vỡ một vòng thao túng của ông lớn."
+    },
+    {
+      "volume": 3,
+      "title": "Ngôi Sao Vụt Sáng",
+      "chapterRange": "281-430",
+      "theme": "Đào tạo và nâng đỡ nghệ sĩ, xây dựng ê-kíp",
+      "summary": "Cố Thanh Trạch không chỉ viết nhạc mà bắt đầu phát hiện, đào tạo và nâng đỡ những tài năng bị vùi dập, hình thành một ê-kíp trung thành quanh mình giữa một ngành đầy bóc lột.",
+      "subArcs": [
+        { "name": "Viên ngọc thô", "chapterRange": "281-330", "focus": "Phát hiện một tài năng bị các công ty lớn bỏ rơi và quyết định nâng đỡ." },
+        { "name": "Hợp đồng bất công", "chapterRange": "331-380", "focus": "Đối đầu một hợp đồng bóc lột nghệ sĩ trẻ và giành lại quyền tự do cho họ." },
+        { "name": "Ê-kíp thành hình", "chapterRange": "381-430", "focus": "Tập hợp những người cùng chí hướng thành một ê-kíp sáng tạo trung thành." }
+      ],
+      "keyMilestone": "Cố Thanh Trạch xây dựng được ê-kíp cốt lõi và đưa một ngôi sao mới vụt sáng."
+    },
+    {
+      "volume": 4,
+      "title": "Thương Hiệu Của Riêng Mình",
+      "chapterRange": "431-580",
+      "theme": "Thành lập công ty, đối đầu các ông lớn trong ngành",
+      "summary": "Cố Thanh Trạch lập công ty quản lý và sản xuất của riêng mình, trực diện cạnh tranh với các tập đoàn giải trí lớn quen chèn ép người ngoài, bảo vệ con đường độc lập của mình.",
+      "subArcs": [
+        { "name": "Dựng cờ", "chapterRange": "431-480", "focus": "Thành lập công ty riêng, đối mặt áp lực và sự tẩy chay từ các ông lớn." },
+        { "name": "Cuộc chiến thị phần", "chapterRange": "481-530", "focus": "Cạnh tranh trực diện trên thị trường, dùng tác phẩm chất lượng để giành khán giả." },
+        { "name": "Bẻ gãy vây hãm", "chapterRange": "531-580", "focus": "Vạch trần và đánh bại một âm mưu chèn ép quy mô lớn của tập đoàn đối thủ." }
+      ],
+      "keyMilestone": "Cố Thanh Trạch khẳng định thương hiệu độc lập và trở thành thế lực không thể xem thường trong ngành."
+    },
+    {
+      "volume": 5,
+      "title": "Vượt Biên Giới Nghệ Thuật",
+      "chapterRange": "581-730",
+      "theme": "Mở rộng sang điện ảnh, truyền hình và các loại hình mới",
+      "summary": "Cố Thanh Trạch đưa tài năng của mình vượt ra ngoài âm nhạc, dấn thân vào điện ảnh, truyền hình và các loại hình giải trí mới, đối mặt những thử thách và đối thủ tầm cỡ hơn.",
+      "subArcs": [
+        { "name": "Màn ảnh", "chapterRange": "581-630", "focus": "Lấn sân sang điện ảnh hoặc truyền hình với một dự án táo bạo." },
+        { "name": "Vinh quang và hiểm họa", "chapterRange": "631-680", "focus": "Giành thành công lớn nhưng vấp phải đối thủ tầm cỡ quốc gia và áp lực dư luận." },
+        { "name": "Dấu ấn thời đại", "chapterRange": "681-730", "focus": "Tác phẩm của anh bắt đầu định hình thị hiếu và xu hướng của cả một thế hệ." }
+      ],
+      "keyMilestone": "Cố Thanh Trạch trở thành một nhà sáng tạo đa lĩnh vực có ảnh hưởng vượt khỏi âm nhạc."
+    },
+    {
+      "volume": 6,
+      "title": "Đỉnh Phong Trong Tầm Tay",
+      "chapterRange": "731-880",
+      "theme": "Trở thành biểu tượng dẫn dắt ngành giải trí",
+      "summary": "Cố Thanh Trạch trở thành biểu tượng dẫn dắt ngành, đối đầu các thế lực muốn thống trị thị trường giải trí và những toan tính lớn nhắm vào đế chế của anh.",
+      "subArcs": [
+        { "name": "Người dẫn đầu", "chapterRange": "731-780", "focus": "Cố Thanh Trạch trở thành người định hình tiêu chuẩn của ngành, đối đầu thế lực bá quyền." },
+        { "name": "Đại chiến giải thưởng", "chapterRange": "781-830", "focus": "Cuộc cạnh tranh đỉnh cao tại các giải thưởng và bảng xếp hạng tầm cỡ quốc tế." },
+        { "name": "Toan tính sau cánh gà", "chapterRange": "831-880", "focus": "Một toan tính lớn nhắm vào đế chế của anh, liên hệ tới những ân oán từ kiếp trước." }
+      ],
+      "keyMilestone": "Cố Thanh Trạch trở thành biểu tượng dẫn dắt ngành và đối mặt thách thức tầm cỡ thời đại."
+    },
+    {
+      "volume": 7,
+      "title": "Huyền Thoại Một Thời Đại",
+      "chapterRange": "881-1000",
+      "theme": "Khép lại ân oán kiếp trước và định hình thời đại âm nhạc mới",
+      "summary": "Cố Thanh Trạch đối mặt và hóa giải những ân oán cuối cùng còn sót lại từ kiếp trước, hoàn tất hành trình viết lại cuộc đời, và lựa chọn cách định hình một thời đại âm nhạc và giải trí mới.",
+      "subArcs": [
+        { "name": "Đối diện quá khứ", "chapterRange": "881-930", "focus": "Đối mặt kẻ thù cuối cùng — người từng vùi dập anh ở kiếp trước — bằng tác phẩm và mưu lược." },
+        { "name": "Quyết chiến đỉnh cao", "chapterRange": "931-980", "focus": "Trận đối đầu cuối cùng trên sân khấu lớn nhất, nơi tài năng phân định tất cả." },
+        { "name": "Di sản", "chapterRange": "981-1000", "focus": "Cố Thanh Trạch định hình thời đại âm nhạc mới và để lại di sản cho thế hệ sau." }
+      ],
+      "keyMilestone": "Cố Thanh Trạch hóa giải ân oán kiếp trước, hoàn tất hành trình làm lại cuộc đời và trở thành huyền thoại."
+    }
+  ]
+}

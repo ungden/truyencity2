@@ -1,0 +1,9 @@
+Ở kiếp trước, Cố Thanh Trạch là một nhạc sĩ chật vật. Anh viết những giai điệu mình tin là hay, nhưng chúng bị vùi dập, bị sửa nát, có khi bị người khác cướp trắng công lao rồi đứng trên sân khấu nhận hào quang. Anh sống cả một đời trong cái bóng của ngành giải trí tàn nhẫn, nhìn tài năng của mình mục rữa dần, rồi lặng lẽ rời đi trong tiếc nuối.
+
+Rồi anh mở mắt ra, trở lại thời sinh viên — trẻ trung, tay trắng, nhưng trong đầu là trọn vẹn ký ức và bài học của một kiếp người đã sống. Anh nhớ những giai điệu chưa ai viết, những ca từ chạm tới triệu trái tim, những xu hướng sẽ làm rung chuyển thị trường, và cả gương mặt của từng kẻ đã từng vùi dập mình. Lần này, anh sẽ không để cuộc đời lặp lại.
+
+Nhưng Cố Thanh Trạch hiểu rõ một điều: ký ức không tự biến thành tác phẩm. Nó cho anh biết một bài hát hay trông ra sao, một thị trường sẽ đi về đâu — còn để giai điệu trong đầu thành bản nhạc làm rung động lòng người, anh vẫn phải tự ngồi xuống viết từng nốt, tự mài giũa từng câu chữ, tự đàm phán từng bản hợp đồng, tự thuyết phục từng ca sĩ và nhà sản xuất. Tấm bản đồ đã có; con đường vẫn là mồ hôi và bản lĩnh của chính anh.
+
+Từ một bài hát đầu tiên khiến cả giảng đường lặng đi, anh từng bước bước vào ngành: nâng đỡ một ca sĩ bị vùi dập tỏa sáng, vả mặt kẻ cướp công bằng chính tác phẩm vượt trội, lật ngược những hợp đồng bất công, đối đầu các ông lớn quen thao túng bảng xếp hạng và dư luận. Mỗi tác phẩm chạm tới trái tim công chúng là một bước anh tiến gần hơn tới đỉnh cao.
+
+Đây là hành trình của một người dùng tài năng và bản lĩnh để viết lại cuộc đời mình, để những giai điệu từng bị chôn vùi được vang lên trọn vẹn, và để trở thành huyền thoại định hình cả một thời đại âm nhạc. Một câu chuyện đô thị giải trí nhiệt huyết, cảm xúc và sảng khoái đang chờ phía trước. Đọc tại TruyenCity.

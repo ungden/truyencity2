@@ -1,0 +1,100 @@
+{
+  "title": "Mạt Thế Đồn Vật Tư: Ta Có Kho Vô Hạn",
+  "totalChapters": 1000,
+  "mainPlotline": "Cố Trầm, người bản địa được Hệ Thống Kho Vô Hạn kích hoạt ngay trước Đại Biến Dị, đi từ một tòa chung cư cũ kỹ đến trụ cột tái thiết văn minh, dẫn dắt người sống sót vượt qua bầy dị thú, các thế lực tham lam và Thú Vương — rồi truy nguồn gốc thảm họa và đặt nền móng cho một thế giới mới.",
+  "originLock": "system-bestowed — Cố Trầm là người bản địa thế giới hiện đại, được Hệ Thống Kho Vô Hạn kích hoạt và cảnh báo ngay trước thảm họa; tri thức do Hệ Thống ban tặng, tuyệt đối không có yếu tố đến từ thế giới khác hay ký ức đời trước, sự biết-trước chỉ đến từ lời cảnh báo của Hệ Thống.",
+  "volumes": [
+    {
+      "volume": 1,
+      "title": "Bảy Mươi Hai Giờ Cuối",
+      "chapterRange": "1-130",
+      "theme": "Chuẩn bị và sống sót đợt đầu",
+      "summary": "Hệ Thống kích hoạt và cảnh báo. Cố Trầm tích trữ điên cuồng trong 72 giờ, rồi khi Đại Biến Dị giáng lâm, anh biến chung cư Bình Minh thành pháo đài, cứu nhóm người sống sót đầu tiên và đẩy lùi đợt dị thú cùng băng cướp local đầu tiên.",
+      "subArcs": [
+        { "name": "Lời cảnh báo", "chapterRange": "1-30", "focus": "Hệ Thống kích hoạt, tích trữ vật tư, cứu những người đầu tiên khi thảm họa nổ ra." },
+        { "name": "Pháo đài Bình Minh", "chapterRange": "31-65", "focus": "Phong tỏa và củng cố chung cư, phân công cộng đồng, mở khóa bản thiết kế phòng thủ." },
+        { "name": "Băng Mãnh Hổ", "chapterRange": "66-100", "focus": "Lý Cường tới uy hiếp đòi tài nguyên; Cố Trầm phòng thủ và đẩy lùi chúng trước mặt mọi người." },
+        { "name": "Đợt dị thú đầu", "chapterRange": "101-130", "focus": "Bầy dị thú từ rừng tràn vào; pháo đài chống đỡ thành công, danh tiếng lan ra." }
+      ],
+      "keyMilestone": "Chung cư Bình Minh trở thành pháo đài sinh tồn an toàn nhất khu vực với cộng đồng đầu tiên ổn định."
+    },
+    {
+      "volume": 2,
+      "title": "Mở Rộng Cứ Điểm",
+      "chapterRange": "131-280",
+      "theme": "Quy mô lớn dần và bài toán quản trị",
+      "summary": "Cố Trầm mở rộng pháo đài, thu nạp thêm người sống sót lưu lạc, đối mặt thách thức quản lý cộng đồng đông đúc và các nhóm cướp lớn hơn, đồng thời lần đầu chạm mặt Trại Quân Sự Số 7.",
+      "subArcs": [
+        { "name": "Người mới", "chapterRange": "131-180", "focus": "Hấp thu các nhóm lưu lạc, xây nội quy, phân vai trò và phòng nội gián." },
+        { "name": "Hậu cần quy mô", "chapterRange": "181-230", "focus": "Quản lý kho lương, nước sạch, điện; thiết lập tổ trinh sát thu gom vật tư." },
+        { "name": "Trại Quân Sự Số 7", "chapterRange": "231-280", "focus": "Va chạm rồi dò xét với tàn quân; cân bằng giữa đối đầu và liên minh." }
+      ],
+      "keyMilestone": "Pháo đài thành cứ điểm vùng, Cố Trầm được công nhận là thủ lĩnh hậu cần đáng tin."
+    },
+    {
+      "volume": 3,
+      "title": "Liên Minh Người Sống Sót",
+      "chapterRange": "281-430",
+      "theme": "Người sống sót liên kết lại",
+      "summary": "Cố Trầm tập hợp các cứ điểm độc lập thành một liên minh để cùng phòng thủ và chia sẻ hậu cần, đối đầu sức ép của các thế lực bạo lực muốn độc chiếm tài nguyên.",
+      "subArcs": [
+        { "name": "Hạt giống liên minh", "chapterRange": "281-330", "focus": "Thuyết phục các cứ điểm nhỏ, lập nguyên tắc chung và mạng tiếp tế." },
+        { "name": "Sức mạnh tập thể", "chapterRange": "331-380", "focus": "Phối hợp phòng thủ liên cứ điểm, chia sẻ bản thiết kế và đào tạo." },
+        { "name": "Phản đòn của kẻ mạnh", "chapterRange": "381-430", "focus": "Thế lực bạo lực chèn ép nguồn cung; liên minh phản công bằng đoàn kết." }
+      ],
+      "keyMilestone": "Liên Minh đủ mạnh để đàm phán ngang hàng và phòng thủ chung cả vùng."
+    },
+    {
+      "volume": 4,
+      "title": "Thú Vương Trỗi Dậy",
+      "chapterRange": "431-580",
+      "theme": "Hiểm họa leo thang lên cấp vùng",
+      "summary": "Một Thú Vương cấp cao xuất hiện chỉ huy thú triều, đe dọa quét sạch các cứ điểm. Cố Trầm buộc các thế lực người gác lại hiềm khích, dùng hậu cần và chiến thuật để chuẩn bị cho trận phòng thủ lớn nhất từ trước tới nay.",
+      "subArcs": [
+        { "name": "Bóng Thú Vương", "chapterRange": "431-480", "focus": "Dấu hiệu thú triều, trinh sát hiểm họa, gây dựng tuyến phòng thủ vùng." },
+        { "name": "Liên minh bất đắc dĩ", "chapterRange": "481-530", "focus": "Đàm phán với Trại Quân Sự Số 7 và các thế lực để hợp lực." },
+        { "name": "Đại chiến phòng thủ", "chapterRange": "531-580", "focus": "Trận chống thú triều, hậu cần và bố phòng của Cố Trầm thành mấu chốt thắng lợi." }
+      ],
+      "keyMilestone": "Thú triều đợt đầu bị đẩy lui; Cố Trầm thành trụ cột hậu cần của cả liên minh vùng."
+    },
+    {
+      "volume": 5,
+      "title": "Trật Tự Mới",
+      "chapterRange": "581-730",
+      "theme": "Xây dựng văn minh giữa tàn tích",
+      "summary": "Sau đại chiến, Cố Trầm dẫn dắt việc tái lập trật tự: nông nghiệp trong nhà kính, phục hồi điện nước, luật lệ cộng đồng, đồng thời đối phó tham vọng quyền lực từ bên trong liên minh.",
+      "subArcs": [
+        { "name": "Mầm xanh hồi sinh", "chapterRange": "581-630", "focus": "Trồng trọt, tự cung lương thực, giảm phụ thuộc vào vật tư cũ." },
+        { "name": "Luật của người sống", "chapterRange": "631-680", "focus": "Thiết lập trật tự, xử lý mâu thuẫn nội bộ và tham vọng cá nhân." },
+        { "name": "Chuẩn của vùng", "chapterRange": "681-730", "focus": "Cứ điểm Cố Trầm định hình mô hình cộng đồng văn minh kiểu mẫu." }
+      ],
+      "keyMilestone": "Một trật tự văn minh sơ khai hình thành quanh liên minh do Cố Trầm dẫn dắt."
+    },
+    {
+      "volume": 6,
+      "title": "Vượt Ranh Giới Vùng Đất Chết",
+      "chapterRange": "731-880",
+      "theme": "Mở rộng ra thế giới rộng lớn",
+      "summary": "Cố Trầm tổ chức các đoàn viễn chinh vượt vùng đất chết, kết nối với những cộng đồng sống sót xa xôi, đối đầu các Thú Vương khác và lần ra manh mối về nguồn gốc Đại Biến Dị.",
+      "subArcs": [
+        { "name": "Đoàn viễn chinh", "chapterRange": "731-780", "focus": "Mở tuyến tiếp tế xa, khám phá vùng đất chết và cộng đồng mới." },
+        { "name": "Bản đồ thế giới mới", "chapterRange": "781-830", "focus": "Liên kết các vùng, đối đầu Thú Vương khu vực khác." },
+        { "name": "Manh mối nguồn gốc", "chapterRange": "831-880", "focus": "Lần theo dấu vết văn minh tiền-Biến-Dị và bí ẩn Hệ Thống." }
+      ],
+      "keyMilestone": "Mạng lưới cộng đồng liên vùng hình thành; manh mối nguồn gốc thảm họa dần lộ ra."
+    },
+    {
+      "volume": 7,
+      "title": "Tái Thiết Văn Minh",
+      "chapterRange": "881-1000",
+      "theme": "Hé lộ nguồn gốc và đại nạn cuối",
+      "summary": "Nguồn gốc Đại Biến Dị và Hệ Thống Kho Vô Hạn được hé lộ. Cố Trầm dẫn dắt toàn bộ liên minh vượt qua đại nạn cuối cùng và đặt nền móng cho một nền văn minh mới hồi sinh từ tro tàn.",
+      "subArcs": [
+        { "name": "Sự thật Biến Dị", "chapterRange": "881-930", "focus": "Reveal nguồn gốc Đại Biến Dị và di sản văn minh tiền-Biến-Dị." },
+        { "name": "Đại nạn cuối", "chapterRange": "931-980", "focus": "Trận chiến tổng lực chống đại nạn đe dọa toàn nhân loại còn sót lại." },
+        { "name": "Bình minh mới", "chapterRange": "981-1000", "focus": "Tái thiết văn minh, trao lại trật tự cho thế hệ sau, khép lại hành trình." }
+      ],
+      "keyMilestone": "Đại nạn được dập tắt; một nền văn minh mới được dựng lên, Cố Trầm thành người đặt nền móng và truyền lửa."
+    }
+  ]
+}

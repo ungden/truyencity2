@@ -1,0 +1,25 @@
+{
+  "arc_number": 1,
+  "start_chapter": 1,
+  "end_chapter": 30,
+  "arc_theme": "Câu thơ đầu tiên — khai văn khí và vả mặt thế gia tại văn hội huyện",
+  "plan_text": "Arc mở màn warm-baseline: Tô Mặc xuyên không vào thân hàn sĩ thi rớt nhưng golden finger (kho thơ kim cổ + cơ chế Văn Khí Nho Đạo) kích hoạt NGAY ch.1, không để MC khổ sở kéo dài. Mỗi chương xoay quanh một tình huống văn đạo cụ thể, với ít nhất 2 cao điểm dopamine/chương (cao điểm đầu trước nửa chương — thường là một câu thơ chấn động hoặc một đòn vả mặt thế gia). Cụm chương theo 5-cluster: ch.1-6 setup (xuyên không, khai văn khí, câu thơ đầu tiên chấn động sân văn hội huyện, vả mặt đám học trò họ Triệu, sinh tài khí Minh Châu đầu tiên); ch.7-14 breathing + competence (kết giao Lý Thanh Tuyền ở thư viện và bạn đồng môn Đỗ Tiểu Nhị, mượn sách, hiểu cơ chế tài khí, đề thêm vài bài nhỏ tích danh vọng); ch.15-22 confront (công tử Triệu Hằng và thế gia họ Triệu bắt đầu chèn ép, thuê văn sĩ ra đề hiểm bêu rếu, Tô Mặc lật ngược bằng áng văn đúng đề bất ngờ); ch.23-28 big_wow (văn hội huyện chính thức, Trần lão phu tử chủ trì, Tô Mặc đề một bài trấn động đạt dị tượng Đạt Phủ, cả lầu văn lặng người, đỗ tư cách Đồng Sinh, danh vang khắp huyện); ch.29-30 resolution + hook (quán quân văn hội huyện, đặt manh mối Trần lão phu tử sững người vì 'giọng văn quen', mở tuyến nguồn cội văn đạo và kỳ thi Tú Tài sắp tới). Giữ nguyên tắc non-combat: mọi xung đột bằng văn đấu/khoa cử/biện luận đạo lý/tài khí. Không đâm chém, không võ công tay đôi. MC điềm tĩnh, lì, hào sảng, lấy tài học và chính khí làm vũ khí.",
+  "chapter_briefs": [
+    { "n": 1, "beat": "setup", "goal": "Tô Mặc xuyên không vào thân hàn sĩ thi rớt, bị đám họ Triệu khinh miệt", "payoff": "Khai văn khí, ngâm câu thơ đầu tiên, tài khí Minh Châu dâng lên đỉnh đầu khiến kẻ khinh hắn sững sờ", "endingHook": "Một vầng mây trắng cuộn giữa ban ngày — dị tượng đầu tiên hiện ra" },
+    { "n": 3, "beat": "setup", "goal": "Hiểu cơ chế Văn Khí qua vài lần đề thơ nhỏ", "payoff": "Đề đúng cảnh sinh tài khí, danh 'hàn sĩ biết khai văn khí' bắt đầu lan trong xóm học trò", "endingHook": "Lý Thanh Tuyền ở thư viện chú ý tới hắn" },
+    { "n": 9, "beat": "breathing", "goal": "Kết giao tri kỷ văn đạo và bạn đồng môn", "payoff": "Lý Thanh Tuyền cho mượn sách quý, Đỗ Tiểu Nhị kết thân, Tô Mặc tích thêm danh vọng và hiểu sâu cơ chế tài khí", "endingHook": "Tin văn hội huyện sắp mở, họ Triệu cũng dự thi" },
+    { "n": 18, "beat": "confront", "goal": "Đối phó đòn bêu rếu của thế gia họ Triệu", "payoff": "Triệu Hằng thuê văn sĩ ra đề hiểm tại chỗ, Tô Mặc lật ngược bằng một áng văn đúng đề bất ngờ, đám đông tán thưởng", "endingHook": "Họ Triệu cay cú, quyết hạ Tô Mặc tại văn hội chính" },
+    { "n": 26, "beat": "big_wow", "goal": "Tranh tài tại văn hội huyện do Trần lão phu tử chủ trì", "payoff": "Tô Mặc đề một bài trấn động đạt dị tượng Đạt Phủ, cả lầu văn lặng người, đám họ Triệu mặt trắng bệch, đỗ tư cách Đồng Sinh", "endingHook": "Trần lão phu tử sững người, lẩm bẩm 'giọng văn này ta như đã gặp ở đâu rất xưa'" },
+    { "n": 30, "beat": "resolution", "goal": "Khép arc 1, định danh hàn sĩ kỳ tài Thanh Hà", "payoff": "Tô Mặc đoạt quán quân văn hội huyện, danh vang khắp huyện, Lý Thanh Tuyền và Đỗ Tiểu Nhị thành đồng đạo thân tín", "endingHook": "Manh mối nguồn cội văn đạo mở ra, kỳ thi Tú Tài và phủ thành Giang Châu chờ phía trước" }
+  ],
+  "threads_to_advance": ["Lật ngược danh tiếng hàn sĩ Thanh Hà", "Quan hệ với tri kỷ văn đạo và bạn đồng môn", "Mở khóa và thăng cấp cơ chế Văn Khí Nho Đạo"],
+  "threads_to_resolve": ["Tô Mặc bị coi là kẻ học dốt (giải quyết: thành quán quân văn hội huyện, đỗ Đồng Sinh)"],
+  "new_threads": ["Đối đầu thế gia họ Triệu và Triệu Hằng", "Bí ẩn 'giọng văn quen' Trần lão phu tử nhận ra", "Manh mối di thư tiền nhân ở thư viện Thanh Hà"],
+  "sub_arcs": [
+    { "name": "Câu thơ đầu tiên", "chapterRange": "1-6", "cluster": "setup" },
+    { "name": "Tri kỷ văn đạo", "chapterRange": "7-14", "cluster": "breathing" },
+    { "name": "Đòn bêu rếu của họ Triệu", "chapterRange": "15-22", "cluster": "confront" },
+    { "name": "Dị tượng văn hội", "chapterRange": "23-28", "cluster": "big_wow" },
+    { "name": "Quán quân Thanh Hà", "chapterRange": "29-30", "cluster": "resolution" }
+  ]
+}

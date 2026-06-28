@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "totalScore": 123,
+  "avgScore": 8.79,
+  "minDimScore": 8,
+  "source": "claude_code",
+  "dimensions": [
+    { "name": "Premise & hook", "score": 9, "note": "Warm-baseline isekai khai hóa: tri thức và Khải Hóa Đồ Giám active ngay ch.1, hook là cứu bộ lạc khỏi rét đêm đầu bằng lửa bền — opportunity-driven, không mở đầu bằng cảnh MC sắp chết thảm." },
+    { "name": "Protagonist engine", "score": 9, "note": "Lâm Mặc thắng bằng tri thức nông học/kỹ thuật/quản trị hiện đại + tổ chức người; tính cách điềm đạm, thực tế, có lòng nhân, kiên nhẫn thử-sai, nhất quán xuyên suốt." },
+    { "name": "System mechanic", "score": 9, "note": "Khải Hóa Đồ Giám có input/output/limit/reward rõ; anti-plot-armor cứng — chỉ gợi ý tiềm năng tài nguyên, không làm thay, mờ khi kiệt sức/đói, vô dụng với vấn đề con người, MC vẫn phải thử-sai và trả giá." },
+    { "name": "Conflict ladder", "score": 9, "note": "Leo thang sạch: sinh tồn bộ lạc đơn → cạnh tranh tài nguyên với lân cận → đối đầu Lang Tộc và Cự Nham → hợp nhất văn minh, giải bằng khai hóa và tổ chức, chiến đấu chỉ phòng vệ." },
+    { "name": "World coherence", "score": 9, "note": "Man Hoang nguyên thủy + bậc thang văn minh có thật (lửa→nông nghiệp→thủ công→kim loại→chữ viết→đô thị→liên minh) nhất quán; forbidden elements rõ (cấm tu luyện, trọng sinh, công nghệ nhảy cóc, gore)." },
+    { "name": "Dopamine cadence", "score": 9, "note": "controlRules ≥2 peak/chương (khai hóa cứu người/cải thiện đời sống + được công nhận hoặc đẩy lui mối nguy), cao điểm đầu trước nửa chương, đúng nhịp sảng văn khai hóa." },
+    { "name": "Origin lock", "score": 9, "note": "mcOrigin=transmigrator khóa chặt; outlines và mọi file dùng phrasing khẳng định (nhập thân xác, người hiện đại từ thế giới khác), KHÔNG chứa token trọng sinh/kiếp trước/đầu thai/chuyển kiếp." },
+    { "name": "Knowledge-as-power coherence", "score": 8, "note": "Sức mạnh đến từ tri thức và tổ chức, không phải võ lực hay phép màu; mọi bước văn minh đều có cơ sở khoa học/lịch sử và bị giới hạn bởi bậc thang, tránh nhảy cóc phi lý." },
+    { "name": "Foreshadowing & twists", "score": 8, "note": "3 twist (nỗi sợ thật của Cốt Vu, khủng hoảng sinh tồn của Lang Tộc, hệ quả quy mô đại lục) + 3 foreshadowing có plant/payoff chapter cụ thể, kéo dài tới cao trào." },
+    { "name": "Long-form sustainability", "score": 9, "note": "noveltyLadder 6 nấc giữ cùng lane 'dùng tri thức khai hóa văn minh', 7 volume cho 1000 chương, endgame hợp nhất các bộ lạc thành một nền văn minh tự vận hành." },
+    { "name": "Vietnamese voice", "score": 8, "note": "Voice anchors ấm áp, thực tế, đúng giọng sử thi khai hóa, đủ diacritics, không AI-tell, dialogue dùng em dash đúng chuẩn tiểu thuyết Việt." }
+  ],
+  "overallFeedback": "Setup vững cho isekai khai hóa văn minh thời nguyên thủy: warm-baseline opening với tri thức và Khải Hóa Đồ Giám active ngay ch.1, golden finger là nhãn-gợi-ý-tiềm-năng có anti-plot-armor cứng (không làm thay, mờ khi kiệt sức, vô dụng với vấn đề con người), conflict ladder leo thang sạch qua 7 volume bằng khai hóa và tổ chức, origin lock transmigrator chặt với phrasing khẳng định, dopamine cadence đúng nhịp sảng văn khai hóa (giải pháp cứu người + được công nhận + đẩy lui mối nguy), foreshadowing và twist có cấu trúc dài hạn. Phân biệt rõ với novel tech-uplift dị giới ma pháp: đây là bộ lạc nguyên thủy đầy mãnh thú từ con số không. Sẵn sàng cho DeepSeek V4 Pro viết chương. PASS."
+}

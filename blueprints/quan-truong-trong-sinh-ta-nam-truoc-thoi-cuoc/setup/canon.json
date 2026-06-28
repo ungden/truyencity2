@@ -1,0 +1,205 @@
+{
+  "power_system": {
+    "name": "Thang Bậc Quan Trường — Cấp Hành Chính, Vốn Chính Trị và Tầm Nhìn",
+    "type": "administrative-political progression (thăng tiến theo cấp bậc hành chính, vốn chính trị, uy tín và tầm nhìn thời cuộc — KHÔNG phải võ lực, KHÔNG phải tu luyện)",
+    "coreResource": "Vốn chính trị của Diệp Hướng Đông: cấp bậc hành chính, thẩm quyền, uy tín cá nhân, lòng tin của cấp trên và người dân, mạng lưới đồng minh chính trực, cùng tầm nhìn thời cuộc từ ký ức một đời đã sống — tích lũy qua những quyết sách đúng được thực tế chứng minh.",
+    "unlockRule": "Diệp Hướng Đông lên 'cấp' khi lập được tích thực (một dự báo cứu một vụ việc, một ngành mũi nhọn cất cánh, một biến động được hóa giải) và được đề bạt đúng quy trình; thẩm quyền lớn hơn mở ra phạm vi cải cách rộng hơn, nhưng cũng kéo theo đối thủ tinh vi hơn và những tình huống vượt ngoài ký ức cũ.",
+    "tiers": [
+      { "tier": 1, "name": "Cán bộ cấp xã/thị trấn", "scope": "Dùng tầm nhìn ngăn một rủi ro địa phương, lập tích thực đầu tay ở cấp cơ sở" },
+      { "tier": 2, "name": "Lãnh đạo cấp huyện", "scope": "Chọn ngành mũi nhọn cho địa bàn, biến một huyện thành điểm sáng, hóa giải một cơn vỡ đầu tư" },
+      { "tier": 3, "name": "Lãnh đạo sở-ngành / rìa cấp tỉnh", "scope": "Đấu trí cấp cao trong 'vùng mù' khi ký ức sai lệch, triệt mạng lưới Phe Trục Lợi quy mô tỉnh" },
+      { "tier": 4, "name": "Người lãnh đạo dẫn dắt toàn tỉnh", "scope": "Dẫn cả tỉnh vượt biến động thời cuộc lớn, lật thế cờ trước liên minh đối lập, kiến tạo di sản bền vững" }
+    ],
+    "antiPlotArmor": [
+      "Tầm nhìn CHỈ cho biết 'đi đâu' — KHÔNG tự biến thành quyền lực, KHÔNG tự thuyết phục người khác, KHÔNG tự thực thi; Diệp Hướng Đông vẫn phải làm đúng quy trình, xây đề án và thuyết phục người hoài nghi thì dự báo mới thành quyết sách.",
+      "Mỗi lần anh tác động vào dòng chảy, thời cuộc đổi khác và ký ức cũ dần sai lệch; càng về sau vùng 'biết trước' càng thu hẹp, buộc anh phải dựa vào năng lực thực — không có chuyện thắng mọi nước cờ chỉ nhờ tiên tri.",
+      "Thăng tiến phải đi kèm tích thực và đúng quy trình; vượt thẩm quyền, phá quy trình hoặc 'lạm dụng tiên tri' để thâu tóm quyền lực đều bị phản đòn.",
+      "Vốn chính trị có thể bị bào mòn: bị cô lập, bị vu cáo, bị cắt nguồn lực, bị điều đi vùng khó đều làm yếu sức mạnh của anh; đối thủ cấp cao có nhiều quan hệ và nguồn lực hơn, anh thường ở thế yếu hơn về quyền lực và phải bù bằng tầm nhìn, chính sách và đấu trí."
+    ],
+    "signatureBuff": {
+      "name": "Đọc Mạch Thời Cuộc",
+      "effect": "Nhờ một đời chính trường đã sống, Diệp Hướng Đông nhận ra các quy luật lặp lại của thời cuộc (ngành nào theo chu kỳ sẽ lên, một cơn sốt đầu tư đi tới đâu thì vỡ, một chính sách triển khai thế nào thì sai), giúp anh đoán hướng diễn tiến và đặt quyết sách đón đầu.",
+      "limit": "Chỉ là quy luật và ký ức từ kinh nghiệm thật, không phải đáp án tuyệt đối; với việc anh chưa từng trải qua hoặc đã bị chính anh thay đổi thì tầm nhìn vô dụng, và đối thủ cao tay có thể tạo ra biến số mới mà ký ức cũ không lường được."
+    },
+    "progressionAxes": [
+      "Cấp bậc hành chính và phạm vi thẩm quyền",
+      "Độ chính xác và phạm vi còn dùng được của tầm nhìn thời cuộc (thu hẹp dần khi anh thay đổi dòng chảy)",
+      "Năng lực thực: khả năng xây đề án, thuyết phục, đấu trí và quyết sách trong vùng mù",
+      "Mạng lưới đồng minh chính trực và lòng tin của cấp trên, người dân"
+    ],
+    "powerCeilingByPhase": {
+      "phase1": "Dùng tầm nhìn ngăn một rủi ro địa phương và lập tích thực đầu tay ở cấp cơ sở",
+      "phase2": "Chọn ngành mũi nhọn cho một huyện và hóa giải một làn sóng đầu tư nóng sắp vỡ ở cấp huyện-sở",
+      "phase3": "Quyết sách trong vùng mù khi ký ức sai lệch và triệt mạng lưới Phe Trục Lợi ở quy mô tỉnh",
+      "phase4": "Dẫn cả tỉnh vượt một biến động thời cuộc lớn, lật ngược liên minh đối lập và kiến tạo di sản phát triển bền vững"
+    }
+  },
+  "worldbuilding": {
+    "tone": "Chính kịch quan trường tỉnh táo, sảng khoái và ấm áp: niềm vui đến từ một quyết sách đúng làm đổi đời một vùng đất và một con người chính trực thăng tiến vững vàng, nhưng không tô hồng — cải cách là quá trình từng bước và mỗi thắng lợi đều có cái giá.",
+    "economy": "Kinh tế Tỉnh Lâm Khê đang chuyển từ kế hoạch cứng nhắc sang vận hành linh hoạt: cải cách doanh nghiệp, đô thị hóa, khu công nghiệp, hạ tầng, các cơn sốt rồi vỡ của những phong trào đầu tư nóng — chính những dòng chuyển dịch này là nơi tầm nhìn của Diệp Hướng Đông phát huy và cũng là miếng mồi của Phe Trục Lợi.",
+    "setting": "Tỉnh Lâm Khê, một tỉnh nội địa hư cấu trong một quốc gia đang bước vào thời kỳ cải cách và tăng trưởng nhanh; giai đoạn bản lề khi cả vùng đất chuyển mình, cơ hội nhiều mà cạm bẫy cũng nhiều.",
+    "geography": {
+      "phase1": "Một thị trấn và các xã nghèo của Lâm Khê: ruộng đồng, doanh nghiệp nhỏ, trụ sở ủy ban cấp xã/thị trấn, khu tập thể cán bộ",
+      "phase2": "Một huyện đang chọn hướng phát triển: khu công nghiệp non trẻ, vùng quy hoạch, các dự án đầu tư",
+      "phase3": "Cấp sở-ngành và trung tâm hành chính cấp tỉnh: nơi hoạch định chính sách, ngân sách và quyền lực thật",
+      "phase4": "Toàn bộ Tỉnh Lâm Khê chuyển mình thành hình mẫu phát triển bền vững và trong sạch"
+    },
+    "techLevel": "Giai đoạn cải cách của một quốc gia đang phát triển nhanh: hạ tầng và công nghiệp mọc lên, quản lý dần hiện đại hóa, nhưng dữ liệu thường bị làm đẹp và tầm nhìn dài hạn còn thiếu — lợi thế của một người biết trước diễn biến mấy mươi năm.",
+    "governanceStructure": "Bốn cấp hành chính (xã/thị trấn, huyện/thành phố, các sở-ngành chuyên môn, cấp tỉnh hoạch định chính sách); con đường cán bộ là chuỗi luân chuyển qua các địa bàn, mỗi nhiệm kỳ là một bài kiểm tra; quyền lực thật chảy theo cả quan hệ thầy-trò, đồng hương, thông gia lẫn sơ đồ tổ chức chính thức.",
+    "conflictMedium": "Giải quyết xung đột bằng chính sách, số liệu, tầm nhìn, dự báo được thực tế chứng minh, thuyết phục, đấu trí chính trị và kết quả thực tế (NON-combat) — tuyệt đối không bằng đánh nhau hay bạo lực thể chất.",
+    "forbiddenElements": [
+      "đánh nhau tay đôi/ẩu đả như nguồn giải quyết xung đột chính",
+      "ám sát, bạo lực băng đảng, gore giật gân",
+      "xuyên không / xuyên việt / đến từ thế giới khác / đến từ trái đất / từ thế giới hiện đại",
+      "tu luyện / cảnh giới / võ công / năng lực siêu nhiên",
+      "MC tham gia giải đấu chiến đấu hoặc xã hội đen làm tuyến chính",
+      "lạm dụng tầm nhìn để thâu tóm quyền lực hoặc trục lợi cá nhân"
+    ]
+  },
+  "factions": [
+    {
+      "name": "Diệp Hướng Đông và nhóm cán bộ chính trực",
+      "type": "nhóm nhân vật chính",
+      "power_level": 3,
+      "summary": "Diệp Hướng Đông cùng ông Hà, cô Mai và lớp cán bộ chính trực, dựa vào tầm nhìn thời cuộc, chính sách đúng, đấu trí và kết quả thực để đưa địa phương đi lên và làm sạch bộ máy.",
+      "territory": "Khởi đầu từ một thị trấn, mở rộng dần lên cấp huyện, sở-ngành rồi cấp tỉnh theo bước thăng tiến của MC",
+      "mc_relation": "MC là trung tâm và người dẫn dắt",
+      "conflicts": ["Phe Thành Tích", "Phe Bảo Thủ", "Phe Trục Lợi"],
+      "alliances": ["Lớp cán bộ chính trực và người dân được hưởng lợi từ quyết sách đúng"],
+      "importance": 10,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Phe Thành Tích",
+      "type": "nhóm cán bộ chạy theo con số đẹp",
+      "power_level": 7,
+      "summary": "Những người chạy theo dự án hoành tráng và con số đẹp để leo nhanh, bất chấp hệ quả dài hạn; ganh đua trực diện với Diệp Hướng Đông bằng thành tích bề nổi và quan hệ.",
+      "territory": "Các vị trí lãnh đạo địa phương ham phô trương thành tích",
+      "mc_relation": "Đối thủ ganh đua xuyên suốt, đối đầu qua đề án, kết quả và đấu trí chính trị",
+      "conflicts": ["Diệp Hướng Đông và nhóm cán bộ chính trực"],
+      "alliances": ["Phe Bảo Thủ (khi cùng cản MC)", "Phe Trục Lợi (khi cần)"],
+      "importance": 8,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Phe Bảo Thủ",
+      "type": "lớp cán bộ ngại đổi mới",
+      "power_level": 7,
+      "summary": "Lớp cán bộ lấy 'an toàn, đúng quy trình cũ' làm lá chắn, vô tình cản các quyết sách táo bạo nhưng đúng đắn của Diệp Hướng Đông; không xấu xa nhưng là lực cản dai dẳng.",
+      "territory": "Các bộ phận hành chính nặng tính thủ tục, các vị trí lãnh đạo lâu năm",
+      "mc_relation": "Lực cản chính giai đoạn đầu-giữa, vượt qua bằng số liệu, mô hình thí điểm và kết quả thực",
+      "conflicts": ["Diệp Hướng Đông và nhóm cán bộ chính trực"],
+      "alliances": ["Phe Thành Tích (khi cùng cản đổi mới)"],
+      "importance": 8,
+      "introduce_arc": 2
+    },
+    {
+      "name": "Phe Trục Lợi",
+      "type": "nhóm lợi dụng giao thời để thâu tóm tài sản công",
+      "power_level": 9,
+      "summary": "Nhóm lợi dụng giai đoạn tranh tối tranh sáng của cải cách để thâu tóm tài sản công, đất đai và cơ hội dưới vỏ bọc đổi mới; phản diện nguy hiểm nhất, hoạt động ngầm qua mạng quan hệ và dòng tiền.",
+      "territory": "Mạng lưới lợi ích ngầm trải từ cấp huyện lên cấp tỉnh",
+      "mc_relation": "Phản diện tối hậu, đối đầu bằng chính sách, pháp luật, minh bạch thông tin và đấu trí ở cường độ cao nhất",
+      "conflicts": ["Diệp Hướng Đông và nhóm cán bộ chính trực"],
+      "alliances": ["Phe Thành Tích", "Phe Bảo Thủ (bị lợi dụng)"],
+      "importance": 10,
+      "introduce_arc": 3
+    }
+  ],
+  "plot_twists": [
+    {
+      "summary": "Trương Bằng, cán bộ Phe Thành Tích tưởng chỉ là kẻ ganh đua phô trương, thực ra là một mắt xích được Phe Trục Lợi nuôi dưỡng từ sớm để hợp thức hóa các dự án thổi phồng — sự cay cú của y với Diệp Hướng Đông che giấu một đường dây lớn hơn.",
+      "payoff_type": "danh tính ẩn",
+      "setup_chapters": [66, 200],
+      "twist_chapter": 340,
+      "reader_impact": "major",
+      "arc_number": 2
+    },
+    {
+      "summary": "Đến giữa truyện, một biến động lớn diễn ra KHÁC hẳn ký ức kiếp trước của Diệp Hướng Đông — vì chính những can thiệp trước đó của anh đã đổi dòng chảy thời cuộc; anh nhận ra tầm nhìn của mình đang co lại thành 'vùng mù' và phải dựa hoàn toàn vào năng lực thực.",
+      "payoff_type": "đảo lộn quy luật golden finger",
+      "setup_chapters": [290, 451],
+      "twist_chapter": 505,
+      "reader_impact": "major",
+      "arc_number": 4
+    },
+    {
+      "summary": "Người đứng đầu mạng lưới Phe Trục Lợi cấp tỉnh chính là một vị lãnh đạo mà ở kiếp trước Diệp Hướng Đông từng kính trọng và tin tưởng, người đã dìu dắt anh — nay anh phải tự tay vạch trần ân nhân cũ của một đời đã qua để giữ liêm chính.",
+      "payoff_type": "nguồn gốc thế cục",
+      "setup_chapters": [120, 611, 700],
+      "twist_chapter": 760,
+      "reader_impact": "major",
+      "arc_number": 5
+    }
+  ],
+  "themes": [
+    {
+      "name": "Tầm nhìn phải đi cùng liêm chính thì mới bền",
+      "type": "main",
+      "description": "Biết trước thời cuộc là lợi thế khổng lồ, nhưng nếu thiếu liêm chính nó chỉ tạo ra một kẻ trục lợi giỏi hơn; chỉ khi tầm nhìn phục vụ cái đúng thì thành quả mới bền.",
+      "motifs": ["từ chối một thương vụ béo bở mình biết sẽ sinh lời", "chọn việc đúng thay vì việc dễ ghi điểm", "đứng thẳng giữa cuộc họp"],
+      "importance": 10
+    },
+    {
+      "name": "Biết 'đi đâu' chưa đủ, vẫn phải tự bước 'đi thế nào'",
+      "type": "main",
+      "description": "Một dự báo dù chính xác cũng chỉ thành quyết sách khi làm đúng quy trình, thuyết phục được người hoài nghi và xây được năng lực thực; tầm nhìn không thay được bản lĩnh.",
+      "motifs": ["dịch tầm nhìn thành đề án và số liệu", "đêm trắng viết lập luận thuyết phục", "quyết sách trong vùng mù không có đáp án cũ"],
+      "importance": 9
+    },
+    {
+      "name": "Một quyết sách đúng có thể đổi đời cả một vùng đất",
+      "type": "supporting",
+      "description": "Chọn đúng ngành mũi nhọn, ngăn một cơn vỡ, an dân trước biến động — mỗi nước cờ đúng thời điểm thay đổi vận mệnh của cả một cộng đồng.",
+      "motifs": ["một xã nghèo đổi đời", "doanh nghiệp lành mạnh được cứu", "đám đông lặng lẽ biết ơn"],
+      "importance": 8
+    },
+    {
+      "name": "Cơ hội được làm lại là để kiến tạo, không phải để trục lợi",
+      "type": "supporting",
+      "description": "Được trao một đời thứ hai, Diệp Hướng Đông chọn dựng nên điều tốt đẹp và để lại di sản, thay vì lặp lại sai lầm hay dùng tầm nhìn để vun vén riêng mình.",
+      "motifs": ["đào tạo lớp kế cận", "thể chế hóa cơ chế minh bạch", "đối diện cái giá của con đường đã chọn"],
+      "importance": 8
+    }
+  ],
+  "voice_anchors": [
+    {
+      "snippet_type": "opening",
+      "prose_text": "Diệp Hướng Đông tỉnh dậy giữa tiếng gà gáy của một buổi sáng mà anh ngỡ đã chôn vùi dưới mấy mươi năm. Trần nhà thấp, vôi tróc từng mảng, chiếc quạt máy cũ kêu cọt kẹt — căn phòng tập thể cán bộ thuở anh mới ra trường. Anh ngồi dậy, lòng bàn tay áp lên ngực, đếm từng nhịp tim cho đến khi chắc chắn mình không mơ. Trên bàn là tập tài liệu quy hoạch thị trấn, đề ngày tháng của một năm mà anh nhớ rõ từng biến cố sắp xảy ra. Anh đã đi gần hết một đời người trên chính trường, đủ lâu để hiểu cái giá của mỗi quyết sách, đủ xa để nuối tiếc những ngã rẽ mình đã không kịp chọn. Giờ thì tất cả lại nằm trước mặt, nguyên vẹn, còn chưa viết. Diệp Hướng Đông khẽ thở ra. Lần này, anh tự nhủ, mình sẽ đi một con đường khác.",
+      "key_traits": ["chín chắn", "điềm tĩnh", "mang gánh nặng của một đời đã sống", "quyết tâm làm lại cho đúng"]
+    },
+    {
+      "snippet_type": "dialogue",
+      "prose_text": "— Cậu còn trẻ mà nói chuyện như ông cụ non. Cái ngành ấy giờ ai thèm để ý, đầu tư vào chỉ tổ ôm lỗ. Trương Bằng cười khẩy, gõ tay xuống bản đề án của Diệp Hướng Đông. Anh không cao giọng, chỉ lật sang trang số liệu mình đã chuẩn bị từ đêm trước. — Anh Bằng nói đúng một nửa: bây giờ thì chưa ai để ý. Nhưng anh thử nhìn ba con số này — chi phí đầu vào đang giảm, nhu cầu vùng lân cận đang nhích lên, và chính sách sắp tới sẽ ưu tiên hướng này. Em không xin anh tin ngay. Em chỉ xin một mô hình thí điểm nhỏ. Nếu sai, em chịu trách nhiệm. Còn nếu đúng — anh nhìn thẳng vào Trương Bằng — thì cả huyện ta sẽ đi trước người khác đúng một bước.",
+      "key_traits": ["bình tĩnh dịch tầm nhìn thành số liệu", "không tranh hơn thua cảm tính", "dám nhận trách nhiệm", "thuyết phục bằng lý lẽ"]
+    },
+    {
+      "snippet_type": "action",
+      "prose_text": "Cuộc họp tỉnh đến phần báo cáo tình hình đầu tư thì cả phòng họp chùng xuống. Cơn sốt mà nửa năm trước ai cũng tung hô giờ đã vỡ đúng như Diệp Hướng Đông cảnh báo, kéo theo những con số đỏ loét trên màn chiếu. Người ta quay sang nhìn anh — người duy nhất nửa năm trước đã đứng lên xin hãm phanh và bị gọi là 'kẻ phá đám tăng trưởng'. Anh không nói một lời đắc thắng. Anh chỉ mở tập tài liệu, trình bày gọn gàng phương án anh đã âm thầm chuẩn bị: những doanh nghiệp lành mạnh nào cần được giữ, những hộ dân nào cần được an, dòng vốn nào cần được nắn lại. Từng trang lật qua, không khí trong phòng đổi từ hoang mang sang trông cậy. Khi anh gấp tập tài liệu, không ai còn nhắc tới hai chữ 'phá đám' nữa.",
+      "key_traits": ["không đắc thắng khi dự báo thành sự thật", "giải pháp thay vì kể công", "an dân và giữ cái lành", "uy tín dựng bằng kết quả"]
+    }
+  ],
+  "foreshadowing": [
+    {
+      "hintText": "Trong tập tài liệu quy hoạch đầu tiên, Diệp Hướng Đông dừng lại ở tên một ngành đang bị xem nhẹ; anh nhớ rõ vài năm sau nó sẽ bùng nổ, lặng lẽ khoanh tròn rồi gấp lại, chưa nói với ai.",
+      "category": "object",
+      "plantCh": 8,
+      "pickupCh": 131,
+      "payoffDescription": "Chính ngành ấy trở thành ngành mũi nhọn anh chọn để biến một huyện trung bình thành điểm sáng."
+    },
+    {
+      "hintText": "Trương Bằng luôn 'tình cờ' xuất hiện đúng lúc các dự án thổi phồng cần một người ký xác nhận, và mỗi lần như thế lại có thêm một nguồn lực mới đổ về tay y mà không rõ từ đâu.",
+      "category": "character_behavior",
+      "plantCh": 66,
+      "pickupCh": 340,
+      "payoffDescription": "Trương Bằng là mắt xích được Phe Trục Lợi nuôi dưỡng để hợp thức hóa các dự án thổi phồng."
+    },
+    {
+      "hintText": "Một lần đối chiếu ký ức với thực tế, Diệp Hướng Đông giật mình nhận ra một sự kiện nhỏ đã diễn ra sớm hơn anh nhớ vài tháng; anh tự nhủ phải cẩn trọng, vì dòng chảy có thể đang đổi khác.",
+      "category": "event",
+      "plantCh": 50,
+      "pickupCh": 505,
+      "payoffDescription": "Ký ức kiếp trước bắt đầu sai lệch vì chính anh đã thay đổi dòng chảy, mở ra giai đoạn anh phải quyết sách trong vùng mù bằng năng lực thực."
+    }
+  ]
+}

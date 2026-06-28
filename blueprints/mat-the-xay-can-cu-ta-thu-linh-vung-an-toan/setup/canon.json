@@ -1,0 +1,197 @@
+{
+  "power_system": {
+    "name": "Bản Năng Tổ Chức — Tầm Nhìn Hậu Cần",
+    "type": "organizational/logistical mastery (năng lực tổ chức và chỉ huy, KHÔNG phải dị năng hay võ lực siêu phàm)",
+    "coreResource": "Sự tỉnh táo, lý trí và uy tín của Phương Viễn cùng tài nguyên và nhân lực thực tế của cộng đồng — bản năng chỉ phát huy khi anh bình tĩnh và có đủ thông tin hiện trường",
+    "unlockRule": "Bản năng vốn có của Phương Viễn từ nghề hậu cần; không cần học từ đầu, nhưng độ chính xác, tốc độ và tầm bao quát tăng dần khi anh tích lũy kinh nghiệm chỉ huy, quy trình chuẩn và uy tín qua từng khủng hoảng vượt qua.",
+    "antiPlotArmor": [
+      "Bản năng CHỈ cho phân tích đúng và kế hoạch tốt — KHÔNG cho sức mạnh thể chất, KHÔNG tự thực thi, KHÔNG bảo đảm thắng nếu thiếu người/tài nguyên.",
+      "Kế hoạch vẫn thất bại nếu cấp dưới làm sai, địch hành động ngoài dự liệu, hoặc Phương Viễn thiếu thông tin hiện trường.",
+      "Tầm nhìn mờ đi khi anh kiệt sức, hoảng loạn, bị thương, hoặc khi tình huống hỗn loạn ngoài tầm quan sát.",
+      "Phương Viễn vẫn là người thường yếu về thể chất, có thể bị thương và chết như bất kỳ ai; anh không tự mình áp đảo kẻ thù bằng vũ lực."
+    ],
+    "signatureBuff": {
+      "name": "Cỗ Máy Vận Hành",
+      "effect": "Khi một cộng đồng đã quen quy trình của Phương Viễn, mọi mệnh lệnh được thực thi nhanh và ăn khớp như một cỗ máy, cho phép anh điều phối nhiều mặt trận cùng lúc vượt xa một nhóm ô hợp.",
+      "limit": "Chỉ hiệu quả khi cộng đồng có kỷ luật và lòng tin; rối loạn nội bộ, phản bội hoặc tổn thất nhân sự chủ chốt làm cỗ máy chệch nhịp."
+    },
+    "progressionAxes": [
+      "Quy mô tổ chức điều phối được (từ một nhóm nhỏ tới một liên minh nhiều vùng)",
+      "Kho quy trình và kinh nghiệm chỉ huy đã kiểm chứng (luật lệ, chiến thuật phòng thủ, hậu cần)",
+      "Uy tín và lòng tin của cộng đồng (nền tảng để cỗ máy vận hành trơn tru)"
+    ],
+    "powerCeilingByPhase": {
+      "phase1": "Tổ chức và phòng thủ một cứ điểm nhỏ (một bãi đỗ xe, vài chục người)",
+      "phase2": "Quản lý một cộng đồng đông và đánh bại một thế lực thù địch cỡ băng nhóm bằng mưu lược",
+      "phase3": "Điều phối một liên minh nhiều vùng và chống biến chủng tiến hóa bằng công sự và chiến thuật tầm cao",
+      "phase4": "Tổ chức một chiến dịch viễn chinh quy mô lớn và đặt nền cho một trật tự tái thiết bền vững"
+    }
+  },
+  "worldbuilding": {
+    "tone": "Sinh tồn mạt thế căng thẳng nhưng ấm áp ở lõi: nỗi sợ thường trực của thế giới sụp đổ đan với cảm giác vững vàng mỗi khi một bức tường dựng lên, một nồi cháo được chia, một người lạ được cứu và ở lại.",
+    "economy": "Kinh tế sinh tồn: nước sạch, lương thực, thuốc men, nhiên liệu, đạn, vật liệu xây dựng và người có kỹ năng là 'tiền tệ'; về sau hình thành hệ trao đổi chuẩn hóa giữa các vùng an toàn và một chợ trung gian.",
+    "setting": "Một đô thị Việt Nam hiện đại sụp đổ trong bảy mươi hai giờ vì làn sương xám biến người phơi nhiễm thành kẻ tha hóa; điện tắt, sóng đứt, đường phố thành mê cung; rải rác là các cứ điểm sống sót co cụm giữa hỗn loạn.",
+    "geography": {
+      "phase1": "Bãi đỗ xe cứ điểm, trạm bơm nước, siêu thị, nhà thuốc và khu phố đổ nát lân cận",
+      "phase2": "Tòa cao ốc của băng cướp và mạng lưới các cứ điểm sống sót quanh vùng",
+      "phase3": "Lãnh thổ liên minh nhiều vùng an toàn và các tuyến tiếp tế kết nối chúng",
+      "phase4": "Vùng trung tâm thành phố nơi 'lõi sương' và biến chủng sinh sôi"
+    },
+    "techLevel": "Hiện đại nhưng hậu tận thế: điện lưới sụp, người sống sót tận dụng máy phát, xe cơ giới còn chạy, vũ khí lạnh và súng đạn còn sót lại, vật liệu xây dựng tái chế; công nghệ phụ thuộc nhiên liệu và phụ tùng ngày một khan hiếm.",
+    "conflictMedium": "Sinh tồn qua tổ chức, hậu cần và mưu lược: dựng công sự, quản nguồn cung, lập luật lệ, đàm phán, ly gián và cắt tiếp tế; vũ lực chỉ là phương án cuối, luôn dưới dạng hành động tập thể có kỷ luật chứ không phải anh hùng cá nhân liều mạng.",
+    "forbiddenElements": [
+      "MC có dị năng / siêu sức mạnh / hệ thống ban năng lực cá nhân",
+      "MC một mình áp đảo bầy tha hóa hay kẻ thù bằng võ lực phi thường",
+      "xuyên không / đến từ thế giới khác",
+      "trọng sinh / ký ức kiếp trước",
+      "tu luyện / cảnh giới / phép thuật",
+      "gore khoái cảm, bạo lực phô trương để giật gân"
+    ]
+  },
+  "factions": [
+    {
+      "name": "Vùng An Toàn của Phương Viễn",
+      "type": "cộng đồng sống sót do MC lãnh đạo",
+      "power_level": 5,
+      "summary": "Cộng đồng Phương Viễn dựng từ một bãi đỗ xe: có tường, nước, kho lương và luật lệ công bằng; mạnh nhờ tổ chức và lòng người chứ không nhờ vũ khí.",
+      "territory": "Bãi đỗ xe cứ điểm và vùng phụ cận, mở rộng dần theo truyện",
+      "mc_relation": "MC là người sáng lập và thủ lĩnh trung tâm",
+      "conflicts": ["Băng Cao Ốc", "Thế lực Bạo Lực"],
+      "alliances": ["Liên Minh Vùng An Toàn"],
+      "importance": 10,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Băng Cao Ốc",
+      "type": "băng cướp vũ trang",
+      "power_level": 7,
+      "summary": "Băng cướp chiếm một tòa cao ốc, thu thuế bảo kê bằng lương thực, áp bức các nhóm sống sót yếu hơn và dòm ngó tài nguyên của cứ điểm Phương Viễn.",
+      "territory": "Tòa cao ốc và khu vực kiểm soát quanh đó",
+      "mc_relation": "Đối thủ thù địch đầu tiên, bị MC bẻ gãy bằng mưu lược",
+      "conflicts": ["Vùng An Toàn của Phương Viễn"],
+      "alliances": [],
+      "importance": 7,
+      "introduce_arc": 3
+    },
+    {
+      "name": "Liên Minh Vùng An Toàn",
+      "type": "liên minh các cộng đồng sống sót",
+      "power_level": 8,
+      "summary": "Mạng lưới các vùng an toàn liên kết quanh cứ điểm Phương Viễn để phòng thủ chung và trao đổi tài nguyên; nội bộ vừa hợp tác vừa tranh giành ảnh hưởng.",
+      "territory": "Nhiều vùng an toàn trải khắp khu vực",
+      "mc_relation": "MC là trung tâm và người định luật chơi của liên minh",
+      "conflicts": ["Thế lực Bạo Lực"],
+      "alliances": ["Vùng An Toàn của Phương Viễn"],
+      "importance": 8,
+      "introduce_arc": 4
+    },
+    {
+      "name": "Thế lực Bạo Lực",
+      "type": "tàn dư có tổ chức muốn cai trị bằng vũ lực",
+      "power_level": 9,
+      "summary": "Một thế lực lớn cuối cùng tin vào cai trị bằng bạo lực và sợ hãi, thách thức mô hình trật tự nhân đạo của Phương Viễn và đe dọa nuốt cả liên minh.",
+      "territory": "Một vùng rộng do chúng kiểm soát bằng sức mạnh",
+      "mc_relation": "Phản diện lớn cuối truyện, đối đầu bằng tổ chức và lòng người",
+      "conflicts": ["Liên Minh Vùng An Toàn", "Vùng An Toàn của Phương Viễn"],
+      "alliances": [],
+      "importance": 9,
+      "introduce_arc": 6
+    }
+  ],
+  "plot_twists": [
+    {
+      "summary": "Một người sống sót được tin cậy trong cộng đồng thật ra là tay trong của băng cướp, âm thầm tuồn tin và phá hoại tích trữ từ bên trong.",
+      "payoff_type": "phản bội nội bộ",
+      "setup_chapters": [150, 200],
+      "twist_chapter": 260,
+      "reader_impact": "major",
+      "arc_number": 2
+    },
+    {
+      "summary": "Một thủ lĩnh trong liên minh tỏ ra hào hiệp thật ra dàn dựng các cuộc khủng hoảng để các vùng yếu đi và lệ thuộc, nhằm thâu tóm cả liên minh dưới danh nghĩa đoàn kết.",
+      "payoff_type": "âm mưu thâu tóm",
+      "setup_chapters": [440, 500],
+      "twist_chapter": 560,
+      "reader_impact": "major",
+      "arc_number": 4
+    },
+    {
+      "summary": "Làn sương xám không phải tai họa tự nhiên ngẫu nhiên mà phát ra từ một 'lõi' có cơ chế cụ thể ở trung tâm thành phố; hiểu cơ chế đó là chìa khóa dập tận gốc thảm họa thay vì chỉ sống sót qua ngày.",
+      "payoff_type": "nguồn gốc thảm họa",
+      "setup_chapters": [120, 640, 690],
+      "twist_chapter": 720,
+      "reader_impact": "cosmic",
+      "arc_number": 5
+    }
+  ],
+  "themes": [
+    {
+      "name": "Tổ chức thắng bạo lực",
+      "type": "main",
+      "description": "Giữa mạt thế, một cộng đồng có kỷ luật và hậu cần tốt sống lâu và mạnh hơn một đám đông hỗn loạn hay một băng cướp dựa vào nắm đấm.",
+      "motifs": ["sổ phân công", "bức tường dựng từng viên gạch", "kế hoạch vận hành đúng nhịp"],
+      "importance": 10
+    },
+    {
+      "name": "Lòng người là pháo đài",
+      "type": "main",
+      "description": "Luật lệ công bằng và sự tin tưởng giữ một cộng đồng đứng vững còn hơn cả tường thép; mất lòng người là mất tất cả.",
+      "motifs": ["ai cũng có việc, ai cũng được ăn", "nồi cháo chia đều", "người lạ được cứu rồi ở lại"],
+      "importance": 9
+    },
+    {
+      "name": "Xây dựng thay vì cướp bóc",
+      "type": "supporting",
+      "description": "Trong tuyệt vọng, chọn dựng nên thay vì giành giật là con đường khó hơn nhưng là con đường duy nhất dẫn tới tương lai.",
+      "motifs": ["dựng cổng thay vì phá cổng", "trồng rau giữa đổ nát", "chừa lối cho kẻ quy hàng"],
+      "importance": 8
+    },
+    {
+      "name": "Gánh nặng của người dẫn đầu",
+      "type": "supporting",
+      "description": "Một thủ lĩnh thật sự gánh trách nhiệm cho mọi cái chết và mọi quyết định, không chỉ ra lệnh rồi đứng ngoài.",
+      "motifs": ["đứng gác cùng người trẻ nhất", "ghi tên người không cứu được", "quyết định khó trong đêm"],
+      "importance": 8
+    }
+  ],
+  "voice_anchors": [
+    {
+      "snippet_type": "opening",
+      "prose_text": "Phương Viễn đứng trên tầng hai của bãi đỗ xe, nhìn xuống con đường ngập khói và tiếng gào, và làm thứ duy nhất anh biết làm khi mọi thứ sụp đổ: anh đếm. Hai mươi ba người còn thở dưới sân. Bốn bình nước. Một bao gạo rách. Một cánh cổng sắt đã hoen gỉ nhưng vẫn đóng được. Trong khi người ta xung quanh anh khóc, cầu nguyện, hoặc đơn giản là chết lặng, thì trong đầu anh, những con số tự sắp thành một bản kế hoạch. Cổng kia chịu được một đêm nếu chèn thêm hai chiếc xe. Nước chia bốn ngày nếu kiểm soát chặt. Và cái người đàn ông to con đang gào thét đòi bỏ chạy kia — anh ta sẽ chết trong nửa giờ nếu ra ngoài một mình, hoặc anh ta có thể là người khuân vác khỏe nhất nhóm, nếu có ai đó cho anh ta một việc để làm. Phương Viễn hít một hơi, bước xuống cầu thang, và bắt đầu phân công.",
+      "key_traits": ["điềm tĩnh", "tư duy hậu cần", "không hoảng loạn", "tổ chức dẫn đường"]
+    },
+    {
+      "snippet_type": "dialogue",
+      "prose_text": "— Tường với luật để làm gì? Ngoài kia là súng với nắm đấm, ai mạnh người đó sống. Đỗ Cường nhổ toẹt xuống nền bê tông. Phương Viễn không cao giọng. — Anh khỏe nhất ở đây, tôi công nhận. Nhưng anh ngủ mấy tiếng một đêm? Anh canh được mấy hướng cùng lúc? Anh ăn được bao nhiêu ngày từ cái kho anh không biết còn gì? Anh nhìn thẳng vào Đỗ Cường. — Một người mạnh sống được tới khi mệt. Một nhóm có tổ chức sống được tới khi hết tài nguyên. Tôi không xây tường để nhốt anh. Tôi xây để anh có chỗ ngủ mà không phải mở một mắt.",
+      "key_traits": ["bình tĩnh thuyết phục", "lập luận bằng hậu cần", "không tranh hơn thua cảm tính"]
+    },
+    {
+      "snippet_type": "action",
+      "prose_text": "Tiếng gầm của bầy tha hóa dội vào cổng sắt như sóng, một đợt, rồi một đợt. Phương Viễn không cầm vũ khí. Anh đứng giữa sân, dưới ánh đuốc chập chờn, tay chỉ về ba hướng cùng lúc. — Tổ một, đổ dầu xuống hào, chưa châm lửa. Tổ hai, lùi về bậc thang, cung tên sẵn sàng. Lý Hân, đưa người già và trẻ con lên tầng ba, ngay bây giờ. Giọng anh đều, không run, và chính cái đều đặn ấy khiến hai mươi con người đang run rẩy bỗng cử động ăn khớp như một. Khi con tha hóa đầu tiên trèo qua cổng, hào lửa bùng lên đúng nơi anh đã tính, và Phương Viễn biết — không phải vì anh mạnh, mà vì mọi người đã làm đúng phần của mình — đêm nay họ sẽ sống.",
+      "key_traits": ["chỉ huy giữa hỗn loạn", "bảo vệ người yếu trước", "thắng bằng tổ chức không bằng vũ lực"]
+    }
+  ],
+  "foreshadowing": [
+    {
+      "hintText": "Trong ngày sụp đổ, Phương Viễn thoáng thấy làn sương xám không loang đều mà như chảy ra từ một hướng cố định ở trung tâm thành phố, rồi bị cuốn vào việc cứu người nên quên đi.",
+      "category": "environmental",
+      "plantCh": 12,
+      "pickupCh": 720,
+      "payoffDescription": "Hướng sương chảy ra chính là vị trí 'lõi sương' — manh mối sớm nhất về nguồn gốc thảm họa và chìa khóa dập tận gốc."
+    },
+    {
+      "hintText": "Ông Tư bảo vệ già lẩm bẩm rằng bãi đỗ xe này 'nối với mấy đường ngầm cũ không có trên bản đồ', rồi lảng đi không nói thêm.",
+      "category": "dialogue",
+      "plantCh": 40,
+      "pickupCh": 380,
+      "payoffDescription": "Các đường ngầm trở thành tuyến tiếp tế bí mật và lối cô lập băng Cao Ốc, lợi thế chiến lược then chốt của cứ điểm."
+    },
+    {
+      "hintText": "Một người sống sót nhiệt tình giúp việc trong kho luôn xung phong kiểm đếm tài nguyên một mình và khó chịu mỗi khi có người khác đối chiếu sổ.",
+      "category": "character_behavior",
+      "plantCh": 150,
+      "pickupCh": 260,
+      "payoffDescription": "Người đó là tay trong của băng cướp, lợi dụng việc kiểm kho một mình để tuồn tin và rút bớt tài nguyên."
+    }
+  ]
+}

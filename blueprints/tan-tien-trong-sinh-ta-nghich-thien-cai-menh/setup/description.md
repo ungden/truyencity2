@@ -1,0 +1,9 @@
+Tần Mục từng là một tu sĩ Kim Đan có chút danh tiếng ở Đại Thương Châu — cho đến cái ngày người sư đệ anh hết lòng nâng đỡ, người bằng hữu anh đặt trọn tin tưởng, cùng nhau đâm một kiếm vào sau lưng anh để đoạt lấy cơ duyên mà anh tìm được bằng cả tính mạng. Anh chết trong tức tưởi, mắt vẫn mở trừng trừng nhìn kẻ phản bội cười nhạt.
+
+Nhưng trời chưa tuyệt đường. Khi mở mắt ra, Tần Mục thấy mình trở về thuở mười sáu tuổi — cái thời anh còn là một thiếu niên tán tu nghèo hèn nơi chợ phường, chưa từng bước chân vào con đường tu tiên chính thức, chưa từng nếm mùi phản bội. Mọi thứ vẫn còn nguyên vẹn: cha mẹ chưa mất, sư môn chưa lụi bại, những kẻ sau này hại anh vẫn đang đeo mặt nạ thân thiết.
+
+Lần này, anh mang theo toàn bộ ký ức của một tu sĩ Kim Đan: anh biết công pháp nào là thượng thừa, biết linh dược nào sắp xuất thế, biết bí cảnh nào sẽ đại mở, biết kẻ nào sẽ trở mặt và vào lúc nào. Anh hiểu được dòng chảy thiên cơ mà kiếp trước phải trả giá bằng cái chết mới ngộ ra. Cơ duyên từng tuột khỏi tay anh, lần này anh sẽ đoạt lấy trước. Quan ải từng suýt giết anh, lần này anh sẽ vượt qua nhẹ nhàng. Và những kẻ từng đâm anh sau lưng — anh sẽ để chúng tự chui đầu vào lưới.
+
+Từ một thiếu niên vô danh nơi chợ phường, Tần Mục từng bước nghịch thiên cải mệnh: luyện thành công pháp tuyệt thế, đoạt được cơ duyên kinh người, đánh mặt từng kẻ khinh thường, hóa giải từng kiếp nạn định sẵn, và trả lại đủ đầy cho những kẻ đã hại anh ở kiếp này. Nhưng con đường tu tiên không có đường lùi — càng lên cao, anh càng phát hiện cái chết của mình kiếp trước không đơn giản là một âm mưu cá nhân, mà ẩn giấu một thiên cơ lớn hơn rất nhiều, liên quan tới chính khí vận của cả Đại Thương Châu.
+
+Một hành trình tu tiên nghịch thiên đầy sảng khoái, nơi tri thức là sức mạnh và ý chí là vũ khí. Đọc tại TruyenCity.

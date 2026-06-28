@@ -1,0 +1,9 @@
+Mặc Thiên lớn lên trong một lãnh địa nhỏ bé bên rìa Hoang Vực Vạn Giới — một mảnh đất nghèo linh khí, dân cư thưa thớt, ngày ngày nơm nớp chờ bị các Triệu Hoán Thế Gia lớn hơn nuốt chửng. Người ta bảo nơi này chẳng nuôi nổi một con yêu thú cấp thấp, nói gì tới giấc mộng quân đoàn thần ma. Thiếu niên mười sáu tuổi ấy chẳng có gì trong tay, ngoài một trái tim không cam chịu và cái tên bị người đời cười nhạo.
+
+Cho đến cái đêm một dấu ấn cổ xưa ngủ say trong huyết mạch anh bừng tỉnh. Vạn Tộc Thống Lĩnh Ấn — truyền thừa của một Triệu Hoán Sư thượng cổ đã khuất từ thời Thần Ma Đại Chiến. Dấu ấn ấy không đánh thay anh một chiêu, cũng chẳng ban cho anh cảnh giới trên trời trong một đêm. Nó chỉ mở cho anh ba con mắt: nhìn thấu phẩm chất và tuyến tiến hóa ẩn của muôn loài trước khi thu phục, ký kết Khế Ước Tộc Hồn bền chặt hơn người thường gấp bội, và khiến những chủng tộc khác máu khác giống chịu kề vai dưới một ngọn cờ thay vì cắn xé lẫn nhau.
+
+Từ con yêu lang gãy chân đầu tiên anh cứu, tới bộ tộc cự nhân lưu vong, một đàn cốt binh bị bỏ quên trong cổ trận, một nhánh long tộc kiêu ngạo — Mặc Thiên từng bước chiêu mộ vạn tộc, dựng lại lãnh địa rách nát thành một đại bản doanh sôi động, và đánh thắng hết trận chênh lệch lực lượng này đến trận khác không phải bằng sức một người, mà bằng sự gắn kết của cả một quân đoàn cùng anh sống chết.
+
+Nhưng vạn giới đang loạn. Các Triệu Hoán Thế Gia ngàn năm dòm ngó linh mạch của anh. Vạn Tộc Minh mục ruỗng vì tranh quyền. Và sâu trong Ma Uyên, vết nứt thời thượng cổ đang rạn ra từng ngày, ma tộc cổ chực phá phong ấn để nuốt chửng cả đại lục. Một thiếu niên xuất thân hàn vi, một dấu ấn không ai hiểu rõ, một giấc mộng thống lĩnh muôn tộc giữa loạn thế — Mặc Thiên sẽ dựng nên quân đoàn thần ma của riêng mình, và bước lên ngôi cao nhất mà chưa Triệu Hoán Sư nào dám mơ tới.
+
+Một thiên sử thi huyền huyễn nhiệt huyết về tham vọng, lòng trung thành và sức mạnh của sự gắn kết giữa vạn tộc. Đọc tại TruyenCity.

@@ -1,0 +1,118 @@
+{
+  "premise": "Tô Vãn, một nữ điều dưỡng bình thường ở thành phố hiện đại, bị cuốn vào các phó bản quái đàm bệnh viện biến dị — hành lang khoa nội kéo dài thêm dãy phòng không tồn tại, phòng bệnh cuối dãy luôn khóa, ca trực đêm vòng lặp không tới sáng — nơi cô phải sinh tồn bằng cách đọc hiểu và tuân thủ những bộ quy trình trực đêm thật-giả lẫn lộn. Cô có một lợi thế nhận thức lặng lẽ: dòng quy trình giả khiến đầu ngón tay cô lạnh buốt khi lướt qua. Nhưng nó chỉ gợi ý, không tự cứu; mọi suy luận và cái giá đều do chính cô gánh. Từ một điều dưỡng trực đêm sống sót, cô trở thành người giải quy trình giỏi nhất, lần ra kẻ đã soạn ra những quy trình tử thần.",
+  "mainConflict": "Con người lý trí đối đầu một hệ thống quy trình phi nhân được thiết kế để giết kẻ tuân thủ. Xung đột không giải quyết bằng bạo lực mà bằng đọc hiểu, đối chiếu mâu thuẫn và suy luận dưới áp lực cận tử. Leo thang từ một phó bản đơn lẻ trong ca trực đêm → cụm phó bản bệnh viện liên kết → đối đầu các phe trong Tổ Bàn Giao muốn trục lợi quái đàm → truy ra Người Soạn Quy Trình đứng sau cả bệnh viện.",
+  "themes": [
+    "Lý trí và bình tĩnh là vũ khí sinh tồn mạnh nhất",
+    "Tuân thủ quy trình một cách mù quáng giết người nhanh hơn cả nguy hiểm",
+    "Giữ được nhân tính và y đức khi sống sót đòi hỏi sự lạnh lùng",
+    "Sự thật luôn nằm trong mâu thuẫn giữa các dòng quy trình"
+  ],
+  "majorPlotPoints": [
+    "Ch.1: ca trực đêm kéo dài hành lang ra thêm một dãy phòng không tồn tại, Tô Vãn phát hiện lợi thế nhận thức và sống sót phó bản đầu tiên bằng suy luận.",
+    "Arc 1: hoàn tất phó bản hành lang khoa nội, vạch trần dòng quy trình giả đã 'xuất viện' những người trước cô, gặp manh mối về Tổ Bàn Giao.",
+    "Arc 2-3: bước vào các phó bản bệnh viện mới (phòng bệnh khóa, ca trực vòng lặp), kết nối với người sống sót khác, nhận ra các phó bản chia sẻ một logic chung.",
+    "Giữa truyện: các phe trong Tổ Bàn Giao xung đột; một phe phân ca lính mới vào tầng chưa kiểm chứng làm vật thí nghiệm, Tô Vãn phơi bày và phá vỡ đường dây.",
+    "Cao trào cuối: truy ra danh tính Người Soạn Quy Trình và lý do bệnh viện bị gài cửa tử; Tô Vãn chọn cách 'viết lại' bộ quy trình gốc thay vì bị nó nuốt chửng."
+  ],
+  "setupKernel": {
+    "readerFantasy": "Cảm giác sảng khoái khi một nữ điều dưỡng bình thường, chỉ bằng cái đầu lạnh và lý trí sắc bén, đọc thủng cái bẫy mà đồng nghiệp mù quáng bước vào — sống sót đúng giây cận tử trong khi những kẻ tự tin làm theo quy trình giả lần lượt bị 'xuất viện', rồi vạch trần cho cả nhóm thấy dòng nào là dối trá. Mỗi lần giải đúng một bộ quy trình là một lần độc giả thở phào và phục lăn trí tuệ của nhân vật.",
+    "protagonistEngine": "Tô Vãn thắng nhờ khả năng quan sát chi tiết lâm sàng, đối chiếu mâu thuẫn giữa các quy trình và giữ bình tĩnh tuyệt đối khi đồng nghiệp hoảng loạn; lợi thế nhận thức chỉ gợi ý dòng đáng ngờ, phần suy luận và cái giá đều do cô gánh. Tính cách điềm tĩnh, lý trí, thận trọng đến lạnh lùng nhưng không vô cảm — cô vẫn giữ y đức, cố cứu người khi còn cách, và day dứt khi không thể.",
+    "pleasureLoop": [
+      "Một bộ quy trình mới hiện ra → Tô Vãn đọc, lợi thế nhận thức làm vài dòng lạnh buốt đầu ngón tay → cô suy luận xem dòng nào thật/giả ngay khi áp lực dâng cao (tension build-up).",
+      "Một đồng nghiệp tin theo quy trình giả và phạm phải → cái giá rợn người giáng xuống họ → Tô Vãn xác nhận suy luận của mình đúng (xác nhận lạnh người + sống sót khi kẻ khác bị xóa).",
+      "Tô Vãn giải đúng một mâu thuẫn quy trình vào đúng giây cận tử → thoát hiểm trong gang tấc (deduction-saves-life peak).",
+      "Cô vạch trần một dòng quy trình giả trước mặt nhóm người trực đêm → cứu được một mạng tưởng đã chắc bị 'xuất viện' (vạch trần quy trình giả + công nhận).",
+      "Hoàn tất phó bản, nhận được manh mối/vật phẩm/quy trình đã kiểm chứng → tiến gần hơn tới sự thật về Người Soạn (harvest + tiến triển).",
+      "Một mảnh sự thật về tổ chức ngầm hoặc nguồn gốc quái đàm được hé lộ → cảm giác bức màn đang được vén lên (revelation payoff)."
+    ],
+    "systemMechanic": {
+      "name": "Lợi Thế Nhận Thức — Cảm Giác Lạnh Đầu Ngón Tay",
+      "input": "Tô Vãn trực tiếp đọc một bộ quy trình thành văn trong phó bản (tờ bàn giao ca, bảng quy trình ép nhựa, sổ y lệnh, thông báo loa nội bộ ghi lại); phải đọc trong trạng thái đầu óc tỉnh táo, không hoảng loạn, không kiệt sức.",
+      "output": "Những dòng quy trình GIẢ (được cài để giết kẻ tuân thủ) khiến đầu ngón tay cô lạnh buốt khi lướt qua con chữ, như chạm vào da người đã lạnh; các dòng còn lại chạm vào bình thường, không phân biệt được thật hay vô hại.",
+      "limit": "Anti-plot-armor cứng: lợi thế CHỈ gợi ý dòng đáng ngờ, KHÔNG nói dòng nào phải làm, KHÔNG tự cứu cô, KHÔNG cho biết hành động đúng. Cô vẫn phải tự suy luận toàn bộ, vẫn bị xóa nếu suy luận sai sau khi đã thấy gợi ý. Lợi thế mờ đi hoặc tắt hẳn khi cô hoảng loạn, kiệt sức, bị thương, hoặc khi quy tắc không ở dạng văn bản (truyền miệng, tiếng loa trực tiếp, ám hiệu). Một số phó bản cao cấp có dòng giả được 'ngụy trang' khiến cảm giác lạnh gần như không nhận ra.",
+      "reward": "Tỉ lệ sống sót cao hơn nhờ thu hẹp được vùng nghi vấn; theo thời gian cô học được các 'mẫu' lừa của Người Soạn, giải quy trình nhanh và sâu hơn — nhưng phần thưởng thật sự luôn là một mạng người và một mảnh sự thật, không phải sức mạnh."
+    },
+    "mcOrigin": "native",
+    "originLockNote": "Tô Vãn là người bản địa, một nữ điều dưỡng bình thường sống tại đô thị năm 2025, bị cuốn vào phó bản quái đàm bệnh viện; cô là người thường, không có bất kỳ năng lực hay ký ức đặc biệt nào từ đầu — mọi năng lực đều phát sinh tại chỗ và do cô tự rèn qua từng phó bản.",
+    "mcSecret": {
+      "secret": "Tô Vãn sở hữu lợi thế nhận thức cảm nhận được dòng quy trình giả qua cái lạnh buốt ở đầu ngón tay — một thứ không người trực đêm nào khác có.",
+      "outsideWorldKnowledge": "Bản thân lợi thế này là một bí ẩn in-world: nó dường như liên quan tới cách Người Soạn tạo ra quy trình, như thể cô chạm được chính 'nét soạn thảo' của người viết; hiểu biết này vượt ngoài mọi tài liệu của Tổ Bàn Giao.",
+      "revealRule": "Giấu kín hoàn toàn ở các phó bản đầu; chỉ hé lộ một phần cho một hai đồng minh thân tín giữa truyện; nguồn gốc thật của lợi thế (mối liên hệ với Người Soạn) chỉ reveal ở cao trào cuối.",
+      "coverStory": "Cô nói mình chỉ 'tay nghề điều dưỡng nhạy và giỏi tìm mâu thuẫn trong y lệnh', che giấu việc thực sự cảm nhận được cái lạnh trên dòng giả."
+    },
+    "benefitLoop": {
+      "goal": "Sống sót qua từng phó bản bệnh viện và lần ngược ra sự thật về kẻ soạn ra mọi quy trình.",
+      "action": "Đọc kỹ từng bộ quy trình, đối chiếu mâu thuẫn giữa các dòng, quan sát hiện trường lâm sàng, dùng lợi thế nhận thức để thu hẹp nghi vấn rồi suy luận ra hành động đúng, đồng thời ghi chép lại quy trình đã kiểm chứng.",
+      "benefit": "Sống thêm một ca trực, cứu thêm một người, thu thêm một quy-trình-đã-kiểm-chứng và một mảnh manh mối; uy tín trong giới người trực đêm và sự hiểu biết về logic quái đàm tăng dần.",
+      "cadence": "Mỗi 1-2 chương có ít nhất một vòng đọc-quy-trình-được-thưởng (một suy luận đúng cứu mạng hoặc một dòng giả bị vạch trần); mỗi 3-5 chương một bước nhảy lớn (hoàn tất một phó bản, hé lộ một mảnh sự thật, lên một bậc trong giới sống sót)."
+    },
+    "interventionRule": "Tô Vãn chỉ ra tay can thiệp khi (a) cô và những người bị cuốn vào cùng phó bản đang trực tiếp đối mặt cửa tử, hoặc (b) khi cô phát hiện một phe trong giới ngầm đang lợi dụng người vô tội làm vật thí nghiệm đọc-quy-trình mà cô có đủ thông tin để phơi bày; cô không đi 'cứu thế giới' ngoài tầm với, luôn giải quyết bằng đọc hiểu, suy luận, vạch trần và tuân thủ quy trình đúng — tuyệt đối không bằng bạo lực thể chất.",
+    "phase1Playground": {
+      "locations": [
+        "Hành lang khoa nội bệnh viện cũ lúc nửa đêm — phó bản mở màn, dãy phòng kéo dài biến dị sau 0 giờ",
+        "Phòng bệnh cuối dãy luôn khóa — phó bản 'bệnh nhân không vòng tay định danh'",
+        "Nhà xác tầng hầm — nơi danh sách tự thêm tên và quy trình ẩn trong sổ ghi",
+        "Phòng trọ thật của Tô Vãn và quán cháo đêm gần cổng bệnh viện (thế giới đời thực giữa các phó bản)"
+      ],
+      "cast": [
+        "Tô Vãn (nữ điều dưỡng, MC, người đọc quy trình)",
+        "Diệp Anh (bác sĩ nội trú bị cuốn vào phó bản phòng bệnh khóa, lý trí, thành đồng minh sớm nhất)",
+        "Bác Mậu (bảo vệ già coi nhà xác, biết nhiều hơn bác tỏ ra, manh mối Tổ Bàn Giao)",
+        "Lý Trác (một 'người trực đêm' kỳ cựu tự tin, đại diện cho kiểu tin quy trình mù quáng, local antagonist)",
+        "Hàn Tuyết (liên lạc viên Tổ Bàn Giao, vừa giúp vừa thử thách Tô Vãn)"
+      ],
+      "resources": [
+        "Lợi Thế Nhận Thức — Cảm Giác Lạnh Đầu Ngón Tay",
+        "Sổ tay ghi chép quy trình đã kiểm chứng của riêng cô",
+        "Quan hệ chớm nở với Diệp Anh và bác Mậu",
+        "Manh mối về Tổ Bàn Giao và 'sổ bàn giao thật' của giới sống sót"
+      ],
+      "localAntagonists": [
+        "Lý Trác — người trực kỳ cựu tin quy trình một cách giáo điều, nhiều lần suýt kéo cả nhóm vào bẫy vì bác bỏ suy luận của Tô Vãn",
+        "Một phe nhỏ trong Tổ Bàn Giao chuyên phân ca người mới vào phó bản để 'thử' quy trình chưa kiểm chứng"
+      ],
+      "repeatableSceneTypes": [
+        "Đọc một bộ quy trình mới, nhận ra dòng làm lạnh đầu ngón tay và suy luận thật/giả dưới áp lực",
+        "Một nhân vật khác phạm dòng quy trình giả và lãnh cái giá rợn người, xác nhận suy luận của Tô Vãn",
+        "Vạch trần một dòng quy trình giả trước nhóm để cứu một mạng vào phút chót",
+        "Hoàn tất phó bản và ghi nhận quy trình đã kiểm chứng + một mảnh manh mối về Người Soạn",
+        "Đoạn đời thực giữa hai phó bản: ghép manh mối, tiếp xúc Tổ Bàn Giao, chuẩn bị cho phó bản kế"
+      ]
+    },
+    "socialReactor": {
+      "witnesses": [
+        "Những đồng nghiệp và người nhà bị cuốn vào cùng phó bản với Tô Vãn",
+        "Người sống sót khác và liên lạc viên trong Tổ Bàn Giao",
+        "Bác Mậu và các 'người gác cửa' đời thực biết về quái đàm",
+        "Cộng đồng ngầm trao đổi sổ bàn giao và xếp hạng người trực đêm"
+      ],
+      "reactionModes": [
+        "Sững sờ và phục khi Tô Vãn chỉ ra dòng quy trình giả mà không ai nhận ra",
+        "Người sống sót tìm đến nhờ cô giải quy trình, đồn thổi về 'điều dưỡng đọc thủng cửa tử'",
+        "Tổ Bàn Giao nâng hạng và bắt đầu để mắt tới cô như một biến số nguy hiểm",
+        "Một số phe nghi kỵ, tung tin để cô lập hoặc thử cô"
+      ],
+      "reportBackCadence": "Phản ứng tức thì trong phó bản mỗi chương (người cùng nhóm); làn sóng đồn đại và động thái của Tổ Bàn Giao dồn lại mỗi 3-5 chương sau khi cô hoàn tất một phó bản đáng chú ý."
+    },
+    "noveltyLadder": [
+      { "chapterRange": "1-30", "newToy": "Phó bản hành lang khoa nội ca trực đêm — học cách đọc quy trình thật/giả và nhận ra lợi thế nhận thức", "keepsSameLane": "Vẫn là sinh tồn bằng đọc hiểu và tuân thủ quy trình trong một không gian bệnh viện biến dị" },
+      { "chapterRange": "31-200", "newToy": "Các phó bản bệnh viện chủ đề khác nhau (phòng bệnh khóa, ca trực vòng lặp, nhà xác) với kiểu lừa quy trình riêng", "keepsSameLane": "Vẫn là đọc-suy-luận-tuân-thủ, chỉ đổi bối cảnh và độ tinh vi của bẫy" },
+      { "chapterRange": "201-500", "newToy": "Phó bản liên kết theo cụm + đối đầu các phe trong Tổ Bàn Giao lợi dụng quái đàm", "keepsSameLane": "Vẫn là giải mã quy trình, nhưng thêm tầng đấu trí với người thật điều khiển luật chơi" },
+      { "chapterRange": "501-800", "newToy": "Quy trình 'tự sửa', phó bản lồng phó bản, manh mối về Người Soạn Quy Trình", "keepsSameLane": "Vẫn cùng lane đọc-hiểu-sinh-tồn, nâng lên cấp meta về cách quy trình được soạn ra" },
+      { "chapterRange": "801-1000", "newToy": "Đối mặt Người Soạn và lựa chọn viết lại bộ quy trình gốc của cả bệnh viện", "keepsSameLane": "Vẫn là cuộc đấu trí với hệ thống quy trình — đỉnh cao của cùng một trò chơi sinh tồn" }
+    ],
+    "controlRules": {
+      "payoffCadence": "Tối thiểu 2 cao điểm dopamine mỗi chương (một suy luận quy trình đúng cứu mạng và một dòng giả bị vạch trần hoặc một kẻ phạm quy trình lãnh giá); cao điểm đầu xuất hiện trước nửa chương; setup không quá 30% và phải có payoff trong cùng hoặc chương kế.",
+      "attentionGradient": "Mở chương bằng một bộ quy trình mới, một dấu hiệu bất thường hoặc một mối nguy cụ thể; đóng chương bằng một cliffhanger rợn người hoặc một mảnh sự thật vừa hé.",
+      "openThreadsPerArc": 3,
+      "closeThreadsPerArc": 2
+    },
+    "patternCards": [
+      "warm-baseline-opening",
+      "deduction-under-pressure",
+      "fake-rule-exposed",
+      "survive-while-others-die",
+      "uncanny-valley-horror"
+    ]
+  }
+}

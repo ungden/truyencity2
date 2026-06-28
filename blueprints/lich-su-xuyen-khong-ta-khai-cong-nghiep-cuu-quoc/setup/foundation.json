@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "totalScore": 122,
+  "avgScore": 8.71,
+  "minDimScore": 8,
+  "source": "claude_code",
+  "dimensions": [
+    { "name": "Premise & hook", "score": 9, "note": "Warm-baseline lịch sử khai công: MC định thần và bắt tay làm ngay ch.1, hook là tri thức công nghiệp giữa thế giới đao kiếm trì trệ — opportunity-driven, không mở đầu bằng cảnh MC sắp chết thảm." },
+    { "name": "Protagonist engine", "score": 9, "note": "Diệp Tử Thanh thắng bằng tri thức kỹ thuật - quản trị hiện đại cộng khả năng hiện thực hóa; tính cách điềm đạm, thực dụng, kiên nhẫn, biết dùng người, nhất quán." },
+    { "name": "System mechanic", "score": 9, "note": "Tri Thức Công Nghiệp có input/output/limit/reward rõ; anti-plot-armor cứng — tri thức chỉ là nguyên lý, phải vật lộn vật liệu/nhân lực/vốn, không nhảy cóc, sai thì thất bại tốn của tốn người." },
+    { "name": "Conflict ladder", "score": 9, "note": "Leo thang sạch: xưởng rèn → lò cao + nông nghiệp → vũ khí hóa chiến tranh → chính trị triều đình → quyết chiến tổng lực Bắc Mạc → thể chế hóa, mọi bậc bắt rễ từ sản xuất." },
+    { "name": "World coherence", "score": 9, "note": "Đại Càn loạn thế hư cấu, kinh tế muối sắt lũng đoạn, ngoại tộc Bắc Mạc, trình độ tiền-công-nghiệp nhất quán; forbidden elements rõ (cấm tu luyện/phép thuật/nhảy cóc công nghệ)." },
+    { "name": "Dopamine cadence", "score": 9, "note": "controlRules ≥2 peak/chương (cải tiến cho thành quả vượt trội + kẻ khinh thường bị thực tế bịt miệng / lợi ích cụ thể), cao điểm đầu trước nửa chương, đúng kiểu khai công sảng văn." },
+    { "name": "Origin lock", "score": 9, "note": "mcOrigin=transmigrator khóa chặt; MC xuyên không mang TRI THỨC, không mang vật phẩm, KHÔNG có ký ức kiếp trước; mọi file tránh token trọng sinh/kiếp trước/đầu thai/chuyển kiếp." },
+    { "name": "Setting & era self-consistency", "score": 8, "note": "Triều đại Đại Càn hư cấu tự nhất quán, KHÔNG dùng tên quốc gia hiện đại có thật; bối cảnh phong kiến phương Đông loạn thế hợp lý cho cuộc khai công." },
+    { "name": "Foreshadowing & twists", "score": 8, "note": "3 twist (quan lại triều ngầm chống lưng, gián điệp phá hoại nội bộ, nội gián Bắc Mạc) + 3 foreshadowing có plant/payoff chapter cụ thể kéo dài tới cao trào." },
+    { "name": "Long-form sustainability", "score": 9, "note": "noveltyLadder 5 nấc giữ cùng lane 'tri thức thành sản xuất', 7 volume cho 1000 chương, endgame thể chế hóa thành cường quốc bền vững." },
+    { "name": "Vietnamese voice", "score": 8, "note": "Voice anchors hào sảng - thực dụng, giọng chính kịch lịch sử khai công, đủ diacritics, không AI-tell, không nhắc meta." }
+  ],
+  "overallFeedback": "Setup vững cho lịch sử khai công xuyên không NON-magic: warm-baseline opening, golden finger là TRI THỨC công nghiệp có anti-plot-armor cứng (chỉ là nguyên lý, phải hiện thực hóa qua vật liệu - nhân lực - vốn, không nhảy cóc), conflict ladder leo thang sạch qua 7 volume từ xưởng rèn tới cường quốc, origin lock transmigrator chặt (mang tri thức không mang ký ức kiếp trước), triều đại hư cấu tự nhất quán, dopamine cadence kiểu khai công (cải tiến vượt trội + kẻ khinh thường ngậm bồ hòn), foreshadowing và twist có cấu trúc dài hạn. Phân biệt rõ với novel triệu hoán danh tướng (đây là dựng công nghiệp cứu quốc). Sẵn sàng cho DeepSeek V4 Pro viết chương. PASS."
+}

@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "totalScore": 122,
+  "avgScore": 8.71,
+  "minDimScore": 8,
+  "source": "claude_code",
+  "dimensions": [
+    { "name": "Premise & hook", "score": 9, "note": "Warm-baseline kiếm hiệp trinh thám: Tống Từ đã là bộ khoái có nghề, thiên phú active ngay ch.1; hook là vụ án phòng kín hóc búa được mời tới phá — mystery/opportunity-driven, không mở đầu bằng cảnh MC khốn cùng." },
+    { "name": "Protagonist engine", "score": 9, "note": "Tống Từ thắng bằng quan sát + đối chiếu mâu thuẫn + bình tĩnh; võ chỉ tự vệ, thắng cao thủ mạnh hơn nhờ đọc đòn và bố cục; tính cách điềm tĩnh, chính trực, nặng lòng với nạn nhân, nhất quán." },
+    { "name": "System mechanic", "score": 9, "note": "Pháp Nhãn Đọc Hiện Trường có input/output/limit/reward rõ; anti-plot-armor cứng — chỉ làm manh mối nổi bật, không chỉ ra hung thủ, mờ khi hoảng loạn/kiệt sức/bị cảm xúc chi phối, MC vẫn phải suy luận và trả giá." },
+    { "name": "Conflict ladder", "score": 9, "note": "Leo thang án lẻ → án giữa đại hội cao thủ → án hàng loạt thương lộ → đấu trí tổ chức ngầm → kẻ bày cờ + cái chết sư phụ; sạch và escalating qua 7 volume." },
+    { "name": "World coherence", "score": 9, "note": "Giang hồ cổ trang triều đình suy yếu + hệ thống lục cảnh võ học + nghề Thần Bộ Khoái + tổ chức ngầm Ám Tuyến, nhất quán; forbidden elements rõ ràng." },
+    { "name": "Dopamine cadence", "score": 9, "note": "controlRules ≥2 peak/chương (vạch mâu thuẫn/manh mối + nghi can lộ sơ hở hoặc cứu người / thắng đòn), cao điểm đầu trước nửa chương, có payoff trong/kế chương." },
+    { "name": "Origin lock", "score": 9, "note": "mcOrigin=native khóa chặt; mọi file không chứa token xuyên không/xuyên việt/trọng sinh/kiếp trước/đầu thai/đến từ trái đất; nguồn tri thức của MC là di sản sư phụ in-world." },
+    { "name": "Combat balance", "score": 8, "note": "Genre kiếm hiệp có combat nhưng đặt làm phương tiện phụ; MC dừng Hóa Kình phần lớn truyện, thắng kẻ mạnh hơn bằng bố cục, không đột phá thần tốc phi lý — anti-plot-armor cho cả võ học." },
+    { "name": "Foreshadowing & twists", "score": 8, "note": "3 twist (kẻ chủ mưu ẩn, nội gián nha môn, di sản sư phụ) + 3 foreshadowing (ký hiệu sợi chỉ đứt, lời lão Tiền, viên thuộc lại) có plant/payoff chapter cụ thể, kéo dài tới cao trào." },
+    { "name": "Long-form sustainability", "score": 9, "note": "noveltyLadder 5 nấc giữ cùng lane 'tra án bằng suy lý', 7 volume cho 1000 chương, endgame đối đầu kẻ bày cờ và giành lại công lý mà không thành kẻ thao túng mới." },
+    { "name": "Vietnamese voice", "score": 8, "note": "Voice anchors lạnh, sắc, đậm không khí cổ trang giang hồ, đúng giọng kiếm hiệp trinh thám, đủ diacritics, không AI-tell." }
+  ],
+  "overallFeedback": "Setup vững cho kiếm hiệp trinh thám: warm-baseline opening với thiên phú quan sát active ch.1, golden finger là pháp-nhãn-gợi-ý có anti-plot-armor cứng (không chỉ ra hung thủ, mờ khi hoảng loạn), võ học cân bằng (MC thắng nhờ trí không nhờ vượt tầng), conflict ladder leo thang sạch qua 7 volume từ án lẻ tới kẻ bày cờ và cái chết sư phụ, origin lock native chặt, dopamine cadence phá-án (vạch mâu thuẫn + nghi can sụp đổ + cứu người), foreshadowing và twist có cấu trúc dài hạn. Sẵn sàng cho DeepSeek V4 Pro viết chương. PASS."
+}

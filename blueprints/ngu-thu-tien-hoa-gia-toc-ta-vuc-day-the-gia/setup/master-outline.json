@@ -1,0 +1,100 @@
+{
+  "title": "Ngự Thú Thế Gia: Ta Vực Dậy Gia Tộc Suy Tàn",
+  "totalChapters": 1000,
+  "mainPlotline": "Mộc Vân, người thừa kế bản địa của Mộc gia ngự thú đang lụi tàn ở thành Thanh Khâu, dùng thiên phú huyết mạch của dòng họ — nhãn lực nhìn thấu tuyến tiến hóa ẩn — để thuần hóa những chiến thú bị cả đại lục coi là phế, dưỡng chúng thành quân bài cực phẩm, từng bước vực dậy thanh danh thế gia; từ một thiếu niên bị khinh rẻ, cậu lần lượt đánh bại các gia tộc đối địch trong đấu thú và đấu trí, khôi phục bí pháp dưỡng thú thất truyền, vươn lên ngôi vị ngự thú đại sư và đưa Mộc gia trở lại hàng ngũ thế gia hàng đầu — tất cả bằng tài dưỡng thú và chỉ huy chiến thú, không bằng việc tự ra tay đánh đấm.",
+  "originLock": "native — Mộc Vân là người bản địa của đại lục Thương Lan, con cháu trực hệ Mộc gia, sinh ra và lớn lên ngay trong gia tộc suy tàn; nhãn lực nhìn thấu tuyến tiến hóa là thiên phú huyết mạch truyền đời của dòng họ. Mọi năng lực đều phát sinh và rèn giũa hoàn toàn tại chỗ trong thế giới truyện.",
+  "volumes": [
+    {
+      "volume": 1,
+      "title": "Phế Thú Trong Tay Ta",
+      "chapterRange": "1-130",
+      "theme": "Khởi đầu vực dậy: thuần hóa con phế thú đầu tiên và giành lại chỗ đứng",
+      "summary": "Mộc Vân nhận về con sói xám gầy gò bị coi là không có tuyến tiến hóa, dùng nhãn lực thấy nhánh tiến hóa ẩn, dưỡng nó qua điểm bùng nổ đầu tiên và thắng trận đấu thú giành lại thể diện cho Mộc gia trước Lý gia.",
+      "subArcs": [
+        { "name": "Tàn tích Mộc gia", "chapterRange": "1-30", "focus": "Mộc Vân thừa kế gia tộc suy tàn, nhận con sói xám phế, nhãn lực nhìn thấu nhánh tiến hóa ẩn và quyết định nuôi nó." },
+        { "name": "Điểm bùng nổ đầu tiên", "chapterRange": "31-65", "focus": "Lặn lội tìm linh thảo, canh thời điểm, kích nhánh tiến hóa đầu tiên của sói xám; xây lòng tin giữa người và thú." },
+        { "name": "Đấu trường Thanh Khâu", "chapterRange": "66-100", "focus": "Lý gia khiêu khích, đấu thú công khai; sói xám tiến hóa lật ngược thế trận trước con thú được đánh giá cao hơn." },
+        { "name": "Chỗ đứng đầu tiên", "chapterRange": "101-130", "focus": "Mộc Vân giành lại một phần thanh danh, thu nhận đệ tử và đồng minh đầu tiên, hé lộ bí pháp dưỡng thú thất truyền của tổ tiên." }
+      ],
+      "keyMilestone": "Mộc Vân chứng minh thú phế trong mắt người khác là cực phẩm trong tay mình, lấy lại chỗ đứng đầu tiên cho Mộc gia."
+    },
+    {
+      "volume": 2,
+      "title": "Bí Pháp Dưỡng Thú",
+      "chapterRange": "131-280",
+      "theme": "Khôi phục bí pháp tổ tiên và mở rộng đàn chiến thú",
+      "summary": "Mộc Vân lần theo manh mối khôi phục thuật dưỡng thú thất truyền của Mộc gia, thu thêm vài con phế thú khác và chứng minh phương pháp của mình vượt trội phái dưỡng thú chính thống.",
+      "subArcs": [
+        { "name": "Tàng thư các", "chapterRange": "131-180", "focus": "Tìm lại tàn quyển bí pháp Mộc gia, ghép với nhãn lực để hiểu nguyên lý tuyến tiến hóa sâu hơn." },
+        { "name": "Đàn thú phế", "chapterRange": "181-230", "focus": "Thu thêm chiến thú bị bỏ rơi, dưỡng thành đội hình bổ trợ nhau; va chạm với phái dưỡng thú chính thống bảo thủ." },
+        { "name": "Hội đấu thú trẻ", "chapterRange": "231-280", "focus": "Tham gia hội đấu thú giữa các thế gia trẻ, đội thú phế của Mộc Vân gây chấn động, Tào gia bắt đầu để mắt." }
+      ],
+      "keyMilestone": "Phương pháp dưỡng thú của Mộc Vân được công nhận vượt trội, Mộc gia có lại đệ tử và danh tiếng vùng Thanh Khâu."
+    },
+    {
+      "volume": 3,
+      "title": "Tranh Đoạt Linh Sơn",
+      "chapterRange": "281-430",
+      "theme": "Tranh chấp tài nguyên săn thú với các thế gia",
+      "summary": "Để nuôi đàn thú tiến hóa, Mộc gia cần khu săn linh thảo. Mộc Vân đấu trí và đấu thú với Lý gia, Tào gia để giành quyền khai thác một linh sơn, chạm trán những dị thú hoang dã mạnh.",
+      "subArcs": [
+        { "name": "Linh sơn vô chủ", "chapterRange": "281-330", "focus": "Phát hiện linh sơn giàu linh thảo nhưng bị nhiều thế gia nhòm ngó; Mộc Vân tìm cách giành quyền hợp pháp." },
+        { "name": "Dị thú hoang", "chapterRange": "331-380", "focus": "Linh sơn có dị thú hoang nguy hiểm; Mộc Vân dùng nhãn lực thuần hóa thay vì tiêu diệt, biến nguy thành cơ." },
+        { "name": "Hội minh giành sơn", "chapterRange": "381-430", "focus": "Đấu thú liên minh tranh quyền khai thác; Mộc gia thắng nhờ chiến thuật dưỡng thú độc đáo." }
+      ],
+      "keyMilestone": "Mộc gia giành được linh sơn riêng, có nền tảng tài nguyên để dưỡng chiến thú cấp cao hơn."
+    },
+    {
+      "volume": 4,
+      "title": "Tứ Đại Thế Gia",
+      "chapterRange": "431-580",
+      "theme": "Đối đầu trực diện với gia tộc từng đẩy Mộc gia xuống đáy",
+      "summary": "Mộc Vân lần ra sự thật: sự lụi tàn của Mộc gia hai mươi năm trước không phải tai họa tự nhiên mà do một thế gia ngầm hãm hại huyết mạch chiến thú. Cậu vạch trần âm mưu bằng bằng chứng và đấu thú công khai.",
+      "subArcs": [
+        { "name": "Vết thương cũ", "chapterRange": "431-480", "focus": "Manh mối cho thấy chiến thú quý Mộc gia xưa bị đầu độc huyết mạch có chủ ý; Mộc Vân điều tra." },
+        { "name": "Kẻ giấu mặt", "chapterRange": "481-530", "focus": "Lần theo dấu vết tới một thế gia trong tứ đại; đấu trí thu thập chứng cứ giữa quyền môn." },
+        { "name": "Phán xử đấu trường", "chapterRange": "531-580", "focus": "Vạch trần âm mưu trước các thế gia bằng chứng cứ và một trận đấu thú quyết định danh dự." }
+      ],
+      "keyMilestone": "Mộc Vân rửa oan cho tổ tiên, đánh sụp uy tín kẻ hãm hại, đưa Mộc gia trở lại hàng tứ đại thế gia Thanh Khâu."
+    },
+    {
+      "volume": 5,
+      "title": "Thánh Thú Huyết Mạch",
+      "chapterRange": "581-730",
+      "theme": "Vươn ra ngoài Thanh Khâu, chạm tới huyết mạch chiến thú cấp thánh",
+      "summary": "Danh tiếng vượt khỏi Thanh Khâu, Mộc Vân được mời tới các vùng đất lớn hơn, nơi tồn tại huyết mạch Thánh Thú. Cậu khám phá tuyến tiến hóa cấp cao mà nhãn lực giờ mới hé lộ được, đối mặt ngự thú sư đại tông sư.",
+      "subArcs": [
+        { "name": "Mời gọi từ kinh đô", "chapterRange": "581-630", "focus": "Mộc Vân ra khỏi Thanh Khâu, bước vào sân chơi của các thế gia tầm đại lục." },
+        { "name": "Tuyến tiến hóa thánh", "chapterRange": "631-680", "focus": "Nhãn lực tiến hóa, lần đầu thấy nhánh tiến hóa cấp Thánh Thú trong một con thú tưởng tầm thường." },
+        { "name": "Đại tông sư", "chapterRange": "681-730", "focus": "Đấu thú với ngự thú đại tông sư; Mộc Vân thắng bằng tuyến tiến hóa ẩn không ai ngờ tới." }
+      ],
+      "keyMilestone": "Mộc Vân dưỡng thành chiến thú cấp Thánh Thú đầu tiên, đứng vào hàng ngũ ngự thú sư đỉnh cao đại lục."
+    },
+    {
+      "volume": 6,
+      "title": "Nguồn Gốc Dung Hợp",
+      "chapterRange": "731-880",
+      "theme": "Truy ra bí ẩn Đại Dung Hợp và bản chất nhãn lực huyết mạch",
+      "summary": "Mộc Vân phát hiện nhãn lực của mình liên quan tới Đại Dung Hợp ngàn năm trước — sự kiện đã tạo ra mọi tuyến tiến hóa. Cậu lần về cội nguồn, đối mặt thế lực muốn lũng đoạn tiến hóa của muôn loài.",
+      "subArcs": [
+        { "name": "Tàn tích cổ", "chapterRange": "731-780", "focus": "Lập bản đồ các di tích Đại Dung Hợp; nhãn lực Mộc Vân hé lộ nguồn gốc thật của tuyến tiến hóa." },
+        { "name": "Kẻ thao túng tiến hóa", "chapterRange": "781-830", "focus": "Một thế lực ngầm muốn độc quyền kiểm soát tuyến tiến hóa của chiến thú toàn đại lục." },
+        { "name": "Cội nguồn nhãn lực", "chapterRange": "831-880", "focus": "Mộc Vân hiểu vì sao huyết mạch Mộc gia mang nhãn lực này và liên hệ của nó với Đại Dung Hợp." }
+      ],
+      "keyMilestone": "Mộc Vân hiểu rõ nguồn gốc nhãn lực và sứ mệnh huyết mạch Mộc gia với cân bằng tiến hóa của muôn loài."
+    },
+    {
+      "volume": 7,
+      "title": "Vương Triều Vạn Thú",
+      "chapterRange": "881-1000",
+      "theme": "Đỉnh cao — dựng lại Mộc gia thành đại thế gia và bảo vệ cân bằng tiến hóa",
+      "summary": "Mộc Vân ngăn thế lực thao túng tiến hóa, bảo vệ quyền tiến hóa tự nhiên của muôn loài, và đưa Mộc gia từ tàn tích lên ngôi vị thế gia ngự thú hàng đầu — khép lại bằng một di sản dưỡng thú truyền đời thay vì độc quyền.",
+      "subArcs": [
+        { "name": "Hội minh cuối", "chapterRange": "881-930", "focus": "Tập hợp các thế gia chính trực và đàn chiến thú đã thuần hóa chống lại thế lực thao túng." },
+        { "name": "Đấu thú vận mệnh", "chapterRange": "931-980", "focus": "Trận đấu thú lớn nhất quyết định ai nắm quyền định hình tiến hóa; Mộc Vân thắng bằng triết lý dưỡng thú thuận tự nhiên." },
+        { "name": "Di sản Mộc gia", "chapterRange": "981-1000", "focus": "Mộc gia trở lại đỉnh cao; Mộc Vân lập học viện truyền bí pháp, để tuyến tiến hóa thuộc về muôn loài chứ không thuộc một nhà." }
+      ],
+      "keyMilestone": "Mộc gia trở thành đại thế gia ngự thú hàng đầu; Mộc Vân biến bí pháp riêng thành di sản chung, hoàn tất hành trình vực dậy."
+    }
+  ]
+}

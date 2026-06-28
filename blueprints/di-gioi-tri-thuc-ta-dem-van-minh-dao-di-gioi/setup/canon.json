@@ -1,0 +1,197 @@
+{
+  "power_system": {
+    "name": "Nấc Thang Văn Minh — Tiến Trình Cải Biến Của Lãnh Địa",
+    "type": "territory tech/economy development progression (tiến trình phát triển công nghệ và kinh tế của lãnh địa, KHÔNG phải tu luyện ma pháp thần tiên)",
+    "coreResource": "Tri thức khoa học, kinh tế và quản trị hiện đại của Cao Viễn + của cải và dân số của lãnh địa + lòng tin và sức lao động của con người + tài nguyên thực của Aldria (đất, quặng, nước, ma pháp bản địa)",
+    "unlockRule": "Mỗi nấc văn minh mở khi nấc trước đã vững và sinh ra dư thừa nguồn lực: cứu lãnh địa khỏi vỡ nợ và dư lương thực → thủ công nghiệp và thương mại → tích lũy vốn → kỹ nghệ cơ khí và luyện kim → khoa học hóa ma pháp → thể chế, giáo dục, y tế công → chính trị đại lục. Văn Minh Sa Bàn chẩn đoán nút thắt và gợi ý hướng cải tiến cho từng nấc, nhưng việc lên nấc đòi hỏi thiết kế giải pháp, thuyết phục con người, đầu tư vốn và thời gian thực tế.",
+    "antiPlotArmor": [
+      "Văn Minh Sa Bàn CHỈ chẩn đoán nút thắt và gợi ý hướng cải tiến — KHÔNG tự thực thi, KHÔNG cho vốn liếng hay nhân lực, KHÔNG đảm bảo thành công.",
+      "Cao Viễn vẫn phải tự tay thiết kế giải pháp chi tiết, thuyết phục người hoài nghi, đầu tư nguồn lực thật và chịu rủi ro: cải cách bị chống đối, đầu tư lỗ, vụ mùa mất, lò cao hỏng đều có thật và buộc làm lại.",
+      "Sa Bàn mờ đi khi Cao Viễn kiệt sức, và HOÀN TOÀN bất lực trước lòng người: âm mưu chính trị, lòng trung thành, sự phản bội, đức tin — những thứ ấy anh phải tự xoay xở bằng tài quản trị và sự khôn ngoan.",
+      "Cải biến bị giới hạn bởi tài nguyên, vốn và nấc thang: không thể công nghiệp hóa khi chưa có dư lương thực và vốn, không thể khoa học hóa ma pháp khi chưa có nền kỹ nghệ và phương pháp thực nghiệm."
+    ],
+    "signatureBuff": {
+      "name": "Đọc Nút Thắt Hệ Thống",
+      "effect": "Khi quan sát kỹ một hệ thống trong trạng thái tỉnh táo, Cao Viễn thấy hiện lên một 'sa bàn' mô phỏng chỉ ra nút thắt đang kìm hãm nó (đất thiếu chất gì, dòng tiền rò rỉ ở đâu, dây chuyền nghẽn chỗ nào) và những hướng cải tiến tiềm năng, giúp anh hoạch định nhiều bước cải biến thay vì mò mẫm.",
+      "limit": "Chỉ là bản đồ chẩn đoán và hướng đi, không phải bản thiết kế hoàn chỉnh hay phép màu thực thi; mỗi cải cách vẫn cần thiết kế chi tiết, vốn, con người và thời gian thực tế, và bất lực hoàn toàn trước lòng người."
+    },
+    "progressionAxes": [
+      "Nấc văn minh đã đạt (cứu phá sản → thương mại → kỹ nghệ → khoa học hóa ma pháp → thể chế → chính trị đại lục)",
+      "Của cải, dân số và năng suất của lãnh địa (ngân khố, dân lưu tán tới nương tựa, sản lượng, công nghệ)",
+      "Uy tín và quyền lực của Cao Viễn cùng độ vững của thể chế (luật lệ, hành chính, liên minh các thế lực cải cách)"
+    ],
+    "powerCeilingByPhase": {
+      "phase1": "Lãnh địa đơn lẻ thoát phá sản — nông nghiệp luân canh, vệ sinh y tế, sổ sách dòng tiền, dư của cải lần đầu",
+      "phase2": "Thế lực thương mại của vùng — thủ công nghiệp tiêu chuẩn hóa, thương lộ, phá độc quyền thương hội cũ",
+      "phase3": "Cường quốc kỹ nghệ — cối xay nước, lò cao, cơ khí, công nghiệp hóa sơ khai, ma pháp khoa học hóa đại trà",
+      "phase4": "Trung tâm văn minh đại lục — thể chế và giáo dục hiện đại, đối đầu trật tự cũ, lan tỏa mô hình ra toàn Aldria"
+    }
+  },
+  "worldbuilding": {
+    "tone": "Sử thi cải biến ấm áp và thực tế: gian nan nhưng tràn hy vọng, niềm vui đến từ mỗi mạng người được cứu khỏi đói rét bệnh tật và mỗi nấc lãnh địa rời khỏi nghèo nàn; căng thẳng đến từ âm mưu chính trị, cạnh tranh kinh tế và sự bảo thủ của trật tự cũ, không từ gore giật gân.",
+    "economy": "Kinh tế phong kiến lạc hậu tiến hóa dần: ban đầu tự cung tự cấp và vỡ nợ, sau có dư lương thực, rồi thủ công nghiệp tiêu chuẩn hóa và thương mại (giấy, thủy tinh, vải, xà phòng), tín dụng và tiền tệ ổn định, công nghiệp hóa; vàng và thương lộ là huyết mạch quyền lực của Aldria.",
+    "setting": "Aldria — một đại lục dị giới nơi ma pháp tồn tại nhưng văn minh giậm chân ở mức trung cổ lạc hậu: người ta cày bằng lưỡi gỗ, chết vì vết thương nhiễm trùng tầm thường, tin bệnh dịch là cơn giận thần linh, và ma pháp là đặc quyền phô trương của quý tộc và học viện pháp sư.",
+    "geography": {
+      "phase1": "Lãnh địa Greenmoor với tòa lâu đài dột nát, đồng ruộng và làng nông nô sắp phá sản",
+      "phase2": "Greenmoor trù phú cùng thương lộ và thị trấn lân cận dẫn tới lãnh địa của Hầu tước Vance",
+      "phase3": "Greenmoor công nghiệp hóa với cối xay nước, lò cao, xưởng ma pháp và mạng lưới thương mại khắp vùng",
+      "phase4": "Cả vương quốc và đại lục Aldria với Greenmoor làm trung tâm văn minh, liên minh các lãnh chúa cải cách và trật tự mới"
+    },
+    "techLevel": "Trung cổ lạc hậu khi mở màn (lưỡi cày gỗ, nến mỡ, lang băm), tiến dần qua nông nghiệp khoa học, vệ sinh y tế, thủ công tiêu chuẩn hóa, kế toán, kỹ nghệ cối xay nước và lò cao, khoa học hóa ma pháp, thể chế và giáo dục — toàn bộ do Cao Viễn cải biến theo nấc thang văn minh có thật.",
+    "conflictMedium": "Cải biến, kinh tế, ngoại giao và luật pháp là phương thức chính giải quyết vấn đề (tri thức, cải cách, thương thuyết, kiện tụng, đổi mới công nghệ); phòng vệ vũ trang có tồn tại nhưng luôn thắng bằng tổ chức, công nghệ và lòng dân chứ không bằng MC đấu sức cá nhân hay gore.",
+    "forbiddenElements": [
+      "MC tu luyện / lên cảnh giới / luyện ma pháp cá nhân thành cường giả như cách thắng chính",
+      "trọng sinh / ký ức kiếp trước / đầu thai / chuyển kiếp",
+      "gore khoái cảm, bạo lực phô trương để giật gân",
+      "MC một mình đấu tay đôi với hiệp sĩ, pháp sư hay quái vật như cách giải quyết chính",
+      "phép màu giải quyết vấn đề thay cho cải biến thực tế và thử-sai",
+      "công nghệ nhảy cóc phi lý vượt nấc thang văn minh (vd súng đạn hiện đại, điện lưới, internet) ở giai đoạn đầu"
+    ]
+  },
+  "factions": [
+    {
+      "name": "Lãnh địa Greenmoor",
+      "type": "lãnh địa của nhân vật chính",
+      "power_level": 3,
+      "summary": "Lãnh địa nhỏ nghèo sắp phá sản nơi Cao Viễn nhập thân; dưới sự cải biến của anh, từng bước trở thành trung tâm của một nền văn minh mới.",
+      "territory": "Vùng đất Greenmoor với lâu đài, đồng ruộng và làng nông nô, sau mở rộng thành cường quốc kỹ nghệ và trung tâm văn minh",
+      "mc_relation": "Lãnh địa MC cai trị và cải biến",
+      "conflicts": ["Thương hội Mercator", "Công tước Aldebrand"],
+      "alliances": ["Liên minh lãnh chúa cải cách"],
+      "importance": 10,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Thương hội Mercator",
+      "type": "thương hội cũ độc quyền",
+      "power_level": 5,
+      "summary": "Thương hội lâu đời quen độc quyền và phá giá thị trường vùng; căm ghét hàng hóa rẻ và tốt của Greenmoor, trở thành đối thủ kinh tế giữa truyện, đối đầu bằng chiến tranh giá cả và kiện tụng.",
+      "territory": "Mạng lưới thương điếm và thương lộ khắp vương quốc",
+      "mc_relation": "Đối thủ thương mại, tìm cách tẩy chay và bóp nghẹt thương phẩm Greenmoor",
+      "conflicts": ["Lãnh địa Greenmoor"],
+      "alliances": ["Công tước Aldebrand"],
+      "importance": 7,
+      "introduce_arc": 2
+    },
+    {
+      "name": "Giáo hội Ánh Sáng",
+      "type": "thế lực tôn giáo bảo thủ",
+      "power_level": 7,
+      "summary": "Giáo hội quyền lực coi bệnh dịch là ý thần linh và mọi đổi mới là dị đoan trái tự nhiên; nghi ngờ cải cách của Cao Viễn và đe dọa buộc tội tà thuyết, đối đầu bằng lý lẽ và minh bạch chứ không bạo lực.",
+      "territory": "Các thánh đường và giáo khu khắp Aldria, ảnh hưởng tới triều đình",
+      "mc_relation": "Thế lực nghi kỵ, có thể buộc tội dị đoan nếu cải cách đi quá nhanh",
+      "conflicts": ["Lãnh địa Greenmoor"],
+      "alliances": ["Học viện pháp sư"],
+      "importance": 8,
+      "introduce_arc": 3
+    },
+    {
+      "name": "Đại quý tộc Công tước Aldebrand",
+      "type": "thế lực lớn đại diện trật tự cũ",
+      "power_level": 9,
+      "summary": "Một trong những đại quý tộc hùng mạnh nhất triều đình, bảo thủ và coi sự trỗi dậy của Greenmoor là mối đe dọa trật tự phong kiến ngàn năm; phản diện chính giai đoạn cuối, tập hợp các thế lực cũ để bóp nghẹt mô hình mới.",
+      "territory": "Lãnh thổ rộng lớn và quyền lực sâu trong triều đình vương quốc",
+      "mc_relation": "Đối thủ tối hậu trong cuộc va chạm văn minh, đối đầu bằng ngoại giao, kinh tế, liên minh và phòng vệ chứ không gore",
+      "conflicts": ["Lãnh địa Greenmoor và liên minh cải cách"],
+      "alliances": ["Thương hội Mercator", "Giáo hội Ánh Sáng"],
+      "importance": 9,
+      "introduce_arc": 6
+    }
+  ],
+  "plot_twists": [
+    {
+      "summary": "Cha xứ Aldric, người chống đối cải cách gay gắt nhất bằng lý lẽ thần linh, thực ra từng chứng kiến một lãnh địa cải cách bị dịch bệnh và hỗn loạn tàn phá thời trẻ — nỗi sợ của ông không phải mê tín mù quáng mà là lo lịch sử lặp lại và dân chúng phải trả giá.",
+      "payoff_type": "động cơ ẩn của đối thủ",
+      "setup_chapters": [85, 380],
+      "twist_chapter": 470,
+      "reader_impact": "major",
+      "arc_number": 4
+    },
+    {
+      "summary": "Sự độc quyền tri thức ma pháp của các học viện không chỉ là tham lam mà còn là một thỏa ước cũ để che giấu một thảm họa ma pháp từng suýt hủy diệt Aldria; việc Cao Viễn khoa học hóa và phổ cập ma pháp chạm vào nỗi sợ bị chôn giấu hàng thế kỷ.",
+      "payoff_type": "nguồn gốc xung đột",
+      "setup_chapters": [490, 620],
+      "twist_chapter": 700,
+      "reader_impact": "major",
+      "arc_number": 5
+    },
+    {
+      "summary": "Tri thức Cao Viễn mang theo không chỉ cứu một lãnh địa mà vô tình làm lung lay trật tự phong kiến ngàn năm của cả Aldria; sự trỗi dậy của một nền văn minh mới là điều cả đại lục chưa từng chứng kiến, buộc đại quý tộc, vương quyền và giáo hội phải chọn phe trong một cuộc chuyển mình toàn lục địa.",
+      "payoff_type": "hệ quả quy mô lớn",
+      "setup_chapters": [730, 840],
+      "twist_chapter": 880,
+      "reader_impact": "cosmic",
+      "arc_number": 6
+    }
+  ],
+  "themes": [
+    {
+      "name": "Tri thức và quản trị là sức mạnh thật sự",
+      "type": "main",
+      "description": "Trong một thế giới mà ma pháp và dòng dõi quý tộc là vua, chính tri thức thực dụng và tài tổ chức mới là thứ thực sự nâng con người khỏi đói nghèo và dựng nên văn minh.",
+      "motifs": ["mảnh khoa học tầm thường thành kỳ tích cứu mạng", "ghi sổ kép chặn dòng tiền rò rỉ", "thử-sai rồi cải cách thành công"],
+      "importance": 10
+    },
+    {
+      "name": "Văn minh thực dụng đánh thức một thế giới ngủ quên",
+      "type": "main",
+      "description": "Mỗi nấc thang văn minh đều phải đổi bằng thiết kế, đầu tư, thuyết phục và kiên nhẫn; không có phép màu, chỉ có sự bền bỉ của một người hiện đại trước một xã hội bảo thủ.",
+      "motifs": ["vụ mùa luân canh đầu tiên gấp đôi sản lượng", "bánh xà phòng dập dịch bệnh", "mẻ thép đầu tiên ra lò"],
+      "importance": 9
+    },
+    {
+      "name": "Phá vỡ độc quyền tri thức giải phóng số đông",
+      "type": "supporting",
+      "description": "Cao Viễn không giữ tri thức cho riêng mình; sức mạnh thật nằm ở việc phổ cập tri thức, giáo dục và trao quyền cho cả cộng đồng, để văn minh tự đứng vững mà không cần một cá nhân.",
+      "motifs": ["dạy chữ cho con nhà nghèo", "ma pháp phục vụ số đông thay vì đặc quyền quý tộc", "bộ luật minh bạch thay cai trị tùy tiện"],
+      "importance": 8
+    },
+    {
+      "name": "Tiến bộ vượt qua trật tự cũ và nỗi sợ cái mới",
+      "type": "supporting",
+      "description": "Mọi bước cải biến đều vấp phải sự bảo thủ, đặc quyền và nỗi sợ thần linh; cải biến cũng là cuộc đấu tranh thay đổi tư duy con người và lay chuyển một trật tự ngàn năm.",
+      "motifs": ["bị giáo hội gọi là dị đoan", "hoài nghi thành kính phục", "đặc quyền cũ bị thách thức"],
+      "importance": 8
+    }
+  ],
+  "voice_anchors": [
+    {
+      "snippet_type": "opening",
+      "prose_text": "Cao Viễn mở mắt, và mùi nến mỡ động vật khét lẹt thay cho mùi giấy in báo cáo tài chính quen thuộc. Anh không ngồi bên bàn làm việc ngổn ngang bản vẽ, mà nằm trên một chiếc giường gỗ ọp ẹp trong một tòa lâu đài ẩm thấp, dột nát. Một quản gia già run rẩy đứng bên cạnh, tay siết chặt một cuốn sổ nợ dày cộp. — Thưa lãnh chúa, ngân khố đã cạn, nông nô đói khát bỏ trốn, mà mùa thu thuế của vương quốc chỉ còn ba tháng nữa. Cao Viễn nhìn cuốn sổ, rồi nhìn bàn tay xa lạ của chính mình. Ký ức của một lãnh chúa trẻ tên Cao Viễn ùa về, hòa lẫn với tri thức của một thạc sĩ quản trị kiêm kỹ sư. Anh không hoảng. Một lãnh địa vỡ nợ, với anh, chỉ là một bài toán dòng tiền. Và anh đã giải hàng trăm bài toán khó hơn thế.",
+      "key_traits": ["điềm tĩnh", "tư duy quản trị", "lý trí", "tầm nhìn xa"]
+    },
+    {
+      "snippet_type": "dialogue",
+      "prose_text": "— Ngài muốn nông dân chôn hạt đậu xuống đất thay vì để ruộng nghỉ? Quản gia Bartho trợn mắt, tay vẫn ôm cuốn sổ nợ. Tổ tiên xưa nay đều để ruộng hoang một năm cho đất hồi sức! Cao Viễn không cãi. Anh chỉ vẽ một đường lên tấm bảng đá. — Bác tin tôi một mùa thôi. Trồng đậu trên mảnh ruộng định bỏ hoang ấy. Nếu tôi sai, tôi tự gánh phần thuế thiếu hụt. Nhưng nếu tôi đúng — anh ngẩng lên nhìn thẳng vào mắt người quản gia già — mảnh ruộng đó sẽ vừa cho thu hoạch đậu, vừa trả lại màu mỡ cho đất, để vụ sau lúa mọc dày gấp đôi. Bác muốn để đất nằm không cả năm, hay muốn ngân khố này không bao giờ cạn nữa?",
+      "key_traits": ["thuyết phục bằng kết quả", "dám cược uy tín", "kiên nhẫn", "lý lẽ thực tế"]
+    },
+    {
+      "snippet_type": "action",
+      "prose_text": "Tin báo tới giữa đêm: thương hội Mercator đã hạ giá vải xuống dưới giá vốn để bóp chết xưởng dệt Greenmoor. Mấy người quản lý xưởng tái mặt, đòi hạ giá theo. Cao Viễn không cho. Anh trải tấm sổ kế toán ra giữa bàn, đầu óc lập tức hiện lên cái sa bàn quen thuộc — và anh thấy ngay nút thắt. — Đừng đua giá với họ. Họ phá giá bằng tiền tích trữ, càng kéo dài họ càng lỗ nặng hơn ta. Anh chỉ vào một dòng số. Ta giữ giá, nhưng đính kèm bảo hành và giao tận nơi — thứ họ không làm được. Khách cần vải bền, không cần vải rẻ mà rách sau một mùa. Một tháng nữa, chính họ sẽ là kẻ cầu hòa. Quả nhiên, chưa đầy một tháng, sứ giả của Mercator gõ cửa lâu đài.",
+      "key_traits": ["dùng đầu thay vì đua máu", "đọc nút thắt hệ thống", "bình tĩnh chỉ huy", "tin vào tri thức"]
+    }
+  ],
+  "foreshadowing": [
+    {
+      "hintText": "Trong thư phòng cũ của lâu đài Greenmoor có một bức bích họa phai màu vẽ một thành phố trù phú với cối xay nước và ống khói — thứ không ai trong vùng hiểu, họ bảo đó chỉ là 'tranh tưởng tượng của tổ tiên'.",
+      "category": "object",
+      "plantCh": 40,
+      "pickupCh": 700,
+      "payoffDescription": "Bức bích họa là dấu vết một nền văn minh cải cách từng tồn tại ở Aldria và sụp đổ; lý giải nỗi sợ của giáo hội và cho thấy con đường của Cao Viễn không phải chưa từng có ai đi."
+    },
+    {
+      "hintText": "Cha xứ Aldric mỗi lần chống đối cải cách đều nhắc tới 'cơn thịnh nộ năm xưa' với ánh mắt ám ảnh, nhưng không bao giờ kể rõ đó là chuyện gì.",
+      "category": "character_behavior",
+      "plantCh": 85,
+      "pickupCh": 470,
+      "payoffDescription": "Aldric thời trẻ từng chứng kiến một lãnh địa cải cách bị dịch bệnh và hỗn loạn tàn phá, hé lộ nỗi sợ của ông là lo lịch sử lặp lại chứ không phải mê tín mù quáng."
+    },
+    {
+      "hintText": "Khi Cao Viễn bắt đầu chuẩn hóa và ghi chép các quy luật ma pháp, các học viện pháp sư phản ứng dữ dội bất thường, có lời đồn rằng 'có những thứ về ma pháp mà các bậc thầy đã thề sẽ không bao giờ viết ra'.",
+      "category": "dialogue",
+      "plantCh": 490,
+      "pickupCh": 880,
+      "payoffDescription": "Độc quyền tri thức ma pháp che giấu một thảm họa ma pháp từng suýt hủy diệt Aldria; việc Cao Viễn phổ cập ma pháp kéo cả đại lục vào cuộc va chạm giữa nền văn minh mới và trật tự cũ."
+    }
+  ]
+}

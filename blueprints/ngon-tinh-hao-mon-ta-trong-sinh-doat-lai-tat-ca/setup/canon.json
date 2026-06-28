@@ -1,0 +1,198 @@
+{
+  "power_system": {
+    "name": "Bậc Thang Quyền Lực Hào Môn",
+    "type": "social-standing & business-mastery hierarchy (địa vị xã hội, uy tín thương hiệu và năng lực thương trường — KHÔNG phải võ lực hay tu luyện)",
+    "coreResource": "Trí tuệ, ký ức kiếp trước, cổ phần biểu quyết, uy tín và mạng lưới quan hệ của Tô Uyển — quyền lực đến từ thông tin, sự chuẩn bị và khả năng kiểm soát dư luận, không từ sức mạnh thể chất",
+    "unlockRule": "Tô Uyển leo bậc thang bằng cách tích lũy năng lực thật (tài chính, đàm phán, truyền thông), giành cổ phần, gây dựng uy tín và mở rộng mạng lưới đồng minh; ký ức kiếp trước chỉ cho cô lợi thế thời điểm chứ không tự nâng địa vị.",
+    "antiPlotArmor": [
+      "Ký ức kiếp trước CHỈ cho biết kịch bản CŨ — KHÔNG tự ký hợp đồng, KHÔNG tự thắng kiện, KHÔNG tự dập bê bối; Tô Uyển vẫn phải tự xây năng lực và ra tay.",
+      "Mỗi lần cô can thiệp sớm, dòng đời lệch khỏi kịch bản cũ, khiến ký ức mất dần giá trị; càng về sau càng phải dựa vào trí tuệ thật.",
+      "Ký ức mù với những việc cô chưa từng biết ở kiếp trước (âm mưu hậu trường, kẻ giật dây thật sự) — cô không thể đoán trước những thứ ngoài trải nghiệm cũ.",
+      "Quyền lực hào môn có ràng buộc thật: cổ phần phải gom đủ phiếu, dư luận có thể quay lưng, đối thủ có nguồn lực lớn hơn — không có chiến thắng nào miễn phí."
+    ],
+    "signatureBuff": {
+      "name": "Đọc Người Đi Trước Một Nước",
+      "effect": "Nhờ từng sống qua chuỗi sự kiện, Tô Uyển nhận ra ý đồ thật của đối phương sớm hơn người khác, giúp cô giăng phản đòn và bày thế cờ trước khi âm mưu chín muồi.",
+      "limit": "Chỉ hiệu quả với những kẻ và kịch bản cô từng biết ở kiếp trước; với nhân tố mới hoặc kẻ giật dây giấu mặt, cô phải đọc người và suy luận từ đầu như mọi doanh nhân khác."
+    },
+    "progressionAxes": [
+      "Quy mô quyền lực (công ty con → thương hiệu riêng → tập đoàn gia tộc → đế chế kinh doanh)",
+      "Uy tín và quyền kiểm soát dư luận trong giới hào môn",
+      "Mạng lưới đồng minh, cổ đông và đối tác chiến lược",
+      "Độ sắc của khả năng đọc người khi ký ức kiếp trước mất dần giá trị"
+    ],
+    "powerCeilingByPhase": {
+      "phase1": "Chặn một cái bẫy cá nhân và nắm quyền điều hành một công ty con nhỏ",
+      "phase2": "Gây dựng thương hiệu độc lập và thắng các đòn cạnh tranh bẩn",
+      "phase3": "Giành quyền kiểm soát tập đoàn gia tộc qua chiến tranh cổ phần",
+      "phase4": "Đối đầu ngang hàng các hào môn kỳ cựu và hạ gục thế lực giật dây thật sự"
+    }
+  },
+  "worldbuilding": {
+    "tone": "Lãng mạn hào môn sảng văn: sắc sảo, lạnh lùng mà kiêu hãnh, đan xen những khoảnh khắc ngọt ngào và day dứt; khoái cảm đến từ việc lật ngược thế cờ và phơi bày sự thật, không từ bạo lực.",
+    "economy": "Kinh tế thượng lưu hiện đại: cổ phần, hợp đồng, thâu tóm, đầu tư, thương hiệu và quan hệ truyền thông là 'tiền tệ' quyền lực; địa vị đo bằng tài sản gia tộc, uy tín và khả năng kiểm soát câu chuyện trước công chúng.",
+    "setting": "Một đô thị phồn hoa hiện đại nơi quyền lực nằm ở cổ phần, danh tiếng và những bữa tiệc; bề mặt là cao ốc kính, biệt thự kín cổng và sự kiện hào nhoáng, bên dưới là liên minh hôn nhân, thâu tóm doanh nghiệp và tin đồn dàn dựng.",
+    "geography": {
+      "phase1": "Biệt thự và tập đoàn gia tộc Tô, một công ty con nhỏ, các sự kiện thượng lưu trong thành phố",
+      "phase2": "Thương trường rộng hơn: thị trường thương hiệu, giới truyền thông, các đối tác và đối thủ cạnh tranh",
+      "phase3": "Phòng họp hội đồng quản trị và mạng lưới cổ đông của tập đoàn gia tộc",
+      "phase4": "Sân chơi của các hào môn kỳ cựu và hậu trường của thế lực giật dây thật sự"
+    },
+    "techLevel": "Hiện đại đương đại: điện thoại, mạng xã hội, truyền thông số, hợp đồng điện tử, phân tích tài chính — công cụ của đấu trí, không phải vũ khí.",
+    "conflictMedium": "Đấu trí thương trường và xã hội (NON-combat): đọc người, thu thập bằng chứng, giành cổ phần biểu quyết, kiểm soát dư luận, đàm phán, kiện tụng và phơi bày sự thật đúng lúc — không bao giờ bằng đánh nhau hay bạo lực.",
+    "forbiddenElements": [
+      "đánh nhau tay đôi/ẩu đả/hành hung như nguồn giải quyết xung đột chính",
+      "bạo lực phô trương, gore, cảnh máu me giật gân",
+      "xuyên không / xuyên việt / đến từ thế giới khác",
+      "tu luyện / cảnh giới / võ công / năng lực siêu nhiên chiến đấu",
+      "MC trả thù bằng phương cách phạm pháp (thuê người đánh, giết, đe dọa bạo lực)",
+      "MC tham gia giải đấu chiến đấu hoặc xã hội đen làm tuyến chính"
+    ]
+  },
+  "factions": [
+    {
+      "name": "Tô Uyển và liên minh chính trực",
+      "type": "nhóm nhân vật chính",
+      "power_level": 4,
+      "summary": "Tô Uyển cùng cha (sau khi được cứu), Hàn Khiết, Lục Thâm và các đồng minh kinh doanh chân chính, dựa vào trí tuệ, bằng chứng và ký ức kiếp trước để đoạt lại gia tộc.",
+      "territory": "Công ty con bàn đạp, thương hiệu riêng, rồi tập đoàn gia tộc Tô",
+      "mc_relation": "MC là trung tâm và người dẫn dắt",
+      "conflicts": ["Phe giả tạo Tô Mạn Nghi - Cố Trạch Viễn", "Thế lực giật dây giấu mặt"],
+      "alliances": ["Tập đoàn của Lục Thâm"],
+      "importance": 10,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Phe giả tạo Tô Mạn Nghi - Cố Trạch Viễn",
+      "type": "nhóm kẻ giả tạo trong gia tộc",
+      "power_level": 6,
+      "summary": "Em gái nuôi diễn vai thiên thần và vị hôn phu cơ hội, từng bước rút ruột gia sản, bôi nhọ thanh danh và đẩy Tô Uyển vào đường cùng ở kiếp trước.",
+      "territory": "Bên trong gia tộc Tô và giới thượng lưu",
+      "mc_relation": "Đối thủ trực tiếp giai đoạn đầu - giữa truyện",
+      "conflicts": ["Tô Uyển và liên minh chính trực"],
+      "alliances": ["Thế lực giật dây giấu mặt"],
+      "importance": 8,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Các hào môn kỳ cựu",
+      "type": "thế lực thượng lưu lâu đời",
+      "power_level": 8,
+      "summary": "Những gia tộc doanh nhân lâu đời nắm các tập đoàn truyền thống, ban đầu xem Tô Uyển như kẻ mới nổi, dần trở thành đối thủ ngang hàng hoặc đối tác.",
+      "territory": "Các lĩnh vực truyền thống: tài chính, bất động sản, thời trang, dược phẩm",
+      "mc_relation": "Vừa là đối thủ vừa là sân chơi MC phải chinh phục",
+      "conflicts": ["Tô Uyển và liên minh chính trực"],
+      "alliances": [],
+      "importance": 7,
+      "introduce_arc": 5
+    },
+    {
+      "name": "Thế lực giật dây giấu mặt",
+      "type": "thế lực chủ mưu thật sự đứng sau bi kịch",
+      "power_level": 10,
+      "summary": "Kẻ thật sự giật dây phe giả tạo và toàn bộ chuỗi tai họa kiếp trước của Tô Uyển; danh tính và động cơ là bí ẩn trung tâm của giai đoạn cuối.",
+      "territory": "Hậu trường giới hào môn và tài chính",
+      "mc_relation": "Phản diện tối hậu, đối đầu bằng đấu trí chứ không bằng vũ lực",
+      "conflicts": ["Tô Uyển và liên minh chính trực"],
+      "alliances": [],
+      "importance": 9,
+      "introduce_arc": 6
+    }
+  ],
+  "plot_twists": [
+    {
+      "summary": "Người em gái nuôi dịu dàng Tô Mạn Nghi không chỉ ghen tị mà đã được dạy dỗ và cài cắm từ nhỏ như một quân cờ để chiếm đoạt gia tộc Tô từ bên trong.",
+      "payoff_type": "danh tính ẩn",
+      "setup_chapters": [40, 200],
+      "twist_chapter": 300,
+      "reader_impact": "major",
+      "arc_number": 3
+    },
+    {
+      "summary": "Vụ thâu tóm gia tộc Tô kiếp trước không phải do phe giả tạo tự nghĩ ra — chúng chỉ là tay sai, được một thế lực tài chính giấu mặt cấp vốn và kịch bản để nuốt trọn tập đoàn.",
+      "payoff_type": "thế lực giật dây",
+      "setup_chapters": [320, 540],
+      "twist_chapter": 760,
+      "reader_impact": "major",
+      "arc_number": 6
+    },
+    {
+      "summary": "Lợi thế ký ức của Tô Uyển gắn với một biến cố mà chính kẻ chủ mưu cũng từng cố thao túng — nghĩa là cuộc trọng sinh của cô không hoàn toàn ngẫu nhiên, và đó là chìa khóa hóa giải tận gốc bi kịch.",
+      "payoff_type": "nguồn gốc lợi thế",
+      "setup_chapters": [120, 700, 810],
+      "twist_chapter": 860,
+      "reader_impact": "cosmic",
+      "arc_number": 6
+    }
+  ],
+  "themes": [
+    {
+      "name": "Trí tuệ thắng bạo lực",
+      "type": "main",
+      "description": "Trong thế giới hào môn, người thắng là người chuẩn bị kỹ hơn, biết nhiều hơn và kiên nhẫn hơn; mọi đòn đau đều giáng xuống bằng sự thật, tiền bạc và dư luận, không bằng nắm đấm.",
+      "motifs": ["bản hợp đồng đặt đúng lúc", "lá phiếu quyết định", "một dòng tít báo lật ngược thế cờ"],
+      "importance": 10
+    },
+    {
+      "name": "Đoạt lại bằng năng lực thật",
+      "type": "main",
+      "description": "Biết trước tương lai chỉ là tấm bản đồ; Tô Uyển phải tự xây năng lực, mạng lưới và uy tín để thật sự đoạt lại đời mình, không chỉ dựa vào lợi thế ký ức.",
+      "motifs": ["học đọc báo cáo tài chính", "công ty con bị coi thường thành bàn đạp", "ký ức mất dần giá trị khi dòng đời đổi"],
+      "importance": 9
+    },
+    {
+      "name": "Tình yêu trên thế bình đẳng",
+      "type": "supporting",
+      "description": "Tô Uyển từ chối một tình yêu cần được che chở; cô chọn người trân trọng bản lĩnh của mình và yêu trên nền tảng tôn trọng và ngang hàng.",
+      "motifs": ["đối tác trước, người yêu sau", "không cần ai cứu", "cùng bày một thế cờ"],
+      "importance": 8
+    },
+    {
+      "name": "Sự thật mạnh hơn mặt nạ",
+      "type": "supporting",
+      "description": "Kẻ giả tạo diễn vai người tốt giỏi đến đâu cũng không thắng nổi sự thật được phơi bày đúng lúc trước công chúng.",
+      "motifs": ["mặt nạ rơi trước đám đông", "bằng chứng tự lên tiếng", "dư luận quay đầu"],
+      "importance": 8
+    }
+  ],
+  "voice_anchors": [
+    {
+      "snippet_type": "opening",
+      "prose_text": "Tô Uyển mở mắt ra giữa mùi nước hoa quen thuộc của phòng khách biệt thự, và trong một khoảnh khắc cô tưởng mình vẫn đang nằm trong căn phòng lạnh lẽo nơi cô đã trút hơi thở cuối cùng. Nhưng ánh nắng đổ vào sàn gỗ này, bộ váy treo sẵn trên ghế kia, và tờ thiệp đính hôn đặt ngay ngắn trên bàn — tất cả đều thuộc về một buổi sáng ba năm trước, buổi sáng mà cô từng hân hoan đến mức ngu ngốc. Cô ngồi dậy thật chậm, lòng bàn tay áp lên mặt bàn mát lạnh để chắc chắn đây là thật. Ngoài kia, tiếng cười dịu dàng của Tô Mạn Nghi vọng vào, ngọt như đường. Lần trước, cô đã tin cái giọng nói ấy. Lần này, Tô Uyển khẽ mỉm cười — một nụ cười không còn chút ngây thơ nào.",
+      "key_traits": ["điềm tĩnh", "lý trí", "kiêu hãnh lạnh lùng", "biết trước cục diện"]
+    },
+    {
+      "snippet_type": "dialogue",
+      "prose_text": "— Chị Uyển, em chỉ lo cho chị thôi. Hợp đồng này có lợi cho cả gia tộc mà. Tô Mạn Nghi chớp đôi mắt long lanh, giọng nói mềm như nhung. Tô Uyển đặt tách trà xuống, không nhanh không chậm. — Em lo cho chị, hay lo cho khoản hoa hồng mười lăm phần trăm giấu trong điều khoản phụ lục C? Cô đẩy tập tài liệu qua mặt bàn. — Chị đọc kỹ rồi. Một bản hợp đồng tốt thì không cần ai phải vội vàng giục ký. Em ngồi xuống đi, mình bàn lại từ trang một.",
+      "key_traits": ["sắc sảo", "không tranh cãi cảm tính", "vạch trần bằng bằng chứng", "kiểm soát nhịp"]
+    },
+    {
+      "snippet_type": "action",
+      "prose_text": "Phòng họp im phăng phắc khi Tô Uyển bước tới bục, không một tờ giấy trên tay. Cô không cần. Mọi con số đã nằm sẵn trong đầu, mọi lá phiếu đã được đếm từ ba ngày trước. Cô nhìn lướt qua hàng ghế cổ đông, dừng lại nửa giây ở gương mặt đang tái dần của kẻ tưởng mình nắm chắc phần thắng. — Thưa quý vị, trước khi biểu quyết, tôi xin trình bày một dòng tiền. Cô chạm tay lên màn hình. Biểu đồ hiện ra, từng mũi tên đỏ chỉ thẳng về một tài khoản mà ai trong phòng cũng nhận ra. Không cần cao giọng, không cần buộc tội. Cô chỉ để những con số nói. Và khi tiếng xì xào dâng lên, Tô Uyển biết ván cờ đã ngã ngũ trước cả khi cánh tay đầu tiên giơ lên.",
+      "key_traits": ["tự tin lạnh lùng", "chuẩn bị kỹ lưỡng", "thắng bằng sự thật", "kiểm soát cục diện"]
+    }
+  ],
+  "foreshadowing": [
+    {
+      "hintText": "Trên tờ thiệp đính hôn buổi sáng trọng sinh, Tô Uyển thoáng để ý một con dấu công ty lạ ở góc dưới mà kiếp trước cô chưa từng nhìn kỹ.",
+      "category": "object",
+      "plantCh": 5,
+      "pickupCh": 760,
+      "payoffDescription": "Con dấu ấy thuộc về thế lực tài chính giấu mặt đã cấp vốn cho vụ thâu tóm — manh mối đầu tiên về kẻ chủ mưu thật sự."
+    },
+    {
+      "hintText": "Cha của Tô Uyển nhắc rằng việc nhận nuôi Tô Mạn Nghi không phải ý của ông, mà do 'một người bạn cũ giới thiệu', rồi gạt đi không nói thêm.",
+      "category": "dialogue",
+      "plantCh": 30,
+      "pickupCh": 300,
+      "payoffDescription": "Hé lộ Tô Mạn Nghi được cài cắm vào gia tộc từ nhỏ như một quân cờ, không phải đơn thuần là đứa trẻ mồ côi được nhận nuôi."
+    },
+    {
+      "hintText": "Lục Thâm, người luôn giữ khoảng cách lịch sự, lại nhìn Tô Uyển bằng một ánh mắt khác hẳn ngay lần đầu, như thể anh nhận ra điều gì đó không khớp với 'tiểu thư ngây thơ' mà thiên hạ đồn.",
+      "category": "character_behavior",
+      "plantCh": 50,
+      "pickupCh": 681,
+      "payoffDescription": "Anh là người đầu tiên cảm nhận sự thay đổi nơi cô và dần trở thành người duy nhất cô hé lộ một phần bí mật, nền tảng cho mối tình bình đẳng."
+    }
+  ]
+}

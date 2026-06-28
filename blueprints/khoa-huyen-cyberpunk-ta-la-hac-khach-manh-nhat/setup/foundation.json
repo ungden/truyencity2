@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "totalScore": 122,
+  "avgScore": 8.71,
+  "minDimScore": 8,
+  "source": "claude_code",
+  "dimensions": [
+    { "name": "Premise & hook", "score": 9, "note": "Warm-baseline cyberpunk: Tố active ngay ch.1, MC đã là hắc khách đang vận hành; hook là một vụ bẻ khóa khó biến thành chiến thắng tỉnh táo — opportunity-driven, không mở đầu bằng cảnh MC sắp cháy não thảm." },
+    { "name": "Protagonist engine", "score": 9, "note": "Lăng Phong thắng bằng đọc cấu trúc + định tuyến + lì lợm; Tố chỉ phơi bày, anh tự né và gánh rủi ro; tính cách lì, lạnh, thực dụng nhưng không bán đứng người tầng đáy, nhất quán." },
+    { "name": "System mechanic", "score": 9, "note": "Tố có input/output/limit/reward rõ; anti-plot-armor cứng — chỉ phơi bày cấu trúc, không tự xâm nhập, mờ khi kiệt sức thần kinh, vô dụng trước hệ thống ngoại tuyến; MC vẫn phải định tuyến và trả giá cháy não." },
+    { "name": "Conflict ladder", "score": 9, "note": "Leo thang vụ bẻ khóa Tích Khu → vạch trần Thâm Lam → Hắc Vệ và chính trị giới hắc khách → đường dây Tứ Đại Tập Đoàn → nhóm sáng lập Tinh Võng, chủ yếu qua xâm nhập và đấu trí." },
+    { "name": "World coherence", "score": 9, "note": "Tân Huyền Thành ba tầng, Tinh Võng/Cảnh Vực, Tứ Đại Tập Đoàn, Hắc Tháp Bảng, cơ chế cháy não đều nhất quán; forbidden elements rõ (cấm xuyên không/trọng sinh/tu luyện/meta-AI)." },
+    { "name": "Dopamine cadence", "score": 9, "note": "controlRules ≥2 peak/chương (định tuyến/lách đúng cứu mạng + vết khâu bị khai thác hoặc đối thủ tự tin bị đọc thủng), cao điểm đầu trước nửa chương." },
+    { "name": "Origin lock", "score": 9, "note": "mcOrigin=system-bestowed khóa chặt; Tố là nguồn IN-WORLD (mảnh phần cứng cổ); outlines và mọi file không chứa token xuyên không/xuyên việt/trọng sinh/đầu thai/đến từ Trái Đất." },
+    { "name": "Conflict medium guardrail", "score": 8, "note": "Genre khoa-huyen combat=true nhưng truyện neon-noir đặt trọng tâm vào xâm nhập + đấu trí + phơi bày; forbiddenElements cấm đấu súng phô trương và gore giật gân làm tuyến chính." },
+    { "name": "Foreshadowing & twists", "score": 8, "note": "3 twist (tiến trình giám sát đội lốt đồng minh, Tứ Đại Tập Đoàn liên minh ngầm khai thác Tích Khu, Tố là di sản nhóm sáng lập) + 3 foreshadowing có plant/payoff chapter cụ thể kéo tới cao trào." },
+    { "name": "Long-form sustainability", "score": 9, "note": "noveltyLadder 5 nấc giữ cùng lane 'xâm nhập-đọc-cấu-trúc-sinh-tồn', 7 volume cho 1000 chương, endgame tái thiết luật chơi Tinh Võng." },
+    { "name": "Vietnamese voice", "score": 8, "note": "Voice anchors neon-noir tỉnh táo, đúng giọng cyberpunk, đủ diacritics, dùng thuật ngữ sci-fi in-world (Tinh Võng, Cảnh Vực, hắc khách), không AI-tell/meta đời thực." }
+  ],
+  "overallFeedback": "Setup vững cho cyberpunk netrunner khoa-huyen: warm-baseline opening với Tố active ch.1, golden finger là trí-tuệ-bạn-đồng-hành phơi-bày-cấu-trúc có anti-plot-armor cứng (không tự xâm nhập, mờ khi kiệt sức thần kinh), conflict ladder leo thang sạch qua 7 volume bằng xâm nhập và đấu trí, origin lock system-bestowed chặt (nguồn IN-WORLD), dopamine cadence dày (lách đúng cứu mạng + đọc thủng kẻ mạnh + vạch trần sự thật), foreshadowing và twist có cấu trúc dài hạn dẫn tới nguồn gốc Tinh Võng. Phân biệt rõ với novel mecha last-stand. Sẵn sàng cho DeepSeek V4 Pro viết chương. PASS."
+}

@@ -1,0 +1,119 @@
+{
+  "premise": "Tần Mục, một tu sĩ Kim Đan bị sư đệ và bằng hữu thân tín phản bội đâm chết để đoạt cơ duyên, trọng sinh về thuở mười sáu tuổi còn là thiếu niên tán tu nghèo hèn nơi chợ phường. Mang theo trọn vẹn ký ức kiếp trước và hiểu biết về dòng chảy thiên cơ, anh đi lại con đường tu tiên: đoạt cơ duyên trước kẻ khác, luyện thành công pháp tuyệt thế, vượt từng quan ải sinh tử nhẹ nhàng, đánh mặt từng kẻ khinh thường và hóa giải từng kiếp nạn định sẵn. Lần này anh không để bi kịch lặp lại — anh nghịch thiên cải mệnh, đoạt lại tất cả những gì từng mất, rồi dần phát hiện cái chết kiếp trước của mình ẩn giấu một thiên cơ lớn liên quan tới khí vận cả Đại Thương Châu.",
+  "mainConflict": "Một tu sĩ mang ký ức và oán hận của kiếp trước đối đầu với chính 'tử cục' định mệnh từng giết mình, với những kẻ phản bội đang đeo mặt nạ thân thiết, và sâu xa hơn là một thế lực ẩn cư thao túng khí vận đã sắp đặt cái chết của anh. Xung đột leo thang từ tranh đoạt cơ duyên cá nhân → trả nợ phản bội trong tông môn → đối đầu các thế lực lớn của Đại Thương Châu → quyết chiến với thế lực ẩn cư đứng sau thiên cơ → cải đổi một đại kiếp số quy mô toàn châu. Giải quyết bằng tu vi, trí tuệ biết-trước, đấu pháp và quyết đoán.",
+  "themes": [
+    "Tri thức và sự chuẩn bị là sức mạnh thật sự — biết trước thiên cơ quý hơn mọi pháp bảo",
+    "Nghịch thiên cải mệnh: vận mệnh không phải thứ bất biến nếu có đủ ý chí và hiểu biết",
+    "Phản bội và công đạo: trả nợ cũ không phải bằng tàn nhẫn mù quáng mà bằng để kẻ ác tự chuốc lấy hậu quả",
+    "Buông được oán hận thừa mới đi xa được trên đại đạo"
+  ],
+  "majorPlotPoints": [
+    "Ch.1: Tần Mục chết dưới tay sư đệ và bằng hữu, trọng sinh về thuở mười sáu tuổi với trọn vẹn ký ức kiếp trước.",
+    "Arc 1: Đoạt cơ duyên đầu tiên kiếp trước từng tuột tay, đặt nền tu luyện vững và gia nhập Thanh Vân Tông, phát hiện một kẻ phản bội cũng đang ở đây đeo mặt nạ thân thiết.",
+    "Arc 2-3: Leo nhanh trong tông môn nhờ biết trước, đột phá Trúc Cơ rồi Kim Đan với phẩm chất vượt xa kiếp trước, lần lượt gài bẫy để các kẻ phản bội tự lộ và bị trừng trị.",
+    "Giữa truyện: Lần ngược cái chết kiếp trước, phát hiện những kẻ phản bội chỉ là quân cờ; đằng sau là một thế lực ẩn cư thao túng khí vận, và cơ duyên anh chết vì nó là chìa khóa của một bí mật lớn.",
+    "Cao trào cuối: Đột phá Hóa Thần rồi hướng Độ Kiếp, đối đầu thế lực ẩn, đòi lại công đạo, và dùng hiểu biết thiên cơ tích lũy hai đời để cải đổi một đại kiếp số của cả Đại Thương Châu."
+  ],
+  "setupKernel": {
+    "readerFantasy": "Cảm giác sảng khoái tột độ khi một kẻ từng chết oan trở về điểm xuất phát với trọn vẹn hiểu biết của tương lai — đoạt cơ duyên ngay trước mũi kẻ từng thắng mình, vượt quan ải từng suýt giết mình một cách nhẹ nhàng, vả thẳng mặt những kẻ kiêu ngạo từng khinh thường, và nhìn những kẻ phản bội từng đâm sau lưng nay tự chui đầu vào lưới mà không hề hay biết người giăng lưới chính là 'con mồi' năm xưa.",
+    "protagonistEngine": "Tần Mục thắng nhờ ký ức và hiểu biết của một tu sĩ Kim Đan ở kiếp trước cộng với quyết đoán lạnh lùng và sự chuẩn bị tỉ mỉ: anh biết trước cơ duyên xuất thế ở đâu, công pháp nào thượng thừa, kẻ nào sẽ trở mặt và vào lúc nào. Tính cách trầm ổn, nhẫn nhịn có tính toán, quyết liệt khi cần xuống tay — không nóng vội báo thù mà giăng lưới chờ thời, nhưng vẫn giữ ân nghĩa với những người tử tế với anh ở cả hai kiếp.",
+    "pleasureLoop": [
+      "Một cơ duyên / biến cố mà Tần Mục biết trước nhờ ký ức kiếp trước hé lộ → anh âm thầm chuẩn bị trong khi kẻ khác còn mù mờ (setup biết-trước).",
+      "Anh ra tay đoạt cơ duyên hoặc vượt quan ải ngay trước mũi đối thủ kiếp trước từng thắng anh → đối thủ chưng hửng, tu vi anh nhảy vọt (đoạt cơ duyên + vượt giới hạn cũ).",
+      "Một kẻ kiêu ngạo khinh thường thiếu niên tán tu Tần Mục → anh lật ngược cục diện và vả thẳng mặt bằng thực lực hoặc trí tuệ (đánh mặt).",
+      "Một kẻ phản bội kiếp trước đang đeo mặt nạ thân thiết → Tần Mục giăng lưới để hắn tự lộ dã tâm, rồi sụp đổ trước chính tông quy hoặc nhân quả (trả nợ cũ, kẻ ác tự chuốc họa).",
+      "Hóa giải một kiếp nạn / biến cố mà kiếp trước anh không kịp ứng phó → cứu được người, nâng cao danh vọng (cải mệnh + công nhận).",
+      "Một mảnh sự thật về cái chết kiếp trước và thiên cơ đứng sau được hé lộ → cảm giác bức màn lớn đang được vén lên (revelation payoff)."
+    ],
+    "systemMechanic": {
+      "name": "Ký Ức Kiếp Trước — Thấu Hiểu Thiên Cơ",
+      "input": "Tần Mục đối chiếu tình huống hiện tại với ký ức trọn vẹn của một đời tu tiên kiếp trước (cơ duyên, biến cố, công pháp, con người) và dùng nó để dự đoán dòng chảy thiên cơ sắp tới; cần thời gian và sự tỉnh táo để hồi tưởng, đối chiếu chính xác.",
+      "output": "Anh biết trước nơi cơ duyên xuất thế, biến cố sắp xảy ra, công pháp/đan phương thượng thừa, và bản chất thật của những kẻ quanh mình — lợi thế thông tin khổng lồ so với người đương thời.",
+      "limit": "Anti-plot-armor cứng: ký ức CHỈ là tri thức, KHÔNG tự nâng tu vi, KHÔNG đánh thay anh, KHÔNG bảo đảm thắng. Anh vẫn phải tự tu luyện đủ thực lực để giữ được cơ duyên — đoạt được mà không đủ sức giữ thì rước họa diệt thân. Quan trọng hơn: hành động của chính anh ở kiếp này khiến tương lai DẦN LỆCH khỏi ký ức kiếp trước — anh đoạt cơ duyên sớm, cứu người đáng lẽ chết, khiến kẻ thù đổi kế hoạch; càng về sau ký ức càng kém chính xác, buộc anh tự suy luận và thích nghi với một dòng thời gian đã đổi. Hồi tưởng tốn tâm lực, mờ đi khi anh trọng thương hoặc tâm thần bất ổn.",
+      "reward": "Lợi thế chuẩn bị giúp anh leo cảnh giới nhanh hơn, ít rủi ro hơn và đoạt được những cơ duyên kiếp trước tuột tay; nhưng phần thưởng thật sự luôn phải đổi bằng tu luyện thực và quyết đoán thực — ký ức chỉ chỉ đường, không đi thay."
+    },
+    "mcOrigin": "reincarnated",
+    "originLockNote": "Tần Mục trọng sinh trong CÙNG thế giới tu tiên Đại Thương Châu, giữ ký ức kiếp trước của một tu sĩ Kim Đan đã chết tại chính thế giới này; anh là người bản địa của Đại Thương Châu ở cả hai kiếp, mọi tri thức của anh đến từ chính cuộc đời tu tiên kiếp trước trong thế giới này chứ không từ bất kỳ nơi nào bên ngoài nó.",
+    "mcSecret": {
+      "secret": "Tần Mục là kẻ trọng sinh mang trọn ký ức của một tu sĩ Kim Đan đã chết, biết trước rất nhiều cơ duyên và biến cố của Đại Thương Châu.",
+      "outsideWorldKnowledge": "Anh biết trước cơ duyên nào sắp xuất thế, bí cảnh nào sắp mở, biến cố ma đạo và đại kiếp số nào sắp ập tới, công pháp/đan phương thượng thừa ở đâu, và bản chất thật của những kẻ quanh mình — tri thức của cả một đời tu tiên tương lai mà người đương thời không thể có.",
+      "revealRule": "Giấu kín tuyệt đối ở các arc đầu; chỉ hé lộ một phần mơ hồ cho một hai người thân tín bậc nhất ở giữa truyện; nguồn gốc thật và mối liên hệ giữa cái chết kiếp trước với thiên cơ toàn châu chỉ reveal đầy đủ ở cao trào cuối.",
+      "coverStory": "Anh giải thích sự nhạy bén của mình bằng 'trực giác tu đạo thiên phú' và 'cơ duyên ngộ ra từ một cuốn cổ tịch', che giấu việc thật sự mang ký ức của một kiếp người đã sống."
+    },
+    "benefitLoop": {
+      "goal": "Nghịch thiên cải mệnh: đi lại con đường tu tiên không vấp những cái bẫy kiếp trước, đoạt lại những gì từng mất, trả nợ phản bội và lần ra thiên cơ đứng sau cái chết của mình.",
+      "action": "Đối chiếu ký ức kiếp trước, chọn đúng cơ duyên để đoạt, tu luyện thực đủ sức giữ cơ duyên, giăng lưới quanh kẻ phản bội, và hóa giải các biến cố trước khi chúng thành thảm họa.",
+      "benefit": "Tu vi tiến vượt bậc với nền tảng vững, đoạt thêm cơ duyên / công pháp / pháp bảo, danh vọng và vị thế trong tông môn lẫn Đại Thương Châu tăng dần, và thêm một mảnh sự thật về thiên cơ.",
+      "cadence": "Mỗi 1-2 chương có ít nhất một vòng biết-trước-được-thưởng (đoạt một cơ duyên, vả mặt một kẻ kiêu ngạo, hoặc gài lùi một kẻ phản bội); mỗi 3-5 chương một bước nhảy lớn (đột phá cảnh giới, hạ một kẻ thù lớn, hé lộ một mảnh thiên cơ)."
+    },
+    "interventionRule": "Tần Mục chỉ ra tay can thiệp khi (a) cơ duyên/biến cố nằm trong tầm với và đủ giá trị cho con đường cải mệnh của anh, hoặc (b) khi một người anh trân quý ở kiếp này đang đối mặt kiếp nạn mà anh biết trước và đủ sức cứu, hoặc (c) khi một kẻ phản bội kiếp trước chủ động bước vào lưới. Anh KHÔNG hành xử như kẻ 'cứu thế độ lượng' vô điều kiện, KHÔNG báo thù nóng vội phá hỏng đại cục; anh tính toán, nhẫn nhịn chờ thời, ưu tiên thực lực và nhân quả thay vì manh động — nhưng một khi đã xuống tay thì dứt khoát.",
+    "phase1Playground": {
+      "locations": [
+        "Chợ phường Lạc Dương — nơi thiếu niên Tần Mục khởi đầu, đầy tán tu, gian thương và cơ duyên nhỏ ẩn giấu",
+        "Linh dược cốc ngoài thành — nơi gốc linh dược đầu tiên kiếp trước anh tuột tay sắp xuất thế",
+        "Tiểu bí cảnh Tàng Phong Động — di tích nhỏ anh biết trước sắp mở, chôn cơ duyên nhập môn",
+        "Thanh Vân Tông (ngoại môn) — tông môn anh gia nhập cuối arc 1, nơi một kẻ phản bội kiếp trước đang ẩn mình"
+      ],
+      "cast": [
+        "Tần Mục (thiếu niên tán tu, MC, kẻ trọng sinh mang ký ức Kim Đan)",
+        "Tần lão (cha của Tần Mục, phàm nhân lương thiện, động lực cải mệnh sớm của anh)",
+        "Lý Thanh Hà (nữ tán tu đồng trang lứa, lý trí và chính trực, trở thành đồng minh tin cậy sớm nhất)",
+        "Triệu Nguyên (sư đệ tương lai sẽ phản bội anh kiếp trước, kiếp này còn là thiếu niên đang diễn vai chân thành — local antagonist ẩn)",
+        "Vương trưởng lão (trưởng lão Thanh Vân Tông tuyển đệ tử, vừa là cánh cửa vừa là thử thách của Tần Mục)"
+      ],
+      "resources": [
+        "Ký ức kiếp trước — Thấu Hiểu Thiên Cơ",
+        "Gốc linh dược và công pháp thượng phẩm đoạt được sớm nhờ biết trước",
+        "Quan hệ chớm nở với Lý Thanh Hà và uy tín nhỏ ở chợ phường",
+        "Thân phận đệ tử ngoại môn Thanh Vân Tông và quyền dùng tài nguyên tông môn"
+      ],
+      "localAntagonists": [
+        "Triệu Nguyên — kẻ kiếp trước phản bội anh, kiếp này đang giả vờ thân thiết, nhiều lần ngấm ngầm tranh đoạt cơ duyên với Tần Mục",
+        "Mã Cường — một đệ tử thế gia kiêu ngạo khinh thường thiếu niên tán tu, đại diện cho kiểu cường giả ỷ thế bị Tần Mục vả mặt"
+      ],
+      "repeatableSceneTypes": [
+        "Tần Mục đối chiếu ký ức kiếp trước, biết trước một cơ duyên/biến cố và âm thầm chuẩn bị",
+        "Đoạt một cơ duyên hoặc vượt một quan ải ngay trước mũi đối thủ kiếp trước từng thắng anh",
+        "Một kẻ kiêu ngạo khinh thường Tần Mục bị anh lật mặt và vả thẳng bằng thực lực hoặc trí tuệ",
+        "Giăng lưới để một kẻ phản bội tự lộ dã tâm và lãnh hậu quả từ chính tông quy / nhân quả",
+        "Đoạn tu luyện và toan tính giữa các biến cố: hấp thụ cơ duyên, lập kế cho biến cố kế tiếp"
+      ]
+    },
+    "socialReactor": {
+      "witnesses": [
+        "Các tán tu và đệ tử đồng trang lứa ở chợ phường và tông môn",
+        "Trưởng lão và đệ tử cốt cán Thanh Vân Tông",
+        "Những thế gia, tông môn có cơ duyên bị Tần Mục đoạt trước",
+        "Giới tu tiên Đại Thương Châu khi danh tiếng anh lan rộng"
+      ],
+      "reactionModes": [
+        "Sửng sốt và ghen tị khi một thiếu niên tán tu vô danh liên tục đoạt cơ duyên và đột phá thần tốc",
+        "Nể phục và tìm đến kết giao của những người chính trực; đồn thổi về 'yêu nghiệt mới của Thanh Vân Tông'",
+        "Cảnh giác và thù địch của những kẻ bị anh đoạt mất cơ duyên hoặc vạch trần",
+        "Thế lực ẩn cư bắt đầu để mắt vì anh 'biết những thứ không nên biết'"
+      ],
+      "reportBackCadence": "Phản ứng tức thì của người chứng kiến trong mỗi chương; làn sóng đồn đại trong giới tu tiên và động thái của các thế lực lớn dồn lại mỗi 3-5 chương sau mỗi lần Tần Mục đoạt cơ duyên hoặc đột phá đáng chú ý."
+    },
+    "noveltyLadder": [
+      { "chapterRange": "1-130", "newToy": "Đoạt cơ duyên nhập môn và đặt nền Luyện Khí ở chợ phường, gia nhập Thanh Vân Tông", "keepsSameLane": "Vẫn là dùng ký ức kiếp trước để đoạt cơ duyên và leo cảnh giới nhanh hơn người" },
+      { "chapterRange": "131-430", "newToy": "Vươn lên trong tông môn, đột phá Trúc Cơ rồi Kim Đan, trả nợ những kẻ phản bội kiếp trước", "keepsSameLane": "Vẫn là biết-trước + tu luyện thực + giăng lưới, chỉ nâng sân khấu lên tông môn và cảnh giới cao hơn" },
+      { "chapterRange": "431-580", "newToy": "Bước ra Đại Thương Châu, đại bí cảnh, đối phó biến cố ma đạo, đột phá Nguyên Anh", "keepsSameLane": "Vẫn cùng lane đoạt cơ duyên + cải mệnh, mở rộng ra quy mô cả châu và đối thủ mạnh hơn" },
+      { "chapterRange": "581-730", "newToy": "Lần ra thiên cơ đứng sau cái chết kiếp trước, đụng độ thế lực ẩn cư", "keepsSameLane": "Vẫn là dùng hiểu biết hai kiếp để nghịch thiên, nâng lên tầng meta về khí vận và thiên cơ" },
+      { "chapterRange": "731-1000", "newToy": "Lên Hóa Thần, quyết chiến thế lực ẩn, cải đổi đại kiếp số toàn châu rồi Độ Kiếp phi thăng", "keepsSameLane": "Vẫn là nghịch thiên cải mệnh — đỉnh cao của cùng một con đường, chỉ ở quy mô lớn nhất" }
+    ],
+    "controlRules": {
+      "payoffCadence": "Tối thiểu 2 cao điểm dopamine mỗi chương (một lần biết-trước đoạt được lợi thế/cơ duyên + một lần vả mặt kẻ kiêu ngạo hoặc gài lùi kẻ phản bội); cao điểm đầu xuất hiện trước nửa chương; setup không quá 30% và phải có payoff trong cùng hoặc chương kế.",
+      "attentionGradient": "Mở chương bằng một cơ duyên/biến cố biết-trước, một lời khiêu khích, hoặc một mối nguy cụ thể; đóng chương bằng một cliffhanger hoặc một mảnh thiên cơ vừa hé.",
+      "openThreadsPerArc": 3,
+      "closeThreadsPerArc": 2
+    },
+    "patternCards": [
+      "warm-baseline-opening",
+      "knowledge-is-power",
+      "snatch-opportunity-first",
+      "face-slap-arrogant-foe",
+      "trap-the-traitor",
+      "outgrow-past-self"
+    ]
+  }
+}

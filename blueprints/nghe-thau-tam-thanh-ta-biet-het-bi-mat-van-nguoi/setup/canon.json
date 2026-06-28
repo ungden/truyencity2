@@ -1,0 +1,163 @@
+{
+  "power_system": {
+    "name": "Tâm Thanh Lục — di sản dòng Thính Tâm Sư",
+    "type": "info-power kết hợp tu chân ẩn giấu (không siêu nhiên công khai trước người thường)",
+    "coreResource": "Niệm Lực — tích từ mỗi lần dùng tiếng lòng để gỡ nút thắt, lật án oan hoặc cứu một người yếu thế",
+    "progressionAxes": [
+      "Tầm Nghe (vài mét → cả căn phòng → cả tầng lầu → xuyên qua đám đông)",
+      "Độ Sâu (ý nghĩ bề mặt → cảm xúc nền → manh mối ký ức gần khi tích đủ Niệm Lực)",
+      "Chống Nhiễu (lọc tiếng lòng giả của tu sĩ khóa tâm, chịu được đám đông ồn)",
+      "Tu vi nền (luyện khí dưỡng thần để gánh được năng lực, đi từ phàm nhân → luyện khí → dưỡng thần)"
+    ],
+    "unlockRule": "Mỗi nấc tầm nghe/độ sâu/chống nhiễu cần ngưỡng Niệm Lực tăng dần; mở khóa rồi vẫn cần Trần Niệm giữ tâm tĩnh và rèn luyện thật. Tâm Thanh Lục chỉ trao khả năng nghe, không tự suy luận hay tìm bằng chứng hộ.",
+    "signatureBuff": {
+      "name": "Niệm Cảnh",
+      "effect": "Khi tích đủ Niệm Lực, Trần Niệm chạm được một mảnh ký ức gần đây liên quan trực tiếp tới nút thắt đang gỡ — như nhìn lại một khoảnh khắc thật của đối phương.",
+      "limit": "Mỗi ngày dùng được một lần; chỉ chạm ký ức liên quan đến vụ việc, không lục lọi đời tư tùy tiện; dùng xong kiệt sức, đau đầu dữ dội."
+    },
+    "antiPlotArmor": [
+      "Nghe được sự thật không đồng nghĩa chứng minh được — vẫn phải đi tìm bằng chứng thật và hành xử hợp pháp.",
+      "Tu sĩ cấp cao khóa tâm hoặc đẩy thông tin giả; nghe quá sức thì chảy máu mũi, ngất.",
+      "Đối thủ có quyền lực/tu vi cao hơn nhiều; thắng phải bằng trí tuệ và nước cờ chứ không bằng năng lực thô."
+    ],
+    "powerCeilingByPhase": {
+      "phase1": "Phàm nhân tinh ý → chớm luyện khí, nghe trong tầm một căn phòng (gỡ rối đời thường)",
+      "phase2": "Luyện khí ổn định, chống nhiễu cơ bản, nghe cả tầng lầu (hợp tác điều tra)",
+      "phase3": "Dưỡng thần sơ, lọc được tâm pháp giả, chạm Niệm Cảnh (đối đầu thế lực tu chân)",
+      "phase4": "Đại thành dòng Thính Tâm Sư, phân xử công đạo hai thế giới (endgame)"
+    }
+  },
+  "worldbuilding": {
+    "setting": "Thành phố Tân Hải và Việt Nam hiện đại, năm 2024 — bề mặt đời thường, ẩn dưới là một thế giới tu chân được che giấu.",
+    "tone": "Trinh thám đô thị huyền ảo ấm áp, nhịp gỡ-rối sảng văn; xung đột chủ yếu bằng trí tuệ và điều tra, combat tiết chế ở cao trào.",
+    "conflictMedium": ["tiếng lòng và sự thật", "manh mối và bằng chứng", "điều tra và pháp luật", "dư luận và uy tín", "đối thoại và thuyết phục", "luật ngầm giới tu chân"],
+    "geography": {
+      "phase1": "Tòa Liên Thành và khu phố cũ Bến Nghé, quận trung tâm Tân Hải",
+      "phase2": "Toàn quận trung tâm và các đồn/tổ điều tra cảnh sát",
+      "phase3": "Các cứ điểm ẩn của Hội Thanh Vân và tu sĩ ẩn cư khắp Tân Hải",
+      "phase4": "Linh mạch dưới sông, di tích dòng Thính Tâm Sư và toàn thành phố hai thế giới"
+    },
+    "economy": {
+      "currency": "Tiền VNĐ đời thường + uy tín/quan hệ; trong giới tu chân là linh thạch, đan dược và quyền kiểm soát linh mạch",
+      "supplyChain": "Linh khí từ mạch dưới sông Tân Hải; dược liệu nhà ông lang Tạ; thông tin và hồ sơ từ vị trí công sở của Trần Niệm"
+    },
+    "techLevel": "Hiện đại 2024: smartphone, camera an ninh, mạng xã hội, hồ sơ điện tử, app gọi xe — đan xen với tu chân giấu mặt.",
+    "forbiddenElements": ["MC mang nguồn gốc từ nơi khác hoặc ký ức của một đời người khác (cấm tuyệt đối — MC là người Tân Hải bản địa được Tâm Thanh Lục ban tặng)", "siêu nhiên phơi bày công khai trước người thường", "bạo lực bừa bãi giải quyết mọi xung đột", "lạm dụng năng lực để trục lợi vô tội vạ"]
+  },
+  "factions": [
+    {
+      "name": "Trần Niệm và mạng lưới đồng minh",
+      "type": "phe của MC",
+      "power_level": 3,
+      "summary": "Trần Niệm cùng ông lang Tạ, điều tra viên Lâm Tịch và các tu sĩ ẩn cư có lương tâm — lấy sự thật và công đạo làm gốc.",
+      "territory": "Tòa Liên Thành và khu phố Bến Nghé (mở rộng dần)",
+      "mc_relation": "MC là trung tâm và người dẫn dắt",
+      "conflicts": ["Tập đoàn Hằng Nguyên", "Phái cứng rắn của Hội Thanh Vân"],
+      "alliances": ["Tổ điều tra cảnh sát phường", "Liên minh tu sĩ ẩn cư"],
+      "importance": 10,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Hội Thanh Vân",
+      "type": "môn phái tu chân lâu đời giữ trật tự ngầm",
+      "power_level": 8,
+      "summary": "Tổ chức tu chân lâu đời giữ luật giấu thân phận trước người thường; có phái cứng rắn coi luật ngầm trên hết và phái ôn hòa coi trọng công đạo.",
+      "territory": "Các cứ điểm ẩn khắp Tân Hải",
+      "mc_relation": "Vừa cản trở vừa có thể là đồng minh tùy phái",
+      "conflicts": ["Trần Niệm (ban đầu)"],
+      "alliances": ["Liên minh tu sĩ ẩn cư (phái ôn hòa)"],
+      "importance": 8,
+      "introduce_arc": 3
+    },
+    {
+      "name": "Tập đoàn Hằng Nguyên",
+      "type": "tài phiệt tu chân hiện đại hóa",
+      "power_level": 9,
+      "summary": "Doanh nghiệp lớn dùng vỏ bọc tập đoàn để khai thác và thâu tóm linh mạch, sẵn sàng ngụy trang án mạng và mua chuộc quyền lực hai giới.",
+      "territory": "Toàn thành phố và mạng linh mạch dưới lòng đất",
+      "mc_relation": "Đối thủ chính của giai đoạn giữa-cuối",
+      "conflicts": ["Trần Niệm và mạng lưới đồng minh", "Hội Thanh Vân (phái ôn hòa)"],
+      "alliances": ["Kẻ thù xưa của dòng Thính Tâm Sư"],
+      "importance": 9,
+      "introduce_arc": 4
+    },
+    {
+      "name": "Tán tu khu phố",
+      "type": "tu sĩ tự do núp bóng đời thường",
+      "power_level": 4,
+      "summary": "Những tu sĩ lẻ núp bóng tiệm cầm đồ, phòng khám, sòng bài — hành sự bất chấp, cho vay nặng lãi, ức hiếp dân thường ở cấp khu phố.",
+      "territory": "Khu phố cũ Bến Nghé và các quận lân cận",
+      "mc_relation": "Đối thủ local thường gặp ở giai đoạn đầu",
+      "conflicts": ["Trần Niệm và mạng lưới đồng minh"],
+      "alliances": ["Một số thế lực lớn khi có lợi"],
+      "importance": 5,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Dòng Thính Tâm Sư (di sản)",
+      "type": "di sản tu chân đã thất truyền",
+      "power_level": 7,
+      "summary": "Dòng tu sĩ cổ từng dùng khả năng nghe lòng để phân xử công đạo trong giới tu chân, đã bị một thế lực bức tử và thất truyền; Tâm Thanh Lục là di sản còn sót.",
+      "territory": "Di tích cổ rải rác và ký ức của vài người cuối cùng",
+      "mc_relation": "Cội nguồn năng lực của MC, mục tiêu khôi phục cuối truyện",
+      "conflicts": ["Kẻ thù xưa từng diệt dòng này"],
+      "alliances": ["Trần Niệm"],
+      "importance": 7,
+      "introduce_arc": 6
+    }
+  ],
+  "plot_twists": [
+    {
+      "summary": "Phó Đạt — quản lý chèn ép Trần Niệm — thật ra chỉ là con tốt; người giật dây sau lưng anh ta là một thành viên cấp thấp của Hằng Nguyên cài vào tòa Liên Thành để canh tầng hầm linh mạch.",
+      "payoff_type": "quan hệ ẩn",
+      "setup_chapters": [10, 48],
+      "twist_chapter": 95,
+      "reader_impact": "major",
+      "arc_number": 1
+    },
+    {
+      "summary": "Ông lang Tạ không chỉ là tu sĩ dưỡng thần ẩn cư mà còn là một trong những người cuối cùng từng biết về dòng Thính Tâm Sư; ông im lặng quan sát để chắc chắn Trần Niệm xứng đáng với di sản.",
+      "payoff_type": "danh tính ẩn",
+      "setup_chapters": [70, 300, 740],
+      "twist_chapter": 800,
+      "reader_impact": "major",
+      "arc_number": 6
+    },
+    {
+      "summary": "Tâm Thanh Lục là di sản của dòng Thính Tâm Sư, và dòng này từng bị chính tiền thân của tập đoàn Hằng Nguyên bức tử để độc chiếm quyền phân xử và linh mạch — kẻ thù hiện tại chính là hậu duệ của kẻ thù xưa.",
+      "payoff_type": "nguồn gốc golden finger",
+      "setup_chapters": [130, 450, 760],
+      "twist_chapter": 905,
+      "reader_impact": "cosmic",
+      "arc_number": 7
+    }
+  ],
+  "themes": [
+    { "name": "Sự thật cần dũng khí mới thành công lý", "type": "main", "description": "Biết sự thật chỉ là khởi đầu; phải có dũng khí và bằng chứng mới biến nó thành công lý thật sự.", "motifs": ["câu nói thật trong lòng vs lời nói ngoài miệng", "đi tìm bằng chứng sau khi đã biết"], "importance": 10 },
+    { "name": "Người yếu thế xứng đáng có người bênh vực", "type": "main", "description": "Những người vô danh, bị oan, không tiếng nói xứng đáng có một người đứng về phía họ.", "motifs": ["người được gỡ oan rơi nước mắt", "kẻ mạnh bị vạch trần trước đám đông"], "importance": 9 },
+    { "name": "Thấu hiểu lòng người là sức mạnh và gánh nặng", "type": "supporting", "description": "Nghe được mọi bí mật vừa là vũ khí vừa là gánh nặng cô độc mà MC phải học cách mang.", "motifs": ["đau đầu chảy máu mũi sau khi nghe", "cô độc vì biết quá nhiều"], "importance": 8 },
+    { "name": "Giữ lương tâm khi nắm quyền lực thông tin", "type": "supporting", "description": "Càng nắm nhiều bí mật càng dễ sa ngã; MC phải giữ ranh giới không lạm dụng năng lực.", "motifs": ["từ chối nghe lén đời tư vô cớ", "không dùng bí mật để trục lợi"], "importance": 8 }
+  ],
+  "voice_anchors": [
+    {
+      "snippet_type": "opening",
+      "prose_text": "Trần Niệm tắt màn hình máy tính lúc gần mười một giờ đêm, tầng 4 tòa Liên Thành chỉ còn mình anh và tiếng máy lạnh rì rầm. Anh đã quen với việc ở lại sau cùng, quen với việc không ai nhớ mình từng có mặt. Lúc cúi xuống nhặt chiếc thẻ nhân viên rơi dưới gầm bàn, đầu anh chợt nhói lên một tiếng, rồi giữa sự im lặng ấy, một câu nói vang lên rõ mồn một — dù xung quanh tuyệt không một bóng người. \"Nếu nó không ký vào biên bản đó, ngày mai mình tiêu rồi.\" Trần Niệm sững lại. Giọng nói ấy không phải của anh, và nó đang rất sợ hãi.",
+      "key_traits": ["điềm đạm", "quen bị xem nhẹ", "nhạy bén", "bình tĩnh trước điều lạ"]
+    },
+    {
+      "snippet_type": "dialogue",
+      "prose_text": "— Tôi thề là tôi không hề lấy số tiền đó, người đồng nghiệp tái mặt, giọng run run. Trần Niệm chỉ nhìn anh ta, điềm tĩnh. Trong tai anh, một câu khác đang vang lên ngược hẳn với lời vừa nói. Anh không vạch mặt ngay. — Anh bình tĩnh đã, anh chậm rãi nói. Nếu anh không lấy, vậy anh có để ý hôm đó ai là người cuối cùng ở lại phòng kế toán không? Người kia khựng lại, ánh mắt thoáng dao động. Trần Niệm gật đầu trong lòng — đúng như tiếng lòng vừa rồi, sự thật nằm ở chỗ anh ta đang cố lái đi.",
+      "key_traits": ["không vội vạch mặt", "dẫn dắt bằng câu hỏi", "biến tiếng lòng thành manh mối"]
+    },
+    {
+      "snippet_type": "action",
+      "prose_text": "Quyển sổ vô hình hiện lên ngay khoảnh khắc người phụ nữ bật khóc vì được minh oan: Niệm Lực +15. Một dòng chữ mờ nổi lên rồi tan đi như sương — Tầm Nghe: mở rộng tới cuối hành lang. Trần Niệm không reo mừng. Anh chỉ lặng lẽ rót cho bà một ly nước ấm, dìu bà ngồi xuống ghế, rồi quay đi giấu cái nhăn mặt vì cơn đau đầu đang siết lấy thái dương. Người ta chỉ cần biết mình đã được trả lại công bằng. Còn cái giá anh trả để nghe được sự thật ấy — đó là chuyện của riêng anh và quyển sổ lặng lẽ này.",
+      "key_traits": ["bình tĩnh trước golden finger", "giấu cái giá phải trả", "đặt người yếu thế lên trước"]
+    }
+  ],
+  "foreshadowing": [
+    { "hintText": "Phó Đạt mỗi lần xuống tầng hầm gửi xe đều nán lại lâu hơn cần thiết, và luôn nhìn quanh như sợ bị theo dõi.", "category": "character_behavior", "plantCh": 10, "pickupCh": 95, "payoffDescription": "Hé lộ Phó Đạt là con tốt được Hằng Nguyên cài vào để canh tầng hầm linh mạch." },
+    { "hintText": "Ông lang Tạ từng buột miệng nói 'người nghe được lòng người xưa kia phải gánh cả công đạo của thiên hạ', rồi vội lảng sang chuyện thuốc thang.", "category": "dialogue", "plantCh": 70, "pickupCh": 800, "payoffDescription": "Reveal ông lang Tạ là một trong những người cuối cùng biết về dòng Thính Tâm Sư." },
+    { "hintText": "Tâm Thanh Lục đôi khi dùng cụm 'theo lệ Thính Tâm' khi mô tả một giới hạn của năng lực, nhưng không giải thích Thính Tâm là gì.", "category": "environmental", "plantCh": 130, "pickupCh": 905, "payoffDescription": "Reveal nguồn gốc dòng Thính Tâm Sư và mối thù với tiền thân tập đoàn Hằng Nguyên." }
+  ]
+}

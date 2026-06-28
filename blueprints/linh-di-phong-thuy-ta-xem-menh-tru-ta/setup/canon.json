@@ -1,0 +1,199 @@
+{
+  "power_system": {
+    "name": "Thiên Nhãn Quán Khí + Phong Thủy Mệnh Lý Truyền Thừa",
+    "type": "cognitive-perception + occult-craft (thấu thị dòng khí + thuật phong thủy mệnh lý, KHÔNG phải võ lực)",
+    "coreResource": "Tinh thần và định lực của Hạ Vô Cữu — thiên nhãn chỉ hoạt động khi anh tĩnh tâm, định thần, không kiệt sức; mỗi lần bố trận lớn hao tổn tinh khí, cần thời gian hồi phục",
+    "unlockRule": "Thiên nhãn là thiên phú bẩm sinh, tự kích hoạt khi anh quán sát định thần; thuật phong thủy mệnh lý đến từ truyền thừa của sư phụ qua bí kíp và la bàn, độ tinh thông tăng dần khi anh tích lũy kinh nghiệm và nhận ra 'dấu khí' của từng loại tà thuật.",
+    "antiPlotArmor": [
+      "Thiên nhãn CHỈ cho thấy dòng khí (long mạch, sát khí, oan hồn) — KHÔNG tự hóa giải tà sự, KHÔNG cho biết phải bố trận thế nào, KHÔNG nói chân tướng là gì.",
+      "Hạ Vô Cữu vẫn phải tự luận đoán, tự bố trí trận pháp, tự tìm chân tướng; phán đoán sai sau khi đã thấy khí vẫn dẫn tới họa cho mình và người khác.",
+      "Thiên nhãn mờ đi hoặc tắt khi anh kiệt sức, hao tổn tinh thần quá độ, bị thương, hoặc khi đối thủ dùng tà thuật che khí; oan hồn chỉ hiện cảm xúc cuối, không kể trực tiếp sự thật.",
+      "Bố trận lớn và trấn yểm cao cấp hao tổn tinh khí thật sự, có thể khiến anh đổ bệnh hoặc suy nhược; không phải sức mạnh dùng vô hạn."
+    ],
+    "signatureBuff": {
+      "name": "Đọc Dấu Khí",
+      "effect": "Khi tập trung cao độ, Hạ Vô Cữu nhận ra các tà sự lớn mang cùng một 'dấu khí' đặc trưng — gợi ý chúng do cùng một dòng phái hoặc một bàn tay tạo ra, giúp anh đoán trước kiểu thủ đoạn.",
+      "limit": "Chỉ là gợi ý mẫu, không phải đáp án; càng gần nguồn tà thuật càng bị ngụy trang chống lại chính khả năng này."
+    },
+    "progressionAxes": [
+      "Độ sắc của thiên nhãn (nhận ra dòng khí tinh vi và tà thuật ngụy trang tốt hơn theo thời gian)",
+      "Độ tinh thông phong thủy mệnh lý và bố trận (từ điều chỉnh bài trí nhỏ tới điều hòa cả địa cục lớn)",
+      "Kho 'dấu khí' và kinh nghiệm đã tích lũy (sổ tay và ký ức vụ việc của MC)"
+    ],
+    "powerCeilingByPhase": {
+      "phase1": "Đọc dòng khí và hóa giải tà sự đời thường trong một nhà/một mộ/một âm trạch đơn lẻ",
+      "phase2": "Giải các địa cục lớn trong thành phố và nhận ra dòng phái tà thuật đứng sau",
+      "phase3": "Đối đầu trận pháp hại người và cuộc tranh đoạt long mạch chủ của cả vùng",
+      "phase4": "Điều hòa được đại trận khí vận của cả thành phố và gánh vai trò người giữ long mạch"
+    }
+  },
+  "worldbuilding": {
+    "tone": "Kinh dị huyền bí phương Đông pha trinh thám: lạnh gáy nhưng thấm thía, tỉnh táo, căng thẳng từ tốn; nỗi sợ đến từ những điều bị che giấu dưới vẻ bình thường và uẩn khúc của người chết, không phải gore giật gân.",
+    "yinYangRules": "Thế giới vận hành theo âm dương ngũ hành nhất quán: mỗi mảnh đất có long mạch và huyệt vị; mỗi nhà có hướng, sơn thủy, chỗ tụ khí và tán khí; mỗi người mang một lá số vận hành theo chu kỳ. Cát hung là hệ quả đọc được từ thế đất, ngày giờ và nghiệp duyên, không ngẫu nhiên. Âm dương mất cân bằng sinh tà sự; hóa giải là điều hòa lại, không phải tiêu diệt.",
+    "entitiesThatExist": "Oan hồn (người chết ôm uẩn khúc chưa siêu thoát, hiếm khi hung dữ vô cớ); âm binh và quỷ do tà thuật nuôi luyện; sát khí và quỷ khí tích tụ ở nơi phạm phong thủy hoặc bị động mộ; long mạch — dòng khí của đất ảnh hưởng vận khí vùng. Không có thần tiên đại chúng tham gia trực tiếp; thế giới giữ vẻ đời thường hiện đại.",
+    "economy": "Hạ Vô Cữu sống bằng thù lao xem mệnh, xem phong thủy và trừ tà; giới hành nghề có kinh tế riêng quanh vật phẩm phong thủy, la bàn cổ, bùa chú và bí kíp truyền thừa; thế giới đời thực vẫn dùng tiền bình thường.",
+    "setting": "Một thành phố Việt Nam hiện đại, ban ngày là phố xá cao ốc bình thường, ban đêm — với người có con mắt — là bản đồ chằng chịt long mạch, sát khí, âm trạch và oan hồn; rải rác các địa cục lớn nhỏ ảnh hưởng vận khí của vô số người.",
+    "geography": {
+      "phase1": "Khu phố cổ nơi đặt quầy xem mệnh, các khu dân cư, mộ tổ và âm trạch quanh đó",
+      "phase2": "Các địa cục lớn khắp thành phố (cao ốc, biệt thự, công trình phạm phong thủy)",
+      "phase3": "Cứ điểm và trận pháp của dòng phái tà thuật, các huyệt vị trọng yếu bị tranh đoạt",
+      "phase4": "Long mạch chủ và đại trận khí vận bao trùm toàn thành phố"
+    },
+    "techLevel": "Hiện đại: điện thoại, mạng xã hội, camera, ô tô — nhưng tri thức âm dương vận hành song song và thường vượt ra ngoài tầm hiểu của khoa học đời thường; công cụ nghề là la bàn, bí kíp, bùa chú, ấn quyết.",
+    "conflictMedium": "Hóa giải tà sự bằng luận đoán mệnh lý, bố trí trận pháp, điều chỉnh phong thủy và khai mở cho oan hồn buông bỏ (NON-combat ở nghĩa võ lực): tìm chân tướng, điều hòa âm dương, chế ngự tà thuật bằng đạo hạnh — không bằng đánh nhau tay đôi.",
+    "forbiddenElements": [
+      "xuyên không / xuyên việt",
+      "trọng sinh / ký ức kiếp trước / đầu thai",
+      "tu tiên đăng tiên, cảnh giới tu luyện kiểu tiên hiệp",
+      "gore khoái cảm, bạo lực phô trương để giật gân",
+      "đánh nhau tay đôi/võ công như nguồn giải quyết xung đột chính",
+      "thần tiên đại chúng can thiệp trực tiếp vào đời thường"
+    ]
+  },
+  "factions": [
+    {
+      "name": "Hạ Vô Cữu và những người đồng hành",
+      "type": "nhóm nhân vật chính",
+      "power_level": 4,
+      "summary": "Hạ Vô Cữu cùng lão Đinh, Tô Vãn Nghi và những người anh cứu giúp, dựa vào thiên nhãn, truyền thừa phong thủy và đạo hạnh để hành nghề cứu người.",
+      "territory": "Quầy xem mệnh phố cổ làm cứ điểm, di chuyển theo từng vụ việc khắp thành phố",
+      "mc_relation": "MC là trung tâm và người dẫn dắt",
+      "conflicts": ["Dòng phái Hắc Sa Môn", "Kẻ giấu mặt giật dây đại trận"],
+      "alliances": ["Giới hành nghề chính trực"],
+      "importance": 10,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Dòng phái Hắc Sa Môn",
+      "type": "dòng phái tà thuật nuôi quỷ",
+      "power_level": 8,
+      "summary": "Một dòng phái dùng tà thuật nuôi âm binh, luyện quỷ, hại người để mưu lợi và đoạt khí vận; hoạt động ngầm khắp thành phố, có nhiều cấp bậc.",
+      "territory": "Các cứ điểm ngầm và trận địa tà thuật rải khắp thành phố",
+      "mc_relation": "Kẻ thù chính giữa truyện",
+      "conflicts": ["Hạ Vô Cữu và những người đồng hành", "Giới hành nghề chính trực"],
+      "alliances": [],
+      "importance": 8,
+      "introduce_arc": 3
+    },
+    {
+      "name": "Giới hành nghề chính trực",
+      "type": "cộng đồng thầy phong thủy mệnh lý chính phái",
+      "power_level": 6,
+      "summary": "Mạng lưới lỏng lẻo các thầy phong thủy, thầy mệnh lý chính trực hành nghề cứu người, có người kính trọng Hạ Vô Cữu, có kẻ ganh ghét; vừa là đồng minh vừa là môi trường anh phải khẳng định mình.",
+      "territory": "Toàn thành phố, mỗi người một địa bàn hành nghề",
+      "mc_relation": "Vừa là đồng minh vừa là nơi MC phải gây dựng uy tín và dè chừng kẻ đố kỵ",
+      "conflicts": ["Dòng phái Hắc Sa Môn"],
+      "alliances": ["Hạ Vô Cữu và những người đồng hành"],
+      "importance": 7,
+      "introduce_arc": 2
+    },
+    {
+      "name": "Kẻ Giấu Mặt",
+      "type": "thế lực giật dây đứng sau đại trận đoạt khí vận",
+      "power_level": 10,
+      "summary": "Một cao nhân ẩn danh giật dây toàn bộ biến động khí vận của thành phố, dựng một đại trận đoạt long mạch; liên quan tới cái chết của sư phụ Hạ Vô Cữu và bí mật chiếc la bàn cổ; động cơ là bí ẩn trung tâm.",
+      "territory": "Ẩn sau mạng lưới địa cục toàn thành phố, nắm các huyệt vị trọng yếu",
+      "mc_relation": "Phản diện tối hậu, đối đầu bằng đấu trí âm dương chứ không bằng vũ lực",
+      "conflicts": ["Hạ Vô Cữu và những người đồng hành"],
+      "alliances": [],
+      "importance": 9,
+      "introduce_arc": 5
+    }
+  ],
+  "plot_twists": [
+    {
+      "summary": "Một 'oan hồn hung dữ' mà ai cũng sợ thật ra không phải kẻ ác — chính người sống trong nhà mới là kẻ đã gây ra cái chết oan và đang dùng nỗi sợ ma quỷ để che giấu tội của mình.",
+      "payoff_type": "đảo chiều thủ phạm",
+      "setup_chapters": [40, 110],
+      "twist_chapter": 250,
+      "reader_impact": "major",
+      "arc_number": 2
+    },
+    {
+      "summary": "Dòng phái Hắc Sa Môn không chỉ nuôi quỷ mưu lợi lẻ tẻ — chúng là công cụ của một kế hoạch lớn hơn nhằm làm động hàng loạt huyệt vị để dồn khí vận về một đại trận duy nhất.",
+      "payoff_type": "âm mưu lớn hơn",
+      "setup_chapters": [300, 470],
+      "twist_chapter": 540,
+      "reader_impact": "major",
+      "arc_number": 4
+    },
+    {
+      "summary": "Thiên nhãn của Hạ Vô Cữu và chiếc la bàn cổ không phải may mắn ngẫu nhiên — sư phụ anh từng là người giữ long mạch của thành phố, bị kẻ giấu mặt hãm hại, và đã âm thầm chọn anh kế thừa vai trò ấy ngay từ khi nhận anh làm đồ đệ.",
+      "payoff_type": "nguồn gốc golden finger và mệnh số",
+      "setup_chapters": [120, 640, 810],
+      "twist_chapter": 860,
+      "reader_impact": "cosmic",
+      "arc_number": 6
+    }
+  ],
+  "themes": [
+    {
+      "name": "Trừ tà là tìm chân tướng",
+      "type": "main",
+      "description": "Hóa giải tà sự không phải đánh đuổi quỷ thần mà là tìm ra sự thật bị chôn giấu phía sau, để cả người sống lẫn người chết đều được yên.",
+      "motifs": ["khai mở cho oan hồn buông bỏ", "lần ra uẩn khúc cuối cùng", "an táng lại đúng cách"],
+      "importance": 10
+    },
+    {
+      "name": "Lòng người là cội nguồn tà sự",
+      "type": "main",
+      "description": "Phần lớn tai họa không đến từ ma quỷ mà từ tham lam, thù hận và dối trá của người sống; quỷ chỉ là cái bóng của nghiệp người.",
+      "motifs": ["thủ phạm là người thân", "tà thuật phục vụ lòng tham", "nỗi sợ ma che giấu tội người"],
+      "importance": 9
+    },
+    {
+      "name": "Đạo hạnh của người nắm tri thức",
+      "type": "supporting",
+      "description": "Phong thủy mệnh lý là tri thức nguy hiểm; dùng để cứu người là chính đạo, dùng để hại người là tà; Hạ Vô Cữu mang gánh nặng của lựa chọn ấy.",
+      "motifs": ["lời dặn của sư phụ", "huyệt vị để giữ chứ không để xem", "từ chối thù lao bất nghĩa"],
+      "importance": 8
+    },
+    {
+      "name": "Sự thật nằm sâu hơn tà khí bề mặt",
+      "type": "supporting",
+      "description": "Lớp tà khí dễ thấy chỉ là triệu chứng; chân tướng luôn nằm sâu hơn, trong thế đất, trong lá số và trong những điều người ta cố che giấu.",
+      "motifs": ["quầng sát khí chỉ là dấu hiệu", "đào sâu xuống dưới nền nhà", "dấu khí lặp lại của một bàn tay"],
+      "importance": 8
+    }
+  ],
+  "voice_anchors": [
+    {
+      "snippet_type": "opening",
+      "prose_text": "Người ta bảo căn hộ tầng năm này 'ở không yên'. Hạ Vô Cữu không vội tin lời ai. Anh đặt chiếc la bàn cũ của sư phụ lên lòng bàn tay, hít một hơi dài, rồi để tâm lắng xuống. Và thế giới đổi khác. Dưới lớp gạch men sáng bóng, một dòng khí chảy lệch một góc rất nhỏ — đủ để cả căn nhà tụ lại một quầng xám mỏng trên trần phòng ngủ, ngay phía trên đầu giường. Trong khóe mắt anh, cạnh tấm gương lớn treo đối diện cửa, có một vệt mờ đang co ro, mang theo một nỗi tủi thân lạnh buốt không nói thành lời. Anh không sợ. Anh chỉ khẽ nói với chủ nhà đang run rẩy sau lưng: chị tháo tấm gương kia xuống trước đã, rồi kể tôi nghe — trước chị, ai từng sống ở đây.",
+      "key_traits": ["điềm đạm", "quan sát kỹ", "không tin lời đồn", "thấu hiểu người chết"]
+    },
+    {
+      "snippet_type": "dialogue",
+      "prose_text": "— Tôi xem rồi, nhà anh phạm phải hướng tuyệt mệnh, phải dỡ bếp xây lại hết, tốn vài trăm triệu là cùng. Trương Bán Tiên vỗ đùi, giọng chắc nịch. Hạ Vô Cữu chỉ nhìn cái bếp, rồi nhìn ông ta. — Bếp này quay đúng hướng. Cái phạm không nằm ở bếp. Anh chỉ tay lên trần. — Là cái xà ngang vừa đóng thêm tháng trước, đè đúng chỗ ngủ của cháu bé. Ông bảo dỡ bếp, vì dỡ bếp mới có tiền cho ông. Còn cái xà kia, chỉ cần kê lại giường là xong, chẳng tốn của ông xu nào.",
+      "key_traits": ["vạch trần thầy rởm", "không tranh cãi cảm tính", "chỉ ra bằng chứng cứ"]
+    },
+    {
+      "snippet_type": "action",
+      "prose_text": "Quá giờ Tý, quầng quỷ khí trong gian thờ đặc lại thành một màn sương đen, lạnh tới mức hơi thở Hạ Vô Cữu hóa khói. Anh không lùi. Anh quỳ xuống trước bài vị, đặt chiếc la bàn vào đúng tâm gian phòng, rồi từ từ cắm năm cây nhang xuống năm điểm anh đã tính kỹ từ lúc trời còn sáng — kim, mộc, thủy, hỏa, thổ, mỗi điểm một hơi thở. Màn sương đen cuộn lên giận dữ, ép vào anh từng đợt, nhưng anh không vội. Anh biết oan hồn này không muốn hại ai; nó chỉ đang gào một cái tên suốt mười năm không ai chịu nghe. Khi cây nhang thứ năm bén lửa, anh ngẩng lên, nói khẽ vào màn sương: tôi tìm được con gái bà rồi. Bà đi theo tôi, tôi đưa bà tới gặp nó.",
+      "key_traits": ["bình tĩnh giữa quỷ khí", "đạo hạnh dẫn đường", "khai mở cho oan hồn buông bỏ"]
+    }
+  ],
+  "foreshadowing": [
+    {
+      "hintText": "Trên mặt chiếc la bàn cũ của sư phụ, ở rìa vòng địa bàn có một nét khắc mảnh không giống ký hiệu phong thủy thông thường — Hạ Vô Cữu chỉ thoáng để ý rồi cho rằng đó là vết xước cũ.",
+      "category": "object",
+      "plantCh": 6,
+      "pickupCh": 660,
+      "payoffDescription": "Nét khắc ấy là dấu của người giữ long mạch đời trước; chiếc la bàn là chìa khóa của một địa cục cổ, và thiên nhãn của anh đọc được nó vì sư phụ đã chọn anh kế thừa vai trò ấy."
+    },
+    {
+      "hintText": "Lão Đinh chủ tiệm đồ cổ lẩm bẩm rằng 'thầy của cậu đâu phải chết vì bệnh, ông ấy khỏe như vâm', rồi vội lảng sang chuyện khác khi Hạ Vô Cữu gặng hỏi.",
+      "category": "dialogue",
+      "plantCh": 25,
+      "pickupCh": 590,
+      "payoffDescription": "Hé lộ cái chết của sư phụ không tự nhiên mà do bị kẻ giấu mặt hãm hại khi đang giữ một huyệt vị trọng yếu."
+    },
+    {
+      "hintText": "Một thân chủ 'tốt bụng' luôn nhiệt tình mời Hạ Vô Cữu tới xem giúp các căn nhà của bạn bè mình, nhưng chính nhà của ông ta thì lần nào cũng tìm cớ không cho anh quán khí.",
+      "category": "character_behavior",
+      "plantCh": 45,
+      "pickupCh": 260,
+      "payoffDescription": "Người đó là tay sai của dòng phái tà thuật, lợi dụng Hạ Vô Cữu để dò các địa cục, và giấu chính nhà mình vì đó là một cứ điểm nuôi quỷ."
+    }
+  ]
+}

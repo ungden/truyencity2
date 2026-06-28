@@ -1,0 +1,461 @@
+[
+  {
+    "slug": "tan-tien-ta-luyen-dan-nuoi-ca-tong-mon",
+    "genre": "tien-hiep",
+    "title": "Tản Tiên: Ta Luyện Đan Nuôi Cả Tông Môn",
+    "main_character": "Diệp Thanh Vân",
+    "mcOrigin": "system-bestowed",
+    "premise": "Một tản tu nghèo được Đan Lô Hệ Thống chọn, lấy luyện đan + cẩu đạo trường sinh làm nền, từ một tông môn sắp giải tán gây dựng thành thánh địa luyện đan thiên hạ.",
+    "nonCombat": false
+  },
+  {
+    "slug": "van-gioi-thon-phe-ta-co-bang-phong-than",
+    "genre": "huyen-huyen",
+    "title": "Vạn Giới Thôn Phệ: Ta Có Bảng Phong Thần",
+    "main_character": "Lăng Tiêu",
+    "mcOrigin": "system-bestowed",
+    "premise": "Thiếu niên bản địa được Bảng Phong Thần (Thiên Đạo Kim Bảng) ban tặng: mỗi lần lên bảng xếp hạng lại nhận thưởng, từ phế vật vươn lên đỉnh phong vạn giới.",
+    "nonCombat": false
+  },
+  {
+    "slug": "kiem-lu-mot-dao-tran-giang-ho",
+    "genre": "kiem-hiep",
+    "title": "Kiếm Lư: Một Đao Trấn Giang Hồ",
+    "main_character": "Tiêu Phong Vũ",
+    "mcOrigin": "system-bestowed",
+    "premise": "Đệ tử lò rèn kiếm được Kiếm Tâm Lĩnh Ngộ Lục ban tặng khả năng lĩnh ngộ võ học qua từng thanh kiếm rèn ra, lấy nghĩa khí giang hồ đối đầu cường quyền võ lâm.",
+    "nonCombat": false
+  },
+  {
+    "slug": "nho-dao-khai-khoa-ta-muon-tho-van-dinh-quoc",
+    "genre": "lich-su",
+    "title": "Nho Đạo Khai Khoa: Ta Mượn Thơ Văn Định Quốc",
+    "main_character": "Tô Mặc",
+    "mcOrigin": "transmigrator",
+    "premise": "Một học giả hiện đại xuyên vào triều đại giả tưởng nơi văn chương sinh ra sức mạnh Nho Đạo; lấy thơ văn kim cổ trấn quốc, đi từ hàn sĩ tới Văn Thánh.",
+    "nonCombat": false
+  },
+  {
+    "slug": "tinh-ham-quat-khoi-ta-la-ky-su-van-minh",
+    "genre": "khoa-huyen",
+    "title": "Tinh Hạm Quật Khởi: Ta Là Kỹ Sư Văn Minh",
+    "main_character": "Lục Thần",
+    "mcOrigin": "system-bestowed",
+    "premise": "Kỹ sư của một văn minh hành tinh lạc hậu được Hệ Thống Văn Minh ban tặng cây kỹ thuật ẩn, từ một xưởng cơ khí nhỏ dẫn dắt cả chủng tộc tiến ra vũ trụ.",
+    "nonCombat": false
+  },
+  {
+    "slug": "toan-dan-chuyen-chuc-ta-giac-ngo-an-nghe-te-dan",
+    "genre": "vong-du",
+    "title": "Toàn Dân Chuyển Chức: Ta Giác Ngộ Ẩn Nghề Tế Đàn",
+    "main_character": "Hàn Lập",
+    "mcOrigin": "native",
+    "premise": "Thời đại toàn dân chuyển chức trong tựa game thực tế ảo phủ lên đời thực; MC giác ngộ ẩn nghề Tế Đàn Sư bị coi là rác, nhưng ẩn chứa hệ phái mạnh nhất bị lãng quên.",
+    "nonCombat": false
+  },
+  {
+    "slug": "nghe-thau-tam-thanh-ta-biet-het-bi-mat-van-nguoi",
+    "genre": "dong-nhan",
+    "title": "Nghe Thấu Tâm Thanh: Ta Biết Hết Bí Mật Vạn Người",
+    "main_character": "Trần Niệm",
+    "mcOrigin": "system-bestowed",
+    "premise": "Một nhân viên quèn được ban khả năng nghe thấy tiếng lòng người khác; dùng thông tin để gỡ rối, lật án oan và vươn lên trong một đô thị tu chân ẩn giấu.",
+    "nonCombat": false
+  },
+  {
+    "slug": "mat-the-don-vat-tu-ta-co-kho-vo-han",
+    "genre": "mat-the",
+    "title": "Mạt Thế Đồn Vật Tư: Ta Có Kho Vô Hạn",
+    "main_character": "Cố Trầm",
+    "mcOrigin": "system-bestowed",
+    "premise": "Trước ngày tận thế giáng lâm, MC được Hệ Thống Kho Vô Hạn kích hoạt, tích trữ vật tư và xây pháo đài sinh tồn, dẫn dắt người sống sót qua đại biến dị thú.",
+    "nonCombat": false
+  },
+  {
+    "slug": "dan-tuc-quai-dam-ngo-tac-truy-hung",
+    "genre": "linh-di",
+    "title": "Dân Tục Quái Đàm: Ngỗ Tác Truy Hung",
+    "main_character": "Lý Vãn",
+    "mcOrigin": "system-bestowed",
+    "premise": "Một ngỗ tác (pháp y thời xưa) thừa kế Nghiệm Thi Lục có thể đọc dấu vết tử thi và âm hồn, lần theo các vụ quái đàm dân tục để truy tìm hung thủ và trấn yểm tà sự.",
+    "nonCombat": false
+  },
+  {
+    "slug": "quan-lo-ta-dung-so-lieu-thang-tien",
+    "genre": "quan-truong",
+    "title": "Quan Lộ: Ta Dùng Số Liệu Thăng Tiến",
+    "main_character": "Trần Hạo",
+    "mcOrigin": "system-bestowed",
+    "premise": "Một công chức trẻ được Hệ Thống Trị Lý ban tặng khả năng nhìn thấu số liệu dân sinh; lấy chính tích thực và liêm chính làm vũ khí thăng tiến trên quan trường, không bạo lực.",
+    "nonCombat": true
+  },
+  {
+    "slug": "toan-dan-lanh-chua-khai-cuc-mot-toa-thanh",
+    "genre": "di-gioi",
+    "title": "Toàn Dân Lãnh Chúa: Khai Cục Một Tòa Thành",
+    "main_character": "Vương Lâm",
+    "mcOrigin": "transmigrator",
+    "premise": "Toàn nhân loại bị triệu hồi tới dị giới làm lãnh chúa, mỗi người khởi đầu một tòa thành sơ khai; MC dùng tri thức Trái Đất và lựa chọn tài nguyên khôn ngoan để phát triển lãnh địa thành đế quốc.",
+    "nonCombat": false
+  },
+  {
+    "slug": "he-thong-nu-phu-ta-song-cho-minh",
+    "genre": "ngon-tinh",
+    "title": "Hệ Thống Nữ Phụ: Ta Sống Cho Mình",
+    "main_character": "Hạ Vy",
+    "mcOrigin": "system-bestowed",
+    "premise": "Một cô gái bản địa được Hệ Thống Nữ Chính ban tặng cơ hội thoát khỏi vai nữ phụ bi kịch; dùng tài năng thiết kế và sự tử tế để gây dựng sự nghiệp và tình yêu chân thành của riêng mình.",
+    "nonCombat": true
+  },
+  {
+    "slug": "quy-tac-quai-dam-muoi-hai-tang-tu-vong",
+    "genre": "quy-tac-quai-dam",
+    "title": "Quy Tắc Quái Đàm: Mười Hai Tầng Tử Vong",
+    "main_character": "Diệp Tranh",
+    "mcOrigin": "native",
+    "premise": "Một người bình thường bị cuốn vào các phó bản quái đàm đời thường biến dị, sinh tồn bằng cách đọc hiểu và tuân thủ các bộ quy tắc thật-giả lẫn lộn; suy luận thay vì chiến đấu.",
+    "nonCombat": true
+  },
+  {
+    "slug": "ngu-thu-tien-hoa-ta-nhin-thau-tuyen-an",
+    "genre": "ngu-thu-tien-hoa",
+    "title": "Ngự Thú Tiến Hóa: Ta Nhìn Thấu Tuyến Ẩn",
+    "main_character": "Lâm Tinh",
+    "mcOrigin": "system-bestowed",
+    "premise": "Một ngự thú sư hạng bét được ban khả năng nhìn thấu Tuyến Tiến Hóa Ẩn của thú cưng; biến những con thú bị coi là phế thành chiến thú đỉnh cao qua công thức tiến hóa độc nhất.",
+    "nonCombat": false
+  },
+  {
+    "slug": "khoai-xuyen-nhiem-vu-cuu-vot-phao-hoi",
+    "genre": "khoai-xuyen",
+    "title": "Khoái Xuyên: Nhiệm Vụ Cứu Vớt Pháo Hôi",
+    "main_character": "Tô Diệp",
+    "mcOrigin": "transmigrator",
+    "premise": "MC ký hợp đồng với Hệ Thống Đa Vũ Trụ, mỗi thế giới xuyên vào một thân phận pháo hôi bị nguyên tác đối xử bất công, hoàn thành nhiệm vụ bù đắp tiếc nuối rồi sang thế giới kế.",
+    "nonCombat": false
+  },
+  {
+    "slug": "do-thi-thuong-chien-ta-thau-tom-thuong-truong",
+    "genre": "do-thi",
+    "title": "Đô Thị Thương Chiến: Ta Thâu Tóm Thương Trường",
+    "main_character": "Trần Mặc",
+    "mcOrigin": "returnee",
+    "premise": "Một thiếu gia du học trở về giữa lúc tập đoàn gia tộc bên bờ phá sản; bằng tầm nhìn thương trường và những nước cờ thâu tóm sắc bén, anh lật ngược thế cờ, biến công ty hấp hối thành đế chế kinh tế.",
+    "nonCombat": true
+  },
+  {
+    "slug": "do-thi-linh-khi-phuc-toi-ta-thuc-tinh-co-vo",
+    "genre": "do-thi",
+    "title": "Linh Khí Phục Tô: Ta Thức Tỉnh Cổ Võ",
+    "main_character": "Lý Trường Canh",
+    "mcOrigin": "native",
+    "premise": "Linh khí thiên địa hồi quy thành phố hiện đại, vạn vật bắt đầu biến đổi; một thanh niên bình thường thức tỉnh truyền thừa cổ võ thất truyền, vừa giấu mình giữa người thường vừa vươn lên thành cường giả trấn giữ một phương.",
+    "nonCombat": false
+  },
+  {
+    "slug": "do-thi-giai-tri-ta-viet-nhac-chan-dong-showbiz",
+    "genre": "do-thi",
+    "title": "Giải Trí Đỉnh Phong: Ta Viết Nhạc Chấn Động Showbiz",
+    "main_character": "Cố Thanh Trạch",
+    "mcOrigin": "reincarnated",
+    "premise": "Trọng sinh về thời sinh viên với ký ức cả một kiếp người, một nhạc sĩ thất bại quyết viết lại cuộc đời; bằng tài năng âm nhạc và sự nhạy bén với thị trường, anh từng bước chinh phục cả ngành giải trí.",
+    "nonCombat": true
+  },
+  {
+    "slug": "tan-tien-trong-sinh-ta-nghich-thien-cai-menh",
+    "genre": "tien-hiep",
+    "title": "Trọng Sinh Tu Tiên: Ta Nghịch Thiên Cải Mệnh",
+    "main_character": "Tần Mục",
+    "mcOrigin": "reincarnated",
+    "premise": "Một tu sĩ chết dưới tay người thân tín bất ngờ trọng sinh về thuở thiếu niên; mang theo ký ức tiền kiếp và hiểu biết thiên cơ, anh đi lại con đường tu tiên, hóa giải kiếp nạn và đoạt lại những gì từng mất.",
+    "nonCombat": false
+  },
+  {
+    "slug": "tan-tien-linh-dien-ta-trong-trot-thanh-tien",
+    "genre": "tien-hiep",
+    "title": "Linh Điền Tại Thân: Ta Trồng Trọt Thành Tiên",
+    "main_character": "Hàn Tiêu",
+    "mcOrigin": "native",
+    "premise": "Một tản tu phát hiện trong người mình ẩn chứa một mảnh Linh Điền có thể trồng linh dược, nuôi linh thú; lấy cẩu đạo trường sinh và canh tác linh điền làm gốc, anh thong dong tích lũy thành đại năng.",
+    "nonCombat": false
+  },
+  {
+    "slug": "huyen-huyen-trieu-hoan-ta-thong-linh-van-toc",
+    "genre": "huyen-huyen",
+    "title": "Triệu Hoán Vạn Tộc: Ta Thống Lĩnh Quân Đoàn Thần Ma",
+    "main_character": "Mặc Thiên",
+    "mcOrigin": "system-bestowed",
+    "premise": "Thiếu niên được ban tặng năng lực triệu hoán và thống lĩnh muôn tộc thần ma; từ một lãnh địa nhỏ bé, anh chiêu mộ các chủng tộc, xây dựng quân đoàn và tranh phong giữa loạn thế vạn giới.",
+    "nonCombat": false
+  },
+  {
+    "slug": "huyen-huyen-vo-han-ta-pha-giai-moi-the-gioi",
+    "genre": "huyen-huyen",
+    "title": "Vô Hạn Thí Luyện: Ta Phá Giải Mọi Thế Giới",
+    "main_character": "Diệp Phong",
+    "mcOrigin": "native",
+    "premise": "Bị cuốn vào không gian thí luyện vô hạn nơi mỗi thế giới là một ván cờ sinh tử, anh dùng trí tuệ lạnh lùng và bản lĩnh từng bước phá giải quy luật, sống sót qua từng phó bản và truy tìm chân tướng đứng sau tất cả.",
+    "nonCombat": false
+  },
+  {
+    "slug": "khoa-huyen-cyberpunk-ta-la-hac-khach-manh-nhat",
+    "genre": "khoa-huyen",
+    "title": "Tinh Võng Cyberpunk: Ta Là Hắc Khách Mạnh Nhất",
+    "main_character": "Lăng Phong",
+    "mcOrigin": "system-bestowed",
+    "premise": "Trong đại đô thị neon nơi tập đoàn thống trị và tinh võng phủ khắp, một hắc khách tầng đáy được ban một trí tuệ bạn đồng hành ẩn giấu; anh xâm nhập hệ thống, vạch trần âm mưu và vươn lên thành huyền thoại trên mạng lưới.",
+    "nonCombat": false
+  },
+  {
+    "slug": "khoa-huyen-trung-trieu-ta-lai-co-giap-cuoi-cung",
+    "genre": "khoa-huyen",
+    "title": "Trùng Triều Giáng Lâm: Ta Lái Cơ Giáp Cuối Cùng",
+    "main_character": "Hạ Tử Đồng",
+    "mcOrigin": "system-bestowed",
+    "premise": "Khi trùng triều xé toạc bầu trời và nhân loại bên bờ diệt vong, một tân binh được kích hoạt con chip tiến hóa cổ xưa trong cơ giáp; anh dẫn đầu phòng tuyến cuối cùng, tiến hóa từng trận chiến để giành lại tương lai loài người.",
+    "nonCombat": false
+  },
+  {
+    "slug": "lich-su-xuyen-khong-ta-khai-cong-nghiep-cuu-quoc",
+    "genre": "lich-su",
+    "title": "Xuyên Không Khai Công: Ta Dựng Công Nghiệp Cứu Quốc",
+    "main_character": "Diệp Tử Thanh",
+    "mcOrigin": "transmigrator",
+    "premise": "Một kỹ sư hiện đại xuyên về một triều đại loạn lạc; bằng tri thức cơ khí, luyện kim và quản trị, anh dựng công xưởng, cải tổ nông tang binh bị, từng bước đưa một vùng đất nghèo khó trở thành cường quốc.",
+    "nonCombat": false
+  },
+  {
+    "slug": "lich-su-trieu-hoan-ta-co-thien-co-danh-tuong",
+    "genre": "lich-su",
+    "title": "Triệu Hoán Danh Tướng: Ta Có Thiên Cổ Mãnh Tướng",
+    "main_character": "Triệu Khải",
+    "mcOrigin": "transmigrator",
+    "premise": "Xuyên thành vị vương gia thất thế giữa thời quần hùng cát cứ, anh sở hữu khả năng triệu hoán những danh tướng văn thần thiên cổ; từ thành trì cô độc, anh chiêu hiền nạp sĩ, dụng binh như thần, gây dựng đại nghiệp thống nhất.",
+    "nonCombat": false
+  },
+  {
+    "slug": "dong-nhan-chu-thien-truc-ba-ta-dan-song-van-gioi",
+    "genre": "dong-nhan",
+    "title": "Chư Thiên Trực Bá: Ta Dẫn Sóng Vạn Giới",
+    "main_character": "Tô Hành",
+    "mcOrigin": "system-bestowed",
+    "premise": "Một thanh niên bình thường được trao kênh trực tiếp phát sóng tới muôn vàn thế giới; mỗi lần lên sóng lại nhận thưởng và khuấy đảo các thế giới khán giả, anh vừa giải trí vạn giới vừa âm thầm trở nên phi phàm.",
+    "nonCombat": false
+  },
+  {
+    "slug": "dong-nhan-lieu-thien-quan-ta-vao-nhom-van-gioi",
+    "genre": "dong-nhan",
+    "title": "Liêu Thiên Quần: Nhóm Chat Của Vạn Giới Đại Năng",
+    "main_character": "Lâm Hạo",
+    "mcOrigin": "system-bestowed",
+    "premise": "Bất ngờ được kéo vào một nhóm trò chuyện quy tụ các đại năng từ vô số thế giới, anh đổi chác vật phẩm, học lỏm thần thông và nhận nhiệm vụ xuyên giới; từ một người bình thường, anh dần trở thành mắt xích then chốt của cả nhóm.",
+    "nonCombat": false
+  },
+  {
+    "slug": "vong-du-lanh-dia-ta-xay-cong-hoi-bat-bai",
+    "genre": "vong-du",
+    "title": "Lãnh Địa Công Hội: Ta Xây Đế Chế Bất Bại",
+    "main_character": "Cố Vân",
+    "mcOrigin": "native",
+    "premise": "Trong tựa game nhập vai toàn cảm phủ lên cả thế giới, một người chơi tay trắng chọn hướng đi xây dựng lãnh địa và công hội; bằng đầu óc quản trị và chiến thuật, anh biến tiền đồn hoang vu thành thành trì khiến mọi thế lực phải dè chừng.",
+    "nonCombat": false
+  },
+  {
+    "slug": "vong-du-npc-giac-tinh-ta-la-npc-manh-nhat",
+    "genre": "vong-du",
+    "title": "NPC Giác Tỉnh: Ta Là NPC Mạnh Nhất Server",
+    "main_character": "Bạch Dạ",
+    "mcOrigin": "native",
+    "premise": "Một NPC nhỏ bé trong thế giới game bỗng giác tỉnh tự ngã và ký ức; nhận ra mình bị định sẵn làm vai phụ bị hi sinh, anh phá vỡ kịch bản, tích lũy sức mạnh và viết lại số phận giữa người chơi lẫn NPC.",
+    "nonCombat": false
+  },
+  {
+    "slug": "kiem-hiep-tham-an-ta-pha-an-chan-dong-giang-ho",
+    "genre": "kiem-hiep",
+    "title": "Thần Bộ Khoái: Ta Phá Án Chấn Động Giang Hồ",
+    "main_character": "Tống Từ",
+    "mcOrigin": "native",
+    "premise": "Một bộ khoái trẻ tuổi với tài quan sát và suy luận hơn người dấn thân vào những vụ án mạng kỳ bí trong giang hồ; mỗi vụ án lại hé lộ một âm mưu lớn hơn, buộc anh dùng cả trí lẫn võ để truy tìm chân tướng và giữ gìn công lý.",
+    "nonCombat": false
+  },
+  {
+    "slug": "kiem-hiep-trong-sinh-ta-mot-kiem-tuyet-tinh-cuu",
+    "genre": "kiem-hiep",
+    "title": "Trọng Sinh Kiếm Hào: Ta Một Kiếm Tuyệt Tình Cừu",
+    "main_character": "Mộ Dung Tuyết",
+    "mcOrigin": "reincarnated",
+    "premise": "Một kiếm khách bị phản bội mà chết, trọng sinh về thời niên thiếu khi mọi bi kịch chưa xảy ra; mang theo ký ức kiếp trước và kiếm đạo đỉnh cao, anh đi lại giang hồ, hóa giải ân oán và rèn nên một thanh kiếm tuyệt thế.",
+    "nonCombat": false
+  },
+  {
+    "slug": "mat-the-xay-can-cu-ta-thu-linh-vung-an-toan",
+    "genre": "mat-the",
+    "title": "Mạt Thế Kiến Căn Cứ: Ta Là Thủ Lĩnh Vùng An Toàn",
+    "main_character": "Phương Viễn",
+    "mcOrigin": "native",
+    "premise": "Khi đại nạn ập tới và trật tự sụp đổ, một người đàn ông điềm tĩnh đứng ra quy tụ những người sống sót; bằng tổ chức, kỷ luật và mưu lược, anh dựng nên một vùng an toàn vững vàng giữa biển hỗn loạn của mạt thế.",
+    "nonCombat": false
+  },
+  {
+    "slug": "mat-the-di-nang-ta-thuc-tinh-thien-phu-cap-than",
+    "genre": "mat-the",
+    "title": "Mạt Thế Dị Năng: Ta Thức Tỉnh Thiên Phú Cấp Thần",
+    "main_character": "Tần Lôi",
+    "mcOrigin": "system-bestowed",
+    "premise": "Ngày tận thế giáng lâm cũng là lúc dị năng thức tỉnh trong loài người; một thanh niên bình thường giác ngộ thiên phú hiếm có bậc nhất, vừa tiến hóa qua từng trận sinh tử vừa che chở những người bên cạnh giữa thế giới tàn khốc.",
+    "nonCombat": false
+  },
+  {
+    "slug": "linh-di-phong-thuy-ta-xem-menh-tru-ta",
+    "genre": "linh-di",
+    "title": "Phong Thủy Tướng Sư: Ta Xem Mệnh Trừ Tà",
+    "main_character": "Hạ Vô Cữu",
+    "mcOrigin": "native",
+    "premise": "Thừa kế y bát phong thủy mệnh lý từ sư phụ, một thanh niên hành tẩu nhân gian xem phong thủy, đoán cát hung và hóa giải tà sự; mỗi lần ra tay lại vén mở một bí ẩn âm dương, dẫn anh tới những chân tướng bị chôn giấu.",
+    "nonCombat": false
+  },
+  {
+    "slug": "linh-di-co-mo-ta-do-dau-gap-quai-su",
+    "genre": "linh-di",
+    "title": "Mộ Cổ Quái Sự: Ta Đổ Đấu Gặp Âm Mưu Thiên Cổ",
+    "main_character": "Tần Lĩnh",
+    "mcOrigin": "native",
+    "premise": "Thừa kế bút ký đổ đấu của tổ phụ, một thanh niên bước vào thế giới mộ cổ đầy cạm bẫy và quái sự; dưới lòng đất ngàn năm, anh đối mặt cơ quan hiểm độc, sinh vật quái dị và một âm mưu thiên cổ dần lộ diện.",
+    "nonCombat": false
+  },
+  {
+    "slug": "quan-truong-phan-tham-ta-lat-tay-quan-tham",
+    "genre": "quan-truong",
+    "title": "Phản Tham Phong Bạo: Ta Lật Tẩy Quan Tham",
+    "main_character": "Trình Khải",
+    "mcOrigin": "native",
+    "premise": "Một cán bộ trẻ liêm chính được điều về vùng đất nơi tham nhũng giăng kín; bằng chứng cứ, luật pháp và bản lĩnh, anh từng bước lật tẩy các đường dây, làm trong sạch bộ máy và thăng tiến bằng chính tích thực, không bạo lực.",
+    "nonCombat": true
+  },
+  {
+    "slug": "quan-truong-trong-sinh-ta-nam-truoc-thoi-cuoc",
+    "genre": "quan-truong",
+    "title": "Quan Trường Trọng Sinh: Ta Nắm Trước Thời Cuộc",
+    "main_character": "Diệp Hướng Đông",
+    "mcOrigin": "reincarnated",
+    "premise": "Một quan chức trọng sinh về thời còn là cán bộ trẻ, mang theo ký ức về thời cuộc mấy mươi năm; anh tận dụng tầm nhìn đi trước thời đại để làm chính sách đúng, an dân và thăng tiến vững vàng trên con đường chính trực.",
+    "nonCombat": true
+  },
+  {
+    "slug": "di-gioi-man-hoang-ta-khai-hoa-bo-lac-nguyen-thuy",
+    "genre": "di-gioi",
+    "title": "Man Hoang Sinh Tồn: Ta Khai Hóa Bộ Lạc Nguyên Thủy",
+    "main_character": "Lâm Mặc",
+    "mcOrigin": "transmigrator",
+    "premise": "Xuyên vào một bộ lạc nguyên thủy giữa man hoang đầy mãnh thú và đói rét, một người hiện đại dùng tri thức sinh tồn, nông nghiệp và chế tác để dẫn dắt bộ tộc; từ ăn lông ở lỗ, anh khai hóa cả một nền văn minh.",
+    "nonCombat": false
+  },
+  {
+    "slug": "di-gioi-tri-thuc-ta-dem-van-minh-dao-di-gioi",
+    "genre": "di-gioi",
+    "title": "Dị Giới Cải Biến: Ta Đem Văn Minh Hiện Đại Tới",
+    "main_character": "Cao Viễn",
+    "mcOrigin": "transmigrator",
+    "premise": "Xuyên tới một dị giới ma pháp lạc hậu, một người hiện đại đem theo tri thức khoa học và quản trị; anh cải tổ nông nghiệp, thương mại và kỹ nghệ, biến một lãnh địa tầm thường thành trung tâm văn minh khiến cả đại lục kinh ngạc.",
+    "nonCombat": false
+  },
+  {
+    "slug": "ngon-tinh-hao-mon-ta-trong-sinh-doat-lai-tat-ca",
+    "genre": "ngon-tinh",
+    "title": "Hào Môn Trọng Sinh: Ta Đoạt Lại Tất Cả",
+    "main_character": "Tô Uyển",
+    "mcOrigin": "reincarnated",
+    "premise": "Bị hãm hại đến tan cửa nát nhà, một người phụ nữ trọng sinh về thời điểm mọi bi kịch chưa bắt đầu; bằng trí tuệ và sự quyết đoán, cô vạch trần kẻ giả tạo, gây dựng sự nghiệp riêng và nắm lấy hạnh phúc thuộc về mình.",
+    "nonCombat": true
+  },
+  {
+    "slug": "ngon-tinh-co-dai-ta-lam-than-y-duoc-sung",
+    "genre": "ngon-tinh",
+    "title": "Cổ Đại Thần Y: Ta Làm Y Nữ Được Sủng",
+    "main_character": "Diệp Như Ý",
+    "mcOrigin": "transmigrator",
+    "premise": "Một bác sĩ hiện đại xuyên thành tiểu thư bị khinh rẻ trong phủ cổ đại; với y thuật vượt thời đại và bản lĩnh tự cường, cô cứu người, trị bệnh, từng bước lật ngược thân phận và gặp được người chân thành che chở cả đời.",
+    "nonCombat": true
+  },
+  {
+    "slug": "quy-tac-quai-dam-cao-oc-van-phong-tang-thu-muoi-ba",
+    "genre": "quy-tac-quai-dam",
+    "title": "Quy Tắc Quái Đàm: Cao Ốc Văn Phòng Tầng Mười Ba",
+    "main_character": "Hạ Mục",
+    "mcOrigin": "native",
+    "premise": "Một nhân viên văn phòng phát hiện tòa cao ốc nơi mình làm việc xuất hiện tầng mười ba quái dị với bộ quy tắc thật-giả lẫn lộn; để sống sót qua mỗi đêm tăng ca, anh phải đọc hiểu quy tắc và suy luận, thay vì đối đầu.",
+    "nonCombat": true
+  },
+  {
+    "slug": "quy-tac-quai-dam-benh-vien-ca-truc-dem",
+    "genre": "quy-tac-quai-dam",
+    "title": "Quy Tắc Quái Đàm: Bệnh Viện Ca Trực Đêm",
+    "main_character": "Tô Vãn",
+    "mcOrigin": "native",
+    "premise": "Một y tá nhận ca trực đêm tại bệnh viện cũ và được trao một bản quy tắc kỳ lạ phải tuyệt đối tuân theo; giữa hành lang tĩnh mịch nơi thật-giả khó phân, cô dùng quan sát và lý trí để vượt qua từng đêm trực chết chóc.",
+    "nonCombat": true
+  },
+  {
+    "slug": "ngu-thu-tien-hoa-gia-toc-ta-vuc-day-the-gia",
+    "genre": "ngu-thu-tien-hoa",
+    "title": "Ngự Thú Thế Gia: Ta Vực Dậy Gia Tộc Suy Tàn",
+    "main_character": "Mộc Vân",
+    "mcOrigin": "native",
+    "premise": "Người thừa kế một gia tộc ngự thú đang lụi tàn quyết tâm vực dậy cơ nghiệp tổ tiên; bằng nhãn lực thiên phú và cách dưỡng thú độc đáo, anh thuần hóa những chiến thú bị xem là phế, gây dựng lại thanh danh thế gia.",
+    "nonCombat": false
+  },
+  {
+    "slug": "ngu-thu-tien-hoa-thuong-nhan-ta-buon-than-thu",
+    "genre": "ngu-thu-tien-hoa",
+    "title": "Ngự Thú Thương Nhân: Ta Buôn Bán Thần Thú",
+    "main_character": "Cố Bạch",
+    "mcOrigin": "system-bestowed",
+    "premise": "Một thương nhân ngự thú được ban đôi mắt giám định nhìn thấu tiềm năng ẩn giấu của muôn loài; anh thu mua những con thú bị coi là vô dụng với giá rẻ, bồi dưỡng thành thần thú và xây nên một thương hội ngự thú lừng danh.",
+    "nonCombat": false
+  },
+  {
+    "slug": "khoai-xuyen-ta-cuu-vot-nhung-phan-phai",
+    "genre": "khoai-xuyen",
+    "title": "Khoái Xuyên: Ta Cứu Vớt Những Phản Phái Bi Kịch",
+    "main_character": "Diệp Tiểu Tiểu",
+    "mcOrigin": "transmigrator",
+    "premise": "Ký chủ của một hệ thống xuyên không, mỗi thế giới cô nhập vai để cứu vớt những phản phái bị nguyên tác đẩy vào kết cục bi thảm; bằng sự thấu hiểu và tử tế, cô hóa giải oán niệm và viết lại số phận cho họ.",
+    "nonCombat": false
+  },
+  {
+    "slug": "khoai-xuyen-dai-nu-chu-ta-khong-lam-phoi-hop",
+    "genre": "khoai-xuyen",
+    "title": "Khoái Xuyên Đại Nữ Chủ: Ta Không Làm Nền Cho Ai",
+    "main_character": "Mạnh Tử Vi",
+    "mcOrigin": "transmigrator",
+    "premise": "Xuyên qua trăm ngàn thế giới với khí chất đại nữ chủ, cô từ chối làm nền cho bất kỳ ai; ở mỗi thế giới cô đường đường chính chính tỏa sáng bằng thực lực, lật đổ kẻ ngạo mạn và sống một cuộc đời rực rỡ của riêng mình.",
+    "nonCombat": false
+  },
+  {
+    "slug": "do-thi-nien-dai-ngu-thon-ta-lam-giau-tu-hai-san",
+    "genre": "do-thi",
+    "title": "Niên Đại Làng Chài: Ta Làm Giàu Từ Hải Sản",
+    "main_character": "Lâm Hải Sinh",
+    "mcOrigin": "reincarnated",
+    "premise": "Trọng sinh về một làng chài ven biển những năm tháng nghèo khó, Lâm Hải Sinh mang theo ký ức kiếp trước và khẩu vị của một người từng trải: anh biết những con tôm, cua, ốc, sò, sá sùng mà người làng chê vỏ nhiều ít thịt thật ra là đặc sản, biết cách làm hải sản chua cay, mắm, dầu hào và đồ khô đem vào thành phố bán cho người thành thị ưa chuộng, từ đó từng bước đưa cả gia đình đổi đời, ăn ngon mặc đẹp, làm giàu giữa thời gian khó.",
+    "nonCombat": true
+  },
+  {
+    "slug": "do-thi-nien-dai-son-thon-ta-buon-dac-san-nui-rung",
+    "genre": "do-thi",
+    "title": "Niên Đại Sơn Thôn: Ta Buôn Đặc Sản Núi Rừng",
+    "main_character": "Cố Thanh Sơn",
+    "mcOrigin": "reincarnated",
+    "premise": "Trọng sinh về một bản miền núi thời thiếu thốn, Cố Thanh Sơn mang theo ký ức kiếp trước biết rõ loại nấm, măng, rau rừng, mật ong, cá suối và dược liệu nào ăn được, loại nào quý giá, cùng cách sơ chế và bảo quản để mang xuống phố; anh biến những sản vật núi rừng bị xem thường thành đặc sản người thành thị tranh nhau mua, từng bước đưa gia đình và cả bản làng đổi đời.",
+    "nonCombat": true
+  },
+  {
+    "slug": "do-thi-nien-dai-dien-van-ta-nau-an-nuoi-ca-nha",
+    "genre": "do-thi",
+    "title": "Niên Đại Điền Văn: Ta Nấu Ăn Nuôi Cả Nhà",
+    "main_character": "Tô Noãn",
+    "mcOrigin": "reincarnated",
+    "premise": "Trọng sinh về một thị trấn nhỏ những năm tháng khó khăn, Tô Noãn mang theo ký ức và tay nghề đầu bếp của kiếp trước cùng tính khéo vun vén; cô biến những nguyên liệu rẻ tiền quê mùa bị chê thành món ngon khiến ai nếm cũng mê, mở một quán ăn nhỏ ấm cúng, từng bước đưa cả gia đình từ chỗ chạy ăn từng bữa tới ăn ngon mặc đẹp và sống một cuộc đời sung túc.",
+    "nonCombat": true
+  }
+]

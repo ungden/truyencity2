@@ -1,0 +1,26 @@
+{
+  "arc_number": 1,
+  "start_chapter": 1,
+  "end_chapter": 30,
+  "arc_theme": "Ván cờ mở màn — xuyên vào Lâm Vãn Tình và lật cái bẫy đầu tiên của nữ chính giả",
+  "plan_text": "Arc mở màn theo warm-baseline khoái xuyên: Tô Diệp ký hợp đồng và xuyên vào thân phận Lâm Vãn Tình ngay ch.1 (golden finger — hợp đồng Hệ Thống + lợi thế biết trước kịch bản — active tức thì, không để MC khổ sở kéo dài). Mỗi chương xoay quanh một nước cờ đấu trí cụ thể với ít nhất 2 cao điểm dopamine/chương (cao điểm đầu trước nửa chương). Cụm chương theo 5-cluster: ch.1-6 setup (ký hợp đồng, nhận nhiệm vụ một, nhập vai Lâm Vãn Tình bị tống về quê, nắm ký ức bề mặt + kịch bản, ổn định vị thế ban đầu); ch.7-14 breathing + competence (trở lại biệt thự Lâm gia, lấy lòng ông nội tỉnh táo, dùng học thức gây bất ngờ, dựng quan hệ với luật sư Trần Mục, hiểu rõ bố cục các phe); ch.15-22 confront (Tống Nhu tung cái bẫy vu oan quen thuộc — vụ chiếc vòng/ăn cắp — Tô Diệp biết trước nên lật ngược bằng camera và bằng chứng, vả mặt trước cả nhà); ch.23-28 big_wow (Tống Nhu leo thang dùng truyền thông/mạng xã hội bôi nhọ; Tô Diệp đảo chiều dư luận bằng sự thật, Điểm Tiếc Nuối nhảy vọt, rơi Thẻ Năng Lực đầu tiên); ch.29-30 resolution + hook (Tô Diệp đứng vững trong Lâm gia, manh mối giám định huyết thống lộ ra, đặt cánh cửa khóa bí ẩn ở Trạm + nghi vấn mẹ ruột Tống Nhu là chủ mưu, mở tuyến âm mưu lớn). Giữ nguyên tắc khoái xuyên: không lộ thân phận xuyên đến, không hại nam/nữ chính nguyên tác quá mức, mọi thắng lợi bằng trí tuệ và bằng chứng — đã tay nhưng không tàn độc.",
+  "chapter_briefs": [
+    { "n": 1, "beat": "setup", "goal": "Tô Diệp ký hợp đồng Hệ Thống và xuyên vào Lâm Vãn Tình trên chuyến tàu rời Giang Thành", "payoff": "Nhận nhiệm vụ một rõ ràng, nắm được ký ức bề mặt + một phần kịch bản, định thần và lập kế hoạch", "endingHook": "Giao diện hiện hạn chót nhiệm vụ và một dòng cảnh báo nếu thất bại" },
+    { "n": 3, "beat": "setup", "goal": "Lần đầu chạm mặt Tống Nhu và bà Lâm khi trở về biệt thự", "payoff": "Tô Diệp nhập vai trót lọt, lặng lẽ đọc bố cục các phe, không lộ", "endingHook": "Ông nội Lâm gia liếc nhìn cô bằng ánh mắt khác thường" },
+    { "n": 6, "beat": "breathing", "goal": "Lấy lòng ông nội tỉnh táo bằng học thức và sự điềm đạm", "payoff": "Giành được một đồng minh quyền lực đầu tiên trong nhà, vị thế nhích lên", "endingHook": "Tống Nhu bắt đầu cảm thấy 'chị gái giả' lần này khác lạ" },
+    { "n": 10, "beat": "breathing", "goal": "Bắt liên lạc với luật sư trẻ Trần Mục để chuẩn bị bằng chứng huyết thống", "payoff": "Có kênh pháp lý đáng tin, đặt nền cho cú lật cờ lớn", "endingHook": "Trần Mục tiết lộ hồ sơ bệnh viện năm xưa có điểm bất thường" },
+    { "n": 18, "beat": "confront", "goal": "Hóa giải cái bẫy vu oan ăn cắp chiếc vòng của Tống Nhu", "payoff": "Tô Diệp tung camera hành lang, lật ngược trước cả nhà, Tống Nhu bẽ mặt công khai", "endingHook": "Bà Lâm tức giận nhưng Tống Nhu đã lộ một sơ hở đầu tiên" },
+    { "n": 26, "beat": "big_wow", "goal": "Đối phó chiến dịch bôi nhọ trên mạng xã hội do Tống Nhu giật dây", "payoff": "Đảo chiều dư luận bằng sự thật, Điểm Tiếc Nuối nhảy vọt, rơi Thẻ Năng Lực đầu tiên", "endingHook": "Một tài khoản ẩn danh bất ngờ tung manh mối về vụ tráo đổi trẻ sơ sinh" },
+    { "n": 30, "beat": "resolution", "goal": "Khép arc 1 — Tô Diệp đứng vững trong Lâm gia và nắm thế chủ động", "payoff": "Kết quả giám định huyết thống được khởi động, danh phận đích nữ bắt đầu lung lay cán cân", "endingHook": "Về Trạm Trung Chuyển, Tô Diệp thấy cánh cửa thứ hai luôn khóa và nghi vấn mẹ ruột Tống Nhu là chủ mưu — tuyến âm mưu lớn mở ra" }
+  ],
+  "threads_to_advance": ["Giành lại danh phận đích nữ Lâm Vãn Tình", "Quan hệ đồng minh với ông nội và luật sư Trần Mục", "Làm chủ cơ chế Hệ Thống và Điểm Tiếc Nuối"],
+  "threads_to_resolve": ["Nguy cơ bị tống khỏi Lâm gia ngay từ đầu (giải quyết: đứng vững và nắm thế chủ động)"],
+  "new_threads": ["Âm mưu tráo đổi trẻ sơ sinh do mẹ ruột Tống Nhu chủ mưu", "Bí ẩn cánh cửa khóa thứ hai ở Trạm Trung Chuyển", "Bản chất thật của các pháo hôi 'lạc kịch bản'"],
+  "sub_arcs": [
+    { "name": "Ký hợp đồng và nhập vai", "chapterRange": "1-6", "cluster": "setup" },
+    { "name": "Dựng thế và đồng minh", "chapterRange": "7-14", "cluster": "breathing" },
+    { "name": "Lật bẫy vu oan", "chapterRange": "15-22", "cluster": "confront" },
+    { "name": "Đảo chiều dư luận", "chapterRange": "23-28", "cluster": "big_wow" },
+    { "name": "Nắm thế chủ động", "chapterRange": "29-30", "cluster": "resolution" }
+  ]
+}

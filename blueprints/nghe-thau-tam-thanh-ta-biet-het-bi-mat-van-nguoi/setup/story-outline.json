@@ -1,0 +1,117 @@
+{
+  "premise": "Trần Niệm, một nhân viên hành chính quèn ở thành phố Tân Hải, được Tâm Thanh Lục ban tặng khả năng nghe thấu tiếng lòng người khác. Anh dùng những bí mật nghe được để gỡ rối công sở, lật án oan, vạch trần kẻ giả dối, và từng bước vươn lên giữa một đô thị tu chân ẩn giấu — biến mỗi bí mật của vạn người thành một cơ hội đòi lại công bằng, chủ yếu bằng trí tuệ và điều tra chứ không bằng bạo lực.",
+  "mainConflict": "Một người vô danh nắm trong tay sự thật của vạn người đối đầu những thế lực quen che giấu: từ kẻ chèn ép nơi công sở, tán tu núp bóng khu phố, đến môn phái Hội Thanh Vân giữ luật giấu thân phận và tập đoàn tu chân Hằng Nguyên thâu tóm linh mạch. Xung đột leo thang từ cấp công sở/phường → giới tu chân ẩn → tranh đoạt linh mạch toàn thành → công đạo của cả hai thế giới; phần lớn giải quyết bằng điều tra, manh mối, pháp luật và đối thoại, combat chỉ bùng nổ tiết chế ở cao trào.",
+  "themes": [
+    "Sự thật cần dũng khí mới biến thành công lý",
+    "Người yếu thế xứng đáng có người đứng về phía mình",
+    "Thấu hiểu lòng người là sức mạnh, nhưng cũng là gánh nặng",
+    "Giữ lương tâm khi nắm quá nhiều bí mật của người khác"
+  ],
+  "majorPlotPoints": [
+    "Ch.1: Trần Niệm thức tỉnh Tâm Thanh Lục, lần đầu nghe tiếng lòng và gỡ một oan ức nhỏ nơi công sở.",
+    "Arc 1: lật một án oan ở phường nhờ tiếng lòng + bằng chứng thật, làm quen ông lang Tạ và biết tu chân tồn tại.",
+    "Arc 2-3: hợp tác bán chính thức với tổ điều tra cảnh sát, đụng độ Hội Thanh Vân về luật giấu thân phận.",
+    "Giữa truyện: tập đoàn Hằng Nguyên tranh đoạt linh mạch dưới sông, Trần Niệm bị cuốn vào và phản công bằng sự thật.",
+    "Cao trào cuối: hé lộ nguồn gốc dòng Thính Tâm Sư, khôi phục công đạo giới tu chân, Trần Niệm thành người phân xử được cả hai thế giới tin tưởng."
+  ],
+  "setupKernel": {
+    "readerFantasy": "Cảm giác sảng khoái khi một người vô danh, hiền lành bị xem thường bỗng nắm được sự thật mà ai cũng cố giấu — nghe đúng tim đen kẻ đạo đức giả rồi lật ngược thế cờ, gỡ oan cho người yếu thế, khiến kẻ tự cho mình thông minh phải há hốc khi bí mật bị phơi bày đúng lúc, công khai, mà không cần một cú đấm nào.",
+    "protagonistEngine": "Trần Niệm thắng nhờ khả năng nghe tiếng lòng + óc suy luận lắp ghép manh mối + lòng kiên nhẫn và trắc ẩn; tính cách điềm đạm, lì đòn, luôn biến thông tin nghe được thành bằng chứng và nước cờ hợp lý, không lạm dụng năng lực để hại người vô tội, không dùng bạo lực trừ khi bị dồn vào cao trào.",
+    "pleasureLoop": [
+      "Một người đang dối trá/giấu giếm xuất hiện → Trần Niệm nghe tiếng lòng để lộ sự thật → lật ngược tình thế trước mặt mọi người (face-slap nhẹ + công nhận).",
+      "Tâm Thanh Lục cộng Niệm Lực sau khi gỡ một nút thắt → mở khóa nghe rõ hơn/xa hơn/chống nhiễu → năng lực tiến một bước (breakthrough/harvest).",
+      "Kẻ có thế lực giăng bẫy/vu oan → Trần Niệm dùng manh mối nghe được phản đòn bằng điều tra và pháp luật → kẻ đó bẽ mặt công khai (face-slap có người chứng kiến).",
+      "Nghe được nỗi đau thật của một người yếu thế → gỡ oan hoặc cứu giúp họ → khoảnh khắc cảm động ấm áp và biết ơn (comfort/recognition).",
+      "Một vụ án/khủng hoảng được hóa giải nhờ sự thật → uy tín và quan hệ của Trần Niệm tăng vọt → cảm giác gặt hái cụ thể (reputation_success).",
+      "Một đồng minh hoặc tiền bối ẩn cư được Trần Niệm giúp/thuyết phục → mạng lưới của anh mạnh thêm, mở ra tầng thế giới mới (network_payoff)."
+    ],
+    "systemMechanic": {
+      "name": "Tâm Thanh Lục",
+      "input": "Ở gần một người trong tầm vài mét, giữ tâm tĩnh và chú ý vào họ; đám đông ồn ào hoặc người che bằng tâm pháp sẽ làm tiếng lòng vỡ vụn khó nghe.",
+      "output": "Một câu ý nghĩ thật trong lòng đối phương ngay lúc đó — chỉ là ý nghĩ bề mặt đang xảy ra, không phải toàn bộ ký ức hay tương lai.",
+      "limit": "Nghe lâu hoặc với người tâm cơ sâu khiến Trần Niệm đau đầu, chảy máu mũi; tu sĩ cấp cao có thể khóa tâm và đẩy thông tin giả; nghe được sự thật không đồng nghĩa chứng minh được nó — vẫn phải đi tìm bằng chứng thật và hành xử trong khuôn khổ pháp luật.",
+      "reward": "Tích Niệm Lực sau mỗi lần dùng tiếng lòng để gỡ nút thắt/lật án/cứu người, giúp nghe rõ hơn, xa hơn, chống nhiễu tốt hơn và dần hé lộ nguồn gốc dòng Thính Tâm Sư."
+    },
+    "mcOrigin": "system-bestowed",
+    "originLockNote": "Trần Niệm là người Tân Hải bản địa năm 2024, một nhân viên hành chính bình thường được Tâm Thanh Lục lựa chọn và ban tặng khả năng nghe tiếng lòng; mọi năng lực vượt trội đều do golden finger in-world (di sản dòng Thính Tâm Sư) trao tặng và do anh tự rèn luyện mà có.",
+    "mcSecret": {
+      "secret": "Trần Niệm nghe được tiếng lòng của người khác và sở hữu Tâm Thanh Lục vô hình, nguồn gốc khả năng này không phải do anh tự có từ đầu.",
+      "outsideWorldKnowledge": "Tâm Thanh Lục tự xưng là di sản của dòng Thính Tâm Sư — những người từng dùng khả năng nghe lòng để phân xử công đạo trong giới tu chân, nay đã thất truyền; kho tri thức của nó vượt xa hiểu biết hiện tại nhưng vẫn nằm trong khuôn khổ thế giới tu chân ẩn giấu của Tân Hải.",
+      "revealRule": "Giữ kín hoàn toàn ở Phase 1-2; chỉ hé lộ một phần cho vài đồng minh thân tín như ông lang Tạ khi quan hệ đủ vững; reveal nguồn gốc dòng Thính Tâm Sư ở cao trào cuối truyện.",
+      "coverStory": "Anh nói mình chỉ là người tinh ý, giỏi quan sát nét mặt và có trực giác tốt, may mắn đoán trúng lòng người."
+    },
+    "benefitLoop": {
+      "goal": "Biến mỗi bí mật nghe được thành một lần đòi lại công bằng cho người yếu thế và một bước vươn lên uy tín của Trần Niệm.",
+      "action": "Nghe tiếng lòng để nắm sự thật, đi tìm bằng chứng thật, lắp ghép manh mối và đưa kẻ giả dối/án oan ra ánh sáng bằng cách hợp pháp và khôn ngoan.",
+      "benefit": "Niệm Lực tăng + năng lực nghe mạnh thêm + uy tín, quan hệ và nguồn lực mở rộng cho bước kế tiếp.",
+      "cadence": "Mỗi 1-2 chương có ít nhất một vòng gỡ-rối-được-thưởng; mỗi 3-5 chương một bước nhảy lớn (lật một án quan trọng, mở khóa năng lực, có thêm đồng minh mạnh)."
+    },
+    "interventionRule": "Trần Niệm chỉ ra tay can thiệp khi (a) một người yếu thế bị oan/bị hại mà anh có thể giúp bằng sự thật và manh mối, hoặc (b) rắc rối đe dọa trực tiếp anh, đồng minh hay người thân; anh không đi nghe lén chuyện riêng tư vô cớ, không lạm dụng năng lực để trục lợi cá nhân, và luôn ưu tiên giải quyết bằng điều tra, đối thoại, pháp luật — bạo lực chỉ là lựa chọn cuối khi bị dồn vào cao trào.",
+    "phase1Playground": {
+      "locations": [
+        "Phòng hành chính tầng 4 tòa nhà văn phòng Liên Thành",
+        "Khu phố cũ Bến Nghé: quán cà phê vợt, tiệm cầm đồ, đồn công an phường",
+        "Nhà thuốc bắc của ông lang Tạ",
+        "Tầng hầm 'tiệm trà' Liên Thành — trạm trung chuyển của giới tu chân"
+      ],
+      "cast": [
+        "Trần Niệm (nhân viên hành chính, MC)",
+        "Ông lang Tạ (thầy thuốc bắc, thật ra là tu sĩ dưỡng thần ẩn cư, tiền bối dẫn đường)",
+        "Phó Đạt (quản lý phòng hành chính chèn ép Trần Niệm, đối thủ local)",
+        "Lâm Tịch (nữ điều tra viên trẻ ở đồn phường, đồng minh dần thành tri kỷ)",
+        "Bà chủ tiệm cầm đồ (vỏ bọc của một tán tu núp bóng khu phố)"
+      ],
+      "resources": [
+        "Khả năng nghe tiếng lòng qua Tâm Thanh Lục + óc suy luận",
+        "Vị trí nhân viên hành chính tiếp xúc nhiều người và hồ sơ",
+        "Quan hệ chớm nở với ông lang Tạ và điều tra viên Lâm Tịch",
+        "Sự vô hại bề ngoài khiến không ai đề phòng anh"
+      ],
+      "localAntagonists": [
+        "Phó Đạt — quản lý chèn ép, vu oan và giành công của Trần Niệm",
+        "Tán tu núp bóng tiệm cầm đồ — cho vay nặng lãi, dùng tà thuật nhẹ ức hiếp dân phố"
+      ],
+      "repeatableSceneTypes": [
+        "Một người dối trá/giấu giếm bị Trần Niệm nghe thấu tiếng lòng và lật ngược",
+        "Lần theo manh mối nghe được để tìm bằng chứng thật và gỡ một án oan",
+        "Đối thủ giăng bẫy và Trần Niệm phản đòn bằng điều tra/pháp luật",
+        "Mở khóa hoặc rèn thêm năng lực nghe từ Tâm Thanh Lục và áp dụng ngay",
+        "Xây dựng quan hệ với tiền bối ẩn cư, đồng nghiệp, hàng xóm và đồng minh"
+      ]
+    },
+    "socialReactor": {
+      "witnesses": [
+        "Đồng nghiệp công sở và cấp trên ở tòa Liên Thành",
+        "Dân khu phố Bến Nghé và những người được gỡ oan",
+        "Tổ điều tra cảnh sát phường và giới luật sư",
+        "Các tu sĩ ẩn cư quan sát hành động của Trần Niệm"
+      ],
+      "reactionModes": [
+        "Lời đồn về một nhân viên 'đoán trúng lòng người' lan trong công sở",
+        "Người được gỡ oan biết ơn và giới thiệu người khác tìm đến nhờ vả",
+        "Cảnh sát/luật sư bắt đầu coi trọng manh mối của Trần Niệm",
+        "Giới tu chân ẩn cư dần để mắt và đánh giá lại anh"
+      ],
+      "reportBackCadence": "Phản hồi tức thì tại hiện trường mỗi chương; làn sóng dư luận/đồn đại và sự chú ý của các thế lực lớn dồn lại mỗi 3-5 chương sau một vụ lớn."
+    },
+    "noveltyLadder": [
+      { "chapterRange": "1-100", "newToy": "Tâm Thanh Lục thức tỉnh, gỡ rối công sở và lật án oan nhỏ ở phường", "keepsSameLane": "Vẫn là một người dùng tiếng lòng để đòi công bằng trong đô thị" },
+      { "chapterRange": "100-300", "newToy": "Hợp tác với tổ điều tra cảnh sát và bước vào giới tu chân ẩn", "keepsSameLane": "Vẫn là điều tra-gỡ rối, chỉ mở rộng sang tầng tu chân" },
+      { "chapterRange": "300-600", "newToy": "Đối đầu tập đoàn Hằng Nguyên tranh đoạt linh mạch toàn thành", "keepsSameLane": "Vẫn dùng sự thật và manh mối làm vũ khí, quy mô lớn hơn" },
+      { "chapterRange": "600-1000", "newToy": "Truy nguồn gốc dòng Thính Tâm Sư và khôi phục công đạo hai thế giới", "keepsSameLane": "Vẫn là hành trình phân xử công đạo bằng năng lực nghe lòng" }
+    ],
+    "controlRules": {
+      "payoffCadence": "Tối thiểu 2 cao điểm dopamine mỗi chương, cao điểm đầu trước nửa chương; setup không quá 30% và phải có payoff trong cùng hoặc chương kế.",
+      "attentionGradient": "Mở chương bằng một móc câu cơ hội hoặc một bí ẩn/manh mối cụ thể; đóng chương bằng một cliffhanger nhẹ hoặc một sự thật vừa lộ ra mở đường cho nước cờ mới.",
+      "openThreadsPerArc": 3,
+      "closeThreadsPerArc": 2
+    },
+    "patternCards": [
+      "warm-baseline-opening",
+      "competence-led-growth",
+      "mass-witnessed-face-slap",
+      "underdog-justice",
+      "truth-beats-deception"
+    ]
+  }
+}

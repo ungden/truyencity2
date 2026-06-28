@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "totalScore": 124,
+  "avgScore": 8.86,
+  "minDimScore": 8,
+  "source": "claude_code",
+  "dimensions": [
+    { "name": "Premise & hook", "score": 9, "note": "Warm-baseline kỹ thuật với hook cơ hội rõ ràng từ ch.1; golden finger active ngay, không khổ-mở-đầu kéo dài." },
+    { "name": "Protagonist engine", "score": 9, "note": "Lục Thần có động cơ rõ (tay nghề kỹ sư + tư duy hệ thống + tầm nhìn nâng văn minh), tính cách nhất quán, lì và tử tế." },
+    { "name": "System mechanic", "score": 9, "note": "Hệ Thống Văn Minh là cây kỹ thuật có input/output/limit/reward + anti-plot-armor; không tự chế hộ, đòi vật liệu và đội ngũ thật." },
+    { "name": "Conflict ladder", "score": 9, "note": "Leo thang xưởng → công nghiệp hành tinh → liên hành tinh → liên sao; cạnh tranh kỹ thuật chuyển dần sang phòng vệ văn minh, combat hợp lý." },
+    { "name": "World coherence", "score": 9, "note": "Vũ trụ nguyên bản, bậc công nghệ/kinh tế/nguồn cung/địa lý nhất quán theo 4 phase, forbidden elements rõ." },
+    { "name": "Dopamine cadence", "score": 9, "note": "controlRules ≥2 peak/chương, face-slap bằng công nghệ vượt trội có người chứng kiến, khoảnh khắc thiên tài tỏa sáng." },
+    { "name": "Origin lock", "score": 9, "note": "mcOrigin=system-bestowed khóa chặt; MC là kỹ sư bản địa Thương Khung, không có token nguồn-gốc-khác hay đời-trước trong bất kỳ file nào." },
+    { "name": "Combat guardrail", "score": 8, "note": "Genre khoa-huyen cho phép combat liên sao, nhưng vũ khí cốt lõi của MC luôn là trí tuệ kiến tạo, không phải sức mạnh cá nhân siêu nhiên." },
+    { "name": "Foreshadowing & twists", "score": 8, "note": "3 tuyến cài cắm dài hạn (Mặc Hàn, Liên Minh Văn Minh Cổ, lão Cát) có plant/payoff chapter cụ thể." },
+    { "name": "Long-form sustainability", "score": 9, "note": "noveltyLadder 4 nấc giữ cùng lane kỹ sư-kiến tạo, 7 volume cho 1000 chương, endgame bậc tinh vân + di sản văn minh cổ." },
+    { "name": "Vietnamese voice", "score": 8, "note": "Voice anchors tự nhiên, hào hùng đúng giọng sảng văn kỹ thuật, đủ diacritics, không AI-tell." }
+  ],
+  "overallFeedback": "Setup vững: warm-baseline opening, golden finger là cây kỹ thuật văn minh có giới hạn rõ, conflict ladder leo thang sạch sẽ từ xưởng cơ khí tới văn minh tinh vân qua 7 volume, origin lock chặt (kỹ sư bản địa, không nguồn gốc ngoài), dopamine cadence và foreshadowing đều có cấu trúc. Combat liên sao được phép nhưng vũ khí cốt lõi của MC là trí tuệ kiến tạo. Sẵn sàng cho DeepSeek V4 Pro viết chương. PASS."
+}

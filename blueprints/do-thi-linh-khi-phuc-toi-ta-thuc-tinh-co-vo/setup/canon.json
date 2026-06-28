@@ -1,0 +1,197 @@
+{
+  "power_system": {
+    "name": "Truyền Thừa Cổ Võ Huyết Mạch — Con Đường Tu Hành Thất Truyền",
+    "type": "cultivation progression (tiến trình tu hành cổ võ qua các cảnh giới, dựa trên hấp thụ linh khí và tôi luyện thân thể)",
+    "coreResource": "Linh khí hấp thụ từ thiên địa, sức bền gân cốt, độ thông kinh mạch và lượng linh khí ngưng tụ trong đan điền của Lý Trường Canh — đều hữu hạn, đòi hỏi khổ luyện và tài nguyên (lõi dị thú, linh dược) để tích lũy.",
+    "unlockRule": "Lý Trường Canh thăng cảnh giới không nhờ ban tặng mà nhờ khổ luyện theo con đường truyền thừa chỉ ra: Luyện Thể (tôi gân cốt, dẫn linh khí vào thân), Khai Mạch (khơi thông kinh mạch), Ngưng Khí (tụ linh khí thành đan điền, phát kình), Hóa Cương (ngưng nội lực thành cương khí hộ thân), rồi các cảnh giới cao hơn dần hé lộ khi linh khí ngày một dày.",
+    "antiPlotArmor": [
+      "Truyền thừa CHỈ chỉ con đường đúng — KHÔNG tự nâng cảnh giới, KHÔNG ban sức mạnh miễn phí; mỗi tầng vẫn đòi mồ hôi, gân cốt rách nát và thời gian khổ luyện thật.",
+      "Nóng vội đốt cháy giai đoạn dẫn tới tẩu hỏa nhập ma, thương tổn kinh mạch thật, có khi tụt cảnh giới hoặc tàn phế.",
+      "Thiếu linh khí, thiếu tài nguyên (lõi dị thú, linh dược) thì tốc độ tu hành chậm lại; truyền thừa không thay thế được tài nguyên thực tế.",
+      "Mọi đột phá đều phải đổi bằng rủi ro thật: đối đầu dị thú mạnh hơn, mạo hiểm thân phận lộ ra, có thể trọng thương hoặc chết nếu tính sai."
+    ],
+    "signatureBuff": {
+      "name": "Cổ Quyền Phá Cương",
+      "effect": "Một bộ công pháp cương mãnh trong truyền thừa cho phép Lý Trường Canh dồn linh khí thành một kình đạo xuyên phá, đánh vỡ phòng ngự của đối thủ cùng cảnh hoặc cao hơn nửa bậc trong khoảnh khắc bộc phát.",
+      "limit": "Tiêu hao linh khí cực lớn, chỉ dùng được số ít lần trước khi cạn kiệt; vô dụng nếu thân thể chưa đủ tôi luyện để chịu phản chấn, và để lộ thực lực nếu dùng nơi đông người."
+    },
+    "progressionAxes": [
+      "Cảnh giới tu hành (Luyện Thể → Khai Mạch → Ngưng Khí → Hóa Cương → cao hơn)",
+      "Độ thuần thục công pháp truyền thừa (mới ngộ → vận dụng thành thục → tự biến hóa)",
+      "Tài nguyên và nền tảng (lõi dị thú, linh dược, bí cảnh khai phá được)",
+      "Tầm ảnh hưởng và thân phận (giấu mình giữa người thường → có tiếng trong giới cổ võ → cường giả trấn giữ một phương)"
+    ],
+    "powerCeilingByPhase": {
+      "phase1": "Hoàn tất Luyện Thể, nắm vững truyền thừa, đủ sức bảo vệ người thân trong hỗn loạn buổi đầu",
+      "phase2": "Đột phá Khai Mạch rồi Ngưng Khí, thành tay săn dị thú có tiếng, thắng các thiên tài cùng lứa",
+      "phase3": "Đột phá Hóa Cương, phá vây cường giả, bảo vệ truyền thừa trước các gia tộc cổ xưa",
+      "phase4": "Trở thành cường giả trấn giữ một phương, đối mặt cội nguồn biến cố linh khí phục tô"
+    }
+  },
+  "worldbuilding": {
+    "tone": "Huyền huyễn đô thị nhiệt huyết và sảng khoái: thực chiến cổ võ cương mãnh mãn nhãn, đột phá cảnh giới đầy phấn khích, vả mặt kẻ kiêu ngạo ỷ mạnh, cảm giác vươn lên từ vô danh thành cường giả — pha trộn nhịp sống đô thị hiện đại và võ đạo của kỷ nguyên mới.",
+    "economy": "Kinh tế đô thị hiện đại đang biến chuyển: tiền tệ thông thường vẫn lưu hành nhưng linh thạch, lõi dị thú và linh dược trở thành tài nguyên giá trị; Võ Quán, Cục Dị Năng và tập đoàn tư nhân tranh giành nguồn cung linh khí và truyền thừa.",
+    "setting": "Một đô thị Việt Nam hiện đại năm 2024 vào đêm Linh Khí Phục Tô — năng lượng huyền bí đột ngột hồi quy. Cây cối lớn nhanh bất thường, vài người bỗng có sức phi phàm, dị thú biến dị xuất hiện, bí cảnh cổ xưa hé mở; trật tự cũ sụp đổ, kỷ nguyên cổ võ mở màn.",
+    "geography": {
+      "phase1": "Khu phố và gia đình Lý Trường Canh, các điểm phục tô dị tượng quanh thành phố",
+      "phase2": "Các Võ Quán và môn phái cổ võ mới nổi trong thành phố",
+      "phase3": "Vùng dị thú biến dị tràn ra, các bí cảnh cổ xưa và lãnh địa gia tộc",
+      "phase4": "Ngoài thành phố, các vùng phục tô khác và cội nguồn của biến cố linh khí"
+    },
+    "techLevel": "Hiện đại 2024 đan xen cổ võ: điện thoại, mạng xã hội, quân đội và chính phủ vẫn vận hành, nhưng dần bất lực trước linh khí; công nghệ cố thích nghi (Cục Dị Năng dùng thiết bị đo linh khí) trong khi sức mạnh cá nhân nghiêng về tu hành.",
+    "conflictMedium": "Thực chiến cổ võ cương mãnh: đấm, đá, thân pháp, ngạnh công được nâng tầm bằng linh khí; săn dị thú, đối đầu cường giả các phe, tranh đoạt truyền thừa và bí cảnh — võ đạo thực chiến chứ không phải phép thuật bay lượn hoang đường.",
+    "forbiddenElements": [
+      "phép thuật bay lượn hoang đường, bắn chưởng kiểu tiên hiệp xa rời võ đạo cương mãnh",
+      "xuyên không / xuyên việt / đến từ một nơi khác",
+      "kiếp trước / đầu thai / chuyển kiếp / ký ức từ đời trước",
+      "truyền thừa tự động nâng cảnh giới hoặc ban sức mạnh miễn phí cho MC",
+      "công nghệ súng đạn hiện đại đè bẹp hoàn toàn cổ võ khiến tu hành vô nghĩa"
+    ]
+  },
+  "factions": [
+    {
+      "name": "Lý Trường Canh và những người thân tín",
+      "type": "phe nhân vật chính",
+      "power_level": 3,
+      "summary": "Lý Trường Canh cùng em gái Lý Tiểu Vân và một số bằng hữu tin cậy; khởi đầu giấu mình giữa người thường, dựa vào truyền thừa cổ võ và khổ luyện âm thầm để vươn lên.",
+      "territory": "Khu phố và gia đình ban đầu, mở rộng dần thành một vùng do anh trấn giữ",
+      "mc_relation": "MC là trung tâm và trụ cột bảo vệ",
+      "conflicts": ["Gia tộc cổ xưa muốn cướp truyền thừa", "Kẻ ỷ mạnh hiếp yếu"],
+      "alliances": ["Một số đồng minh trong Võ Quán và Cục Dị Năng"],
+      "importance": 10,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Cục Dị Năng",
+      "type": "cơ quan chính phủ quản lý cường giả",
+      "power_level": 7,
+      "summary": "Tổ chức chính phủ lập ra để quản lý cường giả, điều tra dị tượng phục tô và phòng vệ dị thú; vừa muốn chiêu mộ vừa muốn kiểm soát những người thức tỉnh, là con dao hai lưỡi với Lý Trường Canh.",
+      "territory": "Các trụ sở và vùng phòng vệ trong thành phố",
+      "mc_relation": "Vừa hợp tác vừa cảnh giác, MC giấu thực lực trước họ",
+      "conflicts": ["Dị thú biến dị", "Các thế lực muốn độc chiếm linh khí"],
+      "alliances": ["Quân đội và chính phủ"],
+      "importance": 8,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Các Võ Quán và môn phái cổ võ tái sinh",
+      "type": "thế lực tu hành mới nổi",
+      "power_level": 6,
+      "summary": "Những Võ Quán và môn phái mọc lên sau phục tô, tranh giành truyền thừa và đệ tử tài năng; trong đó có cả người chính trực lẫn kẻ kiêu ngạo ỷ tài hiếp người mà Lý Trường Canh sẽ đối đầu.",
+      "territory": "Các đạo trường và cứ điểm tu hành rải rác trong thành phố",
+      "mc_relation": "MC gia nhập một Võ Quán làm vỏ bọc, đối đầu kẻ kiêu ngạo",
+      "conflicts": ["Tranh đoạt đệ tử và truyền thừa với nhau"],
+      "alliances": ["Một số liên minh lỏng lẻo với Cục Dị Năng"],
+      "importance": 7,
+      "introduce_arc": 2
+    },
+    {
+      "name": "Các gia tộc cổ xưa nắm truyền thừa",
+      "type": "thế lực cổ xưa phản diện",
+      "power_level": 9,
+      "summary": "Những gia tộc từng nắm truyền thừa cổ võ thức tỉnh trở lại sau phục tô; nhận ra giá trị truyền thừa huyết mạch của Lý Trường Canh và tìm cách cướp đoạt hoặc thu phục anh.",
+      "territory": "Các lãnh địa và cứ điểm cổ xưa, sau lan ra ngoài thành phố",
+      "mc_relation": "Đối thủ chính giai đoạn giữa và cuối",
+      "conflicts": ["Lý Trường Canh và phe trung thành"],
+      "alliances": ["Một số thế lực muốn độc chiếm linh khí"],
+      "importance": 9,
+      "introduce_arc": 4
+    }
+  ],
+  "plot_twists": [
+    {
+      "summary": "Truyền thừa cổ võ trong huyết mạch Lý Trường Canh không phải di sản ngẫu nhiên — tổ tiên anh từng là người canh giữ một bí mật liên quan trực tiếp tới lý do linh khí phục tô vào đúng thời khắc này.",
+      "payoff_type": "nguồn gốc ẩn giấu",
+      "setup_chapters": [60, 680],
+      "twist_chapter": 900,
+      "reader_impact": "major",
+      "arc_number": 7
+    },
+    {
+      "summary": "Gia tộc cổ xưa truy lùng truyền thừa của Lý Trường Canh thật ra đã đánh mất chính mạch truyền thừa ấy từ đời trước; họ không muốn 'thu hồi' mà sợ anh thức tỉnh một sự thật chôn giấu về tội lỗi của họ.",
+      "payoff_type": "âm mưu che giấu quá khứ",
+      "setup_chapters": [440, 520],
+      "twist_chapter": 560,
+      "reader_impact": "major",
+      "arc_number": 4
+    },
+    {
+      "summary": "Dị thú thủ lĩnh mà Lý Trường Canh săn để lấy lõi linh khí hóa ra giữ trong cơ thể một mảnh manh mối cổ xưa, chỉ ra rằng dị thú biến dị và truyền thừa cùng bắt nguồn từ một biến cố duy nhất.",
+      "payoff_type": "manh mối liên kết",
+      "setup_chapters": [400, 420],
+      "twist_chapter": 430,
+      "reader_impact": "moderate",
+      "arc_number": 3
+    }
+  ],
+  "themes": [
+    {
+      "name": "Khổ luyện thật mới có sức mạnh thật",
+      "type": "main",
+      "description": "Truyền thừa chỉ cho con đường, còn từng bước trên đó là mồ hôi và máu; không có sức mạnh nào đến miễn phí, nóng vội là tự hủy.",
+      "motifs": ["đêm dài luyện công đến kiệt sức", "gân cốt rách rồi lành lại cứng cáp hơn", "kiềm chế không đốt cháy giai đoạn"],
+      "importance": 10
+    },
+    {
+      "name": "Giấu mình mà vươn lên",
+      "type": "main",
+      "description": "Trong thế giới cường giả bị săn lùng, khôn ngoan là vừa ẩn mình giữa người thường vừa âm thầm bước đi xa nhất trên con đường võ đạo.",
+      "motifs": ["ban ngày thanh niên bình dị, ban đêm khổ luyện", "giả vờ tư chất tầm thường", "ra tay rồi rút lui kín đáo"],
+      "importance": 9
+    },
+    {
+      "name": "Bảo vệ người mình thương",
+      "type": "supporting",
+      "description": "Động lực sâu xa của Lý Trường Canh không phải tham vọng bá quyền mà là che chở gia đình và những người yếu thế trước hỗn loạn của kỷ nguyên mới.",
+      "motifs": ["ra tay lần đầu để cứu người thân", "đặt em gái và gia đình lên trên danh lợi"],
+      "importance": 8
+    },
+    {
+      "name": "Truy tìm cội nguồn của biến cố",
+      "type": "supporting",
+      "description": "Câu hỏi vì sao linh khí phục tô và truyền thừa đến từ đâu kéo Lý Trường Canh đi từ một thanh niên giấu mình tới người định đoạt hướng đi của cả kỷ nguyên.",
+      "motifs": ["một manh mối tổ tiên hé lộ", "dấu vết cổ xưa trong bí cảnh"],
+      "importance": 8
+    }
+  ],
+  "voice_anchors": [
+    {
+      "snippet_type": "opening",
+      "prose_text": "Đêm ấy cả thành phố ngẩng đầu nhìn bầu trời đổi sắc. Lý Trường Canh tỉnh giấc giữa cơn đau buốt chạy dọc sống lưng, mồ hôi ướt đẫm áo. Trong đầu anh, một dòng chữ cổ xưa hiện lên rõ ràng như khắc vào xương — không phải giấc mơ mơ hồ như người ta vẫn kể, mà là một con đường. Anh ngồi dậy, đặt tay lên ngực, cảm nhận thứ năng lượng lạ lẫm đang chảy chậm rãi trong gân cốt. Bên ngoài cửa sổ, một cái cây trong sân lớn nhanh trông thấy, cành vươn ra chạm khung kính. Lý Trường Canh hít một hơi sâu, ép cơn hoảng loạn xuống. Đầu tiên là dẫn khí. Anh nhắm mắt, làm theo từng bước mà truyền thừa chỉ ra.",
+      "key_traits": ["điềm tĩnh trong hỗn loạn", "kiên định", "cảm nhận tinh tế", "tuân thủ kỷ luật tu hành"]
+    },
+    {
+      "snippet_type": "dialogue",
+      "prose_text": "— Tư chất tầm thường thế này mà cũng đòi bái sư? Gã đệ tử áo gấm nhìn Lý Trường Canh từ đầu đến chân, khóe miệng nhếch lên khinh miệt. Ở Võ Quán này, hạng như cậu chỉ xứng quét sân. Lý Trường Canh không đáp ngay. Anh cúi xuống nhặt cây gậy gỗ luyện tập dưới đất, phủi bụi, giọng vẫn bình thản. — Anh nói phải, tôi tư chất tầm thường. Anh ngẩng lên, ánh mắt phẳng lặng. Nhưng nếu anh muốn, chúng ta cứ ra sân tỉ thí một lần. Tôi quét sân hay anh quét sân, để cây gậy này nói.",
+      "key_traits": ["nhẫn nhịn có giới hạn", "giấu thực lực", "tự tin lạnh lùng", "lấy hành động đáp khiêu khích"]
+    },
+    {
+      "snippet_type": "action",
+      "prose_text": "Con dị thú lao tới, móng vuốt xé gió. Lý Trường Canh không lùi. Anh trầm hông, dồn linh khí xuống đan điền rồi bộc phát lên cánh tay phải trong một nhịp thở. Cổ Quyền Phá Cương. Nắm đấm của anh va vào lớp da thép của con thú, một tiếng nổ trầm vang lên, kình đạo xuyên thẳng qua lớp phòng ngự, đánh con thú văng ngược ra sau, đập vào bức tường bê tông nứt toác. Lý Trường Canh đứng thẳng, cánh tay phải tê dại vì phản chấn, hơi thở nặng nề. Anh biết mình chỉ còn đủ linh khí cho một đòn như vậy nữa. Phải kết thúc nhanh.",
+      "key_traits": ["thực chiến cương mãnh", "tính toán tài nguyên", "gan lì", "ý thức giới hạn bản thân"]
+    }
+  ],
+  "foreshadowing": [
+    {
+      "hintText": "Dòng chữ cổ xưa trong truyền thừa có một đoạn Lý Trường Canh chưa giải mã được, như thể bị cố ý phong ấn, chỉ hé mở dần theo cảnh giới.",
+      "category": "object",
+      "plantCh": 12,
+      "pickupCh": 900,
+      "payoffDescription": "Đoạn phong ấn đó là chìa khóa hé lộ tổ tiên anh từng canh giữ bí mật về lý do linh khí phục tô, dẫn anh về tận cội nguồn biến cố."
+    },
+    {
+      "hintText": "Một trưởng lão gia tộc cổ xưa khi nhìn thấy chiêu thức của Lý Trường Canh đã biến sắc và vội rút lui thay vì cướp đoạt như dự tính.",
+      "category": "character_behavior",
+      "plantCh": 470,
+      "pickupCh": 560,
+      "payoffDescription": "Gia tộc ấy đã đánh mất chính mạch truyền thừa này từ đời trước và sợ anh thức tỉnh sự thật về tội lỗi họ chôn giấu."
+    },
+    {
+      "hintText": "Lõi linh khí lấy từ con dị thú thủ lĩnh phát ra một dao động kỳ lạ cộng hưởng với truyền thừa trong huyết mạch Lý Trường Canh.",
+      "category": "object",
+      "plantCh": 410,
+      "pickupCh": 690,
+      "payoffDescription": "Dao động ấy chứng tỏ dị thú biến dị và truyền thừa cùng bắt nguồn từ một biến cố duy nhất, là manh mối đầu tiên về nguồn gốc phục tô."
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "totalScore": 125,
+  "avgScore": 9.0,
+  "minDimScore": 8,
+  "source": "claude_code",
+  "dimensions": [
+    { "name": "Premise & hook", "score": 9, "note": "Warm-baseline ngôn tình nghề nghiệp với hook cơ hội rõ ràng từ ch.1; golden finger active ngay, không kéo dài khổ-mở-đầu dù MC bị đổ oan." },
+    { "name": "Protagonist engine", "score": 9, "note": "Hạ Vy có động cơ rõ (tài năng + thấu cảm + bản lĩnh nghề), tính cách nhất quán, ấm áp và kiên cường, không chơi bẩn." },
+    { "name": "System mechanic", "score": 9, "note": "Hệ Thống Nữ Chính là mô hình tài năng-danh tiếng có input/output/limit/reward + anti-plot-armor; không tự may hộ." },
+    { "name": "Conflict ladder", "score": 9, "note": "Leo thang studio → ngành thành phố → toàn quốc → quốc tế, tất cả non-combat qua cạnh tranh nghề/cuộc thi/truyền thông/pháp lý." },
+    { "name": "World coherence", "score": 9, "note": "Sài Gòn 2024 đời thực ngành thời trang, kinh tế/nguồn cung/truyền thông nhất quán, forbidden elements rõ." },
+    { "name": "Dopamine cadence", "score": 9, "note": "controlRules ≥2 peak/chương, recognition có người chứng kiến, buff Đồng Cảm cảm động, tuyến tình cảm slow-burn xen kẽ." },
+    { "name": "Origin lock", "score": 10, "note": "mcOrigin=system-bestowed khóa chặt; framing 'thoát vai nữ phụ' là tự viết lại đời mình; outlines sạch hoàn toàn các token nguồn-gốc-ngoài-đời-thực dù trong negation, MC luôn là cô gái bản địa được Hệ Thống chọn." },
+    { "name": "Non-combat guardrail", "score": 9, "note": "Genre ngôn tình non-combat; mọi xung đột giải quyết bằng cảm xúc/nghề/cuộc thi/truyền thông/pháp lý; forbidden elements liệt kê rõ ẩu đả/giang hồ/giải đấu đối kháng." },
+    { "name": "Foreshadowing & twists", "score": 8, "note": "4 tuyến cài cắm dài hạn (Tống Mỹ Kỳ, Hội Nghệ Nhân, bà Tâm, duyên Lục Trạch Viễn) có plant/payoff chapter cụ thể." },
+    { "name": "Long-form sustainability", "score": 9, "note": "noveltyLadder 4 nấc giữ cùng lane nghề + tình cảm, 7 volume cho 1000 chương, endgame phục dựng Hội và tình yêu trọn vẹn." },
+    { "name": "Vietnamese voice", "score": 8, "note": "Voice anchors ấm áp, nữ tính, lãng mạn tinh tế, đủ diacritics, không AI-tell, đúng giọng ngôn tình Việt." }
+  ],
+  "overallFeedback": "Setup vững: warm-baseline opening, golden finger là mô hình tài năng-danh tiếng có giới hạn rõ, conflict ladder ngôn tình non-combat leo thang sạch sẽ qua 7 volume, origin lock chặt (system-bestowed, MC là cô gái bản địa được Hệ Thống chọn), tuyến tình cảm slow-burn ngang hàng, dopamine cadence và foreshadowing đều có cấu trúc. Sẵn sàng cho DeepSeek V4 Pro viết chương. PASS."
+}

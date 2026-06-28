@@ -1,0 +1,100 @@
+{
+  "title": "Thần Bộ Khoái: Ta Phá Án Chấn Động Giang Hồ",
+  "totalChapters": 1000,
+  "mainPlotline": "Tống Từ, một bộ khoái trẻ tuổi bản địa của giang hồ với tài quan sát và suy lý hơn người cùng võ công đủ tự vệ, dấn thân vào hết vụ án mạng kỳ bí này tới vụ án khác; mỗi vụ án anh phá được lại hé lộ một sợi dây của một tổ chức giấu mặt thao túng cả chính đạo lẫn hắc đạo, dẫn anh từ những án mạng lẻ tẻ trong khách điếm tới một bàn cờ lớn dính líu chính cái chết bí ẩn của sư phụ anh năm xưa; anh phá án bằng nghiệm thi, nghiệm tích, đối chiếu khẩu cung và suy lý, dùng võ chỉ khi buộc phải, từng bước trở thành Thần Bộ Khoái danh chấn võ lâm và giành lại công lý bằng cả trí lẫn kiếm.",
+  "originLock": "native — Tống Từ là người bản địa sinh ra và lớn lên trong chính giang hồ này, là bộ khoái được sư phụ truyền nghề tra án và võ công tại chỗ; anh không đến từ thế giới khác, không mang ký ức kiếp nào khác, mọi năng lực đều do anh khổ luyện và bẩm sinh trong thế giới truyện.",
+  "volumes": [
+    {
+      "volume": 1,
+      "title": "Án Phòng Kín Khách Điếm",
+      "chapterRange": "1-140",
+      "theme": "Khẳng định danh tiếng — vụ án phòng kín đầu tiên và phương pháp tra án của Tống Từ",
+      "summary": "Tống Từ được mời tới phá vụ một cao thủ chết trong phòng cài then từ bên trong. Anh phô diễn tài nghiệm thi, đọc hiện trường và suy lý, vạch trần thủ đoạn gây án; vụ này gắn anh với nha môn trấn và để lộ manh mối đầu tiên về một thế lực ngầm đứng sau.",
+      "subArcs": [
+        { "name": "Chén trà còn ấm", "chapterRange": "1-35", "focus": "Vào hiện trường phòng kín, đọc các điểm bất hợp lý, loại trừ các giả thuyết hiển nhiên, sống sót một cú ám toán đầu tiên." },
+        { "name": "Khẩu cung lệch nhịp", "chapterRange": "36-75", "focus": "Đối chiếu lời khai mâu thuẫn của các nhân chứng; phát hiện một người làm chứng đang che giấu động cơ." },
+        { "name": "Đường vào của hung thủ", "chapterRange": "76-110", "focus": "Tái dựng cách hung thủ ra vào phòng kín; lật ngược nghi can hiển nhiên để tìm kẻ thật sự." },
+        { "name": "Sợi chỉ đầu tiên", "chapterRange": "111-140", "focus": "Bắt hung thủ; nhưng cách gây án và một tín vật để lại hé lộ vụ án này không đơn lẻ — có người thuê." }
+      ],
+      "keyMilestone": "Tống Từ phá vụ án phòng kín, khẳng định phương pháp tra án và nhận ra có một bàn tay giấu mặt đứng sau cái chết."
+    },
+    {
+      "volume": 2,
+      "title": "Đại Hội Võ Lâm",
+      "chapterRange": "141-300",
+      "theme": "Án mạng giữa đám đông cao thủ — áp lực chính trị giang hồ",
+      "summary": "Một chưởng môn chết ngay giữa đại hội võ lâm trước mặt trăm cao thủ. Tống Từ phải tra án trong môi trường ai cũng là nghi can và có võ công cao hơn anh, đồng thời chịu sức ép từ các đại môn phái muốn dìm vụ việc.",
+      "subArcs": [
+        { "name": "Cái chết trên đài", "chapterRange": "141-190", "focus": "Nghiệm thi giữa hàng trăm nhân chứng; loại trừ độc, ám khí hiển nhiên; nhận ra thủ pháp tinh vi hơn." },
+        { "name": "Trăm kẻ tình nghi", "chapterRange": "191-245", "focus": "Đối chiếu vị trí, động cơ, tầng võ công của từng môn phái; bị các phái lớn cản trở và đe dọa." },
+        { "name": "Kẻ mượn tay", "chapterRange": "246-300", "focus": "Vạch trần kẻ chủ mưu mượn tay người khác; phát hiện tín vật cùng loại với vụ khách điếm — cùng một tổ chức." }
+      ],
+      "keyMilestone": "Tống Từ phá án giữa thế giới cao thủ, xác nhận hai vụ án có chung một nguồn và bước vào tầm ngắm của tổ chức ngầm."
+    },
+    {
+      "volume": 3,
+      "title": "Thương Lộ Mất Tích",
+      "chapterRange": "301-470",
+      "theme": "Án hàng loạt và truy vết trên đường dài",
+      "summary": "Hàng loạt người biến mất không để lại xác trên một thương lộ lớn. Tống Từ lần theo dấu vết qua nhiều trấn, hợp tác với một tiêu cục và một nữ pháp y, dần dựng được sơ đồ hoạt động của tổ chức ngầm.",
+      "subArcs": [
+        { "name": "Người không xác", "chapterRange": "301-355", "focus": "Tra các vụ mất tích tưởng không liên quan; tìm điểm chung về thời gian, địa điểm, nạn nhân." },
+        { "name": "Bạn đồng hành", "chapterRange": "356-415", "focus": "Liên minh với tiêu cục và nữ pháp y Diệp Thanh Lam; phối hợp nghiệm tích trên quy mô lớn." },
+        { "name": "Sơ đồ bóng tối", "chapterRange": "416-470", "focus": "Dựng được mạng lưới tổ chức ngầm; cứu một nhóm nạn nhân còn sống đúng lúc; lộ tên một thủ lĩnh cấp trung." }
+      ],
+      "keyMilestone": "Tống Từ chuyển từ phá án lẻ sang truy quét cả một đường dây, có đồng minh thân tín và bản đồ đầu tiên về tổ chức ngầm."
+    },
+    {
+      "volume": 4,
+      "title": "Tổ Chức Trong Bóng Tối",
+      "chapterRange": "471-640",
+      "theme": "Đấu trí trực diện với thế lực thao túng giang hồ",
+      "summary": "Tống Từ đối đầu một thủ lĩnh cấp cao của tổ chức ngầm, kẻ cài người vào cả nha môn lẫn các đại môn phái. Anh phải phá án trong khi chính mình bị vu oan và truy đuổi, dùng bằng chứng và bố cục để lật ngược thế cờ.",
+      "subArcs": [
+        { "name": "Nội gián", "chapterRange": "471-525", "focus": "Phát hiện tổ chức cài người trong nha môn; lọc ra ai đáng tin qua đối chiếu hành vi." },
+        { "name": "Bị vu oan", "chapterRange": "526-585", "focus": "Tống Từ bị gài tội; phải vừa trốn truy nã vừa thu thập bằng chứng minh oan bằng chính nghề tra án." },
+        { "name": "Lật cờ", "chapterRange": "586-640", "focus": "Vạch trần thủ lĩnh cấp cao trước cả giang hồ bằng chuỗi bằng chứng; hắn khai ra một cái tên cao hơn." }
+      ],
+      "keyMilestone": "Tống Từ hạ một trụ cột của tổ chức ngầm, tự minh oan, và lần đầu nghe tới kẻ đứng đầu thật sự."
+    },
+    {
+      "volume": 5,
+      "title": "Manh Mối Sư Môn",
+      "chapterRange": "641-810",
+      "theme": "Vụ án dính tới quá khứ — cái chết của sư phụ",
+      "summary": "Manh mối dẫn Tống Từ về chính cái chết bí ẩn của sư phụ anh năm xưa. Anh phá lại 'vụ án nguội' của đời mình, đối diện sự thật rằng nghề tra án và thiên phú quan sát của anh là di sản sư phụ để lại nhằm vạch trần tổ chức này.",
+      "subArcs": [
+        { "name": "Vụ án nguội", "chapterRange": "641-695", "focus": "Mở lại hồ sơ cái chết của sư phụ; đối chiếu với thủ pháp của tổ chức ngầm hiện tại." },
+        { "name": "Di sản", "chapterRange": "696-755", "focus": "Phát hiện sư phụ cố tình để lại manh mối và truyền nghề cho Tống Từ như một nước cờ dài hạn." },
+        { "name": "Kẻ ra tay năm xưa", "chapterRange": "756-810", "focus": "Tìm ra kẻ trực tiếp giết sư phụ; hắn là cầu nối tới người đứng đầu tổ chức." }
+      ],
+      "keyMilestone": "Tống Từ phá được vụ án lớn nhất đời mình, hiểu vì sao mình được truyền nghề, và xác định danh tính kẻ cầm đầu."
+    },
+    {
+      "volume": 6,
+      "title": "Bàn Cờ Lớn",
+      "chapterRange": "811-940",
+      "theme": "Đối đầu kẻ bày cờ thao túng cả giang hồ",
+      "summary": "Tống Từ nhận ra mọi vụ án anh từng phá đều là một quân cờ trong ván cờ của kẻ cầm đầu — một người dùng án mạng để định hình lại trật tự giang hồ. Anh phải đấu trí ở quy mô toàn cục, không còn là một hiện trường mà là cả một mưu đồ.",
+      "subArcs": [
+        { "name": "Toàn cảnh ván cờ", "chapterRange": "811-865", "focus": "Ghép tất cả vụ án thành một bức tranh; hiểu mục tiêu cuối cùng của kẻ cầm đầu." },
+        { "name": "Quân cờ phản đòn", "chapterRange": "866-905", "focus": "Tống Từ chủ động bày một thế cờ ngược để dụ kẻ cầm đầu lộ diện." },
+        { "name": "Diện kiến", "chapterRange": "906-940", "focus": "Đối mặt trực tiếp kẻ cầm đầu; tranh biện về công lý, trật tự và cái giá của phương pháp hắn." }
+      ],
+      "keyMilestone": "Tống Từ buộc kẻ cầm đầu lộ diện và đưa cuộc đối đầu lên tầm tư tưởng, không chỉ là bắt một hung thủ."
+    },
+    {
+      "volume": 7,
+      "title": "Công Lý Giành Lấy",
+      "chapterRange": "941-1000",
+      "theme": "Lựa chọn cuối — công lý và cái giá của nó",
+      "summary": "Tống Từ hạ kẻ cầm đầu bằng một chuỗi bằng chứng và bố cục không thể chối cãi, kết hợp một trận quyết đấu mà anh thắng nhờ trí nhiều hơn nhờ võ. Anh chọn cách lập lại trật tự công lý cho giang hồ mà không trở thành một kẻ bày cờ mới, đồng thời gánh cái giá của tất cả những gì đã mất.",
+      "subArcs": [
+        { "name": "Chứng cứ tối hậu", "chapterRange": "941-970", "focus": "Hoàn thiện chuỗi bằng chứng buộc tội kẻ cầm đầu trước toàn giang hồ." },
+        { "name": "Quyết đấu", "chapterRange": "971-990", "focus": "Trận đối đầu cuối; Tống Từ thắng nhờ bố cục, đọc đòn và ý chí, không phải nhờ vượt tầng võ công." },
+        { "name": "Trật tự mới", "chapterRange": "991-1000", "focus": "Khép lại tổ chức ngầm; Tống Từ trả lại công lý cho các nạn nhân và chọn tiếp tục làm bộ khoái thay vì nắm quyền lực." }
+      ],
+      "keyMilestone": "Kẻ cầm đầu sa lưới, tổ chức ngầm tan rã; Tống Từ trở thành Thần Bộ Khoái danh chấn giang hồ và gánh hệ quả của con đường mình chọn."
+    }
+  ]
+}

@@ -1,0 +1,118 @@
+{
+  "premise": "Diệp Tiểu Tiểu là ký chủ của Hệ Thống Tái Cấu Trúc Số Phận, lần lượt xuyên vào hết thế giới này đến thế giới khác dưới một thân phận mới, mỗi nhiệm vụ kéo dài khoảng ba mươi đến năm mươi chương. Ở mỗi thế giới, cô đến bên cạnh một 'phản phái' bị nguyên tác đẩy vào kết cục bi thảm — đại ma đầu bị vu oan, tổng tài vết thương tuổi thơ, nữ phản diện bị bỏ rơi — và dùng sự thấu hiểu cùng lòng tử tế chân thật để gỡ đúng nút thắt oán niệm trước khi nó kịp biến họ thành quái vật, viết lại số phận cho họ. Càng đi xa, cô càng phát hiện những bi kịch này bị một bàn tay trong bóng tối cố ý gieo rắc, và chính cô cũng là một mắt xích trong một câu chuyện lớn hơn.",
+  "mainConflict": "Lòng thấu cảm và lựa chọn tử tế đối đầu với những vết thương đủ sâu để biến con người thành phản diện, và sâu hơn là đối đầu với một thế lực cố ý gieo oán niệm để thu hoạch nỗi đau. Xung đột mỗi thế giới được giải bằng thấu hiểu, kiên nhẫn và những nghĩa cử đúng lúc — KHÔNG bằng tàn nhẫn hay thao túng. Leo thang từ cứu một phản phái đơn lẻ → nhận ra dấu chữ ký chung giữa các bi kịch → phát hiện Kẻ Thu Hoạch Oán Niệm và vai trò bị giấu của chính ký chủ → hàn gắn cả cội nguồn đẻ ra bi kịch.",
+  "themes": [
+    "Không ai sinh ra đã là quái vật — chỉ có những vết thương không được băng bó kịp",
+    "Thấu hiểu mạnh hơn phán xét, tử tế cứu được thứ mà bạo lực chỉ phá hủy",
+    "Chìa tay ra đúng lúc có thể viết lại cả một số phận",
+    "Cứu người không phải áp đặt mình là đúng, mà là chịu lắng nghe nỗi đau của họ"
+  ],
+  "majorPlotPoints": [
+    "Volume 1: Diệp Tiểu Tiểu xuyên vào thế giới tu tiên làm tiểu nha hoàn, cứu thiếu niên Thẩm Tiêu khỏi kết cục hóa ma đầu bằng cách tin cậu và vạch trần kẻ vu oan, đồng thời phát hiện dấu hiệu bi kịch bị dàn dựng.",
+    "Volume 2-3: Cứu tổng tài Lục Trầm (vết thương tuổi thơ) và nữ sinh Hứa Niệm (bị bỏ rơi), nhận ra oán niệm ở các thế giới đều bị một thế lực vô hình khuếch đại và mang chung một 'chữ ký'.",
+    "Volume 4-6: Qua các thế giới giang hồ, mạt thế, cung đình, cô lần đầu thấy Kẻ Thu Hoạch và bắt đầu nghi ngờ chính hệ thống biết nhiều hơn nó nói.",
+    "Volume 7: Phát hiện toàn bộ sự thật — chuỗi bi kịch là 'mùa thu hoạch' của Kẻ Thu Hoạch, và cô được chọn làm ký chủ vì một lý do bị giấu kín.",
+    "Volume 8-9: Liên minh với những phản phái từng được cứu để chặn dây chuyền sụp đổ, rồi đối mặt lựa chọn cuối — cô hàn gắn chính Kẻ Thu Hoạch (vốn cũng là một vết rách không ai cứu) thay vì tiêu diệt, đóng vòng tròn cứu vớt bằng thấu hiểu."
+  ],
+  "setupKernel": {
+    "readerFantasy": "Cảm giác ấm áp và thỏa mãn khi chứng kiến một con người tưởng đã hỏng hẳn — kẻ ai cũng ghét, ai cũng quay lưng — được một người dịu dàng chịu lắng nghe và cứu vớt đúng vào giây phút trái tim sắp vỡ; mỗi lần một đôi mắt đầy oán hận dịu lại, một số phận bi kịch được viết lại thành kết thúc ấm, là một lần độc giả thấy lòng mình được sưởi ấm và tin rằng tử tế thật sự có sức mạnh thay đổi cả một con người.",
+    "protagonistEngine": "Diệp Tiểu Tiểu thắng nhờ khả năng quan sát nỗi đau ẩn giấu, sự kiên nhẫn không bỏ cuộc và lòng tử tế chân thật không vụ lợi; cô không dùng vũ lực hay quyền năng để ép buộc mà gỡ nút thắt oán niệm bằng cách hiểu đúng vết thương rồi chìa tay đúng lúc. Tính cách dịu dàng, ấm áp, đồng cảm sâu sắc nhưng cũng bướng bỉnh và can đảm — cô dám đứng về phía kẻ cả thế gian ruồng bỏ và dám gánh cái giá để cứu một người.",
+    "pleasureLoop": [
+      "Hồ sơ một phản phái bi kịch hiện ra → Diệp Tiểu Tiểu nhập vai, quan sát và dần hiểu vết thương thật sự đằng sau sự độc ác/lạnh lùng của họ (thấu hiểu dần dần).",
+      "Cô làm một nghĩa cử tử tế nhỏ đúng lúc → đôi mắt phòng bị của phản phái thoáng dao động, Chỉ Số Oán Niệm tụt xuống (khoảnh khắc ấm lòng + xác nhận tiến bộ).",
+      "Một người khác phán xét, ruồng bỏ phản phái như nguyên tác → Diệp Tiểu Tiểu công khai đứng về phía họ, chứng minh thế gian đã hiểu lầm (bênh vực + công nhận ngược dòng).",
+      "Nút thắt bi kịch bùng nổ đúng như nguyên tác định → cô không bỏ chạy mà ở lại bên phản phái đúng giây quyết định, kéo họ lùi khỏi bờ vực (cứu-vớt-đúng-lúc cao trào).",
+      "Phản phái chọn buông oán niệm, viết lại kết cục của mình → Độ Lệch Số Mệnh đạt mốc, nhiệm vụ hoàn tất, một số phận được sưởi ấm (harvest cảm xúc + thành quả).",
+      "Một mảnh sự thật về kẻ gieo bi kịch hoặc về chính hệ thống được hé lộ ở Trạm Trung Chuyển → cảm giác bức màn lớn đang được vén lên (revelation nền)."
+    ],
+    "systemMechanic": {
+      "name": "Hệ Thống Tái Cấu Trúc Số Phận — Bản Đồ Oán Niệm",
+      "input": "Diệp Tiểu Tiểu nhập một thân phận mới trong thế giới nhiệm vụ, đọc hồ sơ phản phái (câu chuyện gốc + nút thắt oán niệm), rồi sống thật trong giới hạn thân phận đó và tương tác chân thành với đối tượng cần cứu.",
+      "output": "Hệ thống hiển thị Chỉ Số Oán Niệm của đối tượng (giảm khi được hàn gắn) và Độ Lệch Số Mệnh (lệch bao nhiêu so với kết cục bi thảm gốc); hé lộ từng phần manh mối nguyên tác theo tiến độ thấu hiểu thực tế của cô.",
+      "limit": "Anti-plot-armor cứng: hệ thống KHÔNG cho phép ép phản phái thành người tốt bằng mệnh lệnh hay phép màu, KHÔNG trao sẵn đáp án — cô phải tự quan sát và đồng cảm thật. Cứu sai cách (dối trá, thao túng) khiến oán niệm bật ngược và thế giới có thể sụp về bi kịch gốc. Cô không bất tử, mỗi thân phận có điểm yếu riêng phải sống thật trong đó; nếu vô tâm hay máy móc, hệ thống khóa bớt quyền hạn. Hệ thống cũng cố tình giấu một phần sự thật khỏi cô.",
+      "reward": "Mỗi nhiệm vụ hoàn tất, cô tích lũy 'kho thấu cảm' giúp đọc vết thương người khác nhanh và sâu hơn ở thế giới kế, cùng một mảnh manh mối về kẻ gieo bi kịch; nhưng phần thưởng thật sự luôn là một con người được cứu và một số phận được viết lại, không phải sức mạnh chiến đấu."
+    },
+    "mcOrigin": "transmigrator",
+    "originLockNote": "Diệp Tiểu Tiểu là ký chủ xuyên vào từng thế giới nhiệm vụ qua Hệ Thống Tái Cấu Trúc Số Phận; mỗi nhiệm vụ cô nhập một thân phận mới rồi rời đi khi thế giới được hàn gắn, là người ngoài bước vào chứ không phải người bản địa của bất kỳ thế giới nhiệm vụ nào — cô giữ ký ức bản thân và kho thấu cảm tích lũy qua các thế giới.",
+    "mcSecret": {
+      "secret": "Diệp Tiểu Tiểu không phải người bản địa mà là ký chủ xuyên vào dưới thân phận giả; cô mang theo hiểu biết về 'kết cục bi thảm gốc' mà không ai trong thế giới nhiệm vụ biết.",
+      "outsideWorldKnowledge": "Cô biết trước con đường mà nguyên tác định cho mỗi phản phái sẽ dẫn tới bi kịch, biết về sự tồn tại của Hệ Thống Tái Cấu Trúc Số Phận và Trạm Trung Chuyển giữa các thế giới — những tri thức không một nhân vật in-world nào có thể tiếp cận.",
+      "revealRule": "Giấu kín thân phận ký chủ với hầu hết nhân vật mỗi thế giới; chỉ hé lộ một phần cho phản phái thân tín nhất ở cao trào mỗi nhiệm vụ khi lòng tin đã đủ; bí mật lớn về vai trò bị giấu của cô trong kế hoạch Kẻ Thu Hoạch chỉ reveal ở Volume 7 trở đi.",
+      "coverStory": "Trong mỗi thế giới cô nói mình chỉ là một người bình thường mang thân phận đã nhập (nha hoàn, trợ lý, bạn cùng lớp...), giải thích sự nhạy cảm với nỗi đau người khác là do 'từng trải qua mất mát', che giấu hoàn toàn việc mình đến từ ngoài thế giới."
+    },
+    "benefitLoop": {
+      "goal": "Hàn gắn oán niệm và viết lại số phận cho từng phản phái bi kịch, rồi lần ngược ra kẻ cố ý gieo bi kịch để chấm dứt cội nguồn.",
+      "action": "Nhập vai, quan sát nỗi đau ẩn giấu, kiên nhẫn xây lòng tin, làm những nghĩa cử tử tế đúng lúc và đứng về phía đối tượng vào khoảnh khắc bi kịch bùng nổ để gỡ đúng nút thắt oán niệm.",
+      "benefit": "Một phản phái được cứu, một số phận được viết lại thành kết thúc ấm; Chỉ Số Oán Niệm giảm và Độ Lệch Số Mệnh tăng; kho thấu cảm dày thêm, một mảnh sự thật về Kẻ Thu Hoạch hé lộ, và một đồng minh tiềm năng cho cuộc đối đầu cuối.",
+      "cadence": "Mỗi 1-2 chương có ít nhất một khoảnh khắc ấm lòng được tưởng thưởng (một nghĩa cử khiến đối tượng dao động hoặc một lần đứng về phía họ thành công); mỗi 3-5 chương một bước nhảy lớn (một nút oán niệm được gỡ, hoàn tất một nhiệm vụ, hoặc hé lộ một mảnh sự thật nền)."
+    },
+    "interventionRule": "Diệp Tiểu Tiểu chỉ ra tay khi (a) đối tượng phản phái của nhiệm vụ đang đứng trước nút thắt oán niệm sắp đẩy họ vào kết cục bi thảm, hoặc (b) khi cô phát hiện một nỗi oan/sự ruồng bỏ trực tiếp gây ra vết thương mà cô có thể hóa giải bằng thấu hiểu; cô không đi 'cứu cả thế giới' ngoài phạm vi nhiệm vụ, không ép ai thay đổi bằng quyền năng, luôn giải quyết bằng lắng nghe, đồng cảm, những nghĩa cử đúng lúc và lựa chọn tử tế — tuyệt đối không bằng dối trá, thao túng hay bạo lực.",
+    "phase1Playground": {
+      "locations": [
+        "Tông môn tu tiên Thanh Vân — phó bản mở màn, nơi Thẩm Tiêu bị vu oan và sắp hóa ma đầu",
+        "Tiểu viện của Thẩm Tiêu trong tông môn — nơi Diệp Tiểu Tiểu hầu hạ và dần chạm tới trái tim cậu",
+        "Tàng Kinh Các và Giới Luật Đường — nơi vu oan diễn ra và bằng chứng được giấu",
+        "Trạm Trung Chuyển — khoảng không tĩnh lặng giữa các thế giới, nơi cô đọc hồ sơ và đối thoại với hệ thống"
+      ],
+      "cast": [
+        "Diệp Tiểu Tiểu (ký chủ, nhập vai tiểu nha hoàn, MC)",
+        "Thẩm Tiêu (thiếu niên thiên tài bị vu oan, phản phái của Volume 1, đối tượng cần cứu)",
+        "Hệ thống / Tái Cấu Trúc Số Phận (giọng dẫn nhiệm vụ, biết nhiều hơn nó nói, mentor mơ hồ)",
+        "Trưởng lão Lăng — kẻ thật sự vu oan Thẩm Tiêu để cướp công pháp (local antagonist)",
+        "Sư tỷ Vân Nhi — đệ tử cùng tông tin theo lời đồn, đại diện cho sự phán xét hùa theo đám đông"
+      ],
+      "resources": [
+        "Hệ Thống Tái Cấu Trúc Số Phận và Bản Đồ Oán Niệm",
+        "Hồ sơ nhiệm vụ + manh mối nguyên tác hé lộ dần",
+        "Kho thấu cảm tích lũy (khởi đầu mỏng, dày lên qua các thế giới)",
+        "Lòng tin chớm nở của Thẩm Tiêu và uy tín nhỏ trong tông môn"
+      ],
+      "localAntagonists": [
+        "Trưởng lão Lăng — kẻ vu oan Thẩm Tiêu, đại diện cho bất công gieo mầm bi kịch",
+        "Đám đệ tử hùa theo lời đồn cô lập Thẩm Tiêu, đẩy cậu về phía oán niệm"
+      ],
+      "repeatableSceneTypes": [
+        "Quan sát và dần hiểu ra vết thương thật đằng sau vẻ lạnh lùng/độc ác của phản phái",
+        "Một nghĩa cử tử tế đúng lúc khiến đối tượng dao động và Chỉ Số Oán Niệm tụt xuống",
+        "Đứng về phía phản phái trước đám đông phán xét, vạch ra sự hiểu lầm",
+        "Ở lại bên đối tượng đúng giây bi kịch bùng nổ và kéo họ lùi khỏi bờ vực",
+        "Đoạn Trạm Trung Chuyển: nghỉ, đọc hồ sơ thế giới kế, ghép manh mối về kẻ gieo bi kịch"
+      ]
+    },
+    "socialReactor": {
+      "witnesses": [
+        "Đối tượng phản phái được cứu và những người thân cận họ",
+        "Đám đông trong mỗi thế giới từng phán xét phản phái",
+        "Hệ thống quan sát tiến độ và phản ứng của cô",
+        "Những phản phái đã được cứu ở các thế giới trước (về sau thành đồng minh)"
+      ],
+      "reactionModes": [
+        "Phản phái từ phòng bị/oán hận chuyển sang tin tưởng và bám víu vào sự ấm áp của cô",
+        "Đám đông sững sờ rồi dần nhìn lại định kiến khi sự thật được phơi bày",
+        "Hệ thống ghi nhận Độ Lệch Số Mệnh và nới/khóa quyền hạn theo cách cô hành xử",
+        "Tiếng lành đồn xa trong giới ký chủ/giữa các thế giới về một người chuyên cứu phản phái"
+      ],
+      "reportBackCadence": "Phản ứng tức thì của đối tượng và người quanh họ mỗi chương; làn sóng thay đổi định kiến của cả thế giới dồn lại quanh cao trào và kết mỗi nhiệm vụ; manh mối nền và phản ứng của hệ thống tổng kết ở mỗi đoạn Trạm Trung Chuyển."
+    },
+    "noveltyLadder": [
+      { "chapterRange": "1-40", "newToy": "Thế giới tu tiên + cơ chế cứu vớt phản phái đầu tiên (thiếu niên bị vu oan)", "keepsSameLane": "Vẫn là thấu hiểu vết thương rồi chìa tay cứu một phản phái khỏi kết cục bi thảm" },
+      { "chapterRange": "41-260", "newToy": "Đổi thể loại thế giới mỗi nhiệm vụ (đô thị, học đường, giang hồ) với kiểu phản phái và bi kịch riêng", "keepsSameLane": "Vẫn là gỡ nút oán niệm bằng thấu cảm, chỉ đổi bối cảnh và dạng vết thương" },
+      { "chapterRange": "261-560", "newToy": "Thế giới khắc nghiệt hơn (mạt thế, cung đình) + tuyến Kẻ Thu Hoạch và sự khả nghi của hệ thống lộ dần", "keepsSameLane": "Vẫn cùng lane cứu vớt phản phái, nhưng thêm tầng bí ẩn nền về kẻ gieo bi kịch" },
+      { "chapterRange": "561-720", "newToy": "Sự thật về hệ thống, vai trò bị giấu của ký chủ, đối thoại trực tiếp với Kẻ Thu Hoạch", "keepsSameLane": "Vẫn là câu chuyện về thấu hiểu và cứu vớt, nâng lên cấp meta về cội nguồn bi kịch" },
+      { "chapterRange": "721-1000", "newToy": "Cứu vớt quy mô lớn + lựa chọn cuối hàn gắn chính Kẻ Thu Hoạch thay vì diệt trừ", "keepsSameLane": "Vẫn là tử tế thắng oán niệm — đỉnh cao của cùng một hành trình cứu vớt bằng thấu hiểu" }
+    ],
+    "controlRules": {
+      "payoffCadence": "Tối thiểu 2 cao điểm dopamine mỗi chương (một khoảnh khắc ấm lòng khiến phản phái dao động + một lần đứng về phía họ thành công hoặc một mảnh vết thương được hiểu ra); cao điểm đầu xuất hiện trước nửa chương; setup không quá 30% và phải có payoff trong cùng hoặc chương kế.",
+      "attentionGradient": "Mở chương bằng một tình huống cụ thể về phản phái (một hành động lạnh lùng/độc ác cần lý giải, một nỗi đau hé lộ, một bất công); đóng chương bằng một khoảnh khắc trái tim đối tượng dao động, một mảnh sự thật vừa hé, hoặc một nguy cơ đẩy bi kịch tới gần.",
+      "openThreadsPerArc": 3,
+      "closeThreadsPerArc": 2
+    },
+    "patternCards": [
+      "warm-baseline-opening",
+      "empathy-cracks-the-armor",
+      "stand-up-for-the-hated",
+      "save-at-the-brink",
+      "rewrite-the-tragic-ending"
+    ]
+  }
+}

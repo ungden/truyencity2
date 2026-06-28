@@ -1,0 +1,118 @@
+{
+  "premise": "Diệp Hướng Đông, một quan chức đi gần hết đời, trọng sinh trở về thời còn là cán bộ trẻ ở Tỉnh Lâm Khê trong cùng thế giới, mang theo ký ức về diễn biến thời cuộc mấy mươi năm sắp tới. Bằng tầm nhìn đi trước thời đại, chính sách đúng đắn, đấu trí chính trị và kết quả thực tế, anh chọn đúng ngành mũi nhọn, ngăn các dự án sắp đổ vỡ, an dân qua biến động, vượt qua Phe Thành Tích, Phe Bảo Thủ và Phe Trục Lợi, thăng tiến vững vàng trên con đường chính trực — tuyệt đối không bằng bạo lực.",
+  "mainConflict": "Một người được trao cơ hội làm lại, mang tầm nhìn đi trước thời đại nhưng tay không quyền lực, phải biến những dự báo thành quyết sách giữa một bộ máy đầy hoài nghi và các phe lợi ích. Xung đột không giải quyết bằng bạo lực mà bằng chính sách, số liệu, dự báo được thực tế chứng minh, thuyết phục và đấu trí chính trị. Leo thang từ một dự báo nhỏ cứu một vụ việc → chọn ngành mũi nhọn cho một huyện → ngăn một làn sóng đầu tư nóng sắp vỡ → đấu trí cấp cao khi ký ức bắt đầu sai lệch → triệt mạng lưới Phe Trục Lợi → dẫn cả tỉnh vượt một biến động thời cuộc lớn → để lại một di sản phát triển bền vững.",
+  "themes": [
+    "Tầm nhìn phải đi cùng liêm chính thì mới bền",
+    "Biết trước 'đi đâu' chưa đủ, vẫn phải tự bước 'đi thế nào'",
+    "Một quyết sách đúng thời điểm có thể đổi đời cả một vùng đất",
+    "Cơ hội được làm lại là để kiến tạo, không phải để trục lợi"
+  ],
+  "majorPlotPoints": [
+    "Ch.1: Diệp Hướng Đông tỉnh lại ở thân phận cán bộ trẻ thuở trước, xác nhận ký ức thời cuộc còn nguyên và quyết tâm đi con đường chính trực thay vì lặp lại sai lầm cũ.",
+    "Arc 1: Dùng một dự báo chính xác để ngăn một rủi ro địa phương, làm đúng quy trình biến dự báo thành quyết sách, lập tích thực đầu tay.",
+    "Arc 2-3: Chọn đúng ngành mũi nhọn biến một huyện thành điểm sáng, rồi dự báo và hóa giải một làn sóng đầu tư nóng sắp vỡ, an dân và vạch trần kẻ trục lợi.",
+    "Giữa truyện: Ký ức kiếp trước bắt đầu sai lệch vì chính anh đã thay đổi dòng chảy; anh trưởng thành thành người lãnh đạo dựa vào năng lực thực, triệt mạng lưới Phe Trục Lợi và xây cơ chế minh bạch.",
+    "Cao trào cuối: Một biến động thời cuộc tầm vóc tỉnh ập đến, các phe liên thủ hạ bệ anh; anh dẫn tỉnh vượt sóng bằng tầm nhìn và kết quả thực, lật thế cờ, rồi để lại một di sản phát triển bền vững và trong sạch."
+  ],
+  "setupKernel": {
+    "readerFantasy": "Cảm giác sảng khoái và ấm áp khi một người được trao cơ hội làm lại, nhìn thấu thời cuộc mấy mươi năm, đặt đúng nước cờ vào đúng thời điểm — chọn ngành sắp cất cánh khi người khác còn coi thường, hãm phanh một cơn vỡ mà cả vùng chưa ai thấy, an dân trước biến động — rồi chứng kiến địa phương đổi đời và bản thân thăng tiến vững vàng bằng chính trực. Mỗi lần một dự báo thành sự thật là một lần độc giả hả hê vì 'người trong cuộc đã biết trước'.",
+    "protagonistEngine": "Diệp Hướng Đông thắng nhờ tầm nhìn thời cuộc từ ký ức kiếp trước, kinh nghiệm chính trường của một đời đã sống, khả năng xây đề án và thuyết phục, cùng bản lĩnh quyết sách điềm tĩnh. Tính cách chín chắn, ấm áp, kiên định với liêm chính nhưng linh hoạt trong sách lược; anh biết chờ thời, biết nhường để được, và luôn đặt lợi ích lâu dài của dân và địa phương lên trên thành tích cá nhân.",
+    "pleasureLoop": [
+      "Một xu thế hoặc rủi ro thời cuộc lộ ra mà chỉ Diệp Hướng Đông biết trước → anh âm thầm chuẩn bị và xây một đề án/quyết sách đón đầu dưới áp lực hoài nghi (tension build-up).",
+      "Anh thuyết phục được cấp trên hoặc tập thể chấp nhận một hướng đi táo bạo bằng lý lẽ và số liệu → khoảnh khắc 'đặt cược' đầy căng thẳng (decision peak).",
+      "Dự báo của anh thành sự thật đúng như tính toán → đối thủ hoài nghi cứng họng, anh được công nhận (face-slap bằng kết quả thực).",
+      "Một địa phương đổi đời, một cơn biến động được hóa giải êm thấm, dân được an → công lý và phát triển hiển hiện (harvest + công nhận).",
+      "Anh được tin tưởng giao trọng trách lớn hơn, thăng tiến bằng tích thực → tiến gần hơn tới tầm cải cách lớn (tiến triển vị thế).",
+      "Một mảnh sự thật về cấu trúc quyền lực hoặc một ngã rẽ thời cuộc mới được hé lộ → bức màn chính trường được vén thêm một lớp (revelation payoff)."
+    ],
+    "systemMechanic": {
+      "name": "Tầm Nhìn Thời Cuộc — Ký Ức Một Đời Đã Sống",
+      "input": "Diệp Hướng Đông gặp một tình huống, ngành nghề, dự án hoặc biến động mà anh từng chứng kiến diễn biến của nó trong quãng đời trước; anh phải nhận ra điểm tương ứng và dành thời gian suy xét cách vận dụng trong tình thế hiện tại.",
+      "output": "Anh biết hướng diễn tiến khả dĩ của thời cuộc — ngành nào sẽ lên, dự án nào sẽ vỡ, chính sách nào sẽ đúng, biến động nào sắp đến — đủ để đón đầu bằng một quyết sách kịp thời, miễn là anh hành động đúng cách.",
+      "limit": "Anti-plot-armor cứng: tầm nhìn CHỈ cho biết 'đi đâu', KHÔNG tự biến thành quyền lực, KHÔNG tự thuyết phục người khác, KHÔNG tự thực thi. Anh vẫn phải làm đúng quy trình, xây đề án, thuyết phục được người hoài nghi và có đủ năng lực-uy tín thì dự báo mới thành quyết sách. Quan trọng nhất: mỗi lần anh tác động vào dòng chảy, thời cuộc đổi khác và ký ức cũ dần sai lệch — càng về sau, vùng 'biết trước' càng thu hẹp, buộc anh phải dựa vào năng lực thực. Tầm nhìn cũng vô dụng với những việc anh chưa từng trải qua hoặc bị anh tự thay đổi.",
+      "reward": "Tỉ lệ ra quyết sách đúng cao hơn nhờ đón đầu xu thế; theo thời gian anh tích lũy uy tín, vị thế và một lớp đồng minh, đồng thời trưởng thành thành nhà lãnh đạo không còn phụ thuộc ký ức — nhưng phần thưởng thật luôn là một địa phương đổi đời, một biến động được hóa giải và một bước thăng tiến chính trực, chứ không phải sức mạnh siêu nhiên."
+    },
+    "mcOrigin": "reincarnated",
+    "originLockNote": "Diệp Hướng Đông trọng sinh trong CÙNG một thế giới: anh từng sống một đời quan chức rồi tỉnh lại ở thân phận cán bộ trẻ thuở trước của chính mình, giữ ký ức về thời cuộc kiếp trước. Đây là tái sinh về một mốc thời gian sớm hơn trong sự nghiệp của anh ngay trong thế giới truyện, hoàn toàn không liên quan tới việc đến từ một thế giới khác.",
+    "mcSecret": {
+      "secret": "Diệp Hướng Đông giữ kín hoàn toàn việc mình trọng sinh và mang ký ức về diễn biến thời cuộc mấy mươi năm sắp tới; với mọi người, anh chỉ là một cán bộ trẻ 'nhạy bén và may mắn lạ thường'.",
+      "outsideWorldKnowledge": "Ký ức về tương lai là lợi thế lớn nhất và cũng là bí mật nguy hiểm nhất của anh: nếu lộ, anh sẽ bị xem là kẻ điên hoặc bị các phe tìm cách khai thác, lợi dụng; vì thế anh luôn 'dịch' tầm nhìn thành lập luận, số liệu và đề án có thể giải thích được bằng lý lẽ đời thường.",
+      "revealRule": "Giấu tuyệt đối trước mọi người suốt truyện; anh không bao giờ nói thẳng mình trọng sinh; chỉ có độc giả và một vài khoảnh khắc nội tâm hé lộ; bí mật này không được tiết lộ cho bất kỳ nhân vật nào, chỉ ảnh hưởng tới cách anh hành xử.",
+      "coverStory": "Anh để người ngoài tin mình chỉ là cán bộ trẻ 'có trực giác chính sách tốt, chịu khó nghiên cứu xu thế và gặp thời', che giấu hoàn toàn nguồn gốc thật của tầm nhìn."
+    },
+    "benefitLoop": {
+      "goal": "Dùng tầm nhìn thời cuộc để đưa ra những quyết sách đúng làm đổi đời địa phương, vượt qua các phe lợi ích và thăng tiến chính trực để có đủ tầm cải cách bền vững cho cả tỉnh.",
+      "action": "Nhận diện một xu thế hoặc rủi ro từ ký ức, kiểm chứng với thực tế hiện tại, xây đề án và lập luận thuyết phục, làm đúng quy trình, đấu trí với các phe cản đường, rồi thực thi và để kết quả tự chứng minh.",
+      "benefit": "Một địa phương đổi đời hoặc một biến động được hóa giải, uy tín và vị thế tăng, phạm vi quyền hạn cải cách mở rộng, một lớp đồng minh chính trực được vun đắp; đồng thời anh trưởng thành dần thành nhà lãnh đạo dựa vào năng lực thực.",
+      "cadence": "Mỗi 1-2 chương có ít nhất một vòng quyết sách-được-thưởng (một dự báo được kiểm chứng, một đề án được duyệt, một đối thủ hoài nghi cứng họng); mỗi 3-5 chương một bước nhảy lớn (một địa phương cất cánh, một cơn vỡ được hóa giải, một bậc thăng tiến)."
+    },
+    "interventionRule": "Diệp Hướng Đông chỉ can thiệp khi (a) anh có thể chuyển tầm nhìn thành một đề án hoặc quyết sách hợp pháp, đúng thẩm quyền và thuyết phục được người có quyền quyết, hoặc (b) khi một biến động sắp tổn hại trực tiếp tới dân hoặc địa phương mà anh có căn cứ để hành động trong tầm tay; anh không 'lạm dụng tiên tri' để thâu tóm quyền lực hay trục lợi, không liều lĩnh vượt thẩm quyền, luôn giải quyết bằng chính sách, số liệu, thuyết phục và đấu trí chính trị — tuyệt đối không bằng bạo lực thể chất.",
+    "phase1Playground": {
+      "locations": [
+        "Thị trấn nơi Diệp Hướng Đông tỉnh lại ở thân phận cán bộ trẻ — không gian cơ sở với ruộng đồng, doanh nghiệp nhỏ và những quyết sách đầu tiên",
+        "Trụ sở ủy ban và phòng làm việc cấp xã/thị trấn — nơi anh xây đề án và thuyết phục cấp trên",
+        "Một xã nghèo của địa bàn — nơi một quyết sách đúng có thể đổi đời cả cộng đồng",
+        "Quán nước và khu tập thể cán bộ — không gian đời thường nơi quan hệ, đồn đoán và thông tin ngầm trao đổi"
+      ],
+      "cast": [
+        "Diệp Hướng Đông (cán bộ trẻ trọng sinh, MC, người nắm tầm nhìn thời cuộc)",
+        "Ông Hà (bí thư thị trấn lão thành chính trực, người đầu tiên đặt lòng tin vào anh)",
+        "Cô Mai (cán bộ trẻ nhiệt huyết, dần thành đồng minh và bạn đồng hành đáng tin)",
+        "Trương Bằng (cán bộ Phe Thành Tích địa phương, chạy theo con số đẹp, local antagonist đầu tiên)",
+        "Bác Lâm (một lão nông/doanh nhân nhỏ tiêu biểu cho người dân được hưởng lợi từ quyết sách đúng)"
+      ],
+      "resources": [
+        "Tầm Nhìn Thời Cuộc — ký ức về diễn biến mấy mươi năm sắp tới",
+        "Kinh nghiệm chính trường của một đời đã sống",
+        "Khả năng xây đề án, lập luận bằng số liệu và thuyết phục",
+        "Lòng tin chớm nở của ông Hà và một số người dân"
+      ],
+      "localAntagonists": [
+        "Trương Bằng — cán bộ Phe Thành Tích chạy theo dự án hoành tráng và con số đẹp, xem thường hướng đi 'âm thầm mà chắc' của Diệp Hướng Đông",
+        "Một nhóm cán bộ bảo thủ ngại đổi mới, cản các đề án táo bạo bằng lý do 'an toàn, đúng quy trình cũ'"
+      ],
+      "repeatableSceneTypes": [
+        "Nhận diện một xu thế hoặc rủi ro thời cuộc từ ký ức và âm thầm chuẩn bị đón đầu",
+        "Xây đề án và thuyết phục cấp trên hoặc tập thể chấp nhận một quyết sách táo bạo nhưng đúng",
+        "Một dự báo thành sự thật khiến đối thủ hoài nghi cứng họng và anh được công nhận",
+        "Một quyết sách đúng làm đổi đời một địa phương hoặc hóa giải một biến động, dân được an",
+        "Cảnh đời thường quan trường: vun đắp đồng minh, hóa giải đòn chèn ép, chuẩn bị cho nước cờ kế tiếp"
+      ]
+    },
+    "socialReactor": {
+      "witnesses": [
+        "Cấp trên và đồng nghiệp trong cùng cơ quan, địa bàn",
+        "Lớp cán bộ chính trực và người có tâm rải rác trong bộ máy",
+        "Người dân và doanh nghiệp được hưởng lợi từ các quyết sách đúng",
+        "Các phe lợi ích quan sát và dò xét từ trong bóng tối"
+      ],
+      "reactionModes": [
+        "Sửng sốt và nể phục khi dự báo của Diệp Hướng Đông liên tục thành sự thật",
+        "Cán bộ chính trực và người dân tìm đến tin cậy, đồn thổi về 'cán bộ trẻ có con mắt nhìn xa'",
+        "Cấp trên đánh giá lại và cân nhắc đề bạt anh vào vị trí có thực quyền hơn",
+        "Các phe nghi kỵ 'sao cậu ta toàn đoán đúng', tìm cách chèn ép, dò xét hoặc lôi kéo"
+      ],
+      "reportBackCadence": "Phản ứng tức thì trong cơ quan mỗi chương (cấp trên, đồng nghiệp); làn sóng dư luận, động thái đề bạt và phản đòn của các phe dồn lại mỗi 3-5 chương sau khi một dự báo lớn của anh thành sự thật."
+    },
+    "noveltyLadder": [
+      { "chapterRange": "1-130", "newToy": "Dùng tầm nhìn để ngăn một rủi ro địa phương và lập tích thực đầu tay ở cấp cơ sở", "keepsSameLane": "Vẫn là biến tầm nhìn thành quyết sách đúng quy trình bằng thuyết phục và kết quả thực" },
+      { "chapterRange": "131-450", "newToy": "Chọn ngành mũi nhọn cho một huyện rồi hãm phanh một làn sóng đầu tư nóng sắp vỡ, quy mô lớn dần", "keepsSameLane": "Vẫn là tầm nhìn-chính sách-thuyết phục-kết quả, chỉ tăng quy mô và độ phức tạp của thời cuộc" },
+      { "chapterRange": "451-770", "newToy": "Quyết sách trong 'vùng mù' khi ký ức sai lệch, đối thủ cấp cao, và triệt mạng lưới Phe Trục Lợi", "keepsSameLane": "Vẫn cùng lane chính trường, thêm tầng đấu trí và sự trưởng thành thành lãnh đạo dựa vào năng lực thực" },
+      { "chapterRange": "771-910", "newToy": "Dẫn cả tỉnh vượt một biến động thời cuộc lớn và lật ngược cuộc liên thủ hạ bệ", "keepsSameLane": "Vẫn là tầm nhìn và quyết sách đúng, ở cường độ và tầm vóc cao nhất" },
+      { "chapterRange": "911-1000", "newToy": "Chuyển từ dẫn dắt sang kiến tạo di sản và thể chế phát triển bền vững", "keepsSameLane": "Vẫn là cuộc chơi tầm nhìn-chính trực — nâng lên cấp để lại di sản thay vì chỉ thắng từng nước cờ" }
+    ],
+    "controlRules": {
+      "payoffCadence": "Tối thiểu 2 cao điểm dopamine mỗi chương (một dự báo được kiểm chứng hoặc một đề án được duyệt + một đối thủ hoài nghi cứng họng hoặc một địa phương/người dân được hưởng lợi), cao điểm đầu xuất hiện trước nửa chương; setup không quá 30% và phải có payoff trong cùng hoặc chương kế.",
+      "attentionGradient": "Mở chương bằng một dấu hiệu xu thế, một tình huống cần quyết sách, một động thái của đối thủ hoặc một manh mối thời cuộc; đóng chương bằng một cliffhanger (một dự báo sắp được kiểm chứng, một đòn phản công sắp tới, một ngã rẽ thời cuộc vừa hé).",
+      "openThreadsPerArc": 3,
+      "closeThreadsPerArc": 2
+    },
+    "patternCards": [
+      "warm-baseline-opening",
+      "foresight-into-policy",
+      "prediction-vindicated",
+      "results-speak-face-slap",
+      "merit-based-promotion"
+    ]
+  }
+}

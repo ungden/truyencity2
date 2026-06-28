@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "totalScore": 122,
+  "avgScore": 8.71,
+  "minDimScore": 8,
+  "source": "claude_code",
+  "dimensions": [
+    { "name": "Premise & hook", "score": 9, "note": "Warm-baseline tu tiên trọng sinh: ký ức kiếp trước active ngay ch.1, hook là cơ duyên biết-trước sắp xuất thế — opportunity-driven, không mở đầu bằng cảnh MC khổ cùng cực hay sắp chết thảm." },
+    { "name": "Protagonist engine", "score": 9, "note": "Tần Mục thắng bằng tri thức kiếp trước + tu luyện thực + quyết đoán lạnh lùng; tính cách trầm ổn, nhẫn nhịn có tính toán, kìm nén oán hận, giữ ân nghĩa — nhất quán." },
+    { "name": "System mechanic", "score": 9, "note": "Ký Ức Kiếp Trước có input/output/limit/reward rõ; anti-plot-armor cứng — chỉ là tri thức không tự nâng tu vi, tương lai dần lệch khiến ký ức kém chính xác, vẫn phải vượt quan ải thật." },
+    { "name": "Conflict ladder", "score": 9, "note": "Leo thang đoạt cơ duyên cá nhân → trả nợ phản bội trong tông → đối đầu thế lực lớn toàn châu → quyết chiến thế lực ẩn → cải đại kiếp số, qua 7 volume." },
+    { "name": "World coherence", "score": 9, "note": "Đại Thương Châu với cửu cảnh giới tu luyện, tài nguyên khốc liệt, tông môn/gia tộc/tán tu, thiên cơ và kiếp số đều nhất quán; forbidden elements rõ." },
+    { "name": "Dopamine cadence", "score": 9, "note": "controlRules ≥2 peak/chương (biết-trước đoạt lợi thế + vả mặt kẻ kiêu ngạo/gài lùi kẻ phản bội), cao điểm đầu trước nửa chương, sảng văn cadence chuẩn." },
+    { "name": "Origin lock", "score": 9, "note": "mcOrigin=reincarnated khóa chặt; trọng sinh CÙNG thế giới, giữ ký ức kiếp trước hợp lệ; outlines KHÔNG chứa token xuyên không/xuyên việt/đến từ trái đất/từ thế giới hiện đại." },
+    { "name": "Combat & stakes", "score": 8, "note": "Tu tiên có chiến đấu (kiếm trận, đấu pháp, đột phá quan ải) cân bằng với đấu trí giăng lưới; cược sinh tử rõ qua tài nguyên và quan ải cảnh giới." },
+    { "name": "Foreshadowing & twists", "score": 8, "note": "3 twist (kẻ thù chỉ là quân cờ, nguồn gốc cơ duyên gắn khí vận, nguồn gốc trọng sinh gắn đại kiếp số) + 3 foreshadowing có plant/payoff chapter cụ thể kéo tới cao trào." },
+    { "name": "Long-form sustainability", "score": 9, "note": "noveltyLadder 5 nấc giữ cùng lane 'biết-trước nghịch thiên cải mệnh', 7 volume cho 1000 chương, endgame cải đại kiếp số toàn châu rồi Độ Kiếp phi thăng." },
+    { "name": "Vietnamese voice", "score": 8, "note": "Voice anchors trầm ổn, tính toán, đúng giọng tu tiên phục thù cải mệnh, đủ diacritics, không AI-tell." }
+  ],
+  "overallFeedback": "Setup vững cho tu tiên trọng sinh sảng văn: warm-baseline opening với ký ức kiếp trước active ch.1, golden finger là tri-thức-biết-trước có anti-plot-armor cứng (không tự nâng tu vi, dòng thời gian dần lệch, vẫn phải vượt quan ải thật), conflict ladder leo thang sạch qua 7 volume từ chợ phường tới cải đại kiếp số toàn châu, origin lock reincarnated chặt (cùng thế giới, không xuyên không), dopamine cadence sảng văn chuẩn (đoạt cơ duyên + vả mặt + trả nợ phản bội), foreshadowing và twist có cấu trúc dài hạn. Phân biệt rõ với tu tiên cẩu đạo điền viên: đây là power-fantasy phục thù-cải-mệnh nhịp nhanh chủ động. Sẵn sàng cho DeepSeek V4 Pro viết chương. PASS."
+}

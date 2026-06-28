@@ -1,0 +1,9 @@
+Tô Vãn, một nữ điều dưỡng hai mươi lăm tuổi, vốn nghĩ ca trực đêm chỉ là chuỗi giờ dài lê thê với mùi cồn sát khuẩn và tiếng máy đo nhịp tim đều đặn — cho đến cái đêm cô nhận trực thay đồng nghiệp tại một bệnh viện cũ, và hành lang khoa nội bỗng kéo dài thêm một dãy phòng bệnh mà ban ngày không hề có. Đèn trần vàng vọt nhấp nháy. Trên quầy trực điều dưỡng, đặt sẵn một tờ bàn giao ca lạ lùng: "Quy trình dành cho điều dưỡng trực đêm. Đọc kỹ trước khi đi buồng. Làm sai một dòng, bạn sẽ không bao giờ giao ca."
+
+Cô nhanh chóng nhận ra sự thật rợn người: trong mỗi bộ quy trình ấy, có dòng cứu người, và có dòng được soạn ra để giết chính kẻ ngoan ngoãn tuân theo. Thật và giả trộn vào nhau, núp dưới lớp vỏ y khoa khô khốc. Người ta không sống sót bằng chạy nhanh hay sức khỏe — mà bằng việc đọc đúng, đối chiếu đúng, suy luận đúng ngay khoảnh khắc một tiếng gọi y tá vang lên từ căn phòng lẽ ra đã trống giường.
+
+May mắn duy nhất của Tô Vãn là một thứ chỉ mình cô cảm nhận được: những dòng quy tắc giả khiến đầu ngón tay cô lạnh buốt khi lướt qua, như chạm vào da người đã lạnh. Nhưng nó không bao giờ chỉ cho cô con đường — nó chỉ thì thầm "dòng này đáng ngờ", phần còn lại vẫn là cái đầu tỉnh táo và lá gan của cô.
+
+Từ hành lang khoa nội lúc nửa đêm, đến phòng bệnh cuối dãy luôn khóa, nhà xác tầng hầm nơi danh sách tự thêm tên, cho tới những ca trực dài tưởng như không bao giờ tới sáng — Tô Vãn bước vào hết phó bản này đến phó bản khác, nơi mỗi bộ quy trình là một ván cược sinh tử. Phía sau những dòng chữ lạnh lùng ấy, ai đó đang quan sát từng người trực đêm. Và câu hỏi lớn nhất không phải "làm sao để giao ca", mà là: ai đã soạn ra tất cả những quy trình tử thần này — và tại sao họ chọn cô.
+
+Một hành trình kinh dị bệnh viện lạnh sống lưng, nơi sự bình tĩnh và lý trí là vũ khí duy nhất. Đọc tại TruyenCity.

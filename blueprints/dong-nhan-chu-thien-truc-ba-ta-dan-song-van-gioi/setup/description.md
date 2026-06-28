@@ -1,0 +1,11 @@
+Tô Hành, một thanh niên hai mươi tư tuổi vừa mất việc, vốn nghĩ điều phi thường nhất trong đời mình là tìm được công việc trả đủ tiền nhà — cho đến cái đêm anh nhìn thấy một khung cửa sổ ánh sáng mở ra ngay giữa căn phòng trọ chật chội. Một giọng nói vang lên trong đầu anh: "Kênh Trực Tiếp Vạn Giới đã sẵn sàng. Mời chủ kênh lên sóng." Và khi anh ngập ngừng cất tiếng, hàng vạn khung cửa sáng treo lơ lửng quanh anh đồng loạt mở ra — sau mỗi khung là một thế giới đang chăm chú nhìn về phía anh.
+
+Có thế giới tu tiên đang khô cạn linh khí, khao khát một cách trồng trọt mới. Có thế giới ma pháp sa lầy trong chiến tranh nguyên tố, bế tắc tìm lối thoát. Có thế giới mạt thế đói khát lương thực, và thế giới võ hiệp mê mẩn những câu chuyện chưa từng nghe. Tất cả họ đều đang chờ anh — cái micro duy nhất nối liền muôn vàn thế giới — mở miệng.
+
+Tô Hành nhanh chóng nhận ra một sự thật khiến tim anh đập rộn: chỉ một mẹo nhỏ với anh có thể là cả một cuộc cách mạng với thế giới đang xem. Một bài học nông nghiệp, một định lý, một bài hát, một đạo lý sống — mỗi thứ anh trình diễn đều khuấy đảo khán giả, đổ về cho anh vô số Lễ Vật mang theo quy tắc của những thế giới xa lạ: đan dược, ma pháp thư, tinh thể hợp kim, hạt giống cổ thụ. Và mỗi món quà ấy lại lặng lẽ khiến chính anh phi phàm hơn.
+
+Nhưng Sảnh Phát Sóng không trao toàn năng. Anh không thể vươn tay can thiệp vào thế giới khán giả — anh chỉ có cái micro và cái đầu của mình. Một lời khuyên sai có thể đẩy cả một thế giới vào tai họa; lòng tin của vạn giới mất đi cũng nhanh như khi nó đến. Anh phải tự nghĩ ra mọi nội dung, tự gánh hậu quả, tự khôn ngoan dẫn dắt dòng chú ý của muôn vàn thế giới sao cho vừa khuấy động, vừa tử tế.
+
+Từ một căn phòng trọ ở góc thành phố, Tô Hành trở thành cái tên được nhắc tới ở vô số thế giới: kẻ giải trí cho vạn giới, người gieo tri thức, chủ nhân của làn sóng chú ý lớn nhất mà các thế giới từng biết. Phía sau những khung cửa sáng ấy, có những kênh phát sóng khác đang trục lợi, và một câu hỏi lớn dần lên: ai đã dựng nên Sảnh Phát Sóng nối liền vạn giới — và vì sao họ chọn chính anh làm cái micro của muôn vàn thế giới.
+
+Một hành trình sảng khoái và ấm áp, nơi trí tuệ, lòng tử tế và sự dí dỏm là vũ khí mạnh nhất. Đọc tại TruyenCity.

@@ -1,0 +1,117 @@
+{
+  "premise": "Một ngự thú sư hạng bét được năng lực Thiên Nhãn Tuyến Ẩn thức tỉnh trong huyết mạch: anh nhìn thấu Tuyến Tiến Hóa Ẩn của thú cưng, biến những con thú bị coi là phế thành chiến thú đỉnh cao qua công thức tiến hóa độc nhất. Từ học viên bị khinh thường ở thành Lục Diệp, Lâm Tinh từng bước thành Ngự Thú Vương, chứng minh không có con thú nào là phế phẩm — chỉ có người chưa nhìn ra tuyến đúng.",
+  "mainConflict": "Underdog vs thế lực lớn trong giới ngự thú: Lâm Tinh khởi đầu yếu thế, ít tài nguyên, đối đầu các gia tộc ngự thú lâu đời và thương hội độc quyền dược liệu tiến hóa. Xung đột leo thang từ cấp học viện → khu vực → toàn liên bang → thế lực cổ xưa, luôn phân xử qua đấu trường ngự thú (thú đấu thú), thi đấu, săn thú vùng cấm và tranh chấp tài nguyên — con người không đánh nhau tay đôi.",
+  "themes": [
+    "Không có con thú nào là phế phẩm, chỉ có người chưa nhìn ra tuyến đúng",
+    "Nuôi dưỡng tận tâm thắng tài nguyên dư thừa",
+    "Kẻ yếu thế bằng trí tuệ và gắn kết có thể đối đầu kẻ mạnh",
+    "Giữ tâm thương thú khi danh vọng lớn dần"
+  ],
+  "majorPlotPoints": [
+    "Ch.1: sắp bị đuổi học, Thiên Nhãn Tuyến Ẩn thức tỉnh, hé lộ con thú phế đầu tiên mang tuyến ẩn đỉnh cao.",
+    "Arc 1: lật ngược danh phận trong học viện, biến thú phế thành chiến thú, leo bảng xếp hạng học viên.",
+    "Arc 2-3: lập đội thú đa hệ, thắng các giải khu vực, đối đầu gia tộc ngự thú địa phương.",
+    "Giữa truyện: vào vùng cấm địa săn dị thú, đối đầu thương hội độc quyền dược liệu tiến hóa.",
+    "Cao trào cuối: đối mặt thế lực cổ xưa đứng sau việc thất truyền các tuyến ẩn, reveal nguồn gốc Thiên Nhãn, phục hưng đạo tiến hóa cổ."
+  ],
+  "setupKernel": {
+    "readerFantasy": "Cảm giác sảng khoái khi một ngự thú sư bị coi là vô dụng, nhờ con mắt độc nhất, biến từng con thú bị cả thế gian bỏ rơi thành chiến thú đỉnh cao khiến cả đấu trường sững sờ — mỗi lần tiến hóa là một lần đối thủ kiêu ngạo bị vả mặt bằng đúng thực lực, không cần một cú đấm nào của chính MC.",
+    "protagonistEngine": "Lâm Tinh thắng nhờ Thiên Nhãn nhìn thấu tuyến ẩn + kiến thức nuôi dưỡng-dược liệu tích lũy thật + thấu cảm tâm tính từng con thú + tư duy chiến thuật đấu trường; tính cách điềm đạm, lì đòn, lấy nuôi dưỡng tận tâm và mưu trí làm vũ khí, không chơi bẩn nhưng không nhẫn nhịn vô lý khi bị chèn ép.",
+    "pleasureLoop": [
+      "Một con thú bị coi là phế xuất hiện → Lâm Tinh dùng Thiên Nhãn thấy tuyến ẩn → nuôi dưỡng và dẫn dắt tiến hóa → con thú lột xác thành chiến thú khiến mọi người sửng sốt (breakthrough/harvest).",
+      "Thiên Nhãn hé lộ một Tuyến Tiến Hóa Ẩn + Công Thức Tiến Hóa mới → Lâm Tinh mở ra hướng đi không ai biết (discovery).",
+      "Đối thủ kiêu ngạo khinh thường thú của Lâm Tinh, thách đấu trường → thú đã tiến hóa của anh thắng áp đảo → đối thủ bẽ mặt trước đám đông (mass-witnessed face-slap).",
+      "Khoảnh khắc con thú trung thành đáp lại tình thương của Lâm Tinh trong trận sinh tử → cảm động ấm áp (bond/recognition).",
+      "Thắng giải, leo hạng, thu được dược liệu/thú quý hiếm sau một sự kiện lớn → cảm giác gặt hái cụ thể (progression-success).",
+      "Một học viên/thú yếu thế khác được Lâm Tinh giúp nhìn ra tuyến ẩn → mạng lưới đồng minh mạnh thêm, danh tiếng lan tỏa (network_payoff)."
+    ],
+    "systemMechanic": {
+      "name": "Thiên Nhãn Tuyến Ẩn",
+      "input": "Quan sát và tiếp xúc kỹ một con thú thật — nuôi dưỡng, huấn luyện, chiến đấu cùng nó để hiểu trạng thái huyết mạch và tiềm năng; liếc qua loa hoặc nhìn từ xa không đủ để soi sâu.",
+      "output": "Hé lộ Tuyến Tiến Hóa Ẩn của con thú cùng một phần Công Thức Tiến Hóa — dược liệu, điều kiện môi trường và lộ trình huấn luyện cần thiết để đi theo tuyến đó.",
+      "limit": "Thấy tuyến ẩn không có nghĩa hoàn thành ngay; vẫn cần dược liệu thật, thời gian nuôi dưỡng thật và kinh nghiệm chiến đấu thật. Mỗi ngày Thiên Nhãn chỉ soi sâu được một số lần giới hạn; thú càng cao cấp càng tốn nhiều ngày để đọc trọn tuyến.",
+      "reward": "Biến những con thú bị coi là phế thành chiến thú đỉnh cao qua công thức tiến hóa độc nhất mà không ngự thú sư nào khác biết tới."
+    },
+    "mcOrigin": "system-bestowed",
+    "originLockNote": "Lâm Tinh là người bản địa của Đại Lục Vạn Thú; năng lực Thiên Nhãn Tuyến Ẩn tự thức tỉnh trong huyết mạch anh, gắn với một dòng dõi ngự thú cổ đã thất truyền. Mọi tri thức vượt trội đều do Thiên Nhãn ban tặng và do anh khổ luyện nuôi dưỡng mà có.",
+    "mcSecret": {
+      "secret": "Lâm Tinh sở hữu Thiên Nhãn Tuyến Ẩn vô hình, có thể nhìn thấu tuyến tiến hóa ẩn của bất kỳ con thú nào.",
+      "outsideWorldKnowledge": "Thiên Nhãn thức tỉnh từ huyết mạch một dòng dõi ngự thú cổ thất truyền; kho tri thức tiến hóa của nó vượt xa điển tịch hiện hành nhưng vẫn nằm trong khuôn khổ đạo ngự thú của thế giới này.",
+      "revealRule": "Giữ kín hoàn toàn ở Phase 1-2; chỉ hé lộ một phần cho vài đồng minh thân tín khi đội ngũ đủ vững; reveal nguồn gốc dòng dõi cổ và Thiên Nhãn ở cao trào cuối truyện.",
+      "coverStory": "Anh nói mình chỉ có trực giác tốt với thú và may mắn vớ được vài cuốn điển tịch tiến hóa cũ của tổ tiên."
+    },
+    "benefitLoop": {
+      "goal": "Biến từng con thú bị coi là phế (rồi cả một đội ngũ chiến thú) thành những hình thái tiến hóa đỉnh cao và trung thành.",
+      "action": "Dùng Thiên Nhãn đọc tuyến ẩn, gom dược liệu và điều kiện cần thiết, kiên nhẫn nuôi dưỡng-huấn luyện, dẫn dắt thú qua tiến hóa và đấu trường.",
+      "benefit": "Chiến thú mạnh hơn + công thức tiến hóa mới + danh vọng, hạng bậc, dược liệu và tài nguyên tăng, mở rộng nguồn lực cho bước kế tiếp.",
+      "cadence": "Mỗi 1-2 chương có ít nhất một vòng đọc-tuyến-được-thưởng hoặc một bước tiến nuôi dưỡng; mỗi 3-5 chương một bước nhảy lớn (một thú tiến hóa thành hình thái mới, thắng giải, thu thú/dược liệu quý)."
+    },
+    "interventionRule": "Lâm Tinh chỉ ra tay can thiệp vào rắc rối bên ngoài khi nó (a) đe dọa trực tiếp anh, thú của anh, đồng minh hoặc nguồn dược liệu, hoặc (b) là bất công trong chính giới ngự thú mà anh có năng lực hóa giải bằng đấu trường và trí tuệ; anh không lo chuyện thiên hạ ngoài chuyên môn và luôn giải quyết qua thú đấu, thi đấu, đàm phán — không bằng bạo lực cá nhân.",
+    "phase1Playground": {
+      "locations": [
+        "Học Viện Ngự Thú Lục Diệp (lớp học, chuồng thú, sân huấn luyện)",
+        "Đấu trường hạng phố của thành Lục Diệp",
+        "Rừng Sương Mù — vùng săn thú hoang cấp thấp cho học viên thực tập",
+        "Chợ thú và các tiệm dược tễ trong thành Lục Diệp"
+      ],
+      "cast": [
+        "Lâm Tinh (ngự thú sư tập sự, MC)",
+        "Con thú phế đầu tiên mang Tuyến Tiến Hóa Ẩn (chiến thú khởi đầu của MC)",
+        "Tô Mạn (nữ giảng viên trẻ tốt bụng ở học viện, người đầu tiên không khinh thường Lâm Tinh)",
+        "Triệu Hằng (học viên con nhà gia tộc, đối thủ kiêu ngạo cùng khóa)",
+        "Lão Khúc (chủ tiệm dược tễ già, nguồn dược liệu và lời khuyên)"
+      ],
+      "resources": [
+        "Thiên Nhãn Tuyến Ẩn + kiến thức nuôi dưỡng tích lũy",
+        "Con thú phế khế ước đầu tiên (tiềm năng ẩn cực lớn)",
+        "Quan hệ với Lão Khúc tiệm dược tễ",
+        "Quyền thực tập trong Rừng Sương Mù và thi đấu hạng phố kiếm điểm học viện"
+      ],
+      "localAntagonists": [
+        "Triệu Hằng — học viên gia tộc khinh thường thú của Lâm Tinh, liên tục khiêu khích thách đấu",
+        "Một giảng viên thiên vị muốn đuổi học Lâm Tinh để giữ thành tích lớp"
+      ],
+      "repeatableSceneTypes": [
+        "Một con thú bị coi là phế xuất hiện và Thiên Nhãn hé lộ tuyến ẩn của nó",
+        "Lâm Tinh nuôi dưỡng-huấn luyện thú qua một bước tiến hóa cụ thể",
+        "Đối thủ khinh thường thách đấu trường, thú của Lâm Tinh thắng áp đảo",
+        "Khoảnh khắc gắn kết cảm động giữa Lâm Tinh và thú trong gian khó",
+        "Xây quan hệ với giảng viên/chủ tiệm dược/đồng môn yếu thế"
+      ]
+    },
+    "socialReactor": {
+      "witnesses": [
+        "Học viên và giảng viên Học Viện Ngự Thú Lục Diệp",
+        "Khán giả đấu trường hạng phố",
+        "Giới buôn thú và chủ tiệm dược trong thành",
+        "Các gia tộc ngự thú dõi theo tài năng trẻ"
+      ],
+      "reactionModes": [
+        "Đám đông đấu trường sững sờ rồi reo hò khi thú phế lột xác thắng trận",
+        "Lời đồn lan trong học viện về 'học viên hạng bét nuôi được thú mạnh'",
+        "Gia tộc cử người dò xét hoặc chiêu mộ Lâm Tinh",
+        "Giới buôn thú tìm tới nhờ anh thẩm định thú"
+      ],
+      "reportBackCadence": "Phản ứng tức thì tại đấu trường/học viện mỗi chương; làn sóng đồn đại và sự chú ý của gia tộc mỗi 3-5 chương sau một sự kiện tiến hóa hoặc thắng giải lớn."
+    },
+    "noveltyLadder": [
+      { "chapterRange": "1-100", "newToy": "Thiên Nhãn hé lộ tuyến ẩn, biến con thú phế đầu tiên thành chiến thú và lật ngược danh phận học viện", "keepsSameLane": "Vẫn là một ngự thú sư trẻ nuôi và đấu thú trong phạm vi học viện" },
+      { "chapterRange": "100-300", "newToy": "Lập đội thú đa hệ và thắng các giải khu vực", "keepsSameLane": "Vẫn là nuôi dưỡng-tiến hóa-đấu thú, chỉ mở rộng quy mô đội và sân đấu" },
+      { "chapterRange": "300-600", "newToy": "Vào vùng cấm địa săn dị thú và đối đầu thương hội độc quyền dược liệu", "keepsSameLane": "Vẫn là đạo ngự thú, đối thủ và thú lớn hơn" },
+      { "chapterRange": "600-1000", "newToy": "Đối mặt thế lực cổ xưa và phục hưng đạo tiến hóa cổ", "keepsSameLane": "Vẫn là hành trình ngự thú sư, đỉnh cao của cùng một nghề" }
+    ],
+    "controlRules": {
+      "payoffCadence": "Tối thiểu 2 cao điểm dopamine mỗi chương, cao điểm đầu trước nửa chương; setup không quá 30% và phải có payoff trong cùng hoặc chương kế.",
+      "attentionGradient": "Mở chương bằng một móc câu cơ hội hoặc thử thách ngự thú cụ thể; đóng chương bằng một cliffhanger nhẹ hoặc một thắng lợi mở ra cơ hội/tuyến tiến hóa mới.",
+      "openThreadsPerArc": 3,
+      "closeThreadsPerArc": 2
+    },
+    "patternCards": [
+      "warm-baseline-opening",
+      "competence-led-growth",
+      "mass-witnessed-face-slap",
+      "underdog-coalition",
+      "nurture-beats-resources"
+    ]
+  }
+}

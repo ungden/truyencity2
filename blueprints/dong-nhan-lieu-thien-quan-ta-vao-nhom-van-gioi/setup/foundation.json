@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "totalScore": 121,
+  "avgScore": 8.64,
+  "minDimScore": 8,
+  "source": "claude_code",
+  "dimensions": [
+    { "name": "Premise & hook", "score": 9, "note": "Warm-baseline đồng nhân nhóm-chat-vạn-giới: Liêu Thiên Quần ban tặng ngay ch.1, hook là nhóm chat lạ hiện trên điện thoại đầy đại năng đang đổi chác — opportunity-driven, không mở đầu bằng cảnh MC cùng quẫn thê thảm." },
+    { "name": "Protagonist engine", "score": 9, "note": "Lâm Hạo thắng bằng mắt định giá bất đối xứng + tri thức/đặc sản Trái Đất + chữ tín + cái đầu ghép mảnh; tính cách điềm đạm, dí dỏm, thực tế, trọng tín, nhất quán." },
+    { "name": "System mechanic", "score": 9, "note": "Liêu Thiên Quần có input/output/limit/reward rõ; anti-plot-armor cứng — chỉ là kênh giao dịch, đổi hớ là lỗ, thần thông phải tự khổ luyện, vật phẩm phải hiểu đúng, không nhờ được đại năng can thiệp đời thực, không nút thắng-tất-cả, Hệ Thống không mách bài." },
+    { "name": "Conflict ladder", "score": 9, "note": "Leo thang thương vụ đơn lẻ → vạch trần nhóm lừa đảo và nội gián → điều phối nhiệm vụ liên giới → Quản Trị Viên, tất cả non-violence qua trí, tín và bằng chứng giao dịch." },
+    { "name": "World coherence", "score": 9, "note": "Đô thị hiện đại 2024 + Liêu Thiên Quần + cơ chế Điểm Quần/đổi chác, giới các nhóm chat vạn giới, đường dây lừa đảo, Quản Trị Viên đều nhất quán; forbidden elements rõ ràng." },
+    { "name": "Dopamine cadence", "score": 9, "note": "controlRules ≥2 peak/chương (một cú lời ngọt + một thần thông/vật phẩm/Điểm Quần về tay hoặc kẻ gian bị vạch trần), cao điểm đầu trước nửa chương." },
+    { "name": "Origin lock", "score": 9, "note": "mcOrigin=system-bestowed khóa chặt; nhóm là golden finger in-world ban tặng tại chỗ; outlines và mọi file không chứa token xuyên không/xuyên việt/trọng sinh/đầu thai/đến từ trái đất." },
+    { "name": "Genre fit (đồng nhân/multiverse)", "score": 8, "note": "Đúng chất nhóm-chat-vạn-giới: một MC bản địa, đại năng nhiều thế giới đổi chác qua nhóm chat; phân biệt rõ với chư-thiên-trực-bá (Novel A) — đây là đổi chác bất đối xứng, không phải phát sóng." },
+    { "name": "Foreshadowing & twists", "score": 8, "note": "3 twist (Trác Phong là nội gián đường dây lừa đảo, một đại năng tin cậy tuồn thông tin giao dịch, nguồn gốc nhóm = chữ ký Quản Trị Viên) + 3 foreshadowing có plant/payoff cụ thể, kéo dài tới cao trào." },
+    { "name": "Long-form sustainability", "score": 9, "note": "noveltyLadder 5 nấc giữ cùng lane 'mắt xích nhóm chat vạn giới', 7 volume cho 1000 chương, endgame định hình lại cách vạn giới giao dịch." },
+    { "name": "Vietnamese voice", "score": 8, "note": "Voice anchors ấm áp, sòng phẳng, dí dỏm, đúng giọng sảng văn đồng nhân, đủ diacritics, không AI-tell, không meta/4th-wall." }
+  ],
+  "overallFeedback": "Setup vững cho đồng nhân nhóm-chat-vạn-giới: warm-baseline opening với Liêu Thiên Quần active ch.1, golden finger là một kênh giao dịch vạn giới có anti-plot-armor cứng (đổi hớ là lỗ, thần thông phải tự khổ luyện, không nhờ được can thiệp đời thực, không nút thắng-tất-cả, mất chữ tín mất quan hệ), conflict ladder leo thang sạch qua 7 volume bằng trí và tín, origin lock system-bestowed chặt, dopamine cadence (cú lời ngọt + thần thông/vật phẩm/Điểm Quần + vạch trần kẻ gian), foreshadowing và twist có cấu trúc dài hạn. Phân biệt rõ với Novel A (chư thiên trực bá phát sóng). Sẵn sàng cho DeepSeek V4 Pro viết chương. PASS."
+}

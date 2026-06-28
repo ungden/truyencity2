@@ -1,0 +1,100 @@
+{
+  "title": "Mạt Thế Kiến Căn Cứ: Ta Là Thủ Lĩnh Vùng An Toàn",
+  "totalChapters": 1000,
+  "mainPlotline": "Phương Viễn, một kỹ thuật viên hậu cần bản địa hoàn toàn bình thường, sống sót qua ngày thành phố sụp đổ vì làn sương xám; bằng cái đầu lạnh và bản năng tổ chức hiếm có, anh dựng nên một vùng an toàn từ một bãi đỗ xe nhỏ, từng bước biến đám người hoảng loạn thành một cộng đồng có kỷ luật, rồi mở rộng thành một thế lực giữ trật tự cho cả vùng — đối đầu các băng cướp, kẻ phản bội bên trong, và các biến chủng ngày một lớn mạnh, tất cả bằng tổ chức, mưu lược và kỷ luật chứ không bằng siêu sức mạnh.",
+  "originLock": "native — Phương Viễn là người bản địa, một kỹ thuật viên hậu cần bình thường sống tại đô thị; là người thường, không dị năng, không siêu sức mạnh, không ký ức đặc biệt nào từ đầu. Mọi năng lực đều là kỹ năng tổ chức/hậu cần anh tự rèn tại chỗ trong mạt thế.",
+  "volumes": [
+    {
+      "volume": 1,
+      "title": "Bức Tường Đầu Tiên",
+      "chapterRange": "1-130",
+      "theme": "Sống sót ngày sụp đổ và dựng vùng an toàn đầu tiên từ một bãi đỗ xe",
+      "summary": "Làn sương xám tràn qua thành phố; Phương Viễn dùng cái đầu lạnh sống sót ba ngày đầu, quy tụ vài người sống sót quanh một bãi đỗ xe có cổng sắt, dựng bức tường đầu tiên, lập luật 'ai cũng có việc, ai cũng được ăn', và đẩy lui đợt tha hóa đầu tiên bằng phòng thủ có tổ chức.",
+      "subArcs": [
+        { "name": "Ba ngày sụp đổ", "chapterRange": "1-30", "focus": "Sương xám tràn tới; Phương Viễn không hoảng loạn, đọc bản đồ thoát hiểm, gom được nước và lương đầu tiên, cứu vài người và chọn bãi đỗ xe làm cứ điểm." },
+        { "name": "Cổng sắt và luật lệ", "chapterRange": "31-65", "focus": "Dựng bức tường đầu tiên, phân công gác/nấu/sửa, lập luật chia phần công bằng; người sống sót đầu tiên tin theo." },
+        { "name": "Nguồn nước", "chapterRange": "66-100", "focus": "Khủng hoảng nước sạch; Phương Viễn tổ chức một chuyến lấy nước từ trạm bơm, thiết lập hệ lọc thô, xử lý kẻ tích trữ ích kỷ trong nhóm." },
+        { "name": "Đợt sóng đầu", "chapterRange": "101-130", "focus": "Bầy tha hóa tấn công cứ điểm; phòng thủ thắng nhờ bố trí hào lửa và phân tuyến rút lui đã chuẩn bị; cứ điểm đứng vững, danh tiếng bắt đầu lan." }
+      ],
+      "keyMilestone": "Bãi đỗ xe trở thành vùng an toàn thật sự đầu tiên với tường, nước, luật và một nhóm người chịu nghe theo Phương Viễn."
+    },
+    {
+      "volume": 2,
+      "title": "Người Tìm Tới Cổng",
+      "chapterRange": "131-280",
+      "theme": "Cộng đồng lớn dần và những mâu thuẫn nội bộ đầu tiên",
+      "summary": "Tiếng lành đồn xa, người sống sót lũ lượt tới gõ cổng. Phương Viễn phải giải bài toán mở rộng: ai được nhận, ai bị từ chối, lương thực chia thế nào, kỷ luật áp ra sao — và đối phó kẻ cơ hội đầu tiên trà trộn vào phá từ bên trong.",
+      "subArcs": [
+        { "name": "Quá tải", "chapterRange": "131-180", "focus": "Dòng người tới quá đông; thiết lập quy trình sàng lọc, khám phơi nhiễm, phân khu ở; căng thẳng vì thiếu chỗ và thiếu lương." },
+        { "name": "Kẻ trong nhà", "chapterRange": "181-230", "focus": "Một kẻ cơ hội kích động bất mãn, tích trữ riêng, suýt gây bạo loạn; Phương Viễn vạch trần bằng sổ tồn kho và phân xử công khai theo luật." },
+        { "name": "Đội ra ngoài", "chapterRange": "231-280", "focus": "Lập đội thu thập tài nguyên có quy trình; lần đầu chạm trán một băng cướp nhỏ ngoài siêu thị, thắng bằng bố trí và rút lui kỷ luật chứ không liều mạng." }
+      ],
+      "keyMilestone": "Vùng an toàn thành một cộng đồng có cơ cấu rõ ràng; Phương Viễn chính thức được công nhận là thủ lĩnh chứ không chỉ người tổ chức."
+    },
+    {
+      "volume": 3,
+      "title": "Băng Cao Ốc",
+      "chapterRange": "281-430",
+      "theme": "Đối đầu thế lực người sống sót thù địch đầu tiên",
+      "summary": "Một băng cướp vũ trang chiếm tòa cao ốc gần đó, thu 'thuế bảo kê' và dòm ngó tài nguyên của cứ điểm. Phương Viễn không lao vào chiến tranh tổng lực mà dùng tình báo, cắt nguồn tiếp tế và đòn tâm lý để bẻ gãy chúng.",
+      "subArcs": [
+        { "name": "Thuế bảo kê", "chapterRange": "281-330", "focus": "Băng Cao Ốc ra tối hậu thư; Phương Viễn câu giờ, cử người trinh sát, lập bản đồ điểm yếu của địch thay vì đáp trả nóng vội." },
+        { "name": "Cắt mạch", "chapterRange": "331-380", "focus": "Cô lập băng cướp bằng cách kiểm soát nguồn nước và tuyến tiếp tế; ly gián nội bộ chúng; lôi kéo những kẻ bị ép gia nhập băng về phía cứ điểm." },
+        { "name": "Đêm sụp đổ của cao ốc", "chapterRange": "381-430", "focus": "Băng Cao Ốc rối loạn, thủ lĩnh chúng đánh liều tấn công; cứ điểm phòng thủ thắng nhờ chuẩn bị; thu nạp người, mở rộng lãnh thổ." }
+      ],
+      "keyMilestone": "Phương Viễn hạ một thế lực thù địch lớn bằng mưu lược thay vì tàn sát, trở thành cái tên có trọng lượng trong cả vùng."
+    },
+    {
+      "volume": 4,
+      "title": "Liên Minh Vùng An Toàn",
+      "chapterRange": "431-580",
+      "theme": "Từ một cứ điểm thành trung tâm của một mạng lưới",
+      "summary": "Các nhóm sống sót khác tìm tới đề nghị liên minh, đổi chác, thậm chí sáp nhập. Phương Viễn phải làm chính trị: cân bằng lợi ích, thiết lập luật chơi chung, xử lý kẻ muốn lợi dụng liên minh để thâu tóm.",
+      "subArcs": [
+        { "name": "Bàn tròn", "chapterRange": "431-480", "focus": "Triệu tập các thủ lĩnh nhỏ, lập quy ước trao đổi và phòng thủ chung; lộ ra một thủ lĩnh hai mặt." },
+        { "name": "Tiền tệ mới", "chapterRange": "481-530", "focus": "Thiết lập hệ trao đổi tài nguyên chuẩn hóa giữa các vùng; kiểm soát đầu cơ; xây chợ an toàn." },
+        { "name": "Kẻ thâu tóm", "chapterRange": "531-580", "focus": "Vạch trần và vô hiệu hóa thủ lĩnh hai mặt muốn nuốt cả liên minh; củng cố vị thế trung tâm của cứ điểm." }
+      ],
+      "keyMilestone": "Cứ điểm của Phương Viễn trở thành trái tim của một liên minh vùng an toàn, định ra luật chơi cho cả khu vực."
+    },
+    {
+      "volume": 5,
+      "title": "Sương Không Tan",
+      "chapterRange": "581-730",
+      "theme": "Hiểm họa biến chủng tiến hóa và bí ẩn nguồn sương",
+      "summary": "Các biến chủng tiến hóa nhanh hơn dự đoán: to lớn, tinh khôn, biết phục kích và phá tường. Phương Viễn phải nâng cấp phòng thủ lên tầm mới và bắt đầu truy tìm nguồn gốc làn sương xám không bao giờ tan ở vùng trung tâm thành phố.",
+      "subArcs": [
+        { "name": "Kẻ phá tường", "chapterRange": "581-630", "focus": "Một biến chủng cỡ lớn phá vỡ phòng tuyến cũ; buộc tái thiết kế công sự, vũ khí cơ giới tự chế, chiến thuật bẫy." },
+        { "name": "Lõi sương", "chapterRange": "631-680", "focus": "Trinh sát phát hiện một 'lõi sương' ở trung tâm thành phố nơi biến chủng sinh sôi; chuẩn bị một chiến dịch viễn chinh có hậu cần." },
+        { "name": "Viễn chinh", "chapterRange": "681-730", "focus": "Dẫn liên minh tiến vào vùng trung tâm; tổn thất và bài học; thu được manh mối lớn về cơ chế của làn sương." }
+      ],
+      "keyMilestone": "Phương Viễn hiểu làn sương không phải tai họa ngẫu nhiên và biết hiểm họa thật nằm ở lõi trung tâm thành phố."
+    },
+    {
+      "volume": 6,
+      "title": "Trật Tự Hay Hỗn Loạn",
+      "chapterRange": "731-880",
+      "theme": "Khủng hoảng lớn nhất — bên trong và bên ngoài cùng ép tới",
+      "summary": "Một thế lực lớn cuối cùng — tàn dư có tổ chức muốn cai trị bằng bạo lực — thách thức mô hình 'trật tự nhân đạo' của Phương Viễn, đúng lúc biến chủng tổng tấn công và nguồn sương lan rộng. Liên minh đứng trước nguy cơ tan rã.",
+      "subArcs": [
+        { "name": "Tối hậu thư", "chapterRange": "731-780", "focus": "Thế lực bạo lực đòi liên minh quy phục; Phương Viễn từ chối, chuẩn bị cho cuộc đối đầu kép." },
+        { "name": "Hai mặt trận", "chapterRange": "781-830", "focus": "Vừa chống biến chủng tổng tấn công vừa chặn thế lực bạo lực; huy động toàn bộ hệ thống hậu cần và phòng thủ đã xây qua nhiều năm." },
+        { "name": "Bản lĩnh thủ lĩnh", "chapterRange": "831-880", "focus": "Phương Viễn giữ liên minh không tan, đánh bại cả hai mối đe dọa bằng tổ chức và lòng người, trả giá đắt nhưng giữ được trật tự." }
+      ],
+      "keyMilestone": "Mô hình trật tự nhân đạo của Phương Viễn vượt qua thử thách sống còn lớn nhất, chứng minh tổ chức thắng bạo lực."
+    },
+    {
+      "volume": 7,
+      "title": "Nền Móng Cho Ngày Mai",
+      "chapterRange": "881-1000",
+      "theme": "Giải quyết tận gốc nguồn sương và đặt nền cho một trật tự bền vững",
+      "summary": "Phương Viễn dẫn một chiến dịch cuối cùng tới lõi sương để vô hiệu hóa nguồn gốc thảm họa, đồng thời chuyển hóa liên minh từ nhóm sinh tồn thành một cộng đồng tái thiết — đặt nền móng luật pháp, giáo dục và sản xuất cho một tương lai không còn chỉ là sống qua ngày.",
+      "subArcs": [
+        { "name": "Đường tới lõi", "chapterRange": "881-930", "focus": "Tổng hợp mọi nguồn lực và tri thức tích lũy để mở đường tới lõi sương an toàn nhất có thể." },
+        { "name": "Dập nguồn", "chapterRange": "931-980", "focus": "Vô hiệu hóa cơ chế phát sương ở lõi; làn sương bắt đầu tan dần khỏi thành phố." },
+        { "name": "Trang mới", "chapterRange": "981-1000", "focus": "Tái thiết: từ vùng an toàn thành một thành phố non trẻ có luật, có trường, có ruộng; Phương Viễn lùi khỏi vai chỉ huy thời chiến để đặt nền cho một trật tự bền vững." }
+      ],
+      "keyMilestone": "Nguồn sương bị dập, thành phố bắt đầu hồi sinh; Phương Viễn từ thủ lĩnh sinh tồn thành người kiến tạo một trật tự mới."
+    }
+  ]
+}

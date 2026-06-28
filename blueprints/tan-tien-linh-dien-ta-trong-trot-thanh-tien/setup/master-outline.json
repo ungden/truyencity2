@@ -1,0 +1,100 @@
+{
+  "title": "Linh Điền Tại Thân: Ta Trồng Trọt Thành Tiên",
+  "totalChapters": 1000,
+  "mainPlotline": "Hàn Tiêu, một tản tu hạng bét ở Vân Mộng Giới chọn con đường cẩu đạo trường sinh, phát hiện trong người mình ẩn chứa một mảnh Linh Điền có thể trồng linh dược, nuôi linh thú, ủ linh tửu với chất lượng cao bất thường. Lấy việc canh tác linh điền và tích lũy bền bỉ làm gốc, anh thong dong kiếm sống, củng cố nền tảng tu luyện vững như bàn thạch, lặng lẽ vượt qua những kẻ ép cảnh giới rồi chết yểu, hóa giải êm đẹp những kẻ tham lam dòm ngó vườn nhà, từng bước mở rộng Linh Điền thành cả một tiểu thế giới điền viên và bất giác tích lũy thành đại năng trường sinh.",
+  "originLock": "native — Hàn Tiêu là người bản địa Vân Mộng Giới, một tản tu sinh ra và lớn lên ngay trong thế giới tu tiên này. Anh không mang ký ức của bất kỳ ai khác, không đến từ nơi nào ngoài Vân Mộng Giới. Linh Điền là một cơ duyên bẩm sinh trong cơ thể anh, một bí mật IN-WORLD; mọi tri thức làm vườn của anh đều do anh tự học và đúc kết qua năm tháng canh tác.",
+  "volumes": [
+    {
+      "volume": 1,
+      "title": "Một Mảnh Ruộng Trong Người",
+      "chapterRange": "1-130",
+      "theme": "Phát hiện Linh Điền, học cách canh tác, ổn định sinh kế",
+      "summary": "Hàn Tiêu, tản tu nghèo ở thôn Vân Khê, vô tình phát hiện mảnh Linh Điền ẩn trong người. Anh học cách gieo trồng những linh dược đầu tiên, hiểu ra linh tính của cây và cơ chế thời gian trong ruộng, và bắt đầu kiếm sống êm ấm bằng đặc sản tự trồng.",
+      "subArcs": [
+        { "name": "Vỡ đất", "chapterRange": "1-30", "focus": "Phát hiện Linh Điền, gieo gói hạt giống linh dược đầu tiên, kinh ngạc trước chất lượng và tốc độ sinh trưởng trong ruộng." },
+        { "name": "Học nghề nông tiên", "chapterRange": "31-65", "focus": "Học linh tính từng loại cây, điều hòa thời tiết linh khí trong ruộng, nuôi con linh thú đầu tiên làm trợ thủ." },
+        { "name": "Phiên chợ đầu", "chapterRange": "66-100", "focus": "Mang linh dược chất lượng cao xuống phường thị bán, giấu nguồn gốc, kiếm món linh thạch đầu tiên đủ sống thong dong." },
+        { "name": "Hàng xóm dòm ngó", "chapterRange": "101-130", "focus": "Một thương nhân và một tản tu tham lam để ý tới đặc sản lạ của Hàn Tiêu; anh khéo léo che giấu và khiến kẻ tham tự vấp lòng tham của mình." }
+      ],
+      "keyMilestone": "Hàn Tiêu làm chủ kỹ năng canh tác cơ bản, ổn định sinh kế và xác lập nguyên tắc sống: kín đáo, thong dong, không tranh giành."
+    },
+    {
+      "volume": 2,
+      "title": "Vườn Dược Mở Rộng",
+      "chapterRange": "131-280",
+      "theme": "Mở rộng Linh Điền, đa dạng cây trồng và thú nuôi, dựng quan hệ ôn hòa",
+      "summary": "Linh Điền mở rộng, Hàn Tiêu trồng được nhiều loại linh dược quý hơn và nuôi thêm linh thú. Anh kết giao vài người bạn tử tế ở thôn và phường thị, dựng một mạng lưới đổi chác êm đẹp mà vẫn giữ kín bí mật.",
+      "subArcs": [
+        { "name": "Đất nở thêm", "chapterRange": "131-180", "focus": "Linh Điền tự mở rộng khi tu vi tăng; Hàn Tiêu trồng được linh dược trung phẩm, ủ mẻ linh tửu đầu tiên." },
+        { "name": "Bạn hiền", "chapterRange": "181-230", "focus": "Kết giao một nữ luyện đan sư chính trực và một lão nông tu tiên; lập quan hệ hợp tác đôi bên cùng lợi mà không lộ Linh Điền." },
+        { "name": "Đặc sản vang danh", "chapterRange": "231-280", "focus": "Linh tửu và linh thực của Hàn Tiêu nổi tiếng kín trong giới sành; một thế lực nhỏ muốn độc quyền thu mua, anh khéo từ chối mà không gây thù." }
+      ],
+      "keyMilestone": "Hàn Tiêu xây xong một sinh kế bền vững và mạng lưới bạn bè ôn hòa, Linh Điền thành một vườn dược phong phú."
+    },
+    {
+      "volume": 3,
+      "title": "Cẩu Đạo Trúc Cơ",
+      "chapterRange": "281-430",
+      "theme": "Đột phá Trúc Cơ với nền tảng hoàn mỹ, vượt người cùng lứa trong âm thầm",
+      "summary": "Nhờ linh dược và môi trường tu luyện hoàn hảo của Linh Điền, Hàn Tiêu đột phá Trúc Cơ với nền tảng hoàn mỹ trong khi những tu sĩ cùng lứa ép cảnh giới lần lượt vấp ngã. Anh vẫn giữ vẻ ngoài bình thường, không phô trương.",
+      "subArcs": [
+        { "name": "Nền tảng hoàn mỹ", "chapterRange": "281-330", "focus": "Dùng linh dược trồng trong ruộng để rửa tủy, ngưng nền Trúc Cơ hoàn mỹ; tu vi vượt xa vẻ ngoài tản tu nghèo." },
+        { "name": "Kẻ vội vã", "chapterRange": "331-380", "focus": "Đối lập với một thiên tài cùng vùng ép đột phá rồi tẩu hỏa; Hàn Tiêu lặng lẽ cứu giúp, củng cố triết lý sống chậm sống lâu." },
+        { "name": "Dòm ngó lớn dần", "chapterRange": "381-430", "focus": "Một gia tộc tu tiên dò ra Hàn Tiêu trồng được linh dược thượng phẩm và tìm cách ép anh phục vụ; anh dùng trí khôn và sự kín đáo thoát thân." }
+      ],
+      "keyMilestone": "Hàn Tiêu chứng minh con đường cẩu đạo trường sinh hơn hẳn lối ép cảnh giới, nhưng cũng bắt đầu lọt vào tầm ngắm của thế lực lớn hơn."
+    },
+    {
+      "volume": 4,
+      "title": "Ẩn Giữa Phồn Hoa",
+      "chapterRange": "431-580",
+      "theme": "Bước vào vùng tu tiên sầm uất hơn, giữ kín giữa nơi đông người",
+      "summary": "Hàn Tiêu chuyển tới một phường thị lớn hơn để có thị trường tốt và hạt giống quý, nơi anh phải giữ kín Linh Điền giữa vô số tu sĩ tinh mắt. Anh vừa làm giàu vừa né tránh các thế lực lớn, hướng tới ngưng Kim Đan.",
+      "subArcs": [
+        { "name": "Phố lớn", "chapterRange": "431-480", "focus": "Lập một sạp đặc sản kín đáo ở phường thị lớn; vừa kiếm hạt giống linh dược quý vừa xây vỏ bọc một tản tu bình thường." },
+        { "name": "Đấu giá", "chapterRange": "481-530", "focus": "Tham dự một hội đấu giá lớn để săn hạt giống tuyệt chủng; đấu trí với thương nhân và thế gia mà không lộ thực lực." },
+        { "name": "Kim Đan thong dong", "chapterRange": "531-580", "focus": "Ngưng Kim Đan êm ả nhờ tài nguyên Linh Điền; thọ nguyên kéo dài, anh càng có thời gian để thong dong tích lũy." }
+      ],
+      "keyMilestone": "Hàn Tiêu thành một thương nhân-tu sĩ giàu kín tiếng và đạt Kim Đan, vẫn ẩn mình hoàn hảo giữa phồn hoa."
+    },
+    {
+      "volume": 5,
+      "title": "Bí Mật Của Linh Điền",
+      "chapterRange": "581-730",
+      "theme": "Nguồn gốc Linh Điền hé lộ, mở rộng thành tiểu thế giới",
+      "summary": "Hàn Tiêu dần khám phá Linh Điền không chỉ là một mảnh ruộng — nó là mảnh vỡ của một thứ lớn hơn, gắn với một di sản điền viên cổ xưa. Ruộng mở rộng thành một tiểu thế giới với hệ sinh thái linh thú và linh dược của riêng anh.",
+      "subArcs": [
+        { "name": "Mảnh vỡ", "chapterRange": "581-630", "focus": "Phát hiện dấu hiệu Linh Điền là một mảnh vỡ của một bảo vật/di sản cổ; tìm các mảnh khác để bồi đắp ruộng." },
+        { "name": "Tiểu thế giới", "chapterRange": "631-680", "focus": "Linh Điền mở thành cả một vùng điền viên với khí hậu, sông suối và linh thú tiến hóa; Hàn Tiêu thành 'chủ một cõi' nhỏ." },
+        { "name": "Người tìm tới", "chapterRange": "681-730", "focus": "Một thế lực cổ xưa từng nắm di sản điền viên dò ra Hàn Tiêu; anh phải vừa giữ ruộng vừa dò xét ý đồ của họ." }
+      ],
+      "keyMilestone": "Hàn Tiêu hiểu Linh Điền của mình gắn với một di sản lớn, và biến nó thành một tiểu thế giới điền viên thật sự."
+    },
+    {
+      "volume": 6,
+      "title": "Trường Sinh Lão Nông",
+      "chapterRange": "731-880",
+      "theme": "Nguyên Anh, bảo vệ cõi điền viên trước thế lực lớn",
+      "summary": "Hàn Tiêu đột phá Nguyên Anh và đối mặt thế lực cổ xưa muốn đoạt di sản điền viên. Anh không hiếu chiến nhưng buộc phải bảo vệ cõi của mình và những người anh trân quý, bằng trí khôn nhà nông và thực lực tích lũy âm thầm bấy lâu.",
+      "subArcs": [
+        { "name": "Nguyên Anh điền viên", "chapterRange": "731-780", "focus": "Đột phá Nguyên Anh với sự trợ lực của cả tiểu thế giới Linh Điền; trở thành cường giả mà vẫn giữ phong thái lão nông thong dong." },
+        { "name": "Giữ cõi", "chapterRange": "781-830", "focus": "Đối đầu thế lực cổ xưa muốn cướp di sản; Hàn Tiêu dùng địa lợi của tiểu thế giới và mưu kế khiến kẻ địch tự sa lầy, hạn chế đổ máu." },
+        { "name": "Cội rễ", "chapterRange": "831-880", "focus": "Hé lộ đầy đủ nguồn gốc di sản điền viên và vì sao nó chọn rơi vào người một tản tu kiên nhẫn như Hàn Tiêu." }
+      ],
+      "keyMilestone": "Hàn Tiêu bảo vệ thành công cõi điền viên của mình và thành một đại năng Nguyên Anh ẩn danh."
+    },
+    {
+      "volume": 7,
+      "title": "Thong Dong Thành Tiên",
+      "chapterRange": "881-1000",
+      "theme": "Đỉnh của con đường, trường sinh và lựa chọn cuối",
+      "summary": "Tích lũy của bao năm thong dong đưa Hàn Tiêu lên đỉnh con đường tu tiên. Đối mặt lựa chọn cuối về trường sinh và phi thăng, anh chứng minh rằng con đường chậm rãi, ôn hòa, gieo trồng và vun đắp cũng có thể dẫn tới đại đạo — thậm chí vững vàng hơn mọi lối tranh đoạt.",
+      "subArcs": [
+        { "name": "Mùa gặt lớn", "chapterRange": "881-930", "focus": "Tiểu thế giới điền viên đạt độ viên mãn; Hàn Tiêu thu hoạch thành quả của cả một đời canh tác, tu vi tiến tới Hóa Thần." },
+        { "name": "Đạo của lão nông", "chapterRange": "931-980", "focus": "Anh đúc kết 'đạo trồng trọt' của riêng mình thành một con đường tu luyện hoàn chỉnh, truyền lại cho hữu duyên." },
+        { "name": "Phi thăng thong dong", "chapterRange": "981-1000", "focus": "Trước ngưỡng phi thăng, Hàn Tiêu đưa ra lựa chọn cuối — mang theo cõi điền viên hay ở lại làm một lão nông trường sinh, khép lại bằng sự mãn nguyện." }
+      ],
+      "keyMilestone": "Hàn Tiêu hoàn tất con đường cẩu đạo trường sinh, chứng minh kẻ sống chậm, sống vui, gieo trồng bền bỉ mới là kẻ cười sau cùng."
+    }
+  ]
+}

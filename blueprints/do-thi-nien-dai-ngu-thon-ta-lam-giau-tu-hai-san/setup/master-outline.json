@@ -1,0 +1,100 @@
+{
+  "title": "Niên Đại Làng Chài: Ta Làm Giàu Từ Hải Sản",
+  "totalChapters": 1000,
+  "mainPlotline": "Lâm Hải Sinh, một người từng lăn lộn cả đời với hải sản và ẩm thực nhưng ra đi trong tiếc nuối vì gia đình chưa kịp đổi đời, trọng sinh trở lại tuổi đôi mươi ở làng chài Hải Đông nghèo khó với trọn vẹn ký ức của một kiếp người; lần này anh dùng ký ức về món ngon, giá trị thật của hải sản và nhu cầu thị trường cùng tay nghề tự rèn để từng bước biến thứ cả làng vứt đi thành đặc sản đắt hàng, làm mắm, phơi đồ khô, mở sạp rồi mở quán, dựng cơ sở chế biến và thương hiệu, đưa cả gia đình từ tay trắng tới sung túc và cả làng chài đổi đời, hoàn thành tâm nguyện dang dở của kiếp trước.",
+  "originLock": "reincarnated — Lâm Hải Sinh trọng sinh trở lại tuổi đôi mươi của chính cuộc đời mình, tại chính làng chài Hải Đông nơi anh từng sống trong cùng một thế giới; anh mang theo ký ức và bài học của kiếp trước ở cùng vùng đất này, nơi anh từng lăn lộn với hải sản và ẩm thực nhưng ra đi trong tiếc nuối. Đây là một kiếp người làm lại trong cùng thế giới — KHÔNG phải tới từ một thế giới khác; lợi thế duy nhất đến từ ký ức và trải nghiệm của chính anh.",
+  "volumes": [
+    {
+      "volume": 1,
+      "title": "Nồi Hải Sản Chua Cay Đầu Tiên",
+      "chapterRange": "1-130",
+      "theme": "Trở về làng chài, biến thứ bị chê thành món ngon và kiếm những đồng lãi đầu tiên",
+      "summary": "Lâm Hải Sinh tỉnh lại ở tuổi đôi mươi với ký ức kiếp trước. Anh nấu nồi hải sản chua cay đầu tiên từ thứ cả nhà định bỏ, đem những loại hải sản người làng chê ra chế biến và bán cho khách trên phố, kiếm được những đồng tiền lãi đầu tiên, và lần đầu nếm trải chuyện hàng xóm ghen tỵ gièm pha.",
+      "subArcs": [
+        { "name": "Bữa cơm ngon đầu tiên", "chapterRange": "1-30", "focus": "Trở về làng chài, nấu nồi hải sản chua cay từ thứ cả nhà định bỏ, cho gia đình một bữa ngon nhớ đời và hé mở con đường làm ăn." },
+        { "name": "Gánh hàng lên phố", "chapterRange": "31-65", "focus": "Bắt và chế biến hải sản bị chê bỏ, gánh lên chợ phiên và phố huyện bán, chinh phục những vị khách thành thị đầu tiên." },
+        { "name": "Lời ra tiếng vào của xóm giềng", "chapterRange": "66-100", "focus": "Hàng xóm ghen tỵ gièm pha khi thấy nhà anh khá lên; Hải Sinh hóa giải bằng cái khéo, lòng tử tế và chất lượng món ăn." },
+        { "name": "Đồng lãi đầu tiên", "chapterRange": "101-130", "focus": "Tích cóp được chút vốn, gia đình khá lên thấy rõ, anh tính chuyện mở rộng sang làm mắm và đồ khô." }
+      ],
+      "keyMilestone": "Lâm Hải Sinh biến hải sản bị chê thành món đắt hàng, kiếm đồng lãi đầu tiên và nuôi cả nhà no đủ hơn."
+    },
+    {
+      "volume": 2,
+      "title": "Hũ Mắm Và Gánh Đồ Khô",
+      "chapterRange": "131-280",
+      "theme": "Mở rộng sang làm mắm, đồ khô, dầu hào và gây dựng mối lái ổn định",
+      "summary": "Lâm Hải Sinh mở rộng sang làm mắm tôm chua, nấu dầu hào, phơi đồ khô đúng độ đem lên phố bán đắt hàng. Anh gây dựng những mối lái đầu tiên, đồng thời vượt qua chuyện một kẻ bắt chước công thức của anh nhưng làm hỏng vị.",
+      "subArcs": [
+        { "name": "Hũ mắm đắt hàng", "chapterRange": "131-180", "focus": "Làm mắm tôm chua và dầu hào theo công thức kiếp trước, đem lên phố bán hết veo và thu hút sự chú ý." },
+        { "name": "Kẻ bắt chước hỏng vị", "chapterRange": "181-230", "focus": "Một người trong làng bắt chước công thức để tranh khách nhưng làm hỏng vị; trò bắt chước vô tình làm tiếng lành về hàng thật của anh đồn xa hơn." },
+        { "name": "Mối lái đầu tiên", "chapterRange": "231-280", "focus": "Gây dựng mối lái ổn định trên phố, đưa nhà từ nghèo lên khá, sắm được những món đồ đầu tiên cả nhà ao ước." }
+      ],
+      "keyMilestone": "Lâm Hải Sinh gây dựng được mối lái ổn định và đưa gia đình từ nghèo lên khá giả."
+    },
+    {
+      "volume": 3,
+      "title": "Sạp Hàng Trên Phố",
+      "chapterRange": "281-430",
+      "theme": "Mở sạp hàng cố định và thoát thế bị thương lái ép giá",
+      "summary": "Lâm Hải Sinh mở một sạp hàng cố định trên phố huyện, không còn phải gánh hàng rong. Anh đối mặt với Lão Mập thương lái quen ép giá và chặn đường hàng, nhưng nhờ chữ tín gây dựng bấy lâu mà mối lái đứng về phía anh, giúp anh tự dựng đầu mối riêng.",
+      "subArcs": [
+        { "name": "Dựng sạp", "chapterRange": "281-330", "focus": "Mở sạp hàng cố định trên phố, ổn định nguồn hàng và mở rộng tệp khách quen." },
+        { "name": "Thương lái ép giá", "chapterRange": "331-380", "focus": "Lão Mập tìm cách ép giá và chặn đường hàng của anh lên phố; Hải Sinh giữ chất lượng và chữ tín để ứng phó." },
+        { "name": "Tự dựng đầu mối", "chapterRange": "381-430", "focus": "Mối lái và khách quen đứng về phía anh; anh thoát thế phụ thuộc, tự dựng đầu mối thu mua và phân phối riêng." }
+      ],
+      "keyMilestone": "Lâm Hải Sinh mở được sạp hàng riêng và thoát khỏi thế bị thương lái ép giá."
+    },
+    {
+      "volume": 4,
+      "title": "Quán Ăn Đặc Sản Biển",
+      "chapterRange": "431-580",
+      "theme": "Mở quán ăn, thuê người làm và tạo công ăn việc làm cho người làng",
+      "summary": "Lâm Hải Sinh mở một quán ăn đặc sản biển trên phố huyện, đưa hương vị biển quê tới đông đảo thực khách. Anh thuê và đào tạo người làng, tạo công ăn việc làm, học cách quản lý một cơ sở lớn hơn và xây dựng thực đơn đặc sắc.",
+      "subArcs": [
+        { "name": "Khai trương quán", "chapterRange": "431-480", "focus": "Mở quán ăn đặc sản biển, dựng thực đơn từ những món tủ và chinh phục thực khách phố huyện." },
+        { "name": "Người làng cùng làm", "chapterRange": "481-530", "focus": "Thuê và đào tạo người làng, tạo công ăn việc làm, học cách quản lý bếp và nhân công." },
+        { "name": "Tiếng thơm lan xa", "chapterRange": "531-580", "focus": "Quán trở thành điểm đến có tiếng; tiếng thơm về đặc sản biển của anh lan ra ngoài phố huyện." }
+      ],
+      "keyMilestone": "Lâm Hải Sinh mở được quán ăn đặc sản biển và tạo công ăn việc làm cho người làng."
+    },
+    {
+      "volume": 5,
+      "title": "Cơ Sở Chế Biến Và Thương Hiệu",
+      "chapterRange": "581-730",
+      "theme": "Dựng cơ sở chế biến, đóng gói và xây thương hiệu hải sản",
+      "summary": "Lâm Hải Sinh dựng một cơ sở chế biến hải sản trong làng, chuẩn hóa quy trình làm mắm, đồ khô và các đặc sản đóng gói để đem đi xa hơn. Anh bắt đầu cạnh tranh với các nhà buôn lớn trong vùng bằng chất lượng và uy tín thương hiệu.",
+      "subArcs": [
+        { "name": "Dựng cơ sở", "chapterRange": "581-630", "focus": "Xây cơ sở chế biến, chuẩn hóa quy trình và nâng sản lượng đặc sản đóng gói." },
+        { "name": "Thương hiệu thành hình", "chapterRange": "631-680", "focus": "Gây dựng thương hiệu hải sản, đưa sản phẩm đóng gói đi xa hơn ngoài phố huyện." },
+        { "name": "Cạnh tranh tầm vùng", "chapterRange": "681-730", "focus": "Cạnh tranh sòng phẳng với các nhà buôn và cơ sở lớn trong vùng bằng chất lượng và chữ tín." }
+      ],
+      "keyMilestone": "Lâm Hải Sinh dựng được cơ sở chế biến và xây dựng thương hiệu hải sản có chỗ đứng."
+    },
+    {
+      "volume": 6,
+      "title": "Vươn Ra Ngoài Tỉnh",
+      "chapterRange": "731-880",
+      "theme": "Đưa thương hiệu hải sản vươn ra thị trường cả tỉnh và lân cận",
+      "summary": "Lâm Hải Sinh đưa thương hiệu hải sản của mình vươn ra thị trường cả tỉnh và các vùng lân cận, đối mặt những thử thách lớn hơn về quy mô, vận chuyển và cạnh tranh, nhưng vẫn giữ vững chất lượng và chữ tín làm gốc.",
+      "subArcs": [
+        { "name": "Mở rộng thị trường", "chapterRange": "731-780", "focus": "Đưa sản phẩm ra thị trường cả tỉnh, giải bài toán vận chuyển và bảo quản ở quy mô lớn." },
+        { "name": "Thử thách quy mô", "chapterRange": "781-830", "focus": "Đối mặt áp lực cạnh tranh và những toan tính chèn ép của các nhà buôn lớn, hóa giải bằng chất lượng và quan hệ tử tế." },
+        { "name": "Dấu ấn vùng miền", "chapterRange": "831-880", "focus": "Hương vị biển Hải Đông trở thành một cái tên có tiếng, định hình một dòng đặc sản của vùng." }
+      ],
+      "keyMilestone": "Lâm Hải Sinh đưa thương hiệu hải sản vươn ra ngoài tỉnh và khẳng định chỗ đứng trên thị trường vùng."
+    },
+    {
+      "volume": 7,
+      "title": "Cả Làng Đổi Đời",
+      "chapterRange": "881-1000",
+      "theme": "Đưa cả gia đình và làng chài đổi đời, hoàn thành tâm nguyện kiếp trước",
+      "summary": "Lâm Hải Sinh hoàn tất hành trình làm giàu từ biển: gia đình anh sung túc đề huề, làng chài Hải Đông đổi đời nhờ nghề hải sản anh gây dựng, và anh hoàn thành tâm nguyện dang dở của kiếp trước — cho người thân và quê hương một cuộc sống no ấm. Anh chọn cách trao lại tay nghề và cơ nghiệp cho thế hệ sau.",
+      "subArcs": [
+        { "name": "Nhà ngói khang trang", "chapterRange": "881-930", "focus": "Gia đình anh sung túc đề huề, sắm sửa đầy đủ, các em ăn học nên người — tâm nguyện kiếp trước dần thành hiện thực." },
+        { "name": "Làng chài hồi sinh", "chapterRange": "931-980", "focus": "Cả làng chài Hải Đông đổi đời nhờ nghề hải sản anh gây dựng và dẫn dắt, từ làng nghèo thành làng nghề trù phú." },
+        { "name": "Trao lại cho đời sau", "chapterRange": "981-1000", "focus": "Lâm Hải Sinh trao lại tay nghề và cơ nghiệp cho thế hệ sau, khép lại hành trình một kiếp người làm lại trọn vẹn." }
+      ],
+      "keyMilestone": "Lâm Hải Sinh đưa cả gia đình và làng chài đổi đời, hoàn thành tâm nguyện dang dở của kiếp trước."
+    }
+  ]
+}

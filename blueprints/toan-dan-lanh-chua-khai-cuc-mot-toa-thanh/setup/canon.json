@@ -1,0 +1,158 @@
+{
+  "power_system": {
+    "name": "Hệ Thống Lãnh Chúa",
+    "type": "territory-building-progression-system (lãnh chúa lưu / SLG)",
+    "coreResource": "Tài nguyên (Lương thực, Gỗ & Đá, Khoáng sản, Tinh Thạch) + Dân số + Binh lực — nền tảng cho mọi binh chủng và công trình; Điểm Trị Quốc sinh từ quản trị tối ưu để mở khóa năng lực.",
+    "unlockRule": "Mỗi công trình, binh chủng và cấp bậc lãnh địa cần ngưỡng tài nguyên + dân số + Điểm Trị Quốc tăng dần; mở khóa rồi vẫn cần tài nguyên thật và quân thật để vận hành. Hệ Thống chỉ ra con đường tối ưu, không tự triệu hồi hay tự đánh hộ.",
+    "signatureBuff": {
+      "name": "Toàn Năng Quản Trị",
+      "effect": "Thiên phú SS của Vương Lâm: tự động hiển thị hiệu suất tối ưu của mọi nguồn lực, tăng sản lượng tài nguyên và tốc độ huấn luyện quân, lâu lâu rơi một bản thiết kế hoặc Lệnh Bài Anh Hùng độc quyền.",
+      "limit": "Chỉ tối ưu trong giới hạn tài nguyên và dân số hiện có; không tạo tài nguyên từ hư không, không thay Vương Lâm ra quyết định chiến lược, không tự thắng trận."
+    },
+    "antiPlotArmor": [
+      "Tài nguyên hữu hạn — triệu hồi quân vượt sức nuôi khiến dân đói và quân rã ngũ.",
+      "Đánh chiếm vượt tầm sẽ vỡ trận, mất quân và mất luôn thành; thắng phải bằng chiến lược và hậu cần chứ không bằng buff.",
+      "Đối thủ và thế lực bản địa có thể đông quân, lắm tài nguyên hoặc lâu đời hơn; Vương Lâm phải thắng bằng cái đầu, không bằng golden-finger vạn năng."
+    ],
+    "progressionAxes": [
+      "Cấp Bậc Lãnh Địa (Thôn → Trấn → Thành → Quận → Vương quốc → Đế quốc)",
+      "Cây Công Trình (nông trại/lò rèn/tường thành/học viện/đàn tế triệu hồi/thương hội)",
+      "Cây Quân Sự (binh chủng, quân hàm sao, Anh Hùng đơn vị, chiến thuật)"
+    ],
+    "powerCeilingByPhase": {
+      "phase1": "Thôn → Trấn (một lãnh địa, đạo quân đầu tiên)",
+      "phase2": "Thành → Quận (qua Mùa Quái Vật, liên minh, chủng tộc bản địa)",
+      "phase3": "Quận → Vương quốc (chiến tranh lãnh địa, thống nhất vùng)",
+      "phase4": "Vương quốc → Đế quốc (thống trị đại lục, Ý Chí Đại Lục)"
+    },
+    "ladder": [
+      { "rank": 1, "name": "Thôn", "note": "Lãnh địa sơ khai, vài trăm dân, công trình cơ bản, đạo quân nhỏ." },
+      { "rank": 2, "name": "Trấn", "note": "Vài nghìn dân, tường thành, binh chủng đa dạng, kiểm soát vùng khai phá." },
+      { "rank": 3, "name": "Thành", "note": "Hàng vạn dân, công trình cao cấp, quân thường trực, ảnh hưởng khu vực." },
+      { "rank": 4, "name": "Quận", "note": "Nhiều thành trực thuộc, hành chính phân cấp, đại quân và Anh Hùng tinh nhuệ." },
+      { "rank": 5, "name": "Vương quốc", "note": "Thống nhất nhiều vùng, thể chế và quân đội thường trực, thế lực hàng đầu đại lục." },
+      { "rank": 6, "name": "Đế quốc", "note": "Thống trị phần lớn Aetheria, định lại trật tự cả thế giới." }
+    ]
+  },
+  "worldbuilding": {
+    "tone": "Hào hùng, chiến lược, sảng văn lãnh chúa lưu; xây dựng bền vững và chiến tranh quân đội quy mô lớn, warm baseline.",
+    "economy": {
+      "currency": "Tài nguyên bốn trụ (Lương thực, Gỗ & Đá, Khoáng sản, Tinh Thạch), dân số, binh lực, và thứ hạng Bảng Xếp Hạng Toàn Cầu",
+      "supplyChain": "Nông trại và rừng trong lãnh địa, mỏ khoáng và Tinh Thạch ở vùng hoang/tàn tích, thương hội trao đổi giữa các lãnh chúa"
+    },
+    "setting": "Đại Lục Aetheria — dị giới nơi toàn nhân loại bị triệu hồi tới làm Lãnh Chúa, mỗi người khởi đầu một tòa thành sơ khai và một golden-finger ngẫu nhiên.",
+    "geography": {
+      "phase1": "Tòa thành khởi đầu và vùng khai phá quanh nó trên Bình Nguyên Khởi Đầu",
+      "phase2": "Toàn Bình Nguyên Khởi Đầu và bìa Rừng Hắc Ám",
+      "phase3": "Các vùng lân cận, Sa Mạc Tàn Tích, lãnh thổ chủng tộc bản địa",
+      "phase4": "Toàn Aetheria gồm Biển Sương Mù và tàn tích Đế Chế Cổ"
+    },
+    "techLevel": "Trung cổ giả tưởng + hệ thống dị giới: nông nghiệp, rèn đúc, công thành xa, pháp thuật chủng tộc bản địa, giao diện Hệ Thống Lãnh Chúa và triệu hồi đơn vị.",
+    "conflictMedium": ["chiến tranh lãnh địa quân đội vs quân đội", "ngoại giao và liên minh", "chiến tranh kinh tế và tài nguyên", "tranh đoạt cứ điểm và thứ hạng toàn cầu", "phòng thủ Mùa Quái Vật"],
+    "forbiddenElements": ["MC tự thân đấu tay đôi ngoài đường phố thay cho quân đội", "trọng sinh / ký ức đời trước / đầu thai / chuyển kiếp", "golden-finger vạn năng tự thắng mọi trận", "giang hồ xã hội đen hiện đại đâm chém"]
+  },
+  "factions": [
+    {
+      "name": "Lãnh Địa Vương Lâm",
+      "type": "lãnh địa của MC",
+      "power_level": 3,
+      "summary": "Tòa thành sơ khai của Vương Lâm trên Bình Nguyên Khởi Đầu, khởi đầu hạng Thôn với thiên phú Toàn Năng Quản Trị và gói tài nguyên SS.",
+      "territory": "Bình Nguyên Khởi Đầu (mở rộng dần)",
+      "mc_relation": "MC sáng lập và làm lãnh chúa",
+      "conflicts": ["Liên Minh Bạo Lãnh", "Đế Chế Cổ Vethanor"],
+      "alliances": ["Liên Minh Bình Nguyên"],
+      "importance": 10,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Liên Minh Bạo Lãnh",
+      "type": "khối lãnh chúa hiếu chiến",
+      "power_level": 8,
+      "summary": "Khối các lãnh chúa người Trái Đất hùng mạnh và hung hãn, đứng đầu là những kẻ kiêu ngạo chuyên dùng quân số đông cướp bóc và ép thần phục lãnh địa yếu.",
+      "territory": "Phần phía bắc Bình Nguyên Khởi Đầu và các vùng lân cận",
+      "mc_relation": "Đối thủ chính phần đầu và giữa truyện",
+      "conflicts": ["Lãnh Địa Vương Lâm", "Liên Minh Bình Nguyên"],
+      "alliances": [],
+      "importance": 9,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Liên Minh Bình Nguyên",
+      "type": "liên minh lãnh chúa và chủng tộc bản địa",
+      "power_level": 7,
+      "summary": "Mạng lưới các lãnh chúa nhỏ và chủng tộc bản địa do Vương Lâm khởi xướng để cùng phòng thủ Mùa Quái Vật, chia sẻ tài nguyên và phối hợp quân sự.",
+      "territory": "Trung và nam Bình Nguyên Khởi Đầu",
+      "mc_relation": "MC là người khởi xướng và thủ lĩnh thực tế",
+      "conflicts": ["Liên Minh Bạo Lãnh"],
+      "alliances": ["Lãnh Địa Vương Lâm"],
+      "importance": 8,
+      "introduce_arc": 3
+    },
+    {
+      "name": "Đế Chế Cổ Vethanor",
+      "type": "thế lực bản địa cổ tàn dư",
+      "power_level": 10,
+      "summary": "Tàn dư một đế chế bản địa lâu đời nắm bí mật Aetheria, điều phối ngầm cục diện và xem người Trái Đất là biến số cần thanh trừng hoặc khuất phục.",
+      "territory": "Sa Mạc Tàn Tích và các di tích cổ rải khắp đại lục",
+      "mc_relation": "Thế lực sau cùng MC phải đối đầu",
+      "conflicts": ["Lãnh Địa Vương Lâm", "Liên Minh Bình Nguyên"],
+      "alliances": [],
+      "importance": 9,
+      "introduce_arc": 6
+    }
+  ],
+  "plot_twists": [
+    {
+      "summary": "Tô Đại Niên — lãnh chúa kiêu ngạo lân cận — thật ra là cấp dưới được Liên Minh Bạo Lãnh cài tới Bình Nguyên Khởi Đầu để dò la và thâu tóm các lãnh địa tân binh, không phải kẻ ngạo mạn đơn lẻ.",
+      "payoff_type": "thân phận ẩn",
+      "setup_chapters": [20, 70],
+      "twist_chapter": 120,
+      "reader_impact": "major",
+      "arc_number": 1
+    },
+    {
+      "summary": "Mùa Quái Vật không phải thiên tai tự nhiên mà do Ý Chí Đại Lục cố ý thả ra để sàng lọc lãnh chúa và ép cả thế giới tiến hóa nhanh.",
+      "payoff_type": "cơ chế thế giới ẩn",
+      "setup_chapters": [150, 400, 720],
+      "twist_chapter": 890,
+      "reader_impact": "cosmic",
+      "arc_number": 7
+    },
+    {
+      "summary": "Lão Tôn — quản gia bản địa già của Vương Lâm — chính là hậu duệ cuối cùng của Đế Chế Cổ Vethanor, âm thầm bảo vệ một mảnh chân tướng Aetheria suốt nhiều đời.",
+      "payoff_type": "danh tính ẩn",
+      "setup_chapters": [5, 350],
+      "twist_chapter": 760,
+      "reader_impact": "major",
+      "arc_number": 6
+    }
+  ],
+  "themes": [
+    { "name": "Quản trị thắng sức mạnh mù quáng", "type": "main", "description": "Cái đầu lạnh, tổ chức và tối ưu nguồn lực thắng kẻ chỉ biết đông quân và cướp bóc.", "motifs": ["bảng phân bổ tài nguyên", "đạo quân kỷ luật vs đám đông hỗn loạn"], "importance": 10 },
+    { "name": "Xây dựng bền vững thắng cướp bóc nhất thời", "type": "main", "description": "Nền móng vững và tài nguyên dồi dào bền hơn chiến lợi phẩm chộp giật.", "motifs": ["công trình mọc lên từng ngày", "kho đầy ắp sau mùa thu hoạch"], "importance": 9 },
+    { "name": "Lãnh đạo bằng lòng người", "type": "supporting", "description": "Lãnh chúa thật là người khiến dân và đồng minh muốn đi theo, không phải bạo chúa.", "motifs": ["dân di cư đổ về", "chủng tộc bản địa quy thuận"], "importance": 8 },
+    { "name": "Trật tự dựng từ hỗn loạn", "type": "supporting", "description": "Giữa một thế giới tận thế hỗn loạn, một người dựng nên trật tự bằng cả sức mạnh lẫn nhân nghĩa.", "motifs": ["luật lệ trong thành", "bàn tròn liên minh"], "importance": 8 }
+  ],
+  "voice_anchors": [
+    {
+      "snippet_type": "opening",
+      "prose_text": "Vương Lâm đứng trên đoạn tường thành thô ráp vừa dựng xong, nhìn xuống tòa thành sơ khai của mình dưới ánh chiều dị giới. Bốn phía là vùng hoang chưa khai phá, xa hơn nữa là bóng tối của Rừng Hắc Ám. Giao diện Hệ Thống Lãnh Chúa lơ lửng trước mắt, chỉ mình anh thấy: dân số ba trăm hai mươi, lương thực còn cầm cự được sáu ngày, một đạo bộ binh hai sao vừa triệu hồi xong. Người khác hoảng loạn, anh thì không. Anh đã quản những dự án rối ren hơn thế này nhiều. Vương Lâm hít một hơi không khí lạ lẫm của Aetheria, rồi bắt đầu sắp lại thứ tự ưu tiên — nông trại trước, rồi lò rèn, rồi mới đến quân. Tận thế hay không, một tòa thành vẫn phải dựng từ viên gạch đầu tiên.",
+      "key_traits": ["điềm tĩnh", "tư duy hệ thống", "không hoảng loạn", "tính dài hạn"]
+    },
+    {
+      "snippet_type": "dialogue",
+      "prose_text": "— Lãnh chúa, Tô Đại Niên đem ba trăm quân áp sát ranh giới phía tây, đòi chúng ta nộp một nửa khoáng sản, Triệu Mãnh siết chặt cán thương, giọng đầy lửa. Vương Lâm không vội ra lệnh xuất quân. — Ba trăm quân của hắn ăn ở đâu, ngủ ở đâu, mấy ngày nữa hết lương? Triệu Mãnh sững lại. — Cái đó… mạt tướng chưa rõ. — Vậy thì cho người dò. Vương Lâm chỉ tay lên bản đồ. Quân hắn đông nhưng hậu cần mỏng. Ta không cần đánh ngay. Ta chỉ cần cắt đường tiếp lương của hắn ba ngày, hắn tự rút. Đánh nhau là chuyện cuối cùng, không phải chuyện đầu tiên.",
+      "key_traits": ["lạnh đầu", "đánh vào hậu cần", "mưu trước lực sau", "chỉ huy không nóng vội"]
+    },
+    {
+      "snippet_type": "action",
+      "prose_text": "Giao diện sáng lên ngay khoảnh khắc nông trại thứ tư hoàn thành: Điểm Trị Quốc +180. Một luồng sáng nhỏ rơi xuống lòng bàn tay Vương Lâm — Bản Thiết Kế: Học Viện Tân Binh. Anh không reo lên, chỉ khẽ nhếch môi. Trên Bảng Xếp Hạng Lãnh Chúa Toàn Cầu lơ lửng góc giao diện, cái tên 'Vương Lâm' lặng lẽ nhích lên ba bậc, vượt qua đúng kẻ tuần trước còn cười nhạo lãnh địa của anh là 'một cái chuồng gà'. Anh không bận tâm tới ánh mắt ai. Anh chỉ mở bản thiết kế ra, tính xem xây học viện ở đâu thì lính ra lò nhanh nhất.",
+      "key_traits": ["bình tĩnh trước phần thưởng", "tập trung vào tối ưu", "face-slap nhẹ qua bảng vàng", "không khoe khoang"]
+    }
+  ],
+  "foreshadowing": [
+    { "hintText": "Lão Tôn nhắc thoáng qua rằng đất Bình Nguyên này 'từng có một đế chế lớn, giờ chỉ còn cát và gió nhớ tên'.", "category": "dialogue", "plantCh": 5, "pickupCh": 760, "payoffDescription": "Hé lộ Lão Tôn là hậu duệ cuối cùng của Đế Chế Cổ Vethanor và nắm một mảnh chân tướng Aetheria." },
+    { "hintText": "Tô Đại Niên đôi lúc liếc nhìn một viên lệnh bài giấu trong tay áo trước khi ra quyết định, như đang chờ chỉ thị từ ai đó.", "category": "character_behavior", "plantCh": 20, "pickupCh": 120, "payoffDescription": "Reveal Tô Đại Niên là cấp dưới được Liên Minh Bạo Lãnh cài cắm chứ không phải kẻ ngạo mạn đơn lẻ." },
+    { "hintText": "Mỗi lần Mùa Quái Vật tới, giao diện Hệ Thống lại hiện một dòng mờ 'Chu kỳ sàng lọc thứ N' rồi tự biến mất trước khi đọc kỹ được.", "category": "environmental", "plantCh": 150, "pickupCh": 890, "payoffDescription": "Reveal Mùa Quái Vật do Ý Chí Đại Lục cố ý thả ra để sàng lọc và ép thế giới tiến hóa." }
+  ]
+}

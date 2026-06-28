@@ -1,0 +1,100 @@
+{
+  "title": "Niên Đại Sơn Thôn: Ta Buôn Đặc Sản Núi Rừng",
+  "totalChapters": 1000,
+  "mainPlotline": "Cố Thanh Sơn, một người từng lăn lộn cả đời với lâm sản và ẩm thực nhưng ra đi trong tiếc nuối vì gia đình chưa kịp đổi đời, trọng sinh trở lại tuổi đôi mươi ở bản miền núi Lộc Sơn nghèo khó với trọn vẹn ký ức của một kiếp người; lần này anh dùng ký ức về món ngon, giá trị thật của lâm sản và nhu cầu thị trường cùng tay nghề tự rèn để từng bước biến thứ cả bản bỏ quên thành đặc sản đắt hàng, sấy nấm hương, làm măng khô, ngâm mật ong, sấy dược liệu, mở sạp rồi mở cơ sở thu mua chế biến và xây thương hiệu, đưa cả gia đình từ tay trắng tới sung túc và cả bản Lộc Sơn đổi đời, hoàn thành tâm nguyện dang dở của kiếp trước.",
+  "originLock": "reincarnated — Cố Thanh Sơn trọng sinh trở lại tuổi đôi mươi của chính cuộc đời mình, tại chính bản miền núi Lộc Sơn nơi anh từng sống trong cùng một thế giới; anh mang theo ký ức và bài học của kiếp trước ở cùng vùng đất này, nơi anh từng lăn lộn với lâm sản và ẩm thực nhưng ra đi trong tiếc nuối. Đây là một kiếp người làm lại trong cùng thế giới — KHÔNG phải tới từ một thế giới khác; lợi thế duy nhất đến từ ký ức và trải nghiệm của chính anh.",
+  "volumes": [
+    {
+      "volume": 1,
+      "title": "Mẻ Nấm Hương Phơi Khô Đầu Tiên",
+      "chapterRange": "1-130",
+      "theme": "Trở về bản miền núi, biến thứ bị chê thành món ngon và kiếm những đồng lãi đầu tiên",
+      "summary": "Cố Thanh Sơn tỉnh lại ở tuổi đôi mươi với ký ức kiếp trước. Anh sấy mẻ nấm hương đầu tiên từ thứ cả nhà định bỏ, đem những loại lâm sản người bản chê ra chế biến và bán cho khách trên phố, kiếm được những đồng tiền lãi đầu tiên, và lần đầu nếm trải chuyện hàng xóm ghen tỵ gièm pha.",
+      "subArcs": [
+        { "name": "Bữa cơm ngon đầu tiên", "chapterRange": "1-30", "focus": "Trở về bản Lộc Sơn, sấy mẻ nấm hương từ thứ cả nhà định bỏ, cho gia đình một bữa ngon nhớ đời và hé mở con đường làm ăn." },
+        { "name": "Gùi hàng xuống phố", "chapterRange": "31-65", "focus": "Tìm hái và chế biến lâm sản bị chê bỏ, gùi xuống chợ phiên và phố huyện bán, chinh phục những vị khách thành thị đầu tiên." },
+        { "name": "Lời ra tiếng vào của xóm giềng", "chapterRange": "66-100", "focus": "Hàng xóm ghen tỵ gièm pha khi thấy nhà anh khá lên; Thanh Sơn hóa giải bằng cái khéo, lòng tử tế và chất lượng món hàng." },
+        { "name": "Đồng lãi đầu tiên", "chapterRange": "101-130", "focus": "Tích cóp được chút vốn, gia đình khá lên thấy rõ, anh tính chuyện mở rộng sang làm măng khô và ngâm mật ong." }
+      ],
+      "keyMilestone": "Cố Thanh Sơn biến lâm sản bị chê thành món đắt hàng, kiếm đồng lãi đầu tiên và nuôi cả nhà no đủ hơn."
+    },
+    {
+      "volume": 2,
+      "title": "Măng Khô Và Hũ Mật Ong Rừng",
+      "chapterRange": "131-280",
+      "theme": "Mở rộng sang làm măng khô, ngâm mật ong, sấy dược liệu và gây dựng mối lái ổn định",
+      "summary": "Cố Thanh Sơn mở rộng sang làm măng khô đúng độ, ngâm mật ong rừng nguyên chất, sấy dược liệu đem xuống phố bán đắt hàng. Anh gây dựng những mối lái đầu tiên, đồng thời vượt qua chuyện một kẻ bắt chước công thức của anh nhưng làm hỏng vị.",
+      "subArcs": [
+        { "name": "Măng khô đắt hàng", "chapterRange": "131-180", "focus": "Làm măng khô và ngâm mật ong rừng theo công thức kiếp trước, đem xuống phố bán hết veo và thu hút sự chú ý." },
+        { "name": "Kẻ bắt chước hỏng vị", "chapterRange": "181-230", "focus": "Một người trong bản bắt chước công thức để tranh khách nhưng làm hỏng vị; trò bắt chước vô tình làm tiếng lành về hàng thật của anh đồn xa hơn." },
+        { "name": "Mối lái đầu tiên", "chapterRange": "231-280", "focus": "Gây dựng mối lái ổn định trên phố, đưa nhà từ nghèo lên khá, sắm được những món đồ đầu tiên cả nhà ao ước." }
+      ],
+      "keyMilestone": "Cố Thanh Sơn gây dựng được mối lái ổn định và đưa gia đình từ nghèo lên khá giả."
+    },
+    {
+      "volume": 3,
+      "title": "Sạp Hàng Dưới Phố",
+      "chapterRange": "281-430",
+      "theme": "Mở sạp hàng cố định và thoát thế bị thương lái ép giá",
+      "summary": "Cố Thanh Sơn mở một sạp hàng cố định trên phố huyện, không còn phải gùi hàng rong. Anh đối mặt với Lão Quỷ thương lái quen ép giá người bản và chặn đường hàng, nhưng nhờ chữ tín gây dựng bấy lâu mà mối lái đứng về phía anh, giúp anh tự dựng đầu mối riêng.",
+      "subArcs": [
+        { "name": "Dựng sạp", "chapterRange": "281-330", "focus": "Mở sạp hàng cố định trên phố, ổn định nguồn hàng lâm sản và mở rộng tệp khách quen." },
+        { "name": "Thương lái ép giá", "chapterRange": "331-380", "focus": "Lão Quỷ tìm cách ép giá và chặn đường hàng của anh xuống phố; Thanh Sơn giữ chất lượng và chữ tín để ứng phó." },
+        { "name": "Tự dựng đầu mối", "chapterRange": "381-430", "focus": "Mối lái và khách quen đứng về phía anh; anh thoát thế phụ thuộc, tự dựng đầu mối thu mua và phân phối riêng." }
+      ],
+      "keyMilestone": "Cố Thanh Sơn mở được sạp hàng riêng và thoát khỏi thế bị thương lái ép giá."
+    },
+    {
+      "volume": 4,
+      "title": "Cơ Sở Thu Mua Chế Biến",
+      "chapterRange": "431-580",
+      "theme": "Mở cơ sở thu mua chế biến, thuê người làm và tạo công ăn việc làm cho người bản",
+      "summary": "Cố Thanh Sơn mở một cơ sở thu mua chế biến lâm sản trong bản, đưa hương vị núi rừng quê tới đông đảo khách hàng. Anh thuê và đào tạo người bản, tạo công ăn việc làm, học cách quản lý một cơ sở lớn hơn và chuẩn hóa các mặt hàng đặc sản.",
+      "subArcs": [
+        { "name": "Khai trương cơ sở", "chapterRange": "431-480", "focus": "Mở cơ sở thu mua chế biến lâm sản, chuẩn hóa các món tủ và mở rộng đầu ra cho đặc sản núi rừng." },
+        { "name": "Người bản cùng làm", "chapterRange": "481-530", "focus": "Thuê và đào tạo người bản, tạo công ăn việc làm, học cách quản lý kho bãi và nhân công." },
+        { "name": "Tiếng thơm lan xa", "chapterRange": "531-580", "focus": "Cơ sở trở thành đầu mối có tiếng; tiếng thơm về đặc sản núi rừng của anh lan ra ngoài phố huyện." }
+      ],
+      "keyMilestone": "Cố Thanh Sơn mở được cơ sở thu mua chế biến và tạo công ăn việc làm cho người bản."
+    },
+    {
+      "volume": 5,
+      "title": "Thương Hiệu Đặc Sản Núi Rừng",
+      "chapterRange": "581-730",
+      "theme": "Chuẩn hóa sấy đóng gói và xây thương hiệu đặc sản núi rừng",
+      "summary": "Cố Thanh Sơn chuẩn hóa quy trình sấy, ngâm ủ và đóng gói nấm hương, măng khô, mật ong, dược liệu để đem đi xa hơn, xây dựng thương hiệu đặc sản núi rừng. Anh bắt đầu cạnh tranh với các nhà buôn lớn trong vùng bằng chất lượng và uy tín thương hiệu.",
+      "subArcs": [
+        { "name": "Chuẩn hóa đóng gói", "chapterRange": "581-630", "focus": "Chuẩn hóa quy trình sấy ngâm đóng gói và nâng sản lượng đặc sản đem đi xa." },
+        { "name": "Thương hiệu thành hình", "chapterRange": "631-680", "focus": "Gây dựng thương hiệu đặc sản núi rừng, đưa sản phẩm đóng gói đi xa hơn ngoài phố huyện." },
+        { "name": "Cạnh tranh tầm vùng", "chapterRange": "681-730", "focus": "Cạnh tranh sòng phẳng với các nhà buôn và cơ sở lớn trong vùng bằng chất lượng và chữ tín." }
+      ],
+      "keyMilestone": "Cố Thanh Sơn xây dựng được thương hiệu đặc sản núi rừng có chỗ đứng."
+    },
+    {
+      "volume": 6,
+      "title": "Vươn Ra Ngoài Tỉnh",
+      "chapterRange": "731-880",
+      "theme": "Đưa thương hiệu đặc sản núi rừng vươn ra thị trường cả tỉnh và lân cận",
+      "summary": "Cố Thanh Sơn đưa thương hiệu đặc sản núi rừng của mình vươn ra thị trường cả tỉnh và các vùng lân cận, đối mặt những thử thách lớn hơn về quy mô, vận chuyển đường rừng và cạnh tranh, nhưng vẫn giữ vững chất lượng và chữ tín làm gốc.",
+      "subArcs": [
+        { "name": "Mở rộng thị trường", "chapterRange": "731-780", "focus": "Đưa sản phẩm ra thị trường cả tỉnh, giải bài toán vận chuyển đường rừng và bảo quản ở quy mô lớn." },
+        { "name": "Thử thách quy mô", "chapterRange": "781-830", "focus": "Đối mặt áp lực cạnh tranh và những toan tính chèn ép của các nhà buôn lớn, hóa giải bằng chất lượng và quan hệ tử tế." },
+        { "name": "Dấu ấn vùng miền", "chapterRange": "831-880", "focus": "Hương vị núi rừng Lộc Sơn trở thành một cái tên có tiếng, định hình một dòng đặc sản của vùng." }
+      ],
+      "keyMilestone": "Cố Thanh Sơn đưa thương hiệu đặc sản núi rừng vươn ra ngoài tỉnh và khẳng định chỗ đứng trên thị trường vùng."
+    },
+    {
+      "volume": 7,
+      "title": "Cả Bản Đổi Đời",
+      "chapterRange": "881-1000",
+      "theme": "Đưa cả gia đình và bản làng đổi đời, hoàn thành tâm nguyện kiếp trước",
+      "summary": "Cố Thanh Sơn hoàn tất hành trình làm giàu từ núi rừng: gia đình anh sung túc đề huề, bản Lộc Sơn đổi đời nhờ nghề lâm sản anh gây dựng, và anh hoàn thành tâm nguyện dang dở của kiếp trước — cho người thân và quê hương một cuộc sống no ấm. Anh chọn cách trao lại tay nghề và cơ nghiệp cho thế hệ sau.",
+      "subArcs": [
+        { "name": "Nhà gỗ khang trang", "chapterRange": "881-930", "focus": "Gia đình anh sung túc đề huề, sắm sửa đầy đủ, các em ăn học nên người — tâm nguyện kiếp trước dần thành hiện thực." },
+        { "name": "Bản làng trù phú", "chapterRange": "931-980", "focus": "Cả bản Lộc Sơn đổi đời nhờ nghề lâm sản anh gây dựng và dẫn dắt, từ bản nghèo thành bản nghề trù phú." },
+        { "name": "Trao lại cho đời sau", "chapterRange": "981-1000", "focus": "Cố Thanh Sơn trao lại tay nghề và cơ nghiệp cho thế hệ sau, khép lại hành trình một kiếp người làm lại trọn vẹn." }
+      ],
+      "keyMilestone": "Cố Thanh Sơn đưa cả gia đình và bản làng đổi đời, hoàn thành tâm nguyện dang dở của kiếp trước."
+    }
+  ]
+}

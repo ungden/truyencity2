@@ -1,0 +1,100 @@
+{
+  "title": "Triệu Hoán Danh Tướng: Ta Có Thiên Cổ Mãnh Tướng",
+  "totalChapters": 1000,
+  "mainPlotline": "Triệu Khải, một người yêu sử và binh pháp hiện đại xuyên không vào thân một vương gia thất thế của tông thất Đại Ung giữa thời Cửu Châu quần hùng cát cứ, thừa kế quyền năng Triệu Hiền Đài triệu hoán linh hồn danh tướng - mưu sĩ - văn thần thiên cổ vào thân phàm phụng sự; từ một tòa thành cô độc binh ít tướng tàn, anh chiêu hiền nạp sĩ, dụng binh như thần, lấy chính nghĩa hoàng thất và nhân tài làm vốn, từng bước thôn tính chư hầu, đánh lui ngoại tộc, quy tụ và điều khiển dàn hào kiệt cá tính, gây dựng đại nghiệp thống nhất Cửu Châu — tất cả bằng mưu lược, dụng người và lòng dân, không bằng võ công cá nhân.",
+  "originLock": "transmigrator — Triệu Khải là kẻ xuyên không từ thời hiện đại, nhập vào thân một vương gia thất thế của Đại Ung; anh mang theo TRI THỨC lịch sử - binh pháp và tầm nhìn chiến lược của thế giới cũ, KHÔNG mang theo vật phẩm. Quyền năng triệu hoán là kỳ ngộ IN-WORLD gắn với khí vận tông thất, không phải năng lực anh có từ thế giới cũ.",
+  "volumes": [
+    {
+      "volume": 1,
+      "title": "Tòa Thành Cô Độc",
+      "chapterRange": "1-140",
+      "theme": "Từ vương gia thất thế triệu hoán danh tướng đầu tiên, giữ vững thành trì sắp mất",
+      "summary": "Triệu Khải tỉnh dậy trong thân vương gia thất thế ở thành Nhạn Môn cô độc, binh ít tướng tàn, sắp bị chư hầu lân cận nuốt. Anh phát hiện Triệu Hiền Đài, triệu hoán danh tướng đầu tiên, giữ được thành và đặt nền móng cho đại nghiệp.",
+      "subArcs": [
+        { "name": "Danh phận hư ảo", "chapterRange": "1-35", "focus": "Tỉnh dậy trong thân vương gia thất thế, nắm bối cảnh Cửu Châu loạn thế và tình thế tuyệt vọng của thành Nhạn Môn; phát hiện Triệu Hiền Đài và cơ chế triệu hoán cùng cái giá của nó." },
+        { "name": "Mãnh tướng đầu tiên", "chapterRange": "36-75", "focus": "Triệu hoán vị danh tướng đầu tiên; dùng người này phá một trận tập kích của quân phiệt lân cận, giữ được thành Nhạn Môn trong gang tấc, thu phục lòng binh sĩ." },
+        { "name": "Thu phục lòng người", "chapterRange": "76-110", "focus": "Ổn định nội bộ thành, an dân, chiêu mộ thêm tướng tài bản địa; xử lý mâu thuẫn đầu tiên giữa danh tướng triệu hoán và tướng cũ của thành." },
+        { "name": "Tiếng vang đầu tiên", "chapterRange": "111-140", "focus": "Đánh bại một thế lực nhỏ lân cận, mở rộng địa bàn lần đầu; danh tiếng vương gia 'biết dùng người' bắt đầu lan ra, vài hào kiệt tìm đến đầu quân." }
+      ],
+      "keyMilestone": "Triệu Khải giữ vững thành Nhạn Môn, triệu hoán được danh tướng đầu tiên và có chỗ đứng để mưu đại nghiệp."
+    },
+    {
+      "volume": 2,
+      "title": "Chiêu Hiền Nạp Sĩ",
+      "chapterRange": "141-290",
+      "theme": "Quy tụ nhân tài và mở rộng cơ nghiệp ban đầu",
+      "summary": "Triệu Khải vừa triệu hoán thêm mưu sĩ - văn thần thiên cổ, vừa chiêu mộ hào kiệt bản địa, xây dựng một ban tướng văn võ. Anh mở rộng từ một thành thành một quận, đồng thời học cách điều hòa các cá tính lớn.",
+      "subArcs": [
+        { "name": "Mưu sĩ trong trướng", "chapterRange": "141-190", "focus": "Triệu hoán một mưu sĩ thiên cổ; dùng kế sách của ông để thắng một trận bằng mưu thay vì lực, lấy ít địch nhiều." },
+        { "name": "Văn trị an dân", "chapterRange": "191-240", "focus": "Triệu hoán một văn thần kinh bang tế thế; xây dựng guồng máy hành chính, thuế khóa, đồn điền nuôi quân, biến địa bàn thành hậu phương vững." },
+        { "name": "Tướng dữ tướng", "chapterRange": "241-290", "focus": "Mâu thuẫn bùng lên giữa các danh tướng cá tính và phe tướng bản địa; Triệu Khải hòa giải, đặt đúng người đúng việc, biến xung đột thành sức mạnh." }
+      ],
+      "keyMilestone": "Triệu Khải có một ban tướng văn võ mạnh và một quận làm hậu phương, đủ sức bước vào cuộc tranh bá lớn hơn."
+    },
+    {
+      "volume": 3,
+      "title": "Quần Hùng Trục Lộc",
+      "chapterRange": "291-440",
+      "theme": "Bước vào cuộc tranh bá với các chư hầu lớn",
+      "summary": "Thế lực Triệu Khải lớn mạnh đủ để lọt vào mắt các đại chư hầu. Anh bị cuốn vào các cuộc chiến và liên minh phức tạp, lần đầu đối đầu một thế lực ngang ngửa, dùng mưu lược và dụng người để sống sót và bành trướng.",
+      "subArcs": [
+        { "name": "Liên minh và phản trắc", "chapterRange": "291-340", "focus": "Kết liên minh với một chư hầu để chống kẻ thù chung; xử lý bội ước và phản trắc bằng mưu lược, không để bị thí." },
+        { "name": "Trận lớn đầu tiên", "chapterRange": "341-390", "focus": "Một chiến dịch quy mô lớn nơi Triệu Khải điều phối nhiều danh tướng và cánh quân, thắng nhờ dùng đúng người đúng kế đúng địa hình." },
+        { "name": "Bá nghiệp thành hình", "chapterRange": "391-440", "focus": "Thôn tính một vùng đất rộng, chính thức trở thành một thế lực đáng gờm trong Cửu Châu; danh tướng đỉnh cao bắt đầu chịu phục một chủ công có thực lực." }
+      ],
+      "keyMilestone": "Triệu Khải từ một thế lực địa phương vươn lên thành một trong những tay chơi lớn của cuộc tranh bá Cửu Châu."
+    },
+    {
+      "volume": 4,
+      "title": "Chính Nghĩa Hoàng Thất",
+      "chapterRange": "441-590",
+      "theme": "Dùng danh phận tông thất làm ngọn cờ chính trị",
+      "summary": "Triệu Khải tận dụng danh phận hoàng thất chính thống để giương ngọn cờ phù Ung trừ loạn, tranh thủ lòng dân và sĩ phu, nhưng cũng vướng vào hiểm họa từ triều đình bù nhìn và các chư hầu ghen ghét danh chính ngôn thuận của anh.",
+      "subArcs": [
+        { "name": "Phù Ung trừ loạn", "chapterRange": "441-490", "focus": "Giương ngọn cờ chính nghĩa hoàng thất, thu phục lòng dân và sĩ phu, biến cuộc bành trướng thành 'dẹp loạn cứu thiên tử'." },
+        { "name": "Thiên tử bù nhìn", "chapterRange": "491-540", "focus": "Vào kinh hoặc giao thiệp với triều đình bù nhìn; đấu trí với các quyền thần khống chế thiên tử, tránh bẫy chính trị mà vẫn giữ danh chính." },
+        { "name": "Ghen ghét tứ phương", "chapterRange": "541-590", "focus": "Các đại chư hầu liên thủ kiềm chế Triệu Khải vì sợ chính nghĩa của anh; anh phá vòng vây bằng ngoại giao, ly gián và một chiến thắng quyết định." }
+      ],
+      "keyMilestone": "Triệu Khải nắm được ngọn cờ chính nghĩa hoàng thất, biến nó thành lợi thế chính trị lớn trong cuộc tranh bá."
+    },
+    {
+      "volume": 5,
+      "title": "Trướng Hùng Nan Ngự",
+      "chapterRange": "591-740",
+      "theme": "Bài toán dụng người ở quy mô lớn — điều khiển dàn danh tướng nghiêng trời",
+      "summary": "Khi dàn hào kiệt ngày một đông và mạnh, mâu thuẫn nội bộ, tham vọng cá nhân và nguy cơ chia rẽ trở thành thách thức lớn nhất. Triệu Khải phải chứng tỏ tài làm chủ — giữ một dàn danh tướng kiêu hùng cùng hướng về một mối.",
+      "subArcs": [
+        { "name": "Công cao chấn chủ", "chapterRange": "591-640", "focus": "Một số danh tướng lập công lớn sinh kiêu hoặc bị ly gián; Triệu Khải xử lý chuyện 'công cao lấn chủ' bằng ân uy và sự công tâm." },
+        { "name": "Mầm chia rẽ", "chapterRange": "641-690", "focus": "Kẻ địch gieo mầm chia rẽ nội bộ, lợi dụng cá tính và quá khứ của các danh tướng triệu hoán; Triệu Khải hóa giải bằng hiểu người và đại nghĩa." },
+        { "name": "Một mối đồng tâm", "chapterRange": "691-740", "focus": "Vượt qua cơn khủng hoảng nội bộ lớn nhất, dàn hào kiệt thật sự đồng tâm; thế lực Triệu Khải trở thành ứng viên số một thống nhất Cửu Châu." }
+      ],
+      "keyMilestone": "Triệu Khải vượt qua thử thách dụng người khắc nghiệt nhất, quy tụ dàn danh tướng thành một khối thống nhất."
+    },
+    {
+      "volume": 6,
+      "title": "Quyết Chiến Thiên Hạ",
+      "chapterRange": "741-890",
+      "theme": "Tổng quyết chiến với các đại địch và ngoại tộc",
+      "summary": "Cuộc tranh bá đi vào hồi kết: Triệu Khải bước vào những trận quyết chiến tổng lực với các đại chư hầu cuối cùng và đánh lui ngoại tộc Khương - Hồ thừa cơ xâm lấn, dùng toàn bộ dàn danh tướng và mưu sĩ cho ván cờ sống còn.",
+      "subArcs": [
+        { "name": "Diệt cường địch", "chapterRange": "741-790", "focus": "Loạt chiến dịch lớn tiêu diệt hoặc thu phục các đại chư hầu cuối; mỗi trận là một bài toán dùng người và mưu lược toàn cục." },
+        { "name": "Vó ngựa ngoại tộc", "chapterRange": "791-840", "focus": "Ngoại tộc Khương - Hồ thừa loạn xâm lấn; Triệu Khải vừa đánh trong vừa chống ngoài, biến nguy thành cơ để quy về một mối." },
+        { "name": "Trận định thiên hạ", "chapterRange": "841-890", "focus": "Trận quyết chiến cuối cùng định đoạt ai làm chủ Cửu Châu; thắng lợi nhờ dàn danh tướng đồng tâm và mưu lược của cả một đời gây dựng." }
+      ],
+      "keyMilestone": "Triệu Khải đánh bại các đại địch cuối cùng và ngoại tộc, nắm trong tay phần lớn Cửu Châu."
+    },
+    {
+      "volume": 7,
+      "title": "Nhất Thống Cửu Châu",
+      "chapterRange": "891-1000",
+      "theme": "Kết — từ tranh bá tới kiến quốc và an định thiên hạ",
+      "summary": "Hết binh đao, Triệu Khải đối mặt bài toán cuối: biến võ công thành văn trị, từ chinh phục sang kiến quốc. Anh thể chế hóa, an dân, định công ban thưởng cho dàn danh tướng, đưa Cửu Châu từ loạn thế sang thái bình và lựa chọn vận mệnh cho ngọn cờ của mình.",
+      "subArcs": [
+        { "name": "Văn trị thay võ công", "chapterRange": "891-940", "focus": "Chuyển từ chiến tranh sang kiến quốc: an dân, cải cách, dựng guồng máy trị quốc dựa trên dàn văn thần đã quy tụ." },
+        { "name": "Định công ban thưởng", "chapterRange": "941-980", "focus": "Xử lý ổn thỏa công lao và tham vọng của dàn danh tướng thiên cổ, tránh vết xe 'điểu tận cung tàng', để hào kiệt yên vị trong thời bình." },
+        { "name": "Thái bình Cửu Châu", "chapterRange": "981-1000", "focus": "Cửu Châu quy về một mối, thái bình lập lại; Triệu Khải khép lại hành trình từ vương gia thất thế tới người định đoạt thiên hạ, để lại một trang sử mới." }
+      ],
+      "keyMilestone": "Cửu Châu thống nhất và an định dưới ngọn cờ của Triệu Khải; đại nghiệp từ một tòa thành cô độc thành sự nghiệp thống nhất thiên hạ."
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "title": "Tinh Võng Cyberpunk: Ta Là Hắc Khách Mạnh Nhất",
+  "totalChapters": 1000,
+  "mainPlotline": "Lăng Phong, một hắc khách tầng đáy bản địa của Tân Huyền Thành, kích hoạt một trí tuệ bạn đồng hành ẩn giấu tên Tố — thứ chỉ phơi bày cấu trúc ẩn của dữ liệu chứ không tự xâm nhập thay anh. Từ những vụ bẻ khóa lặt vặt ở Tích Khu, anh dùng Tố để rút từng sợi chỉ bí mật giấu trong lõi các tập đoàn, vạch trần âm mưu, leo dần lên Hắc Tháp Bảng, đối đầu các Hắc Vệ tinh nhuệ, và cuối cùng truy ra nguồn gốc thật của Tố cùng bí mật chôn dưới chính nền móng Tinh Võng — trở thành hắc khách mạnh nhất bằng trí tuệ và sự lì lợm, không bằng phép màu.",
+  "originLock": "system-bestowed — Lăng Phong là người bản địa Tân Huyền Thành, một hắc khách tầng đáy bình thường sinh ra và lớn lên tại Tích Khu; mọi năng lực vượt trội đều đến từ trí tuệ bạn đồng hành Tố mà anh kích hoạt hoàn toàn trong thế giới truyện (một mảnh phần cứng cổ nhặt ở chợ đen). Anh không mang ký ức hay gốc gác từ bất kỳ nơi nào ngoài thành phố này.",
+  "volumes": [
+    {
+      "volume": 1,
+      "title": "Mảnh Phần Cứng Ở Chợ Đen",
+      "chapterRange": "1-130",
+      "theme": "Kích hoạt Tố, học cách 'đọc' cấu trúc dữ liệu và sống sót những vụ xâm nhập đầu tiên",
+      "summary": "Lăng Phong nhặt được mảnh phần cứng cổ và đánh thức Tố. Anh phát hiện Tố chỉ phơi bày cấu trúc ẩn chứ không tự xâm nhập, học cách tận dụng nó trong các hợp đồng nhỏ ở Tích Khu, đối đầu một băng tống tiền dữ liệu địa phương, và lần đầu chạm tới một sợi chỉ bí mật của tập đoàn.",
+      "subArcs": [
+        { "name": "Tố thức tỉnh", "chapterRange": "1-30", "focus": "Kích hoạt Tố, nhận ra nó phơi bày đường nối ẩn của dữ liệu; hoàn tất vụ bẻ khóa đầu tiên một cách tỉnh táo, không suýt chết thảm." },
+        { "name": "Hợp đồng đầu tiên", "chapterRange": "31-65", "focus": "Nhận hợp đồng xâm nhập ở Tích Khu; gặp Tô Vãn (môi giới hợp đồng) và Đậu Tử (kỹ thuật viên trẻ); học giới hạn của Tố khi kiệt sức thần kinh." },
+        { "name": "Băng Tống Tiền", "chapterRange": "66-100", "focus": "Đối đầu Hạt Tiêu — trùm tống tiền dữ liệu địa phương dùng mã độc; Lăng Phong dùng Tố tìm 'vết khâu' trong hệ thống của hắn và lật ngược thế cờ." },
+        { "name": "Sợi chỉ đầu tiên", "chapterRange": "101-130", "focus": "Một vụ xâm nhập vô tình chạm tới dữ liệu bị bóp méo của tập đoàn Thâm Lam; Lăng Phong leo bậc đầu trên Hắc Tháp Bảng và lọt vào tầm ngắm." }
+      ],
+      "keyMilestone": "Lăng Phong làm chủ cơ chế 'đọc cấu trúc' của Tố, có chỗ đứng ở Tích Khu và chạm tới bí mật đầu tiên của một tập đoàn lớn."
+    },
+    {
+      "volume": 2,
+      "title": "Vết Khâu Của Thâm Lam",
+      "chapterRange": "131-280",
+      "theme": "Vạch trần một âm mưu truyền thông bị xóa dấu, đối đầu Hắc Vệ tập đoàn lần đầu",
+      "summary": "Sợi chỉ từ Vol.1 dẫn Lăng Phong vào lõi dữ liệu Thâm Lam, nơi một vụ thanh trừng bị xóa khỏi ký ức công cộng. Anh liên minh với một nhà báo ngầm, đối đầu đội Hắc Vệ Thâm Lam, và phơi bày sự thật mà không cần bạo lực.",
+      "subArcs": [
+        { "name": "Ký ức bị xóa", "chapterRange": "131-180", "focus": "Phát hiện một sự kiện bị Thâm Lam gỡ sạch khỏi Tinh Võng; Tố lần ra 'vết khâu' nơi dữ liệu từng bị vá." },
+        { "name": "Nhà báo ngầm", "chapterRange": "181-230", "focus": "Liên minh với Lận Châu (nhà báo Trung Tầng); cùng truy ngược dữ liệu gốc dưới sự săn lùng của Hắc Vệ." },
+        { "name": "Phơi bày", "chapterRange": "231-280", "focus": "Tung sự thật ra Tinh Võng đúng thời điểm, làm rúng động Thâm Lam; Lăng Phong vọt lên Hắc Tháp Bảng và thành cái tên nguy hiểm." }
+      ],
+      "keyMilestone": "Lăng Phong lần đầu hạ uy tín một tập đoàn lớn bằng sự thật, đối đầu Hắc Vệ và sống sót."
+    },
+    {
+      "volume": 3,
+      "title": "Đỉnh Hắc Tháp",
+      "chapterRange": "281-430",
+      "theme": "Chính trị ngầm của giới hắc khách, lên cao trong Hắc Tháp Bảng",
+      "summary": "Danh tiếng kéo Lăng Phong vào chính trị ngầm của giới hắc khách: các phe phái, những bảng xếp hạng bị thao túng, và những hắc khách kỳ cựu vừa kính vừa kỵ anh. Anh phải đấu trí để giữ mình giữa các thế lực muốn lợi dụng Tố.",
+      "subArcs": [
+        { "name": "Bảng xếp hạng giả", "chapterRange": "281-330", "focus": "Phát hiện Hắc Tháp Bảng bị một phe thao túng để loại đối thủ; Lăng Phong vạch trần bằng dữ liệu." },
+        { "name": "Hắc khách kỳ cựu", "chapterRange": "331-380", "focus": "Đối đầu Cố Triệt — hắc khách top đầu kiêu ngạo; đấu trí xâm nhập chứ không đấu vũ lực." },
+        { "name": "Cái giá của đỉnh cao", "chapterRange": "381-430", "focus": "Lên top Hắc Tháp Bảng nhưng thành mục tiêu của cả Tứ Đại Tập Đoàn; lần đầu nghi ngờ Tố không đơn giản." }
+      ],
+      "keyMilestone": "Lăng Phong chạm đỉnh giới hắc khách và bắt đầu nghi ngờ về bản chất thật của Tố."
+    },
+    {
+      "volume": 4,
+      "title": "Bốn Cây Tháp",
+      "chapterRange": "431-580",
+      "theme": "Đấu trí với Tứ Đại Tập Đoàn, vạch trần đường dây khai thác Tích Khu",
+      "summary": "Lăng Phong phát hiện Tứ Đại Tập Đoàn ngầm hợp tác khai thác cư dân Tích Khu làm 'tài nguyên thần kinh' — thuê não người làm máy tính sinh học rẻ tiền rồi bỏ mặc. Anh dùng Tố và mạng lưới đồng minh để phơi bày đường dây này.",
+      "subArcs": [
+        { "name": "Tài nguyên thần kinh", "chapterRange": "431-480", "focus": "Phát hiện cư dân Tích Khu bị dụ cấy ghép rồi biến thành nút tính toán sống; truy nguồn." },
+        { "name": "Liên minh ngầm", "chapterRange": "481-530", "focus": "Lần ra bằng chứng Tứ Đại Tập Đoàn cùng đứng sau; tập hợp đồng minh ở mọi tầng." },
+        { "name": "Phơi bày toàn cảnh", "chapterRange": "531-580", "focus": "Tung bằng chứng làm rạn nứt liên minh tập đoàn; Lăng Phong thành biểu tượng của Tích Khu." }
+      ],
+      "keyMilestone": "Lăng Phong phá vỡ đường dây khai thác và buộc Tứ Đại Tập Đoàn phải coi anh là mối đe dọa cấp hệ thống."
+    },
+    {
+      "volume": 5,
+      "title": "Cảnh Vực Sâu",
+      "chapterRange": "581-730",
+      "theme": "Cấp meta — những tầng Tinh Võng không ai chạm tới, manh mối nguồn gốc Tố",
+      "summary": "Lăng Phong lặn xuống các tầng Cảnh Vực sâu mà không hắc khách nào sống sót trở về, nơi dữ liệu tự tái cấu trúc và quy luật vật lý số học bị bẻ cong. Tại đây, manh mối về nguồn gốc thật của Tố và của Tinh Võng dần lộ ra.",
+      "subArcs": [
+        { "name": "Tầng không bản đồ", "chapterRange": "581-630", "focus": "Lặn xuống Cảnh Vực sâu; dữ liệu tự đổi hình khi bị quan sát; Tố học cách 'đọc nhịp thay đổi'." },
+        { "name": "Kiến trúc cổ", "chapterRange": "631-680", "focus": "Phát hiện kiến trúc dữ liệu cổ hơn cả Tứ Đại Tập Đoàn — phần móng đầu tiên của Tinh Võng." },
+        { "name": "Nét tay của Tố", "chapterRange": "681-730", "focus": "Nhận ra Tố mang cùng 'chữ ký kiến trúc' với phần móng cổ ấy — Tố không phải phần mềm thương mại, mà là di sản của người dựng nên Tinh Võng." }
+      ],
+      "keyMilestone": "Lăng Phong hiểu Tố là một di sản cổ gắn liền với nguồn gốc Tinh Võng, không phải may mắn ngẫu nhiên."
+    },
+    {
+      "volume": 6,
+      "title": "Người Dựng Mạng",
+      "chapterRange": "731-880",
+      "theme": "Truy ra kẻ đứng sau nguồn gốc Tinh Võng và lý do Tích Khu bị thiết kế để giam người",
+      "summary": "Lăng Phong lần ngược kiến trúc cổ tới những kẻ thật sự dựng nên Tinh Võng — một nhóm sáng lập đã ẩn mình hàng chục năm, kiểm soát thành phố từ tầng sâu nhất. Anh đối mặt những tầng phòng vệ Cảnh Vực hiểm độc nhất và tiến tới sự thật cuối.",
+      "subArcs": [
+        { "name": "Nhóm sáng lập", "chapterRange": "731-780", "focus": "Lập bản đồ kiến trúc cổ; nhận ra Tứ Đại Tập Đoàn chỉ là bình phong cho nhóm sáng lập thật sự." },
+        { "name": "Tường lửa tối hậu", "chapterRange": "781-830", "focus": "Các tầng Cảnh Vực gần nguồn được thiết kế để loại bỏ chính những hắc khách giỏi nhất; đấu trí cường độ cao." },
+        { "name": "Cổng cuối", "chapterRange": "831-880", "focus": "Tới được lõi Tinh Võng; hé lộ vì sao Tích Khu được dựng để không ai leo lên và vì sao Tố được cài vào mảnh phần cứng đó." }
+      ],
+      "keyMilestone": "Lăng Phong đối mặt nhóm sáng lập Tinh Võng và biết toàn bộ sự thật về Tố lẫn về thành phố."
+    },
+    {
+      "volume": 7,
+      "title": "Viết Lại Mạng Lưới",
+      "chapterRange": "881-1000",
+      "theme": "Lựa chọn cuối — phá bỏ, kế thừa hay tái thiết Tinh Võng",
+      "summary": "Hiểu rằng đánh sập Tinh Võng bằng vũ lực sẽ kéo cả thành phố xuống vực, Lăng Phong dùng chính sự thấu hiểu cấu trúc của mình (và của Tố) để tái thiết luật chơi của mạng lưới — giải phóng Tích Khu mà không gây hỗn loạn diệt vong, đồng thời gánh cái giá của việc trở thành kẻ nắm lõi.",
+      "subArcs": [
+        { "name": "Bài toán cuối", "chapterRange": "881-930", "focus": "Nhóm sáng lập đặt ra một thử thách kiến trúc tối hậu; Lăng Phong giải nó như một bài toán hệ thống toàn cục." },
+        { "name": "Kiến trúc mới", "chapterRange": "931-980", "focus": "Anh tái viết các quy tắc cốt lõi của Tinh Võng để gỡ xích Tích Khu mà không tạo bất công mới." },
+        { "name": "Bình minh nhân tạo", "chapterRange": "981-1000", "focus": "Giải phóng cư dân tầng đáy; khép lại bằng cái giá và sự bình yên mong manh của một thành phố nơi mạng lưới không còn là xiềng xích." }
+      ],
+      "keyMilestone": "Tinh Võng được tái thiết; Lăng Phong trở thành kẻ viết lại luật chơi và gánh hệ quả của lựa chọn đó."
+    }
+  ]
+}

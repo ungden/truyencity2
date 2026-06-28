@@ -1,0 +1,100 @@
+{
+  "title": "Đô Thị Thương Chiến: Ta Thâu Tóm Thương Trường",
+  "totalChapters": 1000,
+  "mainPlotline": "Trần Mặc, người thừa kế gia tộc vừa du học trở về giữa lúc Trần thị Tập đoàn bên bờ phá sản, dùng tầm nhìn tài chính và những nước cờ thâu tóm sắc bén để lật ngược thế cờ: cứu tập đoàn khỏi vỡ nợ, đẩy lùi gã khổng lồ Hoằng Đạt, nuốt lại từng mảng thị trường đã mất, mở rộng sang công nghệ - tài chính - năng lượng, rồi vươn ra đấu trường quốc tế và xây dựng một đế chế kinh tế — tất cả bằng chiến tranh giá, M&A, truyền thông, kiện tụng và liên minh, tuyệt đối không bằng bạo lực.",
+  "originLock": "returnee — Trần Mặc là người bản địa hồi quy: anh sinh ra trong gia tộc Trần thị, rời quê hương đi du học và làm việc tại các quỹ đầu tư nước ngoài nhiều năm rồi quay về. Đây hoàn toàn là hành trình đời thực của một người bản địa từng đi xa rồi trở về; mọi lợi thế đến từ kiến thức và mạng lưới anh tích lũy được khi ở nước ngoài.",
+  "volumes": [
+    {
+      "volume": 1,
+      "title": "Trở Về Giữa Đống Tro Tàn",
+      "chapterRange": "1-130",
+      "theme": "Cứu Trần thị khỏi vỡ nợ trước mắt và giành lại quyền kiểm soát nội bộ",
+      "summary": "Trần Mặc du học trở về đúng lúc Trần thị sắp vỡ nợ. Anh dùng tầm nhìn tài chính phát hiện chỗ giấu nợ, lật ngược cuộc họp hội đồng quản trị, dập tắt nỗ lực bán tháo của các cổ đông phản trắc và mua được thời gian sống còn cho tập đoàn.",
+      "subArcs": [
+        { "name": "Cuộc họp tử thần", "chapterRange": "1-30", "focus": "Trần Mặc về nước, đọc thủng báo cáo tài chính giả, lật ngược cuộc họp định bán tháo tập đoàn bằng một nước cờ tái cơ cấu nợ bất ngờ." },
+        { "name": "Chủ nợ và con cờ", "chapterRange": "31-65", "focus": "Đàm phán với ngân hàng chủ nợ hung hãn, biến áp lực nợ thành đòn bẩy; nhận diện cổ đông nội bộ đang bắt tay với đối thủ." },
+        { "name": "Giành lại ghế", "chapterRange": "66-100", "focus": "Củng cố quyền kiểm soát cổ phần, vô hiệu hóa phe phản trắc trong gia tộc bằng bằng chứng và luật chơi cổ đông." },
+        { "name": "Hơi thở đầu tiên", "chapterRange": "101-130", "focus": "Tập đoàn thoát nguy cơ vỡ nợ trước mắt; Trần Mặc chính thức nắm quyền điều hành; Hoằng Đạt Group lộ diện như đối thủ chính." }
+      ],
+      "keyMilestone": "Trần Mặc cứu Trần thị khỏi phá sản tức thời và giành quyền kiểm soát tập đoàn từ tay phe phản trắc."
+    },
+    {
+      "volume": 2,
+      "title": "Chiến Tranh Giá",
+      "chapterRange": "131-280",
+      "theme": "Phản công đối thủ trên thị trường bán lẻ cốt lõi",
+      "summary": "Hoằng Đạt mở chiến tranh giá để bóp nghẹt mảng bán lẻ của Trần thị. Trần Mặc không lao vào cuộc đua đốt tiền mà tái định vị, tối ưu chuỗi cung ứng và đánh vào điểm yếu thanh khoản của đối thủ.",
+      "subArcs": [
+        { "name": "Đòn phá giá", "chapterRange": "131-180", "focus": "Hoằng Đạt phá giá để giết mảng bán lẻ; Trần Mặc từ chối đua đốt tiền, chuyển sang tái định vị thương hiệu và phân khúc." },
+        { "name": "Chuỗi cung ứng", "chapterRange": "181-230", "focus": "Tối ưu chuỗi cung ứng và đàm phán nhà cung cấp để hạ giá vốn, biến điểm yếu chi phí thành lợi thế." },
+        { "name": "Phản đòn thanh khoản", "chapterRange": "231-280", "focus": "Phát hiện Hoằng Đạt cạn thanh khoản vì chiến tranh giá kéo dài; Trần Mặc phản công, giành lại thị phần và buộc đối thủ rút lui." }
+      ],
+      "keyMilestone": "Trần Mặc thắng cuộc chiến giá, giành lại thị phần bán lẻ và làm Hoằng Đạt tổn thương nặng về tài chính."
+    },
+    {
+      "volume": 3,
+      "title": "Ván Cờ Thâu Tóm",
+      "chapterRange": "281-430",
+      "theme": "Chuyển từ phòng thủ sang tấn công bằng M&A",
+      "summary": "Trần Mặc bắt đầu chủ động thâu tóm: gom các doanh nghiệp tiềm năng đang suy yếu, mở rộng đế chế, đồng thời chống lại một nỗ lực thâu tóm thù địch nhắm vào chính Trần thị.",
+      "subArcs": [
+        { "name": "Mục tiêu đầu tiên", "chapterRange": "281-330", "focus": "Trần Mặc nhắm thâu tóm một công ty công nghệ logistics đang khó khăn nhưng giàu tiềm năng, giành nó trước mũi đối thủ." },
+        { "name": "Hiệp sĩ trắng", "chapterRange": "331-380", "focus": "Một quỹ đầu cơ mở thâu tóm thù địch nhắm vào Trần thị; Trần Mặc dùng chiến lược chống thâu tóm và lôi kéo đồng minh chiến lược." },
+        { "name": "Sáp nhập", "chapterRange": "381-430", "focus": "Hoàn tất thương vụ M&A đầu tiên, tích hợp công nghệ vào hệ sinh thái Trần thị, tăng vọt vị thế." }
+      ],
+      "keyMilestone": "Trần Mặc hoàn tất thương vụ thâu tóm lớn đầu tiên và bẻ gãy một cuộc thâu tóm thù địch nhắm vào mình."
+    },
+    {
+      "volume": 4,
+      "title": "Mặt Trận Truyền Thông",
+      "chapterRange": "431-580",
+      "theme": "Đấu trí trên sân khấu dư luận và pháp lý",
+      "summary": "Hoằng Đạt và các đồng minh phát động chiến dịch bôi nhọ và kiện tụng để hạ uy tín Trần thị. Trần Mặc phản công bằng quan hệ công chúng, bằng chứng và những vụ kiện ngược sắc bén.",
+      "subArcs": [
+        { "name": "Tin đồn", "chapterRange": "431-480", "focus": "Một chiến dịch truyền thông bẩn nhắm vào Trần thị; Trần Mặc lần ra nguồn và chuẩn bị phản đòn thay vì chối quanh." },
+        { "name": "Phòng xử án", "chapterRange": "481-530", "focus": "Đối thủ khởi kiện về hợp đồng và sở hữu trí tuệ; Trần Mặc thắng kiện và lật ngược thành bằng chứng buộc tội ngược." },
+        { "name": "Vãn hồi danh tiếng", "chapterRange": "531-580", "focus": "Biến khủng hoảng truyền thông thành cú lội ngược dòng hình ảnh, nâng Trần thị thành biểu tượng doanh nghiệp tử tế." }
+      ],
+      "keyMilestone": "Trần Mặc biến cuộc tấn công truyền thông - pháp lý thành chiến thắng kép, nâng uy tín tập đoàn lên tầm cao mới."
+    },
+    {
+      "volume": 5,
+      "title": "Mở Rộng Đế Chế",
+      "chapterRange": "581-730",
+      "theme": "Đa dạng hóa sang công nghệ - tài chính - năng lượng",
+      "summary": "Với nền tảng vững, Trần Mặc dẫn dắt tập đoàn lấn sân sang các ngành mới: fintech, năng lượng tái tạo, nền tảng số — biến Trần thị từ doanh nghiệp bán lẻ thành tập đoàn đa ngành.",
+      "subArcs": [
+        { "name": "Bàn cờ fintech", "chapterRange": "581-630", "focus": "Xây dựng mảng tài chính - công nghệ, cạnh tranh với các tay chơi lớn bằng mô hình mới." },
+        { "name": "Năng lượng tương lai", "chapterRange": "631-680", "focus": "Đầu tư năng lượng tái tạo, giành dự án lớn qua đấu thầu và liên minh chiến lược." },
+        { "name": "Hệ sinh thái", "chapterRange": "681-730", "focus": "Kết nối các mảng thành một hệ sinh thái khép kín, tạo hiệu ứng cộng hưởng khiến đối thủ khó bắt kịp." }
+      ],
+      "keyMilestone": "Trần Mặc đưa Trần thị thành tập đoàn đa ngành với hệ sinh thái kinh doanh khép kín."
+    },
+    {
+      "volume": 6,
+      "title": "Đấu Trường Quốc Tế",
+      "chapterRange": "731-880",
+      "theme": "Vươn ra thị trường toàn cầu",
+      "summary": "Trần Mặc đưa đế chế ra biển lớn, đối đầu các tập đoàn đa quốc gia, tận dụng mạng lưới quốc tế tích lũy từ thời du học để giành các thương vụ xuyên biên giới.",
+      "subArcs": [
+        { "name": "Cửa ngõ toàn cầu", "chapterRange": "731-780", "focus": "Mở rộng ra nước ngoài qua một thương vụ thâu tóm xuyên biên giới đầy rủi ro." },
+        { "name": "Đối thủ đa quốc gia", "chapterRange": "781-830", "focus": "Đối đầu một tập đoàn quốc tế hùng mạnh trên sân chơi toàn cầu, dùng am hiểu thị trường nội địa làm lợi thế." },
+        { "name": "Bàn đàm phán lớn", "chapterRange": "831-880", "focus": "Thắng thương vụ then chốt qua đàm phán đa bên, đưa Trần thị thành tên tuổi được nể trọng trên trường quốc tế." }
+      ],
+      "keyMilestone": "Trần Mặc đưa Trần thị thành một thế lực được công nhận trên thương trường quốc tế."
+    },
+    {
+      "volume": 7,
+      "title": "Đế Chế Và Di Sản",
+      "chapterRange": "881-1000",
+      "theme": "Hoàn tất đế chế kinh tế và định nghĩa di sản",
+      "summary": "Trần Mặc đối mặt ván cờ cuối: hoàn tất việc thâu tóm hoặc khuất phục Hoằng Đạt, củng cố đế chế bền vững và quyết định di sản mình muốn để lại — một đế chế không chỉ giàu mà còn có trách nhiệm.",
+      "subArcs": [
+        { "name": "Quyết chiến cuối", "chapterRange": "881-930", "focus": "Ván cờ tổng lực với Hoằng Đạt; Trần Mặc dồn đối thủ vào thế phải bán mình hoặc sáp nhập." },
+        { "name": "Tái cấu trúc đỉnh cao", "chapterRange": "931-980", "focus": "Sáp nhập tài sản đối thủ, tái cấu trúc thành một tập đoàn vững mạnh, đặt nền cho thế hệ kế thừa." },
+        { "name": "Di sản", "chapterRange": "981-1000", "focus": "Trần Mặc hoàn tất đế chế kinh tế, lựa chọn hướng đi trách nhiệm xã hội, khép lại hành trình từ tro tàn tới đỉnh cao." }
+      ],
+      "keyMilestone": "Trần Mặc hoàn tất đế chế kinh tế, thâu tóm hoặc khuất phục đối thủ cuối cùng và định hình di sản của mình."
+    }
+  ]
+}

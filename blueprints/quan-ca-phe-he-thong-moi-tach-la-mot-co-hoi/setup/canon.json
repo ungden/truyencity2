@@ -1,0 +1,150 @@
+{
+  "power_system": {
+    "name": "Hệ Thống Quán Quốc Dân",
+    "type": "business-progression-system (không siêu nhiên công khai)",
+    "coreResource": "Điểm Danh Vọng — tích từ mỗi khách thật sự hài lòng uống tại quán",
+    "progressionAxes": [
+      "Cấp Quán (Hạng Hẻm → Hạng Phố → Hạng Quận → Hạng Thành Phố → Hạng Quốc Dân)",
+      "Cây Công Thức (espresso/phin/cold brew/signature/fusion)",
+      "Cây Kỹ Năng (pha chế, quản lý, đào tạo, marketing, đàm phán)"
+    ],
+    "unlockRule": "Mỗi công thức/kỹ năng cần ngưỡng Danh Vọng tăng dần; mở khóa rồi vẫn cần nguyên liệu thật + tay nghề thật để thực thi. Hệ Thống chỉ đường, không tự pha hộ.",
+    "signatureBuff": {
+      "name": "Hương Vị Ký Ức",
+      "effect": "Một ly đồ uống gợi đúng một ký ức đẹp của khách, khiến họ cảm động thật lòng (không phải mê hoặc/ép buộc).",
+      "limit": "Mỗi ngày kích hoạt được một lần; cần Minh Quân thật sự đọc hiểu được khách."
+    },
+    "antiPlotArmor": [
+      "Không tự pha hộ — thất bại vẫn xảy ra nếu tay nghề/nguyên liệu không đủ.",
+      "Khách vị tình hoặc miễn cưỡng không tạo Danh Vọng — phải chinh phục thật.",
+      "Đối thủ có vốn lớn hơn nhiều; thắng phải bằng nước cờ thông minh chứ không bằng buff."
+    ],
+    "powerCeilingByPhase": {
+      "phase1": "Hạng Hẻm → Hạng Phố (vận hành 1 quán)",
+      "phase2": "Hạng Quận (vài quán + liên minh)",
+      "phase3": "Hạng Thành Phố → toàn quốc (chuỗi nhượng quyền)",
+      "phase4": "Hạng Quốc Dân → quốc tế (biểu tượng ẩm thực)"
+    }
+  },
+  "worldbuilding": {
+    "setting": "Sài Gòn và Việt Nam hiện đại, năm 2024 — đô thị đời thực, không có siêu nhiên công khai.",
+    "tone": "Ấm áp, đời thường, sảng văn kinh doanh; cạnh tranh bằng chất lượng và uy tín, không bạo lực.",
+    "conflictMedium": ["chất lượng sản phẩm", "trải nghiệm dịch vụ", "dòng tiền và doanh thu", "uy tín thương hiệu", "truyền thông và review", "hợp đồng và pháp lý"],
+    "geography": {
+      "phase1": "Hẻm 47 Nguyễn Thị Minh Khai, quận 1 và bán kính 2km khu trung tâm",
+      "phase2": "Toàn TP.HCM",
+      "phase3": "Hà Nội, Đà Nẵng và các đô thị lớn",
+      "phase4": "Thị trường quốc tế (đấu trường barista thế giới, xuất khẩu)"
+    },
+    "economy": {
+      "currency": "VNĐ doanh thu, lượt review 5 sao, lượng khách quay lại, hợp đồng nhượng quyền",
+      "supplyChain": "Vựa cà phê Cầu Đất Đà Lạt, hợp tác xã Arabica, xưởng rang xay thủ công"
+    },
+    "techLevel": "Hiện đại 2024: app giao đồ uống, mạng xã hội, food review TikTok/YouTube, POS, dữ liệu khách hàng.",
+    "forbiddenElements": ["bạo lực vật lý giải quyết xung đột", "xã hội đen giang hồ đâm chém", "yếu tố siêu nhiên công khai", "tu luyện/cảnh giới"]
+  },
+  "factions": [
+    {
+      "name": "Tách & Tách",
+      "type": "thương hiệu của MC",
+      "power_level": 3,
+      "summary": "Quán cà phê độc lập của Minh Quân, khởi đầu một mặt bằng 32m² trong hẻm.",
+      "territory": "Hẻm 47 Nguyễn Thị Minh Khai (mở rộng dần)",
+      "mc_relation": "MC sáng lập và làm chủ",
+      "conflicts": ["Highground Coffee"],
+      "alliances": ["Liên Minh Quán Tử Tế"],
+      "importance": 10,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Highground Coffee",
+      "type": "chuỗi cà phê đối thủ",
+      "power_level": 9,
+      "summary": "Chuỗi 1.200 chi nhánh được quỹ đầu tư Singapore hậu thuẫn; vũ khí là vốn lớn, giá rẻ, marketing rầm rộ.",
+      "territory": "Toàn quốc",
+      "mc_relation": "Đối thủ cạnh tranh chính",
+      "conflicts": ["Tách & Tách", "Liên Minh Quán Tử Tế"],
+      "alliances": ["Quỹ Đầu Tư Meridian"],
+      "importance": 9,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Liên Minh Quán Tử Tế",
+      "type": "liên minh quán độc lập",
+      "power_level": 6,
+      "summary": "Mạng lưới các quán cà phê độc lập do Minh Quân khởi xướng để cùng đàm phán nguồn cung và chia sẻ tri thức.",
+      "territory": "Các đô thị lớn",
+      "mc_relation": "MC là người khởi xướng và dẫn dắt",
+      "conflicts": ["Highground Coffee"],
+      "alliances": ["Tách & Tách"],
+      "importance": 8,
+      "introduce_arc": 3
+    },
+    {
+      "name": "Quỹ Đầu Tư Meridian",
+      "type": "quỹ đầu tư tài chính",
+      "power_level": 10,
+      "summary": "Quỹ Singapore đứng sau Highground, mục tiêu thâu tóm thị trường F&B Việt Nam; sẵn sàng ép mua lại đối thủ tiềm năng.",
+      "territory": "Khu vực Đông Nam Á",
+      "mc_relation": "Thế lực sau cùng MC phải đối đầu",
+      "conflicts": ["Tách & Tách", "Liên Minh Quán Tử Tế"],
+      "alliances": ["Highground Coffee"],
+      "importance": 9,
+      "introduce_arc": 4
+    }
+  ],
+  "plot_twists": [
+    {
+      "summary": "Đỗ Khải — quản lý Highground đối diện — thật ra từng là bạn học và đồng nghiệp cũ của Minh Quân, người đã 'mách' sếp khiến Quân bị sa thải để leo lên.",
+      "payoff_type": "quan hệ ẩn",
+      "setup_chapters": [12, 45],
+      "twist_chapter": 88,
+      "reader_impact": "major",
+      "arc_number": 1
+    },
+    {
+      "summary": "Hệ Thống Quán Quốc Dân là di sản của Hội Quán Quốc Dân — một hội nghệ nhân ẩm thực thật từng tồn tại và bị quỹ đầu tư tiền thân của Meridian bức tử để độc chiếm thị trường.",
+      "payoff_type": "nguồn gốc golden finger",
+      "setup_chapters": [150, 400, 720],
+      "twist_chapter": 905,
+      "reader_impact": "cosmic",
+      "arc_number": 7
+    },
+    {
+      "summary": "Bà Tư chủ nhà chính là hậu duệ cuối cùng của một nghệ nhân Hội Quán Quốc Dân; căn nhà cho thuê giữ lại công thức gốc của Hội.",
+      "payoff_type": "danh tính ẩn",
+      "setup_chapters": [3, 250],
+      "twist_chapter": 890,
+      "reader_impact": "major",
+      "arc_number": 7
+    }
+  ],
+  "themes": [
+    { "name": "Phục vụ tử tế là tài năng", "type": "main", "description": "Sự tử tế và thấu cảm với khách là một năng lực cạnh tranh thật sự, không thua kém vốn liếng.", "motifs": ["tách cà phê trao tay", "nhớ tên và gu của khách quen"], "importance": 10 },
+    { "name": "Chất lượng thật thắng marketing rỗng", "type": "main", "description": "Sản phẩm tốt và trải nghiệm thật bền hơn quảng cáo và giá rẻ nhất thời.", "motifs": ["ngụm đầu tiên đổi sắc mặt", "review thật vs review thuê"], "importance": 9 },
+    { "name": "Người nhỏ liên kết", "type": "supporting", "description": "Những người yếu thế khi đoàn kết có thể đối đầu kẻ khổng lồ.", "motifs": ["bàn tròn các chủ quán", "chia sẻ công thức"], "importance": 8 },
+    { "name": "Giữ gốc khi thành công", "type": "supporting", "description": "Càng lớn càng phải giữ tâm nghề và gốc gác, không bán mình cho đồng tiền.", "motifs": ["cà phê vợt của ông ngoại", "từ chối lời đề nghị mua lại"], "importance": 8 }
+  ],
+  "voice_anchors": [
+    {
+      "snippet_type": "opening",
+      "prose_text": "Hồ Minh Quân lau lại mặt quầy gỗ lần thứ ba trong buổi tối không một bóng khách. Bên ngoài hẻm 47, tấm biển \"Tách & Tách\" hắt thứ ánh đèn vàng mệt mỏi xuống nền xi măng ẩm. Đối diện, chi nhánh Highground sáng trưng, loa quảng cáo lặp đi lặp lại chương trình đồng giá hai mươi lăm nghìn. Quân nhìn bảng doanh thu trong ngày: con số không tròn trĩnh nằm đó như một lời nhạo báng. Anh không trách ai. Anh chỉ pha thêm một ly cho chính mình, hít một hơi mùi hạt Cầu Đất vừa rang, và tự nhủ — ngày mai, mình sẽ làm tốt hơn một chút nữa.",
+      "key_traits": ["điềm đạm", "lì đòn", "yêu nghề", "không cay cú"]
+    },
+    {
+      "snippet_type": "dialogue",
+      "prose_text": "— Cà phê của em đắng quá, vị này tôi không quen, người khách lớn tuổi đặt tách xuống, cau mày. Minh Quân không vội thanh minh. — Dạ, để con pha lại cho chú một ly khác. Chú thường uống buổi sáng hay buổi chiều ạ? Người khách hơi sững. — Sáng. Sáng sớm, hồi tôi còn đi làm ở xưởng. — Vậy con biết rồi, Quân mỉm cười, tay đã bắt đầu chỉnh lại tỉ lệ. Ly này con pha nhạt hơn, thêm chút sữa đặc kiểu cũ. Mời chú thử lại.",
+      "key_traits": ["lắng nghe khách", "không tự ái", "biến mỗi khiếu nại thành cơ hội"]
+    },
+    {
+      "snippet_type": "action",
+      "prose_text": "Giao diện trong suốt hiện lên ngay khoảnh khắc người khách gật gù ngụm thứ hai: Danh Vọng +12. Một mảnh sáng nhỏ rơi xuống như cánh bướm — Mảnh Công Thức: Phin Sữa Ký Ức. Minh Quân không reo lên. Anh chỉ liếc nhanh dòng chữ, rồi lại cúi xuống lau khô đáy tách kế tiếp, như thể vừa nhận được một lời cảm ơn chứ không phải một phép màu. Khách không cần biết. Khách chỉ cần ly cà phê đúng vị. Phần còn lại là chuyện của anh và cái hệ thống lặng lẽ này.",
+      "key_traits": ["bình tĩnh trước golden finger", "giữ bí mật tự nhiên", "tập trung vào khách"]
+    }
+  ],
+  "foreshadowing": [
+    { "hintText": "Bà Tư nhắc thoáng qua rằng căn nhà này 'ngày xưa cũng từng là một quán có tiếng, giờ chẳng ai nhớ'.", "category": "dialogue", "plantCh": 3, "pickupCh": 890, "payoffDescription": "Hé lộ bà Tư là hậu duệ nghệ nhân Hội Quán Quốc Dân và căn nhà giữ công thức gốc." },
+    { "hintText": "Đỗ Khải nhìn Minh Quân với ánh mắt vừa quen vừa né tránh trong lần đầu chạm mặt ở hẻm.", "category": "character_behavior", "plantCh": 12, "pickupCh": 88, "payoffDescription": "Reveal Đỗ Khải là đồng nghiệp cũ đã hại Quân bị sa thải." },
+    { "hintText": "Hệ Thống đôi khi dùng cụm 'theo lệ Hội Quán' khi mô tả một công thức, nhưng không giải thích Hội Quán là gì.", "category": "environmental", "plantCh": 150, "pickupCh": 905, "payoffDescription": "Reveal nguồn gốc Hội Quán Quốc Dân và mối thù với tiền thân quỹ Meridian." }
+  ]
+}

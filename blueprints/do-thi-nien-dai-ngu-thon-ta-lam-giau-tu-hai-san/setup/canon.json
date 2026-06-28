@@ -1,0 +1,210 @@
+{
+  "power_system": {
+    "name": "Bậc Thang Cơ Nghiệp Hải Sản — Tay Nghề Dẫn Lối Bởi Ký Ức Một Kiếp",
+    "type": "craft-and-commerce progression (tiến trình tay nghề ẩm thực, sự nhạy bén thị trường, vốn liếng và chữ tín trong buôn bán hải sản thời gian khó, KHÔNG phải võ lực hay siêu nhiên)",
+    "coreResource": "Tay nghề chế biến, sự nhạy bén thị trường, uy tín và chữ tín, vốn liếng, mối lái và ký ức kiếp trước của Lâm Hải Sinh — đều hữu hạn và phải tích lũy, bảo toàn, tái đầu tư khôn ngoan.",
+    "unlockRule": "Lâm Hải Sinh tăng 'cấp' không qua tu luyện mà qua mỗi mẻ hàng và mỗi món ăn thành công: thêm tiền lãi, thêm vốn, thêm mối lái, thêm uy tín và quyền chủ động trong làm ăn. Ký ức kiếp trước cho anh biết món gì ngon, hải sản nào quý, thị trường cần gì, nhưng độ chính xác giảm dần khi thời thế đổi thay và quy mô làm ăn lớn lên, buộc anh ngày càng dựa vào tay nghề và bản lĩnh tự rèn.",
+    "antiPlotArmor": [
+      "Ký ức CHỈ là tấm bản đồ — KHÔNG tự bắt được hải sản, KHÔNG tự nấu thành món, KHÔNG ép khách mua hay thương lái trả giá cao.",
+      "Lâm Hải Sinh vẫn phải tự lội bãi mò bắt, tự nhóm bếp nêm nếm, tự gánh hàng lên phố, tự mặc cả và giữ chữ tín; thiếu vốn, thiếu sức, làm ẩu hỏng vị hay đọc sai thị trường vẫn dẫn tới ế hàng và lỗ thật.",
+      "Ký ức sai lệch dần khi thời thế đổi thay; vô dụng khi gặp tình huống chưa từng có trong trí nhớ hoặc khi anh thiếu vốn liếng, nhân lực, thời gian để hiện thực hóa.",
+      "Mọi thành công đều đổi bằng mồ hôi và rủi ro thật: bỏ vốn nhập nguyên liệu, mạo hiểm một mối lái, có thể lỗ và mất uy tín nếu tính sai thời cơ hoặc làm hỏng một mẻ hàng."
+    ],
+    "signatureBuff": {
+      "name": "Hóa Phế Thành Bảo",
+      "effect": "Khi nắm đúng nguyên liệu và đủ chuẩn bị, Lâm Hải Sinh có thể biến một loại hải sản rẻ rúng cả làng chê bỏ thành một món đặc sản hoặc một mẻ hàng khiến khách thành thị tranh nhau mua, lật ngược định kiến và mở ra một dòng tiền mới chỉ sau một lần chinh phục vị giác.",
+      "limit": "Chỉ hiệu quả khi món ăn đã được chế biến thật tới và bán đúng nơi, đúng người, đúng thời điểm; không phải phép màu tức thời, và vô dụng nếu anh thiếu vốn, làm ẩu hỏng vị, hoặc đọc sai khẩu vị và túi tiền của thị trường."
+    },
+    "progressionAxes": [
+      "Tầm vóc cơ nghiệp (một nồi hải sản chua cay nuôi cả nhà → gánh hàng → sạp → quán → cơ sở chế biến → thương hiệu hải sản vùng)",
+      "Mức sung túc của gia đình (bữa cơm độn khoai → mâm đầy cá thịt → áo mới, đồ xịn, nhà ngói khang trang)",
+      "Độ sâu tay nghề và bản lĩnh (dựa nhiều vào ký ức → tự sáng tạo món và đọc thị trường bằng năng lực thật)",
+      "Sức nặng uy tín và quan hệ (một ngư dân vô danh → người làm ăn có chữ tín → nhà buôn hải sản có tiếng với mạng lưới mối lái rộng khắp)"
+    ],
+    "powerCeilingByPhase": {
+      "phase1": "Bắt và chế biến hải sản bị chê bỏ thành món ngon, kiếm những đồng lãi đầu tiên và nuôi cả nhà no đủ hơn",
+      "phase2": "Làm mắm, đồ khô, dầu hào đem lên phố, gây dựng mối lái ổn định và đưa nhà từ nghèo lên khá",
+      "phase3": "Mở sạp rồi quán ăn đặc sản biển, dựng cơ sở chế biến, tạo công ăn việc làm cho người làng",
+      "phase4": "Trở thành nhà buôn hải sản có tiếng vươn ra ngoài tỉnh, đưa cả gia đình và làng chài đổi đời, hoàn thành tâm nguyện dang dở của kiếp trước"
+    }
+  },
+  "worldbuilding": {
+    "tone": "Niên đại điền viên ấm áp, mộc mạc và sảng khoái nhẹ nhàng: mỗi chương là một món ngon nghi ngút trên bếp lửa, một mẻ hàng bán hết veo, hoặc một bước gia đình khấm khá; nỗi hồi hộp đến từ việc chinh phục vị giác khách và niềm vui đếm từng đồng lãi, không từ bạo lực.",
+    "economy": "Kinh tế thời gian khó eo hẹp: gạo đong từng lon, vải mua bằng tem phiếu, tiền mặt hiếm hoi; hải sản bán theo gánh, theo mẻ ở chợ phiên và phố huyện; quyền lực làm ăn đo bằng vốn liếng, uy tín, mối lái và tay nghề. Vốn liếng hữu hạn buộc phải dành dụm và tái đầu tư khôn ngoan.",
+    "vietnamLocalization": {
+      "currencyNote": "Bối cảnh thuần Việt Nam thời bao cấp. Tiền tệ dùng hệ đồng – hào – xu (1 đồng = 10 hào = 100 xu); tiền mặt hiếm, nhiều mặt hàng thiết yếu mua bằng tem phiếu. TUYỆT ĐỐI không dùng đơn vị tiền nước ngoài (tệ/nhân dân tệ/lượng bạc/quan/văn) hay địa danh nước ngoài; mọi giá cả phải theo hệ đồng-hào-xu.",
+      "priceAnchors": {
+        "gạo": "khoảng 4 hào một cân (kg) ngoài chợ tự do; bữa ăn thường phải độn khoai, sắn, ngô",
+        "côngLaoĐộng": "một ngày công làm thuê chừng 1 đồng; tiêu pha cả nhà tằn tiện vài hào mỗi ngày",
+        "nguyênLiệuBịChê": "tôm tít (bề bề), sá sùng, ốc, cua nhỏ vỏ nhiều ít thịt gần như cho không, một–hai xu một mớ, người ta thường kho mặn ăn qua bữa hoặc phơi cho gà vịt",
+        "mónChếBiếnBánRa": "một đĩa hải sản chua cay 2–3 hào, một bát bún hải sản 1–2 hào, một hũ mắm tôm chua 5–8 hào, một gánh đồ khô (mực, cá, ruốc) bán hết được vài đồng",
+        "biênLãiSướng": "nguyên liệu vài xu một cân hóa thành món bán vài hào một đĩa — lãi gấp nhiều lần sau khi trừ gia vị và công, đó là điểm sảng khoái cốt lõi của truyện",
+        "mốcĐổiĐời": "tích cóp dần: bộ quần áo mới vài đồng, chiếc đài hoặc đồng hồ vài chục đồng, chiếc xe đạp Thống Nhất là mơ ước lớn của cả làng, sau cùng là ngôi nhà ngói"
+      },
+      "localIngredients": "Hải sản Việt Nam có thật, dùng đúng tên dân dã: tôm tít/bề bề, sá sùng, ốc hương, ốc móng tay, ốc len, cua gạch, ghẹ, ngao, sò huyết, sò lông, hàu, vẹm, cá khoai, cá cơm, cá nục, cá trích, con ruốc (con moi), mực, don, dắt. Cách chế biến kiểu Việt: hải sản chua cay, lẩu/canh chua, mắm tôm chua, nước mắm nhỉ, ruốc (moi) khô, mực một nắng, cá khô, chả mực, bún/bánh đa hải sản — TUYỆT ĐỐI không dùng món hay gia vị đặc trưng nước ngoài."
+    },
+    "setting": "Làng chài Hải Đông nghèo khó nằm nép bên bờ biển những năm tháng gian khó, nơi cả làng quanh năm bám biển mà vẫn chạy ăn từng bữa; ra khơi bằng thuyền nan lưới vá, tôm cua ốc sò vỏ nhiều ít thịt bị chê là thứ bỏ đi. Phố huyện gần đó là nơi có khách thành thị sành ăn và các thương lái — thị trường để Lâm Hải Sinh đem hương vị biển quê lên bán.",
+    "geography": {
+      "phase1": "Bãi triều, ghềnh đá ven làng chài Hải Đông, căn bếp nhỏ trong nhà và chợ phiên gần đó",
+      "phase2": "Phố huyện với khách thành thị và các thương lái, các mối lái đầu tiên trên phố",
+      "phase3": "Sạp hàng và quán ăn đặc sản biển trên phố huyện, cơ sở chế biến nhỏ trong làng",
+      "phase4": "Thị trường hải sản cả tỉnh và các vùng lân cận, nơi thương hiệu của anh vươn tới"
+    },
+    "techLevel": "Thời gian khó, kỹ thuật thô sơ: thuyền nan, lưới vá, bếp củi, chum vại làm mắm, giàn phơi đồ khô; không có máy móc hiện đại, mọi thứ dựa vào đôi tay, kinh nghiệm và sự khéo léo — tay nghề và cái đầu tỉnh táo của con người mới là yếu tố quyết định.",
+    "conflictMedium": "Đấu tài nấu nướng - thị trường - chữ tín (NON-combat): cạnh tranh bằng chất lượng món ăn và mẻ hàng, mặc cả giá với thương lái, gây dựng mối lái, hóa giải chuyện hàng xóm ghen tỵ và kẻ bắt chước hỏng vị — tuyệt đối không bằng đánh nhau hay bạo lực.",
+    "forbiddenElements": [
+      "đánh nhau tay đôi/ẩu đả/xã hội đen như nguồn giải quyết xung đột chính",
+      "bạo lực thể chất, máu me, tra tấn để giật gân",
+      "kẻ tới từ một thế giới khác hay không gian song song",
+      "tu luyện / cảnh giới / võ công / phép thuật / siêu năng lực",
+      "ký ức kiếp trước tự động biến thành món ăn hoàn chỉnh hay mẻ hàng mà không cần MC bỏ công",
+      "kẻ thù máu lửa, âm mưu hiểm độc, bi kịch nặng nề — chỉ có mâu thuẫn đời thường nhẹ nhàng"
+    ]
+  },
+  "factions": [
+    {
+      "name": "Gia đình Lâm Hải Sinh",
+      "type": "phe nhân vật chính",
+      "power_level": 2,
+      "summary": "Lâm Hải Sinh cùng mẹ, em gái Lâm Tiểu Điệp và những người thân; khởi đầu từ một gia đình ngư dân nghèo tay trắng, dựa vào tay nghề, ký ức kiếp trước và sự chịu khó của Hải Sinh để từng bước đổi đời.",
+      "territory": "Căn nhà nhỏ và gánh hàng ban đầu trong làng chài, mở rộng dần thành sạp, quán và cơ sở chế biến",
+      "mc_relation": "MC là trụ cột và linh hồn của cả gia đình",
+      "conflicts": ["Hàng xóm ghen tỵ gièm pha", "Thương lái quen ép giá"],
+      "alliances": ["Những ngư dân tử tế và người làm cùng trong làng"],
+      "importance": 10,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Hàng xóm ghen tỵ và kẻ bắt chước",
+      "type": "phe gây khó cấp thấp",
+      "power_level": 2,
+      "summary": "Những người trong làng như Bà Béo hay gièm pha, ghen tỵ khi thấy nhà Hải Sinh khá lên, và đôi kẻ thấy anh bán chạy liền bắt chước công thức nhưng làm hỏng vị — chướng ngại đời thường đầu tiên Hải Sinh phải hóa giải bằng cái khéo và lòng tử tế.",
+      "territory": "Xóm giềng quanh nhà Hải Sinh và chợ phiên trong làng",
+      "mc_relation": "Chướng ngại nhẹ nhàng giai đoạn đầu",
+      "conflicts": ["Gia đình Lâm Hải Sinh"],
+      "alliances": [],
+      "importance": 5,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Giới thương lái phố huyện",
+      "type": "thế lực buôn bán cũ kỹ",
+      "power_level": 5,
+      "summary": "Các thương lái như Lão Mập quen ép giá ngư dân, nắm đầu mối phân phối hàng lên phố; ban đầu xem thường rồi tìm cách chèn ép Hải Sinh khi anh bán chạy, nhưng cuối cùng phải nể vì chất lượng và chữ tín của anh.",
+      "territory": "Phố huyện, các đầu mối thu mua và phân phối hải sản",
+      "mc_relation": "Đối thủ làm ăn giai đoạn giữa, hóa giải bằng chất lượng và chữ tín",
+      "conflicts": ["Gia đình Lâm Hải Sinh"],
+      "alliances": ["Một số chủ hàng thực dụng trên phố"],
+      "importance": 7,
+      "introduce_arc": 2
+    },
+    {
+      "name": "Các nhà buôn và cơ sở hải sản lớn trong vùng",
+      "type": "thế lực thị trường tầm vùng",
+      "power_level": 7,
+      "summary": "Những nhà buôn và cơ sở chế biến hải sản lớn có tiếng trong tỉnh, quen thống lĩnh thị trường; khi thương hiệu của Hải Sinh vươn lên, anh phải cạnh tranh sòng phẳng với họ bằng chất lượng, giá cả và uy tín, không bằng thủ đoạn.",
+      "territory": "Thị trường hải sản cả tỉnh và các vùng lân cận",
+      "mc_relation": "Đối thủ cạnh tranh giai đoạn cuối, đối đầu bằng tay nghề và chữ tín",
+      "conflicts": ["Gia đình Lâm Hải Sinh"],
+      "alliances": [],
+      "importance": 7,
+      "introduce_arc": 5
+    }
+  ],
+  "plot_twists": [
+    {
+      "summary": "Loại hải sản mà cả làng chê là 'thứ bỏ đi' và Bà Béo cười nhạo khi thấy Hải Sinh nhặt nhạnh, hóa ra chính là nguyên liệu cho món đặc sản đắt nhất mà khách phố tranh nhau mua; thứ tưởng vô giá trị lại là mỏ vàng mà chỉ mình anh nhìn ra nhờ ký ức kiếp trước.",
+      "payoff_type": "phế phẩm hóa châu báu",
+      "setup_chapters": [3, 12],
+      "twist_chapter": 26,
+      "reader_impact": "major",
+      "arc_number": 1
+    },
+    {
+      "summary": "Kẻ bắt chước công thức hải sản chua cay của Hải Sinh để tranh khách, càng làm càng hỏng vị và mất khách, vô tình khiến tiếng lành về hàng thật của anh đồn xa hơn; trò bắt chước phá giá trở thành bàn đạp đưa uy tín của anh lên.",
+      "payoff_type": "gậy ông đập lưng ông",
+      "setup_chapters": [40, 90],
+      "twist_chapter": 110,
+      "reader_impact": "moderate",
+      "arc_number": 2
+    },
+    {
+      "summary": "Lão Mập thương lái tìm cách ép giá và chặn đường hàng của Hải Sinh lên phố, nhưng chính những mối lái và khách quen mà anh giữ chữ tín bấy lâu lại đứng về phía anh, biến cú chèn ép thành dịp để anh thoát khỏi thế phụ thuộc và tự dựng đầu mối riêng.",
+      "payoff_type": "chữ tín hóa giải vây hãm",
+      "setup_chapters": [150, 230],
+      "twist_chapter": 260,
+      "reader_impact": "moderate",
+      "arc_number": 3
+    }
+  ],
+  "themes": [
+    {
+      "name": "Tri thức và tay nghề biến cái rẻ thành của quý",
+      "type": "main",
+      "description": "Người hiểu giá trị thật của nguyên liệu và có tay nghề chế biến cuối cùng biến thứ cả làng vứt đi thành đặc sản đắt hàng, biến cái nghèo thành sung túc.",
+      "motifs": ["con hải sản bị chê hóa thành món khách tranh nhau mua", "nồi hải sản chua cay nghi ngút trên bếp lửa", "khách nếm xong sững người rồi tấm tắc khen"],
+      "importance": 10
+    },
+    {
+      "name": "Gia đình từ từ đổi đời",
+      "type": "main",
+      "description": "Hạnh phúc lớn nhất là nhìn gia đình mỗi ngày một no đủ: từ bữa cơm độn khoai tới mâm đầy cá thịt, từ áo vá tới áo mới, từ nhà tranh dột tới nhà ngói khang trang.",
+      "motifs": ["mâm cơm mỗi ngày một đầy đặn", "tấm áo mới và món đồ trong mơ", "ánh mắt người thân rạng rỡ dần lên"],
+      "importance": 10
+    },
+    {
+      "name": "Chữ tín và lòng tử tế là vốn liếng bền vững",
+      "type": "supporting",
+      "description": "Trong làm ăn thời gian khó, người giữ chất lượng và chữ tín, đối đãi tử tế với mối lái và người làm cùng, cuối cùng thắng kẻ chỉ biết ép giá hay bắt chước phá giá.",
+      "motifs": ["giữ đúng hẹn giao hàng dù thiệt", "không pha trộn làm dối một mẻ hàng", "mối lái và khách quen đứng về phía người tử tế"],
+      "importance": 8
+    },
+    {
+      "name": "Làm lại cuộc đời bằng chính mồ hôi của mình",
+      "type": "supporting",
+      "description": "Ký ức của một kiếp người chỉ là tấm bản đồ; giàu sang vẫn phải đổi bằng đôi tay phồng rộp lội bãi, nhóm bếp, gánh hàng và cái đầu tỉnh táo của chính Lâm Hải Sinh.",
+      "motifs": ["đôi tay phồng rộp sau buổi lội bãi", "đêm khuya ngồi tính toán đường làm ăn", "từ chối đường tắt dù dễ lãi"],
+      "importance": 8
+    }
+  ],
+  "voice_anchors": [
+    {
+      "snippet_type": "opening",
+      "prose_text": "Lâm Hải Sinh mở mắt ra giữa mùi mặn mòi quen thuộc của gió biển. Mái tranh thấp lè tè trên đầu, vách đất loang lổ, và ngoài sân là tiếng mẹ anh lạch cạch nhóm bếp trong buổi sớm còn nhập nhoạng. Anh ngồi bật dậy, tim đập dồn. Bàn tay đưa lên mặt — làn da rám nắng, căng và trẻ, không một nếp nhăn. Anh nhớ rõ mình đã nhắm mắt ở tuổi nào, trong căn phòng nào, với nỗi tiếc nuối nào chưa kịp nói: cha mẹ và các em chưa được một ngày ăn no mặc ấm. Vậy mà giờ đây anh đang ở đây, trở lại tuổi đôi mươi, ở chính làng chài Hải Đông này, với cả một kiếp người nằm gọn trong trí nhớ. Lâm Hải Sinh nhìn ra phía bãi triều đang rút nước, nơi tôm cua ốc sò mà cả làng chê là thứ bỏ đi đang nằm chờ. Lần này, anh sẽ không để gia đình mình đói nghèo thêm một ngày nào nữa.",
+      "key_traits": ["điềm tĩnh", "từng trải", "thương gia đình tha thiết", "khao khát làm lại"]
+    },
+    {
+      "snippet_type": "dialogue",
+      "prose_text": "— Cái thằng này, nhặt mấy con ốc vỏ dày ít thịt ấy về làm gì cho bẩn gánh? Bà Béo đứng tựa cửa, tay chống nạnh, giọng đầy mỉa mai. Cả làng người ta vứt cho gà ăn, mày tha về định nuôi cả nhà bằng vỏ ốc đấy à? Lâm Hải Sinh không vội đáp. Anh đặt gánh xuống, lau mồ hôi, rồi mới ngẩng lên cười hiền. — Bác nói phải, thứ này người ta chê thật. Anh nhặt một con lên, xoay xoay trong tay. Nhưng bác cứ chờ tới chiều, nếu nồi của cháu thơm thì mời bác sang nếm thử một bát. Còn nếu dở, cháu xin chịu để bác cười cho cả xóm nghe.",
+      "key_traits": ["nhẫn nại ôn hòa", "tự tin kín đáo", "lấy tài nghệ đáp lại lời gièm pha"]
+    },
+    {
+      "snippet_type": "action",
+      "prose_text": "Lâm Hải Sinh nhóm lửa lớn, chờ chảo nóng già rồi mới trút mẻ hải sản vào. Tiếng xèo xèo bốc lên cùng làn khói thơm nức, mùi sả, mùi ớt, mùi gừng quyện với vị ngọt của biển lan khắp gian bếp chật. Anh đảo tay đều, nêm từng chút mắm, từng chút đường, nếm thử rồi gật đầu — đúng cái vị anh đã thuộc nằm lòng từ một kiếp trước. Khi anh bưng nồi hải sản chua cay nghi ngút khói đặt giữa mâm, mẹ anh và bé Tiểu Điệp ngồi quây quanh, mắt mở to. Bé Tiểu Điệp gắp một miếng, vừa đưa vào miệng đã reo lên, hai mắt sáng rỡ. Mẹ anh nếm một đũa, bàn tay chai sạn khẽ run, rồi bà quay đi giấu vội giọt nước mắt. Đã lâu lắm rồi cả nhà mới có một bữa ngon đến thế. Lâm Hải Sinh nhìn cảnh ấy, trong lòng ấm như có lửa. Đây mới chỉ là bữa đầu tiên thôi.",
+      "key_traits": ["tỉ mỉ trong bếp núc", "ấm áp tình thân", "lặng lẽ làm nên niềm vui cho người nhà"]
+    }
+  ],
+  "foreshadowing": [
+    {
+      "hintText": "Ngay buổi đầu trở về, Lâm Hải Sinh lặng lẽ nhặt nhạnh những con hải sản cả làng chê bỏ mà chưa nói cho ai biết anh định làm gì với chúng.",
+      "category": "object",
+      "plantCh": 3,
+      "pickupCh": 26,
+      "payoffDescription": "Chính loại hải sản bị chê ấy được anh chế biến thành món đặc sản khiến khách phố tranh nhau mua, mở ra dòng tiền đầu tiên — dựa trên ký ức kiếp trước về giá trị thật của nó."
+    },
+    {
+      "hintText": "Mỗi khi nói về món ăn hay đường làm ăn, Lâm Hải Sinh lại bộc lộ một chiều sâu hiểu biết kỳ lạ so với tuổi, khiến Ông Tư chài đôi lần nhìn anh dò xét.",
+      "category": "character_behavior",
+      "plantCh": 8,
+      "pickupCh": 120,
+      "payoffDescription": "Chiều sâu ấy đến từ ký ức trọn vẹn của một kiếp người; bí mật trọng sinh được anh giấu kín suốt truyện, chỉ hé lộ qua từng món ăn và mẻ hàng một cách hợp lý."
+    },
+    {
+      "hintText": "Lão Mập thương lái ban đầu xem thường gánh hàng nhỏ của Hải Sinh, nhưng ánh mắt hắn thoáng đổi khi thấy khách quay lại mua nữa.",
+      "category": "character_behavior",
+      "plantCh": 60,
+      "pickupCh": 260,
+      "payoffDescription": "Lão Mập về sau tìm cách ép giá và chặn đường hàng của Hải Sinh, nhưng chính chữ tín anh gây dựng khiến mối lái đứng về phía anh, giúp anh thoát thế phụ thuộc và tự dựng đầu mối riêng."
+    }
+  ]
+}

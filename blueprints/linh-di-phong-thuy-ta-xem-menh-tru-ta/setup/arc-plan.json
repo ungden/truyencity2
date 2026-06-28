@@ -1,0 +1,25 @@
+{
+  "arc_number": 1,
+  "start_chapter": 1,
+  "end_chapter": 30,
+  "arc_theme": "Quầy xem mệnh phố cổ — tiếp quản y bát truyền thừa, giải vụ phong thủy đời thường đầu tiên và học cách trừ tà cứu người",
+  "plan_text": "Arc mở màn warm-baseline: Hạ Vô Cữu đã thừa kế y bát và có thiên nhãn quán khí hoạt động ngay từ ch.1; anh KHÔNG mở đầu bằng cảnh khốn cùng mà ở trạng thái một thầy phong thủy trẻ vừa tiếp quản quầy xem mệnh của sư phụ, nhận vụ đầu tiên và xử lý tỉnh táo nhờ một luận đoán âm dương đúng. Mỗi chương xoay quanh một tình huống xem mệnh/phong thủy/trừ tà cụ thể, với ít nhất 2 cao điểm dopamine/chương (một luận đoán đúng cứu người + một thầy rởm bị vạch trần hoặc một chân tướng được hé lộ), cao điểm đầu trước nửa chương. Cụm chương theo 5-cluster: ch.1-6 setup (sư phụ qua đời để lại la bàn và bí kíp, Hạ Vô Cữu mở lại quầy, nhận vụ căn hộ 'ở không yên', quán khí đọc ra sát khí từ tấm gương đặt sai và một oan hồn ôm uẩn khúc, hóa giải êm xuôi bằng cách tháo gương và khai mở cho oan hồn); ch.7-14 breathing + competence (gây dựng quầy, làm quen lão Đinh và Tô Vãn Nghi, nhận vài vụ nhỏ, ghi sổ tay dấu khí, hé bí ẩn nét khắc mảnh trên la bàn); ch.15-22 confront (đụng độ Trương Bán Tiên thầy bói rởm phán bậy khiến thân chủ suýt mang họa, Hạ Vô Cữu vạch trần bằng chứng cứ âm dương trước mặt mọi người); ch.23-28 big_wow (vụ một oan hồn 'hung dữ' khiến cả khu sợ hãi, anh quán khí lần ra chân tướng cái chết oan và khai mở cho oan hồn buông bỏ đúng giờ Tý, cứu một mạng tưởng đã nguy, đồng thời chạm dấu khí lạ của tà thuật qua Quách Đạo Sinh); ch.29-30 resolution + hook (kết vụ trọn vẹn, danh tiếng bước đầu lan ra; lão Đinh buột miệng nghi vấn về cái chết của sư phụ, mở tuyến bí mật la bàn và dòng phái tà thuật). Giữ nguyên tắc NON-COMBAT: mọi tà sự giải quyết bằng quán khí, luận đoán, bố trận, tìm chân tướng và khai mở cho oan hồn — không đánh nhau tay đôi, không gore giật gân. MC điềm đạm, chính trực, lạnh lùng khi cần nhưng giàu trắc ẩn.",
+  "chapter_briefs": [
+    { "n": 1, "beat": "setup", "goal": "Sư phụ qua đời, Hạ Vô Cữu mở lại quầy xem mệnh và nhận vụ căn hộ 'ở không yên'", "payoff": "Quán khí đọc ra sát khí từ tấm gương đặt sai và một vệt oan hồn ôm uẩn khúc; anh trấn an chủ nhà và bảo tháo gương xuống", "endingHook": "Oan hồn không hung dữ — nó đang gào một cái tên mà mười năm không ai chịu nghe" },
+    { "n": 3, "beat": "setup", "goal": "Lần ra chân tướng phía sau căn hộ — ai từng sống và chết ở đây", "payoff": "Anh tìm được uẩn khúc của oan hồn, khai mở cho nó buông bỏ, căn hộ trở lại yên ổn", "endingHook": "Trên rìa la bàn của sư phụ có một nét khắc mảnh không giống ký hiệu phong thủy" },
+    { "n": 9, "beat": "breathing", "goal": "Gây dựng lại quầy, làm quen lão Đinh và Tô Vãn Nghi, nhận vài vụ nhỏ", "payoff": "Anh giải gọn một vụ mộ tổ bị động và bắt đầu ghi sổ tay dấu khí, tiếng tăm chớm lan", "endingHook": "Lão Đinh lẩm bẩm thầy của cậu đâu phải chết vì bệnh, rồi vội lảng đi" },
+    { "n": 18, "beat": "confront", "goal": "Ngăn thân chủ làm theo lời phán bậy của thầy bói rởm Trương Bán Tiên", "payoff": "Hạ Vô Cữu chỉ ra cái phạm thật nằm ở xà ngang chứ không phải bếp, vạch trần Trương Bán Tiên trục lợi", "endingHook": "Trương Bán Tiên cay cú, ngầm liên hệ với một thầy phong thủy dùng tà thuật trong vùng" },
+    { "n": 25, "beat": "big_wow", "goal": "Hóa giải một oan hồn 'hung dữ' khiến cả khu khiếp sợ", "payoff": "Anh quán khí lần ra chân tướng cái chết oan, bố trận khai mở cho oan hồn buông bỏ đúng giờ Tý, cứu một mạng tưởng đã nguy", "endingHook": "Trong quỷ khí, anh nhận ra một dấu khí lạ — không phải oan hồn tự nhiên mà có bàn tay tà thuật can dự" },
+    { "n": 30, "beat": "resolution", "goal": "Khép arc 1, kết vụ trọn vẹn và an định danh tiếng bước đầu", "payoff": "Người sống được yên, oan hồn siêu thoát; Hạ Vô Cữu giữ sổ tay dấu khí đầu tiên và uy tín chớm nở trong khu vực", "endingHook": "Lão Đinh nói thêm về nghi vấn cái chết của sư phụ và nhắc tới 'huyệt vị để giữ' — mở tuyến bí mật la bàn và dòng phái tà thuật" }
+  ],
+  "threads_to_advance": ["Gây dựng nghề và uy tín của Hạ Vô Cữu", "Thiên nhãn quán khí và sổ tay dấu khí", "Quan hệ với lão Đinh và Tô Vãn Nghi"],
+  "threads_to_resolve": ["Giải vụ căn hộ 'ở không yên' và oan hồn ôm uẩn khúc (giải quyết: tháo gương, tìm chân tướng, khai mở cho oan hồn siêu thoát)"],
+  "new_threads": ["Nghi vấn cái chết của sư phụ", "Bí ẩn nét khắc mảnh trên chiếc la bàn cổ", "Dấu khí lạ của dòng phái tà thuật"],
+  "sub_arcs": [
+    { "name": "Quầy xem mệnh và vụ đầu tiên", "chapterRange": "1-6", "cluster": "setup" },
+    { "name": "Gây dựng nghề và sổ tay dấu khí", "chapterRange": "7-14", "cluster": "breathing" },
+    { "name": "Thầy rởm bị vạch trần", "chapterRange": "15-22", "cluster": "confront" },
+    { "name": "Oan hồn hung dữ", "chapterRange": "23-28", "cluster": "big_wow" },
+    { "name": "Khép vụ và mở tuyến lớn", "chapterRange": "29-30", "cluster": "resolution" }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "arc_number": 1,
+  "start_chapter": 1,
+  "end_chapter": 20,
+  "arc_theme": "Ngọn lửa đầu tiên — nhập thân, kích hoạt Khải Hóa Đồ Giám và dùng tri thức cứu bộ lạc khỏi đói rét",
+  "plan_text": "Arc mở màn warm-baseline: Lâm Mặc nhập thân xác thiếu niên Hắc Thạch ngay ch.1 với Khải Hóa Đồ Giám đã kích hoạt và tri thức nguyên vẹn — anh KHÔNG mở đầu bằng cảnh sắp chết thảm mà ngay đêm đầu đã cứu người bằng cách giữ lửa cháy suốt đêm và nấu chín thức ăn. Mỗi chương xoay quanh một vấn đề sinh tồn cụ thể hoặc một bước khai hóa nhỏ, với ít nhất 2 cao điểm dopamine/chương (một giải pháp khai hóa cứu người/cải thiện đời sống + một khoảnh khắc được công nhận hoặc một mối nguy bị đẩy lui), cao điểm đầu trước nửa chương. Cụm chương theo 5-cluster: ch.1-4 setup (tỉnh dậy trong thân xác thiếu niên, hiểu hoàn cảnh bộ lạc đói rét, Đồ Giám kích hoạt, giữ lửa bền và nấu chín cứu người khỏi rét đêm đầu); ch.5-8 breathing + competence (dạy luộc nước trị bệnh đường ruột, thu phục lòng tin của thợ săn trẻ A Lỗi, A Đào và những người được cứu, ghi nhớ tri thức để truyền lại); ch.9-14 confront (Đại Tế Tư Cốt Vu nghi Lâm Mặc chọc giận thần linh, kích động hoài nghi; Lâm Mặc dựng bẫy thú thay vì liều mạng săn, chứng minh tri thức bằng kết quả thực tế và hóa giải hiềm khích); ch.15-18 big_wow (thuyết phục bộ lạc vùi nắm hạt cỏ đầu tiên xuống đất bất chấp hoài nghi, đẩy lui một toán cướp lẻ bằng bẫy và tổ chức, cứu được cả nhóm tưởng nguy); ch.19-20 resolution + hook (bộ lạc bắt đầu tích thịt muối và lửa bền chuẩn bị qua đông, Tù Trưởng Hắc Nham lần đầu công nhận Lâm Mặc, mở tuyến mùa đông sắp tới và mầm cỏ vừa gieo). Giữ nguyên tắc khai hóa thực tế: mọi vấn đề ưu tiên giải bằng tri thức, thử nghiệm, tổ chức và công cụ; chiến đấu chỉ là phòng vệ và luôn thắng bằng tổ chức/bẫy chứ không liều mạng đấu sức hay gore. MC điềm tĩnh, thực tế, có lòng nhân.",
+  "chapter_briefs": [
+    { "n": 1, "beat": "setup", "goal": "Lâm Mặc tỉnh dậy trong thân xác thiếu niên Hắc Thạch giữa hang đá lạnh lẽo và hiểu hoàn cảnh đói rét của bộ lạc", "payoff": "Khải Hóa Đồ Giám kích hoạt; anh xếp củi và che gió giữ lửa cháy suốt đêm, nấu chín thức ăn cứu người khỏi rét đêm đầu", "endingHook": "Một đứa trẻ ho khan vì uống nước suối bẩn — vấn đề tiếp theo lộ ra" },
+    { "n": 4, "beat": "setup", "goal": "Dạy bộ lạc luộc nước trước khi uống để trị bệnh đường ruột đang hoành hành", "payoff": "Vài người khỏi bệnh sau khi uống nước đun sôi, lần đầu tri thức của Lâm Mặc cho kết quả thấy được", "endingHook": "Thợ săn trẻ A Lỗi bắt đầu tò mò nhìn anh bằng ánh mắt khác" },
+    { "n": 7, "beat": "breathing", "goal": "Thu phục lòng tin của A Lỗi và A Đào, bắt đầu ghi nhớ và truyền lại tri thức", "payoff": "A Lỗi tình nguyện theo Lâm Mặc học cách đặt bẫy; A Đào học giữ lửa và nấu nướng — nhóm tin cậy đầu tiên hình thành", "endingHook": "Đại Tế Tư Cốt Vu lặng lẽ quan sát với vẻ mặt không hài lòng" },
+    { "n": 11, "beat": "confront", "goal": "Hóa giải sự nghi kỵ của Cốt Vu, người gọi Lâm Mặc là kẻ chọc giận thần linh", "payoff": "Lâm Mặc dựng bẫy hố bắt được con thú lớn nuôi cả tộc mấy ngày, chứng minh tri thức bằng kết quả thay vì cãi vã", "endingHook": "Cốt Vu im lặng nhưng ánh mắt vẫn đầy đề phòng — một bí mật chưa nói ra" },
+    { "n": 16, "beat": "big_wow", "goal": "Thuyết phục bộ lạc gieo nắm hạt cỏ đầu tiên và đẩy lui một toán cướp lẻ", "payoff": "Anh dùng bẫy và tổ chức đẩy lui toán cướp không tổn thất, đồng thời vùi được nắm hạt xuống đất trước sự hoài nghi của cả tộc", "endingHook": "Hắc Nham bắt đầu nhìn Lâm Mặc như một người có thể dẫn dắt" },
+    { "n": 20, "beat": "resolution", "goal": "Khép arc 1, chuẩn bị cho mùa đông đầu tiên", "payoff": "Bộ lạc tích được thịt muối và lửa bền lần đầu; Tù Trưởng Hắc Nham chính thức công nhận và giao Lâm Mặc lo việc tích trữ", "endingHook": "Gió lạnh đầu mùa thổi tới, và những mầm cỏ vừa gieo bắt đầu nhú lên khỏi mặt đất" }
+  ],
+  "threads_to_advance": ["Khai hóa sinh tồn cơ bản cho bộ lạc Hắc Thạch", "Thu phục lòng tin và xây dựng nhóm nòng cốt", "Hóa giải sự bảo thủ của giới quyền lực cũ"],
+  "threads_to_resolve": ["Cứu bộ lạc khỏi đói rét và bệnh tật trước mắt (giải quyết: lửa bền, nước sạch, bẫy thú, tích trữ)"],
+  "new_threads": ["Mùa đông đầu tiên sắp tới", "Bí mật và nỗi sợ thật sự của Cốt Vu", "Vụ mùa gieo hạt đầu tiên có thành công hay không"],
+  "sub_arcs": [
+    { "name": "Thiếu niên gầy gò", "chapterRange": "1-4", "cluster": "setup" },
+    { "name": "Nước sạch và lòng tin", "chapterRange": "5-8", "cluster": "breathing" },
+    { "name": "Nỗi sợ của Tế Tư", "chapterRange": "9-14", "cluster": "confront" },
+    { "name": "Hạt giống và bẫy hố", "chapterRange": "15-18", "cluster": "big_wow" },
+    { "name": "Chuẩn bị qua đông", "chapterRange": "19-20", "cluster": "resolution" }
+  ]
+}

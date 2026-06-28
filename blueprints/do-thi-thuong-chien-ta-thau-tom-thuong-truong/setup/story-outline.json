@@ -1,0 +1,118 @@
+{
+  "premise": "Trần Mặc, người thừa kế gia tộc vừa du học trở về giữa lúc Trần thị Tập đoàn bên bờ phá sản, dùng tầm nhìn tài chính và những nước cờ thâu tóm sắc bén để lật ngược thế cờ. Anh không có phép màu, chỉ có kiến thức và mạng lưới quan hệ tích lũy từ những năm làm việc tại các quỹ đầu tư quốc tế. Từ một cuộc họp hội đồng tưởng là lễ tang của tập đoàn, anh từng bước cứu công ty hấp hối, đẩy lùi gã khổng lồ Hoằng Đạt, mở rộng đế chế và vươn ra đấu trường quốc tế — tất cả bằng chiến tranh giá, M&A, truyền thông và pháp lý, không một giọt máu.",
+  "mainConflict": "Một người trở về tay trắng đối đầu một hệ thống thương trường tàn khốc và những kẻ săn mồi tài chính muốn xẻ thịt gia tộc anh. Xung đột không giải quyết bằng bạo lực mà bằng tầm nhìn, chiến lược, đàm phán và kiểm soát thông tin. Leo thang từ cứu tập đoàn khỏi vỡ nợ → thắng chiến tranh giá → chủ động thâu tóm và chống thâu tóm thù địch → đấu trí truyền thông - pháp lý → mở rộng đa ngành → đối đầu tập đoàn đa quốc gia → quyết chiến cuối với Hoằng Đạt và định hình một đế chế kinh tế bền vững.",
+  "themes": [
+    "Tầm nhìn và chiến lược thắng được sức mạnh tài chính thô bạo",
+    "Khủng hoảng là cơ hội cho người biết đọc nước cờ",
+    "Giữ đạo đức kinh doanh giữa thương trường tàn khốc là một lựa chọn dũng cảm",
+    "Quyền lực thật nằm ở kiểm soát thông tin và lòng người, không ở số tiền lớn nhất"
+  ],
+  "majorPlotPoints": [
+    "Ch.1: Trần Mặc du học trở về, đọc thủng báo cáo tài chính giả và lật ngược cuộc họp hội đồng định bán tháo tập đoàn bằng một nước cờ tái cơ cấu nợ bất ngờ.",
+    "Arc 1: Cứu Trần thị khỏi vỡ nợ trước mắt, vô hiệu hóa phe cổ đông phản trắc, giành quyền điều hành; Hoằng Đạt Group lộ diện như đối thủ chính.",
+    "Arc 2-3: Thắng chiến tranh giá trên mảng bán lẻ, chuyển sang chủ động thâu tóm doanh nghiệp tiềm năng và bẻ gãy một cuộc thâu tóm thù địch nhắm vào mình.",
+    "Giữa truyện: Đối thủ phát động chiến dịch truyền thông bẩn và kiện tụng; Trần Mặc lật ngược thành chiến thắng kép về danh tiếng và pháp lý, rồi mở rộng đế chế sang fintech - năng lượng - nền tảng số.",
+    "Cao trào cuối: Quyết chiến tổng lực với Hoằng Đạt, đưa đế chế ra quốc tế, thâu tóm hoặc khuất phục đối thủ cuối cùng và định hình một di sản kinh tế có trách nhiệm."
+  ],
+  "setupKernel": {
+    "readerFantasy": "Cảm giác sảng khoái khi một người bị cả thiên hạ coi thường, chỉ bằng cái đầu lạnh và tầm nhìn thương trường, lật ngược ván cờ tưởng đã thua: đọc thủng cái bẫy tài chính mà kẻ khác bị lừa, tung ra nước cờ khiến cả phòng họp chết lặng, biến chủ nợ hung hãn thành đồng minh và biến kẻ săn mồi thành con mồi — mỗi thương vụ thắng là một lần độc giả phục lăn trí tuệ và thấy nhân vật vươn lên một bậc.",
+    "protagonistEngine": "Trần Mặc thắng nhờ khả năng đọc dòng tiền và báo cáo tài chính sắc bén, nhìn ra ý đồ thật sau mỗi lời chào mua, và tính trước nhiều nước cờ chiến lược; kiến thức quỹ đầu tư cùng mạng lưới quốc tế chỉ là điểm tựa, mọi thắng lợi đều phải tự huy động vốn, tự thuyết phục và tự gánh rủi ro. Tính cách điềm tĩnh, quyết đoán, lý trí đến lạnh lùng trong đàm phán nhưng giữ đạo đức kinh doanh — không hạ thủ tàn nhẫn với người vô tội, trọng chữ tín.",
+    "pleasureLoop": [
+      "Một mối đe dọa tài chính/thương vụ mới xuất hiện (chủ nợ siết, đối thủ chào mua, chiến dịch bôi nhọ) → Trần Mặc đọc thủng ý đồ thật và nhận ra điểm yếu giấu kín của đối phương (đọc thấu nước cờ).",
+      "Anh âm thầm bày bố nước cờ phản công, gom thông tin và đồng minh trong khi đối thủ tưởng nắm thế thượng phong (giăng bẫy ngược).",
+      "Trong một cuộc họp/đàm phán then chốt, Trần Mặc tung ra nước cờ bất ngờ khiến đối thủ chết lặng và cả phòng họp sững sờ (cú lật mặt sảng khoái).",
+      "Đối thủ kiêu ngạo bị chính cái bẫy mình giăng siết cổ, mất tiền/mất thị phần/mất uy tín → công lý thương trường được thực thi (vả mặt kẻ kiêu ngạo).",
+      "Thương vụ hoàn tất, Trần thị giành thêm thị phần/tài sản/đồng minh, vốn hóa và uy tín tăng vọt (thu hoạch + tiến triển).",
+      "Một bậc thầy thương trường hoặc đối thủ đáng nể công nhận tài năng của Trần Mặc, mở ra cơ hội/quan hệ mới (công nhận từ kẻ mạnh)."
+    ],
+    "systemMechanic": {
+      "name": "Tầm Nhìn Thương Trường — Bản Năng Đọc Dòng Tiền",
+      "input": "Trần Mặc tiếp cận dữ liệu thật của một tình huống kinh doanh: báo cáo tài chính, cấu trúc cổ phần, hợp đồng, động thái thị trường, lời chào mua hay tin đồn; phải có thời gian phân tích và đủ thông tin để suy luận.",
+      "output": "Anh nhìn ra chỗ giấu nợ, dòng tiền yếu, ý đồ thâu tóm thật sau vẻ thiện chí, và điểm gãy chiến lược của đối thủ — từ đó hình dung được nhiều nước cờ phản công khả thi cùng rủi ro của mỗi nước.",
+      "limit": "Anti-plot-armor cứng: tầm nhìn CHỈ cho anh đọc tình huống và thấy cơ hội, KHÔNG tự tạo ra tiền, KHÔNG tự thắng thương vụ, KHÔNG ép được cổ đông hay đối tác gật đầu. Anh vẫn phải tự huy động vốn, tự đàm phán, tự thuyết phục con người, và vẫn thua nếu thiếu thanh khoản, đọc sai con người hoặc bị thông tin giả đánh lừa. Tầm nhìn vô dụng khi thiếu dữ liệu thật hoặc khi đối thủ chơi ngoài quy luật kinh tế.",
+      "reward": "Tỉ lệ thắng cao hơn nhờ thấy trước nước cờ và điểm yếu đối thủ; theo thời gian anh tích lũy vốn, đồng minh, thị phần và uy tín — nhưng phần thưởng luôn phải đổi bằng rủi ro thật và mồ hôi đàm phán, không phải sức mạnh ban tặng."
+    },
+    "mcOrigin": "returnee",
+    "originLockNote": "Trần Mặc là người bản địa hồi quy: sinh ra trong gia tộc Trần thị, đi du học và làm việc tại các quỹ đầu tư nước ngoài nhiều năm rồi quay về. Đây là hành trình đời thực của một người từng đi xa rồi trở về — mọi lợi thế đến từ kiến thức và quan hệ tích lũy khi ở nước ngoài.",
+    "mcSecret": {
+      "secret": "Trần Mặc không chỉ là cậu thiếu gia ăn chơi như mọi người tưởng; những năm ở nước ngoài anh từng là chiến lược gia thầm lặng đứng sau vài thương vụ thâu tóm đình đám của một quỹ đầu tư lớn, tích lũy cả kinh nghiệm thực chiến lẫn một mạng lưới quan hệ quyền lực.",
+      "outsideWorldKnowledge": "Anh nắm các mô hình tài chính, kỹ thuật M&A và mánh khóe phòng họp ở đẳng cấp quốc tế mà giới doanh nhân nội địa chưa quen, cùng quan hệ với các quỹ và ngân hàng nước ngoài — đây là kiến thức và mạng lưới có thật từ thời du học, không phải năng lực siêu nhiên.",
+      "revealRule": "Giấu kín ở các arc đầu để mọi người vẫn coi thường anh, tạo lợi thế bất ngờ; hé lộ dần cho đồng minh thân tín giữa truyện; toàn bộ tầm vóc quan hệ quốc tế của anh chỉ phơi bày trọn vẹn khi đế chế vươn ra toàn cầu.",
+      "coverStory": "Anh để mọi người tin mình chỉ là thiếu gia may mắn được học hành tử tế, che giấu chiều sâu kinh nghiệm và sức nặng của mạng lưới quan hệ thật sự."
+    },
+    "benefitLoop": {
+      "goal": "Cứu và vực dậy Trần thị, rồi từng bước thâu tóm thương trường để xây dựng một đế chế kinh tế bền vững.",
+      "action": "Phân tích dữ liệu tài chính và thị trường, đọc ý đồ đối thủ, bày bố nước cờ chiến lược, huy động vốn, đàm phán với chủ nợ - cổ đông - đối tác, và thực thi các thương vụ M&A, chiến tranh giá hoặc chiến dịch truyền thông đúng thời điểm.",
+      "benefit": "Mỗi nước cờ thắng đem lại thêm thị phần, tài sản, dòng tiền, đồng minh và uy tín; vị thế cá nhân lẫn vốn hóa tập đoàn tăng dần, đối thủ suy yếu tương ứng.",
+      "cadence": "Mỗi 1-2 chương có ít nhất một vòng nước-cờ-được-thưởng (một suy luận tài chính đúng cứu nguy hoặc một đòn phản công làm đối thủ chịu thiệt); mỗi 3-5 chương một bước nhảy lớn (hoàn tất một thương vụ, thắng một trận chiến giá, giành quyền kiểm soát, mở một mảng kinh doanh mới)."
+    },
+    "interventionRule": "Trần Mặc chỉ ra tay khi (a) lợi ích sống còn của Trần thị, người thân hoặc đồng minh của anh bị đe dọa trực tiếp, hoặc (b) khi anh phát hiện một đối thủ đang dùng thủ đoạn bẩn (lừa đảo, thâu tóm thù địch, vu khống) mà anh có đủ thông tin và đòn bẩy để phản công; anh không đi 'cứu cả nền kinh tế' ngoài tầm với, luôn giải quyết bằng chiến lược thương mại, đàm phán, M&A, truyền thông và pháp lý — tuyệt đối không bằng bạo lực thể chất.",
+    "phase1Playground": {
+      "locations": [
+        "Trụ sở Trần thị Tập đoàn — phòng họp hội đồng quản trị, nơi diễn ra các ván cờ quyền lực mở màn",
+        "Văn phòng ngân hàng chủ nợ và bàn đàm phán tái cơ cấu nợ",
+        "Trung tâm thương mại - chuỗi bán lẻ cốt lõi của Trần thị, chiến trường thị phần",
+        "Căn hộ và quán cà phê quen của Trần Mặc — nơi anh tính nước cờ và gặp đồng minh ngoài giờ"
+      ],
+      "cast": [
+        "Trần Mặc (người thừa kế hồi quy, MC, chiến lược gia thương trường)",
+        "Tô Vãn Nghi (giám đốc tài chính trẻ tài năng, lý trí, thành cánh tay phải sớm nhất)",
+        "Lão Vương (trợ lý lâu năm của chủ tịch, trung thành, nắm bí mật nội bộ tập đoàn)",
+        "Trần Hạo (người chú phản trắc trong gia tộc, đang bắt tay với đối thủ, local antagonist)",
+        "Đổng Lập (giám đốc chi nhánh Hoằng Đạt phụ trách thâu tóm Trần thị, đối thủ hiện diện sớm)"
+      ],
+      "resources": [
+        "Tầm Nhìn Thương Trường — bản năng đọc dòng tiền và ý đồ đối thủ",
+        "Kiến thức M&A và mạng lưới quỹ đầu tư quốc tế tích lũy từ thời du học",
+        "Quyền kiểm soát một phần cổ phần thừa kế và lòng trung thành của Lão Vương, Tô Vãn Nghi",
+        "Hồ sơ nội bộ phơi bày các khoản nợ giấu và giao dịch mờ ám của phe phản trắc"
+      ],
+      "localAntagonists": [
+        "Trần Hạo — người chú trong gia tộc tham vọng, muốn bán tháo tập đoàn để chia chác, nhiều lần phá ngang nước cờ của Trần Mặc",
+        "Đổng Lập — đại diện Hoằng Đạt tại chiến dịch thâu tóm Trần thị, kiêu ngạo, đánh giá thấp cậu thiếu gia mới về"
+      ],
+      "repeatableSceneTypes": [
+        "Đọc một báo cáo tài chính/hợp đồng/lời chào mua và phát hiện cái bẫy hoặc điểm yếu giấu kín",
+        "Một cuộc họp hoặc đàm phán căng thẳng nơi Trần Mặc tung nước cờ bất ngờ lật ngược thế cờ",
+        "Một đối thủ kiêu ngạo bị chính cái bẫy mình giăng phản đòn, mất tiền hoặc mất mặt trước nhiều người",
+        "Hoàn tất một thương vụ hoặc thắng một trận giá, giành thêm thị phần/tài sản và một mảnh đòn bẩy mới",
+        "Đoạn ngoài phòng họp: Trần Mặc gặp đồng minh, gom thông tin, tính nước cờ tiếp theo và củng cố quan hệ"
+      ]
+    },
+    "socialReactor": {
+      "witnesses": [
+        "Hội đồng quản trị và cổ đông Trần thị",
+        "Giới doanh nhân, đối thủ và đối tác trên thương trường",
+        "Giới truyền thông tài chính và cộng đồng nhà đầu tư",
+        "Nhân viên tập đoàn và các đồng minh thân tín"
+      ],
+      "reactionModes": [
+        "Sững sờ và nể phục khi Trần Mặc lật ngược một ván cờ tưởng đã thua",
+        "Đối tác và quỹ đầu tư tìm đến đề nghị hợp tác sau mỗi thương vụ thắng",
+        "Đối thủ chuyển từ coi thường sang dè chừng, rồi xem anh là mối đe dọa lớn",
+        "Truyền thông và nhà đầu tư bàn tán, đẩy giá cổ phiếu và uy tín Trần thị lên"
+      ],
+      "reportBackCadence": "Phản ứng tức thì trong phòng họp/đàm phán mỗi chương; làn sóng dư luận thị trường, động thái đối thủ và biến động cổ phiếu dồn lại mỗi 3-5 chương sau mỗi thương vụ đáng chú ý."
+    },
+    "noveltyLadder": [
+      { "chapterRange": "1-130", "newToy": "Cứu tập đoàn khỏi vỡ nợ và giành quyền kiểm soát nội bộ qua luật chơi cổ đông", "keepsSameLane": "Vẫn là đấu trí thương trường, đọc dòng tiền và bày nước cờ chiến lược" },
+      { "chapterRange": "131-280", "newToy": "Chiến tranh giá và tối ưu chuỗi cung ứng trên mảng bán lẻ", "keepsSameLane": "Vẫn là đọc-điểm-yếu-đối-thủ rồi phản công, chỉ đổi sân chơi sang vận hành" },
+      { "chapterRange": "281-580", "newToy": "M&A chủ động, chống thâu tóm thù địch, và đấu trí truyền thông - pháp lý", "keepsSameLane": "Vẫn là chiến lược và đàm phán, thêm tầng đấu trí với người thật điều khiển luật chơi" },
+      { "chapterRange": "581-730", "newToy": "Mở rộng đa ngành sang fintech, năng lượng, nền tảng số và xây hệ sinh thái", "keepsSameLane": "Vẫn cùng lane xây đế chế bằng tầm nhìn, nâng lên cấp chiến lược tập đoàn" },
+      { "chapterRange": "731-1000", "newToy": "Đấu trường quốc tế với tập đoàn đa quốc gia và quyết chiến cuối với Hoằng Đạt", "keepsSameLane": "Vẫn là cuộc đấu trí thương trường — đỉnh cao của cùng một trò chơi chiến lược" }
+    ],
+    "controlRules": {
+      "payoffCadence": "Tối thiểu 2 cao điểm dopamine mỗi chương (một nước cờ tài chính đọc đúng cứu nguy và một đòn phản công làm đối thủ chịu thiệt hoặc một cú lật mặt trong phòng họp); cao điểm đầu xuất hiện trước nửa chương; setup không quá 30% và phải có payoff trong cùng hoặc chương kế.",
+      "attentionGradient": "Mở chương bằng một mối đe dọa tài chính, một lời chào mua đáng ngờ hoặc một cơ hội cụ thể; đóng chương bằng một cliffhanger thương trường (đòn phản công sắp tung, một bí mật tài chính vừa lộ, hoặc đối thủ vừa ra nước cờ mới).",
+      "openThreadsPerArc": 3,
+      "closeThreadsPerArc": 2
+    },
+    "patternCards": [
+      "warm-baseline-opening",
+      "read-the-balance-sheet",
+      "boardroom-reversal",
+      "trap-the-arrogant-predator",
+      "merger-and-harvest"
+    ]
+  }
+}

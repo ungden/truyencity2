@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "totalScore": 124,
+  "avgScore": 11.27,
+  "minDimScore": 8,
+  "source": "claude_code",
+  "dimensions": [
+    { "name": "Premise & hook", "score": 9, "note": "Warm-baseline võ hiệp với hook đối đầu cường quyền rõ từ ch.1; golden finger kích hoạt ngay khi Kiếm Lư Trại bị ức hiếp, không khổ-mở-đầu kéo dài." },
+    { "name": "Protagonist engine", "score": 9, "note": "Phong Vũ động cơ rõ (bảo vệ lò rèn + nghĩa khí + lĩnh ngộ qua nghề rèn), tính cách nhất quán, điềm đạm và lì đòn." },
+    { "name": "System mechanic", "score": 9, "note": "Kiếm Tâm Lĩnh Ngộ Lục có input/output/limit/reward gắn nghề rèn + anti-plot-armor; không tự đánh hộ, kiếm cẩu thả không tính." },
+    { "name": "Conflict ladder", "score": 9, "note": "Leo thang vùng Thanh Khê → châu quận → toàn võ lâm → thế lực giật dây tối thượng, qua tỉ võ/mưu lược/uy danh." },
+    { "name": "World coherence", "score": 9, "note": "Trung Nguyên võ lâm cổ điển nhất quán, kinh tế uy danh/hàn thiết/môn phái rõ, forbidden elements khóa origin và công nghệ hiện đại." },
+    { "name": "Dopamine cadence", "score": 9, "note": "controlRules ≥2 peak/chương, face-slap trấn áp kẻ ngạo mạn có quần hùng chứng kiến, lĩnh ngộ kiếm quyết thưởng đều." },
+    { "name": "Origin lock", "score": 9, "note": "mcOrigin=system-bestowed khóa chặt; MC là đệ tử lò rèn bản địa, không chứa token cấm; phrasing origin tích cực qua Lư Thánh đường." },
+    { "name": "Combat guardrail", "score": 8, "note": "Genre kiem-hiep cho phép combat; mỗi trận tỉ võ/đao kiếm phục vụ thành trưởng và khí phách, không bạo lực vô nghĩa." },
+    { "name": "Foreshadowing & twists", "score": 8, "note": "3 tuyến cài cắm dài hạn (Triệu Đại Đao, Lư Thánh đường, Đoàn Thiết Sơn) có plant/payoff chapter cụ thể." },
+    { "name": "Long-form sustainability", "score": 9, "note": "noveltyLadder 4 nấc giữ cùng lane rèn kiếm + nghĩa khí, 7 volume cho 1000 chương, endgame phục hưng Lư Thánh đường." },
+    { "name": "Vietnamese voice", "score": 8, "note": "Voice anchors hào sảng đúng giọng võ hiệp, đủ diacritics, dùng đại từ giang hồ (tại hạ/huynh đài) tự nhiên, không AI-tell." }
+  ],
+  "overallFeedback": "Setup vững: warm-baseline opening, golden finger là con đường lĩnh ngộ võ học gắn nghề rèn có giới hạn rõ, conflict ladder võ hiệp leo thang sạch sẽ qua 7 volume, origin lock chặt với phrasing tích cực, dopamine cadence và foreshadowing đều có cấu trúc. Sẵn sàng cho DeepSeek V4 Pro viết chương. PASS."
+}

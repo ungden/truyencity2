@@ -1,0 +1,26 @@
+{
+  "arc_number": 1,
+  "start_chapter": 1,
+  "end_chapter": 30,
+  "arc_theme": "Viên đan đầu tiên — Đan Lô Hệ Thống kích hoạt và vực dậy những mạng người đầu tiên trong Phế Kiếm Tông",
+  "plan_text": "Arc mở màn warm-baseline: Diệp Thanh Vân dạt tới Phế Kiếm Tông đúng đêm tông môn sắp tháo biển, và Đan Lô Hệ Thống kích hoạt ngay ch.1 — không để MC khổ sở kéo dài, golden finger sống dậy lập tức. Mỗi chương xoay quanh một mạng người cần cứu hoặc một tình huống vận hành sơn môn cụ thể, với ít nhất hai cao điểm dopamine mỗi chương (cao điểm đầu trước nửa chương). Cụm chương theo 5-cluster: ch.1-6 setup (Hệ Thống kích hoạt, viên đan đầu tiên cứu một đệ tử sắp tẩu hỏa nhập ma, ổn định khẩu phần đan dược ngày đầu); ch.7-14 breathing + competence (đọc căn cơ đệ tử bằng Đan Hồn Cảm Ứng, phục hồi một góc linh dược viên, thu phục lòng tin của Tô Nhược Lam và vài đệ tử ở lại); ch.15-22 confront (Trưởng lão Hắc Phong tung đòn ép giải tán tông và cắt khẩu phần linh thạch, Diệp Thanh Vân phản công bằng đan dược và bố trí thay vì tranh tu vi); ch.23-28 big_wow (một Đan Sư trẻ kiêu ngạo của gia tộc lân cận khiêu chiến đấu đan để hạ nhục Phế Kiếm Tông, MC thắng vang dội bằng phẩm đan vượt trội trước đông người chứng kiến); ch.29-30 resolution + hook (sơn môn từ chỗ chờ tháo biển thành tông môn nhỏ có đan dược tự chủ, đặt manh mối Hắc Phong lén liếc xuống núi về phía gia tộc lân cận, mở ra tuyến quan hệ ẩn về kẻ giật dây thật). Giữ nguyên tắc đan đạo: mọi xung đột giải quyết bằng phẩm đan, đấu đan, bố trí tài nguyên và ân nghĩa — Diệp Thanh Vân căn cơ tầm thường nên không và không cần thắng bằng tu vi đè người. MC điềm đạm, lì, trọng tình nghĩa, lấy phẩm chất viên đan làm vũ khí.",
+  "chapter_briefs": [
+    { "n": 1, "beat": "setup", "goal": "Diệp Thanh Vân dạt tới Phế Kiếm Tông đêm sắp giải tán, Đan Lô Hệ Thống kích hoạt", "payoff": "Viên đan đầu tiên cứu một đệ tử sắp tẩu hỏa nhập ma, Đan Tâm đầu tiên cộng dồn", "endingHook": "Giao diện hé lộ một Tàn Quyển Đan Phương đầu tiên rơi xuống" },
+    { "n": 3, "beat": "setup", "goal": "Hiểu cơ chế Hệ Thống và Đan Hồn Cảm Ứng qua việc cứu thêm một đệ tử bệnh", "payoff": "Mở khóa đan trợ tu sơ cấp, Tô Nhược Lam bắt đầu tin MC không phải kẻ lừa đảo", "endingHook": "Tô Nhược Lam tiết lộ lò đan cũ là di vật tông chủ tiền nhiệm dặn không bao giờ được bán" },
+    { "n": 6, "beat": "setup", "goal": "Ổn định khẩu phần đan dược cho số đệ tử còn lại, giữ chân họ ở lại tông", "payoff": "Doanh thu đan dược ngày đầu dương, vài đệ tử quyết định không bỏ đi", "endingHook": "Trưởng lão Hắc Phong nghe tin có người luyện được đan, mắt lóe tham lam" },
+    { "n": 12, "beat": "breathing", "goal": "Dùng Đan Hồn Cảm Ứng đọc căn cơ đệ tử, phục hồi một góc linh dược viên hoang phế", "payoff": "Phát hiện một luồng khí ẩn lạ thường nơi đệ tử nghèo Lâm Tiểu Thất, có nguồn dược liệu tự chủ đầu tiên", "endingHook": "Hắc Phong triệu tập trưởng lão, đưa ra đề nghị giải tán tông chia mặt bằng" },
+    { "n": 18, "beat": "confront", "goal": "Đối phó đòn Hắc Phong ép giải tán tông và cắt khẩu phần linh thạch", "payoff": "MC không tranh tu vi mà dùng đan dược cứu người tạo uy tín, giữ được lòng đệ tử và linh mạch", "endingHook": "Hắc Phong lén liếc xuống con đường về phía gia tộc lân cận — có kẻ đứng sau" },
+    { "n": 26, "beat": "big_wow", "goal": "Nhận lời khiêu chiến đấu đan của Đan Sư trẻ kiêu ngạo gia tộc lân cận", "payoff": "Diệp Thanh Vân thắng vang dội bằng phẩm đan vượt trội, kẻ kiêu ngạo tâm phục trước đông người", "endingHook": "Danh tiếng đan đạo Phế Kiếm Tông chớm lan, tu sĩ bắt đầu tới cầu đan" },
+    { "n": 30, "beat": "resolution", "goal": "Khép arc 1, sơn môn từ chờ tháo biển thành tông môn có đan dược tự chủ", "payoff": "Phế Kiếm Tông ổn định, Tô Nhược Lam thành quản sự đắc lực, Lâm Tiểu Thất xin bái sư", "endingHook": "Manh mối kẻ giật dây sau lưng Hắc Phong lộ ra — tuyến quan hệ ẩn mở rộng" }
+  ],
+  "threads_to_advance": ["Vực dậy Phế Kiếm Tông bằng đan đạo", "Mở khóa Đan Lô Hệ Thống và tích Đan Tâm", "Gây dựng lòng tin với đệ tử và quản sự Tô Nhược Lam"],
+  "threads_to_resolve": ["Tông môn sắp giải tán (giải quyết: thành tông môn nhỏ có đan dược tự chủ và danh tiếng chớm nở)"],
+  "new_threads": ["Đối đầu Trưởng lão Hắc Phong và kẻ giật dây phía sau", "Bí ẩn căn cơ ẩn của Lâm Tiểu Thất", "Manh mối lò đan cũ và di vật tông chủ tiền nhiệm"],
+  "sub_arcs": [
+    { "name": "Viên đan đầu tiên", "chapterRange": "1-6", "cluster": "setup" },
+    { "name": "Đọc căn cơ, phục hồi linh dược viên", "chapterRange": "7-14", "cluster": "breathing" },
+    { "name": "Hắc Phong ép giải tán", "chapterRange": "15-22", "cluster": "confront" },
+    { "name": "Đấu đan rửa nhục", "chapterRange": "23-28", "cluster": "big_wow" },
+    { "name": "Sơn môn đứng vững", "chapterRange": "29-30", "cluster": "resolution" }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "arc_number": 1,
+  "start_chapter": 1,
+  "end_chapter": 30,
+  "arc_theme": "Đêm Triệu Hồi — đặt nền móng tòa thành đầu tiên và triệu hồi đạo quân khởi đầu",
+  "plan_text": "Arc mở màn warm-baseline: toàn nhân loại bị triệu hồi tới Aetheria, Vương Lâm rút trúng thiên phú Toàn Năng Quản Trị hạng SS NGAY ch.1 (golden finger active tức thì, không để MC khổ sở kéo dài). Tòa thành sơ khai đã đứng đó với công trình cơ bản và một viên Lãnh Chúa Tinh — MC khởi đầu ở baseline vận hành được, không phải con số không. Mỗi chương xoay quanh một bước quản trị hoặc một tình huống lãnh địa cụ thể, với ít nhất 2 cao điểm dopamine/chương (cao điểm đầu trước nửa chương). Cụm chương theo 5-cluster: ch.1-6 setup (Hệ Thống kích hoạt, rút thiên phú SS, dựng nông trại + triệu hồi bộ binh đầu tiên, sống sót đêm đầu); ch.7-14 breathing + competence (khai phá vùng hoang, chiếm mỏ khoáng, chiêu mộ Tộc Người Bản Địa, mở khóa công trình qua Điểm Trị Quốc, chiêu mộ Anh Hùng Triệu Mãnh); ch.15-22 confront (lãnh chúa kiêu ngạo Tô Đại Niên cướp tài nguyên và lấn ranh, Vương Lâm phản công bằng cắt hậu cần và đạo quân kỷ luật thay vì lao vào đánh bừa); ch.23-28 big_wow (đại thắng đè bẹp Tô Đại Niên công khai, thu chiến lợi phẩm và lãnh địa, thứ hạng toàn cầu vọt lên trước mắt mọi lãnh chúa); ch.29-30 resolution + hook (nâng thành lên hạng Trấn, đặt manh mối lệnh bài bí ẩn của Tô Đại Niên, mở ra tuyến Liên Minh Bạo Lãnh). Giữ nguyên tắc: xung đột giải quyết bằng quân đội vs quân đội, ngoại giao và mưu lược — KHÔNG phải MC tự thân đấu tay đôi ngoài đường phố. MC điềm tĩnh, lì, lấy quản trị và chiến lược làm vũ khí.",
+  "chapter_briefs": [
+    { "n": 1, "beat": "setup", "goal": "Toàn dân bị triệu hồi, Vương Lâm rút thiên phú Toàn Năng Quản Trị hạng SS", "payoff": "Đặt nền móng tòa thành, triệu hồi đạo bộ binh đầu tiên, Điểm Trị Quốc đầu tiên", "endingHook": "Giao diện cảnh báo đêm đầu có quái vật lảng vảng quanh thành" },
+    { "n": 2, "beat": "setup", "goal": "Hiểu cơ chế Hệ Thống và sống sót đêm đầu", "payoff": "Đánh lui bầy quái nhỏ bằng phòng tuyến và quân vừa triệu hồi, dân an toàn", "endingHook": "Bảng Xếp Hạng Toàn Cầu hiện lần đầu, Vương Lâm xếp ngoài top xa" },
+    { "n": 6, "beat": "breathing", "goal": "Ổn định sản xuất, dựng nông trại và lò rèn theo thứ tự ưu tiên", "payoff": "Tài nguyên dương trở lại, mở khóa công trình mới qua Điểm Trị Quốc", "endingHook": "Phát hiện một mỏ khoáng giàu ở vùng hoang phía tây — cũng là nơi Tô Đại Niên nhắm tới" },
+    { "n": 12, "beat": "breathing", "goal": "Chiêu mộ Tộc Người Bản Địa và Anh Hùng Triệu Mãnh", "payoff": "Dân số và binh lực nhảy vọt, có tướng dẫn quân đầu tiên", "endingHook": "Triệu Mãnh báo Tô Đại Niên đang điều quân áp sát ranh giới" },
+    { "n": 18, "beat": "confront", "goal": "Đối phó Tô Đại Niên cướp tài nguyên và lấn ranh", "payoff": "Vương Lâm không đánh bừa mà cắt đường tiếp lương ba ngày, quân địch rối loạn", "endingHook": "Tô Đại Niên điên tiết dốc toàn lực tấn công tổng lực" },
+    { "n": 26, "beat": "big_wow", "goal": "Đại chiến đè bẹp đạo quân Tô Đại Niên", "payoff": "Quân kỷ luật của Vương Lâm thắng lớn, thu chiến lợi phẩm và một phần lãnh địa địch, thứ hạng toàn cầu vọt lên trước mắt mọi lãnh chúa", "endingHook": "Trong tù binh lộ ra một viên lệnh bài lạ — dấu hiệu Tô Đại Niên không hành động một mình" },
+    { "n": 30, "beat": "resolution", "goal": "Khép arc 1, nâng thành lên hạng Trấn", "payoff": "Lãnh địa ổn định và mở rộng, dân di cư bắt đầu đổ về vì danh tiếng", "endingHook": "Manh mối lệnh bài chỉ về Liên Minh Bạo Lãnh — tuyến đối thủ lớn mở ra" }
+  ],
+  "threads_to_advance": ["Đặt nền móng và phát triển lãnh địa", "Quan hệ với dân và chủng tộc bản địa", "Mở khóa Hệ Thống Lãnh Chúa"],
+  "threads_to_resolve": ["Sống sót đêm đầu và ổn định tài nguyên (giải quyết: thành lên hạng Trấn, tài nguyên dương)"],
+  "new_threads": ["Đối đầu Liên Minh Bạo Lãnh", "Bí ẩn lệnh bài của Tô Đại Niên", "Manh mối quá khứ đại lục qua Lão Tôn"],
+  "sub_arcs": [
+    { "name": "Đêm Triệu Hồi", "chapterRange": "1-6", "cluster": "setup" },
+    { "name": "Khai Phá Vùng Hoang", "chapterRange": "7-14", "cluster": "breathing" },
+    { "name": "Lãnh Chúa Lấn Ranh", "chapterRange": "15-22", "cluster": "confront" },
+    { "name": "Đại Thắng Đầu Tiên", "chapterRange": "23-28", "cluster": "big_wow" },
+    { "name": "Thành Lên Hạng Trấn", "chapterRange": "29-30", "cluster": "resolution" }
+  ]
+}

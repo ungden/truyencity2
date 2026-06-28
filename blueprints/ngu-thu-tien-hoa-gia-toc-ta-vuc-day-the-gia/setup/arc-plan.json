@@ -1,0 +1,25 @@
+{
+  "arc_number": 1,
+  "start_chapter": 1,
+  "end_chapter": 20,
+  "arc_theme": "Phế thú trong tay ta — thừa kế gia tộc suy tàn, thuần hóa con sói xám phế đầu tiên và giành lại chỗ đứng đầu tiên",
+  "plan_text": "Arc mở màn warm-baseline: Mộc Vân thừa kế Mộc gia suy tàn nhưng KHÔNG mở đầu bằng cảnh bị đánh đập thê thảm — nhãn lực huyết mạch của cậu active ngay ch.1 khi cậu nhìn con sói xám phế và thấy nhánh tiến hóa ẩn, hook là cơ hội/khám phá chứ không phải MC sắp chết. Mỗi chương xoay quanh một bước dưỡng thú cụ thể hoặc một va chạm với thế gia đối địch, với ít nhất 2 cao điểm dopamine/chương (một tiến triển dưỡng thú/khám phá tiềm năng + một mẩu khinh thường bị đáp trả hoặc một thắng lợi nhỏ), cao điểm đầu trước nửa chương. Giữ tuyệt đối NON-MC-combat: mọi trận đánh là thú-vs-thú trong đấu trường có luật, Mộc Vân đứng ngoài chỉ huy và đọc thế trận, không tự lao vào đánh người. Cụm chương theo 5-cluster: ch.1-4 setup (Mộc Vân thừa kế phủ Mộc gia tàn tích, gặp con sói xám phế Hôi Ảnh, nhãn lực hé lộ nhánh tiến hóa ẩn, cậu quyết tâm nuôi nó bất chấp lời chê cười); ch.5-9 breathing + competence (lặn lội rừng linh thảo kiếm thức ăn linh khí, học lại bí pháp dưỡng thú từ Lão Cát, gặp Tô Yến, xây lòng tin với Hôi Ảnh, dưỡng nó qua bước tiến hóa nhỏ đầu tiên); ch.10-14 confront (Lý Hạo khinh miệt và khiêu khích đấu thú công khai, phái dưỡng thú bảo thủ dèm pha; Mộc Vân nhận lời thách đấu, canh điểm bùng nổ); ch.15-18 big_wow (trận đấu thú với báo lửa Lý gia, Hôi Ảnh kích nhánh tiến hóa ẩn đúng giây quyết định, lật ngược thế trận giành thắng, cả khán đài sửng sốt); ch.19-20 resolution + hook (Mộc gia giành lại chỗ đứng đầu tiên, Mộc Vân thu nhận đồng minh/đệ tử đầu tiên; Lão Cát lẩm bẩm con sói có sống lưng giống con thú trong tranh cũ ở từ đường — mở tuyến huyết mạch chiến thú gốc Mộc gia). MC điềm đạm, gan lì, trọng tình với thú, ôm chí vực dậy gia tộc nhưng không tàn nhẫn.",
+  "chapter_briefs": [
+    { "n": 1, "beat": "setup", "goal": "Mộc Vân thừa kế phủ Mộc gia tàn tích và phát hiện con sói xám bị coi là phế thú", "payoff": "Nhãn lực huyết mạch active, cậu thấy nhánh tiến hóa ẩn dọc sống lưng con sói mà cả thành bỏ sót và quyết tâm nuôi nó", "endingHook": "Lời chê cười của người trong thành: 'Mộc gia sa sút tới mức nuôi cả phế thú'" },
+    { "n": 3, "beat": "setup", "goal": "Bắt đầu xây lòng tin với con sói xám Hôi Ảnh và tìm hiểu nhu cầu tiến hóa của nó", "payoff": "Hôi Ảnh lần đầu chịu ăn từ tay Mộc Vân; nhãn lực chỉ ra loại linh thảo cần để kích bước tiến hóa đầu", "endingHook": "Một góc tranh cũ ở từ đường thoáng giống dáng con sói" },
+    { "n": 7, "beat": "breathing", "goal": "Lặn lội rừng linh thảo ngoại thành kiếm thức ăn linh khí và học lại bí pháp từ Lão Cát", "payoff": "Dưỡng Hôi Ảnh qua bước tiến hóa nhỏ đầu tiên thành công; gặp Tô Yến, kết đồng minh", "endingHook": "Tô Yến cảnh báo Lý gia đang để mắt tới việc Mộc gia 'nuôi phế thú'" },
+    { "n": 12, "beat": "confront", "goal": "Đối mặt Lý Hạo khinh miệt và lời thách đấu thú công khai", "payoff": "Mộc Vân bình thản nhận lời, không nóng nảy; cậu đã thấy được điểm bùng nổ sắp tới của Hôi Ảnh", "endingHook": "Hạn đấu ấn định, cả thành chờ xem 'con sói ghẻ' của Mộc gia bị nghiền nát" },
+    { "n": 16, "beat": "big_wow", "goal": "Trận đấu thú quyết định với con báo lửa Lý gia trong đấu trường Thanh Khâu", "payoff": "Mộc Vân chỉ huy đọc thế trận, kích nhánh tiến hóa ẩn của Hôi Ảnh đúng giây quyết định, lật ngược thế trận giành thắng; khán đài sửng sốt, Lý Hạo cứng họng", "endingHook": "Các thế gia khác bắt đầu xì xào về 'thiếu gia Mộc gia có mắt thần'" },
+    { "n": 20, "beat": "resolution", "goal": "Khép arc 1, củng cố chỗ đứng đầu tiên cho Mộc gia", "payoff": "Mộc gia giành lại một phần thanh danh, Mộc Vân thu nhận đồng minh/đệ tử đầu tiên và giữ vững Hôi Ảnh đã tiến hóa", "endingHook": "Lão Cát lẩm bẩm con sói có sống lưng giống con thú trong tranh cũ ở từ đường — mở tuyến huyết mạch chiến thú gốc Mộc gia" }
+  ],
+  "threads_to_advance": ["Dưỡng con sói xám Hôi Ảnh qua các bước tiến hóa", "Học lại và khôi phục bí pháp dưỡng thú Mộc gia", "Quan hệ với Lão Cát và Tô Yến"],
+  "threads_to_resolve": ["Giành lại chỗ đứng đầu tiên cho Mộc gia trước Lý gia (giải quyết: thắng trận đấu thú công khai)"],
+  "new_threads": ["Bí ẩn nguồn gốc nhánh tiến hóa của Hôi Ảnh", "Sự dòm ngó của các thế gia đối địch", "Manh mối về quá khứ lụi tàn của Mộc gia"],
+  "sub_arcs": [
+    { "name": "Tàn tích và con phế thú", "chapterRange": "1-4", "cluster": "setup" },
+    { "name": "Linh thảo và lòng tin", "chapterRange": "5-9", "cluster": "breathing" },
+    { "name": "Lời khiêu khích", "chapterRange": "10-14", "cluster": "confront" },
+    { "name": "Đấu trường Thanh Khâu", "chapterRange": "15-18", "cluster": "big_wow" },
+    { "name": "Chỗ đứng đầu tiên", "chapterRange": "19-20", "cluster": "resolution" }
+  ]
+}

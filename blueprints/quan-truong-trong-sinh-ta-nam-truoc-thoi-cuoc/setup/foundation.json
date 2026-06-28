@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "totalScore": 122,
+  "avgScore": 8.71,
+  "minDimScore": 8,
+  "source": "claude_code",
+  "dimensions": [
+    { "name": "Premise & hook", "score": 9, "note": "Warm-baseline officialdom: Diệp Hướng Đông tỉnh lại như cán bộ trẻ chín chắn mang ký ức một đời đã sống, hook là tập tài liệu quy hoạch đề đúng năm anh nhớ rõ từng biến cố — opportunity/foresight-driven, không mở đầu bằng cảnh MC bị vùi dập." },
+    { "name": "Protagonist engine", "score": 9, "note": "Diệp Hướng Đông thắng bằng tầm nhìn thời cuộc + kinh nghiệm chính trường một đời + khả năng xây đề án và thuyết phục bằng số liệu + bản lĩnh quyết sách; tính cách chín chắn, ấm áp, kiên định liêm chính nhưng linh hoạt sách lược, nhất quán." },
+    { "name": "System mechanic", "score": 8, "note": "Tầm Nhìn Thời Cuộc có input/output/limit/reward rõ; anti-plot-armor cứng — chỉ cho biết 'đi đâu' không tự thành quyền lực, ký ức sai lệch dần khi anh đổi dòng chảy, vô dụng với việc chưa từng trải qua. Phi siêu nhiên, đúng genre." },
+    { "name": "Conflict ladder", "score": 9, "note": "Leo thang sạch: ngăn rủi ro địa phương → chọn ngành mũi nhọn → hãm phanh cơn vỡ đầu tư → quyết sách trong vùng mù khi ký ức lệch → triệt mạng lưới Phe Trục Lợi → dẫn tỉnh vượt biến động lớn → di sản, tất cả NON-combat." },
+    { "name": "World coherence", "score": 9, "note": "Tỉnh Lâm Khê hư cấu nhất quán: bốn cấp hành chính, ba phe (Thành Tích/Bảo Thủ/Trục Lợi), cơ chế xung đột bằng chính sách/số liệu/đấu trí; forbidden elements rõ ràng (cấm bạo lực, xuyên không/xuyên việt/đến từ thế giới khác, tu luyện, lạm dụng tầm nhìn)." },
+    { "name": "Dopamine cadence", "score": 9, "note": "controlRules ≥2 peak/chương (dự báo được kiểm chứng/đề án được duyệt + đối thủ hoài nghi cứng họng hoặc địa phương/người dân được hưởng lợi), cao điểm đầu trước nửa chương, adapted cho chính kịch quan trường ấm áp." },
+    { "name": "Origin lock", "score": 9, "note": "mcOrigin=reincarnated khóa chặt là TRỌNG SINH trong CÙNG thế giới (tái sinh về mốc thời gian sớm hơn trong sự nghiệp của chính anh); outlines và mọi file không chứa token xuyên không/xuyên việt/đến từ trái đất/từ thế giới hiện đại; token tái sinh được dùng đúng và hợp lệ cho origin này." },
+    { "name": "Non-combat guardrail", "score": 9, "note": "Genre quan-truong NON_COMBAT; xung đột giải quyết bằng chính sách + số liệu + dự báo chứng minh + thuyết phục + đấu trí; cấm đánh nhau, ám sát, bạo lực băng đảng trong forbiddenElements." },
+    { "name": "Foreshadowing & twists", "score": 8, "note": "3 twist (Trương Bằng là mắt xích Phe Trục Lợi, ký ức bắt đầu sai lệch vì chính anh đổi dòng chảy, trùm Phe Trục Lợi là ân nhân cũ của kiếp trước) + 3 foreshadowing có plant/payoff chapter cụ thể, kéo dài tới cao trào." },
+    { "name": "Long-form sustainability", "score": 9, "note": "noveltyLadder 5 nấc giữ cùng lane 'tầm nhìn-chính sách-thuyết phục-kết quả', 7 volume cho 1000 chương, endgame chuyển từ thắng từng nước cờ sang kiến tạo di sản thể chế bền vững; vùng tầm nhìn thu hẹp dần buộc MC trưởng thành." },
+    { "name": "Vietnamese voice", "score": 8, "note": "Voice anchors chín chắn, ấm áp, đúng giọng chính kịch quan trường trọng sinh, đủ diacritics, không AI-tell; đối thoại dùng em dash đúng quy ước." }
+  ],
+  "overallFeedback": "Setup vững cho chính kịch quan trường trọng sinh NON-combat: warm-baseline opening với tầm nhìn thời cuộc hiển lộ từ ch.1, golden finger là ký ức một đời đã sống phi siêu nhiên có anti-plot-armor cứng (chỉ cho biết 'đi đâu' không tự thành quyền lực, ký ức sai lệch dần khi MC tác động vào dòng chảy, vô dụng với việc chưa từng trải qua), conflict ladder leo thang sạch qua 7 volume bằng chính sách-số liệu-thuyết phục-đấu trí, origin lock reincarnated khóa chặt là tái sinh trong cùng thế giới (không phải xuyên không/đến từ thế giới khác), dopamine cadence adapted cho quan trường ấm áp (dự báo được kiểm chứng + đối thủ hoài nghi cứng họng + địa phương đổi đời + thăng tiến bằng tích thực), foreshadowing và twist có cấu trúc dài hạn. Phân biệt rõ với novel chống tham nhũng: đây là quan chức trọng sinh với tầm nhìn đi trước thời đại làm chính sách đúng và an dân, không phải cán bộ bản địa điều tra-lật tẩy. Sẵn sàng cho DeepSeek V4 Pro viết chương. PASS."
+}

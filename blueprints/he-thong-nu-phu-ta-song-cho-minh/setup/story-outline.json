@@ -1,0 +1,118 @@
+{
+  "premise": "Hạ Vy là một trợ lý thiết kế tài năng nhưng luôn bị vùi dập vào vai phụ ở nhà mốt lớn, đến mức bị đổ oan và gần như mất nghề. Đúng lúc đó, Hệ Thống Nữ Chính chọn cô: mỗi lần cô sống thật với tài năng và sự tử tế, khiến người khác thật sự cảm động hoặc công nhận, cô nhận về điểm Tỏa Sáng để mở khóa linh cảm thiết kế và kỹ năng nghề. Cô biến mỗi thiết kế thành một cơ hội để là chính mình, đi từ studio thuê chung 25m² đến biểu tượng thời trang sống thật với chính mình — thắng đối thủ bằng đúng tài năng và phẩm giá, không bằng bạo lực, và xây nên một tình yêu chân thành của riêng cô.",
+  "mainConflict": "Cô gái yếu thế bị áp đặt vai phụ vươn lên trong ngành thời trang khắc nghiệt: Hạ Vy đối đầu những nhà mốt giàu vốn và quan hệ (Lệ Hoa Couture, Tinh Tú House) cùng những kẻ quen cướp công và dìm danh tiếng người khác. Xung đột leo thang từ cấp studio nhỏ → cấp ngành thành phố → toàn quốc → quốc tế, luôn được giải quyết qua kênh cảm xúc và xã hội: cạnh tranh nghề nghiệp, cuộc thi thiết kế, drama quan hệ, áp lực gia đình, danh tiếng, truyền thông và tranh chấp bản quyền — tuyệt đối không bằng bạo lực.",
+  "themes": [
+    "Sống thật với chính mình quan trọng hơn vai trò người khác áp đặt",
+    "Tài năng thật và sự tử tế bền hơn quan hệ và tiền bạc",
+    "Tình yêu chân thành là sự công nhận giữa hai người ngang hàng",
+    "Người yếu thế liên kết lại có thể thay đổi cả một ngành"
+  ],
+  "majorPlotPoints": [
+    "Ch.1: bị đổ oan và đẩy ra rìa, Hệ Thống Nữ Chính kích hoạt; thiết kế đầu tiên làm-cho-mình chinh phục một khách hàng khó tính.",
+    "Arc 1: rời nhà mốt cũ, lập studio riêng, lấy lại danh dự khi đánh bại đòn dìm tên của Tống Mỹ Kỳ bằng đúng tài năng tại một cuộc thi thiết kế.",
+    "Arc 2-3: dựng thương hiệu riêng, tập hợp các designer độc lập thành Hội Thiết Kế Tự Do; tuyến tình cảm với Lục Trạch Viễn nảy nở.",
+    "Giữa truyện: tập đoàn sau lưng Tinh Tú ép mua thương hiệu, Hạ Vy từ chối và phản công ra toàn quốc; vượt qua hiểu lầm lớn trong tình yêu.",
+    "Cao trào cuối: đưa thời trang Việt ra quốc tế, hé lộ nguồn gốc Hội Nghệ Nhân Áo Dài, phục dựng Hội và cùng Trạch Viễn xây mái nhà chung."
+  ],
+  "setupKernel": {
+    "readerFantasy": "Cảm giác thỏa mãn khi một cô gái tử tế, tài năng thật sự, từ chỗ bị coi là vai phụ vô danh vươn lên khiến cả ngành phải gọi đúng tên mình — mỗi thiết kế là một lần được công nhận, mỗi kẻ từng cướp công và coi thường cô bị vả mặt bằng đúng tài năng và danh tiếng, và cuối cùng cô được yêu thương như một người ngang hàng mà không cần đánh đổi phẩm giá.",
+    "protagonistEngine": "Hạ Vy thắng nhờ tài năng thiết kế thật + sự thấu cảm với câu chuyện của từng người + bản lĩnh nghề ngày càng vững; tính cách ấm áp, kiên cường, lấy phẩm giá và sự tử tế làm vũ khí, không bao giờ đạo nhái hay chơi bẩn nhưng cũng không còn nhẫn nhịn vô lý khi bị chèn ép.",
+    "pleasureLoop": [
+      "Khách hàng/giám khảo hoài nghi nhìn vào thiết kế của Hạ Vy → khoảnh khắc thấy tác phẩm → biểu cảm thay đổi → công nhận và quay lại (face-slap nhẹ + công nhận).",
+      "Hệ Thống cộng điểm Tỏa Sáng + rơi Mảnh Linh Cảm/Thẻ Kỹ Năng → Hạ Vy mở khóa năng lực thiết kế mới (breakthrough/harvest).",
+      "Kẻ từng cướp công hoặc dìm tên cô (Tống Mỹ Kỳ, nhà mốt lớn) chơi chiêu → Hạ Vy hóa giải bằng nước cờ nghề nghiệp và minh bạch → đối thủ bẽ mặt công khai trước giới chuyên môn (face-slap có người chứng kiến).",
+      "Buff Đồng Cảm Sâu Sắc giúp cô tạo một thiết kế chạm đúng câu chuyện của khách → khoảnh khắc cảm động ấm áp (comfort/recognition).",
+      "Đơn hàng/giải thưởng/lượt yêu thích tăng vọt sau một sự kiện hoặc một show diễn → cảm giác gặt hái cụ thể (career_success).",
+      "Một designer trẻ hoặc người yếu thế khác được Hạ Vy nâng đỡ, hoặc một khoảnh khắc ấm áp với Lục Trạch Viễn → mạng lưới và tuyến tình cảm mạnh thêm (network_and_romance_payoff)."
+    ],
+    "systemMechanic": {
+      "name": "Hệ Thống Nữ Chính",
+      "input": "Hạ Vy sống thật với tài năng và sự tử tế, làm ra tác phẩm bằng cả trái tim và khiến người khác thật sự cảm động hoặc công nhận giá trị của cô, đo qua ánh mắt, lời khen thật lòng, sự thay đổi thái độ và hành vi quay lại; lời khen xã giao hay sự thương hại không được tính.",
+      "output": "Điểm Tỏa Sáng cộng dồn, đôi khi rơi ra một Mảnh Linh Cảm (ý tưởng thiết kế đột phá) hoặc một Thẻ Kỹ Năng (cắt may, dựng phom, phối màu, đàm phán, thuyết trình, quản lý thương hiệu).",
+      "limit": "Mỗi linh cảm và kỹ năng cần một lượng Tỏa Sáng tăng dần để mở khóa, và vẫn đòi hỏi đôi tay thật, chất liệu thật cùng công sức thật để hiện thực hóa; Hệ Thống chỉ ra hướng đúng chứ không tự may hộ một đường kim; buff Đồng Cảm Sâu Sắc mỗi ngày chỉ dùng được một lần.",
+      "reward": "Mở khóa linh cảm thiết kế đột phá, kỹ năng nghề và quản lý thương hiệu, cùng buff Đồng Cảm Sâu Sắc giúp Hạ Vy đọc hiểu điều một người thật sự khao khát thể hiện để tạo ra thiết kế chạm đúng câu chuyện của họ, khiến họ cảm động thật lòng."
+    },
+    "mcOrigin": "system-bestowed",
+    "originLockNote": "Hạ Vy là cô gái Sài Gòn bản địa năm 2024, được Hệ Thống Nữ Chính chọn để gây dựng cuộc đời của chính mình; mọi linh cảm và kỹ năng vượt trội đều do Hệ Thống (ngọn lửa in-world của Hội Nghệ Nhân Áo Dài) ban tặng và do cô khổ luyện mà có. Câu chuyện thoát khỏi vai nữ phụ là cô tự viết lại cuộc đời mình, KHÔNG phải cô là người được sinh ra lại hay đến từ một nơi khác.",
+    "mcSecret": {
+      "secret": "Hạ Vy sở hữu Hệ Thống Nữ Chính vô hình, nguồn các linh cảm thiết kế đột phá không hoàn toàn do cô tự nghĩ ra.",
+      "outsideWorldKnowledge": "Hệ Thống tự xưng là ngọn lửa của Hội Nghệ Nhân Áo Dài — một hội nghệ nhân tạo mẫu đã mai một; kho tri thức của nó vượt xa trình độ ngành hiện tại nhưng vẫn nằm trong khuôn khổ thời trang và thủ công đời thực.",
+      "revealRule": "Giữ kín hoàn toàn ở Phase 1-2; chỉ hé lộ một phần cho vài người thân tín (gồm Lục Trạch Viễn) khi đủ tin cậy; reveal nguồn gốc Hội Nghệ Nhân Áo Dài ở cao trào cuối truyện.",
+      "coverStory": "Cô nói các ý tưởng và kỹ thuật là do học nghề và biến tấu từ bà ngoại — một người thợ may áo dài Sài Gòn xưa, điều này cũng đúng một phần."
+    },
+    "benefitLoop": {
+      "goal": "Biến mỗi thiết kế (rồi cả thương hiệu) thành nơi Hạ Vy được sống thật với chính mình và được người khác công nhận đúng tên.",
+      "action": "Thiết kế bằng cả trái tim, lắng nghe câu chuyện của từng người, dùng linh cảm/kỹ năng mở khóa được để nâng tác phẩm và hóa giải đòn cạnh tranh.",
+      "benefit": "Điểm Tỏa Sáng + linh cảm/kỹ năng mới + đơn hàng, giải thưởng và danh tiếng tăng, mở rộng nguồn lực và quan hệ cho bước kế tiếp.",
+      "cadence": "Mỗi 1-2 chương có ít nhất một vòng sống-thật-được-thưởng; mỗi 3-5 chương một bước nhảy lớn (thắng cuộc thi, ra mắt bộ sưu tập, ký hợp đồng thương hiệu, một bước tiến trong tình cảm)."
+    },
+    "interventionRule": "Hạ Vy chỉ ra tay can thiệp vào rắc rối bên ngoài khi nó (a) đe dọa trực tiếp danh dự, studio, đồng minh hoặc người cô thương, hoặc (b) là bất công trong chính ngành thời trang mà cô có năng lực hóa giải bằng tài năng và uy tín; cô không đi lo chuyện thiên hạ ngoài chuyên môn và luôn giải quyết bằng tác phẩm, cuộc thi, đối thoại, truyền thông minh bạch và pháp lý về bản quyền — TUYỆT ĐỐI không bằng bạo lực, không ẩu đả, không đối đầu vật lý.",
+    "phase1Playground": {
+      "locations": [
+        "Studio thuê chung 25m² trong chung cư cũ chuyển đổi ở Bình Thạnh",
+        "Khu cộng đồng sáng tạo quanh studio (xưởng may thủ công, quán cà phê của nhiếp ảnh gia, không gian co-working)",
+        "Nhà mốt Lệ Hoa Couture nơi Hạ Vy từng làm trợ lý",
+        "Các điểm trong giới thời trang quận 1: showroom Đồng Khởi, hội trường cuộc thi thiết kế trẻ"
+      ],
+      "cast": [
+        "Hạ Vy (nhà thiết kế, MC)",
+        "Bà Tâm (chủ chung cư cũ, người cho thuê studio giá mềm, ấm áp như mẹ)",
+        "Tống Mỹ Kỳ (đồng nghiệp cũ ở Lệ Hoa từng cướp công Hạ Vy, đối thủ local — kỳ phùng địch thủ, không phải kẻ thù bạo lực)",
+        "Khả Như (stylist freelance, khách hàng đầu tiên rồi thành bạn thân và cộng sự)",
+        "Lục Trạch Viễn (nhà sáng lập thương hiệu thời trang bền vững, tuyến tình cảm chính)"
+      ],
+      "resources": [
+        "Tài năng thiết kế + Hệ Thống Nữ Chính",
+        "Studio 25m² giá thuê mềm từ bà Tâm",
+        "Kỹ thuật may áo dài và quan hệ với làng nghề học từ bà ngoại",
+        "Cộng đồng người trẻ làm sáng tạo quanh chung cư"
+      ],
+      "localAntagonists": [
+        "Tống Mỹ Kỳ — đồng nghiệp cũ tìm cách dìm tên và cạnh tranh không lành mạnh (đối thủ nghề nghiệp, không phải kẻ thù bạo lực)",
+        "Một KOL thời trang được thuê để hạ thấp tác phẩm của Hạ Vy"
+      ],
+      "repeatableSceneTypes": [
+        "Một khách hàng hoặc giám khảo hoài nghi bị chinh phục bằng một thiết kế chạm đúng câu chuyện của họ",
+        "Đối thủ tung đòn cạnh tranh nghề nghiệp và Hạ Vy hóa giải bằng tài năng và minh bạch",
+        "Mở khóa Mảnh Linh Cảm/Thẻ Kỹ Năng từ Hệ Thống và áp dụng ngay vào một tác phẩm",
+        "Khoảnh khắc Đồng Cảm Sâu Sắc làm một người cảm động vì được thấu hiểu",
+        "Một khoảnh khắc ấm áp xây dựng quan hệ với cộng sự, đồng minh, hoặc tuyến tình cảm Lục Trạch Viễn"
+      ]
+    },
+    "socialReactor": {
+      "witnesses": [
+        "Khách hàng và những người được Hạ Vy may đo",
+        "Cộng đồng người trẻ sáng tạo quanh studio (Khả Như, bà Tâm, các xưởng)",
+        "Giới chuyên môn thời trang: giám khảo cuộc thi, biên tập tạp chí, các nhà thiết kế khác",
+        "Cộng đồng mạng yêu thời trang và các KOL/fashion blogger"
+      ],
+      "reactionModes": [
+        "Lời khen thật lòng và sự thay đổi thái độ từ hoài nghi sang nể phục",
+        "Khách giới thiệu bạn bè quay lại đặt may, danh sách chờ dài thêm",
+        "Bài viết tạp chí và video KOL triệu view xoay chiều dư luận về tên tuổi Hạ Vy",
+        "Giới chuyên môn công nhận tại cuộc thi, sàn diễn, giải thưởng"
+      ],
+      "reportBackCadence": "Phản hồi tức thì từ khách và cộng sự mỗi chương; làn sóng truyền thông và sự công nhận của giới chuyên môn mỗi 3-5 chương sau một sự kiện lớn."
+    },
+    "noveltyLadder": [
+      { "chapterRange": "1-100", "newToy": "Mảnh Linh Cảm signature và buff Đồng Cảm Sâu Sắc giúp Hạ Vy lấy lại danh dự và lập studio riêng", "keepsSameLane": "Vẫn là một nhà thiết kế làm việc cá nhân với từng khách và từng tác phẩm" },
+      { "chapterRange": "100-300", "newToy": "Dựng thương hiệu riêng và lập Hội Thiết Kế Tự Do; tuyến tình cảm với Lục Trạch Viễn nảy nở", "keepsSameLane": "Vẫn là làm thời trang, chỉ mở rộng quy mô, mạng lưới và chiều sâu cảm xúc" },
+      { "chapterRange": "300-600", "newToy": "Đưa thương hiệu lên sàn diễn quốc gia và ra Hà Nội; đối thủ là tập đoàn đứng sau Tinh Tú", "keepsSameLane": "Vẫn là cạnh tranh trong ngành thời trang, đối thủ lớn hơn nhưng vẫn phi bạo lực" },
+      { "chapterRange": "600-1000", "newToy": "Đưa thời trang Việt ra quốc tế và phục dựng Hội Nghệ Nhân Áo Dài; hoàn thiện tình yêu chân thành", "keepsSameLane": "Vẫn là hành trình thời trang và tình cảm, đỉnh cao của cùng một hành trình sống cho mình" }
+    ],
+    "controlRules": {
+      "payoffCadence": "Tối thiểu 2 cao điểm dopamine mỗi chương, cao điểm đầu trước nửa chương; setup không quá 30% và phải có payoff trong cùng hoặc chương kế.",
+      "attentionGradient": "Mở chương bằng một móc câu cơ hội hoặc thử thách nghề/tình cảm cụ thể; đóng chương bằng một cliffhanger nhẹ, một thắng lợi mở ra cơ hội mới, hoặc một khoảnh khắc tình cảm khiến độc giả muốn đọc tiếp.",
+      "openThreadsPerArc": 3,
+      "closeThreadsPerArc": 2
+    },
+    "patternCards": [
+      "warm-baseline-opening",
+      "competence-led-growth",
+      "mass-witnessed-recognition",
+      "slow-burn-romance",
+      "talent-beats-connections",
+      "non-combat-conflict-resolution"
+    ]
+  }
+}

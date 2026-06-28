@@ -1,0 +1,27 @@
+{
+  "arc_number": 1,
+  "start_chapter": 1,
+  "end_chapter": 30,
+  "arc_theme": "Xác chết trong miếu hoang — Nghiệm Thi Lục thức tỉnh và vụ truy hung đầu tiên",
+  "plan_text": "Arc mở màn warm-baseline: Lý Vãn đã là ngỗ tác lành nghề của huyện nha (golden finger thức tỉnh ngay ch.1, không kéo dài MC khổ sở vô cớ). Mỗi chương xoay quanh một bước nghiệm thi hoặc một diễn biến điều tra cụ thể, với ít nhất 2 cao điểm dopamine mỗi chương (cao điểm đầu trước nửa chương) — chủ yếu là khoảnh khắc Lý Vãn đọc ra một dấu vết người khác bỏ sót và vạch mặt sự dối trá. Cụm chương theo 5-cluster: ch.1-6 setup (xác chết tư thế quái dị trong miếu hoang, Nghiệm Thi Lục thức tỉnh, đọc tử ban lật lại 'án treo cổ' thành án mạng, manh mối đầu tiên); ch.7-14 breathing + competence (Lý Vãn xây uy tín trong nha, sai dịch Trần Đại tin theo, Tô Yên Nhi góp dược lý, mở khóa tầng Thông Âm); ch.15-22 confront (kẻ tình nghi quyền thế và tri huyện ép khép án, Lý Vãn phản biện bằng chứng cứ tử thi tại công đường, lần ra tay thầy cúng giả nhúng tay); ch.23-28 big_wow (thông âm nghe oan tình âm hồn nạn nhân, An Hồn cho họ siêu thoát, vạch trần và bắt hung thủ trước đám đông); ch.29-30 resolution + hook (huyện tạm yên, Lý Vãn được công nhận, đặt manh mối lời lảm nhảm 'Vô Diện đã thấy ngươi' mở ra tuyến hội tà thần). Giữ tông u ám rùng rợn mà không máu me khoa trương; xung đột giải quyết bằng nghiệm thi, suy luận, biện án và An Hồn; đánh đấm nhẹ, chỉ khi âm vật hung dữ không thể giảng lý. MC điềm tĩnh, gan lì, lấy chân tướng làm vũ khí.",
+  "chapter_briefs": [
+    { "n": 1, "beat": "setup", "goal": "Nghiệm thi xác chết tư thế quái dị trong miếu hoang giữa đêm mưa", "payoff": "Nghiệm Thi Lục thức tỉnh, đọc tử ban lật 'án treo cổ' thành án mạng, Âm Đức đầu tiên", "endingHook": "Cuốn sổ hé lộ một manh mối: hung khí không phải dây thừng" },
+    { "n": 2, "beat": "setup", "goal": "Trình bày phát hiện trước nha, hiểu cơ chế Nghiệm Thi Lục", "payoff": "Sai dịch Trần Đại bán tín bán nghi nhưng bị thuyết phục, hé mở hiện trường thật", "endingHook": "Một di vật ngũ sắc dưới móng tay người chết chưa rõ nghĩa" },
+    { "n": 6, "beat": "setup", "goal": "Khóa lại nghi vấn ban đầu, ổn định vị thế trong nha", "payoff": "Lý Vãn chỉ ra hiện trường bị dàn dựng, Trần Đại ngả về tin anh", "endingHook": "Tri huyện sốt ruột muốn khép án nhanh cho yên dân" },
+    { "n": 12, "beat": "breathing", "goal": "Mở khóa tầng Thông Âm, Tô Yên Nhi góp kiến giải dược lý", "payoff": "Lần đầu thông âm nghe được một mảnh tàn niệm nạn nhân, hé tên một người", "endingHook": "Cái tên ấy lại là người ai cũng tưởng vô can" },
+    { "n": 18, "beat": "confront", "goal": "Đối phó áp lực khép án và kẻ tình nghi quyền thế phủ nhận", "payoff": "Lý Vãn phản biện bằng tử ban và vết thương ngay tại công đường, kẻ kia cứng họng", "endingHook": "Một tay thầy cúng giả bất ngờ nhảy vào 'giải điềm gở', làm nhiễu hướng điều tra" },
+    { "n": 24, "beat": "big_wow", "goal": "Thông âm trọn vẹn oan tình nạn nhân và An Hồn cho họ", "payoff": "Oan tình được giãi, âm hồn siêu thoát, chân tướng hung thủ phơi bày", "endingHook": "Hung thủ thật lộ diện ngay giữa đám đông nhân chứng" },
+    { "n": 28, "beat": "big_wow", "goal": "Bắt hung thủ và vạch trần thầy cúng giả tiếp tay", "payoff": "Hung thủ sa lưới, thầy cúng giả bị tóm, dân chúng tôn Lý Vãn là thần tra", "endingHook": "Thầy cúng giả lảm nhảm 'Vô Diện đã thấy ngươi rồi, ngỗ tác'" },
+    { "n": 30, "beat": "resolution", "goal": "Khép arc 1, huyện Thanh Khê tạm yên", "payoff": "Lý Vãn được quan dân công nhận, Tô Yên Nhi và Trần Đại thành trợ thủ thân tín", "endingHook": "Câu nói 'Vô Diện' ám ảnh — một thế lực giấu mặt bắt đầu lộ bóng" }
+  ],
+  "threads_to_advance": ["Phá vụ án miếu hoang", "Xây uy tín và đồng minh trong nha", "Mở khóa các tầng Nghiệm Thi Lục"],
+  "threads_to_resolve": ["Án mạng miếu hoang bị ngụy thành treo cổ (giải quyết: bắt đúng hung thủ, giãi oan nạn nhân)"],
+  "new_threads": ["Bí ẩn Hội Vô Diện thờ tà thần", "Tay thầy cúng giả là mắt xích của ai", "Mối duyên xưa nơi cuốn sổ Nghiệm Thi Lục"],
+  "sub_arcs": [
+    { "name": "Xác trong miếu hoang", "chapterRange": "1-6", "cluster": "setup" },
+    { "name": "Uy tín và đồng minh", "chapterRange": "7-14", "cluster": "breathing" },
+    { "name": "Công đường tranh biện", "chapterRange": "15-22", "cluster": "confront" },
+    { "name": "An Hồn và truy hung", "chapterRange": "23-28", "cluster": "big_wow" },
+    { "name": "Bóng Vô Diện", "chapterRange": "29-30", "cluster": "resolution" }
+  ]
+}

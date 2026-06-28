@@ -1,0 +1,119 @@
+{
+  "premise": "Lâm Hạo, một nhân viên kho bình thường ở đô thị hiện đại, được Hệ Thống ban tặng tại chỗ Liêu Thiên Quần — một nhóm chat quy tụ đại năng từ vô số thế giới. Anh đổi tri thức và đặc sản Trái Đất lấy thần thông, công pháp, vật phẩm vạn giới, tích Điểm Quần để nâng quyền hạn, học lỏm và ghép mảnh để dần phi phàm hóa. Nhóm chỉ trao kênh giao dịch chứ không trao toàn năng: mọi thứ phải đổi sòng phẳng, đổi hớ là lỗ; thần thông phải tự khổ luyện, vật phẩm phải hiểu đúng; không đại năng nào can thiệp vào đời anh theo ý muốn.",
+  "mainConflict": "Một người bình thường giữa toàn cao thủ vạn giới phải sống bằng sự lanh lợi trong đổi chác, sự chân thành xây quan hệ và cái đầu biết ghép mảnh — giữa lúc có những nhóm chat lừa đảo, kẻ hai lòng trong chính nhóm mình, và một Quản Trị Viên ẩn danh đầy bí ẩn. Xung đột không giải quyết bằng vũ lực mà bằng trí, tín và sự tỉnh táo. Leo thang từ thương vụ đơn lẻ → vạch trần nhóm lừa đảo và nội gián → điều phối nhiệm vụ liên giới → truy ra Quản Trị Viên dựng nên Liêu Thiên Quần.",
+  "themes": [
+    "Chữ tín và sự sòng phẳng là vốn liếng lớn nhất giữa người với người",
+    "Người bình thường vẫn có chỗ đứng giữa cao thủ nhờ trí tuệ và sự chân thành",
+    "Đổi chác công bằng và kết nối tạo ra giá trị mà tranh giành không có được",
+    "Phi phàm đến từ tích góp và ghép mảnh, không từ may mắn được nhấc bổng"
+  ],
+  "majorPlotPoints": [
+    "Ch.1: Liêu Thiên Quần được Hệ Thống ban tặng tại chỗ; Lâm Hạo hóng chuyện các đại năng và thực hiện thương vụ đổi chác đầu tiên (đặc sản Trái Đất lấy thần thông vụn).",
+    "Arc 1: Lâm Hạo thành thạo cơ chế đổi chác - Điểm Quần - khổ luyện, tỉnh táo tránh một cú đổi hớ, biết nhóm có Quản Trị Viên ẩn danh.",
+    "Arc 2-3: Trở thành nhà môi giới đáng tin giữa các đại năng; vạch trần các nhóm chat lừa đảo và kẻ hai lòng trong nhóm bằng bằng chứng giao dịch.",
+    "Giữa truyện: Một Nhiệm Vụ Nhóm liên giới quy mô lớn; Lâm Hạo điều phối các đại năng cùng góp sức, giải bằng hợp tác thay vì tranh giành.",
+    "Cao trào cuối: Truy ra Quản Trị Viên dựng nên Liêu Thiên Quần và lý do vạn giới được gom vào một nhóm; Lâm Hạo chọn định hình lại cách vạn giới kết nối thay vì độc chiếm."
+  ],
+  "setupKernel": {
+    "readerFantasy": "Cảm giác sảng khoái, hài hước và ấm áp khi một người bình thường lọt vào một nhóm chat toàn đại năng vạn giới, rồi từ chỗ rụt rè hóng chuyện dần trở thành kẻ mà cả tiên nhân lẫn lãnh chúa đều muốn giao dịch — mỗi thương vụ là một cú lời ngọt, mỗi thần thông học lỏm là một bước đổi đời, mỗi lần anh giữ chữ tín là một lần được cả nhóm nể trọng. Độc giả vừa được phiêu lưu gián tiếp qua vô số thế giới, vừa thỏa mãn vì trí khôn và sự tử tế của người thường được tưởng thưởng giữa toàn cao thủ.",
+    "protagonistEngine": "Lâm Hạo thắng nhờ sự lanh lợi trong đổi chác (nhìn ra món đồ tầm thường nào là bảo vật ở thế giới khác), sự chân thành giữ chữ tín, kho tri thức Trái Đất thực tế, và cái đầu biết ghép mảnh thần thông + vật phẩm vạn giới thành thứ hữu dụng. Tính cách điềm đạm, hài hước, thực tế, trọng tín — anh không tham lam đổi hớ người khác và day dứt khi một thương vụ làm ai đó thiệt.",
+    "pleasureLoop": [
+      "Một đại năng đăng nhu cầu hoặc khoe của trong nhóm → Lâm Hạo nhận ra một món đồ/tri thức Trái Đất tầm thường lại đúng thứ họ khao khát (setup nhanh, gợi cú lời).",
+      "Anh đề nghị đổi chác khéo léo và chốt được thương vụ có lời → nhận về thần thông/công pháp/vật phẩm vạn giới + Điểm Quần (khoảnh khắc lời ngọt + harvest).",
+      "Lâm Hạo tự khổ luyện thần thông học lỏm hoặc ghép vài vật phẩm lại → đạt một năng lực mới rõ rệt (breakthrough cá nhân do chính tay anh).",
+      "Anh giữ chữ tín trong một thương vụ khó hoặc cứu một đại năng khỏi cú lừa → được cả nhóm nể trọng và tin tưởng hơn (công nhận).",
+      "Một kẻ lừa đảo hoặc nhóm chat giả mạo bị Lâm Hạo vạch trần bằng bằng chứng giao dịch → khán giả hả hê thấy kẻ gian trắng tay (face-slap nhắm vào kẻ gian, không phải MC).",
+      "Một mảnh sự thật về Liêu Thiên Quần hoặc Quản Trị Viên hé lộ → cảm giác bức màn vạn giới đang được vén lên (revelation payoff)."
+    ],
+    "systemMechanic": {
+      "name": "Liêu Thiên Quần — Nhóm Chat Đổi Chác Vạn Giới",
+      "input": "Lâm Hạo tương tác trong nhóm chat: trò chuyện, đề nghị đổi chác (gửi tri thức/đặc sản Trái Đất qua túi giao hàng), nhận hồng bao, hoặc hoàn thành Nhiệm Vụ Nhóm; mọi giao dịch phải sòng phẳng, hai bên đồng thuận.",
+      "output": "Anh nhận về thần thông, công pháp, vật phẩm thật từ vạn giới (qua túi giao hàng), cùng Điểm Quần tích lũy khi đóng góp giá trị; quan hệ và uy tín với các đại năng tăng theo chữ tín anh giữ.",
+      "limit": "Anti-plot-armor cứng: nhóm CHỈ là kênh giao dịch — không đại năng nào nuôi Lâm Hạo miễn phí, đổi hớ là lỗ nặng; thần thông học lỏm phải tự khổ luyện gian khổ mới dùng được; vật phẩm vạn giới phải hiểu đúng cách mới không phản tác dụng; anh KHÔNG thể nhờ đại năng can thiệp vào đời thực theo ý muốn (họ ở thế giới khác, chỉ giúp khi có lợi); KHÔNG có nút bấm thắng-tất-cả và Hệ Thống KHÔNG mách bài. Mất chữ tín thì mất luôn quan hệ và cơ hội giao dịch.",
+      "reward": "Điểm Quần mở khóa quyền hạn cao hơn (hồng bao lớn, túi giao hàng nâng cấp, hỏi riêng đại năng); thần thông và vật phẩm giúp Lâm Hạo phi phàm hóa dần; phần thưởng sâu nhất luôn là một mối quan hệ tin cậy, một bậc uy tín mới và một mảnh sự thật về vạn giới — không phải sức mạnh tức thời."
+    },
+    "mcOrigin": "system-bestowed",
+    "originLockNote": "Lâm Hạo là người bản địa của đô thị hiện đại năm 2024, được Hệ Thống ban tặng tại chỗ Liêu Thiên Quần như một golden finger in-world; anh không đến từ thế giới nào khác và không mang ký ức từ một đời nào khác — mọi năng lực đều phát sinh từ nhóm chat và do anh tự rèn.",
+    "mcSecret": {
+      "secret": "Lâm Hạo sở hữu Liêu Thiên Quần — nhóm chat nối anh tới đại năng của muôn vàn thế giới, một thứ không người bình thường nào quanh anh biết tới.",
+      "outsideWorldKnowledge": "Bản thân nhóm là một bí ẩn in-world: nó dường như liên hệ với cách Quản Trị Viên dựng nên mạng lưới nhóm chat vạn giới, như thể Lâm Hạo nắm một mắt xích đặc biệt trong thiết kế của họ; hiểu biết này vượt ngoài tầm của mọi thành viên khác.",
+      "revealRule": "Giấu kín hoàn toàn với người đời thường ở các arc đầu; chỉ hé lộ một phần cho một hai đại năng/đồng minh thân tín giữa truyện; nguồn gốc thật của nhóm (mối liên hệ với Quản Trị Viên và lý do anh được kéo vào) chỉ reveal ở cao trào cuối.",
+      "coverStory": "Với người đời thường quanh anh, Lâm Hạo chỉ nói mình 'buôn bán đồ sưu tầm trên mạng', che giấu việc thực sự đang đổi chác với đại năng vạn giới."
+    },
+    "benefitLoop": {
+      "goal": "Trở thành mắt xích then chốt và nhà giao dịch đáng tin nhất của Liêu Thiên Quần, phi phàm hóa từng bước, và lần ngược ra sự thật về Quản Trị Viên.",
+      "action": "Đọc nhu cầu của các đại năng, nhận ra giá trị bất đối xứng giữa các thế giới, chốt thương vụ sòng phẳng có lời, tự khổ luyện thần thông và ghép mảnh vật phẩm, đồng thời giữ chữ tín và xây quan hệ.",
+      "benefit": "Thu về thần thông/vật phẩm/Điểm Quần, phi phàm hóa thêm một bậc, mở rộng mạng lưới quan hệ tin cậy với các đại năng, và thu thêm một mảnh manh mối về vạn giới.",
+      "cadence": "Mỗi 1-2 chương có ít nhất một vòng đổi-chác-được-thưởng (một thương vụ có lời + một thần thông/vật phẩm/Điểm Quần về tay); mỗi 3-5 chương một bước nhảy lớn (khổ luyện thành một năng lực mới, vạch trần một kẻ lừa đảo, lên một bậc uy tín, hoặc hé lộ một mảnh sự thật)."
+    },
+    "interventionRule": "Lâm Hạo chỉ chủ động ra tay khi (a) một thương vụ hoặc nhiệm vụ nhóm trong tầm với của anh cần giải quyết, hoặc (b) khi anh phát hiện một nhóm chat lừa đảo hoặc kẻ hai lòng đang gài bẫy thành viên cả tin mà anh có đủ bằng chứng để vạch trần; anh không 'cứu cả vạn giới' ngoài tầm với, luôn giải quyết bằng trí, tín, đổi chác và bằng chứng — tuyệt đối không bằng cách nhờ đại năng can thiệp trực tiếp hay dùng vũ lực vạn giới.",
+    "phase1Playground": {
+      "locations": [
+        "Phòng trọ nhỏ và kho hàng đời thực của Lâm Hạo ở đô thị hiện đại (cứ điểm đời thực)",
+        "Giao diện Liêu Thiên Quần trên điện thoại (Bảng Tin, túi giao hàng, hồng bao, danh sách đại năng)",
+        "Quán cà phê và siêu thị đời thực nơi Lâm Hạo tìm 'hàng hóa' để đổi chác",
+        "Thế giới tu tiên của tiên nhân Thanh Vân (đối tác đổi chác sớm, qua mô tả trên Bảng Tin)",
+        "Thế giới mạt thế của lãnh chúa Cố Đại Sơn (khán giả/đối tác cần lương thực, qua Bảng Tin)"
+      ],
+      "cast": [
+        "Lâm Hạo (nhân viên kho, MC, chủ Liêu Thiên Quần)",
+        "Thanh Vân Tử (tiên nhân tu vi thâm hậu, đối tác đổi chác chân thành sớm nhất, thiếu 'vị trần tục')",
+        "Vexna (đại pháp sư tò mò về khoa học Trái Đất, đối tác đổi tri thức lấy thần chú)",
+        "Cố Đại Sơn (lãnh chúa thời mạt thế cần lương thực và chiến thuật, đối tác thực tế)",
+        "Trác Phong (một thành viên gian xảo trong nhóm, chuyên dụ người đổi hớ, local antagonist)"
+      ],
+      "resources": [
+        "Liêu Thiên Quần và các chức năng (đổi chác, hồng bao, Bảng Tin, nhiệm vụ)",
+        "Điểm Quần tích lũy và quyền hạn nhóm đã mở khóa",
+        "Kho tri thức và đặc sản Trái Đất của Lâm Hạo (gia vị, thuốc men, kỹ thuật, văn hóa)",
+        "Thần thông/vật phẩm vạn giới đầu tiên đổi được và sổ ghi giá trị các món hàng giữa các thế giới"
+      ],
+      "localAntagonists": [
+        "Trác Phong — thành viên gian xảo trong nhóm, nhiều lần dụ Lâm Hạo và người mới đổi hớ để trục lợi",
+        "Một nhóm chat giả mạo do kẻ gian lập ra để lừa thành viên cả tin đổi hàng rồi cướp trắng"
+      ],
+      "repeatableSceneTypes": [
+        "Một đại năng đăng nhu cầu/khoe của; Lâm Hạo nhận ra giá trị bất đối xứng và đề nghị đổi chác",
+        "Chốt một thương vụ có lời và nhận về thần thông/vật phẩm/Điểm Quần",
+        "Tự khổ luyện thần thông học lỏm hoặc ghép vài vật phẩm thành thứ hữu dụng",
+        "Vạch trần một cú lừa đổi chác hoặc giữ chữ tín trong một thương vụ khó để được nể trọng",
+        "Đoạn đời thực giữa các thương vụ: tìm hàng hóa, nghỉ ngơi, ghép manh mối về Quản Trị Viên"
+      ]
+    },
+    "socialReactor": {
+      "witnesses": [
+        "Các đại năng thành viên Liêu Thiên Quần đang theo dõi Bảng Tin và giao dịch",
+        "Các đối tác đổi chác đã được Lâm Hạo phục vụ sòng phẳng",
+        "Các nhóm chat vạn giới khác và mạng lưới đứng sau",
+        "Người đời thực quanh Lâm Hạo (chỉ thấy phần 'buôn đồ sưu tầm')"
+      ],
+      "reactionModes": [
+        "Ngạc nhiên và nể khi Lâm Hạo nhìn ra giá trị bất đối xứng mà cao thủ bỏ qua",
+        "Các đại năng tìm tới đặt giao dịch, đồn thổi về 'tay buôn người Trái Đất giữ chữ tín'",
+        "Các nhóm chat khác để mắt tới Lâm Hạo như một đối thủ/đối tác đáng gờm",
+        "Kẻ gian tung tin, gài bẫy hoặc lôi kéo để hạ uy tín anh"
+      ],
+      "reportBackCadence": "Phản ứng tức thì trong nhóm mỗi chương (tin nhắn + giao dịch ngay); làn sóng đồn đại liên giới và động thái của các nhóm chat khác dồn lại mỗi 3-5 chương sau một thương vụ hoặc vụ vạch trần đáng chú ý."
+    },
+    "noveltyLadder": [
+      { "chapterRange": "1-30", "newToy": "Liêu Thiên Quần và các thương vụ đổi chác đầu tiên — biến đồ Trái Đất tầm thường thành bảo vật vạn giới", "keepsSameLane": "Vẫn là đổi chác sòng phẳng + học lỏm + tích Điểm Quần để phi phàm hóa" },
+      { "chapterRange": "31-200", "newToy": "Quan hệ với nhiều đại năng chủ đề khác nhau (tiên nhân, pháp sư, lãnh chúa, kiếm khách) và môi giới thương vụ phức tạp", "keepsSameLane": "Vẫn là nhìn-giá-trị → đổi chác → khổ luyện, chỉ đổi đối tác và độ phức tạp thương vụ" },
+      { "chapterRange": "201-500", "newToy": "Đối đầu các nhóm chat lừa đảo, kẻ hai lòng + điều phối Nhiệm Vụ Nhóm liên giới", "keepsSameLane": "Vẫn là giao dịch và chữ tín, thêm tầng đấu trí với kẻ gian và điều phối hợp tác" },
+      { "chapterRange": "501-800", "newToy": "Quyền hạn sâu của nhóm, luật ẩn của Liêu Thiên Quần, manh mối về Quản Trị Viên", "keepsSameLane": "Vẫn cùng lane nhóm-chat-vạn-giới, nâng lên cấp meta về cách hệ thống vận hành" },
+      { "chapterRange": "801-1000", "newToy": "Đối mặt Quản Trị Viên và định hình lại cách vạn giới được kết nối", "keepsSameLane": "Vẫn là làm mắt xích của nhóm chat vạn giới — đỉnh cao của cùng một trò chơi giao dịch và kết nối" }
+    ],
+    "controlRules": {
+      "payoffCadence": "Tối thiểu 2 cao điểm dopamine mỗi chương (một thương vụ có lời + một thần thông/vật phẩm/Điểm Quần về tay hoặc một kẻ gian bị vạch trần); cao điểm đầu xuất hiện trước nửa chương; setup không quá 30% và phải có payoff trong cùng hoặc chương kế.",
+      "attentionGradient": "Mở chương bằng một nhu cầu/khoe của mới trong nhóm, một thương vụ hấp dẫn hoặc một động thái của kẻ gian; đóng chương bằng một cliffhanger hấp dẫn hoặc một mảnh sự thật vạn giới vừa hé.",
+      "openThreadsPerArc": 3,
+      "closeThreadsPerArc": 2
+    },
+    "patternCards": [
+      "warm-baseline-opening",
+      "asymmetric-value-trade",
+      "casual-competence-wow",
+      "trust-builds-recognition",
+      "scammer-exposed"
+    ]
+  }
+}

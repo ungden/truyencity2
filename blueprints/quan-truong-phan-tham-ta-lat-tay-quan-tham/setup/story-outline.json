@@ -1,0 +1,118 @@
+{
+  "premise": "Trình Khải, một cán bộ trẻ liêm chính người bản địa, được điều về Châu Giang — vùng duyên hải giàu có nơi tham nhũng giăng kín từ cấp xã lên tới cấp châu. Bằng chứng cứ, luật pháp, số liệu và bản lĩnh chính trị, anh từng bước lật tẩy các đường dây rút ruột công trình, đấu thầu khép kín và thao túng quy hoạch, lần lượt hạ gục Phe Cảng, Phe Đất và Phe Cũ, làm trong sạch bộ máy và thăng tiến bằng chính tích thực — tuyệt đối không bằng bạo lực.",
+  "mainConflict": "Một cán bộ trẻ liêm chính, tay không phe cánh, đối đầu một mạng lưới tham nhũng đan cài qua nhiều thế hệ trong bộ máy chính quyền. Xung đột không giải quyết bằng bạo lực mà bằng điều tra, thu thập chứng cứ, đối chiếu hồ sơ và dòng tiền, vận dụng pháp luật và quy trình, thuyết phục và đấu trí chính trị. Leo thang từ một biên bản nghiệm thu khống → đường dây đấu thầu của Phe Cảng → thao túng quy hoạch đất của Phe Đất → quỹ đen ngân sách → thế lực bảo kê Phe Cũ → cuộc tổng phản công vu cáo của ba phe → kiến tạo một thể chế minh bạch bền vững.",
+  "themes": [
+    "Liêm chính là một con đường khó nhưng có thể đi đến cùng",
+    "Chứng cứ và pháp luật mạnh hơn quyền lực và quan hệ",
+    "Trừng trị cái xấu chưa đủ, phải kiến tạo cơ chế để cái xấu không tái sinh",
+    "Người dân và lương tâm cán bộ là gốc rễ của công cuộc làm sạch"
+  ],
+  "majorPlotPoints": [
+    "Ch.1: Trình Khải nhận công tác tại Châu Giang, ngay lập tức phát hiện một biên bản nghiệm thu khống và chọn ghi chép kín kẽ thay vì manh động.",
+    "Arc 1: Lật tẩy mắt xích tham nhũng đầu tiên bằng chứng cứ, đứng vững trong bộ máy và lọt vào tầm ngắm của cấp trên.",
+    "Arc 2-3: Lần ra đường dây đấu thầu khép kín của Phe Cảng và thế thao túng quy hoạch đất của Phe Đất, hạ từng trụ cột bằng pháp lý và số liệu.",
+    "Giữa truyện: Xây cơ chế giám sát ngân sách bằng dữ liệu, lần ra quỹ đen, đối đầu Phe Cũ — thế lực bảo kê lâu năm — bằng đấu trí tinh vi.",
+    "Cao trào cuối: Ba phe tổng phản công bằng một vụ vu cáo lớn; Trình Khải tự minh oan, lật ngược thế cờ, đánh sập liên minh, rồi kiến tạo một thể chế minh bạch bền vững cho Châu Giang."
+  ],
+  "setupKernel": {
+    "readerFantasy": "Cảm giác sảng khoái khi một cán bộ trẻ tay không phe cánh, chỉ bằng cái đầu lạnh, sự am hiểu luật và một bộ chứng cứ không thể chối cãi, lật tẩy đám quan tham tưởng như bất khả xâm phạm — khiến chúng cứng họng giữa cuộc họp, sụp đổ trước pháp luật, trong khi anh đứng thẳng và thăng tiến bằng chính tích thực. Mỗi lần một đường dây bị phơi bày là một lần độc giả hả hê vì công lý thắng đúng theo luật chơi của kẻ xấu.",
+    "protagonistEngine": "Trình Khải thắng nhờ trí nhớ sắc bén với từng dòng chứng từ, khả năng đối chiếu hồ sơ và dòng tiền tìm ra mâu thuẫn, sự am hiểu pháp luật và quy trình, cùng bản lĩnh chính trị giữ bình tĩnh khi bị dồn ép. Tính cách liêm chính, kiên định, điềm tĩnh và thận trọng nhưng không cứng nhắc — anh biết chờ thời, biết tìm đồng minh, và luôn giải quyết bằng đúng luật chứ không bằng tiểu xảo bẩn.",
+    "pleasureLoop": [
+      "Một dấu hiệu bất thường lộ ra (báo cáo đẹp quá mức, số liệu không khớp, đơn thư của dân) → Trình Khải lặng lẽ vào cuộc, thu thập và đối chiếu chứng cứ dưới áp lực bị theo dõi (tension build-up).",
+      "Anh tìm ra mắt xích yếu trong đường dây tham nhũng và dựng một bộ chứng cứ không thể chối cãi → khoảnh khắc 'nắm thóp' lạnh người (deduction + leverage peak).",
+      "Tại một cuộc họp hoặc cuộc thanh tra đúng quy trình, anh tung chứng cứ khiến đối thủ cứng họng trước tập thể → vạch trần công khai (face-slap bằng sự thật).",
+      "Một quan tham bị xử lý đúng pháp luật, dự án được cứu, quyền lợi của dân được trả lại → công lý hiển hiện (harvest + công nhận).",
+      "Trình Khải được tin tưởng giao trọng trách lớn hơn, thăng tiến bằng tích thực → tiến gần hơn tới tâm của các thế lực (tiến triển vị thế).",
+      "Một mảnh sự thật về cấu trúc quyền lực ngầm được hé lộ → bức màn quan trường được vén thêm một lớp (revelation payoff)."
+    ],
+    "systemMechanic": {
+      "name": "Phương Pháp Đối Chiếu — Nhãn Quan Chứng Cứ",
+      "input": "Trình Khải tiếp cận được hồ sơ, chứng từ, báo cáo, dòng tiền hoặc lời khai liên quan đến một vụ việc, và dành thời gian đọc, đối chiếu, hệ thống hóa chúng trong trạng thái tỉnh táo, đủ dữ liệu.",
+      "output": "Anh nhận ra những mâu thuẫn, lỗ hổng và dấu vết bất thường mà người khác bỏ qua — một con số không khớp thực địa, một dòng tiền chảy vòng, một mốc thời gian vô lý — từ đó dựng lên giả thuyết về đường dây tham nhũng và biết cần truy tiếp chứng cứ nào.",
+      "limit": "Anti-plot-armor cứng: phương pháp này CHỈ giúp phát hiện mâu thuẫn từ dữ liệu thật anh thực sự có trong tay; nó KHÔNG bịa ra chứng cứ, KHÔNG cho biết kết luận sẵn, KHÔNG tự hạ gục đối thủ. Anh vẫn phải tự thu thập đủ bằng chứng hợp pháp, vẫn thất bại nếu chứng cứ thiếu hoặc bị tiêu hủy, vẫn phải đi đúng quy trình nếu không muốn bị phản đòn. Khả năng này vô dụng khi anh bị cắt nguồn tiếp cận hồ sơ, bị cô lập, hoặc khi đối thủ ngụy tạo chứng từ quá tinh vi.",
+      "reward": "Tỉ lệ lật tẩy thành công cao hơn nhờ tìm đúng mắt xích yếu; theo thời gian anh tích lũy 'mẫu thủ đoạn' của từng phe, điều tra nhanh và sâu hơn — nhưng phần thưởng thật luôn là một đường dây bị triệt, một dự án được cứu, uy tín và vị thế tăng dần, chứ không phải sức mạnh siêu nhiên."
+    },
+    "mcOrigin": "native",
+    "originLockNote": "Trình Khải là người bản địa Châu Giang, một cán bộ trẻ bình thường lớn lên và trưởng thành trong chính thế giới truyện; mọi năng lực của anh là sở học, rèn giũa nghiệp vụ và bản lĩnh tích lũy trong cuộc đời này, không đến từ bất kỳ nguồn gốc đặc biệt nào.",
+    "mcSecret": {
+      "secret": "Trình Khải âm thầm xây dựng và cất giữ một 'kho chứng cứ' đồ sộ — bản sao chứng từ, nhật ký công vụ, ghi âm hợp pháp và sơ đồ quan hệ ngầm — được giấu kỹ và sao lưu nhiều nơi, mà các phe không biết quy mô thật.",
+      "outsideWorldKnowledge": "Kho chứng cứ này là vũ khí lớn nhất của anh và cũng là điểm yếu chí mạng nếu lộ; ngoài một vài đồng minh tâm phúc, không ai trong bộ máy biết anh đã ghi lại bao nhiêu, đến mức nào, và những ai đã bị anh nắm thóp.",
+      "revealRule": "Giấu kín hoàn toàn ở các arc đầu; chỉ hé lộ một phần cho một hai đồng minh thân tín giữa truyện; quy mô và sức nặng thật của kho chứng cứ chỉ bung ra trọn vẹn ở cao trào tổng phản công khi anh dùng nó để tự minh oan và đánh sập ba phe.",
+      "coverStory": "Anh để người ngoài tin mình chỉ là một cán bộ 'cẩn thận quá mức, hay lưu hồ sơ', che giấu việc thực chất đang dựng một hồ sơ toàn cảnh về cả mạng lưới tham nhũng Châu Giang."
+    },
+    "benefitLoop": {
+      "goal": "Lật tẩy và triệt từng đường dây tham nhũng, làm trong sạch bộ máy Châu Giang và thăng tiến bằng tích thực để có đủ thẩm quyền cải cách tận gốc.",
+      "action": "Phát hiện dấu hiệu bất thường, lặng lẽ thu thập và đối chiếu chứng cứ hợp pháp, tìm đồng minh chính trực, vận dụng pháp luật và quy trình thanh tra, rồi vạch trần đúng thời điểm và xử lý đúng thẩm quyền.",
+      "benefit": "Triệt thêm một mắt xích tham nhũng, cứu thêm một dự án hoặc trả lại quyền lợi cho dân, củng cố uy tín, thăng tiến vị thế và mở rộng phạm vi quyền hạn cải cách; đồng thời thu thêm 'mẫu thủ đoạn' và chứng cứ cho cuộc đối đầu lớn hơn.",
+      "cadence": "Mỗi 1-2 chương có ít nhất một vòng điều tra-được-thưởng (một mâu thuẫn được phát hiện, một chứng cứ chốt được, một đòn vạch trần nhỏ); mỗi 3-5 chương một bước nhảy lớn (triệt một mắt xích, thăng một bậc vị thế, hé lộ một tầng cấu trúc quyền lực)."
+    },
+    "interventionRule": "Trình Khải chỉ ra tay khi (a) anh nắm được chứng cứ đủ vững trong thẩm quyền hoặc có kênh hợp pháp để chuyển chứng cứ tới cơ quan đúng thẩm quyền, hoặc (b) khi quyền lợi của dân hoặc một dự án công đang bị xâm hại trực tiếp mà anh có đủ căn cứ để can thiệp; anh không 'anh hùng đơn độc' liều lĩnh vượt quá tầm với hay phá vỡ quy trình, luôn giải quyết bằng điều tra, chứng cứ, pháp luật, thanh tra và đấu trí chính trị — tuyệt đối không bằng bạo lực thể chất.",
+    "phase1Playground": {
+      "locations": [
+        "Phòng ban cấp huyện nơi Trình Khải nhận việc — không gian công sở với hồ sơ, báo cáo và những bất thường đầu tiên",
+        "Công trình thoát nước đang thi công — hiện trường để đối chiếu khối lượng nghiệm thu với thực địa",
+        "Khu lưu trữ hồ sơ và phòng kế toán huyện — nơi anh lặng lẽ đối chiếu chứng từ và dòng tiền",
+        "Quán trà và khu tập thể cán bộ — không gian đời thường nơi quan hệ, đồn đoán và manh mối ngầm trao đổi"
+      ],
+      "cast": [
+        "Trình Khải (cán bộ trẻ liêm chính, MC, người điều tra)",
+        "Lý Văn Cường (kế toán huyện chính trực nhưng nhút nhát, dần thành đồng minh sớm nhất)",
+        "Bà Tư (người dân có đơn thư tố cáo, cung cấp manh mối từ phía cộng đồng)",
+        "Hoàng Đắc Lộc (cán bộ kỹ thuật khai khống khối lượng, local antagonist đầu tiên)",
+        "Phó phòng Đỗ Mạnh (cấp trên trực tiếp, vừa quan sát vừa thử thách Trình Khải, ngả nghiêng giữa các phe)"
+      ],
+      "resources": [
+        "Phương Pháp Đối Chiếu — Nhãn Quan Chứng Cứ và trí nhớ chứng từ sắc bén",
+        "Kho chứng cứ bí mật mới chớm hình thành (bản sao, nhật ký công vụ)",
+        "Sự am hiểu pháp luật và quy trình hành chính, thanh tra",
+        "Quan hệ chớm nở với Lý Văn Cường và lòng tin của một số người dân"
+      ],
+      "localAntagonists": [
+        "Hoàng Đắc Lộc — cán bộ kỹ thuật khai khống khối lượng công trình, đại diện cho mắt xích tham nhũng cấp cơ sở",
+        "Một nhóm đồng nghiệp ăn chia nhỏ trong phòng ban, sẵn sàng cô lập và 'dằn mặt' người mới dám soi xét"
+      ],
+      "repeatableSceneTypes": [
+        "Phát hiện một dấu hiệu bất thường trong báo cáo/số liệu và lặng lẽ vào cuộc điều tra",
+        "Đối chiếu hồ sơ, chứng từ và dòng tiền để dựng một bộ chứng cứ không thể chối cãi",
+        "Vạch trần một mắt xích tham nhũng tại cuộc họp hoặc cuộc thanh tra đúng quy trình",
+        "Xử lý đúng thẩm quyền một quan tham, cứu một dự án hoặc trả lại quyền lợi cho dân",
+        "Cảnh đời thường quan trường: tìm đồng minh, hóa giải đòn thử và cô lập, chuẩn bị cho mắt xích kế tiếp"
+      ]
+    },
+    "socialReactor": {
+      "witnesses": [
+        "Đồng nghiệp và cấp trên trong cùng phòng ban, cơ quan",
+        "Khối thanh tra, kiểm toán và những cán bộ chính trực rải rác trong bộ máy",
+        "Người dân Châu Giang có đơn thư và những người được anh bảo vệ quyền lợi",
+        "Các phe lợi ích quan sát từ trong bóng tối"
+      ],
+      "reactionModes": [
+        "Sửng sốt và nể phục khi Trình Khải chỉ ra mâu thuẫn chứng cứ mà không ai dám hoặc không ai nhận ra",
+        "Cán bộ chính trực và người dân tìm đến tin cậy, đồn thổi về 'người dám soi sổ sách'",
+        "Cấp trên đánh giá lại và cân nhắc đề bạt anh vào vị trí có thực quyền hơn",
+        "Các phe nghi kỵ, dựng chuyện bôi nhọ, cô lập hoặc thử thách để dò ý đồ và sức mạnh của anh"
+      ],
+      "reportBackCadence": "Phản ứng tức thì trong cơ quan mỗi chương (đồng nghiệp, cấp trên); làn sóng dư luận, động thái đề bạt và phản đòn của các phe dồn lại mỗi 3-5 chương sau khi anh hoàn tất một vụ lật tẩy đáng chú ý."
+    },
+    "noveltyLadder": [
+      { "chapterRange": "1-130", "newToy": "Lật tẩy mắt xích tham nhũng cấp cơ sở (nghiệm thu khống) và học cách điều tra-thu thập chứng cứ an toàn", "keepsSameLane": "Vẫn là làm trong sạch bộ máy bằng chứng cứ, pháp luật và đấu trí trong môi trường công sở" },
+      { "chapterRange": "131-450", "newToy": "Đối đầu các đường dây có tổ chức của Phe Cảng (đấu thầu) và Phe Đất (quy hoạch), quy mô châu", "keepsSameLane": "Vẫn là điều tra-chứng cứ-pháp luật, chỉ tăng quy mô đối thủ và độ tinh vi của thủ đoạn" },
+      { "chapterRange": "451-770", "newToy": "Giám sát ngân sách bằng dữ liệu, truy quỹ đen, và đấu trí với Phe Cũ bảo kê không để lại dấu vết", "keepsSameLane": "Vẫn cùng lane chống tham nhũng, thêm tầng đấu trí chính trị với những đối thủ lão luyện" },
+      { "chapterRange": "771-910", "newToy": "Cuộc tổng phản công vu cáo của liên minh ba phe và màn tự minh oan lật ngược thế cờ", "keepsSameLane": "Vẫn là đối đầu bằng chứng cứ và pháp luật, ở cường độ và tầm vóc cao nhất" },
+      { "chapterRange": "911-1000", "newToy": "Chuyển từ trừng trị sang kiến tạo thể chế minh bạch bền vững ở vị trí lãnh đạo", "keepsSameLane": "Vẫn là cuộc chiến chống tham nhũng — nâng lên cấp xây dựng cơ chế thay vì chỉ phá đường dây" }
+    ],
+    "controlRules": {
+      "payoffCadence": "Tối thiểu 2 cao điểm dopamine mỗi chương (một mâu thuẫn chứng cứ được phát hiện hoặc một chứng cứ chốt được + một đòn vạch trần hoặc một quan tham lãnh hậu quả), cao điểm đầu xuất hiện trước nửa chương; setup không quá 30% và phải có payoff trong cùng hoặc chương kế.",
+      "attentionGradient": "Mở chương bằng một dấu hiệu bất thường, một đơn thư, một động thái của đối thủ hoặc một manh mối cụ thể; đóng chương bằng một cliffhanger (một chứng cứ bất ngờ, một đòn phản công sắp giáng, một mảnh sự thật vừa hé).",
+      "openThreadsPerArc": 3,
+      "closeThreadsPerArc": 2
+    },
+    "patternCards": [
+      "warm-baseline-opening",
+      "investigation-under-pressure",
+      "evidence-checkmate",
+      "public-exposure-face-slap",
+      "merit-based-promotion"
+    ]
+  }
+}

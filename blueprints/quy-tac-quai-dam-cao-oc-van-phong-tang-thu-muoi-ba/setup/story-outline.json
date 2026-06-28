@@ -1,0 +1,118 @@
+{
+  "premise": "Hạ Mục, một nhân viên văn phòng bình thường ở thành phố hiện đại, bị cuốn vào các phó bản quái đàm công sở biến dị — Tầng Mười Ba không có trên bảng nút thang máy, phòng họp đóng kín, ca trực đêm vô tận — nơi anh phải sinh tồn bằng cách đọc hiểu và tuân thủ những bản nội quy trực đêm thật-giả lẫn lộn. Anh có một lợi thế nhận thức lặng lẽ: điều khoản giả vang lên trong đầu anh bằng một giọng đọc lệch nhịp nửa giây. Nhưng nó chỉ gợi ý, không tự cứu; mọi suy luận và cái giá đều do chính anh gánh. Từ một nhân sự trực đêm sống sót, anh trở thành người giải nội quy giỏi nhất, lần ra kẻ đã soạn ra những điều khoản tử thần.",
+  "mainConflict": "Con người lý trí đối đầu một hệ thống điều khoản phi nhân được thiết kế để giết kẻ tuân thủ. Xung đột không giải quyết bằng bạo lực mà bằng đọc hiểu, đối chiếu mâu thuẫn và suy luận dưới áp lực cận tử. Leo thang từ một phó bản đơn lẻ trên Tầng Mười Ba → cụm phó bản công sở liên kết → đối đầu các phe trong Phòng Nhân Sự Đêm muốn trục lợi quái đàm → truy ra Người Soạn Nội Quy đứng sau cả tòa tháp.",
+  "themes": [
+    "Lý trí và bình tĩnh là vũ khí sinh tồn mạnh nhất",
+    "Tuân thủ nội quy một cách mù quáng giết người nhanh hơn cả nguy hiểm",
+    "Giữ được nhân tính khi sống sót đòi hỏi sự lạnh lùng",
+    "Sự thật luôn nằm trong mâu thuẫn giữa các điều khoản"
+  ],
+  "majorPlotPoints": [
+    "Ch.1: thang máy dừng ở Tầng Mười Ba không có trên bảng nút, Hạ Mục phát hiện lợi thế nhận thức và sống sót phó bản đầu tiên bằng suy luận.",
+    "Arc 1: hoàn tất phó bản Tầng Mười Ba, vạch trần điều khoản giả đã 'cho thôi việc' những người trước anh, gặp manh mối về Phòng Nhân Sự Đêm.",
+    "Arc 2-3: bước vào các phó bản công sở mới (phòng họp kín, ca trực vòng lặp), kết nối với người sống sót khác, nhận ra các phó bản chia sẻ một logic chung.",
+    "Giữa truyện: các phe trong Phòng Nhân Sự Đêm xung đột; một phe điều lính mới vào tầng chưa kiểm chứng làm vật thí nghiệm, Hạ Mục phơi bày và phá vỡ đường dây.",
+    "Cao trào cuối: truy ra danh tính Người Soạn Nội Quy và lý do tòa tháp bị gài cửa tử; Hạ Mục chọn cách 'viết lại' bản nội quy gốc thay vì bị nó nuốt chửng."
+  ],
+  "setupKernel": {
+    "readerFantasy": "Cảm giác sảng khoái khi một nhân viên văn phòng bình thường, chỉ bằng cái đầu lạnh và lý trí sắc bén, đọc thủng cái bẫy mà đồng nghiệp mù quáng bước vào — sống sót đúng giây cận tử trong khi những kẻ tự tin làm theo điều khoản giả lần lượt bị 'cho thôi việc', rồi vạch trần cho cả nhóm thấy dòng nào là dối trá. Mỗi lần giải đúng một bản nội quy là một lần độc giả thở phào và phục lăn trí tuệ của nhân vật.",
+    "protagonistEngine": "Hạ Mục thắng nhờ khả năng quan sát chi tiết hành chính, đối chiếu mâu thuẫn giữa các điều khoản và giữ bình tĩnh tuyệt đối khi đồng nghiệp hoảng loạn; lợi thế nhận thức chỉ gợi ý dòng đáng ngờ, phần suy luận và cái giá đều do anh gánh. Tính cách điềm tĩnh, lý trí, thận trọng đến lạnh lùng nhưng không vô cảm — anh vẫn cố cứu người khi còn cách, và day dứt khi không thể.",
+    "pleasureLoop": [
+      "Một bản nội quy mới hiện ra → Hạ Mục đọc, lợi thế nhận thức làm một vài điều khoản vang giọng lệch nhịp → anh suy luận xem dòng nào thật/giả ngay khi áp lực dâng cao (tension build-up).",
+      "Một đồng nghiệp tin theo điều khoản giả và phạm phải → cái giá rợn người giáng xuống họ → Hạ Mục xác nhận suy luận của mình đúng (xác nhận lạnh người + sống sót khi kẻ khác bị xóa).",
+      "Hạ Mục giải đúng một mâu thuẫn nội quy vào đúng giây cận tử → thoát hiểm trong gang tấc (deduction-saves-life peak).",
+      "Anh vạch trần một điều khoản giả trước mặt nhóm nhân sự trực đêm → cứu được một mạng tưởng đã chắc bị 'thôi việc' (vạch trần điều khoản giả + công nhận).",
+      "Hoàn tất phó bản, nhận được manh mối/vật phẩm/nội quy đã kiểm chứng → tiến gần hơn tới sự thật về Người Soạn (harvest + tiến triển).",
+      "Một mảnh sự thật về tổ chức ngầm hoặc nguồn gốc quái đàm được hé lộ → cảm giác bức màn đang được vén lên (revelation payoff)."
+    ],
+    "systemMechanic": {
+      "name": "Lợi Thế Nhận Thức — Giọng Đọc Lệch Nhịp",
+      "input": "Hạ Mục trực tiếp đọc một bản nội quy thành văn trong phó bản (thông báo in laser, biên bản họp, email trên màn hình, bảng LED); phải đọc trong trạng thái đầu óc tỉnh táo, không hoảng loạn, không kiệt sức.",
+      "output": "Những điều khoản GIẢ (được cài để giết kẻ tuân thủ) vang lên trong đầu anh bằng một giọng đọc lệch nhịp khoảng nửa giây, lạc tông so với phần còn lại; các điều khoản còn lại đọc lên bình thường, không phân biệt được thật hay vô hại.",
+      "limit": "Anti-plot-armor cứng: lợi thế CHỈ gợi ý điều khoản đáng ngờ, KHÔNG nói dòng nào phải làm, KHÔNG tự cứu anh, KHÔNG cho biết hành động đúng. Anh vẫn phải tự suy luận toàn bộ, vẫn bị xóa nếu suy luận sai sau khi đã nghe gợi ý. Lợi thế mờ đi hoặc tắt hẳn khi anh hoảng loạn, kiệt sức, bị thương, hoặc khi nội quy không ở dạng văn bản (truyền miệng, ám hiệu, biển báo hình). Một số phó bản cao cấp có điều khoản giả được 'ngụy trang' khiến giọng lệch nhịp gần như không nghe ra.",
+      "reward": "Tỉ lệ sống sót cao hơn nhờ thu hẹp được vùng nghi vấn; theo thời gian anh học được các 'mẫu' lừa của Người Soạn, giải nội quy nhanh và sâu hơn — nhưng phần thưởng thật sự luôn là một mạng người và một mảnh sự thật, không phải sức mạnh."
+    },
+    "mcOrigin": "native",
+    "originLockNote": "Hạ Mục là người bản địa, một nhân viên văn phòng bình thường sống tại đô thị năm 2025, bị cuốn vào phó bản quái đàm công sở; anh là người thường, không có bất kỳ năng lực hay ký ức đặc biệt nào từ đầu — mọi năng lực đều phát sinh tại chỗ và do anh tự rèn qua từng phó bản.",
+    "mcSecret": {
+      "secret": "Hạ Mục sở hữu lợi thế nhận thức nghe được điều khoản giả vang giọng lệch nhịp — một thứ không nhân sự trực đêm nào khác có.",
+      "outsideWorldKnowledge": "Bản thân lợi thế này là một bí ẩn in-world: nó dường như liên quan tới cách Người Soạn tạo ra nội quy, như thể anh nghe được chính 'giọng soạn thảo' của người viết; hiểu biết này vượt ngoài mọi tài liệu của Phòng Nhân Sự Đêm.",
+      "revealRule": "Giấu kín hoàn toàn ở các phó bản đầu; chỉ hé lộ một phần cho một hai đồng minh thân tín giữa truyện; nguồn gốc thật của lợi thế (mối liên hệ với Người Soạn) chỉ reveal ở cao trào cuối.",
+      "coverStory": "Anh nói mình chỉ 'nhạy với câu chữ hành chính và giỏi tìm mâu thuẫn logic', che giấu việc thực sự nghe thấy giọng lệch nhịp trên điều khoản giả."
+    },
+    "benefitLoop": {
+      "goal": "Sống sót qua từng phó bản công sở và lần ngược ra sự thật về kẻ soạn ra mọi nội quy.",
+      "action": "Đọc kỹ từng bản nội quy, đối chiếu mâu thuẫn giữa các điều khoản, quan sát hiện trường, dùng lợi thế nhận thức để thu hẹp nghi vấn rồi suy luận ra hành động đúng, đồng thời ghi chép lại nội quy đã kiểm chứng.",
+      "benefit": "Sống thêm một ca trực, cứu thêm một người, thu thêm một điều-khoản-đã-kiểm-chứng và một mảnh manh mối; uy tín trong giới nhân sự trực đêm và sự hiểu biết về logic quái đàm tăng dần.",
+      "cadence": "Mỗi 1-2 chương có ít nhất một vòng đọc-nội-quy-được-thưởng (một suy luận đúng cứu mạng hoặc một điều khoản giả bị vạch trần); mỗi 3-5 chương một bước nhảy lớn (hoàn tất một phó bản, hé lộ một mảnh sự thật, lên một bậc trong giới sống sót)."
+    },
+    "interventionRule": "Hạ Mục chỉ ra tay can thiệp khi (a) anh và những đồng nghiệp bị cuốn vào cùng phó bản đang trực tiếp đối mặt cửa tử, hoặc (b) khi anh phát hiện một phe trong giới ngầm đang lợi dụng người vô tội làm vật thí nghiệm đọc-nội-quy mà anh có đủ thông tin để phơi bày; anh không đi 'cứu thế giới' ngoài tầm với, luôn giải quyết bằng đọc hiểu, suy luận, vạch trần và tuân thủ điều khoản đúng — tuyệt đối không bằng bạo lực thể chất.",
+    "phase1Playground": {
+      "locations": [
+        "Tầng Mười Ba không có trên bảng nút thang máy — phó bản mở màn, hành lang văn phòng biến dị sau 23 giờ",
+        "Phòng họp kính tầng cao đóng kín lúc nửa đêm — phó bản 'người dự họp không tên'",
+        "Kho lưu trữ hồ sơ tầng hầm — nơi hồ sơ tự lật trang và nội quy ẩn trong các bìa tài liệu",
+        "Căn hộ trọ thật của Hạ Mục và quán cơm văn phòng dưới đường (thế giới đời thực giữa các phó bản)"
+      ],
+      "cast": [
+        "Hạ Mục (nhân viên văn phòng, MC, người đọc nội quy)",
+        "Lâm Du (thư ký bị cuốn vào phó bản phòng họp, lý trí, thành đồng minh sớm nhất)",
+        "Bác Tài (bảo vệ già của tòa tháp, biết nhiều hơn bác tỏ ra, manh mối Phòng Nhân Sự Đêm)",
+        "Trương Khải (một 'nhân sự trực đêm' kỳ cựu tự tin, đại diện cho kiểu tin nội quy mù quáng, local antagonist)",
+        "Tô Hàng (liên lạc viên Phòng Nhân Sự Đêm, vừa giúp vừa thử thách Hạ Mục)"
+      ],
+      "resources": [
+        "Lợi Thế Nhận Thức — Giọng Đọc Lệch Nhịp",
+        "Sổ tay ghi chép nội quy đã kiểm chứng của riêng anh",
+        "Quan hệ chớm nở với Lâm Du và bác Tài",
+        "Manh mối về Phòng Nhân Sự Đêm và 'sổ tay nội quy thật' của giới sống sót"
+      ],
+      "localAntagonists": [
+        "Trương Khải — nhân sự kỳ cựu tin nội quy một cách giáo điều, nhiều lần suýt kéo cả nhóm vào bẫy vì bác bỏ suy luận của Hạ Mục",
+        "Một phe nhỏ trong Phòng Nhân Sự Đêm chuyên điều người mới vào phó bản để 'thử' nội quy chưa kiểm chứng"
+      ],
+      "repeatableSceneTypes": [
+        "Đọc một bản nội quy mới, nhận ra điều khoản vang giọng lệch nhịp và suy luận thật/giả dưới áp lực",
+        "Một nhân vật khác phạm điều khoản giả và lãnh cái giá rợn người, xác nhận suy luận của Hạ Mục",
+        "Vạch trần một điều khoản giả trước nhóm để cứu một mạng vào phút chót",
+        "Hoàn tất phó bản và ghi nhận nội quy đã kiểm chứng + một mảnh manh mối về Người Soạn",
+        "Đoạn đời thực giữa hai phó bản: ghép manh mối, tiếp xúc Phòng Nhân Sự Đêm, chuẩn bị cho phó bản kế"
+      ]
+    },
+    "socialReactor": {
+      "witnesses": [
+        "Những đồng nghiệp bị cuốn vào cùng phó bản với Hạ Mục",
+        "Người sống sót khác và liên lạc viên trong Phòng Nhân Sự Đêm",
+        "Bác Tài và các 'người gác cửa' đời thực biết về quái đàm",
+        "Cộng đồng ngầm trao đổi sổ tay nội quy và xếp hạng nhân sự trực đêm"
+      ],
+      "reactionModes": [
+        "Sững sờ và phục khi Hạ Mục chỉ ra điều khoản giả mà không ai nhận ra",
+        "Người sống sót tìm đến nhờ anh giải nội quy, đồn thổi về 'kẻ đọc thủng cửa tử'",
+        "Phòng Nhân Sự Đêm nâng hạng và bắt đầu để mắt tới anh như một biến số nguy hiểm",
+        "Một số phe nghi kỵ, tung tin để cô lập hoặc thử anh"
+      ],
+      "reportBackCadence": "Phản ứng tức thì trong phó bản mỗi chương (người cùng nhóm); làn sóng đồn đại và động thái của Phòng Nhân Sự Đêm dồn lại mỗi 3-5 chương sau khi anh hoàn tất một phó bản đáng chú ý."
+    },
+    "noveltyLadder": [
+      { "chapterRange": "1-30", "newToy": "Phó bản Tầng Mười Ba — học cách đọc nội quy thật/giả và nhận ra lợi thế nhận thức", "keepsSameLane": "Vẫn là sinh tồn bằng đọc hiểu và tuân thủ nội quy trong một không gian công sở biến dị" },
+      { "chapterRange": "31-200", "newToy": "Các phó bản công sở chủ đề khác nhau (phòng họp kín, ca trực vòng lặp, kho lưu trữ) với kiểu lừa nội quy riêng", "keepsSameLane": "Vẫn là đọc-suy-luận-tuân-thủ, chỉ đổi bối cảnh và độ tinh vi của bẫy" },
+      { "chapterRange": "201-500", "newToy": "Phó bản liên kết theo cụm + đối đầu các phe trong Phòng Nhân Sự Đêm lợi dụng quái đàm", "keepsSameLane": "Vẫn là giải mã nội quy, nhưng thêm tầng đấu trí với người thật điều khiển luật chơi" },
+      { "chapterRange": "501-800", "newToy": "Nội quy 'tự sửa', phó bản lồng phó bản, manh mối về Người Soạn Nội Quy", "keepsSameLane": "Vẫn cùng lane đọc-hiểu-sinh-tồn, nâng lên cấp meta về cách nội quy được soạn ra" },
+      { "chapterRange": "801-1000", "newToy": "Đối mặt Người Soạn và lựa chọn viết lại bản nội quy gốc của cả tòa tháp", "keepsSameLane": "Vẫn là cuộc đấu trí với hệ thống điều khoản — đỉnh cao của cùng một trò chơi sinh tồn" }
+    ],
+    "controlRules": {
+      "payoffCadence": "Tối thiểu 2 cao điểm dopamine mỗi chương (một suy luận nội quy đúng cứu mạng và một điều khoản giả bị vạch trần hoặc một kẻ phạm nội quy lãnh giá); cao điểm đầu xuất hiện trước nửa chương; setup không quá 30% và phải có payoff trong cùng hoặc chương kế.",
+      "attentionGradient": "Mở chương bằng một bản nội quy mới, một dấu hiệu bất thường hoặc một mối nguy cụ thể; đóng chương bằng một cliffhanger rợn người hoặc một mảnh sự thật vừa hé.",
+      "openThreadsPerArc": 3,
+      "closeThreadsPerArc": 2
+    },
+    "patternCards": [
+      "warm-baseline-opening",
+      "deduction-under-pressure",
+      "fake-rule-exposed",
+      "survive-while-others-die",
+      "uncanny-valley-horror"
+    ]
+  }
+}

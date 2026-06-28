@@ -1,0 +1,308 @@
+{
+  "tan-tien-ta-luyen-dan-nuoi-ca-tong-mon": {
+    "projectId": "67ffabe5-f672-43d8-afdb-3ccd6f2eff9e",
+    "novelId": "8fbc7501-eda4-4a6d-b5c2-1d8e7fc9c765",
+    "genre": "tien-hiep",
+    "mcOrigin": "system-bestowed"
+  },
+  "van-gioi-thon-phe-ta-co-bang-phong-than": {
+    "projectId": "3bf4410e-a550-4bd5-b6dd-0b0b80f2300f",
+    "novelId": "8ccabeea-98d2-4127-bbdc-01da5653efb9",
+    "genre": "huyen-huyen",
+    "mcOrigin": "system-bestowed"
+  },
+  "kiem-lu-mot-dao-tran-giang-ho": {
+    "projectId": "635831f6-ce4c-45c0-a527-6692f47d9529",
+    "novelId": "6353b391-c9b3-4b88-81c4-ce88e07b0374",
+    "genre": "kiem-hiep",
+    "mcOrigin": "system-bestowed"
+  },
+  "nho-dao-khai-khoa-ta-muon-tho-van-dinh-quoc": {
+    "projectId": "c44e15e2-2f29-4a5b-9901-d4972b8cdce3",
+    "novelId": "f09f43c1-a986-4d58-aa6c-f14c0fc20b7c",
+    "genre": "lich-su",
+    "mcOrigin": "transmigrator"
+  },
+  "tinh-ham-quat-khoi-ta-la-ky-su-van-minh": {
+    "projectId": "c4711f47-4814-4075-afa4-6780f91a1ff7",
+    "novelId": "9c5ceef1-17ca-45ba-a305-58185a5307fe",
+    "genre": "khoa-huyen",
+    "mcOrigin": "system-bestowed"
+  },
+  "toan-dan-chuyen-chuc-ta-giac-ngo-an-nghe-te-dan": {
+    "projectId": "c3b6554e-c816-4833-8f10-0f63b36359b5",
+    "novelId": "0e2f084e-f169-466f-b9eb-43894108c828",
+    "genre": "vong-du",
+    "mcOrigin": "native"
+  },
+  "nghe-thau-tam-thanh-ta-biet-het-bi-mat-van-nguoi": {
+    "projectId": "c35f32bb-f375-4aa7-937e-82f9ceba5c38",
+    "novelId": "daf30efe-c83a-4cad-8574-656ca92c1ebb",
+    "genre": "dong-nhan",
+    "mcOrigin": "system-bestowed"
+  },
+  "mat-the-don-vat-tu-ta-co-kho-vo-han": {
+    "projectId": "147eccd7-c0a9-4388-92aa-5adcb33d849f",
+    "novelId": "21921f6b-dbf0-4fb1-bd63-cd18f3e9ac88",
+    "genre": "mat-the",
+    "mcOrigin": "system-bestowed"
+  },
+  "dan-tuc-quai-dam-ngo-tac-truy-hung": {
+    "projectId": "36097d5a-6e9b-45d7-b8b1-3c798d0d9c89",
+    "novelId": "3bea62a4-488c-498d-9feb-5323419114bf",
+    "genre": "linh-di",
+    "mcOrigin": "system-bestowed"
+  },
+  "quan-lo-ta-dung-so-lieu-thang-tien": {
+    "projectId": "e53587f2-2ecd-4ce1-90e9-239fa155adc7",
+    "novelId": "25464af9-0c04-4174-ab77-d6a9581f64c5",
+    "genre": "quan-truong",
+    "mcOrigin": "system-bestowed"
+  },
+  "toan-dan-lanh-chua-khai-cuc-mot-toa-thanh": {
+    "projectId": "f3eec1f0-bf71-41d4-aee8-04a3839c1b9f",
+    "novelId": "3b626388-5810-4363-8d2e-1a739ded32e2",
+    "genre": "di-gioi",
+    "mcOrigin": "transmigrator"
+  },
+  "he-thong-nu-phu-ta-song-cho-minh": {
+    "projectId": "ecd3f4b0-2e41-4a3c-a485-cb49e5aa4ab0",
+    "novelId": "4540257f-c307-4933-bfc3-055eb6e29054",
+    "genre": "ngon-tinh",
+    "mcOrigin": "system-bestowed"
+  },
+  "quy-tac-quai-dam-muoi-hai-tang-tu-vong": {
+    "projectId": "e9539725-a2bc-4d53-857d-8034e3331bde",
+    "novelId": "218d04a3-ff38-4dc5-bffd-f03ec3304736",
+    "genre": "quy-tac-quai-dam",
+    "mcOrigin": "native"
+  },
+  "ngu-thu-tien-hoa-ta-nhin-thau-tuyen-an": {
+    "projectId": "6b7dc6b8-910b-42eb-be9f-25af4897a500",
+    "novelId": "666cd369-9b6e-4a07-874b-12f11c52253c",
+    "genre": "ngu-thu-tien-hoa",
+    "mcOrigin": "system-bestowed"
+  },
+  "khoai-xuyen-nhiem-vu-cuu-vot-phao-hoi": {
+    "projectId": "b69fa2c5-10b9-41a8-8a22-ff7e4ed29bf1",
+    "novelId": "0682d70b-5375-4f8e-ab29-906b4aab2f48",
+    "genre": "khoai-xuyen",
+    "mcOrigin": "transmigrator"
+  },
+  "do-thi-thuong-chien-ta-thau-tom-thuong-truong": {
+    "projectId": "b9b71daf-253a-42c7-926c-146c82808f8b",
+    "novelId": "8c248d1a-2627-41c9-93c1-628db7464e15",
+    "genre": "do-thi",
+    "mcOrigin": "returnee"
+  },
+  "do-thi-linh-khi-phuc-toi-ta-thuc-tinh-co-vo": {
+    "projectId": "c910b675-cb84-4e53-8ff7-e0a2db9130e4",
+    "novelId": "4546a549-3628-4160-8076-0d310727cf6b",
+    "genre": "do-thi",
+    "mcOrigin": "native"
+  },
+  "do-thi-giai-tri-ta-viet-nhac-chan-dong-showbiz": {
+    "projectId": "c784fcb0-99a8-44eb-9774-b05344c75a8d",
+    "novelId": "2f9d525e-d0e7-4f04-9ab8-e6595d76b9d9",
+    "genre": "do-thi",
+    "mcOrigin": "reincarnated"
+  },
+  "tan-tien-trong-sinh-ta-nghich-thien-cai-menh": {
+    "projectId": "e60ebaed-8f4e-484d-a6ec-ca591ba4320e",
+    "novelId": "637ec998-7642-4439-ae30-cffb84d2bead",
+    "genre": "tien-hiep",
+    "mcOrigin": "reincarnated"
+  },
+  "tan-tien-linh-dien-ta-trong-trot-thanh-tien": {
+    "projectId": "71bd8fee-f52e-4eda-a7ec-a1f01ea7e242",
+    "novelId": "a11b2e4b-413a-4c0d-9f29-165a51bbb234",
+    "genre": "tien-hiep",
+    "mcOrigin": "native"
+  },
+  "huyen-huyen-trieu-hoan-ta-thong-linh-van-toc": {
+    "projectId": "9598511f-51b9-4aa6-ae4e-403a1280f62c",
+    "novelId": "24b3e09a-0e7b-4913-b4b1-1eff59ebc003",
+    "genre": "huyen-huyen",
+    "mcOrigin": "system-bestowed"
+  },
+  "huyen-huyen-vo-han-ta-pha-giai-moi-the-gioi": {
+    "projectId": "0e2055f0-a71e-4736-81df-53f1e3d9cd14",
+    "novelId": "3f4df51c-603d-4f39-b9ef-89550cdb492f",
+    "genre": "huyen-huyen",
+    "mcOrigin": "native"
+  },
+  "khoa-huyen-cyberpunk-ta-la-hac-khach-manh-nhat": {
+    "projectId": "692d68ee-b1fa-4d0a-b143-00fa166692e5",
+    "novelId": "bb92bdd0-b117-45f2-bbb7-6e854cc980aa",
+    "genre": "khoa-huyen",
+    "mcOrigin": "system-bestowed"
+  },
+  "khoa-huyen-trung-trieu-ta-lai-co-giap-cuoi-cung": {
+    "projectId": "1a7404dd-310e-4058-855d-c947c73756ab",
+    "novelId": "77bc4fca-2167-4a53-a959-d3d3c6ffaa7d",
+    "genre": "khoa-huyen",
+    "mcOrigin": "system-bestowed"
+  },
+  "lich-su-xuyen-khong-ta-khai-cong-nghiep-cuu-quoc": {
+    "projectId": "5444f9f3-3ece-4928-8570-b003e877efde",
+    "novelId": "2574923e-ec91-44a9-a4fd-134616a6f02d",
+    "genre": "lich-su",
+    "mcOrigin": "transmigrator"
+  },
+  "lich-su-trieu-hoan-ta-co-thien-co-danh-tuong": {
+    "projectId": "a9fe9bfd-5c2f-44d0-b0a9-352735814c46",
+    "novelId": "580db347-7e94-4b77-9d43-58d7b7d40148",
+    "genre": "lich-su",
+    "mcOrigin": "transmigrator"
+  },
+  "dong-nhan-chu-thien-truc-ba-ta-dan-song-van-gioi": {
+    "projectId": "bdfafafd-6855-49dc-b6bb-22ded32273e5",
+    "novelId": "2eb3db98-61d5-4dff-9cdb-497cdc5a2420",
+    "genre": "dong-nhan",
+    "mcOrigin": "system-bestowed"
+  },
+  "dong-nhan-lieu-thien-quan-ta-vao-nhom-van-gioi": {
+    "projectId": "6c804da3-f740-40c3-982d-0581c7c19799",
+    "novelId": "bbbec14e-82b0-4815-81b5-7259c73269aa",
+    "genre": "dong-nhan",
+    "mcOrigin": "system-bestowed"
+  },
+  "vong-du-lanh-dia-ta-xay-cong-hoi-bat-bai": {
+    "projectId": "813605ad-2134-4ea4-bacd-8bf54afafe84",
+    "novelId": "6249a199-a007-4477-93bc-9ca6e7730459",
+    "genre": "vong-du",
+    "mcOrigin": "native"
+  },
+  "vong-du-npc-giac-tinh-ta-la-npc-manh-nhat": {
+    "projectId": "3816b94f-b082-4e52-8b18-bc2b30e40128",
+    "novelId": "64173e59-420b-48c5-86cf-25d7f4cc1cfd",
+    "genre": "vong-du",
+    "mcOrigin": "native"
+  },
+  "kiem-hiep-tham-an-ta-pha-an-chan-dong-giang-ho": {
+    "projectId": "adebec6a-1edf-495d-8ffb-3a1936394a38",
+    "novelId": "c7a4dfc8-bf73-447b-aa6c-58e1fc6b0735",
+    "genre": "kiem-hiep",
+    "mcOrigin": "native"
+  },
+  "kiem-hiep-trong-sinh-ta-mot-kiem-tuyet-tinh-cuu": {
+    "projectId": "c9cdd51a-6189-4f40-a0e1-31f50643a6e9",
+    "novelId": "1efc26aa-b83d-4b90-9b1c-e721b401e01a",
+    "genre": "kiem-hiep",
+    "mcOrigin": "reincarnated"
+  },
+  "mat-the-xay-can-cu-ta-thu-linh-vung-an-toan": {
+    "projectId": "008d8af8-2e5f-4c1e-9f47-48edc8036fce",
+    "novelId": "11f9a7c1-02f2-4750-bbf0-d979aaab19f1",
+    "genre": "mat-the",
+    "mcOrigin": "native"
+  },
+  "mat-the-di-nang-ta-thuc-tinh-thien-phu-cap-than": {
+    "projectId": "4e52b0df-c797-46b0-89b5-ce0183d7c556",
+    "novelId": "0d372a92-caf0-483f-b6d8-448f7b75c53a",
+    "genre": "mat-the",
+    "mcOrigin": "system-bestowed"
+  },
+  "linh-di-phong-thuy-ta-xem-menh-tru-ta": {
+    "projectId": "91560860-bee2-4077-98d0-87403de43806",
+    "novelId": "dae0afcc-898f-42b2-ae1e-97407b525d72",
+    "genre": "linh-di",
+    "mcOrigin": "native"
+  },
+  "linh-di-co-mo-ta-do-dau-gap-quai-su": {
+    "projectId": "e92f8741-749a-4955-a195-25d044ebb19b",
+    "novelId": "6fb185e1-65a8-41c8-8dc7-38c2d26936b6",
+    "genre": "linh-di",
+    "mcOrigin": "native"
+  },
+  "quan-truong-phan-tham-ta-lat-tay-quan-tham": {
+    "projectId": "d52c8f58-922b-4bea-b65c-6ac90df5f014",
+    "novelId": "376f635a-76d5-4918-9e38-43a3b13768d5",
+    "genre": "quan-truong",
+    "mcOrigin": "native"
+  },
+  "quan-truong-trong-sinh-ta-nam-truoc-thoi-cuoc": {
+    "projectId": "1f696e27-3dad-40a5-baf5-ac7c1b0522dc",
+    "novelId": "55dfbf25-bc36-475a-8538-f764fa31e452",
+    "genre": "quan-truong",
+    "mcOrigin": "reincarnated"
+  },
+  "di-gioi-man-hoang-ta-khai-hoa-bo-lac-nguyen-thuy": {
+    "projectId": "2e345380-a810-46f3-b41d-72b81160071c",
+    "novelId": "e6c5053c-d5b6-49f8-a2a7-b52881be08da",
+    "genre": "di-gioi",
+    "mcOrigin": "transmigrator"
+  },
+  "di-gioi-tri-thuc-ta-dem-van-minh-dao-di-gioi": {
+    "projectId": "b3cb5eff-7cc1-4504-b5c6-99e0703565ef",
+    "novelId": "5196ca11-9ae0-4ca8-b3ad-1d23d11d76c0",
+    "genre": "di-gioi",
+    "mcOrigin": "transmigrator"
+  },
+  "ngon-tinh-hao-mon-ta-trong-sinh-doat-lai-tat-ca": {
+    "projectId": "acbc61ed-8104-4e44-9c81-5c341e9c7c3b",
+    "novelId": "21027b35-d2a8-472d-be8d-2976f5747990",
+    "genre": "ngon-tinh",
+    "mcOrigin": "reincarnated"
+  },
+  "ngon-tinh-co-dai-ta-lam-than-y-duoc-sung": {
+    "projectId": "9a53117e-b3eb-47a7-8a16-6e85a7f44951",
+    "novelId": "51abcdb4-acfa-4f53-9147-03c39a4bac28",
+    "genre": "ngon-tinh",
+    "mcOrigin": "transmigrator"
+  },
+  "quy-tac-quai-dam-cao-oc-van-phong-tang-thu-muoi-ba": {
+    "projectId": "28d3f6db-b494-4bd1-a18b-d392679fba9e",
+    "novelId": "05d8164b-f014-4bb7-a61c-833d246a1eba",
+    "genre": "quy-tac-quai-dam",
+    "mcOrigin": "native"
+  },
+  "quy-tac-quai-dam-benh-vien-ca-truc-dem": {
+    "projectId": "0c0985a3-b72c-4d89-b7cf-10e28935cea2",
+    "novelId": "74b82a03-6dbc-4374-bce1-57a86827a3c1",
+    "genre": "quy-tac-quai-dam",
+    "mcOrigin": "native"
+  },
+  "ngu-thu-tien-hoa-gia-toc-ta-vuc-day-the-gia": {
+    "projectId": "4d97ec33-d1a6-4a3c-820b-977e48bd25f0",
+    "novelId": "7e4df8a4-43d4-41ee-abb9-6014adc02e5c",
+    "genre": "ngu-thu-tien-hoa",
+    "mcOrigin": "native"
+  },
+  "ngu-thu-tien-hoa-thuong-nhan-ta-buon-than-thu": {
+    "projectId": "e49f9e2f-841a-4412-958e-2e62620a72f0",
+    "novelId": "c8bd0a66-c080-4eaf-b640-590fa860c18f",
+    "genre": "ngu-thu-tien-hoa",
+    "mcOrigin": "system-bestowed"
+  },
+  "khoai-xuyen-ta-cuu-vot-nhung-phan-phai": {
+    "projectId": "23144d10-7b56-4866-ab81-b850a28fbab2",
+    "novelId": "d46361ff-1cd5-415c-ad63-5d1393370678",
+    "genre": "khoai-xuyen",
+    "mcOrigin": "transmigrator"
+  },
+  "khoai-xuyen-dai-nu-chu-ta-khong-lam-phoi-hop": {
+    "projectId": "09e4ae1e-db4a-4b67-ba48-ba324a95774a",
+    "novelId": "5099b64c-ff41-4f62-b4cb-d357d2c24a87",
+    "genre": "khoai-xuyen",
+    "mcOrigin": "transmigrator"
+  },
+  "do-thi-nien-dai-ngu-thon-ta-lam-giau-tu-hai-san": {
+    "projectId": "a960791c-92b4-43a6-bc93-f674f8502ce3",
+    "novelId": "cf1df86e-d1e1-41e5-a03e-bfc7594c4e83",
+    "genre": "do-thi",
+    "mcOrigin": "reincarnated"
+  },
+  "do-thi-nien-dai-son-thon-ta-buon-dac-san-nui-rung": {
+    "projectId": "dca7e357-044f-46a4-a9ae-35bf8219b2f0",
+    "novelId": "844e5c7f-5115-4f67-ba1e-aa40c7877ae5",
+    "genre": "do-thi",
+    "mcOrigin": "reincarnated"
+  },
+  "do-thi-nien-dai-dien-van-ta-nau-an-nuoi-ca-nha": {
+    "projectId": "d4cad0a4-59c3-43c0-aeb8-a9b5d810b2c7",
+    "novelId": "e315fa89-2fe4-4389-92f6-989c1de5b793",
+    "genre": "do-thi",
+    "mcOrigin": "reincarnated"
+  }
+}

@@ -1,0 +1,118 @@
+{
+  "premise": "Phương Viễn, một kỹ thuật viên hậu cần bình thường, sống sót qua ngày đô thị sụp đổ vì làn sương xám biến người thành kẻ tha hóa. Không dị năng, không siêu sức mạnh — vũ khí duy nhất của anh là cái đầu lạnh và bản năng tổ chức hiếm có. Từ một bãi đỗ xe có cổng sắt, anh dựng nên vùng an toàn đầu tiên với tường, nước, kho lương và luật lệ công bằng, rồi từng bước biến đám người hoảng loạn thành một cộng đồng kỷ luật và một thế lực giữ trật tự cho cả vùng.",
+  "mainConflict": "Trật tự nhân đạo có tổ chức đối đầu hỗn loạn của mạt thế trên ba mặt trận đan xen: các băng cướp vũ trang và thế lực bạo lực muốn cướp thứ cứ điểm có; kẻ cơ hội và phản bội phá hoại từ bên trong; và các biến chủng tiến hóa cùng nguồn sương xám đe dọa sự tồn vong của mọi sự sống. Xung đột leo thang từ giữ một bức tường → giữ một cộng đồng → giữ một liên minh → dập tận gốc nguồn thảm họa, giải quyết bằng tổ chức, hậu cần và mưu lược chứ không bằng siêu sức mạnh cá nhân.",
+  "themes": [
+    "Tổ chức và kỷ luật mạnh hơn bạo lực và sức mạnh cá nhân",
+    "Lòng người và sự công bằng là pháo đài vững nhất giữa thế giới đổ nát",
+    "Chọn xây dựng thay vì cướp bóc là lựa chọn khó nhưng đúng",
+    "Một thủ lĩnh thật sự gánh trách nhiệm chứ không chỉ ra lệnh"
+  ],
+  "majorPlotPoints": [
+    "Ch.1: làn sương xám tràn qua thành phố; Phương Viễn giữ cái đầu lạnh, gom nước và lương đầu tiên, cứu vài người và chọn một bãi đỗ xe có cổng sắt làm cứ điểm.",
+    "Arc 1: dựng bức tường đầu tiên, lập luật 'ai cũng có việc, ai cũng được ăn', đẩy lui đợt tha hóa đầu tiên bằng phòng thủ có tổ chức — vùng an toàn thật sự ra đời.",
+    "Arc 2-3: cộng đồng lớn dần, xử lý kẻ cơ hội bên trong, rồi hạ băng cướp Cao Ốc bằng tình báo và cắt tiếp tế thay vì chiến tranh tổng lực.",
+    "Giữa truyện: cứ điểm thành trung tâm một liên minh vùng an toàn; Phương Viễn làm chính trị, vạch trần kẻ muốn thâu tóm liên minh.",
+    "Cao trào cuối: truy ra nguồn gốc làn sương ở lõi trung tâm thành phố, đánh bại thế lực bạo lực cuối cùng và biến chủng tổng tấn công, rồi dập nguồn sương và đặt nền cho một trật tự tái thiết."
+  ],
+  "setupKernel": {
+    "readerFantasy": "Cảm giác sảng khoái khi một người bình thường, không siêu sức mạnh, chỉ bằng cái đầu lạnh và tài tổ chức, biến một đám đông hoảng loạn thành một cỗ máy sinh tồn vận hành trơn tru — mỗi bức tường dựng lên, mỗi kho lương đầy thêm, mỗi kẻ thù mạnh hơn bị bẻ gãy bằng mưu lược thay vì bạo lực, đều cho độc giả cảm giác 'từ tay trắng dựng nên cơ đồ' và sự an tâm của trật tự thắng hỗn loạn.",
+    "protagonistEngine": "Phương Viễn thắng nhờ khả năng đọc người và đọc hệ thống: anh nhìn một nhóm hỗn loạn liền thấy ai làm được việc gì, bức tường nào sắp đổ, chuỗi cung ứng nào sắp đứt; anh giữ bình tĩnh tuyệt đối khi người khác hoảng loạn và biến tài nguyên ít ỏi thành lợi thế tối đa. Tính cách điềm tĩnh, công bằng, quyết đoán nhưng nhân hậu — anh gánh trách nhiệm của cả cộng đồng và day dứt với từng người không cứu được.",
+    "pleasureLoop": [
+      "Một khủng hoảng tài nguyên hoặc một mối đe dọa cụ thể ập tới → Phương Viễn đọc tình hình, phân công và lên kế hoạch dưới áp lực (tension build-up).",
+      "Kế hoạch của anh vận hành đúng như tính toán → một bức tường dựng xong, một chuyến lấy tài nguyên thành công, một đợt tấn công bị đẩy lui (competence payoff + harvest).",
+      "Một kẻ kiêu ngạo hoặc thù địch coi thường tổ chức của anh → bị mưu lược của anh bẻ gãy gọn gàng mà không cần liều mạng (vạch mặt + sảng).",
+      "Người sống sót được cứu và nhận ra cứ điểm này thật sự an toàn, công bằng → tin theo, ở lại, ngưỡng mộ (recognition + cộng đồng lớn mạnh).",
+      "Cứ điểm/liên minh lên một bậc quy mô mới (thêm tường, thêm người, thêm lãnh thổ, thêm tài nguyên chiến lược) → cảm giác cơ đồ vững thêm (milestone).",
+      "Một mảnh sự thật về làn sương hoặc biến chủng được hé lộ → bức màn bí ẩn trung tâm được vén thêm một chút (revelation payoff)."
+    ],
+    "systemMechanic": {
+      "name": "Bản Năng Tổ Chức — Tầm Nhìn Hậu Cần",
+      "input": "Phương Viễn quan sát trực tiếp một nhóm người, một công sự, hoặc một chuỗi cung ứng tài nguyên trong trạng thái đầu óc tỉnh táo, có đủ thông tin hiện trường và thời gian tối thiểu để cân nhắc.",
+      "output": "Anh nhận ra rõ ràng năng lực và điểm yếu của từng người, lỗ hổng của phòng thủ, và mắt xích sắp đứt trong nguồn cung — từ đó dựng được kế hoạch phân công và bố trí tối ưu với tài nguyên hiện có.",
+      "limit": "Anti-plot-armor cứng: bản năng này CHỈ cho anh phân tích đúng và kế hoạch tốt — KHÔNG cho anh sức mạnh thể chất, KHÔNG tự thực thi kế hoạch, KHÔNG bảo đảm thành công nếu thiếu người/thiếu tài nguyên. Kế hoạch vẫn thất bại nếu cấp dưới làm sai, nếu địch ngoài dự liệu, hoặc nếu anh thiếu thông tin. Tầm nhìn mờ đi khi anh kiệt sức, hoảng loạn, hoặc khi tình huống hỗn loạn ngoài tầm quan sát; bản thân Phương Viễn vẫn yếu đuối về thể chất và có thể chết như mọi người thường.",
+      "reward": "Tỉ lệ sống sót của cả cộng đồng tăng nhờ tổ chức tốt; theo thời gian anh tích lũy kinh nghiệm chỉ huy, quy trình chuẩn và uy tín — nhưng phần thưởng thật sự luôn là một bức tường vững hơn, một mạng người được cứu và một bước mở rộng cộng đồng, không phải sức mạnh cá nhân."
+    },
+    "mcOrigin": "native",
+    "originLockNote": "Phương Viễn là người bản địa, một kỹ thuật viên hậu cần bình thường sống tại đô thị, sống sót qua ngày thành phố sụp đổ; anh là người thường, không dị năng, không siêu sức mạnh, không ký ức đặc biệt nào từ đầu — mọi năng lực đều là kỹ năng tổ chức và hậu cần anh tự rèn tại chỗ qua từng giai đoạn mạt thế.",
+    "mcSecret": {
+      "secret": "Phương Viễn sở hữu một bản năng tổ chức và tầm nhìn hậu cần khác thường, cho anh đọc thấu năng lực con người và lỗ hổng hệ thống nhanh hơn bất kỳ ai quanh anh.",
+      "outsideWorldKnowledge": "Phần lớn người sống sót nghĩ thời mạt thế chỉ cần sức mạnh và vũ khí; Phương Viễn hiểu rằng thứ quyết định sống còn lâu dài là chuỗi cung ứng, kỷ luật và lòng người — một tri thức hệ thống mà những kẻ chỉ biết cướp bóc hoàn toàn thiếu, khiến mọi tính toán của họ luôn chậm anh một bước.",
+      "revealRule": "Giấu kín mức độ thật của bản năng này ở giai đoạn đầu (anh chỉ tỏ ra là người 'biết tính toán'); hé lộ dần cho vài cộng sự thân tín giữa truyện; tầm ảnh hưởng đầy đủ của nó chỉ lộ rõ khi anh điều phối cả một liên minh ở cao trào.",
+      "coverStory": "Anh nói mình chỉ là 'một tay hậu cần quen tính toán, may mắn giữ được bình tĩnh', che giấu việc thật sự đọc thấu người và hệ thống tới mức nào."
+    },
+    "benefitLoop": {
+      "goal": "Dựng và giữ vững một vùng an toàn, rồi mở rộng nó thành một trật tự bền vững giữa mạt thế.",
+      "action": "Quan sát tình hình, dùng tầm nhìn hậu cần phân công người và bố trí phòng thủ, tổ chức các chuyến thu thập tài nguyên có quy trình, lập và thực thi luật lệ công bằng, đàm phán/ly gián/cắt tiếp tế để xử lý kẻ thù bằng mưu lược.",
+      "benefit": "Một bức tường vững hơn, kho lương đầy thêm, người sống sót mới gia nhập, một mối đe dọa bị vô hiệu hóa, lãnh thổ và uy tín mở rộng; tri thức và quy trình tổ chức của cộng đồng tích lũy dần.",
+      "cadence": "Mỗi 1-2 chương có ít nhất một vòng tổ chức-được-thưởng (một kế hoạch nhỏ thành công, một kẻ ngạo mạn bị bẻ gãy, một tài nguyên quan trọng thu được); mỗi 3-5 chương một bước nhảy lớn (mở rộng cứ điểm, đẩy lui một đợt tấn công lớn, hạ một thế lực, hé lộ một mảnh sự thật về sương)."
+    },
+    "interventionRule": "Phương Viễn chỉ ra tay can thiệp khi (a) cộng đồng anh chịu trách nhiệm bị đe dọa trực tiếp về an toàn hoặc tài nguyên sống còn, hoặc (b) khi anh có đủ thông tin và nguồn lực để cứu một nhóm người sống sót mà không đặt cứ điểm vào rủi ro vô lý; anh không lao đi 'cứu cả thế giới' ngoài tầm với, luôn ưu tiên giải pháp tổ chức — đàm phán, ly gián, cắt tiếp tế, phòng thủ có chuẩn bị — và chỉ dùng vũ lực khi không còn lựa chọn nào khác, luôn dưới dạng hành động tập thể có kỷ luật chứ không phải anh hùng cá nhân liều mạng.",
+    "phase1Playground": {
+      "locations": [
+        "Bãi đỗ xe nhiều tầng có cổng sắt — cứ điểm mở màn và bức tường đầu tiên",
+        "Trạm bơm nước và khu dân cư lân cận — nguồn nước sạch đầu tiên phải giành lấy",
+        "Siêu thị và nhà thuốc gần đó — mỏ tài nguyên kiêm tử địa của các chuyến thu thập",
+        "Khu phố đổ nát quanh cứ điểm — nơi cứu người, trinh sát và chạm trán bầy tha hóa"
+      ],
+      "cast": [
+        "Phương Viễn (kỹ thuật viên hậu cần, MC, người tổ chức và thủ lĩnh)",
+        "Trần Mục (cựu kỹ sư xây dựng, giúp dựng tường và công sự, cánh tay kỹ thuật của Phương Viễn)",
+        "Lý Hân (y tá trẻ lý trí, lập trạm xá và quy trình khám phơi nhiễm, đồng minh sớm nhất)",
+        "Ông Tư (bảo vệ già của bãi đỗ xe, biết rõ địa hình và các lối ngầm, cố vấn lặng lẽ)",
+        "Đỗ Cường (một kẻ sống sót khỏe mạnh nhưng ngạo mạn, coi thường tổ chức, local antagonist)"
+      ],
+      "resources": [
+        "Bản Năng Tổ Chức — Tầm Nhìn Hậu Cần",
+        "Sổ tồn kho và sổ phân công của riêng Phương Viễn",
+        "Cổng sắt, vật liệu xây tường và hào lửa của bãi đỗ xe",
+        "Quan hệ chớm nở với Trần Mục, Lý Hân và ông Tư cùng nhóm sống sót đầu tiên"
+      ],
+      "localAntagonists": [
+        "Đỗ Cường — kẻ khỏe mạnh ngạo mạn tin vào nắm đấm, nhiều lần phá vỡ kỷ luật và suýt kéo nhóm vào nguy hiểm vì coi thường kế hoạch của Phương Viễn",
+        "Một băng cướp nhỏ lảng vảng quanh siêu thị, chuyên cướp tài nguyên của các nhóm sống sót yếu hơn"
+      ],
+      "repeatableSceneTypes": [
+        "Một khủng hoảng tài nguyên hoặc mối đe dọa ập tới, Phương Viễn đọc tình hình và phân công bố trí dưới áp lực",
+        "Một chuyến thu thập tài nguyên hoặc một đợt phòng thủ vận hành đúng kế hoạch và thành công nhờ chuẩn bị",
+        "Một kẻ ngạo mạn hoặc thù địch coi thường tổ chức bị mưu lược của Phương Viễn bẻ gãy gọn gàng",
+        "Cứu một nhóm người sống sót, sàng lọc và đón họ vào cộng đồng theo luật lệ công bằng",
+        "Đoạn lắng giữa các khủng hoảng: kiểm kho, củng cố tường, gắn kết cộng đồng, chuẩn bị cho mối đe dọa kế"
+      ]
+    },
+    "socialReactor": {
+      "witnesses": [
+        "Nhóm người sống sót trong cứ điểm và những người mới gia nhập",
+        "Các nhóm sống sót khác trong vùng và những thủ lĩnh nhỏ lân cận",
+        "Băng cướp và thế lực thù địch dòm ngó tài nguyên của cứ điểm",
+        "Cộng đồng trao đổi tin tức, bản đồ và tài nguyên giữa các vùng an toàn"
+      ],
+      "reactionModes": [
+        "Người sống sót cảm phục và an tâm khi thấy cứ điểm có trật tự, công bằng và thật sự an toàn",
+        "Tin đồn về 'vùng an toàn của người biết tổ chức' lan ra, người ta lũ lượt tìm tới gõ cổng",
+        "Các thủ lĩnh khác tìm đến đề nghị liên minh, đổi chác, hoặc dè chừng Phương Viễn như một đối thủ",
+        "Thế lực thù địch xem cứ điểm vừa là miếng mồi vừa là mối nguy, tìm cách cướp hoặc phá từ bên trong"
+      ],
+      "reportBackCadence": "Phản ứng tức thì trong cộng đồng mỗi chương (người trong cứ điểm); làn sóng đồn đại và động thái của các thế lực bên ngoài dồn lại mỗi 3-5 chương sau mỗi lần cứ điểm vượt qua một khủng hoảng hoặc mở rộng đáng kể."
+    },
+    "noveltyLadder": [
+      { "chapterRange": "1-130", "newToy": "Dựng vùng an toàn đầu tiên từ một bãi đỗ xe — tường, nước, luật lệ và phòng thủ chống đợt tha hóa đầu", "keepsSameLane": "Vẫn là sinh tồn bằng tổ chức và hậu cần trong một thế giới mạt thế sụp đổ" },
+      { "chapterRange": "131-280", "newToy": "Quản lý một cộng đồng đông đảo: sàng lọc, phân khu, xử lý mâu thuẫn nội bộ và kẻ cơ hội", "keepsSameLane": "Vẫn là tổ chức-phân công-giữ trật tự, chỉ tăng quy mô và độ phức tạp của con người" },
+      { "chapterRange": "281-430", "newToy": "Đối đầu thế lực người sống sót thù địch bằng tình báo, cắt tiếp tế và đòn tâm lý", "keepsSameLane": "Vẫn là mưu lược thay vì bạo lực, thêm tầng đấu trí với kẻ thù có tổ chức" },
+      { "chapterRange": "431-730", "newToy": "Làm chính trị giữa một liên minh nhiều vùng và đối phó biến chủng tiến hóa phá tường", "keepsSameLane": "Vẫn cùng lane tổ chức-phòng thủ-giữ trật tự, nâng lên cấp liên minh và công sự tầm cao" },
+      { "chapterRange": "731-1000", "newToy": "Khủng hoảng kép cuối cùng và chiến dịch dập nguồn sương để tái thiết một trật tự bền vững", "keepsSameLane": "Vẫn là bài toán giữ trật tự và tổ chức nguồn lực — ở quy mô lớn nhất và đặt nền cho tương lai" }
+    ],
+    "controlRules": {
+      "payoffCadence": "Tối thiểu 2 cao điểm dopamine mỗi chương (một kế hoạch tổ chức vận hành đúng + một kẻ ngạo mạn/thù địch bị bẻ gãy hoặc một tài nguyên/người quan trọng thu về); cao điểm đầu xuất hiện trước nửa chương; setup không quá 30% và phải có payoff trong cùng hoặc chương kế.",
+      "attentionGradient": "Mở chương bằng một khủng hoảng tài nguyên, một mối đe dọa cụ thể hoặc một cơ hội mở rộng; đóng chương bằng một cliffhanger căng thẳng hoặc một thắng lợi tổ chức vừa giành được mở ra thách thức kế.",
+      "openThreadsPerArc": 3,
+      "closeThreadsPerArc": 2
+    },
+    "patternCards": [
+      "warm-baseline-opening",
+      "competence-led-organization",
+      "scheme-beats-brute-force",
+      "base-building-milestone",
+      "survival-community-grows"
+    ]
+  }
+}

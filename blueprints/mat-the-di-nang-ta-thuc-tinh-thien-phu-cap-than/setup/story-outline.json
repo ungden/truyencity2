@@ -1,0 +1,118 @@
+{
+  "premise": "Tần Lôi, một sinh viên bản địa bình thường, trong đêm Tinh Triều giáng xuống và hủy diệt văn minh đã thức tỉnh thiên phú cấp Thần — một hệ năng lực tiến hóa độc nhất do Tinh Triều ban xuống ngay trong thế giới này, cho phép anh hấp thụ và dung hợp tinh túy của kẻ địch đánh bại để tiến hóa sức mạnh của chính mình. Từ một người sống sót yếu ớt, anh đột phá qua từng trận sinh tử, leo các nấc thang dị năng, vừa che chở những người yếu bên cạnh vừa truy ra bí ẩn nguồn gốc Tinh Triều.",
+  "mainConflict": "Một người thức tỉnh mạnh lên không ngừng đối đầu một thế giới tận thế nơi sức mạnh quyết định sống chết, trên nhiều tầng leo thang: dị thú tiến hóa từ bầy thấp tới lãnh chúa thông minh; các bang hội, gia tộc và cường giả tranh giành tài nguyên và địa vị; và sau cùng là thế lực ẩn thao túng Tinh Triều cùng cội nguồn của thảm họa. Tần Lôi giải quyết bằng chiến đấu đổ máu và trí tuệ chiến đấu, mạnh lên qua thắng lợi trả bằng rủi ro sinh tử chứ không bằng may mắn.",
+  "themes": [
+    "Sức mạnh đổi bằng máu — mỗi đột phá là một trận sinh tử thật sự",
+    "Mạnh lên không phải để thống trị mà để bảo vệ người mình trân trọng",
+    "Tận thế lột trần bản chất con người: kẻ ức hiếp và người che chở",
+    "Tiến hóa không ngừng là con đường sống duy nhất giữa thế giới tàn khốc"
+  ],
+  "majorPlotPoints": [
+    "Ch.1: Tinh Triều giáng xuống; Tần Lôi thức tỉnh thiên phú cấp Thần và lập tức dùng nó hạ rồi hấp thụ con dị thú đầu tiên để sống sót.",
+    "Arc 1: làm chủ cơ chế hấp thụ-dung hợp-tiến hóa và cái giá phản phệ; che chở em gái và nhóm bạn, đánh bại một kẻ thức tỉnh ức hiếp người yếu, tiến hóa một bậc.",
+    "Arc 2-3: bước vào trật tự thành phố an toàn và hệ thứ hạng dị năng; lập công trong đội săn, rồi hạ một lãnh chúa dị thú thông minh cấp cao và đột phá mạnh.",
+    "Giữa truyện: danh tiếng kéo theo kẻ thù mạnh; Tần Lôi dựng thế lực riêng, đánh bại một cường giả cấp A mưu mô.",
+    "Cao trào cuối: truy ra nguồn gốc Tinh Triều và bản chất thiên phú cấp Thần, vượt lên cấp S rồi cấp Thần, đối đầu thế lực ẩn cùng cội nguồn thảm họa và định hình tương lai loài người."
+  ],
+  "setupKernel": {
+    "readerFantasy": "Cảm giác sảng khoái nhiệt huyết khi một người sống sót bình thường mạnh lên không ngừng — mỗi trận sinh tử là một bậc tiến hóa, mỗi kẻ địch mạnh hơn bị đánh bại lại biến thành tinh túy nuôi sức mạnh của chính mình, mỗi lần đột phá đúng lằn ranh cái chết khiến độc giả nín thở rồi reo lên; và phía sau cơn cuồng phong sức mạnh ấy là sự ấm áp của một người dùng chính sức mạnh đó để che chở cho những người yếu hơn.",
+    "protagonistEngine": "Tần Lôi thắng nhờ thiên phú tiến hóa độc nhất kết hợp với gan lì dám lao vào sinh tử, đầu óc chiến đấu nhạy bén và ý chí không lùi bước khi đối thủ mạnh hơn; anh đọc được điểm yếu của kẻ địch trong trận và biết khi nào nên giấu thực lực, khi nào nên bùng nổ. Tính cách kiên định, trọng tình nghĩa, lạnh lùng với kẻ ác nhưng ấm với người thân — anh mạnh lên để bảo vệ chứ không để áp bức.",
+    "pleasureLoop": [
+      "Một kẻ địch hoặc dị thú mạnh hơn xuất hiện và ép Tần Lôi vào thế nguy → căng thẳng dâng cao khi anh tính cách chiến đấu (tension build-up).",
+      "Tần Lôi lật ngược thế cờ đúng lằn ranh sinh tử, đánh bại đối thủ mạnh hơn bằng thiên phú và trí tuệ chiến đấu (đột phá cứu mạng + sảng).",
+      "Anh hấp thụ tinh túy/tinh hạch của kẻ vừa hạ và tiến hóa năng lực lên tầm cao hơn → sức mạnh mới hiện ra (harvest + power-up cụ thể).",
+      "Một kẻ ngạo mạn coi thường hoặc ức hiếp Tần Lôi và người yếu bị anh đánh bại công khai → vạch mặt và trừng trị (face-slap + công nhận).",
+      "Người Tần Lôi che chở được giữ an toàn hoặc một nhóm sống sót được cứu nhờ sức mạnh của anh → ấm áp và ý nghĩa (bảo vệ + recognition).",
+      "Một mảnh bí ẩn về Tinh Triều hoặc về thiên phú cấp Thần được hé lộ → bức màn trung tâm được vén thêm (revelation payoff)."
+    ],
+    "systemMechanic": {
+      "name": "Thiên Phú Cấp Thần — Hấp Thụ Tiến Hóa",
+      "input": "Tần Lôi phải thật sự đánh bại một dị thú hoặc kẻ địch trong sinh tử rồi hấp thụ tinh túy/tinh hạch của chúng; quá trình hấp thụ đòi hỏi anh còn đủ tỉnh táo và thể lực để chủ động dung hợp.",
+      "output": "Anh thu được tinh túy năng lực của đối thủ và có thể dung hợp nó để tiến hóa năng lực của chính mình — không bị khóa vào một hệ cố định, mà mở rộng và nâng cấp theo những gì đã đánh bại.",
+      "limit": "Anti-plot-armor cứng: thiên phú KHÔNG cho sức mạnh miễn phí — anh phải tự đánh bại đối thủ trước (thiên phú không tự chiến đấu thay anh); hấp thụ thứ vượt quá sức chịu đựng gây phản phệ, có thể trọng thương hoặc chết; mỗi năng lực mới cần thời gian và thực chiến để thuần hóa, dùng vội thì phản tác dụng; hấp thụ kiệt sức khiến anh yếu đi tạm thời và dễ bị tập kích. Anh KHÔNG bất khả chiến bại — đối thủ vượt quá nhiều bậc vẫn giết được anh nếu anh liều lĩnh.",
+      "reward": "Mỗi trận thắng sinh tử đổi lấy một bậc tiến hóa thật sự và một năng lực/sức mạnh mới; theo thời gian anh tích lũy một kho năng lực dung hợp đa dạng và độc nhất — nhưng phần thưởng luôn trả bằng máu và rủi ro, không bao giờ miễn phí."
+    },
+    "mcOrigin": "system-bestowed",
+    "originLockNote": "Tần Lôi là người bản địa, một sinh viên bình thường sống tại đô thị; thiên phú cấp Thần của anh do Tinh Triều — golden finger có nguồn IN-WORLD — ban xuống ngay trong thế giới này trong đêm tận thế. Anh không có bất kỳ năng lực hay ký ức đặc biệt nào trước đó; mọi sức mạnh đều phát sinh và tiến hóa tại chỗ qua chiến đấu đổ máu.",
+    "mcSecret": {
+      "secret": "Tần Lôi thức tỉnh thiên phú cấp Thần — một hệ năng lực tiến hóa độc nhất cho phép hấp thụ và dung hợp tinh túy kẻ địch, thuộc hàng bậc cao nhất mà gần như không người thức tỉnh nào khác có.",
+      "outsideWorldKnowledge": "Bản chất thiên phú này là một bí ẩn in-world: nó dường như cộng hưởng với chính cơ chế Tinh Triều, như thể anh được Tinh Triều 'chọn', một mối liên hệ vượt ngoài mọi hiểu biết của các thế lực người thức tỉnh đương thời.",
+      "revealRule": "Giấu kín chiều sâu thật của thiên phú ở giai đoạn đầu (anh tỏ ra chỉ là người thức tỉnh hạng thường có tiềm năng); hé lộ một phần cho vài đồng minh thân tín giữa truyện; nguồn gốc thật của thiên phú (mối liên hệ với cội nguồn Tinh Triều) chỉ reveal ở cao trào cuối.",
+      "coverStory": "Anh nói mình chỉ thức tỉnh 'một hệ cường hóa bình thường, may mắn hợp với thực chiến', che giấu khả năng hấp thụ-tiến hóa thật sự để tránh thành mục tiêu của các thế lực lớn."
+    },
+    "benefitLoop": {
+      "goal": "Sống sót và mạnh lên không ngừng để bảo vệ những người mình trân trọng, đồng thời truy ra sự thật về Tinh Triều.",
+      "action": "Dám lao vào các trận sinh tử với dị thú và kẻ địch mạnh hơn, dùng trí tuệ chiến đấu để thắng, hấp thụ tinh túy và dung hợp tiến hóa năng lực, thuần hóa sức mạnh mới qua thực chiến, và che chở người yếu quanh mình.",
+      "benefit": "Một bậc tiến hóa và một năng lực mới sau mỗi trận thắng, một kẻ ác bị trừng trị, một người được cứu, một mảnh manh mối về Tinh Triều; thực lực, danh tiếng và thế lực của anh tăng dần.",
+      "cadence": "Mỗi 1-2 chương có ít nhất một vòng chiến đấu-được-thưởng (một trận thắng đổi lấy tiến hóa nhỏ hoặc một kẻ ngạo mạn bị bẻ gãy); mỗi 3-5 chương một bước nhảy lớn (đột phá một bậc dị năng, hạ một kẻ địch/dị thú lớn, hé lộ một mảnh sự thật về Tinh Triều)."
+    },
+    "interventionRule": "Tần Lôi ra tay khi (a) bản thân hoặc những người anh che chở bị đe dọa trực tiếp, hoặc (b) khi anh chứng kiến kẻ mạnh ức hiếp người yếu trong tầm với và đủ thực lực để can thiệp mà không tự sát; anh không lao đi 'cứu cả thế giới' vượt quá thực lực hiện tại, biết giấu sức mạnh và chọn thời điểm, ưu tiên bảo vệ người thân cận trước; anh giải quyết bằng chiến đấu trực diện và trí tuệ chiến đấu — combat là phương tiện chính của genre này — nhưng luôn cân nhắc rủi ro phản phệ và không liều lĩnh ngoài khả năng tiến hóa của mình.",
+    "phase1Playground": {
+      "locations": [
+        "Khu ký túc xá và đường phố đô thị đêm Tinh Triều — nơi mở màn thức tỉnh và trận sinh tử đầu tiên",
+        "Điểm trú ẩn tạm (một trường học hoặc tòa nhà kiên cố) — nơi nhóm sống sót co cụm những ngày đầu",
+        "Khu vực săn dị thú cấp thấp quanh đó — nơi Tần Lôi rèn luyện và tiến hóa qua thực chiến",
+        "Rìa một thành phố an toàn có tường năng lượng — nơi anh lần đầu chạm trật tự người thức tỉnh"
+      ],
+      "cast": [
+        "Tần Lôi (sinh viên, MC, người thức tỉnh thiên phú cấp Thần)",
+        "Tần Nhi (em gái Tần Lôi, người anh quyết bảo vệ bằng mọi giá, động lực cốt lõi)",
+        "Lê Phong (bạn học cùng thức tỉnh, hệ cường hóa thể chất, đồng đội chiến đấu sớm nhất)",
+        "Diệp Thanh (một người thức tỉnh hệ trị liệu lý trí, gia nhập nhóm và thành chỗ dựa hậu cần)",
+        "Mã Hùng (một kẻ thức tỉnh cấp cao hơn, hung hãn, ức hiếp người yếu trong khu trú ẩn, local antagonist)"
+      ],
+      "resources": [
+        "Thiên Phú Cấp Thần — Hấp Thụ Tiến Hóa",
+        "Tinh hạch của các dị thú đã hạ (nhiên liệu tiến hóa và tiền tệ)",
+        "Kho năng lực dung hợp đang lớn dần của Tần Lôi",
+        "Nhóm đồng đội thân tín (Lê Phong, Diệp Thanh) và em gái Tần Nhi để bảo vệ"
+      ],
+      "localAntagonists": [
+        "Mã Hùng — kẻ thức tỉnh cấp cao hơn, hung hãn và ngạo mạn, cướp bóc và ức hiếp người yếu trong khu trú ẩn, coi thường Tần Lôi cho tới khi bị anh hạ",
+        "Một bầy dị thú cấp thấp có thủ lĩnh đang dần tiến hóa, đe dọa điểm trú ẩn của nhóm"
+      ],
+      "repeatableSceneTypes": [
+        "Một kẻ địch hoặc dị thú mạnh hơn xuất hiện, Tần Lôi tính cách chiến đấu dưới áp lực rồi lật ngược thế cờ",
+        "Đánh bại đối thủ trong sinh tử rồi hấp thụ tinh túy/tinh hạch để tiến hóa một năng lực mới cụ thể",
+        "Một kẻ ngạo mạn ức hiếp người yếu bị Tần Lôi đánh bại công khai và trừng trị",
+        "Che chở em gái và đồng đội, cứu một nhóm sống sót khỏi dị thú hoặc kẻ ác",
+        "Đoạn lắng giữa các trận: thuần hóa sức mạnh mới, gắn kết nhóm, ghép manh mối về Tinh Triều, chuẩn bị cho thử thách kế"
+      ]
+    },
+    "socialReactor": {
+      "witnesses": [
+        "Em gái Tần Nhi và nhóm đồng đội thân tín của Tần Lôi",
+        "Người sống sót trong khu trú ẩn và thành phố an toàn",
+        "Các đội săn, gia tộc, bang hội và cường giả trong trật tự người thức tỉnh",
+        "Cộng đồng người thức tỉnh trao đổi tin tức về các cao thủ và thứ hạng dị năng"
+      ],
+      "reactionModes": [
+        "Người yếu được che chở cảm kích và đặt niềm tin vào Tần Lôi",
+        "Kẻ ngạo mạn coi thường rồi sững sờ khi bị anh đánh bại với thực lực vượt dự đoán",
+        "Các thế lực bắt đầu để mắt, vừa muốn chiêu mộ vừa dè chừng anh như một biến số nguy hiểm",
+        "Tin đồn về một người thức tỉnh trẻ mạnh lên với tốc độ phi thường lan rộng trong giới"
+      ],
+      "reportBackCadence": "Phản ứng tức thì trong nhóm và hiện trường trận chiến mỗi chương; làn sóng đồn đại và động thái của các thế lực dồn lại mỗi 3-5 chương sau mỗi lần Tần Lôi lập chiến tích hoặc đột phá đáng chú ý."
+    },
+    "noveltyLadder": [
+      { "chapterRange": "1-130", "newToy": "Thức tỉnh thiên phú cấp Thần và làm chủ cơ chế hấp thụ-dung hợp-tiến hóa cùng cái giá phản phệ", "keepsSameLane": "Vẫn là sinh tồn tiến hóa bằng chiến đấu trong thế giới tận thế dị năng" },
+      { "chapterRange": "131-280", "newToy": "Hệ thứ hạng dị năng và trật tự thành phố an toàn — đội săn, mỏ tinh hạch, cạnh tranh", "keepsSameLane": "Vẫn là chiến đấu-hấp thụ-tiến hóa, thêm tầng xã hội và cạnh tranh của người thức tỉnh" },
+      { "chapterRange": "281-430", "newToy": "Lãnh chúa dị thú thông minh cấp cao và chiến dịch đột kích sào huyệt", "keepsSameLane": "Vẫn là leo nấc thang sức mạnh qua sinh tử, nâng tầm đối thủ lên dị thú tiến hóa" },
+      { "chapterRange": "431-730", "newToy": "Tranh bá với các thế lực người thức tỉnh mạnh và truy bí ẩn nguồn gốc Tinh Triều", "keepsSameLane": "Vẫn cùng lane chiến đấu-tiến hóa, thêm tầng tranh bá và bí ẩn trung tâm" },
+      { "chapterRange": "731-1000", "newToy": "Đột phá cấp S rồi cấp Thần và đối đầu thế lực ẩn cùng cội nguồn Tinh Triều", "keepsSameLane": "Vẫn là cuộc tiến hóa qua sinh tử — ở đỉnh cao nhất của cùng một con đường sức mạnh" }
+    ],
+    "controlRules": {
+      "payoffCadence": "Tối thiểu 2 cao điểm dopamine mỗi chương (một trận thắng/đột phá đúng lằn ranh sinh tử + một kẻ ngạo mạn bị bẻ gãy hoặc một năng lực mới hấp thụ được); cao điểm đầu xuất hiện trước nửa chương; setup không quá 30% và phải có payoff trong cùng hoặc chương kế.",
+      "attentionGradient": "Mở chương bằng một mối đe dọa cụ thể, một kẻ địch mạnh hơn hoặc một cơ hội tiến hóa; đóng chương bằng một cliffhanger căng thẳng hoặc một đột phá sức mạnh vừa giành được mở ra thử thách kế.",
+      "openThreadsPerArc": 3,
+      "closeThreadsPerArc": 2
+    },
+    "patternCards": [
+      "warm-baseline-opening",
+      "evolution-through-life-or-death",
+      "face-slap-the-arrogant",
+      "power-up-milestone",
+      "protect-the-weak"
+    ]
+  }
+}

@@ -1,0 +1,7 @@
+Năm 2005, Trần Gia Khang rời Sài Gòn sang Nhật theo diện thực tập sinh, bắt đầu từ chân rửa bát trong một quán izakaya nhỏ ở Osaka. Năm năm sau anh về nước — nhưng trong đầu anh là ký ức của trọn một kiếp đã sống: mười lăm năm lăn lộn từ phụ bếp lên bếp chính một quán ramen có tiếng giữa Tokyo, thấm cả kỹ thuật bếp Nhật chuẩn mực lẫn nghệ thuật vận hành nhà hàng. Anh gục xuống giữa một ca đêm vì kiệt sức, rồi mở mắt ra ở Sài Gòn năm 2010 — đúng vào lúc đồ Nhật ở Việt Nam còn là thứ xa lạ, lúc một tô ramen đúng vị vẫn là điều chưa ai từng nếm.
+
+Khang biết một cơn sóng đang tới. Vài năm nữa thôi, người Sài Gòn sẽ xếp hàng vì ramen, sẽ hẹn nhau ở izakaya sau giờ làm, sẽ gọi tên những món mà hôm nay họ còn ngại "cá sống tanh". Và anh — với đôi tay đã quen dao thớt tới thành bản năng, với một kho ký ức về những gì sắp xảy ra — sẽ là người đón con sóng ấy từ khi nó còn chưa thành hình.
+
+Anh mở một quán nhỏ mang tên **Aniki**, ở **112 Trần Khắc Chân, Phường Tân Định** — một con đường nhỏ gần chợ Tân Định. Vài bàn gỗ, một quầy bếp mở để khách ngồi nhìn anh nấu, tấm rèm noren khẽ lay trước cửa. Từ đĩa cơm cá hồi áp chảo còn xèo xèo trên lớp da vàng giòn, tới bát ramen nước dùng hầm mười hai tiếng trong veo mà đậm tới tận đáy lưỡi — mỗi món ăn ở Aniki là một lời mời, và là một viên gạch đầu tiên cho điều lớn hơn rất nhiều: một thương hiệu, một chuỗi, một hành trình của người đàn ông tử tế chỉ muốn nấu cho người ta một bữa ngon.
+
+Đây là câu chuyện về món ăn, về đồng vốn, về từng người khách bước qua tấm rèm cửa — và về một quán ăn có thật mà bạn có thể tìm đến.

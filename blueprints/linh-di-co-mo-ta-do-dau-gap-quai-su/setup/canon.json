@@ -1,0 +1,199 @@
+{
+  "power_system": {
+    "name": "Cảm Khí Quán Mộ + Truyền Thừa Đổ Đấu",
+    "type": "cognitive-perception + occult-craft (giác quan đọc tử khí và kết cấu ẩn dưới lòng đất + kỹ thuật đổ đấu từ bút ký, KHÔNG phải võ lực)",
+    "coreResource": "Sự tỉnh táo và định lực của Tần Lĩnh — cảm khí chỉ hoạt động khi anh bình tĩnh, không hoảng loạn, không kiệt sức và không bị trận pháp trấn yểm che khí; mỗi chuyến xuống mộ kéo dài bào mòn tinh thần và thể lực, cần thời gian hồi phục giữa các mộ.",
+    "unlockRule": "Cảm khí quán mộ là thiên phú bẩm sinh, tự kích hoạt khi Tần Lĩnh định thần dưới lòng đất; kỹ thuật đổ đấu (đọc sơ đồ, khẩu quyết, hóa giải cơ quan) đến từ truyền thừa qua bút ký của tổ phụ, độ tinh thông tăng dần khi anh tích lũy 'mẫu cơ quan' của từng thời đại và dòng phái thợ xây mộ.",
+    "antiPlotArmor": [
+      "Cảm khí CHỈ cảnh báo về tử khí và kết cấu ẩn (đường đi cơ quan, chỗ tụ tử khí, vùng đã bị động chạm) — KHÔNG cho biết cơ quan vận hành thế nào, KHÔNG nói cách hóa giải, KHÔNG tự cứu anh.",
+      "Tần Lĩnh vẫn phải tự luận ra nguyên lý cạm bẫy từ bút ký và quan sát, tự hóa giải, tự đối mặt quái sự; phán đoán sai sau khi đã thấy cảnh báo vẫn dẫn tới cái chết cho mình và đồng đội.",
+      "Cảm khí mờ đi hoặc tắt khi anh hoảng loạn, kiệt sức, bị thương, hoặc khi mộ thất được trấn yểm/khí quá dày; nó không phân biệt được cơ quan đã hỏng hay còn hoạt động.",
+      "Mỗi chuyến xuống mộ hao tổn thể lực và tinh thần thật sự; không phải năng lực dùng vô hạn, và không thay thế được kinh nghiệm, dụng cụ hay sự cẩn trọng."
+    ],
+    "signatureBuff": {
+      "name": "Đọc Mẫu Cơ Quan",
+      "effect": "Khi tập trung cao độ, Tần Lĩnh nhận ra các cơ quan và mộ thất do cùng một dòng phái thợ hoặc cùng một thời đại tạo ra mang cùng một 'mẫu' đặc trưng — giúp anh đoán trước kiểu cạm bẫy kế tiếp.",
+      "limit": "Chỉ là gợi ý mẫu, không phải đáp án; mộ càng cổ, càng được trấn yểm kỹ thì càng phá vỡ mẫu quen thuộc, buộc anh suy luận lại từ đầu."
+    },
+    "progressionAxes": [
+      "Độ nhạy của cảm khí (nhận ra tử khí tinh vi và kết cấu ẩn được trấn yểm tốt hơn theo thời gian)",
+      "Độ tinh thông đổ đấu và giải cơ quan (từ một ngôi mộ nhỏ ven núi tới lăng tẩm khổng lồ và trận đồ phong ấn)",
+      "Kho 'mẫu cơ quan' và khắc văn lịch sử đã tích lũy (bút ký và sổ tay của MC)"
+    ],
+    "powerCeilingByPhase": {
+      "phase1": "Cảm tử khí và vượt cơ quan cơ bản trong một ngôi mộ đơn lẻ ven núi hoặc bỏ hoang",
+      "phase2": "Giải mộ quần liên hoàn và nhận ra dấu vết của đội buôn cổ vật cùng truy tìm",
+      "phase3": "Đối đầu đội buôn cổ vật phá mộ bừa và trấn lại thứ bị đánh thức bằng am hiểu người xưa",
+      "phase4": "Giải đại mộ đế vương và trận đồ phong ấn ngàn năm cả nước, gánh vai trò người giữ phong ấn"
+    }
+  },
+  "worldbuilding": {
+    "tone": "Kinh dị huyền bí phương Đông pha mạo hiểm và trinh thám: nghẹt thở dưới lòng đất, lạnh gáy nhưng tỉnh táo, căng thẳng từ tốn; nỗi sợ đến từ bóng tối ngàn năm, cạm bẫy người xưa và những điều bị phong ấn, không phải gore giật gân.",
+    "yinYangRules": "Thế giới ngầm vận hành theo một bộ quy luật nhất quán: mỗi ngôi mộ là một hệ thống khép kín, kết cấu phong thủy âm trạch quyết định nơi tụ tử khí; cơ quan cạm bẫy được gài theo logic của người xưa (nỏ liên hoàn, hầm chông, cơ quan nước, trận đá xoay); mộ lớn được trấn yểm bằng trận pháp để giữ thứ bên trong. Quái sự không ngẫu nhiên: xác biến dị do tử khí và chất táng nuôi, ảo giác do khí độc, sinh vật tiến hóa trong bóng tối, và đôi khi là thực thể cổ xưa bị phong ấn. Tử khí tích tụ ngàn năm gây hoa mắt, ảo giác, mục rữa nội tạng nếu ở lâu.",
+    "entitiesThatExist": "Xác biến dị (do tử khí và chất liệu táng nuôi dưỡng, không phải ma quỷ ngẫu nhiên); côn trùng và sinh vật tiến hóa trong bóng tối ngàn năm; ảo giác do khí độc và bố cục mộ thất gây ra; tử khí — dòng khí chết tích tụ gây họa; và hiếm hoi là những thực thể thật sự cổ xưa bị tiền nhân phong ấn. Không có thần tiên đại chúng can thiệp; mặt đất giữ vẻ đời thường hiện đại.",
+    "economy": "Tần Lĩnh và giới đổ đấu sống bằng minh khí lấy được dưới mộ, bán qua đầu nậu cổ vật và các đội buôn; giới có kinh tế ngầm quanh cổ vật, dụng cụ đổ đấu, bí kíp và sơ đồ mộ; thế giới đời thực vẫn dùng tiền bình thường.",
+    "setting": "Một đất nước Việt Nam hiện đại — trên mặt đất là phố thị, đồng ruộng, núi rừng bình thường; sâu dưới lòng đất là vô số ngôi mộ cổ ngủ yên hàng trăm, hàng ngàn năm, xây bằng cơ quan cạm bẫy và trận pháp trấn yểm, đôi khi giấu cả thứ không nên đánh thức.",
+    "geography": {
+      "phase1": "Nhà cũ của tổ phụ, quán trà nơi gặp người trong giới, ngôi mộ nhỏ ven núi và mộ bỏ hoang gần làng",
+      "phase2": "Cụm mộ liên hoàn nối nhau bằng địa đạo ở vùng sâu, địa bàn các đội đổ đấu cạnh tranh",
+      "phase3": "Hang ổ và tuyến vận chuyển của đội buôn cổ vật, các mộ bị phá bừa bãi",
+      "phase4": "Đại mộ đế vương khổng lồ và trận đồ phong ấn ngàn năm trải khắp cả nước"
+    },
+    "techLevel": "Hiện đại: điện thoại, xe cộ, đèn pin, thiết bị dò; nhưng tri thức đổ đấu và quy luật âm trạch vận hành song song, thường vượt ngoài tầm khoa học đời thường; công cụ nghề là bút ký, la bàn, dụng cụ phá cơ quan, nến, khẩu quyết nhận khí.",
+    "conflictMedium": "Vượt mộ và đối đầu kẻ địch bằng đọc hiểu cơ quan người xưa, suy luận, giải mã khắc văn lịch sử, né và trấn quái sự bằng am hiểu — KHÔNG bằng đánh nhau tay đôi. Kể cả khi đụng độ đội buôn cổ vật, Tần Lĩnh dựa vào địa hình mộ thất và cơ quan để chế ngự chứ không huyết chiến vô nghĩa.",
+    "forbiddenElements": [
+      "xuyên không / xuyên việt / đến từ thế giới hiện đại khác",
+      "trọng sinh / ký ức kiếp trước / đầu thai / chuyển kiếp",
+      "tu tiên đăng tiên, cảnh giới tu luyện kiểu tiên hiệp",
+      "gore khoái cảm, bạo lực phô trương để giật gân",
+      "đánh nhau tay đôi/võ công như nguồn giải quyết xung đột chính",
+      "thần tiên đại chúng can thiệp trực tiếp vào đời thường"
+    ]
+  },
+  "factions": [
+    {
+      "name": "Tần Lĩnh và đội đổ đấu của anh",
+      "type": "nhóm nhân vật chính",
+      "power_level": 4,
+      "summary": "Tần Lĩnh cùng lão Cửu, Diệp Thanh và những người đồng hành, dựa vào cảm khí quán mộ, bút ký truyền thừa và quy củ nghề để xuống mộ cứu người và lần ra sự thật.",
+      "territory": "Nhà cũ của tổ phụ làm cứ điểm, di chuyển theo từng ngôi mộ khắp cả nước",
+      "mc_relation": "MC là trung tâm và người dẫn dắt",
+      "conflicts": ["Đội buôn cổ vật quốc tế", "Thế lực giấu mặt"],
+      "alliances": ["Giới đổ đấu trọng nghĩa"],
+      "importance": 10,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Đội buôn cổ vật quốc tế",
+      "type": "tổ chức buôn lậu cổ vật tàn nhẫn",
+      "power_level": 8,
+      "summary": "Một đội buôn cổ vật xuyên quốc gia phá mộ bừa bãi để đoạt minh khí, dùng thuốc nổ và bạo lực, sẵn sàng hại người và đánh thức thứ không nên đánh thức để mưu lợi.",
+      "territory": "Các tuyến buôn lậu và hang ổ rải khắp vùng, theo dấu các minh khí khắc văn",
+      "mc_relation": "Kẻ thù chính giữa truyện",
+      "conflicts": ["Tần Lĩnh và đội đổ đấu của anh", "Giới đổ đấu trọng nghĩa"],
+      "alliances": [],
+      "importance": 8,
+      "introduce_arc": 2
+    },
+    {
+      "name": "Giới đổ đấu trọng nghĩa",
+      "type": "cộng đồng lỏng lẻo các tay đổ đấu giữ quy củ",
+      "power_level": 6,
+      "summary": "Mạng lưới các tay đổ đấu hành nghề có quy củ, kính trọng người đã khuất; có người nể phục Tần Lĩnh, có kẻ ganh ghét; vừa là đồng minh vừa là môi trường anh phải khẳng định mình.",
+      "territory": "Khắp cả nước, mỗi đội một địa bàn và một dòng truyền thừa",
+      "mc_relation": "Vừa là đồng minh vừa là nơi MC gây dựng uy tín và dè chừng kẻ phản bội",
+      "conflicts": ["Đội buôn cổ vật quốc tế"],
+      "alliances": ["Tần Lĩnh và đội đổ đấu của anh"],
+      "importance": 7,
+      "introduce_arc": 2
+    },
+    {
+      "name": "Thế Lực Giấu Mặt",
+      "type": "thế lực giật dây muốn đánh thức bí mật thiên cổ",
+      "power_level": 10,
+      "summary": "Một thế lực ẩn danh giật dây từ trong bóng tối, muốn đánh thức và lợi dụng bí mật thiên cổ bị phong ấn dưới lòng đất; liên quan tới sự mất tích của tổ phụ Tần Lĩnh và trận đồ phong ấn ngàn năm; động cơ là bí ẩn trung tâm.",
+      "territory": "Ẩn sau mạng lưới mộ quần liên hoàn cả nước, nắm các huyệt mộ trọng yếu",
+      "mc_relation": "Phản diện tối hậu, đối đầu bằng đấu trí và am hiểu cơ quan chứ không bằng vũ lực thuần",
+      "conflicts": ["Tần Lĩnh và đội đổ đấu của anh"],
+      "alliances": [],
+      "importance": 9,
+      "introduce_arc": 4
+    }
+  ],
+  "plot_twists": [
+    {
+      "summary": "Một 'quái sự' khiến cả đội khiếp sợ trong mộ thực ra không phải thực thể siêu nhiên mà là cơ quan và xác biến dị do một kẻ sống cố tình dàn dựng để giấu việc hắn đã sát hại đồng đội cũ và độc chiếm minh khí.",
+      "payoff_type": "đảo chiều thủ phạm",
+      "setup_chapters": [70, 200],
+      "twist_chapter": 320,
+      "reader_impact": "major",
+      "arc_number": 3
+    },
+    {
+      "summary": "Các ngôi mộ tưởng rời rạc khắp cả nước không phải ngẫu nhiên — chúng là một trận đồ phong ấn khổng lồ do tiền nhân cố ý dựng để khóa một bí mật thiên cổ, và đội buôn cổ vật chỉ là công cụ của thế lực muốn phá phong ấn ấy.",
+      "payoff_type": "âm mưu lớn hơn",
+      "setup_chapters": [280, 530],
+      "twist_chapter": 760,
+      "reader_impact": "major",
+      "arc_number": 6
+    },
+    {
+      "summary": "Thiên phú cảm khí của Tần Lĩnh và việc tổ phụ chọn anh kế thừa bút ký không phải ngẫu nhiên — dòng họ anh vốn là người giữ phong ấn qua nhiều đời, và tổ phụ mất tích vì đang 'chôn lại' bí mật thiên cổ chứ không đi đoạt, đã âm thầm trao lại vai trò ấy cho anh.",
+      "payoff_type": "nguồn gốc golden finger và huyết mạch",
+      "setup_chapters": [120, 630, 700],
+      "twist_chapter": 720,
+      "reader_impact": "cosmic",
+      "arc_number": 5
+    }
+  ],
+  "themes": [
+    {
+      "name": "Đổ đấu là đọc hiểu người xưa",
+      "type": "main",
+      "description": "Vượt mộ không phải đào bới may rủi mà là hiểu tiền nhân chôn gì, sợ gì, gài bẫy ở đâu và vì sao; mỗi cạm bẫy là một câu đố của người xưa cần giải bằng trí tuệ.",
+      "motifs": ["đọc sơ đồ và khẩu quyết bút ký", "luận ra nguyên lý cơ quan", "giải mã khắc văn lịch sử"],
+      "importance": 10
+    },
+    {
+      "name": "Có thứ tiền nhân cố ý chôn lại",
+      "type": "main",
+      "description": "Không phải mọi bí mật đều nên đào lên; có những thứ tiền nhân cố ý phong ấn, và trách nhiệm của người kế thừa là giữ chúng yên chứ không đoạt lấy hay tiêu diệt.",
+      "motifs": ["lời dặn của tổ phụ", "chôn lại thay vì đoạt", "gánh vai trò người giữ phong ấn"],
+      "importance": 9
+    },
+    {
+      "name": "Lòng tham là cạm bẫy nguy hiểm nhất",
+      "type": "supporting",
+      "description": "Phần lớn tai họa dưới mộ không đến từ cơ quan người xưa mà từ lòng tham của người sống — kẻ phá quy củ, kẻ phản bội, kẻ đoạt minh khí bất chấp đều tự rước họa và kéo cả đội xuống vực.",
+      "motifs": ["tham một món minh khí mà phạm quy", "phản bội vì cổ vật", "kẻ liều lĩnh bác bỏ cảnh báo"],
+      "importance": 8
+    },
+    {
+      "name": "Sự thật nằm sâu hơn ngôi mộ tăm tối nhất",
+      "type": "supporting",
+      "description": "Lớp cạm bẫy và quái sự dễ thấy chỉ là bề mặt; chân tướng lịch sử luôn nằm sâu hơn, trong khắc văn, trong những trang bút ký bị xé và trong điều tiền nhân cố giấu.",
+      "motifs": ["trang giấy bị xé dở", "khắc văn dẫn xuống sâu hơn", "mảnh sự thật ghép dần qua từng mộ"],
+      "importance": 8
+    }
+  ],
+  "voice_anchors": [
+    {
+      "snippet_type": "opening",
+      "prose_text": "Cửa mộ ven núi hé ra một luồng hơi lạnh mục, tanh nồng mùi đất ngàn năm không thấy ánh mặt trời. Tần Lĩnh dừng lại ở bậc đá đầu tiên, không vội bước xuống. Anh nhắm mắt, hít một hơi nông, rồi để tâm lắng lại theo lời tổ phụ dặn trong bút ký. Và lòng đất hiện ra khác hẳn. Dưới lớp bụi dày, một vệt mờ chạy ngoằn ngoèo dọc theo nền hành lang — đường đi của một cơ quan còn sống. Bên trái, ngay chỗ viên gạch nhìn chẳng khác gì những viên quanh nó, tử khí tụ lại thành một quầng lạnh buốt, báo cho anh biết: đặt chân lên đó là chết. Anh mở mắt, soi đèn vào sơ đồ chép tay đã ngả vàng, rồi khẽ nói với người phía sau đang định bước tới: đừng giẫm viên gạch thứ ba bên trái. Lùi lại, để tôi đi trước.",
+      "key_traits": ["điềm tĩnh", "giữ quy củ", "cảm tử khí và kết cấu", "thận trọng cứu đồng đội"]
+    },
+    {
+      "snippet_type": "dialogue",
+      "prose_text": "— Mộ này dễ ăn, tôi vào nát cả chục cái rồi, nỏ với chông gì sợ. Mã Tam vỗ ngực, tay đã đặt lên cánh cửa đá. Tần Lĩnh không tranh. Anh chỉ chỉ tay vào rãnh nước cạn dọc chân tường. — Anh thấy cái rãnh này khô không? Nó khô vì nước đã rút xuống một khoang chứa phía dưới. Anh đẩy cửa, sức nặng dồn lên nền, nước tràn ngược lại, cả gian này thành bẫy chìm. Cửa không mở bằng cách đẩy. Mở bằng cách tháo cái chốt đá ở góc đông nam kia — đúng như bút ký của tổ phụ tôi chép. Anh tham nhanh một bước, cả đội đi theo anh xuống nước.",
+      "key_traits": ["không tranh cãi cảm tính", "chỉ ra bằng chứng cứ", "dẫn chiếu bút ký", "cảnh tỉnh kẻ liều lĩnh"]
+    },
+    {
+      "snippet_type": "action",
+      "prose_text": "Khi tiếng dây nỏ bật lên ken két trong bóng tối, Tần Lĩnh không nhảy lùi như bản năng mách bảo. Anh biết phía sau là một dãy chông ngược còn chết người hơn mũi tên. Trong một nhịp thở, cảm khí cho anh thấy: ba luồng tử khí lạnh đang lao tới từ ba lỗ châu mai trên tường, nhưng có một khe hẹp giữa chúng, nơi không có quầng lạnh. Anh ép sát người xuống nền, kéo theo Diệp Thanh, lăn vào đúng cái khe ấy. Mũi tên cắm phập vào tấm bia đá sau lưng, rung lên bần bật. Bụi mù mịt. Anh không reo mừng. Anh đếm lại số mũi tên đã bắn, đối chiếu với sơ đồ, rồi nói khẽ: còn một loạt nữa, mười nhịp đếm. Nằm yên đã.",
+      "key_traits": ["lạnh đầu giữa hiểm cảnh", "luận cơ quan trong tích tắc", "cứu đồng đội", "không chủ quan sau khi thoát"]
+    }
+  ],
+  "foreshadowing": [
+    {
+      "hintText": "Bìa trong bút ký của tổ phụ có một dòng chữ viết vội: 'Nếu cháu mở được quyển này, đừng đi tìm ông. Hãy đi tìm thứ ông đang chôn lại.' Tần Lĩnh ban đầu chỉ hiểu là lời dặn tránh nguy hiểm.",
+      "category": "object",
+      "plantCh": 1,
+      "pickupCh": 640,
+      "payoffDescription": "Câu này hé lộ tổ phụ không đi đoạt mà đi 'chôn lại' bí mật thiên cổ; ông là người giữ phong ấn, và đã chọn Tần Lĩnh kế thừa vai trò ấy."
+    },
+    {
+      "hintText": "Lão Cửu thắc mắc rằng cảm giác của Tần Lĩnh về cơ quan 'nhạy quá mức người thường', rồi lảng đi khi anh gặng hỏi vì sao tổ phụ lại có thể đi sâu vào những mộ mà cả đội kỳ cựu không dám.",
+      "category": "dialogue",
+      "plantCh": 35,
+      "pickupCh": 690,
+      "payoffDescription": "Hé lộ thiên phú cảm khí liên hệ với huyết mạch dòng họ — những người giữ phong ấn qua nhiều đời, vượt xa mọi ghi chép trong bút ký."
+    },
+    {
+      "hintText": "Trên minh khí khắc văn đầu tiên có một ký hiệu lặp lại mà Tần Lĩnh thấy mơ hồ quen, dù anh chưa từng học khắc văn; anh cho rằng chỉ là trùng hợp.",
+      "category": "object",
+      "plantCh": 110,
+      "pickupCh": 530,
+      "payoffDescription": "Ký hiệu ấy là dấu của trận đồ phong ấn ngàn năm; các ngôi mộ rời rạc cùng mang nó vì đều là mắt xích của một trận đồ khổng lồ tiền nhân dựng để khóa bí mật thiên cổ."
+    }
+  ]
+}

@@ -141,8 +141,18 @@ function loadBundle(setupDir: string): SetupBundle {
   }
 
   const worldDescription = readText(f('world.md')).trim();
-  const character = readJson<{ mainCharacter?: string }>(f('character.json'));
-  const mainCharacter = (character.mainCharacter || '').trim();
+  const character = readJson<{ mainCharacter?: unknown }>(f('character.json'));
+  // mainCharacter may be a bare string (café convention) OR a rich profile
+  // object {name, ...}. Both are accepted — we persist only the name to
+  // ai_story_projects.main_character; the rich profile stays in the file.
+  const mcRaw = character.mainCharacter;
+  const mainCharacter = (
+    typeof mcRaw === 'string'
+      ? mcRaw
+      : (mcRaw && typeof mcRaw === 'object'
+          ? String((mcRaw as Record<string, unknown>).name ?? '')
+          : '')
+  ).trim();
   const description = readText(f('description.md')).trim();
   const masterOutline = readJson<Record<string, unknown>>(f('master-outline.json'));
   const storyOutline = readJson<Record<string, unknown>>(f('story-outline.json'));

@@ -1,0 +1,25 @@
+{
+  "arc_number": 1,
+  "start_chapter": 1,
+  "end_chapter": 20,
+  "arc_theme": "Tu Tiên Giới — nhập vai tiểu nha hoàn, thấu hiểu và gỡ nút thắt oán niệm đầu tiên cho thiếu niên Thẩm Tiêu bị vu oan",
+  "plan_text": "Arc mở màn warm-baseline của thế giới nhiệm vụ đầu tiên: Diệp Tiểu Tiểu xuyên vào thân phận tiểu nha hoàn ngay ch.1 với hệ thống ĐÃ active và hồ sơ nhiệm vụ trong tay, KHÔNG mở đầu bằng cảnh khổ cùng cực mà bằng một cơ hội cứu vớt rõ ràng — cô lập tức nhìn thấy con đường bi kịch của Thẩm Tiêu và bắt đầu chìa tay. Mỗi chương xoay quanh một tương tác cụ thể với phản phái hoặc một bước hé lộ vết thương của cậu, với ít nhất 2 cao điểm dopamine/chương (một khoảnh khắc ấm lòng khiến Thẩm Tiêu dao động + một lần đứng về phía cậu thành công hoặc một mảnh vết thương được hiểu ra), cao điểm đầu trước nửa chương. Cụm chương theo 5-cluster: ch.1-4 setup (xuyên vào thân phận tiểu nha hoàn, đọc hồ sơ nhiệm vụ và Bản Đồ Oán Niệm, thấy con đường hóa ma đầu của Thẩm Tiêu, lần đầu chìa chén trà ấm khiến cậu thoáng dao động — Chỉ Số Oán Niệm tụt nhẹ); ch.5-9 breathing + competence (kiên nhẫn hầu hạ, từng bước hiểu vì sao Thẩm Tiêu khép lòng, những nghĩa cử nhỏ xây lòng tin, học cơ chế Chỉ Số Oán Niệm/Độ Lệch Số Mệnh qua phản ứng thực tế); ch.10-14 confront (sư tỷ Vân Nhi và đám đệ tử hùa theo lời đồn cô lập Thẩm Tiêu; Diệp Tiểu Tiểu công khai ngồi cạnh cậu trước đám đông, vạch ra sự vô lý của tin đồn, oán niệm tụt rõ rệt); ch.15-18 big_wow (đêm vu oan bùng nổ đúng nguyên tác; Diệp Tiểu Tiểu liều thân phận tìm ra bằng chứng và đứng chắn trước Thẩm Tiêu đúng giây cậu sắp hóa ma đầu, kéo cậu lùi khỏi bờ vực bằng một câu nói đúng lúc); ch.19-20 resolution + hook (gỡ được nút thắt oán niệm bước đầu, Thẩm Tiêu lần đầu tin có người ở bên; hé lộ một dòng dữ liệu lạ về 'nguồn ngoài' từng đẩy oán niệm cậu cao bất thường — mở tuyến bí ẩn nền). Giữ nguyên tắc cứu-vớt-bằng-thấu-hiểu tuyệt đối: mọi xung đột giải bằng lắng nghe, đồng cảm và nghĩa cử đúng lúc — KHÔNG ép buộc, KHÔNG thao túng, KHÔNG bạo lực. MC dịu dàng, ấm áp, kiên nhẫn nhưng can đảm đứng về phía kẻ bị ruồng bỏ. Lưu ý: arc này chỉ là phần đầu (ch.1-20) của Volume 1 (thế giới tu tiên, ch.1-40); nút thắt vu oan và phần minh oan trọn vẹn sẽ tiếp tục ở các arc kế của cùng thế giới.",
+  "chapter_briefs": [
+    { "n": 1, "beat": "setup", "goal": "Diệp Tiểu Tiểu xuyên vào thân phận tiểu nha hoàn, đọc hồ sơ nhiệm vụ và thấy con đường hóa ma đầu của Thẩm Tiêu", "payoff": "Cô chìa chén trà ấm đầu tiên, Thẩm Tiêu thoáng dao động, Chỉ Số Oán Niệm tụt nhẹ — bằng chứng thấu cảm có tác dụng", "endingHook": "Hồ sơ ghi rõ: ba tháng nữa Thẩm Tiêu sẽ bị vu oan" },
+    { "n": 4, "beat": "setup", "goal": "Quan sát đời sống bị cô lập của Thẩm Tiêu trong tông môn", "payoff": "Cô hiểu cậu thức trắng vì đau chứ không vì xấu, nói đúng điều đó khiến cậu lần đầu nhìn thẳng vào cô", "endingHook": "Một sư tỷ cảnh báo cô tránh xa 'mầm họa' kẻo vạ lây" },
+    { "n": 8, "beat": "breathing", "goal": "Kiên nhẫn xây lòng tin qua những nghĩa cử nhỏ thường nhật", "payoff": "Thẩm Tiêu lần đầu chủ động nói với cô một câu không lạnh lùng; Độ Lệch Số Mệnh nhích lên", "endingHook": "Cô nhận ra càng tới gần ngày vu oan, oán niệm cậu càng dâng nhanh bất thường" },
+    { "n": 12, "beat": "confront", "goal": "Ngăn đám đệ tử do Vân Nhi dẫn đầu cô lập và làm nhục Thẩm Tiêu", "payoff": "Diệp Tiểu Tiểu công khai ngồi cạnh cậu trước đám đông, vạch ra sự vô lý của lời đồn, cứu cậu một phen bẽ mặt", "endingHook": "Trưởng lão Lăng lặng lẽ để mắt tới Tàng Kinh Các" },
+    { "n": 17, "beat": "big_wow", "goal": "Đối mặt đêm vu oan bùng nổ đúng nguyên tác", "payoff": "Cô liều thân phận đưa ra bằng chứng và đứng chắn trước Thẩm Tiêu đúng giây cậu sắp hóa ma đầu, kéo cậu lùi lại bằng một câu nói đúng lúc", "endingHook": "Thẩm Tiêu lần đầu để rơi nước mắt — oán niệm chững lại" },
+    { "n": 20, "beat": "resolution", "goal": "Gỡ bước đầu nút thắt oán niệm, khép phần mở của thế giới tu tiên", "payoff": "Thẩm Tiêu lần đầu tin có người thật lòng ở bên; Chỉ Số Oán Niệm tụt mạnh, một số phận bắt đầu được viết lại", "endingHook": "Hệ thống lướt qua một dòng dữ liệu lạ về 'nguồn ngoài' đẩy oán niệm cậu cao bất thường rồi biến mất — mở tuyến bí ẩn nền" }
+  ],
+  "threads_to_advance": ["Xây lòng tin và gỡ oán niệm cho Thẩm Tiêu", "Diệp Tiểu Tiểu học cơ chế Chỉ Số Oán Niệm / Độ Lệch Số Mệnh", "Quan hệ ký chủ - hệ thống"],
+  "threads_to_resolve": ["Bước đầu kéo Thẩm Tiêu lùi khỏi bờ vực hóa ma đầu trong đêm vu oan (giải quyết: cậu để rơi nước mắt và tin có người ở bên)"],
+  "new_threads": ["Bí ẩn 'nguồn ngoài' khuếch đại oán niệm", "Trưởng lão Lăng và âm mưu cướp công pháp", "Bản chất thật và nghị trình giấu kín của hệ thống"],
+  "sub_arcs": [
+    { "name": "Chén trà ấm", "chapterRange": "1-4", "cluster": "setup" },
+    { "name": "Xây lòng tin", "chapterRange": "5-9", "cluster": "breathing" },
+    { "name": "Đứng về phía cậu", "chapterRange": "10-14", "cluster": "confront" },
+    { "name": "Đêm vu oan", "chapterRange": "15-18", "cluster": "big_wow" },
+    { "name": "Người ở bên", "chapterRange": "19-20", "cluster": "resolution" }
+  ]
+}

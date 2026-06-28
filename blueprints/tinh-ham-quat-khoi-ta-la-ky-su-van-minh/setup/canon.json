@@ -1,0 +1,162 @@
+{
+  "power_system": {
+    "name": "Hệ Thống Văn Minh",
+    "type": "tech-tree civilization-progression system (cây kỹ thuật văn minh)",
+    "coreResource": "Điểm Văn Minh — tích từ mỗi sản phẩm/giải pháp kỹ thuật giải quyết được nhu cầu thật của con người",
+    "progressionAxes": [
+      "Bậc Văn Minh (Hành Tinh Đơn Lẻ → Liên Hành Tinh → Liên Sao → Văn Minh Tinh Vân)",
+      "Cây Kỹ Thuật (động cơ, vật liệu, năng lượng, hàng không vũ trụ, phòng vệ)",
+      "Cây Năng Lực (kỹ sư, quản lý, đào tạo, đàm phán, thống lĩnh)"
+    ],
+    "unlockRule": "Mỗi nhánh kỹ thuật cần ngưỡng điểm Văn Minh tăng dần; mở khóa rồi vẫn cần vật liệu thật + cơ sở chế tạo thật + đội ngũ thật để hiện thực hóa. Hệ Thống chỉ ra bản vẽ, không tự chế hộ.",
+    "signatureBuff": {
+      "name": "Linh Cảm Đột Phá",
+      "effect": "Lục Thần thấy trước điểm nghẽn của một thiết kế và đường tối ưu thật sự để vượt qua nó (giúp anh giải bài toán kỹ thuật nhanh và chính xác, không phải biến vật liệu ra từ hư không).",
+      "limit": "Mỗi ngày kích hoạt được một lần; cần Lục Thần thật sự nắm chắc bài toán mới phát huy."
+    },
+    "antiPlotArmor": [
+      "Không tự chế hộ — thất bại vẫn xảy ra nếu vật liệu/cơ sở/đội ngũ không đủ.",
+      "Sản phẩm trưng bày suông hoặc gian lận không tạo điểm Văn Minh — phải đưa vào vận hành thật.",
+      "Đối thủ và văn minh thù địch có nguồn lực lớn hơn nhiều; thắng phải bằng nước cờ kỹ thuật và chiến thuật thông minh chứ không bằng buff."
+    ],
+    "powerCeilingByPhase": {
+      "phase1": "Bậc Hành Tinh Đơn Lẻ (vận hành một xưởng/tập đoàn chế tạo)",
+      "phase2": "Liên Hành Tinh (động cơ phản trọng lực, định cư mặt trăng và vành đai)",
+      "phase3": "Liên Sao (tinh hạm cong vênh, tiến ra Tinh Vực Liệt Hỏa)",
+      "phase4": "Văn Minh Tinh Vân (kết cấu vĩ mô, năng lượng sao, đối mặt văn minh cổ)"
+    }
+  },
+  "worldbuilding": {
+    "setting": "Vũ trụ nguyên bản; sân khấu khởi đầu là hành tinh Thương Khung — quê hương bản địa của chủng tộc người Thương Khung, vừa bước vào kỷ nguyên công nghiệp.",
+    "tone": "Sảng văn kỹ thuật hào hùng, lý trí; cảm giác xây dựng từ con số không lên tới các vì sao. Combat được phép ở quy mô vũ trụ (phòng vệ chủng tộc), nhưng vũ khí cốt lõi của MC là trí tuệ kiến tạo.",
+    "conflictMedium": ["giải pháp kỹ thuật và sáng chế", "chất lượng và năng lực chế tạo", "dòng tiền và đơn hàng", "uy tín kỹ sư và bằng sáng chế", "ngoại giao tinh vực", "chiến tranh vũ trụ phòng vệ"],
+    "geography": {
+      "phase1": "Thành phố cảng Hắc Diêm và khu công nghiệp trên hành tinh Thương Khung",
+      "phase2": "Toàn hành tinh Thương Khung, mặt trăng và vành đai tiểu hành tinh lân cận",
+      "phase3": "Tinh Vực Liệt Hỏa và các hệ sao lân cận",
+      "phase4": "Vùng tinh vân rộng lớn và phế tích các văn minh cổ"
+    },
+    "economy": {
+      "currency": "Đơn đặt hàng, bằng sáng chế, hợp đồng quân sự, cổ phần, uy tín kỹ sư, năng lượng tinh thạch",
+      "supplyChain": "Các xưởng đúc và mỏ vật liệu ở Hắc Diêm; về sau là vành đai tiểu hành tinh và mỏ tinh thạch liên sao"
+    },
+    "techLevel": "Khởi đầu bậc 0 (hơi nước + điện cơ + hóa thạch), leo dần qua phản trọng lực, động cơ cong vênh không gian, tới kết cấu vĩ mô và năng lượng sao của bậc tinh vân.",
+    "forbiddenElements": ["MC mang nguồn gốc từ thế giới khác hay ký ức đời trước", "tu luyện/cảnh giới kiểu tiên hiệp", "phép thuật siêu nhiên không có cơ sở khoa học", "MC dùng sức mạnh cá nhân siêu nhiên thay cho trí tuệ kỹ thuật"]
+  },
+  "factions": [
+    {
+      "name": "Xưởng Thần Lô / Tập Đoàn Thần Lô",
+      "type": "thế lực chế tạo của MC",
+      "power_level": 3,
+      "summary": "Xưởng cơ khí độc lập của Lục Thần, khởi đầu một nhà xưởng 300m² ven cảng, dần thành tập đoàn rồi lực lượng kiến tạo của cả văn minh.",
+      "territory": "Khu công nghiệp cảng Hắc Diêm (mở rộng dần ra toàn hành tinh rồi tinh vực)",
+      "mc_relation": "MC sáng lập và dẫn dắt",
+      "conflicts": ["Liên Hiệp Thiết Phủ"],
+      "alliances": ["Liên Minh Kỹ Sư"],
+      "importance": 10,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Liên Hiệp Thiết Phủ",
+      "type": "tài phiệt công nghiệp độc quyền",
+      "power_level": 9,
+      "summary": "Tổ hợp đúc luyện và sáng chế độc quyền lớn nhất Hắc Diêm, được quỹ tư bản hậu thuẫn; vũ khí là vốn lớn, kiện bằng sáng chế, ép giá nguyên liệu và mua chuộc nhân tài.",
+      "territory": "Toàn hành tinh Thương Khung",
+      "mc_relation": "Đối thủ cạnh tranh chính giai đoạn đầu",
+      "conflicts": ["Tập Đoàn Thần Lô", "Liên Minh Kỹ Sư"],
+      "alliances": ["Quỹ Tư Bản Hoàng Diệu"],
+      "importance": 9,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Liên Minh Kỹ Sư",
+      "type": "liên minh xưởng nhỏ và kỹ sư độc lập",
+      "power_level": 6,
+      "summary": "Mạng lưới các xưởng cơ khí nhỏ và kỹ sư độc lập do Lục Thần khởi xướng để chia sẻ tri thức, đàm phán nguồn vật liệu và chống thế độc quyền.",
+      "territory": "Các trung tâm công nghiệp lớn của hành tinh",
+      "mc_relation": "MC là người khởi xướng và dẫn dắt",
+      "conflicts": ["Liên Hiệp Thiết Phủ"],
+      "alliances": ["Tập Đoàn Thần Lô"],
+      "importance": 8,
+      "introduce_arc": 3
+    },
+    {
+      "name": "Quỹ Tư Bản Hoàng Diệu",
+      "type": "quỹ tư bản tài chính",
+      "power_level": 10,
+      "summary": "Quỹ tài chính đứng sau Thiết Phủ, mục tiêu độc chiếm năng lực công nghiệp của hành tinh và kìm hãm tiến bộ để giữ thế độc quyền; sẵn sàng thâu tóm mọi đối thủ tiềm năng.",
+      "territory": "Trung tâm tài chính hành tinh, vươn ra liên hành tinh",
+      "mc_relation": "Thế lực hậu cảnh MC phải đối đầu",
+      "conflicts": ["Tập Đoàn Thần Lô", "Liên Minh Kỹ Sư"],
+      "alliances": ["Liên Hiệp Thiết Phủ"],
+      "importance": 9,
+      "introduce_arc": 4
+    },
+    {
+      "name": "Đế Chế Cương Vực",
+      "type": "đế chế công nghệ ngoài hành tinh",
+      "power_level": 11,
+      "summary": "Một đế chế công nghệ bá quyền trong Tinh Vực Liệt Hỏa, chuyên nô dịch các văn minh non trẻ và độc chiếm công nghệ; đối thủ chính giai đoạn liên sao.",
+      "territory": "Nhiều hệ sao trong Tinh Vực Liệt Hỏa",
+      "mc_relation": "Thế lực thù địch buộc MC phải phòng vệ chủng tộc",
+      "conflicts": ["Tập Đoàn Thần Lô", "văn minh Thương Khung"],
+      "alliances": [],
+      "importance": 9,
+      "introduce_arc": 5
+    }
+  ],
+  "plot_twists": [
+    {
+      "summary": "Mặc Hàn — quản đốc Liên Hiệp Thiết Phủ đối diện — thật ra từng là bạn học và đồng nghiệp cũ của Lục Thần, người đã tố cáo sai để Lục Thần bị đuổi việc nhằm leo lên vị trí của anh.",
+      "payoff_type": "quan hệ ẩn",
+      "setup_chapters": [12, 45],
+      "twist_chapter": 88,
+      "reader_impact": "major",
+      "arc_number": 1
+    },
+    {
+      "summary": "Hệ Thống Văn Minh là di sản của Liên Minh Văn Minh Cổ — một liên minh các văn minh tinh vân thật từng tồn tại và bị một thế lực cổ xưa hủy diệt để độc chiếm tri thức; quỹ tư bản Hoàng Diệu là tàn dư tay sai của thế lực đó trên Thương Khung.",
+      "payoff_type": "nguồn gốc golden finger",
+      "setup_chapters": [150, 400, 720],
+      "twist_chapter": 905,
+      "reader_impact": "cosmic",
+      "arc_number": 7
+    },
+    {
+      "summary": "Lão Cát — người thợ rèn già ở lại xưởng Thần Lô — chính là người gìn giữ cuối cùng một mảnh bản vẽ cổ của Liên Minh Văn Minh Cổ mà người thầy quá cố của Lục Thần để lại, chìa khóa mở ra di sản cuối truyện.",
+      "payoff_type": "danh tính ẩn",
+      "setup_chapters": [3, 250],
+      "twist_chapter": 890,
+      "reader_impact": "major",
+      "arc_number": 7
+    }
+  ],
+  "themes": [
+    { "name": "Trí tuệ kỹ thuật nâng cả văn minh", "type": "main", "description": "Tri thức và năng lực kiến tạo của con người là sức mạnh thật sự đưa cả một chủng tộc từ mặt đất lên tới các vì sao.", "motifs": ["bản vẽ trao tay", "cỗ máy đầu tiên đi vào vận hành"], "importance": 10 },
+    { "name": "Sáng tạo tử tế thắng độc quyền", "type": "main", "description": "Công nghệ làm vì tiến bộ chung bền hơn độc quyền tham lam kìm hãm.", "motifs": ["thư viện bản vẽ mở", "sáng chế thật vs kiện sáng chế bẩn"], "importance": 9 },
+    { "name": "Người nhỏ liên kết", "type": "supporting", "description": "Những kỹ sư và xưởng nhỏ yếu thế khi đoàn kết có thể đối đầu kẻ khổng lồ.", "motifs": ["bàn tròn các chủ xưởng", "chia sẻ tri thức"], "importance": 8 },
+    { "name": "Giữ lý tưởng khi quyền lực lớn", "type": "supporting", "description": "Càng lên cao càng phải giữ cội nguồn và lý tưởng, không bán mình cho quyền lực hay tư bản.", "motifs": ["bản vẽ của người thầy", "từ chối lời đề nghị thâu tóm"], "importance": 8 }
+  ],
+  "voice_anchors": [
+    {
+      "snippet_type": "opening",
+      "prose_text": "Lục Thần lau lại mặt bàn máy lần thứ ba trong buổi tối không một đơn hàng. Bên ngoài xưởng Thần Lô, tấm biển sắt rỉ hắt thứ ánh đèn vàng mệt mỏi xuống nền bê tông loang dầu. Đối diện, tổ hợp Liên Hiệp Thiết Phủ sáng trưng, dàn máy đúc khổng lồ gầm rú suốt đêm như muốn nuốt chửng cả khu công nghiệp. Anh nhìn cuốn sổ nợ: con số đỏ nằm đó như một lời nhạo báng. Anh không trách ai. Anh chỉ siết lại con ốc cuối cùng trên cỗ máy tiện cũ, hít một hơi mùi dầu máy quen thuộc, và tự nhủ — ngày mai, mình sẽ chế ra một thứ tốt hơn một chút nữa.",
+      "key_traits": ["điềm tĩnh", "lì đòn", "yêu nghề kỹ thuật", "không cay cú"]
+    },
+    {
+      "snippet_type": "dialogue",
+      "prose_text": "— Cái van này của xưởng cậu cứ chạy được vài giờ là kẹt, vị chủ tàu già đặt mạnh chi tiết hỏng xuống bàn, cau mày. Lục Thần không vội thanh minh. — Dạ, để con xem lại cho bác. Tàu của bác chạy tuyến nào, tải nặng cỡ bao nhiêu ạ? Người chủ tàu hơi sững. — Tuyến muối ngoài cảng. Nặng, mà nước biển ăn mòn dữ lắm. — Vậy con hiểu rồi, Lục Thần khẽ gật, tay đã bắt đầu phác lại bản vẽ. Van cũ làm bằng thép thường nên muối ăn mòn rồi kẹt. Con đổi sang hợp kim chống ăn mòn và thêm rãnh thoát cặn. Mời bác quay lại sau ba ngày thử.",
+      "key_traits": ["lắng nghe nhu cầu thật", "không tự ái", "biến mỗi lỗi thành cơ hội cải tiến"]
+    },
+    {
+      "snippet_type": "action",
+      "prose_text": "Giao diện trong suốt hiện lên ngay khoảnh khắc cỗ động cơ rền lên đều đặn và chạy thật: Điểm Văn Minh +18. Một mảnh sáng nhỏ rơi xuống như tàn lửa hàn — Mảnh Bản Vẽ: Hợp Kim Chịu Nhiệt Bậc Một. Lục Thần không reo lên. Anh chỉ liếc nhanh dòng chữ, rồi lại cúi xuống lau sạch lớp dầu trên trục khuỷu kế tiếp, như thể vừa nhận được một lời cảm ơn chứ không phải một phép màu. Khách không cần biết. Khách chỉ cần cỗ máy chạy bền. Phần còn lại là chuyện giữa anh và cái hệ thống lặng lẽ này.",
+      "key_traits": ["bình tĩnh trước golden finger", "giữ bí mật tự nhiên", "tập trung vào sản phẩm thật"]
+    }
+  ],
+  "foreshadowing": [
+    { "hintText": "Lão Cát nhắc thoáng qua rằng người thầy quá cố của Lục Thần 'từng nói cái xưởng này giữ một thứ còn quý hơn cả vàng, nhưng chưa tới lúc'.", "category": "dialogue", "plantCh": 3, "pickupCh": 890, "payoffDescription": "Hé lộ lão Cát giữ mảnh bản vẽ cổ của Liên Minh Văn Minh Cổ, chìa khóa mở ra di sản cuối truyện." },
+    { "hintText": "Mặc Hàn nhìn Lục Thần với ánh mắt vừa quen vừa né tránh trong lần đầu chạm mặt ở khu công nghiệp.", "category": "character_behavior", "plantCh": 12, "pickupCh": 88, "payoffDescription": "Reveal Mặc Hàn là đồng nghiệp cũ đã tố cáo sai khiến Lục Thần bị đuổi việc." },
+    { "hintText": "Hệ Thống đôi khi dùng cụm 'theo chuẩn Liên Minh' khi mô tả một bản vẽ, nhưng không giải thích Liên Minh là gì.", "category": "environmental", "plantCh": 150, "pickupCh": 905, "payoffDescription": "Reveal nguồn gốc Liên Minh Văn Minh Cổ và mối thù với thế lực cổ xưa đứng sau quỹ Hoàng Diệu." }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "title": "Quy Tắc Quái Đàm: Bệnh Viện Ca Trực Đêm",
+  "totalChapters": 1000,
+  "mainPlotline": "Tô Vãn, nữ điều dưỡng bản địa thế giới hiện đại, bị cuốn vào hết phó bản quái đàm bệnh viện này đến phó bản khác, sinh tồn bằng cách đọc hiểu các bộ quy trình trực đêm thật-giả lẫn lộn nhờ một lợi thế nhận thức lặng lẽ; từ một điều dưỡng trực đêm sống sót, cô trở thành người giải quy trình giỏi nhất, phá vỡ các phe trong Tổ Bàn Giao lợi dụng quái đàm để trục lợi, rồi truy ra Người Soạn Quy Trình đứng sau cả bệnh viện và chọn cách viết lại bộ quy trình gốc của trò chơi — tất cả bằng lý trí và suy luận, không bằng bạo lực.",
+  "originLock": "native — Tô Vãn là người bản địa, một nữ điều dưỡng bình thường sống tại đô thị năm 2025; là người thường, không có năng lực hay ký ức đặc biệt nào từ đầu. Mọi năng lực đều phát sinh tại chỗ trong phó bản và do cô tự rèn.",
+  "volumes": [
+    {
+      "volume": 1,
+      "title": "Ca Trực Không Có Trên Bảng Phân",
+      "chapterRange": "1-130",
+      "theme": "Học cách đọc quy trình thật/giả và sống sót phó bản đầu tiên",
+      "summary": "Ca trực đêm kéo dài bệnh viện ra thêm một dãy phòng không tồn tại. Tô Vãn phát hiện lợi thế nhận thức, học cách đối chiếu mâu thuẫn giữa các quy trình, sống sót khi những đồng nghiệp tin theo dòng giả lần lượt bị 'xuất viện', và lần ra manh mối đầu tiên về Tổ Bàn Giao.",
+      "subArcs": [
+        { "name": "Tờ bàn giao ca", "chapterRange": "1-30", "focus": "Nhận ca trực đêm, hành lang kéo dài, nhận ra dòng quy trình giả khiến đầu ngón tay lạnh buốt, sống sót tiếng gọi y tá đầu tiên từ phòng trống giường bằng một suy luận đúng giây cận tử." },
+        { "name": "Người trực cùng", "chapterRange": "31-65", "focus": "Gặp những người bị cuốn vào cùng; một đồng nghiệp tin quy trình mù quáng suýt khiến cả nhóm 'xuất viện'; Tô Vãn vạch trần dòng giả." },
+        { "name": "Quy trình nói dối", "chapterRange": "66-100", "focus": "Phát hiện bộ quy trình thứ hai mâu thuẫn bộ thứ nhất; suy ra logic 'thật-giả lồng nhau'; cứu một người tưởng đã chắc chắn bị xóa." },
+        { "name": "Giờ giao ca", "chapterRange": "101-130", "focus": "Hoàn tất phó bản hành lang khoa nội, ra ngoài đời thực; bác bảo vệ nhà xác hé lộ sự tồn tại của Tổ Bàn Giao." }
+      ],
+      "keyMilestone": "Tô Vãn sống sót phó bản đầu tiên, hiểu cơ chế quy trình thật/giả và biết mình không đơn độc."
+    },
+    {
+      "volume": 2,
+      "title": "Phòng Bệnh Cuối Dãy",
+      "chapterRange": "131-280",
+      "theme": "Phó bản mới, kiểu lừa quy trình tinh vi hơn",
+      "summary": "Tô Vãn bị cuốn vào phòng bệnh cuối dãy luôn khóa, nơi quy trình giả được ngụy trang khéo hơn dưới dạng y lệnh bác sĩ. Cô gặp Diệp Anh, một bác sĩ nội trú lý trí, và cùng anh giải bộ quy trình 'bệnh nhân không vòng tay'.",
+      "subArcs": [
+        { "name": "Y lệnh ma", "chapterRange": "131-180", "focus": "Vào phó bản phòng bệnh khóa, quy trình dài và rối hơn núp dưới dạng y lệnh; lợi thế nhận thức mờ vì căng thẳng, buộc cô suy luận thuần lý." },
+        { "name": "Bệnh nhân không vòng tay", "chapterRange": "181-230", "focus": "Liên minh với Diệp Anh; phân biệt 'người thật' và 'thực thể đội lốt bệnh nhân' qua mâu thuẫn quy trình." },
+        { "name": "Vòng cuối đi buồng", "chapterRange": "231-280", "focus": "Hoàn tất phó bản; nhận ra phòng bệnh và hành lang khoa nội chia sẻ một 'chữ ký soạn thảo' — manh mối về một Người Soạn duy nhất." }
+      ],
+      "keyMilestone": "Lần đầu Tô Vãn nhận ra các phó bản khác nhau có chung một bàn tay soạn thảo."
+    },
+    {
+      "volume": 3,
+      "title": "Đêm Trực Không Tới Sáng",
+      "chapterRange": "281-430",
+      "theme": "Phó bản vòng lặp và áp lực thời gian",
+      "summary": "Một ca trực đêm biến thành phó bản vòng lặp: đồng hồ treo tường cứ quay về 0 giờ, quy trình đổi sau mỗi vòng lặp. Tổ Bàn Giao bắt đầu chủ động tiếp cận Tô Vãn.",
+      "subArcs": [
+        { "name": "Đồng hồ quay lùi", "chapterRange": "281-330", "focus": "Quy trình thay đổi theo từng vòng lặp ca trực; áp lực thời gian; Hàn Tuyết xuất hiện vừa giúp vừa thử cô." },
+        { "name": "Vòng lặp cuối", "chapterRange": "331-380", "focus": "Đối chiếu các bộ quy trình qua nhiều vòng lặp để tìm điều kiện giao ca thật; vạch trần vòng lặp giả." },
+        { "name": "Sổ bàn giao thật", "chapterRange": "381-430", "focus": "Hoàn tất phó bản; gia nhập vòng ngoài Tổ Bàn Giao; thấy mặt trái của tổ chức." }
+      ],
+      "keyMilestone": "Tô Vãn chính thức bước vào giới người trực đêm và bắt đầu hiểu chính trị ngầm quanh quái đàm."
+    },
+    {
+      "volume": 4,
+      "title": "Tổ Bàn Giao",
+      "chapterRange": "431-580",
+      "theme": "Đấu trí với người thật điều khiển luật chơi",
+      "summary": "Một phe trong Tổ Bàn Giao bị lộ là đang 'phân ca' lính mới vào các tầng chưa kiểm chứng để thu thập quy trình. Tô Vãn phơi bày đường dây này bằng bằng chứng và suy luận, không bằng vũ lực.",
+      "subArcs": [
+        { "name": "Lính mới phân ca", "chapterRange": "431-480", "focus": "Phát hiện người mới bị dụ vào phó bản làm 'máy đọc quy trình' rồi bị bỏ mặc." },
+        { "name": "Truy dấu phân công", "chapterRange": "481-530", "focus": "Lần theo các bộ quy trình giả mạo; đối chiếu để tìm kẻ đứng sau trong tổ chức." },
+        { "name": "Phơi bày", "chapterRange": "531-580", "focus": "Vạch trần phe trục lợi trước cả tổ chức bằng bằng chứng quy trình, làm sụp uy tín của chúng." }
+      ],
+      "keyMilestone": "Tô Vãn phá vỡ đường dây trục lợi và trở thành cái tên có trọng lượng trong giới người trực đêm."
+    },
+    {
+      "volume": 5,
+      "title": "Quy Trình Tự Sửa",
+      "chapterRange": "581-730",
+      "theme": "Cấp meta — khi quy trình thay đổi giữa chừng",
+      "summary": "Xuất hiện loại phó bản mà quy trình tự sửa khi người trực đọc, và phó bản lồng trong phó bản (một khoa bệnh ảo trong khoa bệnh). Lợi thế nhận thức của Tô Vãn bắt đầu hé lộ liên hệ với 'nét soạn thảo' của Người Soạn.",
+      "subArcs": [
+        { "name": "Y lệnh chưa ký", "chapterRange": "581-630", "focus": "Quy trình đổi khi bị quan sát; Tô Vãn học cách 'cảm nhận nhịp thay đổi' thay vì đọc nội dung tĩnh." },
+        { "name": "Khoa trong khoa", "chapterRange": "631-680", "focus": "Một phó bản giấu phó bản khác bên trong; phải giải lớp ngoài để lộ lớp trong." },
+        { "name": "Dấu của Người Soạn", "chapterRange": "681-730", "focus": "Lợi thế nhận thức cho thấy mọi dòng giả mang cùng một 'độ lạnh' — manh mối lớn về một tác giả duy nhất." }
+      ],
+      "keyMilestone": "Tô Vãn hiểu rằng toàn bộ quái đàm là tác phẩm của một Người Soạn và lợi thế của cô chạm được chính nét soạn thảo đó."
+    },
+    {
+      "volume": 6,
+      "title": "Người Soạn Quy Trình",
+      "chapterRange": "731-880",
+      "theme": "Truy ra danh tính và động cơ đứng sau cả bệnh viện",
+      "summary": "Tô Vãn lần ngược chuỗi phó bản về nguồn, đối đầu những tầng phòng vệ quy trình ngày càng hiểm độc, và dần tiến tới nơi Người Soạn ẩn mình.",
+      "subArcs": [
+        { "name": "Ngược dòng bệnh án", "chapterRange": "731-780", "focus": "Lập bản đồ toàn bộ phó bản trong bệnh viện; nhận ra chúng tạo thành một 'bộ quy trình gốc' lớn hơn." },
+        { "name": "Tầng phòng vệ", "chapterRange": "781-830", "focus": "Các phó bản gần nguồn được thiết kế để loại bỏ chính người đọc quy trình giỏi; đấu trí cường độ cao." },
+        { "name": "Phòng trực cuối cùng", "chapterRange": "831-880", "focus": "Tới được không gian của Người Soạn; hé lộ vì sao bệnh viện bị gài cửa tử và vì sao Tô Vãn được chọn." }
+      ],
+      "keyMilestone": "Tô Vãn đối mặt trực tiếp với Người Soạn Quy Trình và biết toàn bộ sự thật."
+    },
+    {
+      "volume": 7,
+      "title": "Viết Lại Bộ Quy Trình Gốc",
+      "chapterRange": "881-1000",
+      "theme": "Lựa chọn cuối — kế thừa, phá bỏ hay viết lại",
+      "summary": "Hiểu rằng đánh bại Người Soạn bằng vũ lực là bất khả, Tô Vãn dùng chính sự thấu hiểu quy trình để 'viết lại' bộ quy trình gốc, giải phóng những người còn kẹt và đặt dấu chấm hết cho chuỗi cửa tử — đồng thời gánh cái giá của việc trở thành người cầm bút soạn thảo.",
+      "subArcs": [
+        { "name": "Đề bài cuối", "chapterRange": "881-930", "focus": "Người Soạn đặt ra một bộ quy trình tối hậu; Tô Vãn giải nó như một bài toán logic toàn cục." },
+        { "name": "Y lệnh mới", "chapterRange": "931-980", "focus": "Cô viết lại các quy trình cốt lõi để vô hiệu hóa cửa tử mà không tạo bất công mới." },
+        { "name": "Trang cuối bệnh án", "chapterRange": "981-1000", "focus": "Giải phóng người còn kẹt; khép lại bằng cái giá và sự bình yên mong manh của một bệnh viện không còn quy trình giết người." }
+      ],
+      "keyMilestone": "Chuỗi quái đàm chấm dứt; Tô Vãn trở thành người viết lại bộ quy trình gốc và gánh hệ quả của lựa chọn đó."
+    }
+  ]
+}

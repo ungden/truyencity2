@@ -1,0 +1,200 @@
+{
+  "power_system": {
+    "name": "Bậc Thang Thế Lực — Khí Vận, Nhân Tài và Đại Cục Quân Chính",
+    "type": "national-power / talent-and-strategy capacity system (sức mạnh đo bằng khí vận - uy tín, chất lượng dàn nhân tài và quy mô đất - dân - quân — KHÔNG phải tu luyện cá nhân siêu nhiên của MC)",
+    "coreResource": "Khí vận - uy tín tích lũy (mở bậc triệu hoán), chất lượng và số lượng danh tướng - mưu sĩ - văn thần dưới trướng, cùng đất - dân - binh - lương làm hậu phương; sức mạnh của MC tỉ lệ thuận với dàn nhân tài anh quy tụ - điều khiển được và cơ nghiệp phía sau, không phải võ công cá nhân.",
+    "unlockRule": "Mỗi bậc thế lực mở ra khi Triệu Khải thật sự gây dựng được cơ nghiệp - chính nghĩa - đất dân và tích đủ khí vận - uy tín; không thể nhảy cóc — danh tướng đỉnh cao chỉ chịu phục một chủ công có thực lực, và một dàn hào kiệt mạnh chỉ giữ được khi anh đủ tài dụng người để điều hòa họ.",
+    "tiers": [
+      { "tier": 1, "name": "Cô Thành Nhất Tướng", "scope": "Một tòa thành cô độc, triệu hoán được danh tướng đầu tiên, giữ vững thế đứng", "milestone": "Giữ thành Nhạn Môn + mãnh tướng đầu tiên + binh sĩ tin phục (Vol 1)" },
+      { "tier": 2, "name": "Ban Tướng Văn Võ", "scope": "Một quận hậu phương, ban tướng văn võ gồm cả mưu sĩ - văn thần triệu hoán và hào kiệt bản địa", "milestone": "Có văn trị - quân sự và hậu phương vững, đủ bước vào tranh bá (Vol 2)" },
+      { "tier": 3, "name": "Cường Lực Cát Cứ", "scope": "Một thế lực đáng gờm trong Cửu Châu, điều phối nhiều danh tướng và cánh quân trong chiến dịch lớn", "milestone": "Thôn tính một vùng rộng, thành một tay chơi lớn của cuộc tranh bá (Vol 3)" },
+      { "tier": 4, "name": "Chính Nghĩa Bá Chủ", "scope": "Giương ngọn cờ chính nghĩa hoàng thất, làm chủ một phương với dàn danh tướng nghiêng trời", "milestone": "Nắm ngọn cờ phù Ung + giữ dàn hào kiệt cùng một mối (Vol 4-5)" },
+      { "tier": 5, "name": "Nhất Thống Thiên Hạ", "scope": "Cỗ máy quân - chính - nhân tài cấp toàn cõi, đủ sức tổng quyết chiến và kiến quốc", "milestone": "Đập tan đại địch + ngoại tộc, thống nhất và an định Cửu Châu (Vol 6-7)" }
+    ],
+    "antiPlotArmor": [
+      "Mỗi lần triệu hoán TIÊU HAO khí vận - uy tín - tài lực; không thể triệu hoán vô hạn hay tùy tiện, phải tích đủ và chọn đúng thời điểm.",
+      "Danh tướng triệu hoán mang tài năng thật nhưng cũng mang cá tính, tham vọng và mâu thuẫn riêng — có thể bất phục, kiêu căng, kèn cựa; dùng sai người sai chỗ hoặc không điều hòa nổi thì sinh họa nội bộ.",
+      "Đài chỉ mở bậc cao khi MC thật sự có cơ nghiệp - chính nghĩa; danh tướng đỉnh cao không phục một chủ công hữu danh vô thực, không thể 'gọi đại thần' khi mới chỉ có một tòa thành.",
+      "MC KHÔNG tự biến thành mãnh tướng tay đôi; thắng lợi đòi hỏi dùng đúng người, mưu lược, ngoại giao, hậu cần và lòng dân — đối thủ chư hầu, ngoại tộc đều có thực lực và mưu mô riêng, không có cứu cánh thần kỳ."
+    ],
+    "progressionAxes": [
+      "Quy mô đất - dân - binh - lương (một thành → một quận → một phương → toàn cõi)",
+      "Chất lượng và bậc của dàn nhân tài triệu hoán - chiêu mộ (mãnh tướng → mưu sĩ - văn thần → danh tướng đỉnh cao thiên cổ)",
+      "Khí vận - uy tín - chính nghĩa tích lũy (mở bậc triệu hoán cao hơn và thu phục lòng người)",
+      "Năng lực điều khiển và điều hòa dàn hào kiệt cá tính (dụng người ở quy mô ngày một lớn)"
+    ],
+    "powerCeilingByPhase": {
+      "phase1": "Một tòa thành cô độc với một danh tướng triệu hoán, đủ tự giữ trước quân phiệt lân cận",
+      "phase2": "Một quận hậu phương với ban tướng văn võ, đủ bước vào cuộc tranh bá lớn hơn",
+      "phase3": "Một thế lực cát cứ đáng gờm điều phối nhiều cánh quân trong chiến dịch quy mô lớn",
+      "phase4": "Một cỗ máy quân - chính - nhân tài cấp toàn cõi định đoạt vận mệnh cả Cửu Châu"
+    }
+  },
+  "worldbuilding": {
+    "tone": "Sử thi quân sự - chính trị hào hùng và mưu trí: cảm giác sảng khoái khi triệu hoán được danh tướng thiên cổ và dùng đúng người lật ngược thế cờ, xen lẫn căng thẳng tranh bá và bài toán dụng người hóc búa; bi tráng của loạn thế nơi lê dân khổ vì binh đao và hào kiệt phải chọn minh chủ.",
+    "economy": "Kinh tế tiền - phong kiến của Cửu Châu loạn thế: nông nghiệp là gốc, đất - dân - lương thực - binh mã là vốn liếng tranh bá; thế gia vọng tộc nắm văn quyền và ruộng đất, chư hầu - tiết độ sứ vơ vét nuôi quân, tiền tệ là bạc và đồng. Triệu Khải gây dựng hậu phương bằng an dân, đồn điền nuôi quân và thu phục nhân tài quản trị.",
+    "setting": "Cửu Châu, một đại lục phương Đông hư cấu thời quần hùng cát cứ: vương triều Đại Ung từng thống nhất nay suy sụp, thiên tử bù nhìn, chư hầu - tiết độ sứ - thế gia cát cứ mỗi người một phương đánh nhau giành đất giành dân, ngoài biên có rợ Khương - Hồ rình rập. Một thế giới thành trì - kỵ binh - bộ binh - cung nỏ và mưu lược binh gia, KHÔNG có tu luyện hay phép thuật.",
+    "geography": {
+      "phase1": "Thành Nhạn Môn biên ải cô độc và vùng phụ cận: vương phủ với Triệu Hiền Đài, doanh trại, làng mạc quanh thành",
+      "phase2": "Cả một quận quanh Nhạn Môn — các thành ấp, vùng nông nghiệp và địa bàn MC thu phục làm hậu phương",
+      "phase3": "Một phương rộng của Cửu Châu — chiến trường tranh bá với các chư hầu lân cận",
+      "phase4": "Toàn cõi Cửu Châu và kinh thành Đại Ung — bàn cờ chính trị, các đại chư hầu và biên thùy giáp ngoại tộc"
+    },
+    "techLevel": "Cổ chiến thuần túy thời quần hùng: thành lũy đất - đá, kỵ binh, bộ binh, cung nỏ, công thành xa, hỏa công, thủy chiến và mưu lược binh gia. KHÔNG có công nghệ vượt thời đại; ưu thế của MC nằm ở dụng người, binh pháp, ngoại giao và hậu cần - tổ chức quân chính chứ không ở vũ khí thần kỳ.",
+    "conflictMedium": "Xung đột giải quyết chủ yếu qua DỤNG NGƯỜI, ĐIỀU BINH KHIỂN TƯỚNG, MƯU LƯỢC, NGOẠI GIAO và LÒNG DÂN: thắng trận bằng đúng tướng đúng kế đúng địa hình, thắng chính trường bằng chính nghĩa và ly gián, thu thiên hạ bằng an dân và quy tụ hào kiệt. Có vô số chiến trận thật, nhưng thắng bại luôn định đoạt bởi mưu lược và dụng người — không bởi một mình một thanh kiếm của MC.",
+    "forbiddenElements": [
+      "tu luyện / cảnh giới / linh khí / võ công siêu nhiên của con người",
+      "phép thuật, yêu ma, thần tiên trực tiếp can thiệp chiến cuộc (Triệu Hiền Đài chỉ triệu hoán LINH HỒN nhân tài vào thân phàm, bản thân nhân tài không có pháp thuật)",
+      "MC tự biến thành mãnh tướng tay đôi quyết định trận đánh bằng võ công cá nhân",
+      "MC mang ký ức của người Đại Ung (MC là kẻ xuyên không mang tri thức thời hiện đại, không phải người bản địa nhớ về quá khứ của thân xác)",
+      "vật phẩm hiện đại hay vũ khí công nghệ mang theo từ thế giới cũ (MC chỉ mang tri thức và tầm nhìn trong đầu)",
+      "triệu hoán vô hạn không trả giá, hoặc gọi được danh tướng đỉnh cao khi chưa có cơ nghiệp - chính nghĩa tương xứng"
+    ]
+  },
+  "factions": [
+    {
+      "name": "Thế lực Nhạn Môn của Triệu Khải",
+      "type": "thế lực hoàng thất - quân chính của nhân vật chính",
+      "power_level": 3,
+      "summary": "Khởi từ một tòa thành cô độc binh ít tướng tàn, dần thành một thế lực có dàn danh tướng thiên cổ và ban văn thần, lấy chính nghĩa hoàng thất Đại Ung làm ngọn cờ, quy tụ hào kiệt và lòng dân để mưu thống nhất Cửu Châu.",
+      "territory": "Thành Nhạn Môn rồi lan ra một quận, một phương và cuối cùng toàn cõi Cửu Châu",
+      "mc_relation": "MC là chủ công, linh hồn và người điều khiển dàn hào kiệt",
+      "conflicts": ["Quân phiệt Mã Đồ", "Thế gia Hạ thị", "các đại chư hầu", "rợ Khương - Hồ"],
+      "alliances": ["lão tướng Tần Trung và phe tướng cũ trung thành", "mưu sĩ - văn thần thiên cổ triệu hoán", "sĩ phu và hào kiệt quy phục"],
+      "importance": 10,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Tập đoàn quân phiệt Mã Đồ và thế gia biên ải",
+      "type": "thế lực quân phiệt - vọng tộc cát cứ lân cận",
+      "power_level": 5,
+      "summary": "Quân phiệt Mã Đồ thiện chiến cát cứ vùng giáp Nhạn Môn, cùng thế gia Hạ thị khinh rẻ 'vương gia hữu danh vô thực', coi Nhạn Môn là miếng mồi dễ nuốt; liên tục tập kích và ngầm phá hoại để chia phần đất của MC.",
+      "territory": "Vùng đất - thành ấp lân cận thành Nhạn Môn",
+      "mc_relation": "Đối thủ cát cứ trực tiếp giai đoạn đầu, bị MC dùng mưu lược - dụng người chế ngự",
+      "conflicts": ["Thế lực Nhạn Môn của Triệu Khải"],
+      "alliances": ["một số đại chư hầu (giai đoạn sau, để kiềm chế MC)"],
+      "importance": 7,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Các đại chư hầu Cửu Châu (Tấn Vương, Sở Công và liên minh vọng tộc)",
+      "type": "các thế lực cát cứ lớn tranh bá thiên hạ",
+      "power_level": 8,
+      "summary": "Tấn Vương phương Bắc thiện chiến, Sở Công phương Nam giàu có, cùng các thế gia vọng tộc nắm văn quyền — những tay chơi lớn của cuộc tranh bá; vừa muốn lợi dụng danh nghĩa hoàng thất của MC vừa liên thủ kiềm chế khi anh trỗi dậy quá nhanh.",
+      "territory": "Các phương lớn của Cửu Châu",
+      "mc_relation": "Đối thủ tranh bá xuyên suốt giai đoạn giữa - cuối, lần lượt bị thôn tính hoặc thu phục",
+      "conflicts": ["Thế lực Nhạn Môn của Triệu Khải", "lẫn nhau"],
+      "alliances": ["liên thủ tạm thời để kiềm chế MC"],
+      "importance": 9,
+      "introduce_arc": 3
+    },
+    {
+      "name": "Liên minh kỵ binh Khương - Hồ",
+      "type": "ngoại tộc xâm lược ngoài biên",
+      "power_level": 9,
+      "summary": "Liên minh các bộ tộc du mục thiện chiến ngoài biên Cửu Châu, kỵ binh cơ động đáng sợ, thừa lúc trung nguyên loạn lạc mà cướp phá rồi tổng tấn công quyết nuốt cả thiên hạ — mối họa ngoại xâm lớn nhất, bị đánh lui nhờ dàn danh tướng đồng tâm và mưu lược của MC.",
+      "territory": "Thảo nguyên ngoài biên và vùng biên thùy bị cướp phá",
+      "mc_relation": "Kẻ thù ngoại xâm tối hậu, bị đập tan ở giai đoạn quyết chiến",
+      "conflicts": ["Thế lực Nhạn Môn của Triệu Khải", "các thế lực trung nguyên"],
+      "alliances": [],
+      "importance": 9,
+      "introduce_arc": 6
+    }
+  ],
+  "plot_twists": [
+    {
+      "summary": "Tình thế tuyệt vọng ban đầu của thành Nhạn Môn không hoàn toàn do thiên tai - loạn lạc mà là một cái bẫy: có kẻ trong tông thất hoặc triều đình bù nhìn cố tình đẩy vị vương gia thất thế này ra biên ải làm con cờ thí, để mượn tay chư hầu xóa sổ một dòng đích.",
+      "payoff_type": "kẻ giật dây ẩn",
+      "setup_chapters": [60, 300],
+      "twist_chapter": 500,
+      "reader_impact": "major",
+      "arc_number": 4
+    },
+    {
+      "summary": "Một trong những danh tướng thiên cổ được triệu hoán mang theo tham vọng và định kiến từ tiền sử của chính mình, ngấm ngầm ấp ủ ý đồ riêng; mầm chia rẽ lớn nhất trong dàn hào kiệt hóa ra bị kẻ địch lợi dụng đúng vào cá tính - quá khứ ấy.",
+      "payoff_type": "phản trắc - mầm chia rẽ nội bộ",
+      "setup_chapters": [250, 600],
+      "twist_chapter": 690,
+      "reader_impact": "major",
+      "arc_number": 5
+    },
+    {
+      "summary": "Cuộc tổng tấn công của ngoại tộc Khương - Hồ không thuần là cướp phá du mục mà được hoạch định cùng nội gián trong trung nguyên, nhắm đúng điểm yếu của các thế lực đang mải tranh bá; chính nhờ tầm nhìn đại cục và dàn mưu sĩ của MC mà âm mưu bị lật ngược thành cơ hội quy về một mối.",
+      "payoff_type": "âm mưu quy mô lớn bị phơi bày",
+      "setup_chapters": [440, 800],
+      "twist_chapter": 840,
+      "reader_impact": "major",
+      "arc_number": 6
+    }
+  ],
+  "themes": [
+    {
+      "name": "Dụng người là sức mạnh lớn nhất",
+      "type": "main",
+      "description": "Trong loạn thế sùng bái võ lực và binh đao, chính tài nhìn người, đặt đúng người đúng việc và điều hòa hào kiệt mới là thứ định đoạt thiên hạ.",
+      "motifs": ["Triệu Hiền Đài sáng lên khi triệu hoán", "MC ngồi giữa trướng điều binh", "một danh tướng đơn thương phá trận theo kế của MC"],
+      "importance": 10
+    },
+    {
+      "name": "Quy tụ hào kiệt khó hơn thắng địch",
+      "type": "main",
+      "description": "Đánh thắng kẻ thù bên ngoài đã khó, giữ một dàn danh tướng cá tính - tham vọng cùng hướng về một mối còn khó hơn — đó mới là bài toán cốt lõi của người làm chủ.",
+      "motifs": ["hai danh tướng kèn cựa nhau trong sảnh", "MC hòa giải bằng ân uy và công tâm", "đại nghĩa khiến hào kiệt bỏ tư thù"],
+      "importance": 9
+    },
+    {
+      "name": "Chính nghĩa và lòng dân là vốn bền vững",
+      "type": "supporting",
+      "description": "Danh phận hoàng thất chính thống và lòng dân là thứ vốn liếng mà binh đao không mua được, giúp MC thu phục hào kiệt và đứng vững giữa loạn thế.",
+      "motifs": ["ngọn cờ phù Ung trừ loạn", "dân chúng quy phục một chủ công biết an dân", "sĩ phu tìm đến vì chính nghĩa"],
+      "importance": 8
+    },
+    {
+      "name": "Từ thế yếu nhất tới định đoạt thiên hạ",
+      "type": "supporting",
+      "description": "Một con người khởi từ thế yếu nhất, không võ công cá nhân, vẫn có thể vực dậy và thống nhất cả thiên hạ bằng tầm nhìn toàn cục và tài dụng người.",
+      "motifs": ["tòa thành cô độc thành kinh đô đại nghiệp", "con cờ thí thành người định đoạt bàn cờ", "bản đồ Cửu Châu dần đổi màu"],
+      "importance": 8
+    }
+  ],
+  "voice_anchors": [
+    {
+      "snippet_type": "opening",
+      "prose_text": "Triệu Khải mở mắt ra giữa tiếng trống trận và mùi khói lửa. Trên đầu là xà gỗ chạm rồng đã bạc màu của một vương phủ tàn tạ, và trong óc anh, ký ức của một vị vương gia trẻ tên Triệu Khải trộn lẫn với ký ức của chính anh — một kẻ yêu sử và binh pháp đến từ một thời đại còn rất xa nơi này. Anh ngồi dậy, nhìn ra ngoài cửa sổ: một tòa thành biên ải cô độc, tường lở, binh sĩ gầy guộc lê bước trên mặt thành, bốn bề là cờ xí của chư hầu đang hau háu chực nuốt. Người đời gọi anh là vương gia hữu danh vô thực, một con cờ thí sắp bị xóa khỏi bàn cờ. Anh không hoảng. Anh chỉ lặng lẽ đảo mắt qua tòa cổ đài rêu phong giữa sân vương phủ — Triệu Hiền Đài — và trong lòng dấy lên một dự cảm. Nơi này thiếu binh, thiếu tướng, thiếu tất cả. Nhưng anh biết một điều cả Cửu Châu này chưa ai biết: anh thuộc nằm lòng cách dùng những con người sẽ làm nên lịch sử.",
+      "key_traits": ["điềm tĩnh", "tư duy đại cục", "không hoảng loạn", "am tường sử và người"]
+    },
+    {
+      "snippet_type": "dialogue",
+      "prose_text": "— Một thành sắp mất, vài trăm binh rệu rã, vương gia định lấy gì mà giữ? Lão tướng Tần Trung chống đao, giọng chua chát. Triệu Khải không phật ý. Anh chỉ tay về phía cổng thành đang bị quân Mã Đồ áp sát. — Tần lão tướng, ta không định lấy số đông mà giữ thành. Ta định lấy đúng một người. Ông cứ cho mở cổng nam, lui quân vào hẻm núi như ta dặn. Một canh giờ nữa, nếu thành không giữ được, ta xin chịu tội trước ba quân. Anh nhìn thẳng vào mắt người tướng già. — Ta biết các ông đã quá mỏi mệt vì một chủ công vô dụng. Hôm nay, ta chỉ xin các ông tin ta một lần.",
+      "key_traits": ["tự tin mà không khoa trương", "dụng người bằng lòng tin", "tôn trọng tướng cũ", "nắm thế cục"]
+    },
+    {
+      "snippet_type": "action",
+      "prose_text": "Triệu Hiền Đài bừng sáng một quầng sáng trầm như ánh đồng cổ, và khí vận trong người Triệu Khải hao đi như nước rút khỏi lòng bàn tay. Anh nghiến răng chịu cơn choáng váng, mắt không rời bóng người đang dần hiện hình trên đài — một mãnh tướng vai rộng, mắt sáng như sao, tay nắm chặt như đang ghì cương một con ngựa vô hình. Ngoài thành, tiếng quân Mã Đồ reo hò tràn lên chân tường. Triệu Khải thở ra, chỉ về phía cổng vỡ. — Tướng quân, trận đầu tiên của ngài ở thế giới này, là ở ngay sau cánh cổng kia. Vị danh tướng cười lớn, nhảy phắt lên lưng ngựa lão tướng Tần Trung dắt tới, một mình một thương lao thẳng vào giữa muôn quân. Trên mặt thành, đám binh sĩ rệu rã trố mắt nhìn một người phá tan cả một mũi xung phong — và lần đầu sau bao tháng, trong mắt họ ánh lên thứ đã tắt từ lâu: hy vọng.",
+      "key_traits": ["trả giá khí vận có thật", "tỉnh táo giữa hiểm nguy", "khoảnh khắc lật thế cờ hào sảng", "tầm vóc khởi nghiệp"]
+    }
+  ],
+  "foreshadowing": [
+    {
+      "hintText": "Khi Triệu Khải lục lại văn thư cũ trong vương phủ, một bức mật thư dở dang nhắc tới việc 'điều vị vương gia này ra biên ải cho yên lòng kinh thành', rồi bị ai đó xé mất nửa dưới.",
+      "category": "environmental",
+      "plantCh": 60,
+      "pickupCh": 500,
+      "payoffDescription": "Hé lộ rằng việc đẩy MC ra tòa thành cô độc biên ải là một cái bẫy chính trị có chủ đích từ kẻ trong tông thất/triều đình, muốn mượn tay chư hầu xóa sổ một dòng đích."
+    },
+    {
+      "hintText": "Một danh tướng thiên cổ được triệu hoán, mỗi khi nhắc tới chuyện 'minh chủ phụ lòng tướng sĩ' lại thoáng đổi sắc mặt và im lặng bất thường, như chạm vào một vết thương cũ từ tiền sử của mình.",
+      "category": "character_behavior",
+      "plantCh": 250,
+      "pickupCh": 690,
+      "payoffDescription": "Cá tính và định kiến mang theo từ tiền sử của vị danh tướng ấy chính là kẽ hở bị kẻ địch khoét vào để gieo mầm chia rẽ lớn nhất trong dàn hào kiệt."
+    },
+    {
+      "hintText": "Một thương nhân ngoài biên giả dạng tới Nhạn Môn buôn ngựa từng dò hỏi tỉ mỉ về tuyến phòng thủ và mâu thuẫn giữa các chư hầu trung nguyên, viện cớ 'để biết đường mà buôn bán cho yên'.",
+      "category": "dialogue",
+      "plantCh": 440,
+      "pickupCh": 840,
+      "payoffDescription": "Ngoại tộc Khương - Hồ đã thu thập tình báo và cấu kết nội gián cho cuộc tổng tấn công nhắm đúng lúc trung nguyên mải tranh bá; chính tầm nhìn đại cục của MC giúp lật ngược âm mưu thành cơ hội quy về một mối."
+    }
+  ]
+}

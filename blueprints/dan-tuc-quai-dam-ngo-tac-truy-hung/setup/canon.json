@@ -1,0 +1,163 @@
+{
+  "power_system": {
+    "name": "Nghiệm Thi Lục",
+    "type": "corpse-reading & exorcism progression (huyền bí dân tục, ẩn dưới vỏ quái đàm)",
+    "coreResource": "Âm Đức — tích từ mỗi vụ truy hung thành công và mỗi âm hồn oan khuất được An Hồn siêu thoát",
+    "progressionAxes": [
+      "Tầng Nghiệm Thi (Đọc Tử Ban → Văn Thi Khí → Thông Âm → Nhập Mộng Tử Giả → Câu Hồn Vấn Tội)",
+      "Cây Trấn Yểm (Phù Trấn → Khẩu Quyết → Trận Đồ → An Hồn → Trấn Đại Tà)",
+      "Cây Suy Luận & Pháp Lý (đọc hiện trường, lý giải tử trạng, biện án trước công đường)"
+    ],
+    "unlockRule": "Mỗi tầng nghiệm thi/trấn yểm cần ngưỡng Âm Đức tăng dần; mở khóa rồi vẫn cần đích thân quan sát, suy luận đúng và làm đúng lễ mới linh nghiệm. Nghiệm Thi Lục chỉ soi điều tử thi muốn nói, không tự kết án hay điểm mặt hung thủ.",
+    "signatureBuff": {
+      "name": "An Hồn",
+      "effect": "Lý Vãn lắng nghe trọn oan tình một âm hồn chưa siêu thoát rồi giải nỗi oan ấy, giúp họ tự nguyện siêu thoát trong an yên — không phải trục xuất hay ép buộc.",
+      "limit": "Mỗi đêm thông âm và An Hồn được một lần; hao tổn tinh thần nặng; chỉ linh nghiệm khi Lý Vãn thật sự thấu hiểu và trả lại được công đạo cho âm hồn đó."
+    },
+    "antiPlotArmor": [
+      "Nghiệm Thi Lục không tự kết án — đọc sai dấu vết hoặc suy luận lệch vẫn bắt nhầm người, vẫn để lọt hung thủ.",
+      "Thông âm hao tổn tinh thần, dùng quá sẽ kiệt sức ốm liệt, không thể lạm dụng.",
+      "Trấn yểm cần đúng phù, đúng lễ, đúng tay nghề; thiếu một thứ là phản phệ, âm vật mạnh hơn vẫn áp đảo được anh.",
+      "Hội tà thần đông và thâm hiểm hơn nhiều; thắng phải bằng điều tra, chứng cứ và mưu trí chứ không bằng buff."
+    ],
+    "powerCeilingByPhase": {
+      "phase1": "Đọc Tử Ban → Thông Âm (phá án cấp huyện)",
+      "phase2": "Văn Thi Khí + Phù Trấn cao (cấp châu phủ)",
+      "phase3": "Nhập Mộng Tử Giả + Trận Đồ trấn yểm (kinh thành, án triều đình)",
+      "phase4": "Câu Hồn Vấn Tội + Trấn Đại Tà (đối đầu tà thần, an định âm dương)"
+    }
+  },
+  "worldbuilding": {
+    "setting": "Đại Lương — một vương triều cổ phong hư cấu, nơi luật vua và lệ tục dân gian song hành; tà sự có thật nhưng ẩn dưới vỏ quái đàm dân gian.",
+    "tone": "U ám, ẩm thấp, rùng rợn mà không sa đà máu me; cái sợ đến từ điều bất thường nhỏ nhặt; ấm áp ở những khoảnh khắc oan tình được giãi.",
+    "conflictMedium": ["nghiệm thi và chứng cứ tử thi", "suy luận và biện án công đường", "trấn yểm và An Hồn", "tin đồn quái đàm dân gian", "mưu kế quan trường và tà phái"],
+    "geography": {
+      "phase1": "Huyện Thanh Khê và các thôn lân cận (Mai Lư, Khúc Đường, am Thanh Tịnh)",
+      "phase2": "Toàn châu phủ và các huyện lân bang",
+      "phase3": "Kinh thành Đại Lương và vùng phụ cận tế tự quốc gia",
+      "phase4": "Khắp các châu và sào huyệt đại tà thần ẩn sâu"
+    },
+    "economy": {
+      "currency": "Bạc lượng, công lao phá án, ân tình dân gian, uy tín trước quan trường",
+      "supplyChain": "Dụng cụ nghiệm thi của huyện nha, dược liệu từ thầy lang, phù giấy và pháp khí từ phương ngoại, tin tức từ hội kín hương lý"
+    },
+    "techLevel": "Cổ phong: huyện nha, công đường tra án, khâm liệm chôn cất, đèn dầu nến sáp, thuyền đò, không có khoa học hiện đại — tri thức tử trạng dựa vào kinh nghiệm ngỗ tác và Nghiệm Thi Lục.",
+    "forbiddenElements": ["yếu tố đến từ nơi khác hay ký ức ngoài đời mình của MC", "công nghệ hiện đại lạc thời", "bạo lực máu me khoa trương vô nghĩa", "ma quỷ vô lý không theo quy tắc thế giới"]
+  },
+  "factions": [
+    {
+      "name": "Huyện nha Thanh Khê",
+      "type": "nha môn quan phủ của MC",
+      "power_level": 4,
+      "summary": "Cơ quan công quyền nơi Lý Vãn làm ngỗ tác; vừa là chỗ dựa thế tục vừa bị quan trên ràng buộc, đôi khi muốn khép án vội.",
+      "territory": "Huyện Thanh Khê",
+      "mc_relation": "MC là ngỗ tác trong nha, dần thành trụ cột phá án",
+      "conflicts": ["Hội Vô Diện thờ tà thần"],
+      "alliances": ["Phương ngoại am Thanh Tịnh"],
+      "importance": 9,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Hội Vô Diện thờ tà thần",
+      "type": "tà phái giấu mặt",
+      "power_level": 9,
+      "summary": "Một hội kín thờ một đại tà thần, chuyên nuôi quái và dàn dựng quái đàm để gieo sợ hãi, giết người diệt khẩu và trục lợi; cài chân tay từ thôn quê tới triều đình.",
+      "territory": "Khắp triều Đại Lương, ẩn trong dân gian và quan trường",
+      "mc_relation": "Kẻ thù chính, thế lực MC truy hung đến cùng",
+      "conflicts": ["Huyện nha Thanh Khê", "Phương ngoại am Thanh Tịnh", "Đề hình ty châu phủ"],
+      "alliances": ["các quan tham bị mua chuộc"],
+      "importance": 10,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Phương ngoại am Thanh Tịnh",
+      "type": "liên minh giới tu hành trấn yểm",
+      "power_level": 6,
+      "summary": "Mạng lưới sư sãi, đạo sĩ và thầy phong thủy do sư Tịnh Không dẫn dắt, thạo trấn yểm và siêu độ; dần thành đồng minh trấn tà của Lý Vãn.",
+      "territory": "Các am, miếu, đạo quán rải rác từ huyện đến châu",
+      "mc_relation": "Đồng minh huyền bí, hỗ trợ trấn yểm và An Hồn",
+      "conflicts": ["Hội Vô Diện thờ tà thần"],
+      "alliances": ["Huyện nha Thanh Khê"],
+      "importance": 8,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Đề hình ty châu phủ",
+      "type": "cơ quan tư pháp cấp châu",
+      "power_level": 7,
+      "summary": "Nha môn xử án hình cấp châu phủ; lúc đầu nghi kỵ Lý Vãn nhưng dần trở thành chỗ dựa pháp lý để anh truy hung quy mô lớn.",
+      "territory": "Toàn châu phủ và liên châu",
+      "mc_relation": "Đồng minh thế tục cấp cao sau khi anh chứng minh tài năng",
+      "conflicts": ["Hội Vô Diện thờ tà thần"],
+      "alliances": ["Huyện nha Thanh Khê"],
+      "importance": 7,
+      "introduce_arc": 2
+    },
+    {
+      "name": "Nghiệm Thi Ty cổ",
+      "type": "truyền thừa nguồn gốc golden finger",
+      "power_level": 8,
+      "summary": "Một nha môn Âm Ty cổ chuyên nghiệm thi và an định âm dương, đã thất truyền sau khi bị hội tà thần tiền thân bức tử; Nghiệm Thi Lục là di sản của nó.",
+      "territory": "Đã thất truyền, dấu tích rải rác trong cổ án và di vật",
+      "mc_relation": "Cội nguồn năng lực của MC, cuối truyện được anh phục dựng",
+      "conflicts": ["Hội Vô Diện thờ tà thần"],
+      "alliances": ["Lý Vãn"],
+      "importance": 8,
+      "introduce_arc": 6
+    }
+  ],
+  "plot_twists": [
+    {
+      "summary": "Tay thầy cúng giả trục lợi ở huyện Thanh Khê chỉ là một con tốt; kẻ đứng sau hắn là một mắt xích cấp dưới của Hội Vô Diện đã trà trộn vào chính huyện nha.",
+      "payoff_type": "kẻ phản trong nội bộ",
+      "setup_chapters": [22, 70],
+      "twist_chapter": 118,
+      "reader_impact": "major",
+      "arc_number": 1
+    },
+    {
+      "summary": "Nghiệm Thi Lục là di sản của Nghiệm Thi Ty — một nha môn Âm Ty cổ từng tồn tại thật và bị tiền thân Hội Vô Diện bức tử để độc chiếm quyền thông âm với cõi chết.",
+      "payoff_type": "nguồn gốc golden finger",
+      "setup_chapters": [150, 430, 740],
+      "twist_chapter": 905,
+      "reader_impact": "cosmic",
+      "arc_number": 7
+    },
+    {
+      "summary": "Sư Tịnh Không trụ trì am Thanh Tịnh thật ra là hậu duệ cuối cùng của một vị quan Nghiệm Thi Ty năm xưa, âm thầm giữ một phần truyền thừa để chờ người kế tục.",
+      "payoff_type": "danh tính ẩn của đồng minh",
+      "setup_chapters": [40, 300],
+      "twist_chapter": 890,
+      "reader_impact": "major",
+      "arc_number": 7
+    }
+  ],
+  "themes": [
+    { "name": "Người chết cũng có tiếng nói", "type": "main", "description": "Mỗi tử thi đều mang một lời chứng; trả công đạo cho người đã khuất cũng quan trọng như cho người sống.", "motifs": ["tử ban kể giờ chết", "âm hồn chưa siêu thoát giãi oan"], "importance": 10 },
+    { "name": "Lý trí thắng mê tín", "type": "main", "description": "Quái đàm rùng rợn đến đâu cũng có quy luật; sự thật và suy luận dập tan nỗi sợ vô căn cứ.", "motifs": ["vạch trần thầy cúng giả", "giải mã điềm gở thành chứng cứ"], "importance": 9 },
+    { "name": "Lòng trắc ẩn với kẻ oan", "type": "supporting", "description": "Thấu cảm với người chết oan là một loại sức mạnh, biến truy hung thành cứu chuộc.", "motifs": ["An Hồn cho âm hồn siêu thoát", "thắp một nén nhang cho kẻ vô danh"], "importance": 8 },
+    { "name": "Kẻ ác là người sống", "type": "supporting", "description": "Ma quỷ đáng sợ, nhưng kẻ ác nhất luôn là người sống mượn tay tà sự để thủ lợi.", "motifs": ["quái đàm được dàn dựng", "hung thủ đội lốt người lương thiện"], "importance": 8 }
+  ],
+  "voice_anchors": [
+    {
+      "snippet_type": "opening",
+      "prose_text": "Đêm mưa, Đình Nghiệm Thi của huyện nha Thanh Khê chỉ còn một ngọn đèn dầu lay lắt. Lý Vãn vén tấm vải liệm, soi đèn lên gương mặt người đã khuất nằm trên phản gỗ. Người ngoài chỉ thấy một xác chết rùng rợn, hai mắt trợn ngược, khóe miệng kéo lên như đang cười. Lý Vãn thì thấy khác. Anh thấy vết tụ máu nơi cổ tay, thấy lớp tử ban tím sẫm loang không đều, thấy một sợi chỉ ngũ sắc còn vương dưới móng tay người chết. Anh không sợ. Anh chỉ khẽ cúi đầu, như chào hỏi, rồi lẩm bẩm — ngươi muốn nói gì, cứ từ từ kể cho ta nghe.",
+      "key_traits": ["điềm tĩnh", "gan lì trước cảnh ghê rợn", "tôn trọng người chết", "con mắt tinh tường"]
+    },
+    {
+      "snippet_type": "dialogue",
+      "prose_text": "— Ngươi một tên ngỗ tác hèn mọn, dám nói bản quan xử oan? Tri huyện đập bàn quát. Lý Vãn không cãi lại, chỉ chắp tay, giọng vẫn đều. — Bẩm đại nhân, tiểu nhân không dám nói ai đúng ai sai. Tiểu nhân chỉ nói cái xác này nói gì. Tử ban đọng ở lưng, nghĩa là người này chết nằm ngửa, chứ không phải treo cổ như trong tờ khai. Một người treo cổ, tử ban phải đọng ở chân tay. Đại nhân muốn tin tờ khai, hay tin cái xác?",
+      "key_traits": ["không khúm núm cũng không hỗn", "lấy chứng cứ tử thi làm lý lẽ", "bình tĩnh phản biện quyền uy"]
+    },
+    {
+      "snippet_type": "action",
+      "prose_text": "Khi đầu ngón tay Lý Vãn vừa chạm vào vết thương trên ngực tử thi, cuốn sổ cũ trong ngực áo anh khẽ ấm lên. Một dòng chữ mờ hiện trong tâm trí anh, chỉ mình anh đọc được: Âm Đức tăng. Hé lộ — hung khí là một cây trâm bạc, ra tay trước giờ Tý. Lý Vãn không reo lên, không biến sắc. Anh chỉ lặng lẽ ghi nhớ, rồi kéo tấm vải liệm đắp lại ngay ngắn cho người đã khuất, như thể vừa nghe được một lời trăng trối chứ không phải một phép lạ. Người sống cần chân tướng. Người chết cần một lời công đạo. Phần còn lại là chuyện giữa anh và cuốn sổ lặng lẽ này.",
+      "key_traits": ["bình thản trước golden finger", "giữ bí mật tự nhiên", "trọng cả người sống lẫn người chết"]
+    }
+  ],
+  "foreshadowing": [
+    { "hintText": "Sư Tịnh Không thoáng nhìn cuốn sổ trong ngực áo Lý Vãn rồi nói 'thí chủ mang trên người một mối duyên rất xưa, xưa hơn cả am này'.", "category": "dialogue", "plantCh": 40, "pickupCh": 890, "payoffDescription": "Hé lộ sư Tịnh Không là hậu duệ quan Nghiệm Thi Ty và nhận ra truyền thừa của Lý Vãn." },
+    { "hintText": "Tay thầy cúng giả trước khi bị bắt lảm nhảm 'Vô Diện đã thấy ngươi rồi, ngỗ tác' — không ai hiểu Vô Diện là gì.", "category": "character_behavior", "plantCh": 70, "pickupCh": 118, "payoffDescription": "Reveal Hội Vô Diện và một mắt xích đã trà trộn vào huyện nha." },
+    { "hintText": "Một dòng khắc mờ trên di vật cổ trong vụ án nhắc tới 'Nghiệm Thi Ty thừa mệnh Âm Ty', nhưng không ai còn nhớ nha môn ấy.", "category": "environmental", "plantCh": 150, "pickupCh": 905, "payoffDescription": "Reveal nguồn gốc Nghiệm Thi Ty và mối thù xưa với tiền thân Hội Vô Diện." }
+  ]
+}

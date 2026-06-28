@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "totalScore": 125,
+  "avgScore": 9.0,
+  "minDimScore": 8,
+  "source": "claude_code",
+  "dimensions": [
+    { "name": "Premise & hook", "score": 9, "note": "Warm-baseline tu tiên đan đạo: tản tu dạt tới tông sắp giải tán, golden finger kích hoạt ngay ch.1; hook cơ hội rõ ràng (một viên đan đổi một mạng người), không khổ-mở-đầu kéo dài." },
+    { "name": "Protagonist engine", "score": 9, "note": "Diệp Thanh Vân có động cơ rõ (đan đạo thiên phú + Đan Hồn Cảm Ứng + đầu óc bố trí tài nguyên), tính cách nhất quán: điềm đạm, lì, trọng tình nghĩa, lấy phẩm đan làm vũ khí." },
+    { "name": "System mechanic", "score": 9, "note": "Đan Lô Hệ Thống có input/output/limit/reward + anti-plot-armor rõ; không tự luyện hộ một viên đan nào, căn cơ MC vẫn tầm thường, thất bại luyện đan vẫn xảy ra." },
+    { "name": "Conflict ladder", "score": 9, "note": "Leo thang sơn môn → quận → Đông Vực → Trung Châu qua 7 volume, giải quyết bằng đan đạo / đấu đan / bố trí / ân nghĩa, không thắng bằng tu vi đè người." },
+    { "name": "World coherence", "score": 9, "note": "Đại Lục Thương Mang nhất quán: cảnh giới tu luyện, phẩm cấp Đan Sư, kinh tế linh thạch và ba dòng đan dược, địa lý 4 phase khớp master-outline." },
+    { "name": "Dopamine cadence", "score": 9, "note": "controlRules ≥2 cao điểm/chương, cao điểm đầu trước nửa chương; face-slap bằng phẩm đan có người chứng kiến (đấu đan), recognition và harvest đều có cadence." },
+    { "name": "Origin lock", "score": 9, "note": "mcOrigin=system-bestowed khóa chặt; MC là tản tu bản địa Đại Lục Thương Mang, tri thức đan đạo do Đan Lô Hệ Thống ban; canon và outlines không chứa bất kỳ token đến từ thế giới khác / ký ức đời trước." },
+    { "name": "Non-combat guardrail", "score": 8, "note": "Genre tien-hiep cho phép combat; nhưng thiết kế chủ động ưu tiên đan đạo và bố trí làm trục thắng, đấu đan thay sống mái — định hướng xung đột rõ ràng và lành mạnh." },
+    { "name": "Foreshadowing & twists", "score": 9, "note": "3 tuyến cài cắm dài hạn (Hắc Phong có kẻ giật dây, thể chất ẩn Lâm Tiểu Thất, di sản Đan Đế / Vạn Dược Tông) đều có plant/payoff chapter cụ thể." },
+    { "name": "Long-form sustainability", "score": 9, "note": "noveltyLadder 4 nấc giữ cùng lane đan đạo, 7 volume cho 1000 chương, endgame phục dựng di sản Đan Đế và dựng thánh địa luyện đan thiên hạ." },
+    { "name": "Vietnamese voice", "score": 8, "note": "Voice anchors tự nhiên, đúng giọng tu tiên đan đạo, đủ diacritics, không AI-tell; thoại đời thường mà vẫn cổ phong." }
+  ],
+  "overallFeedback": "Setup vững: warm-baseline opening với golden finger là mô hình đan đạo có giới hạn rõ ràng, conflict ladder leo thang sạch qua 7 volume từ sơn môn biên cương tới Trung Châu, origin lock chặt (tản tu bản địa system-bestowed), dopamine cadence và foreshadowing đều có cấu trúc, voice anchors đúng giọng. Sẵn sàng cho DeepSeek V4 Pro viết chương. PASS."
+}

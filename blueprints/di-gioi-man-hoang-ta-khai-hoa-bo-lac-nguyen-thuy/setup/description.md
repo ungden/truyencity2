@@ -1,0 +1,9 @@
+Lâm Mặc nhắm mắt ở phòng thí nghiệm nông học của một trường đại học, rồi mở mắt giữa một hang đá lạnh lẽo, trong thân xác gầy trơ xương của một thiếu niên bộ lạc Hắc Thạch. Quanh anh là những con người ăn lông ở lỗ, gặm thịt sống, run rẩy bên đống lửa sắp tàn, mỗi mùa đông lại chôn đi một phần ba số dân vì đói và rét. Đây là Man Hoang — đại lục hồng hoang nơi mãnh thú thống trị bóng đêm và con người chỉ là con mồi yếu ớt nhất.
+
+Nhưng trong cái đầu của Lâm Mặc là cả một nền văn minh. Anh biết cách giữ lửa cháy suốt đêm, biết luộc nước cho khỏi sinh bệnh, biết gieo hạt để mùa sau có cái ăn, biết thuần con thú hoang thành gia súc, biết nung đất thành gốm và rèn quặng thành dao. Với người Hắc Thạch, đó là phép màu của thần linh. Với anh, đó chỉ là bài học vỡ lòng của một thế giới đã đi trước hàng vạn năm.
+
+Từ một thiếu niên vô danh suýt bị bỏ lại cho sói ăn, Lâm Mặc bắt đầu thắp lên ngọn lửa khai hóa. Anh dạy người ta dựng bẫy thay vì liều mạng săn thú, đào giếng thay vì uống nước bẩn, tích lương thay vì cầu may trời thương. Mỗi mảnh tri thức là một mạng người được cứu, một miệng ăn được no, một bước bộ tộc rời khỏi hang tối. Hoài nghi dần biến thành kính phục; kính phục dần biến thành lòng trung thành.
+
+Nhưng khai hóa không hề dễ dàng. Mùa đông vẫn gào thét, mãnh thú vẫn rình rập, các bộ lạc thù địch thèm khát kho lương đầy ắp của Hắc Thạch, và ngay trong tộc cũng có kẻ sợ hãi cái mới, gọi anh là kẻ chọc giận thần linh. Lâm Mặc phải vừa trồng trọt vừa cầm giáo, vừa dạy chữ vừa dựng tường thành, biến hai trăm con người đói khát thành một bộ tộc khiến cả Man Hoang phải nể sợ.
+
+Đây là hành trình một con người hiện đại đốt lửa văn minh giữa thời nguyên thủy — từ ăn lông ở lỗ tới gốm, đồng, sắt, chữ viết và thành trì. Một bản anh hùng ca về tri thức, sinh tồn và khát vọng dựng nên một nền văn minh từ con số không. Đọc tại TruyenCity.

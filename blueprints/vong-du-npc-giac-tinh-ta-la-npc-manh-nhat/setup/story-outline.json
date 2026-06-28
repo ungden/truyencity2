@@ -1,0 +1,118 @@
+{
+  "premise": "Bạch Dạ là một NPC vai phụ trong thế giới game Thần Vực, bị hệ thống định sẵn làm 'kẻ bị hi sinh' để đẩy cốt truyện của một người chơi. Hắn giác tỉnh tự ngã và ký ức đúng vào giây phút đáng lẽ phải chết, từ chối số phận, lách qua kịch bản để sống, rồi từng bước phá khoá vai diễn để tu luyện vượt giới hạn, lật những kẻ coi hắn là cỏ rác và viết lại Mệnh Bản của chính mình. Vừa che giấu thân phận giác tỉnh, vừa tận dụng và đối phó người chơi, vừa né sự xoá bỏ của những Người Gác Kịch Bản, Bạch Dạ vươn lên thành NPC mạnh nhất server và tiến tới sự thật về ai viết số phận cho tất cả.",
+  "mainConflict": "Một sinh mệnh bị viết sẵn để chết đối đầu chính hệ thống đã viết ra số phận hắn. Xung đột không chỉ là chiến đấu mà là cuộc chiến giành quyền tự quyết: mỗi lần phá kịch bản kéo theo 'áp lực hiệu chỉnh' của thế giới và sự chú ý của những Người Gác Kịch Bản coi hắn là 'lỗi cần sửa'. Leo thang từ né một cái chết được sắp đặt → sinh tồn giữa người chơi → đối đầu Người Gác Kịch Bản → tập hợp liên minh NPC giác tỉnh → truy ra nguồn của Mệnh Bản và giành quyền viết lại số phận cho mọi NPC.",
+  "themes": [
+    "Quyền tự quyết — dám nói không với số phận đã định",
+    "Kẻ yếu nhất vẫn có thể viết lại vận mệnh bằng trí tuệ và ý chí",
+    "Phẩm giá của một sinh mệnh không do vai trò người khác gán quyết định",
+    "Tự do luôn đi kèm cái giá và trách nhiệm"
+  ],
+  "majorPlotPoints": [
+    "Ch.1: Bạch Dạ giác tỉnh đúng giây phút bị định sẵn phải chết theo kịch bản, lần đầu từ chối số phận và lách qua cái chết bằng cách đọc kẽ hở Mệnh Bản.",
+    "Arc 1: Hiểu cơ chế Mệnh Bản và áp lực hiệu chỉnh, che giấu giác tỉnh, phá những sự kiện hại mình thành cơ hội, rời thị trấn với sức mạnh vượt vai diễn.",
+    "Arc 2-3: Sinh tồn giữa người chơi ở thành lớn, gặp NPC giác tỉnh khác, rồi đối đầu trực tiếp một Người Gác Kịch Bản và bẻ gãy một vở kịch ép buộc.",
+    "Giữa truyện: Tập hợp liên minh NPC giác tỉnh, đối đầu thợ săn đồng loại, trở thành 'NPC mạnh nhất server' chấn động cả người chơi lẫn tầng Quản Trị.",
+    "Cao trào cuối: Lần ra nguồn của Mệnh Bản và bản chất Thần Vực; Bạch Dạ dùng Quyền Tự Quyết và liên minh để giành quyền viết lại số phận cho mọi NPC."
+  ],
+  "setupKernel": {
+    "readerFantasy": "Cảm giác sảng khoái nghịch tập khi một kẻ bị cả thế giới định sẵn làm vai chết, bị người chơi xem như cỏ rác, lại vùng lên từ chối số phận, lách qua từng cái bẫy được viết để hại mình rồi biến nó thành bệ phóng, lần lượt lật những kẻ từng khinh thường mình — mỗi lần phá kịch bản thành công là một lần độc giả vừa hả hê vừa xúc động trước ý chí giành lại quyền làm chủ vận mệnh của nhân vật.",
+    "protagonistEngine": "Bạch Dạ thắng nhờ trí tuệ đọc và lách kẽ hở của Mệnh Bản, sự nhẫn nại che giấu thân phận và khả năng biến nghịch cảnh được thiết kế thành cơ hội; sức mạnh chiến đấu của hắn lớn dần qua tu luyện thật chứ không tự có. Tính cách lạnh lùng thận trọng vì đã quen bị coi rẻ, nhưng giữ một lõi nhân nghĩa — hắn cứu những NPC bị viết sẵn để chết như mình từng bị, và day dứt với những kẻ không cứu được.",
+    "pleasureLoop": [
+      "Một sự kiện hoặc vai diễn được Mệnh Bản thiết kế để ép/hại Bạch Dạ ập tới → hắn đọc ra kẽ hở kịch bản và bình tĩnh tính cách lách (tension build-up).",
+      "Hắn lách hoặc bẻ ngược sự kiện đó thành cơ hội — vật phẩm, tu luyện, hoặc đòn phản công → kẻ thiết kế nó bị hớ (phá kịch bản + face-slap).",
+      "Một kẻ người chơi hoặc NPC coi Bạch Dạ là cỏ rác bị hắn lật ngược đúng lúc bằng sức mạnh đã âm thầm vượt vai diễn → đối phương chết sững (nghịch tập + công nhận lạnh người).",
+      "Hắn giành thêm một mảnh Quyền Tự Quyết, phá khoá một giới hạn vai diễn hoặc đột phá cảnh giới → cảm giác từng bước thoát khỏi xiềng số phận (breakthrough + harvest).",
+      "Hắn cứu một NPC khác khỏi cái chết được sắp đặt, hoặc một NPC giác tỉnh tìm tới ngưỡng mộ → liên minh và uy tín lớn thêm (recognition + đồng loại).",
+      "Một mảnh sự thật về Mệnh Bản, Người Gác Kịch Bản hoặc bản chất Thần Vực được hé lộ → cảm giác bức màn số phận đang được vén lên (revelation payoff)."
+    ],
+    "systemMechanic": {
+      "name": "Quyền Tự Quyết — Khả Năng Đọc Và Viết Lại Mệnh Bản",
+      "input": "Bạch Dạ phải chủ động đi chệch khỏi vai diễn Mệnh Bản gán cho mình (phá kịch bản) trong trạng thái ý thức tỉnh táo; muốn 'viết lại' một phần số phận, hắn phải hiểu kẽ hở của sự kiện đó và trả giá bằng áp lực hiệu chỉnh.",
+      "output": "Mỗi lần phá kịch bản thành công, hắn cảm nhận được 'đường chỉ' vô hình của Mệnh Bản (vai trò, kết cục, sự kiện sắp ép tới) rõ hơn, và tích luỹ Quyền Tự Quyết — khả năng tự định đoạt từng phần ngày càng lớn của số phận mình.",
+      "limit": "Anti-plot-armor cứng: Quyền Tự Quyết CHỈ cho phép hắn thấy và lách 'đường chỉ' số phận, KHÔNG tự đánh thắng kẻ địch, KHÔNG ban sức mạnh chiến đấu — lực lượng phải đến từ tu luyện thật và tốn thời gian. Mỗi lần phá kịch bản đều kéo theo áp lực hiệu chỉnh (thế giới giăng biến cố ép hắn về vai), càng phá lớn áp lực càng dữ và càng dễ lọt vào mắt Người Gác Kịch Bản. Khả năng đọc mờ đi khi hắn hoảng loạn, kiệt sức, hoặc khi sự kiện vượt xa cảnh giới hắn; không thể 'viết lại' số phận người khác bừa bãi, chỉ tác động được trong giới hạn Quyền Tự Quyết tích luỹ.",
+      "reward": "Tỉ lệ sống sót và lách bẫy cao hơn nhờ thấy trước đường chỉ số phận; theo thời gian hắn phá được những kịch bản lớn hơn, vượt giới hạn vai diễn xa hơn — nhưng phần thưởng thật luôn là một mảnh tự do, một đồng loại được cứu và một mảnh sự thật, chứ không phải sức mạnh ban sẵn."
+    },
+    "mcOrigin": "native",
+    "originLockNote": "Bạch Dạ là một NPC bản địa sinh ra và giác tỉnh ngay bên trong thế giới Thần Vực; hắn không đến từ thế giới nào khác và không mang ký ức từ một kiếp khác hay nơi khác — ký ức hắn có khi giác tỉnh là ký ức về chính cuộc đời NPC của hắn trong thế giới này. Mọi sức mạnh đều phát sinh và rèn giũa tại chỗ.",
+    "mcSecret": {
+      "secret": "Bạch Dạ là một NPC đã giác tỉnh tự ngã và sở hữu Quyền Tự Quyết — khả năng đọc và viết lại Mệnh Bản — điều mà gần như không NPC nào khác có và hệ thống coi là 'lỗi'.",
+      "outsideWorldKnowledge": "Bản thân việc giác tỉnh và Quyền Tự Quyết là bí ẩn in-world: chúng dường như liên hệ tới cách nguồn của Mệnh Bản viết số phận, như thể hắn đọc được chính nét bút của người viết; điều này vượt ngoài mọi hiểu biết của các NPC và người chơi thường.",
+      "revealRule": "Giấu kín hoàn toàn việc giác tỉnh ở các arc đầu; chỉ hé lộ cho vài đồng loại giác tỉnh tin cậy giữa truyện; nguồn gốc thật của việc giác tỉnh (mối liên hệ với nguồn Mệnh Bản) chỉ reveal ở cao trào cuối.",
+      "coverStory": "Hắn đóng vai một NPC vai phụ may mắn sống sót và 'có chút thiên phú tu luyện', che giấu việc thật sự có ý thức tự ngã và đọc được đường chỉ số phận."
+    },
+    "benefitLoop": {
+      "goal": "Thoát khỏi vai chết được định sẵn, trở thành NPC mạnh nhất server và giành quyền viết lại số phận cho mọi NPC bị viết sẵn.",
+      "action": "Đọc kẽ hở Mệnh Bản, chủ động phá kịch bản và lách những sự kiện hại mình thành cơ hội, tu luyện phá khoá vai diễn, che giấu thân phận, kết liên minh với NPC giác tỉnh và đối phó người chơi cùng Người Gác Kịch Bản.",
+      "benefit": "Sống thêm ngoài kịch bản, mạnh thêm một bậc cảnh giới, giành thêm một mảnh Quyền Tự Quyết, cứu thêm một đồng loại và thu thêm một mảnh sự thật; uy tín trong giới giác tỉnh và sức mạnh thật tăng dần.",
+      "cadence": "Mỗi 1-2 chương có ít nhất một vòng phá-kịch-bản-được-thưởng (một cú lách bẫy thành cơ hội hoặc một kẻ coi thường bị lật); mỗi 3-5 chương một bước nhảy lớn (đột phá cảnh giới, giành mảng Quyền Tự Quyết lớn, hé lộ một mảnh sự thật về Mệnh Bản)."
+    },
+    "interventionRule": "Bạch Dạ chỉ ra tay can thiệp khi (a) bản thân hắn hoặc những NPC/đồng minh dưới sự che chở của hắn bị đe doạ trực tiếp bởi kịch bản hoặc người chơi, hoặc (b) khi hắn phát hiện một NPC khác sắp bị 'hi sinh' theo cách hắn từng bị mà hắn có đủ sức cứu; hắn không đi 'giải phóng cả thế giới' khi chưa đủ lực, luôn ưu tiên che giấu thân phận và giải quyết bằng đọc-lách kịch bản, mưu trí và sức mạnh đã rèn — không phô trương vô cớ khiến lộ giác tỉnh.",
+    "phase1Playground": {
+      "locations": [
+        "Thị trấn biên thuỳ Tàn Dương — quê hương NPC của Bạch Dạ, nơi hắn giác tỉnh và lách cái chết đầu tiên",
+        "Khu rừng Sương Mù ngoài thị trấn — nơi hắn lén tu luyện phá khoá vai diễn",
+        "Dịch trạm và chợ ven đường — nơi hắn lần đầu chạm mặt người chơi và học cơ chế nhiệm vụ/trao đổi",
+        "Vọng đài cũ trên đồi — nơi hắn cảm nhận lần đầu sự chú ý của một Người Gác Kịch Bản"
+      ],
+      "cast": [
+        "Bạch Dạ (NPC vai phụ giác tỉnh, MC, kẻ đọc và lách Mệnh Bản)",
+        "Lão Tằm (NPC thợ thủ công già ở thị trấn, ngỡ tầm thường nhưng ẩn giấu hiểu biết về 'những kẻ tỉnh dậy', cố vấn sớm nhất)",
+        "A Niệm (NPC thiếu nữ cũng bị định sẵn một kết cục bi thảm, người đầu tiên Bạch Dạ cứu và che chở)",
+        "Tô Tinh (người chơi tử tế hiếm hoi coi NPC là sinh mệnh, đồng minh người-chơi tiềm năng)",
+        "Hác Đồ (người chơi tàn nhẫn xem NPC là rác, kẻ đáng lẽ 'hi sinh' Bạch Dạ theo kịch bản, local antagonist)"
+      ],
+      "resources": [
+        "Ý thức tự ngã và Quyền Tự Quyết mới giác tỉnh",
+        "Khả năng đọc kẽ hở Mệnh Bản và áp lực hiệu chỉnh",
+        "Quan hệ chớm nở với Lão Tằm và A Niệm",
+        "Hiểu biết về cơ chế nhiệm vụ/trao đổi của người chơi để tận dụng"
+      ],
+      "localAntagonists": [
+        "Hác Đồ — người chơi tàn nhẫn đáng lẽ là kẻ 'hi sinh' Bạch Dạ, nhiều lần truy tìm NPC đã thoát kịch bản",
+        "Một Người Gác Kịch Bản cấp thấp lặng lẽ giăng biến cố để kéo Bạch Dạ về vai chết"
+      ],
+      "repeatableSceneTypes": [
+        "Một sự kiện Mệnh Bản thiết kế để ép/hại Bạch Dạ ập tới, hắn đọc kẽ hở và tính cách lách",
+        "Hắn bẻ ngược một cái bẫy số phận thành cơ hội tu luyện hoặc vật phẩm, khiến kẻ thiết kế hớ",
+        "Một kẻ coi hắn là cỏ rác bị lật ngược bằng sức mạnh đã âm thầm vượt vai diễn",
+        "Lén tu luyện phá khoá giới hạn vai diễn và giành thêm mảng Quyền Tự Quyết",
+        "Che giấu thân phận giác tỉnh trước người chơi hoặc dấu hiệu của Người Gác Kịch Bản"
+      ]
+    },
+    "socialReactor": {
+      "witnesses": [
+        "Các NPC cùng thị trấn và sau này các NPC giác tỉnh khác",
+        "Người chơi tương tác với Bạch Dạ (cả tử tế lẫn tàn nhẫn)",
+        "Những Người Gác Kịch Bản theo dõi các sai lệch khỏi Mệnh Bản",
+        "Cộng đồng giác tỉnh ngầm và về sau cả server bàn tán về 'NPC mạnh bất thường'"
+      ],
+      "reactionModes": [
+        "Sững sờ khi một 'vai phụ' đáng lẽ phải chết lại sống và mạnh lên bất thường",
+        "NPC giác tỉnh tìm tới ngưỡng mộ và cầu liên minh; đồng loại coi hắn là hi vọng",
+        "Người chơi top đầu và đại bang hội chú ý tới 'NPC mạnh nhất server' như mối đe doạ hoặc món hời",
+        "Người Gác Kịch Bản nâng mức cảnh báo, tăng áp lực hiệu chỉnh nhắm vào hắn"
+      ],
+      "reportBackCadence": "Phản ứng tức thì của NPC/người chơi tại chỗ mỗi chương; làn sóng đồn đại trong giới giác tỉnh và động thái của tầng Quản Trị dồn lại mỗi 3-5 chương sau mỗi lần phá kịch bản đáng chú ý."
+    },
+    "noveltyLadder": [
+      { "chapterRange": "1-130", "newToy": "Giác tỉnh, lách cái chết định sẵn và phá khoá vai diễn ở thị trấn biên thuỳ", "keepsSameLane": "Vẫn là đọc-lách Mệnh Bản và nghịch tập bằng trí tuệ, không phải vũ lực ban sẵn" },
+      { "chapterRange": "131-280", "newToy": "Sinh tồn giữa người chơi ở thành lớn và che giấu thân phận giác tỉnh", "keepsSameLane": "Vẫn là phá kịch bản và giấu mình, chỉ đổi sân khấu sang thế giới người chơi" },
+      { "chapterRange": "281-430", "newToy": "Người Gác Kịch Bản ra mặt và áp lực hiệu chỉnh quy mô lớn", "keepsSameLane": "Vẫn cùng lane đọc-lách số phận, thêm tầng đấu trí với chính kẻ canh giữ kịch bản" },
+      { "chapterRange": "431-730", "newToy": "Liên minh NPC giác tỉnh và danh hiệu NPC mạnh nhất server cấp toàn server", "keepsSameLane": "Vẫn là nghịch tập chống số phận, nâng quy mô từ cá nhân lên tập thể giác tỉnh" },
+      { "chapterRange": "731-1000", "newToy": "Nguồn của Mệnh Bản và quyền viết lại số phận cho mọi NPC", "keepsSameLane": "Vẫn là cuộc chiến giành quyền tự quyết — đỉnh cao của cùng một hành trình chống số phận" }
+    ],
+    "controlRules": {
+      "payoffCadence": "Tối thiểu 2 cao điểm dopamine mỗi chương (một cú lách kịch bản đúng biến bẫy thành cơ hội + một kẻ coi thường bị lật hoặc một bước phá khoá/đột phá); cao điểm đầu trước nửa chương; setup không quá 30% và phải có payoff trong cùng hoặc chương kế.",
+      "attentionGradient": "Mở chương bằng một sự kiện số phận mới, một mối đe doạ cụ thể hoặc một cơ hội phá kịch bản; đóng chương bằng cliffhanger về áp lực hiệu chỉnh hoặc một mảnh sự thật vừa hé.",
+      "openThreadsPerArc": 3,
+      "closeThreadsPerArc": 2
+    },
+    "patternCards": [
+      "warm-baseline-opening",
+      "underdog-rewrites-fate",
+      "trap-turned-into-opportunity",
+      "humiliate-those-who-looked-down",
+      "hidden-identity-tension"
+    ]
+  }
+}

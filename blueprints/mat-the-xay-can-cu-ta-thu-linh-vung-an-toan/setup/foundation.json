@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "totalScore": 122,
+  "avgScore": 8.71,
+  "minDimScore": 8,
+  "source": "claude_code",
+  "dimensions": [
+    { "name": "Premise & hook", "score": 9, "note": "Warm-baseline mat-the: Phương Viễn giữ đầu lạnh và bản năng tổ chức kích hoạt ngay ch.1, hook là 'từ tay trắng dựng cơ đồ' giữa sụp đổ — opportunity/competence-driven, không mở đầu bằng cảnh MC sắp chết thảm." },
+    { "name": "Protagonist engine", "score": 9, "note": "Phương Viễn thắng bằng đọc người + đọc hệ thống + tổ chức, không bằng vũ lực; tính cách điềm tĩnh, công bằng, quyết đoán nhưng nhân hậu, nhất quán." },
+    { "name": "System mechanic", "score": 9, "note": "Tầm Nhìn Hậu Cần có input/output/limit/reward rõ; anti-plot-armor cứng — chỉ cho phân tích và kế hoạch, không cho sức mạnh thể chất, không tự thực thi, mờ khi kiệt sức/hỗn loạn, MC vẫn yếu về thể chất và có thể chết." },
+    { "name": "Conflict ladder", "score": 9, "note": "Leo thang giữ một tường → giữ một cộng đồng → hạ băng cướp → lãnh đạo liên minh → dập nguồn sương, kết hợp combat (chống tha hóa, đụng độ kẻ thù) nhưng luôn thắng bằng tổ chức và mưu lược." },
+    { "name": "World coherence", "score": 9, "note": "Đô thị sụp đổ vì sương xám + cơ chế tha hóa/biến chủng + kinh tế tài nguyên + các phe người sống sót đều nhất quán; forbidden elements khóa MC không có dị năng/siêu sức mạnh." },
+    { "name": "Dopamine cadence", "score": 9, "note": "controlRules ≥2 peak/chương (kế hoạch tổ chức vận hành đúng + kẻ ngạo mạn/mối đe dọa bị xử lý hoặc tài nguyên/người thu về), cao điểm đầu trước nửa chương." },
+    { "name": "Origin lock", "score": 9, "note": "mcOrigin=native khóa chặt; outlines và mọi file không chứa token xuyên không/đến từ thế giới khác/trọng sinh/kiếp trước/đầu thai." },
+    { "name": "Combat-genre balance", "score": 8, "note": "mat-the là combat-allowed (chống bầy tha hóa, đụng độ băng cướp) nhưng MC là người thường không dị năng — mọi thắng lợi đến từ tổ chức và hành động tập thể có kỷ luật, forbidden elements cấm MC áp đảo bằng vũ lực phi thường." },
+    { "name": "Foreshadowing & twists", "score": 8, "note": "3 twist (tay trong băng cướp, âm mưu thâu tóm liên minh, lõi sương là nguồn thảm họa) + 3 foreshadowing có plant/payoff chapter cụ thể, kéo dài tới cao trào." },
+    { "name": "Long-form sustainability", "score": 9, "note": "noveltyLadder 5 nấc giữ cùng lane 'sinh tồn bằng tổ chức', 7 volume cho 1000 chương, endgame dập nguồn sương và tái thiết một trật tự bền vững." },
+    { "name": "Vietnamese voice", "score": 8, "note": "Voice anchors căng thẳng mà ấm, đúng giọng sinh tồn mạt thế lấy tổ chức làm lõi, đủ diacritics, không AI-tell." }
+  ],
+  "overallFeedback": "Setup vững cho mat-the combat-allowed lấy base-building làm lõi: warm-baseline opening với bản năng tổ chức active ch.1, golden finger là Tầm Nhìn Hậu Cần có anti-plot-armor cứng (không cho sức mạnh, không tự thực thi, MC vẫn là người thường có thể chết), conflict ladder leo thang sạch qua 7 volume bằng tổ chức và mưu lược, origin lock native chặt, dopamine cadence rõ (kế hoạch thành công + kẻ ngạo mạn bị bẻ gãy + cộng đồng lớn mạnh), foreshadowing và twist có cấu trúc dài hạn. Khác biệt rõ với novel god-tier esper: đây là thủ lĩnh điềm tĩnh xây dựng. Sẵn sàng cho DeepSeek V4 Pro viết chương. PASS."
+}

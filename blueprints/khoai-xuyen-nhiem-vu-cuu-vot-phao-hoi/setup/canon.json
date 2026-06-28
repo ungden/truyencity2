@@ -1,0 +1,150 @@
+{
+  "power_system": {
+    "name": "Hệ Thống Đa Vũ Trụ",
+    "type": "quest-progression-system (khoái xuyên, không tu luyện truyền thống)",
+    "coreResource": "Điểm Tiếc Nuối — tích từ mỗi nhiệm vụ bù đắp tiếc nuối hoàn thành đúng quy tắc",
+    "progressionAxes": [
+      "Cấp Ký Chủ (Tân Binh → Lão Luyện → Tinh Anh → Đại Sư → Truyền Kỳ)",
+      "Cây Thẻ Năng Lực (trí nhớ kịch bản, thuyết phục, ngụy trang, kiến thức chuyên môn theo thế giới)",
+      "Kho Lưu Trữ Phi Vật Chất (kỹ năng, công thức, ngôn ngữ, ký ức mang được qua các thế giới)"
+    ],
+    "unlockRule": "Mỗi Thẻ Năng Lực và nâng cấp cần ngưỡng Điểm Tiếc Nuối tăng dần; mở khóa rồi vẫn cần Tô Diệp tự vận dụng đúng tình huống — Hệ Thống chỉ cấp công cụ và một phần kịch bản, không tự ra tay thay cô.",
+    "signatureBuff": {
+      "name": "Mảnh Ký Ức Nguyên Chủ",
+      "effect": "Cho Tô Diệp truy cập sâu hơn vào ký ức và cảm xúc của nguyên chủ pháo hôi, giúp nhập vai chuẩn xác và thấu hiểu nỗi oan để bù đắp đúng cách.",
+      "limit": "Mỗi thế giới chỉ kích hoạt được số lần giới hạn; lạm dụng để thao túng cảm xúc người khác sẽ bị Hệ Thống trừ điểm."
+    },
+    "antiPlotArmor": [
+      "Hệ Thống không tự ra tay — sai lầm của Tô Diệp vẫn gây hậu quả thật.",
+      "Kịch bản biết trước chỉ một phần và sẽ lệch đi khi cô can thiệp, không phải biết tuốt.",
+      "Phá quy tắc (lộ thân phận, giết nam/nữ chính, lạm quyền tàn nhẫn) bị trừ điểm; điểm âm kéo dài có thể thu hồi hợp đồng và xóa sổ linh hồn."
+    ],
+    "powerCeilingByPhase": {
+      "phase1": "Tân Binh → Lão Luyện (1-2 thế giới, lợi thế chủ yếu là trí tuệ + biết trước kịch bản)",
+      "phase2": "Tinh Anh (vài thế giới, tích nhiều Thẻ Năng Lực và kỹ năng đa lĩnh vực)",
+      "phase3": "Đại Sư (làm chủ vòng lặp nhiệm vụ, đối đầu ký chủ khác)",
+      "phase4": "Truyền Kỳ (chạm tới lõi Hệ Thống, đủ sức định đoạt vận mệnh ký chủ và pháo hôi)"
+    }
+  },
+  "worldbuilding": {
+    "setting": "Đa vũ trụ vô tận gồm vô số thế giới song song, mỗi thế giới vốn là cốt truyện của một tác phẩm đã viết ra; nối giữa chúng là Trạm Trung Chuyển không thời gian của Hệ Thống.",
+    "tone": "Sảng văn khoái xuyên hiện đại: nhịp nhanh, đổi vị liên tục theo thế giới, dày face-slap và công nhận; ấm áp ở lõi cứu người nhưng đã tay ở vỏ lật cờ. Có hành động và mưu kế.",
+    "conflictMedium": ["đấu trí và mưu lược", "vạch trần bằng chứng cứ", "đối đầu trực diện khi cần", "truyền thông và dư luận", "quyền lực và quan hệ trong từng thế giới"],
+    "geography": {
+      "phase1": "Trạm Trung Chuyển + thế giới hào môn hiện đại Giang Thành",
+      "phase2": "Thế giới học đường và showbiz hiện đại",
+      "phase3": "Thế giới cổ trang cung đình và giang hồ",
+      "phase4": "Thế giới mạt thế dị năng và meta-thế giới lõi của Hệ Thống"
+    },
+    "economy": {
+      "currency": "Điểm Tiếc Nuối (giữa các thế giới); trong mỗi thế giới dùng tiền tệ/quyền lực bản địa tương ứng",
+      "supplyChain": "Thẻ Năng Lực và Mảnh Ký Ức cấp qua hoàn thành nhiệm vụ; nâng cấp tại Trạm Trung Chuyển"
+    },
+    "techLevel": "Biến thiên theo thế giới — từ hiện đại 2024 (mạng xã hội, pháp lý, showbiz) tới cổ trang cung đình tới mạt thế dị năng; kiến thức hiện đại của Tô Diệp là lợi thế ở các thế giới cổ.",
+    "forbiddenElements": ["lộ thân phận ký chủ xuyên đến cho nhân vật trong thế giới", "giết nam/nữ chính nguyên tác", "phá nát kịch bản thế giới", "lạm quyền tàn nhẫn để trả thù cho sướng tay", "gán cho MC nguồn gốc tái sinh từ quá khứ — origin lock là transmigrator thuần túy"]
+  },
+  "factions": [
+    {
+      "name": "Hệ Thống Đa Vũ Trụ",
+      "type": "thực thể quản trị đa vũ trụ",
+      "power_level": 10,
+      "summary": "Thực thể giao nhiệm vụ, cấp điểm và công cụ cho ký chủ, đặt ra mọi quy tắc; bản chất và động cơ thật là bí ẩn lớn nhất của truyện.",
+      "territory": "Toàn bộ đa vũ trụ và Trạm Trung Chuyển",
+      "mc_relation": "Đối tác hợp đồng kiêm bí ẩn trung tâm mà MC dần truy nguồn",
+      "conflicts": ["Phe Ký Chủ Lạm Quyền"],
+      "alliances": [],
+      "importance": 10,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Liên Minh Ký Chủ Chính Trực",
+      "type": "nhóm ký chủ đồng minh",
+      "power_level": 7,
+      "summary": "Tập hợp các ký chủ tuân thủ quy tắc, thật lòng bù đắp tiếc nuối cho pháo hôi, do Tô Diệp dần dẫn dắt khi phát hiện phe lạm quyền.",
+      "territory": "Trạm Trung Chuyển và các thế giới họ phụ trách",
+      "mc_relation": "MC là thành viên cốt cán và người khởi xướng liên minh",
+      "conflicts": ["Phe Ký Chủ Lạm Quyền"],
+      "alliances": ["Hệ Thống Đa Vũ Trụ"],
+      "importance": 8,
+      "introduce_arc": 6
+    },
+    {
+      "name": "Phe Ký Chủ Lạm Quyền",
+      "type": "nhóm ký chủ phản diện",
+      "power_level": 8,
+      "summary": "Các ký chủ lách hoặc phá quy tắc, biến pháo hôi và cả thế giới thành con cờ phục vụ lợi ích riêng, sẵn sàng hi sinh nguyên chủ.",
+      "territory": "Các thế giới họ thao túng",
+      "mc_relation": "Đối thủ meta-arc chính của MC",
+      "conflicts": ["Liên Minh Ký Chủ Chính Trực", "Hệ Thống Đa Vũ Trụ"],
+      "alliances": [],
+      "importance": 9,
+      "introduce_arc": 3
+    },
+    {
+      "name": "Lâm Gia (thế giới một)",
+      "type": "gia tộc hào môn nguyên tác",
+      "power_level": 6,
+      "summary": "Gia tộc giàu có ở Giang Thành nơi diễn ra nhiệm vụ một; nội bộ chia rẽ giữa phe bao che nữ chính giả Tống Nhu và phe ông nội ủng hộ đích nữ thật.",
+      "territory": "Thành phố Giang Thành",
+      "mc_relation": "Bối cảnh và sân khấu nhiệm vụ một; vừa là rào cản vừa là phần thưởng cần giành lại",
+      "conflicts": ["Tống Nhu (trong nội bộ)"],
+      "alliances": ["Tô Diệp (qua ông nội và đích nữ thật)"],
+      "importance": 6,
+      "introduce_arc": 1
+    }
+  ],
+  "plot_twists": [
+    {
+      "summary": "Tống Nhu — nữ chính giả ở thế giới một — không chỉ tráo đổi tình cờ; mẹ ruột cô ta là kẻ chủ mưu năm xưa cố ý đánh tráo trẻ sơ sinh để leo vào hào môn, và bằng chứng nằm ngay trong bệnh viện nơi Lâm Vãn Tình suýt chết.",
+      "payoff_type": "âm mưu ẩn",
+      "setup_chapters": [8, 40],
+      "twist_chapter": 120,
+      "reader_impact": "major",
+      "arc_number": 1
+    },
+    {
+      "summary": "Các 'pháo hôi' mà Tô Diệp cứu không phải nhân vật hư cấu thuần túy — họ là những linh hồn thật bị Hệ Thống (hoặc kẻ đứng sau) gán vào kịch bản bi thảm; cứu họ thực chất là giải phóng những sinh mệnh có thật.",
+      "payoff_type": "bản chất thế giới",
+      "setup_chapters": [300, 600, 760],
+      "twist_chapter": 880,
+      "reader_impact": "cosmic",
+      "arc_number": 6
+    },
+    {
+      "summary": "Hệ Thống Đa Vũ Trụ không phải đấng quản trị trung lập — nó được tạo ra từ chính 'tiếc nuối' tập thể của vô số sinh mệnh, và Tô Diệp được chọn vì cô vốn cũng là một pháo hôi của một thế giới đã bị xóa; lựa chọn cuối định đoạt liệu vòng lặp tiếc nuối có chấm dứt.",
+      "payoff_type": "nguồn gốc Hệ Thống và danh tính MC",
+      "setup_chapters": [450, 750, 900],
+      "twist_chapter": 960,
+      "reader_impact": "cosmic",
+      "arc_number": 7
+    }
+  ],
+  "themes": [
+    { "name": "Mỗi tiếc nuối xứng đáng được viết lại", "type": "main", "description": "Không số phận nào là định sẵn; sự can thiệp tử tế có thể đảo ngược một kết cục bi thảm.", "motifs": ["cánh cửa sang thế giới mới", "bảng tổng kết Điểm Tiếc Nuối"], "importance": 10 },
+    { "name": "Công bằng bằng trí tuệ, không bằng tàn độc", "type": "main", "description": "Tô Diệp đòi công lý cho pháo hôi mà không trở thành ác nữ; thắng bằng mưu lược và sự thật.", "motifs": ["nước cờ lật ngược", "vạch trần trước đám đông"], "importance": 9 },
+    { "name": "Giữ bản ngã khi liên tục đổi thân phận", "type": "supporting", "description": "Dù mang bao nhiêu khuôn mặt khác nhau, Tô Diệp vẫn giữ lương tri và con người thật của mình.", "motifs": ["Trạm Trung Chuyển trắng tinh", "Mảnh Ký Ức Nguyên Chủ"], "importance": 8 },
+    { "name": "Sức mạnh thật là hiểu người", "type": "supporting", "description": "Biết trước kịch bản chỉ là công cụ; điều khiến cô thắng là thấu hiểu lòng người và nỗi oan của họ.", "motifs": ["lắng nghe nguyên chủ", "đọc động cơ phản diện"], "importance": 8 }
+  ],
+  "voice_anchors": [
+    {
+      "snippet_type": "opening",
+      "prose_text": "Khi mở mắt, Tô Diệp đã ngồi trên chuyến tàu chiều rời khỏi Giang Thành, hành lý cũ kỹ nhét vội dưới chân. Trong đầu cô, ký ức của Lâm Vãn Tình tràn về như một cuộn phim mờ — bị cả nhà chối bỏ, bị tống về quê, bị người ta gọi là 'con bé giả mạo'. Giao diện trong suốt chỉ mình cô thấy lặng lẽ hiện lên một dòng: Nhiệm vụ một — bù đắp tiếc nuối cho Lâm Vãn Tình. Tô Diệp không hoảng. Cô chỉ nhìn ra ô cửa sổ loang nắng, khẽ thở ra một hơi, rồi mỉm cười rất nhạt. Theo kịch bản, cô gái này lẽ ra phải chết trong cay đắng. Nhưng kịch bản đó, từ hôm nay, sẽ do cô viết lại.",
+      "key_traits": ["bình tĩnh", "quyết đoán", "biết trước kịch bản", "ấm ở lõi"]
+    },
+    {
+      "snippet_type": "dialogue",
+      "prose_text": "— Chị Vãn Tình, em không cố ý đâu, là cái vòng tự rơi vào túi chị mà, Tống Nhu mắt đỏ hoe, giọng run run đúng kiểu trắng trong tội nghiệp. Cả phòng khách đổ dồn ánh nhìn trách móc về phía Tô Diệp. Cô không vội thanh minh. — Vậy à, cô chậm rãi đặt tách trà xuống, ánh mắt điềm tĩnh quét qua từng người. Vậy phiền mọi người xem giúp camera hành lang lúc ba giờ chiều. Nếu cái vòng tự rơi vào túi tôi, chắc nó cũng tự biết đi đường nào để rơi.",
+      "key_traits": ["không tự ái", "phản đòn bằng bằng chứng", "điềm tĩnh trước vu oan"]
+    },
+    {
+      "snippet_type": "action",
+      "prose_text": "Giao diện bật lên ngay khoảnh khắc luật sư Trần Mục đặt kết quả giám định huyết thống lên bàn họp gia tộc: Điểm Tiếc Nuối +250. Một tấm thẻ ánh bạc rơi xuống tầm mắt cô — Thẻ Năng Lực: Trí Nhớ Hồ Sơ. Tô Diệp không reo lên, cũng không liếc lâu. Cô chỉ đứng thẳng lưng giữa căn phòng từng coi thường mình, nhìn gương mặt tái đi của Tống Nhu, và nói bằng giọng không hề lên cao: — Bây giờ, ai mới là người giả mạo trong cái nhà này?",
+      "key_traits": ["bình thản trước phần thưởng", "khí thế lật cờ", "giữ kín Hệ Thống"]
+    }
+  ],
+  "foreshadowing": [
+    { "hintText": "Hệ Thống thi thoảng gọi pháo hôi là 'những linh hồn lạc kịch bản' thay vì 'nhân vật', nhưng không giải thích vì sao.", "category": "dialogue", "plantCh": 5, "pickupCh": 880, "payoffDescription": "Hé lộ pháo hôi là linh hồn thật bị gán vào kịch bản bi thảm, không phải nhân vật hư cấu." },
+    { "hintText": "Mỗi lần về Trạm Trung Chuyển, Tô Diệp thấy một cánh cửa thứ hai luôn khóa, khác hẳn cánh cửa dẫn sang thế giới mới.", "category": "environmental", "plantCh": 28, "pickupCh": 905, "payoffDescription": "Cánh cửa khóa dẫn vào lõi Hệ Thống — nơi sự thật cuối cùng được phơi bày." },
+    { "hintText": "Một ký chủ lạ ở Trạm buột miệng nói 'cô cũng từng là pháo hôi mà, đúng không' rồi vội im bặt khi Tô Diệp quay lại.", "category": "dialogue", "plantCh": 200, "pickupCh": 960, "payoffDescription": "Reveal Tô Diệp vốn là pháo hôi của một thế giới đã bị xóa, lý do cô được Hệ Thống chọn." }
+  ]
+}

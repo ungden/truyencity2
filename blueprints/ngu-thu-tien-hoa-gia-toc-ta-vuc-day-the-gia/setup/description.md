@@ -1,0 +1,9 @@
+Mộc Vân lớn lên trong đống tàn tích của một thế gia từng lừng danh. Hai mươi năm trước, Mộc gia là một trong tứ đại thế gia ngự thú của thành Thanh Khâu, nổi tiếng khắp đại lục Thương Lan nhờ thuật dưỡng thú độc nhất vô nhị. Giờ đây, từ đường phủ bụi, huyết mạch chiến thú quý chết dần, bí pháp thất truyền, đệ tử tản mác. Các gia tộc đối địch như Lý gia, Tào gia chực chờ nuốt trọn những gì còn sót lại. Trên vai chàng thiếu niên mười sáu tuổi là một cái họ đang chìm, và lời thề vực dậy cơ nghiệp tổ tiên.
+
+Cả thành đều cười nhạo khi Mộc Vân nhận về những chiến thú bị xem là phế: một con sói xám gầy gò bị chê là không có tuyến tiến hóa, một con chim nhỏ ốm yếu bị chủ cũ vứt bỏ. Nhưng họ không biết Mộc Vân thừa hưởng thiên phú huyết mạch lặng lẽ của dòng họ — đôi mắt nhìn thấu **tuyến tiến hóa ẩn** mà cả đại lục bỏ sót. Nơi người khác chỉ thấy một con vật vô dụng, cậu thấy được những nhánh tiến hóa cực phẩm còn ngủ say, cùng "điểm bùng nổ" cần kích đúng lúc để đánh thức.
+
+Nhưng nhìn thấy con đường không có nghĩa là đi được. Nhãn lực chỉ cho cậu hướng đi; còn lại là những đêm dài lặn lội tìm linh thảo, canh từng thời khắc tiến hóa mong manh, và kiên nhẫn xây lòng tin với những con thú từng bị bỏ rơi. Mỗi con thú "phế" cậu cứu lên và dưỡng thành đều là một quân bài lật ngược thế cờ, một cái tát thẳng vào những kẻ từng coi thường Mộc gia.
+
+Từ đấu trường thành Thanh Khâu nơi chiến thú giao đấu giành danh dự, đến những khu săn linh thảo tranh chấp giữa các thế gia, đến những cuộc đấu trí đầy mưu mô chốn quyền môn — Mộc Vân từng bước dựng lại thanh danh dòng họ. Cậu không phải kẻ ra trận đánh đấm; cậu là người đứng sau, đọc thấu thế trận, chỉ huy đàn chiến thú từng bị cả thế gian ruồng bỏ vươn lên đỉnh cao.
+
+Một hành trình vực dậy thế gia suy tàn đầy nhiệt huyết, nơi con mắt tinh tường và tấm lòng với muôn loài mạnh hơn mọi huyết mạch cao quý. Đọc tại TruyenCity.

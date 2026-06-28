@@ -1,0 +1,119 @@
+{
+  "premise": "Tô Uyển, tiểu thư gia tộc Tô từng bị người thân giả tạo và vị hôn phu phản bội hãm hại đến tan cửa nát nhà rồi chết trong tủi nhục, trọng sinh trở về ba năm trước — thời điểm mọi bi kịch chưa kịp bắt đầu. Mang theo ký ức kiếp trước như một tấm bản đồ thời điểm (biết ai sẽ phản bội, thương vụ nào sẽ sụp, tin đồn nào sẽ được tung ra), cô lặng lẽ vạch trần kẻ giả tạo, cứu gia tộc, gây dựng sự nghiệp riêng và đoạt lại thanh danh. Nhưng ký ức không tự ký hợp đồng hay thắng kiện; mọi bước đoạt lại đều đòi cô tự rèn năng lực thật và đọc lại tình thế khi dòng đời đã đổi. Tất cả giải quyết bằng trí tuệ và mưu lược thương trường — tuyệt đối không bạo lực.",
+  "mainConflict": "Một người phụ nữ lý trí, từng trả giá bằng cả mạng sống cho sự ngây thơ, đối đầu một mạng lưới kẻ giả tạo và một thế lực giật dây trong giới hào môn — những kẻ giỏi diễn vai người tốt và nghiền nát đối thủ bằng tin đồn, hợp đồng và thâu tóm. Xung đột không giải quyết bằng bạo lực mà bằng đọc người, thu thập bằng chứng, giành cổ phần, kiểm soát dư luận và ra tay đúng thời điểm. Leo thang từ chặn một cái bẫy cá nhân → gây dựng sự nghiệp độc lập → vạch trần kẻ giả tạo trước công chúng → giành quyền kiểm soát tập đoàn → đối đầu thế lực chủ mưu thật sự đứng sau bi kịch kiếp trước.",
+  "themes": [
+    "Trí tuệ và sự chuẩn bị thắng được mọi âm mưu, không cần đến bạo lực",
+    "Đoạt lại đời mình bằng năng lực thật, không chỉ dựa vào lợi thế biết trước",
+    "Tình yêu xứng đáng được xây trên sự bình đẳng và tôn trọng",
+    "Sự thật được phơi bày đúng lúc mạnh hơn mọi lời vu khống"
+  ],
+  "majorPlotPoints": [
+    "Ch.1: Tô Uyển trọng sinh về buổi sáng ba năm trước, nhận ra mình đang đứng trước tất cả những kẻ sẽ hại cô và lặng lẽ từ chối nước cờ đính hôn mà kiếp trước cô đã hân hoan nhận.",
+    "Arc 1: Chặn được cái bẫy đầu tiên của kiếp trước, giành quyền điều hành một công ty con bị coi thường làm bàn đạp, khiến kẻ giả tạo lần đầu bất an vì kịch bản đã lệch.",
+    "Arc 2-3: Gây dựng thương hiệu riêng chứng minh năng lực thật, rồi vạch trần em gái nuôi và vị hôn phu cũ trước công chúng bằng bằng chứng, cứu gia tộc Tô khỏi bị thâu tóm.",
+    "Giữa truyện: Bước vào cuộc chiến cổ phần hội đồng quản trị, giành lại quyền điều hành tập đoàn gia tộc và mở rộng thành một đế chế kinh doanh mới.",
+    "Cao trào cuối: Lần ra thế lực giật dây thật sự đứng sau toàn bộ bi kịch kiếp trước, hạ gục kẻ chủ mưu bằng thế cờ đã bày sẵn, đoạt lại trọn vẹn gia tộc, sự nghiệp, thanh danh và một mối tình bình đẳng."
+  ],
+  "setupKernel": {
+    "readerFantasy": "Cảm giác sảng khoái khi một người phụ nữ từng bị nghiền nát vì cả tin nay trở lại với cái đầu lạnh và một tấm bản đồ tương lai — bình thản nhìn kẻ giả tạo diễn vai người tốt rồi tự tay tháo từng mắt xích âm mưu, biến mỗi cú vùi dập định sẵn thành bậc thang đi lên, để kẻ từng cười trên nỗi đau của cô phải tự lột mặt nạ trước cả thành phố. Mỗi lần cô lật ngược một thế cờ tưởng đã thua là một lần độc giả thở phào và hả hê.",
+    "protagonistEngine": "Tô Uyển thắng nhờ ký ức kiếp trước cho cô biết TRƯỚC ai sẽ ra tay và khi nào, cộng với trí tuệ thương trường, khả năng đọc người và sự kiên nhẫn lạnh lùng để chờ đúng thời điểm. Tính cách điềm tĩnh, sắc sảo, kiêu hãnh mà không phô trương; cô không gào khóc hay trả thù bốc đồng, mà bày thế cờ để sự thật và luật chơi tự nghiền kẻ ác — đồng thời vẫn giữ lòng trắc ẩn với người thật sự tốt.",
+    "pleasureLoop": [
+      "Một kẻ giả tạo ra một nước cờ quen thuộc từ kiếp trước → Tô Uyển nhận ra ngay và lặng lẽ chuẩn bị phản đòn trong khi đối phương tưởng cô vẫn ngây thơ (tension build-up + thông tin bất đối xứng).",
+      "Kẻ giả tạo tự tin tung đòn (tin đồn, hợp đồng bẫy, thâu tóm) → Tô Uyển bật lại bằng bằng chứng/thế cờ đã giăng sẵn → đối phương chết lặng (xác nhận lạnh người + lật kèo).",
+      "Cô đoạt lại một thương vụ hoặc một mảng quyền lực tưởng đã mất vào đúng phiên họp/sự kiện quyết định (giành-lại-peak).",
+      "Cô vạch trần một bộ mặt giả trước đám đông bằng sự thật, cứu một người vô tội hoặc cả gia tộc khỏi bẫy (phơi bày + công nhận).",
+      "Hoàn tất một thương vụ/chiến dịch, thu về cổ phần, danh tiếng hoặc một đồng minh mới → tiến gần hơn tới việc đoạt lại tất cả (harvest + tiến triển).",
+      "Một mảnh sự thật về thế lực giật dây thật sự đứng sau bi kịch kiếp trước được hé lộ → cảm giác bức màn đang được vén lên (revelation payoff)."
+    ],
+    "systemMechanic": {
+      "name": "Ký Ức Kiếp Trước — Bản Đồ Thời Điểm",
+      "input": "Tô Uyển đối chiếu một tình huống hiện tại với ký ức về cùng sự kiện ở kiếp trước; ký ức chỉ rõ ràng với những việc cô từng đích thân trải qua hoặc nghe thấy, và chỉ trong khoảng ba năm trước thời điểm cô chết.",
+      "output": "Cô biết trước một kẻ sẽ phản bội vào lúc nào, một thương vụ sẽ sụp ra sao, một tin đồn sẽ được tung ra khi nào — như có sẵn một tấm bản đồ thời điểm của chuỗi tai họa cũ.",
+      "limit": "Anti-plot-armor cứng: ký ức CHỈ cho biết kịch bản CŨ, KHÔNG tự ký hợp đồng, KHÔNG tự thắng kiện, KHÔNG tự dập một vụ bê bối — cô vẫn phải tự xây năng lực và ra tay. Quan trọng hơn, mỗi lần cô can thiệp sớm, dòng đời lệch khỏi kịch bản cũ, khiến ký ức mất dần giá trị; càng về sau cô càng phải dựa vào trí tuệ thật thay vì trí nhớ. Ký ức cũng mù với những việc cô chưa từng biết ở kiếp trước (âm mưu hậu trường, kẻ giật dây thật sự).",
+      "reward": "Lợi thế thời điểm giúp cô tránh bẫy và đi trước đối thủ một nước; theo thời gian cô tích lũy năng lực, mạng lưới và uy tín thật — phần thưởng thật sự luôn là quyền lực tự gây dựng và một mảnh sự thật, không phải sự ban phát của ký ức."
+    },
+    "mcOrigin": "reincarnated",
+    "originLockNote": "Tô Uyển trọng sinh trong CÙNG một thế giới hiện đại, trở về chính cuộc đời mình ba năm trước và giữ nguyên ký ức kiếp trước; cô là người bản địa của thế giới này, không đến từ bất kỳ nơi nào khác, và mọi tri thức của cô đều bắt nguồn từ trải nghiệm kiếp trước trong chính thế giới ấy.",
+    "mcSecret": {
+      "secret": "Tô Uyển đã sống trọn vẹn ba năm tiếp theo ở kiếp trước và biết trước toàn bộ chuỗi bi kịch sắp xảy ra cùng bộ mặt thật của những kẻ quanh mình.",
+      "outsideWorldKnowledge": "Tri thức của cô không phải từ một thế giới khác mà từ chính tương lai của thế giới này mà cô đã sống qua một lần — một lợi thế mà không một ai khác sở hữu và không thể giải thích bằng logic thông thường.",
+      "revealRule": "Giấu kín hoàn toàn ở giai đoạn đầu; chỉ hé lộ một phần mơ hồ cho nam chính và một hai đồng minh thân tín ở giữa truyện (dưới dạng 'linh cảm sắc bén' chứ không nói thẳng là trọng sinh); bản chất thật chỉ được xác nhận trọn vẹn ở cao trào cuối.",
+      "coverStory": "Cô nói mình chỉ 'nhạy bén với con người và đoán giỏi xu hướng thị trường', che giấu việc thật sự nhớ rõ tương lai từng xảy ra."
+    },
+    "benefitLoop": {
+      "goal": "Đoạt lại tất cả những gì từng bị cướp đi — gia tộc, sự nghiệp, thanh danh, tình yêu — và hóa giải tận gốc nguồn cơn bi kịch kiếp trước.",
+      "action": "Đối chiếu ký ức để nhận diện bẫy, kiên nhẫn thu thập bằng chứng, gây dựng năng lực và mạng lưới thật, giành cổ phần và kiểm soát dư luận, rồi ra tay đúng thời điểm để sự thật và luật chơi tự nghiền kẻ ác.",
+      "benefit": "Mỗi vòng cô tránh được một tai họa, đoạt lại một mảng quyền lực hoặc một thương vụ, vạch trần một bộ mặt giả, thu thêm một đồng minh và một mảnh sự thật; uy tín, tài sản và vị thế của cô trong giới hào môn tăng dần.",
+      "cadence": "Mỗi 1-2 chương có ít nhất một vòng đọc-thế-cờ-được-thưởng (một nước phản đòn lật kèo hoặc một bộ mặt giả bị bóc); mỗi 3-5 chương một bước nhảy lớn (đoạt lại một thương vụ lớn, vạch trần công khai, lên một bậc quyền lực hoặc hé lộ một mảnh sự thật)."
+    },
+    "interventionRule": "Tô Uyển chỉ ra tay can thiệp khi (a) chính cô, gia tộc cô hoặc người vô tội mà cô quan tâm đang trực tiếp bị một âm mưu nhắm tới, hoặc (b) khi cô có đủ bằng chứng để phơi bày một kẻ giả tạo mà không làm hại người ngay thẳng; cô không đi 'cứu cả thế giới' ngoài tầm với, luôn giải quyết bằng đọc người, thu thập chứng cứ, đấu trí thương trường, kiểm soát dư luận và phơi bày sự thật đúng lúc — tuyệt đối không bằng bạo lực thể chất, không thuê người hành hung, không trả thù bằng phương cách phạm pháp.",
+    "phase1Playground": {
+      "locations": [
+        "Biệt thự gia tộc Tô — nơi diễn ra các bữa tiệc, lễ đính hôn và những màn diễn vai của kẻ giả tạo",
+        "Tòa nhà tập đoàn Tô và một công ty con nhỏ bị coi thường mà Tô Uyển chọn làm bàn đạp đầu tiên",
+        "Các sự kiện thượng lưu: tiệc từ thiện, buổi ra mắt thương hiệu, phòng họp hội đồng quản trị",
+        "Văn phòng riêng và không gian đời thường của Tô Uyển (căn hộ, quán cà phê nơi cô gặp đồng minh)"
+      ],
+      "cast": [
+        "Tô Uyển (tiểu thư trọng sinh, MC, doanh nhân lý trí)",
+        "Tô Mạn Nghi (em gái nuôi dịu dàng bề ngoài, kẻ giả tạo chủ chốt, local antagonist)",
+        "Cố Trạch Viễn (vị hôn phu hào hoa kiếp trước, kẻ phản bội, local antagonist)",
+        "Tô Hoài Đức (cha của Tô Uyển, người cô muốn cứu khỏi bệnh và bị qua mặt)",
+        "Lục Thâm (doanh nhân trầm tĩnh, nam chính, dần trân trọng bản lĩnh của cô)",
+        "Hàn Khiết (trợ lý/bạn thân chân thành, đồng minh sớm nhất của Tô Uyển)"
+      ],
+      "resources": [
+        "Ký ức kiếp trước — Bản Đồ Thời Điểm",
+        "Quyền điều hành một công ty con nhỏ làm bàn đạp",
+        "Kiến thức tài chính và quan hệ truyền thông cô tự rèn lại",
+        "Quan hệ chớm nở với Lục Thâm và Hàn Khiết"
+      ],
+      "localAntagonists": [
+        "Tô Mạn Nghi — em gái nuôi diễn vai thiên thần, từng bước rút ruột gia sản và bôi nhọ Tô Uyển ở kiếp trước",
+        "Cố Trạch Viễn — vị hôn phu hào hoa nhưng cơ hội, đồng lõa trong âm mưu thâu tóm gia tộc"
+      ],
+      "repeatableSceneTypes": [
+        "Nhận diện một nước cờ quen thuộc từ kiếp trước và lặng lẽ giăng phản đòn trong khi đối phương tưởng cô vẫn ngây thơ",
+        "Một kẻ giả tạo tung đòn (tin đồn, hợp đồng bẫy) và bị Tô Uyển lật ngược bằng bằng chứng/thế cờ đã chuẩn bị",
+        "Vạch trần một bộ mặt giả trước đám đông tại một sự kiện thượng lưu để cứu người hoặc đoạt lại danh dự",
+        "Đoạt lại hoặc giành được một thương vụ/mảng quyền lực tại một phiên họp hay buổi đàm phán quyết định",
+        "Đoạn đời thường giữa các thương vụ: ghép manh mối, củng cố đồng minh, và những khoảnh khắc tình cảm chớm nở với nam chính"
+      ]
+    },
+    "socialReactor": {
+      "witnesses": [
+        "Các thành viên và cổ đông gia tộc Tô",
+        "Giới doanh nhân và các gia tộc hào môn trong thành phố",
+        "Báo chí, mạng xã hội và giới phóng viên giải trí",
+        "Đồng minh, đối tác kinh doanh và những người từng coi thường cô"
+      ],
+      "reactionModes": [
+        "Sững sờ và nể phục khi Tô Uyển lật ngược một thế cờ tưởng đã thua",
+        "Dư luận đảo chiều, từ khinh bỉ sang ngưỡng mộ khi sự thật được phơi bày",
+        "Các gia tộc kỳ cựu bắt đầu dè chừng và xem cô như một đối thủ đáng gờm",
+        "Kẻ giả tạo hoảng loạn, tung thêm tin đồn để bôi nhọ nhưng càng tự sa lầy"
+      ],
+      "reportBackCadence": "Phản ứng tức thì của những người trong cuộc mỗi chương; làn sóng dư luận và động thái của các gia tộc dồn lại mỗi 3-5 chương sau khi cô hoàn tất một nước cờ đáng chú ý."
+    },
+    "noveltyLadder": [
+      { "chapterRange": "1-130", "newToy": "Chặn cái bẫy kiếp trước và giành công ty con đầu tiên làm bàn đạp", "keepsSameLane": "Vẫn là đấu trí hào môn bằng đọc người, bằng chứng và thế cờ thương trường" },
+      { "chapterRange": "131-280", "newToy": "Gây dựng thương hiệu riêng và phản đòn cạnh tranh bẩn", "keepsSameLane": "Vẫn là đoạt lại quyền lực bằng năng lực và dư luận, chỉ nâng quy mô sân chơi" },
+      { "chapterRange": "281-430", "newToy": "Vạch trần kẻ giả tạo trước công chúng bằng chuỗi bằng chứng", "keepsSameLane": "Vẫn cùng lane đấu trí phơi bày sự thật, không bạo lực, chỉ tăng độ phơi bày công khai" },
+      { "chapterRange": "431-730", "newToy": "Chiến tranh cổ phần hội đồng quản trị và mở rộng đế chế kinh doanh", "keepsSameLane": "Vẫn là giành quyền bằng phiếu, liên minh và chiến lược, thêm tầng đối đầu các hào môn kỳ cựu" },
+      { "chapterRange": "731-1000", "newToy": "Truy ra và hạ gục thế lực giật dây thật sự đứng sau bi kịch kiếp trước", "keepsSameLane": "Vẫn là cuộc đấu trí hào môn — đỉnh cao của cùng một trò chơi quyền lực và sự thật" }
+    ],
+    "controlRules": {
+      "payoffCadence": "Tối thiểu 2 cao điểm dopamine mỗi chương (một nước phản đòn lật kèo và một bộ mặt giả bị bóc hoặc một thương vụ được đoạt lại); cao điểm đầu xuất hiện trước nửa chương; setup không quá 30% và phải có payoff trong cùng hoặc chương kế.",
+      "attentionGradient": "Mở chương bằng một nước cờ của đối thủ, một cơ hội bất ngờ hoặc một dấu hiệu âm mưu; đóng chương bằng một cú lật kèo, một mảnh sự thật vừa hé hoặc một khoảnh khắc tình cảm tạo tò mò.",
+      "openThreadsPerArc": 3,
+      "closeThreadsPerArc": 2
+    },
+    "patternCards": [
+      "warm-baseline-opening",
+      "rebirth-foreknowledge-edge",
+      "fake-mask-exposed",
+      "boardroom-power-play",
+      "slow-burn-equal-romance"
+    ]
+  }
+}

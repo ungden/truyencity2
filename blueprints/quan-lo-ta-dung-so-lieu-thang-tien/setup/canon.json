@@ -1,0 +1,151 @@
+{
+  "power_system": {
+    "name": "Hệ Thống Trị Lý",
+    "type": "governance-progression-system (năng lực trị lý & uy tín chính trị, KHÔNG võ thuật, KHÔNG siêu nhiên công khai)",
+    "coreResource": "Điểm Tín Nhiệm — tích lũy khi Trần Hạo tạo ra chính tích thật khiến dân tin và cấp trên công nhận",
+    "progressionAxes": [
+      "Cấp Quan (Cán bộ xã → Cán bộ huyện → Lãnh đạo tỉnh → Cấp trung ương)",
+      "Cây Năng Lực Trị Lý (phân tích số liệu, thiết kế chính sách, quản trị ngân sách, đàm phán, vận động chính sách)",
+      "Cây Uy Tín (lòng dân, tín nhiệm đồng cấp, niềm tin của cấp trên, ảnh hưởng dư luận)"
+    ],
+    "unlockRule": "Mỗi tầng góc nhìn quản trị và mỗi nấc thăng tiến cần ngưỡng Tín Nhiệm tăng dần; mở khóa rồi vẫn cần Trần Hạo tự thuyết phục tập thể, vượt quy trình pháp lý và lòng người để thực thi. Hệ Thống chỉ phơi bày sự thật bằng số liệu, không tự ra quyết định và không tự thực thi hộ.",
+    "signatureBuff": {
+      "name": "Soi Thấu Báo Cáo",
+      "effect": "Khi Trần Hạo đọc một bản báo cáo/hồ sơ đã khảo sát thực địa, anh lập tức thấy con số nào bị làm giả và đâu là số liệu thật bên dưới (không phải đọc được suy nghĩ, không ép buộc ai).",
+      "limit": "Chỉ hiệu lực với dữ liệu anh đã trực tiếp kiểm chứng tại thực địa; báo cáo về địa bàn anh chưa đặt chân tới thì Hệ Thống không soi được."
+    },
+    "antiPlotArmor": [
+      "Không tự ra quyết định — chính sách vẫn thất bại nếu Trần Hạo thuyết phục kém hoặc thực thi sai.",
+      "Dự báo chỉ đúng trong phạm vi dữ liệu đã khảo sát; biến số chính trị (vây cánh, lá phiếu, quan hệ) Hệ Thống không kiểm soát.",
+      "Đối thủ có quyền lực và quan hệ thật lớn hơn nhiều; thắng phải bằng nước cờ chính trị thông minh và kênh hợp pháp, không bằng buff."
+    ],
+    "powerCeilingByPhase": {
+      "phase1": "Cán bộ xã → được tín nhiệm đề bạt (quản trị một địa bàn cơ sở)",
+      "phase2": "Cán bộ huyện (phá dự án ma + lập mạng lưới cải cách)",
+      "phase3": "Lãnh đạo cấp tỉnh (minh bạch quy mô tỉnh, đối đầu lợi ích nhóm lớn)",
+      "phase4": "Cấp trung ương (cải cách thể chế minh bạch số liệu, phục dựng Viện Trị Lý)"
+    }
+  },
+  "worldbuilding": {
+    "setting": "Một quốc gia giả tưởng mang hơi thở Việt Nam đương đại — đô thị và nông thôn đời thực, guồng máy hành chính bốn cấp xã/huyện/tỉnh/trung ương, không có siêu nhiên công khai.",
+    "tone": "Ấm áp, đời thường xen nghị trường, sảng văn quan trường; thăng tiến bằng chính tích và liêm chính, không bạo lực.",
+    "conflictMedium": ["chính sách công", "số liệu và dữ liệu kiểm toán", "đàm phán và vận động chính sách", "pháp lý và kênh giám sát", "truyền thông và dư luận"],
+    "geography": {
+      "phase1": "Xã Đông Phú (xã nghèo vùng ven) và huyện chủ quản",
+      "phase2": "Toàn huyện và các phòng ban chuyên môn",
+      "phase3": "Cấp tỉnh: các sở, khu công nghiệp, đại dự án bất động sản",
+      "phase4": "Cấp trung ương: các bộ ngành, cơ quan thanh tra/kiểm toán/giám sát"
+    },
+    "economy": {
+      "currency": "Chỉ số tăng trưởng địa phương, tỷ lệ hộ nghèo giảm, vốn đầu tư thu hút, điểm hài lòng của dân, phiếu tín nhiệm",
+      "supplyChain": "Hợp tác xã nông nghiệp, làng nghề, khu công nghiệp, chuỗi giá trị nông sản, ngân sách nhà nước"
+    },
+    "techLevel": "Hiện đại đương đại: chính phủ điện tử, cơ sở dữ liệu dân cư, báo cáo điện tử, mạng xã hội, báo chí điều tra, công cụ phân tích dữ liệu.",
+    "conflictMedium_note": "Mọi xung đột giải quyết hoàn toàn non-combat: qua bàn họp, văn bản, số liệu, đàm phán, pháp lý, truyền thông.",
+    "forbiddenElements": ["bạo lực vật lý giải quyết xung đột", "đánh nhau/ẩu đả", "xã hội đen giang hồ đâm chém", "ám sát/hành hung", "yếu tố siêu nhiên công khai", "tu luyện/cảnh giới võ thuật"]
+  },
+  "factions": [
+    {
+      "name": "Mạng Lưới Cải Cách",
+      "type": "liên minh cán bộ liêm chính của MC",
+      "power_level": 6,
+      "summary": "Mạng lưới cán bộ liêm chính, chuyên gia kỹ trị và nhà báo điều tra do Trần Hạo khởi xướng để minh bạch hóa số liệu và phản biện chính sách.",
+      "territory": "Lan từ xã → huyện → tỉnh → trung ương",
+      "mc_relation": "MC là người khởi xướng và dẫn dắt",
+      "conflicts": ["Liên Minh Lợi Ích Nhóm", "Tập đoàn Hồng Phát"],
+      "alliances": ["Cục Giám Sát & Kiểm Toán"],
+      "importance": 10,
+      "introduce_arc": 3
+    },
+    {
+      "name": "Liên Minh Lợi Ích Nhóm",
+      "type": "phe quan chức biến chất câu kết doanh nghiệp",
+      "power_level": 9,
+      "summary": "Liên minh ngầm giữa một số quan chức biến chất và doanh nghiệp sân sau, sống bằng dự án ma, đội vốn, thổi giá đất và báo cáo láo; vũ khí là quan hệ, tiền và che giấu số liệu.",
+      "territory": "Cấp huyện đến trung ương",
+      "mc_relation": "Đối thủ chính trị xuyên suốt",
+      "conflicts": ["Mạng Lưới Cải Cách"],
+      "alliances": ["Tập đoàn Hồng Phát"],
+      "importance": 9,
+      "introduce_arc": 2
+    },
+    {
+      "name": "Tập đoàn Hồng Phát",
+      "type": "doanh nghiệp sân sau",
+      "power_level": 9,
+      "summary": "Tập đoàn bất động sản - xây dựng đứng sau nhiều dự án đội vốn và thổi giá đất; mục tiêu thâu tóm quỹ đất và ngân sách công qua quan hệ với lợi ích nhóm.",
+      "territory": "Toàn quốc",
+      "mc_relation": "Thế lực kinh tế MC phải đối đầu bằng pháp lý và số liệu",
+      "conflicts": ["Mạng Lưới Cải Cách"],
+      "alliances": ["Liên Minh Lợi Ích Nhóm"],
+      "importance": 9,
+      "introduce_arc": 4
+    },
+    {
+      "name": "Cục Giám Sát & Kiểm Toán",
+      "type": "cơ quan giám sát nhà nước",
+      "power_level": 8,
+      "summary": "Cơ quan thanh tra, kiểm toán và giám sát hợp pháp; khi Trần Hạo cung cấp số liệu thật, đây là kênh chính thống để xử lý sai phạm và lật ngược thế cờ.",
+      "territory": "Toàn quốc",
+      "mc_relation": "Đồng minh thể chế của MC",
+      "conflicts": ["Liên Minh Lợi Ích Nhóm"],
+      "alliances": ["Mạng Lưới Cải Cách"],
+      "importance": 8,
+      "introduce_arc": 2
+    }
+  ],
+  "plot_twists": [
+    {
+      "summary": "Lê Cường — cán bộ địa chính xã có khoản chi sai — thật ra từng là người cùng khóa và là kẻ đã đặt điều khiến Trần Hạo bị điều về xã nghèo ngay từ đầu để dọn đường thăng tiến cho mình.",
+      "payoff_type": "quan hệ ẩn",
+      "setup_chapters": [12, 45],
+      "twist_chapter": 88,
+      "reader_impact": "major",
+      "arc_number": 1
+    },
+    {
+      "summary": "Hệ Thống Trị Lý là di sản của Viện Trị Lý — một viện chuyên gia quản trị quốc gia thật từng tồn tại và bị tiền thân của Liên Minh Lợi Ích Nhóm bức tử để độc chiếm việc kiểm soát số liệu quốc gia.",
+      "payoff_type": "nguồn gốc golden finger",
+      "setup_chapters": [150, 400, 720],
+      "twist_chapter": 905,
+      "reader_impact": "cosmic",
+      "arc_number": 7
+    },
+    {
+      "summary": "Ông Bảy chủ nhiệm hợp tác xã già chính là học trò cuối cùng của một chuyên gia Viện Trị Lý; ông giữ lại bộ phương pháp thống kê gốc mà Trần Hạo cần để lần ra di sản của Viện.",
+      "payoff_type": "danh tính ẩn",
+      "setup_chapters": [5, 250],
+      "twist_chapter": 890,
+      "reader_impact": "major",
+      "arc_number": 7
+    }
+  ],
+  "themes": [
+    { "name": "Liêm chính là con đường thăng tiến", "type": "main", "description": "Làm đúng, vì dân và chính tích thật là con đường thăng tiến bền vững, không thua vây cánh và phong bì.", "motifs": ["bảng số liệu thật trên bàn họp", "cái bắt tay của dân"], "importance": 10 },
+    { "name": "Số liệu thật thắng báo cáo láo", "type": "main", "description": "Sự thật bằng con số bền hơn mọi báo cáo tô hồng và tin giả.", "motifs": ["con số bị bôi đỏ trong báo cáo", "dữ liệu kiểm toán đối chiếu"], "importance": 9 },
+    { "name": "Người liêm chính liên kết", "type": "supporting", "description": "Những cán bộ tử tế yếu thế khi đoàn kết có thể đối đầu lợi ích nhóm khổng lồ.", "motifs": ["bàn tròn cán bộ cải cách", "chia sẻ phương pháp minh bạch"], "importance": 8 },
+    { "name": "Giữ sơ tâm khi quyền lực lớn", "type": "supporting", "description": "Càng lên cao càng phải giữ sơ tâm phụng sự dân, không bị quyền lực và cám dỗ tha hóa.", "motifs": ["từ chối lời mời gia nhập phe", "nhớ về xã nghèo đầu tiên"], "importance": 8 }
+  ],
+  "voice_anchors": [
+    {
+      "snippet_type": "opening",
+      "prose_text": "Trần Hạo trải lại tập hồ sơ của hợp tác xã Đông Phú lần thứ ba dưới ngọn đèn trụ sở xã lúc đã quá nửa đêm. Ngoài kia, con đường liên thôn lầy lội phản chiếu thứ ánh trăng nhợt nhạt. Trên bàn, bản báo cáo cuối năm ghi hợp tác xã 'hoạt động ổn định, có lãi'. Trần Hạo nhìn dòng chữ đó mà thấy nực cười, bởi sáng nay anh vừa đi qua những thửa ruộng bỏ hoang và những hộ dân nợ giống nợ phân. Anh không trách người viết báo cáo. Anh chỉ rót thêm một ly trà nguội, mở lại từng con số, và tự nhủ — ngày mai, mình sẽ tìm ra sự thật nằm dưới những con số này.",
+      "key_traits": ["điềm đạm", "lì đòn", "vì dân", "không cay cú"]
+    },
+    {
+      "snippet_type": "dialogue",
+      "prose_text": "— Cậu mới về, biết gì mà dám nói báo cáo của tôi sai? Lê Cường đặt mạnh tập hồ sơ xuống bàn, cau mày. Trần Hạo không vội cãi. — Dạ, em không nói anh sai. Em chỉ xin anh cùng em ra thực địa một buổi. Khối lượng đường liên thôn báo cáo là tám trăm mét, anh ạ. Em đo lại sáng nay, chỉ có bốn trăm mét đổ bê tông, phần còn lại vẫn là đường đất. Lê Cường hơi sững. — Cậu... đo thật à? — Vâng, em đo cùng chị Thắm trưởng thôn và hai hộ dân làm chứng. Mời anh ra xem lại cùng em.",
+      "key_traits": ["dùng số liệu thay vì to tiếng", "lễ độ mà cứng", "biến mỗi tranh cãi thành đối chất dữ liệu"]
+    },
+    {
+      "snippet_type": "action",
+      "prose_text": "Giao diện trong suốt hiện lên ngay khoảnh khắc Trần Hạo đặt chân tới bờ ruộng và bắt tay người nông dân đầu tiên: Tín Nhiệm +9. Một lớp số liệu thật trải ra trước mắt anh — sản lượng thực, công nợ thực, mức bức xúc thực của từng hộ, khác xa bản báo cáo 'có lãi' trên bàn. Trần Hạo không reo lên. Anh chỉ liếc nhanh các con số, rồi lại cúi xuống hỏi bác nông dân vụ mùa năm nay thế nào, như thể vừa nghe được một lời tâm sự chứ không phải một phép màu. Dân không cần biết. Dân chỉ cần một cán bộ chịu lội bùn xuống ruộng. Phần còn lại là chuyện của anh và cái hệ thống lặng lẽ này.",
+      "key_traits": ["bình tĩnh trước golden finger", "giữ bí mật tự nhiên", "tập trung vào dân"]
+    }
+  ],
+  "foreshadowing": [
+    { "hintText": "Ông Bảy chủ nhiệm hợp tác xã nhắc thoáng qua rằng 'hồi xưa có một cái viện chuyên dạy người ta đọc số liệu cho đúng, giờ chẳng còn ai nhớ'.", "category": "dialogue", "plantCh": 5, "pickupCh": 890, "payoffDescription": "Hé lộ ông Bảy là học trò cuối cùng của chuyên gia Viện Trị Lý và giữ bộ phương pháp thống kê gốc." },
+    { "hintText": "Lê Cường nhìn Trần Hạo với ánh mắt vừa quen vừa né tránh trong lần đầu chạm mặt ở trụ sở xã.", "category": "character_behavior", "plantCh": 12, "pickupCh": 88, "payoffDescription": "Reveal Lê Cường là người cùng khóa đã đặt điều khiến Trần Hạo bị điều về xã nghèo." },
+    { "hintText": "Hệ Thống đôi khi dùng cụm 'theo chuẩn của Viện' khi mô tả một góc nhìn quản trị, nhưng không giải thích Viện là gì.", "category": "environmental", "plantCh": 150, "pickupCh": 905, "payoffDescription": "Reveal nguồn gốc Viện Trị Lý và mối thù với tiền thân của Liên Minh Lợi Ích Nhóm." }
+  ]
+}

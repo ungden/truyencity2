@@ -1,0 +1,25 @@
+{
+  "arc_number": 1,
+  "start_chapter": 1,
+  "end_chapter": 20,
+  "arc_theme": "Ba ngày sụp đổ và bức tường đầu tiên — sống sót ngày đại nạn và dựng nền móng vùng an toàn",
+  "plan_text": "Arc mở màn warm-baseline: Phương Viễn KHÔNG mở đầu bằng cảnh sắp chết thảm hay rơi xuống đáy. Ngay ch.1, giữa lúc làn sương xám tràn qua và cả thành phố hoảng loạn, anh giữ cái đầu lạnh và bản năng tổ chức kích hoạt — anh đếm người, đếm tài nguyên, đọc địa hình và bắt đầu phân công thay vì gào thét. Mỗi chương xoay quanh một khủng hoảng sinh tồn hoặc một bài toán tổ chức cụ thể, với ít nhất 2 cao điểm dopamine/chương (một kế hoạch vận hành đúng cứu được người/tài nguyên + một kẻ ngạo mạn hoặc mối đe dọa bị xử lý gọn), cao điểm đầu trước nửa chương. Cụm chương theo 5-cluster: ch.1-4 setup (sương xám tràn tới, Phương Viễn không hoảng loạn, gom nước và lương đầu tiên, cứu vài người, chọn bãi đỗ xe có cổng sắt làm cứ điểm); ch.5-9 breathing + competence (chèn xe gia cố cổng, phân công gác/nấu/sửa, lập luật 'ai cũng có việc, ai cũng được ăn', nhóm sống sót đầu tiên bắt đầu tin theo); ch.10-14 confront (Đỗ Cường khỏe mạnh ngạo mạn coi thường tổ chức, đòi bỏ chạy hoặc cướp, suýt kéo nhóm vào nguy hiểm; Phương Viễn thuyết phục bằng lập luận hậu cần và phân cho anh ta một việc đúng tầm thay vì đối đầu); ch.15-18 big_wow (bầy tha hóa tấn công cứ điểm lần đầu; phòng thủ thắng nhờ hào lửa và phân tuyến rút lui đã chuẩn bị trước, cứu được cả người già trẻ nhỏ đúng kế hoạch); ch.19-20 resolution + hook (cứ điểm đứng vững sau đêm dài, cộng đồng chính thức tin Phương Viễn là người dẫn dắt; ông Tư hé lộ bãi đỗ xe nối với các đường ngầm cũ không có trên bản đồ — mở tuyến chiến lược cho arc sau). Genre mat-the là combat-allowed: có chống bầy tha hóa và đụng độ kẻ thù, nhưng MỌI thắng lợi đến từ tổ chức, bố trí và mưu lược tập thể — Phương Viễn KHÔNG tự mình áp đảo bằng vũ lực phi thường, vì anh là người thường không dị năng. MC điềm tĩnh, công bằng, quyết đoán nhưng nhân hậu, gánh trách nhiệm cho cả nhóm.",
+  "chapter_briefs": [
+    { "n": 1, "beat": "setup", "goal": "Phương Viễn sống sót giờ đầu của ngày sụp đổ và chọn bãi đỗ xe có cổng sắt làm cứ điểm", "payoff": "Anh giữ đầu lạnh giữa hỗn loạn, đếm người và tài nguyên, phân công đầu tiên để hai mươi mấy người sống sót cử động ăn khớp thay vì tan rã", "endingHook": "Tiếng gầm của bầy tha hóa vọng lại từ cuối phố — cổng sắt chỉ chịu được nếu chèn thêm xe ngay trong đêm" },
+    { "n": 3, "beat": "setup", "goal": "Gom nước và lương thực đầu tiên từ khu phố lân cận", "payoff": "Một chuyến lấy đồ ngắn có bố trí cảnh giới thành công, mang về nước và gạo đủ cầm cự, không mất ai", "endingHook": "Ông Tư lẩm bẩm về những đường ngầm cũ không có trên bản đồ" },
+    { "n": 7, "beat": "breathing", "goal": "Gia cố cổng và lập luật lệ chia phần công bằng cho cộng đồng non trẻ", "payoff": "Cổng được chèn xe vững, luật 'ai cũng có việc, ai cũng được ăn' được chấp nhận, Trần Mục và Lý Hân thành cánh tay đắc lực", "endingHook": "Đỗ Cường công khai chế giễu việc xây tường lập luật giữa thời ai mạnh người đó sống" },
+    { "n": 12, "beat": "confront", "goal": "Ngăn Đỗ Cường kích động nhóm bỏ chạy hoặc cướp tài nguyên", "payoff": "Phương Viễn thuyết phục bằng lập luận hậu cần và giao cho Đỗ Cường vai khuân vác/phá dỡ đúng tầm, hóa đối đầu thành đóng góp", "endingHook": "Người trinh sát báo một bầy tha hóa lớn đang lần theo mùi máu tiến về cứ điểm" },
+    { "n": 16, "beat": "big_wow", "goal": "Chống đợt tấn công đầu tiên của bầy tha hóa vào cứ điểm", "payoff": "Phòng thủ thắng nhờ hào lửa và phân tuyến rút lui chuẩn bị sẵn; người già trẻ nhỏ được đưa lên tầng ba an toàn đúng kế hoạch, không thắng bằng vũ lực cá nhân mà bằng tổ chức", "endingHook": "Bình minh lên, cổng vẫn đứng — nhưng đợt này chỉ là bầy nhỏ, và ngoài kia còn lớn hơn" },
+    { "n": 20, "beat": "resolution", "goal": "Khép arc 1, củng cố cứ điểm và xác lập vai thủ lĩnh của Phương Viễn", "payoff": "Cộng đồng đứng vững sau khủng hoảng đầu, chính thức tin và đi theo Phương Viễn; vùng an toàn đầu tiên thành hình", "endingHook": "Ông Tư dẫn anh xuống xem các đường ngầm cũ — một lợi thế chiến lược mở ra hướng đi mới" }
+  ],
+  "threads_to_advance": ["Dựng và củng cố vùng an toàn đầu tiên", "Bản năng tổ chức và uy tín của Phương Viễn", "Quan hệ với nhóm sống sót đầu tiên (Trần Mục, Lý Hân, ông Tư)"],
+  "threads_to_resolve": ["Sống sót đợt tấn công tha hóa đầu tiên vào cứ điểm (giải quyết: phòng thủ thắng nhờ tổ chức, cộng đồng đứng vững)"],
+  "new_threads": ["Bí ẩn các đường ngầm cũ không có trên bản đồ", "Hướng làn sương xám chảy ra từ trung tâm thành phố", "Sự dòm ngó của các thế lực bên ngoài với một cứ điểm có tài nguyên"],
+  "sub_arcs": [
+    { "name": "Ba ngày sụp đổ", "chapterRange": "1-4", "cluster": "setup" },
+    { "name": "Cổng sắt và luật lệ", "chapterRange": "5-9", "cluster": "breathing" },
+    { "name": "Kẻ ngạo mạn", "chapterRange": "10-14", "cluster": "confront" },
+    { "name": "Đợt sóng đầu", "chapterRange": "15-18", "cluster": "big_wow" },
+    { "name": "Bức tường đứng vững", "chapterRange": "19-20", "cluster": "resolution" }
+  ]
+}

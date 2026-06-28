@@ -1,0 +1,100 @@
+{
+  "title": "Toàn Dân Chuyển Chức: Ta Giác Ngộ Ẩn Nghề Tế Đàn",
+  "totalChapters": 1000,
+  "mainPlotline": "Hàn Lập, người chơi bản địa giác ngộ Ẩn Nghề Tế Đàn Sư bị coi là rác, dùng cơ chế hiến tế Cổ Tế Nhất Mạch bị lãng quên để đi từ kẻ bị khinh thường nhất phường Tây Khẩu đến đỉnh bảng xếp hạng đại lục, đánh bại các đại Công Hội và thế lực cổ xưa từng bức tử hệ phái — rồi phục hưng Cổ Tế Nhất Mạch và định đoạt vận mệnh cõi Bảng.",
+  "originLock": "native — MC là người chơi bản địa bình thường sinh ra ở thành phố Lâm Uyên trong thế giới game-overlaid; mọi quyền năng đến từ việc giác ngộ Ẩn Nghề Tế Đàn Sư và tự khám phá cơ chế hiến tế, tuyệt đối không có yếu tố đến từ nơi khác hay ký ức đời trước.",
+  "volumes": [
+    {
+      "volume": 1,
+      "title": "Nghề Rác Giác Ngộ",
+      "chapterRange": "1-130",
+      "theme": "Lật ngược định kiến ở phường Tây Khẩu",
+      "summary": "Hàn Lập giác ngộ nghề rác Tế Đàn Sư, phát hiện cơ chế hiến tế giấu kín, và từng bước vả mặt đám tân thủ Thiên Lang khinh thường mình ngay tại Liệt Khẩu Cấp Một số 7.",
+      "subArcs": [
+        { "name": "Hiến tế đầu tiên", "chapterRange": "1-30", "focus": "Giác ngộ Tế Đàn Sư, thử Hiến Tế, phát hiện sức mạnh ẩn, sống sót lần đầu vào Liệt Khẩu." },
+        { "name": "Vả mặt kẻ khinh thường", "chapterRange": "31-65", "focus": "Triệu Cương và đám Thiên Lang giành Liệt Khẩu; Hàn Lập phản đòn bằng tuyệt kỹ hiến tế bất ngờ." },
+        { "name": "Tin đồn nghề rác mà mạnh", "chapterRange": "66-100", "focus": "Clip đấu Liệt Khẩu viral; dư luận đảo chiều, người yếu thế bắt đầu tìm tới." },
+        { "name": "Hạt giống đội ngũ", "chapterRange": "101-130", "focus": "Thu nạp Tiểu Vũ và vài nghề rác khác, đặt nền cho đội của riêng mình." }
+      ],
+      "keyMilestone": "Từ kẻ bị khinh nhất phường, Hàn Lập trở thành cái tên người chơi Tây Khẩu phải nể."
+    },
+    {
+      "volume": 2,
+      "title": "Đội Của Kẻ Yếu Thế",
+      "chapterRange": "131-280",
+      "theme": "Mở rộng đội và giữ sức mạnh đồng đều",
+      "summary": "Hàn Lập lập đội nghề rác, đối mặt thách thức phối hợp kỹ năng và quản người, trong khi Công Hội Thiên Lang leo thang chèn ép ở cấp thành phố.",
+      "subArcs": [
+        { "name": "Tế Văn ban buff", "chapterRange": "131-180", "focus": "Giác ngộ Tế Văn hỗ trợ đồng đội, biến nghề rác thành lõi đội hình." },
+        { "name": "Bài toán phối hợp", "chapterRange": "181-230", "focus": "Đấu Liệt Khẩu cấp cao hơn, rèn ăn ý, xử lý khủng hoảng nội bộ đội." },
+        { "name": "Đối đầu cấp thành phố", "chapterRange": "231-280", "focus": "Thiên Lang dùng vốn ép tài nguyên; Hàn Lập phản công qua luật Bảng và đấu giải." }
+      ],
+      "keyMilestone": "Đội của Hàn Lập đứng vững trên bảng xếp hạng thành phố Lâm Uyên."
+    },
+    {
+      "volume": 3,
+      "title": "Liên Minh Nghề Bị Quên",
+      "chapterRange": "281-430",
+      "theme": "Người yếu thế liên kết lại",
+      "summary": "Hàn Lập tập hợp những người chơi nghề rác và yếu thế thành một liên minh để cùng giành Liệt Khẩu và chống sức ép của các đại Công Hội.",
+      "subArcs": [
+        { "name": "Tiếng gọi nghề rác", "chapterRange": "281-330", "focus": "Thuyết phục các nghề bị quên, dựng nguyên tắc chung của liên minh." },
+        { "name": "Sức mạnh tập thể", "chapterRange": "331-380", "focus": "Giành Liệt Khẩu béo bở, chia sẻ Tế Văn và đào tạo lẫn nhau." },
+        { "name": "Phản đòn Công Hội", "chapterRange": "381-430", "focus": "Thiên Lang và Bạch Tháp liên thủ; liên minh phản công bằng đoàn kết và bí mật nghề." }
+      ],
+      "keyMilestone": "Liên minh đủ mạnh để đàm phán ngang hàng với đại Công Hội về tài nguyên."
+    },
+    {
+      "volume": 4,
+      "title": "Khi Đại Thế Lực Để Mắt",
+      "chapterRange": "431-580",
+      "theme": "Giữ cốt cách khi cám dỗ và truy sát ập tới",
+      "summary": "Đại Công Hội nhận ra giá trị thật của Tế Đàn Sư, vừa lôi kéo bằng đãi ngộ vừa truy sát để độc chiếm. Hàn Lập từ chối quy phục và phản công ra cấp đại lục.",
+      "subArcs": [
+        { "name": "Lời mời và cạm bẫy", "chapterRange": "431-480", "focus": "Đại Công Hội chiêu mộ, áp lực và cám dỗ, Hàn Lập quyết giữ độc lập." },
+        { "name": "Truy sát giấu mặt", "chapterRange": "481-530", "focus": "Đối phó ám toán và cướp tài nguyên, giác ngộ tuyệt kỹ phòng thân Cổ Tế." },
+        { "name": "Bắc tiến đại lục", "chapterRange": "531-580", "focus": "Đưa liên minh vào sân chơi cấp đại lục, va chạm thế lực vùng khác." }
+      ],
+      "keyMilestone": "Liên minh của Hàn Lập trở thành thế lực độc lập có tiếng nói trên đại lục."
+    },
+    {
+      "volume": 5,
+      "title": "Sóng Gió Đại Lục",
+      "chapterRange": "581-730",
+      "theme": "Sức mạnh thật ở quy mô lớn",
+      "summary": "Cuộc cạnh tranh lan ra cấp đại lục; Hàn Lập vừa mở rộng vừa giữ cốt cách nghề, đối đầu chiến dịch bôi nhọ và liên minh các đại thế lực.",
+      "subArcs": [
+        { "name": "Đấu trường đại lục", "chapterRange": "581-630", "focus": "Tham gia giải đấu liên thành, khẳng định Tế Đàn Sư trước cả đại lục." },
+        { "name": "Chiến dịch bôi nhọ", "chapterRange": "631-680", "focus": "Đối phó tin giả về 'nghề tà đạo'; sự thật và thực lực thắng vu khống." },
+        { "name": "Tàn ảnh Cổ Thần", "chapterRange": "681-730", "focus": "Giác ngộ tuyệt kỹ triệu hồi tàn ảnh Cổ Thần, định hình chuẩn sức mạnh mới." }
+      ],
+      "keyMilestone": "Hàn Lập được công nhận là một trong những người chơi mạnh nhất đại lục."
+    },
+    {
+      "volume": 6,
+      "title": "Dấu Vết Cổ Tế",
+      "chapterRange": "731-880",
+      "theme": "Lần theo nguồn gốc hệ phái bị lãng quên",
+      "summary": "Hàn Lập lần theo dấu vết Cổ Tế Nhất Mạch khắp đại lục, khám phá các đàn tế cổ và đối đầu thế lực cổ xưa từng bức tử hệ phái.",
+      "subArcs": [
+        { "name": "Những đàn tế cổ", "chapterRange": "731-780", "focus": "Khám phá di tích Cổ Tế, mở khóa các bậc Tế Đàn Sư thất truyền." },
+        { "name": "Kẻ thù trong bóng tối", "chapterRange": "781-830", "focus": "Hé lộ thế lực cổ đứng sau các đại Công Hội đã chôn vùi Cổ Tế." },
+        { "name": "Bí mật Ngày Giáng Lâm", "chapterRange": "831-880", "focus": "Liên hệ giữa Cổ Tế Nhất Mạch và việc Bảng phủ lên đời thực." }
+      ],
+      "keyMilestone": "Hàn Lập nắm trọn cơ chế Cổ Tế và lộ diện kẻ thù cổ xưa cuối cùng."
+    },
+    {
+      "volume": 7,
+      "title": "Phục Hưng Nhất Mạch",
+      "chapterRange": "881-1000",
+      "theme": "Hé lộ nguồn gốc và phục hưng",
+      "summary": "Nguồn gốc Cổ Tế Nhất Mạch và các Cổ Thần trong Bảng được hé lộ trọn vẹn. Hàn Lập đánh bại thế lực cổ, phục hưng hệ phái và định đoạt vận mệnh cõi Bảng, rồi truyền nghề cho thế hệ sau.",
+      "subArcs": [
+        { "name": "Cổ Thần thức tỉnh", "chapterRange": "881-930", "focus": "Reveal trọn vẹn Cổ Tế Nhất Mạch và các Cổ Thần ngủ quên trong Bảng." },
+        { "name": "Trận cuối", "chapterRange": "931-980", "focus": "Đại chiến định đoạt vận mệnh cõi Bảng với thế lực cổ." },
+        { "name": "Truyền lại ngọn lửa", "chapterRange": "981-1000", "focus": "Phục hưng Nhất Mạch, đào tạo thế hệ kế cận, khép lại bằng một lần hiến tế truyền nhân." }
+      ],
+      "keyMilestone": "Cổ Tế Nhất Mạch hồi sinh; Hàn Lập thành biểu tượng và người truyền lửa của hệ phái."
+    }
+  ]
+}

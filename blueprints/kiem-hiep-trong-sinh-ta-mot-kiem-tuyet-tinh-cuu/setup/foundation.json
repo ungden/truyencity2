@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "totalScore": 122,
+  "avgScore": 8.71,
+  "minDimScore": 8,
+  "source": "claude_code",
+  "dimensions": [
+    { "name": "Premise & hook", "score": 9, "note": "Warm-baseline kiếm hiệp trọng sinh: Mộ Dung Tuyết mở mắt trong thân xác niên thiếu với kiếm ý và ký ức một đời active ngay ch.1; hook là cú nhận ra mình có cơ hội thứ hai và biết trước mọi nước cờ — opportunity/foreknowledge-driven, không mở đầu bằng cảnh MC khốn cùng." },
+    { "name": "Protagonist engine", "score": 9, "note": "Mộ Dung Tuyết thắng nhờ kiếm đạo và kiếm ý đỉnh cao đời trước, hiểu biết tương lai và cái đầu lạnh đã sống một lần; tính cách điềm tĩnh, sâu sắc, cân nhắc giữa hận thù và buông bỏ thay vì nóng nảy si tình như kiếp trước, nhất quán." },
+    { "name": "System mechanic", "score": 9, "note": "Túc Mệnh Hồi Quy có input/output/limit/reward rõ; anti-plot-armor cứng — thân thể niên thiếu chỉ gánh phần nhỏ kiếm ý (quá sức là tự tổn thương), ký ức tương lai MẤT DẦN tác dụng ở mọi chỗ thế giới đã chệch quỹ đạo, không tự đánh thắng ai thay anh." },
+    { "name": "Conflict ladder", "score": 9, "note": "Leo thang né cạm bẫy nhỏ → ân oán sư môn (sư huynh phản bội) → thế gia bội ước → hội minh chính đạo đạo đức giả → vượt qua đỉnh cũ → truy ra bàn tay giấu mặt sắp đặt cái chết đời trước; sạch và escalating qua 5 nấc noveltyLadder." },
+    { "name": "World coherence", "score": 9, "note": "Giang hồ cổ trang + hệ thống Kiếm Đạo Thất Cảnh + Thanh Vân Kiếm Phái + thế lực giấu mặt Huyền Cơ Các, nhất quán; forbidden elements cấm rõ token xuyên không/xuyên việt và linh hồn từ thế giới khác — chỉ trọng sinh trong CÙNG thế giới." },
+    { "name": "Dopamine cadence", "score": 9, "note": "controlRules ≥2 cao điểm/chương (một thế cờ đổi vận thành công + một đòn lật mặt kẻ coi thường hoặc kỳ ngộ/danh dự đòi lại), cao điểm đầu trước nửa chương, payoff trong/kế chương." },
+    { "name": "Origin lock", "score": 9, "note": "mcOrigin=reincarnated khóa chặt: Mộ Dung Tuyết tái sinh trong CÙNG một thế giới về chính thân xác mình thời niên thiếu. Dùng token trọng sinh/kiếp trước hợp lệ với reincarnated; KHÔNG file nào chứa token xuyên không/xuyên việt/đến từ trái đất/từ thế giới hiện đại — origin-guard transmigration set sạch." },
+    { "name": "Combat balance", "score": 8, "note": "Genre kiếm hiệp có combat đặt làm trục chính, nhưng MC thắng kẻ mạnh hơn nhờ kiếm ý và bố cục chứ không vượt tầng cảnh giới phi lý; thân thể niên thiếu giới hạn thi triển — anti-plot-armor cho cả võ học, không đột phá thần tốc." },
+    { "name": "Foreshadowing & twists", "score": 8, "note": "3 twist (bàn tay giấu mặt sắp đặt cái chết đời trước, một số 'kẻ thù' chỉ là quân cờ, người từng hận hóa ra vô can) + 3 foreshadowing (tín vật sau lưng Tiêu Vọng, ký ức nhòe ở chỗ thay đổi, chấp sự ăn cánh) có plant/payoff chapter cụ thể." },
+    { "name": "Long-form sustainability", "score": 9, "note": "noveltyLadder 5 nấc giữ cùng lane 'kiếm khách đi lại con đường giang hồ giải ân oán bằng kiếm và mưu', đủ cho 1000 chương, endgame đối đầu bàn tay giấu mặt và lựa chọn giữa trả hận với buông bỏ." },
+    { "name": "Vietnamese voice", "score": 8, "note": "Voice anchors lạnh, sắc, đậm kiếm khí và không khí cổ trang giang hồ, đúng giọng kiếm hiệp trọng sinh, đủ diacritics, không AI-tell, không meta/AI term." }
+  ],
+  "overallFeedback": "Setup vững cho kiếm hiệp trọng sinh: warm-baseline opening với kiếm ý + ký ức đời trước active ch.1, golden finger là Túc Mệnh Hồi Quy (foreknowledge + kiếm ý) có anti-plot-armor cứng (thân thể niên thiếu giới hạn, ký ức mất dần ở chỗ thế giới đổi khác), combat cân bằng (MC thắng nhờ kiếm ý và bố cục không nhờ vượt tầng), conflict ladder leo thang sạch từ ân oán sư môn tới bàn tay giấu mặt và cái chết đời trước, origin lock reincarnated chặt (trọng sinh CÙNG thế giới, sạch token xuyên không/xuyên việt/đến từ trái đất), dopamine cadence đổi-vận (thế cờ thành công + lật mặt kẻ coi thường + đòi lại danh dự), foreshadowing và twist có cấu trúc dài hạn. Sẵn sàng cho DeepSeek V4 Pro viết chương. PASS."
+}

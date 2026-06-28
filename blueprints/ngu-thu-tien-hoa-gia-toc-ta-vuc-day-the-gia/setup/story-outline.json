@@ -1,0 +1,118 @@
+{
+  "premise": "Mộc Vân, người thừa kế bản địa của Mộc gia ngự thú đang lụi tàn ở thành Thanh Khâu, thừa hưởng thiên phú huyết mạch của dòng họ — nhãn lực nhìn thấu tuyến tiến hóa ẩn của muôn loài. Cả đại lục Thương Lan đánh giá chiến thú theo bậc bề ngoài và vứt bỏ những con bị coi là phế; Mộc Vân lại thấy được những nhánh tiến hóa cực phẩm còn ngủ say bên trong chúng, cùng điểm bùng nổ cần kích. Nhưng nhãn lực chỉ cho cậu con đường, không tự nuôi thú giúp cậu — kiếm linh thảo, canh thời điểm, xây lòng tin với thú vẫn đòi mồ hôi và rủi ro. Cậu thuần hóa từng con phế thú thành quân bài lật ngược thế cờ, từng bước vực dậy thanh danh thế gia.",
+  "mainConflict": "Một thiếu niên gánh cái họ đang chìm đối đầu với định kiến của cả đại lục và những thế gia đối địch chực chờ nuốt trọn Mộc gia. Xung đột không giải quyết bằng MC tự ra tay đánh đấm mà bằng tài dưỡng thú và chỉ huy chiến thú trong đấu thú có luật, cộng với đấu trí chốn quyền môn. Leo thang từ giành lại chỗ đứng ở Thanh Khâu → khôi phục bí pháp tổ tiên → tranh đoạt tài nguyên với tứ đại thế gia → vạch trần âm mưu hãm hại Mộc gia xưa → vươn ra đại lục chạm huyết mạch Thánh Thú → truy ra nguồn gốc nhãn lực và bảo vệ cân bằng tiến hóa của muôn loài.",
+  "themes": [
+    "Giá trị thật nằm ở tiềm năng ẩn, không ở nhãn mác bề ngoài",
+    "Vực dậy một di sản đòi hỏi kiên nhẫn và lòng tin hơn là huyết mạch cao quý",
+    "Mối quan hệ tin cậy giữa người và thú mạnh hơn mọi sức mạnh ép buộc",
+    "Tôn trọng tiến hóa tự nhiên của muôn loài thay vì thao túng độc quyền"
+  ],
+  "majorPlotPoints": [
+    "Ch.1: Mộc Vân thừa kế Mộc gia suy tàn, nhận con sói xám phế, nhãn lực huyết mạch hé lộ nhánh tiến hóa ẩn và cậu quyết tâm nuôi nó.",
+    "Arc 1: dưỡng con sói xám qua điểm bùng nổ đầu tiên, thắng trận đấu thú trước Lý gia, giành lại chỗ đứng đầu tiên cho Mộc gia.",
+    "Arc 2-3: khôi phục bí pháp dưỡng thú thất truyền, mở rộng đàn chiến thú phế, tranh đoạt linh sơn làm nền tảng tài nguyên.",
+    "Giữa truyện: lần ra sự thật Mộc gia bị một thế gia hãm hại huyết mạch chiến thú hai mươi năm trước; vạch trần âm mưu và rửa oan cho tổ tiên.",
+    "Cao trào cuối: truy ra nguồn gốc nhãn lực liên hệ với Đại Dung Hợp, ngăn thế lực thao túng tiến hóa, đưa Mộc gia lên đại thế gia hàng đầu."
+  ],
+  "setupKernel": {
+    "readerFantasy": "Cảm giác sảng khoái khi một thiếu niên gánh cái họ bị cả thế gian coi thường nhặt về những con thú phế mà ai cũng vứt bỏ, rồi dưỡng chúng thành cực phẩm khiến những kẻ từng khinh rẻ phải há hốc mồm. Mỗi lần một con thú 'rác' lột xác trong đấu trường, lật ngược thế trận trước con thú đắt giá hơn, là một lần độc giả vừa hả hê vừa phục cái nhìn tinh tường của nhân vật — kèm theo niềm vui vực dậy một di sản gia tộc từ tro tàn.",
+    "protagonistEngine": "Mộc Vân thắng nhờ nhãn lực nhìn thấu tuyến tiến hóa ẩn cộng với sự kiên nhẫn, hiểu thú và đầu óc chiến thuật khi chỉ huy đấu thú; cậu không tự ra tay đánh nhau mà đọc thế trận, ra lệnh đúng lúc, kích điểm bùng nổ đúng thời khắc. Tính cách điềm đạm, gan lì, trọng tình với muôn loài, ôm chí lớn vực dậy gia tộc nhưng không tàn nhẫn — cậu cứu thú bị bỏ rơi và chiêu mộ người bị thế gia chính thống ruồng bỏ.",
+    "pleasureLoop": [
+      "Mộc Vân gặp một con thú bị coi là phế → nhãn lực hé lộ nhánh tiến hóa ẩn cực phẩm mà người khác bỏ sót → cậu quyết định nuôi nó (khám phá tiềm năng giấu kín).",
+      "Cậu lặn lội kiếm linh thảo, canh thời điểm và kích điểm bùng nổ → con thú lột xác tiến hóa thành công sau bao công sức (harvest + breakthrough).",
+      "Một gia tộc đối địch khinh thường khiêu khích đấu thú → con thú 'phế' của Mộc Vân lật ngược thế trận giành thắng → kẻ coi thường bị tát thẳng mặt (đấu thú thắng + face-slap).",
+      "Đám đông và các thế gia chứng kiến sửng sốt → danh tiếng Mộc gia và Mộc Vân tăng vọt (công nhận trước đám đông).",
+      "Mỗi chiến thú mới dưỡng thành bổ sung vào đàn → Mộc gia mạnh thêm một bậc, tiến gần hơn ngày phục hưng (tích lũy + tiến triển).",
+      "Một mảnh sự thật về sự lụi tàn của Mộc gia hoặc nguồn gốc nhãn lực được hé lộ → cảm giác bức màn quá khứ đang được vén (revelation payoff)."
+    ],
+    "systemMechanic": {
+      "name": "Nhãn Tiến Hóa — Thiên Phú Huyết Mạch Mộc Gia",
+      "input": "Mộc Vân quan sát kỹ một chiến thú sống (đủ gần, đủ lâu, trong trạng thái tập trung) — con thú phải còn sống và còn tiềm năng tiến hóa chưa cạn.",
+      "output": "Cậu thấy được các nhánh tuyến tiến hóa tiềm tàng của con thú đó (kể cả nhánh ẩn người khác bỏ sót), cùng 'điểm bùng nổ' — điều kiện và thời khắc cần kích để con thú rẽ sang nhánh cực phẩm.",
+      "limit": "Anti-plot-armor cứng: nhãn lực CHỈ cho thấy con đường, KHÔNG tự nuôi thú, KHÔNG đảm bảo thành công. Mộc Vân vẫn phải tự kiếm đúng linh thảo, canh đúng thời điểm, xây đủ lòng tin với thú; dưỡng sai vẫn hỏng nhánh tiến hóa hoặc khiến thú chết. Nhãn lực có tầm giới hạn theo cấp bậc của cậu — ban đầu chỉ thấy nhánh cấp thấp, nhánh Thánh Thú phải tới sau mới hé lộ. Không dùng được trên thú đã chết, thú đã cạn tiềm năng, hay khi cậu kiệt sức.",
+      "reward": "Đàn chiến thú từ phế thú lột xác thành cực phẩm; danh tiếng và vị thế Mộc gia tăng dần; nhưng phần thưởng thật luôn là một con thú được cứu sống và một bậc thang đưa gia tộc trở lại đỉnh cao — không phải sức mạnh tự thân của MC."
+    },
+    "mcOrigin": "native",
+    "originLockNote": "Mộc Vân là người bản địa của đại lục Thương Lan, con cháu trực hệ Mộc gia, sinh ra và lớn lên trong gia tộc suy tàn; nhãn lực nhìn thấu tuyến tiến hóa là thiên phú huyết mạch truyền đời của dòng họ, phát sinh và rèn giũa hoàn toàn tại chỗ.",
+    "mcSecret": {
+      "secret": "Mộc Vân mang nhãn lực nhìn thấu tuyến tiến hóa ẩn của chiến thú — một thiên phú huyết mạch Mộc gia mà ngay cả người trong nhà cũng tưởng đã thất truyền.",
+      "outsideWorldKnowledge": "Bản thân nhãn lực là bí ẩn in-world: nó dường như liên hệ với Đại Dung Hợp ngàn năm trước, sự kiện đã sinh ra mọi tuyến tiến hóa — như thể Mộc gia từng giữ vai trò gì đó trong cân bằng tiến hóa của muôn loài, một tri thức vượt ngoài hiểu biết của các thế gia khác.",
+      "revealRule": "Giấu kín hoàn toàn ở giai đoạn đầu — cậu chỉ nói mình 'có mắt nhìn thú'; chỉ hé lộ một phần cho đệ tử và đồng minh thân tín giữa truyện; nguồn gốc thật của nhãn lực (liên hệ Đại Dung Hợp) chỉ reveal ở cao trào cuối.",
+      "coverStory": "Cậu nói mình chỉ 'kế thừa chút kinh nghiệm dưỡng thú của tổ tiên và nhạy với tướng thú', che giấu việc thực sự nhìn thấy tuyến tiến hóa ẩn."
+    },
+    "benefitLoop": {
+      "goal": "Vực dậy Mộc gia từ tàn tích trở lại hàng đại thế gia ngự thú và khôi phục thanh danh tổ tiên.",
+      "action": "Tìm kiếm và nhận về những chiến thú bị coi là phế, dùng nhãn lực xác định nhánh tiến hóa ẩn, kiếm linh thảo và canh thời điểm để kích điểm bùng nổ, dưỡng thú qua từng cấp, rồi chỉ huy chúng trong đấu thú và đấu trí với các thế gia.",
+      "benefit": "Một con phế thú lột xác thành cực phẩm, một trận đấu thú thắng lợi, một chỗ đứng/tài nguyên/đệ tử giành lại cho Mộc gia; danh tiếng dòng họ và tầm nhãn lực của cậu tăng dần.",
+      "cadence": "Mỗi 1-2 chương có ít nhất một vòng dưỡng-thú-được-thưởng (một bước tiến hóa, một mẩu khinh thường bị đáp trả); mỗi 3-5 chương một bước nhảy lớn (một con thú lột xác hẳn, thắng một trận đấu thú lớn, giành lại một cột mốc cho gia tộc, hé lộ một mảnh quá khứ)."
+    },
+    "interventionRule": "Mộc Vân chỉ ra tay khi (a) Mộc gia, đàn chiến thú hoặc người dưới trướng cậu bị uy hiếp trực tiếp, (b) một con thú có tiềm năng đang bị ngược đãi/bỏ rơi mà cậu có thể cứu, hoặc (c) một thế gia chèn ép kẻ yếu hoặc hãm hại bằng thủ đoạn mà cậu đủ sức vạch trần; cậu không đi 'cứu cả đại lục' ngoài tầm với, luôn giải quyết bằng dưỡng thú, chỉ huy đấu thú có luật và đấu trí — tuyệt đối không tự mình lao vào đánh nhau tay đôi với người.",
+    "phase1Playground": {
+      "locations": [
+        "Phủ đệ Mộc gia tàn tích ở thành Thanh Khâu — sân khấu mở màn, từ đường phủ bụi và chuồng thú bỏ hoang",
+        "Đấu trường ngự thú Thanh Khâu — nơi các thế gia cho chiến thú giao đấu giành danh dự",
+        "Rừng linh thảo ngoại thành Thanh Khâu — nơi Mộc Vân lặn lội kiếm thức ăn linh khí cho thú tiến hóa",
+        "Chợ thú và quán trà thành Thanh Khâu (đời thường giữa các trận đấu, nơi giao dịch và nghe ngóng tin tức thế gia)"
+      ],
+      "cast": [
+        "Mộc Vân (người thừa kế Mộc gia, MC, ngự thú sư có nhãn lực tiến hóa)",
+        "Lão Cát (gia nhân già trung thành còn lại của Mộc gia, biết chút bí pháp dưỡng thú cũ, người dìu dắt sớm)",
+        "Tô Yến (nữ ngự thú sư trẻ phiêu bạt, lý trí và giỏi nghề, thành đồng minh và bạn đấu sớm nhất)",
+        "Lý Hạo (thiếu gia Lý gia kiêu ngạo, đại diện kiểu chuộng huyết mạch bề ngoài, local antagonist)",
+        "Sói xám 'Hôi Ảnh' (con phế thú đầu tiên Mộc Vân nuôi, mang nhánh tiến hóa ẩn cực phẩm)"
+      ],
+      "resources": [
+        "Nhãn Tiến Hóa — thiên phú huyết mạch Mộc gia",
+        "Tàn quyển bí pháp dưỡng thú của tổ tiên còn sót lại",
+        "Phủ đệ và chuồng thú Mộc gia (dù tàn nhưng là căn cứ)",
+        "Quan hệ chớm nở với Lão Cát và Tô Yến, manh mối về quá khứ lụi tàn của gia tộc"
+      ],
+      "localAntagonists": [
+        "Lý Hạo — thiếu gia Lý gia tin tuyệt đối vào huyết mạch bề ngoài, nhiều lần khinh miệt phế thú của Mộc Vân và khiêu khích đấu thú",
+        "Phái dưỡng thú chính thống bảo thủ ở Thanh Khâu chê phương pháp của Mộc Vân là tà đạo và tìm cách cô lập cậu"
+      ],
+      "repeatableSceneTypes": [
+        "Mộc Vân gặp một con thú bị coi là phế, dùng nhãn lực phát hiện nhánh tiến hóa ẩn và quyết định nuôi",
+        "Lặn lội kiếm linh thảo và canh thời điểm để kích điểm bùng nổ, dưỡng một con thú qua một bước tiến hóa",
+        "Đấu thú trong đấu trường với một thế gia khinh thường, con thú phế lật ngược thế trận giành thắng",
+        "Đám đông và các thế gia chứng kiến sửng sốt, danh tiếng Mộc gia tăng và kẻ coi thường bị đáp trả",
+        "Đoạn đời thường giữa các trận: ghép manh mối về quá khứ gia tộc, giao dịch ở chợ thú, chiêu mộ người và thú mới"
+      ]
+    },
+    "socialReactor": {
+      "witnesses": [
+        "Khán giả và các thế gia trong đấu trường ngự thú Thanh Khâu",
+        "Gia nhân, đệ tử và đồng minh dưới trướng Mộc gia",
+        "Phái dưỡng thú chính thống và giới ngự thú sư trong thành",
+        "Giới buôn thú và những người sống sót còn nhớ Mộc gia thời hoàng kim"
+      ],
+      "reactionModes": [
+        "Sửng sốt và bị thuyết phục khi một con phế thú của Mộc Vân lột xác thành cực phẩm trong đấu trường",
+        "Người tìm tới xin học dưỡng thú hoặc nhờ Mộc Vân xem tướng thú, đồn thổi về 'thiếu gia có mắt thần'",
+        "Các thế gia lớn bắt đầu dè chừng và để mắt tới Mộc gia như một biến số đang trỗi dậy",
+        "Phe bảo thủ và gia tộc đối địch tung tin dèm pha, tìm cách cô lập hoặc khiêu khích cậu"
+      ],
+      "reportBackCadence": "Phản ứng tức thì của khán giả và đối thủ ngay trong và sau mỗi trận đấu thú; làn sóng đồn đại và động thái của các thế gia dồn lại mỗi 3-5 chương sau mỗi cột mốc đáng chú ý."
+    },
+    "noveltyLadder": [
+      { "chapterRange": "1-30", "newToy": "Con sói xám phế và nhánh tiến hóa ẩn đầu tiên — học cơ chế nhãn lực và dưỡng thú", "keepsSameLane": "Vẫn là nhìn thấu tiềm năng ẩn rồi dưỡng phế thú thành cực phẩm để vực dậy gia tộc" },
+      { "chapterRange": "31-200", "newToy": "Nhiều loại phế thú khác nhau và bí pháp dưỡng thú thất truyền của tổ tiên", "keepsSameLane": "Vẫn là khám phá tuyến tiến hóa ẩn và dưỡng thú, chỉ đa dạng loài và sâu hơn về phương pháp" },
+      { "chapterRange": "201-500", "newToy": "Tranh đoạt tài nguyên linh sơn + thuần hóa dị thú hoang + đấu trí với tứ đại thế gia", "keepsSameLane": "Vẫn là dưỡng và chỉ huy chiến thú, thêm tầng tài nguyên và chính trị thế gia" },
+      { "chapterRange": "501-800", "newToy": "Huyết mạch Thánh Thú, tuyến tiến hóa cấp cao và bí ẩn Đại Dung Hợp", "keepsSameLane": "Vẫn cùng lane nhãn-lực-dưỡng-thú, nâng lên cấp huyết mạch và nguồn gốc tiến hóa" },
+      { "chapterRange": "801-1000", "newToy": "Đối đầu thế lực thao túng tiến hóa và đưa Mộc gia lên đại thế gia hàng đầu", "keepsSameLane": "Vẫn là cuộc chơi dưỡng-thú và chỉ huy chiến thú — đỉnh cao của cùng một con đường" }
+    ],
+    "controlRules": {
+      "payoffCadence": "Tối thiểu 2 cao điểm dopamine mỗi chương (một bước tiến hóa/thắng lợi dưỡng thú và một mẩu khinh thường bị đáp trả hoặc một thắng lợi đấu thú); cao điểm đầu xuất hiện trước nửa chương; setup không quá 30% và phải có payoff trong cùng hoặc chương kế.",
+      "attentionGradient": "Mở chương bằng một con thú mới, một thử thách dưỡng thú cụ thể hoặc một lời khiêu khích từ thế gia đối địch; đóng chương bằng một cliffhanger (điểm bùng nổ sắp tới, lời thách đấu, hoặc một mảnh sự thật vừa hé).",
+      "openThreadsPerArc": 3,
+      "closeThreadsPerArc": 2
+    },
+    "patternCards": [
+      "warm-baseline-opening",
+      "hidden-potential-revealed",
+      "underdog-beast-wins-arena",
+      "face-slap-the-arrogant-clan",
+      "restore-the-fallen-house"
+    ]
+  }
+}

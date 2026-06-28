@@ -1,0 +1,198 @@
+{
+  "power_system": {
+    "name": "Bậc Thang Ảnh Hưởng Thương Trường — Tầm Nhìn Đọc Dòng Tiền",
+    "type": "competence-and-capital progression (tiến trình năng lực + tài nguyên kinh doanh, KHÔNG phải võ lực hay siêu nhiên)",
+    "coreResource": "Vốn, dòng tiền, quyền kiểm soát cổ phần, thông tin và mạng lưới quan hệ của Trần Mặc — tất cả đều hữu hạn và phải được tích lũy, bảo toàn, tái đầu tư.",
+    "unlockRule": "Trần Mặc tăng 'cấp' không qua tu luyện mà qua mỗi thương vụ thắng: thêm vốn, thêm thị phần, thêm đồng minh, thêm uy tín. Tầm Nhìn Đọc Dòng Tiền là bản năng phân tích sắc bén, độ chính xác và tốc độ tăng dần khi anh tích lũy dữ liệu thực chiến và kinh nghiệm thương trường.",
+    "antiPlotArmor": [
+      "Tầm nhìn CHỈ giúp đọc tình huống và thấy cơ hội/điểm yếu — KHÔNG tự tạo ra tiền, KHÔNG tự thắng thương vụ, KHÔNG ép cổ đông hay đối tác gật đầu.",
+      "MC vẫn phải tự huy động vốn, tự đàm phán, tự thuyết phục con người; thiếu thanh khoản hoặc đọc sai lòng người vẫn dẫn tới thất bại thật.",
+      "Tầm nhìn vô dụng khi thiếu dữ liệu thật, bị thông tin giả đánh lừa, hoặc khi đối thủ chơi ngoài quy luật kinh tế (vận động chính trị bẩn, tin giả quy mô lớn).",
+      "Mọi thắng lợi đều phải đổi bằng rủi ro thật: đặt cược vốn, mạo hiểm uy tín, có thể thua và mất tất cả nếu tính sai."
+    ],
+    "signatureBuff": {
+      "name": "Nước Cờ Phòng Họp",
+      "effect": "Khi nắm đủ thông tin và đòn bẩy, Trần Mặc có thể tung một nước cờ bất ngờ trong cuộc họp/đàm phán lật ngược toàn bộ thế cờ — biến thế thua thành thế thắng chỉ trong vài câu nói và một bộ hồ sơ.",
+      "limit": "Chỉ hiệu quả khi anh đã chuẩn bị đòn bẩy thật từ trước (bằng chứng, vốn, đồng minh); không phải phép màu tức thời và vô dụng nếu đối thủ đã bịt mọi khe hở."
+    },
+    "progressionAxes": [
+      "Quy mô vốn và dòng tiền kiểm soát (từ cứu nợ tới xây quỹ đầu tư riêng)",
+      "Phạm vi đế chế (bán lẻ → đa ngành → quốc tế)",
+      "Sức nặng mạng lưới quan hệ và uy tín (nội bộ gia tộc → giới doanh nhân → trường quốc tế)",
+      "Độ sắc của tầm nhìn (đọc thương vụ đơn giản → ván cờ đa bên phức tạp toàn cầu)"
+    ],
+    "powerCeilingByPhase": {
+      "phase1": "Cứu một tập đoàn khỏi vỡ nợ và giành quyền kiểm soát nội bộ",
+      "phase2": "Thắng chiến tranh giá và chủ động thâu tóm doanh nghiệp tiềm năng",
+      "phase3": "Xây hệ sinh thái đa ngành và bẻ gãy thâu tóm thù địch quy mô lớn",
+      "phase4": "Đối đầu và thắng tập đoàn đa quốc gia, định hình một đế chế kinh tế bền vững"
+    }
+  },
+  "worldbuilding": {
+    "tone": "Chính kịch thương trường căng thẳng, thông minh và sảng khoái: mỗi chương là một ván đấu trí về tiền bạc và chiến lược; nỗi hồi hộp đến từ những nước cờ ẩn và cú lật mặt trong phòng họp, không từ bạo lực.",
+    "economy": "Kinh tế thị trường hiện đại đầy đủ: vốn hóa thị trường, cổ phần, nợ vay, M&A, chiến tranh giá, đấu thầu, IPO, quỹ đầu cơ; quyền lực đo bằng tiền, thông tin và quan hệ.",
+    "setting": "Một đô thị lớn hiện đại năm 2024 với những tòa cao ốc kính thép, các tập đoàn gia tộc và đa quốc gia, nơi mỗi cuộc họp hội đồng quản trị có thể định đoạt số phận hàng nghìn người; trung tâm là Trần thị Tập đoàn đang bên bờ phá sản.",
+    "geography": {
+      "phase1": "Trụ sở Trần thị, các chi nhánh bán lẻ, văn phòng ngân hàng chủ nợ trong thành phố",
+      "phase2": "Thị trường bán lẻ và chuỗi cung ứng toàn thành phố, các đối thủ trong nước",
+      "phase3": "Các ngành mới (fintech, năng lượng, nền tảng số) và mạng lưới kinh doanh cả nước",
+      "phase4": "Thị trường quốc tế, các trung tâm tài chính và tập đoàn đa quốc gia toàn cầu"
+    },
+    "techLevel": "Hiện đại 2024: dữ liệu lớn, phân tích tài chính, nền tảng số, fintech, năng lượng tái tạo, truyền thông số — công nghệ là công cụ và đôi khi là chiến trường, nhưng quyết định vẫn nằm ở chiến lược con người.",
+    "conflictMedium": "Đấu trí thương mại - tài chính - pháp lý (NON-combat): chiến tranh giá, thâu tóm và sáp nhập, gom cổ phần, chống thâu tóm, chiến dịch truyền thông, kiện tụng, vận động hành lang, đàm phán và liên minh — tuyệt đối không bằng đánh nhau hay bạo lực.",
+    "forbiddenElements": [
+      "đánh nhau tay đôi/ẩu đả/xã hội đen như nguồn giải quyết xung đột chính",
+      "bạo lực thể chất, máu me, tra tấn để giật gân",
+      "xuyên không / xuyên việt / đến từ trái đất",
+      "trọng sinh / ký ức kiếp trước / đầu thai",
+      "tu luyện / cảnh giới / võ công / phép thuật / siêu năng lực",
+      "MC tham gia giải đấu chiến đấu hoặc đấu võ làm tuyến chính"
+    ]
+  },
+  "factions": [
+    {
+      "name": "Trần Mặc và Trần thị Tập đoàn (phe trung thành)",
+      "type": "phe nhân vật chính",
+      "power_level": 4,
+      "summary": "Trần Mặc cùng Tô Vãn Nghi, Lão Vương và những đồng minh trung thành, khởi đầu từ một tập đoàn hấp hối, dựa vào tầm nhìn chiến lược và lòng người để vực dậy.",
+      "territory": "Trụ sở Trần thị và chuỗi bán lẻ cốt lõi, mở rộng dần ra đa ngành rồi quốc tế",
+      "mc_relation": "MC là trung tâm và người dẫn dắt",
+      "conflicts": ["Hoằng Đạt Group", "Phe phản trắc trong gia tộc Trần"],
+      "alliances": ["Các quỹ đầu tư và đối tác chiến lược thân Trần Mặc"],
+      "importance": 10,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Phe phản trắc gia tộc Trần",
+      "type": "phe nội bộ phản trắc",
+      "power_level": 5,
+      "summary": "Các chú bác và cổ đông trong gia tộc do Trần Hạo cầm đầu, muốn bán tháo tập đoàn để chia chác, sẵn sàng bắt tay với đối thủ bên ngoài.",
+      "territory": "Bên trong hội đồng quản trị và cơ cấu cổ đông Trần thị",
+      "mc_relation": "Đối thủ nội bộ giai đoạn đầu",
+      "conflicts": ["Trần Mặc và Trần thị (phe trung thành)"],
+      "alliances": ["Hoằng Đạt Group"],
+      "importance": 7,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Hoằng Đạt Group",
+      "type": "tập đoàn đối thủ săn mồi",
+      "power_level": 8,
+      "summary": "Gã khổng lồ chuyên thâu tóm các doanh nghiệp suy yếu rồi xẻ thịt bán dần; nhắm vào Trần thị như con mồi tiếp theo, dùng chiến tranh giá, thâu tóm thù địch và truyền thông bẩn.",
+      "territory": "Khắp các ngành bán lẻ, bất động sản và tài chính trong nước",
+      "mc_relation": "Đối thủ chính xuyên suốt",
+      "conflicts": ["Trần Mặc và Trần thị (phe trung thành)"],
+      "alliances": ["Phe phản trắc gia tộc Trần", "Một số quỹ đầu cơ"],
+      "importance": 9,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Tập đoàn đa quốc gia Aurelian",
+      "type": "đối thủ quốc tế",
+      "power_level": 10,
+      "summary": "Một tập đoàn đa quốc gia hùng mạnh mà Trần Mặc phải đối đầu khi đưa đế chế ra biển lớn; tài chính dồi dào, mạng lưới toàn cầu, là phép thử cuối cùng cho tầm vóc của anh.",
+      "territory": "Các trung tâm tài chính và thị trường toàn cầu",
+      "mc_relation": "Đối thủ giai đoạn cuối, đối đầu bằng đàm phán và chiến lược",
+      "conflicts": ["Trần Mặc và Trần thị (phe trung thành)"],
+      "alliances": [],
+      "importance": 8,
+      "introduce_arc": 6
+    }
+  ],
+  "plot_twists": [
+    {
+      "summary": "Phe phản trắc trong gia tộc Trần đã bí mật ký thỏa thuận ngầm bán quyền kiểm soát cho Hoằng Đạt từ trước khi Trần Mặc về nước; cuộc khủng hoảng nợ là được dàn dựng có chủ đích để ép tập đoàn vào thế phải bán.",
+      "payoff_type": "âm mưu nội gián",
+      "setup_chapters": [20, 90],
+      "twist_chapter": 160,
+      "reader_impact": "major",
+      "arc_number": 1
+    },
+    {
+      "summary": "Vị bậc thầy thương trường ẩn danh từng nâng đỡ Trần Mặc thời du học hóa ra có liên hệ sâu với chính người sáng lập Hoằng Đạt — biến cuộc đối đầu thành một ván cờ cũ chưa kết thúc giữa hai thế hệ.",
+      "payoff_type": "quá khứ ẩn giấu",
+      "setup_chapters": [280, 600],
+      "twist_chapter": 760,
+      "reader_impact": "major",
+      "arc_number": 6
+    },
+    {
+      "summary": "Cú phá giá tàn khốc của Hoằng Đạt thật ra là canh bạc tất tay che giấu lỗ hổng thanh khoản chí mạng của chính họ; Trần Mặc nhận ra kẻ săn mồi đã tự đặt cổ mình vào thòng lọng.",
+      "payoff_type": "điểm yếu giấu kín của đối thủ",
+      "setup_chapters": [140, 240],
+      "twist_chapter": 270,
+      "reader_impact": "moderate",
+      "arc_number": 2
+    }
+  ],
+  "themes": [
+    {
+      "name": "Tầm nhìn thắng sức mạnh thô bạo",
+      "type": "main",
+      "description": "Trong thương trường, người tính trước nhiều nước và đọc thấu dòng tiền thắng được kẻ chỉ có nhiều tiền và sự kiêu ngạo.",
+      "motifs": ["đọc lại báo cáo tài chính tới dòng cuối", "phác nước cờ trên bảng trắng lúc nửa đêm", "một bộ hồ sơ lật ngược cả phòng họp"],
+      "importance": 10
+    },
+    {
+      "name": "Khủng hoảng là cơ hội",
+      "type": "main",
+      "description": "Mỗi mối đe dọa tài chính, mỗi đòn tấn công của đối thủ đều ẩn chứa một khe hở mà người bình tĩnh biến thành bàn đạp lật ngược thế cờ.",
+      "motifs": ["biến chủ nợ thành đồng minh", "dùng cái bẫy đối thủ giăng để siết cổ chúng"],
+      "importance": 9
+    },
+    {
+      "name": "Đạo đức kinh doanh giữa thương trường tàn khốc",
+      "type": "supporting",
+      "description": "Trần Mặc lạnh lùng với kẻ săn mồi nhưng trọng chữ tín và không hạ thủ tàn nhẫn với người vô tội — đó vừa là nguyên tắc vừa là lợi thế lâu dài.",
+      "motifs": ["giữ lời với một đối tác nhỏ dù thiệt trước mắt", "từ chối thủ đoạn bẩn dù dễ thắng"],
+      "importance": 8
+    },
+    {
+      "name": "Quyền lực nằm ở thông tin và lòng người",
+      "type": "supporting",
+      "description": "Người kiểm soát thông tin tốt hơn và giữ được lòng trung thành của đồng minh mới là kẻ thật sự nắm quyền, chứ không phải kẻ có két tiền lớn nhất.",
+      "motifs": ["một bí mật tài chính đúng lúc", "lòng trung thành của Lão Vương và Tô Vãn Nghi"],
+      "importance": 8
+    }
+  ],
+  "voice_anchors": [
+    {
+      "snippet_type": "opening",
+      "prose_text": "Cả phòng họp hội đồng quản trị Trần thị im phăng phắc khi Trần Mặc bước vào, muộn đúng ba phút. Trên màn hình lớn là bản báo cáo tài chính quý cuối — đỏ rực từ trên xuống dưới như một bản án tử. Người ta đã chuẩn bị sẵn bộ hồ sơ bán tháo, chỉ chờ chữ ký của anh. Trần Mặc không ngồi xuống ngay. Anh đứng trước màn hình, đọc chậm rãi từng dòng, ánh mắt dừng lại nửa giây ở mục nợ phải trả khác. Rồi anh mỉm cười, một nụ cười khiến vài người trong phòng thấy lạnh sống lưng. — Trước khi chúng ta bàn chuyện bán, tôi muốn hỏi một câu. Anh chỉ vào con số ấy. Khoản này, ai trong số quý vị có thể giải thích nó thật sự là gì?",
+      "key_traits": ["điềm tĩnh", "đọc thấu con số", "tự tin lạnh lùng", "chủ động dẫn dắt"]
+    },
+    {
+      "snippet_type": "dialogue",
+      "prose_text": "— Cậu mới về nước được mấy ngày, đừng tưởng đọc vài quyển sách kinh tế là hiểu thương trường. Đổng Lập tựa lưng vào ghế, giọng đầy bề trên. Lời chào mua của Hoằng Đạt là cứu cánh cuối cùng cho Trần thị, cậu nên biết ơn. Trần Mặc đặt nhẹ tập hồ sơ xuống bàn. — Anh Đổng nói phải, tôi nên biết ơn. Anh lật mở trang đầu. Biết ơn vì các anh đã để lộ rằng quỹ thâu tóm của Hoằng Đạt đang vay nóng để gồng chiến tranh giá. Một lời chào mua hào phóng đến thế, từ một bên đang thiếu thanh khoản — anh ngẩng lên — anh nghĩ tôi nên gọi đó là cứu cánh, hay là một canh bạc tất tay?",
+      "key_traits": ["bình tĩnh trước khiêu khích", "phản đòn bằng thông tin", "lật thế bằng logic tài chính"]
+    },
+    {
+      "snippet_type": "action",
+      "prose_text": "Đồng hồ điểm mười một giờ đêm. Trần Mặc một mình trong văn phòng tối, chỉ còn ánh đèn bàn và tấm bảng trắng phủ kín những mũi tên, con số, tên công ty. Anh khoanh tròn một cái tên ở góc bảng — nhà cung cấp lớn nhất của Hoằng Đạt — rồi nối nó bằng một đường thẳng tới khoản nợ đáo hạn trong ba tuần nữa. Cả bức tranh hiện ra rõ ràng trong đầu anh như một ván cờ đã thấy trước nước chiếu hết. Hoằng Đạt tưởng mình đang đi săn. Họ không biết rằng cái bẫy giá mà họ giăng ra đã tự khóa chân chính mình. Trần Mặc tắt đèn, cầm điện thoại lên. Đến lượt anh đặt quân cờ đầu tiên.",
+      "key_traits": ["tư duy chiến lược", "kiên nhẫn bày bố", "nhìn trước nhiều nước cờ"]
+    }
+  ],
+  "foreshadowing": [
+    {
+      "hintText": "Trong báo cáo tài chính quý cuối, một khoản 'nợ phải trả khác' nhỏ bị Trần Mặc khoanh lại nhưng chưa giải thích trước hội đồng.",
+      "category": "object",
+      "plantCh": 8,
+      "pickupCh": 160,
+      "payoffDescription": "Khoản đó là dấu vết của thỏa thuận ngầm bán quyền kiểm soát cho Hoằng Đạt, bằng chứng phơi bày âm mưu nội gián của phe phản trắc gia tộc."
+    },
+    {
+      "hintText": "Lão Vương nhắc rằng chủ tịch từng dặn 'có một người ở nước ngoài cậu Mặc nợ ơn lớn, đừng bao giờ quên', rồi không nói thêm.",
+      "category": "dialogue",
+      "plantCh": 45,
+      "pickupCh": 760,
+      "payoffDescription": "Người ấy là bậc thầy thương trường ẩn danh từng nâng đỡ Trần Mặc, hóa ra có liên hệ sâu với người sáng lập Hoằng Đạt, biến cuộc đối đầu thành ván cờ cũ giữa hai thế hệ."
+    },
+    {
+      "hintText": "Khi Hoằng Đạt phá giá điên cuồng, Tô Vãn Nghi thắc mắc tại sao một tập đoàn lớn lại đốt tiền nhanh đến mức bất thường như vậy.",
+      "category": "character_behavior",
+      "plantCh": 135,
+      "pickupCh": 270,
+      "payoffDescription": "Cú phá giá là canh bạc tất tay che giấu lỗ hổng thanh khoản chí mạng của Hoằng Đạt, điểm yếu mà Trần Mặc khai thác để phản công."
+    }
+  ]
+}

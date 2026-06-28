@@ -1,0 +1,25 @@
+{
+  "arc_number": 1,
+  "start_chapter": 1,
+  "end_chapter": 30,
+  "arc_theme": "Cuộc họp tử thần — du học trở về, lật ngược cuộc họp định bán tháo và cứu Trần thị khỏi vỡ nợ trước mắt",
+  "plan_text": "Arc mở màn warm-baseline: Trần Mặc đã có sẵn lợi thế (tầm nhìn thương trường + kiến thức và mạng lưới quốc tế) ngay ch.1, anh KHÔNG mở đầu bằng cảnh khốn cùng mà bước vào giữa khủng hoảng với cái đầu lạnh và chủ động lật ngược thế cờ trong cuộc họp đầu tiên. Mỗi chương xoay quanh một ván đấu trí tài chính cụ thể, với ít nhất 2 cao điểm dopamine/chương (một nước cờ đọc đúng cứu nguy + một cú lật mặt trong phòng họp hoặc một đòn làm đối thủ chịu thiệt), cao điểm đầu trước nửa chương. Cụm chương theo 5-cluster: ch.1-6 setup (Trần Mặc về nước giữa lúc Trần thị sắp vỡ nợ, đọc thủng báo cáo tài chính giả, lật ngược cuộc họp hội đồng định bán tháo bằng một nước cờ tái cơ cấu nợ bất ngờ); ch.7-14 breathing + competence (nắm tình hình nội bộ, củng cố lòng trung thành của Tô Vãn Nghi và Lão Vương, đọc ra dòng tiền yếu và các khoản nợ giấu, lên kế hoạch sống còn); ch.15-22 confront (đàm phán căng với ngân hàng chủ nợ hung hãn, biến áp lực nợ thành đòn bẩy; phe chú Trần Hạo bắt tay Hoằng Đạt phá ngang, Trần Mặc phản đòn bằng luật chơi cổ đông); ch.23-28 big_wow (phơi bày khoản nợ mờ ám và thỏa thuận ngầm của phe phản trắc, vô hiệu hóa nỗ lực bán tháo, giành lại quyền kiểm soát đúng phút chót trước hạn vỡ nợ); ch.29-30 resolution + hook (Trần thị thoát vỡ nợ trước mắt, Trần Mặc chính thức nắm quyền điều hành; Đổng Lập của Hoằng Đạt tuyên chiến, mở tuyến đối thủ chính). Giữ nguyên tắc NON-COMBAT tuyệt đối: mọi xung đột giải quyết bằng chiến lược, đàm phán, luật cổ đông, M&A và truyền thông — không đánh nhau, không xã hội đen, không bạo lực. MC điềm tĩnh, quyết đoán, lý trí nhưng trọng chữ tín và không hạ thủ tàn nhẫn với người vô tội.",
+  "chapter_briefs": [
+    { "n": 1, "beat": "setup", "goal": "Trần Mặc du học trở về và bước vào cuộc họp hội đồng quản trị định bán tháo Trần thị", "payoff": "Anh đọc thủng báo cáo tài chính giả và tung một nước cờ tái cơ cấu nợ khiến cả phòng họp chết lặng, hoãn được việc bán tháo", "endingHook": "Một khoản 'nợ phải trả khác' bị anh khoanh lại — không ai dám giải thích nó là gì" },
+    { "n": 4, "beat": "setup", "goal": "Trần Mặc nắm thực trạng tài chính tập đoàn và nhận diện ai trung thành, ai phản trắc", "payoff": "Anh thu phục được giám đốc tài chính Tô Vãn Nghi và trợ lý Lão Vương làm cánh tay đầu tiên", "endingHook": "Lão Vương tiết lộ chủ tịch từng dặn anh đừng quên một ân nhân ở nước ngoài" },
+    { "n": 10, "beat": "breathing", "goal": "Lên kế hoạch sống còn và đọc ra điểm yếu dòng tiền của tập đoàn", "payoff": "Anh phát hiện hướng tái cơ cấu khả thi và chuẩn bị đòn bẩy đàm phán với chủ nợ", "endingHook": "Ngân hàng chủ nợ gửi tối hậu thư siết nợ trong vòng hai tuần" },
+    { "n": 18, "beat": "confront", "goal": "Đàm phán với ngân hàng chủ nợ và đối phó phe chú Trần Hạo phá ngang", "payoff": "Trần Mặc biến áp lực nợ thành đòn bẩy, giành thêm thời gian; vạch trần Trần Hạo đang bắt tay đối thủ", "endingHook": "Trần Hạo cay cú, ám chỉ có một thỏa thuận ngầm mà Trần Mặc chưa biết" },
+    { "n": 25, "beat": "big_wow", "goal": "Phơi bày âm mưu bán tháo của phe phản trắc và chặn nó lại", "payoff": "Anh trưng bằng chứng về khoản nợ mờ ám và thỏa thuận ngầm với Hoằng Đạt, vô hiệu hóa nỗ lực bán tháo đúng phút chót", "endingHook": "Quyền kiểm soát được giữ lại — nhưng hạn vỡ nợ chỉ còn vài ngày" },
+    { "n": 30, "beat": "resolution", "goal": "Khép arc 1, đưa Trần thị thoát vỡ nợ trước mắt", "payoff": "Tái cơ cấu nợ hoàn tất, Trần Mặc chính thức nắm quyền điều hành tập đoàn", "endingHook": "Đổng Lập đại diện Hoằng Đạt tuyên chiến công khai — chiến tranh giá sắp bắt đầu" }
+  ],
+  "threads_to_advance": ["Cứu Trần thị khỏi vỡ nợ và tái cơ cấu tài chính", "Củng cố quyền kiểm soát và lòng trung thành nội bộ", "Tầm nhìn thương trường và mạng lưới quốc tế của Trần Mặc"],
+  "threads_to_resolve": ["Nguy cơ vỡ nợ tức thời của Trần thị (giải quyết: tái cơ cấu nợ thành công, thoát phá sản trước mắt)"],
+  "new_threads": ["Cuộc đối đầu với Hoằng Đạt Group", "Âm mưu bán tháo của phe phản trắc gia tộc", "Bí ẩn ân nhân thương trường ở nước ngoài"],
+  "sub_arcs": [
+    { "name": "Cuộc họp tử thần", "chapterRange": "1-6", "cluster": "setup" },
+    { "name": "Nắm thực trạng và thu phục lòng người", "chapterRange": "7-14", "cluster": "breathing" },
+    { "name": "Đàm phán chủ nợ và phe phản trắc", "chapterRange": "15-22", "cluster": "confront" },
+    { "name": "Phơi bày âm mưu bán tháo", "chapterRange": "23-28", "cluster": "big_wow" },
+    { "name": "Giành quyền và thoát vỡ nợ", "chapterRange": "29-30", "cluster": "resolution" }
+  ]
+}

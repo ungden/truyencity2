@@ -1,0 +1,100 @@
+{
+  "title": "Khoái Xuyên: Nhiệm Vụ Cứu Vớt Pháo Hôi",
+  "totalChapters": 1000,
+  "mainPlotline": "Tô Diệp, ký chủ của Hệ Thống Đa Vũ Trụ, lần lượt xuyên vào thân phận pháo hôi của bảy thế giới khác nhau, mỗi thế giới một nhiệm vụ bù đắp tiếc nuối: đảo ngược kết cục bất công bằng trí tuệ và bản lĩnh mà không phá vỡ quy tắc Hệ Thống. Qua từng thế giới, Điểm Tiếc Nuối và năng lực của cô tăng dần, đồng thời bí mật thật sự về Hệ Thống và nguồn gốc các pháo hôi dần lộ ra, dẫn tới meta-cao trào nơi cô định đoạt số phận chính mình và toàn bộ ký chủ.",
+  "originLock": "transmigrator — Tô Diệp xuyên không (transmigrator) giữa các thế giới song song theo hợp đồng với Hệ Thống Đa Vũ Trụ; cô không mang ký ức của bất kỳ đời nào khác và không hề được tái sinh từ quá khứ. Mỗi nhiệm vụ là một lần xuyên vào thân phận pháo hôi của một thế giới khác bằng linh hồn nguyên bản.",
+  "volumes": [
+    {
+      "volume": 1,
+      "title": "Thế Giới Một: Hào Môn Đích Nữ Bị Hoán Đổi",
+      "chapterRange": "1-150",
+      "theme": "Giành lại danh phận và công bằng cho đích nữ thật",
+      "summary": "Tô Diệp xuyên vào Lâm Vãn Tình — đích nữ thật bị tráo đổi với nữ chính giả Tống Nhu. Cô dùng hiểu biết kịch bản và trí tuệ vạch trần Tống Nhu, giành lại huyết thống, khiến gia tộc nhìn nhận con gái thật, đòi công bằng mà không sa thành ác nữ.",
+      "subArcs": [
+        { "name": "Ván cờ mở màn", "chapterRange": "1-30", "focus": "Ký hợp đồng, nhập vai Lâm Vãn Tình, lật cái bẫy đầu tiên của Tống Nhu, lấy lòng ông nội." },
+        { "name": "Lật mặt nạ", "chapterRange": "31-70", "focus": "Thu thập chứng cứ huyết thống, đối đầu mẹ nuôi thiên vị, vạch các trò vu oan." },
+        { "name": "Phản công truyền thông", "chapterRange": "71-110", "focus": "Tống Nhu dùng dư luận và showbiz hãm hại; Tô Diệp đảo chiều dư luận bằng sự thật." },
+        { "name": "Phán quyết", "chapterRange": "111-150", "focus": "Vạch trần toàn bộ vụ tráo đổi, danh phận đích nữ được công nhận, nguyên chủ được bù đắp." }
+      ],
+      "keyMilestone": "Lâm Vãn Tình được trả lại danh phận và tương lai; nhiệm vụ một hoàn thành, Tô Diệp về Trạm nâng cấp."
+    },
+    {
+      "volume": 2,
+      "title": "Thế Giới Hai: Học Bá Bị Vùi Dập",
+      "chapterRange": "151-300",
+      "theme": "Trả lại tài năng cho người bị dìm",
+      "summary": "Tô Diệp xuyên vào một học sinh thiên tài bị bạn học và giáo viên thiên vị vùi dập để tôn lên 'thần đồng' giả. Cô phải khôi phục thành tích, vạch gian lận và bù đắp cho nguyên chủ từng bị bức tới bỏ học.",
+      "subArcs": [
+        { "name": "Tái nhập học", "chapterRange": "151-200", "focus": "Nhập vai, chứng minh năng lực thật trong kỳ thi đầu tiên." },
+        { "name": "Mạng lưới gian lận", "chapterRange": "201-250", "focus": "Lần ra đường dây thiên vị và đạo thành tích của thần đồng giả." },
+        { "name": "Phơi bày", "chapterRange": "251-300", "focus": "Vạch trần gian lận trước toàn trường, nguyên chủ được phục danh và có lựa chọn tương lai." }
+      ],
+      "keyMilestone": "Thần đồng giả sụp đổ, học bá thật được công nhận; Điểm Tiếc Nuối và Thẻ Năng Lực mới."
+    },
+    {
+      "volume": 3,
+      "title": "Thế Giới Ba: Nữ Phụ Showbiz Bị Dìm",
+      "chapterRange": "301-450",
+      "theme": "Tỏa sáng nơi từng bị chôn vùi",
+      "summary": "Tô Diệp xuyên vào một nữ diễn viên nữ phụ bị ê-kíp và nữ chính chèn ép, cướp vai, bôi nhọ. Cô lật ngược sự nghiệp bằng thực lực và chiến lược truyền thông, bù đắp cho nguyên chủ từng bị hủy hoại.",
+      "subArcs": [
+        { "name": "Vai diễn bị cướp", "chapterRange": "301-350", "focus": "Giành lại cơ hội diễn xuất bằng thực lực, gây bất ngờ giới phê bình." },
+        { "name": "Chiến tranh truyền thông", "chapterRange": "351-400", "focus": "Đối đầu chiến dịch bôi nhọ, xoay chuyển dư luận bằng sự thật và tác phẩm." },
+        { "name": "Ngôi sao thật", "chapterRange": "401-450", "focus": "Nguyên chủ tỏa sáng đúng tài năng, kẻ chèn ép trả giá theo luật ngành." }
+      ],
+      "keyMilestone": "Nữ phụ vươn lên hàng sao thật; meta-manh mối: gặp một ký chủ lạm dụng Hệ Thống."
+    },
+    {
+      "volume": 4,
+      "title": "Thế Giới Bốn: Cung Đình Phế Hậu",
+      "chapterRange": "451-600",
+      "theme": "Rửa án oan giữa quyền mưu",
+      "summary": "Tô Diệp xuyên vào một phi tần bị vu oan phản nghịch và phế truất để tôn lên sủng phi nguyên tác. Cô dùng kiến thức hiện đại và mưu lược lật ngược án oan triều đình, cứu nguyên chủ khỏi cái chết.",
+      "subArcs": [
+        { "name": "Lãnh cung", "chapterRange": "451-500", "focus": "Sống sót trong lãnh cung, dựng thế lực ngầm, đọc cục diện triều đình." },
+        { "name": "Mưu lược", "chapterRange": "501-550", "focus": "Lần ra kẻ giật dây vụ vu oan, gài bẫy ngược các phe." },
+        { "name": "Phục vị", "chapterRange": "551-600", "focus": "Vạch trần âm mưu trước triều, nguyên chủ được minh oan và chọn lối đi riêng." }
+      ],
+      "keyMilestone": "Án oan được rửa; Hệ Thống hé lộ rằng nhiều pháo hôi mang dấu vết bị 'gán kịch bản'."
+    },
+    {
+      "volume": 5,
+      "title": "Thế Giới Năm: Mạt Thế Phế Vật",
+      "chapterRange": "601-750",
+      "theme": "Sinh tồn cực hạn và giá trị của kẻ bị bỏ rơi",
+      "summary": "Tô Diệp xuyên vào một dị năng giả 'phế vật' bị đội nhóm bỏ mặc làm mồi nhử trong tận thế. Cô lật ngược vị thế bằng trí tuệ sinh tồn, cứu nguyên chủ khỏi cái chết bị sắp đặt và đối đầu loại bất công tàn khốc nhất.",
+      "subArcs": [
+        { "name": "Bị bỏ lại", "chapterRange": "601-650", "focus": "Thoát kịch bản làm mồi nhử, gây dựng nhóm sinh tồn riêng." },
+        { "name": "Lật vị thế", "chapterRange": "651-700", "focus": "Chứng minh giá trị dị năng thật, đối đầu thủ lĩnh nguyên tác ích kỷ." },
+        { "name": "Cứu vớt", "chapterRange": "701-750", "focus": "Cứu nguyên chủ và những kẻ yếu thế bị hi sinh, vạch bộ mặt thật của 'người hùng' nguyên tác." }
+      ],
+      "keyMilestone": "Phế vật trở thành chỗ dựa thật; Tô Diệp thấy dấu tay Hệ Thống can thiệp vào số mệnh."
+    },
+    {
+      "volume": 6,
+      "title": "Thế Giới Sáu: Liên Minh Ký Chủ",
+      "chapterRange": "751-880",
+      "theme": "Khi quy tắc Hệ Thống bị lạm dụng",
+      "summary": "Tô Diệp phát hiện một nhóm ký chủ đang lạm dụng Hệ Thống để thao túng các thế giới vì lợi riêng, biến pháo hôi thành con tốt. Cô liên kết các ký chủ chính trực, vừa làm nhiệm vụ vừa đối đầu phe lạm quyền.",
+      "subArcs": [
+        { "name": "Vết nứt", "chapterRange": "751-800", "focus": "Phát hiện một thế giới bị ký chủ khác phá luật, hậu quả lên nguyên chủ." },
+        { "name": "Tập hợp", "chapterRange": "801-840", "focus": "Liên minh các ký chủ chính trực, vạch âm mưu của phe lạm quyền tại Trạm." },
+        { "name": "Đối đầu", "chapterRange": "841-880", "focus": "Trận đấu trí và năng lực giữa hai phe ký chủ, đặt câu hỏi Hệ Thống đứng về phía ai." }
+      ],
+      "keyMilestone": "Liên minh ký chủ thành hình; meta-twist lớn: pháo hôi không tự nhiên sinh ra."
+    },
+    {
+      "volume": 7,
+      "title": "Thế Giới Bảy: Bản Chất Của Tiếc Nuối",
+      "chapterRange": "881-1000",
+      "theme": "Hé lộ và định đoạt",
+      "summary": "Bí mật cuối cùng về Hệ Thống Đa Vũ Trụ và nguồn gốc các tiếc nuối được phơi bày. Tô Diệp bước vào meta-thế giới của chính Hệ Thống, đối mặt lựa chọn định đoạt số phận mình và toàn bộ ký chủ, khép lại hành trình.",
+      "subArcs": [
+        { "name": "Cánh cửa cuối", "chapterRange": "881-930", "focus": "Lần theo mọi manh mối, bước vào lõi của Hệ Thống." },
+        { "name": "Sự thật", "chapterRange": "931-980", "focus": "Bản chất Hệ Thống và kẻ tạo ra pháo hôi lộ diện; meta-twist chốt." },
+        { "name": "Lựa chọn của Tô Diệp", "chapterRange": "981-1000", "focus": "Quyết định cuối cùng giải phóng hoặc tái lập Hệ Thống, khép lại bằng một cái kết do chính cô viết." }
+      ],
+      "keyMilestone": "Tô Diệp định đoạt số phận chung của ký chủ và pháo hôi; hành trình khoái xuyên hoàn tất."
+    }
+  ]
+}

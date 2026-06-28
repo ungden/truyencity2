@@ -1,0 +1,100 @@
+{
+  "title": "Toàn Dân Lãnh Chúa: Khai Cục Một Tòa Thành",
+  "totalChapters": 1000,
+  "mainPlotline": "Vương Lâm, người đến từ thế giới cũ bị Cuộc Triệu Hồi Toàn Dân đưa tới dị giới Aetheria, rút trúng thiên phú Toàn Năng Quản Trị hạng SS, đi từ một tòa thành sơ khai trên Bình Nguyên Khởi Đầu đến đế quốc thống trị đại lục — sống sót qua Mùa Quái Vật, đè bẹp lãnh chúa kiêu ngạo, thu phục chủng tộc bản địa, thống nhất các vùng và cuối cùng hé lộ chân tướng Cuộc Triệu Hồi cùng Ý Chí Đại Lục, định lại trật tự cho cả Aetheria.",
+  "originLock": "transmigrator — Vương Lâm bị Cuộc Triệu Hồi Toàn Dân đưa nguyên vẹn từ thế giới cũ tới Aetheria cùng toàn nhân loại; tri thức của anh là kiến thức quản trị mang theo cộng thiên phú golden-finger. TUYỆT ĐỐI không có yếu tố luân hồi hay tái sinh.",
+  "volumes": [
+    {
+      "volume": 1,
+      "title": "Khai Cục Một Tòa Thành",
+      "chapterRange": "1-130",
+      "theme": "Sống sót và đặt nền móng lãnh địa",
+      "summary": "Toàn dân bị triệu hồi, Vương Lâm rút trúng thiên phú Toàn Năng Quản Trị hạng SS. Anh bình tĩnh đặt nền móng tòa thành đầu tiên, triệu hồi đạo quân đầu, đánh bại lãnh chúa kiêu ngạo lân cận Tô Đại Niên và nâng thành lên hạng Trấn.",
+      "subArcs": [
+        { "name": "Đêm Triệu Hồi", "chapterRange": "1-30", "focus": "Toàn dân tới Aetheria, Vương Lâm rút thiên phú SS, dựng công trình đầu, triệu hồi quân đầu tiên, sống sót đêm đầu." },
+        { "name": "Mở Rộng Khai Phá", "chapterRange": "31-65", "focus": "Khai phá vùng hoang, chiếm mỏ và rừng, chiêu mộ Tộc Người Bản Địa, mở khóa công trình qua Điểm Trị Quốc." },
+        { "name": "Lãnh Chúa Kiêu Ngạo", "chapterRange": "66-100", "focus": "Tô Đại Niên cướp tài nguyên và lấn ranh; Vương Lâm phản công bằng đạo quân kỷ luật, đè bẹp công khai." },
+        { "name": "Thành Lên Hạng Trấn", "chapterRange": "101-130", "focus": "Lãnh địa ổn định, nâng cấp Thôn lên Trấn, đặt nền cho liên minh và Mùa Quái Vật sắp tới." }
+      ],
+      "keyMilestone": "Tòa thành sơ khai sống sót và nâng cấp lên hạng Trấn, Vương Lâm lọt vào tầm chú ý của lãnh chúa quanh vùng."
+    },
+    {
+      "volume": 2,
+      "title": "Mùa Quái Vật Đầu Tiên",
+      "chapterRange": "131-280",
+      "theme": "Phòng thủ và thu hoạch từ hiểm họa",
+      "summary": "Mùa Quái Vật ập tới Bình Nguyên Khởi Đầu. Vương Lâm xây tường thành, bố trí phòng tuyến và quân chủng, đánh lui thủy triều quái thú, thu hoạch lõi quái và tài nguyên hiếm trong khi các lãnh chúa yếu bị xóa sổ.",
+      "subArcs": [
+        { "name": "Chuẩn Bị Phòng Tuyến", "chapterRange": "131-180", "focus": "Xây tường thành, tháp canh, công thành xa; tối ưu binh chủng cho phòng thủ." },
+        { "name": "Thủy Triều Quái Thú", "chapterRange": "181-230", "focus": "Đánh lui từng đợt quái vật, chỉ huy quân đội theo chiến thuật, cứu lãnh địa đồng minh." },
+        { "name": "Thu Hoạch Sau Bão", "chapterRange": "231-280", "focus": "Vơ lõi quái và tài nguyên hiếm, danh tiếng vọt hạng, thu hút dân di cư và đồng minh mới." }
+      ],
+      "keyMilestone": "Vượt Mùa Quái Vật đầu tiên nguyên vẹn, leo lên hạng Thành và lọt Top bảng vàng khu vực."
+    },
+    {
+      "volume": 3,
+      "title": "Liên Minh Bình Nguyên",
+      "chapterRange": "281-430",
+      "theme": "Ngoại giao và sức mạnh tập thể",
+      "summary": "Vương Lâm tập hợp các lãnh chúa người Trái Đất và chủng tộc bản địa thành một liên minh để chống các thế lực lớn ép buộc, chia sẻ tài nguyên và phối hợp quân sự, leo lên hạng Quận.",
+      "subArcs": [
+        { "name": "Hạt Giống Liên Minh", "chapterRange": "281-330", "focus": "Thuyết phục Lý Hàn Băng và các lãnh chúa nhỏ, lập nguyên tắc chung và hội đồng." },
+        { "name": "Thu Phục Bản Địa", "chapterRange": "331-380", "focus": "Ngoại giao và quân sự thu phục Tộc Thú Nhân, Tộc Lùn; mở khóa binh chủng và rèn đúc mới." },
+        { "name": "Phản Đòn Thế Lực Lớn", "chapterRange": "381-430", "focus": "Một thế lực lãnh chúa lớn ép thần phục; liên minh phản công bằng phối hợp quân đội." }
+      ],
+      "keyMilestone": "Liên minh đủ mạnh để đối đầu thế lực lớn, Vương Lâm thành thủ lĩnh thực tế và đạt hạng Quận."
+    },
+    {
+      "volume": 4,
+      "title": "Chiến Tranh Lãnh Địa",
+      "chapterRange": "431-580",
+      "theme": "Đại chiến quân đội vs quân đội",
+      "summary": "Xung đột leo thang thành chiến tranh lãnh địa cấp vùng. Vương Lâm chỉ huy các chiến dịch quy mô lớn, vây thành, công thành và ngoại giao chia rẽ địch, thâu tóm lãnh địa đối thủ.",
+      "subArcs": [
+        { "name": "Lời Tuyên Chiến", "chapterRange": "431-480", "focus": "Thế lực lớn tuyên chiến; Vương Lâm điều phối phòng thủ và phản công chiến lược." },
+        { "name": "Công Thành Vây Hãm", "chapterRange": "481-530", "focus": "Chiến dịch công thành, hậu cần, mưu kế chia rẽ liên minh địch." },
+        { "name": "Thâu Tóm Lãnh Địa", "chapterRange": "531-580", "focus": "Sáp nhập lãnh địa thắng được, ổn định dân và quản trị vùng mới." }
+      ],
+      "keyMilestone": "Vương Lâm kiểm soát phần lớn Bình Nguyên Khởi Đầu, đặt nền cho một Vương quốc."
+    },
+    {
+      "volume": 5,
+      "title": "Vương Quốc Trỗi Dậy",
+      "chapterRange": "581-730",
+      "theme": "Thống nhất và dựng quốc",
+      "summary": "Vương Lâm thống nhất các vùng thành một Vương quốc, xây dựng thể chế, kinh tế và quân đội thường trực, đối đầu chiến tranh kinh tế và ngoại giao với các vương quốc lãnh chúa khác.",
+      "subArcs": [
+        { "name": "Lập Quốc", "chapterRange": "581-630", "focus": "Dựng thể chế, hệ thống hành chính, quân đội thường trực và thương hội." },
+        { "name": "Chiến Tranh Kinh Tế", "chapterRange": "631-680", "focus": "Phong tỏa tài nguyên, độc quyền thương mại, ngoại giao đè bẹp đối thủ không cần đánh." },
+        { "name": "Chuẩn Đại Lục", "chapterRange": "681-730", "focus": "Vương quốc của Vương Lâm trở thành chuẩn mực, các thế lực buộc phải ngồi vào bàn." }
+      ],
+      "keyMilestone": "Vương quốc của Vương Lâm trở thành thế lực hàng đầu đại lục, leo Top toàn cầu."
+    },
+    {
+      "volume": 6,
+      "title": "Bí Ẩn Đế Chế Cổ",
+      "chapterRange": "731-880",
+      "theme": "Đối đầu thế lực cổ và bí ẩn đại lục",
+      "summary": "Một Đế Chế Cổ tàn dư và những thế lực bản địa lâu đời điều phối cục diện sau màn lộ diện. Vương Lâm lần theo bí ẩn Aetheria, đối đầu thế lực cổ bằng cả quân sự lẫn trí tuệ, mở rộng tới các vùng chưa khai phá.",
+      "subArcs": [
+        { "name": "Tàn Dư Đế Chế", "chapterRange": "731-780", "focus": "Đụng độ Đế Chế Cổ, khám phá Sa Mạc Tàn Tích và di tích văn minh cổ." },
+        { "name": "Vượt Biển Sương Mù", "chapterRange": "781-830", "focus": "Khám phá vùng chưa ai tới, mở khóa tài nguyên và binh chủng cổ." },
+        { "name": "Liên Hoành Hợp Tung", "chapterRange": "831-880", "focus": "Hợp tung các vương quốc lãnh chúa chống Đế Chế Cổ, đại chiến quyết định." }
+      ],
+      "keyMilestone": "Đánh bại Đế Chế Cổ, Vương Lâm nắm chìa khóa bí ẩn nguồn gốc Aetheria."
+    },
+    {
+      "volume": 7,
+      "title": "Đế Quốc Và Ý Chí Đại Lục",
+      "chapterRange": "881-1000",
+      "theme": "Chân tướng và định lại trật tự",
+      "summary": "Chân tướng Cuộc Triệu Hồi Toàn Dân và Ý Chí Đại Lục được hé lộ. Vương Lâm dựng nên một đế quốc, định lại luật chơi cho cả Aetheria, khép lại hành trình bằng một trật tự mới do chính tay anh dựng nên.",
+      "subArcs": [
+        { "name": "Chân Tướng Triệu Hồi", "chapterRange": "881-930", "focus": "Hé lộ vì sao toàn nhân loại bị triệu hồi và bản chất Ý Chí Đại Lục." },
+        { "name": "Đăng Cơ Đế Quốc", "chapterRange": "931-980", "focus": "Thống nhất đại lục, dựng đế quốc và thể chế bền vững." },
+        { "name": "Trật Tự Mới", "chapterRange": "981-1000", "focus": "Định lại luật chơi Aetheria, trao quyền và khép lại bằng một thế giới ổn định." }
+      ],
+      "keyMilestone": "Đế quốc của Vương Lâm thống nhất Aetheria; trật tự mới được dựng nên và truyền lại."
+    }
+  ]
+}

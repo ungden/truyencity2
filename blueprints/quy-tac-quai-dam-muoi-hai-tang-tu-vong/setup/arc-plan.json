@@ -1,0 +1,25 @@
+{
+  "arc_number": 1,
+  "start_chapter": 1,
+  "end_chapter": 30,
+  "arc_theme": "Tờ giấy ố vàng — vào phó bản đầu tiên, học cách đọc quy tắc thật/giả và sống sót bằng suy luận",
+  "plan_text": "Arc mở màn warm-baseline: lợi thế nhận thức của Diệp Tranh kích hoạt ngay ch.1, anh KHÔNG mở đầu bằng cảnh sắp chết thảm mà sống sót đêm đầu một cách tỉnh táo nhờ một suy luận quy tắc đúng giây cận tử. Mỗi chương xoay quanh một bộ quy tắc hoặc một tình huống sinh tồn cụ thể, với ít nhất 2 cao điểm dopamine/chương (một suy luận đúng cứu mạng + một dòng giả bị vạch trần hoặc một kẻ phạm quy tắc lãnh giá), cao điểm đầu trước nửa chương. Cụm chương theo 5-cluster: ch.1-6 setup (thang máy tới tầng mười hai không tồn tại, đọc bộ quy tắc đầu tiên, nhãn nhận thức làm vài dòng ánh xám, sống sót tiếng gõ cửa ban đêm bằng cách KHÔNG mở); ch.7-14 breathing + competence (khám phá hành lang tầng mười hai, ghi sổ tay quy tắc, gặp những người bị cuốn vào cùng, học cơ chế cái giá khi phạm quy tắc qua một nạn nhân khác); ch.15-22 confront (Trịnh Khôi tin quy tắc mù quáng, tranh cãi với Diệp Tranh, suýt kéo cả nhóm vào bẫy; Diệp Tranh đối chiếu mâu thuẫn giữa hai bộ quy tắc và vạch trần dòng giả); ch.23-28 big_wow (phát hiện bộ quy tắc thứ hai chống lại bộ thứ nhất, suy ra logic thật-giả lồng nhau, cứu một người tưởng chết chắc vào phút chót, tìm ra điều kiện thoát thật); ch.29-30 resolution + hook (thoát phó bản ra đời thực, ông Bảy hé lộ tòa nhà không phải nơi duy nhất có 'giấy dán tường lạ', mở tuyến Hội Biên Mục). Giữ nguyên tắc NON-COMBAT tuyệt đối: mọi nguy hiểm giải quyết bằng đọc hiểu, đối chiếu, suy luận và tuân thủ đúng quy tắc — không đánh nhau, không gore giật gân. MC điềm tĩnh, lý trí, lạnh lùng nhưng vẫn cố cứu người.",
+  "chapter_briefs": [
+    { "n": 1, "beat": "setup", "goal": "Diệp Tranh bị thang máy đưa tới tầng mười hai không tồn tại và đọc bộ quy tắc đầu tiên", "payoff": "Nhãn nhận thức kích hoạt, anh nhận ra một dòng ánh xám là giả và sống sót tiếng gõ cửa đầu tiên bằng cách không mở", "endingHook": "Tiếng gõ cửa thứ tư vang lên — quy tắc thật chỉ nhắc tới ba tiếng" },
+    { "n": 3, "beat": "setup", "goal": "Khám phá hành lang tầng mười hai và đọc thêm chỉ dẫn rải rác", "payoff": "Anh ghép được quy tắc 'không soi gương sau 0 giờ' là thật, tránh được cái bẫy gương", "endingHook": "Một góc tờ giấy có nét mực mảnh như chữ ký bị bôi đi" },
+    { "n": 9, "beat": "breathing", "goal": "Gặp những người khác bị cuốn vào cùng và bắt đầu ghi sổ tay quy tắc", "payoff": "Anh chứng kiến một nạn nhân phạm dòng giả và lãnh cái giá rợn người, xác nhận cơ chế thật/giả", "endingHook": "Trịnh Khôi tuyên bố mình 'thuộc lòng mọi quy tắc' và sẽ dẫn nhóm" },
+    { "n": 18, "beat": "confront", "goal": "Ngăn Trịnh Khôi mở cửa theo dòng quy tắc số bốn", "payoff": "Diệp Tranh đối chiếu quy tắc số một với số bốn, vạch trần dòng giả, cả nhóm thoát chết", "endingHook": "Trịnh Khôi cay cú bỏ đi một mình về phía cầu thang cấm" },
+    { "n": 25, "beat": "big_wow", "goal": "Giải bộ quy tắc thứ hai mâu thuẫn bộ thứ nhất để tìm lối thoát thật", "payoff": "Anh suy ra logic thật-giả lồng nhau, cứu một người phụ nữ tưởng đã chết chắc đúng giây cận tử", "endingHook": "Điều kiện thoát hiện ra — nhưng đòi hỏi cả nhóm cùng làm đúng" },
+    { "n": 30, "beat": "resolution", "goal": "Khép arc 1, đưa nhóm thoát phó bản tòa nhà", "payoff": "Họ ra được đời thực; Diệp Tranh giữ sổ tay quy tắc đầu tiên, sống sót với lý trí nguyên vẹn", "endingHook": "Ông Bảy lẩm bẩm tòa nhà này không phải nơi duy nhất có giấy dán tường lạ — mở tuyến Hội Biên Mục" }
+  ],
+  "threads_to_advance": ["Học cơ chế quy tắc thật/giả", "Lợi thế nhận thức và sổ tay quy tắc", "Quan hệ với những người sống sót cùng phó bản"],
+  "threads_to_resolve": ["Sống sót phó bản Tòa Nhà Mười Hai Tầng (giải quyết: cả nhóm thoát ra đời thực)"],
+  "new_threads": ["Sự tồn tại của Hội Biên Mục", "Bí ẩn nét mực chữ ký trên tờ quy tắc", "Bản chất lợi thế nhận thức của Diệp Tranh"],
+  "sub_arcs": [
+    { "name": "Tờ giấy ố vàng", "chapterRange": "1-6", "cluster": "setup" },
+    { "name": "Hành lang và sổ tay", "chapterRange": "7-14", "cluster": "breathing" },
+    { "name": "Quy tắc nói dối", "chapterRange": "15-22", "cluster": "confront" },
+    { "name": "Hai bộ quy tắc", "chapterRange": "23-28", "cluster": "big_wow" },
+    { "name": "Lối ra", "chapterRange": "29-30", "cluster": "resolution" }
+  ]
+}

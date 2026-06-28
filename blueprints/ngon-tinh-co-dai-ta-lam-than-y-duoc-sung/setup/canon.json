@@ -1,0 +1,198 @@
+{
+  "power_system": {
+    "name": "Bậc Thang Y Đạo Và Tôn Nghiêm",
+    "type": "medical-mastery & social-standing hierarchy (y thuật, y đức, danh tiếng và địa vị xã hội — KHÔNG phải võ lực hay tu luyện)",
+    "coreResource": "Tri thức y học hiện đại, tay nghề lâm sàng, y đức, ân tình và danh tiếng của Diệp Như Ý — sức mạnh đến từ chẩn đúng, chữa khỏi và niềm tin cô gây dựng được, không từ sức mạnh thể chất hay phép thuật",
+    "unlockRule": "Diệp Như Ý leo bậc thang bằng cách cứu đúng người vào đúng lúc, tích lũy ân tình và danh tiếng, vạch trần kẻ giả y, đào tạo đệ tử và buộc y giới công nhận; tri thức hiện đại chỉ cho cô lợi thế chẩn đoán chứ không tự nâng địa vị — mỗi bậc đều phải đổi bằng một ca cứu thật và một định kiến bị phá.",
+    "antiPlotArmor": [
+      "Tri thức hiện đại CHỈ cho biết nguyên lý đúng — KHÔNG tự cung cấp thiết bị, thuốc tây hay phòng mổ; Diệp Như Ý phải tái tạo mọi thứ từ nguyên liệu cổ đại (chưng rượu sát trùng, rèn kim châm, tìm thảo dược thay thế), việc đó tốn thời gian và đôi khi bất khả.",
+      "Cô vẫn có thể thất bại nếu thiếu nguyên liệu, gặp bệnh ngoài tầm hiểu biết của một bác sĩ thế kỷ hai mươi mốt, hoặc bị bệnh nhân/xã hội từ chối tin tưởng đúng lúc nguy cấp.",
+      "Chữa đúng vẫn có thể bị quy là tà thuật nếu cô không thuyết phục được người đương thời; rào cản định kiến giới và y giới chính thống là có thật, không thể bỏ qua bằng một câu nói.",
+      "Danh tiếng và ân tình là tài nguyên có giới hạn và có thể mất: một ca thất bại, một lời gièm pha đúng thời điểm, hay một thế gia trở mặt đều có thể kéo cô xuống nếu cô không gây dựng nền tảng vững."
+    ],
+    "signatureBuff": {
+      "name": "Đôi Mắt Bác Sĩ",
+      "effect": "Nhờ được đào tạo y học hiện đại, Diệp Như Ý đọc ra triệu chứng, nguyên nhân và tiên lượng của một ca bệnh sớm và chính xác hơn mọi thầy thuốc đương thời, nhìn thấu chỗ thái y chẩn sai và phát hiện dấu hiệu hạ độc hay gieo dịch mà người khác bỏ qua.",
+      "limit": "Chỉ là chẩn đoán, không phải chữa khỏi: biết bệnh không có nghĩa có sẵn phương tiện chữa; cô vẫn phải tái tạo cách trị từ công cụ cổ đại và thuyết phục người ta để được phép ra tay."
+    },
+    "progressionAxes": [
+      "Phạm vi cứu người (tự cứu mình → cứu người trong phủ → cứu dân gian → cứu người quyền quý → cứu cả kinh thành khỏi đại dịch)",
+      "Danh tiếng và mức độ công nhận của y giới (y nữ bị coi thường → thần y dân gian → được Thái Y Viện công nhận → thần y cả thiên hạ tôn vinh)",
+      "Quyền tự chủ và chỗ đứng (góc dược phòng → dược đường riêng → y quán/y viện đào tạo → di sản y học cho đời sau)",
+      "Chiều sâu định kiến bị phá và độ tinh của khả năng đối đầu âm mưu thế gia bằng y thuật và trí tuệ"
+    ],
+    "powerCeilingByPhase": {
+      "phase1": "Tự giải độc cứu mình và cứu một ca khó sinh trong phủ, giành một góc dược phòng tự chủ",
+      "phase2": "Lập danh thần y dân gian, vạch trần lang trung lừa đảo và khống chế một ổ dịch nhỏ",
+      "phase3": "Cứu một vị vương gia mắc bệnh nan y, bước vào thượng tầng và buộc Thái Y Viện phải công nhận",
+      "phase4": "Dẫn dắt cuộc chống đại ôn dịch kinh thành, vạch trần thế lực giấu mặt và lập di sản y học"
+    }
+  },
+  "worldbuilding": {
+    "tone": "Ngôn tình cổ đại sảng văn ngọt ấm: điềm tĩnh, nhân hậu mà kiêu hãnh, đan xen khoảnh khắc cứu người căng thẳng và những đoạn tình cảm dịu dàng; khoái cảm đến từ việc cứu người, phá định kiến và phơi bày sự thật, không từ bạo lực.",
+    "economy": "Kinh tế phong kiến phân tầng: ruộng đất, dòng dõi, liên minh hôn nhân và ân sủng triều đình là 'tiền tệ' quyền lực; với Diệp Như Ý, y thuật, ân tình và danh tiếng mới là vốn liếng đổi đời, đo bằng số người cô cứu và mức tin tưởng cô giành được.",
+    "setting": "Vương triều Đại Càn cổ đại hư cấu phỏng phong vị Trung Hoa: kinh đô Lạc Dương phồn hoa với phố xá, tửu lâu, dược đường và phủ đệ thế gia; trên đỉnh là hoàng thất và Thái Y Viện nam giới độc quyền tri thức y học, dưới là thế gia, thương nhân, lang trung và nô bộc — một xã hội coi phụ nữ hành nghề y là trái lẽ thường.",
+    "geography": {
+      "phase1": "Phủ Diệp — viện của tiểu thư, dược phòng, hậu trạch nơi tranh đoạt nội bộ",
+      "phase2": "Dược đường và phố thị kinh đô Lạc Dương nơi cô hành y cho dân thường",
+      "phase3": "Vương phủ, phủ đệ thế gia và tầm mắt thượng tầng nơi cô cứu người quyền quý",
+      "phase4": "Thái Y Viện, triều đình và cả kinh thành giữa cơn đại ôn dịch"
+    },
+    "techLevel": "Cổ đại: y học nặng về kinh nghiệm và lý luận âm dương ngũ hành, châm cứu, bốc thuốc; chưa biết vi trùng, vô trùng, giải phẫu hay cách ly dịch — tri thức hiện đại của Diệp Như Ý là lợi thế khổng lồ nhưng phải tái tạo từ công cụ thô sơ.",
+    "conflictMedium": "Đấu trí y học và xã hội (NON-combat): chẩn đúng, chữa khỏi, vô trùng và cách ly, vạch trần kẻ giả y bằng bằng chứng, thuyết phục người hoài nghi bằng kết quả, tích lũy ân tình và hóa giải âm mưu thế gia bằng trí tuệ và nhân tâm — không bao giờ bằng võ công, đánh nhau hay bạo lực.",
+    "forbiddenElements": [
+      "đánh nhau tay đôi/võ công/ẩu đả như nguồn giải quyết xung đột chính",
+      "bạo lực phô trương, gore, cảnh máu me giật gân (cảnh y tế chỉ ở mức cần thiết, không rùng rợn hóa)",
+      "trọng sinh / kiếp trước / đầu thai / chuyển kiếp / tiền kiếp (MC là người hiện đại XUYÊN vào thân xác cổ đại, KHÔNG phải tái sinh trong cùng thế giới)",
+      "tu luyện / cảnh giới / pháp thuật / linh lực / năng lực siêu nhiên (y thuật của MC là khoa học hiện đại, không phải phép màu)",
+      "MC giải quyết kẻ thù bằng cách hạ độc/giết người/hại mạng (cô giữ y đức, không hại người dù với kẻ thù)",
+      "MC tham gia tranh đấu võ lâm/giang hồ hay giải đấu chiến đấu làm tuyến chính"
+    ]
+  },
+  "factions": [
+    {
+      "name": "Diệp Như Ý và những người mang ơn",
+      "type": "nhóm nhân vật chính",
+      "power_level": 3,
+      "summary": "Diệp Như Ý cùng nha hoàn Thanh Nhi, các đệ tử và những người được cô cứu chữa; dựa vào y thuật, y đức và ân tình tích lũy để lật ngược thân phận và bảo vệ chính mình.",
+      "territory": "Góc dược phòng trong phủ Diệp, rồi dược đường và y quán riêng ở kinh đô",
+      "mc_relation": "MC là trung tâm và người dẫn dắt",
+      "conflicts": ["Đích mẫu và tỷ muội phủ Diệp", "Thái Y Viện đố kỵ", "Thế lực giấu mặt gieo dịch"],
+      "alliances": ["Vương phủ của Mộ Dung Tịch"],
+      "importance": 10,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Đích mẫu và tỷ muội phủ Diệp",
+      "type": "phe chèn ép trong gia tộc",
+      "power_level": 4,
+      "summary": "Diệp phu nhân và Diệp Như Sương khinh rẻ, chèn ép và hãm hại nguyên chủ, muốn gả bán cô như quân cờ chính trị; là đối thủ gần gũi nhất ở giai đoạn đầu.",
+      "territory": "Hậu trạch phủ Diệp và quan hệ thông gia thế gia",
+      "mc_relation": "Đối thủ trực tiếp giai đoạn đầu, dần phải kiêng dè khi danh tiếng cô lên",
+      "conflicts": ["Diệp Như Ý và những người mang ơn"],
+      "alliances": [],
+      "importance": 7,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Thái Y Viện",
+      "type": "y giới chính thống của triều đình",
+      "power_level": 7,
+      "summary": "Các thái y nam giới nắm độc quyền tri thức và địa vị y học; ban đầu coi thường và đố kỵ một y nữ, vu cho cô tà thuật và tìm cách dìm cô qua tỉ thí và gièm pha, sau buộc phải công nhận.",
+      "territory": "Hoàng cung, Thái Y Viện và giới y giới kinh thành",
+      "mc_relation": "Đối thủ tầm cao về định kiến giới và y giới, hóa giải bằng y thuật và bằng chứng",
+      "conflicts": ["Diệp Như Ý và những người mang ơn"],
+      "alliances": [],
+      "importance": 8,
+      "introduce_arc": 4
+    },
+    {
+      "name": "Thế lực giấu mặt gieo dịch",
+      "type": "thế lực chủ mưu thật sự đứng sau đại họa",
+      "power_level": 10,
+      "summary": "Một thế lực thế gia/triều đình giấu mặt cố ý gieo rắc ôn dịch để gây loạn triều đình; danh tính và động cơ là bí ẩn trung tâm của giai đoạn cuối, đối đầu bằng bằng chứng dịch tễ chứ không bằng vũ lực.",
+      "territory": "Hậu trường triều đình và các thế gia vọng tộc",
+      "mc_relation": "Phản diện tối hậu, bị vạch trần bằng truy vết dịch tễ và trí tuệ",
+      "conflicts": ["Diệp Như Ý và những người mang ơn"],
+      "alliances": [],
+      "importance": 9,
+      "introduce_arc": 6
+    }
+  ],
+  "plot_twists": [
+    {
+      "summary": "Trận đầu độc khiến nguyên chủ suýt chết ở ch.1 không phải tranh chấp hậu trạch đơn thuần, mà là một mắt xích của âm mưu thế gia lớn hơn nhắm vào phủ Diệp như một quân cờ.",
+      "payoff_type": "động cơ ẩn",
+      "setup_chapters": [10, 300],
+      "twist_chapter": 600,
+      "reader_impact": "major",
+      "arc_number": 5
+    },
+    {
+      "summary": "Vị vương gia Mộ Dung Tịch mắc 'bệnh khó nói' mà Thái Y Viện bó tay không phải bệnh tự nhiên, mà là hậu quả của một bàn tay từng cố hại anh — manh mối nối thẳng tới thế lực giấu mặt sau này.",
+      "payoff_type": "nguồn gốc bệnh",
+      "setup_chapters": [300, 580],
+      "twist_chapter": 800,
+      "reader_impact": "major",
+      "arc_number": 6
+    },
+    {
+      "summary": "Trận đại ôn dịch kinh thành không hoàn toàn tự nhiên — ổ dịch được cố ý gieo rắc bởi cùng một thế lực đã đứng sau chuỗi tai họa nhắm vào phủ Diệp và vương gia, biến cả ba tuyến âm mưu thành một.",
+      "payoff_type": "thế lực giật dây",
+      "setup_chapters": [600, 780, 830],
+      "twist_chapter": 855,
+      "reader_impact": "cosmic",
+      "arc_number": 6
+    }
+  ],
+  "themes": [
+    {
+      "name": "Tri thức và nhân thuật thắng quyền thế",
+      "type": "main",
+      "description": "Trong một xã hội phong kiến đo người bằng dòng dõi và quyền thế, Diệp Như Ý chứng minh rằng tri thức cứu người và một tấm lòng nhân hậu mới là sức mạnh thật sự, đủ để lật ngược cả một thân phận bị khinh rẻ.",
+      "motifs": ["một mạch chẩn đúng giữa lúc ai cũng bó tay", "rượu chưng để sát trùng", "kim châm tự rèn"],
+      "importance": 10
+    },
+    {
+      "name": "Tự cường giành tôn nghiêm",
+      "type": "main",
+      "description": "Diệp Như Ý đứng vững bằng năng lực và y đức trước khi được ai che chở; cô không quỳ lụy cầu sủng, mà giành lại tôn nghiêm bằng từng mạng người cứu được.",
+      "motifs": ["từ chối lòng thương hại", "góc dược phòng đầu tiên", "cúi đầu mang ơn của kẻ từng khinh rẻ"],
+      "importance": 9
+    },
+    {
+      "name": "Phá định kiến giới bằng kết quả",
+      "type": "supporting",
+      "description": "Cô không thắng định kiến 'y nữ là trái lẽ' bằng tranh cãi suông mà bằng ca cứu chữa công khai trước nhiều người, để kết quả tự lên tiếng và mở đường cho phụ nữ hành y.",
+      "motifs": ["chữa một ca trước đám đông hoài nghi", "tỉ thí y thuật", "triều đình buộc phải công nhận"],
+      "importance": 8
+    },
+    {
+      "name": "Tình yêu trên thế bình đẳng",
+      "type": "supporting",
+      "description": "Mộ Dung Tịch yêu và che chở Diệp Như Ý không phải vì cô yếu đuối cần được cứu, mà vì anh trân trọng bản lĩnh và y đức của cô; đó là một mối tình được sủng nhưng bình đẳng.",
+      "motifs": ["người được cứu thành chỗ dựa", "không cần ai cứu mà vẫn được yêu", "trân trọng thay vì thương hại"],
+      "importance": 8
+    }
+  ],
+  "voice_anchors": [
+    {
+      "snippet_type": "opening",
+      "prose_text": "Diệp Như Ý mở mắt ra giữa mùi thuốc bắc nồng đắng và tiếng rên khe khẽ của chính cổ họng mình. Trần nhà chạm trổ rồng phượng, rèm lụa đỏ rủ xuống bốn phía, và cơn đau âm ỉ chạy dọc kinh mạch nói cho cô biết một điều mà bất kỳ bác sĩ nào cũng nhận ra ngay: thân thể này vừa bị hạ độc. Cô không hoảng. Theo bản năng của mười mấy năm cầm dao mổ, ba ngón tay cô đã tự đặt lên cổ tay bắt mạch — mạch trầm mà huyền, độc tính còn lưu ở trung tiêu nhưng chưa tới tim. Còn kịp. Trong đầu cô, từng bước xử trí hiện lên rành mạch như đọc một bệnh án. Ngoài kia có tiếng cười khẩy của ai đó tưởng cô đã chết. Diệp Như Ý khẽ nhếch môi, chậm rãi ngồi dậy. Người ta giết được tiểu thư phủ Diệp. Nhưng họ không giết nổi một bác sĩ.",
+      "key_traits": ["điềm tĩnh", "lý trí", "bản lĩnh nghề y", "không hoảng loạn trước hiểm nguy"]
+    },
+    {
+      "snippet_type": "dialogue",
+      "prose_text": "— Cô nương, vết thương này phải đắp lá cầm máu rồi để trời định, can thiệp nhiều chỉ chọc giận thần linh. Lý lang trung phẩy tay, giọng đầy vẻ bề trên. Diệp Như Ý không tranh cãi. Cô chỉ chỉ vào miệng vết thương đang sưng đỏ. — Tiên sinh nhìn xem, mép da đã nóng và mưng mủ. Đây không phải thần linh nổi giận, đây là vết thương đang làm độc. Nếu không rửa sạch và dẫn mủ ra, ba ngày nữa người này sẽ sốt cao mà chết. Cô xắn tay áo. — Tiên sinh có thể đứng xem. Tôi cần một bình rượu mạnh và một cây kim đã hơ qua lửa.",
+      "key_traits": ["không tranh cãi cảm tính", "thuyết phục bằng nguyên lý", "tự tin chuyên môn", "điềm tĩnh hành động"]
+    },
+    {
+      "snippet_type": "action",
+      "prose_text": "Sản phụ đã tắt dần hơi, bà mụ quỳ sụp xuống lạy lia lịa, miệng lẩm bẩm rằng số trời đã định. Cả gian phòng đặc mùi tuyệt vọng. Diệp Như Ý gạt đám người sang một bên, áp tai xuống bụng sản phụ, rồi đặt tay dò vị trí thai. Ngôi ngang. Ở thế giới của cô, đây là một ca xử trí khẩn nhưng không phải án tử. Cô hít một hơi, giọng vang lên rành rọt cắt ngang tiếng khóc: — Đun nước sôi để nguội, lấy cho tôi mảnh vải sạch nhất trong nhà và rượu trắng mạnh nhất. Nhanh. Người đàn bà còn sống, đứa bé còn sống, tôi cần tất cả những người ở đây nghe theo tôi từng chữ một. Đôi tay cô đặt lên bụng sản phụ, vững vàng không một thoáng run. Trong căn phòng tối đèn dầu của một thời đại chưa ai biết rửa tay trước khi đỡ đẻ, một bác sĩ bắt đầu giành lại hai mạng người từ tay tử thần.",
+      "key_traits": ["quyết đoán trong nguy cấp", "y thuật vượt thời đại", "kiểm soát hiện trường", "cứu người bằng tay nghề"]
+    }
+  ],
+  "foreshadowing": [
+    {
+      "hintText": "Khi tự chẩn độc tính trong người mình ở ch.1, Diệp Như Ý nhận ra loại độc này quá tinh vi, không giống thủ đoạn vụng về của tranh chấp hậu trạch thông thường — như thể có một bàn tay lão luyện hơn đứng sau.",
+      "category": "object",
+      "plantCh": 8,
+      "pickupCh": 600,
+      "payoffDescription": "Loại độc ấy là dấu vết của thế lực thế gia giấu mặt, hé lộ rằng vụ hại nguyên chủ chỉ là một mắt xích của âm mưu lớn hơn nhắm vào phủ Diệp."
+    },
+    {
+      "hintText": "Khi khám cho Mộ Dung Tịch, Diệp Như Ý nhận thấy căn bệnh của anh có những triệu chứng không tự nhiên, như thể cơ thể anh từng bị một thứ gì đó tác động có chủ đích từ lâu.",
+      "category": "character_behavior",
+      "plantCh": 300,
+      "pickupCh": 800,
+      "payoffDescription": "Bệnh của vương gia là hậu quả của một âm mưu hạ độc kéo dài, nối thẳng tới thế lực giấu mặt sẽ gieo đại dịch về sau."
+    },
+    {
+      "hintText": "Mộ Dung Tịch, người vốn lạnh nhạt và đa nghi với mọi thầy thuốc, lại lặng lẽ giữ lại mảnh vải Diệp Như Ý dùng băng vết thương cho anh, và nhìn cô bằng ánh mắt khác hẳn cách anh nhìn người khác.",
+      "category": "object",
+      "plantCh": 320,
+      "pickupCh": 700,
+      "payoffDescription": "Khoảnh khắc ấy là mầm đầu tiên của tình cảm; anh là người đầu tiên cảm nhận sự khác lạ nơi cô và dần trở thành người duy nhất cô hé lộ một phần bí mật, nền tảng cho mối tình bình đẳng."
+    }
+  ]
+}

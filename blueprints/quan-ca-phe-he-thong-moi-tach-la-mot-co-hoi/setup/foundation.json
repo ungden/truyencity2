@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "totalScore": 124,
+  "avgScore": 8.86,
+  "minDimScore": 8,
+  "source": "claude_code",
+  "dimensions": [
+    { "name": "Premise & hook", "score": 9, "note": "Warm-baseline F&B system với hook cơ hội rõ ràng từ ch.1; golden finger active ngay, không khổ-mở-đầu." },
+    { "name": "Protagonist engine", "score": 9, "note": "Minh Quân có động cơ rõ (tay nghề + thấu cảm + đầu óc kinh doanh), tính cách nhất quán, lì và tử tế." },
+    { "name": "System mechanic", "score": 9, "note": "Hệ Thống là mô hình kinh doanh có input/output/limit/reward + anti-plot-armor; không tự pha hộ." },
+    { "name": "Conflict ladder", "score": 9, "note": "Leo thang hẻm → khu vực → toàn quốc → quốc tế, tất cả non-combat qua cạnh tranh kinh doanh." },
+    { "name": "World coherence", "score": 9, "note": "Sài Gòn 2024 đời thực, kinh tế/nguồn cung/truyền thông nhất quán, forbidden elements rõ." },
+    { "name": "Dopamine cadence", "score": 9, "note": "controlRules ≥2 peak/chương, face-slap bằng chất lượng có người chứng kiến, buff cảm động." },
+    { "name": "Origin lock", "score": 9, "note": "mcOrigin=system-bestowed khóa chặt, outlines không chứa token xuyên không/trọng sinh." },
+    { "name": "Non-combat guardrail", "score": 9, "note": "Genre do-thi non-combat; mọi xung đột giải quyết bằng kinh doanh/pháp lý/truyền thông." },
+    { "name": "Foreshadowing & twists", "score": 8, "note": "3 tuyến cài cắm dài hạn (Đỗ Khải, Hội Quán, bà Tư) có plant/payoff chapter cụ thể." },
+    { "name": "Long-form sustainability", "score": 9, "note": "noveltyLadder 4 nấc giữ cùng lane nghề, 7 volume cho 1000 chương, endgame phục dựng Hội Quán." },
+    { "name": "Vietnamese voice", "score": 8, "note": "Voice anchors tự nhiên, đời thường, đúng giọng Sài Gòn, đủ diacritics, không AI-tell." }
+  ],
+  "overallFeedback": "Setup vững: warm-baseline opening, golden finger là mô hình kinh doanh có giới hạn rõ, conflict ladder non-combat leo thang sạch sẽ qua 7 volume, origin lock chặt, dopamine cadence và foreshadowing đều có cấu trúc. Sẵn sàng cho DeepSeek V4 Pro viết chương. PASS."
+}

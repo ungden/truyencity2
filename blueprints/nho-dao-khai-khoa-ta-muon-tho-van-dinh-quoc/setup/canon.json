@@ -1,0 +1,164 @@
+{
+  "power_system": {
+    "name": "Văn Khí Nho Đạo",
+    "type": "literary-cultivation (tu luyện văn chương, đề thơ sinh tài khí)",
+    "coreResource": "Tài khí — luồng khí sinh ra từ thơ văn đúng đạo lý được người đời tâm phục",
+    "unlockRule": "Đề một bài thơ/áng văn đúng cảnh đúng đề, đủ cảm xúc thật và được người nghe tâm phục thì tài khí ngưng tụ; tài khí cộng dồn để thăng khoa danh và luyện văn bảo. Thơ sáo rỗng hoặc đề sai cảnh không sinh tài khí.",
+    "coreResourceTiers": [
+      "Minh Châu — rung động một người",
+      "Đạt Phủ — chấn động một huyện/phủ",
+      "Trấn Quốc / Truyền Thế — chấn động thiên hạ, lưu danh vạn cổ"
+    ],
+    "signatureBuff": {
+      "name": "Chính Khí Ca",
+      "effect": "Một áng văn mang chính khí có thể trấn áp yêu ngôn, an định lòng người, cảm hóa kẻ lầm đường — sức mạnh tỉ lệ với cảnh giới và mức độ người đời cộng hưởng.",
+      "limit": "Chỉ phát huy khi Tô Mặc thật sự sống đúng đạo lý mình ngâm; mượn lời mà tâm không chính thì chính khí yếu dần."
+    },
+    "antiPlotArmor": [
+      "Kho thơ trong đầu Tô Mặc CÓ HẠN và phải chọn ĐÚNG bài cho đúng đề/đúng cảnh — đề sai thì thơ hay vẫn không sinh tài khí.",
+      "Mỗi cảnh giới có ngưỡng tài khí phải đạt, không thể nhảy cóc; thăng cấp cần tích lũy thật.",
+      "Tài khí cần tâm cảnh thật — mượn văn mà sống sai đạo lý thì dị tượng suy yếu.",
+      "Đối thủ cảnh giới cao hơn hoặc ra đề hiểm vẫn ép được hắn nếu hắn chọn sai bài."
+    ],
+    "progressionAxes": [
+      "Khoa danh (Đồng Sinh → Tú Tài → Cử Nhân → Tiến Sĩ → Đại Nho → Văn Thánh)",
+      "Văn bảo (bút/nghiên/sách hóa pháp khí, luyện từ tài khí)",
+      "Dị tượng văn cung (Minh Châu → Đạt Phủ → Trấn Quốc/Truyền Thế)"
+    ],
+    "powerCeilingByPhase": {
+      "phase1": "Đồng Sinh → Tú Tài (văn đàn huyện, dị tượng Minh Châu)",
+      "phase2": "Cử Nhân (văn đàn châu, văn bảo thành hình, dị tượng Đạt Phủ)",
+      "phase3": "Tiến Sĩ → Đại Nho (triều đình, trấn nhất thành tới cấp tỉnh)",
+      "phase4": "Văn Thánh (định quốc an bang, dị tượng phủ thiên hạ)"
+    },
+    "ladder": [
+      { "rank": "Đồng Sinh", "tier": 1, "description": "Mới khai văn khí, thơ chỉ rung lá rụng, mực phát quang yếu." },
+      { "rank": "Tú Tài", "tier": 2, "description": "Chữ thành ngôn linh, một câu khuyên răn trấn an lòng người, bút trừ tà khí nhẹ." },
+      { "rank": "Cử Nhân", "tier": 3, "description": "Văn khí ngưng thành văn bảo, thơ hay gọi mưa, dẹp dịch một vùng." },
+      { "rank": "Tiến Sĩ", "tier": 4, "description": "Vào triều, một bài phú trấn nhất thành, dị tượng phủ cả phủ huyện." },
+      { "rank": "Đại Nho", "tier": 5, "description": "Văn khí thông thiên, chính khí ca diệt yêu ma cấp tỉnh, lời thành thánh chỉ đạo lý." },
+      { "rank": "Văn Thánh", "tier": 6, "description": "Đỉnh cao Nho Đạo, văn chương vạn cổ trường tồn, một áng văn định quốc an bang, dị tượng phủ thiên hạ." }
+    ]
+  },
+  "worldbuilding": {
+    "setting": "Đại Càn triều — một triều đại giả tưởng kiểu Á Đông (KHÔNG phải lịch sử có thật), nơi văn chương sinh ra sức mạnh Nho Đạo.",
+    "tone": "Hào sảng, cổ phong, sảng văn văn đạo; ấm áp và chính khí; cạnh tranh bằng tài học và đạo lý, không bạo lực.",
+    "economy": {
+      "currency": "Bạc đồng nhà Đại Càn cho sinh hoạt; tài nguyên thật sự của kẻ sĩ là tài khí, danh vọng sĩ lâm, khoa danh và văn bảo.",
+      "resourceFlow": "Thắng văn hội/khoa cử mang về thưởng tài khí, sách quý, văn phòng tứ bảo thượng phẩm, tiến cử và quan hệ trưởng bối."
+    },
+    "geography": {
+      "phase1": "Thanh Hà huyện thuộc Giang Châu — thư viện, văn miếu, chợ học trò, phủ thế gia họ Triệu",
+      "phase2": "Phủ thành Giang Châu và văn đàn cấp châu",
+      "phase3": "Kinh đô Thần Kinh — Quốc Tử Giám, Hàn Lâm Văn Cung, triều đình",
+      "phase4": "Cửu Châu và biên ải, cục diện toàn Đại Càn"
+    },
+    "techLevel": "Cổ đại giả tưởng kiểu Á Đông: bút lông, mực, giấy, mộc bản, khoa cử; sức mạnh siêu nhiên hoàn toàn nằm trong khuôn khổ Nho Đạo (tài khí, văn bảo, dị tượng).",
+    "conflictMedium": ["văn hội và thi hội", "khoa cử (thi huyện/Hương/Hội/Đình)", "biện luận đạo lý", "đề thơ sinh tài khí và dị tượng", "danh vọng và tiến cử sĩ lâm", "chính khí ca trấn yêu ngôn"],
+    "forbiddenElements": ["đâm chém bạo lực vật lý giải quyết xung đột", "giang hồ kiếm hiệp võ công tay đôi làm A-plot", "công nghệ hiện đại trong thế giới Đại Càn", "MC tái sinh trong cùng thế giới (MC chỉ là kẻ xuyên không từ thế giới khác)", "tên triều đại/nhân vật lịch sử có thật của Việt Nam hay Trung Hoa"]
+  },
+  "factions": [
+    {
+      "name": "Sĩ Lâm Chính Thống",
+      "type": "giới văn nhân chính đạo",
+      "power_level": 7,
+      "summary": "Các thư viện, văn miếu và Hàn Lâm Văn Cung nắm chuẩn mực văn đàn; đề cao tài học và chính khí, là lực lượng Tô Mặc dần trở thành trụ cột.",
+      "territory": "Cửu Châu, trung tâm ở Quốc Tử Giám Thần Kinh",
+      "mc_relation": "MC khởi từ hàn sĩ bên rìa, dần thành trụ cột và biểu tượng của sĩ lâm chính thống",
+      "conflicts": ["Diệt Văn Giáo", "Thế Gia Khoa Bảng"],
+      "alliances": [],
+      "importance": 9,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Thế Gia Khoa Bảng",
+      "type": "các dòng họ khoa bảng vọng tộc",
+      "power_level": 8,
+      "summary": "Những dòng họ độc chiếm tài nguyên học vấn và khoa cử, khinh thường hàn sĩ; tiêu biểu là họ Triệu ở Thanh Hà — đối thủ leo thang từ huyện lên kinh.",
+      "territory": "Khắp Cửu Châu, mạnh nhất ở các phủ thành lớn",
+      "mc_relation": "Đối thủ cạnh tranh chính của MC trên con đường khoa cử và văn đàn",
+      "conflicts": ["Sĩ Lâm Chính Thống"],
+      "alliances": [],
+      "importance": 8,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Diệt Văn Giáo",
+      "type": "ma đạo phản Nho",
+      "power_level": 9,
+      "summary": "Phái tà muốn hủy Nho Đạo, dùng yêu ngôn làm loạn lòng người và bôi nhọ đạo lý; thế lực sau cùng đe dọa quốc vận Đại Càn.",
+      "territory": "Ẩn náu khắp các châu, hang ổ ở vùng man hoang",
+      "mc_relation": "Kẻ thù lớn nhất về văn đạo, MC dùng chính khí ca đối đầu",
+      "conflicts": ["Sĩ Lâm Chính Thống", "Triều Đình Đại Càn"],
+      "alliances": [],
+      "importance": 9,
+      "introduce_arc": 5
+    },
+    {
+      "name": "Triều Đình Đại Càn",
+      "type": "vương triều cai trị",
+      "power_level": 10,
+      "summary": "Vua và bá quan Đại Càn, cần Văn Thánh trấn quốc vận nhưng cũng e dè kẻ sĩ quá mạnh; có các phe phái chính trị tranh giành lợi dụng văn đạo.",
+      "territory": "Toàn Đại Càn, trung tâm ở kinh đô Thần Kinh",
+      "mc_relation": "Vừa là sân khấu MC vươn tới đỉnh cao, vừa là thế lực MC phải khéo léo giữ chính khí trước cám dỗ",
+      "conflicts": ["Diệt Văn Giáo"],
+      "alliances": ["Sĩ Lâm Chính Thống"],
+      "importance": 8,
+      "introduce_arc": 4
+    }
+  ],
+  "plot_twists": [
+    {
+      "summary": "Công tử thế gia Triệu Hằng — kẻ khinh thường Tô Mặc — thật ra cũng từng âm thầm ngưỡng mộ tài học, và việc dìm Tô Mặc là do trưởng bối họ Triệu ép buộc để giữ thể diện dòng họ; về sau Triệu Hằng quay sang kính phục.",
+      "payoff_type": "quan hệ ẩn",
+      "setup_chapters": [20, 75],
+      "twist_chapter": 125,
+      "reader_impact": "major",
+      "arc_number": 1
+    },
+    {
+      "summary": "Lý Thanh Tuyền — tiểu thư quản thư viện Thanh Hà — thuộc một dòng dõi từng giữ một phần di thư của tiền nhân Nho Đạo, và những cuốn sách hiếm nàng cho Tô Mặc mượn chứa manh mối về nguồn cội văn đạo.",
+      "payoff_type": "danh tính ẩn",
+      "setup_chapters": [40, 300],
+      "twist_chapter": 760,
+      "reader_impact": "major",
+      "arc_number": 6
+    },
+    {
+      "summary": "Kho thơ văn kim cổ trong đầu Tô Mặc không chỉ là ký ức của thế giới gốc hắn xuyên không tới, mà có liên hệ huyền bí với một Văn Thánh thượng cổ của Đại Càn đã mất tích — lý giải vì sao thơ ngoài thế giới lại cộng hưởng được với tài khí của Đại Càn.",
+      "payoff_type": "nguồn gốc golden finger",
+      "setup_chapters": [150, 500, 880],
+      "twist_chapter": 985,
+      "reader_impact": "cosmic",
+      "arc_number": 7
+    }
+  ],
+  "themes": [
+    { "name": "Tài học thật thắng gia thế", "type": "main", "description": "Tài học và chính khí thật của một hàn sĩ có thể vượt qua gia thế, danh hão và đặc quyền của thế gia khoa bảng.", "motifs": ["dị tượng văn cung hiện khi đề thơ", "bảng vàng đề danh hàn sĩ"], "importance": 10 },
+    { "name": "Văn chương lay chuyển thiên hạ", "type": "main", "description": "Một câu văn đặt đúng lúc đúng cảnh có thể trấn quốc, an dân, cảm hóa lòng người.", "motifs": ["chính khí ca trấn yêu ngôn", "áng văn định quốc an bang"], "importance": 9 },
+    { "name": "Giữ chính khí giữa hư danh", "type": "supporting", "description": "Trong một văn đàn đầy danh lợi và phe phái, kẻ sĩ phải giữ tâm chính và đạo lý.", "motifs": ["từ chối chiêu mộ phe phái", "đứng về phía dân khổ"], "importance": 8 },
+    { "name": "Mượn lời người xưa, sống đúng đạo mình ngâm", "type": "supporting", "description": "Mượn văn chương kim cổ làm vũ khí, nhưng phải sống đúng đạo lý ấy thì tài khí mới bền.", "motifs": ["chính khí suy khi tâm không chính", "khiêm tốn về nguồn gốc thơ"], "importance": 8 }
+  ],
+  "voice_anchors": [
+    {
+      "snippet_type": "opening",
+      "prose_text": "Tô Mặc tỉnh lại trong gian phòng trọ dột nát ven sông Thanh Hà, mùi mực cũ và ẩm mốc xộc vào mũi. Trên bàn là một xấp bài thi bị chấm trượt, nét chữ run rẩy của chủ nhân cũ thân xác này vẫn còn hằn nỗi tủi nhục. Ngoài kia, tiếng cười nhạo của đám học trò họ Triệu vọng vào: 'Hàn sĩ Thanh Hà à, học cả đời cũng chỉ biết mài mực.' Tô Mặc đặt tay lên trán, trong đầu là cả một biển thơ văn của một thế giới khác mà nơi này chưa từng nghe. Hắn không vội. Hắn chỉ khẽ ngâm một câu, và lần đầu tiên kể từ khi tỉnh dậy, một luồng khí mát lạnh dâng lên đỉnh đầu — tài khí.",
+      "key_traits": ["điềm tĩnh", "lì đòn", "hiểu rõ giá trị mình nắm", "không cay cú"]
+    },
+    {
+      "snippet_type": "dialogue",
+      "prose_text": "— Một hàn sĩ thi rớt mà cũng dám lên đài đề thơ? Triệu Hằng khoanh tay, môi cong lên khinh khỉnh. Tô Mặc không đáp ngay. Hắn cầm bút, chấm mực, rồi ngẩng lên nhìn thẳng vào đối phương. — Triệu công tử nói phải, tài học vốn không nhìn vào áo gấm hay áo vải. Vậy mời công tử nghe câu này. Bút lông hạ xuống, từng chữ hiện lên giấy như có hồn, và trên đầu Tô Mặc, một vầng mây trắng bắt đầu cuộn lại giữa ban ngày.",
+      "key_traits": ["không tranh cãi vô ích", "để thơ tự lên tiếng", "tự tin trầm ổn"]
+    },
+    {
+      "snippet_type": "action",
+      "prose_text": "Câu thơ cuối vừa dứt, cả lầu văn lặng đi như tờ. Vầng mây trên đỉnh đầu Tô Mặc bỗng tỏa sáng, ngưng thành một đóa văn cung Minh Châu, ánh sáng dịu dàng phủ xuống cả sân. Trần lão phu tử đứng bật dậy, tay run run vuốt râu, miệng lẩm bẩm 'Đạt Phủ... không, đã chạm tới Đạt Phủ rồi.' Đám học trò họ Triệu lúc nãy còn cười cợt giờ cứng đờ, mặt trắng bệch. Tô Mặc chỉ đặt bút xuống, cúi đầu chào phu tử một cái thật khiêm cung, như thể vầng dị tượng kia chẳng phải chuyện gì to tát.",
+      "key_traits": ["bình thản trước dị tượng", "khiêm tốn đúng lễ", "vả mặt đối thủ bằng tài học"]
+    }
+  ],
+  "foreshadowing": [
+    { "hintText": "Trần lão phu tử thoáng sững người khi nghe câu thơ của Tô Mặc, lẩm bẩm rằng 'giọng văn này... ta như đã gặp ở đâu đó rất xưa'.", "category": "dialogue", "plantCh": 25, "pickupCh": 985, "payoffDescription": "Hé lộ kho thơ của Tô Mặc cộng hưởng với di phong của một Văn Thánh thượng cổ Đại Càn." },
+    { "hintText": "Lý Thanh Tuyền nhắc rằng thư viện Thanh Hà còn giữ vài cuốn di thư cũ 'không ai đọc hiểu nổi, chỉ tổ tiên ta dặn phải giữ'.", "category": "object", "plantCh": 40, "pickupCh": 760, "payoffDescription": "Reveal Lý Thanh Tuyền thuộc dòng giữ di thư tiền nhân Nho Đạo, chứa manh mối nguồn cội văn đạo." },
+    { "hintText": "Trong dân gian bắt đầu lan truyền vài câu vè lạ làm người nghe bứt rứt, cãi vã, mất niềm tin vào sách thánh hiền.", "category": "environmental", "plantCh": 150, "pickupCh": 590, "payoffDescription": "Đó là yêu ngôn đầu tiên của Diệt Văn giáo gieo rắc, mở màn tuyến ma đạo phản Nho." }
+  ]
+}

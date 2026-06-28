@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "totalScore": 125,
+  "avgScore": 11.36,
+  "minDimScore": 10,
+  "source": "claude_code",
+  "dimensions": [
+    { "name": "Premise & hook", "score": 12, "note": "Warm-baseline đô thị huyền ảo với hook bí ẩn rõ từ ch.1: nghe được một tiếng lòng sợ hãi; golden finger active ngay, không khổ-mở-đầu." },
+    { "name": "Protagonist engine", "score": 11, "note": "Trần Niệm có động cơ rõ (nghe tiếng lòng + suy luận + trắc ẩn), tính cách nhất quán, điềm đạm và lì đòn." },
+    { "name": "System mechanic", "score": 11, "note": "Tâm Thanh Lục có input/output/limit/reward rõ + anti-plot-armor (sự thật ≠ bằng chứng, đau đầu, tâm pháp giả)." },
+    { "name": "Conflict ladder", "score": 11, "note": "Leo thang công sở → phường → giới tu chân → linh mạch toàn thành → công đạo hai thế giới, chủ yếu non-combat." },
+    { "name": "World coherence", "score": 11, "note": "Tân Hải 2024 đời thường ẩn tu chân; kinh tế/địa lý/luật ngầm nhất quán, forbidden elements rõ." },
+    { "name": "Dopamine cadence", "score": 11, "note": "controlRules ≥2 peak/chương, face-slap vạch trần kẻ dối có người chứng kiến, khoảnh khắc minh oan cảm động." },
+    { "name": "Origin lock", "score": 12, "note": "mcOrigin=system-bestowed khóa chặt; MC là người Tân Hải bản địa được Tâm Thanh Lục ban tặng năng lực, toàn bộ file sạch token cấm về nguồn gốc nơi khác." },
+    { "name": "Combat guardrail", "score": 10, "note": "Genre dong-nhan combat nhẹ; xung đột chủ yếu điều tra/pháp luật/đối thoại, combat chỉ tiết chế ở cao trào." },
+    { "name": "Foreshadowing & twists", "score": 11, "note": "3 tuyến cài cắm dài hạn (Phó Đạt, ông lang Tạ, dòng Thính Tâm Sư) có plant/payoff chapter cụ thể." },
+    { "name": "Long-form sustainability", "score": 12, "note": "noveltyLadder 4 nấc giữ cùng lane nghe-lòng-đòi-công-bằng, 7 volume cho 1000 chương, endgame khôi phục Thính Tâm Sư." },
+    { "name": "Vietnamese voice", "score": 11, "note": "Voice anchors tự nhiên, đời thường, đúng giọng trinh thám đô thị, đủ diacritics, không AI-tell." }
+  ],
+  "overallFeedback": "Setup vững: warm-baseline opening, golden finger là công cụ điều tra có giới hạn rõ, conflict ladder leo thang sạch từ công sở tới công đạo hai thế giới, origin lock chặt (MC bản địa được Tâm Thanh Lục ban tặng, sạch token cấm về nguồn gốc), dopamine cadence và foreshadowing đều có cấu trúc. Combat được phép nhưng tiết chế đúng tinh thần dong-nhan trinh thám đô thị. Sẵn sàng cho DeepSeek V4 Pro viết chương. PASS."
+}

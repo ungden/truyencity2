@@ -1,0 +1,117 @@
+{
+  "premise": "Một tản tu nghèo căn cơ tầm thường dạt về Phế Kiếm Tông sắp giải tán thì được Đan Lô Hệ Thống chọn: mỗi viên đan anh tự tay luyện để cứu giúp, nuôi dưỡng người trong tông đổi thành điểm Đan Tâm để mở khóa đan phương và bí thuật khống hỏa. Diệp Thanh Vân lấy luyện đan làm gốc, cẩu đạo trường sinh làm nền, từ một sơn môn chờ ngày tháo biển gây dựng thành thánh địa luyện đan thiên hạ — thắng đối thủ bằng đúng phẩm chất viên đan, không bằng tu vi đè người.",
+  "mainConflict": "Kẻ yếu vực dậy giữa rừng cường giả: một Đan Sư mới nổi giữ Phế Kiếm Tông non yếu, đối đầu các thế lực tham lam muốn nuốt tông môn, độc chiếm đan đạo và tài nguyên linh thạch của Đông Vực. Xung đột leo thang từ cấp sơn môn → quận trấn → toàn Đông Vực → Trung Châu, luôn giải quyết qua đan đạo, đấu đan, bố trí tài nguyên, danh vọng và ân nghĩa — Diệp Thanh Vân căn cơ tầm thường nên không thể và không cần thắng bằng tu vi.",
+  "themes": [
+    "Nuôi dưỡng người khác cũng là một con đường lên tiên",
+    "Phẩm chất viên đan thắng tu vi hư danh",
+    "Kẻ yếu liên kết lại có thể đứng vững giữa cường giả",
+    "Cẩu đạo trường sinh — giữ mình và giữ gốc giữa tham vọng thiên hạ"
+  ],
+  "majorPlotPoints": [
+    "Ch.1: Phế Kiếm Tông sắp giải tán, Đan Lô Hệ Thống kích hoạt, viên đan đầu tiên cứu một đệ tử sắp tẩu hỏa nhập ma.",
+    "Arc 1: ổn định sơn môn, đẩy lui Trưởng lão Hắc Phong Đường muốn nuốt mặt bằng, đấu đan thắng Đan Sư trẻ kiêu ngạo của gia tộc lân cận.",
+    "Arc 2-3: danh tiếng đan đạo lan khắp Thanh Khâu Quận; thu nạp đệ tử có tiềm năng bị chôn vùi; liên kết tản tu và tiểu tông thành Đan Minh.",
+    "Giữa truyện: một siêu tông muốn ép Phế Kiếm Tông giao nộp đan phương, Diệp Thanh Vân từ chối và phản công ra toàn Đông Vực.",
+    "Cao trào cuối: tiến vào Trung Châu sánh ngang Đan Đạo Các, hé lộ nguồn gốc Đan Đế và Đan Lô Hệ Thống, dựng nên thánh địa luyện đan thiên hạ."
+  ],
+  "setupKernel": {
+    "readerFantasy": "Cảm giác sảng khoái khi một kẻ căn cơ tầm thường bị cả thiên hạ coi thường, nhờ đan đạo siêu phàm mà vực dậy cả một tông môn, khiến những đại nhân vật kiêu ngạo phải cúi đầu cầu một viên đan — mỗi lò đan là một lần cứu người và một lần vả mặt kẻ ngạo mạn, không cần một trận sống mái nào.",
+    "protagonistEngine": "Diệp Thanh Vân thắng nhờ đan đạo thiên phú được Hệ Thống dẫn dắt + sự thấu hiểu căn cơ từng người + đầu óc bố trí tài nguyên ngày càng sắc; tính cách điềm đạm, lì đòn, trọng tình nghĩa, lấy phẩm chất viên đan làm vũ khí, không chơi bẩn nhưng cũng không nhẫn nhịn vô lý khi tông môn bị chèn ép.",
+    "pleasureLoop": [
+      "Một người hoài nghi / khinh thường đan dược của Diệp Thanh Vân → uống thử / dùng thử một viên đan → kết quả vượt kỳ vọng → tâm phục khẩu phục (face-slap nhẹ + công nhận).",
+      "Hệ Thống cộng điểm Đan Tâm + rơi ra Tàn Quyển Đan Phương / Hỏa Hầu Ấn Ký → Diệp Thanh Vân mở khóa năng lực luyện đan mới (breakthrough/harvest).",
+      "Đối thủ chèn ép (cắt nguồn dược liệu, đấu đan khiêu chiến, vu cáo) → Diệp Thanh Vân hóa giải bằng một nước cờ đan đạo / bố trí thông minh → đối thủ bẽ mặt trước đông người (face-slap có người chứng kiến).",
+      "Dị năng Đan Hồn Cảm Ứng nhìn ra tiềm năng bị chôn vùi của một đệ tử nghèo → luyện đan đúng thể chất giúp họ đột phá → khoảnh khắc cảm động ấm áp (comfort/recognition).",
+      "Một viên đan đột phá / một mẻ đan bán đấu giá đem về linh thạch và danh vọng cho tông môn → cảm giác gặt hái cụ thể (sect_prosperity).",
+      "Một tản tu / tiểu tông được Diệp Thanh Vân cứu giúp bằng đan dược → mạng lưới đồng minh mạnh thêm, ân nghĩa lan xa (network_payoff)."
+    ],
+    "systemMechanic": {
+      "name": "Đan Lô Hệ Thống",
+      "input": "Luyện đan thật bằng dược liệu thật, hoặc cứu giúp / nuôi dưỡng người trong tông môn bằng đan dược do chính tay Diệp Thanh Vân luyện; kẻ giả vờ hàm ơn hoặc người bị ép nhận đan không tính.",
+      "output": "Điểm Đan Tâm cộng dồn, đôi khi rơi ra một Tàn Quyển Đan Phương hoặc một Hỏa Hầu Ấn Ký (kỹ năng khống hỏa / luyện chế).",
+      "limit": "Mỗi đan phương / kỹ năng cần một lượng Đan Tâm tăng dần để mở khóa, và vẫn đòi hỏi dược liệu thật, linh hỏa thật cùng tay nghề thật để luyện; Hệ Thống chỉ ra con đường chứ không tự luyện hộ một viên đan nào; căn cơ Diệp Thanh Vân vẫn tầm thường nên không thể thắng bằng tu vi đè người, mọi thắng lợi phải qua đan đạo và bố trí; dị năng Đan Hồn Cảm Ứng mỗi ngày chỉ dùng được một lần.",
+      "reward": "Mở khóa đan phương cao phẩm, kỹ năng khống hỏa và luyện chế, và dị năng Đan Hồn Cảm Ứng giúp cảm nhận thiên phú / căn cơ ẩn của một người để nuôi dưỡng đúng cách."
+    },
+    "mcOrigin": "system-bestowed",
+    "originLockNote": "Diệp Thanh Vân là người bản địa của Đại Lục Thương Mang, một tản tu sinh ra và lớn lên trong thế giới tu tiên này; mọi tri thức đan đạo vượt thời đại đều do Đan Lô Hệ Thống (di sản in-world của một Đan Đế thượng cổ) ban tặng và do anh khổ luyện mà có.",
+    "mcSecret": {
+      "secret": "Diệp Thanh Vân sở hữu Đan Lô Hệ Thống vô hình, nguồn gốc các đan phương thần kỳ không phải do anh tự nghĩ ra.",
+      "outsideWorldKnowledge": "Hệ Thống tự xưng là di sản của một Đan Đế thượng cổ đã ngã xuống; kho đan phương của nó vượt xa trình độ đan đạo đương thời nhưng vẫn nằm trong khuôn khổ đan đạo của thế giới này.",
+      "revealRule": "Giữ kín hoàn toàn ở Phase 1-2; chỉ hé lộ một phần cho vài đồng minh thân tín khi Đan Minh đủ vững; reveal nguồn gốc Đan Đế ở cao trào cuối truyện.",
+      "coverStory": "Anh nói các đan phương là nhặt được trong một quyển đan phổ tàn khuyết tại một động phủ cổ khi còn lang bạt tản tu."
+    },
+    "benefitLoop": {
+      "goal": "Biến Phế Kiếm Tông (rồi cả Đan Minh) thành nơi đan dược tự chủ, đệ tử được nuôi dưỡng, danh vọng đan đạo vững vàng.",
+      "action": "Luyện đan tử tế, dùng Đan Hồn Cảm Ứng đọc căn cơ từng người, dùng đan phương / kỹ năng mở khóa được để cứu người và xử lý đòn chèn ép.",
+      "benefit": "Điểm Đan Tâm + đan phương / kỹ năng mới + linh thạch và danh vọng tông môn tăng, mở rộng nguồn lực cho bước kế tiếp.",
+      "cadence": "Mỗi 1-2 chương có ít nhất một vòng luyện-đan-được-thưởng; mỗi 3-5 chương một bước nhảy nguồn lực lớn (thu nạp đệ tử quan trọng, thắng đấu đan lớn, mở rộng tông môn)."
+    },
+    "interventionRule": "Diệp Thanh Vân chỉ ra tay can thiệp vào rắc rối bên ngoài khi nó (a) đe dọa trực tiếp tông môn / đệ tử / nguồn dược liệu của anh, hoặc (b) là bất công trong chính giới đan đạo mà anh có năng lực giải quyết; anh không đi lo chuyện thiên hạ ngoài chuyên môn và luôn giải quyết bằng đan đạo, đấu đan, bố trí tài nguyên, ân nghĩa và danh vọng — không lao vào sống mái bằng tu vi.",
+    "phase1Playground": {
+      "locations": [
+        "Phế Kiếm Tông trên Vân Lộc Sơn (đan phòng cũ, kho linh thạch gần cạn, các sơn động đệ tử)",
+        "Linh dược viên hoang phế của tông môn và khu rừng linh dược quanh Vân Lộc Sơn",
+        "Thanh Khâu Quận: chợ tu tiên, lâu các đấu giá, các tiểu gia tộc buôn dược liệu",
+        "Hắc Phong Đường — sơn đường của trưởng lão tham lam muốn nuốt mặt bằng tông môn"
+      ],
+      "cast": [
+        "Diệp Thanh Vân (tản tu, Đan Sư, MC)",
+        "Tô Nhược Lam (đệ tử thân truyền cuối cùng của tông chủ cũ, quản sự tông môn 19 tuổi)",
+        "Trưởng lão Hắc Phong (trưởng lão tham lam muốn giải tán tông để chiếm mặt bằng, đối thủ local)",
+        "Lâm Tiểu Thất (đệ tử nghèo căn cơ bị coi là phế, có tiềm năng ẩn được Đan Hồn Cảm Ứng phát hiện)",
+        "Mạnh lão (chưởng quầy lâu các đấu giá Thanh Khâu Quận, đồng minh thương nhân)"
+      ],
+      "resources": [
+        "Đan đạo thiên phú + Đan Lô Hệ Thống",
+        "Đan phòng cổ và một lò luyện đan cũ của tông môn",
+        "Linh dược viên hoang phế có thể phục hồi và rừng linh dược quanh núi",
+        "Quan hệ với lâu các đấu giá Thanh Khâu Quận để bán đan đổi linh thạch"
+      ],
+      "localAntagonists": [
+        "Trưởng lão Hắc Phong — muốn giải tán tông môn để chiếm mặt bằng và linh mạch",
+        "Một Đan Sư trẻ kiêu ngạo của gia tộc lân cận khiêu chiến đấu đan để hạ nhục Phế Kiếm Tông"
+      ],
+      "repeatableSceneTypes": [
+        "Một người hoài nghi dùng thử đan dược của MC và bị chinh phục bởi phẩm chất viên đan",
+        "Đối thủ tung đòn chèn ép và Diệp Thanh Vân hóa giải bằng nước cờ đan đạo / bố trí",
+        "Mở khóa đan phương / kỹ năng mới từ Hệ Thống và luyện ngay một mẻ đan",
+        "Đan Hồn Cảm Ứng phát hiện tiềm năng bị chôn vùi của một đệ tử và nuôi dưỡng họ đột phá",
+        "Xây dựng ân nghĩa với đệ tử / tản tu / nhà cung ứng dược liệu"
+      ]
+    },
+    "socialReactor": {
+      "witnesses": [
+        "Đệ tử và trưởng lão trong Phế Kiếm Tông",
+        "Các tu sĩ và tiểu gia tộc ở Thanh Khâu Quận",
+        "Thương nhân và chưởng quầy lâu các đấu giá",
+        "Giới Đan Sư và các tông môn lân cận ở Đông Vực"
+      ],
+      "reactionModes": [
+        "Truyền miệng kinh ngạc về phẩm đan và tỉ lệ thành đan của MC",
+        "Tu sĩ kéo tới Phế Kiếm Tông cầu đan, xếp hàng chờ đặt đan",
+        "Một trận đấu đan thắng vang dội làm chấn động giới Đan Sư cả quận",
+        "Các tông môn và gia tộc đua nhau cầu thân, đặt quan hệ với Phế Kiếm Tông"
+      ],
+      "reportBackCadence": "Phản hồi tức thì trong tông môn / phiên giao dịch mỗi chương; làn sóng chấn động giới đan đạo và các tông lân cận mỗi 3-5 chương sau một sự kiện lớn."
+    },
+    "noveltyLadder": [
+      { "chapterRange": "1-100", "newToy": "Đan phương trợ tu và dị năng Đan Hồn Cảm Ứng vực dậy Phế Kiếm Tông", "keepsSameLane": "Vẫn là một Đan Sư gây dựng một tông môn nhỏ ở vùng biên" },
+      { "chapterRange": "100-300", "newToy": "Đan đột phá cao phẩm và liên kết tản tu thành Đan Minh", "keepsSameLane": "Vẫn là đan đạo và tông môn, chỉ mở rộng quy mô và mạng lưới" },
+      { "chapterRange": "300-600", "newToy": "Thánh địa luyện đan của Đông Vực và đan hội đào tạo Đan Sư", "keepsSameLane": "Vẫn là gây dựng danh vọng đan đạo, đối thủ là siêu tông tham lam" },
+      { "chapterRange": "600-1000", "newToy": "Tiến vào Trung Châu sánh ngang Đan Đạo Các và reveal di sản Đan Đế", "keepsSameLane": "Vẫn là hành trình đan đạo, đỉnh cao của cùng một con đường" }
+    ],
+    "controlRules": {
+      "payoffCadence": "Tối thiểu 2 cao điểm dopamine mỗi chương, cao điểm đầu trước nửa chương; setup không quá 30% và phải có payoff trong cùng hoặc chương kế.",
+      "attentionGradient": "Mở chương bằng một móc câu cơ hội đan đạo hoặc thử thách cụ thể; đóng chương bằng một cliffhanger nhẹ hoặc một thắng lợi mở ra cơ hội mới.",
+      "openThreadsPerArc": 3,
+      "closeThreadsPerArc": 2
+    },
+    "patternCards": [
+      "warm-baseline-opening",
+      "competence-led-growth",
+      "mass-witnessed-face-slap",
+      "underdog-coalition",
+      "craft-beats-raw-power"
+    ]
+  }
+}

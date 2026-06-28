@@ -1,0 +1,9 @@
+Ở kiếp trước, Lâm Hải Sinh lăn lộn cả đời khắp các chợ hải sản và gian bếp, nếm đủ món ngon của thiên hạ, hiểu tường tận con nào quý con nào thường, biết biến một thứ nguyên liệu rẻ rúng thành đặc sản khiến người ta tranh nhau mua. Vậy mà tới lúc nhắm mắt, anh vẫn canh cánh một nỗi tiếc nuối: cha mẹ và các em ở quê chưa kịp một ngày ăn no mặc ấm.
+
+Rồi anh mở mắt ra, trở lại tuổi đôi mươi ở chính làng chài Hải Đông nghèo khó — nơi gạo đong từng lon, vải mua bằng tem phiếu, cả nhà quanh năm bám biển mà vẫn chạy ăn từng bữa. Trong đầu anh là trọn vẹn ký ức của một kiếp người: anh biết con sá sùng, con ốc hương, con cua gạch mà người làng chê vỏ nhiều ít thịt thật ra là của hiếm; biết công thức hải sản chua cay, cách làm mắm, nấu dầu hào, phơi đồ khô đúng độ; biết người thành thị trên phố thèm thuồng những hương vị gì.
+
+Nhưng Lâm Hải Sinh hiểu rõ: ký ức không tự biến thành tiền. Nó cho anh biết món gì ngon, thứ gì quý, thị trường cần gì — còn để có được mâm cơm đầy và những đồng tiền lãi, anh vẫn phải tự lội bãi mò bắt, tự nhóm bếp nêm nếm, tự gánh hàng lên phố, tự mặc cả với thương lái và giữ chữ tín với khách. Tấm bản đồ đã có; con đường vẫn là mồ hôi và cái đầu tỉnh táo của chính anh.
+
+Từ một nồi hải sản chua cay đầu tiên khiến khách phố nức nở khen, anh từng bước gây dựng cơ nghiệp: bán đắt những thứ cả làng vứt đi, làm mắm, phơi đồ khô, mở sạp rồi mở quán, đưa hương vị biển quê lên tận thành phố. Niềm vui lớn nhất là nhìn gia đình mỗi ngày một khấm khá — từ bữa cơm độn khoai tới mâm đầy cá thịt, từ tấm áo vá tới bộ quần áo mới, từ nhà tranh dột nát tới ngôi nhà ngói khang trang.
+
+Đường làm giàu của anh không có kẻ thù máu lửa, chỉ đôi ba chuyện hàng xóm ghen tỵ gièm pha hay bắt chước công thức rồi làm hỏng vị — và lần nào cũng được hóa giải bằng cái tài, cái khéo và lòng tử tế. Đây là một câu chuyện niên đại ấm áp, mộc mạc và sảng khoái về một gia đình tay trắng vươn lên sung túc giữa thời gian khó. Đọc tại TruyenCity.

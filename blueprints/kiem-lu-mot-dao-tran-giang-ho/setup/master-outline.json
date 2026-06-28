@@ -1,0 +1,100 @@
+{
+  "title": "Kiếm Lư: Một Đao Trấn Giang Hồ",
+  "totalChapters": 1000,
+  "mainPlotline": "Tiêu Phong Vũ, đệ tử lò rèn bản địa được Kiếm Tâm Lĩnh Ngộ Lục ban tặng, đi từ một lò rèn ven sông Thanh Khê đến đệ nhất kiếm khách trấn động giang hồ, lấy nghĩa khí đối đầu Thiên Kiếm Môn và thế lực giật dây sau lưng — rồi phục hưng dòng truyền thừa Lư Thánh đường và định lại trật tự võ lâm.",
+  "originLock": "system-bestowed — MC là đệ tử lò rèn bản địa của Trung Nguyên võ lâm, võ học do Kiếm Tâm Lĩnh Ngộ Lục (di sản giang hồ của Lư Thánh đường thất truyền) ban tặng; tuyệt đối không có yếu tố đến từ thế giới khác hay ký ức đời trước.",
+  "volumes": [
+    {
+      "volume": 1,
+      "title": "Lò Rèn Thanh Khê",
+      "chapterRange": "1-130",
+      "theme": "Bảo vệ lò rèn và trấn giữ một vùng",
+      "summary": "Kiếm Lư Trại bị Thiên Kiếm Môn ức hiếp thì Kiếm Tâm Lĩnh Ngộ Lục kích hoạt. Phong Vũ trấn áp đệ tử Triệu Đại Đao, dẹp sơn tặc Hắc Phong Trại làm tay sai bẩn, biến đệ tử lò rèn vô danh thành hiệp khách nức tiếng vùng Thanh Khê.",
+      "subArcs": [
+        { "name": "Thanh kiếm đầu tiên", "chapterRange": "1-30", "focus": "Lĩnh Ngộ Lục kích hoạt, trấn áp kẻ tới gây sự, ổn định Kiếm Lư Trại." },
+        { "name": "Đòn ép của danh môn", "chapterRange": "31-65", "focus": "Triệu Đại Đao thay mặt Thiên Kiếm Môn ép quy phục; Phong Vũ phản công bằng kiếm ý và mưu lược." },
+        { "name": "Sơn tặc tay sai", "chapterRange": "66-100", "focus": "Hắc Phong Trại bị mua chuộc cướp đoàn tiêu; Phong Vũ dẹp loạn, lật mặt kẻ giật dây." },
+        { "name": "Trấn động Thanh Khê", "chapterRange": "101-130", "focus": "Vùng Thanh Khê quy phục, thu nhận hiệp khách đầu tiên, đặt nền lập danh hào." }
+      ],
+      "keyMilestone": "Lò rèn từ chỗ bị ức hiếp thành chỗ dựa nghĩa khí của cả vùng Thanh Khê."
+    },
+    {
+      "volume": 2,
+      "title": "Danh Chấn Châu Quận",
+      "chapterRange": "131-280",
+      "theme": "Lập danh hào và kết giao quần hùng",
+      "summary": "Phong Vũ rời Thanh Khê dấn thân giang hồ, lập danh hào, kết giao quần hùng, đối mặt thử thách giữ vững nghĩa khí khi Thiên Kiếm Môn leo thang chèn ép ở cấp châu quận.",
+      "subArcs": [
+        { "name": "Bước chân giang hồ", "chapterRange": "131-180", "focus": "Dấn thân châu quận, rèn kiếm thần cho hiệp khách, dựng uy danh." },
+        { "name": "Ân oán quần hùng", "chapterRange": "181-230", "focus": "Kết giao và va chạm với quần hùng, xử lý hiểu lầm và khiêu khích." },
+        { "name": "Đối đầu châu quận", "chapterRange": "231-280", "focus": "Thiên Kiếm Môn dồn ép cấp châu quận; Phong Vũ phản công bằng tỉ võ và lòng dân giang hồ." }
+      ],
+      "keyMilestone": "Danh hào của Phong Vũ vang khắp châu quận, được quần hùng trọng nghĩa nể phục."
+    },
+    {
+      "volume": 3,
+      "title": "Kiếm Minh",
+      "chapterRange": "281-430",
+      "theme": "Kẻ yếu thế liên kết lại",
+      "summary": "Phong Vũ tập hợp các môn phái nhỏ và hiệp khách lẻ thành Kiếm Minh để cùng chống lại sự thâu tóm của Thiên Kiếm Môn và chia sẻ bí thuật rèn kiếm.",
+      "subArcs": [
+        { "name": "Hạt giống minh hội", "chapterRange": "281-330", "focus": "Thuyết phục các môn phái nhỏ, dựng minh quy nghĩa khí." },
+        { "name": "Sức mạnh đồng đạo", "chapterRange": "331-380", "focus": "Chia sẻ kiếm pháp và bí thuật rèn, củng cố nội lực Kiếm Minh." },
+        { "name": "Phản đòn đại phái", "chapterRange": "381-430", "focus": "Thiên Kiếm Môn chèn ép nguồn hàn thiết; Kiếm Minh phản công bằng đoàn kết." }
+      ],
+      "keyMilestone": "Kiếm Minh đủ mạnh để đối thoại ngang hàng với một đại phái về thế cục võ lâm."
+    },
+    {
+      "volume": 4,
+      "title": "Cám Dỗ Của Đại Phái",
+      "chapterRange": "431-580",
+      "theme": "Giữ cốt cách khi cám dỗ lớn dần",
+      "summary": "Môn chủ Thiên Kiếm Môn Cung Tự Hàn dụ dỗ Phong Vũ thu nạp anh làm trưởng lão với địa vị và bí kíp hậu hĩnh. Phong Vũ từ chối và quyết định trực diện chống lại tham vọng độc bá võ lâm.",
+      "subArcs": [
+        { "name": "Lời chiêu mời", "chapterRange": "431-480", "focus": "Lời dụ dỗ danh lợi, áp lực và cám dỗ, quyết định giữ nghĩa khí." },
+        { "name": "Truyền thừa nghĩa khí", "chapterRange": "481-530", "focus": "Xây mô hình truyền thừa rèn kiếm giữ được cốt cách và danh dự." },
+        { "name": "Bắc chinh", "chapterRange": "531-580", "focus": "Tiến vào địa bàn đại phái, va chạm thế lực và quy củ võ lâm phương Bắc." }
+      ],
+      "keyMilestone": "Kiếm Minh trở thành thế lực trấn giữ một phương, độc lập và được giang hồ kính nể."
+    },
+    {
+      "volume": 5,
+      "title": "Sóng Cả Võ Lâm",
+      "chapterRange": "581-730",
+      "theme": "Khí phách thật giữa đại cục",
+      "summary": "Cuộc đối đầu lan ra toàn võ lâm; Phong Vũ vừa mở rộng thế lực vừa giữ sơ tâm thợ rèn, đối đầu mưu kế ly gián và đại hội võ lâm do Cung Tự Hàn giật dây.",
+      "subArcs": [
+        { "name": "Đại hội võ lâm", "chapterRange": "581-630", "focus": "Tỉ võ đại hội, khẳng định kiếm đạo của kẻ xuất thân lò rèn." },
+        { "name": "Mưu kế ly gián", "chapterRange": "631-680", "focus": "Hóa giải kế ly gián Kiếm Minh; minh bạch thắng tin đồn." },
+        { "name": "Chuẩn mực giang hồ", "chapterRange": "681-730", "focus": "Phong Vũ định hình lại chuẩn nghĩa khí cho giang hồ." }
+      ],
+      "keyMilestone": "Uy danh phủ khắp võ lâm, được tôn là biểu tượng nghĩa khí chống cường quyền."
+    },
+    {
+      "volume": 6,
+      "title": "Kiếm Ý Trùng Dương",
+      "chapterRange": "731-880",
+      "theme": "Đạt tới đỉnh cao kiếm đạo",
+      "summary": "Phong Vũ truy tới đỉnh cao kiếm đạo, đối đầu các cao thủ tuyệt đỉnh và lần ra dấu vết thế lực giật dây sau lưng Thiên Kiếm Môn, đồng thời gây dựng nền truyền thừa rèn kiếm bền vững cho giang hồ.",
+      "subArcs": [
+        { "name": "Tuyệt đỉnh giao phong", "chapterRange": "731-780", "focus": "Đối đầu cao thủ tuyệt đỉnh, lĩnh ngộ tầng kiếm ý cao nhất." },
+        { "name": "Bóng sau màn", "chapterRange": "781-830", "focus": "Lần ra thế lực thật giật dây Thiên Kiếm Môn." },
+        { "name": "Truyền thừa bền vững", "chapterRange": "831-880", "focus": "Gây dựng lò rèn truyền thừa, nâng đời thợ rèn và môn phái nhỏ." }
+      ],
+      "keyMilestone": "Kiếm đạo của Phong Vũ đạt tới tuyệt đỉnh, được công nhận đệ nhất kiếm khách."
+    },
+    {
+      "volume": 7,
+      "title": "Di Sản Lư Thánh",
+      "chapterRange": "881-1000",
+      "theme": "Hé lộ nguồn gốc và phục hưng",
+      "summary": "Nguồn gốc Kiếm Tâm Lĩnh Ngộ Lục và Lư Thánh đường được hé lộ. Phong Vũ lật tẩy thế lực tối thượng, phục hưng Lư Thánh đường như một dòng truyền thừa thợ rèn kiếm thần, khép lại hành trình bằng việc trao lại kiếm đạo cho thế hệ sau.",
+      "subArcs": [
+        { "name": "Manh mối Lư Thánh", "chapterRange": "881-930", "focus": "Lần theo di sản của Lư Thánh đường đã thất truyền." },
+        { "name": "Trận chiến cuối", "chapterRange": "931-980", "focus": "Lật tẩy và đánh bại thế lực giật dây tối thượng." },
+        { "name": "Trao lại đường kiếm", "chapterRange": "981-1000", "focus": "Phục hưng Lư Thánh đường, đào tạo truyền nhân, khép lại bằng một thanh kiếm trao tay." }
+      ],
+      "keyMilestone": "Lư Thánh đường hồi sinh; Phong Vũ thành đệ nhất kiếm khách trấn giang hồ và người truyền lửa nghề rèn kiếm thần."
+    }
+  ]
+}

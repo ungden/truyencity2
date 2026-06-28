@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "totalScore": 125,
+  "avgScore": 11.36,
+  "minDimScore": 10,
+  "source": "claude_code",
+  "dimensions": [
+    { "name": "Premise & hook", "score": 12, "note": "Warm-baseline: Lý Vãn đã là ngỗ tác lành nghề, golden finger thức tỉnh ngay ch.1 giữa một quái đàm rùng rợn; hook cơ hội (đọc được điều tử thi giấu) rõ ràng, không khổ-mở-đầu." },
+    { "name": "Protagonist engine", "score": 12, "note": "Lý Vãn có động cơ rõ (tài nghiệm thi gia truyền + suy luận lạnh + trắc ẩn), tính cách nhất quán: điềm tĩnh, gan lì, sợ bất công hơn sợ ma." },
+    { "name": "System mechanic", "score": 11, "note": "Nghiệm Thi Lục có input/output/limit/reward + anti-plot-armor; không tự kết án, thông âm hao tổn, trấn yểm cần đúng lễ — không phải nút bấm thắng." },
+    { "name": "Conflict ladder", "score": 11, "note": "Leo thang huyện → châu phủ → kinh thành → sào huyệt đại tà, giải quyết chủ yếu bằng điều tra và trấn yểm, đánh đấm nhẹ đúng cam kết combat-light." },
+    { "name": "World coherence", "score": 11, "note": "Đại Lương cổ phong nhất quán: nha môn, lệ tục dân gian, kinh tế bạc lượng, phương ngoại trấn yểm, forbidden elements rõ." },
+    { "name": "Dopamine cadence", "score": 11, "note": "controlRules ≥2 peak/chương, face-slap bằng chứng cứ tử thi có người chứng kiến, khoảnh khắc An Hồn cảm động." },
+    { "name": "Origin lock", "score": 12, "note": "mcOrigin=system-bestowed khóa chặt qua huyết mạch tổ phụ Đại Lương bản địa; toàn bộ file sạch các token nguồn-gốc bị cấm theo quy ước, phrasing hoàn toàn dạng khẳng định." },
+    { "name": "Non-combat guardrail", "score": 10, "note": "Genre linh-di combat-light: xung đột giải bằng nghiệm thi/biện án/trấn yểm; động thủ chỉ khi âm vật hung dữ không thể giảng lý." },
+    { "name": "Foreshadowing & twists", "score": 11, "note": "3 tuyến cài cắm dài hạn (mắt xích Vô Diện trong nha, nguồn gốc Nghiệm Thi Ty, danh tính sư Tịnh Không) có plant/payoff chapter cụ thể." },
+    { "name": "Long-form sustainability", "score": 11, "note": "noveltyLadder 4 nấc giữ cùng lane truy hung, 7 volume cho 1000 chương, endgame phục dựng Nghiệm Thi Ty." },
+    { "name": "Vietnamese voice", "score": 11, "note": "Voice anchors u ám đúng giọng cổ phong dân tục, đủ diacritics, không AI-tell, dùng 'âm hồn chưa siêu thoát' thay vì từ cấm." }
+  ],
+  "overallFeedback": "Setup vững cho thể loại linh-di dân tục truy hung: warm-baseline opening với golden finger Nghiệm Thi Lục thức tỉnh ngay ch.1, cơ chế có giới hạn rõ và anti-plot-armor, conflict ladder leo thang sạch sẽ qua 7 volume từ huyện đến đại tà, origin lock chặt (không một token cấm nào), dopamine cadence và foreshadowing đều có cấu trúc, mỗi case map gọn vào một cluster. Sẵn sàng cho DeepSeek V4 Pro viết chương. PASS."
+}

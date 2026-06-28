@@ -1,0 +1,118 @@
+{
+  "premise": "Lý Trường Canh, một thanh niên bản địa vô danh, thức tỉnh một truyền thừa cổ võ thất truyền ẩn trong huyết mạch tổ tiên đúng đêm linh khí phục tô về thành phố hiện đại. Truyền thừa cho anh con đường tu hành đúng đắn trong khi cả thiên hạ còn mò mẫm, nhưng không cho không thứ gì — mỗi cảnh giới đều đổi bằng khổ luyện và rủi ro thật. Anh vừa giấu mình giữa người thường để tránh thành mục tiêu, vừa âm thầm vươn lên: đột phá cảnh giới, săn dị thú, khai phá bí cảnh, đối đầu các môn phái và gia tộc cổ xưa muốn cướp đoạt truyền thừa, rồi trở thành cường giả trấn giữ một phương và truy ra bí mật nguồn cội linh khí.",
+  "mainConflict": "Một thanh niên vô danh nắm con đường tu hành đúng giữa một thế giới hỗn loạn nơi cường giả bị săn lùng và kẻ yếu bị chà đạp. Xung đột leo thang từ sinh tồn buổi đầu phục tô → đột phá cảnh giới và vả mặt kẻ ỷ mạnh trong giới cổ võ → săn dị thú biến dị → đối đầu các gia tộc/môn phái cổ xưa muốn cướp truyền thừa → khai phá bí cảnh tranh cơ duyên → trở thành cường giả trấn giữ một phương → truy ra cội nguồn linh khí phục tô. Cổ võ thực chiến cương mãnh là phương tiện giải quyết xung đột, nhưng tinh thần là vươn lên và bảo vệ người yếu, không phải bạo lực vô nghĩa.",
+  "themes": [
+    "Con đường đúng vẫn phải đi bằng mồ hôi của chính mình",
+    "Giấu mình không phải hèn nhát mà là khôn ngoan để vươn xa hơn",
+    "Sức mạnh có ý nghĩa khi dùng để bảo vệ người mình thương",
+    "Cơ duyên thuộc về kẻ chuẩn bị, không thuộc về kẻ may mắn lười biếng"
+  ],
+  "majorPlotPoints": [
+    "Ch.1: Đêm linh khí phục tô, Lý Trường Canh thức tỉnh truyền thừa cổ võ thất truyền trong huyết mạch và dẫn được luồng linh khí đầu tiên.",
+    "Arc 1: Đặt nền cảnh giới Luyện Thể, hiểu truyền thừa chỉ chỉ đường chứ không cho không, chọn chiến lược giấu mình vươn lên và lần đầu bảo vệ người thân.",
+    "Arc 2-3: Gia nhập Võ Quán làm vỏ bọc, đột phá Khai Mạch rồi Ngưng Khí, vả mặt kẻ ỷ tài, săn dị thú biến dị thành tay săn thú có tiếng.",
+    "Giữa truyện: Gia tộc cổ xưa thức tỉnh nhận ra giá trị truyền thừa và tìm cách cướp đoạt; Lý Trường Canh phá vây, đột phá Hóa Cương, khai phá bí cảnh tìm cơ duyên và manh mối nguồn gốc.",
+    "Cao trào cuối: Trở thành cường giả trấn giữ một phương, đối mặt mối nguy tầm cỡ kỷ nguyên, truy ra bí mật vì sao linh khí phục tô và nguồn gốc truyền thừa huyết mạch, định hình tương lai kỷ nguyên mới."
+  ],
+  "setupKernel": {
+    "readerFantasy": "Cảm giác sảng khoái khi một thanh niên vô danh, bị cả thế giới xem thường, âm thầm nắm con đường tu hành mạnh nhất rồi từng bước đột phá cảnh giới, đánh bại những kẻ ỷ tài ỷ thế, và vươn lên thành cường giả trấn giữ một phương — mỗi lần đột phá là một lần phấn khích, mỗi lần vả mặt kẻ kiêu ngạo là một lần hả dạ, mỗi lần giấu mình rồi bùng nổ đúng lúc là một lần độc giả nín thở rồi reo lên.",
+    "protagonistEngine": "Lý Trường Canh thắng nhờ nắm con đường tu hành đúng từ truyền thừa, kiên trì khổ luyện không nóng vội, và đầu óc tỉnh táo biết khi nào giấu mình khi nào ra tay; truyền thừa chỉ chỉ đường, mọi đột phá đều đổi bằng mồ hôi và rủi ro thật. Tính cách điềm đạm, kiên định, trọng tình thân, lạnh lùng với kẻ ác nhưng giàu nghĩa khí với người yếu thế.",
+    "pleasureLoop": [
+      "Lý Trường Canh gặp một nút thắt tu hành hoặc một mối nguy mới (dị thú, kẻ ỷ mạnh, âm mưu cướp truyền thừa) → truyền thừa hé lộ con đường đúng nhưng đòi anh tự khổ luyện/tự ngộ (setup tu hành).",
+      "Anh âm thầm tích lũy, khổ luyện và chuẩn bị trong khi che giấu thực lực, để kẻ khác coi thường (giấu mình tích lực).",
+      "Đúng thời điểm, anh đột phá một cảnh giới mới hoặc tung tuyệt kỹ cổ võ, sức mạnh nhảy vọt (đột phá phấn khích).",
+      "Một kẻ ỷ tài ỷ thế khinh thường anh bị anh vả mặt trong thực chiến cổ võ mãn nhãn → công lý được thực thi (vả mặt kẻ kiêu ngạo).",
+      "Anh săn được dị thú/giành được cơ duyên/bảo vệ được người thân, thu hoạch tài nguyên và uy danh (thu hoạch + tiến triển).",
+      "Một manh mối về nguồn gốc linh khí phục tô hoặc truyền thừa huyết mạch được hé lộ → cảm giác bức màn lớn đang vén lên (revelation payoff)."
+    ],
+    "systemMechanic": {
+      "name": "Truyền Thừa Cổ Võ Huyết Mạch — Con Đường Tu Hành Thất Truyền",
+      "input": "Lý Trường Canh hấp thụ linh khí thiên địa và khổ luyện thân thể, kinh mạch theo công pháp cổ võ mà truyền thừa hé lộ; cần thời gian tu luyện thật, linh khí đủ dày và thân thể chịu được áp lực mỗi cảnh giới.",
+      "output": "Truyền thừa cho anh biết con đường tu hành đúng đắn (công pháp, thứ tự đột phá, cách tránh tẩu hỏa) mà thế nhân chưa biết, cùng các tuyệt kỹ cổ võ cương mãnh; sức mạnh thực chiến và cảnh giới tăng theo từng tầng tu hành.",
+      "limit": "Anti-plot-armor cứng: truyền thừa CHỈ chỉ đường, KHÔNG tự nâng cảnh giới, KHÔNG ban sức mạnh miễn phí, KHÔNG đánh hộ anh. Mỗi tầng đột phá đòi hỏi khổ luyện thật và đủ tài nguyên; nóng vội thì tẩu hỏa nhập ma, thương tổn thật. Anh vẫn có thể bị đánh bại bởi kẻ cảnh giới cao hơn hoặc số đông; truyền thừa vô dụng nếu anh lười tu hoặc cạn linh khí/tài nguyên.",
+      "reward": "Tốc độ và độ vững khi tu hành cao hơn người thường nhờ đi đúng đường; theo thời gian anh đột phá vượt bậc, có tuyệt kỹ độc nhất và uy danh — nhưng phần thưởng luôn đổi bằng mồ hôi, máu và những lựa chọn khó, không phải sức mạnh cho không."
+    },
+    "mcOrigin": "native",
+    "originLockNote": "Lý Trường Canh là người bản địa thuần túy: sinh ra và lớn lên tại đô thị hiện đại của thế giới truyện. Truyền thừa cổ võ là di sản huyết mạch tổ tiên trong CHÍNH thế giới này, được linh khí phục tô đánh thức — một cơ duyên in-world, không đến từ bất kỳ nơi nào khác.",
+    "mcSecret": {
+      "secret": "Lý Trường Canh sở hữu một truyền thừa cổ võ thất truyền ẩn trong huyết mạch tổ tiên, cho anh con đường tu hành đúng đắn mà cả thiên hạ chưa ai biết.",
+      "outsideWorldKnowledge": "Truyền thừa chứa tri thức về một thời đại cổ võ cổ xưa từng tồn tại ngay trong thế giới này trước khi linh khí cạn kiệt — kiến thức vượt xa hiểu biết của mọi môn phái và Cục Dị Năng đương thời, vốn vẫn đang mò mẫm tự nghiên cứu.",
+      "revealRule": "Giấu kín hoàn toàn ở các arc đầu (giả vờ tư chất bình thường); chỉ hé lộ một phần cho vài người thân tín và đối thủ lớn giữa truyện; nguồn gốc thật của truyền thừa (liên hệ với cội nguồn phục tô) chỉ reveal ở cao trào cuối.",
+      "coverStory": "Anh nói mình chỉ 'may mắn có chút tư chất và chăm tu luyện', che giấu việc đang đi một con đường truyền thừa độc nhất."
+    },
+    "benefitLoop": {
+      "goal": "Khổ luyện vươn lên theo con đường truyền thừa, bảo vệ người thân, trở thành cường giả trấn giữ một phương và truy ra bí mật nguồn cội linh khí.",
+      "action": "Hấp thụ linh khí và khổ luyện công pháp cổ võ, giấu thực lực khi cần, săn dị thú và khai phá bí cảnh để lấy tài nguyên, ra tay đúng lúc để bảo vệ người yếu và vả mặt kẻ ác.",
+      "benefit": "Mỗi vòng đem lại đột phá cảnh giới, tuyệt kỹ mới, tài nguyên tu hành, uy danh và đồng minh; thực lực và chỗ đứng của anh tăng dần, kẻ ác suy yếu tương ứng.",
+      "cadence": "Mỗi 1-2 chương có ít nhất một vòng tu-hành-hoặc-thực-chiến-được-thưởng (một tiến bộ tu luyện rõ rệt hoặc một trận thắng vả mặt kẻ kiêu ngạo); mỗi 3-5 chương một bước nhảy lớn (đột phá cảnh giới, hoàn tất một cuộc săn dị thú/bí cảnh, hé lộ một mảnh sự thật)."
+    },
+    "interventionRule": "Lý Trường Canh chỉ ra tay khi (a) tính mạng người thân, người yếu thế quanh anh hoặc chính anh bị đe dọa trực tiếp, hoặc (b) khi anh đối mặt kẻ ác ỷ mạnh hiếp yếu hay âm mưu cướp đoạt truyền thừa mà anh đủ sức và đủ cớ để can thiệp; anh không đi 'cứu cả thế giới' ngoài tầm với, ưu tiên giấu mình tích lũy, chỉ bùng nổ khi cần thiết — và khi ra tay thì dứt khoát bằng cổ võ thực chiến.",
+    "phase1Playground": {
+      "locations": [
+        "Khu phố và căn nhà của Lý Trường Canh — nơi anh giấu mình giữa người thường và khổ luyện ban đêm",
+        "Võ Quán cổ võ mới mở — vỏ bọc để anh hòa vào giới tu hành mà không lộ thực lực",
+        "Các con phố và công viên đô thị nơi dị tượng phục tô và dị thú đầu tiên xuất hiện",
+        "Trụ sở Cục Dị Năng địa phương — thế lực chính quyền quản lý cường giả mới nổi"
+      ],
+      "cast": [
+        "Lý Trường Canh (thanh niên bản địa, MC, người thức tỉnh truyền thừa cổ võ)",
+        "Lý Tiểu Vân (em gái của Lý Trường Canh, lý do anh giấu mình và vươn lên để bảo vệ)",
+        "Hà Thanh Phong (sư huynh ở Võ Quán, chính trực, thành bạn đồng hành sớm)",
+        "Tôn Bưu (đệ tử thiên tài kiêu ngạo của Võ Quán, ỷ tài hiếp người, local antagonist)",
+        "Đội trưởng Cục Dị Năng địa phương (vừa chiêu mộ vừa dò xét cường giả mới như Lý Trường Canh)"
+      ],
+      "resources": [
+        "Truyền Thừa Cổ Võ Huyết Mạch — con đường tu hành thất truyền",
+        "Thân thể được tôi luyện và linh khí hấp thụ qua khổ luyện",
+        "Tình thân với em gái và bạn đồng hành Hà Thanh Phong",
+        "Tài nguyên thu được từ săn dị thú và dị tượng phục tô buổi đầu"
+      ],
+      "localAntagonists": [
+        "Tôn Bưu — đệ tử thiên tài kiêu ngạo ỷ tài hiếp người, nhiều lần khiêu khích và coi thường Lý Trường Canh",
+        "Một nhóm cường giả mới nổi chuyên cướp tài nguyên và dị thú của kẻ yếu hơn trong buổi đầu phục tô"
+      ],
+      "repeatableSceneTypes": [
+        "Khổ luyện theo truyền thừa và đột phá một nút thắt tu hành",
+        "Giấu thực lực giữa người thường hoặc trong Võ Quán để tránh thành mục tiêu",
+        "Thực chiến cổ võ vả mặt một kẻ ỷ tài ỷ thế khinh thường anh",
+        "Săn dị thú biến dị hoặc bảo vệ người yếu trước hiểm họa phục tô, thu hoạch tài nguyên",
+        "Đoạn đời thực và tình thân: chăm lo gia đình, gặp bạn đồng hành, ghép manh mối nguồn gốc"
+      ]
+    },
+    "socialReactor": {
+      "witnesses": [
+        "Người thân và hàng xóm quanh Lý Trường Canh",
+        "Sư huynh đệ và quản sự trong Võ Quán",
+        "Cục Dị Năng và các cường giả mới nổi trong giới cổ võ",
+        "Các gia tộc cổ xưa và môn phái tái sinh để mắt tới truyền thừa"
+      ],
+      "reactionModes": [
+        "Sững sờ và nể phục khi Lý Trường Canh bất ngờ bộc lộ thực lực vượt cảnh giới",
+        "Bạn đồng hành tin tưởng, kẻ ỷ mạnh chuyển từ khinh thường sang dè chừng rồi e sợ",
+        "Cục Dị Năng và các thế lực lớn dò xét, chiêu mộ hoặc cảnh giác anh",
+        "Tin đồn về một cao thủ trẻ bí ẩn lan trong giới cổ võ, đẩy uy danh anh lên"
+      ],
+      "reportBackCadence": "Phản ứng tức thì của người chứng kiến trong mỗi trận/sự kiện; làn sóng đồn đại và động thái của các thế lực lớn dồn lại mỗi 3-5 chương sau mỗi lần anh bộc lộ thực lực đáng chú ý."
+    },
+    "noveltyLadder": [
+      { "chapterRange": "1-130", "newToy": "Thức tỉnh truyền thừa, đặt nền Luyện Thể và chiến lược giấu mình", "keepsSameLane": "Vẫn là tu hành cổ võ theo con đường truyền thừa giữa đô thị phục tô" },
+      { "chapterRange": "131-280", "newToy": "Nhập Võ Quán làm vỏ bọc, đột phá Khai Mạch, thực chiến cổ võ đầu tiên", "keepsSameLane": "Vẫn là khổ-luyện-rồi-bùng-nổ, chỉ thêm sân khấu giới cổ võ" },
+      { "chapterRange": "281-430", "newToy": "Săn dị thú biến dị tràn phố, đột phá Ngưng Khí", "keepsSameLane": "Vẫn là tu hành và thực chiến, thêm chiến trường dị thú và tài nguyên" },
+      { "chapterRange": "431-730", "newToy": "Đối đầu gia tộc cổ xưa tranh truyền thừa, đột phá Hóa Cương, khai phá bí cảnh", "keepsSameLane": "Vẫn cùng lane vươn lên bằng truyền thừa, thêm tầng đấu với thế lực lớn" },
+      { "chapterRange": "731-1000", "newToy": "Trấn giữ một phương, đại chiến cường giả và truy ra cội nguồn linh khí", "keepsSameLane": "Vẫn là con đường cổ võ truyền thừa — đỉnh cao của cùng hành trình tu hành" }
+    ],
+    "controlRules": {
+      "payoffCadence": "Tối thiểu 2 cao điểm dopamine mỗi chương (một tiến bộ tu hành/đột phá rõ rệt và một trận thực chiến vả mặt kẻ kiêu ngạo hoặc một mối nguy được hóa giải); cao điểm đầu xuất hiện trước nửa chương; setup không quá 30% và phải có payoff trong cùng hoặc chương kế.",
+      "attentionGradient": "Mở chương bằng một nút thắt tu hành, một mối nguy phục tô hoặc một kẻ khiêu khích cụ thể; đóng chương bằng một cliffhanger (đột phá sắp tới, một cao thủ vừa xuất hiện, hoặc một manh mối nguồn gốc vừa lộ).",
+      "openThreadsPerArc": 3,
+      "closeThreadsPerArc": 2
+    },
+    "patternCards": [
+      "warm-baseline-opening",
+      "hide-strength-then-erupt",
+      "cultivation-breakthrough",
+      "face-slap-the-arrogant",
+      "beast-hunt-and-harvest"
+    ]
+  }
+}

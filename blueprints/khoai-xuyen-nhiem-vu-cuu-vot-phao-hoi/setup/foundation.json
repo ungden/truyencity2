@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "totalScore": 123,
+  "avgScore": 11.18,
+  "minDimScore": 8,
+  "source": "claude_code",
+  "dimensions": [
+    { "name": "Premise & hook", "score": 12, "note": "Warm-baseline khoái xuyên với hook rõ từ ch.1: ký hợp đồng và nhập vai pháo hôi, biết trước kịch bản, lập tức có lợi thế — không khổ-mở-đầu kéo dài." },
+    { "name": "Protagonist engine", "score": 11, "note": "Tô Diệp thắng bằng trí tuệ + thấu hiểu lòng người + lợi thế kịch bản; tính cách bình tĩnh, quyết đoán, ấm ở lõi, nhất quán xuyên các thế giới." },
+    { "name": "System mechanic", "score": 12, "note": "Hệ Thống Đa Vũ Trụ có input/output/limit/reward + anti-plot-armor rõ; không tự ra tay, kịch bản chỉ biết một phần, phá luật bị trừ điểm." },
+    { "name": "Conflict ladder", "score": 11, "note": "Leo thang theo thế giới (hào môn → học đường → cung đình → mạt thế → meta) + meta-arc Hệ Thống lớn dần; quy mô đối thủ tăng đều." },
+    { "name": "World coherence", "score": 11, "note": "Đa vũ trụ + Trạm Trung Chuyển + meta-quy tắc lặp lại nhất quán; thế giới một (Lâm gia Giang Thành) chi tiết, kinh tế/quyền lực rõ." },
+    { "name": "Dopamine cadence", "score": 11, "note": "controlRules ≥2 peak/chương, face-slap có người chứng kiến qua bằng chứng, settlement Điểm Tiếc Nuối + đổi vị thế giới mỗi 25-40 chương." },
+    { "name": "Origin lock", "score": 12, "note": "mcOrigin=transmigrator khóa chặt; outlines + canon KHÔNG chứa bất kỳ token tái-sinh-từ-quá-khứ nào bị cấm. Token xuyên không/xuyên việt là trung tâm premise và được phép dùng tự do." },
+    { "name": "Non-combat guardrail", "score": 11, "note": "Genre khoái xuyên có chiến đấu (nonCombat=false); cho phép hành động và mưu kế, nhưng ràng buộc rõ: không giết nam/nữ chính, không lạm quyền tàn nhẫn." },
+    { "name": "Foreshadowing & twists", "score": 8, "note": "3 tuyến cài cắm dài hạn (mẹ ruột Tống Nhu chủ mưu, pháo hôi là linh hồn thật, MC vốn là pháo hôi) + 3 foreshadowing có plant/payoff chapter cụ thể." },
+    { "name": "Long-form sustainability", "score": 12, "note": "noveltyLadder 4 nấc giữ cùng lane khoái xuyên, 7 volume (mỗi volume ≈ một thế giới) cho 1000 chương, endgame meta về bản chất Hệ Thống." },
+    { "name": "Vietnamese voice", "score": 10, "note": "Voice anchors tự nhiên, đủ diacritics, đúng giọng khoái xuyên ngôn tình hiện đại, không AI-tell; dùng đầy đủ họ+tên nhân vật." }
+  ],
+  "overallFeedback": "Setup vững cho khoái xuyên episodic: warm-baseline opening, Hệ Thống Đa Vũ Trụ là cơ chế nhiệm vụ có giới hạn rõ + anti-plot-armor, conflict ladder leo thang sạch qua 7 thế giới với meta-arc Hệ Thống xuyên suốt, origin lock transmigrator chặt (không token tái-sinh bị cấm, dùng tự do token xuyên không), Hub Space + vòng lặp nhiệm vụ nhất quán, dopamine cadence và foreshadowing đều có cấu trúc. Sẵn sàng cho DeepSeek V4 Pro viết chương. PASS."
+}

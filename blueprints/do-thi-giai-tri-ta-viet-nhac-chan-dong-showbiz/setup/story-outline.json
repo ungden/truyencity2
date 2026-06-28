@@ -1,0 +1,118 @@
+{
+  "premise": "Cố Thanh Trạch, một nhạc sĩ thất bại từng bị vùi dập và cướp công cả một đời, trọng sinh trở về thời sinh viên với trọn vẹn ký ức kiếp trước. Anh không có phép màu, chỉ có ký ức về những giai điệu, ca từ, xu hướng và những bài học cay đắng của một kiếp người. Từ bài hát đầu tiên khiến cả giảng đường lặng đi, anh từng bước bước vào ngành giải trí, nâng đỡ tài năng bị vùi dập, vả mặt kẻ cướp công và các ông lớn quen thao túng bảng xếp hạng, xây dựng đế chế âm nhạc của riêng mình — tất cả bằng tác phẩm, mưu lược, hợp đồng, dư luận và pháp lý, không bằng bạo lực.",
+  "mainConflict": "Một người mang ký ức của cả một kiếp thất bại đối đầu một ngành giải trí hào nhoáng nhưng tàn nhẫn và những kẻ quen thao túng, bóc lột, cướp công. Xung đột giải quyết bằng tài năng sáng tạo, sự nhạy bén thị trường, bản lĩnh đối nhân, hợp đồng và pháp lý — không bằng bạo lực. Leo thang từ viết bài hát đầu tiên và bảo vệ quyền tác giả → chinh phục bảng xếp hạng và phá vòng thao túng → đào tạo nghệ sĩ và xây ê-kíp → lập công ty đối đầu các ông lớn → mở rộng sang điện ảnh truyền hình → trở thành biểu tượng dẫn dắt ngành → hóa giải ân oán kiếp trước và định hình một thời đại âm nhạc mới.",
+  "themes": [
+    "Tài năng thật cuối cùng thắng được thao túng và sự kiêu ngạo",
+    "Ký ức và bài học của một kiếp người là tấm bản đồ, nhưng con đường vẫn phải tự đi bằng mồ hôi",
+    "Nâng đỡ tài năng bị vùi dập là cách trả lại công bằng cho chính mình của kiếp trước",
+    "Tác phẩm chạm tới trái tim công chúng mới là quyền lực bền vững nhất"
+  ],
+  "majorPlotPoints": [
+    "Ch.1: Cố Thanh Trạch tỉnh lại ở thời sinh viên với ký ức kiếp trước, viết bài hát đầu tiên từ trí nhớ khiến cả giảng đường sửng sốt.",
+    "Arc 1: Nâng đỡ một ca sĩ trẻ bị xem thường, phản đòn kẻ cướp công sáng tác bằng bằng chứng và tác phẩm vượt trội, đặt chân vào ngành.",
+    "Arc 2-3: Tác phẩm leo bảng xếp hạng, phá vỡ một vòng thao túng của ông lớn, rồi phát hiện và đào tạo những tài năng bị bỏ rơi thành ê-kíp trung thành.",
+    "Giữa truyện: Lập công ty quản lý - sản xuất riêng, đối đầu sự tẩy chay và âm mưu chèn ép của các tập đoàn giải trí lớn, rồi lấn sân sang điện ảnh và truyền hình.",
+    "Cao trào cuối: Đối mặt kẻ thù cuối cùng — người từng vùi dập anh ở kiếp trước — trong một cuộc quyết đấu tài năng trên sân khấu lớn nhất, hóa giải ân oán và định hình một thời đại âm nhạc mới."
+  ],
+  "setupKernel": {
+    "readerFantasy": "Cảm giác sảng khoái khi một người từng bị cả ngành coi thường và cướp trắng công lao được làm lại từ đầu: tung ra một bài hát khiến cả khán phòng nín lặng rồi vỡ òa, vả mặt kẻ cướp công bằng chính bản gốc xuất sắc hơn, nâng một tài năng bị vùi dập lên đỉnh vinh quang, và nhìn những kẻ từng chà đạp mình phải ngước lên kính nể — mỗi tác phẩm thành công là một lần độc giả nổi da gà và thấy nhân vật tiến lên một bậc.",
+    "protagonistEngine": "Cố Thanh Trạch thắng nhờ ký ức về những tác phẩm và xu hướng của một kiếp người cộng với sự nhạy bén thị trường và bản lĩnh đối nhân anh tự rèn; ký ức chỉ là điểm tựa, mọi thành công đều phải tự ngồi viết từng nốt nhạc, tự đàm phán hợp đồng, tự thuyết phục ca sĩ và nhà sản xuất. Tính cách điềm đạm, tinh tế, kiên định và trọng nghĩa khí, từng trải nên thấu hiểu lòng người và biết khi nào nên nhường, khi nào phải phản đòn.",
+    "pleasureLoop": [
+      "Một cơ hội hoặc mối đe dọa mới xuất hiện trong ngành (một cuộc thi, một hợp đồng bất công, một kẻ cướp công, một thế lực thao túng) → Cố Thanh Trạch nhận ra nhờ ký ức kiếp trước đây là khoảnh khắc then chốt (đọc thấu thời cơ).",
+      "Anh âm thầm chuẩn bị: viết một tác phẩm xuất sắc, gom bằng chứng, sắp xếp người và thời điểm trong khi đối thủ chủ quan (bày bố trong im lặng).",
+      "Tới đúng thời điểm, anh tung ra tác phẩm hoặc nước cờ khiến cả khán phòng/ban giám khảo/công chúng sững sờ (màn trình diễn chấn động).",
+      "Kẻ cướp công hoặc kẻ kiêu ngạo bị chính tác phẩm vượt trội và sự thật phơi bày làm bẽ mặt trước đám đông → công bằng được trả lại (vả mặt sảng khoái).",
+      "Tác phẩm thành công, một tài năng được nâng đỡ tỏa sáng, danh tiếng và quan hệ của anh tăng vọt (thu hoạch + tiến triển).",
+      "Một bậc tiền bối hoặc một ngôi sao đáng nể công nhận tài năng của anh, mở ra cơ hội và quan hệ mới (công nhận từ người có vị thế)."
+    ],
+    "systemMechanic": {
+      "name": "Ký Ức Một Kiếp Người — Bản Đồ Của Giai Điệu Và Thời Cuộc",
+      "input": "Cố Thanh Trạch dựa vào ký ức trọn vẹn của kiếp trước: những giai điệu và ca từ anh từng nghe hoặc viết, xu hướng thị trường sẽ diễn ra, và gương mặt cùng thủ đoạn của những kẻ trong ngành; cần thời gian và công sức để biến ký ức thành tác phẩm hoàn chỉnh.",
+      "output": "Anh biết một bài hát hay trông như thế nào và một xu hướng sẽ đi về đâu, dự đoán được nước đi của các đối thủ quen mặt, và chọn đúng thời điểm tung tác phẩm hay nước cờ.",
+      "limit": "Anti-plot-armor cứng: ký ức CHỈ là tấm bản đồ — KHÔNG tự viết thành bài hát hoàn chỉnh, KHÔNG tự thắng cuộc thi, KHÔNG ép công chúng yêu thích hay ca sĩ gật đầu. Anh vẫn phải tự mài giũa tác phẩm, tự đàm phán, tự thuyết phục con người; ký ức sai lệch theo thời gian khi anh thay đổi dòng chảy sự kiện, và vô dụng nếu anh thiếu kỹ năng thực thi hoặc đối thủ ra nước đi mới chưa từng có trong ký ức.",
+      "reward": "Tỉ lệ thành công cao hơn nhờ chọn đúng tác phẩm và thời điểm; theo thời gian anh tích lũy danh tiếng, quan hệ, ê-kíp và vốn liếng — nhưng phần thưởng luôn phải đổi bằng công sức sáng tạo và bản lĩnh đối nhân thật, không phải tài năng ban tặng."
+    },
+    "mcOrigin": "reincarnated",
+    "originLockNote": "Cố Thanh Trạch trọng sinh trở lại thời sinh viên của chính cuộc đời mình, trong cùng một thế giới hiện đại nơi anh từng sống và thất bại. Anh mang theo ký ức và bài học của kiếp trước tại chính thế giới này — một kiếp người làm lại từ đầu, lợi thế duy nhất là trí nhớ và trải nghiệm của bản thân.",
+    "mcSecret": {
+      "secret": "Cố Thanh Trạch giấu kín rằng anh mang ký ức của cả một kiếp người đã sống tới tận lúc lìa đời; những bài hát anh 'sáng tác' và những dự đoán xu hướng chính xác đến kỳ lạ thật ra đến từ trí nhớ về một tương lai mà chỉ mình anh từng trải qua.",
+      "outsideWorldKnowledge": "Anh biết trước những giai điệu, ca từ và xu hướng âm nhạc của nhiều năm tới, cùng số phận và thủ đoạn của những nhân vật trong ngành — đây là ký ức về chính thế giới này ở kiếp trước, không phải tri thức từ một thế giới khác.",
+      "revealRule": "Bí mật trọng sinh được giấu tuyệt đối với tất cả mọi người suốt cả truyện; anh che đậy bằng hình ảnh một thiên tài sáng tác và một người nhạy bén thị trường, chỉ để lộ chiều sâu hiểu biết của mình một cách hợp lý qua từng tác phẩm.",
+      "coverStory": "Anh để mọi người tin mình chỉ là một sinh viên có tài năng thiên bẩm và trực giác thị trường tốt, không ai biết anh đã sống trọn một kiếp người trước đó."
+    },
+    "benefitLoop": {
+      "goal": "Viết lại cuộc đời mình bằng tài năng, nâng đỡ tài năng bị vùi dập, và từng bước xây dựng đế chế âm nhạc rồi trở thành huyền thoại định hình một thời đại.",
+      "action": "Dựa vào ký ức để chọn đúng tác phẩm và thời cơ, ngồi viết và mài giũa từng tác phẩm, đào tạo nghệ sĩ, đàm phán hợp đồng, đấu trí với thế lực thao túng và dùng dư luận - pháp lý đúng thời điểm.",
+      "benefit": "Mỗi tác phẩm thành công đem lại thêm danh tiếng, người hâm mộ, quan hệ, vốn liếng và một tài năng được nâng đỡ; vị thế của anh trong ngành tăng dần, kẻ thao túng và kẻ cướp công suy yếu tương ứng.",
+      "cadence": "Mỗi 1-2 chương có ít nhất một vòng tác-phẩm-hoặc-nước-cờ-được-thưởng (một màn trình diễn chạm tới khán giả hoặc một đòn vạch mặt kẻ xấu); mỗi 3-5 chương một bước nhảy lớn (một bản hit lên đỉnh bảng, một ngôi sao mới ra mắt, thắng một cuộc thi hoặc lật một âm mưu lớn)."
+    },
+    "interventionRule": "Cố Thanh Trạch chỉ ra tay khi (a) tài năng hoặc lợi ích chính đáng của bản thân, người thân hay ê-kíp của anh bị đe dọa trực tiếp (cướp công, hợp đồng bóc lột, chèn ép), hoặc (b) khi anh thấy một tài năng đáng giá đang bị vùi dập bất công mà anh có đủ khả năng nâng đỡ; anh không đi 'cứu rỗi cả ngành' ngoài tầm với, luôn giải quyết bằng tác phẩm, mưu lược, hợp đồng, dư luận và pháp lý — tuyệt đối không bằng bạo lực thể chất.",
+    "phase1Playground": {
+      "locations": [
+        "Giảng đường và phòng tập nhạc của trường đại học — nơi Cố Thanh Trạch trình làng tác phẩm đầu tiên",
+        "Quán cà phê acoustic và sân khấu nhỏ nơi các nghệ sĩ trẻ biểu diễn",
+        "Phòng thu âm và văn phòng một công ty quản lý nơi diễn ra đàm phán hợp đồng đầu tiên",
+        "Căn phòng trọ của Cố Thanh Trạch — nơi anh ngồi viết nhạc và tính toán từng nước đi"
+      ],
+      "cast": [
+        "Cố Thanh Trạch (nhạc sĩ trọng sinh, MC, thiên tài sáng tác kín đáo)",
+        "Lâm Tịch (ca sĩ trẻ tài năng nhưng bị xem thường, người đầu tiên được anh nâng đỡ)",
+        "Hứa Bình (một bậc đàn anh trong ngành tử tế, nhìn ra tài năng của Cố Thanh Trạch sớm)",
+        "Phương Đại Hải (một kẻ trong ngành chuyên cướp công người trẻ, local antagonist)",
+        "Tống Diệu (đại diện một công ty quản lý lớn, kiêu ngạo, quen chèn ép người ngoài)"
+      ],
+      "resources": [
+        "Ký ức trọn vẹn của một kiếp người về giai điệu, ca từ và xu hướng",
+        "Tài năng sáng tác và sự nhạy bén thị trường được trí nhớ kiếp trước dẫn lối",
+        "Bản lĩnh đối nhân và sự từng trải hiểu thấu lòng người",
+        "Bằng chứng và hiểu biết về thủ đoạn của những kẻ xấu mà anh từng là nạn nhân"
+      ],
+      "localAntagonists": [
+        "Phương Đại Hải — kẻ chuyên rình rập cướp công sáng tác của người trẻ, nhiều lần tìm cách chiếm đoạt tác phẩm của Cố Thanh Trạch",
+        "Tống Diệu — đại diện công ty lớn kiêu ngạo, xem thường nghệ sĩ độc lập và tìm cách chèn ép anh"
+      ],
+      "repeatableSceneTypes": [
+        "Cố Thanh Trạch trình làng hoặc dàn dựng một tác phẩm khiến khán giả/ban giám khảo sững sờ rồi vỡ òa",
+        "Vạch mặt một kẻ cướp công hoặc thao túng bằng bằng chứng và bản gốc vượt trội trước đám đông",
+        "Một buổi đàm phán hợp đồng căng thẳng nơi anh giành lại quyền lợi chính đáng cho mình hoặc nghệ sĩ",
+        "Nâng đỡ một tài năng bị vùi dập, biến điểm yếu của họ thành thế mạnh và đưa họ tỏa sáng",
+        "Đoạn lặng: Cố Thanh Trạch ngồi viết nhạc, hồi tưởng kiếp trước và tính nước đi tiếp theo"
+      ]
+    },
+    "socialReactor": {
+      "witnesses": [
+        "Khán giả, người hâm mộ và cộng đồng nghe nhạc trực tuyến",
+        "Giới nghệ sĩ, nhà sản xuất và các công ty quản lý trong ngành",
+        "Ban giám khảo các cuộc thi và giới phê bình âm nhạc",
+        "Bạn bè, ê-kíp và những tài năng anh nâng đỡ"
+      ],
+      "reactionModes": [
+        "Khán phòng nín lặng rồi vỡ òa tán thưởng khi một tác phẩm chạm tới trái tim họ",
+        "Các nhà sản xuất và công ty tìm đến mời hợp tác sau mỗi thành công",
+        "Đối thủ chuyển từ coi thường sang dè chừng rồi xem anh là mối đe dọa",
+        "Truyền thông và cộng đồng mạng bàn tán, đẩy lượt nghe và danh tiếng của anh lên"
+      ],
+      "reportBackCadence": "Phản ứng tức thì của khán giả trong mỗi màn trình diễn hoặc lần ra mắt tác phẩm; làn sóng dư luận, bảng xếp hạng và động thái đối thủ dồn lại mỗi 3-5 chương sau mỗi tác phẩm đáng chú ý."
+    },
+    "noveltyLadder": [
+      { "chapterRange": "1-130", "newToy": "Viết bài hát đầu tiên, bảo vệ quyền tác giả và nâng đỡ một ca sĩ trẻ", "keepsSameLane": "Vẫn là dùng tài năng sáng tác và ký ức để chinh phục khán giả và phản đòn kẻ xấu" },
+      { "chapterRange": "131-280", "newToy": "Chinh phục bảng xếp hạng và phá vòng thao túng của ông lớn", "keepsSameLane": "Vẫn là tác-phẩm-thắng-thao-túng, chỉ nâng sân chơi lên tầm thị trường" },
+      { "chapterRange": "281-580", "newToy": "Đào tạo nghệ sĩ, xây ê-kíp và lập công ty đối đầu các tập đoàn lớn", "keepsSameLane": "Vẫn là nâng đỡ tài năng và đấu trí trong ngành, thêm tầng quản lý và xây dựng tổ chức" },
+      { "chapterRange": "581-730", "newToy": "Lấn sân sang điện ảnh, truyền hình và các loại hình mới", "keepsSameLane": "Vẫn cùng lane sáng tạo và đấu trí thị trường, mở rộng loại hình nghệ thuật" },
+      { "chapterRange": "731-1000", "newToy": "Đại chiến giải thưởng tầm quốc tế và quyết đấu cuối với kẻ thù kiếp trước", "keepsSameLane": "Vẫn là cuộc đấu bằng tài năng và mưu lược — đỉnh cao của cùng một hành trình" }
+    ],
+    "controlRules": {
+      "payoffCadence": "Tối thiểu 2 cao điểm dopamine mỗi chương (một màn trình diễn/tác phẩm chạm tới khán giả và một đòn vạch mặt kẻ cướp công hoặc một bước tiến danh tiếng); cao điểm đầu xuất hiện trước nửa chương; setup không quá 30% và phải có payoff trong cùng hoặc chương kế.",
+      "attentionGradient": "Mở chương bằng một cơ hội, một cuộc thi, một mối đe dọa trong ngành hoặc một tác phẩm sắp ra mắt; đóng chương bằng một cliffhanger giải trí (một màn trình diễn sắp lên sóng, một âm mưu vừa lộ, hoặc đối thủ vừa ra nước cờ mới).",
+      "openThreadsPerArc": 3,
+      "closeThreadsPerArc": 2
+    },
+    "patternCards": [
+      "warm-baseline-opening",
+      "memory-as-map",
+      "showstopping-performance",
+      "expose-the-credit-thief",
+      "nurture-and-harvest-talent"
+    ]
+  }
+}

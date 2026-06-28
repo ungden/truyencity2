@@ -1,0 +1,200 @@
+{
+  "power_system": {
+    "name": "Bậc Thang Quốc Lực — Năng Lực Công Nghiệp, Quân Sự và Tổ Chức",
+    "type": "national-power / industrial-military capacity system (sức mạnh đo bằng năng lực sản xuất, quân sự và tổ chức — KHÔNG phải tu luyện cá nhân siêu nhiên)",
+    "coreResource": "Năng lực sản xuất thực tế: quặng - than - thép - lương thực - nhân lực có kỹ năng - tổ chức và hậu cần; sức mạnh của MC và thế lực anh dựng lên tỉ lệ thuận với cỗ máy sản xuất phía sau, không phải võ công cá nhân.",
+    "unlockRule": "Mỗi bậc quốc lực mở ra khi MC giải xong một tầng bài toán sản xuất - tổ chức và tích lũy đủ nền tảng (mỏ, lò, xưởng, trường nghề, nhân tài); không thể nhảy cóc — công nghệ và quy mô cao đòi hỏi nền móng các bậc dưới đã vững.",
+    "tiers": [
+      { "tier": 1, "name": "Tác Phường", "scope": "Một xưởng rèn thủ công cải tiến, thép tốt hơn hàng địa phương", "milestone": "Thép vượt trội + nhóm thợ trung thành đầu tiên (Vol 1)" },
+      { "tier": 2, "name": "Cơ Sở Tự Chủ", "scope": "Lò cao gang lỏng + nông nghiệp cải cách, một huyện tự chủ về thép và lương thực", "milestone": "Thanh Khê tự chủ, đủ nuôi đội thợ và dân binh lớn (Vol 2)" },
+      { "tier": 3, "name": "Binh Công Liên Hoàn", "scope": "Vũ khí hóa công nghiệp — binh khí chuẩn hóa, hỏa khí cải tiến, hậu cần khoa học", "milestone": "Thắng lợi quân sự đầu tiên bắt rễ từ sản xuất (Vol 3)" },
+      { "tier": 4, "name": "Cải Cách Liên Châu", "scope": "Hệ thống xưởng - mỏ - trường nghề trên nhiều châu, được triều đình trao đặc quyền cải cách", "milestone": "Mô hình Thanh Khê nhân rộng toàn cõi + đào tạo nhân tài (Vol 4-5)" },
+      { "tier": 5, "name": "Quốc Lực Tổng Hợp", "scope": "Cỗ máy công nghiệp - quân sự - hậu cần cấp quốc gia, đủ sức quyết chiến tổng lực", "milestone": "Đập tan đại quân Bắc Mạc + thể chế hóa thành cường quốc bền vững (Vol 6-7)" }
+    ],
+    "antiPlotArmor": [
+      "Tri thức của MC CHỈ là nguyên lý — không tự biến thành sản phẩm; mỗi cải tiến phải vật lộn với vật liệu kém, thợ mù chữ, vốn cạn và thời gian.",
+      "Không nhảy cóc công nghệ: công nghệ cao đòi hỏi xây nền nhiều bước (muốn thép tốt phải có gang ổn định, muốn gang phải có lò - quặng - than - nhân công), thử sai là tất yếu.",
+      "Sức mạnh quân sự là HỆ QUẢ của hậu phương mạnh, không phải võ lực cá nhân của MC; MC không tự biến thành mãnh tướng tay đôi.",
+      "Đối thủ chính trị, cường hào, ngoại xâm đều có thực lực và mưu mô riêng; thắng lợi đòi hỏi tổ chức, liên minh và kiên nhẫn, không có cứu cánh thần kỳ."
+    ],
+    "progressionAxes": [
+      "Quy mô và độ tinh vi của sản xuất (rèn thủ công → lò cao → hệ thống liên châu)",
+      "Năng lực quân sự - hậu cần bắt rễ từ sản xuất (binh khí chuẩn hóa, hỏa khí, vận lương)",
+      "Vốn nhân lực và tri thức được truyền bá (thợ giỏi, quản đốc, trường dạy nghề)",
+      "Quyền lực và tầm ảnh hưởng chính trị (huyện → châu → triều đình → quốc gia)"
+    ],
+    "powerCeilingByPhase": {
+      "phase1": "Một xưởng rèn cho thép tốt hơn hàng địa phương trong một huyện",
+      "phase2": "Lò cao quy mô lớn + nông nghiệp cải cách, một huyện tự chủ thép và lương thực",
+      "phase3": "Công nghiệp vũ khí hóa quyết định cục diện một chiến trường biên thùy",
+      "phase4": "Cỗ máy công nghiệp - quân sự - hậu cần cấp quốc gia, định đoạt vận mệnh cả Đại Càn"
+    }
+  },
+  "worldbuilding": {
+    "tone": "Chính kịch lịch sử - giả tưởng hào sảng và mưu trí: cảm giác phấn chấn khi tri thức biến đất chết thành cường địa, xen lẫn căng thẳng chính trị và chiến trận; bi tráng khi cái mới phải trả giá để vượt sức ì của cái cũ.",
+    "economy": "Kinh tế tiền - phong kiến của Đại Càn: nông nghiệp là gốc, muối và sắt là mặt hàng chiến lược bị cường hào - thương hội lũng đoạn; tiền tệ là bạc và đồng. MC phá thế độc quyền bằng năng suất, tự chủ quặng - than và mạng phân phối riêng, rồi xây nền kinh tế sản xuất kiểu mới.",
+    "setting": "Đại Càn, một vương triều phương Đông hư cấu cuối thời phong kiến đang trượt vào loạn lạc: triều đình suy nhược, quan tham vơ vét, ngoại tộc Bắc Mạc cướp phá biên thùy, cường hào cát cứ phương Nam, dân chúng đói khổ. Một thế giới đao kiếm - cung nỏ - kỵ binh - thành lũy đất nện, chưa hề biết tới công nghiệp.",
+    "geography": {
+      "phase1": "Huyện biên thùy Thanh Khê và vùng phụ cận: chợ huyện, bến sông, mỏ quặng và rừng than",
+      "phase2": "Cả châu quanh Thanh Khê, các vùng nông nghiệp và mỏ được MC khai thác và liên kết",
+      "phase3": "Tuyến biên thùy phía Bắc giáp Bắc Mạc — chiến trường nơi công nghiệp gặp chiến tranh",
+      "phase4": "Toàn cõi Đại Càn và kinh thành — mạng lưới xưởng - mỏ - trường nghề liên châu và bàn cờ chính trị quốc gia"
+    },
+    "techLevel": "Khởi đầu tiền-công-nghiệp: rèn thủ công, nông nghiệp phụ thuộc thời tiết, vũ khí đao kiếm thép non và thần công thô nặng. Qua bàn tay MC, trình độ tiến dần lên: lò cao gió cưỡng bức, tôi thép, bánh răng - trục - guồng nước, nông học khoa học, dây chuyền và tiêu chuẩn hóa, hỏa khí định lượng — nhưng luôn trong giới hạn vật liệu và nhân lực bản địa, không nhảy cóc.",
+    "conflictMedium": "Xung đột giải quyết chủ yếu qua SẢN XUẤT, TỔ CHỨC, MƯU LƯỢC và CHÍNH TRỊ: phá độc quyền bằng năng suất, thắng chính trường bằng giá trị không thể thay thế, thắng chiến trường bằng thép tốt - lương đủ - hỏa khý chuẩn xác - hậu cần thông suốt. Có chiến tranh thật, nhưng vũ lực luôn là hệ quả cuối của hậu phương mạnh, không phải võ công cá nhân của MC.",
+    "forbiddenElements": [
+      "tu luyện / cảnh giới / linh khí / võ công siêu nhiên",
+      "phép thuật, yêu ma, thần tiên can thiệp cốt truyện",
+      "MC tự biến thành mãnh tướng tay đôi quyết định trận đánh bằng vũ lực cá nhân",
+      "MC mang ký ức của người Đại Càn (MC là kẻ xuyên không mang tri thức thời hiện đại, không phải người bản địa nhớ về quá khứ của thân xác)",
+      "vật phẩm hiện đại mang theo từ thế giới cũ (MC chỉ mang tri thức trong đầu)",
+      "công nghệ nhảy cóc không nền tảng (làm ra thứ vượt quá vật liệu/nhân lực bản địa cho phép)"
+    ]
+  },
+  "factions": [
+    {
+      "name": "Tập đoàn Thanh Khê của Diệp Tử Thanh",
+      "type": "thế lực sản xuất - cải cách của nhân vật chính",
+      "power_level": 4,
+      "summary": "Khởi từ một xưởng rèn nhỏ, dần thành hệ thống xưởng - mỏ - trường nghề và hậu phương công nghiệp do MC dựng lên, tập hợp thợ thuyền, nông dân và nhân tài kỹ trị.",
+      "territory": "Huyện Thanh Khê rồi lan ra nhiều châu của Đại Càn",
+      "mc_relation": "MC là người sáng lập và linh hồn",
+      "conflicts": ["Cường hào Hồ Lương", "Thương hội Tụ Bảo", "Bắc Mạc", "phe quan tham triều đình"],
+      "alliances": ["Quan thanh liêm Trần Mặc", "phe tướng lĩnh thực dụng"],
+      "importance": 10,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Thương hội Tụ Bảo và liên minh cường hào muối sắt",
+      "type": "thế lực kinh tế bảo thủ lũng đoạn",
+      "power_level": 6,
+      "summary": "Bang buôn lũng đoạn muối, sắt và lương thực liên kết cường hào địa phương; xem nền sản xuất của MC là mối đe dọa miếng ăn, dùng tiền và quan hệ để bóp nghẹt và phá hoại.",
+      "territory": "Mạng lưới buôn bán khắp các châu, mạnh ở vùng giáp Thanh Khê",
+      "mc_relation": "Đối thủ kinh tế xuyên suốt giai đoạn đầu - giữa",
+      "conflicts": ["Tập đoàn Thanh Khê của Diệp Tử Thanh"],
+      "alliances": ["phe quan tham triều đình"],
+      "importance": 7,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Triều đình Đại Càn",
+      "type": "chính quyền trung ương phong kiến",
+      "power_level": 8,
+      "summary": "Triều đình suy nhược, nội bộ chia phe thanh liêm và quan tham; vừa cần năng lực cứu quốc của MC vừa nghi kỵ một thế lực địa phương mạnh lên quá nhanh, là bàn cờ chính trị MC phải sinh tồn và chinh phục.",
+      "territory": "Kinh thành và toàn cõi Đại Càn trên danh nghĩa",
+      "mc_relation": "Vừa là chủ quân vừa là nơi MC phải dè chừng và chứng minh giá trị",
+      "conflicts": ["Bắc Mạc", "cát cứ phương Nam"],
+      "alliances": ["Tập đoàn Thanh Khê (giai đoạn sau)"],
+      "importance": 9,
+      "introduce_arc": 4
+    },
+    {
+      "name": "Liên minh kỵ binh Bắc Mạc",
+      "type": "ngoại tộc xâm lược phương Bắc",
+      "power_level": 9,
+      "summary": "Liên minh các bộ tộc du mục thiện chiến phương Bắc, kỵ binh cơ động đáng sợ, năm nào cũng cướp phá biên thùy và cuối cùng tổng tấn công quyết nuốt Đại Càn — mối họa ngoại xâm lớn nhất của truyện.",
+      "territory": "Thảo nguyên phương Bắc và vùng biên thùy bị cướp phá",
+      "mc_relation": "Kẻ thù ngoại xâm tối hậu, bị đánh bại nhờ ưu thế công nghiệp - hậu cần",
+      "conflicts": ["Triều đình Đại Càn", "Tập đoàn Thanh Khê của Diệp Tử Thanh"],
+      "alliances": [],
+      "importance": 9,
+      "introduce_arc": 3
+    }
+  ],
+  "plot_twists": [
+    {
+      "summary": "Cường hào và thương hội muối sắt phá hoại xưởng của MC không chỉ vì lợi nhuận mà còn được một thế lực quan lại trong triều ngầm chống lưng, vì sợ một nền sản xuất mới phá vỡ trật tự đặc quyền của cả tầng lớp họ.",
+      "payoff_type": "kẻ giật dây ẩn",
+      "setup_chapters": [80, 250],
+      "twist_chapter": 480,
+      "reader_impact": "major",
+      "arc_number": 4
+    },
+    {
+      "summary": "Một số thất bại 'tai nạn' trong các xưởng và mỏ liên châu thực ra là phá hoại có tổ chức từ bên trong, do gián điệp của phe bảo thủ - thương hội cài cắm vào hàng ngũ thợ và quản đốc của MC.",
+      "payoff_type": "phản bội nội bộ",
+      "setup_chapters": [300, 600],
+      "twist_chapter": 700,
+      "reader_impact": "major",
+      "arc_number": 5
+    },
+    {
+      "summary": "Cuộc tổng tấn công của Bắc Mạc không thuần là cướp phá du mục mà được hoạch định cùng tình báo về điểm yếu hậu cần Đại Càn, có bàn tay nội gián tiếp tay; chính nhờ hệ thống sản xuất - thông tin của MC mà âm mưu bị lật ngược.",
+      "payoff_type": "âm mưu quy mô lớn bị phơi bày",
+      "setup_chapters": [420, 760],
+      "twist_chapter": 840,
+      "reader_impact": "major",
+      "arc_number": 6
+    }
+  ],
+  "themes": [
+    {
+      "name": "Tri thức là sức mạnh thật",
+      "type": "main",
+      "description": "Trong một thế giới sùng bái đặc quyền và võ lực, chính tri thức và khả năng tổ chức sản xuất mới là thứ vực dậy được cả một quốc gia.",
+      "motifs": ["lò cao đỏ rực giữa đêm", "lưỡi thép sắc hơn binh khí cũ", "sổ ghi nguyên lý của MC"],
+      "importance": 10
+    },
+    {
+      "name": "Hậu phương quyết định chiến trường",
+      "type": "main",
+      "description": "Mọi thắng lợi quân sự đều bắt rễ từ thép tốt, lương đủ, hỏa khí chuẩn xác và hậu cần thông suốt — không phải từ một mình một thanh kiếm.",
+      "motifs": ["đoàn xe lương nối dài ra biên ải", "kho thép đầy ắp", "bản đồ hậu cần"],
+      "importance": 9
+    },
+    {
+      "name": "Cái mới trả giá để thắng cái cũ",
+      "type": "supporting",
+      "description": "Mỗi cải cách đều va chạm với đặc quyền, mê tín, giấu nghề và trì trệ; tiến bộ luôn phải đánh đổi và kiên nhẫn.",
+      "motifs": ["sĩ phu khinh rẻ kẻ làm nghề khéo", "thương hội phá hoại", "thợ giấu nghề được thuyết phục mở lòng"],
+      "importance": 8
+    },
+    {
+      "name": "Dùng người và gây dựng nền móng",
+      "type": "supporting",
+      "description": "Một con người không thể cứu quốc một mình; sức mạnh bền vững đến từ việc truyền bá tri thức, đào tạo nhân tài và thể chế hóa thành quả.",
+      "motifs": ["trường dạy nghề", "thợ thường làm ra hàng đồng đều nhờ tiêu chuẩn", "lớp quản đốc mới trưởng thành"],
+      "importance": 8
+    }
+  ],
+  "voice_anchors": [
+    {
+      "snippet_type": "opening",
+      "prose_text": "Diệp Tử Thanh mở mắt ra giữa mùi khói bếp và mùi đói. Mái tranh thủng lỗ chỗ để lọt vào những vệt nắng gầy guộc, và trong đầu anh, ký ức của một thư sinh nghèo tên Diệp Tử Thanh trộn lẫn với ký ức của chính anh — một kỹ sư từ một thời đại còn rất xa nơi này. Anh ngồi dậy, nhìn bàn tay chai sần xa lạ của thân xác mới, rồi nhìn ra ngoài cửa: một huyện lỵ tiêu điều, ruộng đồng nứt nẻ, người gầy như que củi lê bước. Anh không hoảng. Anh chỉ lặng lẽ đảo mắt qua cái lò bễ han gỉ ở góc sân, qua đống sắt vụn, qua dòng suối chảy sau nhà — và trong óc anh, từng đường nét của một lò cao, một guồng nước, một dây chuyền đã bắt đầu hiện ra. Nơi này thiếu tất cả. Nhưng anh có thứ cả vùng đất này chưa ai có: anh biết phải làm thế nào.",
+      "key_traits": ["điềm đạm", "thực dụng", "tư duy kỹ thuật", "không hoảng loạn"]
+    },
+    {
+      "snippet_type": "dialogue",
+      "prose_text": "— Thư sinh trói gà không chặt mà đòi dạy lão rèn sắt? Lý Đại hừ một tiếng, quai búa nện xuống. Diệp Tử Thanh không phật ý. Anh nhặt một mẩu sắt nguội, đặt lên đe. — Bác cứ nung lò nóng thêm, thổi gió đều tay hơn, rồi tôi trong nước muối thay vì nước lã. Một lần thôi. Nếu lưỡi dao không sắc hơn mọi con dao bác từng rèn, cháu xin chịu phạt. Anh nhìn thẳng vào mắt người thợ già. — Cháu không tranh nghề với bác. Cháu chỉ biết một cái lý mà người ta tốn cả trăm năm mới tìm ra. Để cháu chỉ, rồi bác sẽ là người rèn giỏi nhất châu này.",
+      "key_traits": ["khiêm nhường mà tự tin", "thuyết phục bằng lý lẽ", "tôn trọng người thợ", "tầm nhìn xa"]
+    },
+    {
+      "snippet_type": "action",
+      "prose_text": "Gió cưỡng bức ào vào lò qua ống dẫn từ guồng nước, lửa trong lò cao gầm lên một màu cam chói mắt rồi chuyển sang trắng. Diệp Tử Thanh đứng cách miệng lò mười bước, mồ hôi nhễ nhại, mắt không rời cái lỗ tháo dưới đáy. Cả đám thợ nín thở. Anh đã ba lần thất bại — lò nứt, gió yếu, quặng lẫn tạp chất — và mỗi lần thất bại là một mẻ than, một mẻ công, một phần lòng tin của họ tan đi. Lần này phải được. Anh giơ tay ra hiệu. Người thợ thông cái lỗ tháo. Và rồi, từ trong lòng lò, một dòng gang lỏng đỏ rực tuôn ra, chảy thành suối vào khuôn cát, sáng đến mức soi tỏ những gương mặt đang há hốc. Lý Đại buông búa, lắp bắp: 'Sắt... sắt chảy thành nước...'. Diệp Tử Thanh thở ra một hơi dài. Bước đầu tiên của cả một thời đại, anh nghĩ, vừa được rót xuống đất Đại Càn.",
+      "key_traits": ["kiên nhẫn qua thất bại", "tỉnh táo giữa căng thẳng", "khoảnh khắc breakthrough hào sảng", "tầm vóc lịch sử"]
+    }
+  ],
+  "foreshadowing": [
+    {
+      "hintText": "Khi cường hào Hồ Lương lần đầu ép giá sắt của xưởng, hắn buột miệng nhắc tới 'người trên kinh sẽ không thích thấy một xưởng rèn quê mùa làm loạn giá', rồi vội lảng đi.",
+      "category": "dialogue",
+      "plantCh": 80,
+      "pickupCh": 480,
+      "payoffDescription": "Hé lộ rằng đằng sau cường hào và thương hội là một thế lực quan lại trong triều ngầm chống lưng, sợ nền sản xuất mới phá vỡ đặc quyền của cả tầng lớp họ."
+    },
+    {
+      "hintText": "Một quản đốc mới được tin dùng ở xưởng liên châu luôn tỏ ra sốt sắng nhưng nhiều lần có mặt đúng lúc xảy ra 'tai nạn' hỏng lò, hỏng quặng.",
+      "category": "character_behavior",
+      "plantCh": 300,
+      "pickupCh": 700,
+      "payoffDescription": "Người đó là gián điệp của phe bảo thủ - thương hội cài vào để phá hoại sản xuất từ bên trong, vén màn mạng lưới phá hoại có tổ chức."
+    },
+    {
+      "hintText": "Một thương nhân Bắc Mạc giả dạng tới mua thép từng dò hỏi tỉ mỉ về các tuyến vận lương và kho hậu cần của Đại Càn, viện cớ 'để buôn bán cho thuận'.",
+      "category": "environmental",
+      "plantCh": 420,
+      "pickupCh": 840,
+      "payoffDescription": "Bắc Mạc đã thu thập tình báo về điểm yếu hậu cần Đại Càn cho cuộc tổng tấn công, có nội gián tiếp tay; chính hệ thống thông tin của MC giúp lật ngược âm mưu."
+    }
+  ]
+}

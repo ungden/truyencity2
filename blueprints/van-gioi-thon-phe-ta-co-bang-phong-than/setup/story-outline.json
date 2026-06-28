@@ -1,0 +1,117 @@
+{
+  "premise": "Một thiếu niên bị coi là phế vật ở Thanh Vân Tông được Thiên Đạo Kim Bảng (Bảng Phong Thần) chọn: mỗi lần lập thực tích để lên một bảng xếp hạng của Thiên Đạo, cậu lại nhận Phong Thần Điểm và Phong Ấn để mở khóa công pháp, đan phương, pháp bảo. Lăng Tiêu biến từng lần lên bảng thành một bước thăng tiến, đi từ đệ tử ngoại môn bị khinh thường đến cường giả vấn đỉnh Vạn Giới — thắng bằng thực lực và mưu trí, từng bước truy tìm bí mật cổ xưa sau tấm bảng vàng.",
+  "mainConflict": "Phế vật nghịch tập trong Vạn Giới tu chân: Lăng Tiêu nền tảng mỏng đối đầu hệ thống thiên kiêu, thế gia và Thánh Địa nắm tài nguyên áp đảo. Xung đột leo thang từ tông môn → Đông Vực → Cửu Đại Vực → vấn đỉnh Vạn Giới, luôn giải quyết bằng tu vi, đấu pháp, cơ duyên và mưu trí; mỗi nấc cậu phải lên một bảng cao hơn giữa cạnh tranh khốc liệt hơn.",
+  "themes": [
+    "Phế vật cũng có thể nghịch tập bằng ý chí và cơ hội",
+    "Thực lực thật mới định đoạt thứ hạng, không phải xuất thân",
+    "Kẻ yếu thế liên kết lại có thể đối đầu cường quyền",
+    "Giữ bản tâm và lòng trung khi đứng trên đỉnh phong"
+  ],
+  "majorPlotPoints": [
+    "Ch.1: sắp bị đuổi khỏi tông môn, Thiên Đạo Kim Bảng kích hoạt, Lăng Tiêu lập thực tích đầu tiên và lên bảng phụ lần đầu.",
+    "Arc 1: lật ngược thân phận phế vật, đánh bại đệ tử thân truyền kiêu ngạo Vương Bá bằng thực lực trên Đấu Pháp Đài.",
+    "Arc 2-3: dương danh Đông Vực, lên bảng xếp hạng vùng, tập hợp đồng đạo yếu thế thành Lăng Vân Minh.",
+    "Giữa truyện: Vạn Kiếm Thánh Địa và thế gia viễn cổ truy sát kẻ liên tục thăng hạng bất thường; Lăng Tiêu phản công và bước ra Cửu Đại Vực.",
+    "Cao trào cuối: vấn đỉnh Phong Thần Bảng Vạn Giới, hé lộ nguồn gốc Thiên Đạo Kim Bảng, định lại trật tự muôn cõi."
+  ],
+  "setupKernel": {
+    "readerFantasy": "Cảm giác sảng khoái khi một phế vật bị cả tông môn khinh thường liên tục lên bảng xếp hạng của Thiên Đạo, mỗi lần lên bảng là một lần được Vạn Giới công nhận và nhận thưởng, vả mặt đám thiên kiêu kiêu ngạo bằng đúng thực lực và thứ hạng — leo từ đáy vực lên đỉnh phong từng bậc một.",
+    "protagonistEngine": "Lăng Tiêu thắng nhờ ngộ tính cao + khổ luyện lì đòn + đầu óc thực dụng biến mọi cơ duyên thành thực tích để lên bảng; tính cách điềm tĩnh, ít nói, bùng nổ bằng thực lực đúng lúc, trung thành với người đối tốt với mình và không bao giờ chịu nhục vô lý.",
+    "pleasureLoop": [
+      "Kẻ kiêu ngạo/cao nhân hoài nghi coi thường Lăng Tiêu → cậu lập một thực tích bất ngờ → kẻ đó chấn động phải công nhận (face-slap nhẹ + công nhận).",
+      "Lập thực tích đủ ngưỡng → Thiên Đạo Kim Bảng xếp cậu lên một bảng phụ hoặc thăng hạng → ban Phong Thần Điểm + rơi Phong Ấn (breakthrough/harvest).",
+      "Đối thủ giở thủ đoạn (chèn ép, gài bẫy, cướp cơ duyên) → Lăng Tiêu hóa giải bằng nước cờ và thực lực → đối thủ bẽ mặt trước đám đông (face-slap có người chứng kiến).",
+      "Mở khóa một công pháp/đan phương/pháp bảo đỉnh cấp từ Phong Ấn → áp dụng ngay vào tình huống kế tiếp (power-up cụ thể).",
+      "Thứ hạng trên bảng nhảy vọt sau một sự kiện lớn → danh vọng và tài nguyên đổ về, cảnh giới đột phá (cảm giác gặt hái cụ thể).",
+      "Một đồng đạo yếu thế hoặc người thân được Lăng Tiêu cứu giúp → mạng lưới đồng minh mạnh thêm, danh tiếng lan tỏa khắp vùng (network/recognition payoff)."
+    ],
+    "systemMechanic": {
+      "name": "Thiên Đạo Kim Bảng (Bảng Phong Thần)",
+      "input": "Lăng Tiêu phải thật sự lập được thực tích trong một lĩnh vực cụ thể (luyện đan, đấu pháp, đào bảo, cứu người, ngộ đạo) đủ để Thiên Đạo ghi nhận và xếp lên một bảng phụ; thành tích giả hoặc vay mượn không được tính.",
+      "output": "Mỗi lần lên bảng hoặc thăng hạng, Kim Bảng ban Phong Thần Điểm cộng dồn và đôi khi rơi ra một Phong Ấn chứa công pháp, đan phương, pháp bảo hoặc một đoạn truyền thừa.",
+      "limit": "Muốn lên bảng phải có thực tích thật; thứ hạng càng cao phần thưởng càng lớn nhưng cạnh tranh càng khốc liệt với vô số thiên kiêu khác. Kim Bảng chỉ ra con đường chứ không tu luyện hộ; thần thông Quan Bảng để dò cơ duyên mỗi ngày chỉ dùng được một lần.",
+      "reward": "Mở khóa công pháp, thần thông, đan phương và pháp bảo đỉnh cấp; tăng tu vi qua Phong Thần Điểm; định vị cơ duyên ẩn giấu trong Vạn Giới qua thần thông Quan Bảng."
+    },
+    "mcOrigin": "system-bestowed",
+    "originLockNote": "Lăng Tiêu là thiếu niên bản địa của Thanh Vân Trấn trong Vạn Giới, được Thiên Đạo Kim Bảng (di vật Thiên Đạo thượng cổ in-world) chấm chọn; mọi tri thức vượt trội đều do Kim Bảng ban tặng và do cậu khổ luyện mà có.",
+    "mcSecret": {
+      "secret": "Lăng Tiêu sở hữu Thiên Đạo Kim Bảng vô hình chỉ mình cậu thấy, nguồn gốc các công pháp và đan phương thần kỳ là do Kim Bảng ban thưởng chứ không phải cậu tự sáng tạo.",
+      "outsideWorldKnowledge": "Kim Bảng tự xưng là di vật của Thiên Đạo Vạn Giới thượng cổ; kho truyền thừa của nó vượt xa trình độ các tông môn hiện tại nhưng vẫn nằm trong khuôn khổ tu chân của Vạn Giới.",
+      "revealRule": "Giữ kín hoàn toàn ở Phase 1-2; chỉ hé lộ một phần cho vài đồng minh thân tín khi Lăng Vân Minh đủ vững; reveal nguồn gốc Thiên Đạo Kim Bảng ở cao trào cuối truyện.",
+      "coverStory": "Cậu nói các công pháp là do tình cờ nhặt được một quyển tàn quyển cổ trong Tàng Kinh Các rồi tự lĩnh ngộ."
+    },
+    "benefitLoop": {
+      "goal": "Đưa Lăng Tiêu từ phế vật đệ tử ngoại môn lên các bảng xếp hạng ngày một cao của Thiên Đạo, vươn tới đỉnh phong Vạn Giới.",
+      "action": "Khổ luyện, lập thực tích trong từng lĩnh vực, dùng công pháp và pháp bảo mở khóa được để vượt qua thử thách và hóa giải đòn của đối thủ.",
+      "benefit": "Phong Thần Điểm + Phong Ấn mới + thứ hạng và danh vọng tăng, mang về tài nguyên và cảnh giới cao hơn cho bước kế tiếp.",
+      "cadence": "Mỗi 1-2 chương có ít nhất một vòng lập-thực-tích-được-thưởng; mỗi 3-5 chương một bước nhảy lớn (lên bảng mới, đột phá cảnh giới, đoạt cơ duyên lớn)."
+    },
+    "interventionRule": "Lăng Tiêu chỉ ra tay can thiệp vào rắc rối bên ngoài khi nó (a) đe dọa trực tiếp người thân, đồng môn, đồng minh hoặc cơ duyên của cậu, hoặc (b) là bất công trong giang hồ tu chân mà cậu đủ thực lực giải quyết và có lợi cho con đường lên bảng; cậu không đi lo chuyện thiên hạ ngoài tầm với và luôn giải quyết bằng tu vi, đấu pháp, mưu trí — chừng mực với thực lực hiện tại của mình.",
+    "phase1Playground": {
+      "locations": [
+        "Thanh Vân Tông và Đấu Pháp Đài, Tàng Kinh Các, Dược Viên",
+        "Thanh Vân Trấn dưới chân núi và các thôn trang lân cận",
+        "Bách Bảo Lâu — thương hội pháp bảo và linh dược ở Đông Vực sơ kỳ",
+        "Một bí cảnh cổ trong dãy núi sau Thanh Vân Tông"
+      ],
+      "cast": [
+        "Lăng Tiêu (đệ tử ngoại môn, MC)",
+        "Lăng Mộ (em gái, người thân duy nhất Lăng Tiêu phải bảo vệ)",
+        "Vương Bá (đệ tử thân truyền kiêu ngạo, đối thủ local)",
+        "Tô Vãn Tình (đệ tử nội môn thiên tài, hoài nghi rồi dần công nhận Lăng Tiêu)",
+        "Lý trưởng lão (trưởng lão Dược Viên đối tốt với Lăng Tiêu)"
+      ],
+      "resources": [
+        "Thiên Đạo Kim Bảng + ngộ tính và ý chí khổ luyện",
+        "Quyền vào Tàng Kinh Các và Dược Viên của đệ tử ngoại môn",
+        "Linh thạch ít ỏi và một đan lô cũ nhặt được",
+        "Quan hệ chớm nở với Lý trưởng lão và một số đồng môn yếu thế"
+      ],
+      "localAntagonists": [
+        "Vương Bá — đệ tử thân truyền chèn ép và sỉ nhục Lăng Tiêu trên Đấu Pháp Đài",
+        "Trưởng lão phe cánh Vương gia muốn đuổi hẳn Lăng Tiêu khỏi tông môn"
+      ],
+      "repeatableSceneTypes": [
+        "Lăng Tiêu lập một thực tích bất ngờ và lên một bảng phụ của Thiên Đạo",
+        "Đối thủ giở thủ đoạn và bị Lăng Tiêu hóa giải bằng thực lực trước đám đông",
+        "Mở khóa công pháp/đan phương/pháp bảo mới từ Phong Ấn và dùng ngay",
+        "Đột phá cảnh giới nhờ Phong Thần Điểm sau một bước ngoặt",
+        "Xây dựng quan hệ với đồng môn yếu thế và trưởng lão thiện cảm"
+      ]
+    },
+    "socialReactor": {
+      "witnesses": [
+        "Đệ tử ngoại môn và nội môn Thanh Vân Tông",
+        "Các trưởng lão và đệ tử thân truyền",
+        "Thương nhân và tu sĩ qua lại Bách Bảo Lâu",
+        "Giang hồ Đông Vực qua lời đồn và các bảng xếp hạng vùng"
+      ],
+      "reactionModes": [
+        "Chấn động và bàn tán khi một phế vật lên bảng của Thiên Đạo",
+        "Đệ tử kéo nhau đến xem Lăng Tiêu đấu pháp và xếp hàng nhờ luyện đan",
+        "Lời đồn lan khắp Đông Vực về thiên kiêu mới nổi của Thanh Vân Tông",
+        "Thế gia và Thánh Địa cử người dò xét kẻ thăng hạng bất thường"
+      ],
+      "reportBackCadence": "Phản ứng tức thì tại hiện trường mỗi chương; làn sóng danh tiếng và sự chú ý của thế lực lớn mỗi 3-5 chương sau một sự kiện lên bảng lớn."
+    },
+    "noveltyLadder": [
+      { "chapterRange": "1-100", "newToy": "Lên bảng phụ đầu tiên và mở khóa công pháp/đan phương lật ngược thân phận phế vật", "keepsSameLane": "Vẫn là tu luyện và lập thực tích trong phạm vi Thanh Vân Tông và Đông Vực sơ kỳ" },
+      { "chapterRange": "100-300", "newToy": "Lên bảng xếp hạng vùng Đông Vực và lập Lăng Vân Minh", "keepsSameLane": "Vẫn là con đường lên bảng của Thiên Đạo, chỉ mở rộng quy mô và mạng lưới" },
+      { "chapterRange": "300-600", "newToy": "Bước ra Cửu Đại Vực, tranh phong trên các bảng liên vực", "keepsSameLane": "Vẫn là tu chân tranh hạng, đối thủ là Thánh Địa và thế gia viễn cổ" },
+      { "chapterRange": "600-1000", "newToy": "Vấn đỉnh Phong Thần Bảng Vạn Giới và hé lộ nguồn gốc Thiên Đạo Kim Bảng", "keepsSameLane": "Vẫn là hành trình lên bảng, đỉnh cao của cùng một con đường tu luyện" }
+    ],
+    "controlRules": {
+      "payoffCadence": "Tối thiểu 2 cao điểm dopamine mỗi chương, cao điểm đầu trước nửa chương; setup không quá 30% và phải có payoff trong cùng hoặc chương kế.",
+      "attentionGradient": "Mở chương bằng một móc câu cơ hội hoặc thử thách tu luyện cụ thể; đóng chương bằng một cliffhanger nhẹ hoặc một lần lên bảng/đột phá mở ra cơ hội mới.",
+      "openThreadsPerArc": 3,
+      "closeThreadsPerArc": 2
+    },
+    "patternCards": [
+      "warm-baseline-opening",
+      "competence-led-growth",
+      "mass-witnessed-face-slap",
+      "underdog-coalition",
+      "leaderboard-climb-progression"
+    ]
+  }
+}

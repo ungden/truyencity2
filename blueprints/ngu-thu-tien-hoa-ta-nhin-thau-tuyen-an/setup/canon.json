@@ -1,0 +1,163 @@
+{
+  "power_system": {
+    "name": "Đạo Ngự Thú Tiến Hóa",
+    "type": "beast-evolution progression system (thú đấu thú, ngự thú sư không đánh tay đôi)",
+    "coreResource": "Công Thức Tiến Hóa — tổ hợp dược liệu, điều kiện môi trường và lộ trình huấn luyện để dẫn một con thú theo một Tuyến Tiến Hóa cụ thể",
+    "progressionAxes": [
+      "Cấp Thú theo huyết mạch (Phàm Thú → Linh Thú → Yêu Thú → Thánh Thú → Thần Thú)",
+      "Phẩm Chất Tiến Hóa (Phế → Phổ Thông → Tinh Anh → Hoàn Mỹ → Biến Dị)",
+      "Cấp Ngự Thú Sư (Tập Sự → Sơ Cấp → Trung Cấp → Cao Cấp → Đại Sư → Tông Sư → Ngự Thú Vương)",
+      "Quy mô Đội Thú (số khế ước + cân bằng đa hệ thuộc tính)"
+    ],
+    "unlockRule": "Mỗi tuyến tiến hóa cần dược liệu thật, thời gian nuôi dưỡng thật và kinh nghiệm chiến đấu thật; thấy được tuyến ẩn không có nghĩa hoàn thành ngay. Cấp thú càng cao càng tốn nhiều ngày và điều kiện khắt khe.",
+    "signatureAbility": {
+      "name": "Thiên Nhãn Tuyến Ẩn",
+      "effect": "Nhìn thấu Tuyến Tiến Hóa Ẩn của một con thú cùng một phần Công Thức Tiến Hóa — con đường biến đổi mạnh hơn nhiều mà điển tịch thông thường không ghi lại.",
+      "limit": "Mỗi ngày chỉ soi sâu được một số lần giới hạn; cần Lâm Tinh thật sự tiếp xúc và hiểu con thú, liếc qua loa không đủ; chỉ chỉ ra con đường chứ không tự hoàn thành tiến hóa."
+    },
+    "antiPlotArmor": [
+      "Thấy tuyến ẩn không tự biến thú thành mạnh — thiếu dược liệu hoặc nuôi sai vẫn thất bại.",
+      "Mỗi ngày Thiên Nhãn giới hạn số lần soi sâu; thú cao cấp tốn nhiều ngày mới đọc trọn tuyến.",
+      "Đối thủ có gia tộc, tài nguyên và thú sẵn mạnh hơn; thắng phải bằng tuyến ẩn thông minh + nuôi dưỡng tận tâm + chiến thuật, không phải buff tức thì."
+    ],
+    "powerCeilingByPhase": {
+      "phase1": "Linh Thú Tinh Anh + Ngự Thú Sư Sơ Cấp (1 đội nhỏ trong học viện)",
+      "phase2": "Yêu Thú + Ngự Thú Sư Trung Cấp (đội đa hệ cấp khu vực)",
+      "phase3": "Thánh Thú/dị thú huyền thoại + Cao Cấp đến Đại Sư (cấp liên bang)",
+      "phase4": "Thần Thú + Tông Sư đến Ngự Thú Vương (đỉnh đại lục)"
+    }
+  },
+  "worldbuilding": {
+    "setting": "Đại Lục Vạn Thú — thế giới nơi con người và thú thú đồng sinh, sức mạnh quốc gia đo bằng chất lượng đội chiến thú.",
+    "tone": "Nhiệt huyết, sảng văn nuôi-thú-lật-kèo; xung đột phân xử qua đấu trường thú đấu thú, không bạo lực cá nhân giữa người với người.",
+    "conflictMedium": ["đấu trường ngự thú (thú đấu thú)", "thi đấu học viện và giải khu vực", "săn thú vùng cấm", "tranh chấp tài nguyên và dược liệu tiến hóa", "uy tín và danh vọng ngự thú sư", "đàm phán khế ước và liên minh"],
+    "geography": {
+      "phase1": "Thành Lục Diệp, Học Viện Ngự Thú Lục Diệp và Rừng Sương Mù lân cận",
+      "phase2": "Các thành khu vực quanh Lục Diệp và sân đấu khu vực",
+      "phase3": "Toàn Liên Bang Vạn Thú và các vùng cấm địa dị thú",
+      "phase4": "Cấm địa cổ, di tích dòng dõi ngự thú cổ và đấu trường đỉnh đại lục"
+    },
+    "economy": {
+      "currency": "Linh tệ, điểm cống hiến học viện, dược liệu tiến hóa, trứng và thú quý hiếm",
+      "supplyChain": "Tiệm dược tễ, chợ thú, vựa dược liệu vùng cấm, thương hội độc quyền dược liệu tiến hóa"
+    },
+    "techLevel": "Thế giới tu dưỡng-thú: điển tịch tiến hóa, đan dược, trận pháp nuôi thú, đấu trường có kết giới bảo hộ; không công nghệ hiện đại.",
+    "forbiddenElements": ["con người đánh nhau tay đôi để giải quyết xung đột", "yếu tố đến từ thế giới khác hay ký ức đời trước của MC", "giết hại thú vô cớ được tôn vinh", "tu luyện nội công kiểu võ hiệp thay cho ngự thú"]
+  },
+  "factions": [
+    {
+      "name": "Đội Ngự Thú Của Lâm Tinh",
+      "type": "đội ngũ của MC",
+      "power_level": 3,
+      "summary": "Đội chiến thú do Lâm Tinh nuôi dưỡng, khởi đầu chỉ một con thú bị coi là phế mang tuyến ẩn.",
+      "territory": "Học Viện Ngự Thú Lục Diệp (mở rộng dần)",
+      "mc_relation": "MC sáng lập và dẫn dắt",
+      "conflicts": ["Gia Tộc Triệu", "Thương Hội Bách Dược"],
+      "alliances": ["Liên Minh Ngự Thú Sư Trẻ"],
+      "importance": 10,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Gia Tộc Triệu",
+      "type": "gia tộc ngự thú lâu đời",
+      "power_level": 7,
+      "summary": "Gia tộc ngự thú danh giá cấp khu vực, sở hữu nhiều thú phẩm chất cao và tài nguyên dồi dào; kiêu ngạo và coi thường ngự thú sư nghèo.",
+      "territory": "Thành Lục Diệp và các thành khu vực lân cận",
+      "mc_relation": "Đối thủ cạnh tranh giai đoạn đầu",
+      "conflicts": ["Đội Ngự Thú Của Lâm Tinh", "Liên Minh Ngự Thú Sư Trẻ"],
+      "alliances": ["Thương Hội Bách Dược"],
+      "importance": 8,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Liên Minh Ngự Thú Sư Trẻ",
+      "type": "liên minh ngự thú sư yếu thế",
+      "power_level": 6,
+      "summary": "Mạng lưới các ngự thú sư trẻ nghèo và thú bị bỏ rơi do Lâm Tinh khởi xướng để cùng tiếp cận tài nguyên và chia sẻ tuyến tiến hóa.",
+      "territory": "Liên Bang Vạn Thú",
+      "mc_relation": "MC là người khởi xướng và dẫn dắt",
+      "conflicts": ["Gia Tộc Triệu", "Thương Hội Bách Dược"],
+      "alliances": ["Đội Ngự Thú Của Lâm Tinh"],
+      "importance": 8,
+      "introduce_arc": 3
+    },
+    {
+      "name": "Thương Hội Bách Dược",
+      "type": "thương hội độc quyền dược liệu tiến hóa",
+      "power_level": 9,
+      "summary": "Thương hội kiểm soát phần lớn nguồn dược liệu tiến hóa của đại lục, thao túng giá và đè các tuyến tiến hóa rẻ để giữ độc quyền.",
+      "territory": "Toàn Liên Bang Vạn Thú",
+      "mc_relation": "Thế lực đối đầu trung kỳ",
+      "conflicts": ["Đội Ngự Thú Của Lâm Tinh", "Liên Minh Ngự Thú Sư Trẻ"],
+      "alliances": ["Gia Tộc Triệu", "Hắc Hội Tàng Tuyến"],
+      "importance": 9,
+      "introduce_arc": 4
+    },
+    {
+      "name": "Hắc Hội Tàng Tuyến",
+      "type": "thế lực cổ xưa trong bóng tối",
+      "power_level": 10,
+      "summary": "Tổ chức cổ xưa cố tình che giấu và xóa bỏ các Tuyến Tiến Hóa Ẩn cao nhất khỏi lịch sử, độc chiếm con đường tiến hóa đỉnh cao của muôn thú.",
+      "territory": "Ẩn khắp đại lục, gốc rễ ở cấm địa cổ",
+      "mc_relation": "Thế lực sau cùng MC phải đối đầu",
+      "conflicts": ["Đội Ngự Thú Của Lâm Tinh", "Liên Minh Ngự Thú Sư Trẻ"],
+      "alliances": ["Thương Hội Bách Dược"],
+      "importance": 10,
+      "introduce_arc": 6
+    }
+  ],
+  "plot_twists": [
+    {
+      "summary": "Triệu Hằng — học viên gia tộc khinh thường Lâm Tinh — thật ra từng bí mật vứt bỏ con thú phế mà sau này Lâm Tinh khế ước, vì gia tộc Triệu đã xếp nhầm nó là phế phẩm và muốn phi tang sai lầm đó.",
+      "payoff_type": "quan hệ ẩn",
+      "setup_chapters": [14, 48],
+      "twist_chapter": 92,
+      "reader_impact": "major",
+      "arc_number": 1
+    },
+    {
+      "summary": "Thiên Nhãn Tuyến Ẩn là di sản của một dòng dõi ngự thú cổ từng nắm giữ đạo tiến hóa cao nhất, bị Hắc Hội Tàng Tuyến tận diệt để độc chiếm các tuyến ẩn — Lâm Tinh là hậu duệ cuối cùng còn sót.",
+      "payoff_type": "nguồn gốc golden finger",
+      "setup_chapters": [160, 420, 760],
+      "twist_chapter": 905,
+      "reader_impact": "cosmic",
+      "arc_number": 7
+    },
+    {
+      "summary": "Lão Khúc chủ tiệm dược tễ già nua thật ra là một Tông Sư ngự thú từng phục vụ dòng dõi cổ, ẩn thân ở thành Lục Diệp để chờ người kế thừa Thiên Nhãn xuất hiện.",
+      "payoff_type": "danh tính ẩn",
+      "setup_chapters": [10, 270],
+      "twist_chapter": 850,
+      "reader_impact": "major",
+      "arc_number": 6
+    }
+  ],
+  "themes": [
+    { "name": "Không con thú nào là phế", "type": "main", "description": "Phẩm chất bề mặt không phải số phận; mọi sinh linh đều có một tuyến tiến hóa xứng đáng nếu gặp đúng người.", "motifs": ["thú phế lột xác", "ánh mắt thú nhìn Lâm Tinh"], "importance": 10 },
+    { "name": "Nuôi dưỡng thắng tài nguyên", "type": "main", "description": "Tận tâm và hiểu thú bền hơn việc đổ tài nguyên dồi dào lên một con thú phẩm chất cao.", "motifs": ["đêm thức nuôi thú bệnh", "công thức tiến hóa độc nhất"], "importance": 9 },
+    { "name": "Kẻ yếu thế liên kết", "type": "supporting", "description": "Những ngự thú sư nghèo và thú bị bỏ rơi khi đoàn kết có thể đối đầu gia tộc và thương hội lớn.", "motifs": ["bàn tròn ngự thú sư trẻ", "chia sẻ tuyến ẩn"], "importance": 8 },
+    { "name": "Giữ tâm khi danh vọng lớn", "type": "supporting", "description": "Càng mạnh càng phải giữ tình thương thú và đạo nghĩa, không biến thú thành công cụ tham vọng.", "motifs": ["từ chối lời chiêu mộ", "không ép thú tiến hóa hại bản tính"], "importance": 8 }
+  ],
+  "voice_anchors": [
+    {
+      "snippet_type": "opening",
+      "prose_text": "Lâm Tinh ngồi xổm trước chuồng thú, lần thứ ba trong đêm vuốt ve lớp lông xơ xác của con thú mà cả học viện gọi là phế phẩm. Bên ngoài, đèn lưu ly ở sân huấn luyện hắt thứ ánh sáng lạnh xuống nền đá. Trên bảng xếp hạng học viên dán ngoài cửa, tên anh nằm chót, cạnh dòng chữ đỏ nhắc nhở hạn cuối thanh lọc. Anh không trách con thú. Anh chỉ chia cho nó nửa phần lương khô của mình, đặt tay lên cái đầu nhỏ đang run, và khẽ nói — yên tâm, sớm muộn gì ta cũng tìm ra con đường của ngươi.",
+      "key_traits": ["điềm đạm", "lì đòn", "yêu thương thú", "không cay cú"]
+    },
+    {
+      "snippet_type": "dialogue",
+      "prose_text": "— Con thú rác rưởi đó của ngươi mà cũng dám lên đài? Triệu Hằng bật cười, chỉ thẳng vào lồng thú của Lâm Tinh. Lâm Tinh không nổi nóng. — Phẩm chất là do người ta xếp, không phải do con thú quyết, anh đáp, giọng bình thản. Ngươi nhìn thấy một con phế. Ta nhìn thấy một con đường. Triệu Hằng hơi sững. — Con đường gì? — Con đường mà gia tộc các ngươi đã bỏ lỡ, Lâm Tinh nói, rồi quay sang vỗ nhẹ con thú. Lên đài đi, để họ tự mở mắt.",
+      "key_traits": ["không tự ái", "tự tin có cơ sở", "lấy thực lực đáp trả khinh thường"]
+    },
+    {
+      "snippet_type": "action",
+      "prose_text": "Ngay khoảnh khắc lòng bàn tay Lâm Tinh áp lên sống lưng con thú, một con mắt vô hình mở ra trong đáy mắt anh. Những đường sáng mờ ảo trườn dọc theo huyết mạch của nó, rẽ nhánh, rồi tụ lại thành một lối đi mà chưa điển tịch nào ghi: Tuyến Tiến Hóa Ẩn — Liệt Diễm Giác Thú. Lâm Tinh không reo lên. Anh chỉ lặng lẽ ghi nhớ từng vị dược liệu, từng điều kiện hiện ra, rồi rút tay về như chưa hề có gì xảy ra. Người ngoài không cần biết. Họ chỉ cần thấy kết quả. Phần còn lại là chuyện của anh và con mắt lặng lẽ này.",
+      "key_traits": ["bình tĩnh trước golden finger", "giữ bí mật tự nhiên", "tập trung vào con thú"]
+    }
+  ],
+  "foreshadowing": [
+    { "hintText": "Lão Khúc nhìn con thú phế của Lâm Tinh hồi lâu rồi lẩm bẩm 'lâu lắm rồi mới thấy lại đường nét này', nhưng không giải thích.", "category": "dialogue", "plantCh": 10, "pickupCh": 850, "payoffDescription": "Hé lộ Lão Khúc là Tông Sư từng phục vụ dòng dõi cổ, nhận ra dấu vết tuyến ẩn cổ." },
+    { "hintText": "Triệu Hằng tránh ánh mắt khi thấy con thú phế của Lâm Tinh, và một lần buột miệng 'sao nó còn sống'.", "category": "character_behavior", "plantCh": 14, "pickupCh": 92, "payoffDescription": "Reveal Triệu Hằng từng vứt bỏ chính con thú đó vì gia tộc xếp nhầm là phế." },
+    { "hintText": "Thiên Nhãn đôi khi hiển thị một biểu tượng cổ bên cạnh tuyến ẩn cao cấp, biểu tượng mà không sách nào trong học viện có.", "category": "environmental", "plantCh": 160, "pickupCh": 905, "payoffDescription": "Reveal biểu tượng thuộc dòng dõi ngự thú cổ — nguồn gốc Thiên Nhãn và mối thù với Hắc Hội Tàng Tuyến." }
+  ]
+}

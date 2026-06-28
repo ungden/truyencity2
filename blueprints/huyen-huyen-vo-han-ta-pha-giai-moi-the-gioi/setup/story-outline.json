@@ -1,0 +1,118 @@
+{
+  "premise": "Diệp Phong, thanh niên bản địa từ một đại lục tu hành tầm thường, bị một thực thể bí ẩn cuốn vào Vô Hạn Thí Luyện Không Gian, nơi cứ một khoảng thời gian lại bị lôi vào một Phó Bản Thế Giới — một thế giới khép kín với quy luật riêng được dựng như một ván cờ sinh tử có lời giải ẩn. Nhờ một trực giác phá giải lặng lẽ (chỉ ngân lên gợi ý mắt xích quy luật, không cho đáp án) cùng đầu óc lạnh lùng, anh từng bước phá giải mọi thế giới, sống sót qua từng đề bài, leo bảng xếp hạng cõi vô hạn và truy tìm chân tướng đứng sau tất cả.",
+  "mainConflict": "Một con người lý trí đối đầu vô số thế giới phó bản được thiết kế để giết kẻ không đọc nổi quy luật. Xung đột không giải bằng vũ lực mà bằng quan sát, thử nghiệm, suy luận và phá giải dưới áp lực cận tử, cộng thêm đấu trí với chính những người chơi tàn nhẫn ở Hư Cảnh nơi điểm của kẻ chết được chia cho người sống. Leo thang từ một phó bản đơn lẻ → cộng đồng người chơi và bảng xếp hạng → phó bản liên kết chia chung logic → quy luật tự đổi cấp meta → và cuối cùng truy ra Chủ Tể Thí Luyện cùng mục đích thật ở tầng cuối.",
+  "themes": [
+    "Lý trí và quan sát lạnh lùng là vũ khí sinh tồn mạnh nhất",
+    "Liều lĩnh và mù quáng giết người nhanh hơn cả hiểm nguy của phó bản",
+    "Niềm tin trong cõi đầy phản trắc phải dựa trên minh bạch, không phải cảm tính",
+    "Mọi quy luật đều có điểm phá giải nếu chịu nhìn vào mâu thuẫn của nó"
+  ],
+  "majorPlotPoints": [
+    "Ch.1: Diệp Phong bị cuốn vào cõi xám, nhận Đề Bài phó bản đầu; trực giác phá giải ngân lên lần đầu và anh sống sót đêm đầu bằng một suy luận đúng.",
+    "Vol 1-2: Phá giải phó bản đầu, về Hư Cảnh, học kinh tế Thí Luyện Điểm, sống sót phó bản nhiễu, lên bảng xếp hạng.",
+    "Vol 3: Phó bản đội nhóm, đoán trước và phá vỡ phản bội, xây nhóm cộng sự dựa trên minh bạch.",
+    "Vol 4-5: Nhận ra các phó bản chia chung 'chữ ký thiết kế' và là mảnh của một câu đố lớn; đối mặt quy luật tự đổi và phó bản lồng nhau.",
+    "Vol 6-7: Truy ngược về tầng sâu, vượt phòng vệ tối hậu, đối mặt Chủ Tể Thí Luyện, giải Đề Bài cuối và định đoạt số phận cõi vô hạn."
+  ],
+  "setupKernel": {
+    "readerFantasy": "Cảm giác sảng khoái khi một người bình thường, chỉ bằng cái đầu lạnh và lý trí sắc bén, đọc thủng quy luật của một thế giới hoàn toàn xa lạ và sống sót đúng giây cận tử trong khi những kẻ liều lĩnh tự tin lần lượt chết — rồi vạch ra điểm phá giải cho cả nhóm thấy. Mỗi phó bản là một thế giới mới với câu đố mới, và mỗi lần giải đúng là một lần độc giả thở phào và phục lăn trí tuệ của nhân vật.",
+    "protagonistEngine": "Diệp Phong thắng nhờ khả năng quan sát chi tiết, thử nghiệm có hệ thống, đối chiếu mâu thuẫn trong quy luật và giữ bình tĩnh tuyệt đối khi người khác hoảng loạn; trực giác phá giải chỉ ngân lên gợi ý mắt xích đáng đào sâu, phần suy luận và cái giá đều do anh gánh. Tính cách điềm tĩnh, lý trí, thận trọng đến lạnh lùng nhưng không vô cảm — anh vẫn cứu người chịu nghe lý lẽ và mang gánh nặng của những người không kịp cứu.",
+    "pleasureLoop": [
+      "Một phó bản thế giới mới mở ra với Đề Bài mơ hồ → Diệp Phong quan sát, trực giác phá giải ngân lên vài chi tiết → anh thử nghiệm và suy luận ra quy luật ngay khi áp lực dâng cao (tension build-up).",
+      "Một người chơi khác lao theo lối giải sai và lãnh cái chết → Diệp Phong xác nhận suy luận của mình đúng (xác nhận lạnh người + sống sót khi kẻ khác chết).",
+      "Anh tìm ra điểm phá giải đúng giây cận tử → hoàn thành Đề Bài, thoát phó bản trong gang tấc (deduction-saves-life peak).",
+      "Anh vạch ra mắt xích quy luật trước mặt nhóm → cứu được một mạng tưởng đã chắc chết hoặc lật ngược một âm mưu phản bội (vạch trần + công nhận).",
+      "Hoàn tất phó bản, nhận Thí Luyện Điểm/vật phẩm/thông tin → leo bảng xếp hạng, mạnh thêm một bậc (harvest + tiến triển).",
+      "Một mảnh chân tướng về Chủ Tể Thí Luyện hoặc cấu trúc cõi vô hạn được hé lộ → cảm giác bức màn đang được vén lên (revelation payoff)."
+    ],
+    "systemMechanic": {
+      "name": "Trực Giác Phá Giải — Nốt Lạc Nhịp",
+      "input": "Diệp Phong quan sát một thế giới phó bản đủ lâu và đủ tập trung (chi tiết môi trường, hành vi sinh linh, mâu thuẫn trong Đề Bài); phải ở trạng thái đầu óc tỉnh táo, không hoảng loạn, không kiệt sức.",
+      "output": "Những chi tiết là 'mắt xích then chốt' của quy luật phó bản khẽ ngân lên trong tâm trí anh như một nốt nhạc lạc nhịp — gợi ý nơi đáng đào sâu; các chi tiết còn lại im lặng, không cho biết đúng/sai hay vô hại.",
+      "limit": "Anti-plot-armor cứng: trực giác CHỈ gợi ý mắt xích đáng chú ý, KHÔNG cho biết lời giải, KHÔNG nói phải làm gì, KHÔNG tự cứu anh. Anh vẫn phải tự suy luận toàn bộ và vẫn chết nếu suy luận sai sau khi đã thấy gợi ý. Trực giác mờ đi hoặc tắt khi anh hoảng loạn, kiệt sức, bị thương, hoặc khi phó bản cố tình gài thông tin nhiễu/giả khiến nốt lạc nhịp vang lên ở chỗ sai. Phó bản tầng cao có 'mồi nhử' khiến trực giác phản tác dụng nếu anh tin nó mù quáng.",
+      "reward": "Tỉ lệ sống sót cao hơn nhờ thu hẹp được vùng tìm kiếm; theo thời gian anh học được các 'mô-típ thiết kế' của Chủ Tể, phá giải nhanh và sâu hơn — nhưng phần thưởng thật luôn là Thí Luyện Điểm phải đổi bằng sinh tử và một mảnh chân tướng, không phải sức mạnh rơi sẵn."
+    },
+    "mcOrigin": "native",
+    "originLockNote": "Diệp Phong là người bản địa của thế giới truyện, một thanh niên tu hành bình thường bị cuốn vào Vô Hạn Thí Luyện Không Gian như mọi người chơi khác; anh sinh ra ngay trong thế giới truyện, không đến từ nơi nào khác và không mang theo ức nào từ một quá khứ xa lạ. Mọi năng lực đều phát sinh và tự rèn tại chỗ.",
+    "mcSecret": {
+      "secret": "Diệp Phong sở hữu trực giác phá giải cho thấy mắt xích quy luật của mỗi phó bản — một thứ không người chơi nào khác có.",
+      "outsideWorldKnowledge": "Bản thân trực giác này là một bí ẩn in-world: nó dường như cảm được chính 'nét thiết kế' mà Chủ Tể Thí Luyện dùng để dựng các thế giới, như thể anh đọc được bút tích của người tạo ra trò chơi; tri thức này vượt ngoài mọi bí kíp lưu hành ở Hư Cảnh.",
+      "revealRule": "Giấu kín hoàn toàn ở các phó bản đầu; chỉ hé lộ một phần cho một hai cộng sự thân tín từ Vol 3; nguồn gốc thật của trực giác (mối liên hệ với Chủ Tể) chỉ reveal ở Vol 5-7.",
+      "coverStory": "Anh nói mình chỉ 'nhạy với chi tiết và giỏi tìm mâu thuẫn logic', che giấu việc thực sự nghe được nốt lạc nhịp trên các mắt xích quy luật."
+    },
+    "benefitLoop": {
+      "goal": "Sống sót qua từng phó bản, leo bảng xếp hạng cõi vô hạn và lần ngược ra chân tướng về Chủ Tể Thí Luyện cùng mục đích thật của trò chơi.",
+      "action": "Quan sát kỹ từng thế giới phó bản, thử nghiệm có hệ thống, đối chiếu mâu thuẫn trong quy luật, dùng trực giác để thu hẹp vùng tìm kiếm rồi suy luận ra điểm phá giải, đồng thời ghi lại mô-típ thiết kế đã kiểm chứng và quản lý Thí Luyện Điểm.",
+      "benefit": "Sống thêm một phó bản, cứu thêm một người chịu nghe lý lẽ, thu thêm Thí Luyện Điểm/vật phẩm/thông tin và một mảnh chân tướng; thứ hạng và hiểu biết về cấu trúc cõi vô hạn tăng dần.",
+      "cadence": "Mỗi 1-2 chương có ít nhất một vòng phá-giải-được-thưởng (một suy luận đúng cứu mạng hoặc một mắt xích quy luật bị vạch ra); mỗi 3-5 chương một bước nhảy lớn (hoàn tất một phó bản, leo một bậc bảng xếp hạng, hoặc hé lộ một mảnh chân tướng)."
+    },
+    "interventionRule": "Diệp Phong chỉ ra tay can thiệp khi (a) anh và những người cùng phó bản đang trực tiếp đối mặt cửa tử, hoặc (b) khi anh phát hiện một thế lực ở Hư Cảnh đang bóc lột/lừa người mới làm bia đỡ điểm mà anh có đủ thông tin để phơi bày; anh không lao đi 'cứu cả cõi vô hạn' ngoài tầm với ở giai đoạn đầu, luôn giải quyết bằng quan sát, suy luận, phá giải quy luật và vạch trần — tuyệt đối không dựa vào vũ lực thuần túy để định đoạt một phó bản.",
+    "phase1Playground": {
+      "locations": [
+        "Cõi Xám — không gian trống rỗng nơi người chơi bị cuốn vào và nhận dấu Khế Văn",
+        "Phó bản đầu tiên: một thị trấn khép kín bị quái vật vây hãm với Đề Bài sống sót và lời giải ẩn",
+        "Hư Cảnh — không gian trung lập với chợ điểm, bảng xếp hạng và các đội nhóm giữa các phó bản",
+        "Phó bản thứ hai: một cung điện ngàn phòng đầy cạm bẫy logic (giới thiệu cuối Vol 1, mở rộng sang Vol 2)"
+      ],
+      "cast": [
+        "Diệp Phong (thanh niên tu hành bình thường, MC, người phá giải)",
+        "Tô Nhiễm (nữ người chơi lý trí gặp ở phó bản đầu, chịu nghe lý lẽ, thành cộng sự sớm nhất)",
+        "Lão Đỗ (người chơi kỳ cựu sống sót nhiều phó bản, biết nhiều luật ngầm của Hư Cảnh)",
+        "Hàn Lệ (liên lạc viên một bang hội thông tin ở Hư Cảnh, vừa giúp vừa thử Diệp Phong)",
+        "Mã Cường (một người chơi liều lĩnh tự tin, đại diện kiểu lao theo lối giải sai, local antagonist)"
+      ],
+      "resources": [
+        "Trực Giác Phá Giải — Nốt Lạc Nhịp",
+        "Dấu Khế Văn và một ít Thí Luyện Điểm khởi đầu",
+        "Sổ tay ghi mô-típ thiết kế và quy luật phó bản đã kiểm chứng của riêng anh",
+        "Quan hệ chớm nở với Tô Nhiễm và lão Đỗ"
+      ],
+      "localAntagonists": [
+        "Mã Cường — người chơi liều lĩnh tin vào trực giác thô và sức mạnh, nhiều lần suýt kéo cả nhóm vào lối giải chết người vì bác bỏ suy luận của Diệp Phong",
+        "Một toán săn người mới ở Hư Cảnh chuyên dụ tân thủ vào phó bản hiểm để cướp điểm"
+      ],
+      "repeatableSceneTypes": [
+        "Bước vào một phó bản thế giới mới, quan sát và để trực giác ngân lên vài mắt xích, suy luận ra quy luật dưới áp lực",
+        "Một người chơi khác lao theo lối giải sai và lãnh cái chết, xác nhận suy luận của Diệp Phong",
+        "Vạch ra điểm phá giải hoặc một âm mưu phản bội trước nhóm để cứu một mạng vào phút chót",
+        "Hoàn tất phó bản, nhận Thí Luyện Điểm và một mảnh manh mối về Chủ Tể, leo bảng xếp hạng",
+        "Đoạn Hư Cảnh giữa hai phó bản: trao đổi ở chợ điểm, ghép manh mối, đối phó các thế lực, chuẩn bị cho phó bản kế"
+      ]
+    },
+    "socialReactor": {
+      "witnesses": [
+        "Những người chơi bị cuốn vào cùng một phó bản với Diệp Phong",
+        "Cộng đồng người chơi và các bang hội thông tin ở Hư Cảnh",
+        "Lão Đỗ và các người chơi kỳ cựu theo dõi bảng xếp hạng",
+        "Các thế lực lão làng nắm bí kíp phó bản dần để mắt tới anh"
+      ],
+      "reactionModes": [
+        "Sững sờ và phục khi Diệp Phong phá giải một phó bản khét tiếng giết sạch người chơi",
+        "Người chơi tìm tới nhờ anh dẫn dắt; đồn thổi về 'kẻ đọc thủng mọi thế giới'",
+        "Các bang hội nâng giá trị và bắt đầu xem anh như một biến số nguy hiểm trên bảng xếp hạng",
+        "Một số thế lực nghi kỵ, tung tin hoặc gài bẫy để cô lập, thử anh"
+      ],
+      "reportBackCadence": "Phản ứng tức thì trong phó bản mỗi chương (người cùng nhóm); làn sóng đồn đại và động thái của các thế lực Hư Cảnh dồn lại mỗi 3-5 chương sau khi anh hoàn tất một phó bản đáng chú ý hoặc leo một bậc bảng xếp hạng."
+    },
+    "noveltyLadder": [
+      { "chapterRange": "1-140", "newToy": "Phó bản đầu — học cách quan sát, thử nghiệm và phá giải quy luật một thế giới khép kín", "keepsSameLane": "Vẫn là sinh tồn bằng đọc thủng quy luật và tìm điểm phá giải dưới áp lực" },
+      { "chapterRange": "141-440", "newToy": "Hư Cảnh, kinh tế điểm, phó bản nhiễu và phó bản đội nhóm có phản bội", "keepsSameLane": "Vẫn là phá giải quy luật, thêm tầng đấu trí với người chơi thật và quản lý nguồn lực" },
+      { "chapterRange": "441-590", "newToy": "Phó bản liên kết chia chung 'chữ ký thiết kế', bản đồ cõi vô hạn", "keepsSameLane": "Vẫn cùng lane quan sát-suy luận-phá giải, nâng lên cấp meta về cấu trúc trò chơi" },
+      { "chapterRange": "591-740", "newToy": "Quy luật tự đổi khi bị giải, phó bản lồng nhau, manh mối về Chủ Tể", "keepsSameLane": "Vẫn là đọc-hiểu-sinh-tồn, nâng lên đọc 'nhịp thay đổi' thay vì quy luật tĩnh" },
+      { "chapterRange": "741-1000", "newToy": "Tầng sâu, phòng vệ tối hậu và Đề Bài cuối quyết định số phận cõi vô hạn", "keepsSameLane": "Vẫn là cuộc đấu trí với hệ thống phó bản — đỉnh cao của cùng một trò chơi phá giải" }
+    ],
+    "controlRules": {
+      "payoffCadence": "Tối thiểu 2 cao điểm dopamine mỗi chương (một suy luận phá giải đúng cứu mạng + một mắt xích quy luật bị vạch ra hoặc một kẻ liều lĩnh lãnh cái chết); cao điểm đầu xuất hiện trước nửa chương; setup không quá 30% và phải có payoff trong cùng hoặc chương kế.",
+      "attentionGradient": "Mở chương bằng một phó bản/Đề Bài mới, một dấu hiệu bất thường hoặc một mối nguy cụ thể; đóng chương bằng một cliffhanger căng thẳng hoặc một mảnh chân tướng vừa hé.",
+      "openThreadsPerArc": 3,
+      "closeThreadsPerArc": 2
+    },
+    "patternCards": [
+      "warm-baseline-opening",
+      "deduction-under-pressure",
+      "rule-decoded-saves-life",
+      "survive-while-others-die",
+      "puzzle-world-survival"
+    ]
+  }
+}

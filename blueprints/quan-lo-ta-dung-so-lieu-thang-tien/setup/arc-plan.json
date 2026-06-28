@@ -1,0 +1,25 @@
+{
+  "arc_number": 1,
+  "start_chapter": 1,
+  "end_chapter": 30,
+  "arc_theme": "Số liệu đầu tiên — Hệ Thống Trị Lý kích hoạt và chinh phục lòng tin ở xã nghèo",
+  "plan_text": "Arc mở màn warm-baseline: Trần Hạo đã về nhận công tác ở xã Đông Phú, golden finger kích hoạt ngay ch.1 (không để MC khổ sở kéo dài). Mỗi chương xoay quanh một vấn đề dân sinh hoặc một tình huống công vụ cụ thể, với ít nhất 2 cao điểm dopamine/chương (cao điểm đầu trước nửa chương). Cụm chương theo 5-cluster: ch.1-6 setup (Hệ Thống kích hoạt khi anh lội thực địa, lớp số liệu thật của hợp tác xã hé lộ, một nước cờ nhỏ cứu vụ mùa khiến dân tin); ch.7-14 breathing + competence (xây lòng tin với dân và trưởng thôn Thắm, mở khóa góc nhìn quản trị, được Chủ tịch xã Đạt để mắt); ch.15-22 confront (cán bộ địa chính Lê Cường và nhà thầu sân sau báo cáo khống khối lượng đường liên thôn; Trần Hạo phản công bằng đo đạc thực địa + dữ liệu, có người dân làm chứng); ch.23-28 big_wow (đối chất giữa hội nghị xã, số liệu thật phơi bày khoản chi sai trước mặt tất cả, dư luận và cấp trên chú ý, một video/bài báo tử tế lan truyền); ch.29-30 resolution + hook (xã thành điểm sáng nông thôn mới sơ khởi, đặt manh mối Lê Cường nhìn Trần Hạo với ánh mắt khó hiểu, mở ra tuyến quan hệ ẩn). Giữ nguyên tắc non-combat tuyệt đối: mọi xung đột bằng chính sách/số liệu/đàm phán/pháp lý/truyền thông. Không bạo lực, không giang hồ, không ẩu đả. MC điềm đạm, lì, lấy số liệu và liêm chính làm vũ khí.",
+  "chapter_briefs": [
+    { "n": 1, "beat": "setup", "goal": "Hệ Thống Trị Lý kích hoạt khi Trần Hạo lội ruộng gặp dân", "payoff": "Lớp số liệu thật của hợp tác xã hé lộ, một nước cờ nhỏ cứu vụ mùa, dân tin lần đầu, Tín Nhiệm đầu tiên", "endingHook": "Giao diện hé lộ báo cáo 'có lãi' của xã hoàn toàn trái sự thật" },
+    { "n": 2, "beat": "setup", "goal": "Hiểu cơ chế Hệ Thống qua các hộ dân khác", "payoff": "Mở khóa góc nhìn kinh tế địa phương, một hộ nghèo được gỡ khó ngay", "endingHook": "Ông Bảy chủ nhiệm hợp tác xã hé một câu lạ về 'cái viện dạy đọc số liệu'" },
+    { "n": 6, "beat": "breathing", "goal": "Ổn định lòng tin, kéo trưởng thôn Thắm về cùng phía", "payoff": "Kế hoạch nông sản đầu tiên có chuyển biến, Chủ tịch xã Đạt để mắt", "endingHook": "Lê Cường ký một báo cáo khối lượng công trình đáng ngờ" },
+    { "n": 18, "beat": "confront", "goal": "Đối phó báo cáo khống của Lê Cường và nhà thầu sân sau", "payoff": "Trần Hạo đo đạc thực địa, dữ liệu vênh lộ rõ, có dân làm chứng", "endingHook": "Lê Cường tung tin đồn dìm uy tín Trần Hạo trong xã" },
+    { "n": 26, "beat": "big_wow", "goal": "Đối chất số liệu giữa hội nghị xã", "payoff": "Khoản chi sai bị phơi bày trước mặt tất cả, cấp trên và dư luận chú ý, bài báo tử tế lan truyền", "endingHook": "Cơ quan giám sát huyện bắt đầu vào cuộc, Lê Cường hoảng" },
+    { "n": 30, "beat": "resolution", "goal": "Khép arc 1, xã thành điểm sáng nông thôn mới sơ khởi", "payoff": "Dân tín nhiệm, Trần Hạo được đề bạt cân nhắc lên huyện", "endingHook": "Lê Cường nhìn Trần Hạo với ánh mắt vừa quen vừa né tránh — tuyến quan hệ ẩn mở ra" }
+  ],
+  "threads_to_advance": ["Lật ngược xã nghèo bằng số liệu", "Lòng tin của dân và đồng nghiệp", "Mở khóa Hệ Thống Trị Lý"],
+  "threads_to_resolve": ["Hợp tác xã thua lỗ (giải quyết: cứu vụ mùa + thành điểm sáng nông thôn mới)"],
+  "new_threads": ["Đối đầu lợi ích nhóm cấp huyện", "Bí ẩn ánh mắt Lê Cường", "Manh mối Viện Trị Lý qua lời ông Bảy"],
+  "sub_arcs": [
+    { "name": "Số liệu đầu tiên", "chapterRange": "1-6", "cluster": "setup" },
+    { "name": "Lòng tin của dân", "chapterRange": "7-14", "cluster": "breathing" },
+    { "name": "Báo cáo khống", "chapterRange": "15-22", "cluster": "confront" },
+    { "name": "Đối chất hội nghị", "chapterRange": "23-28", "cluster": "big_wow" },
+    { "name": "Điểm sáng của xã", "chapterRange": "29-30", "cluster": "resolution" }
+  ]
+}

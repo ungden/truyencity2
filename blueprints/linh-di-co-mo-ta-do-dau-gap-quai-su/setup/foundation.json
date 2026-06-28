@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "totalScore": 121,
+  "avgScore": 8.64,
+  "minDimScore": 8,
+  "source": "claude_code",
+  "dimensions": [
+    { "name": "Premise & hook", "score": 9, "note": "Warm-baseline tomb-raiding mystery: cảm khí quán mộ active ngay ch.1, hook là bút ký bị xé dở của tổ phụ mất tích + dòng chữ 'đi tìm thứ ông đang chôn lại' — mystery/opportunity-driven, không mở đầu bằng cảnh MC khốn cùng." },
+    { "name": "Protagonist engine", "score": 9, "note": "Tần Lĩnh thắng bằng cảm tử khí + suy luận cơ quan từ bút ký + bình tĩnh giữ quy củ; tính cách điềm tĩnh, trọng nghĩa, gan dạ mà thận trọng, không tham minh khí, nhất quán." },
+    { "name": "System mechanic", "score": 9, "note": "Cảm khí quán mộ có input/output/limit/reward rõ; anti-plot-armor cứng — chỉ cảnh báo tử khí và kết cấu, không tự hóa giải cơ quan, mờ khi kiệt sức/bị trấn yểm, MC vẫn phải luận và trả giá nếu sai." },
+    { "name": "Conflict ladder", "score": 9, "note": "Leo thang mộ ven núi đơn lẻ → mộ quần liên hoàn → đội buôn cổ vật phá mộ bừa → đại mộ đế vương phong ấn → trận đồ phong ấn ngàn năm và thế lực giấu mặt, tất cả NON-combat qua đọc hiểu cơ quan và giải mã khắc văn." },
+    { "name": "World coherence", "score": 9, "note": "Nhân gian hiện đại + thế giới mộ cổ dưới lòng đất vận hành theo quy luật âm trạch/cơ quan/trận pháp nhất quán; quái sự (xác biến dị, tử khí, thực thể phong ấn) đều có cơ chế và cái giá; forbidden elements rõ (cấm xuyên không/trọng sinh/tu tiên/gore)." },
+    { "name": "Dopamine cadence", "score": 9, "note": "controlRules ≥2 peak/chương (suy luận cơ quan đúng cứu mạng + kẻ tham lam phạm quy lãnh giá hoặc mảnh khắc văn được giải), cao điểm đầu trước nửa chương, adapted cho tomb-raiding adventure-mystery." },
+    { "name": "Origin lock", "score": 9, "note": "mcOrigin=native khóa chặt; world/master/story outline và canon không chứa token xuyên không/xuyên việt/trọng sinh/kiếp trước/đầu thai; originLock phát biểu khẳng định, mọi bản lĩnh từ bút ký truyền thừa và thiên phú bản địa." },
+    { "name": "Non-combat guardrail", "score": 8, "note": "Xung đột giải quyết bằng cảm khí, suy luận cơ quan, đối chiếu bút ký, giải mã khắc văn và am hiểu người xưa; kể cả với kẻ địch cũng dựa vào địa hình mộ thất và cơ quan để chế ngự, không huyết chiến tay đôi, không gore giật gân." },
+    { "name": "Foreshadowing & twists", "score": 8, "note": "3 twist (quái sự do người sống dàn dựng, mộ rời rạc là một trận đồ phong ấn, huyết mạch người giữ phong ấn của dòng họ) + 3 foreshadowing (dòng chữ 'chôn lại', cảm khí nhạy bất thường, ký hiệu lặp trên minh khí) có plant/payoff cụ thể kéo tới cao trào." },
+    { "name": "Long-form sustainability", "score": 9, "note": "noveltyLadder 5 nấc giữ cùng lane 'xuống mộ đọc cơ quan người xưa', 7 volume cho 1000 chương, endgame chôn lại bí mật thiên cổ và gánh vai trò người giữ phong ấn." },
+    { "name": "Vietnamese voice", "score": 8, "note": "Voice anchors nghẹt thở dưới lòng đất, lạnh gáy mà tỉnh táo, đúng giọng kinh dị huyền bí phương Đông pha mạo hiểm, đủ diacritics, không AI-tell, không thuật ngữ meta." }
+  ],
+  "overallFeedback": "Setup vững cho kinh dị huyền bí phương Đông pha mạo hiểm và trinh thám NON-combat: warm-baseline opening với cảm khí quán mộ active ch.1, golden finger là giác-quan-đọc-tử-khí-và-kết-cấu-ẩn có anti-plot-armor cứng (chỉ cảnh báo, không tự hóa giải cơ quan, mờ khi kiệt sức/bị trấn yểm), conflict ladder leo thang sạch qua 7 volume bằng đọc hiểu cơ quan người xưa và giải mã khắc văn, origin lock native chặt phát biểu khẳng định, dopamine cadence adapted cho tomb-raiding (suy luận cơ quan cứu mạng + lòng tham phạm quy lãnh giá + hé mảnh sự thật lịch sử), foreshadowing và twist có cấu trúc dài hạn xoay quanh bút ký bị xé, sự mất tích của tổ phụ và trận đồ phong ấn ngàn năm. Phân biệt rõ với novel phong thủy trừ tà: đây là đổ đấu mộ cổ dưới lòng đất chứ không phải thầy phong thủy hành tẩu nhân gian. Sẵn sàng cho DeepSeek V4 Pro viết chương. PASS."
+}

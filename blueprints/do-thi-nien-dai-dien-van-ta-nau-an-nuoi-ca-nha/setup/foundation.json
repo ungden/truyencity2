@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "totalScore": 122,
+  "avgScore": 8.71,
+  "minDimScore": 8,
+  "source": "claude_code",
+  "dimensions": [
+    { "name": "Premise & hook", "score": 9, "note": "Warm-baseline niên đại điền viên: ký ức kiếp trước active ngay ch.1, hook là bát mì nóng hổi đậm đà đầu tiên từ thứ cả nhà định ăn qua bữa khiến cả nhà sững người vì ngon — opportunity-driven, không mở đầu bằng cảnh MC chết đói hay bị đánh đập." },
+    { "name": "Protagonist engine", "score": 9, "note": "Tô Noãn thắng bằng tay nghề đầu bếp + ký ức về giá trị nguyên liệu và khẩu vị thị trường + tính khéo vun vén tự rèn; điềm đạm, đảm đang, ấm áp, thương gia đình tha thiết, nhất quán." },
+    { "name": "System mechanic", "score": 9, "note": "Ký Ức Một Kiếp Người có input/output/limit/reward rõ; anti-plot-armor cứng — chỉ là bản đồ, không tự đi chợ/không tự nấu thành món/không ép khách ăn, ký ức sai lệch khi thời thế đổi, MC vẫn phải chọn nguyên liệu, đứng bếp, bưng bê và gánh rủi ro ế lỗ." },
+    { "name": "Conflict ladder", "score": 9, "note": "Leo thang êm ái: bát mì nuôi nhà → bán thứ người ta chê → chõng chợ và khách quen → quán ăn nhỏ → quán đông khách → thực đơn đặc sắc và đặt cỗ → vươn ra cả vùng, tất cả NON-combat, mâu thuẫn đời thường nhẹ nhàng." },
+    { "name": "World coherence", "score": 9, "note": "Thị trấn nhỏ thời gian khó + kinh tế eo hẹp đầy đủ (gạo đong từng lon, tem phiếu, bán theo bát theo đĩa, chõng chợ, quán ăn), các thế lực và định kiến nhất quán; forbidden elements rõ." },
+    { "name": "Dopamine cadence", "score": 8, "note": "controlRules ≥2 peak/chương (một món chinh phục vị giác khách + một khoảnh khắc gia đình đổi đời hoặc bước tiến làm ăn), cao điểm đầu trước nửa chương." },
+    { "name": "Origin lock", "score": 9, "note": "mcOrigin=reincarnated khóa đúng; trọng sinh trong CÙNG thị trấn Thanh Khê và thời đại này, outlines và mọi file không chứa token xuyên không/xuyên việt/đến từ trái đất/từ thế giới hiện đại. Lợi thế là ký ức và tay nghề của chính kiếp trước cô ở vùng đất này." },
+    { "name": "Non-combat guardrail", "score": 9, "note": "Genre do-thi NON_COMBAT; xung đột giải quyết qua tài nấu nướng-thị trường-chữ tín-lòng tử tế; cấm đánh nhau/xã hội đen/bạo lực/kẻ thù máu lửa trong forbiddenElements." },
+    { "name": "Foreshadowing & twists", "score": 8, "note": "3 twist (phế phẩm hóa châu báu, kẻ bắt chước gậy ông đập lưng ông, chữ tín hóa giải vây hãm quán cũ) + 3 foreshadowing có plant/payoff chapter cụ thể, kéo dài qua các arc." },
+    { "name": "Long-form sustainability", "score": 9, "note": "noveltyLadder 5 nấc giữ cùng lane 'ẩm thực + quán ăn làm giàu', 7 volume cho 1000 chương, endgame đưa cả gia đình đổi đời và quán thành niềm tự hào thị trấn, hoàn thành tâm nguyện kiếp trước." },
+    { "name": "Vietnamese voice", "score": 8, "note": "Voice anchors ấm áp, mộc mạc, sảng khoái nhẹ nhàng, đúng giọng niên đại điền viên thị trấn nhỏ, đủ diacritics, không AI-tell." }
+  ],
+  "overallFeedback": "Setup vững cho niên đại điền viên NON-combat: warm-baseline opening với ký ức kiếp trước active ch.1, golden finger là ký-ức-một-kiếp-người có anti-plot-armor cứng (chỉ là bản đồ, không tự đi chợ hay nấu thành món, ký ức sai lệch khi thời thế đổi), conflict ladder leo thang êm ái qua 7 volume bằng tay nghề và chữ tín, origin lock reincarnated chặt (trọng sinh trong cùng thị trấn, không xuyên không/tới từ thế giới khác), dopamine cadence ấm áp (món ngon chinh phục vị giác + gia đình đổi đời từng bước + hóa giải lời gièm pha), foreshadowing và twist nhẹ nhàng hướng về hành trình làm giàu dài hạn. Điểm sướng cốt lõi là gia đình tay trắng vươn lên sung túc giữa thời gian khó bằng đôi tay đầu bếp của một người phụ nữ. Sẵn sàng cho DeepSeek V4 Pro viết chương. PASS."
+}

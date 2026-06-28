@@ -1,0 +1,100 @@
+{
+  "title": "Man Hoang Sinh Tồn: Ta Khai Hóa Bộ Lạc Nguyên Thủy",
+  "totalChapters": 1000,
+  "mainPlotline": "Lâm Mặc, một kỹ sư nông nghiệp hiện đại, mở mắt trong thân xác một thiếu niên đói khát của bộ lạc Hắc Thạch giữa đại lục Man Hoang hồng hoang. Mang theo tri thức của cả một nền văn minh và lợi thế Khải Hóa Đồ Giám, anh dẫn dắt bộ tộc đi từng nấc thang khai hóa: giữ lửa và nấu chín, thuần cây trồng và gia súc, gốm dệt muối mộc, kim loại đồng rồi sắt, chữ viết lịch pháp luật lệ, thành trì đường sá thương mại, cuối cùng liên minh các bộ lạc thành một nền văn minh sơ khai khiến cả Man Hoang kinh ngạc — mọi nấc đều phải tự tay thử nghiệm, vượt mãnh thú, thiên tai, ngoại bộ và lòng người.",
+  "originLock": "transmigrator — Lâm Mặc là người hiện đại từ thế giới khác, ý thức nhập vào thân xác một thiếu niên bộ lạc Hắc Thạch ở Man Hoang. Anh mang nguyên vẹn tri thức nền văn minh hiện đại nhưng phải tự tay khai hóa từng bước; lợi thế Khải Hóa Đồ Giám chỉ gợi ý tiềm năng, không làm thay.",
+  "volumes": [
+    {
+      "volume": 1,
+      "title": "Ngọn Lửa Đầu Tiên",
+      "chapterRange": "1-130",
+      "theme": "Sinh tồn cơ bản — giữ lửa, nấu chín, nước sạch, dựng chỗ đứng trong bộ lạc",
+      "summary": "Lâm Mặc tỉnh dậy trong thân xác thiếu niên Hắc Thạch sắp bị bỏ lại. Anh dùng tri thức giữ lửa bền, luộc nước, bẫy thú nhỏ để cứu vài mạng người và chứng minh giá trị của mình, biến hoài nghi thành lòng tin đầu tiên.",
+      "subArcs": [
+        { "name": "Thiếu niên gầy gò", "chapterRange": "1-30", "focus": "Nhập thân xác, hiểu hoàn cảnh bộ lạc; Khải Hóa Đồ Giám kích hoạt; giữ lửa cháy suốt đêm và nấu chín thức ăn — bước khai hóa đầu tiên cứu người khỏi đói rét." },
+        { "name": "Nước và bẫy", "chapterRange": "31-65", "focus": "Dạy luộc nước trị bệnh đường ruột; dựng bẫy thú thay vì liều mạng săn; thu phục những người đầu tiên tin theo, gồm thợ săn trẻ A Lỗi." },
+        { "name": "Hoài nghi của Tế Tư", "chapterRange": "66-100", "focus": "Đại Tế Tư Cốt Vu nghi anh chọc giận thần linh; Lâm Mặc chứng minh tri thức bằng kết quả thực tế, hóa giải hiềm khích đầu tiên." },
+        { "name": "Mùa đông không chết người", "chapterRange": "101-130", "focus": "Lần đầu bộ lạc qua đông không mất ai nhờ tích trữ thịt muối và lửa bền; Lâm Mặc được Tù Trưởng Hắc Nham công nhận." }
+      ],
+      "keyMilestone": "Bộ lạc Hắc Thạch lần đầu qua một mùa đông không chết người; Lâm Mặc từ thiếu niên vô danh thành người được tin cậy."
+    },
+    {
+      "volume": 2,
+      "title": "Hạt Giống Của Văn Minh",
+      "chapterRange": "131-280",
+      "theme": "Nông nghiệp và thuần thú — dư lương thực, định cư",
+      "summary": "Lâm Mặc thuần hóa loài cỏ dại thành cây lương thực và bắt đầu nuôi gia súc, đưa bộ lạc từ du cư săn bắt sang định cư trồng trọt — bước ngoặt tạo ra dư thừa lương thực và dân số tăng.",
+      "subArcs": [
+        { "name": "Cỏ thành lúa", "chapterRange": "131-180", "focus": "Đồ Giám chỉ ra loài cỏ có tiềm năng thuần; nhiều mùa thử nghiệm, mất mùa, rồi vụ thu hoạch đầu tiên thành công." },
+        { "name": "Chuồng thú đầu tiên", "chapterRange": "181-230", "focus": "Bắt và thuần dưỡng dê núi, lợn rừng làm gia súc; học cách chăn nuôi, lấy sữa và phân bón." },
+        { "name": "Làng định cư", "chapterRange": "231-280", "focus": "Bộ lạc dựng làng cố định quanh ruộng nương; dân số tăng, nảy sinh vấn đề phân phối và tổ chức lao động." }
+      ],
+      "keyMilestone": "Hắc Thạch chuyển từ du cư sang định cư, có dư lương thực lần đầu trong lịch sử bộ tộc."
+    },
+    {
+      "volume": 3,
+      "title": "Gốm, Dệt Và Muối",
+      "chapterRange": "281-430",
+      "theme": "Thủ công nghiệp sơ khai — gốm, dệt, muối, mộc",
+      "summary": "Có dư lương thực, Lâm Mặc dạy nung gốm để chứa và nấu, dệt sợi để mặc ấm, làm muối để bảo quản thực phẩm. Của cải dư thừa khiến các bộ lạc lân cận chú ý — trao đổi và cả nhòm ngó.",
+      "subArcs": [
+        { "name": "Lò gốm", "chapterRange": "281-330", "focus": "Nung đất sét thành nồi, vò chứa nước và lương; cách mạng việc nấu nướng và tích trữ." },
+        { "name": "Sợi và vải", "chapterRange": "331-380", "focus": "Se sợi từ lông thú và cây, dệt vải thô giúp qua đông; nghề dệt sinh ra phân công lao động." },
+        { "name": "Mỏ muối", "chapterRange": "381-430", "focus": "Tìm và khai thác muối; muối thành hàng hóa quý, mở ra trao đổi với bộ lạc Xích Hà — đồng minh thương mại đầu tiên." }
+      ],
+      "keyMilestone": "Hắc Thạch trở thành trung tâm hàng hóa thủ công của vùng, bắt đầu mạng lưới trao đổi liên bộ lạc."
+    },
+    {
+      "volume": 4,
+      "title": "Lửa Luyện Kim",
+      "chapterRange": "431-580",
+      "theme": "Kim loại — đồng rồi sắt, công cụ và vũ khí",
+      "summary": "Đồ Giám chỉ ra quặng đồng; Lâm Mặc luyện kim loại đầu tiên, tạo ra công cụ và vũ khí vượt trội. Bước nhảy này khiến Hắc Thạch mạnh lên vượt bậc nhưng cũng thành mục tiêu cướp bóc của bộ lạc Lang Tộc hung hãn.",
+      "subArcs": [
+        { "name": "Quặng xanh", "chapterRange": "431-480", "focus": "Tìm quặng đồng, dựng lò luyện; cuốc xẻng và dao đồng cách mạng nông nghiệp và săn bắn." },
+        { "name": "Lưỡi giáo đồng", "chapterRange": "481-530", "focus": "Vũ khí đồng giúp Hắc Thạch đẩy lui cuộc cướp đầu tiên của Lang Tộc bằng tổ chức và công cụ, không liều mạng." },
+        { "name": "Bí mật của sắt", "chapterRange": "531-580", "focus": "Đồ Giám hé lộ quặng sắt — kim loại mạnh hơn; Lâm Mặc khởi đầu hành trình luyện sắt gian nan." }
+      ],
+      "keyMilestone": "Hắc Thạch bước vào thời đại kim loại, sức mạnh quân sự và sản xuất vượt xa các bộ lạc xung quanh."
+    },
+    {
+      "volume": 5,
+      "title": "Chữ Viết Và Luật Lệ",
+      "chapterRange": "581-730",
+      "theme": "Văn hóa và quản trị — chữ viết, lịch pháp, luật lệ",
+      "summary": "Bộ tộc lớn mạnh sinh ra vấn đề quản trị: tranh chấp, phân phối, ghi nhớ tri thức. Lâm Mặc tạo ra hệ chữ viết sơ khai, lịch pháp cho mùa vụ và bộ luật lệ đầu tiên, đặt nền móng cho một nhà nước nguyên thủy.",
+      "subArcs": [
+        { "name": "Nét khắc đầu tiên", "chapterRange": "581-630", "focus": "Sáng tạo chữ tượng hình để ghi tri thức nông học và số lượng kho lương, chấm dứt cảnh truyền miệng tam sao thất bản." },
+        { "name": "Lịch của trời", "chapterRange": "631-680", "focus": "Lập lịch pháp dựa trên quan sát mặt trời và mùa, giúp trồng trọt đúng thời vụ và dự báo mùa đông." },
+        { "name": "Đá khắc luật", "chapterRange": "681-730", "focus": "Ban hành bộ luật lệ đầu tiên giải quyết tranh chấp đất đai, lương thực và lao động một cách công bằng thay vì sức mạnh." }
+      ],
+      "keyMilestone": "Hắc Thạch có chữ viết, lịch pháp và luật lệ — không còn là bộ lạc mà là một cộng đồng văn minh sơ khai."
+    },
+    {
+      "volume": 6,
+      "title": "Thành Trì Và Thương Lộ",
+      "chapterRange": "731-880",
+      "theme": "Đô thị hóa — thành trì, đường sá, thương mại liên vùng",
+      "summary": "Lâm Mặc dựng thành trì bằng đất nung và đá để chống mãnh thú và ngoại xâm, mở đường sá nối các làng, thiết lập thương lộ liên bộ lạc. Hắc Thạch trở thành trung tâm văn minh, thu hút các bộ tộc nhỏ quy phục và cả sự thù địch của những thế lực lớn hơn.",
+      "subArcs": [
+        { "name": "Tường thành đất nung", "chapterRange": "731-780", "focus": "Xây thành lũy bảo vệ trung tâm dân cư; lần đầu Hắc Thạch có một đô thị thực sự." },
+        { "name": "Con đường trao đổi", "chapterRange": "781-830", "focus": "Mở thương lộ và chợ liên bộ lạc; hàng hóa, tri thức và người di chuyển, lan tỏa văn minh." },
+        { "name": "Liên minh và đối thủ", "chapterRange": "831-880", "focus": "Các bộ tộc nhỏ quy phục dưới ngọn cờ Hắc Thạch; đại bộ lạc Cự Nham xem Lâm Mặc là mối đe dọa trật tự cũ." }
+      ],
+      "keyMilestone": "Hắc Thạch trở thành đô thị trung tâm của cả vùng, hạt nhân của một liên minh văn minh đang hình thành."
+    },
+    {
+      "volume": 7,
+      "title": "Bình Minh Của Một Nền Văn Minh",
+      "chapterRange": "881-1000",
+      "theme": "Liên minh và di sản — hợp nhất các bộ lạc thành một nền văn minh",
+      "summary": "Lâm Mặc đối mặt thử thách cuối: hợp nhất các bộ lạc rời rạc — bằng tri thức, thương mại và cả sức mạnh phòng vệ — thành một nền văn minh thống nhất có thể tự đứng vững mà không cần anh, đồng thời gánh cái giá của người mở đường và đặt dấu ấn cho hàng vạn năm sau.",
+      "subArcs": [
+        { "name": "Đại hội các bộ lạc", "chapterRange": "881-930", "focus": "Triệu tập đại hội liên bộ lạc, đặt ra luật chung và phân chia trách nhiệm; thuyết phục bằng lợi ích thực thay vì áp đặt." },
+        { "name": "Cơn bão cuối cùng", "chapterRange": "931-980", "focus": "Cự Nham và liên minh thù địch tổng tấn công; Lâm Mặc dùng thành trì, kim loại và tổ chức để bảo vệ thành quả văn minh." },
+        { "name": "Di sản", "chapterRange": "981-1000", "focus": "Nền văn minh đứng vững và tự vận hành; Lâm Mặc trao lại quyền cho thế hệ kế thừa, khép lại bằng một Man Hoang đã thay da đổi thịt." }
+      ],
+      "keyMilestone": "Các bộ lạc Man Hoang hợp nhất thành một nền văn minh sơ khai bền vững; Lâm Mặc hoàn thành sứ mệnh khai hóa và để lại di sản."
+    }
+  ]
+}

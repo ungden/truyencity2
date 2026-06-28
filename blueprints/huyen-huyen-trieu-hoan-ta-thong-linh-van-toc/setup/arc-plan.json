@@ -1,0 +1,25 @@
+{
+  "arc_number": 1,
+  "start_chapter": 1,
+  "end_chapter": 20,
+  "arc_theme": "Dấu ấn trong huyết mạch — thức tỉnh truyền thừa, thu phục tộc đầu tiên và giữ vững cổng lãnh địa",
+  "plan_text": "Arc mở màn warm-baseline: Mặc Thiên KHÔNG mở đầu bằng cảnh sắp chết thảm kéo dài. Vạn Tộc Thống Lĩnh Ấn bừng tỉnh ngay ch.1 đúng lúc lãnh địa Thanh Lĩnh bị thế gia lân cận uy hiếp, và anh lập tức có cơ hội thu phục con yêu lang đầu tiên — golden finger active từ trang đầu, hook là cơ hội (một tộc hồn đáng thu phục) chứ không phải bi kịch. Mỗi chương có ít nhất 2 cao điểm dopamine (một bước tiến thu phục/xây dựng + một trận thắng nhỏ hoặc một kẻ coi thường bị vả mặt), cao điểm đầu trước nửa chương. Cụm chương theo 5-cluster: ch.1-4 setup (ấn thức tỉnh, đọc Tộc Hồn Đồ lần đầu trên yêu lang gãy chân, ký Khế Ước Tộc Hồn đầu tiên, hiểu sơ cơ chế); ch.5-9 breathing + competence (Mặc Thiên rèn Hắc Lang, dựng lại Triệu Hoán Trận cũ, Tô Vân lo hậu cần và trận pháp, lão Khâu hé manh mối truyền thừa, thu thêm vài sinh linh lưu lạc); ch.10-14 confront (Triệu Hùng thiếu chủ thế gia lân cận tới khiêu khích, sỉ nhục xuất thân hàn vi của Mặc Thiên và đòi thôn tính lãnh địa; Mặc Thiên dùng Hắc Lang và mưu trí đẩy lui đợt thăm dò đầu); ch.15-18 big_wow (thế gia kéo quân đông gấp bội tấn công cổng lãnh địa; Mặc Thiên phát Thống Lĩnh Quang Hoàn lần đầu gắn kết yêu lang, cự nhân và sinh linh lưu lạc thành một thể, thắng trận chênh lệch lực lượng, vả mặt Triệu Hùng giữa ba quân); ch.19-20 resolution + hook (lãnh địa đứng vững, danh tiếng bắt đầu lan, lão Khâu hé lộ dấu ấn của Mặc Thiên có thể không tầm thường như anh tưởng — mở tuyến truy nguồn truyền thừa và các chủng tộc lớn hơn). Giữ nguyên tắc: combat là quân đoàn/tộc phối hợp dưới sự chỉ huy của MC, KHÔNG để MC một mình tay đôi quyết định mọi trận; sức mạnh đến từ gắn kết và chiến thuật. MC kiên định, trọng nghĩa, điềm tĩnh nhưng nhiệt huyết.",
+  "chapter_briefs": [
+    { "n": 1, "beat": "setup", "goal": "Lãnh địa Thanh Lĩnh bị uy hiếp; Vạn Tộc Thống Lĩnh Ấn bừng tỉnh trong huyết mạch Mặc Thiên", "payoff": "Anh đọc được Tộc Hồn Đồ của con yêu lang gãy chân và nhận ra tiềm năng tiến hóa ẩn của nó", "endingHook": "Một thoáng ảo ảnh quân đoàn vạn tộc dưới ngọn cờ gãy đổ hiện lên rồi tắt" },
+    { "n": 3, "beat": "setup", "goal": "Mặc Thiên hoàn thành điều kiện và ký Khế Ước Tộc Hồn đầu tiên với yêu lang", "payoff": "Hắc Lang gia nhập, quân đoàn có trụ cột đầu tiên; anh hiểu sơ cơ chế và giới hạn của ấn", "endingHook": "Triệu Hoán Trận cổ trong lãnh địa khẽ sáng lại sau nhiều năm tắt lịm" },
+    { "n": 7, "beat": "breathing", "goal": "Rèn Hắc Lang, dựng lại Triệu Hoán Trận, thu thêm vài sinh linh lưu lạc", "payoff": "Lãnh địa rách nát bắt đầu hồi sinh; Tô Vân và lão Khâu trở thành chỗ dựa", "endingHook": "Lão Khâu lẩm bẩm linh mạch quanh đây không tự nhiên mà mỏng đi" },
+    { "n": 12, "beat": "confront", "goal": "Triệu Hùng tới khiêu khích, sỉ nhục xuất thân hàn vi và đòi thôn tính Thanh Lĩnh", "payoff": "Mặc Thiên dùng Hắc Lang và mưu trí đẩy lui đợt thăm dò, khiến Triệu Hùng mất mặt lần đầu", "endingHook": "Triệu Hùng tức tối thề kéo đại quân san phẳng lãnh địa" },
+    { "n": 16, "beat": "big_wow", "goal": "Thế gia kéo quân đông gấp bội tấn công cổng lãnh địa Thanh Lĩnh", "payoff": "Mặc Thiên phát Thống Lĩnh Quang Hoàn lần đầu, gắn kết các tộc thành một thể và thắng trận chênh lệch lực lượng, vả mặt Triệu Hùng giữa ba quân", "endingHook": "Quân thế gia tháo chạy; cái tên Mặc Thiên lần đầu được người ngoài nhắc tới" },
+    { "n": 20, "beat": "resolution", "goal": "Khép arc 1, củng cố lãnh địa vừa giữ được", "payoff": "Thanh Lĩnh đứng vững, quân đoàn sơ khai thành hình, danh tiếng bắt đầu lan ra", "endingHook": "Lão Khâu hé lộ dấu ấn của Mặc Thiên có thể là truyền thừa thượng cổ — mở tuyến truy nguồn và chủng tộc lớn hơn" }
+  ],
+  "threads_to_advance": ["Học cơ chế Khế Ước Tộc Hồn và đọc Tộc Hồn Đồ", "Gây dựng quân đoàn và hồi sinh lãnh địa Thanh Lĩnh", "Quan hệ với Hắc Lang, Cương Lực, Tô Vân, lão Khâu"],
+  "threads_to_resolve": ["Giữ vững lãnh địa Thanh Lĩnh trước đợt xâm lấn đầu tiên của thế gia lân cận (giải quyết: đẩy lui Triệu Hùng)"],
+  "new_threads": ["Bí ẩn nguồn gốc thượng cổ của Vạn Tộc Thống Lĩnh Ấn", "Linh mạch quanh Thanh Lĩnh đang mỏng đi bất thường", "Mối thù với thế gia ngàn năm sau lần vả mặt Triệu Hùng"],
+  "sub_arcs": [
+    { "name": "Dấu ấn thức tỉnh", "chapterRange": "1-4", "cluster": "setup" },
+    { "name": "Hồi sinh lãnh địa", "chapterRange": "5-9", "cluster": "breathing" },
+    { "name": "Kẻ khinh thường", "chapterRange": "10-14", "cluster": "confront" },
+    { "name": "Trận giữ cổng", "chapterRange": "15-18", "cluster": "big_wow" },
+    { "name": "Đứng vững", "chapterRange": "19-20", "cluster": "resolution" }
+  ]
+}

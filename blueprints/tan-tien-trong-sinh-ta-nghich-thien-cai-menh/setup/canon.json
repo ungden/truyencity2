@@ -1,0 +1,209 @@
+{
+  "power_system": {
+    "name": "Tu Tiên Cửu Cảnh — Con Đường Trường Sinh",
+    "type": "cultivation-realm system (tu luyện linh khí, có chiến đấu và đấu pháp)",
+    "coreResource": "Linh khí đất trời luyện hóa thành chân nguyên trong đan điền; linh thạch, linh dược, đan dược, công pháp và pháp bảo là tài nguyên trợ tu.",
+    "unlockRule": "Tu sĩ hấp thụ linh khí, vận chuyển theo công pháp để tích lũy chân nguyên và đột phá; mỗi đại cảnh giới phải vượt một quan ải sinh tử (ngưng đan, kết anh, độ tâm ma kiếp, lôi kiếp). Tần Mục biết trước con đường nên ít vấp, nhưng vẫn phải tu luyện thực để đủ thực lực.",
+    "realmLadder": [
+      "Luyện Khí — hơn phàm nhân chút ít, dẫn linh khí nhập thể",
+      "Trúc Cơ — xây nền đạo cơ, thọ nguyên kéo dài, ngự khí sơ bộ",
+      "Kim Đan — ngưng kết kim đan, ngự kiếm bay, trấn giữ một vùng nhỏ",
+      "Nguyên Anh — kết nguyên anh, cường giả trấn một phương, thọ nguyên vài trăm năm",
+      "Hóa Thần — thần thức hóa hình, có thể di sơn đảo hải, truyền thuyết một châu",
+      "Luyện Hư — luyện hư hợp đạo, hiếm khi xuất thế",
+      "Hợp Thể — thân đạo hợp nhất",
+      "Đại Thừa — đỉnh phong nhân gian, chờ phi thăng",
+      "Độ Kiếp — vượt thiên kiếp cuối để phi thăng tiên giới"
+    ],
+    "antiPlotArmor": [
+      "Ký ức kiếp trước CHỈ là tri thức — KHÔNG tự nâng tu vi, KHÔNG đánh thay MC, KHÔNG bảo đảm thắng.",
+      "MC vẫn phải tu luyện thực đủ thực lực để giữ cơ duyên; đoạt mà không giữ nổi thì rước họa diệt thân.",
+      "Hành động của MC ở kiếp này làm tương lai DẦN LỆCH khỏi ký ức kiếp trước; càng về sau ký ức càng kém chính xác, buộc anh tự suy luận và thích nghi.",
+      "Mỗi đột phá vẫn phải vượt quan ải sinh tử thật; tâm ma kiếp và lôi kiếp không thể né bằng tri thức suông.",
+      "Hồi tưởng tốn tâm lực và mờ đi khi MC trọng thương hoặc tâm thần bất ổn."
+    ],
+    "signatureBuff": {
+      "name": "Thấu Hiểu Thiên Cơ",
+      "effect": "Tần Mục đối chiếu ký ức kiếp trước để dự đoán dòng chảy thiên cơ: cơ duyên xuất thế, biến cố sắp tới, bản chất thật của con người, công pháp/đan phương thượng thừa.",
+      "limit": "Chỉ là dự đoán dựa trên một dòng thời gian đã bị chính anh làm lệch; càng can thiệp nhiều, độ chính xác càng giảm — không phải tiên tri tuyệt đối."
+    },
+    "progressionAxes": [
+      "Cảnh giới tu vi (Luyện Khí → Độ Kiếp)",
+      "Phẩm chất nền tảng (đan phẩm, đạo cơ vững nhờ chuẩn bị kỹ hơn kiếp trước)",
+      "Kho cơ duyên / công pháp / pháp bảo đoạt được nhờ biết trước",
+      "Độ chính xác và phạm vi của Thấu Hiểu Thiên Cơ (giảm dần khi dòng thời gian lệch)"
+    ],
+    "powerCeilingByPhase": {
+      "phase1": "Luyện Khí đến Trúc Cơ, đoạt cơ duyên nhập môn, lập nền vững nơi chợ phường và ngoại môn tông",
+      "phase2": "Trúc Cơ đến Kim Đan, vươn lên trong tông môn, trả nợ những kẻ phản bội kiếp trước",
+      "phase3": "Kim Đan đến Nguyên Anh, danh chấn Đại Thương Châu, đối phó biến cố ma đạo và đại bí cảnh",
+      "phase4": "Nguyên Anh đến Hóa Thần rồi Độ Kiếp, quyết chiến thế lực ẩn và cải đổi đại kiếp số toàn châu"
+    }
+  },
+  "worldbuilding": {
+    "tone": "Tu tiên sảng văn cổ điển pha sắc thái phục thù và cải mệnh: nhịp nhanh, leo thang cảnh giới rõ ràng, đoạt cơ duyên, đánh mặt kẻ kiêu ngạo, trả nợ phản bội bằng nhân quả, từng bước nghịch thiên đổi vận.",
+    "economy": "Linh thạch là tiền tệ cứng; linh dược, đan dược, công pháp, pháp bảo, linh mạch và động phủ phong thủy bảo địa là tài nguyên tranh đoạt sống còn giữa các tông môn và gia tộc.",
+    "setting": "Đại Thương Châu — một vùng tu tiên giới rộng lớn, linh khí dồi dào, vô số tông môn, gia tộc và tán tu, nơi tài nguyên quyết định sinh tử và kẻ mạnh hô mưa gọi gió.",
+    "geography": {
+      "phase1": "Chợ phường Lạc Dương, linh dược cốc ngoài thành, tiểu bí cảnh Tàng Phong Động và ngoại môn Thanh Vân Tông",
+      "phase2": "Toàn bộ Thanh Vân Tông và các thế lực lân cận tranh đoạt động phủ, tài nguyên",
+      "phase3": "Khắp Đại Thương Châu: đại bí cảnh, di tích thượng cổ, vùng ma đạo trỗi dậy",
+      "phase4": "Các thánh địa, cấm khu và tầng nền khí vận nơi thế lực ẩn cư và đại kiếp số vận hành"
+    },
+    "techLevel": "Tu tiên cổ điển: kiếm phù, trận pháp, đan lô, ngọc giản, ngự kiếm phi hành; không có công nghệ hiện đại — bối cảnh thuần tu tiên giới.",
+    "conflictMedium": "Giải quyết bằng tu vi, đấu pháp, đấu trí biết-trước và tranh đoạt tài nguyên; CÓ chiến đấu (kiếm trận, pháp thuật, đấu cảnh giới) nhưng cũng nặng đấu trí và giăng lưới, không phải chỉ bạo lực thuần.",
+    "forbiddenElements": [
+      "xuyên không / xuyên việt từ thế giới khác",
+      "MC đến từ Trái Đất hoặc thế giới hiện đại",
+      "công nghệ hiện đại (súng, máy móc, internet) trong tu tiên giới",
+      "báo thù nóng vội phi logic phá hỏng tính toán dài hạn của MC",
+      "ký ức kiếp trước biến thành tiên tri tuyệt đối không bao giờ sai"
+    ]
+  },
+  "factions": [
+    {
+      "name": "Tần Mục và đồng minh",
+      "type": "nhóm nhân vật chính",
+      "power_level": 4,
+      "summary": "Tần Mục cùng Lý Thanh Hà và những người tử tế anh kết giao ở cả hai kiếp, dựa vào tri thức biết-trước, tu luyện thực và quyết đoán để nghịch thiên cải mệnh.",
+      "territory": "Khởi từ chợ phường Lạc Dương và ngoại môn Thanh Vân Tông, mở rộng dần khắp Đại Thương Châu",
+      "mc_relation": "MC là trung tâm và người dẫn dắt",
+      "conflicts": ["Triệu Nguyên và phe phản bội", "Thế lực ẩn cư thao túng khí vận"],
+      "alliances": ["Phe chính trực trong Thanh Vân Tông"],
+      "importance": 10,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Thanh Vân Tông",
+      "type": "tông môn tu tiên lớn",
+      "power_level": 7,
+      "summary": "Một trong các tông môn lớn của Đại Thương Châu, nắm công pháp thượng thừa và truyền thừa lâu đời; nội bộ có cả người chính trực lẫn kẻ phản bội ẩn mình.",
+      "territory": "Một vùng rộng quanh núi Thanh Vân",
+      "mc_relation": "Bệ phóng và đồng thời là nơi MC phải dè chừng kẻ phản bội",
+      "conflicts": ["Phe phản bội bên trong tông"],
+      "alliances": ["Tần Mục và đồng minh"],
+      "importance": 8,
+      "introduce_arc": 1
+    },
+    {
+      "name": "Triệu Nguyên và phe phản bội",
+      "type": "nhóm phản diện trung kỳ",
+      "power_level": 7,
+      "summary": "Những kẻ ở kiếp trước phản bội giết Tần Mục để đoạt cơ duyên; kiếp này còn đeo mặt nạ thân thiết, ngấm ngầm tranh đoạt và hãm hại, nhưng thật ra chỉ là quân cờ của một thế lực lớn hơn.",
+      "territory": "Trà trộn trong tông môn và giới tu tiên",
+      "mc_relation": "Đối thủ trực tiếp giữa truyện, mục tiêu trả nợ của MC",
+      "conflicts": ["Tần Mục và đồng minh"],
+      "alliances": ["Thế lực ẩn cư (bị giật dây mà không hay)"],
+      "importance": 8,
+      "introduce_arc": 2
+    },
+    {
+      "name": "Thế lực ẩn cư",
+      "type": "thế lực Hóa Thần ẩn cư thao túng khí vận",
+      "power_level": 10,
+      "summary": "Một thế lực ẩn cư đứng sau cái chết kiếp trước của Tần Mục, thao túng khí vận Đại Thương Châu và thèm muốn cơ duyên gắn với một bí mật lớn; phản diện tối hậu của truyện.",
+      "territory": "Cấm khu và tầng nền khí vận của Đại Thương Châu",
+      "mc_relation": "Phản diện tối hậu, đối đầu bằng cả tu vi lẫn đấu trí",
+      "conflicts": ["Tần Mục và đồng minh"],
+      "alliances": [],
+      "importance": 9,
+      "introduce_arc": 5
+    }
+  ],
+  "plot_twists": [
+    {
+      "summary": "Triệu Nguyên, kẻ Tần Mục tin là thủ phạm chính của cái chết kiếp trước, thật ra chỉ là một quân cờ bị thao túng — chính hắn cũng không biết ai đang giật dây mình.",
+      "payoff_type": "kẻ thù chỉ là quân cờ",
+      "setup_chapters": [180, 380],
+      "twist_chapter": 600,
+      "reader_impact": "major",
+      "arc_number": 5
+    },
+    {
+      "summary": "Cơ duyên mà Tần Mục tìm được và chết vì nó ở kiếp trước không phải báu vật bình thường, mà là một chìa khóa gắn với khí vận của cả Đại Thương Châu — đó là lý do nhiều thế lực sắp đặt để đoạt nó.",
+      "payoff_type": "nguồn gốc cơ duyên",
+      "setup_chapters": [100, 460, 650],
+      "twist_chapter": 670,
+      "reader_impact": "cosmic",
+      "arc_number": 5
+    },
+    {
+      "summary": "Việc Tần Mục trọng sinh không hoàn toàn ngẫu nhiên — nó là một biến số mà thiên cơ Đại Thương Châu 'cho phép' xuất hiện để cải đổi một đại kiếp số định sẵn; anh vừa là người cải mệnh vừa là một mắt xích của một định mệnh lớn hơn.",
+      "payoff_type": "nguồn gốc trọng sinh",
+      "setup_chapters": [300, 730, 880],
+      "twist_chapter": 940,
+      "reader_impact": "cosmic",
+      "arc_number": 7
+    }
+  ],
+  "themes": [
+    {
+      "name": "Tri thức là sức mạnh",
+      "type": "main",
+      "description": "Hiểu biết về thiên cơ và sự chuẩn bị tỉ mỉ quý hơn mọi pháp bảo; nhưng tri thức chỉ chỉ đường, vẫn phải tự đi bằng tu luyện thực.",
+      "motifs": ["đối chiếu ký ức kiếp trước", "đón đầu cơ duyên trước kẻ khác", "biết trước kẻ nào sẽ trở mặt"],
+      "importance": 10
+    },
+    {
+      "name": "Nghịch thiên cải mệnh",
+      "type": "main",
+      "description": "Vận mệnh không phải thứ bất biến; với đủ ý chí, hiểu biết và quyết đoán, một kẻ từng chết oan có thể viết lại cả con đường của mình.",
+      "motifs": ["đi lại con đường cũ không vấp bẫy cũ", "biến cục tử thành cục sinh", "đổi vận của cả một phương trời"],
+      "importance": 9
+    },
+    {
+      "name": "Phản bội và công đạo",
+      "type": "supporting",
+      "description": "Trả nợ phản bội không phải bằng tàn nhẫn mù quáng mà bằng cách để kẻ ác tự lộ dã tâm và lãnh hậu quả từ chính tông quy và nhân quả.",
+      "motifs": ["giăng lưới chờ kẻ phản bội tự bước vào", "kẻ ác sụp đổ bởi chính lòng tham của nó"],
+      "importance": 8
+    },
+    {
+      "name": "Buông oán hận để đi xa",
+      "type": "supporting",
+      "description": "Oán hận từng là động lực, nhưng để vượt tâm ma kiếp và đi tới cuối đại đạo, Tần Mục phải buông được phần oán hận thừa, giữ lại ý chí cải mệnh.",
+      "motifs": ["tâm ma kiếp đối diện nỗi đau bị phản bội", "chọn công đạo thay vì hủy diệt"],
+      "importance": 7
+    }
+  ],
+  "voice_anchors": [
+    {
+      "snippet_type": "opening",
+      "prose_text": "Tần Mục mở mắt, và mùi ẩm mốc quen thuộc của căn gác xép nơi chợ phường Lạc Dương ùa vào mũi anh. Trần nhà thấp lè tè, vết nứt trên xà gỗ vẫn nằm đúng chỗ ấy — đúng cái chỗ mà mười mấy năm trước, khi còn là một thiếu niên tán tu nghèo hèn, anh từng nằm ngửa nhìn nó mỗi đêm và mơ về tiên đạo. Anh chậm rãi giơ tay lên. Bàn tay gầy guộc, non nớt, không một vết chai luyện kiếm, không một sợi chân nguyên Kim Đan. Đây là bàn tay của một thiếu niên mười sáu tuổi. Anh nhắm mắt lại, và ký ức của một đời tu tiên — của cả cái khoảnh khắc lưỡi kiếm của sư đệ xuyên qua sau lưng — ùa về rõ ràng đến từng chi tiết. Anh không chết. Anh trở về. Và lần này, anh biết tất cả.",
+      "key_traits": ["trầm tĩnh", "tính toán", "ý chí sắt đá", "kìm nén oán hận"]
+    },
+    {
+      "snippet_type": "dialogue",
+      "prose_text": "— Tần huynh, gốc Tụ Linh Thảo này ta thấy trước, lẽ ra phải là của ta. Triệu Nguyên cười, giọng vẫn ngọt như mật. Tần Mục thu gốc linh dược vào tay áo, nhìn hắn bằng ánh mắt bình thản đến lạ. — Triệu sư đệ thấy trước, nhưng ta tới trước. Trên đời này, thấy được mà giữ không được thì cũng chỉ là người ngoài cuộc. Anh quay lưng đi, để lại một câu nhẹ tênh. — Sau này đệ sẽ học được điều đó. Học bằng cách dễ, hoặc bằng cách khó.",
+      "key_traits": ["điềm tĩnh áp chế", "ẩn ý răn đe", "không lộ bài"]
+    },
+    {
+      "snippet_type": "action",
+      "prose_text": "Linh khí trong động phủ cuộn lên thành xoáy, và Tần Mục bước vào đúng vị trí mà ký ức kiếp trước đã khắc sâu trong tâm trí. Ba thước về bên trái là cạm bẫy trận pháp từng giết một đệ tử cốt cán; nửa nén hương nữa cửa thạch thất sẽ khép. Anh không vội. Anh đặt chân lên đúng phiến đá an toàn, tay kết ấn dẫn động linh mạch, và cơ quan giấu sau bức bích họa từ từ mở ra — để lộ bộ công pháp mà kiếp trước anh phải đổi bằng cả tính mạng mới chạm tới. Phía sau, đám đệ tử thế gia vẫn đang loay hoay phá trận sai hướng. Tần Mục thu công pháp vào ngực, khẽ thở ra một hơi. Lần này, không ai cướp được thứ thuộc về anh nữa.",
+      "key_traits": ["chính xác", "biết trước nhưng vẫn cẩn trọng", "đoạt tiên cơ"]
+    }
+  ],
+  "foreshadowing": [
+    {
+      "hintText": "Cơ duyên đầu tiên Tần Mục đoạt được ở tiểu bí cảnh mang một dấu triện cổ mờ nhạt mà anh không nhận ra, chỉ thấy quen thuộc đến rợn người.",
+      "category": "object",
+      "plantCh": 90,
+      "pickupCh": 670,
+      "payoffDescription": "Dấu triện ấy chính là ấn ký gắn cơ duyên với khí vận Đại Thương Châu — manh mối đầu tiên cho thấy vì sao nhiều thế lực sắp đặt để đoạt nó và vì sao anh chết vì nó kiếp trước."
+    },
+    {
+      "hintText": "Triệu Nguyên đôi khi lẩm bẩm những lời không giống tính cách hắn, như thể có ai đó khác đang nói qua miệng hắn, rồi lập tức quên mất.",
+      "category": "character_behavior",
+      "plantCh": 180,
+      "pickupCh": 600,
+      "payoffDescription": "Triệu Nguyên chỉ là quân cờ bị thế lực ẩn cư thao túng từ trong vô thức — hé lộ rằng kẻ phản bội thật sự không phải hắn."
+    },
+    {
+      "hintText": "Mỗi lần Tần Mục cải đổi một biến cố so với ký ức kiếp trước, anh cảm thấy một thoáng 'lệch nhịp' khó tả trong dòng thiên cơ, như thể có thứ gì đó đang chú ý tới anh.",
+      "category": "environmental",
+      "plantCh": 300,
+      "pickupCh": 940,
+      "payoffDescription": "Sự 'lệch nhịp' là dấu hiệu thiên cơ Đại Thương Châu phản ứng với biến số trọng sinh của anh — dẫn tới sự thật rằng việc anh trở về gắn với một đại kiếp số định sẵn."
+    }
+  ]
+}

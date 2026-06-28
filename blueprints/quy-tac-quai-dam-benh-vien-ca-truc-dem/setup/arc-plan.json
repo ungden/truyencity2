@@ -1,0 +1,25 @@
+{
+  "arc_number": 1,
+  "start_chapter": 1,
+  "end_chapter": 20,
+  "arc_theme": "Tờ bàn giao ca — vào phó bản hành lang khoa nội ca trực đêm đầu tiên, học cách đọc quy trình thật/giả và sống sót bằng suy luận",
+  "plan_text": "Arc mở màn warm-baseline: lợi thế nhận thức của Tô Vãn kích hoạt ngay ch.1, cô KHÔNG mở đầu bằng cảnh sắp 'xuất viện' thê thảm mà sống sót đêm trực đầu tiên một cách tỉnh táo nhờ một suy luận quy trình đúng giây cận tử. Mỗi chương xoay quanh một bộ quy trình hoặc một tình huống sinh tồn trực đêm cụ thể, với ít nhất 2 cao điểm dopamine/chương (một suy luận đúng cứu mạng + một dòng quy trình giả bị vạch trần hoặc một kẻ phạm quy trình lãnh giá), cao điểm đầu trước nửa chương. Cụm chương theo 5-cluster: ch.1-4 setup (hành lang khoa nội kéo dài ra dãy phòng 313-315 không có trên sơ đồ, đọc tờ bàn giao ca đầu tiên, lợi thế làm vài dòng quy trình lạnh buốt đầu ngón tay, sống sót tiếng gọi y tá đầu tiên từ phòng trống giường bằng cách KHÔNG đáp lại); ch.5-9 breathing + competence (khám phá dãy phòng biến dị, ghi sổ tay quy trình, gặp những đồng nghiệp và người nhà bị cuốn vào cùng, học cơ chế 'xuất viện vĩnh viễn' khi phạm quy trình qua một nạn nhân khác, để ý vệt mực như chữ ký bị xóa cuối tờ bàn giao); ch.10-14 confront (Lý Trác tin quy trình mù quáng, tranh cãi với Tô Vãn, suýt kéo cả nhóm vào phòng trống giường theo dòng giả; Tô Vãn đối chiếu mâu thuẫn giữa dòng y lệnh ghi tay và bảng quy trình rồi vạch trần dòng giả); ch.15-18 big_wow (phát hiện bộ quy trình thứ hai trong sổ y lệnh chống lại bộ thứ nhất, suy ra logic thật-giả lồng nhau, cứu một cô điều dưỡng trẻ tưởng đã chắc bị xóa vào phút chót, tìm ra điều kiện giao ca thật); ch.19-20 resolution + hook (thoát phó bản ra đời thực, bác Mậu hé lộ bệnh viện này không phải nơi duy nhất có tờ bàn giao lạ dán lúc nửa đêm, mở tuyến Tổ Bàn Giao). Giữ nguyên tắc NON-COMBAT tuyệt đối: mọi nguy hiểm giải quyết bằng đọc hiểu, đối chiếu, suy luận và tuân thủ đúng quy trình — không đánh nhau, không gore giật gân. MC điềm tĩnh, lý trí, lạnh lùng nhưng vẫn giữ y đức và cố cứu người.",
+  "chapter_briefs": [
+    { "n": 1, "beat": "setup", "goal": "Tô Vãn nhận ca trực đêm thay đồng nghiệp, hành lang khoa nội kéo dài ra dãy phòng 313-315 không có trên sơ đồ và cô đọc tờ bàn giao ca đầu tiên", "payoff": "Lợi thế nhận thức kích hoạt, cô nhận ra một dòng quy trình làm lạnh buốt đầu ngón tay là giả và sống sót tiếng gọi y tá đầu tiên từ phòng trống giường bằng cách không đáp lại", "endingHook": "Tiếng gọi y tá vang lên lần thứ tư — quy trình thật chỉ nói tới ba lần gọi" },
+    { "n": 3, "beat": "setup", "goal": "Khám phá dãy phòng 313-315 biến dị và đọc thêm các bảng quy trình ép nhựa treo đầu giường", "payoff": "Cô ghép được dòng 'không đo nhịp cho bệnh nhân không có vòng tay định danh' là thật, tránh được cái bẫy bệnh nhân không vòng tay ở phòng 314", "endingHook": "Cuối tờ bàn giao có một vệt mực mảnh như chữ ký bị xóa đi" },
+    { "n": 7, "beat": "breathing", "goal": "Gặp những đồng nghiệp và người nhà bị cuốn vào cùng phó bản và bắt đầu ghi sổ tay quy trình", "payoff": "Cô chứng kiến một nạn nhân phạm dòng quy trình giả và bị 'xuất viện vĩnh viễn', xác nhận cơ chế thật/giả", "endingHook": "Lý Trác tuyên bố mình 'thuộc lòng mọi quy trình trực đêm' và sẽ dẫn nhóm" },
+    { "n": 12, "beat": "confront", "goal": "Ngăn Lý Trác mở cửa phòng 313 trống giường theo dòng quy trình giả", "payoff": "Tô Vãn đối chiếu dòng y lệnh ghi tay với bảng quy trình, vạch trần dòng giả, cả nhóm thoát chết", "endingHook": "Lý Trác cay cú bỏ đi một mình về phía thang bộ thoát hiểm bị cấm" },
+    { "n": 16, "beat": "big_wow", "goal": "Giải bộ quy trình thứ hai trong sổ y lệnh mâu thuẫn bộ thứ nhất để tìm điều kiện giao ca thật", "payoff": "Cô suy ra logic thật-giả lồng nhau, cứu một cô điều dưỡng trẻ tưởng đã chắc bị xóa đúng giây cận tử", "endingHook": "Điều kiện giao ca sáng hiện ra — nhưng đòi hỏi cả nhóm cùng làm đúng" },
+    { "n": 20, "beat": "resolution", "goal": "Khép arc 1, đưa nhóm thoát phó bản hành lang khoa nội", "payoff": "Họ ra được đời thực lúc giao ca sáng; Tô Vãn giữ sổ tay quy trình đầu tiên, sống sót với lý trí và y đức nguyên vẹn", "endingHook": "Bác Mậu lẩm bẩm bệnh viện này không phải nơi duy nhất có tờ bàn giao lạ dán lúc nửa đêm — mở tuyến Tổ Bàn Giao" }
+  ],
+  "threads_to_advance": ["Học cơ chế quy trình thật/giả", "Lợi thế nhận thức và sổ tay quy trình", "Quan hệ với những đồng nghiệp và người nhà sống sót cùng phó bản"],
+  "threads_to_resolve": ["Sống sót phó bản hành lang khoa nội ca trực đêm (giải quyết: cả nhóm thoát ra đời thực lúc giao ca sáng)"],
+  "new_threads": ["Sự tồn tại của Tổ Bàn Giao", "Bí ẩn vệt mực chữ ký trên tờ bàn giao", "Bản chất lợi thế nhận thức của Tô Vãn"],
+  "sub_arcs": [
+    { "name": "Tờ bàn giao ca", "chapterRange": "1-4", "cluster": "setup" },
+    { "name": "Dãy phòng và sổ tay", "chapterRange": "5-9", "cluster": "breathing" },
+    { "name": "Quy trình nói dối", "chapterRange": "10-14", "cluster": "confront" },
+    { "name": "Hai bộ quy trình", "chapterRange": "15-18", "cluster": "big_wow" },
+    { "name": "Giờ giao ca", "chapterRange": "19-20", "cluster": "resolution" }
+  ]
+}

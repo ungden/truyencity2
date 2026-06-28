@@ -1,0 +1,118 @@
+{
+  "premise": "Hạ Vô Cữu, người bản địa thừa kế y bát phong thủy mệnh lý từ sư phụ đã khuất, mở quầy xem mệnh giữa phố cổ, lấy việc xem phong thủy, đoán cát hung và hóa giải tà sự làm kế sinh nhai. Nhờ một thiên nhãn lặng lẽ đọc được dòng khí — long mạch, sát khí, oan hồn — anh nhìn thấu điều người khác chỉ mơ hồ cảm nhận; nhưng thiên nhãn chỉ cho thông tin, mọi luận đoán, bố trận và cái giá đều do anh tự gánh. Mỗi vụ anh nhận lại vén mở một bí ẩn âm dương, dẫn anh từ những tà sự đời thường tới một đại trận khuấy động long mạch của cả thành phố và sự thật về cái chết của sư phụ.",
+  "mainConflict": "Một con người thấu hiểu âm dương đối đầu những kẻ lợi dụng phong thủy, tà thuật và long mạch để hại người, mưu lợi và đoạt khí vận. Xung đột không giải quyết bằng bạo lực mà bằng luận đoán mệnh lý, bố trí trận pháp, tìm ra chân tướng phía sau mỗi tà sự và sự thấu hiểu uẩn khúc của cả người sống lẫn người chết. Leo thang từ một tà sự đời thường đơn lẻ → các địa cục lớn trong thành phố → dòng phái tà thuật nuôi quỷ → cuộc tranh đoạt long mạch chủ → kẻ giấu mặt giật dây toàn bộ và đại trận đoạt khí vận của cả thành phố.",
+  "themes": [
+    "Trừ tà không phải là đánh đuổi mà là tìm ra chân tướng để cả người sống lẫn người chết được yên",
+    "Lòng người mới là cội nguồn của hầu hết tà sự, không phải bản thân quỷ thần",
+    "Đạo hạnh và trách nhiệm của người nắm tri thức nguy hiểm",
+    "Sự thật luôn nằm sâu hơn lớp tà khí trên bề mặt"
+  ],
+  "majorPlotPoints": [
+    "Ch.1: Sư phụ qua đời để lại la bàn và bí kíp; Hạ Vô Cữu nhận vụ đầu tiên, dùng thiên nhãn đọc ra sát khí từ một cái gương đặt sai và một oan hồn ôm uẩn khúc, hóa giải êm xuôi.",
+    "Arc 1: Hoàn tất các vụ phong thủy đời thường (mộ tổ bị động, đứa bé khóc đêm, lá bùa rách dưới nền nhà), gây dựng tiếng tăm và chạm manh mối đầu tiên về dòng phái tà thuật.",
+    "Arc 2-3: Giải những địa cục lớn hơn trong thành phố, đối đầu dòng phái dùng tà thuật nuôi quỷ hại người, nhận ra các tà sự không ngẫu nhiên mà có bàn tay sắp đặt.",
+    "Giữa truyện: Cuộc tranh đoạt long mạch chủ của thành phố nổ ra; Hạ Vô Cữu chọn bảo vệ khí vận dân thường và lần ngược về cái chết của sư phụ cùng bí mật chiếc la bàn.",
+    "Cao trào cuối: Truy ra kẻ giấu mặt giật dây toàn bộ và đại trận đoạt khí vận; Hạ Vô Cữu điều hòa lại càn khôn thay vì đánh bại bằng vũ lực, gánh vai trò người giữ long mạch suốt đời."
+  ],
+  "setupKernel": {
+    "readerFantasy": "Cảm giác thỏa mãn khi một thầy phong thủy trẻ, chỉ bằng con mắt thấu thị âm dương và cái đầu tỉnh táo, đọc thủng những điều bị che giấu dưới lớp đời thường — chỉ ra chính xác vì sao nhà này họa, vì sao người kia bệnh, ai đã chết oan ở đây — trong khi những thầy bói rởm và kẻ tà thuật lộ nguyên hình; mỗi vụ giải đúng là một lần độc giả thở phào, người sống được cứu và người chết được yên.",
+    "protagonistEngine": "Hạ Vô Cữu thắng nhờ thiên nhãn đọc dòng khí kết hợp luận đoán mệnh lý sắc bén, quan sát tỉ mỉ hiện trường và sự bình tĩnh thấu hiểu lòng người; thiên nhãn chỉ cung cấp thông tin, phần luận giải, bố trận và cái giá đều do anh gánh. Tính cách điềm đạm, chính trực, lạnh lùng khi cần nhưng giàu trắc ẩn — anh luôn cố tìm chân tướng để cứu cả người sống lẫn an ủi người chết.",
+    "pleasureLoop": [
+      "Một thân chủ tìm tới với một tà sự khó hiểu (nhà ở không yên, người ốm lạ, vận bại bất thường) → Hạ Vô Cữu tới hiện trường, thiên nhãn cho thấy quầng sát khí/vệt oan hồn → anh luận đoán nguồn cơn dưới áp lực (tension build-up).",
+      "Một thầy rởm hoặc kẻ tà thuật đưa ra phán đoán sai lệch hoặc giở trò → Hạ Vô Cữu vạch trần bằng chứng cứ âm dương → kẻ đó lộ nguyên hình (vạch trần + công nhận).",
+      "Anh bố trí trận pháp / điều chỉnh bài trí / dùng ấn quyết hóa giải tà sự đúng thời khắc then chốt → người sống thoát họa trong gang tấc (giải pháp cứu mạng peak).",
+      "Anh lần ra chân tướng phía sau tà sự — một cái chết oan, một mối thù bị giấu — và khai mở cho oan hồn buông bỏ → cả nhà yên ổn, oan hồn siêu thoát (chân tướng + an ủi người chết).",
+      "Hoàn tất một vụ, nhận thù lao, vật phẩm phong thủy hoặc một manh mối → uy tín trong giới tăng, tiến gần hơn tới sự thật lớn (harvest + tiến triển).",
+      "Một mảnh sự thật về dòng phái tà thuật, long mạch hoặc cái chết của sư phụ được hé lộ → cảm giác bức màn lớn đang được vén lên (revelation payoff)."
+    ],
+    "systemMechanic": {
+      "name": "Thiên Nhãn Quán Khí — Con Mắt Đọc Dòng Khí Âm Dương",
+      "input": "Hạ Vô Cữu tĩnh tâm quán sát một không gian, một thế đất, một con người hoặc một di vật; phải ở trạng thái tinh thần tỉnh táo, định thần, không kiệt sức và không bị tà thuật che mắt.",
+      "output": "Long mạch hiện ra chảy như sông dưới lòng đất, sát khí tụ thành quầng xám ở nơi phạm phong thủy, oan hồn hiện thành vệt mờ mang theo cảm xúc cuối cùng trước khi chết; lá số con người ánh lên những điểm vận hạn cát hung.",
+      "limit": "Anti-plot-armor cứng: thiên nhãn CHỈ cung cấp thông tin dòng khí, KHÔNG tự hóa giải tà sự, KHÔNG cho biết phải bố trận thế nào, KHÔNG nói chân tướng là gì. Anh vẫn phải tự luận đoán, tự bố trí trận pháp, tự đối mặt hiểm nguy và vẫn trả giá (tổn hao tinh thần, thậm chí nguy tới tính mạng) nếu phán đoán sai. Thiên nhãn mờ đi hoặc tắt khi anh kiệt sức, hao tổn tinh thần quá độ, bị thương, hoặc khi đối thủ dùng tà thuật che khí; oan hồn chỉ hiện cảm xúc cuối, không kể trực tiếp sự thật.",
+      "reward": "Đọc cục diện nhanh và sâu hơn người thường, thu hẹp được phạm vi phán đoán; theo thời gian anh tích lũy kinh nghiệm nhận ra 'dấu khí' đặc trưng của từng loại tà thuật, giải vụ nhanh hơn — nhưng phần thưởng thật luôn là một mạng người được cứu, một oan hồn được siêu thoát và một mảnh sự thật, không phải sức mạnh thuần túy."
+    },
+    "mcOrigin": "native",
+    "originLockNote": "Hạ Vô Cữu là người bản địa của nhân gian hiện đại trong truyện, một thầy phong thủy trẻ thừa kế nghề từ sư phụ đã khuất; anh là người thường có thiên phú, không có bất kỳ ký ức hay nguồn gốc nào ngoài thế giới này — mọi bản lĩnh đều đến từ truyền thừa và tự rèn qua từng vụ việc.",
+    "mcSecret": {
+      "secret": "Hạ Vô Cữu sở hữu thiên nhãn quán khí đọc được dòng khí âm dương — một thiên phú mà hầu hết thầy phong thủy chỉ mơ ước, và anh giấu kín mức độ thật sự của nó.",
+      "outsideWorldKnowledge": "Bản thân thiên nhãn là một bí ẩn in-world: nó dường như liên hệ với chiếc la bàn cổ và một địa cục từ đời trước mà sư phụ anh từng giữ; mức thấu thị của nó vượt xa mọi ghi chép trong bí kíp truyền thừa.",
+      "revealRule": "Giấu kín hoàn toàn ở các vụ đầu, chỉ tỏ ra là 'thầy phong thủy giỏi'; chỉ hé lộ một phần cho một hai đồng minh thân tín giữa truyện; nguồn gốc thật của thiên nhãn (mối liên hệ với la bàn cổ và mệnh số anh) chỉ reveal ở cao trào.",
+      "coverStory": "Anh nói mình chỉ 'có chút thiên phú trời cho và được sư phụ dạy kỹ về quan sát thế đất', che giấu việc thực sự nhìn thấy long mạch, sát khí và oan hồn hiện hình."
+    },
+    "benefitLoop": {
+      "goal": "Hành nghề cứu người, hóa giải tà sự, và từng bước lần ra sự thật về dòng phái tà thuật, long mạch thành phố và cái chết của sư phụ.",
+      "action": "Tới hiện trường, dùng thiên nhãn quán khí, đối chiếu lá số và thế đất, luận đoán nguồn cơn tà sự, lần ra chân tướng phía sau, rồi bố trí trận pháp / điều chỉnh bài trí / dùng ấn quyết để hóa giải; đồng thời ghi chép lại 'dấu khí' và manh mối.",
+      "benefit": "Cứu thêm một người, an ủi thêm một oan hồn, thu thêm thù lao/vật phẩm và một mảnh manh mối; uy tín trong giới hành nghề và sự thấu hiểu âm dương tăng dần.",
+      "cadence": "Mỗi 1-2 chương có ít nhất một vòng quán-khí-được-thưởng (một luận đoán đúng cứu người hoặc một thầy rởm/kẻ tà thuật bị vạch trần); mỗi 3-5 chương một bước nhảy lớn (hoàn tất một vụ lớn, hé lộ một mảnh sự thật, lên một bậc uy tín)."
+    },
+    "interventionRule": "Hạ Vô Cữu chỉ ra tay can thiệp khi (a) có người đang trực tiếp gặp họa vì tà sự, phong thủy hại hoặc tà thuật mà anh đủ khả năng hóa giải, hoặc (b) khi anh phát hiện kẻ dùng tà thuật/đoạt long mạch đang hại người vô tội và anh có đủ manh mối để vạch trần; anh không đi 'cứu thế giới' ngoài tầm với, luôn giải quyết bằng luận đoán mệnh lý, bố trận, tìm chân tướng và khai mở cho oan hồn — tuyệt đối không bằng bạo lực thể chất vô nghĩa, kể cả với kẻ ác cũng dùng trận pháp và đạo hạnh để chế ngự.",
+    "phase1Playground": {
+      "locations": [
+        "Quầy xem mệnh phố cổ của Hạ Vô Cữu — cứ điểm đời thực, nơi thân chủ tìm tới",
+        "Khu chung cư cũ 'ở không yên' — vụ mở màn với sát khí từ gương đặt sai và oan hồn ôm uẩn khúc",
+        "Khu mộ tổ của một gia đình giàu bị công trình làm động long mạch",
+        "Căn nhà có đứa bé khóc đêm và một âm trạch xây sai gần đó"
+      ],
+      "cast": [
+        "Hạ Vô Cữu (thầy phong thủy trẻ, MC, người đọc dòng khí)",
+        "Lão Đinh (người bạn già của sư phụ, chủ tiệm đồ cổ, biết nhiều bí mật của nghề, cố vấn sớm nhất)",
+        "Tô Vãn Nghi (nữ phóng viên/điều tra viên lý trí, hoài nghi nhưng tò mò, dần thành đồng minh)",
+        "Trương Bán Tiên (một thầy bói rởm tự phụ, đại diện kiểu lừa gạt lòng tin, local antagonist)",
+        "Quách Đạo Sinh (một thầy phong thủy dùng tà thuật trong vùng, manh mối về dòng phái tà thuật)"
+      ],
+      "resources": [
+        "Thiên nhãn quán khí — con mắt đọc dòng khí âm dương",
+        "Chiếc la bàn cổ và quyển bí kíp truyền thừa của sư phụ",
+        "Quan hệ chớm nở với lão Đinh và Tô Vãn Nghi",
+        "Manh mối về dòng phái tà thuật và 'dấu khí' đặc trưng của chúng"
+      ],
+      "localAntagonists": [
+        "Trương Bán Tiên — thầy bói rởm nhiều lần phán bậy khiến thân chủ suýt mang họa, cay cú khi bị Hạ Vô Cữu vạch trần",
+        "Quách Đạo Sinh — thầy phong thủy dùng tà thuật cấp thấp, đầu mối đầu tiên dẫn tới dòng phái nuôi quỷ hại người"
+      ],
+      "repeatableSceneTypes": [
+        "Thân chủ trình bày một tà sự khó hiểu, Hạ Vô Cữu tới hiện trường quán khí và luận đoán nguồn cơn dưới áp lực",
+        "Một thầy rởm hoặc kẻ tà thuật đưa phán đoán sai/giở trò, Hạ Vô Cữu vạch trần bằng chứng cứ âm dương",
+        "Bố trí trận pháp / điều chỉnh bài trí / dùng ấn quyết hóa giải tà sự đúng thời khắc then chốt để cứu người",
+        "Lần ra chân tướng phía sau tà sự và khai mở cho oan hồn buông bỏ, kết một vụ trọn vẹn",
+        "Đoạn đời thường giữa hai vụ: tại quầy hoặc tiệm đồ cổ, ghép manh mối, trò chuyện với lão Đinh, chuẩn bị cho vụ kế"
+      ]
+    },
+    "socialReactor": {
+      "witnesses": [
+        "Thân chủ và gia đình họ trong từng vụ việc",
+        "Lão Đinh, Tô Vãn Nghi và những người quanh quầy xem mệnh",
+        "Giới thầy phong thủy, thầy bói và dân hành nghề tâm linh trong vùng",
+        "Cộng đồng truyền tai nhau về 'thầy phong thủy trẻ xem đâu trúng đó'"
+      ],
+      "reactionModes": [
+        "Sững sờ và nể phục khi Hạ Vô Cữu chỉ ra chính xác nguồn cơn mà không ai luận ra",
+        "Thân chủ giới thiệu anh cho người khác, tiếng tăm lan dần khắp khu vực",
+        "Giới hành nghề bắt đầu để mắt, người thì kính trọng, kẻ thì ganh ghét",
+        "Các dòng phái tà thuật nghi kỵ, coi anh là biến số nguy hiểm và tìm cách thử/cản"
+      ],
+      "reportBackCadence": "Phản ứng tức thì của thân chủ và người chứng kiến trong mỗi vụ (mỗi chương); làn sóng tiếng tăm và động thái của giới hành nghề dồn lại mỗi 3-5 chương sau khi anh giải xong một vụ đáng chú ý."
+    },
+    "noveltyLadder": [
+      { "chapterRange": "1-130", "newToy": "Các vụ phong thủy đời thường (nhà ở, mộ tổ, âm trạch, bùa trấn) — học cách đọc dòng khí và hóa giải tà sự", "keepsSameLane": "Vẫn là xem mệnh, xem phong thủy, trừ tà cứu người bằng luận đoán âm dương" },
+      { "chapterRange": "131-280", "newToy": "Các địa cục lớn trong thành phố (cao ốc, biệt thự nuốt người) và mặt tối của giới hành nghề", "keepsSameLane": "Vẫn là đọc thế đất, luận cát hung, bố trận hóa giải, chỉ phức tạp và nhiều tầng hơn" },
+      { "chapterRange": "281-430", "newToy": "Dòng phái tà thuật nuôi quỷ, cổ thuật chôn giấu, trận pháp hại người", "keepsSameLane": "Vẫn là đối đầu tà khí bằng đạo hạnh và trận pháp, thêm tầng đấu trí với người dùng tà thuật" },
+      { "chapterRange": "431-730", "newToy": "Tranh đoạt long mạch của cả vùng, bí mật la bàn cổ và cái chết sư phụ", "keepsSameLane": "Vẫn cùng lane thấu hiểu âm dương, nâng lên cấp địa cục toàn thành phố và bí mật bản thân" },
+      { "chapterRange": "731-1000", "newToy": "Đối mặt kẻ giấu mặt và điều hòa đại trận đoạt khí vận của cả thành phố", "keepsSameLane": "Vẫn là cuộc đấu trí âm dương — đỉnh cao của cùng một nghề xem mệnh, bố trận, giữ long mạch" }
+    ],
+    "controlRules": {
+      "payoffCadence": "Tối thiểu 2 cao điểm dopamine mỗi chương (một luận đoán âm dương đúng cứu người và một thầy rởm/kẻ tà thuật bị vạch trần hoặc một chân tướng được hé lộ); cao điểm đầu xuất hiện trước nửa chương; setup không quá 30% và phải có payoff trong cùng hoặc chương kế.",
+      "attentionGradient": "Mở chương bằng một tà sự mới, một dấu hiệu khí bất thường hoặc một thân chủ mang nỗi sợ cụ thể; đóng chương bằng một cliffhanger lạnh gáy hoặc một mảnh sự thật vừa hé.",
+      "openThreadsPerArc": 3,
+      "closeThreadsPerArc": 2
+    },
+    "patternCards": [
+      "warm-baseline-opening",
+      "deduction-under-pressure",
+      "fake-master-exposed",
+      "save-the-living-comfort-the-dead",
+      "eastern-occult-mystery"
+    ]
+  }
+}
