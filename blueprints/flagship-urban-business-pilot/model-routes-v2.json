@@ -1,0 +1,8 @@
+{
+  "setupCreative": "gemini-3.1-pro-preview",
+  "setupJudge": "gemini-3.5-flash",
+  "director": "gemini-3.1-pro-preview",
+  "writer": "gemini-3.1-pro-preview",
+  "editor": "gemini-3.5-flash",
+  "planner": "gemini-3.1-pro-preview"
+}

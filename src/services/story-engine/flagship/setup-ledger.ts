@@ -29,12 +29,14 @@ export async function finishFlagshipSetupRun(input: {
   status: 'saved' | 'setup_blocked' | 'infra_blocked' | 'human_gate';
   callRoles?: FlagshipSetupRole[] | string[];
   errorMessage?: string;
+  artifact?: unknown;
 }): Promise<void> {
   if (!input.runId) return;
   const { error } = await input.db.from('story_flagship_setup_runs').update({
     status: input.status,
     call_roles: input.callRoles || [],
     error_message: input.errorMessage?.slice(0, 1000) || null,
+    artifact_snapshot: input.artifact ?? null,
     finished_at: new Date().toISOString(),
   }).eq('id', input.runId);
   if (error) throw new FlagshipSetupError('setup_blocked', `Required flagship setup telemetry could not finish: ${error.message}`);

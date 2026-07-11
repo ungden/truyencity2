@@ -72,7 +72,7 @@ export async function planNextFlagshipWindowForProject(
     validateRollingPlanWindow(parsed.data);
     const { error: commitError } = await db.rpc('commit_flagship_rolling_window_v2', { p_project_id: projectId, p_expected_current_chapter: startChapter - 1, p_window: parsed.data });
     if (commitError) throw new FlagshipSetupError('setup_blocked', `Could not commit rolling plans: ${commitError.message}`);
-    await finishFlagshipSetupRun({ db, runId, status: 'saved', callRoles: ['rolling_planner'] });
+    await finishFlagshipSetupRun({ db, runId, status: 'saved', callRoles: ['rolling_planner'], artifact: parsed.data });
     return parsed.data;
   } catch (caught) {
     const failure = caught instanceof FlagshipSetupError ? caught : new FlagshipSetupError('setup_blocked', caught instanceof Error ? caught.message : String(caught));

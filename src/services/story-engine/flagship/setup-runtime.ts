@@ -80,11 +80,11 @@ export async function runFlagshipConceptTournamentForProject(
     const routes = requireFlagshipModelRoutes(project.style_directives);
     runId = await startFlagshipSetupRun({ db, projectId, phase: 'concept_tournament', model: routes.setupCreative, modelRoutes: routes, promptVersion: FLAGSHIP_SETUP_PROMPT_VERSION });
     await db.from('ai_story_projects').update({ flagship_setup_status: 'tournament_generating', updated_at: new Date().toISOString() }).eq('id', projectId);
-    const result = await generateConceptTournamentV2(brief.data, { invoke: dependencies.invoke || modelInvoker(project, projectId) });
-    callRoles = result.callRoles;
+    const baseInvoke = dependencies.invoke || modelInvoker(project, projectId);
+    const result = await generateConceptTournamentV2(brief.data, { invoke: async call => { callRoles.push(call.role); return baseInvoke(call); } });
     const { error } = await db.rpc('save_flagship_concept_tournament_v2', { p_project_id: projectId, p_tournament: result.artifact });
     if (error) throw new FlagshipSetupError('setup_blocked', `Could not persist concept tournament: ${error.message}`);
-    await finishFlagshipSetupRun({ db, runId, status: 'saved', callRoles });
+    await finishFlagshipSetupRun({ db, runId, status: 'saved', callRoles, artifact: result.artifact });
     return result;
   } catch (caught) {
     const error = caught instanceof FlagshipSetupError ? caught : new FlagshipSetupError('setup_blocked', caught instanceof Error ? caught.message : String(caught));
@@ -127,8 +127,8 @@ export async function materializeFlagshipSetupForProject(
     const routes = requireFlagshipModelRoutes(project.style_directives);
     runId = await startFlagshipSetupRun({ db, projectId, phase: 'launch_pack', model: routes.setupCreative, modelRoutes: routes, promptVersion: FLAGSHIP_SETUP_PROMPT_VERSION });
     await db.from('ai_story_projects').update({ flagship_setup_status: 'kernel_generating', updated_at: new Date().toISOString() }).eq('id', projectId);
-    const result = await materializeFlagshipLaunchPackV2({ brief: brief.data, tournament: tournament.data, selection: selection.data }, { invoke: dependencies.invoke || modelInvoker(project, projectId) });
-    callRoles = result.callRoles;
+    const baseInvoke = dependencies.invoke || modelInvoker(project, projectId);
+    const result = await materializeFlagshipLaunchPackV2({ brief: brief.data, tournament: tournament.data, selection: selection.data }, { invoke: async call => { callRoles.push(call.role); return baseInvoke(call); } });
     const { error } = await db.rpc('commit_flagship_launch_pack_v2', {
       p_project_id: projectId,
       p_selection: selection.data,
@@ -136,7 +136,7 @@ export async function materializeFlagshipSetupForProject(
       p_foundation_score: result.foundationScore,
     });
     if (error) throw new FlagshipSetupError('setup_blocked', `Could not commit launch pack: ${error.message}`);
-    await finishFlagshipSetupRun({ db, runId, status: 'saved', callRoles });
+    await finishFlagshipSetupRun({ db, runId, status: 'saved', callRoles, artifact: result.launchPack });
     return result;
   } catch (caught) {
     const error = caught instanceof FlagshipSetupError ? caught : new FlagshipSetupError('setup_blocked', caught instanceof Error ? caught.message : String(caught));

@@ -17,6 +17,7 @@ The flagship lane is quality-first and isolated from the legacy fleet. A project
 ```bash
 # These commands require both flagship migrations to be applied and a paused,
 # unwritten project already marked pipeline_version=flagship_v2.
+npm run flagship:create-pilot -- --title="Flagship Pilot" --slug=flagship-pilot --brief=/absolute/story-specific-brief.json --routes=/absolute/model-routes.json
 npm run flagship:setup:brief -- --project=<uuid> --brief=/absolute/story-specific-brief.json --routes=/absolute/model-routes.json
 npm run flagship:setup:tournament -- --project=<uuid>
 npm run flagship:setup:materialize -- --project=<uuid> --selection=/absolute/human-selection.json

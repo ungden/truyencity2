@@ -28,13 +28,15 @@ CREATE TABLE IF NOT EXISTS public.story_flagship_setup_runs (
   model_routes jsonb NOT NULL DEFAULT '{}'::jsonb,
   prompt_version text NOT NULL,
   call_roles jsonb NOT NULL DEFAULT '[]'::jsonb,
+  artifact_snapshot jsonb,
   error_message text,
   started_at timestamptz NOT NULL DEFAULT now(),
   finished_at timestamptz
 );
 
 ALTER TABLE public.story_flagship_setup_runs
-  ADD COLUMN IF NOT EXISTS model_routes jsonb NOT NULL DEFAULT '{}'::jsonb;
+  ADD COLUMN IF NOT EXISTS model_routes jsonb NOT NULL DEFAULT '{}'::jsonb,
+  ADD COLUMN IF NOT EXISTS artifact_snapshot jsonb;
 
 CREATE INDEX IF NOT EXISTS idx_story_flagship_setup_runs_project_recent
   ON public.story_flagship_setup_runs(project_id, started_at DESC);
@@ -229,6 +231,12 @@ BEGIN
       setup_stage_updated_at = now(),
       updated_at = now()
   WHERE id = p_project_id;
+
+  UPDATE public.novels
+  SET title = p_launch_pack->'storySpec'->>'title',
+      description = p_launch_pack->'storySpec'->>'premise',
+      updated_at = now()
+  WHERE id = (SELECT novel_id FROM public.ai_story_projects WHERE id = p_project_id);
 
   RETURN jsonb_build_object('saved', true, 'status', 'story_spec_review', 'candidate_id', v_candidate_id);
 END;
