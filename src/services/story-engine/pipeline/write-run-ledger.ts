@@ -5,7 +5,10 @@ export type WriteRunStatus =
   | 'running'
   | 'saved'
   | 'post_write_done'
-  | 'failed';
+  | 'failed'
+  | 'infra_blocked'
+  | 'quality_rejected'
+  | 'human_gate';
 
 export type WriteCheckpointStep =
   | 'context_assembled'
@@ -31,6 +34,12 @@ export interface StartWriteRunInput {
   targetWordCount?: number | null;
   contextSizeChars?: number | null;
   idempotencyKey?: string;
+  pipelineVersion?: 'legacy' | 'flagship_v2';
+  promptVersion?: string | null;
+  modelRoute?: Record<string, string>;
+  contextManifest?: unknown[];
+  /** Flagship requires telemetry to exist before any model call. Legacy remains best-effort. */
+  required?: boolean;
 }
 
 export async function startWriteRun(input: StartWriteRunInput): Promise<WriteRunHandle | null> {
@@ -52,6 +61,10 @@ export async function startWriteRun(input: StartWriteRunInput): Promise<WriteRun
       model: input.model || null,
       target_word_count: input.targetWordCount || null,
       context_size_chars: input.contextSizeChars || null,
+      pipeline_version: input.pipelineVersion || 'legacy',
+      prompt_version: input.promptVersion || null,
+      model_route: input.modelRoute || {},
+      context_manifest: input.contextManifest || [],
       updated_at: new Date().toISOString(),
     };
     const { data, error } = await db
@@ -76,6 +89,7 @@ export async function startWriteRun(input: StartWriteRunInput): Promise<WriteRun
     if (error) throw error;
     return null;
   } catch (e) {
+    if (input.required) throw e;
     console.warn('[write-run-ledger] startWriteRun failed:', e instanceof Error ? e.message : String(e));
     return null;
   }
@@ -132,6 +146,10 @@ export async function finishWriteRun(
     qualityScore?: number | null;
     contextSizeChars?: number | null;
     errorMessage?: string | null;
+    failureClass?: 'infrastructure' | 'quality' | 'setup' | 'unknown' | null;
+    publicationDecision?: 'publish' | 'revise' | 'reject' | 'human_gate' | null;
+    criticEvidence?: unknown[];
+    revisionLineage?: unknown[];
   } = {},
 ): Promise<void> {
   if (!run) return;
@@ -143,12 +161,41 @@ export async function finishWriteRun(
       quality_score: updates.qualityScore ?? null,
       context_size_chars: updates.contextSizeChars ?? null,
       error_message: updates.errorMessage ? updates.errorMessage.slice(0, 1000) : null,
+      failure_class: updates.failureClass ?? null,
+      publication_decision: updates.publicationDecision ?? null,
+      critic_evidence: updates.criticEvidence ?? [],
+      revision_lineage: updates.revisionLineage ?? [],
       updated_at: new Date().toISOString(),
       finished_at: status === 'running' ? null : new Date().toISOString(),
     }).eq('id', run.id);
     if (error) throw error;
   } catch (e) {
     console.warn('[write-run-ledger] finishWriteRun failed:', e instanceof Error ? e.message : String(e));
+  }
+}
+
+export async function updateWriteRunTelemetry(
+  run: WriteRunHandle | null,
+  updates: {
+    contextSizeChars?: number;
+    contextManifest?: unknown[];
+    promptVersion?: string | null;
+    modelRoute?: Record<string, string>;
+  },
+): Promise<void> {
+  if (!run) return;
+  try {
+    const db = getSupabase();
+    const { error } = await db.from('story_write_runs').update({
+      context_size_chars: updates.contextSizeChars,
+      context_manifest: updates.contextManifest,
+      prompt_version: updates.promptVersion,
+      model_route: updates.modelRoute,
+      updated_at: new Date().toISOString(),
+    }).eq('id', run.id);
+    if (error) throw error;
+  } catch (e) {
+    console.warn('[write-run-ledger] update telemetry failed:', e instanceof Error ? e.message : String(e));
   }
 }
 

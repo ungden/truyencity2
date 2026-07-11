@@ -63,6 +63,14 @@ export type ToneProfile =
 // ── Style Directives (JSONB metadata) ────────────────────────────────────────
 
 export interface StyleDirectives {
+  /** Pipeline generation. flagship_v2 is quality-first and never uses routine soft gates. */
+  pipeline_version?: 'legacy' | 'flagship_v2';
+  /** Publication policy. Flagship stays human-gated through chapter 30. */
+  publication_mode?: 'automatic' | 'human_gate' | 'offline_only';
+  /** Latest human checkpoint approved for a flagship project. */
+  flagship_human_gate?: 'concept' | 'story_spec' | 'chapter_3' | 'chapter_10' | 'chapter_30' | 'chapter_50';
+  /** Stable prompt bundle identifier persisted into write-run telemetry. */
+  prompt_version?: string;
   /** Override DEFAULT_CONFIG.targetWordCount for this project */
   target_chapter_length_override?: number;
   /** Cliffhanger density: how often to use plot cliffhangers vs emotional/reveal endings */

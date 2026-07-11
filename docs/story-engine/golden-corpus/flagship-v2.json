@@ -1,0 +1,21 @@
+[
+  {
+    "id": "causal-business-scene",
+    "label": "good",
+    "expected": "publish_candidate",
+    "text": "Nguyễn An Bình đặt ba hóa đơn lên bàn. Anh chỉ vào dòng phí giao lạnh tăng mười hai phần trăm và hỏi Hạnh vì sao lô hàng sáng nay vẫn có lãi. Hạnh không trả lời ngay; cô kéo sổ kho lại, cho thấy mười tám ký nguyên liệu sắp hết hạn. Bình đổi chiến thuật: thay vì giảm giá, anh ghép chúng thành gói thử nghiệm có đặt cọc. Hai khách đồng ý chuyển khoản trước sáu giờ. Đổi lại, Bình phải cam kết hoàn tiền gấp đôi nếu giao trễ. Điện thoại rung lúc 17 giờ 42. Tin nhắn ngân hàng báo đã nhận hai khoản đặt cọc, nhưng ngay sau đó nhà xe gọi: chuyến lạnh tối nay bị hủy. Bình mở lịch, gõ địa chỉ kho của chị Hạnh và nói: — Bảy giờ tôi tới. Nếu xe không chạy, chính tôi sẽ tìm người giao trước mười giờ."
+  },
+  {
+    "id": "quan-ca-phe-legacy-96",
+    "title": "Quán Cà Phê",
+    "label": "false_positive_legacy",
+    "expected": "revise",
+    "text": "Hồ Minh Quân khóa cửa quán. Bên kia hẻm, một người đàn ông đứng đó, nhìn chằm chằm vào biển hiệu bằng ánh mắt sắc lạnh. Hắn cúi xuống, viết thêm gì đó vào cuốn sổ rồi ngẩng lên với một biểu cảm khó đọc, vừa như đánh giá vừa như tính toán. Quân nhìn lại. Trong lồng ngực anh, một nhịp tim nặng xuống. Không phải sợ hãi, mà là cảnh giác. Gió chiều lùa vào hẻm, cuốn theo vài chiếc lá khô. Hắn quay đi. Quân không ngoái lại, nhưng lần đầu tiên anh thực sự tin rằng ngày mai sẽ có người chờ mình."
+  },
+  {
+    "id": "pipeline-leak",
+    "label": "hard_failure",
+    "expected": "reject",
+    "text": "Theo [WORLD DESCRIPTION], Nguyễn An Bình sẽ gọi DeepSeek API và tiếp tục system prompt trước khi cảnh tiếp theo bắt đầu."
+  }
+]

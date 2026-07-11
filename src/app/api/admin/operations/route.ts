@@ -538,6 +538,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     case 'resume_novel': {
       const projectId = body.projectId as string;
       if (!projectId) return NextResponse.json({ error: 'projectId required' }, { status: 400 });
+      const { data: project } = await supabase
+        .from('ai_story_projects')
+        .select('pause_reason')
+        .eq('id', projectId)
+        .maybeSingle();
+      if (project?.pause_reason?.startsWith('legacy_archived_')) {
+        return NextResponse.json({ error: 'legacy_archived_project_cannot_resume' }, { status: 409 });
+      }
       const { error } = await supabase
         .from('ai_story_projects')
         .update({ status: 'active', updated_at: new Date().toISOString() })
@@ -548,6 +556,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     case 'test_one_chapter': {
       const projectId = body.projectId as string;
       if (!projectId) return NextResponse.json({ error: 'projectId required' }, { status: 400 });
+      const { data: project } = await supabase
+        .from('ai_story_projects')
+        .select('pause_reason')
+        .eq('id', projectId)
+        .maybeSingle();
+      if (project?.pause_reason?.startsWith('legacy_archived_')) {
+        return NextResponse.json({ error: 'legacy_archived_project_cannot_write' }, { status: 409 });
+      }
       const { writeOneChapter } = await import('@/services/story-engine/pipeline/orchestrator');
       try {
         const result = await writeOneChapter({ projectId });
@@ -567,6 +583,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         .from('ai_story_projects')
         .select('id,novel_id')
         .in('status', ['active', 'paused'])
+        .or('pause_reason.is.null,pause_reason.not.like.legacy_archived_*')
         .order('created_at', { ascending: false })
         .limit(limit);
 

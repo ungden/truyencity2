@@ -8,7 +8,7 @@
  *   const result = await writeChapterForProject({ projectId: '...' });
  */
 
-export { writeOneChapter } from './pipeline/orchestrator';
+export { writeChapterForProject, writeChapterForProject as writeOneChapter, writeLegacyChapter } from './dispatch';
 export type { OrchestratorResult, OrchestratorOptions } from './pipeline/orchestrator';
 
 // Re-export types that consumers might need
@@ -22,4 +22,5 @@ export type {
  * Convenience alias — write a single chapter for a project.
  * This is the main function that cron routes and API routes should call.
  */
-export { writeOneChapter as writeChapterForProject } from './pipeline/orchestrator';
+// Quality-first flagship v2 contracts and offline pilot tooling.
+export * from './flagship';

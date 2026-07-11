@@ -49,6 +49,7 @@ scripts/_*.ts
 /tmp/mat-the-audit/
 /tmp/probe/
 /tmp/title-audit/
+/backups/legacy-archive/
 
 # env files (can opt-in for committing if needed)
 .env*
@@ -93,4 +94,3 @@ mobile/test-*.js
 mobile/expo_output.log
 .claude/
 /scratch/
-

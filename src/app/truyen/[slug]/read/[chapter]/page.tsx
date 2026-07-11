@@ -24,6 +24,7 @@ const getReaderMetadata = unstable_cache(
       .from('novels')
       .select('id, title, author, slug')
       .eq('slug', slug)
+      .eq('hidden', false)
       .maybeSingle();
 
     if (!novel) {

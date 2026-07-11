@@ -45,6 +45,7 @@ import {
   getDefaultDailyChapterQuota,
   getProjectDailyChapterQuota,
   isRecoverableRoutineWriteError,
+  classifyStoryFailure,
   isDailyQuotaDue,
 } from '@/lib/story-production-quota';
 import { decideNextProductionAction } from '@/lib/story-production-flow';
@@ -454,6 +455,24 @@ async function updateQuotaAfterError(
   vnDate: string,
   errorMsg: string,
 ): Promise<void> {
+  const failureClass = classifyStoryFailure(errorMsg);
+  if (failureClass === 'infrastructure') {
+    await supabase
+      .from('project_daily_quotas')
+      .update({
+        status: 'infra_blocked',
+        failure_class: failureClass,
+        last_error: errorMsg.slice(0, 500),
+        infra_blocked_at: new Date().toISOString(),
+        next_due_at: null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('project_id', projectId)
+      .eq('vn_date', vnDate);
+    console.warn(`[infra-blocked] Project ${projectId.slice(0, 8)} stopped without consuming quality retries: ${errorMsg.slice(0, 120)}`);
+    return;
+  }
+
   // Read prior retry_count so we can increment (not reset to 1).
   // Cross-cron-tick failure tracking is the basis for the circuit breaker below.
   const { data: prior } = await supabase
@@ -475,6 +494,7 @@ async function updateQuotaAfterError(
     .from('project_daily_quotas')
     .update({
       retry_count: newRetryCount,
+      failure_class: failureClass,
       last_error: lastError.slice(0, 500),
       // Fast-retry early failures. If a cheap writer/gate issue keeps failing,
       // back off instead of pausing forever or burning every cron tick.
@@ -690,15 +710,16 @@ async function writeOneChapter(
       try {
         const { data: paused } = await supabase
           .from('ai_story_projects')
-          .select('id')
+          .select('id,pause_reason')
           .eq('status', 'paused')
           .order('created_at', { ascending: true })
-          .limit(1);
-        if (paused && paused.length > 0) {
+          .limit(50);
+        const replacement = paused?.find(candidate => !candidate.pause_reason?.startsWith('legacy_archived_'));
+        if (replacement) {
           await supabase
             .from('ai_story_projects')
             .update({ status: 'active', updated_at: new Date().toISOString() })
-            .eq('id', paused[0].id)
+            .eq('id', replacement.id)
             .eq('status', 'paused');
         }
       } catch { /* non-fatal */ }
@@ -804,15 +825,16 @@ async function writeOneChapter(
       try {
         const { data: paused } = await supabase
           .from('ai_story_projects')
-          .select('id')
+          .select('id,pause_reason')
           .eq('status', 'paused')
           .order('created_at', { ascending: true })
-          .limit(1);
-        if (paused && paused.length > 0) {
+          .limit(50);
+        const replacement = paused?.find(candidate => !candidate.pause_reason?.startsWith('legacy_archived_'));
+        if (replacement) {
           await supabase
             .from('ai_story_projects')
             .update({ status: 'active', updated_at: new Date().toISOString() })
-            .eq('id', paused[0].id)
+            .eq('id', replacement.id)
             .eq('status', 'paused');
         }
       } catch { /* non-fatal: daily-rotate handles this too */ }
@@ -959,6 +981,7 @@ export async function GET(request: NextRequest) {
           novels!ai_story_projects_novel_id_fkey (id, title)
         `)
         .eq('status', 'paused')
+        .or('pause_reason.is.null,pause_reason.not.like.legacy_archived_*')
         .eq('current_chapter', 0)
         .in('setup_stage', STAGED_SETUP_STATES)
         .lt('updated_at', lockBoundary)

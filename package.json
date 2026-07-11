@@ -18,7 +18,12 @@
     "blueprint:generate": "node --import tsx scripts/generate-chapter-blueprints.ts",
     "backfill:quality-metrics": "node --import tsx scripts/backfill-published-quality-metrics.ts",
     "codex:story": "node --import tsx scripts/codex-story-pipeline.ts",
-    "codex:automation": "node --import tsx scripts/codex-automation-pipeline.ts"
+    "codex:automation": "node --import tsx scripts/codex-automation-pipeline.ts",
+    "flagship:preflight": "node --import tsx scripts/flagship-pilot-preflight.ts",
+    "flagship:concepts": "node --import tsx scripts/flagship-concept-tournament.ts",
+    "flagship:bakeoff": "node --import tsx scripts/flagship-model-bakeoff.ts",
+    "flagship:classify-legacy": "node --import tsx scripts/classify-legacy-stories.ts",
+    "legacy:archive": "node --import tsx scripts/archive-all-legacy.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",

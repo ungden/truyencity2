@@ -19,6 +19,7 @@ export default async function LegacyNovelPage({
     .from('novels')
     .select('slug')
     .eq('id', id)
+    .eq('hidden', false)
     .single();
 
   if (!novel?.slug) {

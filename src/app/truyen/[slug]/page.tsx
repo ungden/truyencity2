@@ -53,6 +53,7 @@ const fetchNovelBySlug = unstable_cache(
       .from('novels')
       .select(`${NOVEL_DETAIL_COLS}, chapters(id, title, chapter_number)`)
       .eq('slug', slug)
+      .eq('hidden', false)
       .single();
 
     if (novel) return { novel, matchedById: false as const };
@@ -63,6 +64,7 @@ const fetchNovelBySlug = unstable_cache(
         .from('novels')
         .select(`${NOVEL_DETAIL_COLS}, chapters(id, title, chapter_number)`)
         .eq('id', slug)
+        .eq('hidden', false)
         .single();
 
       if (novelById) return { novel: novelById, matchedById: true as const };
@@ -89,6 +91,7 @@ const fetchNovelMeta = unstable_cache(
       .from('novels')
       .select('title, description, author, cover_url, genres')
       .eq('slug', slug)
+      .eq('hidden', false)
       .single();
     return data ?? null;
   },

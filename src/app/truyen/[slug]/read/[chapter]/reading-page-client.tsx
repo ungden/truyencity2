@@ -108,6 +108,7 @@ export default function ReadingPageClient({ novelSlug, chapterNumber }: ReadingP
           .from('novels')
           .select('id, title, slug, chapter_count')
           .eq('slug', novelSlug)
+          .eq('hidden', false)
           .single();
 
         if (!novelData) throw new Error('Không tìm thấy truyện này.');

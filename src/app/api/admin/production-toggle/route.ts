@@ -139,6 +139,9 @@ export async function POST(request: NextRequest) {
     }
 
     const existing = (cur.style_directives as ProjectStyleDirectives | null) || {};
+    if (enabled && cur.pause_reason?.startsWith('legacy_archived_')) {
+      return NextResponse.json({ error: 'legacy_archived_project_cannot_enable_production' }, { status: 409 });
+    }
     const nextDirectives: ProjectStyleDirectives = { ...existing, production_enabled: enabled };
     if (enabled && existing.production_daily_chapter_quota == null) {
       nextDirectives.production_daily_chapter_quota = DAILY_TARGET;

@@ -86,6 +86,35 @@ export function isRecoverableRoutineWriteError(errorMsg: string): boolean {
   );
 }
 
+export type StoryFailureClass = 'infrastructure' | 'quality' | 'setup' | 'unknown';
+
+/** Infrastructure outages must never consume content-quality retries or mutate canon. */
+export function classifyStoryFailure(errorMsg: string): StoryFailureClass {
+  const normalized = errorMsg.toLowerCase();
+  if (
+    normalized.startsWith('infra_blocked:') ||
+    /\b402\b|insufficient balance|billing|payment required|quota exceeded|invalid api key|unauthorized|forbidden/.test(normalized) ||
+    /rate limit|timeout|fetch failed|network|temporarily unavailable|\b5\d\d\b/.test(normalized)
+  ) return 'infrastructure';
+  if (
+    normalized.startsWith('setup_blocked:') ||
+    normalized.startsWith('human_gate:') ||
+    errorMsg.startsWith('PUBLISHED_SETUP_KERNEL_MISSING') ||
+    errorMsg.startsWith('SETUP_KERNEL_DEAD_LETTER') ||
+    errorMsg.startsWith('CHAPTER_BLUEPRINT_MISSING_OR_INVALID') ||
+    errorMsg.startsWith('FLAGSHIP_STORY_SPEC_INVALID') ||
+    errorMsg.startsWith('FLAGSHIP_CHAPTER_PLAN_INVALID')
+  ) return 'setup';
+  if (
+    normalized.startsWith('quality_rejected:') ||
+    normalized.includes('failed quality gate') ||
+    normalized.includes('flagship_quality_rejected') ||
+    normalized.includes('critical contradictions') ||
+    normalized.includes('bridge broken')
+  ) return 'quality';
+  return 'unknown';
+}
+
 export function computeRecoverableRoutineRetryDelayMinutes(
   retryCount: number,
   maxFastRetries: number,
@@ -104,7 +133,7 @@ export function isDailyQuotaDue(
   },
   now: Date = new Date(),
 ): boolean {
-  if (quota.status === 'completed') return false;
+  if (quota.status === 'completed' || quota.status === 'infra_blocked') return false;
   const written = Number(quota.written_chapters ?? 0);
   const target = Number(quota.target_chapters ?? 0);
   if (!Number.isFinite(written) || !Number.isFinite(target)) return true;
