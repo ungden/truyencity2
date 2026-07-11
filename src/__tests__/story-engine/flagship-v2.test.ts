@@ -17,6 +17,12 @@ import {
   applyChapterStateDelta,
   getFlagshipPublicationPolicy,
   runConceptTournament,
+  generateConceptTournamentV2,
+  materializeFlagshipLaunchPackV2,
+  FlagshipSetupBriefV2Schema,
+  HumanConceptSelectionV2Schema,
+  validateRollingPlanWindow,
+  FlagshipModelRoutesV2Schema,
   scoreBlindBakeoff,
   validateChapterPlanSemantics,
   type ArcPlanV2,
@@ -62,23 +68,40 @@ function spec(): StorySpecV2 {
       name: 'Nguyễn An Bình',
       publicIdentity: long('Chủ kho lạnh đời thứ hai đang gánh khoản vay của gia đình'),
       desire: long('Giữ kho và trả hết khoản vay mà không bán quyền kiểm soát'),
+      fear: long('Sợ việc chia quyền sẽ khiến gia đình mất nốt tài sản cuối cùng'),
       contradiction: long('Muốn cộng tác nhưng luôn giữ số liệu và quyết định cho riêng mình'),
+      misbelief: long('Tin rằng người chịu trách nhiệm cuối cùng phải là người biết và quyết mọi thứ'),
       competence: long('Đọc dòng tiền, thương lượng vận tải và hiểu hao hụt thực phẩm'),
       blindSpot: long('Đánh giá thấp lòng tự trọng và nhu cầu được tham gia của cộng sự'),
+      privateAgenda: long('Âm thầm mua lại phần kho từng bị cha đem thế chấp mà không cho cộng sự biết'),
+      leverage: long('Nắm sổ hao hụt ba năm và quan hệ trực tiếp với nhóm tiểu thương đầu mối'),
+      moralBoundary: long('Không bán hàng không rõ nguồn và không đẩy thiệt hại sang người giao hàng yếu thế'),
+      decisionSignature: long('Khi bị ép, Bình kiểm tra con số rồi nhận phần rủi ro lớn nhất về mình'),
+      changeTrigger: long('Một cộng sự rời đi vì bị giấu thông tin buộc Bình phải học cách chia quyền'),
       voiceContract: long('Nói ngắn, dùng con số vừa đủ và chỉ đùa khi đã tìm ra phương án'),
     },
     cast: ['Lê Thu Hạnh', 'Trần Hải Nam', 'Phạm Gia Linh', 'Võ Hoàng Sơn'].map((name, index) => ({
       name,
+      socialIdentity: long(`${name} có vị trí xã hội và nghĩa vụ nghề nghiệp riêng số ${index}`),
       agenda: long(`${name} muốn bảo vệ lợi ích nghề nghiệp riêng số ${index}`),
       leverage: long(`${name} nắm một nguồn hàng hoặc quan hệ mà Bình không thể tự thay thế`),
       conflictWithProtagonist: long(`${name} buộc Bình chia sẻ quyền quyết định và chi phí thật`),
+      moralBoundary: long(`${name} không chấp nhận hy sinh người yếu thế để cứu giao dịch số ${index}`),
+      decisionSignature: long(`${name} phản ứng bằng một kiểu lựa chọn nghề nghiệp đặc trưng số ${index}`),
+      relationshipBehavior: long(`${name} nói và hành động khác với Bình khi có mặt đối tác hoặc gia đình`),
       voiceContract: long(`${name} có nhịp nói và vốn từ nghề nghiệp riêng, không nói thay tác giả`),
       firstAppearanceChapter: index + 1,
     })),
     causalWorldRules: Array.from({ length: 4 }, (_, index) => ({
       rule: long(`Quy tắc vận tải và thanh toán ${index}`),
+      beneficiary: long(`Nhóm nắm giấy phép và lịch xe hưởng lợi từ quy tắc ${index}`),
+      harmedParty: long(`Tiểu thương thiếu vốn chịu phí và thời gian chờ từ quy tắc ${index}`),
+      enforcement: long(`Biên nhận, cổng kho và đơn vị vận tải cưỡng chế quy tắc ${index}`),
+      cost: long(`Phá quy tắc ${index} làm mất tiền cọc, lịch xe hoặc uy tín có ghi nhận`),
       consequence: long(`Vi phạm quy tắc ${index} làm phát sinh chi phí hoặc mất quan hệ`),
       evidenceSource: long(`Hóa đơn, sổ kho hoặc hợp đồng xác nhận quy tắc ${index}`),
+      exceptions: long(`Ngoại lệ quy tắc ${index} chỉ có khi một bên ký nhận thêm trách nhiệm`),
+      sceneAffordances: [long(`Cảnh thương lượng quyền ưu tiên theo quy tắc ${index}`), long(`Cảnh kiểm chứng vi phạm bằng chứng từ số ${index}`)],
     })),
     resourceEconomy: ['tiền mặt', 'xe lạnh', 'uy tín'].map(resource => ({
       resource,
@@ -382,5 +405,130 @@ describe('tournament, blind bakeoff, legacy and infra isolation', () => {
 
   it('keeps legacy classification read-only and conservative', () => {
     expect(classifyLegacyProject({ currentChapter: 17, recentPassRate: 0.4, averageQualityScore: 62, criticalContinuityCount: 0, setupV2Ready: false }).disposition).toBe('rewrite_from_ch1');
+  });
+});
+
+describe('isolated flagship setup v2', () => {
+  const brief = FlagshipSetupBriefV2Schema.parse({
+    schemaVersion: 2,
+    language: 'vi',
+    genre: 'do-thi',
+    audience: long('Độc giả Việt trưởng thành thích quyết định kinh doanh có hậu quả'),
+    desiredExperience: long('Căng thẳng đến từ thương lượng, dòng tiền và lòng tin thay đổi'),
+    domain: long('Chuỗi lạnh thực phẩm, kho vận và hợp tác xã tiểu thương tại Việt Nam'),
+    boundaries: [long('Không có hệ thống cộng điểm'), long('Không có cứu viện bí ẩn'), long('Không biến đối thủ thành bia mặt')],
+    researchNotes: [0, 1, 2].map(index => ({ source: long(`Chứng từ và phỏng vấn nguồn độc lập số ${index}`), finding: long(`Quy trình ngành nghề tạo chi phí kiểm chứng số ${index}`) })),
+    seedConstraints: [],
+  });
+
+  const concepts = Array.from({ length: 20 }, (_, index) => {
+    const marker = Array.from({ length: 15 }, (_, tokenIndex) => `mechanism${String.fromCharCode(97 + index)}${String.fromCharCode(97 + tokenIndex)}`).join(' ');
+    return {
+      id: `concept_c${index}`,
+      workingTitle: index === 0 ? spec().title : `Tựa truyện ${index}`,
+      readerCuriosity: `${marker} khiến độc giả muốn biết giao dịch cụ thể sẽ đảo chiều ra sao`,
+      readerFantasy: index === 0 ? spec().readerFantasy : `${marker} cho độc giả trải nghiệm năng lực nghề nghiệp có giới hạn và hậu quả`,
+      premise: index === 0 ? spec().premise : `${marker} buộc một người lao động chọn giữa tài sản, quan hệ và nghĩa vụ đã ký`,
+      irreversibleProblem: `${marker} tạo một nghĩa vụ không thể xóa bằng lời xin lỗi hoặc may mắn`,
+      protagonistContradiction: `${marker} vừa cần người khác vừa sợ trao cho họ quyền quyết định`,
+      domainMechanism: `${marker} vận hành bằng chứng từ, lịch giao nhận và quyền kiểm soát hữu hạn`,
+      conflictEngine: `${marker} biến lựa chọn trước thành đòn bẩy thực tế của người khác`,
+      emotionalCore: `${marker} thử thách khả năng tin người khi trách nhiệm không thể chia đều`,
+      differenceClaim: `${marker} khác ở cơ chế nhân quả chứ không phải tên nghề hoặc trope`,
+      nearestComparisonRisk: `${marker} có nguy cơ bị viết thành truyện kinh doanh cộng điểm nếu làm hời hợt`,
+    };
+  });
+
+  const openingFor = (candidateId: string) => ({
+    schemaVersion: 2 as const,
+    candidateId,
+    chapters: [1, 2, 3].map(chapterNumber => ({
+      chapterNumber,
+      title: `Giao dịch ${chapterNumber}`,
+      prose: `Nhân vật lựa chọn và trả giá bằng chứng từ trong cảnh ${chapterNumber}. `.repeat(30),
+      causalStateChange: long(`Giao dịch chương ${chapterNumber} đổi quyền kiểm soát và nghĩa vụ giao hàng`),
+      requiredPlanAnchor: long(`Mỏ neo opening chương ${chapterNumber} phải được giữ nguyên trong kế hoạch`),
+      protagonistChoice: long(`Nhân vật chọn nhận nghĩa vụ thay vì chờ một cứu viện ở chương ${chapterNumber}`),
+      costPaid: long(`Nhân vật mất tiền, thời gian hoặc lòng tin đã ghi nhận ở chương ${chapterNumber}`),
+      exitPressure: long(`Hậu quả chương ${chapterNumber} đặt ra hạn chót cụ thể cho chương tiếp theo`),
+    })),
+    continuityDigest: long('Ba chương nối nhau bằng nghĩa vụ, dòng tiền và quyền đặt xe thay đổi'),
+    unresolvedPressure: long('Kho phải giao đúng giờ trong khi quyền điều phối xe đang thuộc về cộng sự'),
+  });
+
+  it('runs 20 concepts, independent pairwise ranking and three openings in five calls', async () => {
+    const ranking = {
+      schemaVersion: 2,
+      matches: Array.from({ length: 17 }, (_, offset) => { const index = offset + 3; const winner = index % 3; return { leftId: `concept_c${winner}`, rightId: `concept_c${index}`, winnerId: `concept_c${winner}`, reason: long(`Concept ${winner} sinh lựa chọn và hậu quả cụ thể hơn đối thủ ${index}`) }; }),
+      ranking: Array.from({ length: 20 }, (_, index) => ({ id: `concept_c${index}`, wins: index < 3 ? 6 : 0, reason: long(`Concept ${index} được xếp theo cơ chế cảnh và xung đột quan hệ cụ thể`) })),
+      finalistIds: ['concept_c0', 'concept_c1', 'concept_c2'],
+    };
+    const result = await generateConceptTournamentV2(brief, { invoke: async call => {
+      if (call.role === 'concept_lab') return JSON.stringify({ schemaVersion: 2, candidates: concepts });
+      if (call.role === 'concept_judge') return JSON.stringify(ranking);
+      return JSON.stringify(openingFor(call.candidateId!));
+    } });
+    expect(result.callRoles).toEqual(['concept_lab', 'concept_judge', 'opening_simulator', 'opening_simulator', 'opening_simulator']);
+    expect(result.artifact.openings).toHaveLength(3);
+    expect(result.artifact.status).toBe('awaiting_human_selection');
+  });
+
+  it('materializes only a human-selected finalist and preserves immutable artifacts', async () => {
+    const selected = concepts[0];
+    const opening = openingFor(selected.id);
+    const tournament = {
+      schemaVersion: 2 as const,
+      promptVersion: 'test',
+      concepts,
+      rejectedNearDuplicateIds: [],
+      ranking: {
+        schemaVersion: 2 as const,
+        matches: Array.from({ length: 17 }, (_, offset) => { const index = offset + 3; const winner = index % 3; return { leftId: `concept_c${winner}`, rightId: `concept_c${index}`, winnerId: `concept_c${winner}`, reason: long(`Concept ${winner} thắng concept ${index} bằng nhân quả cụ thể`) }; }),
+        ranking: Array.from({ length: 20 }, (_, index) => ({ id: `concept_c${index}`, wins: index < 3 ? 6 : 0, reason: long(`Concept ${index} được xếp theo khả năng tạo lựa chọn khó`) })),
+        finalistIds: ['concept_c0', 'concept_c1', 'concept_c2'],
+      },
+      openings: [opening, openingFor('concept_c1'), openingFor('concept_c2')],
+      status: 'awaiting_human_selection' as const,
+    };
+    const selection = HumanConceptSelectionV2Schema.parse({ schemaVersion: 2, candidateId: selected.id, approvedBy: 'human-reviewer', rationale: long('Opening tạo áp lực nhân quả rõ nhất trong blind review'), approvedAt: new Date().toISOString() });
+    const story = spec();
+    const characters = { schemaVersion: 2, protagonist: story.protagonist, cast: story.cast, relationshipConflicts: story.cast.slice(0, 3).map(member => ({ left: story.protagonist.name, right: member.name, incompatibleNeeds: long('Hai bên cần quyền quyết định khác nhau trong cùng một giao dịch'), mutualDependence: long('Hai bên giữ nguồn lực mà người kia không thể tự thay thế'), likelyBreakingPoint: long('Một bên giấu dữ liệu khi nghĩa vụ đến hạn thanh toán') })) };
+    const world = { schemaVersion: 2, rules: story.causalWorldRules, resources: story.resourceEconomy, institutions: [0, 1].map(index => ({ name: `Tổ chức ${index}`, power: long(`Tổ chức ${index} kiểm soát giấy phép hoặc lịch vận chuyển`), incentive: long(`Tổ chức ${index} kiếm lợi từ việc giữ kỷ luật giao nhận`), enforcementEvidence: long(`Hợp đồng và nhật ký cổng kho chứng minh quyền số ${index}`), pressureOnCast: long(`Quyền số ${index} buộc cast lựa chọn giữa tiền và quan hệ`) })), knowledgeDistribution: [story.protagonist, ...story.cast.slice(0, 2)].map(member => ({ holder: member.name, knows: long(`${member.name} biết một phần giao dịch có bằng chứng riêng`), doesNotKnow: long(`${member.name} chưa biết agenda và giới hạn của người còn lại`) })) };
+    let before = { marker: 'state-0' };
+    const plans = [1, 2, 3, 4, 5].map(chapterNumber => {
+      const next = { marker: `state-${chapterNumber}` };
+      const value = { ...plan(), chapterNumber, chapterPromise: chapterNumber <= 3 ? opening.chapters[chapterNumber - 1].requiredPlanAnchor : long(`Kế hoạch chương ${chapterNumber} tiếp tục hậu quả từ cửa sổ trước`), stateBefore: before, stateAfter: next, scenes: plan().scenes.map((scene, index) => ({ ...scene, id: `scene_${chapterNumber}_${index}` })) };
+      before = next;
+      return value;
+    });
+    const launchPack = { schemaVersion: 2, selectedConceptId: selected.id, storySpec: story, arcPlan: arc(), storyState: state(), rollingChapterPlans: plans, status: 'awaiting_story_spec_approval' };
+    const result = await materializeFlagshipLaunchPackV2({ brief, tournament, selection }, { invoke: async call => {
+      if (call.role === 'character_designer') return JSON.stringify(characters);
+      if (call.role === 'causal_world') return JSON.stringify(world);
+      return JSON.stringify(launchPack);
+    } });
+    expect(result.callRoles).toEqual(['character_designer', 'causal_world', 'launch_architect']);
+    expect(result.foundationScore.passed).toBe(true);
+    expect(result.launchPack.storySpec.premise).toBe(selected.premise);
+    expect(() => validateRollingPlanWindow({ schemaVersion: 2, startChapter: 1, endChapter: 5, plans })).not.toThrow();
+  });
+
+  it('keeps setup storage and cron isolated from legacy fallback', () => {
+    const migration = readFileSync(path.join(process.cwd(), 'supabase/migrations/20260711044323_flagship_setup_v2.sql'), 'utf8');
+    const cron = readFileSync(path.join(process.cwd(), 'src/app/api/cron/write-chapters/route.ts'), 'utf8');
+    const runtime = readFileSync(path.join(process.cwd(), 'src/services/story-engine/flagship/runtime.ts'), 'utf8');
+    expect(FlagshipSetupBriefV2Schema.safeParse({ schemaVersion: 2, language: 'vi', genre: 'do-thi' }).success).toBe(false);
+    expect(FlagshipModelRoutesV2Schema.safeParse({ setupCreative: 'model-a', setupJudge: 'model-b', director: 'model-a', writer: 'model-a', editor: 'model-a', planner: 'model-a' }).success).toBe(false);
+    expect(migration).toContain('CREATE TABLE IF NOT EXISTS public.story_flagship_setup_runs');
+    expect(migration).toContain('ENABLE ROW LEVEL SECURITY');
+    expect(migration).toContain('install_flagship_setup_brief_v2');
+    expect(migration).toContain('save_flagship_concept_tournament_v2');
+    expect(migration).toContain('commit_flagship_launch_pack_v2');
+    expect(migration).toContain('commit_flagship_rolling_window_v2');
+    expect(migration).toContain('SECURITY INVOKER');
+    expect(migration).not.toContain('SECURITY DEFINER');
+    expect(cron).toContain('flagship_v2 setup is manual-only and never enters legacy setup-pipeline');
+    expect(runtime).toContain("project.status !== 'paused'");
+    expect(runtime).toContain('disableRouting: true');
   });
 });

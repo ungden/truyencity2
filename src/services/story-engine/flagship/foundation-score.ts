@@ -50,17 +50,24 @@ export function computeFoundationScoreV2(spec: StorySpecV2): FoundationScoreV2 {
     ),
     protagonist_engine: boundedScore([
       spec.protagonist.desire,
+      spec.protagonist.fear,
       spec.protagonist.contradiction,
+      spec.protagonist.misbelief,
       spec.protagonist.competence,
       spec.protagonist.blindSpot,
-    ].filter(concrete).length * 2.5),
+      spec.protagonist.privateAgenda,
+      spec.protagonist.leverage,
+      spec.protagonist.moralBoundary,
+      spec.protagonist.decisionSignature,
+      spec.protagonist.changeTrigger,
+    ].filter(concrete).length * (10 / 11)),
     cast_agency: boundedScore(
-      Math.min(6, namedCast.size) +
-      spec.cast.filter(member => concrete(member.agenda) && concrete(member.leverage)).length * 0.7,
+      Math.min(4, namedCast.size) +
+      spec.cast.filter(member => [member.socialIdentity, member.agenda, member.leverage, member.moralBoundary, member.decisionSignature, member.relationshipBehavior].every(concrete)).length * 1.5,
     ),
     causal_world: boundedScore(
-      Math.min(6, spec.causalWorldRules.length) +
-      spec.causalWorldRules.filter(rule => concrete(rule.consequence) && concrete(rule.evidenceSource)).length * 0.7,
+      Math.min(4, spec.causalWorldRules.length) +
+      spec.causalWorldRules.filter(rule => [rule.beneficiary, rule.harmedParty, rule.enforcement, rule.cost, rule.consequence, rule.evidenceSource, rule.exceptions].every(concrete) && rule.sceneAffordances.length >= 2).length * 1.5,
     ),
     resource_economy: boundedScore(
       Math.min(5, spec.resourceEconomy.length * 1.5) +
@@ -86,6 +93,12 @@ export function computeFoundationScoreV2(spec: StorySpecV2): FoundationScoreV2 {
   if (namedCast.size !== spec.cast.length) issues.push('cast contains duplicate names');
   if (distinctPayoffs.size < Math.ceil(spec.promisePayoffLedger.length * 0.8)) issues.push('promise/payoff ledger repeats the same payoff');
   if (distinctRunway.size < spec.runway30.length) issues.push('30-chapter runway repeats irreversible changes');
+  if (spec.causalWorldRules.some(rule => rule.beneficiary.trim().toLowerCase() === rule.harmedParty.trim().toLowerCase())) {
+    issues.push('causal world contains a rule whose beneficiary and harmed party are identical');
+  }
+  if (spec.cast.some(member => member.agenda.trim().toLowerCase() === member.conflictWithProtagonist.trim().toLowerCase())) {
+    issues.push('cast agenda is copied from protagonist conflict instead of expressing independent agency');
+  }
 
   const values = Object.values(dimensions);
   const total = Number((values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(2));

@@ -47,18 +47,19 @@ for (const raw of rawPlans) {
   if (semantic.length) planIssues.push({ chapter: result.data.chapterNumber, issues: semantic });
 }
 
-const missing = Array.from({ length: 30 }, (_, index) => index + 1).filter(chapter => !chapters.has(chapter));
+const missing = Array.from({ length: 5 }, (_, index) => index + 1).filter(chapter => !chapters.has(chapter));
 const foundation = computeFoundationScoreV2(specResult.data);
 const arcCoversOpening = arcResult.data.startChapter === 1 && arcResult.data.endChapter >= 20;
 const stateStartsClean = stateResult.data.chapterNumber === 0;
-const ready = foundation.passed && arcCoversOpening && stateStartsClean && planIssues.length === 0 && missing.length === 0;
+const suppliedOnlyRollingWindow = [...chapters].every(chapter => chapter >= 1 && chapter <= 5);
+const ready = foundation.passed && arcCoversOpening && stateStartsClean && suppliedOnlyRollingWindow && planIssues.length === 0 && missing.length === 0;
 console.log(JSON.stringify({
   ready,
   mode: 'offline_only',
   foundation,
   arc: { id: arcResult.data.arcId, start: arcResult.data.startChapter, end: arcResult.data.endChapter, coversOpening: arcCoversOpening },
   state: { chapterNumber: stateResult.data.chapterNumber, startsClean: stateStartsClean },
-  plans: { supplied: chapters.size, missing, issues: planIssues },
+  plans: { supplied: chapters.size, expectedRollingWindow: '1-5', suppliedOnlyRollingWindow, missing, issues: planIssues },
   nextGate: ready ? 'human_review_story_spec' : 'repair_artifacts',
 }, null, 2));
 if (!ready) process.exit(1);

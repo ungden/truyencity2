@@ -2,8 +2,18 @@ import { z } from 'zod';
 
 const nonGeneric = z.string().trim().min(20);
 const namedText = z.string().trim().min(2);
+const range = (value: string): [number, number] => value.split('-').map(Number) as [number, number];
+const contiguousFromOneThroughThirty = (values: string[]): boolean => {
+  const ranges = values.map(range).sort((a, b) => a[0] - b[0]);
+  let expected = 1;
+  for (const [start, end] of ranges) {
+    if (start !== expected || end < start) return false;
+    expected = end + 1;
+  }
+  return expected >= 31;
+};
 
-export const StorySpecV2Schema = z.object({
+export const StorySpecV2ObjectSchema = z.object({
   schemaVersion: z.literal(2),
   pipelineVersion: z.literal('flagship_v2'),
   title: namedText,
@@ -26,24 +36,41 @@ export const StorySpecV2Schema = z.object({
     name: namedText,
     publicIdentity: nonGeneric,
     desire: nonGeneric,
+    fear: nonGeneric,
     contradiction: nonGeneric,
+    misbelief: nonGeneric,
     competence: nonGeneric,
     blindSpot: nonGeneric,
+    privateAgenda: nonGeneric,
+    leverage: nonGeneric,
+    moralBoundary: nonGeneric,
+    decisionSignature: nonGeneric,
+    changeTrigger: nonGeneric,
     voiceContract: nonGeneric,
-  }),
+  }).strict(),
   cast: z.array(z.object({
     name: namedText,
+    socialIdentity: nonGeneric,
     agenda: nonGeneric,
     leverage: nonGeneric,
     conflictWithProtagonist: nonGeneric,
+    moralBoundary: nonGeneric,
+    decisionSignature: nonGeneric,
+    relationshipBehavior: nonGeneric,
     voiceContract: nonGeneric,
     firstAppearanceChapter: z.number().int().min(1).max(30),
-  })).min(4).max(8),
+  }).strict()).min(3).max(8),
   causalWorldRules: z.array(z.object({
     rule: nonGeneric,
+    beneficiary: nonGeneric,
+    harmedParty: nonGeneric,
+    enforcement: nonGeneric,
+    cost: nonGeneric,
     consequence: nonGeneric,
     evidenceSource: nonGeneric,
-  })).min(4).max(12),
+    exceptions: nonGeneric,
+    sceneAffordances: z.array(nonGeneric).min(2).max(5),
+  }).strict()).min(4).max(12),
   resourceEconomy: z.array(z.object({
     resource: namedText,
     source: nonGeneric,
@@ -76,6 +103,21 @@ export const StorySpecV2Schema = z.object({
     terminalChange: nonGeneric,
   })).min(3).max(8),
 }).strict();
+
+export const StorySpecV2Schema = StorySpecV2ObjectSchema.superRefine((spec, ctx) => {
+  const castNames = [spec.protagonist.name, ...spec.cast.map(member => member.name)].map(name => name.toLowerCase());
+  if (new Set(castNames).size !== castNames.length) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['cast'], message: 'Protagonist and cast names must be unique.' });
+  const resourceNames = spec.resourceEconomy.map(item => item.resource.toLowerCase());
+  if (new Set(resourceNames).size !== resourceNames.length) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['resourceEconomy'], message: 'Resource names must be unique.' });
+  const promiseIds = spec.promisePayoffLedger.map(item => item.id);
+  if (new Set(promiseIds).size !== promiseIds.length) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['promisePayoffLedger'], message: 'Promise ids must be unique.' });
+  if (!contiguousFromOneThroughThirty(spec.conflictLadder.map(item => item.chapterRange))) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['conflictLadder'], message: 'Conflict ladder must cover contiguous chapters 1-30 or more.' });
+  if (!contiguousFromOneThroughThirty(spec.runway30.map(item => item.chapterRange))) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['runway30'], message: 'Runway must cover contiguous chapters 1-30.' });
+  for (const [index, promise] of spec.promisePayoffLedger.entries()) {
+    const [payoffStart, payoffEnd] = range(promise.payoffWindow);
+    if (payoffEnd < payoffStart || payoffStart < promise.plantedByChapter) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['promisePayoffLedger', index, 'payoffWindow'], message: 'Payoff window must be ordered after the promise is planted.' });
+  }
+});
 
 export type StorySpecV2 = z.infer<typeof StorySpecV2Schema>;
 

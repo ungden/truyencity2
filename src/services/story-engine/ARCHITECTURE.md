@@ -1,5 +1,8 @@
 # Story Engine Architecture
 
+> `pipeline/`, `templates/`, and the legacy setup below are frozen legacy architecture.
+> `flagship_v2` is a separate lane under `flagship/`: story-specific brief → concept tournament → human-selected opening → character/world kernel → rolling plan → Director → Writer → Editor. It never imports these legacy prompts or uses them as fallback.
+
 5-layer architecture inspired by **đại thần workflow** (top web novel author practices).
 Each layer has a single responsibility — no overlap.
 

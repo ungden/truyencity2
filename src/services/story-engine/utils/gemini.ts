@@ -87,13 +87,13 @@ function resolveRoute(task: string | undefined): string | null {
 export async function callGemini(
   userPrompt: string,
   config: GeminiConfig,
-  options?: { jsonMode?: boolean; tracking?: TrackingContext },
+  options?: { jsonMode?: boolean; tracking?: TrackingContext; disableRouting?: boolean },
 ): Promise<GeminiResponse> {
   // 1. Per-task routing override (set via globalThis.__MODEL_ROUTING__)
   // 2. Otherwise, model name itself decides: anything starting with `deepseek-`
   //    routes to DeepSeek. This makes DEFAULT_CONFIG.model = 'gemini-3.1-flash-lite'
   //    enough to switch the whole pipeline.
-  const routed = resolveRoute(options?.tracking?.task);
+  const routed = options?.disableRouting ? null : resolveRoute(options?.tracking?.task);
   const targetModel = routed || config.model;
   if (process.env.DEBUG_ROUTING === '1') {
     console.warn(`[ROUTER] task=${options?.tracking?.task || 'NO_TASK'} target=${targetModel}`);

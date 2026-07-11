@@ -592,6 +592,15 @@ async function prepareInitProject(
 ): Promise<RunResult> {
   const novel = Array.isArray(project.novels) ? project.novels[0] : project.novels;
   if (!novel?.id) throw new Error('No novel linked');
+  if ((project.style_directives as Record<string, unknown> | null)?.pipeline_version === 'flagship_v2') {
+    return {
+      id: project.id,
+      title: novel.title,
+      tier: 'init-prep',
+      success: false,
+      error: 'setup_blocked: flagship_v2 setup is manual-only and never enters legacy setup-pipeline',
+    };
+  }
 
   // 2026-05-01 STAGE PIPELINE: User feedback "không được fallback mà phải đi qua đầy
   // đủ các bước". Replaced lump regen with explicit stage state machine — 1 stage per
@@ -1023,8 +1032,10 @@ export async function GET(request: NextRequest) {
       return !held;
     });
 
-    const rawCandidates = filterQualityHold(filterProductionEnabled((candidateQuery.data || []) as ProjectRow[]));
-    const setupOnlyCandidates = filterQualityHold(filterProductionEnabled((setupCandidateQuery.data || []) as ProjectRow[]));
+    const rawCandidates = filterQualityHold(filterProductionEnabled((candidateQuery.data || []) as ProjectRow[]))
+      .filter(project => (project.style_directives as Record<string, unknown> | null)?.pipeline_version !== 'flagship_v2');
+    const setupOnlyCandidates = filterQualityHold(filterProductionEnabled((setupCandidateQuery.data || []) as ProjectRow[]))
+      .filter(project => (project.style_directives as Record<string, unknown> | null)?.pipeline_version !== 'flagship_v2');
     console.log(`[Cron] Step 1 OK: ${activeCount} active, ${rawCandidates.length} active candidates, ${setupOnlyCandidates.length} setup candidates fetched`);
 
     // Filter candidates eligible for processing (respect soft-ending grace buffer)

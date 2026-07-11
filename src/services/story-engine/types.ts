@@ -69,6 +69,17 @@ export interface StyleDirectives {
   publication_mode?: 'automatic' | 'human_gate' | 'offline_only';
   /** Latest human checkpoint approved for a flagship project. */
   flagship_human_gate?: 'concept' | 'story_spec' | 'chapter_3' | 'chapter_10' | 'chapter_30' | 'chapter_50';
+  /** Flagship setup is always operator-triggered by project id. */
+  flagship_setup_mode?: 'manual_only';
+  /** Explicit per-role routes. Flagship never falls back to ai_model or a global default. */
+  flagship_model_routes?: {
+    setupCreative: string;
+    setupJudge: string;
+    director: string;
+    writer: string;
+    editor: string;
+    planner: string;
+  };
   /** Stable prompt bundle identifier persisted into write-run telemetry. */
   prompt_version?: string;
   /** Override DEFAULT_CONFIG.targetWordCount for this project */

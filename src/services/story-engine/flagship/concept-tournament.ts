@@ -1,4 +1,4 @@
-export interface ConceptCandidateV2 {
+export interface ScoredConceptCandidateV2 {
   id: string;
   premise: string;
   protagonistEngine: string;
@@ -8,7 +8,7 @@ export interface ConceptCandidateV2 {
 }
 
 export interface ConceptTournamentResult {
-  finalists: ConceptCandidateV2[];
+  finalists: ScoredConceptCandidateV2[];
   rejectedAsNearDuplicates: string[];
   ranking: Array<{ id: string; score: number }>;
 }
@@ -18,7 +18,7 @@ function tokens(text: string): Set<string> {
     .split(/[^a-z0-9]+/).filter(token => token.length > 3));
 }
 
-export function conceptSimilarity(a: ConceptCandidateV2, b: ConceptCandidateV2): number {
+export function conceptSimilarity(a: ScoredConceptCandidateV2, b: ScoredConceptCandidateV2): number {
   const left = tokens(`${a.premise} ${a.protagonistEngine} ${a.conflictEngine} ${a.domain}`);
   const right = tokens(`${b.premise} ${b.protagonistEngine} ${b.conflictEngine} ${b.domain}`);
   const intersection = [...left].filter(token => right.has(token)).length;
@@ -26,11 +26,11 @@ export function conceptSimilarity(a: ConceptCandidateV2, b: ConceptCandidateV2):
   return union ? intersection / union : 1;
 }
 
-export function runConceptTournament(candidates: ConceptCandidateV2[], finalistCount = 3, minimumCandidates = 20): ConceptTournamentResult {
+export function runConceptTournament(candidates: ScoredConceptCandidateV2[], finalistCount = 3, minimumCandidates = 20): ConceptTournamentResult {
   if (candidates.length < Math.max(finalistCount, minimumCandidates)) {
     throw new Error(`Concept tournament requires at least ${Math.max(finalistCount, minimumCandidates)} candidates.`);
   }
-  const unique: ConceptCandidateV2[] = [];
+  const unique: ScoredConceptCandidateV2[] = [];
   const rejectedAsNearDuplicates: string[] = [];
   for (const candidate of candidates) {
     if (unique.some(existing => conceptSimilarity(existing, candidate) >= 0.62)) rejectedAsNearDuplicates.push(candidate.id);

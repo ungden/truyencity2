@@ -183,16 +183,18 @@ DECLARE
   v_current int;
   v_pipeline text;
   v_novel uuid;
+  v_project_status text;
   v_item jsonb;
 BEGIN
-  SELECT current_chapter, style_directives->>'pipeline_version', novel_id
-    INTO v_current, v_pipeline, v_novel
+  SELECT current_chapter, style_directives->>'pipeline_version', novel_id, status
+    INTO v_current, v_pipeline, v_novel, v_project_status
   FROM public.ai_story_projects
   WHERE id = p_project_id
   FOR UPDATE;
 
   IF NOT FOUND THEN RAISE EXCEPTION 'FLAGSHIP_PROJECT_NOT_FOUND'; END IF;
   IF v_pipeline IS DISTINCT FROM 'flagship_v2' THEN RAISE EXCEPTION 'FLAGSHIP_PIPELINE_MISMATCH'; END IF;
+  IF v_project_status IS DISTINCT FROM 'paused' THEN RAISE EXCEPTION 'FLAGSHIP_MANUAL_WRITE_REQUIRES_PAUSED_PROJECT'; END IF;
   IF v_novel IS DISTINCT FROM p_novel_id THEN RAISE EXCEPTION 'FLAGSHIP_NOVEL_MISMATCH'; END IF;
   IF COALESCE(v_current, 0) <> p_expected_current_chapter OR p_chapter_number <> p_expected_current_chapter + 1 THEN
     RAISE EXCEPTION 'FLAGSHIP_CHAPTER_RACE expected %, actual %, requested %', p_expected_current_chapter, v_current, p_chapter_number;

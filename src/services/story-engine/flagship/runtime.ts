@@ -15,18 +15,20 @@ import { executeFlagshipPipeline, FlagshipPipelineError, type FlagshipModelCall 
 import { canPublishFlagshipChapter } from './policy';
 import { FLAGSHIP_PROMPT_VERSION } from './prompts';
 import { applyChapterStateDelta } from './state-transition';
+import { requireFlagshipModelRoutes } from './model-routes';
 
 interface FlagshipProjectRow {
   id: string;
+  status: string;
   novel_id: string;
   current_chapter: number | null;
   target_chapter_length: number | null;
   temperature: number | null;
-  ai_model: string | null;
   style_directives: StyleDirectives | null;
   story_spec_v2: unknown;
   arc_plan_v2: unknown;
   story_state_v2: unknown;
+  flagship_setup_status: string | null;
   novels: { id: string; title: string } | Array<{ id: string; title: string }> | null;
 }
 
@@ -86,7 +88,7 @@ export async function writeFlagshipChapter(
   const db = dependencies.db || getSupabase();
   const { data, error } = await db
     .from('ai_story_projects')
-    .select('id,novel_id,current_chapter,target_chapter_length,temperature,ai_model,style_directives,story_spec_v2,arc_plan_v2,story_state_v2,novels!ai_story_projects_novel_id_fkey(id,title)')
+    .select('id,status,novel_id,current_chapter,target_chapter_length,temperature,style_directives,story_spec_v2,arc_plan_v2,story_state_v2,flagship_setup_status,novels!ai_story_projects_novel_id_fkey(id,title)')
     .eq('id', options.projectId)
     .single();
   if (error || !data) throw new FlagshipPipelineError('setup_blocked', error?.message || 'Flagship project not found.');
@@ -95,12 +97,17 @@ export async function writeFlagshipChapter(
   if (project.style_directives?.pipeline_version !== 'flagship_v2') {
     throw new FlagshipPipelineError('setup_blocked', 'Project is not marked flagship_v2.');
   }
+  if (project.flagship_setup_status !== 'ready_to_write') {
+    throw new FlagshipPipelineError('setup_blocked', `Flagship setup is ${project.flagship_setup_status || 'missing'}, expected ready_to_write.`);
+  }
+  if (project.status !== 'paused') throw new FlagshipPipelineError('setup_blocked', 'Flagship manual write requires project status=paused.');
   const novel = linkedNovel(project);
   if (!novel) throw new FlagshipPipelineError('setup_blocked', 'Project has no linked novel.');
   const nextChapter = Number(project.current_chapter || 0) + 1;
-  const model = options.model || project.ai_model;
+  let modelRoutes;
+  try { modelRoutes = requireFlagshipModelRoutes(project.style_directives); }
+  catch (caught) { throw new FlagshipPipelineError('setup_blocked', caught instanceof Error ? caught.message : String(caught)); }
   const targetWordCount = options.targetWordCount || project.target_chapter_length;
-  if (!model) throw new FlagshipPipelineError('setup_blocked', 'Flagship requires an explicit project model or call-level model.');
   if (!targetWordCount || targetWordCount < 1000) throw new FlagshipPipelineError('setup_blocked', 'Flagship requires an explicit target_chapter_length of at least 1000 words.');
   let run: WriteRunHandle | null = null;
   let contextSize = 0;
@@ -110,11 +117,11 @@ export async function writeFlagshipChapter(
       projectId: project.id,
       novelId: novel.id,
       chapterNumber: nextChapter,
-      model,
+      model: modelRoutes.writer,
       targetWordCount,
       pipelineVersion: 'flagship_v2',
       promptVersion: FLAGSHIP_PROMPT_VERSION,
-      modelRoute: globalThis.__MODEL_ROUTING__ || {},
+      modelRoute: modelRoutes,
       required: true,
     });
     if (!run) throw new FlagshipPipelineError('setup_blocked', 'Required write-run telemetry was not created.');
@@ -162,16 +169,18 @@ export async function writeFlagshipChapter(
       contextSizeChars: context.totalChars,
       contextManifest: context.manifest,
       promptVersion: FLAGSHIP_PROMPT_VERSION,
-      modelRoute: globalThis.__MODEL_ROUTING__ || {},
+      modelRoute: modelRoutes,
     });
 
     const invoke = dependencies.invoke || (async (call: FlagshipModelCall) => {
+      const model = call.role === 'writer' || call.role === 'writer_revision' ? modelRoutes.writer
+        : call.role === 'editor' ? modelRoutes.editor : modelRoutes.director;
       const response = await callGemini(call.userPrompt, {
         model,
         temperature: call.role === 'writer' || call.role === 'writer_revision' ? (options.temperature ?? project.temperature ?? 0.8) : 0.2,
         maxTokens: call.role === 'writer' || call.role === 'writer_revision' ? 32768 : 16384,
         systemPrompt: call.systemPrompt,
-      }, { jsonMode: true, tracking: { projectId: project.id, chapterNumber: nextChapter, task: `flagship_${call.role}` } });
+      }, { jsonMode: true, disableRouting: true, tracking: { projectId: project.id, chapterNumber: nextChapter, task: `flagship_${call.role}` } });
       return response.content;
     });
 
@@ -213,7 +222,7 @@ export async function writeFlagshipChapter(
       p_editor_evidence: generated.editorEvidence,
       p_revision_lineage: generated.revisionLineage,
       p_prompt_version: FLAGSHIP_PROMPT_VERSION,
-      p_model_route: globalThis.__MODEL_ROUTING__ || {},
+      p_model_route: modelRoutes,
     });
     if (commitError) throw new FlagshipPipelineError('commit_failed', commitError.message);
 

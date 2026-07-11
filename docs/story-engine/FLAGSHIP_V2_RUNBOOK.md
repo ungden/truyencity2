@@ -4,30 +4,43 @@ The flagship lane is quality-first and isolated from the legacy fleet. A project
 
 ## Required artifacts
 
-1. `ai_story_projects.story_spec_v2` must validate as `StorySpecV2`, include a unique `storyIdentity`, and have a computed foundation score of at least 8/10 with no dimension below 7.
-2. `ai_story_projects.arc_plan_v2` must validate as `ArcPlanV2` and cover the chapter being written.
-3. `ai_story_projects.story_state_v2` must validate as `StoryStateV2` and match `current_chapter` exactly.
-4. Every next chapter must have `chapter_blueprints.meta.chapterPlanV2`; Director may refine wording but cannot add scene IDs, cast, resources, promises, or state keys.
-5. The project must use `publication_mode = "offline_only"` while artifacts and opening simulations are under review.
-6. Human checkpoints advance in order: `concept` → `story_spec` → `chapter_3` → `chapter_10` → `chapter_30` → `chapter_50`.
+1. `flagship_setup_brief_v2` is authored for one story and must include real domain research. There is no shared genre setup or default brief.
+2. `flagship_concept_tournament_v2` contains 20 generated concepts, lexical duplicate removal, pairwise ranking and three full opening simulations.
+3. A human must persist `flagship_setup_selection_v2`; the engine cannot choose its own winner.
+4. `ai_story_projects.story_spec_v2` must validate as `StorySpecV2`, preserve the selected concept/characters/world exactly, and have a computed foundation score of at least 8/10 with no dimension below 7.
+5. `ai_story_projects.arc_plan_v2` covers only the current 20-30 chapter arc; `story_state_v2` must match `current_chapter` exactly.
+6. Only five rolling `ChapterPlanV2` records may be prepared at a time. There is no fake 1,000-chapter detail map.
+7. Human checkpoints advance in order: `concept` → `story_spec` → `chapter_3` → `chapter_10` → `chapter_30` → `chapter_50`.
 
 ## Safe workflow
 
 ```bash
-npm run flagship:concepts -- --input=/absolute/concepts.json
+# These commands require both flagship migrations to be applied and a paused,
+# unwritten project already marked pipeline_version=flagship_v2.
+npm run flagship:setup:brief -- --project=<uuid> --brief=/absolute/story-specific-brief.json --routes=/absolute/model-routes.json
+npm run flagship:setup:tournament -- --project=<uuid>
+npm run flagship:setup:materialize -- --project=<uuid> --selection=/absolute/human-selection.json
+npm run flagship:setup:approve -- --project=<uuid> --reviewer=<name>
+npm run flagship:write -- --project=<uuid>
+npm run flagship:plan-window -- --project=<uuid>
+npm run flagship:approve-checkpoint -- --project=<uuid> --stage=chapter_3 --reviewer=<name>
+
 npm run flagship:preflight -- --spec=/absolute/story-spec.json --arc=/absolute/arc-plan.json --state=/absolute/story-state.json --plans=/absolute/chapter-plans.json
 npm run flagship:bakeoff -- --ballots=/absolute/blind-ballots.json --candidate-ids=A,B
 npm run flagship:classify-legacy -- --limit=5000
 ```
 
-The preflight and classifier are read-only. The bake-off requires at least ten decisive blind ballots and a winner with at least 65% preference.
+`flagship:preflight` expects only plans 1-5. The preflight and classifier are read-only. The bake-off requires at least ten decisive blind ballots and a winner with at least 65% preference.
+
+`model-routes.json` must contain explicit `setupCreative`, `setupJudge`, `director`, `writer`, `editor`, and `planner` model names. `setupJudge` must differ from `setupCreative`, and `editor` must differ from `writer`. Global model routing is disabled for every flagship call.
 
 Before any flagship project can run against production:
 
 1. Apply `20260711014524_flagship_v2_quality_pipeline.sql` through the normal Supabase migration workflow.
-2. Verify `story_write_runs`, `story_write_checkpoints`, `story_cast_ledger`, `story_resource_ledger`, `story_promise_ledger`, and `story_flagship_reviews` exist and are inaccessible to `anon`/`authenticated`.
-3. Verify the configured writer and independent critic providers are funded and reachable.
-4. Keep all legacy `production_enabled` projects paused.
+2. Apply `20260711044323_flagship_setup_v2.sql` only after authenticating to the intended Supabase project.
+3. Verify telemetry/ledger tables and all flagship setup/planning/approval RPCs exist and are inaccessible to `anon`/`authenticated`.
+4. Verify the explicitly selected model route is funded and reachable.
+5. Keep every legacy project paused. The production cron excludes flagship projects too; pilot writes are manual by project ID.
 
 ## Publication behavior
 
@@ -35,6 +48,7 @@ Before any flagship project can run against production:
 - Each chapter uses Director → Writer → independent Editor. A publish uses three model calls; one evidence-scoped local revision may use a fourth and final call.
 - `routine_soft` and golden fallback are unavailable to flagship projects.
 - There are no cross-story setup fallbacks. Missing story identity, arc plan, prior state, cast ledger, timeline, retrieval, or independent calibration fails closed.
+- Setup is `Concept Lab → pairwise Judge → three Opening Simulators → human selection → Character Designer → Causal World → Launch Architect`. Each role sees only its own input and no legacy prompt.
 - Quality axes never receive default passing scores; every axis must be scored for this exact story by the independent reviewer.
 - A deterministic hard failure rejects the candidate before persistence.
 - A passing deterministic result still needs an independent calibrated review.
