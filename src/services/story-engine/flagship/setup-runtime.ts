@@ -44,7 +44,7 @@ function modelInvoker(project: SetupProjectRow, projectId: string) {
     try {
       const response = await callGemini(call.userPrompt, {
         model: call.role === 'concept_judge' ? routes.setupJudge : routes.setupCreative,
-        temperature: call.role === 'opening_simulator' ? 0.9 : 0.35,
+        temperature: call.role === 'opening_simulator' ? 0.7 : 0.35,
         maxTokens: call.role === 'opening_simulator' ? 32768 : 24576,
         systemPrompt: call.systemPrompt,
       }, { jsonMode: true, disableRouting: true, tracking: { projectId, task: `flagship_setup_${call.role}` } });

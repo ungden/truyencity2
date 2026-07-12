@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 2,
+  "usage": "upstream_concept_lab_only",
+  "mustNeverReachWriter": true,
+  "cards": [
+    {
+      "id": "coastal-era-rebirth",
+      "readerPromise": "Biết sớm hơn người khác, làm thật và nhìn gia đình khá lên từng nấc.",
+      "rewardLoop": "Nhận ra cơ hội -> lao động/chế biến -> bán -> tái đầu tư -> gia đình hưởng lợi.",
+      "collapseRisk": "Ký ức chính xác tuyệt đối, tài nguyên vô hạn hoặc lặp bán một loại hàng."
+    },
+    {
+      "id": "two-world-trade",
+      "readerPromise": "Dùng chênh lệch giá trị giữa hai thế giới để giải bài toán của cả hai bên.",
+      "rewardLoop": "Phát hiện nhu cầu -> vận chuyển có giới hạn -> giao dịch -> hậu quả giá và quyền lực.",
+      "collapseRisk": "Lặp mì gói đổi báu vật, bỏ qua logistics và tác động thị trường."
+    },
+    {
+      "id": "heiress-counterplot",
+      "readerPromise": "Biết trước kịch bản, rời quan hệ độc hại và tự xây địa vị khiến sự thật quay lại.",
+      "rewardLoop": "Nhận diện bẫy -> giữ quyền lựa chọn -> xây giá trị -> hậu quả xã hội lộ ra.",
+      "collapseRisk": "Gia đình ác vô cớ, hành hạ dài hoặc chỉ chờ nam chính cứu."
+    },
+    {
+      "id": "villain-breaks-script",
+      "readerPromise": "Thoát điểm chết trong nguyên tác bằng cách từ chối vai trò đã được gán.",
+      "rewardLoop": "Biết điểm chết -> đổi lựa chọn -> canon lệch -> lợi thế cũ mất dần.",
+      "collapseRisk": "Biết hết mọi thứ và thắng mà không trả chi phí cho butterfly effect."
+    },
+    {
+      "id": "entertainment-career",
+      "readerPromise": "Năng lực sáng tạo được công nhận qua từng dự án và phản ứng công chúng có nguyên nhân.",
+      "rewardLoop": "Tạo sản phẩm -> phát hành -> phản hồi -> cơ hội nghề nghiệp -> dự án lớn hơn.",
+      "collapseRisk": "Đạo văn kho tác phẩm Trái Đất, khán giả chỉ biết kinh ngạc và đối thủ tự hủy."
+    },
+    {
+      "id": "healing-parent",
+      "readerPromise": "Nuôi một đứa trẻ và dựng lại mái nhà trong khi sự nghiệp tiến lên vừa đủ.",
+      "rewardLoop": "Vấn đề chăm sóc -> hành động ấm áp -> trẻ thay đổi -> gia đình/sự nghiệp mở ra.",
+      "collapseRisk": "Đứa trẻ chỉ làm máy bán manh hoặc giàu lên nhờ thân phận người còn lại."
+    }
+  ]
+}

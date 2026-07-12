@@ -25,6 +25,7 @@
     "flagship:classify-legacy": "node --import tsx scripts/classify-legacy-stories.ts",
     "flagship:setup:tournament": "node --import tsx scripts/flagship-setup-tournament.ts",
     "flagship:create-pilot": "node --import tsx scripts/flagship-create-pilot.ts",
+    "flagship:reject-pilot": "node --import tsx scripts/flagship-reject-pilot.ts",
     "flagship:setup:brief": "node --import tsx scripts/flagship-setup-install-brief.ts",
     "flagship:setup:materialize": "node --import tsx scripts/flagship-setup-materialize.ts",
     "flagship:setup:approve": "node --import tsx scripts/flagship-setup-approve.ts",

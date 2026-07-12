@@ -9,6 +9,7 @@ import {
   FlagshipLaunchPackV2Schema,
   HumanConceptSelectionV2Schema,
   OpeningTrialV2Schema,
+  OpeningTrialTransportV2Schema,
   type ConceptCandidateV2,
   type ConceptTournamentArtifactV2,
   type FlagshipLaunchPackV2,
@@ -31,7 +32,7 @@ import {
   buildOpeningSimulationPrompt,
 } from './setup-prompts';
 import { conceptSimilarity } from './concept-tournament';
-import { validateChapterPlanSemantics } from './contracts';
+import { validateChapterPlanSemantics, validatePleasureWindow } from './contracts';
 
 export type FlagshipSetupRole = 'concept_lab' | 'concept_judge' | 'opening_simulator' | 'character_designer' | 'causal_world' | 'launch_architect';
 
@@ -126,7 +127,14 @@ export async function generateConceptTournamentV2(
   const byId = new Map(deduped.unique.map(candidate => [candidate.id, candidate]));
   const openings = await Promise.all(ranking.finalistIds.map(async candidateId => {
     const candidate = byId.get(candidateId)!;
-    const trial = parseJson(await invoke({ role: 'opening_simulator', candidateId, systemPrompt: OPENING_SIMULATOR_SYSTEM, userPrompt: buildOpeningSimulationPrompt(brief, candidate), jsonMode: true }), OpeningTrialV2Schema, `Opening Simulator ${candidateId}`);
+    const transport = parseJson(await invoke({ role: 'opening_simulator', candidateId, systemPrompt: OPENING_SIMULATOR_SYSTEM, userPrompt: buildOpeningSimulationPrompt(brief, candidate), jsonMode: true }), OpeningTrialTransportV2Schema, `Opening Simulator ${candidateId}`);
+    const trial = OpeningTrialV2Schema.parse({
+      ...transport,
+      chapters: transport.chapters.map(({ proseParagraphs, ...chapter }) => ({
+        ...chapter,
+        prose: proseParagraphs.join('\n\n'),
+      })),
+    });
     if (trial.candidateId !== candidateId) throw new FlagshipSetupError('setup_blocked', `Opening Simulator changed candidate identity from ${candidateId} to ${trial.candidateId}.`);
     return trial;
   }));
@@ -173,6 +181,7 @@ export async function materializeFlagshipLaunchPackV2(input: {
   if (launchPack.selectedConceptId !== selection.candidateId) throw new FlagshipSetupError('setup_blocked', 'Launch Architect changed the human-selected concept.');
   const identityChanges: string[] = [];
   if (launchPack.storySpec.title !== candidate.workingTitle) identityChanges.push('title');
+  if (JSON.stringify(launchPack.storySpec.pleasureProfile) !== JSON.stringify(input.brief.pleasureProfile)) identityChanges.push('pleasureProfile');
   if (launchPack.storySpec.readerFantasy !== candidate.readerFantasy) identityChanges.push('readerFantasy');
   if (launchPack.storySpec.premise !== candidate.premise) identityChanges.push('premise');
   if (JSON.stringify(launchPack.storySpec.protagonist) !== JSON.stringify(characters.protagonist)) identityChanges.push('protagonist');
@@ -189,6 +198,7 @@ export async function materializeFlagshipLaunchPackV2(input: {
   }
 
   const planIssues = launchPack.rollingChapterPlans.flatMap((plan, index) => validateChapterPlanSemantics(plan).map(issue => ({ ...issue, path: `rollingChapterPlans.${index}.${issue.path}` })));
+  planIssues.push(...validatePleasureWindow(launchPack.rollingChapterPlans, launchPack.storySpec.pleasureProfile));
   if (planIssues.length) throw new FlagshipSetupError('setup_blocked', 'Launch Architect returned inert scenes or unchanged chapter state.', planIssues);
   const foundationScore = computeFoundationScoreV2(launchPack.storySpec);
   if (!foundationScore.passed) throw new FlagshipSetupError('setup_blocked', 'Computed foundation score did not pass.', foundationScore);

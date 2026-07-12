@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ArcPlanV2Schema, ChapterPlanV2Schema, StorySpecV2ObjectSchema, StorySpecV2Schema, StoryStateV2Schema } from './contracts';
+import { ArcPlanV2Schema, ChapterPlanV2Schema, PleasureProfileV2Schema, StorySpecV2ObjectSchema, StorySpecV2Schema, StoryStateV2Schema } from './contracts';
 
 const concrete = z.string().trim().min(20);
 const named = z.string().trim().min(2);
@@ -12,6 +12,7 @@ export const FlagshipSetupBriefV2Schema = z.object({
   audience: concrete,
   desiredExperience: concrete,
   domain: concrete,
+  pleasureProfile: PleasureProfileV2Schema,
   boundaries: z.array(concrete).min(3).max(12),
   researchNotes: z.array(z.object({ source: concrete, finding: concrete }).strict()).min(3).max(20),
   seedConstraints: z.array(concrete).max(10),
@@ -62,8 +63,28 @@ export const OpeningChapterTrialV2Schema = z.object({
   causalStateChange: concrete,
   requiredPlanAnchor: concrete,
   protagonistChoice: concrete,
+  agencyMove: concrete,
+  earnedReward: concrete,
+  materialProgression: concrete,
+  comfortPayoff: concrete,
   costPaid: concrete,
   exitPressure: concrete,
+}).strict();
+
+export const OpeningChapterTransportV2Schema = OpeningChapterTrialV2Schema.omit({ prose: true }).extend({
+  proseParagraphs: z.array(z.string().trim().min(40).max(600)).min(8).max(20),
+}).strict().superRefine((chapter, ctx) => {
+  if (chapter.proseParagraphs.join('\n\n').length < 1200) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['proseParagraphs'], message: 'Opening prose paragraphs must total at least 1200 characters.' });
+  }
+});
+
+export const OpeningTrialTransportV2Schema = z.object({
+  schemaVersion: z.literal(2),
+  candidateId: conceptId,
+  chapters: z.array(OpeningChapterTransportV2Schema).length(3),
+  continuityDigest: concrete,
+  unresolvedPressure: concrete,
 }).strict();
 
 export const OpeningTrialV2Schema = z.object({
@@ -171,6 +192,7 @@ export type ConceptCandidateV2 = z.infer<typeof ConceptCandidateV2Schema>;
 export type ConceptBatchV2 = z.infer<typeof ConceptBatchV2Schema>;
 export type ConceptRankingV2 = z.infer<typeof ConceptRankingV2Schema>;
 export type OpeningTrialV2 = z.infer<typeof OpeningTrialV2Schema>;
+export type OpeningTrialTransportV2 = z.infer<typeof OpeningTrialTransportV2Schema>;
 export type ConceptTournamentArtifactV2 = z.infer<typeof ConceptTournamentArtifactV2Schema>;
 export type HumanConceptSelectionV2 = z.infer<typeof HumanConceptSelectionV2Schema>;
 export type CharacterDesignV2 = z.infer<typeof CharacterDesignV2Schema>;

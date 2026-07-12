@@ -20,7 +20,8 @@ import { evaluateFlagshipQuality, type QualityEvidenceV2, type QualityVerdictV2 
 
 const AXIS_KEYS = [
   'premise_interest', 'character_voice', 'scene_tension', 'causal_surprise',
-  'emotional_movement', 'domain_truth', 'prose_naturalness', 'desire_to_read_next',
+  'emotional_movement', 'domain_truth', 'prose_naturalness', 'agency',
+  'earned_pleasure', 'recovery_pacing', 'desire_to_read_next',
 ] as const;
 
 const WriterOutputSchema = z.object({

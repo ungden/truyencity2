@@ -10,6 +10,9 @@ export type QualityAxisV2 =
   | 'emotional_movement'
   | 'domain_truth'
   | 'prose_naturalness'
+  | 'agency'
+  | 'earned_pleasure'
+  | 'recovery_pacing'
   | 'desire_to_read_next';
 
 export interface QualityEvidenceV2 {
@@ -40,7 +43,8 @@ export interface QualityVerdictV2 {
 
 const AXES: QualityAxisV2[] = [
   'premise_interest', 'character_voice', 'scene_tension', 'causal_surprise',
-  'emotional_movement', 'domain_truth', 'prose_naturalness', 'desire_to_read_next',
+  'emotional_movement', 'domain_truth', 'prose_naturalness', 'agency',
+  'earned_pleasure', 'recovery_pacing', 'desire_to_read_next',
 ];
 
 const HARD_LEAKS: Array<[string, RegExp]> = [

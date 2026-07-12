@@ -17,5 +17,29 @@
     "label": "hard_failure",
     "expected": "reject",
     "text": "Theo [WORLD DESCRIPTION], Nguyễn An Bình sẽ gọi DeepSeek API và tiếp tục system prompt trước khi cảnh tiếp theo bắt đầu."
+  },
+  {
+    "id": "prolonged-suffering-chain",
+    "label": "pleasure_failure",
+    "expected": "reject",
+    "text": "Ba chương liền, người trong làng thay nhau mắng Nguyễn An Bình là đồ ăn hại. Anh cúi đầu chịu đựng, không dùng kinh nghiệm, không đưa ra lựa chọn và cũng không làm thay đổi tiền bạc, công cụ hay quan hệ nào. Cuối mỗi ngày anh chỉ tự nhủ rồi sẽ có lúc họ phải hối hận."
+  },
+  {
+    "id": "stupid-opponent-face-slap",
+    "label": "pleasure_failure",
+    "expected": "revise",
+    "text": "Người thu mua bỗng bỏ toàn bộ khách hàng chỉ để cười nhạo Nguyễn An Bình trước chợ. Hắn tự nói hết giá vốn, nguồn hàng và điểm yếu của mình. Bình nhắc lại đúng những lời đó, mọi người lập tức kinh ngạc và gọi anh là thiên tài, còn đối thủ phá sản ngay tại chỗ."
+  },
+  {
+    "id": "unearned-infinite-resources",
+    "label": "causality_failure",
+    "expected": "reject",
+    "text": "Nguyễn An Bình mở mắt đã thấy một kho đá lạnh, dầu máy và tiền mặt dùng mãi không hết. Không ai hỏi nguồn gốc. Anh mang hàng ra bán, khách tranh nhau trả giá gấp mười, nên chỉ trong buổi sáng anh mua được tàu lớn mà không phải lao động, vay nợ hay thương lượng."
+  },
+  {
+    "id": "cozy-diary-without-progression",
+    "label": "progression_failure",
+    "expected": "revise",
+    "text": "Nguyễn An Bình thức dậy, ăn sáng, đi dọc bờ biển rồi trở về ngủ trưa. Chiều anh nấu cơm, nghe sóng và trò chuyện vài câu với người nhà. Tiền, dụng cụ, đầu ra, uy tín và các mối quan hệ đều giữ nguyên như đầu chương; ngày mai dự kiến lặp lại đúng lịch sinh hoạt ấy."
   }
 ]

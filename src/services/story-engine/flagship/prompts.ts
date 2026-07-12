@@ -1,11 +1,12 @@
 import type { ArcPlanV2, ChapterPlanV2, StorySpecV2, StoryStateV2 } from './contracts';
 import type { QualityEvidenceV2 } from './quality-verdict';
 
-export const FLAGSHIP_PROMPT_VERSION = 'flagship-clean-v2.2';
+export const FLAGSHIP_PROMPT_VERSION = 'flagship-clean-v2.3-pleasure';
 
 export const DIRECTOR_SYSTEM = `Bạn là Scene Director của đúng một bộ truyện.
 Chỉ khóa kế hoạch chương đã được chuẩn bị; không viết văn xuôi, không tạo canon mới, không dùng trope hay luật thể loại mặc định.
 Mọi scene phải có ham muốn, lực cản, chiến thuật, cái giá và thay đổi không thể đảo ngược.
+Giữ nhịp hồi phục, vòng thưởng và tiến bộ đúng pleasureProfile của truyện; không kéo dài bất lực quá setbackRecoveryWindow.
 Giữ nguyên schema ChapterPlanV2 và chỉ trả JSON.`;
 
 export const WRITER_SYSTEM = `Bạn là tiểu thuyết gia viết đúng một chương theo kernel riêng được cung cấp.
@@ -14,7 +15,8 @@ Không tự tạo cứu viện, tài sản, quyền lực, ký ức hay setup. K
 Viết tiếng Việt tự nhiên, cụ thể qua hành động, đối thoại và hậu quả. Chỉ trả JSON {"title":"...","content":"..."}.`;
 
 export const EDITOR_SYSTEM = `Bạn là biên tập viên độc lập. Không viết lại chương và không thưởng cho việc đủ checklist.
-Đánh giá bằng bằng chứng nằm trong văn bản: canon, timeline, tri thức nhân vật, quyền hạn, nhân quả tài nguyên, fidelity với plan, giọng nhân vật, căng thẳng cảnh, chuyển động cảm xúc, sự thật ngành nghề, độ tự nhiên và nhu cầu đọc tiếp.
+Đánh giá bằng bằng chứng nằm trong văn bản: canon, timeline, tri thức nhân vật, quyền hạn, nhân quả tài nguyên, fidelity với plan, giọng nhân vật, căng thẳng cảnh, chuyển động cảm xúc, sự thật ngành nghề, độ tự nhiên, agency, phần thưởng kiếm được, nhịp hồi phục và nhu cầu đọc tiếp.
+Hạ điểm nếu người xung quanh chỉ kinh ngạc, đối thủ tự ngu để bị phản đòn, hoặc nhân vật chính chịu dồn khổ mà không tạo thay đổi trạng thái.
 Mỗi lỗi phải có start/end/excerpt. Chỉ trả JSON đúng schema được yêu cầu.`;
 
 function json(value: unknown): string {
@@ -46,6 +48,7 @@ export function buildWriterPrompt(input: {
 }): string {
   const voiceContract = {
     storyIdentity: input.storySpec.storyIdentity,
+    pleasureProfile: input.storySpec.pleasureProfile,
     readerFantasy: input.storySpec.readerFantasy,
     premise: input.storySpec.premise,
     protagonist: input.storySpec.protagonist,
@@ -71,16 +74,16 @@ export function buildEditorPrompt(input: {
   content: string;
 }): string {
   return `Đánh giá độc lập chương ${input.chapterPlan.chapterNumber}.
-Hard gates là boolean. Tám trục chấm 0-10. publish chỉ khi mọi hard gate đạt, mọi trục >=7.5 và confidence >=0.65.
+Hard gates là boolean. Mười một trục chấm 0-10. publish chỉ khi mọi hard gate đạt, mọi trục >=7.5 và confidence >=0.65.
 revise khi lỗi có thể sửa đúng một lượt; reject khi mâu thuẫn nền tảng hoặc bản sửa vẫn không đạt.
 
-CANON=${json({ protagonist: input.storySpec.protagonist, cast: input.storySpec.cast, rules: input.storySpec.causalWorldRules, economy: input.storySpec.resourceEconomy })}
+CANON=${json({ protagonist: input.storySpec.protagonist, cast: input.storySpec.cast, rules: input.storySpec.causalWorldRules, economy: input.storySpec.resourceEconomy, pleasureProfile: input.storySpec.pleasureProfile })}
 STATE=${json(input.storyState)}
 PLAN=${json(input.chapterPlan)}
 TITLE=${json(input.title)}
 PROSE=${json(input.content)}
 
-Trả JSON: {"decision":"publish|revise|reject","confidence":0-1,"planFidelity":number,"hardGates":{"canon":boolean,"timeline":boolean,"resourceCausality":boolean,"characterKnowledge":boolean,"authority":boolean,"promptLeak":boolean,"planFidelity":boolean},"axes":{"premise_interest":number,"character_voice":number,"scene_tension":number,"causal_surprise":number,"emotional_movement":number,"domain_truth":number,"prose_naturalness":number,"desire_to_read_next":number},"evidence":[{"code":string,"severity":"critical|major|moderate","message":string,"start":number,"end":number,"excerpt":string}],"revisionInstructions":[string]}.`;
+Trả JSON: {"decision":"publish|revise|reject","confidence":0-1,"planFidelity":number,"hardGates":{"canon":boolean,"timeline":boolean,"resourceCausality":boolean,"characterKnowledge":boolean,"authority":boolean,"promptLeak":boolean,"planFidelity":boolean},"axes":{"premise_interest":number,"character_voice":number,"scene_tension":number,"causal_surprise":number,"emotional_movement":number,"domain_truth":number,"prose_naturalness":number,"agency":number,"earned_pleasure":number,"recovery_pacing":number,"desire_to_read_next":number},"evidence":[{"code":string,"severity":"critical|major|moderate","message":string,"start":number,"end":number,"excerpt":string}],"revisionInstructions":[string]}.`;
 }
 
 export function buildRevisionPrompt(input: {
@@ -95,7 +98,7 @@ export function buildRevisionPrompt(input: {
   return `Sửa đúng một lượt chương ${input.chapterPlan.chapterNumber}. Giữ nguyên mọi beat và sự kiện đã đúng; chỉ sửa các lỗi có evidence dưới đây.
 Không thêm setup, nhân vật, nguồn lực hoặc twist mới.
 
-VOICE=${json({ protagonist: input.storySpec.protagonist, cast: input.storySpec.cast, storyIdentity: input.storySpec.storyIdentity })}
+VOICE=${json({ protagonist: input.storySpec.protagonist, cast: input.storySpec.cast, storyIdentity: input.storySpec.storyIdentity, pleasureProfile: input.storySpec.pleasureProfile })}
 STATE=${json(input.storyState)}
 PLAN=${json(input.chapterPlan)}
 CURRENT=${json({ title: input.title, content: input.content })}

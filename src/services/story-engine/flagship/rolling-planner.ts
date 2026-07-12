@@ -2,7 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { classifyStoryFailure } from '@/lib/story-production-quota';
 import { callGemini } from '../utils/gemini';
 import { getSupabase } from '../utils/supabase';
-import { parseArcPlanV2, parseStorySpecV2, parseStoryStateV2, validateChapterPlanSemantics } from './contracts';
+import { parseArcPlanV2, parseStorySpecV2, parseStoryStateV2, validateChapterPlanSemantics, validatePleasureWindow, type PleasureProfileV2 } from './contracts';
 import { RollingPlanWindowV2Schema, type RollingPlanWindowV2 } from './setup-contracts';
 import { FlagshipSetupError } from './setup';
 import { finishFlagshipSetupRun, startFlagshipSetupRun } from './setup-ledger';
@@ -17,11 +17,12 @@ Không dùng outline, template hay genre playbook legacy. Chỉ trả JSON đún
 const json = (value: unknown) => JSON.stringify(value);
 
 export function buildRollingPlannerPrompt(input: { storySpec: unknown; arcPlan: unknown; storyState: unknown; startChapter: number }): string {
-  return `STORY_KERNEL=${json(input.storySpec)}\nARC=${json(input.arcPlan)}\nCOMMITTED_STATE=${json(input.storyState)}\nSTART_CHAPTER=${input.startChapter}\n\nChỉ dùng promise đến hạn và xung đột đang active. Trả năm plan từ chương ${input.startChapter} đến ${input.startChapter + 4}.`;
+  return `STORY_KERNEL=${json(input.storySpec)}\nARC=${json(input.arcPlan)}\nCOMMITTED_STATE=${json(input.storyState)}\nSTART_CHAPTER=${input.startChapter}\n\nChỉ dùng promise đến hạn và xung đột đang active. Trong năm chương phải có ít nhất hai payoff năng lực kiếm được, một payoff đời sống đúng comfortLoop và một bước tiến cụ thể trong progressionSignals. Áp lực không được giữ nhân vật chính bất lực lâu hơn setbackRecoveryWindow. Nếu là cửa sổ 1-5: chương 1 phải có hành động chủ động dùng advantage và chậm nhất chương 3 phải đổi một resource bằng thành quả vật chất. Trả năm plan từ chương ${input.startChapter} đến ${input.startChapter + 4}.`;
 }
 
-export function validateRollingPlanWindow(window: RollingPlanWindowV2): void {
+export function validateRollingPlanWindow(window: RollingPlanWindowV2, pleasureProfile?: PleasureProfileV2): void {
   const issues = window.plans.flatMap((plan, index) => validateChapterPlanSemantics(plan).map(issue => ({ ...issue, path: `plans.${index}.${issue.path}` })));
+  if (pleasureProfile) issues.push(...validatePleasureWindow(window.plans, pleasureProfile));
   if (issues.length) throw new FlagshipSetupError('setup_blocked', 'Rolling planner returned inert scenes.', issues);
 }
 
@@ -69,7 +70,7 @@ export async function planNextFlagshipWindowForProject(
     const parsed = RollingPlanWindowV2Schema.safeParse(value);
     if (!parsed.success) throw new FlagshipSetupError('setup_blocked', 'Rolling planner violated its typed contract.', parsed.error.issues);
     if (parsed.data.startChapter !== startChapter) throw new FlagshipSetupError('setup_blocked', 'Rolling planner changed requested window identity.');
-    validateRollingPlanWindow(parsed.data);
+    validateRollingPlanWindow(parsed.data, spec.data.pleasureProfile);
     const { error: commitError } = await db.rpc('commit_flagship_rolling_window_v2', { p_project_id: projectId, p_expected_current_chapter: startChapter - 1, p_window: parsed.data });
     if (commitError) throw new FlagshipSetupError('setup_blocked', `Could not commit rolling plans: ${commitError.message}`);
     await finishFlagshipSetupRun({ db, runId, status: 'saved', callRoles: ['rolling_planner'], artifact: parsed.data });

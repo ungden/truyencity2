@@ -9,6 +9,10 @@ import {
   buildDirectorPrompt,
   buildEditorPrompt,
   buildWriterPrompt,
+  buildCharacterDesignPrompt,
+  buildCausalWorldPrompt,
+  buildLaunchPackPrompt,
+  buildOpeningSimulationPrompt,
   canPublishFlagshipChapter,
   classifyLegacyProject,
   computeFoundationScoreV2,
@@ -22,6 +26,7 @@ import {
   FlagshipSetupBriefV2Schema,
   HumanConceptSelectionV2Schema,
   validateRollingPlanWindow,
+  validatePleasureWindow,
   FlagshipModelRoutesV2Schema,
   scoreBlindBakeoff,
   validateChapterPlanSemantics,
@@ -60,6 +65,21 @@ function spec(): StorySpecV2 {
         long('Dễ giống mô-típ đối thủ chuỗi lớn theo dõi quán nhỏ'),
         long('Dễ biến nhân vật phụ thành khách hàng chỉ biết khen MC'),
       ],
+    },
+    pleasureProfile: {
+      realityMode: 'fictionalized',
+      advantage: long('Bình biết trước nhịp hao hụt và nhu cầu giao lạnh nhờ kinh nghiệm nghề nghiệp đã trả giá'),
+      knowledgeLimit: long('Ký ức chỉ cho xu hướng và kỹ thuật, không cho con số chính xác hay cứu viện tự động'),
+      primaryRewardLoop: [
+        long('Phát hiện một lô hàng hoặc nhu cầu bị đánh giá sai'),
+        long('Dùng tay nghề và số liệu để tạo phương án có thể kiểm chứng'),
+        long('Thương lượng nghĩa vụ và tự trả chi phí thực hiện'),
+        long('Thu lợi rồi biến lợi ích thành tài sản hoặc quan hệ bền hơn'),
+      ],
+      comfortLoop: [long('Bữa cơm gia đình đủ món sau một ngày lao động có kết quả'), long('Người nhà bớt một khoản lo và cùng sửa lại căn nhà cũ')],
+      setbackRecoveryWindow: 2,
+      faceSlapPolicy: long('Chỉ phản đòn người đã hành động vì lợi ích cụ thể; kết quả phải đến từ bằng chứng và năng lực'),
+      progressionSignals: ['tiền mặt', 'dụng cụ', 'đầu ra', 'uy tín', 'bữa cơm gia đình'],
     },
     readerFantasy: long('Độc giả theo dõi một người chủ kho nhỏ thắng bằng số liệu và uy tín'),
     premise: long('Nguyễn An Bình cứu kho thực phẩm gia đình khỏi chuỗi phân phối lớn'),
@@ -242,7 +262,11 @@ describe('flagship context and prompts', () => {
     expect(director).not.toContain('PROSE=');
     expect(writer).not.toContain('hardGates');
     expect(writer).not.toContain('revisionInstructions');
+    expect(writer).toContain('pleasureProfile');
+    expect(writer).not.toContain('two-world-trade');
+    expect(writer).not.toContain('heiress-counterplot');
     expect(editor).not.toContain('forbiddenGenericMoves');
+    expect(editor).toContain('earned_pleasure');
   });
 });
 
@@ -257,7 +281,7 @@ describe('golden corpus quality gate', () => {
       storySpec: spec(),
       chapterPlan: plan(),
       planFidelityScore: 8,
-      calibrated: { source: 'golden_corpus', confidence: 0.9, scores: { premise_interest: 5, character_voice: 4, scene_tension: 3, causal_surprise: 3, emotional_movement: 4, domain_truth: 2, prose_naturalness: 4, desire_to_read_next: 4 } },
+      calibrated: { source: 'golden_corpus', confidence: 0.9, scores: { premise_interest: 5, character_voice: 4, scene_tension: 3, causal_surprise: 3, emotional_movement: 4, domain_truth: 2, prose_naturalness: 4, agency: 3, earned_pleasure: 2, recovery_pacing: 3, desire_to_read_next: 4 } },
       editorEvidence: [{ code: 'fake_watch', severity: 'major', message: 'Đối thủ chỉ đứng nhìn để giả tạo căng thẳng, không có hành động nhân quả.', start: content.indexOf('một người đàn ông'), end: content.indexOf('một người đàn ông') + 'một người đàn ông đứng đó'.length, excerpt: 'một người đàn ông đứng đó' }],
       hardGates: { canon: true, timeline: true, resourceCausality: true, characterKnowledge: true, authority: true, promptLeak: true, planFidelity: true },
     });
@@ -280,10 +304,19 @@ describe('golden corpus quality gate', () => {
     expect(verdict.axes.premise_interest).toBe(0);
     expect(verdict.evidence.map(item => item.code)).toContain('story_specific_calibration_missing');
   });
+
+  it('covers the four pleasure-first failure modes in the golden corpus', () => {
+    expect(corpus.map(item => item.id)).toEqual(expect.arrayContaining([
+      'prolonged-suffering-chain',
+      'stupid-opponent-face-slap',
+      'unearned-infinite-resources',
+      'cozy-diary-without-progression',
+    ]));
+  });
 });
 
 describe('flagship rollout policy', () => {
-  const publishVerdict = { version: 2 as const, decision: 'publish' as const, confidence: 0.8, hardGatePassed: true, planFidelity: 9, axes: Object.fromEntries(['premise_interest','character_voice','scene_tension','causal_surprise','emotional_movement','domain_truth','prose_naturalness','desire_to_read_next'].map(axis => [axis, 8])) as any, evidence: [], calibratedBy: 'human_blind_review' as const };
+  const publishVerdict = { version: 2 as const, decision: 'publish' as const, confidence: 0.8, hardGatePassed: true, planFidelity: 9, axes: Object.fromEntries(['premise_interest','character_voice','scene_tension','causal_surprise','emotional_movement','domain_truth','prose_naturalness','agency','earned_pleasure','recovery_pacing','desire_to_read_next'].map(axis => [axis, 8])) as any, evidence: [], calibratedBy: 'human_blind_review' as const };
 
   it('never enables a soft gate', () => {
     expect(getFlagshipPublicationPolicy({ pipeline_version: 'flagship_v2' }).allowSoftGate).toBe(false);
@@ -314,7 +347,7 @@ describe('flagship migration contract', () => {
 });
 
 describe('clean flagship runtime boundary and call budget', () => {
-  const axes = Object.fromEntries(['premise_interest','character_voice','scene_tension','causal_surprise','emotional_movement','domain_truth','prose_naturalness','desire_to_read_next'].map(key => [key, 8.5]));
+  const axes = Object.fromEntries(['premise_interest','character_voice','scene_tension','causal_surprise','emotional_movement','domain_truth','prose_naturalness','agency','earned_pleasure','recovery_pacing','desire_to_read_next'].map(key => [key, 8.5]));
   const hardGates = { canon: true, timeline: true, resourceCausality: true, characterKnowledge: true, authority: true, promptLeak: true, planFidelity: true };
   const publishableContent = () => {
     const sceneText = plan().scenes.flatMap(scene => Object.values(scene)).join(' ');
@@ -416,6 +449,7 @@ describe('isolated flagship setup v2', () => {
     audience: long('Độc giả Việt trưởng thành thích quyết định kinh doanh có hậu quả'),
     desiredExperience: long('Căng thẳng đến từ thương lượng, dòng tiền và lòng tin thay đổi'),
     domain: long('Chuỗi lạnh thực phẩm, kho vận và hợp tác xã tiểu thương tại Việt Nam'),
+    pleasureProfile: spec().pleasureProfile,
     boundaries: [long('Không có hệ thống cộng điểm'), long('Không có cứu viện bí ẩn'), long('Không biến đối thủ thành bia mặt')],
     researchNotes: [0, 1, 2].map(index => ({ source: long(`Chứng từ và phỏng vấn nguồn độc lập số ${index}`), finding: long(`Quy trình ngành nghề tạo chi phí kiểm chứng số ${index}`) })),
     seedConstraints: [],
@@ -449,12 +483,27 @@ describe('isolated flagship setup v2', () => {
       causalStateChange: long(`Giao dịch chương ${chapterNumber} đổi quyền kiểm soát và nghĩa vụ giao hàng`),
       requiredPlanAnchor: long(`Mỏ neo opening chương ${chapterNumber} phải được giữ nguyên trong kế hoạch`),
       protagonistChoice: long(`Nhân vật chọn nhận nghĩa vụ thay vì chờ một cứu viện ở chương ${chapterNumber}`),
+      agencyMove: long(`Nhân vật chủ động dùng lợi thế nghề nghiệp để đổi tình thế ở chương ${chapterNumber}`),
+      earnedReward: long(`Thành quả chương ${chapterNumber} đến từ lao động và thương lượng có bằng chứng`),
+      materialProgression: long(`Tiền mặt hoặc dụng cụ của gia đình tăng lên cụ thể ở chương ${chapterNumber}`),
+      comfortPayoff: long(`Bữa cơm gia đình bớt thiếu thốn nhờ thành quả ở chương ${chapterNumber}`),
       costPaid: long(`Nhân vật mất tiền, thời gian hoặc lòng tin đã ghi nhận ở chương ${chapterNumber}`),
       exitPressure: long(`Hậu quả chương ${chapterNumber} đặt ra hạn chót cụ thể cho chương tiếp theo`),
     })),
     continuityDigest: long('Ba chương nối nhau bằng nghĩa vụ, dòng tiền và quyền đặt xe thay đổi'),
     unresolvedPressure: long('Kho phải giao đúng giờ trong khi quyền điều phối xe đang thuộc về cộng sự'),
   });
+
+  const openingTransportFor = (candidateId: string) => {
+    const opening = openingFor(candidateId);
+    return {
+      ...opening,
+      chapters: opening.chapters.map(({ prose: _prose, ...chapter }) => ({
+        ...chapter,
+        proseParagraphs: Array.from({ length: 10 }, (_, index) => long(`Đoạn ${index} cho thấy nhân vật hành động, trả giá và nhận thành quả cụ thể trong cảnh`)),
+      })),
+    };
+  };
 
   it('runs 20 concepts, independent pairwise ranking and three openings in five calls', async () => {
     const ranking = {
@@ -466,11 +515,12 @@ describe('isolated flagship setup v2', () => {
     const result = await generateConceptTournamentV2(brief, { invoke: async call => {
       if (call.role === 'concept_lab') return JSON.stringify({ schemaVersion: 2, candidates: concepts });
       if (call.role === 'concept_judge') return JSON.stringify(ranking);
-      return JSON.stringify(openingFor(call.candidateId!));
+      return JSON.stringify(openingTransportFor(call.candidateId!));
     } });
     expect(result.callRoles).toEqual(['concept_lab', 'concept_judge', 'opening_simulator', 'opening_simulator', 'opening_simulator']);
     expect(result.artifact.openings).toHaveLength(3);
     expect(result.artifact.status).toBe('awaiting_human_selection');
+    expect(buildOpeningSimulationPrompt(brief, concepts[0])).toContain('proseParagraphs');
   });
 
   it('materializes only a human-selected finalist and preserves immutable artifacts', async () => {
@@ -497,7 +547,7 @@ describe('isolated flagship setup v2', () => {
     let before = { marker: 'state-0' };
     const plans = [1, 2, 3, 4, 5].map(chapterNumber => {
       const next = { marker: `state-${chapterNumber}` };
-      const value = { ...plan(), chapterNumber, chapterPromise: chapterNumber <= 3 ? opening.chapters[chapterNumber - 1].requiredPlanAnchor : long(`Kế hoạch chương ${chapterNumber} tiếp tục hậu quả từ cửa sổ trước`), stateBefore: before, stateAfter: next, scenes: plan().scenes.map((scene, index) => ({ ...scene, id: `scene_${chapterNumber}_${index}` })) };
+      const value = { ...plan(), chapterNumber, chapterPromise: chapterNumber <= 3 ? opening.chapters[chapterNumber - 1].requiredPlanAnchor : long(`Kế hoạch chương ${chapterNumber} tiếp tục hậu quả từ cửa sổ trước`), stateBefore: before, stateAfter: next, scenes: plan().scenes.map((scene, index) => ({ ...scene, id: `scene_${chapterNumber}_${index}`, payoff: chapterNumber === 5 && index === 1 ? long('Bữa cơm gia đình đủ món và người nhà cùng sửa lại căn nhà cũ') : scene.payoff })) };
       before = next;
       return value;
     });
@@ -510,7 +560,22 @@ describe('isolated flagship setup v2', () => {
     expect(result.callRoles).toEqual(['character_designer', 'causal_world', 'launch_architect']);
     expect(result.foundationScore.passed).toBe(true);
     expect(result.launchPack.storySpec.premise).toBe(selected.premise);
-    expect(() => validateRollingPlanWindow({ schemaVersion: 2, startChapter: 1, endChapter: 5, plans })).not.toThrow();
+    expect(() => validateRollingPlanWindow({ schemaVersion: 2, startChapter: 1, endChapter: 5, plans }, story.pleasureProfile)).not.toThrow();
+    expect(validatePleasureWindow(plans, story.pleasureProfile)).toEqual([]);
+  });
+
+  it('gives every materialization role an exact JSON contract', () => {
+    const selected = concepts[0];
+    const opening = openingFor(selected.id);
+    const story = spec();
+    const characters = { schemaVersion: 2 as const, protagonist: story.protagonist, cast: story.cast, relationshipConflicts: story.cast.slice(0, 3).map(member => ({ left: story.protagonist.name, right: member.name, incompatibleNeeds: long('Hai bên cần quyền quyết định khác nhau trong cùng một giao dịch'), mutualDependence: long('Hai bên giữ nguồn lực mà người kia không thể tự thay thế'), likelyBreakingPoint: long('Một bên giấu dữ liệu khi nghĩa vụ đến hạn thanh toán') })) };
+    const world = { schemaVersion: 2 as const, rules: story.causalWorldRules, resources: story.resourceEconomy, institutions: [0, 1].map(index => ({ name: `Tổ chức ${index}`, power: long(`Tổ chức ${index} kiểm soát giấy phép hoặc lịch vận chuyển`), incentive: long(`Tổ chức ${index} kiếm lợi từ việc giữ kỷ luật giao nhận`), enforcementEvidence: long(`Hợp đồng và nhật ký cổng kho chứng minh quyền số ${index}`), pressureOnCast: long(`Quyền số ${index} buộc cast lựa chọn giữa tiền và quan hệ`) })), knowledgeDistribution: [story.protagonist, ...story.cast.slice(0, 2)].map(member => ({ holder: member.name, knows: long(`${member.name} biết một phần giao dịch có bằng chứng riêng`), doesNotKnow: long(`${member.name} chưa biết agenda và giới hạn của người còn lại`) })) };
+    const selection = { schemaVersion: 2 as const, candidateId: selected.id, approvedBy: 'human-reviewer', rationale: long('Opening tạo nhịp thưởng và nhân quả rõ nhất'), approvedAt: new Date().toISOString() };
+    expect(buildCharacterDesignPrompt(brief, selected, opening)).toContain('OUTPUT_CONTRACT_EXACT=');
+    expect(buildCausalWorldPrompt(brief, selected, opening, characters)).toContain('OUTPUT_CONTRACT_EXACT=');
+    const launchPrompt = buildLaunchPackPrompt({ brief, selection, candidate: selected, opening, characters, world });
+    expect(launchPrompt).toContain('OUTPUT_CONTRACT_EXACT=');
+    expect(launchPrompt).toContain('pleasureProfile');
   });
 
   it('keeps setup storage and cron isolated from legacy fallback', () => {
@@ -535,5 +600,22 @@ describe('isolated flagship setup v2', () => {
     expect(pilotMigration).toContain("'paused'");
     expect(pilotMigration).toContain('SECURITY INVOKER');
     expect(pilotMigration).not.toContain('SECURITY DEFINER');
+    const rejectionMigration = readFileSync(path.join(process.cwd(), 'supabase/migrations/20260712100925_add_flagship_rejected_status.sql'), 'utf8');
+    expect(rejectionMigration).toContain("'rejected'");
+    expect(rejectionMigration).toContain('reject_flagship_pilot_v2');
+    expect(rejectionMigration).toContain('flagship-setup-v2.1-pleasure');
+    expect(rejectionMigration).toContain('SECURITY INVOKER');
+    expect(rejectionMigration).not.toContain('SECURITY DEFINER');
+  });
+
+  it('validates the coastal-era pilot brief and keeps market cards upstream-only', () => {
+    const blueprintRoot = path.join(process.cwd(), 'blueprints/flagship-coastal-era-pilot');
+    const coastalBrief = FlagshipSetupBriefV2Schema.parse(JSON.parse(readFileSync(path.join(blueprintRoot, 'setup-brief-v2.json'), 'utf8')));
+    const marketCards = JSON.parse(readFileSync(path.join(blueprintRoot, 'market-cards-v2.json'), 'utf8'));
+    expect(coastalBrief.pleasureProfile.realityMode).toBe('fictionalized');
+    expect(coastalBrief.pleasureProfile.setbackRecoveryWindow).toBe(2);
+    expect(coastalBrief.seedConstraints.join(' ')).toContain('đúng 20 concept');
+    expect(marketCards).toMatchObject({ usage: 'upstream_concept_lab_only', mustNeverReachWriter: true });
+    expect(buildWriterPrompt({ storySpec: spec(), chapterPlan: plan(), storyState: state(), targetWordCount: 2200 })).not.toContain('coastal-era-rebirth');
   });
 });

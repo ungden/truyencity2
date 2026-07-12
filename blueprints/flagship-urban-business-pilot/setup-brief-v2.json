@@ -5,6 +5,24 @@
   "audience": "Độc giả Việt trưởng thành thích truyện đô thị có năng lực nghề nghiệp, lựa chọn khó, quan hệ quyền lực và hậu quả kinh tế nhìn thấy được.",
   "desiredExperience": "Cảm giác cuốn đến từ việc nhân vật dùng hiểu biết ngành nghề để xoay chuyển tình thế nhưng mỗi thắng lợi tạo nghĩa vụ, đối thủ có phản ứng hợp lý và quan hệ thay đổi thật.",
   "domain": "Hệ sinh thái doanh nghiệp nhỏ tại đô thị Việt Nam: bán lẻ đa kênh, logistics, thanh toán số, thương mại điện tử, hợp tác xã, tín dụng và tuân thủ pháp lý.",
+  "pleasureProfile": {
+    "realityMode": "realistic",
+    "advantage": "Nhân vật chính có kinh nghiệm xử lý khủng hoảng vận hành và nhìn ra nút thắt trước đội ngũ chưa quen phối hợp.",
+    "knowledgeLimit": "Kinh nghiệm chỉ giúp đặt câu hỏi và chọn ưu tiên; nhân vật không biết trước dữ liệu, ý định đối tác hay kết quả thị trường.",
+    "primaryRewardLoop": [
+      "Nhìn ra một nút thắt vận hành bị bỏ sót trong dữ liệu hiện có.",
+      "Thử một thay đổi nhỏ bằng nguồn lực và quyền hạn thực sự đang có.",
+      "Đo kết quả rồi nhận nghĩa vụ mới do thay đổi vừa tạo ra.",
+      "Biến kết quả thành năng lực đội ngũ, uy tín hoặc dòng tiền bền hơn."
+    ],
+    "comfortLoop": [
+      "Đội ngũ có một bữa ăn hoặc khoảng nghỉ thật sau khi giải quyết được việc.",
+      "Quan hệ đồng nghiệp bớt phòng thủ khi quyền quyết định được chia sẻ rõ hơn."
+    ],
+    "setbackRecoveryWindow": 3,
+    "faceSlapPolicy": "Chỉ phản đòn một bên đã hành động vì lợi ích kinh tế cụ thể; kết quả phải được chứng minh bằng vận hành hoặc giao dịch.",
+    "progressionSignals": ["dòng tiền", "quyền truy cập", "năng lực đội ngũ", "uy tín", "khách hàng"]
+  },
   "boundaries": [
     "Không mặc định hệ thống cộng điểm, trọng sinh, thân phận bí mật, tài sản từ trên trời hoặc quý nhân cứu miễn phí.",
     "Không dùng đối thủ đứng nhìn, khinh thường vô cớ hoặc tự phá việc kinh doanh chỉ để nhân vật chính có màn vả mặt.",

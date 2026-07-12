@@ -13,6 +13,19 @@ const contiguousFromOneThroughThirty = (values: string[]): boolean => {
   return expected >= 31;
 };
 
+export const PleasureProfileV2Schema = z.object({
+  realityMode: z.enum(['realistic', 'fictionalized', 'alternate_world']),
+  advantage: nonGeneric,
+  knowledgeLimit: nonGeneric,
+  primaryRewardLoop: z.array(nonGeneric).min(4).max(7),
+  comfortLoop: z.array(nonGeneric).min(2).max(6),
+  setbackRecoveryWindow: z.number().int().min(1).max(3),
+  faceSlapPolicy: nonGeneric,
+  progressionSignals: z.array(namedText).min(4).max(10),
+}).strict();
+
+export type PleasureProfileV2 = z.infer<typeof PleasureProfileV2Schema>;
+
 export const StorySpecV2ObjectSchema = z.object({
   schemaVersion: z.literal(2),
   pipelineVersion: z.literal('flagship_v2'),
@@ -29,6 +42,7 @@ export const StorySpecV2ObjectSchema = z.object({
     forbiddenGenericMoves: z.array(nonGeneric).min(5).max(20),
     similarityRisks: z.array(nonGeneric).min(3).max(10),
   }).strict(),
+  pleasureProfile: PleasureProfileV2Schema,
   readerFantasy: nonGeneric,
   premise: nonGeneric,
   endingDirection: nonGeneric,
@@ -290,6 +304,44 @@ export function validateChapterPlanSemantics(plan: ChapterPlanV2): ContractIssue
   const after = JSON.stringify(plan.stateAfter);
   if (before === after) {
     issues.push({ path: 'stateAfter', message: 'Chapter stateAfter must differ from stateBefore.' });
+  }
+  return issues;
+}
+
+const EXPERIENCE_STOP_WORDS = new Set(['của', 'và', 'cho', 'một', 'những', 'được', 'trong', 'bằng', 'với', 'thành', 'người', 'nhân', 'vật']);
+
+function experienceTokens(values: string[]): string[] {
+  return [...new Set(values.join(' ').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').match(/[a-z0-9]{4,}/g) || [])]
+    .filter(token => !EXPERIENCE_STOP_WORDS.has(token));
+}
+
+function planMatchesExperience(plan: ChapterPlanV2, signals: string[]): boolean {
+  const haystack = JSON.stringify({ promise: plan.chapterPromise, scenes: plan.scenes.map(scene => scene.payoff), after: plan.stateAfter }).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const tokens = experienceTokens(signals);
+  return tokens.filter(token => haystack.includes(token)).length >= Math.min(2, tokens.length);
+}
+
+export function validatePleasureWindow(plans: ChapterPlanV2[], profile: PleasureProfileV2): ContractIssue[] {
+  const issues: ContractIssue[] = [];
+  if (plans.length !== 5) return [{ path: 'plans', message: 'Pleasure validation requires one five-chapter rolling window.' }];
+  const sortedPlans = [...plans].sort((a, b) => a.chapterNumber - b.chapterNumber);
+  const openingWindow = sortedPlans[0].chapterNumber === 1;
+  const earnedPayoffChapters = sortedPlans.filter(plan => plan.scenes.some(scene => scene.payoff.trim().length >= 20));
+  const progressionChapters = sortedPlans.filter(plan => plan.stateDelta.resources.length > 0 || plan.promisesPaid.length > 0 || planMatchesExperience(plan, profile.progressionSignals));
+  const comfortChapters = sortedPlans.filter(plan => planMatchesExperience(plan, profile.comfortLoop));
+
+  if (earnedPayoffChapters.length < 2) issues.push({ path: 'plans', message: 'Five-chapter window needs at least two earned competence payoffs.' });
+  if (progressionChapters.length < 1) issues.push({ path: 'plans', message: 'Five-chapter window needs at least one concrete progression change.' });
+  if (comfortChapters.length < 1) issues.push({ path: 'plans', message: 'Five-chapter window needs at least one story-specific comfort payoff.' });
+  if (openingWindow) {
+    const first = sortedPlans[0];
+    if (!first.scenes.some(scene => scene.pov.trim().length >= 2 && scene.tactic.trim().length >= 20)) {
+      issues.push({ path: 'plans.0', message: 'Chapter 1 must give the protagonist an active agency move.' });
+    }
+    const firstThree = sortedPlans.filter(plan => plan.chapterNumber <= 3);
+    if (!firstThree.some(plan => plan.stateDelta.resources.length > 0)) {
+      issues.push({ path: 'plans', message: 'Opening must earn a material gain by chapter 3.' });
+    }
   }
   return issues;
 }

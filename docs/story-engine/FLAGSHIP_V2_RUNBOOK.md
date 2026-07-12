@@ -4,7 +4,7 @@ The flagship lane is quality-first and isolated from the legacy fleet. A project
 
 ## Required artifacts
 
-1. `flagship_setup_brief_v2` is authored for one story and must include real domain research. There is no shared genre setup or default brief.
+1. `flagship_setup_brief_v2` is authored for one story and must include real domain research plus its own `pleasureProfile`. There is no shared genre setup or default brief.
 2. `flagship_concept_tournament_v2` contains 20 generated concepts, lexical duplicate removal, pairwise ranking and three full opening simulations.
 3. A human must persist `flagship_setup_selection_v2`; the engine cannot choose its own winner.
 4. `ai_story_projects.story_spec_v2` must validate as `StorySpecV2`, preserve the selected concept/characters/world exactly, and have a computed foundation score of at least 8/10 with no dimension below 7.
@@ -18,6 +18,7 @@ The flagship lane is quality-first and isolated from the legacy fleet. A project
 # These commands require both flagship migrations to be applied and a paused,
 # unwritten project already marked pipeline_version=flagship_v2.
 npm run flagship:create-pilot -- --title="Flagship Pilot" --slug=flagship-pilot --brief=/absolute/story-specific-brief.json --routes=/absolute/model-routes.json
+npm run flagship:reject-pilot -- --project=<uuid> --reviewer=<name> --reason="superseded by a researched story direction"
 npm run flagship:setup:brief -- --project=<uuid> --brief=/absolute/story-specific-brief.json --routes=/absolute/model-routes.json
 npm run flagship:setup:tournament -- --project=<uuid>
 npm run flagship:setup:materialize -- --project=<uuid> --selection=/absolute/human-selection.json
@@ -51,6 +52,8 @@ Before any flagship project can run against production:
 - There are no cross-story setup fallbacks. Missing story identity, arc plan, prior state, cast ledger, timeline, retrieval, or independent calibration fails closed.
 - Setup is `Concept Lab → pairwise Judge → three Opening Simulators → human selection → Character Designer → Causal World → Launch Architect`. Each role sees only its own input and no legacy prompt.
 - Quality axes never receive default passing scores; every axis must be scored for this exact story by the independent reviewer.
+- `pleasureProfile` is part of the selected story kernel, not a genre suffix. Writer sees only that story-specific contract; upstream market cards never reach chapter generation.
+- A five-chapter plan must contain earned competence payoffs, a story-specific comfort payoff and concrete progression. The opening must show agency in chapter 1 and material gain by chapter 3.
 - A deterministic hard failure rejects the candidate before persistence.
 - A passing deterministic result still needs an independent calibrated review.
 - Provider billing/network failures set the daily quota to `infra_blocked`; they do not consume quality retries or alter canon.

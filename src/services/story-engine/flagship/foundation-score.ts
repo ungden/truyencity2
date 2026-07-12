@@ -3,6 +3,7 @@ import type { StorySpecV2 } from './contracts';
 export type FoundationDimension =
   | 'story_identity'
   | 'premise_interest'
+  | 'reader_pleasure_engine'
   | 'protagonist_engine'
   | 'cast_agency'
   | 'causal_world'
@@ -47,6 +48,13 @@ export function computeFoundationScoreV2(spec: StorySpecV2): FoundationScoreV2 {
       (concrete(spec.premise) ? 4 : 1) +
       (concrete(spec.readerFantasy) ? 3 : 0) +
       (spec.premise.toLowerCase() !== spec.readerFantasy.toLowerCase() ? 3 : 0),
+    ),
+    reader_pleasure_engine: boundedScore(
+      (concrete(spec.pleasureProfile.advantage) ? 2 : 0) +
+      (concrete(spec.pleasureProfile.knowledgeLimit) ? 2 : 0) +
+      Math.min(2, spec.pleasureProfile.primaryRewardLoop.length * 0.5) +
+      Math.min(2, spec.pleasureProfile.comfortLoop.length) +
+      Math.min(2, spec.pleasureProfile.progressionSignals.length * 0.4),
     ),
     protagonist_engine: boundedScore([
       spec.protagonist.desire,
