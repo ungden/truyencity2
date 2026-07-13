@@ -5,19 +5,21 @@ import type {
   FlagshipSetupBriefV2,
   HumanConceptSelectionV2,
   OpeningTrialV2,
+  WorldKernelTrialV2,
 } from './setup-contracts';
+import type { BenchmarkConceptGuidanceV1 } from './chinese-benchmark';
 
-export const FLAGSHIP_SETUP_PROMPT_VERSION = 'flagship-setup-v2.2-portfolio';
+export const FLAGSHIP_SETUP_PROMPT_VERSION = 'flagship-setup-v2.3-benchmark';
 
 export const CONCEPT_LAB_SYSTEM = `Bạn phụ trách Concept Lab cho đúng một brief truyện.
 Tạo 20 cơ chế truyện khác nhau về nguyên nhân vận hành, lựa chọn của nhân vật và nguồn xung đột; đổi tên, nghề hoặc trope không được tính là khác.
-Không mặc định bàn tay vàng, hệ thống, trọng sinh, thang sức mạnh, phản diện hay kiểu mở đầu. Không lập thế giới hoặc outline.
+Không mặc định bàn tay vàng, hệ thống, trọng sinh, thang sức mạnh, phản diện hay kiểu mở đầu. Không lập bách khoa thế giới hoặc outline; chỉ chứng minh cơ chế thế giới đủ sinh cảnh độc quyền.
 Nếu brief chủ động chọn trọng sinh hoặc lợi thế biết trước, phải làm nó hoạt động sớm nhưng giữ đúng giới hạn ký ức và vòng thưởng riêng trong pleasureProfile.
 Nguồn lực khởi đầu phải hợp thân phận; không dùng tội phạm, âm mưu bí mật, làm giả, tống tiền hoặc tập đoàn thâu tóm làm lối tắt tăng căng thẳng nếu brief không yêu cầu rõ.
 Chỉ trả JSON đúng schema ConceptBatchV2.`;
 
 export const CONCEPT_JUDGE_SYSTEM = `Bạn là giám khảo concept độc lập.
-So sánh từng cặp bằng sức tò mò, khả năng sinh lựa chọn khó, tính nhân quả, sự thật ngành nghề và độ khác biệt có thể triển khai thành cảnh.
+So sánh từng cặp bằng sức tò mò, khả năng sinh lựa chọn khó, tính nhân quả, sự thật ngành nghề và ba tình huống chỉ thế giới đó mới sinh ra.
 Hạ hạng concept cần vốn phi lý, bịa quy trình pháp lý, chỉ sống nhờ đối thủ phạm tội hoặc phải leo thang sang âm mưu lớn mới duy trì được.
 Hạ hạng concept để nhân vật chính chịu nhục kéo dài, thắng nhờ may mắn/đối thủ ngu, không kích hoạt lợi thế trong ba chương đầu, hoặc chỉ lặp một giao dịch mà không tạo tiến bộ vật chất và tình cảm trong 30 chương.
 Không chấm theo độ dài, số trope, tên thể loại hoặc lời tự quảng cáo. Chỉ trả JSON đúng schema ConceptRankingV2.`;
@@ -44,28 +46,31 @@ Không lập chi tiết 1.000 chương, không tạo volume ladder cứng, khôn
 
 const json = (value: unknown) => JSON.stringify(value);
 
-export function buildConceptLabPrompt(brief: FlagshipSetupBriefV2): string {
-  return `BRIEF=${json(brief)}
+export function buildConceptLabPrompt(brief: FlagshipSetupBriefV2, benchmark?: BenchmarkConceptGuidanceV1): string {
+  return `BRIEF=${json(brief)}${benchmark ? `\nBENCHMARK_MECHANISMS_ONLY=${json(benchmark)}` : ''}
 
-OUTPUT_CONTRACT_EXACT={"schemaVersion":2,"candidates":[{"id":"concept_ascii_slug","workingTitle":"...","readerCuriosity":"...","readerFantasy":"...","premise":"...","irreversibleProblem":"...","protagonistContradiction":"...","domainMechanism":"...","conflictEngine":"...","emotionalCore":"...","differenceClaim":"...","nearestComparisonRisk":"...","serialityProof":"...","openingAdvantage":"...","progressionProof":"...","antiCloneFingerprint":"advantage|reward|currencies|conflict|world"}]}
+OUTPUT_CONTRACT_EXACT={"schemaVersion":2,"candidates":[{"id":"concept_ascii_slug","workingTitle":"...","readerCuriosity":"...","readerFantasy":"...","premise":"...","irreversibleProblem":"...","protagonistContradiction":"...","domainMechanism":"...","conflictEngine":"...","emotionalCore":"...","differenceClaim":"...","nearestComparisonRisk":"...","serialityProof":"...","openingAdvantage":"...","progressionProof":"...","worldProof":{"signatureSituations":["...","...","..."],"institutionalReaction":"...","resourceCirculation":"...","thirtyChapterMutation":"..."},"antiCloneFingerprint":"advantage|reward|currencies|conflict|world"}]}
 
-Trả đúng 20 object và đúng các key trên, không thêm title/description/score. id chỉ dùng chữ thường ASCII, số, gạch dưới hoặc gạch ngang và phải bắt đầu bằng concept_. antiCloneFingerprint của 20 concept phải khác nhau thật sự theo cơ chế, không chỉ khác cách diễn đạt. Mỗi trường văn bản ngoài fingerprint tối thiểu 20 ký tự.`;
+Trả đúng 20 object và đúng các key trên, không thêm title/description/score. id chỉ dùng chữ thường ASCII, số, gạch dưới hoặc gạch ngang và phải bắt đầu bằng concept_. antiCloneFingerprint của 20 concept phải khác nhau thật sự theo cơ chế, không chỉ khác cách diễn đạt. signatureSituations phải là ba cảnh chỉ causal world này mới sinh ra; nếu đổi tên bối cảnh mà vẫn dùng được thì concept không đạt. Mỗi trường văn bản ngoài fingerprint tối thiểu 20 ký tự. Benchmark chỉ là kết luận cơ chế đã chưng cất, không phải template và không được suy đoán hoặc bắt chước tác phẩm nguồn.`;
 }
 
 export function buildConceptJudgePrompt(brief: FlagshipSetupBriefV2, candidates: ConceptCandidateV2[]): string {
   return `BRIEF=${json(brief)}\nCANDIDATES=${json(candidates)}
 
-OUTPUT_CONTRACT_EXACT={"schemaVersion":2,"matches":[{"leftId":"concept_id","rightId":"concept_id","winnerId":"concept_id","reason":"..."}],"ranking":[{"id":"concept_id","wins":0,"reason":"..."}],"finalistIds":["concept_id","concept_id","concept_id"]}
+OUTPUT_ROOT_KEYS_EXACT=["schemaVersion","matches","ranking","finalistIds","finalistWorldKernels"]
+OUTPUT_RANKING_FIELDS_EXACT={"schemaVersion":2,"matches":[{"leftId":"concept_id","rightId":"concept_id","winnerId":"concept_id","reason":"..."}],"ranking":[{"id":"concept_id","wins":0,"reason":"..."}],"finalistIds":["concept_id","concept_id","concept_id"]}
 
-ranking phải chứa mỗi candidate đúng một lần. matches phải cho mỗi candidate xuất hiện ít nhất một lần. Mỗi finalist phải trực tiếp thắng ít nhất một match. Chỉ dùng id có trong CANDIDATES, reason tối thiểu 20 ký tự.`;
+OUTPUT_CONTRACT_ADDITION_EXACT={"finalistWorldKernels":[{"candidateId":"concept_id","signatureSituations":["...","...","..."],"rules":[{"rule":"...","beneficiary":"...","harmedParty":"...","enforcement":"...","cost":"...","consequence":"...","evidenceSource":"...","exceptions":"...","sceneAffordances":["...","..."]},{"rule":"...","beneficiary":"...","harmedParty":"...","enforcement":"...","cost":"...","consequence":"...","evidenceSource":"...","exceptions":"...","sceneAffordances":["...","..."]},{"rule":"...","beneficiary":"...","harmedParty":"...","enforcement":"...","cost":"...","consequence":"...","evidenceSource":"...","exceptions":"...","sceneAffordances":["...","..."]}],"resources":[{"resource":"...","source":"...","spendRule":"...","scarcity":"..."},{"resource":"...","source":"...","spendRule":"...","scarcity":"..."}],"institutionalResponses":[{"name":"...","power":"...","incentive":"...","enforcementEvidence":"...","pressureOnCast":"..."},{"name":"...","power":"...","incentive":"...","enforcementEvidence":"...","pressureOnCast":"..."}],"thirtyChapterMutation":"..."}]}
+
+ranking phải chứa mỗi candidate đúng một lần. matches phải cho mỗi candidate xuất hiện ít nhất một lần. Mỗi finalist phải trực tiếp thắng ít nhất một match. finalistWorldKernels phải có đúng một kernel cho mỗi finalistId; signatureSituations phải sao chép đúng worldProof.signatureSituations của candidate đó. Kernel chỉ materialize ba luật, 2-3 tài nguyên và 2-3 phản ứng thiết chế cần để test opening, không viết bách khoa. Chỉ dùng id có trong CANDIDATES, reason tối thiểu 20 ký tự.`;
 }
 
-export function buildOpeningSimulationPrompt(brief: FlagshipSetupBriefV2, candidate: ConceptCandidateV2): string {
-  return `BRIEF_BOUNDARIES=${json({ audience: brief.audience, desiredExperience: brief.desiredExperience, boundaries: brief.boundaries, researchNotes: brief.researchNotes })}\nCONCEPT=${json(candidate)}
+export function buildOpeningSimulationPrompt(brief: FlagshipSetupBriefV2, candidate: ConceptCandidateV2, worldKernel: WorldKernelTrialV2): string {
+  return `BRIEF_BOUNDARIES=${json({ audience: brief.audience, desiredExperience: brief.desiredExperience, boundaries: brief.boundaries, researchNotes: brief.researchNotes })}\nCONCEPT=${json(candidate)}\nAPPROVED_WORLD_KERNEL=${json(worldKernel)}
 
 OUTPUT_CONTRACT_EXACT={"schemaVersion":2,"candidateId":"${candidate.id}","chapters":[{"chapterNumber":1,"title":"...","proseParagraphs":["đoạn 1...","đoạn 2..."],"causalStateChange":"...","requiredPlanAnchor":"...","protagonistChoice":"...","agencyMove":"...","earnedReward":"...","materialProgression":"...","comfortPayoff":"...","costPaid":"...","exitPressure":"..."},{"chapterNumber":2,"title":"...","proseParagraphs":["đoạn 1...","đoạn 2..."],"causalStateChange":"...","requiredPlanAnchor":"...","protagonistChoice":"...","agencyMove":"...","earnedReward":"...","materialProgression":"...","comfortPayoff":"...","costPaid":"...","exitPressure":"..."},{"chapterNumber":3,"title":"...","proseParagraphs":["đoạn 1...","đoạn 2..."],"causalStateChange":"...","requiredPlanAnchor":"...","protagonistChoice":"...","agencyMove":"...","earnedReward":"...","materialProgression":"...","comfortPayoff":"...","costPaid":"...","exitPressure":"..."}],"continuityDigest":"...","unresolvedPressure":"..."}
 
-Viết thử chương 1, 2, 3 bằng văn Việt tự nhiên. Mỗi chương trả 8-20 proseParagraphs; mỗi đoạn 40-600 ký tự và tổng tối thiểu 1200 ký tự. Mỗi phần tử phải là một JSON string một dòng, không chứa newline nội bộ. Thoại dùng gạch đầu dòng em dash; tuyệt đối không dùng dấu ngoặc kép ASCII. Engine sẽ ghép proseParagraphs bằng hai newline theo cách deterministic. Giữ candidateId chính xác. Không thêm key và không xây canon ngoài concept/research.`;
+Viết thử chương 1, 2, 3 bằng văn Việt tự nhiên. Mỗi chương trả 8-20 proseParagraphs; mỗi đoạn 40-600 ký tự và tổng tối thiểu 1200 ký tự. Mỗi phần tử phải là một JSON string một dòng, không chứa newline nội bộ. Thoại dùng gạch đầu dòng em dash; tuyệt đối không dùng dấu ngoặc kép ASCII. Engine sẽ ghép proseParagraphs bằng hai newline theo cách deterministic. Giữ candidateId chính xác. Không thêm key, không sửa kernel và không xây canon ngoài concept/research/kernel.`;
 }
 
 export function buildCharacterDesignPrompt(
@@ -85,12 +90,13 @@ export function buildCausalWorldPrompt(
   candidate: ConceptCandidateV2,
   opening: OpeningTrialV2,
   characters: CharacterDesignV2,
+  worldKernel: WorldKernelTrialV2,
 ): string {
-  return `RESEARCH_AND_BOUNDARIES=${json({ domain: brief.domain, boundaries: brief.boundaries, researchNotes: brief.researchNotes })}\nCONCEPT=${json(candidate)}\nOPENING_STATE_CHANGES=${json(opening.chapters.map(chapter => ({ chapterNumber: chapter.chapterNumber, causalStateChange: chapter.causalStateChange, costPaid: chapter.costPaid, materialProgression: chapter.materialProgression })))}\nCHARACTERS=${json(characters)}
+  return `RESEARCH_AND_BOUNDARIES=${json({ domain: brief.domain, boundaries: brief.boundaries, researchNotes: brief.researchNotes })}\nCONCEPT=${json(candidate)}\nAPPROVED_WORLD_KERNEL=${json(worldKernel)}\nOPENING_STATE_CHANGES=${json(opening.chapters.map(chapter => ({ chapterNumber: chapter.chapterNumber, causalStateChange: chapter.causalStateChange, costPaid: chapter.costPaid, materialProgression: chapter.materialProgression })))}\nCHARACTERS=${json(characters)}
 
 OUTPUT_CONTRACT_EXACT={"schemaVersion":2,"rules":[{"rule":"...","beneficiary":"...","harmedParty":"...","enforcement":"...","cost":"...","consequence":"...","evidenceSource":"...","exceptions":"...","sceneAffordances":["...","..."]}],"resources":[{"resource":"...","source":"...","spendRule":"...","scarcity":"..."}],"institutions":[{"name":"...","power":"...","incentive":"...","enforcementEvidence":"...","pressureOnCast":"..."}],"knowledgeDistribution":[{"holder":"...","knows":"...","doesNotKnow":"..."}]}
 
-Rules có 4-12 mục, resources 3-10, institutions 2-8, knowledgeDistribution 3-12. Chỉ tạo luật và tài nguyên cần cho các áp lực này; không thêm key.`;
+Rules có 4-12 mục, resources 3-10, institutions 2-8, knowledgeDistribution 3-12. Phải giữ nguyên từng object trong APPROVED_WORLD_KERNEL.rules, resources và institutionalResponses rồi chỉ mở rộng phần còn thiếu; không viết lại kernel đã được dùng để blind-review opening. Chỉ tạo luật và tài nguyên cần cho các áp lực này; không thêm key.`;
 }
 
 function launchContract(input: Parameters<typeof buildLaunchPackPrompt>[0]) {
@@ -115,7 +121,7 @@ function launchContract(input: Parameters<typeof buildLaunchPackPrompt>[0]) {
       title: input.candidate.workingTitle,
       genre: input.brief.genre,
       genreLane: input.brief.genreLane,
-      serialityEngine: { recurringSituation: input.candidate.serialityProof, variationAxes: ['...', '...', '...'], escalationVectors: ['...', '...', '...'], depletionRisks: ['...', '...', '...'] },
+      serialityEngine: { recurringSituation: input.candidate.serialityProof, variationAxes: input.candidate.worldProof.signatureSituations, escalationVectors: ['...', '...', '...'], depletionRisks: ['...', '...', '...'] },
       progressionCurrencies: [{ name: 'power_currency', kind: 'power', source: '...', spend: '...', visibility: '...' }, { name: 'material_currency', kind: 'material', source: '...', spend: '...', visibility: '...' }, { name: 'social_currency', kind: 'social', source: '...', spend: '...', visibility: '...' }],
       storyIdentity: { uniqueMechanism: '...', emotionalCore: input.candidate.emotionalCore, domainTruthSources: ['...', '...', '...'], forbiddenGenericMoves: ['...', '...', '...', '...', '...'], similarityRisks: ['...', '...', '...'] },
       pleasureProfile: input.brief.pleasureProfile,
@@ -150,5 +156,5 @@ export function buildLaunchPackPrompt(input: {
 
 OUTPUT_CONTRACT_EXACT=${json(launchContract(input))}
 
-Chỉ dùng đúng các key trong contract. Các mảng phải đạt cardinality của ví dụ/schema; mỗi ChapterPlan có 2-5 scenes dù contract chỉ minh họa một scene. StorySpec phải sao chép chính xác title, genreLane, pleasureProfile, readerFantasy, premise, protagonist, cast, causalWorldRules và resourceEconomy từ artifact đã duyệt. serialityEngine phải chứng minh tình huống lặp có thể biến hóa chứ không phải một thang tăng cấp; progressionCurrencies phải có nguồn, cách tiêu và dấu hiệu độc giả nhìn thấy. StoryState chương 0 phải chứa toàn bộ cast, resources và promises. Arc đầu phủ chương 1-20 đến tối đa 30. rollingChapterPlans chỉ gồm chương 1-5; plan chương 1-3 phải chứa nguyên văn requiredPlanAnchor tương ứng.`;
+Chỉ dùng đúng các key trong contract. Các mảng phải đạt cardinality của ví dụ/schema; mỗi ChapterPlan có 2-5 scenes dù contract chỉ minh họa một scene. StorySpec phải sao chép chính xác title, genreLane, pleasureProfile, readerFantasy, premise, protagonist, cast, causalWorldRules và resourceEconomy từ artifact đã duyệt. serialityEngine.recurringSituation phải giữ serialityProof và variationAxes phải sao chép đúng ba worldProof.signatureSituations đã thắng tournament; progressionCurrencies phải có nguồn, cách tiêu và dấu hiệu độc giả nhìn thấy. StoryState chương 0 phải chứa toàn bộ cast, resources và promises. Arc đầu phủ chương 1-20 đến tối đa 30. rollingChapterPlans chỉ gồm chương 1-5; plan chương 1-3 phải chứa nguyên văn requiredPlanAnchor tương ứng.`;
 }

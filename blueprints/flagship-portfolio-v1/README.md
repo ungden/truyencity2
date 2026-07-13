@@ -25,11 +25,15 @@ Nguồn sự thật typed nằm ở `src/services/story-engine/flagship/portfoli
 | DT-11 | Giám bảo và thị trường đồ cũ | Đô thị–nghề nghiệp |
 | DT-13 | Y nghiệp có giới hạn | Đô thị–nghề nghiệp |
 
-Mỗi slot đi qua `20 concept → pairwise rank → 3 opening`. Chỉ sau blind review mới chọn ba slot để materialize StorySpec. Cohort đích là một huyền huyễn, một tiên hiệp và một commercial winner từ bốn opening đô thị/niên đại/song xuyên.
+Mỗi slot đi qua `ChineseBenchmarkPackV1 → 20 concept có worldProof → pairwise rank → 3 opening`. Chỉ sau blind review mới chọn ba slot để materialize StorySpec. Cohort đích là một huyền huyễn, một tiên hiệp và một commercial winner từ bốn opening đô thị/niên đại/song xuyên.
+
+Mỗi pack có tối thiểu sáu tác phẩm Trung Quốc để đối chiếu cơ chế, tối thiểu ba nguồn chính thức và ranh giới chống sao chép. Engine chỉ đưa phần kết luận cơ chế đã chưng cất vào Concept Lab; tên truyện, tác giả và URL nguồn không được vào prompt. Danh sách đầy đủ nằm tại [chinese-benchmarks-v1.md](./chinese-benchmarks-v1.md).
 
 ## Ranh giới bắt buộc
 
 - Market cards và portfolio data không được import vào Director, Writer hoặc Editor.
+- Chinese benchmark chỉ được dùng trước khi tạo concept; thiếu pack ở một opening lane phải `setup_blocked` trước model call đầu tiên.
+- Mỗi concept phải nêu đúng ba `worldProof.signatureSituations`; nếu đổi tên bối cảnh mà vẫn dùng được thì concept chưa đủ riêng.
 - Không tạo project placeholder. Thiếu brief riêng hoặc concept được duyệt thì trả `setup_blocked`.
 - Không generic genre suffix, không fallback, không mượn kernel của slot khác.
 - Hai pilot cũ là `lab_reference`, không tính vào 30 và không được viết tiếp.

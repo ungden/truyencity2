@@ -5,12 +5,19 @@ import {
   FLAGSHIP_MARKET_RESEARCH_V1,
 } from '@/services/story-engine/flagship/portfolio-data';
 import {
+  FLAGSHIP_CHINESE_BENCHMARKS_V1,
+  buildConceptLabPrompt,
+  distillBenchmarkForConceptLab,
   FlagshipSetupBriefV2Schema,
+  generateConceptTournamentV2,
+  getChineseBenchmarkPack,
+  validateBenchmarkCoverage,
   validatePortfolioResearch,
 } from '@/services/story-engine/flagship';
 
 describe('flagship first-30 portfolio', () => {
   const validated = validatePortfolioResearch(FLAGSHIP_FIRST_30_MANIFEST, FLAGSHIP_MARKET_RESEARCH_V1);
+  const benchmarks = validateBenchmarkCoverage(validated.manifest, FLAGSHIP_CHINESE_BENCHMARKS_V1);
 
   it('locks the 30-story allocation and 30-to-9 cohort', () => {
     const slots = validated.manifest.slots;
@@ -46,12 +53,60 @@ describe('flagship first-30 portfolio', () => {
     }
   });
 
+  it('requires a six-work Chinese benchmark pack for every opening lane', () => {
+    expect(benchmarks.packs).toHaveLength(9);
+    for (const pack of benchmarks.packs) {
+      expect(pack.comparables.length).toBeGreaterThanOrEqual(6);
+      expect(pack.sourceUrls.length).toBeGreaterThanOrEqual(3);
+      expect(pack).toMatchObject({
+        usage: 'upstream_concept_lab_only',
+        mustNeverReachChapterRoles: true,
+        inspirationMode: 'mechanisms_not_expression',
+      });
+    }
+  });
+
+  it('distills mechanisms for Concept Lab without exposing titles, authors or source URLs', () => {
+    const pack = getChineseBenchmarkPack('DT-03')!;
+    const guidance = distillBenchmarkForConceptLab(pack);
+    const serialized = JSON.stringify(guidance);
+    for (const comparable of pack.comparables) {
+      expect(serialized).not.toContain(comparable.title);
+      expect(serialized).not.toContain(comparable.author);
+    }
+    for (const url of pack.sourceUrls) expect(serialized).not.toContain(url);
+
+    const raw = JSON.parse(readFileSync(path.join(process.cwd(), 'blueprints/flagship-coastal-era-pilot/setup-brief-v2.json'), 'utf8'));
+    const brief = FlagshipSetupBriefV2Schema.parse({
+      ...raw,
+      portfolioSlotId: 'DT-03',
+      genreLane: 'era_industrial',
+      laneCardIds: ['market_era_livelihood', 'market_urban_professional'],
+      promotionCohort: 'opening_tournament',
+    });
+    const prompt = buildConceptLabPrompt(brief, guidance);
+    expect(prompt).toContain(pack.id);
+    expect(prompt).toContain('worldProof');
+    for (const comparable of pack.comparables) expect(prompt).not.toContain(comparable.title);
+  });
+
+  it('blocks an opening tournament before any model call when its benchmark pack is missing', async () => {
+    const raw = JSON.parse(readFileSync(path.join(process.cwd(), 'blueprints/flagship-coastal-era-pilot/setup-brief-v2.json'), 'utf8'));
+    const brief = FlagshipSetupBriefV2Schema.parse({ ...raw, promotionCohort: 'opening_tournament' });
+    let calls = 0;
+    await expect(generateConceptTournamentV2(brief, { invoke: async () => { calls += 1; return '{}'; } }))
+      .rejects.toMatchObject({ code: 'setup_blocked' });
+    expect(calls).toBe(0);
+  });
+
   it('forbids portfolio and market-card modules from the chapter role prompts', () => {
     const prompts = readFileSync(path.join(process.cwd(), 'src/services/story-engine/flagship/prompts.ts'), 'utf8');
     expect(prompts).not.toContain("from './portfolio'");
     expect(prompts).not.toContain("from './portfolio-data'");
     expect(prompts).not.toContain('MARKET_CARD');
     expect(prompts).not.toContain('PORTFOLIO_SLOT');
+    expect(prompts).not.toContain('chinese-benchmark');
+    expect(prompts).not.toContain('BENCHMARK_MECHANISMS_ONLY');
   });
 
   it('keeps the two old pilot briefs as lab references outside the first 30', () => {

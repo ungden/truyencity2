@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { ArcPlanV2Schema, ChapterPlanV2Schema, PleasureProfileV2Schema, StorySpecV2ObjectSchema, StorySpecV2Schema, StoryStateV2Schema } from './contracts';
 import { GenreLaneV2Schema, PromotionCohortV1Schema } from './portfolio-taxonomy';
 import { PortfolioSlotIdV1Schema } from './portfolio';
+import { ChineseBenchmarkIdV1Schema } from './chinese-benchmark';
 
 const concrete = z.string().trim().min(20);
 const named = z.string().trim().min(2);
@@ -42,6 +43,12 @@ export const ConceptCandidateV2Schema = z.object({
   serialityProof: concrete,
   openingAdvantage: concrete,
   progressionProof: concrete,
+  worldProof: z.object({
+    signatureSituations: z.array(concrete).length(3),
+    institutionalReaction: concrete,
+    resourceCirculation: concrete,
+    thirtyChapterMutation: concrete,
+  }).strict(),
   antiCloneFingerprint: z.string().trim().min(12),
 }).strict();
 
@@ -61,11 +68,27 @@ export const PairwiseMatchV2Schema = z.object({
   }
 });
 
+export const WorldKernelTrialV2Schema = z.object({
+  candidateId: conceptId,
+  signatureSituations: z.array(concrete).length(3),
+  rules: z.array(StorySpecV2ObjectSchema.shape.causalWorldRules.element).length(3),
+  resources: z.array(StorySpecV2ObjectSchema.shape.resourceEconomy.element).min(2).max(3),
+  institutionalResponses: z.array(z.object({
+    name: named,
+    power: concrete,
+    incentive: concrete,
+    enforcementEvidence: concrete,
+    pressureOnCast: concrete,
+  }).strict()).min(2).max(3),
+  thirtyChapterMutation: concrete,
+}).strict();
+
 export const ConceptRankingV2Schema = z.object({
   schemaVersion: z.literal(2),
   matches: z.array(PairwiseMatchV2Schema).min(3).max(190),
   ranking: z.array(z.object({ id: conceptId, wins: z.number().int().min(0), reason: concrete }).strict()).min(3).max(20),
   finalistIds: z.array(conceptId).length(3),
+  finalistWorldKernels: z.array(WorldKernelTrialV2Schema).length(3),
 }).strict();
 
 export const OpeningChapterTrialV2Schema = z.object({
@@ -115,6 +138,7 @@ export const OpeningTrialV2Schema = z.object({
 export const ConceptTournamentArtifactV2Schema = z.object({
   schemaVersion: z.literal(2),
   promptVersion: z.string().min(3),
+  benchmarkId: ChineseBenchmarkIdV1Schema.nullable(),
   concepts: z.array(ConceptCandidateV2Schema).min(3).max(20),
   rejectedNearDuplicateIds: z.array(conceptId),
   ranking: ConceptRankingV2Schema,
@@ -203,6 +227,7 @@ export type FlagshipSetupBriefV2 = z.infer<typeof FlagshipSetupBriefV2Schema>;
 export type ConceptCandidateV2 = z.infer<typeof ConceptCandidateV2Schema>;
 export type ConceptBatchV2 = z.infer<typeof ConceptBatchV2Schema>;
 export type ConceptRankingV2 = z.infer<typeof ConceptRankingV2Schema>;
+export type WorldKernelTrialV2 = z.infer<typeof WorldKernelTrialV2Schema>;
 export type OpeningTrialV2 = z.infer<typeof OpeningTrialV2Schema>;
 export type OpeningTrialTransportV2 = z.infer<typeof OpeningTrialTransportV2Schema>;
 export type ConceptTournamentArtifactV2 = z.infer<typeof ConceptTournamentArtifactV2Schema>;

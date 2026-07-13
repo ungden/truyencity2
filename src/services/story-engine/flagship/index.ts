@@ -20,3 +20,5 @@ export * from './model-routes';
 export * from './portfolio-taxonomy';
 export * from './portfolio';
 export * from './portfolio-data';
+export * from './chinese-benchmark';
+export * from './chinese-benchmark-data';

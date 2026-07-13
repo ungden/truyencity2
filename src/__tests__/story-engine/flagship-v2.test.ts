@@ -504,6 +504,12 @@ describe('isolated flagship setup v2', () => {
       serialityProof: index === 0 ? spec().serialityEngine.recurringSituation : `${marker} sinh ba mươi chương bằng cách đổi quyền kiểm soát, nghĩa vụ và phản ứng của đối tác`,
       openingAdvantage: `${marker} được kích hoạt ngay chương đầu bằng một lựa chọn nghề nghiệp có giới hạn`,
       progressionProof: `${marker} làm thay đổi tiền, quyền truy cập và quan hệ theo dấu hiệu nhìn thấy được`,
+      worldProof: {
+        signatureSituations: index === 0 ? spec().serialityEngine.variationAxes : [0, 1, 2].map(situation => `${marker} tạo tình huống độc quyền số ${situation} từ kho lạnh, quyền điều xe và hao hụt`),
+        institutionalReaction: `${marker} khiến chủ kho, tài xế và hợp tác xã phản ứng theo quyền lợi có bằng chứng`,
+        resourceCirculation: `${marker} theo tiền cọc, lịch xe và hàng lạnh từ nguồn tới người chịu hao hụt`,
+        thirtyChapterMutation: `${marker} làm dữ liệu cũ mất giá khi đối tác học và quyền điều phối được chia lại`,
+      },
       antiCloneFingerprint: `native|reward-${index}|cash-access-${index}|contract-${index}|fictionalized`,
     };
   });
@@ -529,6 +535,25 @@ describe('isolated flagship setup v2', () => {
     unresolvedPressure: long('Kho phải giao đúng giờ trong khi quyền điều phối xe đang thuộc về cộng sự'),
   });
 
+  const kernelFor = (candidateId: string) => {
+    const candidate = concepts.find(item => item.id === candidateId)!;
+    const story = spec();
+    return {
+      candidateId,
+      signatureSituations: candidate.worldProof.signatureSituations,
+      rules: story.causalWorldRules.slice(0, 3),
+      resources: story.resourceEconomy.slice(0, 2),
+      institutionalResponses: [0, 1].map(index => ({
+        name: `Tổ chức ${index}`,
+        power: long(`Tổ chức ${index} kiểm soát giấy phép hoặc lịch vận chuyển`),
+        incentive: long(`Tổ chức ${index} kiếm lợi từ việc giữ kỷ luật giao nhận`),
+        enforcementEvidence: long(`Hợp đồng và nhật ký cổng kho chứng minh quyền số ${index}`),
+        pressureOnCast: long(`Quyền số ${index} buộc cast lựa chọn giữa tiền và quan hệ`),
+      })),
+      thirtyChapterMutation: candidate.worldProof.thirtyChapterMutation,
+    };
+  };
+
   const openingTransportFor = (candidateId: string) => {
     const opening = openingFor(candidateId);
     return {
@@ -546,6 +571,7 @@ describe('isolated flagship setup v2', () => {
       matches: Array.from({ length: 17 }, (_, offset) => { const index = offset + 3; const winner = index % 3; return { leftId: `concept_c${winner}`, rightId: `concept_c${index}`, winnerId: `concept_c${winner}`, reason: long(`Concept ${winner} sinh lựa chọn và hậu quả cụ thể hơn đối thủ ${index}`) }; }),
       ranking: Array.from({ length: 20 }, (_, index) => ({ id: `concept_c${index}`, wins: index < 3 ? 6 : 0, reason: long(`Concept ${index} được xếp theo cơ chế cảnh và xung đột quan hệ cụ thể`) })),
       finalistIds: ['concept_c0', 'concept_c1', 'concept_c2'],
+      finalistWorldKernels: ['concept_c0', 'concept_c1', 'concept_c2'].map(kernelFor),
     };
     const result = await generateConceptTournamentV2(brief, { invoke: async call => {
       if (call.role === 'concept_lab') return JSON.stringify({ schemaVersion: 2, candidates: concepts });
@@ -555,7 +581,7 @@ describe('isolated flagship setup v2', () => {
     expect(result.callRoles).toEqual(['concept_lab', 'concept_judge', 'opening_simulator', 'opening_simulator', 'opening_simulator']);
     expect(result.artifact.openings).toHaveLength(3);
     expect(result.artifact.status).toBe('awaiting_human_selection');
-    expect(buildOpeningSimulationPrompt(brief, concepts[0])).toContain('proseParagraphs');
+    expect(buildOpeningSimulationPrompt(brief, concepts[0], kernelFor('concept_c0'))).toContain('APPROVED_WORLD_KERNEL');
   });
 
   it('materializes only a human-selected finalist and preserves immutable artifacts', async () => {
@@ -564,6 +590,7 @@ describe('isolated flagship setup v2', () => {
     const tournament = {
       schemaVersion: 2 as const,
       promptVersion: 'test',
+      benchmarkId: null,
       concepts,
       rejectedNearDuplicateIds: [],
       ranking: {
@@ -571,6 +598,7 @@ describe('isolated flagship setup v2', () => {
         matches: Array.from({ length: 17 }, (_, offset) => { const index = offset + 3; const winner = index % 3; return { leftId: `concept_c${winner}`, rightId: `concept_c${index}`, winnerId: `concept_c${winner}`, reason: long(`Concept ${winner} thắng concept ${index} bằng nhân quả cụ thể`) }; }),
         ranking: Array.from({ length: 20 }, (_, index) => ({ id: `concept_c${index}`, wins: index < 3 ? 6 : 0, reason: long(`Concept ${index} được xếp theo khả năng tạo lựa chọn khó`) })),
         finalistIds: ['concept_c0', 'concept_c1', 'concept_c2'],
+        finalistWorldKernels: ['concept_c0', 'concept_c1', 'concept_c2'].map(kernelFor),
       },
       openings: [opening, openingFor('concept_c1'), openingFor('concept_c2')],
       status: 'awaiting_human_selection' as const,
@@ -597,6 +625,16 @@ describe('isolated flagship setup v2', () => {
     expect(result.launchPack.storySpec.premise).toBe(selected.premise);
     expect(() => validateRollingPlanWindow({ schemaVersion: 2, startChapter: 1, endChapter: 5, plans }, story.pleasureProfile)).not.toThrow();
     expect(validatePleasureWindow(plans, story.pleasureProfile)).toEqual([]);
+
+    const rewrittenWorld = {
+      ...world,
+      rules: world.rules.map((rule, index) => index === 0 ? { ...rule, rule: long('Luật đã bị Causal World tự ý viết lại sau blind review') } : rule),
+    };
+    await expect(materializeFlagshipLaunchPackV2({ brief, tournament, selection }, { invoke: async call => {
+      if (call.role === 'character_designer') return JSON.stringify(characters);
+      if (call.role === 'causal_world') return JSON.stringify(rewrittenWorld);
+      return JSON.stringify(launchPack);
+    } })).rejects.toMatchObject({ code: 'setup_blocked' });
   });
 
   it('gives every materialization role an exact JSON contract', () => {
@@ -607,7 +645,7 @@ describe('isolated flagship setup v2', () => {
     const world = { schemaVersion: 2 as const, rules: story.causalWorldRules, resources: story.resourceEconomy, institutions: [0, 1].map(index => ({ name: `Tổ chức ${index}`, power: long(`Tổ chức ${index} kiểm soát giấy phép hoặc lịch vận chuyển`), incentive: long(`Tổ chức ${index} kiếm lợi từ việc giữ kỷ luật giao nhận`), enforcementEvidence: long(`Hợp đồng và nhật ký cổng kho chứng minh quyền số ${index}`), pressureOnCast: long(`Quyền số ${index} buộc cast lựa chọn giữa tiền và quan hệ`) })), knowledgeDistribution: [story.protagonist, ...story.cast.slice(0, 2)].map(member => ({ holder: member.name, knows: long(`${member.name} biết một phần giao dịch có bằng chứng riêng`), doesNotKnow: long(`${member.name} chưa biết agenda và giới hạn của người còn lại`) })) };
     const selection = { schemaVersion: 2 as const, candidateId: selected.id, approvedBy: 'human-reviewer', rationale: long('Opening tạo nhịp thưởng và nhân quả rõ nhất'), approvedAt: new Date().toISOString() };
     expect(buildCharacterDesignPrompt(brief, selected, opening)).toContain('OUTPUT_CONTRACT_EXACT=');
-    expect(buildCausalWorldPrompt(brief, selected, opening, characters)).toContain('OUTPUT_CONTRACT_EXACT=');
+    expect(buildCausalWorldPrompt(brief, selected, opening, characters, kernelFor(selected.id))).toContain('APPROVED_WORLD_KERNEL=');
     const launchPrompt = buildLaunchPackPrompt({ brief, selection, candidate: selected, opening, characters, world });
     expect(launchPrompt).toContain('OUTPUT_CONTRACT_EXACT=');
     expect(launchPrompt).toContain('pleasureProfile');

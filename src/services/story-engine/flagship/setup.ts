@@ -33,6 +33,8 @@ import {
 } from './setup-prompts';
 import { conceptSimilarity } from './concept-tournament';
 import { validateChapterPlanSemantics, validatePleasureWindow } from './contracts';
+import { distillBenchmarkForConceptLab } from './chinese-benchmark';
+import { getChineseBenchmarkPack } from './chinese-benchmark-data';
 
 export type FlagshipSetupRole = 'concept_lab' | 'concept_judge' | 'opening_simulator' | 'character_designer' | 'causal_world' | 'launch_architect';
 
@@ -106,12 +108,30 @@ function validateRanking(ranking: z.infer<typeof ConceptRankingV2Schema>, candid
       throw new FlagshipSetupError('setup_blocked', `Finalist ${finalist} never won a direct comparison.`);
     }
   }
+  const kernelIds = ranking.finalistWorldKernels.map(kernel => kernel.candidateId);
+  if (new Set(kernelIds).size !== 3 || [...kernelIds].sort().join('|') !== [...ranking.finalistIds].sort().join('|')) {
+    throw new FlagshipSetupError('setup_blocked', 'Concept Judge did not return exactly one world kernel for each finalist.');
+  }
+  for (const kernel of ranking.finalistWorldKernels) {
+    const candidate = candidates.find(item => item.id === kernel.candidateId)!;
+    if (JSON.stringify(kernel.signatureSituations) !== JSON.stringify(candidate.worldProof.signatureSituations)) {
+      throw new FlagshipSetupError('setup_blocked', `World kernel for ${kernel.candidateId} rewrote its signature situations.`);
+    }
+  }
 }
 
 export async function generateConceptTournamentV2(
   brief: FlagshipSetupBriefV2,
   dependencies: FlagshipSetupDependencies,
 ): Promise<{ artifact: ConceptTournamentArtifactV2; callRoles: FlagshipSetupRole[] }> {
+  const benchmarkPack = getChineseBenchmarkPack(brief.portfolioSlotId);
+  if (brief.promotionCohort === 'opening_tournament' && !benchmarkPack) {
+    throw new FlagshipSetupError('setup_blocked', `Chinese benchmark pack missing for opening-tournament slot ${brief.portfolioSlotId}.`);
+  }
+  if (benchmarkPack && benchmarkPack.slotId !== brief.portfolioSlotId) {
+    throw new FlagshipSetupError('setup_blocked', `Chinese benchmark pack does not belong to slot ${brief.portfolioSlotId}.`);
+  }
+  const benchmarkGuidance = benchmarkPack ? distillBenchmarkForConceptLab(benchmarkPack) : undefined;
   const callRoles: FlagshipSetupRole[] = [];
   const invoke = async (call: FlagshipSetupCall) => {
     callRoles.push(call.role);
@@ -119,7 +139,7 @@ export async function generateConceptTournamentV2(
     return dependencies.invoke(call);
   };
 
-  const batch = parseJson(await invoke({ role: 'concept_lab', systemPrompt: CONCEPT_LAB_SYSTEM, userPrompt: buildConceptLabPrompt(brief), jsonMode: true }), ConceptBatchV2Schema, 'Concept Lab');
+  const batch = parseJson(await invoke({ role: 'concept_lab', systemPrompt: CONCEPT_LAB_SYSTEM, userPrompt: buildConceptLabPrompt(brief, benchmarkGuidance), jsonMode: true }), ConceptBatchV2Schema, 'Concept Lab');
   uniqueIds(batch.candidates);
   const deduped = removeNearDuplicates(batch.candidates);
   if (deduped.unique.length < 3) throw new FlagshipSetupError('setup_blocked', 'Concept Lab produced fewer than three mechanically distinct concepts.', { rejected: deduped.rejected });
@@ -129,7 +149,8 @@ export async function generateConceptTournamentV2(
   const byId = new Map(deduped.unique.map(candidate => [candidate.id, candidate]));
   const openings = await Promise.all(ranking.finalistIds.map(async candidateId => {
     const candidate = byId.get(candidateId)!;
-    const transport = parseJson(await invoke({ role: 'opening_simulator', candidateId, systemPrompt: OPENING_SIMULATOR_SYSTEM, userPrompt: buildOpeningSimulationPrompt(brief, candidate), jsonMode: true }), OpeningTrialTransportV2Schema, `Opening Simulator ${candidateId}`);
+    const worldKernel = ranking.finalistWorldKernels.find(kernel => kernel.candidateId === candidateId)!;
+    const transport = parseJson(await invoke({ role: 'opening_simulator', candidateId, systemPrompt: OPENING_SIMULATOR_SYSTEM, userPrompt: buildOpeningSimulationPrompt(brief, candidate, worldKernel), jsonMode: true }), OpeningTrialTransportV2Schema, `Opening Simulator ${candidateId}`);
     const trial = OpeningTrialV2Schema.parse({
       ...transport,
       chapters: transport.chapters.map(({ proseParagraphs, ...chapter }) => ({
@@ -144,6 +165,7 @@ export async function generateConceptTournamentV2(
   const artifact = ConceptTournamentArtifactV2Schema.parse({
     schemaVersion: 2,
     promptVersion: FLAGSHIP_SETUP_PROMPT_VERSION,
+    benchmarkId: benchmarkPack?.id ?? null,
     concepts: deduped.unique,
     rejectedNearDuplicateIds: deduped.rejected,
     ranking,
@@ -169,7 +191,8 @@ export async function materializeFlagshipLaunchPackV2(input: {
   }
   const candidate = input.tournament.concepts.find(item => item.id === selection.candidateId);
   const opening = input.tournament.openings.find(item => item.candidateId === selection.candidateId);
-  if (!candidate || !opening) throw new FlagshipSetupError('setup_blocked', 'Selected finalist is missing its immutable concept or opening artifact.');
+  const worldKernel = input.tournament.ranking.finalistWorldKernels.find(item => item.candidateId === selection.candidateId);
+  if (!candidate || !opening || !worldKernel) throw new FlagshipSetupError('setup_blocked', 'Selected finalist is missing its immutable concept, world kernel or opening artifact.');
 
   const callRoles: FlagshipSetupRole[] = [];
   const invoke = async (call: FlagshipSetupCall) => {
@@ -178,13 +201,18 @@ export async function materializeFlagshipLaunchPackV2(input: {
     return dependencies.invoke(call);
   };
   const characters = parseJson(await invoke({ role: 'character_designer', systemPrompt: CHARACTER_DESIGNER_SYSTEM, userPrompt: buildCharacterDesignPrompt(input.brief, candidate, opening), jsonMode: true }), CharacterDesignV2Schema, 'Character Designer');
-  const world = parseJson(await invoke({ role: 'causal_world', systemPrompt: CAUSAL_WORLD_SYSTEM, userPrompt: buildCausalWorldPrompt(input.brief, candidate, opening, characters), jsonMode: true }), CausalWorldV2Schema, 'Causal World');
+  const world = parseJson(await invoke({ role: 'causal_world', systemPrompt: CAUSAL_WORLD_SYSTEM, userPrompt: buildCausalWorldPrompt(input.brief, candidate, opening, characters, worldKernel), jsonMode: true }), CausalWorldV2Schema, 'Causal World');
+  const containsExact = (items: unknown[], expected: unknown[]) => expected.every(value => items.some(item => JSON.stringify(item) === JSON.stringify(value)));
+  if (!containsExact(world.rules, worldKernel.rules) || !containsExact(world.resources, worldKernel.resources) || !containsExact(world.institutions, worldKernel.institutionalResponses)) {
+    throw new FlagshipSetupError('setup_blocked', 'Causal World rewrote or dropped an approved world-kernel rule, resource or institutional response.');
+  }
   const launchPack = parseJson(await invoke({ role: 'launch_architect', systemPrompt: LAUNCH_ARCHITECT_SYSTEM, userPrompt: buildLaunchPackPrompt({ ...input, selection, candidate, opening, characters, world }), jsonMode: true }), FlagshipLaunchPackV2Schema, 'Launch Architect');
   if (launchPack.selectedConceptId !== selection.candidateId) throw new FlagshipSetupError('setup_blocked', 'Launch Architect changed the human-selected concept.');
   const identityChanges: string[] = [];
   if (launchPack.storySpec.title !== candidate.workingTitle) identityChanges.push('title');
   if (launchPack.storySpec.genreLane !== input.brief.genreLane) identityChanges.push('genreLane');
   if (launchPack.storySpec.serialityEngine.recurringSituation !== candidate.serialityProof) identityChanges.push('serialityEngine.recurringSituation');
+  if (JSON.stringify(launchPack.storySpec.serialityEngine.variationAxes) !== JSON.stringify(candidate.worldProof.signatureSituations)) identityChanges.push('serialityEngine.variationAxes');
   if (JSON.stringify(launchPack.storySpec.pleasureProfile) !== JSON.stringify(input.brief.pleasureProfile)) identityChanges.push('pleasureProfile');
   if (launchPack.storySpec.readerFantasy !== candidate.readerFantasy) identityChanges.push('readerFantasy');
   if (launchPack.storySpec.premise !== candidate.premise) identityChanges.push('premise');
