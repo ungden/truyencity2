@@ -17,3 +17,6 @@ export * from './setup-runtime';
 export * from './rolling-planner';
 export * from './setup-ledger';
 export * from './model-routes';
+export * from './portfolio-taxonomy';
+export * from './portfolio';
+export * from './portfolio-data';

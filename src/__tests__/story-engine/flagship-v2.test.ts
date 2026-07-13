@@ -45,6 +45,20 @@ function spec(): StorySpecV2 {
     pipelineVersion: 'flagship_v2',
     title: 'Sổ Nợ Phố Cũ',
     genre: 'do-thi',
+    genreLane: 'urban_professional',
+    serialityEngine: {
+      recurringSituation: long('Bình nhận một nút thắt kho vận có chủ sở hữu, thời hạn và nghĩa vụ đã ký'),
+      variationAxes: [long('Loại nguồn lực bị khóa thay đổi giữa tiền, xe và dữ liệu'), long('Người có quyền quyết định thay đổi theo hợp đồng và quan hệ'), long('Thành quả tạo một nghĩa vụ mới khác với giao dịch trước')],
+      escalationVectors: [long('Quy mô đơn hàng tăng nhưng quyền kiểm soát phải được chia'), long('Dữ liệu tốt hơn làm đối tác phản ứng có chiến lược hơn'), long('Uy tín tích lũy khiến lựa chọn đạo đức có giá cao hơn')],
+      depletionRisks: [long('Lặp cảnh kiểm sổ rồi tìm ra sai số đúng lúc'), long('Đối thủ tự phạm lỗi để Bình có cơ hội cứu kho'), long('Mọi tiến bộ bị quy đổi thành tiền mặt mà không đổi quan hệ')],
+    },
+    progressionCurrencies: [['tiền mặt', 'material'], ['quyền điều phối', 'institutional'], ['uy tín cộng tác', 'social']].map(([name, kind]) => ({
+      name,
+      kind,
+      source: long(`${name} chỉ tăng từ giao dịch hoặc thỏa thuận được thực hiện`),
+      spend: long(`${name} phải được đem cược hoặc chia sẻ để mở lựa chọn mới`),
+      visibility: long(`${name} hiện ra qua tài sản, chữ ký hoặc cách người khác giao quyền`),
+    })),
     storyIdentity: {
       uniqueMechanism: long('Mỗi quyết định truyện phải đối chiếu đồng thời sổ kho, dòng tiền và quyền giữ xe lạnh'),
       emotionalCore: long('Một người quen tự gánh học cách chia quyền mà không bỏ trách nhiệm với gia đình'),
@@ -227,6 +241,17 @@ describe('flagship v2 contracts and computed foundation', () => {
     expect(computeFoundationScoreV2(story).source).toBe('computed_v2');
     expect(computeFoundationScoreV2(story).passed).toBe(true);
     expect(validateChapterPlanSemantics(chapter)).toEqual([]);
+  });
+
+  it('requires fantasy progression outside raw power', () => {
+    const fantasy = StorySpecV2Schema.parse({
+      ...spec(),
+      genre: 'huyen-huyen',
+      genreLane: 'xuanhuan_rules',
+      progressionCurrencies: spec().progressionCurrencies.map(currency => ({ ...currency, kind: 'power' })),
+    });
+    expect(computeFoundationScoreV2(fantasy).issues).toContain('fantasy kernel needs at least two non-power progression currencies');
+    expect(computeFoundationScoreV2(fantasy).passed).toBe(false);
   });
 
   it('rejects a scene that changes nothing', () => {
@@ -445,6 +470,12 @@ describe('isolated flagship setup v2', () => {
   const brief = FlagshipSetupBriefV2Schema.parse({
     schemaVersion: 2,
     language: 'vi',
+    portfolioSlotId: 'DT-08',
+    genreLane: 'urban_professional',
+    laneCardIds: ['market_urban_professional'],
+    distinctnessFingerprint: 'native|operations|cash+access|contract|fictionalized',
+    researchQuestions: [long('Ai thực sự nắm quyền điều xe và bằng chứng nào xác nhận quyền đó'), long('Dòng tiền và hao hụt thay đổi ra sao sau từng quyết định vận hành'), long('Nghĩa vụ mới nào phát sinh khi nhân vật thắng một giao dịch')],
+    promotionCohort: 'lab_reference',
     genre: 'do-thi',
     audience: long('Độc giả Việt trưởng thành thích quyết định kinh doanh có hậu quả'),
     desiredExperience: long('Căng thẳng đến từ thương lượng, dòng tiền và lòng tin thay đổi'),
@@ -470,6 +501,10 @@ describe('isolated flagship setup v2', () => {
       emotionalCore: `${marker} thử thách khả năng tin người khi trách nhiệm không thể chia đều`,
       differenceClaim: `${marker} khác ở cơ chế nhân quả chứ không phải tên nghề hoặc trope`,
       nearestComparisonRisk: `${marker} có nguy cơ bị viết thành truyện kinh doanh cộng điểm nếu làm hời hợt`,
+      serialityProof: index === 0 ? spec().serialityEngine.recurringSituation : `${marker} sinh ba mươi chương bằng cách đổi quyền kiểm soát, nghĩa vụ và phản ứng của đối tác`,
+      openingAdvantage: `${marker} được kích hoạt ngay chương đầu bằng một lựa chọn nghề nghiệp có giới hạn`,
+      progressionProof: `${marker} làm thay đổi tiền, quyền truy cập và quan hệ theo dấu hiệu nhìn thấy được`,
+      antiCloneFingerprint: `native|reward-${index}|cash-access-${index}|contract-${index}|fictionalized`,
     };
   });
 

@@ -7,7 +7,7 @@ import type {
   OpeningTrialV2,
 } from './setup-contracts';
 
-export const FLAGSHIP_SETUP_PROMPT_VERSION = 'flagship-setup-v2.1-pleasure';
+export const FLAGSHIP_SETUP_PROMPT_VERSION = 'flagship-setup-v2.2-portfolio';
 
 export const CONCEPT_LAB_SYSTEM = `Bạn phụ trách Concept Lab cho đúng một brief truyện.
 Tạo 20 cơ chế truyện khác nhau về nguyên nhân vận hành, lựa chọn của nhân vật và nguồn xung đột; đổi tên, nghề hoặc trope không được tính là khác.
@@ -47,9 +47,9 @@ const json = (value: unknown) => JSON.stringify(value);
 export function buildConceptLabPrompt(brief: FlagshipSetupBriefV2): string {
   return `BRIEF=${json(brief)}
 
-OUTPUT_CONTRACT_EXACT={"schemaVersion":2,"candidates":[{"id":"concept_ascii_slug","workingTitle":"...","readerCuriosity":"...","readerFantasy":"...","premise":"...","irreversibleProblem":"...","protagonistContradiction":"...","domainMechanism":"...","conflictEngine":"...","emotionalCore":"...","differenceClaim":"...","nearestComparisonRisk":"..."}]}
+OUTPUT_CONTRACT_EXACT={"schemaVersion":2,"candidates":[{"id":"concept_ascii_slug","workingTitle":"...","readerCuriosity":"...","readerFantasy":"...","premise":"...","irreversibleProblem":"...","protagonistContradiction":"...","domainMechanism":"...","conflictEngine":"...","emotionalCore":"...","differenceClaim":"...","nearestComparisonRisk":"...","serialityProof":"...","openingAdvantage":"...","progressionProof":"...","antiCloneFingerprint":"advantage|reward|currencies|conflict|world"}]}
 
-Trả đúng 20 object và đúng các key trên, không thêm title/description/score. id chỉ dùng chữ thường ASCII, số, gạch dưới hoặc gạch ngang và phải bắt đầu bằng concept_. Mỗi trường văn bản tối thiểu 20 ký tự.`;
+Trả đúng 20 object và đúng các key trên, không thêm title/description/score. id chỉ dùng chữ thường ASCII, số, gạch dưới hoặc gạch ngang và phải bắt đầu bằng concept_. antiCloneFingerprint của 20 concept phải khác nhau thật sự theo cơ chế, không chỉ khác cách diễn đạt. Mỗi trường văn bản ngoài fingerprint tối thiểu 20 ký tự.`;
 }
 
 export function buildConceptJudgePrompt(brief: FlagshipSetupBriefV2, candidates: ConceptCandidateV2[]): string {
@@ -114,6 +114,9 @@ function launchContract(input: Parameters<typeof buildLaunchPackPrompt>[0]) {
       pipelineVersion: 'flagship_v2',
       title: input.candidate.workingTitle,
       genre: input.brief.genre,
+      genreLane: input.brief.genreLane,
+      serialityEngine: { recurringSituation: input.candidate.serialityProof, variationAxes: ['...', '...', '...'], escalationVectors: ['...', '...', '...'], depletionRisks: ['...', '...', '...'] },
+      progressionCurrencies: [{ name: 'power_currency', kind: 'power', source: '...', spend: '...', visibility: '...' }, { name: 'material_currency', kind: 'material', source: '...', spend: '...', visibility: '...' }, { name: 'social_currency', kind: 'social', source: '...', spend: '...', visibility: '...' }],
       storyIdentity: { uniqueMechanism: '...', emotionalCore: input.candidate.emotionalCore, domainTruthSources: ['...', '...', '...'], forbiddenGenericMoves: ['...', '...', '...', '...', '...'], similarityRisks: ['...', '...', '...'] },
       pleasureProfile: input.brief.pleasureProfile,
       readerFantasy: input.candidate.readerFantasy,
@@ -147,5 +150,5 @@ export function buildLaunchPackPrompt(input: {
 
 OUTPUT_CONTRACT_EXACT=${json(launchContract(input))}
 
-Chỉ dùng đúng các key trong contract. Các mảng phải đạt cardinality của ví dụ/schema; mỗi ChapterPlan có 2-5 scenes dù contract chỉ minh họa một scene. StorySpec phải sao chép chính xác title, pleasureProfile, readerFantasy, premise, protagonist, cast, causalWorldRules và resourceEconomy từ artifact đã duyệt. StoryState chương 0 phải chứa toàn bộ cast, resources và promises. Arc đầu phủ chương 1-20 đến tối đa 30. rollingChapterPlans chỉ gồm chương 1-5; plan chương 1-3 phải chứa nguyên văn requiredPlanAnchor tương ứng.`;
+Chỉ dùng đúng các key trong contract. Các mảng phải đạt cardinality của ví dụ/schema; mỗi ChapterPlan có 2-5 scenes dù contract chỉ minh họa một scene. StorySpec phải sao chép chính xác title, genreLane, pleasureProfile, readerFantasy, premise, protagonist, cast, causalWorldRules và resourceEconomy từ artifact đã duyệt. serialityEngine phải chứng minh tình huống lặp có thể biến hóa chứ không phải một thang tăng cấp; progressionCurrencies phải có nguồn, cách tiêu và dấu hiệu độc giả nhìn thấy. StoryState chương 0 phải chứa toàn bộ cast, resources và promises. Arc đầu phủ chương 1-20 đến tối đa 30. rollingChapterPlans chỉ gồm chương 1-5; plan chương 1-3 phải chứa nguyên văn requiredPlanAnchor tương ứng.`;
 }

@@ -1,5 +1,7 @@
 import { z } from 'zod';
 import { ArcPlanV2Schema, ChapterPlanV2Schema, PleasureProfileV2Schema, StorySpecV2ObjectSchema, StorySpecV2Schema, StoryStateV2Schema } from './contracts';
+import { GenreLaneV2Schema, PromotionCohortV1Schema } from './portfolio-taxonomy';
+import { PortfolioSlotIdV1Schema } from './portfolio';
 
 const concrete = z.string().trim().min(20);
 const named = z.string().trim().min(2);
@@ -8,6 +10,12 @@ const conceptId = z.string().regex(/^concept_[a-z0-9_-]+$/);
 export const FlagshipSetupBriefV2Schema = z.object({
   schemaVersion: z.literal(2),
   language: z.literal('vi'),
+  portfolioSlotId: PortfolioSlotIdV1Schema,
+  genreLane: GenreLaneV2Schema,
+  laneCardIds: z.array(z.string().regex(/^market_[a-z0-9_-]+$/)).min(1).max(4),
+  distinctnessFingerprint: z.string().min(12),
+  researchQuestions: z.array(concrete).min(3).max(8),
+  promotionCohort: PromotionCohortV1Schema,
   genre: StorySpecV2ObjectSchema.shape.genre,
   audience: concrete,
   desiredExperience: concrete,
@@ -31,6 +39,10 @@ export const ConceptCandidateV2Schema = z.object({
   emotionalCore: concrete,
   differenceClaim: concrete,
   nearestComparisonRisk: concrete,
+  serialityProof: concrete,
+  openingAdvantage: concrete,
+  progressionProof: concrete,
+  antiCloneFingerprint: z.string().trim().min(12),
 }).strict();
 
 export const ConceptBatchV2Schema = z.object({

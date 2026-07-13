@@ -1,6 +1,16 @@
 {
   "schemaVersion": 2,
   "language": "vi",
+  "portfolioSlotId": "DT-08",
+  "genreLane": "urban_professional",
+  "laneCardIds": ["market_urban_professional"],
+  "distinctnessFingerprint": "native|operations-diagnosis|cash+access+team|contracts-and-customers|realistic",
+  "researchQuestions": [
+    "Ai thực sự nắm dữ liệu, hàng hóa, quyền truy cập và quyền ký trong từng nút thắt vận hành?",
+    "Một thay đổi nhỏ tạo doanh thu, chi phí chuyển đổi và nghĩa vụ mới có thể kiểm chứng thế nào?",
+    "Đối tác và đội ngũ sẽ phản ứng ra sao khi lợi ích hoặc quyền quyết định của họ bị thay đổi?"
+  ],
+  "promotionCohort": "lab_reference",
   "genre": "do-thi",
   "audience": "Độc giả Việt trưởng thành thích truyện đô thị có năng lực nghề nghiệp, lựa chọn khó, quan hệ quyền lực và hậu quả kinh tế nhìn thấy được.",
   "desiredExperience": "Cảm giác cuốn đến từ việc nhân vật dùng hiểu biết ngành nghề để xoay chuyển tình thế nhưng mỗi thắng lợi tạo nghĩa vụ, đối thủ có phản ứng hợp lý và quan hệ thay đổi thật.",

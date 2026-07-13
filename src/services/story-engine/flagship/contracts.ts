@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { GenreLaneV2Schema } from './portfolio-taxonomy';
 
 const nonGeneric = z.string().trim().min(20);
 const namedText = z.string().trim().min(2);
@@ -35,6 +36,20 @@ export const StorySpecV2ObjectSchema = z.object({
     'vong-du', 'dong-nhan', 'mat-the', 'linh-di', 'quan-truong', 'di-gioi',
     'ngon-tinh', 'quy-tac-quai-dam', 'ngu-thu-tien-hoa', 'khoai-xuyen',
   ]),
+  genreLane: GenreLaneV2Schema,
+  serialityEngine: z.object({
+    recurringSituation: nonGeneric,
+    variationAxes: z.array(nonGeneric).min(3).max(8),
+    escalationVectors: z.array(nonGeneric).min(3).max(8),
+    depletionRisks: z.array(nonGeneric).min(3).max(8),
+  }).strict(),
+  progressionCurrencies: z.array(z.object({
+    name: namedText,
+    kind: z.enum(['power', 'material', 'social', 'institutional', 'knowledge', 'life']),
+    source: nonGeneric,
+    spend: nonGeneric,
+    visibility: nonGeneric,
+  }).strict()).min(3).max(10),
   storyIdentity: z.object({
     uniqueMechanism: nonGeneric,
     emotionalCore: nonGeneric,

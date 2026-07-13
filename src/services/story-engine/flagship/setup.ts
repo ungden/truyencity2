@@ -75,6 +75,8 @@ function parseJson<T>(raw: string, schema: z.ZodType<T>, label: string): T {
 function uniqueIds(candidates: ConceptCandidateV2[]): void {
   const ids = new Set(candidates.map(candidate => candidate.id));
   if (ids.size !== candidates.length) throw new FlagshipSetupError('setup_blocked', 'Concept Lab returned duplicate ids.');
+  const fingerprints = new Set(candidates.map(candidate => candidate.antiCloneFingerprint.trim().toLowerCase()));
+  if (fingerprints.size !== candidates.length) throw new FlagshipSetupError('setup_blocked', 'Concept Lab returned duplicate anti-clone fingerprints.');
 }
 
 function removeNearDuplicates(candidates: ConceptCandidateV2[]): { unique: ConceptCandidateV2[]; rejected: string[] } {
@@ -181,6 +183,8 @@ export async function materializeFlagshipLaunchPackV2(input: {
   if (launchPack.selectedConceptId !== selection.candidateId) throw new FlagshipSetupError('setup_blocked', 'Launch Architect changed the human-selected concept.');
   const identityChanges: string[] = [];
   if (launchPack.storySpec.title !== candidate.workingTitle) identityChanges.push('title');
+  if (launchPack.storySpec.genreLane !== input.brief.genreLane) identityChanges.push('genreLane');
+  if (launchPack.storySpec.serialityEngine.recurringSituation !== candidate.serialityProof) identityChanges.push('serialityEngine.recurringSituation');
   if (JSON.stringify(launchPack.storySpec.pleasureProfile) !== JSON.stringify(input.brief.pleasureProfile)) identityChanges.push('pleasureProfile');
   if (launchPack.storySpec.readerFantasy !== candidate.readerFantasy) identityChanges.push('readerFantasy');
   if (launchPack.storySpec.premise !== candidate.premise) identityChanges.push('premise');

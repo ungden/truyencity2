@@ -1,6 +1,16 @@
 {
   "schemaVersion": 2,
   "language": "vi",
+  "portfolioSlotId": "DT-01",
+  "genreLane": "era_coastal",
+  "laneCardIds": ["market_era_livelihood"],
+  "distinctnessFingerprint": "rebirth|coastal-value-chain|cash+tools+outlet|weather-market-family|fictionalized",
+  "researchQuestions": [
+    "Mùa vụ, thời tiết và giới hạn tàu nhỏ tạo cơ hội nào mà không biến ký ức thành dự báo tuyệt đối?",
+    "Đá lạnh, muối, hao hụt và đầu ra thay đổi giá trị mẻ hàng qua từng công đoạn ra sao?",
+    "Lợi nhuận đầu tiên có thể chuyển thành thay đổi đời sống và năng lực sản xuất nào nhìn thấy được?"
+  ],
+  "promotionCohort": "lab_reference",
   "genre": "do-thi",
   "audience": "Độc giả Việt thích nam tần niên đại, làm giàu bằng tay nghề, gia đình ấm lên từng bước và nhịp đọc nhẹ nhàng có thành quả sớm.",
   "desiredExperience": "Khoái hoạt đến từ một người từng trải được làm lại, chủ động biến hiểu biết nghề biển thành mẻ hàng, bữa cơm, dụng cụ và uy tín; khó khăn ngắn và luôn mở đường cho năng lực hoặc tình thân.",

@@ -32,6 +32,8 @@
     "flagship:plan-window": "node --import tsx scripts/flagship-plan-window.ts",
     "flagship:write": "node --import tsx scripts/flagship-write-chapter.ts",
     "flagship:approve-checkpoint": "node --import tsx scripts/flagship-approve-checkpoint.ts",
+    "flagship:portfolio:validate": "node --import tsx scripts/flagship-portfolio-validate.ts",
+    "flagship:portfolio:promote": "node --import tsx scripts/flagship-portfolio-promote.ts",
     "legacy:archive": "node --import tsx scripts/archive-all-legacy.ts"
   },
   "dependencies": {

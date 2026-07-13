@@ -90,8 +90,12 @@ export function computeFoundationScoreV2(spec: StorySpecV2): FoundationScoreV2 {
       Math.min(5, distinctPayoffs.size),
     ),
     runway_sustainability: boundedScore(
-      Math.min(5, spec.runway30.length) +
-      Math.min(5, distinctRunway.size),
+      Math.min(3, spec.runway30.length * 0.6) +
+      Math.min(2, distinctRunway.size * 0.4) +
+      (concrete(spec.serialityEngine.recurringSituation) ? 1 : 0) +
+      Math.min(2, spec.serialityEngine.variationAxes.length * 0.7) +
+      Math.min(1, spec.serialityEngine.escalationVectors.length * 0.4) +
+      Math.min(1, spec.progressionCurrencies.length * 0.35),
     ),
   };
 
@@ -101,6 +105,8 @@ export function computeFoundationScoreV2(spec: StorySpecV2): FoundationScoreV2 {
   if (namedCast.size !== spec.cast.length) issues.push('cast contains duplicate names');
   if (distinctPayoffs.size < Math.ceil(spec.promisePayoffLedger.length * 0.8)) issues.push('promise/payoff ledger repeats the same payoff');
   if (distinctRunway.size < spec.runway30.length) issues.push('30-chapter runway repeats irreversible changes');
+  if (new Set(spec.progressionCurrencies.map(item => item.name.trim().toLowerCase())).size !== spec.progressionCurrencies.length) issues.push('progression currencies contain duplicate names');
+  if (['huyen-huyen', 'tien-hiep'].includes(spec.genre) && spec.progressionCurrencies.filter(item => item.kind !== 'power').length < 2) issues.push('fantasy kernel needs at least two non-power progression currencies');
   if (spec.causalWorldRules.some(rule => rule.beneficiary.trim().toLowerCase() === rule.harmedParty.trim().toLowerCase())) {
     issues.push('causal world contains a rule whose beneficiary and harmed party are identical');
   }
