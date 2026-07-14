@@ -34,6 +34,9 @@
     "flagship:approve-checkpoint": "node --import tsx scripts/flagship-approve-checkpoint.ts",
     "flagship:portfolio:validate": "node --import tsx scripts/flagship-portfolio-validate.ts",
     "flagship:portfolio:promote": "node --import tsx scripts/flagship-portfolio-promote.ts",
+    "flagship:catalogue:validate": "node --import tsx scripts/flagship-catalogue-validate.ts",
+    "flagship:catalogue:export": "node --import tsx scripts/export-flagship-catalogue.ts",
+    "flagship:covers:render": "node --import tsx scripts/render-flagship-covers.ts",
     "legacy:archive": "node --import tsx scripts/archive-all-legacy.ts"
   },
   "dependencies": {
@@ -90,6 +93,7 @@
     "react-hook-form": "^7.56.4",
     "react-resizable-panels": "^3.0.2",
     "recharts": "^2.15.3",
+    "sharp": "^0.34.5",
     "sonner": "^2.0.3",
     "tailwind-merge": "^3.3.0",
     "tailwindcss-animate": "^1.0.7",

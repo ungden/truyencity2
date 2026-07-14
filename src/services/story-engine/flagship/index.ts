@@ -22,3 +22,5 @@ export * from './portfolio';
 export * from './portfolio-data';
 export * from './chinese-benchmark';
 export * from './chinese-benchmark-data';
+export * from './catalogue';
+export * from './catalogue-data';

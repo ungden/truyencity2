@@ -1,9 +1,11 @@
 import { readFileSync } from 'fs';
 import path from 'path';
+import sharp from 'sharp';
 import {
   FLAGSHIP_FIRST_30_MANIFEST,
   FLAGSHIP_MARKET_RESEARCH_V1,
 } from '@/services/story-engine/flagship/portfolio-data';
+import { FLAGSHIP_FIRST_30_CATALOGUE_V1 } from '@/services/story-engine/flagship/catalogue-data';
 import {
   FLAGSHIP_CHINESE_BENCHMARKS_V1,
   buildConceptLabPrompt,
@@ -12,12 +14,14 @@ import {
   generateConceptTournamentV2,
   getChineseBenchmarkPack,
   validateBenchmarkCoverage,
+  validateFlagshipCatalogue,
   validatePortfolioResearch,
 } from '@/services/story-engine/flagship';
 
 describe('flagship first-30 portfolio', () => {
   const validated = validatePortfolioResearch(FLAGSHIP_FIRST_30_MANIFEST, FLAGSHIP_MARKET_RESEARCH_V1);
   const benchmarks = validateBenchmarkCoverage(validated.manifest, FLAGSHIP_CHINESE_BENCHMARKS_V1);
+  const catalogue = validateFlagshipCatalogue(validated.manifest, FLAGSHIP_FIRST_30_CATALOGUE_V1).catalogue;
 
   it('locks the 30-story allocation and 30-to-9 cohort', () => {
     const slots = validated.manifest.slots;
@@ -33,6 +37,44 @@ describe('flagship first-30 portfolio', () => {
     const slots = validated.manifest.slots;
     expect(new Set(slots.map(slot => slot.genreLane)).size).toBe(30);
     expect(new Set(slots.map(slot => slot.distinctnessFingerprint)).size).toBe(30);
+  });
+
+  it('prepares one distinct concept package for every portfolio slot without materializing StorySpec', () => {
+    expect(catalogue.packages).toHaveLength(30);
+    expect(new Set(catalogue.packages.map(item => item.title)).size).toBe(30);
+    expect(new Set(catalogue.packages.map(item => item.visualFingerprint)).size).toBe(30);
+    expect(catalogue.packages.every(item => item.status === 'concept_package_ready')).toBe(true);
+    expect(catalogue.packages.every(item => item.storySpecStatus === 'not_materialized')).toBe(true);
+    expect(catalogue.packages.every(item => item.writerIsolation)).toBe(true);
+  });
+
+  it('keeps ImageGen art-only and makes ratio, Vietnamese title and watermark deterministic', () => {
+    for (const item of catalogue.packages) {
+      expect(item.coverArt.imagePrompt).toContain('strict 3:4 portrait composition');
+      expect(item.coverArt.imagePrompt).toContain('no sparkles');
+      expect(item.coverArt.imagePrompt).toContain('no bokeh');
+      expect(item.coverArt.imagePrompt).toContain('no text, no letters, no typography, no watermark');
+      expect(item.coverArt.imagePrompt).not.toContain(item.title);
+      expect(item.coverArt.imagePrompt).not.toContain('truyencity.com');
+      expect(item.coverArt.renderSpec).toEqual({
+        width: 1086,
+        height: 1448,
+        title: item.title,
+        watermark: 'truyencity.com',
+      });
+    }
+  });
+
+  it('ships all 30 reproducible source illustrations and rendered 3:4 covers', async () => {
+    validateFlagshipCatalogue(validated.manifest, catalogue, { requireCoverFiles: true, workspaceRoot: process.cwd() });
+    for (const item of catalogue.packages) {
+      const cover = readFileSync(path.join(process.cwd(), 'public', item.coverArt.assetPath.replace(/^\//, '')));
+      const source = readFileSync(path.join(process.cwd(), 'public', item.coverArt.sourceAssetPath.replace(/^\//, '')));
+      expect(source.length).toBeGreaterThan(100_000);
+      expect(cover.subarray(0, 4).toString('ascii')).toBe('RIFF');
+      const metadata = await sharp(cover).metadata();
+      expect(metadata).toMatchObject({ format: 'webp', width: 1086, height: 1448 });
+    }
   });
 
   it('uses the bounded advantage mix instead of one universal setup', () => {
@@ -103,6 +145,8 @@ describe('flagship first-30 portfolio', () => {
     const prompts = readFileSync(path.join(process.cwd(), 'src/services/story-engine/flagship/prompts.ts'), 'utf8');
     expect(prompts).not.toContain("from './portfolio'");
     expect(prompts).not.toContain("from './portfolio-data'");
+    expect(prompts).not.toContain("from './catalogue'");
+    expect(prompts).not.toContain("from './catalogue-data'");
     expect(prompts).not.toContain('MARKET_CARD');
     expect(prompts).not.toContain('PORTFOLIO_SLOT');
     expect(prompts).not.toContain('chinese-benchmark');

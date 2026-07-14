@@ -64,7 +64,9 @@ scripts/_*.ts
 .codex/automation-runs/
 .automation/
 /automation-runs/
-public/covers/
+public/covers/*
+!public/covers/flagship-first-30/
+!public/covers/flagship-first-30/**
 
 # typescript
 *.tsbuildinfo
