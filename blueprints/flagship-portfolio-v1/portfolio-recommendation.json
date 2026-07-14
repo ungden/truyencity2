@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "status": "awaiting_human_portfolio_selection",
+  "reviewedSlots": 9,
+  "recommendedFinalists": [
+    {
+      "slotId": "HX-04",
+      "winnerBlindCode": "HX04-B",
+      "score": 90.7,
+      "criticalFails": [],
+      "confidence": 0.95,
+      "summary": "Tác phẩm thể hiện tư duy thiết kế thế giới (world-building) rất tốt thông qua công việc bảo trì kênh rạch. Các giải pháp kỹ thuật của nhân vật chính (phân loại đá bằng màu, chế phân bón từ đá mục) rất sáng tạo và thực tế."
+    },
+    {
+      "slotId": "TH-01",
+      "winnerBlindCode": "TH01-C",
+      "score": 92.9,
+      "criticalFails": [],
+      "confidence": 1,
+      "summary": "Một tác phẩm xuất sắc với hệ thống ma pháp âm thanh và hạn ngạch từ ngữ vô cùng sáng tạo. Nhân vật chính có sức nặng, hành động nhất quán và bầu không khí truyện được xây dựng rất tốt."
+    },
+    {
+      "slotId": "DT-11",
+      "winnerBlindCode": "DT11-B",
+      "score": 84.9,
+      "criticalFails": [],
+      "confidence": 0.9,
+      "summary": "Truyện kết hợp xuất sắc giữa giám định cổ vật truyền thống và khoa học vật liệu hiện đại. Nhân vật chính quyết đoán, dám chấp nhận rủi ro lớn để bảo vệ sự thật khoa học. Các chi tiết chuyên môn rất thuyết phục."
+    }
+  ],
+  "rankedSlots": [
+    {
+      "slotId": "TH-01",
+      "winnerBlindCode": "TH01-C",
+      "score": 92.9,
+      "criticalFails": [],
+      "confidence": 1,
+      "summary": "Một tác phẩm xuất sắc với hệ thống ma pháp âm thanh và hạn ngạch từ ngữ vô cùng sáng tạo. Nhân vật chính có sức nặng, hành động nhất quán và bầu không khí truyện được xây dựng rất tốt."
+    },
+    {
+      "slotId": "HX-04",
+      "winnerBlindCode": "HX04-B",
+      "score": 90.7,
+      "criticalFails": [],
+      "confidence": 0.95,
+      "summary": "Tác phẩm thể hiện tư duy thiết kế thế giới (world-building) rất tốt thông qua công việc bảo trì kênh rạch. Các giải pháp kỹ thuật của nhân vật chính (phân loại đá bằng màu, chế phân bón từ đá mục) rất sáng tạo và thực tế."
+    },
+    {
+      "slotId": "DT-11",
+      "winnerBlindCode": "DT11-B",
+      "score": 84.9,
+      "criticalFails": [],
+      "confidence": 0.9,
+      "summary": "Truyện kết hợp xuất sắc giữa giám định cổ vật truyền thống và khoa học vật liệu hiện đại. Nhân vật chính quyết đoán, dám chấp nhận rủi ro lớn để bảo vệ sự thật khoa học. Các chi tiết chuyên môn rất thuyết phục."
+    },
+    {
+      "slotId": "DT-13",
+      "winnerBlindCode": "DT13-B",
+      "score": 84.9,
+      "criticalFails": [],
+      "confidence": 0.9,
+      "summary": "Truyện thể hiện kiến thức y khoa lâm sàng xuất sắc, nhịp độ dồn dập và nhân vật chính có hành động quyết đoán vượt qua rào cản thủ tục hành chính."
+    },
+    {
+      "slotId": "DT-03",
+      "winnerBlindCode": "DT03-B",
+      "score": 82.7,
+      "criticalFails": [],
+      "confidence": 0.95,
+      "summary": "Tác phẩm xuất sắc với các chi tiết kỹ thuật cơ khí dã chiến cực kỳ thuyết phục. Bối cảnh nông thôn Việt Nam thời kỳ đổi mới được khắc họa sinh động, chân thực."
+    },
+    {
+      "slotId": "HX-01",
+      "winnerBlindCode": "HX01-A",
+      "score": 80,
+      "criticalFails": [],
+      "confidence": 0.9,
+      "summary": "Một mở đầu xuất sắc với hệ thống thế giới độc đáo dựa trên âm thanh và giấy tro. Nhân vật chính có chuyên môn cao, hành động nhất quán và có chiều sâu tâm lý."
+    },
+    {
+      "slotId": "HX-05",
+      "winnerBlindCode": "HX05-A",
+      "score": 80,
+      "criticalFails": [],
+      "confidence": 1,
+      "summary": "HX05-A có mở đầu tốt, thế giới chẩn đoán âm học độc đáo và nhân vật chính hành động quyết đoán, có tính nhân quả rõ ràng."
+    },
+    {
+      "slotId": "DT-05",
+      "winnerBlindCode": "DT05-A",
+      "score": 78.2,
+      "criticalFails": [],
+      "confidence": 0.9,
+      "summary": "Một chương mở đầu rất hứa hẹn với hệ thống giao thương hai thế giới dựa trên các quy tắc vật lý và cơ học thực tế. Tác giả lồng ghép khéo léo các chi tiết kỹ thuật như màng co PE, dây cảo tăng đơ, và cáp nấm."
+    },
+    {
+      "slotId": "TH-03",
+      "winnerBlindCode": "TH03-A",
+      "score": 78.2,
+      "criticalFails": [],
+      "confidence": 0.9,
+      "summary": "Một câu chuyện xuất sắc kết hợp giữa tư duy khoa học thực nghiệm (thử nghiệm mù đôi, loại bỏ thiên kiến) vào bối cảnh tu tiên giả tưởng. Nhân vật chính có mục tiêu rõ ràng, hành động nhất quán và giải quyết vấn đề bằng trí tuệ."
+    }
+  ],
+  "humanGateRequired": true,
+  "storySpecsMaterialized": 0,
+  "productionWrites": 0
+}

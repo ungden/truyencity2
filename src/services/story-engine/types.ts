@@ -768,6 +768,8 @@ export interface GeminiConfig {
   temperature: number;
   maxTokens: number;
   systemPrompt?: string;
+  thinkingLevel?: 'low' | 'medium' | 'high';
+  responseJsonSchema?: Record<string, unknown>;
   deepseekThinkingEnabled?: boolean;
   deepseekReasoningEffort?: 'high' | 'max';
   deepseekThinkingTasks?: string[];

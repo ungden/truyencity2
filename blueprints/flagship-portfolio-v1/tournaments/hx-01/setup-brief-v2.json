@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 2,
+  "language": "vi",
+  "portfolioSlotId": "HX-01",
+  "genreLane": "xuanhuan_rules",
+  "laneCardIds": [
+    "market_xuanhuan_hybrid"
+  ],
+  "distinctnessFingerprint": "native|phát hiện dấu hiệu, thử quy tắc, trả giá để xác nhận, khai thác kẽ hở rồi đổi vị thế trong cộng đồng.|hiểu biết quy tắc+uy tín điều tra+vật chứng|các quy tắc chồng lấn, tổ chức độc quyền diễn giải và người khác có cách sinh tồn hợp lý riêng.|alternate_world",
+  "researchQuestions": [
+    "Cơ chế Huyền huyễn quy tắc và dị tượng vận hành bằng nguồn lực, giới hạn và bằng chứng nào để không trở thành lời giải tùy tiện?",
+    "Các tài sản hiểu biết quy tắc, vật chứng, uy tín điều tra được tạo, tiêu và mất ra sao để độc giả nhìn thấy tiến bộ thật?",
+    "Nguồn xung đột Các quy tắc chồng lấn, tổ chức độc quyền diễn giải và người khác có cách sinh tồn hợp lý riêng. phản ứng thế nào sau mỗi thắng lợi để vòng thưởng không lặp lại?"
+  ],
+  "promotionCohort": "opening_tournament",
+  "genre": "huyen-huyen",
+  "audience": "Độc giả nam Việt thích huyền huyễn trí mưu, bí ẩn có thể suy luận và cảm giác phá luật bằng quan sát thay vì chịu hành hạ kéo dài.",
+  "desiredExperience": "Mỗi dị tượng là một bài toán có vật chứng, người hưởng lợi và rủi ro thật; main thắng sớm bằng một suy luận kiểm chứng được rồi dần giành quyền giải thích thế giới.",
+  "domain": "Một thành phố hư cấu xây quanh các giếng chuông cổ, nơi lời khai được ghi lên giấy tro có thể biến thành quy tắc cưỡng chế nếu đủ người tin và một thiết chế kiểm định đóng dấu.",
+  "pleasureProfile": {
+    "realityMode": "alternate_world",
+    "advantage": "Main là nhân viên phục chế hồ sơ có trí nhớ hình ảnh về nét mực và thói quen sửa giấy, nên nhận ra quy tắc đã bị con người can thiệp trước người khác.",
+    "knowledgeLimit": "Anh chỉ nhìn ra dấu vết vật chất và mâu thuẫn trong hồ sơ; không biết đáp án, nguồn dị tượng, ý nghĩ người khác hoặc quy tắc chưa từng để lại bằng chứng.",
+    "primaryRewardLoop": [
+      "Phát hiện dấu vết sai trong một quy tắc đang gây hại.",
+      "Đặt phép thử nhỏ có người chứng kiến và chấp nhận rủi ro.",
+      "Dùng kết quả tìm kẽ hở cứu người hoặc đổi thế thương lượng.",
+      "Thu vật chứng, uy tín và quyền tiếp cận hồ sơ sâu hơn."
+    ],
+    "comfortLoop": [
+      "Trở về tiệm sửa giấy ăn bữa khuya với người thân sau mỗi vụ.",
+      "Dùng thắng lợi để bảo vệ một góc phố và khôi phục sinh hoạt bình thường."
+    ],
+    "setbackRecoveryWindow": 2,
+    "faceSlapPolicy": "Chỉ phản đòn người đã bóp méo hồ sơ hoặc lợi dụng quy tắc vì lợi ích thật; bằng chứng phải công khai và đối phương được quyền phản ứng hợp lý.",
+    "progressionSignals": [
+      "vật chứng",
+      "quyền tra hồ sơ",
+      "uy tín điều tra",
+      "khu phố an toàn",
+      "đồng minh biết việc"
+    ]
+  },
+  "boundaries": [
+    "Không sao chép tên riêng, hệ sức mạnh, vật phẩm nhận diện, cảnh nổi tiếng hoặc chuỗi sự kiện của bất kỳ tác phẩm đối chiếu nào.",
+    "Không dùng đối thủ ngu, đám đông tung hô hoặc may mắn vô nguồn để chứng minh nhân vật chính giỏi; thắng lợi phải có chuẩn bị, bằng chứng và cái giá.",
+    "Không kéo dài nhục nhã hoặc bất lực quá cửa sổ hồi phục; áp lực phải buộc nhân vật lựa chọn và làm thay đổi trạng thái truyện.",
+    "Tên người, địa danh, tổ chức và giọng thoại phải thuộc riêng truyện này; không dùng hậu tố thể loại hoặc thiết chế chung như một setup thay thế.",
+    "Không dùng danh sách điều cấm tùy tiện; mỗi quy tắc phải có cơ chế hình thành, phạm vi và dấu vết kiểm chứng.",
+    "Không biến tổ chức điều tra thành kho lời giải; các bộ phận có quyền lợi và mức hiểu biết xung đột.",
+    "Không lấy điên loạn, máu me hoặc úp mở làm chiều sâu thay cho lựa chọn nhân vật."
+  ],
+  "researchNotes": [
+    {
+      "source": "https://www.chinawriter.com.cn/n1/2025/1022/c404027-40587015.html — nguồn chính thức trong benchmark_hx_01.",
+      "finding": "Quy tắc hấp dẫn khi vừa giải được bằng bằng chứng vừa còn phần bất định buộc nhân vật chấp nhận rủi ro."
+    },
+    {
+      "source": "https://www.chinawriter.com.cn/n1/2025/0109/c404023-40398625.html — nguồn chính thức trong benchmark_hx_01.",
+      "finding": "Sức mạnh phải tạo thêm nghĩa vụ, nguy cơ hoặc cách bị khai thác thay vì chỉ mở khóa chiến thắng lớn hơn."
+    },
+    {
+      "source": "https://www.cssn.cn/skgz/bwyc/202604/t20260420_5981165.shtml — nguồn chính thức trong benchmark_hx_01.",
+      "finding": "Mỗi dị tượng cần làm lệch đời sống, nghề nghiệp hoặc trật tự cộng đồng để bí ẩn có trọng lượng cảm xúc."
+    }
+  ],
+  "seedConstraints": [
+    "Ba tình huống đặc trưng phải phụ thuộc giấy tro, giếng chuông và quyền đóng dấu.",
+    "Chương một phải có một phép thử do main chủ động đề xuất và một người được cứu bằng kết quả.",
+    "Đến chương ba main phải giành được một vật chứng hoặc quyền tiếp cận mới nhưng đồng thời bị một thiết chế chú ý.",
+    "Ba mươi chương phải làm ít nhất hai hiểu biết cũ mất giá vì quy tắc chồng lấn."
+  ]
+}

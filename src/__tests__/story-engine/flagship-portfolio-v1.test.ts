@@ -6,11 +6,14 @@ import {
   FLAGSHIP_MARKET_RESEARCH_V1,
 } from '@/services/story-engine/flagship/portfolio-data';
 import { FLAGSHIP_FIRST_30_CATALOGUE_V1 } from '@/services/story-engine/flagship/catalogue-data';
+import { FLAGSHIP_OPENING_COHORT_BRIEFS_V2 } from '@/services/story-engine/flagship/portfolio-setup-briefs-data';
+import { BlindSlotReviewV1Schema, rankBlindSlotReview } from '@/services/story-engine/flagship/portfolio-opening-review';
 import {
   FLAGSHIP_CHINESE_BENCHMARKS_V1,
   buildConceptLabPrompt,
   distillBenchmarkForConceptLab,
   FlagshipSetupBriefV2Schema,
+  ConceptTournamentArtifactV2Schema,
   generateConceptTournamentV2,
   getChineseBenchmarkPack,
   validateBenchmarkCoverage,
@@ -108,6 +111,57 @@ describe('flagship first-30 portfolio', () => {
     }
   });
 
+  it('gives all nine opening lanes a valid story-specific setup brief', () => {
+    const briefs = Object.values(FLAGSHIP_OPENING_COHORT_BRIEFS_V2);
+    expect(briefs).toHaveLength(9);
+    expect(new Set(briefs.map(brief => brief.portfolioSlotId)).size).toBe(9);
+    expect(new Set(briefs.map(brief => brief.domain)).size).toBe(9);
+    expect(new Set(briefs.map(brief => brief.pleasureProfile.advantage)).size).toBe(9);
+    expect(briefs.every(brief => brief.promotionCohort === 'opening_tournament')).toBe(true);
+    expect(briefs.every(brief => brief.researchNotes.length >= 3)).toBe(true);
+    expect(briefs.every(brief => brief.boundaries.length >= 7)).toBe(true);
+    expect(briefs.every(brief => brief.pleasureProfile.setbackRecoveryWindow <= 3)).toBe(true);
+    for (const brief of briefs) {
+      const slot = validated.manifest.slots.find(item => item.slotId === brief.portfolioSlotId)!;
+      expect(FlagshipSetupBriefV2Schema.parse(brief)).toEqual(brief);
+      expect(brief.genreLane).toBe(slot.genreLane);
+      expect(brief.distinctnessFingerprint).toBe(slot.distinctnessFingerprint);
+      expect(brief.pleasureProfile.realityMode).toBe(slot.worldMode);
+    }
+  });
+
+  it('ships nine schema-valid tournaments and nine blind editorial reviews without materializing stories', () => {
+    const slotIds = Object.keys(FLAGSHIP_OPENING_COHORT_BRIEFS_V2).sort();
+    let concepts = 0;
+    let openings = 0;
+    let chapters = 0;
+    for (const slotId of slotIds) {
+      const directory = path.join(process.cwd(), 'blueprints/flagship-portfolio-v1/tournaments', slotId.toLowerCase());
+      const tournament = ConceptTournamentArtifactV2Schema.parse(JSON.parse(readFileSync(path.join(directory, 'tournament.json'), 'utf8')));
+      const review = BlindSlotReviewV1Schema.parse(JSON.parse(readFileSync(path.join(directory, 'editorial-review.json'), 'utf8')));
+      expect(tournament.status).toBe('awaiting_human_selection');
+      expect(review.ballots.map(item => item.blindCode).sort()).toEqual([
+        `${slotId.replace('-', '')}-A`,
+        `${slotId.replace('-', '')}-B`,
+        `${slotId.replace('-', '')}-C`,
+      ]);
+      concepts += tournament.concepts.length;
+      openings += tournament.openings.length;
+      chapters += tournament.openings.reduce((total, opening) => total + opening.chapters.length, 0);
+    }
+    expect({ tournaments: slotIds.length, concepts, openings, chapters }).toEqual({ tournaments: 9, concepts: 180, openings: 27, chapters: 81 });
+
+    const recommendation = JSON.parse(readFileSync(path.join(process.cwd(), 'blueprints/flagship-portfolio-v1/portfolio-recommendation.json'), 'utf8'));
+    expect(recommendation).toMatchObject({
+      status: 'awaiting_human_portfolio_selection',
+      reviewedSlots: 9,
+      humanGateRequired: true,
+      storySpecsMaterialized: 0,
+      productionWrites: 0,
+    });
+    expect(recommendation.recommendedFinalists.map((item: { slotId: string }) => item.slotId)).toEqual(['HX-04', 'TH-01', 'DT-11']);
+  });
+
   it('distills mechanisms for Concept Lab without exposing titles, authors or source URLs', () => {
     const pack = getChineseBenchmarkPack('DT-03')!;
     const guidance = distillBenchmarkForConceptLab(pack);
@@ -129,6 +183,7 @@ describe('flagship first-30 portfolio', () => {
     const prompt = buildConceptLabPrompt(brief, guidance);
     expect(prompt).toContain(pack.id);
     expect(prompt).toContain('worldProof');
+    expect(prompt).toContain('tuyệt đối không trả bare array');
     for (const comparable of pack.comparables) expect(prompt).not.toContain(comparable.title);
   });
 
@@ -163,8 +218,36 @@ describe('flagship first-30 portfolio', () => {
 
   it('has no production mutation in the preparation commands', () => {
     const promote = readFileSync(path.join(process.cwd(), 'scripts/flagship-portfolio-promote.ts'), 'utf8');
+    const tournaments = readFileSync(path.join(process.cwd(), 'scripts/flagship-portfolio-tournaments.ts'), 'utf8');
+    const review = readFileSync(path.join(process.cwd(), 'scripts/flagship-portfolio-review-openings.ts'), 'utf8');
     expect(promote).toContain('databaseWrites: 0');
     expect(promote).toContain('SETUP_BLOCKED');
     expect(promote).not.toContain('getSupabase');
+    expect(tournaments).toContain('productionWrites: 0');
+    expect(tournaments).toContain('checkpoint');
+    expect(tournaments).not.toContain('getSupabase');
+    expect(tournaments).not.toContain('chapter-writer');
+    expect(tournaments).not.toContain('orchestrator');
+    expect(review).toContain('productionWrites: 0');
+    expect(review).toContain('humanGateRequired: true');
+    expect(review).not.toContain('getSupabase');
+    expect(review).not.toContain('chapter-writer');
+    expect(review).not.toContain('orchestrator');
+  });
+
+  it('ranks blind openings by reading quality and applies explicit critical penalties', () => {
+    const ballot = (blindCode: string, score: number, criticalFails: string[] = []) => ({
+      blindCode,
+      axes: { opening_pull: score, world_specificity: score, protagonist_agency: score, causal_reward: score, character_life: score, seriality_30: score, prose_naturalness: score, read_chapter_4: score },
+      criticalFails,
+      evidence: [
+        { axis: 'opening_pull', chapterNumber: 1, span: 'Một evidence span đủ dài', reason: 'Lựa chọn này tạo hậu quả trực tiếp cho chương tiếp theo.' },
+        { axis: 'read_chapter_4', chapterNumber: 3, span: 'Một evidence span thứ hai', reason: 'Áp lực chưa giải quyết tạo nhu cầu đọc tiếp có nguyên nhân.' },
+      ],
+      confidence: 0.8,
+      summary: 'Opening được chấm từ prose và thay đổi trạng thái thực tế, không dựa vào concept score.',
+    });
+    const review = BlindSlotReviewV1Schema.parse({ schemaVersion: 1, ballots: [ballot('HX01-A', 5, ['ai_sounding_prose']), ballot('HX01-B', 4), ballot('HX01-C', 3)] });
+    expect(rankBlindSlotReview(review)[0].blindCode).toBe('HX01-B');
   });
 });

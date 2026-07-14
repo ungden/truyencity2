@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "ballots": [
+    {
+      "blindCode": "TH01-A",
+      "axes": {
+        "opening_pull": 4,
+        "world_specificity": 4,
+        "protagonist_agency": 4,
+        "causal_reward": 4,
+        "character_life": 4,
+        "seriality_30": 4,
+        "prose_naturalness": 4,
+        "read_chapter_4": 4
+      },
+      "criticalFails": [],
+      "evidence": [
+        {
+          "axis": "opening_pull",
+          "chapterNumber": 1,
+          "span": "— Việc bán đất, nhánh thứ tư của con tuyệt đối không đồng ý! — Giọng hắn vang lên lạnh lẽo và kiên định.",
+          "reason": "Nhân vật chính ngay lập tức phản đối quyết định bán đất của gia tộc, tạo ra mâu thuẫn trực tiếp và kịch tính ngay từ đầu."
+        },
+        {
+          "axis": "world_specificity",
+          "chapterNumber": 1,
+          "span": "Nước luân canh mang theo oán khí và bình cảnh tu luyện của người đi trước.",
+          "reason": "Thiết lập một cơ chế thế giới độc đáo khi nguồn nước tưới tiêu mang theo tạp chất tinh thần của người tu luyện."
+        },
+        {
+          "axis": "causal_reward",
+          "chapterNumber": 3,
+          "span": "Nhận ba mươi khối linh thạch và mười cân linh gạo thượng hạng từ nhánh ba, Mộc biết mình đã chính thức kéo được vị trưởng bối này về phe mình.",
+          "reason": "Phần thưởng chính trị và tài nguyên trực tiếp từ hành động lọc nước giúp đỡ nhánh ba trước đó."
+        }
+      ],
+      "confidence": 0.9,
+      "summary": "Một mở đầu tốt với hệ thống nông nghiệp tu tiên sáng tạo, nhân vật chính chủ động và có tính toán chiến thuật rõ ràng."
+    },
+    {
+      "blindCode": "TH01-B",
+      "axes": {
+        "opening_pull": 4,
+        "world_specificity": 4,
+        "protagonist_agency": 4,
+        "causal_reward": 4,
+        "character_life": 4,
+        "seriality_30": 4,
+        "prose_naturalness": 4,
+        "read_chapter_4": 4
+      },
+      "criticalFails": [],
+      "evidence": [
+        {
+          "axis": "world_specificity",
+          "chapterNumber": 1,
+          "span": "khi bóng Thanh Tùng đổ xuống vào giờ ngọ, nhánh họ nào sẽ phải gánh vác việc cày cuốc trong Vùng Tối? Ai chịu nổi cảnh mù lòa câm điếc suốt nửa năm trời?",
+          "reason": "Xác lập quy luật khắc nghiệt của điền trang âm dương và hình phạt mất ngũ quan độc đáo."
+        },
+        {
+          "axis": "protagonist_agency",
+          "chapterNumber": 1,
+          "span": "— Ta sẽ vào. Không chỉ vậy, ta sẽ chứng minh Vùng Tối không phải là án tử vô hình mà các người vẫn khiếp sợ.",
+          "reason": "Nhân vật chính chủ động dấn thân vào nguy hiểm để bảo vệ lợi ích lâu dài của gia tộc."
+        },
+        {
+          "axis": "character_life",
+          "chapterNumber": 3,
+          "span": "Mất đi giác quan suốt nửa năm khiến giờ đây, chỉ một ngụm trà nóng cũng đủ làm hắn trào dâng niềm thỏa mãn khó tả.",
+          "reason": "Mô tả chân thực tâm lý và cảm giác của nhân vật sau khi trải qua thời gian dài bị tước đoạt giác quan."
+        }
+      ],
+      "confidence": 0.9,
+      "summary": "Ý tưởng về vùng sáng tối và khai thác khoáng sản trong bóng tối rất hứa hẹn, nhân vật kiên cường và có mục tiêu rõ ràng."
+    },
+    {
+      "blindCode": "TH01-C",
+      "axes": {
+        "opening_pull": 5,
+        "world_specificity": 5,
+        "protagonist_agency": 5,
+        "causal_reward": 4,
+        "character_life": 5,
+        "seriality_30": 4,
+        "prose_naturalness": 4,
+        "read_chapter_4": 5
+      },
+      "criticalFails": [],
+      "evidence": [
+        {
+          "axis": "world_specificity",
+          "chapterNumber": 3,
+          "span": "Mỗi người chỉ có năm mươi từ một ngày. Ai vượt quá hạn ngạch, vòng gỗ sẽ tự động siết cổ.",
+          "reason": "Hệ thống hạn ngạch từ ngữ cực kỳ độc đáo và mang tính cưỡng chế cao, tạo ra nét đặc trưng riêng biệt cho thế giới."
+        },
+        {
+          "axis": "protagonist_agency",
+          "chapterNumber": 1,
+          "span": "Lâm Viễn lao tới bàn, không một chút do dự, giật phăng bản khế ước và xé toạc nó làm đôi.",
+          "reason": "Hành động quyết liệt, chấp nhận chịu phạt để ngăn chặn sai lầm của gia tộc thể hiện tính chủ động cực cao."
+        },
+        {
+          "axis": "character_life",
+          "chapterNumber": 3,
+          "span": "Không một lời chúc tụng, không một tiếng trò chuyện. Nhưng khi húp ngụm canh thịt ngọt lịm, hơi ấm trôi tuột xuống dạ dày, vuốt ve những kinh mạch đang co rút vì đau đớn, Lâm Viễn khẽ mỉm cười.",
+          "reason": "Khắc họa xuất sắc không khí gia đình ấm áp nhưng im lặng, phản ánh đúng luật lệ khắc nghiệt vừa được thiết lập."
+        }
+      ],
+      "confidence": 1,
+      "summary": "Một tác phẩm xuất sắc với hệ thống ma pháp âm thanh và hạn ngạch từ ngữ vô cùng sáng tạo. Nhân vật chính có sức nặng, hành động nhất quán và bầu không khí truyện được xây dựng rất tốt."
+    }
+  ]
+}

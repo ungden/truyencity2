@@ -43,8 +43,14 @@ Mỗi pack có tối thiểu sáu tác phẩm Trung Quốc để đối chiếu 
 
 ```bash
 npm run flagship:portfolio:validate
+npm run flagship:portfolio:tournaments
+npm run flagship:portfolio:review
 npm run flagship:portfolio:promote
 ```
+
+`tournaments` tạo 20 concept, pairwise rank và ba opening cho từng slot bằng checkpoint có hash. `review` chấm mù ba opening, kiểm evidence nguyên văn và tạo [khuyến nghị 9 → 3](./portfolio-recommendation.md). Cả hai lệnh đều offline và không import Supabase, chapter writer hoặc legacy orchestrator.
+
+Kết quả hiện tại: 9 tournament, 180 concept, 27 opening và 81 chương mẫu. Blind editor đề cử `HX-04 / HX04-B`, `TH-01 / TH01-C` và `DT-11 / DT11-B`. Đây vẫn là khuyến nghị AI; `StorySpec` chỉ được materialize sau human gate.
 
 Lệnh `promote` hiện chỉ tạo promotion packet trên stdout và không ghi database. `--apply` cố ý bị chặn cho tới khi từng slot có brief riêng và concept được duyệt; đây là fail-closed, không phải tính năng còn thiếu để engine tự lấp.
 

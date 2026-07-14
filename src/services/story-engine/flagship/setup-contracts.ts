@@ -7,6 +7,7 @@ import { ChineseBenchmarkIdV1Schema } from './chinese-benchmark';
 const concrete = z.string().trim().min(20);
 const named = z.string().trim().min(2);
 const conceptId = z.string().regex(/^concept_[a-z0-9_-]+$/);
+const conceptText = concrete.max(360);
 
 export const FlagshipSetupBriefV2Schema = z.object({
   schemaVersion: z.literal(2),
@@ -29,27 +30,27 @@ export const FlagshipSetupBriefV2Schema = z.object({
 
 export const ConceptCandidateV2Schema = z.object({
   id: conceptId,
-  workingTitle: named,
-  readerCuriosity: concrete,
-  readerFantasy: concrete,
-  premise: concrete,
-  irreversibleProblem: concrete,
-  protagonistContradiction: concrete,
-  domainMechanism: concrete,
-  conflictEngine: concrete,
-  emotionalCore: concrete,
-  differenceClaim: concrete,
-  nearestComparisonRisk: concrete,
-  serialityProof: concrete,
-  openingAdvantage: concrete,
-  progressionProof: concrete,
+  workingTitle: named.max(80),
+  readerCuriosity: conceptText,
+  readerFantasy: conceptText,
+  premise: conceptText,
+  irreversibleProblem: conceptText,
+  protagonistContradiction: conceptText,
+  domainMechanism: conceptText,
+  conflictEngine: conceptText,
+  emotionalCore: conceptText,
+  differenceClaim: conceptText,
+  nearestComparisonRisk: conceptText,
+  serialityProof: conceptText,
+  openingAdvantage: conceptText,
+  progressionProof: conceptText,
   worldProof: z.object({
-    signatureSituations: z.array(concrete).length(3),
-    institutionalReaction: concrete,
-    resourceCirculation: concrete,
-    thirtyChapterMutation: concrete,
+    signatureSituations: z.array(conceptText).length(3),
+    institutionalReaction: conceptText,
+    resourceCirculation: conceptText,
+    thirtyChapterMutation: conceptText,
   }).strict(),
-  antiCloneFingerprint: z.string().trim().min(12),
+  antiCloneFingerprint: z.string().trim().min(12).max(240),
 }).strict();
 
 export const ConceptBatchV2Schema = z.object({
@@ -96,18 +97,20 @@ export const OpeningChapterTrialV2Schema = z.object({
   title: named,
   prose: z.string().trim().min(1200),
   causalStateChange: concrete,
-  requiredPlanAnchor: concrete,
+  requiredPlanAnchor: z.string().trim().min(8).max(160),
   protagonistChoice: concrete,
   agencyMove: concrete,
-  earnedReward: concrete,
-  materialProgression: concrete,
-  comfortPayoff: concrete,
+  earnedReward: concrete.nullable(),
+  materialProgression: concrete.nullable(),
+  comfortPayoff: concrete.nullable(),
   costPaid: concrete,
   exitPressure: concrete,
 }).strict();
 
 export const OpeningChapterTransportV2Schema = OpeningChapterTrialV2Schema.omit({ prose: true }).extend({
-  proseParagraphs: z.array(z.string().trim().min(40).max(600)).min(8).max(20),
+  // A short spoken line can be a legitimate paragraph. Judge chapter substance by
+  // total prose length instead of forcing every paragraph to satisfy a prose quota.
+  proseParagraphs: z.array(z.string().trim().min(2).max(600)).min(8).max(20),
 }).strict().superRefine((chapter, ctx) => {
   if (chapter.proseParagraphs.join('\n\n').length < 1200) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['proseParagraphs'], message: 'Opening prose paragraphs must total at least 1200 characters.' });
@@ -120,7 +123,12 @@ export const OpeningTrialTransportV2Schema = z.object({
   chapters: z.array(OpeningChapterTransportV2Schema).length(3),
   continuityDigest: concrete,
   unresolvedPressure: concrete,
-}).strict();
+}).strict().superRefine((trial, ctx) => {
+  const chapterThree = trial.chapters.find(chapter => chapter.chapterNumber === 3);
+  for (const key of ['earnedReward', 'materialProgression', 'comfortPayoff'] as const) {
+    if (!chapterThree?.[key]) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['chapters', 2, key], message: `${key} must be earned by chapter 3.` });
+  }
+});
 
 export const OpeningTrialV2Schema = z.object({
   schemaVersion: z.literal(2),
@@ -132,6 +140,10 @@ export const OpeningTrialV2Schema = z.object({
   const sequence = trial.chapters.map(chapter => chapter.chapterNumber).sort();
   if (JSON.stringify(sequence) !== JSON.stringify([1, 2, 3])) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['chapters'], message: 'Opening trial must contain chapters 1, 2 and 3 exactly once.' });
+  }
+  const chapterThree = trial.chapters.find(chapter => chapter.chapterNumber === 3);
+  for (const key of ['earnedReward', 'materialProgression', 'comfortPayoff'] as const) {
+    if (!chapterThree?.[key]) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['chapters', 2, key], message: `${key} must be earned by chapter 3.` });
   }
 });
 

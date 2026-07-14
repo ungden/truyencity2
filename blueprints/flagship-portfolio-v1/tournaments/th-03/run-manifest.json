@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "slotId": "TH-03",
+  "status": "awaiting_human_selection",
+  "promptVersion": "flagship-setup-v2.14-scene-affordance-cardinality",
+  "benchmarkId": "benchmark_th_03",
+  "callRoles": [
+    "concept_lab",
+    "concept_judge",
+    "opening_simulator",
+    "opening_simulator",
+    "opening_simulator"
+  ],
+  "modelRoutes": {
+    "setupCreative": "gemini-3.1-pro-preview",
+    "setupJudge": "gemini-3.5-flash"
+  },
+  "databaseWrites": 0,
+  "productionProjectsChanged": false
+}

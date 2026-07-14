@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "ballots": [
+    {
+      "blindCode": "HX04-A",
+      "axes": {
+        "opening_pull": 4,
+        "world_specificity": 5,
+        "protagonist_agency": 4,
+        "causal_reward": 5,
+        "character_life": 4,
+        "seriality_30": 4,
+        "prose_naturalness": 4,
+        "read_chapter_4": 4
+      },
+      "criticalFails": [],
+      "evidence": [
+        {
+          "axis": "world_specificity",
+          "chapterNumber": 1,
+          "span": "Tro trắng khi nén chặt và làm ẩm có độ mịn đáng kinh ngạc, tựa như đất sét trắng thượng hạng.",
+          "reason": "Thế giới giả tưởng độc đáo nơi tro trắng của thung lũng có tính chất vật lý đặc biệt, có thể nén chặt và làm ẩm để tạo hình như đất sét, phục vụ cho việc chế tạo thấu kính hội tụ nhiệt mặt trời."
+        },
+        {
+          "axis": "causal_reward",
+          "chapterNumber": 3,
+          "span": "Khoa ngồi bệt dưới mái hiên lợp bằng rêu đan mát mẻ, bưng bát cháo nóng hổi, ngọt lịm. Từng thìa cháo nuốt xuống bụng mang theo cảm giác no đủ, ấm áp lan tỏa khắp các cơ bắp mệt nhoài.",
+          "reason": "Nhân vật nhận được phần thưởng vật chất xứng đáng sau khi giải quyết khủng hoảng: rêu khô để nấu cháo, mang lại sự thỏa mãn thể chất rõ rệt sau chuỗi ngày nhịn đói và lao động vất vả."
+        }
+      ],
+      "confidence": 0.9,
+      "summary": "Một mở đầu xuất sắc với ý tưởng khoa học thực tiễn áp dụng vào sinh tồn. Thế giới thung lũng tro củi và rêu được xây dựng nhất quán, logic nhân quả chặt chẽ và nhân vật chính có động cơ rõ ràng."
+    },
+    {
+      "blindCode": "HX04-B",
+      "axes": {
+        "opening_pull": 4,
+        "world_specificity": 5,
+        "protagonist_agency": 5,
+        "causal_reward": 5,
+        "character_life": 4,
+        "seriality_30": 4,
+        "prose_naturalness": 4,
+        "read_chapter_4": 5
+      },
+      "criticalFails": [],
+      "evidence": [
+        {
+          "axis": "world_specificity",
+          "chapterNumber": 1,
+          "span": "Đá mang dấu tay giữ nước tuyệt vời, nhưng cái giá phải trả là axit từ rễ rêu sẽ ăn mòn nó sau đúng chín mươi ngày.",
+          "reason": "Chi tiết kỹ thuật cực kỳ cụ thể về sự tương tác sinh-hóa giữa rêu và đá lót kênh, thiết lập nên quy luật vận hành và bảo trì của thế giới này."
+        },
+        {
+          "axis": "causal_reward",
+          "chapterNumber": 3,
+          "span": "Khang húp một thìa súp nóng hổi, cảm nhận hơi ấm bùng nổ trong dạ dày, sự no đủ thỏa mãn lan tỏa khắp cơ thể.",
+          "reason": "Phần thưởng thực tế từ Thím Ba (rêu sấy khô hảo hạng và nước sạch) giúp Khang có một bữa ăn ấm áp, giải tỏa cơn đói và mệt mỏi thể xác sau ca trực căng thẳng."
+        }
+      ],
+      "confidence": 0.95,
+      "summary": "Tác phẩm thể hiện tư duy thiết kế thế giới (world-building) rất tốt thông qua công việc bảo trì kênh rạch. Các giải pháp kỹ thuật của nhân vật chính (phân loại đá bằng màu, chế phân bón từ đá mục) rất sáng tạo và thực tế."
+    },
+    {
+      "blindCode": "HX04-C",
+      "axes": {
+        "opening_pull": 4,
+        "world_specificity": 5,
+        "protagonist_agency": 5,
+        "causal_reward": 5,
+        "character_life": 4,
+        "seriality_30": 4,
+        "prose_naturalness": 4,
+        "read_chapter_4": 4
+      },
+      "criticalFails": [],
+      "evidence": [
+        {
+          "axis": "world_specificity",
+          "chapterNumber": 2,
+          "span": "Đá này phải ngâm nước sạch mười hai giờ mới hết độc. Nếu không, chạm vào nước sinh hoạt là rêu hạ lưu chết sạch.",
+          "reason": "Quy trình xử lý đá tôi độc hại đòi hỏi tính toán kỹ lưỡng về thời gian và nguồn nước, thể hiện tính nhất quán và chi tiết của hệ thống sinh thái trong truyện."
+        },
+        {
+          "axis": "causal_reward",
+          "chapterNumber": 3,
+          "span": "Vị ngọt thanh của rêu không bị ám mùi hắc ín, húp một ngụm mà trôi tuột từ cuống họng xuống dạ dày, mang lại sự thỏa mãn êm ái mà đã mấy tháng rồi cậu chưa được nếm.",
+          "reason": "Sự cải thiện trực tiếp về chất lượng cuộc sống của nhân vật chính sau khi bảo vệ thành công nguồn nước sạch: được thưởng thức bát canh rêu ngon lành không còn mùi hóa chất."
+        }
+      ],
+      "confidence": 0.9,
+      "summary": "Truyện giải quyết xung đột kỹ thuật và xã hội đan xen rất tốt. Hành động hy sinh đôi tay của Khoa để giữ khớp nối ống dẫn nước độc thể hiện tinh thần trách nhiệm cao, phần thưởng nhận lại rất xứng đáng."
+    }
+  ]
+}

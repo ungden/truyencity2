@@ -91,8 +91,10 @@ export const StorySpecV2ObjectSchema = z.object({
   }).strict()).min(3).max(8),
   causalWorldRules: z.array(z.object({
     rule: nonGeneric,
-    beneficiary: nonGeneric,
-    harmedParty: nonGeneric,
+    // These are actor labels, not explanatory prose. Requiring 20 characters
+    // rewarded padded names and rejected precise groups such as "thợ già".
+    beneficiary: namedText,
+    harmedParty: namedText,
     enforcement: nonGeneric,
     cost: nonGeneric,
     consequence: nonGeneric,

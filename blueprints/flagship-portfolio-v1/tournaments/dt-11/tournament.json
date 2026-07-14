@@ -1,0 +1,1222 @@
+{
+  "schemaVersion": 2,
+  "promptVersion": "flagship-setup-v2.7-opening-payoff-window",
+  "benchmarkId": "benchmark_dt_11",
+  "concepts": [
+    {
+      "id": "concept_porosity_reader",
+      "workingTitle": "Hơi Thở Của Đất",
+      "readerCuriosity": "Làm sao một chiếc bình gốm xỉn màu, thô ráp lại có giá trị hơn hàng men bóng loáng, và bí mật gì nằm sau lớp sáp phủ nhân tạo?",
+      "readerFantasy": "Dùng cảm giác chạm để nhận biết độ xốp của đất nung, bóc trần những lớp ngụy trang rẻ tiền để trả lại giá trị lịch sử cho di vật gia đình.",
+      "premise": "Một cựu nhân viên kho lưu trữ phát hiện mình có thể cảm nhận độ thoát ẩm của gốm sứ, dùng nó để tìm ra những tác phẩm lò gốm Nam Bộ xưa bị phủ sáp che giấu.",
+      "irreversibleProblem": "Thị trường chuộng đồ bóng bẩy, khiến những món gốm mộc nguyên bản bị thợ buôn phủ hóa chất làm hỏng cấu trúc, nếu không cứu kịp sẽ mất vĩnh viễn dấu vết lò nung.",
+      "protagonistContradiction": "Muốn bảo tồn nguyên trạng sự thô mộc của hiện vật, nhưng khách hàng lại sẵn sàng trả giá cao cho những món đồ đã bị 'làm mới' sai cách.",
+      "domainMechanism": "Chợ đồ cũ Vạn Thái vận hành dựa trên các đợt thanh lý nhà cổ; giá trị định đoạt bởi giấy tờ mua bán cũ và lớp men nguyên bản chưa bị can thiệp hóa học.",
+      "conflictEngine": "Xung đột giữa việc giữ nguyên lớp gốm xốp dễ bám bẩn (đúng lịch sử) và việc phủ bóng (dễ bán). Đối thủ là những tay buôn chuyên 'mông má' đồ cũ bằng keo công nghiệp.",
+      "emotionalCore": "Sự trân trọng những giá trị mộc mạc, không hoàn hảo; niềm vui khi nghe người chủ cũ kể về bữa cơm gia đình bên chiếc thố đất nung.",
+      "differenceClaim": "Không định giá bằng mắt thần, mà bằng việc cảm nhận độ 'thở' của đất, sau đó phải lật tìm sổ sách gia phả để chứng minh xuất xứ lò gốm.",
+      "nearestComparisonRisk": "Dễ bị nhầm với truyện giám định gốm sứ Trung Hoa, khắc phục bằng cách tập trung vào dòng gốm gia dụng Nam Bộ hư cấu và tài liệu di cư.",
+      "serialityProof": "Mỗi món đồ mở ra một mảnh ghép về bản đồ các lò gốm đã tắt lửa, tạo thành chuỗi nhiệm vụ phục dựng hồ sơ di sản địa phương.",
+      "openingAdvantage": "Chương 1: Từ chối mua chiếc bình bóng bẩy vì không có giấy tờ và cảm nhận đất bị bít kín. Tìm được mảnh gốm vỡ có độ xốp chuẩn, dẫn đến một bộ sưu tập ẩn.",
+      "progressionProof": "Tăng vốn từ việc bán đồ đã làm sạch hóa chất; uy tín tăng giúp tiếp cận các gia đình trí thức cũ; thu thập đủ hồ sơ để lập bản đồ lò gốm.",
+      "worldProof": {
+        "signatureSituations": [
+          "Dùng cồn y tế lau một góc bình để chứng minh lớp sáp ngụy trang trước mặt người mua.",
+          "So sánh độ xốp của hiện vật với mảnh vỡ tiêu bản trong kho lưu trữ để xác định niên đại lò nung.",
+          "Thuyết phục người thừa kế không đánh bóng lại bộ ấm trà kỷ vật bằng cách đưa ra bức ảnh đen trắng của ông nội họ."
+        ],
+        "institutionalReaction": "Giới buôn bán ban đầu cười nhạo vì main mua 'đồ xỉn màu', sau đó phải thay đổi tiêu chuẩn thu mua khi main công bố hồ sơ chứng minh giá trị nguyên bản.",
+        "resourceCirculation": "Tiền lời dùng để mua dung dịch bóc tách chuyên dụng và trả phí trích lục hồ sơ; uy tín đổi lấy quyền xem trước đồ thanh lý.",
+        "thirtyChapterMutation": "Uy tín cao khiến main bị ép làm trọng tài cho các vụ tranh chấp thật giả, buộc phải đối mặt với rủi ro pháp lý nếu giám định sai."
+      },
+      "antiCloneFingerprint": "cảm nhận độ xốp|bóc tách hóa chất phục hồi nguyên bản|hồ sơ lò gốm+dung dịch chuyên dụng|thợ mông má đồ cũ|chợ thanh lý nhà cổ Nam Bộ"
+    },
+    {
+      "id": "concept_thermal_composite",
+      "workingTitle": "Dấu Vết Nhiệt Dung",
+      "readerCuriosity": "Làm sao phát hiện một chiếc bình cổ được chắp vá từ ba mảnh vỡ của ba thời kỳ khác nhau chỉ bằng cách chạm tay?",
+      "readerFantasy": "Trở thành người giải phẫu đồ cổ, dùng cảm nhận truyền nhiệt để bóc trần những món đồ 'Frankenstein' được ghép nối tinh vi bằng keo tàng hình.",
+      "premise": "Nhân vật chính có khả năng cảm nhận tốc độ truyền nhiệt của vật liệu, giúp phát hiện những đường nối bằng keo epoxy giấu dưới lớp sơn vẽ lại.",
+      "irreversibleProblem": "Công nghệ phục hồi bằng keo quang trùng hợp đang tạo ra những món đồ giả hoàn hảo, làm lũng đoạn niềm tin của giới sưu tầm chân chính.",
+      "protagonistContradiction": "Biết rõ món đồ là chắp vá, nhưng một trong các mảnh ghép lại là di vật quan trọng cần được tách ra để trả về đúng bộ sưu tập.",
+      "domainMechanism": "Thị trường ký gửi đồ cũ, nơi các tay buôn trộn lẫn hàng chắp vá vào lô hàng thật. Giao dịch dựa trên hợp đồng cam kết 'nguyên bản' có điều khoản bồi thường.",
+      "conflictEngine": "Cuộc chiến pháp lý và hợp đồng với những xưởng phục hồi 'đen' chuyên ghép đồ vỡ thành đồ lành để lừa đảo người mới chơi.",
+      "emotionalCore": "Sự an ủi khi tìm lại được một mảnh vỡ thất lạc của kỷ vật gia đình, dù phải phá bỏ một tác phẩm chắp vá đắt tiền.",
+      "differenceClaim": "Cảm ứng nhiệt chỉ chỉ ra sự không đồng nhất vật liệu, main phải dùng tia UV, dung môi và hồ sơ đấu giá cũ để chứng minh sự chắp vá.",
+      "nearestComparisonRisk": "Giống truyện dùng mắt X-quang, khác biệt ở chỗ main chỉ thấy 'lạnh/nóng' và phải tự tìm bằng chứng vật lý để lật tẩy.",
+      "serialityProof": "Từ việc phát hiện một mảnh ghép, main lần ra cả một đường dây chuyên thu gom mảnh vỡ để chế tạo đồ giả, mỗi vụ án là một mắt xích.",
+      "openingAdvantage": "Chương 1: Bỏ qua món hời vì cảm nhận nhiệt độ bất thường ở đáy bình (chứng tỏ đáy bị ghép). Chương 3: Mua rẻ một món đồ xấu xí để lấy mảnh ghép xịn bên trong.",
+      "progressionProof": "Tích lũy vốn từ việc rã đồ chắp vá bán mảnh xịn; xây dựng mạng lưới thợ phục hồi chân chính; thu thập hồ sơ các vụ lừa đảo.",
+      "worldProof": {
+        "signatureSituations": [
+          "Áp tay vào bình gốm trong phòng lạnh để tìm ra đường nứt ẩn do keo tản nhiệt chậm hơn gốm.",
+          "Dùng dung môi rã một chiếc đĩa đắt tiền ngay giữa chợ để chứng minh nó được ghép từ hai nửa khác nhau.",
+          "Đàm phán mua lại một mảnh vỡ từ tay buôn phế liệu để hoàn thiện một hiện vật có hồ sơ lịch sử rõ ràng."
+        ],
+        "institutionalReaction": "Các cửa hàng bắt đầu thêm điều khoản 'không chịu trách nhiệm nếu phát hiện chắp vá sau khi ra khỏi cửa', buộc main phải kiểm tra kỹ hơn.",
+        "resourceCirculation": "Vốn dùng để mua đồ chắp vá (chịu rủi ro); uy tín giúp main được mời làm cố vấn kiểm định trước các phiên giao dịch lớn.",
+        "thirtyChapterMutation": "Main trở thành 'khắc tinh' của giới ghép đồ, bị họ gài bẫy bằng những món đồ ghép từ cùng một vật liệu nhưng khác niên đại."
+      },
+      "antiCloneFingerprint": "cảm nhận truyền nhiệt|rã đồ chắp vá lấy mảnh xịn|mạng lưới thợ phục hồi+hợp đồng cam kết|xưởng phục hồi đen|thị trường ký gửi đồ cũ"
+    },
+    {
+      "id": "concept_acoustic_resonance",
+      "workingTitle": "Âm Vang Đồ Cũ",
+      "readerCuriosity": "Tiếng gõ vào một món đồ gỗ cũ có thể tiết lộ điều gì về những ngăn bí mật hay cấu trúc bị mối mọt ăn rỗng bên trong?",
+      "readerFantasy": "Dùng thính giác và xúc giác khi gõ để lập bản đồ cấu trúc ngầm của đồ vật, tìm ra những tài liệu hoặc vật phẩm bị giấu kín hàng thập kỷ.",
+      "premise": "Một thợ mộc học việc có khả năng cảm nhận độ vang âm học của gỗ, chuyên săn lùng những món nội thất cũ chứa ngăn bí mật hoặc tài liệu gia tộc.",
+      "irreversibleProblem": "Những món nội thất cổ đang bị tháo dỡ bán gỗ vụn, khiến những bí mật lịch sử gia đình giấu bên trong bị tiêu hủy vĩnh viễn.",
+      "protagonistContradiction": "Phải mua toàn bộ món đồ cồng kềnh với giá cao chỉ vì nghi ngờ có ngăn bí mật, đối mặt với rủi ro cạn vốn nếu bên trong trống rỗng.",
+      "domainMechanism": "Chợ đồ gỗ cũ và bãi phế liệu kiến trúc. Giá trị nằm ở loại gỗ và độ nguyên vẹn, nhưng main tìm kiếm giá trị từ những thứ được cất giấu.",
+      "conflictEngine": "Cạnh tranh với những tay buôn gỗ nguyên liệu chỉ muốn xẻ thịt đồ cổ, và những gia đình muốn đòi lại tài sản giấu kín mà không có giấy tờ.",
+      "emotionalCore": "Khoảnh khắc trao trả lại những lá thư tình, di chúc hoặc kỷ vật gia đình được giấu kín cho đúng thế hệ hậu duệ đang cần chúng.",
+      "differenceClaim": "Không nhìn thấu đồ vật, chỉ nghe âm thanh phản dội để đoán cấu trúc rỗng. Phải tự tay tháo lắp cẩn thận để không làm hỏng hiện vật.",
+      "nearestComparisonRisk": "Dễ thành truyện tìm kho báu ngẫu nhiên. Khắc phục bằng cách yêu cầu main phải điều tra lịch sử gia đình chủ cũ để biết họ có thói quen giấu đồ không.",
+      "serialityProof": "Mỗi ngăn bí mật chứa một manh mối (thư từ, bản đồ, chìa khóa) dẫn đến những món đồ hoặc câu chuyện phức tạp hơn của giới tư sản cũ.",
+      "openingAdvantage": "Chương 1: Từ chối mua một chiếc tủ đẹp vì âm vang cho thấy nó bị rỗng ruột do mối. Chương 3: Mua chiếc hộp gỗ xấu xí, gõ tìm được đáy kép chứa giấy tờ sở hữu đất cũ.",
+      "progressionProof": "Vốn tăng nhờ bán lại đồ gỗ sau khi lấy được bí mật; uy tín tăng trong giới săn tài liệu cũ; kỹ năng tháo lắp mộc không dùng đinh.",
+      "worldProof": {
+        "signatureSituations": [
+          "Gõ dọc theo thành tủ để vẽ lại sơ đồ một ngăn kéo ẩn mà thợ mộc đời trước thiết kế.",
+          "Tranh luận với thợ xẻ gỗ để mua lại một cây cột nhà cũ có âm vang lạ trước khi nó bị cưa đôi.",
+          "Dùng giấy tờ tìm được trong ngăn bí mật để chứng minh nguồn gốc của một bộ sưu tập đang bị tranh chấp."
+        ],
+        "institutionalReaction": "Giới buôn gỗ bắt đầu tự gõ đập đồ của mình, làm hỏng nhiều hiện vật, buộc main phải can thiệp bằng kiến thức mộc truyền thống để cứu đồ.",
+        "resourceCirculation": "Tiền dùng để thuê kho bãi chứa đồ gỗ lớn; uy tín giúp main được các gia đình mời đến kiểm tra di vật trước khi bán nhà.",
+        "thirtyChapterMutation": "Việc tìm thấy quá nhiều bí mật khiến main bị cuốn vào một vụ tranh chấp quyền thừa kế lớn, nơi uy tín của anh là bằng chứng duy nhất trước tòa."
+      },
+      "antiCloneFingerprint": "cảm nhận độ vang âm|tìm ngăn bí mật và tài liệu|kỹ năng tháo lắp mộc+kho bãi|thợ xẻ gỗ nguyên liệu|bãi phế liệu kiến trúc"
+    },
+    {
+      "id": "concept_density_weight",
+      "workingTitle": "Trọng Lượng Của Lịch Sử",
+      "readerCuriosity": "Tại sao một bức tượng đồng nhỏ lại nặng hơn bình thường, và lớp vỏ bọc bên ngoài đang che giấu kim loại quý hay một lõi rỗng lừa đảo?",
+      "readerFantasy": "Cảm nhận chính xác trọng lượng riêng của vật liệu chỉ bằng cách cầm lên, phát hiện hàng giả đúc rỗng hoặc hàng thật bị bọc vỏ ngụy trang.",
+      "premise": "Nhân vật chính có cảm giác cơ học tuyệt đối về khối lượng riêng, chuyên săn lùng những món đồ kim khí bị đánh giá sai tại các chợ phế liệu và tiệm cầm đồ.",
+      "irreversibleProblem": "Kỹ thuật mạ và bọc kim loại hiện đại làm giả trọng lượng rất tinh vi, khiến những món đồ thật bị lẫn lộn và nung chảy làm phế liệu.",
+      "protagonistContradiction": "Phát hiện một món đồ có lõi quý nhưng vỏ ngoài là tác phẩm nghệ thuật có giá trị lịch sử, phải chọn giữ nguyên hay phá vỏ lấy lõi.",
+      "domainMechanism": "Thị trường cầm đồ và thanh lý kim loại màu. Giao dịch diễn ra nhanh chóng dựa trên cân nặng và kiểm tra bề mặt bằng axit.",
+      "conflictEngine": "Đối đầu với những kẻ đúc đồ giả có lõi chì để tăng trọng lượng, và những chủ tiệm cầm đồ gian lận cân đo.",
+      "emotionalCore": "Sự trân trọng công sức của những nghệ nhân đúc đồng xưa, niềm vui khi cứu được một tác phẩm nghệ thuật khỏi lò nung phế liệu.",
+      "differenceClaim": "Chỉ biết trọng lượng riêng bất thường, phải dùng kiến thức luyện kim, hồ sơ xưởng đúc và kỹ thuật bóc tách để chứng minh giá trị thực.",
+      "nearestComparisonRisk": "Giống truyện 'nhặt rác thành vàng'. Khắc phục bằng cách mỗi món đồ đều có hồ sơ sở hữu và chi phí bóc tách/phục hồi đắt đỏ.",
+      "serialityProof": "Từ việc phát hiện các kỹ thuật đúc khác nhau, main lập bản đồ các xưởng đúc thủ công đã thất truyền và thu thập đủ bộ sưu tập của họ.",
+      "openingAdvantage": "Chương 1: Từ chối mua tượng vàng vì cảm nhận trọng lượng riêng của lõi vonfram. Chương 3: Mua một cục chặn giấy gỉ sét nhưng nặng bất thường, bóc ra là ấn triện đồng đen.",
+      "progressionProof": "Tăng vốn từ chênh lệch giá trị kim loại; uy tín trong giới thợ kim hoàn; xây dựng xưởng bóc tách và phục hồi kim loại an toàn.",
+      "worldProof": {
+        "signatureSituations": [
+          "Cầm hai bức tượng giống hệt nhau và chỉ ra bức tượng giả nhờ sự chênh lệch vài chục gram do bọt khí bên trong.",
+          "Dùng hóa chất tẩy rửa lớp sơn ngụy trang trên một món đồ đồng để lộ ra các dấu vết chạm khắc của xưởng đúc danh tiếng.",
+          "Thuyết phục chủ tiệm cầm đồ hủy bỏ giao dịch lừa đảo bằng cách chứng minh lõi chì bên trong món đồ bằng bảng tỷ trọng kim loại."
+        ],
+        "institutionalReaction": "Các tiệm cầm đồ bắt đầu trang bị máy quét siêu âm, nhưng vẫn không thể thay thế được kiến thức lịch sử xưởng đúc của main.",
+        "resourceCirculation": "Vốn dùng để mua hóa chất và thiết bị bóc tách; uy tín giúp main được tiếp cận các kho hàng thanh lý của nhà máy cũ.",
+        "thirtyChapterMutation": "Main phát hiện một lô hàng giả tinh vi có hệ thống, buộc phải hợp tác với cơ quan chức năng, biến từ thợ săn đồ thành chuyên gia giám định độc lập."
+      },
+      "antiCloneFingerprint": "cảm nhận trọng lượng riêng|bóc vỏ ngụy trang cứu lõi thật|kiến thức luyện kim+xưởng bóc tách|kẻ đúc đồ giả lõi chì|thị trường cầm đồ kim loại"
+    },
+    {
+      "id": "concept_organic_decay",
+      "workingTitle": "Dấu Ấn Thời Gian",
+      "readerCuriosity": "Làm sao phân biệt được lớp sơn mài bong tróc tự nhiên qua trăm năm với vết nứt do hóa chất tạo ra trong vài ngày?",
+      "readerFantasy": "Cảm nhận được mức độ phân hủy của các chất kết dính hữu cơ (nhựa cây, keo da trâu), từ đó xác định chính xác tuổi thọ thực sự của đồ gỗ và sơn mài.",
+      "premise": "Một thợ phục hồi tranh sơn mài có khả năng cảm nhận độ 'chết' của nhựa cây, dùng nó để vạch trần những món đồ giả cổ được làm lão hóa bằng axit.",
+      "irreversibleProblem": "Đồ sơn mài thật đang bị hư hỏng do bảo quản sai cách, trong khi đồ giả cổ lại tràn ngập thị trường làm mất giá trị nghệ thuật truyền thống.",
+      "protagonistContradiction": "Phải lựa chọn giữa việc phục hồi món đồ cho đẹp mắt (mất dấu vết thời gian) hay giữ nguyên trạng thái tàn tạ nhưng nguyên bản (khó bán).",
+      "domainMechanism": "Thị trường giao dịch tranh và đồ mỹ nghệ sơn mài hư cấu. Giá trị phụ thuộc vào lớp vóc, loại sơn và kỹ thuật mài của từng nghệ nhân.",
+      "conflictEngine": "Xung đột với những xưởng làm giả cổ bằng cách ngâm bùn, tạt axit, và những nhà sưu tầm chỉ quan tâm đến vẻ bề ngoài bóng bẩy.",
+      "emotionalCore": "Sự đồng cảm với nỗi vất vả của nghệ nhân làm sơn mài xưa, niềm vui khi phục hồi lại được màu sắc nguyên bản dưới lớp bụi thời gian.",
+      "differenceClaim": "Cảm ứng chỉ cho biết tuổi của lớp sơn, main phải dùng hồ sơ triển lãm cũ, kỹ thuật mài thử và phân tích lớp vóc để chứng minh nguồn gốc.",
+      "nearestComparisonRisk": "Dễ nhầm với truyện giám định tranh chữ Trung Quốc. Khắc phục bằng cách tập trung vào kỹ thuật sơn mài đặc trưng của Việt Nam (sơn ta, vóc hom).",
+      "serialityProof": "Mỗi lớp sơn mài bóc ra kể một câu chuyện về giai đoạn sáng tác của nghệ nhân, dẫn dắt main tìm kiếm những tác phẩm thất lạc trong chiến tranh.",
+      "openingAdvantage": "Chương 1: Từ chối mua bức bình phong vì cảm nhận lớp keo còn quá mới. Chương 3: Mua một khay trà nứt nẻ, dùng kỹ thuật mài nhẹ để lộ ra lớp vàng lá bên dưới.",
+      "progressionProof": "Tăng vốn nhờ phục hồi đúng cách; uy tín trong giới họa sĩ và nhà sưu tầm nghệ thuật; thu thập công thức pha sơn cổ.",
+      "worldProof": {
+        "signatureSituations": [
+          "Dùng giấy nhám chuyên dụng mài một góc nhỏ của bức tranh để chứng minh nó có 5 lớp sơn thay vì 2 lớp như hàng giả.",
+          "Chỉ ra sự vô lý của một món đồ 'cổ' bằng cách chứng minh lớp keo dán bên trong là keo tổng hợp hiện đại.",
+          "Thuyết phục một gia đình không vứt bỏ bức hoành phi cũ nát bằng cách giải thích giá trị của lớp sơn ta đang bị bong tróc."
+        ],
+        "institutionalReaction": "Giới làm giả bắt đầu dùng sơn ta thật và keo da trâu để làm giả, buộc main phải kết hợp cảm ứng với việc tra cứu hồ sơ lịch sử mỹ thuật.",
+        "resourceCirculation": "Tiền dùng để mua nguyên liệu phục hồi đắt đỏ (vàng quỳ, sơn then); uy tín giúp main được mượn hồ sơ từ các bảo tàng tư nhân.",
+        "thirtyChapterMutation": "Main nhận trách nhiệm phục hồi một tác phẩm lớn của quốc gia, áp lực từ dư luận và giới chuyên môn buộc anh không được phép sai sót dù chỉ một nét mài."
+      },
+      "antiCloneFingerprint": "cảm nhận độ phân hủy hữu cơ|mài bóc lớp ngụy trang|công thức sơn cổ+nguyên liệu phục hồi|xưởng làm giả bằng axit|thị trường tranh sơn mài"
+    },
+    {
+      "id": "concept_magnetic_trace",
+      "workingTitle": "Từ Tính Của Đất",
+      "readerCuriosity": "Tại sao đất sét từ một khúc sông cụ thể lại có từ tính khác biệt, và điều đó giúp xác định nguồn gốc của những món gốm thất truyền như thế nào?",
+      "readerFantasy": "Cảm nhận được lượng khoáng sắt vi lượng trong gốm, từ đó truy xuất chính xác mỏ đất sét nguyên liệu, lật tẩy hàng nhái dùng đất nơi khác.",
+      "premise": "Một nhà nghiên cứu địa chất chuyển nghề buôn đồ cũ, dùng khả năng cảm nhận từ tính vi lượng để phân biệt gốm của các lò nung cổ ven sông.",
+      "irreversibleProblem": "Các mỏ đất sét cổ đã cạn kiệt hoặc bị san lấp, hàng giả dùng đất hiện đại pha màu đang làm nhiễu loạn thị trường gốm sưu tầm.",
+      "protagonistContradiction": "Biết chính xác món đồ là thật nhờ từ tính, nhưng không thể giải thích cho người khác bằng cảm giác, buộc phải tìm bằng chứng địa chất và hồ sơ lò nung.",
+      "domainMechanism": "Giới sưu tầm gốm Nam Bộ hư cấu, nơi giá trị định đoạt bởi 'cốt đất' và 'men tro'. Giao dịch cần giấy chứng nhận nguồn gốc hoặc sự bảo lãnh của chuyên gia.",
+      "conflictEngine": "Đối đầu với những chuyên gia rởm định giá bằng mắt và những tay buôn lậu gốm giả từ nước ngoài về gắn mác gốm cổ địa phương.",
+      "emotionalCore": "Hành trình tìm lại ký ức về những làng nghề đã biến mất dưới tốc độ đô thị hóa, kết nối những người thợ già với di sản của họ.",
+      "differenceClaim": "Từ tính chỉ là manh mối khởi đầu. Main phải đối chiếu với bản đồ địa chất cũ, phân tích quang phổ (nếu cần) và tìm nhân chứng để chốt giao dịch.",
+      "nearestComparisonRisk": "Giống các truyện có 'mắt thẩm định'. Khắc phục bằng việc main phải vất vả đi tìm tài liệu địa chất và chứng minh bằng logic khoa học.",
+      "serialityProof": "Thu thập đủ các mẫu gốm từ các mỏ đất khác nhau để lập một 'từ điển cốt đất', trở thành quy chuẩn mới cho giới sưu tầm.",
+      "openingAdvantage": "Chương 1: Bỏ qua món đồ men đẹp vì cốt đất không có từ tính của quặng sắt địa phương. Chương 3: Mua rẻ một chiếc chóe bám đầy hàu vì nhận ra từ tính chuẩn của lò gốm cổ.",
+      "progressionProof": "Vốn tăng từ việc mua rẻ bán đúng giá trị; uy tín trong giới nghiên cứu văn hóa; xây dựng được bộ tiêu bản cốt đất độc quyền.",
+      "worldProof": {
+        "signatureSituations": [
+          "Dùng một nam châm siêu nhạy tự chế để chứng minh sự khác biệt về lực hút vi lượng giữa hai chiếc đĩa giống hệt nhau.",
+          "Trải bản đồ địa chất thủy văn cũ ra giữa chợ để giải thích tại sao lò gốm này lại có lẫn quặng sắt trong đất.",
+          "Đưa một người thợ gốm già đến chạm vào món đồ để họ xác nhận kỹ thuật vuốt tay đặc trưng của làng nghề xưa."
+        ],
+        "institutionalReaction": "Giới làm giả bắt đầu trộn mạt sắt vào đất sét hiện đại, buộc main phải phân biệt giữa từ tính tự nhiên phân bố đều và từ tính nhân tạo vón cục.",
+        "resourceCirculation": "Tiền lời dùng để mua các bản đồ cổ và tài liệu địa chất; uy tín giúp main được mời thẩm định các bộ sưu tập tư nhân lớn.",
+        "thirtyChapterMutation": "Main phát hiện một mỏ đất sét cổ chưa bị khai thác, đối mặt với áp lực từ các tập đoàn muốn thâu tóm mỏ đất để sản xuất hàng giả hợp pháp."
+      },
+      "antiCloneFingerprint": "cảm nhận từ tính vi lượng|lập bản đồ cốt đất|tài liệu địa chất+bộ tiêu bản|chuyên gia rởm+hàng nhái ngoại nhập|giới sưu tầm gốm Nam Bộ"
+    },
+    {
+      "id": "concept_surface_tension",
+      "workingTitle": "Vết Cắt Thời Gian",
+      "readerCuriosity": "Làm sao phân biệt được một chi tiết đồng hồ được tiện bằng máy CNC hiện đại với một chi tiết được dũa tay bởi nghệ nhân trăm năm trước?",
+      "readerFantasy": "Cảm nhận được độ nhám vi mô và sức căng bề mặt của kim loại, đọc được 'chữ ký' từ các vết dụng cụ thủ công để lại trên đồ cơ khí cổ.",
+      "premise": "Một thợ sửa đồng hồ có khả năng cảm nhận các vết xước vi mô, chuyên săn lùng và phục hồi các cỗ máy cơ khí, đồng hồ cổ bị đánh giá sai.",
+      "irreversibleProblem": "Thị trường tràn ngập đồng hồ cổ bị thay thế linh kiện bằng hàng sản xuất hàng loạt, làm mất đi tính đồng bộ và giá trị lịch sử của cỗ máy.",
+      "protagonistContradiction": "Phải chọn giữa việc thay linh kiện mới để đồng hồ chạy ngay (có tiền nhanh) hay mất hàng tháng trời để tự tay dũa lại linh kiện theo đúng chuẩn cũ.",
+      "domainMechanism": "Thị trường giao dịch đồng hồ cổ, máy hát, đồ cơ khí tinh xảo. Giá trị nằm ở tính 'nguyên bản toàn bộ' (matching numbers) và tình trạng hoạt động.",
+      "conflictEngine": "Xung đột với những thợ sửa chữa 'luộc' đồ, tráo linh kiện xịn bằng linh kiện lô, và những tay buôn bán đồ chắp vá.",
+      "emotionalCore": "Niềm đam mê với sự hoàn hảo của cơ khí thủ công, khoảnh khắc cỗ máy trăm năm tuổi cất tiếng tích tắc trở lại sau thời gian dài im lặng.",
+      "differenceClaim": "Cảm ứng chỉ phát hiện sự cọc cạch của linh kiện. Main phải dùng catalogue cũ, kính lúp và kỹ năng cơ khí để chứng minh và phục hồi.",
+      "nearestComparisonRisk": "Dễ biến thành truyện dạy sửa đồng hồ. Khắc phục bằng cách gắn mỗi cỗ máy với lịch sử của người chủ (ví dụ: đồng hồ của một nhà văn nổi tiếng).",
+      "serialityProof": "Mỗi chiếc đồng hồ được phục hồi mở ra mối quan hệ với một nhà sưu tầm giàu có, dẫn đến những cỗ máy phức tạp và hiếm có hơn.",
+      "openingAdvantage": "Chương 1: Từ chối mua chiếc đồng hồ vỏ vàng vì cảm nhận bánh răng bên trong nhẵn thín (hàng máy dập). Chương 3: Mua một cỗ máy gỉ sét, nhận ra các vết dũa tay của một nghệ nhân danh tiếng.",
+      "progressionProof": "Tăng vốn nhờ bán đồng hồ đã phục hồi; uy tín trong giới chơi đồ cơ khí; trang bị được dàn máy móc phục hồi chuyên dụng.",
+      "worldProof": {
+        "signatureSituations": [
+          "Tháo tung một chiếc đồng hồ ngay tại chỗ để chỉ ra một bánh răng có vết cắt laser hiện đại, lật tẩy kẻ bán hàng giả.",
+          "Dùng kính hiển vi soi vết dũa để chứng minh hai linh kiện thuộc về hai nghệ nhân khác nhau, dù chúng khớp nhau hoàn hảo.",
+          "Tra cứu các bản vẽ kỹ thuật trong thư viện để tìm ra cách phục hồi một cơ chế điểm chuông đã thất truyền."
+        ],
+        "institutionalReaction": "Các thợ 'luộc' đồ bắt đầu mài tay lại các linh kiện máy dập để tạo vết xước giả, buộc main phải phân biệt được lực tay tự nhiên và lực mài cố ý.",
+        "resourceCirculation": "Tiền dùng để mua phôi kim loại cổ và dụng cụ chế tác; uy tín đổi lấy quyền truy cập vào các bộ sưu tập linh kiện hiếm.",
+        "thirtyChapterMutation": "Uy tín cao khiến main được giao phục hồi chiếc đồng hồ tháp của thành phố, một sai lầm nhỏ sẽ phá hỏng di sản công cộng và danh tiếng nghề nghiệp."
+      },
+      "antiCloneFingerprint": "cảm nhận vết xước vi mô|phục hồi tính đồng bộ cơ khí|catalogue cũ+kỹ năng dũa tay|thợ luộc linh kiện|thị trường đồng hồ cơ khí cổ"
+    },
+    {
+      "id": "concept_ash_content",
+      "workingTitle": "Tàn Tro Kể Chuyện",
+      "readerCuriosity": "Tại sao tỷ lệ tro trấu trong lớp men gốm lại là chìa khóa để giải mã nguồn gốc của những lò gốm đã bị vùi lấp dưới lòng đất?",
+      "readerFantasy": "Cảm nhận được tỷ lệ và loại tro thực vật (tro trấu, tro củi) dùng trong men gốm, từ đó xác định chính xác nhiệt độ nung và niên đại.",
+      "premise": "Một sinh viên khảo cổ bỏ học có khả năng cảm nhận thành phần tro trong men, chuyên đi thu gom các mảnh vỡ và đồ gốm lỗi từ các công trường xây dựng.",
+      "irreversibleProblem": "Quá trình đô thị hóa đang cày xới các di chỉ lò gốm cổ, những mảnh vỡ có giá trị nghiên cứu bị vứt bỏ như xà bần trước khi được ghi nhận.",
+      "protagonistContradiction": "Muốn giữ lại các mảnh vỡ để nghiên cứu lập hồ sơ di chỉ, nhưng cần tiền để sinh tồn nên phải bán bớt những món đồ nguyên vẹn cho giới buôn.",
+      "domainMechanism": "Thị trường 'đồ đào' (hợp pháp từ các công trường dân dụng). Giao dịch diễn ra lén lút giữa thợ máy xúc, người thu gom và giới sưu tầm.",
+      "conflictEngine": "Cạnh tranh với những kẻ săn lùng đồ cổ bất chấp phá hoại di chỉ, và những tay buôn muốn xóa dấu vết nguồn gốc để dễ bề thổi giá.",
+      "emotionalCore": "Sự xót xa khi thấy di sản bị nghiền nát dưới bánh xích máy xúc, nỗ lực tuyệt vọng để cứu vãn những mảnh vụn của lịch sử địa phương.",
+      "differenceClaim": "Cảm ứng chỉ cho biết loại tro. Main phải đối chiếu với thảm thực vật lịch sử, ghi chép địa phương và ghép nối các mảnh vỡ để chứng minh giá trị.",
+      "nearestComparisonRisk": "Dễ vi phạm luật cấm buôn bán đồ đào trộm. Khắc phục: Main chỉ thu gom đồ từ các công trường đã được cấp phép san lấp (đồ phế liệu), tập trung vào gốm dân dụng.",
+      "serialityProof": "Từ những mảnh vỡ, main dựng lại được công thức men tro thất truyền, giúp các xưởng gốm hiện đại phục hồi lại dòng gốm xưa.",
+      "openingAdvantage": "Chương 1: Từ chối mua chiếc bình nguyên vẹn vì men dùng hóa chất công nghiệp. Chương 3: Bới trong đống xà bần tìm được một chiếc bát mẻ có men tro trấu chuẩn xác của thế kỷ 19.",
+      "progressionProof": "Vốn tăng từ việc bán đồ đã xác minh nguồn gốc; uy tín với các nhà nghiên cứu; xây dựng được kho lưu trữ tiêu bản men gốm.",
+      "worldProof": {
+        "signatureSituations": [
+          "Tranh cãi với thợ máy xúc để mua lại một đống đất vụn, sau đó ngồi ghép lại thành một chiếc bình có men tro độc bản.",
+          "Chứng minh một món đồ là giả bằng cách chỉ ra rằng loại cây dùng làm tro men không hề tồn tại ở vùng đất đó vào thời điểm đó.",
+          "Thuyết phục một nhà sưu tầm tài trợ cho việc khai quật cứu hộ một lò gốm sắp bị san phẳng làm chung cư."
+        ],
+        "institutionalReaction": "Giới buôn đồ giả bắt đầu đốt tro thực vật thật để pha vào men, buộc main phải phân tích sâu hơn về độ kết tinh của men dưới nhiệt độ nung.",
+        "resourceCirculation": "Tiền dùng để trả công cho thợ máy xúc giữ lại đồ và mua keo phục hồi; uy tín giúp main được báo tin mỗi khi có công trường mới đào trúng đồ.",
+        "thirtyChapterMutation": "Main nắm trong tay công thức men cổ, bị các xưởng gốm lớn gây áp lực đòi mua đứt bản quyền, buộc phải dùng luật sở hữu trí tuệ để bảo vệ di sản."
+      },
+      "antiCloneFingerprint": "cảm nhận thành phần tro men|ghép mảnh vỡ phục dựng công thức|thảm thực vật lịch sử+tiêu bản men|kẻ phá hoại di chỉ|thị trường đồ phế liệu công trường"
+    },
+    {
+      "id": "concept_oxidation_layer",
+      "workingTitle": "Lớp Áo Thời Gian",
+      "readerCuriosity": "Làm sao phân biệt được lớp gỉ đồng (patina) hình thành qua hàng trăm năm khói nhang với lớp gỉ được tạo ra bằng hóa chất trong một đêm?",
+      "readerFantasy": "Cảm nhận được độ sâu và sự liên kết của lớp oxy hóa trên bề mặt kim loại, lật tẩy các kỹ thuật làm giả cổ bằng axit và chôn đất.",
+      "premise": "Một người thợ đánh bóng kim loại có khả năng cảm nhận cấu trúc của lớp patina, chuyên săn lùng đồ đồng thờ cúng và phong thủy bị đánh giá sai.",
+      "irreversibleProblem": "Nhiều người không hiểu biết đã dùng hóa chất tẩy trắng đồ đồng cổ, làm mất đi lớp patina quý giá, biến đồ cổ thành đồ đồng nát.",
+      "protagonistContradiction": "Phải thuyết phục khách hàng rằng lớp gỉ xỉn màu kia mới là thứ đáng giá, trong khi tâm lý chung luôn thích đồ thờ cúng phải sáng bóng.",
+      "domainMechanism": "Chợ đồ thờ cúng cũ và giới chơi đồ phong thủy. Giá trị nằm ở 'linh khí' (thực chất là dấu vết thời gian) và nguồn gốc từ các gia đình gia giáo.",
+      "conflictEngine": "Xung đột với những thợ làm giả patina bằng amoniac, và những người buôn đồ thờ cúng trộm cắp không rõ nguồn gốc.",
+      "emotionalCore": "Sự tôn kính đối với tín ngưỡng gia đình, niềm vui khi trả lại vẻ đẹp trầm mặc, uy nghi cho những món đồ thờ cúng đã bị lãng quên.",
+      "differenceClaim": "Cảm ứng chỉ phân biệt được gỉ tự nhiên và gỉ ép. Main phải dùng hồ sơ gia phả, ảnh thờ cũ để chứng minh nguồn gốc hợp pháp và giá trị lịch sử.",
+      "nearestComparisonRisk": "Dễ mang màu sắc mê tín dị đoan. Khắc phục bằng cách giải thích mọi thứ dưới góc độ hóa học (sự oxy hóa) và văn hóa (lịch sử gia đình).",
+      "serialityProof": "Mỗi món đồ thờ cúng gắn liền với lịch sử thăng trầm của một dòng họ, main giúp họ tìm lại kỷ vật và kết nối lại các nhánh gia tộc.",
+      "openingAdvantage": "Chương 1: Từ chối mua lư đồng sáng bóng vì lớp gỉ bị tẩy bằng axit. Chương 3: Mua một bát nhang đen sì, dùng nước ấm lau nhẹ để lộ ra lớp patina màu mắt cua tuyệt đẹp.",
+      "progressionProof": "Tăng vốn nhờ phục hồi lớp patina đúng cách; uy tín trong giới sưu tầm đồ tâm linh; thu thập các bí quyết bảo quản đồng cổ.",
+      "worldProof": {
+        "signatureSituations": [
+          "Dùng tăm bông tẩm dung dịch nhẹ để lau một góc nhỏ, chứng minh lớp gỉ hóa chất dễ dàng bong tróc trong khi gỉ tự nhiên bám chặt vào cốt đồng.",
+          "Từ chối mua một bộ đồ thờ có lớp patina đẹp nhưng cảm nhận được mùi đất chôn (đồ đào trộm), yêu cầu người bán xuất trình giấy tờ thừa kế.",
+          "Hướng dẫn một gia đình cách dùng tro rơm nếp để làm sạch đồ đồng mà không làm mất đi lớp gỉ thời gian."
+        ],
+        "institutionalReaction": "Giới làm giả bắt đầu dùng công nghệ điện phân để tạo lớp gỉ bám chặt hơn, buộc main phải kết hợp soi cấu trúc tinh thể bằng kính lúp chuyên dụng.",
+        "resourceCirculation": "Tiền dùng để mua các loại sáp bảo quản chuyên dụng; uy tín giúp main được các dòng họ lớn mời đến bảo dưỡng từ đường.",
+        "thirtyChapterMutation": "Main được giao bảo dưỡng bộ đỉnh đồng của một di tích lịch sử, phải đối mặt với hội đồng thẩm định bảo thủ muốn tẩy trắng toàn bộ hiện vật."
+      },
+      "antiCloneFingerprint": "cảm nhận độ sâu lớp oxy hóa|bảo tồn lớp patina tự nhiên|ảnh thờ cũ+sáp bảo quản|thợ làm giả bằng hóa chất|chợ đồ thờ cúng cũ"
+    },
+    {
+      "id": "concept_fiber_tension",
+      "workingTitle": "Sức Căng Của Sợi",
+      "readerCuriosity": "Tại sao độ chùng của sợi toan (canvas) hay lụa lại tiết lộ việc một bức tranh đã bị bóc khỏi khung gốc và tráo đổi?",
+      "readerFantasy": "Cảm nhận được sức căng và độ mỏi của các sợi dệt, từ đó phát hiện những bức tranh bị bồi lại, thảm cũ bị dệt dặm, hay đồ mây tre đan bị thay nan.",
+      "premise": "Một thợ đóng khung tranh có khả năng cảm nhận độ căng của sợi vải, chuyên tìm kiếm những tác phẩm nghệ thuật bị giấu dưới lớp tranh rẻ tiền hoặc bị bồi sai cách.",
+      "irreversibleProblem": "Kỹ thuật bồi tranh và căng khung sai cách đang làm rách nát các tác phẩm cũ, trong khi thợ bồi hiện đại lạm dụng keo hóa học làm hỏng sợi vải.",
+      "protagonistContradiction": "Phát hiện một kiệt tác bị bồi dính chặt vào một bức tranh rác, việc bóc tách có nguy cơ làm rách cả hai, đòi hỏi sự kiên nhẫn và kỹ thuật đỉnh cao.",
+      "domainMechanism": "Thị trường tranh cũ, cửa hàng đồ trang trí nội thất và giới sưu tầm mỹ thuật. Giá trị nằm ở chữ ký tác giả và tình trạng nguyên bản của nền tranh.",
+      "conflictEngine": "Xung đột với những phòng tranh chuyên 'luộc' tranh thật thay bằng bản chép tay, và những thợ bồi tranh ẩu làm hỏng hiện vật.",
+      "emotionalCore": "Khoảnh khắc bóc thành công lớp giấy lót, để lộ ra một tác phẩm nghệ thuật đã bị che giấu hàng thập kỷ vì lý do lịch sử.",
+      "differenceClaim": "Cảm ứng chỉ cho biết sợi vải bị căng ép bất thường. Main phải dùng hóa chất bóc tách, tra cứu danh mục triển lãm cũ để xác định tác giả.",
+      "nearestComparisonRisk": "Giống các truyện bóc tranh trong tranh. Khắc phục bằng cách nhấn mạnh vào kỹ thuật bồi giấy/vải truyền thống của Việt Nam và chi phí phục hồi đắt đỏ.",
+      "serialityProof": "Mỗi bức tranh được bóc tách hé lộ một giai đoạn sáng tác của các họa sĩ Đông Dương, giúp main xây dựng một gallery nghệ thuật uy tín.",
+      "openingAdvantage": "Chương 1: Từ chối mua bức tranh chép vì cảm nhận sợi toan còn quá mới và căng cứng. Chương 3: Mua một bức tranh phong cảnh xấu xí, cảm nhận độ chùng bất thường, bóc ra bức phác thảo lụa bên dưới.",
+      "progressionProof": "Tăng vốn từ việc bán tranh đã phục hồi; uy tín trong giới giám tuyển nghệ thuật; làm chủ các kỹ thuật bồi biểu truyền thống.",
+      "worldProof": {
+        "signatureSituations": [
+          "Dùng hơi nước nóng để làm chùng sợi vải, chứng minh bức tranh đã bị cắt xén và căng lại trên một khung nhỏ hơn để che giấu chữ ký thật.",
+          "Tranh luận với một chủ gallery về việc họ đã dùng keo dán gỗ để bồi một bức tranh lụa quý, làm hỏng cấu trúc sợi.",
+          "Thuyết phục người mua chờ đợi 3 tháng để quá trình bóc tách và bồi lại tranh hoàn tất, thay vì bán đứt món đồ đang bị hư hại."
+        ],
+        "institutionalReaction": "Những kẻ chép tranh bắt đầu dùng toan cũ bóc từ các bức tranh vô danh để vẽ lại, buộc main phải phân tích sự ăn nhập giữa lớp màu và độ mỏi của sợi.",
+        "resourceCirculation": "Tiền dùng để mua giấy dó cổ và hồ dán tự nhiên; uy tín giúp main được tiếp cận kho lưu trữ của hội mỹ thuật.",
+        "thirtyChapterMutation": "Main nhận bồi lại một bức tranh lịch sử khổ lớn, phải huy động một mạng lưới thợ thủ công giỏi và đối mặt với nguy cơ đền bù khổng lồ nếu thất bại."
+      },
+      "antiCloneFingerprint": "cảm nhận độ mỏi sợi dệt|bóc tách tranh bồi nhiều lớp|danh mục triển lãm+kỹ thuật bồi biểu|phòng tranh luộc đồ|thị trường tranh cũ và đồ trang trí"
+    },
+    {
+      "id": "concept_pigment_binding",
+      "workingTitle": "Độ Bám Của Màu",
+      "readerCuriosity": "Làm sao biết được một nét vẽ thêm vào để che đi vết nứt trên đĩa gốm mới được thực hiện cách đây vài tuần chứ không phải từ lúc xuất xưởng?",
+      "readerFantasy": "Cảm nhận được mức độ thẩm thấu của bột màu vào vật liệu nền, lật tẩy những chi tiết vẽ thêm (overpainting) nhằm che giấu khuyết điểm hoặc nâng khống giá trị.",
+      "premise": "Một họa sĩ vẽ minh họa có khả năng cảm nhận độ bám của hạt màu, chuyên săn lùng những món đồ gốm sứ, biển quảng cáo cũ bị vẽ đè sai lệch.",
+      "irreversibleProblem": "Thói quen 'tút tát' lại đồ cũ cho mới của giới buôn làm mất đi vẻ đẹp nguyên bản và giá trị lịch sử của các hiện vật.",
+      "protagonistContradiction": "Phải dùng dung môi tẩy đi những nét vẽ thêm rất đẹp mắt để trả món đồ về trạng thái sứt mẻ nguyên thủy, đối mặt với việc bị khách hàng chê bai.",
+      "domainMechanism": "Chợ đồ xưa, nơi giao dịch các vật dụng sinh hoạt thời bao cấp, biển hiệu quảng cáo vẽ tay, gốm sứ bình dân. Giá trị nằm ở tính nguyên bản và hoài niệm.",
+      "conflictEngine": "Xung đột với những tay thợ chuyên 'vẽ bùa' (thêm chữ ký, thêm họa tiết rồng phượng) lên đồ gốm trơn để lừa đảo.",
+      "emotionalCore": "Sự trân trọng những nét vẽ mộc mạc của thợ thủ công xưa, niềm vui khi tìm lại được thông điệp gốc bị che khuất dưới lớp sơn mới.",
+      "differenceClaim": "Cảm ứng chỉ phát hiện sự chênh lệch độ bám màu. Main phải dùng tia cực tím, dung môi tẩy rửa và ảnh tư liệu cũ để chứng minh nét vẽ nào là giả.",
+      "nearestComparisonRisk": "Dễ trùng lặp với cơ chế bóc tranh. Khắc phục bằng cách tập trung vào vật dụng sinh hoạt (gốm, gỗ, kim loại) và kỹ thuật tẩy rửa hóa học thay vì bóc lớp vật lý.",
+      "serialityProof": "Từ việc tẩy rửa các món đồ, main thu thập được bộ sưu tập các biển hiệu, logo thương hiệu Việt xưa đã thất truyền.",
+      "openingAdvantage": "Chương 1: Từ chối mua chiếc đĩa có chữ ký vua chúa vì cảm nhận hạt màu nổi cộm trên mặt men. Chương 3: Mua một biển hiệu bị sơn đen, dùng xăng thơm tẩy đi để lộ ra logo của một hãng trà nổi tiếng xưa.",
+      "progressionProof": "Tăng vốn nhờ bán đồ nguyên bản cho giới sưu tầm hoài cổ; uy tín trong cộng đồng yêu lịch sử đô thị; thu thập công thức dung môi an toàn.",
+      "worldProof": {
+        "signatureSituations": [
+          "Dùng đèn UV chiếu lên chiếc bình gốm giữa chợ để cho khách hàng thấy những mảng màu vẽ thêm phát sáng khác biệt so với màu gốc.",
+          "Cẩn thận dùng tăm bông tẩm dung môi lau đi chữ ký giả trên một bức tượng, trả lại giá trị thực cho tác phẩm vô danh nhưng tuyệt đẹp.",
+          "Tìm kiếm các bức ảnh đường phố cũ trong thư viện để chứng minh màu sắc gốc của một biển quảng cáo bằng tôn."
+        ],
+        "institutionalReaction": "Giới làm giả bắt đầu nung lại đồ gốm sau khi vẽ thêm để màu chìm vào men, buộc main phải phân tích sự chênh lệch nhiệt độ nung của hai lớp màu.",
+        "resourceCirculation": "Tiền dùng để mua các loại dung môi hữu cơ đắt tiền; uy tín giúp main được các quán cà phê hoài cổ đặt hàng tìm kiếm đồ trang trí nguyên bản.",
+        "thirtyChapterMutation": "Main tẩy rửa một món đồ và vô tình phát hiện ra mật mã hoặc tài liệu nhạy cảm thời chiến được giấu dưới lớp sơn, buộc phải quyết định công bố hay tiêu hủy."
+      },
+      "antiCloneFingerprint": "cảm nhận độ thẩm thấu hạt màu|tẩy nét vẽ đè phục hồi nguyên bản|ảnh tư liệu+dung môi hóa học|thợ vẽ bùa thêm họa tiết|chợ đồ xưa thời bao cấp"
+    },
+    {
+      "id": "concept_crystalline_structure",
+      "workingTitle": "Kết Tinh Của Lửa",
+      "readerCuriosity": "Tại sao độ thủy tinh hóa (vitrification) của cốt gốm lại là bằng chứng không thể chối cãi về nhiệt độ nung và công nghệ của từng thời kỳ?",
+      "readerFantasy": "Cảm nhận được cấu trúc tinh thể bên trong gốm sứ, phân biệt được đồ nung củi truyền thống (nhiệt độ không đều) với đồ nung ga/điện hiện đại (hoàn hảo nhưng vô hồn).",
+      "premise": "Một kỹ sư vật liệu gốm có khả năng cảm nhận độ kết tinh của silicat, chuyên đi thẩm định các mảnh vỡ (tiêu bản) và đồ gốm sứ cao cấp.",
+      "irreversibleProblem": "Công nghệ nung ga hiện đại có thể làm giả hoàn hảo màu men và kiểu dáng, khiến mắt thường và kính lúp không thể phân biệt được đồ cổ và đồ mới.",
+      "protagonistContradiction": "Biết một món đồ là giả nhờ cấu trúc tinh thể quá hoàn hảo, nhưng không thể thuyết phục người mua vì bề ngoài của nó đáp ứng mọi tiêu chuẩn thẩm định truyền thống.",
+      "domainMechanism": "Giới chơi 'tiêu bản' (mảnh vỡ gốm sứ) và đồ sứ ký kiểu. Giao dịch dựa trên sự so sánh đối chiếu với các mảnh vỡ chuẩn mực đã được công nhận.",
+      "conflictEngine": "Đối đầu với những lò gốm công nghệ cao chuyên sản xuất hàng giả cổ tinh vi, và những chuyên gia thẩm định bảo thủ chỉ dựa vào hoa văn.",
+      "emotionalCore": "Sự ngưỡng mộ đối với kỹ năng kiểm soát lửa (hỏa biến) của nghệ nhân xưa, vẻ đẹp của sự không hoàn hảo do tự nhiên tạo ra.",
+      "differenceClaim": "Cảm ứng chỉ cho biết độ kết tinh. Main phải dùng các mảnh tiêu bản chuẩn, máy đo quang phổ (nếu cần) và kiến thức về cấu trúc lò bầu/lò rồng để lập luận.",
+      "nearestComparisonRisk": "Giống truyện giám định gốm sứ thông thường. Khắc phục bằng cách tập trung vào thị trường 'tiêu bản' (chơi mảnh vỡ) rất đặc thù của Việt Nam.",
+      "serialityProof": "Thu thập các mảnh vỡ tiêu bản để lập một thư viện vật liệu chuẩn, trở thành 'tòa án tối cao' cho mọi cuộc tranh cãi về gốm sứ trong vùng.",
+      "openingAdvantage": "Chương 1: Từ chối mua chiếc bình sứ hoàn hảo vì cảm nhận cấu trúc tinh thể đồng đều của lò ga. Chương 3: Mua một mảnh vỡ sắc lẹm, cảm nhận độ kết tinh độc đáo của lò củi nhiệt độ cao, bán lại cho người cần ghép đồ.",
+      "progressionProof": "Tăng vốn từ việc buôn bán tiêu bản hiếm; uy tín trong giới nghiên cứu gốm sứ; xây dựng được bộ sưu tập tiêu bản chuẩn mực.",
+      "worldProof": {
+        "signatureSituations": [
+          "So sánh âm thanh khi gõ hai mảnh vỡ, kết hợp với cảm nhận cấu trúc để chứng minh một mảnh được nung bằng củi, mảnh kia nung bằng điện.",
+          "Chỉ ra vết 'sống' (chưa kết tinh hết) ở đáy một chiếc bát cổ, chứng minh nó được nung trong lò bầu có nhiệt độ không đồng đều.",
+          "Thuyết phục một nhà sưu tầm đập vỡ một chiếc bình giả giá trị cao để xem cấu trúc bên trong, đánh cược bằng chính uy tín của mình."
+        ],
+        "institutionalReaction": "Các lò làm giả bắt đầu dùng củi để nung lại hàng giả, buộc main phải phân biệt được tro củi hiện đại và tro củi cổ đại bám trong cấu trúc.",
+        "resourceCirculation": "Tiền dùng để mua các mảnh tiêu bản đắt đỏ làm mẫu chuẩn; uy tín giúp main được mời làm giảng viên thỉnh giảng về vật liệu gốm.",
+        "thirtyChapterMutation": "Main bị cuốn vào một vụ lừa đảo quy mô lớn liên quan đến một bộ sưu tập sứ ký kiểu của hoàng gia, nơi các mảnh vỡ tiêu bản của anh là bằng chứng duy nhất trước tòa."
+      },
+      "antiCloneFingerprint": "cảm nhận độ thủy tinh hóa|lập thư viện tiêu bản gốm|mảnh vỡ chuẩn+kiến thức lò nung|lò gốm công nghệ cao làm giả|giới chơi tiêu bản gốm sứ"
+    },
+    {
+      "id": "concept_resin_hardness",
+      "workingTitle": "Giọt Nhựa Hóa Thạch",
+      "readerCuriosity": "Làm sao phân biệt được một vết nứt được trám bằng nhựa cây tự nhiên (kintsugi truyền thống) với vết trám bằng keo epoxy công nghiệp?",
+      "readerFantasy": "Cảm nhận được trạng thái đóng rắn của các loại nhựa tự nhiên (hổ phách, nhựa thông, sơn ta), từ đó đánh giá chất lượng phục hồi và nguồn gốc vật liệu.",
+      "premise": "Một thợ kim hoàn chuyên làm đồ thủ công có khả năng cảm nhận độ cứng của nhựa cây, săn lùng những món đồ trang sức cũ, đồ gốm phục hồi bằng vàng (kintsugi).",
+      "irreversibleProblem": "Việc lạm dụng keo epoxy công nghiệp trong phục hồi đang phá hủy cấu trúc của đồ cổ, làm mất đi khả năng tháo lắp và sửa chữa lại trong tương lai.",
+      "protagonistContradiction": "Phải tốn hàng tháng trời để chờ nhựa tự nhiên khô hoàn toàn khi phục hồi một món đồ, trong khi khách hàng luôn hối thúc và muốn dùng keo hóa học cho nhanh.",
+      "domainMechanism": "Thị trường trang sức cũ, hổ phách, và dịch vụ phục hồi gốm sứ nghệ thuật. Giá trị nằm ở tính thẩm mỹ của vết nứt và vật liệu phục hồi an toàn.",
+      "conflictEngine": "Xung đột với những thợ phục hồi 'mì ăn liền' dùng keo dán sắt và sơn nhũ vàng để làm giả kỹ thuật kintsugi đắt tiền.",
+      "emotionalCore": "Triết lý về việc tôn vinh những vết thương và sự không hoàn hảo (wabi-sabi), biến vết nứt thành một tác phẩm nghệ thuật mới.",
+      "differenceClaim": "Cảm ứng chỉ phát hiện loại nhựa. Main phải dùng kỹ thuật mài, dung môi tự nhiên và bột vàng thật để bóc tách keo dỏm và phục hồi lại đúng chuẩn.",
+      "nearestComparisonRisk": "Dễ biến thành truyện dạy làm thủ công. Khắc phục bằng cách mỗi vết nứt trên món đồ đều gắn với một câu chuyện biến cố của gia đình chủ nhân.",
+      "serialityProof": "Mỗi món đồ được phục hồi giúp main kết nối với những nhà sưu tầm có gu thẩm mỹ cao, mở ra các đơn hàng phục hồi những bảo vật gia truyền.",
+      "openingAdvantage": "Chương 1: Từ chối mua chuỗi hạt hổ phách vì cảm nhận độ cứng của nhựa tổng hợp. Chương 3: Mua một chiếc bát vỡ được dán bằng keo con voi, dùng dung môi rã ra và phục hồi lại bằng sơn ta rắc vàng.",
+      "progressionProof": "Tăng vốn từ phí dịch vụ phục hồi cao cấp; uy tín trong giới chơi đồ nghệ thuật; thu thập các loại nhựa cây quý hiếm làm nguyên liệu.",
+      "worldProof": {
+        "signatureSituations": [
+          "Dùng kim nung nóng châm nhẹ vào vết trám để chứng minh mùi khét của nhựa epoxy so với mùi thơm của nhựa thông tự nhiên.",
+          "Tranh luận với khách hàng về việc tại sao vết trám bằng sơn ta lại đổi màu theo thời tiết, chứng minh đó là vật liệu 'sống'.",
+          "Thuyết phục một người thừa kế không vứt bỏ chiếc bình vỡ của mẹ họ, mà hãy biến nó thành một tác phẩm nghệ thuật mang dấu ấn kỷ niệm."
+        ],
+        "institutionalReaction": "Giới làm giả bắt đầu trộn bột nhựa tự nhiên vào keo epoxy để đánh lừa khứu giác, buộc main phải dựa vào cảm nhận độ cứng vi mô của cấu trúc.",
+        "resourceCirculation": "Tiền dùng để mua bột vàng thật và các loại nhựa quý; uy tín giúp main được các bảo tàng tư nhân giao phó việc bảo quản hiện vật dễ vỡ.",
+        "thirtyChapterMutation": "Main nhận phục hồi một kỷ vật quan trọng của một nhân vật có thế lực, áp lực phải hoàn thành trong thời gian ngắn buộc anh phải tìm kiếm một công thức nhựa cổ đã thất truyền."
+      },
+      "antiCloneFingerprint": "cảm nhận độ cứng nhựa tự nhiên|phục hồi vết nứt bằng vật liệu chuẩn|bột vàng+dung môi tự nhiên|thợ phục hồi mì ăn liền|thị trường trang sức và kintsugi"
+    },
+    {
+      "id": "concept_moisture_gradient",
+      "workingTitle": "Độ Ẩm Của Gỗ",
+      "readerCuriosity": "Tại sao một bức tượng gỗ mới mua về lại nứt toác chỉ sau một mùa hanh khô, và làm sao để biết gỗ đã được sấy tự nhiên qua hàng chục năm?",
+      "readerFantasy": "Cảm nhận được sự chênh lệch độ ẩm giữa lõi và vỏ của khối gỗ, lật tẩy những món đồ gỗ mới được sấy ép bằng nhiệt công nghiệp để giả cổ.",
+      "premise": "Một thợ mộc chuyên làm đồ thờ có khả năng cảm nhận gradient độ ẩm trong gỗ, chuyên săn lùng những khối gỗ lũa, tượng gỗ cổ bị bỏ quên.",
+      "irreversibleProblem": "Gỗ sấy ép công nghiệp sẽ bị nứt nẻ và biến dạng theo thời gian, làm hỏng các tác phẩm điêu khắc tinh xảo và gây thiệt hại lớn cho người sưu tầm.",
+      "protagonistContradiction": "Biết một khối gỗ là tốt nhưng độ ẩm chưa đạt chuẩn, phải quyết định găm vốn chờ gỗ khô tự nhiên thêm vài năm hay bán rẻ cho thợ khác.",
+      "domainMechanism": "Chợ gỗ mỹ nghệ và đồ thờ cúng bằng gỗ. Giá trị nằm ở loại gỗ (trắc, sưa, hương) và độ ổn định của vật liệu (không cong vênh, nứt nẻ).",
+      "conflictEngine": "Đối đầu với những xưởng mộc dùng lò sấy vi sóng để ép khô gỗ nhanh, và những tay buôn gỗ lậu dùng hóa chất tạo màu giả gỗ quý.",
+      "emotionalCore": "Sự kiên nhẫn và tôn trọng quy luật của tự nhiên, niềm vui khi tạo ra một tác phẩm trường tồn với thời gian từ một khúc gỗ bỏ đi.",
+      "differenceClaim": "Cảm ứng chỉ cho biết tình trạng nước trong gỗ. Main phải dùng máy đo độ ẩm (để chứng minh cho người khác), kiến thức sinh học cây và kỹ thuật bảo quản để giao dịch.",
+      "nearestComparisonRisk": "Giống truyện buôn gỗ quý thông thường. Khắc phục bằng cách tập trung vào đồ mỹ nghệ đã thành hình và lịch sử của những bức tượng cổ.",
+      "serialityProof": "Từ việc thu gom các pho tượng cũ, main khám phá ra các phong cách điêu khắc đặc trưng của từng làng nghề mộc truyền thống.",
+      "openingAdvantage": "Chương 1: Từ chối mua pho tượng sưa vì cảm nhận lõi gỗ còn ướt (sấy ép). Chương 3: Mua một khúc gỗ lũa vứt lăn lóc, cảm nhận độ khô kiệt hoàn hảo, tạc thành một tác phẩm giá trị cao.",
+      "progressionProof": "Tăng vốn nhờ bán đồ gỗ ổn định không nứt; uy tín trong giới chơi đồ gỗ mỹ nghệ; xây dựng được kho chứa sấy gỗ tự nhiên.",
+      "worldProof": {
+        "signatureSituations": [
+          "Dùng máy đo độ ẩm cắm vào lõi một khúc gỗ bị cưa đôi để chứng minh cho khách hàng thấy sự chênh lệch độ ẩm mà main đã cảm nhận được.",
+          "Chỉ ra những vết nứt dăm siêu nhỏ trên bề mặt tượng do sấy ép quá nhanh, lật tẩy lời nói dối 'gỗ để mộc 10 năm' của người bán.",
+          "Hướng dẫn một nhà sưu tầm cách dùng sáp ong và khăn ẩm để cứu một bức tượng cổ đang bị nứt do để trong phòng điều hòa."
+        ],
+        "institutionalReaction": "Các xưởng mộc bắt đầu dùng kỹ thuật luộc gỗ trước khi sấy để làm đều độ ẩm, buộc main phải phân biệt được cấu trúc xơ gỗ bị phá hủy do luộc.",
+        "resourceCirculation": "Tiền dùng để thuê kho bãi rộng rãi để trữ gỗ chờ khô; uy tín giúp main được ưu tiên chọn mua những lô gỗ thanh lý từ các ngôi nhà cổ.",
+        "thirtyChapterMutation": "Main mua được một pho tượng cổ có giá trị tâm linh lớn nhưng đang bị nứt nghiêm trọng, phải tìm cách phục hồi môi trường vi khí hậu để cứu pho tượng trước khi nó vỡ vụn."
+      },
+      "antiCloneFingerprint": "cảm nhận chênh lệch độ ẩm gỗ|bảo quản và tạc tượng từ gỗ chuẩn|máy đo độ ẩm+kho sấy tự nhiên|xưởng sấy ép gỗ công nghiệp|chợ gỗ mỹ nghệ và đồ thờ"
+    },
+    {
+      "id": "concept_alloy_consistency",
+      "workingTitle": "Tạp Chất Lịch Sử",
+      "readerCuriosity": "Tại sao sự hiện diện của vỏ đạn đồng lẫn trong một chiếc mâm thau lại làm tăng giá trị lịch sử của nó thay vì làm giảm giá trị vật liệu?",
+      "readerFantasy": "Cảm nhận được sự không đồng nhất và các tạp chất trong hợp kim, từ đó xác định được nguồn gốc phế liệu kim loại (ví dụ: đồng nát thời chiến) dùng để đúc đồ.",
+      "premise": "Một thợ đúc đồng có khả năng cảm nhận độ đồng nhất của hợp kim, chuyên săn lùng những vật dụng sinh hoạt thời bao cấp được đúc từ phế liệu chiến tranh.",
+      "irreversibleProblem": "Những vật dụng mang dấu ấn lịch sử đang bị nung chảy để lấy kim loại nguyên liệu, làm mất đi những chứng tích về một thời kỳ khó khăn của đất nước.",
+      "protagonistContradiction": "Phải mua những món đồ với giá cao hơn giá trị kim loại phế liệu, đối mặt với sự chế giễu của giới buôn đồng nát chỉ quan tâm đến cân nặng.",
+      "domainMechanism": "Thị trường thu mua phế liệu và giới sưu tầm kỷ vật thời chiến/bao cấp. Giá trị nằm ở câu chuyện đằng sau vật liệu tạo nên món đồ.",
+      "conflictEngine": "Xung đột với những chủ vựa phế liệu muốn nung chảy mọi thứ, và những kẻ làm giả kỷ vật bằng kim loại nguyên chất hiện đại.",
+      "emotionalCore": "Sự trân trọng sức sáng tạo và khả năng sinh tồn của con người trong hoàn cảnh thiếu thốn, lưu giữ ký ức cho thế hệ sau.",
+      "differenceClaim": "Cảm ứng chỉ phát hiện tạp chất. Main phải dùng hồ sơ lịch sử, lời kể của nhân chứng và phân tích quang phổ để chứng minh nguồn gốc phế liệu.",
+      "nearestComparisonRisk": "Dễ nhầm với truyện buôn phế liệu thông thường. Khắc phục bằng cách tập trung vào giá trị sưu tầm văn hóa (kỷ vật) thay vì giá trị vật chất.",
+      "serialityProof": "Mỗi món đồ là một mảnh ghép về đời sống dân sự trong thời chiến, giúp main tổ chức một triển lãm chuyên đề về văn hóa tái chế.",
+      "openingAdvantage": "Chương 1: Từ chối mua chiếc lư đồng mới đúc bằng đồng nguyên chất. Chương 3: Mua một chiếc kẻng làm từ vỏ bom, cảm nhận được tỷ lệ thép đặc trưng, bán cho bảo tàng tư nhân.",
+      "progressionProof": "Tăng vốn từ việc bán kỷ vật cho nhà sưu tầm; uy tín trong giới nghiên cứu lịch sử; xây dựng mạng lưới thu gom từ các vựa phế liệu.",
+      "worldProof": {
+        "signatureSituations": [
+          "Chỉ ra những vết rỗ li ti trên bề mặt chiếc mâm thau do lẫn tạp chất nhôm từ xác máy bay, chứng minh nó được đúc vào thập niên 70.",
+          "Ngăn cản một chủ vựa phế liệu nung chảy một lô ca uống nước của bộ đội bằng cách trả giá cao gấp đôi giá đồng nát.",
+          "Tìm kiếm những người thợ đúc thủ công thời bao cấp để xác nhận kỹ thuật pha trộn kim loại tạp nham của họ."
+        ],
+        "institutionalReaction": "Giới làm giả bắt đầu trộn mạt sắt và nhôm vào đồng để đúc kỷ vật giả, buộc main phải phân tích sự phân bố tự nhiên của tạp chất khi nóng chảy.",
+        "resourceCirculation": "Tiền dùng để bao tiêu các lô phế liệu lớn trước khi chúng bị nung chảy; uy tín giúp main được các cựu chiến binh tin tưởng giao phó kỷ vật.",
+        "thirtyChapterMutation": "Main phát hiện một lô kỷ vật giả quy mô lớn được tuồn vào các bảo tàng địa phương, buộc phải đứng ra vạch trần và đối mặt với sự trả đũa của đường dây làm giả."
+      },
+      "antiCloneFingerprint": "cảm nhận tạp chất hợp kim|cứu kỷ vật khỏi lò nung phế liệu|lời kể nhân chứng+phân tích quang phổ|chủ vựa phế liệu nung chảy|giới sưu tầm kỷ vật thời chiến"
+    },
+    {
+      "id": "concept_glaze_craquelure",
+      "workingTitle": "Mạng Nhện Trên Men",
+      "readerCuriosity": "Làm sao phân biệt được những vết rạn men hình thành tự nhiên qua trăm năm với những vết rạn do ngâm nước trà và luộc nhiệt độ cao?",
+      "readerFantasy": "Cảm nhận được chiều sâu và sức căng của các vết nứt vi mô trên lớp men gốm (craquelure), lật tẩy công nghệ làm giả đồ cổ bằng cách ép rạn men.",
+      "premise": "Một thợ phục hồi gốm sứ có khả năng cảm nhận độ sâu của vết rạn, chuyên săn lùng những món đồ gốm rạn đặc trưng của các lò gốm Bắc Bộ xưa.",
+      "irreversibleProblem": "Công nghệ ép rạn men bằng nhiệt độ chênh lệch và nhuộm màu đang tạo ra những món đồ giả hoàn hảo, làm mất niềm tin vào dòng gốm rạn truyền thống.",
+      "protagonistContradiction": "Khách hàng thích những vết rạn to, rõ ràng (thường là hàng giả ép rạn), trong khi đồ thật rạn rất mảnh và mờ, đòi hỏi main phải giáo dục lại gu thẩm mỹ của thị trường.",
+      "domainMechanism": "Thị trường gốm sứ trang trí và đồ trà cụ. Giá trị nằm ở tính độc bản của mạng lưới vết rạn và niên đại thực sự của món đồ.",
+      "conflictEngine": "Xung đột với những xưởng gốm chuyên sản xuất hàng 'giả cổ' bán với giá đồ thật, và những nhà sưu tầm hợm hĩnh chỉ tin vào giấy chứng nhận rởm.",
+      "emotionalCore": "Vẻ đẹp của sự tàn phai và dấu ấn của thời gian, sự trân trọng đối với những biến đổi tự nhiên không thể cưỡng cầu.",
+      "differenceClaim": "Cảm ứng chỉ cho biết vết rạn nông hay sâu. Main phải dùng kính lúp soi cấu trúc, dung môi tẩy màu nhuộm và hồ sơ lò gốm để chứng minh.",
+      "nearestComparisonRisk": "Giống truyện giám định gốm sứ chung. Khắc phục bằng cách tập trung hoàn toàn vào kỹ thuật men rạn đặc trưng (ví dụ: men rạn Bát Tràng hư cấu) và các thủ thuật làm giả nó.",
+      "serialityProof": "Từ việc nghiên cứu các kiểu rạn khác nhau, main lập được bản đồ phân loại các dòng men rạn thất truyền, trở thành chuyên gia hàng đầu.",
+      "openingAdvantage": "Chương 1: Từ chối mua chiếc bình rạn đều tăm tắp vì cảm nhận vết rạn chỉ ở bề mặt (ép nhiệt). Chương 3: Mua một chiếc đĩa rạn mờ xỉn, dùng oxy già tẩy sạch lớp cáu bẩn để lộ ra mạng rạn trĩu sâu tuyệt đẹp.",
+      "progressionProof": "Tăng vốn nhờ bán đồ rạn chuẩn; uy tín trong giới chơi trà cụ; thu thập các công thức men rạn cổ.",
+      "worldProof": {
+        "signatureSituations": [
+          "Dùng dung dịch tẩy rửa mạnh lau lên bề mặt gốm, chứng minh các vết rạn giả bị mất màu do chỉ là mực ngâm, trong khi rạn thật ngấm sâu vào cốt.",
+          "Chỉ ra sự vô lý của một món đồ khi các vết rạn cắt ngang qua các họa tiết vẽ nổi một cách không tự nhiên.",
+          "Thuyết phục một nghệ nhân già truyền lại công thức men rạn cổ bằng cách chứng minh sự am hiểu về sức căng bề mặt của men."
+        ],
+        "institutionalReaction": "Giới làm giả bắt đầu dùng kỹ thuật rạn nhiều lớp để đánh lừa cảm giác chiều sâu, buộc main phải kết hợp soi chiếu bằng ánh sáng xuyên thấu.",
+        "resourceCirculation": "Tiền dùng để mua các thiết bị quang học soi men; uy tín giúp main được mời thẩm định các bộ đồ trà quý của giới tinh hoa.",
+        "thirtyChapterMutation": "Main được mời làm cố vấn cho một dự án phục dựng lò gốm cổ, phải đối mặt với áp lực thương mại hóa từ các nhà đầu tư muốn sản xuất hàng loạt men rạn giả cổ."
+      },
+      "antiCloneFingerprint": "cảm nhận chiều sâu vết rạn men|tẩy màu nhuộm lật tẩy rạn giả|kính lúp+dung môi tẩy màu|xưởng gốm ép rạn giả cổ|thị trường gốm sứ men rạn"
+    },
+    {
+      "id": "concept_paper_acidity",
+      "workingTitle": "Hương Vị Của Giấy",
+      "readerCuriosity": "Tại sao độ giòn và tính axit của một tờ giấy lại tiết lộ việc một cuốn gia phả đã bị đánh tráo các trang quan trọng để tranh giành thừa kế?",
+      "readerFantasy": "Cảm nhận được mức độ phân hủy cellulose và tính axit của giấy, từ đó xác định niên đại thực sự của tài liệu, sách cổ và tranh giấy.",
+      "premise": "Một nhân viên lưu trữ thư viện có khả năng cảm nhận độ giòn của sợi giấy, chuyên săn lùng các tài liệu, sách cũ, thư từ gia đình tại các vựa ve chai và chợ sách cũ.",
+      "irreversibleProblem": "Sách và tài liệu cũ đang bị hủy hoại từng ngày do tính axit tự nhiên của giấy, nếu không được khử axit kịp thời sẽ biến thành bụi.",
+      "protagonistContradiction": "Phải bỏ ra chi phí lớn để mua hóa chất khử axit cứu một cuốn sách vô danh, trong khi có thể dùng tiền đó mua những cuốn sách dễ bán hơn để xoay vòng vốn.",
+      "domainMechanism": "Chợ sách cũ, vựa ve chai và giới sưu tầm tài liệu lịch sử. Giá trị nằm ở nội dung thông tin, chữ ký tác giả và tình trạng bảo quản.",
+      "conflictEngine": "Xung đột với những kẻ làm giả chữ ký danh nhân trên giấy cũ, và những gia đình muốn tiêu hủy tài liệu bất lợi cho họ.",
+      "emotionalCore": "Sự trân trọng tri thức và ký ức, khoảnh khắc cứu được một văn bản lịch sử duy nhất khỏi sự mục nát vĩnh viễn.",
+      "differenceClaim": "Cảm ứng chỉ cho biết độ lão hóa của giấy. Main phải dùng hóa chất thử axit, đối chiếu font chữ, mực in và bối cảnh lịch sử để chứng minh tính xác thực.",
+      "nearestComparisonRisk": "Dễ biến thành truyện trinh thám tài liệu. Khắc phục bằng cách gắn chặt với thị trường mua bán sách cũ và chi phí phục hồi vật lý đắt đỏ.",
+      "serialityProof": "Mỗi tài liệu cứu được mở ra một bí mật về lịch sử đô thị hoặc một nhân vật nổi tiếng, giúp main xây dựng một kho lưu trữ tư nhân vô giá.",
+      "openingAdvantage": "Chương 1: Từ chối mua cuốn sách có chữ ký tác giả vì cảm nhận trang giấy ký tên ít axit hơn các trang khác (giấy ghép). Chương 3: Mua một mớ giấy lộn mục nát, khử axit thành công và phát hiện đó là bản thảo chưa xuất bản của một nhà văn lớn.",
+      "progressionProof": "Tăng vốn từ việc bán tài liệu đã phục hồi cho bảo tàng; uy tín trong giới học giả; trang bị được phòng lab khử axit chuyên dụng.",
+      "worldProof": {
+        "signatureSituations": [
+          "Dùng bút thử pH chấm lên góc trang giấy để chứng minh cho người mua thấy cuốn sách đang trong quá trình tự hủy và cần được phục hồi gấp.",
+          "Chỉ ra sự khác biệt về độ giòn giữa hai nửa của một tờ giấy chứng nhận đất đai, lật tẩy việc nó đã bị cắt ghép tinh vi.",
+          "Cẩn thận dùng dung dịch kiềm nhẹ để bóc tách các trang sách bị dính chặt vào nhau do ẩm mốc, cứu vãn một cuốn gia phả cổ."
+        ],
+        "institutionalReaction": "Những kẻ làm giả bắt đầu dùng lò vi sóng và tia UV để làm lão hóa giấy nhân tạo, buộc main phải phân tích sự đứt gãy của sợi cellulose dưới kính hiển vi.",
+        "resourceCirculation": "Tiền dùng để mua hóa chất bảo quản và tủ chống ẩm; uy tín giúp main được các gia đình trí thức cũ tin tưởng giao phó thư viện cá nhân.",
+        "thirtyChapterMutation": "Main tìm thấy một tập tài liệu liên quan đến quyền sở hữu một khu đất vàng của thành phố, bị các thế lực bất động sản đe dọa và mua chuộc để tiêu hủy bằng chứng."
+      },
+      "antiCloneFingerprint": "cảm nhận độ axit của giấy|khử axit cứu tài liệu cổ|bút thử pH+phòng lab bảo quản|kẻ làm giả chữ ký danh nhân|chợ sách cũ và vựa ve chai"
+    },
+    {
+      "id": "concept_enamel_adhesion",
+      "workingTitle": "Sắc Màu Pháp Lam",
+      "readerCuriosity": "Làm sao biết được một mảng màu pháp lam (cloisonné) bị bong tróc là do lỗi kỹ thuật của nghệ nhân xưa hay do va đập cố ý để làm giả đồ cổ?",
+      "readerFantasy": "Cảm nhận được lực liên kết giữa lớp men thủy tinh và cốt đồng bên dưới, lật tẩy những món đồ pháp lam được phục hồi bằng sơn móng tay hoặc keo màu.",
+      "premise": "Một thợ kim hoàn chuyên làm đồ mỹ nghệ có khả năng cảm nhận độ bám dính của men pháp lam, chuyên săn lùng những món đồ trang trí cung đình thất lạc.",
+      "irreversibleProblem": "Kỹ thuật phục hồi pháp lam bằng nhiệt độ thấp đang làm hỏng cốt đồng nguyên bản, trong khi thợ buôn dùng sơn màu để che giấu vết nứt lừa khách hàng.",
+      "protagonistContradiction": "Phục hồi pháp lam đúng chuẩn đòi hỏi phải nung lại ở nhiệt độ cao, có nguy cơ làm chảy toàn bộ lớp men cũ, đòi hỏi sự đánh đổi rủi ro cực lớn.",
+      "domainMechanism": "Giới sưu tầm đồ mỹ nghệ cung đình và trang sức cổ. Giá trị nằm ở sự nguyên vẹn của các ô màu và kỹ thuật bóp chỉ đồng.",
+      "conflictEngine": "Xung đột với những thợ phục hồi dùng sơn epoxy lạnh, và những tay buôn đồ giả từ nước ngoài gắn mác pháp lam nội địa.",
+      "emotionalCore": "Sự ngưỡng mộ đối với kỹ thuật thủ công đỉnh cao đã thất truyền, nỗ lực phục hưng lại một ngành nghề nghệ thuật rực rỡ.",
+      "differenceClaim": "Cảm ứng chỉ phát hiện sự lỏng lẻo của men. Main phải dùng dung môi tẩy sơn, kính lúp soi bọt khí và hồ sơ xưởng chế tác để chứng minh.",
+      "nearestComparisonRisk": "Giống truyện buôn đồ cổ Trung Quốc (Cảnh Thái Lam). Khắc phục bằng cách tập trung vào kỹ thuật Pháp Lam Huế hư cấu, với các màu sắc và họa tiết thuần Việt.",
+      "serialityProof": "Từ việc thu thập và phục hồi các mảnh pháp lam vỡ, main dần tìm lại được bảng màu gốc và công thức nung men đã thất truyền.",
+      "openingAdvantage": "Chương 1: Từ chối mua chiếc hộp pháp lam vì cảm nhận một mảng màu không có lực bám của thủy tinh (trám bằng sơn). Chương 3: Mua một chiếc khay móp méo, dùng nhiệt độ thấp bóc lớp sơn phủ để lộ ra họa tiết pháp lam tinh xảo bên dưới.",
+      "progressionProof": "Tăng vốn nhờ phục hồi pháp lam đúng chuẩn; uy tín trong giới sưu tầm đồ cung đình; xây dựng được lò nung men chuyên dụng.",
+      "worldProof": {
+        "signatureSituations": [
+          "Dùng axeton lau qua một mảng màu trên chiếc bình, lớp sơn giả lập tức tan ra, lật tẩy trò lừa đảo trám vết nứt bằng sơn móng tay.",
+          "Chỉ ra sự khác biệt về độ cong của các sợi chỉ đồng để chứng minh một món đồ là hàng sản xuất hàng loạt bằng máy ép chứ không phải bóp tay.",
+          "Đánh cược uy tín của mình để nung lại một chiếc đĩa pháp lam quý giá nhằm cố định lại lớp men đang bong tróc, một sai lầm sẽ làm hỏng toàn bộ."
+        ],
+        "institutionalReaction": "Giới làm giả bắt đầu dùng men thủy tinh nhiệt độ thấp để trám vết nứt, buộc main phải phân biệt sự chênh lệch độ cứng và bọt khí giữa hai loại men.",
+        "resourceCirculation": "Tiền dùng để mua bột men màu và chỉ đồng nguyên chất; uy tín giúp main được mượn các hiện vật chuẩn từ bảo tàng để đối chiếu màu sắc.",
+        "thirtyChapterMutation": "Main được giao nhiệm vụ phục hồi một bộ pháp lam lớn của một di tích, phải đối mặt với sự phá hoại ngầm từ những xưởng làm giả không muốn kỹ thuật thật được công bố."
+      },
+      "antiCloneFingerprint": "cảm nhận độ bám dính men pháp lam|tẩy sơn giả phục hồi men thật|dung môi tẩy+lò nung chuyên dụng|thợ trám men bằng sơn lạnh|giới sưu tầm mỹ nghệ cung đình"
+    },
+    {
+      "id": "concept_scent_retention",
+      "workingTitle": "Ký Ức Của Mùi Hương",
+      "readerCuriosity": "Tại sao một chiếc ấm trà cũ kỹ, cáu bẩn lại có giá trị gấp mười lần một chiếc ấm mới tinh cùng loại, và mùi hương ngấm trong cốt gốm tiết lộ điều gì?",
+      "readerFantasy": "Cảm nhận được lượng tinh dầu hữu cơ (trà, trầm hương) tích tụ trong các lỗ xốp của vật liệu, từ đó xác định lịch sử sử dụng và giá trị thực của trà cụ, hương cụ.",
+      "premise": "Một người sành trà có khả năng cảm nhận độ ngậm mùi của gốm và gỗ, chuyên đi săn lùng những chiếc ấm tử sa (hoặc gốm xốp địa phương) và lư hương cũ.",
+      "irreversibleProblem": "Nhiều người không biết đã dùng xà phòng hoặc chất tẩy rửa mạnh để rửa ấm trà cổ, làm mất đi lớp 'cao trà' quý giá tích tụ hàng chục năm, phá hủy giá trị món đồ.",
+      "protagonistContradiction": "Phải thuyết phục khách hàng mua một chiếc ấm nhìn có vẻ bẩn thỉu với giá cao, và ngăn cản họ làm sạch nó theo cách thông thường.",
+      "domainMechanism": "Giới chơi trà đạo và hương đạo hư cấu. Giá trị của món đồ không chỉ ở chất liệu, nghệ nhân mà còn ở 'tuổi đời sử dụng' (đã được dưỡng bao lâu, bằng loại trà/hương gì).",
+      "conflictEngine": "Xung đột với những kẻ luộc ấm bằng trà rẻ tiền để tạo cao trà giả, và những người buôn đồ cổ chỉ quan tâm đến hình thức bên ngoài.",
+      "emotionalCore": "Sự kết nối tâm giao giữa những người chủ khác thời đại thông qua cùng một mùi hương, triết lý về việc 'dưỡng' đồ vật bằng thời gian và sự kiên nhẫn.",
+      "differenceClaim": "Cảm ứng chỉ cho biết độ sâu của mùi. Main phải dùng nước sôi để thử mùi thực tế, đối chiếu hình dáng ấm với loại trà phù hợp, và tìm hiểu lịch sử người chủ cũ.",
+      "nearestComparisonRisk": "Dễ nhầm với truyện buôn ấm Tử Sa Trung Quốc. Khắc phục bằng cách sáng tạo ra một dòng gốm xốp pha trà đặc trưng của Việt Nam (ví dụ: gốm sa khoáng Tây Nguyên) và các loại trà bản địa.",
+      "serialityProof": "Mỗi chiếc ấm mang mùi hương của một loại trà cổ thụ khác nhau, dẫn dắt main đi tìm những vùng trà thất truyền và những nghệ nhân làm trà ẩn dật.",
+      "openingAdvantage": "Chương 1: Từ chối mua chiếc ấm bóng loáng vì cảm nhận mùi trà tẩm hóa chất ép nhiệt. Chương 3: Mua một chiếc ấm vứt lăn lóc trong góc bếp, rót nước sôi vào tỏa ra hương trà sen cổ truyền, chứng minh nó từng thuộc về một danh gia.",
+      "progressionProof": "Tăng vốn nhờ bán ấm đã được 'dưỡng' đúng cách; uy tín trong giới tinh hoa yêu trà; sưu tầm được các loại trà quý hiếm để thử ấm.",
+      "worldProof": {
+        "signatureSituations": [
+          "Rót nước sôi vào một chiếc ấm không có trà, để khách hàng ngửi thấy hương thơm tỏa ra từ cốt gốm, chứng minh giá trị của lớp cao trà 50 năm.",
+          "Ngăn cản một người giúp việc dùng nước rửa chén để cọ rửa bộ ấm trà kỷ vật của gia đình, cứu vãn một di sản vô hình.",
+          "Phân biệt hai chiếc ấm giống hệt nhau bằng cách chỉ ra một chiếc được dưỡng bằng trà mạn (đúng chuẩn), chiếc kia bị ám mùi cà phê (mất giá trị)."
+        ],
+        "institutionalReaction": "Giới làm giả bắt đầu dùng tinh dầu công nghiệp áp suất cao để ép mùi vào ấm mới, buộc main phải phân biệt được sự tỏa hương từ từ của cao trà tự nhiên và sự sực nức của tinh dầu ép.",
+        "resourceCirculation": "Tiền dùng để mua các loại trà cổ thụ đắt tiền để 'dưỡng' ấm; uy tín giúp main được mời tham gia các buổi tiệc trà kín của giới thượng lưu.",
+        "thirtyChapterMutation": "Main sở hữu một chiếc ấm mang mùi hương của một loại trà đã tuyệt chủng, bị các nhà sưu tầm ráo riết săn lùng, buộc phải quyết định giữ lại làm di sản hay bán đi để lấy vốn mở rộng kinh doanh."
+      },
+      "antiCloneFingerprint": "cảm nhận độ ngậm tinh dầu hữu cơ|dưỡng ấm và bảo tồn cao trà|nước sôi thử mùi+trà cổ thụ|kẻ ép mùi bằng tinh dầu công nghiệp|giới chơi trà cụ và hương cụ"
+    },
+    {
+      "id": "concept_joint_friction",
+      "workingTitle": "Khớp Nối Thời Gian",
+      "readerCuriosity": "Tại sao độ mòn của một chiếc bản lề hay khớp mộng gỗ lại là bằng chứng tố cáo một chiếc tủ cổ thực chất được ghép từ hai món đồ vỡ nát khác nhau?",
+      "readerFantasy": "Cảm nhận được độ mòn cơ học và ma sát của các khớp nối chuyển động (ngăn kéo, bản lề, mộng gỗ), lật tẩy những món đồ 'râu ông nọ cắm cằm bà kia' (married pieces).",
+      "premise": "Một thợ mộc chuyên sửa chữa cơ cấu chuyển động có khả năng cảm nhận sự đồng bộ của độ mòn, chuyên săn lùng những món đồ nội thất, hộp cơ khí bị đánh giá sai.",
+      "irreversibleProblem": "Thị trường tràn ngập những món đồ được ghép nối tinh vi từ các bộ phận của nhiều món đồ hỏng khác nhau, làm mất đi tính nguyên bản và giá trị lịch sử.",
+      "protagonistContradiction": "Phát hiện một chiếc tủ ghép rất đẹp và tiện dụng, nhưng phải tháo tung nó ra để tìm lại bộ phận gốc, đối mặt với nguy cơ làm hỏng cả hai món đồ.",
+      "domainMechanism": "Chợ đồ gỗ nội thất cũ và đồ cơ khí dân dụng. Giá trị nằm ở tính nguyên bản đồng bộ (matching parts) và sự hoàn hảo của cơ cấu chuyển động.",
+      "conflictEngine": "Xung đột với những xưởng mộc chuyên 'luộc' đồ, tráo đổi các ngăn kéo, cánh cửa xịn sang khung tủ mới để bán được nhiều tiền hơn.",
+      "emotionalCore": "Sự trân trọng đối với sự tính toán chính xác của những người thợ thủ công xưa, niềm vui khi trả lại sự trơn tru, hoàn hảo cho một cơ cấu chuyển động.",
+      "differenceClaim": "Cảm ứng chỉ phát hiện sự cọc cạch của khớp nối. Main phải dùng thước kẹp, bản vẽ kỹ thuật cũ và kiến thức về thói quen sử dụng để chứng minh sự chắp vá.",
+      "nearestComparisonRisk": "Giống truyện buôn đồ gỗ chung. Khắc phục bằng cách tập trung vào các cơ cấu chuyển động (ngăn kéo bí mật, bản lề ẩn, khóa cơ khí) thay vì chỉ nhìn chất gỗ.",
+      "serialityProof": "Từ việc tìm kiếm các bộ phận bị tráo đổi, main lần ra đường dây chuyên tháo dỡ và phân phối linh kiện đồ cổ trái phép.",
+      "openingAdvantage": "Chương 1: Từ chối mua chiếc tủ chè vì cảm nhận ngăn kéo trượt quá rít (ngăn kéo của tủ khác ghép vào). Chương 3: Mua một chiếc hộp gỗ kẹt khóa, cảm nhận độ mòn của chốt, dùng mẹo mở ra mà không làm hỏng khóa.",
+      "progressionProof": "Tăng vốn nhờ bán đồ đồng bộ nguyên bản; uy tín trong giới sưu tầm đồ cơ khí gỗ; thu thập các bản vẽ mộng gỗ thất truyền.",
+      "worldProof": {
+        "signatureSituations": [
+          "Kéo thử một ngăn kéo và chỉ ra rằng độ mòn của thanh trượt không khớp với thói quen sử dụng của người thuận tay phải (như chủ nhân cũ của chiếc tủ).",
+          "Tháo một chiếc bản lề ra để chứng minh các lỗ đinh vít đã bị khoan lại nhiều lần, lật tẩy việc cánh cửa đã bị thay thế.",
+          "Dùng sáp ong và kỹ thuật bào mộng thủ công để phục hồi lại sự trơn tru cho một chiếc tủ tài liệu cổ mà không cần dùng đinh ốc hiện đại."
+        ],
+        "institutionalReaction": "Giới làm giả bắt đầu dùng máy chà nhám để làm mòn nhân tạo các khớp nối cho khớp nhau, buộc main phải phân biệt được vết mòn tự nhiên (không đều) và vết mòn nhân tạo (đều tăm tắp).",
+        "resourceCirculation": "Tiền dùng để mua các dụng cụ đo lường chính xác và sáp bảo dưỡng; uy tín giúp main được các thư viện, lưu trữ quốc gia thuê bảo dưỡng tủ kệ cổ.",
+        "thirtyChapterMutation": "Main phát hiện ra một chiếc tủ chứa cơ quan bí mật phức tạp, việc tháo lắp sai một khớp nối sẽ kích hoạt cơ chế tự hủy tài liệu bên trong, đòi hỏi sự tập trung và kỹ năng tuyệt đối."
+      },
+      "antiCloneFingerprint": "cảm nhận độ mòn khớp nối|phục hồi tính đồng bộ cơ cấu|thước kẹp+bản vẽ mộng gỗ|xưởng mộc ghép đồ râu ông nọ|chợ nội thất và hộp cơ khí"
+    }
+  ],
+  "rejectedNearDuplicateIds": [],
+  "ranking": {
+    "schemaVersion": 2,
+    "matches": [
+      {
+        "leftId": "concept_porosity_reader",
+        "rightId": "concept_thermal_composite",
+        "winnerId": "concept_porosity_reader",
+        "reason": "Hơi Thở Của Đất có tính nhân quả cao hơn khi gắn liền với men lò địa phương và hồ sơ di cư thay vì chỉ đo nhiệt độ vật liệu chung chung."
+      },
+      {
+        "leftId": "concept_crystalline_structure",
+        "rightId": "concept_ash_content",
+        "winnerId": "concept_crystalline_structure",
+        "reason": "Kết Tinh Của Lửa khai thác sâu sắc thị trường tiêu bản gốm sứ rất đặc thù của Việt Nam, tạo ra xung đột chuyên môn cao hơn."
+      },
+      {
+        "leftId": "concept_magnetic_trace",
+        "rightId": "concept_density_weight",
+        "winnerId": "concept_magnetic_trace",
+        "reason": "Từ Tính Của Đất gắn liền với địa chất sông ngòi và lịch sử làng nghề Nam Bộ, vượt trội hơn cơ chế cân nặng kim loại dễ bị bắt chước."
+      },
+      {
+        "leftId": "concept_glaze_craquelure",
+        "rightId": "concept_oxidation_layer",
+        "winnerId": "concept_glaze_craquelure",
+        "reason": "Mạng Nhện Trên Men tập trung vào kỹ thuật men rạn Bát Tràng và các thủ thuật hóa chất tinh vi, tạo ra nhiều tình huống đối đầu kịch tính."
+      },
+      {
+        "leftId": "concept_paper_acidity",
+        "rightId": "concept_organic_decay",
+        "winnerId": "concept_paper_acidity",
+        "reason": "Hương Vị Của Giấy liên kết trực tiếp với hồ sơ gia phả và tranh chấp thừa kế, tạo động cơ nhân vật mạnh mẽ hơn sơn mài mỹ thuật."
+      },
+      {
+        "leftId": "concept_enamel_adhesion",
+        "rightId": "concept_scent_retention",
+        "winnerId": "concept_enamel_adhesion",
+        "reason": "Sắc Màu Pháp Lam khai thác dòng Pháp Lam Huế độc đáo với kỹ thuật bóp chỉ đồng, có tính trực quan và rủi ro phục hồi cao hơn."
+      },
+      {
+        "leftId": "concept_fiber_tension",
+        "rightId": "concept_pigment_binding",
+        "winnerId": "concept_fiber_tension",
+        "reason": "Sức Căng Của Sợi tập trung vào kỹ thuật bồi tranh Đông Dương truyền thống, tạo ra các tình huống bóc tách tranh kịch tính hơn."
+      },
+      {
+        "leftId": "concept_resin_hardness",
+        "rightId": "concept_moisture_gradient",
+        "winnerId": "concept_resin_hardness",
+        "reason": "Giọt Nhựa Hóa Thạch khai thác triết lý wabi-sabi và kỹ thuật kintsugi bằng sơn ta, mang lại chiều sâu cảm xúc tốt hơn."
+      },
+      {
+        "leftId": "concept_alloy_consistency",
+        "rightId": "concept_joint_friction",
+        "winnerId": "concept_alloy_consistency",
+        "reason": "Tạp Chất Lịch Sử gắn liền với kỷ vật thời chiến và phế liệu bao cấp, mang đậm tính bản địa Việt Nam hơn khớp mộng gỗ."
+      },
+      {
+        "leftId": "concept_surface_tension",
+        "rightId": "concept_acoustic_resonance",
+        "winnerId": "concept_acoustic_resonance",
+        "reason": "Âm Vang Đồ Cũ tạo ra sự tò mò lớn về cấu trúc ngăn kéo bí mật của đồ gỗ cổ, dễ triển khai tình huống kịch tính hơn đồng hồ."
+      },
+      {
+        "leftId": "concept_porosity_reader",
+        "rightId": "concept_crystalline_structure",
+        "winnerId": "concept_porosity_reader",
+        "reason": "Hơi Thở Của Đất chiến thắng nhờ sự kết hợp hoàn hảo giữa cảm ứng độ xốp vật liệu và hồ sơ di cư gia đình, tạo ra mạch truyện giàu cảm xúc."
+      },
+      {
+        "leftId": "concept_crystalline_structure",
+        "rightId": "concept_magnetic_trace",
+        "winnerId": "concept_crystalline_structure",
+        "reason": "Kết Tinh Của Lửa vượt trội nhờ khai thác văn hóa chơi tiêu bản gốm sứ độc đáo, tạo ra vòng lặp tiến bộ vật chất và tri thức rất rõ ràng."
+      },
+      {
+        "leftId": "concept_magnetic_trace",
+        "rightId": "concept_ash_content",
+        "winnerId": "concept_magnetic_trace",
+        "reason": "Từ Tính Của Đất thắng nhờ gắn kết chặt chẽ giữa địa chất học và lịch sử di cư của các dòng họ Nam Bộ."
+      },
+      {
+        "leftId": "concept_ash_content",
+        "rightId": "concept_glaze_craquelure",
+        "winnerId": "concept_ash_content",
+        "reason": "Tàn Tro Kể Chuyện khai thác bối cảnh công trường xây dựng đô thị hóa, tạo ra nguồn hàng thực tế và rủi ro pháp lý rõ ràng."
+      },
+      {
+        "leftId": "concept_paper_acidity",
+        "rightId": "concept_glaze_craquelure",
+        "winnerId": "concept_paper_acidity",
+        "reason": "Hương Vị Của Giấy có tính nhân quả cao khi giải quyết các tranh chấp gia tộc bằng tài liệu lịch sử."
+      },
+      {
+        "leftId": "concept_organic_decay",
+        "rightId": "concept_oxidation_layer",
+        "winnerId": "concept_organic_decay",
+        "reason": "Dấu Ấn Thời Gian khai thác kỹ thuật sơn mài truyền thống Việt Nam, có tính bản địa sâu sắc hơn đồ đồng thờ cúng."
+      },
+      {
+        "leftId": "concept_oxidation_layer",
+        "rightId": "concept_enamel_adhesion",
+        "winnerId": "concept_oxidation_layer",
+        "reason": "Lớp Áo Thời Gian gắn liền với đồ thờ cúng gia đình và lớp patina tự nhiên, tạo ra nhiều kết nối cảm xúc gia đình."
+      },
+      {
+        "leftId": "concept_scent_retention",
+        "rightId": "concept_fiber_tension",
+        "winnerId": "concept_scent_retention",
+        "reason": "Ký Ức Của Mùi Hương khai thác văn hóa trà cụ bản địa, tạo ra trải nghiệm đọc thư thái và tinh tế."
+      },
+      {
+        "leftId": "concept_pigment_binding",
+        "rightId": "concept_resin_hardness",
+        "winnerId": "concept_resin_hardness",
+        "reason": "Giọt Nhựa Hóa Thạch có tính thử thách cao hơn khi phục hồi vết nứt gốm sứ bằng sơn ta rắc vàng thật."
+      },
+      {
+        "leftId": "concept_moisture_gradient",
+        "rightId": "concept_alloy_consistency",
+        "winnerId": "concept_moisture_gradient",
+        "reason": "Độ Ẩm Của Gỗ có tính ứng dụng cao trong việc bảo tồn tượng gỗ cổ trước thời tiết khắc nghiệt."
+      },
+      {
+        "leftId": "concept_joint_friction",
+        "rightId": "concept_thermal_composite",
+        "winnerId": "concept_joint_friction",
+        "reason": "Khớp Nối Thời Gian khai thác sự đồng bộ cơ học của mộng gỗ, thực tế hơn việc đo nhiệt độ truyền dẫn."
+      },
+      {
+        "leftId": "concept_density_weight",
+        "rightId": "concept_acoustic_resonance",
+        "winnerId": "concept_acoustic_resonance",
+        "reason": "Âm Vang Đồ Cũ tạo ra sự tò mò lớn về cấu trúc ngăn kéo bí mật của đồ gỗ cổ, dễ triển khai tình huống kịch tính hơn đồng hồ."
+      },
+      {
+        "leftId": "concept_surface_tension",
+        "rightId": "concept_thermal_composite",
+        "winnerId": "concept_thermal_composite",
+        "reason": "Dấu Vết Nhiệt Dung có tính ứng dụng cao hơn khi phát hiện đồ chắp vá bằng keo epoxy tản nhiệt chậm."
+      }
+    ],
+    "ranking": [
+      {
+        "id": "concept_porosity_reader",
+        "wins": 2,
+        "reason": "Hơi Thở Của Đất đứng đầu nhờ sự kết hợp hoàn hảo giữa cảm ứng độ xốp vật liệu, hồ sơ di cư gia đình và mạng lưới thợ phục hồi bản địa."
+      },
+      {
+        "id": "concept_crystalline_structure",
+        "wins": 2,
+        "reason": "Kết Tinh Của Lửa xuất sắc nhờ khai thác văn hóa chơi tiêu bản gốm sứ độc đáo, tạo ra vòng lặp tiến bộ vật chất và tri thức rất rõ ràng."
+      },
+      {
+        "id": "concept_magnetic_trace",
+        "wins": 2,
+        "reason": "Từ Tính Của Đất có tính nhân quả cao khi gắn kết chặt chẽ giữa địa chất học sông ngòi và lịch sử di cư của các dòng họ Nam Bộ."
+      },
+      {
+        "id": "concept_ash_content",
+        "wins": 1,
+        "reason": "Tàn Tro Kể Chuyện khai thác bối cảnh công trường xây dựng đô thị hóa, tạo ra nguồn hàng thực tế và rủi ro pháp lý rõ ràng."
+      },
+      {
+        "id": "concept_paper_acidity",
+        "wins": 2,
+        "reason": "Hương Vị Của Giấy có tính nhân quả cao khi giải quyết các tranh chấp gia tộc bằng tài liệu lịch sử."
+      },
+      {
+        "id": "concept_organic_decay",
+        "wins": 1,
+        "reason": "Dấu Ấn Thời Gian khai thác kỹ thuật sơn mài truyền thống Việt Nam, có tính bản địa sâu sắc hơn đồ đồng thờ cúng."
+      },
+      {
+        "id": "concept_oxidation_layer",
+        "wins": 1,
+        "reason": "Lớp Áo Thời Gian gắn liền với đồ thờ cúng gia đình và lớp patina tự nhiên, tạo ra nhiều kết nối cảm xúc gia đình."
+      },
+      {
+        "id": "concept_scent_retention",
+        "wins": 1,
+        "reason": "Ký Ức Của Mùi Hương khai thác văn hóa trà cụ bản địa, tạo ra trải nghiệm đọc thư thái và tinh tế."
+      },
+      {
+        "id": "concept_resin_hardness",
+        "wins": 2,
+        "reason": "Giọt Nhựa Hóa Thạch có tính thử thách cao hơn khi phục hồi vết nứt gốm sứ bằng sơn ta rắc vàng thật."
+      },
+      {
+        "id": "concept_moisture_gradient",
+        "wins": 1,
+        "reason": "Độ Ẩm Của Gỗ có tính ứng dụng cao trong việc bảo tồn tượng gỗ cổ trước thời tiết khắc nghiệt."
+      },
+      {
+        "id": "concept_joint_friction",
+        "wins": 1,
+        "reason": "Khớp Nối Thời Gian khai thác sự đồng bộ cơ học của mộng gỗ, thực tế hơn việc đo nhiệt độ truyền dẫn."
+      },
+      {
+        "id": "concept_acoustic_resonance",
+        "wins": 2,
+        "reason": "Âm Vang Đồ Cũ tạo ra sự tò mò lớn về cấu trúc ngăn kéo bí mật của đồ gỗ cổ, dễ triển khai tình huống kịch tính hơn đồng hồ."
+      },
+      {
+        "id": "concept_thermal_composite",
+        "wins": 1,
+        "reason": "Dấu Vết Nhiệt Dung có tính ứng dụng cao hơn khi phát hiện đồ chắp vá bằng keo epoxy tản nhiệt chậm."
+      },
+      {
+        "id": "concept_glaze_craquelure",
+        "wins": 1,
+        "reason": "Mạng Nhện Trên Men tập trung vào kỹ thuật men rạn Bát Tràng và các thủ thuật hóa chất tinh vi, tạo ra nhiều tình huống đối đầu kịch tính."
+      },
+      {
+        "id": "concept_enamel_adhesion",
+        "wins": 1,
+        "reason": "Sắc Màu Pháp Lam khai thác dòng Pháp Lam Huế độc đáo với kỹ thuật bóp chỉ đồng, có tính trực quan và rủi ro phục hồi cao hơn."
+      },
+      {
+        "id": "concept_fiber_tension",
+        "wins": 1,
+        "reason": "Sức Căng Của Sợi tập trung vào kỹ thuật bồi tranh Đông Dương truyền thống, tạo ra các tình huống bóc tách tranh kịch tính hơn."
+      },
+      {
+        "id": "concept_alloy_consistency",
+        "wins": 1,
+        "reason": "Tạp Chất Lịch Sử gắn liền với kỷ vật thời chiến và phế liệu bao cấp, mang đậm tính bản địa Việt Nam hơn khớp mộng gỗ."
+      },
+      {
+        "id": "concept_pigment_binding",
+        "wins": 0,
+        "reason": "Độ Bám Của Màu bị hạ hạng do cơ chế bóc tách màu vẽ đè dễ bị lặp lại giao dịch mà không tạo tiến bộ vật chất lớn."
+      },
+      {
+        "id": "concept_density_weight",
+        "wins": 0,
+        "reason": "Trọng Lượng Của Lịch Sử bị hạ hạng do cơ chế cảm nhận khối lượng riêng quá đơn giản, dễ bị đối thủ qua mặt bằng công nghệ đúc chì."
+      },
+      {
+        "id": "concept_surface_tension",
+        "wins": 0,
+        "reason": "Vết Cắt Thời Gian bị hạ hạng do tập trung vào đồng hồ cơ khí cổ, ít liên kết với men lò địa phương và hồ sơ di cư gia đình."
+      }
+    ],
+    "finalistIds": [
+      "concept_porosity_reader",
+      "concept_crystalline_structure",
+      "concept_magnetic_trace"
+    ],
+    "finalistWorldKernels": [
+      {
+        "candidateId": "concept_porosity_reader",
+        "signatureSituations": [
+          "Dùng cồn y tế lau một góc bình để chứng minh lớp sáp ngụy trang trước mặt người mua.",
+          "So sánh độ xốp của hiện vật với mảnh vỡ tiêu bản trong kho lưu trữ để xác định niên đại lò nung.",
+          "Thuyết phục người thừa kế không đánh bóng lại bộ ấm trà kỷ vật bằng cách đưa ra bức ảnh đen trắng của ông nội họ."
+        ],
+        "rules": [
+          {
+            "rule": "Quy tắc chứng minh nguồn gốc di cư",
+            "beneficiary": "Người mua chân chính",
+            "harmedParty": "Kẻ buôn đồ giả cổ",
+            "enforcement": "Ban quản lý chợ đồ cũ Vạn Thái tịch thu hàng nếu không có trích lục gia phả hợp lệ.",
+            "cost": "Người bán phải trả phí tra cứu hồ sơ lưu trữ địa phương.",
+            "consequence": "Đồ vật không rõ nguồn gốc bị hạ giá xuống mức phế liệu.",
+            "evidenceSource": "Sổ đăng ký hộ tịch cũ và nhật ký di cư của các dòng họ.",
+            "exceptions": "Các hiện vật được khai quật trực tiếp từ móng nhà cổ có biên bản xác nhận của chính quyền địa phương.",
+            "sceneAffordances": [
+              "Nhân vật chính phải chi một triệu đồng để thuê người trích lục sổ hộ tịch cũ tại kho lưu trữ quận nhằm chứng minh chiếc thố đất thuộc về một gia đình di cư năm 1954.",
+              "Kẻ buôn lậu phải chấp nhận bán rẻ chiếc bình gốm cổ với giá đồ nát vì không thể cung cấp được bất kỳ giấy tờ chứng minh nguồn gốc nào."
+            ]
+          },
+          {
+            "rule": "Quy tắc bảo tồn nguyên trạng vật liệu",
+            "beneficiary": "Thợ phục hồi truyền thống",
+            "harmedParty": "Thợ mông má hóa chất",
+            "enforcement": "Hiệp hội cổ vật từ chối cấp chứng nhận cho đồ vật bị phủ keo công nghiệp.",
+            "cost": "Mất nhiều tuần để bóc tách hóa chất bằng dung dịch chuyên dụng.",
+            "consequence": "Đồ vật bị can thiệp hóa chất mất 90% giá trị giao dịch.",
+            "evidenceSource": "Thử nghiệm độ thoát ẩm và độ xốp của đất nung.",
+            "exceptions": "Đồ vật bị vỡ nát hoàn toàn cần dùng keo gia cố cấu trúc bên trong để tránh sụp đổ.",
+            "sceneAffordances": [
+              "Người thợ phục hồi phải tỉ mỉ dùng tăm bông thấm cồn y tế lau sạch lớp sáp phủ công nghiệp trong suốt mười tiếng liên tục để cứu cốt gốm mộc.",
+              "Khách hàng từ chối nhận lại chiếc bình gốm sau khi phát hiện thợ sửa chữa đã tự ý phun bóng bề mặt bằng sơn PU."
+            ]
+          },
+          {
+            "rule": "Quy tắc trọng tài độc lập",
+            "beneficiary": "Người mua bị lừa",
+            "harmedParty": "Cửa hàng gian lận",
+            "enforcement": "Tòa án chợ đồ cũ buộc hoàn tiền gấp đôi nếu có kết luận của hai chuyên gia độc lập.",
+            "cost": "Chi phí thuê chuyên gia giám định độc lập rất cao.",
+            "consequence": "Cửa hàng gian lận bị tước giấy phép kinh doanh tại chợ Vạn Thái.",
+            "evidenceSource": "Biên bản giám định độc lập có chữ ký của đại diện bảo tàng tư nhân.",
+            "exceptions": "Các giao dịch thỏa thuận bằng văn bản miễn trừ trách nhiệm giám định giữa hai bên.",
+            "sceneAffordances": [
+              "Nhân vật chính phải đối chất với chủ tiệm đồ cũ trước ban quản lý chợ, đưa ra bằng chứng độ xốp sai lệch để đòi lại tiền cọc.",
+              "Chủ tiệm đồ cũ phải bồi thường một trăm triệu đồng cho khách hàng sau khi biên bản giám định độc lập kết luận chiếc bình là hàng giả cổ."
+            ]
+          }
+        ],
+        "resources": [
+          {
+            "resource": "Hồ sơ nguồn gốc",
+            "source": "Kho lưu trữ gia đình và sổ sách hộ tịch cũ.",
+            "spendRule": "Tiêu tốn khi thực hiện giao dịch lớn để bảo chứng giá trị; mất đi nếu hồ sơ bị rách nát hoặc thất lạc.",
+            "scarcity": "Cực kỳ khan hiếm vì nhiều gia đình đã thất lạc giấy tờ trong các đợt di cư lịch sử."
+          },
+          {
+            "resource": "Vốn quay vòng",
+            "source": "Lợi nhuận từ các giao dịch mua rẻ bán đúng giá trị.",
+            "spendRule": "Dùng để đặt cọc mua đồ cũ và trả chi phí phục hồi.",
+            "scarcity": "Hạn chế ở giai đoạn đầu, buộc nhân vật phải lựa chọn kỹ lưỡng món đồ để đầu tư."
+          }
+        ],
+        "institutionalResponses": [
+          {
+            "name": "Ban quản lý Chợ đồ cũ Vạn Thái",
+            "power": "Quyết định quyền kinh doanh và giải quyết tranh chấp giao dịch trong khu vực chợ.",
+            "incentive": "Duy trì uy tín của chợ để thu hút các nhà sưu tầm giàu có.",
+            "enforcementEvidence": "Biên bản tịch thu hàng giả và danh sách đen các hộ kinh doanh gian lận treo ở cổng chợ.",
+            "pressureOnCast": "Buộc nhân vật chính phải cung cấp bằng chứng vật lý rõ ràng trong vòng 3 ngày nếu muốn lật tẩy một vụ lừa đảo."
+          },
+          {
+            "name": "Mạng lưới thợ phục hồi truyền thống",
+            "power": "Độc quyền các công thức bóc tách hóa chất và phục hồi gốm mộc.",
+            "incentive": "Bảo vệ danh tiếng nghề nghiệp và chống lại xu hướng mông má đồ cũ bằng keo công nghiệp.",
+            "enforcementEvidence": "Từ chối phục hồi cho các cửa hàng chuyên bán đồ giả cổ.",
+            "pressureOnCast": "Đòi hỏi nhân vật chính phải chứng minh sự trân trọng hiện vật trước khi đồng ý giúp đỡ phục hồi các món đồ khó."
+          }
+        ],
+        "thirtyChapterMutation": "Uy tín cao khiến main bị ép làm trọng tài cho các vụ tranh chấp thật giả, buộc phải đối mặt với rủi ro pháp lý nếu giám định sai."
+      },
+      {
+        "candidateId": "concept_crystalline_structure",
+        "signatureSituations": [
+          "So sánh âm thanh khi gõ hai mảnh vỡ, kết hợp với cảm nhận cấu trúc để chứng minh một mảnh được nung bằng củi, mảnh kia nung bằng điện.",
+          "Chỉ ra vết 'sống' (chưa kết tinh hết) ở đáy một chiếc bát cổ, chứng minh nó được nung trong lò bầu có nhiệt độ không đồng đều.",
+          "Thuyết phục một nhà sưu tầm đập vỡ một chiếc bình giả giá trị cao để xem cấu trúc bên trong, đánh cược bằng chính uy tín của mình."
+        ],
+        "rules": [
+          {
+            "rule": "Quy tắc đối chiếu tiêu bản",
+            "beneficiary": "Nhà nghiên cứu gốm sứ",
+            "harmedParty": "Lò gốm công nghệ cao sản xuất hàng giả",
+            "enforcement": "Giới chơi tiêu bản từ chối công nhận các món đồ không khớp với cấu trúc tinh thể của mảnh vỡ chuẩn.",
+            "cost": "Phải mua các mảnh vỡ tiêu bản đắt đỏ để làm mẫu đối chiếu.",
+            "consequence": "Đồ gốm không có tiêu bản đối chiếu bị coi là hàng trôi nổi không rõ niên đại.",
+            "evidenceSource": "Thư viện tiêu bản gốm sứ của các nhà sưu tầm uy tín.",
+            "exceptions": "Các dòng gốm độc bản của cung đình không có mảnh vỡ tiêu bản lưu hành ngoài thị trường.",
+            "sceneAffordances": [
+              "Nhân vật chính phải dùng búa gõ nhẹ vào mảnh vỡ tiêu bản để so sánh âm thanh thanh mảnh của gốm nung củi với tiếng đục của gốm nung điện.",
+              "Người mua từ chối trả tiền cho chiếc bình sứ sau khi đối chiếu cốt gốm dưới kính hiển vi và thấy cấu trúc tinh thể quá hoàn hảo của lò ga."
+            ]
+          },
+          {
+            "rule": "Quy tắc minh bạch công nghệ nung",
+            "beneficiary": "Người sưu tầm gốm cổ",
+            "harmedParty": "Xưởng sản xuất giả cổ bằng lò ga",
+            "enforcement": "Hiệp hội gốm mỹ nghệ đánh tụt hạng các tác phẩm cố tình che giấu việc dùng lò nung hiện đại để giả cổ.",
+            "cost": "Chi phí vận hành lò bầu nung củi truyền thống rất cao và tỷ lệ hỏng lớn.",
+            "consequence": "Hàng giả cổ bị lật tẩy ngay lập tức khi kiểm tra độ thủy tinh hóa của cốt đất.",
+            "evidenceSource": "Bản đồ phân bố nhiệt độ nung của các lò bầu cổ.",
+            "exceptions": "Đồ gốm hiện đại ghi rõ nguồn gốc nung bằng lò ga phục vụ mục đích trang trí thông thường.",
+            "sceneAffordances": [
+              "Nhân vật chính phải chỉ ra vết 'sống' chưa kết tinh hết ở đáy chiếc bát cổ để chứng minh nó được nung ở góc nhiệt độ thấp của lò bầu xưa.",
+              "Chủ xưởng gốm giả cổ phải thừa nhận đã dùng lò ga hiện đại sau khi nhân vật chính chứng minh cấu trúc tinh thể của chiếc bình đồng đều tuyệt đối."
+            ]
+          },
+          {
+            "rule": "Quy tắc bảo chứng bằng uy tín cá nhân",
+            "beneficiary": "Thị trường giao dịch minh bạch",
+            "harmedParty": "Chuyên gia giám định thiếu năng lực",
+            "enforcement": "Chuyên gia phải đền bù toàn bộ giá trị món đồ nếu kết luận giám định bị chứng minh là sai lệch.",
+            "cost": "Chuyên gia phải đặt cược danh tiếng và toàn bộ tài sản khi ký tên vào biên bản giám định.",
+            "consequence": "Chuyên gia giám định sai bị loại bỏ hoàn toàn khỏi giới sưu tầm.",
+            "evidenceSource": "Biên bản đối chất công khai trước hội đồng chuyên gia gốm sứ.",
+            "exceptions": "Các giao dịch mang tính chất tham khảo không ký biên bản bảo chứng.",
+            "sceneAffordances": [
+              "Nhân vật chính phải ký cam kết đền bù hai trăm triệu đồng trước khi tiến hành đập vỡ chiếc bình giả để chứng minh cấu trúc bên trong cho nhà sưu tầm.",
+              "Hội đồng thẩm định phải thu hồi chứng thư giám định của một chuyên gia lâu năm sau khi nhân vật chính chứng minh ông ta đã nhìn sai cốt đất."
+            ]
+          }
+        ],
+        "resources": [
+          {
+            "resource": "Thư viện tiêu bản gốm",
+            "source": "Thu thập các mảnh vỡ từ các di chỉ lò nung cổ và công trường xây dựng.",
+            "spendRule": "Dùng để đối chiếu cấu trúc tinh thể khi giám định đồ khó; có thể bị sứt mẻ hoặc mất mát nếu bảo quản không tốt.",
+            "scarcity": "Cực kỳ quý hiếm vì mỗi mảnh vỡ đại diện cho một tầng địa chất và công nghệ nung đã thất truyền."
+          },
+          {
+            "resource": "Uy tín giới sưu tầm",
+            "source": "Các vụ giám định thành công và lật tẩy hàng giả cổ công khai.",
+            "spendRule": "Tiêu tốn để bảo lãnh cho các giao dịch lớn; mất sạch nếu giám định sai dù chỉ một lần.",
+            "scarcity": "Khó tích lũy, đòi hỏi sự chuẩn xác tuyệt đối và tính trung thực cao."
+          }
+        ],
+        "institutionalResponses": [
+          {
+            "name": "Hội đồng Thẩm định Gốm sứ Cổ",
+            "power": "Cấp chứng thư giám định có giá trị pháp lý và thương mại cao nhất trong vùng.",
+            "incentive": "Bảo vệ đặc quyền định giá và uy tín của các thành viên sáng lập.",
+            "enforcementEvidence": "Các chứng thư giám định có đóng dấu nổi và chữ ký của ba ủy viên hội đồng.",
+            "pressureOnCast": "Gây khó dễ, từ chối công nhận các phát hiện của nhân vật chính nếu không có bằng chứng thực nghiệm không thể chối cãi."
+          },
+          {
+            "name": "Liên minh các lò gốm giả cổ công nghệ cao",
+            "power": "Sở hữu công nghệ nung ga và pha chế men hiện đại có thể sao chép 99% vẻ ngoài của gốm cổ.",
+            "incentive": "Tối đa hóa lợi nhuận từ việc tuồn hàng giả cổ vào thị trường đồ cũ.",
+            "enforcementEvidence": "Các lô hàng giả cổ tinh vi được phân phối qua các đại lý trung gian có vỏ bọc uy tín.",
+            "pressureOnCast": "Đe dọa, gài bẫy bằng những món đồ ghép tinh vi để phá hủy uy tín giám định của nhân vật chính."
+          }
+        ],
+        "thirtyChapterMutation": "Main bị cuốn vào một vụ lừa đảo quy mô lớn liên quan đến một bộ sưu tập sứ ký kiểu của hoàng gia, nơi các mảnh vỡ tiêu bản của anh là bằng chứng duy nhất trước tòa."
+      },
+      {
+        "candidateId": "concept_magnetic_trace",
+        "signatureSituations": [
+          "Dùng một nam châm siêu nhạy tự chế để chứng minh sự khác biệt về lực hút vi lượng giữa hai chiếc đĩa giống hệt nhau.",
+          "Trải bản đồ địa chất thủy văn cũ ra giữa chợ để giải thích tại sao lò gốm này lại có lẫn quặng sắt trong đất.",
+          "Đưa một người thợ gốm già đến chạm vào món đồ để họ xác nhận kỹ thuật vuốt tay đặc trưng của làng nghề xưa."
+        ],
+        "rules": [
+          {
+            "rule": "Quy tắc xác minh cốt đất địa phương",
+            "beneficiary": "Làng nghề truyền thống",
+            "harmedParty": "Kẻ buôn lậu gốm giả ngoại nhập",
+            "enforcement": "Các nhà sưu tầm từ chối mua gốm Nam Bộ nếu cốt đất không chứa hàm lượng khoáng sắt đặc trưng của vùng sông Đồng Giang.",
+            "cost": "Phải đối chiếu với bản đồ địa chất thủy văn và mẫu đất gốc.",
+            "consequence": "Gốm giả dùng đất sét nơi khác bị loại khỏi danh mục gốm cổ địa phương.",
+            "evidenceSource": "Bản đồ địa chất cổ và kết quả đo từ tính vi lượng của cốt đất.",
+            "exceptions": "Các sản phẩm gốm xuất khẩu thời xưa được đặt hàng làm bằng đất sét nhập khẩu đặc biệt.",
+            "sceneAffordances": [
+              "Nhân vật chính phải dùng nam châm siêu nhạy tự chế để đo lực hút vi lượng trên cốt chiếc đĩa gốm nhằm chứng minh nó được làm từ đất sét ven sông Đồng Giang.",
+              "Kẻ buôn lậu phải rút lại món đồ giả cổ sau khi nhân vật chính chứng minh cốt đất của nó hoàn toàn không có từ tính của quặng sắt địa phương."
+            ]
+          },
+          {
+            "rule": "Quy tắc bảo chứng của nhân chứng làng nghề",
+            "beneficiary": "Các nghệ nhân già",
+            "harmedParty": "Chuyên gia định giá bằng mắt",
+            "enforcement": "Giao dịch gốm cổ chỉ được hoàn tất khi có sự xác nhận kỹ thuật vuốt tay của thợ cả làng nghề xưa.",
+            "cost": "Chi phí tìm kiếm và mời các nghệ nhân già đã giải nghệ đến thẩm định.",
+            "consequence": "Các chuyên gia định giá sai bị lật tẩy bởi những người trực tiếp làm ra dòng gốm đó.",
+            "evidenceSource": "Trí nhớ nghề nghiệp và kỹ thuật vuốt tay đặc trưng của các nghệ nhân già.",
+            "exceptions": "Các lò gốm đã thất truyền hoàn toàn không còn bất kỳ nghệ nhân nào sống sót.",
+            "sceneAffordances": [
+              "Nhân vật chính phải lặn lội về vùng quê hẻo lánh để mời một người thợ gốm tám mươi tuổi đến chạm tay vào chiếc chóe cổ để xác nhận vết vuốt lòng trong.",
+              "Nhà sưu tầm đồng ý trả giá cao cho chiếc bình sau khi nghe người thợ già giải thích về kỹ thuật tạo hình độc đáo của thế hệ ông."
+            ]
+          },
+          {
+            "rule": "Quy tắc minh bạch bản đồ địa chất",
+            "beneficiary": "Người mua khoa học",
+            "harmedParty": "Kẻ thổi giá bằng truyền thuyết tự chế",
+            "enforcement": "Các giao dịch lớn buộc phải đính kèm tài liệu địa chất chứng minh mỏ đất sét đã cạn kiệt.",
+            "cost": "Phí trích lục bản đồ địa chất cũ từ các cơ quan lưu trữ nhà nước.",
+            "consequence": "Các câu chuyện ly kỳ tự bịa về nguồn gốc món đồ bị bác bỏ bởi số liệu khoa học.",
+            "evidenceSource": "Bản đồ địa chất thủy văn cũ và ghi chép khai thác mỏ của chính quyền địa phương.",
+            "exceptions": "Các món đồ được chứng minh nguồn gốc bằng hồ sơ khảo cổ học chính thức của nhà nước.",
+            "sceneAffordances": [
+              "Nhân vật chính phải trải bản đồ địa chất cũ ra giữa chợ đồ cũ để chứng minh mỏ đất sét tạo nên chiếc bình đã bị san lấp từ năm 1975.",
+              "Kẻ lừa đảo bị ban quản lý chợ phạt tiền vì bịa đặt câu chuyện chiếc bình được làm từ đất sét của một ngọn núi linh thiêng không có thật."
+            ]
+          }
+        ],
+        "resources": [
+          {
+            "resource": "Tài liệu địa chất và bản đồ cổ",
+            "source": "Trích lục từ các cơ quan lưu trữ địa chất cũ.",
+            "spendRule": "Dùng để chứng minh nguồn gốc cốt đất trong các vụ tranh chấp lớn; mất giá trị nếu bản đồ bị rách hoặc thông tin bị mờ.",
+            "scarcity": "Rất khó tiếp cận, đòi hỏi quan hệ và chi phí trích lục cao."
+          },
+          {
+            "resource": "Bộ tiêu bản cốt đất độc quyền",
+            "source": "Thu thập trực tiếp từ các mỏ đất sét cổ và phế tích lò nung.",
+            "spendRule": "Dùng để đối chiếu từ tính vi lượng trực tiếp tại hiện trường giao dịch.",
+            "scarcity": "Không thể tái tạo vì các mỏ đất cổ hầu hết đã bị đô thị hóa san lấp hoàn toàn."
+          }
+        ],
+        "institutionalResponses": [
+          {
+            "name": "Hiệp hội Nghiên cứu Văn hóa Gốm sứ Địa phương",
+            "power": "Có quyền công bố các công trình nghiên cứu xác định niên đại và nguồn gốc các dòng gốm thất truyền.",
+            "incentive": "Bảo tồn giá trị văn hóa bản địa và nâng cao uy tín học thuật của hiệp hội.",
+            "enforcementEvidence": "Các kỷ yếu nghiên cứu và bản đồ phân loại gốm sứ được xuất bản định kỳ.",
+            "pressureOnCast": "Đòi hỏi nhân vật chính phải trình bày lập luận khoa học chặt chẽ trước khi công nhận một dòng gốm mới phát hiện."
+          },
+          {
+            "name": "Đường dây buôn lậu gốm giả ngoại nhập",
+            "power": "Sở hữu nguồn tài chính mạnh và mạng lưới phân phối rộng khắp các tiệm đồ cũ lớn.",
+            "incentive": "Thâu tóm thị trường gốm cổ bằng cách dán nhãn gốm địa phương lên hàng nhái giá rẻ.",
+            "enforcementEvidence": "Các giấy chứng nhận nguồn gốc giả được làm cực kỳ tinh vi bằng máy in chuyên dụng.",
+            "pressureOnCast": "Tìm cách mua chuộc hoặc đe dọa nhân vật chính để anh không công bố phương pháp đo từ tính cốt đất."
+          }
+        ],
+        "thirtyChapterMutation": "Main phát hiện một mỏ đất sét cổ chưa bị khai thác, đối mặt với áp lực từ các tập đoàn muốn thâu tóm mỏ đất để sản xuất hàng giả hợp pháp."
+      }
+    ]
+  },
+  "openings": [
+    {
+      "schemaVersion": 2,
+      "candidateId": "concept_porosity_reader",
+      "chapters": [
+        {
+          "chapterNumber": 1,
+          "title": "Hơi Thở Bị Bít Kín",
+          "prose": "Cái nắng hầm hập của buổi trưa đổ xuống mái tôn chợ đồ cũ Vạn Thái. Trọng ngồi xổm trước sạp hàng của Hải hói, ngón tay cái miết nhẹ lên bề mặt chiếc ấm trà men lam.\n\n— Đồ chuẩn Lái Thiêu thời đầu đấy ông em. Sáng bóng, không tì vết. — Hải hói rít điếu thuốc, nheo mắt nhìn Trọng. — Lấy nốt đi, anh để giá hữu nghị ba triệu.\n\nTrọng nhắm mắt lại. Dưới ngón tay anh, bề mặt chiếc ấm trơn tuột, lạnh lẽo và đặc quánh. Nó không thở. Một món đồ gốm nung củi truyền thống luôn có độ xốp nhất định, một dạng nhịp đập vi tế của đất sét khi tiếp xúc với hơi ẩm từ da người.\n\nChiếc ấm này đã bị bít kín bởi một lớp sáp công nghiệp rẻ tiền để che đi những vết nứt chân chim, ép nó mang vẻ ngoài hào nhoáng giả tạo phù hợp với thị hiếu người mua nghiệp dư.\n\n— Lớp sơn PU này phun khéo đấy, nhưng bít hết lỗ chân lông của gốm rồi. — Trọng rút khăn giấy lau sạch ngón tay. — Đồ mông má thế này, em không dám rước.\n\nMặt Hải hói sượng lại. Hắn vứt điếu thuốc xuống đất, chà gót giày lên đầy hằn học.\n\n— Không mua thì đứng ra cho người khác làm ăn. Chê ỏng chê eo, mắt cậu làm sao đọ được với thợ thầy ở cái chợ này?\n\nTrọng không đáp. Ánh mắt anh vừa lướt qua một đống đồ lặt vặt nằm lăn lóc ở góc bạt. Đó là những thứ Hải hói mua mão từ các đợt thanh lý nhà cổ, chưa kịp phân loại.\n\nNổi bật trong đống phế liệu là một chiếc thố đất nung xỉn màu, bám đầy bùn khô và mạng nhện. Trọng vươn tay cầm lấy nó. Vừa chạm vào, anh đã cảm nhận được sự thô ráp quen thuộc.\n\nĐộ nhám của bề mặt truyền đến những vi mạch trên đầu ngón tay. Đất sét pha cát mịn, độ xốp cao, hút ẩm ngay lập tức. Đây chính là hơi thở của đất nung nguyên bản chưa bị hóa chất tàn phá.\n\n— Cái thố mẻ miệng này thì sao? — Trọng hỏi, cố giữ giọng bình thản nhất có thể.\n\nHải hói bĩu môi, liếc nhìn chiếc thố bẩn thỉu đầy khinh bỉ.\n\n— Đồ nát, chắc của nhà bà cụ Bảy ngoài xóm đạo di cư bỏ lại. Cậu thích thì đưa tám trăm ngàn đây. Coi như mở hàng xả xui.\n\nTám trăm ngàn là toàn bộ số vốn quay vòng còn lại trong túi Trọng sau khi nghỉ việc ở kho lưu trữ. Nếu mua, anh sẽ trắng tay cho đến khi chứng minh được giá trị thật của nó.\n\nMột chiếc thố không giấy tờ, không gia phả chứng minh ở chợ Vạn Thái này chỉ đáng giá phế liệu. Ban quản lý chợ sẽ không cho phép giao dịch đồ giá trị cao nếu thiếu trích lục hộ tịch cũ.\n\nNhưng ngón tay anh vẫn đang cảm nhận được độ thoát ẩm tuyệt vời của cốt gốm. Nó ẩn chứa một mộc triện lò gốm Nam Bộ xưa dưới lớp bùn kia. Trọng tin vào sự nhạy cảm của đôi bàn tay.\n\nAnh lẳng lặng rút ví, đếm đủ tám tờ một trăm ngàn đặt lên mẹt.\n\n— Em lấy cái này. — Trọng cất chiếc thố vào balo, quay lưng bước đi.\n\nCầm chiếc thố đất đi khỏi sạp, Trọng biết mình vừa tự đẩy bản thân vào thế kẹt. Anh phải làm sạch nó và tìm ra chứng cứ lịch sử trước khi ngày mai khu chợ mở phiên đấu giá thanh lý.",
+          "causalStateChange": "Từ việc là người quan sát ở chợ đồ cũ, Trọng quyết định vét sạch vốn liếng để mua một món đồ không giấy tờ, tự đưa mình vào áp lực phải phục hồi và chứng minh nguồn gốc của nó.",
+          "requiredPlanAnchor": "chứng minh nguồn gốc thố đất Lái Thiêu",
+          "protagonistChoice": "Từ chối chiếc ấm dễ bán nhưng đã bị phủ hóa chất, quyết định mua chiếc thố bẩn thỉu vô danh vì cảm nhận được độ xốp nguyên bản của gốm.",
+          "agencyMove": "Dùng xúc giác nhạy bén để nhận biết sự khác biệt giữa lớp sơn PU công nghiệp và độ thoát ẩm tự nhiên của đất nung.",
+          "earnedReward": null,
+          "materialProgression": null,
+          "comfortPayoff": null,
+          "costPaid": "Tiêu tốn 800 ngàn đồng, là toàn bộ số vốn khởi điểm, đánh cược vào một món đồ nát.",
+          "exitPressure": "Chiếc thố hiện tại chỉ có giá trị phế liệu. Trọng bắt buộc phải bóc lớp bùn sáp và trích lục hồ sơ để có bằng chứng hợp lệ, nếu không sẽ vĩnh viễn mất số tiền vừa bỏ ra."
+        },
+        {
+          "chapterNumber": 2,
+          "title": "Mộc Triện Dưới Lớp Bùn",
+          "prose": "Trở về căn phòng trọ chật hẹp, Trọng cẩn thận đặt chiếc thố đất lên bàn làm việc. Dụng cụ của anh chỉ có một lọ cồn y tế, vài bịch tăm bông và một con dao mổ cùn.\n\nTheo quy tắc của giới phục hồi truyền thống, việc dùng hóa chất mạnh sẽ phá hủy hoàn toàn lớp men mộc. Trọng chọn cách chậm nhất: dùng tăm bông tẩm cồn y tế lau từng milimet bùn đất dính sáp.\n\nMười tiếng đồng hồ trôi qua. Lưng Trọng mỏi nhừ, không khí nồng nặc mùi cồn. Nhưng phần đáy thố đã lộ ra nguyên trạng cốt gốm mộc màu gạch cua tuyệt đẹp.\n\nỞ sát vành đáy, một mộc triện hình chiếc lá mờ nhạt hiện ra: lò gốm Hưng Ký. Đây là dòng gốm gia dụng cực hiếm từ trước năm 1954, do những nghệ nhân di cư đầu tiên chế tác.\n\nTuy nhiên, ở chợ Vạn Thái, mộc triện là chưa đủ. Không có giấy tờ chứng minh nguồn gốc di cư, chiếc thố vẫn chỉ là hàng trôi nổi, dễ dàng bị ép giá hoặc thậm chí bị ban quản lý tịch thu.\n\nSáng hôm sau, Trọng mang hình chụp mộc triện đến Kho lưu trữ quận, nơi anh từng làm việc. Căn phòng ngập trong mùi giấy dó và ẩm mốc quen thuộc.\n\n— Chị Liên, em cần tìm hồ sơ hộ tịch cũ của khu xóm đạo, dòng họ Nguyễn di cư năm 1954. — Trọng đặt tờ giấy ghi chép lên bàn thủ thư.\n\nNgười phụ nữ trung niên đẩy gọng kính, nhìn Trọng với vẻ ái ngại.\n\n— Trích lục hồ sơ sâu thế này phải nộp phí dịch vụ một triệu đồng. Chị nhớ em mới nghỉ việc, tiền đâu ra mà đóng bây giờ?\n\nTrọng cắn môi. Anh vừa kiểm tra thẻ ATM sáng nay. Số dư chỉ còn đúng một triệu lẻ hai mươi ngàn. Nếu đóng khoản phí này, anh sẽ không còn tiền ăn mỳ tôm trong tuần tới.\n\nNhưng nếu không có hồ sơ chứng minh gia đình bà Bảy từng sở hữu đồ lò Hưng Ký, chiếc thố sẽ không được công nhận. Khách hàng sẵn sàng trả giá cao, nhưng họ cần bằng chứng lịch sử.\n\nTrọng rút thẻ ATM đưa cho chị Liên. Sự lựa chọn này đánh đổi bằng toàn bộ sinh hoạt phí cuối cùng của anh. Anh không còn đường lui.\n\n— Chị cứ quẹt đi. Giao dịch này rất quan trọng với em.\n\nHai tiếng sau, Trọng cầm trên tay bản sao nhật ký di cư có con dấu giáp lai của kho lưu trữ. Dòng chữ viết tay từ năm 1954 ghi rõ: mang theo một thố gốm Hưng Ký làm kỷ vật gia truyền.\n\nTờ giấy mỏng manh nhưng nặng trĩu. Trọng đã có bằng chứng, nhưng áp lực bây giờ là phải tiếp cận được đúng người mua. Ông Phát, nhà sưu tầm gốm Nam Bộ khét tiếng, đang có mặt ở chợ Vạn Thái chiều nay.\n\nTrọng biết Hải hói cũng đang chờ ông Phát để chào bán chiếc ấm giả tạo kia. Anh phải chốt được giao dịch này bằng cách chứng minh sự khác biệt vật lý, nếu không sẽ thực sự chết đói.",
+          "causalStateChange": "Từ việc chỉ có một món đồ phục hồi một nửa, Trọng đã đánh đổi toàn bộ sinh hoạt phí để đổi lấy hồ sơ chứng minh hợp lệ, nâng mức độ rủi ro lên đỉnh điểm.",
+          "requiredPlanAnchor": "đối chiếu mộc triện Hưng Ký với sổ hộ tịch",
+          "protagonistChoice": "Chấp nhận trả mức phí tra cứu cao ngất ngưởng bằng số tiền ăn cuối cùng để lấy bản trích lục di cư năm 1954.",
+          "agencyMove": "Vận dụng kiến thức phục hồi bằng cồn y tế để bảo vệ cốt gốm, và kỹ năng nghiệp vụ kho lưu trữ để khoanh vùng chính xác hồ sơ gia đình người chủ cũ.",
+          "earnedReward": null,
+          "materialProgression": null,
+          "comfortPayoff": null,
+          "costPaid": "Tiêu sạch 1 triệu đồng trong tài khoản cá nhân, rơi vào trạng thái cạn kiệt tài chính hoàn toàn.",
+          "exitPressure": "Đã có đồ vật sạch và hồ sơ chứng minh, nhưng Trọng phải cạnh tranh trực tiếp với Hải hói trước mặt nhà sưu tầm uy tín. Nếu thất bại, anh sẽ mang nợ và bị đào thải khỏi chợ."
+        },
+        {
+          "chapterNumber": 3,
+          "title": "Giá Trị Của Sự Thô Mộc",
+          "prose": "Chiều muộn, khu nhà vòm trung tâm chợ Vạn Thái đông đặc người. Ông Phát, vị khách VIP của giới sưu tầm, đang ngồi thẩm định đồ bên ấm trà thiết Quan Âm.\n\nTrên bàn của ông Phát lúc này là chiếc ấm men lam bóng loáng của Hải hói. Hải đang liến thoắng thuyết minh về độ hiếm của món đồ nguyên bản chưa từng qua sửa chữa.\n\nTrọng ôm chiếc hộp các tông mòn vẹt lách qua đám đông, bước thẳng đến bàn thẩm định. Sự xuất hiện của anh khiến Hải hói khựng lại, trừng mắt đe dọa.\n\n— Ông Phát, cháu có một món đồ gốm mộc Nam Bộ, cốt Hưng Ký nguyên bản, đầy đủ trích lục gia phả năm 1954. — Trọng đặt hộp xuống, mở nắp.\n\nChiếc thố đất nung xù xì, màu gạch cua lộ ra. Nó không hề bắt sáng, nhưng bề mặt xốp của nó mang lại cảm giác chân thực đến từng lỗ rỗng liti.\n\nÔng Phát nhíu mày, đưa tay chạm vào chiếc thố, rồi lại nhìn sang chiếc ấm của Hải hói. Sự tương phản giữa một bên bóng bẩy và một bên thô mộc quá rõ rệt.\n\n— Đồ nát bóp méo lịch sử! — Hải hói đập tay xuống bàn. — Ông Phát, chiếc ấm của cháu mới là cực phẩm. Thằng ranh này chuyên lượm ve chai, biết gì mà giám định?\n\nTrọng biết mình không thể lùi bước. Nếu không lật tẩy được sự giả tạo của lớp sơn PU, quy tắc bảo tồn nguyên trạng vật liệu của chợ Vạn Thái sẽ bị chà đạp, và anh sẽ mất cơ hội bán hàng.\n\n— Nếu chiếc ấm của anh là gốm nguyên bản, anh dám để tôi thử độ thoát ẩm không? — Trọng lấy từ trong túi áo ra một lọ cồn y tế nhỏ và chiếc tăm bông.\n\nKhông đợi Hải đồng ý, Trọng thấm cồn, miết mạnh lên đáy chiếc ấm men lam. Lập tức, lớp sáp công nghiệp phản ứng với dung dịch, nhão ra thành một thứ keo nhầy nhụa màu vàng ố.\n\nMùi hóa chất bốc lên gay gắt. Ông Phát nhăn mặt, vội vã rút tay lại khỏi chiếc ấm như chạm phải mầm bệnh.\n\nSự thật đã phơi bày. Việc Trọng công khai bóc mẽ mánh khóe mông má bằng keo công nghiệp trước mặt ban quản lý chợ đã biến Hải hói thành kẻ thù không đội trời chung.\n\nNhưng ông Phát không quan tâm đến sự hậm hực của Hải. Ông đeo kính lúp, cẩn thận so sánh mộc triện trên thố đất với bản trích lục lưu trữ Trọng mang tới.\n\n— Cốt gốm thở rất êm, độ xốp nguyên bản không bị can thiệp. Giấy tờ chuẩn xác. — Ông Phát gật gù, ánh mắt lộ vẻ hài lòng. — Mười lăm triệu. Tôi lấy chiếc thố này.\n\nTài khoản của Trọng ting ting báo nhận tiền. Số vốn này đủ để anh bước qua khỏi ranh giới sinh tồn chật vật của một kẻ lượm mót.\n\nTối hôm đó, tại quán cơm tấm lề đường góc phố Vạn Thái, Trọng gọi một dĩa sườn bì chả cỡ lớn và một chai bia ướp lạnh.\n\nHớp ngụm bia mát rượi, cảm nhận vị ngọt của miếng sườn nướng mỡ hành, Trọng khẽ mỉm cười. Cảm giác cứu được một di vật khỏi lớp sáp ngụy trang và trả nó về đúng vị trí lịch sử mang lại sự thỏa mãn tĩnh lặng.",
+          "causalStateChange": "Trọng chuyển từ một cựu nhân viên thất nghiệp trắng tay thành một nhà giám định thực chiến có nguồn vốn đầu tiên, nhưng đồng thời tạo ra một kẻ thù nguy hiểm tại địa bàn.",
+          "requiredPlanAnchor": "dùng cồn y tế lật tẩy lớp sáp công nghiệp",
+          "protagonistChoice": "Quyết định can thiệp vật lý trực tiếp lên món đồ của đối thủ để chứng minh sự thật, bất chấp việc gây thù chuốc oán.",
+          "agencyMove": "Sử dụng phản ứng hóa học đơn giản giữa cồn y tế và sáp sơn PU để phá vỡ lớp ngụy trang trước mắt nhà sưu tầm.",
+          "earnedReward": "Sự công nhận của ông Phát, nhà sưu tầm uy tín bậc nhất, giúp Trọng xác lập tư cách chuyên môn tại chợ Vạn Thái.",
+          "materialProgression": "Nhận được 15 triệu đồng từ việc bán thố đất, số tiền đủ để mua dung dịch bóc tách hóa chất chuyên dụng của Đức cho các món đồ sau.",
+          "comfortPayoff": "Bữa tối no nê với dĩa cơm tấm sườn bì chả cỡ lớn và chai bia lạnh, tận hưởng niềm vui bảo vệ được tính nguyên bản của lịch sử.",
+          "costPaid": "Gây thù oán công khai với Hải hói và băng nhóm thợ mông má đồ cũ tại khu chợ Vạn Thái.",
+          "exitPressure": "Có vốn và uy tín, Trọng sẽ trở thành cái gai trong mắt những tay buôn đồ giả cổ. Chúng sẽ tìm cách bẫy anh bằng những món đồ ngụy trang tinh vi hơn để trả thù."
+        }
+      ],
+      "continuityDigest": "Trọng dùng xúc giác phát hiện một thố gốm mộc thật dưới lớp bùn sáp, mua nó bằng đồng vốn cuối cùng. Áp lực phải chứng minh nguồn gốc buộc anh vét sạch tiền sinh hoạt để mua trích lục lưu trữ. Cuối cùng, anh dùng hồ sơ và cồn y tế để lật tẩy đối thủ, bán thành công thố gốm cho nhà sưu tầm lớn, thu về lợi nhuận vật chất và xác lập uy tín cá nhân.",
+      "unresolvedPressure": "Hải hói mất mối làm ăn và bẽ mặt trước đám đông chắc chắn sẽ phản công, lợi dụng các quy tắc ngầm của chợ Vạn Thái để gài bẫy Trọng trong những phi vụ giám định pháp lý phức tạp hơn."
+    },
+    {
+      "schemaVersion": 2,
+      "candidateId": "concept_crystalline_structure",
+      "chapters": [
+        {
+          "chapterNumber": 1,
+          "title": "Chạm Vào Sự Hoàn Hảo Giả Tạo",
+          "prose": "Hoàng miết ngón tay cái dọc theo vành chân không phủ men của chiếc bình tỏi men lam.\n\nBề mặt cốt đất nhẵn mịn, mát lạnh. Dưới ánh đèn huỳnh quang của cửa hàng đồ cổ, lớp men phát ra ánh sáng dịu nhẹ, họa tiết sơn thủy sắc nét đến từng chi tiết.\n\n—Cậu xem kỹ đi, đồ vớt biển đấy. Lành tặn 100%, trôn mộc mạc thế này cơ mà.— Lão Tuấn, tay lái buôn gốm, rít một hơi thuốc lào, ánh mắt đắc ý.\n\nBác Hùng, chủ cửa hàng, khẽ gật đầu, ra hiệu cho Hoàng. Nếu Hoàng gật đầu, giao dịch hai trăm triệu sẽ được chốt, và Hoàng bỏ túi mười triệu tiền phí giám định.\n\nNhưng khi tập trung tinh thần vào đầu ngón tay, Hoàng cảm nhận được một sự phản hồi kỳ lạ từ cấu trúc silicat bên trong cốt gốm.\n\nKhác với những cấu trúc tinh thể lộn xộn, đứt gãy do sự chênh lệch nhiệt độ của lò bầu đun củi, kết cấu bên trong chiếc bình này đồng đều một cách hoàn hảo. Mức độ thủy tinh hóa xuyên suốt từ thành bình đến đáy không hề có lấy một điểm chưa chín.\n\nChỉ có lò ga hoặc lò điện hiện đại, với bộ điều khiển nhiệt độ điện tử chính xác đến từng độ C, mới tạo ra được cốt đất nung chín đều tăm tắp như một khối nhựa đúc thế này.\n\n—Cháu xin lỗi, bác Hùng. Cháu không thể ký vào biên bản xác nhận cho chiếc bình này.— Hoàng rút tay lại, lùi lại một bước.\n\nCả căn phòng rơi vào tĩnh lặng. Lão Tuấn trố mắt, rồi đập mạnh tay xuống bàn trà.\n\n—Mày nói cái gì? Men bọt sâu thế này, cốt chìm vệt thời gian rõ mồn một, mày bảo đồ đểu à? Ranh con vắt mũi chưa sạch mà đòi lật mâm?— Lão Tuấn gắt lên.\n\nBác Hùng nhíu mày, giọng chùng xuống: —Hoàng, cậu chắc chứ? Mắt thường và kính lúp đều không thấy dấu vết làm giả. Lão Tuấn làm ăn với tôi chục năm nay rồi.\n\n—Nhiệt độ nung quá hoàn hảo, bác ạ.— Hoàng bình tĩnh đáp. —Lò củi ngày xưa nhiệt độ phân bố không đều, kiểu gì trôn bình cũng phải có chỗ kết tinh kém hơn. Chiếc bình này nung bằng lò ga.\n\nLão Tuấn đứng phắt dậy, chỉ thẳng mặt Hoàng: —Bằng chứng đâu? Mày chỉ sờ sờ cái đít bình mà dám phán bừa? Nếu hôm nay mày không trưng ra được đồ chuẩn để so sánh, đừng hòng bước ra khỏi cái phố này!\n\nBác Hùng không bênh vực Hoàng, chỉ thở dài. Ông cần một lý do thuyết phục hơn là cảm giác của một kỹ sư vật liệu.\n\nÁp lực đè nặng lên vai Hoàng, nếu không chứng minh được, anh không chỉ mất mối làm ăn mà còn bị giới đồ cổ tẩy chay, đồng thời đắc tội với một tay buôn có máu mặt.",
+          "causalStateChange": "Từ việc chỉ là người xem hàng, Hoàng trở thành trung tâm của sự thù địch khi phá hỏng giao dịch lớn và bị thách thức chứng minh năng lực.",
+          "requiredPlanAnchor": "Tìm mảnh vỡ chuẩn men lam triều Thanh",
+          "protagonistChoice": "Từ chối xác nhận chiếc bình tỏi dù sẽ mất khoản tiền hoa hồng mười triệu đồng.",
+          "agencyMove": "Dùng xúc giác ở ngón tay để cảm nhận độ thủy tinh hóa đồng đều bất thường của cốt gốm, chỉ ra điểm yếu của đồ giả nung bằng lò ga.",
+          "earnedReward": null,
+          "materialProgression": null,
+          "comfortPayoff": null,
+          "costPaid": "Mất ngay mười triệu tiền phí giám định và đắc tội với lão Tuấn, một tay buôn gốm sừng sỏ.",
+          "exitPressure": "Lão Tuấn và bác Hùng yêu cầu bằng chứng đối chiếu. Nếu không có tiêu bản chuẩn để chứng minh lời nói, Hoàng sẽ bị tẩy chay khỏi phố đồ cổ."
+        },
+        {
+          "chapterNumber": 2,
+          "title": "Mảnh Vỡ Đắt Giá",
+          "prose": "Bị tống cổ khỏi cửa hàng của bác Hùng với lời hẹn trong ngày phải mang bằng chứng đến, Hoàng lao ngay đến chợ đồ cũ.\n\nAnh cần một mảnh tiêu bản chuẩn của thời kỳ đó, một mảnh vỡ mang trong mình cấu trúc tinh thể chân thực của lửa củi để đối chứng.\n\nGian hàng của ông Thắng lèo tèo vài ba món đồ sứt mẻ, nhưng bên dưới gầm bàn là một thùng xốp chứa đầy những mảnh vỡ gốm sứ mới được đào từ công trường xây dựng ven sông.\n\n—Năm triệu cả thùng, không bán lẻ. Đồ đào chuẩn đấy, sứt nhưng cốt cứng đanh.— Ông Thắng hất hàm, tay vẫn phe phẩy chiếc quạt nan.\n\nNăm triệu là toàn bộ số tiền Hoàng định dùng để trả tiền thuê xưởng tháng này. Nếu mua, anh sẽ cạn sạch túi. Nhưng nếu không mua, sự nghiệp giám bảo bằng vật liệu của anh coi như chấm hết.\n\nHoàng ngồi xổm xuống, thò tay vào thùng xốp. Anh nhặt từng mảnh vỡ lên, ngón tay miết dọc theo mặt cắt sắc lẹm của chúng.\n\nMảnh thứ nhất: xốp, nhiệt độ nung thấp, đồ dân dụng rẻ tiền. Mảnh thứ hai: nung điện, hàng giả cổ vứt ra bãi rác.\n\nĐến mảnh thứ mười mấy, ngón tay anh khựng lại. Đó là một phần đáy của chiếc bát men lam.\n\nTại mặt cắt, cấu trúc tinh thể hiện lên rõ rệt qua xúc giác: phần gần lớp men kết tinh đặc sắc, cứng cáp, nhưng càng đi sâu về phía trung tâm cốt gốm, cấu trúc càng xốp dần.\n\nĐặc biệt, ở một góc của trôn bát, có một vết sống nơi đất chưa thủy tinh hóa hoàn toàn. Đây chính là dấu vết không thể làm giả của một góc lò bầu bị thiếu nhiệt.\n\n—Cháu lấy thùng này.— Hoàng nghiến răng, rút xấp tiền lẻ từ trong ví ra đếm.\n\nMua xong, anh dùng dao cạo một chút bụi từ mặt cắt của mảnh vỡ, đặt lên miếng lam kính để chuẩn bị cho màn đối chất.\n\nChiều hôm đó, Hoàng quay lại cửa hàng bác Hùng. Bất ngờ thay, lão Tuấn đã mời đến một người khác: ông Tường, một ủy viên của Hội đồng Thẩm định Gốm sứ Cổ.\n\n—Cậu kỹ sư trẻ mang được cái gì đến chứng minh đây? Hay lại vài lý thuyết sách vở?— Ông Tường nhếch mép cười, tay cầm chiếc kính lúp mạ vàng săm soi chiếc bình tỏi.\n\nHoàng đặt mảnh tiêu bản vỡ sứt mẻ lên bàn cẩm thạch, ánh mắt kiên định. Anh biết, đối đầu với một ủy viên Hội đồng thẩm định nghĩa là anh đang đánh cược toàn bộ uy tín nghề nghiệp của mình.",
+          "causalStateChange": "Hoàng chuyển từ trạng thái phòng ngự sang thế chuẩn bị phản công, nhưng tự dồn mình vào bước đường cùng về tài chính.",
+          "requiredPlanAnchor": "Đối chất với chuyên gia Hội đồng Thẩm định",
+          "protagonistChoice": "Dùng toàn bộ tiền thuê xưởng tháng này để mua cả thùng xốp chứa mảnh vỡ đào được, chỉ để lấy một mảnh đáy bát chuẩn.",
+          "agencyMove": "Vận dụng xúc giác để mò mẫm hàng chục mảnh vỡ sứt mẻ, tìm ra đúng một mảnh mang dấu vết sượng do nhiệt độ lò bầu không đều.",
+          "earnedReward": null,
+          "materialProgression": null,
+          "comfortPayoff": null,
+          "costPaid": "Tiêu sạch năm triệu đồng tiền mặt cuối cùng trong ví, đối mặt với nguy cơ bị đòi lại xưởng làm việc.",
+          "exitPressure": "Mang bằng chứng về nhưng phải đối mặt với một ủy viên của Hội đồng Thẩm định do lão Tuấn mời đến, người hoàn toàn phản bác lý thuyết của Hoàng."
+        },
+        {
+          "chapterNumber": 3,
+          "title": "Bằng Chứng Của Lửa",
+          "prose": "—So sánh đi.— Hoàng hất cằm về phía mảnh vỡ đáy bát và chiếc bình tỏi. —Ông Tường, ông nói cốt chuẩn, vậy ông giải thích sao về độ đồng đều âm thanh?\n\nHoàng lấy từ trong túi đồ nghề ra một chiếc búa cao su nhỏ. Anh cầm lên, gõ nhẹ vào mảnh vỡ tiêu bản.\n\nCạch... cạch. Âm thanh vang lên thanh mảnh nhưng đục ở âm cuối, minh chứng cho một cấu trúc tinh thể có độ đặc xốp không đồng đều do nhiệt lò củi.\n\nTiếp theo, anh gõ vào trôn chiếc bình tỏi. Keng... keng. Âm thanh vang, trong trẻo và kéo dài như gõ vào một thanh kim loại.\n\nBác Hùng biến sắc. Lão Tuấn vội vàng lấp liếm: —Đồ nguyên vẹn thì tiếng phải trong hơn đồ vỡ, mày lừa trẻ con à?\n\n—Vậy thì thử mặt cắt.— Hoàng rút ra một bản cam kết. —Cháu cược bồi thường hai trăm triệu đồng, bằng đúng giá chiếc bình này, nếu cháu sai.\n\nHoàng nhìn thẳng vào Bác Hùng: —Cho cháu xin phép mài một vết nhỏ bằng hạt gạo ở trôn bình, nơi không có men.—\n\nÔng Tường đập bàn: —Cậu điên à? Phá hoại hiện vật, ai chịu trách nhiệm?\n\n—Nếu nó là đồ thật, vết mài ở trôn không làm giảm giá trị bao nhiêu. Nhưng nếu cháu đền hai trăm triệu, các người có ngay tiền mặt, sợ gì?— Hoàng ký xoẹt tên mình.\n\nBác Hùng chần chừ vài giây rồi gật đầu. Dưới ánh mắt phẫn nộ của lão Tuấn, Hoàng dùng một chiếc giũa kim cương nhỏ xíu, khẽ mài một rãnh nông ở đáy bình.\n\nBụi gốm rơi xuống. Hoàng thu thập chúng, soi dưới kính hiển vi điện tử cầm tay kết nối với màn hình máy tính bảng. Cấu trúc bột hiện lên trắng toát, đồng nhất tăm tắp.\n\n—Lò ga, nhiệt độ 1280 độ C, nung liên tục 12 tiếng. Hoàn hảo đến mức giả tạo.— Hoàng chỉ vào màn hình. —Còn đây là bột mài từ mảnh tiêu bản của cháu, các vệt tinh thể thô, có lẫn cả hạt silica chưa tan hết do thiếu nhiệt.\n\nBác Hùng nhìn màn hình, rồi nhìn lão Tuấn đang toát mồ hôi hột. Giao dịch bị hủy ngay lập tức. Ông Tường tức giận vẩy tay áo bỏ đi, không quên ném lại một ánh nhìn hằn học.\n\nTối hôm đó, Hoàng ngồi trong xưởng nhỏ của mình. Bác Hùng đã đưa phong bì hai mươi triệu đồng tiền mặt làm phí cố vấn, kèm theo lời cảm ơn rối rít vì cứu ông một vố lừa.\n\nHoàng nhấp một ngụm trà Thiết Quan Âm từ chiếc chén sành cũ kỹ, cảm nhận hơi ấm len lỏi qua lớp men rạn.\n\nAnh cẩn thận dùng cọ lông mềm phủi bụi cho mảnh vỡ tiêu bản men lam, rồi đặt nó vào ngăn kéo số ba trong tủ gỗ, nơi anh dán nhãn Thư viện Tiêu bản Lò củi Thanh.\n\nKhóe môi Hoàng nhếch lên một nụ cười mãn nguyện. Tiền thưởng đủ để trả tiền thuê xưởng, nhưng niềm vui thực sự là được chạm vào dấu vết của lửa, của lịch sử.\n\nTuy nhiên, khi nhìn lại tờ giấy nhắn đe dọa vừa được nhét qua khe cửa: Đừng cản đường làm ăn của anh em, cứ đợi đấy. Hoàng biết rằng lũ làm giả bằng lò công nghệ cao sẽ không để anh yên.",
+          "causalStateChange": "Hoàng chứng minh được năng lực, chính thức vạch mặt công nghệ làm giả, nhưng đồng thời trở thành cái gai trong mắt một đường dây làm giả chuyên nghiệp.",
+          "requiredPlanAnchor": "Đưa mảnh tiêu bản Thanh vào thư viện",
+          "protagonistChoice": "Ký giấy cam kết đền bù hai trăm triệu đồng để được phép mài xước trôn chiếc bình giả, đánh cược toàn bộ uy tín.",
+          "agencyMove": "Kết hợp âm thanh khi gõ gốm và cấu trúc bột mài dưới kính hiển vi điện tử để chứng minh sự khác biệt rành rành giữa cốt gốm lò củi và lò ga.",
+          "earnedReward": "Nhận được sự tin tưởng tuyệt đối của bác Hùng và một mảnh vỡ tiêu bản men lam cực hiếm từ lò củi triều Thanh.",
+          "materialProgression": "Nhận phong bì hai mươi triệu đồng tiền mặt làm phí cố vấn, giải quyết ngay vấn đề tiền thuê xưởng.",
+          "comfortPayoff": "Thong thả nhấp trà trong chiếc chén sành men rạn, cẩn thận phân loại và cất giữ mảnh tiêu bản mới vào thư viện cá nhân với sự thỏa mãn của một người lưu giữ sự thật của lửa.",
+          "costPaid": "Biến lão Tuấn và ông Tường (ủy viên Hội đồng) thành kẻ thù không đội trời chung.",
+          "exitPressure": "Đường dây làm giả công nghệ cao nhận ra sự cản trở của Hoàng và gửi tờ giấy đe dọa nhét qua khe cửa xưởng, báo hiệu những cạm bẫy lớn hơn."
+        }
+      ],
+      "continuityDigest": "Hoàng dùng kỹ năng cảm nhận độ kết tinh để phát hiện bình sứ giả nung bằng lò ga, từ chối ký xác nhận và bị thách thức. Anh dùng số tiền cuối cùng mua một mảnh vỡ tiêu bản chuẩn, dũng cảm đem ra đối chất, mài đáy bình giả trước mặt chuyên gia Hội đồng Thẩm định, thành công chứng minh sự thật và nhận phần thưởng, nhưng lại chuốc lấy sự thù hận từ đường dây làm giả.",
+      "unresolvedPressure": "Hoàng đã làm hỏng giao dịch hai trăm triệu của lão Tuấn và làm mất mặt ủy viên Hội đồng Thẩm định. Lời đe dọa nhét qua khe cửa xưởng báo hiệu đường dây làm gốm giả công nghệ cao sẽ dùng mọi thủ đoạn để bôi nhọ uy tín và dồn anh vào chân tường trong tương lai gần."
+    },
+    {
+      "schemaVersion": 2,
+      "candidateId": "concept_magnetic_trace",
+      "chapters": [
+        {
+          "chapterNumber": 1,
+          "title": "Chỉ Tơ Đứng Im",
+          "prose": "Nam lật ngửa chiếc đĩa men lam tỳ vết mờ mờ dưới ánh mặt trời gay gắt của khu chợ đồ cổ lê lết ven đường. Hải, gã lái buôn ranh mãnh nhất xóm, đang ngồi nhịp đùi chờ đợi.\n\n— Hàng xịn Lái Thiêu đời đầu đấy chú em. Cốt đất nặng trịch, men rạn tự nhiên. Anh để chú giá sỉ hai triệu, mang về bán qua tay bèo cũng lời gấp ba.\n\nNam không đáp. Anh rút từ trong túi áo ngực ra một ống đồng nhỏ bằng ngón tay, bên trong treo một viên nam châm neodymium siêu nhạy bằng một sợi chỉ tơ.\n\nĐây là công cụ do Nam tự chế sau nhiều năm nghiên cứu địa chất thủy văn. Khác với cách nhìn men hay gõ nghe tiếng thanh trầm của giới buôn đồ cổ truyền thống, anh đi thẳng vào bản chất của vật liệu.\n\nNam đưa ống đồng áp sát vào phần cốt đất lộ ra ở trôn đĩa. Sợi chỉ tơ đứng im phăng phắc, viên nam châm không hề có dấu hiệu nhúc nhích.\n\nLàng gốm cổ ven sông Đồng Giang lấy đất sét từ mỏ phù sa cổ. Đất ở đó lẫn một lượng quặng sắt vi lượng rất đặc trưng. Bất cứ món gốm nào ra lò từ nguồn đất ấy đều tạo ra một lực hút từ tính nhẹ, đủ làm sợi chỉ tơ trong ống đồng của Nam chao đảo.\n\n— Cốt đất này pha bột đá hiện đại, không có hạt sắt nào cả. Đồ làm giả từ bên kia biên giới chuyển về rồi hầm phèn cho cũ men đi thôi.\n\nNam trả chiếc đĩa lại chỗ cũ, nói rành rọt. Xung quanh, vài vị khách đang lúi húi chọn đồ chợt khựng lại, dỏng tai nghe.\n\nMặt Hải biến sắc. Gã giật phắt chiếc đĩa lại, trừng mắt nhìn Nam.\n\n— Mày thì biết cái quái gì mà nói xằng nói bậy! Đi chỗ khác chơi, đừng có phá đám làm ăn của người ta.\n\nNam thản nhiên đứng dậy, phủi bụi trên quần. Anh không cần phải tranh cãi. Khả năng cảm nhận từ tính vi lượng của anh chưa bao giờ sai.\n\nTuy nhiên, hành động vạch mặt vừa rồi đã khiến các chủ sạp xung quanh cảnh giác. Họ xì xào to nhỏ và bắt đầu dọn những món đồ nhạy cảm cất đi.\n\nBuổi sáng trôi qua vô ích. Việc chọn cách thẳng thắn bảo vệ nguyên tắc nghề nghiệp khiến Nam tự đóng sập cơ hội tìm kiếm nguồn hàng ở khu chợ chính.\n\nTrong túi anh lúc này chỉ còn đúng một triệu sáu trăm ngàn đồng tiền vốn. Nếu hôm nay không tìm được món nào để mua đi bán lại, ngày mai anh sẽ không có tiền đóng nợ sinh hoạt phí.\n\nÁp lực đè nặng lên vai. Nam biết mình phải rời khỏi khu trung tâm, tiến về vùng ven, nơi những người gom ve chai phế liệu hoạt động, hy vọng mót được chút đồ sót lại.",
+          "causalStateChange": "Từ một người đang tìm hàng, Nam làm mất lòng giới buôn lậu chợ trung tâm và tự đẩy mình vào tình thế thiếu nguồn hàng trầm trọng.",
+          "requiredPlanAnchor": "vạch mặt đĩa gốm giả",
+          "protagonistChoice": "Quyết định nói thẳng sự thật về cốt đất phi kim để cảnh báo khách mua thay vì im lặng rời đi.",
+          "agencyMove": "Dùng ống đồng nam châm tự chế để đo từ tính vi lượng ngay tại chỗ.",
+          "earnedReward": null,
+          "materialProgression": null,
+          "comfortPayoff": null,
+          "costPaid": "Mất cơ hội mua bán với các sạp đồ cổ ở khu chợ chính.",
+          "exitPressure": "Sắp hết tiền sinh hoạt, buộc phải đánh liều tìm đến vùng ven mua ve chai phế liệu."
+        },
+        {
+          "chapterNumber": 2,
+          "title": "Canh Bạc Cuối Cùng",
+          "prose": "Nắng chiều hắt những tia oi ả xuống vựa phế liệu của ông Ba Tèo nằm sát mép kênh đen ngòm. Mùi rỉ sét quyện với mùi bùn hôi bốc lên nồng nặc.\n\nNam bước qua đống sắt vụn ngổn ngang, mắt lia nhanh qua các giỏ nhựa đựng đồ sành sứ tạp nham. Phần lớn là bát đĩa sứt mẻ của các quán ăn bỏ đi.\n\nChợt ánh mắt anh dừng lại ở một góc khuất. Một chiếc chóe cao cỡ hai gang tay, bám đầy hàu và bùn khô cứng ngắc, nằm lăn lóc cạnh đống lốp xe cũ.\n\nNam bước tới, ngồi xổm xuống cầm chiếc chóe lên. Lớp vỏ hàu dày đặc che kín toàn bộ họa tiết và men áo. Cầm trên tay có cảm giác nặng trịch, nhưng chưa thể khẳng định được gì bằng mắt thường.\n\nAnh lôi chiếc ống đồng chứa nam châm siêu nhạy ra, áp sát vào phần trôn chóe hiếm hoi không bị hàu bám.\n\nNgay lập tức, viên nam châm neodymium bên trong rung bần bật, sợi chỉ tơ kéo lệch hẳn về phía cốt gốm. Lực hút vi lượng này mạnh và ổn định, chính xác là đất sét quặng sắt của mỏ Đồng Giang cổ.\n\nNam kiềm chế sự hưng phấn, gõ nhẹ tay lên lớp hàu bám, giả vờ hỏi một cách hờ hững.\n\n— Chú Ba, cái hũ đựng mắm này chú tính bao nhiêu?\n\nÔng Ba Tèo đang ngậm điếu thuốc, hếch mắt nhìn sang. Ông không rành đồ cổ, nhưng cũng lõi đời trong việc nhìn thái độ khách.\n\n— Đồ vớt dưới sông lên đấy. Cầm nặng tay phết. Một triệu rưỡi, không bớt.\n\nNam chần chừ. Một triệu rưỡi là gần như toàn bộ số vốn còn lại của anh. Hơn nữa, chiếc chóe bám hàu này là một canh bạc thật sự.\n\nViệc làm sạch lớp hàu hóa thạch đòi hỏi kỹ thuật và sự kiên nhẫn. Nếu lỡ tay làm xước lớp men bên trong, giá trị món đồ sẽ về số không. Nhưng nếu không mua, anh sẽ trắng tay hôm nay.\n\n— Cháu lấy. Chú nhận tiền mặt luôn nhé.\n\nNam rút những tờ tiền cuối cùng trong ví, giao cho ông Ba. Nhận lại chiếc chóe nặng trịch, anh cảm thấy áp lực rủi ro đè nặng trên từng đầu ngón tay.\n\nVề đến phòng trọ, nhìn chiếc chóe bẩn thỉu đặt trên bàn và tờ mười ngàn đồng duy nhất còn sót lại trong ví, Nam biết mình không có đường lùi. Đêm nay, anh phải phục hồi nó hoàn hảo.",
+          "causalStateChange": "Từ tình trạng cạn kiệt vốn, Nam chuyển sang sở hữu một món đồ có tiềm năng nhưng đòi hỏi kỹ năng phục hồi rủi ro cao.",
+          "requiredPlanAnchor": "mua chiếc chóe bám hàu",
+          "protagonistChoice": "Chấp nhận trả giá cao không mặc cả để mua chiếc chóe bám hàu dựa trên kết quả đo từ tính.",
+          "agencyMove": "Dùng nam châm xác định cốt đất Đồng Giang dưới lớp vỏ hàu ngụy trang.",
+          "earnedReward": null,
+          "materialProgression": null,
+          "comfortPayoff": null,
+          "costPaid": "Tiêu sạch 1.5 triệu vốn cuối cùng, chỉ còn đúng 10 ngàn đồng phòng thân.",
+          "exitPressure": "Phải làm sạch lớp vỏ hàu cứng ngắc mà không làm hỏng men gốm, nếu thất bại sẽ hoàn toàn trắng tay."
+        },
+        {
+          "chapterNumber": 3,
+          "title": "Bản Đồ Cốt Đất",
+          "prose": "Suốt sáu tiếng đồng hồ ban đêm, Nam tỉ mẩn dùng dung dịch axit loãng và tăm tre xỉa từng milimet vỏ hàu. Mỗi âm thanh lách cách vang lên đều khiến anh nín thở.\n\nĐến gần sáng, lớp vỏ cứng cuối cùng cũng bong ra. Chiếc chóe lộ diện với lớp men tro ngả vàng óng ả, không hề có một vết xước.\n\nỞ phần thân chóe, những vệt vuốt tay đều đặn hiện lên rõ nét, minh chứng cho kỹ thuật bàn xoay thủ công của các nghệ nhân làng gốm ngày xưa.\n\nChín giờ sáng, Nam ôm chiếc chóe được bọc kỹ bằng báo cũ đến nhà ông Lâm, một nhà sưu tầm gốm Nam Bộ có tiếng ở thành phố.\n\nÔng Lâm đeo kính lúp, soi đi soi lại lớp men, rồi lắc đầu nghi hoặc.\n\n— Men xịn đấy, nhưng cốt đất này lạ quá, không giống đồ Lái Thiêu hay Biên Hòa tôi hay gặp. Cậu lấy gì chứng minh đây là đồ cổ Nam Bộ?\n\nNam không nói nhiều. Anh lôi từ trong balo ra một tờ bản đồ địa chất thủy văn cũ úa vàng, có đóng dấu mộc đỏ của cơ quan lưu trữ từ trước năm 1975, trải thẳng lên mặt bàn trà.\n\n— Bác xem, đây là bản đồ trắc địa mỏ đất sét ven khúc sông Đồng Giang cổ. Đất ở đây chứa khoáng sắt đặc thù. Lò gốm này đã bị san lấp hoàn toàn từ thập niên tám mươi.\n\nNam tiếp tục đặt ống đồng nam châm lên trôn chóe. Viên nam châm lệch góc chỉ thẳng vào phần cốt gốm lộ ra.\n\n— Mắt người có thể bị đánh lừa bởi màu men pha hóa chất, nhưng từ tính vi lượng của đất mẹ thì không thể làm giả. Cốt đất này chính là cuốn gia phả của mỏ sét Đồng Giang.\n\nÔng Lâm sững sờ đối chiếu giữa bản đồ, độ rung của nam châm và vết vuốt tay trên chóe. Mọi bằng chứng logic khoa học đều khớp nhau hoàn hảo.\n\n— Được! Lập luận sắc sảo lắm. Tám triệu, tôi lấy cái chóe này. Cậu làm tôi mở rộng tầm mắt đấy.\n\nCầm xấp tiền mặt trên tay, Nam thở phào nhẹ nhõm. Áp lực tài chính suốt mấy ngày qua đã hoàn toàn tan biến.\n\nBuổi trưa hôm đó, anh tự thưởng cho mình một tô phở nạm gầu đầy ắp thịt và một ly cà phê sữa đá lề đường. Cảm giác vị ngọt của nước dùng trôi tuột xuống dạ dày thật sảng khoái.\n\nPhần quan trọng nhất là mảnh vỏ hàu dính chút đất sét dưới đáy chóe đã được Nam giữ lại. Nó sẽ là mẫu vật đầu tiên để anh xây dựng bộ tiêu bản cốt đất độc quyền, chuẩn bị cho những bước tiến xa hơn trong nghề.",
+          "causalStateChange": "Từ kẻ vô danh đối diện nguy cơ phá sản, Nam dùng kiến thức địa chất để chốt giao dịch lớn, thiết lập uy tín với nhà sưu tầm có tiếng.",
+          "requiredPlanAnchor": "đối chiếu bản đồ địa chất",
+          "protagonistChoice": "Không dùng lời lẽ thuyết phục suông mà đưa trực tiếp bản đồ địa chất và làm thí nghiệm đo từ tính trước mặt khách hàng.",
+          "agencyMove": "Kết hợp tài liệu bản đồ cũ với bài kiểm tra từ tính thực tế để chứng minh nguồn gốc món đồ.",
+          "earnedReward": "Nhận được 8 triệu đồng tiền mặt từ giao dịch với ông Lâm.",
+          "materialProgression": "Tăng vốn kinh doanh lên 8 triệu và giữ lại được mẫu cốt đất đầu tiên cho bộ tiêu bản độc quyền.",
+          "comfortPayoff": "Thưởng thức một tô phở nạm gầu đầy ắp thịt và ly cà phê sữa đá lề đường xua tan mệt mỏi.",
+          "costPaid": "Thức trắng một đêm, tốn sức lực và sự tập trung cao độ để dùng axit loãng và tăm tre làm sạch chóe.",
+          "exitPressure": "Sự xuất hiện của một phương pháp định giá khoa học mới đã lọt vào tai giới sưu tầm, điều này chắc chắn sẽ kéo theo sự dòm ngó của những kẻ chuyên làm giả gốm."
+        }
+      ],
+      "continuityDigest": "Nam dùng phương pháp kiểm tra từ tính vi lượng để từ chối hàng giả tại chợ chính, chịu cảnh bị cô lập và hết vốn. Anh đánh liều mua một chiếc chóe bám hàu ở vựa phế liệu bằng đồng tiền cuối cùng, tự tay phục hồi không tì vết. Sau đó, anh dùng bản đồ địa chất kết hợp thí nghiệm từ tính để chứng minh nguồn gốc với nhà sưu tầm ông Lâm, thu về vốn liếng và bắt đầu xây dựng bộ tiêu bản cốt đất chuẩn.",
+      "unresolvedPressure": "Việc Nam bắt đầu sử dụng bản đồ địa chất và từ tính vi lượng để định giá gốm cổ đã thiết lập một tiêu chuẩn mới, gián tiếp thách thức và đe dọa chén cơm của các đường dây buôn lậu gốm giả ngoại nhập, buộc chúng phải tìm cách đối phó."
+    }
+  ],
+  "status": "awaiting_human_selection"
+}

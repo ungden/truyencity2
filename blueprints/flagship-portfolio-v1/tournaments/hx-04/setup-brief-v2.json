@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 2,
+  "language": "vi",
+  "portfolioSlotId": "HX-04",
+  "genreLane": "xuanhuan_civilization",
+  "laneCardIds": [
+    "market_xuanhuan_hybrid"
+  ],
+  "distinctnessFingerprint": "native|nhìn nút thắt sinh kế, tổ chức người thật, hoàn thành công trình, tăng sản lượng rồi giải bài toán quyền lực mới.|dân số tự nguyện+năng lực sản xuất+tính chính danh|địa hình, mùa vụ, phe lợi ích và người dân chỉ hợp tác khi lợi ích cùng rủi ro được chia rõ.|alternate_world",
+  "researchQuestions": [
+    "Cơ chế Văn minh và lãnh địa vận hành bằng nguồn lực, giới hạn và bằng chứng nào để không trở thành lời giải tùy tiện?",
+    "Các tài sản dân số tự nguyện, năng lực sản xuất, tính chính danh được tạo, tiêu và mất ra sao để độc giả nhìn thấy tiến bộ thật?",
+    "Nguồn xung đột Địa hình, mùa vụ, phe lợi ích và người dân chỉ hợp tác khi lợi ích cùng rủi ro được chia rõ. phản ứng thế nào sau mỗi thắng lợi để vòng thưởng không lặp lại?"
+  ],
+  "promotionCohort": "opening_tournament",
+  "genre": "huyen-huyen",
+  "audience": "Độc giả nam Việt thích xây dựng lãnh địa, sản xuất và đời sống cộng đồng nhưng vẫn muốn nhân vật, tranh lợi và payoff cụ thể trong từng cụm chương.",
+  "desiredExperience": "Khoái cảm đến từ biến một khu tro trắng không giữ được nước thành nơi đáng sống, với từng công trình làm bữa ăn, mái nhà và cán cân quyền lực đổi thật.",
+  "domain": "Một thung lũng tro trắng hư cấu, nơi nước chỉ bám vào đá mang dấu tay cộng đồng; ba nhóm dân giữ kỹ năng đào kênh, nung đá và gieo rêu nhưng không tin nhau.",
+  "pleasureProfile": {
+    "realityMode": "alternate_world",
+    "advantage": "Main từng làm người đo đất lưu động, hiểu địa hình và biết tổ chức thử nhỏ để các nhóm nhìn thấy lợi ích chung trước khi góp sức.",
+    "knowledgeLimit": "Anh không có bảng xây dựng, vật tư tự sinh hay công nghệ toàn năng; mọi phương án phụ thuộc thợ, mùa, quyền sử dụng đất và sự đồng thuận có thể rút lại.",
+    "primaryRewardLoop": [
+      "Tìm nút thắt sinh kế đang khiến một nhóm bỏ đi.",
+      "Ghép kỹ năng và nguồn lực của các phe bằng một cam kết có thể kiểm chứng.",
+      "Hoàn thành công trình nhỏ rồi đo sản lượng và người chịu thiệt.",
+      "Tái phân phối lợi ích để mở công trình khó hơn và tăng tính chính danh."
+    ],
+    "comfortLoop": [
+      "Một bếp chung có thêm món và người sau mỗi thay đổi sản xuất.",
+      "Nhà ở, nước sạch và tiếng trẻ con trở lại theo tiến độ nhìn thấy được."
+    ],
+    "setbackRecoveryWindow": 3,
+    "faceSlapPolicy": "Main chỉ thắng phe cản trở sau khi chứng minh phương án vận hành và chia rủi ro tốt hơn; không biến dân chúng thành đám đông biết ơn vô điều kiện.",
+    "progressionSignals": [
+      "nước dự trữ",
+      "sản lượng lương thực",
+      "dân ở lại",
+      "tay nghề",
+      "tính chính danh",
+      "công trình được bảo trì"
+    ]
+  },
+  "boundaries": [
+    "Không sao chép tên riêng, hệ sức mạnh, vật phẩm nhận diện, cảnh nổi tiếng hoặc chuỗi sự kiện của bất kỳ tác phẩm đối chiếu nào.",
+    "Không dùng đối thủ ngu, đám đông tung hô hoặc may mắn vô nguồn để chứng minh nhân vật chính giỏi; thắng lợi phải có chuẩn bị, bằng chứng và cái giá.",
+    "Không kéo dài nhục nhã hoặc bất lực quá cửa sổ hồi phục; áp lực phải buộc nhân vật lựa chọn và làm thay đổi trạng thái truyện.",
+    "Tên người, địa danh, tổ chức và giọng thoại phải thuộc riêng truyện này; không dùng hậu tố thể loại hoặc thiết chế chung như một setup thay thế.",
+    "Không kể bằng báo cáo sản lượng thay cho cảnh lao động, thương lượng và hậu quả trên người thật.",
+    "Không dựng lộ trình công nghiệp hóa Trái Đất dưới tên huyền huyễn.",
+    "Mỗi công trình phải có chủ bảo trì, chi phí và nhóm bị ảnh hưởng."
+  ],
+  "researchNotes": [
+    {
+      "source": "https://book.qidian.com/booklist/detail/238466/1/ — nguồn chính thức trong benchmark_hx_04.",
+      "finding": "Payoff xây dựng mạnh nhất khi công trình thay đổi cách người dân ăn, ở, làm việc và nhìn người tổ chức."
+    },
+    {
+      "source": "https://www.chinawriter.com.cn/n1/2023/0102/c404027-32598233.html — nguồn chính thức trong benchmark_hx_04.",
+      "finding": "Mỗi bước tăng sản lượng phải kéo theo bài toán phân phối, quyền sở hữu, bảo trì hoặc tính chính danh mới."
+    },
+    {
+      "source": "https://wyb.chinawriter.com.cn/content/202602/06/content82721.html — nguồn chính thức trong benchmark_hx_04.",
+      "finding": "Dàn nhân vật có chuyên môn và lợi ích khác nhau giúp lãnh địa vận hành như xã hội thay vì bàn cờ của main."
+    }
+  ],
+  "seedConstraints": [
+    "Ba tình huống đặc trưng phải sinh từ tro trắng, đá dấu tay và ba cộng đồng kỹ năng.",
+    "Chương một main phải giải một nút thắt nước nhỏ bằng nguồn lực sẵn có.",
+    "Chậm nhất chương ba một bữa ăn hoặc mái nhà phải tốt lên và một tranh chấp phân phối mới phải xuất hiện.",
+    "Ba mươi chương phải đổi không thể đảo ngược một công trình, một tập quán và một cán cân quyền lực."
+  ]
+}

@@ -1,0 +1,1156 @@
+{
+  "schemaVersion": 2,
+  "promptVersion": "flagship-setup-v2.3-benchmark",
+  "benchmarkId": "benchmark_dt_03",
+  "concepts": [
+    {
+      "id": "concept_precision_jigs_01",
+      "workingTitle": "Đồ Gá Năm 89",
+      "readerCuriosity": "Làm sao chế tạo bơm nước chính xác khi máy tiện thanh lý đã rơ lắc và thợ quen làm ẩu?",
+      "readerFantasy": "Thỏa mãn khi thấy phế phẩm biến thành hàng chuẩn nhờ tư duy kỹ thuật hiện đại áp dụng trên công cụ thô sơ.",
+      "premise": "Một kỹ sư trọng sinh về xưởng cơ khí sắp giải thể, dùng trí nhớ về 'đồ gá' (jigs) để ép các máy tiện cũ nát sản xuất ra linh kiện bơm nước đạt chuẩn.",
+      "irreversibleProblem": "Xưởng bị thanh lý, máy tốt bị tuồn đi, main chỉ còn lại một máy tiện rơ trục và khoản nợ lương của thợ.",
+      "protagonistContradiction": "Biết rõ bản vẽ bơm tối ưu nhưng không thể gia công trực tiếp bằng tay nghề và máy móc hiện tại, buộc phải đi đường vòng là chế tạo công cụ phụ trợ trước.",
+      "domainMechanism": "Sản xuất dựa trên việc thiết kế đồ gá: thay vì đòi hỏi thợ giỏi, main tạo ra các khuôn kẹp phôi chuẩn xác, biến thợ bậc thấp cũng tiện được đồ bậc cao.",
+      "conflictEngine": "Sai số tích lũy: Máy cũ rung lắc, phôi gang đúc không đều, và thợ làm tắt quy trình dẫn đến tỷ lệ hỏng hóc bất ngờ khi lắp ráp.",
+      "emotionalCore": "Sự gắn kết của những người thợ già bị bỏ lại, tìm thấy hy vọng khi xưởng sáng đèn và bữa cơm có thêm đĩa thịt luộc.",
+      "differenceClaim": "Không tập trung vào thiết kế bơm thần kỳ, mà tập trung vào *cách gia công* nó trong điều kiện thiếu thốn của năm 1989.",
+      "nearestComparisonRisk": "Dễ bị nhầm với truyện chế tạo vũ khí hoặc công nghệ cao nếu bỏ qua yếu tố dân dụng và giới hạn vật liệu thời kỳ này.",
+      "serialityProof": "Từ đồ gá cho trục bơm, tiến tới đồ gá cho vỏ bơm, sau đó là chuẩn hóa toàn bộ dây chuyền, mỗi bước mở khóa một mức sản lượng mới.",
+      "openingAdvantage": "Chương 1: Main chặn xe chở phế liệu, dùng tay không cân chỉnh lại mâm cặp máy tiện cũ để tiện thành công một trục bơm mẫu, giữ lại được cỗ máy.",
+      "progressionProof": "Tiền bán bơm lẻ -> mua thép làm đồ gá -> thợ làm nhanh hơn -> giảm tỷ lệ lỗi -> đại lý huyện đặt cọc tiền mặt.",
+      "worldProof": {
+        "signatureSituations": [
+          "Cảnh main dùng nêm gỗ và lá đồng mỏng để chêm mâm cặp máy tiện cũ trước ánh mắt nghi ngờ của thợ già.",
+          "Cảnh thử bơm tại ruộng, nước lên mạnh nhưng trục rung bần bật, main phải tháo ra đo lại độ rơ ngay trên bờ mương.",
+          "Cảnh đại lý huyện từ chối nhập hàng vì vỏ bơm sần sùi, buộc main phải nghĩ cách đánh bóng bằng cát và mỡ bò."
+        ],
+        "institutionalReaction": "Hợp tác xã vật tư ban đầu ép giá phôi gang, sau thấy main tiêu thụ đều đặn liền giở trò đòi tăng giá hoặc cắt nguồn cung.",
+        "resourceCirculation": "Tiền cọc từ đại lý -> mua phôi gang -> trả công thợ -> bán hàng thu tiền mặt -> mua thêm máy khoan bàn cũ.",
+        "thirtyChapterMutation": "Đến chương 30, các xưởng khác bắt đầu bắt chước hình dáng bơm, main mất lợi thế độc quyền thiết kế, phải chuyển sang cạnh tranh bằng độ bền và dịch vụ bảo hành."
+      },
+      "antiCloneFingerprint": "advantage|jig_design|currencies|scrap_metal_and_jigs|conflict|tolerance_stacking|world|liquidated_workshop_1989"
+    },
+    {
+      "id": "concept_voltage_drop_02",
+      "workingTitle": "Động Cơ Sụt Áp",
+      "readerCuriosity": "Giải quyết thế nào khi bơm nước thiết kế chuẩn nhưng điện lưới nông thôn năm 89 lúc nào cũng yếu?",
+      "readerFantasy": "Cảm giác chiến thắng khi sản phẩm của mình là thứ duy nhất hoạt động được trong môi trường khắc nghiệt, đánh bại mọi hàng ngoại nhập.",
+      "premise": "Main nhớ nguyên lý quấn dây động cơ chịu sụt áp, quyết định thu mua vỏ bơm cũ và quấn lại lõi để bán cho các vùng cuối nguồn điện.",
+      "irreversibleProblem": "Mùa khô đến, điện lưới chập chờn, hàng loạt bơm nước của cửa hàng huyện bị cháy motor, nông dân đòi đền tiền.",
+      "protagonistContradiction": "Muốn làm bơm công suất lớn để bán giá cao, nhưng thực tế điện nông thôn không gánh nổi, phải chấp nhận làm bơm nhỏ, tối ưu hiệu suất.",
+      "domainMechanism": "Kỹ thuật quấn dây đồng và tính toán tụ điện khởi động: Bơm không cần mạnh nhất, nhưng phải khởi động được ở điện áp 160V thay vì 220V.",
+      "conflictEngine": "Chất lượng dây đồng tráng men trên thị trường tạp nham, lẫn tạp chất, dẫn đến tính toán lý thuyết đúng nhưng thực tế motor vẫn quá nhiệt.",
+      "emotionalCore": "Sự hàm ơn của những người nông dân cứu được ruộng lúa khô hạn nhờ chiếc bơm chạy được lúc chập tối.",
+      "differenceClaim": "Điểm nhấn vào hệ thống điện và sự tương thích với hạ tầng tồi tàn, thay vì chỉ tập trung vào cơ khí thủy lực.",
+      "nearestComparisonRisk": "Giống truyện sửa chữa điện tử dân dụng nếu không gắn chặt với nhu cầu tưới tiêu quy mô lớn và áp lực mùa vụ.",
+      "serialityProof": "Từ quấn lại motor cũ -> tự đúc vỏ bơm -> thiết kế cánh quạt nhẹ hơn để giảm tải -> xây dựng trạm bảo hành đổi trả.",
+      "openingAdvantage": "Chương 1: Main dùng đồng hồ vạn năng tự chế, chứng minh lô bơm của HTX không hỏng cơ mà do cháy cuộn đề, giành quyền nhận thầu sửa chữa.",
+      "progressionProof": "Số lượng motor quấn xong -> tiền mua dây đồng xịn -> thuê thợ phụ -> mua máy quấn dây bán tự động -> mở rộng mạng lưới thu mua bơm hỏng.",
+      "worldProof": {
+        "signatureSituations": [
+          "Cảnh test bơm lúc 6h tối (giờ cao điểm), bóng đèn dây tóc tối mờ nhưng bơm của main vẫn rít lên và hút được nước.",
+          "Cảnh main phải đền tiền ở chương 3 vì dây đồng mua ở chợ trời bị xước men, gây chập cháy sau 2 ngày chạy liên tục.",
+          "Cảnh đại lý huyện lén tháo motor của main ra xem để bắt chước nhưng không hiểu cách đấu nối tụ điện kép."
+        ],
+        "institutionalReaction": "Cửa hàng điện máy quốc doanh mất khách, quản lý cửa hàng dùng mối quan hệ để chặn nguồn mua dây đồng giá sỉ của main.",
+        "resourceCirculation": "Thu mua bơm cháy giá bèo -> quấn lại -> bán giá bơm cũ chất lượng cao -> gom vốn mua máy dập lá thép stator.",
+        "thirtyChapterMutation": "Sau 30 chương, điện lưới được nâng cấp một phần, lợi thế 'chạy điện yếu' giảm, main phải chuyển hướng sang làm bơm lưu lượng lớn cho ao tôm."
+      },
+      "antiCloneFingerprint": "advantage|low_voltage_winding|currencies|copper_wire_and_capacitors|conflict|impure_materials|world|rural_grid_1989"
+    },
+    {
+      "id": "concept_modular_assembly_03",
+      "workingTitle": "Lắp Ráp Phân Tán",
+      "readerCuriosity": "Làm sao sản xuất số lượng lớn khi xưởng chính đã bị niêm phong, không có không gian tập trung?",
+      "readerFantasy": "Thỏa mãn khi thấy một mạng lưới sản xuất tại gia (cottage industry) được tổ chức quy củ, biến cả khu phố thành một nhà máy ngầm.",
+      "premise": "Main không cố giữ xưởng lớn, mà chia nhỏ các công đoạn (tiện trục, đúc vỏ, quấn dây) giao cho các thợ cơ khí mang máy về nhà làm, main chỉ lo lắp ráp và KCS.",
+      "irreversibleProblem": "Giám đốc cũ ôm tiền bỏ trốn, xưởng bị ngân hàng khóa cửa, thợ thuyền bơ vơ mang theo vài máy móc nhỏ về nhà siết nợ.",
+      "protagonistContradiction": "Biết quy trình sản xuất dây chuyền hiện đại, nhưng phải áp dụng nó trong môi trường phân tán, thiếu kỷ luật của các hộ gia đình.",
+      "domainMechanism": "Quản lý chuỗi cung ứng vi mô và dung sai lắp ráp: Đảm bảo chi tiết do ông A tiện ở xóm Đông lắp vừa khít với vỏ do ông B đúc ở xóm Đoài.",
+      "conflictEngine": "Tiêu chuẩn chất lượng không đồng đều giữa các hộ: người làm kỹ, người làm ẩu, dẫn đến ách tắc ở khâu lắp ráp cuối cùng và đọng vốn.",
+      "emotionalCore": "Sự hồi sinh của cả một xóm thợ, tiếng máy rèn, máy tiện vang lên trong từng nếp nhà, trẻ con có quần áo mới.",
+      "differenceClaim": "Mô hình quản lý chuỗi cung ứng và KCS (Kiểm tra chất lượng) thay vì tự tay main làm từ A đến Z trong một xưởng.",
+      "nearestComparisonRisk": "Dễ biến thành truyện quản lý tập đoàn nếu không giữ quy mô ở mức 'xóm thợ' và những mâu thuẫn vụn vặt, đời thường.",
+      "serialityProof": "Từ 3 hộ gia đình -> 10 hộ -> mâu thuẫn lợi ích khi có hộ tuồn hàng ra ngoài -> main phải thiết lập lại luật chơi và xây dựng xưởng lắp ráp trung tâm.",
+      "openingAdvantage": "Chương 1: Main xông vào xưởng đang bị niêm phong, không lấy máy to mà chỉ lấy bộ thước cặp chuẩn và các bản vẽ chi tiết, thuyết phục 2 thợ già hợp tác.",
+      "progressionProof": "Số lượng chi tiết đạt chuẩn -> tiền thanh toán theo sản phẩm -> mua thêm thước đo cho thợ -> thuê mặt bằng lắp ráp -> ký hợp đồng đại lý.",
+      "worldProof": {
+        "signatureSituations": [
+          "Cảnh main cầm thước cặp đi từng nhà đo phôi, gạch chéo đỏ vào những chi tiết sai số và tranh cãi nảy lửa với thợ làm ẩu.",
+          "Cảnh chương 3: Lô bơm đầu tiên bán ra bị rỉ nước do gioăng cao su (đặt mua ngoài) không chịu được nhiệt, main phải thu hồi và tự đền tiền.",
+          "Cảnh các đại lý đến tận sân nhà main chờ lấy hàng, trong khi thợ phụ đang hối hả siết ốc lắp ráp ngay trên phản gỗ."
+        ],
+        "institutionalReaction": "Đội quản lý thị trường nghi ngờ xóm thợ làm hàng giả, main phải chứng minh nguồn gốc vật tư và đăng ký tiêu chuẩn cơ sở.",
+        "resourceCirculation": "Tiền ứng của đại lý -> mua vật tư chia cho các hộ -> trả công lắp ráp -> thu tiền đuôi -> mua máy thử áp lực nước.",
+        "thirtyChapterMutation": "Sau 30 chương, mô hình phân tán bộc lộ giới hạn về sản lượng và bí mật công nghệ (bị lộ mẫu), buộc main phải gom vốn lập lại nhà máy tập trung."
+      },
+      "antiCloneFingerprint": "advantage|micro_supply_chain|currencies|calipers_and_piece_rates|conflict|decentralized_qc|world|cottage_industry_1989"
+    },
+    {
+      "id": "concept_muddy_water_04",
+      "workingTitle": "Bơm Bùn Đất Sét",
+      "readerCuriosity": "Bơm nước sạch thì dễ, nhưng làm sao hút được nước mương đầy bùn rác vào mùa cạn mà không kẹt cánh quạt?",
+      "readerFantasy": "Thấy sản phẩm giải quyết đúng nỗi đau thực tế nhất của nông dân, đè bẹp các loại máy móc nhập ngoại bóng bẩy nhưng vô dụng ở ruộng lầy.",
+      "premise": "Main thiết kế lại buồng bơm và cánh quạt hở (open impeller) chuyên trị nước đục, chấp nhận hy sinh cột áp để lấy khả năng chống kẹt rác.",
+      "irreversibleProblem": "Hạn hán kỷ lục, nước mương cạn trơ bùn, bơm ly tâm thông thường của cửa hàng huyện cháy sạch do kẹt rác, nông dân tuyệt vọng.",
+      "protagonistContradiction": "Áp dụng thiết kế thủy lực tiên tiến nhưng phải đúc bằng khuôn cát thủ công, bề mặt nhám làm giảm hiệu suất, phải tìm điểm cân bằng.",
+      "domainMechanism": "Thiết kế cánh quạt hở và khe hở buồng bơm: Tính toán khoảng cách đủ rộng để rác đi qua nhưng không quá rộng để mất áp lực hút.",
+      "conflictEngine": "Vật liệu đúc cánh quạt kém, khi hút phải sỏi nhỏ dễ bị mẻ hoặc gãy cánh, dẫn đến mất cân bằng động và phá nát ổ bi.",
+      "emotionalCore": "Niềm vui vỡ òa khi dòng nước đục ngầu tuôn ra từ ống xả, cứu sống ruộng hoa màu sắp chết khô của gia đình và hàng xóm.",
+      "differenceClaim": "Tập trung vào cơ học chất lưu (fluid mechanics) ứng dụng thực tế và vật liệu chống mài mòn, thay vì chỉ là cơ khí lắp ráp.",
+      "nearestComparisonRisk": "Có thể thành truyện nông nghiệp thuần túy nếu thiếu các yếu tố đàm phán đại lý, quản lý xưởng và cải tiến kỹ thuật liên tục.",
+      "serialityProof": "Từ bơm bùn nhỏ -> bơm hút cát cho xưởng gạch -> bơm chống ăn mòn cho ao tôm -> nâng cấp công nghệ đúc hợp kim.",
+      "openingAdvantage": "Chương 1: Main tháo tung một chiếc bơm ngoại bị kẹt bùn, dùng đe búa gò lại cánh quạt kín thành cánh hở, cứu sống ruộng lúa của trưởng thôn để đổi lấy máy hàn cũ.",
+      "progressionProof": "Số ruộng được cứu -> tiền công/lúa quy ra tiền -> mua than đá và gang tốt -> xây lò đúc nhỏ -> đại lý huyện chủ động tìm đến.",
+      "worldProof": {
+        "signatureSituations": [
+          "Cảnh test bơm dưới mương bùn đặc quánh, tiếng máy gầm lên, rung bần bật nhưng nước bùn vẫn phụt ra mạnh mẽ.",
+          "Cảnh chương 3: Bơm chạy tốt nhưng ổ bi vỡ nát do nước bùn lọt qua phớt cơ khí hỏng, main phải đền tiền và tìm cách chế phớt chắn cát.",
+          "Cảnh đại lý huyện mang trả lại bơm ngoại nhập, năn nỉ đổi lấy bơm 'xấu xí' của main vì nông dân chỉ đòi mua loại này."
+        ],
+        "institutionalReaction": "Trạm thủy nông huyện thấy bơm của main hiệu quả, muốn đặt hàng số lượng lớn nhưng yêu cầu phải có hóa đơn đỏ, ép main phải lập doanh nghiệp.",
+        "resourceCirculation": "Bán bơm thu tiền mặt/nông sản -> mua phôi gang và bi nồi -> đúc cánh quạt -> bán cho đại lý -> đầu tư máy cân bằng động.",
+        "thirtyChapterMutation": "Sau 30 chương, mùa mưa đến, nhu cầu bơm bùn giảm mạnh, main phải dùng lợi nhuận để nghiên cứu dòng bơm đẩy cao cho mùa lũ."
+      },
+      "antiCloneFingerprint": "advantage|open_impeller_design|currencies|cast_iron_and_bearings|conflict|abrasive_wear|world|drought_stricken_farmland_1989"
+    },
+    {
+      "id": "concept_dealer_leverage_05",
+      "workingTitle": "Đại Lý Độc Quyền",
+      "readerCuriosity": "Làm sao một xưởng nhỏ không vốn có thể ép các cửa hàng vật tư lớn ở huyện phải nôn tiền cọc ra trước?",
+      "readerFantasy": "Đấu trí thương trường, dùng chất lượng sản phẩm và nghệ thuật khan hiếm để lật ngược thế cờ với những kẻ trung gian hống hách.",
+      "premise": "Main có kỹ thuật làm bơm tốt, nhưng không tự bán lẻ mà dùng chiến thuật 'đại lý độc quyền từng xã', dùng đại lý này gây áp lực lên đại lý kia để chiếm dụng vốn.",
+      "irreversibleProblem": "Xưởng làm ra được 10 cái bơm đầu tiên nhưng cạn sạch vốn lưu động, không có tiền mua vật tư làm lô tiếp theo, trong khi đại lý ép mua chịu.",
+      "protagonistContradiction": "Sản phẩm tốt nhưng thương hiệu bằng không, phải nhún nhường ở bước đầu nhưng ngấm ngầm cài cắm điều khoản để nắm thóp đại lý sau này.",
+      "domainMechanism": "Kinh doanh B2B và quản lý dòng tiền: Thiết kế chính sách chiết khấu, bảo hành đổi trả và phân vùng thị trường để kiểm soát mạng lưới phân phối.",
+      "conflictEngine": "Đại lý bán phá giá, lấn tuyến của nhau, hoặc cố tình giam công nợ để ép main giảm giá nhập sỉ.",
+      "emotionalCore": "Sự hả hê khi từ chỗ phải đi năn nỉ ký gửi, main trở thành người quyết định ai được quyền bán hàng của mình, mang lại sự no đủ cho gia đình.",
+      "differenceClaim": "Trọng tâm đặt vào nghệ thuật đàm phán, hợp đồng phân phối và dòng tiền (cash flow), kỹ thuật chỉ là điều kiện cần.",
+      "nearestComparisonRisk": "Dễ sa đà vào âm mưu thương trường đen tối nếu không giữ vững nguyên tắc: chiến thắng cuối cùng phải dựa trên chất lượng bơm và dịch vụ.",
+      "serialityProof": "Từ ký gửi 1 cửa hàng -> đấu thầu 3 cửa hàng -> đại lý phá rào -> main cắt nguồn cung, tự mở trạm phân phối -> chiếm lĩnh toàn huyện.",
+      "openingAdvantage": "Chương 1: Main dùng 1 chiếc bơm mẫu, biểu diễn độ bền bằng cách cho chạy khan (không nước) 30 phút không cháy, ép chủ cửa hàng lớn nhất huyện phải mua đứt thay vì ký gửi.",
+      "progressionProof": "Số tiền cọc thu được -> vòng quay vốn lưu động -> số lượng vật tư mua sỉ -> mở rộng quy mô xưởng -> số lượng đại lý cấp 1.",
+      "worldProof": {
+        "signatureSituations": [
+          "Cảnh main ngồi ở quán nước đối diện cửa hàng đại lý, ghi chép số lượng khách hỏi mua bơm để nắm rõ sức bán thực tế trước khi đàm phán.",
+          "Cảnh chương 3: Đại lý cố tình làm hỏng một chiếc bơm (đấu sai điện) để bắt đền và ép giảm giá, main dùng bút thử điện chứng minh lỗi do người dùng.",
+          "Cảnh hai chủ đại lý ở hai xã khác nhau cãi nhau tại xưởng của main vì tranh giành suất lấy hàng sớm."
+        ],
+        "institutionalReaction": "Các xưởng cơ khí cũ liên minh với cửa hàng quốc doanh để tẩy chay hàng của main, buộc main phải đi đường vòng qua các cửa hàng tư nhân mới mở.",
+        "resourceCirculation": "Tiền cọc của đại lý A -> sản xuất hàng cho đại lý B -> lấy tiền đại lý B trả nợ vật tư -> mở rộng sản xuất.",
+        "thirtyChapterMutation": "Sau 30 chương, mạng lưới đại lý đã ổn định, lợi thế đàm phán bão hòa, xung đột chuyển sang việc các đại lý đòi main phải đa dạng hóa sản phẩm (máy xát gạo, máy tời)."
+      },
+      "antiCloneFingerprint": "advantage|b2b_distribution_tactics|currencies|deposits_and_territories|conflict|dealer_cannibalization|world|transitioning_market_1989"
+    },
+    {
+      "id": "concept_scrap_substitution_06",
+      "workingTitle": "Vật Liệu Thay Thế",
+      "readerCuriosity": "Làm sao chế tạo bơm khi không mua được đồng và thép tốt, chỉ có nhôm phế liệu và nhựa tái chế?",
+      "readerFantasy": "Sự sáng tạo vô bờ bến, biến rác thành vàng nhờ hiểu biết sâu sắc về đặc tính vật liệu và giới hạn cơ học.",
+      "premise": "Main không cố tìm vật liệu chuẩn như ký ức, mà thiết kế lại kết cấu bơm để sử dụng các vật liệu rẻ tiền, dễ kiếm tại địa phương (nhôm đúc từ vỏ lon, nhựa ép) nhưng vẫn đảm bảo độ bền tối thiểu.",
+      "irreversibleProblem": "Đường dây buôn lậu đồng bị bắt, giá vật tư đồng/thép tăng vọt gấp 3 lần, các xưởng bơm khác đồng loạt đóng cửa vì lỗ.",
+      "protagonistContradiction": "Biết dùng vật liệu xịn thì bơm sẽ bền 10 năm, nhưng để sinh tồn hiện tại phải làm ra cái bơm dùng được 2 năm với giá rẻ bằng một nửa.",
+      "domainMechanism": "Kỹ thuật luyện kim quy mô nhỏ và thiết kế bù đắp: Dùng nhôm thay gang thì phải tăng độ dày gân chịu lực; dùng trục thép thường thì phải xử lý nhiệt bề mặt.",
+      "conflictEngine": "Sự không đồng nhất của phế liệu: Lô nhôm này lẫn nhiều kẽm, lô sau lẫn nhiều chì, dẫn đến nhiệt độ nóng chảy và độ ngót khi đúc thay đổi liên tục, gây nứt vỏ.",
+      "emotionalCore": "Niềm tự hào của người thợ khi chứng minh được rằng trí tuệ có thể bù đắp cho sự thiếu thốn vật chất, xưởng không phải sa thải ai.",
+      "differenceClaim": "Tập trung vào khoa học vật liệu (material science) ứng dụng và xử lý nhiệt thủ công, một khía cạnh hiếm khai thác sâu trong truyện làm xưởng.",
+      "nearestComparisonRisk": "Giống truyện luyện kim kỳ ảo nếu main tự nhiên chế ra được siêu hợp kim từ rác. Phải giữ đúng giới hạn vật lý: nhôm phế liệu thì vẫn yếu hơn gang.",
+      "serialityProof": "Từ vỏ nhôm đúc -> trục thép tôi dầu -> cánh quạt nhựa ép -> tối ưu hóa lò nấu kim loại -> xây dựng quy trình phân loại phế liệu chuẩn.",
+      "openingAdvantage": "Chương 1: Main mua lại đống vỏ motor nhôm nát với giá đồng nát, tự đắp lò nấu và đúc thành công một vỏ bơm nhẹ, tản nhiệt tốt, bán được ngay lấy vốn.",
+      "progressionProof": "Khối lượng phế liệu thu mua -> tỷ lệ đúc thành công -> tiền lãi chênh lệch vật liệu -> mua máy đo nhiệt độ lò -> cải thiện bữa ăn cho thợ.",
+      "worldProof": {
+        "signatureSituations": [
+          "Cảnh main hướng dẫn thợ nhìn màu ngọn lửa lò than để đoán nhiệt độ rót nhôm, vì không có nhiệt kế công nghiệp.",
+          "Cảnh chương 3: Lô bơm vỏ nhôm đầu tiên bị rỉ nước do bọt khí bên trong (rỗ đúc), main phải thu hồi, đền tiền và tìm cách pha thêm chất khử khí.",
+          "Cảnh khách hàng ngạc nhiên khi xách chiếc bơm lên thấy nhẹ bẫng, ban đầu chê bai nhưng sau đó thích thú vì dễ di chuyển."
+        ],
+        "institutionalReaction": "Những kẻ thu gom phế liệu địa phương thấy main cần nhiều nhôm liền bắt tay nhau găm hàng thổi giá, buộc main phải tìm nguồn từ bãi rác huyện khác.",
+        "resourceCirculation": "Tiền bán bơm -> mua phế liệu giá rẻ -> than đá/hóa chất xử lý -> đúc vỏ -> bán bơm giá cạnh tranh -> tích lũy vốn.",
+        "thirtyChapterMutation": "Sau 30 chương, nguồn phế liệu cạn kiệt và giá tăng, lợi thế vật liệu rẻ biến mất, main phải dùng vốn đã tích lũy để chuyển sang nhập vật tư chuẩn, cạnh tranh bằng hiệu suất."
+      },
+      "antiCloneFingerprint": "advantage|scrap_metallurgy|currencies|aluminum_scrap_and_coal|conflict|material_inconsistency|world|resource_scarce_town_1989"
+    },
+    {
+      "id": "concept_service_first_07",
+      "workingTitle": "Trạm Bảo Hành Số 1",
+      "readerCuriosity": "Bắt đầu từ việc đi sửa dạo, làm sao vươn lên thành ông chủ xưởng sản xuất bơm nước lớn nhất vùng?",
+      "readerFantasy": "Hành trình đi lên từ đáy, dùng dịch vụ hậu mãi và sự thấu hiểu khách hàng để đánh bại những xưởng sản xuất lớn nhưng quan liêu.",
+      "premise": "Main không có tiền mở xưởng ngay, bắt đầu bằng việc lập đội sửa chữa lưu động. Qua việc sửa hàng ngàn chiếc bơm hỏng, main thu thập dữ liệu về điểm yếu của mọi loại bơm trên thị trường để tự thiết kế chiếc bơm hoàn hảo.",
+      "irreversibleProblem": "Main mang tiếng là kẻ phá hoại vì từng làm hỏng máy của xưởng cũ, không ai dám cho vay tiền hay bán chịu vật tư, chỉ có bộ đồ nghề xách tay.",
+      "protagonistContradiction": "Có kiến thức thiết kế tổng thể nhưng phải cắn răng đi làm thợ sửa vặt, kiếm từng đồng bạc lẻ và chịu sự coi thường của các chủ xưởng cũ.",
+      "domainMechanism": "Kỹ thuật chẩn đoán lỗi (troubleshooting) và kỹ thuật đảo ngược (reverse engineering): Nhìn vết mòn trên trục để biết lỗi do thiết kế hay do người dùng, từ đó cải tiến.",
+      "conflictEngine": "Khách hàng nông thôn hay tự sửa mò làm hỏng thêm, sau đó đổ lỗi cho thợ; hoặc các xưởng sản xuất từ chối bán phụ tùng thay thế cho main.",
+      "emotionalCore": "Sự ấm áp khi gia đình từ chỗ bị hàng xóm khinh rẻ vì nợ nần, dần được mọi người nể trọng, mang quà cáp đến tận nhà nhờ sửa máy.",
+      "differenceClaim": "Góc nhìn từ dịch vụ hậu mãi (after-sales service) tiến lên sản xuất, dùng dữ liệu lỗi (failure data) làm vũ khí cạnh tranh.",
+      "nearestComparisonRisk": "Dễ thành truyện 'thần y sửa máy' lặp đi lặp lại. Phải đảm bảo việc sửa chữa chỉ là bước đệm để tích lũy vốn và dữ liệu thiết kế bơm riêng.",
+      "serialityProof": "Sửa dạo -> mở tiệm sửa cố định -> tự chế phụ tùng thay thế -> lắp ráp bơm từ phụ tùng tự chế -> mở xưởng sản xuất bơm mang thương hiệu riêng.",
+      "openingAdvantage": "Chương 1: Main chỉ nghe tiếng kêu của một chiếc bơm đang chạy tại ruộng, phán đoán chính xác ổ bi sắp vỡ, tháo ra thay kịp thời cứu cả vụ tưới, được thưởng tiền mặt.",
+      "progressionProof": "Số lượng khách quen -> tiền công sửa chữa -> kho phụ tùng tự chế -> thuê thợ học việc -> ra mắt mẫu bơm đầu tiên.",
+      "worldProof": {
+        "signatureSituations": [
+          "Cảnh main lôi ra một cuốn sổ dày cộp ghi chép hàng trăm ca hỏng hóc, chỉ cho thợ thấy 80% bơm của xưởng X đều gãy trục ở cùng một vị trí.",
+          "Cảnh chương 3: Main tự tiện lại một trục bơm để thay cho khách, nhưng do thép kém nên gãy lại sau 3 ngày, main phải đền cái bơm mới và tìm nguồn thép tốt.",
+          "Cảnh các chủ xưởng lớn tức tối khi thấy khách hàng thà mua bơm lắp ráp từ tiệm sửa xe của main còn hơn mua hàng mới nguyên hộp của họ."
+        ],
+        "institutionalReaction": "Các xưởng lớn cấm đại lý bán phụ tùng cho main, buộc main phải tự mua máy tiện nhỏ về gia công lấy phụ tùng.",
+        "resourceCirculation": "Công sửa chữa -> mua máy tiện cũ -> tự làm phụ tùng -> bán phụ tùng/lắp bơm -> thu lợi nhuận cao -> mở xưởng.",
+        "thirtyChapterMutation": "Sau 30 chương, khi đã thành xưởng lớn, main phải đối mặt với chính vấn đề cũ: làm sao quản lý đội ngũ bảo hành của riêng mình khi quy mô phình to, thợ bắt đầu làm ẩu."
+      },
+      "antiCloneFingerprint": "advantage|failure_data_analysis|currencies|spare_parts_and_reputation|conflict|user_error_and_blame|world|mobile_repair_network_1989"
+    },
+    {
+      "id": "concept_standardization_08",
+      "workingTitle": "Chuẩn Hóa Hệ Mét",
+      "readerCuriosity": "Làm sao sản xuất công nghiệp khi ốc vít, gioăng phớt trên thị trường mỗi nơi một kích cỡ, Tây Ta lẫn lộn?",
+      "readerFantasy": "Thỏa mãn chứng OCD kỹ thuật: Đưa trật tự vào sự hỗn loạn, thiết lập tiêu chuẩn sản xuất khiến mọi đối thủ phải tuân theo hoặc bị đào thải.",
+      "premise": "Thị trường vật tư 1989 đầy rẫy đồ phế liệu hệ Inch (Mỹ/Anh) và hệ Mét (Liên Xô/Tiệp). Main quyết định chế tạo dòng bơm chuẩn hóa 100% hệ Mét, linh kiện có thể hoán đổi hoàn toàn, dễ dàng thay thế.",
+      "irreversibleProblem": "Lô hàng đầu tiên bị trả lại toàn bộ vì đại lý không thể tìm được cờ-lê vừa với con ốc hệ Inch mà thợ của main nhặt được ở bãi phế liệu để lắp vào.",
+      "protagonistContradiction": "Việc chuẩn hóa đòi hỏi vứt bỏ lượng lớn vật tư giá rẻ đang có, gây áp lực dòng tiền cực lớn trong ngắn hạn để đổi lấy lợi thế dài hạn.",
+      "domainMechanism": "Quản lý dung sai và tiêu chuẩn hóa (Standardization): Tự chế tạo các bộ taro, bàn ren chuẩn để tự làm ốc vít, gioăng phớt thay vì phụ thuộc thị trường chợ trời.",
+      "conflictEngine": "Thợ cũ quen thói 'lắp không vừa thì lấy búa gõ', phá hỏng các chi tiết chuẩn xác. Sự kháng cự của thói quen làm việc tùy tiện.",
+      "emotionalCore": "Sự chuyển biến của xưởng từ một bãi rác lộn xộn thành một dây chuyền ngăn nắp, thợ thuyền tự hào vì làm ra hàng 'chuẩn như đồ Tây'.",
+      "differenceClaim": "Xung đột cốt lõi là cuộc chiến giữa 'tiêu chuẩn hóa' và 'sự tùy tiện', một bước ngoặt bắt buộc của công nghiệp hóa thực sự.",
+      "nearestComparisonRisk": "Có thể trở nên khô khan nếu chỉ tả về kích thước ốc vít. Phải gắn tiêu chuẩn với sự sống còn của hợp đồng và tiền bạc.",
+      "serialityProof": "Chuẩn hóa ốc vít -> chuẩn hóa gioăng phớt -> chuẩn hóa quy trình lắp ráp -> bán bộ tiêu chuẩn/phụ tùng cho các xưởng khác -> làm chủ thị trường phụ trợ.",
+      "openingAdvantage": "Chương 1: Main từ chối dùng mớ ốc vít tạp nham, tự tay mài một mũi dao tiện để tiện ra bộ ốc chuẩn hệ Mét đầu tiên, cứu một chiếc bơm xuất khẩu bị kẹt ren.",
+      "progressionProof": "Tỷ lệ linh kiện tự sản xuất -> giảm thời gian lắp ráp -> tiền tiết kiệm từ việc không hỏng vặt -> mua máy dập ốc -> mở rộng quy mô.",
+      "worldProof": {
+        "signatureSituations": [
+          "Cảnh main cầm búa đập nát một chiếc vỏ bơm vừa đúc xong chỉ vì thợ khoan lệch lỗ ốc 1mm, thiết lập kỷ luật thép.",
+          "Cảnh chương 3: Lô bơm chuẩn hóa bán chạy, nhưng đại lý phàn nàn giá cao. Main chứng minh bằng cách tháo tung 2 cái bơm, tráo linh kiện cho nhau và lắp lại chạy bình thường.",
+          "Cảnh thợ sửa chữa ở các xã lùng sục tìm mua 'bơm của xưởng anh A' vì chỉ cần mang đúng 2 cái cờ-lê là sửa được mọi lỗi."
+        ],
+        "institutionalReaction": "Các xưởng đối thủ ban đầu cười nhạo main lãng phí tiền làm ốc vít, sau đó phải lén lút cử người đến mua phụ tùng của main vì khách hàng chỉ đòi linh kiện chuẩn.",
+        "resourceCirculation": "Vốn tự có -> đầu tư khuôn/taro chuẩn -> tự làm linh kiện -> lắp ráp nhanh/bán giá cao -> tái đầu tư máy móc chính xác.",
+        "thirtyChapterMutation": "Sau 30 chương, thị trường vật tư bắt đầu nhập khẩu hàng chuẩn hệ Mét giá rẻ, lợi thế 'tự làm linh kiện chuẩn' của main mất đi, phải chuyển sang cạnh tranh bằng hiệu suất động cơ."
+      },
+      "antiCloneFingerprint": "advantage|metric_standardization|currencies|taps_dies_and_fasteners|conflict|sloppy_work_habits|world|mixed_imperial_metric_scrap_1989"
+    },
+    {
+      "id": "concept_water_head_09",
+      "workingTitle": "Cột Áp Vùng Cao",
+      "readerCuriosity": "Bơm nước ở đồng bằng thì dễ, nhưng làm sao đẩy nước lên đồi dốc trồng cây công nghiệp với công suất máy hạn chế?",
+      "readerFantasy": "Chinh phục địa hình khắc nghiệt bằng kỹ thuật, mở ra một thị trường ngách béo bở mà các ông lớn bỏ qua.",
+      "premise": "Main nhận ra thị trường bơm đồng bằng (lưu lượng lớn, cột áp thấp) đã bão hòa và cạnh tranh khốc liệt. Anh chuyển hướng thiết kế bơm nhiều tầng cánh (multi-stage) để đẩy nước lên đồi cao cho các nông trường cà phê/tiêu mới mở.",
+      "irreversibleProblem": "Xưởng bị chèn ép không mua được phôi đúc vỏ bơm to, main buộc phải tận dụng các phôi nhỏ nhưng phải làm sao cho chúng có giá trị cao.",
+      "protagonistContradiction": "Bơm nhiều tầng cánh đòi hỏi độ đồng tâm cực cao, một sai số nhỏ ở trục sẽ làm cọ xát và phá hủy toàn bộ hệ thống, vượt quá năng lực máy móc hiện tại.",
+      "domainMechanism": "Kỹ thuật thủy lực cột áp cao (High-head hydraulics): Ghép nối tiếp nhiều buồng bơm, tính toán lực dọc trục và thiết kế bạc đạn chịu lực đẩy (thrust bearing).",
+      "conflictEngine": "Hiện tượng xâm thực (Cavitation) phá hủy cánh quạt khi hút nước ở độ sâu lớn, buộc main phải thử nghiệm liên tục để tìm ra góc nghiêng cánh quạt tối ưu.",
+      "emotionalCore": "Niềm vui của những hộ dân đi kinh tế mới khi lần đầu tiên thấy dòng nước vọt lên đỉnh đồi, biến đất cằn thành rẫy xanh.",
+      "differenceClaim": "Tập trung vào một bài toán vật lý cụ thể (cột áp và xâm thực) và một thị trường ngách (vùng đồi núi), tạo ra cảnh quan và thử thách hoàn toàn khác.",
+      "nearestComparisonRisk": "Giống các truyện khai hoang nếu không giữ vững trọng tâm là việc *chế tạo* và *bán* máy bơm, chứ không phải đi trồng cây.",
+      "serialityProof": "Bơm 2 tầng cánh -> giải quyết lỗi xâm thực -> bơm 4 tầng cánh -> thiết kế van một chiều chống búa nước -> thống lĩnh thị trường nông trường.",
+      "openingAdvantage": "Chương 1: Main dùng kiến thức thủy lực, lắp thêm một buồng bơm phụ tự chế vào chiếc bơm cũ, đẩy nước qua ngọn đồi nhỏ, giành được hợp đồng cọc từ một chủ rẫy.",
+      "progressionProof": "Độ cao cột nước đạt được -> tiền cọc từ chủ rẫy -> mua thép hợp kim làm trục -> thuê thợ hàn bậc cao -> mở rộng xưởng.",
+      "worldProof": {
+        "signatureSituations": [
+          "Cảnh test bơm dưới chân đồi, đường ống căng phồng như chực vỡ, main phải áp tai vào vỏ bơm nghe tiếng 'lạo xạo' để đoán mức độ xâm thực.",
+          "Cảnh chương 3: Bơm đẩy nước lên tốt, nhưng khi tắt máy, nước dội ngược (búa nước) làm vỡ toác vỏ bơm, main phải đền tiền và thức trắng đêm chế van một chiều.",
+          "Cảnh các đại lý đồng bằng chê cười bơm của main nhỏ xíu, cho đến khi thấy các chủ rẫy mang từng bao tiền mặt đến tranh nhau mua."
+        ],
+        "institutionalReaction": "Công ty vật tư nông nghiệp tỉnh thấy thị trường vùng cao béo bở, nhập khẩu bơm ngoại về cạnh tranh, ép main phải liên tục cải tiến hiệu suất.",
+        "resourceCirculation": "Tiền cọc chủ rẫy -> mua thép tốt/bi chịu lực -> chế tạo bơm nhiều tầng -> thu nốt tiền -> đầu tư máy phay vạn năng.",
+        "thirtyChapterMutation": "Sau 30 chương, thị trường vùng cao bão hòa, các rẫy đã có đủ bơm, main phải dùng công nghệ bơm áp lực cao này để chuyển sang làm máy xịt rửa công nghiệp hoặc bơm cứu hỏa."
+      },
+      "antiCloneFingerprint": "advantage|multi_stage_high_head|currencies|thrust_bearings_and_pipes|conflict|cavitation_and_water_hammer|world|hilly_cash_crop_farms_1989"
+    },
+    {
+      "id": "concept_casting_bottleneck_10",
+      "workingTitle": "Lò Đúc Đêm Khuya",
+      "readerCuriosity": "Thiết kế bơm giỏi đến mấy cũng vô dụng nếu không có vỏ gang. Làm sao tự xây lò đúc khi không có than cốc và thợ khuôn?",
+      "readerFantasy": "Sự lột xác từ một xưởng lắp ráp phụ thuộc thành một cơ sở làm chủ công nghệ lõi (đúc gang), nắm quyền sinh sát chuỗi cung ứng.",
+      "premise": "Main bị các xưởng đúc địa phương bắt chẹt, giao phôi rỗ, muộn tiến độ. Anh quyết định tự xây lò chảo (cupola furnace) cỡ nhỏ, tự pha trộn cát làm khuôn để tự chủ hoàn toàn vỏ bơm.",
+      "irreversibleProblem": "Đơn hàng lớn đầu tiên bị đe dọa hủy vì xưởng đúc duy nhất trong huyện đình công, phôi gang giao đến toàn bọt khí, tiện vào là mẻ dao.",
+      "protagonistContradiction": "Biết rõ tỷ lệ pha trộn mẻ nấu, nhưng đúc gang là nghệ thuật của kinh nghiệm (nhìn màu lửa, độ ẩm cát), main phải vừa làm vừa học lại từ đầu bằng mồ hôi và máu.",
+      "domainMechanism": "Công nghệ đúc khuôn cát và luyện kim gang xám: Trộn cát, làm lõi (core), tính toán hệ thống rót, đậu ngót để gang điền đầy khuôn mà không bị rỗ khí hay nứt ngót.",
+      "conflictEngine": "Độ ẩm của cát khuôn thay đổi theo thời tiết; than đá địa phương nhiều lưu huỳnh làm gang bị giòn. Mỗi mẻ đúc hỏng là một đống tiền đổ sông đổ biển.",
+      "emotionalCore": "Sự căng thẳng tột độ khi chờ đập khuôn cát, và niềm sung sướng vỡ òa khi lộ ra chiếc vỏ bơm láng mịn, hoàn hảo.",
+      "differenceClaim": "Đưa công đoạn 'đúc' (casting) lên làm trung tâm của câu chuyện, thay vì chỉ là bước nền. Đúc là khâu rủi ro nhất, tốn kém nhất và dễ tạo kịch tính nhất.",
+      "nearestComparisonRisk": "Dễ sa đà vào kỹ thuật luyện kim nhàm chán. Phải gắn mỗi mẻ đúc với áp lực trả nợ, giao hàng và sự mong đợi của gia đình/thợ thuyền.",
+      "serialityProof": "Xây lò nhỏ -> đúc vỏ bơm -> đúc cánh quạt -> giải quyết lỗi rỗ khí -> mở rộng lò -> nhận đúc gia công cho xưởng khác, làm trùm chuỗi cung ứng.",
+      "openingAdvantage": "Chương 1: Main phát hiện nguyên nhân phôi gang bị rỗ là do cát khuôn quá ướt, tự tay sấy cát và đắp lại hệ thống rót, cứu được mẻ đúc cuối cùng của HTX, đổi lấy một mẻ phôi miễn phí.",
+      "progressionProof": "Tỷ lệ phôi đạt chuẩn -> giảm chi phí vỏ bơm -> tiền lãi tăng vọt -> mua than cốc xịn -> xây lò lớn hơn -> thuê thêm thợ đúc.",
+      "worldProof": {
+        "signatureSituations": [
+          "Cảnh main cởi trần, mồ hôi nhễ nhại, dùng sào dài chọc thủng lỗ tháo xỉ lò, dòng gang đỏ rực chảy ra sáng rực cả góc sân giữa đêm.",
+          "Cảnh chương 3: Lô vỏ bơm đầu tiên tự đúc trông rất đẹp, nhưng khi lắp ráp thử áp lực nước thì bị rỉ (rỗ vi mô), main phải đập bỏ toàn bộ, chịu lỗ nặng để giữ uy tín.",
+          "Cảnh chủ xưởng đúc cũ từng chèn ép main nay phải mang tiền đến xin mua lại phôi gang vì lò của ông ta hỏng mà không biết sửa."
+        ],
+        "institutionalReaction": "Sở tài nguyên môi trường (hoặc cơ quan tương đương thời đó) xuống kiểm tra khói bụi, ép main phải đầu tư hệ thống xử lý khí thải hoặc dời xưởng ra xa khu dân cư.",
+        "resourceCirculation": "Vốn liếng/vay mượn -> mua than/gang vụn/cát -> đúc phôi -> gia công bơm -> bán thu tiền -> tái đầu tư lò đúc.",
+        "thirtyChapterMutation": "Sau 30 chương, công nghệ đúc khuôn cát thủ công đạt giới hạn sản lượng, main phải đối mặt với bài toán huy động vốn lớn để nhập dây chuyền đúc mẫu chảy hoặc đúc áp lực."
+      },
+      "antiCloneFingerprint": "advantage|cupola_furnace_casting|currencies|coke_coal_and_foundry_sand|conflict|porosity_and_shrinkage|world|monopolized_foundry_town_1989"
+    },
+    {
+      "id": "concept_cashflow_trap_11",
+      "workingTitle": "Vòng Xoáy Công Nợ",
+      "readerCuriosity": "Làm ra bơm tốt, bán đắt hàng, nhưng tại sao xưởng vẫn đứng bên bờ vực phá sản vì thiếu tiền mặt?",
+      "readerFantasy": "Nghệ thuật tung hứng tài chính (juggling), dùng mỡ nó rán nó, biến nợ nần thành đòn bẩy để nuốt chửng các đối thủ lớn hơn.",
+      "premise": "Main có kỹ thuật, nhưng bài toán khó nhất năm 1989 là lạm phát và công nợ (bán chịu). Main phải thiết kế một cơ chế 'đổi hàng lấy vật tư' (barter) và chiết khấu tiền mặt để duy trì dòng máu cho xưởng.",
+      "irreversibleProblem": "Xưởng có đơn hàng 100 chiếc bơm, nhưng đại lý chỉ trả chậm sau 3 tháng. Trong khi đó, chủ bán dây đồng và gang yêu cầu tiền mặt trao tay.",
+      "protagonistContradiction": "Muốn mở rộng nhanh thì phải cho nợ, nhưng cho nợ thì xưởng chết đói. Phải tìm cách ép đại lý trả tiền ngay mà họ vẫn vui vẻ.",
+      "domainMechanism": "Quản trị dòng tiền (Cash flow management) và chiết khấu thương mại: Thiết kế các gói bán hàng, dùng bơm để cấn trừ nợ vật tư, tạo ra một vòng tuần hoàn khép kín không cần nhiều tiền mặt.",
+      "conflictEngine": "Đại lý chây ì trả nợ; lạm phát làm tiền mất giá (bán bơm hôm nay, 3 tháng sau thu tiền về không đủ mua vật tư làm cái bơm mới).",
+      "emotionalCore": "Sự nhẹ nhõm sau những đêm mất ngủ tính toán từng đồng, khi cuối cùng xưởng cũng có một két sắt đầy tiền mặt, trả đủ lương cho thợ.",
+      "differenceClaim": "Biến 'tài chính vi mô' thành cơ chế cốt lõi. Xung đột không nằm ở việc làm ra cái bơm, mà ở việc làm sao lấy được tiền về trước khi xưởng sập.",
+      "nearestComparisonRisk": "Giống truyện kinh doanh thuần túy. Phải giữ chặt yếu tố sản xuất: dòng tiền phải gắn liền với tiến độ nhập vật tư, đúc phôi, và giao hàng.",
+      "serialityProof": "Bán chịu -> thiếu vốn -> thiết lập chiết khấu tiền mặt -> dùng hàng đổi vật tư -> phát hành 'phiếu mua hàng' -> làm chủ cuộc chơi tài chính địa phương.",
+      "openingAdvantage": "Chương 1: Main dùng 3 chiếc bơm mẫu, không bán lấy tiền mà mang đi đổi trực tiếp lấy 1 tạ dây đồng từ một nhà máy đang cần bơm nhưng không có ngân sách, giải quyết ngay khâu vật tư.",
+      "progressionProof": "Tỷ lệ thu tiền mặt -> vòng quay hàng tồn kho -> số dư quỹ lương -> khả năng mua đứt vật tư giá rẻ -> mở rộng xưởng.",
+      "worldProof": {
+        "signatureSituations": [
+          "Cảnh main ngồi vạch sơ đồ dòng tiền trên bảng đen, chỉ cho thợ thấy xưởng đang 'lãi giả, lỗ thật' vì đọng vốn ở đại lý.",
+          "Cảnh chương 3: Một đại lý lớn tuyên bố vỡ nợ, main mất trắng lô hàng 20 chiếc bơm, phải cắn răng bán rẻ máy tiện của xưởng để trả lương thợ.",
+          "Cảnh main cầm xấp tiền mặt dày cộp đến đập bàn chủ nợ vật tư, yêu cầu giảm giá 20% vì trả ngay, lật ngược thế cờ."
+        ],
+        "institutionalReaction": "Ngân hàng nhà nước siết tín dụng, các xưởng khác chết đứng, main nhờ cơ chế thu tiền mặt tốt nên nhân cơ hội thâu tóm máy móc thanh lý giá bèo.",
+        "resourceCirculation": "Bơm -> đổi lấy vật tư -> sản xuất bơm -> bán chiết khấu lấy tiền mặt -> mua vật tư giá sỉ -> tăng biên lợi nhuận.",
+        "thirtyChapterMutation": "Sau 30 chương, lạm phát được kiểm soát, kinh tế ổn định, bài toán dòng tiền giảm nhiệt, main phải quay lại cạnh tranh bằng đột phá công nghệ (ví dụ: bơm tự mồi)."
+      },
+      "antiCloneFingerprint": "advantage|barter_and_cashflow|currencies|receivables_and_inventory_turns|conflict|inflation_and_bad_debt|world|credit_crunched_market_1989"
+    },
+    {
+      "id": "concept_efficiency_curve_12",
+      "workingTitle": "Đường Cong Hiệu Suất",
+      "readerCuriosity": "Làm sao một chiếc bơm nhỏ xíu, ít tốn điện lại hút được nhiều nước hơn chiếc bơm to đùng của đối thủ?",
+      "readerFantasy": "Sự áp đảo tuyệt đối bằng tri thức khoa học. Dùng toán học và thiết kế tối ưu để đánh bại tư duy 'to là khỏe' của thời đại cũ.",
+      "premise": "Main sử dụng trí nhớ về 'đường cong hiệu suất' (pump performance curve) để gọt giũa cánh quạt và buồng xoắn ốc (volute), tạo ra chiếc bơm đạt điểm hiệu suất tối ưu (BEP) đúng vào nhu cầu thực tế của vùng.",
+      "irreversibleProblem": "Thị trường chuộng bơm to, nặng (tâm lý thích đồ nồi đồng cối đá). Bơm của main nhỏ gọn, bị chê là đồ chơi, không ai thèm mua.",
+      "protagonistContradiction": "Biết chắc thiết kế của mình tiết kiệm 30% điện và ra nhiều nước hơn, nhưng không thể giải thích lý thuyết thủy lực cho nông dân, phải tìm cách chứng minh thực tế.",
+      "domainMechanism": "Tối ưu hóa thủy lực (Hydraulic optimization): Cắt gọt đường kính cánh quạt (impeller trimming), điều chỉnh khe hở để giảm tổn thất dòng chảy và hiện tượng dòng quẩn.",
+      "conflictEngine": "Gia công thủ công khó đạt được biên dạng cong lý tưởng của cánh quạt. Thợ mài lố tay 1mm là hỏng cả đường cong hiệu suất, bơm chạy rung và yếu.",
+      "emotionalCore": "Sự ngỡ ngàng và thán phục của những người thợ già khi thấy chiếc bơm nhỏ bé đánh bại cỗ máy khổng lồ trong cuộc thi bơm nước trực tiếp.",
+      "differenceClaim": "Tập trung vào 'hiệu suất' (efficiency) và 'thiết kế vi mô' (micro-design) thay vì chỉ làm cho máy chạy được. Xung đột đến từ việc gia công chính xác biên dạng cong.",
+      "nearestComparisonRisk": "Dễ trở nên quá hàn lâm. Phải chuyển hóa các thông số kỹ thuật thành kết quả trực quan: tiền điện giảm, nước chảy mạnh hơn, máy êm hơn.",
+      "serialityProof": "Thiết kế tối ưu -> khó gia công -> chế tạo dưỡng đo (template) -> đào tạo thợ mài -> chứng minh thực tế -> thay đổi nhận thức thị trường.",
+      "openingAdvantage": "Chương 1: Main tháo cánh quạt của một chiếc bơm đang chạy yếu, dùng giũa tay gọt lại mép cánh theo góc nghiêng chuẩn, lắp vào nước vọt ra gấp đôi, khiến chủ máy sững sờ.",
+      "progressionProof": "Số lượng dưỡng đo được tạo ra -> độ êm của máy -> tiền điện tiết kiệm được (khách hàng phản hồi) -> doanh số tăng -> mua máy phay định hình.",
+      "worldProof": {
+        "signatureSituations": [
+          "Cảnh main dùng bìa cứng cắt thành các 'dưỡng đo' biên dạng cong, bắt thợ phải mài cánh quạt sao cho ốp vừa khít tấm bìa.",
+          "Cảnh chương 3: Bơm bán ra chạy rất êm nhưng sau 1 tuần thì tụt áp. Main phát hiện do thợ mài cánh quạt không cân, làm mòn phớt. Phải đền tiền và thiết lập khâu cân bằng tĩnh.",
+          "Cảnh tổ chức 'thi bơm nước' tại sân đình: bơm của main nhỏ bằng nửa bơm đối thủ nhưng bơm đầy bể nhanh hơn 5 phút, chốt hạ hàng trăm đơn hàng."
+        ],
+        "institutionalReaction": "Trạm điện lực xã thấy bơm của main tiết kiệm điện, giảm tải cho biến áp, liền chủ động giới thiệu cho các thôn khác mua, tạo ra kênh phân phối bất ngờ.",
+        "resourceCirculation": "Kiến thức tối ưu -> giảm vật liệu (bơm nhỏ hơn) -> giá thành rẻ/hiệu suất cao -> bán chạy -> đầu tư máy móc gia công chính xác.",
+        "thirtyChapterMutation": "Sau 30 chương, đối thủ mua bơm của main về mổ xẻ và sao chép được biên dạng cánh quạt. Main phải chuyển sang nghiên cứu vật liệu mới (nhựa kỹ thuật) để đúc cánh quạt hàng loạt, bỏ xa gia công tay."
+      },
+      "antiCloneFingerprint": "advantage|impeller_trimming_and_bep|currencies|templates_and_flow_rate|conflict|manual_profiling_errors|world|bigger_is_better_mindset_1989"
+    },
+    {
+      "id": "concept_assembly_line_13",
+      "workingTitle": "Nhịp Độ Dây Chuyền",
+      "readerCuriosity": "Làm sao biến một đám thợ quen làm việc tự do, lề mề thành một dây chuyền sản xuất công nghiệp nhịp nhàng?",
+      "readerFantasy": "Thỏa mãn khi thấy sự hỗn loạn được sắp xếp lại thành trật tự, năng suất tăng gấp 10 lần chỉ nhờ thay đổi cách tổ chức công việc.",
+      "premise": "Main không có công nghệ gì quá siêu việt, nhưng áp dụng tư duy 'sản xuất tinh gọn' (Lean manufacturing) và 'dây chuyền lắp ráp' (Assembly line) vào xưởng cơ khí tồi tàn năm 89.",
+      "irreversibleProblem": "Nhận được đơn hàng lớn đột xuất, nhưng với cách làm cũ (mỗi thợ tự làm một cái bơm từ A-Z), xưởng chắc chắn sẽ trễ hẹn và đền hợp đồng.",
+      "protagonistContradiction": "Phải phá vỡ thói quen làm việc và lòng tự ái của các 'thợ cả' (những người thích làm toàn bộ sản phẩm để chứng tỏ tay nghề), ép họ chỉ làm một công đoạn lặp đi lặp lại.",
+      "domainMechanism": "Kỹ thuật công nghiệp (Industrial Engineering): Bấm giờ từng công đoạn, cân bằng chuyền (line balancing), loại bỏ thao tác thừa, thiết kế xe đẩy vật tư.",
+      "conflictEngine": "Sự chống đối của thợ cũ: họ cho rằng làm theo dây chuyền là biến con người thành cái máy. Nút thắt cổ chai (bottleneck) liên tục dịch chuyển khi một khâu làm quá nhanh hoặc quá chậm.",
+      "emotionalCore": "Sự tự hào của tập thể khi nhìn thấy những chiếc bơm xuất xưởng liên tục như nước chảy, thu nhập của mọi người tăng vọt nhờ năng suất.",
+      "differenceClaim": "Xung đột cốt lõi là 'quản trị con người và quy trình' chứ không phải 'kỹ thuật cơ khí'. Main là một nhà quản lý sản xuất (Production Manager) hơn là một kỹ sư thiết kế.",
+      "nearestComparisonRisk": "Dễ thành truyện quản lý nhân sự chung chung. Phải gắn chặt với các công đoạn cơ khí cụ thể: tiện, phay, quấn dây, lắp ráp, sơn.",
+      "serialityProof": "Bấm giờ -> chia công đoạn -> thợ cả đình công -> main tự đứng chuyền chứng minh năng suất -> thiết lập hệ thống thưởng theo sản lượng -> tối ưu hóa kho bãi.",
+      "openingAdvantage": "Chương 1: Main dùng đồng hồ bấm giờ, sắp xếp lại vị trí để đồ nghề của một thợ tiện, giúp ông ta giảm một nửa thời gian tiện một trục bơm, chứng minh sức mạnh của việc tối ưu thao tác.",
+      "progressionProof": "Thời gian hoàn thành 1 sản phẩm (Takt time) giảm -> sản lượng ngày tăng -> quỹ lương tăng -> mua thêm máy móc chuyên dụng -> mở rộng xưởng.",
+      "worldProof": {
+        "signatureSituations": [
+          "Cảnh main vẽ các ô vuông bằng phấn trên nền xưởng, quy định nghiêm ngặt vị trí để phôi và vị trí để thành phẩm, ai để sai vạch sẽ bị phạt.",
+          "Cảnh chương 3: Dây chuyền chạy nhanh nhưng khâu KCS (kiểm tra) không theo kịp, dẫn đến một lô hàng lỗi lọt ra ngoài. Main phải đền hợp đồng và lập tức thêm người vào khâu KCS.",
+          "Cảnh các chủ xưởng khác đến tham quan, thấy thợ của main làm việc nhịp nhàng như múa, không ai nói chuyện phiếm, sản lượng gấp 3 xưởng họ dù máy móc kém hơn."
+        ],
+        "institutionalReaction": "Công đoàn địa phương (hoặc tổ chức tương tự) xuống kiểm tra vì có đơn thư tố cáo main 'bóc lột sức lao động kiểu tư bản', main phải dùng bảng lương cao gấp đôi để chứng minh.",
+        "resourceCirculation": "Tối ưu quy trình -> tăng sản lượng -> giảm chi phí cố định/sản phẩm -> lợi nhuận cao -> đầu tư băng chuyền cơ học.",
+        "thirtyChapterMutation": "Sau 30 chương, dây chuyền tay đã đạt giới hạn tốc độ cực đại. Main phải đối mặt với việc tự động hóa: thiết kế các máy cấp phôi tự động để thay thế sức người ở những khâu nguy hiểm."
+      },
+      "antiCloneFingerprint": "advantage|lean_manufacturing_tactics|currencies|takt_time_and_piece_rates|conflict|bottlenecks_and_worker_resistance|world|craftsman_ego_workshop_1989"
+    },
+    {
+      "id": "concept_paint_and_finish_14",
+      "workingTitle": "Lớp Sơn Chống Rỉ",
+      "readerCuriosity": "Bơm chạy tốt nhưng vỏ ngoài rỉ sét nhem nhuốc thì ai mua? Làm sao giải quyết khâu hoàn thiện sản phẩm trong điều kiện thiếu thốn?",
+      "readerFantasy": "Sự lột xác về ngoại hình sản phẩm. Biến một cục sắt thô kệch thành một món hàng công nghiệp bóng bẩy, bán được giá cao gấp đôi.",
+      "premise": "Main nhận ra các xưởng năm 89 chỉ quan tâm máy chạy được, bỏ qua ngoại hình. Anh đầu tư vào quy trình xử lý bề mặt, sơn tĩnh điện (hoặc sơn sấy thủ công) để tạo ra những chiếc bơm chống rỉ sét, đẹp như hàng ngoại.",
+      "irreversibleProblem": "Môi trường nước phèn ở địa phương ăn mòn vỏ gang chỉ sau 1 tháng, bơm của các xưởng đều biến thành cục sắt gỉ, khách hàng chê bai.",
+      "protagonistContradiction": "Đầu tư vào sơn và xử lý bề mặt tốn kém hóa chất và thời gian, làm chậm tiến độ giao hàng trong khi đại lý đang giục giã.",
+      "domainMechanism": "Công nghệ xử lý bề mặt (Surface treatment): Tẩy gỉ bằng axit, phốt-phát hóa tạo chân bám, và thiết kế lò sấy sơn bằng than tổ ong để sơn bám chắc, chịu được nước phèn.",
+      "conflictEngine": "Hóa chất tẩy rửa độc hại, khó kiểm soát nồng độ. Nhiệt độ lò sấy không đều khiến sơn bị rộp hoặc cháy. Bụi trong xưởng bám vào lớp sơn ướt làm hỏng bề mặt.",
+      "emotionalCore": "Niềm kiêu hãnh khi sản phẩm của xưởng mình được đặt ở vị trí trang trọng nhất trong cửa hàng, đánh bạt mọi hàng nội địa khác nhờ vẻ ngoài hoàn hảo.",
+      "differenceClaim": "Tập trung vào khâu 'hoàn thiện' (Finishing) - một khía cạnh thường bị xem nhẹ trong truyện cơ khí, nhưng lại quyết định giá trị thương mại của sản phẩm.",
+      "nearestComparisonRisk": "Giống truyện làm đồ thủ công mỹ nghệ. Phải nhấn mạnh tính năng *bảo vệ* của lớp sơn (chống ăn mòn, chịu nhiệt) chứ không chỉ là làm đẹp.",
+      "serialityProof": "Sơn tay rỉ sét -> chế lò sấy thủ công -> pha chế hóa chất tẩy nền -> giải quyết lỗi rộp sơn -> xây dựng buồng sơn sạch -> bán giá premium.",
+      "openingAdvantage": "Chương 1: Main mua lại một chiếc bơm cũ chạy tốt nhưng gỉ nát, dùng axit chanh và sơn dầu tự pha, sấy bằng bếp than, biến nó thành như mới và bán lãi gấp 3.",
+      "progressionProof": "Tỷ lệ bơm bị trả lại do gỉ sét giảm -> giá bán tăng -> tiền mua hóa chất chuẩn -> xây buồng sơn cách ly bụi -> đại lý tranh nhau nhập hàng.",
+      "worldProof": {
+        "signatureSituations": [
+          "Cảnh main cẩn thận dùng giấy nhám nước đánh bóng từng góc cạnh của vỏ gang, trong khi thợ cũ cằn nhằn 'chạy được là được, màu mè làm gì'.",
+          "Cảnh chương 3: Lô hàng đầu tiên sơn rất đẹp, nhưng khi khách mang về chạy, nhiệt độ motor làm lớp sơn chảy nhão và bốc mùi khét. Main phải đền tiền và tìm công thức sơn chịu nhiệt.",
+          "Cảnh đại lý huyện dùng cờ-lê gõ mạnh vào vỏ bơm của main, thấy lớp sơn không hề bong tróc mà chỉ móp nhẹ, lập tức ký hợp đồng độc quyền."
+        ],
+        "institutionalReaction": "Cửa hàng hóa chất nhà nước không bán lẻ axit và dung môi, main phải tìm cách chưng cất lại từ nguồn phế phẩm của nhà máy dệt gần đó.",
+        "resourceCirculation": "Bơm đẹp/bền -> bán giá cao -> lợi nhuận lớn -> đầu tư máy phun sơn áp lực -> mua hóa chất xịn -> tăng năng suất hoàn thiện.",
+        "thirtyChapterMutation": "Sau 30 chương, các xưởng khác cũng bắt đầu chú trọng sơn phết. Main phải chuyển sang công nghệ vật liệu mới: đúc vỏ bơm bằng nhựa kỹ thuật hoặc inox để chống rỉ vĩnh viễn."
+      },
+      "antiCloneFingerprint": "advantage|surface_treatment_and_baking|currencies|acid_baths_and_premium_pricing|conflict|dust_and_temperature_control|world|acidic_water_region_1989"
+    },
+    {
+      "id": "concept_noise_reduction_15",
+      "workingTitle": "Vòng Bi Tĩnh Âm",
+      "readerCuriosity": "Bơm nước kêu to như máy cày là chuyện bình thường năm 89. Làm sao chế tạo được chiếc bơm chạy êm ru trong đêm?",
+      "readerFantasy": "Chinh phục thị trường thành thị và khu dân cư đông đúc bằng sự tinh tế của kỹ thuật giảm chấn và cân bằng động.",
+      "premise": "Main nhắm vào thị trường ngách mới nổi: các hộ gia đình ở thị trấn/thành phố cần bơm nước lên bồn trên cao nhưng ghét tiếng ồn. Anh tập trung giải quyết bài toán rung lắc và tiếng ồn của động cơ.",
+      "irreversibleProblem": "Xưởng nhận được đơn hàng từ khu tập thể cán bộ, nhưng lô bơm mẫu bị trả về vì khi chạy ban đêm làm cả khu mất ngủ.",
+      "protagonistContradiction": "Để giảm ồn cần vòng bi xịn và máy cân bằng động, nhưng xưởng chỉ có vòng bi rẻ tiền và gia công tay. Phải dùng mẹo cơ học để triệt tiêu rung động.",
+      "domainMechanism": "Kỹ thuật giảm ồn và rung động (NVH - Noise, Vibration, Harshness): Cân bằng động cánh quạt bằng cách khoan bớt khối lượng, thiết kế đệm cao su giảm chấn, và căn chỉnh đồng trục tuyệt đối.",
+      "conflictEngine": "Vòng bi (bạc đạn) trên thị trường chất lượng tồi, bi không tròn đều. Trục tiện bị đảo (runout) dù chỉ 0.1mm cũng gây tiếng rít chói tai khi chạy ở tốc độ cao.",
+      "emotionalCore": "Sự bình yên của những giấc ngủ không bị làm phiền, và sự nể trọng của tầng lớp khách hàng khó tính dành cho một người thợ tỉnh lẻ.",
+      "differenceClaim": "Lấy 'tiếng ồn' làm kẻ thù chính. Đòi hỏi sự chính xác vi mô và các giải pháp sáng tạo về vật liệu giảm chấn (cao su, lò xo).",
+      "nearestComparisonRisk": "Dễ bị nhầm với truyện âm thanh/loa đài. Phải gắn chặt tiếng ồn với các lỗi cơ khí cơ bản: ma sát, lệch trục, mất cân bằng động.",
+      "serialityProof": "Dùng đệm cao su -> tự lựa chọn và bảo dưỡng vòng bi -> chế máy cân bằng động thô sơ -> thiết kế lại vỏ tản nhiệt để giảm tiếng rít gió -> chiếm lĩnh thị trường thành thị.",
+      "openingAdvantage": "Chương 1: Main giải quyết tiếng kêu chói tai của chiếc bơm nhà chủ tịch xã chỉ bằng cách chêm một miếng cao su cắt từ lốp xe cũ vào đúng điểm cộng hưởng, được cấp giấy phép mở xưởng.",
+      "progressionProof": "Độ ồn (đo bằng cảm nhận/độ rung mặt nước) giảm -> bán được vào khu tập thể -> giá bán cao -> mua vòng bi nhập khẩu -> chế tạo máy cân bằng.",
+      "worldProof": {
+        "signatureSituations": [
+          "Cảnh main đặt một ly nước đầy lên lưng chiếc bơm đang chạy, yêu cầu thợ phải căn chỉnh trục sao cho mặt nước không gợn sóng.",
+          "Cảnh chương 3: Bơm chạy êm, nhưng sau 1 tháng đệm cao su tự chế bị lão hóa, xẹp xuống làm trục lệch và phá nát vòng bi. Main phải đền máy và tìm nguồn cao su chịu dầu/nhiệt.",
+          "Cảnh khách hàng thành phố đến tận xưởng, áp tai vào máy đang chạy thử và ngỡ ngàng vì chỉ nghe tiếng nước chảy chứ không nghe tiếng động cơ."
+        ],
+        "institutionalReaction": "Các xưởng đối thủ tung tin đồn bơm của main chạy êm là do công suất yếu. Main phải tổ chức buổi thử nghiệm công khai: bơm nước lên tầng 3 mà vẫn êm ru.",
+        "resourceCirculation": "Bơm tĩnh âm -> bán cho người giàu/cơ quan -> biên lợi nhuận cao -> đầu tư máy tiện chính xác cao -> nhập vòng bi xịn.",
+        "thirtyChapterMutation": "Sau 30 chương, thị trường thành thị bão hòa, main dùng công nghệ cân bằng động này để lấn sân sang sản xuất quạt thông gió công nghiệp hoặc máy ly tâm."
+      },
+      "antiCloneFingerprint": "advantage|nvh_and_dynamic_balancing|currencies|bearings_and_rubber_mounts|conflict|runout_and_resonance|world|urban_residential_market_1989"
+    },
+    {
+      "id": "concept_seal_and_leak_16",
+      "workingTitle": "Phớt Cơ Khí",
+      "readerCuriosity": "Bơm nước mạnh đến đâu mà rỉ nước vào động cơ thì cũng cháy. Làm sao chế tạo phớt chắn nước hoàn hảo khi không có vật liệu hiện đại?",
+      "readerFantasy": "Làm chủ công nghệ cốt lõi nhỏ bé nhưng quyết định sự sống còn của cả cỗ máy, bẻ gãy sự độc quyền của hàng ngoại nhập.",
+      "premise": "Main phát hiện ra 90% bơm hỏng năm 89 là do hỏng phớt (seal) làm nước rò vào motor. Thay vì làm cả cái bơm, anh tập trung nghiên cứu chế tạo 'phớt cơ khí' (mechanical seal) bằng gốm và than chì, bán cho tất cả các xưởng khác.",
+      "irreversibleProblem": "Nguồn cung phớt cao su từ Liên Xô bị cắt đứt, toàn bộ các xưởng bơm trong tỉnh đứng hình vì không có linh kiện chắn nước.",
+      "protagonistContradiction": "Biết cấu tạo phớt cơ khí hiện đại, nhưng việc mài phẳng tuyệt đối hai mặt tiếp xúc (gốm và than chì) bằng tay là điều không tưởng.",
+      "domainMechanism": "Công nghệ mài nghiền (Lapping) và vật liệu ma sát: Dùng bột rà (abrasive compound) và mặt kính phẳng để mài hai mặt phớt đạt độ phẳng quang học, ngăn nước tuyệt đối dù trục quay tốc độ cao.",
+      "conflictEngine": "Than chì lấy từ lõi pin cũ quá bở; gốm tận dụng từ sứ cách điện quá cứng, khó gia công. Lò xo ép phớt tự quấn không đều lực làm phớt bị hở khi chạy nóng.",
+      "emotionalCore": "Sự tự hào khi một linh kiện nhỏ bằng đồng xu do xưởng mình làm ra lại là trái tim bảo vệ cho hàng ngàn cỗ máy lớn hoạt động bền bỉ.",
+      "differenceClaim": "Chuyển hướng từ B2C (bán bơm cho dân) sang B2B sâu hơn (bán linh kiện cốt lõi cho xưởng bơm). Tập trung vào độ chính xác siêu vi mô (độ phẳng).",
+      "nearestComparisonRisk": "Có thể quá hẹp và khô khan. Phải mở rộng ra các ứng dụng khác của phớt (bơm hóa chất, bơm nước nóng) và các cuộc đàm phán với xưởng lớn.",
+      "serialityProof": "Chế phớt cho bơm nhà -> bán phớt cho xưởng nhỏ -> giải quyết lỗi mài mòn -> chế phớt chịu nhiệt/hóa chất -> trở thành nhà cung cấp linh kiện độc quyền.",
+      "openingAdvantage": "Chương 1: Main tháo lõi pin con thỏ, kết hợp với mảnh sứ vỡ, tự tay mài trên mặt kính suốt đêm để tạo ra bộ phớt cơ khí đầu tiên, cứu chiếc bơm duy nhất của trạm xá xã.",
+      "progressionProof": "Số giờ chạy không rỉ nước -> đơn đặt hàng từ các xưởng -> tiền mua bột kim cương mài -> chế máy mài lapping tự động -> mở rộng quy mô.",
+      "worldProof": {
+        "signatureSituations": [
+          "Cảnh main dùng ánh sáng đèn pin chiếu qua khe hở giữa hai mặt phớt ép vào nhau, nếu lọt sáng dù chỉ một tia là bắt thợ mài lại từ đầu.",
+          "Cảnh chương 3: Phớt kín nước hoàn toàn, nhưng do lò xo ép quá căng, ma sát làm mặt than chì bốc khói và vỡ vụn sau 2 giờ chạy. Main phải đền tiền và tính toán lại lực ép lò xo.",
+          "Cảnh các giám đốc xưởng bơm lớn từng khinh khỉnh nay phải xếp hàng ở cửa xưởng main, cầm tiền mặt năn nỉ mua từng hộp phớt."
+        ],
+        "institutionalReaction": "Nhà máy cơ khí quốc doanh của tỉnh thấy main làm được phớt, muốn ép main giao nộp công nghệ với danh nghĩa 'đóng góp cho nhà nước', main phải dùng bằng sáng chế hoặc liên doanh để bảo vệ.",
+        "resourceCirculation": "Bán phớt -> thu tiền mặt nhanh -> mua vật liệu gốm/than chì chuẩn -> đầu tư máy mài phẳng -> sản xuất hàng loạt -> giảm giá thành đè bẹp hàng lậu.",
+        "thirtyChapterMutation": "Sau 30 chương, khi đã làm chủ công nghệ phớt, main không bán phớt nữa mà dùng lợi thế này để quay lại sản xuất dòng bơm chìm (submersible pump) cao cấp, đánh bật mọi đối thủ."
+      },
+      "antiCloneFingerprint": "advantage|mechanical_seal_lapping|currencies|graphite_ceramics_and_abrasives|conflict|optical_flatness_and_spring_tension|world|seal_shortage_crisis_1989"
+    },
+    {
+      "id": "concept_power_source_17",
+      "workingTitle": "Bơm Không Cần Điện",
+      "readerCuriosity": "Vùng sâu vùng xa không có điện lưới, làm sao bán được máy bơm nước cho họ?",
+      "readerFantasy": "Sự sáng tạo vượt ra ngoài khuôn khổ, kết hợp các loại máy móc khác nhau để tạo ra giải pháp sinh tồn cho những vùng đất bị lãng quên.",
+      "premise": "Main thiết kế các bộ chuyển đổi (adapter) và hộp số để gắn đầu bơm nước vào các nguồn động lực có sẵn ở nông thôn: máy cày tay (công nông), động cơ diesel cũ, hoặc thậm chí là sức kéo của trâu bò/sức nước.",
+      "irreversibleProblem": "Xưởng lỡ sản xuất một lô đầu bơm lớn nhưng đối tác cung cấp motor điện phá sản. Main ôm đống đầu bơm không có động cơ, nguy cơ vỡ nợ.",
+      "protagonistContradiction": "Thiết kế đầu bơm chạy điện thì quay tốc độ cao (2900 vòng/phút), nhưng máy nổ diesel hoặc sức kéo lại quay rất chậm. Phải chế tạo bộ tăng tốc (hộp số/puli) mà không làm suy hao quá nhiều công suất.",
+      "domainMechanism": "Kỹ thuật truyền động (Transmission engineering): Tính toán tỷ số truyền của puli, dây curoa, và thiết kế trục các-đăng (cardan) để nối đầu bơm với các loại máy nổ rung lắc mạnh.",
+      "conflictEngine": "Dây curoa chất lượng kém bị trượt và đứt khi chạy tải nặng. Trục nối không đồng tâm làm gãy trục máy nổ của nông dân, gây thiệt hại lớn.",
+      "emotionalCore": "Niềm vui của những bản làng xa xôi lần đầu tiên có nước sạch bơm từ suối lên nhờ chiếc máy cày cũ kỹ của trưởng bản.",
+      "differenceClaim": "Tách rời 'đầu bơm' và 'động cơ'. Xung đột nằm ở việc 'ghép nối' (coupling) hai hệ thống không sinh ra để dành cho nhau.",
+      "nearestComparisonRisk": "Giống truyện chế tạo xe cộ. Phải giữ trọng tâm là việc bơm nước và giải quyết nhu cầu tưới tiêu/sinh hoạt, hộp số chỉ là phương tiện.",
+      "serialityProof": "Chế puli nối máy cày -> giải quyết đứt dây curoa -> chế hộp số tăng tốc -> làm bơm chạy bằng sức dòng chảy (ram pump) -> thống lĩnh thị trường vùng sâu.",
+      "openingAdvantage": "Chương 1: Main cứu vãn lô đầu bơm ế bằng cách hàn một bộ khung thép, dùng dây curoa nối đầu bơm với chiếc máy cày D8 của nhà hàng xóm, bơm nước ầm ầm trước sự ngỡ ngàng của chủ nợ.",
+      "progressionProof": "Số lượng đầu bơm bán được -> tiền mua thép làm khung/puli -> thuê thợ hàn -> thiết kế các bộ kit lắp ráp chuẩn -> mở rộng thị trường lên miền núi.",
+      "worldProof": {
+        "signatureSituations": [
+          "Cảnh test máy: Đầu bơm được nối với một chiếc máy nổ diesel cũ nát, máy nổ rung bần bật nhảy chồm chồm trên mặt đất nhưng đầu bơm vẫn hút nước ổn định nhờ khớp nối mềm tự chế.",
+          "Cảnh chương 3: Khớp nối cứng quá làm gãy trục khuỷu máy nổ của khách. Main phải đền cả cái máy nổ (số tiền khổng lồ) và thức trắng đêm chế tạo khớp nối các-đăng từ phụ tùng xe tải cũ.",
+          "Cảnh đại lý vùng cao chất đầy các 'bộ kit chuyển đổi' của main, nông dân chỉ cần mua về tự vặn ốc là gắn được bơm vào bất kỳ động cơ nào họ có."
+        ],
+        "institutionalReaction": "Các trạm xăng dầu địa phương thấy máy nổ chạy bơm tiêu thụ nhiều dầu, liền bắt tay với main để khuyến mãi: mua bơm tặng phiếu mua dầu, tạo ra liên minh chéo.",
+        "resourceCirculation": "Bán đầu bơm + bộ kit -> thu tiền mặt -> mua thép/dây curoa/bi -> sản xuất hàng loạt bộ kit -> giảm giá thành -> độc chiếm thị trường không điện.",
+        "thirtyChapterMutation": "Sau 30 chương, điện lưới quốc gia kéo về các vùng sâu, nhu cầu bơm chạy máy nổ giảm. Main dùng kinh nghiệm làm hộp số để chuyển sang sản xuất máy trộn bê tông hoặc tời kéo."
+      },
+      "antiCloneFingerprint": "advantage|power_take_off_adapters|currencies|pulleys_belts_and_kits|conflict|rpm_mismatch_and_vibration|world|off_grid_villages_1989"
+    },
+    {
+      "id": "concept_weight_reduction_18",
+      "workingTitle": "Bơm Xách Tay",
+      "readerCuriosity": "Nông dân phải vác máy bơm lội qua hàng cây số đường bùn. Làm sao chế tạo chiếc bơm đủ nhẹ để xách một tay mà vẫn đủ mạnh?",
+      "readerFantasy": "Tối ưu hóa thiết kế đến mức cực đoan, tạo ra một sản phẩm mang tính cách mạng về tính cơ động, thay đổi hoàn toàn thói quen canh tác.",
+      "premise": "Main nhận ra nỗi khổ của việc di chuyển máy bơm gang nặng 40kg. Anh quyết định thiết kế lại toàn bộ, dùng vỏ nhôm mỏng có gân chịu lực, trục rỗng, và motor quấn dây nhôm (thay vì đồng) để ép trọng lượng xuống dưới 15kg.",
+      "irreversibleProblem": "Mùa mưa bão, ruộng ngập úng cục bộ rải rác, nông dân không thể vác máy bơm to đi từng thửa ruộng nhỏ để cứu lúa. Cần một giải pháp cơ động gấp.",
+      "protagonistContradiction": "Làm nhẹ thì dễ hỏng. Vỏ mỏng dễ nứt khi va đập, dây nhôm dễ cháy nếu chạy lâu. Phải tìm điểm cân bằng giữa 'nhẹ' và 'bền'.",
+      "domainMechanism": "Kỹ thuật tối ưu hóa kết cấu (Structural optimization) và tản nhiệt: Tính toán vị trí đặt các gân gia cường (ribs) để vỏ mỏng vẫn chịu được áp lực nước; thiết kế cánh quạt gió làm mát cực mạnh cho motor dây nhôm.",
+      "conflictEngine": "Thợ hàn làm thủng vỏ nhôm vì nhiệt độ quá cao. Khách hàng quen thói quăng quật máy bơm gang, áp dụng với bơm nhôm làm vỡ vỏ, đòi bắt đền.",
+      "emotionalCore": "Sự biết ơn của những người phụ nữ, người già ở nông thôn giờ đây cũng có thể tự xách máy bơm đi tưới rau mà không cần chờ đàn ông giúp.",
+      "differenceClaim": "Xung đột xoay quanh 'trọng lượng' và 'độ bền cơ học'. Sự đánh đổi (trade-off) giữa vật liệu nhẹ và thói quen sử dụng bạo lực của người dùng.",
+      "nearestComparisonRisk": "Giống truyện làm đồ gia dụng. Phải giữ môi trường làm việc khắc nghiệt của nông nghiệp: bùn đất, va đập, chạy liên tục nhiều giờ.",
+      "serialityProof": "Giảm trọng lượng vỏ -> giải quyết lỗi nứt vỡ -> thay dây đồng bằng dây nhôm -> giải quyết lỗi quá nhiệt -> thiết kế quai xách công thái học -> tạo ra trào lưu mới.",
+      "openingAdvantage": "Chương 1: Main cưa bỏ 1/3 khối lượng gang thừa trên một chiếc bơm cũ, hàn thêm quai xách, giúp một bà lão neo đơn tự xách được bơm ra ruộng cứu luống hoa màu, thu hút sự chú ý của cả làng.",
+      "progressionProof": "Trọng lượng bơm giảm dần -> doanh số bán cho hộ gia đình nhỏ tăng -> tiền mua máy hàn Tig (hàn nhôm) -> đào tạo thợ hàn -> mở rộng tệp khách hàng.",
+      "worldProof": {
+        "signatureSituations": [
+          "Cảnh main dùng búa gõ vào các mẫu vỏ nhôm mỏng có gân chịu lực khác nhau, lắng nghe âm thanh để kiểm tra độ cứng vững trước khi đem thử áp lực.",
+          "Cảnh chương 3: Bơm xách tay bán rất chạy, nhưng một khách hàng làm rơi từ bờ ruộng xuống, vỏ nhôm vỡ toác. Main phải đền máy mới và thiết kế thêm khung thép ống bảo vệ bên ngoài.",
+          "Cảnh tại cửa hàng đại lý: khách hàng nam định mua bơm gang to, nhưng người vợ đi cùng xách thử chiếc bơm của main lên thấy nhẹ bẫng, lập tức quyết định mua hàng của main."
+        ],
+        "institutionalReaction": "Các xưởng làm bơm gang truyền thống tung tin đồn 'bơm nhẹ là bơm rởm, ăn bớt vật tư'. Main phải làm chiến dịch marketing: cho bơm chạy liên tục 48h trong lồng kính tại chợ huyện để chứng minh độ bền.",
+        "resourceCirculation": "Bán bơm nhẹ -> biên lợi nhuận cao (ít tốn vật liệu) -> đầu tư máy hàn/khuôn đúc nhôm -> sản xuất hàng loạt -> thay đổi tiêu chuẩn ngành.",
+        "thirtyChapterMutation": "Sau 30 chương, các xưởng khác cũng bắt chước làm bơm nhôm. Main dùng lợi thế về thiết kế nhỏ gọn để lấn sân sang thị trường bơm chìm giếng khoan (cần đường kính cực nhỏ)."
+      },
+      "antiCloneFingerprint": "advantage|structural_ribbing_and_weight_reduction|currencies|aluminum_and_tig_welding|conflict|fragility_and_overheating|world|fragmented_flooded_fields_1989"
+    },
+    {
+      "id": "concept_winter_freeze_19",
+      "workingTitle": "Chống Đóng Băng",
+      "readerCuriosity": "Ở vùng núi cao mùa đông nước đóng băng làm nứt vỡ vỏ bơm. Làm sao chế tạo chiếc bơm 'biết tự sưởi ấm' hoặc xả nước tự động?",
+      "readerFantasy": "Chiến thắng thiên nhiên khắc nghiệt. Sản phẩm của main trở thành cứu cánh duy nhất cho cả một vùng kinh tế trong mùa đông giá rét.",
+      "premise": "Bối cảnh mở rộng lên vùng núi phía Bắc (hoặc vùng có mùa đông khắc nghiệt). Bơm nước để ngoài trời qua đêm bị đóng băng, nước nở ra làm nứt toác vỏ gang. Main thiết kế van xả đáy tự động và buồng bơm co giãn để chống nứt.",
+      "irreversibleProblem": "Một đợt rét đậm bất thường ập đến, 100% máy bơm của nông trường chè bị nứt vỏ, đe dọa toàn bộ hệ thống tưới tiêu khi sương muối xuống.",
+      "protagonistContradiction": "Thiết kế van xả tự động cần lò xo lưỡng kim (bimetallic) nhạy nhiệt, nhưng vật liệu này năm 89 cực kỳ hiếm. Phải dùng giải pháp cơ học thuần túy: van xả bằng trọng lực hoặc áp suất.",
+      "domainMechanism": "Vật lý nhiệt động lực học (Thermodynamics) và cơ học chất lỏng: Thiết kế vỏ bơm có hình dáng bầu dục để phân tán lực nở của đá, và van xả tự động mở khi máy ngừng chạy để tháo cạn nước.",
+      "conflictEngine": "Thợ lắp ráp quên bôi mỡ chống kẹt, van xả bị rỉ sét không mở được, bơm vẫn bị nứt. Khách hàng lười không chịu che chắn máy, phó mặc hoàn toàn cho tính năng chống băng.",
+      "emotionalCore": "Sự ấm áp và hy vọng khi giữa cánh đồng chè trắng xóa sương giá, những chiếc bơm của main vẫn giật nổ và phun ra dòng nước cứu sống cây trồng.",
+      "differenceClaim": "Đưa yếu tố 'thời tiết cực đoan' (đóng băng) làm bài toán kỹ thuật chính. Xung đột không chỉ với con người mà với định luật vật lý (nước nở ra khi đông đá).",
+      "nearestComparisonRisk": "Giống truyện sinh tồn mùa đông. Phải giữ vững góc nhìn của người làm xưởng: sản xuất hàng loạt, bảo hành, và thu tiền từ nỗi sợ thời tiết của khách hàng.",
+      "serialityProof": "Chế van xả tay -> khách quên xả bị nứt -> đền tiền -> chế van xả tự động bằng áp suất -> thử nghiệm vật liệu đàn hồi -> độc quyền thị trường vùng lạnh.",
+      "openingAdvantage": "Chương 1: Main đi thu mua vỏ bơm nứt giá đồng nát, dùng kỹ thuật hàn gang (nung nóng toàn bộ rồi hàn) để phục hồi, lắp thêm một cái vòi xả nhỏ ở đáy, bán lại cho chính nông trường với giá cao.",
+      "progressionProof": "Số lượng bơm phục hồi -> tiền mua phôi gang mới -> thiết kế khuôn đúc vỏ bầu dục -> sản xuất bơm chống băng thế hệ mới -> ký hợp đồng với tổng nông trường.",
+      "worldProof": {
+        "signatureSituations": [
+          "Cảnh main nhét chiếc bơm mẫu vào tủ đông của xưởng kem que duy nhất trong huyện, để qua đêm rồi mang ra đập đá chạy thử trước mặt giám đốc nông trường.",
+          "Cảnh chương 3: Van xả tự động hoạt động tốt, nhưng khi bơm chạy, van đóng không kín làm tụt áp lực nước. Main phải đền hợp đồng và thiết kế lại gioăng cao su chịu lạnh.",
+          "Cảnh các đại lý vùng đồng bằng ế ẩm mùa đông, trong khi xưởng của main ở vùng núi phải đốt đuốc làm ca đêm để kịp giao hàng chạy rét."
+        ],
+        "institutionalReaction": "Cục khí tượng dự báo mùa đông năm sau sẽ ấm, các đại lý hủy đơn hàng cọc. Main phải đánh cược vào trí nhớ trọng sinh (năm đó rét kỷ lục) để tiếp tục sản xuất và ôm trọn thị trường khi rét ập đến.",
+        "resourceCirculation": "Bán bơm chống rét -> thu tiền mặt/chè xuất khẩu -> mua vật tư -> cải tiến van tự động -> mở rộng xưởng -> tích trữ hàng chờ rét.",
+        "thirtyChapterMutation": "Sau 30 chương, hết mùa đông, nhu cầu bơm chống băng về không. Main phải dùng công nghệ van tự động này để chế tạo hệ thống tưới nhỏ giọt hoặc bơm định lượng cho mùa xuân."
+      },
+      "antiCloneFingerprint": "advantage|freeze_protection_design|currencies|welding_rods_and_tea_barter|conflict|ice_expansion_and_valve_failure|world|frost_prone_highlands_1989"
+    },
+    {
+      "id": "concept_packaging_transit_20",
+      "workingTitle": "Thùng Gỗ Chống Sốc",
+      "readerCuriosity": "Bơm làm ra rất tốt, nhưng đường đất đỏ năm 89 xóc như rang lạc làm gãy chân đế, vỡ vỏ trước khi đến tay khách. Làm sao giải quyết?",
+      "readerFantasy": "Tư duy hệ thống toàn diện: Không chỉ làm ra sản phẩm tốt, mà còn đảm bảo nó hoàn hảo cho đến tận tay người dùng cuối, đánh bại sự cẩu thả của thời đại.",
+      "premise": "Main nhận ra tỷ lệ hỏng hóc do vận chuyển (transit damage) lên tới 20%. Thay vì gia cố cái bơm cho nặng thêm, anh tập trung thiết kế hệ thống đóng gói (packaging) bằng rơm, gỗ tạp và dây đai tự chế để hấp thụ xung lực.",
+      "irreversibleProblem": "Một chuyến xe tải chở 50 cái bơm giao cho đại lý xa bị sụp ổ voi. Bơm va vào nhau gãy nát chân đế, tài xế bỏ trốn, xưởng đứng trước nguy cơ đền trắng tay.",
+      "protagonistContradiction": "Đóng gói kỹ thì tốn tiền gỗ, tiền rơm, làm tăng giá thành và giảm sức cạnh tranh. Phải thiết kế thùng gỗ sao cho vừa chống sốc, vừa có thể tháo ra làm kệ trưng bày cho đại lý.",
+      "domainMechanism": "Kỹ thuật đóng gói và logistics (Packaging engineering): Tính toán điểm trọng tâm của bơm, thiết kế các thanh nêm gỗ và lớp đệm rơm ép để triệt tiêu lực văng ngang và lực dội dọc.",
+      "conflictEngine": "Rơm ẩm làm rỉ sét vỏ bơm trong quá trình lưu kho. Thợ đóng thùng làm ẩu, đóng đinh xuyên vào cuộn dây motor. Đại lý vứt bỏ thùng gỗ bừa bãi gây lãng phí.",
+      "emotionalCore": "Sự an tâm tuyệt đối của khách hàng khi nhận một sản phẩm được nâng niu, trân trọng từ nhà sản xuất, khác hẳn thói quen quăng quật hàng hóa thời bao cấp.",
+      "differenceClaim": "Đưa khâu 'đóng gói và vận chuyển' (Logistics/Packaging) lên làm nút thắt sinh tử. Xung đột diễn ra trên những chuyến xe tải xóc nảy, không phải trong xưởng.",
+      "nearestComparisonRisk": "Dễ thành truyện vận tải/xe cộ. Phải gắn chặt việc đóng gói với thiết kế cơ khí của cái bơm (ví dụ: đúc thêm các gờ để ngoạm dây đai).",
+      "serialityProof": "Bơm vỡ do vận chuyển -> thiết kế thùng gỗ chèn rơm -> rơm ẩm làm rỉ bơm -> thiết kế thùng carton tẩm sáp -> đại lý trả lại vỏ thùng lấy tiền cọc -> tối ưu chuỗi cung ứng.",
+      "openingAdvantage": "Chương 1: Main cứu lô hàng 50 cái bơm bị vỡ chân đế bằng cách tự tay hàn lại, sau đó đi xin lốp xe đạp cũ cắt ra làm đệm lót, đóng lại lên xe bò chở an toàn đến đại lý, lấy lại được uy tín.",
+      "progressionProof": "Tỷ lệ hàng vỡ khi vận chuyển giảm về 0 -> đại lý vùng sâu dám đặt hàng -> tiền cọc tăng -> thuê xưởng mộc đóng thùng -> mở rộng bán kính phân phối.",
+      "worldProof": {
+        "signatureSituations": [
+          "Cảnh main biểu diễn độ an toàn bằng cách ôm nguyên thùng gỗ chứa máy bơm ném từ thùng xe tải xuống đất trước mặt đại lý, mở ra bơm vẫn nguyên vẹn.",
+          "Cảnh chương 3: Bơm không vỡ, nhưng rơm lót bên trong chưa phơi khô, ủ hơi ẩm làm toàn bộ lô bơm bị rỉ sét sau 1 tuần lưu kho. Main phải đền tiền và xây lò sấy rơm.",
+          "Cảnh các đại lý giữ lại những chiếc thùng gỗ đóng bơm của main, ghép lại thành kệ trưng bày rất đẹp, vô tình tạo ra bộ nhận diện thương hiệu độc quyền."
+        ],
+        "institutionalReaction": "Trạm kiểm lâm làm khó dễ việc main mua gỗ tạp đóng thùng, ép main phải chuyển sang nghiên cứu dùng bẹ chuối ép hoặc giấy bồi làm vật liệu chống sốc.",
+        "resourceCirculation": "Bơm an toàn đến đích -> thu tiền đúng hạn -> mua gỗ/rơm/đinh -> đóng gói chuyên nghiệp -> mở rộng thị trường ra tỉnh ngoài -> tăng doanh thu.",
+        "thirtyChapterMutation": "Sau 30 chương, đường sá được rải nhựa, rủi ro vận chuyển giảm. Main dùng hệ thống thùng gỗ và đệm lót này để chuyển sang xuất khẩu bơm sang các nước lân cận (yêu cầu đóng gói đường biển khắt khe)."
+      },
+      "antiCloneFingerprint": "advantage|packaging_and_shock_absorption|currencies|scrap_wood_and_straw|conflict|transit_damage_and_moisture|world|potholed_dirt_roads_1989"
+    }
+  ],
+  "rejectedNearDuplicateIds": [],
+  "ranking": {
+    "schemaVersion": 2,
+    "matches": [
+      {
+        "leftId": "concept_precision_jigs_01",
+        "rightId": "concept_modular_assembly_03",
+        "winnerId": "concept_precision_jigs_01",
+        "reason": "Đồ gá cơ khí (jigs) giải quyết trực tiếp bài toán sai số sản xuất tại nguồn, trong khi mô hình lắp ráp phân tán năm 1989 sẽ sụp đổ ngay lập tức do dung sai tích lũy từ các hộ gia đình làm ẩu."
+      },
+      {
+        "leftId": "concept_muddy_water_04",
+        "rightId": "concept_voltage_drop_02",
+        "winnerId": "concept_muddy_water_04",
+        "reason": "Bơm bùn đất sét giải quyết một nỗi đau nông nghiệp cực kỳ trực quan và cấp bách trong mùa hạn hán, tạo ra sức hút thị trường mạnh mẽ hơn việc tối ưu hóa sụt áp điện lưới vốn khó chứng minh thực địa."
+      },
+      {
+        "leftId": "concept_casting_bottleneck_10",
+        "rightId": "concept_scrap_substitution_06",
+        "winnerId": "concept_casting_bottleneck_10",
+        "reason": "Làm chủ lò đúc gang xám là kiểm soát công nghệ lõi và chuỗi cung ứng vỏ bơm, mang lại tiến bộ vật chất bền vững hơn việc tận dụng nhôm phế liệu vốn dễ nứt vỡ và không chịu nổi áp lực cao."
+      },
+      {
+        "leftId": "concept_precision_jigs_01",
+        "rightId": "concept_muddy_water_04",
+        "winnerId": "concept_precision_jigs_01",
+        "reason": "Đồ gá chính xác là nền tảng của mọi loại bơm. Không có đồ gá để chuẩn hóa mâm cặp máy tiện cũ, xưởng không thể gia công trục cho cả bơm bùn lẫn bơm thường."
+      },
+      {
+        "leftId": "concept_muddy_water_04",
+        "rightId": "concept_casting_bottleneck_10",
+        "winnerId": "concept_muddy_water_04",
+        "reason": "Bơm bùn đất sét có điểm chạm khách hàng cực mạnh nhờ cứu sống trực tiếp các ruộng lúa khô cạn, tạo ra dòng tiền nhanh hơn việc tập trung xây dựng lò đúc tốn kém ở giai đoạn đầu."
+      },
+      {
+        "leftId": "concept_dealer_leverage_05",
+        "rightId": "concept_cashflow_trap_11",
+        "winnerId": "concept_cashflow_trap_11",
+        "reason": "Vòng xoáy công nợ khai thác sâu sắc thực tế lạm phát và cơ chế đổi hàng lấy vật tư năm 1989, tạo ra nhiều lựa chọn tài chính khó khăn hơn là chỉ đàm phán đại lý đơn thuần."
+      },
+      {
+        "leftId": "concept_standardization_08",
+        "rightId": "concept_service_first_07",
+        "winnerId": "concept_standardization_08",
+        "reason": "Chuẩn hóa hệ mét tạo ra xung đột kỹ thuật sâu sắc giữa sự tùy tiện của thợ cũ và kỷ luật công nghiệp, vượt trội hơn việc đi sửa dạo tích lũy dữ liệu vốn có nhịp độ chậm."
+      },
+      {
+        "leftId": "concept_water_head_09",
+        "rightId": "concept_power_source_17",
+        "winnerId": "concept_water_head_09",
+        "reason": "Cột áp vùng cao khai thác bài toán vật lý phức tạp về xâm thực và búa nước trên địa hình đồi dốc, có tính nhân quả chặt chẽ hơn việc chế bộ kit đấu nối máy cày."
+      },
+      {
+        "leftId": "concept_efficiency_curve_12",
+        "rightId": "concept_assembly_line_13",
+        "winnerId": "concept_assembly_line_13",
+        "reason": "Nhịp độ dây chuyền tập trung vào quản trị con người và tối ưu hóa thao tác thợ cả, tạo ra sự thay đổi trạng thái xưởng rõ rệt hơn là việc giải thích đường cong hiệu suất thủy lực."
+      },
+      {
+        "leftId": "concept_paint_and_finish_14",
+        "rightId": "concept_noise_reduction_15",
+        "winnerId": "concept_noise_reduction_15",
+        "reason": "Vòng bi tĩnh âm nhắm vào phân khúc thành thị khó tính với các giải pháp cân bằng động vi mô, tạo ra rào cản kỹ thuật tốt hơn việc chỉ xử lý bề mặt sơn chống rỉ."
+      },
+      {
+        "leftId": "concept_seal_and_leak_16",
+        "rightId": "concept_weight_reduction_18",
+        "winnerId": "concept_seal_and_leak_16",
+        "reason": "Phớt cơ khí bằng gốm và than chì tự mài phẳng là một đột phá kỹ thuật B2B cực kỳ thuyết phục, giải quyết tận gốc nguyên nhân cháy motor của 90% bơm thời kỳ này."
+      },
+      {
+        "leftId": "concept_winter_freeze_19",
+        "rightId": "concept_packaging_transit_20",
+        "winnerId": "concept_winter_freeze_19",
+        "reason": "Chống đóng băng bằng van xả tự động khai thác sự khắc nghiệt của thời tiết vùng cao, tạo ra kịch tính sinh tồn cho nông trường chè tốt hơn việc tối ưu thùng gỗ chống sốc."
+      }
+    ],
+    "ranking": [
+      {
+        "id": "concept_precision_jigs_01",
+        "wins": 2,
+        "reason": "Đồ Gá Năm 89 là concept xuất sắc nhất nhờ giải quyết trực tiếp mâu thuẫn giữa máy móc cũ nát năm 1989 và yêu cầu chính xác của bơm nước, kích hoạt lợi thế kỹ thuật ngay chương một."
+      },
+      {
+        "id": "concept_muddy_water_04",
+        "wins": 2,
+        "reason": "Bơm Bùn Đất Sét sở hữu điểm chạm thực tế nông nghiệp cực cao, biến phế phẩm thành cứu cánh cho nông dân trong mùa hạn hán bằng thiết kế cánh quạt hở đầy tính thuyết phục."
+      },
+      {
+        "id": "concept_casting_bottleneck_10",
+        "wins": 1,
+        "reason": "Lò Đúc Đêm Khuya đưa công đoạn rủi ro và kịch tính nhất của ngành cơ khí là đúc gang lên làm trung tâm, tạo ra những cảnh tượng rực lửa và tiến bộ vật chất rõ rệt."
+      },
+      {
+        "id": "concept_seal_and_leak_16",
+        "wins": 1,
+        "reason": "Phớt Cơ Khí khai thác sâu kỹ thuật mài phẳng quang học vi mô, chuyển dịch xưởng từ B2C sang nhà cung cấp linh kiện cốt lõi B2B đầy thông minh."
+      },
+      {
+        "id": "concept_cashflow_trap_11",
+        "wins": 1,
+        "reason": "Vòng Xoáy Công Nợ lột tả chân thực bối cảnh lạm phát và tín dụng thắt chặt năm 1989, buộc nhân vật chính phải tung hứng dòng tiền bằng cơ chế đổi hàng lấy vật tư."
+      },
+      {
+        "id": "concept_standardization_08",
+        "wins": 1,
+        "reason": "Chuẩn Hóa Hệ Mét tạo ra cuộc chiến tư duy sâu sắc giữa sự tùy tiện của thợ thủ công cũ và kỷ luật tiêu chuẩn hóa của nền công nghiệp hiện đại."
+      },
+      {
+        "id": "concept_water_head_09",
+        "wins": 1,
+        "reason": "Cột Áp Vùng Cao giải quyết bài toán thủy lực khó về xâm thực và búa nước, mở ra thị trường ngách béo bở tại các nông trường cà phê vùng đồi núi."
+      },
+      {
+        "id": "concept_assembly_line_13",
+        "wins": 1,
+        "reason": "Nhịp Độ Dây Chuyền mang lại trải nghiệm sướng mắt khi sắp xếp lại sự hỗn loạn của xưởng thành một dây chuyền tinh gọn, nâng cao năng suất rõ rệt."
+      },
+      {
+        "id": "concept_noise_reduction_15",
+        "wins": 1,
+        "reason": "Vòng Bi Tĩnh Âm khai thác kỹ thuật NVH tinh tế để chinh phục thị trường khu tập thể thành thị khó tính, tránh được lối mòn chỉ bán hàng cho nông thôn."
+      },
+      {
+        "id": "concept_winter_freeze_19",
+        "wins": 1,
+        "reason": "Chống Đóng Băng tận dụng tốt yếu tố thời tiết cực đoan để tạo ra áp lực kỹ thuật và cơ hội kinh doanh độc quyền tại các vùng núi cao."
+      },
+      {
+        "id": "concept_voltage_drop_02",
+        "wins": 0,
+        "reason": "Động Cơ Sụt Áp tốt nhưng kỹ thuật quấn dây đồng ít tạo ra các va chạm cơ khí trực quan và kịch tính bằng việc chế tạo đồ gá hay đúc gang."
+      },
+      {
+        "id": "concept_scrap_substitution_06",
+        "wins": 0,
+        "reason": "Vật Liệu Thay Thế có ý tưởng hay về luyện kim nhôm phế liệu nhưng giới hạn vật lý của nhôm đúc thủ công khiến sản phẩm khó bền vững lâu dài."
+      },
+      {
+        "id": "concept_modular_assembly_03",
+        "wins": 0,
+        "reason": "Lắp Ráp Phân Tán quá mạo hiểm về mặt kiểm soát chất lượng trong bối cảnh tay nghề thợ không đồng đều năm 1989, dễ dẫn đến lỗi hệ thống."
+      },
+      {
+        "id": "concept_dealer_leverage_05",
+        "wins": 0,
+        "reason": "Đại Lý Độc Quyền thiên quá nhiều về thủ thuật thương mại B2B, làm giảm đi sức hấp dẫn của việc tự tay chế tạo và cải tiến kỹ thuật tại xưởng."
+      },
+      {
+        "id": "concept_service_first_07",
+        "wins": 0,
+        "reason": "Trạm Bảo Hành Số 1 có khởi đầu đi sửa dạo hơi chậm chạp, không kích hoạt được lợi thế làm chủ xưởng sản xuất lớn ngay trong các chương đầu."
+      },
+      {
+        "id": "concept_power_source_17",
+        "wins": 0,
+        "reason": "Bơm Không Cần Điện mang tính chất chắp vá cơ khí (coupling) nhiều hơn là nghiên cứu sâu về công nghệ chế tạo bơm nước tiêu chuẩn."
+      },
+      {
+        "id": "concept_weight_reduction_18",
+        "wins": 0,
+        "reason": "Bơm Xách Tay thỏa hiệp bằng cách dùng dây nhôm dễ cháy, tạo ra rủi ro chất lượng quá lớn cho một sản phẩm nông nghiệp cần chạy liên tục."
+      },
+      {
+        "id": "concept_efficiency_curve_12",
+        "wins": 0,
+        "reason": "Đường Cong Hiệu Suất quá hàn lâm và khó trực quan hóa bằng hành động cơ khí cụ thể cho độc giả phổ thông dễ cảm nhận."
+      },
+      {
+        "id": "concept_paint_and_finish_14",
+        "wins": 0,
+        "reason": "Lớp Sơn Chống Rỉ chỉ giải quyết khâu hoàn thiện ngoại quan, không phải là trái tim kỹ thuật quyết định hiệu suất vận hành của máy bơm."
+      },
+      {
+        "id": "concept_packaging_transit_20",
+        "wins": 0,
+        "reason": "Thùng Gỗ Chống Sốc là khâu tối ưu hóa logistics quá muộn, không đủ sức gánh vác xung đột cốt lõi của một truyện trọng sinh niên đại làm xưởng."
+      }
+    ],
+    "finalistIds": [
+      "concept_precision_jigs_01",
+      "concept_muddy_water_04",
+      "concept_casting_bottleneck_10"
+    ],
+    "finalistWorldKernels": [
+      {
+        "candidateId": "concept_precision_jigs_01",
+        "signatureSituations": [
+          "Cảnh main dùng nêm gỗ và lá đồng mỏng để chêm mâm cặp máy tiện cũ trước ánh mắt nghi ngờ của thợ già.",
+          "Cảnh thử bơm tại ruộng, nước lên mạnh nhưng trục rung bần bật, main phải tháo ra đo lại độ rơ ngay trên bờ mương.",
+          "Cảnh đại lý huyện từ chối nhập hàng vì vỏ bơm sần sùi, buộc main phải nghĩ cách đánh bóng bằng cát và mỡ bò."
+        ],
+        "rules": [
+          {
+            "rule": "Dung sai tích lũy của máy tiện cũ không được vượt quá 0.05mm ở trục truyền động chính.",
+            "beneficiary": "Nhân vật chính (đảm bảo chất lượng lắp ráp không bị rung lắc)",
+            "harmedParty": "Thợ tiện quen làm ẩu (buộc phải tuân thủ quy trình căn chỉnh đồ gá)",
+            "enforcement": "Kiểm tra bằng thước cặp cơ khí và đồng hồ so tại bàn KCS sau mỗi ca tiện.",
+            "cost": "Thời gian căn chỉnh đồ gá tăng thêm 15 phút cho mỗi mẻ gia công.",
+            "consequence": "Nếu vi phạm, trục bơm sẽ bị đảo, phá hỏng ổ bi và gây rò rỉ phớt chắn nước chỉ sau 10 giờ chạy.",
+            "evidenceSource": "Kinh nghiệm vận hành nhà máy cơ khí thực tế năm 1989.",
+            "exceptions": "Không có ngoại lệ cho các chi tiết quay tốc độ cao.",
+            "sceneAffordances": [
+              "Bàn map kiểm tra bằng đá granite cũ",
+              "Đồng hồ so chân gập hệ mét"
+            ]
+          },
+          {
+            "rule": "Mọi khoản tạm ứng vật tư từ đại lý phải được bảo lãnh bằng sản phẩm mẫu đạt chuẩn thực địa.",
+            "beneficiary": "Đại lý phân phối (tránh rủi ro mất vốn lưu động)",
+            "harmedParty": "Xưởng cơ khí của main (áp lực phải làm ra mẫu chạy tốt ngay lập tức)",
+            "enforcement": "Thử nghiệm bơm trực tiếp tại mương nước trước sự chứng kiến của đại diện đại lý.",
+            "cost": "Hao phí nhiên liệu chạy thử và rủi ro hỏng hóc mẫu trước mặt khách hàng.",
+            "consequence": "Nếu mẫu thất bại, đại lý rút cọc, xưởng không có tiền mua phôi gang cho lô tiếp theo.",
+            "evidenceSource": "Thực tế kinh doanh tự do thời kỳ đầu xóa bỏ bao cấp.",
+            "exceptions": "Chỉ áp dụng khi đại lý là người nhà có bảo lãnh bằng tài sản khác.",
+            "sceneAffordances": [
+              "Bờ mương đất sạt lở làm bệ thử",
+              "Thùng phuy sắt 200 lít để đong lưu lượng nước"
+            ]
+          },
+          {
+            "rule": "Đồ gá gia công (jigs) phải được khóa định vị cơ khí bằng chốt ren trước khi khởi động mâm cặp máy tiện.",
+            "beneficiary": "Thợ vận hành máy tiện (an toàn lao động tuyệt đối)",
+            "harmedParty": "Thợ cả quen gá phôi bằng tay theo cảm giác (bị gò bó vào quy trình)",
+            "enforcement": "Main trực tiếp kiểm tra chốt định vị và ký sổ nhật ký ca máy.",
+            "cost": "Giảm tốc độ gá đặt ban đầu của dây chuyền.",
+            "consequence": "Nếu không khóa, lực ly tâm sẽ làm văng phôi gang nặng 5kg ra ngoài, gây tai nạn và vỡ mâm cặp máy tiện.",
+            "evidenceSource": "Tiêu chuẩn an toàn xưởng cơ khí công nghiệp.",
+            "exceptions": "Không có ngoại lệ khi gia công phôi kim loại.",
+            "sceneAffordances": [
+              "Chốt định vị ren lục giác chìm",
+              "Mâm cặp bốn chấu tự định tâm"
+            ]
+          }
+        ],
+        "resources": [
+          {
+            "resource": "Đồ gá tự chế (Jigs)",
+            "source": "Tự gia công từ thép dụng cụ phế liệu thu hồi từ xưởng thanh lý.",
+            "spendRule": "Mòn dần và mất độ chính xác sau mỗi 500 lần kẹp phôi, cần mài lại hoặc thay chốt định vị.",
+            "scarcity": "Cực kỳ khan hiếm vì thép lò xo hoặc thép dụng cụ chất lượng cao rất đắt đỏ năm 1989."
+          },
+          {
+            "resource": "Vốn lưu động bằng tiền mặt",
+            "source": "Tiền đặt cọc lô nhỏ (10-20%) từ các đại lý huyện tư nhân.",
+            "spendRule": "Chi trực tiếp cho việc mua phôi gang đúc thô và trả lương tuần để giữ chân thợ giỏi.",
+            "scarcity": "Khan hiếm cực độ do lạm phát phi mã, đại lý luôn tìm cách giam công nợ để giữ tiền mặt."
+          }
+        ],
+        "institutionalResponses": [
+          {
+            "name": "Hợp tác xã Vật tư Huyện",
+            "power": "Độc quyền phân phối phôi gang đúc thô và than đá chất lượng cao trong vùng.",
+            "incentive": "Tối đa hóa lợi nhuận từ việc thanh lý phế liệu và ép giá các xưởng tư nhân mới mở.",
+            "enforcementEvidence": "Yêu cầu thanh toán bằng tiền mặt ngay tại kho, không chấp nhận hóa đơn ký nợ gối đầu.",
+            "pressureOnCast": "Buộc main phải quay vòng vốn cực nhanh từ đại lý để có tiền mua nguyên liệu sản xuất."
+          },
+          {
+            "name": "Ban Thanh lý Tài sản Xưởng Cơ khí Tập thể",
+            "power": "Quyết định quyền sử dụng và thời hạn thanh lý các máy tiện cũ, mặt bằng xưởng.",
+            "incentive": "Muốn bán nhanh máy móc cho dân buôn phế liệu để thu tiền chênh lệch bỏ túi riêng.",
+            "enforcementEvidence": "Liên tục gửi thông báo đòi niêm phong nhà xưởng nếu không thanh toán tiền thuê đúng hạn.",
+            "pressureOnCast": "Ép main phải tạo ra dòng tiền và sản phẩm bán được ngay trong 3 chương đầu để giữ lại cỗ máy tiện cốt lõi."
+          }
+        ],
+        "thirtyChapterMutation": "Đến chương 30, các xưởng khác bắt đầu bắt chước hình dáng bơm, main mất lợi thế độc quyền thiết kế, phải chuyển sang cạnh tranh bằng độ bền và dịch vụ bảo hành."
+      },
+      {
+        "candidateId": "concept_muddy_water_04",
+        "signatureSituations": [
+          "Cảnh test bơm dưới mương bùn đặc quánh, tiếng máy gầm lên, rung bần bật nhưng nước bùn vẫn phụt ra mạnh mẽ.",
+          "Cảnh chương 3: Bơm chạy tốt nhưng ổ bi vỡ nát do nước bùn lọt qua phớt cơ khí hỏng, main phải đền tiền và tìm cách chế phớt chắn cát.",
+          "Cảnh đại lý huyện mang trả lại bơm ngoại nhập, năn nỉ đổi lấy bơm 'xấu xí' của main vì nông dân chỉ đòi mua loại này."
+        ],
+        "rules": [
+          {
+            "rule": "Khe hở giữa cánh quạt hở và thớt buồng bơm phải duy trì nghiêm ngặt từ 1.5mm đến 2.0mm.",
+            "beneficiary": "Nông dân sử dụng bơm (rác và bùn nhỏ có thể thoát ra mà không gây kẹt cánh)",
+            "harmedParty": "Hiệu suất cột áp đẩy cao của bơm (bị tụt giảm khoảng 15%)",
+            "enforcement": "Sử dụng căn lá đồng để đo và căn chỉnh đệm lót trục khi lắp ráp.",
+            "cost": "Đòi hỏi thợ lắp ráp phải tỉ mỉ, tăng thời gian kiểm tra chất lượng cuối chuyền.",
+            "consequence": "Nếu khe hở nhỏ hơn 1.5mm, sỏi nhỏ dưới mương sẽ làm kẹt cứng và gãy cánh quạt đúc bằng gang giòn.",
+            "evidenceSource": "Nguyên lý thiết kế bơm ly tâm cánh hở chuyên dụng cho nước thải.",
+            "exceptions": "Chỉ khi bơm nước giếng khoan đã qua bể lọc cát tiêu chuẩn.",
+            "sceneAffordances": [
+              "Bộ căn lá đồng nhiều lá mỏng",
+              "Thớt buồng bơm đúc bằng gang xám"
+            ]
+          },
+          {
+            "rule": "Mọi sản phẩm bị hỏng phớt chắn nước trong tuần đầu tiên phải được đổi mới và sửa chữa tại ruộng trong vòng 12 giờ.",
+            "beneficiary": "Nông dân (đảm bảo tiến độ cứu ruộng lúa đang khô hạn)",
+            "harmedParty": "Quỹ dự phòng của xưởng (chịu toàn bộ chi phí vận chuyển và linh kiện thay thế)",
+            "enforcement": "Main trực tiếp mang túi đồ nghề đi xe đạp xuống tận ruộng của khách hàng để xử lý.",
+            "cost": "Chi phí cơ hội của main khi phải rời xưởng sản xuất và hao mòn thể lực.",
+            "consequence": "Nếu chậm trễ, nông dân sẽ trả máy đòi tiền, phá hủy uy tín truyền miệng - kênh bán hàng duy nhất của xưởng.",
+            "evidenceSource": "Thực tế dịch vụ hậu mãi nông thôn Việt Nam cuối thập niên 1980.",
+            "exceptions": "Máy bị cháy do người dùng chạy khan không có nước quá 30 phút.",
+            "sceneAffordances": [
+              "Túi đồ nghề bạt cũ chứa kìm, mỏ lết",
+              "Bờ ruộng sạt lở trơn trượt sau cơn mưa giông"
+            ]
+          },
+          {
+            "rule": "Cánh quạt đúc phải được mài cân bằng tĩnh trên đồ gá song song trước khi ép vào trục động cơ.",
+            "beneficiary": "Động cơ điện của bơm (tránh rung lắc phá hủy ổ bi và phớt)",
+            "harmedParty": "Thợ mài cánh quạt (phải làm việc tỉ mỉ dưới ánh đèn dầu ca đêm)",
+            "enforcement": "Thử nghiệm đặt cánh quạt lên hai thanh thép song song đã căn thăng bằng bằng bọt nước.",
+            "cost": "Tốn thêm 10 phút mài tay bằng máy mài đá hai đầu cho mỗi sản phẩm.",
+            "consequence": "Nếu không cân bằng, lực ly tâm lệch tâm ở tốc độ 2900 vòng/phút sẽ phá nát ổ bi chỉ sau 3 ngày chạy.",
+            "evidenceSource": "Kỹ thuật cơ khí chế tạo máy tiêu chuẩn.",
+            "exceptions": "Không có ngoại lệ cho cánh quạt quay tốc độ cao.",
+            "sceneAffordances": [
+              "Thanh thép căn thăng bằng bằng bọt nước",
+              "Máy mài đá hai đầu chạy điện 3 pha"
+            ]
+          }
+        ],
+        "resources": [
+          {
+            "resource": "Phôi gang đúc cánh hở",
+            "source": "Đặt đúc từ lò thủ công của HTX cơ khí địa phương theo khuôn gỗ của main.",
+            "spendRule": "Tiêu hao theo tỷ lệ lỗi đúc (thường là 20% bị rỗ khí hoặc thiếu liệu phải nấu lại).",
+            "scarcity": "Khan hiếm do nguồn gang vụn phế liệu của huyện không ổn định và bị tranh mua."
+          },
+          {
+            "resource": "Phớt chắn cát tự chế",
+            "source": "Cải tiến từ phớt cao su kết hợp vòng đệm da bò ngâm mỡ bò chịu nhiệt.",
+            "spendRule": "Lắp trực tiếp vào trục bơm ở khâu lắp ráp cuối cùng.",
+            "scarcity": "Phụ thuộc vào nguồn da bò thuộc chất lượng cao từ các lò mổ tư nhân trong huyện."
+          }
+        ],
+        "institutionalResponses": [
+          {
+            "name": "Trạm Thủy nông Huyện",
+            "power": "Quản lý toàn bộ nguồn nước các tuyến mương và có quyền giới thiệu, bao thầu máy bơm cho nông dân.",
+            "incentive": "Muốn giải quyết nạn hạn hán nhanh chóng để đạt chỉ tiêu sản lượng lúa của huyện giao phó.",
+            "enforcementEvidence": "Tổ chức các buổi trình diễn máy bơm thực địa tại các xã để đánh giá hiệu quả thực tế.",
+            "pressureOnCast": "Ép main phải chứng minh bơm bùn tự chế hiệu quả và rẻ hơn bơm quốc doanh nhập khẩu từ Liên Xô."
+          },
+          {
+            "name": "Cửa hàng Vật tư Nông nghiệp Quốc doanh Huyện",
+            "power": "Độc quyền phân phối máy bơm nhập khẩu nguyên chiếc và vật tư nông nghiệp chính ngạch.",
+            "incentive": "Bảo vệ doanh số bán hàng và khoản hoa hồng lớn từ việc phân phối máy bơm ngoại nhập giá cao.",
+            "enforcementEvidence": "Tung tin đồn ác ý rằng bơm tự chế của main làm rò rỉ dầu máy gây ô nhiễm nguồn nước ruộng.",
+            "pressureOnCast": "Buộc main phải công khai thử nghiệm độ sạch của nước sau khi bơm trước sự chứng kiến của chính quyền xã."
+          }
+        ],
+        "thirtyChapterMutation": "Sau 30 chương, mùa mưa đến, nhu cầu bơm bùn giảm mạnh, main phải dùng lợi nhuận để nghiên cứu dòng bơm đẩy cao cho mùa lũ."
+      },
+      {
+        "candidateId": "concept_casting_bottleneck_10",
+        "signatureSituations": [
+          "Cảnh main cởi trần, mồ hôi nhễ nhại, dùng sào dài chọc thủng lỗ tháo xỉ lò, dòng gang đỏ rực chảy ra sáng rực cả góc sân giữa đêm.",
+          "Cảnh chương 3: Lô vỏ bơm đầu tiên tự đúc trông rất đẹp, nhưng khi lắp ráp thử áp lực nước thì bị rỉ (rỗ vi mô), main phải đập bỏ toàn bộ, chịu lỗ nặng để giữ uy tín.",
+          "Cảnh chủ xưởng đúc cũ từng chèn ép main nay phải mang tiền đến xin mua lại phôi gang vì lò của ông ta hỏng mà không biết sửa."
+        ],
+        "rules": [
+          {
+            "rule": "Nhiệt độ nước gang lỏng khi rót khuôn phải đạt từ 1250°C đến 1300°C (nhìn màu đỏ cam sáng rực).",
+            "beneficiary": "Chất lượng phôi đúc vỏ bơm (gang chảy loãng, điền đầy khuôn không bị thiếu liệu)",
+            "harmedParty": "Thợ lò (phải chịu sức nóng khủng khiếp và xúc than liên tục dưới nắng nóng)",
+            "enforcement": "Main trực tiếp quan sát màu sắc dòng gang lỏng bằng mắt kính bảo hộ chuyên dụng.",
+            "cost": "Tiêu hao lượng lớn than cốc chất lượng cao để duy trì nhiệt độ lò chảo.",
+            "consequence": "Nếu dưới 1250°C, gang sẽ bị đông cục bộ, gây thiếu hụt chi tiết vỏ bơm hoặc tạo bọt khí bên trong.",
+            "evidenceSource": "Sổ tay kỹ thuật đúc gang xám công nghiệp.",
+            "exceptions": "Chỉ khi đúc các chi tiết phụ không chịu áp lực nước như chân đế máy.",
+            "sceneAffordances": [
+              "Gáo múc gang lót đất sét chịu lửa",
+              "Kính màu bảo hộ thợ đúc"
+            ]
+          },
+          {
+            "rule": "Cát làm khuôn đúc phải được phơi khô hoàn toàn và trộn theo tỷ lệ nghiêm ngặt: 8% đất sét, 5% nước.",
+            "beneficiary": "Bề mặt phôi đúc vỏ bơm (láng mịn, không bị rỗ khí do hơi nước)",
+            "harmedParty": "Thợ làm khuôn cát (phải sàng cát và trộn thủ công cực nhọc bằng xẻng)",
+            "enforcement": "Kiểm tra độ ẩm bằng cách nắm chặt cát trong tay, nếu tạo thành khối không rã và không dính tay là đạt.",
+            "cost": "Tốn diện tích sân phơi xưởng và nhân công sàng cát mịn.",
+            "consequence": "Nếu cát quá ướt, nước bốc hơi đột ngột khi rót gang nóng 1300°C sẽ gây nổ khuôn hoặc rỗ khí nghiêm trọng.",
+            "evidenceSource": "Kỹ thuật đúc khuôn cát thủ công truyền thống.",
+            "exceptions": "Không có ngoại lệ cho khuôn vỏ bơm chịu áp lực nước.",
+            "sceneAffordances": [
+              "Sàng cát bằng tre đan thủ công",
+              "Bàn dầm khuôn gỗ cầm tay"
+            ]
+          },
+          {
+            "rule": "Mọi mẻ đúc có tỷ lệ rỗ khí trên 15% khi thử áp lực nước phải được đập bỏ hoàn toàn để nấu lại.",
+            "beneficiary": "Uy tín chất lượng của xưởng bơm đối với đại lý và nông dân",
+            "harmedParty": "Lợi nhuận ngắn hạn của xưởng (mất trắng chi phí than cốc và công thợ cả mẻ)",
+            "enforcement": "Thử áp lực nước bằng bơm tay kiểm tra rò rỉ rỗ vi mô sau khi tiện thô vỏ.",
+            "cost": "Lãng phí than cốc và hao hụt gang do cháy hao trong lò nấu.",
+            "consequence": "Nếu cố tình dùng phôi rỗ, vỏ bơm sẽ bị rỉ nước rỉ sét hoặc nứt vỡ khi nông dân chạy máy ở áp lực cao.",
+            "evidenceSource": "Quy trình kiểm soát chất lượng KCS nghiêm ngặt của nhà máy cơ khí.",
+            "exceptions": "Không có ngoại lệ cho vỏ bơm chịu áp.",
+            "sceneAffordances": [
+              "Búa tạ 5kg để đập bỏ phôi lỗi",
+              "Bơm tay thử áp lực nước có đồng hồ đo áp"
+            ]
+          }
+        ],
+        "resources": [
+          {
+            "resource": "Than cốc chất lượng cao",
+            "source": "Mua gom từ các xe tải chở than từ mỏ lớn Quảng Ninh đi qua tỉnh.",
+            "spendRule": "Tiêu hao khoảng 150kg cho mỗi mẻ nấu 1 tấn gang phế liệu trong lò chảo.",
+            "scarcity": "Cực kỳ khan hiếm do nhà nước phân phối theo chỉ tiêu cho xưởng quốc doanh, phải mua chợ đen giá cao."
+          },
+          {
+            "resource": "Gang vụn phế liệu",
+            "source": "Thu mua từ các bãi phế liệu, đường ray cũ, máy nông nghiệp hỏng của các hợp tác xã giải thể.",
+            "spendRule": "Nấu chảy trực tiếp trong lò chảo để tái chế thành gang xám đúc vỏ bơm.",
+            "scarcity": "Cạnh tranh khốc liệt với các xưởng đúc thủ công khác trong vùng đang khát nguyên liệu."
+          }
+        ],
+        "institutionalResponses": [
+          {
+            "name": "Phòng Quản lý Đô thị và Môi trường Huyện",
+            "power": "Cấp phép hoạt động, kiểm tra tiêu chuẩn môi trường và xử phạt các cơ sở gây ô nhiễm khói bụi.",
+            "incentive": "Muốn giảm thiểu khói bụi độc hại từ các lò đúc thủ công trong khu dân cư thị trấn.",
+            "enforcementEvidence": "Kiểm tra đột xuất nồng độ khói đen và đe dọa đình chỉ hoạt động lò đúc của main.",
+            "pressureOnCast": "Buộc main phải tự thiết kế và lắp đặt hệ thống dập bụi bằng tia nước ở đỉnh lò để đối phó."
+          },
+          {
+            "name": "Hợp tác xã Đúc Gang Truyền thống Địa phương",
+            "power": "Liên minh các chủ lò đúc cũ, kiểm soát giá nhân công và nguồn thợ đúc khuôn cát lành nghề.",
+            "incentive": "Bảo vệ thế độc quyền đúc gang trong huyện, không muốn một xưởng cơ khí tư nhân tự chủ được lò đúc.",
+            "enforcementEvidence": "Ép các thợ khuôn giỏi trong vùng ký cam kết không được sang làm việc hoặc truyền nghề cho lò đúc của main.",
+            "pressureOnCast": "Buộc main phải tự đào tạo thợ trẻ từ đầu và tự tay thực hiện các công đoạn kỹ thuật khó nhất của mẻ đúc."
+          }
+        ],
+        "thirtyChapterMutation": "Sau 30 chương, công nghệ đúc khuôn cát thủ công đạt giới hạn sản lượng, main phải đối mặt với việc huy động vốn lớn để nhập dây chuyền đúc mẫu chảy hoặc đúc áp lực."
+      }
+    ]
+  },
+  "openings": [
+    {
+      "schemaVersion": 2,
+      "candidateId": "concept_precision_jigs_01",
+      "chapters": [
+        {
+          "chapterNumber": 1,
+          "title": "Cỗ Máy Tiện Vạn Năng",
+          "prose": "Mùi dầu máy khét lẹt xộc vào mũi Lâm. Anh mở mắt, nhận ra mình đang đứng giữa xưởng cơ khí xập xệ của năm 1989.\n\nTiếng búa đập chát chúa vang lên. Lão trưởng ban thanh lý đang chỉ đạo hai gã buôn đồng nát buộc dây thừng vào cỗ máy tiện vạn năng cũ kỹ.\n\n— Dừng tay! — Lâm hét lớn, lao tới ôm lấy cần gạt máy tiện. — Cỗ máy này vẫn còn dùng được, sao các người lại bán sắt vụn?\n\nLão trưởng ban nhếch mép, gõ điếu cày tành tạch vào chân máy.\n\n— Dùng được? Mâm cặp rơ lắc cả ly, tiện cái chốt cửa còn méo. Cậu định dùng nó làm gì? Xưởng phá sản rồi, lo mà tìm đường về quê đi.\n\nÔng Ba, người thợ cả già tóc hoa râm, thở dài vỗ vai Lâm.\n\n— Thôi cháu ạ, máy tã lắm rồi. Dung sai trục chính vượt quá không phẩy một ly, tiện trục bơm toàn đảo, hỏng hết phớt nước. Trả máy cho người ta dỡ đi, gạt nợ.\n\nLâm siết chặt tay quay bàn xe dao. Anh biết rõ, dung sai tích lũy của máy tiện cũ không được vượt quá 0.05mm ở trục truyền động chính. Với kỹ thuật năm 89, thợ quen gá phôi bằng tay theo cảm giác, máy rơ thì chịu chết.\n\nNhưng anh là kỹ sư cơ khí từ ba mươi năm sau. Anh không cần một cỗ máy hoàn hảo, anh chỉ cần một cái đồ gá đúng chuẩn.\n\n— Cho tôi một giờ. — Lâm gằn giọng. — Nếu tôi tiện ra được cái trục bơm chuẩn, độ rơ dưới không phẩy không năm, ông phải để cỗ máy này lại cho tôi thuê. Tiền lương tháng này của tôi coi như cọc!\n\nLão trưởng ban bật cười khùng khục, xua tay đồng ý. Ông Ba nhìn Lâm như nhìn một thằng điên.\n\nLâm không nói thêm lời nào. Anh vơ lấy vài thanh nêm gỗ góc xưởng và cắt một dải lá đồng mỏng từ lõi dây điện cũ.\n\nBằng đôi tay thoăn thoắt của một người đã rành rẽ từng con ốc, anh chêm nêm gỗ và lá đồng mỏng vào khe hở giữa mâm cặp bốn chấu và mặt bích trục chính.\n\nViệc chêm lá đồng vào mâm cặp bốn chấu yêu cầu cảm giác tay cực kỳ tinh tế để bù đắp sự mài mòn không đồng đều của ổ bi cũ. Anh xoay mâm cặp, gõ nhẹ búa cao su, đo lại bằng đồng hồ so chân gập hệ mét.\n\n— Khóa định vị cơ khí! — Lâm lẩm bẩm, siết chặt các chốt ren. Nếu không khóa, lực ly tâm sẽ làm văng phôi gang, vỡ mâm cặp ngay lập tức.\n\nKim đồng hồ so khẽ nhích. Dung sai chỉ còn 0.03mm. Hoàn hảo.\n\nTiếng mô tơ gầm lên. Lưỡi dao hợp kim ăn vào phôi thép phế liệu, rít lên những tiếng chói tai, bắn ra những sợi phôi xoắn ruột gà xanh biếc.\n\nMười lăm phút sau, chiếc trục bơm nhẵn thín, bóng loáng nằm gọn trong tay Lâm. Ông Ba giật lấy chiếc thước cặp cơ khí, run rẩy đo thử.\n\n— Chuẩn... chuẩn quá! Không sai một vạch! — Ông lão trợn tròn mắt.\n\nLão trưởng ban tái mặt, hậm hực vung tay bảo đám đồng nát tháo dây thừng. Lâm thở phào, mồ hôi ướt đẫm lưng áo. Cỗ máy đã được giữ lại, nhưng không có phôi gang đúc vỏ, chiếc trục này cũng chỉ là cục sắt vụn vô dụng.",
+          "causalStateChange": "Từ mất máy móc thành giữ được máy tiện nhưng thiếu tiền mua nguyên liệu đúc vỏ bơm.",
+          "requiredPlanAnchor": "chêm lá đồng vào mâm cặp bốn chấu",
+          "protagonistChoice": "Đánh cược tháng lương cuối cùng để đổi lấy một giờ dùng máy tiện cũ.",
+          "agencyMove": "Dùng nêm gỗ và lá đồng mỏng để tự tay căn chỉnh mâm cặp máy tiện đã rơ lắc, khắc phục giới hạn thiết bị.",
+          "earnedReward": "Sản xuất thành công cụm trục bơm đạt chuẩn dung sai dưới 0.05mm, buộc ban thanh lý hoãn việc dỡ máy.",
+          "materialProgression": "Giữ được tư liệu sản xuất cốt lõi là máy tiện vạn năng.",
+          "comfortPayoff": "Giành được sự tôn trọng ban đầu từ thợ cả già kinh nghiệm.",
+          "costPaid": "Đánh mất số tiền lương tháng cuối có thể dùng để ăn tiêu, đẩy bản thân vào thế tay trắng hoàn toàn.",
+          "exitPressure": "Có trục bơm tốt nhưng không có vỏ gang, cần tìm đại lý cấp cọc để mua nguyên liệu từ Hợp tác xã."
+        },
+        {
+          "chapterNumber": 2,
+          "title": "Bờ Mương Đất Sạt",
+          "prose": "Sáng hôm sau, Lâm dùng chiếc trục vừa tiện để lắp ráp hoàn thiện một cụm bơm mẫu, tận dụng chiếc vỏ gang gỉ sét nhặt trong kho phế liệu của xưởng.\n\nAnh chở chiếc bơm nặng trịch trên yên xe đạp tàng, đạp rã rời hơn chục cây số đến cửa hàng nông cơ của anh Tư trên huyện.\n\nTư béo là tay buôn máy bơm tư nhân có máu mặt. Nhìn cái bơm xỉn màu, gã bĩu môi lắc đầu.\n\n— Mày giỡn mặt tao hả Lâm? Hàng xưởng xí nghiệp tao còn ứ đầy, mày mang cái của nợ chắp vá này đến bắt tao nhập?\n\n— Bơm tốt hay không phải xuống nước mới biết. — Lâm điềm tĩnh đáp. — Ra mương thử, nếu lưu lượng không gấp rưỡi bơm hợp tác xã, em xách về.\n\nTư béo hừ lạnh, xách chiếc bơm ra bờ mương đất sạt lở sau nhà, nơi có đặt sẵn một thùng phuy sắt hai trăm lít để đong lưu lượng.\n\nTiếng máy nổ xành xạch vang lên. Trục bơm quay tít. Một cột nước đục ngầu, to bằng cổ chân trào ra từ ống xả, xối xả nạp đầy thùng phuy chỉ trong nháy mắt.\n\nTư béo trợn mắt, điếu thuốc lá rơi bộp xuống đất. Nhưng nụ cười của Lâm chưa kịp nở thì cỗ máy bắt đầu rung bần bật.\n\nTiếng kim loại va đập lách cách phát ra từ buồng bơm. Vỏ gang cũ không chịu nổi áp lực, nước bắt đầu rỉ ra ở phớt chắn.\n\n— Đấy! Tao biết ngay mà! — Tư béo gạt công tắc, nhăn nhó. — Trục đảo thế này chạy mười tiếng là nát ổ bi. Vứt!\n\nLâm không cãi. Anh lẳng lặng lôi cờ lê từ túi đồ nghề, quyết định tháo trục bơm ngay trên bờ mương đầy bùn đất.\n\nAnh rút cụm trục sáng bóng ra khỏi vỏ gang sần sùi, đưa cho Tư béo cùng một chiếc thước cặp.\n\n— Anh tự đo đi. Trục không hề xước, dung sai cực chuẩn. Lỗi ở cái vỏ gang phế liệu này lỗ ổ bi bị ô van, không đồng tâm.\n\nTư béo săm soi chiếc trục. Gã là dân buôn lõi đời, nhìn vết tiện nhẵn thín là biết tay nghề không phải dạng vừa. Một cái trục tốt thế này, xưởng huyện làm còn khó.\n\n— Em cần anh cọc trước hai mươi phần trăm tiền mặt. — Lâm nhìn thẳng vào mắt Tư béo. — Đủ tiền mua phôi gang đúc mới, em sẽ giao cho anh năm con bơm chạy êm ru, không rỏ một giọt nước.\n\nTư béo do dự nhìn cột nước tràn mép thùng phuy, rồi lại nhìn cái trục tiện chuẩn xác. Nông dân đang khát nước tưới tiêu, bơm này mà êm thì bán đắt như tôm tươi.\n\nCuối cùng, gã nghiến răng, lôi từ cạp quần ra một xấp tiền lẻ nhàu nhĩ dúi vào tay Lâm.\n\nCầm nắm tiền đặt cọc có mùi mồ hôi chua loét, Lâm thở phào. Nhưng áp lực mới lại đè nặng: Hợp tác xã Vật tư Huyện chỉ bán phôi gang thu tiền mặt một lần, mà số cọc này vơi đi mua nguyên liệu thì vẫn phải giải bài toán làm đẹp sản phẩm cuối.",
+          "causalStateChange": "Từ có sản phẩm mẫu nhưng bị nghi ngờ chất lượng thành chứng minh được năng lực cốt lõi và lấy được vốn lưu động ban đầu.",
+          "requiredPlanAnchor": "tháo trục bơm ngay trên bờ mương",
+          "protagonistChoice": "Chấp nhận rủi ro bị từ chối thẳng thừng bằng cách tháo tung sản phẩm ngay trước mặt khách để chứng minh nguồn gốc lỗi.",
+          "agencyMove": "Dùng thước cặp cơ khí đo đạc độ mòn của vỏ cũ để bảo vệ thiết kế trục chuẩn xác, thuyết phục đại lý bằng dữ liệu thực tế.",
+          "earnedReward": "Nhận được khoản tiền cọc 20% tiền mặt từ đại lý để làm vốn lưu động.",
+          "materialProgression": "Có dòng tiền mặt đầu tiên để chuyển từ giai đoạn làm mẫu sang gia công hàng loạt lô nhỏ.",
+          "comfortPayoff": "Xây dựng được kênh phân phối đầu tiên với một đại lý tư nhân có nguồn tiền dồi dào.",
+          "costPaid": "Hủy hoại cụm bơm mẫu duy nhất, lấm lem bùn đất và mất sức đạp xe hàng chục cây số.",
+          "exitPressure": "Sản phẩm tốt về ruột nhưng vỏ gang đúc thô sẽ bị sần sùi, nguy cơ đại lý chê hình thức từ chối nhận hàng lô sau."
+        },
+        {
+          "chapterNumber": 3,
+          "title": "Mẻ Bơm Đầu Tiên Và Bữa Cơm Có Thịt",
+          "prose": "Trở lại xưởng, Lâm dồn hết tiền cọc mua được đúng năm bộ phôi gang đúc thô từ tay quản kho hách dịch của Hợp tác xã Vật tư.\n\nSuốt ba ngày đêm, xưởng cơ khí cũ rích xập xình tiếng máy. Ông Ba và hai thợ trẻ được Lâm huy động, cắm cúi gá phôi theo các đồ gá định vị mới mà anh tự tay thiết kế từ thép phế liệu.\n\nViệc sử dụng đồ gá có chốt ren định vị giúp giảm thiểu sai sót của thợ gá tay. Tiếng dao tiện gọt gang ràn rạt, mùn gang đen sì bay mù mịt.\n\nĐến chiều ngày thứ ba, năm chiếc bơm nước ráp xong, xếp hàng ngay ngắn trên nền gạch vỡ. Trục quay trơn tru, không một tiếng động lạ.\n\nTuy nhiên, khi Tư béo phóng xe máy cúp xuống nghiệm thu, sắc mặt gã lại tối sầm.\n\n— Ruột thì êm đấy, nhưng vỏ ngoài sần sùi bọt khí thế này, tao bán cho ai? Nông dân họ cũng chuộng hình thức, hàng nhìn như đồng nát ai dám mua!\n\nTư béo nhất quyết từ chối nhập hàng, dọa đòi lại cọc. Xưởng chìm vào im lặng. Ông Ba cúi gầm mặt, thợ trẻ chán nản vứt cờ lê xuống đất.\n\nLâm nghiến răng. Không thể để chết ở bước cuối cùng này. Máy mài đã hỏng từ lâu, anh không có tiền mua đá nhám đắt tiền.\n\n— Đợi em nửa tiếng. — Lâm quả quyết, lôi từ góc xưởng ra một xô cát xây dựng mịn và một hộp mỡ bò đen ngòm.\n\nAnh tháo vỏ bơm ra, kẹp lên mâm cặp máy tiện. Sau đó, anh trộn cát vào mỡ bò, bôi đặc lên một miếng giẻ gai rách.\n\nBật máy tiện cho quay tốc độ cao, Lâm ấn chặt miếng giẻ tẩm cát mỡ bò vào bề mặt vỏ gang đang xoay tít.\n\nĐây là kỹ thuật đánh bóng vỏ bơm bằng cát trộn mỡ bò, một mẹo cơ khí dã chiến khi thiếu vật tư. Ma sát sinh nhiệt, cát hạt mịn bào mòn lớp xỉ đúc sần sùi.\n\nMười lăm phút sau, Lâm lau sạch lớp mỡ. Lớp vỏ gang hiện ra đen bóng, mịn màng, nhẵn thín như được chà bằng giấy ráp loại xịn nhất.\n\nTư béo há hốc mồm. Gã vỗ đùi đánh đét, lập tức rút ví đếm đủ tiền mặt cho cả năm chiếc bơm, không kỳ kèo thêm một đồng.\n\nCầm xấp tiền dày cộp, Lâm trích ngay một phần ba trả lương tuần cho ông Ba và thợ trẻ. Anh còn rẽ qua chợ, xách về một tảng thịt lợn ba chỉ dính sườn.\n\nTối đó, trong căn bếp lợp fibro xi măng dột nát, vợ Lâm rơm rớm nước mắt gắp miếng thịt luộc chấm nước mắm gừng cho đứa con gái nhỏ.\n\nBữa cơm có thịt đầu tiên sau nhiều tháng ăn độn bo bo khiến lồng ngực Lâm ấm áp. Mọi cực nhọc bỗng tan biến.\n\nNhưng niềm vui ngắn chẳng tày gang. Sáng hôm sau, tờ giấy thông báo tăng gấp ba tiền thuê xưởng của Ban Thanh lý đã dán chễm chệ ngay trước cửa.\n\nBọn chúng thấy xưởng sáng đèn, bơm bán được tiền mặt, liền nổi lòng tham muốn bóp chẹt Lâm để ăn chia. Anh buộc phải tìm cách mở rộng quy mô sản xuất để chống lại sức ép này.",
+          "causalStateChange": "Từ nguy cơ tồn kho vỡ nợ thành thanh lý lô hàng thành công, có lợi nhuận thực tế bù đắp cho xưởng và gia đình.",
+          "requiredPlanAnchor": "đánh bóng vỏ bơm bằng cát trộn mỡ bò",
+          "protagonistChoice": "Dùng mẹo cơ khí dã chiến ma sát thủ công thay vì đầu hàng trước giới hạn của quy trình đúc thô thời bấy giờ.",
+          "agencyMove": "Kết hợp mâm cặp máy tiện và hỗn hợp cát mỡ bò để đánh bóng bề mặt kim loại, nâng cao thẩm mỹ sản phẩm với chi phí bằng không.",
+          "earnedReward": "Nhận được 80% giá trị hợp đồng bằng tiền mặt còn lại, giải quyết xong vấn đề lương thợ.",
+          "materialProgression": "Thu hồi đủ vốn để xoay vòng lô tiếp theo, trả được một phần công nợ nhân công cho ông Ba.",
+          "comfortPayoff": "Mang tảng thịt ba chỉ về nhà, mang lại một bữa cơm no ấm đủ chất cho vợ con sau những ngày ăn bo bo cực khổ.",
+          "costPaid": "Hao mòn thể lực khi phải tự tay ép giẻ ma sát tốc độ cao, chịu rát bỏng tay vì nhiệt lượng.",
+          "exitPressure": "Ban Thanh lý Tài sản thấy xưởng có lãi liền giở trò đòi tăng tiền thuê và ép dỡ máy, buộc Lâm phải sản xuất quy mô lớn hơn để mua đứt thiết bị."
+        }
+      ],
+      "continuityDigest": "Lâm giữ được máy tiện cũ nhờ căn chỉnh mâm cặp bằng lá đồng (Chương 1), sau đó dùng trục tiện chuẩn để thuyết phục đại lý ứng tiền tại bờ mương (Chương 2), cuối cùng dùng tiền ứng làm lô bơm hoàn chỉnh, khắc phục lỗi bề mặt bằng mỡ trộn cát để thu tiền mặt về mua thịt cho gia đình (Chương 3).",
+      "unresolvedPressure": "Ban Thanh lý Tài sản Xưởng Cơ khí Tập thể đã để mắt tới nguồn lợi nhuận mới của Lâm, gửi thông báo tăng giá thuê gấp ba lần và đe dọa niêm phong máy, buộc Lâm phải tìm nguồn vốn lớn hơn hoặc khách hàng mạnh hơn để đối phó."
+    },
+    {
+      "schemaVersion": 2,
+      "candidateId": "concept_muddy_water_04",
+      "chapters": [
+        {
+          "chapterNumber": 1,
+          "title": "Cánh Quạt Chết Báo Cáo Hạn Hán",
+          "prose": "Tháng Sáu năm 1989, cái nắng như đổ lửa thiêu đốt cánh đồng xã Bình Lộc đến nứt nẻ. Mương dẫn nước từ trạm bơm huyện cạn trơ đáy, chỉ còn lại thứ bùn đặc quánh lẫn lộn rác rưởi và rễ cây mục nát.\n\nTrên bờ ruộng, trưởng thôn Ba ôm đầu ngồi xổm, ánh mắt tuyệt vọng nhìn chiếc máy bơm ly tâm Liên Xô xanh biếc vừa xì khói khét lẹt. Động cơ chết cứng. Cuộn dây đồng bên trong đã cháy đen vì kẹt rác.\n\n— Đồ ngoại đắt tiền mà vứt đi! Nước bùn thế này, cứ cắm vòi xuống là kẹt cánh quạt, cháy máy. Cứu lúa kiểu gì bây giờ? — Trưởng thôn Ba đấm tay xuống đất, giọng khản đặc.\n\nHải lau những giọt mồ hôi đang chảy ròng ròng trên trán. Anh tiến lại gần chiếc máy bơm đang bốc khói, tháo phích cắm điện, dùng mỏ lết gõ nhẹ vào buồng bơm.\n\n— Bơm này thiết kế cánh quạt kín để đẩy nước sạch lên cao, bác cắm xuống vũng bùn thì cháy là phải. — Hải nói nhỏ, tay thoăn thoắt tháo bốn con ốc mặt bích. — Để cháu sửa lại, cứu được ruộng lúa này, bác gán cho cháu cái máy hàn hỏng trong kho HTX nhé?\n\n— Mày điên à Hải? Kỹ sư trạm huyện còn bó tay. Mày làm hỏng thêm thì lấy tiền đâu mà đền? — Trưởng thôn trố mắt nhìn anh thanh niên đang lúi húi moi đống bùn kẹt cứng trong buồng bơm ra.\n\nHải không đáp. Anh vác cái búa đinh tạ và chiếc đe sắt mượn từ lò rèn đầu làng ra mép ruộng. Trái tim của máy bơm ly tâm là cánh quạt đồng thau dạng kín. Bùn, sỏi nhỏ và rác rơm rạ hút vào sẽ kẹt cứng giữa hai vách cánh.\n\nKhông chút chần chừ, Hải kê cánh quạt lên đe, vung búa tạ. Tiếng kim loại va đập chát chúa vang lên giữa cánh đồng tĩnh lặng. Anh đang đập bỏ hoàn toàn mặt bích phía trước của cánh quạt.\n\n— Trời ơi, mày phá nát cái máy rồi! — Ông Ba hét lên, định lao vào can.\n\n— Bác muốn giữ cái máy chết hay muốn ruộng lúa sống? — Hải gằn giọng, tay vẫn thoăn thoắt dùng búa và đục thép gò lại các mép cánh quạt cho vát đi. Anh đang ép một chiếc cánh quạt kín thành cánh hở, hy sinh khả năng đẩy cao để lấy khả năng nuốt bùn rác.\n\nHai mươi phút sau, Hải lắp lại buồng bơm. Bề mặt cắt gồ ghề làm giảm hiệu suất, nhưng khoảng không gian hở đã được mở rộng. Anh nối ống bạt, thả chõ hút thẳng xuống vũng bùn đặc, không cần màng lọc.\n\nĐóng cầu dao. Động cơ gầm lên một tiếng nặng nhọc, rung bần bật trên bờ đất. Trục quay rít lên từng hồi ma sát.\n\nMột giây. Hai giây. Rồi một tiếng ọc lớn phát ra. Dòng nước đục ngầu, sền sệt như cháo bóp nát cả những cọng rơm rạ, phụt mạnh ra từ ống xả, tràn vào mặt ruộng khô khốc.\n\n— Ra nước rồi! Nước bùn mà nó vẫn đẩy được! — Vài người dân xung quanh chạy tới, reo lên sung sướng khi thấy dòng nước cứu sinh tuôn chảy.\n\nHải thở phào, xoa đôi bàn tay phồng rộp vì quai búa. Anh biết đây chỉ là giải pháp tạm thời. Buồng bơm sẽ sớm bị mài mòn, nhưng hôm nay, anh đã có vốn để bắt đầu.",
+          "causalStateChange": "Từ chỗ bất lực nhìn ruộng lúa chết khô và máy bơm cháy, Hải dùng kỹ năng cơ khí ép cải tạo máy bơm, cứu được ruộng lúa và có vốn khởi điểm.",
+          "requiredPlanAnchor": "Gò lại cánh quạt kín thành cánh hở tại mép ruộng",
+          "protagonistChoice": "Chấp nhận rủi ro bị bắt đền tiền chiếc máy bơm nhập khẩu đắt giá để đập vỡ cánh quạt, cải tạo nó ngay tại hiện trường.",
+          "agencyMove": "Chủ động tháo máy, dùng búa và đe phá vỡ cấu trúc cánh kín của máy bơm Liên Xô để tạo không gian cho rác và bùn lọt qua.",
+          "earnedReward": "Chiếc máy hàn hồ quang cũ đã hỏng mâm từ và xác một chiếc động cơ cháy từ kho của Hợp tác xã.",
+          "materialProgression": "Thu được công cụ sản xuất nền tảng đầu tiên (máy hàn) để bắt đầu xây dựng xưởng cơ khí cá nhân.",
+          "comfortPayoff": "Được trưởng thôn Ba mời một bữa cơm trắng với tép rang cháy cạnh ngay tại bờ ruộng, thay cho những bữa khoai sắn lót dạ.",
+          "costPaid": "Đôi bàn tay bị phồng rộp rỉ máu do vung búa tạ liên tục, và sự hoài nghi gay gắt từ trưởng thôn trước khi có kết quả.",
+          "exitPressure": "Giải pháp đập cánh quạt chỉ dùng được vài giờ. Đất cát trong bùn đang mài mòn buồng bơm cũ, Hải bắt buộc phải tự đúc một bộ cánh quạt hở bằng gang chuẩn chỉ nếu muốn bán lấy tiền."
+        },
+        {
+          "chapterNumber": 2,
+          "title": "Thước Căn Lá Và Đêm Chỉnh Máy",
+          "prose": "Xác máy hàn cũ được Hải sửa lại mâm từ trong buổi sáng hôm sau. Từ chỗ tiền công cứu lúa của thôn, anh vét sạch túi được bảy mươi nghìn đồng, đạp xe rã rời hai chục cây số lên lò đúc của HTX cơ khí huyện.\n\nHải đặt thợ lò đúc một thớt buồng bơm và một cánh quạt hở bằng gang xám, khuôn gỗ do chính tay anh đẽo gọt. Bọn thợ đúc cười khẩy khi thấy cái cánh quạt ba cánh trơ trọi, trông giống như chân vịt tàu thủy hơn là đồ bơm nước.\n\nTrưa hôm thứ ba, Hải hì hục chở bao tải chứa hai phôi gang đen sì, sần sùi về xưởng che tạm bằng bạt nilon ở góc vườn nhà. Gia tài chỉ còn đúng nửa lon gạo, nhưng mắt anh sáng rực.\n\nGang xám rất giòn. Nếu lắp không chuẩn, lực ly tâm khi quay ở tốc độ hai ngàn chín trăm vòng một phút sẽ văng nát cánh quạt. Bài toán lớn nhất của bơm ly tâm cánh hở là khe hở giữa cánh và mặt thớt buồng bơm.\n\n— Rộng quá thì mất áp, tụt nước. Hẹp quá thì sỏi kẹt vào là gãy cánh... — Hải lẩm bẩm, cẩn thận đặt cánh quạt lên hai thanh thép song song đã căn thăng bằng bằng bọt nước.\n\nAnh thắp ngọn đèn dầu hỏa sáng rực. Suốt năm tiếng đồng hồ của ca đêm, tiếng máy mài đá hai đầu kêu rít lên chói tai. Hải kiên nhẫn mài bớt từng gram kim loại ở các góc cánh quạt để nó đạt độ cân bằng tĩnh hoàn hảo, không tự lăn trên hai thanh thép.\n\nĐến khâu lắp ráp ghép vào động cơ, Hải lấy từ trong hộp đồ nghề ra một bộ căn lá đồng mỏng dính. Anh lót vào khe hở, siết ốc, rồi lại tháo ra mài đệm lót trục.\n\n— Phải duy trì chính xác một ly rưỡi. Không được sai một vạch. — Hải cắn chặt môi, mồ hôi ướt sũng chiếc áo bảo hộ sờn rách. Anh dùng căn lá đồng miết dọc theo vòng quay của cánh quạt.\n\nĐúng một ly rưỡi. Ở khoảng cách này, những viên sỏi nhỏ sẽ bị đánh bật ra ngoài theo luồng nước mà không kẹt cứng lại làm vỡ gang, đồng thời vẫn giữ được lực hút chân không để kéo bùn đặc lên.\n\nGần sáng, nguyên mẫu bơm bùn đầu tiên ra đời. Nó có vẻ ngoài thô kệch, nặng trịch, sơn chống rỉ màu xám xịt, khác hẳn vẻ bóng bẩy của máy bơm quốc doanh. Nhưng bên trong là một buồng thủy lực chuyên trị môi trường khắc nghiệt.\n\nSáng hôm sau, tin đồn về thằng Hải chế được máy hút bùn lan ra. Một lão nông ở xóm dưới tìm đến tận nhà, xách theo một bao lúa mười cân và hai trăm nghìn tiền mặt.\n\n— Bán cho chú cái máy đó. Trạm bơm đóng cửa rồi, ruộng nhà chú cạn khô, mua bơm cửa hàng về cắm xuống là cháy. Chú nghe ông Ba nói mày có máy hút được bùn? — Lão nông hối hả.\n\nHải gật đầu, nhận tiền, giao máy. Nhưng trong thâm tâm, anh biết một rủi ro chết người vẫn đang chực chờ. Khâu chống thấm nước của trục bơm anh vẫn phải dùng phớt cơ khí bán sẵn ở chợ trời.",
+          "causalStateChange": "Từ nguyên lý tạm thời, Hải chuyển hóa thành sản phẩm vật lý (nguyên mẫu bơm bùn) bằng kỹ thuật cơ khí chính xác, bán được chiếc máy đầu tiên thu về tiền mặt.",
+          "requiredPlanAnchor": "Dùng căn lá đồng đo khe hở buồng bơm chuẩn 1.5mm",
+          "protagonistChoice": "Chấp nhận tiêu sạch vốn liếng và nhịn đói để đặt đúc phôi gang chất lượng, tự tay mài cân bằng tĩnh thay vì lắp ẩu bán kiếm tiền ngay.",
+          "agencyMove": "Dùng kiến thức cơ học chất lưu và bộ căn lá đồng để tinh chỉnh khe hở làm việc của buồng bơm, đảm bảo điểm cân bằng giữa việc tạo áp và chống kẹt rác.",
+          "earnedReward": "Hai trăm nghìn đồng tiền mặt và mười cân lúa từ vị khách hàng đầu tiên, chứng minh nhu cầu có thực của thị trường.",
+          "materialProgression": "Chuyển từ việc sửa chữa chắp vá sang khả năng tự lắp ráp một máy bơm hoàn chỉnh mang thương hiệu cá nhân với các phôi đúc theo khuôn riêng.",
+          "comfortPayoff": "Đổi mười cân lúa lấy gạo nương thơm, nấu một nồi cơm trắng dẻo không độn sắn mài cho cả nhà ăn bữa sáng no nê.",
+          "costPaid": "Thức trắng đêm mài gang, hít bụi kim loại độc hại và đánh cược toàn bộ tài sản vào một mẻ đúc chưa qua kiểm chứng dài hạn.",
+          "exitPressure": "Bán được máy nhưng linh cảm về sự yếu kém của phớt cơ khí chợ trời trước áp lực nước bùn cọ xát liên tục khiến Hải ăn ngủ không yên."
+        },
+        {
+          "chapterNumber": 3,
+          "title": "Phớt Da Bò Cứu Nguy",
+          "prose": "Mới đến chiều ngày thứ ba sau khi bán máy, điều Hải lo sợ nhất đã xảy ra. Lão nông xóm dưới đạp xe xộc thẳng vào sân nhà, mặt bừng bừng tức giận, theo sau là chiếc xe kéo chở cái máy bơm dính đầy bùn đất.\n\n— Đồ lừa đảo! Máy mày chạy được đúng một ngày thì kẹt cứng, giờ cắm điện chỉ rên o o. Nước rỉ tong tỏng ra chỗ trục mô tơ thế kia kìa! — Lão nông ném toẹt cuộn dây điện xuống sân.\n\nHải không cãi lại. Anh lập tức xách túi đồ nghề bạt cũ kĩ chạy ra. Tháo ốc lốc máy, một cảnh tượng tồi tệ hiện ra: ổ bi vỡ nát, rỉ sét vàng khè. Nước bùn mang theo cát mịn đã đánh xước và phá hỏng hoàn toàn chiếc phớt cơ khí mỏng manh.\n\n— Lỗi do cháu chưa lường hết độ mài mòn của cát mịn dưới mương. — Hải bình tĩnh nói, nhấc chiếc trục động cơ đã kẹt cứng ra. — Cháu hứa sửa xong ngay tại bờ ruộng trong mười hai tiếng, chú cứ ngồi uống nước.\n\nĐể đền bù, Hải phải móc số tiền hai trăm nghìn vừa kiếm được ra mua một bộ bi nồi mới tinh của Nhật. Nhưng thay bi mới cũng sẽ hỏng nếu không chặn được cát lọt qua phớt.\n\nAnh lôi từ đáy thùng đồ nghề ra một tấm da bò thuộc dày cộp mà anh xin được từ lò mổ của xã tuần trước. Da bò có đặc tính ngậm mỡ và trương nở khi gặp nước, tự tạo ra lớp gioăng bó sát trục quay mà không bị cát cào rách dễ dàng như cao su hay sứ.\n\nHải hì hục dùng compa vạch, rồi lấy kéo và đục sắt cắt tấm da bò thành ba vòng đệm tròn trịa. Anh đem ngâm chúng vào hộp mỡ bò chịu nhiệt đun chảy trên bếp than tổ ong.\n\nKhi những vòng da bò đã no mỡ, chuyển sang màu đen bóng, Hải xếp chúng vào bầu chứa phớt, xen kẽ với lò xo ép và phớt cao su cũ. Lực ép của lò xo sẽ đẩy da bò ôm chặt lấy trục. Khi trục quay, mỡ bò tứa ra làm trơn, còn cát bị lớp da bò cứng cáp gạt ngược trở lại.\n\nHai tiếng sau, chiếc máy bơm được chở lại ra mép ruộng xóm dưới. Hải tự tay cắm điện. Động cơ kêu rè rè êm ru, không còn tiếng kim loại nghiến vào nhau. Nước bùn đặc quánh lại ào ạt phun ra, tưới tắm cho ruộng ngô đang héo rũ.\n\n— Tài thật! Trục máy khô ran, không gỉ một giọt nước nào! — Lão nông lúc nãy còn chửi bới, giờ há hốc mồm vuốt ve lớp vỏ động cơ khô ráo.\n\nTiếng lành đồn xa. Chiều hôm đó, có thêm ba hộ dân kéo đến tận xưởng của Hải đặt tiền cọc mua máy bơm hút bùn, chấp nhận đợi ba ngày để anh đúc phôi.\n\nCầm xấp tiền cọc dày cộm, Hải ra thẳng sạp thịt chợ xã. Anh vung tay mua hai cân thịt ba chỉ ngon nhất và một chai nước mắm cốt. Tối hôm đó, mùi thịt lợn rang cháy cạnh thơm nức mũi tỏa ra từ căn bếp xập xệ của gia đình Hải.\n\nBữa cơm tràn ngập tiếng cười của đàn em nhỏ. Tuy nhiên, niềm vui chưa trọn vẹn. Sáng hôm sau, một chiếc xe Uaz màu xanh quân sự đỗ xịch trước cổng nhà Hải. Trưởng trạm thủy nông huyện bước xuống, ánh mắt sắc lẹm nhìn vào những chiếc khuôn đúc gỗ.\n\n— Nghe nói cậu chế được bơm bùn cứu lúa? Trạm muốn đặt hai chục cái cho xã bên, nhưng phòng tài vụ yêu cầu phải có hóa đơn đỏ. Cậu làm chui thế này, lấy đâu ra tư cách pháp nhân mà ký hợp đồng? — Vị trưởng trạm lạnh lùng ra điều kiện.",
+          "causalStateChange": "Hải giải quyết thành công nhược điểm chí mạng của máy bơm bùn bằng vật liệu tự chế, lấy lại uy tín, thu được nhiều đơn hàng nhưng bị cuốn vào hệ thống kinh tế chính quy.",
+          "requiredPlanAnchor": "Chế phớt chắn cát bằng vòng đệm da bò ngâm mỡ",
+          "protagonistChoice": "Không trốn tránh trách nhiệm, chấp nhận đền tiền túi thay ổ bi Nhật đắt tiền và tự sáng chế phớt da bò để giữ uy tín bảo hành tại ruộng.",
+          "agencyMove": "Ứng dụng đặc tính cơ lý của da bò thuộc ngậm mỡ để thay thế phớt cơ khí tiêu chuẩn, giải bài toán mài mòn do cát mịn gây ra.",
+          "earnedReward": "Sự tin tưởng tuyệt đối của nông dân, dẫn đến việc ba hộ dân tự động mang tiền mặt đến đặt cọc mua máy bơm mà không cần xem hàng trước.",
+          "materialProgression": "Hoàn thiện công nghệ lõi của máy bơm bùn (cánh hở + phớt da bò), chuyển từ mô hình bán đơn lẻ sang có đơn đặt hàng chờ (backlog).",
+          "comfortPayoff": "Mua được hai cân thịt ba chỉ ngon, mang lại bữa cơm cải thiện thực sự chất lượng, đầy đủ dinh dưỡng cho gia đình sau nhiều tháng đói kém.",
+          "costPaid": "Mất trắng số tiền lãi của chiếc máy đầu tiên để mua ổ bi Nhật đền cho khách, tốn thời gian hì hục cắt gọt da bò trong áp lực bị chửi mắng.",
+          "exitPressure": "Đơn hàng lớn từ Trạm thủy nông huyện vừa là cơ hội đổi đời vừa là gông cùm: Hải buộc phải tìm cách lập doanh nghiệp hoặc đăng ký kinh doanh để xuất hóa đơn đỏ, nếu không sẽ mất mối và bị cấm sản xuất chui."
+        }
+      ],
+      "continuityDigest": "Hải cải tạo bơm cháy thành máy bơm bùn tại ruộng -> Kiếm được máy hàn và tự đúc phôi gang lắp ráp máy bơm chuẩn -> Máy bán ra bị hỏng phớt do cát, Hải chế phớt da bò ngâm mỡ cứu vãn tình thế -> Uy tín lan rộng kéo theo đơn hàng lớn từ trạm thủy nông nhưng đòi hỏi tính pháp lý.",
+      "unresolvedPressure": "Áp lực pháp lý từ Trạm thủy nông huyện khi yêu cầu hóa đơn đỏ cho đơn hàng 20 máy bơm, buộc Hải phải thoát khỏi quy mô xưởng gia đình chui để đối mặt với thủ tục hành chính khắt khe."
+    },
+    {
+      "schemaVersion": 2,
+      "candidateId": "concept_casting_bottleneck_10",
+      "chapters": [
+        {
+          "chapterNumber": 1,
+          "title": "Mẻ Cát Ướt Sũng",
+          "prose": "Xưởng đúc của Hợp tác xã Toàn Thắng mịt mù khói khét lẹt. Lâm đứng khoanh tay trước đống phôi gang vừa dỡ khuôn, lông mày nhíu chặt. Bề mặt vỏ bơm lỗ rỗ như tổ ong, cầm mũi ve gõ nhẹ là vỡ vụn.\n\n— Thế này thì tiện thô thế nào được? Giao hàng kiểu này khác gì giết xưởng cơ khí của tôi? — Lâm hất hàm về phía quản đốc Hải.\n\nLão Hải nhổ toẹt bãi nước bọt xuống nền đất đen sì, vỗ tay bành bạch, hất mặt lên đầy thách thức.\n\n— Cậu giỏi thì đi mà làm! Than thì đầy lưu huỳnh, trời thì nồm ẩm. Đúc ra hình cái vỏ bơm là phúc tổ bảy mươi đời rồi, ở đấy mà chê với bai.\n\nLâm không cãi lại. Hắn bước thẳng về phía đống cát tạo khuôn đang được mấy thợ học việc nhào trộn bằng xẻng. Hắn thò tay bốc một nắm cát, bóp chặt rồi mở lòng bàn tay ra. Khối cát vỡ vụn, ướt nhẹp và dính chặt vào kẽ tay.\n\n— Cát ướt sũng thế này, nước bốc hơi đột ngột khi rót gang 1300 độ thì không nổ khuôn rỗ khí mới lạ. — Lâm phủi tay, giọng lạnh tanh. — Dừng ngay mẻ rót tiếp theo lại. Xúc hết đống này rải ra bãi tôn ngoài nắng phơi sấy lại cho tôi!\n\nMấy người thợ ngơ ngác nhìn lão Hải. Lão đỏ mặt tía tai định chửi, nhưng mẻ gang trong lò chảo đã bắt đầu chuyển màu đỏ cam, sủi bọt chuẩn bị ra lò. Nếu hỏng mẻ này nữa, HTX cũng vỡ nợ vì hết sạch than.\n\n— Cho tôi một giờ, tôi sửa lại tỷ lệ cát và hệ thống rót. Đổi lại, mẻ phôi 20 cái này tôi lấy miễn phí cấn trừ vào hợp đồng cũ các người nợ tôi. — Lâm đưa ra điều kiện, ánh mắt không chớp nhìn thẳng lão Hải.\n\nKhông đợi lão gật đầu, Lâm lột chiếc áo bảo hộ, vồ lấy cây xẻng xúc cát. Hắn chỉ đạo đám thợ rải cát mỏng ra tấm tôn đốt củi sấy bên dưới. Vừa làm, hắn vừa đong đếm lại tỷ lệ: đúng 8 phần trăm đất sét, 5 phần trăm nước.\n\nKhi nắm cát mới nằm gọn trong tay, không rã, không dính kẽ tay, Lâm mới gật đầu cho dầm lại khuôn. Hắn tự tay đắp lại hệ thống rót, khoét rộng thêm đậu ngót để thoát khí.\n\nMột giờ sau, dòng gang đỏ rực được rót vào những khuôn cát mới. Không hề có tiếng xèo xèo của hơi nước bốc lên đột ngột. Khi đập khuôn, hai mươi chiếc vỏ bơm láng mịn, đen bóng hiện ra trong sự ngỡ ngàng của cả xưởng.\n\nLâm gọi thợ phụ tự tay bốc phôi lên chiếc xe ba gác, không thèm nhìn khuôn mặt hằm hằm của lão Hải, đạp xe thẳng về xưởng nhà.",
+          "causalStateChange": "Từ chỗ sắp trễ hợp đồng vì phôi hỏng, Lâm dùng kiến thức kỹ thuật đoạt được lô phôi chất lượng tốt, nhưng làm mất mặt hoàn toàn quản đốc xưởng đúc độc quyền.",
+          "requiredPlanAnchor": "Sấy khô 20 khuôn cát vỏ bơm",
+          "protagonistChoice": "Bất chấp sự chống đối của quản đốc, Lâm tự tay nhào trộn lại cát khuôn và sửa đậu ngót để cứu mẻ gang cuối.",
+          "agencyMove": "Dùng kiến thức kiểm tra độ ẩm cát bằng tay không và can thiệp trực tiếp vào dây chuyền nhà người khác để ép đổi lấy lợi ích.",
+          "earnedReward": "Hai mươi chiếc vỏ bơm láng mịn miễn phí, đủ để duy trì hợp đồng hiện tại.",
+          "materialProgression": "Nhận được nguyên liệu thô đạt chuẩn mà không mất tiền mua.",
+          "comfortPayoff": "Giải tỏa cơn ức chế vì bị chèn ép, lấy lại vị thế làm chủ công việc trước thợ của mình.",
+          "costPaid": "Đắc tội trực tiếp với Hợp tác xã Toàn Thắng, cắt đứt nguồn cung phôi gang duy nhất trong huyện.",
+          "exitPressure": "Sau khi giao xong hai mươi vỏ bơm này, xưởng của Lâm sẽ không còn chỗ nào để mua phôi cho đợt hàng tiếp theo."
+        },
+        {
+          "chapterNumber": 2,
+          "title": "Than Cốc Chợ Đen",
+          "prose": "Hai mươi chiếc vỏ bơm hoàn hảo giúp xưởng cơ khí nhỏ của Lâm hoàn thành đợt giao hàng đầu tiên cho trạm bơm xã. Khi cầm xấp tiền giấy dày cộp từ tay chủ nhiệm xã, Lâm thở phào.\n\nNhưng niềm vui ngắn chẳng tày gang. Buổi chiều, lão Hải cử người mang đến một tờ giấy báo giá mới. Giá phôi gang tăng gấp rưỡi, lại còn yêu cầu đặt cọc trước một tháng. Lão muốn bóp nghẹt cái mầm mống cơ khí tư nhân vừa dám làm bẽ mặt HTX.\n\n— Chó thật, chúng nó cậy độc quyền cả cái huyện này nên muốn ép ai thì ép! — Thằng Hưng, thợ phụ của Lâm đập mạnh cờ lê xuống bàn thợ, mặt hầm hầm phẫn nộ.\n\nLâm vuốt ve tờ tiền mới cứng trong túi, ánh mắt nhìn ra khoảng sân đất trống cỏ mọc um tùm sau xưởng. Hắn biết rõ, nếu không tự chủ được khâu đúc, làm cơ khí mãi mãi chỉ là đi làm thuê cho lò gang.\n\n— Rút toàn bộ tiền lãi đợt này, thuê xe bò ra bãi phế liệu nhà ga gom hết đường ray hỏng và bệ máy cày gỉ cho anh. — Lâm ra lệnh, giọng quả quyết không một chút do dự.\n\n— Gom sắt vụn làm gì hả anh? Mình đâu có lò nấu gang? — Hưng há hốc mồm kinh ngạc.\n\n— Thì xây! — Lâm gõ tay lên bản vẽ phác thảo hắn đã vẽ sẵn đêm qua. — Anh sẽ tự xây một cái lò chảo cỡ nhỏ ngay tại góc sân kia.\n\nNhưng bài toán khó nhất không phải là gạch chịu lửa hay sắt vụn, mà là than cốc. Than bùn địa phương đầy lưu huỳnh sẽ làm gang giòn như bánh đa. Đúc chịu áp lực nước thì bắt buộc phải có than cốc xịn.\n\nLâm xách theo chai lựu đạn rượu quốc lủi và hai bao Vàm Cỏ, lặn lội ra tận bãi đỗ xe tải đường dài quốc lộ. Hắn chầu chực từ tối đến khuya, tiếp cận một tay tài xế chở than từ mỏ Cọc Sáu Quảng Ninh đi ngang qua.\n\nSau ba chầu rượu và một khoản tiền đút lót cắt cổ, Lâm mua lại được phần than dư tuồn lén trong đêm. Số tiền lãi vừa cầm nóng tay đã sạch bách, thậm chí hắn còn phải cắm tạm cái xe đạp thống nhất của vợ để trả nốt tiền cước xe tải chở than về.\n\nVề đến xưởng lúc ba giờ sáng, nhìn đống than đen bóng và đống sắt vụn chất cao ở góc sân, Lâm mỉm cười xoa tay. Cái giá phải trả là túi tiền rỗng tuếch, nhưng nền móng đầu tiên của quyền tự quyết đã nằm trên sân nhà.",
+          "causalStateChange": "Bị HTX cấm vận nguồn cung, Lâm dùng toàn bộ vốn liếng vừa kiếm được chuyển đổi sang vật tư tự xây lò nấu gang, biến xưởng cơ khí thành cơ sở đúc khép kín.",
+          "requiredPlanAnchor": "Gom 150kg than cốc chợ đen",
+          "protagonistChoice": "Chơi tất tay toàn bộ lợi nhuận và cầm cố tài sản gia đình để mua vật liệu đúc thay vì cắn răng chịu mức giá ép uổng của HTX.",
+          "agencyMove": "Tự đi ngoại giao, đút lót tài xế đường dài để giải quyết điểm nghẽn nguyên liệu cốt lõi (than cốc) mà địa phương không có.",
+          "earnedReward": "Mua được than cốc chất lượng cao và lượng lớn gang phế liệu giá rẻ.",
+          "materialProgression": "Vật liệu luyện kim chất đống trong sân, bản vẽ lò chảo chuẩn bị được thi công thực tế.",
+          "comfortPayoff": "Sự hưng phấn của người thợ khi bắt đầu làm chủ dây chuyền sản xuất của chính mình.",
+          "costPaid": "Đầu tư sạch số tiền tạm ứng, cầm cố xe đạp của vợ, đối mặt rủi ro phá sản nếu mẻ đúc tự làm thất bại.",
+          "exitPressure": "Tiền đã cạn, vật tư đã mua, Lâm buộc phải nấu thành công mẻ gang ngay trong đêm mai để kịp ra phôi giao đợt hai, không có cơ hội thử nghiệm lần hai."
+        },
+        {
+          "chapterNumber": 3,
+          "title": "Lửa Đêm Và Búa Tạ",
+          "prose": "Đêm khuya, góc sân sau xưởng cơ khí sáng rực như ban ngày. Chiếc lò chảo cao hai mét do Lâm tự đắp gạch chịu lửa đang gầm rít, nuốt chửng từng tảng than cốc và gang vụn.\n\nNhiệt độ ngoài trời oi bức cộng thêm hơi nóng hầm hập từ lò khiến Lâm cởi trần, mồ hôi nhễ nhại chảy ròng ròng trên những bắp thịt cuồn cuộn. Hắn đeo cặp kính thợ hàn tối màu, căng mắt nhìn qua lỗ quan sát sát đáy lò.\n\n— Gang chảy rồi anh Lâm ơi! — Tiếng thằng Hưng hét lên lanh lảnh trong tiếng quạt gió thổi ù ù.\n\nDòng nước gang đỏ cam, sáng lóa vọt ra từ lỗ tháo xỉ khi Lâm dùng sào dài chọc thủng nút đất sét. Nhiệt độ đạt chuẩn 1300 độ C, gang chảy loãng như nước, điền đầy vào dãy khuôn cát đã được sấy khô hoàn hảo.\n\nSáng hôm sau, Lâm cùng Hưng đập khuôn. Ba mươi chiếc vỏ bơm hình thù vuông vức, bề mặt nhám đều, không có lấy một vết lõm nứt ngót. Lâm mang toàn bộ vỏ đi tiện thô rồi đưa lên bệ thử áp lực nước.\n\nHai mươi tám chiếc hoàn hảo. Nhưng chiếc thứ hai mươi chín và ba mươi, đồng hồ áp suất vừa nhích lên, những giọt nước li ti đã rỉ ra từ bề mặt gang thép đen sì. Rỗ vi mô. Lỗi do thao tác rót đoạn cuối bị hụt hơi, dòng chảy không liên tục.\n\n— Hơi rỉ một tí thôi anh, trát tý ma tít rồi sơn đè lên là nông dân không biết đâu. Tiếc của lắm! — Hưng ôm lấy cái vỏ bơm lỗi, suýt xoa xót ruột đống tiền than cốc.\n\nLâm không nói không rằng, vác cây búa tạ 5kg bước tới. Bốp! Bốp! Hai tiếng chát chúa vang lên. Hai chiếc vỏ bơm vỡ đôi, lộ ra những bọt khí nhỏ li ti bên trong lớp thịt gang.\n\n— Uy tín của xưởng không đánh đổi bằng vài đồng bạc cắc. Rỗ là đập, nấu lại! — Lời Lâm đanh thép, dập tắt mọi ý định giấu giếm gian dối của thợ thuyền.\n\nĐổi lại, 28 chiếc máy bơm hoàn chỉnh xuất xưởng buổi chiều mang về một xấp tiền lớn chưa từng có. Chiều đó, bữa cơm nhà Lâm có thêm một cân thịt ba chỉ quay giòn rụm và một chiếc quạt bàn Điện Cơ Thống Nhất mới cóng xoay vù vù thổi bay cái nóng mùa hè.\n\nVợ hắn rơm rớm nước mắt gắp miếng thịt dày cho chồng, thằng con trai thì cứ chúi mũi vào lồng quạt trêu gió. Khung cảnh gia đình đầm ấm khiến mọi mệt mỏi của đêm thức trắng tan biến.\n\nĐúng lúc cả nhà đang ăn ngon miệng, cánh cửa xưởng bị đập dầm dầm. Một cán bộ đeo băng đỏ của Phòng Quản lý Đô thị Huyện đứng chống nạnh ngoài cửa, chỉ tay vào cái ống khói xám xịt trên nóc lò.\n\n— Anh Lâm! Xưởng anh xả khói mù mịt tối qua làm dân khu phố gửi đơn kiện rồi. Đề nghị anh dập lò ngay, chúng tôi sẽ lập biên bản đình chỉ hoạt động đúc gang trong khu dân cư!",
+          "causalStateChange": "Từ thử nghiệm cá nhân, Lâm đúc thành công phôi gang, thiết lập được tiêu chuẩn KCS khắt khe, nhưng hệ lụy môi trường ngay lập tức thu hút sự can thiệp của chính quyền.",
+          "requiredPlanAnchor": "Đập bỏ phôi rỉ nước dưới áp lực",
+          "protagonistChoice": "Kiên quyết dùng búa tạ đập nát phôi lỗi trước mặt thợ thay vì dùng mồi nhét ma tít lừa khách hàng.",
+          "agencyMove": "Trực tiếp điều hành mẻ đúc thủ công gian khổ, thiết lập uy quyền tuyệt đối về chất lượng bằng hành động phá hủy giá trị ngắn hạn.",
+          "earnedReward": "Sản xuất thành công 28 máy bơm chất lượng cao, thu về lợi nhuận lớn đợt hai, xác lập lòng tin với đội ngũ.",
+          "materialProgression": "Đổi tiền bán bơm lấy chiếc quạt máy mới và mâm cơm có thịt, cải thiện rõ rệt đời sống gia đình.",
+          "comfortPayoff": "Nhìn thấy vợ con được hưởng thụ tiện nghi vật chất đầu tiên từ mồ hôi công sức của mình, tận hưởng thành quả của sự lao động kỹ thuật.",
+          "costPaid": "Hao hụt than cốc, phế liệu gang do đập bỏ phôi lỗi, cạn kiệt sức lực sau một đêm thức trắng chịu đựng nhiệt độ cao.",
+          "exitPressure": "Chính quyền đòi lập biên bản đình chỉ lò đúc vì khói bụi ô nhiễm, đe dọa trực tiếp đến cần câu cơm vừa mới xây dựng xong."
+        }
+      ],
+      "continuityDigest": "Lâm vượt qua sự kìm kẹp của HTX bằng cách tự xây lò chảo, đánh đổi tiền vốn và mồ hôi để đúc thành công lô vỏ bơm đầu tiên, mang lại tiện nghi cho gia đình nhưng lập tức vướng rắc rối môi trường.",
+      "unresolvedPressure": "Chính quyền đòi đình chỉ lò đúc vì khói bụi, buộc Lâm phải tìm cách chế tạo hệ thống xử lý khí thải thủ công bằng tia nước nếu không muốn lò bị dỡ bỏ."
+    }
+  ],
+  "status": "awaiting_human_selection"
+}

@@ -34,6 +34,8 @@
     "flagship:approve-checkpoint": "node --import tsx scripts/flagship-approve-checkpoint.ts",
     "flagship:portfolio:validate": "node --import tsx scripts/flagship-portfolio-validate.ts",
     "flagship:portfolio:promote": "node --import tsx scripts/flagship-portfolio-promote.ts",
+    "flagship:portfolio:tournaments": "node --import tsx scripts/flagship-portfolio-tournaments.ts",
+    "flagship:portfolio:review": "node --import tsx scripts/flagship-portfolio-review-openings.ts",
     "flagship:catalogue:validate": "node --import tsx scripts/flagship-catalogue-validate.ts",
     "flagship:catalogue:export": "node --import tsx scripts/export-flagship-catalogue.ts",
     "flagship:covers:render": "node --import tsx scripts/render-flagship-covers.ts",
@@ -98,7 +100,8 @@
     "tailwind-merge": "^3.3.0",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^1.1.2",
-    "zod": "^3.25.28"
+    "zod": "^3.25.28",
+    "zod-to-json-schema": "^3.25.2"
   },
   "devDependencies": {
     "@dyad-sh/nextjs-webpack-component-tagger": "latest",

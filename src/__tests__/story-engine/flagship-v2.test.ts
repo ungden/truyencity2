@@ -11,6 +11,7 @@ import {
   buildWriterPrompt,
   buildCharacterDesignPrompt,
   buildCausalWorldPrompt,
+  buildConceptJudgePrompt,
   buildLaunchPackPrompt,
   buildOpeningSimulationPrompt,
   canPublishFlagshipChapter,
@@ -25,6 +26,7 @@ import {
   materializeFlagshipLaunchPackV2,
   FlagshipSetupBriefV2Schema,
   HumanConceptSelectionV2Schema,
+  OpeningTrialTransportV2Schema,
   validateRollingPlanWindow,
   validatePleasureWindow,
   FlagshipModelRoutesV2Schema,
@@ -258,6 +260,13 @@ describe('flagship v2 contracts and computed foundation', () => {
     const chapter = plan();
     chapter.scenes[0].irreversibleChange = long('Không có gì thay đổi');
     expect(validateChapterPlanSemantics(chapter)[0].path).toBe('scenes.0');
+  });
+
+  it('allows concise causal actor labels without relaxing rule evidence', () => {
+    const value = spec();
+    value.causalWorldRules[0].beneficiary = 'thợ già';
+    value.causalWorldRules[0].harmedParty = 'chủ lò';
+    expect(StorySpecV2Schema.parse(value).causalWorldRules[0]).toMatchObject({ beneficiary: 'thợ già', harmedParty: 'chủ lò' });
   });
 });
 
@@ -565,6 +574,28 @@ describe('isolated flagship setup v2', () => {
     };
   };
 
+  it('accepts short dialogue paragraphs while enforcing total chapter substance', () => {
+    const transport = openingTransportFor('concept_c0');
+    transport.chapters[0].proseParagraphs[0] = '— Ừ.';
+    expect(OpeningTrialTransportV2Schema.parse(transport).chapters[0].proseParagraphs[0]).toBe('— Ừ.');
+  });
+
+  it('allows payoff to land within the opening window but requires it by chapter three', () => {
+    const transport: any = openingTransportFor('concept_c0');
+    transport.chapters[0].earnedReward = null;
+    transport.chapters[0].materialProgression = null;
+    transport.chapters[0].comfortPayoff = null;
+    expect(OpeningTrialTransportV2Schema.parse(transport).chapters[0].earnedReward).toBeNull();
+    transport.chapters[2].materialProgression = null;
+    expect(OpeningTrialTransportV2Schema.safeParse(transport).success).toBe(false);
+  });
+
+  it('keeps required plan anchors short enough to copy verbatim', () => {
+    const transport = openingTransportFor('concept_c0');
+    transport.chapters[0].requiredPlanAnchor = 'mua lõi cảm âm mới';
+    expect(OpeningTrialTransportV2Schema.parse(transport).chapters[0].requiredPlanAnchor).toBe('mua lõi cảm âm mới');
+  });
+
   it('runs 20 concepts, independent pairwise ranking and three openings in five calls', async () => {
     const ranking = {
       schemaVersion: 2,
@@ -573,15 +604,35 @@ describe('isolated flagship setup v2', () => {
       finalistIds: ['concept_c0', 'concept_c1', 'concept_c2'],
       finalistWorldKernels: ['concept_c0', 'concept_c1', 'concept_c2'].map(kernelFor),
     };
+    const responseSchemas: Record<string, unknown>[] = [];
     const result = await generateConceptTournamentV2(brief, { invoke: async call => {
+      responseSchemas.push(call.responseJsonSchema);
       if (call.role === 'concept_lab') return JSON.stringify({ schemaVersion: 2, candidates: concepts });
       if (call.role === 'concept_judge') return JSON.stringify(ranking);
       return JSON.stringify(openingTransportFor(call.candidateId!));
     } });
     expect(result.callRoles).toEqual(['concept_lab', 'concept_judge', 'opening_simulator', 'opening_simulator', 'opening_simulator']);
+    expect(responseSchemas).toHaveLength(5);
+    expect(responseSchemas.every(schema => schema.type === 'object')).toBe(true);
+    expect(JSON.stringify(responseSchemas)).not.toContain('"const"');
+    expect(JSON.stringify(responseSchemas)).not.toContain('"minLength"');
+    expect(JSON.stringify(responseSchemas)).not.toContain('"pattern"');
+    expect(JSON.stringify(responseSchemas)).not.toContain('"minItems"');
+    expect(JSON.stringify(responseSchemas)).not.toContain('"maxItems"');
     expect(result.artifact.openings).toHaveLength(3);
     expect(result.artifact.status).toBe('awaiting_human_selection');
-    expect(buildOpeningSimulationPrompt(brief, concepts[0], kernelFor('concept_c0'))).toContain('APPROVED_WORLD_KERNEL');
+    const openingPrompt = buildOpeningSimulationPrompt(brief, concepts[0], kernelFor('concept_c0'));
+    expect(openingPrompt).toContain('APPROVED_WORLD_KERNEL');
+    expect(openingPrompt).toContain('không được bỏ dấu đóng root');
+    const judgePrompt = buildConceptJudgePrompt(brief, concepts);
+    expect(judgePrompt).toContain('REQUIRED_RANKING_COUNT=20');
+    expect(judgePrompt).toContain('REQUIRED_CANDIDATE_IDS_EXACT');
+    expect(judgePrompt).toContain('không được chỉ ghi tên địa điểm');
+    expect(judgePrompt).toContain('không được ghi "không có ngoại lệ"');
+    expect(judgePrompt).toContain('nêu cả nguồn gốc lẫn ai hoặc bằng cách nào');
+    expect(judgePrompt).toContain('theo đúng thứ tự và byte-for-byte');
+    expect(judgePrompt).toContain('không được chỉ ghi tên/tiêu đề luật');
+    expect(judgePrompt).toContain('2-5 sceneAffordances khác nhau');
   });
 
   it('materializes only a human-selected finalist and preserves immutable artifacts', async () => {

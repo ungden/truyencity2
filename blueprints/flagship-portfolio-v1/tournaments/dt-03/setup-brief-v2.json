@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 2,
+  "language": "vi",
+  "portfolioSlotId": "DT-03",
+  "genreLane": "era_industrial",
+  "laneCardIds": [
+    "market_era_livelihood",
+    "market_urban_professional"
+  ],
+  "distinctnessFingerprint": "rebirth|chọn nhu cầu thật, làm mẫu, sửa lỗi, bán lô nhỏ, dựng quy trình rồi mở mạng phân phối.|hợp đồng phân phối+máy móc+tay nghề đội ngũ|sai số sản xuất, vốn lưu động, tiêu chuẩn chất lượng và đại lý bảo vệ lợi ích riêng.|fictionalized",
+  "researchQuestions": [
+    "Cơ chế Trọng sinh công nghiệp và phân phối vận hành bằng nguồn lực, giới hạn và bằng chứng nào để không trở thành lời giải tùy tiện?",
+    "Các tài sản máy móc, tay nghề đội ngũ, hợp đồng phân phối được tạo, tiêu và mất ra sao để độc giả nhìn thấy tiến bộ thật?",
+    "Nguồn xung đột Sai số sản xuất, vốn lưu động, tiêu chuẩn chất lượng và đại lý bảo vệ lợi ích riêng. phản ứng thế nào sau mỗi thắng lợi để vòng thưởng không lặp lại?"
+  ],
+  "promotionCohort": "opening_tournament",
+  "genre": "do-thi",
+  "audience": "Độc giả nam Việt thích trọng sinh niên đại, làm xưởng và kinh doanh bằng kỹ thuật có nguồn, với gia đình hưởng lợi sớm và tiến bộ vật chất rõ.",
+  "desiredExperience": "Main nhớ nhu cầu tương lai nhưng phải tự làm mẫu, sửa lỗi và dựng mạng phân phối; mỗi lô hàng đổi tiền, dụng cụ, đội ngũ và chất lượng sống.",
+  "domain": "Một thị trấn công nghiệp hư cấu năm 1989, nơi xưởng cơ khí tập thể đang thanh lý máy cũ còn các cửa hàng huyện thiếu bơm nước nhỏ dễ sửa cho mùa khô.",
+  "pleasureProfile": {
+    "realityMode": "fictionalized",
+    "advantage": "Main trọng sinh với kinh nghiệm từng vận hành nhà máy, nhớ xu hướng nhu cầu và nguyên lý thiết kế bơm nhưng không có bản vẽ hoàn chỉnh.",
+    "knowledgeLimit": "Máy móc, vật liệu, tiêu chuẩn, vốn và tay nghề hiện tại khác ký ức; giá, đơn hàng và phản ứng đại lý không thể biết trước.",
+    "primaryRewardLoop": [
+      "Chọn nhu cầu nhỏ đang bị hàng lớn bỏ qua.",
+      "Tận dụng máy và tay nghề sẵn có để làm mẫu.",
+      "Thử thực địa, sửa lỗi và tính đủ hao hụt.",
+      "Bán lô nhỏ, thu tiền có nguồn rồi đầu tư vào quy trình và phân phối."
+    ],
+    "comfortLoop": [
+      "Bữa cơm nhà có thêm thịt và cha mẹ bớt lo sau từng lô hàng.",
+      "Xưởng sáng đèn, thợ có việc và đồ dùng trong nhà được sửa dần."
+    ],
+    "setbackRecoveryWindow": 2,
+    "faceSlapPolicy": "Chỉ phản đòn người đã ép công nợ, phá cam kết hoặc bán hàng lỗi; chiến thắng dựa vào thử thực địa, chất lượng và giao hàng đúng.",
+    "progressionSignals": [
+      "tiền mặt",
+      "máy công cụ",
+      "tỷ lệ lỗi",
+      "tay nghề đội",
+      "đại lý",
+      "vốn lưu động",
+      "đời sống gia đình"
+    ]
+  },
+  "boundaries": [
+    "Không sao chép tên riêng, hệ sức mạnh, vật phẩm nhận diện, cảnh nổi tiếng hoặc chuỗi sự kiện của bất kỳ tác phẩm đối chiếu nào.",
+    "Không dùng đối thủ ngu, đám đông tung hô hoặc may mắn vô nguồn để chứng minh nhân vật chính giỏi; thắng lợi phải có chuẩn bị, bằng chứng và cái giá.",
+    "Không kéo dài nhục nhã hoặc bất lực quá cửa sổ hồi phục; áp lực phải buộc nhân vật lựa chọn và làm thay đổi trạng thái truyện.",
+    "Tên người, địa danh, tổ chức và giọng thoại phải thuộc riêng truyện này; không dùng hậu tố thể loại hoặc thiết chế chung như một setup thay thế.",
+    "Không ăn cắp phát minh hoàn chỉnh, nhảy cóc vật liệu hoặc bịa điều kiện sản xuất cuối thập niên 1980.",
+    "Không dùng hợp đồng lớn hoặc vốn miễn phí xuất hiện đúng lúc.",
+    "Mỗi khoản công nợ, nguyên liệu và máy móc phải có chủ, thời hạn và rủi ro."
+  ],
+  "researchNotes": [
+    {
+      "source": "https://www.chinawriter.com.cn/n1/2025/0506/c404027-40473870.html — nguồn chính thức trong benchmark_dt_03.",
+      "finding": "Công nghiệp thuyết phục khi kỹ thuật, vốn, tiêu chuẩn, đội ngũ và đầu ra cùng xuất hiện trong nhân quả cảnh."
+    },
+    {
+      "source": "https://www.chinawriter.com.cn/n1/2019/0303/c425784-30954734.html — nguồn chính thức trong benchmark_dt_03.",
+      "finding": "Ký ức tương lai nên giúp chọn vấn đề đúng nhưng không thay thế bản vẽ, thử mẫu, kiểm định và bán hàng."
+    },
+    {
+      "source": "https://www.chinawriter.com.cn/n1/2024/0924/c404027-40326963.html — nguồn chính thức trong benchmark_dt_03.",
+      "finding": "Payoff vật chất phải đi từ mẫu đạt, lô hàng, máy móc tới đời sống gia đình và năng lực đội ngũ nhìn thấy được."
+    }
+  ],
+  "seedConstraints": [
+    "Ba tình huống đặc trưng phải phụ thuộc máy thanh lý, thử bơm thực địa và mạng cửa hàng huyện.",
+    "Chương một main phải giữ được một máy hoặc đơn thử bằng hành động chủ động.",
+    "Chương ba phải có tiền/hàng đầu tiên và một lỗi sản phẩm buộc main nhận trách nhiệm.",
+    "Ba mươi chương phải chuyển từ làm mẫu sang quy trình và làm lợi thế ký ức giảm dần."
+  ]
+}

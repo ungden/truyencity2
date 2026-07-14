@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "ballots": [
+    {
+      "blindCode": "HX01-A",
+      "axes": {
+        "opening_pull": 4,
+        "world_specificity": 4,
+        "protagonist_agency": 4,
+        "causal_reward": 4,
+        "character_life": 4,
+        "seriality_30": 4,
+        "prose_naturalness": 4,
+        "read_chapter_4": 4
+      },
+      "criticalFails": [],
+      "evidence": [
+        {
+          "axis": "protagonist_agency",
+          "chapterNumber": 1,
+          "span": "Kỷ hít một hơi thật sâu, ấn mũi dao lên vệt mực đỏ.",
+          "reason": "Kỷ chủ động thực hiện hành vi sửa đổi tờ sớ thuế đầy rủi ro để cứu người khác bằng kỹ năng của mình."
+        },
+        {
+          "axis": "causal_reward",
+          "chapterNumber": 3,
+          "span": "Kỷ đón lấy bát mì, hơi nóng phả vào mặt mang theo mùi thơm của nước dùng hầm xương dở dang và hành lá thái nhỏ.",
+          "reason": "Phần thưởng giản dị nhưng thiết thực, mang lại sự thay đổi trạng thái tâm lý và thể chất rõ rệt sau một đêm căng thẳng."
+        }
+      ],
+      "confidence": 0.9,
+      "summary": "Một mở đầu xuất sắc với hệ thống thế giới độc đáo dựa trên âm thanh và giấy tro. Nhân vật chính có chuyên môn cao, hành động nhất quán và có chiều sâu tâm lý."
+    },
+    {
+      "blindCode": "HX01-B",
+      "axes": {
+        "opening_pull": 3,
+        "world_specificity": 3,
+        "protagonist_agency": 3,
+        "causal_reward": 2,
+        "character_life": 3,
+        "seriality_30": 3,
+        "prose_naturalness": 3,
+        "read_chapter_4": 2
+      },
+      "criticalFails": [
+        "stupid_opponent_face_slap"
+      ],
+      "evidence": [
+        {
+          "axis": "world_specificity",
+          "chapterNumber": 1,
+          "span": "Bên trong là bột than phục chế, thứ được chế tạo từ gỗ thông cổ thụ đốt trong lò kín.",
+          "reason": "Giải thích về chất liệu đặc thù dùng để phục chế giấy trong thế giới này."
+        },
+        {
+          "axis": "causal_reward",
+          "chapterNumber": 3,
+          "span": "Thạch ngồi khoan khoái trên chiếc ghế tựa bọc nhung mới mua, nhấp một ngụm trà Thiết Quan Âm thượng hạng.",
+          "reason": "Sự thăng tiến quá nhanh về tài sản và địa vị chỉ sau 3 chương tạo cảm giác thiếu thuyết phục."
+        }
+      ],
+      "confidence": 0.9,
+      "summary": "Ý tưởng tương tự bản A nhưng cách giải quyết tình huống quá thuận lợi cho nhân vật chính. Phản diện mang tài liệu tự hủy đến để nhân vật chính lật kèo quá dễ dàng."
+    },
+    {
+      "blindCode": "HX01-C",
+      "axes": {
+        "opening_pull": 4,
+        "world_specificity": 4,
+        "protagonist_agency": 4,
+        "causal_reward": 4,
+        "character_life": 4,
+        "seriality_30": 4,
+        "prose_naturalness": 4,
+        "read_chapter_4": 4
+      },
+      "criticalFails": [],
+      "evidence": [
+        {
+          "axis": "world_specificity",
+          "chapterNumber": 1,
+          "span": "Mùng năm nắng gắt, giấy tro co rút. Nếu đóng dấu thật vào ngày đó, mực không thể thấm sâu.",
+          "reason": "Thiết lập quy luật vật lý rất cụ thể và logic của thế giới liên quan đến độ ẩm và giấy tro."
+        },
+        {
+          "axis": "causal_reward",
+          "chapterNumber": 3,
+          "span": "Sáng hôm sau, Tạ Duyên dùng năm đồng bạc hối lộ cho một viên thư lại lén lút tuồn ra những bản sao biểu đồ thời tiết lịch sử của Cục Khí Tượng.",
+          "reason": "Nhân vật sử dụng phần thưởng nhận được một cách thực tế và khôn ngoan để củng cố công việc kinh doanh của mình."
+        }
+      ],
+      "confidence": 0.9,
+      "summary": "Mở đầu rất tốt với yếu tố giám định pháp y giấy tờ dựa trên thời tiết và độ ẩm. Cách giải quyết vấn đề bằng khoa học vật lý thay vì phép thuật tạo cảm giác chân thực và lôi cuốn."
+    }
+  ]
+}

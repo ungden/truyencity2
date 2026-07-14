@@ -35,6 +35,7 @@ import { conceptSimilarity } from './concept-tournament';
 import { validateChapterPlanSemantics, validatePleasureWindow } from './contracts';
 import { distillBenchmarkForConceptLab } from './chinese-benchmark';
 import { getChineseBenchmarkPack } from './chinese-benchmark-data';
+import { FLAGSHIP_SETUP_RESPONSE_SCHEMAS } from './setup-response-schemas';
 
 export type FlagshipSetupRole = 'concept_lab' | 'concept_judge' | 'opening_simulator' | 'character_designer' | 'causal_world' | 'launch_architect';
 
@@ -43,6 +44,7 @@ export interface FlagshipSetupCall {
   systemPrompt: string;
   userPrompt: string;
   jsonMode: true;
+  responseJsonSchema: Record<string, unknown>;
   candidateId?: string;
 }
 
@@ -139,18 +141,18 @@ export async function generateConceptTournamentV2(
     return dependencies.invoke(call);
   };
 
-  const batch = parseJson(await invoke({ role: 'concept_lab', systemPrompt: CONCEPT_LAB_SYSTEM, userPrompt: buildConceptLabPrompt(brief, benchmarkGuidance), jsonMode: true }), ConceptBatchV2Schema, 'Concept Lab');
+  const batch = parseJson(await invoke({ role: 'concept_lab', systemPrompt: CONCEPT_LAB_SYSTEM, userPrompt: buildConceptLabPrompt(brief, benchmarkGuidance), jsonMode: true, responseJsonSchema: FLAGSHIP_SETUP_RESPONSE_SCHEMAS.concept_lab }), ConceptBatchV2Schema, 'Concept Lab');
   uniqueIds(batch.candidates);
   const deduped = removeNearDuplicates(batch.candidates);
   if (deduped.unique.length < 3) throw new FlagshipSetupError('setup_blocked', 'Concept Lab produced fewer than three mechanically distinct concepts.', { rejected: deduped.rejected });
 
-  const ranking = parseJson(await invoke({ role: 'concept_judge', systemPrompt: CONCEPT_JUDGE_SYSTEM, userPrompt: buildConceptJudgePrompt(brief, deduped.unique), jsonMode: true }), ConceptRankingV2Schema, 'Concept Judge');
+  const ranking = parseJson(await invoke({ role: 'concept_judge', systemPrompt: CONCEPT_JUDGE_SYSTEM, userPrompt: buildConceptJudgePrompt(brief, deduped.unique), jsonMode: true, responseJsonSchema: FLAGSHIP_SETUP_RESPONSE_SCHEMAS.concept_judge }), ConceptRankingV2Schema, 'Concept Judge');
   validateRanking(ranking, deduped.unique);
   const byId = new Map(deduped.unique.map(candidate => [candidate.id, candidate]));
   const openings = await Promise.all(ranking.finalistIds.map(async candidateId => {
     const candidate = byId.get(candidateId)!;
     const worldKernel = ranking.finalistWorldKernels.find(kernel => kernel.candidateId === candidateId)!;
-    const transport = parseJson(await invoke({ role: 'opening_simulator', candidateId, systemPrompt: OPENING_SIMULATOR_SYSTEM, userPrompt: buildOpeningSimulationPrompt(brief, candidate, worldKernel), jsonMode: true }), OpeningTrialTransportV2Schema, `Opening Simulator ${candidateId}`);
+    const transport = parseJson(await invoke({ role: 'opening_simulator', candidateId, systemPrompt: OPENING_SIMULATOR_SYSTEM, userPrompt: buildOpeningSimulationPrompt(brief, candidate, worldKernel), jsonMode: true, responseJsonSchema: FLAGSHIP_SETUP_RESPONSE_SCHEMAS.opening_simulator }), OpeningTrialTransportV2Schema, `Opening Simulator ${candidateId}`);
     const trial = OpeningTrialV2Schema.parse({
       ...transport,
       chapters: transport.chapters.map(({ proseParagraphs, ...chapter }) => ({
@@ -200,13 +202,13 @@ export async function materializeFlagshipLaunchPackV2(input: {
     if (callRoles.length > 3) throw new FlagshipSetupError('setup_blocked', 'Launch pack call budget exceeded.');
     return dependencies.invoke(call);
   };
-  const characters = parseJson(await invoke({ role: 'character_designer', systemPrompt: CHARACTER_DESIGNER_SYSTEM, userPrompt: buildCharacterDesignPrompt(input.brief, candidate, opening), jsonMode: true }), CharacterDesignV2Schema, 'Character Designer');
-  const world = parseJson(await invoke({ role: 'causal_world', systemPrompt: CAUSAL_WORLD_SYSTEM, userPrompt: buildCausalWorldPrompt(input.brief, candidate, opening, characters, worldKernel), jsonMode: true }), CausalWorldV2Schema, 'Causal World');
+  const characters = parseJson(await invoke({ role: 'character_designer', systemPrompt: CHARACTER_DESIGNER_SYSTEM, userPrompt: buildCharacterDesignPrompt(input.brief, candidate, opening), jsonMode: true, responseJsonSchema: FLAGSHIP_SETUP_RESPONSE_SCHEMAS.character_designer }), CharacterDesignV2Schema, 'Character Designer');
+  const world = parseJson(await invoke({ role: 'causal_world', systemPrompt: CAUSAL_WORLD_SYSTEM, userPrompt: buildCausalWorldPrompt(input.brief, candidate, opening, characters, worldKernel), jsonMode: true, responseJsonSchema: FLAGSHIP_SETUP_RESPONSE_SCHEMAS.causal_world }), CausalWorldV2Schema, 'Causal World');
   const containsExact = (items: unknown[], expected: unknown[]) => expected.every(value => items.some(item => JSON.stringify(item) === JSON.stringify(value)));
   if (!containsExact(world.rules, worldKernel.rules) || !containsExact(world.resources, worldKernel.resources) || !containsExact(world.institutions, worldKernel.institutionalResponses)) {
     throw new FlagshipSetupError('setup_blocked', 'Causal World rewrote or dropped an approved world-kernel rule, resource or institutional response.');
   }
-  const launchPack = parseJson(await invoke({ role: 'launch_architect', systemPrompt: LAUNCH_ARCHITECT_SYSTEM, userPrompt: buildLaunchPackPrompt({ ...input, selection, candidate, opening, characters, world }), jsonMode: true }), FlagshipLaunchPackV2Schema, 'Launch Architect');
+  const launchPack = parseJson(await invoke({ role: 'launch_architect', systemPrompt: LAUNCH_ARCHITECT_SYSTEM, userPrompt: buildLaunchPackPrompt({ ...input, selection, candidate, opening, characters, world }), jsonMode: true, responseJsonSchema: FLAGSHIP_SETUP_RESPONSE_SCHEMAS.launch_architect }), FlagshipLaunchPackV2Schema, 'Launch Architect');
   if (launchPack.selectedConceptId !== selection.candidateId) throw new FlagshipSetupError('setup_blocked', 'Launch Architect changed the human-selected concept.');
   const identityChanges: string[] = [];
   if (launchPack.storySpec.title !== candidate.workingTitle) identityChanges.push('title');

@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 2,
+  "language": "vi",
+  "portfolioSlotId": "DT-11",
+  "genreLane": "urban_collectibles",
+  "laneCardIds": [
+    "market_urban_professional"
+  ],
+  "distinctnessFingerprint": "bounded_system|nhận món đồ bị đánh giá sai, kiểm chứng nguồn gốc, phục hồi hoặc kết nối đúng người mua, thu lợi rồi nâng năng lực thẩm định.|hồ sơ nguồn gốc+uy tín giới sưu tầm+vốn quay vòng|hàng giả, lịch sử sở hữu thiếu đoạn, chi phí phục hồi và người mua bán có thông tin cùng mục tiêu khác nhau.|fictionalized",
+  "researchQuestions": [
+    "Cơ chế Giám bảo và thị trường đồ cũ vận hành bằng nguồn lực, giới hạn và bằng chứng nào để không trở thành lời giải tùy tiện?",
+    "Các tài sản hồ sơ nguồn gốc, vốn quay vòng, uy tín giới sưu tầm được tạo, tiêu và mất ra sao để độc giả nhìn thấy tiến bộ thật?",
+    "Nguồn xung đột Hàng giả, lịch sử sở hữu thiếu đoạn, chi phí phục hồi và người mua bán có thông tin cùng mục tiêu khác nhau. phản ứng thế nào sau mỗi thắng lợi để vòng thưởng không lặp lại?"
+  ],
+  "promotionCohort": "opening_tournament",
+  "genre": "do-thi",
+  "audience": "Độc giả nam Việt thích giám bảo, thị trường đồ cũ và thương lượng bằng kiến thức, muốn bí mật món đồ gắn với con người thay vì mắt thần báo giá.",
+  "desiredExperience": "Khoái cảm đến từ nhận ra một chi tiết bị định giá sai, kiểm chứng nguồn gốc, phục hồi đúng mức và tìm đúng người mua; mỗi món mở thêm quan hệ và trách nhiệm nghề.",
+  "domain": "Một khu chợ đồ cũ hư cấu tại đô thị Việt, xoay quanh gốm lò địa phương thất truyền, hồ sơ di cư của các gia đình và mạng thợ phục hồi có tiêu chuẩn khác nhau.",
+  "pleasureProfile": {
+    "realityMode": "fictionalized",
+    "advantage": "Main có công cụ cảm ứng chỉ báo một thuộc tính vật liệu sau khi chạm và kinh nghiệm làm kho bảo tàng, nên biết câu hỏi nào cần kiểm chứng.",
+    "knowledgeLimit": "Cảm ứng luôn có sai số, không cho niên đại, giá, nguồn gốc, tính hợp pháp hoặc ý định chủ đồ; mọi kết luận cần hồ sơ và chuyên gia.",
+    "primaryRewardLoop": [
+      "Nhận món đồ bị đánh giá sai vì một chi tiết vật liệu.",
+      "Tìm hồ sơ sở hữu và kiểm chứng bằng nhiều nguồn.",
+      "Chọn phục hồi, giữ nguyên hoặc kết nối người mua phù hợp.",
+      "Thu lợi hợp pháp rồi tăng vốn, uy tín và quyền tiếp cận nguồn hàng."
+    ],
+    "comfortLoop": [
+      "Uống trà và nghe chủ cũ kể lại đời món đồ sau khi giao dịch rõ ràng.",
+      "Dùng tiền lời sửa căn phòng nhỏ và giữ một món bình dân có ý nghĩa gia đình."
+    ],
+    "setbackRecoveryWindow": 3,
+    "faceSlapPolicy": "Chỉ phản đòn người đã làm giả hồ sơ, ép giá hoặc cố che lỗi; thắng bằng provenance, giám định độc lập và điều khoản giao dịch.",
+    "progressionSignals": [
+      "hồ sơ nguồn gốc",
+      "vốn quay vòng",
+      "uy tín",
+      "mạng chuyên gia",
+      "kỹ năng phục hồi",
+      "nguồn hàng hợp pháp"
+    ]
+  },
+  "boundaries": [
+    "Không sao chép tên riêng, hệ sức mạnh, vật phẩm nhận diện, cảnh nổi tiếng hoặc chuỗi sự kiện của bất kỳ tác phẩm đối chiếu nào.",
+    "Không dùng đối thủ ngu, đám đông tung hô hoặc may mắn vô nguồn để chứng minh nhân vật chính giỏi; thắng lợi phải có chuẩn bị, bằng chứng và cái giá.",
+    "Không kéo dài nhục nhã hoặc bất lực quá cửa sổ hồi phục; áp lực phải buộc nhân vật lựa chọn và làm thay đổi trạng thái truyện.",
+    "Tên người, địa danh, tổ chức và giọng thoại phải thuộc riêng truyện này; không dùng hậu tố thể loại hoặc thiết chế chung như một setup thay thế.",
+    "Không để chạm món nào cũng trúng đồ quý hoặc công cụ cho giá chính xác.",
+    "Không bịa lịch sử hiện vật thật, vu cáo bảo tàng/nhà đấu giá/thương hiệu có thật.",
+    "Mỗi món phải có chi phí phục hồi, rủi ro pháp lý và người sở hữu với động cơ riêng."
+  ],
+  "researchNotes": [
+    {
+      "source": "https://www.chinawriter.com.cn/2013/2013-12-09/184408.html — nguồn chính thức trong benchmark_dt_11.",
+      "finding": "Đồ vật hấp dẫn khi có lịch sử sở hữu, dấu vết vật liệu, người cần nó và lý do giá trị bị hiểu sai."
+    },
+    {
+      "source": "https://www.chinawriter.com.cn/n1/2023/0215/c404027-32624199.html — nguồn chính thức trong benchmark_dt_11.",
+      "finding": "Mỗi vụ giám định nên thay đổi uy tín, quan hệ hoặc quyền tiếp cận thị trường chứ không chỉ cộng tiền."
+    },
+    {
+      "source": "https://www.chinawriter.com.cn/2015/2015-07-09/247852.html — nguồn chính thức trong benchmark_dt_11.",
+      "finding": "Kiến thức cần được chứng minh bằng thao tác, hồ sơ và phản biện để payoff vừa sảng vừa đáng tin."
+    }
+  ],
+  "seedConstraints": [
+    "Ba tình huống đặc trưng phải phụ thuộc men lò địa phương, hồ sơ gia đình và lựa chọn phục hồi.",
+    "Chương một main phải từ chối một món lời nhanh vì provenance thiếu rồi tìm được manh mối tốt hơn.",
+    "Chương ba phải hoàn tất giao dịch nhỏ có lãi và mở một món đồ khó hơn bằng quan hệ đã kiếm.",
+    "Ba mươi chương phải làm uy tín tạo cả cơ hội lẫn nghĩa vụ, không chỉ tăng giá món đồ."
+  ]
+}

@@ -45,11 +45,17 @@ function modelInvoker(project: SetupProjectRow, projectId: string) {
       const response = await callGemini(call.userPrompt, {
         model: call.role === 'concept_judge' ? routes.setupJudge : routes.setupCreative,
         temperature: call.role === 'opening_simulator' ? 0.7 : 0.35,
-        maxTokens: call.role === 'opening_simulator' ? 32768 : 24576,
+        maxTokens: ['concept_lab', 'concept_judge', 'opening_simulator', 'launch_architect'].includes(call.role) ? 32768 : 24576,
+        thinkingLevel: call.role === 'concept_lab' ? 'low' : call.role === 'concept_judge' ? 'high' : 'medium',
+        responseJsonSchema: call.responseJsonSchema,
         systemPrompt: call.systemPrompt,
       }, { jsonMode: true, disableRouting: true, tracking: { projectId, task: `flagship_setup_${call.role}` } });
+      if (response.finishReason === 'MAX_TOKENS') {
+        throw new FlagshipSetupError('infra_blocked', `${call.role} output hit the configured token ceiling before its typed artifact completed.`);
+      }
       return response.content;
     } catch (error) {
+      if (error instanceof FlagshipSetupError) throw error;
       const message = error instanceof Error ? error.message : String(error);
       if (classifyStoryFailure(message) === 'infrastructure') throw new FlagshipSetupError('infra_blocked', message);
       throw new FlagshipSetupError('setup_blocked', `${call.role} failed without fallback: ${message}`);

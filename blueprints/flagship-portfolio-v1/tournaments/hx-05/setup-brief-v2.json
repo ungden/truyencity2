@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 2,
+  "language": "vi",
+  "portfolioSlotId": "HX-05",
+  "genreLane": "xuanhuan_crafting",
+  "laneCardIds": [
+    "market_xuanhuan_hybrid",
+    "market_urban_professional"
+  ],
+  "distinctnessFingerprint": "rebirth|phân tích nhu cầu, thử vật liệu, chế tạo có hao hụt, bán hoặc sử dụng rồi tái đầu tư vào xưởng.|dụng cụ xưởng+quan hệ cung ứng+tay nghề|độc quyền nguyên liệu, tiêu chuẩn sản phẩm, hỏng thử nghiệm và khách hàng có yêu cầu đối nghịch.|alternate_world",
+  "researchQuestions": [
+    "Cơ chế Luyện khí và kinh tế tài nguyên vận hành bằng nguồn lực, giới hạn và bằng chứng nào để không trở thành lời giải tùy tiện?",
+    "Các tài sản tay nghề, dụng cụ xưởng, quan hệ cung ứng được tạo, tiêu và mất ra sao để độc giả nhìn thấy tiến bộ thật?",
+    "Nguồn xung đột Độc quyền nguyên liệu, tiêu chuẩn sản phẩm, hỏng thử nghiệm và khách hàng có yêu cầu đối nghịch. phản ứng thế nào sau mỗi thắng lợi để vòng thưởng không lặp lại?"
+  ],
+  "promotionCohort": "opening_tournament",
+  "genre": "huyen-huyen",
+  "audience": "Độc giả nam Việt thích chế tạo, thử nghiệm và kinh doanh tài nguyên, muốn thấy đồ vật có công dụng trong đời sống thay vì bảng chỉ số dài.",
+  "desiredExperience": "Main biến phế liệu có sai số thành dụng cụ hữu ích qua thử nghiệm nhìn thấy được; món đồ bán ra làm đổi quan hệ cung ứng, tay nghề và vị thế của xưởng.",
+  "domain": "Một thành cảng hư cấu dùng khoáng vật biết giữ âm rung; phế liệu từ chuông vận tải, bếp nhiệt và máy bơm linh lực được định giá theo độ ổn định chứ không theo độ hiếm.",
+  "pleasureProfile": {
+    "realityMode": "alternate_world",
+    "advantage": "Main sống lại sau một tai nạn xưởng, nhớ nguyên lý cộng hưởng và các lỗi từng gây hỏng hàng nhưng không nhớ công thức hoàn chỉnh.",
+    "knowledgeLimit": "Thành phần quặng, dụng cụ đo và độ ẩm hiện tại đều khác; mọi công thức phải thử lại, hao vật liệu và có thể thất bại trước khách hàng.",
+    "primaryRewardLoop": [
+      "Nhận một nhu cầu thật mà hàng chuẩn đang quá đắt.",
+      "Phân loại phế liệu và đặt phép thử cộng hưởng nhỏ.",
+      "Chế tạo, làm hỏng hoặc sửa mẫu bằng cái giá cụ thể.",
+      "Ứng dụng hoặc bán món đồ rồi tái đầu tư vào dụng cụ và nguồn cung."
+    ],
+    "comfortLoop": [
+      "Xưởng bớt lạnh, bữa ăn thợ đủ hơn khi đơn hàng có lãi.",
+      "Một dụng cụ tốt giúp đồng đội làm việc an toàn và tự hào về nghề."
+    ],
+    "setbackRecoveryWindow": 2,
+    "faceSlapPolicy": "Chỉ phản đòn nhà cung ứng hoặc đối thủ đã phá chuẩn, ép giá hay giấu lỗi; kết quả được chứng minh qua phép thử và người dùng thực tế.",
+    "progressionSignals": [
+      "dụng cụ đo",
+      "tay nghề",
+      "tỷ lệ phế phẩm",
+      "đơn hàng",
+      "quan hệ cung ứng",
+      "thợ học việc"
+    ]
+  },
+  "boundaries": [
+    "Không sao chép tên riêng, hệ sức mạnh, vật phẩm nhận diện, cảnh nổi tiếng hoặc chuỗi sự kiện của bất kỳ tác phẩm đối chiếu nào.",
+    "Không dùng đối thủ ngu, đám đông tung hô hoặc may mắn vô nguồn để chứng minh nhân vật chính giỏi; thắng lợi phải có chuẩn bị, bằng chứng và cái giá.",
+    "Không kéo dài nhục nhã hoặc bất lực quá cửa sổ hồi phục; áp lực phải buộc nhân vật lựa chọn và làm thay đổi trạng thái truyện.",
+    "Tên người, địa danh, tổ chức và giọng thoại phải thuộc riêng truyện này; không dùng hậu tố thể loại hoặc thiết chế chung như một setup thay thế.",
+    "Không đổi tên hóa học hoặc luyện kim Trái Đất rồi coi đó là hệ huyền huyễn.",
+    "Không để lần thử đầu luôn thành công hoặc phế liệu nào cũng là báu vật.",
+    "Mỗi sản phẩm phải có giới hạn sử dụng, chi phí bảo trì và tác động thị trường."
+  ],
+  "researchNotes": [
+    {
+      "source": "https://book.qidian.com/booklist/detail/238466/1/ — nguồn chính thức trong benchmark_hx_05.",
+      "finding": "Cảnh chế tác hay cần nhu cầu cụ thể, vật liệu có sai số, phép thử nhìn thấy được và hậu quả khi ứng dụng."
+    },
+    {
+      "source": "https://h5.if.qidian.com/h5/share/column?columnId=19804 — nguồn chính thức trong benchmark_hx_05.",
+      "finding": "Tay nghề chỉ có giá trị dài hạn khi gắn với dụng cụ, tiêu chuẩn, người học và mạng cung ứng có thể đứt."
+    },
+    {
+      "source": "https://wyb.chinawriter.com.cn/content/202602/06/content82721.html — nguồn chính thức trong benchmark_hx_05.",
+      "finding": "Bất ngờ nên đến từ tính chất vật liệu hoặc nhu cầu bị hiểu sai, không từ công thức hoàn hảo bỗng xuất hiện."
+    }
+  ],
+  "seedConstraints": [
+    "Ba tình huống đặc trưng phải dùng cộng hưởng âm, sai số phế liệu và chuẩn nghiệm thu.",
+    "Chương một phải có phép thử thất bại một phần nhưng giúp main kiếm cơ hội đơn hàng.",
+    "Chậm nhất chương ba sản phẩm đầu tiên phải tạo tiền hoặc cứu một công đoạn và để lại nghĩa vụ bảo hành.",
+    "Ba mươi chương phải làm nguồn phế liệu, tiêu chuẩn hoặc nhu cầu thị trường đổi ít nhất hai lần."
+  ]
+}

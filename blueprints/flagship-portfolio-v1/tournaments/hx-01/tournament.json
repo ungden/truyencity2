@@ -1,0 +1,1174 @@
+{
+  "schemaVersion": 2,
+  "promptVersion": "flagship-setup-v2.10-opening-root",
+  "benchmarkId": "benchmark_hx_01",
+  "concepts": [
+    {
+      "id": "concept_acoustic_ash",
+      "workingTitle": "Âm Vực Giấy Tro",
+      "readerCuriosity": "Làm sao một thợ sửa giấy có thể dùng độ dày của nét mực để thay đổi âm thanh cưỡng chế của giếng chuông?",
+      "readerFantasy": "Phá giải các quy tắc chết người chỉ bằng cách cạo đi một lớp mực mỏng, biến luật lệ của kẻ thù thành vũ khí bảo vệ khu phố.",
+      "premise": "Tại thành phố Vọng Âm, quy tắc trên giấy tro được giếng chuông khuếch đại thành luật. Main phát hiện kẻ gian cố tình viết nét đậm để đổi tần số luật.",
+      "irreversibleProblem": "Một quy tắc thu thuế sinh mệnh mới được đóng dấu, đe dọa khu phố của main, nhưng không ai tin hồ sơ đã bị can thiệp.",
+      "protagonistContradiction": "Chỉ là thợ phục chế thấp bé, nhưng lại nắm giữ trí nhớ hình ảnh về mọi thói quen tì bút của các quan kiểm định.",
+      "domainMechanism": "Giấy tro hấp thụ âm thanh niềm tin; giếng chuông phát sóng cưỡng chế. Mực đóng dấu chốt tần số. Nét mực sai lệch sẽ bóp méo phạm vi tác dụng.",
+      "conflictEngine": "Giới tinh hoa lén sửa nét chữ để lách luật, trong khi dân nghèo chịu trận. Các quy tắc cũ mới giao thoa tạo ra vùng nhiễu âm nguy hiểm.",
+      "emotionalCore": "Bảo vệ mâm cơm khuya yên bình tại tiệm giấy trước những âm mưu bóc lột được bọc dưới lớp vỏ quy tắc thiêng liêng.",
+      "differenceClaim": "Không dùng phép thuật, main chiến thắng bằng việc phân tích độ rung của giấy và thói quen viết tay để tìm kẽ hở tần số.",
+      "nearestComparisonRisk": "Dễ bị nhầm với truyện giải đố chữ viết thông thường nếu không nhấn mạnh hậu quả vật lý của âm thanh giếng chuông.",
+      "serialityProof": "Mỗi vụ án mở ra một kỹ thuật ngụy tạo mới (đổi loại tro, pha mực, góc đóng dấu), dẫn đến các phe phái kiểm định khác nhau.",
+      "openingAdvantage": "Chương 1: Main nhớ thói quen phẩy đuôi chữ của viên quan, chứng minh giấy bị sửa, cứu một người khỏi vùng cấm âm thanh.",
+      "progressionProof": "Từ việc cứu người, thu được mẫu mực hiếm (chương 3), uy tín tăng, được thuê sửa hồ sơ mật, mở rộng vùng an toàn cho khu phố.",
+      "worldProof": {
+        "signatureSituations": [
+          "Người dân bị ép quỳ khi tiếng chuông vang lên từ một tờ giấy tro.",
+          "Quan kiểm định soi đèn tìm dấu triện ẩn trong sớ.",
+          "Main dùng dao cạo giấy để đổi hướng một luồng âm phạt."
+        ],
+        "institutionalReaction": "Viện Khuếch Âm ban đầu phớt lờ, sau đó phái người giám sát khi main liên tục bẻ khóa các quy tắc độc quyền của họ.",
+        "resourceCirculation": "Giấy tro nguyên bản và mực triện là tài sản. Uy tín điều tra đổi lấy quyền xem hồ sơ cũ để tìm luật đối kháng.",
+        "thirtyChapterMutation": "Chương 30: Hai giếng chuông cộng hưởng tạo ra quy tắc lai, khiến toàn bộ hiểu biết về tần số đơn lẻ trước đây vô hiệu."
+      },
+      "antiCloneFingerprint": "nhớ nét mực|cứu người bằng kẽ hở|mẫu mực, uy tín|độc quyền tần số|giếng chuông phát sóng"
+    },
+    {
+      "id": "concept_ash_origins",
+      "workingTitle": "Nguồn Gốc Tro Tàn",
+      "readerCuriosity": "Việc trộn lẫn tro của các loại gỗ khác nhau ảnh hưởng thế nào đến tính cưỡng chế của một quy tắc?",
+      "readerFantasy": "Nhìn thấu sự pha tạp trong chất liệu giấy để lật tẩy những quy tắc giả mạo, giành lại quyền kiểm soát sinh hoạt thường ngày.",
+      "premise": "Quy tắc chỉ linh nghiệm nếu giấy tro làm từ mộc hương thuần khiết. Main phát hiện sợi tro tạp chất làm sai lệch đối tượng chịu phạt.",
+      "irreversibleProblem": "Một lệnh cấm ra đường ban đêm được ban hành, nhưng main thấy giấy tro có lẫn sợi gai, báo hiệu mục tiêu thực sự là bắt cóc.",
+      "protagonistContradiction": "Người duy nhất phân biệt được cấu trúc sợi tro bằng mắt thường lại là kẻ không có quyền lên tiếng trong hội đồng.",
+      "domainMechanism": "Giếng chuông đốt cháy niềm tin thành năng lượng, truyền vào giấy tro. Tro tạp chất sẽ bẻ cong năng lượng sang hướng trục lợi.",
+      "conflictEngine": "Các phường hội độc quyền nguồn gỗ đốt, cố tình pha tạp để tạo ra các quy tắc có lợi cho phe mình, mặc kệ hậu quả phụ.",
+      "emotionalCore": "Giữ gìn sự thật trong từng trang giấy để bảo vệ những người hàng xóm khỏi những tai ương từ trên trời rơi xuống.",
+      "differenceClaim": "Tập trung vào cấu trúc vật lý của giấy tro thay vì nội dung văn bản, biến việc soi giấy thành một màn phá án gay cấn.",
+      "nearestComparisonRisk": "Có thể bị nhầm với nghề giám định đồ cổ nếu không gắn chặt với hậu quả sinh tử của các quy tắc.",
+      "serialityProof": "Khám phá ra các công thức pha trộn tro ngày càng tinh vi, từ đó bóc trần mạng lưới tham nhũng của các phường hội.",
+      "openingAdvantage": "Chương 1: Main đốt một góc giấy thừa, dùng màu khói chứng minh quy tắc bị lỗi, cứu người hàng xóm khỏi án tử.",
+      "progressionProof": "Đến chương 3, main thu được tro nguyên bản, bị Phường Mộc Hương để mắt, bắt đầu dùng uy tín để đổi lấy quyền tra cứu sổ gốc.",
+      "worldProof": {
+        "signatureSituations": [
+          "Thợ giấy soi vân tro dưới ánh trăng để tìm tạp chất.",
+          "Giếng chuông phun khói đen khi một quy tắc lỗi bị kích hoạt.",
+          "Người dân thu gom tàn tro để tự bảo vệ mình."
+        ],
+        "institutionalReaction": "Phường Mộc Hương cắt nguồn cung cấp giấy cho tiệm của main, buộc anh phải tìm cách tự chế giấy từ tro phế liệu.",
+        "resourceCirculation": "Tro thuần khiết là tiền tệ. Quyền tra cứu sổ gốc giúp main dự đoán được quy tắc nào sắp bị bóp méo.",
+        "thirtyChapterMutation": "Chương 30: Một loại tro mới xuất hiện làm đảo lộn hai quy tắc cơ bản về thời gian và không gian, ép main phải học lại từ đầu."
+      },
+      "antiCloneFingerprint": "nhìn sợi tro|lật tẩy quy tắc giả|tro nguyên bản, quyền tra sổ|độc quyền nguồn gỗ|giếng chuông đốt niềm tin"
+    },
+    {
+      "id": "concept_ink_oxidation",
+      "workingTitle": "Mực Thời Gian",
+      "readerCuriosity": "Làm sao hóa chất làm chậm quá trình khô của mực lại có thể thay đổi thời điểm kích hoạt của một lời nguyền?",
+      "readerFantasy": "Tính toán chính xác độ phai màu của mực để kích hoạt quy tắc đối kháng đúng giây phút quyết định, lật ngược thế cờ.",
+      "premise": "Mực đóng dấu tương tác với giấy tro theo thời gian. Kẻ gian dùng chất ức chế để trì hoãn quy tắc, main nhìn ra độ dốc màu.",
+      "irreversibleProblem": "Quy tắc bảo vệ khu phố bị làm chậm lại 24 giờ, mở đường cho một cuộc thanh trừng, main phải tìm cách gia tốc nó.",
+      "protagonistContradiction": "Kẻ nắm rõ nhất về hóa tính của mực lại không được phép sở hữu con dấu kiểm định.",
+      "domainMechanism": "Giếng chuông cung cấp độ ẩm kích hoạt. Mực oxy hóa trên giấy tro tạo ra màng bọc quy tắc. Hóa chất can thiệp làm thủng màng bọc này.",
+      "conflictEngine": "Cục Giám Ấn lạm dụng chất xúc tác để điều khiển thời gian hiệu lực của luật, tạo ra những khoảng trống pháp lý chết người.",
+      "emotionalCore": "Chạy đua với thời gian phai màu của mực để giữ lại mạng sống cho những người thân yêu trong tiệm giấy.",
+      "differenceClaim": "Biến thời gian khô của mực thành một biến số chiến thuật, tạo ra sự căng thẳng đếm ngược trong từng vụ án.",
+      "nearestComparisonRisk": "Dễ biến thành truyện giả kim thuật nếu không giữ vững yếu tố cưỡng chế của quy tắc xã hội.",
+      "serialityProof": "Đối mặt với các loại mực có chu kỳ oxy hóa phức tạp hơn, từ mực ngày đêm đến mực phản ứng với máu.",
+      "openingAdvantage": "Chương 1: Main chỉ ra vết loang màu bất thường, ép quy tắc kích hoạt sớm, cứu một đứa trẻ khỏi vùng nguy hiểm.",
+      "progressionProof": "Chương 3: Main lấy được lọ dung môi hiếm, bị Cục Giám Ấn điều tra, dùng uy tín để lập giao kèo bảo vệ tiệm giấy.",
+      "worldProof": {
+        "signatureSituations": [
+          "Quan viên hơ giấy trên lửa để ép mực khô nhanh.",
+          "Main dùng kính lúp đo độ dốc màu của nét chữ.",
+          "Quy tắc đột ngột mất hiệu lực khi mực chuyển sang màu xám."
+        ],
+        "institutionalReaction": "Cục Giám Ấn cử sát thủ dùng mực tàng hình để ám sát, buộc main phải tìm cách hiện hình các quy tắc ẩn.",
+        "resourceCirculation": "Dung môi và mực hiếm là tài nguyên. Uy tín giúp main mượn được các bản gốc để so sánh tốc độ phai màu.",
+        "thirtyChapterMutation": "Chương 30: Giếng chuông thay đổi độ ẩm, làm hai quy tắc về tốc độ và trọng lượng bị đảo lộn thời gian kích hoạt."
+      },
+      "antiCloneFingerprint": "đo độ phai màu|kích hoạt luật sớm|dung môi, uy tín|độc quyền thời gian luật|giếng chuông cấp ẩm"
+    },
+    {
+      "id": "concept_spatial_geometry",
+      "workingTitle": "Bản Đồ Giếng Chuông",
+      "readerCuriosity": "Việc dịch chuyển một nét vẽ trên bản đồ giấy tro có thể bóp méo không gian thực tế như thế nào?",
+      "readerFantasy": "Vẽ lại các đường ranh giới quy tắc để tạo ra những vùng an toàn tuyệt đối, nhốt kẻ thù vào chính cái bẫy của chúng.",
+      "premise": "Quy tắc hoạt động theo bán kính hình học quanh giếng chuông. Main phát hiện kẻ gian cố tình vẽ lệch tọa độ trên giấy tro.",
+      "irreversibleProblem": "Một quy tắc thu hồi đất được ban hành với tọa độ bị chỉnh sửa vi tế, nuốt trọn tiệm giấy của main vào vùng giải tỏa.",
+      "protagonistContradiction": "Main có trí nhớ không gian hoàn hảo về bản đồ gốc, nhưng lại bị coi là kẻ mù chữ trong mắt giới tinh hoa.",
+      "domainMechanism": "Giếng chuông là tâm chấn. Giấy tro là bản đồ. Dấu triện xác nhận tọa độ. Sai lệch 1mm trên giấy bằng 10m ngoài đời.",
+      "conflictEngine": "Hội Đo Lường liên tục dịch chuyển ranh giới quy tắc để chiếm đoạt tài nguyên, ép người dân vào các vùng chồng lấn nguy hiểm.",
+      "emotionalCore": "Bảo vệ từng tấc đất của khu phố, nơi lưu giữ những kỷ niệm ấm áp nhất, khỏi sự bành trướng của lòng tham.",
+      "differenceClaim": "Kết hợp giải đố hình học với quy tắc sinh tồn, biến mỗi tờ giấy tro thành một chiến trường không gian thu nhỏ.",
+      "nearestComparisonRisk": "Dễ nhầm với truyện trận pháp tu tiên nếu không nhấn mạnh vào tính pháp lý và bằng chứng vật lý của bản đồ.",
+      "serialityProof": "Từ việc sửa tọa độ đơn giản đến việc giải quyết các quy tắc không gian đa chiều, chồng chéo lên nhau.",
+      "openingAdvantage": "Chương 1: Main chứng minh nét vẽ bị lệch góc 2 độ, đẩy vùng sát thương của quy tắc ra khỏi một người vô tội.",
+      "progressionProof": "Chương 3: Main đoạt được thước đo chuẩn, bị Hội Đo Lường cảnh cáo, dùng uy tín bảo vệ thành công một ngã tư.",
+      "worldProof": {
+        "signatureSituations": [
+          "Người dân bước qua một vạch phấn vô hình và bị bốc cháy.",
+          "Main dùng compa và thước kẻ để tìm điểm mù của quy tắc.",
+          "Giếng chuông rung lên khi hai vùng quy tắc va chạm."
+        ],
+        "institutionalReaction": "Hội Đo Lường thay đổi hệ quy chiếu, khiến các bản đồ cũ của main trở nên vô dụng, buộc anh phải tìm cách đo đạc lại.",
+        "resourceCirculation": "Thước đo chuẩn và bản đồ gốc là tài sản. Uy tín giúp main huy động người dân làm mốc sống để thử nghiệm.",
+        "thirtyChapterMutation": "Chương 30: Một giếng chuông mới mọc lên, phá vỡ hai quy tắc hình học cũ, tạo ra các vùng không gian phi logic."
+      },
+      "antiCloneFingerprint": "nhớ tọa độ gốc|đẩy lùi vùng sát thương|thước chuẩn, uy tín|độc quyền ranh giới|giếng chuông tâm chấn"
+    },
+    {
+      "id": "concept_palimpsest_layers",
+      "workingTitle": "Giấy Chồng Lớp",
+      "readerCuriosity": "Làm sao những vết hằn của các quy tắc cũ bị cạo đi lại có thể tương tác với quy tắc mới được viết đè lên?",
+      "readerFantasy": "Đọc được những quy tắc đã bị xóa bỏ qua lực ấn của bút, dùng luật cũ để vô hiệu hóa luật mới của kẻ thù.",
+      "premise": "Giấy tro khan hiếm nên thường bị cạo đi viết lại. Main nhận ra kẻ gian cố tình cạo không sạch để luật cũ rỉn lên luật mới.",
+      "irreversibleProblem": "Luật bảo vệ dân nghèo bị viết đè lên một đạo luật hiến tế cũ chưa được cạo sạch, khiến người được bảo vệ lại trở thành vật tế.",
+      "protagonistContradiction": "Chỉ thợ sửa giấy mới cảm nhận được độ lồi lõm của mặt giấy, nhưng tiếng nói của anh không có trọng lượng pháp lý.",
+      "domainMechanism": "Giếng chuông đọc toàn bộ bề mặt giấy. Dấu triện mới kích hoạt cả những tàn dư cũ nếu chúng tạo thành câu có nghĩa.",
+      "conflictEngine": "Viện Tái Chế cố tình tạo ra các văn bản chồng lớp để gài bẫy đối thủ chính trị và bóc lột tầng lớp thấp.",
+      "emotionalCore": "Khôi phục lại sự thật bị vùi lấp, mang lại công lý cho những người đã bị các quy tắc cũ nghiền nát.",
+      "differenceClaim": "Sử dụng khái niệm palimpsest (văn bản viết đè) làm cơ sở cho hệ thống pháp thuật, đòi hỏi sự tinh tế trong xúc giác và thị giác.",
+      "nearestComparisonRisk": "Dễ biến thành truyện trinh thám tài liệu đơn thuần nếu không có sự cưỡng chế bạo lực từ giếng chuông.",
+      "serialityProof": "Khám phá ra những lớp luật cổ đại bị chôn vùi dưới hàng chục lớp mực, mở ra lịch sử đen tối của thành phố.",
+      "openingAdvantage": "Chương 1: Main dùng bột than làm nổi bật vết hằn cũ, chứng minh sự mâu thuẫn, cứu một người khỏi án hiến tế.",
+      "progressionProof": "Chương 3: Main lấy được kính soi bóng mờ, bị Viện Tái Chế theo dõi, dùng uy tín để giành quyền kiểm tra giấy trước khi đóng dấu.",
+      "worldProof": {
+        "signatureSituations": [
+          "Quan viên dùng dao cạo giấy cẩn thận từng li để xóa luật.",
+          "Main rắc bột than lên giấy để đọc các chữ bị chìm.",
+          "Một quy tắc mới phát nổ vì xung đột logic với lớp chữ cũ."
+        ],
+        "institutionalReaction": "Viện Tái Chế bắt đầu dùng hóa chất để xóa sạch hoàn toàn, buộc main phải tìm cách phục hồi trí nhớ của chính tờ giấy tro.",
+        "resourceCirculation": "Kính soi và bột than đặc biệt là công cụ. Uy tín giúp main tiếp cận kho lưu trữ các bản nháp chưa bị cạo.",
+        "thirtyChapterMutation": "Chương 30: Giếng chuông cộng hưởng sâu, làm sống lại hai quy tắc cổ đại, khiến các luật mới trên bề mặt mất tác dụng."
+      },
+      "antiCloneFingerprint": "cảm nhận vết hằn|dùng luật cũ phá luật mới|kính soi, quyền kiểm giấy|độc quyền tái chế|giếng chuông đọc bề mặt"
+    },
+    {
+      "id": "concept_thermal_activation",
+      "workingTitle": "Nhiệt Ấn Quy Tắc",
+      "readerCuriosity": "Sự chênh lệch nhiệt độ của sáp trộn trong mực có thể tạo ra những kẽ hở chết người nào trong một đạo luật?",
+      "readerFantasy": "Lợi dụng điểm nóng chảy của mực để làm một phần quy tắc biến mất ngay giữa phiên tòa, lật mặt kẻ gian.",
+      "premise": "Quy tắc kích hoạt bằng nhiệt từ giếng chuông. Kẻ gian trộn sáp chịu nhiệt vào mực để một số từ không được kích hoạt.",
+      "irreversibleProblem": "Một hợp đồng bảo hộ bị vô hiệu hóa vì chữ 'miễn trừ' không lên nhiệt, khiến khu phố của main đối mặt với quái vật.",
+      "protagonistContradiction": "Main có đôi mắt nhạy bén với độ bóng của sáp, nhưng lại thiếu quyền lực để yêu cầu kiểm tra nhiệt độ công khai.",
+      "domainMechanism": "Giếng chuông tỏa nhiệt lượng niềm tin. Giấy tro truyền nhiệt. Mực phải đạt đủ nhiệt độ mới kết tinh thành quy tắc.",
+      "conflictEngine": "Hội Lò Lửa kiểm soát nhiệt độ giếng chuông, cố tình tạo ra các vùng lạnh để vô hiệu hóa luật bảo vệ dân đen.",
+      "emotionalCore": "Giữ cho ngọn lửa ấm áp của tình người không bị dập tắt bởi sự lạnh lẽo của những quy tắc bị thao túng.",
+      "differenceClaim": "Biến nhiệt động học thành cơ sở của pháp thuật quy tắc, nơi nhiệt độ môi trường quyết định sự sống còn.",
+      "nearestComparisonRisk": "Dễ bị nhầm với phép thuật hệ hỏa nếu không tập trung vào tính chất vật lý của mực và giấy.",
+      "serialityProof": "Đối phó với các loại mực có điểm nóng chảy khác nhau, từ đó vạch trần âm mưu thao túng thời tiết của giới cầm quyền.",
+      "openingAdvantage": "Chương 1: Main dùng hơi ấm từ tay để kích hoạt chữ bị ẩn, chứng minh hợp đồng bị lỗi, cứu khu phố khỏi đợt tấn công.",
+      "progressionProof": "Chương 3: Main thu được nhiệt kế tinh thể, bị Hội Lò Lửa chú ý, dùng uy tín để lập trạm kiểm tra nhiệt độ độc lập.",
+      "worldProof": {
+        "signatureSituations": [
+          "Người dân mang giấy tro ra phơi nắng để luật có hiệu lực.",
+          "Main soi độ bóng của nét chữ dưới ánh đèn dầu.",
+          "Quy tắc đóng băng và vỡ vụn khi nhiệt độ môi trường giảm đột ngột."
+        ],
+        "institutionalReaction": "Hội Lò Lửa tung ra loại mực phản ứng ngược với nhiệt, buộc main phải tìm cách làm lạnh giấy để đọc luật.",
+        "resourceCirculation": "Nhiệt kế và nguồn nhiệt ổn định là tài sản. Uy tín giúp main kêu gọi người dân góp lửa để kích hoạt luật lớn.",
+        "thirtyChapterMutation": "Chương 30: Một đợt rét đậm bất thường làm hai quy tắc sinh tử bị đóng băng, đảo lộn trật tự xã hội."
+      },
+      "antiCloneFingerprint": "nhìn độ bóng sáp|kích nhiệt chữ ẩn|nhiệt kế, trạm kiểm tra|độc quyền nhiệt lượng|giếng chuông tỏa nhiệt"
+    },
+    {
+      "id": "concept_water_soluble",
+      "workingTitle": "Mực Ngậm Nước",
+      "readerCuriosity": "Làm sao việc phủ một lớp chống nước mỏng lên vài chữ cái có thể thay đổi hoàn toàn ý nghĩa của một bản án?",
+      "readerFantasy": "Dùng một giọt nước để rửa trôi lớp ngụy trang, phơi bày sự thật và đảo ngược tình thế ngay trước mắt đám đông.",
+      "premise": "Độ ẩm từ giếng chuông hòa tan mực vào giấy tro để tạo luật. Kẻ gian dùng sáp chống nước che đậy các điều khoản bất lợi.",
+      "irreversibleProblem": "Luật phân phối nước sạch bị sửa đổi, khiến khu phố của main bị cắt nước, trong khi giấy tờ trông hoàn toàn hợp lệ.",
+      "protagonistContradiction": "Main nhận ra những mảng giấy khô bất thường nhờ kinh nghiệm bồi giấy, nhưng không ai tin một thợ quèn.",
+      "domainMechanism": "Giếng chuông phun sương niềm tin. Mực hòa tan tạo thành mạch liên kết. Chữ không thấm nước sẽ bị loại khỏi mạch quy tắc.",
+      "conflictEngine": "Thủy Cục thao túng độ ẩm của giếng chuông và dùng mực chống nước để độc quyền tài nguyên sinh tồn.",
+      "emotionalCore": "Mang lại dòng nước mát lành và sự công bằng cho những người dân đang khát khô dưới ách áp bức.",
+      "differenceClaim": "Sử dụng tính thấm nước của vật liệu làm cơ chế phá án, tạo ra những màn lật kèo tinh tế chỉ bằng một giọt nước.",
+      "nearestComparisonRisk": "Dễ biến thành truyện sinh tồn mạt thế thiếu nước nếu không giữ vững yếu tố điều tra quy tắc.",
+      "serialityProof": "Khám phá ra các loại dung dịch chống nước phức tạp hơn, đòi hỏi main phải tìm ra các dung môi giải mã tương ứng.",
+      "openingAdvantage": "Chương 1: Main vẩy nước lên giấy, làm lộ ra chữ 'miễn phí' bị che giấu, cứu một người khỏi tội ăn cắp nước.",
+      "progressionProof": "Chương 3: Main lấy được dung môi đặc biệt, bị Thủy Cục đe dọa, dùng uy tín để mở một giếng nước phụ cho khu phố.",
+      "worldProof": {
+        "signatureSituations": [
+          "Quan viên phun sương lên giấy tro để tuyên án.",
+          "Main sờ mặt giấy để tìm những điểm khô ráp bất thường.",
+          "Một quy tắc bị đứt đoạn và xẹt lửa khi gặp vùng giấy chống nước."
+        ],
+        "institutionalReaction": "Thủy Cục dùng mực tan trong máu thay vì nước, buộc main phải trả giá bằng tổn thương vật lý để kiểm chứng.",
+        "resourceCirculation": "Dung môi và nước sạch là tài nguyên. Uy tín giúp main được người dân cho phép thử nghiệm trên giấy tờ của họ.",
+        "thirtyChapterMutation": "Chương 30: Giếng chuông phun ra sương độc, làm hai quy tắc về thanh lọc và chữa bệnh bị biến chất hoàn toàn."
+      },
+      "antiCloneFingerprint": "tìm điểm khô ráp|rửa trôi ngụy trang|dung môi, giếng phụ|độc quyền độ ẩm|giếng chuông phun sương"
+    },
+    {
+      "id": "concept_magnetic_alignment",
+      "workingTitle": "Từ Tính Quy Tắc",
+      "readerCuriosity": "Sự sắp xếp của các hạt mạt sắt li ti trong mực có thể bẻ cong hướng tác dụng của một lời nguyền như thế nào?",
+      "readerFantasy": "Dùng một thỏi nam châm nhỏ giấu trong tay áo để làm rối loạn từ trường của tờ giấy, khiến đòn tấn công của kẻ thù quay ngược lại.",
+      "premise": "Mực chứa mạt sắt, được từ trường giếng chuông định hướng. Kẻ gian dùng nam châm làm rối loạn trật tự hạt để đổi mục tiêu.",
+      "irreversibleProblem": "Một quy tắc trừng phạt kẻ trộm bị bẻ cong từ tính, nhắm thẳng vào những người tố cáo, bao gồm cả bạn của main.",
+      "protagonistContradiction": "Main nhìn thấy dòng chảy của các hạt kim loại nhờ thói quen soi giấy dưới ánh sáng xiên, nhưng thiếu thiết bị đo từ trường.",
+      "domainMechanism": "Giếng chuông là cực từ. Giấy tro là từ trường. Mực là đường sức. Sự nhiễu loạn hạt sắt sẽ bẻ cong đường sức quy tắc.",
+      "conflictEngine": "Hội Kim Tinh dùng đá nam châm để thao túng hướng đi của các quy tắc có lợi, biến pháp luật thành vũ khí tư nhân.",
+      "emotionalCore": "Giữ cho la bàn đạo đức của khu phố không bị lệch hướng bởi những thế lực có khả năng bẻ cong cả thực tại.",
+      "differenceClaim": "Đưa khái niệm từ trường vào hệ thống pháp thuật, biến việc quan sát dòng chảy hạt vi mô thành chìa khóa phá án.",
+      "nearestComparisonRisk": "Dễ nhầm với dị năng điều khiển kim loại nếu không giới hạn sự can thiệp chỉ ở mức độ hạt mực trên giấy.",
+      "serialityProof": "Đối mặt với các loại mực có từ tính phức tạp (đa cực, phản từ), đòi hỏi main phải chế tạo các công cụ đo lường tinh vi hơn.",
+      "openingAdvantage": "Chương 1: Main rắc mạt sắt lên giấy để chứng minh từ trường bị nhiễu, bẻ hướng quy tắc trừng phạt khỏi người bạn.",
+      "progressionProof": "Chương 3: Main thu được la bàn từ tính, bị Hội Kim Tinh dòm ngó, dùng uy tín để thiết lập vùng cấm từ trường quanh tiệm.",
+      "worldProof": {
+        "signatureSituations": [
+          "Giấy tro tự động xoay về hướng giếng chuông khi được đóng dấu.",
+          "Main soi giấy dưới ánh sáng xiên để nhìn dòng chảy mạt sắt.",
+          "Quy tắc bị bẻ cong 90 độ, đánh trúng bức tường thay vì tội phạm."
+        ],
+        "institutionalReaction": "Hội Kim Tinh dùng mực khử từ, khiến la bàn của main vô dụng, buộc anh phải tìm cách kích từ lại cho giấy.",
+        "resourceCirculation": "La bàn và đá nam châm chuẩn là công cụ. Uy tín giúp main thu thập được các mẫu giấy bị nhiễu từ để nghiên cứu.",
+        "thirtyChapterMutation": "Chương 30: Đảo cực từ trường của giếng chuông khiến hai quy tắc về bảo vệ và tấn công bị hoán đổi tác dụng."
+      },
+      "antiCloneFingerprint": "nhìn dòng chảy hạt|bẻ hướng quy tắc|la bàn, vùng cấm từ|độc quyền từ trường|giếng chuông cực từ"
+    },
+    {
+      "id": "concept_fungal_spores",
+      "workingTitle": "Bào Tử Giấy Tro",
+      "readerCuriosity": "Làm sao việc cấy một loại nấm siêu vi vào nét chữ lại có thể khiến một đạo luật 'ăn thịt' người vi phạm?",
+      "readerFantasy": "Phát hiện ra các bào tử nấm ngoại lai, dùng nhiệt độ để tiêu diệt chúng, biến một quy tắc chết chóc trở lại thành văn bản bình thường.",
+      "premise": "Giấy tro được dệt cùng sợi nấm đồng sinh. Kẻ gian cấy bào tử nấm ký sinh vào mực để quy tắc hút sinh lực người chịu phạt.",
+      "irreversibleProblem": "Luật lao động công ích bị cấy nấm ký sinh, khiến những người thợ trong khu phố kiệt sức đến chết mà không rõ lý do.",
+      "protagonistContradiction": "Main nhận ra những vết sần nhỏ li ti trên nét mực nhờ xúc giác nhạy bén, nhưng y tế thành phố phủ nhận sự tồn tại của nấm.",
+      "domainMechanism": "Giếng chuông phát ra sóng sinh học nuôi nấm. Sợi nấm kết nối tạo thành mạng lưới luật. Nấm ký sinh sẽ bóp méo mạng lưới này.",
+      "conflictEngine": "Nông Hội ngầm phát triển các loại nấm ký sinh để biến quy tắc thành công cụ hút máu, bóc lột sức lao động.",
+      "emotionalCore": "Chữa lành cho những người hàng xóm bị bòn rút sinh lực, bảo vệ sự sống mỏng manh trong một thành phố độc hại.",
+      "differenceClaim": "Kết hợp sinh học vi sinh với hệ thống pháp thuật, biến việc kiểm tra giấy tờ thành một quá trình xét nghiệm bệnh lý.",
+      "nearestComparisonRisk": "Dễ biến thành truyện kinh dị sinh tồn nếu không giữ vững cấu trúc phá án và bẻ luật bằng logic.",
+      "serialityProof": "Phát hiện ra các chủng nấm mới có khả năng thay đổi trí nhớ hoặc cảm xúc, mở rộng quy mô âm mưu của Nông Hội.",
+      "openingAdvantage": "Chương 1: Main dùng cồn đốt cháy các vết sần trên chữ, tiêu diệt nấm ký sinh, cứu một người thợ khỏi cơn nguy kịch.",
+      "progressionProof": "Chương 3: Main lấy được kính hiển vi thô sơ, bị Nông Hội đe dọa, dùng uy tín để lập trạm kiểm dịch giấy cho khu phố.",
+      "worldProof": {
+        "signatureSituations": [
+          "Giấy tro mọc ra những sợi nấm phát sáng khi luật được kích hoạt.",
+          "Main vuốt ve mặt giấy để cảm nhận các bào tử siêu vi.",
+          "Người vi phạm luật bị các sợi nấm vô hình trói chặt và hút máu."
+        ],
+        "institutionalReaction": "Nông Hội tạo ra loại nấm kháng nhiệt và cồn, buộc main phải tìm ra thiên địch sinh học của chúng để đối phó.",
+        "resourceCirculation": "Kính hiển vi và thuốc diệt nấm là tài nguyên. Uy tín giúp main thuyết phục người dân cho phép đốt các giấy tờ nhiễm bệnh.",
+        "thirtyChapterMutation": "Chương 30: Giếng chuông bùng phát dịch nấm, làm hai quy tắc về y tế và an ninh bị lây nhiễm chéo, gây hỗn loạn."
+      },
+      "antiCloneFingerprint": "cảm nhận vết sần nấm|tiêu diệt nấm ký sinh|kính hiển vi, trạm kiểm dịch|độc quyền sinh học|giếng chuông nuôi nấm"
+    },
+    {
+      "id": "concept_weight_balance",
+      "workingTitle": "Trọng Lượng Chữ",
+      "readerCuriosity": "Việc thêm vài hạt bụi kim loại nặng vào một chữ cái có thể làm mất cân bằng cán cân công lý của giếng chuông ra sao?",
+      "readerFantasy": "Đo lường chính xác trọng lượng của từng nét chữ, chỉ ra sự gian lận vi bẩy, khiến toàn bộ phán quyết của tòa án sụp đổ.",
+      "premise": "Quy tắc chỉ kích hoạt khi trọng lượng mực trên giấy cân bằng. Kẻ gian pha bụi chì vào mực để làm nặng các điều khoản ép buộc.",
+      "irreversibleProblem": "Một bản án tranh chấp đất đai nghiêng hẳn về phía địa chủ vì chữ 'tịch thu' được viết bằng mực pha chì, đe dọa tiệm giấy.",
+      "protagonistContradiction": "Main có khả năng ước lượng trọng lượng giấy qua độ cong khi cầm, nhưng không có chiếc cân chuẩn nào để chứng minh.",
+      "domainMechanism": "Giếng chuông là một cán cân năng lượng. Giấy tro phải đạt trạng thái cân bằng trọng lực. Chữ nặng hơn sẽ kéo luật về phía nó.",
+      "conflictEngine": "Cục Cân Đo lạm dụng bụi kim loại nặng để thao túng các bản án, biến công lý thành thứ có thể mua bằng trọng lượng.",
+      "emotionalCore": "Cân bằng lại cán cân công lý cho những người yếu thế, chứng minh rằng sự thật không thể bị đè bẹp bởi sức nặng của đồng tiền.",
+      "differenceClaim": "Sử dụng trọng lượng vi mô làm cơ chế bẻ luật, đòi hỏi sự tinh tế trong cảm giác vật lý và khả năng suy luận logic.",
+      "nearestComparisonRisk": "Dễ bị nhầm với các hệ thống giao dịch linh hồn nếu không tập trung vào tính chất vật lý của mực và giấy.",
+      "serialityProof": "Đối mặt với các loại mực có trọng lượng thay đổi theo thời gian hoặc nhiệt độ, đòi hỏi các phương pháp đo lường phức tạp hơn.",
+      "openingAdvantage": "Chương 1: Main thả tờ giấy rơi tự do, chứng minh nó lật nghiêng bất thường, lật tẩy chữ pha chì, cứu tiệm giấy.",
+      "progressionProof": "Chương 3: Main chế tạo được chiếc cân tiểu ly siêu nhạy, bị Cục Cân Đo tịch thu, dùng uy tín để mượn cân của hội buôn.",
+      "worldProof": {
+        "signatureSituations": [
+          "Quan viên đặt giấy tro lên một chiếc cân năng lượng trước khi đóng dấu.",
+          "Main quan sát độ cong của tờ giấy khi cầm trên tay.",
+          "Quy tắc mất cân bằng tạo ra một lực hấp dẫn đè nát đồ vật xung quanh."
+        ],
+        "institutionalReaction": "Cục Cân Đo dùng khí nhẹ bơm vào giấy để bù trừ trọng lượng chì, buộc main phải tìm cách đo khối lượng riêng thay vì trọng lượng.",
+        "resourceCirculation": "Cân tiểu ly và quả cân chuẩn là công cụ. Uy tín giúp main được mời làm người thứ ba giám định các hợp đồng lớn.",
+        "thirtyChapterMutation": "Chương 30: Giếng chuông thay đổi trọng lực cục bộ, làm hai quy tắc về xây dựng và di chuyển bị đảo lộn hoàn toàn."
+      },
+      "antiCloneFingerprint": "nhìn độ cong giấy|chứng minh mất cân bằng|cân tiểu ly, quyền giám định|độc quyền trọng lượng|giếng chuông cán cân"
+    },
+    {
+      "id": "concept_light_refraction",
+      "workingTitle": "Quang Ảnh Quy Tắc",
+      "readerCuriosity": "Góc chiếu sáng của mặt trời ảnh hưởng thế nào đến việc một điều khoản ẩn trong giấy tro được kích hoạt hay biến mất?",
+      "readerFantasy": "Dùng một lăng kính nhỏ để bẻ cong ánh sáng, làm hiện ra những dòng chữ độc ác bị giấu kín, cứu sống hàng trăm người.",
+      "premise": "Mực quy tắc phản ứng với quang phổ ánh sáng từ giếng chuông. Kẻ gian dùng mực khúc xạ để giấu các điều khoản phụ.",
+      "irreversibleProblem": "Một lệnh ân xá có điều khoản ẩn 'tử hình sau 3 ngày' được viết bằng mực khúc xạ, main phải tìm cách làm nó hiện hình.",
+      "protagonistContradiction": "Main biết cách soi giấy dưới các góc độ khác nhau để tìm vết xước quang học, nhưng ánh sáng giếng chuông lại bị kiểm soát.",
+      "domainMechanism": "Giếng chuông phát ra ánh sáng niềm tin. Giấy tro hấp thụ quang phổ. Mực khúc xạ sẽ bẻ cong ánh sáng, làm luật tàng hình.",
+      "conflictEngine": "Hội Quang Minh độc quyền các lăng kính kiểm định, cố tình bỏ qua các điều khoản ẩn để trục lợi từ những bản án oan.",
+      "emotionalCore": "Mang ánh sáng sự thật chiếu rọi vào những góc khuất tăm tối nhất của hệ thống pháp luật, bảo vệ sinh mạng vô tội.",
+      "differenceClaim": "Biến quang học thành công cụ phá án, sử dụng góc chiếu, lăng kính và sự khúc xạ làm chìa khóa giải quyết xung đột.",
+      "nearestComparisonRisk": "Dễ nhầm với phép thuật ảo ảnh nếu không gắn chặt với các bằng chứng vật lý trên bề mặt giấy tro.",
+      "serialityProof": "Khám phá ra các loại mực phản ứng với tia cực tím hoặc hồng ngoại, đòi hỏi main phải chế tạo các bộ lọc ánh sáng mới.",
+      "openingAdvantage": "Chương 1: Main dùng một mảnh thủy tinh vỡ để bẻ góc sáng, làm hiện ra điều khoản tử hình, cứu người bị hàm oan.",
+      "progressionProof": "Chương 3: Main thu được một lăng kính chuẩn, bị Hội Quang Minh truy lùng, dùng uy tín để thiết lập phòng tối kiểm định.",
+      "worldProof": {
+        "signatureSituations": [
+          "Giấy tro chỉ phát sáng và có hiệu lực khi được đặt dưới ánh nắng giữa trưa.",
+          "Main soi mặt giấy dưới nhiều góc độ để tìm sự sai lệch quang học.",
+          "Một quy tắc tàng hình bất ngờ chém đứt vật thể khi có người bước qua."
+        ],
+        "institutionalReaction": "Hội Quang Minh dùng mực hấp thụ hoàn toàn ánh sáng (đen tuyệt đối), buộc main phải dùng xúc giác hoặc hóa học để kiểm tra.",
+        "resourceCirculation": "Lăng kính và bộ lọc sáng là tài nguyên. Uy tín giúp main mượn được các nguồn sáng nhân tạo từ thợ mỏ.",
+        "thirtyChapterMutation": "Chương 30: Giếng chuông phát ra nhật thực giả, làm hai quy tắc về ngày và đêm bị vô hiệu hóa, bóng tối bao trùm."
+      },
+      "antiCloneFingerprint": "tìm vết xước quang học|làm hiện chữ tàng hình|lăng kính, phòng tối|độc quyền ánh sáng|giếng chuông phát quang"
+    },
+    {
+      "id": "concept_linguistic_syntax",
+      "workingTitle": "Ngữ Pháp Sinh Tử",
+      "readerCuriosity": "Một dấu phẩy siêu nhỏ bị đặt sai chỗ có thể biến một lệnh bảo vệ thành một lệnh thảm sát như thế nào?",
+      "readerFantasy": "Phát hiện ra những vi phạm ngữ pháp tinh vi, dùng chính logic của câu chữ để tạo ra nghịch lý, làm nổ tung quy tắc của kẻ thù.",
+      "premise": "Giếng chuông thi hành luật theo logic ngữ pháp nghiêm ngặt. Kẻ gian thêm các dấu câu vi mô để đảo ngược ý nghĩa mệnh đề.",
+      "irreversibleProblem": "Luật 'Bảo vệ dân, không giết' bị thêm dấu phẩy thành 'Bảo vệ dân không, giết', đe dọa toàn bộ khu phố của main.",
+      "protagonistContradiction": "Main có trí nhớ hoàn hảo về khoảng cách giữa các chữ, nhưng các học giả lại khinh thường kiến thức của một thợ giấy.",
+      "domainMechanism": "Giếng chuông là cỗ máy phân tích cú pháp. Giấy tro là đầu vào. Dấu câu vi mô làm thay đổi cây cú pháp, bẻ cong hành động.",
+      "conflictEngine": "Viện Hàn Lâm lạm dụng sự phức tạp của ngôn ngữ để cài cắm các bẫy logic, khiến người dân bình thường không thể tự bảo vệ.",
+      "emotionalCore": "Đấu tranh cho quyền được hiểu và được bảo vệ của những người thất học, biến ngôn ngữ từ vũ khí áp bức thành khiên che chở.",
+      "differenceClaim": "Sử dụng ngôn ngữ học và logic học làm cơ chế chiến đấu, biến mỗi tờ giấy thành một bài toán giải tích cú pháp.",
+      "nearestComparisonRisk": "Dễ biến thành truyện hài hước chơi chữ nếu không có hậu quả đẫm máu từ sự cưỡng chế của giếng chuông.",
+      "serialityProof": "Đối mặt với các bẫy logic phức tạp hơn như vòng lặp vô hạn hoặc nghịch lý tự tham chiếu, đòi hỏi tư duy toán học.",
+      "openingAdvantage": "Chương 1: Main chỉ ra khoảng cách bất thường, chứng minh có dấu phẩy ẩn, tạo ra nghịch lý làm quy tắc tự hủy, cứu khu phố.",
+      "progressionProof": "Chương 3: Main lấy được từ điển gốc, bị Viện Hàn Lâm kiện, dùng uy tín để mở lớp dạy ngữ pháp sinh tồn cho dân nghèo.",
+      "worldProof": {
+        "signatureSituations": [
+          "Quy tắc quét qua đám đông, phân loại mục tiêu dựa trên các mệnh đề điều kiện.",
+          "Main dùng thước kẹp để đo khoảng cách giữa các ký tự.",
+          "Một quy tắc bốc cháy vì rơi vào vòng lặp logic vô hạn."
+        ],
+        "institutionalReaction": "Viện Hàn Lâm bắt đầu dùng các ngôn ngữ cổ đại không có dấu câu, buộc main phải học cách phân tích ngữ cảnh và từ nguyên.",
+        "resourceCirculation": "Từ điển gốc và kính lúp đo đạc là công cụ. Uy tín giúp main được mời làm người soạn thảo hợp đồng cho các bang hội.",
+        "thirtyChapterMutation": "Chương 30: Giếng chuông cập nhật bộ quy tắc ngữ pháp mới, làm hai luật cơ bản về sở hữu và nhân xưng bị hiểu sai lệch."
+      },
+      "antiCloneFingerprint": "đo khoảng cách chữ|tạo nghịch lý logic|từ điển gốc, lớp học|độc quyền ngôn ngữ|giếng chuông phân tích cú pháp"
+    },
+    {
+      "id": "concept_blood_coagulation",
+      "workingTitle": "Huyết Triện Ngưng Tụ",
+      "readerCuriosity": "Tốc độ đông máu của người đóng dấu ảnh hưởng thế nào đến thời gian duy trì hiệu lực của một đạo luật?",
+      "readerFantasy": "Phân tích vết nứt trên dấu triện máu để tính toán chính xác thời điểm quy tắc sụp đổ, phản công ngay khi kẻ thù yếu nhất.",
+      "premise": "Dấu triện phải dùng máu người ban hành. Kẻ gian dùng thuốc chống đông để kéo dài thời gian hiệu lực của các luật bóc lột.",
+      "irreversibleProblem": "Một lệnh thu thuế máu lẽ ra chỉ kéo dài 1 ngày lại không có dấu hiệu kết thúc, main phát hiện mép dấu triện không hề nứt nẻ.",
+      "protagonistContradiction": "Main hiểu rõ quá trình khô của mọi loại chất lỏng trên giấy tro, nhưng việc xét nghiệm máu lại thuộc thẩm quyền của y viện.",
+      "domainMechanism": "Giếng chuông nhận diện sinh mệnh qua máu. Giấy tro hấp thụ huyết khí. Máu đông lại thì luật hết hạn. Thuốc chống đông phá vỡ giới hạn này.",
+      "conflictEngine": "Huyết Viện lén lút cung cấp thuốc chống đông cho giới quý tộc để duy trì các đặc quyền vĩnh viễn, chà đạp lên quy luật tự nhiên.",
+      "emotionalCore": "Chấm dứt sự bòn rút sinh mệnh vô tận, trả lại sự hữu hạn công bằng cho mọi quy tắc, bảo vệ sức khỏe của cộng đồng.",
+      "differenceClaim": "Kết hợp sinh lý học (sự đông máu) với cơ chế pháp thuật, tạo ra yếu tố đếm ngược căng thẳng dựa trên trạng thái vật lý của dấu triện.",
+      "nearestComparisonRisk": "Dễ bị nhầm với ma cà rồng hoặc huyết ma thuật nếu không tập trung vào khía cạnh pháp lý và bằng chứng trên giấy.",
+      "serialityProof": "Phát hiện ra các thủ đoạn tinh vi hơn như trộn máu của nhiều người hoặc dùng máu động vật để thay đổi đối tượng chịu luật.",
+      "openingAdvantage": "Chương 1: Main dùng hóa chất làm đông máu nhân tạo, ép dấu triện nứt vỡ, kết thúc lệnh thu thuế, cứu người hàng xóm suy kiệt.",
+      "progressionProof": "Chương 3: Main thu được mẫu thuốc chống đông, bị Huyết Viện truy sát, dùng uy tín để yêu cầu kiểm tra máu công khai.",
+      "worldProof": {
+        "signatureSituations": [
+          "Quan viên cắt tay lấy máu nhỏ vào con dấu trước khi đóng lên giấy tro.",
+          "Main soi các vết nứt vi mô trên viền dấu triện đỏ.",
+          "Quy tắc tan biến thành sương máu khi dấu triện khô hoàn toàn."
+        ],
+        "institutionalReaction": "Huyết Viện dùng loại máu nhân tạo không bao giờ đông, buộc main phải tìm cách phá hủy cấu trúc protein của máu đó.",
+        "resourceCirculation": "Hóa chất thử máu và mẫu máu chuẩn là tài nguyên. Uy tín giúp main thu thập được máu của các quan chức để đối chiếu.",
+        "thirtyChapterMutation": "Chương 30: Giếng chuông bị nhiễm độc máu, làm hai quy tắc về thừa kế và huyết thống bị đảo lộn, nhận diện sai mục tiêu."
+      },
+      "antiCloneFingerprint": "soi vết nứt dấu triện|ép luật hết hạn sớm|hóa chất thử máu, uy tín|độc quyền huyết khí|giếng chuông nhận diện máu"
+    },
+    {
+      "id": "concept_fiber_weaving",
+      "workingTitle": "Mạch Giấy Đứt Gãy",
+      "readerCuriosity": "Việc cắt đứt một sợi xơ nhỏ bên trong tờ giấy tro có thể tạo ra một 'lỗ hổng' cho phép kẻ phạm tội trốn thoát ra sao?",
+      "readerFantasy": "Nhìn thấu cấu trúc đan chéo của sợi giấy, tìm ra điểm đứt gãy vi mô, chứng minh quy tắc đã bị đục lỗ và tóm gọn kẻ gian.",
+      "premise": "Quy tắc truyền dẫn qua mạng lưới sợi giấy tro. Kẻ gian dùng kim siêu nhỏ cắt đứt các sợi cụ thể để tạo vùng miễn trừ cho bản thân.",
+      "irreversibleProblem": "Một tên giết người thoát khỏi sự trừng phạt của luật đền mạng, main phát hiện chữ tên hắn nằm đúng trên một mạch giấy bị cắt đứt.",
+      "protagonistContradiction": "Chỉ có đôi tay của thợ bồi giấy mới cảm nhận được sự đứt gãy bên trong, nhưng tòa án chỉ tin vào những gì nhìn thấy trên bề mặt.",
+      "domainMechanism": "Giếng chuông truyền năng lượng qua mạng lưới sợi. Giấy tro là bảng mạch. Cắt đứt sợi giấy sẽ ngắt dòng năng lượng đến các từ cụ thể.",
+      "conflictEngine": "Hội Thợ Dệt ngầm cung cấp dịch vụ 'đục lỗ' quy tắc cho giới nhà giàu, tạo ra một tầng lớp đứng trên pháp luật.",
+      "emotionalCore": "Vá lại những lỗ hổng của công lý, đảm bảo rằng không ai có thể dùng tiền để mua sự miễn trừ trước những tội ác tàn nhẫn.",
+      "differenceClaim": "Biến cấu trúc vật lý ba chiều của tờ giấy thành một mê cung năng lượng, đòi hỏi khả năng phân tích cấu trúc vi mô.",
+      "nearestComparisonRisk": "Dễ nhầm với việc phá trận pháp thông thường nếu không nhấn mạnh vào kỹ năng nghề nghiệp bồi giấy của main.",
+      "serialityProof": "Đối mặt với các kỹ thuật tinh vi hơn như dệt thêm sợi giả hoặc dùng sợi dẫn điện để bẻ lái năng lượng sang mục tiêu khác.",
+      "openingAdvantage": "Chương 1: Main dùng ánh sáng xuyên thấu chỉ ra mạch giấy đứt, nối lại bằng mực dẫn, kích hoạt luật trừng phạt kẻ giết người.",
+      "progressionProof": "Chương 3: Main lấy được kim cắt sợi vi mô, bị Hội Thợ Dệt cảnh cáo, dùng uy tín để mở dịch vụ soi lỗi hợp đồng.",
+      "worldProof": {
+        "signatureSituations": [
+          "Năng lượng chạy dọc theo các sợi giấy tạo thành những đường sáng li ti.",
+          "Main dùng ngón tay miết nhẹ để tìm những điểm gợn sóng bên trong giấy.",
+          "Quy tắc xẹt lửa và bỏ qua một mục tiêu vì dòng năng lượng bị ngắt."
+        ],
+        "institutionalReaction": "Hội Thợ Dệt dùng kỹ thuật dệt ảo ảnh, khiến mạch giấy trông nguyên vẹn nhưng thực chất đã đứt, buộc main phải dùng dung dịch thử.",
+        "resourceCirculation": "Mực dẫn năng lượng và kính xuyên thấu là công cụ. Uy tín giúp main được quyền tháo tung các lớp giấy của hồ sơ cũ.",
+        "thirtyChapterMutation": "Chương 30: Giếng chuông thay đổi tần số truyền dẫn, làm hai quy tắc về liên kết và chia sẻ bị đứt gãy hàng loạt."
+      },
+      "antiCloneFingerprint": "cảm nhận mạch đứt|nối lại mạch quy tắc|mực dẫn, dịch vụ soi lỗi|độc quyền cấu trúc giấy|giếng chuông truyền năng lượng"
+    },
+    {
+      "id": "concept_echo_interference",
+      "workingTitle": "Vần Điệu Triệt Tiêu",
+      "readerCuriosity": "Làm sao việc thay đổi thứ tự nét bút lại có thể tạo ra một 'tiếng vọng' triệt tiêu sức mạnh của một đạo luật?",
+      "readerFantasy": "Phân tích thứ tự chồng chéo của các nét mực, chứng minh kẻ gian đã viết sai nhịp điệu, làm sụp đổ một quy tắc áp bức.",
+      "premise": "Giếng chuông ghi nhận quy tắc theo nhịp điệu viết. Kẻ gian cố tình viết sai thứ tự nét để tạo ra sóng âm triệt tiêu một phần luật.",
+      "irreversibleProblem": "Luật phân phát lương thực bị triệt tiêu phần 'cho người nghèo', main nhận ra nét ngang của chữ 'nghèo' bị viết sau nét sổ.",
+      "protagonistContradiction": "Main có trí nhớ hình ảnh về sự chồng lấn của các nét mực chưa khô, nhưng không ai tin thứ tự viết lại quan trọng đến thế.",
+      "domainMechanism": "Giếng chuông thu âm quá trình viết. Giấy tro lưu giữ thứ tự nét. Nhịp điệu sai lệch tạo ra giao thoa triệt tiêu sóng cưỡng chế.",
+      "conflictEngine": "Hội Thư Pháp độc quyền cách viết chuẩn, lén lút thay đổi nhịp điệu để tạo ra các quy tắc có lợi cho phe phái của mình.",
+      "emotionalCore": "Bảo vệ miếng ăn và quyền lợi cơ bản của người dân khỏi những thủ đoạn tinh vi được che đậy dưới lớp vỏ nghệ thuật.",
+      "differenceClaim": "Sử dụng thứ tự nét bút (thư pháp) làm cơ sở cho giao thoa sóng âm, kết hợp nghệ thuật viết chữ với vật lý âm thanh.",
+      "nearestComparisonRisk": "Dễ biến thành truyện tu tiên dùng bùa chú nếu không giữ vững yếu tố điều tra bằng chứng vật lý (sự chồng nét mực).",
+      "serialityProof": "Khám phá ra các kỹ thuật viết nhịp điệu phức tạp hơn như viết bằng hai tay hoặc dùng nhiều loại bút để tạo hợp âm.",
+      "openingAdvantage": "Chương 1: Main dùng kính lúp chỉ ra nét mực đè lên nhau sai quy chuẩn, khôi phục nhịp điệu, ép luật phân phát lương thực hoạt động.",
+      "progressionProof": "Chương 3: Main thu được bản phổ nhịp điệu gốc, bị Hội Thư Pháp chèn ép, dùng uy tín để dạy dân nghèo cách tự viết luật bảo vệ.",
+      "worldProof": {
+        "signatureSituations": [
+          "Giếng chuông phát ra tiếng nhạc khi một quy tắc được viết đúng nhịp.",
+          "Main soi kỹ các điểm giao nhau của nét chữ để xem nét nào nằm trên.",
+          "Quy tắc vỡ vụn thành bụi vì hai luồng sóng âm tự triệt tiêu nhau."
+        ],
+        "institutionalReaction": "Hội Thư Pháp dùng loại mực khô ngay lập tức, không để lại dấu vết chồng nét, buộc main phải phân tích độ sâu của vết hằn.",
+        "resourceCirculation": "Bản phổ nhịp điệu và kính lúp chuyên dụng là tài nguyên. Uy tín giúp main mượn được các bản thảo nháp của quan viên.",
+        "thirtyChapterMutation": "Chương 30: Giếng chuông bị nứt, làm thay đổi âm sắc cơ bản, khiến hai quy tắc về giao tiếp và mệnh lệnh bị nhiễu loạn."
+      },
+      "antiCloneFingerprint": "soi nét mực chồng|khôi phục nhịp điệu luật|bản phổ, lớp dạy viết|độc quyền thư pháp|giếng chuông thu âm viết"
+    },
+    {
+      "id": "concept_parasitic_ink",
+      "workingTitle": "Mực Ăn Giấy",
+      "readerCuriosity": "Việc thêm một chút axit vào mực có thể khiến một bản án chung thân tự động biến mất sau vài tháng như thế nào?",
+      "readerFantasy": "Tính toán tốc độ ăn mòn của mực, dùng chất kiềm để chặn đứng quá trình phá hủy, giữ lại bằng chứng định tội kẻ ác.",
+      "premise": "Mực quy tắc từ từ ăn mòn giấy tro. Kẻ gian pha thêm axit để đẩy nhanh quá trình, làm luật tự hủy trước thời hạn.",
+      "irreversibleProblem": "Bằng chứng định tội một tên quý tộc đang bị mực ăn mòn nhanh chóng, chỉ còn vài giờ là biến mất hoàn toàn, main phải cứu vãn nó.",
+      "protagonistContradiction": "Main biết cách trung hòa axit bảo vệ giấy, nhưng việc can thiệp vào hồ sơ đang có hiệu lực bị coi là trọng tội.",
+      "domainMechanism": "Giếng chuông cung cấp năng lượng cho mực. Mực tiêu thụ giấy tro để duy trì luật. Axit làm tăng tốc độ tiêu thụ, phá hủy vật mang.",
+      "conflictEngine": "Cục Lưu Trữ lạm dụng mực axit để tiêu hủy các hồ sơ bất lợi, xóa sổ các quy tắc bảo vệ dân đen một cách 'tự nhiên'.",
+      "emotionalCore": "Giữ gìn ký ức và sự thật lịch sử, không để những kẻ có quyền lực xóa sổ tội ác của chúng một cách dễ dàng.",
+      "differenceClaim": "Biến quá trình bảo quản tài liệu thành một cuộc chạy đua với thời gian, sử dụng hóa học cơ bản để can thiệp vào pháp thuật.",
+      "nearestComparisonRisk": "Dễ bị nhầm với việc phá hủy vật chứng thông thường nếu không có sự cưỡng chế năng lượng từ giếng chuông.",
+      "serialityProof": "Đối mặt với các loại mực ăn mòn chọn lọc (chỉ ăn mòn tên người, hoặc chỉ ăn mòn số tiền), đòi hỏi các chất trung hòa đặc hiệu.",
+      "openingAdvantage": "Chương 1: Main dùng dung dịch kiềm tự chế bôi lên giấy, chặn đứng sự ăn mòn, giữ lại bằng chứng và tống giam tên quý tộc.",
+      "progressionProof": "Chương 3: Main lấy được công thức mực chuẩn, bị Cục Lưu Trữ truy tố, dùng uy tín để giành quyền phục chế các hồ sơ mật.",
+      "worldProof": {
+        "signatureSituations": [
+          "Các tờ giấy tro trong kho lưu trữ bốc khói nhẹ và từ từ mỏng đi.",
+          "Main ngửi mùi chua của giấy để phát hiện sự hiện diện của axit.",
+          "Một quy tắc đột ngột sụp đổ khi tờ giấy mang nó bị thủng một lỗ."
+        ],
+        "institutionalReaction": "Cục Lưu Trữ dùng loại vi khuẩn ăn giấy thay vì axit, buộc main phải tìm ra chất kháng sinh phù hợp để bảo vệ hồ sơ.",
+        "resourceCirculation": "Dung dịch kiềm và công thức mực là công cụ. Uy tín giúp main được tiếp cận các kho lưu trữ sâu hơn, nơi chứa các luật cổ.",
+        "thirtyChapterMutation": "Chương 30: Giếng chuông tăng cường năng lượng, làm tốc độ ăn mòn của mọi loại mực tăng vọt, đe dọa xóa sổ hai quy tắc nền tảng."
+      },
+      "antiCloneFingerprint": "ngửi mùi axit|trung hòa mực ăn mòn|dung dịch kiềm, quyền phục chế|độc quyền lưu trữ|giếng chuông cấp năng lượng"
+    },
+    {
+      "id": "concept_sympathetic_ink",
+      "workingTitle": "Mực Tương Sinh",
+      "readerCuriosity": "Tại sao việc viết một đạo luật bằng mực chiết xuất từ nọc rắn lại có thể vô hiệu hóa một đạo luật viết bằng mực từ máu ếch?",
+      "readerFantasy": "Phân tích thành phần sinh học của mực, dùng quy luật thiên địch để tạo ra một đạo luật nhỏ đè bẹp đạo luật lớn của kẻ thù.",
+      "premise": "Mực chứa tinh chất động vật. Kẻ gian dùng mực thiên địch để chèn ép các quy tắc cũ mà không cần cạo sửa.",
+      "irreversibleProblem": "Luật bảo vệ quyền buôn bán của khu phố (mực cừu) bị vô hiệu hóa bởi một luật thuế mới (mực sói), main phải tìm cách cân bằng.",
+      "protagonistContradiction": "Main nhận ra sự phân tách sắc tố của các loại mực khác nhau, nhưng không có quyền săn bắt các sinh vật quý hiếm để làm mực.",
+      "domainMechanism": "Giếng chuông mô phỏng chuỗi thức ăn tự nhiên. Giấy tro là hệ sinh thái. Mực thiên địch sẽ áp chế mực con mồi, làm luật con mồi mất tác dụng.",
+      "conflictEngine": "Hội Thợ Săn độc quyền các loại mực từ thú dữ, dùng chúng để thiết lập hệ thống phân giai cấp pháp lý, chèn ép dân thường.",
+      "emotionalCore": "Bảo vệ những người yếu thế (con mồi) khỏi sự cắn xé của những kẻ lạm quyền (thú dữ), thiết lập lại sự cân bằng sinh thái xã hội.",
+      "differenceClaim": "Đưa chuỗi thức ăn sinh học vào hệ thống phân cấp pháp thuật, biến việc chọn mực thành một chiến lược sinh tồn.",
+      "nearestComparisonRisk": "Dễ biến thành truyện ngự thú nếu không giới hạn sự tương tác chỉ ở mức độ hóa học và năng lượng trên mặt giấy.",
+      "serialityProof": "Khám phá ra các chuỗi thức ăn phức tạp hơn, bao gồm cả các sinh vật huyền thoại, đòi hỏi main phải tìm ra các loại mực khắc chế chéo.",
+      "openingAdvantage": "Chương 1: Main dùng mực chiết xuất từ bọ cạp viết một điều khoản bổ sung, khắc chế luật mực nhện của kẻ gian, cứu khu phố khỏi bị bóc lột.",
+      "progressionProof": "Chương 3: Main thu được bộ lọc sắc tố, bị Hội Thợ Săn đe dọa, dùng uy tín để mở một chợ giao dịch mực sinh học công bằng.",
+      "worldProof": {
+        "signatureSituations": [
+          "Hai tờ giấy tro đặt gần nhau, tờ viết bằng mực con mồi tự động co rúm lại.",
+          "Main soi sự phân tách sắc tố để xác định nguồn gốc sinh học của mực.",
+          "Một quy tắc phát ra tiếng gầm gừ khi áp chế thành công quy tắc khác."
+        ],
+        "institutionalReaction": "Hội Thợ Săn lai tạo ra các loại thú mới để tạo mực không có thiên địch tự nhiên, buộc main phải dùng độc tố để khắc chế.",
+        "resourceCirculation": "Bộ lọc sắc tố và tinh chất động vật là tài nguyên. Uy tín giúp main huy động thợ săn tự do cung cấp nguyên liệu.",
+        "thirtyChapterMutation": "Chương 30: Giếng chuông đảo lộn chuỗi thức ăn, làm hai quy tắc về thống trị và phục tùng bị đảo ngược hoàn toàn."
+      },
+      "antiCloneFingerprint": "soi sắc tố mực|dùng luật thiên địch khắc chế|bộ lọc sắc tố, chợ giao dịch|độc quyền thú dữ|giếng chuông chuỗi thức ăn"
+    },
+    {
+      "id": "concept_atmospheric_pressure",
+      "workingTitle": "Khí Áp Quy Tắc",
+      "readerCuriosity": "Những lỗ châm kim siêu nhỏ trên giấy tro có thể làm thay đổi áp suất năng lượng và bẻ cong hướng đi của một đạo luật ra sao?",
+      "readerFantasy": "Phát hiện ra các lỗ thủng vi mô, dùng sáp lấp kín chúng để khôi phục áp suất, khiến đòn trừng phạt dội ngược lại kẻ gian lận.",
+      "premise": "Quy tắc hoạt động dựa trên áp suất năng lượng bề mặt. Kẻ gian châm các lỗ siêu nhỏ để xì hơi năng lượng, làm yếu luật.",
+      "irreversibleProblem": "Luật phòng thủ của khu phố bị suy yếu nghiêm trọng trước đợt tấn công của quái thú, main phát hiện giấy tro có hàng ngàn lỗ châm kim.",
+      "protagonistContradiction": "Main có thể nhìn thấy sự đọng mực ở các lỗ thủng nhờ kinh nghiệm soi giấy, nhưng không có thiết bị đo áp suất năng lượng.",
+      "domainMechanism": "Giếng chuông bơm năng lượng vào giấy tro. Bề mặt giấy phải kín để duy trì áp suất luật. Lỗ thủng làm giảm áp suất, thu hẹp phạm vi tác dụng.",
+      "conflictEngine": "Cục Khí Tượng ngầm sử dụng kỹ thuật châm kim để làm suy yếu các luật bảo vệ dân đen, mở đường cho các thế lực ngầm thao túng.",
+      "emotionalCore": "Bịt kín những lỗ hổng của sự phản bội, giữ vững tấm khiên bảo vệ sự bình yên cho những người dân vô tội.",
+      "differenceClaim": "Sử dụng nguyên lý áp suất khí nén áp dụng cho năng lượng pháp thuật, biến việc tìm lỗ thủng thành chìa khóa giải quyết vấn đề.",
+      "nearestComparisonRisk": "Dễ nhầm với việc phá hoại bùa chú thông thường nếu không nhấn mạnh vào sự thay đổi áp suất và phạm vi tác dụng.",
+      "serialityProof": "Đối mặt với các kỹ thuật xì hơi tinh vi hơn như dùng vật liệu xốp hoặc tạo các van một chiều trên giấy, đòi hỏi các chất trám đặc biệt.",
+      "openingAdvantage": "Chương 1: Main dùng sáp ong lấp kín các lỗ châm kim, khôi phục áp suất, kích hoạt tối đa luật phòng thủ, đẩy lùi quái thú.",
+      "progressionProof": "Chương 3: Main chế tạo được màng đo áp suất, bị Cục Khí Tượng tịch thu, dùng uy tín để huy động dân chúng tự kiểm tra giấy tờ.",
+      "worldProof": {
+        "signatureSituations": [
+          "Giấy tro phồng lên như quả bóng khi được giếng chuông bơm năng lượng.",
+          "Main soi giấy dưới ánh sáng mạnh để tìm các điểm hắt sáng từ lỗ thủng.",
+          "Quy tắc xì hơi tạo ra những tiếng rít chói tai và mất dần sức mạnh."
+        ],
+        "institutionalReaction": "Cục Khí Tượng dùng dung môi làm mỏng giấy toàn diện thay vì châm lỗ, buộc main phải tìm cách gia cố cấu trúc giấy từ bên trong.",
+        "resourceCirculation": "Sáp trám và màng đo áp suất là công cụ. Uy tín giúp main được mời làm cố vấn gia cố các hợp đồng quan trọng.",
+        "thirtyChapterMutation": "Chương 30: Giếng chuông tăng áp suất đột ngột, làm nổ tung hai quy tắc cũ có cấu trúc giấy yếu, gây ra sóng xung kích."
+      },
+      "antiCloneFingerprint": "tìm lỗ châm kim|trám lỗ khôi phục áp suất|sáp trám, màng đo áp|độc quyền áp suất|giếng chuông bơm năng lượng"
+    },
+    {
+      "id": "concept_ink_crystallization",
+      "workingTitle": "Mực Kết Tinh",
+      "readerCuriosity": "Việc thêm muối ức chế vào mực để ngăn chặn quá trình kết tinh có thể tạo ra một đạo luật 'chưa hoàn thiện' với những kẽ hở nào?",
+      "readerFantasy": "Kích thích quá trình kết tinh bị đình trệ, làm cho đạo luật hoàn thiện ngay giữa phiên tòa, khóa chặt mọi đường lui của kẻ thù.",
+      "premise": "Mực phải kết tinh thành cấu trúc tinh thể trên giấy tro mới có hiệu lực. Kẻ gian dùng muối ức chế để giữ luật ở trạng thái lỏng lẻo.",
+      "irreversibleProblem": "Một đạo luật cấm bóc lột lao động bị giữ ở trạng thái chưa kết tinh, khiến giới chủ thoải mái lách luật, main phải tìm cách làm nó đông cứng.",
+      "protagonistContradiction": "Main nhận ra sự thiếu vắng ánh kim của tinh thể mực, nhưng không có quyền mang hóa chất xúc tác vào phòng lưu trữ.",
+      "domainMechanism": "Giếng chuông cung cấp sóng rung động. Mực kết tinh theo sóng. Muối ức chế làm gián đoạn mạng tinh thể, tạo ra các điều khoản mập mờ.",
+      "conflictEngine": "Hội Giả Kim lạm dụng hóa chất ức chế để tạo ra các hợp đồng có thể diễn giải theo nhiều hướng, trục lợi từ sự mập mờ pháp lý.",
+      "emotionalCore": "Đưa sự thật từ trạng thái mập mờ trở nên rõ ràng, sắc bén như pha lê, cắt đứt những vòi bạch tuộc bóc lột của giới chủ.",
+      "differenceClaim": "Sử dụng quá trình kết tinh hóa học làm cơ chế xác nhận pháp lý, biến việc quan sát cấu trúc vi mô thành bằng chứng thép.",
+      "nearestComparisonRisk": "Dễ biến thành truyện khoa học viễn tưởng về vật liệu nếu không gắn chặt với sự cưỡng chế của giếng chuông.",
+      "serialityProof": "Khám phá ra các cấu trúc tinh thể phức tạp hơn có khả năng lưu trữ thông tin ẩn, đòi hỏi main phải dùng các dung môi giải mã đặc biệt.",
+      "openingAdvantage": "Chương 1: Main lén rắc bột xúc tác lên giấy, ép mực kết tinh hoàn toàn, làm rõ điều khoản cấm bóc lột, giải cứu các công nhân.",
+      "progressionProof": "Chương 3: Main thu được kính lúp phân cực, bị Hội Giả Kim truy sát, dùng uy tín để thiết lập tiêu chuẩn kết tinh cho khu phố.",
+      "worldProof": {
+        "signatureSituations": [
+          "Mực trên giấy tro từ từ mọc ra các gai tinh thể lấp lánh khi luật được kích hoạt.",
+          "Main soi độ lấp lánh của nét chữ để đánh giá mức độ hoàn thiện của luật.",
+          "Một quy tắc chưa kết tinh bị bóp méo hình dạng khi có người cố tình vi phạm."
+        ],
+        "institutionalReaction": "Hội Giả Kim dùng loại mực kết tinh giả (thủy tinh), buộc main phải dùng thử nghiệm độ cứng để phân biệt thật giả.",
+        "resourceCirculation": "Bột xúc tác và kính phân cực là tài nguyên. Uy tín giúp main mượn được các bản hợp đồng gốc để kiểm tra độ kết tinh.",
+        "thirtyChapterMutation": "Chương 30: Giếng chuông phát ra sóng siêu âm, làm vỡ vụn hai quy tắc có cấu trúc tinh thể yếu, định hình lại luật lệ."
+      },
+      "antiCloneFingerprint": "soi ánh kim tinh thể|ép luật kết tinh hoàn toàn|bột xúc tác, kính phân cực|độc quyền hóa chất|giếng chuông sóng rung"
+    },
+    {
+      "id": "concept_temporal_humidity",
+      "workingTitle": "Độ Ẩm Thời Gian",
+      "readerCuriosity": "Sự chênh lệch độ ẩm giữa hai lần đóng dấu đè lên nhau có thể tiết lộ việc một hồ sơ bị sửa đổi sau khi đã có hiệu lực ra sao?",
+      "readerFantasy": "Phân tích viền loang của vết mực để chứng minh dấu triện thứ hai được đóng vào một ngày mưa, lật tẩy âm mưu ngụy tạo chứng cứ.",
+      "premise": "Giấy tro lưu giữ dấu vết độ ẩm tại thời điểm đóng dấu. Kẻ gian đóng dấu đè lên để sửa luật, main phát hiện sự sai lệch viền loang.",
+      "irreversibleProblem": "Một di chúc chuyển giao quyền sở hữu giếng chuông phụ bị sửa đổi, main phát hiện dấu triện mới có viền loang của ngày độ ẩm cao.",
+      "protagonistContradiction": "Main có trí nhớ hoàn hảo về thời tiết và độ loang của mực, nhưng tòa án chỉ công nhận con dấu bề mặt, không quan tâm đến viền loang.",
+      "domainMechanism": "Giếng chuông ghi nhận thời gian qua độ ẩm không khí. Giấy tro hấp thụ ẩm. Mực loang theo độ ẩm. Đóng dấu sai thời điểm sẽ tạo viền kép.",
+      "conflictEngine": "Cục Khí Tượng và Viện Lưu Trữ cấu kết để sửa đổi các hồ sơ cũ, lợi dụng sự thiếu hiểu biết của dân chúng về viền loang độ ẩm.",
+      "emotionalCore": "Bảo vệ di sản và quyền lợi chính đáng của những người đã khuất, không để kẻ gian dùng quyền lực bóp méo quá khứ.",
+      "differenceClaim": "Sử dụng khí tượng học (độ ẩm) kết hợp với động học chất lỏng (sự loang mực) làm cơ chế xác định thời gian ngụy tạo.",
+      "nearestComparisonRisk": "Dễ biến thành truyện trinh thám pháp y thông thường nếu không có sự cưỡng chế năng lượng từ giếng chuông dựa trên thời gian.",
+      "serialityProof": "Đối mặt với các kỹ thuật ngụy tạo tinh vi hơn như dùng phòng điều hòa độ ẩm để đóng dấu giả, đòi hỏi main phải tìm các dấu vết vi sinh vật.",
+      "openingAdvantage": "Chương 1: Main dùng nhiệt để làm rõ viền loang kép, chứng minh di chúc bị sửa sau ngày mưa, bảo vệ quyền thừa kế cho một đứa trẻ.",
+      "progressionProof": "Chương 3: Main thu được ẩm kế cổ, bị Cục Khí Tượng theo dõi, dùng uy tín để mở dịch vụ giám định niên đại hồ sơ.",
+      "worldProof": {
+        "signatureSituations": [
+          "Giấy tro thay đổi màu sắc nhẹ theo độ ẩm của môi trường xung quanh.",
+          "Main dùng kính lúp đo khoảng cách giữa các viền loang của dấu triện.",
+          "Quy tắc bị lỗi thời gian tạo ra những ảo ảnh của quá khứ chập chờn."
+        ],
+        "institutionalReaction": "Viện Lưu Trữ dùng hóa chất khóa viền loang, buộc main phải phân tích sự phân bố hạt mực bên trong viền thay vì kích thước viền.",
+        "resourceCirculation": "Ẩm kế và biểu đồ thời tiết lịch sử là công cụ. Uy tín giúp main được quyền tra cứu nhật ký khí tượng của thành phố.",
+        "thirtyChapterMutation": "Chương 30: Giếng chuông bốc hơi mạnh, làm hai quy tắc về thời hạn và lịch trình bị xóa sạch viền loang, gây khủng hoảng niềm tin."
+      },
+      "antiCloneFingerprint": "đo viền loang mực|chứng minh sai lệch thời gian|ẩm kế, biểu đồ thời tiết|độc quyền khí tượng|giếng chuông ghi nhận độ ẩm"
+    }
+  ],
+  "rejectedNearDuplicateIds": [],
+  "ranking": {
+    "schemaVersion": 2,
+    "matches": [
+      {
+        "leftId": "concept_acoustic_ash",
+        "rightId": "concept_ash_origins",
+        "winnerId": "concept_acoustic_ash",
+        "reason": "Âm Vực Giấy Tro vượt trội nhờ liên kết trực tiếp giữa tần số âm thanh giếng chuông và độ dày nét mực vật lý."
+      },
+      {
+        "leftId": "concept_palimpsest_layers",
+        "rightId": "concept_ink_oxidation",
+        "winnerId": "concept_palimpsest_layers",
+        "reason": "Giấy Chồng Lớp tạo ra chiều sâu trinh thám tài liệu tốt hơn việc chỉ theo dõi thời gian oxy hóa của mực."
+      },
+      {
+        "leftId": "concept_temporal_humidity",
+        "rightId": "concept_spatial_geometry",
+        "winnerId": "concept_temporal_humidity",
+        "reason": "Độ Ẩm Thời Gian gắn chặt với khí hậu và động học chất lỏng, tạo ra các bằng chứng vi mô thuyết phục hơn bản đồ."
+      },
+      {
+        "leftId": "concept_thermal_activation",
+        "rightId": "concept_water_soluble",
+        "winnerId": "concept_water_soluble",
+        "reason": "Mực Ngậm Nước dễ tạo ra các tình huống lật kèo trực quan bằng nước hơn là sự thay đổi nhiệt độ đơn thuần."
+      },
+      {
+        "leftId": "concept_magnetic_alignment",
+        "rightId": "concept_fungal_spores",
+        "winnerId": "concept_fungal_spores",
+        "reason": "Bào Tử Giấy Tro mang lại yếu tố sinh học rùng rợn và các bài toán xét nghiệm bệnh lý độc đáo hơn từ tính."
+      },
+      {
+        "leftId": "concept_weight_balance",
+        "rightId": "concept_light_refraction",
+        "winnerId": "concept_light_refraction",
+        "reason": "Quang Ảnh Quy Tắc sử dụng lăng kính và góc chiếu sáng tạo ra các màn phá án trực quan hơn cân đo trọng lượng."
+      },
+      {
+        "leftId": "concept_linguistic_syntax",
+        "rightId": "concept_blood_coagulation",
+        "winnerId": "concept_linguistic_syntax",
+        "reason": "Ngữ Pháp Sinh Tử khai thác sâu tính logic của cú pháp câu chữ, tạo ra các nghịch lý thú vị hơn huyết triện."
+      },
+      {
+        "leftId": "concept_fiber_weaving",
+        "rightId": "concept_echo_interference",
+        "winnerId": "concept_fiber_weaving",
+        "reason": "Mạch Giấy Đứt Gãy tận dụng tối đa kỹ năng bồi giấy thủ công của nhân vật chính hơn là nhịp điệu thư pháp."
+      },
+      {
+        "leftId": "concept_parasitic_ink",
+        "rightId": "concept_sympathetic_ink",
+        "winnerId": "concept_sympathetic_ink",
+        "reason": "Mực Tương Sinh đưa chuỗi thức ăn sinh học vào pháp thuật quy tắc, tạo ra tính chiến thuật cao hơn mực ăn mòn."
+      },
+      {
+        "leftId": "concept_atmospheric_pressure",
+        "rightId": "concept_ink_crystallization",
+        "winnerId": "concept_ink_crystallization",
+        "reason": "Mực Kết Tinh sử dụng cấu trúc tinh thể lấp lánh làm bằng chứng xác thực trực quan hơn áp suất khí nén."
+      },
+      {
+        "leftId": "concept_acoustic_ash",
+        "rightId": "concept_water_soluble",
+        "winnerId": "concept_acoustic_ash",
+        "reason": "Âm Vực Giấy Tro chiến thắng nhờ cơ chế cộng hưởng âm thanh giếng chuông có sức ảnh hưởng diện rộng hơn mực nước."
+      },
+      {
+        "leftId": "concept_palimpsest_layers",
+        "rightId": "concept_fungal_spores",
+        "winnerId": "concept_palimpsest_layers",
+        "reason": "Giấy Chồng Lớp vượt trội nhờ khai thác lịch sử bị xóa bỏ của các đạo luật, tạo chiều sâu cảm xúc hơn bào tử nấm."
+      },
+      {
+        "leftId": "concept_temporal_humidity",
+        "rightId": "concept_light_refraction",
+        "winnerId": "concept_temporal_humidity",
+        "reason": "Độ Ẩm Thời Gian chiến thắng nhờ liên kết chặt chẽ giữa khí tượng học và dấu vết loang mực không thể chối cãi."
+      },
+      {
+        "leftId": "concept_linguistic_syntax",
+        "rightId": "concept_fiber_weaving",
+        "winnerId": "concept_linguistic_syntax",
+        "reason": "Ngữ Pháp Sinh Tử tạo ra các bẫy logic ngôn ngữ sắc bén hơn việc chỉ nối lại các mạch giấy đứt gãy vật lý."
+      },
+      {
+        "leftId": "concept_sympathetic_ink",
+        "rightId": "concept_ink_crystallization",
+        "winnerId": "concept_sympathetic_ink",
+        "reason": "Mực Tương Sinh chiến thắng nhờ tính tương khắc sinh học đa dạng, mở ra nhiều hướng phát triển hơn mực kết tinh."
+      }
+    ],
+    "ranking": [
+      {
+        "id": "concept_acoustic_ash",
+        "wins": 2,
+        "reason": "Ý tưởng xuất sắc nhất kết hợp hoàn hảo giữa âm thanh giếng chuông và độ dày nét mực vật lý, tạo ra lối chơi trí mưu đỉnh cao."
+      },
+      {
+        "id": "concept_palimpsest_layers",
+        "wins": 2,
+        "reason": "Khai thác sâu sắc kỹ năng phục chế tài liệu qua các lớp chữ chồng đè, tạo ra chiều sâu lịch sử và cảm xúc mạnh mẽ."
+      },
+      {
+        "id": "concept_temporal_humidity",
+        "wins": 2,
+        "reason": "Sử dụng động học chất lỏng và khí tượng học để tạo ra các bằng chứng vi loang cực kỳ thuyết phục và độc đáo."
+      },
+      {
+        "id": "concept_linguistic_syntax",
+        "wins": 2,
+        "reason": "Tư duy logic ngôn ngữ học cực kỳ sắc bén, biến các lỗi cú pháp thành vũ khí bẻ luật đầy trí tuệ."
+      },
+      {
+        "id": "concept_sympathetic_ink",
+        "wins": 2,
+        "reason": "Cơ chế tương khắc sinh học độc đáo biến việc chọn mực thành một bàn cờ chiến thuật đầy biến số."
+      },
+      {
+        "id": "concept_water_soluble",
+        "wins": 1,
+        "reason": "Tạo ra các tình huống lật kèo nhanh gọn và trực quan chỉ bằng một giọt nước, rất phù hợp với nhịp truyện nhanh."
+      },
+      {
+        "id": "concept_fungal_spores",
+        "wins": 1,
+        "reason": "Yếu tố sinh học vi sinh mang lại màu sắc bí ẩn và các bài toán xét nghiệm bệnh lý đầy căng thẳng."
+      },
+      {
+        "id": "concept_light_refraction",
+        "wins": 1,
+        "reason": "Tận dụng quang học và góc chiếu sáng để tạo ra các điều khoản ẩn tàng hình đầy bất ngờ."
+      },
+      {
+        "id": "concept_fiber_weaving",
+        "wins": 1,
+        "reason": "Khai thác tốt cấu trúc ba chiều của giấy tro, biến tờ giấy thành một bảng mạch năng lượng tinh vi."
+      },
+      {
+        "id": "concept_ink_crystallization",
+        "wins": 1,
+        "reason": "Sử dụng trạng thái kết tinh lấp lánh của mực làm bằng chứng vật lý rõ ràng, dễ hình dung cho độc giả."
+      },
+      {
+        "id": "concept_ash_origins",
+        "wins": 0,
+        "reason": "Ý tưởng tốt về chất liệu giấy nhưng phạm vi ảnh hưởng hẹp hơn so với các cơ chế tương tác mực."
+      },
+      {
+        "id": "concept_ink_oxidation",
+        "wins": 0,
+        "reason": "Cơ chế thời gian khô của mực khá thú vị nhưng dễ bị lặp lại nếu không có thêm biến số môi trường."
+      },
+      {
+        "id": "concept_spatial_geometry",
+        "wins": 0,
+        "reason": "Tính toán hình học bản đồ hơi phức tạp và dễ bị nhầm lẫn với trận pháp tu tiên truyền thống."
+      },
+      {
+        "id": "concept_thermal_activation",
+        "wins": 0,
+        "reason": "Cơ chế nhiệt độ dễ bị lạm dụng thành phép thuật hệ hỏa nếu không kiểm soát chặt chẽ tính vật lý."
+      },
+      {
+        "id": "concept_magnetic_alignment",
+        "wins": 0,
+        "reason": "Từ tính hạt mực hơi khó hình dung trực quan và dễ bị biến thành dị năng điều khiển kim loại."
+      },
+      {
+        "id": "concept_weight_balance",
+        "wins": 0,
+        "reason": "Cân đo trọng lượng vi mô khó tạo ra các tình huống hành động kịch tính ở quy mô lớn."
+      },
+      {
+        "id": "concept_blood_coagulation",
+        "wins": 0,
+        "reason": "Yếu tố máu dễ bị trùng lặp với các thể loại tu tiên tà đạo nếu không giữ vững tính pháp lý."
+      },
+      {
+        "id": "concept_echo_interference",
+        "wins": 0,
+        "reason": "Giao thoa nhịp điệu viết chữ hơi trừu tượng và khó giải thích một cách mạch lạc cho độc giả."
+      },
+      {
+        "id": "concept_parasitic_ink",
+        "wins": 0,
+        "reason": "Mực axit ăn mòn giấy có cơ chế đơn giản, dễ đoán và ít không gian phát triển lâu dài."
+      },
+      {
+        "id": "concept_atmospheric_pressure",
+        "wins": 0,
+        "reason": "Áp suất năng lượng bề mặt hơi khó giải thích bằng trực giác vật lý thông thường của độc giả."
+      }
+    ],
+    "finalistIds": [
+      "concept_acoustic_ash",
+      "concept_palimpsest_layers",
+      "concept_temporal_humidity"
+    ],
+    "finalistWorldKernels": [
+      {
+        "candidateId": "concept_acoustic_ash",
+        "signatureSituations": [
+          "Người dân bị ép quỳ khi tiếng chuông vang lên từ một tờ giấy tro.",
+          "Quan kiểm định soi đèn tìm dấu triện ẩn trong sớ.",
+          "Main dùng dao cạo giấy để đổi hướng một luồng âm phạt."
+        ],
+        "rules": [
+          {
+            "rule": "Quy tắc Thu Thuế Sinh Mệnh: Khi giếng chuông trung tâm ngân vang vào giờ Tý, bất kỳ ai đứng trên mặt đất không quỳ lạy trước tờ giấy tro thuế vụ sẽ bị tước đoạt một năm thọ mệnh.",
+            "beneficiary": "Giới quý tộc cai trị thành phố Vọng Âm",
+            "harmedParty": "Người dân nghèo không có nhà kiên cố hoặc không kịp quỳ",
+            "enforcement": "Sóng âm tần số thấp từ giếng chuông kích hoạt hạt tro trong máu nạn nhân",
+            "cost": "Năng lượng niềm tin tích lũy trong giếng chuông bị tiêu hao một phần",
+            "consequence": "Nạn nhân già đi nhanh chóng, tóc bạc trắng chỉ sau một đêm",
+            "evidenceSource": "Vết mực đóng dấu màu đỏ sậm trên tờ giấy tro thuế vụ",
+            "exceptions": "Người mang theo một mảnh giấy tro nguyên bản chưa bị đóng dấu trong ngực áo sẽ không bị ảnh hưởng.",
+            "sceneAffordances": [
+              "Nhân vật chính dùng dao cạo cạo bớt một lớp mực mỏng trên tờ sớ thuế để làm lệch tần số âm thanh, chấp nhận rủi ro bị sóng âm phản phệ rách màng nhĩ.",
+              "Một người dân nghèo dùng máu của mình bôi lên tờ giấy tro để cố gắng thay đổi tên người chịu thuế trước khi tiếng chuông vang lên."
+            ]
+          },
+          {
+            "rule": "Quy tắc Vùng Cấm Âm: Mọi âm thanh vượt quá ba mươi decibel trong phạm vi một trăm mét quanh giếng chuông phụ sẽ bị biến thành lực chấn động nghiền nát xương cốt kẻ phát ngôn.",
+            "beneficiary": "Viện Khuếch Âm giữ gìn sự yên tĩnh để nghiên cứu",
+            "harmedParty": "Thương nhân và người lao động cần la hét trao đổi",
+            "enforcement": "Không khí xung quanh rung động cực mạnh theo nhịp chuông",
+            "cost": "Sự mài mòn của các bánh răng đồng cổ kính trong giếng chuông",
+            "consequence": "Kẻ vi phạm bị gãy xương sườn và dập nát thanh quản ngay lập tức",
+            "evidenceSource": "Bản đồ phân vùng âm thanh được lưu trữ tại Viện Khuếch Âm",
+            "exceptions": "Người đeo mặt nạ làm bằng tro gỗ mộc hương thuần khiết có thể nói chuyện bình thường mà không bị phạt.",
+            "sceneAffordances": [
+              "Nhân vật chính ném một viên sỏi vào chuông đồng để tạo tiếng vang đối kháng, cứu một đứa trẻ đang khóc lớn khỏi bị chấn vỡ ngực.",
+              "Viên quan kiểm định gõ mạnh cây thước gỗ xuống bàn để kích hoạt quy tắc im lặng, ép buộc nghi phạm phải cúi đầu nhận tội."
+            ]
+          },
+          {
+            "rule": "Quy tắc Giới Nghiêm Giấy Tro: Bất kỳ ai mang giấy tro chưa qua kiểm định ra khỏi khu vực giếng chuông vào ban đêm sẽ bị thiêu cháy đôi bàn tay.",
+            "beneficiary": "Tổ chức độc quyền phân phối giấy tro",
+            "harmedParty": "Thợ phục chế tự do và người buôn lậu giấy",
+            "enforcement": "Hạt tro trên giấy tự bốc cháy khi tiếp xúc với sương đêm",
+            "cost": "Sự hao hụt của lượng tro nguyên bản trong kho lưu trữ",
+            "consequence": "Đôi tay bị bỏng nặng và không thể phục hồi khả năng cầm bút",
+            "evidenceSource": "Dấu triện kiểm định màu xanh lam phản quang trên mép giấy",
+            "exceptions": "Giấy tro đã được ngâm trong nước giếng chuông lạnh trong vòng mười hai giờ sẽ không tự bốc cháy.",
+            "sceneAffordances": [
+              "Nhân vật chính giấu tờ giấy tro vào xô nước lạnh để vận chuyển qua trạm gác, chấp nhận nguy cơ làm nhòe nét mực phục chế.",
+              "Lính canh dùng đèn dầu hơ qua tay nghi phạm để tìm dấu vết tàn tro bám trên da thịt nhằm định tội buôn lậu."
+            ]
+          }
+        ],
+        "resources": [
+          {
+            "resource": "Giấy tro nguyên bản",
+            "source": "Đốt cháy sớ nguyện ước của người dân tại các giếng chuông cổ",
+            "spendRule": "Bị tiêu hao khi viết quy tắc mới hoặc bị cạo sửa quá nhiều lần",
+            "scarcity": "Cực kỳ khan hiếm vì chỉ có Viện Khuếch Âm được quyền thu gom tro từ giếng"
+          },
+          {
+            "resource": "Mực triện tần số",
+            "source": "Chế tạo từ quặng kim loại nặng nghiền mịn trộn với dầu thông cổ",
+            "spendRule": "Dùng để đóng dấu chốt tần số quy tắc lên giấy tro",
+            "scarcity": "Bị kiểm soát nghiêm ngặt bởi Cục Giám Ấn, mỗi giọt đều được đánh số"
+          }
+        ],
+        "institutionalResponses": [
+          {
+            "name": "Viện Khuếch Âm",
+            "power": "Độc quyền diễn giải tần số âm thanh và sở hữu các giếng chuông lớn",
+            "incentive": "Duy trì sự thống trị tuyệt đối bằng cách bóp méo quy tắc có lợi cho giới tinh hoa",
+            "enforcementEvidence": "Các bản sớ thuế được đóng dấu triện đỏ sậm treo trên đỉnh giếng chuông",
+            "pressureOnCast": "Phái người giám sát tiệm giấy của nhân vật chính khi phát hiện anh có khả năng bẻ khóa tần số"
+          },
+          {
+            "name": "Cục Giám Ấn",
+            "power": "Nắm giữ các con dấu kiểm định tối cao có khả năng kích hoạt quy tắc",
+            "incentive": "Ngăn chặn mọi hành vi ngụy tạo hoặc sửa đổi giấy tro ngoài tầm kiểm soát",
+            "enforcementEvidence": "Sổ đăng ký con dấu và các bản lưu trữ quy tắc gốc",
+            "pressureOnCast": "Đe dọa tịch thu giấy phép hành nghề phục chế của nhân vật chính nếu anh tiếp tục điều tra"
+          }
+        ],
+        "thirtyChapterMutation": "Chương 30: Hai giếng chuông cộng hưởng tạo ra quy tắc lai, khiến toàn bộ hiểu biết về tần số đơn lẻ trước đây vô hiệu."
+      },
+      {
+        "candidateId": "concept_palimpsest_layers",
+        "signatureSituations": [
+          "Quan viên dùng dao cạo giấy cẩn thận từng li để xóa luật.",
+          "Main rắc bột than lên giấy để đọc các chữ bị chìm.",
+          "Một quy tắc mới phát nổ vì xung đột logic với lớp chữ cũ."
+        ],
+        "rules": [
+          {
+            "rule": "Quy tắc Hiến Tế Cổ: Bất kỳ ai bước vào đền thờ vào ngày rằm mà không mang theo lễ vật sẽ bị tước đoạt toàn bộ ký ức của năm gần nhất.",
+            "beneficiary": "Các tư tế đền thờ cổ đại",
+            "harmedParty": "Người dân nghèo lỡ bước hoặc khách lữ hành",
+            "enforcement": "Năng lượng từ giếng chuông kích hoạt lớp chữ chìm đã bị cạo",
+            "cost": "Sự mài mòn của lớp biểu bì giấy tro cổ",
+            "consequence": "Nạn nhân mất trí nhớ hoàn toàn về gia đình và công việc trong một năm qua",
+            "evidenceSource": "Vết hằn sâu của nét bút cũ dưới lớp mực mới",
+            "exceptions": "Người mang theo một mảnh giấy có viết tên của tổ tiên bằng mực đỏ sẽ giữ được ký ức.",
+            "sceneAffordances": [
+              "Nhân vật chính rắc bột than lên tờ giấy sớ để làm nổi bật vết hằn của luật hiến tế cũ, chấp nhận hít phải bụi than độc hại.",
+              "Một tư tế dùng dao cạo cạo mạnh lên mặt giấy để cố gắng xóa bỏ điều khoản miễn trừ trước khi tiếng chuông vang lên."
+            ]
+          },
+          {
+            "rule": "Quy tắc Bảo Vệ Dân Nghèo: Mọi hành vi cưỡng chế thu hồi đất đai trong khu phố cổ đều bị vô hiệu hóa nếu không có sự đồng ý của trưởng phố.",
+            "beneficiary": "Cư dân khu phố cổ",
+            "harmedParty": "Giới địa chủ và quan lại muốn giải tỏa đất",
+            "enforcement": "Một bức tường năng lượng vô hình ngăn cản lính canh bước vào",
+            "cost": "Sự tiêu hao năng lượng của giếng chuông phụ",
+            "consequence": "Kẻ cố tình xâm phạm sẽ bị đẩy lùi và ngã gãy chân",
+            "evidenceSource": "Tờ sớ bảo hộ được lưu giữ tại tiệm giấy của nhân vật chính",
+            "exceptions": "Nếu tờ sớ bảo hộ bị viết đè lên bởi một luật thuế mới, bức tường năng lượng sẽ biến mất.",
+            "sceneAffordances": [
+              "Nhân vật chính dùng kính soi bóng mờ để chứng minh luật thuế mới được viết đè lên luật bảo hộ chưa được cạo sạch.",
+              "Địa chủ thuê thợ viết lén lút nhỏ axit lên tờ sớ bảo hộ để làm mờ lớp chữ cũ nhằm vô hiệu hóa bức tường."
+            ]
+          },
+          {
+            "rule": "Quy tắc Thừa Kế Tài Sản: Quyền sở hữu tiệm giấy chỉ được chuyển giao cho người có dấu vân tay trùng khớp với vết máu trên khế ước gốc.",
+            "beneficiary": "Người thừa kế hợp pháp của tiệm giấy",
+            "harmedParty": "Kẻ muốn chiếm đoạt tài sản bằng giấy tờ giả",
+            "enforcement": "Con dấu trên khế ước sẽ phát sáng màu đỏ khi có người chạm vào",
+            "cost": "Sự phân hủy tự nhiên của huyết khí trong sợi giấy",
+            "consequence": "Kẻ giả mạo bị bỏng tay và con dấu giả sẽ tự động bốc khói đen",
+            "evidenceSource": "Vết máu khô ẩn sâu trong thớ giấy tro của khế ước",
+            "exceptions": "If khế ước bị ngâm trong nước giếng chuông pha muối, dấu vân tay máu sẽ bị tạm thời vô hiệu hóa.",
+            "sceneAffordances": [
+              "Nhân vật chính dùng ngón tay miết nhẹ lên vết máu khô để cảm nhận độ lồi lõm, chứng minh khế ước đã bị cạo sửa.",
+              "Kẻ chiếm đoạt tài sản dùng một con dao nhỏ cố gắng cạo đi lớp máu cũ để nhỏ máu của mình lên."
+            ]
+          }
+        ],
+        "resources": [
+          {
+            "resource": "Bột than phục chế",
+            "source": "Chế tạo từ gỗ thông cổ thụ đốt trong lò kín không có oxy",
+            "spendRule": "Rắc lên mặt giấy để làm nổi bật các vết hằn của chữ đã bị cạo",
+            "scarcity": "Chỉ có thợ phục chế chuyên nghiệp mới biết công thức pha chế"
+          },
+          {
+            "resource": "Kính soi bóng mờ",
+            "source": "Mài từ thạch anh tự nhiên tìm thấy dưới đáy các giếng chuông cổ",
+            "spendRule": "Dùng để quan sát các lớp mực chồng lên nhau dưới ánh sáng xiên",
+            "scarcity": "Cực kỳ đắt đỏ, chỉ có ba chiếc tồn tại trong thành phố"
+          }
+        ],
+        "institutionalResponses": [
+          {
+            "name": "Viện Tái Chế",
+            "power": "Kiểm soát việc thu hồi và tái sử dụng giấy tro cũ trong thành phố",
+            "incentive": "Che giấu các sai phạm trong quá khứ bằng cách cạo sạch các luật cũ có lợi cho dân",
+            "enforcementEvidence": "Các lò đốt giấy khổng lồ và kho lưu trữ giấy đã qua xử lý",
+            "pressureOnCast": "Cử người đến tịch thu các bản nháp cổ tại tiệm giấy của nhân vật chính"
+          },
+          {
+            "name": "Tòa Án Tối Cao Vọng Âm",
+            "power": "Phán quyết tối cao dựa trên các văn bản giấy tro được đóng dấu",
+            "incentive": "Duy trì uy tín của thiết chế bằng cách bảo vệ tính bất khả xâm phạm của con dấu mới",
+            "enforcementEvidence": "Bản án đóng dấu triện vàng được treo trước công đường",
+            "pressureOnCast": "Đe dọa khép nhân vật chính vào tội ngụy tạo chứng cứ nếu anh công bố các lớp chữ cũ"
+          }
+        ],
+        "thirtyChapterMutation": "Chương 30: Giếng chuông cộng hưởng sâu, làm sống lại hai quy tắc cổ đại, khiến các luật mới trên bề mặt mất tác dụng."
+      },
+      {
+        "candidateId": "concept_temporal_humidity",
+        "signatureSituations": [
+          "Giấy tro thay đổi màu sắc nhẹ theo độ ẩm của môi trường xung quanh.",
+          "Main dùng kính lúp đo khoảng cách giữa các viền loang của dấu triện.",
+          "Quy tắc bị lỗi thời gian tạo ra những ảo ảnh của quá khứ chập chờn."
+        ],
+        "rules": [
+          {
+            "rule": "Quy tắc Thừa Kế Giếng Chuông: Quyền điều khiển giếng chuông phụ chỉ được chuyển giao vào ngày có độ ẩm không khí trên tám mươi phần trăm.",
+            "beneficiary": "Người thừa kế hợp pháp được chỉ định trong di chúc",
+            "harmedParty": "Kẻ muốn cướp quyền điều khiển vào ngày nắng ráo",
+            "enforcement": "Giếng chuông sẽ không phản ứng với con dấu nếu độ ẩm không đạt chuẩn",
+            "cost": "Sự ngưng tụ của hơi nước năng lượng xung quanh giếng",
+            "consequence": "Kẻ cố tình kích hoạt sẽ bị luồng hơi nước nóng làm bỏng mặt",
+            "evidenceSource": "Viền loang của dấu triện trên di chúc giấy tro",
+            "exceptions": "Nếu sử dụng một lượng nước cất từ giếng chuông chính để làm ướt giấy, quy tắc có thể kích hoạt vào ngày khô hạn.",
+            "sceneAffordances": [
+              "Nhân vật chính dùng kính lúp đo khoảng cách viền loang để chứng minh di chúc bị đóng dấu vào ngày khô ráo, lật tẩy kẻ giả mạo.",
+              "Kẻ cướp quyền dùng một bình phun sương để cố gắng làm tăng độ ẩm xung quanh tờ giấy tro trước khi đóng dấu."
+            ]
+          },
+          {
+            "rule": "Quy tắc Thuế Khí Tượng: Mỗi hộ gia đình phải nộp ba lít nước sạch vào ngày có độ ẩm dưới ba mươi phần trăm.",
+            "beneficiary": "Cục Khí Tượng kiểm soát nguồn nước",
+            "harmedParty": "Người dân nghèo không có nguồn dự trữ nước",
+            "enforcement": "Hạt tro trong nhà tự động hút ẩm từ cơ thể người nếu không nộp đủ nước",
+            "cost": "Sự tiêu hao của hệ thống dẫn nước ngầm",
+            "consequence": "Thành viên trong gia đình bị mất nước nghiêm trọng và ngất xỉu",
+            "evidenceSource": "Bản đồ độ ẩm được đóng dấu triện xanh của Cục Khí Tượng",
+            "exceptions": "Hộ gia đình có treo một tờ giấy tro đã ngấm sương đêm trước cửa sẽ được miễn trừ thu thuế.",
+            "sceneAffordances": [
+              "Nhân vật chính treo tờ giấy tro ngấm sương trước cửa tiệm để bảo vệ gia đình, chấp nhận rủi ro bị lính tuần tra tịch thu.",
+              "Nhân viên Cục Khí Tượng dùng máy đo độ ẩm áp sát vào tường nhà để kiểm tra mức độ tuân thủ quy tắc."
+            ]
+          },
+          {
+            "rule": "Quy tắc Lưu Trữ Hồ Sơ: Mọi hồ sơ pháp lý phải được lưu trữ trong phòng có độ ẩm cố định năm mươi phần trăm để tránh tự hủy.",
+            "beneficiary": "Viện Lưu Trữ bảo vệ lịch sử",
+            "harmedParty": "Kẻ muốn tiêu hủy chứng cứ bằng cách thay đổi thời tiết",
+            "enforcement": "Giấy tro tự động bốc khói và mờ chữ nếu độ ẩm lệch quá mười phần trăm",
+            "cost": "Sự vận hành liên tục của các lò sưởi ẩm bằng than",
+            "consequence": "Hồ sơ bị xóa sạch hoàn toàn và không thể phục hồi",
+            "evidenceSource": "Chất chỉ thị màu tự nhiên trộn trong sợi giấy tro",
+            "exceptions": "Hồ sơ được bọc trong một lớp da cá mập biển sâu có thể tồn tại trong mọi điều kiện độ ẩm mà không bị mờ chữ.",
+            "sceneAffordances": [
+              "Nhân vật chính dùng một khay nước nóng đặt dưới kệ sách để duy trì độ ẩm cho hồ sơ mật đang bị khô héo.",
+              "Kẻ phá hoại lén mở cửa sổ vào đêm sương muối để làm tăng độ ẩm đột ngột nhằm hủy hoại các chứng cứ phạm tội."
+            ]
+          }
+        ],
+        "resources": [
+          {
+            "resource": "Ẩm kế cổ",
+            "source": "Chế tạo từ tóc của các tư tế giếng chuông kết hợp với kim đồng",
+            "spendRule": "Dùng để đo chính xác độ ẩm không khí tại thời điểm kiểm chứng quy tắc",
+            "scarcity": "Chỉ có vài chiếc được lưu hành trong giới học giả khí tượng"
+          },
+          {
+            "resource": "Nước cất giếng chuông",
+            "source": "Ngưng tụ từ hơi sương phun ra từ miệng giếng chuông chính vào lúc bình minh",
+            "spendRule": "Dùng để làm ẩm giấy tro một cách an toàn mà không làm hỏng sợi giấy",
+            "scarcity": "Cực kỳ khan hiếm, phải có giấy phép đặc biệt mới được thu thập"
+          }
+        ],
+        "institutionalResponses": [
+          {
+            "name": "Cục Khí Tượng",
+            "power": "Kiểm soát các thiết bị tạo mưa và đo đạc độ ẩm toàn thành phố",
+            "incentive": "Tạo ra các đợt hạn hán giả tạo để kích hoạt quy tắc thu thuế nước",
+            "enforcementEvidence": "Các tháp phun sương khổng lồ đặt quanh các giếng chuông",
+            "pressureOnCast": "Cử lính tuần tra phong tỏa tiệm giấy của nhân vật chính khi anh bắt đầu đo đạc độ ẩm độc lập"
+          },
+          {
+            "name": "Viện Lưu Trữ",
+            "power": "Quản lý toàn bộ kho hồ sơ giấy tro của thành phố từ khi thành lập",
+            "incentive": "Bảo vệ các bí mật lịch sử của giới quý tộc bằng cách kiểm soát độ ẩm phòng lưu trữ",
+            "enforcementEvidence": "Các phòng chứa kiên cố có hệ thống điều hòa ẩm bằng đồng",
+            "pressureOnCast": "Đe dọa tước quyền tiếp cận hồ sơ của nhân vật chính nếu anh phát hiện ra các viền loang kép"
+          }
+        ],
+        "thirtyChapterMutation": "Chương 30: Giếng chuông bốc hơi mạnh, làm hai quy tắc về thời hạn và lịch trình bị xóa sạch viền loang, gây khủng hoảng niềm tin."
+      }
+    ]
+  },
+  "openings": [
+    {
+      "schemaVersion": 2,
+      "candidateId": "concept_acoustic_ash",
+      "chapters": [
+        {
+          "chapterNumber": 1,
+          "title": "Chương 1: Tiếng Chuông Giờ Tý",
+          "prose": "Tiệm giấy tro Khô Mộc lọt thỏm giữa con hẻm chật chội của thành phố Vọng Âm, rủ xuống những tấm mành rách nát để che chắn gió đêm. Kỷ ngồi lặng lẽ trước bàn làm việc, ánh đèn dầu leo lét hắt lên khuôn mặt gầy guộc và đôi bàn tay dính đầy muội than.\n\n— Kỷ ơi, cứu dì với...\n\nGiọng nói run rẩy vang lên kèm theo tiếng đẩy cửa cọt kẹt. Dì Hoa, người bán mì gõ đầu ngõ, lảo đảo bước vào. Trên tay bà là tờ sớ thuế vụ màu xám xịt, giữa trang giấy là một chữ Thọ bị đóng dấu triện đỏ sậm.\n\nKỷ nhíu mày, cầm lấy tờ giấy tro. Bề mặt giấy thô ráp, tỏa ra mùi ngai ngái của sự cháy dở. Hắn đưa tờ sớ lên gần ngọn đèn dầu, đồng tử hơi co lại khi nhìn thấy nét phẩy cuối cùng của chữ Thọ. Nét mực đỏ không đều, phần đuôi bị đè mạnh một cách cố ý, tạo thành một vệt đậm hơn bình thường.\n\n— Bọn quan lại Cục Giám Ấn lại giở trò. Nét đè này sẽ làm lệch tần số khi giếng chuông điểm giờ Tý. Dì ở nhà trát bùn, âm thanh cưỡng chế sẽ xuyên thẳng qua mái nhà. Nó sẽ ép hạt tro trong máu dì cộng hưởng, rút đi một năm tuổi thọ.\n\nDì Hoa quỳ sụp xuống nền đất lạnh lẽo, nước mắt trào ra. Bà không có tiền để đút lót cho nha dịch đổi sớ mới, cũng chẳng có nhà gạch kiên cố để cản âm.\n\nThời gian chỉ còn không tới một khắc là đến giờ Tý. Kỷ với tay lấy con dao cạo chuyên dụng, lưỡi dao mỏng tang và sắc lẹm. Hắn chỉ là một thợ phục chế thấp bé, nhưng trí nhớ hình ảnh của hắn ghi lại mọi thói quen tì bút của từng viên quan kiểm định trong thành phố này.\n\n— Kẻ đóng dấu này là tên Lương, hắn luôn có thói quen xoay cổ tay sang phải ở nhịp cuối. Nét đè này dầy thêm hai phần mười ly mực, đủ để hạ tần số xuống mức tàn phá xương cốt người già.\n\nKỷ hít một hơi thật sâu, ấn mũi dao lên vệt mực đỏ. Hắn không có phép thuật, cũng chẳng có thế lực nào chống lưng. Thứ duy nhất hắn có là sự am hiểu tuyệt đối về độ rung của mặt giấy và kết cấu của mực triện. Lưỡi dao khẽ lướt qua, cạo đi một lớp mực mỏng dính.\n\nNgay khoảnh khắc lớp mực bị bóc ra, một âm thanh rít lên chói tai phát ra từ mặt giấy. Đó là sóng âm phản phệ khi cấu trúc tần số bị phá vỡ. Kỷ nghiến răng, cố giữ chặt tờ sớ không để nó rung lên bần bật.\n\nMột luồng áp lực vô hình dội thẳng vào màng nhĩ phải của Kỷ. Hắn cảm nhận được một cơn đau nhói, kéo theo một dòng máu ấm nóng rỉ ra từ lỗ tai. Nhưng lưỡi dao vẫn không dừng lại, gọt chính xác phần đuôi chữ Thọ cho đến khi nó trở về độ dày tiêu chuẩn.\n\nBoong... Boong... Boong...\n\nTiếng chuông từ giếng trung tâm thành phố Vọng Âm bắt đầu ngân vang. Sóng âm trầm đục lan tỏa trong không khí, vô hình nhưng mang theo sức mạnh cưỡng chế tuyệt đối của Quy tắc Thu Thuế Sinh Mệnh.\n\nDì Hoa nhắm chặt mắt, ôm đầu chờ đợi cơn đau đớn xé rách cơ thể và tuổi xuân bị tước đoạt. Nhưng sóng âm khi lướt qua tờ sớ trên tay Kỷ đã bị vệt mực mới cản lại, trượt đi như một dòng nước gặp hòn đá êm ái.\n\nHồi chuông kết thúc. Dì Hoa vẫn còn nguyên vẹn, mái tóc không hề bạc thêm một sợi. Bà mở mắt, kinh ngạc nhìn đôi bàn tay mình rồi dập đầu tạ ơn Kỷ rối rít trước khi lủi nhanh về nhà.\n\nKỷ lau vệt máu bên tai, sắc mặt tái nhợt. Việc thay đổi cấu trúc luật lệ chưa bao giờ là dễ dàng. Hắn nhìn xuống những mạt mực đỏ li ti dính trên lưỡi dao, khóe môi khẽ nhếch lên. Lần đầu tiên, một kẻ thấp cổ bé họng đã đánh lừa được giếng chuông.\n\nTuy nhiên, hắn không kịp vui mừng. Viện Khuếch Âm quản lý giếng chuông rất nghiêm ngặt. Việc một làn sóng âm thuế vụ bị triệt tiêu mà không thu về được thọ mệnh chắc chắn sẽ tạo ra một khoảng trống trên bản đồ phân vùng âm thanh. Kỷ biết, tai họa chỉ mới bắt đầu.",
+          "causalStateChange": "Từ thợ phục chế bình thường thành người can thiệp trực tiếp vào quy tắc, cứu được hàng xóm nhưng để lại lỗ hổng trên bản đồ thu thuế của Viện Khuếch Âm.",
+          "requiredPlanAnchor": "vết xước vi phân trên chữ Thọ",
+          "protagonistChoice": "Bất chấp rủi ro phản phệ sóng âm, quyết định dùng dao cạo gọt mỏng nét mực trên sớ thuế vụ để bảo vệ người hàng xóm nghèo.",
+          "agencyMove": "Chủ động phân tích thói quen tì bút của viên quan Lương và dùng dao cạo thay đổi độ dày của nét mực triện.",
+          "earnedReward": null,
+          "materialProgression": null,
+          "comfortPayoff": null,
+          "costPaid": "Sóng âm phản phệ gây rách nhẹ màng nhĩ phải, khiến lỗ tai chảy máu và đau đớn kéo dài.",
+          "exitPressure": "Sự thiếu hụt năng lượng sinh mệnh nộp về giếng chuông báo động cho các viên quan Cục Giám Ấn, buộc chúng phải đến ngõ để điều tra."
+        },
+        {
+          "chapterNumber": 2,
+          "title": "Chương 2: Lồng Đèn Xanh Lam",
+          "prose": "Mùi hương ngai ngái của giấy tro cháy dở vẫn còn luẩn quẩn trong không gian tiệm Khô Mộc. Kỷ cẩn thận gom những mạt mực đỏ xíu xiu vừa cạo ra vào một chiếc lọ thủy tinh nhỏ, giấu kỹ dưới gầm bàn.\n\nChưa đầy nửa canh giờ sau khi tiếng chuông dứt, những tiếng bước chân nặng nề đã vang lên ngoài hẻm. Âm thanh đế giày bọc đồng gõ xuống phiến đá xanh nhịp nhàng, mang theo áp lực đặc trưng của đội tuần tra thuộc Cục Giám Ấn.\n\n— Tiệm giấy Khô Mộc, mở cửa kiểm tra!\n\nMột giọng nói ồm ồm vang lên, kèm theo đó là tiếng gõ cửa thô bạo. Kỷ khẽ chau mày. Hắn biết chúng sẽ đến, nhưng không ngờ lại nhanh như vậy. Việc một tờ sớ thuế bị thay đổi tần số đã báo động đến những bánh răng đồng cổ kính trong giếng chuông.\n\nKỷ liếc nhìn tờ sớ của dì Hoa mà bà lão vì hoảng loạn đã bỏ quên trên bàn. Vết cạo mỏng tang nhưng nếu soi dưới ánh đèn chuyên dụng của bọn nha dịch, lớp giấy bị xước sẽ lộ rõ. Giấu nó mang ra ngoài lúc này là vi phạm Quy tắc Giới Nghiêm Giấy Tro, bàn tay sẽ tự bốc cháy.\n\nCửa gỗ bị đẩy tung. Tên Lương, viên quan kiểm định với khuôn mặt vuông vức và ánh mắt diều hâu, bước vào. Trên tay hắn cầm một chiếc lồng đèn lưu ly nhỏ, bên trong tỏa ra ánh sáng xanh lam lạnh lẽo dùng để soi dấu triện ẩn.\n\n— Vừa rồi khu vực ngõ này có dao động âm thanh bất thường. Không có năng lượng sinh mệnh nộp về giếng chuông. Ngươi là thợ phục chế, có thấy ai mang sớ lậu qua đây không?\n\nLương vừa nói, vừa lia ánh sáng xanh lam khắp căn phòng lộn xộn. Ánh đèn quét qua những xấp giấy tro cũ kỹ, những lọ hồ dán và dụng cụ hành nghề của Kỷ. Kỷ đứng nép mình bên cạnh quầy, tỏ ra khép nép và sợ hãi.\n\n— Bẩm quan lớn, tiểu nhân chỉ cặm cụi sửa mấy tờ giấy nát kiếm cơm qua ngày. Giờ Tý chuông kêu, tiểu nhân đã quỳ lạy đúng luật, không dám ngẩng đầu lên nên không thấy gì cả.\n\nKỷ nói, ánh mắt cẩn trọng liếc về phía chiếc xô gỗ đặt cạnh chân bàn. Bên trong xô chứa đầy nước lạnh múc từ giếng chuông. Đó là ngoại lệ duy nhất của quy tắc giới nghiêm: giấy tro ngâm trong nước giếng chuông lạnh mười hai giờ sẽ bị cô lập hoàn toàn khỏi hệ thống cưỡng chế.\n\nKhi tiếng gõ cửa vang lên, Kỷ đã nhanh tay dìm tờ sớ của dì Hoa xuống đáy xô. Nhưng việc này đi kèm một cái giá: nước lạnh sẽ dần hòa tan cấu trúc giấy, và nếu ngâm quá lâu, tờ sớ thuế sẽ hỏng bét, dì Hoa sẽ thành kẻ trốn thuế chịu án tử vào đêm mai.\n\nLương hừ lạnh, bước lại gần bàn làm việc. Hắn nhặt lưỡi dao cạo của Kỷ lên xem xét, ánh đèn xanh rọi sát vào mép kim loại. May mắn là Kỷ đã chùi sạch vụn mực, nhưng bầu không khí vẫn căng thẳng tột độ.\n\nĐột nhiên, ánh mắt Lương dừng lại ở chiếc xô gỗ. Mặt nước hơi gợn sóng, và một tia sáng phản quang mờ nhạt màu đỏ sậm từ đáy xô hắt lên khi ánh đèn xanh vô tình quét qua. Đó là màu của mực triện tần số.\n\nKỷ nín thở, mồ hôi lạnh toát ra dọc sống lưng. Hắn chỉ có một khoảnh khắc để phản ứng. Kỷ cố tình bước lùi lại một bước, giả vờ vấp vào chân bàn, làm đổ một lọ hồ dán lên đống giấy tro vụn tạo ra tiếng động lớn.\n\n— Ối!\n\nTiếng ồn vừa vượt qua ngưỡng ba mươi decibel. Ngay lập tức, một luồng không khí rung động mạnh mẽ ép xuống từ giếng chuông phụ gần đó. Quy tắc Vùng Cấm Âm bị kích hoạt nhẹ. Lương giật mình lùi lại, ôm lấy lồng ngực đang bị chấn động.\n\n— Thằng ngu này! Ngươi muốn chết à?\n\nLương quát lên nhưng phải hạ giọng ngay lập tức để không tự kích hoạt luật. Cơn đau ngực khiến hắn mất đi sự tập trung vào chiếc xô nước. Hắn đá mạnh vào bắp chân Kỷ, ném lưỡi dao xuống bàn rồi hậm hực dẫn quân rời đi, không quên đe dọa sẽ quay lại.\n\nKhi tiếng bước chân đã khuất hẳn, Kỷ mới dám ôm lấy chân bầm tím, thở phào nhẹ nhõm. Hắn thò tay vào xô nước lạnh buốt, lôi tờ sớ ướt sũng ra. Lớp giấy đã mềm nhũn, nhưng một hiện tượng kỳ lạ đang xảy ra trước mắt hắn.",
+          "causalStateChange": "Thành công đánh lạc hướng sự chú ý của đoàn kiểm tra nhưng lại khiến tờ sớ thuế ngấm nước lạnh, kích hoạt một phản ứng hóa học ngoài dự kiến với mực triện.",
+          "requiredPlanAnchor": "giấu giấy tro vào xô nước lạnh",
+          "protagonistChoice": "Chấp nhận tự kích hoạt Quy tắc Vùng Cấm Âm bằng tiếng ồn lớn để thu hút sự chú ý của Lương khỏi xô nước giấu vật chứng.",
+          "agencyMove": "Lợi dụng kiến thức về luật ngoại lệ ngâm nước giếng chuông và mức phạt decibel để thao túng hành vi của viên quan tuần tra.",
+          "earnedReward": null,
+          "materialProgression": null,
+          "comfortPayoff": null,
+          "costPaid": "Bị Lương đá bầm tím bắp chân, đồng thời đối diện nguy cơ tờ sớ bị rãnh nát hoàn toàn khi ngâm nước.",
+          "exitPressure": "Tờ sớ ướt sũng sắp bị hỏng, và Kỷ nhận ra lớp mực triện quý giá đang bắt đầu bong tróc, buộc hắn phải nhanh chóng bảo quản trước khi luật lệ trên giấy bị mất hiệu lực hoàn toàn."
+        },
+        {
+          "chapterNumber": 3,
+          "title": "Chương 3: Ngoại Lệ Tự Trọng",
+          "prose": "Căn tiệm nhỏ chìm trong tĩnh lặng sau sự rời đi của đội tuần tra. Kỷ vớt tờ sớ thuế vụ ướt sũng lên, cẩn thận trải nó ra mặt bàn đá. Nước lạnh từ giếng chuông không chỉ ngăn giấy tro bốc cháy, mà còn tạo ra một phản ứng phụ mà giới tinh hoa ở Viện Khuếch Âm luôn cố giấu giếm.\n\nDưới ánh đèn dầu leo lét, lớp mực đỏ sậm mang theo quy tắc tần số bắt đầu bong tróc khỏi bề mặt giấy, nổi lềnh bềnh trên màng nước. Nét chữ Thọ mà Kỷ cạo sửa đã phá vỡ màng bảo vệ của dấu triện, cho phép nước giếng hòa tan quặng kim loại nặng và dầu thông cổ.\n\nKỷ nén cơn đau từ bên tai phải đang ù đi, dùng một chiếc kẹp tre nhỏ tỉ mỉ gắp từng mảng mực đỏ ấy cho vào đĩa sứ. Đôi bàn tay vốn quen với việc phục chế những tài liệu mục nát giờ đây đang thực hiện một hành vi trộm cắp tri thức nguy hiểm nhất Vọng Âm thành.\n\nSuốt hai canh giờ, hắn tập trung cao độ, chưng cất và gạt bỏ tạp chất. Cuối cùng, những mảng mực tan ra, ngưng tụ lại thành một giọt mực triện tần số màu đỏ rực, sánh đặc và hoàn toàn tinh khiết. Chỉ một giọt này thôi, Cục Giám Ấn đã đánh số và kiểm soát gắt gao đến từng miligram.\n\n— Có thứ này rồi, mình không chỉ là kẻ bị động chờ chuông gõ nhịp nữa.\n\nKỷ lẩm bẩm, cẩn thận rót giọt mực vào một chiếc lọ pha lê nhỏ, niêm phong bằng sáp ong. Việc nắm giữ vật phẩm này không chỉ là thành quả sau một đêm mạo hiểm, mà còn là công cụ để hắn định hình lại các luật lệ bảo vệ chính mình.\n\nKỷ lấy từ trong rương gỗ ra tờ giấy phép hành nghề phục chế của mình. Bề mặt tờ giấy đã sờn cũ, dấu triện kiểm định màu xanh lam ở góc mờ nhạt, biểu thị hắn chỉ là thợ hạng bét, không có quyền năng bảo hộ âm thanh. Hắn dùng một sợi lông ngỗng, chấm nhẹ vào lọ mực đỏ vừa thu được.\n\nBằng sự am hiểu thói quen tì bút của nha môn, Kỷ nín thở phẩy một nét móc cực nhỏ, ẩn sâu vào trong dấu triện xanh lam. Nét mực đỏ tiệp vào cấu trúc cũ, ngay lập tức làm thay đổi vi mô độ rung của toàn bộ tờ giấy phép. Hắn vừa tạo ra một ngoại lệ giả: quyền miễn trừ sóng âm dưới bốn mươi decibel trong bán kính ba thước quanh người.\n\nKhi nét mực khô lại, một tiếng xèo nhỏ vang lên. Tờ giấy phép tỏa ra một vầng sáng dịu nhẹ, chứng tỏ hệ thống giếng chuông đã chấp nhận tần số mới mà không phát hiện ra sự can thiệp. Kỷ đã chính thức tự nâng cấp quyền hạn của mình.\n\nSáng hôm sau, dì Hoa rụt rè gõ cửa tiệm. Khi thấy tờ sớ thuế của mình đã được sấy khô phẳng phiu, dù màu giấy có nhạt đi chút ít nhưng chữ Thọ vẫn trọn vẹn, bà lão đã bật khóc nức nở.\n\nĐể báo đáp, dì Hoa mang đến cho Kỷ một bát mì gõ bốc khói nghi ngút, bên trên có thêm hai lát thịt xá xíu thái mỏng — một điều xa xỉ đối với người dân khu ổ chuột này.\n\nKỷ đón lấy bát mì, hơi nóng phả vào mặt mang theo mùi thơm của nước dùng hầm xương dở dang và hành lá thái nhỏ. Hắn ngồi xuống chiếc ghế đẩu quen thuộc, nhấp một ngụm nước dùng ngọt thanh, cảm giác ấm áp lan tỏa khắp cơ thể xua tan đi cái lạnh lẽo và căng thẳng của đêm dài.\n\nMột mâm cơm khuya yên bình, dù đơn sơ, nhưng là phần thưởng lớn nhất mà hắn trân trọng. Trong phạm vi ba thước quanh bàn ăn lúc này, âm thanh húp mì sột soạt vang lên mà không hề kích hoạt bất kỳ luồng không khí chấn động nào từ Quy tắc Vùng Cấm Âm. Sự tự do hiếm hoi đã được mua bằng chính năng lực quan sát của hắn.\n\nNhưng sự yên bình này quá đỗi mong manh. Cục Giám Ấn không phải là những kẻ dễ bị lừa gạt mãi. Giọt mực đỏ trong lọ pha lê đã vơi đi một phần, và Kỷ biết rằng khi bọn chúng đối chiếu sổ sách năng lượng niềm tin cuối tháng, khoảng hụt từ sớ thuế của dì Hoa sẽ dẫn đường cho những kẻ săn lùng sắc bén nhất tìm đến tiệm Khô Mộc.",
+          "causalStateChange": "Từ kẻ phải tuân thủ luật âm thanh tuyệt đối thành người nắm giữ một ngoại lệ khu vực tư nhân, có khả năng chủ động phòng vệ trước giếng chuông.",
+          "requiredPlanAnchor": "chưng cất mực triện từ giấy ướt",
+          "protagonistChoice": "Quyết định không vứt bỏ phần mực thừa mà liều lĩnh dùng nó nâng cấp tờ giấy phép hành nghề của chính mình ngay lập tức.",
+          "agencyMove": "Thu thập mực triện quý hiếm bong tróc từ quá trình ngâm giấy để làm giả dấu triện tần số bảo vệ không gian sống cá nhân.",
+          "earnedReward": "Quyền miễn trừ sóng âm dưới 40 decibel trong bán kính ba thước nhờ giấy phép tự ngụy tạo thành công.",
+          "materialProgression": "Một giọt mực triện tần số màu đỏ rực cất trong lọ pha lê nhỏ, thu được từ việc hòa tan bề mặt giấy tro.",
+          "comfortPayoff": "Bát mì gõ nóng hổi có thịt xá xíu của dì Hoa, ăn thỏa thích trong vùng an toàn tĩnh lặng mà không sợ bị chuông phạt.",
+          "costPaid": "Mực triện cất giữ bị vơi đi một phần, đồng thời tờ giấy phép hành nghề bị thay đổi cấu trúc không thể phục hồi về dạng gốc.",
+          "exitPressure": "Sự chênh lệch trong sổ sách năng lượng niềm tin cuối tháng của Viện Khuếch Âm sẽ phơi bày toàn bộ sự việc, kích hoạt cuộc săn lùng thợ phục chế phá luật."
+        }
+      ],
+      "continuityDigest": "Kỷ dùng sự hiểu biết về nét bút để cạo sửa tờ giấy tro của dì Hoa cứu bà khỏi thuế sinh mệnh (Chương 1). Việc này đánh động quan tuần tra, buộc Kỷ phải giấu chứng cứ vào nước lạnh và tạo tiếng ồn chịu phạt nhẹ để đánh lạc hướng (Chương 2). Từ phần giấy ướt, Kỷ chưng cất được mực triện hiếm, dùng nó ngụy tạo vùng an toàn cho tiệm và tận hưởng một bữa ăn bình yên (Chương 3).",
+      "unresolvedPressure": "Khoảng hụt năng lượng sinh mệnh không được thu hồi từ tờ giấy tro thuế vụ đã bị cạo sửa sẽ bị phát hiện khi Cục Giám Ấn kiểm tra sổ sách cuối tháng, chĩa mũi dùi điều tra thẳng vào khu vực tiệm Khô Mộc."
+    },
+    {
+      "schemaVersion": 2,
+      "candidateId": "concept_palimpsest_layers",
+      "chapters": [
+        {
+          "chapterNumber": 1,
+          "title": "Bột Than Dưới Lớp Luật Mới",
+          "prose": "Khói từ lò đốt của Viện Tái Chế phủ một lớp bụi xám xịt lên mái ngói khu phố cổ. Thạch ngồi trước bàn làm việc, những ngón tay chai sần miết nhẹ lên mặt một tờ giấy tro thô ráp. Cậu là thợ phục chế, người duy nhất ở đây còn giữ thói quen đọc bằng xúc giác.\n\n— Lão bá, tờ giấy này bị cạo chưa sạch. Dưới lớp mực mới vẫn còn rỉn lên sát khí của những quy tắc cũ chồng chéo.\n\nLão Tôn run rẩy bám lấy khung cửa tiệm, mồ hôi vã ra như tắm. Lão vừa nhận được lệnh thu hồi đất đai có đóng mộc đỏ chót của Viện Tái Chế. Bọn lính canh đang đứng rầm rập ngoài ngõ, vũ khí chạm nhau lanh canh.\n\n— Thạch, bọn chúng bảo mảnh đất nhà ta vi phạm luật thuế mới. Nếu không giao đất, ta sẽ bị đưa lên đền thờ cổ làm vật hiến tế. Lão Tôn mếu máo, đôi mắt đục ngầu tuyệt vọng.\n\nThạch nheo mắt nhìn tờ sớ trên tay lão Tôn. Giấy tro rất đắt đỏ, nên bọn quan lại thường dùng dao lam cạo đi luật cũ để viết luật mới lên. Nhưng cạo không khéo, năng lượng của giếng chuông vẫn sẽ nhận diện cả hai lớp chữ nếu có điều kiện kích hoạt.\n\nBước ra ngoài cửa, Thạch đối mặt với viên đội trưởng của Viện Tái Chế. Hắn đang nhếch mép, tay cầm một con dao cạo nhỏ xíu gõ gõ vào chuôi kiếm.\n\n— Thằng thợ quèn kia, giao lão Tôn ra đây. Lệnh đã đóng dấu, luật thuế mới quy định rõ kẻ nợ thuế trễ ba ngày phải chịu án hiến tế. Tiếng chuông chiều sắp điểm rồi, đừng để bọn tao phải ra tay.\n\nThạch không đáp, chỉ lẳng lặng rút từ trong túi áo ra một lọ sứ nhỏ. Bên trong là bột than phục chế, thứ được chế tạo từ gỗ thông cổ thụ đốt trong lò kín. Cậu rắc đều lớp bột đen ngòm lên mặt tờ giấy lệnh.\n\nHít một hơi thật sâu, Thạch chấp nhận luồng bụi độc hại xộc thẳng vào phổi. Phổi cậu nóng ran, nhưng đôi tay vẫn vững vàng miết lớp bột than len lỏi vào từng rãnh nhỏ ti ti trên mặt giấy tro.\n\n— Ngươi làm cái trò gì vậy? Chống người thi hành công vụ à? Viên đội trưởng gắt lên, toan bước tới giật tờ giấy.\n\nNgay lập tức, những vệt than đen đọng lại dưới rãnh xước bắt đầu tỏa ra ánh sáng nhàn nhạt. Những nét chữ bị chìm lấp dưới luật thuế mới dần hiện lên rành rành. Một câu hoàn chỉnh được ghép lại từ tàn dư cũ.\n\n— Quy tắc Bảo Vệ Dân Nghèo. Thạch gằn giọng đọc to. Mọi hành vi cưỡng chế thu hồi đất đai trong khu phố cổ đều bị vô hiệu hóa nếu không có sự đồng ý của trưởng phố. Các người dám viết đè luật thuế lên tờ sớ bảo hộ chưa được cạo sạch sao?\n\nVừa dứt lời, một tiếng boong trầm đục vang lên từ hướng giếng chuông trung tâm. Năng lượng tràn qua thớ giấy, kích hoạt lớp chữ chìm. Một bức tường năng lượng vô hình bùng nổ, hất văng viên đội trưởng và đám lính canh ngã nhào ra đất.\n\nViên đội trưởng ôm cái chân gãy, nghiến răng trừng mắt nhìn Thạch. Hắn không ngờ một tên thợ phục chế lại dám dùng chính luật cũ để vô hiệu hóa lệnh mới.\n\n— Mày khá lắm. Nhưng ngày mai, tao sẽ mang tờ lệnh được xử lý bằng hóa chất đến. Để xem cái mạng quèn của mày có đỡ được axit xóa chữ không! Hắn gầm gừ rồi ra lệnh cho đám thuộc hạ dìu đi.\n\nThạch ho sặc sụa, khạc ra một búng máu lẫn bọt than đen. Cậu đã cứu được lão Tôn hôm nay, nhưng cái giá phải trả là lá phổi tổn thương và sự thù hằn trực diện từ Viện Tái Chế. Để đối phó với giấy tẩm hóa chất vào ngày mai, cậu buộc phải tìm cho ra chiếc kính soi bóng mờ huyền thoại.",
+          "causalStateChange": "Thạch vô hiệu hóa thành công lệnh thu hồi bằng cách kích hoạt luật cũ, nhưng chọc giận Viện Tái Chế và khiến chúng quyết định dùng hóa chất xóa giấy, đẩy Thạch vào thế phải tìm công cụ mạnh hơn.",
+          "requiredPlanAnchor": "tìm kính soi bóng mờ",
+          "protagonistChoice": "Thạch quyết định can thiệp vào việc của triều đình, hít bụi than độc hại để phơi bày lớp chữ bị giấu kín thay vì đứng nhìn lão Tôn bị bắt đi.",
+          "agencyMove": "Sử dụng kiến thức về giấy và bột than chuyên dụng để kích hoạt Quy tắc Bảo Vệ Dân Nghèo còn sót lại bên dưới lớp mực mới.",
+          "earnedReward": null,
+          "materialProgression": null,
+          "comfortPayoff": null,
+          "costPaid": "Hít phải bụi than độc hại làm tổn thương phổi nghiêm trọng, gây ho ra máu.",
+          "exitPressure": "Viện Tái Chế đe dọa sẽ quay lại vào ngày mai với tờ lệnh xử lý bằng axit, đòi hỏi Thạch phải nhanh chóng có được kính soi bóng mờ để đối phó."
+        },
+        {
+          "chapterNumber": 2,
+          "title": "Máu Trên Khế Ước Cũ",
+          "prose": "Cơn đau rát từ cuống phổi kéo dài suốt đêm khiến Thạch không thể chợp mắt. Sáng sớm, cậu đã đứng trước cửa dinh thự hoang tàn của cố đại sư làm giấy họ Lâm. Đây là nơi duy nhất trong thành phố còn lưu giữ một chiếc kính soi bóng mờ.\n\nThế nhưng, dinh thự lúc này đang bị vây kín bởi đám tay chân của gã trọc phú tên Bàng. Gã đang cầm trên tay bản khế ước chuyển nhượng tiệm giấy, hung hăng ép Lâm phu nhân và cô con gái nhỏ phải dọn đi.\n\n— Dấu vân tay bằng máu của lão Lâm rành rành trên khế ước đây! Ta là người thừa kế hợp pháp. Bàng đắc ý vỗ vỗ vào mặt giấy. Khôn hồn thì giao chiếc kính soi bóng mờ ra đây, tao còn nương tay. Viện Tái Chế đã đặt mua nó với giá cao rồi.\n\nThạch chen qua đám đông, tiến thẳng về phía chiếc bàn đặt khế ước. Cậu biết rõ, Quy tắc Thừa Kế Tài Sản gắn liền với tờ giấy này không dễ bị qua mặt. Chỉ có người mang huyết thống hoặc được truyền lại thực sự mới có dấu vân tay máu khớp với thớ giấy.\n\n— Để tôi kiểm tra một chút. Thạch bình thản nói, không màng đến những lưỡi dao đang chĩa vào mình. Cậu là thợ sửa giấy, việc thẩm định là nghề của cậu.\n\nLâm phu nhân gật đầu hàm ơn. Thạch vươn tay, dùng ngón trỏ miết nhẹ lên vết máu khô đỏ bầm trên tờ giấy tro. Xúc giác nhạy bén của cậu lập tức nhận ra sự bất thường. Bề mặt nhám của giấy đã bị một vật sắc nhọn gọt đi một lớp biểu bì cực mỏng.\n\n— Vết máu này không ngấm vào sợi giấy, mà chỉ nằm hờ trên lớp bột giấy mới được đắp lên. Thạch tuyên bố, ánh mắt sắc lẹm nhìn thẳng vào gã Bàng. Ông đã dùng dao nhỏ cạo đi lớp máu cũ của Lâm đại sư, rồi nhỏ máu mình lên để giả mạo.\n\n— Mày ngậm máu phun người! Bàng đỏ mặt tía tai, vung tay định tát Thạch. Nhưng tay gã vô tình chạm mạnh vào mặt con dấu trên khế ước.\n\nSự can thiệp của Thạch đã kích hoạt cơ chế phòng vệ của giấy. Lớp máu cũ ẩn sâu trong thớ giấy cảm nhận được kẻ ngoại lai. Con dấu trên khế ước đột ngột phát sáng màu đỏ rực, tỏa ra nhiệt lượng kinh người.\n\nGã Bàng hét lên thảm thiết khi ngón tay bị bỏng rộp, thịt da xèo xèo bốc khói. Cùng lúc đó, toàn bộ tờ khế ước giả mạo tự động bốc khói đen mù mịt, thiêu rụi bằng chứng cướp đoạt của gã.\n\nĐám tay chân thấy chủ bị giấy phản phệ thì khiếp đảm lùi lại. Thạch cũng phải nghiến răng chịu đựng sự đau đớn, bởi đầu ngón tay cậu vừa miết lên lớp máu cũng bị nhiệt lượng làm cho phồng rộp.\n\nBàng ôm bàn tay cháy đen, gầm rú trong điên loạn. Hắn biết mình đã thất bại, vội vã lủi thủi dẫn đám tay chân chạy trốn, không quên để lại một ánh nhìn thù hận tột độ dành cho Thạch.\n\n— Đa tạ ân công cứu mạng gia đình. Lâm phu nhân quỳ xuống, hai tay dâng lên một chiếc hộp gỗ lim xỉn màu. Đây là kính soi bóng mờ mài từ thạch anh dưới đáy giếng chuông. Lão gia dặn dò chỉ giao cho người thực sự hiểu thấu sinh mệnh của giấy.\n\nThạch nhận lấy chiếc hộp, cảm nhận hơi lạnh tỏa ra từ thạch anh. Cậu vừa có được thứ vũ khí đắt giá nhất của nghề, nhưng cái giá phải trả là đắc tội với cả Viện Tái Chế lẫn giới địa chủ.\n\nVừa bước chân về đến ngõ nhà, Thạch đã khựng lại. Toàn bộ tiệm giấy của cậu đã bị đám lính canh của Viện Tái Chế vây kín. Viên đội trưởng chân bó nẹp đang đứng đó, tay cầm một tờ lệnh thu hồi mới tinh, bề mặt giấy láng bóng mùi hóa chất xóa chữ.",
+          "causalStateChange": "Thạch phá tan âm mưu chiếm đoạt di sản của gã Bàng để lấy được kính soi bóng mờ, nhưng ngay khi trở về, cậu phải đối đầu ngay lập tức với đợt tấn công thứ hai của Viện Tái Chế.",
+          "requiredPlanAnchor": "đối mặt hóa chất xóa chữ",
+          "protagonistChoice": "Thạch quyết định đối đầu với gã trọc phú đông tay chân, dùng tay trần chạm vào khế ước nguy hiểm để lật tẩy vết máu giả.",
+          "agencyMove": "Dùng xúc giác nhạy bén miết lên lớp máu khô để nhận biết độ lồi lõm của lớp bột giấy mới, qua đó kích hoạt cơ chế bảo vệ của quy tắc thừa kế.",
+          "earnedReward": null,
+          "materialProgression": null,
+          "comfortPayoff": null,
+          "costPaid": "Ngón tay dùng để cảm nhận giấy bị bỏng rộp do nhiệt lượng phản phệ từ con dấu pháp thuật.",
+          "exitPressure": "Đám lính canh Viện Tái Chế đã vây kín tiệm giấy với tờ lệnh được xử lý hóa chất triệt để, cắt đứt đường lui của Thạch."
+        },
+        {
+          "chapterNumber": 3,
+          "title": "Ánh Sáng Khúc Xạ Luật Cổ",
+          "prose": "Không khí trước tiệm giấy đặc quánh lại vì mùi hóa chất nồng nặc. Viên đội trưởng cười gằn, phe phẩy tờ lệnh thu hồi vừa được Tòa Án Tối Cao Vọng Âm đóng dấu. Bề mặt giấy phẳng lì, trắng bệch, không còn bất kỳ dấu vết nào của lớp mực cũ.\n\n— Sao rồi thằng thợ nhãi ranh? Viện Tái Chế đã dùng dung dịch axit đặc biệt để ăn mòn hoàn toàn bề mặt giấy. Quy tắc Bảo Vệ Dân Nghèo của mày đã bị xóa sổ tận gốc. Đội trưởng đắc ý tiến lại gần, ra hiệu cho lính canh chuẩn bị phá cửa tiệm.\n\nLão Tôn và những người dân xung quanh rúm ró nép vào góc tường. Không còn bức tường năng lượng bảo vệ, bọn họ chỉ là những con kiến chờ bị nghiền nát dưới bánh xe pháp luật.\n\nThạch bình tĩnh mở hộp gỗ lim, cẩn thận lấy ra chiếc kính soi bóng mờ. Mặt kính thạch anh trong vắt nhưng lại có khả năng khúc xạ ánh sáng kỳ lạ. Cậu giơ kính lên ngang tầm mắt, hứng lấy vạt nắng chiều đang hắt xiên qua mái ngói.\n\n— Xóa bề mặt giấy thì dễ, nhưng ông quên mất giấy tro được tạo ra từ đâu sao? Thạch lạnh lùng bước tới, yêu cầu được kiểm tra tờ lệnh theo đúng quyền hạn của một thợ giấy có môn bài. Viên đội trưởng hừ lạnh, ném tờ giấy sang vì tin chắc không còn sơ hở.\n\nDưới ánh sáng xiên qua thấu kính thạch anh, cấu trúc ba chiều của tờ giấy hiện ra rõ mồn một. Axit quả thực đã xóa sạch lớp mực cũ, nhưng nó lại làm mỏng đi phần biểu bì, khiến cho một bí mật sâu thẳm hơn lộ ra.\n\n— Ông cạo bỏ luật bảo vệ dân nghèo, nhưng lại vô tình để lộ ra tàn dư của Quy tắc Hiến Tế Cổ ở lớp thứ ba. Thạch chỉ tay vào những nếp hằn mờ ảo đang rỉn lên dưới đáy tờ giấy, thứ mà mắt thường tuyệt đối không thể thấy.\n\nViên đội trưởng biến sắc. Hắn giật thót mình nhận ra sai lầm chí mạng. Luật hiến tế quy định kẻ bước vào khu vực kích hoạt mà không mang lễ vật sẽ bị tước đoạt ký ức. Nếu tờ giấy này được giếng chuông đọc...\n\n— Khoan đã! Dừng lại! Viên đội trưởng hét lên, nhưng đã quá muộn. Con dấu đỏ chót của tòa án trên tờ giấy đã tiếp xúc với năng lượng từ giếng chuông văng vẳng vọng tới.\n\nTờ lệnh phát ra một tiếng rít xé tai. Vì lớp biểu bì đã bị axit làm mỏng, giếng chuông đọc thẳng vào lớp luật cổ đại. Một luồng ánh sáng xám xịt bùng nổ, quét qua toàn bộ đội lính canh của Viện Tái Chế.\n\nĐám lính ngã rạp xuống đất, ánh mắt trở nên đờ đẫn, trống rỗng. Bọn chúng đã mất sạch ký ức của một năm qua, quên luôn cả lý do vì sao mình đứng ở đây. Viên đội trưởng hoảng loạn bò lùi lại, vứt bỏ tờ lệnh như một thứ tà vật.\n\n— Trưởng phố có lệnh, từ nay mọi văn bản thu hồi đất trong khu vực này phải qua tay Thạch thẩm định xem có an toàn hay không mới được thi hành! Một giọng nói dõng dạc vang lên. Vị trưởng phố già chống gậy bước ra từ đám đông, đập mạnh tờ quyết định xuống bàn.\n\nSự thất bại thảm hại của Viện Tái Chế trước mắt bao người đã buộc chúng phải nhượng bộ. Viên đội trưởng không còn cách nào khác, đành cắn răng ra lệnh cho đám thuộc hạ ngây dại rút lui, bỏ lại quyền kiểm soát giấy tờ cho Thạch.\n\nTối hôm đó, tiệm giấy đóng cửa sớm. Thạch ngồi khoan khoái trên chiếc ghế tựa bọc nhung mới mua, nhấp một ngụm trà Thiết Quan Âm thượng hạng. Không còn mùi khói bụi, chỉ có mùi hương mộc mạc của giấy và bình yên.\n\nTrên bàn, một túi tiền vàng nặng trĩu là thù lao mà các hộ dân gom góp tạ ơn cậu. Hơn thế nữa, mảnh môn bài kiểm định giấy đỏ chót vừa được cấp chính thức xác lập vị thế không thể đụng đến của Thạch ở khu phố cổ này.\n\nCậu khẽ vuốt ve chiếc kính soi bóng mờ. Viện Tái Chế chắc chắn sẽ không dừng lại ở việc dùng axit, chúng sẽ viện đến những loại tà thuật giấy đáng sợ hơn. Nhưng với quyền lực mới trong tay và con mắt nhìn thấu các tầng lớp luật cũ, Thạch đã sẵn sàng cho một cuộc chiến sòng phẳng.",
+          "causalStateChange": "Thạch mượn sai lầm của kẻ thù để kích hoạt luật cổ, đánh đuổi Viện Tái Chế và vươn lên thành người kiểm định có thẩm quyền bảo vệ khu phố.",
+          "requiredPlanAnchor": "đạt quyền kiểm định văn bản",
+          "protagonistChoice": "Thạch quyết định dùng kính soi bóng mờ để soi thấu cấu trúc giấy thay vì tranh cãi lý lẽ, lợi dụng chính độ mỏng do axit tạo ra để bẫy kẻ thù.",
+          "agencyMove": "Dùng kính thạch anh và ánh sáng xiên để chứng minh axit đã làm lộ ra tầng luật cổ đại thứ ba, kích hoạt hiệu ứng xóa trí nhớ của luật hiến tế lên đám lính.",
+          "earnedReward": "Một túi tiền vàng nặng trĩu thù lao từ các hộ dân khu phố cổ và mảnh môn bài kiểm định giấy chính thức cấp quyền thẩm định pháp lý.",
+          "materialProgression": "Sở hữu chiếc kính soi bóng mờ quý giá làm từ thạch anh giếng chuông và quyền độc quyền kiểm tra giấy tờ thu hồi đất trong khu vực.",
+          "comfortPayoff": "Ngồi thư thả trên chiếc ghế tựa bọc nhung mới, thưởng thức trà Thiết Quan Âm thượng hạng trong không gian tiệm giấy an toàn và tĩnh lặng.",
+          "costPaid": "Phải đối mặt với sự dè chừng của bộ máy chính quyền sở tại và áp lực duy trì sự minh bạch bằng sinh mạng cá nhân.",
+          "exitPressure": "Sự thất bại bẽ bàng này chắc chắn sẽ khiến Viện Tái Chế từ bỏ các biện pháp địa phương và chuyển sang dùng những thứ tà thuật biến đổi cấu trúc giấy ở mức độ cao hơn."
+        }
+      ],
+      "continuityDigest": "Thạch can thiệp cứu người bằng cách lật tẩy luật cũ dưới lớp mực mới, chuốc lấy sự thù hận của Viện Tái Chế. Để chống lại hóa chất xóa giấy, cậu mạo hiểm lấy kính soi bóng mờ từ vụ tranh chấp thừa kế, rồi dùng chính chiếc kính đó để chứng minh hóa chất của kẻ thù đã vô tình làm lộ ra một luật cổ nguy hiểm hơn, buộc chúng phải tháo lui và nhượng lại quyền kiểm định cho cậu.",
+      "unresolvedPressure": "Viện Tái Chế đã mất mặt và bị vô hiệu hóa lực lượng thi hành án cơ sở. Sự trỗi dậy của Thạch báo hiệu một cuộc thanh trừng quy mô lớn từ cấp cao nhất của Viện, nơi chúng bắt đầu sử dụng các phương thức xóa ký ức giấy cực đoan không để lại vết hằn vật lý."
+    },
+    {
+      "schemaVersion": 2,
+      "candidateId": "concept_temporal_humidity",
+      "chapters": [
+        {
+          "chapterNumber": 1,
+          "title": "Viền Loang Kép Kể Tội",
+          "prose": "Cuộn di chúc bằng giấy tro nằm tĩnh lặng trên mặt bàn gỗ lim. Bề mặt giấy xám xịt, hơi thô ráp, tỏa ra mùi ngai ngái đặc trưng của những tài liệu vừa được rút ra từ hầm chứa của Viện Lưu Trữ.\n\nLê Phú gõ nhịp ngón tay rếch rác mỡ màng xuống mép bàn, khóe miệng nhếch lên đầy vẻ tự đắc.\n\n— Lão Tạ, tờ di chúc này đã được Viện Lưu Trữ đóng dấu triện đỏ xác nhận vào mùng năm tháng trước. Quyền kiểm soát giếng chuông phụ thuộc về ta. Ngươi chỉ là thợ giám định, cứ việc ký giấy chứng thực để ta còn đi nhận quyền.\n\nTạ Duyên không đáp. Hắn híp mắt nhìn chằm chằm vào dấu triện đỏ chót nằm ở góc phải tờ giấy tro. Màu mực tươi tắn, đường nét sắc sảo, bề ngoài không có nửa điểm tì vết.\n\nNhưng Tạ Duyên có một trí nhớ hoàn hảo về thời tiết. Mùng năm tháng trước là một ngày nắng ráo, hanh khô đến mức da người nứt nẻ, độ ẩm chưa tới ba mươi phần trăm. Khí tượng như vậy tuyệt đối không thể kích hoạt Quy tắc Thừa Kế Giếng Chuông.\n\n— Mùng năm nắng gắt, giấy tro co rút. Nếu đóng dấu thật vào ngày đó, mực không thể thấm sâu. — Tạ Duyên chậm rãi lên tiếng.\n\nHắn vươn tay, kéo khay than hồng từ dưới gầm bàn lên, đặt một tấm lưới đồng mỏng cách ngọn lửa chừng hai tấc. Sau đó, hắn cẩn thận nhấc tờ di chúc đặt lên trên tấm lưới.\n\n— Ngươi làm cái điên rồ gì thế? Sém cháy di chúc bây giờ! — Lê Phú chồm người tới định giật lại.\n\n— Đứng im. Viện Lưu Trữ quy định thợ giám định được quyền dùng nhiệt để thử giấy tro. — Tạ Duyên gạt tay gã ra, ánh mắt đanh lại.\n\nDưới tác động của nhiệt độ, hơi ẩm lưu cữu bên trong các sợi giấy tro bắt đầu bốc lên bưng bưng. Tạ Duyên lập tức rút từ trong ngực áo ra một chiếc kính lúp viền đồng, áp sát mắt vào mặt giấy.\n\nSự thật hiện hình. Bao quanh nét mực đỏ tươi trên bề mặt, một viền mực nhạt màu hơn bắt đầu lan ra, tạo thành hai lớp mép rõ rệt. Khoảng cách giữa hai lớp viền loang rộng đến mức bất thường.\n\n— Viền loang kép. — Tạ Duyên gõ tay xuống bàn, giọng đanh thép. — Tờ giấy này từng bị đóng dấu đè lên vào một ngày mưa dầm, độ ẩm vượt quá tám mươi phần trăm. Có kẻ đã ngụy tạo ngày tháng để cướp quyền thừa kế của đứa cháu.\n\nMặt Lê Phú biến sắc, trắng bệch như xác chết. Gã lùi lại một bước, chỉ tay vào mặt Tạ Duyên, giọng run rẩy nhưng đầy ác ý.\n\n— Ngươi dám vu khống con dấu của Viện Lưu Trữ? Ngươi chán sống rồi! Cứ đợi đấy, người của Cục Khí Tượng và Viện Lưu Trữ sẽ tới dẹp cái tiệm rách này của ngươi!",
+          "causalStateChange": "Từ một thợ giám định trầm lặng, Tạ Duyên công khai vô hiệu hóa một văn bản có dấu triện của cơ quan có thẩm quyền, chuốc lấy rắc rối lớn để bảo vệ sự thật.",
+          "requiredPlanAnchor": "Đo khoảng cách viền loang kép bằng kính lúp",
+          "protagonistChoice": "Bỏ qua sự an toàn của bản thân, quyết định dùng nhiệt độ và kính lúp để vạch trần viền loang mực ngụy tạo trên di chúc giấy tro.",
+          "agencyMove": "Dựa vào trí nhớ chính xác về thời tiết và đặc tính hút ẩm của giấy tro, chủ động hơ nóng tài liệu để làm lộ chứng cứ vật lý.",
+          "earnedReward": null,
+          "materialProgression": null,
+          "comfortPayoff": null,
+          "costPaid": "Đắc tội trực tiếp với thế lực địa phương có quan hệ với Viện Lưu Trữ, khiến cửa tiệm đối mặt với nguy cơ bị phong tỏa.",
+          "exitPressure": "Lê Phú đe dọa mang người của Viện Lưu Trữ đến trả thù, buộc Tạ Duyên phải tìm cách chống lại công nghệ che giấu chứng cứ của giới chức trách."
+        },
+        {
+          "chapterNumber": 2,
+          "title": "Hóa Chất Khóa Viền",
+          "prose": "Chỉ nửa canh giờ sau khi Lê Phú bỏ đi, cánh cửa tiệm giấy bị đạp tung. Gió lùa vào mang theo hơi lạnh ngắt của buổi xế chiều.\n\nNghiêm Thạch, một quan viên khoác áo chùng xám thêu gia huy của Viện Lưu Trữ, sải bước bước vào. Theo sau gã là hai tên lính tuần tra lăm lăm tay thước.\n\n— Tạ Duyên, có người tố cáo ngươi dùng hỏa thuật phá hoại di sản văn thư. Giao tờ di chúc ra đây, Viện Lưu Trữ sẽ tịch thu để bảo quản. — Nghiêm Thạch lạnh lùng ra lệnh.\n\nTạ Duyên lùi lại che chắn tờ giấy tro trên bàn. Hắn thừa hiểu nếu để di chúc lọt vào tay Nghiêm Thạch, bằng chứng viền loang kép sẽ vĩnh viễn biến mất.\n\n— Quy định của Viện cho phép giám định bằng nhiệt nhẹ. Văn bản này là chứng cứ giả mạo, viền loang đã chứng minh điều đó. — Tạ Duyên đáp, tay xiết chặt chuôi kính lúp.\n\nNghiêm Thạch cười khẩy. Gã rút từ trong ống tay áo ra một lọ thủy tinh nhỏ chứa thứ chất lỏng màu lục nhạt, nhanh như cắt vẩy vài giọt lên mặt tờ di chúc.\n\nTiếng xèo xèo vang lên. Mùi hăng hắc bốc ra. Trái tim Tạ Duyên chùng xuống. Đó là dung dịch khóa ẩm đặc chế của Viện Lưu Trữ. Dưới tác dụng của thuốc, tờ giấy tro lập tức khô cứng lại, viền loang nhạt màu xung quanh con dấu đỏ co rút rồi biến mất hoàn toàn.\n\n— Viền loang nào? Ta chỉ thấy một con dấu hoàn hảo. Ngươi vu khống cơ quan công quyền, chuẩn bị giao nộp giấy phép hành nghề đi. — Nghiêm Thạch đắc thắng vỗ tay.\n\nMồ hôi lạnh rịn trên trán Tạ Duyên. Hắn chỉ còn một cơ hội duy nhất. Nếu viền ngoài đã bị khóa, hắn phải tìm kiếm bằng chứng ở một tầng sâu hơn.\n\nHắn cắn răng, lôi từ dưới đáy rương gỗ ra một lọ sứ nhỏ xíu, được bọc cẩn thận bằng rêu khô. Đây là nước cất giếng chuông nguyên chất, thứ tài nguyên hiếm hoi hắn tốn ba năm mới đổi được một giọt.\n\n— Ngươi làm gì vậy? Lùi lại! — Nghiêm Thạch quát lớn khi thấy Tạ Duyên nhỏ giọt nước cất lấp lánh thứ ánh sáng dịu nhẹ lên chính giữa con dấu đỏ.\n\nNước cất giếng chuông mang năng lượng thời gian thuần khiết, lập tức xuyên qua lớp hóa chất khóa ẩm. Bề mặt giấy không loang ra nữa, nhưng dưới thấu kính lúp, vô số hạt mực nhỏ li ti bắt đầu phát sáng và phân tách.\n\n— Ngươi nhìn cho kỹ. — Tạ Duyên áp kính lúp xuống, ép Nghiêm Thạch phải cúi nhìn. — Hóa chất của ngươi chỉ khóa được mép ngoài. Nhưng sự phân bố hạt mực bên trong viền bị khóa đang vón cục bất thường. Mực đóng vào ngày khô ráo sẽ tản đều, mực đóng ngày ẩm ướt rồi sấy khô sẽ đóng cục. Ngươi không thể xóa dấu vết động học chất lỏng này.\n\nSắc mặt Nghiêm Thạch xám xịt. Gã không ngờ một thợ giám định quèn lại dám dùng đến nước cất giếng chuông, phá vỡ hoàn toàn kỹ thuật che đậy của Viện Lưu Trữ.",
+          "causalStateChange": "Tạ Duyên đánh bại sự can thiệp của Viện Lưu Trữ, khẳng định tính toàn vẹn của bằng chứng nhưng phải trả giá bằng tài nguyên quý giá nhất của mình.",
+          "requiredPlanAnchor": "Phân tích sự phân bố hạt mực bên trong viền bị khóa",
+          "protagonistChoice": "Chấp nhận tiêu hủy giọt nước cất giếng chuông quý giá nhất để xuyên thủng lớp hóa chất bảo vệ của Viện Lưu Trữ, giành lấy bằng chứng không thể chối cãi.",
+          "agencyMove": "Quan sát thấy viền ngoài bị xóa, lập tức chuyển hướng suy luận sang cấu trúc vi mô của hạt mực bên trong và dùng tài nguyên đặc biệt để hiện hình chúng.",
+          "earnedReward": null,
+          "materialProgression": null,
+          "comfortPayoff": null,
+          "costPaid": "Tiêu hao giọt nước cất giếng chuông duy nhất mà hắn mất ba năm tích cóp, mất đi một công cụ cứu mạng trong tương lai.",
+          "exitPressure": "Quan chức Viện Lưu Trữ rút lui nhưng để lại lời đe dọa tước giấy phép hành nghề, Tạ Duyên cần lập tức có uy tín và sự bảo vệ từ các thế lực khác để sinh tồn."
+        },
+        {
+          "chapterNumber": 3,
+          "title": "Ẩm Kế Báo Thời Gian",
+          "prose": "Nghiêm Thạch hầm hầm dẫn người bỏ đi, không quên ném lại ánh nhìn sắc lẹm như dao cạo. Lê Phú đứng lấp ló ngoài cửa sổ thấy thế cũng hoảng hồn cúp đuôi chạy thẳng.\n\nBên trong tiệm, không gian tĩnh lặng trở lại. Một người phụ nữ trẻ mặc áo gai bước ra từ căn phòng phía sau, dắt theo đứa bé trai chừng bảy tuổi. Đó là mẹ con Lê An, những người suýt bị cướp trắng quyền kiểm soát giếng chuông phụ.\n\n— Đa tạ Tạ ân nhân. Nếu không có ngài liều mình vạch trần, mẹ con ta đã trắng tay ra đường vào mùa hạn hán tới. — Người phụ nữ rưng rưng nước mắt, cúi gập người hành lễ.\n\nBà trân trọng đặt lên bàn một chiếc hộp gỗ trắc nạm bạc, bên cạnh là một túi gấm nhỏ nặng trĩu. Tạ Duyên không từ chối, bởi hắn biết rõ cái giá mình vừa phải trả là bao nhiêu.\n\nHắn mở nắp hộp gỗ. Bên trong lớp lụa nhung đỏ là một chiếc ẩm kế cổ. Mặt số làm bằng đồng thau chạm khắc tinh xảo, kim chỉ báo được chế tác từ sợi tóc của các tư tế giếng chuông đời đầu. Chỉ cần không khí thay đổi độ ẩm dù là một phần ngàn, kim đồng cũng khẽ rung lên báo hiệu.\n\n— Vật này vốn là di vật của thái gia để lại. Nay xin tặng ân nhân làm khí cụ hộ thân. — Người phụ nữ nói thêm trước khi dắt con rời đi.\n\nTạ Duyên cầm chiếc ẩm kế lên, cảm nhận độ lạnh của kim loại truyền qua lòng bàn tay. Sợi tóc tư tế khẽ căng ra, kim đồng nhích nhẹ về con số sáu mươi lăm phần trăm. Cực kỳ chính xác.\n\nHắn đổ túi gấm ra, ba mươi đồng bạc trắng lăn lóc trên mặt bàn gỗ lim. Đã rất lâu rồi tiệm giấy xập xệ này mới có một khoản thu lớn đến vậy.\n\nSáng hôm sau, Tạ Duyên dùng năm đồng bạc hối lộ cho một viên thư lại lén lút tuồn ra những bản sao biểu đồ thời tiết lịch sử của Cục Khí Tượng. Hai mươi đồng bạc khác được dùng để thay một tấm biển hiệu mới bằng gỗ gụ vát viền vàng.\n\nTiếng búa gõ chát chúa vang lên giữa phố. Tấm biển mới được treo cao trước cửa tiệm với dòng chữ chạm khắc sắc nét: Dịch Vụ Giám Định Niên Đại Giấy Tro.\n\nVài kẻ qua đường chỉ trỏ tò mò, lính tuần tra của Cục Khí Tượng lượn lờ dòm ngó với ánh mắt mang đầy sự nghi kỵ và phòng bị. Nhưng Tạ Duyên không quan tâm.\n\nHắn pha một ấm trà sen nóng, ngồi phịch xuống chiếc ghế mây bọc nệm êm ái. Một tay nhâm nhi chén trà, tay kia lật mở những trang nhật ký khí tượng chi tiết đến từng giờ. Chiếc ẩm kế cổ tích tắc đều đặn trên bàn. Cảm giác mọi lời dối trá của quan lại đều có thể bị bóc trần bằng một phép đo vật lý đơn giản mang lại cho hắn một sự sảng khoái tột độ.",
+          "causalStateChange": "Tạ Duyên chính thức chuyển mình từ một người thợ thủ công phòng thủ thành một chuyên gia có vũ khí chuyên dụng, công khai thách thức sự độc quyền thông tin của chính quyền.",
+          "requiredPlanAnchor": "Mở dịch vụ giám định niên đại hồ sơ bằng ẩm kế cổ",
+          "protagonistChoice": "Nhận lấy phần thưởng rủi ro cao là chiếc ẩm kế cổ, dùng tiền mua quyền tiếp cận dữ liệu lịch sử và phơi bày công việc kinh doanh mới giữa ban ngày.",
+          "agencyMove": "Biến thắng lợi bảo vệ thân chủ thành lợi ích vật chất, lập tức đầu tư vào công cụ và dữ liệu thời tiết để xây dựng nền tảng quyền lực riêng.",
+          "earnedReward": "Nhận được ẩm kế cổ chế tác từ tóc tư tế giếng chuông và ba mươi đồng bạc trắng từ gia đình người thừa kế.",
+          "materialProgression": "Sở hữu công cụ đo độ ẩm chính xác tuyệt đối và đủ vốn để trả phí tra cứu nhật ký khí tượng của thành phố.",
+          "comfortPayoff": "Ngồi trong tiệm êm ấm, nhâm nhi trà sen lật mở biểu đồ thời tiết, tận hưởng cảm giác nắm giữ chân lý có thể lật đổ mọi văn bản ngụy tạo.",
+          "costPaid": "Trở thành cái gai trong mắt Cục Khí Tượng và Viện Lưu Trữ, bị lính tuần tra đánh dấu theo dõi toàn thời gian.",
+          "exitPressure": "Sự xuất hiện của dịch vụ giám định độc lập đe dọa trực tiếp đến mánh khóe làm giả của cơ quan chức năng, buộc chúng phải dùng những thủ đoạn tinh vi hơn để đối phó."
+        }
+      ],
+      "continuityDigest": "Tạ Duyên bảo vệ quyền thừa kế giếng chuông phụ bằng cách vạch trần viền loang mực ngụy tạo. Viện Lưu Trữ can thiệp bằng hóa chất, buộc Tạ Duyên hy sinh tài nguyên để chứng minh bằng mật độ hạt mực. Thắng lợi mang về cho hắn ẩm kế cổ và dữ liệu thời tiết, tạo đà mở dịch vụ giám định niên đại chuyên nghiệp.",
+      "unresolvedPressure": "Tạ Duyên đã thu thập đủ công cụ để lật tẩy các văn bản giả, nhưng sự theo dõi gắt gao của Cục Khí Tượng và sự cạn kiệt nước cất giếng chuông khiến hắn rơi vào thế nguy hiểm nếu gặp phải một vụ làm giả bằng phòng điều hòa độ ẩm tinh vi."
+    }
+  ],
+  "status": "awaiting_human_selection"
+}

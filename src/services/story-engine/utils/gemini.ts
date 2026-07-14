@@ -157,11 +157,11 @@ export async function callGemini(
     const task = options?.tracking?.task || '';
     const isChapterTask = ['architect', 'writer', 'writer_continuation', 'critic', 'continuity_guardian', 'auto_revision'].includes(task);
     const valid = (v: string): v is 'low' | 'medium' | 'high' => ['low', 'medium', 'high'].includes(v);
-    let level: string | undefined;
-    if (isChapterTask) {
+    let level: string | undefined = config.thinkingLevel;
+    if (!level && isChapterTask) {
       const envChapter = (process.env.GEMINI_CHAPTER_THINKING_LEVEL || '').toLowerCase();
       level = valid(envChapter) ? envChapter : 'low';
-    } else {
+    } else if (!level) {
       const envSetup = (process.env.GEMINI_THINKING_LEVEL || '').toLowerCase();
       level = valid(envSetup) ? envSetup : 'high';
     }
@@ -172,7 +172,16 @@ export async function callGemini(
 
   // JSON mode: force Gemini to return raw JSON (no markdown wrapping)
   if (options?.jsonMode) {
-    generationConfig.responseMimeType = 'application/json';
+    if (config.responseJsonSchema) {
+      // This client still calls the legacy generateContent endpoint. Its stable
+      // structured-output fields are responseMimeType + responseJsonSchema;
+      // responseFormat belongs to the newer API surface and is not accepted by
+      // every generateContent model rollout yet.
+      generationConfig.responseMimeType = 'application/json';
+      generationConfig.responseJsonSchema = config.responseJsonSchema;
+    } else {
+      generationConfig.responseMimeType = 'application/json';
+    }
   }
 
   const body: Record<string, unknown> = {

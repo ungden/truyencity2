@@ -1,0 +1,1192 @@
+{
+  "schemaVersion": 2,
+  "promptVersion": "flagship-setup-v2.14-scene-affordance-cardinality",
+  "benchmarkId": "benchmark_th_01",
+  "concepts": [
+    {
+      "id": "concept_karmic_water_transfer",
+      "workingTitle": "Thanh Tùng Ghi Thề: Nước Luân Canh Trầm Luân",
+      "readerCuriosity": "Làm sao để chia sẻ nguồn nước luân canh khi mỗi giọt nước đều mang theo bình cảnh tu luyện của nhánh họ khác?",
+      "readerFantasy": "Dùng kiến thức tương lai để sắp xếp lại trật tự gia tộc, biến gánh nặng luân canh thành cơ hội đột phá cho từng người.",
+      "premise": "Trọng sinh về lúc gia tộc định bán linh điền, nam chính dùng vòng gỗ Thanh Tùng thiết lập lại minh ước chia nước, gánh vác bình cảnh của toàn tộc.",
+      "irreversibleProblem": "Bán linh điền sẽ cắt đứt rễ Thanh Tùng, khiến toàn bộ minh ước bảo vệ gia tộc từ đời trước vỡ nát không thể vãn hồi.",
+      "protagonistContradiction": "Muốn bảo vệ mọi người nhưng phải ép họ ký minh ước chịu khổ luân canh, nhận lấy sự oán trách trong ngắn hạn.",
+      "domainMechanism": "Nước tưới linh điền mang theo tạp chất tâm cảnh; luân canh đòi hỏi các nhánh họ phải luân phiên gánh chịu áp lực tinh thần của nhau.",
+      "conflictEngine": "Người già muốn bán đất để lấy tài nguyên kéo dài tuổi thọ, người trẻ không muốn gánh tạp chất tu luyện của trưởng bối.",
+      "emotionalCore": "Sự thấu hiểu muộn màng giữa các thế hệ khi nhận ra cái giá mà người đi trước đã trả để giữ lại mảnh đất chung.",
+      "differenceClaim": "Cơ chế chia sẻ rủi ro tu luyện thông qua canh tác nông nghiệp, biến việc làm nông thành một nghi thức gánh vác gia tộc.",
+      "nearestComparisonRisk": "Dễ bị nhầm với truyện làm ruộng hệ thống nếu không nhấn mạnh vào sự giằng xé khi ký minh ước trên vòng gỗ.",
+      "serialityProof": "Mỗi mùa vụ luân canh tạo ra một tổ hợp bình cảnh mới, buộc nam chính phải liên tục điều chỉnh nhân sự và minh ước.",
+      "openingAdvantage": "Biết trước nhánh họ nào sắp tẩu hỏa nhập ma để điều hướng dòng nước tạp chất, dùng quyền phân thủy để ngăn vụ bán đất.",
+      "progressionProof": "Từ việc bị nghi ngờ khi ép ký minh ước, đến lúc các nhánh tự nguyện xin gánh nước độc để giúp nhánh khác đột phá.",
+      "worldProof": {
+        "signatureSituations": [
+          "Lễ rạch vòng gỗ Thanh Tùng để thề nhận nước độc, người thề bị ám ảnh bởi ký ức của nhánh họ khác.",
+          "Tranh cãi nảy lửa khi quyết định nhánh nào phải trồng loại cây hút tạp chất, hy sinh tiến độ tu luyện mùa này.",
+          "Một trưởng bối lén xả nước sạch cho cháu mình, làm hỏng toàn bộ trận pháp luân canh của gia tộc."
+        ],
+        "institutionalReaction": "Các gia tộc khác chế giễu việc giữ đất, cho đến khi thấy nhân tài nhánh này đột phá nhờ tâm cảnh được mài giũa qua nước độc.",
+        "resourceCirculation": "Tài nguyên không chỉ là linh thạch mà là 'hạn ngạch nước sạch'; minh ước được dùng để vay mượn hạn ngạch giữa các đời.",
+        "thirtyChapterMutation": "Đầu tư vào một đứa trẻ nhánh phụ bắt đầu sinh lời, nhưng nó quyết định dùng tài nguyên để đổi nghề thay vì cày cuốc, làm sai lệch ký ức kiếp trước."
+      },
+      "antiCloneFingerprint": "foresight_water_toxin|delayed_breakthrough|clean_water_quota|elder_survival_vs_youth_future|tree_ring_oath_transfer"
+    },
+    {
+      "id": "concept_lifespan_soil_bond",
+      "workingTitle": "Huyết Mạch Hóa Bùn: Lời Thề Dưới Gốc Tùng",
+      "readerCuriosity": "Nếu linh điền chỉ phục hồi bằng tuổi thọ tự nguyện hiến tế qua minh ước, ai sẽ là người phải hy sinh?",
+      "readerFantasy": "Tối ưu hóa việc sử dụng tuổi thọ của gia tộc, đầu tư sinh lời để chuộc lại thanh xuân cho những người đã hy sinh.",
+      "premise": "Nam chính ngăn cản việc bán linh điền bằng cách tự trích xuất tuổi thọ ký minh ước, bắt đầu hành trình luân canh sinh mệnh.",
+      "irreversibleProblem": "Linh điền đã cạn kiệt, nếu bán đi, những trưởng bối từng hiến tuổi thọ cho đất sẽ lập tức hồn phi phách tán.",
+      "protagonistContradiction": "Phải tính toán chi li từng tháng tuổi thọ của người thân như một con buôn, dù trong lòng đau xót tột cùng.",
+      "domainMechanism": "Vòng gỗ Thanh Tùng ghi nhận tuổi thọ thế chấp; luân canh là việc các nhánh thay nhau hiến sinh lực để nuôi dưỡng linh dược.",
+      "conflictEngine": "Sự bất bình đẳng khi nhánh chính hưởng linh dược để thăng cấp, trong khi nhánh phụ phải hao mòn tuổi thọ cày cấy.",
+      "emotionalCore": "Tình thân thể hiện qua việc tranh nhau ký tên lên vòng gỗ để gánh vác cái chết thay cho con cháu.",
+      "differenceClaim": "Tài nguyên cốt lõi là thời gian sống thực tế, biến mỗi quyết định đầu tư thành một ván cược bằng sinh mệnh gia tộc.",
+      "nearestComparisonRisk": "Có thể giống truyện hiến tế ma tu nếu không giữ vững ranh giới tự nguyện và tình cảm gia đình trong minh ước.",
+      "serialityProof": "Giải quyết xong nợ tuổi thọ của thế hệ này lại phải đối mặt với khoản nợ đáo hạn của tổ tiên từ trăm năm trước.",
+      "openingAdvantage": "Nhớ rõ loại linh dược nào sẽ tăng giá đột biến, nam chính dùng 10 năm tuổi thọ của mình cược vào vụ mùa đầu tiên để giữ đất.",
+      "progressionProof": "Linh điền từ màu tro tàn chuyển sang đỏ thẫm, các thành viên từ chỗ giấu giếm tuổi thọ đến việc lập quỹ thời gian chung.",
+      "worldProof": {
+        "signatureSituations": [
+          "Buổi họp tộc đo đếm nếp nhăn và tóc bạc để quyết định ai đủ điều kiện xuống đồng luân canh mùa tới.",
+          "Nghi thức truyền thọ nguyên qua rễ Thanh Tùng, nơi người sắp chết dồn chút hơi tàn cuối cùng vào đất.",
+          "Xung đột khi một thiên tài từ chối hiến tuổi thọ theo nghĩa vụ vì sợ ảnh hưởng căn cơ Trúc Cơ."
+        ],
+        "institutionalReaction": "Thương hội ép giá linh điền vì biết gia tộc đã cạn tuổi thọ, sau đó hoảng sợ khi thấy họ thu hoạch linh dược thượng phẩm.",
+        "resourceCirculation": "Tuổi thọ được lượng hóa thành 'Thọ Châu' qua rễ Tùng, dùng để trả công luân canh hoặc mua đứt minh ước.",
+        "thirtyChapterMutation": "Linh dược thu hoạch được dùng để cứu một trưởng bối, nhưng ông lại lén chia cho cháu ngoại khác họ, phá vỡ kế hoạch tích lũy."
+      },
+      "antiCloneFingerprint": "foresight_market_spike|lifespan_reclamation|lifespan_pearls|branch_sacrifice_inequality|tree_ring_lifespan_mortgage"
+    },
+    {
+      "id": "concept_skill_fragment_rotation",
+      "workingTitle": "Mảnh Ghép Truyền Thừa: Luân Canh Trận Pháp",
+      "readerCuriosity": "Làm sao để canh tác khi mỗi nhánh họ chỉ nắm giữ một phần ba khẩu quyết điều khiển thời tiết của linh điền?",
+      "readerFantasy": "Hàn gắn gia tộc rạn nứt bằng cách khéo léo kết hợp các mảnh ghép kỹ năng, tạo ra chuỗi sản xuất độc quyền.",
+      "premise": "Trọng sinh về lúc các nhánh đòi chia gia tài, nam chính dùng minh ước Thanh Tùng ép họ hợp tác luân canh để tạo ra linh vật hoàn chỉnh.",
+      "irreversibleProblem": "Nếu bán linh điền, trận pháp thời tiết sẽ vỡ, các mảnh truyền thừa của mỗi nhánh sẽ trở thành phế phẩm vĩnh viễn.",
+      "protagonistContradiction": "Phải giao phó những khâu quan trọng nhất cho những kẻ từng phản bội gia tộc ở kiếp trước vì chỉ họ mới có kỹ năng.",
+      "domainMechanism": "Linh điền yêu cầu luân canh bằng ba loại linh lực khác nhau; vòng gỗ Thanh Tùng khóa chặt kỹ năng, cấm truyền dạy chéo giữa các nhánh.",
+      "conflictEngine": "Nhánh nắm kỹ năng cốt lõi đòi chia phần nhiều hơn, nhánh yếu thế dùng quyền ngắt nước để đình công tống tiền.",
+      "emotionalCore": "Sự tin tưởng buộc phải có giữa những người ruột thịt luôn nghi kỵ lẫn nhau, dần dần biến thành sự thấu hiểu thực sự.",
+      "differenceClaim": "Phân chia giai cấp trong gia tộc dựa trên độc quyền kỹ năng canh tác thay vì cảnh giới tu vi thuần túy.",
+      "nearestComparisonRisk": "Dễ biến thành truyện quản lý công ty hiện đại nếu thiếu đi yếu tố phản phệ tâm ma của minh ước tu tiên.",
+      "serialityProof": "Mở rộng quy mô đòi hỏi phải tìm lại những nhánh họ đã thất lạc mang theo các mảnh ghép kỹ năng cao cấp hơn.",
+      "openingAdvantage": "Biết cách dung hợp tạm thời hai mảnh kỹ năng bằng máu của mình, nam chính biểu diễn phép gọi mưa để ép các nhánh hủy bỏ khế ước bán đất.",
+      "progressionProof": "Từ việc phải dùng máu ép buộc hợp tác, đến lúc ba nhánh tự động phối hợp tạo ra dị tượng thời tiết khi luân canh.",
+      "worldProof": {
+        "signatureSituations": [
+          "Ba vị trưởng lão đứng ở ba góc linh điền, gầm gừ đe dọa nhau nhưng tay vẫn phải bấm quyết đồng bộ để gọi mưa.",
+          "Một đứa trẻ vô tình thức tỉnh kỹ năng của nhánh khác, bị đưa ra trước Thanh Tùng để phán xét tội ăn cắp truyền thừa.",
+          "Đàm phán hôn minh thất bại vì nhà gái đòi của hồi môn là một mảnh khẩu quyết luân canh cốt lõi."
+        ],
+        "institutionalReaction": "Các thế lực lớn cố gắng ám sát một nhánh để phá vỡ thế độc quyền sản xuất của gia tộc, buộc họ phải bảo vệ nhau.",
+        "resourceCirculation": "Quyền lợi được chia theo 'thời lượng đóng góp kỹ năng'; minh ước quy định rõ ai làm sai nhịp phải đền bù linh thạch.",
+        "thirtyChapterMutation": "Đầu tư tài nguyên cho một thiên tài học kỹ năng mới, nhưng nó lại sáng tạo ra biến thể làm thay đổi hoàn toàn quy trình luân canh kiếp trước."
+      },
+      "antiCloneFingerprint": "foresight_skill_fusion|monopoly_production|skill_contribution_time|core_skill_extortion|tree_ring_skill_lock"
+    },
+    {
+      "id": "concept_ancestral_debt_harvest",
+      "workingTitle": "Nợ Tổ Tiên: Mùa Vụ Trả Quả",
+      "readerCuriosity": "Gia tộc sẽ ra sao khi linh điền không mọc ra linh thảo, mà mọc ra những 'khoản nợ' do tổ tiên để lại cần người sống gánh vác?",
+      "readerFantasy": "Thanh toán từng khoản nợ nghiệp chướng của gia tộc, biến quả báo thành tài nguyên tu luyện thông qua luân canh.",
+      "premise": "Nam chính ngăn bán linh điền vì biết người mua thực chất muốn kích nổ nợ nghiệp; hắn dùng minh ước để tái phân bổ nợ cho các nhánh.",
+      "irreversibleProblem": "Bán đất đồng nghĩa với việc toàn bộ nợ nghiệp của tổ tiên sẽ giáng thẳng vào thần hồn của những đứa trẻ mới sinh.",
+      "protagonistContradiction": "Phải ép con cháu đối mặt với những thử thách sinh tử do lỗi lầm của người đi trước, đóng vai ác nhân để cứu tộc.",
+      "domainMechanism": "Vòng gỗ Thanh Tùng ghi lại nợ nghiệp; luân canh là quá trình chuyển hóa nợ nghiệp thành thực thể (quái vật, dị tượng) để tiêu diệt và thu hoạch.",
+      "conflictEngine": "Nhánh họ có tổ tiên gây nhiều nợ bị các nhánh khác cô lập và ép phải nhận phần nước tưới ít nhất.",
+      "emotionalCore": "Sự chuộc lỗi xuyên thế hệ; người trẻ học cách tha thứ cho sai lầm của tổ tiên khi tự tay gặt hái thành quả từ nợ nghiệp.",
+      "differenceClaim": "Biến lịch sử đen tối của gia tộc thành một loại tài nguyên có thể khai thác thông qua cơ chế nông nghiệp tâm linh.",
+      "nearestComparisonRisk": "Giống truyện thợ săn quái vật nếu không gắn chặt việc xuất hiện nợ nghiệp với chu kỳ luân canh và chia nước.",
+      "serialityProof": "Mỗi vòng gỗ sâu hơn của Thanh Tùng chứa những khoản nợ cổ xưa và nguy hiểm hơn, đòi hỏi sự đoàn kết lớn hơn.",
+      "openingAdvantage": "Nhớ rõ khoản nợ đầu tiên sẽ hóa thành linh vật gì, nam chính dùng toàn bộ gia sản cược vào vũ khí khắc chế để giữ đất.",
+      "progressionProof": "Từ việc sợ hãi khi linh điền kết trái nợ, đến lúc các nhánh tranh nhau quyền luân canh ở những thửa ruộng có nợ nghiệp cao để thu lợi.",
+      "worldProof": {
+        "signatureSituations": [
+          "Cả gia tộc vũ trang đầy đủ đứng quanh linh điền chờ 'thu hoạch', khi nợ nghiệp hóa thành ma thú trồi lên từ đất.",
+          "Một nhánh họ từ chối chia nước vì sợ nước sẽ kích hoạt khoản nợ của cụ tổ họ từng tàn sát phàm nhân.",
+          "Đứa trẻ sinh ra mang bớt hình vòng gỗ, bị coi là vật thế mạng cho nợ nghiệp chưa trả hết."
+        ],
+        "institutionalReaction": "Tông môn quản lý địa phương thu thuế bằng 'nợ nghiệp đã thanh tẩy', ép gia tộc phải liên tục canh tác nguy hiểm.",
+        "resourceCirculation": "Nợ nghiệp thanh tẩy hóa thành 'Tịnh Tinh'; minh ước phân chia Tịnh Tinh dựa trên mức độ rủi ro khi gánh nợ.",
+        "thirtyChapterMutation": "Đầu tư vũ khí cho một nhánh để gánh nợ, nhưng họ lại dùng nó để uy hiếp đòi quyền trưởng tộc, làm chệch hướng lịch sử."
+      },
+      "antiCloneFingerprint": "foresight_karma_entity|karma_purification_crystal|cleansed_karma_tax|ancestral_sin_isolation|tree_ring_karma_record"
+    },
+    {
+      "id": "concept_emotion_fed_flora",
+      "workingTitle": "Thất Tình Linh Điền: Canh Tác Cảm Xúc",
+      "readerCuriosity": "Làm sao để trồng trọt khi linh điền yêu cầu luân canh bằng các loại cảm xúc cực đoan (Hỉ, Nộ, Ái, Ố) của người chăm sóc?",
+      "readerFantasy": "Thao túng và điều hòa tâm lý của cả gia tộc, biến những mâu thuẫn nội bộ thành nguồn phân bón thượng hạng.",
+      "premise": "Trọng sinh, nam chính nhận ra việc gia tộc lục đục chính là điều kiện hoàn hảo để trồng Huyết Nộ Liên, bèn xé giấy bán đất.",
+      "irreversibleProblem": "Nếu bán đất, gia tộc sẽ mất đi nơi xả cảm xúc, minh ước Thanh Tùng sẽ phản phệ khiến tất cả tẩu hỏa nhập ma vì uất ức.",
+      "protagonistContradiction": "Phải cố tình kích động mâu thuẫn giữa các nhánh họ để duy trì năng suất linh điền, dù bản thân khao khát bình yên.",
+      "domainMechanism": "Vòng gỗ Thanh Tùng hấp thụ và ghi nhớ tần số cảm xúc; luân canh là việc đổi người chăm sóc có tâm trạng phù hợp với từng giai đoạn của cây.",
+      "conflictEngine": "Người đang hạnh phúc không thể chăm sóc cây cần sự bi ai; gia tộc ép buộc các thành viên phải trải qua bi kịch để làm việc.",
+      "emotionalCore": "Sự hy sinh thầm lặng khi một người chấp nhận đóng vai kẻ phản diện bị ghét bỏ chỉ để cung cấp 'Nộ khí' cho linh điền.",
+      "differenceClaim": "Tài nguyên nông nghiệp gắn liền trực tiếp với trạng thái tâm lý, biến drama gia tộc thành một phần của quy trình sản xuất.",
+      "nearestComparisonRisk": "Dễ thành truyện cẩu huyết gia đấu nếu không có cơ chế minh ước và luân canh kiểm soát chặt chẽ hậu quả.",
+      "serialityProof": "Các loại linh dược cao cấp hơn đòi hỏi những cảm xúc phức tạp và tinh tế hơn, buộc nam chính phải dàn xếp những kịch bản tâm lý khó.",
+      "openingAdvantage": "Biết trước cơn giận dữ của đại bá khi bị từ hôn, nam chính dùng minh ước ép ông ra đồng cày cuốc, vô tình tạo ra vụ mùa bội thu.",
+      "progressionProof": "Từ việc cãi vã vô ý thức, các nhánh bắt đầu học cách kiểm soát và 'đóng kịch' cảm xúc để tối ưu hóa luân canh chia nước.",
+      "worldProof": {
+        "signatureSituations": [
+          "Buổi chia nước luân canh biến thành đại hội kể khổ, ai khóc to và chân thật nhất sẽ được phân ruộng Bi Thương.",
+          "Một cặp tình nhân bị gia tộc cấm cản không phải vì môn đăng hộ đối, mà vì họ cần 'Oán khí' của sự chia ly cho mùa vụ tới.",
+          "Nam chính đứng trước Thanh Tùng, dùng minh ước ép một trưởng lão phải tha thứ cho kẻ thù để chuyển đổi thuộc tính đất."
+        ],
+        "institutionalReaction": "Thị trường ưa chuộng linh dược của gia tộc vì nó chứa cảm xúc thuần túy giúp đột phá tâm ma, đẩy giá lên cao.",
+        "resourceCirculation": "Cảm xúc kết tinh thành 'Tình Lệ'; minh ước quy định rõ ai đóng góp cảm xúc nào sẽ nhận lại tài nguyên tương ứng.",
+        "thirtyChapterMutation": "Đầu tư bồi dưỡng một hạt giống 'Hỉ khí', nhưng đứa trẻ lại gặp biến cố mất người thân, biến thành 'Bi khí' phá hỏng toàn bộ quy hoạch."
+      },
+      "antiCloneFingerprint": "foresight_emotional_trigger|emotion_crystal_tears|staged_family_drama|forced_tragedy_for_harvest|tree_ring_emotion_frequency"
+    },
+    {
+      "id": "concept_time_borrowed_harvest",
+      "workingTitle": "Vay Mượn Tương Lai: Linh Điền Nghịch Thời",
+      "readerCuriosity": "Nếu nước luân canh hôm nay được rút từ dòng thời gian của 50 năm sau, con cháu sẽ lấy gì để tưới tiêu?",
+      "readerFantasy": "Sử dụng đòn bẩy thời gian một cách hoàn hảo, vay mượn tài nguyên của tương lai để cứu hiện tại và đầu tư sinh lời trả nợ.",
+      "premise": "Nam chính hủy khế ước bán đất, dùng minh ước Thanh Tùng kích hoạt trận pháp vay mượn linh khí từ tương lai của chính gia tộc.",
+      "irreversibleProblem": "Bán đất lúc này sẽ khiến khoản nợ thời gian của tổ tiên đáo hạn ngay lập tức, xóa sổ sự tồn tại của thế hệ trẻ.",
+      "protagonistContradiction": "Mỗi lần tưới nước cho linh điền hiện tại là đang bóp nghẹt tài nguyên của con cháu, tạo ra cảm giác tội lỗi tột cùng.",
+      "domainMechanism": "Vòng gỗ Thanh Tùng là đồng hồ đếm ngược nợ thời gian; luân canh là việc các nhánh thay nhau gánh vác việc trả nợ linh khí cho tương lai.",
+      "conflictEngine": "Thế hệ già muốn vay mượn thêm để đột phá, thế hệ trẻ nổi loạn vì sinh ra đã mang nợ linh khí không thể tu luyện.",
+      "emotionalCore": "Tình yêu thương nghiệt ngã: vắt kiệt tương lai của con để giữ mạng cho nó hôm nay, hy vọng một ngày có thể trả đủ nợ.",
+      "differenceClaim": "Đưa khái niệm tài chính (nợ công, lạm phát tài nguyên) vào tu tiên thông qua cơ chế thao túng thời gian cục bộ của linh điền.",
+      "nearestComparisonRisk": "Giống truyện hệ thống vay mượn nếu không neo chặt vào vật thể vật lý là vòng gỗ Thanh Tùng và hành động chia nước.",
+      "serialityProof": "Khoản nợ thời gian ngày càng phình to, buộc gia tộc phải bành trướng thế lực để cướp linh mạch của kẻ khác bù đắp vào lỗ hổng.",
+      "openingAdvantage": "Nhớ rõ tọa độ một mạch nước ngầm sẽ xuất hiện sau 10 năm, nam chính dùng minh ước thế chấp nó để vay nước cứu vụ mùa hiện tại.",
+      "progressionProof": "Từ việc tuyệt vọng vay mượn từng giọt nước, đến lúc gia tộc đủ giàu để 'trả nợ trước hạn' và bắt đầu tích lũy cho tương lai.",
+      "worldProof": {
+        "signatureSituations": [
+          "Nghi thức chia nước căng thẳng khi nước tưới xuống đất hôm nay khiến một đứa trẻ vừa sinh ra bị hụt mất một tầng tu vi.",
+          "Trưởng bối quỳ gối trước Thanh Tùng, xin lỗi những đứa cháu chưa ra đời trước khi mở van nước vay mượn.",
+          "Xung đột nổ ra khi một nhánh lén dùng nước tương lai để tưới cho linh thảo tư lợi, đẩy nợ chung lên cao."
+        ],
+        "institutionalReaction": "Thiên Đạo phái Lôi Kiếp xuống cảnh cáo việc lạm dụng thời gian, buộc gia tộc phải dùng minh ước để che giấu thiên cơ.",
+        "resourceCirculation": "Tài nguyên giao dịch là 'Thời Tinh' (thời gian cô đặc); minh ước là các hợp đồng tương lai có kỳ hạn rõ ràng.",
+        "thirtyChapterMutation": "Khoản đầu tư vào một thiên tài thành công, nhưng hắn từ chối dùng sức mạnh để trả nợ thời gian mà bỏ trốn, để lại hậu quả khôn lường."
+      },
+      "antiCloneFingerprint": "foresight_future_vein|time_crystal_currency|future_resource_leverage|youth_born_with_debt|tree_ring_time_countdown"
+    },
+    {
+      "id": "concept_symbiotic_curse_farming",
+      "workingTitle": "Đồng Sinh Cộng Tử: Linh Điền Chú Thuật",
+      "readerCuriosity": "Tại sao linh điền chỉ tươi tốt khi các nhánh họ trong gia tộc liên tục nguyền rủa và hóa giải lời nguyền cho nhau?",
+      "readerFantasy": "Biến những mâu thuẫn, thù hằn nội tộc thành một hệ sinh thái khép kín, nơi độc dược của người này là phân bón của người kia.",
+      "premise": "Trọng sinh, nam chính ngăn bán đất bằng cách tiết lộ bí mật: linh điền Thanh Tùng thực chất là một trận pháp nuôi dưỡng chú thuật.",
+      "irreversibleProblem": "Bán linh điền sẽ giải phóng toàn bộ chú thuật tích tụ ngàn năm, nguyền rủa mọi kẻ mang huyết mạch gia tộc thành phế nhân.",
+      "protagonistContradiction": "Phải duy trì sự thù địch ở mức độ vừa phải giữa các nhánh để có 'Chú lực' canh tác, ngăn cản họ thực sự hòa giải.",
+      "domainMechanism": "Vòng gỗ Thanh Tùng ghi nhận các lời nguyền; luân canh là việc chuyển giao chú thuật từ đất sang người, rồi từ người sang cây.",
+      "conflictEngine": "Nhánh bị nguyền rủa đòi bồi thường tài nguyên lớn để chịu đựng đau đớn, trong khi nhánh hạ chú không muốn trả giá.",
+      "emotionalCore": "Sự gắn kết kỳ dị: họ ghét nhau, nguyền rủa nhau, nhưng lại không thể sống thiếu nhau vì sinh mệnh đã trói buộc qua linh điền.",
+      "differenceClaim": "Thay vì linh khí, năng lượng vận hành gia tộc là 'Chú lực' sinh ra từ ác ý có kiểm soát, tạo ra một gia tộc tu tiên hắc ám nhưng đoàn kết.",
+      "nearestComparisonRisk": "Dễ bị nhầm với ma tu tàn sát nếu không nhấn mạnh vào tính quy củ, minh ước và giới hạn của việc hạ chú trong nội tộc.",
+      "serialityProof": "Cần tìm kiếm và dung hợp các loại chú thuật mới từ bên ngoài để đa dạng hóa sản phẩm linh dược của gia tộc.",
+      "openingAdvantage": "Biết trước một loại chú thuật thất truyền, nam chính tự hạ chú lên bản thân để kích thích linh điền hồi sinh, lấy cớ giữ đất.",
+      "progressionProof": "Từ việc nguyền rủa bừa bãi gây thương vong, gia tộc lập ra 'Chú Quy', biến việc hạ chú thành một nghề nghiệp chuyên môn cao.",
+      "worldProof": {
+        "signatureSituations": [
+          "Lễ hội chia nước hàng năm thực chất là đại hội thi đấu hạ chú, nhánh nào thắng sẽ được quyền chọn ruộng luân canh.",
+          "Một trưởng lão ốm yếu vì gánh quá nhiều chú thuật, được cả gia tộc kính trọng dâng lên linh dược tốt nhất để kéo dài mạng.",
+          "Hôn minh với bên ngoài bị hủy vì nhà gái phát hiện sính lễ là một rương chứa đầy 'Ác Chú Tinh' đang đập thình thịch."
+        ],
+        "institutionalReaction": "Các danh môn chính phái kinh tởm phương pháp canh tác này nhưng vẫn lén lút mua linh dược giải độc cực mạnh của gia tộc.",
+        "resourceCirculation": "Giao dịch bằng 'Chú Ấn'; minh ước Thanh Tùng đóng vai trò như một cơ quan bảo hiểm, đảm bảo không ai bị nguyền rủa đến chết.",
+        "thirtyChapterMutation": "Đầu tư cho một nhánh phát triển chú thuật phòng ngự, nhưng họ lại vô tình tạo ra một loại chú lây nhiễm làm hỏng một nửa linh điền."
+      },
+      "antiCloneFingerprint": "foresight_lost_curse|curse_seal_currency|controlled_malice_ecology|compensation_for_suffering|tree_ring_curse_record"
+    },
+    {
+      "id": "concept_memory_soil_harvest",
+      "workingTitle": "Đất Nuôi Ký Ức: Vụ Mùa Lãng Quên",
+      "readerCuriosity": "Gia tộc sẽ trả giá thế nào khi linh điền yêu cầu phân bón là những đoạn ký ức quý giá nhất của người cày cuốc?",
+      "readerFantasy": "Lựa chọn hy sinh những ký ức đau buồn hoặc không cần thiết để đổi lấy tài nguyên, tái thiết lại lịch sử gia tộc.",
+      "premise": "Nam chính ngăn bán đất, dùng minh ước Thanh Tùng để thiết lập quy trình hiến tế ký ức có chọn lọc, cứu sống linh điền.",
+      "irreversibleProblem": "Bán đất sẽ khiến toàn bộ ký ức tổ tiên lưu trong đất bị xóa sổ, gia tộc sẽ quên mất nguồn gốc và công pháp cốt lõi.",
+      "protagonistContradiction": "Nam chính có lợi thế trọng sinh (nhiều ký ức), nhưng mỗi lần hiến tế để cứu nguy, hắn lại quên đi một phần lợi thế tương lai.",
+      "domainMechanism": "Vòng gỗ Thanh Tùng lưu trữ bản sao ký ức; luân canh là việc các nhánh thay nhau cấy ký ức vào đất và uống nước chứa ký ức của người khác.",
+      "conflictEngine": "Tranh cãi xem ký ức của ai ít giá trị hơn để đem đi bón ruộng; người già sợ quên con cháu, người trẻ sợ quên kỹ năng.",
+      "emotionalCore": "Nỗi buồn man mác khi nhìn người thân ăn linh dược mọc lên từ chính kỷ niệm tuổi thơ của họ mà họ không còn nhớ.",
+      "differenceClaim": "Tài nguyên canh tác là thông tin và kỷ niệm, biến việc mất trí nhớ thành một loại thuế tài nguyên có hệ thống.",
+      "nearestComparisonRisk": "Giống các truyện đổi tuổi thọ lấy sức mạnh nếu không tập trung vào sự xáo trộn quan hệ xã hội khi mất ký ức.",
+      "serialityProof": "Ký ức hiến tế càng mạnh (tình yêu, thù hận sâu sắc), linh dược càng quý; nam chính phải đi săn ký ức từ kẻ thù.",
+      "openingAdvantage": "Dùng một đoạn ký ức về kho báu tương lai (chấp nhận quên nó) để bón cho gốc Tùng, tạo ra linh khí bùng nổ cản trở việc bán đất.",
+      "progressionProof": "Từ việc ép buộc hiến tế ký ức, gia tộc lập ra 'Ngân hàng Ký ức', cho phép vay mượn và chuộc lại kỷ niệm bằng linh thạch.",
+      "worldProof": {
+        "signatureSituations": [
+          "Một người mẹ cày ruộng xong nhìn con mình với ánh mắt xa lạ, phải đọc lại nhật ký ghi trên vòng gỗ để biết đó là con mình.",
+          "Nước luân canh bị ô nhiễm bởi ký ức tẩu hỏa nhập ma của một trưởng lão, khiến cả nhánh họ gặp ác mộng hàng đêm.",
+          "Tranh chấp tài sản vì bản di chúc ghi trong ký ức của tộc trưởng đã bị đem đi bón cho cây Thanh Tùng."
+        ],
+        "institutionalReaction": "Thương nhân thích mua linh dược của gia tộc vì khi ăn vào sẽ trải nghiệm được những đoạn ký ức tuyệt đẹp đính kèm.",
+        "resourceCirculation": "Đơn vị tiền tệ là 'Niệm Châu' (ký ức kết tinh); minh ước quy định quyền được chuộc lại ký ức sau thu hoạch.",
+        "thirtyChapterMutation": "Đầu tư cho một thiên tài bằng cách cho nó hấp thụ ký ức chiến đấu của tổ tiên, nhưng nó lại bị nhân cách tổ tiên đồng hóa, chống lại nam chính."
+      },
+      "antiCloneFingerprint": "foresight_memory_sacrifice|memory_pearl_currency|memory_bank_system|fear_of_forgetting_kin|tree_ring_memory_backup"
+    },
+    {
+      "id": "concept_shadow_pact_rotation",
+      "workingTitle": "Bóng Tùng Đổ Bóng: Khế Ước Âm Dương",
+      "readerCuriosity": "Linh điền chia làm hai nửa Âm Dương, nhánh họ cày ruộng Âm sẽ bị tước đoạt ngũ quan để nuôi dưỡng ruộng Dương?",
+      "readerFantasy": "Sử dụng minh ước để luân chuyển sự hy sinh một cách công bằng, biến sự tàn tật tạm thời thành bước đệm rèn luyện tâm trí.",
+      "premise": "Nam chính xé bỏ khế ước bán đất, kích hoạt trận pháp Âm Dương của Thanh Tùng, bắt đầu chu kỳ luân canh ánh sáng và bóng tối.",
+      "irreversibleProblem": "Bán nửa ruộng Dương sẽ khiến nửa ruộng Âm vĩnh viễn chìm trong bóng tối, những người đang cày ở đó sẽ kẹt lại mãi mãi.",
+      "protagonistContradiction": "Phải tự tay đẩy những người thân thiết vào ruộng Âm chịu cảnh mù lòa, câm điếc tạm thời để đổi lấy tài nguyên cho toàn tộc.",
+      "domainMechanism": "Vòng gỗ Thanh Tùng điều khiển hướng đổ bóng; luân canh là việc các nhánh đổi chỗ giữa vùng sáng (thu hoạch) và vùng tối (trả giá ngũ quan).",
+      "conflictEngine": "Nhánh đang ở vùng sáng không muốn đổi chỗ khi đến hạn; nhánh ở vùng tối nghi ngờ mình bị bỏ rơi và lén phá hoại mạch nước.",
+      "emotionalCore": "Sự tin tưởng tuyệt đối khi một người chấp nhận mất đi thị giác, giao phó sinh mạng cho người ở vùng sáng dẫn đường qua minh ước.",
+      "differenceClaim": "Cơ chế luân canh vật lý đi kèm với sự tước đoạt giác quan có thời hạn, tạo ra sự phụ thuộc lẫn nhau cực độ giữa các nhánh.",
+      "nearestComparisonRisk": "Dễ thành truyện sinh tồn kinh dị nếu thiếu đi ánh sáng của tình thân và sự đền bù xứng đáng khi trở lại vùng sáng.",
+      "serialityProof": "Mở rộng linh điền đòi hỏi phải kiểm soát những vùng bóng tối sâu hơn, nơi tước đoạt cả cảm giác đau đớn hay ý thức.",
+      "openingAdvantage": "Biết trước quy luật đổ bóng của Thanh Tùng, nam chính chọn đứng vào vùng tối nguy hiểm nhất để chứng minh sự an toàn, thuyết phục gia tộc không bán đất.",
+      "progressionProof": "Từ việc hoảng loạn khi mất ngũ quan, các thành viên học được cách tu luyện 'Tâm Nhãn' trong vùng tối, tăng cường chiến lực thực tế.",
+      "worldProof": {
+        "signatureSituations": [
+          "Lễ bàn giao luân canh: người từ vùng tối bước ra, nhận lại đôi mắt từ người vùng sáng chuẩn bị bước vào.",
+          "Một nhánh họ ở vùng sáng lén lút bớt xén nước sạch, khiến người ở vùng tối bị ảo giác tấn công lẫn nhau.",
+          "Đứa trẻ sinh ra trong vùng tối mang đôi mắt trắng dã, có khả năng nhìn thấu linh mạch nhưng không thể ra ngoài ánh sáng."
+        ],
+        "institutionalReaction": "Kẻ thù tấn công gia tộc vào ngày luân canh vì nghĩ họ yếu nhất, nhưng bị tàn sát bởi những tu sĩ đã quen chiến đấu không cần ngũ quan.",
+        "resourceCirculation": "Tài nguyên là 'Quang Tinh' và 'Ám Tinh'; minh ước quy định tỷ lệ trao đổi bắt buộc để cân bằng âm dương trong cơ thể.",
+        "thirtyChapterMutation": "Nhánh họ được đầu tư nhiều nhất ở vùng sáng từ chối luân canh, dùng tài nguyên xây trận pháp cản bóng tối, phá vỡ hệ sinh thái."
+      },
+      "antiCloneFingerprint": "foresight_shadow_pattern|light_dark_crystals|temporary_sense_deprivation|blind_trust_navigation|tree_ring_shadow_control"
+    },
+    {
+      "id": "concept_blood_resonance_fields",
+      "workingTitle": "Huyết Mạch Đồng Thanh: Linh Điền Hát Ca",
+      "readerCuriosity": "Linh điền không cần phân bón, chỉ cần các nhánh họ cùng hòa âm bằng nhịp đập của huyết mạch, nhưng sai một nhịp sẽ nổ tung?",
+      "readerFantasy": "Biến một gia tộc rời rạc, mạnh ai nấy sống thành một dàn nhạc giao hưởng hoàn hảo thông qua kỷ luật và minh ước.",
+      "premise": "Nam chính ngăn bán đất bằng cách dùng máu mình gõ nhịp lên Thanh Tùng, đánh thức linh điền đang ngủ say vì thiếu sự đồng điệu.",
+      "irreversibleProblem": "Bán đất sẽ phá vỡ 'Huyết Âm' của gia tộc, khiến mọi công pháp âm luật truyền đời trở thành thứ giết chết chính người tu.",
+      "protagonistContradiction": "Phải ép những kẻ thù ghét nhau tột độ ngồi lại, đồng bộ nhịp tim và hơi thở để tưới nước, dù chỉ muốn chém chết đối phương.",
+      "domainMechanism": "Vòng gỗ Thanh Tùng là khuông nhạc; luân canh là việc các nhánh thay đổi bè (trầm, bổng) trong bản hòa tấu huyết mạch để kích thích đất.",
+      "conflictEngine": "Nhánh có tu vi cao chê nhánh thấp làm sai nhịp; người bị thương loạn nhịp tim bị ép phải rời khỏi trận pháp chia nước, mất quyền lợi.",
+      "emotionalCore": "Khoảnh khắc những xích mích được xóa bỏ tạm thời khi hàng trăm trái tim cùng đập một nhịp để cứu lấy vụ mùa đang héo úa.",
+      "differenceClaim": "Sử dụng âm nhạc và nhịp điệu sinh học làm cơ chế canh tác, biến sự đoàn kết từ một khái niệm trừu tượng thành yêu cầu kỹ thuật cứng.",
+      "nearestComparisonRisk": "Giống truyện tu tiên âm luật thông thường nếu không gắn chặt với việc luân canh nông nghiệp và sinh kế gia tộc.",
+      "serialityProof": "Các loại linh dược quý hiếm yêu cầu những bản nhạc huyết mạch phức tạp hơn, đòi hỏi gia tộc phải sinh thêm người mang dị bẩm.",
+      "openingAdvantage": "Nhớ được 'Bản nhạc' thất truyền của tổ tiên, nam chính hướng dẫn ba nhánh họ gõ nhịp, tạo ra mưa linh khí ngay chương một để giữ đất.",
+      "progressionProof": "Từ việc gõ nhịp lộn xộn gây thổ huyết, gia tộc tiến tới việc dùng nhịp đập huyết mạch để giao tiếp không lời và chiến đấu tập thể.",
+      "worldProof": {
+        "signatureSituations": [
+          "Buổi chia nước im phăng phắc, chỉ có tiếng nhịp tim đập thình thịch đồng bộ của hàng trăm người vang vọng quanh gốc Tùng.",
+          "Một trưởng lão cố tình làm sai nhịp để phá hoại vụ mùa của nhánh đối thủ, bị minh ước phản phệ vỡ nát màng nhĩ.",
+          "Đứa trẻ sinh ra bị điếc bẩm sinh, bị coi là phế vật cho đến khi nam chính phát hiện nó có thể cảm nhận nhịp đập qua lòng đất."
+        ],
+        "institutionalReaction": "Các tông môn khác gửi đệ tử đến 'nghe lén' nhịp điệu canh tác, buộc gia tộc phải tạo ra các bản nhạc giả để đánh lừa.",
+        "resourceCirculation": "Tài nguyên là 'Âm Phù' kết tinh từ đất; minh ước quy định ai giữ bè chính sẽ được chia nhiều Âm Phù hơn.",
+        "thirtyChapterMutation": "Đầu tư tài nguyên chữa bệnh cho một thiên tài loạn nhịp tim, nhưng khi khỏi bệnh, nhịp đập của nó lại quá mạnh, lấn át và phá hỏng nhịp chung của toàn tộc."
+      },
+      "antiCloneFingerprint": "foresight_lost_symphony|sound_rune_crystals|heartbeat_synchronization|arrhythmia_exile|tree_ring_musical_score"
+    },
+    {
+      "id": "concept_oath_bound_crafting",
+      "workingTitle": "Minh Ước Hóa Cụ: Nông Cụ Trói Hồn",
+      "readerCuriosity": "Linh điền cực kỳ cứng rắn, chỉ có thể cày xới bằng nông cụ rèn từ gỗ Thanh Tùng và được kích hoạt bằng lời thề độc của người dùng?",
+      "readerFantasy": "Xây dựng một hệ thống phân công lao động nghiêm ngặt, nơi sức mạnh của công cụ tỷ lệ thuận với trách nhiệm gánh vác gia tộc.",
+      "premise": "Nam chính ngăn bán đất, dùng quyền trưởng tộc mở kho chứa nông cụ Thanh Tùng, ép các nhánh thề độc để nhận công cụ luân canh.",
+      "irreversibleProblem": "Bán đất đồng nghĩa với việc giao nộp Thanh Tùng, các nông cụ đang liên kết với hồn phách người trong tộc sẽ lập tức vỡ vụn, phế bỏ tu vi họ.",
+      "protagonistContradiction": "Khuyến khích người thân thề những lời thề nguy hiểm (như bảo vệ nhánh khác bằng mạng sống) để nông cụ đủ sắc bén cày đất.",
+      "domainMechanism": "Vòng gỗ Thanh Tùng cung cấp phôi gỗ; luân canh là việc chuyển giao nông cụ giữa các nhánh, đòi hỏi người nhận phải gánh luôn lời thề của người trước.",
+      "conflictEngine": "Không ai muốn nhận chiếc cày mang lời thề 'tuyệt tự nếu làm hỏng vụ mùa', dẫn đến đùn đẩy trách nhiệm chia nước và luân canh.",
+      "emotionalCore": "Sự kính trọng dành cho những trưởng bối mang trên mình hàng chục lời thề độc, dùng cả sinh mạng để giữ cho nông cụ gia tộc luôn sắc bén.",
+      "differenceClaim": "Vật chất hóa lời thề thành công cụ sản xuất, biến đạo đức và trách nhiệm thành thông số kỹ thuật có thể đo lường.",
+      "nearestComparisonRisk": "Dễ nhầm với truyện luyện khí sư nếu không giữ bối cảnh nông nghiệp luân canh và sự ràng buộc luân chuyển công cụ.",
+      "serialityProof": "Đất ngày càng cằn cỗi, yêu cầu những lời thề khắc nghiệt hơn để rèn nông cụ mới, buộc gia tộc phải tìm cách lách luật Thiên Đạo.",
+      "openingAdvantage": "Biết trước kẽ hở của một lời thề cổ, nam chính rút được chiếc cuốc mạnh nhất từ gốc Tùng mà không bị phản phệ, uy hiếp kẻ định mua đất.",
+      "progressionProof": "Từ việc sợ hãi lời thề, các nhánh bắt đầu tính toán 'lãi suất lời thề', thề những điều có lợi cho cả đôi bên để tối ưu hóa công cụ.",
+      "worldProof": {
+        "signatureSituations": [
+          "Nghi thức bàn giao cày: người nhận phải rạch tay nhỏ máu lên lưỡi cày, lặp lại nguyên văn lời thề của người giao.",
+          "Một lưỡi liềm cùn đi giữa chừng vì người dùng vừa nảy sinh ý định phản bội gia tộc, làm hỏng cả hệ thống chia nước.",
+          "Tranh giành quyền thừa kế một chiếc cuốc rỉ sét nhưng mang lời thề mang lại may mắn cho con cháu."
+        ],
+        "institutionalReaction": "Thương hội bên ngoài muốn mua nông cụ của gia tộc, nhưng phát hiện người ngoài cầm vào sẽ bị lời thề cắn trả đến chết.",
+        "resourceCirculation": "Tài nguyên là 'Thệ Mộc' (gỗ chứa lời thề); minh ước là sổ đăng ký quản lý rủi ro của các lời thề.",
+        "thirtyChapterMutation": "Đầu tư cho một thợ rèn trẻ để tạo nông cụ mới, nhưng nó lại rèn ra một công cụ yêu cầu lời thề tàn sát, gây chia rẽ nội tộc."
+      },
+      "antiCloneFingerprint": "foresight_oath_loophole|oath_wood_currency|tool_sharpness_by_oath|oath_inheritance_refusal|tree_ring_tool_forge"
+    },
+    {
+      "id": "concept_dream_harvest_rotation",
+      "workingTitle": "Mộng Cảnh Linh Điền: Canh Tác Trong Mơ",
+      "readerCuriosity": "Linh điền thực chất là một vùng không gian mộng cảnh; luân canh là việc các nhánh thay nhau ngủ sâu để cày cuốc bằng ý thức?",
+      "readerFantasy": "Xây dựng và bảo vệ một đế chế nông nghiệp trong mơ, nơi các quy tắc vật lý bị bẻ cong bởi ý chí và minh ước gia tộc.",
+      "premise": "Nam chính đánh thức cả gia tộc khỏi cơn mộng mị lười biếng, dùng minh ước Thanh Tùng ép họ đồng bộ giấc mơ để cứu linh điền đang sụp đổ.",
+      "irreversibleProblem": "Bán mảnh đất chứa rễ Thanh Tùng ngoài đời thực sẽ làm mộng cảnh sụp đổ, những người đang ngủ say cày cuốc sẽ kẹt lại thành thực vật.",
+      "protagonistContradiction": "Phải ép người thân đối mặt với ác mộng sâu thẳm của họ trong lúc luân canh, vì ác mộng mới tạo ra linh dược phẩm chất cao.",
+      "domainMechanism": "Vòng gỗ Thanh Tùng là máy chủ kết nối giấc mơ; luân canh là việc chia ca ngủ, nước tưới là 'Tinh Thần Lực' truyền từ người thức sang người ngủ.",
+      "conflictEngine": "Người thức lơ là việc truyền tinh thần lực khiến người ngủ bị quái vật mộng cảnh tấn công; tranh cãi về việc ai phải làm ca đêm (nguy hiểm nhất).",
+      "emotionalCore": "Sự bảo vệ thầm lặng: người thức canh gác thân xác yếu ớt của người ngủ, trong khi người ngủ chiến đấu với ác mộng để mang tài nguyên về.",
+      "differenceClaim": "Chuyển không gian làm ruộng vào mộng cảnh, kết hợp yếu tố Inception với quản lý gia tộc tu tiên.",
+      "nearestComparisonRisk": "Giống truyện võng du/thực tế ảo nếu không nhấn mạnh hậu quả vật lý (tổn thương thần hồn) và cơ chế chia nước/tinh thần lực.",
+      "serialityProof": "Mở rộng mộng cảnh đòi hỏi phải kết nối với giấc mơ của các thực thể cổ đại hoặc gia tộc khác, mang lại rủi ro xâm nhập tâm trí.",
+      "openingAdvantage": "Nhớ rõ cấu trúc mộng cảnh kiếp trước, nam chính hướng dẫn gia tộc tìm thấy một mạch nước ngầm tinh thần bị giấu kín, hủy bỏ ý định bán đất.",
+      "progressionProof": "Từ việc bị ác mộng đuổi giết, gia tộc học cách xây dựng pháo đài trong mơ, biến linh điền thành một căn cứ địa bất khả xâm phạm.",
+      "worldProof": {
+        "signatureSituations": [
+          "Một nửa gia tộc nằm ngủ xếp lớp quanh gốc Thanh Tùng, nửa còn lại căng thẳng truyền tinh thần lực qua các sợi dây leo.",
+          "Một người thức lén cắt đứt dây truyền tinh thần lực của đối thủ, khiến kẻ đó bị kẹt trong mộng cảnh thu hoạch.",
+          "Đứa trẻ mắc chứng mộng du trở thành thiên tài canh tác vì có thể mang vật phẩm từ mộng cảnh ra đời thực mà không cần minh ước."
+        ],
+        "institutionalReaction": "Các thế lực khác không thể cướp linh điền vì nó nằm trong mộng cảnh, chuyển sang ám sát thân xác người đang ngủ.",
+        "resourceCirculation": "Tài nguyên là 'Mộng Tinh'; minh ước quy định rõ trách nhiệm bồi thường nếu người thức làm người ngủ bị thương.",
+        "thirtyChapterMutation": "Đầu tư tài nguyên cho một nhánh xây dựng trận pháp bảo vệ trong mơ, nhưng họ lại dùng nó để cô lập một khu vực mộng cảnh làm của riêng."
+      },
+      "antiCloneFingerprint": "foresight_dream_map|dream_crystal_currency|sleep_shift_farming|waking_guard_betrayal|tree_ring_dream_server"
+    },
+    {
+      "id": "concept_vitality_grafting_fields",
+      "workingTitle": "Tiếp Sinh Linh Điền: Luân Canh Huyết Nhục",
+      "readerCuriosity": "Linh điền không trồng cây, mà trồng chính các bộ phận cơ thể bị đứt lìa của người trong tộc để chúng mọc ra linh dược?",
+      "readerFantasy": "Quản lý một hệ thống y tế/nông nghiệp rùng rợn nhưng hiệu quả, dùng tài nguyên để tái tạo cơ thể cho những người đã cống hiến.",
+      "premise": "Nam chính ngăn bán đất bằng cách tự chặt một ngón tay, dùng minh ước Thanh Tùng cấy vào đất để chứng minh linh điền chưa chết.",
+      "irreversibleProblem": "Bán đất sẽ khiến những bộ phận cơ thể đang 'trồng' dưới đất thối rữa, những người đã cống hiến huyết nhục sẽ chết vì phản phệ.",
+      "protagonistContradiction": "Khuyến khích sự hy sinh thân thể vì lợi ích chung, đóng vai một tộc trưởng máu lạnh để đổi lấy sự sinh tồn của cả họ.",
+      "domainMechanism": "Vòng gỗ Thanh Tùng ghi nhận DNA/huyết nhục; luân canh là việc các nhánh thay nhau hiến tế một phần cơ thể nhỏ, nước tưới là linh khí nuôi cấy.",
+      "conflictEngine": "Nhánh nghèo phải hiến nhiều huyết nhục hơn để đổi lấy tài nguyên; tranh cãi khi linh dược mọc ra từ tay của người này lại được chia cho người khác.",
+      "emotionalCore": "Tình cảm gia đình thể hiện qua những vết sẹo; một người cha cụt tay tự hào vì cánh tay của mình đã nuôi sống cả nhánh họ qua mùa đông.",
+      "differenceClaim": "Đẩy khái niệm 'đầu tư vào đất' đến mức cực đoan về thể xác, tạo ra một hệ thống kinh tế dựa trên sự tái sinh và hy sinh sinh học.",
+      "nearestComparisonRisk": "Rất dễ thành truyện kinh dị tà tu nếu không có cơ chế tái tạo cơ thể hoàn hảo (payoff) sau khi thu hoạch linh dược.",
+      "serialityProof": "Cần tìm kiếm các loại linh thủy cao cấp hơn để rút ngắn thời gian tái tạo cơ thể, cho phép gia tộc tăng tần suất canh tác.",
+      "openingAdvantage": "Biết trước bí thuật kích thích huyết nhục sinh trưởng nhanh, nam chính biến ngón tay mình thành một cây linh sâm ngàn năm ngay trong đêm.",
+      "progressionProof": "Từ việc sợ hãi hiến tế, gia tộc coi việc có bộ phận cơ thể đang trồng dưới đất là một biểu tượng địa vị và sự giàu có.",
+      "worldProof": {
+        "signatureSituations": [
+          "Buổi chia nước luân canh giống như một trạm xá, nơi mọi người kiểm tra xem 'cánh tay' hay 'đôi mắt' của mình dưới đất đã mọc ra quả chưa.",
+          "Một kẻ lén đào trộm huyết nhục của nhánh khác để cấy vào ruộng nhà mình, bị minh ước Thanh Tùng siết cổ.",
+          "Hôn minh kỳ lạ: sính lễ là một lọ thuốc mọc lại chi, của hồi môn là quyền được trồng ba ngón tay vào linh điền lõi."
+        ],
+        "institutionalReaction": "Tông môn y thuật thèm khát khả năng tái tạo của gia tộc, liên tục gửi gián điệp đến học trộm bí quyết luân canh.",
+        "resourceCirculation": "Tài nguyên là 'Huyết Sâm' (linh dược mọc từ thịt); minh ước đảm bảo người hiến tế được ưu tiên nhận thuốc tái tạo.",
+        "thirtyChapterMutation": "Đầu tư cho một thiên tài nghiên cứu cách trồng huyết nhục của ma thú thay vì người, nhưng nó lại tạo ra một giống cây ăn thịt người mất kiểm soát."
+      },
+      "antiCloneFingerprint": "foresight_flesh_growth|flesh_ginseng_currency|body_part_farming|scar_as_status_symbol|tree_ring_dna_registry"
+    },
+    {
+      "id": "concept_seasonal_curse_rotation",
+      "workingTitle": "Tứ Quý Nghịch Hành: Luân Canh Tai Ương",
+      "readerCuriosity": "Linh điền không trải qua Xuân Hạ Thu Đông, mà trải qua Sinh Lão Bệnh Tử; luân canh là việc chia nhau gánh vác các mùa tai ương này?",
+      "readerFantasy": "Dùng trí tuệ và sự chuẩn bị để biến tai ương thành cơ hội, thao túng chu kỳ sinh tử của linh điền để trục lợi.",
+      "premise": "Nam chính ngăn bán đất, dùng minh ước Thanh Tùng ép gia tộc khởi động lại chu kỳ Sinh Lão Bệnh Tử đã bị đình trệ nhiều năm.",
+      "irreversibleProblem": "Nếu bán đất khi đang ở mùa 'Bệnh', toàn bộ gia tộc sẽ mang mầm bệnh vĩnh viễn không thể chữa khỏi do minh ước đứt gãy.",
+      "protagonistContradiction": "Phải lừa các nhánh họ vào những mùa khắc nghiệt (Lão, Bệnh) bằng những lời hứa hẹn về lợi ích ở mùa Sinh, dù biết họ sẽ rất khổ sở.",
+      "domainMechanism": "Vòng gỗ Thanh Tùng là la bàn chỉ mùa; luân canh là việc các nhánh thay nhau chịu đựng hiệu ứng của mùa để duy trì sự sống cho đất.",
+      "conflictEngine": "Không ai muốn nhận ruộng vào mùa 'Tử' (cây cối héo úa, tu vi giảm sút); nhánh đang ở mùa 'Sinh' từ chối chia sẻ tài nguyên cho nhánh ở mùa 'Bệnh'.",
+      "emotionalCore": "Sự kiên cường bám trụ qua những mùa đông tàn khốc của đời người, tin tưởng rằng mùa xuân (Sinh) chắc chắn sẽ đến với con cháu mình.",
+      "differenceClaim": "Thay thế thời tiết thông thường bằng các trạng thái sinh học/tâm linh, biến việc làm nông thành cuộc chiến sinh tồn theo chu kỳ.",
+      "nearestComparisonRisk": "Giống truyện sinh tồn thảm họa nếu không gắn chặt với việc chăm sóc linh điền và cơ chế chia nước luân canh.",
+      "serialityProof": "Chu kỳ ngày càng khắc nghiệt hơn, xuất hiện những mùa phụ biến dị (ví dụ: mùa 'Điên Cuồng'), đòi hỏi sự chuẩn bị phức tạp hơn.",
+      "openingAdvantage": "Biết trước cách tích trữ linh khí trong mùa 'Lão' để bùng nổ ở mùa 'Sinh', nam chính biểu diễn sự hồi xuân của một gốc cây khô để thuyết phục gia tộc.",
+      "progressionProof": "Từ việc hoảng loạn khi mùa 'Bệnh' đến, gia tộc học cách cố tình nhiễm bệnh để luyện hóa độc tính thành công pháp đặc thù.",
+      "worldProof": {
+        "signatureSituations": [
+          "Lễ chuyển giao mùa: nhánh họ đang trẻ trung phơi phới (mùa Sinh) đổi chỗ cho nhánh họ đang già nua lụ khụ (mùa Lão) trên linh điền.",
+          "Tranh giành quyền kiểm soát van nước trong mùa 'Tử', vì chỉ có nước từ Thanh Tùng mới giữ được mạng sống.",
+          "Một đứa trẻ sinh ra trong mùa 'Bệnh' mang thể chất vạn độc bất xâm, trở thành chìa khóa cho vụ mùa tiếp theo."
+        ],
+        "institutionalReaction": "Thị trường hoang mang vì linh dược của gia tộc thay đổi dược tính xoành xoạch theo mùa, tạo ra một sàn giao dịch kỳ hạn riêng cho họ.",
+        "resourceCirculation": "Tài nguyên là 'Tứ Quý Quả'; minh ước quy định quỹ dự trữ bắt buộc: mùa Sinh phải nộp 30% để nuôi mùa Bệnh.",
+        "thirtyChapterMutation": "Đầu tư xây dựng nhà kính che chắn mùa 'Tử' cho một nhánh, nhưng sự bảo bọc này làm mất đi khả năng kháng cự tự nhiên, khiến họ chết sạch khi nhà kính vỡ."
+      },
+      "antiCloneFingerprint": "foresight_season_hoarding|four_seasons_fruit|aging_sickness_seasons|season_evasion_conflict|tree_ring_season_compass"
+    },
+    {
+      "id": "concept_karma_thread_weaving",
+      "workingTitle": "Tơ Quả Báo: Linh Điền Dệt Mệnh",
+      "readerCuriosity": "Linh điền không trồng cây mà trồng những 'sợi tơ nhân quả'; luân canh là việc dệt những sợi tơ này thành vận mệnh của gia tộc?",
+      "readerFantasy": "Trở thành người thợ dệt vận mệnh, dùng tài nguyên để cắt đứt ác duyên và kết nối thiện duyên cho từng thành viên trong họ.",
+      "premise": "Nam chính ngăn bán đất bằng cách chỉ ra rằng mảnh đất đang trói buộc tơ nhân quả của toàn tộc với một đại kiếp sắp tới.",
+      "irreversibleProblem": "Bán đất sẽ làm đứt tung mạng lưới tơ nhân quả, khiến mọi thành viên gia tộc gặp tai nạn bất đắc kỳ tử trong vòng một tháng.",
+      "protagonistContradiction": "Phải lấy đi may mắn (tơ vàng) của người hiền lành để bù đắp cho xui xẻo (tơ đen) của kẻ ác độc trong họ, nhằm giữ cân bằng cho linh điền.",
+      "domainMechanism": "Vòng gỗ Thanh Tùng là khung cửi; luân canh là việc các nhánh thay nhau gỡ rối và dệt tơ nhân quả, nước tưới là 'Công Đức' để làm mềm tơ.",
+      "conflictEngine": "Nhánh có nhiều tơ vàng không muốn bị luân canh chung với nhánh có nhiều tơ đen; tranh cãi khi một người bị ép gánh ác duyên của người khác.",
+      "emotionalCore": "Sự hy sinh vô hình: một trưởng bối chấp nhận mang danh xui xẻo, bệnh tật cả đời chỉ để dệt một sợi tơ may mắn cho đứa cháu đích tôn.",
+      "differenceClaim": "Vật chất hóa khái niệm nhân quả thành cây trồng nông nghiệp, biến việc quản lý gia tộc thành việc quản lý rủi ro số phận.",
+      "nearestComparisonRisk": "Giống truyện bói toán/thiên cơ nếu không có hành động cày cuốc, tưới tiêu và thu hoạch tơ nhân quả vật lý trên linh điền.",
+      "serialityProof": "Gia tộc càng lớn, mạng lưới tơ càng phức tạp, dễ sinh ra những 'nút thắt nghiệp chướng' khổng lồ cần huy động toàn tộc để gỡ.",
+      "openingAdvantage": "Nhìn thấy sợi tơ đen tử thần nối từ người mua đất đến gia tộc, nam chính dùng minh ước cắt đứt nó, cứu mạng tộc trưởng để giành quyền.",
+      "progressionProof": "Từ việc bị tơ nhân quả trói buộc thụ động, gia tộc học cách chủ động trồng tơ may mắn và bán 'áo choàng vận mệnh' cho bên ngoài.",
+      "worldProof": {
+        "signatureSituations": [
+          "Buổi chia nước Công Đức: mọi người căng mắt nhìn những sợi tơ mờ ảo mọc lên từ đất, cẩn thận tưới nước để chúng không rối vào nhau.",
+          "Một thành viên lén cắt sợi tơ đen của mình nối sang ruộng của nhánh khác, gây ra một chuỗi tai nạn liên hoàn.",
+          "Đứa trẻ sinh ra không có tơ nhân quả (người vô mệnh), bị coi là quái vật nhưng lại là người duy nhất có thể nhổ cỏ nghiệp chướng."
+        ],
+        "institutionalReaction": "Thiên Cơ Các phái người đến tiêu diệt gia tộc vì tội can thiệp vào sổ sinh tử, buộc gia tộc phải dệt một mạng lưới tơ ngụy trang khổng lồ.",
+        "resourceCirculation": "Tài nguyên là 'Mệnh Ti' (tơ vận mệnh); minh ước là bản thiết kế quy định ai được dệt vào vị trí nào trên khung cửi Thanh Tùng.",
+        "thirtyChapterMutation": "Đầu tư dệt một sợi tơ may mắn cực lớn cho một thiên tài, nhưng may mắn đó lại thu hút sự chú ý của một lão quái vật đoạt xá, làm sai lệch tương lai."
+      },
+      "antiCloneFingerprint": "foresight_death_thread|fate_silk_currency|karma_weaving_farming|luck_redistribution_conflict|tree_ring_loom"
+    },
+    {
+      "id": "concept_echo_chamber_farming",
+      "workingTitle": "Vọng Âm Cốc: Linh Điền Vang Vọng",
+      "readerCuriosity": "Linh điền nằm trong một thung lũng, nơi mọi lời nói và hành động hôm nay sẽ dội lại thành hiện thực vật lý vào 10 năm sau?",
+      "readerFantasy": "Lên kế hoạch tỉ mỉ cho từng lời nói và hành động của cả gia tộc, gieo nhân hôm nay để gặt hái những 'tiếng vọng' tài nguyên khổng lồ trong tương lai.",
+      "premise": "Nam chính xé khế ước bán đất, dùng minh ước Thanh Tùng ép mọi người im lặng, vì hắn biết một tiếng vọng hủy diệt từ 10 năm trước sắp dội tới.",
+      "irreversibleProblem": "Bán đất sẽ dỡ bỏ trận pháp cách âm của Thanh Tùng, khiến toàn bộ những tiếng vọng thù hận tích tụ trăm năm dội thẳng vào thần hồn gia tộc.",
+      "protagonistContradiction": "Phải ép gia tộc sống trong kỷ luật thép, cấm đoán những cảm xúc bộc phát tự nhiên để tránh tạo ra những tiếng vọng xấu cho tương lai.",
+      "domainMechanism": "Vòng gỗ Thanh Tùng ghi lại âm thanh; luân canh là việc các nhánh thay nhau hứng chịu tiếng vọng của quá khứ và gieo tiếng vọng cho tương lai.",
+      "conflictEngine": "Thế hệ trẻ phải gánh chịu những tiếng vọng tai ương do những lời chửi rủa của thế hệ già từ chục năm trước; họ đòi quyền được tự do ngôn luận.",
+      "emotionalCore": "Sự hối hận muộn màng khi một lời mắng chửi vô tình năm xưa nay hóa thành sấm sét đánh trúng đứa con mình yêu thương nhất.",
+      "differenceClaim": "Sử dụng độ trễ thời gian của âm thanh làm cơ chế nhân quả vật lý, biến giao tiếp hàng ngày thành hành vi canh tác rủi ro cao.",
+      "nearestComparisonRisk": "Giống truyện vòng lặp thời gian nếu không nhấn mạnh vào việc canh tác linh điền và thu hoạch tài nguyên từ những tiếng vọng tốt.",
+      "serialityProof": "Cần phải tính toán các chu kỳ tiếng vọng chồng chéo lên nhau (1 năm, 10 năm, 100 năm), tạo ra những bài toán quản lý ngày càng phức tạp.",
+      "openingAdvantage": "Nhớ chính xác thời điểm và vị trí một tiếng vọng 'mưa linh thạch' từ đời cụ tổ sắp rơi xuống, nam chính đưa cả nhà ra hứng để giải quyết khủng hoảng tài chính.",
+      "progressionProof": "Từ việc sợ hãi không dám nói chuyện, gia tộc lập ra 'Dàn hợp xướng', hàng ngày ra đồng hát những lời chúc phúc để tạo tài nguyên cho tương lai.",
+      "worldProof": {
+        "signatureSituations": [
+          "Cả gia tộc mặc giáp nặng ra đồng cày cuốc trong im lặng tuyệt đối, thỉnh thoảng phải né những lưỡi kiếm vô hình dội lại từ quá khứ.",
+          "Một nhánh họ lén ra đồng gào thét nguyền rủa nhánh khác, tạo ra một cái bẫy âm thanh nổ chậm cho mùa vụ sau.",
+          "Đứa trẻ sinh ra bị câm bẩm sinh lại là người cày cuốc giỏi nhất vì không bao giờ tạo ra tiếng vọng rác."
+        ],
+        "institutionalReaction": "Các gia tộc khác dùng thung lũng của nam chính làm nơi xả rác âm thanh (chửi rủa kẻ thù), buộc nam chính phải xây tường cách âm.",
+        "resourceCirculation": "Tài nguyên là 'Âm Thạch' (tiếng vọng kết tinh); minh ước quy định hạn ngạch từ ngữ được phép nói mỗi ngày của từng nhánh.",
+        "thirtyChapterMutation": "Đầu tư cho một nhánh học công pháp Sư Tử Hống để tạo tiếng vọng lớn, nhưng âm thanh quá mạnh làm nứt vòng gỗ Thanh Tùng, giải phóng một bí mật cổ xưa."
+      },
+      "antiCloneFingerprint": "foresight_echo_timing|echo_stone_currency|delayed_sound_manifestation|speech_quota_conflict|tree_ring_audio_record"
+    },
+    {
+      "id": "concept_gravity_shift_fields",
+      "workingTitle": "Đảo Điên Linh Điền: Trọng Lực Luân Canh",
+      "readerCuriosity": "Linh điền có trọng lực thay đổi liên tục; luân canh là việc các nhánh phải cày cuốc trên trần nhà, vách đá hay lơ lửng giữa không trung?",
+      "readerFantasy": "Tận dụng sự thay đổi trọng lực để rèn luyện thể phách cho gia tộc, biến một môi trường khắc nghiệt thành lò luyện thể độc quyền.",
+      "premise": "Nam chính ngăn bán đất bằng cách kích hoạt lại trận pháp trọng lực của Thanh Tùng, chứng minh đây không phải đất chết mà là đất luyện thể.",
+      "irreversibleProblem": "Bán đất sẽ làm mất đi lõi trọng lực, khiến toàn bộ nhà cửa và mồ mả tổ tiên của gia tộc bị hút vào không gian vỡ nát.",
+      "protagonistContradiction": "Phải ép những trưởng bối già yếu tham gia luân canh trong môi trường trọng lực gấp 10 lần, nguy hiểm đến tính mạng, để duy trì trận pháp.",
+      "domainMechanism": "Vòng gỗ Thanh Tùng điều khiển hướng và lực hút; luân canh là việc các nhánh thay nhau canh tác ở các khu vực trọng lực khác nhau để cân bằng trận pháp.",
+      "conflictEngine": "Nhánh được phân công cày ở khu vực 'Trọng lực âm' (bay lơ lửng) nhàn hạ không muốn đổi chỗ cho nhánh ở khu vực 'Trọng lực x10' (bò lết).",
+      "emotionalCore": "Sự đùm bọc khi những người trẻ khỏe tự nguyện gánh vác phần ruộng trọng lực cao thay cho cha mẹ già, dù điều đó làm chậm tiến độ tu luyện của họ.",
+      "differenceClaim": "Đưa yếu tố vật lý viễn tưởng (thao túng trọng lực) vào việc làm nông tu tiên, tạo ra những cảnh tượng thị giác và xung đột phân chia lao động độc đáo.",
+      "nearestComparisonRisk": "Giống truyện thể tu thông thường nếu không gắn chặt việc rèn luyện với nghĩa vụ cày cuốc, chia nước và minh ước gia tộc.",
+      "serialityProof": "Mở rộng linh điền đồng nghĩa với việc đối mặt với những vùng không gian có trọng lực xoắn ốc hoặc đứt gãy, cần kỹ năng canh tác phức tạp hơn.",
+      "openingAdvantage": "Biết trước quy luật đảo chiều trọng lực, nam chính cứu được tộc trưởng khỏi một cú ngã chết người khi trận pháp đột ngột kích hoạt, giành lấy tiếng nói.",
+      "progressionProof": "Từ việc bò lết khổ sở để gieo hạt, gia tộc phát triển ra môn khinh công và võ kỹ chiến đấu ba chiều độc nhất vô nhị nhờ quen với trọng lực.",
+      "worldProof": {
+        "signatureSituations": [
+          "Cảnh chia nước kỳ lạ: nước tưới không chảy xuống đất mà bay ngược lên trời, người cày phải đu lộn ngược trên cành Thanh Tùng để hứng nước vào ruộng.",
+          "Một nhánh họ lén thay đổi thông số trên vòng gỗ để giảm trọng lực khu vực mình, vô tình đè bẹp khu vực của nhánh khác.",
+          "Đứa trẻ sinh ra trong vùng không trọng lực có xương cốt mềm dẻo kỳ lạ, không thể đi lại bình thường nhưng lại là thiên tài cấy lúa trên không."
+        ],
+        "institutionalReaction": "Quân đội của vương triều muốn thu nạp người của gia tộc vì khả năng chiến đấu không cần điểm tựa, tạo ra áp lực chảy máu chất xám.",
+        "resourceCirculation": "Tài nguyên là 'Trọng Thạch'; minh ước quy định rõ thời gian bắt buộc phải phục vụ ở khu vực trọng lực cao để được chia tài nguyên.",
+        "thirtyChapterMutation": "Đầu tư xây dựng hệ thống ròng rọc để giảm tải cho nhánh yếu, nhưng sự tiện nghi này làm thui chột ý chí luyện thể, khiến họ thất bại thảm hại trong kỳ thi tông môn."
+      },
+      "antiCloneFingerprint": "foresight_gravity_shift|gravity_stone_currency|multi_directional_farming|high_gravity_evasion|tree_ring_gravity_dial"
+    },
+    {
+      "id": "concept_parasitic_root_network",
+      "workingTitle": "Rễ Tùng Ký Sinh: Mạng Lưới Hút Máu",
+      "readerCuriosity": "Linh điền không có đất, chỉ có một mạng lưới rễ Thanh Tùng khổng lồ; luân canh là việc cắm rễ vào cơ thể để nuôi dưỡng linh dược?",
+      "readerFantasy": "Quản lý một hệ thống tài nguyên sinh học tàn nhẫn, tối ưu hóa việc 'hiến máu' để đổi lấy sức mạnh mà không làm sụp đổ gia tộc.",
+      "premise": "Nam chính ngăn bán 'đất' bằng cách tự cắm rễ Tùng chủ vào tim mình, chứng minh rễ cây chưa chết mà chỉ đang đói.",
+      "irreversibleProblem": "Bán mạng lưới rễ sẽ khiến những rễ con đang ký sinh trong cơ thể mọi người trong tộc bạo phát, hút cạn máu họ ngay lập tức.",
+      "protagonistContradiction": "Phải đóng vai một kẻ bóc lột, tính toán xem mỗi nhánh họ có thể bị hút bao nhiêu máu mỗi tháng để nuôi cây mà không chết.",
+      "domainMechanism": "Vòng gỗ Thanh Tùng là van điều áp; luân canh là việc các nhánh thay nhau cắm rễ vào người để làm 'bình chứa' lọc nước và linh khí cho cây.",
+      "conflictEngine": "Nhánh khỏe mạnh bị ép làm bình chứa nhiều hơn nhưng nhận lại linh dược bằng với nhánh yếu; sự bất mãn về cào bằng tài nguyên.",
+      "emotionalCore": "Tình mẫu tử bi tráng khi một người mẹ giấu giếm bệnh tật, lén cắm rễ của con mình vào người mình để gánh chịu sự đau đớn thay con.",
+      "differenceClaim": "Biến việc canh tác thành một hành vi ký sinh sinh học, đẩy mâu thuẫn phân chia tài nguyên lên mức độ sinh tử trực tiếp.",
+      "nearestComparisonRisk": "Giống truyện ma tu huyết tế nếu không có cơ chế minh ước bảo vệ nghiêm ngặt và sự tự nguyện hy sinh vì gia đình.",
+      "serialityProof": "Cây Thanh Tùng càng lớn, nhu cầu hút máu càng cao, buộc gia tộc phải tìm kiếm các nguồn máu ma thú hoặc tù binh để thay thế.",
+      "openingAdvantage": "Biết trước một huyệt đạo cắm rễ không gây đau đớn mà lại lọc linh khí tốt nhất, nam chính dạy cho gia tộc để vượt qua khủng hoảng hiến máu đầu tiên.",
+      "progressionProof": "Từ việc sợ hãi bị rễ cắm vào người, gia tộc coi những vết sẹo rễ cây là huy chương, phát triển công pháp dùng rễ cây làm vũ khí chiến đấu.",
+      "worldProof": {
+        "signatureSituations": [
+          "Buổi luân canh rùng rợn: mọi người xếp hàng quanh gốc Tùng, cởi áo để những chiếc rễ sắc nhọn cắm phập vào lưng, truyền nước và linh khí.",
+          "Một thành viên lén uống thuốc độc trước khi cắm rễ để đầu độc nhánh họ đang nhận linh dược từ nhánh rễ đó.",
+          "Đứa trẻ sinh ra đã có rễ Tùng quấn quanh tim, không thể tách rời, trở thành 'Linh Điền Sống' di động của gia tộc."
+        ],
+        "institutionalReaction": "Các thế lực tự xưng là danh môn chính phái lấy cớ trừ ma vệ đạo để tấn công gia tộc, thực chất là muốn cướp linh dược sinh học thượng phẩm.",
+        "resourceCirculation": "Tài nguyên là 'Huyết Quả'; minh ước là bảng định mức hiến máu, ai vượt định mức sẽ được quyền biểu quyết trong hội đồng tộc.",
+        "thirtyChapterMutation": "Đầu tư mua lượng lớn máu ma thú để thay thế máu người, nhưng rễ Tùng hấp thụ máu thú bắt đầu biến dị, sinh ra ý thức hoang dã tấn công người trong tộc."
+      },
+      "antiCloneFingerprint": "foresight_painless_node|blood_fruit_currency|human_body_as_filter|blood_donation_quota_conflict|tree_ring_pressure_valve"
+    },
+    {
+      "id": "concept_illusion_veil_farming",
+      "workingTitle": "Huyễn Cảnh Che Đậy: Linh Điền Dối Trá",
+      "readerCuriosity": "Linh điền thực chất là một bãi rác hoang tàn, chỉ có thể trồng trọt khi cả gia tộc cùng duy trì một ảo ảnh tập thể về sự trù phú?",
+      "readerFantasy": "Xây dựng một đế chế dựa trên sự lừa dối hoàn hảo, dùng minh ước để ép mọi người tin vào ảo ảnh cho đến khi nó biến thành sự thật.",
+      "premise": "Nam chính ngăn bán đất bằng cách vạch trần ảo ảnh, nhưng ngay lập tức dùng minh ước Thanh Tùng thiết lập một ảo ảnh mới, mạnh mẽ hơn để lừa người mua.",
+      "irreversibleProblem": "Nếu bán đất, ảo ảnh sẽ vỡ, kẻ thù sẽ nhận ra gia tộc đã suy yếu đến cùng cực và sẽ tiến hành diệt tộc ngay đêm đó.",
+      "protagonistContradiction": "Phải liên tục nói dối và ép người thân sống trong sự dối trá, trừng phạt những ai dám nói ra sự thật về sự nghèo đói của gia tộc.",
+      "domainMechanism": "Vòng gỗ Thanh Tùng là lõi phát ảo ảnh; luân canh là việc các nhánh thay nhau đóng kịch, tiêu hao tinh thần lực để duy trì lớp ngụy trang cho linh điền.",
+      "conflictEngine": "Người trẻ không chịu nổi áp lực sống giả tạo muốn bỏ trốn; nhánh họ phải đóng vai 'kẻ hầu người hạ' trong ảo ảnh bất mãn với nhánh đóng vai 'chủ nhân'.",
+      "emotionalCore": "Nỗi đau của sự tỉnh táo: nam chính là người duy nhất nhìn thấy sự hoang tàn thật sự, gánh vác áp lực duy trì giấc mơ đẹp cho những người khác.",
+      "differenceClaim": "Canh tác không phải là cày cuốc vật lý, mà là việc duy trì một server thực tế ảo bằng tinh thần lực tập thể để lừa gạt thiên đạo sinh ra tài nguyên.",
+      "nearestComparisonRisk": "Giống truyện huyễn thuật sư nếu không gắn chặt việc duy trì ảo ảnh với chu kỳ luân canh nông nghiệp và sinh kế gia tộc.",
+      "serialityProof": "Ảo ảnh càng lớn càng dễ có lỗ hổng, cần liên tục vá víu và nâng cấp kịch bản, đối phó với những kẻ thù có khả năng nhìn thấu huyễn cảnh.",
+      "openingAdvantage": "Nhớ rõ kịch bản ảo ảnh hoàn hảo nhất kiếp trước, nam chính đạo diễn một màn kịch 'tiên nhân giáng trần' ngay tại linh điền để dọa người mua đất bỏ chạy.",
+      "progressionProof": "Từ việc chật vật đóng kịch để sinh tồn, gia tộc bắt đầu dùng ảo ảnh để lừa thiên đạo, biến những linh dược ảo thành vật chất thật.",
+      "worldProof": {
+        "signatureSituations": [
+          "Cảnh chia nước kỳ cục: mọi người cầm những chiếc thùng rỗng không, làm động tác múc nước và tưới cây cực kỳ nghiêm túc để duy trì ảo ảnh.",
+          "Một đứa trẻ vô tình thốt lên 'cây lúa này héo rồi', làm thủng một lỗ trên ảo ảnh, khiến linh khí rò rỉ xém chút hủy diệt cả vụ mùa.",
+          "Tranh cãi nảy lửa trong phòng họp kín về việc viết kịch bản luân canh mùa tới: nhánh nào sẽ được đóng vai anh hùng thu hoạch."
+        ],
+        "institutionalReaction": "Thương hội nghi ngờ chất lượng linh dược vì trông chúng quá hoàn hảo, buộc gia tộc phải cố tình tạo ra vài khuyết điểm ảo để trông chân thật hơn.",
+        "resourceCirculation": "Tài nguyên là 'Huyễn Tinh' (vật chất hóa từ niềm tin); minh ước là kịch bản phân vai bắt buộc, làm sai kịch bản sẽ bị trục xuất.",
+        "thirtyChapterMutation": "Đầu tư cho một thiên tài huyễn thuật để nâng cấp màng bọc, nhưng nó lại quá nhập tâm vào ảo ảnh, tưởng mình là tiên đế và bắt đầu tàn sát người trong tộc."
+      },
+      "antiCloneFingerprint": "foresight_perfect_script|illusion_crystal_currency|collective_delusion_farming|acting_role_dissatisfaction|tree_ring_illusion_core"
+    },
+    {
+      "id": "concept_soul_fragment_fertilizer",
+      "workingTitle": "Toái Hồn Bồi Thổ: Linh Điền Phân Thần",
+      "readerCuriosity": "Linh điền yêu cầu phân bón là những mảnh linh hồn của người sống; luân canh là việc xé rách linh hồn mình để nuôi đất?",
+      "readerFantasy": "Tính toán chi li giới hạn chịu đựng của linh hồn, đầu tư tài nguyên để chữa lành và củng cố thần hồn cho gia tộc, tạo ra đội quân bất khuất.",
+      "premise": "Nam chính ngăn bán đất bằng cách tự xé một mảnh linh hồn bón cho Thanh Tùng, kích hoạt trận pháp phục hồi thần hồn cổ xưa.",
+      "irreversibleProblem": "Bán đất sẽ làm mất đi trận pháp phục hồi, những người đã hiến mảnh linh hồn sẽ vĩnh viễn trở thành kẻ ngốc hoặc điên loạn.",
+      "protagonistContradiction": "Phải lạnh lùng ra lệnh cho người thân tự xé rách linh hồn họ, nhìn họ đau đớn vật vã để đổi lấy linh dược duy trì gia tộc.",
+      "domainMechanism": "Vòng gỗ Thanh Tùng là khuôn đúc linh hồn; luân canh là việc các nhánh thay nhau hiến mảnh hồn và nhận nước tưới chứa linh hồn đã được thanh tẩy để phục hồi.",
+      "conflictEngine": "Nhánh bị yêu cầu hiến mảnh hồn chứa 'trí nhớ kỹ năng' phản đối vì sợ mất nghề; tranh giành nước thanh tẩy vì ai cũng muốn mau chóng hết đau đầu.",
+      "emotionalCore": "Sự hy sinh trí tuệ: một học giả uyên bác của gia tộc tự nguyện hiến đi mảnh hồn chứa khả năng đọc hiểu để cứu vụ mùa, chấp nhận sống phần đời còn lại như một đứa trẻ.",
+      "differenceClaim": "Đưa khái niệm tổn thương tâm thần (mất linh hồn) vào làm chi phí sản xuất nông nghiệp, tạo ra sự căng thẳng tột độ trong mỗi quyết định luân canh.",
+      "nearestComparisonRisk": "Giống truyện tu luyện thần hồn thông thường nếu không có cơ chế luân canh, chia nước phục hồi và sự ràng buộc của minh ước gia tộc.",
+      "serialityProof": "Linh điền cấp cao yêu cầu những mảnh hồn chứa cảm xúc hoặc nhân cách cụ thể, buộc gia tộc phải đối mặt với sự thay đổi tính cách của các thành viên.",
+      "openingAdvantage": "Biết trước một phương pháp xé linh hồn không tổn hại đến căn cơ, nam chính hướng dẫn gia tộc vượt qua đợt thu thuế linh hồn đầu tiên của thiên đạo, giữ lại đất.",
+      "progressionProof": "Từ việc sợ hãi trở thành kẻ ngốc, gia tộc học cách xé những mảnh hồn chứa 'tâm ma' hoặc 'sợ hãi' để bón ruộng, vừa được tài nguyên vừa thanh lọc tâm trí.",
+      "worldProof": {
+        "signatureSituations": [
+          "Buổi luân canh im lặng đáng sợ, chỉ có tiếng nghiến răng trèo trẹo khi mọi người dùng bí pháp tự cắt đi một phần ý thức của mình nhỏ xuống đất.",
+          "Một người lén tráo đổi nước thanh tẩy, khiến mảnh hồn của người khác nhập vào mình, sinh ra đa nhân cách.",
+          "Đứa trẻ sinh ra với linh hồn khuyết thiếu bẩm sinh lại là mảnh ghép hoàn hảo để hấp thụ những mảnh hồn rác của linh điền."
+        ],
+        "institutionalReaction": "Các tông môn tà tu thèm khát linh dược của gia tộc vì chúng chứa mảnh hồn tinh khiết, liên tục tổ chức các cuộc săn lùng.",
+        "resourceCirculation": "Tài nguyên là 'Hồn Tinh'; minh ước quy định thứ tự ưu tiên nhận nước thanh tẩy dựa trên mức độ quan trọng của mảnh hồn đã hiến.",
+        "thirtyChapterMutation": "Đầu tư tài nguyên để phục hồi hoàn toàn linh hồn cho một trưởng lão, nhưng khi linh hồn đầy đủ, ông ta nhớ lại một mối thù cũ với nam chính và âm mưu lật đổ."
+      },
+      "antiCloneFingerprint": "foresight_safe_soul_tear|soul_crystal_currency|soul_fragment_farming|cleansing_water_monopoly|tree_ring_soul_mold"
+    }
+  ],
+  "rejectedNearDuplicateIds": [],
+  "ranking": {
+    "schemaVersion": 2,
+    "matches": [
+      {
+        "leftId": "concept_karmic_water_transfer",
+        "rightId": "concept_lifespan_soil_bond",
+        "winnerId": "concept_karmic_water_transfer",
+        "reason": "Karmic water transfer has better long-term mechanical progression and avoids the repetitive transaction of trading lifespan."
+      },
+      {
+        "leftId": "concept_shadow_pact_rotation",
+        "rightId": "concept_vitality_grafting_fields",
+        "winnerId": "concept_shadow_pact_rotation",
+        "reason": "Shadow pact rotation creates deep trust and sensory stakes without resorting to extreme body horror that borders on tà tu."
+      },
+      {
+        "leftId": "concept_echo_chamber_farming",
+        "rightId": "concept_illusion_veil_farming",
+        "winnerId": "concept_echo_chamber_farming",
+        "reason": "Echo chamber farming has a brilliant temporal causality where words become physical seeds, far more concrete than maintaining a collective illusion."
+      },
+      {
+        "leftId": "concept_skill_fragment_rotation",
+        "rightId": "concept_oath_bound_crafting",
+        "winnerId": "concept_skill_fragment_rotation",
+        "reason": "Skill fragment rotation forces genuine political cooperation between branches over monopoly of techniques."
+      },
+      {
+        "leftId": "concept_ancestral_debt_harvest",
+        "rightId": "concept_symbiotic_curse_farming",
+        "winnerId": "concept_ancestral_debt_harvest",
+        "reason": "Ancestral debt harvest turns family history into a literal resource, creating a unique cycle of generational redemption."
+      },
+      {
+        "leftId": "concept_emotion_fed_flora",
+        "rightId": "concept_dream_harvest_rotation",
+        "winnerId": "concept_emotion_fed_flora",
+        "reason": "Emotion-fed flora leverages internal clan drama directly into agricultural output, creating high emotional stakes."
+      },
+      {
+        "leftId": "concept_time_borrowed_harvest",
+        "rightId": "concept_seasonal_curse_rotation",
+        "winnerId": "concept_time_borrowed_harvest",
+        "reason": "Time borrowed harvest introduces brilliant financial leverage concepts into cultivation, creating high-stakes debt management."
+      },
+      {
+        "leftId": "concept_memory_soil_harvest",
+        "rightId": "concept_soul_fragment_fertilizer",
+        "winnerId": "concept_memory_soil_harvest",
+        "reason": "Memory soil harvest creates a poignant tax on identity and history, avoiding the pure pain-centric loop of soul tearing."
+      },
+      {
+        "leftId": "concept_blood_resonance_fields",
+        "rightId": "concept_gravity_shift_fields",
+        "winnerId": "concept_blood_resonance_fields",
+        "reason": "Blood resonance fields turn clan unity into a literal technical requirement of heartbeat synchronization."
+      },
+      {
+        "leftId": "concept_karma_thread_weaving",
+        "rightId": "concept_parasitic_root_network",
+        "winnerId": "concept_karma_thread_weaving",
+        "reason": "Karma thread weaving materializes fate into physical threads, avoiding the grotesque parasitic blood-drinking tropes."
+      },
+      {
+        "leftId": "concept_karmic_water_transfer",
+        "rightId": "concept_skill_fragment_rotation",
+        "winnerId": "concept_karmic_water_transfer",
+        "reason": "Karmic water transfer integrates mental impurities directly into the core resource loop, creating more immediate and visceral trade-offs."
+      },
+      {
+        "leftId": "concept_shadow_pact_rotation",
+        "rightId": "concept_ancestral_debt_harvest",
+        "winnerId": "concept_shadow_pact_rotation",
+        "reason": "Shadow pact's sensory deprivation creates a more intimate and tense atmosphere of mutual reliance between branches."
+      },
+      {
+        "leftId": "concept_echo_chamber_farming",
+        "rightId": "concept_time_borrowed_harvest",
+        "winnerId": "concept_echo_chamber_farming",
+        "reason": "Echo chamber's delayed acoustic manifestation offers a more poetic and highly causal narrative engine than pure time debt."
+      },
+      {
+        "leftId": "concept_lifespan_soil_bond",
+        "rightId": "concept_vitality_grafting_fields",
+        "winnerId": "concept_lifespan_soil_bond",
+        "reason": "Lifespan soil bond maintains family warmth and sacrifice, whereas vitality grafting leans too far into tà tu horror."
+      },
+      {
+        "leftId": "concept_illusion_veil_farming",
+        "rightId": "concept_soul_fragment_fertilizer",
+        "winnerId": "concept_illusion_veil_farming",
+        "reason": "Illusion veil farming focuses on collective acting and deception, which yields better political intrigue than simple soul mutilation."
+      },
+      {
+        "leftId": "concept_oath_bound_crafting",
+        "rightId": "concept_symbiotic_curse_farming",
+        "winnerId": "concept_oath_bound_crafting",
+        "reason": "Oath-bound crafting materializes moral responsibility into tool sharpness, creating a clearer progression of duty."
+      },
+      {
+        "leftId": "concept_dream_harvest_rotation",
+        "rightId": "concept_gravity_shift_fields",
+        "winnerId": "concept_dream_harvest_rotation",
+        "reason": "Dream harvest rotation creates a dual-state narrative of waking guards and sleeping farmers, offering richer scene affordances."
+      },
+      {
+        "leftId": "concept_seasonal_curse_rotation",
+        "rightId": "concept_parasitic_root_network",
+        "winnerId": "concept_seasonal_curse_rotation",
+        "reason": "Seasonal curse rotation uses biological cycles of Birth-Aging-Sickness-Death, which is more thematic than parasitic blood-sucking."
+      }
+    ],
+    "ranking": [
+      {
+        "id": "concept_karmic_water_transfer",
+        "wins": 2,
+        "reason": "Excellent mechanical integration of water rotation, mental impurities, and clan dynamics."
+      },
+      {
+        "id": "concept_shadow_pact_rotation",
+        "wins": 2,
+        "reason": "Brilliant physical and sensory stakes, forces deep trust and cooperation between branches."
+      },
+      {
+        "id": "concept_echo_chamber_farming",
+        "wins": 2,
+        "reason": "Incredible temporal causality, every word spoken is a literal seed for future harvest or disaster."
+      },
+      {
+        "id": "concept_skill_fragment_rotation",
+        "wins": 1,
+        "reason": "Strong political tension between branches over technical monopoly."
+      },
+      {
+        "id": "concept_ancestral_debt_harvest",
+        "wins": 1,
+        "reason": "Unique redemption cycle that turns family history into a literal resource."
+      },
+      {
+        "id": "concept_emotion_fed_flora",
+        "wins": 1,
+        "reason": "Leverages internal clan drama directly into agricultural output."
+      },
+      {
+        "id": "concept_time_borrowed_harvest",
+        "wins": 1,
+        "reason": "Introduces brilliant financial leverage concepts into cultivation."
+      },
+      {
+        "id": "concept_memory_soil_harvest",
+        "wins": 1,
+        "reason": "Creates a poignant tax on identity and history."
+      },
+      {
+        "id": "concept_blood_resonance_fields",
+        "wins": 1,
+        "reason": "Turns clan unity into a literal technical requirement."
+      },
+      {
+        "id": "concept_karma_thread_weaving",
+        "wins": 1,
+        "reason": "Materializes fate into physical threads."
+      },
+      {
+        "id": "concept_lifespan_soil_bond",
+        "wins": 1,
+        "reason": "Maintains family warmth and sacrifice."
+      },
+      {
+        "id": "concept_illusion_veil_farming",
+        "wins": 1,
+        "reason": "Focuses on collective acting and deception."
+      },
+      {
+        "id": "concept_oath_bound_crafting",
+        "wins": 1,
+        "reason": "Materializes moral responsibility into tool sharpness."
+      },
+      {
+        "id": "concept_dream_harvest_rotation",
+        "wins": 1,
+        "reason": "Creates a dual-state narrative of waking guards and sleeping farmers."
+      },
+      {
+        "id": "concept_seasonal_curse_rotation",
+        "wins": 1,
+        "reason": "Uses biological cycles of Birth-Aging-Sickness-Death."
+      },
+      {
+        "id": "concept_symbiotic_curse_farming",
+        "wins": 0,
+        "reason": "Lacks clear progression and feels too repetitive."
+      },
+      {
+        "id": "concept_vitality_grafting_fields",
+        "wins": 0,
+        "reason": "Leans too far into tà tu horror."
+      },
+      {
+        "id": "concept_gravity_shift_fields",
+        "wins": 0,
+        "reason": "Lacks strong emotional core and family dynamics."
+      },
+      {
+        "id": "concept_parasitic_root_network",
+        "wins": 0,
+        "reason": "Grotesque parasitic blood-drinking tropes are too extreme."
+      },
+      {
+        "id": "concept_soul_fragment_fertilizer",
+        "wins": 0,
+        "reason": "Pure pain-centric loop of soul tearing lacks nuance."
+      }
+    ],
+    "finalistIds": [
+      "concept_karmic_water_transfer",
+      "concept_shadow_pact_rotation",
+      "concept_echo_chamber_farming"
+    ],
+    "finalistWorldKernels": [
+      {
+        "candidateId": "concept_karmic_water_transfer",
+        "signatureSituations": [
+          "Lễ rạch vòng gỗ Thanh Tùng để thề nhận nước độc, người thề bị ám ảnh bởi ký ức của nhánh họ khác.",
+          "Tranh cãi nảy lửa khi quyết định nhánh nào phải trồng loại cây hút tạp chất, hy sinh tiến độ tu luyện mùa này.",
+          "Một trưởng bối lén xả nước sạch cho cháu mình, làm hỏng toàn bộ trận pháp luân canh của gia tộc."
+        ],
+        "rules": [
+          {
+            "rule": "Mọi thành viên tiếp nhận nước luân canh từ linh điền Thanh Tùng bắt buộc phải gánh chịu một phần tạp chất tâm cảnh của nhánh họ đi trước, nếu không dòng nước sẽ tự động hóa thành kịch độc thiêu rụi linh điền.",
+            "beneficiary": "Nhánh họ canh tác trước",
+            "harmedParty": "Nhánh họ nhận nước luân canh tiếp theo",
+            "enforcement": "Vòng gỗ Thanh Tùng tự động thắt chặt và truyền tâm ma trực tiếp vào thần hồn kẻ vi phạm.",
+            "cost": "Sự suy giảm tạm thời về tốc độ tu luyện và nguy cơ tẩu hỏa nhập ma cực cao.",
+            "consequence": "Toàn bộ linh điền của nhánh họ đó sẽ bị khô héo và mất quyền chia nước trong ba mùa vụ tiếp theo.",
+            "evidenceSource": "Vết rạch đen xuất hiện trên vòng gỗ Thanh Tùng tương ứng với nhánh họ vi phạm.",
+            "exceptions": "Trưởng tộc có thể dùng máu tim của mình để thanh tẩy tối đa mười giọt nước sạch cho một đứa trẻ sơ sinh dưới mười tuổi.",
+            "sceneAffordances": [
+              "Đại bá của nhánh thứ ba chấp nhận uống ngụm nước đục ngầu chứa đầy oán khí của nhánh thứ hai để bảo vệ ruộng linh dược của con trai mình.",
+              "Một thiếu niên trẻ tuổi cố tình dùng bùa chú ngăn chặn tâm ma xâm nhập khi tưới nước, dẫn đến việc vòng gỗ Thanh Tùng siết chặt cổ tay rỉ máu."
+            ]
+          },
+          {
+            "rule": "Việc phân chia hạn ngạch nước sạch giữa các nhánh họ phải được quyết định công khai tại buổi lễ Thanh Tùng, dựa trên khối lượng tạp chất tâm cảnh mà nhánh đó đã gánh vác ở mùa vụ trước.",
+            "beneficiary": "Nhánh họ đã chịu nhiều hy sinh gánh nước độc",
+            "harmedParty": "Nhánh họ chỉ muốn dùng nước sạch để đột phá nhanh",
+            "enforcement": "Trận pháp phân thủy của gốc Thanh Tùng chỉ mở van dẫn nước khi có đủ dấu ấn huyết mạch của các trưởng lão đồng thuận.",
+            "cost": "Sự trì trệ tiến độ tu luyện của các thiên tài thuộc nhánh chính để nhường nước sạch cho nhánh phụ.",
+            "consequence": "Nếu tự ý thay đổi dòng chảy, toàn bộ hệ thống luân canh sẽ bị nhiễm độc, biến linh dược thành độc thảo.",
+            "evidenceSource": "Màu sắc của dòng nước chảy qua các mương dẫn thay đổi từ trong suốt sang tím sẫm.",
+            "exceptions": "Khi gia tộc đối mặt với nguy cơ diệt vong từ bên ngoài, toàn bộ nước sạch sẽ được dồn cho người mạnh nhất để đột phá Trúc Cơ.",
+            "sceneAffordances": [
+              "Tộc trưởng đứng ra phân xử tranh chấp nguồn nước giữa hai người anh em ruột, buộc người em phải nhường nước sạch cho người anh đang cận kề cái chết.",
+              "Một trưởng lão nhánh phụ chấp nhận rạch tay hiến máu để kích hoạt van nước sạch cho cháu gái mình, chấp nhận chịu phạt gánh nước độc mùa sau."
+            ]
+          },
+          {
+            "rule": "Mỗi nhánh họ bắt buộc phải luân phiên trồng loại cây hút tạp chất trên phần đất của mình ít nhất một lần mỗi ba năm để làm sạch nguồn nước chung cho toàn tộc.",
+            "beneficiary": "Toàn thể gia tộc tu tiên",
+            "harmedParty": "Nhánh họ đến lượt trồng cây hút tạp chất",
+            "enforcement": "Minh ước khắc trên vòng gỗ Thanh Tùng sẽ tự động kích hoạt, làm suy giảm linh khí trên đất của nhánh trốn tránh.",
+            "cost": "Nhánh họ đó hoàn toàn không có thu hoạch linh dược có giá trị kinh tế trong suốt một năm trồng cây hút độc.",
+            "consequence": "Đất đai của nhánh vi phạm sẽ bị biến thành tử địa cằn cỗi, không thể canh tác bất kỳ loại cây nào khác trong mười năm.",
+            "evidenceSource": "Lá cây Thanh Tùng rụng đen ngòm tại khu vực đất của nhánh họ trốn tránh nghĩa vụ.",
+            "exceptions": "Nhánh họ có thể mua lại quyền miễn trừ bằng cách cống hiến một vạn linh thạch thượng phẩm vào quỹ chung của gia tộc.",
+            "sceneAffordances": [
+              "Trưởng lão nhánh thứ tư quỳ trước gốc Thanh Tùng xin nhận hạt giống cây hút độc, chấp nhận hy sinh toàn bộ thu nhập của nhánh mình mùa này.",
+              "Một nhóm tu sĩ trẻ tuổi nổi loạn cố tình nhổ bỏ cây hút độc để trồng linh sâm lén lút, khiến đất đai xung quanh lập tức hóa thành tro bụi."
+            ]
+          }
+        ],
+        "resources": [
+          {
+            "resource": "Hạn ngạch nước sạch",
+            "source": "Mạch nước ngầm chảy ra từ rễ cây Thanh Tùng cổ thụ, chỉ được tiếp cận thông qua trận pháp phân thủy do tộc trưởng quản lý.",
+            "spendRule": "Chỉ được dùng để tưới cho linh dược cao cấp hoặc hỗ trợ đột phá bình cảnh tu luyện của các thành viên có công lớn.",
+            "scarcity": "Cực kỳ khan hiếm, lượng nước giảm dần sau mỗi mùa vụ nếu không có đủ nhánh họ tham gia luân canh gánh nước độc."
+          },
+          {
+            "resource": "Vòng gỗ Thanh Tùng",
+            "source": "Các vòng gỗ được cắt từ nhánh cây Thanh Tùng ghi nhớ lời thề, được trao cho trưởng các nhánh họ giữ gìn.",
+            "spendRule": "Dùng để thế chấp khi vay mượn tài nguyên giữa các nhánh hoặc khắc ghi các minh ước hợp tác mới.",
+            "scarcity": "Số lượng giới hạn tương ứng với số nhánh họ được rễ Thanh Tùng thừa nhận, không thể tự ý chế tạo thêm."
+          }
+        ],
+        "institutionalResponses": [
+          {
+            "name": "Tông môn quản lý địa phương",
+            "power": "Sở hữu lực lượng tu sĩ Trúc Cơ đông đảo và quyền thu thuế linh điền trên toàn khu vực.",
+            "incentive": "Muốn ép gia tộc bán linh điền để chiếm đoạt mạch nước ngầm Thanh Tùng.",
+            "enforcementEvidence": "Gửi sứ giả đến kiểm tra định kỳ và liên tục tăng thuế đối với các gia tộc không có tu sĩ Trúc Cơ.",
+            "pressureOnCast": "Buộc gia tộc phải liên tục tối ưu hóa luân canh để vừa có đủ linh dược nộp thuế vừa giữ lại nước sạch cho con cháu."
+          },
+          {
+            "name": "Thương hội liên minh",
+            "power": "Độc quyền thu mua linh dược và cung cấp công pháp, đan dược bổ trợ tu luyện.",
+            "incentive": "Ép giá thu mua linh dược của gia tộc bằng cách tung tin đồn về việc nước luân canh bị nhiễm độc tâm ma.",
+            "enforcementEvidence": "Từ chối mua linh dược nếu không có giấy chứng nhận độ tinh khiết từ giám định sư của thương hội.",
+            "pressureOnCast": "Ép nam chính phải tìm cách nâng cao chất lượng thanh tẩy nước để chứng minh dược tính tinh khiết của sản phẩm."
+          }
+        ],
+        "thirtyChapterMutation": "Đầu tư vào một đứa trẻ nhánh phụ bắt đầu sinh lời, nhưng nó quyết định dùng tài nguyên để đổi nghề thay vì cày cuốc, làm sai lệch ký ức kiếp trước."
+      },
+      {
+        "candidateId": "concept_shadow_pact_rotation",
+        "signatureSituations": [
+          "Lễ bàn giao luân canh: người từ vùng tối bước ra, nhận lại đôi mắt từ người vùng sáng chuẩn bị bước vào.",
+          "Một nhánh họ ở vùng sáng lén lút bớt xén nước sạch, khiến người ở vùng tối bị ảo giác tấn công lẫn nhau.",
+          "Đứa trẻ sinh ra trong vùng tối mang đôi mắt trắng dã, có khả năng nhìn thấu linh mạch nhưng không thể ra ngoài ánh sáng."
+        ],
+        "rules": [
+          {
+            "rule": "Khi đến kỳ hạn luân canh âm dương, nhánh họ đang ở vùng sáng bắt buộc phải bàn giao ngũ quan của mình cho nhánh họ chuẩn bị bước ra từ vùng tối.",
+            "beneficiary": "Nhánh họ vừa hoàn thành ca canh tác trong vùng tối",
+            "harmedParty": "Nhánh họ chuẩn bị bước vào vùng tối để cày cuốc",
+            "enforcement": "Bóng của cây Thanh Tùng tự động đổ xuống, tước đoạt thị giác và thính giác của những kẻ không chịu bàn giao.",
+            "cost": "Sự mất đi hoàn toàn các giác quan vật lý trong suốt thời gian canh tác ở vùng tối.",
+            "consequence": "Nếu trì hoãn bàn giao, cả hai nhánh họ sẽ bị kẹt trong trạng thái nửa tỉnh nửa điên, linh điền lập tức bị sụp đổ.",
+            "evidenceSource": "Vòng gỗ Thanh Tùng chuyển sang màu xám xịt và phát ra tiếng khóc than của tổ tiên.",
+            "exceptions": "Những người mang huyết mạch dị bẩm 'Tâm Nhãn' có thể giữ lại thính giác nhưng phải chịu nỗi đau thể xác gấp đôi.",
+            "sceneAffordances": [
+              "Một trưởng lão vùng sáng chấp nhận nhắm mắt, để rễ Thanh Tùng hút đi ánh sáng từ đồng tử của mình truyền sang cho người em họ vừa bước ra từ bóng tối.",
+              "Thiếu niên trẻ tuổi hoảng loạn gào thét khi bóng tối ập xuống tước đi thính giác của mình, cố gắng bám chặt lấy chiếc cày gỗ để không ngã xuống vực."
+            ]
+          },
+          {
+            "rule": "Nước tưới thu hoạch từ vùng sáng bắt buộc phải được chia sẻ công bằng cho vùng tối để duy trì sự sống của những người đang chịu cảnh mù lòa.",
+            "beneficiary": "Các tu sĩ đang canh tác trong bóng tối không có ngũ quan",
+            "harmedParty": "Nhánh họ ở vùng sáng muốn giữ lại nước sạch để tưới linh dược quý",
+            "enforcement": "Mạch nước ngầm của linh điền sẽ tự động ngắt dòng chảy nếu lượng nước phân phối cho vùng tối thấp hơn mức tối thiểu.",
+            "cost": "Sự sụt giảm sản lượng linh dược thượng phẩm ở vùng sáng do phải chia sẻ tài nguyên nước.",
+            "consequence": "Người ở vùng tối sẽ bị ảo giác ác mộng tấn công, dẫn đến việc phá hủy mạch nước ngầm chung của gia tộc.",
+            "evidenceSource": "Dòng nước chảy vào vùng sáng bỗng nhiên hóa thành màu máu đen ngòm.",
+            "exceptions": "Nếu vùng tối không có người canh tác trong mùa vụ đó, toàn bộ nước sạch được phép giữ lại vùng sáng.",
+            "sceneAffordances": [
+              "Một người mẹ ở vùng sáng lén bớt xén một gáo nước sạch để tưới cho cây linh sâm của con mình, khiến người chồng ở vùng tối lập tức bị ảo giác điên cuồng.",
+              "Trưởng tộc dùng quyền lực ép buộc nhánh thứ nhất phải đổ phân nửa số nước sạch thu hoạch được xuống mương dẫn vào vùng tối tăm."
+            ]
+          },
+          {
+            "rule": "Mọi đứa trẻ sinh ra trong vùng tối bắt buộc phải được đưa ra vùng sáng trước mười tuổi để tránh việc huyết mạch bị đồng hóa hoàn toàn với bóng tối.",
+            "beneficiary": "Đứa trẻ sinh ra trong bóng tối",
+            "harmedParty": "Gia tộc mất đi một nhân tài có khả năng nhìn thấu linh mạch",
+            "enforcement": "Minh ước Thanh Tùng sẽ tự động kích hoạt lôi kiếp trừng phạt cha mẹ nếu cố tình che giấu đứa trẻ.",
+            "cost": "Đứa trẻ sẽ mất đi vĩnh viễn khả năng nhìn thấu linh mạch quý hiếm khi bước ra ánh sáng.",
+            "consequence": "Đứa trẻ sẽ biến thành một thực thể bóng tối không có linh hồn, tấn công mọi thành viên trong họ.",
+            "evidenceSource": "Đôi mắt của đứa trẻ chuyển từ màu trắng dã sang màu đen hoàn toàn không có lòng trắng.",
+            "exceptions": "Có thể giữ đứa trẻ lại vùng tối thêm năm năm nếu gia tộc hiến tế một vạn linh thạch để duy trì trận pháp bảo vệ.",
+            "sceneAffordances": [
+              "Người cha đau đớn bế đứa con có đôi mắt trắng dã bước qua ranh giới bóng tối, chấp nhận nhìn con mất đi thiên phú để đổi lấy mạng sống bình thường.",
+              "Một bà mẹ lén giấu con dưới hầm tối của gốc Thanh Tùng, bị minh ước phản phệ khiến toàn thân mọc đầy rêu đen."
+            ]
+          }
+        ],
+        "resources": [
+          {
+            "resource": "Quang Tinh",
+            "source": "Linh khí kết tinh từ những thửa ruộng nằm trong vùng sáng của Thanh Tùng, chỉ được thu hoạch bởi những người có đầy đủ ngũ quan.",
+            "spendRule": "Dùng để chế tạo đan dược đột phá cảnh giới hoặc đổi lấy nhu yếu phẩm từ các thương hội bên ngoài.",
+            "scarcity": "Chỉ xuất hiện trong chu kỳ nửa năm khi vùng sáng được canh tác đầy đủ, số lượng phụ thuộc vào sự đồng bộ của người cày."
+          },
+          {
+            "resource": "Ám Tinh",
+            "source": "Khoáng thạch sinh ra từ lòng đất sâu của vùng tối, chỉ có thể được tìm thấy bởi những tu sĩ đã mất đi thị giác.",
+            "spendRule": "Dùng để rèn luyện thần thức và chế tạo các vũ khí ám sát không phát ra tiếng động.",
+            "scarcity": "Cực kỳ nguy hiểm để thu hoạch, đòi hỏi người đi săn phải có lòng tin tuyệt đối vào người dẫn đường ở vùng sáng."
+          }
+        ],
+        "institutionalResponses": [
+          {
+            "name": "Vương triều thiết chế địa phương",
+            "power": "Sở hữu quân đội tu sĩ thiện chiến và quyền kiểm soát các mỏ linh thạch lớn.",
+            "incentive": "Muốn tuyển dụng những tu sĩ có khả năng chiến đấu không cần ngũ quan của gia tộc để làm quân tiên phong.",
+            "enforcementEvidence": "Gửi lệnh triệu tập nghĩa vụ quân sự bắt buộc đối với các thanh niên đã trải qua luân canh vùng tối.",
+            "pressureOnCast": "Ép buộc gia tộc phải tìm cách lách luật hoặc giấu giếm danh sách thành viên để tránh mất đi lực lượng lao động cốt lõi."
+          },
+          {
+            "name": "Hắc bang ám sát liên minh",
+            "power": "Mạng lưới gián điệp và sát thủ hoạt động trong bóng tối của các thành thị tu tiên.",
+            "incentive": "Muốn cướp đoạt công thức chế tạo Ám Tinh và bắt cóc những đứa trẻ có đôi mắt trắng dã.",
+            "enforcementEvidence": "Liên tục tổ chức các cuộc đột kích lén lút vào vùng tối của gia tộc trong những ngày bàn giao luân canh.",
+            "pressureOnCast": "Buộc nam chính phải thiết lập hệ thống phòng thủ nghiêm ngặt và dùng minh ước để trói buộc lòng trung thành của các thành viên."
+          }
+        ],
+        "thirtyChapterMutation": "Nhánh họ được đầu tư nhiều nhất ở vùng sáng từ chối luân canh, dùng tài nguyên xây trận pháp cản bóng tối, phá vỡ hệ sinh thái."
+      },
+      {
+        "candidateId": "concept_echo_chamber_farming",
+        "signatureSituations": [
+          "Cả gia tộc mặc giáp nặng ra đồng cày cuốc trong im lặng tuyệt đối, thỉnh thoảng phải né những lưỡi kiếm vô hình dội lại từ quá khứ.",
+          "Một nhánh họ lén ra đồng gào thét nguyền rủa nhánh khác, tạo ra một cái bẫy âm thanh nổ chậm cho mùa vụ sau.",
+          "Đứa trẻ sinh ra bị câm bẩm sinh lại là người cày cuốc giỏi nhất vì không bao giờ tạo ra tiếng vọng rác."
+        ],
+        "rules": [
+          {
+            "rule": "Mọi lời nói và âm thanh phát ra trên linh điền Vọng Âm bắt buộc phải tuân theo hạn ngạch nghiêm ngặt để tránh tạo ra tiếng vọng hủy diệt trong tương lai.",
+            "beneficiary": "Thế hệ con cháu canh tác mười năm sau",
+            "harmedParty": "Thành viên gia tộc muốn tự do ngôn luận và bộc lộ cảm xúc",
+            "enforcement": "Vòng gỗ Thanh Tùng sẽ tự động thắt chặt cổ họng của kẻ nói quá số từ quy định trong ngày.",
+            "cost": "Sự ức chế tâm lý cực độ và khó khăn trong việc giao tiếp khẩn cấp khi gặp tai nạn.",
+            "consequence": "Nếu vượt quá hạn ngạch, một tiếng sét âm thanh sẽ dội lại ngay lập tức, phá hủy toàn bộ màng nhĩ của những người xung quanh.",
+            "evidenceSource": "Các đường vân trên vòng gỗ Thanh Tùng rung động mạnh và phát ra ánh sáng đỏ.",
+            "exceptions": "Trưởng tộc được phép dùng 'Loa Thanh Tùng' để phát ngôn không giới hạn trong các trường hợp khẩn cấp cứu người.",
+            "sceneAffordances": [
+              "Một người cha chấp nhận im lặng nhìn con mình bị đá đè gãy chân, chỉ dùng tay ra hiệu để tránh lãng phí hạn ngạch từ ngữ của ngày hôm đó.",
+              "Thiếu niên trẻ tuổi vô tình chửi thề một tiếng khi vấp ngã, lập tức bị vòng gỗ siết cổ đến mức rỉ máu để dập tắt âm thanh."
+            ]
+          },
+          {
+            "rule": "Mọi tiếng vọng thù hận dội lại từ quá khứ bắt buộc phải được gánh chịu bởi chính nhánh họ đã gieo ra âm thanh đó mười năm trước.",
+            "beneficiary": "Các nhánh họ vô tội khác trong gia tộc",
+            "harmedParty": "Nhánh họ có tổ tiên thích chửi rủa và gây hấn",
+            "enforcement": "Trận pháp cách âm của Thanh Tùng sẽ tự động định vị huyết mạch và dồn tiếng vọng sát thương vào khu vực của nhánh đó.",
+            "cost": "Nhánh họ đó phải tốn hao lượng lớn linh thạch để mua giáp nặng và trận pháp phòng thủ âm thanh.",
+            "consequence": "Nếu trốn tránh, tiếng vọng sẽ khuếch đại gấp mười lần, phá hủy toàn bộ nhà cửa và mồ mả của nhánh vi phạm.",
+            "evidenceSource": "Tiếng thì thầm oán hận phát ra từ lòng đất dưới chân khu nhà của nhánh họ vi phạm.",
+            "exceptions": "Nhánh họ có thể thuê người của nhánh khác gánh thay tiếng vọng bằng cách trả một lượng lớn Âm Thạch.",
+            "sceneAffordances": [
+              "Cả một nhánh họ mặc giáp sắt nặng nề, quỳ rạp dưới đất chịu đựng những lưỡi kiếm âm thanh dội lại từ lời nguyền rủa của cụ tổ họ mười năm trước.",
+              "Một trưởng lão lén dùng trận pháp chuyển hướng tiếng vọng sang ruộng nhà bên cạnh, bị minh ước Thanh Tùng đánh nứt thần hồn."
+            ]
+          },
+          {
+            "rule": "Những đứa trẻ sinh ra bị câm bẩm sinh bắt buộc phải được ưu tiên giao quyền quản lý các thửa ruộng lõi có tần số âm thanh nhạy cảm nhất.",
+            "beneficiary": "Đứa trẻ câm bẩm sinh",
+            "harmedParty": "Những thiên tài có giọng nói hay nhưng không được chạm vào ruộng lõi",
+            "enforcement": "Đất linh điền lõi sẽ tự động từ chối nảy mầm nếu phát hiện có bất kỳ dao động âm thanh nào từ người chăm sóc.",
+            "cost": "Sự ghen tị và cô lập từ các thành viên khác đối với đứa trẻ câm được ưu ái.",
+            "consequence": "Nếu giao ruộng cho người bình thường, linh điền sẽ bị nổ tung do các tiếng vọng rác tích tụ từ hơi thở và tiếng nói.",
+            "evidenceSource": "Mặt đất linh điền nứt nẻ và phun ra những luồng khí xám xịt mỗi khi có tiếng nói cất lên.",
+            "exceptions": "Người bình thường có thể chăm sóc ruộng lõi nếu uống thuốc câm tạm thời có tác dụng trong vòng một mùa vụ.",
+            "sceneAffordances": [
+              "Đứa trẻ câm lặng lẽ cấy từng cây lúa dưới sự bảo vệ của hàng chục tu sĩ mặc giáp nặng, không một tiếng động nào được phép phát ra.",
+              "Một tu sĩ trẻ tuổi cố tình uống thuốc câm để giành quyền cày ruộng lõi, chấp nhận mất đi giọng nói trong suốt sáu tháng ròng rã."
+            ]
+          }
+        ],
+        "resources": [
+          {
+            "resource": "Âm Thạch",
+            "source": "Tiếng vọng tốt đẹp (lời chúc phúc, tiếng tụng kinh) kết tinh thành đá quý dưới rễ cây Thanh Tùng sau mười năm tích lũy.",
+            "spendRule": "Dùng để hấp thụ tăng cường thần hồn hoặc làm lõi năng lượng cho các trận pháp phòng thủ âm thanh.",
+            "scarcity": "Cực kỳ khan hiếm vì đòi hỏi gia tộc phải duy trì sự hòa thuận và im lặng trong một thời gian rất dài."
+          },
+          {
+            "resource": "Hạn ngạch từ ngữ",
+            "source": "Hệ thống phân phối từ ngữ hàng ngày do ban quản lý gia tộc quyết định dựa trên đóng góp của từng nhánh họ.",
+            "spendRule": "Dùng để giao tiếp, ra lệnh chiến đấu hoặc truyền đạt kỹ năng tu luyện giữa các thế hệ.",
+            "scarcity": "Được lượng hóa nghiêm ngặt, mỗi người chỉ có khoảng năm mươi từ mỗi ngày, dùng hết sẽ bị câm lặng hoàn toàn."
+          }
+        ],
+        "institutionalResponses": [
+          {
+            "name": "Thiên Cơ Các chi nhánh địa phương",
+            "power": "Tổ chức tình báo và giám sát thiên cơ có mạng lưới rộng khắp các vương triều tu tiên.",
+            "incentive": "Muốn thu thập các tiếng vọng lịch sử của gia tộc để bán thông tin mật cho kẻ thù.",
+            "enforcementEvidence": "Liên tục thả các thiết bị nghe lén pháp bảo bay quanh thung lũng Vọng Âm.",
+            "pressureOnCast": "Buộc gia tộc phải duy trì sự im lặng tuyệt đối và phát triển các mật mã bằng cử chỉ để đánh lừa kẻ nghe lén."
+          },
+          {
+            "name": "Liên minh các gia tộc đối địch",
+            "power": "Sở hữu liên minh tu sĩ đông đảo và các pháp bảo phát ra âm thanh cực lớn.",
+            "incentive": "Muốn phá hoại linh điền của gia tộc bằng cách xả rác âm thanh (chửi rủa, gào thét) vào thung lũng.",
+            "enforcementEvidence": "Thường xuyên cử người đến ranh giới thung lũng gõ chiêng trống và la hét vào ban đêm.",
+            "pressureOnCast": "Ép buộc gia tộc phải xây dựng các bức tường cách âm khổng lồ bằng gỗ Thanh Tùng và tổ chức các đội tuần tra im lặng."
+          }
+        ],
+        "thirtyChapterMutation": "Đầu tư cho một nhánh học công pháp Sư Tử Hống để tạo tiếng vọng lớn, nhưng âm thanh quá mạnh làm nứt vòng gỗ Thanh Tùng, giải phóng một bí mật cổ xưa."
+      }
+    ]
+  },
+  "openings": [
+    {
+      "schemaVersion": 2,
+      "candidateId": "concept_karmic_water_transfer",
+      "chapters": [
+        {
+          "chapterNumber": 1,
+          "title": "Huyết Thệ Từ Đường",
+          "prose": "Mùi nhang trầm trong từ đường Trần gia không giấu được mùi mục nát của một gia tộc đang trên đà suy hỏa. Trần Mộc quỳ trên phiến đá lạnh, ánh mắt dán chặt vào tờ khế ước đỏ chót trên bàn thờ.\n\nĐại bá Trần Hạc gõ mạnh cây trượng xuống đất, giọng khàn đục vang vọng:\n\n— Tông môn Thanh Đình Sơn đã ra giá ba ngàn linh thạch. Đủ để mua Thọ Nguyên Đan cho ba vị trưởng lão và chu cấp tài nguyên cho thế hệ trẻ. Bán Thanh Tùng linh điền là con đường sống duy nhất!\n\nMộc khép hờ mắt. Kiếp trước, tờ khế ước này đã được ký. Kết cục là rễ cây Thanh Tùng bị chặt đứt, minh ước bảo vệ gia tộc vỡ vụn, toàn bộ con cháu Trần gia rơi vào cảnh lưu vong, bị tông môn bóc lột đến chết.\n\nHắn liếc nhìn sang Nhị bá Trần Lôi đang ngồi cắn chặt môi ở góc phòng. Con trai của Nhị bá đang trong cơn tẩu hỏa nhập ma vì gánh quá nhiều tạp chất tâm cảnh từ nước luân canh mùa trước. Chỉ cần có nước sạch trong lúc này, đứa trẻ đó sẽ giữ được mạng.\n\nMộc chậm rãi đứng lên. Hắn rút con dao găm bên hông, dứt khoát cắt ngón tay hiến máu khởi động Vòng gỗ Thanh Tùng trước đại sảnh. Máu tươi rỏ xuống khối gỗ sần sùi đang đeo trên cổ tay.\n\n— Việc bán đất, nhánh thứ tư của con tuyệt đối không đồng ý! — Giọng hắn vang lên lạnh lẽo và kiên định.\n\nĐại bá trừng mắt, gân xanh nổi lên trên trán:\n\n— Nhãi ranh! Ngươi lấy quyền gì? Ruộng nhà ngươi cằn cỗi, không có linh thạch nộp thuế, ngươi định để cả họ chết chìm sao?\n\nMộc không bận tâm đến Đại bá, hắn quay thẳng sang Nhị bá, gằn từng chữ:\n\n— Nhị bá, nhánh hai năm nay đến lượt gánh nước luân canh từ nhánh đại bá. Nếu bá bỏ phiếu chống lại việc bán đất, con nguyện dùng Vòng gỗ Thanh Tùng của mình để gánh toàn bộ nước độc của nhánh hai mùa này.\n\nCả từ đường xôn xao. Nước luân canh mang theo oán khí và bình cảnh tu luyện của người đi trước. Nhánh đại bá tu luyện công pháp hệ hỏa bạo liệt, tạp chất của họ đủ sức thiêu rụi kinh mạch của một tu sĩ Luyện Khí kỳ mỏng manh như Mộc.\n\nNhị bá bật dậy, hốc mắt đỏ ngầu, đôi tay run rẩy:\n\n— Mộc nhi, lời ngươi nói là thật? Ngươi dám gánh thay ca ca ngươi?\n\n— Con dùng máu thề trên Vòng Thanh Tùng! — Mộc giơ cao cổ tay. Vòng gỗ hút máu, phát ra ánh sáng xanh lục u ám. Một vết rạch đen kịt hiện lên, chứng minh minh ước đã thành lập.\n\nNgay lập tức, một cơn đau xé rách thần hồn xộc thẳng vào óc Mộc. Cảm giác phẫn uất, tàn nhẫn và bạo liệt từ tâm ma của nhánh hai cuồn cuộn đổ vào kinh mạch hắn. Lần đầu tiên, Mộc thực sự cảm nhận được nỗi thống khổ mà những trưởng bối kiếp trước phải âm thầm gánh chịu để giữ đất. Hắn lảo đảo, cắn nát môi để không phát ra tiếng kêu.\n\nNhị bá hít một hơi thật sâu, quay ngoắt sang Đại bá, giọng kiên quyết:\n\n— Nhánh hai bỏ phiếu chống! Khế ước bán đất này, hôm nay không thể ký!\n\nĐại bá tức giận đến run người, phất tay áo bỏ đi, bỏ lại một câu đe dọa lạnh lẽo:\n\n— Tốt! Cuối tháng này là hạn chót nộp thuế linh dược cho Thanh Đình Sơn. Nếu ruộng của ngươi bị nước độc làm cho chết khô không giao đủ định mức, ta sẽ tự tay dùng gia pháp trục xuất ngươi khỏi Trần gia để lấy đất bán!",
+          "causalStateChange": "Trần Mộc ngăn chặn quyết định bán đất của Đại bá bằng cách dùng máu kích hoạt Vòng gỗ Thanh Tùng, ép nhánh hai thay đổi phiếu bầu thông qua việc gánh vác nước độc.",
+          "requiredPlanAnchor": "Cắt ngón tay hiến máu khởi động Vòng gỗ Thanh Tùng trước đại sảnh",
+          "protagonistChoice": "Chấp nhận gánh vác toàn bộ lượng tạp chất tâm cảnh bạo liệt của nhánh hai thay vì trơ mắt nhìn linh điền gia tộc rơi vào tay người ngoài.",
+          "agencyMove": "Sử dụng ký ức kiếp trước về việc con trai Nhị bá sắp tẩu hỏa nhập ma để đàm phán chớp nhoáng, bẻ gãy sự đồng thuận bán đất.",
+          "earnedReward": null,
+          "materialProgression": null,
+          "comfortPayoff": null,
+          "costPaid": "Chịu đựng cơn đau xé rách thần hồn khi tâm ma tích tụ của nhánh hai tràn thẳng vào kinh mạch qua kết nối của Vòng gỗ Thanh Tùng.",
+          "exitPressure": "Phải ngay lập tức xử lý lượng nước độc khổng lồ đang đổ vào linh điền nhà mình trước khi rễ cây hoại tử và đối mặt với án phạt nộp thuế vào cuối tháng."
+        },
+        {
+          "chapterNumber": 2,
+          "title": "Lọc Nước Chuyển Dòng",
+          "prose": "Nước luân canh chảy vào linh điền của nhánh thứ tư không có màu trong suốt như bình thường. Nó đặc quánh một màu tím sẫm, sủi bọt và bốc lên hơi nóng hừng hực của sự thù hận.\n\nTrần Mộc đứng bên bờ mương, hai bàn tay rỉ máu vì phải liên tục dùng linh lực kìm hãm tâm ma đang gào thét trong đầu. Cảm giác bứt rứt, muốn hủy diệt mọi thứ xung quanh cứ chực chờ nuốt chửng lý trí hắn.\n\nHắn không vội vàng xả nước vào ruộng, mà lấy từ trong túi áo ra một nắm hạt giống Hắc Diệp Liên — loại cây hút tạp chất mà cả Trần gia đều ghét bỏ vì trồng nó đồng nghĩa với việc mất trắng thu nhập cả năm.\n\nMục tiêu của hắn rất rõ ràng: Trồng Hắc Diệp Liên tại khu đất cằn góc tây để lọc nước cho nhánh ba. Mộc nhẩm tính vị trí của các mao mạch ngầm dưới lòng đất để dẫn nước đi cho chuẩn xác.\n\nHắn cắn răng, chịu đựng cơn đau nhức tột độ, cắm từng hạt giống xuống bùn lầy. Khi dòng nước độc chảy qua, hạt giống lập tức nảy mầm. Những chiếc lá Hắc Diệp Liên vươn lên, đen ngòm như mực, cuộn tròn lại để hút lấy sự bạo liệt và oán khí trong nước.\n\nMỗi một lá cây mọc lên là một luồng tạp chất được rút khỏi dòng chảy. Đổi lại, linh khí trên toàn bộ khu ruộng của Mộc bị hút cạn. Mảnh đất vốn đã nghèo nàn nay biến thành một vùng tử địa xám xịt. Năm nay, hắn sẽ không thu hoạch được bất kỳ cây linh thảo nào có giá trị kinh tế.\n\nNhưng dòng nước chảy ra khỏi bãi Hắc Diệp Liên đã hoàn toàn biến đổi. Nó trong vắt, mang theo một tia sinh cơ thuần khiết đến khó tin.\n\nMộc vỗ tay vào thân cây Thanh Tùng nhỏ ở giữa ruộng, kích hoạt trận pháp phân thủy ngầm.\n\n— Đi! — Hắn khẽ quát.\n\nDòng nước sạch bong này không chảy vào phần đất còn lại của hắn, mà len lỏi qua mạng lưới rễ cây dưới lòng đất, hướng thẳng đến khu linh điền của nhánh thứ ba. Ở đó, vườn Bạch Ngọc Sâm của Tam thúc đang héo úa vì thiếu nước sạch trầm trọng.\n\nBỏ mặc sự mệt mỏi đến cùng cực, Mộc ngã gục xuống bờ mương, thở dốc. Hắn biết, Tam thúc là người trọng tình nghĩa nhưng cực kỳ thực tế. Chỉ có lợi ích thật sự mới kéo được vị trưởng bối này về phe mình chống lại Đại bá.\n\nVài ngày trôi qua, ruộng của Mộc ngày càng xơ xác. Đám tu sĩ trẻ của nhánh đại bá thỉnh thoảng đi ngang qua, buông những lời chế giễu cay độc về kẻ ngu ngốc tự rước nước độc vào nhà.\n\nSáng hôm nay, cửa rào nhà Mộc bị đạp tung. Trần Quản sự, tay chân thân tín của Đại bá, bước vào với nụ cười lạnh nhạt trên môi.\n\n— Trần Mộc, nghe nói ruộng của ngươi đã hóa thành đất chết. Đại bá phái ta đến thu hồi quyền canh tác. Đất không sinh lời, ngươi không có tư cách giữ nước của tổ tông!",
+          "causalStateChange": "Trần Mộc thiết lập hệ thống luân canh hút độc, chuyển hóa nước tạp chất thành nước tinh khiết và bí mật rót sang linh điền của nhánh ba.",
+          "requiredPlanAnchor": "Trồng Hắc Diệp Liên tại khu đất cằn góc tây để lọc nước cho nhánh ba",
+          "protagonistChoice": "Hy sinh thu nhập cả năm của linh điền nhà mình bằng cách trồng cây hút độc, dồn tài nguyên nước sạch cứu vườn Bạch Ngọc Sâm của nhánh ba.",
+          "agencyMove": "Can thiệp vào mạng lưới rễ ngầm của trận pháp phân thủy để dòng nước sạch nhắm trúng thời điểm linh sâm của nhánh ba đang cần đột phá nhất.",
+          "earnedReward": null,
+          "materialProgression": null,
+          "comfortPayoff": null,
+          "costPaid": "Đôi tay rỉ máu vì phản phệ tâm ma, ruộng đất nhà mình biến thành bãi đất chết không thể tạo ra linh dược bán lấy tiền.",
+          "exitPressure": "Tay sai của Đại bá kéo đến ruộng để kiểm tra thu hoạch, lấy cớ đất đai cằn cỗi để tước đoạt quyền canh tác của hắn."
+        },
+        {
+          "chapterNumber": 3,
+          "title": "Bữa Cơm Gạo Linh",
+          "prose": "Trần Quản sự vừa dứt lời, định vung tay cắm cờ thu hồi đất lên bờ mương nhà Mộc thì một luồng kình phong ập tới, đánh bay gã ngã lăn ra đất.\n\n— Kẻ nào dám đụng đến linh điền của Mộc nhi? — Giọng nói ồm ồm như sấm vang lên.\n\nTam thúc Trần Đỉnh sải bước bước vào, khuôn mặt đỏ au tràn đầy hồng quang. Trên tay ông, nâng niu như báu vật, là một gốc Bạch Ngọc Sâm tỏa ra sương mù trắng xóa. Từng rễ sâm căng mọng, không hề có lấy một tia tạp chất.\n\nSự xuất hiện của củ linh sâm cực phẩm khiến Trần Quản sự trợn tròn mắt, lắp bắp không thành lời.\n\nTam thúc quay sang Trần Mộc, ánh mắt đầy vẻ phức tạp lẫn hàm ơn. Ông biết rõ, nếu không có dòng nước tinh khiết chảy đến vào đúng giai đoạn quyết định vài ngày trước, toàn bộ tâm huyết mười năm của ông đã đổ sông đổ bể.\n\nTam thúc đẩy chiếc túi lên bàn đá. Nhận ba mươi khối linh thạch và mười cân linh gạo thượng hạng từ nhánh ba, Mộc biết mình đã chính thức kéo được vị trưởng bối này về phe mình. Từ nay, Vòng gỗ Thanh Tùng của nhánh ba sẽ đồng tiến lùi với nhánh bốn!\n\nMộc mỉm cười chắp tay, cảm nhận sức nặng của sự ủng hộ chính trị này. Có nhánh ba và nhánh hai đứng sau, Đại bá không thể nào dùng luật gia tộc để ép bán đất hay thu hồi quyền canh tác được nữa.\n\nTrần Quản sự thấy tình thế bất lợi, liền lồm cồm bò dậy, ôm mặt chạy thẳng về phía từ đường để báo cáo với chủ tử.\n\nChiều hôm đó, căn bếp nhỏ vốn lạnh lẽo của Mộc lần đầu tiên đỏ lửa rực rỡ. Hắn dùng vài khối linh thạch vừa nhận được để mua một bộ cày cuốc khắc sẵn trận pháp tụ linh, chuẩn bị cho việc cải tạo phần đất không trồng Hắc Diệp Liên.\n\nTrên bếp, nồi linh gạo thượng hạng sôi sùng sục. Trần Tiểu Vũ, cô em gái ốm yếu của Mộc, cẩn thận xúc từng bát cơm trắng ngần, tỏa hương thơm ngát.\n\nHơi nóng từ bát cơm xua tan đi cái lạnh lẽo của nhiều tháng ngày ăn đói mặc rét. Khi nhai từng hạt gạo dẻo ngọt, cảm nhận linh khí dịu dàng trôi vào đan điền, Mộc thấy mọi đau đớn từ việc gánh nước độc dường như tan biến. Bữa cơm gia đình ấm áp này chính là lý do hắn trùng sinh để chiến đấu.\n\nThế nhưng, sóng gió chưa dừng lại. Việc một củ Bạch Ngọc Sâm cực phẩm xuất hiện đã nhanh chóng bay đến tai tông môn Thanh Đình Sơn.\n\nSứ giả của tông môn đã bắt đầu rục rịch. Bọn chúng nhận ra rằng mạch nước ngầm Thanh Tùng không chỉ đơn thuần là để tưới tiêu, mà còn chứa đựng một cơ chế tinh lọc tâm ma đáng sợ. Áp lực đòi thâu tóm gia tộc giờ đây chuyển sang một hình thái tàn bạo hơn rất nhiều.",
+          "causalStateChange": "Nhánh ba thu hoạch Bạch Ngọc Sâm thành công và công khai bảo vệ Trần Mộc, đập tan lý do ép bán đất của Đại bá, đồng thời thiết lập liên minh lợi ích vững chắc.",
+          "requiredPlanAnchor": "Nhận ba mươi khối linh thạch và mười cân linh gạo thượng hạng từ nhánh ba",
+          "protagonistChoice": "Nhận lấy sự đền đáp bằng hiện vật thiết thực thay vì yêu cầu quyền lực suông, chứng minh giá trị của mình qua nông nghiệp.",
+          "agencyMove": "Dùng thành quả của vườn Bạch Ngọc Sâm làm bằng chứng thép trước mặt mọi người, cho thấy linh điền Thanh Tùng vẫn có thể sinh lời khổng lồ nếu hợp tác luân canh đúng cách.",
+          "earnedReward": "Sự ủng hộ chính trị tuyệt đối từ nhánh ba bằng Vòng gỗ Thanh Tùng và ba mươi khối linh thạch hạ phẩm làm vốn sinh nhai.",
+          "materialProgression": "Mua sắm được một bộ công cụ làm nông khắc sẵn trận pháp tụ linh để phục hồi sinh khí cho mảnh ruộng cằn cỗi sau đợt lọc độc.",
+          "comfortPayoff": "Cùng em gái ăn một bữa cơm nóng hổi nấu bằng linh gạo thượng hạng, mang lại cảm giác no đủ và xua tan cái lạnh lẽo của gia cảnh bần hàn.",
+          "costPaid": "Đại bá triệt để xem Trần Mộc là cái gai trong mắt, bắt đầu liên kết với thương hội bên ngoài để chèn ép giá linh dược của hắn.",
+          "exitPressure": "Sứ giả tông môn Thanh Đình Sơn phát hiện ra sự tồn tại của Bạch Ngọc Sâm cực phẩm và bắt đầu nhòm ngó bí mật mạch nước ngầm, rục rịch ý định chiếm đoạt bằng vũ lực."
+        }
+      ],
+      "continuityDigest": "Chương 1: Trần Mộc dùng Vòng gỗ Thanh Tùng gánh nước độc để chặn quyết định bán đất của Đại bá. Chương 2: Mộc trồng Hắc Diệp Liên lọc nước độc, hy sinh thu nhập để bơm nước sạch cứu linh sâm nhánh ba. Chương 3: Nhánh ba thu hoạch sâm thành công, báo đáp Mộc bằng tài nguyên và bảo vệ hắn khỏi sự trả thù của Đại bá.",
+      "unresolvedPressure": "Gia tộc tạm thời không bị bán đất nhưng Đại bá vẫn nắm quyền kiểm soát một phần thuế, trong khi tông môn bên ngoài đã bắt đầu nhòm ngó bí mật tinh lọc tâm ma của rễ cây Thanh Tùng."
+    },
+    {
+      "schemaVersion": 2,
+      "candidateId": "concept_shadow_pact_rotation",
+      "chapters": [
+        {
+          "chapterNumber": 1,
+          "title": "Bóng Tùng Đổ Xuống",
+          "prose": "Tờ khế ước mua bán điền trang nạm viền vàng đặt chễm chệ trên mặt bàn đá lạnh lẽo. Nhị thúc gõ nhịp ngón tay đầy căng thẳng, khuôn mặt già nua lấm tấm mồ hôi hột, lộ rõ vẻ bất đắc dĩ. Xung quanh sảnh đường, những gương mặt thân thuộc của các nhánh họ đều cúi gằm, không một ai dám ngẩng lên nhìn thẳng vào gốc Thanh Tùng cổ thụ ngoài sân đang rì rào trong gió sớm.\n\n— Bán nửa linh điền mảng Âm cho Tôn gia là lối thoát duy nhất lúc này, Từ Uyên. Cháu nhìn xem, nếu giữ lại toàn bộ, khi bóng Thanh Tùng đổ xuống vào giờ ngọ, nhánh họ nào sẽ phải gánh vác việc cày cuốc trong Vùng Tối? Ai chịu nổi cảnh mù lòa câm điếc suốt nửa năm trời?\n\nTừ Uyên không trả lời ngay. Hắn liếc nhìn vòng gỗ Thanh Tùng treo giữa đại sảnh, bảo vật duy trì khế ước của gia tộc. Cổ vật đang dần chuyển sang màu xám xịt ảm đạm, phát ra những tiếng kêu răng rắc rợn người, báo hiệu kỳ hạn luân canh âm dương đã cận kề. Đã ba đời nay, vì sợ hãi việc mất đi ngũ quan, gia tộc luôn tìm cách lách luật bằng việc bỏ hoang mảng Âm.\n\n— Bán đi mảng Âm, thì mảng Dương lấy nước từ đâu thưa Nhị thúc? Rễ Thanh Tùng hút linh mạch từ cả hai phía để cân bằng. Nhổ gốc rễ mảng Âm, linh điền bên Dương sớm muộn cũng sẽ héo úa, tàn lụi. Chúng ta đang tự cắt đi mạch sống của chính con cháu mình.\n\nHắn không chờ Nhị thúc hay các trưởng lão phản bác, sải bước tới thẳng bàn đá và vồ lấy tờ khế ước. Chất giấy linh phù dai dẳng được yểm bùa kiên cố, nhưng không cản được lực đạo quyết liệt của một đôi tay đã cày cuốc mười năm trên ruộng linh sâm.\n\nXoẹt một tiếng sắc lẹm, khế ước nát làm đôi, rồi bị xé vụn thành từng mảnh nhỏ rơi lả tả xuống sàn đá. Tiếng xé giấy vang lên giữa đại sảnh tĩnh lặng nghe như một cái tát trời giáng. Mấy vị trưởng lão ồ lên kinh ngạc, có người vỗ bàn đứng phắt dậy, mặt đỏ phừng phừng giận dữ.\n\n— Thằng nhãi ranh to gan! Ngươi định đẩy cả họ vào chỗ chết sao? Không bán đất cho Tôn gia, thì ai sẽ bước vào Vùng Tối để gánh vác số mệnh luân canh? Ai dám lấy thân mình ra chịu cái cảnh sống không bằng chết đó?\n\nTừ Uyên bình thản nhặt lấy mộc bài gia chủ đang nằm chỏng chơ trên bàn, siết chặt trong lòng bàn tay. Hắn xoay người, nhìn thẳng vào thân cây Thanh Tùng đang tỏa ra hàn khí. Hắn dồn toàn bộ linh lực còn sót lại vào lồng ngực, đảm bảo từng chữ thốt ra đều ghim chặt vào tâm trí mọi người.\n\n— Ta sẽ vào. Không chỉ vậy, ta sẽ chứng minh Vùng Tối không phải là án tử vô hình mà các người vẫn khiếp sợ. Nó là mỏ quặng Ám Tinh mà tổ tiên đã cất công để lại. Các người chỉ việc đứng ở Vùng Sáng, giữ vững mạch nước ngầm, không được bớt xén dù chỉ một gáo cặn.\n\nChẳng đợi ai can ngăn, hắn cắn nát đầu ngón tay cái, nhỏ một giọt máu tươi lên vòng gỗ Thanh Tùng. Trận pháp luân canh bị bỏ quên hàng chục năm lập tức gầm gừ tỉnh giấc. Bầu trời trên đỉnh đầu bỗng chẻ làm hai nửa âm dương rõ rệt, ranh giới sáng tối nứt toác ra như một vết chém.\n\nCái bóng khổng lồ của Thanh Tùng lao nhanh xuống như một con thú đói khát, nuốt chửng lấy khoảng sân nơi Từ Uyên đang hiên ngang đứng thẳng. Nhị thúc lùi lại mấy bước, hoảng hốt nhìn người cháu ruột của mình dần bị lớp mực đen đặc quánh bao phủ toàn thân.\n\nCảm giác đầu tiên ập đến với Từ Uyên là bóng tối nhơm nhớp đè bẹp mí mắt, tước đi hoàn toàn thị giác trong chớp mắt. Tiếp đó, tiếng gió rít bên tai như bị hút cạn vào một hố đen sâu thẳm, để lại sự tĩnh lặng tuyệt đối. Hắn vươn tay ra trước mặt, nhưng không thể thấy ngón tay mình, cũng không nghe thấy nhịp tim đập. Cái giá của khế ước Âm Dương đã bắt đầu thu nạp vật tế.",
+          "causalStateChange": "Từ việc chuẩn bị ký khế ước bán đất tị nạn, chuyển sang việc kích hoạt khế ước luân canh và lao vào Vùng Tối.",
+          "requiredPlanAnchor": "Kích hoạt vòng gỗ Thanh Tùng",
+          "protagonistChoice": "Xé bỏ khế ước bán đất và tự nguyện bước vào Vùng Tối để chứng minh giá trị của mỏ quặng Ám Tinh.",
+          "agencyMove": "Nhỏ máu kích hoạt trận pháp Thanh Tùng, ép buộc gia tộc phải tuân thủ luật cung cấp nước khi mình bước vào vùng mất ngũ quan.",
+          "earnedReward": null,
+          "materialProgression": null,
+          "comfortPayoff": null,
+          "costPaid": "Bị tước đoạt hoàn toàn thị giác và thính giác, rơi vào cõi tĩnh lặng tuyệt đối ngay lập tức.",
+          "exitPressure": "Phải sống sót và tìm được quặng trong tình trạng mù lòa câm điếc để chứng minh mình không tự sát vô nghĩa."
+        },
+        {
+          "chapterNumber": 2,
+          "title": "Mạch Nước Đổi Màu",
+          "prose": "Ngày thứ ba trong Vùng Tối, cảm giác mất đi ngũ quan bắt đầu bào mòn thần trí Từ Uyên. Không có ánh sáng, không có âm thanh, thời gian trôi qua hệt như một dòng sông bùn lầy đặc quánh. Hắn chỉ có thể dựa vào cảm giác đau đớn khi lòng bàn chân giẫm lên lớp đá dăm gồ ghề để biết mình còn sống.\n\nKhí lạnh của mỏ quặng Ám Tinh thấu tận xương tủy, nhưng thứ đáng sợ nhất là ảo giác. Mỗi khi quá mệt mỏi, trong đầu hắn lại vọng lên tiếng gọi văng vẳng của Nhị thúc bảo hắn quay về, hoặc tiếng khóc xé lòng của đứa trẻ bị quái thú xé xác. Từ Uyên cắn chặt môi đến bật máu, mượn cơn đau thể xác để xua đuổi những hình ảnh mộng mị do bóng tối thêu dệt.\n\nHắn bò lết dọc theo rãnh nước ngầm duy nhất chảy từ Vùng Sáng sang. Đây là chiếc phao cứu sinh, cũng là điểm tựa niềm tin cuối cùng. Chừng nào dòng nước vẫn còn chảy ướt đẫm đầu gối, chừng đó hắn biết người nhà bên Vùng Sáng vẫn đang tuân thủ minh ước, chia sẻ nguồn sống cho kẻ cày cuốc dưới bóng tối.\n\nThế nhưng, ngay lúc hắn vươn tay sờ soạng tìm kiếm mạch khoáng Ám Tinh, dòng nước đột ngột rút cạn. Sự mát lạnh dưới bùn biến mất trong tích tắc, thay vào đó là thứ chất lỏng nhớp nháp, có mùi tanh nồng sực thẳng vào khứu giác. Hắn không nhìn thấy, nhưng cảm nhận được mạch nước đang khô cạn dần.\n\n— Bọn họ ép mạch nước để tưới linh sâm rồi.\n\nTừ Uyên nhủ thầm trong cõi lòng tĩnh lặng, dù cổ họng khô khốc không thể thốt nên lời. Việc nước giảm xuống mức tối thiểu kích hoạt sự trừng phạt của Vùng Tối. Lập tức, hàng ngàn mũi kim vô hình châm chích vào màng nhĩ vốn đã điếc đặc của hắn, tạo ra những cơn ảo thanh điên cuồng.\n\nHắn thấy mình bị ném vào một vạc dầu sôi, lửa cháy rừng rực thiêu rụi từng thớ thịt. Nếu là kẻ khác, lúc này đã vung cuốc loạn xạ, phá hủy hoàn toàn mạch nước ngầm chung của gia tộc để thỏa mãn cơn điên. Nhưng Từ Uyên đã chuẩn bị cho khoảnh khắc này.\n\nThay vì hoảng loạn vung tay, hắn cắm sâu thanh cuốc quặng xuống lớp bùn khô cạn, dùng nó làm mỏ neo giữ vững thân thể đang run rẩy bần bật. Hắn tập trung toàn bộ thần thức vào điểm giữa trán, vận dụng bí quyết 'Tâm Nhãn' mà tổ tiên ghi lại. Hắn phó mặc cho ảo giác cắn xé thân thể, dồn sự chú ý vào độ rung động li ti của mũi cuốc.\n\nCạch. Một luồng dao động siêu nhỏ truyền từ cán cuốc lên lòng bàn tay. Không phải đá tảng, cũng không phải rễ cây. Thứ này phát ra một tầng khí tức lạnh lẽo, đối nghịch hoàn toàn với cái nóng rát của ảo giác.\n\nVượt qua cơn đau thắt nghẹn ở lồng ngực, Từ Uyên dùng tay không cào rách mảng bùn đen đặc. Những ngón tay rướm máu chạm vào một khối quặng lởm chởm, to bằng nắm tay. Khoảnh khắc da thịt tiếp xúc với khối quặng, sự điên cuồng trong tâm trí bỗng dịu đi đôi chút. Viên Ám Tinh đầu tiên trong mười năm qua đã nằm gọn trong lòng bàn tay hắn.\n\nÁp lực lúc này lại đè nặng lên một chuyện khác. Có được quặng là một chuyện, nhưng làm sao giữ được mạng sống để quay về Vùng Sáng khi dòng nước ngày càng cạn kiệt? Nếu Nhị thúc không chịu mở van nước trước giờ luân canh, hắn sẽ kẹt chết trong này với viên quặng vô tri.",
+          "causalStateChange": "Từ việc bị ảo giác hành hạ khi nước cạn, chuyển sang việc tĩnh tâm dùng Tâm Nhãn định vị được quặng quý.",
+          "requiredPlanAnchor": "Đào được khối Ám Tinh đầu tiên",
+          "protagonistChoice": "Từ chối việc nổi điên đập phá mạch nước ngầm để trả thù, chọn cách ghim chặt cơ thể để tập trung dùng Tâm Nhãn.",
+          "agencyMove": "Dùng chính sự sụt giảm của dòng nước làm mốc định vị, chịu đựng cơn ảo thanh để mò ra vị trí mạch khoáng.",
+          "earnedReward": null,
+          "materialProgression": null,
+          "comfortPayoff": null,
+          "costPaid": "Chịu đựng ảo giác cơ thể bị thiêu rụi và tổn thương tinh thần sâu sắc khi biết người nhà định hy sinh mình.",
+          "exitPressure": "Cầm được quặng nhưng mạch nước ngầm đang cạn kiệt đe dọa trực tiếp mạng sống trước khi kịp tới giờ bàn giao."
+        },
+        {
+          "chapterNumber": 3,
+          "title": "Ánh Sáng Khắc Nghiệt",
+          "prose": "Bên ngoài ranh giới sáng tối, Nhị thúc đi vòng quanh gốc Thanh Tùng với khuôn mặt tái mét. Cây linh sâm thượng phẩm của chi thứ ba đang trong thời kỳ trổ hoa cần nước bón, khiến ông mờ mắt hạ lệnh bớt xén dòng nước ngầm xuống Vùng Tối một nén nhang. Nhưng khi thấy nước trong mương chuyển dần sang màu máu, ông mới bàng hoàng nhận ra sai lầm chí mạng.\n\n— Mau mở van! Đổ toàn bộ lượng nước dự trữ vào Vùng Tối! Bọn khốn, các ngươi định giết chết Từ Uyên sao?\n\nTiếng gào của Nhị thúc vang vọng khắp sảnh, nhưng đã chậm một bước. Thời khắc luân canh bàn giao ngũ quan đã điểm. Vòng gỗ Thanh Tùng kêu lên những tiếng cót két khô khốc, báo hiệu trận pháp chuẩn bị tự động hoán đổi vị trí của hai nửa điền trang. Nếu Từ Uyên không bước ra kịp lúc ánh sáng chạm tới vạch kẻ, hắn sẽ vĩnh viễn hóa thành bóng ma.\n\nMọi ánh mắt đổ dồn vào lớp sương đen dày đặc nơi cổng vòm. Từng nhịp thở nặng nhọc vang lên. Bóng đen cuồn cuộn cuộn trào như một nồi súp đặc. Rồi từ trong mảng tối u ám đó, một thân ảnh gầy gò, lấm lem bùn đất loạng choạng bước ra, kéo theo tiếng kim loại lết trên mặt đá.\n\nKhoảnh khắc bước qua ranh giới, bóng tối nhường chỗ cho ánh nắng ban mai rực rỡ. Từ Uyên hít một hơi thật sâu, đôi mắt từ từ mở ra. Lớp màng xám đục tan biến, để lại con ngươi đen láy. Ánh sáng chói lọi làm hắn chói mắt, tiếng chim hót và tiếng gió thoảng qua màng nhĩ bỗng trở nên vô cùng sắc nét, sống động.\n\n— Từ Uyên! Cháu còn sống!\n\nNhị thúc nhào tới, định đỡ lấy hắn, nhưng Từ Uyên đưa tay gạt ra. Hắn đứng thẳng người, tung thứ đang nắm chặt trong tay phải xuống đất. Một khối khoáng thạch đen tuyền, tỏa ra những luồng khí lạnh buốt, đập bộp xuống sàn đá. Nó lấp lánh thứ ánh sáng huyền bí, cắt đứt mọi lời bàn tán xì xầm của đám trưởng lão.\n\n— Ám Tinh! Đúng là Ám Tinh thượng phẩm! Lớn chừng này, đủ sức đổi lấy một vạn linh thạch ngoài chợ đen!\n\nMột vị trưởng lão thốt lên, giọng điệu từ hoài nghi chuyển hẳn sang thèm khát tột độ. Từ Uyên phủi lớp đất khô trên tay, lạnh nhạt lên tiếng, âm vực đanh lại đầy uy nghiêm.\n\n— Khối quặng này dư sức trả dứt điểm khoản nợ của gia tộc và chuộc lại quyền sử dụng nguồn nước từ tay Tôn gia. Từ hôm nay, luật luân canh âm dương chính thức khôi phục.\n\nBữa cơm tối hôm đó diễn ra tại nhà chính của chi trưởng. Từ Uyên ngồi gắp miếng thịt thú rừng hầm nhừ, cảm nhận rõ rệt hương vị đậm đà và sự ấm áp của ngọn nến hắt lên mặt bàn gỗ. Mất đi giác quan suốt nửa năm khiến giờ đây, chỉ một ngụm trà nóng cũng đủ làm hắn trào dâng niềm thỏa mãn khó tả.\n\nNhưng hắn biết, sự yên bình này chỉ là khởi đầu. Ánh mắt tham lam của các nhánh họ lúc nhìn thấy khối Ám Tinh đã nói lên tất cả. Họ không còn sợ Vùng Tối, mà họ thèm khát vơ vét nó. Hắn sẽ phải đối mặt với việc các nhánh họ tranh giành quyền kiểm soát luân canh, và lòng tham luôn tàn nhẫn hơn bất kỳ ảo giác mờ mịt nào.",
+          "causalStateChange": "Từ vị thế kẻ liều mạng đánh cược, trở thành gia chủ mang về tài phú thực sự, khôi phục hoàn toàn luật luân canh.",
+          "requiredPlanAnchor": "Thanh toán nợ chuộc lại nguồn nước",
+          "protagonistChoice": "Phô diễn khối Ám Tinh thượng phẩm ngay giữa đại sảnh thay vì giấu giếm, áp đặt luật chơi mới cho toàn tộc.",
+          "agencyMove": "Dùng giá trị của khối quặng để ép các trưởng lão phải cúi đầu chấp nhận việc luân canh định kỳ thay vì bán đất.",
+          "earnedReward": "Một khối Ám Tinh thượng phẩm nguyên vẹn, tỏa khí lạnh buốt và lấp lánh trong ánh sáng ban mai.",
+          "materialProgression": "Số quặng đào được mang lại giá trị tương đương một vạn linh thạch, giải quyết dứt điểm món nợ mua nước từ Tôn gia.",
+          "comfortPayoff": "Một bữa cơm tối ấm áp với các giác quan sắc bén hồi phục, nếm được vị đậm đà của thịt hầm và cảm nhận ánh nến hắt lên mặt.",
+          "costPaid": "Mất đi sự đoàn kết ngây thơ ban đầu, Nhị thúc bị mất uy tín và nội bộ gia tộc bắt đầu rạn nứt vì lòng tham.",
+          "exitPressure": "Sự xuất hiện của tài sản khổng lồ từ Vùng Tối kích thích lòng tham tột độ của các nhánh họ, mầm mống tranh giành quyền luân canh."
+        }
+      ],
+      "continuityDigest": "Từ Uyên xé bỏ khế ước bán đất, tự nguyện hiến tế ngũ quan để bước vào Vùng Tối của trận pháp Thanh Tùng. Vượt qua ảo giác điên loạn do Nhị thúc bớt xén dòng nước, hắn dùng Tâm Nhãn tìm được khối Ám Tinh thượng phẩm. Trở về ánh sáng, hắn dùng khối quặng trả nợ cho gia tộc, khôi phục thiết chế luân canh âm dương, nhưng đồng thời kích phát lòng tham tàn nhẫn của các nhánh họ đối với tài nguyên mới.",
+      "unresolvedPressure": "Các nhánh họ đã nếm được mùi lợi ích từ Ám Tinh và bắt đầu lên kế hoạch tranh giành vị trí xuống Vùng Tối, thậm chí sẵn sàng dùng thủ đoạn để hạ bệ nhau trong các kỳ bàn giao luân canh sắp tới."
+    },
+    {
+      "schemaVersion": 2,
+      "candidateId": "concept_echo_chamber_farming",
+      "chapters": [
+        {
+          "chapterNumber": 1,
+          "title": "Xé Khế Ước Bán Đất",
+          "prose": "Đại sảnh Lâm thị ngập trong sự im lặng ngột ngạt. Bức tường gỗ Thanh Tùng dày đặc những đường vân xám xịt, hấp thu mọi tiếng động nhỏ nhất để tránh rò rỉ ra ngoài.\n\nĐại bá Lâm Chấn ngồi trên ghế chủ tọa, hai mắt vằn tia máu. Bàn tay chai sần của ông run rẩy cầm lấy con dấu đồng, lơ lửng trên bản khế ước được viết bằng mực huyết sa.\n\nBản khế ước bán ba mẫu linh điền giáp ranh phía nam cho Trần gia. Đó là lối thoát duy nhất để trả món nợ ba trăm linh thạch cho hắc thị vào sáng ngày mai.\n\n— Không được đóng dấu!\n\nMột bóng người xông thẳng vào đại sảnh. Lâm Viễn lao tới bàn, không một chút do dự, giật phăng bản khế ước và xé toạc nó làm đôi. Tiếng giấy rách vang lên khô khốc, sắc lẹm.\n\n— Thằng ranh con! Ngươi điên rồi? — Lâm Chấn gầm lên, vung tay tung một chưởng lực phẫn nộ.\n\nMột luồng chưởng phong đập thẳng vào ngực Lâm Viễn. Tiếng xương sườn kêu răng rắc. Hắn lảo đảo lùi lại ba bước, cắn chặt môi nuốt ngụm máu tanh nghẹn trong họng xuống bụng.\n\nCùng lúc đó, vòng gỗ Thanh Tùng trên cổ đại bá tóe ra ánh sáng đỏ rực. Đó là cảnh báo hạn ngạch từ ngữ của ông đang tiêu hao quá mức vì cảm xúc kích động.\n\n— Mảnh linh điền phía nam không chỉ là đất, nó là mỏ neo của trận pháp cách âm bao quanh Vọng Âm Cốc. — Lâm Viễn ôm ngực, khó nhọc lên tiếng.\n\nHắn nhìn chằm chằm vào đại bá: — Bán nó đi, mảng giáp bảo vệ vỡ vụn. Toàn bộ tiếng chửi rủa, thù hận của gia tộc tích tụ dưới lòng đất mười năm trước sẽ dội thẳng vào thần hồn chúng ta. Không một ai sống sót!\n\n— Vậy ngươi lấy cái gì để trả nợ ba trăm linh thạch? — Giọng Lâm Chấn khàn đi, xen lẫn sự bất lực tột cùng. — Ngươi dùng mạng mình đổi lấy linh thạch được sao?\n\n— Đêm nay. Tại đồi Mộc Lĩnh. Cháu sẽ mang đủ số linh thạch về. — Ánh mắt Lâm Viễn sắc lạnh, không hề chớp.\n\nLâm Chấn sững sờ. Mộc Lĩnh chỉ là một ngọn đồi hoang tàn, đất đai cằn cỗi không thể trồng linh lúa. Chỗ đó lấy đâu ra tài nguyên?\n\n— Mang toàn bộ giỏ đan bằng vỏ Thanh Tùng trong kho ra đó. Mọi người mặc giáp sắt nặng. Trận pháp tụng kinh cầu phúc một trăm ngày của cụ tổ từ một thế kỷ trước... đêm nay sẽ dội lại.\n\nSự im lặng bao trùm đại sảnh. Lời tuyên bố của hắn nghe qua vô cùng hoang đường. Những tiếng vọng kéo dài hàng thế kỷ rất hiếm khi hội tụ chính xác.\n\nNhưng ánh mắt kiên định và việc hắn sẵn sàng chịu một chưởng không tránh né đã khiến Lâm Chấn dao động. Ông cắn răng nhìn mảnh khế ước nát vụn dưới sàn nhà.\n\n— Nếu đêm nay trắng tay, ta sẽ tự phế tu vi, rời khỏi Vọng Âm Cốc để Trần gia bắt giữ làm nô lệ gạt nợ. — Lâm Viễn trầm giọng đưa ra lời thề độc.\n\nKhông còn đường lui. Việc bán đất đã bị phá ngang, thời gian không cho phép làm lại khế ước mới. Lựa chọn duy nhất của gia tộc lúc này là đặt cược mạng sống vào kế hoạch điên rồ của gã thanh niên này.",
+          "causalStateChange": "Từ việc cam chịu mất đất và vỡ trận pháp sang trạng thái đánh cược mạng sống để tìm kiếm tài nguyên từ quá khứ.",
+          "requiredPlanAnchor": "thu hồi khế ước bán đất",
+          "protagonistChoice": "Quyết định xé bỏ khế ước bán linh điền và công khai vị trí rơi của tiếng vọng phúc lành để trả nợ.",
+          "agencyMove": "Chủ động chịu một chưởng của đại bá để chứng minh quyết tâm và dẫn dắt cả gia tộc lên đồi Mộc Lĩnh trong đêm.",
+          "earnedReward": null,
+          "materialProgression": null,
+          "comfortPayoff": null,
+          "costPaid": "Chịu đựng một chưởng lực phẫn nộ làm nứt xương sườn và phải lập lời thề độc tự phế tu vi nếu thất bại.",
+          "exitPressure": "Áp lực phải sống sót và thu thập đủ Âm Thạch dưới cơn mưa tiếng vọng đầy rủi ro."
+        },
+        {
+          "chapterNumber": 2,
+          "title": "Mưa Âm Thạch",
+          "prose": "Gió đêm buốt giá rít qua sườn đồi Mộc Lĩnh. Hai mươi thành viên Lâm thị bọc mình trong những bộ áo giáp sắt dày cộp, quỳ một gối trên nền đất lạnh.\n\nAi nấy đều cắn chặt một miếng gỗ Thanh Tùng trong miệng. Đó là quy tắc sinh tồn tối thượng: không một tiếng động nào được phép phát ra để tránh làm ô nhiễm khu vực.\n\nPhía trên đỉnh đầu, bầu trời đêm dường như bị bẻ cong. Không gian gợn sóng dữ dội.\n\nMột giọng tụng kinh trầm mặc, văng vẳng như từ cõi xa xăm vọng về. Đó là thanh âm thuần khiết của cụ tổ Lâm thị, tích tụ từ hàng vạn lời cầu nguyện một trăm năm trước.\n\nTừng chữ kinh văn vang lên, không khí ngưng tụ lại thành những luồng sáng xanh lục, rồi hóa thành những viên đá lấp lánh rơi xuống rào rào như mưa rào.\n\nÂm Thạch! Nguồn tài nguyên quý giá bậc nhất của Vọng Âm Cốc. Chúng đập vào lớp áo giáp sắt kêu loong coong, rơi lả tả xuống mặt đất.\n\nÁnh mắt đại bá Lâm Chấn trợn ngược vì sung sướng. Bàn tay sần sùi của ông run rẩy đưa chiếc giỏ đan bằng vỏ Thanh Tùng ra hứng lấy nguồn sống của gia tộc.\n\nNhưng ngay sau nhịp tụng kinh bình yên, một tiếng thở dài sầu thảm của cụ tổ bất ngờ vang lên. Sự hối tiếc từ quá khứ lập tức hóa thành hàng chục lưỡi đao gió sắc lẹm chém thẳng xuống.\n\nỞ góc phải, đứa em họ Lâm Mặc, một đứa trẻ câm bẩm sinh, đang mải mê rướn người nhặt một viên Âm Thạch to cỡ quả trứng gà, hoàn toàn không cảm nhận được sát cơ.\n\nLâm Viễn không hề do dự, lao tới dùng tấm lưng bọc thép của mình che chắn cho đứa bé.\n\nBa lưỡi đao gió chém rách bươm lớp giáp vai, xé toạc lớp da thịt trên lưng hắn. Máu tươi nóng hổi tuôn ra, thấm ướt một mảng áo.\n\nCơn đau thấu xương ập tới, nhưng Lâm Viễn cắn ngập răng vào miếng gỗ trong miệng, tuyệt đối không phát ra lấy một tiếng rên rỉ. Bất kỳ tạp âm đau đớn nào lúc này cũng sẽ làm vỡ nát viên Âm Thạch lõi tinh khiết kia.\n\nHắn dùng tay đẩy nhẹ vai Lâm Mặc, ra hiệu cho thằng bé tiếp tục thu thập. Nhờ sự im lặng tuyệt đối của một đứa trẻ câm, viên Âm Thạch lõi được lấy lên nguyên vẹn, tỏa ra linh khí dày đặc.\n\nĐêm đó, dưới sự gồng gánh và nhẫn nhịn của cả gia tộc, họ thu hoạch được hơn bốn trăm khối Âm Thạch. Số tài nguyên vượt xa món nợ ba trăm khối.\n\nTuy nhiên, sự xuất hiện của cơn mưa đá và sự kích động sinh mệnh lực đã làm trận pháp Thanh Tùng của gia tộc vận hành quá tải. Dưới chân đồi, những đường nứt bắt đầu lan rộng về phía khu nhà của Nhị thúc.",
+          "causalStateChange": "Từ khủng hoảng nợ nần cận kề sang việc sở hữu đủ tài nguyên để trả nợ nhưng lại kích hoạt rủi ro trận pháp mới.",
+          "requiredPlanAnchor": "hứng trọn mưa Âm Thạch",
+          "protagonistChoice": "Chấp nhận dùng thân mình che chắn cho đứa em họ câm bẩm sinh để bảo vệ độ tinh khiết của Âm Thạch lõi.",
+          "agencyMove": "Lấy thân bọc giáp sắt chịu đòn thay, tuyệt đối giữ im lặng không rên rỉ để tránh ô nhiễm khu vực thu hoạch.",
+          "earnedReward": null,
+          "materialProgression": null,
+          "comfortPayoff": null,
+          "costPaid": "Lưng bị đao gió chém rách bươm, máu chảy đầm đìa và kinh mạch tổn thương nghiêm trọng do nén đau.",
+          "exitPressure": "Trận pháp Thanh Tùng quá tải khiến một tiếng vọng nguyền rủa từ mười năm trước chực chờ bùng nổ tại khu nhà Nhị thúc."
+        },
+        {
+          "chapterNumber": 3,
+          "title": "Hạn Ngạch Từ Ngữ",
+          "prose": "Sáng hôm sau, ba trăm khối Âm Thạch đã được đập thẳng xuống bàn giao dịch, thanh toán sòng phẳng món nợ trước sự ngỡ ngàng của kẻ trung gian Trần gia.\n\nTuy nhiên, khi Lâm Viễn vừa bước chân về đến cổng Vọng Âm Cốc, cảnh tượng hỗn loạn đã đập vào mắt.\n\nTại khu nhà của Nhị thúc Lâm Hải, mặt đất đang nứt toác. Từng luồng khí xám xịt, hôi thối phụt lên. Tiếng chửi rủa ầm ĩ, tục tĩu do chính Nhị thúc quát mắng vợ con từ mười năm trước đang tụ lại thành hình.\n\n— Cứu ta với! Nó sắp nổ rồi! — Nhị thúc kinh hãi ngã phịch xuống đất, nhìn mảng linh điền trồng lúa linh mạch đang sủi bọt, héo úa dần.\n\nNếu khối tiếng vọng rác này phát nổ, không chỉ ba mẫu linh mạch thành tro bụi, mà màng nhĩ của toàn bộ nhánh thứ hai sẽ bị xé nát vĩnh viễn.\n\nKhông chần chừ, Lâm Viễn ném ra một túi vải chứa hơn một trăm khối Âm Thạch thặng dư thu được từ đêm qua. Hắn gạt bỏ ánh mắt thèm thuồng của những kẻ định chia chác cá nhân.\n\n— Đem toàn bộ số linh thạch này ra phường thị, mua ngay Trận Bàn Cách Âm Hộ Viện cao cấp nhất. Mọi người còn lại bận giáp sắt, đứng quanh nhà Nhị thúc làm bức tường thịt! — Hắn ra lệnh bằng chất giọng đanh thép.\n\nMệnh lệnh được thi hành tắp lự. Nhờ có đủ tài nguyên, một trận bàn bằng gỗ Thanh Tùng nguyên khối được mang về và cắm phập xuống khu ruộng.\n\nMột lồng hấp thụ âm thanh dày đặc bung tỏa. Nó gánh trọn lấy trận cuồng phong chứa hàng ngàn mũi dùi âm thanh, chặn đứng sức công phá nhắm vào khu linh điền của nhánh thứ hai.\n\nKhói bụi tan đi, linh điền an toàn. Mọi người thở phào nhẹ nhõm ném mũ giáp xuống đất.\n\nNhưng Lâm Viễn bước tới, bê ra một khay gỗ đựng hàng chục chiếc vòng cổ Thanh Tùng khắc đầy cấm chế đỏ chót.\n\n— Bài học hôm nay đã quá rõ. Từ giờ phút này, mọi lời nói trong Vọng Âm Cốc đều phải được đong đếm. — Giọng hắn vang lên lạnh lẽo. — Mỗi người chỉ có năm mươi từ một ngày. Ai vượt quá hạn ngạch, vòng gỗ sẽ tự động siết cổ.\n\nBất chấp những ánh mắt hoang mang, sợ hãi và phẫn nộ của đám thanh niên trong tộc, Lâm Viễn cầm chiếc vòng đầu tiên lên, tự tròng vào cổ mình. Một tiếng lách cách khô khốc vang lên, khóa chết lại. Hắn tự nguyện đeo gông để thiết lập luật lệ thép.\n\nSự độc tài của hắn đổi lại một đêm bình yên. Trong gian bếp nhỏ, đại bá Lâm Chấn im lặng bưng ra một mâm thịt thú rừng hầm linh thảo nóng hổi. Đó là bữa tiệc tạ lỗi chân thành nhất của ông.\n\nKhông một lời chúc tụng, không một tiếng trò chuyện. Nhưng khi húp ngụm canh thịt ngọt lịm, hơi ấm trôi tuột xuống dạ dày, vuốt ve những kinh mạch đang co rút vì đau đớn, Lâm Viễn khẽ mỉm cười.\n\nHắn cắn một miếng thịt mềm nhừ, cảm nhận sự an toàn thực sự bao bọc lấy gia đình. Đã quá lâu rồi, cái gia tộc rách nát này mới có một bữa no và một đêm không phải nơm nớp lo sợ tiếng chửi rủa từ dĩ vãng dội về.",
+          "causalStateChange": "Từ tình trạng phân bổ tài nguyên tự do sang thiết chế kỷ luật thép với hạn ngạch giao tiếp nghiêm ngặt.",
+          "requiredPlanAnchor": "thiết lập hạn ngạch từ ngữ",
+          "protagonistChoice": "Dùng toàn bộ Âm Thạch dư thừa để cứu linh điền nhánh thứ hai thay vì chia chác, đồng thời ép mọi người đeo vòng giới hạn.",
+          "agencyMove": "Tự mình đeo chiếc vòng Thanh Tùng đầu tiên, chấp nhận bị khóa cổ họng để làm gương ép buộc sự tuân thủ.",
+          "earnedReward": "Hơn 100 khối Âm Thạch thặng dư được giữ lại làm vốn lưu động gia tộc sau khi đã thanh toán hết nợ nần cho hắc thị.",
+          "materialProgression": "Mua và lắp đặt thành công Trận Bàn Cách Âm Hộ Viện cao cấp, bảo vệ an toàn ba mẫu linh điền trồng lúa linh mạch khỏi sự tàn phá.",
+          "comfortPayoff": "Được thưởng thức bữa ăn no nê với món thịt thú rừng hầm linh thảo nóng hổi do đích thân đại bá nấu, mang lại cảm giác bình yên ấm áp.",
+          "costPaid": "Biến bản thân thành kẻ độc tài đáng sợ trong mắt thế hệ trẻ và vĩnh viễn mất đi quyền tự do ngôn luận tự nhiên.",
+          "exitPressure": "Áp lực tâm lý tích tụ từ thế hệ trẻ bị cấm khẩu và sự dòm ngó của các thế lực bên ngoài muốn phá hoại sự im lặng của thung lũng."
+        }
+      ],
+      "continuityDigest": "Lâm Viễn xé khế ước bán đất để bảo vệ trận pháp, đánh cược mạng sống dẫn gia tộc đi hứng mưa Âm Thạch từ tiếng vọng trăm năm, giải quyết nợ nần nhưng phải thiết quân luật hạn ngạch từ ngữ để đối phó hậu quả nổ tiếng vọng thù hận.",
+      "unresolvedPressure": "Sự bất mãn của giới trẻ trong tộc đối với đạo luật cấm khẩu khắc nghiệt và bóng tối từ thế lực ngoại lai đang lăm le phá hoại trận pháp Thanh Tùng để khai thác bí mật gia tộc."
+    }
+  ],
+  "status": "awaiting_human_selection"
+}

@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "ballots": [
+    {
+      "blindCode": "DT11-A",
+      "axes": {
+        "opening_pull": 4,
+        "world_specificity": 4,
+        "protagonist_agency": 5,
+        "causal_reward": 4,
+        "character_life": 4,
+        "seriality_30": 4,
+        "prose_naturalness": 4,
+        "read_chapter_4": 4
+      },
+      "criticalFails": [],
+      "evidence": [
+        {
+          "axis": "protagonist_agency",
+          "chapterNumber": 2,
+          "span": "Trọng rút thẻ ATM đưa cho chị Liên. Sự lựa chọn này đánh đổi bằng toàn bộ sinh hoạt phí cuối cùng của anh. Anh không còn đường lui.",
+          "reason": "Nhân vật chính đưa ra quyết định chủ động và mạo hiểm cực cao khi dùng toàn bộ số tiền sinh hoạt cuối cùng để lấy tài liệu chứng minh nguồn gốc hiện vật."
+        },
+        {
+          "axis": "world_specificity",
+          "chapterNumber": 1,
+          "span": "Một món đồ gốm nung củi truyền thống luôn có độ xốp nhất định, một dạng nhịp đập vi tế của đất sét khi tiếp xúc với hơi ẩm từ da người.",
+          "reason": "Tác giả thể hiện kiến thức chuyên sâu về đặc tính vật lý của gốm nung củi truyền thống, tạo nên sự chân thực cho bối cảnh."
+        }
+      ],
+      "confidence": 0.9,
+      "summary": "Một mở đầu xuất sắc về đề tài phục chế và giám định cổ vật. Nhân vật chính có động cơ rõ ràng, hành động quyết đoán và có chuyên môn thực thụ. Các chi tiết kỹ thuật về gốm Nam Bộ được lồng ghép tự nhiên, tạo nên một thế giới có chiều sâu."
+    },
+    {
+      "blindCode": "DT11-B",
+      "axes": {
+        "opening_pull": 4,
+        "world_specificity": 5,
+        "protagonist_agency": 5,
+        "causal_reward": 4,
+        "character_life": 4,
+        "seriality_30": 4,
+        "prose_naturalness": 4,
+        "read_chapter_4": 4
+      },
+      "criticalFails": [],
+      "evidence": [
+        {
+          "axis": "world_specificity",
+          "chapterNumber": 1,
+          "span": "Khác với những cấu trúc tinh thể lộn xộn, đứt gãy do sự chênh lệch nhiệt độ của lò bầu đun củi, kết cấu bên trong chiếc bình này đồng đều một cách hoàn hảo.",
+          "reason": "Sử dụng kiến thức khoa học vật lý trị liệu/vật liệu học rất cụ thể về cấu trúc tinh thể silicat để phân biệt lò củi và lò ga hiện đại."
+        },
+        {
+          "axis": "protagonist_agency",
+          "chapterNumber": 3,
+          "span": "Cháu cược bồi thường hai trăm triệu đồng, bằng đúng giá chiếc bình này, nếu cháu sai.",
+          "reason": "Nhân vật chủ động đặt cược uy tín và tài chính của mình để giành quyền kiểm tra hiện vật, thể hiện tính chủ động cực kỳ cao."
+        }
+      ],
+      "confidence": 0.9,
+      "summary": "Truyện kết hợp xuất sắc giữa giám định cổ vật truyền thống và khoa học vật liệu hiện đại. Nhân vật chính quyết đoán, dám chấp nhận rủi ro lớn để bảo vệ sự thật khoa học. Các chi tiết chuyên môn rất thuyết phục."
+    },
+    {
+      "blindCode": "DT11-C",
+      "axes": {
+        "opening_pull": 4,
+        "world_specificity": 4,
+        "protagonist_agency": 5,
+        "causal_reward": 4,
+        "character_life": 4,
+        "seriality_30": 4,
+        "prose_naturalness": 4,
+        "read_chapter_4": 4
+      },
+      "criticalFails": [],
+      "evidence": [
+        {
+          "axis": "world_specificity",
+          "chapterNumber": 1,
+          "span": "Đất ở đó lẫn một lượng quặng sắt vi lượng rất đặc trưng. Bất cứ món gốm nào ra lò từ nguồn đất ấy đều tạo ra một lực hút từ tính nhẹ, đủ làm sợi chỉ tơ trong ống đồng của Nam chao đảo.",
+          "reason": "Chi tiết độc đáo về địa chất học và từ tính của đất sét vùng Đồng Giang tạo nên nét đặc trưng riêng biệt cho phương pháp giám định của nhân vật."
+        },
+        {
+          "axis": "protagonist_agency",
+          "chapterNumber": 2,
+          "span": "Một triệu rưỡi là gần như toàn bộ số vốn còn lại của anh. Hơn nữa, chiếc chóe bám hàu này là một canh bạc thật sự.",
+          "reason": "Nhân vật tự đưa ra quyết định mạo hiểm tài chính dựa trên kết quả đo đạc từ tính của chính mình, không hề thụ động chờ đợi."
+        }
+      ],
+      "confidence": 0.9,
+      "summary": "Một hướng tiếp cận độc đáo khi dùng địa chất thủy văn và từ tính để giám định gốm cổ. Nhân vật chính có cá tính, hành động dựa trên cơ sở khoa học rõ ràng và chủ động giải quyết khó khăn tài chính bằng thực lực."
+    }
+  ]
+}
