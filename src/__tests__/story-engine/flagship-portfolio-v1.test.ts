@@ -49,6 +49,9 @@ describe('flagship first-30 portfolio', () => {
     expect(catalogue.packages.every(item => item.status === 'concept_package_ready')).toBe(true);
     expect(catalogue.packages.every(item => item.storySpecStatus === 'not_materialized')).toBe(true);
     expect(catalogue.packages.every(item => item.writerIsolation)).toBe(true);
+    expect(catalogue.packages.every(item => item.title.length >= 40 && item.title.length <= 80)).toBe(true);
+    expect(catalogue.packages.every(item => item.title.split(/\s+/).length >= 10)).toBe(true);
+    expect(catalogue.packages.every(item => /[:,?!]/.test(item.title))).toBe(true);
   });
 
   it('keeps ImageGen art-only and makes ratio, Vietnamese title and watermark deterministic', () => {

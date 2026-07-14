@@ -45,7 +45,7 @@ function spec(): StorySpecV2 {
   return StorySpecV2Schema.parse({
     schemaVersion: 2,
     pipelineVersion: 'flagship_v2',
-    title: 'Sổ Nợ Phố Cũ',
+    title: 'Tiếp Quản Kho Hàng Nhà Mình, Tôi Dùng Một Tuyến Xe Cứu Cả Phố Cũ',
     genre: 'do-thi',
     genreLane: 'urban_professional',
     serialityEngine: {
@@ -499,7 +499,7 @@ describe('isolated flagship setup v2', () => {
     const marker = Array.from({ length: 15 }, (_, tokenIndex) => `mechanism${String.fromCharCode(97 + index)}${String.fromCharCode(97 + tokenIndex)}`).join(' ');
     return {
       id: `concept_c${index}`,
-      workingTitle: index === 0 ? spec().title : `Tựa truyện ${index}`,
+      workingTitle: index === 0 ? 'Sổ Nợ Phố Cũ' : `Tựa truyện ${index}`,
       readerCuriosity: `${marker} khiến độc giả muốn biết giao dịch cụ thể sẽ đảo chiều ra sao`,
       readerFantasy: index === 0 ? spec().readerFantasy : `${marker} cho độc giả trải nghiệm năng lực nghề nghiệp có giới hạn và hậu quả`,
       premise: index === 0 ? spec().premise : `${marker} buộc một người lao động chọn giữa tài sản, quan hệ và nghĩa vụ đã ký`,
@@ -654,7 +654,8 @@ describe('isolated flagship setup v2', () => {
       openings: [opening, openingFor('concept_c1'), openingFor('concept_c2')],
       status: 'awaiting_human_selection' as const,
     };
-    const selection = HumanConceptSelectionV2Schema.parse({ schemaVersion: 2, candidateId: selected.id, approvedBy: 'human-reviewer', rationale: long('Opening tạo áp lực nhân quả rõ nhất trong blind review'), approvedAt: new Date().toISOString() });
+    expect(() => HumanConceptSelectionV2Schema.parse({ schemaVersion: 2, candidateId: selected.id, approvedTitle: 'Sổ Nợ Phố Cũ', approvedBy: 'human-reviewer', rationale: long('Tên ngắn không nói premise'), approvedAt: new Date().toISOString() })).toThrow();
+    const selection = HumanConceptSelectionV2Schema.parse({ schemaVersion: 2, candidateId: selected.id, approvedTitle: spec().title, approvedBy: 'human-reviewer', rationale: long('Opening tạo áp lực nhân quả rõ nhất trong blind review và tên nói thẳng cơ chế'), approvedAt: new Date().toISOString() });
     const story = spec();
     const characters = { schemaVersion: 2, protagonist: story.protagonist, cast: story.cast, relationshipConflicts: story.cast.slice(0, 3).map(member => ({ left: story.protagonist.name, right: member.name, incompatibleNeeds: long('Hai bên cần quyền quyết định khác nhau trong cùng một giao dịch'), mutualDependence: long('Hai bên giữ nguồn lực mà người kia không thể tự thay thế'), likelyBreakingPoint: long('Một bên giấu dữ liệu khi nghĩa vụ đến hạn thanh toán') })) };
     const world = { schemaVersion: 2, rules: story.causalWorldRules, resources: story.resourceEconomy, institutions: [0, 1].map(index => ({ name: `Tổ chức ${index}`, power: long(`Tổ chức ${index} kiểm soát giấy phép hoặc lịch vận chuyển`), incentive: long(`Tổ chức ${index} kiếm lợi từ việc giữ kỷ luật giao nhận`), enforcementEvidence: long(`Hợp đồng và nhật ký cổng kho chứng minh quyền số ${index}`), pressureOnCast: long(`Quyền số ${index} buộc cast lựa chọn giữa tiền và quan hệ`) })), knowledgeDistribution: [story.protagonist, ...story.cast.slice(0, 2)].map(member => ({ holder: member.name, knows: long(`${member.name} biết một phần giao dịch có bằng chứng riêng`), doesNotKnow: long(`${member.name} chưa biết agenda và giới hạn của người còn lại`) })) };
@@ -673,6 +674,8 @@ describe('isolated flagship setup v2', () => {
     } });
     expect(result.callRoles).toEqual(['character_designer', 'causal_world', 'launch_architect']);
     expect(result.foundationScore.passed).toBe(true);
+    expect(result.launchPack.storySpec.title).toBe(selection.approvedTitle);
+    expect(result.launchPack.storySpec.title).not.toBe(selected.workingTitle);
     expect(result.launchPack.storySpec.premise).toBe(selected.premise);
     expect(() => validateRollingPlanWindow({ schemaVersion: 2, startChapter: 1, endChapter: 5, plans }, story.pleasureProfile)).not.toThrow();
     expect(validatePleasureWindow(plans, story.pleasureProfile)).toEqual([]);
@@ -694,11 +697,12 @@ describe('isolated flagship setup v2', () => {
     const story = spec();
     const characters = { schemaVersion: 2 as const, protagonist: story.protagonist, cast: story.cast, relationshipConflicts: story.cast.slice(0, 3).map(member => ({ left: story.protagonist.name, right: member.name, incompatibleNeeds: long('Hai bên cần quyền quyết định khác nhau trong cùng một giao dịch'), mutualDependence: long('Hai bên giữ nguồn lực mà người kia không thể tự thay thế'), likelyBreakingPoint: long('Một bên giấu dữ liệu khi nghĩa vụ đến hạn thanh toán') })) };
     const world = { schemaVersion: 2 as const, rules: story.causalWorldRules, resources: story.resourceEconomy, institutions: [0, 1].map(index => ({ name: `Tổ chức ${index}`, power: long(`Tổ chức ${index} kiểm soát giấy phép hoặc lịch vận chuyển`), incentive: long(`Tổ chức ${index} kiếm lợi từ việc giữ kỷ luật giao nhận`), enforcementEvidence: long(`Hợp đồng và nhật ký cổng kho chứng minh quyền số ${index}`), pressureOnCast: long(`Quyền số ${index} buộc cast lựa chọn giữa tiền và quan hệ`) })), knowledgeDistribution: [story.protagonist, ...story.cast.slice(0, 2)].map(member => ({ holder: member.name, knows: long(`${member.name} biết một phần giao dịch có bằng chứng riêng`), doesNotKnow: long(`${member.name} chưa biết agenda và giới hạn của người còn lại`) })) };
-    const selection = { schemaVersion: 2 as const, candidateId: selected.id, approvedBy: 'human-reviewer', rationale: long('Opening tạo nhịp thưởng và nhân quả rõ nhất'), approvedAt: new Date().toISOString() };
+    const selection = { schemaVersion: 2 as const, candidateId: selected.id, approvedTitle: story.title, approvedBy: 'human-reviewer', rationale: long('Opening tạo nhịp thưởng và nhân quả rõ nhất'), approvedAt: new Date().toISOString() };
     expect(buildCharacterDesignPrompt(brief, selected, opening)).toContain('OUTPUT_CONTRACT_EXACT=');
     expect(buildCausalWorldPrompt(brief, selected, opening, characters, kernelFor(selected.id))).toContain('APPROVED_WORLD_KERNEL=');
     const launchPrompt = buildLaunchPackPrompt({ brief, selection, candidate: selected, opening, characters, world });
     expect(launchPrompt).toContain('OUTPUT_CONTRACT_EXACT=');
+    expect(launchPrompt).toContain('HUMAN_SELECTION.approvedTitle');
     expect(launchPrompt).toContain('pleasureProfile');
   });
 

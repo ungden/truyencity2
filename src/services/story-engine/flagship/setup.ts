@@ -211,7 +211,7 @@ export async function materializeFlagshipLaunchPackV2(input: {
   const launchPack = parseJson(await invoke({ role: 'launch_architect', systemPrompt: LAUNCH_ARCHITECT_SYSTEM, userPrompt: buildLaunchPackPrompt({ ...input, selection, candidate, opening, characters, world }), jsonMode: true, responseJsonSchema: FLAGSHIP_SETUP_RESPONSE_SCHEMAS.launch_architect }), FlagshipLaunchPackV2Schema, 'Launch Architect');
   if (launchPack.selectedConceptId !== selection.candidateId) throw new FlagshipSetupError('setup_blocked', 'Launch Architect changed the human-selected concept.');
   const identityChanges: string[] = [];
-  if (launchPack.storySpec.title !== candidate.workingTitle) identityChanges.push('title');
+  if (launchPack.storySpec.title !== selection.approvedTitle) identityChanges.push('title');
   if (launchPack.storySpec.genreLane !== input.brief.genreLane) identityChanges.push('genreLane');
   if (launchPack.storySpec.serialityEngine.recurringSituation !== candidate.serialityProof) identityChanges.push('serialityEngine.recurringSituation');
   if (JSON.stringify(launchPack.storySpec.serialityEngine.variationAxes) !== JSON.stringify(candidate.worldProof.signatureSituations)) identityChanges.push('serialityEngine.variationAxes');

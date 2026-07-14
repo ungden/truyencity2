@@ -36,10 +36,12 @@ function wrapTitle(title: string, maxCharacters = 19): string[] {
 function typographySvg(width: number, height: number, title: string, watermark: string): Buffer {
   const lines = wrapTitle(title);
   const longest = Math.max(...lines.map(line => line.length));
-  const fontSize = lines.length >= 3 ? 70 : longest >= 18 ? 78 : 88;
+  const availableTitleHeight = 410;
+  const heightBoundSize = Math.floor(availableTitleHeight / (lines.length * 1.08));
+  const fontSize = Math.max(48, Math.min(82, heightBoundSize, longest >= 18 ? 76 : 82));
   const lineHeight = Math.round(fontSize * 1.08);
   const titleBlockHeight = lines.length * lineHeight;
-  const firstBaseline = Math.round(50 + (320 - titleBlockHeight) / 2 + fontSize * 0.82);
+  const firstBaseline = Math.round(30 + (availableTitleHeight - titleBlockHeight) / 2 + fontSize * 0.82);
   const tspans = lines.map((line, index) => `<tspan x="${width / 2}" y="${firstBaseline + index * lineHeight}">${escapeXml(line)}</tspan>`).join('');
 
   return Buffer.from(`

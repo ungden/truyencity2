@@ -10,9 +10,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 - StorySpec đã materialize: 0
 - Production mutation: không
 
-## HX-01 — Những Quy Tắc Không Có Trong Sổ
+## HX-01 — Đi Kiểm Định Dị Tượng, Tôi Phát Hiện Thành Phố Này Có Luật Giết Người
 
-![Bìa Những Quy Tắc Không Có Trong Sổ](../../public/covers/flagship-first-30/hx-01.webp)
+![Bìa Đi Kiểm Định Dị Tượng, Tôi Phát Hiện Thành Phố Này Có Luật Giết Người](../../public/covers/flagship-first-30/hx-01.webp)
 
 **Tagline:** Mỗi dị tượng đều có quy luật; cái giá nằm ở việc ai dám kiểm chứng trước.
 
@@ -26,9 +26,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Mỗi vụ việc mở một quy tắc, một thiết chế hưởng lợi và một thay đổi đời sống; hiểu biết cũ liên tục mất giá khi các quy tắc chồng lên nhau.
 
-## HX-02 — Ca Trực Cuối Cùng Của Võ Sư
+## HX-02 — Võ Sư Hạng Bét Trực Đêm: Nhìn Sai Số, Cứu Cả Khu Phố
 
-![Bìa Ca Trực Cuối Cùng Của Võ Sư](../../public/covers/flagship-first-30/hx-02.webp)
+![Bìa Võ Sư Hạng Bét Trực Đêm: Nhìn Sai Số, Cứu Cả Khu Phố](../../public/covers/flagship-first-30/hx-02.webp)
 
 **Tagline:** Giấy phép cho anh quyền ra tay; mỗi cú đấm buộc anh chịu trách nhiệm lâu hơn.
 
@@ -42,9 +42,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Mỗi nhiệm vụ đổi loại địa hình, quyền hạn và đồng đội; tiến bộ thể lực luôn đi cùng trách nhiệm pháp lý và xã hội nhìn thấy được.
 
-## HX-03 — Trại Thú Sau Nhà
+## HX-03 — Xuyên Đến Vùng Biên Nuôi Linh Thú, Tôi Dựng Lại Gia Nghiệp
 
-![Bìa Trại Thú Sau Nhà](../../public/covers/flagship-first-30/hx-03.webp)
+![Bìa Xuyên Đến Vùng Biên Nuôi Linh Thú, Tôi Dựng Lại Gia Nghiệp](../../public/covers/flagship-first-30/hx-03.webp)
 
 **Tagline:** Nuôi được một sinh vật mạnh không khó bằng khiến cả đàn tin mình.
 
@@ -58,9 +58,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Các vòng nuôi dưỡng đổi từ bệnh, sinh sản, cộng sinh tới đất đai; mỗi tiến bộ của đàn thú tạo nghĩa vụ mới với gia đình và làng xóm.
 
-## HX-04 — Thành Phố Xây Từ Tro Trắng
+## HX-04 — Từ Một Rãnh Nước, Tôi Dẫn Dân Tị Nạn Xây Thành Trên Tro Trắng
 
-![Bìa Thành Phố Xây Từ Tro Trắng](../../public/covers/flagship-first-30/hx-04.webp)
+![Bìa Từ Một Rãnh Nước, Tôi Dẫn Dân Tị Nạn Xây Thành Trên Tro Trắng](../../public/covers/flagship-first-30/hx-04.webp)
 
 **Tagline:** Anh không được ban một vương quốc; anh phải thuyết phục từng người ở lại.
 
@@ -74,9 +74,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Từ nước, gạch, lương thực tới xưởng và chợ, mỗi công trình thay đổi sinh kế lẫn cán cân quyền lực; thành phố chỉ lớn nếu dân tự nguyện ở lại.
 
-## HX-05 — Xưởng Luyện Khí Cuối Hẻm
+## HX-05 — Trọng Sinh Về Xưởng Luyện Khí, Tôi Dùng Phế Liệu Dựng Cơ Nghiệp
 
-![Bìa Xưởng Luyện Khí Cuối Hẻm](../../public/covers/flagship-first-30/hx-05.webp)
+![Bìa Trọng Sinh Về Xưởng Luyện Khí, Tôi Dùng Phế Liệu Dựng Cơ Nghiệp](../../public/covers/flagship-first-30/hx-05.webp)
 
 **Tagline:** Nhớ được nguyên lý không có nghĩa là làm đúng ngay lần đầu.
 
@@ -90,9 +90,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Mỗi vòng chế tạo đổi nhu cầu, vật liệu và khách hàng; lợi thế ký ức giảm dần khi tiêu chuẩn tăng và người khác học theo.
 
-## HX-06 — Ngày Đèn Thành Phố Tắt
+## HX-06 — Tận Thế Mất Điện: Khôi Phục Máy Bơm, Dựng Lại Từng Khu Phố
 
-![Bìa Ngày Đèn Thành Phố Tắt](../../public/covers/flagship-first-30/hx-06.webp)
+![Bìa Tận Thế Mất Điện: Khôi Phục Máy Bơm, Dựng Lại Từng Khu Phố](../../public/covers/flagship-first-30/hx-06.webp)
 
 **Tagline:** Sống sót không chỉ là giết quái; đó là làm cho đèn sáng lại vào tối mai.
 
@@ -106,9 +106,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Mỗi vùng an toàn mới mở một chuỗi cung ứng, cộng đồng và bí mật môi trường; tiến bộ luôn hiện qua hạ tầng có thể sử dụng.
 
-## HX-07 — Kẻ Phản Diện Tự Mua Đường Sống
+## HX-07 — Bảo Tôi Làm Phản Diện, Tôi Bán Gia Sản Tự Mua Đường Sống
 
-![Bìa Kẻ Phản Diện Tự Mua Đường Sống](../../public/covers/flagship-first-30/hx-07.webp)
+![Bìa Bảo Tôi Làm Phản Diện, Tôi Bán Gia Sản Tự Mua Đường Sống](../../public/covers/flagship-first-30/hx-07.webp)
 
 **Tagline:** Kịch bản cho hắn một cái chết; hắn trả giá để mua từng ngày tự do.
 
@@ -122,9 +122,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Mỗi mốc thoát kịch bản làm thông tin cũ mất giá, buộc main xây tài sản, quan hệ và uy tín không dựa vào vai phản diện.
 
-## TH-01 — Gia Phả Dưới Gốc Thanh Tùng
+## TH-01 — Trọng Sinh Về Gia Tộc Tu Tiên, Tôi Đầu Tư Cho Trăm Năm Sau
 
-![Bìa Gia Phả Dưới Gốc Thanh Tùng](../../public/covers/flagship-first-30/th-01.webp)
+![Bìa Trọng Sinh Về Gia Tộc Tu Tiên, Tôi Đầu Tư Cho Trăm Năm Sau](../../public/covers/flagship-first-30/th-01.webp)
 
 **Tagline:** Có những khoản đầu tư phải chờ đến đời cháu mới biết đúng hay sai.
 
@@ -138,9 +138,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Mỗi arc nối quyết định một thế hệ với hậu quả thế hệ sau; tiến bộ đến từ người, đất, nghề và minh ước ngoài cảnh giới.
 
-## TH-02 — Tiên Môn Dạy Nghề
+## TH-02 — Bảo Tôi Dạy Đám Đệ Tử Bị Loại, Họ Lại Dựng Lại Tiên Môn
 
-![Bìa Tiên Môn Dạy Nghề](../../public/covers/flagship-first-30/th-02.webp)
+![Bìa Bảo Tôi Dạy Đám Đệ Tử Bị Loại, Họ Lại Dựng Lại Tiên Môn](../../public/covers/flagship-first-30/th-02.webp)
 
 **Tagline:** Thu đồ dễ, dạy họ thành người không giống mình mới khó.
 
@@ -154,9 +154,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Mỗi học trò mở một nghề, quan hệ và bài toán dạy khác; thành công của họ tăng uy tín môn phái đồng thời tạo quyền tự quyết mới.
 
-## TH-03 — Phòng Thí Nghiệm Trên Đỉnh Mây
+## TH-03 — Xuyên Đến Tiên Môn, Tôi Biến Tu Tiên Thành Một Môn Khoa Học
 
-![Bìa Phòng Thí Nghiệm Trên Đỉnh Mây](../../public/covers/flagship-first-30/th-03.webp)
+![Bìa Xuyên Đến Tiên Môn, Tôi Biến Tu Tiên Thành Một Môn Khoa Học](../../public/covers/flagship-first-30/th-03.webp)
 
 **Tagline:** Linh khí không đọc sách giáo khoa, và thí nghiệm sai vẫn phải có người trả giá.
 
@@ -170,9 +170,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Ba mươi chương liên tục đổi giả thuyết, sai số và người chịu tác động; tiến bộ hiện qua thiết bị, dữ liệu và quyền học thuật.
 
-## TH-04 — Mỗi Đời Chỉ Mang Về Một Thứ
+## TH-04 — Tu Tiên Mô Phỏng: Mỗi Kiếp Tôi Chỉ Được Mang Về Một Thứ
 
-![Bìa Mỗi Đời Chỉ Mang Về Một Thứ](../../public/covers/flagship-first-30/th-04.webp)
+![Bìa Tu Tiên Mô Phỏng: Mỗi Kiếp Tôi Chỉ Được Mang Về Một Thứ](../../public/covers/flagship-first-30/th-04.webp)
 
 **Tagline:** Sống lại vô số lần, nhưng mỗi lần anh chỉ cứu được một ký ức.
 
@@ -186,9 +186,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Mỗi vòng đổi mục tiêu, quan hệ và lịch sử; quyết định giữ một thứ luôn đóng vĩnh viễn nhiều con đường khác.
 
-## TH-05 — Y Quán Dưới Chân Núi
+## TH-05 — Y Tu Mở Quán Dưới Tiên Sơn, Chữa Một Người Để Cứu Cả Làng
 
-![Bìa Y Quán Dưới Chân Núi](../../public/covers/flagship-first-30/th-05.webp)
+![Bìa Y Tu Mở Quán Dưới Tiên Sơn, Chữa Một Người Để Cứu Cả Làng](../../public/covers/flagship-first-30/th-05.webp)
 
 **Tagline:** Chữa một người là trả lại cho cả làng một phần sức sống.
 
@@ -202,9 +202,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Ca bệnh, dược điền và sinh kế nối nhau; uy tín tăng kéo theo chuẩn mực, dịch bệnh và lựa chọn phân phối dược liệu khó hơn.
 
-## DT-01 — Trở Lại Mùa Cá Nổi
+## DT-01 — Trọng Sinh Về Làng Biển, Tôi Biến Cá Rẻ Thành Cơ Nghiệp Cả Nhà
 
-![Bìa Trở Lại Mùa Cá Nổi](../../public/covers/flagship-first-30/dt-01.webp)
+![Bìa Trọng Sinh Về Làng Biển, Tôi Biến Cá Rẻ Thành Cơ Nghiệp Cả Nhà](../../public/covers/flagship-first-30/dt-01.webp)
 
 **Tagline:** Anh nhớ mùa biển đổi, nhưng mẻ cá đầu tiên vẫn phải tự tay kéo lên.
 
@@ -218,9 +218,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Đánh bắt, chế biến và phân phối thay nhau tạo payoff; lợi thế ký ức giảm khi thị trường học theo và nguồn lợi biển cần được bảo vệ.
 
-## DT-02 — Mùa Rừng Trả Lộc
+## DT-02 — Trọng Sinh Về Bản Núi, Một Tay Dẫn Cả Bản Làm Giàu Từ Lộc Rừng
 
-![Bìa Mùa Rừng Trả Lộc](../../public/covers/flagship-first-30/dt-02.webp)
+![Bìa Trọng Sinh Về Bản Núi, Một Tay Dẫn Cả Bản Làm Giàu Từ Lộc Rừng](../../public/covers/flagship-first-30/dt-02.webp)
 
 **Tagline:** Biết lấy gì từ rừng chưa đủ; phải biết để lại gì cho mùa sau.
 
@@ -234,9 +234,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Mỗi mùa đổi sản vật, cách sơ chế và quyền khai thác; tiến bộ vật chất luôn gắn với việc giữ nguồn hàng sống qua năm sau.
 
-## DT-03 — Xưởng Nhỏ Năm 1989
+## DT-03 — Trọng Sinh Năm 1989: Dùng Tiền Cưới Mua Máy Phế Liệu Mở Xưởng
 
-![Bìa Xưởng Nhỏ Năm 1989](../../public/covers/flagship-first-30/dt-03.webp)
+![Bìa Trọng Sinh Năm 1989: Dùng Tiền Cưới Mua Máy Phế Liệu Mở Xưởng](../../public/covers/flagship-first-30/dt-03.webp)
 
 **Tagline:** Anh nhớ thị trường sẽ cần gì; chiếc máy cũ vẫn bắt anh làm lại từ đầu.
 
@@ -250,9 +250,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Từ mẫu thử tới quy trình, máy móc và hợp đồng phân phối; ký ức tương lai giảm giá trị khi đối thủ học và tiêu chuẩn thị trường tăng.
 
-## DT-04 — Bếp Nhà Qua Bốn Mùa
+## DT-04 — Về Quê Chăm Mẹ, Tôi Mở Bếp Theo Mùa Nuôi Cả Nhà
 
-![Bìa Bếp Nhà Qua Bốn Mùa](../../public/covers/flagship-first-30/dt-04.webp)
+![Bìa Về Quê Chăm Mẹ, Tôi Mở Bếp Theo Mùa Nuôi Cả Nhà](../../public/covers/flagship-first-30/dt-04.webp)
 
 **Tagline:** Một bữa ngon không đổi đời ngay, nhưng bốn mùa có thể dựng lại một mái nhà.
 
@@ -266,9 +266,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Mùa vụ, món ăn, khách quen và không gian nhà cùng tiến triển; đời sống ấm áp luôn để lại thay đổi vật chất hoặc quan hệ.
 
-## DT-05 — Chuyến Hàng Qua Cánh Cổng Mưa
+## DT-05 — Cổng Song Xuyên Chỉ Mở Khi Mưa, Tôi Mang Máy Lọc Nước Đổi Hàng
 
-![Bìa Chuyến Hàng Qua Cánh Cổng Mưa](../../public/covers/flagship-first-30/dt-05.webp)
+![Bìa Cổng Song Xuyên Chỉ Mở Khi Mưa, Tôi Mang Máy Lọc Nước Đổi Hàng](../../public/covers/flagship-first-30/dt-05.webp)
 
 **Tagline:** Hai thế giới không thiếu đồ; chúng thiếu người hiểu thứ gì thật sự có giá trị.
 
@@ -282,9 +282,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Mỗi giao dịch làm giá, luật và quyền lực hai bên đổi; cổng hữu hạn buộc main chọn quan hệ dài hạn thay vì vét báu vật.
 
-## DT-06 — Phòng Thu Không Có Bài Hit
+## DT-06 — Xuyên Đến Giới Giải Trí, Tôi Không Chép Nhạc Vẫn Thành Nhà Sản Xuất
 
-![Bìa Phòng Thu Không Có Bài Hit](../../public/covers/flagship-first-30/dt-06.webp)
+![Bìa Xuyên Đến Giới Giải Trí, Tôi Không Chép Nhạc Vẫn Thành Nhà Sản Xuất](../../public/covers/flagship-first-30/dt-06.webp)
 
 **Tagline:** Anh mang theo cách làm nghề, không mang theo một kho kiệt tác để chép lại.
 
@@ -298,9 +298,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Từng sản phẩm đổi định dạng, công chúng và quan hệ sáng tạo; thành công không đồng thanh và luôn mở dự án khó hơn.
 
-## DT-07 — Lần Này Ba Sẽ Về Sớm
+## DT-07 — Trọng Sinh Khi Con Gái Còn Nhỏ, Lần Này Tôi Nhất Định Về Nhà Sớm
 
-![Bìa Lần Này Ba Sẽ Về Sớm](../../public/covers/flagship-first-30/dt-07.webp)
+![Bìa Trọng Sinh Khi Con Gái Còn Nhỏ, Lần Này Tôi Nhất Định Về Nhà Sớm](../../public/covers/flagship-first-30/dt-07.webp)
 
 **Tagline:** Anh nhớ những tiếc nuối lớn, nhưng phải học lại con mình từ đầu.
 
@@ -314,9 +314,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Mỗi vòng chăm sóc gắn với một bước nghề nghiệp và nếp nhà; tiến bộ đo bằng lòng tin của con, thời gian thật và căn nhà tốt lên.
 
-## DT-08 — Sổ Nợ Phố Cũ
+## DT-08 — Tiếp Quản Kho Hàng Nhà Mình, Tôi Dùng Một Tuyến Xe Cứu Cả Phố Cũ
 
-![Bìa Sổ Nợ Phố Cũ](../../public/covers/flagship-first-30/dt-08.webp)
+![Bìa Tiếp Quản Kho Hàng Nhà Mình, Tôi Dùng Một Tuyến Xe Cứu Cả Phố Cũ](../../public/covers/flagship-first-30/dt-08.webp)
 
 **Tagline:** Cứu một cửa hàng không khó bằng khiến những người giữ nó chịu chia quyền.
 
@@ -330,9 +330,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Mỗi nút thắt vận hành đổi quyền, dữ liệu và quan hệ; tiến bộ hiện qua dòng tiền, tài sản và quyền quyết định được chia đúng.
 
-## DT-09 — Vai Phản Diện Xin Nghỉ Việc
+## DT-09 — Bảo Tôi Làm Phản Diện Cướp Dự Án, Tôi Lại Nghỉ Việc Tự Khởi Nghiệp
 
-![Bìa Vai Phản Diện Xin Nghỉ Việc](../../public/covers/flagship-first-30/dt-09.webp)
+![Bìa Bảo Tôi Làm Phản Diện Cướp Dự Án, Tôi Lại Nghỉ Việc Tự Khởi Nghiệp](../../public/covers/flagship-first-30/dt-09.webp)
 
 **Tagline:** Biết mình sẽ bị hạ bệ, anh quyết không diễn tiếp cảnh mà người khác đã viết.
 
@@ -346,9 +346,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Mỗi bước thoát vai làm kịch bản cũ mất giá; tự do tăng cùng trách nhiệm với đội ngũ và những người bị lựa chọn mới tác động.
 
-## DT-10 — Bang Hội Không Đánh Boss
+## DT-10 — Bảo Tôi Lập Bang Đánh Boss, Tôi Lại Mở Dịch Vụ Cho Cả Máy Chủ
 
-![Bìa Bang Hội Không Đánh Boss](../../public/covers/flagship-first-30/dt-10.webp)
+![Bìa Bảo Tôi Lập Bang Đánh Boss, Tôi Lại Mở Dịch Vụ Cho Cả Máy Chủ](../../public/covers/flagship-first-30/dt-10.webp)
 
 **Tagline:** Họ không mạnh nhất máy chủ; họ khiến cả máy chủ cần đến mình.
 
@@ -362,9 +362,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Dịch vụ, đội ngũ và thị trường thay nhau tiến triển; mỗi thành công khiến người chơi lẫn nhà phát hành học và phản ứng.
 
-## DT-11 — Vết Men Dưới Lớp Bụi
+## DT-11 — Giám Bảo Đồ Cũ: Công Cụ Chỉ Gợi Một Dòng, Còn Tôi Tự Tìm Hàng Thật
 
-![Bìa Vết Men Dưới Lớp Bụi](../../public/covers/flagship-first-30/dt-11.webp)
+![Bìa Giám Bảo Đồ Cũ: Công Cụ Chỉ Gợi Một Dòng, Còn Tôi Tự Tìm Hàng Thật](../../public/covers/flagship-first-30/dt-11.webp)
 
 **Tagline:** Giá trị thật không phát sáng; nó để lại dấu vết cho người đủ kiên nhẫn.
 
@@ -378,9 +378,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Mỗi món đồ mở một vụ kiểm chứng, quan hệ và bài toán vốn; uy tín có thể mất nếu main vội kết luận hoặc giấu nguồn gốc.
 
-## DT-12 — Hiệp Hai Mới Bắt Đầu
+## DT-12 — Từ Ghế Dự Bị Đến Suất Đá Chính: Đọc Nhịp Trận Đấu Để Đổi Đời
 
-![Bìa Hiệp Hai Mới Bắt Đầu](../../public/covers/flagship-first-30/dt-12.webp)
+![Bìa Từ Ghế Dự Bị Đến Suất Đá Chính: Đọc Nhịp Trận Đấu Để Đổi Đời](../../public/covers/flagship-first-30/dt-12.webp)
 
 **Tagline:** Đọc được trận đấu chỉ cho anh một cơ hội; đôi chân phải tự chạy đến phút cuối.
 
@@ -394,9 +394,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Từng cửa sổ trận đấu đổi điểm yếu, bài tập và vai trò; thành công của main được đo bằng đội mạnh lên và cơ thể còn đi được đường dài.
 
-## DT-13 — Ca Trực Không Có Phép Màu
+## DT-13 — Bác Sĩ Cấp Cứu Không Hệ Thống: Chỉ Dựa Chẩn Đoán Vẫn Cứu Được Người
 
-![Bìa Ca Trực Không Có Phép Màu](../../public/covers/flagship-first-30/dt-13.webp)
+![Bìa Bác Sĩ Cấp Cứu Không Hệ Thống: Chỉ Dựa Chẩn Đoán Vẫn Cứu Được Người](../../public/covers/flagship-first-30/dt-13.webp)
 
 **Tagline:** Bác sĩ giỏi không biết hết; anh biết lúc nào phải hỏi thêm một người.
 
@@ -410,9 +410,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Ca bệnh thay đổi chuyên khoa, thông tin và quan hệ; sau ba mươi chương, cả khoa phải làm việc tốt hơn chứ không chỉ danh tiếng main tăng.
 
-## DT-14 — Thành Phố Cần Một Dòng Nước
+## DT-14 — Xuyên Đến Dị Giới, Tôi Dùng Kỹ Thuật Cấp Nước Xây Lại Cả Thành Phố
 
-![Bìa Thành Phố Cần Một Dòng Nước](../../public/covers/flagship-first-30/dt-14.webp)
+![Bìa Xuyên Đến Dị Giới, Tôi Dùng Kỹ Thuật Cấp Nước Xây Lại Cả Thành Phố](../../public/covers/flagship-first-30/dt-14.webp)
 
 **Tagline:** Anh không mang theo máy móc hiện đại; chỉ mang theo cách tìm đúng nút thắt.
 
@@ -426,9 +426,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Mỗi hạ tầng đổi vật liệu, người hưởng lợi và chi phí bảo trì; tiến bộ kỹ thuật luôn tạo bài toán phân phối mới.
 
-## DT-15 — Đường Dài Có Biên Nhận
+## DT-15 — Đội Xe Sắp Giải Tán: Từ Chuyến Hàng Đầu Tiên Đến Nghiệp Vận Tải Đường Dài
 
-![Bìa Đường Dài Có Biên Nhận](../../public/covers/flagship-first-30/dt-15.webp)
+![Bìa Đội Xe Sắp Giải Tán: Từ Chuyến Hàng Đầu Tiên Đến Nghiệp Vận Tải Đường Dài](../../public/covers/flagship-first-30/dt-15.webp)
 
 **Tagline:** Giao đúng hẹn là lời hứa; giữ được người đi cùng mới là sự nghiệp.
 
@@ -442,9 +442,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Tuyến đường, hàng hóa, thời tiết và đội ngũ liên tục đổi; tiến bộ hiện qua xe, dữ liệu và hợp đồng dài hạn có thể mất.
 
-## DT-16 — Quán Nhỏ Đợi Mùa Về
+## DT-16 — Về Phố Nhỏ Mở Quán, Tôi Dùng Món Theo Mùa Nuôi Khách Quen
 
-![Bìa Quán Nhỏ Đợi Mùa Về](../../public/covers/flagship-first-30/dt-16.webp)
+![Bìa Về Phố Nhỏ Mở Quán, Tôi Dùng Món Theo Mùa Nuôi Khách Quen](../../public/covers/flagship-first-30/dt-16.webp)
 
 **Tagline:** Khách quen không đến vì món đắt nhất; họ đến vì quán nhớ mình cần gì.
 
@@ -458,9 +458,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Món ăn, khách quen và không gian quán cùng mở rộng; mỗi comfort payoff phải để lại tiền, kỹ năng hoặc quan hệ mới.
 
-## DT-17 — Mỗi Ngày Một Tấn Hy Vọng
+## DT-17 — Cổng Song Xuyên Mỗi Ngày Chỉ Chở Một Tấn, Tôi Mang Nước Cứu Làng Hạn Hán
 
-![Bìa Mỗi Ngày Một Tấn Hy Vọng](../../public/covers/flagship-first-30/dt-17.webp)
+![Bìa Cổng Song Xuyên Mỗi Ngày Chỉ Chở Một Tấn, Tôi Mang Nước Cứu Làng Hạn Hán](../../public/covers/flagship-first-30/dt-17.webp)
 
 **Tagline:** Cổng chỉ chở được một tấn; cứu ai trước trở thành quyết định không thể trốn.
 
@@ -474,9 +474,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Mỗi chuyến đổi nhu cầu cấp bách, hậu cần và quyền phân phối; giới hạn cổng giữ lựa chọn khó trong khi đời sống vẫn khá lên rõ.
 
-## DT-18 — Qua Mỗi Thế Giới, Học Một Nghề
+## DT-18 — Xuyên Nhanh Làm Nghề: Mỗi Thế Giới Tôi Chỉ Được Giữ Một Kỹ Năng
 
-![Bìa Qua Mỗi Thế Giới, Học Một Nghề](../../public/covers/flagship-first-30/dt-18.webp)
+![Bìa Xuyên Nhanh Làm Nghề: Mỗi Thế Giới Tôi Chỉ Được Giữ Một Kỹ Năng](../../public/covers/flagship-first-30/dt-18.webp)
 
 **Tagline:** Anh không mang phần thưởng về; anh mang một kỹ năng và hậu quả của việc đã thay đổi nơi ấy.
 

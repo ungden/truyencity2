@@ -3,6 +3,7 @@ import { ArcPlanV2Schema, ChapterPlanV2Schema, PleasureProfileV2Schema, StorySpe
 import { GenreLaneV2Schema, PromotionCohortV1Schema } from './portfolio-taxonomy';
 import { PortfolioSlotIdV1Schema } from './portfolio';
 import { ChineseBenchmarkIdV1Schema } from './chinese-benchmark';
+import { FlagshipMarketTitleV1Schema } from './market-title';
 
 const concrete = z.string().trim().min(20);
 const named = z.string().trim().min(2);
@@ -161,6 +162,7 @@ export const ConceptTournamentArtifactV2Schema = z.object({
 export const HumanConceptSelectionV2Schema = z.object({
   schemaVersion: z.literal(2),
   candidateId: conceptId,
+  approvedTitle: FlagshipMarketTitleV1Schema,
   approvedBy: z.string().trim().min(2),
   rationale: concrete,
   approvedAt: z.string().datetime(),

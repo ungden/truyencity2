@@ -24,3 +24,4 @@ export * from './chinese-benchmark';
 export * from './chinese-benchmark-data';
 export * from './catalogue';
 export * from './catalogue-data';
+export * from './market-title';

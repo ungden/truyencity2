@@ -2,6 +2,7 @@ import { existsSync } from 'fs';
 import path from 'path';
 import { z } from 'zod';
 import { PortfolioManifestV1Schema, PortfolioSlotIdV1Schema, type PortfolioManifestV1 } from './portfolio';
+import { FlagshipMarketTitleV1Schema } from './market-title';
 
 const concrete = z.string().trim().min(20);
 const named = z.string().trim().min(2);
@@ -9,7 +10,7 @@ const named = z.string().trim().min(2);
 export const FlagshipStoryPackageV1Schema = z.object({
   schemaVersion: z.literal(1),
   slotId: PortfolioSlotIdV1Schema,
-  title: named.max(80),
+  title: FlagshipMarketTitleV1Schema,
   tagline: concrete.max(180),
   logline: concrete.max(360),
   catalogueDescription: concrete.max(900),
@@ -26,7 +27,7 @@ export const FlagshipStoryPackageV1Schema = z.object({
     renderSpec: z.object({
       width: z.literal(1086),
       height: z.literal(1448),
-      title: named.max(80),
+      title: FlagshipMarketTitleV1Schema,
       watermark: z.literal('truyencity.com'),
     }).strict(),
   }).strict(),

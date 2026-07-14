@@ -9,7 +9,7 @@ import type {
 } from './setup-contracts';
 import type { BenchmarkConceptGuidanceV1 } from './chinese-benchmark';
 
-export const FLAGSHIP_SETUP_PROMPT_VERSION = 'flagship-setup-v2.14-scene-affordance-cardinality';
+export const FLAGSHIP_SETUP_PROMPT_VERSION = 'flagship-setup-v2.15-direct-market-title';
 
 export const CONCEPT_LAB_SYSTEM = `Bạn phụ trách Concept Lab cho đúng một brief truyện.
 Tạo 20 cơ chế truyện khác nhau về nguyên nhân vận hành, lựa chọn của nhân vật và nguồn xung đột; đổi tên, nghề hoặc trope không được tính là khác.
@@ -51,7 +51,7 @@ export function buildConceptLabPrompt(brief: FlagshipSetupBriefV2, benchmark?: B
 
 OUTPUT_CONTRACT_EXACT={"schemaVersion":2,"candidates":[{"id":"concept_ascii_slug","workingTitle":"...","readerCuriosity":"...","readerFantasy":"...","premise":"...","irreversibleProblem":"...","protagonistContradiction":"...","domainMechanism":"...","conflictEngine":"...","emotionalCore":"...","differenceClaim":"...","nearestComparisonRisk":"...","serialityProof":"...","openingAdvantage":"...","progressionProof":"...","worldProof":{"signatureSituations":["...","...","..."],"institutionalReaction":"...","resourceCirculation":"...","thirtyChapterMutation":"..."},"antiCloneFingerprint":"advantage|reward|currencies|conflict|world"}]}
 
-Ký tự đầu tiên của response bắt buộc là { và ký tự cuối cùng bắt buộc là }. Top-level phải là một object chỉ có đúng hai key schemaVersion và candidates; tuyệt đối không trả bare array và không đặt candidates ngoài root object. Trả đúng 20 object và đúng các key trên, không thêm title/description/score. workingTitle tối đa 80 ký tự; mỗi trường văn bản khác dài 20-280 ký tự; antiCloneFingerprint dài 12-240 ký tự. Không viết outline chương trong các field: thirtyChapterMutation chỉ mô tả một thay đổi hệ thống ở mốc 30 chương. id chỉ dùng chữ thường ASCII, số, gạch dưới hoặc gạch ngang và phải bắt đầu bằng concept_. antiCloneFingerprint của 20 concept phải khác nhau thật sự theo cơ chế, không chỉ khác cách diễn đạt. signatureSituations phải là ba cảnh chỉ causal world này mới sinh ra; nếu đổi tên bối cảnh mà vẫn dùng được thì concept không đạt. Benchmark chỉ là kết luận cơ chế đã chưng cất, không phải template và không được suy đoán hoặc bắt chước tác phẩm nguồn.`;
+Ký tự đầu tiên của response bắt buộc là { và ký tự cuối cùng bắt buộc là }. Top-level phải là một object chỉ có đúng hai key schemaVersion và candidates; tuyệt đối không trả bare array và không đặt candidates ngoài root object. Trả đúng 20 object và đúng các key trên, không thêm title/description/score. workingTitle phải là tên thị trường tiếng Việt dài 10-18 từ, tối đa 80 ký tự, nói thẳng ít nhất hai trong ba thứ: tình huống vào truyện, lợi thế/cơ chế riêng, payoff hữu hình; ưu tiên hai vế có dấu phẩy hoặc dấu hai chấm. Không dùng nhãn văn học mơ hồ kiểu “Vòng Đời Của Đá”, “Kết Tinh Của Lửa”, cũng không hứa vô địch/vô địch thiên hạ nếu concept không chứng minh. Mỗi trường văn bản khác dài 20-280 ký tự; antiCloneFingerprint dài 12-240 ký tự. Không viết outline chương trong các field: thirtyChapterMutation chỉ mô tả một thay đổi hệ thống ở mốc 30 chương. id chỉ dùng chữ thường ASCII, số, gạch dưới hoặc gạch ngang và phải bắt đầu bằng concept_. antiCloneFingerprint của 20 concept phải khác nhau thật sự theo cơ chế, không chỉ khác cách diễn đạt. signatureSituations phải là ba cảnh chỉ causal world này mới sinh ra; nếu đổi tên bối cảnh mà vẫn dùng được thì concept không đạt. Benchmark chỉ là kết luận cơ chế đã chưng cất, không phải template và không được suy đoán hoặc bắt chước tác phẩm nguồn.`;
 }
 
 export function buildConceptJudgePrompt(brief: FlagshipSetupBriefV2, candidates: ConceptCandidateV2[]): string {
@@ -118,7 +118,7 @@ function launchContract(input: Parameters<typeof buildLaunchPackPrompt>[0]) {
     storySpec: {
       schemaVersion: 2,
       pipelineVersion: 'flagship_v2',
-      title: input.candidate.workingTitle,
+      title: input.selection.approvedTitle,
       genre: input.brief.genre,
       genreLane: input.brief.genreLane,
       serialityEngine: { recurringSituation: input.candidate.serialityProof, variationAxes: input.candidate.worldProof.signatureSituations, escalationVectors: ['...', '...', '...'], depletionRisks: ['...', '...', '...'] },
@@ -156,5 +156,5 @@ export function buildLaunchPackPrompt(input: {
 
 OUTPUT_CONTRACT_EXACT=${json(launchContract(input))}
 
-Chỉ dùng đúng các key trong contract. Các mảng phải đạt cardinality của ví dụ/schema; mỗi ChapterPlan có 2-5 scenes dù contract chỉ minh họa một scene. StorySpec phải sao chép chính xác title, genreLane, pleasureProfile, readerFantasy, premise, protagonist, cast, causalWorldRules và resourceEconomy từ artifact đã duyệt. serialityEngine.recurringSituation phải giữ serialityProof và variationAxes phải sao chép đúng ba worldProof.signatureSituations đã thắng tournament; progressionCurrencies phải có nguồn, cách tiêu và dấu hiệu độc giả nhìn thấy. StoryState chương 0 phải chứa toàn bộ cast, resources và promises. Arc đầu phủ chương 1-20 đến tối đa 30. rollingChapterPlans chỉ gồm chương 1-5; plan chương 1-3 phải chứa nguyên văn requiredPlanAnchor tương ứng.`;
+Chỉ dùng đúng các key trong contract. Các mảng phải đạt cardinality của ví dụ/schema; mỗi ChapterPlan có 2-5 scenes dù contract chỉ minh họa một scene. StorySpec.title phải sao chép chính xác HUMAN_SELECTION.approvedTitle; workingTitle của Concept Lab chỉ là nhãn nội bộ và không được dùng làm tên xuất bản. StorySpec phải sao chép chính xác genreLane, pleasureProfile, readerFantasy, premise, protagonist, cast, causalWorldRules và resourceEconomy từ artifact đã duyệt. serialityEngine.recurringSituation phải giữ serialityProof và variationAxes phải sao chép đúng ba worldProof.signatureSituations đã thắng tournament; progressionCurrencies phải có nguồn, cách tiêu và dấu hiệu độc giả nhìn thấy. StoryState chương 0 phải chứa toàn bộ cast, resources và promises. Arc đầu phủ chương 1-20 đến tối đa 30. rollingChapterPlans chỉ gồm chương 1-5; plan chương 1-3 phải chứa nguyên văn requiredPlanAnchor tương ứng.`;
 }

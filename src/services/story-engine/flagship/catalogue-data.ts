@@ -44,7 +44,7 @@ Originality: original characters and world only; do not imitate an existing book
 const packages: FlagshipStoryPackageV1[] = [
   storyPackage({
     slotId: 'HX-01',
-    title: 'Những Quy Tắc Không Có Trong Sổ',
+    title: 'Đi Kiểm Định Dị Tượng, Tôi Phát Hiện Thành Phố Này Có Luật Giết Người',
     tagline: 'Mỗi dị tượng đều có quy luật; cái giá nằm ở việc ai dám kiểm chứng trước.',
     logline: 'Một nhân viên kiểm định hiện trường phát hiện những tai nạn vô lý trong thành phố đều để lại cùng một loại vật chứng, nhưng mỗi lần anh chứng minh được một quy tắc, thành phố lại sinh ra ngoại lệ nguy hiểm hơn.',
     catalogueDescription: 'Huyền huyễn điều tra thiên về trí mưu và khoái cảm giải mã. Main không biết sẵn đáp án, phải quan sát, thử sai và dùng vật chứng để giành quyền diễn giải từ một cơ quan vốn sống nhờ giữ bí mật. Mỗi thắng lợi đem lại uy tín lẫn một cách mới để thế giới phản công.',
@@ -61,7 +61,7 @@ const packages: FlagshipStoryPackageV1[] = [
   }),
   storyPackage({
     slotId: 'HX-02',
-    title: 'Ca Trực Cuối Cùng Của Võ Sư',
+    title: 'Võ Sư Hạng Bét Trực Đêm: Nhìn Sai Số, Cứu Cả Khu Phố',
     tagline: 'Giấy phép cho anh quyền ra tay; mỗi cú đấm buộc anh chịu trách nhiệm lâu hơn.',
     logline: 'Một võ sư hạng thấp làm đội bảo hộ đêm dùng khả năng đọc sai số vận động để cứu các khu phố, từ đó từng bước giành chứng chỉ, quyền điều động và niềm tin của đội ngũ.',
     catalogueDescription: 'Cao võ đô thị nhưng sức mạnh nằm trong nghề nghiệp, giấy phép và phối hợp. Công cụ của main chỉ đo phản hồi luyện tập, không tặng kỹ năng. Anh thắng sớm nhờ chuẩn bị đúng, rồi phải gánh hậu quả công khai của từng quyết định bảo hộ.',
@@ -78,7 +78,7 @@ const packages: FlagshipStoryPackageV1[] = [
   }),
   storyPackage({
     slotId: 'HX-03',
-    title: 'Trại Thú Sau Nhà',
+    title: 'Xuyên Đến Vùng Biên Nuôi Linh Thú, Tôi Dựng Lại Gia Nghiệp',
     tagline: 'Nuôi được một sinh vật mạnh không khó bằng khiến cả đàn tin mình.',
     logline: 'Một kỹ thuật viên chăn nuôi xuyên tới vùng biên có linh thú, dùng quan sát tập tính và chăm sóc dài hạn để cứu trại thú của gia đình khỏi bệnh, nợ và tranh chấp đất.',
     catalogueDescription: 'Ngự thú theo hướng gia đình và tài sản sống. Kiến thức sinh học chỉ giúp main đặt giả thuyết; mỗi giống loài có phản ứng riêng, cần thời gian và nguồn thức ăn thật. Payoff đến từ đàn thú khỏe lên, mái nhà ổn hơn và cộng đồng học cách cùng bảo vệ nguồn sống.',
@@ -95,7 +95,7 @@ const packages: FlagshipStoryPackageV1[] = [
   }),
   storyPackage({
     slotId: 'HX-04',
-    title: 'Thành Phố Xây Từ Tro Trắng',
+    title: 'Từ Một Rãnh Nước, Tôi Dẫn Dân Tị Nạn Xây Thành Trên Tro Trắng',
     tagline: 'Anh không được ban một vương quốc; anh phải thuyết phục từng người ở lại.',
     logline: 'Một người tổ chức dân sinh tới vùng đất núi lửa nghèo, bắt đầu bằng giếng nước và lò gạch rồi biến những người tản cư thành cộng đồng có sản xuất, luật phân phối và quyền lên tiếng.',
     catalogueDescription: 'Huyền huyễn xây dựng văn minh với payoff đời sống cụ thể. Không có bảng xây dựng hay vật tư tự sinh. Mỗi công trình cần dân, vật liệu và tính chính danh; khi sản lượng tăng, tranh chấp phân phối và quyền lực cũng tăng theo.',
@@ -112,7 +112,7 @@ const packages: FlagshipStoryPackageV1[] = [
   }),
   storyPackage({
     slotId: 'HX-05',
-    title: 'Xưởng Luyện Khí Cuối Hẻm',
+    title: 'Trọng Sinh Về Xưởng Luyện Khí, Tôi Dùng Phế Liệu Dựng Cơ Nghiệp',
     tagline: 'Nhớ được nguyên lý không có nghĩa là làm đúng ngay lần đầu.',
     logline: 'Trọng sinh về lúc còn là thợ phụ, một luyện khí sư dùng ký ức về sai lầm cũ để biến phế liệu thành công cụ hữu ích, nhưng phải tự dựng lại công thức, uy tín và mạng cung ứng.',
     catalogueDescription: 'Khoái cảm chế tạo đi cùng kinh tế tài nguyên. Mỗi món đồ bắt đầu từ nhu cầu thật, vật liệu có sai số và phép thử có thể hỏng. Main không nhặt báu vật liên tục; anh xây tay nghề, dụng cụ xưởng và quan hệ với thợ lẫn khách hàng.',
@@ -129,7 +129,7 @@ const packages: FlagshipStoryPackageV1[] = [
   }),
   storyPackage({
     slotId: 'HX-06',
-    title: 'Ngày Đèn Thành Phố Tắt',
+    title: 'Tận Thế Mất Điện: Khôi Phục Máy Bơm, Dựng Lại Từng Khu Phố',
     tagline: 'Sống sót không chỉ là giết quái; đó là làm cho đèn sáng lại vào tối mai.',
     logline: 'Sau một biến cố năng lượng, một kỹ thuật viên bảo trì dùng năng lực hấp thụ duy nhất một dạng phóng xạ để dựng nơi trú ẩn, khôi phục hạ tầng và kết nối các cộng đồng có chiến lược sinh tồn khác nhau.',
     catalogueDescription: 'Mạt thế khoái hoạt theo hướng chủ động xây lại đời sống. Main có lợi thế sớm nhưng phải đo năng lượng, tiêu hao vật tư và dựa vào đội ngũ. Thành quả là ánh sáng, nước sạch, khu ở và người có thể quay lại làm việc.',
@@ -146,7 +146,7 @@ const packages: FlagshipStoryPackageV1[] = [
   }),
   storyPackage({
     slotId: 'HX-07',
-    title: 'Kẻ Phản Diện Tự Mua Đường Sống',
+    title: 'Bảo Tôi Làm Phản Diện, Tôi Bán Gia Sản Tự Mua Đường Sống',
     tagline: 'Kịch bản cho hắn một cái chết; hắn trả giá để mua từng ngày tự do.',
     logline: 'Biết mình chỉ là phản diện sẽ chết ở hồi đầu, một thiếu chủ không đi cướp cơ duyên của nhân vật chính mà bán tài sản phe cũ, lập giao ước mới và chịu butterfly effect để giành quyền tự quyết.',
     catalogueDescription: 'Phá mệnh theo hướng giao dịch và kiến thiết phe mới. Main chỉ nhớ các điểm chết lớn; sau lựa chọn đầu tiên, kịch bản mất độ tin cậy. Đối thủ không ngu và nhân vật nguyên tác có mục tiêu độc lập.',
@@ -163,7 +163,7 @@ const packages: FlagshipStoryPackageV1[] = [
   }),
   storyPackage({
     slotId: 'TH-01',
-    title: 'Gia Phả Dưới Gốc Thanh Tùng',
+    title: 'Trọng Sinh Về Gia Tộc Tu Tiên, Tôi Đầu Tư Cho Trăm Năm Sau',
     tagline: 'Có những khoản đầu tư phải chờ đến đời cháu mới biết đúng hay sai.',
     logline: 'Một tu sĩ trọng sinh không tìm kho báu mà trở về cứu gia tộc nhỏ bằng cách chọn người, giữ đất và đặt những lời hứa sẽ ràng buộc nhiều thế hệ.',
     catalogueDescription: 'Tiên hiệp gia tộc với ký ức dài và payoff có độ trễ. Mỗi thành viên có agenda, tuổi thọ và thước đo thành công riêng. Tài nguyên hôm nay có thể chỉ đời sau hưởng, còn sai lầm của tổ tiên không biến mất qua một lần nhảy thời gian.',
@@ -180,7 +180,7 @@ const packages: FlagshipStoryPackageV1[] = [
   }),
   storyPackage({
     slotId: 'TH-02',
-    title: 'Tiên Môn Dạy Nghề',
+    title: 'Bảo Tôi Dạy Đám Đệ Tử Bị Loại, Họ Lại Dựng Lại Tiên Môn',
     tagline: 'Thu đồ dễ, dạy họ thành người không giống mình mới khó.',
     logline: 'Một tu sĩ giỏi nhìn tiềm năng nhận quản một tiên môn sắp giải tán, dùng cách dạy riêng cho từng học trò để dựng lại xưởng nghề và danh dự môn phái.',
     catalogueDescription: 'Tiên hiệp sư đồ pha vận hành tổ chức. Main không nhìn được thiên mệnh; học trò có ý chí và mục tiêu riêng. Payoff đến từ lúc người học tự vượt nút thắt, còn xung đột nảy sinh khi họ trưởng thành theo hướng thầy không kiểm soát.',
@@ -197,7 +197,7 @@ const packages: FlagshipStoryPackageV1[] = [
   }),
   storyPackage({
     slotId: 'TH-03',
-    title: 'Phòng Thí Nghiệm Trên Đỉnh Mây',
+    title: 'Xuyên Đến Tiên Môn, Tôi Biến Tu Tiên Thành Một Môn Khoa Học',
     tagline: 'Linh khí không đọc sách giáo khoa, và thí nghiệm sai vẫn phải có người trả giá.',
     logline: 'Một nghiên cứu viên xuyên tới tiên môn dùng phương pháp giả thuyết và đo lường để tìm hiểu linh khí, nhưng phát hiện quy luật nơi đây phản ứng với người quan sát và lợi ích học thuật.',
     catalogueDescription: 'Tu tiên nghiên cứu, nơi tri thức tạo cả sức mạnh lẫn xung đột thể chế. Main chỉ giỏi đặt câu hỏi; cần thiết bị, vật liệu, cộng sự và quyền công bố. Mỗi phát hiện mở một ứng dụng cùng một nguy cơ đạo đức.',
@@ -214,7 +214,7 @@ const packages: FlagshipStoryPackageV1[] = [
   }),
   storyPackage({
     slotId: 'TH-04',
-    title: 'Mỗi Đời Chỉ Mang Về Một Thứ',
+    title: 'Tu Tiên Mô Phỏng: Mỗi Kiếp Tôi Chỉ Được Mang Về Một Thứ',
     tagline: 'Sống lại vô số lần, nhưng mỗi lần anh chỉ cứu được một ký ức.',
     logline: 'Một đệ tử được mô phỏng những vòng đời khác nhau trong tiên môn, song mỗi lần thất bại chỉ có thể giữ lại một kỹ năng hoặc mảnh thông tin và mọi can thiệp đều làm lịch sử biến dạng.',
     catalogueDescription: 'Vòng lặp tu tiên không farm vô hạn. Mỗi đời là một chiến lược có mục tiêu và mất mát, còn hiện thực chỉ nhận một kết quả hữu hạn. Càng biết nhiều, main càng phải chọn điều gì đáng mang về.',
@@ -231,7 +231,7 @@ const packages: FlagshipStoryPackageV1[] = [
   }),
   storyPackage({
     slotId: 'TH-05',
-    title: 'Y Quán Dưới Chân Núi',
+    title: 'Y Tu Mở Quán Dưới Tiên Sơn, Chữa Một Người Để Cứu Cả Làng',
     tagline: 'Chữa một người là trả lại cho cả làng một phần sức sống.',
     logline: 'Một y tu có khả năng cảm nhận sinh cơ mở quán ở vùng nghèo, chữa bệnh bằng dược liệu hữu hạn và gây dựng dược điền để cộng đồng tự sống được sau khi anh rời đi.',
     catalogueDescription: 'Tiên hiệp chữa lành nhưng không cứu miễn phí. Chẩn đoán của main có phạm vi hẹp và tiêu hao sức lực; bệnh nhân có quyền từ chối. Mỗi ca chữa trị phục hồi một con người, một nghề và một mắt xích sinh kế.',
@@ -248,7 +248,7 @@ const packages: FlagshipStoryPackageV1[] = [
   }),
   storyPackage({
     slotId: 'DT-01',
-    title: 'Trở Lại Mùa Cá Nổi',
+    title: 'Trọng Sinh Về Làng Biển, Tôi Biến Cá Rẻ Thành Cơ Nghiệp Cả Nhà',
     tagline: 'Anh nhớ mùa biển đổi, nhưng mẻ cá đầu tiên vẫn phải tự tay kéo lên.',
     logline: 'Trọng sinh về làng biển cuối thập niên 1980, một người đàn ông dùng kinh nghiệm mùa cá, bảo quản và thị trường để cứu gia đình khỏi nợ rồi dựng sinh kế bền vững cho cả nhóm thuyền.',
     catalogueDescription: 'Niên đại làng biển khoái hoạt, main chủ động từ chương đầu và có thành quả vật chất trước chương ba. Ký ức chỉ cho xu hướng, không cho tọa độ hay giá chính xác; mỗi đồng tiền phải đi qua lao động, hao hụt và đầu ra thật.',
@@ -265,7 +265,7 @@ const packages: FlagshipStoryPackageV1[] = [
   }),
   storyPackage({
     slotId: 'DT-02',
-    title: 'Mùa Rừng Trả Lộc',
+    title: 'Trọng Sinh Về Bản Núi, Một Tay Dẫn Cả Bản Làm Giàu Từ Lộc Rừng',
     tagline: 'Biết lấy gì từ rừng chưa đủ; phải biết để lại gì cho mùa sau.',
     logline: 'Trọng sinh về bản núi nghèo, một người thợ rừng dùng kinh nghiệm mùa vụ và sơ chế lâm sản để nuôi gia đình, nhưng mỗi lần kiếm nhanh đều đặt nguồn sống năm sau trước lựa chọn khó.',
     catalogueDescription: 'Niên đại miền núi thiên về sinh kế và đời sống ấm. Main biết kỹ thuật chứ không biết kho báu hay vị trí con mồi. Payoff là dụng cụ tốt hơn, bếp đủ ăn và nguồn hàng tái sinh, không phải săn giết vô hạn.',
@@ -282,7 +282,7 @@ const packages: FlagshipStoryPackageV1[] = [
   }),
   storyPackage({
     slotId: 'DT-03',
-    title: 'Xưởng Nhỏ Năm 1989',
+    title: 'Trọng Sinh Năm 1989: Dùng Tiền Cưới Mua Máy Phế Liệu Mở Xưởng',
     tagline: 'Anh nhớ thị trường sẽ cần gì; chiếc máy cũ vẫn bắt anh làm lại từ đầu.',
     logline: 'Trọng sinh về năm 1989, một kỹ thuật viên chọn sản phẩm gia dụng nhỏ đang thiếu, sửa máy, làm mẫu và dựng mạng đại lý mà không sở hữu bản vẽ tương lai hay vốn vô hạn.',
     catalogueDescription: 'Niên đại công nghiệp lấy logic kỹ thuật, vốn lưu động, đội ngũ và phân phối làm causal engine. Main thắng nhờ chọn đúng nhu cầu và thử nhỏ, nhưng sai số sản xuất cùng công nợ có thể giết xưởng dù hàng bán được.',
@@ -299,7 +299,7 @@ const packages: FlagshipStoryPackageV1[] = [
   }),
   storyPackage({
     slotId: 'DT-04',
-    title: 'Bếp Nhà Qua Bốn Mùa',
+    title: 'Về Quê Chăm Mẹ, Tôi Mở Bếp Theo Mùa Nuôi Cả Nhà',
     tagline: 'Một bữa ngon không đổi đời ngay, nhưng bốn mùa có thể dựng lại một mái nhà.',
     logline: 'Một người đàn ông về quê chăm mẹ mở bếp theo mùa, biến nông sản đúng vụ thành món ăn có khách và từng bước sửa lại nhà, vườn cùng quan hệ làng xóm.',
     catalogueDescription: 'Hưu nhàn nhưng không đứng yên. Mỗi mùa có nguyên liệu, sức lao động và nhu cầu khách khác nhau; món ăn là payoff cảm xúc đồng thời tạo tiền, dụng cụ và sinh hoạt cộng đồng mới.',
@@ -316,7 +316,7 @@ const packages: FlagshipStoryPackageV1[] = [
   }),
   storyPackage({
     slotId: 'DT-05',
-    title: 'Chuyến Hàng Qua Cánh Cổng Mưa',
+    title: 'Cổng Song Xuyên Chỉ Mở Khi Mưa, Tôi Mang Máy Lọc Nước Đổi Hàng',
     tagline: 'Hai thế giới không thiếu đồ; chúng thiếu người hiểu thứ gì thật sự có giá trị.',
     logline: 'Một chủ kho nhỏ phát hiện cánh cổng chỉ mở trong mưa và vận chuyển được khối lượng hữu hạn, từ đó xây tuyến giao dịch giữa thành phố hiện đại với một thế giới khan nước nhưng thừa vật liệu lạ.',
     catalogueDescription: 'Song xuyên kinh doanh với logistics, nguồn hàng và phản ứng thị trường thật. Không gian không vô hạn, hàng không tự sinh và đối tác hai bên có mục tiêu riêng. Tiến bộ đi từ món hàng sang hạn mức, kho vận và tín nhiệm.',
@@ -333,7 +333,7 @@ const packages: FlagshipStoryPackageV1[] = [
   }),
   storyPackage({
     slotId: 'DT-06',
-    title: 'Phòng Thu Không Có Bài Hit',
+    title: 'Xuyên Đến Giới Giải Trí, Tôi Không Chép Nhạc Vẫn Thành Nhà Sản Xuất',
     tagline: 'Anh mang theo cách làm nghề, không mang theo một kho kiệt tác để chép lại.',
     logline: 'Xuyên tới một nền giải trí khác, một nhà sản xuất thất bại dùng phương pháp thử khán giả và phối hợp đội ngũ để tạo từng sản phẩm mới, thay vì sao chép tác phẩm từ thế giới cũ.',
     catalogueDescription: 'Truyện giải trí thiên về quá trình sáng tạo và phản hồi phân hóa. Main có thẩm mỹ lẫn kinh nghiệm nhưng không nhớ nguyên văn bài hát, phim hay thuật toán. Mỗi dự án nâng kỹ năng, khán giả và quyền sản xuất cùng trách nhiệm.',
@@ -350,7 +350,7 @@ const packages: FlagshipStoryPackageV1[] = [
   }),
   storyPackage({
     slotId: 'DT-07',
-    title: 'Lần Này Ba Sẽ Về Sớm',
+    title: 'Trọng Sinh Khi Con Gái Còn Nhỏ, Lần Này Tôi Nhất Định Về Nhà Sớm',
     tagline: 'Anh nhớ những tiếc nuối lớn, nhưng phải học lại con mình từ đầu.',
     logline: 'Trọng sinh về lúc con gái còn nhỏ, một người cha chọn rời cuộc đua nghề nghiệp cũ để chăm con, dựng lại nếp nhà và gây dựng một công việc cho phép mình có mặt đúng lúc.',
     catalogueDescription: 'Nãi ba nam tần nhưng cả trẻ và người thân đều có nhu cầu, ranh giới riêng. Main không biết trước mọi bệnh hay cảm xúc. Payoff đến từ hành động chăm sóc cụ thể, lòng tin được xây lại và năng lực nghề nghiệp phù hợp đời sống mới.',
@@ -367,7 +367,7 @@ const packages: FlagshipStoryPackageV1[] = [
   }),
   storyPackage({
     slotId: 'DT-08',
-    title: 'Sổ Nợ Phố Cũ',
+    title: 'Tiếp Quản Kho Hàng Nhà Mình, Tôi Dùng Một Tuyến Xe Cứu Cả Phố Cũ',
     tagline: 'Cứu một cửa hàng không khó bằng khiến những người giữ nó chịu chia quyền.',
     logline: 'Một chuyên gia vận hành trở về phố cũ tiếp quản kho hàng gia đình, dùng dữ liệu, thử nghiệm nhỏ và thương lượng để cứu mạng lưới tiểu thương khỏi đứt dòng tiền.',
     catalogueDescription: 'Đô thị nghề nghiệp thực tế, nơi khách hàng, hợp đồng, hàng hóa và quyền truy cập đều có chủ. Main không biết ý định đối tác hay kết quả thị trường; mỗi thắng lợi tạo thêm nghĩa vụ kinh tế và buộc anh học cách tin đội ngũ.',
@@ -384,7 +384,7 @@ const packages: FlagshipStoryPackageV1[] = [
   }),
   storyPackage({
     slotId: 'DT-09',
-    title: 'Vai Phản Diện Xin Nghỉ Việc',
+    title: 'Bảo Tôi Làm Phản Diện Cướp Dự Án, Tôi Lại Nghỉ Việc Tự Khởi Nghiệp',
     tagline: 'Biết mình sẽ bị hạ bệ, anh quyết không diễn tiếp cảnh mà người khác đã viết.',
     logline: 'Một giám đốc trẻ nhận ra đời mình đang đi đúng kịch bản phản diện, chủ động rời tập đoàn gia đình và gây dựng nghề nghiệp hợp pháp trước khi thông tin cũ mất hết giá trị.',
     catalogueDescription: 'Phá kịch bản đô thị không dựa vào bí mật tác giả để vả mặt. Sau mỗi can thiệp, người khác phản ứng độc lập và tuyến sự kiện đổi thật. Main phải xây tài sản, nghề và quan hệ mới thay vì chỉ né tai họa cũ.',
@@ -401,7 +401,7 @@ const packages: FlagshipStoryPackageV1[] = [
   }),
   storyPackage({
     slotId: 'DT-10',
-    title: 'Bang Hội Không Đánh Boss',
+    title: 'Bảo Tôi Lập Bang Đánh Boss, Tôi Lại Mở Dịch Vụ Cho Cả Máy Chủ',
     tagline: 'Họ không mạnh nhất máy chủ; họ khiến cả máy chủ cần đến mình.',
     logline: 'Một người chơi dùng dữ liệu giao dịch đã xảy ra để tổ chức bang hội dịch vụ, tạo thị trường và ảnh hưởng cộng đồng mà không săn drop hiếm hay độc quyền chiến lực.',
     catalogueDescription: 'Võng du kinh tế cộng đồng. Bảng dữ liệu không dự báo giá hoặc hành động người chơi; nhà phát hành, bang hội khác và khách hàng đều phản ứng theo lợi ích. Payoff đến từ đội nhóm, niềm tin và quyền thị trường.',
@@ -418,7 +418,7 @@ const packages: FlagshipStoryPackageV1[] = [
   }),
   storyPackage({
     slotId: 'DT-11',
-    title: 'Vết Men Dưới Lớp Bụi',
+    title: 'Giám Bảo Đồ Cũ: Công Cụ Chỉ Gợi Một Dòng, Còn Tôi Tự Tìm Hàng Thật',
     tagline: 'Giá trị thật không phát sáng; nó để lại dấu vết cho người đủ kiên nhẫn.',
     logline: 'Một thợ phục hồi đồ cũ sở hữu công cụ chỉ gợi ý một thuộc tính vật liệu, phải dùng hồ sơ nguồn gốc, tay nghề và thương lượng để tìm đúng câu chuyện lẫn người mua cho từng món đồ.',
     catalogueDescription: 'Giám bảo nghề nghiệp không dùng mắt thần toàn năng. Mỗi vật phẩm có lịch sử sở hữu, chi phí phục hồi và rủi ro pháp lý. Tiến bộ đi từ vốn quay vòng tới uy tín và quyền tiếp cận nguồn hàng đáng tin.',
@@ -435,7 +435,7 @@ const packages: FlagshipStoryPackageV1[] = [
   }),
   storyPackage({
     slotId: 'DT-12',
-    title: 'Hiệp Hai Mới Bắt Đầu',
+    title: 'Từ Ghế Dự Bị Đến Suất Đá Chính: Đọc Nhịp Trận Đấu Để Đổi Đời',
     tagline: 'Đọc được trận đấu chỉ cho anh một cơ hội; đôi chân phải tự chạy đến phút cuối.',
     logline: 'Một tiền vệ hạng dưới có khả năng đọc nhịp trận đấu gây dựng sự nghiệp dài bằng luyện tập, chiến thuật và niềm tin đồng đội, thay vì liên tục phá kỷ lục cá nhân.',
     catalogueDescription: 'Thể thao đường dài với tiến bộ nhìn thấy qua bài tập, vai trò và cách đội vận hành. Main không được hệ thống tăng chỉ số; chấn thương, lịch thi đấu và cạnh tranh vị trí đều có hậu quả kéo dài.',
@@ -452,7 +452,7 @@ const packages: FlagshipStoryPackageV1[] = [
   }),
   storyPackage({
     slotId: 'DT-13',
-    title: 'Ca Trực Không Có Phép Màu',
+    title: 'Bác Sĩ Cấp Cứu Không Hệ Thống: Chỉ Dựa Chẩn Đoán Vẫn Cứu Được Người',
     tagline: 'Bác sĩ giỏi không biết hết; anh biết lúc nào phải hỏi thêm một người.',
     logline: 'Một bác sĩ cấp cứu giỏi đọc dấu hiệu nhưng không có năng lực siêu nhiên, giải các ca bệnh bằng loại trừ giả thuyết, phối hợp và tôn trọng quyền quyết định của bệnh nhân.',
     catalogueDescription: 'Y nghiệp có domain truth và giới hạn thẩm quyền. Ca bệnh tạo căng thẳng từ thông tin thiếu, thời gian và nguồn lực, không cần đồng nghiệp ngu để bị vả mặt. Payoff gồm kết quả điều trị, lòng tin và năng lực đội ngũ.',
@@ -469,7 +469,7 @@ const packages: FlagshipStoryPackageV1[] = [
   }),
   storyPackage({
     slotId: 'DT-14',
-    title: 'Thành Phố Cần Một Dòng Nước',
+    title: 'Xuyên Đến Dị Giới, Tôi Dùng Kỹ Thuật Cấp Nước Xây Lại Cả Thành Phố',
     tagline: 'Anh không mang theo máy móc hiện đại; chỉ mang theo cách tìm đúng nút thắt.',
     logline: 'Một kỹ sư xuyên tới thế giới mới phải dùng vật liệu địa phương để sửa nước, đường và năng lượng, trong khi mỗi công trình làm thay đổi nhóm hưởng lợi lẫn người phải trả chi phí.',
     catalogueDescription: 'Kỹ nghệ thế giới mới nhưng không phát minh thần tốc. Main nhớ nguyên lý, thiếu bản vẽ và tiêu chuẩn; mọi giải pháp phải đo, thử, bảo trì. Payoff cộng đồng hiện qua nước sạch, đường đi và công xưởng vận hành được.',
@@ -486,7 +486,7 @@ const packages: FlagshipStoryPackageV1[] = [
   }),
   storyPackage({
     slotId: 'DT-15',
-    title: 'Đường Dài Có Biên Nhận',
+    title: 'Đội Xe Sắp Giải Tán: Từ Chuyến Hàng Đầu Tiên Đến Nghiệp Vận Tải Đường Dài',
     tagline: 'Giao đúng hẹn là lời hứa; giữ được người đi cùng mới là sự nghiệp.',
     logline: 'Một điều phối viên dựng đội vận tải nhỏ bằng dữ liệu tuyến, bảo quản và lòng tin tài xế, xử lý những biến cố không thể biết trước trên các chuyến đường dài.',
     catalogueDescription: 'Logistics hiện thực, mỗi đơn hàng có nguồn, lịch, chi phí nhiên liệu và bằng chứng giao. Main không biết trước tai nạn hay khách hàng; anh thắng nhờ ghép đúng xe, người và tuyến rồi tái đầu tư có kiểm soát.',
@@ -503,7 +503,7 @@ const packages: FlagshipStoryPackageV1[] = [
   }),
   storyPackage({
     slotId: 'DT-16',
-    title: 'Quán Nhỏ Đợi Mùa Về',
+    title: 'Về Phố Nhỏ Mở Quán, Tôi Dùng Món Theo Mùa Nuôi Khách Quen',
     tagline: 'Khách quen không đến vì món đắt nhất; họ đến vì quán nhớ mình cần gì.',
     logline: 'Một đầu bếp mở quán nhỏ theo mùa, dùng nguyên liệu địa phương và sự quan sát để nuôi khách quen, cải thiện không gian quán và dựng một cộng đồng không ồn ào.',
     catalogueDescription: 'Cozy nam tần có progression rõ. Mỗi món phục vụ một nhu cầu thật, bị giới hạn bởi mùa, giá và sức lao động. Đời sống chữa lành nhưng quán, nghề và quan hệ vẫn thay đổi sau từng cửa sổ chương.',
@@ -520,7 +520,7 @@ const packages: FlagshipStoryPackageV1[] = [
   }),
   storyPackage({
     slotId: 'DT-17',
-    title: 'Mỗi Ngày Một Tấn Hy Vọng',
+    title: 'Cổng Song Xuyên Mỗi Ngày Chỉ Chở Một Tấn, Tôi Mang Nước Cứu Làng Hạn Hán',
     tagline: 'Cổng chỉ chở được một tấn; cứu ai trước trở thành quyết định không thể trốn.',
     logline: 'Một nhân viên cứu trợ phát hiện cổng tới vùng cổ đại đang hạn hán, nhưng hạn mức vận chuyển buộc anh thiết kế từng gói nước, lương thực và thuốc có nguồn rồi tổ chức phân phối cùng người bản địa.',
     catalogueDescription: 'Song xuyên cứu trợ không biến hiện đại thành kho vô hạn. Mọi hàng phải mua, cân và theo dõi; can thiệp làm giá cả, quyền phân phối và nhu cầu hai bên đổi. Payoff là cộng đồng phục hồi năng lực tự sống.',
@@ -537,7 +537,7 @@ const packages: FlagshipStoryPackageV1[] = [
   }),
   storyPackage({
     slotId: 'DT-18',
-    title: 'Qua Mỗi Thế Giới, Học Một Nghề',
+    title: 'Xuyên Nhanh Làm Nghề: Mỗi Thế Giới Tôi Chỉ Được Giữ Một Kỹ Năng',
     tagline: 'Anh không mang phần thưởng về; anh mang một kỹ năng và hậu quả của việc đã thay đổi nơi ấy.',
     logline: 'Một người đàn ông đi qua các thế giới nhiệm vụ nghề nghiệp, mỗi lần phải hiểu cơ chế địa phương, tạo thay đổi bền rồi chỉ được giữ lại một bài học hoặc kỹ năng.',
     catalogueDescription: 'Khoái xuyên nam tần không farm điểm hệ thống. Mỗi thế giới là bài toán nghề và tổ chức khác, người bản địa có mục tiêu riêng và nơi cũ không reset sạch. Tiến bộ dài hạn là khả năng ra quyết định cùng bản sắc được giữ lại.',
