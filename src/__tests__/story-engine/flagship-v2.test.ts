@@ -444,6 +444,24 @@ describe('clean flagship runtime boundary and call budget', () => {
     expect(calls).toEqual(['director', 'writer', 'editor', 'writer_revision']);
   });
 
+  it('keeps grounded editor evidence on a rejected chapter for run telemetry', async () => {
+    const content = `${publishableContent()} CHI TIẾT GÂY LỖI`;
+    await expect(executeFlagshipPipeline({ storySpec: spec(), arcPlan: arc(), storyState: state(), preparedPlan: plan(), targetWordCount: 2200 }, {
+      invoke: async call => {
+        if (call.role === 'director') return JSON.stringify(plan());
+        if (call.role === 'writer') return JSON.stringify({ title: 'Hai khoản đặt cọc', content });
+        return JSON.stringify({
+          decision: 'reject', confidence: 0.9, planFidelity: 8.5, hardGates, axes,
+          evidence: [{ code: 'causal_break', severity: 'critical', message: 'Sai nhân quả.', start: content.length - 17, end: content.length, excerpt: 'CHI TIẾT GÂY LỖI' }],
+          revisionInstructions: [],
+        });
+      },
+    })).rejects.toMatchObject({
+      code: 'quality_rejected',
+      detail: { editorEvidence: [expect.objectContaining({ code: 'causal_break' })] },
+    });
+  });
+
   it('contains no imports from legacy writer, prompt, template, assembler or orchestrator', () => {
     const root = path.join(process.cwd(), 'src/services/story-engine/flagship');
     const files = require('fs').readdirSync(root).filter((name: string) => name.endsWith('.ts'));

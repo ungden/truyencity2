@@ -226,7 +226,9 @@ export async function executeFlagshipPipeline(
   });
 
   if (editor.decision === 'reject' || verdict.decision === 'reject') {
-    throw new FlagshipPipelineError('quality_rejected', 'Independent editor rejected the chapter.', { verdict, callRoles });
+    throw new FlagshipPipelineError('quality_rejected', 'Independent editor rejected the chapter.', {
+      verdict, editorEvidence, revisionLineage: [], callRoles,
+    });
   }
 
   const revisionLineage: Array<{ attempt: number; evidenceCodes: string[] }> = [];
@@ -238,7 +240,9 @@ export async function executeFlagshipPipeline(
       && editorEvidence.every(item => item.severity !== 'critical')
       && editor.revisionInstructions.length > 0;
     if (!locallyRevisable) {
-      throw new FlagshipPipelineError('quality_rejected', 'Revision was requested for non-local or under-threshold problems.', { verdict, callRoles });
+      throw new FlagshipPipelineError('quality_rejected', 'Revision was requested for non-local or under-threshold problems.', {
+        verdict, editorEvidence, revisionLineage, callRoles,
+      });
     }
     const revisionRaw = await invoke({
       role: 'writer_revision',
@@ -249,7 +253,9 @@ export async function executeFlagshipPipeline(
     const revised = parseJson(revisionRaw, WriterOutputSchema, 'Revision Writer');
     revisionLineage.push({ attempt: 1, evidenceCodes: editorEvidence.map(item => item.code) });
     if (revised.content === draft.content || !evidenceRemoved(revised.content, editorEvidence)) {
-      throw new FlagshipPipelineError('quality_rejected', 'Single revision did not remove the cited evidence.', { callRoles });
+      throw new FlagshipPipelineError('quality_rejected', 'Single revision did not remove the cited evidence.', {
+        verdict, editorEvidence, revisionLineage, callRoles,
+      });
     }
     draft = revised;
     verdict = evaluateFlagshipQuality({
@@ -263,7 +269,9 @@ export async function executeFlagshipPipeline(
   }
 
   if (verdict.decision !== 'publish') {
-    throw new FlagshipPipelineError('quality_rejected', 'Chapter did not reach publish after the single allowed revision.', { verdict, callRoles });
+    throw new FlagshipPipelineError('quality_rejected', 'Chapter did not reach publish after the single allowed revision.', {
+      verdict, editorEvidence, revisionLineage, callRoles,
+    });
   }
   return { ...draft, chapterPlan, verdict, editorEvidence, callRoles, revisionLineage };
 }

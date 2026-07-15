@@ -74,11 +74,25 @@ async function finishFailure(run: WriteRunHandle | null, error: FlagshipPipeline
     : error.code === 'quality_rejected' || error.code === 'human_gate' ? 'quality'
       : error.code === 'setup_blocked' ? 'setup'
         : 'unknown';
+  const detail = error.detail && typeof error.detail === 'object' ? error.detail as Record<string, unknown> : null;
+  const verdictCandidate = detail?.verdict && typeof detail.verdict === 'object'
+    ? detail.verdict as Record<string, unknown>
+    : detail;
+  const axes = verdictCandidate?.axes && typeof verdictCandidate.axes === 'object'
+    ? Object.values(verdictCandidate.axes as Record<string, unknown>).filter((value): value is number => typeof value === 'number')
+    : [];
+  const criticEvidence = Array.isArray(detail?.editorEvidence)
+    ? detail.editorEvidence
+    : Array.isArray(verdictCandidate?.evidence) ? verdictCandidate.evidence : [];
+  const revisionLineage = Array.isArray(detail?.revisionLineage) ? detail.revisionLineage : [];
   await finishWriteRun(run, status, {
     contextSizeChars: contextSize,
+    qualityScore: axes.length ? Math.min(...axes) : null,
     errorMessage: error.message,
     failureClass,
     publicationDecision: error.code === 'human_gate' ? 'human_gate' : error.code === 'quality_rejected' ? 'reject' : null,
+    criticEvidence,
+    revisionLineage,
   });
 }
 
