@@ -46,4 +46,3 @@ export const APPROVED_PORTFOLIO_FINALISTS_V2: readonly ApprovedPortfolioFinalist
     }),
   },
 ]);
-
