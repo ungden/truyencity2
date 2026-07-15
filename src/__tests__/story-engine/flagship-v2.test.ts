@@ -310,6 +310,7 @@ describe('flagship context and prompts', () => {
     const writer = buildWriterPrompt({ storySpec: spec(), chapterPlan: plan(), storyState: state(), targetWordCount: 2200 });
     const editor = buildEditorPrompt({ storySpec: spec(), chapterPlan: plan(), storyState: state(), title: 'Đặt cọc', content: 'Nguyễn An Bình '.repeat(100) });
     expect(director).not.toContain('PROSE=');
+    expect(director).toContain('Sao chép byte-for-byte các trường identity đã khóa');
     expect(writer).not.toContain('hardGates');
     expect(writer).not.toContain('revisionInstructions');
     expect(writer).toContain('pleasureProfile');
@@ -728,6 +729,7 @@ describe('isolated flagship setup v2', () => {
     expect(launchPrompt).toContain('OUTPUT_CONTRACT_EXACT=');
     expect(launchPrompt).toContain('HUMAN_SELECTION.approvedTitle');
     expect(launchPrompt).toContain('chapterPromise và nextChapterPressure');
+    expect(launchPrompt).toContain('nếu anchor ngắn hơn 20 ký tự');
     expect(launchPrompt).toContain('pleasureProfile');
   });
 

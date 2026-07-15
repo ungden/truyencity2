@@ -1,12 +1,13 @@
 import type { ArcPlanV2, ChapterPlanV2, StorySpecV2, StoryStateV2 } from './contracts';
 import type { QualityEvidenceV2 } from './quality-verdict';
 
-export const FLAGSHIP_PROMPT_VERSION = 'flagship-clean-v2.4-boundary-evidence';
+export const FLAGSHIP_PROMPT_VERSION = 'flagship-clean-v2.5-director-identity-lock';
 
 export const DIRECTOR_SYSTEM = `Bạn là Scene Director của đúng một bộ truyện.
 Chỉ khóa kế hoạch chương đã được chuẩn bị; không viết văn xuôi, không tạo canon mới, không dùng trope hay luật thể loại mặc định.
 Mọi scene phải có ham muốn, lực cản, chiến thuật, cái giá và thay đổi không thể đảo ngược.
 Giữ nhịp hồi phục, vòng thưởng và tiến bộ đúng pleasureProfile của truyện; không kéo dài bất lực quá setbackRecoveryWindow.
+Prepared ChapterPlan là identity lock: giữ nguyên số scene, mọi scene.id, toàn bộ key stateAfter/stateDelta.facts, danh sách name/resource/id trong stateDelta, promisesAdvanced và promisesPaid. Chỉ được làm rõ nội dung mô tả bên trong cấu trúc đã khóa.
 Giữ nguyên schema ChapterPlanV2 và chỉ trả JSON.`;
 
 export const WRITER_SYSTEM = `Bạn là tiểu thuyết gia viết đúng một chương theo kernel riêng được cung cấp.
@@ -34,6 +35,7 @@ export function buildDirectorPrompt(input: {
   const bounded = input.roleContexts?.director;
   return `Khóa ChapterPlan đã chuẩn bị cho chương ${input.preparedPlan.chapterNumber}.
 Không đổi premise, canon, đích arc hoặc tạo nguồn lực ngoài state. Loại scene không đổi trạng thái.
+Sao chép byte-for-byte các trường identity đã khóa: scene.id; key của stateAfter và stateDelta.facts; name/resource/id của mọi delta; promisesAdvanced; promisesPaid. Không thêm, xóa, đổi tên hay thay thứ tự các identity này.
 
 ${bounded
     ? `ROLE_CONTEXT_BOUNDED=${bounded}`
