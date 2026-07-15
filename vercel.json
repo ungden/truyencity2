@@ -1,4 +1,10 @@
 {
+  "crons": [
+    {
+      "path": "/api/cron/flagship-factory",
+      "schedule": "*/5 * * * *"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

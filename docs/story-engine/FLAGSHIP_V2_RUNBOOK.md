@@ -61,6 +61,8 @@ Every project is created `paused` and `hidden`, with one queued `story_factory_j
 
 To arm a deployment, set `FLAGSHIP_FACTORY_ENABLED=1`. If a required `GEMINI_API_KEY` or `DEEPSEEK_API_KEY` is absent, the cron returns `waitingForProvider: true`, claims zero leases and leaves setup/canon unchanged. Therefore the production fleet can be provisioned and armed first; adding the required API key is the final action that starts the next cron cycle.
 
+Vercel invokes only `/api/cron/flagship-factory` every five minutes. No legacy writing route is present in the Vercel cron list. Each invocation still passes through global enablement, provider readiness, project opt-in and database lease gates before setup or prose work can start.
+
 ## Publication behavior
 
 - Dispatch happens before the legacy orchestrator loads context or runs setup repair. Flagship never imports the legacy writer, prompts, templates, context assembler, polishers, or fallback gates.

@@ -6,8 +6,20 @@ import {
 } from '@/services/story-engine/flagship/factory-lifecycle';
 import { hasCompletePersistedRollingWindow } from '@/services/story-engine/flagship/factory-setup';
 import { ChapterPlanV2Schema } from '@/services/story-engine/flagship/contracts';
+import { readFileSync } from 'fs';
+import path from 'path';
 
 describe('flagship factory lifecycle', () => {
+  it('has one dedicated scheduler and never revives a legacy writing cron', () => {
+    const vercel = JSON.parse(readFileSync('vercel.json', 'utf8')) as {
+      crons?: Array<{ path: string; schedule: string }>;
+    };
+    expect(vercel.crons).toEqual([{
+      path: '/api/cron/flagship-factory',
+      schedule: '*/5 * * * *',
+    }]);
+  });
+
   it('accepts only an explicit flagship auto opt-in', () => {
     expect(factoryEligibility({
       pipelineVersion: 'flagship_v2', factoryEnabled: true, publicationMode: 'automatic',
@@ -69,5 +81,3 @@ describe('flagship factory lifecycle', () => {
     expect(decideAfterChapter(complete, 31, 2000)).toMatchObject({ status: 'completed', stage: 'completion' });
   });
 });
-import { readFileSync } from 'fs';
-import path from 'path';
