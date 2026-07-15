@@ -4,6 +4,8 @@ import {
   decideAfterChapter,
   factoryEligibility,
 } from '@/services/story-engine/flagship/factory-lifecycle';
+import { hasCompletePersistedRollingWindow } from '@/services/story-engine/flagship/factory-setup';
+import { ChapterPlanV2Schema } from '@/services/story-engine/flagship/contracts';
 
 describe('flagship factory lifecycle', () => {
   it('accepts only an explicit flagship auto opt-in', () => {
@@ -21,6 +23,20 @@ describe('flagship factory lifecycle', () => {
     expect(canTransitionFactoryJob('cancelled', 'queued')).toBe(false);
     expect(() => assertFactoryTransition('completed', 'queued')).toThrow('FACTORY_INVALID_TRANSITION');
     expect(canTransitionFactoryJob('infra_blocked', 'queued')).toBe(true);
+  });
+
+  it('reuses a complete persisted five-chapter window instead of paying for a duplicate planner call', () => {
+    const launchPack = JSON.parse(readFileSync(path.join(
+      process.cwd(),
+      'blueprints/flagship-portfolio-v1/materialized/hx-04/launch-pack.json',
+    ), 'utf8')) as { rollingChapterPlans: unknown[] };
+    const rows = launchPack.rollingChapterPlans.map(plan => {
+      const parsed = ChapterPlanV2Schema.parse(plan);
+      return { chapter_number: parsed.chapterNumber, meta: { chapterPlanV2: parsed } };
+    });
+    expect(hasCompletePersistedRollingWindow(rows, 1)).toBe(true);
+    expect(hasCompletePersistedRollingWindow(rows.slice(0, 4), 1)).toBe(false);
+    expect(hasCompletePersistedRollingWindow(rows, 2)).toBe(false);
   });
 
   const healthy = {
@@ -53,3 +69,5 @@ describe('flagship factory lifecycle', () => {
     expect(decideAfterChapter(complete, 31, 2000)).toMatchObject({ status: 'completed', stage: 'completion' });
   });
 });
+import { readFileSync } from 'fs';
+import path from 'path';

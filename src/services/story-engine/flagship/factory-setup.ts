@@ -4,6 +4,7 @@ import {
   FlagshipSetupBriefV2Schema,
   HumanConceptSelectionV2Schema,
 } from './setup-contracts';
+import { ChapterPlanV2Schema } from './contracts';
 import { FlagshipSetupError } from './setup';
 import {
   approveFlagshipStorySpecForProject,
@@ -11,6 +12,19 @@ import {
   runFlagshipConceptTournamentForProject,
 } from './setup-runtime';
 import { planNextFlagshipWindowForProject } from './rolling-planner';
+
+export function hasCompletePersistedRollingWindow(
+  rows: Array<{ chapter_number: number; meta: unknown }>,
+  startChapter: number,
+): boolean {
+  if (rows.length !== 5) return false;
+  return rows.every((row, index) => {
+    if (row.chapter_number !== startChapter + index) return false;
+    const plan = (row.meta as { chapterPlanV2?: unknown } | null)?.chapterPlanV2;
+    const parsed = ChapterPlanV2Schema.safeParse(plan);
+    return parsed.success && parsed.data.chapterNumber === row.chapter_number;
+  });
+}
 
 /**
  * Advance one unattended setup job without pretending that a machine review
@@ -121,11 +135,19 @@ export async function advanceAutonomousFlagshipSetup(
   }
 
   if (setupStatus === 'ready_to_write') {
-    if (data.arc_plan_v2 && data.story_state_v2) {
+    const startChapter = Number(data.current_chapter || 0) + 1;
+    const { data: persistedPlans, error: planReadError } = await db.from('chapter_blueprints')
+      .select('chapter_number,meta')
+      .eq('project_id', projectId)
+      .gte('chapter_number', startChapter)
+      .lte('chapter_number', startChapter + 4)
+      .order('chapter_number', { ascending: true });
+    if (planReadError) throw new FlagshipSetupError('setup_blocked', `Persisted rolling-plan lookup failed: ${planReadError.message}`);
+    if (!hasCompletePersistedRollingWindow(persistedPlans || [], startChapter) && data.arc_plan_v2 && data.story_state_v2) {
       await planNextFlagshipWindowForProject(projectId, { db });
     }
     await restoreAutomaticFlags();
-    return { status: 'ready', step: 'rolling_window_committed' };
+    return { status: 'ready', step: hasCompletePersistedRollingWindow(persistedPlans || [], startChapter) ? 'rolling_window_reused' : 'rolling_window_committed' };
   }
 
   throw new FlagshipSetupError('setup_blocked', `Factory setup cannot advance from ${setupStatus || 'missing'}.`);

@@ -35,6 +35,7 @@
     "flagship:approve-checkpoint": "node --import tsx scripts/flagship-approve-checkpoint.ts",
     "flagship:portfolio:validate": "node --import tsx scripts/flagship-portfolio-validate.ts",
     "flagship:portfolio:promote": "node --import tsx scripts/flagship-portfolio-promote.ts",
+    "flagship:portfolio:provision": "node --import tsx scripts/flagship-portfolio-provision.ts",
     "flagship:portfolio:tournaments": "node --import tsx scripts/flagship-portfolio-tournaments.ts",
     "flagship:portfolio:review": "node --import tsx scripts/flagship-portfolio-review-openings.ts",
     "flagship:portfolio:materialize": "node --import tsx scripts/flagship-portfolio-materialize.ts",

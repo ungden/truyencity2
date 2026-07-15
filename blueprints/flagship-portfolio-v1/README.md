@@ -49,6 +49,7 @@ npm run flagship:portfolio:materialize
 npm run flagship:portfolio:write-openings
 npm run flagship:covers:verify
 npm run flagship:portfolio:promote
+npm run flagship:portfolio:provision
 ```
 
 `tournaments` tạo 20 concept, pairwise rank và ba opening cho từng slot bằng checkpoint có hash. `review` chấm mù ba opening, kiểm evidence nguyên văn và tạo [khuyến nghị 9 → 3](./portfolio-recommendation.md). Cả hai lệnh đều offline và không import Supabase, chapter writer hoặc legacy orchestrator.
@@ -59,7 +60,7 @@ Tên catalogue đã qua [market-title audit V2](./title-market-audit-v2.md): tê
 
 `flagship:covers:verify` kiểm tra đủ 30 source/rendered cover, WebP 1086×1448 và hash của từng ảnh trong [cover-render-manifest.json](./cover-render-manifest.json). Manifest khóa title đã duyệt và watermark `truyencity.com`; nếu đổi title phải render lại cover rồi cập nhật manifest, không được âm thầm dùng bìa cũ.
 
-Lệnh `promote` hiện chỉ tạo promotion packet trên stdout và không ghi database. `--apply` cố ý bị chặn cho tới khi từng slot có brief riêng và concept được duyệt; đây là fail-closed, không phải tính năng còn thiếu để engine tự lấp.
+Lệnh `promote` chỉ in gói tuyển chọn 30 → 9 để audit và không ghi database. Đường production nằm ở `flagship:portfolio:provision`: lệnh này kiểm đủ 30 brief riêng, chín tournament và ba kernel thắng rồi mới tạo project paused/hidden cùng factory job theo cách idempotent. Dry-run là mặc định; production cần `--apply --confirm=PROVISION_FLAGSHIP_FIRST_30`. Nó không ghi chương và không đưa prose opening offline lên production.
 
 ## Research basis
 

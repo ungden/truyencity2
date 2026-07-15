@@ -17,6 +17,7 @@ import { advanceAutonomousFlagshipSetup } from '@/services/story-engine/flagship
 import { planNextFlagshipWindowForProject } from '@/services/story-engine/flagship/rolling-planner';
 import { FlagshipSetupError } from '@/services/story-engine/flagship/setup';
 import { canTransitionFactoryJob } from '@/services/story-engine/flagship/factory-lifecycle';
+import { getFlagshipProviderReadiness } from '@/services/story-engine/flagship/provider-readiness';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 800;
@@ -222,6 +223,27 @@ async function run(request: NextRequest): Promise<NextResponse> {
   if (!verifyCronAuth(request)) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
   if (process.env.FLAGSHIP_FACTORY_ENABLED !== '1') return NextResponse.json({ success: true, disabled: true });
   const db = getSupabaseAdmin();
+  const { data: optedInProjects, error: readinessError } = await db.from('ai_story_projects')
+    .select('id,style_directives')
+    .contains('style_directives', {
+      pipeline_version: 'flagship_v2',
+      factory_enabled: true,
+      publication_mode: 'automatic',
+    })
+    .limit(5000);
+  if (readinessError) {
+    return NextResponse.json({ success: false, error: `Factory readiness lookup failed: ${readinessError.message}` }, { status: 503 });
+  }
+  const providerReadiness = getFlagshipProviderReadiness(optedInProjects || []);
+  if (!providerReadiness.ready) {
+    return NextResponse.json({
+      success: true,
+      autonomous: true,
+      waitingForProvider: true,
+      claimed: 0,
+      providerReadiness,
+    });
+  }
   const concurrency = intEnv('FLAGSHIP_FACTORY_CONCURRENCY', 8, 1, 32);
   const leaseSeconds = intEnv('FLAGSHIP_FACTORY_LEASE_SECONDS', 900, 60, 3600);
   const workerPrefix = `flagship-factory:${process.env.VERCEL_REGION || 'local'}:${Date.now()}`;

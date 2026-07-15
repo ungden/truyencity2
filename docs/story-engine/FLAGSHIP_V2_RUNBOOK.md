@@ -6,11 +6,11 @@ The flagship lane is quality-first and isolated from the legacy fleet. A project
 
 1. `flagship_setup_brief_v2` is authored for one story and must include real domain research plus its own `pleasureProfile`. There is no shared genre setup or default brief.
 2. `flagship_concept_tournament_v2` contains 20 generated concepts, lexical duplicate removal, pairwise ranking and three full opening simulations.
-3. A human must persist `flagship_setup_selection_v2`; the engine cannot choose its own winner.
+3. A manual pilot requires a human to persist `flagship_setup_selection_v2`. A project explicitly enrolled in the autonomous factory may select the pairwise winner with reviewer provenance `factory-auto`; it may not invent a candidate or borrow another story's kernel.
 4. `ai_story_projects.story_spec_v2` must validate as `StorySpecV2`, preserve the selected concept/characters/world exactly, and have a computed foundation score of at least 8/10 with no dimension below 7.
 5. `ai_story_projects.arc_plan_v2` covers only the current 20-30 chapter arc; `story_state_v2` must match `current_chapter` exactly.
 6. Only five rolling `ChapterPlanV2` records may be prepared at a time. There is no fake 1,000-chapter detail map.
-7. Human checkpoints advance in order: `concept` → `story_spec` → `chapter_3` → `chapter_10` → `chapter_30` → `chapter_50`.
+7. Manual pilots advance through human checkpoints: `concept` → `story_spec` → `chapter_3` → `chapter_10` → `chapter_30` → `chapter_50`. Autonomous projects replace those chat checkpoints with explicit per-project opt-in while retaining Editor hard gates, evidence and transactional commit.
 
 ## Safe workflow
 
@@ -30,6 +30,11 @@ npm run flagship:approve-checkpoint -- --project=<uuid> --stage=chapter_3 --revi
 npm run flagship:preflight -- --spec=/absolute/story-spec.json --arc=/absolute/arc-plan.json --state=/absolute/story-state.json --plans=/absolute/chapter-plans.json
 npm run flagship:bakeoff -- --ballots=/absolute/blind-ballots.json --candidate-ids=A,B
 npm run flagship:classify-legacy -- --limit=5000
+
+# First-30 factory provisioning. Dry-run is the default. The apply command is
+# idempotent and creates only paused, hidden projects plus queued jobs.
+npm run flagship:portfolio:provision
+npm run flagship:portfolio:provision -- --apply --confirm=PROVISION_FLAGSHIP_FIRST_30
 ```
 
 `flagship:preflight` expects only plans 1-5. The preflight and classifier are read-only. The bake-off requires at least ten decisive blind ballots and a winner with at least 65% preference.
@@ -42,7 +47,19 @@ Before any flagship project can run against production:
 2. Apply `20260711044323_flagship_setup_v2.sql` only after authenticating to the intended Supabase project.
 3. Verify telemetry/ledger tables and all flagship setup/planning/approval RPCs exist and are inaccessible to `anon`/`authenticated`.
 4. Verify the explicitly selected model route is funded and reachable.
-5. Keep every legacy project paused. The production cron excludes flagship projects too; pilot writes are manual by project ID.
+5. Keep legacy data retired. Portfolio provisioning creates exactly 30 `flagship_v2` projects, keyed by `portfolio_slot_id`, so rerunning it cannot create duplicates.
+
+## Autonomous first-30 factory
+
+`flagship:portfolio:provision` validates all 30 story-specific briefs, all nine committed tournament artifacts, the three approved launch packs and their recomputed foundation scores before it writes production. Its stage map is fixed:
+
+- `HX-04`, `TH-01`, `DT-11`: approved kernel imported as `ready_to_write`.
+- Six other opening-tournament slots: their existing tournament is imported as `concept_review`; the factory continues from the ranked finalists.
+- Twenty-one reserve slots: their own typed brief is stored as `brief_ready`; the factory creates their tournament after a provider is connected.
+
+Every project is created `paused` and `hidden`, with one queued `story_factory_jobs` row and a unique `(portfolio_id, portfolio_slot_id)` identity. The provisioner never writes a chapter and never imports offline opening prose as production prose.
+
+To arm a deployment, set `FLAGSHIP_FACTORY_ENABLED=1`. If a required `GEMINI_API_KEY` or `DEEPSEEK_API_KEY` is absent, the cron returns `waitingForProvider: true`, claims zero leases and leaves setup/canon unchanged. Therefore the production fleet can be provisioned and armed first; adding the required API key is the final action that starts the next cron cycle.
 
 ## Publication behavior
 

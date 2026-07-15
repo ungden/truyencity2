@@ -23,6 +23,7 @@ import {
   validateBenchmarkCoverage,
   validateFlagshipCatalogue,
   validatePortfolioResearch,
+  buildFlagshipFirst30ProvisionPlan,
 } from '@/services/story-engine/flagship';
 
 describe('flagship first-30 portfolio', () => {
@@ -121,6 +122,25 @@ describe('flagship first-30 portfolio', () => {
         expect(cards.get(cardId)?.sourceIds.length).toBeGreaterThanOrEqual(3);
         expect(cards.get(cardId)).toMatchObject({ usage: 'upstream_concept_lab_only', mustNeverReachWriter: true });
       }
+    }
+  });
+
+  it('builds 30 production-ready, story-specific briefs without a shared kernel fallback', () => {
+    const plan = buildFlagshipFirst30ProvisionPlan();
+    expect(plan.items).toHaveLength(30);
+    expect(plan.items.filter(item => item.provisionStage === 'ready_to_write')).toHaveLength(3);
+    expect(plan.items.filter(item => item.provisionStage === 'concept_review')).toHaveLength(6);
+    expect(plan.items.filter(item => item.provisionStage === 'brief_ready')).toHaveLength(21);
+    expect(new Set(plan.items.map(item => item.slotId)).size).toBe(30);
+    expect(new Set(plan.items.map(item => item.setupBrief.distinctnessFingerprint)).size).toBe(30);
+    expect(new Set(plan.items.map(item => item.setupBrief.domain)).size).toBe(30);
+    expect(plan.items.every(item => item.slug === `flagship-${item.slotId.toLowerCase()}`)).toBe(true);
+    expect(plan.items.every(item => item.setupBrief.seedConstraints.some(value => value.includes(item.slotId) || value.includes('Chương') || value.includes('chương')))).toBe(true);
+    for (const item of plan.items) {
+      expect(FlagshipSetupBriefV2Schema.parse(item.setupBrief)).toEqual(item.setupBrief);
+      expect(item.setupBrief.portfolioSlotId).toBe(item.slotId);
+      expect(item.setupBrief.pleasureProfile.primaryRewardLoop.length).toBeGreaterThanOrEqual(4);
+      expect(item.setupBrief.researchNotes.length).toBeGreaterThanOrEqual(3);
     }
   });
 
