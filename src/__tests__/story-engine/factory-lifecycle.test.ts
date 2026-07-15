@@ -65,6 +65,12 @@ describe('flagship factory lifecycle', () => {
     expect(hasCompletePersistedRollingWindow(rows, 2)).toBe(false);
   });
 
+  it('locks rolling-window identifiers and records typed validation details', () => {
+    const planner = readFileSync('src/services/story-engine/flagship/rolling-planner.ts', 'utf8');
+    expect(planner).toContain('copy byte-for-byte từ COMMITTED_STATE');
+    expect(planner).toContain('failure.detail');
+  });
+
   const healthy = {
     projectId: 'p', currentChapter: 30, forecastChapters: 1000,
     latestContinuityVerdict: 'pass' as const, latestMemoryOk: true,

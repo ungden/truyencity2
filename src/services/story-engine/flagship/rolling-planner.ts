@@ -9,10 +9,12 @@ import { requireFlagshipModelRoutes } from './model-routes';
 import { callFlagshipModel } from './provider';
 import { toGeminiResponseJsonSchema } from './setup-response-schemas';
 
-export const ROLLING_PLANNER_PROMPT_VERSION = 'flagship-rolling-v2.0';
+export const ROLLING_PLANNER_PROMPT_VERSION = 'flagship-rolling-v2.1-typed-identities';
 export const ROLLING_PLANNER_SYSTEM = `Bạn là rolling planner của đúng một bộ truyện.
 Lập đúng năm ChapterPlanV2 liên tiếp từ state đã commit. Mỗi scene phải có desire, opposition, tactic, cost và irreversible change.
 Hậu quả chương trước phải trở thành stateBefore và áp lực thật của chương sau. Không tạo canon, cast, tài nguyên, promise hoặc quyền lực ngoài kernel/state.
+Mọi name/resource/id trong stateDelta phải copy byte-for-byte từ COMMITTED_STATE, kể cả hoa thường và dấu. Giữ stateBefore của plan sau bằng đúng stateAfter của plan trước.
+Trả đúng năm plan liên tiếp; mỗi plan có 2-5 scene. chapterPromise, nextChapterPressure và mọi trường mô tả scene phải là câu cụ thể dài ít nhất 20 ký tự.
 Không dùng outline, template hay genre playbook legacy. Chỉ trả JSON đúng RollingPlanWindowV2.`;
 
 const json = (value: unknown) => JSON.stringify(value);
@@ -84,7 +86,8 @@ export async function planNextFlagshipWindowForProject(
     return parsed.data;
   } catch (caught) {
     const failure = caught instanceof FlagshipSetupError ? caught : new FlagshipSetupError('setup_blocked', caught instanceof Error ? caught.message : String(caught));
-    await finishFlagshipSetupRun({ db, runId, status: failure.code, callRoles: ['rolling_planner'], errorMessage: failure.message });
+    const diagnostic = `${failure.message}${failure.detail === undefined ? '' : ` detail=${JSON.stringify(failure.detail)}`}`;
+    await finishFlagshipSetupRun({ db, runId, status: failure.code, callRoles: ['rolling_planner'], errorMessage: diagnostic.slice(0, 4000) });
     throw failure;
   }
 }
