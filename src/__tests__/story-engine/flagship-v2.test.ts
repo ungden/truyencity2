@@ -360,6 +360,14 @@ describe('flagship rollout policy', () => {
     expect(canPublishFlagshipChapter({ verdict: publishVerdict, chapterNumber: 1, style: { pipeline_version: 'flagship_v2', publication_mode: 'human_gate', flagship_human_gate: 'story_spec' } }).allowed).toBe(true);
     expect(canPublishFlagshipChapter({ verdict: publishVerdict, chapterNumber: 4, style: { pipeline_version: 'flagship_v2', publication_mode: 'human_gate', flagship_human_gate: 'story_spec' } }).allowed).toBe(false);
   });
+
+  it('allows explicitly opted-in autonomous factory projects without a chat checkpoint', () => {
+    expect(canPublishFlagshipChapter({
+      verdict: publishVerdict,
+      chapterNumber: 1,
+      style: { pipeline_version: 'flagship_v2', publication_mode: 'automatic', factory_enabled: true },
+    }).allowed).toBe(true);
+  });
 });
 
 describe('flagship migration contract', () => {

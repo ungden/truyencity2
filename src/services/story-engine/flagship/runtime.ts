@@ -100,7 +100,13 @@ export async function writeFlagshipChapter(
   if (project.flagship_setup_status !== 'ready_to_write') {
     throw new FlagshipPipelineError('setup_blocked', `Flagship setup is ${project.flagship_setup_status || 'missing'}, expected ready_to_write.`);
   }
-  if (project.status !== 'paused') throw new FlagshipPipelineError('setup_blocked', 'Flagship manual write requires project status=paused.');
+  const autonomousFactory = project.style_directives?.publication_mode === 'automatic'
+    && project.style_directives.factory_enabled === true;
+  if (project.status !== 'paused' && !(autonomousFactory && project.status === 'active')) {
+    throw new FlagshipPipelineError('setup_blocked', autonomousFactory
+      ? 'Autonomous flagship factory requires project status=active or paused.'
+      : 'Flagship manual write requires project status=paused.');
+  }
   const novel = linkedNovel(project);
   if (!novel) throw new FlagshipPipelineError('setup_blocked', 'Project has no linked novel.');
   const nextChapter = Number(project.current_chapter || 0) + 1;
@@ -259,6 +265,18 @@ export async function writeFlagshipChapter(
       p_model_route: modelRoutes,
     });
     if (commitError) throw new FlagshipPipelineError('commit_failed', commitError.message);
+
+    // Close the run only after the canon RPC has committed. This records the
+    // publication decision and evidence for checkpoint/telemetry consumers
+    // without changing prose or state.
+    await finishWriteRun(run, 'saved', {
+      lastChapterNumber: nextChapter,
+      qualityScore,
+      contextSizeChars: contextSize,
+      publicationDecision: 'publish',
+      criticEvidence: generated.editorEvidence,
+      revisionLineage: generated.revisionLineage,
+    });
 
     return {
       chapterNumber: nextChapter,

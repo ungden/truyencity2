@@ -65,12 +65,18 @@ export type ToneProfile =
 export interface StyleDirectives {
   /** Pipeline generation. flagship_v2 is quality-first and never uses routine soft gates. */
   pipeline_version?: 'legacy' | 'flagship_v2';
-  /** Publication policy. Flagship stays human-gated through chapter 30. */
+  /** Publication policy. Automatic is allowed only for explicitly factory-enabled projects. */
   publication_mode?: 'automatic' | 'human_gate' | 'offline_only';
+  /** Opt this project into the autonomous flagship factory scheduler. This is
+   * deliberately separate from production_enabled (the frozen legacy lane).
+   * The scheduler requires an explicit true value and never infers it. */
+  factory_enabled?: boolean;
+  /** Hard chapter ceiling for autonomous runs. Defaults to 1000. */
+  factory_max_chapters?: number;
   /** Latest human checkpoint approved for a flagship project. */
   flagship_human_gate?: 'concept' | 'story_spec' | 'chapter_3' | 'chapter_10' | 'chapter_30' | 'chapter_50';
-  /** Flagship setup is always operator-triggered by project id. */
-  flagship_setup_mode?: 'manual_only';
+  /** Setup mode is explicit per project; the factory mode is unattended. */
+  flagship_setup_mode?: 'manual_only' | 'autonomous_factory';
   /** Explicit per-role routes. Flagship never falls back to ai_model or a global default. */
   flagship_model_routes?: {
     setupCreative: string;

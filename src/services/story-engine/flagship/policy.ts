@@ -9,14 +9,15 @@ export function getFlagshipPublicationPolicy(style: StyleDirectives | null | und
   allowSoftGate: false;
   allowGoldenFallback: false;
   requireIndependentCalibration: true;
-  publicationMode: 'human_gate' | 'offline_only';
+  publicationMode: 'automatic' | 'human_gate' | 'offline_only';
   isolatedRolePrompts: true;
 } {
   return {
     allowSoftGate: false,
     allowGoldenFallback: false,
     requireIndependentCalibration: true,
-    publicationMode: style?.publication_mode === 'offline_only' ? 'offline_only' : 'human_gate',
+    publicationMode: style?.publication_mode === 'offline_only' ? 'offline_only'
+      : style?.publication_mode === 'automatic' && style.factory_enabled === true ? 'automatic' : 'human_gate',
     isolatedRolePrompts: true,
   };
 }
@@ -29,6 +30,14 @@ export function canPublishFlagshipChapter(input: {
   if (!isFlagshipV2(input.style)) return { allowed: false, reason: 'project is not flagship_v2' };
   if (input.verdict.decision !== 'publish') return { allowed: false, reason: `quality decision=${input.verdict.decision}` };
   if (input.style?.publication_mode === 'offline_only') return { allowed: false, reason: 'publication_mode=offline_only' };
+
+  // Autonomous factory projects are still held to the exact same independent
+  // editor verdict and hard gates.  They simply do not require a human chat
+  // checkpoint on every story.  Opt-in is explicit and scoped per project;
+  // absence of the flag keeps the existing human-gated pilot behaviour.
+  if (input.style?.publication_mode === 'automatic' && input.style.factory_enabled === true) {
+    return { allowed: true, reason: 'quality passed; autonomous factory enabled' };
+  }
 
   const gate = input.style?.flagship_human_gate;
   const required = input.chapterNumber <= 3 ? 'story_spec'
