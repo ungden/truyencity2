@@ -9,7 +9,7 @@ import type {
 } from './setup-contracts';
 import type { BenchmarkConceptGuidanceV1 } from './chinese-benchmark';
 
-export const FLAGSHIP_SETUP_PROMPT_VERSION = 'flagship-setup-v2.18-anchor-embedding';
+export const FLAGSHIP_SETUP_PROMPT_VERSION = 'flagship-setup-v2.19-causal-field-minimums';
 
 export const CONCEPT_LAB_SYSTEM = `Bạn phụ trách Concept Lab cho đúng một brief truyện.
 Tạo 20 cơ chế truyện khác nhau về nguyên nhân vận hành, lựa chọn của nhân vật và nguồn xung đột; đổi tên, nghề hoặc trope không được tính là khác.
@@ -96,7 +96,7 @@ export function buildCausalWorldPrompt(
 
 OUTPUT_CONTRACT_EXACT={"schemaVersion":2,"rules":[{"rule":"...","beneficiary":"...","harmedParty":"...","enforcement":"...","cost":"...","consequence":"...","evidenceSource":"...","exceptions":"...","sceneAffordances":["...","..."]}],"resources":[{"resource":"...","source":"...","spendRule":"...","scarcity":"..."}],"institutions":[{"name":"...","power":"...","incentive":"...","enforcementEvidence":"...","pressureOnCast":"..."}],"knowledgeDistribution":[{"holder":"...","knows":"...","doesNotKnow":"..."}]}
 
-Rules có 4-12 mục, resources 3-10, institutions 2-8, knowledgeDistribution 3-12. Phải giữ nguyên từng object trong APPROVED_WORLD_KERNEL.rules, resources và institutionalResponses rồi chỉ mở rộng phần còn thiếu; không viết lại kernel đã được dùng để blind-review opening. Chỉ tạo luật và tài nguyên cần cho các áp lực này; không thêm key.`;
+Rules có 4-12 mục, resources 3-10, institutions 2-8, knowledgeDistribution 3-12. Phải giữ nguyên từng object trong APPROVED_WORLD_KERNEL.rules, resources và institutionalResponses rồi chỉ mở rộng phần còn thiếu; không viết lại kernel đã được dùng để blind-review opening. Với mỗi resource, source, spendRule và scarcity đều phải là câu cụ thể dài ít nhất 20 ký tự; trước khi trả phải tự kiểm tra từng giá trị, đặc biệt resource mới ngoài kernel. Mọi trường mô tả khác ngoài name, holder, beneficiary và harmedParty cũng phải dài ít nhất 20 ký tự. Chỉ tạo luật và tài nguyên cần cho các áp lực này; không thêm key.`;
 }
 
 function launchContract(input: Parameters<typeof buildLaunchPackPrompt>[0]) {

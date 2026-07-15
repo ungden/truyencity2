@@ -724,7 +724,9 @@ describe('isolated flagship setup v2', () => {
     const world = { schemaVersion: 2 as const, rules: story.causalWorldRules, resources: story.resourceEconomy, institutions: [0, 1].map(index => ({ name: `Tổ chức ${index}`, power: long(`Tổ chức ${index} kiểm soát giấy phép hoặc lịch vận chuyển`), incentive: long(`Tổ chức ${index} kiếm lợi từ việc giữ kỷ luật giao nhận`), enforcementEvidence: long(`Hợp đồng và nhật ký cổng kho chứng minh quyền số ${index}`), pressureOnCast: long(`Quyền số ${index} buộc cast lựa chọn giữa tiền và quan hệ`) })), knowledgeDistribution: [story.protagonist, ...story.cast.slice(0, 2)].map(member => ({ holder: member.name, knows: long(`${member.name} biết một phần giao dịch có bằng chứng riêng`), doesNotKnow: long(`${member.name} chưa biết agenda và giới hạn của người còn lại`) })) };
     const selection = { schemaVersion: 2 as const, candidateId: selected.id, approvedTitle: story.title, approvedBy: 'human-reviewer', rationale: long('Opening tạo nhịp thưởng và nhân quả rõ nhất'), approvedAt: new Date().toISOString() };
     expect(buildCharacterDesignPrompt(brief, selected, opening)).toContain('OUTPUT_CONTRACT_EXACT=');
-    expect(buildCausalWorldPrompt(brief, selected, opening, characters, kernelFor(selected.id))).toContain('APPROVED_WORLD_KERNEL=');
+    const causalPrompt = buildCausalWorldPrompt(brief, selected, opening, characters, kernelFor(selected.id));
+    expect(causalPrompt).toContain('APPROVED_WORLD_KERNEL=');
+    expect(causalPrompt).toContain('source, spendRule và scarcity');
     const launchPrompt = buildLaunchPackPrompt({ brief, selection, candidate: selected, opening, characters, world });
     expect(launchPrompt).toContain('OUTPUT_CONTRACT_EXACT=');
     expect(launchPrompt).toContain('HUMAN_SELECTION.approvedTitle');
