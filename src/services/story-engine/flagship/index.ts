@@ -31,3 +31,4 @@ export * from './arc-planner';
 export * from './portfolio-finalists';
 export * from './portfolio-provisioning';
 export * from './provider-readiness';
+export * from './provider';

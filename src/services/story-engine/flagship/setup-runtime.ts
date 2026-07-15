@@ -1,6 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { classifyStoryFailure } from '@/lib/story-production-quota';
-import { callGemini } from '../utils/gemini';
 import { getSupabase } from '../utils/supabase';
 import {
   ConceptTournamentArtifactV2Schema,
@@ -16,6 +15,7 @@ import {
 import { finishFlagshipSetupRun, startFlagshipSetupRun } from './setup-ledger';
 import { FLAGSHIP_SETUP_PROMPT_VERSION } from './setup-prompts';
 import { FlagshipModelRoutesV2Schema, requireFlagshipModelRoutes, type FlagshipModelRoutesV2 } from './model-routes';
+import { callFlagshipModel } from './provider';
 
 interface SetupProjectRow {
   id: string;
@@ -42,14 +42,14 @@ function modelInvoker(project: SetupProjectRow, projectId: string) {
   const routes = requireFlagshipModelRoutes(project.style_directives);
   return async (call: FlagshipSetupCall): Promise<string> => {
     try {
-      const response = await callGemini(call.userPrompt, {
+      const response = await callFlagshipModel(call.userPrompt, {
         model: call.role === 'concept_judge' ? routes.setupJudge : routes.setupCreative,
         temperature: call.role === 'opening_simulator' ? 0.7 : 0.35,
         maxTokens: ['concept_lab', 'concept_judge', 'opening_simulator', 'launch_architect'].includes(call.role) ? 32768 : 24576,
         thinkingLevel: call.role === 'concept_lab' ? 'low' : call.role === 'concept_judge' ? 'high' : 'medium',
         responseJsonSchema: call.responseJsonSchema,
         systemPrompt: call.systemPrompt,
-      }, { jsonMode: true, disableRouting: true, tracking: { projectId, task: `flagship_setup_${call.role}` } });
+      }, { jsonMode: true, schemaName: `flagship_setup_${call.role}`, tracking: { projectId, task: `flagship_setup_${call.role}` } });
       if (response.finishReason === 'MAX_TOKENS') {
         throw new FlagshipSetupError('infra_blocked', `${call.role} output hit the configured token ceiling before its typed artifact completed.`);
       }

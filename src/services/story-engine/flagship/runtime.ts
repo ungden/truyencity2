@@ -1,21 +1,23 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { finishWriteRun, startWriteRun, updateWriteRunTelemetry, type WriteRunHandle } from '../pipeline/write-run-ledger';
 import type { StyleDirectives } from '../types';
-import { callGemini } from '../utils/gemini';
 import { getSupabase } from '../utils/supabase';
 import { classifyStoryFailure } from '@/lib/story-production-quota';
 import { assembleFlagshipRoleContexts } from './context';
 import {
+  ChapterPlanV2Schema,
   parseArcPlanV2,
   parseChapterPlanV2,
   parseStorySpecV2,
   parseStoryStateV2,
 } from './contracts';
-import { executeFlagshipPipeline, FlagshipPipelineError, type FlagshipModelCall } from './pipeline';
+import { EditorOutputSchema, executeFlagshipPipeline, FlagshipPipelineError, WriterOutputSchema, type FlagshipModelCall } from './pipeline';
 import { canPublishFlagshipChapter } from './policy';
 import { FLAGSHIP_PROMPT_VERSION } from './prompts';
 import { applyChapterStateDelta } from './state-transition';
 import { requireFlagshipModelRoutes } from './model-routes';
+import { callFlagshipModel } from './provider';
+import { toGeminiResponseJsonSchema } from './setup-response-schemas';
 
 interface FlagshipProjectRow {
   id: string;
@@ -214,12 +216,18 @@ export async function writeFlagshipChapter(
     const invoke = dependencies.invoke || (async (call: FlagshipModelCall) => {
       const model = call.role === 'writer' || call.role === 'writer_revision' ? modelRoutes.writer
         : call.role === 'editor' ? modelRoutes.editor : modelRoutes.director;
-      const response = await callGemini(call.userPrompt, {
+      const responseSchema = call.role === 'director'
+        ? toGeminiResponseJsonSchema(ChapterPlanV2Schema)
+        : call.role === 'editor'
+          ? toGeminiResponseJsonSchema(EditorOutputSchema)
+          : toGeminiResponseJsonSchema(WriterOutputSchema);
+      const response = await callFlagshipModel(call.userPrompt, {
         model,
         temperature: call.role === 'writer' || call.role === 'writer_revision' ? (options.temperature ?? project.temperature ?? 0.8) : 0.2,
         maxTokens: call.role === 'writer' || call.role === 'writer_revision' ? 32768 : 16384,
         systemPrompt: call.systemPrompt,
-      }, { jsonMode: true, disableRouting: true, tracking: { projectId: project.id, chapterNumber: nextChapter, task: `flagship_${call.role}` } });
+        responseJsonSchema: responseSchema,
+      }, { jsonMode: true, schemaName: `flagship_${call.role}`, tracking: { projectId: project.id, chapterNumber: nextChapter, task: `flagship_${call.role}` } });
       return response.content;
     });
 

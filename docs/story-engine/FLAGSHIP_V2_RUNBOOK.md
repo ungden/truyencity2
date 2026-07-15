@@ -37,6 +37,9 @@ npm run flagship:classify-legacy -- --limit=5000
 # idempotent and creates only paused, hidden projects plus queued jobs.
 npm run flagship:portfolio:provision
 npm run flagship:portfolio:provision -- --apply --confirm=PROVISION_FLAGSHIP_FIRST_30
+npm run flagship:portfolio:provision -- --slots=HX-04,TH-01,DT-11,DT-01,HX-01
+npm run flagship:factory:first-five
+npm run flagship:factory:first-five -- --apply --confirm=START_FLAGSHIP_FIRST_5
 ```
 
 `flagship:preflight` expects only plans 1-5. The preflight and classifier are read-only. The human bake-off requires at least ten decisive blind ballots and a winner with at least 65% preference. Both provider bake-offs are offline Writer screening tools: they read credentials only from process environment, write raw generations to the explicitly selected output path, and never change a project or production route. The OpenAI transport runner uses `store: false` and calls the official Responses API with the same Luna slug for standard and Pro mode.
@@ -61,7 +64,9 @@ Before any flagship project can run against production:
 
 Every project is created `paused` and `hidden`, with one queued `story_factory_jobs` row and a unique `(portfolio_id, portfolio_slot_id)` identity. The provisioner never writes a chapter and never imports offline opening prose as production prose.
 
-To arm a deployment, set `FLAGSHIP_FACTORY_ENABLED=1`. If a required `GEMINI_API_KEY` or `DEEPSEEK_API_KEY` is absent, the cron returns `waitingForProvider: true`, claims zero leases and leaves setup/canon unchanged. Therefore the production fleet can be provisioned and armed first; adding the required API key is the final action that starts the next cron cycle.
+To arm a deployment, set `FLAGSHIP_FACTORY_ENABLED=1`. Provider readiness is derived from every explicit role route; a missing `GEMINI_API_KEY`, `DEEPSEEK_API_KEY`, or `OPENAI_API_KEY` makes the cron return `waitingForProvider: true`, claim zero leases and leave setup/canon unchanged. There is no provider substitution. Official OpenAI routes use the Responses API with `store: false`, medium reasoning effort and the base model slug; Pro mode is not enabled by a separate slug or fallback.
+
+The first production canary is exactly `HX-04`, `TH-01`, `DT-11`, `DT-01`, and `HX-01`. `flagship:factory:first-five` is read-only unless both `--apply` and the confirmation token are supplied. Apply mode disables and cancels every non-selected portfolio job, keeps all five projects hidden/paused between leases, locks Writer to official `gpt-5.6-luna`, and creates a Vietnam-calendar quota of 20 chapters per selected story. The database claim function excludes completed quotas, while an `AFTER INSERT` trigger increments quota in the same transaction as chapter publication.
 
 Vercel invokes only `/api/cron/flagship-factory` every five minutes. No legacy writing route is present in the Vercel cron list. Each invocation still passes through global enablement, provider readiness, project opt-in and database lease gates before setup or prose work can start.
 

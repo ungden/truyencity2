@@ -1,12 +1,13 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { classifyStoryFailure } from '@/lib/story-production-quota';
-import { callGemini } from '../utils/gemini';
 import { getSupabase } from '../utils/supabase';
 import { parseArcPlanV2, parseStorySpecV2, parseStoryStateV2, validateChapterPlanSemantics, validatePleasureWindow, type PleasureProfileV2 } from './contracts';
 import { RollingPlanWindowV2Schema, type RollingPlanWindowV2 } from './setup-contracts';
 import { FlagshipSetupError } from './setup';
 import { finishFlagshipSetupRun, startFlagshipSetupRun } from './setup-ledger';
 import { requireFlagshipModelRoutes } from './model-routes';
+import { callFlagshipModel } from './provider';
+import { toGeminiResponseJsonSchema } from './setup-response-schemas';
 
 export const ROLLING_PLANNER_PROMPT_VERSION = 'flagship-rolling-v2.0';
 export const ROLLING_PLANNER_SYSTEM = `Bạn là rolling planner của đúng một bộ truyện.
@@ -54,7 +55,13 @@ export async function planNextFlagshipWindowForProject(
   try {
     if (dependencies.invoke) raw = await dependencies.invoke(systemPrompt, userPrompt);
     else {
-      const response = await callGemini(userPrompt, { model: modelRoutes.planner, temperature: 0.3, maxTokens: 32768, systemPrompt }, { jsonMode: true, disableRouting: true, tracking: { projectId, chapterNumber: startChapter, task: 'flagship_rolling_planner' } });
+      const response = await callFlagshipModel(userPrompt, {
+        model: modelRoutes.planner,
+        temperature: 0.3,
+        maxTokens: 32768,
+        systemPrompt,
+        responseJsonSchema: toGeminiResponseJsonSchema(RollingPlanWindowV2Schema),
+      }, { jsonMode: true, schemaName: 'flagship_rolling_planner', tracking: { projectId, chapterNumber: startChapter, task: 'flagship_rolling_planner' } });
       raw = response.content;
     }
   } catch (caught) {

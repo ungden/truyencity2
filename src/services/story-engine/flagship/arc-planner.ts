@@ -1,10 +1,11 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { classifyStoryFailure } from '@/lib/story-production-quota';
-import { callGemini } from '../utils/gemini';
 import { getSupabase } from '../utils/supabase';
 import { parseArcPlanV2, parseStorySpecV2, parseStoryStateV2, ArcPlanV2Schema, type ArcPlanV2 } from './contracts';
 import { FlagshipSetupError } from './setup';
 import { requireFlagshipModelRoutes } from './model-routes';
+import { callFlagshipModel } from './provider';
+import { toGeminiResponseJsonSchema } from './setup-response-schemas';
 
 export const FLAGSHIP_ARC_PLANNER_PROMPT_VERSION = 'flagship-arc-planner-v2.0';
 const SYSTEM = `Bạn là Arc Director của đúng một bộ truyện flagship.
@@ -35,9 +36,13 @@ export async function extendFlagshipArcForFactory(
   try {
     raw = dependencies.invoke
       ? await dependencies.invoke(SYSTEM, prompt({ spec: spec.data, state: state.data, previousArc: previous.data, startChapter }))
-      : (await callGemini(prompt({ spec: spec.data, state: state.data, previousArc: previous.data, startChapter }), {
-        model: routes.planner, temperature: 0.25, maxTokens: 16384, systemPrompt: SYSTEM,
-      }, { jsonMode: true, disableRouting: true, tracking: { projectId, chapterNumber: startChapter, task: 'flagship_arc_extension' } })).content;
+      : (await callFlagshipModel(prompt({ spec: spec.data, state: state.data, previousArc: previous.data, startChapter }), {
+        model: routes.planner,
+        temperature: 0.25,
+        maxTokens: 16384,
+        systemPrompt: SYSTEM,
+        responseJsonSchema: toGeminiResponseJsonSchema(ArcPlanV2Schema),
+      }, { jsonMode: true, schemaName: 'flagship_arc_extension', tracking: { projectId, chapterNumber: startChapter, task: 'flagship_arc_extension' } })).content;
   } catch (caught) {
     const message = caught instanceof Error ? caught.message : String(caught);
     throw new FlagshipSetupError(classifyStoryFailure(message) === 'infrastructure' ? 'infra_blocked' : 'setup_blocked', message);

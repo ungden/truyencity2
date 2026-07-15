@@ -20,6 +20,14 @@ describe('flagship factory lifecycle', () => {
     }]);
   });
 
+  it('claims autonomous jobs only inside their Vietnam-day quota and accounts in the chapter transaction', () => {
+    const sql = readFileSync('supabase/migrations/20260715212604_flagship_factory_daily_quota_v1.sql', 'utf8');
+    expect(sql).toContain("v_vn_date date := (now() AT TIME ZONE 'Asia/Ho_Chi_Minh')::date");
+    expect(sql).toContain("q.written_chapters < q.target_chapters");
+    expect(sql).toContain("AFTER INSERT ON public.chapters");
+    expect(sql).toContain("written_chapters = project_daily_quotas.written_chapters + 1");
+  });
+
   it('accepts only an explicit flagship auto opt-in', () => {
     expect(factoryEligibility({
       pipelineVersion: 'flagship_v2', factoryEnabled: true, publicationMode: 'automatic',

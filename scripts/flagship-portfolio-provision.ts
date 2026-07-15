@@ -32,6 +32,15 @@ function arg(name: string): string | undefined {
   return process.argv.find(value => value.startsWith(`--${name}=`))?.slice(name.length + 3);
 }
 
+function selectedSlots(value: string | undefined): Set<string> | null {
+  if (!value) return null;
+  const slots = value.split(',').map(item => item.trim().toUpperCase()).filter(Boolean);
+  if (!slots.length || slots.some(slot => !/^(HX|TH|DT)-\d{2}$/.test(slot))) {
+    throw new Error('Invalid --slots list. Expected comma-separated portfolio slot ids.');
+  }
+  return new Set(slots);
+}
+
 function readJson(filePath: string): unknown {
   return JSON.parse(readFileSync(filePath, 'utf8'));
 }
@@ -197,18 +206,25 @@ async function main(): Promise<void> {
   const routesPath = arg('routes') || path.join(process.cwd(), 'blueprints/flagship-portfolio-v1/model-routes-v2.json');
   const routes = FlagshipModelRoutesV2Schema.parse(readJson(routesPath));
   const plan = buildFlagshipFirst30ProvisionPlan(maxChapters);
+  const requestedSlots = selectedSlots(arg('slots'));
+  const items = requestedSlots ? plan.items.filter(item => requestedSlots.has(item.slotId)) : plan.items;
+  if (requestedSlots && items.length !== requestedSlots.size) {
+    const found = new Set(items.map(item => item.slotId));
+    throw new Error(`Unknown portfolio slots: ${[...requestedSlots].filter(slot => !found.has(slot)).join(', ')}`);
+  }
   const artifactMap = new Map(plan.items.map(item => [item.slotId, loadArtifacts(item)]));
   const summary = {
     portfolioId: plan.portfolioId,
-    total: plan.items.length,
-    stages: plan.items.reduce<Record<string, number>>((counts, item) => {
+    total: items.length,
+    selectedSlots: items.map(item => item.slotId),
+    stages: items.reduce<Record<string, number>>((counts, item) => {
       counts[item.provisionStage] = (counts[item.provisionStage] || 0) + 1;
       return counts;
     }, {}),
-    jobsToQueue: plan.items.length,
+    jobsToQueue: items.length,
     chaptersToWriteNow: 0,
     modelRoutes: routes,
-    providerCredentialPresent: Boolean(process.env.GEMINI_API_KEY?.trim() || process.env.DEEPSEEK_API_KEY?.trim()),
+    providerCredentialPresent: Boolean(process.env.GEMINI_API_KEY?.trim() || process.env.DEEPSEEK_API_KEY?.trim() || process.env.OPENAI_API_KEY?.trim()),
   };
 
   if (!apply) {
@@ -218,7 +234,7 @@ async function main(): Promise<void> {
   if (confirm !== CONFIRMATION) throw new Error(`Refusing production provisioning. Pass --confirm=${CONFIRMATION}.`);
 
   const results = [];
-  for (const item of plan.items) {
+  for (const item of items) {
     results.push(await provisionOne(item, routes, artifactMap.get(item.slotId) || {}));
   }
   console.log(JSON.stringify({ mode: 'applied', ...summary, results }, null, 2));

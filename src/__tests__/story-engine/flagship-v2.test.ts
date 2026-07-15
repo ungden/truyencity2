@@ -730,7 +730,8 @@ describe('isolated flagship setup v2', () => {
     expect(migration).not.toContain('SECURITY DEFINER');
     expect(cron).toContain('flagship_v2 setup is manual-only and never enters legacy setup-pipeline');
     expect(runtime).toContain("project.status !== 'paused'");
-    expect(runtime).toContain('disableRouting: true');
+    expect(runtime).toContain('callFlagshipModel');
+    expect(runtime).not.toContain('callGemini(');
     const pilotMigration = readFileSync(path.join(process.cwd(), 'supabase/migrations/20260711052533_flagship_pilot_factory_v2.sql'), 'utf8');
     expect(pilotMigration).toContain('create_flagship_pilot_v2');
     expect(pilotMigration).toContain("'paused'");
