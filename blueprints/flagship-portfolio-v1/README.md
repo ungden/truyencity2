@@ -47,6 +47,7 @@ npm run flagship:portfolio:tournaments
 npm run flagship:portfolio:review
 npm run flagship:portfolio:materialize
 npm run flagship:portfolio:write-openings
+npm run flagship:covers:verify
 npm run flagship:portfolio:promote
 ```
 
@@ -55,6 +56,8 @@ npm run flagship:portfolio:promote
 Kết quả tournament: 9 tournament, 180 concept, 27 opening và 81 chương mẫu. Blind editor đề cử `HX-04 / HX04-B`, `TH-01 / TH01-C` và `DT-11 / DT11-B`; human gate ngày 15/07/2026 đã duyệt cả ba cùng tên xuất bản trực diện. `materialize` đã tạo ba kernel riêng với foundation score lần lượt `9.7 / 9.7 / 9.4`. `write-openings` đã chạy đủ 9 chương 1–3: cả 9 verdict là `publish`, plan fidelity 10/10, trục thấp nhất từ 8.0 trở lên; TH-01 chương 1 dùng một revision có evidence, tám chương còn lại dùng đúng ba call. [Opening human gate](./materialized/opening-human-review.md) vẫn bắt buộc trước khi tạo project pilot. Hai lệnh không ghi production, không tạo project và không có content fallback.
 
 Tên catalogue đã qua [market-title audit V2](./title-market-audit-v2.md): tên xuất bản phải nói thẳng setup/cơ chế/payoff và được human gate duyệt riêng, không tái sử dụng nhãn ngắn do Concept Lab sinh. Ba opening thắng có [title options riêng](./finalist-title-options-v2.md).
+
+`flagship:covers:verify` kiểm tra đủ 30 source/rendered cover, WebP 1086×1448 và hash của từng ảnh trong [cover-render-manifest.json](./cover-render-manifest.json). Manifest khóa title đã duyệt và watermark `truyencity.com`; nếu đổi title phải render lại cover rồi cập nhật manifest, không được âm thầm dùng bìa cũ.
 
 Lệnh `promote` hiện chỉ tạo promotion packet trên stdout và không ghi database. `--apply` cố ý bị chặn cho tới khi từng slot có brief riêng và concept được duyệt; đây là fail-closed, không phải tính năng còn thiếu để engine tự lấp.
 
