@@ -26,6 +26,14 @@ function concrete(text: string): boolean {
   return text.trim().length >= 30 && !generic.some(value => lower === value);
 }
 
+function namedActor(text: string): boolean {
+  return text.trim().length >= 2;
+}
+
+function causalDetail(text: string): boolean {
+  return text.trim().length >= 20;
+}
+
 function boundedScore(points: number): number {
   return Math.max(0, Math.min(10, Math.round(points)));
 }
@@ -75,7 +83,13 @@ export function computeFoundationScoreV2(spec: StorySpecV2): FoundationScoreV2 {
     ),
     causal_world: boundedScore(
       Math.min(4, spec.causalWorldRules.length) +
-      spec.causalWorldRules.filter(rule => [rule.beneficiary, rule.harmedParty, rule.enforcement, rule.cost, rule.consequence, rule.evidenceSource, rule.exceptions].every(concrete) && rule.sceneAffordances.length >= 2).length * 1.5,
+      spec.causalWorldRules.filter(rule =>
+        causalDetail(rule.rule) &&
+        namedActor(rule.beneficiary) &&
+        namedActor(rule.harmedParty) &&
+        [rule.enforcement, rule.cost, rule.consequence, rule.evidenceSource, rule.exceptions].every(causalDetail) &&
+        rule.sceneAffordances.length >= 2,
+      ).length * 1.5,
     ),
     resource_economy: boundedScore(
       Math.min(5, spec.resourceEconomy.length * 1.5) +

@@ -268,6 +268,7 @@ describe('flagship v2 contracts and computed foundation', () => {
     value.causalWorldRules[0].beneficiary = 'thợ già';
     value.causalWorldRules[0].harmedParty = 'chủ lò';
     expect(StorySpecV2Schema.parse(value).causalWorldRules[0]).toMatchObject({ beneficiary: 'thợ già', harmedParty: 'chủ lò' });
+    expect(computeFoundationScoreV2(value).dimensions.causal_world).toBeGreaterThanOrEqual(7);
   });
 });
 
