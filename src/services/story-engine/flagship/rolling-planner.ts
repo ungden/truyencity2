@@ -9,12 +9,13 @@ import { requireFlagshipModelRoutes } from './model-routes';
 import { callFlagshipModel } from './provider';
 import { toGeminiResponseJsonSchema } from './setup-response-schemas';
 
-export const ROLLING_PLANNER_PROMPT_VERSION = 'flagship-rolling-v2.1-typed-identities';
+export const ROLLING_PLANNER_PROMPT_VERSION = 'flagship-rolling-v2.2-scene-identities';
 export const ROLLING_PLANNER_SYSTEM = `Bạn là rolling planner của đúng một bộ truyện.
 Lập đúng năm ChapterPlanV2 liên tiếp từ state đã commit. Mỗi scene phải có desire, opposition, tactic, cost và irreversible change.
 Hậu quả chương trước phải trở thành stateBefore và áp lực thật của chương sau. Không tạo canon, cast, tài nguyên, promise hoặc quyền lực ngoài kernel/state.
 Mọi name/resource/id trong stateDelta phải copy byte-for-byte từ COMMITTED_STATE, kể cả hoa thường và dấu. Giữ stateBefore của plan sau bằng đúng stateAfter của plan trước.
 Trả đúng năm plan liên tiếp; mỗi plan có 2-5 scene. chapterPromise, nextChapterPressure và mọi trường mô tả scene phải là câu cụ thể dài ít nhất 20 ký tự.
+Mỗi scene.id phải dùng đúng mẫu ASCII lowercase scene_<chapterNumber>_<letter>, trong đó letter lần lượt là a, b, c, d, e. Ví dụ chương 6 có scene_6_a, scene_6_b; không dùng số thứ tự ở hậu tố, chữ hoa, dấu cách, dấu chấm hoặc chữ có dấu.
 Không dùng outline, template hay genre playbook legacy. Chỉ trả JSON đúng RollingPlanWindowV2.`;
 
 const json = (value: unknown) => JSON.stringify(value);

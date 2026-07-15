@@ -49,6 +49,7 @@ describe('flagship factory lifecycle', () => {
     expect(canTransitionFactoryJob('cancelled', 'queued')).toBe(false);
     expect(() => assertFactoryTransition('completed', 'queued')).toThrow('FACTORY_INVALID_TRANSITION');
     expect(canTransitionFactoryJob('infra_blocked', 'queued')).toBe(true);
+    expect(canTransitionFactoryJob('infra_blocked', 'blocked')).toBe(true);
   });
 
   it('reuses a complete persisted five-chapter window instead of paying for a duplicate planner call', () => {
@@ -68,6 +69,7 @@ describe('flagship factory lifecycle', () => {
   it('locks rolling-window identifiers and records typed validation details', () => {
     const planner = readFileSync('src/services/story-engine/flagship/rolling-planner.ts', 'utf8');
     expect(planner).toContain('copy byte-for-byte từ COMMITTED_STATE');
+    expect(planner).toContain('scene_<chapterNumber>_<letter>');
     expect(planner).toContain('failure.detail');
   });
 

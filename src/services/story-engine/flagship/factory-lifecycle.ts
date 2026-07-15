@@ -66,7 +66,7 @@ const transitions: Record<FactoryJobStatus, readonly FactoryJobStatus[]> = {
   writing: ['writing', 'ready', 'finale', 'completed', 'blocked', 'infra_blocked'],
   finale: ['writing', 'completed', 'blocked', 'infra_blocked'],
   blocked: ['setup', 'ready', 'writing', 'cancelled'],
-  infra_blocked: ['infra_blocked', 'queued', 'setup', 'ready', 'writing', 'cancelled'],
+  infra_blocked: ['infra_blocked', 'queued', 'setup', 'ready', 'writing', 'blocked', 'cancelled'],
   completed: [],
   cancelled: [],
 };
