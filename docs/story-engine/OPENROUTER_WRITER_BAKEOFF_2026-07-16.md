@@ -30,7 +30,7 @@ The cost estimate covers the successful Writer call only. It excludes Director, 
 - `gpt-5.6-luna` is the best primary Writer candidate from this screen. It led on all three kernels and cost roughly one quarter of Luna Pro. Its consistent over-length output must be corrected before production, ideally by a more explicit scene/word budget rather than destructive truncation.
 - `glm-5.2` is the strongest cost-controlled challenger. It was the only model inside the length band on all three standardized runs and was especially competitive on `TH-01`. An earlier diagnostic run exhausted its response budget on hidden reasoning and failed the exact schema, so it needs a longer no-fallback soak before being trusted as primary.
 - `qwen3.7-max` can be excellent for the right kernel: it challenged for first on `HX-04` and remained strong on `DT-11`, but fell sharply on `TH-01` and often over-wrote. It is a story-specific challenger, not a global default.
-- `gpt-5.6-luna-pro` did not justify its reasoning overhead for prose. OpenRouter describes it as Luna with Pro reasoning mode; equal list pricing did not produce equal request cost because the Pro route consumed far more reasoning tokens. It should not replace standard Luna as Writer based on this evidence.
+- `gpt-5.6-luna-pro` did not justify its reasoning overhead for prose. OpenRouter exposes Pro as a separate route, while the official OpenAI Responses API uses the same `gpt-5.6-luna` slug with `reasoning.mode: "pro"`. Equal list pricing did not produce equal request cost because Pro performed far more model work. It should not replace standard Luna as Writer based on this evidence.
 - `qwen3.7-plus`, `grok-4.5`, `hy3:free` and Flash Lite are not Writer candidates under the current flagship contract. Their low price or speed did not compensate for weaker scene quality, short/long drift and causal or prose defects. The free Hy3 route is also temporary.
 - Gemini 3.1 Pro and 3.5 Flash remain candidates for structured Director/Editor work, but this Writer-only run does not establish that role. They should be tested on role-specific contracts rather than inferred from prose ranking.
 
@@ -41,6 +41,8 @@ The cost estimate covers the successful Writer call only. It excludes Director, 
 3. Add a story-specific challenger selection: every new kernel can compare the primary Writer against one challenger before chapter one, without creating a content fallback.
 4. Do not use Luna and Luna Pro as the nominally independent Writer and Editor pair; they are variants of the same underlying model family.
 5. Benchmark Director and Editor separately with their exact schemas. A prose winner must not automatically own planning or publication judgment.
+
+The direct OpenAI transport follow-up found practical quality parity between standard OpenAI official and OpenRouter transport, while Pro remained uneconomical for routine Writer calls. See [OpenAI official transport bake-off](./OPENAI_OFFICIAL_TRANSPORT_BAKEOFF_2026-07-16.md).
 
 ## Reproduction
 

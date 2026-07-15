@@ -23,6 +23,7 @@
     "flagship:concepts": "node --import tsx scripts/flagship-concept-tournament.ts",
     "flagship:bakeoff": "node --import tsx scripts/flagship-model-bakeoff.ts",
     "flagship:providers:bakeoff": "node --import tsx scripts/flagship-provider-bakeoff.ts",
+    "flagship:openai:transport-bakeoff": "node --import tsx scripts/flagship-openai-transport-bakeoff.ts",
     "flagship:classify-legacy": "node --import tsx scripts/classify-legacy-stories.ts",
     "flagship:setup:tournament": "node --import tsx scripts/flagship-setup-tournament.ts",
     "flagship:create-pilot": "node --import tsx scripts/flagship-create-pilot.ts",

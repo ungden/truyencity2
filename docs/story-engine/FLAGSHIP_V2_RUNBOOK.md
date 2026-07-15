@@ -30,6 +30,7 @@ npm run flagship:approve-checkpoint -- --project=<uuid> --stage=chapter_3 --revi
 npm run flagship:preflight -- --spec=/absolute/story-spec.json --arc=/absolute/arc-plan.json --state=/absolute/story-state.json --plans=/absolute/chapter-plans.json
 npm run flagship:bakeoff -- --ballots=/absolute/blind-ballots.json --candidate-ids=A,B
 npm run flagship:providers:bakeoff -- --slots=hx-04,th-01,dt-11 --output=/tmp/flagship-provider-bakeoff.json
+npm run flagship:openai:transport-bakeoff -- --slots=hx-04,th-01,dt-11 --openrouter-results=/tmp/openrouter-a.json,/tmp/openrouter-b.json --output=/tmp/openai-transport-bakeoff.json
 npm run flagship:classify-legacy -- --limit=5000
 
 # First-30 factory provisioning. Dry-run is the default. The apply command is
@@ -38,7 +39,7 @@ npm run flagship:portfolio:provision
 npm run flagship:portfolio:provision -- --apply --confirm=PROVISION_FLAGSHIP_FIRST_30
 ```
 
-`flagship:preflight` expects only plans 1-5. The preflight and classifier are read-only. The human bake-off requires at least ten decisive blind ballots and a winner with at least 65% preference. The provider bake-off is an offline Writer screening tool: it reads `OPENROUTER_API_KEY` only from process environment, writes raw generations to the explicitly selected output path, and never changes a project or production route.
+`flagship:preflight` expects only plans 1-5. The preflight and classifier are read-only. The human bake-off requires at least ten decisive blind ballots and a winner with at least 65% preference. Both provider bake-offs are offline Writer screening tools: they read credentials only from process environment, write raw generations to the explicitly selected output path, and never change a project or production route. The OpenAI transport runner uses `store: false` and calls the official Responses API with the same Luna slug for standard and Pro mode.
 
 `model-routes.json` must contain explicit `setupCreative`, `setupJudge`, `director`, `writer`, `editor`, and `planner` model names. `setupJudge` must differ from `setupCreative`, and `editor` must differ from `writer`. Global model routing is disabled for every flagship call.
 
