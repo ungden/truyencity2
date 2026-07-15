@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 2,
+  "chapterNumber": 0,
+  "facts": {
+    "nợ_hắc_thị": "Gia tộc đang nợ 300 linh thạch của hắc thị, hạn chót phải trả là sáng ngày mai.",
+    "trận_pháp_yếu": "Trận pháp cách âm bảo vệ Vọng Âm Cốc đang ở mức báo động, sắp vỡ vụn nếu mất đi linh điền phía nam."
+  },
+  "timeline": [
+    {
+      "chapter": 0,
+      "event": "Lâm Viễn trọng sinh về đúng đêm trước khi đại bá Lâm Chấn định đóng dấu bán linh điền."
+    }
+  ],
+  "cast": [
+    {
+      "name": "Lâm Viễn",
+      "status": "alive",
+      "location": "Đang lao thẳng vào đại sảnh Lâm thị.",
+      "knowledge": [
+        "Biết chính xác thời gian và địa điểm cơn mưa Âm Thạch sẽ rơi xuống trong đêm nay."
+      ],
+      "relationshipToProtagonist": "Bản thân nhân vật chính."
+    },
+    {
+      "name": "Lâm Chấn",
+      "status": "alive",
+      "location": "Ngồi trên ghế chủ tọa trong đại sảnh Lâm thị.",
+      "knowledge": [
+        "Biết gia tộc đã cạn kiệt tài nguyên và không còn cách nào khác ngoài việc bán đất."
+      ],
+      "relationshipToProtagonist": "Đại bá, người đang nắm quyền quyết định cao nhất nhưng sắp bị đoạt quyền."
+    },
+    {
+      "name": "Lâm Mặc",
+      "status": "alive",
+      "location": "Đang lủi thủi ở góc sân ngoài đại sảnh.",
+      "knowledge": [
+        "Biết cách di chuyển nhẹ nhàng không phát ra tiếng động nhưng chưa nhận thức được giá trị của mình."
+      ],
+      "relationshipToProtagonist": "Em họ câm bẩm sinh, người sẽ trở thành công cụ thu hoạch đắc lực nhất."
+    },
+    {
+      "name": "Lâm Hải",
+      "status": "alive",
+      "location": "Đang ở khu nhà nhánh thứ hai, lo lắng về linh điền.",
+      "knowledge": [
+        "Biết rõ tình trạng thê thảm của lúa linh mạch nhưng không biết tiếng vọng rác sắp nổ."
+      ],
+      "relationshipToProtagonist": "Nhị thúc, người quản lý linh điền và là mầm mống phản loạn tương lai."
+    },
+    {
+      "name": "Lâm Tuyết",
+      "status": "alive",
+      "location": "Đang ở trong phòng riêng tại nhánh thứ hai.",
+      "knowledge": [
+        "Biết một số giai điệu cổ xưa nhưng chưa từng dám hát lớn tiếng."
+      ],
+      "relationshipToProtagonist": "Em họ có tài năng ca hát, người sẽ liên tục thách thức luật cấm khẩu."
+    }
+  ],
+  "resources": [
+    {
+      "resource": "Âm Thạch",
+      "amount": "0 khối",
+      "source": "Kho chung của gia tộc đã hoàn toàn trống rỗng do trả nợ các kỳ trước.",
+      "lastChangedChapter": 0
+    },
+    {
+      "resource": "Hạn ngạch từ ngữ",
+      "amount": "Chưa áp dụng",
+      "source": "Mọi người vẫn đang giao tiếp tự do, tiêu hao sinh khí của trận pháp.",
+      "lastChangedChapter": 0
+    },
+    {
+      "resource": "Nước Ngầm Vang Vọng",
+      "amount": "Đang cạn kiệt",
+      "source": "Mạch nước ngầm chảy qua rễ cây Thanh Tùng đang ở mức thấp nhất trong năm.",
+      "lastChangedChapter": 0
+    },
+    {
+      "resource": "Trận Bàn Cách Âm",
+      "amount": "Cũ nát, sắp hỏng",
+      "source": "Trận bàn cốt lõi của gia tộc đã hoạt động quá tải nhiều năm chưa được thay thế.",
+      "lastChangedChapter": 0
+    }
+  ],
+  "promises": [
+    {
+      "id": "promise_1",
+      "status": "open",
+      "currentPressure": "Đại bá sắp đóng dấu bán đất, thời gian chỉ còn tính bằng giây."
+    },
+    {
+      "id": "promise_2",
+      "status": "open",
+      "currentPressure": "Món nợ 300 linh thạch lơ lửng trên đầu, sáng mai hắc thị sẽ đến đòi mạng."
+    },
+    {
+      "id": "promise_3",
+      "status": "open",
+      "currentPressure": "Những tiếng chửi rủa từ 10 năm trước đang tích tụ dưới lòng đất nhánh hai, chực chờ phát nổ."
+    },
+    {
+      "id": "promise_4",
+      "status": "open",
+      "currentPressure": "Lâm Mặc bị coi là phế vật, đang khao khát được chứng minh giá trị bản thân."
+    },
+    {
+      "id": "promise_5",
+      "status": "open",
+      "currentPressure": "Lâm Tuyết cảm thấy ngột ngạt trong sự im lặng, khao khát được cất tiếng hát tự do."
+    }
+  ],
+  "recentSummary": "Lâm Viễn vừa tỉnh lại sau khi trọng sinh, nhận ra gia tộc sắp đưa ra quyết định sai lầm chí mạng là bán linh điền phía nam.",
+  "previousEnding": "Lâm Viễn bước nhanh về phía đại sảnh, nơi đại bá đang cầm con dấu bằng đồng chuẩn bị đóng xuống bản khế ước bán đất.",
+  "retrievalNotes": [
+    "Nhớ kỹ quy tắc vòng gỗ Thanh Tùng sẽ siết cổ nếu nói quá nhiều.",
+    "Độ trễ tiếng vọng là 10 năm, mọi hành động hôm nay sẽ dội lại vào tương lai."
+  ]
+}

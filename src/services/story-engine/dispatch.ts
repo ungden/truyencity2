@@ -1,5 +1,5 @@
 import { writeFlagshipChapter } from './flagship/runtime';
-import { writeOneChapter as writeLegacyChapter, type OrchestratorOptions, type OrchestratorResult } from './pipeline/orchestrator';
+import type { OrchestratorOptions, OrchestratorResult } from './pipeline/orchestrator';
 import { getSupabase } from './utils/supabase';
 
 /** Dispatch before legacy loads context, validates setup, or mutates anything. */
@@ -18,4 +18,8 @@ export async function writeChapterForProject(options: OrchestratorOptions): Prom
   return writeLegacyChapter(options);
 }
 
-export { writeLegacyChapter };
+/** Load the frozen legacy writer only after a project has explicitly selected it. */
+export async function writeLegacyChapter(options: OrchestratorOptions): Promise<OrchestratorResult> {
+  const { writeOneChapter } = await import('./pipeline/orchestrator');
+  return writeOneChapter(options);
+}

@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "status": "three_story_kernels_ready",
+  "materialized": [
+    {
+      "slotId": "HX-04",
+      "title": "Bảo Tôi Xây Thành Trên Tro Trắng, Tôi Lại Bắt Đầu Bằng Lịch Thay Đá",
+      "candidateId": "concept_stone_degradation_cycle",
+      "foundationScore": 9.7,
+      "callRoles": [
+        "character_designer",
+        "causal_world",
+        "launch_architect"
+      ]
+    },
+    {
+      "slotId": "TH-01",
+      "title": "Trọng Sinh Về Gia Tộc Tu Tiên, Tôi Gieo Tiếng Vọng Cho Mười Năm Sau",
+      "candidateId": "concept_echo_chamber_farming",
+      "foundationScore": 9.7,
+      "callRoles": [
+        "character_designer",
+        "causal_world",
+        "launch_architect"
+      ]
+    },
+    {
+      "slotId": "DT-11",
+      "title": "Giám Bảo Gốm Cổ: Tôi Chạm Một Lần, Biết Nó Được Nung Bằng Lửa Gì",
+      "candidateId": "concept_crystalline_structure",
+      "foundationScore": 9.4,
+      "callRoles": [
+        "character_designer",
+        "causal_world",
+        "launch_architect"
+      ]
+    }
+  ],
+  "productionWrites": 0,
+  "productionProjectsChanged": false
+}

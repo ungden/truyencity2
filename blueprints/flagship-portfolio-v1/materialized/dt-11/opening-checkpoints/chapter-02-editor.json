@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "slotId": "DT-11",
+  "chapterNumber": 2,
+  "role": "editor",
+  "model": "gemini-3.5-flash",
+  "promptHash": "4592aa09605bbf1036276a5296efa8949ac8090e8f2a98b5b72e30f58af73be8",
+  "promptTokens": 11541,
+  "completionTokens": 163,
+  "finishReason": "STOP",
+  "content": "{\"decision\":\"publish\",\"confidence\":0.95,\"planFidelity\":10,\"hardGates\":{\"canon\":true,\"timeline\":true,\"resourceCausality\":true,\"characterKnowledge\":true,\"authority\":true,\"promptLeak\":true,\"planFidelity\":true},\"axes\":{\"premise_interest\":8.8,\"character_voice\":9.2,\"scene_tension\":8.7,\"causal_surprise\":8.5,\"emotional_movement\":8.3,\"domain_truth\":9.5,\"prose_naturalness\":8.8,\"agency\":9.0,\"earned_pleasure\":8.6,\"recovery_pacing\":8.5,\"desire_to_read_next\":9.3},\"evidence\":[],\"revisionInstructions\":[]}"
+}

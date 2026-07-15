@@ -3,6 +3,8 @@ import { GenreLaneV2Schema } from './portfolio-taxonomy';
 
 const nonGeneric = z.string().trim().min(20);
 const namedText = z.string().trim().min(2);
+const promiseId = z.string().regex(/^[a-z0-9][a-z0-9_-]+$/);
+const chapterRange = z.string().regex(/^[1-9]\d*-[1-9]\d*$/);
 const range = (value: string): [number, number] => value.split('-').map(Number) as [number, number];
 const contiguousFromOneThroughThirty = (values: string[]): boolean => {
   const ranges = values.map(range).sort((a, b) => a[0] - b[0]);
@@ -107,32 +109,32 @@ export const StorySpecV2ObjectSchema = z.object({
     source: nonGeneric,
     spendRule: nonGeneric,
     scarcity: nonGeneric,
-  })).min(3).max(10),
+  }).strict()).min(3).max(10),
   conflictLadder: z.array(z.object({
-    chapterRange: z.string().regex(/^\d+-\d+$/),
+    chapterRange,
     actor: namedText,
     stake: nonGeneric,
     escalationCause: nonGeneric,
     resolutionChanges: nonGeneric,
-  })).min(3).max(6),
+  }).strict()).min(3).max(6),
   promisePayoffLedger: z.array(z.object({
-    id: z.string().regex(/^[a-z0-9][a-z0-9_-]+$/),
+    id: promiseId,
     promise: nonGeneric,
     plantedByChapter: z.number().int().min(1).max(30),
-    payoffWindow: z.string().regex(/^\d+-\d+$/),
+    payoffWindow: chapterRange,
     payoff: nonGeneric,
-  })).min(5).max(15),
+  }).strict()).min(5).max(15),
   runway30: z.array(z.object({
-    chapterRange: z.string().regex(/^\d+-\d+$/),
+    chapterRange,
     irreversibleChange: nonGeneric,
     protagonistChoice: nonGeneric,
     payoff: nonGeneric,
-  })).min(5).max(10),
+  }).strict()).min(5).max(10),
   volumeSpine: z.array(z.object({
     name: namedText,
     direction: nonGeneric,
     terminalChange: nonGeneric,
-  })).min(3).max(8),
+  }).strict()).min(3).max(8),
 }).strict();
 
 export const StorySpecV2Schema = StorySpecV2ObjectSchema.superRefine((spec, ctx) => {
@@ -143,7 +145,10 @@ export const StorySpecV2Schema = StorySpecV2ObjectSchema.superRefine((spec, ctx)
   const promiseIds = spec.promisePayoffLedger.map(item => item.id);
   if (new Set(promiseIds).size !== promiseIds.length) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['promisePayoffLedger'], message: 'Promise ids must be unique.' });
   if (!contiguousFromOneThroughThirty(spec.conflictLadder.map(item => item.chapterRange))) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['conflictLadder'], message: 'Conflict ladder must cover contiguous chapters 1-30 or more.' });
-  if (!contiguousFromOneThroughThirty(spec.runway30.map(item => item.chapterRange))) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['runway30'], message: 'Runway must cover contiguous chapters 1-30.' });
+  const runwayRanges = spec.runway30.map(item => item.chapterRange);
+  if (!contiguousFromOneThroughThirty(runwayRanges) || range(runwayRanges[runwayRanges.length - 1])[1] !== 30) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['runway30'], message: 'Runway must cover contiguous chapters 1-30 exactly.' });
+  }
   for (const [index, promise] of spec.promisePayoffLedger.entries()) {
     const [payoffStart, payoffEnd] = range(promise.payoffWindow);
     if (payoffEnd < payoffStart || payoffStart < promise.plantedByChapter) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['promisePayoffLedger', index, 'payoffWindow'], message: 'Payoff window must be ordered after the promise is planted.' });
@@ -165,15 +170,18 @@ export const ArcPlanV2Schema = z.object({
     leverage: nonGeneric,
     nextMove: nonGeneric,
   }).strict()).min(1).max(8),
-  duePromises: z.array(z.string().regex(/^[a-z0-9][a-z0-9_-]+$/)).max(10),
+  duePromises: z.array(promiseId).max(10),
   rollingBeats: z.array(z.object({
-    chapterRange: z.string().regex(/^\d+-\d+$/),
+    chapterRange,
     pressure: nonGeneric,
     causalChange: nonGeneric,
   }).strict()).min(2).max(10),
 }).strict().superRefine((arc, ctx) => {
   if (arc.endChapter < arc.startChapter || arc.endChapter - arc.startChapter > 29) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['endChapter'], message: 'Arc must cover 1-30 ordered chapters.' });
+  }
+  if (new Set(arc.duePromises).size !== arc.duePromises.length) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['duePromises'], message: 'Arc duePromises must be unique.' });
   }
 });
 
@@ -201,14 +209,37 @@ export const StoryStateV2Schema = z.object({
     lastChangedChapter: z.number().int().min(0),
   }).strict()).max(20),
   promises: z.array(z.object({
-    id: z.string().regex(/^[a-z0-9][a-z0-9_-]+$/),
+    id: promiseId,
     status: z.enum(['open', 'advanced', 'paid', 'broken']),
     currentPressure: z.string().trim().min(5),
   }).strict()).max(30),
   recentSummary: z.string().max(5000),
   previousEnding: z.string().max(6000),
   retrievalNotes: z.array(z.string().trim().min(10)).max(12),
-}).strict();
+}).strict().superRefine((state, ctx) => {
+  const castNames = state.cast.map(item => item.name.trim().toLowerCase());
+  if (new Set(castNames).size !== castNames.length) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['cast'], message: 'Committed cast names must be unique.' });
+  }
+  const resourceNames = state.resources.map(item => item.resource.trim().toLowerCase());
+  if (new Set(resourceNames).size !== resourceNames.length) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['resources'], message: 'Committed resource names must be unique.' });
+  }
+  const promiseIds = state.promises.map(item => item.id);
+  if (new Set(promiseIds).size !== promiseIds.length) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['promises'], message: 'Committed promise ids must be unique.' });
+  }
+  for (const [index, event] of state.timeline.entries()) {
+    if (event.chapter > state.chapterNumber) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['timeline', index, 'chapter'], message: 'Timeline cannot contain events beyond committed chapter.' });
+    }
+  }
+  for (const [index, resource] of state.resources.entries()) {
+    if (resource.lastChangedChapter > state.chapterNumber) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['resources', index, 'lastChangedChapter'], message: 'Resource change cannot be after committed chapter.' });
+    }
+  }
+});
 
 export type StoryStateV2 = z.infer<typeof StoryStateV2Schema>;
 
@@ -232,8 +263,8 @@ export const ChapterPlanV2Schema = z.object({
   stateBefore: z.record(z.string(), z.string()),
   scenes: z.array(ChapterSceneV2Schema).min(2).max(5),
   stateAfter: z.record(z.string(), z.string()),
-  promisesAdvanced: z.array(z.string()).max(5),
-  promisesPaid: z.array(z.string()).max(3),
+  promisesAdvanced: z.array(promiseId).max(5),
+  promisesPaid: z.array(promiseId).max(3),
   nextChapterPressure: nonGeneric,
   stateDelta: z.object({
     facts: z.record(z.string(), z.string()),
@@ -250,12 +281,35 @@ export const ChapterPlanV2Schema = z.object({
       source: z.string().trim().min(5),
     }).strict()).max(12),
     promises: z.array(z.object({
-      id: z.string().regex(/^[a-z0-9][a-z0-9_-]+$/),
+      id: promiseId,
       status: z.enum(['open', 'advanced', 'paid', 'broken']),
       currentPressure: z.string().trim().min(5),
     }).strict()).max(10),
   }).strict(),
-}).strict();
+}).strict().superRefine((plan, ctx) => {
+  const sceneIds = plan.scenes.map(scene => scene.id);
+  if (new Set(sceneIds).size !== sceneIds.length) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['scenes'], message: 'Chapter scene ids must be unique.' });
+  }
+  if (new Set(plan.promisesAdvanced).size !== plan.promisesAdvanced.length) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['promisesAdvanced'], message: 'promisesAdvanced must be unique.' });
+  }
+  if (new Set(plan.promisesPaid).size !== plan.promisesPaid.length) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['promisesPaid'], message: 'promisesPaid must be unique.' });
+  }
+  const castNames = plan.stateDelta.cast.map(item => item.name.trim().toLowerCase());
+  if (new Set(castNames).size !== castNames.length) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['stateDelta', 'cast'], message: 'State cast deltas must be unique.' });
+  }
+  const resourceNames = plan.stateDelta.resources.map(item => item.resource.trim().toLowerCase());
+  if (new Set(resourceNames).size !== resourceNames.length) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['stateDelta', 'resources'], message: 'State resource deltas must be unique.' });
+  }
+  const promiseIds = plan.stateDelta.promises.map(item => item.id);
+  if (new Set(promiseIds).size !== promiseIds.length) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['stateDelta', 'promises'], message: 'State promise deltas must be unique.' });
+  }
+});
 
 export type ChapterPlanV2 = z.infer<typeof ChapterPlanV2Schema>;
 export type ChapterSceneV2 = z.infer<typeof ChapterSceneV2Schema>;
@@ -317,9 +371,11 @@ export function validateChapterPlanSemantics(plan: ChapterPlanV2): ContractIssue
       issues.push({ path: `scenes.${index}`, message: 'Scene does not create a concrete state change.' });
     }
   }
-  const before = JSON.stringify(plan.stateBefore);
-  const after = JSON.stringify(plan.stateAfter);
-  if (before === after) {
+  const beforeKeys = Object.keys(plan.stateBefore).sort();
+  const afterKeys = Object.keys(plan.stateAfter).sort();
+  const sameState = beforeKeys.length === afterKeys.length
+    && beforeKeys.every((key, index) => key === afterKeys[index] && plan.stateBefore[key] === plan.stateAfter[key]);
+  if (sameState) {
     issues.push({ path: 'stateAfter', message: 'Chapter stateAfter must differ from stateBefore.' });
   }
   return issues;
@@ -338,6 +394,17 @@ function planMatchesExperience(plan: ChapterPlanV2, signals: string[]): boolean 
   return tokens.filter(token => haystack.includes(token)).length >= Math.min(2, tokens.length);
 }
 
+function planContainsConcreteComfort(plan: ChapterPlanV2): boolean {
+  const payoffText = plan.scenes.map(scene => scene.payoff).join(' ').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return [
+    /bua an (?:no|du|am|ngon)/,
+    /an no|com no|co them mon|bep (?:chung|nha|am)/,
+    /sua (?:nha|mai|bep)|nha (?:duoc sua|am|kin)/,
+    /nuoc sach|ao quan moi|giuong (?:moi|am)/,
+    /gia dinh (?:doan tu|an tam)|cha me (?:an tam|duoc cham)/,
+  ].some(pattern => pattern.test(payoffText));
+}
+
 export function validatePleasureWindow(plans: ChapterPlanV2[], profile: PleasureProfileV2): ContractIssue[] {
   const issues: ContractIssue[] = [];
   if (plans.length !== 5) return [{ path: 'plans', message: 'Pleasure validation requires one five-chapter rolling window.' }];
@@ -345,7 +412,7 @@ export function validatePleasureWindow(plans: ChapterPlanV2[], profile: Pleasure
   const openingWindow = sortedPlans[0].chapterNumber === 1;
   const earnedPayoffChapters = sortedPlans.filter(plan => plan.scenes.some(scene => scene.payoff.trim().length >= 20));
   const progressionChapters = sortedPlans.filter(plan => plan.stateDelta.resources.length > 0 || plan.promisesPaid.length > 0 || planMatchesExperience(plan, profile.progressionSignals));
-  const comfortChapters = sortedPlans.filter(plan => planMatchesExperience(plan, profile.comfortLoop));
+  const comfortChapters = sortedPlans.filter(plan => planMatchesExperience(plan, profile.comfortLoop) || planContainsConcreteComfort(plan));
 
   if (earnedPayoffChapters.length < 2) issues.push({ path: 'plans', message: 'Five-chapter window needs at least two earned competence payoffs.' });
   if (progressionChapters.length < 1) issues.push({ path: 'plans', message: 'Five-chapter window needs at least one concrete progression change.' });

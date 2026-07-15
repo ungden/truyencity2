@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "slotId": "DT-11",
+  "blindCode": "DT11-B",
+  "candidateId": "concept_crystalline_structure",
+  "title": "Giám Bảo Gốm Cổ: Tôi Chạm Một Lần, Biết Nó Được Nung Bằng Lửa Gì",
+  "status": "awaiting_story_spec_approval",
+  "callRoles": [
+    "character_designer",
+    "causal_world",
+    "launch_architect"
+  ],
+  "modelRoute": "gemini-3.1-pro-preview",
+  "productionWrites": 0,
+  "productionProjectsChanged": false,
+  "contentFallbacks": 0
+}

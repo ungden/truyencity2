@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "slotId": "DT-11",
+  "chapterNumber": 3,
+  "role": "editor",
+  "model": "gemini-3.5-flash",
+  "promptHash": "9c472a3adc19c33f6bf4ddc85b02a2993540fb92fb7a6a66cbb136af6a0264ca",
+  "promptTokens": 11986,
+  "completionTokens": 225,
+  "finishReason": "STOP",
+  "content": "{\"decision\":\"publish\",\"confidence\":0.95,\"planFidelity\":10,\"hardGates\":{\"canon\":true,\"timeline\":true,\"resourceCausality\":true,\"characterKnowledge\":true,\"authority\":true,\"promptLeak\":true,\"planFidelity\":true},\"axes\":{\"premise_interest\":9.0,\"character_voice\":9.2,\"scene_tension\":9.0,\"causal_surprise\":8.8,\"emotional_movement\":8.5,\"domain_truth\":9.5,\"prose_naturalness\":9.0,\"agency\":9.5,\"earned_pleasure\":9.0,\"recovery_pacing\":8.8,\"desire_to_read_next\":9.5},\"evidence\":[],\"revisionInstructions\":[\"Văn bản đạt chất lượng xuất sắc, nhịp truyện căng thẳng và giải quyết mâu thuẫn bằng kiến thức vật liệu rất thuyết phục.\",\"Trong các chương tới, cần duy trì sự cân bằng giữa yếu tố kỹ thuật và sự an toàn của Hoàng khi đối đầu với đường dây làm giả.\"]}"
+}

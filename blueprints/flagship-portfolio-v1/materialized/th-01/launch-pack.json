@@ -1,0 +1,1004 @@
+{
+  "schemaVersion": 2,
+  "selectedConceptId": "concept_echo_chamber_farming",
+  "storySpec": {
+    "schemaVersion": 2,
+    "pipelineVersion": "flagship_v2",
+    "title": "Trọng Sinh Về Gia Tộc Tu Tiên, Tôi Gieo Tiếng Vọng Cho Mười Năm Sau",
+    "genre": "tien-hiep",
+    "genreLane": "xianxia_clan",
+    "serialityEngine": {
+      "recurringSituation": "Cần phải tính toán các chu kỳ tiếng vọng chồng chéo lên nhau (1 năm, 10 năm, 100 năm), tạo ra những bài toán quản lý ngày càng phức tạp.",
+      "variationAxes": [
+        "Cả gia tộc mặc giáp nặng ra đồng cày cuốc trong im lặng tuyệt đối, thỉnh thoảng phải né những lưỡi kiếm vô hình dội lại từ quá khứ.",
+        "Một nhánh họ lén ra đồng gào thét nguyền rủa nhánh khác, tạo ra một cái bẫy âm thanh nổ chậm cho mùa vụ sau.",
+        "Đứa trẻ sinh ra bị câm bẩm sinh lại là người cày cuốc giỏi nhất vì không bao giờ tạo ra tiếng vọng rác."
+      ],
+      "escalationVectors": [
+        "Tiếng vọng từ quá khứ ngày càng mạnh và mang tính hủy diệt cao hơn theo thời gian.",
+        "Mâu thuẫn nội bộ gia tộc leo thang dữ dội do áp lực dồn nén của hạn ngạch từ ngữ.",
+        "Sự dòm ngó và tấn công của các thế lực bên ngoài khi phát hiện bí mật của Vọng Âm Cốc."
+      ],
+      "depletionRisks": [
+        "Sự cạn kiệt sức chịu đựng tâm lý của các thành viên gia tộc dưới luật cấm khẩu.",
+        "Vòng gỗ Thanh Tùng nứt vỡ do hấp thụ quá nhiều âm thanh cấm kỵ vượt mức cho phép.",
+        "Mạch nước ngầm Vang Vọng khô cạn nếu quá trình luân canh giữa các nhánh thất bại."
+      ]
+    },
+    "progressionCurrencies": [
+      {
+        "name": "Thần hồn cường hóa",
+        "kind": "power",
+        "source": "Hấp thụ năng lượng từ Âm Thạch tinh khiết thu thập được sau những cơn mưa tiếng vọng.",
+        "spend": "Sử dụng để chống lại áp lực từ tiếng vọng sát thương và điều khiển trận bàn cách âm.",
+        "visibility": "Khả năng chịu đựng âm thanh lớn mà không cần mặc giáp nặng hay dùng pháp bảo bảo vệ."
+      },
+      {
+        "name": "Âm Thạch",
+        "kind": "material",
+        "source": "Tiếng vọng tốt đẹp (lời chúc phúc, tiếng tụng kinh) kết tinh thành đá quý dưới rễ cây Thanh Tùng sau mười năm tích lũy.",
+        "spend": "Dùng để hấp thụ tăng cường thần hồn hoặc làm lõi năng lượng cho các trận pháp phòng thủ âm thanh.",
+        "visibility": "Số lượng đá phát sáng lấp lánh được lưu trữ trong kho chung của gia tộc ngày càng nhiều."
+      },
+      {
+        "name": "Uy tín phân bổ hạn ngạch",
+        "kind": "social",
+        "source": "Giải quyết thành công các cuộc khủng hoảng tiếng vọng và mang lại tài nguyên cho gia tộc.",
+        "spend": "Dùng để ép buộc các trưởng bối và các nhánh họ khác phải tuân thủ luật lệ phân chia tài nguyên.",
+        "visibility": "Số lượng từ ngữ được cấp phép sử dụng mỗi ngày của từng nhánh họ được hiển thị trên vòng gỗ."
+      }
+    ],
+    "storyIdentity": {
+      "uniqueMechanism": "Sử dụng độ trễ thời gian của âm thanh làm cơ chế nhân quả vật lý, biến giao tiếp hàng ngày thành hành vi canh tác rủi ro cao.",
+      "emotionalCore": "Sự hối hận muộn màng khi một lời mắng chửi vô tình năm xưa nay hóa thành sấm sét đánh trúng đứa con mình yêu thương nhất.",
+      "domainTruthSources": [
+        "Gia tộc chỉ có sức sống khi thành viên khác thế hệ có agenda, năng lực và thước đo thành công không giống nhau.",
+        "Tài nguyên có độ trễ tạo lựa chọn đau: đầu tư hôm nay có thể chỉ con cháu hưởng hoặc phải gánh hậu quả.",
+        "Vị thế phải đến từ sản nghiệp, nhân tài, liên minh và uy tín chứ không quy hết về cảnh giới của tộc trưởng."
+      ],
+      "forbiddenGenericMoves": [
+        "Không dùng đối thủ ngu, đám đông tung hô hoặc may mắn vô nguồn để chứng minh nhân vật chính giỏi; thắng lợi phải có chuẩn bị, bằng chứng và cái giá.",
+        "Không sao chép tên riêng, hệ sức mạnh, vật phẩm nhận diện, cảnh nổi tiếng hoặc chuỗi sự kiện của bất kỳ tác phẩm đối chiếu nào.",
+        "Không kéo dài nhục nhã hoặc bất lực quá cửa sổ hồi phục; áp lực phải buộc nhân vật lựa chọn và làm thay đổi trạng thái truyện.",
+        "Không nhảy thời gian để bỏ qua hậu quả cảm xúc và vận hành của các quyết định đầu tư gia tộc.",
+        "Không coi con cháu là chỉ số sinh sản hoặc quân cờ tuyệt đối phục tùng mệnh lệnh của tộc trưởng."
+      ],
+      "similarityRisks": [
+        "Giống truyện vòng lặp thời gian nếu không nhấn mạnh vào việc canh tác linh điền và thu hoạch tài nguyên từ những tiếng vọng tốt.",
+        "Giống truyện hệ thống phát nhiệm vụ nếu vòng gỗ Thanh Tùng phản hồi quá máy móc mà thiếu đi yếu tố cảm xúc con người.",
+        "Giống truyện tu tiên gia tộc cổ điển nếu bỏ qua yếu tố quản lý âm thanh và độ trễ của nhân quả."
+      ]
+    },
+    "pleasureProfile": {
+      "realityMode": "alternate_world",
+      "advantage": "Main trọng sinh về lúc gia tộc sắp bán mảnh linh điền cuối, nhớ xu thế đại biến và vài sai lầm chiến lược của đời trước.",
+      "knowledgeLimit": "Ký ức lệch nhanh theo lựa chọn mới, không chứa tọa độ kho báu, công pháp hoàn chỉnh hay lòng trung thành tương lai của con cháu.",
+      "primaryRewardLoop": [
+        "Nhìn ra một quyết định gia tộc sẽ tạo nợ dài hạn.",
+        "Thuyết phục đúng người góp tài nguyên bằng quyền lợi và giới hạn rõ.",
+        "Đầu tư vào đất, nghề hoặc nhân tài rồi nhận payoff có độ trễ.",
+        "Xử lý thế hệ sau dùng thành quả theo cách khác dự tính."
+      ],
+      "comfortLoop": [
+        "Bữa giỗ và sân nhà đông dần nhưng lời thoại vẫn cho thấy khác biệt giữa các nhánh.",
+        "Người già bớt lo, trẻ nhỏ có cơ hội học nghề và mỗi mái nhà hưởng lợi khác nhau."
+      ],
+      "setbackRecoveryWindow": 3,
+      "faceSlapPolicy": "Tranh thắng trong họ phải dựa vào kết quả đầu tư và trách nhiệm gánh lỗ; không biến trưởng bối thành người ngu chỉ để main đoạt quyền.",
+      "progressionSignals": [
+        "linh điền",
+        "nhân tài",
+        "nghề truyền thừa",
+        "minh ước",
+        "quỹ chung",
+        "uy tín giữa các nhánh"
+      ]
+    },
+    "readerFantasy": "Lên kế hoạch tỉ mỉ cho từng lời nói và hành động của cả gia tộc, gieo nhân hôm nay để gặt hái những 'tiếng vọng' tài nguyên khổng lồ trong tương lai.",
+    "premise": "Nam chính xé khế ước bán đất, dùng minh ước Thanh Tùng ép mọi người im lặng, vì hắn biết một tiếng vọng hủy diệt từ 10 năm trước sắp dội tới.",
+    "endingDirection": "Lâm Viễn thành công dẫn dắt gia tộc vượt qua chu kỳ tiếng vọng hủy diệt lớn nhất, biến Vọng Âm Cốc thành một thánh địa nơi mọi lời nói đều là những lời chúc phúc tạo ra tài nguyên vô tận, gia tộc tự do ngôn luận trong sự thấu hiểu.",
+    "protagonist": {
+      "name": "Lâm Viễn",
+      "publicIdentity": "Thanh niên đời thứ ba của Lâm thị, kẻ vừa cứu gia tộc khỏi phá sản nhưng trở thành bạo chúa độc tài cấm khẩu.",
+      "desire": "Xây dựng một gia tộc vững mạnh, tích lũy Âm Thạch và tài nguyên để chống lại thảm họa tiếng vọng hủy diệt trong tương lai.",
+      "fear": "Sự sụp đổ của gia tộc do những cảm xúc bộc phát vô kỷ luật tạo ra những tiếng vọng rác rưởi phá hủy linh điền và sinh mạng.",
+      "contradiction": "Muốn bảo vệ gia đình khỏi cái chết nhưng lại tước đoạt quyền tự do cơ bản nhất của họ, biến nhà thành ngục tù im lặng.",
+      "misbelief": "Tin rằng chỉ cần kiểm soát tuyệt đối mọi âm thanh và cảm xúc thì có thể thay đổi hoàn toàn số phận bi thảm của kiếp trước.",
+      "competence": "Nắm giữ ký ức về các chu kỳ tiếng vọng, hiểu rõ cơ chế vận hành của Vọng Âm Cốc và sẵn sàng chịu đựng đau đớn thể xác.",
+      "blindSpot": "Không nhận ra rằng sự dồn nén cảm xúc không làm nó biến mất mà chỉ chuyển hóa thành một dạng năng lượng phản kháng ngầm nguy hiểm hơn.",
+      "privateAgenda": "Lợi dụng sự im lặng của gia tộc để che giấu việc mình đang bí mật thu thập những tiếng vọng cấm kỵ nhằm luyện hóa một loại công pháp đặc thù.",
+      "leverage": "Nắm giữ quyền phân bổ Âm Thạch, hiểu biết về thời gian và địa điểm rơi của các tiếng vọng giá trị, cùng quyền kiểm soát trận bàn cách âm.",
+      "moralBoundary": "Tuyệt đối không hy sinh tính mạng của người trong tộc để đổi lấy tài nguyên, sẵn sàng lấy thân mình che chắn cho họ trước hiểm nguy.",
+      "decisionSignature": "Đưa ra quyết định cực đoan, nhanh chóng, chấp nhận trả giá bằng máu thịt của bản thân trước để ép người khác tuân thủ luật lệ.",
+      "changeTrigger": "Khi một thành viên trong tộc vì bị cấm khẩu mà không thể kêu cứu dẫn đến bi kịch, hoặc khi sự dồn nén bùng nổ phá vỡ trận pháp.",
+      "voiceContract": "Lời nói ngắn gọn, đanh thép, mang tính mệnh lệnh tuyệt đối, không giải thích dài dòng, thường dùng hành động để chứng minh."
+    },
+    "cast": [
+      {
+        "name": "Lâm Chấn",
+        "socialIdentity": "Tộc trưởng danh nghĩa của Lâm thị, người chịu trách nhiệm về nợ nần và sinh kế của gia tộc trước khi Lâm Viễn đoạt quyền.",
+        "agenda": "Duy trì sự tồn tại của gia tộc bằng mọi giá, kể cả việc phải bán đi tài sản tổ tiên, đồng thời giữ gìn uy tín của người đứng đầu.",
+        "leverage": "Quyền lực trưởng bối, khả năng huy động nhân lực, và sự tín nhiệm của các thành viên lớn tuổi trong tộc Lâm thị.",
+        "conflictWithProtagonist": "Bị Lâm Viễn tước đoạt quyền quyết định thực tế, cảm thấy bị sỉ nhục khi một kẻ vãn bối qua mặt và áp đặt luật lệ lên toàn tộc.",
+        "moralBoundary": "Không bao giờ phản bội gia tộc để theo ngoại nhân, dù có bất mãn với nội bộ và sự độc tài của Lâm Viễn đến đâu.",
+        "decisionSignature": "Thường chọn giải pháp an toàn, nhẫn nhịn, hy sinh tài sản để giữ mạng sống, dễ bị cảm xúc chi phối trong lúc nguy cấp.",
+        "relationshipBehavior": "Bề ngoài nhượng bộ Lâm Viễn vì lợi ích chung, nhưng bên trong luôn tìm cách lấy lại quyền kiểm soát và thể hiện uy quyền trưởng bối.",
+        "voiceContract": "Giọng điệu trầm khàn, thường xen lẫn sự bất lực và phẫn nộ kìm nén, hay dùng lý lẽ truyền thống để áp đặt người khác.",
+        "firstAppearanceChapter": 1
+      },
+      {
+        "name": "Lâm Mặc",
+        "socialIdentity": "Đứa trẻ bị xem là phế vật trong mắt nhiều người vì câm bẩm sinh, nhưng lại là nhân tài thu thập Âm Thạch hoàn hảo nhất.",
+        "agenda": "Muốn chứng minh giá trị của bản thân trong gia tộc, tìm kiếm sự công nhận và tình thương, đặc biệt là từ người anh họ Lâm Viễn.",
+        "leverage": "Khả năng di chuyển và làm việc trong vùng tiếng vọng mà không tạo ra bất kỳ tạp âm nào, bảo đảm độ tinh khiết tuyệt đối của Âm Thạch.",
+        "conflictWithProtagonist": "Trở thành công cụ thu hoạch hoàn hảo trong mắt Lâm Viễn, nhưng bản thân Lâm Mặc lại khao khát được chữa khỏi bệnh câm để gọi tiếng anh.",
+        "moralBoundary": "Tuyệt đối trung thành, không bao giờ làm hại Lâm Viễn, người đã lấy thân che đao gió cứu mạng mình trên đồi Mộc Lĩnh.",
+        "decisionSignature": "Hành động theo bản năng và sự trung thành, thường dùng ngôn ngữ cơ thể để bày tỏ ý muốn thay vì suy tính sâu xa.",
+        "relationshipBehavior": "Bám đuôi Lâm Viễn, tuân thủ tuyệt đối mọi mệnh lệnh, nhưng đôi khi tự ý hành động liều lĩnh để bảo vệ Lâm Viễn khỏi nguy hiểm.",
+        "voiceContract": "Không có lời nói, chỉ dùng cử chỉ, ánh mắt và những tiếng ú ớ nghẹn ngào khi quá xúc động hoặc muốn cảnh báo nguy hiểm.",
+        "firstAppearanceChapter": 2
+      },
+      {
+        "name": "Lâm Hải",
+        "socialIdentity": "Người quản lý linh điền của nhánh thứ hai, tính tình nóng nảy, từng tạo ra nhiều tiếng vọng rác rưởi trong quá khứ gây họa cho hiện tại.",
+        "agenda": "Bảo vệ tài sản của nhánh mình, trốn tránh trách nhiệm về những sai lầm trong quá khứ đã gây ra khủng hoảng nổ tiếng vọng.",
+        "leverage": "Nắm giữ kỹ thuật luân canh linh điền và quản lý nguồn nước tưới tiêu cho toàn bộ Vọng Âm Cốc, thứ không thể thiếu để trồng lúa.",
+        "conflictWithProtagonist": "Phẫn nộ vì bị Lâm Viễn ép đeo vòng cấm khẩu, cho rằng Lâm Viễn đang mượn cớ để triệt hạ nhánh thứ hai và thâu tóm quyền lực.",
+        "moralBoundary": "Sẵn sàng lươn lẹo để trục lợi cá nhân nhưng không dám làm tổn hại đến nền tảng sinh tồn của toàn gia tộc vì sợ chết.",
+        "decisionSignature": "Hành động bốc đồng, hay đổ lỗi cho người khác, ưu tiên lợi ích ngắn hạn của nhánh mình hơn là sự an nguy của toàn tộc.",
+        "relationshipBehavior": "Luôn tìm cách lách luật hạn ngạch từ ngữ, xúi giục thế hệ trẻ phản kháng ngầm chống lại sự độc tài của Lâm Viễn.",
+        "voiceContract": "Giọng điệu cục cằn, hay dùng từ ngữ thô lỗ trước khi bị cấm khẩu, hiện tại thường dùng ánh mắt lườm nguýt và tiếng hừ lạnh.",
+        "firstAppearanceChapter": 3
+      },
+      {
+        "name": "Lâm Tuyết",
+        "socialIdentity": "Thiếu nữ tài năng của thế hệ trẻ nhánh thứ hai, có giọng hát thiên phú có thể tạo ra tiếng vọng phúc lành kích thích linh lúa.",
+        "agenda": "Khao khát tự do ngôn luận, muốn dùng giọng hát của mình để mang lại niềm vui và tài nguyên, thay vì sống trong im lặng ngột ngạt.",
+        "leverage": "Sở hữu chất giọng đặc biệt có khả năng xoa dịu những tiếng vọng thù hận và kích thích linh lúa phát triển nhanh chóng.",
+        "conflictWithProtagonist": "Chống đối gay gắt luật hạn ngạch từ ngữ, cho rằng Lâm Viễn đang giết chết tâm hồn và tiềm năng thực sự của gia tộc.",
+        "moralBoundary": "Không bao giờ sử dụng giọng hát của mình để tạo ra tiếng vọng nguyền rủa làm hại người khác, dù có căm ghét đến đâu.",
+        "decisionSignature": "Lãng mạn, bốc đồng, sẵn sàng phá vỡ quy tắc nếu tin rằng điều đó mang lại ý nghĩa tốt đẹp cho những người xung quanh.",
+        "relationshipBehavior": "Thường xuyên vi phạm hạn ngạch để hát lén, cố tình thách thức giới hạn chịu đựng của Lâm Viễn để đòi lại quyền tự do.",
+        "voiceContract": "Giọng nói trong trẻo, giàu cảm xúc, thường dùng những lời lẽ châm biếm sâu cay để chỉ trích sự độc tài của Lâm Viễn.",
+        "firstAppearanceChapter": 3
+      }
+    ],
+    "causalWorldRules": [
+      {
+        "rule": "Mọi lời nói và âm thanh phát ra trên linh điền Vọng Âm bắt buộc phải tuân theo hạn ngạch nghiêm ngặt để tránh tạo ra tiếng vọng hủy diệt trong tương lai.",
+        "beneficiary": "Thế hệ con cháu canh tác mười năm sau",
+        "harmedParty": "Thành viên gia tộc muốn tự do ngôn luận và bộc lộ cảm xúc",
+        "enforcement": "Vòng gỗ Thanh Tùng sẽ tự động thắt chặt cổ họng của kẻ nói quá số từ quy định trong ngày.",
+        "cost": "Sự ức chế tâm lý cực độ và khó khăn trong việc giao tiếp khẩn cấp khi gặp tai nạn.",
+        "consequence": "Nếu vượt quá hạn ngạch, một tiếng sét âm thanh sẽ dội lại ngay lập tức, phá hủy toàn bộ màng nhĩ của những người xung quanh.",
+        "evidenceSource": "Các đường vân trên vòng gỗ Thanh Tùng rung động mạnh và phát ra ánh sáng đỏ.",
+        "exceptions": "Trưởng tộc được phép dùng 'Loa Thanh Tùng' để phát ngôn không giới hạn trong các trường hợp khẩn cấp cứu người.",
+        "sceneAffordances": [
+          "Một người cha chấp nhận im lặng nhìn con mình bị đá đè gãy chân, chỉ dùng tay ra hiệu để tránh lãng phí hạn ngạch từ ngữ của ngày hôm đó.",
+          "Thiếu niên trẻ tuổi vô tình chửi thề một tiếng khi vấp ngã, lập tức bị vòng gỗ siết cổ đến mức rỉ máu để dập tắt âm thanh."
+        ]
+      },
+      {
+        "rule": "Mọi tiếng vọng thù hận dội lại từ quá khứ bắt buộc phải được gánh chịu bởi chính nhánh họ đã gieo ra âm thanh đó mười năm trước.",
+        "beneficiary": "Các nhánh họ vô tội khác trong gia tộc",
+        "harmedParty": "Nhánh họ có tổ tiên thích chửi rủa và gây hấn",
+        "enforcement": "Trận pháp cách âm của Thanh Tùng sẽ tự động định vị huyết mạch và dồn tiếng vọng sát thương vào khu vực của nhánh đó.",
+        "cost": "Nhánh họ đó phải tốn hao lượng lớn linh thạch để mua giáp nặng và trận pháp phòng thủ âm thanh.",
+        "consequence": "Nếu trốn tránh, tiếng vọng sẽ khuếch đại gấp mười lần, phá hủy toàn bộ nhà cửa và mồ mả của nhánh vi phạm.",
+        "evidenceSource": "Tiếng thì thầm oán hận phát ra từ lòng đất dưới chân khu nhà của nhánh họ vi phạm.",
+        "exceptions": "Nhánh họ có thể thuê người của nhánh khác gánh thay tiếng vọng bằng cách trả một lượng lớn Âm Thạch.",
+        "sceneAffordances": [
+          "Cả một nhánh họ mặc giáp sắt nặng nề, quỳ rạp dưới đất chịu đựng những lưỡi kiếm âm thanh dội lại từ lời nguyền rủa của cụ tổ họ mười năm trước.",
+          "Một trưởng lão lén dùng trận pháp chuyển hướng tiếng vọng sang ruộng nhà bên cạnh, bị minh ước Thanh Tùng đánh nứt thần hồn."
+        ]
+      },
+      {
+        "rule": "Những đứa trẻ sinh ra bị câm bẩm sinh bắt buộc phải được ưu tiên giao quyền quản lý các thửa ruộng lõi có tần số âm thanh nhạy cảm nhất.",
+        "beneficiary": "Đứa trẻ câm bẩm sinh",
+        "harmedParty": "Những thiên tài có giọng nói hay nhưng không được chạm vào ruộng lõi",
+        "enforcement": "Đất linh điền lõi sẽ tự động từ chối nảy mầm nếu phát hiện có bất kỳ dao động âm thanh nào từ người chăm sóc.",
+        "cost": "Sự ghen tị và cô lập từ các thành viên khác đối với đứa trẻ câm được ưu ái.",
+        "consequence": "Nếu giao ruộng cho người bình thường, linh điền sẽ bị nổ tung do các tiếng vọng rác tích tụ từ hơi thở và tiếng nói.",
+        "evidenceSource": "Mặt đất linh điền nứt nẻ và phun ra những luồng khí xám xịt mỗi khi có tiếng nói cất lên.",
+        "exceptions": "Người bình thường có thể chăm sóc ruộng lõi nếu uống thuốc câm tạm thời có tác dụng trong vòng một mùa vụ.",
+        "sceneAffordances": [
+          "Đứa trẻ câm lặng lẽ cấy từng cây lúa dưới sự bảo vệ của hàng chục tu sĩ mặc giáp nặng, không một tiếng động nào được phép phát ra.",
+          "Một tu sĩ trẻ tuổi cố tình uống thuốc câm để giành quyền cày ruộng lõi, chấp nhận mất đi giọng nói trong suốt sáu tháng ròng rã."
+        ]
+      },
+      {
+        "rule": "Linh điền chỉ phục hồi sinh khí khi ít nhất ba nhánh họ luân phiên canh tác và chia sẻ nguồn nước ngầm có lẫn Âm Thạch vụn mỗi mùa.",
+        "beneficiary": "Toàn bộ gia tộc vì đảm bảo được sản lượng lúa linh mạch",
+        "harmedParty": "Các nhánh họ mạnh muốn độc chiếm ruộng tốt hoặc lười biếng không muốn hợp tác",
+        "enforcement": "Mạch nước ngầm tự động khô cạn nếu phát hiện rễ lúa chỉ mang khí tức huyết mạch của một nhánh duy nhất trong hai mùa liên tiếp.",
+        "cost": "Phải chia sẻ bí quyết chăm bón và chấp nhận năng suất phụ thuộc vào sự hợp tác của nhánh đối thủ.",
+        "consequence": "Đất đai hóa đá, lúa linh mạch chết héo, toàn tộc mất nguồn thu nhập chính và đối mặt với nạn đói.",
+        "evidenceSource": "Màu nước tưới chuyển từ trong vắt sang đen ngòm và bốc mùi bùn thối.",
+        "exceptions": "Trưởng tộc dùng máu tim để hiến tế, ép mạch nước chảy thêm một mùa nhưng phải trả giá bằng tuổi thọ.",
+        "sceneAffordances": [
+          "Lâm Viễn ép Lâm Hải phải nhường nước cho nhánh yếu hơn, Lâm Hải tức giận nhưng không thể chửi rủa vì vòng cấm khẩu.",
+          "Lâm Chấn đứng ra hòa giải mâu thuẫn chia nước bằng cách tự trích máu mình để bù đắp lượng nước thiếu hụt, ép các nhánh phải xấu hổ mà tuân thủ."
+        ]
+      },
+      {
+        "rule": "Người chết mang theo oán hận phải được chôn cất ngoài thung lũng Vọng Âm, nếu không tiếng vọng lúc lâm chung sẽ ám vào đất vĩnh viễn.",
+        "beneficiary": "Thế hệ tương lai không bị ma âm quấy nhiễu và linh điền không bị ô nhiễm",
+        "harmedParty": "Gia quyến của người chết muốn chôn cất người thân tại khu mộ tổ tiên trong thung lũng",
+        "enforcement": "Rễ cây Thanh Tùng sẽ trồi lên quấn nát quan tài và đẩy xác lên mặt đất nếu phát hiện tử thi có tần số oán khí cao.",
+        "cost": "Chi phí vận chuyển thi hài đi xa, nguy cơ bị kẻ thù cướp xác và sự tổn thương tình cảm gia đình.",
+        "consequence": "Khu vực chôn cất sai quy định sẽ liên tục phát ra tiếng khóc than, làm thối rữa hạt giống trong bán kính mười dặm.",
+        "evidenceSource": "Đất quanh mộ sủi bọt máu và phát ra tiếng rên rỉ mỗi đêm trăng tròn.",
+        "exceptions": "Nếu dùng Âm Thạch thượng phẩm để phong ấn thất khiếu của tử thi trước khi tắt thở, thi thể có thể được chôn tại mộ tổ.",
+        "sceneAffordances": [
+          "Một người mẹ gào khóc bằng cử chỉ xin Lâm Viễn cho chôn con trai trong thung lũng, Lâm Viễn lạnh lùng ra lệnh ném xác ra ngoài ranh giới.",
+          "Một nhánh họ lén chôn giấu thi thể mang oán khí, khiến cả một mẫu lúa linh mạch thối rữa chỉ sau một đêm."
+        ]
+      }
+    ],
+    "resourceEconomy": [
+      {
+        "resource": "Âm Thạch",
+        "source": "Tiếng vọng tốt đẹp (lời chúc phúc, tiếng tụng kinh) kết tinh thành đá quý dưới rễ cây Thanh Tùng sau mười năm tích lũy.",
+        "spendRule": "Dùng để hấp thụ tăng cường thần hồn hoặc làm lõi năng lượng cho các trận pháp phòng thủ âm thanh.",
+        "scarcity": "Cực kỳ khan hiếm vì đòi hỏi gia tộc phải duy trì sự hòa thuận và im lặng trong một thời gian rất dài."
+      },
+      {
+        "resource": "Hạn ngạch từ ngữ",
+        "source": "Hệ thống phân phối từ ngữ hàng ngày do ban quản lý gia tộc quyết định dựa trên đóng góp của từng nhánh họ.",
+        "spendRule": "Dùng để giao tiếp, ra lệnh chiến đấu hoặc truyền đạt kỹ năng tu luyện giữa các thế hệ.",
+        "scarcity": "Được lượng hóa nghiêm ngặt, mỗi người chỉ có khoảng năm mươi từ mỗi ngày, dùng hết sẽ bị câm lặng hoàn toàn."
+      },
+      {
+        "resource": "Nước Ngầm Vang Vọng",
+        "source": "Mạch nước ngầm chảy qua rễ cây Thanh Tùng, hấp thụ những tiếng vọng trầm thấp của lòng đất.",
+        "spendRule": "Dùng để tưới tiêu linh điền lõi, pha chế thuốc câm tạm thời hoặc làm dịu các vết thương do âm thanh gây ra.",
+        "scarcity": "Chỉ dâng lên vào mùa mưa và phụ thuộc hoàn toàn vào sự luân canh nhịp nhàng của các nhánh họ."
+      },
+      {
+        "resource": "Trận Bàn Cách Âm",
+        "source": "Mua từ các thương hội bên ngoài bằng linh thạch hoặc đổi bằng lúa linh mạch chất lượng cao.",
+        "spendRule": "Tiêu hao liên tục để tạo màng bọc bảo vệ các khu vực sinh hoạt và linh điền khỏi tiếng vọng rác từ quá khứ.",
+        "scarcity": "Cực kỳ đắt đỏ, dễ hỏng nếu phải hứng chịu tiếng vọng có cường độ quá lớn và nguồn cung bị thương hội độc quyền kiểm soát."
+      }
+    ],
+    "conflictLadder": [
+      {
+        "chapterRange": "1-10",
+        "actor": "Lâm Hải và thế hệ trẻ nhánh thứ hai",
+        "stake": "Quyền tự do ngôn luận và sự an toàn của linh điền nhánh hai.",
+        "escalationCause": "Lâm Tuyết lén lút ca hát khiến trận pháp cách âm bị dao động mạnh, đe dọa phá vỡ màng bảo vệ.",
+        "resolutionChanges": "Lâm Viễn chứng minh hậu quả nhãn tiền, thiết lập Dàn hợp xướng có kiểm soát để tận dụng giọng hát thay vì cấm đoán hoàn toàn."
+      },
+      {
+        "chapterRange": "11-20",
+        "actor": "Thương Hội Hắc Âm",
+        "stake": "Nguồn cung cấp trận bàn cách âm sống còn của toàn bộ gia tộc.",
+        "escalationCause": "Thương hội phát hiện Lâm thị đang khủng hoảng nên cố tình ép giá vật tư lên gấp ba lần.",
+        "resolutionChanges": "Lâm Viễn sử dụng Âm Thạch lõi do Lâm Mặc thu thập để đàm phán trực tiếp với thế lực cấp cao hơn, tự chủ một phần vật liệu."
+      },
+      {
+        "chapterRange": "21-30",
+        "actor": "Thiên Cơ Các và Gia tộc đối địch",
+        "stake": "Bí mật về cách thức canh tác tiếng vọng của Vọng Âm Cốc.",
+        "escalationCause": "Kẻ thù liên tục xả rác âm thanh vào thung lũng để phá hoại mùa màng và ép Lâm thị lộ diện.",
+        "resolutionChanges": "Lâm Viễn đầu tư công pháp Sư Tử Hống, dùng âm thanh phản đòn cực mạnh để bảo vệ thung lũng và răn đe kẻ thù."
+      }
+    ],
+    "promisePayoffLedger": [
+      {
+        "id": "promise_1",
+        "promise": "thu hồi khế ước bán đất",
+        "plantedByChapter": 1,
+        "payoffWindow": "4-8",
+        "payoff": "Gia tộc giữ được mảnh đất cốt lõi, củng cố lại trận pháp bảo vệ toàn diện thung lũng."
+      },
+      {
+        "id": "promise_2",
+        "promise": "hứng trọn mưa Âm Thạch",
+        "plantedByChapter": 2,
+        "payoffWindow": "5-9",
+        "payoff": "Thanh toán dứt điểm nợ nần hắc thị và có dư vốn liếng để mua sắm vật tư phòng thủ."
+      },
+      {
+        "id": "promise_3",
+        "promise": "thiết lập hạn ngạch từ ngữ",
+        "plantedByChapter": 3,
+        "payoffWindow": "6-10",
+        "payoff": "Ngăn chặn thành công các đợt nổ tiếng vọng rác, nhưng tạo ra áp lực tâm lý ngầm trong giới trẻ."
+      },
+      {
+        "id": "promise_4",
+        "promise": "Lâm Mặc thu thập Âm Thạch lõi",
+        "plantedByChapter": 2,
+        "payoffWindow": "7-11",
+        "payoff": "Âm Thạch lõi tinh khiết giúp nâng cấp trận bàn cách âm lên một tầm cao mới, chống lại sự dòm ngó."
+      },
+      {
+        "id": "promise_5",
+        "promise": "Lâm Tuyết khao khát ca hát",
+        "plantedByChapter": 3,
+        "payoffWindow": "8-12",
+        "payoff": "Giọng hát của Lâm Tuyết được định hướng để trung hòa các tiếng vọng thù hận, tạo ra nguồn lợi mới."
+      }
+    ],
+    "runway30": [
+      {
+        "chapterRange": "1-6",
+        "irreversibleChange": "Gia tộc chuyển từ trạng thái sinh hoạt tự do sang kỷ luật thép với hạn ngạch từ ngữ.",
+        "protagonistChoice": "Áp đặt vòng cấm khẩu lên toàn bộ thành viên, tự mình đeo gông làm gương.",
+        "payoff": "Sống sót qua đợt nổ tiếng vọng thù hận đầu tiên, bảo vệ được linh điền nhánh hai."
+      },
+      {
+        "chapterRange": "7-12",
+        "irreversibleChange": "Phân hóa vai trò rõ rệt trong gia tộc giữa người cày cuốc im lặng và người ca hát tạo phúc.",
+        "protagonistChoice": "Cho phép Lâm Tuyết ca hát trong một khu vực được kiểm soát nghiêm ngặt.",
+        "payoff": "Thu hoạch thành công lứa lúa linh mạch đầu tiên an toàn không bị ô nhiễm âm thanh."
+      },
+      {
+        "chapterRange": "13-18",
+        "irreversibleChange": "Xung đột ngoại giao công khai với Thương Hội Hắc Âm về nguồn cung vật tư.",
+        "protagonistChoice": "Từ chối bị ép giá, quyết định tự tìm đường chế tạo trận bàn từ vỏ cây Thanh Tùng.",
+        "payoff": "Gia tộc bắt đầu tự chủ được một phần vật liệu cách âm, giảm bớt sự phụ thuộc bên ngoài."
+      },
+      {
+        "chapterRange": "19-24",
+        "irreversibleChange": "Bí mật về thung lũng Vọng Âm bị lộ một phần ra thế giới tu tiên bên ngoài.",
+        "protagonistChoice": "Huy động toàn tộc xây dựng bức tường cách âm khổng lồ bằng gỗ Thanh Tùng.",
+        "payoff": "Chặn đứng đợt tấn công bằng rác âm thanh đầu tiên của liên minh gia tộc đối địch."
+      },
+      {
+        "chapterRange": "25-30",
+        "irreversibleChange": "Đầu tư công pháp Sư Tử Hống bắt đầu mang lại kết quả thực chiến.",
+        "protagonistChoice": "Quyết định dùng âm thanh tấn công ngược lại kẻ thù thay vì chỉ phòng thủ thụ động.",
+        "payoff": "Giải phóng một bí mật cổ xưa dưới lòng đất, nâng cấp toàn diện sức mạnh gia tộc."
+      }
+    ],
+    "volumeSpine": [
+      {
+        "name": "Volume 1: Kỷ Luật Thép",
+        "direction": "Tập trung vào sinh tồn, giải quyết nợ nần và thiết lập các luật lệ khắc nghiệt để kiểm soát âm thanh.",
+        "terminalChange": "Toàn bộ gia tộc chấp nhận hạn ngạch từ ngữ như một phần tất yếu của cuộc sống sinh tồn."
+      },
+      {
+        "name": "Volume 2: Gieo Mầm Tiếng Vọng",
+        "direction": "Tận dụng cơ chế nhân quả của âm thanh để bắt đầu tạo ra tài nguyên và phân công lao động mới.",
+        "terminalChange": "Chuyển đổi thành công từ thế phòng thủ thụ động sang chủ động canh tác tiếng vọng tốt đẹp."
+      },
+      {
+        "name": "Volume 3: Vang Vọng Cửu Châu",
+        "direction": "Đối mặt với các thế lực bên ngoài muốn cướp đoạt bí mật thung lũng và khẳng định vị thế gia tộc.",
+        "terminalChange": "Vọng Âm Cốc trở thành một thế lực độc lập không thể xâm phạm, tự do ngôn luận trong sự thấu hiểu."
+      }
+    ]
+  },
+  "arcPlan": {
+    "schemaVersion": 2,
+    "arcId": "arc_1",
+    "startChapter": 1,
+    "endChapter": 30,
+    "direction": "Thiết lập quyền lực tuyệt đối của Lâm Viễn, giải quyết khủng hoảng sinh tồn trước mắt và đưa gia tộc vào quỹ đạo canh tác tiếng vọng.",
+    "terminalChange": "Từ một gia tộc nợ nần, chia rẽ và ồn ào thành một cỗ máy im lặng, kỷ luật, bắt đầu thu hoạch những trái ngọt đầu tiên từ việc kiểm soát âm thanh.",
+    "activeConflicts": [
+      {
+        "actor": "Lâm Hải",
+        "objective": "Lấy lại quyền tự do ngôn luận và quyền tự quyết cho nhánh thứ hai.",
+        "leverage": "Nắm giữ kỹ thuật luân canh linh điền và quản lý nguồn nước tưới tiêu.",
+        "nextMove": "Kích động thanh niên trong nhánh lén lút vi phạm hạn ngạch từ ngữ để thách thức Lâm Viễn."
+      },
+      {
+        "actor": "Thương Hội Hắc Âm",
+        "objective": "Bóc lột tài nguyên của Lâm thị thông qua việc bán trận bàn giá cao.",
+        "leverage": "Độc quyền cung cấp các loại trận bàn cách âm chất lượng cao trong vùng.",
+        "nextMove": "Cắt đứt nguồn cung cấp trận bàn ngay khi Lâm thị đang đối mặt với đợt nổ tiếng vọng lớn."
+      }
+    ],
+    "duePromises": [
+      "promise_1",
+      "promise_2",
+      "promise_3"
+    ],
+    "rollingBeats": [
+      {
+        "chapterRange": "1-5",
+        "pressure": "Khủng hoảng nợ nần hắc thị và nguy cơ nổ tiếng vọng thù hận phá hủy linh điền.",
+        "causalChange": "Khế ước bán đất bị xé bỏ, luật cấm khẩu được ban hành, gia tộc bước vào kỷ luật thép."
+      },
+      {
+        "chapterRange": "6-10",
+        "pressure": "Sự phản kháng ngầm của thế hệ trẻ đối với vòng cấm khẩu ngày càng tăng cao.",
+        "causalChange": "Lâm Tuyết lén hát gây họa, Lâm Viễn phải xử lý khéo léo để lập uy mà không giết người."
+      },
+      {
+        "chapterRange": "11-15",
+        "pressure": "Thiếu hụt nghiêm trọng vật tư cách âm khi Thương Hội Hắc Âm bắt đầu ép giá.",
+        "causalChange": "Khai thác thành công Âm Thạch lõi tinh khiết để đổi lấy vật tư từ một thế lực khác."
+      },
+      {
+        "chapterRange": "16-20",
+        "pressure": "Mạch nước ngầm Vang Vọng cạn kiệt do mâu thuẫn luân canh giữa các nhánh họ.",
+        "causalChange": "Lâm Viễn dùng vũ lực và uy tín ép buộc các nhánh phải hợp tác chia sẻ nguồn nước."
+      },
+      {
+        "chapterRange": "21-25",
+        "pressure": "Kẻ thù ngoại lai phát hiện bí mật và bắt đầu xả rác âm thanh vào thung lũng.",
+        "causalChange": "Toàn tộc đoàn kết xây dựng bức tường thịt và gỗ Thanh Tùng để chặn đứng ma âm."
+      },
+      {
+        "chapterRange": "26-30",
+        "pressure": "Một tiếng vọng khổng lồ từ 100 năm trước dội về đe dọa san phẳng toàn bộ thung lũng.",
+        "causalChange": "Kích hoạt thành công công pháp Sư Tử Hống, phá vỡ giới hạn cũ và bảo vệ gia tộc."
+      }
+    ]
+  },
+  "storyState": {
+    "schemaVersion": 2,
+    "chapterNumber": 0,
+    "facts": {
+      "nợ_hắc_thị": "Gia tộc đang nợ 300 linh thạch của hắc thị, hạn chót phải trả là sáng ngày mai.",
+      "trận_pháp_yếu": "Trận pháp cách âm bảo vệ Vọng Âm Cốc đang ở mức báo động, sắp vỡ vụn nếu mất đi linh điền phía nam."
+    },
+    "timeline": [
+      {
+        "chapter": 0,
+        "event": "Lâm Viễn trọng sinh về đúng đêm trước khi đại bá Lâm Chấn định đóng dấu bán linh điền."
+      }
+    ],
+    "cast": [
+      {
+        "name": "Lâm Viễn",
+        "status": "alive",
+        "location": "Đang lao thẳng vào đại sảnh Lâm thị.",
+        "knowledge": [
+          "Biết chính xác thời gian và địa điểm cơn mưa Âm Thạch sẽ rơi xuống trong đêm nay."
+        ],
+        "relationshipToProtagonist": "Bản thân nhân vật chính."
+      },
+      {
+        "name": "Lâm Chấn",
+        "status": "alive",
+        "location": "Ngồi trên ghế chủ tọa trong đại sảnh Lâm thị.",
+        "knowledge": [
+          "Biết gia tộc đã cạn kiệt tài nguyên và không còn cách nào khác ngoài việc bán đất."
+        ],
+        "relationshipToProtagonist": "Đại bá, người đang nắm quyền quyết định cao nhất nhưng sắp bị đoạt quyền."
+      },
+      {
+        "name": "Lâm Mặc",
+        "status": "alive",
+        "location": "Đang lủi thủi ở góc sân ngoài đại sảnh.",
+        "knowledge": [
+          "Biết cách di chuyển nhẹ nhàng không phát ra tiếng động nhưng chưa nhận thức được giá trị của mình."
+        ],
+        "relationshipToProtagonist": "Em họ câm bẩm sinh, người sẽ trở thành công cụ thu hoạch đắc lực nhất."
+      },
+      {
+        "name": "Lâm Hải",
+        "status": "alive",
+        "location": "Đang ở khu nhà nhánh thứ hai, lo lắng về linh điền.",
+        "knowledge": [
+          "Biết rõ tình trạng thê thảm của lúa linh mạch nhưng không biết tiếng vọng rác sắp nổ."
+        ],
+        "relationshipToProtagonist": "Nhị thúc, người quản lý linh điền và là mầm mống phản loạn tương lai."
+      },
+      {
+        "name": "Lâm Tuyết",
+        "status": "alive",
+        "location": "Đang ở trong phòng riêng tại nhánh thứ hai.",
+        "knowledge": [
+          "Biết một số giai điệu cổ xưa nhưng chưa từng dám hát lớn tiếng."
+        ],
+        "relationshipToProtagonist": "Em họ có tài năng ca hát, người sẽ liên tục thách thức luật cấm khẩu."
+      }
+    ],
+    "resources": [
+      {
+        "resource": "Âm Thạch",
+        "amount": "0 khối",
+        "source": "Kho chung của gia tộc đã hoàn toàn trống rỗng do trả nợ các kỳ trước.",
+        "lastChangedChapter": 0
+      },
+      {
+        "resource": "Hạn ngạch từ ngữ",
+        "amount": "Chưa áp dụng",
+        "source": "Mọi người vẫn đang giao tiếp tự do, tiêu hao sinh khí của trận pháp.",
+        "lastChangedChapter": 0
+      },
+      {
+        "resource": "Nước Ngầm Vang Vọng",
+        "amount": "Đang cạn kiệt",
+        "source": "Mạch nước ngầm chảy qua rễ cây Thanh Tùng đang ở mức thấp nhất trong năm.",
+        "lastChangedChapter": 0
+      },
+      {
+        "resource": "Trận Bàn Cách Âm",
+        "amount": "Cũ nát, sắp hỏng",
+        "source": "Trận bàn cốt lõi của gia tộc đã hoạt động quá tải nhiều năm chưa được thay thế.",
+        "lastChangedChapter": 0
+      }
+    ],
+    "promises": [
+      {
+        "id": "promise_1",
+        "status": "open",
+        "currentPressure": "Đại bá sắp đóng dấu bán đất, thời gian chỉ còn tính bằng giây."
+      },
+      {
+        "id": "promise_2",
+        "status": "open",
+        "currentPressure": "Món nợ 300 linh thạch lơ lửng trên đầu, sáng mai hắc thị sẽ đến đòi mạng."
+      },
+      {
+        "id": "promise_3",
+        "status": "open",
+        "currentPressure": "Những tiếng chửi rủa từ 10 năm trước đang tích tụ dưới lòng đất nhánh hai, chực chờ phát nổ."
+      },
+      {
+        "id": "promise_4",
+        "status": "open",
+        "currentPressure": "Lâm Mặc bị coi là phế vật, đang khao khát được chứng minh giá trị bản thân."
+      },
+      {
+        "id": "promise_5",
+        "status": "open",
+        "currentPressure": "Lâm Tuyết cảm thấy ngột ngạt trong sự im lặng, khao khát được cất tiếng hát tự do."
+      }
+    ],
+    "recentSummary": "Lâm Viễn vừa tỉnh lại sau khi trọng sinh, nhận ra gia tộc sắp đưa ra quyết định sai lầm chí mạng là bán linh điền phía nam.",
+    "previousEnding": "Lâm Viễn bước nhanh về phía đại sảnh, nơi đại bá đang cầm con dấu bằng đồng chuẩn bị đóng xuống bản khế ước bán đất.",
+    "retrievalNotes": [
+      "Nhớ kỹ quy tắc vòng gỗ Thanh Tùng sẽ siết cổ nếu nói quá nhiều.",
+      "Độ trễ tiếng vọng là 10 năm, mọi hành động hôm nay sẽ dội lại vào tương lai."
+    ]
+  },
+  "rollingChapterPlans": [
+    {
+      "schemaVersion": 2,
+      "chapterNumber": 1,
+      "chapterPromise": "thu hồi khế ước bán đất",
+      "stateBefore": {
+        "khế_ước": "Đang nằm trên bàn chờ đóng dấu",
+        "nợ_nần": "Chưa có hướng giải quyết"
+      },
+      "scenes": [
+        {
+          "id": "scene_1_a",
+          "pov": "Lâm Viễn",
+          "desire": "Lâm Viễn muốn ngăn cản việc bán đất bằng mọi giá để giữ lại mảng giáp bảo vệ cốt lõi của trận pháp.",
+          "opposition": "Đại bá Lâm Chấn phẫn nộ vì sự hỗn xược của vãn bối và sự bế tắc của món nợ 300 linh thạch.",
+          "tactic": "Lao vào xé nát khế ước, chủ động chịu một chưởng lực phẫn nộ để chứng minh sự kiên định.",
+          "irreversibleChange": "Khế ước bán đất bị hủy bỏ hoàn toàn, gia tộc không còn đường lui ngoài việc tin Lâm Viễn.",
+          "informationDelta": "Lâm Chấn nhận ra Lâm Viễn có một kế hoạch điên rồ liên quan đến đồi Mộc Lĩnh trong đêm nay.",
+          "cost": "Lâm Viễn bị chưởng lực làm nứt xương sườn, hộc máu và phải lập lời thề độc tự phế tu vi.",
+          "payoff": "Giữ lại được mảnh linh điền phía nam, bảo vệ nền tảng của trận pháp cách âm Vọng Âm Cốc.",
+          "exitHook": "Cả gia tộc mặc giáp sắt nặng nề, mang theo giỏ đan tiến về phía đồi Mộc Lĩnh trong đêm tối."
+        },
+        {
+          "id": "scene_1_b",
+          "pov": "Lâm Viễn",
+          "desire": "Thuyết phục toàn bộ gia tộc tuân thủ quy tắc im lặng tuyệt đối khi lên đồi Mộc Lĩnh.",
+          "opposition": "Sự hoài nghi và sợ hãi của các thành viên gia tộc khi phải đến nơi hoang tàn cằn cỗi giữa đêm.",
+          "tactic": "Dùng uy quyền vừa đoạt được và lời thề độc để ép buộc mọi người ngậm chặt miếng gỗ Thanh Tùng.",
+          "irreversibleChange": "Gia tộc lần đầu tiên trải nghiệm sự kỷ luật quân sự dưới sự chỉ huy độc đoán của Lâm Viễn.",
+          "informationDelta": "Mọi người lờ mờ nhận ra đồi Mộc Lĩnh không hề vô dụng như họ vẫn tưởng suốt trăm năm qua.",
+          "cost": "Sự bất mãn ngầm bắt đầu nhen nhóm trong lòng những thanh niên quen thói tự do sinh hoạt.",
+          "payoff": "Đội hình hai mươi người tiến lên đồi trong sự im lặng tuyệt đối, sẵn sàng đón nhận cơ hội.",
+          "exitHook": "Bầu trời đêm trên đồi Mộc Lĩnh bắt đầu bẻ cong, không gian gợn sóng báo hiệu tiếng vọng sắp tới."
+        }
+      ],
+      "stateAfter": {
+        "khế_ước": "Đã bị xé nát",
+        "vị_thế": "Lâm Viễn tạm thời nắm quyền chỉ huy"
+      },
+      "promisesAdvanced": [
+        "promise_1"
+      ],
+      "promisesPaid": [],
+      "nextChapterPressure": "Áp lực phải hứng chịu cơn mưa tiếng vọng nguy hiểm để thu thập đủ 300 khối Âm Thạch.",
+      "stateDelta": {
+        "facts": {
+          "khế_ước_bị_hủy": "Bản khế ước bán đất đã bị Lâm Viễn xé nát thành từng mảnh nhỏ."
+        },
+        "cast": [
+          {
+            "name": "Lâm Chấn",
+            "status": "alive",
+            "location": "Đồi Mộc Lĩnh",
+            "learned": [
+              "Lâm Viễn sẵn sàng đánh cược mạng sống để bảo vệ linh điền."
+            ],
+            "relationshipChange": "Từ chỗ tức giận chuyển sang dao động và tạm thời nghe theo sự sắp đặt của Lâm Viễn."
+          },
+          {
+            "name": "Lâm Viễn",
+            "status": "alive",
+            "location": "Đồi Mộc Lĩnh",
+            "learned": [
+              "Đại bá vẫn còn đủ sức mạnh để tung ra một chưởng lực uy lực."
+            ],
+            "relationshipChange": "Trở thành người dẫn dắt thực tế của đội ngũ thu thập tài nguyên."
+          }
+        ],
+        "resources": [
+          {
+            "resource": "Âm Thạch",
+            "amountAfter": "0 khối",
+            "source": "Chưa thu thập được gì, đang chờ cơn mưa tiếng vọng."
+          }
+        ],
+        "promises": [
+          {
+            "id": "promise_1",
+            "status": "advanced",
+            "currentPressure": "Đất đã giữ được nhưng món nợ vẫn còn đó, cần tài nguyên gấp."
+          }
+        ]
+      }
+    },
+    {
+      "schemaVersion": 2,
+      "chapterNumber": 2,
+      "chapterPromise": "hứng trọn mưa Âm Thạch",
+      "stateBefore": {
+        "tài_nguyên": "0 khối Âm Thạch",
+        "nguy_hiểm": "Tiếng vọng sắp dội xuống"
+      },
+      "scenes": [
+        {
+          "id": "scene_2_a",
+          "pov": "Lâm Viễn",
+          "desire": "Thu thập đủ số lượng Âm Thạch từ cơn mưa tiếng vọng phúc lành của cụ tổ để trả nợ hắc thị.",
+          "opposition": "Sự khắc nghiệt của cơn mưa đá Âm Thạch và những lưỡi đao gió xen lẫn từ sự hối tiếc của quá khứ.",
+          "tactic": "Duy trì đội hình quỳ gối, ngậm gỗ Thanh Tùng, dùng giáp sắt hứng chịu va đập để nhặt tài nguyên.",
+          "irreversibleChange": "Gia tộc lần đầu tiên tận mắt chứng kiến và thu hoạch được khối lượng tài nguyên khổng lồ từ quá khứ.",
+          "informationDelta": "Mọi người nhận ra giá trị thực sự của sự im lặng và những lời cầu nguyện từ hàng thế kỷ trước.",
+          "cost": "Nhiều thành viên bị bầm dập, áo giáp móp méo do sức nặng của cơn mưa Âm Thạch trút xuống.",
+          "payoff": "Thu hoạch được hơn bốn trăm khối Âm Thạch, vượt xa số lượng cần thiết để thanh toán nợ nần.",
+          "exitHook": "Một tiếng thở dài sầu thảm bất ngờ vang lên, hóa thành đao gió chém thẳng về phía Lâm Mặc."
+        },
+        {
+          "id": "scene_2_b",
+          "pov": "Lâm Viễn",
+          "desire": "Bảo vệ Lâm Mặc và viên Âm Thạch lõi tinh khiết khỏi sự phá hủy của đao gió sát thương.",
+          "opposition": "Tốc độ cực nhanh của đao gió và quy tắc cấm phát ra tiếng động để không làm vỡ Âm Thạch lõi.",
+          "tactic": "Lấy thân mình bọc giáp sắt lao ra che chắn, cắn ngập răng vào miếng gỗ để nén cơn đau thấu xương.",
+          "irreversibleChange": "Lâm Mặc hoàn toàn thần phục Lâm Viễn, viên Âm Thạch lõi quý giá nhất được bảo toàn nguyên vẹn.",
+          "informationDelta": "Lâm Viễn xác nhận Lâm Mặc là nhân tài thu thập hoàn hảo nhất vì không bao giờ phát ra tạp âm.",
+          "cost": "Lưng Lâm Viễn bị chém rách bươm, máu chảy đầm đìa, kinh mạch tổn thương nghiêm trọng do nén đau.",
+          "payoff": "Sở hữu viên Âm Thạch lõi tinh khiết, chìa khóa để nâng cấp trận pháp cách âm trong tương lai.",
+          "exitHook": "Trận pháp Thanh Tùng dưới chân đồi quá tải, những vết nứt lan rộng báo hiệu thảm họa tại nhánh hai."
+        }
+      ],
+      "stateAfter": {
+        "tài_nguyên": "Hơn 400 khối Âm Thạch",
+        "nguy_hiểm": "Trận pháp nhánh hai sắp vỡ"
+      },
+      "promisesAdvanced": [
+        "promise_2",
+        "promise_4"
+      ],
+      "promisesPaid": [
+        "promise_1"
+      ],
+      "nextChapterPressure": "Tiếng vọng thù hận từ 10 năm trước sắp nổ tung tại khu nhà Nhị thúc, đe dọa hủy diệt linh điền.",
+      "stateDelta": {
+        "facts": {
+          "nợ_được_giải_quyết": "Đã có đủ tài nguyên để trả nợ hắc thị vào sáng mai."
+        },
+        "cast": [
+          {
+            "name": "Lâm Mặc",
+            "status": "alive",
+            "location": "Đồi Mộc Lĩnh",
+            "learned": [
+              "Lâm Viễn sẵn sàng hy sinh thân mình để bảo vệ cậu bé."
+            ],
+            "relationshipChange": "Trở nên trung thành tuyệt đối với Lâm Viễn, coi hắn như ân nhân cứu mạng."
+          },
+          {
+            "name": "Lâm Viễn",
+            "status": "alive",
+            "location": "Đồi Mộc Lĩnh",
+            "learned": [
+              "Sức mạnh của đao gió quá khứ mạnh hơn dự kiến rất nhiều."
+            ],
+            "relationshipChange": "Xác lập được uy tín tuyệt đối bằng hành động xả thân cứu người."
+          }
+        ],
+        "resources": [
+          {
+            "resource": "Âm Thạch",
+            "amountAfter": "Hơn 400 khối",
+            "source": "Thu hoạch từ cơn mưa tiếng vọng phúc lành của cụ tổ trên đồi Mộc Lĩnh."
+          }
+        ],
+        "promises": [
+          {
+            "id": "promise_2",
+            "status": "advanced",
+            "currentPressure": "Đã có đủ Âm Thạch, chỉ cần đem đi trả nợ là xong."
+          },
+          {
+            "id": "promise_4",
+            "status": "advanced",
+            "currentPressure": "Lâm Mặc đã chứng minh được giá trị, cần được giao nhiệm vụ quan trọng hơn."
+          }
+        ]
+      }
+    },
+    {
+      "schemaVersion": 2,
+      "chapterNumber": 3,
+      "chapterPromise": "thiết lập hạn ngạch từ ngữ",
+      "stateBefore": {
+        "khủng_hoảng": "Tiếng vọng rác sắp nổ tại nhánh hai",
+        "kỷ_luật": "Chưa có luật cấm khẩu chính thức"
+      },
+      "scenes": [
+        {
+          "id": "scene_3_a",
+          "pov": "Lâm Viễn",
+          "desire": "Ngăn chặn khối tiếng vọng rác rưởi phát nổ để cứu ba mẫu linh điền trồng lúa linh mạch của nhánh hai.",
+          "opposition": "Sức công phá khủng khiếp của hàng ngàn mũi dùi âm thanh tích tụ từ những lời chửi rủa của Nhị thúc.",
+          "tactic": "Dùng hơn 100 khối Âm Thạch thặng dư mua gấp Trận Bàn Cách Âm Hộ Viện, ép mọi người làm tường thịt.",
+          "irreversibleChange": "Linh điền nhánh hai được cứu, nhưng toàn bộ gia tộc nhận thức rõ sự tàn phá kinh hoàng của lời nói.",
+          "informationDelta": "Nhị thúc Lâm Hải nhận ra chính những lời chửi mắng vô cớ của mình năm xưa suýt giết chết cả nhà.",
+          "cost": "Tiêu tốn toàn bộ số Âm Thạch thặng dư vừa kiếm được, gia tộc lại rơi vào tình trạng trắng tay tạm thời.",
+          "payoff": "Bảo vệ thành công nguồn sinh kế cốt lõi, thiết lập được nền tảng vật lý vững chắc để chống tiếng vọng.",
+          "exitHook": "Khói bụi tan đi, Lâm Viễn lạnh lùng bê ra một khay gỗ đựng hàng chục chiếc vòng cổ Thanh Tùng đỏ chót."
+        },
+        {
+          "id": "scene_3_b",
+          "pov": "Lâm Viễn",
+          "desire": "Áp đặt luật hạn ngạch từ ngữ lên toàn bộ gia tộc để triệt tiêu vĩnh viễn nguy cơ tạo ra tiếng vọng rác.",
+          "opposition": "Sự hoang mang, sợ hãi và phẫn nộ tột độ của đám thanh niên và các trưởng bối khi bị tước đoạt tiếng nói.",
+          "tactic": "Tuyên bố luật lệ thép, tự mình đeo chiếc vòng cấm khẩu đầu tiên để làm gương và khóa chết mọi sự phản kháng.",
+          "irreversibleChange": "Gia tộc chính thức bước vào kỷ nguyên im lặng, mọi lời nói đều bị đong đếm và kiểm soát gắt gao.",
+          "informationDelta": "Mọi người hiểu rằng từ nay sinh mạng của họ gắn liền với số lượng từ ngữ phát ra mỗi ngày.",
+          "cost": "Lâm Viễn trở thành kẻ độc tài đáng sợ, vĩnh viễn mất đi quyền tự do ngôn luận tự nhiên của bản thân.",
+          "payoff": "Đổi lấy một đêm bình yên thực sự, được thưởng thức bữa ăn no nê ấm áp do đích thân đại bá nấu tạ lỗi.",
+          "exitHook": "Trong bóng tối, Lâm Tuyết nhìn chiếc vòng trên cổ mình, ánh mắt lóe lên sự phản kháng không cam chịu."
+        }
+      ],
+      "stateAfter": {
+        "khủng_hoảng": "Đã được giải quyết tạm thời",
+        "kỷ_luật": "Luật hạn ngạch từ ngữ được thiết lập"
+      },
+      "promisesAdvanced": [
+        "promise_3",
+        "promise_5"
+      ],
+      "promisesPaid": [
+        "promise_2"
+      ],
+      "nextChapterPressure": "Sự bất mãn ngầm của Lâm Hải và Lâm Tuyết đối với đạo luật cấm khẩu khắc nghiệt bắt đầu nhen nhóm.",
+      "stateDelta": {
+        "facts": {
+          "luật_cấm_khẩu": "Mỗi người chỉ được nói 50 từ một ngày, vi phạm sẽ bị vòng gỗ siết cổ."
+        },
+        "cast": [
+          {
+            "name": "Lâm Hải",
+            "status": "alive",
+            "location": "Khu nhà nhánh hai",
+            "learned": [
+              "Tiếng chửi rủa của mình có thể phá hủy toàn bộ cơ nghiệp."
+            ],
+            "relationshipChange": "Sợ hãi sức mạnh của Lâm Viễn nhưng trong lòng vẫn ôm hận vì bị ép đeo gông."
+          },
+          {
+            "name": "Lâm Tuyết",
+            "status": "alive",
+            "location": "Khu nhà nhánh hai",
+            "learned": [
+              "Giọng nói giờ đây là một thứ tài nguyên bị kiểm soát gắt gao."
+            ],
+            "relationshipChange": "Bắt đầu nảy sinh ý định chống đối ngầm để đòi lại quyền được ca hát."
+          }
+        ],
+        "resources": [
+          {
+            "resource": "Hạn ngạch từ ngữ",
+            "amountAfter": "50 từ/người/ngày",
+            "source": "Do Lâm Viễn thiết lập thông qua vòng gỗ Thanh Tùng."
+          },
+          {
+            "resource": "Trận Bàn Cách Âm",
+            "amountAfter": "Mới tinh, hoạt động tốt",
+            "source": "Mua từ phường thị bằng 100 khối Âm Thạch thặng dư."
+          }
+        ],
+        "promises": [
+          {
+            "id": "promise_3",
+            "status": "advanced",
+            "currentPressure": "Luật đã lập nhưng việc duy trì nó sẽ gặp vô vàn thách thức từ nội bộ."
+          },
+          {
+            "id": "promise_5",
+            "status": "advanced",
+            "currentPressure": "Lâm Tuyết bị cấm khẩu, khao khát ca hát càng bị dồn nén mạnh mẽ hơn."
+          }
+        ]
+      }
+    },
+    {
+      "schemaVersion": 2,
+      "chapterNumber": 4,
+      "chapterPromise": "xử lý sự phản kháng đầu tiên với vòng cấm khẩu",
+      "stateBefore": {
+        "nội_bộ": "Căng thẳng ngầm vì luật cấm khẩu",
+        "linh_điền": "Đang cần chăm sóc sau khủng hoảng"
+      },
+      "scenes": [
+        {
+          "id": "scene_4_a",
+          "pov": "Lâm Viễn",
+          "desire": "Đảm bảo mọi người tuân thủ nghiêm ngặt hạn ngạch từ ngữ trong ngày đầu tiên ra đồng làm việc.",
+          "opposition": "Lâm Hải bực tức vì không thể quát tháo đám thanh niên lười biếng, cố tình lách luật bằng cách gõ mõ.",
+          "tactic": "Lâm Viễn xuất hiện, dùng ánh mắt lạnh lẽo và chỉ tay vào vết nứt trên trận bàn để cảnh cáo sự ngu ngốc.",
+          "irreversibleChange": "Lâm Hải nhận ra mọi hành vi tạo tiếng ồn, dù không phải lời nói, đều bị trận pháp ghi nhận là rủi ro.",
+          "informationDelta": "Toàn tộc hiểu rằng luật cấm khẩu không chỉ áp dụng cho miệng mà cho mọi hành vi tạo ra tạp âm lớn.",
+          "cost": "Lâm Viễn phải tiêu tốn 5 từ trong hạn ngạch quý giá của mình để giải thích quy tắc cho những kẻ cứng đầu.",
+          "payoff": "Thiết lập được trật tự làm việc im lặng tuyệt đối trên linh điền, năng suất cày cuốc tăng lên đáng kể.",
+          "exitHook": "Một tiếng hét thất thanh vang lên từ phía bờ suối, nơi Lâm Tuyết đang giặt đồ, phá vỡ sự im lặng."
+        },
+        {
+          "id": "scene_4_b",
+          "pov": "Lâm Viễn",
+          "desire": "Cứu Lâm Tuyết khỏi tai nạn và trừng phạt việc vi phạm hạn ngạch từ ngữ để giữ nghiêm quân pháp.",
+          "opposition": "Lâm Tuyết bị một con yêu thú nhỏ tấn công, hoảng loạn la hét khiến vòng gỗ Thanh Tùng siết chặt cổ.",
+          "tactic": "Lâm Viễn lao tới chém chết yêu thú, nhưng đứng nhìn vòng gỗ siết cổ Lâm Tuyết đến mức rỉ máu mới nới lỏng.",
+          "irreversibleChange": "Lâm Tuyết trải qua cảm giác cận kề cái chết do chính chiếc vòng bảo vệ gây ra, khắc sâu nỗi sợ hãi.",
+          "informationDelta": "Mọi người tận mắt chứng kiến sự tàn nhẫn của vòng cấm khẩu và sự sắt đá không khoan nhượng của Lâm Viễn.",
+          "cost": "Lâm Tuyết bị tổn thương thanh quản nhẹ, Lâm Viễn mang tiếng là kẻ máu lạnh vô tình trước người nhà.",
+          "payoff": "Luật lệ được củng cố bằng máu, không còn ai dám có ý định thử thách giới hạn của vòng Thanh Tùng nữa.",
+          "exitHook": "Đêm đó, Lâm Mặc lén lút mang một viên thuốc trị thương đến cho Lâm Tuyết, dùng cử chỉ an ủi cô bé."
+        }
+      ],
+      "stateAfter": {
+        "nội_bộ": "Sợ hãi và tuân thủ tuyệt đối",
+        "linh_điền": "Được chăm sóc trong im lặng"
+      },
+      "promisesAdvanced": [
+        "promise_3",
+        "promise_5"
+      ],
+      "promisesPaid": [],
+      "nextChapterPressure": "Sự dồn nén tâm lý cần một lối thoát, Lâm Viễn phải tìm cách tận dụng tài năng của Lâm Tuyết.",
+      "stateDelta": {
+        "facts": {
+          "sự_tàn_nhẫn_của_vòng": "Vòng Thanh Tùng thực sự có thể giết người nếu vi phạm hạn ngạch."
+        },
+        "cast": [
+          {
+            "name": "Lâm Tuyết",
+            "status": "alive",
+            "location": "Phòng riêng nhánh hai",
+            "learned": [
+              "La hét trong Vọng Âm Cốc đồng nghĩa với tự sát."
+            ],
+            "relationshipChange": "Sợ hãi Lâm Viễn tột độ nhưng khao khát tìm cách kiểm soát âm thanh của mình."
+          },
+          {
+            "name": "Lâm Hải",
+            "status": "alive",
+            "location": "Linh điền nhánh hai",
+            "learned": [
+              "Không thể lách luật bằng các công cụ tạo tiếng ồn khác."
+            ],
+            "relationshipChange": "Hoàn toàn khuất phục trước sự giám sát gắt gao của Lâm Viễn."
+          }
+        ],
+        "resources": [
+          {
+            "resource": "Hạn ngạch từ ngữ",
+            "amountAfter": "Đang bị tiêu hao dè dặt",
+            "source": "Mọi người bắt đầu dùng cử chỉ thay vì nói chuyện."
+          }
+        ],
+        "promises": [
+          {
+            "id": "promise_3",
+            "status": "paid",
+            "currentPressure": "Luật cấm khẩu đã được thực thi triệt để bằng máu và sự sợ hãi."
+          },
+          {
+            "id": "promise_5",
+            "status": "advanced",
+            "currentPressure": "Lâm Tuyết bị thương ở cổ, khao khát ca hát biến thành khao khát sinh tồn."
+          }
+        ]
+      }
+    },
+    {
+      "schemaVersion": 2,
+      "chapterNumber": 5,
+      "chapterPromise": "phát hiện tiềm năng của Lâm Tuyết và Lâm Mặc",
+      "stateBefore": {
+        "tâm_lý": "Dồn nén cực độ",
+        "nhân_tài": "Chưa được phân công đúng sở trường"
+      },
+      "scenes": [
+        {
+          "id": "scene_5_a",
+          "pov": "Lâm Viễn",
+          "desire": "Giao phó khu vực linh điền lõi nhạy cảm nhất cho người có khả năng chăm sóc mà không tạo ra tiếng vọng rác.",
+          "opposition": "Các trưởng bối phản đối việc giao khu đất quan trọng nhất cho một đứa trẻ câm bẩm sinh như Lâm Mặc.",
+          "tactic": "Lâm Viễn đưa mọi người ra xem Lâm Mặc cấy lúa, chứng minh sự đồng bộ nhịp tim hoàn hảo của cậu bé với rễ cây.",
+          "irreversibleChange": "Lâm Mặc chính thức trở thành người quản lý linh điền lõi, thay đổi hoàn toàn địa vị từ phế vật thành nhân tài.",
+          "informationDelta": "Gia tộc nhận ra khiếm khuyết câm bẩm sinh lại là món quà tuyệt vời nhất để sinh tồn trong Vọng Âm Cốc.",
+          "cost": "Lâm Viễn phải gạt bỏ thể diện của các trưởng bối, tạo ra sự ghen tị ngầm từ những thanh niên khỏe mạnh khác.",
+          "payoff": "Linh điền lõi bắt đầu nảy mầm mạnh mẽ dưới sự chăm sóc im lặng tuyệt đối, hứa hẹn một vụ mùa bội thu.",
+          "exitHook": "Trong lúc mọi người đang vui mừng, một giai điệu trầm bổng kỳ lạ vang lên từ phía sau ngọn đồi."
+        },
+        {
+          "id": "scene_5_b",
+          "pov": "Lâm Viễn",
+          "desire": "Điều tra nguồn gốc của giai điệu kỳ lạ và kiểm soát biến số âm thanh mới xuất hiện trong thung lũng.",
+          "opposition": "Giai điệu có sức mạnh xoa dịu tâm trí, làm suy yếu ý chí cảnh giác của Lâm Viễn và các thành viên khác.",
+          "tactic": "Lâm Viễn cắn nát đầu lưỡi để giữ tỉnh táo, lần theo âm thanh và phát hiện Lâm Tuyết đang lén hát ru lúa.",
+          "irreversibleChange": "Lâm Viễn nhận ra giọng hát của Lâm Tuyết không tạo ra tiếng vọng rác mà lại kích thích linh lúa phát triển.",
+          "informationDelta": "Lâm Viễn hiểu rằng âm thanh không chỉ mang tính hủy diệt mà còn có thể là công cụ canh tác mạnh mẽ nhất.",
+          "cost": "Lâm Tuyết vi phạm luật cấm khẩu, vòng gỗ đang siết chặt cổ cô bé, đe dọa tính mạng nếu không dừng lại.",
+          "payoff": "Tìm ra phương pháp trung hòa tiếng vọng thù hận và tăng năng suất linh điền bằng âm nhạc có kiểm soát.",
+          "exitHook": "Lâm Viễn bước tới, không trừng phạt mà dùng chìa khóa đặc biệt nới lỏng vòng cổ cho Lâm Tuyết, mỉm cười bí hiểm."
+        }
+      ],
+      "stateAfter": {
+        "tâm_lý": "Bắt đầu có hy vọng mới",
+        "nhân_tài": "Đã được đặt đúng vị trí"
+      },
+      "promisesAdvanced": [
+        "promise_4",
+        "promise_5"
+      ],
+      "promisesPaid": [],
+      "nextChapterPressure": "Lâm Viễn phải thiết lập Dàn hợp xướng và đối mặt với sự chú ý từ các thế lực bên ngoài khi năng suất lúa tăng vọt.",
+      "stateDelta": {
+        "facts": {
+          "âm_nhạc_canh_tác": "Giọng hát của Lâm Tuyết có tác dụng kích thích linh lúa phát triển."
+        },
+        "cast": [
+          {
+            "name": "Lâm Mặc",
+            "status": "alive",
+            "location": "Linh điền lõi",
+            "learned": [
+              "Bản thân là người quan trọng nhất đối với sự sống còn của linh điền lõi."
+            ],
+            "relationshipChange": "Cảm thấy tự hào và gắn bó sâu sắc hơn với mảnh đất và Lâm Viễn."
+          },
+          {
+            "name": "Lâm Tuyết",
+            "status": "alive",
+            "location": "Sau ngọn đồi",
+            "learned": [
+              "Giọng hát của mình có giá trị đặc biệt và được Lâm Viễn công nhận."
+            ],
+            "relationshipChange": "Từ thù ghét chuyển sang tò mò và sẵn sàng hợp tác với Lâm Viễn."
+          }
+        ],
+        "resources": [
+          {
+            "resource": "Nước Ngầm Vang Vọng",
+            "amountAfter": "Bắt đầu dâng lên",
+            "source": "Sự phát triển của linh điền lõi kích thích mạch nước ngầm hoạt động trở lại."
+          }
+        ],
+        "promises": [
+          {
+            "id": "promise_4",
+            "status": "paid",
+            "currentPressure": "Lâm Mặc đã chứng minh được giá trị tuyệt đối tại linh điền lõi."
+          },
+          {
+            "id": "promise_5",
+            "status": "advanced",
+            "currentPressure": "Lâm Tuyết được phép hát, nhưng phải hát theo sự chỉ đạo nghiêm ngặt của Lâm Viễn."
+          }
+        ]
+      }
+    }
+  ],
+  "status": "awaiting_story_spec_approval"
+}

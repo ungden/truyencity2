@@ -45,12 +45,14 @@ Mỗi pack có tối thiểu sáu tác phẩm Trung Quốc để đối chiếu 
 npm run flagship:portfolio:validate
 npm run flagship:portfolio:tournaments
 npm run flagship:portfolio:review
+npm run flagship:portfolio:materialize
+npm run flagship:portfolio:write-openings
 npm run flagship:portfolio:promote
 ```
 
 `tournaments` tạo 20 concept, pairwise rank và ba opening cho từng slot bằng checkpoint có hash. `review` chấm mù ba opening, kiểm evidence nguyên văn và tạo [khuyến nghị 9 → 3](./portfolio-recommendation.md). Cả hai lệnh đều offline và không import Supabase, chapter writer hoặc legacy orchestrator.
 
-Kết quả hiện tại: 9 tournament, 180 concept, 27 opening và 81 chương mẫu. Blind editor đề cử `HX-04 / HX04-B`, `TH-01 / TH01-C` và `DT-11 / DT11-B`. Đây vẫn là khuyến nghị AI; `StorySpec` chỉ được materialize sau human gate.
+Kết quả tournament: 9 tournament, 180 concept, 27 opening và 81 chương mẫu. Blind editor đề cử `HX-04 / HX04-B`, `TH-01 / TH01-C` và `DT-11 / DT11-B`; human gate ngày 15/07/2026 đã duyệt cả ba cùng tên xuất bản trực diện. `materialize` đã tạo ba kernel riêng với foundation score lần lượt `9.7 / 9.7 / 9.4`. `write-openings` đã chạy đủ 9 chương 1–3: cả 9 verdict là `publish`, plan fidelity 10/10, trục thấp nhất từ 8.0 trở lên; TH-01 chương 1 dùng một revision có evidence, tám chương còn lại dùng đúng ba call. [Opening human gate](./materialized/opening-human-review.md) vẫn bắt buộc trước khi tạo project pilot. Hai lệnh không ghi production, không tạo project và không có content fallback.
 
 Tên catalogue đã qua [market-title audit V2](./title-market-audit-v2.md): tên xuất bản phải nói thẳng setup/cơ chế/payoff và được human gate duyệt riêng, không tái sử dụng nhãn ngắn do Concept Lab sinh. Ba opening thắng có [title options riêng](./finalist-title-options-v2.md).
 

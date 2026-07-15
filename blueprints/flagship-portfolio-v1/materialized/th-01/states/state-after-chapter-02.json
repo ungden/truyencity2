@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 2,
+  "chapterNumber": 2,
+  "facts": {
+    "nợ_hắc_thị": "Gia tộc đang nợ 300 linh thạch của hắc thị, hạn chót phải trả là sáng ngày mai.",
+    "trận_pháp_yếu": "Trận pháp cách âm bảo vệ Vọng Âm Cốc đang ở mức báo động, sắp vỡ vụn nếu mất đi linh điền phía nam.",
+    "khế_ước": "Đã bị xé nát",
+    "vị_thế": "Lâm Viễn tạm thời nắm quyền chỉ huy",
+    "khế_ước_bị_hủy": "Bản khế ước bán đất đã bị Lâm Viễn xé nát thành từng mảnh nhỏ.",
+    "tài_nguyên": "Hơn 400 khối Âm Thạch",
+    "nguy_hiểm": "Trận pháp nhánh hai sắp vỡ",
+    "nợ_được_giải_quyết": "Đã có đủ tài nguyên để trả nợ hắc thị vào sáng mai."
+  },
+  "timeline": [
+    {
+      "chapter": 0,
+      "event": "Lâm Viễn trọng sinh về đúng đêm trước khi đại bá Lâm Chấn định đóng dấu bán linh điền."
+    },
+    {
+      "chapter": 1,
+      "event": "thu hồi khế ước bán đất"
+    },
+    {
+      "chapter": 2,
+      "event": "hứng trọn mưa Âm Thạch"
+    }
+  ],
+  "cast": [
+    {
+      "name": "Lâm Viễn",
+      "status": "alive",
+      "location": "Đồi Mộc Lĩnh",
+      "knowledge": [
+        "Biết chính xác thời gian và địa điểm cơn mưa Âm Thạch sẽ rơi xuống trong đêm nay.",
+        "Đại bá vẫn còn đủ sức mạnh để tung ra một chưởng lực uy lực.",
+        "Sức mạnh của đao gió quá khứ mạnh hơn dự kiến rất nhiều."
+      ],
+      "relationshipToProtagonist": "Xác lập được uy tín tuyệt đối bằng hành động xả thân cứu người."
+    },
+    {
+      "name": "Lâm Chấn",
+      "status": "alive",
+      "location": "Đồi Mộc Lĩnh",
+      "knowledge": [
+        "Biết gia tộc đã cạn kiệt tài nguyên và không còn cách nào khác ngoài việc bán đất.",
+        "Lâm Viễn sẵn sàng đánh cược mạng sống để bảo vệ linh điền."
+      ],
+      "relationshipToProtagonist": "Từ chỗ tức giận chuyển sang dao động và tạm thời nghe theo sự sắp đặt của Lâm Viễn."
+    },
+    {
+      "name": "Lâm Mặc",
+      "status": "alive",
+      "location": "Đồi Mộc Lĩnh",
+      "knowledge": [
+        "Biết cách di chuyển nhẹ nhàng không phát ra tiếng động nhưng chưa nhận thức được giá trị của mình.",
+        "Lâm Viễn sẵn sàng hy sinh thân mình để bảo vệ cậu bé."
+      ],
+      "relationshipToProtagonist": "Trở nên trung thành tuyệt đối với Lâm Viễn, coi hắn như ân nhân cứu mạng."
+    },
+    {
+      "name": "Lâm Hải",
+      "status": "alive",
+      "location": "Đang ở khu nhà nhánh thứ hai, lo lắng về linh điền.",
+      "knowledge": [
+        "Biết rõ tình trạng thê thảm của lúa linh mạch nhưng không biết tiếng vọng rác sắp nổ."
+      ],
+      "relationshipToProtagonist": "Nhị thúc, người quản lý linh điền và là mầm mống phản loạn tương lai."
+    },
+    {
+      "name": "Lâm Tuyết",
+      "status": "alive",
+      "location": "Đang ở trong phòng riêng tại nhánh thứ hai.",
+      "knowledge": [
+        "Biết một số giai điệu cổ xưa nhưng chưa từng dám hát lớn tiếng."
+      ],
+      "relationshipToProtagonist": "Em họ có tài năng ca hát, người sẽ liên tục thách thức luật cấm khẩu."
+    }
+  ],
+  "resources": [
+    {
+      "resource": "Âm Thạch",
+      "amount": "Hơn 400 khối",
+      "source": "Thu hoạch từ cơn mưa tiếng vọng phúc lành của cụ tổ trên đồi Mộc Lĩnh.",
+      "lastChangedChapter": 2
+    },
+    {
+      "resource": "Hạn ngạch từ ngữ",
+      "amount": "Chưa áp dụng",
+      "source": "Mọi người vẫn đang giao tiếp tự do, tiêu hao sinh khí của trận pháp.",
+      "lastChangedChapter": 0
+    },
+    {
+      "resource": "Nước Ngầm Vang Vọng",
+      "amount": "Đang cạn kiệt",
+      "source": "Mạch nước ngầm chảy qua rễ cây Thanh Tùng đang ở mức thấp nhất trong năm.",
+      "lastChangedChapter": 0
+    },
+    {
+      "resource": "Trận Bàn Cách Âm",
+      "amount": "Cũ nát, sắp hỏng",
+      "source": "Trận bàn cốt lõi của gia tộc đã hoạt động quá tải nhiều năm chưa được thay thế.",
+      "lastChangedChapter": 0
+    }
+  ],
+  "promises": [
+    {
+      "id": "promise_1",
+      "status": "advanced",
+      "currentPressure": "Đất đã giữ được nhưng món nợ vẫn còn đó, cần tài nguyên gấp."
+    },
+    {
+      "id": "promise_2",
+      "status": "advanced",
+      "currentPressure": "Đã có đủ Âm Thạch, chỉ cần đem đi trả nợ là xong."
+    },
+    {
+      "id": "promise_3",
+      "status": "open",
+      "currentPressure": "Những tiếng chửi rủa từ 10 năm trước đang tích tụ dưới lòng đất nhánh hai, chực chờ phát nổ."
+    },
+    {
+      "id": "promise_4",
+      "status": "advanced",
+      "currentPressure": "Lâm Mặc đã chứng minh được giá trị, cần được giao nhiệm vụ quan trọng hơn."
+    },
+    {
+      "id": "promise_5",
+      "status": "open",
+      "currentPressure": "Lâm Tuyết cảm thấy ngột ngạt trong sự im lặng, khao khát được cất tiếng hát tự do."
+    }
+  ],
+  "recentSummary": "Chương 2: Cơn Mưa Phúc Lành Và Đao Gió Quá Khứ: hứng trọn mưa Âm Thạch Trạng thái mới: Hơn 400 khối Âm Thạch; Trận pháp nhánh hai sắp vỡ",
+  "previousEnding": "t vọng của một kẻ đã bị chôn sống tại đây mười năm trước, bị lẫn vào trong bài kinh của vị cao tăng. Âm thanh đó hấp thụ trọn vẹn luồng tử khí của đất trời, cô đặc lại thành một lưỡi đao gió màu đen tuyền, to bằng nửa thân người, không phát ra bất kỳ tiếng động nào khi xé rách không gian. Mục tiêu của nó không phải là những kẻ trưởng thành to lớn, mà lại hướng thẳng về phía nguồn sinh khí trong trẻo nhất đang đứng gần đó: Lâm Mặc. Lúc này, Lâm Mặc đang đứng trên một mỏm đá chênh vênh, hai tay cẩn thận nâng niu một viên đá đặc biệt. Đó là viên Âm Thạch lõi, to bằng cái bát lớn, trong suốt như pha lê, không tì vết. Nó là kết tinh thuần khiết nhất của bài kinh chúc phúc, là chìa khóa cực kỳ quan trọng để Lâm Viễn có thể nâng cấp trận pháp phòng thủ của gia tộc lên một cảnh giới mới. Thằng bé hoàn toàn không nhận ra cái chết đang lao đến từ phía điểm mù sau lưng. Nếu đao gió chém trúng, Lâm Mặc chắc chắn sẽ bị xẻ làm đôi. Nhưng điều tồi tệ hơn là, nếu thằng bé bị thương và theo bản năng phát ra dù chỉ là một tiếng kêu ú ớ nghẹn ngào vì đau đớn, âm thanh tạp nham đó sẽ lập tức phá vỡ cấu trúc hoàn hảo của viên Âm Thạch lõi, biến mọi nỗ lực đêm nay thành một vụ nổ chết chóc. Lâm Viễn nhìn thấy. Đồng tử hắn co rụt lại bằng đầu kim. Khoảng cách quá xa. Tốc độ của đao gió quá nhanh. Hắn không thể vươn tay kéo thằng bé lại kịp. Hắn cũng không thể dùng âm thanh để cảnh báo, vì luật cấm ngôn đang khóa chặt thanh quản, và bất cứ âm thanh nào phát ra lúc này cũng sẽ tạo thành một gợn sóng hủy diệt viên Âm Thạch lõi. Quyết định được đưa ra trong một phần nghìn nhịp thở. Không có thời gian do dự. Không có quyền mưu tính sâu xa. Lâm Viễn đạp mạnh chân xuống đất, mượn lực đẩy toàn bộ cơ thể bay vọt lên không trung. Xương sườn gãy của hắn đâm phập vào phổi, nhưng hắn phớt lờ. Hắn biến cơ thể mình thành một tấm khiên thịt, lao thẳng vào giữa đường bay của lưỡi đao gió đen kịt và bóng lưng nhỏ bé của Lâm Mặc. Phập! Một âm thanh rợn người vang lên. Lưỡi đao gió mang theo sự oán hận của mười năm trước chém phăng lớp giáp sắt sau lưng Lâm Viễn như chém vào đậu hũ. Lớp thép vỡ vụn. Đao khí lạnh buốt xé toạc lớp da thịt, cày sâu vào tận xương sống. Máu tươi xịt ra như suối, nhuộm đỏ cả một vạt đất cằn cỗi. Lực va chạm khủng khiếp hất tung Lâm Viễn đập mạnh vào người Lâm Mặc. Cả hai anh em lăn lông lốc xuống sườn đồi, va đập vào những rễ cây Thanh Tùng lởm chởm. Trong khoảnh khắc đau đớn tột cùng, lục phủ ngũ tạng như bị thiêu đốt, kinh mạch nứt nẻ vì chấn động lực lượng, Lâm Viễn vẫn cắn ngập hàm răng vào miếng gỗ Thanh Tùng. Hắn cắn mạnh đến mức răng cửa rạn nứt, máu từ lợi túa ra hòa lẫn với vị mặn chát của mồ hôi. Hắn dùng toàn bộ ý chí của một kẻ đã từng nhìn thấy gia tộc diệt vong để nuốt ngược tiếng thét gào đau đớn vào trong bụng. Hắn không cho phép bất kỳ một thanh âm nào thoát ra. Sự tĩnh lặng lúc này được đánh đổi bằng máu và sinh mạng của chính hắn. Bụi đất lắng xuống. Đội ngũ hai mươi người chết lặng. Lâm Chấn trợn trừng mắt. Lâm Hải há hốc mồm, quên cả sự sợ hãi. Lâm Tuyết đưa tay bịt chặt miệng để ngăn mình khỏi nấc lên. Tất cả bọn họ vừa chứng kiến vị gia chủ lâm thời tàn nhẫn, kẻ vừa ép họ ngậm gỗ cấm ngôn, đã không ngần ngại lấy nhục thể của mình để che chắn cho đứa trẻ câm bẩm sinh vô dụng nhất gia tộc. Dưới chân dốc, Lâm Viễn nằm sấp trên mặt đất, hơi thở thoi thóp, tấm lưng bê bết máu thịt lẫn lộn. Lớp giáp sắt chỉ còn là những mảnh vụn cắm sâu vào da thịt. Nhưng đôi cánh tay đầy sẹo của hắn vẫn vươn ra, tạo thành một vòng cung bảo vệ vững chắc. Nằm gọn trong vòng tay đó là Lâm Mặc. Thằng bé không bị một vết xước nào. Đôi mắt to tròn của nó ngấn nước, trân trân nhìn tấm lưng be bét máu của người anh họ. Từ lúc sinh ra đến giờ, nó luôn bị coi là gánh nặng, là phế vật, chưa từng có ai dùng mạng sống để bảo vệ nó như vậy. Trong khoảnh khắc đó, một thứ tình cảm mãnh liệt, một sự trung thành tuyệt đối và bất diệt đã khắc sâu vào linh hồn thằng bé câm. Nó gạt đi nước mắt, hai bàn tay nhỏ xíu siết chặt lấy viên Âm Thạch lõi vẫn còn phát sáng rực rỡ và tinh khiết. Viên đá quý giá nhất đã được bảo toàn nguyên vẹn. Ân tình này, nó sẽ dùng cả đời tĩnh lặng của mình để báo đáp. Lâm Viễn khó nhọc chống một tay xuống đất, cố gắng nâng nửa thân trên lên. Hắn nhổ miếng gỗ Thanh Tùng nhuốm máu ra khỏi miệng. Thuốc câm hết tác dụng, nhưng hắn không rên la, chỉ thở hắt ra một hơi dài nặc mùi tanh. Hắn liếc nhìn viên Âm Thạch lõi trong tay Lâm Mặc, rồi gật đầu nhẹ. Thế là đủ. Trận cược này, hắn đã thắng. Uy tín của hắn giờ đây không chỉ được xây bằng sự áp đặt tàn nhẫn, mà bằng chính máu thịt và sự hy sinh không thể chối cãi. Đám người Lâm Chấn, Lâm Hải lục tục chạy tới, vội vã đỡ Lâm Viễn dậy, trong ánh mắt họ không còn sự hoài nghi hay chống đối, chỉ còn lại sự kính sợ sâu sắc. Bốn trăm khối Âm Thạch đã được thu gom gọn gàng. Món nợ hắc thị ngày mai không còn là mối đe dọa. Sự sống còn của linh điền đã được đảm bảo. Thế nhưng, đúng vào lúc mọi người tưởng chừng như đã có thể an tâm rút lui để băng bó vết thương, một biến cố khác lại ập đến. Không phải từ trên bầu trời Mộc Lĩnh, mà là từ dưới thung lũng Vọng Âm. Dưới chân núi, nơi tọa lạc khu nhà của nhánh thứ hai do Lâm Hải quản lý, một luồng ánh sáng đỏ rực như máu bất thần bùng phát, chiếu sáng cả một góc trời. Các đường vân của trận bàn cách âm bảo vệ khu vực đó rung lên bần bật, phát ra những tiếng răng rắc chói tai của thứ vật chất đang bị ép đến giới hạn vỡ vụn. Mặt đất dưới chân Lâm Hải rung chuyển nhẹ. Lão biến sắc, đôi mắt hiện lên sự hoảng loạn tột độ. Đó là báo hiệu của những tiếng vọng thù hận, những lời chửi rủa rác rưởi mà lão và các thành viên nhánh hai đã gieo rắc trên linh điền mười năm về trước. Độ trễ thời gian đã hết. Âm thanh của quá khứ đã ủ đủ oán khí và đang hội tụ lại thành một quả bom âm thanh khổng lồ dưới lòng đất. Trận pháp phòng thủ của nhánh hai đang quá tải và sắp sửa nổ tung, đe dọa nuốt chửng toàn bộ khu nhà và phá hủy linh điền lõi kế bên. Hậu quả của những cảm xúc bộc phát vô kỷ luật cuối cùng cũng đã hiển hiện để đòi nợ máu.",
+  "retrievalNotes": [
+    "Nhớ kỹ quy tắc vòng gỗ Thanh Tùng sẽ siết cổ nếu nói quá nhiều.",
+    "Độ trễ tiếng vọng là 10 năm, mọi hành động hôm nay sẽ dội lại vào tương lai."
+  ]
+}

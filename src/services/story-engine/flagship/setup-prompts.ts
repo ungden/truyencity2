@@ -9,7 +9,7 @@ import type {
 } from './setup-contracts';
 import type { BenchmarkConceptGuidanceV1 } from './chinese-benchmark';
 
-export const FLAGSHIP_SETUP_PROMPT_VERSION = 'flagship-setup-v2.15-direct-market-title';
+export const FLAGSHIP_SETUP_PROMPT_VERSION = 'flagship-setup-v2.16-ledger-contract';
 
 export const CONCEPT_LAB_SYSTEM = `Bạn phụ trách Concept Lab cho đúng một brief truyện.
 Tạo 20 cơ chế truyện khác nhau về nguyên nhân vận hành, lựa chọn của nhân vật và nguồn xung đột; đổi tên, nghề hoặc trope không được tính là khác.
@@ -138,7 +138,18 @@ function launchContract(input: Parameters<typeof buildLaunchPackPrompt>[0]) {
       volumeSpine: Array.from({ length: 3 }, (_, index) => ({ name: `Volume ${index + 1}`, direction: '...', terminalChange: '...' })),
     },
     arcPlan: { schemaVersion: 2, arcId: 'arc_1', startChapter: 1, endChapter: 30, direction: '...', terminalChange: '...', activeConflicts: [{ actor: '...', objective: '...', leverage: '...', nextMove: '...' }], duePromises: ['promise_1'], rollingBeats: [{ chapterRange: '1-5', pressure: '...', causalChange: '...' }, { chapterRange: '6-10', pressure: '...', causalChange: '...' }] },
-    storyState: { schemaVersion: 2, chapterNumber: 0, facts: {}, timeline: [], cast: [], resources: [], promises: [], recentSummary: '', previousEnding: '', retrievalNotes: [] },
+    storyState: {
+      schemaVersion: 2,
+      chapterNumber: 0,
+      facts: {},
+      timeline: [],
+      cast: [input.characters.protagonist, ...input.characters.cast].map(character => ({ name: character.name, status: 'alive', location: 'địa điểm cụ thể lúc mở truyện', knowledge: ['tri thức cụ thể nhân vật đang nắm'], relationshipToProtagonist: 'quan hệ cụ thể với nhân vật chính' })),
+      resources: input.world.resources.map(resource => ({ resource: resource.resource, amount: 'số lượng hoặc trạng thái ban đầu cụ thể', source: 'nguồn ban đầu phù hợp causal world', lastChangedChapter: 0 })),
+      promises: Array.from({ length: 5 }, (_, index) => ({ id: `promise_${index + 1}`, status: 'open', currentPressure: 'áp lực cụ thể ở thời điểm chương 0' })),
+      recentSummary: '',
+      previousEnding: '',
+      retrievalNotes: [],
+    },
     rollingChapterPlans: [1, 2, 3, 4, 5].map(plan),
     status: 'awaiting_story_spec_approval',
   };
@@ -156,5 +167,5 @@ export function buildLaunchPackPrompt(input: {
 
 OUTPUT_CONTRACT_EXACT=${json(launchContract(input))}
 
-Chỉ dùng đúng các key trong contract. Các mảng phải đạt cardinality của ví dụ/schema; mỗi ChapterPlan có 2-5 scenes dù contract chỉ minh họa một scene. StorySpec.title phải sao chép chính xác HUMAN_SELECTION.approvedTitle; workingTitle của Concept Lab chỉ là nhãn nội bộ và không được dùng làm tên xuất bản. StorySpec phải sao chép chính xác genreLane, pleasureProfile, readerFantasy, premise, protagonist, cast, causalWorldRules và resourceEconomy từ artifact đã duyệt. serialityEngine.recurringSituation phải giữ serialityProof và variationAxes phải sao chép đúng ba worldProof.signatureSituations đã thắng tournament; progressionCurrencies phải có nguồn, cách tiêu và dấu hiệu độc giả nhìn thấy. StoryState chương 0 phải chứa toàn bộ cast, resources và promises. Arc đầu phủ chương 1-20 đến tối đa 30. rollingChapterPlans chỉ gồm chương 1-5; plan chương 1-3 phải chứa nguyên văn requiredPlanAnchor tương ứng.`;
+Chỉ dùng đúng các key trong contract. Các mảng phải đạt cardinality của ví dụ/schema; storyIdentity.domainTruthSources có ít nhất 3 mục, forbiddenGenericMoves có ít nhất 5 mục và similarityRisks có ít nhất 3 mục; mỗi ChapterPlan có 2-5 scenes dù contract chỉ minh họa một scene. Mọi trường mô tả của scene, kể cả payoff, phải là câu cụ thể dài ít nhất 20 ký tự; không dùng "không có", nhãn rút gọn hoặc câu chung chung. StorySpec.title phải sao chép chính xác HUMAN_SELECTION.approvedTitle; workingTitle của Concept Lab chỉ là nhãn nội bộ và không được dùng làm tên xuất bản. StorySpec phải sao chép chính xác genreLane, pleasureProfile, readerFantasy, premise, protagonist, cast, causalWorldRules và resourceEconomy từ artifact đã duyệt. serialityEngine.recurringSituation phải giữ serialityProof và variationAxes phải sao chép đúng ba worldProof.signatureSituations đã thắng tournament; progressionCurrencies phải có nguồn, cách tiêu và dấu hiệu độc giả nhìn thấy. StoryState chương 0 phải chứa toàn bộ cast, resources và promises. Arc đầu phủ chương 1-20 đến tối đa 30. rollingChapterPlans chỉ gồm chương 1-5; plan chương 1-3 phải chứa nguyên văn requiredPlanAnchor tương ứng.`;
 }

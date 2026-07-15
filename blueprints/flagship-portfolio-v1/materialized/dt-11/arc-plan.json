@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 2,
+  "arcId": "arc_1",
+  "startChapter": 1,
+  "endChapter": 30,
+  "direction": "Thiết lập chỗ đứng trong giới đồ cổ thông qua việc xây dựng thư viện tiêu bản và chứng minh năng lực khoa học.",
+  "terminalChange": "Hoàng chuyển từ một kỹ sư nghèo bị chèn ép thành chuyên gia có tiếng nói quyết định, buộc giới buôn lậu phải kiêng dè.",
+  "activeConflicts": [
+    {
+      "actor": "Lão Tuấn",
+      "objective": "Tiêu diệt uy tín của Hoàng để bảo vệ đường dây bán hàng giả.",
+      "leverage": "Tiền bạc dồi dào và mạng lưới giang hồ đe dọa vật lý.",
+      "nextMove": "Cắt đứt nguồn cung tiêu bản của Hoàng và gài bẫy bằng một món đồ giả tinh vi."
+    },
+    {
+      "actor": "Ông Tường",
+      "objective": "Bảo vệ quyền lực định giá của Hội đồng Thẩm định trước phương pháp khoa học của Hoàng.",
+      "leverage": "Uy tín học thuật lâu năm và khả năng thao túng dư luận giới sưu tầm.",
+      "nextMove": "Phủ nhận giá trị pháp lý của các mảnh tiêu bản trong một hội thảo công khai."
+    }
+  ],
+  "duePromises": [
+    "promise_1",
+    "promise_2",
+    "promise_3"
+  ],
+  "rollingBeats": [
+    {
+      "chapterRange": "1-10",
+      "pressure": "Áp lực tài chính đè nặng và những lời đe dọa vật lý từ đường dây buôn lậu.",
+      "causalChange": "Hoàng giải quyết được vấn đề tiền thuê xưởng và có được những mảnh tiêu bản chuẩn đầu tiên."
+    },
+    {
+      "chapterRange": "11-20",
+      "pressure": "Bị cắt đứt nguồn cung cấp tiêu bản và bị bôi nhọ danh dự trên các diễn đàn đồ cổ.",
+      "causalChange": "Hoàng tự xây dựng được mạng lưới thu mua độc lập và nắm được điểm yếu của công nghệ làm giả."
+    },
+    {
+      "chapterRange": "21-30",
+      "pressure": "Đối mặt với sự chèn ép từ quyền lực học thuật cấp cao của Hội đồng Thẩm định.",
+      "causalChange": "Hoàng lật đổ thành công một ủy viên hội đồng, chính thức hóa giá trị của thư viện tiêu bản."
+    }
+  ]
+}

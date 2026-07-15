@@ -4,7 +4,7 @@ import type { StyleDirectives } from '../types';
 import { callGemini } from '../utils/gemini';
 import { getSupabase } from '../utils/supabase';
 import { classifyStoryFailure } from '@/lib/story-production-quota';
-import { assembleFlagshipContext } from './context';
+import { assembleFlagshipRoleContexts } from './context';
 import {
   parseArcPlanV2,
   parseChapterPlanV2,
@@ -158,16 +158,49 @@ export async function writeFlagshipChapter(
     const preparedPlan = parseChapterPlanV2((blueprint?.meta as { chapterPlanV2?: unknown } | null)?.chapterPlanV2);
     if (!preparedPlan.success) throw issues('ChapterPlanV2', preparedPlan);
 
-    const context = assembleFlagshipContext([
-      { id: 'story-spec-v2', layer: 'canon', priority: 100, required: true, content: JSON.stringify(spec.data), sourceRef: 'ai_story_projects.story_spec_v2' },
-      { id: 'arc-plan-v2', layer: 'plan', priority: 100, required: true, content: JSON.stringify(arc.data), sourceRef: 'ai_story_projects.arc_plan_v2' },
-      { id: 'chapter-plan-v2', layer: 'plan', priority: 95, required: true, content: JSON.stringify(preparedPlan.data), sourceRef: `chapter_blueprints:${nextChapter}` },
-      { id: 'story-state-v2', layer: 'state', priority: 100, required: true, content: JSON.stringify(state.data), sourceRef: 'ai_story_projects.story_state_v2' },
-    ]);
-    contextSize = context.totalChars;
+    const voiceContract = {
+      storyIdentity: spec.data.storyIdentity,
+      pleasureProfile: spec.data.pleasureProfile,
+      readerFantasy: spec.data.readerFantasy,
+      premise: spec.data.premise,
+      protagonist: spec.data.protagonist,
+      cast: spec.data.cast,
+      causalWorldRules: spec.data.causalWorldRules,
+      resourceEconomy: spec.data.resourceEconomy,
+    };
+    // Keep Writer/Editor focused on the current window.  Long-range history
+    // remains in StoryStateV2 for the Director, while only the recent delta
+    // and the committed ending are sent to prose-oriented roles.
+    const relevantState = {
+      ...state.data,
+      timeline: state.data.timeline.slice(-12),
+      retrievalNotes: state.data.retrievalNotes.slice(-4),
+    };
+    // Each role receives only its own bounded context.  The same bundle is
+    // never handed to all three calls, so budgets are enforceable in practice
+    // and editor/revision instructions cannot leak into Writer input.
+    const roleContexts = assembleFlagshipRoleContexts({
+      director: [
+        { id: 'story-spec-v2', layer: 'canon', priority: 100, required: true, content: JSON.stringify(spec.data), sourceRef: 'ai_story_projects.story_spec_v2' },
+        { id: 'arc-plan-v2', layer: 'plan', priority: 100, required: true, content: JSON.stringify(arc.data), sourceRef: 'ai_story_projects.arc_plan_v2' },
+        { id: 'chapter-plan-v2', layer: 'plan', priority: 95, required: true, content: JSON.stringify(preparedPlan.data), sourceRef: `chapter_blueprints:${nextChapter}` },
+        { id: 'story-state-v2', layer: 'state', priority: 100, required: true, content: JSON.stringify(state.data), sourceRef: 'ai_story_projects.story_state_v2' },
+      ],
+      writer: [
+        { id: 'voice-contract-v2', layer: 'canon', priority: 100, required: true, content: JSON.stringify(voiceContract), sourceRef: 'ai_story_projects.story_spec_v2:voice' },
+        { id: 'chapter-plan-v2', layer: 'plan', priority: 100, required: true, content: JSON.stringify(preparedPlan.data), sourceRef: `chapter_blueprints:${nextChapter}` },
+        { id: 'relevant-state-v2', layer: 'state', priority: 100, required: true, content: JSON.stringify(relevantState), sourceRef: 'ai_story_projects.story_state_v2:recent' },
+      ],
+      editor: [
+        { id: 'editor-canon-v2', layer: 'canon', priority: 100, required: true, content: JSON.stringify({ protagonist: spec.data.protagonist, cast: spec.data.cast, rules: spec.data.causalWorldRules, economy: spec.data.resourceEconomy, pleasureProfile: spec.data.pleasureProfile }), sourceRef: 'ai_story_projects.story_spec_v2:editor' },
+        { id: 'chapter-plan-v2', layer: 'plan', priority: 100, required: true, content: JSON.stringify(preparedPlan.data), sourceRef: `chapter_blueprints:${nextChapter}` },
+        { id: 'relevant-state-v2', layer: 'state', priority: 100, required: true, content: JSON.stringify(relevantState), sourceRef: 'ai_story_projects.story_state_v2:recent' },
+      ],
+    });
+    contextSize = roleContexts.totalChars;
     await updateWriteRunTelemetry(run, {
-      contextSizeChars: context.totalChars,
-      contextManifest: context.manifest,
+      contextSizeChars: roleContexts.totalChars,
+      contextManifest: roleContexts.manifest,
       promptVersion: FLAGSHIP_PROMPT_VERSION,
       modelRoute: modelRoutes,
     });
@@ -189,10 +222,11 @@ export async function writeFlagshipChapter(
       generated = await executeFlagshipPipeline({
         storySpec: spec.data,
         arcPlan: arc.data,
-        storyState: state.data,
-        preparedPlan: preparedPlan.data,
-        targetWordCount,
-      }, { invoke });
+      storyState: state.data,
+      preparedPlan: preparedPlan.data,
+      targetWordCount,
+      roleContexts,
+    }, { invoke });
     } catch (modelError) {
       if (modelError instanceof FlagshipPipelineError) throw modelError;
       const message = modelError instanceof Error ? modelError.message : String(modelError);
@@ -218,7 +252,7 @@ export async function writeFlagshipChapter(
       p_resource_ledger: nextState.resources,
       p_promise_ledger: nextState.promises,
       p_run_id: run.id,
-      p_context_manifest: context.manifest,
+      p_context_manifest: roleContexts.manifest,
       p_editor_evidence: generated.editorEvidence,
       p_revision_lineage: generated.revisionLineage,
       p_prompt_version: FLAGSHIP_PROMPT_VERSION,

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "slotId": "HX-04",
+  "chapterNumber": 3,
+  "role": "editor",
+  "model": "gemini-3.5-flash",
+  "promptHash": "4dea7f12b10d58d3ef851ca4ea4f594505b8ffa4d5171137071ebe967d3be1d6",
+  "promptTokens": 11872,
+  "completionTokens": 238,
+  "finishReason": "STOP",
+  "content": "{\n  \"decision\": \"publish\",\n  \"confidence\": 0.95,\n  \"planFidelity\": 10,\n  \"hardGates\": {\n    \"canon\": true,\n    \"timeline\": true,\n    \"resourceCausality\": true,\n    \"characterKnowledge\": true,\n    \"authority\": true,\n    \"promptLeak\": true,\n    \"planFidelity\": true\n  },\n  \"axes\": {\n    \"premise_interest\": 9,\n    \"character_voice\": 9,\n    \"scene_tension\": 9,\n    \"causal_surprise\": 9,\n    \"emotional_movement\": 9,\n    \"domain_truth\": 9,\n    \"prose_naturalness\": 9,\n    \"agency\": 9,\n    \"earned_pleasure\": 9,\n    \"recovery_pacing\": 9,\n    \"desire_to_read_next\": 9\n  },\n  \"evidence\": [],\n  \"revisionInstructions\": []\n}"
+}

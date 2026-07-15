@@ -1,0 +1,277 @@
+{
+  "schemaVersion": 1,
+  "catalogueId": "flagship-first-30-catalogue",
+  "generatedAt": "2026-07-13T11:00:00.000Z",
+  "entries": [
+    {
+      "slotId": "HX-01",
+      "title": "Đi Kiểm Định Dị Tượng, Tôi Phát Hiện Thành Phố Này Có Luật Giết Người",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "5f68ab9099556dc9f83df9a8a38f9541241743243c25dc9c9cc589c1504ecb32",
+      "renderedSha256": "fb02cf598958aa089e3d1759de82093ec3013f7955250f756ed22022cf327dd7"
+    },
+    {
+      "slotId": "HX-02",
+      "title": "Võ Sư Hạng Bét Trực Đêm: Nhìn Sai Số, Cứu Cả Khu Phố",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "0283900560e6718139bbda213869c078d2ef4aebbc537c2539d931206b71ff88",
+      "renderedSha256": "b178e360f0b91896741c891f59768998a4a7aaf1ee108bcd94219a492d768c1e"
+    },
+    {
+      "slotId": "HX-03",
+      "title": "Xuyên Đến Vùng Biên Nuôi Linh Thú, Tôi Dựng Lại Gia Nghiệp",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "706dc1c728b4410f7bc61275455d14679819b7f169ec13bb7574d8e96b7f233e",
+      "renderedSha256": "cf85ef038635268c1a22306e72a61661554712d5cc99601cb303fec63483d970"
+    },
+    {
+      "slotId": "HX-04",
+      "title": "Bảo Tôi Xây Thành Trên Tro Trắng, Tôi Lại Bắt Đầu Bằng Lịch Thay Đá",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "6a66ed2284d28c3e9ff98fbce0d7dfb9a7c6091029779dfc1eed888c225d7291",
+      "renderedSha256": "01011a25d26dd87448b17f55c788f5fd45eebfdd3fb270260e2cf5daca8d35ea"
+    },
+    {
+      "slotId": "HX-05",
+      "title": "Trọng Sinh Về Xưởng Luyện Khí, Tôi Dùng Phế Liệu Dựng Cơ Nghiệp",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "7d50d4936d6e221a917b51d01cc0a704f8676b72e9542f04caeca8814d2622f0",
+      "renderedSha256": "9e6e2d5094c01ad571211b80adae23e8c443818aea15c494d38148e2fad3dd1c"
+    },
+    {
+      "slotId": "HX-06",
+      "title": "Tận Thế Mất Điện: Khôi Phục Máy Bơm, Dựng Lại Từng Khu Phố",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "29233bbaf46c081d19625b31414e841803298091f0afae090dd17839e238749f",
+      "renderedSha256": "6f44c13e92b9d32d6a0aad0cec25c373fa36367edbbacb494f75f7aea42b675c"
+    },
+    {
+      "slotId": "HX-07",
+      "title": "Bảo Tôi Làm Phản Diện, Tôi Bán Gia Sản Tự Mua Đường Sống",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "bd5a922d7c994f981b57a09c71fd8e5a933c534c29acdff26cd1a78345112d89",
+      "renderedSha256": "9793f6d05470f4aa7da7b49ef9d54de7ed6a8602d20be4a411e5981d2b92ea66"
+    },
+    {
+      "slotId": "TH-01",
+      "title": "Trọng Sinh Về Gia Tộc Tu Tiên, Tôi Gieo Tiếng Vọng Cho Mười Năm Sau",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "7485d3fc94d980549a6f80389b55e774f783465c3640aee4c654a2c0a55032a8",
+      "renderedSha256": "ce515d549d2b187a2c88875cf758b02a36f13742310c4aea09e1baabf39dd987"
+    },
+    {
+      "slotId": "TH-02",
+      "title": "Bảo Tôi Dạy Đám Đệ Tử Bị Loại, Họ Lại Dựng Lại Tiên Môn",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "5b7ae5ec37bc9303744479827c2e85ff5a4834e8c985f8b745d23127ce0b6bfe",
+      "renderedSha256": "7214e196954dd48f5aa9efa590810821cd3b3687554be998dfea2b3bfccc96ae"
+    },
+    {
+      "slotId": "TH-03",
+      "title": "Xuyên Đến Tiên Môn, Tôi Biến Tu Tiên Thành Một Môn Khoa Học",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "de0ab33b1d2c3c929939a9a558cfc3e42218df72aee27d9c9eeb093d266f1b53",
+      "renderedSha256": "1a1af2988f0f628ddb28b887e95f87ff0442d8e8c5338bb16ca225e3508c88e8"
+    },
+    {
+      "slotId": "TH-04",
+      "title": "Tu Tiên Mô Phỏng: Mỗi Kiếp Tôi Chỉ Được Mang Về Một Thứ",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "35b0cd25032c93aaa2e82dc7fa60f17c11d408777816a6cd88bcd5c8ffd29776",
+      "renderedSha256": "520f71b84b38cca09abdd3a240741d123644e9128eb6976ac67da1060da53325"
+    },
+    {
+      "slotId": "TH-05",
+      "title": "Y Tu Mở Quán Dưới Tiên Sơn, Chữa Một Người Để Cứu Cả Làng",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "b375df47dae429db7615db173d27ae7e929381d93bf9768b30091a2952d4d6e7",
+      "renderedSha256": "5f4bc2289a0c527dfc169121a6bdd68976edb7089558396f61f5a1a73572276f"
+    },
+    {
+      "slotId": "DT-01",
+      "title": "Trọng Sinh Về Làng Biển, Tôi Biến Cá Rẻ Thành Cơ Nghiệp Cả Nhà",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "186651f19ae353d5b8b2a40db6f1ca20b0e80b2158d323094f80bd89d745b03e",
+      "renderedSha256": "a4374b6acb05b01f09889674cd986515c08e8ee7880bf69aa7ab24dccc57bfbb"
+    },
+    {
+      "slotId": "DT-02",
+      "title": "Trọng Sinh Về Bản Núi, Một Tay Dẫn Cả Bản Làm Giàu Từ Lộc Rừng",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "470b83508860d427fa6e8bd27ce22e247b561a6b4a704ccafa7b7f9e7c42856a",
+      "renderedSha256": "97c87e2d5d917e47f1d525df2ddff58343a230117de7e09a8b730cf57f009bfa"
+    },
+    {
+      "slotId": "DT-03",
+      "title": "Trọng Sinh Năm 1989: Dùng Tiền Cưới Mua Máy Phế Liệu Mở Xưởng",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "c19810dad9cda96e37b7f4d98e8b6fb2a8d6fb4cad705d32f7c6564b68f0fd11",
+      "renderedSha256": "10330181ef1b2ad557ad816d3c8fe754c3a71361e1ea1ac183aacfdcbd251b09"
+    },
+    {
+      "slotId": "DT-04",
+      "title": "Về Quê Chăm Mẹ, Tôi Mở Bếp Theo Mùa Nuôi Cả Nhà",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "319fdb45d95514c892d22673df0cf54306df2c9e458965554971a0310654ce97",
+      "renderedSha256": "c97bf96c0d8bd4796d6209c443ce884b1027d12c98d8c78447d6b73221a9bb8c"
+    },
+    {
+      "slotId": "DT-05",
+      "title": "Cổng Song Xuyên Chỉ Mở Khi Mưa, Tôi Mang Máy Lọc Nước Đổi Hàng",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "917fb4cf907aa4896d426f6b10da68f4abf7e1fa5194f638dd7d4a53b8816d60",
+      "renderedSha256": "2a397fe6ab5c9afc58aadd24dfc3508a1f08e75fd754d3b42961aa5609e3132a"
+    },
+    {
+      "slotId": "DT-06",
+      "title": "Xuyên Đến Giới Giải Trí, Tôi Không Chép Nhạc Vẫn Thành Nhà Sản Xuất",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "eaf8c0f8daf206b5be1f3e5b44586d0a61f47fb0b401cf91d0cff6454c12a76d",
+      "renderedSha256": "bc4cce5a1aa0cfdf207f08ac640ea455f743173b28985c38cfd6fdbfe7f24a5b"
+    },
+    {
+      "slotId": "DT-07",
+      "title": "Trọng Sinh Khi Con Gái Còn Nhỏ, Lần Này Tôi Nhất Định Về Nhà Sớm",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "25c767b87c552bc04fe64ba4a0443820d5e1dacee8e3455e085b2e2da61738de",
+      "renderedSha256": "c7e6c86fde6ccbaf2e688f837f84b7cb6b210da35e2d3bb873d37dab386d0b1a"
+    },
+    {
+      "slotId": "DT-08",
+      "title": "Tiếp Quản Kho Hàng Nhà Mình, Tôi Dùng Một Tuyến Xe Cứu Cả Phố Cũ",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "81ce232b2e62c4a59d916dff6f7fdc48b5eaf64c0363f31259b2d6c0373d28f1",
+      "renderedSha256": "8726caabee786023ba77da5a421d74a4e5bbe0f4d35c8cd2afe62d04282710e6"
+    },
+    {
+      "slotId": "DT-09",
+      "title": "Bảo Tôi Làm Phản Diện Cướp Dự Án, Tôi Lại Nghỉ Việc Tự Khởi Nghiệp",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "9b649d9ae374a5971a6d974ec6f3b94ec8a28a387b9331d20cc7b1e1de793f0f",
+      "renderedSha256": "7fc7dfd1d814543cf3ea8f48e223227d58f43ffae55e611ecd46247b515932a6"
+    },
+    {
+      "slotId": "DT-10",
+      "title": "Bảo Tôi Lập Bang Đánh Boss, Tôi Lại Mở Dịch Vụ Cho Cả Máy Chủ",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "09952f1b4446c948610d2709053cdd3fc2099540b038f6da4d58f12790ffdf39",
+      "renderedSha256": "e8a8cb678687b38d350aa69b595c1e12214a9eb6290e475833197cd9b89cb79a"
+    },
+    {
+      "slotId": "DT-11",
+      "title": "Giám Bảo Gốm Cổ: Tôi Chạm Một Lần, Biết Nó Được Nung Bằng Lửa Gì",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "b9fbce1b260a225c33afeea661e60c0dc658cdb3f0e6e32b0a5a1f1f9956226b",
+      "renderedSha256": "c223eb1abb7fb411baf7d54b0c3f10d992d983c255fac4bd3da1350fd4b451f3"
+    },
+    {
+      "slotId": "DT-12",
+      "title": "Từ Ghế Dự Bị Đến Suất Đá Chính: Đọc Nhịp Trận Đấu Để Đổi Đời",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "8c536d63d46cb228f4be590fd8317de93b2a8aa4fa2d78bad563d5848afdc31a",
+      "renderedSha256": "93b8e5cd6982c3f8529f0c4a5122c8b5ef8b3c080563a5d6ce28fd71835c36e3"
+    },
+    {
+      "slotId": "DT-13",
+      "title": "Bác Sĩ Cấp Cứu Không Hệ Thống: Chỉ Dựa Chẩn Đoán Vẫn Cứu Được Người",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "17704f3283d7651fa7c80936e753227385b922ded9c4c388406c427967ea510a",
+      "renderedSha256": "1f725b895e32c68ff719867c6802b1e4478d4d479fcb7e061c806771f89993e8"
+    },
+    {
+      "slotId": "DT-14",
+      "title": "Xuyên Đến Dị Giới, Tôi Dùng Kỹ Thuật Cấp Nước Xây Lại Cả Thành Phố",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "632f61610b60a1edb34bc966f74143d815f21d2fe7585dbba20bea2f6de6c847",
+      "renderedSha256": "900e6430db14d619a58609ec5f91e8812c26bf09ccb77c62584d4056539bbd26"
+    },
+    {
+      "slotId": "DT-15",
+      "title": "Đội Xe Sắp Giải Tán: Từ Chuyến Hàng Đầu Tiên Đến Nghiệp Vận Tải Đường Dài",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "184a504de056f6768d8d9e5e8b9fa92363c5f0808886cd759881883e71fbd422",
+      "renderedSha256": "cd285fbdc307b7cd0d387348dd8fc653b52f8f3c6d2f4d7518c1572c86682eaf"
+    },
+    {
+      "slotId": "DT-16",
+      "title": "Về Phố Nhỏ Mở Quán, Tôi Dùng Món Theo Mùa Nuôi Khách Quen",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "1ae2f9f9e094d4dbced553835b5afc808f80fc6ff74d4bc091c40b344c6d5adf",
+      "renderedSha256": "a48509377df092d7caa9b13c68b62a54e162617f081a2f098f7cff36d9a74e1a"
+    },
+    {
+      "slotId": "DT-17",
+      "title": "Cổng Song Xuyên Mỗi Ngày Chỉ Chở Một Tấn, Tôi Mang Nước Cứu Làng Hạn Hán",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "35e52da6839bda924859d30fbc9f2fc23ae37f493ffb58f9be87618858871e88",
+      "renderedSha256": "b4227cae4a245311a4166c68f41b595360f37c2b04203e3072e8bf215ad3af48"
+    },
+    {
+      "slotId": "DT-18",
+      "title": "Xuyên Nhanh Làm Nghề: Mỗi Thế Giới Tôi Chỉ Được Giữ Một Kỹ Năng",
+      "watermark": "truyencity.com",
+      "width": 1086,
+      "height": 1448,
+      "sourceSha256": "f9b4adf1015d795b2fb8b885c9f32a801ae8ce5639902703119c890f787b5413",
+      "renderedSha256": "4b7c1b51a99f9316b969bdaf1c0748c1576b3e2b0d376f2b7cd11bcc5d1b6efe"
+    }
+  ]
+}

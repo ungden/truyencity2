@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 2,
+  "chapterNumber": 2,
+  "facts": {
+    "kênh_số_4_nguy_kịch": "Hơn nửa số đá lót kênh đang ở tháng thứ 3 chuẩn bị mủn, nguy cơ vỡ kênh diện rộng rất cao.",
+    "kênh_tình_trạng": "Tạm ổn nhưng Khang bị trừ nước và đắc tội nhiều bên",
+    "sự_cố_kênh_4": "Đã được Khang ngăn chặn kịp thời bằng cách thay đá sớm.",
+    "đá_mới": "Đã được phân loại màu nhưng vấp phải sự chống đối của thợ rêu",
+    "hệ_thống_vạch_màu": "Đã được áp dụng để phân loại tuổi thọ đá lót kênh."
+  },
+  "timeline": [
+    {
+      "chapter": 1,
+      "event": "Đánh dấu màu phân loại tuổi đá"
+    },
+    {
+      "chapter": 2,
+      "event": "Đàm phán bù hao hụt rêu"
+    }
+  ],
+  "cast": [
+    {
+      "name": "Khang",
+      "status": "alive",
+      "location": "Trạm cấp nước",
+      "knowledge": [
+        "Cách dùng que gỗ đo độ mủn của đá mang dấu tay dưới lớp rễ rêu.",
+        "Lão Chư và Đốc công Hùng có sự thông đồng ngầm."
+      ],
+      "relationshipToProtagonist": "Trở thành cái gai trong mắt Lão Chư và Đốc công Hùng."
+    },
+    {
+      "name": "Lão Chư",
+      "status": "alive",
+      "location": "Xưởng nung đá chính của thung lũng",
+      "knowledge": [
+        "Cách pha tạp chất và giảm nhiệt độ để nung đá non kiếm lời."
+      ],
+      "relationshipToProtagonist": "Kẻ thù tiềm năng đang nắm giữ nguồn vật liệu"
+    },
+    {
+      "name": "Thím Ba",
+      "status": "alive",
+      "location": "Bãi tập kết đá",
+      "knowledge": [
+        "Vị trí dòng nước chảy êm nhất giúp rêu bám rễ nhanh.",
+        "Khang định dỡ đá vạch đỏ chỉ sau 60 ngày."
+      ],
+      "relationshipToProtagonist": "Tức giận và chuẩn bị bạo động chống lại Khang."
+    },
+    {
+      "name": "Đốc công Hùng",
+      "status": "alive",
+      "location": "Trạm cấp nước tuyến số bốn",
+      "knowledge": [
+        "Cách ghi chép sổ sách để che đậy lượng nước thất thoát thực tế."
+      ],
+      "relationshipToProtagonist": "Kẻ giám sát quan liêu nắm giữ khẩu phần nước"
+    },
+    {
+      "name": "Trình",
+      "status": "alive",
+      "location": "Khu lán thợ kênh",
+      "knowledge": [
+        "Tin tức vỉa hè về các biến động nhân sự trong thung lũng."
+      ],
+      "relationshipToProtagonist": "Thợ phụ cấp dưới nhút nhát nhưng trung thành"
+    }
+  ],
+  "resources": [
+    {
+      "resource": "Đá mang dấu tay phân loại tuổi",
+      "amount": "Hơn 200 viên đã được đánh dấu màu",
+      "source": "Lô hàng lỗi của Lão Chư",
+      "lastChangedChapter": 2
+    },
+    {
+      "resource": "Bột đá tái sinh",
+      "amount": "Chưa tồn tại",
+      "source": "Đá cũ nát chưa được tận dụng",
+      "lastChangedChapter": 0
+    },
+    {
+      "resource": "Nước sạch định mức",
+      "amount": "Giảm 50% khẩu phần ngày của Khang",
+      "source": "Bị Đốc công Hùng trừ phạt",
+      "lastChangedChapter": 1
+    },
+    {
+      "resource": "Rêu sấy khô loại nhất",
+      "amount": "Đang sinh trưởng trên đá, chưa đến kỳ thu hoạch",
+      "source": "Luống rêu của Thím Ba",
+      "lastChangedChapter": 0
+    }
+  ],
+  "promises": [
+    {
+      "id": "promise_1",
+      "status": "paid",
+      "currentPressure": "Hệ thống màu đã hoàn thành, chờ kiểm chứng thực tế."
+    },
+    {
+      "id": "promise_2",
+      "status": "advanced",
+      "currentPressure": "Phải tìm cách bù đắp thiệt hại cho thợ rêu ngay lập tức."
+    },
+    {
+      "id": "promise_3",
+      "status": "open",
+      "currentPressure": "Lượng đá cũ thải ra quá nhiều, sức người không thể dọn dẹp kịp."
+    },
+    {
+      "id": "promise_4",
+      "status": "open",
+      "currentPressure": "Đốc công Hùng liên tục tìm cớ trừ lương nước của đội bảo trì."
+    },
+    {
+      "id": "promise_5",
+      "status": "open",
+      "currentPressure": "Lão Chư đe dọa cắt nguồn cung đá mới nếu không chịu nhận hàng lỗi."
+    }
+  ],
+  "recentSummary": "Chương 2: Hệ Thống Vạch Màu: Đàm phán bù hao hụt rêu Trạng thái mới: Đã được phân loại màu nhưng vấp phải sự chống đối của thợ rêu",
+  "previousEnding": "ng đống vật liệu hai trăm mười viên lên. Gõ. Nghe âm thanh. Dùng mũi sắt cạo nhẹ vào phần lõi ẩn. Cảm nhận độ xốp. Đánh giá tốc độ ăn mòn của axit rễ rêu nếu nó bám vào bề mặt này. Khang làm việc như một cỗ máy chính xác không có sai số. 'Cạch. Lõi xốp sâu. Tuổi thọ tối đa sáu mươi ngày,' Khang lẩm bẩm. Anh bốc một nắm đất sét màu đỏ, bôi một vạch dài ngang mép viên đá rồi ném sang một bên. 'Bụp. Độ xốp trung bình. Tuổi thọ bảy mươi lăm ngày,' Anh quệt một vạch đất sét vàng lên viên tiếp theo. 'Keng. Viên này nung lọt gần tâm lò, lõi tương đối đặc. Chín mươi ngày tiêu chuẩn,' Một vạch đất sét xanh được đánh dấu. Trình trợn tròn mắt nhìn tốc độ làm việc điên cuồng của Khang. 'Anh Khang... anh đang làm cái quái gì vậy? Sao phải phân màu làm gì cho mệt xác? Cứ mang đi lót kênh, hỏng đến đâu mình vá đến đó như trước giờ vẫn làm thôi.' Khang không dừng tay, giọng nói vang lên lạnh lẽo và đầy tính toán: 'Vá đến đâu hỏng đến đó là cách làm của những kẻ chờ chết. Lão Chư tuồn đá nung non vào để phá vỡ chu kỳ bảo trì chín mươi ngày của chúng ta. Nếu tao không phân loại, thợ mương sẽ vác lộn xộn các loại đá này lót thành một dãy dài. Đến ngày thứ sáu mươi mốt, những viên đá xốp nhất sẽ vỡ vụn thành bùn mà không có dấu hiệu báo trước. Một viên vỡ sẽ làm mất áp lực nước, nước sẽ ngấm thẳng vào nền tro, kéo theo toàn bộ vách kênh dài mười mét đổ sập. Tao không cho phép bất kỳ sự cố bất ngờ nào xảy ra trên tuyến kênh của tao.' Khang ném một viên đá vạch đỏ sang đống lớn nhất. 'Hệ thống vạch màu này là một hợp đồng sinh tử vật lý. Đá vạch đỏ bắt buộc phải được cạy lên và thay thế vào đúng ngày thứ năm mươi chín sau khi lắp đặt. Không ngoại lệ. Bất kể bề mặt của nó lúc đó trông có hoàn hảo đến đâu, tao cũng sẽ dỡ nó lên. Chỉ có cách định hình vòng đời cụ thể cho từng loại vật liệu, tao mới khống chế được sự bục nát ngầm do Lão Chư gài bẫy.' Trình nghe xong rùng mình. Cậu nhìn đống đá đang dần được phân loại. Đống vạch đỏ cao ngất ngưởng, chiếm đến hơn một nửa tổng số hàng giao. Mười ngón tay của Khang đã rớm máu vì ma sát liên tục với bề mặt nhám của đá, phần đất sét đỏ trộn lẫn với máu tươi bôi lên từng viên đá tạo thành những vết hằn rợn người. Suốt cả đêm đó, Khang không chợp mắt. Tiếng gõ đá lách cách vang lên đều đặn nhịp nhàng như nhịp đập của một chiếc đồng hồ đếm ngược tử thần. Đến khi ánh sáng mờ đục của buổi bình minh xuyên qua lớp sương tro, Khang mới buông thanh sắt xuống. Hai trăm mười viên đá đã được phân thành ba đống rõ rệt. Khang đứng dậy, vươn vai để giải phóng những khớp xương cứng đờ. Toàn thân anh đau nhức, kiệt sức, và túi tiền đã rỗng tuếch, nhưng trong ánh mắt lại lóe lên sự an tâm tuyệt đối. Anh đã thiết lập xong hệ thống quản lý rủi ro đầu tiên của thung lũng. Tiếng bước chân lộn xộn vang lên phá vỡ sự tĩnh lặng của buổi sáng. Đám thợ kênh ca ngày bắt đầu lục tục kéo đến trạm. Họ ngạc nhiên chỉ trỏ vào ba đống đá đầy màu sắc kỳ lạ. Khang bước lên đứng trên một tảng đá lớn, cất giọng dõng dạc, rành rọt từng chữ: 'Nghe cho rõ đây. Kể từ hôm nay, tuyến kênh số bốn sẽ áp dụng quy định bảo trì mới. Toàn bộ vật liệu đã được phân loại tuổi thọ theo màu. Vạch xanh dỡ ở ngày tám mươi chín. Vạch vàng dỡ ở ngày bảy mươi tư. Riêng đống đá vạch đỏ này, bắt buộc dỡ bỏ vào đúng ngày thứ năm mươi chín, không chậm trễ một khắc. Bất cứ kẻ nào trong đội bảo trì để đá vạch đỏ lố ngày, tao sẽ tự tay tống cổ kẻ đó xuống làm phu mỏ.' Đám thợ kênh xôn xao bàn tán. Một quy định quá mới mẻ, quá khắt khe, đi ngược lại hoàn toàn thói quen chờ đá hỏng hẳn mới sửa của họ. Nhưng uy lực từ giọng nói lạnh lùng và hành động chứng minh thực tế của Khang khiến không ai dám lên tiếng phản đối. Trình vội vàng ghi chép lại các mốc thời gian vào một tấm bảng gỗ nhỏ treo trước cửa lán. Hệ thống màu sắc đã chính thức đi vào vận hành. Thông tin về quy định dỡ đá sáu mươi ngày lan truyền nhanh hơn cả tốc độ dòng chảy của đoạn kênh số bốn. Khang vừa cắn một miếng rêu khô lót dạ, chuẩn bị chỉ đạo tốp thợ đầu tiên vác đá vạch đỏ đi thay cho đoạn kênh đang rỉ nước, thì từ đằng xa, một đám đông ồn ào đang rầm rập tiến lại gần. Đi đầu là Thím Ba, đại diện nhóm thợ gieo rêu, người đàn bà có thân hình đậm chắc, khuôn mặt hầm hầm sát khí. Theo sau bà là hơn chục người thợ gieo rêu tay lăm lăm thước đo rễ, rổ tre và xẻng nạo. Tiếng bước chân đạp mạnh xuống lớp tro tạo thành những đám mây bụi đục ngầu. Thím Ba chống nạnh, cặp mắt trợn trừng đỏ ngầu nhìn thẳng vào Khang, giọng the thé cất lên xé toạc không gian tĩnh lặng của trạm nước: 'Thằng Khang! Mày vừa ra lệnh cái gì? Mày nói to lên cho bà nghe lại xem nào! Dỡ đá ở ngày thứ năm mươi chín?' Khang bình tĩnh lau tay vào giẻ, đáp lại bằng chất giọng đều đều không đổi sắc: 'Đúng vậy. Đá vạch đỏ có độ xốp cao, không chịu được axit từ rễ rêu quá sáu mươi ngày. Để đảm bảo an toàn vách kênh, ngày thứ năm mươi chín tôi sẽ cho thợ cạy toàn bộ đá vạch đỏ lên.' 'Tổ sư cha nhà mày!' Thím Ba hét lên, lao tới vung tay chỉ thẳng mặt Khang, nước bọt văng tung tóe. 'Quy luật sinh trưởng của rêu là bắt buộc phải ba mươi ngày bám rễ trên mặt đá mới đạt chuẩn dinh dưỡng để thu hoạch. Chu kỳ chín mươi ngày tiêu chuẩn tao thu hoạch được đúng ba lứa. Mày cắt cái rụp ở ngày năm mươi chín, nghĩa là lứa rêu thứ hai của tao vừa mới mọc được hai mươi chín ngày đã bị dỡ bỏ! Chín muồi thì chưa tới, mà thu non thì Hội đồng kiểm định lương thực tịch thu sạch. Mày dỡ đá sớm là mày chặt đứt nồi cơm của mấy chục con người ở đây. Mày định để đám thợ rêu bọn tao cạp tro trắng mà ăn à?' Cả đám thợ rêu phía sau đồng loạt hô hào ầm ĩ, huơ huơ các nông cụ lên trời đe dọa. Sự căng thẳng leo thang tột độ. Khang nhìn thẳng vào đôi mắt rực lửa giận dữ của Thím Ba. Anh nhận ra một lỗ hổng chí mạng trong kế hoạch của mình: anh đã tính toán hoàn hảo rủi ro vật lý của hệ thống kênh mương, nhưng lại hoàn toàn phớt lờ rủi ro về mặt sinh kế của những người bám rễ trên chính hệ thống đó. Sự thật vật lý đang va chạm trực tiếp với lợi ích sinh tồn của con người, và Thím Ba không phải là kẻ sẽ lùi bước trước bất kỳ lý lẽ khô khan nào.",
+  "retrievalNotes": [
+    "Cần nhớ quy luật 90 ngày của đá mang dấu tay và sự ăn mòn của rễ rêu."
+  ]
+}

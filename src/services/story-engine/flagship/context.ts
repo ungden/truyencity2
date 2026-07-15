@@ -32,6 +32,21 @@ export interface FlagshipContextBundle {
   budgets: FlagshipContextBudgets;
 }
 
+/**
+ * Context is deliberately assembled per responsibility.  A single, shared
+ * blob makes it too easy for the writer to see editor instructions (or for
+ * the editor to inherit a planning prompt), and it also makes the advertised
+ * layer budgets meaningless.  These are plain strings so the pipeline stays
+ * independent from storage and model clients.
+ */
+export interface FlagshipRoleContexts {
+  director: string;
+  writer: string;
+  editor: string;
+  manifest: Array<FlagshipContextManifestEntry & { role: 'director' | 'writer' | 'editor' }>;
+  totalChars: number;
+}
+
 export const FLAGSHIP_CONTEXT_BUDGETS: FlagshipContextBudgets = {
   canon: 20_000,
   plan: 16_000,
@@ -92,4 +107,28 @@ export function assembleFlagshipContext(
 
   const text = chunks.join('\n\n');
   return { text, manifest, totalChars: text.length, budgets };
+}
+
+export interface FlagshipRoleContextInput {
+  director: FlagshipContextBlock[];
+  writer: FlagshipContextBlock[];
+  editor: FlagshipContextBlock[];
+}
+
+/** Assemble all role inputs and fail closed if a required block exceeds its layer budget. */
+export function assembleFlagshipRoleContexts(input: FlagshipRoleContextInput): FlagshipRoleContexts {
+  const roles = (Object.keys(input) as Array<keyof FlagshipRoleContextInput>).map(role => {
+    const bundle = assembleFlagshipContext(input[role]);
+    return {
+      role,
+      bundle,
+    };
+  });
+  return {
+    director: roles.find(item => item.role === 'director')!.bundle.text,
+    writer: roles.find(item => item.role === 'writer')!.bundle.text,
+    editor: roles.find(item => item.role === 'editor')!.bundle.text,
+    manifest: roles.flatMap(({ role, bundle }) => bundle.manifest.map(entry => ({ ...entry, role }))),
+    totalChars: roles.reduce((total, item) => total + item.bundle.totalChars, 0),
+  };
 }

@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 2,
+  "chapterNumber": 0,
+  "facts": {
+    "market_status": "Hàng giả lò ga đang tràn ngập thị trường nhưng chưa ai có phương pháp lật tẩy triệt để bằng vật liệu."
+  },
+  "timeline": [],
+  "cast": [
+    {
+      "name": "Hoàng",
+      "status": "alive",
+      "location": "Xưởng gốm tồi tàn ở ngoại ô thành phố.",
+      "knowledge": [
+        "Kỹ thuật vật liệu gốm sứ hiện đại và cổ đại."
+      ],
+      "relationshipToProtagonist": "Bản thân nhân vật chính."
+    },
+    {
+      "name": "Lão Tuấn",
+      "status": "alive",
+      "location": "Cửa hàng đồ cổ lớn trên phố trung tâm.",
+      "knowledge": [
+        "Nguồn cung cấp hàng giả công nghệ cao từ các lò ngoại ô."
+      ],
+      "relationshipToProtagonist": "Đối tác làm ăn tiềm năng nhưng sắp trở thành kẻ thù không đội trời chung."
+    },
+    {
+      "name": "Bác Hùng",
+      "status": "alive",
+      "location": "Cửa hàng đồ cổ uy tín lâu năm.",
+      "knowledge": [
+        "Lịch sử giao dịch và nguồn gốc di cư của các gia đình sở hữu đồ cổ."
+      ],
+      "relationshipToProtagonist": "Khách hàng đầu tiên và người bảo trợ dè dặt của Hoàng."
+    },
+    {
+      "name": "Ông Tường",
+      "status": "alive",
+      "location": "Viện nghiên cứu gốm sứ quốc gia.",
+      "knowledge": [
+        "Cách thức thao túng hội đồng thẩm định để cấp giấy chứng nhận khống."
+      ],
+      "relationshipToProtagonist": "Chuyên gia thế hệ trước sắp bị Hoàng thách thức quyền lực."
+    },
+    {
+      "name": "Ông Thắng",
+      "status": "alive",
+      "location": "Bãi phế liệu và chợ đồ cũ ven sông.",
+      "knowledge": [
+        "Vị trí chính xác của các hố đào phế tích lò gốm cổ."
+      ],
+      "relationshipToProtagonist": "Nguồn cung cấp tiêu bản thô duy nhất của Hoàng lúc này."
+    }
+  ],
+  "resources": [
+    {
+      "resource": "Thư viện tiêu bản gốm",
+      "amount": "Trống rỗng, chỉ có vài mảnh vụn không giá trị.",
+      "source": "Chưa có nguồn cung cấp ổn định.",
+      "lastChangedChapter": 0
+    },
+    {
+      "resource": "Uy tín giới sưu tầm",
+      "amount": "Bằng không, chỉ là một kỹ sư trẻ vô danh.",
+      "source": "Chưa thực hiện vụ giám định thành công nào.",
+      "lastChangedChapter": 0
+    },
+    {
+      "resource": "Hồ sơ phục chế ngầm",
+      "amount": "Chưa tiếp cận được mạng lưới thợ phục hồi.",
+      "source": "Chưa có mối quan hệ nào trong giới thợ ngầm.",
+      "lastChangedChapter": 0
+    },
+    {
+      "resource": "Tiền mặt lưu động",
+      "amount": "Năm triệu đồng, vừa đủ trả tiền thuê xưởng tháng này.",
+      "source": "Tiền tiết kiệm cá nhân ít ỏi.",
+      "lastChangedChapter": 0
+    }
+  ],
+  "promises": [
+    {
+      "id": "promise_1",
+      "status": "open",
+      "currentPressure": "Hoàng cần một cơ hội để chứng minh năng lực vật liệu của mình trước giới đồ cổ."
+    },
+    {
+      "id": "promise_2",
+      "status": "open",
+      "currentPressure": "Sự thống trị của các chuyên gia bảo thủ đang bóp nghẹt sự thật về gốm sứ."
+    },
+    {
+      "id": "promise_3",
+      "status": "open",
+      "currentPressure": "Hoàng khao khát xây dựng một thư viện tiêu bản nhưng chưa có mảnh vỡ chuẩn nào."
+    },
+    {
+      "id": "promise_4",
+      "status": "open",
+      "currentPressure": "Đường dây làm giả đang hoạt động mạnh mẽ và sẵn sàng nghiền nát bất cứ ai cản đường."
+    },
+    {
+      "id": "promise_5",
+      "status": "open",
+      "currentPressure": "Những bí ẩn về công thức men cổ vẫn đang bị chôn vùi dưới các lớp đất phế tích."
+    }
+  ],
+  "recentSummary": "Hoàng vừa tốt nghiệp và mở xưởng giám định độc lập nhưng chưa có khách hàng nào tìm đến.",
+  "previousEnding": "Hoàng chuẩn bị đến cửa hàng bác Hùng để thực hiện vụ giám định đầu tiên mang tính quyết định.",
+  "retrievalNotes": [
+    "Cần nhấn mạnh sự nghèo khó của Hoàng lúc đầu để làm nổi bật quyết định cược tiền mua tiêu bản."
+  ]
+}

@@ -25,3 +25,4 @@ export * from './chinese-benchmark-data';
 export * from './catalogue';
 export * from './catalogue-data';
 export * from './market-title';
+export * from './portfolio-finalists';

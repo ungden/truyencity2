@@ -16,6 +16,7 @@ import {
   buildRevisionPrompt,
   buildWriterPrompt,
 } from './prompts';
+import type { FlagshipRoleContexts } from './context';
 import { evaluateFlagshipQuality, type QualityEvidenceV2, type QualityVerdictV2 } from './quality-verdict';
 
 const AXIS_KEYS = [
@@ -24,7 +25,7 @@ const AXIS_KEYS = [
   'earned_pleasure', 'recovery_pacing', 'desire_to_read_next',
 ] as const;
 
-const WriterOutputSchema = z.object({
+export const WriterOutputSchema = z.object({
   title: z.string().trim().min(2).max(200),
   content: z.string().trim().min(1000),
 }).strict();
@@ -75,6 +76,8 @@ export interface FlagshipPipelineInput {
   storyState: StoryStateV2;
   preparedPlan: ChapterPlanV2;
   targetWordCount: number;
+  /** Pre-budgeted, role-isolated context. Omitted only by offline unit callers. */
+  roleContexts?: Pick<FlagshipRoleContexts, 'director' | 'writer' | 'editor'>;
 }
 
 export interface FlagshipPipelineOutput {
@@ -164,7 +167,7 @@ function groundEvidence(content: string, evidence: QualityEvidenceV2[]): Quality
   return evidence.map(item => {
     const start = content.indexOf(item.excerpt);
     if (start < 0) {
-      throw new FlagshipPipelineError('quality_rejected', `Editor evidence is not grounded in prose: ${item.code}.`);
+      throw new FlagshipPipelineError('infra_blocked', `Editor output contract is invalid because evidence is not grounded in prose: ${item.code}.`);
     }
     return { ...item, start, end: start + item.excerpt.length };
   });

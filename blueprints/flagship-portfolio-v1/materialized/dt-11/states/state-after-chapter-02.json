@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 2,
+  "chapterNumber": 2,
+  "facts": {
+    "market_status": "Hàng giả lò ga đang tràn ngập thị trường nhưng chưa ai có phương pháp lật tẩy triệt để bằng vật liệu.",
+    "hoang_money": "0 đồng",
+    "hoang_reputation": "Đang trong cuộc đối chất sinh tử",
+    "fake_tech_revealed": "Công nghệ lò ga làm giả gốm cổ đã xuất hiện tại cửa hàng Bác Hùng.",
+    "thang_stash_bought": "Hoàng đã mua toàn bộ thùng xốp phế liệu của Ông Thắng."
+  },
+  "timeline": [
+    {
+      "chapter": 1,
+      "event": "Tìm mảnh vỡ chuẩn men lam triều Thanh"
+    },
+    {
+      "chapter": 2,
+      "event": "Đối chất với chuyên gia Hội đồng Thẩm định"
+    }
+  ],
+  "cast": [
+    {
+      "name": "Hoàng",
+      "status": "alive",
+      "location": "Xưởng gốm tồi tàn ở ngoại ô thành phố.",
+      "knowledge": [
+        "Kỹ thuật vật liệu gốm sứ hiện đại và cổ đại."
+      ],
+      "relationshipToProtagonist": "Bản thân nhân vật chính."
+    },
+    {
+      "name": "Lão Tuấn",
+      "status": "alive",
+      "location": "Cửa hàng Bác Hùng",
+      "knowledge": [
+        "Nguồn cung cấp hàng giả công nghệ cao từ các lò ngoại ô.",
+        "Hoàng có khả năng phát hiện đồ giả bằng cách sờ nắn."
+      ],
+      "relationshipToProtagonist": "Chuyển từ đối tác tiềm năng sang kẻ thù trực tiếp."
+    },
+    {
+      "name": "Bác Hùng",
+      "status": "alive",
+      "location": "Cửa hàng đồ cổ uy tín lâu năm.",
+      "knowledge": [
+        "Lịch sử giao dịch và nguồn gốc di cư của các gia đình sở hữu đồ cổ."
+      ],
+      "relationshipToProtagonist": "Khách hàng đầu tiên và người bảo trợ dè dặt của Hoàng."
+    },
+    {
+      "name": "Ông Tường",
+      "status": "alive",
+      "location": "Cửa hàng Bác Hùng",
+      "knowledge": [
+        "Cách thức thao túng hội đồng thẩm định để cấp giấy chứng nhận khống.",
+        "Hoàng dám thách thức quyền lực của Hội đồng Thẩm định."
+      ],
+      "relationshipToProtagonist": "Xuất hiện với tư cách kẻ thù bảo vệ lợi ích nhóm."
+    },
+    {
+      "name": "Ông Thắng",
+      "status": "alive",
+      "location": "Chợ đồ cũ ven sông",
+      "knowledge": [
+        "Vị trí chính xác của các hố đào phế tích lò gốm cổ.",
+        "Hoàng sẵn sàng chi số tiền lớn cho những mảnh vỡ sứt mẻ."
+      ],
+      "relationshipToProtagonist": "Trở thành nguồn cung cấp tiềm năng nhưng đầy thực dụng."
+    }
+  ],
+  "resources": [
+    {
+      "resource": "Thư viện tiêu bản gốm",
+      "amount": "Sở hữu mảnh vỡ men lam chuẩn đầu tiên",
+      "source": "Gian hàng Ông Thắng",
+      "lastChangedChapter": 2
+    },
+    {
+      "resource": "Uy tín giới sưu tầm",
+      "amount": "Đang bị thử thách nghiêm trọng",
+      "source": "Sự kiện từ chối giám định tại cửa hàng Bác Hùng",
+      "lastChangedChapter": 1
+    },
+    {
+      "resource": "Hồ sơ phục chế ngầm",
+      "amount": "Chưa tiếp cận được mạng lưới thợ phục hồi.",
+      "source": "Chưa có mối quan hệ nào trong giới thợ ngầm.",
+      "lastChangedChapter": 0
+    },
+    {
+      "resource": "Tiền mặt lưu động",
+      "amount": "0 đồng",
+      "source": "Đã chi trả cho Ông Thắng",
+      "lastChangedChapter": 2
+    }
+  ],
+  "promises": [
+    {
+      "id": "promise_1",
+      "status": "paid",
+      "currentPressure": "Đã tìm thấy mảnh vỡ chuẩn, sẵn sàng sử dụng."
+    },
+    {
+      "id": "promise_2",
+      "status": "advanced",
+      "currentPressure": "Cuộc đối chất với Ông Tường đang diễn ra căng thẳng."
+    },
+    {
+      "id": "promise_3",
+      "status": "open",
+      "currentPressure": "Hoàng khao khát xây dựng một thư viện tiêu bản nhưng chưa có mảnh vỡ chuẩn nào."
+    },
+    {
+      "id": "promise_4",
+      "status": "open",
+      "currentPressure": "Đường dây làm giả đang hoạt động mạnh mẽ và sẵn sàng nghiền nát bất cứ ai cản đường."
+    },
+    {
+      "id": "promise_5",
+      "status": "open",
+      "currentPressure": "Những bí ẩn về công thức men cổ vẫn đang bị chôn vùi dưới các lớp đất phế tích."
+    }
+  ],
+  "recentSummary": "Chương 2: Đánh Cược Cùng Phế Liệu: Đối chất với chuyên gia Hội đồng Thẩm định Trạng thái mới: 0 đồng; Đang trong cuộc đối chất sinh tử",
+  "previousEnding": "ua tay là hàng chục lần sự thất vọng nhân lên. Đống phế phẩm vơi dần, hy vọng cũng cạn kiệt theo.\n\nChỉ còn lại khoảng năm mảnh vỡ nằm trơ trọi dưới đáy thùng xốp.\n\nHoàng nhặt lên một phần ba chiếc trôn bát khá dày, có lẽ thuộc về một chiếc bát tô lớn. Ngay khi phần thịt mềm ở đầu ngón cái lướt qua vết cắt ngang của lõi đất, mắt Hoàng đột ngột mở bừng. Cơ bắp trên cánh tay anh khẽ căng lên. Một cảm giác nhám rát, lợn cợn cực kỳ tinh vi truyền đến.\n\nAnh vội vàng đưa mảnh vỡ lên ngang tầm mắt. Phía bên ngoài là lớp men lam vẽ họa tiết dây hoa leo đã bị xỉn màu do nằm dưới đất, nhưng phần quan trọng nhất nằm ở mặt cắt. Ở rìa ngoài của mảnh vỡ, cấu trúc silicat đã thủy tinh hóa rất tốt, cứng cáp và đanh chắc. Tuy nhiên, khi ngón tay di chuyển sâu xuống phần đáy góc khuất của trôn bát, bề mặt trở nên thô ráp hơn hẳn. Ở đây, cấu trúc tinh thể bị gián đoạn.\n\n\"Vết sượng nhiệt,\" Hoàng lẩm bẩm, môi khẽ nhếch lên thành một nụ cười rạng rỡ hiếm hoi.\n\nĐây chính là dấu vết không thể bị làm giả. Trong cấu trúc của lò bầu đun củi thời xưa, hình dáng giống như nửa quả bầu đặt nằm nghiêng trên sườn đồi, nhiệt độ phân bố không bao giờ đều tuyệt đối. Dù thợ đốt lò có giỏi đến mấy, lửa vẫn luôn ưu tiên bốc lên trên và hút về phía ống khói. Những món đồ được xếp ở góc chết phía dưới cùng, đặc biệt là phần trôn đáy dày dặn, thường xuyên bị thiếu một chút nhiệt so với phần thân phía trên. Quá trình thủy tinh hóa không được diễn ra trọn vẹn, để lại một phần cốt gốm hơi \"sống\", tạo ra độ nhám và xốp li ti ở cấp độ vi mô do tinh thể chưa tan chảy hết thành thủy tinh.\n\nCông nghệ giả cổ nung bằng lò ga có quạt đối lưu phân bổ nhiệt độ đồng đều 100% ở mọi ngóc ngách. Kẻ làm giả không bao giờ đủ khả năng kiểm soát để ép một góc nhỏ xíu ở đáy bình bị sượng nhiệt một cách tự nhiên như thế này.\n\nTiêu sạch năm triệu đồng tiền mặt cuối cùng, đánh cược bằng sự tồn vong của xưởng gốm, nhưng Hoàng đã tìm thấy mảnh tiêu chuẩn men lam triều Thanh đầu tiên cho bộ sưu tập của mình.\n\nAnh rút từ trong túi áo ngực ra một con dao găm nhỏ chuyên dụng, cẩn thận miết nhẹ mũi dao lên bề mặt vết sượng nhiệt. Một lớp bụi mỏng tang, có màu trắng ngà của đất chưa chín hẳn bong ra, khẳng định chắc chắn dự đoán của anh. Hoàng cẩn thận cất mảnh vỡ vào một chiếc hộp nhựa nhỏ có đệm mút, nhét sâu vào túi áo khoác. Anh đứng thẳng dậy, phủi lớp bụi đất trên đầu gối, không thèm nhìn ông Thắng lấy một lần, quay gót bước nhanh ra khỏi bãi rác lầy lội để hướng thẳng về phía cửa hàng Bác Hùng.\n\n***\n\nKhi Hoàng đẩy cánh cửa kính cường lực của Tĩnh Hương bước vào, không gian bên trong tĩnh lặng và nặng nề đến nghẹt thở. Mùi hương trầm thoang thoảng không giấu được sự căng thẳng đang chực chờ bùng nổ.\n\nLão Tuấn vẫn ngồi chễm chệ trên chiếc ghế tựa, nhịp nhịp chân với điệu bộ ngạo mạn của kẻ đang nắm đằng chuôi. Bác Hùng đứng nép bên quầy tính tiền, ánh mắt lộ rõ sự bất an khi thấy Hoàng xuất hiện với bộ dạng lấm lem bùn đất và mồ hôi ướt đẫm lưng áo. Nhưng điều khiến Hoàng chú ý nhất là người đàn ông thứ tư vừa xuất hiện trong phòng.\n\nNgười đó khoảng ngoài sáu mươi, mặc một bộ áo lụa tơ tằm cổ tàu màu mận chín, tóc vuốt keo gọn gàng điểm bạc. Ông ta ngồi thưởng trà với một phong thái đạo mạo, chậm rãi vuốt chòm râu ngắn, đôi mắt ẩn sau tròng kính viễn thị nhìn Hoàng đầy vẻ soi mói và khinh miệt. Không cần ai giới thiệu, Hoàng cũng thừa biết đó là ai - Ông Tường, Ủy viên Hội đồng Thẩm định Gốm sứ Cổ, một cây đa cây đề luôn xuất hiện trên truyền hình với những bài diễn văn đạo đức về bảo tồn di sản.\n\n\"Đây là cậu thanh niên đã dõng dạc đòi bóc phốt cái bình của tôi đấy hả?\" Lão Tuấn cười gằn, hất hàm về phía Hoàng. \"Tưởng mày trốn luôn rồi chứ. Chú Tường xem, thanh niên thời nay làm việc chẳng có chút tôn ti trật tự nào, nhìn bằng mắt thường rồi phán bừa, làm ảnh hưởng đến danh dự của cả hội đồng.\"\n\nÔng Tường đặt chén trà nạm vàng xuống mặt bàn gỗ trắc, tiếng cạch vang lên đầy uy quyền. Ông ta hắng giọng, dùng chất giọng bề trên răn dạy: \"Cậu thanh niên, tôi nghe anh Hùng nói cậu là kỹ sư vật liệu. Giới trẻ mấy cậu bây giờ học được dăm ba cái lý thuyết sách vở phương Tây về thông số, về máy móc, rồi tưởng mình hiểu được đồ cổ. Đồ gốm sứ cha ông để lại không phải là những cục đất vô tri vô giác để cậu cân đo đong đếm. Nó là 'hồn', là 'khí vận', là 'cốt cách' của người thợ tài hoa. Cậu nhìn một món đồ mang thần thái tượng thị triều Thanh mà dám phán là đồ mới chỉ vì vài cái vệt men? Cậu có biết tờ chứng thư tôi ký bảo chứng cho món đồ này dựa trên hàng chục năm nghiên cứu mỹ học không?\"\n\nHoàng đứng lặng yên, ánh mắt lạnh lùng quét qua khuôn mặt đạo mạo của ông Tường rồi dừng lại ở lão Tuấn. Mảnh ghép cuối cùng của sự thật bẩn thỉu đã hiện rõ ràng trước mắt anh. Lão Tuấn cần nguồn hàng giả tinh vi. Ông Tường dùng uy tín học thuật và danh xưng Ủy viên để biến đồ giả thành đồ thật trên giấy tờ, kiếm lợi nhuận từ những chữ ký khống. Một liên minh lợi ích hoàn hảo đè bẹp mọi tiếng nói chuyên môn.\n\n\"Sự thật vật lý không biết rung cảm trước ngôn từ mỹ học của ông đâu, thưa Ủy viên,\" Hoàng điềm tĩnh đáp trả, giọng nói không bộc lộ một tia sợ hãi. Anh bước tới, thò tay vào túi áo ngực.\n\nHoàng rút chiếc hộp nhựa ra, mở nắp, cẩn thận đặt mảnh vỡ tiêu bản men lam lấm tấm bùn đất lên trên mặt bàn gỗ trắc sáng bóng, ngay sát cạnh chiếc bình tỏi tuyệt đẹp đang tỏa sáng rực rỡ.\n\nTừ trong chiếc ba lô nhỏ mang theo, Hoàng lần lượt lấy ra một chiếc búa thép nhỏ bọc đầu cao su mềm và một chiếc kính lúp phân cực chuyên dụng của thợ kiểm tra cấu trúc tinh thể. Anh bày chúng ra một cách chậm rãi, rành mạch, biến chiếc bàn trà trị giá hàng trăm triệu thành một phòng thí nghiệm dã chiến.\n\nBác Hùng trố mắt nhìn mảnh vỡ xấu xí, lại nhìn sang đống dụng cụ cơ khí của Hoàng, mồ hôi hột bắt đầu tứa ra trên trán. Trong khi đó, sắc mặt của ông Tường thoáng chùng xuống, nhưng rất nhanh sau đó, ông ta lấy lại vẻ đạo mạo thường thấy.\n\nÔng Tường nhếch mép cười khẩy, khoanh tay trước ngực, giọng đều đều ném ra một lời thách thức gã kỹ sư trẻ dùng cái mớ lý thuyết sách vở ấy để chứng minh vào thực tế.",
+  "retrievalNotes": [
+    "Cần nhấn mạnh sự nghèo khó của Hoàng lúc đầu để làm nổi bật quyết định cược tiền mua tiêu bản."
+  ]
+}

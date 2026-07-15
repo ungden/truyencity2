@@ -36,7 +36,10 @@
     "flagship:portfolio:promote": "node --import tsx scripts/flagship-portfolio-promote.ts",
     "flagship:portfolio:tournaments": "node --import tsx scripts/flagship-portfolio-tournaments.ts",
     "flagship:portfolio:review": "node --import tsx scripts/flagship-portfolio-review-openings.ts",
+    "flagship:portfolio:materialize": "node --import tsx scripts/flagship-portfolio-materialize.ts",
+    "flagship:portfolio:write-openings": "node --import tsx scripts/flagship-portfolio-write-openings.ts",
     "flagship:catalogue:validate": "node --import tsx scripts/flagship-catalogue-validate.ts",
+    "flagship:covers:verify": "node --import tsx scripts/flagship-covers-verify.ts",
     "flagship:catalogue:export": "node --import tsx scripts/export-flagship-catalogue.ts",
     "flagship:covers:render": "node --import tsx scripts/render-flagship-covers.ts",
     "legacy:archive": "node --import tsx scripts/archive-all-legacy.ts"

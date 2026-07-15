@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 2,
+  "chapterNumber": 0,
+  "facts": {
+    "kênh_số_4_nguy_kịch": "Hơn nửa số đá lót kênh đang ở tháng thứ 3 chuẩn bị mủn, nguy cơ vỡ kênh diện rộng rất cao."
+  },
+  "timeline": [],
+  "cast": [
+    {
+      "name": "Khang",
+      "status": "alive",
+      "location": "Lán thợ bảo trì tại đoạn kênh số bốn",
+      "knowledge": [
+        "Cách dùng que gỗ đo độ mủn của đá mang dấu tay dưới lớp rễ rêu."
+      ],
+      "relationshipToProtagonist": "Bản thân nhân vật chính"
+    },
+    {
+      "name": "Lão Chư",
+      "status": "alive",
+      "location": "Xưởng nung đá chính của thung lũng",
+      "knowledge": [
+        "Cách pha tạp chất và giảm nhiệt độ để nung đá non kiếm lời."
+      ],
+      "relationshipToProtagonist": "Kẻ thù tiềm năng đang nắm giữ nguồn vật liệu"
+    },
+    {
+      "name": "Thím Ba",
+      "status": "alive",
+      "location": "Khu vực luống rêu dọc đoạn kênh số bốn",
+      "knowledge": [
+        "Vị trí dòng nước chảy êm nhất giúp rêu bám rễ nhanh."
+      ],
+      "relationshipToProtagonist": "Đối tác bất đắc dĩ trên cùng mặt bằng kênh"
+    },
+    {
+      "name": "Đốc công Hùng",
+      "status": "alive",
+      "location": "Trạm cấp nước tuyến số bốn",
+      "knowledge": [
+        "Cách ghi chép sổ sách để che đậy lượng nước thất thoát thực tế."
+      ],
+      "relationshipToProtagonist": "Kẻ giám sát quan liêu nắm giữ khẩu phần nước"
+    },
+    {
+      "name": "Trình",
+      "status": "alive",
+      "location": "Khu lán thợ kênh",
+      "knowledge": [
+        "Tin tức vỉa hè về các biến động nhân sự trong thung lũng."
+      ],
+      "relationshipToProtagonist": "Thợ phụ cấp dưới nhút nhát nhưng trung thành"
+    }
+  ],
+  "resources": [
+    {
+      "resource": "Đá mang dấu tay phân loại tuổi",
+      "amount": "Đang cạn kiệt, phần lớn đá trên kênh sắp mủn",
+      "source": "Xưởng nung của Lão Chư",
+      "lastChangedChapter": 0
+    },
+    {
+      "resource": "Bột đá tái sinh",
+      "amount": "Chưa tồn tại",
+      "source": "Đá cũ nát chưa được tận dụng",
+      "lastChangedChapter": 0
+    },
+    {
+      "resource": "Nước sạch định mức",
+      "amount": "Bị kiểm soát gắt gao, chỉ đủ uống qua ngày",
+      "source": "Kho tổng Nha Lộ Thung Lũng",
+      "lastChangedChapter": 0
+    },
+    {
+      "resource": "Rêu sấy khô loại nhất",
+      "amount": "Đang sinh trưởng trên đá, chưa đến kỳ thu hoạch",
+      "source": "Luống rêu của Thím Ba",
+      "lastChangedChapter": 0
+    }
+  ],
+  "promises": [
+    {
+      "id": "promise_1",
+      "status": "open",
+      "currentPressure": "Kênh sắp vỡ, cần một phương pháp phân loại đá gấp để tránh thảm họa."
+    },
+    {
+      "id": "promise_2",
+      "status": "open",
+      "currentPressure": "Thợ rêu sẵn sàng bạo động nếu bị ép dỡ đá trước thời hạn 90 ngày."
+    },
+    {
+      "id": "promise_3",
+      "status": "open",
+      "currentPressure": "Lượng đá cũ thải ra quá nhiều, sức người không thể dọn dẹp kịp."
+    },
+    {
+      "id": "promise_4",
+      "status": "open",
+      "currentPressure": "Đốc công Hùng liên tục tìm cớ trừ lương nước của đội bảo trì."
+    },
+    {
+      "id": "promise_5",
+      "status": "open",
+      "currentPressure": "Lão Chư đe dọa cắt nguồn cung đá mới nếu không chịu nhận hàng lỗi."
+    }
+  ],
+  "recentSummary": "Khang chuẩn bị bắt đầu ca trực tại đoạn kênh số 4 trong bối cảnh hệ thống đá lót đang xuống cấp trầm trọng.",
+  "previousEnding": "Không có, đây là điểm bắt đầu của câu chuyện.",
+  "retrievalNotes": [
+    "Cần nhớ quy luật 90 ngày của đá mang dấu tay và sự ăn mòn của rễ rêu."
+  ]
+}

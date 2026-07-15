@@ -7,9 +7,13 @@ import {
 } from '@/services/story-engine/flagship/portfolio-data';
 import { FLAGSHIP_FIRST_30_CATALOGUE_V1 } from '@/services/story-engine/flagship/catalogue-data';
 import { FLAGSHIP_OPENING_COHORT_BRIEFS_V2 } from '@/services/story-engine/flagship/portfolio-setup-briefs-data';
+import { APPROVED_PORTFOLIO_FINALISTS_V2 } from '@/services/story-engine/flagship/portfolio-finalists';
 import { BlindSlotReviewV1Schema, rankBlindSlotReview } from '@/services/story-engine/flagship/portfolio-opening-review';
 import {
+  FlagshipLaunchPackV2Schema,
   FLAGSHIP_CHINESE_BENCHMARKS_V1,
+  StoryStateV2Schema,
+  applyChapterStateDelta,
   buildConceptLabPrompt,
   distillBenchmarkForConceptLab,
   FlagshipSetupBriefV2Schema,
@@ -80,6 +84,25 @@ describe('flagship first-30 portfolio', () => {
       expect(cover.subarray(0, 4).toString('ascii')).toBe('RIFF');
       const metadata = await sharp(cover).metadata();
       expect(metadata).toMatchObject({ format: 'webp', width: 1086, height: 1448 });
+    }
+  });
+
+  it('keeps the committed cover-render manifest in sync with approved titles', () => {
+    const manifest = JSON.parse(readFileSync(path.join(process.cwd(), 'blueprints/flagship-portfolio-v1/cover-render-manifest.json'), 'utf8')) as {
+      schemaVersion: number;
+      catalogueId: string;
+      entries: Array<{ slotId: string; title: string; watermark: string; width: number; height: number; sourceSha256: string; renderedSha256: string }>;
+    };
+    expect(manifest).toMatchObject({ schemaVersion: 1, catalogueId: 'flagship-first-30-catalogue' });
+    expect(manifest.entries).toHaveLength(30);
+    for (const item of catalogue.packages) {
+      expect(manifest.entries).toContainEqual(expect.objectContaining({
+        slotId: item.slotId,
+        title: item.title,
+        watermark: 'truyencity.com',
+        width: 1086,
+        height: 1448,
+      }));
     }
   });
 
@@ -165,6 +188,64 @@ describe('flagship first-30 portfolio', () => {
     expect(recommendation.recommendedFinalists.map((item: { slotId: string }) => item.slotId)).toEqual(['HX-04', 'TH-01', 'DT-11']);
   });
 
+  it('materializes only the three human-approved kernels with exact chapter-zero ledger coverage', () => {
+    const materializedRoot = path.join(process.cwd(), 'blueprints/flagship-portfolio-v1/materialized');
+    const manifest = JSON.parse(readFileSync(path.join(materializedRoot, 'manifest.json'), 'utf8'));
+    expect(manifest).toMatchObject({
+      status: 'three_story_kernels_ready',
+      productionWrites: 0,
+      productionProjectsChanged: false,
+    });
+    expect(manifest.materialized.map((item: { slotId: string }) => item.slotId)).toEqual(['HX-04', 'TH-01', 'DT-11']);
+
+    for (const finalist of APPROVED_PORTFOLIO_FINALISTS_V2) {
+      const slotRoot = path.join(materializedRoot, finalist.slotId.toLowerCase());
+      const launchPack = FlagshipLaunchPackV2Schema.parse(JSON.parse(readFileSync(path.join(slotRoot, 'launch-pack.json'), 'utf8')));
+      const foundation = JSON.parse(readFileSync(path.join(slotRoot, 'foundation-score.json'), 'utf8'));
+      expect(launchPack.selectedConceptId).toBe(finalist.selection.candidateId);
+      expect(launchPack.storySpec.title).toBe(finalist.selection.approvedTitle);
+      expect(launchPack.rollingChapterPlans.map(plan => plan.chapterNumber)).toEqual([1, 2, 3, 4, 5]);
+      expect(foundation).toMatchObject({ passed: true, issues: [], source: 'computed_v2' });
+      expect(foundation.total).toBeGreaterThanOrEqual(8);
+      expect(launchPack.storyState.cast.map(item => item.name).sort()).toEqual([launchPack.storySpec.protagonist.name, ...launchPack.storySpec.cast.map(item => item.name)].sort());
+      expect(launchPack.storyState.resources.map(item => item.resource).sort()).toEqual(launchPack.storySpec.resourceEconomy.map(item => item.resource).sort());
+      expect(launchPack.storyState.promises.map(item => item.id).sort()).toEqual(launchPack.storySpec.promisePayoffLedger.map(item => item.id).sort());
+    }
+  });
+
+  it('ships three continuous 1-3 openings through the strict call budget without production writes', () => {
+    const materializedRoot = path.join(process.cwd(), 'blueprints/flagship-portfolio-v1/materialized');
+    const manifest = JSON.parse(readFileSync(path.join(materializedRoot, 'opening-manifest.json'), 'utf8'));
+    expect(manifest).toMatchObject({
+      status: 'three_openings_ready_for_human_gate',
+      productionWrites: 0,
+      productionProjectsChanged: false,
+    });
+    expect(manifest.runs).toHaveLength(3);
+
+    for (const finalist of APPROVED_PORTFOLIO_FINALISTS_V2) {
+      const slotRoot = path.join(materializedRoot, finalist.slotId.toLowerCase());
+      const launchPack = FlagshipLaunchPackV2Schema.parse(JSON.parse(readFileSync(path.join(slotRoot, 'launch-pack.json'), 'utf8')));
+      const run = JSON.parse(readFileSync(path.join(slotRoot, 'opening-run-manifest.json'), 'utf8'));
+      expect(run).toMatchObject({ status: 'opening_1_3_publishable_offline', chaptersPublished: 3, productionWrites: 0, contentFallbacks: 0 });
+      let state = StoryStateV2Schema.parse(launchPack.storyState);
+      for (let chapterNumber = 1; chapterNumber <= 3; chapterNumber += 1) {
+        const chapter = JSON.parse(readFileSync(path.join(slotRoot, 'chapters', `chapter-${String(chapterNumber).padStart(2, '0')}.json`), 'utf8'));
+        expect(chapter.verdict).toMatchObject({ decision: 'publish', hardGatePassed: true, planFidelity: 10 });
+        expect(Math.min(...Object.values(chapter.verdict.axes) as number[])).toBeGreaterThanOrEqual(7.5);
+        expect(chapter.callRoles.slice(0, 3)).toEqual(['director', 'writer', 'editor']);
+        expect(chapter.callRoles.length).toBeGreaterThanOrEqual(3);
+        expect(chapter.callRoles.length).toBeLessThanOrEqual(4);
+        expect(chapter.content).toContain(launchPack.storySpec.protagonist.name);
+        const committed = StoryStateV2Schema.parse(applyChapterStateDelta({ state, plan: chapter.chapterPlan, title: chapter.title, content: chapter.content }));
+        const saved = StoryStateV2Schema.parse(JSON.parse(readFileSync(path.join(slotRoot, 'states', `state-after-chapter-${String(chapterNumber).padStart(2, '0')}.json`), 'utf8')));
+        expect(saved).toEqual(committed);
+        state = saved;
+      }
+      expect(state.chapterNumber).toBe(3);
+    }
+  });
+
   it('distills mechanisms for Concept Lab without exposing titles, authors or source URLs', () => {
     const pack = getChineseBenchmarkPack('DT-03')!;
     const guidance = distillBenchmarkForConceptLab(pack);
@@ -223,6 +304,8 @@ describe('flagship first-30 portfolio', () => {
     const promote = readFileSync(path.join(process.cwd(), 'scripts/flagship-portfolio-promote.ts'), 'utf8');
     const tournaments = readFileSync(path.join(process.cwd(), 'scripts/flagship-portfolio-tournaments.ts'), 'utf8');
     const review = readFileSync(path.join(process.cwd(), 'scripts/flagship-portfolio-review-openings.ts'), 'utf8');
+    const materialize = readFileSync(path.join(process.cwd(), 'scripts/flagship-portfolio-materialize.ts'), 'utf8');
+    const writeOpenings = readFileSync(path.join(process.cwd(), 'scripts/flagship-portfolio-write-openings.ts'), 'utf8');
     expect(promote).toContain('databaseWrites: 0');
     expect(promote).toContain('SETUP_BLOCKED');
     expect(promote).not.toContain('getSupabase');
@@ -236,6 +319,15 @@ describe('flagship first-30 portfolio', () => {
     expect(review).not.toContain('getSupabase');
     expect(review).not.toContain('chapter-writer');
     expect(review).not.toContain('orchestrator');
+    for (const script of [materialize, writeOpenings]) {
+      expect(script).toContain('productionWrites: 0');
+      expect(script).toContain('contentFallbacks: 0');
+      expect(script).not.toContain('getSupabase');
+      expect(script).not.toContain('chapter-writer');
+      expect(script).not.toContain('orchestrator');
+      expect(script).not.toContain('routine_soft');
+      expect(script).not.toContain('golden fallback');
+    }
   });
 
   it('ranks blind openings by reading quality and applies explicit critical penalties', () => {

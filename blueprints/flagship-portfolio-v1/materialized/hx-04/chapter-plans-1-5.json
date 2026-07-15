@@ -1,0 +1,396 @@
+[
+  {
+    "schemaVersion": 2,
+    "chapterNumber": 1,
+    "chapterPromise": "Đánh dấu màu phân loại tuổi đá",
+    "stateBefore": {
+      "kênh_tình_trạng": "Sắp vỡ do đá mủn ở ngày thứ 89"
+    },
+    "scenes": [
+      {
+        "id": "scene_1_a",
+        "pov": "Khang",
+        "desire": "Ngăn chặn viên đá mục nát vỡ vụn làm sập đoạn kênh số bốn.",
+        "opposition": "Thím Ba gào thét ngăn cản vì xót mảng rêu non chưa đủ tuổi thu hoạch.",
+        "tactic": "Dùng que gỗ nhọn đâm xuyên lớp rêu để chứng minh cốt đá bên trong đã xốp bục.",
+        "irreversibleChange": "Viên đá mủn bị nạy lên và vỡ nát, cứu được kênh nhưng chọc giận thợ rêu.",
+        "informationDelta": "Khang chứng minh được khả năng đo độ mủn của đá bằng xúc giác qua que gỗ.",
+        "cost": "Bị Thím Ba thù ghét và Lão Chư ghi hận vì làm mất mối bán đá số lượng lớn.",
+        "payoff": "Đoạn kênh số bốn được an toàn, dòng nước quý giá không bị thất thoát xuống tro.",
+        "exitHook": "Đốc công Hùng xuất hiện, lạnh lùng ghi sổ phạt Khang vì tự ý dừng dòng chảy."
+      },
+      {
+        "id": "scene_1_b",
+        "pov": "Khang",
+        "desire": "Nhận đủ khẩu phần nước sau một ca làm việc căng thẳng cứu kênh.",
+        "opposition": "Đốc công Hùng vin vào luật lệ cứng nhắc để trừ nửa gáo nước của Khang.",
+        "tactic": "Chấp nhận hình phạt trong im lặng, không đôi co để tránh bị phạt thêm.",
+        "irreversibleChange": "Khang chính thức bị đưa vào danh sách đen của Đốc công Hùng.",
+        "informationDelta": "Khang nhận ra Lão Chư đang đứng sau giật dây Hùng để trả đũa mình.",
+        "cost": "Mất nửa khẩu phần nước, cổ họng khô khốc sau một ngày lao động nặng nhọc.",
+        "payoff": "Nhận diện rõ ràng liên minh lợi ích giữa Lão Chư và Đốc công Hùng.",
+        "exitHook": "Lão Chư cười khẩy rời đi, báo hiệu một mẻ đá tồi tệ sắp được giao đến."
+      }
+    ],
+    "stateAfter": {
+      "kênh_tình_trạng": "Tạm ổn nhưng Khang bị trừ nước và đắc tội nhiều bên"
+    },
+    "promisesAdvanced": [
+      "promise_1"
+    ],
+    "promisesPaid": [],
+    "nextChapterPressure": "Lão Chư giao mẻ đá nung non để trả đũa, ép Khang vào thế bí.",
+    "stateDelta": {
+      "facts": {
+        "sự_cố_kênh_4": "Đã được Khang ngăn chặn kịp thời bằng cách thay đá sớm."
+      },
+      "cast": [
+        {
+          "name": "Khang",
+          "status": "alive",
+          "location": "Trạm cấp nước",
+          "learned": [
+            "Lão Chư và Đốc công Hùng có sự thông đồng ngầm."
+          ],
+          "relationshipChange": "Trở thành cái gai trong mắt Lão Chư và Đốc công Hùng."
+        }
+      ],
+      "resources": [
+        {
+          "resource": "Nước sạch định mức",
+          "amountAfter": "Giảm 50% khẩu phần ngày của Khang",
+          "source": "Bị Đốc công Hùng trừ phạt"
+        }
+      ],
+      "promises": [
+        {
+          "id": "promise_1",
+          "status": "advanced",
+          "currentPressure": "Cần phân loại đá gấp vì Lão Chư sắp giao hàng lỗi."
+        }
+      ]
+    }
+  },
+  {
+    "schemaVersion": 2,
+    "chapterNumber": 2,
+    "chapterPromise": "Đàm phán bù hao hụt rêu",
+    "stateBefore": {
+      "đá_mới": "Chưa có, đang chờ Lão Chư giao hàng"
+    },
+    "scenes": [
+      {
+        "id": "scene_2_a",
+        "pov": "Khang",
+        "desire": "Nhận lô đá mới chất lượng để thay thế các đoạn kênh sắp mủn.",
+        "opposition": "Phu xe của Lão Chư giao mẻ đá nung non, bề ngoài không vết nứt nhưng bên trong xốp.",
+        "tactic": "Gõ thử và cạo bề mặt để phát hiện lỗi, nhưng buộc phải ký nhận vì không có nguồn khác.",
+        "irreversibleChange": "Đoạn kênh số bốn chính thức phải sử dụng lô đá kém chất lượng có tuổi thọ ngắn.",
+        "informationDelta": "Khang xác nhận Lão Chư cố tình dùng đá nung non để ép tiến độ hỏng hóc.",
+        "cost": "Phải gánh chịu rủi ro vỡ kênh cao hơn trong 60 ngày tới.",
+        "payoff": "Giữ được nguồn cung vật liệu tạm thời để kênh không bị đình trệ ngay lập tức.",
+        "exitHook": "Nhìn đống đá lỗi, Khang vét sạch tiền túi đi mua đất sét màu."
+      },
+      {
+        "id": "scene_2_b",
+        "pov": "Khang",
+        "desire": "Phân loại toàn bộ bãi đá để kiểm soát rủi ro vỡ kênh do đá nung non.",
+        "opposition": "Số lượng đá quá lớn, làm việc trong đêm tối thiếu ánh sáng.",
+        "tactic": "Thức trắng đêm dùng đất sét đỏ, vàng, xanh đánh dấu từng viên đá theo độ chín.",
+        "irreversibleChange": "Hệ thống quản lý vật liệu bằng vạch màu đầu tiên của thung lũng ra đời.",
+        "informationDelta": "Đám thợ kênh biết được quy định mới: đá vạch đỏ phải dỡ sau đúng 60 ngày.",
+        "cost": "Thức trắng đêm, kiệt sức và tốn chút tiền túi cuối cùng mua đất sét.",
+        "payoff": "Kiểm soát được hoàn toàn tuổi thọ dự kiến của hơn hai trăm viên đá mới.",
+        "exitHook": "Thím Ba dẫn đầu đám thợ rêu xông tới, giận dữ vì quy định dỡ đá 60 ngày."
+      }
+    ],
+    "stateAfter": {
+      "đá_mới": "Đã được phân loại màu nhưng vấp phải sự chống đối của thợ rêu"
+    },
+    "promisesAdvanced": [
+      "promise_1",
+      "promise_2"
+    ],
+    "promisesPaid": [
+      "promise_1"
+    ],
+    "nextChapterPressure": "Thợ rêu dọa đình công, không nhường mặt bằng kênh nếu Khang ép dỡ đá sớm.",
+    "stateDelta": {
+      "facts": {
+        "hệ_thống_vạch_màu": "Đã được áp dụng để phân loại tuổi thọ đá lót kênh."
+      },
+      "cast": [
+        {
+          "name": "Thím Ba",
+          "status": "alive",
+          "location": "Bãi tập kết đá",
+          "learned": [
+            "Khang định dỡ đá vạch đỏ chỉ sau 60 ngày."
+          ],
+          "relationshipChange": "Tức giận và chuẩn bị bạo động chống lại Khang."
+        }
+      ],
+      "resources": [
+        {
+          "resource": "Đá mang dấu tay phân loại tuổi",
+          "amountAfter": "Hơn 200 viên đã được đánh dấu màu",
+          "source": "Lô hàng lỗi của Lão Chư"
+        }
+      ],
+      "promises": [
+        {
+          "id": "promise_1",
+          "status": "paid",
+          "currentPressure": "Hệ thống màu đã hoàn thành, chờ kiểm chứng thực tế."
+        },
+        {
+          "id": "promise_2",
+          "status": "advanced",
+          "currentPressure": "Phải tìm cách bù đắp thiệt hại cho thợ rêu ngay lập tức."
+        }
+      ]
+    }
+  },
+  {
+    "schemaVersion": 2,
+    "chapterNumber": 3,
+    "chapterPromise": "Lập trạm nghiền bột đá",
+    "stateBefore": {
+      "thợ_rêu": "Đang bao vây và đe dọa đình công"
+    },
+    "scenes": [
+      {
+        "id": "scene_3_a",
+        "pov": "Khang",
+        "desire": "Thuyết phục thợ rêu chấp nhận lịch dỡ đá 60 ngày mà không gây bạo loạn.",
+        "opposition": "Thím Ba và đám đông thợ rêu kiên quyết bảo vệ chu kỳ sinh trưởng 90 ngày của rêu.",
+        "tactic": "Dùng chày giã nát đá cũ, trộn với tro làm phân bón và trình diễn luống rêu thử nghiệm mọc cực nhanh.",
+        "irreversibleChange": "Công thức phân bón bột đá từ đá mục chính thức được công khai cho thợ rêu.",
+        "informationDelta": "Thợ rêu nhận ra đá cũ không phải phế liệu mà là nguồn khoáng chất quý giá.",
+        "cost": "Khang phải tự tay giã đá thủ công trước mặt mọi người, tốn rất nhiều sức lực.",
+        "payoff": "Thím Ba nếm thử rêu non, đồng ý nhượng bộ và giải tán đám đông.",
+        "exitHook": "Thím Ba ném cho Khang một túi rêu sấy khô loại nhất như một sự công nhận ngầm."
+      },
+      {
+        "id": "scene_3_b",
+        "pov": "Khang",
+        "desire": "Nghỉ ngơi và tận hưởng thành quả sau khi giải quyết xong khủng hoảng.",
+        "opposition": "Cơn đau nhức cơ bắp ập đến, nhắc nhở về khối lượng đá cũ khổng lồ đang chờ.",
+        "tactic": "Nấu một nồi súp rêu nóng hổi để hồi phục thể lực, vừa ăn vừa tính toán bước tiếp theo.",
+        "irreversibleChange": "Khang nhận lấy trách nhiệm phải cung cấp đủ phân bón bột đá cho toàn bộ thợ rêu.",
+        "informationDelta": "Khang nhận ra sức người không thể giã kịp hàng ngàn viên đá mục trong tháng tới.",
+        "cost": "Cơ thể kiệt quệ, đối mặt với áp lực công việc tay chân khổng lồ sắp tới.",
+        "payoff": "Có một bữa ăn no đủ hiếm hoi và sự hợp tác tạm thời của nhóm thợ rêu.",
+        "exitHook": "Nhìn dòng kênh chảy xiết qua khe cửa sổ, Khang nảy ra ý tưởng dùng sức nước."
+      }
+    ],
+    "stateAfter": {
+      "thợ_rêu": "Đã hợp tác nhưng Khang đối mặt với khủng hoảng sức lao động"
+    },
+    "promisesAdvanced": [
+      "promise_2",
+      "promise_3"
+    ],
+    "promisesPaid": [
+      "promise_2"
+    ],
+    "nextChapterPressure": "Núi đá cũ chất đống, sức người không thể nghiền kịp để giao phân bón đúng hẹn.",
+    "stateDelta": {
+      "facts": {
+        "công_thức_phân_bón": "Đã được chứng minh hiệu quả và chấp nhận rộng rãi."
+      },
+      "cast": [
+        {
+          "name": "Khang",
+          "status": "alive",
+          "location": "Trong lều cá nhân",
+          "learned": [
+            "Sức người có giới hạn, cần cơ giới hóa việc nghiền đá."
+          ],
+          "relationshipChange": "Được Thím Ba tôn trọng hơn một chút."
+        }
+      ],
+      "resources": [
+        {
+          "resource": "Bột đá tái sinh",
+          "amountAfter": "Một lượng nhỏ được tạo ra thủ công",
+          "source": "Đá cũ nát giã bằng chày"
+        },
+        {
+          "resource": "Rêu sấy khô loại nhất",
+          "amountAfter": "Tăng thêm một túi nhỏ",
+          "source": "Quà tặng từ Thím Ba"
+        }
+      ],
+      "promises": [
+        {
+          "id": "promise_2",
+          "status": "paid",
+          "currentPressure": "Thợ rêu đã đồng ý lịch dỡ đá nhờ có phân bón."
+        },
+        {
+          "id": "promise_3",
+          "status": "advanced",
+          "currentPressure": "Phải tìm cách lập trạm nghiền cơ giới trước khi núi đá cũ đè bẹp tiến độ."
+        }
+      ]
+    }
+  },
+  {
+    "schemaVersion": 2,
+    "chapterNumber": 4,
+    "chapterPromise": "Chế tạo cối xay đá sức nước",
+    "stateBefore": {
+      "đá_cũ": "Chất thành núi trước bãi tập kết"
+    },
+    "scenes": [
+      {
+        "id": "scene_4_a",
+        "pov": "Khang",
+        "desire": "Nghiền nát đống đá cũ thành phân bón để giao cho Thím Ba đúng hẹn.",
+        "opposition": "Trình và Khang vật lộn giã đá thủ công nhưng tiến độ quá chậm, Đốc công Hùng đến mỉa mai.",
+        "tactic": "Cắn răng chịu đựng sự sỉ nhục của Hùng, quan sát kỹ dòng chảy xiết của đoạn kênh dốc.",
+        "irreversibleChange": "Khang quyết định từ bỏ việc giã đá bằng tay, chuyển hướng sang cơ giới hóa.",
+        "informationDelta": "Khang nhận ra có thể lợi dụng độ dốc của kênh để tạo động lực cho cối giã.",
+        "cost": "Bị Đốc công Hùng đe dọa cắt nước nếu để bụi đá bay xuống lòng kênh.",
+        "payoff": "Hình thành bản thiết kế sơ bộ cho một hệ thống guồng nước nối với chày giã.",
+        "exitHook": "Khang lén lút đo đạc lưu lượng nước vào ban đêm để hoàn thiện bản vẽ."
+      },
+      {
+        "id": "scene_4_b",
+        "pov": "Khang",
+        "desire": "Hoàn thiện bản thiết kế cối xay nước và tìm kiếm vật liệu chế tạo.",
+        "opposition": "Thiếu một trục gỗ lim đủ cứng để chịu lực đập liên tục của chày đá.",
+        "tactic": "Lục lọi bãi phế liệu của thung lũng nhưng không tìm thấy khúc gỗ nào đạt yêu cầu.",
+        "irreversibleChange": "Bản thiết kế cối xay hoàn thành trên giấy nhưng bế tắc ở khâu vật liệu.",
+        "informationDelta": "Trình tiết lộ gã gác kho vật tư của Nha Lộ có giấu một khúc gỗ lim phế liệu.",
+        "cost": "Mất thời gian nghỉ ngơi quý giá để lén lút làm việc ngoài giờ.",
+        "payoff": "Xác định được mục tiêu cần giao dịch để lấy vật liệu cốt lõi.",
+        "exitHook": "Khang nhìn túi rêu sấy khô loại nhất, quyết định dùng nó làm vật hối lộ."
+      }
+    ],
+    "stateAfter": {
+      "đá_cũ": "Vẫn chất đống nhưng đã có giải pháp cơ giới hóa trên giấy"
+    },
+    "promisesAdvanced": [
+      "promise_3"
+    ],
+    "promisesPaid": [],
+    "nextChapterPressure": "Phải giao dịch thành công để lấy khúc gỗ lim trước khi Thím Ba đến đòi phân bón.",
+    "stateDelta": {
+      "facts": {
+        "bản_thiết_kế_cối_xay": "Đã hoàn thành và khả thi về mặt lý thuyết."
+      },
+      "cast": [
+        {
+          "name": "Trình",
+          "status": "alive",
+          "location": "Bãi phế liệu",
+          "learned": [
+            "Khang đang chế tạo một cỗ máy bí mật."
+          ],
+          "relationshipChange": "Trở thành đồng phạm giúp Khang tìm kiếm vật liệu."
+        }
+      ],
+      "resources": [
+        {
+          "resource": "Rêu sấy khô loại nhất",
+          "amountAfter": "Chuẩn bị được mang đi hối lộ",
+          "source": "Túi quà của Thím Ba"
+        }
+      ],
+      "promises": [
+        {
+          "id": "promise_3",
+          "status": "advanced",
+          "currentPressure": "Chỉ còn thiếu trục gỗ lim là có thể lắp ráp trạm nghiền."
+        }
+      ]
+    }
+  },
+  {
+    "schemaVersion": 2,
+    "chapterNumber": 5,
+    "chapterPromise": "Giao dịch ngầm lấy gỗ lim",
+    "stateBefore": {
+      "vật_liệu_trục": "Thiếu khúc gỗ lim cốt lõi"
+    },
+    "scenes": [
+      {
+        "id": "scene_5_a",
+        "pov": "Khang",
+        "desire": "Đổi lấy khúc gỗ lim phế liệu từ gã gác kho vật tư của Nha Lộ.",
+        "opposition": "Gã gác kho đòi giá cắt cổ, không chịu nhận tiền xu mà chỉ muốn thức ăn ngon.",
+        "tactic": "Đưa ra túi rêu sấy khô loại nhất, thuyết phục gã rằng đây là món hàng hiếm.",
+        "irreversibleChange": "Khang chính thức bước chân vào thị trường giao dịch chợ đen của thung lũng.",
+        "informationDelta": "Khang học được cách dùng tài nguyên thực tế (rêu) để lách luật Nha Lộ.",
+        "cost": "Mất toàn bộ số rêu ngon dự trữ, phải quay lại ăn tro trộn rêu vụn.",
+        "payoff": "Lấy được khúc gỗ lim hoàn hảo để làm trục truyền động cho cối xay.",
+        "exitHook": "Khang vác khúc gỗ nặng trịch về lán trong đêm tối, gọi Trình dậy lắp ráp."
+      },
+      {
+        "id": "scene_5_b",
+        "pov": "Khang",
+        "desire": "Lắp ráp và vận hành thử nghiệm trạm nghiền bột đá cơ giới đầu tiên.",
+        "opposition": "Bóng tối, sự mệt mỏi và nguy cơ bị tuần tra của Đốc công Hùng phát hiện.",
+        "tactic": "Làm việc trong im lặng, dùng bùn trát các khớp nối để giảm tiếng ồn khi chạy thử.",
+        "irreversibleChange": "Trạm nghiền cơ giới chạy bằng sức nước chính thức đi vào hoạt động.",
+        "informationDelta": "Đám thợ rêu sáng hôm sau chứng kiến bột đá tuôn ra đều đặn mà không tốn sức người.",
+        "cost": "Mất ngủ hoàn toàn, rủi ro bị Nha Lộ khép tội phá hoại dòng chảy.",
+        "payoff": "Giải quyết triệt để bài toán sức lao động, nguồn phân bón bột đá trở nên dồi dào.",
+        "exitHook": "Tiếng cối giã rầm rập vang lên, Đốc công Hùng tức giận dẫn người lao tới đòi đập phá."
+      }
+    ],
+    "stateAfter": {
+      "trạm_nghiền": "Hoạt động trơn tru, sản xuất bột đá liên tục"
+    },
+    "promisesAdvanced": [
+      "promise_3",
+      "promise_4"
+    ],
+    "promisesPaid": [
+      "promise_3"
+    ],
+    "nextChapterPressure": "Đốc công Hùng đòi phá bỏ trạm nghiền vì tội tự ý sử dụng động năng của dòng chảy.",
+    "stateDelta": {
+      "facts": {
+        "trạm_nghiền_cơ_giới": "Đã được xây dựng và vận hành thành công tại đoạn kênh số bốn."
+      },
+      "cast": [
+        {
+          "name": "Đốc công Hùng",
+          "status": "alive",
+          "location": "Đang tiến đến trạm nghiền",
+          "learned": [
+            "Khang đã lén lút chế tạo máy móc dùng sức nước."
+          ],
+          "relationshipChange": "Quyết tâm tiêu diệt phát minh của Khang để bảo vệ quyền lực."
+        }
+      ],
+      "resources": [
+        {
+          "resource": "Rêu sấy khô loại nhất",
+          "amountAfter": "Đã tiêu sạch",
+          "source": "Dùng để hối lộ lấy gỗ lim"
+        },
+        {
+          "resource": "Bột đá tái sinh",
+          "amountAfter": "Sản lượng tăng vọt, dồi dào",
+          "source": "Trạm nghiền cơ giới"
+        }
+      ],
+      "promises": [
+        {
+          "id": "promise_3",
+          "status": "paid",
+          "currentPressure": "Trạm nghiền đã giải quyết xong bài toán sức lao động."
+        },
+        {
+          "id": "promise_4",
+          "status": "advanced",
+          "currentPressure": "Cuộc đối đầu trực tiếp với Đốc công Hùng đã bắt đầu."
+        }
+      ]
+    }
+  }
+]

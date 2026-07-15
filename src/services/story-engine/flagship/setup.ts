@@ -224,6 +224,28 @@ export async function materializeFlagshipLaunchPackV2(input: {
   if (JSON.stringify(launchPack.storySpec.resourceEconomy) !== JSON.stringify(world.resources)) identityChanges.push('resourceEconomy');
   if (identityChanges.length) throw new FlagshipSetupError('setup_blocked', `Launch Architect rewrote approved artifacts: ${identityChanges.join(', ')}.`);
 
+  const exactCoverage = (actual: string[], expected: string[]): boolean => {
+    const normalized = (values: string[]) => [...new Set(values.map(value => value.trim().toLowerCase()))].sort();
+    return JSON.stringify(normalized(actual)) === JSON.stringify(normalized(expected));
+  };
+  const stateCoverageIssues: string[] = [];
+  if (!exactCoverage(launchPack.storyState.cast.map(item => item.name), [launchPack.storySpec.protagonist.name, ...launchPack.storySpec.cast.map(item => item.name)])) stateCoverageIssues.push('cast');
+  if (!exactCoverage(launchPack.storyState.resources.map(item => item.resource), launchPack.storySpec.resourceEconomy.map(item => item.resource))) stateCoverageIssues.push('resources');
+  if (!exactCoverage(launchPack.storyState.promises.map(item => item.id), launchPack.storySpec.promisePayoffLedger.map(item => item.id))) stateCoverageIssues.push('promises');
+  if (stateCoverageIssues.length) throw new FlagshipSetupError('setup_blocked', `StoryState chapter 0 does not exactly cover StorySpec ledgers: ${stateCoverageIssues.join(', ')}.`);
+
+  const allowedCast = new Set(launchPack.storyState.cast.map(item => item.name));
+  const allowedResources = new Set(launchPack.storyState.resources.map(item => item.resource));
+  const allowedPromises = new Set(launchPack.storyState.promises.map(item => item.id));
+  for (const plan of launchPack.rollingChapterPlans) {
+    const unknownCast = plan.stateDelta.cast.map(item => item.name).filter(name => !allowedCast.has(name));
+    const unknownResources = plan.stateDelta.resources.map(item => item.resource).filter(resource => !allowedResources.has(resource));
+    const unknownPromises = plan.stateDelta.promises.map(item => item.id).filter(id => !allowedPromises.has(id));
+    if (unknownCast.length || unknownResources.length || unknownPromises.length) {
+      throw new FlagshipSetupError('setup_blocked', `ChapterPlan ${plan.chapterNumber} references state outside the chapter-0 ledgers.`, { unknownCast, unknownResources, unknownPromises });
+    }
+  }
+
   for (const chapter of opening.chapters) {
     const plan = launchPack.rollingChapterPlans.find(item => item.chapterNumber === chapter.chapterNumber);
     if (!plan || !JSON.stringify(plan).includes(chapter.requiredPlanAnchor)) {

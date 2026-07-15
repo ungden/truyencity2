@@ -7,7 +7,7 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 - Tiên hiệp phi cổ điển: 5
 - Đô thị, niên đại, nghề nghiệp và song xuyên: 18
 - Trạng thái: concept_package_ready
-- StorySpec đã materialize: 0
+- StorySpec đã materialize: 3 (HX-04, TH-01, DT-11; offline, chưa tạo project production)
 - Production mutation: không
 
 ## HX-01 — Đi Kiểm Định Dị Tượng, Tôi Phát Hiện Thành Phố Này Có Luật Giết Người
@@ -362,9 +362,9 @@ Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một
 
 **Lời hứa dài kỳ:** Dịch vụ, đội ngũ và thị trường thay nhau tiến triển; mỗi thành công khiến người chơi lẫn nhà phát hành học và phản ứng.
 
-## DT-11 — Giám Bảo Đồ Cũ: Công Cụ Chỉ Gợi Một Dòng, Còn Tôi Tự Tìm Hàng Thật
+## DT-11 — Giám Bảo Gốm Cổ: Tôi Chạm Một Lần, Biết Nó Được Nung Bằng Lửa Gì
 
-![Bìa Giám Bảo Đồ Cũ: Công Cụ Chỉ Gợi Một Dòng, Còn Tôi Tự Tìm Hàng Thật](../../public/covers/flagship-first-30/dt-11.webp)
+![Bìa Giám Bảo Gốm Cổ: Tôi Chạm Một Lần, Biết Nó Được Nung Bằng Lửa Gì](../../public/covers/flagship-first-30/dt-11.webp)
 
 **Tagline:** Giá trị thật không phát sáng; nó để lại dấu vết cho người đủ kiên nhẫn.
 

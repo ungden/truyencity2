@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 2,
+  "chapterNumber": 1,
+  "facts": {
+    "kênh_số_4_nguy_kịch": "Hơn nửa số đá lót kênh đang ở tháng thứ 3 chuẩn bị mủn, nguy cơ vỡ kênh diện rộng rất cao.",
+    "kênh_tình_trạng": "Tạm ổn nhưng Khang bị trừ nước và đắc tội nhiều bên",
+    "sự_cố_kênh_4": "Đã được Khang ngăn chặn kịp thời bằng cách thay đá sớm."
+  },
+  "timeline": [
+    {
+      "chapter": 1,
+      "event": "Đánh dấu màu phân loại tuổi đá"
+    }
+  ],
+  "cast": [
+    {
+      "name": "Khang",
+      "status": "alive",
+      "location": "Trạm cấp nước",
+      "knowledge": [
+        "Cách dùng que gỗ đo độ mủn của đá mang dấu tay dưới lớp rễ rêu.",
+        "Lão Chư và Đốc công Hùng có sự thông đồng ngầm."
+      ],
+      "relationshipToProtagonist": "Trở thành cái gai trong mắt Lão Chư và Đốc công Hùng."
+    },
+    {
+      "name": "Lão Chư",
+      "status": "alive",
+      "location": "Xưởng nung đá chính của thung lũng",
+      "knowledge": [
+        "Cách pha tạp chất và giảm nhiệt độ để nung đá non kiếm lời."
+      ],
+      "relationshipToProtagonist": "Kẻ thù tiềm năng đang nắm giữ nguồn vật liệu"
+    },
+    {
+      "name": "Thím Ba",
+      "status": "alive",
+      "location": "Khu vực luống rêu dọc đoạn kênh số bốn",
+      "knowledge": [
+        "Vị trí dòng nước chảy êm nhất giúp rêu bám rễ nhanh."
+      ],
+      "relationshipToProtagonist": "Đối tác bất đắc dĩ trên cùng mặt bằng kênh"
+    },
+    {
+      "name": "Đốc công Hùng",
+      "status": "alive",
+      "location": "Trạm cấp nước tuyến số bốn",
+      "knowledge": [
+        "Cách ghi chép sổ sách để che đậy lượng nước thất thoát thực tế."
+      ],
+      "relationshipToProtagonist": "Kẻ giám sát quan liêu nắm giữ khẩu phần nước"
+    },
+    {
+      "name": "Trình",
+      "status": "alive",
+      "location": "Khu lán thợ kênh",
+      "knowledge": [
+        "Tin tức vỉa hè về các biến động nhân sự trong thung lũng."
+      ],
+      "relationshipToProtagonist": "Thợ phụ cấp dưới nhút nhát nhưng trung thành"
+    }
+  ],
+  "resources": [
+    {
+      "resource": "Đá mang dấu tay phân loại tuổi",
+      "amount": "Đang cạn kiệt, phần lớn đá trên kênh sắp mủn",
+      "source": "Xưởng nung của Lão Chư",
+      "lastChangedChapter": 0
+    },
+    {
+      "resource": "Bột đá tái sinh",
+      "amount": "Chưa tồn tại",
+      "source": "Đá cũ nát chưa được tận dụng",
+      "lastChangedChapter": 0
+    },
+    {
+      "resource": "Nước sạch định mức",
+      "amount": "Giảm 50% khẩu phần ngày của Khang",
+      "source": "Bị Đốc công Hùng trừ phạt",
+      "lastChangedChapter": 1
+    },
+    {
+      "resource": "Rêu sấy khô loại nhất",
+      "amount": "Đang sinh trưởng trên đá, chưa đến kỳ thu hoạch",
+      "source": "Luống rêu của Thím Ba",
+      "lastChangedChapter": 0
+    }
+  ],
+  "promises": [
+    {
+      "id": "promise_1",
+      "status": "advanced",
+      "currentPressure": "Cần phân loại đá gấp vì Lão Chư sắp giao hàng lỗi."
+    },
+    {
+      "id": "promise_2",
+      "status": "open",
+      "currentPressure": "Thợ rêu sẵn sàng bạo động nếu bị ép dỡ đá trước thời hạn 90 ngày."
+    },
+    {
+      "id": "promise_3",
+      "status": "open",
+      "currentPressure": "Lượng đá cũ thải ra quá nhiều, sức người không thể dọn dẹp kịp."
+    },
+    {
+      "id": "promise_4",
+      "status": "open",
+      "currentPressure": "Đốc công Hùng liên tục tìm cớ trừ lương nước của đội bảo trì."
+    },
+    {
+      "id": "promise_5",
+      "status": "open",
+      "currentPressure": "Lão Chư đe dọa cắt nguồn cung đá mới nếu không chịu nhận hàng lỗi."
+    }
+  ],
+  "recentSummary": "Chương 1: Ngày Thứ Tám Mươi Chín: Đánh dấu màu phân loại tuổi đá Trạng thái mới: Tạm ổn nhưng Khang bị trừ nước và đắc tội nhiều bên",
+  "previousEnding": "mới là điều quan trọng nhất. Đột nhiên, tiếng giày đinh gõ xuống lề kênh khô khốc. Đốc công Hùng xuất hiện từ phía sau trạm gác, hai tay chắp sau lưng, khuôn mặt lạnh tanh không chút cảm xúc. Gã nhìn đồng hồ cát vắt vẻo bên hông, lại nhìn dòng nước vừa được lưu thông, rồi chậm rãi mở cuốn sổ bìa da nham nhở vết than. \"Thợ bảo trì Khang,\" Giọng Hùng cộc lốc vang lên, \"Tự ý hạ vách ngăn, dừng dòng chảy. Không có lệnh báo trước từ Nha Lộ Thung Lũng.\" Khang lấy giẻ lau bùn trên tay, nhàn nhạt đáp: \"Tôi ngăn chặn sự cố vỡ kênh do đá bục ở ngày thứ tám mươi chín. Dấu vết bùn đá cũ vẫn còn trên bờ kìa.\" Hùng không thèm liếc nhìn đống bùn lấy một giây. Gã chỉ nhìn vào đồng hồ cát. \"Thời gian dừng nước: Một khắc mười lăm nhịp. Quá giới hạn quy định một khắc. Vi phạm luật vận hành trạm.\" Hùng rút bút than, thẳng tay gạch một đường đen đặc vắt ngang tên Khang trên trang sổ. Khang không nói thêm lời nào. Anh biết có giải thích cũng vô ích với kẻ chỉ sống bằng luật lệ giấy tờ. Hùng cần một kẻ gánh lỗi để sổ sách của gã sạch sẽ, và Khang vừa tự biến mình thành bia đỡ đạn. Chiều muộn, tại trạm cấp nước tuyến số bốn. Cái nóng hầm hập của thung lũng vẫn chưa chịu buông tha cho những tấm thân gầy gò nhễ nhại mồ hôi. Bụi tro lơ lửng trong không khí bám vào cổ họng, khiến ai nấy đều khát khô. Đám thợ kênh xếp thành một hàng dài trước cổng kho tổng, chờ nhận khẩu phần nước trả công trong ngày. Trình đứng ngay sau Khang, tay xoa xoa bắp chân đau nhức, lẩm bẩm bằng giọng rụt rè: \"Anh Khang ơi... sao anh cứ phải làm rùm beng lên thế? Kênh chưa sập thì mình cứ để kệ nó đi, báo hỏng lên trên rồi chờ lệnh thay. Lúc nãy anh tự ý chặn nước, chắc chắn Đốc công Hùng sẽ vin vào đó mà trừ lương. Mình chết khát mất.\" Khang không quay đầu lại, mắt dán chặt vào họng phuy nước phía trước: \"Chờ lệnh báo hỏng thì đoạn kênh số bốn đã sụp thành vũng bùn. Mười lăm mét hạ tầng bị phá hủy sẽ mất ba ngày để khôi phục. Mày định nhịn khát ba ngày hay bị trừ một ít nước ngày hôm nay?\" Trình chóp chép miệng, đuối lý nhưng ánh mắt vẫn bồn chồn lo sợ. Đến lượt Khang. Đốc công Hùng ngồi vắt chân sau chiếc bàn gỗ nứt nẻ, lật đúng trang sổ có đường gạch đen lúc chiều. Gã dùng chiếc gáo gỗ chuẩn định mức múc một gáo đầy nước trong veo từ thùng phuy ra. Nhưng thay vì đổ vào bát của Khang, gã nghiêng tay, để dòng nước ào ào đổ ngược trở lại thùng phuy cho đến khi chỉ còn đúng một nửa. \"Thợ bảo trì Khang,\" Hùng cất giọng đều đều như máy tụng kinh, \"Tự ý dừng dòng chảy gián đoạn một khắc mười lăm nhịp. Bất kể lý do là gì, vi phạm luật an toàn. Khẩu phần nước trả công hôm nay trừ năm mươi phần trăm.\" Khang đưa chiếc bát gỗ sứt mẻ ra hứng lấy phần nước ít ỏi vơi cạn ở đáy. Cổ họng anh rát bỏng như có lửa đốt, mồ hôi khô bám thành từng mảng tinh thể muối trên áo, nhưng anh tuyệt nhiên không thốt ra một lời than vãn. \"Quy định là quy định,\" Hùng hếch cằm thách thức, gõ cán bút xuống bàn. \"Không có lệnh từ trên, bề mặt đá không có vết nứt để tháo dỡ, mày tự tiện đụng tay vào là mày sai. Lần sau, mày thà để dòng chảy cuốn trôi cái rãnh đó còn hơn tự làm anh hùng.\" Khang nhìn sâu vào mắt Hùng, rồi lùi lại một bước, bưng bát nước lùi về phía mép lán che. Tầm mắt anh lướt qua vai Đốc công, xuyên qua lớp rào gỗ và dừng lại ở góc kho bãi phía xa. Dưới bóng râm đục ngầu bụi tro, Lão Chư đang nhàn nhã ngồi trên một khúc gỗ nghiến. Lão mặc một chiếc áo lụa xỉn màu, tay xoay xoay một viên đá mang dấu tay còn mới tinh, chưa qua sử dụng. Ánh mắt lươn lẹo của lão chạm ánh mắt Khang. Lão nhoẻn miệng, khoe hàm răng ố vàng sỉn màu khói than củi, nhếch lên một nụ cười khẩy đầy ác ý. Khang lập tức móc nối các sự kiện lại với nhau. Lão Chư kiểm soát toàn bộ nguồn cung cấp đá của thung lũng. Đá càng nhanh hỏng, lão càng bán được nhiều. Khang chặn đứng thảm họa sập kênh hôm nay, nghĩa là đã cắt đi một đơn hàng hàng chục khối đá mới để khôi phục hạ tầng. Hơn nữa, việc Khang cạy viên đá mủn ra trước mặt đám thợ rêu đã trực tiếp vạch trần chất lượng thực sự của những mẻ đá mang dấu tay mà Lão Chư luôn tự hào giao hàng nguyên vẹn bề mặt. Lão Chư không dại gì tự tay đánh Khang. Lão dùng áp lực kinh tế. Lão giật dây Đốc công Hùng. Hùng cần thành tích hoàn hảo trong sổ sách, còn Lão Chư cần dằn mặt kẻ dám phá vỡ luồng lợi nhuận mờ ám của lão. Một liên minh lợi ích tàn nhẫn được thiết lập ngay tại trạm nước này. Khang im lặng. Cãi cọ lúc này vô ích. Hùng nắm quyền phân phát nước, Lão Chư nắm nguồn cung vật liệu. Việc chống đối trực tiếp bằng lời nói chỉ khiến anh bị tước đoạt nốt nửa gáo nước còn lại. Khang bưng bát lên môi, cẩn thận uống một ngụm nhỏ, giữ thứ chất lỏng quý giá trong miệng để làm ướt cổ họng rạn nứt. \"Trạm số bốn dạo này làm ăn khá nhỉ,\" Lão Chư lững thững đứng dậy, phủi bụi tro trên vạt áo, cố tình nói lớn bằng chất giọng khàn đục để lọt vào tai Khang. \"Kênh mương hao mòn dữ quá. Than củi nung đá thì khan hiếm, thợ thuyền nhà tao làm không kịp thở. Nhưng tao là người hào sảng, không để anh em thiếu vật liệu bao giờ. Ngày mai tao sẽ cho xe chở trực tiếp mẻ đá tốt nhất đến tận trạm chúng mày. Nhớ chuẩn bị sức mà đỡ.\" Câu nói mang tính đe dọa không thèm che đậy. Khang biết thừa cái 'mẻ đá tốt nhất' của lão là gì. Đó chắc chắn sẽ là những viên đá nung non, bên trong đầy tạp chất xốp bục, nhưng bề ngoài lại nhẵn thín không một vết nứt để ép thợ kênh phải nhận hàng theo đúng quy định giao nhận. Nếu không nhận, Hùng sẽ lại dùng luật lệ để ghi vi phạm tiến độ. Trình đứng nghe mà chân tay run lập cập, vội cúi gằm mặt xuống đất không dám thở mạnh. Khang uống cạn ngụm nước cuối cùng, úp chiếc bát gỗ xuống lòng bàn tay. Anh quay lưng bước đi, bắt đầu tính toán trong đầu. Nếu Lão Chư muốn dùng đá nung non để phá vỡ hệ thống hạ tầng và trả đũa, anh sẽ phải thiết lập một bộ tiêu chuẩn đánh giá khác biệt. Một hệ thống đánh dấu màu phân loại tuổi thọ của từng viên đá bằng dấu vết vật lý trên mặt kênh, nơi mà không một tờ giấy hay một bề mặt nhẵn nhụi nào có thể lấp liếm được sự bục nát từ lõi. Một cuộc chiến sinh tồn trên từng mét vuông kênh dẫn nước vừa mới chính thức bắt đầu.",
+  "retrievalNotes": [
+    "Cần nhớ quy luật 90 ngày của đá mang dấu tay và sự ăn mòn của rễ rêu."
+  ]
+}
