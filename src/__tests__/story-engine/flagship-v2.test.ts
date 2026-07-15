@@ -732,6 +732,7 @@ describe('isolated flagship setup v2', () => {
     expect(launchPrompt).toContain('HUMAN_SELECTION.approvedTitle');
     expect(launchPrompt).toContain('chapterPromise và nextChapterPressure');
     expect(launchPrompt).toContain('nếu anchor ngắn hơn 20 ký tự');
+    expect(launchPrompt).toContain('copy byte-for-byte, kể cả hoa thường và dấu');
     expect(launchPrompt).toContain('pleasureProfile');
   });
 
