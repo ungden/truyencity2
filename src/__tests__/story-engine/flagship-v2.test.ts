@@ -727,6 +727,7 @@ describe('isolated flagship setup v2', () => {
     const launchPrompt = buildLaunchPackPrompt({ brief, selection, candidate: selected, opening, characters, world });
     expect(launchPrompt).toContain('OUTPUT_CONTRACT_EXACT=');
     expect(launchPrompt).toContain('HUMAN_SELECTION.approvedTitle');
+    expect(launchPrompt).toContain('chapterPromise và nextChapterPressure');
     expect(launchPrompt).toContain('pleasureProfile');
   });
 

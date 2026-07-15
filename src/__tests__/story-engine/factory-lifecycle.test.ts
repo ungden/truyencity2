@@ -28,6 +28,12 @@ describe('flagship factory lifecycle', () => {
     expect(sql).toContain("written_chapters = project_daily_quotas.written_chapters + 1");
   });
 
+  it('rearms a canary without reusing checkpoint attempts or stealing an active lease', () => {
+    const script = readFileSync('scripts/flagship-start-first-five.ts', 'utf8');
+    expect(script).not.toContain('attempt: 0');
+    expect(script).toContain('has an active factory lease; refusing to rearm a running job');
+  });
+
   it('accepts only an explicit flagship auto opt-in', () => {
     expect(factoryEligibility({
       pipelineVersion: 'flagship_v2', factoryEnabled: true, publicationMode: 'automatic',

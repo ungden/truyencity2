@@ -128,6 +128,11 @@ async function applyStart(): Promise<void> {
     if (Number(project.current_chapter || 0) !== 0) {
       throw new Error(`${slot} already has chapters; refusing to reset its job or quota.`);
     }
+    const existingJob = await db.from('story_factory_jobs').select('lease_until').eq('project_id', project.id).maybeSingle();
+    if (existingJob.error) throw existingJob.error;
+    if (existingJob.data?.lease_until && new Date(existingJob.data.lease_until).getTime() > Date.now()) {
+      throw new Error(`${slot} has an active factory lease; refusing to rearm a running job.`);
+    }
     const { error } = await db.from('ai_story_projects').update({
       status: 'paused',
       pause_reason: 'flagship_first_five_armed',
@@ -148,7 +153,10 @@ async function applyStart(): Promise<void> {
     }).eq('id', project.id);
     if (error) throw error;
     const resetJob = await db.from('story_factory_jobs').update({
-      status: 'queued', stage: 'setup', current_chapter: 0, attempt: 0,
+      // Attempt is a monotonic checkpoint generation. Resetting it can collide
+      // with the immutable (job, stage, chapter, attempt, status, digest)
+      // ledger when an operator safely rearms a blocked zero-chapter canary.
+      status: 'queued', stage: 'setup', current_chapter: 0,
       lease_owner: null, lease_token: null, lease_until: null,
       failure_class: null, last_error: null, updated_at: new Date().toISOString(),
     }).eq('project_id', project.id).neq('status', 'completed');

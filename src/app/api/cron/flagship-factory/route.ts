@@ -51,6 +51,18 @@ function digest(value: unknown): string {
   return createHash('sha256').update(JSON.stringify(value)).digest('hex');
 }
 
+function errorMessage(value: unknown): string {
+  if (value instanceof Error) return value.message;
+  if (value && typeof value === 'object') {
+    const record = value as Record<string, unknown>;
+    const parts = [record.code, record.message, record.details, record.hint]
+      .filter(part => typeof part === 'string' && part.trim().length > 0);
+    if (parts.length) return parts.join(': ');
+    try { return JSON.stringify(value); } catch { /* fall through */ }
+  }
+  return String(value);
+}
+
 async function runWithConcurrency<T>(tasks: Array<() => Promise<T>>, concurrency: number): Promise<T[]> {
   const results: T[] = new Array(tasks.length);
   let cursor = 0;
@@ -200,7 +212,7 @@ async function processJob(db: ReturnType<typeof getSupabaseAdmin>, job: FactoryJ
     return { ...base, status: 'written', chapterNumber: written.chapterNumber };
   } catch (caught) {
     const code = caught instanceof FlagshipPipelineError || caught instanceof FlagshipSetupError ? caught.code : undefined;
-    const message = caught instanceof Error ? caught.message : String(caught);
+    const message = errorMessage(caught);
     const infra = code === 'infra_blocked';
     if (infra) {
       await advance(db, job, 'infra_blocked', committedChapter ? 'plan' : job.stage, committedChapter || job.current_chapter, [{ code, committedChapter: committedChapter || null }], 'infrastructure', message);
@@ -210,7 +222,7 @@ async function processJob(db: ReturnType<typeof getSupabaseAdmin>, job: FactoryJ
       await preserveFactoryPause(db, job.project_id, job.id);
       await advance(db, job, 'blocked', committedChapter ? 'plan' : job.stage === 'write' ? 'review' : job.stage, committedChapter || job.current_chapter, [{ code: code || 'unknown', committedChapter: committedChapter || null }], code === 'setup_blocked' ? 'setup' : 'quality', message);
     } catch (transitionError) {
-      return { ...base, status: 'failed', error: `${message}; transition: ${transitionError instanceof Error ? transitionError.message : String(transitionError)}` };
+      return { ...base, status: 'failed', error: `${message}; transition: ${errorMessage(transitionError)}` };
     }
     return { ...base, status: 'blocked', error: message };
   }

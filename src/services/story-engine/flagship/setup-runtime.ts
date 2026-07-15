@@ -63,10 +63,15 @@ function modelInvoker(project: SetupProjectRow, projectId: string) {
   };
 }
 
+function setupDiagnostic(error: FlagshipSetupError): string {
+  return `${error.message}${error.detail === undefined ? '' : ` detail=${JSON.stringify(error.detail)}`}`;
+}
+
 async function markFailure(db: SupabaseClient, projectId: string, error: FlagshipSetupError): Promise<void> {
+  const diagnostic = setupDiagnostic(error);
   await db.from('ai_story_projects').update({
     flagship_setup_status: error.code === 'infra_blocked' ? 'infra_blocked' : error.code === 'human_gate' ? 'concept_review' : 'setup_blocked',
-    setup_stage_error: error.message.slice(0, 500),
+    setup_stage_error: diagnostic.slice(0, 500),
     setup_stage_updated_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   }).eq('id', projectId);
@@ -95,7 +100,7 @@ export async function runFlagshipConceptTournamentForProject(
   } catch (caught) {
     const error = caught instanceof FlagshipSetupError ? caught : new FlagshipSetupError('setup_blocked', caught instanceof Error ? caught.message : String(caught));
     await markFailure(db, projectId, error);
-    await finishFlagshipSetupRun({ db, runId, status: error.code, callRoles, errorMessage: error.message });
+    await finishFlagshipSetupRun({ db, runId, status: error.code, callRoles, errorMessage: setupDiagnostic(error).slice(0, 4000) });
     throw error;
   }
 }
@@ -147,7 +152,7 @@ export async function materializeFlagshipSetupForProject(
   } catch (caught) {
     const error = caught instanceof FlagshipSetupError ? caught : new FlagshipSetupError('setup_blocked', caught instanceof Error ? caught.message : String(caught));
     await markFailure(db, projectId, error);
-    await finishFlagshipSetupRun({ db, runId, status: error.code, callRoles, errorMessage: error.message });
+    await finishFlagshipSetupRun({ db, runId, status: error.code, callRoles, errorMessage: setupDiagnostic(error).slice(0, 4000) });
     throw error;
   }
 }
