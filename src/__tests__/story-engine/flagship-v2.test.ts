@@ -6,6 +6,7 @@ import {
   StoryStateV2Schema,
   StorySpecV2Schema,
   assembleFlagshipContext,
+  projectDirectorStoryKernel,
   buildDirectorPrompt,
   buildEditorPrompt,
   buildWriterPrompt,
@@ -287,6 +288,21 @@ describe('flagship context and prompts', () => {
       { id: 'story-specific-arc', layer: 'plan', priority: 10, content: '', required: true },
       { id: 'legacy-outline', layer: 'plan', priority: 1, content: 'legacy fallback content' },
     ])).toThrow('FLAGSHIP_CONTEXT_MISSING: story-specific-arc');
+  });
+
+  it('projects setup prose out of the Director kernel without truncating canon', () => {
+    const story = spec();
+    const kernel = projectDirectorStoryKernel(story);
+    const serialized = JSON.stringify(kernel);
+    expect(kernel).not.toHaveProperty('runway30');
+    expect(kernel).not.toHaveProperty('conflictLadder');
+    expect(kernel.storyIdentity).not.toHaveProperty('domainTruthSources');
+    expect(kernel.protagonist).not.toHaveProperty('voiceContract');
+    expect(kernel.cast[0]).not.toHaveProperty('voiceContract');
+    expect(serialized.length).toBeLessThan(20_000);
+    expect(() => assembleFlagshipContext([
+      { id: 'story-kernel-v2', layer: 'canon', priority: 100, content: serialized, required: true },
+    ])).not.toThrow();
   });
 
   it('keeps role prompts isolated', () => {
@@ -718,6 +734,7 @@ describe('isolated flagship setup v2', () => {
     const migration = readFileSync(path.join(process.cwd(), 'supabase/migrations/20260711044323_flagship_setup_v2.sql'), 'utf8');
     const cron = readFileSync(path.join(process.cwd(), 'src/app/api/cron/write-chapters/route.ts'), 'utf8');
     const runtime = readFileSync(path.join(process.cwd(), 'src/services/story-engine/flagship/runtime.ts'), 'utf8');
+    const factorySetup = readFileSync(path.join(process.cwd(), 'src/services/story-engine/flagship/factory-setup.ts'), 'utf8');
     expect(FlagshipSetupBriefV2Schema.safeParse({ schemaVersion: 2, language: 'vi', genre: 'do-thi' }).success).toBe(false);
     expect(FlagshipModelRoutesV2Schema.safeParse({ setupCreative: 'model-a', setupJudge: 'model-b', director: 'model-a', writer: 'model-a', editor: 'model-a', planner: 'model-a' }).success).toBe(false);
     expect(migration).toContain('CREATE TABLE IF NOT EXISTS public.story_flagship_setup_runs');
@@ -732,6 +749,9 @@ describe('isolated flagship setup v2', () => {
     expect(runtime).toContain("project.status !== 'paused'");
     expect(runtime).toContain('callFlagshipModel');
     expect(runtime).not.toContain('callGemini(');
+    expect(factorySetup).toContain("novels!ai_story_projects_novel_id_fkey(title)");
+    expect(factorySetup).toContain('approvedTitle,');
+    expect(factorySetup).not.toContain('approvedTitle: candidate.workingTitle');
     const pilotMigration = readFileSync(path.join(process.cwd(), 'supabase/migrations/20260711052533_flagship_pilot_factory_v2.sql'), 'utf8');
     expect(pilotMigration).toContain('create_flagship_pilot_v2');
     expect(pilotMigration).toContain("'paused'");

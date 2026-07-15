@@ -3,7 +3,7 @@ import { finishWriteRun, startWriteRun, updateWriteRunTelemetry, type WriteRunHa
 import type { StyleDirectives } from '../types';
 import { getSupabase } from '../utils/supabase';
 import { classifyStoryFailure } from '@/lib/story-production-quota';
-import { assembleFlagshipRoleContexts } from './context';
+import { assembleFlagshipRoleContexts, projectDirectorStoryKernel } from './context';
 import {
   ChapterPlanV2Schema,
   parseArcPlanV2,
@@ -166,6 +166,12 @@ export async function writeFlagshipChapter(
     const preparedPlan = parseChapterPlanV2((blueprint?.meta as { chapterPlanV2?: unknown } | null)?.chapterPlanV2);
     if (!preparedPlan.success) throw issues('ChapterPlanV2', preparedPlan);
 
+    // The Director needs the story's causal kernel, not the setup-time
+    // research/audit payload or the duplicated 30-chapter runway.  The active
+    // ArcPlan already owns that runway.  Projecting the approved StorySpec is
+    // deterministic (never truncation or fallback) and keeps the required
+    // canon block inside its explicit 20K budget.
+    const directorKernel = projectDirectorStoryKernel(spec.data);
     const voiceContract = {
       storyIdentity: spec.data.storyIdentity,
       pleasureProfile: spec.data.pleasureProfile,
@@ -189,7 +195,7 @@ export async function writeFlagshipChapter(
     // and editor/revision instructions cannot leak into Writer input.
     const roleContexts = assembleFlagshipRoleContexts({
       director: [
-        { id: 'story-spec-v2', layer: 'canon', priority: 100, required: true, content: JSON.stringify(spec.data), sourceRef: 'ai_story_projects.story_spec_v2' },
+        { id: 'story-kernel-v2', layer: 'canon', priority: 100, required: true, content: JSON.stringify(directorKernel), sourceRef: 'ai_story_projects.story_spec_v2:director-kernel' },
         { id: 'arc-plan-v2', layer: 'plan', priority: 100, required: true, content: JSON.stringify(arc.data), sourceRef: 'ai_story_projects.arc_plan_v2' },
         { id: 'chapter-plan-v2', layer: 'plan', priority: 95, required: true, content: JSON.stringify(preparedPlan.data), sourceRef: `chapter_blueprints:${nextChapter}` },
         { id: 'story-state-v2', layer: 'state', priority: 100, required: true, content: JSON.stringify(state.data), sourceRef: 'ai_story_projects.story_state_v2' },

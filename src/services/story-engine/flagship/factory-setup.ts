@@ -37,7 +37,7 @@ export async function advanceAutonomousFlagshipSetup(
   db: SupabaseClient,
 ): Promise<{ status: 'setup' | 'ready'; step: string; candidateId?: string }> {
   const { data, error } = await db.from('ai_story_projects').select(
-    'id,status,current_chapter,style_directives,flagship_setup_status,flagship_concept_tournament_v2,flagship_setup_artifacts_v2,flagship_setup_brief_v2,story_spec_v2,arc_plan_v2,story_state_v2',
+    'id,status,current_chapter,style_directives,flagship_setup_status,flagship_concept_tournament_v2,flagship_setup_artifacts_v2,flagship_setup_brief_v2,story_spec_v2,arc_plan_v2,story_state_v2,novels!ai_story_projects_novel_id_fkey(title)',
   ).eq('id', projectId).single();
   if (error || !data) throw new FlagshipSetupError('setup_blocked', error?.message || 'Factory project not found.');
 
@@ -101,10 +101,18 @@ export async function advanceAutonomousFlagshipSetup(
     const winner = ranked[0];
     const candidate = winner ? byId.get(winner.id) : undefined;
     if (!winner || !candidate) throw new FlagshipSetupError('setup_blocked', 'Factory tournament has no machine-selectable finalist.');
+    const novel = Array.isArray(data.novels) ? data.novels[0] : data.novels;
+    const approvedTitle = novel && typeof novel === 'object' && 'title' in novel ? novel.title : null;
+    if (typeof approvedTitle !== 'string' || !approvedTitle.trim()) {
+      throw new FlagshipSetupError('setup_blocked', 'Factory project has no story-specific approved market title.');
+    }
     const selection = HumanConceptSelectionV2Schema.parse({
       schemaVersion: 2,
       candidateId: candidate.id,
-      approvedTitle: candidate.workingTitle,
+      // Concept workingTitle is deliberately only an internal lab label. The
+      // portfolio's curated novel title is the story-specific publication
+      // title and must survive materialization unchanged.
+      approvedTitle,
       approvedBy: 'factory-auto',
       rationale: `Machine selection: finalist ${candidate.id} led the typed pairwise ranking with ${winner.wins} wins; no title or kernel fallback was used.`,
       approvedAt: new Date().toISOString(),

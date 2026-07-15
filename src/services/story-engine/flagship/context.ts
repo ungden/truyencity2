@@ -53,6 +53,73 @@ export const FLAGSHIP_CONTEXT_BUDGETS: FlagshipContextBudgets = {
   state: 24_000,
 };
 
+/**
+ * Project an approved StorySpecV2 into the causal kernel needed by Director.
+ * Setup-only research, similarity diagnostics, voice prose, conflict/runway
+ * duplication, and the volume spine stay in storage; ArcPlanV2 owns the live
+ * planning window.  This is an explicit typed projection, never truncation.
+ */
+export function projectDirectorStoryKernel(spec: StorySpecV2) {
+  return {
+    schemaVersion: spec.schemaVersion,
+    title: spec.title,
+    genre: spec.genre,
+    genreLane: spec.genreLane,
+    serialityEngine: {
+      recurringSituation: spec.serialityEngine.recurringSituation,
+      variationAxes: spec.serialityEngine.variationAxes,
+      escalationVectors: spec.serialityEngine.escalationVectors,
+    },
+    progressionCurrencies: spec.progressionCurrencies.map(currency => ({
+      name: currency.name,
+      kind: currency.kind,
+      source: currency.source,
+      spend: currency.spend,
+    })),
+    storyIdentity: {
+      uniqueMechanism: spec.storyIdentity.uniqueMechanism,
+      emotionalCore: spec.storyIdentity.emotionalCore,
+      forbiddenGenericMoves: spec.storyIdentity.forbiddenGenericMoves,
+    },
+    pleasureProfile: spec.pleasureProfile,
+    readerFantasy: spec.readerFantasy,
+    premise: spec.premise,
+    endingDirection: spec.endingDirection,
+    protagonist: {
+      name: spec.protagonist.name,
+      desire: spec.protagonist.desire,
+      contradiction: spec.protagonist.contradiction,
+      competence: spec.protagonist.competence,
+      blindSpot: spec.protagonist.blindSpot,
+      privateAgenda: spec.protagonist.privateAgenda,
+      leverage: spec.protagonist.leverage,
+      moralBoundary: spec.protagonist.moralBoundary,
+      decisionSignature: spec.protagonist.decisionSignature,
+    },
+    cast: spec.cast.map(member => ({
+      name: member.name,
+      agenda: member.agenda,
+      leverage: member.leverage,
+      conflictWithProtagonist: member.conflictWithProtagonist,
+      moralBoundary: member.moralBoundary,
+      decisionSignature: member.decisionSignature,
+      firstAppearanceChapter: member.firstAppearanceChapter,
+    })),
+    causalWorldRules: spec.causalWorldRules.map(rule => ({
+      rule: rule.rule,
+      beneficiary: rule.beneficiary,
+      harmedParty: rule.harmedParty,
+      enforcement: rule.enforcement,
+      cost: rule.cost,
+      consequence: rule.consequence,
+      evidenceSource: rule.evidenceSource,
+      exceptions: rule.exceptions,
+    })),
+    resourceEconomy: spec.resourceEconomy,
+    promisePayoffLedger: spec.promisePayoffLedger,
+  };
+}
+
 const LAYER_ORDER: Record<FlagshipContextLayer, number> = { canon: 0, plan: 1, state: 2 };
 
 /**
@@ -132,3 +199,4 @@ export function assembleFlagshipRoleContexts(input: FlagshipRoleContextInput): F
     totalChars: roles.reduce((total, item) => total + item.bundle.totalChars, 0),
   };
 }
+import type { StorySpecV2 } from './contracts';
