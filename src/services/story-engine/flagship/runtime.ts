@@ -81,10 +81,25 @@ async function finishFailure(run: WriteRunHandle | null, error: FlagshipPipeline
   const axes = verdictCandidate?.axes && typeof verdictCandidate.axes === 'object'
     ? Object.values(verdictCandidate.axes as Record<string, unknown>).filter((value): value is number => typeof value === 'number')
     : [];
-  const criticEvidence = Array.isArray(detail?.editorEvidence)
-    ? detail.editorEvidence
-    : Array.isArray(verdictCandidate?.evidence) ? verdictCandidate.evidence : [];
-  const revisionLineage = Array.isArray(detail?.revisionLineage) ? detail.revisionLineage : [];
+  const editorEvidence = Array.isArray(detail?.editorEvidence) ? detail.editorEvidence : [];
+  const verdictEvidence = Array.isArray(verdictCandidate?.evidence) ? verdictCandidate.evidence : [];
+  const seenEvidence = new Set<string>();
+  const criticEvidence = [...editorEvidence, ...verdictEvidence].filter(item => {
+    const record = item && typeof item === 'object' ? item as Record<string, unknown> : {};
+    const key = JSON.stringify([record.code, record.start, record.end, record.excerpt]);
+    if (seenEvidence.has(key)) return false;
+    seenEvidence.add(key);
+    return true;
+  });
+  const revisionLineage = Array.isArray(detail?.revisionLineage) ? [...detail.revisionLineage] : [];
+  if (revisionLineage.length === 0 && Array.isArray(detail?.callRoles)) {
+    revisionLineage.push({
+      attempt: 0,
+      outcome: error.code,
+      callRoles: detail.callRoles,
+      evidenceCodes: criticEvidence.map(item => item && typeof item === 'object' ? (item as Record<string, unknown>).code : null).filter(Boolean),
+    });
+  }
   await finishWriteRun(run, status, {
     contextSizeChars: contextSize,
     qualityScore: axes.length ? Math.min(...axes) : null,
@@ -93,6 +108,7 @@ async function finishFailure(run: WriteRunHandle | null, error: FlagshipPipeline
     publicationDecision: error.code === 'human_gate' ? 'human_gate' : error.code === 'quality_rejected' ? 'reject' : null,
     criticEvidence,
     revisionLineage,
+    qualityVerdict: verdictCandidate || {},
   });
 }
 
@@ -304,6 +320,7 @@ export async function writeFlagshipChapter(
       publicationDecision: 'publish',
       criticEvidence: generated.editorEvidence,
       revisionLineage: generated.revisionLineage,
+      qualityVerdict: generated.verdict,
     });
 
     return {

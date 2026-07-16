@@ -3,6 +3,6 @@
   "setupJudge": "gemini-3.5-flash",
   "director": "gemini-3.1-pro-preview",
   "writer": "gpt-5.6-luna",
-  "editor": "gemini-3.5-flash",
+  "editor": "gemini-3.1-pro-preview",
   "planner": "gemini-3.1-pro-preview"
 }

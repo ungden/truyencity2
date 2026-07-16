@@ -16,7 +16,7 @@ import { extendFlagshipArcForFactory, FlagshipPipelineError, writeFlagshipChapte
 import { advanceAutonomousFlagshipSetup } from '@/services/story-engine/flagship/factory-setup';
 import { planNextFlagshipWindowForProject } from '@/services/story-engine/flagship/rolling-planner';
 import { FlagshipSetupError } from '@/services/story-engine/flagship/setup';
-import { canTransitionFactoryJob } from '@/services/story-engine/flagship/factory-lifecycle';
+import { canTransitionFactoryJob, decideFactoryQualityRetry } from '@/services/story-engine/flagship/factory-lifecycle';
 import { getFlagshipProviderReadiness } from '@/services/story-engine/flagship/provider-readiness';
 
 export const dynamic = 'force-dynamic';
@@ -37,7 +37,7 @@ type FactoryJob = {
 type FactoryResult = {
   jobId: string;
   projectId: string;
-  status: 'setup' | 'written' | 'completed' | 'infra_blocked' | 'blocked' | 'skipped' | 'failed';
+  status: 'setup' | 'written' | 'completed' | 'infra_blocked' | 'retry_scheduled' | 'blocked' | 'skipped' | 'failed';
   chapterNumber?: number;
   error?: string;
 };
@@ -126,6 +126,36 @@ async function preserveFactoryPause(db: ReturnType<typeof getSupabaseAdmin>, pro
     updated_at: new Date().toISOString(),
   }).eq('id', projectId).in('status', ['active', 'paused']);
   if (error) throw error;
+}
+
+function failureEvidence(caught: unknown): unknown[] {
+  if (!(caught instanceof FlagshipPipelineError) || !caught.detail || typeof caught.detail !== 'object') return [];
+  const detail = caught.detail as Record<string, unknown>;
+  const verdict = detail.verdict && typeof detail.verdict === 'object' ? detail.verdict as Record<string, unknown> : null;
+  const editorEvidence = Array.isArray(detail.editorEvidence) ? detail.editorEvidence : [];
+  const verdictEvidence = Array.isArray(verdict?.evidence) ? verdict.evidence : [];
+  const seen = new Set<string>();
+  return [...editorEvidence, ...verdictEvidence].filter(item => {
+    const key = JSON.stringify(item);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).slice(0, 50);
+}
+
+async function recordQualityFailure(
+  db: ReturnType<typeof getSupabaseAdmin>,
+  projectId: string,
+  message: string,
+  evidence: unknown[],
+): Promise<number> {
+  const { data, error } = await db.rpc('record_flagship_factory_quality_failure_v1', {
+    p_project_id: projectId,
+    p_error_message: message,
+    p_evidence: evidence,
+  });
+  if (error) throw error;
+  return Number((data as { retry_count?: number } | null)?.retry_count || 0);
 }
 
 async function restoreFactoryProject(db: ReturnType<typeof getSupabaseAdmin>, projectId: string, jobId: string, status: 'active' | 'completed' = 'active'): Promise<void> {
@@ -217,6 +247,27 @@ async function processJob(db: ReturnType<typeof getSupabaseAdmin>, job: FactoryJ
     if (infra) {
       await advance(db, job, 'infra_blocked', committedChapter ? 'plan' : job.stage, committedChapter || job.current_chapter, [{ code, committedChapter: committedChapter || null }], 'infrastructure', message);
       return { ...base, status: 'infra_blocked', error: message };
+    }
+    if (code === 'quality_rejected') {
+      const evidence = failureEvidence(caught);
+      try {
+        await preserveFactoryPause(db, job.project_id, job.id);
+        const retryCount = await recordQualityFailure(db, job.project_id, message, evidence);
+        const retry = decideFactoryQualityRetry(retryCount);
+        await advance(
+          db,
+          job,
+          retry.status,
+          retry.stage,
+          committedChapter || job.current_chapter,
+          [{ code, retryCount, retryReason: retry.reason, evidence }],
+          'quality',
+          message,
+        );
+        return { ...base, status: retry.retry ? 'retry_scheduled' : 'blocked', error: message };
+      } catch (transitionError) {
+        return { ...base, status: 'failed', error: `${message}; quality retry transition: ${errorMessage(transitionError)}` };
+      }
     }
     try {
       await preserveFactoryPause(db, job.project_id, job.id);

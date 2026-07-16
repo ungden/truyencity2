@@ -107,11 +107,11 @@ function parseJson<T>(raw: string, schema: z.ZodType<T>, label: string): T {
   try {
     value = JSON.parse(cleaned);
   } catch (error) {
-    throw new FlagshipPipelineError('quality_rejected', `${label} returned invalid JSON`, { error: String(error) });
+    throw new FlagshipPipelineError('infra_blocked', `${label} returned invalid JSON`, { error: String(error) });
   }
   const parsed = schema.safeParse(value);
   if (!parsed.success) {
-    throw new FlagshipPipelineError('quality_rejected', `${label} violated its output contract`, parsed.error.issues);
+    throw new FlagshipPipelineError('infra_blocked', `${label} violated its output contract`, parsed.error.issues);
   }
   return parsed.data;
 }
@@ -181,6 +181,29 @@ function effectiveHardGates(editor: z.infer<typeof EditorOutputSchema>): Record<
   return { ...editor.hardGates, planFidelity: editor.hardGates.planFidelity && editor.planFidelity >= 7.5 };
 }
 
+function assertEditorDecisionIsAuditable(editor: z.infer<typeof EditorOutputSchema>): void {
+  const failedGates = Object.entries(effectiveHardGates(editor))
+    .filter(([, passed]) => !passed)
+    .map(([gate]) => gate);
+  const failedAxes = Object.entries(editor.axes)
+    .filter(([, score]) => score < 7.5)
+    .map(([axis, score]) => `${axis}=${score}`);
+  const needsEvidence = editor.decision !== 'publish' || failedGates.length > 0 || failedAxes.length > 0;
+  if (needsEvidence && editor.evidence.length === 0) {
+    throw new FlagshipPipelineError('infra_blocked', 'Editor returned a failing verdict without grounded prose evidence.', {
+      decision: editor.decision,
+      failedGates,
+      failedAxes,
+    });
+  }
+  if (editor.decision === 'revise' && editor.revisionInstructions.length === 0) {
+    throw new FlagshipPipelineError('infra_blocked', 'Editor requested revision without evidence-scoped instructions.', {
+      failedGates,
+      failedAxes,
+    });
+  }
+}
+
 export async function executeFlagshipPipeline(
   input: FlagshipPipelineInput,
   dependencies: FlagshipPipelineDependencies,
@@ -214,6 +237,7 @@ export async function executeFlagshipPipeline(
     jsonMode: true,
   });
   const editor = parseJson(editorRaw, EditorOutputSchema, 'Editor');
+  assertEditorDecisionIsAuditable(editor);
   const editorEvidence = groundEvidence(draft.content, editor.evidence);
   let verdict = evaluateFlagshipQuality({
     content: draft.content,
@@ -226,6 +250,14 @@ export async function executeFlagshipPipeline(
   });
 
   if (editor.decision === 'reject' || verdict.decision === 'reject') {
+    if (editor.decision === 'reject' && verdict.decision === 'publish') {
+      throw new FlagshipPipelineError('infra_blocked', 'Editor decision contradicts its own gates, scores and evidence.', {
+        decision: editor.decision,
+        verdict,
+        editorEvidence,
+        callRoles,
+      });
+    }
     throw new FlagshipPipelineError('quality_rejected', 'Independent editor rejected the chapter.', {
       verdict, editorEvidence, revisionLineage: [], callRoles,
     });

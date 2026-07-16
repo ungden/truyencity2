@@ -22,6 +22,31 @@ export const FactoryFailureClassSchema = z.enum([
 ]);
 export type FactoryFailureClass = z.infer<typeof FactoryFailureClassSchema>;
 
+export const MAX_FACTORY_QUALITY_ATTEMPTS_PER_CHAPTER = 3;
+
+export function decideFactoryQualityRetry(retryCount: number): {
+  retry: boolean;
+  status: 'ready' | 'blocked';
+  stage: 'plan' | 'review';
+  reason: string;
+} {
+  const normalized = Math.max(0, Math.floor(retryCount));
+  if (normalized < MAX_FACTORY_QUALITY_ATTEMPTS_PER_CHAPTER) {
+    return {
+      retry: true,
+      status: 'ready',
+      stage: 'plan',
+      reason: `rejected draft ${normalized}/${MAX_FACTORY_QUALITY_ATTEMPTS_PER_CHAPTER}; schedule a fresh flagship attempt`,
+    };
+  }
+  return {
+    retry: false,
+    status: 'blocked',
+    stage: 'review',
+    reason: `quality hold after ${normalized} rejected drafts for the same chapter`,
+  };
+}
+
 export const FactoryJobV1Schema = z.object({
   schemaVersion: z.literal(1),
   id: z.string().min(1),

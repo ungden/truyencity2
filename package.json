@@ -29,6 +29,7 @@
     "flagship:create-pilot": "node --import tsx scripts/flagship-create-pilot.ts",
     "flagship:factory:enroll": "node --import tsx scripts/flagship-factory-enroll.ts",
     "flagship:factory:first-five": "node --import tsx scripts/flagship-start-first-five.ts",
+    "flagship:factory:requeue-quality": "node --import tsx scripts/flagship-requeue-quality-blocked.ts",
     "flagship:reject-pilot": "node --import tsx scripts/flagship-reject-pilot.ts",
     "flagship:setup:brief": "node --import tsx scripts/flagship-setup-install-brief.ts",
     "flagship:setup:materialize": "node --import tsx scripts/flagship-setup-materialize.ts",

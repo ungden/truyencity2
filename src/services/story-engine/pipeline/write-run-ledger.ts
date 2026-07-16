@@ -45,9 +45,20 @@ export interface StartWriteRunInput {
 export async function startWriteRun(input: StartWriteRunInput): Promise<WriteRunHandle | null> {
   try {
     const db = getSupabase();
+    const { data: previous, error: previousError } = await db
+      .from('story_write_runs')
+      .select('attempt_no')
+      .eq('project_id', input.projectId)
+      .eq('started_chapter', input.chapterNumber)
+      .order('attempt_no', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (previousError) throw previousError;
+    const attemptNo = Number(previous?.attempt_no || 0) + 1;
     const idempotencyKey = input.idempotencyKey || digestObject({
       projectId: input.projectId,
       chapterNumber: input.chapterNumber,
+      attemptNo,
       startedAtBucket: Math.floor(Date.now() / 300_000),
     });
     const row = {
@@ -57,6 +68,7 @@ export async function startWriteRun(input: StartWriteRunInput): Promise<WriteRun
       started_chapter: input.chapterNumber,
       last_chapter_number: input.chapterNumber,
       status: 'running',
+      attempt_no: attemptNo,
       idempotency_key: idempotencyKey,
       model: input.model || null,
       target_word_count: input.targetWordCount || null,
@@ -150,6 +162,7 @@ export async function finishWriteRun(
     publicationDecision?: 'publish' | 'revise' | 'reject' | 'human_gate' | null;
     criticEvidence?: unknown[];
     revisionLineage?: unknown[];
+    qualityVerdict?: unknown;
   } = {},
 ): Promise<void> {
   if (!run) return;
@@ -165,6 +178,7 @@ export async function finishWriteRun(
       publication_decision: updates.publicationDecision ?? null,
       critic_evidence: updates.criticEvidence ?? [],
       revision_lineage: updates.revisionLineage ?? [],
+      quality_verdict: updates.qualityVerdict ?? {},
       updated_at: new Date().toISOString(),
       finished_at: status === 'running' ? null : new Date().toISOString(),
     }).eq('id', run.id);

@@ -1,7 +1,7 @@
 import type { ArcPlanV2, ChapterPlanV2, StorySpecV2, StoryStateV2 } from './contracts';
 import type { QualityEvidenceV2 } from './quality-verdict';
 
-export const FLAGSHIP_PROMPT_VERSION = 'flagship-clean-v2.5-director-identity-lock';
+export const FLAGSHIP_PROMPT_VERSION = 'flagship-clean-v2.6-auditable-editor';
 
 export const DIRECTOR_SYSTEM = `Bạn là Scene Director của đúng một bộ truyện.
 Chỉ khóa kế hoạch chương đã được chuẩn bị; không viết văn xuôi, không tạo canon mới, không dùng trope hay luật thể loại mặc định.
@@ -89,7 +89,8 @@ export function buildEditorPrompt(input: {
   return `Đánh giá độc lập chương ${input.chapterPlan.chapterNumber}.
 Hard gates là boolean theo nghĩa pass=true. Vì tên field được giữ để tương thích, hardGates.promptLeak=true khi prose KHÔNG rò prompt và false khi có rò prompt. planFidelity và mười một trục đều dùng thang 0-10, không dùng thang 0-1; fidelity hoàn hảo phải ghi 10, không ghi 1. publish chỉ khi mọi hard gate đạt, planFidelity >=7.5, mọi trục >=7.5 và confidence >=0.65.
 revise khi lỗi có thể sửa đúng một lượt; reject khi mâu thuẫn nền tảng hoặc bản sửa vẫn không đạt.
-Nếu có evidence, excerpt phải là một đoạn liên tục copy nguyên văn từ PROSE; tuyệt đối không dùng "..." để nối hai đoạn. Trước khi trả, tự kiểm tra điều kiện PROSE.includes(excerpt) cho từng evidence. Nếu không thể copy đúng substring thì bỏ evidence đó; không được phát minh typo, lỗi mã hóa, câu lặp hoặc tự sửa chữ trong excerpt.
+Nếu decision là revise/reject, có hard gate=false hoặc có trục dưới 7.5 thì evidence bắt buộc có ít nhất một lỗi được chứng minh. excerpt phải là một đoạn liên tục copy nguyên văn từ PROSE; tuyệt đối không dùng "..." để nối hai đoạn. Trước khi trả, tự kiểm tra điều kiện PROSE.includes(excerpt) cho từng evidence. Nếu không thể copy đúng substring thì không được hạ gate/trục hoặc trả revise/reject dựa trên lỗi đó; không được phát minh typo, lỗi mã hóa, câu lặp hoặc tự sửa chữ trong excerpt.
+Nếu decision=revise thì revisionInstructions bắt buộc có ít nhất một chỉ dẫn chỉ sửa đúng evidence đã nêu. Reject không evidence là output contract không hợp lệ.
 
 ${bounded
     ? `ROLE_CONTEXT_BOUNDED=${bounded}`

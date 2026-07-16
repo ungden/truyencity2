@@ -1,8 +1,10 @@
 import {
   assertFactoryTransition,
   canTransitionFactoryJob,
+  decideFactoryQualityRetry,
   decideAfterChapter,
   factoryEligibility,
+  MAX_FACTORY_QUALITY_ATTEMPTS_PER_CHAPTER,
 } from '@/services/story-engine/flagship/factory-lifecycle';
 import { hasCompletePersistedRollingWindow } from '@/services/story-engine/flagship/factory-setup';
 import { ChapterPlanV2Schema } from '@/services/story-engine/flagship/contracts';
@@ -50,6 +52,23 @@ describe('flagship factory lifecycle', () => {
     expect(() => assertFactoryTransition('completed', 'queued')).toThrow('FACTORY_INVALID_TRANSITION');
     expect(canTransitionFactoryJob('infra_blocked', 'queued')).toBe(true);
     expect(canTransitionFactoryJob('infra_blocked', 'blocked')).toBe(true);
+  });
+
+  it('retries rejected drafts without publishing them and holds after the bounded third attempt', () => {
+    expect(MAX_FACTORY_QUALITY_ATTEMPTS_PER_CHAPTER).toBe(3);
+    expect(decideFactoryQualityRetry(1)).toMatchObject({ retry: true, status: 'ready', stage: 'plan' });
+    expect(decideFactoryQualityRetry(2)).toMatchObject({ retry: true, status: 'ready', stage: 'plan' });
+    expect(decideFactoryQualityRetry(3)).toMatchObject({ retry: false, status: 'blocked', stage: 'review' });
+  });
+
+  it('persists full verdicts and Vietnam-day quality retry backoff', () => {
+    const sql = readFileSync('supabase/migrations/20260716052410_flagship_factory_quality_retry_v1.sql', 'utf8');
+    expect(sql).toContain('quality_verdict jsonb');
+    expect(sql).toContain('record_flagship_factory_quality_failure_v1');
+    expect(sql).toContain("AT TIME ZONE 'Asia/Ho_Chi_Minh'");
+    expect(sql).toContain('retry_count = q.retry_count + 1');
+    expect(sql).toContain('SECURITY INVOKER');
+    expect(sql).not.toContain('SECURITY DEFINER');
   });
 
   it('reuses a complete persisted five-chapter window instead of paying for a duplicate planner call', () => {

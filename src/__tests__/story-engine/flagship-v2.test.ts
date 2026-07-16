@@ -462,6 +462,30 @@ describe('clean flagship runtime boundary and call budget', () => {
     });
   });
 
+  it('treats an evidence-free failing editor verdict as a provider contract failure', async () => {
+    await expect(executeFlagshipPipeline({ storySpec: spec(), arcPlan: arc(), storyState: state(), preparedPlan: plan(), targetWordCount: 2200 }, {
+      invoke: async call => {
+        if (call.role === 'director') return JSON.stringify(plan());
+        if (call.role === 'writer') return JSON.stringify({ title: 'Hai khoản đặt cọc', content: publishableContent() });
+        return JSON.stringify({
+          decision: 'reject', confidence: 0.9, planFidelity: 6.5,
+          hardGates: { ...hardGates, planFidelity: false },
+          axes: { ...axes, scene_tension: 6.5 },
+          evidence: [], revisionInstructions: [],
+        });
+      },
+    })).rejects.toMatchObject({
+      code: 'infra_blocked',
+      message: expect.stringContaining('without grounded prose evidence'),
+    });
+  });
+
+  it('treats invalid role JSON as infrastructure instead of consuming a quality attempt', async () => {
+    await expect(executeFlagshipPipeline({ storySpec: spec(), arcPlan: arc(), storyState: state(), preparedPlan: plan(), targetWordCount: 2200 }, {
+      invoke: async () => 'not-json',
+    })).rejects.toMatchObject({ code: 'infra_blocked' });
+  });
+
   it('contains no imports from legacy writer, prompt, template, assembler or orchestrator', () => {
     const root = path.join(process.cwd(), 'src/services/story-engine/flagship');
     const files = require('fs').readdirSync(root).filter((name: string) => name.endsWith('.ts'));
