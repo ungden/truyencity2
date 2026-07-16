@@ -132,12 +132,15 @@ async function provisionOne(
   artifacts: LocalArtifacts,
 ) {
   const db = getSupabase();
+  const coverAssetPath = new URL(item.coverUrl).pathname;
   const { data, error } = await db.rpc('provision_flagship_portfolio_story_v1', {
     p_slot_id: item.slotId,
     p_title: item.title,
     p_slug: item.slug,
     p_description: item.description,
-    p_cover_url: item.coverUrl,
+    // The v1 RPC validates the repository asset path. The canonical public
+    // URL is persisted below before provisioning can be reported complete.
+    p_cover_url: coverAssetPath,
     p_genre: item.genre,
     p_main_character: item.protagonistSeed,
     p_brief: item.setupBrief,
@@ -149,6 +152,11 @@ async function provisionOne(
   if (!projectId) throw new Error(`${item.slotId}: provision RPC returned no project id.`);
 
   let current = await projectStatus(projectId);
+  const canonicalCover = await db.from('novels').update({
+    cover_url: item.coverUrl,
+    updated_at: new Date().toISOString(),
+  }).eq('id', current.novel_id);
+  if (canonicalCover.error) throw new Error(`${item.slotId}: canonical cover URL update failed: ${canonicalCover.error.message}`);
   if (artifacts.tournament && current.flagship_setup_status === 'brief_ready') {
     const saved = await db.rpc('save_flagship_concept_tournament_v2', {
       p_project_id: projectId,

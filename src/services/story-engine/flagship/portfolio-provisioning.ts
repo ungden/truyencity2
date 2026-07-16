@@ -19,7 +19,7 @@ export const FlagshipPortfolioProvisionItemV1Schema = z.object({
   title: z.string().trim().min(20),
   slug: z.string().regex(/^flagship-(hx|th|dt)-\d{2}$/),
   genre: z.string().trim().min(2),
-  coverUrl: z.string().regex(/^\/covers\/flagship-first-30\/[a-z0-9-]+\.webp$/),
+  coverUrl: z.string().regex(/^https:\/\/www\.truyencity\.com\/covers\/flagship-first-30\/[a-z0-9-]+\.webp$/),
   description: z.string().trim().min(20),
   protagonistSeed: z.string().trim().min(20),
   setupBrief: FlagshipSetupBriefV2Schema,
@@ -155,7 +155,9 @@ export function buildFlagshipFirst30ProvisionPlan(maxChapters = 1000): FlagshipP
         title: story.title,
         slug: `flagship-${slot.slotId.toLowerCase()}`,
         genre: slot.genre,
-        coverUrl: story.coverArt.assetPath,
+        // Mobile clients require an absolute URI. The relative asset path is
+        // still retained by coverArt for local existence/render checks.
+        coverUrl: `https://www.truyencity.com${story.coverArt.assetPath}`,
         description: story.catalogueDescription,
         protagonistSeed: story.protagonistSeed,
         setupBrief: getFlagshipFirst30SetupBrief(slot.slotId),

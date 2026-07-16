@@ -5,6 +5,15 @@ import Animated from "react-native-reanimated";
 import { Image as RNImage } from "expo-image";
 
 const AnimatedExpoImage = Animated.createAnimatedComponent(RNImage);
+const PUBLIC_WEB_ORIGIN = "https://www.truyencity.com";
+
+function resolveImageSource(
+  source: React.ComponentProps<typeof AnimatedExpoImage>["source"]
+) {
+  if (typeof source !== "string") return source;
+  const uri = source.startsWith("/") ? `${PUBLIC_WEB_ORIGIN}${source}` : source;
+  return { uri };
+}
 
 export type ImageProps = React.ComponentProps<typeof Image>;
 
@@ -18,9 +27,7 @@ function CSSImage(props: React.ComponentProps<typeof AnimatedExpoImage>) {
       contentFit={objectFit}
       contentPosition={objectPosition}
       {...props}
-      source={
-        typeof props.source === "string" ? { uri: props.source } : props.source
-      }
+      source={resolveImageSource(props.source)}
       // @ts-expect-error: Style is remapped above
       style={style}
     />

@@ -135,6 +135,7 @@ describe('flagship first-30 portfolio', () => {
     expect(new Set(plan.items.map(item => item.setupBrief.distinctnessFingerprint)).size).toBe(30);
     expect(new Set(plan.items.map(item => item.setupBrief.domain)).size).toBe(30);
     expect(plan.items.every(item => item.slug === `flagship-${item.slotId.toLowerCase()}`)).toBe(true);
+    expect(plan.items.every(item => item.coverUrl === `https://www.truyencity.com/covers/flagship-first-30/${item.slotId.toLowerCase()}.webp`)).toBe(true);
     expect(plan.items.every(item => item.setupBrief.seedConstraints.some(value => value.includes(item.slotId) || value.includes('Chương') || value.includes('chương')))).toBe(true);
     for (const item of plan.items) {
       expect(FlagshipSetupBriefV2Schema.parse(item.setupBrief)).toEqual(item.setupBrief);
