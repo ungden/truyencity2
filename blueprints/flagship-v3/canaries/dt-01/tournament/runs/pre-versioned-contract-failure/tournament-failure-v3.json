@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 3,
+  "promptVersion": "flagship-v3-concept-2026-07-16.2",
+  "snapshotId": "dt_01_research_2026_07",
+  "routeVersion": "canary-gemini-v3.1",
+  "estimatedCostUsd": 0.16559,
+  "calls": [
+    {
+      "role": "concept_generator",
+      "index": 1,
+      "model": "gemini-2.5-pro",
+      "estimatedCostUsd": 0.16559
+    }
+  ],
+  "error": "INFRA_BLOCKED: Concept Generator 2 violated its exact schema.",
+  "detail": [
+    {
+      "code": "too_small",
+      "minimum": 12,
+      "type": "string",
+      "inclusive": true,
+      "exact": false,
+      "message": "String must contain at least 12 character(s)",
+      "path": [
+        "candidates",
+        9,
+        "mechanismFingerprint",
+        0
+      ]
+    }
+  ],
+  "failedAt": "2026-07-16T11:19:31.944Z"
+}

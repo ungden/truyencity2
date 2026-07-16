@@ -17,14 +17,15 @@ import { FlagshipV3Error } from './pipeline';
 import { applyChapterStateV3 } from './state-transition';
 import { validateV3Artifacts } from './validation';
 
-export const V3_ROLLING_PLANNER_PROMPT_VERSION = 'flagship-v3.0-rolling-five';
+export const V3_ROLLING_PLANNER_PROMPT_VERSION = 'flagship-v3.1-rolling-five-fact-create';
 export const V3_ROLLING_PLANNER_SYSTEM = `Bạn là Rolling Planner của đúng một bộ truyện.
 Tạo đúng năm ChapterPlanV3 liên tiếp. Không viết văn xuôi và không tạo canon mới.
 Mỗi scene phải có thời gian, địa điểm, người tham gia, desire, opposition, tactic, cost, payoff và irreversibleChange.
 Mọi resource transaction phải khớp before + delta = after và tiếp nối plan trước.
 Mọi knowledge change phải chỉ rõ nhân vật, fact và nguồn học.
+Fact mới được phép tạo bằng stable factId với valueBefore=null; fact đã tồn tại phải ghi valueBefore khớp state.
 hookIntent chỉ là enum hiệu ứng; unresolvedQuestion không được viết như câu kết văn xuôi sẵn.
-Chỉ dùng stable id có trong kernel/state. Trả đúng JSON RollingPlanWindowV3.`;
+Character/resource/promise ID chỉ được lấy từ kernel/state; fact ID mới phải theo mẫu stable ID. Trả đúng JSON RollingPlanWindowV3.`;
 
 const cleanJson = (raw: string): unknown => JSON.parse(raw.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, ''));
 

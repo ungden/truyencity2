@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 3,
+  "snapshotId": "hx_04_research_2026_07",
+  "genreLane": "xuanhuan_civilization",
+  "refreshedAt": "2026-07-16T11:12:25.823Z",
+  "commission": {
+    "slotId": "hx_04",
+    "audience": "Độc giả nam Việt thích xây dựng lãnh địa, sản xuất và đời sống cộng đồng nhưng vẫn muốn nhân vật, tranh lợi và payoff cụ thể trong từng cụm chương.",
+    "desiredExperience": "Khoái cảm đến từ biến một khu tro trắng không giữ được nước thành nơi đáng sống, với từng công trình làm bữa ăn, mái nhà và cán cân quyền lực đổi thật.",
+    "domainOpportunity": "Một thung lũng tro trắng hư cấu, nơi nước chỉ bám vào đá mang dấu tay cộng đồng; ba nhóm dân giữ kỹ năng đào kênh, nung đá và gieo rêu nhưng không tin nhau.",
+    "requiredMechanisms": [
+      "Tìm nút thắt sinh kế đang khiến một nhóm bỏ đi.",
+      "Ghép kỹ năng và nguồn lực của các phe bằng một cam kết có thể kiểm chứng.",
+      "Hoàn thành công trình nhỏ rồi đo sản lượng và người chịu thiệt.",
+      "Tái phân phối lợi ích để mở công trình khó hơn và tăng tính chính danh."
+    ],
+    "openingRequirements": [
+      "Chương một main phải giải một nút thắt nước nhỏ bằng nguồn lực sẵn có.",
+      "Chậm nhất chương ba một bữa ăn hoặc mái nhà phải tốt lên và một tranh chấp phân phối mới phải xuất hiện."
+    ],
+    "serialityRequirements": [
+      "Cơ chế Văn minh và lãnh địa vận hành bằng nguồn lực, giới hạn và bằng chứng nào để không trở thành lời giải tùy tiện?",
+      "Các tài sản dân số tự nguyện, năng lực sản xuất, tính chính danh được tạo, tiêu và mất ra sao để độc giả nhìn thấy tiến bộ thật?",
+      "Nguồn xung đột Địa hình, mùa vụ, phe lợi ích và người dân chỉ hợp tác khi lợi ích cùng rủi ro được chia rõ. phản ứng thế nào sau mỗi thắng lợi để vòng thưởng không lặp lại?"
+    ],
+    "boundaries": [
+      "Không sao chép tên riêng, hệ sức mạnh, vật phẩm nhận diện, cảnh nổi tiếng hoặc chuỗi sự kiện của bất kỳ tác phẩm đối chiếu nào.",
+      "Không dùng đối thủ ngu, đám đông tung hô hoặc may mắn vô nguồn để chứng minh nhân vật chính giỏi; thắng lợi phải có chuẩn bị, bằng chứng và cái giá.",
+      "Không kéo dài nhục nhã hoặc bất lực quá cửa sổ hồi phục; áp lực phải buộc nhân vật lựa chọn và làm thay đổi trạng thái truyện.",
+      "Tên người, địa danh, tổ chức và giọng thoại phải thuộc riêng truyện này; không dùng hậu tố thể loại hoặc thiết chế chung như một setup thay thế.",
+      "Không kể bằng báo cáo sản lượng thay cho cảnh lao động, thương lượng và hậu quả trên người thật.",
+      "Không dựng lộ trình công nghiệp hóa Trái Đất dưới tên huyền huyễn.",
+      "Mỗi công trình phải có chủ bảo trì, chi phí và nhóm bị ảnh hưởng."
+    ]
+  },
+  "sources": [
+    {
+      "id": "source_1",
+      "url": "https://book.qidian.com/booklist/detail/238466/1/",
+      "title": "Nguồn nghiên cứu HX-04 số 1: book.qidian.com",
+      "publisher": "book.qidian.com",
+      "observedAt": "2026-07-16T11:12:25.823Z"
+    },
+    {
+      "id": "source_2",
+      "url": "https://www.chinawriter.com.cn/n1/2023/0102/c404027-32598233.html",
+      "title": "Nguồn nghiên cứu HX-04 số 2: chinawriter.com.cn",
+      "publisher": "chinawriter.com.cn",
+      "observedAt": "2026-07-16T11:12:25.823Z"
+    },
+    {
+      "id": "source_3",
+      "url": "https://wyb.chinawriter.com.cn/content/202602/06/content82721.html",
+      "title": "Nguồn nghiên cứu HX-04 số 3: wyb.chinawriter.com.cn",
+      "publisher": "wyb.chinawriter.com.cn",
+      "observedAt": "2026-07-16T11:12:25.823Z"
+    }
+  ],
+  "signals": [
+    {
+      "id": "signal_1",
+      "claim": "Payoff xây dựng mạnh nhất khi công trình thay đổi cách người dân ăn, ở, làm việc và nhìn người tổ chức.",
+      "sourceIds": [
+        "source_1"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "id": "signal_2",
+      "claim": "Mỗi bước tăng sản lượng phải kéo theo bài toán phân phối, quyền sở hữu, bảo trì hoặc tính chính danh mới.",
+      "sourceIds": [
+        "source_2"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "id": "signal_3",
+      "claim": "Dàn nhân vật có chuyên môn và lợi ích khác nhau giúp lãnh địa vận hành như xã hội thay vì bàn cờ của main.",
+      "sourceIds": [
+        "source_3"
+      ],
+      "confidence": 0.8
+    }
+  ],
+  "prohibitedDirectImitation": [
+    "Không sao chép tên riêng, hệ sức mạnh, vật phẩm nhận diện, cảnh nổi tiếng hoặc chuỗi sự kiện của bất kỳ tác phẩm đối chiếu nào.",
+    "Không dùng đối thủ ngu, đám đông tung hô hoặc may mắn vô nguồn để chứng minh nhân vật chính giỏi; thắng lợi phải có chuẩn bị, bằng chứng và cái giá.",
+    "Không kéo dài nhục nhã hoặc bất lực quá cửa sổ hồi phục; áp lực phải buộc nhân vật lựa chọn và làm thay đổi trạng thái truyện.",
+    "Tên người, địa danh, tổ chức và giọng thoại phải thuộc riêng truyện này; không dùng hậu tố thể loại hoặc thiết chế chung như một setup thay thế.",
+    "Không kể bằng báo cáo sản lượng thay cho cảnh lao động, thương lượng và hậu quả trên người thật.",
+    "Không dựng lộ trình công nghiệp hóa Trái Đất dưới tên huyền huyễn.",
+    "Mỗi công trình phải có chủ bảo trì, chi phí và nhóm bị ảnh hưởng."
+  ]
+}

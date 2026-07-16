@@ -57,6 +57,21 @@ describe('flagship v3 architecture boundary', () => {
     expect(migration).toContain('estimated_cost_usd');
     expect(migration).toContain('REVOKE ALL ON public.factory_story_status_v3 FROM PUBLIC, anon, authenticated');
   });
+
+  it('stages v3 plans without overwriting v2 blueprints and archives them only inside reset', () => {
+    const migration = read('supabase/migrations/20260716162000_flagship_v3_staging_window.sql');
+    const stage = migration.slice(
+      migration.indexOf('CREATE OR REPLACE FUNCTION public.stage_flagship_launch_pack_v3'),
+      migration.indexOf('CREATE OR REPLACE FUNCTION public.archive_reset_flagship_canary_v3'),
+    );
+    const reset = migration.slice(migration.indexOf('CREATE OR REPLACE FUNCTION public.archive_reset_flagship_canary_v3'));
+    expect(migration).toContain('ADD COLUMN IF NOT EXISTS initial_window_v3 jsonb');
+    expect(migration).toContain('CREATE TABLE IF NOT EXISTS public.story_benchmark_plans');
+    expect(stage).toContain("initial_window_v3 = p_launch_pack->'initialWindow'");
+    expect(stage).not.toContain('DELETE FROM public.chapter_blueprints');
+    expect(reset).toContain('INSERT INTO public.story_benchmark_plans');
+    expect(reset).toContain('DELETE FROM public.chapter_blueprints WHERE project_id = p_project_id');
+  });
 });
 
 describe('flagship v3 golden production failures', () => {
@@ -146,7 +161,14 @@ describe('flagship v3 long-story state bounds', () => {
         }],
         requiredDeltas: [
           { id: `cash_${chapter}`, kind: 'resource_numeric', resourceId: 'cash', before: chapter - 1, delta: 1, after: chapter, unit: 'dong', source: 'completed work', sink: 'none', evidenceRequired: true },
-          { id: `progress_${chapter}`, kind: 'fact', factId: 'progress', valueAfter: `chapter ${chapter}`, evidenceRequired: true },
+          {
+            id: `progress_${chapter}`,
+            kind: 'fact',
+            factId: 'progress',
+            valueBefore: chapter === 1 ? 'chapter zero' : `chapter ${chapter - 1}`,
+            valueAfter: `chapter ${chapter}`,
+            evidenceRequired: true,
+          },
         ],
         nextChapterPressure: 'Bước tiến kế tiếp cần một lựa chọn mới thay vì lặp lại giao dịch cũ.',
       } as ChapterPlanV3;

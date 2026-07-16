@@ -69,23 +69,30 @@ function overlay(): Buffer {
   </svg>`);
 }
 
-mkdirSync(path.dirname(path.resolve(output)), { recursive: true });
-await sharp(path.resolve(source))
-  .rotate()
-  .resize(WIDTH, HEIGHT, { fit: 'cover', position: 'centre' })
-  .composite([{ input: overlay(), top: 0, left: 0 }])
-  .webp({ quality: 91, effort: 6, smartSubsample: true })
-  .toFile(path.resolve(output));
+async function main(): Promise<void> {
+  mkdirSync(path.dirname(path.resolve(output!)), { recursive: true });
+  await sharp(path.resolve(source!))
+    .rotate()
+    .resize(WIDTH, HEIGHT, { fit: 'cover', position: 'centre' })
+    .composite([{ input: overlay(), top: 0, left: 0 }])
+    .webp({ quality: 91, effort: 6, smartSubsample: true })
+    .toFile(path.resolve(output!));
 
-const metadata = await sharp(path.resolve(output)).metadata();
-if (metadata.width !== WIDTH || metadata.height !== HEIGHT || metadata.format !== 'webp') {
-  throw new Error(`Rendered cover contract failed: ${metadata.format} ${metadata.width}x${metadata.height}.`);
+  const metadata = await sharp(path.resolve(output!)).metadata();
+  if (metadata.width !== WIDTH || metadata.height !== HEIGHT || metadata.format !== 'webp') {
+    throw new Error(`Rendered cover contract failed: ${metadata.format} ${metadata.width}x${metadata.height}.`);
+  }
+  console.log(JSON.stringify({
+    output: path.resolve(output!),
+    width: WIDTH,
+    height: HEIGHT,
+    ratio: '2:3',
+    title,
+    watermark,
+  }, null, 2));
 }
-console.log(JSON.stringify({
-  output: path.resolve(output),
-  width: WIDTH,
-  height: HEIGHT,
-  ratio: '2:3',
-  title,
-  watermark,
-}, null, 2));
+
+main().catch(error => {
+  console.error(error);
+  process.exitCode = 1;
+});

@@ -1,12 +1,16 @@
 #!/usr/bin/env tsx
 
 import 'dotenv/config';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import {
+  ArcPlanV3Schema,
   FlagshipLaunchPackV3Schema,
   FlagshipModelRoutesV3Schema,
   MarketResearchSnapshotV3Schema,
+  RollingPlanWindowV3Schema,
+  StoryKernelV3Schema,
+  StoryStateV3Schema,
   validateLaunchPackV3,
 } from '../src/services/story-engine/flagship-v3';
 import { callFlagshipModel } from '../src/services/story-engine/flagship/provider';
@@ -21,49 +25,224 @@ const snapshotPath = value('--snapshot');
 const tournamentPath = value('--tournament');
 const routesPath = value('--routes');
 const outputPath = value('--output');
-if (!snapshotPath || !tournamentPath || !routesPath || !outputPath) {
-  throw new Error('--snapshot, --tournament, --routes and --output are required.');
+const requiredTitle = value('--title');
+if (!snapshotPath || !tournamentPath || !routesPath || !outputPath || !requiredTitle) {
+  throw new Error('--snapshot, --tournament, --routes, --output and --title are required.');
 }
+
 const snapshot = MarketResearchSnapshotV3Schema.parse(JSON.parse(readFileSync(path.resolve(snapshotPath), 'utf8')));
 const tournament = JSON.parse(readFileSync(path.resolve(tournamentPath), 'utf8')) as {
-  selected: unknown;
+  selected: { id?: string };
   openingTrials: Array<{ candidateId: string }>;
   openingReviews: unknown[];
 };
 const routes = FlagshipModelRoutesV3Schema.parse(JSON.parse(readFileSync(path.resolve(routesPath), 'utf8')));
-const selected = tournament.selected as { id?: string };
-if (!selected?.id) throw new Error('Tournament has no selected concept.');
-const opening = tournament.openingTrials.find(item => item.candidateId === selected.id);
+const PROMPT_VERSIONS: Record<string, string> = {
+  kernel_architect: 'flagship-v3-kernel-2026-07-16.2',
+  state_seeder: 'flagship-v3-state-seeder-2026-07-16.2',
+  arc_architect: 'flagship-v3-arc-2026-07-16.2',
+  initial_rolling_planner: 'flagship-v3-initial-plan-2026-07-16.5',
+};
+if (!tournament.selected?.id) throw new Error('Tournament has no selected concept.');
+const opening = tournament.openingTrials.find(item => item.candidateId === tournament.selected.id);
 if (!opening) throw new Error('Selected concept has no opening trial.');
+const resolvedOutput = path.resolve(outputPath);
+const checkpointDir = `${resolvedOutput}.checkpoints`;
+mkdirSync(path.dirname(resolvedOutput), { recursive: true });
+mkdirSync(checkpointDir, { recursive: true });
 
-const response = await callFlagshipModel(
-  `MARKET_SIGNAL_PROVENANCE=${JSON.stringify({ snapshotId: snapshot.snapshotId, signals: snapshot.signals })}
+const calls: Array<{
+  role: string;
+  model: string;
+  estimatedCostUsd: number;
+  promptTokens: number;
+  completionTokens: number;
+  finishReason: string;
+  reused: boolean;
+}> = [];
+
+function parseJson<T>(raw: string, schema: { parse(value: unknown): T }): T {
+  return schema.parse(JSON.parse(raw.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '')));
+}
+
+async function invoke<T>(input: {
+  role: string;
+  model: string;
+  systemPrompt: string;
+  userPrompt: string;
+  schema: { parse(value: unknown): T; _def: unknown };
+}): Promise<T> {
+  const checkpointPath = path.join(checkpointDir, `${input.role}.response.json`);
+  const promptVersion = PROMPT_VERSIONS[input.role];
+  if (!promptVersion) throw new Error(`Missing prompt version for ${input.role}.`);
+  if (existsSync(checkpointPath)) {
+    const checkpoint = JSON.parse(readFileSync(checkpointPath, 'utf8')) as {
+      model?: string;
+      routeVersion?: string;
+      promptVersion?: string;
+      estimatedCostUsd?: number;
+      promptTokens?: number;
+      completionTokens?: number;
+      finishReason?: string;
+      content?: string;
+    };
+    if (
+      checkpoint.model === input.model
+      && checkpoint.routeVersion === routes.routeVersion
+      && checkpoint.promptVersion === promptVersion
+      && checkpoint.content
+    ) {
+      try {
+        const parsed = parseJson(checkpoint.content, input.schema);
+        calls.push({
+          role: input.role,
+          model: input.model,
+          estimatedCostUsd: Number(checkpoint.estimatedCostUsd || 0),
+          promptTokens: Number(checkpoint.promptTokens || 0),
+          completionTokens: Number(checkpoint.completionTokens || 0),
+          finishReason: checkpoint.finishReason || 'UNKNOWN',
+          reused: true,
+        });
+        return parsed;
+      } catch {
+        // A schema or prompt version change invalidates only this checkpoint.
+      }
+    }
+  }
+  const response = await callFlagshipModel(input.userPrompt, {
+    model: input.model,
+    temperature: 0.15,
+    maxTokens: 32768,
+    systemPrompt: input.systemPrompt,
+    responseJsonSchema: toGeminiResponseJsonSchema(input.schema as never),
+  }, { jsonMode: true, schemaName: `flagship_v3_${input.role}` });
+  const metadata = {
+    role: input.role,
+    model: input.model,
+    routeVersion: routes.routeVersion,
+    promptVersion,
+    estimatedCostUsd: response.estimatedCostUsd || 0,
+    promptTokens: response.promptTokens,
+    completionTokens: response.completionTokens,
+    finishReason: response.finishReason,
+    reused: false,
+  };
+  calls.push(metadata);
+  writeFileSync(checkpointPath, `${JSON.stringify({
+    ...metadata,
+    content: response.content,
+  }, null, 2)}\n`);
+  return parseJson(response.content, input.schema);
+}
+
+async function main(): Promise<void> {
+  const kernel = await invoke({
+    role: 'kernel_architect',
+    model: routes.launchArchitect,
+    schema: StoryKernelV3Schema,
+    systemPrompt: 'Bạn là Kernel Architect. Chỉ tạo bản sắc truyện, cast, causal world, resource, promise và ending contract; chỉ trả JSON đúng schema.',
+    userPrompt: `STORY_COMMISSION=${JSON.stringify(snapshot.commission)}
+MARKET_SIGNAL_PROVENANCE=${JSON.stringify({ snapshotId: snapshot.snapshotId, signals: snapshot.signals })}
+REQUIRED_DATABASE_TITLE=${JSON.stringify(requiredTitle)}
 SELECTED_CONCEPT=${JSON.stringify(tournament.selected)}
 APPROVED_OPENING=${JSON.stringify(opening)}
 BLIND_OPENING_REVIEWS=${JSON.stringify(tournament.openingReviews)}
 
-Tạo FlagshipLaunchPackV3. Kernel chỉ chứa quyết định riêng của truyện, không chứa taxonomy thị trường hoặc tên tác phẩm nguồn.
-Arc đầu phải có 20-30 chương. InitialState chapterNumber=0 phải bao phủ toàn bộ character/resource/promise.
-InitialWindow phải có đúng ChapterPlanV3 chương 1-5, resource arithmetic liên tục và không có câu exitHook viết sẵn.`,
-  {
+Tạo StoryKernelV3. title phải khớp tuyệt đối REQUIRED_DATABASE_TITLE.
+Không chứa taxonomy thị trường, prompt benchmark hoặc tên tác phẩm tham khảo.
+Cần ít nhất 4 nhân vật có agenda/voice riêng, 4 world claim có nguồn và ngoại lệ, 3 resource, 4 promise.
+Mục tiêu kết thúc mặc định 800-1200 chương, forecast khoảng 900, nhưng không kéo dài vô hạn.`,
+  });
+  if (kernel.title !== requiredTitle) throw new Error('Kernel Architect changed the deterministic database title.');
+
+  const initialState = await invoke({
+    role: 'state_seeder',
     model: routes.launchArchitect,
-    temperature: 0.2,
-    maxTokens: 65536,
-    systemPrompt: 'Bạn là Launch Architect. Bảo toàn concept đã chọn, tạo đúng bốn artifact v3 và chỉ trả JSON theo schema.',
-    responseJsonSchema: toGeminiResponseJsonSchema(FlagshipLaunchPackV3Schema),
-  },
-  { jsonMode: true, schemaName: 'flagship_v3_launch_pack' },
-);
-const pack = FlagshipLaunchPackV3Schema.parse(JSON.parse(response.content.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '')));
-if (pack.selectedConceptId !== selected.id) throw new Error('Launch Architect changed selected concept identity.');
-validateLaunchPackV3(pack);
-mkdirSync(path.dirname(path.resolve(outputPath)), { recursive: true });
-writeFileSync(path.resolve(outputPath), `${JSON.stringify(pack, null, 2)}\n`);
-console.log(JSON.stringify({
-  valid: true,
-  title: pack.kernel.title,
-  selectedConceptId: pack.selectedConceptId,
-  model: routes.launchArchitect,
-  estimatedCostUsd: response.estimatedCostUsd || 0,
-  output: path.resolve(outputPath),
-}, null, 2));
+    schema: StoryStateV3Schema,
+    systemPrompt: 'Bạn là State Seeder. Chỉ tạo StoryStateV3 chapter zero bao phủ chính xác kernel; không viết outline hoặc prose.',
+    userPrompt: `STORY_KERNEL_V3=${JSON.stringify(kernel)}
+
+Tạo StoryStateV3 chapterNumber=0.
+Phải có đúng một state entry cho mọi characterId, resourceId và promiseId trong kernel.
+Mọi resource numeric có amount/unit/source hữu hạn; state value phải mô tả rõ trạng thái ban đầu.
+Không thêm character/resource/promise ngoài kernel.`,
+  });
+
+  const arc = await invoke({
+    role: 'arc_architect',
+    model: routes.launchArchitect,
+    schema: ArcPlanV3Schema,
+    systemPrompt: 'Bạn là Arc Architect. Chỉ tạo arc hiện tại 20-30 chương từ kernel và state đã commit; không lập 1000 chương.',
+    userPrompt: `STORY_KERNEL_V3=${JSON.stringify(kernel)}
+STORY_STATE_V3=${JSON.stringify(initialState)}
+SELECTED_CONCEPT=${JSON.stringify(tournament.selected)}
+
+Tạo ArcPlanV3 bắt đầu chương 1, dài 20-30 chương.
+Actor ID, promise ID và progression signal phải lấy từ kernel.
+Terminal change phải hữu hình về vật chất, quan hệ hoặc thế giới; conflict actor có agenda/leverage/next move thật.`,
+  });
+
+  const initialWindow = await invoke({
+    role: 'initial_rolling_planner',
+    model: routes.planner,
+    schema: RollingPlanWindowV3Schema,
+    systemPrompt: 'Bạn là Rolling Planner. Chỉ tạo đúng năm ChapterPlanV3 liên tục; không viết prose, không tự sửa kernel/state/arc.',
+    userPrompt: `STORY_KERNEL_V3=${JSON.stringify(kernel)}
+ARC_PLAN_V3=${JSON.stringify(arc)}
+STORY_STATE_V3=${JSON.stringify(initialState)}
+
+Tạo RollingPlanWindowV3 chương 1-5.
+Mọi id, factId, characterId, resourceId, promiseId, locationId và locationAfter phải là stable ID ASCII theo mẫu [a-z][a-z0-9_-], tuyệt đối không dùng tên địa điểm dạng câu.
+Mỗi scene phải có ít nhất một requiredDeltaId và mọi delta phải được scene thực hiện.
+Scene đầu tiên của MỖI chương bắt buộc travelMinutesFromPrevious=0.
+Các scene sau không chồng nhau; startMinute phải lớn hơn hoặc bằng startMinute + durationMinutes + travelMinutesFromPrevious của scene trước.
+desire, opposition, tactic, cost, payoff, irreversibleChange và informationDelta đều phải là câu đầy đủ, ít nhất 20 ký tự.
+Resource transaction phải có before + delta = after, source/sink rõ và liên tục qua năm chương.
+source, sink, learnedFrom và mọi state value phải là cụm có nghĩa ít nhất 8 ký tự, không dùng nhãn cụt như "chợ", "bán", "mua".
+Fact mới dùng kind=fact với valueBefore=null; fact đã có phải ghi valueBefore khớp chính xác state hiện tại.
+Knowledge change ghi characterId, factId và learnedFrom. Chỉ dùng hookIntent/unresolvedQuestion, không viết sẵn câu hook.`,
+  });
+
+  const pack = FlagshipLaunchPackV3Schema.parse({
+    schemaVersion: 3,
+    selectedConceptId: tournament.selected.id,
+    kernel,
+    arc,
+    initialState,
+    initialWindow,
+  });
+  validateLaunchPackV3(pack);
+  writeFileSync(resolvedOutput, `${JSON.stringify(pack, null, 2)}\n`);
+  writeFileSync(`${resolvedOutput}.run.json`, `${JSON.stringify({
+    schemaVersion: 3,
+    selectedConceptId: pack.selectedConceptId,
+    title: pack.kernel.title,
+    routeVersion: routes.routeVersion,
+    calls,
+    estimatedCostUsd: Number(calls.reduce((sum, call) => sum + call.estimatedCostUsd, 0).toFixed(6)),
+    createdAt: new Date().toISOString(),
+  }, null, 2)}\n`);
+  console.log(JSON.stringify({
+    valid: true,
+    title: pack.kernel.title,
+    selectedConceptId: pack.selectedConceptId,
+    callCount: calls.length,
+    estimatedCostUsd: Number(calls.reduce((sum, call) => sum + call.estimatedCostUsd, 0).toFixed(6)),
+    output: resolvedOutput,
+  }, null, 2));
+}
+
+main().catch(error => {
+  writeFileSync(`${resolvedOutput}.failure.json`, `${JSON.stringify({
+    routeVersion: routes.routeVersion,
+    calls,
+    estimatedCostUsd: Number(calls.reduce((sum, call) => sum + call.estimatedCostUsd, 0).toFixed(6)),
+    error: error instanceof Error ? error.message : String(error),
+    detail: error && typeof error === 'object'
+      ? 'detail' in error ? error.detail : 'issues' in error ? error.issues : null
+      : null,
+    failedAt: new Date().toISOString(),
+  }, null, 2)}\n`);
+  console.error(error);
+  process.exitCode = 1;
+});

@@ -23,6 +23,9 @@ export function validateV3Artifacts(input: {
   const stateCharacters = new Map(state.characters.map(item => [item.characterId, item]));
   const stateResources = new Map(state.resources.map(item => [item.resourceId, item]));
   const statePromises = new Set(state.promises.map(item => item.promiseId));
+  const createdFactIds = new Set(plan.requiredDeltas.flatMap(delta =>
+    delta.kind === 'fact' && delta.valueBefore === null ? [delta.factId] : [],
+  ));
 
   if (plan.chapterNumber !== state.chapterNumber + 1) {
     issues.push({ code: 'chapter_sequence', path: 'chapterNumber', message: `Expected chapter ${state.chapterNumber + 1}.` });
@@ -64,11 +67,16 @@ export function validateV3Artifacts(input: {
     if ('characterId' in delta && (!characters.has(delta.characterId) || !stateCharacters.has(delta.characterId))) {
       issues.push({ code: 'unknown_character_delta', path, message: `Unknown character ${delta.characterId}.` });
     }
-    if (delta.kind === 'character_knowledge' && !facts.has(delta.factId)) {
+    if (delta.kind === 'character_knowledge' && !facts.has(delta.factId) && !createdFactIds.has(delta.factId)) {
       issues.push({ code: 'unknown_knowledge_fact', path, message: `Knowledge delta references unknown fact ${delta.factId}.` });
     }
-    if (delta.kind === 'fact' && !facts.has(delta.factId)) {
-      issues.push({ code: 'unknown_fact_delta', path, message: `Fact delta references unknown fact ${delta.factId}.` });
+    if (delta.kind === 'fact') {
+      const current = facts.get(delta.factId);
+      if (current === undefined && delta.valueBefore !== null) {
+        issues.push({ code: 'fact_create_requires_null_before', path, message: `New fact ${delta.factId} must use valueBefore=null.` });
+      } else if (current !== undefined && delta.valueBefore !== current) {
+        issues.push({ code: 'fact_stale_before', path, message: `Fact ${delta.factId} valueBefore does not match committed state.` });
+      }
     }
     if (delta.kind === 'promise' && (!promises.has(delta.promiseId) || !statePromises.has(delta.promiseId))) {
       issues.push({ code: 'unknown_promise_delta', path, message: `Unknown promise ${delta.promiseId}.` });

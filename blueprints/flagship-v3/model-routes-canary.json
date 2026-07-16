@@ -5,7 +5,7 @@
   ],
   "setupJudges": [
     "gemini-3.1-pro-preview",
-    "gemini-3.5-flash",
+    "gemini-3-flash-preview",
     "gemini-2.5-pro"
   ],
   "openingSimulator": "gemini-2.5-pro",
@@ -13,6 +13,6 @@
   "planner": "gemini-3.1-pro-preview",
   "writer": "gemini-2.5-pro",
   "editor": "gemini-3.1-pro-preview",
-  "routeVersion": "canary-gemini-v3.1",
+  "routeVersion": "canary-gemini-v3.2",
   "maxPublishedChapterCostUsd": 0.5
 }

@@ -102,9 +102,16 @@ async function reconcile(): Promise<void> {
   console.log(JSON.stringify(data, null, 2));
 }
 
-if (command === 'stage') await stage(projectId!);
-else if (command === 'reset') await reset(projectId!);
-else if (command === 'promote') await promote(projectId!);
-else if (command === 'status') console.log(JSON.stringify(await status(projectId!), null, 2));
-else if (command === 'reconcile') await reconcile();
-else throw new Error('Usage: flagship-v3-operator.ts stage|reset|promote|status|reconcile [options] [--apply]');
+async function main(): Promise<void> {
+  if (command === 'stage') await stage(projectId!);
+  else if (command === 'reset') await reset(projectId!);
+  else if (command === 'promote') await promote(projectId!);
+  else if (command === 'status') console.log(JSON.stringify(await status(projectId!), null, 2));
+  else if (command === 'reconcile') await reconcile();
+  else throw new Error('Usage: flagship-v3-operator.ts stage|reset|promote|status|reconcile [options] [--apply]');
+}
+
+main().catch(error => {
+  console.error(error);
+  process.exitCode = 1;
+});

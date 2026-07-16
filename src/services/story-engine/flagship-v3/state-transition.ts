@@ -33,7 +33,11 @@ export function applyChapterStateV3(input: {
 
   const apply = (delta: ChapterDeltaV3): void => {
     if (delta.kind === 'fact') {
-      facts = replaceBy(facts, item => item.id, delta.factId, item => ({ ...item, value: delta.valueAfter, sourceChapter: chapter }));
+      const existing = facts.some(item => item.id === delta.factId);
+      facts = (existing
+        ? replaceBy(facts, item => item.id, delta.factId, item => ({ ...item, value: delta.valueAfter, sourceChapter: chapter }))
+        : [...facts, { id: delta.factId, value: delta.valueAfter, sourceChapter: chapter }]
+      ).slice(-100);
     } else if (delta.kind === 'character_location') {
       characters = replaceBy(characters, item => item.characterId, delta.characterId, item => ({ ...item, locationId: delta.locationAfter }));
     } else if (delta.kind === 'character_knowledge') {

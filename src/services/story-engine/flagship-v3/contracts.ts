@@ -53,8 +53,8 @@ export const StoryKernelV3Schema = z.object({
     antiCloneFingerprint: z.array(text).min(3).max(10),
   }).strict(),
   pleasure: z.object({
-    primaryRewardLoop: z.array(detailed).min(3).max(7),
-    comfortLoop: z.array(detailed).min(2).max(6),
+    primaryRewardLoop: z.array(text).min(3).max(7),
+    comfortLoop: z.array(text).min(2).max(6),
     setbackRecoveryWindow: z.number().int().min(1).max(3),
     progressionSignals: z.array(named).min(3).max(10),
   }).strict(),
@@ -209,6 +209,7 @@ export const ChapterDeltaV3Schema = z.discriminatedUnion('kind', [
     id,
     kind: z.literal('fact'),
     factId: id,
+    valueBefore: text.nullable(),
     valueAfter: text,
     evidenceRequired: z.literal(true),
   }).strict(),

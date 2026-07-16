@@ -33,6 +33,7 @@
     "flagship:v3:operator": "node --import tsx scripts/flagship-v3-operator.ts",
     "flagship:v3:cover": "node --import tsx scripts/render-flagship-v3-cover.ts",
     "flagship:v3:concepts": "node --import tsx scripts/flagship-v3-concept-tournament.ts",
+    "flagship:v3:research-import": "node --import tsx scripts/flagship-v3-import-research.ts",
     "flagship:v3:launch-pack": "node --import tsx scripts/flagship-v3-build-launch-pack.ts",
     "flagship:v3:calibrate": "node --import tsx scripts/flagship-v3-calibrate.ts",
     "flagship:reject-pilot": "node --import tsx scripts/flagship-reject-pilot.ts",

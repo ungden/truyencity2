@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 3,
+  "snapshotId": "dt_01_research_2026_07",
+  "genreLane": "era_coastal",
+  "refreshedAt": "2026-07-16T11:12:25.855Z",
+  "commission": {
+    "slotId": "dt_01",
+    "audience": "Độc giả Việt thích nam tần niên đại, làm giàu bằng tay nghề, gia đình ấm lên từng bước và nhịp đọc nhẹ nhàng có thành quả sớm.",
+    "desiredExperience": "Khoái hoạt đến từ một người từng trải được làm lại, chủ động biến hiểu biết nghề biển thành mẻ hàng, bữa cơm, dụng cụ và uy tín; khó khăn ngắn và luôn mở đường cho năng lực hoặc tình thân.",
+    "domainOpportunity": "Một huyện biển hư cấu mang chất Việt vào cuối thập niên 1980: đánh bắt ven bờ quy mô nhỏ, phân loại hải sản, đá lạnh và muối, phơi sấy, mắm, chợ cá, người thu mua, tín dụng phi chính thức và quá trình thị trường hóa ban đầu.",
+    "requiredMechanisms": [
+      "Nhận ra một mùa vụ, loại hải sản hoặc phần sản lượng đang bị đánh giá thấp.",
+      "Tự đi biển, phân loại, bảo quản hoặc chế biến bằng công cụ và lao động đang có.",
+      "Thương lượng đầu ra trong điều kiện giá, thời gian và hao hụt thực tế.",
+      "Thu lợi có nguồn rồi tái đầu tư vào dụng cụ, sản lượng, quan hệ hoặc chất lượng sản phẩm.",
+      "Đưa một phần thành quả về bữa cơm, mái nhà và sự yên tâm của gia đình."
+    ],
+    "openingRequirements": [
+      "Chương 1 phải kích hoạt ký ức và một hành động chủ động; chậm nhất chương 3 phải có tiền, dụng cụ, hàng hóa hoặc bữa cơm tốt hơn do nhân vật tự kiếm.",
+      "Trục chương 1-5 là mẻ hàng đầu và bữa cơm đủ; 6-10 có dụng cụ, khách và uy tín; 11-20 hình thành nhóm nhỏ; 21-30 đối diện giới hạn nguồn lợi."
+    ],
+    "serialityRequirements": [
+      "Trục chương 1-5 là mẻ hàng đầu và bữa cơm đủ; 6-10 có dụng cụ, khách và uy tín; 11-20 hình thành nhóm nhỏ; 21-30 đối diện giới hạn nguồn lợi.",
+      "Mỗi concept phải chứng minh vòng thưởng có thể biến hóa 30 chương mà không lặp đổi loài cá, gặp người chê rồi bán giá cao."
+    ],
+    "boundaries": [
+      "Không dùng không gian vô hạn, cửa hàng hệ thống, vật tư tự sinh, kho báu liên tục, xổ số hoặc quý nhân trao vốn miễn phí.",
+      "Không biến ký ức tương lai thành bảng giá và tọa độ chính xác; mọi quyết định vẫn chịu thời tiết, hao hụt, sức lao động và phản ứng của người khác.",
+      "Không dùng xã hội đen, quan chức ác, cưỡng hiếp, tra tấn, buôn lậu hoặc cả làng cùng ngu để tạo đối thủ cho nhân vật chính.",
+      "Không kéo dài đói rét, sỉ nhục hoặc bất lực quá hai chương; áp lực phải nhanh chóng biến thành hành động có agency và một thay đổi trạng thái.",
+      "Không dùng người xung quanh chỉ để kinh ngạc, khen ngon hoặc gọi nhân vật chính là thiên tài; mỗi người phải có lợi ích và công việc riêng.",
+      "Không áp kỹ thuật hiện đại vượt điều kiện cuối thập niên 1980; mọi dụng cụ, đá, muối, nhiên liệu, vốn và phương tiện phải có nguồn.",
+      "Không khai thác tận diệt hoặc coi tài nguyên biển là vô hạn; từ chương 21-30 phải buộc nhân vật chọn lợi nhuận nhanh hay sinh kế bền vững.",
+      "Không bê tên gọi, lễ nghi, đơn vị tiền hoặc khẩu khí truyện Trung Quốc; ngôn ngữ, bữa ăn, xưng hô và quan hệ làng xóm phải tự nhiên với người Việt."
+    ]
+  },
+  "sources": [
+    {
+      "id": "source_1",
+      "url": "https://www.fao.org/4/ac467e/ac467e07.htm",
+      "title": "Nguồn nghiên cứu DT-01 số 1: fao.org",
+      "publisher": "fao.org",
+      "observedAt": "2026-07-16T11:12:25.855Z"
+    },
+    {
+      "id": "source_2",
+      "url": "https://www.fao.org/4/y5707e/y5707e0g.htm",
+      "title": "Nguồn nghiên cứu DT-01 số 2: fao.org",
+      "publisher": "fao.org",
+      "observedAt": "2026-07-16T11:12:25.855Z"
+    },
+    {
+      "id": "source_3",
+      "url": "https://www.fao.org/fishery/docs/DOCUMENT/fcp/en/FI_CP_VN.pdf",
+      "title": "Nguồn nghiên cứu DT-01 số 3: fao.org",
+      "publisher": "fao.org",
+      "observedAt": "2026-07-16T11:12:25.855Z"
+    },
+    {
+      "id": "source_4",
+      "url": "https://www.fao.org/flw-in-fish-value-chains/resources/articles/improved-post-harvest-practices-for-fish-loss-and-waste-reduction/en/",
+      "title": "Nguồn nghiên cứu DT-01 số 4: fao.org",
+      "publisher": "fao.org",
+      "observedAt": "2026-07-16T11:12:25.855Z"
+    },
+    {
+      "id": "source_5",
+      "url": "https://moit.gov.vn/gioi-thieu/cac-thoi-ky-phat-trien/giai-doan-1986-2006.html",
+      "title": "Nguồn nghiên cứu DT-01 số 5: moit.gov.vn",
+      "publisher": "moit.gov.vn",
+      "observedAt": "2026-07-16T11:12:25.855Z"
+    },
+    {
+      "id": "source_6",
+      "url": "https://www.chinawriter.com.cn/n1/2026/0413/c404027-40700182.html",
+      "title": "Nguồn nghiên cứu DT-01 số 6: chinawriter.com.cn",
+      "publisher": "chinawriter.com.cn",
+      "observedAt": "2026-07-16T11:12:25.855Z"
+    }
+  ],
+  "signals": [
+    {
+      "id": "signal_1",
+      "claim": "Giai đoạn 1980-2000 số tàu cá và công suất máy tăng mạnh nhưng phần lớn vẫn là tàu nhỏ hoạt động ven bờ; điều này tạo giới hạn thật về ngư cụ, an toàn, sản lượng và áp lực nguồn lợi.",
+      "sourceIds": [
+        "source_1"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "id": "signal_2",
+      "claim": "Ngư dân thường yếu thế khi bán ngay tại bến vì chi phí bảo quản và rủi ro hư hỏng; lượng đá quyết định thời gian chuyến biển, còn nguồn cung đồng loạt có thể ép giá xuống.",
+      "sourceIds": [
+        "source_2"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "id": "signal_3",
+      "claim": "Cá giá trị thấp có thể đi vào thức ăn, bột cá hoặc nước mắm; chất lượng giảm khi chỉ ướp muối thay vì dùng đá, tạo cơ chế truyện cho phân loại, bảo quản và chế biến tăng giá trị.",
+      "sourceIds": [
+        "source_3"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "id": "signal_4",
+      "claim": "Cá hư nhanh từ lúc đánh bắt; làm lạnh, vệ sinh, phơi, muối, hun hoặc chế biến đúng cách có thể kéo dài thời hạn và giảm tổn thất, nhưng luôn cần công cụ, thời gian và kiểm soát chất lượng.",
+      "sourceIds": [
+        "source_4"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "id": "signal_5",
+      "claim": "Cuối thập niên 1980 là thời kỳ chuyển từ cơ chế tập trung sang thị trường, giá cả còn biến động mạnh và cơ hội thương mại mở dần; plot phải phản ánh sự chuyển đổi chứ không áp thị trường hiện đại vào quá khứ.",
+      "sourceIds": [
+        "source_5"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "id": "signal_6",
+      "claim": "Niên đại văn tạo gần gũi bằng vật dụng và đời sống thời kỳ, dùng trọng sinh hoặc xuyên để sửa tiếc nuối và tạo hành trình thấp mở cao đi; chi tiết đời thường phải mang chức năng cảm xúc chứ không chỉ trang trí.",
+      "sourceIds": [
+        "source_6"
+      ],
+      "confidence": 0.8
+    }
+  ],
+  "prohibitedDirectImitation": [
+    "Không dùng không gian vô hạn, cửa hàng hệ thống, vật tư tự sinh, kho báu liên tục, xổ số hoặc quý nhân trao vốn miễn phí.",
+    "Không biến ký ức tương lai thành bảng giá và tọa độ chính xác; mọi quyết định vẫn chịu thời tiết, hao hụt, sức lao động và phản ứng của người khác.",
+    "Không dùng xã hội đen, quan chức ác, cưỡng hiếp, tra tấn, buôn lậu hoặc cả làng cùng ngu để tạo đối thủ cho nhân vật chính.",
+    "Không kéo dài đói rét, sỉ nhục hoặc bất lực quá hai chương; áp lực phải nhanh chóng biến thành hành động có agency và một thay đổi trạng thái.",
+    "Không dùng người xung quanh chỉ để kinh ngạc, khen ngon hoặc gọi nhân vật chính là thiên tài; mỗi người phải có lợi ích và công việc riêng.",
+    "Không áp kỹ thuật hiện đại vượt điều kiện cuối thập niên 1980; mọi dụng cụ, đá, muối, nhiên liệu, vốn và phương tiện phải có nguồn.",
+    "Không khai thác tận diệt hoặc coi tài nguyên biển là vô hạn; từ chương 21-30 phải buộc nhân vật chọn lợi nhuận nhanh hay sinh kế bền vững.",
+    "Không bê tên gọi, lễ nghi, đơn vị tiền hoặc khẩu khí truyện Trung Quốc; ngôn ngữ, bữa ăn, xưng hô và quan hệ làng xóm phải tự nhiên với người Việt."
+  ]
+}

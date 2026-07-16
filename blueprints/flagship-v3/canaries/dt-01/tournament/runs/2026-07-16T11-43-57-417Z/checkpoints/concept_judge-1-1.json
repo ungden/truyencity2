@@ -1,0 +1,10 @@
+{
+  "role": "concept_judge",
+  "index": 1,
+  "batchIndex": 1,
+  "model": "gemini-3-flash-preview",
+  "promptVersion": "flagship-v3-concept-2026-07-16.2",
+  "estimatedCostUsd": 0.0347045,
+  "content": "{\n  \"schemaVersion\": 3,\n  \"judgeId\": \"judge_2\",\n  \"batchIndex\": 1,\n  \"comparisons\": [\n    {\n      \"leftId\": \"c2_bamboo_traps\",\n      \"rightId\": \"c4_rock_pool_tides\",\n      \"winnerId\": \"c2_bamboo_traps\",\n      \"reason\": \"c2 thể hiện cơ chế tay nghề (đan lồng) chủ động và có tính hệ thống hơn việc đi nhặt lộc biển phụ thuộc vào rủi ro địa hình của c4. Chuỗi phần thưởng của c2 cũng rõ ràng hơn trong việc tái đầu tư vào dụng cụ bền hơn.\"\n    },\n    {\n      \"leftId\": \"c2_bamboo_traps\",\n      \"rightId\": \"c5_shrimp_paste\",\n      \"winnerId\": \"c2_bamboo_traps\",\n      \"reason\": \"c2 tập trung vào khai thác hải sản giá trị cao (ghẹ xanh) bằng công cụ tự chế, phù hợp với chất 'nam tần' hơn là việc làm mắm tép có vòng quay vốn nhanh nhưng ít tính phiêu lưu nghề biển như c5.\"\n    },\n    {\n      \"leftId\": \"c2_bamboo_traps\",\n      \"rightId\": \"c6_handline_bait\",\n      \"winnerId\": \"c2_bamboo_traps\",\n      \"reason\": \"c2 có cơ chế sản xuất (đan lồng) và khai thác ổn định. c6 dựa vào việc bán cho tàu nước ngoài, một yếu tố có",
+  "reusedFrom": "/Users/alexle/Documents/truyencity/blueprints/flagship-v3/canaries/dt-01/tournament/runs/2026-07-16T11-35-34-633Z/checkpoints/concept_judge-1-1.json"
+}

@@ -1,0 +1,1446 @@
+{
+  "candidates": [
+    {
+      "id": "c1_bycatch_ice",
+      "title": "Mẻ Biển Hừng Đông",
+      "premise": "Sống lại năm 1988, một cựu thương lái hải sản nhận ra rào cản lớn nhất không phải là thiếu cá, mà là cá vụn bị hỏng do thiếu đá lạnh. Anh dùng bèo tây và lá chuối khô làm lớp cách nhiệt tự nhiên, cứu lấy mẻ 'cá dạt' và biến nó thành những bữa cơm có thịt đầu tiên.",
+      "protagonistEngine": "Kinh nghiệm quản lý hao hụt hải sản và khả năng tối ưu hóa nhiệt độ bảo quản bằng vật liệu thô sơ.",
+      "protagonistContradiction": "Sở hữu kiến thức bảo quản chuẩn mực nhưng lại bị giới hạn bởi thân thể gầy gò và việc nhà máy đá địa phương chỉ bán cho tàu lớn.",
+      "advantageLimits": "Lớp cách nhiệt tự nhiên chỉ kéo dài độ tươi được 4-6 tiếng, buộc anh phải chạy đua với thời gian để lên chợ huyện trước khi nắng gắt.",
+      "worldReaction": "Người làng cười chê vì gom 'cá rác', nhưng tiểu thương chợ huyện nhanh chóng nhận ra chất lượng cá tươi không xước bụng và sẵn sàng trả giá cao hơn.",
+      "openingAdvantage": "Nhớ lại một mẻ cá dạt cực lớn của bến cá ngày hôm đó bị đổ bỏ do tàu về trễ, anh chủ động chuẩn bị thúng tre và lớp lót từ đêm.",
+      "firstThreeChapterMechanism": "Chương 1: Thu gom bèo tây, phơi qua một nắng. Chương 2: Chờ bến cá hừng đông, xin mua rẻ mẻ cá dạt, phân loại và ướp ngay tại chỗ. Chương 3: Gánh cá lên chợ, bán được tiền tươi và mua ngay cân gạo, miếng thịt lợn về nấu cơm cho vợ đang bệnh.",
+      "causalCost": "Đánh đổi giấc ngủ và sức lực cơ bắp; bèo tây phải hái và xử lý liên tục, mỗi chuyến đi là một lần kiệt sức.",
+      "mechanismFingerprint": [
+        "Phân loại cá dạt thành 3 cấp độ tươi",
+        "Xử lý bèo tây và lá chuối làm lớp bảo ôn",
+        "Tính toán thời gian từ bến lên chợ khớp với chu kỳ nhiệt độ"
+      ],
+      "rewardLoopFingerprint": [
+        "Mua rẻ cá dạt",
+        "Bảo quản không dùng đá",
+        "Bán giá cá tươi",
+        "Mua nhu yếu phẩm và mua thêm thúng"
+      ],
+      "conflictEconomyFingerprint": [
+        "Cạnh tranh mua cá dạt với người làm mắm",
+        "Thương lượng với người bán thịt lợn để đổi cá",
+        "Chia sẻ lợi ích với chủ xe bò để chở được nhiều hơn"
+      ],
+      "seriality30": [
+        "Chương 1-5: Trúng mẻ cá dạt đầu tiên, bảo quản bằng bèo tây, bán giá tốt và mang về bữa cơm đầy đặn.",
+        "Chương 6-10: Mua được xe kéo tay, ký gửi được cá cho một quán ăn nhỏ trên huyện, uy tín bắt đầu có.",
+        "Chương 11-15: Lượng cá lớn hơn giới hạn sức người, bắt đầu rủ hai người anh em họ cùng gom và đẩy xe.",
+        "Chương 16-20: Hình thành một trạm thu mua nhỏ lợp lá, gom tiền cọc để chen chân mua được đá viên từ nhà máy.",
+        "Chương 21-30: Nguồn cá dạt giảm do tàu chuộng lưới mắt nhỏ tận diệt; nhân vật quyết định chỉ thu mua cá đạt kích cỡ, thuyết phục bạn thuyền bỏ lưới tận diệt để bảo vệ sinh kế dài hạn."
+      ],
+      "antiStupidOpponent": "Trưởng bến cá: Không chèn ép vô lý nhưng kiên quyết thu phí bến bãi đàng hoàng, ban đầu nghi ngờ MC phá giá nhưng sau đó hợp tác khi thấy MC giúp dọn sạch bến.",
+      "domainResearchNeeds": [
+        "Cách dùng vật liệu tự nhiên cách nhiệt thập niên 80",
+        "Tỉ lệ hao hụt của cá biển khi không có đá lạnh",
+        "Giá cả gạo thịt và cá vụn thời kỳ đầu Đổi Mới"
+      ]
+    },
+    {
+      "id": "c2_bamboo_traps",
+      "title": "Nước Ròng Bắt Ghẹ",
+      "premise": "Trở về làng biển nghèo, người thợ cả hiểu dòng chảy cửa lạch đã tự đan những chiếc lồng bát quái từ tre vụn, nhắm vào đàn ghẹ xanh trú ẩn dưới rạn đá ngầm mà lưới kéo không chạm tới được.",
+      "protagonistEngine": "Sự am hiểu tường tận về tập tính di cư theo con nước của các loài hải sản đáy và kỹ thuật đan lồng bẫy.",
+      "protagonistContradiction": "Muốn bắt nhiều nhưng không có tiền mua lưới cước xịn, phải cặm cụi đan lồng tre dễ bị hỏng do đá chém hoặc nước cuốn.",
+      "advantageLimits": "Lồng tre cồng kềnh, mỗi lần chỉ chở được vài chiếc trên chiếc xuồng ba lá, và phải đặt đúng giờ nước rút.",
+      "worldReaction": "Những người thả lưới khinh thường việc lúi húi ở lạch đá nghèo nàn, cho đến khi thấy những con ghẹ xanh khổng lồ còn sống nguyên vẹn được mang lên.",
+      "openingAdvantage": "Tận dụng đống tre hỏng sau bão của nhà hàng xóm, chẻ ra đan được 3 chiếc lồng bẫy với rập cửa vào một chiều.",
+      "firstThreeChapterMechanism": "Chương 1: Xin tre vụn, vót nan và đan lồng trong đêm. Chương 2: Căn con nước ròng sớm mai để đặt lồng ngầm dưới rạn đá. Chương 3: Kéo lồng trúng ghẹ xanh, giữ sống bằng rong biển ướt, bán cho đầu nậu được mớ tiền mua gạo và chỉ cước.",
+      "causalCost": "Bàn tay chai sần rớm máu vì chẻ tre, nguy cơ lật xuồng ở lạch đá nước xiết.",
+      "mechanismFingerprint": [
+        "Đoán con nước rút ở lạch ngầm",
+        "Đan lồng tre với hom một chiều",
+        "Mồi bẫy làm từ ốc vụn đập giập"
+      ],
+      "rewardLoopFingerprint": [
+        "Đặt lồng bẫy tre",
+        "Thu hoạch hải sản đáy",
+        "Bán hải sản sống",
+        "Tái đầu tư mua cước đan lồng bền hơn"
+      ],
+      "conflictEconomyFingerprint": [
+        "Giữ bí mật vị trí lạch đá với bạn thuyền",
+        "Trả giá với thương lái chuyên ép giá ghẹ ngộp",
+        "Đổi công với thợ mộc để mượn đồ nghề làm lồng"
+      ],
+      "seriality30": [
+        "Chương 1-5: Đan 3 lồng tre, bắt mẻ ghẹ đầu, đổi được gạo và vá lại mái nhà dột.",
+        "Chương 6-10: Cải tiến lồng bằng cước lưới xin được, lượng lồng tăng lên 15 cái, khách buôn bắt đầu săn đón.",
+        "Chương 11-15: Rủ thêm em vợ phụ chèo xuồng và canh chừng, mở rộng vùng thả lồng ra hòn đảo nhỏ gần bờ.",
+        "Chương 16-20: Thành lập tổ ba chiếc xuồng thả lồng, thương lượng được giá cố định với nhà hàng trên tỉnh.",
+        "Chương 21-30: Phát hiện mùa sinh sản, lồng dính đầy ghẹ ôm trứng. MC quyết định thả ghẹ ôm trứng, chấp nhận giảm doanh thu, hướng dẫn tổ đội làm theo để mùa sau không mất gốc."
+      ],
+      "antiStupidOpponent": "Đầu nậu thu mua: Một bà cô sắc sảo, luôn bới móc để ép giá nhưng khi thấy hàng chất lượng thực sự thì trả tiền mặt sòng phẳng để giữ mối.",
+      "domainResearchNeeds": [
+        "Kỹ thuật đan lồng bát quái bằng tre",
+        "Tập tính sinh sống của ghẹ xanh ven bờ",
+        "Cách đọc con nước thủy triều lịch âm"
+      ]
+    },
+    {
+      "id": "c3_sun_drying_fish",
+      "title": "Nắng Vàng Cá Biển",
+      "premise": "Thập niên 80, cá rộ mùa rẻ như bèo. Thay vì bán tháo, MC tận dụng muối hột địa phương và kỹ thuật canh nắng mổ phanh để làm khô cá nục một nắng, tạo ra loại thực phẩm dự trữ xa xỉ thời bấy giờ.",
+      "protagonistEngine": "Kỹ thuật canh tỉ lệ muối - nước và cảm quan độ ẩm không khí tuyệt vời để cá khô từ bên trong mà không gắt dầu.",
+      "protagonistContradiction": "Biết cách làm ngon nhất nhưng không có sân phơi đủ rộng và thiếu vốn ôm hàng lúc rẻ nhất.",
+      "advantageLimits": "Phụ thuộc hoàn toàn vào thời tiết. Một cơn mưa rào bất chợt có thể làm hỏng cả mẻ vốn liếng.",
+      "worldReaction": "Người nhà xót của khi thấy đem muối xát vào cá tươi, nhưng khi mùi cá một nắng nướng xộc lên, cả xóm chài phải thèm thuồng.",
+      "openingAdvantage": "Nhận ra mẻ cá nục rộ mùa bị thương lái chê ỏng chê eo, mua lại với giá rẻ mạt bằng chút tiền cưới vợ còn sót lại.",
+      "firstThreeChapterMechanism": "Chương 1: Tranh cãi với vợ để dốc túi mua mẻ cá ế. Chương 2: Mổ phanh, ngâm nước muối loãng xả nhớt, phơi trên mành tre xin được. Chương 3: Cá vừa độ một nắng dẻo thơm, đem ra nướng thử một con cho vợ ăn, phần còn lại bán cho bách hóa huyện được giá gấp ba.",
+      "causalCost": "Phải thức trắng đêm xẻ cá để kịp phơi nắng sớm, ruồi muỗi bâu đầy tay và mùi tanh bám chặt.",
+      "mechanismFingerprint": [
+        "Tỉ lệ ngâm nước muối xả máu tanh",
+        "Căng mành tre cách mặt đất 1 mét",
+        "Lật cá theo chu kỳ bóng nắng"
+      ],
+      "rewardLoopFingerprint": [
+        "Gom cá ế mùa rộ",
+        "Sơ chế và canh nắng",
+        "Bán thành phẩm cá một nắng",
+        "Mua thêm vỉ phơi và chum ủ muối"
+      ],
+      "conflictEconomyFingerprint": [
+        "Mặc cả với ruộng muối để có muối hạt to không tạp chất",
+        "Thuyết phục cửa hàng quốc doanh nhận ký gửi",
+        "Bảo vệ mẻ cá khỏi chó mèo và thời tiết xấu"
+      ],
+      "seriality30": [
+        "Chương 1-5: Mua mẻ cá nục ế, làm khô một nắng, bữa cơm có thêm đĩa cá nướng thơm lừng, bán mẻ đầu lấy vốn.",
+        "Chương 6-10: Đóng thêm 10 vỉ phơi, tìm được nguồn muối tốt hơn, khách đường dài bắt đầu tìm đến mua làm quà.",
+        "Chương 11-15: Mùa mưa tới, phải thuê thợ mộc đóng lò sấy củi bùn, rủ thêm hai cô hàng xóm xẻ cá phụ.",
+        "Chương 16-20: Hoàn thiện quy trình làm khô cá trích, cá hố, tạo nên xưởng nhỏ với 5 nhân công thường xuyên.",
+        "Chương 21-30: Thương lái yêu cầu tẩm hóa chất để cá đẹp và để lâu hơn. MC từ chối lợi nhuận nhanh, kiên trì quy trình ủ muối tự nhiên, chuyển hướng bán cho khách sạn chuyên biệt bảo vệ thương hiệu."
+      ],
+      "antiStupidOpponent": "Cửa hàng trưởng bách hóa: Người cứng nhắc với quy trình giấy tờ, không nhận hàng không rõ nguồn gốc ban đầu, nhưng khi mang cá về ăn thử thấy ngon liền chủ động hướng dẫn MC làm giấy tờ hợp tác xã.",
+      "domainResearchNeeds": [
+        "Quy trình làm cá một nắng chuẩn",
+        "Cách bảo quản khô không dùng chất hóa học",
+        "Thương mại hàng hóa qua cửa hàng quốc doanh 1988"
+      ]
+    },
+    {
+      "id": "c4_rock_pool_tides",
+      "title": "Người Nhặt Lộc Biển",
+      "premise": "Không có tiền mua thuyền, người đàn ông tái sinh dùng ký ức về địa hình rạn san hô và lịch thủy triều để tay không bắt ốc đá, nhum biển và hái rong mứt ở những vách đá nguy hiểm nhất.",
+      "protagonistEngine": "Trí nhớ không gian 3D về các rãnh đá ngầm và nhịp điệu sinh học của hải sản bám đá.",
+      "protagonistContradiction": "Biết rõ mỏ vàng dưới rạn đá nhưng thể lực yếu, phổi kém, chỉ có thể nín thở trong thời gian ngắn.",
+      "advantageLimits": "Chỉ làm việc được 2 tiếng mỗi ngày lúc nước ròng cực đại trăng khuyết; sai một nhịp là sóng cuốn.",
+      "worldReaction": "Làng chài coi việc cào ốc ở bãi đá là việc của đàn bà trẻ con, cho đến khi thấy MC xách về những rổ nhum gạch đầy ắp.",
+      "openingAdvantage": "Nhớ ra đêm nay là đợt nước rút sâu nhất trong năm để vỡ nợ, MC cầm chiếc móc sắt tự rèn và bao tải cũ ra bãi đá vằng.",
+      "firstThreeChapterMechanism": "Chương 1: Rèn móc sắt, đi bộ ra mũi đá hiểm trở trong đêm trăng. Chương 2: Dùng kỹ năng lách sóng, gỡ nhum và ốc đụn trước khi nước lên. Chương 3: Sáng sớm mang nhum làm sạch bán cho nhà hàng mua gom, đổi lấy tiền trả nợ đợt 1 và một nồi cháo nhum bồi bổ cho con.",
+      "causalCost": "Trầy xước da thịt vì hàu cứa, nguy hiểm rình rập từ sứa độc và hụt chân.",
+      "mechanismFingerprint": [
+        "Tính toán chu kỳ sóng để thò tay vào rãnh đá",
+        "Kỹ thuật gỡ nhum biển không vỡ gai",
+        "Nhận diện rong mứt đạt độ trưởng thành"
+      ],
+      "rewardLoopFingerprint": [
+        "Canh thủy triều cực dại",
+        "Khai thác hải sản bám đá",
+        "Sơ chế tại bãi",
+        "Bán cho khách sành ăn/nhà hàng"
+      ],
+      "conflictEconomyFingerprint": [
+        "Bảo vệ lãnh địa khai thác khỏi những kẻ bắt chước",
+        "Cân đối giữa việc mạo hiểm tiến sâu hơn và sự an toàn",
+        "Tìm mối bán trực tiếp bỏ qua thương lái ép giá"
+      ],
+      "seriality30": [
+        "Chương 1-5: Bắt mẻ nhum và ốc đụn đầu tiên ở vách đá, sống sót về nhà, nấu cháo nhum và bán được tiền trả nợ.",
+        "Chương 6-10: Sắm được đồ lặn thô sơ (kính tự chế, giày đế bọc vỏ xe), vươn ra xa hơn, thu lượm rong mứt cao cấp.",
+        "Chương 11-15: Phát hiện hang tôm hùm giống, nhận ra sức mình không đủ, kêu gọi hai bạn trẻ khỏe trong làng lập tổ lặn bám đá.",
+        "Chương 16-20: Tổ chức phân công: người gỡ, người kéo dây, người trên bờ bảo quản, thu nhập ổn định và mua được thúng chai lớn.",
+        "Chương 21-30: Các nhóm khác ùa theo cào trọc cả rạn san hô, đập phá đá. MC buộc nhóm mình thu hẹp vùng khai thác, thả nhum non, tham gia bảo vệ rạn đá và lập bến đỗ an toàn."
+      ],
+      "antiStupidOpponent": "Trưởng nhóm lặn làng bên: Cậy khỏe lấn lướt bãi đá, nhưng sau một lần bị mắc kẹt được MC chỉ mẹo dòng chảy cứu ra thì nể phục và giữ đúng luật giang hồ biển.",
+      "domainResearchNeeds": [
+        "Kỹ thuật khai thác hàu, nhum, rong mứt tay không",
+        "Địa hình vách đá bờ biển Việt Nam",
+        "Dòng chảy RIP và thủy triều ven bờ"
+      ]
+    },
+    {
+      "id": "c5_shrimp_paste",
+      "title": "Chum Mắm Khởi Nghiệp",
+      "premise": "Giai đoạn đói kém, MC nhận ra làm nước mắm cá cơm mất tận 1 năm mới có tiền, anh liền chuyển hướng mua con moi (ruốc) rẻ tiền về ủ mắm xổi, mắm tép để có dòng tiền xoay vòng nhanh mười ngày một mẻ.",
+      "protagonistEngine": "Bí quyết cân bằng nhiệt độ ủ mắm và tỉ lệ thính gạo rang để kích men lên men nhanh, thơm dịu mà không chua.",
+      "protagonistContradiction": "Nắm công thức ngon nhưng thiếu thố chum vại, và nhà nghèo không có gạo để làm thính.",
+      "advantageLimits": "Mắm xổi vòng đời ngắn, phải bán hết trong vài tuần, nếu không sẽ bị gắt; cần mạng lưới tiêu thụ linh hoạt.",
+      "worldReaction": "Người làng cười vì nhà không có cơm lại đi làm mắm, nhưng khi hũ mắm tép mở nắp thơm lừng cả xóm, ai cũng xách bát sang xin nếm thử.",
+      "openingAdvantage": "Nhờ quan hệ từ kiếp trước, MC đổi được một mẻ moi biển bị nát nhẹ từ tàu lưới mùng với giá cực bèo.",
+      "firstThreeChapterMechanism": "Chương 1: Gom phế phẩm moi biển, vét gạo rang thính. Chương 2: Làm sạch, giã nát, ủ chum dưới phơi nắng gắt và kiểm soát lên men. Chương 3: Mười ngày sau, mẻ mắm tép chưng thịt chín tới, mang ra chợ bán lẻ đổi lấy rổ khoai, gạo mới và nụ cười của mẹ già.",
+      "causalCost": "Ngày nào cũng phải đảo mắm dưới nắng gắt, nhà cửa ám mùi không ai dám đến gần ban đầu.",
+      "mechanismFingerprint": [
+        "Sàng lọc moi cát",
+        "Rang thính gạo tạo men",
+        "Kiểm soát độ ẩm và nắng khi ủ mắm xổi"
+      ],
+      "rewardLoopFingerprint": [
+        "Nhập moi biển giá rẻ",
+        "Ủ mắm tép ngắn ngày",
+        "Bán lẻ thu tiền lẻ",
+        "Gom tiền mua chum to và cá cơm để làm mắm dài hạn"
+      ],
+      "conflictEconomyFingerprint": [
+        "Dành giật mua muối sạch với xưởng nước mắm lớn",
+        "Chống lại tin đồn làm mắm bằng đồ thiu",
+        "Xây dựng mạng lưới bán lẻ qua các gánh hàng rong"
+      ],
+      "seriality30": [
+        "Chương 1-5: Làm mẻ mắm tép đầu tiên, bữa cơm chan mắm chưng thịt, bán lẻ tại chợ thu tiền đồng.",
+        "Chương 6-10: Vòng vốn xoay nhanh, mua được 5 chum sành lớn, khách các làng lân cận bắt đầu đặt hàng.",
+        "Chương 11-15: Lập xưởng nhỏ sân nhà, thuê vợ chồng anh trai phụ giã moi, bắt đầu trích lãi ủ mắm cá cơm dài hạn.",
+        "Chương 16-20: Đăng ký tem nhãn hợp tác xã, đưa mắm tép vào kệ hàng trên thị xã, vượt mặt các đối thủ làm ẩu.",
+        "Chương 21-30: Rộ lên dịch bệnh khiến moi biển chết hàng loạt; MC quyết định đình chỉ thu mua rẻ để tránh ngộ độc, chấp nhận treo chum, dùng dự trữ mắm cá cơm để giữ vững uy tín thương hiệu."
+      ],
+      "antiStupidOpponent": "Chủ xưởng mắm lâu năm: Người bảo thủ cho rằng mắm tép xổi là làm hỏng truyền thống, nhưng là người sành ăn, nếm thử thấy kỹ thuật thính quá tốt nên quay sang hỏi mua lại công thức.",
+      "domainResearchNeeds": [
+        "Quá trình sinh hóa của việc ủ mắm tép/ruốc",
+        "Giá trị và cách phân biệt muối làm mắm",
+        "Đời sống kinh tế chợ phiên thập niên 1980"
+      ]
+    },
+    {
+      "id": "c6_handline_bait",
+      "title": "Lưỡi Câu Chạm Đáy",
+      "premise": "Trong khi dân làng kiệt quệ với lưới rê vì chi phí dầu tăng, MC dùng chiếc thuyền nan nhỏ và công thức mồi câu đặc chế từ ruột cá lên men để câu tay những con cá song, cá mú hang sâu giá trị cao.",
+      "protagonistEngine": "Sự kết hợp giữa công thức mồi câu kích thích khứu giác cá đáy và kỹ năng cảm nhận độ rung của cước bằng ngón tay.",
+      "protagonistContradiction": "Sát cá nhưng thể lực yếu, kéo một con cá mú 10kg lên thuyền nan mỏng manh là cuộc chiến sinh tử lật thuyền.",
+      "advantageLimits": "Câu tay chỉ có thể bắt từng con một, phụ thuộc lớn vào việc đánh hơi đúng hang cá.",
+      "worldReaction": "Mọi người khuyên bán thuyền nan vì không bõ công đi biển, kinh ngạc tột độ khi thấy MC kéo lên con mú đỏ nặng trịch chỉ bằng cuộn cước.",
+      "openingAdvantage": "Nhớ lại vị trí một rạn san hô chìm ít ai biết, MC lén chuẩn bị mồi ruột mực ủ chua mặn và đi biển một mình lúc chạng vạng.",
+      "firstThreeChapterMechanism": "Chương 1: Trộn mồi ủ bí mật, chuẩn bị thẻo câu cước lớn. Chương 2: Canh dòng chảy thả mồi đúng miệng hang, giằng co nảy lửa kéo con cá mú đầu tiên. Chương 3: Bán cá mú cho tàu thu mua của HongKong đang neo ngoài vịnh, mang về một cục tiền lớn và mua chiếc máy nổ cũ xập xệ.",
+      "causalCost": "Ngón tay bị cước cứa sâu nứt nẻ, đau nhức xương khớp vì phải ngồi gò lưng trên thuyền thúng nhiều giờ.",
+      "mechanismFingerprint": [
+        "Pha chế mồi câu từ nội tạng ủ chua",
+        "Kỹ thuật thắt nút thẻo câu chống đứt",
+        "Đọc dòng chảy để neo thuyền nan đúng điểm"
+      ],
+      "rewardLoopFingerprint": [
+        "Câu cá đáy giá trị cao",
+        "Bán cho khách đặc biệt/tàu nước ngoài",
+        "Nâng cấp đồ nghề (cước, máy nổ)",
+        "Nghiên cứu điểm câu xa hơn"
+      ],
+      "conflictEconomyFingerprint": [
+        "Tránh sự dòm ngó bám đuôi của các thuyền khác",
+        "Thương lượng giá trực tiếp với đại lý lớn, bỏ qua đầu nậu nhỏ",
+        "Mua nguyên liệu làm mồi câu mà không để lộ bí quyết"
+      ],
+      "seriality30": [
+        "Chương 1-5: Trộn mồi câu mẻ đầu, bắt cá mú đỏ, bán được tiền to, mua mâm cơm thịnh soạn và thuốc men cho gia đình.",
+        "Chương 6-10: Gắn máy nổ cho thuyền nan, đi được xa hơn, uy tín là tay 'sát cá' lan truyền, có đầu nậu riêng đến đón.",
+        "Chương 11-15: Chạm trán luồng cá lớn, không đủ sức kéo, phải rủ bạn thân đi cùng chia chác, hình thành đội câu hai người.",
+        "Chương 16-20: Tích góp đổi được thuyền gỗ nhỏ có khoang chứa nước sống, chuyên cung cấp cá mú sống cho nhà hàng trên phố.",
+        "Chương 21-30: Rạn san hô bí mật có dấu hiệu cạn kiệt cá lớn. Thay vì dùng mồi hóa chất hay đánh mìn, MC công khai một phần công thức mồi thường, rủ mọi người luân phiên vùng câu, tự đặt luật chỉ bắt cá trên 2kg."
+      ],
+      "antiStupidOpponent": "Tay thuyền trưởng lưới rê: Thường trêu chọc MC câu cò con, nhưng là người sòng phẳng; khi tàu lỡ hỏng máy được MC lai dắt về thì trở thành bạn nhậu và chia sẻ tin tức luồng cá.",
+      "domainResearchNeeds": [
+        "Kỹ thuật câu tay (handline fishing) truyền thống",
+        "Tập tính ăn mồi của các loài cá rạn san hô",
+        "Cách xử lý cá mú sống không bị ngộp khi đưa lên bờ"
+      ]
+    },
+    {
+      "id": "c7_live_seafood_transport",
+      "title": "Khoang Nước Sủi Tăm",
+      "premise": "Nhận thấy bề bề (tôm tít) chết rẻ như bèo nhưng nếu sống thì giá trên trời, MC thiết kế một hệ thống sục khí cơ học bằng tay quay và máy bơm xe đạp cũ để chở bề bề sống lên tỉnh lỵ.",
+      "protagonistEngine": "Hiểu biết về nhu cầu oxy của hải sản vỏ cứng và sự khéo tay trong cơ khí ứng dụng từ đồ phế liệu.",
+      "protagonistContradiction": "Nắm cách thiết kế trạm oxy mini nhưng phải tự đạp xe ba gác quãng đường 20km đường đất đỏ sóc nảy rã rời.",
+      "advantageLimits": "Máy sục khí bằng sức người chỉ duy trì được oxy trong 2 tiếng nếu không quay liên tục, đòi hỏi thể lực cực đại khi di chuyển.",
+      "worldReaction": "Người bán vứt bỏ bề bề ngộp, ngỡ ngàng khi thấy MC thu mua rồi hì hục bơm hơi vào thùng phi, càng ngỡ ngàng hơn khi biết giá bán trên thị xã.",
+      "openingAdvantage": "Nhìn thấy chiếc bơm xe đạp hỏng và van săm lốp, MC nảy ra ý tưởng đục lỗ ống nhựa tạo hệ thống sục khí đáy thùng.",
+      "firstThreeChapterMechanism": "Chương 1: Chế tạo thùng sục khí từ can nhựa và bơm xe đạp. Chương 2: Mua rẻ bề bề vừa cập bến, bỏ vào thùng và nai lưng đạp xe ba gác lên tỉnh, vừa đạp vừa bơm khí. Chương 3: Giao bề bề còn sống búng tanh tách cho quán nhậu, lấy tiền mua tặng vợ chiếc áo mới và sửa lại bánh xe bò.",
+      "causalCost": "Chân tay rã rời vì vừa đạp xe vừa phải canh giờ quay sục khí, đối mặt với bùn lầy những ngày mưa.",
+      "mechanismFingerprint": [
+        "Chế tạo van một chiều từ xăm lốp",
+        "Kỹ thuật lót rong biển giảm xóc cho tôm",
+        "Nhịp độ sục khí tối ưu theo nhiệt độ nước"
+      ],
+      "rewardLoopFingerprint": [
+        "Mua rẻ hải sản khó bảo quản",
+        "Vận chuyển giữ sống cơ học",
+        "Bán giá hàng tươi sống cao cấp",
+        "Nâng cấp hệ thống vận chuyển (động cơ)"
+      ],
+      "conflictEconomyFingerprint": [
+        "Chống lại rung lắc của đường giao thông nông thôn",
+        "Thuyết phục chủ quán nhậu trả giá cao cho hàng sống",
+        "Cạnh tranh với xe tải chở đá lạnh của hợp tác xã"
+      ],
+      "seriality30": [
+        "Chương 1-5: Chế thùng oxy, vận chuyển chuyến bề bề sống đầu tiên thành công, ăn bữa ngon và củng cố niềm tin.",
+        "Chương 6-10: Dùng tiền lời nâng cấp thành bình ắc quy và mô tơ quạt, vận chuyển được khối lượng lớn hơn, đỡ tốn sức.",
+        "Chương 11-15: Đơn hàng tăng, rủ người em trai chạy phụ xe lam, hình thành dây chuyền: một người gom hàng, một người chở.",
+        "Chương 16-20: Nắm giữ mảng vận chuyển hải sản sống của cả vùng, kết nối cung cầu từ làng chài đến các thị xã lớn.",
+        "Chương 21-30: Thương lái gom bề bề non giá rẻ ép MC chở đi. MC nhận ra nguy cơ cạn kiệt, từ chối chở hàng size nhỏ, thiết lập tiêu chuẩn thu mua khắt khe, chấp nhận mất khách tạm thời để bảo vệ nguồn lợi."
+      ],
+      "antiStupidOpponent": "Chủ xe tải đông lạnh: Ban đầu xem thường xe ba gác của MC, nhưng khi thấy hàng MC sống 100% trong khi hàng ướp đá của mình bị giảm chất lượng, liền đề nghị hợp tác chia sẻ không gian xe tải lớn.",
+      "domainResearchNeeds": [
+        "Kỹ thuật sục khí oxy thủ công không dùng điện",
+        "Quá trình hô hấp của tôm tít/bề bề",
+        "Tình trạng giao thông lộ trình làng biển - thị xã cuối thập niên 80"
+      ]
+    },
+    {
+      "id": "c8_light_luring_squid",
+      "title": "Ánh Đèn Dụ Mực",
+      "premise": "Thời kỳ mọi người chỉ biết câu mực mù bằng tay, MC cải tiến đèn măng xông dầu hỏa, gắn thêm nón nhôm phản quang tự gò để gom ánh sáng chiếu sâu xuống nước, tạo ra lợi thế tuyệt đối trong đêm tối.",
+      "protagonistEngine": "Kiến thức về quang học cơ bản và tập tính hướng sáng của mực ống, cùng khả năng độ chế đèn dầu.",
+      "protagonistContradiction": "Biết mực ở đâu nhưng dầu hỏa rất đắt và khan hiếm, nếu đêm đó trời động không câu được sẽ lỗ nặng tiền dầu.",
+      "advantageLimits": "Gió to sẽ làm tắt đèn hoặc làm vỡ kính măng xông, bán kính sáng chỉ hiệu quả ở vùng nước lặng.",
+      "worldReaction": "Người làng mắng là phá gia chi tử khi đốt dầu hỏa đắt đỏ giữa biển, cho đến khi thấy thuyền MC ngập tràn mực ống tươi rói phản chiếu ánh sáng.",
+      "openingAdvantage": "Nhặt được cái mâm nhôm cũ, MC gò lại thành phễu tản sáng và xin mua chịu được một can dầu hỏa từ trạm xăng.",
+      "firstThreeChapterMechanism": "Chương 1: Gò mâm nhôm, vệ sinh đèn măng xông, cắn răng vay tiền mua dầu. Chương 2: Ra khơi đêm, bật đèn gom sáng, đàn mực ùa lên mặt nước, dùng vợt xúc thay vì câu. Chương 3: Sáng cập bến, bán mực ống tươi chớp sáng, trả nợ tiền dầu, mang mực về hấp gừng cho gia đình một bữa no nê.",
+      "causalCost": "Bỏng tay vì thao tác với đèn măng xông nhiệt độ cao, thức trắng đêm và hít khói dầu hỏa.",
+      "mechanismFingerprint": [
+        "Cắt gò nhôm làm chóa phản quang",
+        "Điều chỉnh van áp suất đèn măng xông",
+        "Kỹ thuật vợt mực không làm vỡ túi mực"
+      ],
+      "rewardLoopFingerprint": [
+        "Đầu tư dầu hỏa",
+        "Dùng ánh sáng gom mực",
+        "Thu hoạch số lượng lớn",
+        "Tích lũy mua thêm cụm đèn và thúng to"
+      ],
+      "conflictEconomyFingerprint": [
+        "Xoay xở tem phiếu/quan hệ để mua đủ dầu hỏa",
+        "Giữ bí mật góc chiếu sáng khi bị các thuyền khác bám theo",
+        "Xử lý nhanh hàng tươi trong buổi sáng để không bị rớt giá"
+      ],
+      "seriality30": [
+        "Chương 1-5: Độ đèn, trúng mẻ mực đêm đầu tiên, giải quyết nợ nần và có bữa cơm gia đình đầm ấm.",
+        "Chương 6-10: Lắp thêm hệ thống 3 đèn quanh thúng, sản lượng tăng vọt, thu hút sự chú ý của toàn bến cá.",
+        "Chương 11-15: Gió mùa về liên tục làm vỡ kính đèn, phải hùn vốn với một chủ thuyền gỗ để có vách che gió, lập đội đi đêm.",
+        "Chương 16-20: Chuyển giao kỹ thuật làm chóa đèn cho anh em trong đội, tạo thành một tổ hợp thuyền câu mực ánh sáng chuyên nghiệp.",
+        "Chương 21-30: Thấy các thuyền ồ ạt thắp đèn pha công suất lớn (máy nổ) làm cá con mù mắt chết nổi. MC quay về nghiên cứu màu sắc ánh sáng (chóa xanh/vàng) chỉ dụ đúng mực trưởng thành, giữ gìn bãi sinh sản."
+      ],
+      "antiStupidOpponent": "Cán bộ quản lý vật tư: Kiểm soát chặt nguồn dầu hỏa, ban đầu từ chối bán số lượng lớn vì sợ đầu cơ, sau khi đích thân kiểm tra và thấy mô hình năng suất cao đã làm báo cáo xin hạn mức riêng cho đội của MC.",
+      "domainResearchNeeds": [
+        "Cấu tạo và cách hoạt động của đèn măng xông (Petromax)",
+        "Tập tính sinh học của loài mực ống",
+        "Chính sách phân phối nhiên liệu thời Đổi Mới"
+      ]
+    },
+    {
+      "id": "c9_oyster_spat_poles",
+      "title": "Rừng Cọc Cửa Sông",
+      "premise": "Thay vì lặn lội mạo hiểm bám biển xa, MC nhận ra bãi lầy cửa sông là mỏ vàng chưa ai khai thác. Anh cắm những cọc tre bọc lốp xe cũ để thu hút hàu giống bám vào, khởi nguồn cho nghề nuôi trồng thủy sản ven bờ.",
+      "protagonistEngine": "Kiến thức về dòng chảy giao thoa mặn - ngọt và thời điểm sinh sản của hàu để hứng spat (hàu giống tự nhiên).",
+      "protagonistContradiction": "Nghề này không ra tiền ngay mà phải chờ hàu lớn mất nhiều tháng, trong khi gia đình đang cần miếng ăn từng ngày.",
+      "advantageLimits": "Phải liên tục bảo vệ cọc hàu khỏi rác, cua đá phá hoại và lũ quét mang nước ngọt làm chết hàu.",
+      "worldReaction": "Làng chài chế giễu việc cắm cọc bùn lầy là trò trẻ con lấp biển, nhưng vài tháng sau họ sững sờ trước những chùm hàu sữa đặc thịt.",
+      "openingAdvantage": "Nhận ra đợt triều cường mang theo vô số ấu trùng hàu, MC gom sạch lốp xe đạp hỏng và cọc tre nứa quanh làng dăm xuống bãi.",
+      "firstThreeChapterMechanism": "Chương 1: Gom phế liệu, lội bùn cắm cọc hứng giống hàu, bị mắng mỏ. Chương 2: Trong lúc chờ hàu lớn, tận dụng bãi cọc làm nơi vây lưới bắt cá đối mưu sinh ngắn hạn. Chương 3: Cá đối mắc lưới ở bãi cọc bán được tiền đổi gạo, hàu giống bắt đầu bám dày đặc báo hiệu một vụ mùa lớn trong tương lai.",
+      "causalCost": "Lội bùn ngập ngang hông, đỉa bám, hàu cứa nát chân và áp lực tài chính trong lúc chờ thu hoạch.",
+      "mechanismFingerprint": [
+        "Xử lý vỏ lốp xe để tạo độ bám cho ấu trùng hàu",
+        "Tính toán khoảng cách cọc thoát nước lũ",
+        "Kết hợp đánh bắt phụ (cá đối/cua) trong khu vực cọc"
+      ],
+      "rewardLoopFingerprint": [
+        "Cắm cọc tạo bãi",
+        "Khai thác cá tôm quanh bãi chờ hàu lớn",
+        "Thu hoạch hàu sữa",
+        "Mở rộng diện tích bãi cọc"
+      ],
+      "conflictEconomyFingerprint": [
+        "Xung đột không gian với những người cào nghêu tự do",
+        "Bảo vệ bãi khỏi trộm đêm khi hàu vào mùa thu hoạch",
+        "Tìm cách tiêu thụ số lượng cực lớn hàu nguyên vỏ"
+      ],
+      "seriality30": [
+        "Chương 1-5: Cắm bãi cọc đầu tiên, giăng lưới bắt cá đối quanh cọc kiếm sống qua ngày, hàu giống bám thành công.",
+        "Chương 6-10: Thu hoạch mẻ hàu sữa đầu, nướng mỡ hành thiết đãi gia đình, bán buôn thu khoản tiền lớn, mua thêm cọc tre.",
+        "Chương 11-15: Bãi hàu mở rộng, cua và ốc ăn thịt hàu xuất hiện, rủ đội thanh niên trong xóm ra canh bãi và bắt cua bán thêm.",
+        "Chương 16-20: Nghiên cứu tự tách vỏ hàu, làm hàu xỏ xâu phơi khô để bán đi xa, tạo công ăn việc làm cho phụ nữ trong làng.",
+        "Chương 21-30: Các gia đình khác ùa theo cắm cọc bít kín luồng lạch cửa sông, gây tù đọng nước và chết hàng loạt. MC tiên phong nhổ bỏ một nửa bãi cọc của mình, thiết lập luồng thoát nước và quy hoạch lại vùng nuôi bền vững."
+      ],
+      "antiStupidOpponent": "Trưởng thôn: Lo sợ bãi cọc cản trở xuồng bè ra vào, nhưng rất công tâm; khi MC chỉ ra cách bố trí cọc theo luồng chữ V vừa hứng hàu vừa gom cá lại tạo lối đi, ông đã ủng hộ và đem mô hình áp dụng cho hợp tác xã.",
+      "domainResearchNeeds": [
+        "Kỹ thuật thu hàu giống tự nhiên bằng vật giá thể",
+        "Độ mặn và sinh thái vùng cửa sông ngập mặn",
+        "Chu kỳ phát triển của hàu Thái Bình Dương"
+      ]
+    },
+    {
+      "id": "c10_net_modifications",
+      "title": "Chỉ Nilon Vá Lưới",
+      "premise": "Thân thể yếu ớt không thể vươn khơi, MC dùng đôi bàn tay tài hoa và kiến thức thủy động lực học để tinh chỉnh, vá và thay đổi mắt lưới của các ngư dân, biến lưới rê thường thành lưới chuyên dụng bắt luồng cá giá trị cao.",
+      "protagonistEngine": "Khả năng nhìn thấu độ chùng của lưới trong nước và cách ráp các mảnh lưới mắt to/nhỏ để giảm lực cản dòng chảy.",
+      "protagonistContradiction": "Sở hữu bí quyết nâng cấp công cụ kiếm tiền cho cả làng nhưng bắt đầu với hai bàn tay trắng và thân phận một thợ vá lưới nghèo hèn bị coi khinh.",
+      "advantageLimits": "Công việc hoàn toàn là lao động thủ công mù mịt, tốn thời gian, và phụ thuộc vào việc chủ tàu có dũng cảm thử nghiệm lưới độ hay không.",
+      "worldReaction": "Chủ tàu bực bội vì MC dám cắt nát tay lưới đắt tiền để 'sửa', kinh hoàng khi kéo lưới lên nhẹ bẫng mà lại tóm gọn cả đàn cá thu.",
+      "openingAdvantage": "Khi một chủ tàu đang tuyệt vọng vì tay lưới mới mua bị rách toạc do kẹt đá, MC đứng ra nhận vá và lén thay đổi hình dáng khoang lưới đáy.",
+      "firstThreeChapterMechanism": "Chương 1: Đánh cược công vá bằng tiền túi để nhận tay lưới rách bươm. Chương 2: Dùng kim chỉ nilon chắp vá, tạo 'túi ảo' giảm sức căng dòng chảy. Chương 3: Thuyền ra khơi về trúng đậm, chủ tàu thưởng lớn, MC dùng tiền mua gạo thịt và sắm bộ đồ nghề vá lưới chuyên nghiệp.",
+      "causalCost": "Mắt mờ đi vì làm việc dưới ánh đèn leo lét, tay chai sần và lưng đau nhức vì ngồi gập người hàng giờ.",
+      "mechanismFingerprint": [
+        "Cắt nối tạo túi lưới giảm áp lực nước",
+        "Thay đổi tỉ lệ phao/chì theo độ sâu",
+        "Kỹ thuật nút thắt kép không tuột của chỉ nilon"
+      ],
+      "rewardLoopFingerprint": [
+        "Nhận lưới hỏng/lưới thường",
+        "Tinh chỉnh cấu trúc thủy động lực",
+        "Ăn chia % sản lượng tăng thêm",
+        "Nhận đơn hàng cải tạo lớn hơn"
+      ],
+      "conflictEconomyFingerprint": [
+        "Chịu áp lực đền bù nếu lưới mới độ bị rách hoặc không hiệu quả",
+        "Đối phó với những thợ vá lưới truyền thống tẩy chay",
+        "Thương lượng chuyển từ lấy tiền công sang lấy cổ phần mẻ cá"
+      ],
+      "seriality30": [
+        "Chương 1-5: Vá bạo tay độ lưới, giúp thuyền trúng cá, nhận thưởng đổi lấy bữa ăn đầy đủ và dụng cụ mới.",
+        "Chương 6-10: Danh tiếng nổi lên, bắt đầu nhận độ lưới rê cho các tàu tầm trung, thu nhập ổn định, xây lại mái hiên che nắng vá lưới.",
+        "Chương 11-15: Đơn hàng quá nhiều, mở lớp dạy nghề vá lưới cho trẻ em cơ nhỡ và phụ nữ trong làng, thiết lập xưởng lưới nhỏ.",
+        "Chương 16-20: Cải tiến thành công lưới vây rút chì, giúp đội tàu hợp tác xã cạnh tranh được với tàu tỉnh bạn, giành lại ngư trường.",
+        "Chương 21-30: Các chủ tàu tham lam yêu cầu bọc thêm lớp lưới mắt siêu nhỏ (lưới bát quái tận diệt). MC kiên quyết từ chối cắt may lưới tận diệt, đối đầu với áp lực lợi nhuận, tổ chức một nhóm chủ tàu theo tiêu chuẩn lưới mắt to để nhận chứng chỉ khai thác giá cao."
+      ],
+      "antiStupidOpponent": "Chủ tàu lớn bảo thủ: Cực kỳ cẩn thận với tài sản, ban đầu cấm MC đụng vào lưới của mình, nhưng sau khi thấy số liệu tính toán chi phí dầu tiết kiệm được nhờ lưới nhẹ, đã trở thành khách hàng sộp nhất và bảo vệ xưởng lưới của MC.",
+      "domainResearchNeeds": [
+        "Cấu tạo các loại lưới đánh cá (lưới rê, lưới vây, lưới kéo)",
+        "Kỹ thuật đan vá lưới thủ công",
+        "Vật lý về lực cản của nước tác động lên mắt lưới"
+      ]
+    },
+    {
+      "id": "dt_01_concept_01",
+      "title": "Biển Bạc Mùa Trứng Cá Cháy",
+      "premise": "Một đầu bếp thất bại sống lại năm 1988, dùng kiến thức về trứng cá và nội tạng - những thứ thường bị bỏ đi - để chế biến thành đặc sản, bắt đầu từ gánh hàng rong của mẹ và xây dựng cơ nghiệp từ những gì biển cả ban cho nhưng người đời chưa biết quý.",
+      "protagonistEngine": "Nỗi ân hận vì đã không thể chăm sóc mẹ già trong quá khứ, nay quyết tâm dùng kinh nghiệm ẩm thực của mình để mẹ được nghỉ ngơi, gia đình có bữa ăn no đủ và một tương lai không còn thiếu thốn.",
+      "protagonistContradiction": "Anh có kiến thức của một đầu bếp hiện đại nhưng lại thiếu vốn liếng, công cụ và uy tín của một người trưởng thành. Anh muốn bứt phá nhanh nhưng cũng sợ những thay đổi mình tạo ra sẽ xáo trộn cuộc sống bình yên của gia đình và làng xóm.",
+      "advantageLimits": "Kiến thức ẩm thực chỉ hữu dụng khi có nguyên liệu phù hợp và người chịu thử. Anh không biết chính xác ngư trường, chỉ có thể chờ ngư dân mang về rồi mới lựa đồ bỏ đi. Kỹ thuật chế biến cũng bị giới hạn bởi bếp củi, thiếu gia vị và dụng cụ thô sơ.",
+      "worldReaction": "Ban đầu là sự nghi ngờ và chế giễu (\"thứ bỏ đi mà cũng bán\"), sau đó là tò mò khi món ăn quá ngon và lạ. Các chủ vựa cá và người bán hàng khác coi anh là mối phiền toái nhỏ, nhưng dần trở nên dè chừng khi anh tạo ra một thị trường ngách mà họ không kiểm soát được.",
+      "openingAdvantage": "Nhận ra mẻ cá nục có đầy trứng đang bị bán rẻ như cho, anh biết rằng món 'trứng cá cháy tỏi' là một đặc sản bị lãng quên.",
+      "firstThreeChapterMechanism": "Anh xin mẹ một ít trứng cá bỏ đi từ mẻ cá bán ế. Anh dùng bếp củi và chút mỡ heo còn lại trong nhà để làm món trứng cá cháy tỏi ớt. Mùi thơm và vị ngon bất ngờ khiến cả nhà kinh ngạc, và anh quyết định ngày mai sẽ làm một mẻ nhỏ bán thử ở chợ.",
+      "causalCost": "Để có nguyên liệu \"bỏ đi\" tốt nhất, anh phải dậy sớm nhất, ra tận bến lựa và chấp nhận mua cả những con cá không ngon chỉ để lấy trứng hoặc bao tử, làm tăng chi phí ban đầu. Thời gian chế biến công phu khiến anh phải hy sinh thời gian nghỉ ngơi.",
+      "mechanismFingerprint": [
+        "Chế biến phụ phẩm",
+        "Tạo món ăn mới",
+        "Giá trị gia tăng",
+        "Thị trường ngách"
+      ],
+      "rewardLoopFingerprint": [
+        "Tìm thấy nguyên liệu bị bỏ phí",
+        "Chế biến thành công món ngon",
+        "Bán được hàng, được công nhận",
+        "Cải thiện bữa ăn gia đình",
+        "Tích lũy vốn mua thêm gia vị, dụng cụ"
+      ],
+      "conflictEconomyFingerprint": [
+        "Tranh giành nguồn phụ phẩm",
+        "Bắt chước công thức",
+        "Ép giá từ chủ vựa",
+        "Nghi ngờ về vệ sinh"
+      ],
+      "seriality30": [
+        "Chương 1-5: Bán thành công món trứng cá cháy tỏi, gia đình có bữa cơm đầu tiên có thịt và tiếng cười.",
+        "Chương 6-10: Mở rộng sang bao tử cá, lườn cá nấu chua, tạo thành một 'menu' nhỏ tại gánh hàng của mẹ, có khách quen.",
+        "Chương 11-20: Hợp tác với một vài bạn thuyền để họ để riêng phụ phẩm cho mình, hình thành chuỗi cung ứng nhỏ.",
+        "Chương 21-30: Đối mặt với việc các chủ vựa khác bắt đầu thu gom phụ phẩm để ép giá hoặc tự chế biến, buộc anh phải nghĩ đến việc xây dựng thương hiệu riêng.",
+        "Chương 26-30: Nghiên cứu cách bảo quản phụ phẩm để bán cho các quán nhậu ở thị trấn, mở rộng thị trường ra ngoài chợ cá."
+      ],
+      "antiStupidOpponent": "Đối thủ là một bà chủ vựa cá tính toán, không chơi xấu nhưng luôn tìm cách tối đa hóa lợi nhuận. Thấy phụ phẩm có giá, bà ta không phá đám mà tổ chức thu mua để bán lại cho nhân vật chính với giá cao hơn, hoặc bán cho người khác, buộc nhân vật chính phải cạnh tranh bằng chất lượng và mối quan hệ.",
+      "domainResearchNeeds": [
+        "Các món ăn từ nội tạng và phụ phẩm cá biển Việt Nam",
+        "Phương pháp chế biến và khử tanh thủ công",
+        "Mô hình chợ cá và các vựa hải sản nhỏ thập niên 80",
+        "Giá cả tương đối của các loại thực phẩm và nhu yếu phẩm thời kỳ này"
+      ]
+    },
+    {
+      "id": "dt_01_concept_02",
+      "title": "Xưởng Mắm Lão Tân",
+      "premise": "Một kỹ sư công nghệ sinh học trở về quá khứ trong thân xác người cha vừa mất đi công thức mắm gia truyền, quyết tâm khôi phục lại danh tiếng \"nước mắm nhỉ\" của gia đình bằng kiến thức vi sinh và quy trình kiểm soát chất lượng, bắt đầu từ vài cái chum sành cũ nát.",
+      "protagonistEngine": "Nỗi day dứt vì đã coi thường nghề truyền thống của cha và để gia đình sa sút. Anh muốn chứng minh giá trị của tri thức khi kết hợp với kinh nghiệm cha ông, và xây dựng lại niềm tự hào cho dòng họ.",
+      "protagonistContradiction": "Anh hiểu về enzyme và vi khuẩn nhưng lại lóng ngóng trong việc chọn cá, muối hay cảm nhận \"nắng, gió\" theo kinh nghiệm của người xưa. Anh muốn áp dụng quy trình khoa học nhưng lại bị dân làng cho là \"vẽ vời\", \"làm khác tổ tiên\".",
+      "advantageLimits": "Kiến thức vi sinh giúp anh hiểu 'tại sao' nhưng không cho anh biết 'làm thế nào' với dụng cụ thô sơ. Anh có thể tối ưu hóa quá trình lên men nhưng không thể tạo ra con cá cơm ngon hơn hay thùng gỗ tốt hơn một cách thần kỳ. Chất lượng vẫn phụ thuộc vào nguyên liệu và thời tiết.",
+      "worldReaction": "Những người làm mắm lâu năm cười chê cách làm 'sách vở' của anh (đo nhiệt độ, che đậy kỹ, ủ riêng từng mẻ). Các thương lái ban đầu từ chối mua mắm của anh vì nó khác với vị quen thuộc. Nhưng khi chất lượng vượt trội và ổn định được chứng minh, họ bắt đầu tranh giành.",
+      "openingAdvantage": "Nhận ra những chum mắm cũ của cha bị hỏng là do nhiễm khuẩn và kiểm soát nhiệt độ kém, không phải do 'vong' hay 'dông' như mẹ anh than khóc.",
+      "firstThreeChapterMechanism": "Anh không vứt bỏ mẻ mắm sắp hỏng của cha. Anh dùng kiến thức của mình để 'cứu' nó: lọc kỹ, phơi nắng đúng cách để diệt khuẩn, và điều chỉnh độ mặn. Kết quả là một mẻ mắm tuy không thượng hạng nhưng ăn được, giúp gia đình có cái ăn ngay lập tức và giữ lại được chút vốn liếng.",
+      "causalCost": "Để duy trì chất lượng, anh phải tốn nhiều công sức hơn để vệ sinh dụng cụ, chọn lựa nguyên liệu kỹ hơn và chấp nhận rủi ro khi thử nghiệm mẻ nhỏ. Việc này khiến sản lượng ban đầu thấp và chi phí cao hơn so với cách làm truyền thống.",
+      "mechanismFingerprint": [
+        "Kiểm soát chất lượng",
+        "Tối ưu hóa quy trình",
+        "Sản phẩm truyền thống",
+        "Thương hiệu hóa"
+      ],
+      "rewardLoopFingerprint": [
+        "Áp dụng một cải tiến khoa học nhỏ",
+        "Chất lượng mắm được cải thiện rõ rệt",
+        "Bán được giá cao hơn hoặc có khách hàng trung thành",
+        "Có tiền mua thêm chum, xây lều ủ",
+        "Gia đình và hàng xóm dần công nhận"
+      ],
+      "conflictEconomyFingerprint": [
+        "Cạnh tranh nguồn cá cơm tươi",
+        "Bị nghi ngờ dùng hóa chất",
+        "Thương lái ép giá vì sản lượng nhỏ",
+        "Xung đột giữa phương pháp mới và kinh nghiệm cũ"
+      ],
+      "seriality30": [
+        "Chương 1-5: Cứu thành công mẻ mắm hỏng, bán được lứa đầu tiên cho hàng xóm, bữa cơm gia đình có thêm món cá kho từ mắm ngon.",
+        "Chương 6-10: Xây dựng được quy trình ủ mắm ổn định, tạo ra sản phẩm 'nước mắm nhỉ' chất lượng cao đầu tiên, được một chủ quán ăn ở thị trấn chú ý.",
+        "Chương 11-20: Thuê hai người làm công, mở rộng quy mô sản xuất, bắt đầu phân loại mắm cốt, mắm long.",
+        "Chương 21-30: Đối mặt với việc nguồn cá cơm than (nguyên liệu tốt nhất) ngày càng ít đi do nhiều người khai thác, buộc anh phải nghiên cứu cách làm mắm từ các loại cá khác.",
+        "Chương 26-30: Bắt đầu xây dựng thương hiệu bằng cách đóng chai thủy tinh (thay vì can nhựa) và dán nhãn tay, nhắm đến phân khúc khách hàng cao cấp hơn."
+      ],
+      "antiStupidOpponent": "Một chủ nhà thùng lớn trong vùng, người làm mắm theo lối cũ. Ông không phá hoại, nhưng luôn dùng kinh nghiệm và uy tín lâu năm của mình để cạnh tranh. Ông công khai chê bai mắm của nhân vật chính là 'không có hồn', 'vị máy móc', tạo ra một cuộc cạnh tranh về triết lý sản phẩm và lòng tin của người tiêu dùng.",
+      "domainResearchNeeds": [
+        "Quy trình làm nước mắm truyền thống của Việt Nam",
+        "Các yếu tố ảnh hưởng đến quá trình lên men (nhiệt độ, độ mặn, loại cá)",
+        "Các loại cá thường dùng làm mắm (cá cơm, cá nục...)",
+        "Lịch sử và văn hóa làng nghề nước mắm"
+      ]
+    },
+    {
+      "id": "dt_01_concept_03",
+      "title": "Người Đan Lưới Vá Trời",
+      "premise": "Một thợ cơ khí hải quân trọng sinh về thời niên thiếu, nơi gia đình anh đang mắc nợ vì tấm lưới rách liên tục. Anh không đi biển, mà dùng kiến thức cơ học và vật liệu của mình để cải tiến và sửa chữa ngư cụ, trở thành người 'vá lại sinh kế' cho cả làng chài.",
+      "protagonistEngine": "Sự bất lực khi thấy cha mình, một ngư dân lão luyện, phải cúi đầu vay nợ chỉ vì một tấm lưới hỏng. Anh muốn dùng đôi tay và khối óc kỹ thuật của mình để những người lao động chân chính không còn bị phụ thuộc vào may rủi và những công cụ kém chất lượng.",
+      "protagonistContradiction": "Anh có tư duy kỹ thuật nhưng thiếu kinh nghiệm thực tế của một ngư dân. Những cải tiến của anh trên giấy tờ thì hoàn hảo, nhưng khi áp dụng vào thực tế lại vấp phải những vấn đề về dòng chảy, loại cá, thói quen sử dụng mà anh không lường trước được.",
+      "advantageLimits": "Kiến thức cơ khí giúp anh hiểu về lực căng, độ bền vật liệu, nhưng anh không thể chế tạo ra sợi cước hay kim loại tốt hơn thời đại cho phép. Anh chỉ có thể tối ưu hóa thiết kế dựa trên những gì có sẵn: sợi đay, cước loại thường, tre, gỗ.",
+      "worldReaction": "Các ngư dân lớn tuổi ban đầu gạt đi, cho rằng 'trứng đòi khôn hơn vịt'. Họ tin vào kinh nghiệm truyền đời hơn là những bản vẽ nguệch ngoạc của một thằng nhóc. Nhưng khi tấm lưới do anh sửa lại bền hơn, bắt được nhiều cá hơn một cách rõ rệt, họ bắt đầu mang ngư cụ hỏng đến nhờ vả.",
+      "openingAdvantage": "Nhìn thấy tấm lưới của cha bị rách ở cùng một điểm, anh nhận ra đó là lỗi thiết kế khiến lực bị tập trung một chỗ, chứ không phải do 'vận rủi'.",
+      "firstThreeChapterMechanism": "Anh không xin tiền mua lưới mới. Thay vào đó, anh tự mình tháo khu vực lưới rách, dùng kỹ thuật đan mắt cáo xen kẽ mà anh học được trong quân đội để gia cố lại điểm yếu. Trong chuyến biển tiếp theo, tấm lưới không những không rách mà còn mang về một mẻ cá lớn, giúp gia đình trả được món nợ nhỏ đầu tiên.",
+      "causalCost": "Việc nghiên cứu và sửa chữa tốn rất nhiều thời gian, khiến anh phải thức khuya, bỏ bê việc học ở trường. Để có vật liệu thử nghiệm, anh phải lượm lặt những mảnh lưới bỏ đi, chịu sự dòm ngó của người khác.",
+      "mechanismFingerprint": [
+        "Cải tiến công cụ",
+        "Kỹ thuật ứng dụng",
+        "Sửa chữa và tái chế",
+        "Xây dựng uy tín"
+      ],
+      "rewardLoopFingerprint": [
+        "Phát hiện một khiếm khuyết trong ngư cụ",
+        "Áp dụng kiến thức để cải tiến",
+        "Ngư cụ mới hoạt động hiệu quả hơn rõ rệt",
+        "Được trả công bằng cá hoặc tiền",
+        "Tích lũy vốn và kinh nghiệm để làm dự án lớn hơn"
+      ],
+      "conflictEconomyFingerprint": [
+        "Cửa hàng bán ngư cụ cũ không hài lòng",
+        "Bị nghi ngờ giấu nghề, không chia sẻ kỹ thuật",
+        "Ngư dân làng khác đến tranh giành 'thợ giỏi'",
+        "Áp lực khi nhận sửa những ngư cụ đắt tiền"
+      ],
+      "seriality30": [
+        "Chương 1-5: Sửa thành công tấm lưới cho cha, chứng minh năng lực, gia đình có tiền trang trải cuộc sống.",
+        "Chương 6-10: Mở một góc nhỏ ở nhà để chuyên sửa lưới và các dụng cụ nhỏ (lưỡi câu, dây kéo), trở thành 'chuyên gia' trong xóm.",
+        "Chương 11-20: Cùng vài người bạn thân lập một đội chuyên nhận các 'ca khó', cải tiến lồng bẫy ghẹ, đó bắt lươn, giúp tăng năng suất cho nhiều gia đình.",
+        "Chương 21-30: Đối mặt với sự xuất hiện của lưới cước công nghiệp giá rẻ nhưng chất lượng kém, buộc anh phải chứng minh giá trị của hàng 'thửa' và bền bỉ.",
+        "Chương 26-30: Bắt đầu thiết kế một loại bẫy cá đáy hoàn toàn mới, dựa trên quan sát tập tính của loài cá mà ngư dân địa phương đang bỏ qua."
+      ],
+      "antiStupidOpponent": "Chủ tiệm tạp hóa duy nhất trong làng bán ngư cụ. Ông ta không phá đám mà cạnh tranh bằng cách giảm giá lưới công nghiệp, đưa ra các chương trình bán chịu hấp dẫn, đánh vào tâm lý ham rẻ và cần vốn của ngư dân, buộc nhân vật chính phải cạnh tranh bằng độ bền và hiệu quả lâu dài.",
+      "domainResearchNeeds": [
+        "Các loại ngư cụ truyền thống của Việt Nam (lưới, lờ, đó, câu...)",
+        "Vật liệu làm ngư cụ cuối những năm 1980",
+        "Nguyên lý cơ bản về thủy động lực học và sức bền vật liệu",
+        "Thói quen và kinh nghiệm của ngư dân ven biển"
+      ]
+    },
+    {
+      "id": "dt_01_concept_04",
+      "title": "Chúa Đầm Rong Biển",
+      "premise": "Một nhà sinh học biển quay về thời thơ ấu ở một làng chài nghèo, nơi rong biển chỉ được coi là thứ vướng lưới. Anh bắt đầu khai thác và chế biến rong biển, biến thứ \"cỏ rác\" của biển cả thành thực phẩm, phân bón và nguồn thu nhập ổn định cho cả làng.",
+      "protagonistEngine": "Nỗi ám ảnh về cái đói và sự bấp bênh của nghề đi biển mà anh đã trải qua. Anh muốn tạo ra một sinh kế bền vững, không phụ thuộc hoàn toàn vào những chuyến ra khơi may rủi, bắt đầu từ nguồn tài nguyên ngay sát bờ mà không ai ngó tới.",
+      "protagonistContradiction": "Anh biết giá trị dinh dưỡng và công dụng của rong biển nhưng lại không biết cách chế biến chúng thành những món ăn hợp khẩu vị người Việt thời đó. Anh muốn thuyết phục mọi người nhưng chính anh cũng phải thử và sai nhiều lần để tìm ra công thức đúng.",
+      "advantageLimits": "Kiến thức sinh học giúp anh phân loại rong, biết loại nào ăn được, loại nào không, và mùa vụ của chúng. Nhưng anh không thể thay đổi định kiến của người dân, cũng không có sẵn thị trường tiêu thụ. Mọi thứ phải được xây dựng từ con số không.",
+      "worldReaction": "Cả làng cười nhạo khi thấy anh và mấy đứa trẻ con vớt 'rác biển' về phơi. Họ cho rằng anh bị 'chập mạch' vì đói. Các bà nội trợ từ chối thử món ăn từ rong biển vì sợ 'tanh và độc'. Chỉ đến khi món nộm và canh rong biển của anh thực sự ngon và giúp lũ trẻ hết táo bón, người ta mới bắt đầu tò mò.",
+      "openingAdvantage": "Anh nhận ra loại rong mơ mà ngư dân hay gỡ khỏi lưới chính là nguyên liệu quý để nấu thạch, làm nộm và có giá trị y học.",
+      "firstThreeChapterMechanism": "Bị mẹ mắng vì mang 'cỏ' về nhà, anh lén lút rửa sạch rong mơ, phơi khô rồi nấu thử món chè rong biển với chút đường ít ỏi. Món chè mát lạnh, giòn sần sật trong ngày hè nóng nực trở thành món quà vặt tuyệt vời cho mấy đứa em, và là bằng chứng đầu tiên cho thấy 'cỏ biển' có thể ăn được.",
+      "causalCost": "Việc thu hoạch và sơ chế rong biển tốn rất nhiều công sức (rửa sạch cát, phơi đủ nắng). Để thuyết phục người khác, anh phải cho không rất nhiều sản phẩm ban đầu, chấp nhận lỗ vốn thời gian và công sức.",
+      "mechanismFingerprint": [
+        "Khai thác tài nguyên bị bỏ qua",
+        "Chế biến nông sản biển",
+        "Xây dựng thị trường",
+        "Sinh kế bền vững"
+      ],
+      "rewardLoopFingerprint": [
+        "Xác định một loại rong có giá trị",
+        "Thử nghiệm thành công cách chế biến mới",
+        "Thuyết phục được người khác dùng thử và yêu thích",
+        "Bán được sản phẩm, có nguồn thu mới",
+        "Đầu tư vào dụng cụ phơi, chế biến tốt hơn"
+      ],
+      "conflictEconomyFingerprint": [
+        "Tranh chấp khu vực khai thác rong",
+        "Bị nghi ngờ sản phẩm gây bệnh",
+        "Thương lái từ nơi khác đến ép giá",
+        "Xung đột về việc chia sẻ lợi ích trong cộng đồng"
+      ],
+      "seriality30": [
+        "Chương 1-5: Chế biến thành công món chè và nộm rong biển, cả nhà chấp nhận nguồn thực phẩm mới, bữa ăn đa dạng hơn.",
+        "Chương 6-10: Bán rong biển khô và các món ăn vặt ở chợ, có được những khách hàng đầu tiên là phụ nữ và trẻ em.",
+        "Chương 11-20: Rủ rê đám bạn cùng lứa lập đội thu hoạch rong, phân công người vớt, người rửa, người phơi, tạo công ăn việc làm.",
+        "Chương 21-30: Đối mặt với việc khai thác quá mức khiến rong biển gần bờ cạn kiệt, buộc anh phải nghiên cứu cách khoanh vùng bảo vệ và trồng rong biển.",
+        "Chương 26-30: Tìm ra công dụng làm phân bón hữu cơ của rong biển, mở ra một thị trường mới với những người làm vườn ở các xã lân cận."
+      ],
+      "antiStupidOpponent": "Một người họ hàng có tư tưởng bảo thủ, luôn cho rằng nhân vật chính đang làm những việc vô bổ và xúi giục người khác chống đối. Ông ta không ác, nhưng luôn vin vào 'truyền thống' và 'kinh nghiệm cha ông' để phản đối mọi cái mới, tạo ra rào cản về mặt xã hội và tâm lý cho nhân vật chính.",
+      "domainResearchNeeds": [
+        "Các loại rong biển phổ biến ở Việt Nam và công dụng của chúng",
+        "Phương pháp thu hoạch và chế biến rong biển thủ công",
+        "Ẩm thực từ rong biển trong văn hóa Việt và châu Á",
+        "Kiến thức cơ bản về hệ sinh thái ven bờ"
+      ]
+    },
+    {
+      "id": "dt_01_concept_05",
+      "title": "Người Giữ Lạnh Cho Biển",
+      "premise": "Một kỹ sư kho lạnh trọng sinh về làng chài quê hương, nơi cá tôm thường bị ép giá vì không có đủ đá để bảo quản. Anh quyết tâm giải quyết bài toán \"nước đá\", bắt đầu từ việc cải tiến cách giữ lạnh thủ công và tiến tới xây dựng nhà máy nước đá đầu tiên của vùng.",
+      "protagonistEngine": "Sự ám ảnh bởi hình ảnh những mẻ cá đầy ắp nhưng bán không được giá, phải đổ cho heo ăn hoặc làm mắm loại hai. Anh muốn dùng kiến thức của mình để nâng cao giá trị của thành quả lao động mà ngư dân phải đánh đổi bằng mồ hôi và cả máu.",
+      "protagonistContradiction": "Anh biết nguyên lý làm lạnh nhưng không có máy móc, không có vốn. Anh muốn xây dựng một hệ thống lớn nhưng lại phải bắt đầu từ những việc nhỏ nhất như tìm nguồn trấu, mùn cưa để làm hầm giữ lạnh, một công việc bị coi là 'buôn ve chai'.",
+      "advantageLimits": "Kiến thức của anh là về hệ thống công nghiệp. Áp dụng vào điều kiện thiếu thốn, anh phải tự mày mò chế tạo. Anh có thể tính toán chính xác lượng đá cần thiết, nhưng không thể tạo ra đá từ hư không. Anh vẫn phải phụ thuộc vào nguồn cung cấp đá ít ỏi từ thị trấn.",
+      "worldReaction": "Mọi người thấy kỳ lạ khi anh đi thu mua trấu và xơ dừa chỉ để 'giữ mấy cục nước đá'. Các chủ vựa ban đầu không quan tâm, vì họ hưởng lợi từ việc cá nhanh ươn. Khi mô hình giữ lạnh của anh hiệu quả, giúp ngư dân giữ cá tươi lâu hơn và 'cứng giá' hơn, các chủ vựa bắt đầu xem anh là một mối đe dọa.",
+      "openingAdvantage": "Anh nhận ra cây đá mua từ thị trấn về đến làng đã hao hụt hơn một nửa. Anh biết rằng vấn đề không chỉ là thiếu đá, mà là không biết cách giữ đá.",
+      "firstThreeChapterMechanism": "Anh dùng tiền túi ít ỏi mua một cây đá nhỏ. Anh không dùng thùng gỗ thông thường mà xây một cái hầm nhỏ trong góc vườn, lót bằng trấu và xơ dừa. Cây đá trong hầm của anh tan chảy chậm hơn hẳn so với của người khác. Anh dùng chính lượng đá tiết kiệm được để ướp một mẻ cá nhỏ của nhà, bán được giá cao hơn 20% vào ngày hôm sau.",
+      "causalCost": "Để có vật liệu cách nhiệt, anh phải đi khắp nơi thu gom, chấp nhận bị bẩn và bị người khác coi thường. Việc xây dựng và duy trì hầm lạnh đòi hỏi sự tỉ mỉ và công sức lao động chân tay nặng nhọc.",
+      "mechanismFingerprint": [
+        "Giải quyết điểm nghẽn",
+        "Logistics và bảo quản",
+        "Ứng dụng kỹ thuật",
+        "Tạo ra dịch vụ mới"
+      ],
+      "rewardLoopFingerprint": [
+        "Tìm ra cách giảm hao hụt (đá, cá)",
+        "Áp dụng thành công, giữ được chất lượng sản phẩm",
+        "Bán được giá cao hơn hoặc mở rộng thời gian bán",
+        "Có thêm thu nhập từ việc bán đá hoặc dịch vụ giữ lạnh",
+        "Tái đầu tư vào hầm chứa lớn hơn, tốt hơn"
+      ],
+      "conflictEconomyFingerprint": [
+        "Cạnh tranh với nguồn cung đá từ thị trấn",
+        "Chủ vựa gây khó dễ vì mất thế ép giá",
+        "Bị nghi ngờ ăn cắp kỹ thuật",
+        "Rủi ro khi đầu tư lớn vào cơ sở hạ tầng"
+      ],
+      "seriality30": [
+        "Chương 1-5: Xây hầm giữ đá thành công, giúp cá của nhà bán được giá, chứng minh hiệu quả của phương pháp.",
+        "Chương 6-10: Mở dịch vụ 'gửi đá' và 'giữ cá qua đêm' cho hàng xóm, kiếm được những đồng vốn đầu tiên.",
+        "Chương 11-20: Hợp tác với một vài chủ thuyền để cung cấp đá cho các chuyến đi biển dài hơn một chút, chia lợi nhuận theo sản lượng.",
+        "Chương 21-30: Đối mặt với việc nguồn cung đá từ thị trấn tăng giá hoặc không ổn định, thúc đẩy anh phải tìm cách tự sản xuất đá.",
+        "Chương 26-30: Bắt đầu lên kế hoạch, tìm hiểu và gom góp vốn để mua một máy làm đá cũ, một quyết định mạo hiểm có thể thay đổi cả vùng."
+      ],
+      "antiStupidOpponent": "Chủ vựa lớn nhất bến cá, một người khôn ngoan và thực dụng. Ông ta không trực tiếp đối đầu mà dùng sức mạnh tài chính của mình: giảm giá mua cá của những người không dùng dịch vụ của ông, và tăng giá mua một chút cho những người trung thành, tạo ra sự chia rẽ trong cộng đồng ngư dân và gây áp lực kinh tế lên nhân vật chính.",
+      "domainResearchNeeds": [
+        "Phương pháp bảo quản lạnh thủ công (hầm đá, vật liệu cách nhiệt tự nhiên)",
+        "Lịch sử phát triển của ngành công nghiệp nước đá ở Việt Nam",
+        "Nguyên lý hoạt động cơ bản của máy làm lạnh",
+        "Tác động của việc bảo quản lạnh đến giá trị hải sản"
+      ]
+    },
+    {
+      "id": "dt_01_concept_06",
+      "title": "Con Thuyền Giấy",
+      "premise": "Một nhà thiết kế tàu thuyền quay về thời niên thiếu, khi cha anh sắp bán đi con thuyền cũ nát để trả nợ. Với kiến thức về thủy động lực học, anh không đóng thuyền mới mà cải tạo lại con thuyền cũ, biến nó thành một chiếc thuyền nhỏ nhưng nhanh, ít tốn dầu và hiệu quả hơn bất kỳ con thuyền nào trong làng.",
+      "protagonistEngine": "Tình yêu sâu sắc với con thuyền gắn liền với tuổi thơ và sự kính trọng dành cho người cha cả đời vất vả. Anh muốn chứng minh rằng giá trị không nằm ở cái mới, mà ở sự thông minh và khéo léo trong việc tận dụng những gì mình có.",
+      "protagonistContradiction": "Anh có bản vẽ và lý thuyết trong đầu nhưng lại thiếu kinh nghiệm thực tế về gỗ, tre và cách làm mộc của làng chài. Anh phải học cách dung hòa giữa thiết kế tối ưu trên lý thuyết và khả năng thi công bằng những công cụ thô sơ.",
+      "advantageLimits": "Kiến thức thiết kế giúp anh tối ưu hóa hình dáng và kết cấu, nhưng anh không thể thay đổi được chất liệu gỗ hay sức mạnh của cái động cơ máy dầu cũ kỹ. Con thuyền của anh có thể hiệu quả hơn, nhưng không thể thần kỳ vượt qua giới hạn vật lý của nó.",
+      "worldReaction": "Mọi người, kể cả cha anh, đều cho rằng anh đang 'phá' con thuyền. Họ cười nhạo khi thấy anh đẽo gọt lại mũi thuyền, thay đổi vị trí bánh lái. Nhưng khi con thuyền cải tạo ra khơi, tốn ít dầu hơn mà lại về bến sớm hơn, sự nghi ngờ biến thành kinh ngạc và ngưỡng mộ.",
+      "openingAdvantage": "Nhìn con thuyền của cha, anh nhận ra phần mũi quá tù và đáy thuyền quá phẳng, gây ra lực cản nước rất lớn, làm tốn dầu và giảm tốc độ.",
+      "firstThreeChapterMechanism": "Anh thuyết phục cha cho mình một tuần để 'sửa' lại con thuyền trước khi bán. Anh dùng những dụng cụ mộc đơn giản, tự mình gọt lại phần mũi thuyền cho thon hơn và gia cố thêm hai đường gờ dọc đáy thuyền. Chuyến ra khơi thử nghiệm sau đó cho kết quả ngoài mong đợi: thuyền chạy nhanh hơn và tiết kiệm được gần một phần ba nhiên liệu.",
+      "causalCost": "Để cải tạo con thuyền, anh phải làm việc cật lực cả ngày lẫn đêm, chịu đựng những vết dằm và sự đau mỏi. Anh phải đánh cược bằng niềm tin của cha mình và nguy cơ làm hỏng hoàn toàn tài sản giá trị nhất của gia đình.",
+      "mechanismFingerprint": [
+        "Tối ưu hóa thiết kế",
+        "Cải tạo và nâng cấp",
+        "Hiệu quả năng lượng",
+        "Ứng dụng kiến thức vật lý"
+      ],
+      "rewardLoopFingerprint": [
+        "Phát hiện một điểm không hiệu quả trên thuyền",
+        "Áp dụng kiến thức để cải tạo",
+        "Thuyền hoạt động tốt hơn (nhanh hơn, ít tốn dầu hơn)",
+        "Tăng lợi nhuận từ mỗi chuyến biển",
+        "Có uy tín và được người khác nhờ tư vấn, cải tạo"
+      ],
+      "conflictEconomyFingerprint": [
+        "Gây ra sự ghen tị từ các chủ thuyền khác",
+        "Thợ mộc trong làng cảm thấy bị đe dọa chuyên môn",
+        "Áp lực khi nhận cải tạo thuyền của người khác",
+        "Bị cho là giữ bí quyết cho riêng mình"
+      ],
+      "seriality30": [
+        "Chương 1-5: Cải tạo thành công thuyền nhà, chuyến biển đầu tiên bội thu, giải quyết được áp lực nợ nần trước mắt.",
+        "Chương 6-10: Tiếng lành đồn xa, anh được một người chú họ nhờ cải tạo thuyền. Thành công lần hai mang lại cho anh uy tín và một khoản thù lao kha khá.",
+        "Chương 11-20: Cùng một người bạn thợ mộc mở một xưởng nhỏ, chuyên nhận 'lên đời' thuyền cũ, tạo ra một dịch vụ độc nhất.",
+        "Chương 21-30: Đối mặt với giới hạn của việc cải tạo: không phải thuyền nào cũng sửa được. Anh bắt đầu nghĩ đến việc tự thiết kế và đóng một mẫu thuyền mới hoàn toàn.",
+        "Chương 26-30: Thiết kế của anh thu hút sự chú ý của một hợp tác xã đóng tàu, mở ra cơ hội hợp tác nhưng cũng kèm theo những thách thức về quyền sở hữu trí tuệ."
+      ],
+      "antiStupidOpponent": "Một thợ mộc già, người đóng hầu hết thuyền trong làng. Ông không chơi xấu, nhưng lòng tự trọng và sự bảo thủ khiến ông luôn tìm cách chứng minh phương pháp của mình là đúng. Ông sẽ thách thức nhân vật chính trong các cuộc thi tay nghề hoặc công khai chỉ ra những rủi ro tiềm ẩn trong thiết kế mới, tạo ra một cuộc đối đầu về kinh nghiệm và sự đổi mới.",
+      "domainResearchNeeds": [
+        "Thiết kế tàu thuyền gỗ truyền thống của Việt Nam",
+        "Nguyên lý cơ bản của thủy động lực học",
+        "Các loại gỗ và vật liệu dùng trong đóng tàu thủ công",
+        "Động cơ tàu cá (máy dầu) phổ biến thời kỳ 1980s"
+      ]
+    },
+    {
+      "id": "dt_01_concept_07",
+      "title": "Bậc Thầy Ruốc Sấy",
+      "premise": "Một chuyên gia marketing thực phẩm trọng sinh về thời bao cấp, nhận thấy con moi (ruốc) ở quê mình chỉ được bán tươi với giá rẻ mạt hoặc làm mắm tôm. Anh áp dụng kỹ thuật sấy khô và phân loại chất lượng, tạo ra sản phẩm ruốc khô cao cấp, mở ra một thị trường hoàn toàn mới.",
+      "protagonistEngine": "Nỗi xấu hổ khi trong quá khứ đã từng chê bai quê hương nghèo khó và món mắm tôm 'kém sang'. Anh muốn dùng kiến thức của mình để nâng tầm một sản vật địa phương, biến thứ bình dân nhất thành một niềm tự hào.",
+      "protagonistContradiction": "Anh có tư duy về sản phẩm và thương hiệu nhưng lại thiếu kinh nghiệm thực tế trong việc đánh bắt và phơi sấy thủ công. Anh phải học hỏi từ những người dân chài và tìm cách dung hòa giữa quy trình lý tưởng và thực tế thiếu thốn.",
+      "advantageLimits": "Kiến thức marketing giúp anh nhận ra tiềm năng của sản phẩm, nhưng anh không thể thay đổi mùa vụ của con moi hay thời tiết thất thường. Anh cũng không có sẵn kênh phân phối, phải tự mình đi gõ cửa từng quán ăn, từng nhà buôn.",
+      "worldReaction": "Mọi người thấy thật phiền phức khi anh yêu cầu phải rửa ruốc bằng nước ngọt, phơi trên giàn lưới thay vì phơi trên xi măng. Họ cho rằng anh 'làm màu'. Các nhà buôn ban đầu từ chối mua ruốc khô của anh vì giá cao hơn và họ đã quen với nguồn hàng truyền thống.",
+      "openingAdvantage": "Anh biết rằng ruốc được phơi đúng cách, sạch cát và giữ được màu đỏ tự nhiên có giá trị cao hơn gấp nhiều lần so với ruốc phơi ẩu, và có thể bán được cho các thị trường khó tính hơn.",
+      "firstThreeChapterMechanism": "Anh thuyết phục mẹ cho mình một góc sân để thử nghiệm. Anh tự làm giàn phơi bằng tre, cẩn thận rửa sạch một mẻ ruốc nhỏ rồi phơi dưới nắng nhẹ. Mẻ ruốc khô thành phẩm không những sạch, không có sạn mà còn có màu đỏ au đẹp mắt. Anh mang biếu một ít cho bà bán phở đầu làng, và bà ngay lập tức nhận ra đây là loại gia vị hảo hạng.",
+      "causalCost": "Quy trình làm ruốc sạch tốn nhiều nước ngọt (một thứ tương đối quý ở làng ven biển) và công sức hơn. Để đảm bảo chất lượng, anh phải chấp nhận sản lượng thấp trong thời gian đầu và tự mình làm mọi công đoạn.",
+      "mechanismFingerprint": [
+        "Phân loại chất lượng",
+        "Cải tiến quy trình sấy",
+        "Xây dựng tiêu chuẩn sản phẩm",
+        "Tìm kiếm thị trường mới"
+      ],
+      "rewardLoopFingerprint": [
+        "Áp dụng một cải tiến nhỏ trong quy trình",
+        "Sản phẩm có chất lượng vượt trội (sạch hơn, đẹp hơn)",
+        "Bán được giá cao hơn cho khách hàng khó tính",
+        "Có vốn để xây giàn phơi, thuê người làm",
+        "Nâng cao danh tiếng cho sản vật địa phương"
+      ],
+      "conflictEconomyFingerprint": [
+        "Cạnh tranh thu mua nguồn ruốc tươi",
+        "Bị người khác làm hàng giả, hàng nhái kém chất lượng",
+        "Nhà buôn lớn tìm cách thâu tóm nguồn cung",
+        "Xung đột về tiêu chuẩn chất lượng với người làm công"
+      ],
+      "seriality30": [
+        "Chương 1-5: Tạo ra mẻ ruốc khô chất lượng cao đầu tiên, bán được cho quán phở và có tiền mua thêm dụng cụ.",
+        "Chương 6-10: Trở thành nhà cung cấp ruốc khô uy tín cho vài quán ăn trong thị trấn, tạo ra một tiêu chuẩn mới cho sản phẩm.",
+        "Chương 11-20: Tổ chức một nhóm các chị em phụ nữ trong xóm để sản xuất theo quy trình của mình, giải quyết việc làm và tăng sản lượng.",
+        "Chương 21-30: Mùa ruốc khan hiếm do biến đổi dòng chảy, buộc anh phải tìm cách dự trữ hoặc nghiên cứu sấy các loại hải sản khác như cá, tôm.",
+        "Chương 26-30: Bắt đầu nghĩ đến việc đóng gói và dán nhãn đơn giản, tìm cách đưa sản phẩm lên các thành phố lớn thông qua các mối quan hệ."
+      ],
+      "antiStupidOpponent": "Một thương lái giàu kinh nghiệm, chuyên thu mua hải sản khô. Bà ta không đối đầu trực tiếp mà tìm cách phá giá bằng cách tung ra thị trường một lượng lớn ruốc khô giá rẻ, chất lượng thấp hơn, đánh vào tâm lý chuộng rẻ của đa số người tiêu dùng. Bà ta buộc nhân vật chính phải nỗ lực hơn trong việc giáo dục thị trường và xây dựng lòng tin vào thương hiệu.",
+      "domainResearchNeeds": [
+        "Vòng đời và mùa vụ của con moi (ruốc) ở biển Việt Nam",
+        "Các phương pháp phơi sấy, chế biến ruốc truyền thống",
+        "Thị trường và ứng dụng của ruốc khô trong ẩm thực",
+        "Các tiêu chuẩn cơ bản về vệ sinh an toàn thực phẩm"
+      ]
+    },
+    {
+      "id": "dt_01_concept_08",
+      "title": "Người Gọi Sò",
+      "premise": "Một người đàn ông từng bỏ xứ đi làm ăn xa, nay trọng sinh về thời điểm làng chài của mình điêu đứng vì sò huyết tự nhiên biến mất. Anh dùng kiến thức về hệ sinh thái và tập tính của sò huyết mà sau này mới biết, để tìm ra bãi sò mới và hướng dẫn bà con cách khai thác bền vững.",
+      "protagonistEngine": "Nỗi hối hận vì đã rời bỏ quê hương trong lúc khó khăn nhất. Anh muốn bù đắp cho gia đình và làng xóm, dùng sự hiểu biết của mình để khôi phục lại nguồn sống chính của cả vùng, thứ mà anh từng coi là tầm thường.",
+      "protagonistContradiction": "Anh biết sò huyết không biến mất mà chỉ di chuyển đến vùng nước sâu hơn do thay đổi dòng chảy, nhưng anh không thể giải thích điều đó bằng ngôn ngữ khoa học. Anh phải dựa vào những 'kinh nghiệm' tự bịa ra, đôi khi bị coi là mê tín hoặc gặp may.",
+      "advantageLimits": "Kiến thức của anh chỉ mang tính định hướng ('tìm ở vùng nước sâu hơn, đáy bùn pha cát'), không phải là tọa độ chính xác. Anh vẫn phải cùng mọi người dò dẫm, thử và sai. Anh biết cách khai thác bền vững nhưng không thể ngăn cản lòng tham của tất cả mọi người.",
+      "worldReaction": "Ban đầu, không ai tin lời một kẻ đã từng bỏ làng đi. Họ cho rằng anh nói khoác. Khi anh thực sự dẫn họ đến một bãi sò mới, họ vừa mừng rỡ vừa nghi ngờ, cho rằng anh có 'phép lạ' hoặc thông đồng với 'thần biển'. Điều này vừa mang lại uy tín, vừa tạo ra những rắc rối không đáng có.",
+      "openingAdvantage": "Nghe mọi người than thở sò huyết 'tuyệt chủng', anh nhớ lại một tài liệu sau này đã đọc, nói rằng sò huyết có xu hướng di chuyển ra các luồng lạch sâu hơn khi môi trường ven bờ thay đổi.",
+      "firstThreeChapterMechanism": "Anh mượn chiếc thuyền nan và một mình chèo ra khu vực lạch sâu mà mọi người thường tránh. Sau nhiều giờ cào tìm, anh đã tìm thấy những con sò huyết đầu tiên. Anh mang về một giỏ đầy, không phải để bán, mà để chứng minh cho mọi người thấy rằng nguồn sống của họ vẫn còn đó.",
+      "causalCost": "Để tìm ra bãi sò mới, anh phải chấp nhận rủi ro đi vào những vùng nước nguy hiểm mà ngư dân khác né tránh. Việc thuyết phục mọi người khai thác có chừng mực khiến anh phải đối mặt với sự phản đối của những người muốn 'bắt cho hết' để kiếm lời nhanh.",
+      "mechanismFingerprint": [
+        "Kiến thức sinh thái",
+        "Tìm kiếm ngư trường mới",
+        "Khai thác bền vững",
+        "Lãnh đạo cộng đồng"
+      ],
+      "rewardLoopFingerprint": [
+        "Đưa ra một giả thuyết dựa trên kiến thức",
+        "Tìm kiếm và xác thực thành công",
+        "Mang lại nguồn lợi cho cộng đồng",
+        "Nhận được sự tôn trọng và tin tưởng",
+        "Sử dụng uy tín để đề xuất các quy tắc mới"
+      ],
+      "conflictEconomyFingerprint": [
+        "Tranh chấp quyền khai thác trên bãi sò mới",
+        "Xung đột giữa khai thác tận thu và bền vững",
+        "Thương lái từ nơi khác đến thao túng giá",
+        "Ghen tị với uy tín và vai trò của nhân vật chính"
+      ],
+      "seriality30": [
+        "Chương 1-5: Tìm ra bãi sò huyết mới, giúp làng chài có lại thu nhập, bữa cơm gia đình không còn phải độn khoai sắn.",
+        "Chương 6-10: Đề xuất và thiết lập các quy tắc khai thác đơn giản (không bắt sò nhỏ, chia khu vực theo ngày), bước đầu tạo ý thức chung.",
+        "Chương 11-20: Cùng những người có uy tín trong làng lập ra một đội tự quản, giám sát việc khai thác và đứng ra thương lượng giá bán với thương lái.",
+        "Chương 21-30: Bãi sò bắt đầu có dấu hiệu suy giảm do có quá nhiều người từ làng khác kéo đến. Anh nhận ra chỉ bảo vệ thôi là chưa đủ.",
+        "Chương 26-30: Bắt đầu thử nghiệm khoanh vùng và nuôi sò giống, chuyển từ khai thác tự nhiên sang bán tự nhiên, một bước đi táo bạo và đầy rủi ro."
+      ],
+      "antiStupidOpponent": "Một người trong làng có đầu óc lanh lợi nhưng thiển cận. Anh ta không chống đối nhân vật chính một cách trực diện, mà luôn tìm cách lách luật, khai thác trộm hoặc xúi giục người khác làm trái quy định để trục lợi cá nhân. Anh ta đại diện cho tư tưởng 'ăn xổi ở thì', tạo ra xung đột nội bộ liên tục trong cộng đồng.",
+      "domainResearchNeeds": [
+        "Tập tính sinh học của sò huyết (môi trường sống, sinh sản)",
+        "Phương pháp khai thác sò huyết thủ công",
+        "Các mô hình quản lý tài nguyên dựa vào cộng đồng",
+        "Kỹ thuật nuôi trồng thủy sản cơ bản"
+      ]
+    },
+    {
+      "id": "dt_01_concept_09",
+      "title": "Gánh Muối Của Cha",
+      "premise": "Một doanh nhân ngành muối trọng sinh về thời niên thiếu ở một làng muối nghèo, nơi muối chỉ được xem là hàng hóa rẻ tiền. Anh áp dụng kiến thức về phân loại và tinh chế muối, tạo ra các sản phẩm muối hạt, muối tinh, muối ướp cá... với giá trị khác nhau, thay đổi số phận của cả diêm dân.",
+      "protagonistEngine": "Nỗi đau khi chứng kiến người cha cả đời bán mặt cho đất bán lưng cho trời trên ruộng muối nhưng vẫn không thoát được cái nghèo. Anh muốn trả lại giá trị đích thực cho hạt muối, thứ kết tinh từ mồ hôi và nước mắt của quê hương.",
+      "protagonistContradiction": "Anh biết về các quy trình sản xuất muối công nghiệp nhưng lại phải làm việc trên những ruộng muối thủ công, phụ thuộc hoàn toàn vào nắng và gió. Anh muốn thay đổi tư duy của mọi người nhưng lại bị coi là 'lý sự' bởi những diêm dân đã làm muối cả đời.",
+      "advantageLimits": "Kiến thức của anh giúp phân biệt các loại muối và tiềm năng của chúng, nhưng không thể khiến trời nắng hơn hay nước biển mặn hơn. Anh phải làm việc trong khuôn khổ của phương pháp sản xuất truyền thống trước khi có thể cải tiến nó.",
+      "worldReaction": "Mọi người, kể cả cha anh, đều cười khi anh tỉ mẩn ngồi lựa riêng những hạt muối to, trong (muối hạt) ra khỏi đống muối thường. Họ cho rằng đó là việc làm vô ích. Các thương lái từ chối trả giá cao hơn cho 'muối được lựa tay', cho đến khi một chủ vựa nước mắm phát hiện ra muối của anh giúp mắm ngon hơn.",
+      "openingAdvantage": "Anh nhận ra trong một đống muối, có nhiều loại với độ tinh khiết và kích thước hạt khác nhau. Anh biết rằng mỗi loại phù hợp với một mục đích sử dụng khác nhau và có giá trị khác nhau.",
+      "firstThreeChapterMechanism": "Anh xin cha cho mình một góc sân và một ít muối vừa thu hoạch. Anh kiên nhẫn sàng lọc, phân ra ba loại: muối hạt to để ướp cá, muối vừa để làm mắm, và muối vụn để dùng trong nấu ăn hàng ngày. Anh mang loại muối hạt tốt nhất đến chào hàng cho một chủ vựa cá, chứng minh rằng nó giúp cá tươi lâu hơn và ít bị xót.",
+      "causalCost": "Việc sàng lọc và phân loại muối là một công việc cực kỳ tốn thời gian và nhàm chán, đòi hỏi sự kiên nhẫn phi thường. Để chứng minh giá trị, anh phải chấp nhận bán chịu hoặc cho không sản phẩm trong giai đoạn đầu.",
+      "mechanismFingerprint": [
+        "Phân loại sản phẩm",
+        "Tinh chế và chế biến",
+        "Tìm kiếm thị trường chuyên dụng",
+        "Nâng cao giá trị nông sản"
+      ],
+      "rewardLoopFingerprint": [
+        "Tạo ra một dòng sản phẩm muối mới từ nguyên liệu cũ",
+        "Chứng minh được công dụng vượt trội của nó",
+        "Tìm được khách hàng sẵn sàng trả giá cao hơn",
+        "Có vốn để cải tiến sân phơi, dụng cụ sàng lọc",
+        "Thay đổi nhận thức của cộng đồng về sản phẩm của họ"
+      ],
+      "conflictEconomyFingerprint": [
+        "Thương lái muối ép giá toàn bộ làng để chống lại sự thay đổi",
+        "Bị nghi ngờ pha trộn hóa chất vào muối",
+        "Xung đột về việc ai được học 'bí quyết' phân loại",
+        "Cạnh tranh với các làng muối khác"
+      ],
+      "seriality30": [
+        "Chương 1-5: Phân loại thành công mẻ muối đầu tiên, bán được cho chủ vựa cá, giúp gia đình có thêm thu nhập.",
+        "Chương 6-10: Cung cấp muối chuyên dụng cho các nhà làm mắm, tạo ra uy tín về 'muối sạch, chất lượng'.",
+        "Chương 11-20: Hướng dẫn cho vài hộ gia đình khác cùng làm, tổ chức thành một tổ hợp tác nhỏ để có sản lượng đủ lớn cung cấp cho một xưởng mắm.",
+        "Chương 21-30: Đối mặt với một năm mưa nhiều, sản lượng muối giảm sút nghiêm trọng. Anh phải nghiên cứu cách cải tạo ruộng muối để rút ngắn thời gian phơi.",
+        "Chương 26-30: Bắt đầu thử nghiệm làm 'muối hầm' và 'muối ớt rang', những sản phẩm chế biến sâu đầu tiên, nhắm đến thị trường tiêu dùng trực tiếp."
+      ],
+      "antiStupidOpponent": "Một thương lái thu mua muối lâu năm, người có mối quan hệ rộng và nắm giữ kênh phân phối. Ông ta không cấm đoán, mà dùng chiêu bài 'ổn định': cam kết mua tất cả muối của làng với giá sàn, bất kể chất lượng, tạo ra sự an toàn giả tạo để diêm dân không muốn mạo hiểm đi theo con đường mới, nhiều rủi ro hơn của nhân vật chính.",
+      "domainResearchNeeds": [
+        "Quy trình sản xuất muối biển thủ công ở Việt Nam",
+        "Các loại muối và ứng dụng của chúng (muối ăn, muối công nghiệp)",
+        "Các yếu tố ảnh hưởng đến chất lượng muối (thời tiết, kỹ thuật)",
+        "Lịch sử ngành muối Việt Nam"
+      ]
+    },
+    {
+      "id": "dt_01_concept_10",
+      "title": "Người Kể Chuyện Của Biển",
+      "premise": "Một hướng dẫn viên du lịch sinh thái biển trọng sinh, nhận ra giá trị của làng chài quê mình không chỉ ở hải sản, mà còn ở những câu chuyện, những kỹ năng và một hệ sinh thái độc đáo đang dần mất đi. Anh bắt đầu từ việc ghi chép, sau đó tổ chức các hoạt động trải nghiệm nhỏ, biến văn hóa làng chài thành một tài sản.",
+      "protagonistEngine": "Nỗi nuối tiếc khi chứng kiến làng chài quê hương sau này bị bê tông hóa, mất hết bản sắc để chạy theo du lịch rẻ tiền. Anh muốn bảo tồn và phát huy những giá trị văn hóa cốt lõi, để quê hương phát triển một cách bền vững và có hồn.",
+      "protagonistContradiction": "Anh có tầm nhìn về du lịch trải nghiệm nhưng lại đang sống ở một thời đại mà 'du lịch' là một khái niệm xa xỉ. Anh muốn kiếm tiền từ những thứ 'vô hình' như câu chuyện, kỹ năng, trong khi mọi người xung quanh chỉ quan tâm đến cái ăn cái mặc trước mắt.",
+      "advantageLimits": "Kiến thức của anh là về tương lai, về thứ mà khách du lịch sẽ thích. Nhưng anh không có vốn, không có khách, và không thể biến làng chài nghèo khó thành một resort ngay lập tức. Anh phải bắt đầu từ những sản phẩm và dịch vụ nhỏ nhất, gần như cho không.",
+      "worldReaction": "Mọi người cho rằng anh bị 'ấm đầu' khi suốt ngày đi theo các cụ già hỏi chuyện xưa, hay lụi cụi vẽ lại bản đồ các rặng san hô ven bờ. Họ không hiểu tại sao anh lại ngăn cản việc bắt cá con hay phá rặng san hô để lấy vôi. Ý tưởng 'thu tiền để người ta xem mình bắt cá' bị coi là trò cười.",
+      "openingAdvantage": "Anh nhận ra món gỏi cá trích mà cha mình hay làm không chỉ là một món ăn, mà là một 'trải nghiệm ẩm thực' độc đáo mà sau này người thành phố sẵn sàng trả giá cao để được thử.",
+      "firstThreeChapterMechanism": "Nhân dịp có một đoàn cán bộ địa chất về khảo sát, anh mạnh dạn đề nghị được làm 'hướng dẫn viên không chuyên'. Anh không chỉ dẫn họ đường đi, mà còn kể cho họ nghe về sự tích ghềnh đá, cách dân làng xem con nước, và mời họ dùng bữa cơm với món gỏi cá trích tươi sống do chính tay cha anh làm. Sự thích thú của đoàn khách giúp anh có được khoản 'boa' đầu tiên và một ý tưởng rõ ràng.",
+      "causalCost": "Để theo đuổi con đường này, anh phải chấp nhận bị xem là kẻ lười biếng, không chịu làm việc nặng nhọc. Anh phải bỏ thời gian và công sức để thu thập thông tin, kết nối mọi người mà không thấy được lợi ích kinh tế ngay lập tức.",
+      "mechanismFingerprint": [
+        "Khai thác giá trị văn hóa",
+        "Du lịch trải nghiệm",
+        "Bảo tồn di sản",
+        "Xây dựng sản phẩm dịch vụ"
+      ],
+      "rewardLoopFingerprint": [
+        "Phát hiện một yếu tố văn hóa/tự nhiên có tiềm năng",
+        "Xây dựng nó thành một câu chuyện hoặc một trải nghiệm nhỏ",
+        "Có được những 'vị khách' đầu tiên và nhận được phản hồi tích cực",
+        "Kiếm được thu nhập từ một hoạt động phi truyền thống",
+        "Dùng tiền và uy tín để tái đầu tư, bảo tồn yếu tố đó"
+      ],
+      "conflictEconomyFingerprint": [
+        "Xung đột giữa phát triển du lịch và bảo vệ môi trường",
+        "Mâu thuẫn về việc chia sẻ lợi ích từ du lịch",
+        "Bị các nhóm lợi ích muốn phát triển du lịch 'nóng' cản trở",
+        "Sự hoài nghi và chống đối từ những người bảo thủ"
+      ],
+      "seriality30": [
+        "Chương 1-5: Tổ chức thành công 'tour' ngẫu hứng cho đoàn cán bộ, có được khoản tiền đầu tiên và sự công nhận ban đầu từ gia đình.",
+        "Chương 6-10: Thiết kế một 'tour đi bộ' quanh làng, kể về lịch sử và nghề chài, bán các sản phẩm lưu niệm nhỏ (vỏ ốc, cá khô) cho khách vãng lai.",
+        "Chương 11-20: Hợp tác với các chủ thuyền để tổ chức các chuyến đi câu cá gần bờ cho khách từ thị trấn, chia sẻ lợi nhuận và tạo thêm thu nhập cho ngư dân.",
+        "Chương 21-30: Đối mặt với nguy cơ một doanh nghiệp muốn xây dựng một nhà máy chế biến gây ô nhiễm gần bờ biển. Anh phải vận động cả làng để bảo vệ tài nguyên.",
+        "Chương 26-30: Bắt đầu xây dựng một 'nhà trưng bày' nhỏ với các ngư cụ cũ và những câu chuyện được ghi chép lại, đặt nền móng cho một bảo tàng cộng đồng."
+      ],
+      "antiStupidOpponent": "Trưởng thôn, một người có tâm nhưng tầm nhìn hạn hẹp. Ông muốn làng phát triển, nhưng chỉ tin vào những con đường cụ thể như xây cầu, làm đường, thu hút nhà máy. Ông không phá hoại, nhưng luôn ưu tiên các dự án 'bê tông' hơn là những ý tưởng 'mơ hồ' của nhân vật chính, tạo ra sự cạnh tranh về nguồn lực và sự ủng hộ của cộng đồng.",
+      "domainResearchNeeds": [
+        "Văn hóa và tín ngưỡng của các làng chài ven biển Việt Nam",
+        "Lịch sử phát triển du lịch ở Việt Nam, đặc biệt là giai đoạn đầu",
+        "Các nguyên tắc cơ bản của du lịch sinh thái và du lịch cộng đồng",
+        "Hệ sinh thái biển ven bờ (san hô, thảm cỏ biển)"
+      ]
+    }
+  ],
+  "finalists": [
+    {
+      "id": "c1_bycatch_ice",
+      "title": "Mẻ Biển Hừng Đông",
+      "premise": "Sống lại năm 1988, một cựu thương lái hải sản nhận ra rào cản lớn nhất không phải là thiếu cá, mà là cá vụn bị hỏng do thiếu đá lạnh. Anh dùng bèo tây và lá chuối khô làm lớp cách nhiệt tự nhiên, cứu lấy mẻ 'cá dạt' và biến nó thành những bữa cơm có thịt đầu tiên.",
+      "protagonistEngine": "Kinh nghiệm quản lý hao hụt hải sản và khả năng tối ưu hóa nhiệt độ bảo quản bằng vật liệu thô sơ.",
+      "protagonistContradiction": "Sở hữu kiến thức bảo quản chuẩn mực nhưng lại bị giới hạn bởi thân thể gầy gò và việc nhà máy đá địa phương chỉ bán cho tàu lớn.",
+      "advantageLimits": "Lớp cách nhiệt tự nhiên chỉ kéo dài độ tươi được 4-6 tiếng, buộc anh phải chạy đua với thời gian để lên chợ huyện trước khi nắng gắt.",
+      "worldReaction": "Người làng cười chê vì gom 'cá rác', nhưng tiểu thương chợ huyện nhanh chóng nhận ra chất lượng cá tươi không xước bụng và sẵn sàng trả giá cao hơn.",
+      "openingAdvantage": "Nhớ lại một mẻ cá dạt cực lớn của bến cá ngày hôm đó bị đổ bỏ do tàu về trễ, anh chủ động chuẩn bị thúng tre và lớp lót từ đêm.",
+      "firstThreeChapterMechanism": "Chương 1: Thu gom bèo tây, phơi qua một nắng. Chương 2: Chờ bến cá hừng đông, xin mua rẻ mẻ cá dạt, phân loại và ướp ngay tại chỗ. Chương 3: Gánh cá lên chợ, bán được tiền tươi và mua ngay cân gạo, miếng thịt lợn về nấu cơm cho vợ đang bệnh.",
+      "causalCost": "Đánh đổi giấc ngủ và sức lực cơ bắp; bèo tây phải hái và xử lý liên tục, mỗi chuyến đi là một lần kiệt sức.",
+      "mechanismFingerprint": [
+        "Phân loại cá dạt thành 3 cấp độ tươi",
+        "Xử lý bèo tây và lá chuối làm lớp bảo ôn",
+        "Tính toán thời gian từ bến lên chợ khớp với chu kỳ nhiệt độ"
+      ],
+      "rewardLoopFingerprint": [
+        "Mua rẻ cá dạt",
+        "Bảo quản không dùng đá",
+        "Bán giá cá tươi",
+        "Mua nhu yếu phẩm và mua thêm thúng"
+      ],
+      "conflictEconomyFingerprint": [
+        "Cạnh tranh mua cá dạt với người làm mắm",
+        "Thương lượng với người bán thịt lợn để đổi cá",
+        "Chia sẻ lợi ích với chủ xe bò để chở được nhiều hơn"
+      ],
+      "seriality30": [
+        "Chương 1-5: Trúng mẻ cá dạt đầu tiên, bảo quản bằng bèo tây, bán giá tốt và mang về bữa cơm đầy đặn.",
+        "Chương 6-10: Mua được xe kéo tay, ký gửi được cá cho một quán ăn nhỏ trên huyện, uy tín bắt đầu có.",
+        "Chương 11-15: Lượng cá lớn hơn giới hạn sức người, bắt đầu rủ hai người anh em họ cùng gom và đẩy xe.",
+        "Chương 16-20: Hình thành một trạm thu mua nhỏ lợp lá, gom tiền cọc để chen chân mua được đá viên từ nhà máy.",
+        "Chương 21-30: Nguồn cá dạt giảm do tàu chuộng lưới mắt nhỏ tận diệt; nhân vật quyết định chỉ thu mua cá đạt kích cỡ, thuyết phục bạn thuyền bỏ lưới tận diệt để bảo vệ sinh kế dài hạn."
+      ],
+      "antiStupidOpponent": "Trưởng bến cá: Không chèn ép vô lý nhưng kiên quyết thu phí bến bãi đàng hoàng, ban đầu nghi ngờ MC phá giá nhưng sau đó hợp tác khi thấy MC giúp dọn sạch bến.",
+      "domainResearchNeeds": [
+        "Cách dùng vật liệu tự nhiên cách nhiệt thập niên 80",
+        "Tỉ lệ hao hụt của cá biển khi không có đá lạnh",
+        "Giá cả gạo thịt và cá vụn thời kỳ đầu Đổi Mới"
+      ]
+    },
+    {
+      "id": "c2_bamboo_traps",
+      "title": "Nước Ròng Bắt Ghẹ",
+      "premise": "Trở về làng biển nghèo, người thợ cả hiểu dòng chảy cửa lạch đã tự đan những chiếc lồng bát quái từ tre vụn, nhắm vào đàn ghẹ xanh trú ẩn dưới rạn đá ngầm mà lưới kéo không chạm tới được.",
+      "protagonistEngine": "Sự am hiểu tường tận về tập tính di cư theo con nước của các loài hải sản đáy và kỹ thuật đan lồng bẫy.",
+      "protagonistContradiction": "Muốn bắt nhiều nhưng không có tiền mua lưới cước xịn, phải cặm cụi đan lồng tre dễ bị hỏng do đá chém hoặc nước cuốn.",
+      "advantageLimits": "Lồng tre cồng kềnh, mỗi lần chỉ chở được vài chiếc trên chiếc xuồng ba lá, và phải đặt đúng giờ nước rút.",
+      "worldReaction": "Những người thả lưới khinh thường việc lúi húi ở lạch đá nghèo nàn, cho đến khi thấy những con ghẹ xanh khổng lồ còn sống nguyên vẹn được mang lên.",
+      "openingAdvantage": "Tận dụng đống tre hỏng sau bão của nhà hàng xóm, chẻ ra đan được 3 chiếc lồng bẫy với rập cửa vào một chiều.",
+      "firstThreeChapterMechanism": "Chương 1: Xin tre vụn, vót nan và đan lồng trong đêm. Chương 2: Căn con nước ròng sớm mai để đặt lồng ngầm dưới rạn đá. Chương 3: Kéo lồng trúng ghẹ xanh, giữ sống bằng rong biển ướt, bán cho đầu nậu được mớ tiền mua gạo và chỉ cước.",
+      "causalCost": "Bàn tay chai sần rớm máu vì chẻ tre, nguy cơ lật xuồng ở lạch đá nước xiết.",
+      "mechanismFingerprint": [
+        "Đoán con nước rút ở lạch ngầm",
+        "Đan lồng tre với hom một chiều",
+        "Mồi bẫy làm từ ốc vụn đập giập"
+      ],
+      "rewardLoopFingerprint": [
+        "Đặt lồng bẫy tre",
+        "Thu hoạch hải sản đáy",
+        "Bán hải sản sống",
+        "Tái đầu tư mua cước đan lồng bền hơn"
+      ],
+      "conflictEconomyFingerprint": [
+        "Giữ bí mật vị trí lạch đá với bạn thuyền",
+        "Trả giá với thương lái chuyên ép giá ghẹ ngộp",
+        "Đổi công với thợ mộc để mượn đồ nghề làm lồng"
+      ],
+      "seriality30": [
+        "Chương 1-5: Đan 3 lồng tre, bắt mẻ ghẹ đầu, đổi được gạo và vá lại mái nhà dột.",
+        "Chương 6-10: Cải tiến lồng bằng cước lưới xin được, lượng lồng tăng lên 15 cái, khách buôn bắt đầu săn đón.",
+        "Chương 11-15: Rủ thêm em vợ phụ chèo xuồng và canh chừng, mở rộng vùng thả lồng ra hòn đảo nhỏ gần bờ.",
+        "Chương 16-20: Thành lập tổ ba chiếc xuồng thả lồng, thương lượng được giá cố định với nhà hàng trên tỉnh.",
+        "Chương 21-30: Phát hiện mùa sinh sản, lồng dính đầy ghẹ ôm trứng. MC quyết định thả ghẹ ôm trứng, chấp nhận giảm doanh thu, hướng dẫn tổ đội làm theo để mùa sau không mất gốc."
+      ],
+      "antiStupidOpponent": "Đầu nậu thu mua: Một bà cô sắc sảo, luôn bới móc để ép giá nhưng khi thấy hàng chất lượng thực sự thì trả tiền mặt sòng phẳng để giữ mối.",
+      "domainResearchNeeds": [
+        "Kỹ thuật đan lồng bát quái bằng tre",
+        "Tập tính sinh sống của ghẹ xanh ven bờ",
+        "Cách đọc con nước thủy triều lịch âm"
+      ]
+    },
+    {
+      "id": "c3_sun_drying_fish",
+      "title": "Nắng Vàng Cá Biển",
+      "premise": "Thập niên 80, cá rộ mùa rẻ như bèo. Thay vì bán tháo, MC tận dụng muối hột địa phương và kỹ thuật canh nắng mổ phanh để làm khô cá nục một nắng, tạo ra loại thực phẩm dự trữ xa xỉ thời bấy giờ.",
+      "protagonistEngine": "Kỹ thuật canh tỉ lệ muối - nước và cảm quan độ ẩm không khí tuyệt vời để cá khô từ bên trong mà không gắt dầu.",
+      "protagonistContradiction": "Biết cách làm ngon nhất nhưng không có sân phơi đủ rộng và thiếu vốn ôm hàng lúc rẻ nhất.",
+      "advantageLimits": "Phụ thuộc hoàn toàn vào thời tiết. Một cơn mưa rào bất chợt có thể làm hỏng cả mẻ vốn liếng.",
+      "worldReaction": "Người nhà xót của khi thấy đem muối xát vào cá tươi, nhưng khi mùi cá một nắng nướng xộc lên, cả xóm chài phải thèm thuồng.",
+      "openingAdvantage": "Nhận ra mẻ cá nục rộ mùa bị thương lái chê ỏng chê eo, mua lại với giá rẻ mạt bằng chút tiền cưới vợ còn sót lại.",
+      "firstThreeChapterMechanism": "Chương 1: Tranh cãi với vợ để dốc túi mua mẻ cá ế. Chương 2: Mổ phanh, ngâm nước muối loãng xả nhớt, phơi trên mành tre xin được. Chương 3: Cá vừa độ một nắng dẻo thơm, đem ra nướng thử một con cho vợ ăn, phần còn lại bán cho bách hóa huyện được giá gấp ba.",
+      "causalCost": "Phải thức trắng đêm xẻ cá để kịp phơi nắng sớm, ruồi muỗi bâu đầy tay và mùi tanh bám chặt.",
+      "mechanismFingerprint": [
+        "Tỉ lệ ngâm nước muối xả máu tanh",
+        "Căng mành tre cách mặt đất 1 mét",
+        "Lật cá theo chu kỳ bóng nắng"
+      ],
+      "rewardLoopFingerprint": [
+        "Gom cá ế mùa rộ",
+        "Sơ chế và canh nắng",
+        "Bán thành phẩm cá một nắng",
+        "Mua thêm vỉ phơi và chum ủ muối"
+      ],
+      "conflictEconomyFingerprint": [
+        "Mặc cả với ruộng muối để có muối hạt to không tạp chất",
+        "Thuyết phục cửa hàng quốc doanh nhận ký gửi",
+        "Bảo vệ mẻ cá khỏi chó mèo và thời tiết xấu"
+      ],
+      "seriality30": [
+        "Chương 1-5: Mua mẻ cá nục ế, làm khô một nắng, bữa cơm có thêm đĩa cá nướng thơm lừng, bán mẻ đầu lấy vốn.",
+        "Chương 6-10: Đóng thêm 10 vỉ phơi, tìm được nguồn muối tốt hơn, khách đường dài bắt đầu tìm đến mua làm quà.",
+        "Chương 11-15: Mùa mưa tới, phải thuê thợ mộc đóng lò sấy củi bùn, rủ thêm hai cô hàng xóm xẻ cá phụ.",
+        "Chương 16-20: Hoàn thiện quy trình làm khô cá trích, cá hố, tạo nên xưởng nhỏ với 5 nhân công thường xuyên.",
+        "Chương 21-30: Thương lái yêu cầu tẩm hóa chất để cá đẹp và để lâu hơn. MC từ chối lợi nhuận nhanh, kiên trì quy trình ủ muối tự nhiên, chuyển hướng bán cho khách sạn chuyên biệt bảo vệ thương hiệu."
+      ],
+      "antiStupidOpponent": "Cửa hàng trưởng bách hóa: Người cứng nhắc với quy trình giấy tờ, không nhận hàng không rõ nguồn gốc ban đầu, nhưng khi mang cá về ăn thử thấy ngon liền chủ động hướng dẫn MC làm giấy tờ hợp tác xã.",
+      "domainResearchNeeds": [
+        "Quy trình làm cá một nắng chuẩn",
+        "Cách bảo quản khô không dùng chất hóa học",
+        "Thương mại hàng hóa qua cửa hàng quốc doanh 1988"
+      ]
+    }
+  ],
+  "openingTrials": [
+    {
+      "schemaVersion": 3,
+      "candidateId": "c1_bycatch_ice",
+      "chapters": [
+        {
+          "chapterNumber": 1,
+          "title": "Vật Liệu Của Kẻ Điên",
+          "proseParagraphs": [
+            "Trời còn chưa hửng sáng, Lâm đã ép cái thân xác gầy rộc của mình rời khỏi manh chiếu. Cơn ho khan của vợ từ giường bên kia như một mũi kim châm vào lòng anh. Sống lại mấy ngày, anh vẫn chưa quen được với cái đói cồn cào và sự yếu ớt của cơ thể này. Nhưng hôm nay thì khác. Trong ký ức của một gã thương lái hải sản hơn ba mươi năm kinh nghiệm, chính ngày hôm nay, con tàu của lão Bốn 'Mặt Sắt' sẽ về bến trễ, mang theo một mẻ cá dạt khổng lồ nhưng gần như hỏng hết vì nắng.",
+            "Thay vì ra bến, Lâm lại đi ngược về phía con rạch nước ngọt sau làng. Lũ trẻ chăn trâu nhìn anh với ánh mắt kỳ quái khi thấy anh lội xuống vớt từng mảng bèo tây lớn, thứ mà người ta chỉ dùng cho lợn ăn. Anh mặc kệ. Bàn tay gầy guộc nhưng thành thạo vớt bèo, giũ sạch bùn rồi rải đều lên bãi cỏ ven bờ. Bên cạnh là những tàu lá chuối khô anh đã gom từ hôm qua. Người ta thấy anh điên, còn anh chỉ thấy một cái tủ lạnh tự nhiên đang dần hình thành.",
+            "Anh làm việc trong im lặng, tính toán từng chút một. Bèo phải phơi qua một nắng cho se mặt, nhưng không được khô giòn, để giữ lại độ ẩm bên trong lõi xốp, tạo thành lớp cách nhiệt hoàn hảo. Lá chuối khô sẽ là lớp lót ngoài cùng, ngăn nước cá rỉ ra làm ướt bèo, mất tác dụng. Mọi thứ phải xong trước khi con nắng gay gắt nhất trong ngày kịp đổ xuống. Mồ hôi ướt đẫm tấm áo vá, nhưng trong đầu Lâm, một kế hoạch chi tiết đã sẵn sàng."
+          ],
+          "stateChange": "Từ một kế hoạch trong đầu, Lâm đã chuẩn bị thành công vật liệu cách nhiệt thiết yếu từ bèo tây và lá chuối khô.",
+          "earnedReward": "Có được công cụ bảo quản tự nhiên - lớp lót bèo tây đã qua sơ chế - sẵn sàng cho mẻ cá sắp tới.",
+          "unresolvedPressure": "Vật liệu đã sẵn sàng nhưng mẻ cá mục tiêu vẫn chưa xuất hiện. Anh phải chạy đua với thời gian để đến bến cá đúng lúc con tàu về, và sức lực của cơ thể này là một dấu hỏi lớn."
+        },
+        {
+          "chapterNumber": 2,
+          "title": "Mua Rác Của Biển",
+          "proseParagraphs": [
+            "Bến cá hừng đông ồn ào như một cái chợ vỡ. Lâm nép mình vào một góc, ôm hai cái thúng tre đã lót sẵn lá chuối và bèo tây, kiên nhẫn chờ đợi. Mùi cá tanh nồng, mùi mồ hôi, và tiếng la hét trả giá trộn lẫn vào nhau. Anh không có tiền để chen chân vào những sọt cá tươi rói kia. Vốn liếng của anh là ký ức và sự liều lĩnh.",
+            "Đúng như anh nhớ, mãi đến khi mặt trời lên quá con sào, tàu của lão Bốn 'Mặt Sắt' mới lừ lừ cập bến. Tiếng lão chửi đổng vang cả một góc: 'Mẹ kiếp, hỏng hết rồi! Đổ đi cho chó ăn!'. Đám bạn thuyền uể oải xúc từng xẻng cá bạc má, cá phèn, cá mối... nhỏ bằng hai ngón tay, đã bắt đầu ươn mình, đổ thẳng xuống nền đất nhầy nhụa. Người làm mắm chê cá đã bở, không ai thèm ngó tới.",
+            "Đó là lúc Lâm bước ra. 'Bác Bốn, chỗ cá này... hay để cháu dọn giúp cho? Cháu gửi bác tiền trà nước.' Lão Bốn nheo mắt nhìn gã trai gầy nhom, rồi phẩy tay: 'Mày mang đi đâu thì mang cho khuất mắt tao. Cầm lấy mà cho lợn ăn đi'. Không cần trả một đồng, Lâm lập tức hành động. Anh không vơ tất cả. Bằng con mắt nhà nghề, anh nhanh chóng phân loại: loại một còn cứng mình, mắt trong; loại hai hơi mềm bụng; loại ba chỉ để làm phân. Anh xếp cá loại một và hai vào thúng, cứ một lớp cá lại một lớp bèo tây ẩm, làm việc nhanh gọn và chuyên nghiệp đến mức vài người tò mò phải dừng lại nhìn. Họ chỉ cười khẩy, cho rằng gã trai nghèo đói đến hóa rồ, đi nhặt cả cá ươn về ăn."
+          ],
+          "stateChange": "Từ chỗ tay không, Lâm đã sở hữu được một lượng lớn cá dạt có giá trị tiềm năng mà không tốn một xu.",
+          "earnedReward": "Hai thúng cá dạt đã được phân loại và bảo quản đúng cách bằng lớp cách nhiệt tự nhiên.",
+          "unresolvedPressure": "Cá đã trong tay, nhưng lớp cách nhiệt chỉ có tác dụng trong vài giờ. Anh phải gánh hai thúng cá nặng trĩu lên chợ huyện trước khi nắng trưa làm hỏng mọi công sức."
+        },
+        {
+          "chapterNumber": 3,
+          "title": "Những Đồng Tiền Tươi Hơn Cá",
+          "proseParagraphs": [
+            "Đòn gánh kẽo kẹt trên vai, siết vào phần xương vai gầy guộc của Lâm đau buốt. Con đường đất lên chợ huyện như dài vô tận dưới cái nắng sớm. Mỗi bước đi là một lần thử thách ý chí. Anh phải đi nhanh, nhưng cũng phải giữ thăng bằng để cá không bị xóc, dập nát.",
+            "Đến chợ, Lâm chọn một góc khuất, mở thúng cá ra. Trong khi hàng cá của các tiểu thương khác đã chảy nước, mềm nhũn vì chỉ được ướp qua loa ít đá vụn đắt đỏ, thì cá của anh vẫn khô ráo, mình săn chắc, mắt cá còn trong. Một bà chủ quán cơm có kinh nghiệm đi ngang qua, liếc mắt một cái liền dừng lại. Bà bốc một con cá bạc má lên, ấn nhẹ vào thân nó, ngạc nhiên vì độ đàn hồi.",
+            "'Cá này sao tươi thế? Mày lấy đâu ra mà không có đá?'. Lâm chỉ cười hiền: 'Cháu có cách riêng, thím ạ. Thím lấy mở hàng cho cháu, cháu để giá mềm'. Bà chủ quán không nói hai lời, mua hết sọt cá loại một của anh. Những tiểu thương khác thấy vậy cũng xúm lại, và chẳng mấy chốc, hai thúng cá đã bán hết sạch. Số tiền lẻ vo tròn trong túi quần là thành quả ngọt ngào nhất.",
+            "Lâm không la cà. Anh đi thẳng đến hàng gạo, đong năm cân gạo trắng thơm. Sau một thoáng đắn đo, anh tặc lưỡi đến hàng thịt, lạng một miếng thịt ba chỉ nhỏ. Trên đường về, đòn gánh trên vai nhẹ bẫng, thay vào đó là túi gạo và miếng thịt lợn đung đưa theo mỗi bước chân. Anh nghĩ đến bát cháo thịt nóng hổi cho vợ, và lần đầu tiên sau khi sống lại, anh cảm thấy tương lai không còn mờ mịt nữa."
+          ],
+          "stateChange": "Từ một người sở hữu tài sản sắp hỏng, Lâm đã biến nó thành tiền mặt và nhu yếu phẩm, hoàn thành chu trình kinh doanh đầu tiên.",
+          "earnedReward": "Tiền bán cá đủ để mua 5 cân gạo và một miếng thịt lợn - bữa ăn có thịt đầu tiên cho gia đình, một sự cải thiện vật chất rõ rệt.",
+          "unresolvedPressure": "Thành công lần này dựa vào may mắn và ký ức. Để biến nó thành một sinh kế bền vững, anh cần lặp lại quy trình này mỗi ngày, đối mặt với sự kiệt quệ về thể chất và sự cạnh tranh tiềm tàng khi bí quyết của anh bị chú ý."
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "candidateId": "c2_bamboo_traps",
+      "chapters": [
+        {
+          "chapterNumber": 1,
+          "title": "Tre Vụn Đêm Mưa",
+          "proseParagraphs": [
+            "Trận bão đêm qua quật nát mấy rặng phi lao, cũng xô đổ luôn giàn tre nhà chú Ba hàng xóm. Hai Lẫm ngồi trong căn nhà lá lụp xụp, nghe tiếng mưa rơi đều đều trên mái, mắt không rời đống tre ngổn ngang ướt sũng bên kia hàng rào. Người ta thấy tan hoang, còn anh thấy cơ hội. Với tay nghề thợ cả và sự am hiểu con nước, anh biết mình không cần một tấm lưới xịn để kiếm ăn, anh chỉ cần thứ mà cơn bão vừa ban cho.",
+            "Xỏ vội đôi dép lê, Hai Lẫm đội mảnh bao tải rách chạy sang. Chú Ba đang rầu rĩ dọn dẹp, thấy anh liền xua tay: \"Chú lấy thì lấy hết đi cho rảnh đất. Tre dập hết rồi, chỉ có nước chẻ ra phơi khô làm củi\". Hai Lẫm mừng rơn, gật đầu cảm ơn rồi một mình vật lộn kéo từng thân tre nặng trĩu về sân. Anh không cần tre tốt, anh cần những đốt tre, những thanh nan có thể uốn được.",
+            "Dưới ánh đèn dầu leo lét, con dao phay sắc lẹm trong tay Hai Lẫm thoăn thoắt làm việc. Tiếng chẻ tre \"tách, tách\" vang lên khô khốc, xé tan màn đêm tĩnh mịch. Vỏ tre sắc như dao cứa vào bàn tay chai sần làm rướm máu, nhưng anh không dừng lại. Từng thanh nan được vót tròn, uốn cong và buộc chặt bằng những sợi lạt tre dẻo dai. Khung lồng dần thành hình, và cái hom một chiều, thứ cốt lõi để \"dụ\" ghẹ vào mà không ra được, được anh đan tỉ mỉ nhất. Đêm ấy, mồ hôi và máu đã đổi lấy ba chiếc lồng bát quái thô mộc nhưng chắc chắn."
+          ],
+          "stateChange": "Từ chỗ tay không và tuyệt vọng sau cơn bão, Hai Lẫm đã tự tạo ra được công cụ lao động đầu tiên từ những vật liệu bị người khác xem là phế thải.",
+          "earnedReward": "Ba chiếc lồng bẫy bằng tre tự đan, sẵn sàng cho chuyến đi biển đầu tiên.",
+          "unresolvedPressure": "Lồng đã có, nhưng con nước ròng sáng sớm không chờ đợi ai. Anh phải tính toán thật chuẩn xác thời điểm để đặt bẫy, nếu không cả đêm vất vả sẽ đổ sông đổ biển."
+        },
+        {
+          "chapterNumber": 2,
+          "title": "Lạch Đá Con Nước",
+          "proseParagraphs": [
+            "Trời chưa sáng rõ mặt người, Hai Lẫm đã thức giấc. Anh nhìn vầng trăng khuyết lơ lửng trên ngọn dừa, tính nhẩm con nước. Chính là lúc này, khi nước bắt đầu rút mạnh nhất. Mồi bẫy là mấy con ốc đá anh đập giập từ chiều qua, bỏ vào túi lưới nhỏ rồi buộc chặt vào đáy mỗi chiếc lồng. Mùi tanh đặc trưng của nó sẽ theo dòng nước len lỏi vào từng kẽ đá, gọi mời lũ ghẹ đang ẩn mình.",
+            "Chiếc xuồng ba lá cũ kỹ chòng chành khi anh chất ba chiếc lồng cồng kềnh lên. Chúng chiếm gần hết diện tích, khiến việc xoay xở trở nên vô cùng khó khăn. Anh một tay giữ thăng bằng, một tay bơi nhẹ ra cửa lạch. Nơi này các thuyền lưới kéo luôn tránh xa vì đá ngầm lởm chởm như bàn chông, chỉ cần sơ sẩy là rách lưới, thậm chí là lật thuyền. Nhưng với Hai Lẫm, đây lại là địa bàn lý tưởng.",
+            "Anh khéo léo luồn lách qua những mỏm đá sắc nhọn mà anh đã thuộc nằm lòng vị trí. Dòng nước xiết muốn đẩy chiếc xuồng đi, nhưng kinh nghiệm đi biển từ nhỏ giúp anh ghì chắc tay chèo. Anh chọn đúng ba vị trí đã nhắm trước, nơi có những hốc đá sâu và dòng chảy khuất. Lần lượt từng chiếc lồng được thả xuống, chìm nghỉm trong làn nước bạc. Anh cắm mấy nhánh tre nhỏ làm dấu rồi lặng lẽ quay thuyền vào bờ, lòng phập phồng một niềm hy vọng."
+          ],
+          "stateChange": "Những chiếc lồng tre từ vật vô tri trên bờ đã trở thành những cái bẫy hoạt động, được đặt ở vị trí chiến lược mà chỉ riêng anh biết và khai thác được.",
+          "earnedReward": "Sự tự tin vào kiến thức con nước của mình được củng cố khi ba chiếc lồng đã nằm yên vị dưới rạn đá, sẵn sàng cho mẻ lưới đầu tiên.",
+          "unresolvedPressure": "Bẫy đã đặt, nhưng liệu có con ghẹ nào vào không, hay những chiếc lồng mỏng manh sẽ bị đá chém vỡ hoặc bị dòng nước cuốn đi mất trước khi anh kịp quay lại?"
+        },
+        {
+          "chapterNumber": 3,
+          "title": "Ghẹ Xanh Trả Công",
+          "proseParagraphs": [
+            "Con nước ròng tiếp theo, Hai Lẫm quay lại lạch đá. Từ xa, anh đã thấy những cây tre làm dấu vẫn còn đó. Tim anh đập thình thịch. Anh kéo dây lồng đầu tiên, hai tay cảm nhận được sức nặng khác thường. Chiếc lồng tre từ từ nhô lên khỏi mặt nước, và bên trong là những con ghẹ xanh to bằng bàn tay, giãy đành đạch, đôi càng xanh biếc giương lên đầy vẻ thách thức. Mắt Hai Lẫm sáng rực. Cả ba lồng đều đầy ắp.",
+            "Anh nhanh chóng gỡ ghẹ cho vào chiếc giỏ tre có lót sẵn rong biển ướt để giữ chúng sống và tươi roi rói. Vừa cập bến, anh đã mang thẳng đến vựa của bà Tư, đầu nậu khét tiếng khó tính trong xóm. Bà ta nheo mắt nhìn mớ ghẹ trong giỏ, rồi lại liếc qua mấy cái lồng tre cũ kỹ của anh, bĩu môi: \"Ghẹ lạch đá chứ gì, toàn loại nhỏ thôi\".",
+            "\"Bà cứ xem thử đi,\" Hai Lẫm bình tĩnh đáp, lật một con ghẹ to nhất lên. \"Ghẹ còn sống nguyên, chắc thịt, không phải thứ ghẹ ngộp dạt vào bờ đâu\". Bà Tư cầm lên xem xét, cặp mắt sắc sảo không thể chê vào đâu được. Sau một hồi kì kèo ép giá, thấy anh vẫn cứng rắn, bà ta liền móc tiền trả sòng phẳng. \"Được. Có hàng thì cứ mang qua đây\", bà nói, giọng không còn vẻ coi thường nữa.",
+            "Cầm xấp tiền trên tay, Hai Lẫm chạy ngay ra tiệm tạp hóa. Anh mua một bao gạo đầy, thứ mà cả nhà đã mong từ lâu. Số tiền còn lại, anh không do dự mà mua một cuộn chỉ cước loại tốt. Bữa cơm no đủ đã có, giờ là lúc phải tái đầu tư, phải làm cho những chiếc lồng tre trở nên bền chắc hơn."
+          ],
+          "stateChange": "Từ một người thợ biển tay trắng, Hai Lẫm đã chứng minh được phương pháp của mình là hiệu quả, biến kiến thức thành tiền bạc và có được nguồn vốn đầu tiên.",
+          "earnedReward": "Một khoản tiền đủ để mua gạo cho gia đình và một cuộn chỉ cước để bắt đầu cải tiến công cụ lao động, mở ra chu kỳ phát triển mới.",
+          "unresolvedPressure": "Thành công bước đầu đã khiến bà Tư đầu nậu để mắt tới. Liệu những người chài lưới khác có bắt đầu nghi ngờ và dòm ngó cái lạch đá cằn cỗi mà anh hay lui tới không?"
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "candidateId": "c3_sun_drying_fish",
+      "chapters": [
+        {
+          "chapterNumber": 1,
+          "title": "Cược Tất Cả Vào Mẻ Cá Bị Chê",
+          "proseParagraphs": [
+            "Trời hửng sáng, cảng cá đã ồn ào. Nhưng hôm nay, không khí có phần não nề. Cá nục được mùa, đầy ắp các khoang thuyền mà thương lái thì cứ lắc đầu chê ỏng chê eo, ép giá xuống tận bùn. Hai Lửa nhìn những con cá tươi rói, mắt còn trong veo bị trả giá rẻ mạt mà lòng quặn thắt. Trong đầu anh lóe lên một ý nghĩ táo bạo, một kỹ thuật mà cha anh đã truyền lại.",
+            "Anh chạy về nhà, nơi vợ anh, chị Ba, đang vá lại tấm lưới cũ. \"Mình ơi, đưa hết số tiền mừng cưới còn lại cho tôi,\" Hai Lửa nói, giọng gấp gáp. Chị Ba sững người, buông kim: \"Anh nói gì vậy? Đó là vốn liếng cuối cùng để phòng thân, để sắm cho con cái nôi. Anh định làm gì?\".",
+            "\"Tôi sẽ mua hết mẻ cá nục bị chê ở bến. Tôi có cách làm chúng đáng giá gấp nhiều lần,\" anh quả quyết, mắt ánh lên niềm tin vào bí quyết gia truyền. Cuộc tranh cãi nổ ra, chị Ba khóc hết nước mắt vì lo sợ, còn Hai Lửa thì kiên nhẫn giải thích về cách muối, cách canh nắng để miếng cá săn lại, ngọt thơm chứ không mặn chát. Cuối cùng, trước sự quyết tâm của chồng, chị Ba đành gật đầu trong lo lắng, trao cho anh bọc tiền cuối cùng của gia đình.",
+            "Hai Lửa cầm tiền quay lại bến cá, dốc sạch túi mua lại toàn bộ số cá nục mà thương lái vừa thẳng thừng từ chối. Anh trở thành chủ nhân của một núi cá tươi, và cũng là con nợ của một canh bạc mà tương lai cả nhà được đặt cược vào đó."
+          ],
+          "stateChange": "Từ một ngư dân tay trắng trở thành người sở hữu một mẻ cá nục bị chê với toàn bộ vốn liếng đặt cược vào đó.",
+          "earnedReward": "Quyền sở hữu mẻ cá nục và cơ hội để chứng minh kỹ thuật làm cá một nắng bí truyền của mình.",
+          "unresolvedPressure": "Phải xử lý toàn bộ mẻ cá khổng lồ trong một đêm trước khi chúng ươn hỏng, và phải chứng minh cho vợ thấy quyết định của mình là đúng đắn."
+        },
+        {
+          "chapterNumber": 2,
+          "title": "Thức Trắng Đêm Cùng Muối Biển",
+          "proseParagraphs": [
+            "Mùi tanh của cá tươi xộc lên nồng nặc trong căn chòi nhỏ. Dưới ánh đèn dầu leo lét, hai vợ chồng Hai Lửa thức trắng đêm. Anh thoăn thoắt mổ bụng, làm sạch từng con cá, tay rát buốt vì máu và vảy. Chị Ba, dù ban đầu phản đối, giờ cũng xắn tay áo phụ chồng, ngâm cá vào thùng nước muối loãng được pha theo một tỉ lệ chính xác mà Hai Lửa đã dặn. Từng thau cá được xả sạch nhớt và máu tanh, để lộ ra phần thịt trắng ngần.",
+            "Trời chưa sáng rõ, Hai Lửa đã tất tả chạy sang nhà hàng xóm, xin mượn mấy tấm mành tre cũ. Anh cẩn thận căng chúng trên những chiếc cọc gỗ, đảm bảo mặt mành phải cách mặt đất đúng một mét để đón gió và tránh hơi ẩm. Từng con cá nục đã được xẻ phanh, ướp muối vừa đủ, được anh nhẹ nhàng trải đều lên mặt mành.",
+            "Khi những tia nắng đầu tiên của ngày rọi xuống, cả một sân phơi cá trắng bạc đã sẵn sàng. Hàng xóm đi qua, người thì tặc lưỡi tiếc của, kẻ lại lắc đầu cho rằng anh gàn dở khi đem cá tươi ngon đi xát muối phơi nắng. Hai Lửa mặc kệ, đôi mắt anh chỉ tập trung vào bầu trời, vào hướng đi của nắng và gió. Một cơn mưa bất chợt lúc này có thể cuốn trôi tất cả."
+          ],
+          "stateChange": "Từ một núi cá tươi có nguy cơ ươn hỏng thành những con cá nục một nắng được sơ chế đúng kỹ thuật, đang phơi mình trên giàn, chờ đợi thành quả.",
+          "earnedReward": "Mẻ cá được sơ chế và phơi đúng kỹ thuật, hứa hẹn một thành phẩm chất lượng cao, vượt qua được giai đoạn xử lý ban đầu đầy khó khăn.",
+          "unresolvedPressure": "Chất lượng cuối cùng của cá và khả năng bán được chúng với giá tốt vẫn là một ẩn số. Thời tiết vẫn có thể trở mặt bất cứ lúc nào."
+        },
+        {
+          "chapterNumber": 3,
+          "title": "Mùi Thơm Nức Lòng Cả Xóm Chài",
+          "proseParagraphs": [
+            "Nắng chiều vừa tắt, Hai Lửa cẩn thận lật những con cá trên mành. Chúng đã ngả màu vàng trong, thân cá dẻo lại, săn chắc, tỏa ra một mùi thơm dìu dịu đặc trưng. Anh chọn lấy một con to nhất, đặt lên vỉ nướng trên bếp than hồng. Mỡ cá chảy xuống xèo xèo, một mùi thơm lừng, đậm đà lan tỏa khắp xóm chài, khiến những người hàng xóm đang chuẩn bị bữa tối cũng phải ngoái nhìn.",
+            "Anh gỡ miếng cá nóng hổi, đưa cho vợ. Chị Ba cắn thử một miếng, vị ngọt đậm của thịt cá tươi hòa quyện với cái mặn dịu của muối biển và hương thơm của nắng tan ra trong miệng. Chị nhìn chồng, ánh mắt không còn lo âu mà thay vào đó là sự thán phục. Chỉ với một miếng cá, mọi nghi ngờ đã được xóa tan.",
+            "Sáng hôm sau, Hai Lửa gom cá vào hai chiếc giỏ lớn, cẩn thận chở lên cửa hàng bách hóa tổng hợp của huyện. Ông cửa hàng trưởng, một người nổi tiếng cứng nhắc, nhìn mẻ cá lạ, không nhãn mác, không giấy tờ, liền xua tay từ chối. Không nản lòng, Hai Lửa mời ông ăn thử con cá nướng anh đã chuẩn bị sẵn. Ban đầu từ chối, nhưng trước mùi thơm không thể cưỡng lại, ông cũng miễn cưỡng nếm thử. Vị ngon bất ngờ khiến ông sững lại. Ngay lập tức, ông đồng ý mua toàn bộ số cá với giá cao gấp ba lần vốn Hai Lửa bỏ ra, còn chủ động hướng dẫn anh cách làm giấy tờ để trở thành nhà cung cấp chính thức.",
+            "Cầm số tiền lời trên tay, Hai Lửa biết rằng, một chương mới của gia đình mình đã thực sự bắt đầu."
+          ],
+          "stateChange": "Từ chỗ là người có sản phẩm tốt nhưng không có đầu ra, anh đã thuyết phục được kênh phân phối chính thống và có được lợi nhuận đầu tiên.",
+          "earnedReward": "Lợi nhuận gấp ba lần vốn, sự công nhận tuyệt đối từ vợ, và một mối làm ăn ổn định với cửa hàng mậu dịch huyện.",
+          "unresolvedPressure": "Làm thế nào để duy trì chất lượng và mở rộng sản xuất với số vốn ít ỏi vừa kiếm được khi nhu cầu đã xuất hiện và đơn đặt hàng đầu tiên đã có?"
+        }
+      ]
+    }
+  ],
+  "openingReviews": [
+    {
+      "schemaVersion": 3,
+      "judgeId": "opening_judge_1",
+      "ranking": [
+        "c1_bycatch_ice",
+        "c2_bamboo_traps",
+        "c3_sun_drying_fish"
+      ],
+      "scores": [
+        {
+          "candidateId": "c1_bycatch_ice",
+          "openingPull": 9,
+          "worldSpecificity": 9,
+          "protagonistAgency": 9,
+          "causalReward": 9,
+          "characterLife": 8,
+          "seriality30": 8,
+          "proseNaturalness": 9,
+          "readChapter4": 9,
+          "criticalFails": [],
+          "evidence": [
+            {
+              "chapterNumber": 1,
+              "excerpt": "Bèo phải phơi qua một nắng cho se mặt, nhưng không được khô giòn, để giữ lại độ ẩm bên trong lõi xốp, tạo thành lớp cách nhiệt hoàn hảo.",
+              "reason": "Thể hiện kiến thức chuyên môn đặc thù và sự chuẩn bị có chủ đích, sáng tạo của nhân vật chính từ những vật liệu bỏ đi."
+            },
+            {
+              "chapterNumber": 2,
+              "excerpt": "Anh xếp cá loại một và hai vào thúng, cứ một lớp cá lại một lớp bèo tây ẩm, làm việc nhanh gọn và chuyên nghiệp đến mức vài người tò mò phải dừng lại nhìn.",
+              "reason": "Hành động giải quyết vấn đề rõ ràng, áp dụng vật liệu đã chuẩn bị vào thực tế một cách logic."
+            },
+            {
+              "chapterNumber": 3,
+              "excerpt": "Trong khi hàng cá của các tiểu thương khác đã chảy nước, mềm nhũn vì chỉ được ướp qua loa ít đá vụn đắt đỏ, thì cá của anh vẫn khô ráo, mình săn chắc, mắt cá còn trong.",
+              "reason": "Phần thưởng nhân quả xứng đáng và thuyết phục cho sự chuẩn bị kỹ lưỡng ở các chương trước."
+            }
+          ]
+        },
+        {
+          "candidateId": "c2_bamboo_traps",
+          "openingPull": 8,
+          "worldSpecificity": 9,
+          "protagonistAgency": 9,
+          "causalReward": 9,
+          "characterLife": 8,
+          "seriality30": 8,
+          "proseNaturalness": 9,
+          "readChapter4": 8,
+          "criticalFails": [],
+          "evidence": [
+            {
+              "chapterNumber": 1,
+              "excerpt": "Khung lồng dần thành hình, và cái hom một chiều, thứ cốt lõi để 'dụ' ghẹ vào mà không ra được, được anh đan tỉ mỉ nhất.",
+              "reason": "Chi tiết chế tác công cụ cụ thể, cho thấy sự am hiểu nghề nghiệp và tính tự chủ cao của nhân vật."
+            },
+            {
+              "chapterNumber": 2,
+              "excerpt": "Mồi bẫy là mấy con ốc đá anh đập giập từ chiều qua, bỏ vào túi lưới nhỏ rồi buộc chặt vào đáy mỗi chiếc lồng.",
+              "reason": "Kiến thức về tập tính sinh vật biển được áp dụng hợp lý, tạo nền tảng vững chắc cho thành quả sau này."
+            },
+            {
+              "chapterNumber": 3,
+              "excerpt": "Anh mua một bao gạo đầy, thứ mà cả nhà đã mong từ lâu. Số tiền còn lại, anh không do dự mà mua một cuộn chỉ cước loại tốt.",
+              "reason": "Phần thưởng thiết thực và tư duy tái đầu tư mở ra hướng phát triển tiếp theo cho câu chuyện."
+            }
+          ]
+        },
+        {
+          "candidateId": "c3_sun_drying_fish",
+          "openingPull": 7,
+          "worldSpecificity": 7,
+          "protagonistAgency": 8,
+          "causalReward": 6,
+          "characterLife": 6,
+          "seriality30": 7,
+          "proseNaturalness": 7,
+          "readChapter4": 6,
+          "criticalFails": [
+            "Nút thắt đầu ra sản phẩm được giải quyết quá dễ dàng và thiếu thực tế"
+          ],
+          "evidence": [
+            {
+              "chapterNumber": 1,
+              "excerpt": "Cuộc tranh cãi nổ ra, chị Ba khóc hết nước mắt vì lo sợ, còn Hai Lửa thì kiên nhẫn giải thích về cách muối, cách canh nắng",
+              "reason": "Xung đột gia đình hơi rập khuôn và mang tính kịch tính hóa, thiếu đi sự tinh tế trong việc xây dựng nhân vật phụ."
+            },
+            {
+              "chapterNumber": 2,
+              "excerpt": "đảm bảo mặt mành phải cách mặt đất đúng một mét để đón gió và tránh hơi ẩm.",
+              "reason": "Chi tiết kỹ thuật phơi cá khá tốt, thể hiện sự am hiểu nghề và tạo được sự chân thực cho quá trình chế biến."
+            },
+            {
+              "chapterNumber": 3,
+              "excerpt": "Ngay lập tức, ông đồng ý mua toàn bộ số cá với giá cao gấp ba lần vốn Hai Lửa bỏ ra, còn chủ động hướng dẫn anh cách làm giấy tờ để trở thành nhà cung cấp chính thức.",
+              "reason": "Sự việc diễn ra quá thuận lợi. Một cửa hàng trưởng cứng nhắc lại dễ dàng mua hàng không nhãn mác với giá cao gấp 3 và tự lo giấy tờ là một phần thưởng thiếu tính nhân quả chặt chẽ."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "judgeId": "opening_judge_2",
+      "ranking": [
+        "c1_bycatch_ice",
+        "c2_bamboo_traps",
+        "c3_sun_drying_fish"
+      ],
+      "scores": [
+        {
+          "candidateId": "c1_bycatch_ice",
+          "openingPull": 9,
+          "worldSpecificity": 9,
+          "protagonistAgency": 9,
+          "causalReward": 8,
+          "characterLife": 8,
+          "seriality30": 9,
+          "proseNaturalness": 8,
+          "readChapter4": 9,
+          "criticalFails": [],
+          "evidence": [
+            {
+              "chapterNumber": 1,
+              "excerpt": "Bèo phải phơi qua một nắng cho se mặt, nhưng không được khô giòn, để giữ lại độ ẩm bên trong lõi xốp, tạo thành lớp cách nhiệt hoàn hảo.",
+              "reason": "The technical specificity of using water hyacinth as a natural insulator demonstrates high world specificity and a clever use of protagonist knowledge."
+            },
+            {
+              "chapterNumber": 2,
+              "excerpt": "Anh không vơ tất cả. Bằng con mắt nhà nghề, anh nhanh chóng phân loại: loại một còn cứng mình, mắt trong; loại hai hơi mềm bụng; loại ba chỉ để làm phân.",
+              "reason": "Shows the protagonist's professional expertise and agency in a way that feels earned and grounded."
+            }
+          ]
+        },
+        {
+          "candidateId": "c2_bamboo_traps",
+          "openingPull": 8,
+          "worldSpecificity": 8,
+          "protagonistAgency": 9,
+          "causalReward": 8,
+          "characterLife": 7,
+          "seriality30": 8,
+          "proseNaturalness": 8,
+          "readChapter4": 8,
+          "criticalFails": [],
+          "evidence": [
+            {
+              "chapterNumber": 1,
+              "excerpt": "Từng thanh nan được vót tròn, uốn cong và buộc chặt bằng những sợi lạt tre dẻo dai. Khung lồng dần thành hình, và cái hom một chiều, thứ cốt lõi để \"dụ\" ghẹ vào mà không ra được, được anh đan tỉ mỉ nhất.",
+              "reason": "The focus on the craft of trap-making provides strong protagonist agency and a tangible sense of progress."
+            },
+            {
+              "chapterNumber": 2,
+              "excerpt": "Nơi này các thuyền lưới kéo luôn tránh xa vì đá ngầm lởm chởm như bàn chông, chỉ cần sơ sẩy là rách lưới, thậm chí là lật thuyền. Nhưng với Hai Lẫm, đây lại là địa bàn lý tưởng.",
+              "reason": "Establishes a clear niche for the protagonist, utilizing environmental knowledge to overcome a lack of resources."
+            }
+          ]
+        },
+        {
+          "candidateId": "c3_sun_drying_fish",
+          "openingPull": 7,
+          "worldSpecificity": 7,
+          "protagonistAgency": 8,
+          "causalReward": 7,
+          "characterLife": 7,
+          "seriality30": 7,
+          "proseNaturalness": 7,
+          "readChapter4": 7,
+          "criticalFails": [],
+          "evidence": [
+            {
+              "chapterNumber": 1,
+              "excerpt": "Cuộc tranh cãi nổ ra, chị Ba khóc hết nước mắt vì lo sợ, còn Hai Lửa thì kiên nhẫn giải thích về cách muối, cách canh nắng để miếng cá săn lại, ngọt thơm chứ không mặn chát.",
+              "reason": "While the conflict is clear, the prose relies on somewhat clichéd emotional descriptions compared to the other candidates."
+            },
+            {
+              "chapterNumber": 3,
+              "excerpt": "Ông cửa hàng trưởng, một người nổi tiếng cứng nhắc... Ban đầu từ chối, nhưng trước mùi thơm không thể cưỡng lại, ông cũng miễn cưỡng nếm thử. Vị ngon bất ngờ khiến ông sững lại.",
+              "reason": "The resolution with the store manager feels a bit rushed and follows a very traditional 'hidden gem' trope, though it provides a clear causal reward."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "judgeId": "opening_judge_3",
+      "ranking": [
+        "c2_bamboo_traps",
+        "c1_bycatch_ice",
+        "c3_sun_drying_fish"
+      ],
+      "scores": [
+        {
+          "candidateId": "c1_bycatch_ice",
+          "openingPull": 9.5,
+          "worldSpecificity": 9,
+          "protagonistAgency": 10,
+          "causalReward": 10,
+          "characterLife": 9.5,
+          "seriality30": 9,
+          "proseNaturalness": 9.5,
+          "readChapter4": 10,
+          "criticalFails": [],
+          "evidence": [
+            {
+              "chapterNumber": 1,
+              "excerpt": "Sống lại mấy ngày, anh vẫn chưa quen được với cái đói cồn cào và sự yếu ớt của cơ thể này. Nhưng hôm nay thì khác. Trong ký ức của một gã thương lái hải sản hơn ba mươi năm kinh nghiệm, chính ngày hôm nay, con tàu của lão Bốn 'Mặt Sắt' sẽ về bến trễ, mang theo một mẻ cá dạt khổng lồ nhưng gần như hỏng hết vì nắng.",
+              "reason": "Mở đầu cực kỳ hấp dẫn với mô-típ trọng sinh, tạo ra một nhân vật chính có lợi thế thông tin rõ ràng và một kế hoạch cụ thể ngay từ đầu. Điều này tạo sự tò mò lớn về việc anh ta sẽ tận dụng ký ức của mình như thế nào."
+            },
+            {
+              "chapterNumber": 2,
+              "excerpt": "Anh không vơ tất cả. Bằng con mắt nhà nghề, anh nhanh chóng phân loại: loại một còn cứng mình, mắt trong; loại hai hơi mềm bụng; loại ba chỉ để làm phân. Anh xếp cá loại một và hai vào thúng, cứ một lớp cá lại một lớp bèo tây ẩm, làm việc nhanh gọn và chuyên nghiệp đến mức vài người tò mò phải dừng lại nhìn.",
+              "reason": "Nhân vật chính thể hiện năng lực vượt trội và chủ động. Hành động phân loại cá chuyên nghiệp giữa một đống cá bỏ đi cho thấy kiến thức và sự tính toán của anh, khẳng định giá trị của ký ức tiền kiếp."
+            },
+            {
+              "chapterNumber": 3,
+              "excerpt": "Trên đường về, đòn gánh trên vai nhẹ bẫng, thay vào đó là túi gạo và miếng thịt lợn đung đưa theo mỗi bước chân. Anh nghĩ đến bát cháo thịt nóng hổi cho vợ, và lần đầu tiên sau khi sống lại, anh cảm thấy tương lai không còn mờ mịt nữa.",
+              "reason": "Phần thưởng nhận được rất cụ thể và giàu cảm xúc. Nó không chỉ là tiền, mà là sự cải thiện trực tiếp cho cuộc sống gia đình (gạo, thịt), kết nối chặt chẽ với động lực ban đầu của nhân vật là chăm sóc cho người vợ bệnh tật."
+            }
+          ]
+        },
+        {
+          "candidateId": "c2_bamboo_traps",
+          "openingPull": 9.5,
+          "worldSpecificity": 10,
+          "protagonistAgency": 10,
+          "causalReward": 10,
+          "characterLife": 9,
+          "seriality30": 9.5,
+          "proseNaturalness": 10,
+          "readChapter4": 10,
+          "criticalFails": [],
+          "evidence": [
+            {
+              "chapterNumber": 1,
+              "excerpt": "Dưới ánh đèn dầu leo lét, con dao phay sắc lẹm trong tay Hai Lẫm thoăn thoắt làm việc. Tiếng chẻ tre \"tách, tách\" vang lên khô khốc, xé tan màn đêm tĩnh mịch. Vỏ tre sắc như dao cứa vào bàn tay chai sần làm rướm máu, nhưng anh không dừng lại.",
+              "reason": "Nhân vật chính cực kỳ chủ động, biến phế liệu thành công cụ lao động bằng chính kỹ năng và sự cần cù của mình. Chi tiết 'mồ hôi và máu' cho thấy sự quyết tâm và cái giá phải trả cho thành quả ban đầu, tạo sự đồng cảm."
+            },
+            {
+              "chapterNumber": 2,
+              "excerpt": "Anh khéo léo luồn lách qua những mỏm đá sắc nhọn mà anh đã thuộc nằm lòng vị trí. Dòng nước xiết muốn đẩy chiếc xuồng đi, nhưng kinh nghiệm đi biển từ nhỏ giúp anh ghì chắc tay chèo. Anh chọn đúng ba vị trí đã nhắm trước, nơi có những hốc đá sâu và dòng chảy khuất.",
+              "reason": "Thế giới và kỹ năng của nhân vật được mô tả rất đặc thù và chi tiết. Việc khai thác một 'lạch đá' nguy hiểm mà người khác né tránh cho thấy kiến thức độc nhất và sự liều lĩnh có tính toán của anh, tạo nên một lợi thế cạnh tranh đáng tin cậy."
+            },
+            {
+              "chapterNumber": 3,
+              "excerpt": "Số tiền còn lại, anh không do dự mà mua một cuộn chỉ cước loại tốt. Bữa cơm no đủ đã có, giờ là lúc phải tái đầu tư, phải làm cho những chiếc lồng tre trở nên bền chắc hơn.",
+              "reason": "Phần thưởng không chỉ giải quyết vấn đề trước mắt (cái ăn) mà còn được tái đầu tư một cách thông minh để phát triển công cụ sản xuất. Điều này cho thấy tầm nhìn của nhân vật và mở ra một vòng lặp phát triển rất hứa hẹn cho các chương sau."
+            }
+          ]
+        },
+        {
+          "candidateId": "c3_sun_drying_fish",
+          "openingPull": 9,
+          "worldSpecificity": 8.5,
+          "protagonistAgency": 9.5,
+          "causalReward": 9,
+          "characterLife": 9.5,
+          "seriality30": 9,
+          "proseNaturalness": 9,
+          "readChapter4": 9.5,
+          "criticalFails": [],
+          "evidence": [
+            {
+              "chapterNumber": 1,
+              "excerpt": "Cuộc tranh cãi nổ ra, chị Ba khóc hết nước mắt vì lo sợ, còn Hai Lửa thì kiên nhẫn giải thích về cách muối, cách canh nắng để miếng cá săn lại, ngọt thơm chứ không mặn chát. Cuối cùng, trước sự quyết tâm của chồng, chị Ba đành gật đầu trong lo lắng, trao cho anh bọc tiền cuối cùng của gia đình.",
+              "reason": "Mâu thuẫn nội bộ gia đình ngay từ đầu tạo ra kịch tính và cảm xúc mạnh. Việc nhân vật chính phải thuyết phục chính người thân của mình và đặt cược tất cả vốn liếng cuối cùng khiến cho mức độ rủi ro trở nên rất cao, làm người đọc tò mò muốn biết kết quả."
+            },
+            {
+              "chapterNumber": 2,
+              "excerpt": "Chị Ba, dù ban đầu phản đối, giờ cũng xắn tay áo phụ chồng, ngâm cá vào thùng nước muối loãng được pha theo một tỉ lệ chính xác mà Hai Lửa đã dặn. Từng thau cá được xả sạch nhớt và máu tanh, để lộ ra phần thịt trắng ngần.",
+              "reason": "Hành động của nhân vật chính đã thuyết phục được người vợ. Sự hợp tác của hai vợ chồng sau mâu thuẫn ban đầu cho thấy sự phát triển trong mối quan hệ và củng cố niềm tin vào kế hoạch của anh. Chi tiết 'tỉ lệ chính xác' nhấn mạnh vào bí quyết riêng."
+            },
+            {
+              "chapterNumber": 3,
+              "excerpt": "Ngay lập tức, ông đồng ý mua toàn bộ số cá với giá cao gấp ba lần vốn Hai Lửa bỏ ra, còn chủ động hướng dẫn anh cách làm giấy tờ để trở thành nhà cung cấp chính thức.",
+              "reason": "Phần thưởng rất lớn và rõ ràng, không chỉ là lợi nhuận mà còn là một cơ hội kinh doanh bền vững (trở thành nhà cung cấp chính thức). Điều này giải quyết triệt để vấn đề đầu ra và mở ra một tương lai hoàn toàn mới cho gia đình nhân vật."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "selected": {
+    "id": "c1_bycatch_ice",
+    "title": "Mẻ Biển Hừng Đông",
+    "premise": "Sống lại năm 1988, một cựu thương lái hải sản nhận ra rào cản lớn nhất không phải là thiếu cá, mà là cá vụn bị hỏng do thiếu đá lạnh. Anh dùng bèo tây và lá chuối khô làm lớp cách nhiệt tự nhiên, cứu lấy mẻ 'cá dạt' và biến nó thành những bữa cơm có thịt đầu tiên.",
+    "protagonistEngine": "Kinh nghiệm quản lý hao hụt hải sản và khả năng tối ưu hóa nhiệt độ bảo quản bằng vật liệu thô sơ.",
+    "protagonistContradiction": "Sở hữu kiến thức bảo quản chuẩn mực nhưng lại bị giới hạn bởi thân thể gầy gò và việc nhà máy đá địa phương chỉ bán cho tàu lớn.",
+    "advantageLimits": "Lớp cách nhiệt tự nhiên chỉ kéo dài độ tươi được 4-6 tiếng, buộc anh phải chạy đua với thời gian để lên chợ huyện trước khi nắng gắt.",
+    "worldReaction": "Người làng cười chê vì gom 'cá rác', nhưng tiểu thương chợ huyện nhanh chóng nhận ra chất lượng cá tươi không xước bụng và sẵn sàng trả giá cao hơn.",
+    "openingAdvantage": "Nhớ lại một mẻ cá dạt cực lớn của bến cá ngày hôm đó bị đổ bỏ do tàu về trễ, anh chủ động chuẩn bị thúng tre và lớp lót từ đêm.",
+    "firstThreeChapterMechanism": "Chương 1: Thu gom bèo tây, phơi qua một nắng. Chương 2: Chờ bến cá hừng đông, xin mua rẻ mẻ cá dạt, phân loại và ướp ngay tại chỗ. Chương 3: Gánh cá lên chợ, bán được tiền tươi và mua ngay cân gạo, miếng thịt lợn về nấu cơm cho vợ đang bệnh.",
+    "causalCost": "Đánh đổi giấc ngủ và sức lực cơ bắp; bèo tây phải hái và xử lý liên tục, mỗi chuyến đi là một lần kiệt sức.",
+    "mechanismFingerprint": [
+      "Phân loại cá dạt thành 3 cấp độ tươi",
+      "Xử lý bèo tây và lá chuối làm lớp bảo ôn",
+      "Tính toán thời gian từ bến lên chợ khớp với chu kỳ nhiệt độ"
+    ],
+    "rewardLoopFingerprint": [
+      "Mua rẻ cá dạt",
+      "Bảo quản không dùng đá",
+      "Bán giá cá tươi",
+      "Mua nhu yếu phẩm và mua thêm thúng"
+    ],
+    "conflictEconomyFingerprint": [
+      "Cạnh tranh mua cá dạt với người làm mắm",
+      "Thương lượng với người bán thịt lợn để đổi cá",
+      "Chia sẻ lợi ích với chủ xe bò để chở được nhiều hơn"
+    ],
+    "seriality30": [
+      "Chương 1-5: Trúng mẻ cá dạt đầu tiên, bảo quản bằng bèo tây, bán giá tốt và mang về bữa cơm đầy đặn.",
+      "Chương 6-10: Mua được xe kéo tay, ký gửi được cá cho một quán ăn nhỏ trên huyện, uy tín bắt đầu có.",
+      "Chương 11-15: Lượng cá lớn hơn giới hạn sức người, bắt đầu rủ hai người anh em họ cùng gom và đẩy xe.",
+      "Chương 16-20: Hình thành một trạm thu mua nhỏ lợp lá, gom tiền cọc để chen chân mua được đá viên từ nhà máy.",
+      "Chương 21-30: Nguồn cá dạt giảm do tàu chuộng lưới mắt nhỏ tận diệt; nhân vật quyết định chỉ thu mua cá đạt kích cỡ, thuyết phục bạn thuyền bỏ lưới tận diệt để bảo vệ sinh kế dài hạn."
+    ],
+    "antiStupidOpponent": "Trưởng bến cá: Không chèn ép vô lý nhưng kiên quyết thu phí bến bãi đàng hoàng, ban đầu nghi ngờ MC phá giá nhưng sau đó hợp tác khi thấy MC giúp dọn sạch bến.",
+    "domainResearchNeeds": [
+      "Cách dùng vật liệu tự nhiên cách nhiệt thập niên 80",
+      "Tỉ lệ hao hụt của cá biển khi không có đá lạnh",
+      "Giá cả gạo thịt và cá vụn thời kỳ đầu Đổi Mới"
+    ]
+  },
+  "callCount": 38
+}

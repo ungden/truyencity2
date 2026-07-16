@@ -9,6 +9,8 @@ import {
   runConceptTournamentV3,
   BlindCalibrationCorpusV3Schema,
   computeCalibrationMetricsV3,
+  assessOpeningFinalistV3,
+  applyChapterStateV3,
   runV3ProsePreflight,
   validateV3Artifacts,
   type ChapterPlanV3,
@@ -316,15 +318,101 @@ describe('flagship v3 core engine', () => {
     expect(classifyStoryFailure('Gemini 404: model gemini-3-pro-preview is no longer available.')).toBe('infrastructure');
     expect(classifyStoryFailure('OpenAI model route not found')).toBe('infrastructure');
   });
+
+  it('creates a new bounded fact and lets a character learn it in the same chapter', () => {
+    const base = plan();
+    const factDelta = {
+      id: 'new_market_fact',
+      kind: 'fact' as const,
+      factId: 'buyer_price_known',
+      valueBefore: null,
+      valueAfter: 'Người mua trực tiếp trả giá cao hơn khi cá được giữ lạnh đúng cách.',
+      evidenceRequired: true as const,
+    };
+    const knowledgeDelta = {
+      id: 'main_learns_price',
+      kind: 'character_knowledge' as const,
+      characterId: 'nguyen_hai_son',
+      factId: 'buyer_price_known',
+      learnedFrom: 'Sơn nghe người mua báo giá và tự đối chiếu tiền nhận được.',
+      evidenceRequired: true as const,
+    };
+    const nextPlan = ChapterPlanV3Schema.parse({
+      ...base,
+      scenes: base.scenes.map((scene, index) => index === 0
+        ? { ...scene, requiredDeltaIds: [...scene.requiredDeltaIds, factDelta.id, knowledgeDelta.id] }
+        : scene),
+      requiredDeltas: [...base.requiredDeltas, factDelta, knowledgeDelta],
+    });
+    expect(validateV3Artifacts({ kernel: kernel(), arc, state: state(), plan: nextPlan })).toHaveLength(0);
+    const next = applyChapterStateV3({
+      state: state(),
+      plan: nextPlan,
+      title: 'Giá Mua Trực Tiếp',
+      content: 'Sơn nhận báo giá và ghi lại bằng chứng giao dịch.',
+      realizedDeltaIds: nextPlan.requiredDeltas.map(delta => delta.id),
+    });
+    expect(next.facts).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: 'buyer_price_known', sourceChapter: 1 }),
+    ]));
+    expect(next.characters.find(item => item.characterId === 'nguyen_hai_son')?.knowledge).toEqual(
+      expect.arrayContaining([expect.objectContaining({ factId: 'buyer_price_known' })]),
+    );
+  });
 });
 
 describe('flagship v3 concept factory', () => {
+  it('blocks a finalist when any blind opening judge reports a critical failure', () => {
+    const candidateId = 'candidate_critical';
+    const reviews = Array.from({ length: 3 }, (_, index) => ({
+      schemaVersion: 3 as const,
+      judgeId: `judge_${index}`,
+      ranking: [candidateId, 'candidate_b', 'candidate_c'],
+      scores: [candidateId, 'candidate_b', 'candidate_c'].map(id => ({
+        candidateId: id,
+        openingPull: 8,
+        worldSpecificity: 8,
+        protagonistAgency: 8,
+        causalReward: 8,
+        characterLife: 8,
+        seriality30: 8,
+        proseNaturalness: 8,
+        readChapter4: 8,
+        criticalFails: index === 1 && id === candidateId ? ['Tài nguyên xuất hiện không có nguồn.'] : [],
+        evidence: [
+          { chapterNumber: 1, excerpt: 'Main chủ động kiểm tra vật chứng.', reason: 'Agency có hành động.' },
+          { chapterNumber: 3, excerpt: 'Giao dịch tạo thay đổi vật chất.', reason: 'Payoff có nguồn.' },
+        ],
+      })),
+    }));
+    expect(assessOpeningFinalistV3(reviews, candidateId).viable).toBe(false);
+  });
+
   it('uses two generators, complete pairwise judging and three blind opening reviews', async () => {
     const snapshot = MarketResearchSnapshotV3Schema.parse({
       schemaVersion: 3,
       snapshotId: 'urban_2026_07',
       genreLane: 'urban_professional',
       refreshedAt: new Date().toISOString(),
+      commission: {
+        slotId: 'dt_11',
+        audience: detailed('Độc giả nam Việt thích nghề nghiệp và thương lượng bằng kiến thức thật'),
+        desiredExperience: detailed('Mỗi chiến thắng đổi vị thế bằng bằng chứng, tay nghề và chi phí có nguồn'),
+        domainOpportunity: detailed('Một thị trường đồ cũ hư cấu với provenance, phục hồi và người mua có agenda'),
+        requiredMechanisms: [
+          detailed('Kiểm chứng vật liệu bằng nhiều nguồn độc lập'),
+          detailed('Uy tín mở cơ hội nhưng đồng thời tạo nghĩa vụ nghề nghiệp'),
+        ],
+        openingRequirements: [
+          detailed('Main chủ động từ chối lợi nhanh thiếu provenance trong chương một'),
+          detailed('Chậm nhất chương ba có giao dịch nhỏ và quan hệ mới có nguồn'),
+        ],
+        serialityRequirements: [
+          detailed('Ba mươi chương phải biến hóa giữa nguồn hàng, phục hồi và thương lượng'),
+          detailed('Mỗi thắng lợi phải làm thị trường và đối thủ điều chỉnh hợp lý'),
+        ],
+        boundaries: ['không mắt thần báo giá', 'không món nào cũng là bảo vật', 'không đối thủ ngu để bị vả mặt'],
+      },
       sources: Array.from({ length: 3 }, (_, index) => ({
         id: `source_${index}`,
         url: `https://example.com/source-${index}`,
@@ -345,8 +433,12 @@ describe('flagship v3 concept factory', () => {
       title: `Concept Trực Diện Số ${index}: Main Dùng Nghề Thật Để Đổi Đời`,
       premise: detailed(`Premise riêng số ${index}`),
       protagonistEngine: detailed(`Năng lực và giới hạn riêng số ${index}`),
+      protagonistContradiction: detailed(`Mâu thuẫn nội tâm riêng số ${index}`),
+      advantageLimits: detailed(`Lợi thế số ${index} có sai số và chi phí thật`),
       worldReaction: detailed(`Thế giới phản ứng theo lợi ích riêng số ${index}`),
       openingAdvantage: detailed(`Lợi thế hoạt động ngay trong opening số ${index}`),
+      firstThreeChapterMechanism: detailed(`Cơ chế số ${index} đổi trạng thái trong ba chương đầu`),
+      causalCost: detailed(`Mỗi lần dùng cơ chế số ${index} phải trả chi phí hữu hạn`),
       mechanismFingerprint: [`mechanism ${index} alpha`, `mechanism ${index} beta`, `mechanism ${index} gamma`],
       rewardLoopFingerprint: [`reward ${index} alpha`, `reward ${index} beta`, `reward ${index} gamma`],
       conflictEconomyFingerprint: [`conflict ${index} alpha`, `conflict ${index} beta`, `conflict ${index} gamma`],
@@ -375,7 +467,13 @@ describe('flagship v3 concept factory', () => {
           });
         }
         if (call.role === 'concept_judge') {
-          return JSON.stringify({ schemaVersion: 3, judgeId: `judge_${call.index + 1}`, comparisons });
+          const required = new Set((call.pairs || []).map(pair => [pair.leftId, pair.rightId].sort().join(':')));
+          return JSON.stringify({
+            schemaVersion: 3,
+            judgeId: `judge_${call.index + 1}`,
+            batchIndex: call.batchIndex,
+            comparisons: comparisons.filter(item => required.has([item.leftId, item.rightId].sort().join(':'))),
+          });
         }
         if (call.role === 'opening_simulator') {
           const candidate = candidates[call.index];
@@ -385,7 +483,9 @@ describe('flagship v3 concept factory', () => {
             chapters: Array.from({ length: 3 }, (_, chapter) => ({
               chapterNumber: chapter + 1,
               title: `Chương thử ${chapter + 1}`,
-              proseParagraphs: Array.from({ length: 8 }, (_, paragraph) => detailed(`Đoạn ${paragraph} chương ${chapter + 1} concept ${candidate.id}`)),
+              proseParagraphs: Array.from({ length: 8 }, (_, paragraph) =>
+                `${detailed(`Đoạn ${paragraph} chương ${chapter + 1} concept ${candidate.id}`)} ${'Chi tiết hành động có nguyên nhân và hậu quả. '.repeat(3)}`,
+              ),
               stateChange: detailed(`Trạng thái đổi ở chương ${chapter + 1}`),
               earnedReward: detailed(`Phần thưởng có nguồn ở chương ${chapter + 1}`),
               unresolvedPressure: detailed(`Áp lực còn mở sau chương ${chapter + 1}`),
@@ -416,12 +516,12 @@ describe('flagship v3 concept factory', () => {
       },
     });
     expect(comparisons).toHaveLength(190);
-    expect(result.callCount).toBe(11);
+    expect(result.callCount).toBe(38);
     expect(result.candidates).toHaveLength(20);
     expect(result.finalists).toHaveLength(3);
     expect(result.openingTrials).toHaveLength(3);
     expect(result.openingReviews).toHaveLength(3);
-    expect(calls).toHaveLength(11);
+    expect(calls).toHaveLength(38);
   });
 });
 

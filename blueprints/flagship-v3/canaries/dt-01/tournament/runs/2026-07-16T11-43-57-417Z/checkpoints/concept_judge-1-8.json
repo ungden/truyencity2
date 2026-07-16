@@ -1,0 +1,9 @@
+{
+  "role": "concept_judge",
+  "index": 1,
+  "batchIndex": 8,
+  "model": "gemini-3-flash-preview",
+  "promptVersion": "flagship-v3-concept-2026-07-16.2",
+  "estimatedCostUsd": 0.0302665,
+  "content": "{\"schemaVersion\":3,\"judgeId\":\"judge_2\",\"batchIndex\":8,\"comparisons\":[{\"leftId\":\"dt_01_concept_02\",\"rightId\":\"dt_01_concept_09\",\"winnerId\":\"dt_01_concept_02\",\"reason\":\"Concept 02 có sự kết hợp tốt hơn giữa kiến thức vi sinh và nghề mắm truyền thống, tạo ra sự thay đổi trạng thái sản phẩm rõ rệt và gắn liền với bữa cơm gia đình Việt hơn là việc chỉ phân loại muối ở Concept 09.\"},{\"leftId\":\"dt_01_concept_02\",\"rightId\":\"dt_01_concept_10\",\"winnerId\":\"dt_01_concept_02\",\"reason\":\"Concept 02 thực tế và phù hợp với bối cảnh kinh tế cuối thập niên 1980 hơn. Concept 10 về du lịch trải nghiệm quá xa lạ với tư duy làm giàu bằng tay nghề biển thời kỳ này.\"},{\"leftId\":\"dt_01_concept_03\",\"rightId\":\"dt_01_concept_04\",\"winnerId\":\"dt_01_concept_03\",\"reason\":\"Concept 03 tập trung vào cải tiến công cụ lao động thiết yếu (lưới), có agency tay nghề mạnh mẽ và giải quyết nợ nần nhanh chóng. Concept 04 gặp rào cản định kiến về rong biển quá lớn, khó tạo ra thành quả sớm trong 3 chương đầu"
+}
