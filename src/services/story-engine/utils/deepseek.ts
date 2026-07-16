@@ -67,7 +67,7 @@ function trackCost(
   cacheHitTokens: number,
   tracking: TrackingContext,
   metadata?: Record<string, unknown>,
-): void {
+): number {
   const p = pricingFor(model);
   // Per-model cache hit rate (not a flat ratio — Flash hit is 2% of miss, Pro hit is 0.83%).
   const cacheMissTokens = Math.max(0, inputTokens - cacheHitTokens);
@@ -92,6 +92,7 @@ function trackCost(
   }).then(({ error }) => {
     if (error) console.warn('[DeepSeekCost] Insert failed:', error.message);
   });
+  return cost;
 }
 
 export async function callDeepSeek(
@@ -182,8 +183,15 @@ export async function callDeepSeek(
       // count vào completion_tokens và bị tính tiền. Trước đây trackCost chỉ chạy SAU empty-guard
       // (chỉ trên success), nên các response rỗng bị tính tiền nhưng KHÔNG ghi sổ → cost_tracking
       // mù, balance âm mà DB báo $0. Track NGAY khi có usage, bất kể content rỗng hay không.
+      const p = pricingFor(config.model);
+      const cacheMissTokens = Math.max(0, promptTokens - cacheHitTokens);
+      let estimatedCostUsd = (
+        cacheMissTokens * p.inputCacheMiss
+        + cacheHitTokens * p.inputCacheHit
+        + completionTokens * p.outputPerMillion
+      ) / 1_000_000;
       if (options?.tracking && (promptTokens > 0 || completionTokens > 0)) {
-        trackCost(config.model, promptTokens, completionTokens, cacheHitTokens, options.tracking, {
+        estimatedCostUsd = trackCost(config.model, promptTokens, completionTokens, cacheHitTokens, options.tracking, {
           thinking_enabled: shouldUseThinking,
           reasoning_effort: shouldUseThinking ? (config.deepseekReasoningEffort || 'high') : null,
           reasoning_tokens: reasoningTokens,
@@ -211,6 +219,7 @@ export async function callDeepSeek(
         promptTokens,
         completionTokens,
         finishReason: finishReason.toUpperCase(),
+        estimatedCostUsd,
       };
     } catch (e) {
       console.warn(`  [DeepSeek Warning] Attempt ${attempt + 1}/${RETRY_DELAYS.length + 1} failed: ${e instanceof Error ? e.message : String(e)}`);

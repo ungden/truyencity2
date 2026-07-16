@@ -1,0 +1,67 @@
+[
+  {
+    "id": "exit_hook_verbatim",
+    "kind": "preflight",
+    "content": "Trời sáng, mẻ cá giữ được độ dẻo nhưng gã cò mồi Gã Bảy đã xông thẳng vào sân.",
+    "expectedCode": "plan_verbatim_leak"
+  },
+  {
+    "id": "foreign_cjk",
+    "kind": "preflight",
+    "content": "Họ dựng một bức tường bằng đủ thứ kim loại拼凑 lại.",
+    "expectedCode": "foreign_cjk_text"
+  },
+  {
+    "id": "robotic_status",
+    "kind": "preflight",
+    "content": "Công đoạn ướp muối cơ bản đã hoàn thành.",
+    "expectedCode": "robotic_status_prose"
+  },
+  {
+    "id": "provider_model_404",
+    "kind": "provider",
+    "content": "Gemini 404: model gemini-3-pro-preview is no longer available.",
+    "expectedClass": "infrastructure"
+  },
+  {
+    "id": "protagonist_alias",
+    "kind": "negative_preflight",
+    "content": "Sơn kéo tấm bạt qua mẻ cá rồi gọi mẹ ra giữ góc còn lại.",
+    "forbiddenCode": "protagonist_absent"
+  },
+  {
+    "id": "timeline_teleportation",
+    "kind": "editor_reject",
+    "excerpt": "Đúng lúc đó, người thanh niên kia quay về, tay ôm một chiếc hộp kim loại lớn.",
+    "gate": "timeline",
+    "code": "timeline_teleportation"
+  },
+  {
+    "id": "canon_gom_nung",
+    "kind": "editor_reject",
+    "excerpt": "Âm thanh phát ra trầm và đục. Nó ngắn, khô và không có độ vang.",
+    "gate": "canon",
+    "code": "canon_violation"
+  },
+  {
+    "id": "domain_electron_microscope",
+    "kind": "editor_reject",
+    "excerpt": "một kính hiển vi điện tử cầm tay có thể kết nối với máy tính bảng",
+    "gate": "resourceCausality",
+    "code": "domain_truth_error"
+  },
+  {
+    "id": "character_agenda_break",
+    "kind": "editor_reject",
+    "excerpt": "Nhưng không có bằng chứng, hắn không thể bắt giữ Kỷ.",
+    "gate": "authority",
+    "code": "character_voice_inconsistency"
+  },
+  {
+    "id": "object_appears",
+    "kind": "editor_reject",
+    "excerpt": "cũng không buồn nhặt lại cây thước gỗ đã rơi xuống sàn.",
+    "gate": "planFidelity",
+    "code": "continuity_error"
+  }
+]

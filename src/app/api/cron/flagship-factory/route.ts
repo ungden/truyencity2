@@ -12,12 +12,14 @@ import { createHash } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyCronAuth } from '@/lib/auth/cron-auth';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
-import { extendFlagshipArcForFactory, FlagshipPipelineError, writeFlagshipChapter } from '@/services/story-engine/flagship';
-import { advanceAutonomousFlagshipSetup } from '@/services/story-engine/flagship/factory-setup';
-import { planNextFlagshipWindowForProject } from '@/services/story-engine/flagship/rolling-planner';
-import { FlagshipSetupError } from '@/services/story-engine/flagship/setup';
-import { canTransitionFactoryJob, decideFactoryQualityRetry } from '@/services/story-engine/flagship/factory-lifecycle';
-import { getFlagshipProviderReadiness } from '@/services/story-engine/flagship/provider-readiness';
+import {
+  FlagshipV3Error,
+  canTransitionFactoryV3,
+  getFlagshipV3ProviderReadiness,
+  planNextFlagshipV3Window,
+  writeFlagshipV3Chapter,
+  type FactoryV3Status,
+} from '@/services/story-engine/flagship-v3';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 800;
@@ -25,7 +27,8 @@ export const maxDuration = 800;
 type FactoryJob = {
   id: string;
   project_id: string;
-  status: 'setup' | 'writing' | 'finale' | 'infra_blocked' | 'blocked' | 'ready' | 'queued';
+  pipeline_version: 'flagship_v3';
+  status: FactoryV3Status;
   stage: 'setup' | 'plan' | 'write' | 'review' | 'commit' | 'completion';
   current_chapter: number;
   max_chapters: number;
@@ -37,7 +40,7 @@ type FactoryJob = {
 type FactoryResult = {
   jobId: string;
   projectId: string;
-  status: 'setup' | 'written' | 'completed' | 'infra_blocked' | 'retry_scheduled' | 'blocked' | 'skipped' | 'failed';
+  status: 'written' | 'completed' | 'infra_blocked' | 'quality_blocked' | 'plan_blocked' | 'skipped' | 'failed';
   chapterNumber?: number;
   error?: string;
 };
@@ -90,14 +93,14 @@ async function claim(db: ReturnType<typeof getSupabaseAdmin>, workerId: string, 
 async function advance(
   db: ReturnType<typeof getSupabaseAdmin>,
   job: FactoryJob,
-  nextStatus: FactoryJob['status'] | 'completed',
+  nextStatus: FactoryV3Status,
   nextStage: FactoryJob['stage'],
   chapterNumber: number,
   evidence: unknown[],
   failureClass?: string,
   errorMessage?: string,
 ): Promise<void> {
-  if (nextStatus !== 'completed' && !canTransitionFactoryJob(job.status, nextStatus)) {
+  if (!canTransitionFactoryV3(job.status, nextStatus)) {
     throw new Error(`FACTORY_INVALID_TRANSITION: ${job.status} -> ${nextStatus}`);
   }
   const input = { jobId: job.id, status: job.status, stage: job.stage, chapterNumber, attempt: job.attempt };
@@ -118,18 +121,8 @@ async function advance(
   if (error) throw error;
 }
 
-async function preserveFactoryPause(db: ReturnType<typeof getSupabaseAdmin>, projectId: string, jobId: string): Promise<void> {
-  const { error } = await db.from('ai_story_projects').update({
-    status: 'paused',
-    pause_reason: `flagship_factory_lease:${jobId}`,
-    paused_at: null,
-    updated_at: new Date().toISOString(),
-  }).eq('id', projectId).in('status', ['active', 'paused']);
-  if (error) throw error;
-}
-
 function failureEvidence(caught: unknown): unknown[] {
-  if (!(caught instanceof FlagshipPipelineError) || !caught.detail || typeof caught.detail !== 'object') return [];
+  if (!(caught instanceof FlagshipV3Error) || !caught.detail || typeof caught.detail !== 'object') return [];
   const detail = caught.detail as Record<string, unknown>;
   const verdict = detail.verdict && typeof detail.verdict === 'object' ? detail.verdict as Record<string, unknown> : null;
   const editorEvidence = Array.isArray(detail.editorEvidence) ? detail.editorEvidence : [];
@@ -143,139 +136,101 @@ function failureEvidence(caught: unknown): unknown[] {
   }).slice(0, 50);
 }
 
-async function recordQualityFailure(
-  db: ReturnType<typeof getSupabaseAdmin>,
-  projectId: string,
-  message: string,
-  evidence: unknown[],
-): Promise<number> {
-  const { data, error } = await db.rpc('record_flagship_factory_quality_failure_v1', {
-    p_project_id: projectId,
-    p_error_message: message,
-    p_evidence: evidence,
-  });
-  if (error) throw error;
-  return Number((data as { retry_count?: number } | null)?.retry_count || 0);
-}
-
-async function restoreFactoryProject(db: ReturnType<typeof getSupabaseAdmin>, projectId: string, jobId: string, status: 'active' | 'completed' = 'active'): Promise<void> {
-  const { error } = await db.from('ai_story_projects').update({
-    status,
-    pause_reason: status === 'active' ? null : `flagship_factory_completed:${jobId}`,
-    paused_at: status === 'active' ? null : new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  }).eq('id', projectId).eq('pause_reason', `flagship_factory_lease:${jobId}`);
-  if (error) throw error;
-}
-
 async function ensureNextWindow(db: ReturnType<typeof getSupabaseAdmin>, projectId: string, nextChapter: number): Promise<void> {
   const { data, error } = await db.from('chapter_blueprints').select('id').eq('project_id', projectId).eq('chapter_number', nextChapter).maybeSingle();
-  if (error) throw new FlagshipSetupError('setup_blocked', `ChapterPlan lookup failed: ${error.message}`);
+  if (error) throw new FlagshipV3Error('plan_blocked', `ChapterPlanV3 lookup failed: ${error.message}`);
   if (data) return;
-  try {
-    await planNextFlagshipWindowForProject(projectId, { db });
-  } catch (caught) {
-    // The initial launch pack intentionally contains one 20-30 chapter arc.
-    // At its boundary the factory asks a typed Arc Director for the next arc;
-    // it never resumes with a generic outline or legacy planner.
-    if (!(caught instanceof FlagshipSetupError) || caught.code !== 'human_gate') throw caught;
-    await extendFlagshipArcForFactory(projectId, { db });
-    await planNextFlagshipWindowForProject(projectId, { db });
-  }
+  await planNextFlagshipV3Window(projectId, { db });
 }
 
 async function processJob(db: ReturnType<typeof getSupabaseAdmin>, job: FactoryJob): Promise<FactoryResult> {
   const base = { jobId: job.id, projectId: job.project_id };
   let committedChapter: number | undefined;
   try {
-    if (job.stage === 'setup') {
-      const setup = await advanceAutonomousFlagshipSetup(job.project_id, db);
-      const nextStatus = setup.status === 'ready' ? 'ready' : 'setup';
-      await advance(db, job, nextStatus, setup.status === 'ready' ? 'plan' : 'setup', job.current_chapter, [{ step: setup.step, candidateId: setup.candidateId || null }]);
-      return { ...base, status: 'setup' };
+    if (job.pipeline_version !== 'flagship_v3') {
+      return { ...base, status: 'skipped', error: 'Only flagship_v3 is claimable.' };
     }
-
-    if (job.stage === 'plan' && job.status === 'infra_blocked') {
+    if (job.status === 'infra_blocked') {
       await ensureNextWindow(db, job.project_id, job.current_chapter + 1);
       await advance(db, job, 'ready', 'plan', job.current_chapter, [{ step: 'rolling_plan_recovered' }]);
-      return { ...base, status: 'setup', chapterNumber: job.current_chapter };
+      return { ...base, status: 'infra_blocked', chapterNumber: job.current_chapter };
     }
 
-    const writable = job.stage === 'write' && (job.status === 'writing' || job.status === 'infra_blocked');
+    const writable = job.stage === 'write' && job.status === 'writing';
     if (!writable) {
       // A completion audit is deliberately not guessed. Hard caps are the
       // only automatic completion signal until a typed ending report exists.
       if (job.status === 'finale' && job.completion_mode === 'hard_cap') {
-        await restoreFactoryProject(db, job.project_id, job.id, 'completed');
         await advance(db, job, 'completed', 'completion', job.current_chapter, [{ reason: 'hard_cap' }]);
         return { ...base, status: 'completed', chapterNumber: job.current_chapter };
       }
-      throw new FlagshipSetupError('setup_blocked', `Factory job is not writable at ${job.status}/${job.stage}; no implicit recovery.`);
+      throw new FlagshipV3Error('plan_blocked', `Factory v3 job is not writable at ${job.status}/${job.stage}.`);
     }
 
     const { data: projectState, error: projectStateError } = await db.from('ai_story_projects')
       .select('current_chapter').eq('id', job.project_id).single();
-    if (projectStateError) throw new FlagshipSetupError('setup_blocked', `Factory chapter state lookup failed: ${projectStateError.message}`);
+    if (projectStateError) throw new FlagshipV3Error('plan_blocked', `Factory chapter state lookup failed: ${projectStateError.message}`);
     // A previous request may have committed the chapter but lost its job
     // checkpoint to a transient DB error. Never write the next chapter twice.
     if (Number(projectState.current_chapter || 0) > job.current_chapter) {
       committedChapter = Number(projectState.current_chapter);
       await ensureNextWindow(db, job.project_id, committedChapter + 1);
-      await restoreFactoryProject(db, job.project_id, job.id, 'active');
       await advance(db, job, 'ready', 'plan', committedChapter, [{ step: 'commit_reconciled', chapterNumber: committedChapter }]);
       return { ...base, status: 'written', chapterNumber: committedChapter };
     }
     if (Number(projectState.current_chapter || 0) < job.current_chapter) {
-      throw new FlagshipSetupError('setup_blocked', 'Factory job chapter is ahead of the committed project; no implicit repair.');
+      throw new FlagshipV3Error('plan_blocked', 'Factory job chapter is ahead of committed state.');
     }
-    await preserveFactoryPause(db, job.project_id, job.id);
-    const written = await writeFlagshipChapter({ projectId: job.project_id });
+    await ensureNextWindow(db, job.project_id, job.current_chapter + 1);
+    const written = await writeFlagshipV3Chapter({ projectId: job.project_id }, { db });
     committedChapter = written.chapterNumber;
     if (written.chapterNumber >= job.max_chapters) {
-      await restoreFactoryProject(db, job.project_id, job.id, 'completed');
       await advance(db, job, 'completed', 'completion', written.chapterNumber, [{ reason: 'safety_max_chapters', maxChapters: job.max_chapters }]);
       return { ...base, status: 'completed', chapterNumber: written.chapterNumber };
     }
     await ensureNextWindow(db, job.project_id, written.chapterNumber + 1);
-    await restoreFactoryProject(db, job.project_id, job.id, 'active');
     await advance(db, job, 'ready', 'plan', written.chapterNumber, [{ chapterNumber: written.chapterNumber, qualityScore: written.qualityScore }]);
     return { ...base, status: 'written', chapterNumber: written.chapterNumber };
   } catch (caught) {
-    const code = caught instanceof FlagshipPipelineError || caught instanceof FlagshipSetupError ? caught.code : undefined;
+    const code = caught instanceof FlagshipV3Error ? caught.code : undefined;
     const message = errorMessage(caught);
     const infra = code === 'infra_blocked';
     if (infra) {
       await advance(db, job, 'infra_blocked', committedChapter ? 'plan' : job.stage, committedChapter || job.current_chapter, [{ code, committedChapter: committedChapter || null }], 'infrastructure', message);
       return { ...base, status: 'infra_blocked', error: message };
     }
-    if (code === 'quality_rejected') {
+    if (code === 'quality_blocked') {
       const evidence = failureEvidence(caught);
       try {
-        await preserveFactoryPause(db, job.project_id, job.id);
-        const retryCount = await recordQualityFailure(db, job.project_id, message, evidence);
-        const retry = decideFactoryQualityRetry(retryCount);
         await advance(
           db,
           job,
-          retry.status,
-          retry.stage,
+          'quality_blocked',
+          'review',
           committedChapter || job.current_chapter,
-          [{ code, retryCount, retryReason: retry.reason, evidence }],
+          [{ code, evidence }],
           'quality',
           message,
         );
-        return { ...base, status: retry.retry ? 'retry_scheduled' : 'blocked', error: message };
+        return { ...base, status: 'quality_blocked', error: message };
       } catch (transitionError) {
-        return { ...base, status: 'failed', error: `${message}; quality retry transition: ${errorMessage(transitionError)}` };
+        return { ...base, status: 'failed', error: `${message}; quality transition: ${errorMessage(transitionError)}` };
+      }
+    }
+    if (code === 'plan_blocked' || code === 'setup_blocked') {
+      try {
+        await advance(db, job, 'plan_blocked', 'plan', committedChapter || job.current_chapter, [{ code }], 'setup', message);
+        return { ...base, status: 'plan_blocked', error: message };
+      } catch (transitionError) {
+        return { ...base, status: 'failed', error: `${message}; plan transition: ${errorMessage(transitionError)}` };
       }
     }
     try {
-      await preserveFactoryPause(db, job.project_id, job.id);
-      await advance(db, job, 'blocked', committedChapter ? 'plan' : job.stage === 'write' ? 'review' : job.stage, committedChapter || job.current_chapter, [{ code: code || 'unknown', committedChapter: committedChapter || null }], code === 'setup_blocked' ? 'setup' : 'quality', message);
+      await advance(db, job, 'quality_blocked', 'review', committedChapter || job.current_chapter, [{ code: code || 'unknown' }], 'unknown', message);
     } catch (transitionError) {
       return { ...base, status: 'failed', error: `${message}; transition: ${errorMessage(transitionError)}` };
     }
-    return { ...base, status: 'blocked', error: message };
+    return { ...base, status: 'quality_blocked', error: message };
   }
 }
 
@@ -289,7 +244,7 @@ async function run(request: NextRequest): Promise<NextResponse> {
   const { data: optedInProjects, error: readinessError } = await db.from('ai_story_projects')
     .select('id,style_directives')
     .contains('style_directives', {
-      pipeline_version: 'flagship_v2',
+      pipeline_version: 'flagship_v3',
       factory_enabled: true,
       publication_mode: 'automatic',
     })
@@ -297,7 +252,7 @@ async function run(request: NextRequest): Promise<NextResponse> {
   if (readinessError) {
     return NextResponse.json({ success: false, error: `Factory readiness lookup failed: ${readinessError.message}` }, { status: 503 });
   }
-  const providerReadiness = getFlagshipProviderReadiness(optedInProjects || []);
+  const providerReadiness = getFlagshipV3ProviderReadiness(optedInProjects || []);
   if (!providerReadiness.ready) {
     return NextResponse.json({
       success: true,

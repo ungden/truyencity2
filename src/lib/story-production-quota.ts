@@ -94,6 +94,7 @@ export function classifyStoryFailure(errorMsg: string): StoryFailureClass {
   if (
     normalized.startsWith('infra_blocked:') ||
     /\b402\b|insufficient balance|billing|payment required|quota exceeded|invalid api key|unauthorized|forbidden/.test(normalized) ||
+    /(?:\b404\b.*\bmodel\b|\bmodel\b.*(?:not found|no longer available|unsupported|does not exist))/.test(normalized) ||
     /rate limit|timeout|fetch failed|network|temporarily unavailable|\b5\d\d\b/.test(normalized)
   ) return 'infrastructure';
   if (

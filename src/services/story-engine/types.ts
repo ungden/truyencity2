@@ -64,7 +64,7 @@ export type ToneProfile =
 
 export interface StyleDirectives {
   /** Pipeline generation. flagship_v2 is quality-first and never uses routine soft gates. */
-  pipeline_version?: 'legacy' | 'flagship_v2';
+  pipeline_version?: 'legacy' | 'flagship_v2' | 'flagship_v3';
   /** Publication policy. Automatic is allowed only for explicitly factory-enabled projects. */
   publication_mode?: 'automatic' | 'human_gate' | 'offline_only';
   /** Opt this project into the autonomous flagship factory scheduler. This is
@@ -85,6 +85,19 @@ export interface StyleDirectives {
     writer: string;
     editor: string;
     planner: string;
+  };
+  /** Exact v3 routes. There is deliberately no Director route because the
+   * five-chapter Rolling Planner owns that responsibility. */
+  flagship_model_routes_v3?: {
+    setupGenerators: [string, string];
+    setupJudges: [string, string, string];
+    openingSimulator: string;
+    launchArchitect: string;
+    planner: string;
+    writer: string;
+    editor: string;
+    routeVersion: string;
+    maxPublishedChapterCostUsd: number;
   };
   /** Stable prompt bundle identifier persisted into write-run telemetry. */
   prompt_version?: string;
@@ -767,6 +780,9 @@ export interface GeminiResponse {
   promptTokens: number;
   completionTokens: number;
   finishReason: string;
+  /** Deterministic estimate from the exact provider/model token usage returned
+   * by the response. Flagship v3 uses it before publication. */
+  estimatedCostUsd?: number;
 }
 
 export interface GeminiConfig {

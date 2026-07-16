@@ -14,6 +14,9 @@ const RETRY_DELAYS = [2000, 5000, 10000];
 // ── Cost Tracking ───────────────────────────────────────────────────────────
 // Pricing per 1M tokens (Google AI docs, Standard tier)
 const PRICING: Record<string, { inputPerMillion: number; outputPerMillion: number }> = {
+  'gemini-2.5-pro':              { inputPerMillion: 1.25, outputPerMillion: 10.00 },
+  'gemini-2.5-flash':            { inputPerMillion: 0.30, outputPerMillion: 2.50 },
+  'gemini-2.5-flash-lite':       { inputPerMillion: 0.10, outputPerMillion: 0.40 },
   'gemini-3.1-flash-lite':        { inputPerMillion: 0.25, outputPerMillion: 1.50 },
   'gemini-3.5-flash':             { inputPerMillion: 0.75, outputPerMillion: 4.50 },
   'gemini-3-flash-preview':       { inputPerMillion: 0.50, outputPerMillion: 3.00 },
@@ -38,7 +41,7 @@ function trackCost(
   inputTokens: number,
   outputTokens: number,
   tracking: TrackingContext,
-): void {
+): number {
   const p = PRICING[model] || PRICING['_default'];
   const cost = (inputTokens * p.inputPerMillion + outputTokens * p.outputPerMillion) / 1_000_000;
 
@@ -57,6 +60,7 @@ function trackCost(
   }).then(({ error }) => {
     if (error) console.warn('[CostTracking] Insert failed:', error.message);
   });
+  return cost;
 }
 
 // ── Router ───────────────────────────────────────────────────────────────────
@@ -226,11 +230,14 @@ export async function callGemini(
       const content = candidate?.content?.parts?.map((p: { text?: string }) => p.text || '').join('') || '';
 
       const promptTokens = data?.usageMetadata?.promptTokenCount || 0;
-      const completionTokens = data?.usageMetadata?.candidatesTokenCount || 0;
+      const completionTokens = (data?.usageMetadata?.candidatesTokenCount || 0)
+        + (data?.usageMetadata?.thoughtsTokenCount || 0);
 
       // Fire-and-forget cost tracking
+      const p = PRICING[config.model] || PRICING['_default'];
+      let estimatedCostUsd = (promptTokens * p.inputPerMillion + completionTokens * p.outputPerMillion) / 1_000_000;
       if (options?.tracking) {
-        trackCost(config.model, promptTokens, completionTokens, options.tracking);
+        estimatedCostUsd = trackCost(config.model, promptTokens, completionTokens, options.tracking);
       }
 
       return {
@@ -238,6 +245,7 @@ export async function callGemini(
         promptTokens,
         completionTokens,
         finishReason: candidate?.finishReason || 'STOP',
+        estimatedCostUsd,
       };
     } catch (e) {
       if (attempt >= RETRY_DELAYS.length) throw e;

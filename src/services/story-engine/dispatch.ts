@@ -1,4 +1,5 @@
 import { writeFlagshipChapter } from './flagship/runtime';
+import { writeFlagshipV3Chapter } from './flagship-v3/runtime';
 import type { OrchestratorOptions, OrchestratorResult } from './pipeline/orchestrator';
 import { getSupabase } from './utils/supabase';
 
@@ -12,6 +13,9 @@ export async function writeChapterForProject(options: OrchestratorOptions): Prom
     .single();
   if (error || !data) throw new Error(error?.message || 'Project not found');
   const style = data.style_directives as { pipeline_version?: string } | null;
+  if (style?.pipeline_version === 'flagship_v3') {
+    return writeFlagshipV3Chapter(options);
+  }
   if (style?.pipeline_version === 'flagship_v2') {
     return writeFlagshipChapter(options);
   }

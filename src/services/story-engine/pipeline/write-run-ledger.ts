@@ -34,9 +34,9 @@ export interface StartWriteRunInput {
   targetWordCount?: number | null;
   contextSizeChars?: number | null;
   idempotencyKey?: string;
-  pipelineVersion?: 'legacy' | 'flagship_v2';
+  pipelineVersion?: 'legacy' | 'flagship_v2' | 'flagship_v3';
   promptVersion?: string | null;
-  modelRoute?: Record<string, string>;
+  modelRoute?: Record<string, unknown>;
   contextManifest?: unknown[];
   /** Flagship requires telemetry to exist before any model call. Legacy remains best-effort. */
   required?: boolean;
@@ -163,6 +163,7 @@ export async function finishWriteRun(
     criticEvidence?: unknown[];
     revisionLineage?: unknown[];
     qualityVerdict?: unknown;
+    estimatedCostUsd?: number;
   } = {},
 ): Promise<void> {
   if (!run) return;
@@ -179,6 +180,7 @@ export async function finishWriteRun(
       critic_evidence: updates.criticEvidence ?? [],
       revision_lineage: updates.revisionLineage ?? [],
       quality_verdict: updates.qualityVerdict ?? {},
+      estimated_cost_usd: updates.estimatedCostUsd ?? null,
       updated_at: new Date().toISOString(),
       finished_at: status === 'running' ? null : new Date().toISOString(),
     }).eq('id', run.id);
@@ -194,7 +196,7 @@ export async function updateWriteRunTelemetry(
     contextSizeChars?: number;
     contextManifest?: unknown[];
     promptVersion?: string | null;
-    modelRoute?: Record<string, string>;
+    modelRoute?: Record<string, unknown>;
   },
 ): Promise<void> {
   if (!run) return;

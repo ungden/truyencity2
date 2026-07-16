@@ -136,6 +136,7 @@ async function callOpenAI(
         content,
         promptTokens: Number(usage.input_tokens || 0),
         completionTokens: Number(usage.output_tokens || 0),
+        estimatedCostUsd: openAICost(config.model, usage),
         finishReason: payload.status === 'incomplete'
           ? payload.incomplete_details?.reason === 'max_output_tokens' ? 'MAX_TOKENS' : 'INCOMPLETE'
           : 'STOP',
