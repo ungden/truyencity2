@@ -67,8 +67,8 @@ async function main(): Promise<void> {
   const routes = FlagshipModelRoutesV2Schema.parse(JSON.parse(readFileSync(
     path.join(process.cwd(), 'blueprints/flagship-portfolio-v1/model-routes-v2.json'), 'utf8',
   )));
-  if (routes.writer !== 'gpt-5.6-luna' || routes.editor !== 'gemini-3.1-pro-preview') {
-    throw new Error('Requeue requires Luna Writer and Gemini Pro independent Editor.');
+  if (routes.writer !== 'gemini-2.5-pro' || routes.editor !== 'gemini-3.1-pro-preview') {
+    throw new Error('Requeue requires Gemini Pro Writer and Gemini Pro independent Editor.');
   }
   const { data: projectRows, error: projectReadError } = await db.from('ai_story_projects')
     .select('id,style_directives')

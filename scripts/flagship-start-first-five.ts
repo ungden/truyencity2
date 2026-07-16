@@ -98,7 +98,7 @@ async function applyStart(): Promise<void> {
   const routes = FlagshipModelRoutesV2Schema.parse(JSON.parse(readFileSync(
     path.join(process.cwd(), 'blueprints/flagship-portfolio-v1/model-routes-v2.json'), 'utf8',
   )));
-  if (routes.writer !== 'gpt-5.6-luna') throw new Error('First-five start requires official gpt-5.6-luna standard as Writer.');
+  if (routes.writer !== 'gemini-2.5-pro') throw new Error('First-five start requires Gemini Pro standard as Writer.');
   const projects = await loadPortfolio();
   const bySlot = new Map(projects.map(project => [String(project.style_directives?.portfolio_slot_id || ''), project]));
   const missing = SELECTED_SLOTS.filter(slot => !bySlot.has(slot));
