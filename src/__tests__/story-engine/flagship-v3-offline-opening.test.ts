@@ -4,6 +4,7 @@ import {
   FlagshipLaunchPackV3Schema,
   FlagshipModelRoutesV3Schema,
   runOfflineOpeningV3,
+  runOfflinePlannedWindowV3,
 } from '@/services/story-engine/flagship-v3';
 
 const launchPack = FlagshipLaunchPackV3Schema.parse(JSON.parse(readFileSync(
@@ -134,5 +135,18 @@ describe('flagship v3 offline opening runner', () => {
     expect(result.finalState.chapterNumber).toBe(0);
     expect(result.chapters[0].status).toBe('quality_blocked');
     expect(result.chapters).toHaveLength(1);
+  });
+
+  it('refuses a rolling calibration window that skips the committed chapter', async () => {
+    await expect(runOfflinePlannedWindowV3({
+      title: launchPack.kernel.title,
+      kernel: launchPack.kernel,
+      arc: launchPack.arc,
+      state: launchPack.initialState,
+      plans: [launchPack.initialWindow.plans[1]],
+      routes,
+    }, {
+      invoke: async () => { throw new Error('model must not be called'); },
+    })).rejects.toThrow('contiguous with committed state');
   });
 });

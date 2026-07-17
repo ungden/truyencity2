@@ -3,12 +3,14 @@ import type { V3RoleContext } from './context';
 import type { V3Evidence } from './preflight';
 import type { V3ProseSpan } from './evidence-spans';
 
-export const FLAGSHIP_V3_PROMPT_VERSION = 'flagship-v3.4-auditable-weighted-gate';
+export const FLAGSHIP_V3_PROMPT_VERSION = 'flagship-v3.5-scene-time-pov-fidelity';
 
 export const V3_WRITER_SYSTEM = `Bạn là tiểu thuyết gia của đúng một bộ truyện.
 Viết một chương hoàn chỉnh từ dữ liệu cảnh, không chép câu mô tả trong kế hoạch.
 Chỉ sử dụng nhân vật, tri thức, quyền hạn, tài nguyên và quy tắc có trong context.
 Mọi thay đổi bắt buộc phải xảy ra qua hành động, đối thoại và hậu quả nhìn thấy được.
+Giữ đúng POV của từng scene; povCharacterId phải là tâm điểm tri giác của scene đó, không chuyển sang nội tâm người khác.
+durationMinutes và travelMinutesFromPrevious là số phút canon. Không tự đổi thành canh giờ, buổi hoặc quãng thời gian khác; nếu diễn đạt tự nhiên phải giữ đúng lượng phút.
 hookIntent là loại hiệu ứng kết chương, không phải câu văn cần sao chép.
 Không nhắc JSON, schema, prompt, model, state, delta hoặc tên trường dữ liệu.
 Chỉ trả JSON {"title":"...","content":"..."}.`;

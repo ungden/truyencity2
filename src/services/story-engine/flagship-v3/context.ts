@@ -109,7 +109,11 @@ function projectRevisionKernel(kernel: StoryKernelV3, plan: ChapterPlanV3) {
   };
 }
 
-function projectState(state: StoryStateV3, plan: ChapterPlanV3) {
+function projectState(
+  state: StoryStateV3,
+  plan: ChapterPlanV3,
+  limits: { timeline: number; retrieval: number } = { timeline: 8, retrieval: 4 },
+) {
   const characterIds = relevantCharacterIds(plan);
   const resourceIds = new Set(plan.requiredDeltas.flatMap(delta =>
     delta.kind === 'resource_numeric' || delta.kind === 'resource_state' ? [delta.resourceId] : [],
@@ -122,13 +126,13 @@ function projectState(state: StoryStateV3, plan: ChapterPlanV3) {
   return {
     chapterNumber: state.chapterNumber,
     facts: state.facts.filter(fact => factIds.has(fact.id)),
-    timeline: state.timeline.slice(-8),
+    timeline: state.timeline.slice(-limits.timeline),
     characters: state.characters.filter(character => characterIds.has(character.characterId)),
     resources: state.resources.filter(resource => resourceIds.has(resource.resourceId)),
     promises: state.promises.filter(promise => promiseIds.has(promise.promiseId)),
     recentSummary: state.recentSummary,
     previousEnding: state.previousEnding,
-    retrievalNotes: state.retrievalNotes.slice(-4),
+    retrievalNotes: state.retrievalNotes.slice(-limits.retrieval),
   };
 }
 
@@ -139,16 +143,18 @@ export function buildV3RoleContexts(input: {
   plan: ChapterPlanV3;
 }): V3RoleContexts {
   const kernel = projectKernel(input.kernel, input.plan);
-  const state = projectState(input.state, input.plan);
+  const writerState = projectState(input.state, input.plan);
+  const editorState = projectState(input.state, input.plan, { timeline: 5, retrieval: 2 });
+  const revisionState = projectState(input.state, input.plan, { timeline: 3, retrieval: 1 });
   const writer = assemble('writer', [
       { id: 'STORY_KERNEL_V3', sourceRef: 'ai_story_projects.story_kernel_v3:writer_projection', value: kernel },
       { id: 'CHAPTER_PLAN_V3', sourceRef: `chapter_blueprints:${input.plan.chapterNumber}`, value: input.plan },
-      { id: 'RELEVANT_STATE_V3', sourceRef: 'ai_story_projects.story_state_v3:writer_projection', value: state },
+      { id: 'RELEVANT_STATE_V3', sourceRef: 'ai_story_projects.story_state_v3:writer_projection', value: writerState },
     ]);
   const editor = assemble('editor', [
       { id: 'STORY_KERNEL_V3', sourceRef: 'ai_story_projects.story_kernel_v3:editor_projection', value: kernel },
       { id: 'CHAPTER_PLAN_V3', sourceRef: `chapter_blueprints:${input.plan.chapterNumber}`, value: input.plan },
-      { id: 'RELEVANT_STATE_V3', sourceRef: 'ai_story_projects.story_state_v3:editor_projection', value: state },
+      { id: 'RELEVANT_STATE_V3', sourceRef: 'ai_story_projects.story_state_v3:editor_projection', value: editorState },
     ]);
   let revisionContext: V3RoleContext | null = null;
   const revision = (): V3RoleContext => {
@@ -160,7 +166,7 @@ export function buildV3RoleContexts(input: {
           value: projectRevisionKernel(input.kernel, input.plan),
         },
         { id: 'CHAPTER_PLAN_V3', sourceRef: `chapter_blueprints:${input.plan.chapterNumber}`, value: input.plan },
-        { id: 'RELEVANT_STATE_V3', sourceRef: 'ai_story_projects.story_state_v3:revision_projection', value: state },
+        { id: 'RELEVANT_STATE_V3', sourceRef: 'ai_story_projects.story_state_v3:revision_projection', value: revisionState },
       ]);
     }
     return revisionContext;

@@ -38,6 +38,7 @@
     "flagship:v3:launch-pack": "node --import tsx scripts/flagship-v3-build-launch-pack.ts",
     "flagship:v3:replan": "node --import tsx scripts/flagship-v3-replan-launch-pack.ts",
     "flagship:v3:opening-offline": "node --import tsx scripts/flagship-v3-write-opening-offline.ts",
+    "flagship:v3:calibration:run": "node --import tsx scripts/flagship-v3-write-calibration-run.ts",
     "flagship:v3:bakeoff-report": "node --import tsx scripts/flagship-v3-opening-bakeoff-report.ts",
     "flagship:v3:calibrate": "node --import tsx scripts/flagship-v3-calibrate.ts",
     "flagship:v3:calibration:import": "node --import tsx scripts/flagship-v3-import-calibration-campaign.ts",

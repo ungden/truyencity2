@@ -1,4 +1,4 @@
-import type { StoryStateV3 } from './contracts';
+import type { ChapterPlanV3, StoryStateV3 } from './contracts';
 import type { FlagshipModelRoutesV3 } from './model-routes';
 import type { FlagshipLaunchPackV3 } from './setup';
 import { buildV3RoleContexts } from './context';
@@ -99,21 +99,55 @@ export async function runOfflineOpeningV3(
   const plans = input.launchPack.initialWindow.plans.slice(0, requestedChapters);
   if (plans.length !== requestedChapters) throw new Error('Launch pack does not contain the requested opening window.');
 
-  let state = input.launchPack.initialState;
+  return runOfflinePlannedWindowV3({
+    title: input.launchPack.kernel.title,
+    kernel: input.launchPack.kernel,
+    arc: input.launchPack.arc,
+    state: input.launchPack.initialState,
+    plans,
+    routes: input.routes,
+    targetWordCount: input.targetWordCount,
+  }, dependencies);
+}
+
+export async function runOfflinePlannedWindowV3(
+  input: {
+    title: string;
+    kernel: FlagshipLaunchPackV3['kernel'];
+    arc: FlagshipLaunchPackV3['arc'];
+    state: StoryStateV3;
+    plans: ChapterPlanV3[];
+    routes: FlagshipModelRoutesV3;
+    targetWordCount?: number;
+  },
+  dependencies: {
+    invoke(request: OfflineOpeningModelRequestV3): Promise<OfflineOpeningModelResponseV3>;
+  },
+): Promise<OfflineOpeningRunV3> {
+  if (input.plans.length < 1 || input.plans.length > 5) {
+    throw new Error('Offline planned window supports between one and five chapters.');
+  }
+  input.plans.forEach((plan, index) => {
+    if (plan.chapterNumber !== input.state.chapterNumber + index + 1) {
+      throw new Error('Offline planned window must be contiguous with committed state.');
+    }
+  });
+
+  let state = input.state;
   const chapters: OfflineOpeningChapterV3[] = [];
-  for (const plan of plans) {
+  for (const plan of input.plans) {
     const calls: OfflineOpeningCallRecordV3[] = [];
     let chapterCost = 0;
     try {
       const contexts = buildV3RoleContexts({
-        kernel: input.launchPack.kernel,
-        arc: input.launchPack.arc,
+        kernel: input.kernel,
+        arc: input.arc,
         state,
         plan,
       });
       const generated = await executeFlagshipV3Pipeline({
-        kernel: input.launchPack.kernel,
-        arc: input.launchPack.arc,
+        kernel: input.kernel,
+        arc: input.arc,
         state,
         plan,
         targetWordCount: input.targetWordCount ?? 1800,
@@ -193,9 +227,9 @@ export async function runOfflineOpeningV3(
   const failed = chapters.find(chapter => chapter.status !== 'publish');
   return {
     schemaVersion: 3,
-    title: input.launchPack.kernel.title,
+    title: input.title,
     routeVersion: input.routes.routeVersion,
-    requestedChapters,
+    requestedChapters: input.plans.length,
     completedChapters,
     stoppedAtChapter: failed?.chapterNumber ?? null,
     estimatedCostUsd: Number(chapters.reduce((sum, chapter) => sum + chapter.estimatedCostUsd, 0).toFixed(6)),

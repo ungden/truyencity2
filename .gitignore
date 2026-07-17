@@ -64,6 +64,7 @@ scripts/_*.ts
 .codex/automation-runs/
 .automation/
 /automation-runs/
+/blueprints/flagship-v3/canaries/*/calibration-*/
 public/covers/*
 !public/covers/flagship-first-30/
 !public/covers/flagship-first-30/**

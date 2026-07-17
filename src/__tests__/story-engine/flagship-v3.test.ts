@@ -18,6 +18,8 @@ import {
   assertFlagshipReleaseV3,
   getFlagshipReleaseManifestV3,
   retainStoryFactsV3,
+  V3_ROLLING_PLANNER_RULES,
+  V3_WRITER_SYSTEM,
   type ChapterPlanV3,
   type StoryKernelV3,
   type StoryStateV3,
@@ -302,6 +304,28 @@ describe('flagship v3 core engine', () => {
     expect(runV3ProsePreflight(content, plan())).toEqual(expect.arrayContaining([
       expect.objectContaining({ code: 'foreign_script_text', excerpt: 'แทบไม่' }),
     ]));
+  });
+
+  it('projects lower-priority history out of Editor and Revision context explicitly', () => {
+    const longState: StoryStateV3 = {
+      ...state(),
+      timeline: Array.from({ length: 20 }, (_, chapter) => ({
+        chapter: chapter + 1, startMinute: chapter * 60, durationMinutes: 60,
+        locationId: 'nha_son', event: `Sự kiện đã commit ở chương ${chapter + 1}`,
+      })),
+      retrievalNotes: Array.from({ length: 8 }, (_, index) => `Ghi chú ${index} ${'chi tiết lịch sử '.repeat(30)}`),
+    };
+    const contexts = buildV3RoleContexts({ kernel: kernel(), arc, state: longState, plan: plan() });
+    expect(contexts.editor.chars).toBeLessThan(contexts.writer.chars);
+    expect(contexts.editor.chars).toBeLessThanOrEqual(contexts.editor.budget);
+    expect(contexts.revision().chars).toBeLessThan(contexts.editor.chars);
+    expect(contexts.revision().chars).toBeLessThanOrEqual(contexts.revision().budget);
+  });
+
+  it('makes POV, participant and minute fidelity explicit in role prompts', () => {
+    expect(V3_ROLLING_PLANNER_RULES).toContain('participantIds chứa ít nhất povCharacterId');
+    expect(V3_WRITER_SYSTEM).toContain('durationMinutes và travelMinutesFromPrevious là số phút canon');
+    expect(V3_WRITER_SYSTEM).toContain('povCharacterId phải là tâm điểm tri giác');
   });
 
   it('publishes with exactly Writer and Editor calls', async () => {

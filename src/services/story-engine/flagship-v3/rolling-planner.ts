@@ -26,6 +26,7 @@ import { validateV3Artifacts } from './validation';
 
 export const V3_ROLLING_PLANNER_PROMPT_VERSION = FLAGSHIP_V3_ROLLING_PLANNER_VERSION;
 export const V3_ROLLING_PLANNER_RULES = `Tạo đúng năm ChapterPlanV3 liên tiếp, mỗi chương có 1-5 scene theo nhu cầu nhân quả; không ép thêm scene phụ để đủ số lượng. Không một scene nào được có requiredDeltaIds=[]; từng scene phải liệt kê ít nhất một ID có thật trong requiredDeltas của chính chương đó.
+Mỗi scene phải có participantIds chứa ít nhất povCharacterId; tuyệt đối không để participantIds rỗng và không đặt POV ngoài participants.
 Mọi required delta bắt buộc evidenceRequired=true và phải được đúng một hoặc nhiều scene thực hiện.
 Mỗi plan chỉ ghi elapsedMinutesSincePreviousChapter, durationMinutes và travelMinutesFromPrevious. Không tự tạo startMinute; engine sẽ cộng timeline tuyệt đối theo thứ tự scene.
 Với resource_numeric, chỉ quyết định delta/source/sink; không tự trả before/after/unit. Với resource_state, chỉ trả after/source. Với fact, chỉ trả valueAfter. Engine sẽ gắn before/after/unit/valueBefore từ ledger theo thứ tự năm chương.
