@@ -61,6 +61,7 @@ async function main(): Promise<void> {
     model: routes.planner,
     temperature: 0.15,
     maxTokens: 32768,
+    thinkingLevel: 'medium',
     systemPrompt: V3_ROLLING_PLANNER_SYSTEM,
     responseJsonSchema: toGeminiResponseJsonSchema(RollingPlanWindowDraftV3Schema),
   }, { jsonMode: true, schemaName: 'flagship_v3_replan_launch_pack' });

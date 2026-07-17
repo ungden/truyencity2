@@ -88,6 +88,12 @@ function resolveRoute(task: string | undefined): string | null {
 // NOTE: Client-side rate limiter removed — Gemini tier 3 unlimited.
 // Server-side 429/503 retries in the call loop handle transient throttling.
 
+export function supportsGeminiThinkingLevel(model: string): boolean {
+  return model === 'gemini-3.5-flash'
+    || model === 'gemini-3-flash-preview'
+    || /^gemini-3(?:\.\d+)?-pro(?:-|$)/.test(model);
+}
+
 export async function callGemini(
   userPrompt: string,
   config: GeminiConfig,
@@ -154,9 +160,7 @@ export async function callGemini(
   // thinkingConfig on gemini-3.1-flash-lite caused empty-content returns on
   // specific prompt combinations (Gia Tộc Tu Tiên + tu-tiên-gia-tộc kernel).
   // Gate to ONLY actual thinking models (gemini-3-flash-preview, gemini-3-pro-*).
-  const isThinkingModel = config.model === 'gemini-3.5-flash'
-    || config.model === 'gemini-3-flash-preview'
-    || config.model.startsWith('gemini-3-pro');
+  const isThinkingModel = supportsGeminiThinkingLevel(config.model);
   if ((isGemini3 || isGemini35) && isThinkingModel) {
     const task = options?.tracking?.task || '';
     const isChapterTask = ['architect', 'writer', 'writer_continuation', 'critic', 'continuity_guardian', 'auto_revision'].includes(task);

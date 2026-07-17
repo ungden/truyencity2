@@ -28,6 +28,7 @@ export const V3_ROLLING_PLANNER_PROMPT_VERSION = FLAGSHIP_V3_ROLLING_PLANNER_VER
 export const V3_ROLLING_PLANNER_RULES = `Tạo đúng năm ChapterPlanV3 liên tiếp, mỗi chương có 1-5 scene theo nhu cầu nhân quả; không ép thêm scene phụ để đủ số lượng. Không một scene nào được có requiredDeltaIds=[]; từng scene phải liệt kê ít nhất một ID có thật trong requiredDeltas của chính chương đó.
 Mỗi scene phải có participantIds chứa ít nhất povCharacterId; tuyệt đối không để participantIds rỗng và không đặt POV ngoài participants.
 Mọi required delta bắt buộc evidenceRequired=true và phải được đúng một hoặc nhiều scene thực hiện.
+chapterPromise là một câu tiếng Việt cụ thể dài ít nhất 20 ký tự mô tả lời hứa nội dung của chương với độc giả; không được điền promise ID như prom_house. Promise ID chỉ xuất hiện trong delta kind=promise. learnedFrom phải là mô tả nguồn học có nguyên nhân dài ít nhất 8 ký tự, không chỉ là tên trần của một nhân vật.
 Mỗi plan chỉ ghi elapsedMinutesSincePreviousChapter, durationMinutes và travelMinutesFromPrevious. Không tự tạo startMinute; engine sẽ cộng timeline tuyệt đối theo thứ tự scene.
 Với resource_numeric, chỉ quyết định delta/source/sink; không tự trả before/after/unit. Với resource_state, chỉ trả after/source. Với fact, chỉ trả valueAfter. Engine sẽ gắn before/after/unit/valueBefore từ ledger theo thứ tự năm chương.
 AUTHORITATIVE_LEDGER.resources là sổ cái duy nhất: mỗi resource_numeric có amount hiện tại, minimumValue và maximumValue. Phải tự cộng tuần tự mọi delta của cả năm chương; sau từng delta, số dư không được thấp hơn minimumValue hoặc cao hơn maximumValue. Không được chi tiền/tài nguyên chưa kiếm được ở một delta trước đó, kể cả khi dự kiến sẽ thu lại ở scene hoặc chương sau.
@@ -200,6 +201,7 @@ Tạo plan chương ${startChapter}-${startChapter + 4}. Trước khi trả JSON
         model: routes.planner,
         temperature: 0.2,
         maxTokens: 32768,
+        thinkingLevel: 'medium',
         systemPrompt: V3_ROLLING_PLANNER_SYSTEM,
         responseJsonSchema: toGeminiResponseJsonSchema(RollingPlanWindowDraftV3Schema),
       }, {

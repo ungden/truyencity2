@@ -27,6 +27,7 @@ import {
 } from '@/services/story-engine/flagship-v3';
 import { classifyStoryFailure } from '@/lib/story-production-quota';
 import { toGeminiResponseJsonSchema } from '@/services/story-engine/flagship/setup-response-schemas';
+import { supportsGeminiThinkingLevel } from '@/services/story-engine/utils/gemini';
 
 const detailed = (value: string) => `${value} với nguyên nhân, giới hạn và hậu quả cụ thể trong thế giới truyện.`;
 const prose = (marker: string, bad = '') => `${marker} ${bad} ${'Sơn làm việc bằng đôi tay chai sần, kiểm tra từng thay đổi rồi mới gọi người nhà đến chứng kiến kết quả. '.repeat(18)}`.trim();
@@ -327,10 +328,19 @@ describe('flagship v3 core engine', () => {
     expect(V3_ROLLING_PLANNER_RULES).toContain('participantIds chứa ít nhất povCharacterId');
     expect(V3_ROLLING_PLANNER_RULES).toContain('số dư không được thấp hơn minimumValue');
     expect(V3_ROLLING_PLANNER_RULES).toContain('Không được chi tiền/tài nguyên chưa kiếm được');
+    expect(V3_ROLLING_PLANNER_RULES).toContain('chapterPromise là một câu tiếng Việt cụ thể');
+    expect(V3_ROLLING_PLANNER_RULES).toContain('Promise ID chỉ xuất hiện trong delta kind=promise');
     expect(V3_WRITER_SYSTEM).toContain('durationMinutes và travelMinutesFromPrevious là số phút canon');
     expect(V3_WRITER_SYSTEM).toContain('povCharacterId phải là tâm điểm tri giác');
     expect(V3_WRITER_SYSTEM).toContain('Không gộp hai scene');
     expect(V3_WRITER_SYSTEM).toContain('ranh giới cảnh rõ');
+  });
+
+  it('recognizes Gemini 3.1 Pro as a thinking model so role budgets are not silently ignored', () => {
+    expect(supportsGeminiThinkingLevel('gemini-3.1-pro-preview')).toBe(true);
+    expect(supportsGeminiThinkingLevel('gemini-3-pro-preview')).toBe(true);
+    expect(supportsGeminiThinkingLevel('gemini-2.5-pro')).toBe(false);
+    expect(getFlagshipReleaseManifestV3().providerVersion).toBe('provider-v3.1-gemini31-role-thinking');
   });
 
   it('puts numeric bounds and source rules beside current balances in the authoritative planner ledger', () => {

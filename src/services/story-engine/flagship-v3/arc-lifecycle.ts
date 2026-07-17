@@ -142,7 +142,7 @@ export async function advanceFlagshipV3Arc(
     const proposalRaw = dependencies.invoke
       ? await dependencies.invoke('planner', system, user)
       : await (async () => { const response = await callFlagshipModel(user, {
-        model: routes.planner, temperature: 0.15, maxTokens: 16384, systemPrompt: system,
+        model: routes.planner, temperature: 0.15, maxTokens: 16384, thinkingLevel: 'medium', systemPrompt: system,
         responseJsonSchema: toGeminiResponseJsonSchema(ArcTransitionProposalV3Schema),
       }, { jsonMode: true, schemaName: 'flagship_v3_arc_transition', tracking: { projectId, chapterNumber: state.chapterNumber, task: 'flagship_v3_arc_planner' } }); estimatedCostUsd += Number(response.estimatedCostUsd || 0); return response.content; })();
     proposal = parseRequired('ArcTransitionProposalV3', ArcTransitionProposalV3Schema, cleanJson(proposalRaw));
@@ -152,7 +152,7 @@ export async function advanceFlagshipV3Arc(
     const judgeRaw = dependencies.invoke
       ? await dependencies.invoke('judge', judgeSystem, judgeUser)
       : await (async () => { const response = await callFlagshipModel(judgeUser, {
-        model: routes.editor, temperature: 0.1, maxTokens: 8192, systemPrompt: judgeSystem,
+        model: routes.editor, temperature: 0.1, maxTokens: 8192, thinkingLevel: 'medium', systemPrompt: judgeSystem,
         responseJsonSchema: toGeminiResponseJsonSchema(ArcTransitionJudgeV3Schema),
       }, { jsonMode: true, schemaName: 'flagship_v3_arc_judge', tracking: { projectId, chapterNumber: state.chapterNumber, task: 'flagship_v3_arc_judge' } }); estimatedCostUsd += Number(response.estimatedCostUsd || 0); return response.content; })();
     judge = parseRequired('ArcTransitionJudgeV3', ArcTransitionJudgeV3Schema, cleanJson(judgeRaw));

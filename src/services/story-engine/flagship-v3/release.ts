@@ -7,7 +7,8 @@ export const FLAGSHIP_V3_CONTEXT_VERSION = 'role-context-v3.3-editor-priority-pr
 export const FLAGSHIP_V3_PREFLIGHT_VERSION = 'deterministic-preflight-v3.1';
 export const FLAGSHIP_V3_QUALITY_VERSION = 'quality-v3.2-auditable-thresholds';
 export const FLAGSHIP_V3_ARC_LIFECYCLE_VERSION = 'arc-lifecycle-v3.1-ending-gated';
-export const FLAGSHIP_V3_ROLLING_PLANNER_VERSION = 'flagship-v3.11-cumulative-resource-bounds';
+export const FLAGSHIP_V3_ROLLING_PLANNER_VERSION = 'flagship-v3.12-semantic-field-contract';
+export const FLAGSHIP_V3_PROVIDER_VERSION = 'provider-v3.1-gemini31-role-thinking';
 
 export const FlagshipReleaseManifestV3Schema = z.object({
   pipelineVersion: z.literal('flagship_v3'),
@@ -18,6 +19,7 @@ export const FlagshipReleaseManifestV3Schema = z.object({
   preflightVersion: z.string().min(3),
   qualityVersion: z.string().min(3),
   arcLifecycleVersion: z.string().min(3),
+  providerVersion: z.string().min(3),
   releaseId: z.string().regex(/^fv3_[a-f0-9]{16}$/),
 }).strict();
 
@@ -46,6 +48,7 @@ export function getFlagshipReleaseManifestV3(): FlagshipReleaseManifestV3 {
     preflightVersion: FLAGSHIP_V3_PREFLIGHT_VERSION,
     qualityVersion: FLAGSHIP_V3_QUALITY_VERSION,
     arcLifecycleVersion: FLAGSHIP_V3_ARC_LIFECYCLE_VERSION,
+    providerVersion: FLAGSHIP_V3_PROVIDER_VERSION,
   };
   return FlagshipReleaseManifestV3Schema.parse({
     ...identity,

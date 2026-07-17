@@ -128,6 +128,7 @@ async function invoke<T>(input: {
     model: input.model,
     temperature: 0.15,
     maxTokens: 32768,
+    thinkingLevel: 'medium',
     systemPrompt: input.systemPrompt,
     responseJsonSchema: toGeminiResponseJsonSchema(input.schema as never),
   }, { jsonMode: true, schemaName: `flagship_v3_${input.role}` });

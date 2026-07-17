@@ -254,6 +254,7 @@ export async function writeFlagshipV3Chapter(
           ? (options.temperature ?? project.temperature ?? 0.75)
           : 0.15,
         maxTokens: call.role === 'writer' || call.role === 'writer_revision' ? 32768 : 16384,
+        thinkingLevel: call.role === 'writer' || call.role === 'writer_revision' ? 'low' : 'medium',
         systemPrompt: call.systemPrompt,
         responseJsonSchema: responseSchema,
       }, {
