@@ -160,6 +160,17 @@ function projectState(
   };
 }
 
+function projectRevisionState(state: StoryStateV3, plan: ChapterPlanV3) {
+  const projected = projectState(state, plan, { timeline: 3, retrieval: 0 });
+  const {
+    recentSummary: _recentSummary,
+    previousEnding: _previousEnding,
+    retrievalNotes: _retrievalNotes,
+    ...authoritativeState
+  } = projected;
+  return authoritativeState;
+}
+
 export function buildV3RoleContexts(input: {
   kernel: StoryKernelV3;
   arc: ArcPlanV3;
@@ -170,7 +181,10 @@ export function buildV3RoleContexts(input: {
   const editorKernel = projectEditorKernel(input.kernel, input.plan);
   const writerState = projectState(input.state, input.plan);
   const editorState = projectState(input.state, input.plan, { timeline: 5, retrieval: 2 });
-  const revisionState = projectState(input.state, input.plan, { timeline: 3, retrieval: 1 });
+  // Revision already receives the full current draft. Repeating narrative history here
+  // wastes the smallest role budget and can crowd out the authoritative facts/ledgers
+  // that the repair must obey.
+  const revisionState = projectRevisionState(input.state, input.plan);
   const writerPlan = projectWriterPlan(input.plan);
   const writer = assemble('writer', [
       { id: 'STORY_KERNEL_V3', sourceRef: 'ai_story_projects.story_kernel_v3:writer_projection', value: kernel },

@@ -329,6 +329,24 @@ describe('flagship v3 core engine', () => {
       expect(contexts.revision().text).not.toContain(scene.unresolvedQuestion);
       expect(contexts.editor.text).toContain(scene.unresolvedQuestion);
     }
+    expect(contexts.revision().text).not.toContain('recentSummary');
+    expect(contexts.revision().text).not.toContain('previousEnding');
+    expect(contexts.revision().text).not.toContain('retrievalNotes');
+  });
+
+  it('keeps Revision under budget when optional narrative history is very large', () => {
+    const longNarrativeState: StoryStateV3 = {
+      ...state(),
+      recentSummary: 'Tóm tắt lịch sử '.repeat(180),
+      previousEnding: 'Đoạn kết chương trước '.repeat(100),
+      retrievalNotes: Array.from({ length: 4 }, () => 'Ghi chú truy hồi '.repeat(40)),
+    };
+    const contexts = buildV3RoleContexts({ kernel: kernel(), arc, state: longNarrativeState, plan: plan() });
+    expect(contexts.revision().chars).toBeLessThanOrEqual(contexts.revision().budget);
+    expect(contexts.revision().chars).toBeLessThan(contexts.writer.chars);
+    expect(contexts.revision().text).toContain('RELEVANT_STATE_V3');
+    expect(contexts.revision().text).toContain('facts');
+    expect(contexts.revision().text).toContain('resources');
   });
 
   it('makes POV, participant and minute fidelity explicit in role prompts', () => {

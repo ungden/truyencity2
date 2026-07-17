@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { FLAGSHIP_V3_PROMPT_VERSION } from './prompts';
 
 export const FLAGSHIP_V3_CONTRACT_VERSION = 'story-contracts-v3.2-arc-memory';
-export const FLAGSHIP_V3_CONTEXT_VERSION = 'role-context-v3.5-editor-relevant-ledgers';
+export const FLAGSHIP_V3_CONTEXT_VERSION = 'role-context-v3.6-revision-authoritative-state';
 export const FLAGSHIP_V3_PREFLIGHT_VERSION = 'deterministic-preflight-v3.1';
 export const FLAGSHIP_V3_QUALITY_VERSION = 'quality-v3.5-local-fidelity-revision';
 export const FLAGSHIP_V3_ARC_LIFECYCLE_VERSION = 'arc-lifecycle-v3.1-ending-gated';
