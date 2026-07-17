@@ -340,7 +340,7 @@ describe('flagship v3 core engine', () => {
     expect(supportsGeminiThinkingLevel('gemini-3.1-pro-preview')).toBe(true);
     expect(supportsGeminiThinkingLevel('gemini-3-pro-preview')).toBe(true);
     expect(supportsGeminiThinkingLevel('gemini-2.5-pro')).toBe(false);
-    expect(getFlagshipReleaseManifestV3().providerVersion).toBe('provider-v3.1-gemini31-role-thinking');
+    expect(getFlagshipReleaseManifestV3().providerVersion).toBe('provider-v3.2-gemini31-medium-thinking');
   });
 
   it('puts numeric bounds and source rules beside current balances in the authoritative planner ledger', () => {

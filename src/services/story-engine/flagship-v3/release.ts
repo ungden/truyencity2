@@ -8,7 +8,7 @@ export const FLAGSHIP_V3_PREFLIGHT_VERSION = 'deterministic-preflight-v3.1';
 export const FLAGSHIP_V3_QUALITY_VERSION = 'quality-v3.2-auditable-thresholds';
 export const FLAGSHIP_V3_ARC_LIFECYCLE_VERSION = 'arc-lifecycle-v3.1-ending-gated';
 export const FLAGSHIP_V3_ROLLING_PLANNER_VERSION = 'flagship-v3.12-semantic-field-contract';
-export const FLAGSHIP_V3_PROVIDER_VERSION = 'provider-v3.1-gemini31-role-thinking';
+export const FLAGSHIP_V3_PROVIDER_VERSION = 'provider-v3.2-gemini31-medium-thinking';
 
 export const FlagshipReleaseManifestV3Schema = z.object({
   pipelineVersion: z.literal('flagship_v3'),

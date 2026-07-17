@@ -95,7 +95,7 @@ async function invokeChapter(chapterNumber: number, model: string, call: Flagshi
     model,
     temperature: call.role === 'writer' || call.role === 'writer_revision' ? 0.75 : 0.15,
     maxTokens: call.role === 'writer' || call.role === 'writer_revision' ? 32768 : 16384,
-    thinkingLevel: call.role === 'writer' || call.role === 'writer_revision' ? 'low' : 'medium',
+    thinkingLevel: 'medium',
     systemPrompt: call.systemPrompt,
     responseJsonSchema: toGeminiResponseJsonSchema(schema as never),
   }, { jsonMode: true, schemaName: `flagship_v3_calibration_ch${chapterNumber}_${call.role}` });
