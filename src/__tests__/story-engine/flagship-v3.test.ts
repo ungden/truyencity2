@@ -5,6 +5,7 @@ import {
   StoryStateV3Schema,
   RollingPlanWindowDraftV3Schema,
   MarketResearchSnapshotV3Schema,
+  buildPlannerLedgerV3,
   buildV3RoleContexts,
   executeFlagshipV3Pipeline,
   runConceptTournamentV3,
@@ -324,8 +325,24 @@ describe('flagship v3 core engine', () => {
 
   it('makes POV, participant and minute fidelity explicit in role prompts', () => {
     expect(V3_ROLLING_PLANNER_RULES).toContain('participantIds chứa ít nhất povCharacterId');
+    expect(V3_ROLLING_PLANNER_RULES).toContain('số dư không được thấp hơn minimumValue');
+    expect(V3_ROLLING_PLANNER_RULES).toContain('Không được chi tiền/tài nguyên chưa kiếm được');
     expect(V3_WRITER_SYSTEM).toContain('durationMinutes và travelMinutesFromPrevious là số phút canon');
     expect(V3_WRITER_SYSTEM).toContain('povCharacterId phải là tâm điểm tri giác');
+    expect(V3_WRITER_SYSTEM).toContain('Không gộp hai scene');
+    expect(V3_WRITER_SYSTEM).toContain('ranh giới cảnh rõ');
+  });
+
+  it('puts numeric bounds and source rules beside current balances in the authoritative planner ledger', () => {
+    const ledger = buildPlannerLedgerV3(state(), kernel()) as {
+      resources: Array<{ resourceId: string; value: unknown; minimumValue: number | null; maximumValue: number | null; sourceRules: string[] }>;
+    };
+    expect(ledger.resources).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        resourceId: 'cash', minimumValue: 0, maximumValue: 1000000000,
+        sourceRules: ['Chỉ tăng từ giao dịch có người trả tiền'],
+      }),
+    ]));
   });
 
   it('publishes with exactly Writer and Editor calls', async () => {

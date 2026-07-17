@@ -7,7 +7,7 @@ export const FLAGSHIP_V3_CONTEXT_VERSION = 'role-context-v3.3-editor-priority-pr
 export const FLAGSHIP_V3_PREFLIGHT_VERSION = 'deterministic-preflight-v3.1';
 export const FLAGSHIP_V3_QUALITY_VERSION = 'quality-v3.2-auditable-thresholds';
 export const FLAGSHIP_V3_ARC_LIFECYCLE_VERSION = 'arc-lifecycle-v3.1-ending-gated';
-export const FLAGSHIP_V3_ROLLING_PLANNER_VERSION = 'flagship-v3.10-pov-participant-integrity';
+export const FLAGSHIP_V3_ROLLING_PLANNER_VERSION = 'flagship-v3.11-cumulative-resource-bounds';
 
 export const FlagshipReleaseManifestV3Schema = z.object({
   pipelineVersion: z.literal('flagship_v3'),

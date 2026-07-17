@@ -36,7 +36,7 @@ const runPath = `${output}.replan-run.json`;
 const userPrompt = `STORY_KERNEL_V3=${JSON.stringify(base.kernel)}
 ARC_PLAN_V3=${JSON.stringify(base.arc)}
 STORY_STATE_V3=${JSON.stringify(base.initialState)}
-AUTHORITATIVE_LEDGER=${JSON.stringify(buildPlannerLedgerV3(base.initialState))}
+AUTHORITATIVE_LEDGER=${JSON.stringify(buildPlannerLedgerV3(base.initialState, base.kernel))}
 
 Tạo RollingPlanWindowV3 chương 1-5. Tự mô phỏng tuần tự cả năm plan trên AUTHORITATIVE_LEDGER; chapter 1 dùng đúng ledger, chapter sau dùng postcondition chapter trước. Không tự lặp lại before/after/unit/valueBefore vì compiler sẽ gắn chúng.`;
 const digest = createHash('sha256').update(JSON.stringify({

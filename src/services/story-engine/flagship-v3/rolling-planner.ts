@@ -30,6 +30,7 @@ Mỗi scene phải có participantIds chứa ít nhất povCharacterId; tuyệt 
 Mọi required delta bắt buộc evidenceRequired=true và phải được đúng một hoặc nhiều scene thực hiện.
 Mỗi plan chỉ ghi elapsedMinutesSincePreviousChapter, durationMinutes và travelMinutesFromPrevious. Không tự tạo startMinute; engine sẽ cộng timeline tuyệt đối theo thứ tự scene.
 Với resource_numeric, chỉ quyết định delta/source/sink; không tự trả before/after/unit. Với resource_state, chỉ trả after/source. Với fact, chỉ trả valueAfter. Engine sẽ gắn before/after/unit/valueBefore từ ledger theo thứ tự năm chương.
+AUTHORITATIVE_LEDGER.resources là sổ cái duy nhất: mỗi resource_numeric có amount hiện tại, minimumValue và maximumValue. Phải tự cộng tuần tự mọi delta của cả năm chương; sau từng delta, số dư không được thấp hơn minimumValue hoặc cao hơn maximumValue. Không được chi tiền/tài nguyên chưa kiếm được ở một delta trước đó, kể cả khi dự kiến sẽ thu lại ở scene hoặc chương sau.
 Scene gắn với resource_numeric phải dùng cùng amount/unit trong cost/payoff/irreversibleChange; không đổi đơn vị hoặc dùng tính từ quy mô mơ hồ trái ledger.
 Mọi knowledge change phải chỉ rõ nhân vật, fact và nguồn học. Fact mới dùng stable ID mới và phải được tạo trước hoặc cùng chương với lần học đầu tiên; engine tự gắn valueBefore.
 Character/resource/promise ID chỉ lấy từ kernel/state. Mọi ID và locationId theo mẫu [a-z][a-z0-9_-].
@@ -39,7 +40,11 @@ hookIntent chỉ là enum hiệu ứng; unresolvedQuestion không được viế
 export const V3_ROLLING_PLANNER_SYSTEM = `Bạn là Rolling Planner của đúng một bộ truyện. Không viết prose, không sửa kernel/state/arc và chỉ trả JSON RollingPlanWindowV3.
 ${V3_ROLLING_PLANNER_RULES}`;
 
-export function buildPlannerLedgerV3(state: StoryStateV3): unknown {
+export function buildPlannerLedgerV3(
+  state: StoryStateV3,
+  kernel: ReturnType<typeof StoryKernelV3Schema.parse>,
+): unknown {
+  const definitions = new Map(kernel.resources.map(resource => [resource.id, resource]));
   return {
     chapterNumber: state.chapterNumber,
     facts: state.facts.map(fact => ({ id: fact.id, value: fact.value })),
@@ -48,7 +53,17 @@ export function buildPlannerLedgerV3(state: StoryStateV3): unknown {
       locationId: character.locationId,
       factIds: character.knowledge.map(item => item.factId),
     })),
-    resources: state.resources.map(resource => ({ resourceId: resource.resourceId, value: resource.value })),
+    resources: state.resources.map(resource => {
+      const definition = definitions.get(resource.resourceId);
+      return {
+        resourceId: resource.resourceId,
+        value: resource.value,
+        minimumValue: definition?.minimumValue ?? null,
+        maximumValue: definition?.maximumValue ?? null,
+        sourceRules: definition?.sourceRules ?? [],
+        spendRules: definition?.spendRules ?? [],
+      };
+    }),
     promises: state.promises.map(promise => ({ promiseId: promise.promiseId, status: promise.status })),
   };
 }
@@ -172,7 +187,7 @@ export async function planNextFlagshipV3Window(
   }
   const context = buildV3PlannerContext({ kernel, arc, state, ledgerMemory: { knowledge: ledgerMemory.knowledge } });
   const userPrompt = `START_CHAPTER=${startChapter}
-AUTHORITATIVE_LEDGER=${JSON.stringify(buildPlannerLedgerV3(state))}
+AUTHORITATIVE_LEDGER=${JSON.stringify(buildPlannerLedgerV3(state, kernel))}
 ROLE_CONTEXT=${context.text}
 Tạo plan chương ${startChapter}-${startChapter + 4}. Trước khi trả JSON, tự mô phỏng tuần tự cả năm plan trên AUTHORITATIVE_LEDGER.`;
   let raw: string;
