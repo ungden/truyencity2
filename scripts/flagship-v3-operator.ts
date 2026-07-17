@@ -1,12 +1,18 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { createClient } from '@supabase/supabase-js';
 import {
   FlagshipLaunchPackV3Schema,
   FlagshipModelRoutesV3Schema,
+  digestFlagshipV3,
+  getFlagshipReleaseManifestV3,
   validateLaunchPackV3,
 } from '../src/services/story-engine/flagship-v3';
+
+dotenv.config({ path: '.env.local' });
+dotenv.config({ path: '.env.runtime' });
+dotenv.config();
 
 const args = process.argv.slice(2);
 const command = args[0];
@@ -34,6 +40,8 @@ async function stage(id: string): Promise<void> {
   if (!launchPackPath || !routesPath) throw new Error('stage requires --launch-pack and --routes JSON files.');
   const launchPack = FlagshipLaunchPackV3Schema.parse(JSON.parse(readFileSync(path.resolve(launchPackPath), 'utf8')));
   const routes = FlagshipModelRoutesV3Schema.parse(JSON.parse(readFileSync(path.resolve(routesPath), 'utf8')));
+  const release = getFlagshipReleaseManifestV3();
+  const launchPackDigest = digestFlagshipV3(launchPack);
   validateLaunchPackV3(launchPack);
   console.log(JSON.stringify({
     dryRun: !apply,
@@ -43,12 +51,16 @@ async function stage(id: string): Promise<void> {
     selectedConceptId: launchPack.selectedConceptId,
     routeVersion: routes.routeVersion,
     initialPlans: launchPack.initialWindow.plans.map(plan => plan.chapterNumber),
+    engineReleaseId: release.releaseId,
+    launchPackDigest,
   }, null, 2));
   if (!apply) return;
-  const { data, error } = await db.rpc('stage_flagship_launch_pack_v3', {
+  const { data, error } = await db.rpc('stage_flagship_launch_pack_release_v3', {
     p_project_id: id,
     p_launch_pack: launchPack,
     p_routes: routes,
+    p_release_manifest: release,
+    p_launch_pack_digest: launchPackDigest,
   });
   if (error) throw error;
   console.log(JSON.stringify(data, null, 2));
@@ -72,8 +84,10 @@ async function reset(id: string): Promise<void> {
     v3InitialPlans: plans,
   }, null, 2));
   if (!apply) return;
-  const { data, error } = await db.rpc('archive_reset_flagship_canary_v3', {
+  const release = getFlagshipReleaseManifestV3();
+  const { data, error } = await db.rpc('archive_reset_flagship_canary_release_v3', {
     p_project_id: id,
+    p_engine_release_id: release.releaseId,
     p_confirmation: 'ARCHIVE_AND_RESET_V3_CANARY',
   });
   if (error) throw error;
@@ -82,10 +96,12 @@ async function reset(id: string): Promise<void> {
 
 async function promote(id: string): Promise<void> {
   const dailyQuota = Number(value('--daily-quota') || '5');
-  console.log(JSON.stringify({ dryRun: !apply, command: 'promote', projectId: id, dailyQuota, current: await status(id) }, null, 2));
+  const release = getFlagshipReleaseManifestV3();
+  console.log(JSON.stringify({ dryRun: !apply, command: 'promote', projectId: id, dailyQuota, engineReleaseId: release.releaseId, current: await status(id) }, null, 2));
   if (!apply) return;
-  const { data, error } = await db.rpc('promote_flagship_v3_factory', {
+  const { data, error } = await db.rpc('promote_flagship_v3_factory_release', {
     p_project_id: id,
+    p_engine_release_id: release.releaseId,
     p_daily_quota: dailyQuota,
     p_confirmation: 'PROMOTE_APPROVED_V3_FACTORY',
   });

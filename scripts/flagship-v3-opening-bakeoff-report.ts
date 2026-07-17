@@ -63,6 +63,7 @@ const pairs = [] as Array<{
   optionB: string;
   aRoute: 'baseline' | 'candidate';
   bRoute: 'baseline' | 'candidate';
+  machineMetrics: { firstPassPublished: boolean; publishedWithinRevision: boolean; publishedCostUsd: number };
 }>;
 
 for (const baselineStory of baseline) {
@@ -81,6 +82,11 @@ for (const baselineStory of baseline) {
       optionB: candidateFirst ? baselineChapter.content : candidateChapter.content,
       aRoute: candidateFirst ? 'candidate' : 'baseline',
       bRoute: candidateFirst ? 'baseline' : 'candidate',
+      machineMetrics: {
+        firstPassPublished: candidateChapter.status === 'publish' && candidateChapter.callRoles.length === 2,
+        publishedWithinRevision: candidateChapter.status === 'publish',
+        publishedCostUsd: candidateChapter.estimatedCostUsd,
+      },
     });
   }
 }
@@ -100,6 +106,17 @@ writeFileSync(path.join(output, 'answer-key.json'), `${JSON.stringify({
   baselineDirectory: baselineName,
   candidateDirectory: candidateName,
   pairs: pairs.map(pair => ({ id: pair.id, optionA: pair.aRoute, optionB: pair.bRoute })),
+}, null, 2)}\n`);
+writeFileSync(path.join(output, 'blind-samples.json'), `${JSON.stringify({
+  schemaVersion: 3,
+  samples: pairs.map(pair => ({
+    sampleKey: pair.id,
+    title: pair.title,
+    chapterNumber: pair.chapterNumber,
+    optionA: pair.optionA,
+    optionB: pair.optionB,
+    machineMetrics: pair.machineMetrics,
+  })),
 }, null, 2)}\n`);
 const packet = pairs.map((pair, index) => `## Mẫu ${index + 1}: ${pair.title} — chương ${pair.chapterNumber}
 

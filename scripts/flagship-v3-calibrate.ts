@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 
-import 'dotenv/config';
+import dotenv from 'dotenv';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { createClient } from '@supabase/supabase-js';
@@ -8,6 +8,10 @@ import {
   BlindCalibrationCorpusV3Schema,
   computeCalibrationMetricsV3,
 } from '../src/services/story-engine/flagship-v3/calibration';
+
+dotenv.config({ path: '.env.local' });
+dotenv.config({ path: '.env.runtime' });
+dotenv.config();
 
 const args = process.argv.slice(2);
 const value = (name: string): string | null => {
@@ -30,6 +34,10 @@ async function main(): Promise<void> {
     pipeline_version: 'flagship_v3',
     prompt_version: corpus.promptVersion,
     route_version: corpus.routeVersion,
+    engine_release_id: corpus.engineReleaseId,
+    launch_pack_digest: corpus.launchPackDigest,
+    launch_pack_digests: corpus.launchPackDigests,
+    distinct_reviewers: corpus.distinctReviewers,
     sample_size: metrics.sampleSize,
     blind_preference_rate: metrics.blindPreferenceRate,
     first_pass_publish_rate: metrics.firstPassPublishRate,
@@ -40,7 +48,7 @@ async function main(): Promise<void> {
     status: metrics.approved ? 'approved' : 'rejected',
     approved_by: corpus.approvedBy,
     evidence: corpus.evidence,
-  }, { onConflict: 'prompt_version,route_version' }).select('*').single();
+  }, { onConflict: 'engine_release_id,route_version,launch_pack_digest' }).select('*').single();
   if (error) throw error;
   console.log(JSON.stringify(data, null, 2));
 }

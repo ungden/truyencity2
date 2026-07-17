@@ -1,5 +1,14 @@
 import type { ChapterDeltaV3, ChapterPlanV3, StoryStateV3 } from './contracts';
 
+export function retainStoryFactsV3(facts: StoryStateV3['facts'], limit = 100): StoryStateV3['facts'] {
+  const pinned = facts.filter(fact => fact.scope === 'invariant' && (fact.status ?? 'active') === 'active');
+  const remainder = facts
+    .filter(fact => !pinned.some(item => item.id === fact.id))
+    .sort((left, right) => right.sourceChapter - left.sourceChapter)
+    .slice(0, Math.max(0, limit - pinned.length));
+  return [...pinned, ...remainder].slice(0, limit);
+}
+
 function replaceBy<T>(items: T[], key: (item: T) => string, wanted: string, update: (item: T) => T): T[] {
   let found = false;
   const next = items.map(item => {
@@ -36,8 +45,9 @@ export function applyChapterStateV3(input: {
       const existing = facts.some(item => item.id === delta.factId);
       facts = (existing
         ? replaceBy(facts, item => item.id, delta.factId, item => ({ ...item, value: delta.valueAfter, sourceChapter: chapter }))
-        : [...facts, { id: delta.factId, value: delta.valueAfter, sourceChapter: chapter }]
-      ).slice(-100);
+        : [...facts, { id: delta.factId, value: delta.valueAfter, sourceChapter: chapter, scope: 'local' as const, status: 'active' as const }]
+      );
+      facts = retainStoryFactsV3(facts);
     } else if (delta.kind === 'character_location') {
       characters = replaceBy(characters, item => item.characterId, delta.characterId, item => ({ ...item, locationId: delta.locationAfter }));
     } else if (delta.kind === 'character_knowledge') {

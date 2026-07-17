@@ -23,6 +23,7 @@ import {
   AlertCircle,
   Target,
   Power,
+  FlaskConical,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -110,6 +111,11 @@ const menuItems: MenuItem[] = [
     title: 'Mục tiêu tối thượng',
     href: '/admin/supreme-goals',
     icon: Target,
+  },
+  {
+    title: 'Blind Calibration',
+    href: '/admin/quality/flagship-calibration',
+    icon: FlaskConical,
   },
   {
     title: 'Chi phi AI',

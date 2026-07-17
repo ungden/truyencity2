@@ -14,7 +14,11 @@ export const BlindCalibrationCorpusV3Schema = z.object({
   schemaVersion: z.literal(3),
   promptVersion: z.string().trim().min(3),
   routeVersion: z.string().trim().min(3),
+  engineReleaseId: z.string().regex(/^fv3_[a-f0-9]{16}$/),
+  launchPackDigest: z.string().regex(/^[a-f0-9]{64}$/),
+  launchPackDigests: z.array(z.string().regex(/^[a-f0-9]{64}$/)).min(1).max(30),
   approvedBy: z.string().trim().min(3),
+  distinctReviewers: z.number().int().min(1),
   samples: z.array(BlindCalibrationSampleV3Schema).min(50),
   evidence: z.array(z.unknown()).max(500).default([]),
 }).strict();
@@ -59,6 +63,7 @@ export function computeCalibrationMetricsV3(corpus: BlindCalibrationCorpusV3): C
       && metrics.withinRevisionPublishRate >= 0.8
       && metrics.criticalContinuityViolations === 0
       && metrics.readChapter4Rate >= 0.7
-      && metrics.medianCostUsd <= 0.35,
+      && corpus.distinctReviewers >= 5
+      && metrics.medianCostUsd <= 0.25,
   };
 }

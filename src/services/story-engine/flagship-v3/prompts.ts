@@ -3,7 +3,7 @@ import type { V3RoleContext } from './context';
 import type { V3Evidence } from './preflight';
 import type { V3ProseSpan } from './evidence-spans';
 
-export const FLAGSHIP_V3_PROMPT_VERSION = 'flagship-v3.3-editor-span-ids';
+export const FLAGSHIP_V3_PROMPT_VERSION = 'flagship-v3.4-auditable-weighted-gate';
 
 export const V3_WRITER_SYSTEM = `Bạn là tiểu thuyết gia của đúng một bộ truyện.
 Viết một chương hoàn chỉnh từ dữ liệu cảnh, không chép câu mô tả trong kế hoạch.
@@ -47,7 +47,8 @@ export function buildV3EditorPrompt(input: {
   deterministicEvidence: V3Evidence[];
 }): string {
   return `Đánh giá chương ${input.plan.chapterNumber}.
-Ngưỡng publish: confidence >=0.70; desire_to_read_next >=8; prose_naturalness, character_voice, domain_truth >=7.5; không trục nào dưới 7.
+Ngưỡng publish: confidence >=0.70; desire_to_read_next >=8; prose_naturalness, character_voice, domain_truth >=7.5; trung bình có trọng số >=7.8; không trục nào dưới 7.
+Nếu bất kỳ ngưỡng nào không đạt hoặc decision khác publish, phải trích evidence span chính xác giải thích nguyên nhân; verdict yếu không có evidence là lỗi contract.
 Nếu deterministic evidence có lỗi, kiểm chứng lại trong prose; không được bỏ qua lỗi có substring chính xác.
 Không chép lại deterministic evidence vào evidence; nếu lỗi sửa được cục bộ thì trả revise và viết revisionInstructions tương ứng.
 Nếu revise, chỉ dẫn phải cục bộ và có evidence. Canon/timeline/resource/knowledge/authority sai nền tảng phải reject.

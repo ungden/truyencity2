@@ -16,6 +16,7 @@ import {
   FlagshipV3Error,
   canTransitionFactoryV3,
   getFlagshipV3ProviderReadiness,
+  advanceFlagshipV3Arc,
   planNextFlagshipV3Window,
   writeFlagshipV3Chapter,
   type FactoryV3Status,
@@ -136,11 +137,20 @@ function failureEvidence(caught: unknown): unknown[] {
   }).slice(0, 50);
 }
 
-async function ensureNextWindow(db: ReturnType<typeof getSupabaseAdmin>, projectId: string, nextChapter: number): Promise<void> {
+async function ensureNextWindow(db: ReturnType<typeof getSupabaseAdmin>, projectId: string, nextChapter: number): Promise<'ready' | 'completed'> {
   const { data, error } = await db.from('chapter_blueprints').select('id').eq('project_id', projectId).eq('chapter_number', nextChapter).maybeSingle();
   if (error) throw new FlagshipV3Error('plan_blocked', `ChapterPlanV3 lookup failed: ${error.message}`);
-  if (data) return;
+  if (data) return 'ready';
+  const { data: project, error: projectError } = await db.from('ai_story_projects')
+    .select('current_chapter,arc_plan_v3').eq('id', projectId).single();
+  if (projectError) throw new FlagshipV3Error('plan_blocked', `Arc lookup failed: ${projectError.message}`);
+  const arc = project.arc_plan_v3 as { endChapter?: number } | null;
+  if (nextChapter > Number(arc?.endChapter || 0)) {
+    const transition = await advanceFlagshipV3Arc(projectId, { db });
+    if (transition.completed) return 'completed';
+  }
   await planNextFlagshipV3Window(projectId, { db });
+  return 'ready';
 }
 
 async function processJob(db: ReturnType<typeof getSupabaseAdmin>, job: FactoryJob): Promise<FactoryResult> {
@@ -158,12 +168,6 @@ async function processJob(db: ReturnType<typeof getSupabaseAdmin>, job: FactoryJ
 
     const writable = job.stage === 'write' && job.status === 'writing';
     if (!writable) {
-      // A completion audit is deliberately not guessed. Hard caps are the
-      // only automatic completion signal until a typed ending report exists.
-      if (job.status === 'finale' && job.completion_mode === 'hard_cap') {
-        await advance(db, job, 'completed', 'completion', job.current_chapter, [{ reason: 'hard_cap' }]);
-        return { ...base, status: 'completed', chapterNumber: job.current_chapter };
-      }
       throw new FlagshipV3Error('plan_blocked', `Factory v3 job is not writable at ${job.status}/${job.stage}.`);
     }
 
@@ -174,7 +178,11 @@ async function processJob(db: ReturnType<typeof getSupabaseAdmin>, job: FactoryJ
     // checkpoint to a transient DB error. Never write the next chapter twice.
     if (Number(projectState.current_chapter || 0) > job.current_chapter) {
       committedChapter = Number(projectState.current_chapter);
-      await ensureNextWindow(db, job.project_id, committedChapter + 1);
+      const windowState = await ensureNextWindow(db, job.project_id, committedChapter + 1);
+      if (windowState === 'completed') {
+        await advance(db, job, 'completed', 'completion', committedChapter, [{ reason: 'typed_ending_report' }]);
+        return { ...base, status: 'completed', chapterNumber: committedChapter };
+      }
       await advance(db, job, 'ready', 'plan', committedChapter, [{ step: 'commit_reconciled', chapterNumber: committedChapter }]);
       return { ...base, status: 'written', chapterNumber: committedChapter };
     }
@@ -185,10 +193,13 @@ async function processJob(db: ReturnType<typeof getSupabaseAdmin>, job: FactoryJ
     const written = await writeFlagshipV3Chapter({ projectId: job.project_id }, { db });
     committedChapter = written.chapterNumber;
     if (written.chapterNumber >= job.max_chapters) {
-      await advance(db, job, 'completed', 'completion', written.chapterNumber, [{ reason: 'safety_max_chapters', maxChapters: job.max_chapters }]);
+      throw new FlagshipV3Error('plan_blocked', `Safety cap ${job.max_chapters} reached without an approved typed ending report.`);
+    }
+    const windowState = await ensureNextWindow(db, job.project_id, written.chapterNumber + 1);
+    if (windowState === 'completed') {
+      await advance(db, job, 'completed', 'completion', written.chapterNumber, [{ reason: 'typed_ending_report' }]);
       return { ...base, status: 'completed', chapterNumber: written.chapterNumber };
     }
-    await ensureNextWindow(db, job.project_id, written.chapterNumber + 1);
     await advance(db, job, 'ready', 'plan', written.chapterNumber, [{ chapterNumber: written.chapterNumber, qualityScore: written.qualityScore }]);
     return { ...base, status: 'written', chapterNumber: written.chapterNumber };
   } catch (caught) {
@@ -226,11 +237,11 @@ async function processJob(db: ReturnType<typeof getSupabaseAdmin>, job: FactoryJ
       }
     }
     try {
-      await advance(db, job, 'quality_blocked', 'review', committedChapter || job.current_chapter, [{ code: code || 'unknown' }], 'unknown', message);
+      await advance(db, job, 'infra_blocked', committedChapter ? 'plan' : job.stage, committedChapter || job.current_chapter, [{ code: code || 'unknown_runtime' }], 'infrastructure', message);
     } catch (transitionError) {
       return { ...base, status: 'failed', error: `${message}; transition: ${errorMessage(transitionError)}` };
     }
-    return { ...base, status: 'quality_blocked', error: message };
+    return { ...base, status: 'infra_blocked', error: message };
   }
 }
 

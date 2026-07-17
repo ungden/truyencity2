@@ -18,19 +18,19 @@ function storyPackage(input: PackageInput): FlagshipStoryPackageV1 {
       sourceAssetPath: `/covers/flagship-first-30/source/${input.slotId.toLowerCase()}.webp`,
       alt: `Bìa truyện ${input.title}: ${input.tagline}`,
       imagePrompt: `Use case: illustration-story
-Asset type: art-only background for a 3:4 Vietnamese serialized-fiction cover
+Asset type: art-only background for a 2:3 Vietnamese serialized-fiction cover
 Primary request: ${artScene}
 Story-specific medium: ${artStyle}
 Shared art direction: restrained editorial book illustration, matte painted surfaces, deliberate large color shapes, subtle natural paper texture, human proportions, tactile real-world materials, confident selective detail. It should feel commissioned by an experienced human illustrator, not like generic AI fantasy art.
-Composition/framing: ${artComposition}; strict 3:4 portrait composition; one clear focal subject and one story-defining object or environment; asymmetrical visual hierarchy; keep the top 30 percent calm and low-detail for later typography; keep critical faces and objects inside the central 70 percent so a mechanical 3:4 crop is safe.
+Composition/framing: ${artComposition}; strict 2:3 portrait composition; one clear focal subject and one story-defining object or environment; asymmetrical visual hierarchy; keep the top 30 percent calm and low-detail for later typography; keep critical faces and objects inside the central 70 percent so a mechanical 2:3 crop is safe.
 Lighting/mood: ${artMood}
 Color palette: ${artPalette}
 Text: no text, no letters, no typography, no watermark; typography will be added later by the cover renderer.
 Hard exclusions: no sparkles, no glowing dust, no floating particles, no bokeh, no lens flare, no volumetric light shafts, no neon rim light, no magical UI panels, no collage or character montage, no glossy 3D-render finish, no plastic skin, no exaggerated anime face, no decorative clutter, no shower of embers, no random symbols.
 Originality: original characters and world only; do not imitate an existing book cover or living artist.`,
       renderSpec: {
-        width: 1086,
-        height: 1448,
+        width: 1200,
+        height: 1800,
         title: input.title,
         watermark: 'truyencity.com',
       },

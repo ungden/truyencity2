@@ -85,6 +85,20 @@ const WEIGHTS: Record<V3QualityAxis, number> = {
 
 const SERIOUS_HARD_GATES = ['canon', 'timeline', 'resourceCausality', 'characterKnowledge', 'authority', 'planFidelity'] as const;
 
+export function qualityThresholdFailuresV3(editor: GroundedQualityVerdictV3Model): string[] {
+  const failures: string[] = [];
+  if (editor.confidence < 0.7) failures.push('confidence');
+  if (editor.axes.desire_to_read_next < 8) failures.push('desire_to_read_next');
+  if (editor.axes.prose_naturalness < 7.5) failures.push('prose_naturalness');
+  if (editor.axes.character_voice < 7.5) failures.push('character_voice');
+  if (editor.axes.domain_truth < 7.5) failures.push('domain_truth');
+  const weighted = V3_AXIS_KEYS.reduce((sum, key) => sum + editor.axes[key] * WEIGHTS[key], 0);
+  const weightedMean = weighted / V3_AXIS_KEYS.reduce((sum, key) => sum + WEIGHTS[key], 0);
+  if (weightedMean < 7.8) failures.push('weighted_mean');
+  if (Math.min(...V3_AXIS_KEYS.map(key => editor.axes[key])) < 7) failures.push('minimum_axis');
+  return failures;
+}
+
 export function evaluateQualityV3(input: {
   plan: ChapterPlanV3;
   editor: GroundedQualityVerdictV3Model;
@@ -112,13 +126,7 @@ export function evaluateQualityV3(input: {
   const weightTotal = V3_AXIS_KEYS.reduce((sum, key) => sum + WEIGHTS[key], 0);
   const weightedMean = Number((weighted / weightTotal).toFixed(2));
   const minAxis = Math.min(...V3_AXIS_KEYS.map(key => input.editor.axes[key]));
-  const thresholdPassed = input.editor.confidence >= 0.7
-    && input.editor.axes.desire_to_read_next >= 8
-    && input.editor.axes.prose_naturalness >= 7.5
-    && input.editor.axes.character_voice >= 7.5
-    && input.editor.axes.domain_truth >= 7.5
-    && weightedMean >= 7.8
-    && minAxis >= 7;
+  const thresholdPassed = qualityThresholdFailuresV3(input.editor).length === 0;
   const seriousGateFailed = SERIOUS_HARD_GATES.some(key => !input.editor.hardGates[key])
     || input.editor.planFidelity < 7.5
     || missingDeltas.length > 0;

@@ -6,6 +6,7 @@ import { runV3ProsePreflight, type V3Evidence } from './preflight';
 import {
   QualityVerdictV3ModelSchema,
   evaluateQualityV3,
+  qualityThresholdFailuresV3,
   type GroundedQualityVerdictV3Model,
   type QualityVerdictV3,
   type QualityVerdictV3Model,
@@ -94,11 +95,11 @@ function groundEditor(editor: QualityVerdictV3Model, spans: V3ProseSpan[]): Grou
 
 function assertAuditable(editor: GroundedQualityVerdictV3Model, deterministicEvidence: V3Evidence[]): void {
   const failedGate = Object.values(editor.hardGates).some(value => !value);
-  const failedAxis = Object.values(editor.axes).some(value => value < 7);
-  if ((editor.decision !== 'publish' || failedGate || failedAxis)
+  const thresholdFailures = qualityThresholdFailuresV3(editor);
+  if ((editor.decision !== 'publish' || failedGate || thresholdFailures.length > 0)
     && editor.evidence.length === 0
     && deterministicEvidence.length === 0) {
-    throw new FlagshipV3Error('infra_blocked', 'Editor returned a failing verdict without grounded evidence.');
+    throw new FlagshipV3Error('infra_blocked', 'Editor returned a failing verdict without grounded evidence.', { thresholdFailures });
   }
   if (editor.decision === 'revise' && editor.revisionInstructions.length === 0) {
     throw new FlagshipV3Error('infra_blocked', 'Editor requested revision without scoped instructions.');

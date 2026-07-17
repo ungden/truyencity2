@@ -177,10 +177,12 @@ export function buildV3PlannerContext(input: {
   kernel: StoryKernelV3;
   arc: ArcPlanV3;
   state: StoryStateV3;
+  ledgerMemory?: unknown;
 }): V3RoleContext {
   return assemble('planner', [
     { id: 'STORY_KERNEL_V3', sourceRef: 'ai_story_projects.story_kernel_v3', value: input.kernel },
     { id: 'ARC_PLAN_V3', sourceRef: 'ai_story_projects.arc_plan_v3', value: input.arc },
     { id: 'STORY_STATE_V3', sourceRef: 'ai_story_projects.story_state_v3', value: input.state },
+    ...(input.ledgerMemory ? [{ id: 'LONG_TERM_LEDGER_V3', sourceRef: 'story_fact_ledger_v3+story_knowledge_ledger_v3', value: input.ledgerMemory }] : []),
   ]);
 }

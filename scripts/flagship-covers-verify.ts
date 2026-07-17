@@ -25,8 +25,8 @@ type CoverEntry = {
   slotId: string;
   title: string;
   watermark: 'truyencity.com';
-  width: 1086;
-  height: 1448;
+  width: 1200;
+  height: 1800;
   sourceSha256: string;
   renderedSha256: string;
 };
@@ -59,8 +59,8 @@ async function buildManifest(): Promise<CoverManifest> {
     const source = readFileSync(sourcePath);
     const rendered = readFileSync(renderedPath);
     const metadata = await sharp(rendered).metadata();
-    if (metadata.format !== 'webp' || metadata.width !== 1086 || metadata.height !== 1448) {
-      throw new Error(`${item.slotId} rendered cover must be WebP 1086x1448; got ${metadata.format} ${metadata.width}x${metadata.height}`);
+    if (metadata.format !== 'webp' || metadata.width !== 1200 || metadata.height !== 1800) {
+      throw new Error(`${item.slotId} rendered cover must be WebP 1200x1800; got ${metadata.format} ${metadata.width}x${metadata.height}`);
     }
     const sourceMetadata = await sharp(source).metadata();
     if (sourceMetadata.format !== 'webp' || sourceMetadata.width !== 1086 || sourceMetadata.height !== 1448) {

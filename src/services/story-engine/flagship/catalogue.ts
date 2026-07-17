@@ -25,8 +25,8 @@ export const FlagshipStoryPackageV1Schema = z.object({
     alt: concrete.max(240),
     imagePrompt: concrete.max(2400),
     renderSpec: z.object({
-      width: z.literal(1086),
-      height: z.literal(1448),
+      width: z.literal(1200),
+      height: z.literal(1800),
       title: FlagshipMarketTitleV1Schema,
       watermark: z.literal('truyencity.com'),
     }).strict(),

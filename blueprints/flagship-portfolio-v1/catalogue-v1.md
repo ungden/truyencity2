@@ -1,6 +1,6 @@
 # Catalogue 30 truyện nam flagship — V1
 
-Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một concept package riêng gồm bản sắc, nhân vật, bối cảnh, opening hook, serial promise và bìa 3:4. Nó chưa phải StorySpec và không được inject vào Writer. Chỉ concept được human-gate chọn mới được materialize thành kernel riêng của truyện.
+Catalogue này là lớp tuyển chọn thượng nguồn. Mỗi mục là một concept package riêng gồm bản sắc, nhân vật, bối cảnh, opening hook, serial promise và bìa 2:3. Nó chưa phải StorySpec và không được inject vào Writer. Chỉ concept được human-gate chọn mới được materialize thành kernel riêng của truyện.
 
 - Tổng số: 30
 - Huyền huyễn: 7

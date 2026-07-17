@@ -61,22 +61,22 @@ describe('flagship first-30 portfolio', () => {
 
   it('keeps ImageGen art-only and makes ratio, Vietnamese title and watermark deterministic', () => {
     for (const item of catalogue.packages) {
-      expect(item.coverArt.imagePrompt).toContain('strict 3:4 portrait composition');
+      expect(item.coverArt.imagePrompt).toContain('strict 2:3 portrait composition');
       expect(item.coverArt.imagePrompt).toContain('no sparkles');
       expect(item.coverArt.imagePrompt).toContain('no bokeh');
       expect(item.coverArt.imagePrompt).toContain('no text, no letters, no typography, no watermark');
       expect(item.coverArt.imagePrompt).not.toContain(item.title);
       expect(item.coverArt.imagePrompt).not.toContain('truyencity.com');
       expect(item.coverArt.renderSpec).toEqual({
-        width: 1086,
-        height: 1448,
+        width: 1200,
+        height: 1800,
         title: item.title,
         watermark: 'truyencity.com',
       });
     }
   });
 
-  it('ships all 30 reproducible source illustrations and rendered 3:4 covers', async () => {
+  it('ships all 30 reproducible source illustrations and rendered 2:3 covers', async () => {
     validateFlagshipCatalogue(validated.manifest, catalogue, { requireCoverFiles: true, workspaceRoot: process.cwd() });
     for (const item of catalogue.packages) {
       const cover = readFileSync(path.join(process.cwd(), 'public', item.coverArt.assetPath.replace(/^\//, '')));
@@ -84,7 +84,7 @@ describe('flagship first-30 portfolio', () => {
       expect(source.length).toBeGreaterThan(100_000);
       expect(cover.subarray(0, 4).toString('ascii')).toBe('RIFF');
       const metadata = await sharp(cover).metadata();
-      expect(metadata).toMatchObject({ format: 'webp', width: 1086, height: 1448 });
+      expect(metadata).toMatchObject({ format: 'webp', width: 1200, height: 1800 });
     }
   });
 
@@ -101,8 +101,8 @@ describe('flagship first-30 portfolio', () => {
         slotId: item.slotId,
         title: item.title,
         watermark: 'truyencity.com',
-        width: 1086,
-        height: 1448,
+        width: 1200,
+        height: 1800,
       }));
     }
   });

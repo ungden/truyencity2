@@ -141,6 +141,7 @@ export type StoryKernelV3 = z.infer<typeof StoryKernelV3Schema>;
 
 export const ArcPlanV3Schema = z.object({
   schemaVersion: z.literal(3),
+  arcMode: z.enum(['standard', 'finale']).optional(),
   arcId: id,
   startChapter: z.number().int().min(1),
   endChapter: z.number().int().min(1),
@@ -160,8 +161,17 @@ export const ArcPlanV3Schema = z.object({
   }).strict()).min(2).max(10),
 }).strict().superRefine((arc, ctx) => {
   const length = arc.endChapter - arc.startChapter + 1;
-  if (length < 20 || length > 30) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['endChapter'], message: 'Arc must contain 20-30 chapters.' });
+  const mode = arc.arcMode ?? 'standard';
+  const valid = mode === 'standard' ? length >= 20 && length <= 30 : length >= 5 && length <= 20;
+  if (!valid) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['endChapter'],
+      message: mode === 'standard' ? 'Standard arc must contain 20-30 chapters.' : 'Finale arc must contain 5-20 chapters.',
+    });
+  }
+  if (length % 5 !== 0) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['endChapter'], message: 'Arc length must align to five-chapter rolling windows.' });
   }
 });
 
@@ -179,6 +189,8 @@ export const StoryStateV3Schema = z.object({
     id,
     value: text,
     sourceChapter: z.number().int().min(0),
+    scope: z.enum(['invariant', 'arc', 'local']).optional(),
+    status: z.enum(['active', 'retired']).optional(),
   }).strict()).max(100),
   timeline: z.array(z.object({
     chapter: z.number().int().min(0),

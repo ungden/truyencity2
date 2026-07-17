@@ -16,7 +16,9 @@ import {
 } from './pipeline';
 import { FLAGSHIP_V3_PROMPT_VERSION } from './prompts';
 import { QualityVerdictV3ModelSchema } from './quality';
+import { assertFlagshipReleaseV3, getFlagshipReleaseManifestV3 } from './release';
 import { applyChapterStateV3 } from './state-transition';
+import { hydratePlanFactsV3 } from './memory';
 
 interface ProjectRowV3 {
   id: string;
@@ -161,16 +163,19 @@ export async function writeFlagshipV3Chapter(
     .single();
   if (error || !data) throw new FlagshipV3Error('setup_blocked', error?.message || 'Flagship v3 project not found.');
   const project = data as unknown as ProjectRowV3;
-  const style = project.style_directives as { pipeline_version?: string } | null;
+  const style = project.style_directives as { pipeline_version?: string; flagship_release_v3?: unknown } | null;
   if (style?.pipeline_version !== 'flagship_v3') throw new FlagshipV3Error('setup_blocked', 'Project is not flagship_v3.');
   if (project.status !== 'paused') throw new FlagshipV3Error('setup_blocked', 'Flagship v3 keeps project status paused; the factory job owns production state.');
   if (project.flagship_v3_status !== 'ready_to_write') throw new FlagshipV3Error('setup_blocked', 'Flagship v3 setup is not approved.');
+  try { assertFlagshipReleaseV3(style?.flagship_release_v3); } catch (caught) {
+    throw new FlagshipV3Error('setup_blocked', caught instanceof Error ? caught.message : String(caught));
+  }
   const novel = linkedNovel(project);
   if (!novel) throw new FlagshipV3Error('setup_blocked', 'Project has no linked novel.');
   const routes = requireFlagshipModelRoutesV3(project.style_directives);
   const kernel = parseRequired('StoryKernelV3', StoryKernelV3Schema, project.story_kernel_v3);
   const arc = parseRequired('ArcPlanV3', ArcPlanV3Schema, project.arc_plan_v3);
-  const state = parseRequired('StoryStateV3', StoryStateV3Schema, project.story_state_v3);
+  let state = parseRequired('StoryStateV3', StoryStateV3Schema, project.story_state_v3);
   const nextChapter = Number(project.current_chapter || 0) + 1;
   if (state.chapterNumber !== nextChapter - 1) throw new FlagshipV3Error('setup_blocked', 'StoryStateV3 does not match current_chapter.');
   const targetWordCount = options.targetWordCount || project.target_chapter_length;
@@ -184,6 +189,14 @@ export async function writeFlagshipV3Chapter(
     ChapterPlanV3Schema,
     (blueprint?.meta as { chapterPlanV3?: unknown } | null)?.chapterPlanV3,
   );
+  try {
+    state = await hydratePlanFactsV3(db, project.id, state, [
+      ...plan.preconditions.map(item => item.factId),
+      ...plan.requiredDeltas.flatMap(delta => delta.kind === 'fact' || delta.kind === 'character_knowledge' ? [delta.factId] : []),
+    ]);
+  } catch (caught) {
+    throw new FlagshipV3Error('infra_blocked', caught instanceof Error ? caught.message : String(caught));
+  }
   const contexts = buildV3RoleContexts({ kernel, arc, state, plan });
   let contextManifest = contexts.used().flatMap(context => context.manifest);
   let contextSize = contexts.used().reduce((sum, context) => sum + context.chars, 0);
@@ -220,6 +233,7 @@ export async function writeFlagshipV3Chapter(
       model_route: routes,
       context_manifest: contextManifest,
       estimated_cost_usd: 0,
+      engine_release_id: getFlagshipReleaseManifestV3().releaseId,
     });
     if (attemptError) throw new FlagshipV3Error('setup_blocked', `Could not create immutable chapter attempt: ${attemptError.message}`);
     await updateWriteRunTelemetry(run, {
@@ -283,7 +297,7 @@ export async function writeFlagshipV3Chapter(
       if (caught instanceof FlagshipV3Error) throw caught;
       const message = caught instanceof Error ? caught.message : String(caught);
       const failure = classifyStoryFailure(message);
-      throw new FlagshipV3Error(failure === 'infrastructure' ? 'infra_blocked' : 'quality_blocked', message);
+      throw new FlagshipV3Error(failure === 'quality' ? 'quality_blocked' : failure === 'setup' ? 'setup_blocked' : 'infra_blocked', message);
     }
 
     const nextState = applyChapterStateV3({
@@ -293,7 +307,7 @@ export async function writeFlagshipV3Chapter(
       content: generated.content,
       realizedDeltaIds: generated.verdict.realizedDeltaEvidence.map(item => item.deltaId),
     });
-    const { error: commitError } = await db.rpc('commit_flagship_chapter_v3', {
+    const { error: commitError } = await db.rpc('commit_flagship_chapter_release_v3', {
       p_project_id: project.id,
       p_novel_id: novel.id,
       p_expected_current_chapter: nextChapter - 1,
@@ -312,6 +326,7 @@ export async function writeFlagshipV3Chapter(
       p_prompt_version: FLAGSHIP_V3_PROMPT_VERSION,
       p_model_route: routes,
       p_estimated_cost_usd: estimatedCostUsd,
+      p_engine_release_id: getFlagshipReleaseManifestV3().releaseId,
     });
     if (commitError) throw new FlagshipV3Error('commit_failed', commitError.message);
 
@@ -330,7 +345,7 @@ export async function writeFlagshipV3Chapter(
     const error = caught instanceof FlagshipV3Error
       ? caught
       : new FlagshipV3Error(
-        classifyStoryFailure(caught instanceof Error ? caught.message : String(caught)) === 'infrastructure' ? 'infra_blocked' : 'setup_blocked',
+        classifyStoryFailure(caught instanceof Error ? caught.message : String(caught)) === 'setup' ? 'setup_blocked' : 'infra_blocked',
         caught instanceof Error ? caught.message : String(caught),
       );
     await finishFailure(db, run, attemptId, error, contextSize, estimatedCostUsd);

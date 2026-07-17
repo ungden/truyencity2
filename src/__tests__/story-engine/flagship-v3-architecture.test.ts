@@ -24,6 +24,7 @@ describe('flagship v3 architecture boundary', () => {
     const files = [
       'contracts.ts', 'context.ts', 'preflight.ts', 'quality.ts', 'prompts.ts',
       'pipeline.ts', 'runtime.ts', 'rolling-planner.ts', 'concept-lab.ts', 'setup.ts',
+      'arc-lifecycle.ts', 'memory.ts', 'release.ts',
     ];
     const forbidden = [
       '/pipeline/orchestrator', 'chapter-writer', '/templates/', 'golden fallback',
@@ -56,6 +57,51 @@ describe('flagship v3 architecture boundary', () => {
     expect(migration).toContain('realized_delta_evidence');
     expect(migration).toContain('estimated_cost_usd');
     expect(migration).toContain('REVOKE ALL ON public.factory_story_status_v3 FROM PUBLIC, anon, authenticated');
+  });
+
+  it('requires release-bound reset, cover manifest promotion and typed ending completion', () => {
+    const migration = read('supabase/migrations/20260717181345_complete_flagship_v3_factory.sql');
+    const route = read('src/app/api/cron/flagship-factory/route.ts');
+    expect(migration).toContain('archive_reset_flagship_canary_release_v3');
+    expect(migration).toContain('story_cover_manifests_v3');
+    expect(migration).toContain('FLAGSHIP_V3_APPROVED_COVER_MANIFEST_REQUIRED');
+    expect(migration).toContain('commit_flagship_arc_transition_v3');
+    expect(route).toContain('typed_ending_report');
+    expect(route).not.toContain("reason: 'safety_max_chapters'");
+  });
+
+  it('promotes the five-story canary only through one approved release calibration set', () => {
+    const migration = read('supabase/migrations/20260717185611_flagship_v3_calibration_set.sql');
+    expect(migration).toContain('launch_pack_digests jsonb');
+    expect(migration).toContain('c.launch_pack_digests @> jsonb_build_array(v_pack_digest)');
+    expect(migration).toContain("c.status='approved'");
+    expect(migration).toContain('c.sample_size>=50');
+    expect(migration).toContain('c.distinct_reviewers>=5');
+    expect(migration).toContain('c.median_cost_usd<=0.25');
+  });
+
+  it('forces every staged launch pack offline even when legacy flags were previously enabled', () => {
+    const migration = read('supabase/migrations/20260717193000_flagship_v3_staging_fail_closed.sql');
+    expect(migration).toContain("NEW.flagship_v3_status = 'staged'");
+    expect(migration).toContain("'pipeline_version', 'flagship_v3'");
+    expect(migration).toContain("'publication_mode', 'offline_only'");
+    expect(migration).toContain("'factory_enabled', false");
+    expect(migration).toContain("WHERE flagship_v3_status = 'staged'");
+  });
+
+  it('keeps unprovisioned legacy billing RPCs fail-closed and lint-safe', () => {
+    const migration = read('supabase/migrations/20260717195500_disable_unprovisioned_billing_rpcs.sql');
+    expect(migration).toContain("'reason', 'billing_not_configured'");
+    expect(migration).not.toContain('FROM public.user_credits');
+    expect(migration).not.toContain('UPDATE public.user_credits');
+  });
+
+  it('never leaks the blind calibration answer key through the GET payload', () => {
+    const route = read('src/app/api/admin/flagship-calibration/route.ts');
+    const getSection = route.slice(route.indexOf('export async function GET'), route.indexOf('export async function POST'));
+    expect(getSection).not.toContain("select('*')");
+    expect(getSection).not.toContain('answer_key');
+    expect(getSection).not.toContain('machine_metrics');
   });
 
   it('stages v3 plans without overwriting v2 blueprints and archives them only inside reset', () => {

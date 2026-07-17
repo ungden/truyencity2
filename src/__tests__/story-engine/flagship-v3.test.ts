@@ -14,6 +14,10 @@ import {
   applyChapterStateV3,
   runV3ProsePreflight,
   validateV3Artifacts,
+  assessEndingReadinessV3,
+  assertFlagshipReleaseV3,
+  getFlagshipReleaseManifestV3,
+  retainStoryFactsV3,
   type ChapterPlanV3,
   type StoryKernelV3,
   type StoryStateV3,
@@ -399,6 +403,51 @@ describe('flagship v3 core engine', () => {
     })).rejects.toThrow('mutating immutable story artifacts');
   });
 
+  it('treats a below-threshold weighted mean without evidence as an Editor contract failure', async () => {
+    const contexts = buildV3RoleContexts({ kernel: kernel(), arc, state: state(), plan: plan() });
+    const content = prose('Sơn trả đủ chi phí rồi mới nhận kết quả của mẻ cá.');
+    const weakAxes = Object.fromEntries(Object.keys(axes).map(key => [key, 7.4])) as typeof axes;
+    weakAxes.character_voice = 7.5;
+    weakAxes.domain_truth = 7.5;
+    weakAxes.prose_naturalness = 7.5;
+    weakAxes.desire_to_read_next = 8;
+    await expect(executeFlagshipV3Pipeline({
+      kernel: kernel(), arc, state: state(), plan: plan(), targetWordCount: 1600, contexts,
+    }, { invoke: async call => call.role === 'writer'
+      ? JSON.stringify({ title: 'Mẻ Cá Qua Mưa', content })
+      : JSON.stringify({ decision: 'publish', confidence: 0.9, planFidelity: 8.5, hardGates, axes: weakAxes, evidence: [], revisionInstructions: [], realizedDeltaEvidence: deltaEvidence(content) })
+    })).rejects.toThrow('without grounded evidence');
+  });
+
+  it('pins invariant facts when the bounded state snapshot is compacted', () => {
+    const facts = [
+      { id: 'world_rule', value: detailed('Quy tắc nền không được quên'), sourceChapter: 0, scope: 'invariant' as const, status: 'active' as const },
+      ...Array.from({ length: 120 }, (_, index) => ({ id: `local_${index}`, value: detailed(`Fact cục bộ ${index}`), sourceChapter: index + 1, scope: 'local' as const, status: 'active' as const })),
+    ];
+    const retained = retainStoryFactsV3(facts);
+    expect(retained).toHaveLength(100);
+    expect(retained.some(fact => fact.id === 'world_rule')).toBe(true);
+    expect(retained.some(fact => fact.id === 'local_119')).toBe(true);
+  });
+
+  it('requires paid ending promises and minimum length before a finale can complete', () => {
+    const base = state();
+    expect(assessEndingReadinessV3(kernel(), base).deterministicReady).toBe(false);
+    const ready = StoryStateV3Schema.parse({
+      ...base,
+      chapterNumber: 800,
+      promises: base.promises.map(item => item.promiseId === 'promise_0' ? { ...item, status: 'paid' as const } : item),
+    });
+    expect(assessEndingReadinessV3(kernel(), ready)).toMatchObject({ deterministicReady: true, unpaidPromiseIds: [] });
+    expect(ArcPlanV3Schema.safeParse({ ...arc, arcMode: 'finale', startChapter: 801, endChapter: 810, arcId: 'finale_1' }).success).toBe(true);
+  });
+
+  it('invalidates staged work when any engine release component drifts', () => {
+    const release = getFlagshipReleaseManifestV3();
+    expect(assertFlagshipReleaseV3(release)).toEqual(release);
+    expect(() => assertFlagshipReleaseV3({ ...release, qualityVersion: `${release.qualityVersion}-drift` })).toThrow('RELEASE_MISMATCH');
+  });
+
   it('does not require the protagonist full name to appear in prose', () => {
     const evidence = runV3ProsePreflight(prose('Sơn kéo tấm bạt qua mẻ cá.'), plan());
     expect(evidence.some(item => item.code === 'protagonist_absent')).toBe(false);
@@ -621,7 +670,11 @@ describe('flagship v3 human calibration gate', () => {
       schemaVersion: 3,
       promptVersion: 'flagship-v3.0-structured-scenes-reeditor',
       routeVersion: 'canary-gemini-v3.1',
+      engineReleaseId: getFlagshipReleaseManifestV3().releaseId,
+      launchPackDigest: 'a'.repeat(64),
+      launchPackDigests: ['a'.repeat(64)],
       approvedBy: 'blind-reader-panel',
+      distinctReviewers: 5,
       samples: Array.from({ length: 50 }, (_, index) => ({
         id: `sample_${index}`,
         preferred: index < 35 ? 'v3' : 'baseline',
@@ -629,7 +682,7 @@ describe('flagship v3 human calibration gate', () => {
         publishedWithinRevision: index < 42,
         criticalContinuityViolation: false,
         wantsChapter4: index < 37,
-        publishedCostUsd: 0.3,
+        publishedCostUsd: 0.2,
       })),
       evidence: [],
     });
@@ -641,7 +694,7 @@ describe('flagship v3 human calibration gate', () => {
       withinRevisionPublishRate: 0.84,
       criticalContinuityViolations: 0,
       readChapter4Rate: 0.74,
-      medianCostUsd: 0.3,
+      medianCostUsd: 0.2,
       approved: true,
     });
     expect(computeCalibrationMetricsV3({

@@ -1,8 +1,15 @@
 #!/usr/bin/env tsx
 
-import { mkdirSync } from 'node:fs';
+import dotenv from 'dotenv';
+import { createHash } from 'node:crypto';
+import { mkdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
+import { createClient } from '@supabase/supabase-js';
+
+dotenv.config({ path: '.env.local' });
+dotenv.config({ path: '.env.runtime' });
+dotenv.config();
 
 const WIDTH = 1200;
 const HEIGHT = 1800;
@@ -15,7 +22,13 @@ const source = value('--source');
 const output = value('--output');
 const title = value('--title');
 const watermark = value('--watermark') || 'truyencity.com';
+const projectId = value('--project-id');
+const novelId = value('--novel-id');
+const coverUrl = value('--cover-url');
+const apply = args.includes('--apply');
 if (!source || !output || !title) throw new Error('--source, --output and --title are required.');
+if (watermark !== 'truyencity.com') throw new Error('Flagship v3 watermark must be exactly truyencity.com.');
+if (apply && (!projectId || !novelId || !coverUrl)) throw new Error('--apply requires --project-id, --novel-id and --cover-url.');
 
 const escapeXml = (input: string): string =>
   input.replace(/[<>&'"]/g, character => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' })[character]!);
@@ -82,14 +95,48 @@ async function main(): Promise<void> {
   if (metadata.width !== WIDTH || metadata.height !== HEIGHT || metadata.format !== 'webp') {
     throw new Error(`Rendered cover contract failed: ${metadata.format} ${metadata.width}x${metadata.height}.`);
   }
-  console.log(JSON.stringify({
+  const sourceSha256 = createHash('sha256').update(readFileSync(path.resolve(source!))).digest('hex');
+  const renderedSha256 = createHash('sha256').update(readFileSync(path.resolve(output!))).digest('hex');
+  const manifest = {
     output: path.resolve(output!),
     width: WIDTH,
     height: HEIGHT,
     ratio: '2:3',
     title,
     watermark,
-  }, null, 2));
+    sourceSha256,
+    renderedSha256,
+    rendererVersion: 'flagship-cover-v3.1-deterministic-type',
+    approved: true,
+  };
+  console.log(JSON.stringify({ dryRun: !apply, ...manifest }, null, 2));
+  if (!apply) return;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) throw new Error('Supabase server environment is missing.');
+  const db = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
+  const { data: project, error: projectError } = await db.from('ai_story_projects')
+    .select('id,novel_id,novels!ai_story_projects_novel_id_fkey(title)').eq('id', projectId!).single();
+  if (projectError || !project || project.novel_id !== novelId) throw new Error(projectError?.message || 'Project/novel mismatch.');
+  const linked = Array.isArray(project.novels) ? project.novels[0] : project.novels;
+  if (linked?.title !== title) throw new Error(`Cover title mismatch: database=${linked?.title}, renderer=${title}.`);
+  const { error: coverError } = await db.from('story_cover_manifests_v3').upsert({
+    project_id: projectId,
+    novel_id: novelId,
+    cover_url: coverUrl,
+    title,
+    watermark,
+    width: WIDTH,
+    height: HEIGHT,
+    source_sha256: sourceSha256,
+    rendered_sha256: renderedSha256,
+    renderer_version: manifest.rendererVersion,
+    approved: true,
+    verified_at: new Date().toISOString(),
+  });
+  if (coverError) throw coverError;
+  const { error: novelError } = await db.from('novels').update({ cover_url: coverUrl }).eq('id', novelId!);
+  if (novelError) throw novelError;
 }
 
 main().catch(error => {

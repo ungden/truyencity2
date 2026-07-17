@@ -18,10 +18,13 @@ import {
 import { buildV3PlannerContext } from './context';
 import { requireFlagshipModelRoutesV3 } from './model-routes';
 import { FlagshipV3Error } from './pipeline';
+import { assertFlagshipReleaseV3, FLAGSHIP_V3_ROLLING_PLANNER_VERSION } from './release';
+import { getFlagshipReleaseManifestV3 } from './release';
+import { loadPlannerLedgerMemoryV3, mergePlannerLedgerMemoryV3 } from './memory';
 import { applyChapterStateV3 } from './state-transition';
 import { validateV3Artifacts } from './validation';
 
-export const V3_ROLLING_PLANNER_PROMPT_VERSION = 'flagship-v3.9-no-forced-filler-scene';
+export const V3_ROLLING_PLANNER_PROMPT_VERSION = FLAGSHIP_V3_ROLLING_PLANNER_VERSION;
 export const V3_ROLLING_PLANNER_RULES = `Tạo đúng năm ChapterPlanV3 liên tiếp, mỗi chương có 1-5 scene theo nhu cầu nhân quả; không ép thêm scene phụ để đủ số lượng. Không một scene nào được có requiredDeltaIds=[]; từng scene phải liệt kê ít nhất một ID có thật trong requiredDeltas của chính chương đó.
 Mọi required delta bắt buộc evidenceRequired=true và phải được đúng một hoặc nhiều scene thực hiện.
 Mỗi plan chỉ ghi elapsedMinutesSincePreviousChapter, durationMinutes và travelMinutesFromPrevious. Không tự tạo startMinute; engine sẽ cộng timeline tuyệt đối theo thứ tự scene.
@@ -145,27 +148,39 @@ export async function planNextFlagshipV3Window(
     .select('status,current_chapter,style_directives,flagship_v3_status,story_kernel_v3,arc_plan_v3,story_state_v3')
     .eq('id', projectId).single();
   if (error || !data) throw new FlagshipV3Error('setup_blocked', error?.message || 'Flagship v3 project not found.');
-  const style = data.style_directives as { pipeline_version?: string } | null;
+  const style = data.style_directives as { pipeline_version?: string; flagship_release_v3?: unknown } | null;
   if (style?.pipeline_version !== 'flagship_v3' || data.status !== 'paused' || data.flagship_v3_status !== 'ready_to_write') {
     throw new FlagshipV3Error('setup_blocked', 'Rolling Planner requires an approved paused flagship_v3 project.');
+  }
+  try { assertFlagshipReleaseV3(style.flagship_release_v3); } catch (caught) {
+    throw new FlagshipV3Error('setup_blocked', caught instanceof Error ? caught.message : String(caught));
   }
   const routes = requireFlagshipModelRoutesV3(data.style_directives);
   const kernel = parseRequired('StoryKernelV3', StoryKernelV3Schema, data.story_kernel_v3);
   const arc = parseRequired('ArcPlanV3', ArcPlanV3Schema, data.arc_plan_v3);
-  const state = parseRequired('StoryStateV3', StoryStateV3Schema, data.story_state_v3);
+  let state = parseRequired('StoryStateV3', StoryStateV3Schema, data.story_state_v3);
   const startChapter = Number(data.current_chapter || 0) + 1;
   if (state.chapterNumber !== startChapter - 1) throw new FlagshipV3Error('setup_blocked', 'Committed StoryStateV3 is stale.');
   if (startChapter + 4 > arc.endChapter) throw new FlagshipV3Error('plan_blocked', 'Current ArcPlanV3 has fewer than five chapters remaining.');
-  const context = buildV3PlannerContext({ kernel, arc, state });
+  let ledgerMemory;
+  try {
+    ledgerMemory = await loadPlannerLedgerMemoryV3(db, projectId);
+    state = mergePlannerLedgerMemoryV3(state, ledgerMemory);
+  } catch (caught) {
+    throw new FlagshipV3Error('infra_blocked', caught instanceof Error ? caught.message : String(caught));
+  }
+  const context = buildV3PlannerContext({ kernel, arc, state, ledgerMemory: { knowledge: ledgerMemory.knowledge } });
   const userPrompt = `START_CHAPTER=${startChapter}
 AUTHORITATIVE_LEDGER=${JSON.stringify(buildPlannerLedgerV3(state))}
 ROLE_CONTEXT=${context.text}
 Tạo plan chương ${startChapter}-${startChapter + 4}. Trước khi trả JSON, tự mô phỏng tuần tự cả năm plan trên AUTHORITATIVE_LEDGER.`;
   let raw: string;
+  let estimatedCostUsd = 0;
   try {
     raw = dependencies.invoke
       ? await dependencies.invoke(V3_ROLLING_PLANNER_SYSTEM, userPrompt)
-      : (await callFlagshipModel(userPrompt, {
+      : await (async () => {
+        const response = await callFlagshipModel(userPrompt, {
         model: routes.planner,
         temperature: 0.2,
         maxTokens: 32768,
@@ -175,10 +190,15 @@ Tạo plan chương ${startChapter}-${startChapter + 4}. Trước khi trả JSON
         jsonMode: true,
         schemaName: 'flagship_v3_rolling_window',
         tracking: { projectId, chapterNumber: startChapter, task: 'flagship_v3_rolling_planner' },
-      })).content;
+        });
+        if (!Number.isFinite(response.estimatedCostUsd)) throw new Error('Planner provider did not return a cost estimate.');
+        estimatedCostUsd = Number(response.estimatedCostUsd);
+        return response.content;
+      })();
   } catch (caught) {
     const message = caught instanceof Error ? caught.message : String(caught);
-    throw new FlagshipV3Error(classifyStoryFailure(message) === 'infrastructure' ? 'infra_blocked' : 'plan_blocked', message);
+    const failure = classifyStoryFailure(message);
+    throw new FlagshipV3Error(failure === 'setup' ? 'setup_blocked' : 'infra_blocked', message);
   }
   let value: unknown;
   try {
@@ -190,13 +210,15 @@ Tạo plan chương ${startChapter}-${startChapter + 4}. Trước khi trả JSON
   if (draft.startChapter !== startChapter) throw new FlagshipV3Error('plan_blocked', 'Rolling Planner changed the requested window identity.');
   const window = materializeRollingWindowV3({ kernel, arc, state, draft });
   validateRollingWindowV3({ kernel, arc, state, window });
-  const { error: commitError } = await db.rpc('commit_flagship_rolling_window_v3', {
+  const { error: commitError } = await db.rpc('commit_flagship_rolling_window_release_v3', {
     p_project_id: projectId,
     p_expected_current_chapter: startChapter - 1,
     p_window: window,
     p_prompt_version: V3_ROLLING_PLANNER_PROMPT_VERSION,
     p_model_route: routes,
     p_context_manifest: context.manifest,
+    p_engine_release_id: getFlagshipReleaseManifestV3().releaseId,
+    p_estimated_cost_usd: estimatedCostUsd,
   });
   if (commitError) throw new FlagshipV3Error('commit_failed', `Could not commit RollingPlanWindowV3: ${commitError.message}`);
   return window;

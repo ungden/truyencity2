@@ -16,3 +16,6 @@ export * from './setup';
 export * from './calibration';
 export * from './offline-opening';
 export * from './evidence-spans';
+export * from './release';
+export * from './arc-lifecycle';
+export * from './memory';
