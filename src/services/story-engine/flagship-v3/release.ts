@@ -3,12 +3,12 @@ import { z } from 'zod';
 import { FLAGSHIP_V3_PROMPT_VERSION } from './prompts';
 
 export const FLAGSHIP_V3_CONTRACT_VERSION = 'story-contracts-v3.2-arc-memory';
-export const FLAGSHIP_V3_CONTEXT_VERSION = 'role-context-v3.3-editor-priority-projection';
+export const FLAGSHIP_V3_CONTEXT_VERSION = 'role-context-v3.5-editor-relevant-ledgers';
 export const FLAGSHIP_V3_PREFLIGHT_VERSION = 'deterministic-preflight-v3.1';
-export const FLAGSHIP_V3_QUALITY_VERSION = 'quality-v3.2-auditable-thresholds';
+export const FLAGSHIP_V3_QUALITY_VERSION = 'quality-v3.5-local-fidelity-revision';
 export const FLAGSHIP_V3_ARC_LIFECYCLE_VERSION = 'arc-lifecycle-v3.1-ending-gated';
-export const FLAGSHIP_V3_ROLLING_PLANNER_VERSION = 'flagship-v3.12-semantic-field-contract';
-export const FLAGSHIP_V3_PROVIDER_VERSION = 'provider-v3.2-gemini31-medium-thinking';
+export const FLAGSHIP_V3_ROLLING_PLANNER_VERSION = 'flagship-v3.15-current-fact-preconditions';
+export const FLAGSHIP_V3_PROVIDER_VERSION = 'provider-v3.4-writer31-low-editor-medium';
 
 export const FlagshipReleaseManifestV3Schema = z.object({
   pipelineVersion: z.literal('flagship_v3'),

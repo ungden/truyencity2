@@ -83,8 +83,6 @@ const WEIGHTS: Record<V3QualityAxis, number> = {
   desire_to_read_next: 1.2,
 };
 
-const SERIOUS_HARD_GATES = ['canon', 'timeline', 'resourceCausality', 'characterKnowledge', 'authority', 'planFidelity'] as const;
-
 export function qualityThresholdFailuresV3(editor: GroundedQualityVerdictV3Model): string[] {
   const failures: string[] = [];
   if (editor.confidence < 0.7) failures.push('confidence');
@@ -127,15 +125,23 @@ export function evaluateQualityV3(input: {
   const weightedMean = Number((weighted / weightTotal).toFixed(2));
   const minAxis = Math.min(...V3_AXIS_KEYS.map(key => input.editor.axes[key]));
   const thresholdPassed = qualityThresholdFailuresV3(input.editor).length === 0;
-  const seriousGateFailed = SERIOUS_HARD_GATES.some(key => !input.editor.hardGates[key])
-    || input.editor.planFidelity < 7.5
-    || missingDeltas.length > 0;
+  // A failed hard gate can still be a one-span wording error (wrong tool name,
+  // an invented side effect, a local quantity phrase). Those are precisely what
+  // the single revision is for. Structural/non-local violations and missing
+  // realized deltas remain immediate rejects.
+  const seriousGateFailed = input.editor.planFidelity < 5
+    || missingDeltas.length > 0
+    || evidence.some(item => !item.local);
   const localized = evidence.length > 0
     && evidence.length <= 3
     && evidence.every(item => item.local)
     && !seriousGateFailed;
+  const hasCriticalEvidence = evidence.some(item => item.severity === 'critical');
 
-  const decision: QualityVerdictV3['decision'] = hardGatePassed && thresholdPassed && evidence.length === 0
+  const decision: QualityVerdictV3['decision'] = input.editor.decision === 'publish'
+      && hardGatePassed
+      && thresholdPassed
+      && !hasCriticalEvidence
     ? 'publish'
     : localized && input.editor.revisionInstructions.length > 0
       ? 'revise'

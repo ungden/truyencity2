@@ -1,0 +1,18 @@
+{
+  "setupGenerators": [
+    "gemini-3.1-pro-preview",
+    "gemini-2.5-pro"
+  ],
+  "setupJudges": [
+    "gemini-3.1-pro-preview",
+    "gemini-3-flash-preview",
+    "gemini-2.5-pro"
+  ],
+  "openingSimulator": "gemini-2.5-pro",
+  "launchArchitect": "gemini-3.1-pro-preview",
+  "planner": "gemini-3.1-pro-preview",
+  "writer": "gemini-3.1-pro-preview",
+  "editor": "gemini-3-flash-preview",
+  "routeVersion": "canary-writer31low-editor3flash-v3.1",
+  "maxPublishedChapterCostUsd": 0.5
+}

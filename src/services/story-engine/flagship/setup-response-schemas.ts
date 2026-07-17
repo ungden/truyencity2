@@ -13,6 +13,11 @@ function supportedSubset(value: unknown): unknown {
   if (!value || typeof value !== 'object') return value;
   const source = value as Record<string, unknown>;
   const result: Record<string, unknown> = {};
+  const constraintHints: string[] = [];
+  if (typeof source.minLength === 'number') constraintHints.push(`minimum string length: ${source.minLength}`);
+  if (typeof source.maxLength === 'number') constraintHints.push(`maximum string length: ${source.maxLength}`);
+  if (typeof source.minItems === 'number') constraintHints.push(`minimum item count: ${source.minItems}`);
+  if (typeof source.maxItems === 'number') constraintHints.push(`maximum item count: ${source.maxItems}`);
   for (const [key, child] of Object.entries(source)) {
     if (['$schema', 'pattern', 'minLength', 'maxLength', 'minItems', 'maxItems'].includes(key)) continue;
     if (key === 'const') {
@@ -20,6 +25,10 @@ function supportedSubset(value: unknown): unknown {
       continue;
     }
     result[key] = supportedSubset(child);
+  }
+  if (constraintHints.length) {
+    const existing = typeof result.description === 'string' ? `${result.description} ` : '';
+    result.description = `${existing}CONSTRAINTS: ${constraintHints.join('; ')}.`;
   }
   return result;
 }

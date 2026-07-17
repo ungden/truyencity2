@@ -30,7 +30,8 @@ Mỗi scene phải có participantIds chứa ít nhất povCharacterId; tuyệt 
 Mọi required delta bắt buộc evidenceRequired=true và phải được đúng một hoặc nhiều scene thực hiện.
 chapterPromise là một câu tiếng Việt cụ thể dài ít nhất 20 ký tự mô tả lời hứa nội dung của chương với độc giả; không được điền promise ID như prom_house. Promise ID chỉ xuất hiện trong delta kind=promise. learnedFrom phải là mô tả nguồn học có nguyên nhân dài ít nhất 8 ký tự, không chỉ là tên trần của một nhân vật.
 Mỗi plan chỉ ghi elapsedMinutesSincePreviousChapter, durationMinutes và travelMinutesFromPrevious. Không tự tạo startMinute; engine sẽ cộng timeline tuyệt đối theo thứ tự scene.
-Với resource_numeric, chỉ quyết định delta/source/sink; không tự trả before/after/unit. Với resource_state, chỉ trả after/source. Với fact, chỉ trả valueAfter. Engine sẽ gắn before/after/unit/valueBefore từ ledger theo thứ tự năm chương.
+preconditions chỉ được tham chiếu fact đang có trong AUTHORITATIVE_LEDGER.facts và expectedValue phải chép đúng value hiện tại của fact đó; nếu không cần điều kiện thì trả mảng rỗng, không đoán giá trị cũ hoặc tương lai.
+Với resource_numeric, chỉ quyết định delta/source/sink; không tự trả before/after/unit. Với resource_state, chỉ trả after/source. Với fact, chỉ trả valueAfter. Engine sẽ gắn before/after/unit/valueBefore từ ledger theo thứ tự năm chương. source và sink phải mô tả nguồn nhận/đích tiêu hao có nguyên nhân, mỗi trường ít nhất 8 ký tự; không dùng một từ trần như "quỹ", "kho" hoặc "mất".
 AUTHORITATIVE_LEDGER.resources là sổ cái duy nhất: mỗi resource_numeric có amount hiện tại, minimumValue và maximumValue. Phải tự cộng tuần tự mọi delta của cả năm chương; sau từng delta, số dư không được thấp hơn minimumValue hoặc cao hơn maximumValue. Không được chi tiền/tài nguyên chưa kiếm được ở một delta trước đó, kể cả khi dự kiến sẽ thu lại ở scene hoặc chương sau.
 Scene gắn với resource_numeric phải dùng cùng amount/unit trong cost/payoff/irreversibleChange; không đổi đơn vị hoặc dùng tính từ quy mô mơ hồ trái ledger.
 Mọi knowledge change phải chỉ rõ nhân vật, fact và nguồn học. Fact mới dùng stable ID mới và phải được tạo trước hoặc cùng chương với lần học đầu tiên; engine tự gắn valueBefore.
@@ -67,6 +68,41 @@ export function buildPlannerLedgerV3(
     }),
     promises: state.promises.map(promise => ({ promiseId: promise.promiseId, status: promise.status })),
   };
+}
+
+type JsonSchemaNode = Record<string, unknown>;
+
+function childSchema(node: JsonSchemaNode, ...path: string[]): JsonSchemaNode {
+  let current = node;
+  for (const segment of path) {
+    const next = current[segment];
+    if (!next || typeof next !== 'object' || Array.isArray(next)) {
+      throw new Error(`Rolling Planner JSON schema is missing ${path.join('.')}.`);
+    }
+    current = next as JsonSchemaNode;
+  }
+  return current;
+}
+
+/** Bind story-owned cast IDs into the provider schema so the planner cannot invent participants. */
+export function buildRollingPlannerResponseJsonSchemaV3(
+  kernel: ReturnType<typeof StoryKernelV3Schema.parse>,
+  state: StoryStateV3,
+): Record<string, unknown> {
+  const schema = toGeminiResponseJsonSchema(RollingPlanWindowDraftV3Schema);
+  const characterIds = [...new Set([
+    ...kernel.characters.map(character => character.id),
+    ...state.characters.map(character => character.characterId),
+  ])].sort();
+  if (characterIds.length === 0) throw new Error('Rolling Planner requires at least one authoritative character ID.');
+  const sceneProperties = childSchema(schema, 'properties', 'plans', 'items', 'properties', 'scenes', 'items', 'properties');
+  childSchema(sceneProperties, 'povCharacterId').enum = characterIds;
+  childSchema(sceneProperties, 'participantIds', 'items').enum = characterIds;
+  const factIds = state.facts.map(fact => fact.id).sort();
+  if (factIds.length > 0) {
+    childSchema(schema, 'properties', 'plans', 'items', 'properties', 'preconditions', 'items', 'properties', 'factId').enum = factIds;
+  }
+  return schema;
 }
 
 export function materializeRollingWindowV3(input: {
@@ -203,7 +239,7 @@ Tạo plan chương ${startChapter}-${startChapter + 4}. Trước khi trả JSON
         maxTokens: 32768,
         thinkingLevel: 'medium',
         systemPrompt: V3_ROLLING_PLANNER_SYSTEM,
-        responseJsonSchema: toGeminiResponseJsonSchema(RollingPlanWindowDraftV3Schema),
+        responseJsonSchema: buildRollingPlannerResponseJsonSchemaV3(kernel, state),
       }, {
         jsonMode: true,
         schemaName: 'flagship_v3_rolling_window',

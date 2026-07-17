@@ -6,8 +6,10 @@ import {
   RollingPlanWindowDraftV3Schema,
   MarketResearchSnapshotV3Schema,
   buildPlannerLedgerV3,
+  buildRollingPlannerResponseJsonSchemaV3,
   buildV3RoleContexts,
   executeFlagshipV3Pipeline,
+  evaluateQualityV3,
   runConceptTournamentV3,
   BlindCalibrationCorpusV3Schema,
   computeCalibrationMetricsV3,
@@ -322,6 +324,11 @@ describe('flagship v3 core engine', () => {
     expect(contexts.editor.chars).toBeLessThanOrEqual(contexts.editor.budget);
     expect(contexts.revision().chars).toBeLessThan(contexts.editor.chars);
     expect(contexts.revision().chars).toBeLessThanOrEqual(contexts.revision().budget);
+    for (const scene of plan().scenes) {
+      expect(contexts.writer.text).not.toContain(scene.unresolvedQuestion);
+      expect(contexts.revision().text).not.toContain(scene.unresolvedQuestion);
+      expect(contexts.editor.text).toContain(scene.unresolvedQuestion);
+    }
   });
 
   it('makes POV, participant and minute fidelity explicit in role prompts', () => {
@@ -340,7 +347,7 @@ describe('flagship v3 core engine', () => {
     expect(supportsGeminiThinkingLevel('gemini-3.1-pro-preview')).toBe(true);
     expect(supportsGeminiThinkingLevel('gemini-3-pro-preview')).toBe(true);
     expect(supportsGeminiThinkingLevel('gemini-2.5-pro')).toBe(false);
-    expect(getFlagshipReleaseManifestV3().providerVersion).toBe('provider-v3.2-gemini31-medium-thinking');
+    expect(getFlagshipReleaseManifestV3().providerVersion).toBe('provider-v3.4-writer31-low-editor-medium');
   });
 
   it('puts numeric bounds and source rules beside current balances in the authoritative planner ledger', () => {
@@ -353,6 +360,18 @@ describe('flagship v3 core engine', () => {
         sourceRules: ['Chỉ tăng từ giao dịch có người trả tiền'],
       }),
     ]));
+  });
+
+  it('binds scene cast fields to the story-owned character IDs in the provider schema', () => {
+    const schema = buildRollingPlannerResponseJsonSchemaV3(kernel(), state()) as any;
+    const scene = schema.properties.plans.items.properties.scenes.items.properties;
+    const precondition = schema.properties.plans.items.properties.preconditions.items.properties;
+    const expectedIds = kernel().characters.map(character => character.id).sort();
+    expect(scene.povCharacterId.enum).toEqual(expectedIds);
+    expect(scene.participantIds.items.enum).toEqual(expectedIds);
+    expect(scene.participantIds.items.enum).not.toContain('char_an');
+    expect(scene.desire.description).toContain('minimum string length: 20');
+    expect(precondition.factId.enum).toEqual(state().facts.map(fact => fact.id).sort());
   });
 
   it('publishes with exactly Writer and Editor calls', async () => {
@@ -406,6 +425,51 @@ describe('flagship v3 core engine', () => {
     expect(calls).toEqual(['writer', 'editor', 'writer_revision', 'editor_recheck']);
     expect(contexts.used().map(context => context.role)).toEqual(['writer', 'editor', 'revision']);
     expect(result.revisionLineage).toHaveLength(1);
+  });
+
+  it('routes a grounded local canon wording error through the single revision', () => {
+    const chapterPlan = plan();
+    const verdict = evaluateQualityV3({
+      plan: chapterPlan,
+      deterministicEvidence: [],
+      editor: {
+        decision: 'revise',
+        confidence: 0.6,
+        planFidelity: 6,
+        hardGates: { ...hardGates, canon: false },
+        axes: axes as any,
+        evidence: [{
+          code: 'canon_violation', severity: 'major', message: 'Sai tên dụng cụ trong một câu.',
+          start: 10, end: 30, excerpt: 'chiếc kính lúp nhỏ', local: true,
+        }],
+        revisionInstructions: ['Đổi đúng tên dụng cụ đã khóa trong kernel.'],
+        realizedDeltaEvidence: chapterPlan.requiredDeltas.map(delta => ({
+          deltaId: delta.id, start: 0, end: 8, excerpt: 'evidence',
+        })),
+      },
+    });
+    expect(verdict.decision).toBe('revise');
+  });
+
+  it('allows a noncritical editorial note when publish gates and thresholds pass', () => {
+    const chapterPlan = plan();
+    const verdict = evaluateQualityV3({
+      plan: chapterPlan,
+      deterministicEvidence: [],
+      editor: {
+        decision: 'publish', confidence: 0.9, planFidelity: 9.5,
+        hardGates, axes: axes as any,
+        evidence: [{
+          code: 'prose_note', severity: 'moderate', message: 'Một câu có thể diễn đạt trực tiếp hơn.',
+          start: 10, end: 20, excerpt: 'câu hơi vòng', local: true,
+        }],
+        revisionInstructions: [],
+        realizedDeltaEvidence: chapterPlan.requiredDeltas.map(delta => ({
+          deltaId: delta.id, start: 0, end: 8, excerpt: 'evidence',
+        })),
+      },
+    });
+    expect(verdict.decision).toBe('publish');
   });
 
   it('lets deterministic preflight own evidence without forcing the Editor to duplicate it', async () => {

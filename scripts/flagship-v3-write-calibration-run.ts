@@ -16,7 +16,9 @@ import {
   V3_ROLLING_PLANNER_SYSTEM,
   WriterOutputV3Schema,
   buildPlannerLedgerV3,
+  buildRollingPlannerResponseJsonSchemaV3,
   buildV3PlannerContext,
+  getFlagshipReleaseManifestV3,
   materializeRollingWindowV3,
   runOfflinePlannedWindowV3,
   validateLaunchPackV3,
@@ -81,7 +83,15 @@ async function invokeChapter(chapterNumber: number, model: string, call: Flagshi
   const chapterDir = path.join(checkpointRoot, `chapter-${chapterNumber}`);
   mkdirSync(chapterDir, { recursive: true });
   const file = path.join(chapterDir, `${call.role}.response.json`);
-  const promptDigest = digest({ chapterNumber, model, call, promptVersion: FLAGSHIP_V3_PROMPT_VERSION, routeVersion: routes.routeVersion });
+  const schema = schemaFor(call);
+  const responseJsonSchema = toGeminiResponseJsonSchema(schema as never);
+  const isWriter = call.role === 'writer' || call.role === 'writer_revision';
+  const transport = {
+    temperature: isWriter ? 0.75 : 0.15,
+    maxTokens: isWriter ? 32768 : 16384,
+    thinkingLevel: isWriter ? 'low' as const : 'medium' as const,
+  };
+  const promptDigest = digest({ chapterNumber, model, call, responseJsonSchema, transport, promptVersion: FLAGSHIP_V3_PROMPT_VERSION, routeVersion: routes.routeVersion });
   if (existsSync(file)) {
     const saved = JSON.parse(readFileSync(file, 'utf8')) as ModelCheckpoint;
     const contract = validateJsonContract(schemaFor(call), saved.content);
@@ -90,14 +100,11 @@ async function invokeChapter(chapterNumber: number, model: string, call: Flagshi
       return { ...saved, reused: true };
     }
   }
-  const schema = schemaFor(call);
   const response = await callFlagshipModel(call.userPrompt, {
     model,
-    temperature: call.role === 'writer' || call.role === 'writer_revision' ? 0.75 : 0.15,
-    maxTokens: call.role === 'writer' || call.role === 'writer_revision' ? 32768 : 16384,
-    thinkingLevel: 'medium',
+    ...transport,
     systemPrompt: call.systemPrompt,
-    responseJsonSchema: toGeminiResponseJsonSchema(schema as never),
+    responseJsonSchema,
   }, { jsonMode: true, schemaName: `flagship_v3_calibration_ch${chapterNumber}_${call.role}` });
   const contract = validateJsonContract(schema, response.content);
   const saved: ModelCheckpoint = {
@@ -118,7 +125,8 @@ async function planSecondWindow(state: OfflineOpeningRunV3['finalState']) {
   const startChapter = state.chapterNumber + 1;
   const userPrompt = `START_CHAPTER=${startChapter}\nAUTHORITATIVE_LEDGER=${JSON.stringify(buildPlannerLedgerV3(state, launchPack.kernel))}\nROLE_CONTEXT=${context.text}\nTạo plan chương ${startChapter}-${startChapter + 4}. Trước khi trả JSON, tự mô phỏng tuần tự cả năm plan trên AUTHORITATIVE_LEDGER.`;
   const file = path.join(checkpointRoot, `planner-${startChapter}-${startChapter + 4}.response.json`);
-  const promptDigest = digest({ model: routes.planner, systemPrompt: V3_ROLLING_PLANNER_SYSTEM, userPrompt, promptVersion: V3_ROLLING_PLANNER_PROMPT_VERSION, routeVersion: routes.routeVersion });
+  const responseJsonSchema = buildRollingPlannerResponseJsonSchemaV3(launchPack.kernel, state);
+  const promptDigest = digest({ model: routes.planner, systemPrompt: V3_ROLLING_PLANNER_SYSTEM, userPrompt, responseJsonSchema, promptVersion: V3_ROLLING_PLANNER_PROMPT_VERSION, routeVersion: routes.routeVersion });
   let raw: string; let estimatedCostUsd = 0;
   if (existsSync(file)) {
     const saved = JSON.parse(readFileSync(file, 'utf8')) as ModelCheckpoint;
@@ -126,8 +134,8 @@ async function planSecondWindow(state: OfflineOpeningRunV3['finalState']) {
     if (saved.promptDigest === promptDigest && saved.model === routes.planner && contract.valid) {
       raw = saved.content; estimatedCostUsd = saved.estimatedCostUsd;
     }
-    else ({ raw, estimatedCostUsd } = await callPlanner(file, promptDigest, userPrompt, startChapter));
-  } else ({ raw, estimatedCostUsd } = await callPlanner(file, promptDigest, userPrompt, startChapter));
+    else ({ raw, estimatedCostUsd } = await callPlanner(file, promptDigest, userPrompt, startChapter, responseJsonSchema));
+  } else ({ raw, estimatedCostUsd } = await callPlanner(file, promptDigest, userPrompt, startChapter, responseJsonSchema));
   const draft = RollingPlanWindowDraftV3Schema.parse(cleanJson(raw));
   if (draft.startChapter !== startChapter) throw new Error('Planner changed the calibration window identity.');
   const window = materializeRollingWindowV3({ kernel: launchPack.kernel, arc: launchPack.arc, state, draft });
@@ -135,12 +143,18 @@ async function planSecondWindow(state: OfflineOpeningRunV3['finalState']) {
   return { window, estimatedCostUsd };
 }
 
-async function callPlanner(file: string, promptDigest: string, userPrompt: string, startChapter: number) {
+async function callPlanner(
+  file: string,
+  promptDigest: string,
+  userPrompt: string,
+  startChapter: number,
+  responseJsonSchema: Record<string, unknown>,
+) {
   const response = await callFlagshipModel(userPrompt, {
     model: routes.planner, temperature: 0.2, maxTokens: 32768,
     thinkingLevel: 'medium',
     systemPrompt: V3_ROLLING_PLANNER_SYSTEM,
-    responseJsonSchema: toGeminiResponseJsonSchema(RollingPlanWindowDraftV3Schema),
+    responseJsonSchema,
   }, { jsonMode: true, schemaName: `flagship_v3_calibration_plan_${startChapter}` });
   const contract = validateJsonContract(RollingPlanWindowDraftV3Schema, response.content);
   const saved: ModelCheckpoint = {
@@ -193,12 +207,13 @@ async function main(): Promise<void> {
     }
   }
   const failed = chapters.find(chapter => chapter.status !== 'publish');
-  const run: OfflineOpeningRunV3 & { planningCostUsd: number; enginePromptVersion: string } = {
+  const run: OfflineOpeningRunV3 & { planningCostUsd: number; enginePromptVersion: string; engineReleaseId: string } = {
     schemaVersion: 3, title: launchPack.kernel.title, routeVersion: routes.routeVersion,
     requestedChapters, completedChapters: chapters.filter(chapter => chapter.status === 'publish').length,
     stoppedAtChapter: failed?.chapterNumber ?? (chapters.length < requestedChapters ? chapters.length + 1 : null),
     estimatedCostUsd: Number((chapters.reduce((sum, chapter) => sum + chapter.estimatedCostUsd, 0)).toFixed(6)),
     chapters, finalState, planningCostUsd: plannerCost, enginePromptVersion: FLAGSHIP_V3_PROMPT_VERSION,
+    engineReleaseId: getFlagshipReleaseManifestV3().releaseId,
   };
   writeFileSync(path.join(target, 'opening-run-v3.json'), `${JSON.stringify(run, null, 2)}\n`);
   console.log(JSON.stringify({ output: target, routeVersion: routes.routeVersion, requestedChapters,
