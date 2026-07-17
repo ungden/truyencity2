@@ -1,0 +1,1526 @@
+{
+  "candidates": [
+    {
+      "id": "c1_debt_arbitrator",
+      "title": "Thung Lũng Tro: Khế Ước Sinh Tồn",
+      "premise": "Một quan hậu cần bị lưu đày dùng sổ nợ để ép ba nhóm dân du mục đang thù ghét nhau phải cùng đào kênh, nung đá, gieo rêu, biến thung lũng chết thành ốc đảo.",
+      "protagonistEngine": "Khả năng nhìn thấy giá trị quy đổi của sức lao động và lòng tin thành vệt sáng trên đá tụ thủy.",
+      "protagonistContradiction": "Muốn xây dựng một cộng đồng công bằng nhưng liên tục phải dùng thủ đoạn ép buộc và siết nợ để duy trì trật tự ban đầu.",
+      "advantageLimits": "Chỉ có thể kích hoạt đá tụ thủy khi các bên tự nguyện ghi dấu tay cam kết, không thể tự tạo ra nước từ hư không.",
+      "worldReaction": "Các nhóm lợi ích liên tục tìm lỗ hổng trong khế ước để trục lợi hoặc lật lọng khi cảm thấy phần chia không thỏa đáng.",
+      "openingAdvantage": "Chương một dùng một món nợ cũ để ép thợ nung đá nhường nhiệt lượng, cứu sống một tảng đá tụ thủy đang cạn kiệt.",
+      "firstThreeChapterMechanism": "Giải quyết tắc nghẽn nước bằng cách ghép sức thợ đào và thợ nung. Đến chương ba, mái che bằng rêu hoàn thành nhưng các phe đánh nhau giành chỗ ngủ.",
+      "causalCost": "Mỗi lần một khế ước bị phá vỡ, lượng nước tích tụ trong đá sẽ bốc hơi tương ứng với mức độ mất lòng tin.",
+      "mechanismFingerprint": [
+        "Định giá mồ hôi của thợ đào và nhiệt lượng của thợ nung.",
+        "Ghi dấu tay của các bên lên đá tụ thủy làm bằng chứng.",
+        "Đo lường lượng nước tạo ra sau khi công trình hoàn tất.",
+        "Chia nước theo tỷ lệ đóng góp đã ghi trên đá.",
+        "Trừng phạt kẻ vi phạm bằng cách cắt phần nước ngày hôm sau."
+      ],
+      "rewardLoopFingerprint": [
+        "Lượng nước tăng lên giúp gieo được nhiều rêu hơn.",
+        "Người dân có thêm khẩu phần ăn và bớt bệnh tật.",
+        "Quyền lực của nhân vật chính được củng cố qua sổ nợ.",
+        "Mở khóa khả năng thuyết phục nhóm thợ cấp cao hơn."
+      ],
+      "conflictEconomyFingerprint": [
+        "Thợ đào kênh kiệt sức đòi thêm khẩu phần ăn ngay lập tức.",
+        "Thợ nung từ chối chia sẻ nhiệt lượng cho nhóm gieo rêu.",
+        "Chi phí bảo trì kênh rạch bị đẩy qua lại giữa các nhóm.",
+        "Người đến sau không có đóng góp ban đầu đòi chia quyền lợi."
+      ],
+      "seriality30": [
+        "Chương 1-6: Ổn định nguồn nước nhỏ và dựng mái che bằng rêu.",
+        "Chương 7-12: Khủng hoảng khi thợ đào đình công đòi tăng khẩu phần rêu.",
+        "Chương 13-18: Liên kết ba nhóm xây bể chứa lớn chống lại mùa khô.",
+        "Chương 19-24: Chống lại nỗ lực lật đổ của trưởng nhóm thợ nung cũ.",
+        "Chương 25-30: Thiết lập bộ luật phân phối tài nguyên vĩnh viễn cho làng."
+      ],
+      "antiStupidOpponent": "Trưởng nhóm thợ nung phản đối vì lo sợ nhiệt lượng bị phân tán sẽ làm hỏng mẻ đá quan trọng nhất của họ, một lý do sinh tồn chính đáng.",
+      "domainResearchNeeds": [
+        "Cách hạch toán chi phí lao động trong nền kinh tế hàng đổi hàng.",
+        "Cơ chế ngưng tụ nước từ chênh lệch nhiệt độ."
+      ]
+    },
+    {
+      "id": "c2_stone_weaver",
+      "title": "Dấu Tay Dẫn Nước: Khởi Đạo Thung Lũng",
+      "premise": "Một thợ điêu khắc tận dụng nghệ thuật khắc đá cộng hưởng để điều hướng mạch ẩm dưới lớp tro, buộc các nhóm dân phải quy tụ quanh các trụ đá của mình.",
+      "protagonistEngine": "Cảm nhận được vi mạch nước bên trong đá cứng và rêu mềm khi chạm tay vào.",
+      "protagonistContradiction": "Đam mê tạo ra những cấu trúc đá vĩnh cửu nhưng phải chấp nhận làm các công trình chắp vá để cứu đói người dân trước mắt.",
+      "advantageLimits": "Chỉ có thể khắc đá khi có đủ máu và mồ hôi của những người lao động tự nguyện hòa vào tro trắng.",
+      "worldReaction": "Người dân coi trụ đá là báu vật thần thánh, dẫn đến việc các phe phái muốn độc chiếm và tự ý xây hàng rào quanh trụ.",
+      "openingAdvantage": "Chương một khắc lại một vệt hỏng trên đá cũ, kéo được mạch sương đêm về để làm mềm lớp tro cứng giúp thợ đào làm việc.",
+      "firstThreeChapterMechanism": "Sửa trụ đá nhỏ để thợ đào khai thông kênh. Tới chương ba, mảng rêu đầu tiên mọc lên nhưng thợ nung đòi đốt rêu làm nhiên liệu thay vì làm thức ăn.",
+      "causalCost": "Việc khắc sai lệch mạch đá sẽ gây ra hiện tượng hút ngược, rút cạn sinh lực của người đang bảo trì trụ đá đó.",
+      "mechanismFingerprint": [
+        "Đọc mạch ẩm đang bị tắc nghẽn dưới lớp tro trắng.",
+        "Yêu cầu các nhóm đóng góp máu và mồ hôi để làm mực.",
+        "Khắc lại hoa văn trên đá để điều hướng dòng ẩm.",
+        "Đo lường diện tích rêu mọc thêm xung quanh trụ đá.",
+        "Giao quyền bảo vệ trụ đá cho nhóm chịu thiệt thòi nhất."
+      ],
+      "rewardLoopFingerprint": [
+        "Trụ đá tỏa ra độ ẩm giúp rêu sinh trưởng nhanh.",
+        "Thợ gieo rêu thu hoạch được thức ăn từ vùng đất cằn.",
+        "Nhân vật chính thu thập thêm kỹ năng khắc đá phức tạp.",
+        "Tính chính danh tăng khi diện tích xanh được mở rộng."
+      ],
+      "conflictEconomyFingerprint": [
+        "Thợ gieo rêu muốn giữ độc quyền thu hoạch quanh trụ đá.",
+        "Thợ đào phàn nàn rễ rêu làm hỏng kênh dẫn nước của họ.",
+        "Chi phí vật liệu khắc đá quá đắt đỏ và khan hiếm.",
+        "Sự chênh lệch năng suất giữa vùng có đá và không có đá."
+      ],
+      "seriality30": [
+        "Chương 1-6: Sửa trụ đá nhỏ, giải quyết cơn khát cục bộ cho thợ đào.",
+        "Chương 7-12: Xung đột khi thợ nung muốn đập đá cũ để lấy vật liệu.",
+        "Chương 13-18: Khởi công mạng lưới trụ đá lớn kết nối ba khu vực.",
+        "Chương 19-24: Bão tro tàn ập đến, thử thách độ bền của hệ thống đá.",
+        "Chương 25-30: Hình thành hội đồng quản lý trụ đá từ đại diện ba phe."
+      ],
+      "antiStupidOpponent": "Thợ gieo rêu từ chối hợp tác vì rễ rêu của họ từng bị nước từ trụ đá làm úng ngập trong quá khứ, họ cần bằng chứng thực nghiệm rõ ràng.",
+      "domainResearchNeeds": [
+        "Kiến trúc dẫn nước cổ đại bằng đá chẻ.",
+        "Động lực học chất lưu trong môi trường xốp."
+      ]
+    },
+    {
+      "id": "c3_thermal_warden",
+      "title": "Lửa Sưởi Tro Trắng",
+      "premise": "Một người sinh tồn am hiểu nhiệt lượng phải cân bằng cái rét cắt da ban đêm và nhiệt độ nung đá để giữ cho cộng đồng không chết cóng và chết khát.",
+      "protagonistEngine": "Khả năng nhìn thấy các dòng chảy nhiệt lượng và các điểm thất thoát nhiệt trong không gian.",
+      "protagonistContradiction": "Biết rằng đốt rêu sẽ ấm ngay lập tức nhưng sẽ hủy hoại hệ sinh thái, buộc phải lạnh lùng cấm đoán người dân sưởi ấm tự do.",
+      "advantageLimits": "Không thể tạo ra nhiệt lượng mới, chỉ có thể thiết kế hệ thống tuần hoàn để tái sử dụng nhiệt từ lò nung đá.",
+      "worldReaction": "Người dân lén lút phá ống dẫn nhiệt để sưởi ấm cá nhân, khiến toàn bộ hệ thống áp suất nước bị hỏng.",
+      "openingAdvantage": "Chương một sắp xếp lại các vách đá quanh một lò nung hỏng để gom nhiệt thừa, chưng cất thành công một bình nước sạch.",
+      "firstThreeChapterMechanism": "Dùng nhiệt thừa để lọc nước cho thợ đào. Chương ba, nhà chung ấm áp đầu tiên hoàn thành nhưng các gia đình tranh giành chỗ ngủ gần lò nhất.",
+      "causalCost": "Mỗi lần nhiệt lượng bị rò rỉ do phá hoại, lò nung sẽ mất nhiệt độ chuẩn, làm hỏng toàn bộ mẻ đá quan trọng của ngày hôm đó.",
+      "mechanismFingerprint": [
+        "Phát hiện điểm rò rỉ nhiệt gây chết cóng ban đêm.",
+        "Thiết kế ống dẫn nhiệt bằng đất sét và đá vụn.",
+        "Đàm phán để thợ nung duy trì lò chạy qua đêm.",
+        "Đo lường lượng nước chưng cất và nhiệt lượng tiết kiệm.",
+        "Phân phối chỗ ngủ ấm theo định mức lao động ban ngày."
+      ],
+      "rewardLoopFingerprint": [
+        "Nhiệt độ ổn định giúp giảm tỷ lệ bệnh tật.",
+        "Nước chưng cất được chia đều làm phần thưởng lao động.",
+        "Uy tín của nhân vật chính tăng khi lò nung hoạt động tốt.",
+        "Lãnh địa mở rộng được quy mô khu vực sưởi ấm."
+      ],
+      "conflictEconomyFingerprint": [
+        "Xung đột vì ai được ngủ gần nguồn nhiệt nhất.",
+        "Thợ nung đòi thêm khẩu phần vì phải thức đêm canh lò.",
+        "Rủi ro hỏa hoạn khi người dân phơi rêu quá gần ống nhiệt.",
+        "Chi phí bảo trì đường ống bị đùn đẩy giữa các bên."
+      ],
+      "seriality30": [
+        "Chương 1-6: Thu hồi nhiệt thừa, cung cấp nước và sưởi ấm lều nhỏ.",
+        "Chương 7-12: Tranh chấp gay gắt về vị trí ngủ khi mùa đông khắc nghiệt tới.",
+        "Chương 13-18: Chuyển đổi công năng lò nung để vừa nung đá vừa sưởi ấm toàn khu.",
+        "Chương 19-24: Đội thợ nung kiệt sức, nguy cơ sập hệ thống nhiệt.",
+        "Chương 25-30: Tái cấu trúc ca làm việc và chia sẻ rủi ro vận hành lò."
+      ],
+      "antiStupidOpponent": "Đại diện các gia đình có con nhỏ đòi chiếm chỗ ấm nhất dù không lao động, tạo ra bài toán đạo đức và nguyên tắc phân phối khó nhằn.",
+      "domainResearchNeeds": [
+        "Hệ thống sưởi sàn Ondol truyền thống.",
+        "Vật lý nhiệt động lực học cơ bản."
+      ]
+    },
+    {
+      "id": "c4_ash_alchemist",
+      "title": "Hạt Giống Rêu Nở Trên Tro",
+      "premise": "Một nhà thực vật học lưu vong phát hiện tỷ lệ trộn đá nung và tro trắng có thể khử độc, tạo ra loại đất giữ nước duy nhất để trồng rêu sinh mệnh.",
+      "protagonistEngine": "Cảm nhận được nồng độ độc tố và tỷ lệ khoáng chất trong tro trắng thông qua việc nếm và ngửi.",
+      "protagonistContradiction": "Bị ám ảnh bởi việc lai tạo giống rêu hoàn hảo, nhưng phải chấp nhận trồng giống rêu năng suất thấp để giải quyết nạn đói trước mắt.",
+      "advantageLimits": "Quá trình khử độc tốn rất nhiều thời gian và cần sự chính xác tuyệt đối; sai một ly là đất hỏng không thể phục hồi.",
+      "worldReaction": "Khi thấy đất có thể trồng trọt, các nhóm thợ lập tức cắm mốc rào đất lại, từ chối chia sẻ sản lượng cho người làm công đào xới.",
+      "openingAdvantage": "Chương một trộn đúng tỷ lệ bột đá và tro để cứu một vạt rêu sắp chết khô, thu được lượng nhỏ rêu ăn được.",
+      "firstThreeChapterMechanism": "Chỉ điểm tỷ lệ trộn tro cho thợ nung và thợ rêu. Chương ba, luống rêu ăn được đầu tiên thu hoạch nhưng thợ đào đòi chia phần vì họ đã cõng tro tới.",
+      "causalCost": "Khu vực đất đã khử độc cần được cấp nước liên tục bằng đá tụ thủy; nếu ngừng nước một ngày, độc tố từ tro xung quanh sẽ ngấm ngược lại.",
+      "mechanismFingerprint": [
+        "Kiểm tra nồng độ độc tố của đụn tro mới.",
+        "Hướng dẫn thợ nung nghiền đá thành bột mịn.",
+        "Trộn bột đá với tro và đo lường độ tơi xốp.",
+        "Giao đất cho thợ rêu gieo hạt và ghi chép sản lượng.",
+        "Trích lập một phần rêu làm quỹ hạt giống cho mẻ sau."
+      ],
+      "rewardLoopFingerprint": [
+        "Rêu mọc nhiều tạo ra nguồn thức ăn ổn định.",
+        "Đất sạch có thể dùng để xây nhà an toàn hơn.",
+        "Nhân vật chính được tôn trọng như một nhà thông thái.",
+        "Mở khóa các giống rêu mới có dược tính chữa bệnh."
+      ],
+      "conflictEconomyFingerprint": [
+        "Thợ đào đòi quyền sở hữu đất vì công sức vận chuyển tro.",
+        "Thợ rêu giấu bớt sản lượng thực tế khi thu hoạch.",
+        "Mâu thuẫn khi chọn trồng rêu ăn được hay rêu dược liệu.",
+        "Khó khăn trong việc bảo vệ luống rêu khỏi côn trùng tro."
+      ],
+      "seriality30": [
+        "Chương 1-6: Cứu vạt rêu chết, chứng minh khả năng cải tạo đất.",
+        "Chương 7-12: Xung đột ăn chia sau vụ thu hoạch lớn đầu tiên.",
+        "Chương 13-18: Mở rộng nông trại, cần thợ đào làm hệ thống thủy lợi mới.",
+        "Chương 19-24: Dịch bệnh nấm mốc lây lan do quản lý nước kém.",
+        "Chương 25-30: Chuẩn hóa quy trình nông nghiệp và lập kho dự trữ chung."
+      ],
+      "antiStupidOpponent": "Thủ lĩnh thợ rêu giấu sản lượng vì họ cần thức ăn để chữa trị cho những người trong tộc đang ốm, một hành vi xuất phát từ sự bảo bọc nội bộ.",
+      "domainResearchNeeds": [
+        "Độ pH của đất và cách trung hòa đất kiềm.",
+        "Nông nghiệp thủy canh và giá thể xốp."
+      ]
+    },
+    {
+      "id": "c5_ruin_scavenger",
+      "title": "Phục Dựng Thành Trì Tro",
+      "premise": "Một kẻ đào bới tàn tích tìm thấy bản vẽ thủy lợi cổ đại ẩn dưới thung lũng, dùng nó để dẫn dắt các phe phái khôi phục cỗ máy sinh tồn của người xưa.",
+      "protagonistEngine": "Tầm nhìn chồng chập không gian, thấy được bóng mờ của các công trình cổ đại đang hoạt động khi đứng tại phế tích.",
+      "protagonistContradiction": "Bản vẽ yêu cầu độ chính xác cao nhưng lực lượng lao động hiện tại quá yếu kém, buộc anh phải cắt xén tiêu chuẩn gây rủi ro sập đổ.",
+      "advantageLimits": "Chỉ có thể nhìn thấy bản vẽ khi có ánh sáng mặt trời phản chiếu qua tinh thể đá đặc biệt, vô dụng vào ban đêm hoặc ngày bão tro.",
+      "worldReaction": "Người dân ban đầu nghi ngờ tính khả thi, sau khi thấy hiệu quả lại nảy sinh tâm lý ỷ lại, không chịu học cách tự vận hành.",
+      "openingAdvantage": "Chương một phát hiện rãnh dẫn nước cổ dưới lớp tro, hướng dẫn thợ đào cào đúng chỗ thay vì đào mù quáng, cứu ngay mạng sống của nhóm thợ.",
+      "firstThreeChapterMechanism": "Đào trúng đường ống cổ giúp nước chảy về trại. Chương ba, khôi phục được một hầm trú ẩn cũ nhưng các phe cãi nhau xem ai được giữ chìa khóa.",
+      "causalCost": "Việc khởi động lại một phần công trình cổ thường đánh thức các bẫy phòng thủ cũ hoặc làm rò rỉ khí độc bị kẹt hàng trăm năm.",
+      "mechanismFingerprint": [
+        "Định vị nền móng công trình cổ dưới lớp tro.",
+        "Giao nhiệm vụ giải tỏa mặt bằng cho thợ đào.",
+        "Yêu cầu thợ nung làm các khớp nối đá theo mẫu cổ.",
+        "Lắp ráp hoàn thiện và chạy thử hệ thống dẫn nước.",
+        "Cử nhóm chịu trách nhiệm bảo trì các van xả cũ."
+      ],
+      "rewardLoopFingerprint": [
+        "Hệ thống cổ vận hành giúp giảm 80% sức lao động.",
+        "Lượng nước dồi dào chảy vào các bể chứa trung tâm.",
+        "Người dân tin tưởng vào tầm nhìn của nhân vật chính.",
+        "Tìm thấy thêm các mảnh bản vẽ công nghệ cao hơn."
+      ],
+      "conflictEconomyFingerprint": [
+        "Tranh giành quyền kiểm soát các van nước chiến lược.",
+        "Thợ nung phàn nàn vì các mẫu đá cổ quá khó chế tác.",
+        "Tai nạn lao động do cấu trúc cũ bị sụt lún.",
+        "Sự chênh lệch quyền lực khi một bên nắm giữ bộ lọc nước."
+      ],
+      "seriality30": [
+        "Chương 1-6: Khai quật rãnh dẫn nước, giải quyết nguy cơ thiếu nước cấp bách.",
+        "Chương 7-12: Mâu thuẫn khi thợ đào muốn chiếm cứ hầm trú ẩn vừa khai quật.",
+        "Chương 13-18: Kết hợp ba phe để ráp nối cỗ máy lọc tro khổng lồ.",
+        "Chương 19-24: Rò rỉ khí độc từ tầng hầm sâu do sai lầm vận hành.",
+        "Chương 25-30: Thiết lập trường đào tạo kỹ thuật viên bảo trì công trình cổ."
+      ],
+      "antiStupidOpponent": "Một thợ đào lão luyện phản đối việc đào tiếp vì kinh nghiệm cho thấy các vùng trũng thường tích tụ khí độc, một phản đối có cơ sở khoa học.",
+      "domainResearchNeeds": [
+        "Kiến trúc cống ngầm thời La Mã cổ đại.",
+        "Kỹ thuật trắc địa và bản đồ địa hình."
+      ]
+    },
+    {
+      "id": "c6_labor_appraiser",
+      "title": "Cán Cân Thung Lũng Trắng",
+      "premise": "Một thương nhân thất thế dùng sổ sách kế toán và tem phiếu lao động để tổ chức lại sự hỗn loạn của thung lũng, định giá lại mọi giọt mồ hôi và nước.",
+      "protagonistEngine": "Khả năng tính toán tức thời lượng calo tiêu hao và giá trị hao mòn vật chất của bất kỳ hành động nào trong tầm mắt.",
+      "protagonistContradiction": "Muốn áp dụng quy luật thị trường tự do nhưng nhận ra trong điều kiện khắc nghiệt, vẫn phải dùng luật phân phối bao cấp để cứu người yếu thế.",
+      "advantageLimits": "Khả năng tính toán không thể ngăn chặn sự dối trá; nếu người dân cố tình khai man số liệu, kết quả điều phối sẽ sai lệch hoàn toàn.",
+      "worldReaction": "Những kẻ cơ bắp từng dùng vũ lực ép người khác chia nước nay cực kỳ căm ghét hệ thống tem phiếu và tìm cách phá giá hoặc làm giả tem.",
+      "openingAdvantage": "Chương một chứng minh một nhóm thợ đào đang gian lận lượng nước cấp, phân bổ lại cho thợ nung để cứu một mẻ đá quan trọng.",
+      "firstThreeChapterMechanism": "Phát hành phiếu nước dựa trên công sức đào và nung. Chương ba, dùng phiếu đổi được bữa ăn rêu đầu tiên, nhưng xuất hiện hiện tượng tích trữ phiếu.",
+      "causalCost": "Mỗi khi hệ thống đếm sai hoặc không minh bạch, giá trị của tem phiếu giảm sút, người dân từ chối làm việc và quay lại cướp bóc.",
+      "mechanismFingerprint": [
+        "Đo lường thời gian và sức lực của một công đoạn.",
+        "Ghi nhận thành quả bằng tem phiếu lao động.",
+        "Tổ chức điểm đổi tem lấy nước và rêu sạch.",
+        "Phát hiện và xử phạt các hành vi đầu cơ tích trữ.",
+        "Điều chỉnh tỷ giá quy đổi để khuyến khích làm việc khó."
+      ],
+      "rewardLoopFingerprint": [
+        "Hệ thống minh bạch thúc đẩy năng suất lao động tăng vọt.",
+        "Của cải tích lũy trong kho chung ngày một nhiều.",
+        "Tem phiếu trở thành đồng tiền chung của thung lũng.",
+        "Quyền lực quản lý kho được giao cho nhân vật chính."
+      ],
+      "conflictEconomyFingerprint": [
+        "Những người ốm yếu không kiếm đủ phiếu để đổi ăn.",
+        "Nhóm thợ tay nghề cao đòi tỷ giá quy đổi đặc quyền.",
+        "Nạn làm giả tem phiếu từ bằng những loại đá tương tự.",
+        "Xung đột khi áp thuế bảo trì kênh rạch lên từng phiếu."
+      ],
+      "seriality30": [
+        "Chương 1-6: Thiết lập điểm phân phát nước minh bạch bằng tem phiếu.",
+        "Chương 7-12: Khủng hoảng khi một nhóm lớn tích trữ tem phiếu gây thiếu hụt rêu.",
+        "Chương 13-18: Hợp tác xây dựng ngân hàng tài nguyên kiên cố để bảo vệ kho.",
+        "Chương 19-24: Bạo loạn của nhóm thợ làm giả tem phiếu bị lật tẩy.",
+        "Chương 25-30: Ra mắt hệ thống phúc lợi cho người già yếu dựa trên thuế."
+      ],
+      "antiStupidOpponent": "Một thủ lĩnh thợ đào lập luận rằng công việc của họ rủi ro sập hầm cao hơn nung đá, nên cần hệ số phụ cấp mạng sống, một yêu cầu rất hợp lý.",
+      "domainResearchNeeds": [
+        "Lịch sử hệ thống tem phiếu thời bao cấp.",
+        "Kinh tế học vi mô và lý thuyết cung cầu cơ bản."
+      ]
+    },
+    {
+      "id": "c7_symbiotic_weaver",
+      "title": "Rễ Trắng Bám Đá",
+      "premise": "Một thầy lang phát hiện dấu tay trên đá không chỉ là cam kết mà là một mạng lưới nấm cộng sinh, cần máu và mồ hôi để lọc nước từ tro độc.",
+      "protagonistEngine": "Cảm nhận được mạng lưới sợi nấm sinh học chạy ngầm dưới lớp tro và nhịp đập sinh lý của chúng.",
+      "protagonistContradiction": "Để hệ thống nước hoạt động, anh phải thuyết phục người dân hiến máu và sức lực cho đá, khiến anh trông giống một tà giáo đồ hút máu.",
+      "advantageLimits": "Mạng lưới cộng sinh có giới hạn dung nạp; nếu nhận quá nhiều máu từ người mang bệnh, toàn bộ mạch nước sẽ bị ô nhiễm.",
+      "worldReaction": "Ban đầu người dân sợ hãi, nhưng khi thấy những người hiến máu được đá bảo vệ khỏi bão tro, họ bắt đầu tôn sùng và cuồng tín.",
+      "openingAdvantage": "Chương một dùng chính máu mình nhỏ lên dấu tay mờ trên đá, kích hoạt sợi nấm lọc ra một bát nước trong cứu đứa trẻ đang khát.",
+      "firstThreeChapterMechanism": "Kết nối máu của thợ đào và thợ rêu vào chung một cụm đá. Chương ba, đá tỏa nhiệt tạo thành mái vòm an toàn, nhưng những ai chưa hiến máu bị đuổi ra ngoài.",
+      "causalCost": "Người hiến máu sẽ bị suy nhược trong ba ngày, cần lượng rêu dinh dưỡng gấp đôi, tạo ra gánh nặng kinh tế ngắn hạn khổng lồ.",
+      "mechanismFingerprint": [
+        "Xác định viên đá có sợi nấm còn khả năng sống.",
+        "Thực hiện nghi thức hiến máu theo liều lượng nghiêm ngặt.",
+        "Theo dõi tốc độ sợi nấm lọc nước từ tro trắng.",
+        "Thu thập nước và phân chia cho người hiến máu trước.",
+        "Chăm sóc phục hồi sức khỏe cho người vừa hiến máu."
+      ],
+      "rewardLoopFingerprint": [
+        "Lượng nước lọc được hoàn toàn tinh khiết không độc tố.",
+        "Không gian an toàn quanh đá mở rộng đẩy lùi bão tro.",
+        "Nhân vật chính trở thành đầu mối sinh mạng của làng.",
+        "Sợi nấm phát triển thành vật liệu xây dựng dẻo dai."
+      ],
+      "conflictEconomyFingerprint": [
+        "Mâu thuẫn giữa người khỏe hiến nhiều và người yếu hiến ít.",
+        "Chi phí nuôi ăn người hiến máu trong giai đoạn phục hồi.",
+        "Những người sợ hiến máu tìm cách phá hoại hệ thống đá.",
+        "Quyền tiếp cận vùng an toàn bị biến thành hàng hóa mua bán."
+      ],
+      "seriality30": [
+        "Chương 1-6: Kích hoạt đá cộng sinh, tạo nguồn nước sạch đầu tiên.",
+        "Chương 7-12: Khủng hoảng nhân đạo khi đuổi người không hiến máu ra khỏi vòm bảo vệ.",
+        "Chương 13-18: Hợp tác quy mô lớn, xây vòm sinh học che phủ toàn bộ ba trại.",
+        "Chương 19-24: Mạng lưới đá bị nhiễm bệnh do một người hiến máu mang độc.",
+        "Chương 25-30: Quy chuẩn hóa việc kiểm tra y tế và tạo nguồn máu dự phòng."
+      ],
+      "antiStupidOpponent": "Thủ lĩnh thợ nung từ chối hiến máu vì nhiệt độ lò nung đã bào mòn thể lực của họ, nếu mất thêm máu họ sẽ gục ngã tại lò.",
+      "domainResearchNeeds": [
+        "Mạng lưới nấm rễ cộng sinh (Mycorrhizal network).",
+        "Sinh lý học tuần hoàn máu người."
+      ]
+    },
+    {
+      "id": "c8_wind_navigator",
+      "title": "Đón Gió Tụ Thủy",
+      "premise": "Một người ngắm gió bị ruồng bỏ sử dụng kiến thức khí tượng để thiết kế các bẫy gió, ép tro độc phải ngưng tụ thành nước trên các phên đá nung.",
+      "protagonistEngine": "Năng lực cảm nhận sự thay đổi vi tế của áp suất khí quyển, độ ẩm và hướng gió trong bán kính nhỏ.",
+      "protagonistContradiction": "Thiết kế bẫy gió dựa trên xác suất thiên nhiên; mỗi quyết định đều cược mạng sống của mọi người vào sự phán đoán của mình.",
+      "advantageLimits": "Không thể tự tạo ra gió hay nước, nếu dự báo sai thời điểm gió ẩm đến, toàn bộ công sức xây dựng sẽ đổ sông đổ biển.",
+      "worldReaction": "Khi bẫy gió thành công, các nhóm thợ bắt đầu xây nhà chắn ngang đường gió để hưởng lợi riêng, làm hỏng luồng khí của toàn thung lũng.",
+      "openingAdvantage": "Chương một dự báo một luồng gió ẩm nhỏ, yêu cầu thợ nung đặt phiến đá nóng đúng góc độ, ngưng tụ được nước bám trên mặt đá.",
+      "firstThreeChapterMechanism": "Dựng bẫy gió thô sơ bằng đá nung và lưới rêu. Chương ba, vách chắn gió lớn hoàn thành tạo ra mái ấm, nhưng góc khuất gió trở thành khu ổ chuột.",
+      "causalCost": "Bẫy gió khi bắt nước cũng đồng thời tích tụ tro độc, đòi hỏi người dọn dẹp phải đối mặt với nguy cơ viêm phổi nặng.",
+      "mechanismFingerprint": [
+        "Đo lường áp suất gió và dự báo thời điểm có độ ẩm.",
+        "Thiết kế góc độ đặt các tấm đá nung và lưới cản.",
+        "Huy động thợ đào dựng móng vững chắc cho vách chắn.",
+        "Thu hoạch nước ngưng tụ ngay trước khi gió đổi chiều.",
+        "Phân công đội cảm tử dọn sạch tro độc bám trên lưới."
+      ],
+      "rewardLoopFingerprint": [
+        "Thu được lượng nước lớn gấp nhiều lần khai thác mỏ đá.",
+        "Vách chắn gió bảo vệ cộng đồng khỏi những cơn bão tro.",
+        "Uy tín của nhân vật chính thăng cấp thành người dẫn đường.",
+        "Mở khóa các kỹ thuật thiết kế kiến trúc khí động học."
+      ],
+      "conflictEconomyFingerprint": [
+        "Không ai muốn tham gia đội dọn tro độc vì tỷ lệ chết cao.",
+        "Các gia đình tranh nhau vị trí cất nhà ở vùng lặng gió.",
+        "Thợ nung phàn nàn vì bẫy gió làm tắt lửa lò của họ.",
+        "Sự trừng phạt với những kẻ tự ý xây vật cản đường gió."
+      ],
+      "seriality30": [
+        "Chương 1-6: Dự báo chính xác, thu được nước bằng bẫy gió nhỏ.",
+        "Chương 7-12: Tranh chấp gay gắt về việc dời lò nung ra khỏi đường gió.",
+        "Chương 13-18: Hợp lực xây dựng tháp bắt gió khổng lồ ở trung tâm.",
+        "Chương 19-24: Bão lốc ngược chiều bất ngờ uy hiếp đánh sập tháp chính.",
+        "Chương 25-30: Hoàn thiện quy hoạch làng xã dựa trên sơ đồ luồng gió."
+      ],
+      "antiStupidOpponent": "Một trưởng lão thợ đào cấm người dân tham gia đội dọn tro vì thấy rõ tỷ lệ hỏng phổi, yêu cầu phải có đồ bảo hộ đàng hoàng mới làm việc.",
+      "domainResearchNeeds": [
+        "Tháp chắt nước từ sương mù (Fog catcher) ở sa mạc.",
+        "Khí động học cơ bản và hệ thống thông gió thụ động."
+      ]
+    },
+    {
+      "id": "c9_mud_mason",
+      "title": "Bùn Trắng Đắp Thành",
+      "premise": "Một thợ xây nghèo tìm ra công thức nhào trộn tro trắng, nước và sợi rêu thành 'bùn sinh mệnh', vật liệu duy nhất không bị bão tro ăn mòn.",
+      "protagonistEngine": "Cảm nhận trực quan về độ kết dính, độ ẩm phân bổ và lực chịu tải của các hỗn hợp vật liệu khi trộn vào nhau.",
+      "protagonistContradiction": "Muốn xây những công trình công cộng kiên cố nhưng người dân chỉ muốn dùng vật liệu mới để vá víu lều cá nhân của họ.",
+      "advantageLimits": "Bùn sinh mệnh khô rất nhanh, đòi hỏi sự phối hợp nhịp nhàng giữa người trộn, người vận chuyển và người đắp; chậm trễ là hỏng cả mẻ.",
+      "worldReaction": "Khi thấy độ bền của bùn sinh mệnh, các phe phái đòi độc quyền công thức, bắt cóc thợ trộn bùn để phục vụ tư lợi.",
+      "openingAdvantage": "Chương một dùng lượng nước nhỏ nhào bùn sinh mệnh để vá một vết nứt hiểm nghèo trên đập giữ nước, ngăn thảm họa vỡ đập.",
+      "firstThreeChapterMechanism": "Trộn mẻ bùn lớn bằng công sức ba phe để xây lại lòng kênh. Chương ba, mái hiên chung đắp bằng bùn hoàn thành, nhưng các bên đòi chia tường ngăn.",
+      "causalCost": "Bùn sinh mệnh sau khi khô cứng cần được bôi trơn bằng một lớp dịch rêu hàng tháng, nếu không sẽ nứt vỡ và nhả lại tro độc.",
+      "mechanismFingerprint": [
+        "Tính toán tỷ lệ tro, nước và sợi rêu theo độ ẩm thời tiết.",
+        "Tổ chức dây chuyền trộn, chuyền và đắp bùn tốc độ cao.",
+        "Nghiệm thu độ chịu lực của bức tường vừa đắp.",
+        "Tiến hành quét dịch rêu bảo quản bề mặt ngoài.",
+        "Giao định mức bảo trì định kỳ cho người sử dụng công trình."
+      ],
+      "rewardLoopFingerprint": [
+        "Công trình kiên cố giúp giảm 90% chi phí sửa chữa lều tạm.",
+        "Nhà ở kín gió giúp giảm tử vong ở người già và trẻ em.",
+        "Nhân vật chính nắm giữ bí quyết công nghệ cốt lõi.",
+        "Làng xóm chuyển từ du mục sang định cư vĩnh viễn."
+      ],
+      "conflictEconomyFingerprint": [
+        "Căng thẳng vì mẻ bùn bị hỏng do người chuyền thao tác chậm.",
+        "Thợ rêu đòi tăng giá sợi rêu khi thấy nhu cầu xây dựng cao.",
+        "Tranh cãi xem nên xây tường rào bảo vệ làng hay xây nhà ở trước.",
+        "Kẻ lười biếng trốn tránh trách nhiệm bôi dịch rêu bảo trì tường."
+      ],
+      "seriality30": [
+        "Chương 1-6: Vá đập nước thành công, chứng minh sức mạnh của bùn.",
+        "Chương 7-12: Mâu thuẫn khi thợ nung lén giấu bùn để xây lò riêng.",
+        "Chương 13-18: Liên kết nhân lực xây nhà chung chống chọi mùa bão tro.",
+        "Chương 19-24: Nguy cơ sập mái nhà chung do bỏ bê bảo trì bề mặt bùn.",
+        "Chương 25-30: Chia lô đất đắp nhà, thiết lập luật sở hữu và bảo trì bất động sản."
+      ],
+      "antiStupidOpponent": "Thợ rêu tăng giá bán sợi rêu không phải do tham lam, mà vì việc khai thác quá mức làm cạn kiệt giống rêu, họ cần tích lũy dự phòng.",
+      "domainResearchNeeds": [
+        "Vật liệu xây dựng truyền thống (Cob, Adobe).",
+        "Kỹ thuật thi công dây chuyền và quản lý thời gian đông kết."
+      ]
+    },
+    {
+      "id": "c10_ecosystem_balancer",
+      "title": "Thiên Địch Của Tro",
+      "premise": "Một người thuần hóa côn trùng phát hiện nguyên nhân làm mất nước không phải do bốc hơi, mà do rệp tro hút cạn; anh dùng thiên địch để làm sạch nguồn nước.",
+      "protagonistEngine": "Nhãn quan vi sinh, nhìn thấy sự tập trung của rệp tro và các chuỗi thức ăn sinh học vi mô đang diễn ra trên bề mặt vật thể.",
+      "protagonistContradiction": "Để bảo vệ nguồn nước và rêu, phải nuôi dưỡng các loài côn trùng săn mồi có hình thù gớm ghiếc, gây khiếp sợ cho chính người dân.",
+      "advantageLimits": "Hệ sinh thái thiên địch rất mong manh; nếu côn trùng săn mồi sinh sản quá nhanh, chúng sẽ quay lại cắn phá rêu và tấn công con người.",
+      "worldReaction": "Người dân ghê tởm côn trùng, lén lút dùng lửa đốt các ổ thiên địch, phá vỡ thế cân bằng và làm rệp tro bùng phát mạnh hơn.",
+      "openingAdvantage": "Chương một thả một nắm bọ săn mồi vào khe đá tụ thủy đang cạn, tiêu diệt ổ rệp tro, lập tức phục hồi lượng nước chảy ra.",
+      "firstThreeChapterMechanism": "Nuôi bọ săn mồi bằng nhiệt lò nung và cho làm sạch kênh đào. Chương ba, thu hoạch rêu tăng vọt nhưng nước có mùi bọ, thợ nung từ chối uống.",
+      "causalCost": "Mỗi khi sử dụng bọ săn mồi quá đà, một tỷ lệ xác bọ sẽ làm ô nhiễm mùi vị của nước, đòi hỏi một quy trình lọc than tốn kém.",
+      "mechanismFingerprint": [
+        "Phát hiện ổ rệp tro đang phá hoại ngầm công trình.",
+        "Nhân giống bọ săn mồi ở nhiệt độ lò nung phù hợp.",
+        "Thả bọ vào khu vực mục tiêu và theo dõi mức độ làm sạch.",
+        "Thu hồi bọ và lọc cặn xác để tránh ô nhiễm nước.",
+        "Trả công cho nhóm phụ trách canh giữ ổ nhân giống."
+      ],
+      "rewardLoopFingerprint": [
+        "Nguồn nước không còn bị hao hụt vô lý do rệp hút.",
+        "Cây rêu không bị cắn rễ nên năng suất lá lớn hơn.",
+        "Nhân vật chính kiểm soát an ninh sinh thái toàn thung lũng.",
+        "Mở khóa khả năng dùng vỏ bọ làm vật liệu cách nhiệt."
+      ],
+      "conflictEconomyFingerprint": [
+        "Dân làng lén xịt thuốc lá độc giết bọ săn mồi vì sợ hãi.",
+        "Thợ nung đình công vì không muốn uống nước ngâm xác bọ.",
+        "Thợ đào đòi phí dọn dẹp xác rệp dưới lòng kênh.",
+        "Mâu thuẫn khi bọ đói bắt đầu cắn phá kho dự trữ rêu."
+      ],
+      "seriality30": [
+        "Chương 1-6: Diệt rệp tro cứu đá tụ thủy, giải quyết khủng hoảng nước.",
+        "Chương 7-12: Xung đột gay gắt khi dân làng đòi giết sạch ổ bọ săn mồi.",
+        "Chương 13-18: Hợp tác xây hầm chứa bọ cách ly và hệ thống lọc nước qua than đá.",
+        "Chương 19-24: Đột biến sinh học làm rệp tro kháng thiên địch, nguy cơ sập hệ sinh thái.",
+        "Chương 25-30: Thiết lập phòng thí nghiệm sinh học và luật bảo vệ các loài có lợi."
+      ],
+      "antiStupidOpponent": "Một người mẹ đốt ổ bọ vì một con bọ đi lạc đã cắn con bà sưng tấy, hành động bảo vệ gia đình hoàn toàn hợp lý về mặt tâm lý.",
+      "domainResearchNeeds": [
+        "Kiểm soát sinh học trong nông nghiệp (Biological pest control).",
+        "Kỹ thuật lọc nước bằng than hoạt tính tự nhiên."
+      ]
+    },
+    {
+      "id": "concept_hx04_01",
+      "title": "Tro Tàn Ghi Dấu",
+      "premise": "Một kẻ ngoại tộc có khả năng 'nghe' thấy ký ức của nước trong lòng đất phải thuyết phục ba gia tộc thù địch cùng nhau chạm tay vào đá để hồi sinh thung lũng tro tàn.",
+      "protagonistEngine": "Khao khát chứng minh giá trị của một năng lực vô hình, bị coi là dị đoan, để tìm một nơi thuộc về.",
+      "protagonistContradiction": "Anh có thể tìm ra nơi nước muốn chảy đến, nhưng lại không thể thấu hiểu lòng người, khiến những kế hoạch hoàn hảo trên lý thuyết của anh vấp phải sự nghi kỵ và tranh chấp.",
+      "advantageLimits": "Chỉ 'nghe' được dòng chảy tiềm năng, không thể tự tạo ra nước. Cần đá và người chạm vào để hiện thực hóa. Tầm nhìn bị giới hạn bởi sự mệt mỏi tinh thần và khoảng cách.",
+      "worldReaction": "Các gia tộc nghi ngờ anh là gián điệp hoặc kẻ lừa đảo. Trưởng lão phe Đào Kênh xem anh là mối đe dọa cho kinh nghiệm truyền đời của họ và tích cực tìm bằng chứng chống lại anh.",
+      "openingAdvantage": "Khả năng cảm nhận một mạch nước ngầm nhỏ đang chảy gần bề mặt nhưng bị một lớp đá phiến mỏng manh chặn lại, ngay cạnh khu ở của nhóm người yếu thế nhất.",
+      "firstThreeChapterMechanism": "Anh chỉ cho một gia đình đang thiếu nước cách đập vỡ một phiến đá cụ thể để khơi nguồn nước nhỏ. Nguồn nước này chỉ đủ cho họ, khiến hàng xóm ghen tị và tranh cãi về quyền sở hữu con suối bắt đầu.",
+      "causalCost": "Mỗi lần sử dụng năng lực, ký ức của anh bị xói mòn một chút, lẫn lộn với ký ức của dòng nước. Thành công càng lớn, anh càng có nguy cơ quên mất mình là ai.",
+      "mechanismFingerprint": [
+        "Dùng năng lực cảm nhận điểm yếu của địa hình.",
+        "Đề xuất một giải pháp kỹ thuật cần ít nhất hai phe hợp tác.",
+        "Thiết lập một hợp đồng phân chia lao động và sản phẩm rõ ràng.",
+        "Giám sát thi công công trình quy mô nhỏ.",
+        "Công khai đo đạc kết quả và xác định người hưởng lợi/thiệt hại.",
+        "Dùng phần lợi ích tăng thêm để thương lượng cho dự án tiếp theo."
+      ],
+      "rewardLoopFingerprint": [
+        "Phát hiện một mạch nước hoặc tài nguyên ẩn.",
+        "Thuyết phục được một người có kỹ năng quan trọng tin tưởng.",
+        "Hoàn thành một công trình nhỏ, cải thiện đời sống rõ rệt (có nước uống, có cá).",
+        "Nhận được sự công nhận hoặc một danh hiệu cụ thể từ một nhóm người.",
+        "Mở khóa một khu vực mới hoặc một công nghệ mới từ sự hợp tác."
+      ],
+      "conflictEconomyFingerprint": [
+        "Công trình mới làm thay đổi dòng chảy, gây khô hạn ở nơi khác.",
+        "Sản lượng tăng lên tạo ra tranh chấp về quyền phân phối và lưu trữ.",
+        "Phe được lợi muốn độc chiếm công nghệ hoặc vị trí.",
+        "Sự phụ thuộc vào năng lực của main khiến các phe vừa hợp tác vừa tìm cách kiểm soát anh.",
+        "Thành công thu hút sự chú ý của các thế lực bên ngoài thung lũng."
+      ],
+      "seriality30": [
+        "Chương 1-5: Giải quyết khủng hoảng nước uống cho một xóm, tạo ra mâu thuẫn phân phối đầu tiên.",
+        "Chương 6-10: Xây dựng kênh dẫn nước chung đầu tiên, hợp nhất kỹ năng đào kênh và gia cố đá.",
+        "Chương 11-15: Thử nghiệm trồng rêu giữ nước, đối mặt với sự phá hoại từ phe bảo thủ.",
+        "Chương 16-22: Xây dựng hồ chứa nước nhỏ đầu tiên, chính thức hình thành hội đồng quản lý chung.",
+        "Chương 23-30: Đối phó với trận mưa axit đầu mùa, công trình mới bộc lộ điểm yếu chết người."
+      ],
+      "antiStupidOpponent": "Đối thủ không phá hoại một cách mù quáng, mà sẽ đề xuất các kế hoạch thay thế có vẻ hợp lý hơn để lôi kéo người dân, hoặc lợi dụng các điều khoản trong hợp đồng để chiếm lợi.",
+      "domainResearchNeeds": [
+        "Kỹ thuật thủy lợi cổ đại (kênh, đập, hồ chứa).",
+        "Nguyên tắc hình thành và hoạt động của các cộng đồng tự quản.",
+        "Tâm lý học đám đông và nghệ thuật đàm phán.",
+        "Các loại rêu và thực vật có khả năng sống ở vùng đất cằn cỗi."
+      ]
+    },
+    {
+      "id": "concept_hx04_02",
+      "title": "Hơi Thở Của Đá",
+      "premise": "Người cuối cùng nắm giữ bí thuật nung đá tro thành gốm giữ nước phải đổi chác từng mẻ gốm để lấy củi, lương thực và sự tin tưởng, nhằm xây một lò nung đủ lớn để cứu cả thung lũng.",
+      "protagonistEngine": "Nỗi ám ảnh phải phục hưng bí thuật của gia tộc và chứng minh nó không phải là nguyên nhân gây ra thảm họa biến thung lũng thành tro bụi trong quá khứ.",
+      "protagonistContradiction": "Anh yêu kỹ thuật của mình nhưng lại ghét việc phải thương lượng, mặc cả. Anh muốn cống hiến nhưng luôn bị buộc phải tính toán thiệt hơn, khiến anh dần trở nên chai sạn.",
+      "advantageLimits": "Kỹ thuật nung gốm tiêu tốn một loại củi đặc biệt chỉ mọc ở khu vực do phe hiếu chiến kiểm soát. Lò nung hiện tại nhỏ, sản lượng thấp. Gốm dễ vỡ nếu pha chế nguyên liệu sai.",
+      "worldReaction": "Mọi người vừa thèm muốn những chiếc bình gốm giữ nước của anh, vừa sợ hãi 'lửa ma' trong lò nung của anh sẽ một lần nữa thiêu rụi vùng đất. Họ đặt ra các quy định khắt khe về địa điểm và thời gian anh được phép nổi lửa.",
+      "openingAdvantage": "Một lò nung nhỏ bí mật và mẻ đất sét tro đã được chuẩn bị sẵn, đủ để nung vài chiếc bình chứa nước chất lượng cao.",
+      "firstThreeChapterMechanism": "Anh nung thành công một chiếc bình, giúp một bà lão giữ được lượng nước mưa quý giá qua đêm. Ngay lập tức, trưởng xóm đến yêu cầu anh nộp 'thuế sản phẩm' để chia cho cả xóm, nếu không sẽ tịch thu lò.",
+      "causalCost": "Nhiệt độ cao và khói bụi từ lò nung dần hủy hoại sức khỏe của anh. Để có củi, anh phải thực hiện những yêu cầu ngày càng nguy hiểm từ phe kiểm soát rừng cây.",
+      "mechanismFingerprint": [
+        "Xác định nhu cầu cấp thiết nhất (bình chứa, ống dẫn).",
+        "Sản xuất một lô sản phẩm gốm mẫu chất lượng cao.",
+        "Dùng sản phẩm để đổi lấy nguyên liệu hoặc lao động cho mẻ tiếp theo.",
+        "Dạy nghề cho một người từ phe khác để xây dựng lòng tin.",
+        "Ghi chép lại công thức và quy trình, tạo ra tài sản chung.",
+        "Thiết kế các sản phẩm gốm chuyên dụng cho các công trình lớn hơn."
+      ],
+      "rewardLoopFingerprint": [
+        "Tạo ra một sản phẩm gốm mới với tính năng vượt trội.",
+        "Nhìn thấy người dân sử dụng sản phẩm của mình để cải thiện cuộc sống.",
+        "Được một thợ cả từ phe khác công nhận tay nghề.",
+        "Tích lũy đủ tài nguyên để nâng cấp lò nung.",
+        "Phục chế thành công một món đồ gốm cổ, khám phá ra một bí mật quá khứ."
+      ],
+      "conflictEconomyFingerprint": [
+        "Nguồn cung củi và đất sét trở thành điểm tranh chấp chiến lược.",
+        "Bí mật công nghệ bị dòm ngó, dẫn đến gián điệp và trộm cắp.",
+        "Sản phẩm gốm tạo ra sự phân hóa giàu nghèo mới.",
+        "Việc mở rộng sản xuất gây ô nhiễm hoặc ảnh hưởng đến các hoạt động khác.",
+        "Đối thủ cố gắng tạo ra sản phẩm thay thế rẻ hơn nhưng kém chất lượng hơn."
+      ],
+      "seriality30": [
+        "Chương 1-5: Sản xuất bình chứa nước, giải quyết tranh chấp sở hữu đầu tiên.",
+        "Chương 6-10: Chế tạo ống dẫn nước bằng gốm, kết nối hai khu nhà riêng lẻ.",
+        "Chương 11-15: Bị vu oan dùng 'lửa ma' gây bệnh, phải chứng minh sự trong sạch.",
+        "Chương 16-22: Xây dựng lò nung chung với sự góp sức của hai phe, tạo ra hội thợ gốm.",
+        "Chương 23-30: Đối mặt với mùa khô hạn, các ống dẫn gốm bị nứt vỡ do kỹ thuật chưa hoàn thiện."
+      ],
+      "antiStupidOpponent": "Đối thủ không phá lò, mà sẽ tìm cách kiểm soát nguồn củi, độc quyền phân phối sản phẩm gốm, hoặc tài trợ cho một thợ gốm khác để tạo ra sự cạnh tranh và chia rẽ nội bộ.",
+      "domainResearchNeeds": [
+        "Quy trình làm gốm sứ thủ công.",
+        "Các loại lò nung cổ đại và nhiên liệu sử dụng.",
+        "Lịch sử các phường hội thủ công và quy tắc hoạt động.",
+        "Hóa học cơ bản về đất sét và các chất phụ gia."
+      ]
+    },
+    {
+      "id": "concept_hx04_03",
+      "title": "Người Gieo Mầm Đá",
+      "premise": "Một nhà thực vật học xuyên không mang theo kiến thức về địa y và vi sinh vật phải thuyết phục những người dân chỉ tin vào đào và đục rằng tương lai nằm ở việc nuôi dưỡng sự sống nhỏ bé nhất.",
+      "protagonistEngine": "Nỗi trăn trở của một nhà khoa học muốn áp dụng kiến thức của mình để cứu người, nhưng lại bị mắc kẹt trong một xã hội không có nền tảng để hiểu những gì anh nói.",
+      "protagonistContradiction": "Anh có tư duy hệ thống và dài hạn, nhưng lại thiếu khả năng ứng biến và sự tàn nhẫn cần thiết trong các cuộc đấu tranh chính trị-xã hội trước mắt.",
+      "advantageLimits": "Kiến thức của anh đi trước thời đại, không có công cụ thí nghiệm. Việc nhân giống rêu và địa y rất chậm và dễ bị các yếu tố môi trường (axit, khô hạn) hủy hoại.",
+      "worldReaction": "Người dân xem việc 'trồng cỏ dại' của anh là vô bổ và phí phạm nước. Các phe phái chỉ muốn lợi dụng kiến thức của anh để tạo ra độc dược hoặc các lợi ích ngắn hạn.",
+      "openingAdvantage": "Kiến thức để nhận biết một loại rêu có khả năng giữ nước gấp nhiều lần trọng lượng của nó, đang mọc yếu ớt trong một khe đá khuất.",
+      "firstThreeChapterMechanism": "Anh hướng dẫn một đứa trẻ dùng vạt áo cũ thấm nước từ khe đá có rêu, sau đó vắt ra được nhiều nước hơn hẳn vải thường. Mẹ đứa trẻ thấy vậy liền xé áo của cả nhà đi thấm rêu, gây ra tranh chấp với gia đình khác cũng muốn làm theo.",
+      "causalCost": "Để bảo vệ các khu thí nghiệm rêu non, anh phải đánh đổi các nguyên tắc đạo đức của mình, thậm chí là hy sinh lợi ích của một nhóm người để bảo vệ lợi ích dài hạn cho số đông.",
+      "mechanismFingerprint": [
+        "Xác định một loài rêu/địa y có ích.",
+        "Tiến hành thí nghiệm quy mô nhỏ để chứng minh hiệu quả.",
+        "Dùng kết quả để đổi lấy một mảnh đất và nguồn nước được bảo vệ.",
+        "Quy chuẩn hóa quy trình nhân giống và chăm sóc.",
+        "Tổ chức các đội thu hoạch và ứng dụng sản phẩm (làm vật liệu giữ ẩm, phân bón).",
+        "Lai tạo các giống mới để thích ứng với những thách thức môi trường khắc nghiệt hơn."
+      ],
+      "rewardLoopFingerprint": [
+        "Nhân giống thành công một mẻ rêu mới.",
+        "Phát hiện ra một ứng dụng bất ngờ của loài thực vật (làm thuốc, thực phẩm).",
+        "Nhìn thấy một mảnh đất tro xám bắt đầu chuyển sang màu xanh.",
+        "Được một nhóm người (nông dân, phụ nữ) công nhận là 'Thầy Rêu'.",
+        "Kiến thức của anh bắt đầu được ghi chép và truyền dạy lại."
+      ],
+      "conflictEconomyFingerprint": [
+        "Các mảnh đất phù hợp để trồng rêu trở thành tài nguyên tranh chấp.",
+        "Kiến thức nhân giống bị đánh cắp hoặc độc quyền hóa.",
+        "Sự phát triển của thảm thực vật thu hút các loài động vật mới, gây hại cho con người.",
+        "Sự phụ thuộc vào một vài giống rêu chủ lực tạo ra nguy cơ dịch bệnh.",
+        "Xung đột giữa phe 'nông nghiệp' mới và các phe 'công nghiệp' truyền thống (đào kênh, nung đá)."
+      ],
+      "seriality30": [
+        "Chương 1-5: Chứng minh hiệu quả giữ nước của rêu, gây tranh chấp về nguồn rêu hoang dã.",
+        "Chương 6-10: Lập vườn ươm đầu tiên, đối mặt với sự phá hoại do thiếu hiểu biết.",
+        "Chương 11-15: Dùng rêu cải tạo một thửa đất nhỏ, trồng thành công vụ rau đầu tiên.",
+        "Chương 16-22: Xung đột với phe đào kênh vì vườn rêu làm thay đổi độ thẩm thấu của đất.",
+        "Chương 23-30: Đối mặt với dịch nấm mốc lạ tấn công các vườn rêu, có nguy cơ mất trắng."
+      ],
+      "antiStupidOpponent": "Đối thủ sẽ không giẫm nát rêu, mà sẽ lập luận rằng việc dùng nước để tưới cho 'cỏ dại' là một sự lãng phí, trong khi có thể dùng nước đó trực tiếp cho người, và lôi kéo dư luận bằng lý lẽ này.",
+      "domainResearchNeeds": [
+        "Kiến thức cơ bản về địa y, rêu và các loài thực vật tiên phong.",
+        "Nguyên tắc cải tạo đất sa mạc hóa.",
+        "Các mô hình nông nghiệp sinh thái và permaculture.",
+        "Lịch sử xung đột giữa nông dân và thợ thủ công trong các xã hội sơ khai."
+      ]
+    },
+    {
+      "id": "concept_hx04_04",
+      "title": "Thợ Khắc Dấu Giao Ước",
+      "premise": "Một luật sư xuyên không, không thể tu luyện hay lao động chân tay, phải dùng kiến thức về hợp đồng và luật pháp để tạo ra những 'giao ước' khắc trên đá, ràng buộc các phe phái và xây dựng trật tự từ hỗn loạn.",
+      "protagonistEngine": "Niềm tin sắt đá rằng một hệ thống quy tắc công bằng và được thực thi nghiêm ngặt là nền tảng duy nhất cho sự tồn tại và phát triển, ngay cả ở nơi tận thế.",
+      "protagonistContradiction": "Anh tìm kiếm sự công bằng tuyệt đối trong một thế giới mà sức mạnh và sự sinh tồn luôn được ưu tiên. Anh thường xuyên phải bẻ cong các quy tắc do chính mình đặt ra để đạt được mục đích lớn hơn.",
+      "advantageLimits": "Anh chỉ có thể soạn thảo giao ước, việc thực thi phụ thuộc hoàn toàn vào sức mạnh và sự đồng thuận của các bên. Giao ước càng phức tạp, càng dễ có lỗ hổng để lách luật.",
+      "worldReaction": "Các thủ lĩnh lợi dụng các bản giao ước của anh để củng cố quyền lực, trong khi người dân thường lại xem chúng là những xiềng xích mới. Họ nghi ngờ một kẻ chỉ biết nói và viết.",
+      "openingAdvantage": "Khả năng nhận diện mâu thuẫn và nhu cầu cốt lõi của hai bên trong một tranh chấp nhỏ về một vũng nước đọng.",
+      "firstThreeChapterMechanism": "Anh soạn một giao ước đơn giản trên một phiến đá: phe A được múc nước buổi sáng, phe B được múc buổi chiều. Nhưng anh cố tình bỏ qua việc xác định 'sáng' và 'chiều' kéo dài bao lâu, khiến hai bên xung đột về thời gian ngay ngày hôm sau.",
+      "causalCost": "Mỗi bản giao ước anh tạo ra đều có người được lợi và kẻ chịu thiệt. Anh trở thành mục tiêu trả thù của những kẻ thua cuộc. Gánh nặng về những hậu quả anh không lường hết được bào mòn tinh thần anh.",
+      "mechanismFingerprint": [
+        "Xác định một xung đột lợi ích cụ thể.",
+        "Làm trung gian hòa giải, tìm ra mẫu số chung nhỏ nhất.",
+        "Soạn thảo một bản hợp đồng với các điều khoản rõ ràng về quyền lợi, nghĩa vụ và chế tài.",
+        "Tổ chức một buổi lễ ký kết công khai để tạo tính chính danh.",
+        "Thành lập một hội đồng giám sát việc thực thi hợp đồng.",
+        "Sửa đổi và bổ sung hợp đồng dựa trên các vấn đề phát sinh."
+      ],
+      "rewardLoopFingerprint": [
+        "Một bản hợp đồng được các bên tự nguyện tuân thủ.",
+        "Ngăn chặn thành công một cuộc ẩu đả bằng các điều khoản đã viết.",
+        "Được một thủ lĩnh tin tưởng nhờ làm trọng tài công tâm.",
+        "Hệ thống 'luật' của anh được áp dụng cho một vấn đề lớn hơn (phân phối lương thực, phòng thủ chung).",
+        "Người dân bắt đầu tìm đến anh thay vì dùng bạo lực để giải quyết tranh chấp."
+      ],
+      "conflictEconomyFingerprint": [
+        "Việc diễn giải các điều khoản trong hợp đồng trở thành một cuộc chiến mới.",
+        "Một phe mạnh hơn lờ đi hợp đồng, thách thức cơ chế thực thi.",
+        "Lỗ hổng trong luật bị khai thác, tạo ra lợi ích bất công.",
+        "Nhu cầu về 'luật sư' và 'thẩm phán' tạo ra một tầng lớp tinh hoa mới.",
+        "Các quy tắc cứng nhắc cản trở sự linh hoạt cần thiết để đối phó với thảm họa bất ngờ."
+      ],
+      "seriality30": [
+        "Chương 1-5: Soạn giao ước chia sẻ vũng nước, tạo ra xung đột về diễn giải luật.",
+        "Chương 6-10: Lập hợp đồng lao động cho dự án đào kênh, giải quyết đình công đầu tiên.",
+        "Chương 11-15: Bị một thủ lĩnh bắt giam vì một điều khoản bất lợi cho hắn, phải tự bào chữa.",
+        "Chương 16-22: Thành lập tòa án sơ khai, xét xử vụ trộm cắp tài sản chung đầu tiên.",
+        "Chương 23-30: Hệ thống luật pháp đối mặt với thách thức từ một nhóm người ngoại lai không công nhận các giao ước."
+      ],
+      "antiStupidOpponent": "Đối thủ sẽ không xé bỏ hợp đồng. Thay vào đó, họ sẽ tuân thủ câu chữ một cách triệt để nhưng lại diễn giải nó theo hướng có lợi cho mình, hoặc tạo ra một tình huống pháp lý mới không được quy định trong hợp đồng.",
+      "domainResearchNeeds": [
+        "Lịch sử phát triển luật pháp và các bộ luật cổ (Hammurabi, La Mã).",
+        "Nguyên tắc cơ bản của luật hợp đồng.",
+        "Các lý thuyết về khế ước xã hội.",
+        "Kỹ năng đàm phán và hòa giải."
+      ]
+    },
+    {
+      "id": "concept_hx04_05",
+      "title": "Người Đong Đếm Sinh Mệnh",
+      "premise": "Một cựu quân需官 (sĩ quan hậu cần) bị lưu đày, xem mọi thứ từ nước, lương thực đến mạng người đều là những con số, phải áp dụng tư duy tối ưu hóa tàn nhẫn của mình để giúp cộng đồng tồn tại qua mùa đông khắc nghiệt.",
+      "protagonistEngine": "Mong muốn được chứng minh hệ thống quản lý và phân phối dựa trên dữ liệu của mình là con đường duy nhất để sống sót, bất chấp sự phản đối từ những người coi trọng tình cảm và truyền thống.",
+      "protagonistContradiction": "Anh có thể tính toán chính xác lượng calo cần thiết cho mỗi người, nhưng lại không thể hiểu được nỗi đau của một người mẹ khi khẩu phần của con mình bị cắt giảm. Anh khao khát trật tự nhưng lại gây ra sự hỗn loạn trong tình cảm con người.",
+      "advantageLimits": "Anh chỉ có thể phân tích và lên kế hoạch dựa trên những tài nguyên hiện có. Anh không có khả năng tạo ra tài nguyên mới. Các kế hoạch của anh đòi hỏi kỷ luật thép, điều mà những người dân tự do không quen.",
+      "worldReaction": "Mọi người sợ hãi sự công bằng lạnh lùng của anh. Các trưởng lão cho rằng anh đang phá vỡ các mối quan hệ gia tộc và truyền thống. Họ tuân theo anh khi đói, nhưng sẽ chống lại anh ngay khi có cơ hội.",
+      "openingAdvantage": "Khả năng nhẩm tính nhanh chóng lượng nước tiêu thụ của một khu dân cư và chỉ ra ngay sự lãng phí trong việc phân phối hiện tại.",
+      "firstThreeChapterMechanism": "Anh phát hiện ra các gia đình ở gần nguồn nước đang dùng lãng phí. Anh đề xuất và áp dụng chế độ phân phối nước theo thẻ, dựa trên số nhân khẩu. Một gia đình có uy thế bị cắt giảm khẩu phần nước, họ liền kích động mọi người chống lại 'kẻ ngoại lai độc tài'.",
+      "causalCost": "Để thực thi các kế hoạch của mình, anh phải gạt bỏ cảm xúc và đưa ra những quyết định tàn nhẫn, khiến anh ngày càng bị cô lập. Anh cứu được nhiều người về mặt thể chất, nhưng lại giết chết lòng tin và tình người xung quanh mình.",
+      "mechanismFingerprint": [
+        "Thống kê toàn bộ tài sản và nhân khẩu.",
+        "Xác định các điểm lãng phí hoặc kém hiệu quả.",
+        "Thiết lập một hệ thống định lượng và phân phối tiêu chuẩn.",
+        "Tổ chức các đội lao động chuyên môn hóa dựa trên kỹ năng.",
+        "Sử dụng phần tài nguyên tiết kiệm được để đầu tư vào các dự án rủi ro nhưng có lợi nhuận cao.",
+        "Đánh giá lại hiệu quả và điều chỉnh lại hệ thống sau mỗi chu kỳ."
+      ],
+      "rewardLoopFingerprint": [
+        "Bảng thống kê cho thấy tài nguyên dự trữ tăng lên.",
+        "Một kế hoạch phân phối phức tạp hoạt động trơn tru.",
+        "Ngăn chặn thành công một cuộc khủng hoảng (nạn đói, dịch bệnh) nhờ dự báo chính xác.",
+        "Được một người từng chỉ trích mình thừa nhận hiệu quả của hệ thống.",
+        "Hoàn thành một dự án lớn đúng tiến độ và trong ngân sách."
+      ],
+      "conflictEconomyFingerprint": [
+        "Hệ thống phân phối theo định lượng tạo ra thị trường chợ đen.",
+        "Việc chuyên môn hóa lao động làm suy yếu quyền lực của các trưởng lão gia tộc.",
+        "Sự ganh đua về 'chỉ số hiệu quả' gây ra xung đột giữa các đội lao động.",
+        "Những người không phù hợp với hệ thống (người già, người tàn tật) trở thành gánh nặng.",
+        "Sự tối ưu hóa quá mức làm cạn kiệt tài nguyên một cách nhanh chóng."
+      ],
+      "seriality30": [
+        "Chương 1-5: Áp dụng chế độ tem phiếu nước, xung đột với các gia tộc lớn.",
+        "Chương 6-10: Tổ chức kho lương thực chung và bếp ăn tập thể, đối mặt với nạn trộm cắp.",
+        "Chương 11-15: Thành lập các đội lao động chuyên trách, gây ra mâu thuẫn giữa 'người sản xuất' và 'người quản lý'.",
+        "Chương 16-22: Bị đổ lỗi cho một đợt ngộ độc thực phẩm hàng loạt do quy trình bảo quản có sai sót.",
+        "Chương 23-30: Kế hoạch dự trữ cho mùa đông thất bại khi một nguồn tài nguyên bất ngờ cạn kiệt."
+      ],
+      "antiStupidOpponent": "Đối thủ sẽ không phản đối trực diện. Họ sẽ giả vờ tuân thủ nhưng lại ngầm báo cáo sai số liệu, lợi dụng hệ thống để tích trữ tài nguyên cho riêng mình, sau đó dùng chính sự thiếu hụt do họ gây ra để chứng minh hệ thống của main là sai lầm.",
+      "domainResearchNeeds": [
+        "Nguyên tắc quản lý hậu cần và chuỗi cung ứng trong quân đội.",
+        "Các hệ thống kinh tế kế hoạch hóa tập trung (ưu và nhược điểm).",
+        "Tâm lý học về sự khan hiếm và hành vi con người trong khủng hoảng.",
+        "Lịch sử các trại tị nạn và mô hình quản lý."
+      ]
+    },
+    {
+      "id": "concept_hx04_06",
+      "title": "Người Giữ Lửa Kể Chuyện",
+      "premise": "Một người hát rong mù, nắm giữ những câu chuyện cổ về thời hoàng kim của thung lũng, phải dùng tài năng của mình để dệt nên một huyền thoại mới, một mục tiêu chung đủ mạnh để đoàn kết các thị tộc.",
+      "protagonistEngine": "Niềm tin rằng hy vọng và một bản sắc chung là tài nguyên quan trọng hơn cả nước và bánh mì. Anh muốn xây dựng một 'công trình' trong tâm trí mọi người trước khi xây nó ngoài đời thực.",
+      "protagonistContradiction": "Anh có thể khơi dậy những cảm xúc mạnh mẽ nhất, nhưng lại bất lực trong việc giải quyết các vấn đề vật chất cụ thể. Anh gieo hy vọng nhưng không thể làm no bụng, khiến lời nói của anh đôi khi trở nên sáo rỗng.",
+      "advantageLimits": "Anh bị mù, phụ thuộc hoàn toàn vào người khác trong di chuyển và sinh hoạt. Sức ảnh hưởng của anh chỉ tồn tại khi mọi người còn tin vào câu chuyện anh kể. Một thất bại thực tế có thể phá hủy tất cả.",
+      "worldReaction": "Người già yêu thích những câu chuyện của anh vì nó gợi lại quá khứ. Những người trẻ thực dụng lại xem anh là kẻ ăn bám, bán rẻ hy vọng hão huyền. Các thủ lĩnh cố gắng lợi dụng anh như một công cụ tuyên truyền.",
+      "openingAdvantage": "Biết một câu chuyện cổ về một con suối thần sẽ hiện ra nếu các gia tộc cùng nhau thực hiện một nghi lễ chạm tay vào đá.",
+      "firstThreeChapterMechanism": "Anh kể câu chuyện và thuyết phục vài người thực hiện nghi lễ tại một phiến đá. Tình cờ, một trận mưa nhỏ đêm đó đọng lại ở phiến đá, được xem là 'phép màu'. Nhưng phe không tham gia nghi lễ cho rằng đó là nước của trời, họ cũng có quyền hưởng, gây ra tranh chấp.",
+      "causalCost": "Để những câu chuyện của mình có sức thuyết phục, anh phải thêm thắt, bóp méo sự thật, thậm chí là tạo ra những lời nói dối thiêng liêng. Anh sợ một ngày nào đó, chính anh cũng sẽ lạc lối trong những huyền thoại do mình tạo ra.",
+      "mechanismFingerprint": [
+        "Tìm một vấn đề thực tế trong cộng đồng.",
+        "Sáng tác hoặc cải biên một câu chuyện, một bài hát liên quan đến vấn đề đó.",
+        "Gắn câu chuyện với một mục tiêu hoặc một hành động cụ thể.",
+        "Tổ chức các buổi kể chuyện, tạo ra một không gian sinh hoạt văn hóa chung.",
+        "Biến những người tham gia thành các nhân vật trong câu chuyện tiếp theo.",
+        "Xây dựng một hệ thống thần thoại và nghi lễ chung cho cả cộng đồng."
+      ],
+      "rewardLoopFingerprint": [
+        "Một đứa trẻ thuộc lòng và hát lại bài hát của anh.",
+        "Hai kẻ thù cùng ngồi xuống lắng nghe câu chuyện.",
+        "Mọi người bắt đầu sử dụng những thuật ngữ, tên gọi do anh sáng tạo.",
+        "Một dự án khó khăn được hoàn thành nhờ niềm tin từ câu chuyện.",
+        "Khám phá ra một di tích cổ, xác thực một phần câu chuyện anh kể."
+      ],
+      "conflictEconomyFingerprint": [
+        "Các phe phái diễn giải câu chuyện theo cách có lợi cho họ, tạo ra các 'dị bản'.",
+        "Sự sùng bái dành cho anh biến thành một giáo phái, gây xung đột với các tín ngưỡng cũ.",
+        "Khi một lời tiên tri trong truyện không thành sự thật, niềm tin sụp đổ.",
+        "Kẻ thù tạo ra những câu chuyện đối nghịch để phá hoại, gây ra 'chiến tranh thông tin'.",
+        "Sự tập trung vào tinh thần làm xao lãng các vấn đề vật chất cấp bách."
+      ],
+      "seriality30": [
+        "Chương 1-5: Tạo ra huyền thoại 'Vũng Nước Giao Ước', gây tranh cãi về quyền sở hữu 'phép màu'.",
+        "Chương 6-10: Sáng tác 'Trường ca Đào Kênh', thúc đẩy tinh thần cho dự án hợp tác đầu tiên.",
+        "Chương 11-15: Bị một thủ lĩnh tố cáo là kẻ lừa đảo, phải đối chất trong một cuộc thi kể chuyện.",
+        "Chương 16-22: Xây dựng 'Đền Thờ Tổ Tiên Chung', vật chất hóa bản sắc cộng đồng mà anh tạo ra.",
+        "Chương 23-30: Một trận động đất làm lộ ra di tích cổ, mâu thuẫn với câu chuyện anh đã kể."
+      ],
+      "antiStupidOpponent": "Đối thủ sẽ không cấm anh kể chuyện. Thay vào đó, họ sẽ mời anh đến, vinh danh anh, sau đó kể một phiên bản khác của câu chuyện, trong đó vai trò của tổ tiên họ được đề cao, nhằm chiếm đoạt tính chính danh của huyền thoại.",
+      "domainResearchNeeds": [
+        "Vai trò của thần thoại và sử thi trong việc hình thành các nền văn minh.",
+        "Nghệ thuật kể chuyện và hùng biện trước công chúng.",
+        "Nhân học văn hóa, đặc biệt là về các nghi lễ và biểu tượng.",
+        "Lịch sử các tôn giáo và sự hình thành giáo phái."
+      ]
+    },
+    {
+      "id": "concept_hx04_07",
+      "title": "Bàn Tay Thợ Cả",
+      "premise": "Một thợ đá già, người duy nhất hiểu rõ kết cấu của các loại đá trong thung lũng, phải dùng đôi tay và kinh nghiệm cả đời để dạy cho lớp trẻ cách xây dựng những công trình bền vững, chống lại sự hời hợt và tham lam.",
+      "protagonistEngine": "Nỗi lo sợ rằng những kỹ năng và sự khôn ngoan tích lũy cả đời sẽ bị mai một. Ông muốn để lại di sản không phải là công trình, mà là một thế hệ thợ lành nghề biết tôn trọng vật liệu.",
+      "protagonistContradiction": "Ông là một người bảo thủ, tin vào kinh nghiệm và sự tỉ mỉ, nhưng lại phải làm việc với một thế hệ trẻ thiếu kiên nhẫn, luôn muốn có kết quả ngay lập tức. Ông ghét những kẻ chỉ biết nói, nhưng bản thân lại không giỏi diễn đạt.",
+      "advantageLimits": "Ông đã già, sức khỏe có hạn. Kiến thức của ông hoàn toàn dựa trên kinh nghiệm, khó truyền đạt thành lời. Ông chỉ có thể làm, không thể giải thích tại sao nó lại hiệu quả một cách khoa học.",
+      "worldReaction": "Mọi người tôn trọng ông nhưng không muốn làm theo cách làm chậm chạp, tốn công của ông. Các thủ lĩnh chỉ muốn ông xây nhanh các công trình phòng thủ, không quan tâm đến độ bền.",
+      "openingAdvantage": "Nhìn vào một phiến đá, ông biết chính xác điểm yếu để đập vỡ nó bằng một nhát búa, giúp khơi thông một khe nước nhỏ bị tắc.",
+      "firstThreeChapterMechanism": "Ông chỉ cho một thanh niên cách khai thác đá hiệu quả. Chàng trai áp dụng và khai thác được nhiều đá hơn. Nhưng thay vì dùng để gia cố bờ kênh chung, anh ta lại dùng đá để xây tường rào cho nhà mình, gây ra mâu thuẫn về tài sản chung và riêng.",
+      "causalCost": "Mỗi công trình ông dồn tâm huyết xây dựng đều bào mòn sức lực cuối cùng của ông. Việc cố gắng thay đổi tư duy của người khác khiến ông mệt mỏi và thất vọng, dần mất đi niềm tin vào thế hệ kế cận.",
+      "mechanismFingerprint": [
+        "Khảo sát địa chất và vật liệu tại chỗ.",
+        "Làm một mô hình nhỏ hoặc một đoạn công trình mẫu để chứng minh kỹ thuật.",
+        "Nhận một vài đệ tử có tiềm năng và truyền nghề trực tiếp.",
+        "Thiết lập các tiêu chuẩn chất lượng và quy trình nghiệm thu.",
+        "Tổ chức các cuộc thi tay nghề để khuyến khích sự học hỏi.",
+        "Ghi lại kiến thức của mình bằng các bản vẽ khắc trên đá."
+      ],
+      "rewardLoopFingerprint": [
+        "Một học trò thực hiện thành công một kỹ thuật khó.",
+        "Một công trình do ông xây đứng vững sau một trận thiên tai nhỏ.",
+        "Được đối thủ (một thợ cả phe khác) công nhận tay nghề.",
+        "Phát hiện ra một loại đá mới với đặc tính ưu việt.",
+        "Nhìn thấy người dân tự giác bảo trì các công trình chung."
+      ],
+      "conflictEconomyFingerprint": [
+        "Sự khan hiếm thợ lành nghề tạo ra sự tranh giành nhân lực.",
+        "Tiêu chuẩn chất lượng cao của ông làm tăng chi phí và thời gian xây dựng, gây xung đột với các phe muốn nhanh.",
+        "Các học trò của ông hình thành một 'phường hội' độc quyền, gây mâu thuẫn với những người lao động khác.",
+        "Kiến thức của ông bị một học trò phản bội đem bán cho thế lực bên ngoài.",
+        "Các công trình cũ, xây dựng kém chất lượng, trở thành mối nguy hiểm, gây tranh cãi về việc phá bỏ hay sửa chữa."
+      ],
+      "seriality30": [
+        "Chương 1-5: Hướng dẫn cách khai thác đá, gây ra tranh chấp về việc sử dụng vật liệu.",
+        "Chương 6-10: Xây dựng nền móng cho kho chứa chung, mâu thuẫn với thủ lĩnh về tiến độ.",
+        "Chương 11-15: Bị một học trò cũ dùng kỹ thuật ông dạy để xây công trình đối nghịch.",
+        "Chương 16-22: Tổ chức cuộc thi tay nghề để chọn người kế thừa, đối mặt với gian lận.",
+        "Chương 23-30: Một cây cầu đá do ông xây nhiều năm trước bị nứt, ông phải chạy đua với thời gian để sửa chữa."
+      ],
+      "antiStupidOpponent": "Đối thủ sẽ không phá hoại công trình. Họ sẽ xây một công trình khác bên cạnh, nhanh hơn, rẻ hơn, trông có vẻ hào nhoáng hơn, để chứng minh phương pháp của ông là lỗi thời và lãng phí, dù công trình của họ sẽ sụp đổ sau vài năm.",
+      "domainResearchNeeds": [
+        "Các kỹ thuật xây dựng bằng đá cổ xưa (không dùng vữa).",
+        "Cấu trúc của các phường hội và hệ thống truyền nghề trung cổ.",
+        "Địa chất học cơ bản, các loại đá và đặc tính của chúng.",
+        "Tâm lý học của người cao tuổi và xung đột thế hệ."
+      ]
+    },
+    {
+      "id": "concept_hx04_08",
+      "title": "Kẻ Săn Bão Tro",
+      "premise": "Một trinh sát trẻ tuổi có khả năng dự báo các trận bão tro và hướng gió, phải bán thông tin của mình để đổi lấy vị thế và tài nguyên, dẫn dắt mọi người đến những nơi an toàn hoặc những nguồn tài nguyên lộ ra sau bão.",
+      "protagonistEngine": "Khao khát được kiểm soát, được là người nắm giữ thông tin sống còn, để bù đắp cho quá khứ bị bỏ rơi và bất lực. Anh không tin ai và chỉ tin vào những gì mình quan sát được.",
+      "protagonistContradiction": "Anh có thể thấy trước sự thay đổi của tự nhiên nhưng không thể dự đoán được lòng người. Anh bán thông tin để có lợi, nhưng lại bị dằn vặt khi thông tin đó được dùng để hại người khác.",
+      "advantageLimits": "Chỉ có thể dự báo ngắn hạn (vài ngày). Năng lực dựa trên quan sát các dấu hiệu tinh vi (hướng côn trùng bay, màu của tro bụi) nên dễ bị che khuất hoặc diễn giải sai. Anh không thể ngăn chặn cơn bão.",
+      "worldReaction": "Mọi người vừa cần thông tin của anh vừa không tin tưởng một kẻ lúc nào cũng giữ lại những bí mật quan trọng nhất cho riêng mình. Anh bị coi là một kẻ cơ hội nguy hiểm.",
+      "openingAdvantage": "Nhận ra dấu hiệu của một trận gió xoáy nhỏ sắp quét qua một khu vực trữ nước lộ thiên, có nguy cơ làm bẩn toàn bộ nguồn nước.",
+      "firstThreeChapterMechanism": "Anh cảnh báo mọi người che đậy vũng nước. Đổi lại, anh yêu cầu một phần nước sạch sau khi bão tan. Một nhóm người không tin và không làm theo, nước của họ bị nhiễm bẩn. Giờ họ muốn dùng vũ lực để cướp phần nước của những người đã nghe lời anh.",
+      "causalCost": "Việc liên tục quan sát và phân tích khiến anh trở nên đa nghi và hoang tưởng. Anh có được quyền lực từ thông tin, nhưng cũng trở thành mục tiêu của tất cả những ai muốn độc chiếm nguồn tin đó.",
+      "mechanismFingerprint": [
+        "Quan sát các dấu hiệu tự nhiên để dự báo một sự kiện thời tiết.",
+        "Định giá thông tin của mình bằng tài nguyên hoặc sự ủng hộ chính trị.",
+        "Bán thông tin cho bên trả giá cao nhất hoặc bên có lợi nhất cho kế hoạch dài hạn của mình.",
+        "Tận dụng sự kiện thời tiết (bão, mưa) để khám phá các khu vực mới hoặc thu thập tài nguyên.",
+        "Xây dựng một mạng lưới người cung cấp thông tin ở các khu vực khác nhau.",
+        "Sử dụng thông tin sai lệch để gài bẫy đối thủ."
+      ],
+      "rewardLoopFingerprint": [
+        "Một dự báo của anh trở thành sự thật một cách chính xác.",
+        "Đổi được một thông tin nhỏ lấy một lợi ích vật chất lớn.",
+        "Dẫn dắt mọi người tránh được một thảm họa.",
+        "Phát hiện ra một mạch khoáng sản hoặc một di tích bị lớp tro che phủ lộ ra sau bão.",
+        "Được một thủ lĩnh phải trả một cái giá đắt để có được thông tin của anh."
+      ],
+      "conflictEconomyFingerprint": [
+        "Thông tin trở thành một loại hàng hóa bị đầu cơ, tích trữ.",
+        "Xung đột nổ ra giữa những người có thông tin và những người không có.",
+        "Đối thủ cố gắng bắt cóc anh hoặc tìm ra phương pháp dự báo của anh.",
+        "Một dự báo sai lầm gây ra thảm họa, khiến uy tín của anh sụp đổ.",
+        "Sự phụ thuộc vào anh khiến cộng đồng mất đi khả năng tự quan sát và phán đoán."
+      ],
+      "seriality30": [
+        "Chương 1-5: Bán thông tin về trận gió xoáy, gây ra xung đột về phân chia nước sạch.",
+        "Chương 6-10: Dự báo một trận mưa axit, tổ chức xây dựng mái che chung đầu tiên.",
+        "Chương 11-15: Bị đối thủ tung tin giả, khiến một đoàn người đi sai hướng và gặp nguy hiểm.",
+        "Chương 16-22: Xây dựng một trạm quan sát thời tiết thô sơ, bắt đầu hệ thống hóa kiến thức.",
+        "Chương 23-30: Dự báo một siêu bão tro sắp đến, buộc các phe phái phải hợp tác để xây dựng hầm trú ẩn chung."
+      ],
+      "antiStupidOpponent": "Đối thủ sẽ không nghi ngờ khả năng của anh. Thay vào đó, họ sẽ tung ra nhiều tin đồn thời tiết trái ngược nhau, gây nhiễu loạn thông tin, làm người dân không biết tin vào đâu, từ đó làm giảm giá trị thông tin của main.",
+      "domainResearchNeeds": [
+        "Khí tượng học cơ bản, các dấu hiệu dự báo thời tiết dân gian.",
+        "Lý thuyết trò chơi và kinh tế học thông tin.",
+        "Kỹ năng sinh tồn trong môi trường khắc nghiệt (sa mạc, núi lửa).",
+        "Lịch sử các cơ quan tình báo và mạng lưới gián điệp."
+      ]
+    },
+    {
+      "id": "concept_hx04_09",
+      "title": "Nồi Hầm Chung Vị",
+      "premise": "Một đầu bếp bị mất vị giác, chỉ có thể tạo ra những món ăn ngon bằng cách tuân thủ nghiêm ngặt các công thức và sự cân bằng dinh dưỡng, phải thuyết phục một cộng đồng đang chết đói rằng ăn đúng còn quan trọng hơn ăn no.",
+      "protagonistEngine": "Nỗi ám ảnh tìm lại vị giác đã mất. Anh tin rằng nếu có thể tạo ra một món ăn hoàn hảo, cân bằng tuyệt đối, vị giác của anh sẽ trở lại. Động lực của anh vừa vị kỷ vừa vị tha.",
+      "protagonistContradiction": "Anh là người nấu ăn ngon nhất nhưng lại không thể thưởng thức. Anh mang lại niềm vui cho người khác qua ẩm thực, nhưng bản thân lại luôn cảm thấy trống rỗng và lạc lõng.",
+      "advantageLimits": "Anh hoàn toàn phụ thuộc vào công thức và nguyên liệu chính xác. Anh không thể ứng biến. Nguồn nguyên liệu trong thung lũng rất hạn chế và thất thường. Anh không thể chiến đấu hay làm việc nặng.",
+      "worldReaction": "Trong thời buổi đói kém, việc anh đòi hỏi các nguyên liệu cụ thể bị xem là xa xỉ và ích kỷ. Mọi người chỉ muốn lấp đầy bụng, không quan tâm đến dinh dưỡng hay hương vị.",
+      "openingAdvantage": "Kiến thức về cách kết hợp một loại rêu đắng và một loại côn trùng có vị chua để tạo thành một món súp vừa cung cấp đủ muối khoáng vừa khử được mùi tanh của nước tro.",
+      "firstThreeChapterMechanism": "Anh nấu một nồi súp nhỏ và chia cho vài người ốm yếu, giúp họ hồi phục sức lực. Những người khỏe mạnh khác liền yêu cầu anh nấu một nồi lớn hơn, nhưng lại không muốn góp đúng loại côn trùng và rêu mà anh yêu cầu, họ cho rằng bất cứ thứ gì ăn được là được.",
+      "causalCost": "Để tìm kiếm những nguyên liệu quý hiếm cho công thức của mình, anh phải dấn thân vào những nơi nguy hiểm hoặc phải đánh đổi những thứ quan trọng. Việc nếm thử các nguyên liệu lạ bằng trực giác hóa học khiến sức khỏe anh ngày càng tệ đi.",
+      "mechanismFingerprint": [
+        "Phân tích các nguồn thực phẩm sẵn có và giá trị dinh dưỡng của chúng.",
+        "Sáng tạo một công thức mới để tối ưu hóa hương vị và dinh dưỡng.",
+        "Tổ chức một bếp ăn chung để đảm bảo phân phối công bằng và chế biến đúng cách.",
+        "Dạy cho người khác các kỹ thuật sơ chế và bảo quản thực phẩm.",
+        "Thiết lập các chuyến đi tìm kiếm và trồng trọt các nguyên liệu mới.",
+        "Sử dụng ẩm thực như một công cụ ngoại giao giữa các phe phái."
+      ],
+      "rewardLoopFingerprint": [
+        "Nhìn thấy vẻ mặt hài lòng của một người khi nếm món ăn của mình.",
+        "Một công thức mới giúp cải thiện sức khỏe của cả cộng đồng.",
+        "Tìm thấy một loại gia vị hoặc nguyên liệu mới.",
+        "Được mọi người công nhận là 'Người Nuôi Sống'.",
+        "Tổ chức thành công một bữa tiệc chung, gắn kết mọi người lại với nhau."
+      ],
+      "conflictEconomyFingerprint": [
+        "Các nguồn nguyên liệu quý hiếm trở thành mục tiêu tranh giành.",
+        "Kiến thức về công thức nấu ăn trở thành một bí mật quyền lực.",
+        "Sự phân chia thức ăn ngon/dở tạo ra sự phân cấp xã hội mới.",
+        "Bếp ăn chung trở thành trung tâm quyền lực, nơi các phe phái tranh giành quyền kiểm soát.",
+        "Sự cải thiện về ẩm thực khiến dân số tăng, tạo áp lực mới lên nguồn cung thực phẩm."
+      ],
+      "seriality30": [
+        "Chương 1-5: Nấu súp dinh dưỡng, gây ra tranh cãi về việc đóng góp nguyên liệu.",
+        "Chương 6-10: Lập bếp ăn tập thể, đối mặt với vấn đề vệ sinh và ngộ độc.",
+        "Chương 11-15: Tìm ra cách hun khói thịt để bảo quản, xung đột với phe kiểm soát nguồn củi.",
+        "Chương 16-22: Bị tố cáo đầu độc một thủ lĩnh qua thức ăn, phải tự chứng minh vô tội.",
+        "Chương 23-30: Tổ chức một cuộc thi nấu ăn giữa các phe để giải quyết một tranh chấp, nhưng lại tạo ra mâu thuẫn mới."
+      ],
+      "antiStupidOpponent": "Đối thủ sẽ không lật đổ nồi súp. Họ sẽ mở một bếp ăn khác, nấu những món ăn nhiều dầu mỡ, thỏa mãn cơn thèm tức thời của mọi người, để cạnh tranh và cho rằng phương pháp dinh dưỡng của main là không thực tế.",
+      "domainResearchNeeds": [
+        "Dinh dưỡng học cơ bản và các bệnh do thiếu chất.",
+        "Các kỹ thuật bảo quản thực phẩm cổ xưa (muối, hun khói, lên men).",
+        "Lịch sử ẩm thực và vai trò của nó trong văn hóa, xã hội.",
+        "Kiến thức về các loại cây và côn trùng ăn được trong tự nhiên."
+      ]
+    },
+    {
+      "id": "concept_hx04_10",
+      "title": "Người Vá Vết Nứt",
+      "premise": "Một người thợ với khả năng kỳ lạ là 'cảm nhận' được sự mỏi và các vết nứt vi mô trong vật liệu, phải đi khắp nơi vá lại những công trình đang xuống cấp của các phe, từ đó dần hàn gắn cả những rạn nứt trong lòng tin giữa họ.",
+      "protagonistEngine": "Nỗi ám ảnh về một thảm họa trong quá khứ do một công trình bị sụp đổ gây ra. Anh tin rằng mọi xung đột lớn đều bắt nguồn từ những rạn nứt nhỏ không được quan tâm.",
+      "protagonistContradiction": "Anh có thể thấy những điểm yếu trong đá và gỗ, nhưng lại mù mờ trước những rạn nứt trong các mối quan hệ con người. Anh sửa chữa vật chất nhưng thường vô tình làm trầm trọng thêm các mâu thuẫn xã hội.",
+      "advantageLimits": "Anh chỉ có thể cảm nhận hư hỏng, không có sức mạnh để tự mình sửa chữa những công trình lớn. Năng lực này gây ra những cơn đau đầu kinh niên. Anh không thể 'thấy' được những lỗi về thiết kế, chỉ thấy được sự xuống cấp của vật liệu.",
+      "worldReaction": "Mọi người xem anh là một thợ sửa chữa hữu ích nhưng không phải là một nhà lãnh đạo. Các phe phái chỉ muốn lợi dụng anh để kiểm tra và gia cố công trình của riêng họ, thay vì hợp tác.",
+      "openingAdvantage": "Cảm nhận được một tảng đá chống đỡ lối vào một hang trú ẩn chung sắp nứt vỡ và có nguy cơ sụp đổ.",
+      "firstThreeChapterMechanism": "Anh cảnh báo về tảng đá. Mọi người đồng ý gia cố nó. Nhưng khi xong việc, phe sống ở gần cửa hang nhất tuyên bố rằng vì họ bỏ nhiều công sức hơn, họ có quyền quyết định ai được vào trú ẩn, gây ra tranh chấp về quyền sử dụng không gian chung.",
+      "causalCost": "Mỗi lần 'cảm nhận' một vết nứt lớn, anh phải gánh chịu một phần 'sự đau đớn' của vật thể đó, khiến cơ thể anh dần bị vôi hóa. Việc liên tục chỉ ra sai sót của người khác khiến anh bị mọi người xa lánh.",
+      "mechanismFingerprint": [
+        "Dùng năng lực để 'khám bệnh' cho một công trình trọng yếu.",
+        "Đưa ra chẩn đoán và đề xuất phương án sửa chữa.",
+        "Tập hợp một đội ngũ từ các phe có liên quan để tiến hành công việc.",
+        "Trong quá trình sửa chữa, tạo cơ hội để các bên giao tiếp và giải quyết mâu thuẫn.",
+        "Thiết lập một quy trình bảo trì định kỳ cho các công trình chung.",
+        "Dạy lại kỹ năng nhận biết các dấu hiệu hư hỏng cơ bản cho người khác."
+      ],
+      "rewardLoopFingerprint": [
+        "Phát hiện và ngăn chặn thành công một vụ sụp đổ.",
+        "Nhận được sự biết ơn từ những người được anh cứu.",
+        "Sửa xong một món đồ, một công trình, nhìn nó hoạt động trở lại.",
+        "Được một thợ cả của phe khác tin tưởng và nhờ tư vấn.",
+        "Hai người thợ từ hai phe thù địch cùng hợp tác ăn ý dưới sự hướng dẫn của anh."
+      ],
+      "conflictEconomyFingerprint": [
+        "Việc sửa chữa công trình nào trước trở thành một quyết định chính trị.",
+        "Nguồn vật liệu dùng để sửa chữa (gỗ tốt, đá chắc) trở nên khan hiếm và bị tranh giành.",
+        "Kiến thức về điểm yếu của các công trình có thể bị lợi dụng để phá hoại.",
+        "Sự phụ thuộc vào khả năng của anh khiến các phe tìm cách kiểm soát hoặc giam lỏng anh.",
+        "Chi phí bảo trì trở thành một gánh nặng, gây ra tranh cãi về việc ai phải trả."
+      ],
+      "seriality30": [
+        "Chương 1-5: Gia cố cửa hang trú ẩn, gây ra tranh chấp về quyền sử dụng.",
+        "Chương 6-10: Sửa chữa một cây cầu độc đạo, buộc hai làng đối địch phải đàm phán.",
+        "Chương 11-15: Bị một phe ép buộc phải tìm ra điểm yếu trong công trình phòng thủ của phe kia.",
+        "Chương 16-22: Xây dựng một đội 'bảo trì' chung, đối mặt với sự bất tuân và chia rẽ nội bộ.",
+        "Chương 23-30: Phát hiện ra một vết nứt khổng lồ trong nền đá của cả thung lũng, báo hiệu một thảm họa sắp xảy ra."
+      ],
+      "antiStupidOpponent": "Đối thủ sẽ không ngăn cản anh sửa chữa. Thay vào đó, họ sẽ 'giúp đỡ' bằng cách cung cấp vật liệu kém chất lượng một cách tinh vi, để công trình sau khi sửa sẽ nhanh chóng hỏng lại, từ đó làm mất uy tín của main và đổ lỗi cho kỹ năng của anh.",
+      "domainResearchNeeds": [
+        "Kiến thức cơ bản về kỹ thuật xây dựng và kết cấu vật liệu.",
+        "Các phương pháp kiểm tra không phá hủy (NDT) trong thực tế.",
+        "Lịch sử bảo trì và sụp đổ của các công trình cổ.",
+        "Kỹ năng hòa giải và giải quyết xung đột."
+      ]
+    }
+  ],
+  "finalists": [
+    {
+      "id": "c8_wind_navigator",
+      "title": "Đón Gió Tụ Thủy",
+      "premise": "Một người ngắm gió bị ruồng bỏ sử dụng kiến thức khí tượng để thiết kế các bẫy gió, ép tro độc phải ngưng tụ thành nước trên các phên đá nung.",
+      "protagonistEngine": "Năng lực cảm nhận sự thay đổi vi tế của áp suất khí quyển, độ ẩm và hướng gió trong bán kính nhỏ.",
+      "protagonistContradiction": "Thiết kế bẫy gió dựa trên xác suất thiên nhiên; mỗi quyết định đều cược mạng sống của mọi người vào sự phán đoán của mình.",
+      "advantageLimits": "Không thể tự tạo ra gió hay nước, nếu dự báo sai thời điểm gió ẩm đến, toàn bộ công sức xây dựng sẽ đổ sông đổ biển.",
+      "worldReaction": "Khi bẫy gió thành công, các nhóm thợ bắt đầu xây nhà chắn ngang đường gió để hưởng lợi riêng, làm hỏng luồng khí của toàn thung lũng.",
+      "openingAdvantage": "Chương một dự báo một luồng gió ẩm nhỏ, yêu cầu thợ nung đặt phiến đá nóng đúng góc độ, ngưng tụ được nước bám trên mặt đá.",
+      "firstThreeChapterMechanism": "Dựng bẫy gió thô sơ bằng đá nung và lưới rêu. Chương ba, vách chắn gió lớn hoàn thành tạo ra mái ấm, nhưng góc khuất gió trở thành khu ổ chuột.",
+      "causalCost": "Bẫy gió khi bắt nước cũng đồng thời tích tụ tro độc, đòi hỏi người dọn dẹp phải đối mặt với nguy cơ viêm phổi nặng.",
+      "mechanismFingerprint": [
+        "Đo lường áp suất gió và dự báo thời điểm có độ ẩm.",
+        "Thiết kế góc độ đặt các tấm đá nung và lưới cản.",
+        "Huy động thợ đào dựng móng vững chắc cho vách chắn.",
+        "Thu hoạch nước ngưng tụ ngay trước khi gió đổi chiều.",
+        "Phân công đội cảm tử dọn sạch tro độc bám trên lưới."
+      ],
+      "rewardLoopFingerprint": [
+        "Thu được lượng nước lớn gấp nhiều lần khai thác mỏ đá.",
+        "Vách chắn gió bảo vệ cộng đồng khỏi những cơn bão tro.",
+        "Uy tín của nhân vật chính thăng cấp thành người dẫn đường.",
+        "Mở khóa các kỹ thuật thiết kế kiến trúc khí động học."
+      ],
+      "conflictEconomyFingerprint": [
+        "Không ai muốn tham gia đội dọn tro độc vì tỷ lệ chết cao.",
+        "Các gia đình tranh nhau vị trí cất nhà ở vùng lặng gió.",
+        "Thợ nung phàn nàn vì bẫy gió làm tắt lửa lò của họ.",
+        "Sự trừng phạt với những kẻ tự ý xây vật cản đường gió."
+      ],
+      "seriality30": [
+        "Chương 1-6: Dự báo chính xác, thu được nước bằng bẫy gió nhỏ.",
+        "Chương 7-12: Tranh chấp gay gắt về việc dời lò nung ra khỏi đường gió.",
+        "Chương 13-18: Hợp lực xây dựng tháp bắt gió khổng lồ ở trung tâm.",
+        "Chương 19-24: Bão lốc ngược chiều bất ngờ uy hiếp đánh sập tháp chính.",
+        "Chương 25-30: Hoàn thiện quy hoạch làng xã dựa trên sơ đồ luồng gió."
+      ],
+      "antiStupidOpponent": "Một trưởng lão thợ đào cấm người dân tham gia đội dọn tro vì thấy rõ tỷ lệ hỏng phổi, yêu cầu phải có đồ bảo hộ đàng hoàng mới làm việc.",
+      "domainResearchNeeds": [
+        "Tháp chắt nước từ sương mù (Fog catcher) ở sa mạc.",
+        "Khí động học cơ bản và hệ thống thông gió thụ động."
+      ]
+    },
+    {
+      "id": "c9_mud_mason",
+      "title": "Bùn Trắng Đắp Thành",
+      "premise": "Một thợ xây nghèo tìm ra công thức nhào trộn tro trắng, nước và sợi rêu thành 'bùn sinh mệnh', vật liệu duy nhất không bị bão tro ăn mòn.",
+      "protagonistEngine": "Cảm nhận trực quan về độ kết dính, độ ẩm phân bổ và lực chịu tải của các hỗn hợp vật liệu khi trộn vào nhau.",
+      "protagonistContradiction": "Muốn xây những công trình công cộng kiên cố nhưng người dân chỉ muốn dùng vật liệu mới để vá víu lều cá nhân của họ.",
+      "advantageLimits": "Bùn sinh mệnh khô rất nhanh, đòi hỏi sự phối hợp nhịp nhàng giữa người trộn, người vận chuyển và người đắp; chậm trễ là hỏng cả mẻ.",
+      "worldReaction": "Khi thấy độ bền của bùn sinh mệnh, các phe phái đòi độc quyền công thức, bắt cóc thợ trộn bùn để phục vụ tư lợi.",
+      "openingAdvantage": "Chương một dùng lượng nước nhỏ nhào bùn sinh mệnh để vá một vết nứt hiểm nghèo trên đập giữ nước, ngăn thảm họa vỡ đập.",
+      "firstThreeChapterMechanism": "Trộn mẻ bùn lớn bằng công sức ba phe để xây lại lòng kênh. Chương ba, mái hiên chung đắp bằng bùn hoàn thành, nhưng các bên đòi chia tường ngăn.",
+      "causalCost": "Bùn sinh mệnh sau khi khô cứng cần được bôi trơn bằng một lớp dịch rêu hàng tháng, nếu không sẽ nứt vỡ và nhả lại tro độc.",
+      "mechanismFingerprint": [
+        "Tính toán tỷ lệ tro, nước và sợi rêu theo độ ẩm thời tiết.",
+        "Tổ chức dây chuyền trộn, chuyền và đắp bùn tốc độ cao.",
+        "Nghiệm thu độ chịu lực của bức tường vừa đắp.",
+        "Tiến hành quét dịch rêu bảo quản bề mặt ngoài.",
+        "Giao định mức bảo trì định kỳ cho người sử dụng công trình."
+      ],
+      "rewardLoopFingerprint": [
+        "Công trình kiên cố giúp giảm 90% chi phí sửa chữa lều tạm.",
+        "Nhà ở kín gió giúp giảm tử vong ở người già và trẻ em.",
+        "Nhân vật chính nắm giữ bí quyết công nghệ cốt lõi.",
+        "Làng xóm chuyển từ du mục sang định cư vĩnh viễn."
+      ],
+      "conflictEconomyFingerprint": [
+        "Căng thẳng vì mẻ bùn bị hỏng do người chuyền thao tác chậm.",
+        "Thợ rêu đòi tăng giá sợi rêu khi thấy nhu cầu xây dựng cao.",
+        "Tranh cãi xem nên xây tường rào bảo vệ làng hay xây nhà ở trước.",
+        "Kẻ lười biếng trốn tránh trách nhiệm bôi dịch rêu bảo trì tường."
+      ],
+      "seriality30": [
+        "Chương 1-6: Vá đập nước thành công, chứng minh sức mạnh của bùn.",
+        "Chương 7-12: Mâu thuẫn khi thợ nung lén giấu bùn để xây lò riêng.",
+        "Chương 13-18: Liên kết nhân lực xây nhà chung chống chọi mùa bão tro.",
+        "Chương 19-24: Nguy cơ sập mái nhà chung do bỏ bê bảo trì bề mặt bùn.",
+        "Chương 25-30: Chia lô đất đắp nhà, thiết lập luật sở hữu và bảo trì bất động sản."
+      ],
+      "antiStupidOpponent": "Thợ rêu tăng giá bán sợi rêu không phải do tham lam, mà vì việc khai thác quá mức làm cạn kiệt giống rêu, họ cần tích lũy dự phòng.",
+      "domainResearchNeeds": [
+        "Vật liệu xây dựng truyền thống (Cob, Adobe).",
+        "Kỹ thuật thi công dây chuyền và quản lý thời gian đông kết."
+      ]
+    },
+    {
+      "id": "c6_labor_appraiser",
+      "title": "Cán Cân Thung Lũng Trắng",
+      "premise": "Một thương nhân thất thế dùng sổ sách kế toán và tem phiếu lao động để tổ chức lại sự hỗn loạn của thung lũng, định giá lại mọi giọt mồ hôi và nước.",
+      "protagonistEngine": "Khả năng tính toán tức thời lượng calo tiêu hao và giá trị hao mòn vật chất của bất kỳ hành động nào trong tầm mắt.",
+      "protagonistContradiction": "Muốn áp dụng quy luật thị trường tự do nhưng nhận ra trong điều kiện khắc nghiệt, vẫn phải dùng luật phân phối bao cấp để cứu người yếu thế.",
+      "advantageLimits": "Khả năng tính toán không thể ngăn chặn sự dối trá; nếu người dân cố tình khai man số liệu, kết quả điều phối sẽ sai lệch hoàn toàn.",
+      "worldReaction": "Những kẻ cơ bắp từng dùng vũ lực ép người khác chia nước nay cực kỳ căm ghét hệ thống tem phiếu và tìm cách phá giá hoặc làm giả tem.",
+      "openingAdvantage": "Chương một chứng minh một nhóm thợ đào đang gian lận lượng nước cấp, phân bổ lại cho thợ nung để cứu một mẻ đá quan trọng.",
+      "firstThreeChapterMechanism": "Phát hành phiếu nước dựa trên công sức đào và nung. Chương ba, dùng phiếu đổi được bữa ăn rêu đầu tiên, nhưng xuất hiện hiện tượng tích trữ phiếu.",
+      "causalCost": "Mỗi khi hệ thống đếm sai hoặc không minh bạch, giá trị của tem phiếu giảm sút, người dân từ chối làm việc và quay lại cướp bóc.",
+      "mechanismFingerprint": [
+        "Đo lường thời gian và sức lực của một công đoạn.",
+        "Ghi nhận thành quả bằng tem phiếu lao động.",
+        "Tổ chức điểm đổi tem lấy nước và rêu sạch.",
+        "Phát hiện và xử phạt các hành vi đầu cơ tích trữ.",
+        "Điều chỉnh tỷ giá quy đổi để khuyến khích làm việc khó."
+      ],
+      "rewardLoopFingerprint": [
+        "Hệ thống minh bạch thúc đẩy năng suất lao động tăng vọt.",
+        "Của cải tích lũy trong kho chung ngày một nhiều.",
+        "Tem phiếu trở thành đồng tiền chung của thung lũng.",
+        "Quyền lực quản lý kho được giao cho nhân vật chính."
+      ],
+      "conflictEconomyFingerprint": [
+        "Những người ốm yếu không kiếm đủ phiếu để đổi ăn.",
+        "Nhóm thợ tay nghề cao đòi tỷ giá quy đổi đặc quyền.",
+        "Nạn làm giả tem phiếu từ bằng những loại đá tương tự.",
+        "Xung đột khi áp thuế bảo trì kênh rạch lên từng phiếu."
+      ],
+      "seriality30": [
+        "Chương 1-6: Thiết lập điểm phân phát nước minh bạch bằng tem phiếu.",
+        "Chương 7-12: Khủng hoảng khi một nhóm lớn tích trữ tem phiếu gây thiếu hụt rêu.",
+        "Chương 13-18: Hợp tác xây dựng ngân hàng tài nguyên kiên cố để bảo vệ kho.",
+        "Chương 19-24: Bạo loạn của nhóm thợ làm giả tem phiếu bị lật tẩy.",
+        "Chương 25-30: Ra mắt hệ thống phúc lợi cho người già yếu dựa trên thuế."
+      ],
+      "antiStupidOpponent": "Một thủ lĩnh thợ đào lập luận rằng công việc của họ rủi ro sập hầm cao hơn nung đá, nên cần hệ số phụ cấp mạng sống, một yêu cầu rất hợp lý.",
+      "domainResearchNeeds": [
+        "Lịch sử hệ thống tem phiếu thời bao cấp.",
+        "Kinh tế học vi mô và lý thuyết cung cầu cơ bản."
+      ]
+    }
+  ],
+  "openingTrials": [
+    {
+      "schemaVersion": 3,
+      "candidateId": "c8_wind_navigator",
+      "chapters": [
+        {
+          "chapterNumber": 1,
+          "title": "Phiến Đá Đầu Tiên",
+          "proseParagraphs": [
+            "Kael cảm nhận nó trước khi bất cứ ai nhìn thấy. Một sự run rẩy vi tế trong không khí, không phải là cơn gió khô khốc mang theo bụi tro quen thuộc, mà là một thứ gì đó khác. Áp suất đang giảm, một cái chạm nhẹ và ẩm ướt trên làn da nứt nẻ của cậu. Cậu nhắm mắt, hít một hơi thật sâu, cố gắng lọc qua mùi khét của lò nung và mùi chua của đám đông tuyệt vọng. Đúng rồi. Độ ẩm, dù chỉ là một thoáng mong manh, đang trôi về phía thung lũng. Đây là cơ hội, có lẽ là duy nhất trong cả tuần trăng này.",
+            "Cậu lao về phía xưởng nung, nơi những người thợ mồ hôi nhễ nhại đang dùng những cây sào dài để kéo một phiến đá đỏ rực ra khỏi lò. Lão Thạch, người thợ cả với cánh tay sần sùi như vỏ cây khô, gầm lên khi thấy Kael. \"Lại là mày, thằng nhóc ngắm gió! Cút đi trước khi tao ném mày vào lò!\" Tiếng cười rộ lên từ những người thợ khác. Sự khinh miệt đã trở thành một lớp chai sạn trên người Kael, nhưng hôm nay cậu không thể lùi bước.",
+            "\"Lão Thạch, chỉ lần này thôi!\" Kael hét lên, cố át đi tiếng lò rít. \"Gió ẩm đang đến! Gió mang nước! Hãy đặt phiến đá đó ở rìa phía tây, nghiêng một góc ba mươi độ về hướng bắc!\" Cậu chỉ tay về một mỏm đá trống, nơi cậu đã tính toán luồng khí sẽ hội tụ. Lão Thạch khịt mũi. \"Nước từ gió? Mày nghĩ nước từ trên trời rơi xuống à? Nước nằm dưới đá, phải đào mới có!\" \"Cược với tôi đi!\" Kael nói, giọng chắc nịch. \"Nếu không có giọt nước nào trước khi phiến đá nguội, tôi sẽ làm người dọn xỉ cho ông trong một tuần trăng, không công!\" Lời đề nghị về một lao động miễn phí khiến lão Thạch khựng lại. Lão nhìn vào đôi mắt quyết tâm của Kael, rồi liếc nhìn phiến đá nóng rẫy. Một tuần sai vặt thằng nhóc phiền phức này cũng không tệ. \"Được rồi,\" lão gầm gừ. \"Chúng mày, vác nó ra đó! Để xem trò hề của thằng nhóc này.\"",
+            "Hai người thợ dùng kẹp sắt lớn nhấc phiến đá, nặng nề di chuyển nó đến vị trí Kael chỉ định. Họ cẩn thận đặt nó xuống, điều chỉnh góc nghiêng theo lời cậu. Cả nhóm đứng đó, im lặng quan sát. Không khí vẫn đặc quánh bụi tro. Thời gian trôi qua, phiến đá bắt đầu mất đi màu đỏ rực. Sự nghi ngờ lại dấy lên trong mắt mọi người. Lão Thạch sắp mở miệng chế giễu thì Kael giơ tay. \"Nhìn kìa.\" Một thứ gì đó lấp lánh trên bề mặt phiến đá. Ban đầu chỉ là một vệt mờ, rồi từ từ, những giọt nước nhỏ li ti bắt đầu hình thành. Chúng lớn dần, đen kịt vì cuốn theo tro bụi trong không khí, rồi lăn dài trên mặt đá, để lại một vệt ẩm ướt. Một giọt, rồi hai giọt, rơi xuống nền đất khô cằn và biến mất trong một tiếng xèo nhỏ. Sự im lặng bao trùm. Lão Thạch bước tới, quệt ngón tay vào vệt nước, đưa lên mũi ngửi rồi ngước nhìn Kael, ánh mắt không còn vẻ khinh miệt mà thay vào đó là sự kinh ngạc không thể che giấu."
+          ],
+          "stateChange": "Từ một kẻ bị ruồng bỏ với lý thuyết điên rồ, Kael đã chứng minh được khái niệm của mình là có thật, dù chỉ ở quy mô rất nhỏ.",
+          "earnedReward": "Vài giọt nước quý giá và một tia hy vọng, cùng sự công nhận ban đầu từ những người thợ nung vốn luôn hoài nghi.",
+          "unresolvedPressure": "Lượng nước thu được quá ít ỏi, không đủ để giải quyết cơn khát của cả cộng đồng. Kael phải chứng minh rằng phương pháp này có thể được nhân rộng."
+        },
+        {
+          "chapterNumber": 2,
+          "title": "Mạng Lưới Rêu Tro",
+          "proseParagraphs": [
+            "Thành công nhỏ nhoi của phiến đá đầu tiên đã cho Kael một chút vốn liếng. Cậu không còn bị xua đuổi, thay vào đó là những ánh nhìn tò mò và những lời thì thầm. Cậu tận dụng điều đó để đề xuất một kế hoạch táo bạo hơn: một dãy năm phiến đá nung, được kết nối với nhau bằng những tấm lưới dệt từ rêu khô, một loại vật liệu có khả năng giữ ẩm tốt. \"Nhiều bề mặt hơn, nhiều góc độ hơn, sẽ ngưng tụ được nhiều nước hơn,\" Kael giải thích trong cuộc họp với các trưởng lão. Lão Thạch, sau khi tận mắt chứng kiến, đã miễn cưỡng ủng hộ cậu. Nguồn nước từ các giếng đá ngày càng cạn kiệt, họ không còn nhiều lựa chọn.",
+            "Việc xây dựng diễn ra trong ba ngày. Những người thợ nung cung cấp đá nóng, đám trẻ con đi thu lượm rêu, và những người phụ nữ khéo tay dệt chúng thành lưới. Kael liên tục di chuyển, dùng tay không để cảm nhận hướng gió, dùng con mắt đã được rèn luyện để tính toán góc đặt tối ưu cho từng phiến đá. Cậu cảm thấy một luồng gió ẩm mạnh hơn đang đến, và lần này, họ đã sẵn sàng. Khi cơn gió thổi qua, hệ thống bẫy gió thô sơ đã hoạt động hiệu quả hơn mong đợi. Nước không còn nhỏ giọt, mà chảy thành những dòng nhỏ, đen ngòm, xuống các rãnh đá được đẽo vội và tụ lại trong một cái vại sành. Tiếng reo hò vỡ oà. Lần đầu tiên sau nhiều tháng, họ có đủ nước để chia cho mỗi gia đình một gáo đầy.",
+            "Nhưng niềm vui nhanh chóng bị dập tắt khi mặt trời lên và cơn gió ẩm qua đi. Những tấm lưới rêu, vốn dùng để tăng diện tích ngưng tụ, giờ đây được bao phủ bởi một lớp bùn đen kịt, sền sệt. Đó là hỗn hợp của nước và tro độc. Khi lớp bùn khô lại, nó tỏa ra một mùi hắc khó chịu và biến thành một lớp vảy cứng. Kael biết rằng nếu không dọn sạch lớp cặn này, tấm lưới sẽ mất tác dụng cho lần đón gió tiếp theo. \"Cần người cạo sạch chúng,\" Kael nói, nhưng không ai nhúc nhích. Mọi người đều biết thứ tro đó nguy hiểm thế nào; hít phải nó có thể gây ra những cơn ho ra máu và cái chết từ từ trong lồng ngực.",
+            "\"Người của tôi sẽ không làm việc đó,\" một giọng nói trầm và đanh thép vang lên. Lão Cấn, trưởng lão của nhóm thợ đào, bước ra. Ông là một người đàn ông khắc khổ, người đã chứng kiến quá nhiều thợ của mình chết vì bệnh phổi do hít bụi đá. \"Cậu đã mang về nước, chúng tôi ghi nhận. Nhưng cậu cũng mang về một loại bệnh dịch mới. Tôi sẽ không để người của mình đổi mạng sống lấy vài gáo nước. Trừ khi cậu có cách để bảo vệ họ, nếu không thì hãy tự mình dọn lấy.\" Lời nói của Lão Cấn như một gáo nước lạnh. Ông không hề sai. Kael đã giải quyết được một vấn đề, nhưng lại tạo ra một vấn đề khác chết người không kém. Hệ thống của cậu, niềm hy vọng của cả thung lũng, đang có nguy cơ sụp đổ chỉ vì không ai dám dọn dẹp nó."
+          ],
+          "stateChange": "Kael từ một người chứng minh khái niệm thành công trở thành một kỹ sư đối mặt với hậu quả không lường trước của phát minh: chất thải độc hại.",
+          "earnedReward": "Thu được một lượng nước đáng kể, đủ để phân phát hạn chế cho cộng đồng, chứng tỏ tiềm năng của hệ thống bẫy gió.",
+          "unresolvedPressure": "Vấn đề tro độc tích tụ trên lưới lọc trở thành một rào cản chết người. Nếu không có giải pháp dọn dẹp an toàn, hệ thống sẽ trở nên vô dụng."
+        },
+        {
+          "chapterNumber": 3,
+          "title": "Bức Tường Chắn Gió",
+          "proseParagraphs": [
+            "Áp lực đè nặng lên Kael. Lão Cấn đã đúng, và sự im lặng của những người khác là một lời đồng tình đáng sợ. Trong hai ngày, cậu nhốt mình trong lều, phác thảo trên những mảnh da cũ. Giải pháp không thể là sự hy sinh. Nó phải đến từ thiết kế. Cuối cùng, cậu nghĩ ra một hệ thống dụng cụ đơn giản: những cây sào tre dài được gắn vào đầu những lưỡi cạo bằng đá mài. Người dọn dẹp có thể đứng từ xa, phía đầu gió, để cạo lớp tro độc khỏi lưới mà không cần hít thở trực tiếp. Nó không hoàn hảo, nhưng đó là thứ tốt nhất cậu có thể làm được với những vật liệu sẵn có. Lão Cấn xem xét bản vẽ, gật gù một cách thận trọng. Ông đồng ý cho một đội nhỏ, được trả công hậu hĩnh bằng nước và lương thực, thử nghiệm phương pháp này.",
+            "Với vấn đề an toàn được giải quyết tạm thời, Kael trình bày kế hoạch lớn nhất của mình: một bức tường chắn gió thực sự. Không chỉ là vài phiến đá, mà là một công trình kiến trúc bằng đá và vữa, đủ cao để làm chậm những cơn bão tro và đủ rộng để tạo ra một vùng lặng gió cho cả khu định cư. Bề mặt của nó sẽ được thiết kế với hàng trăm phiến đá nung và lưới rêu, biến nó thành một cỗ máy thu nước khổng lồ. Lần này, không còn sự hoài nghi. Toàn bộ thung lũng được huy động. Thợ đào của Lão Cấn đào móng, thợ nung của Lão Thạch cung cấp đá và vữa, những người khác cùng nhau góp sức xây dựng.",
+            "Sau hai tuần lao động cật lực, bức tường đã hoàn thành. Nó sừng sững ở rìa thung lũng, một biểu tượng cho sự đoàn kết và hy vọng. Và rồi, một cơn gió ẩm mạnh ập đến. Kết quả vượt xa mọi sự tưởng tượng. Nước chảy ròng ròng từ bức tường, đổ đầy tất cả các bể chứa. Quan trọng hơn, khu vực phía sau bức tường trở nên yên tĩnh một cách kỳ lạ. Lần đầu tiên, mọi người có thể đứng ngoài trời mà không cần phải che mặt khỏi bụi tro. Tiếng cười của trẻ con vang lên trong không khí trong lành tương đối. Kael đã thành công. Cậu đã mang lại cho họ nước và sự an toàn.",
+            "Nhưng khi màn đêm buông xuống, một thực tế mới, nghiệt ngã hơn bắt đầu hình thành. Vùng lặng gió quý giá đó ngay lập tức trở thành một thứ tài sản. Những gia đình mạnh nhất, những người có tiếng nói trong hội đồng, nhanh chóng chiếm lấy những vị trí tốt nhất, ngay sát chân tường. Họ bắt đầu dựng lên những căn lều tạm bợ. Những người yếu thế hơn bị đẩy ra xa, đến những nơi vẫn còn bị ảnh hưởng bởi gió xoáy. Chỉ trong một đêm, khu vực an toàn mà Kael tạo ra cho tất cả mọi người đã biến thành một khu ổ chuột phân chia giai cấp. Cậu đứng trên đỉnh tường, nhìn xuống sự hỗn loạn và tranh giành bên dưới. Cậu nhận ra rằng việc chinh phục cơn gió dễ dàng hơn nhiều so với việc chinh phục lòng tham của con người. Vấn đề của cậu giờ không còn là kỹ thuật, mà là chính trị."
+          ],
+          "stateChange": "Kael chuyển từ một kỹ sư giải quyết các vấn đề kỹ thuật thành một nhà lãnh đạo cộng đồng bất đắc dĩ, đối mặt với các vấn đề xã hội phức tạp do chính thành công của mình tạo ra.",
+          "earnedReward": "Một nguồn nước dồi dào và một khu vực an toàn, được bảo vệ khỏi gió bụi, nâng cao đáng kể chất lượng sống và uy tín của Kael.",
+          "unresolvedPressure": "Sự thành công của bức tường chắn gió đã tạo ra một cuộc khủng hoảng mới về phân chia tài nguyên và đất đai, dẫn đến xung đột xã hội và bất bình đẳng."
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "candidateId": "c9_mud_mason",
+      "chapters": [
+        {
+          "chapterNumber": 1,
+          "title": "Vết Nứt",
+          "proseParagraphs": [
+            "Ngọn gió rít qua khe núi mang theo cái vị khô khốc của tro bụi sắp về. Kian không cần nhìn lên bầu trời xám xịt cũng biết cơn bão tro đang đến gần. Xung quanh, tiếng người la hét, tiếng cọc lều được đóng lại một cách tuyệt vọng. Họ đang cố vá víu những tấm da thú mỏng manh bằng những miếng vá vụng về. Vô ích. Kian biết rõ điều đó. Cơn thịnh nộ của bầu trời sẽ xé toạc chúng như giấy vụn. Nhưng mối nguy thực sự không nằm ở đó. Nó nằm ở phía thượng nguồn, im lìm và nặng trịch.",
+            "Kian quay lưng lại với sự hỗn loạn của xóm lều, đôi mắt dán chặt vào con đập chắn nước cũ kỹ. Một vết nứt nhỏ, như một sợi chỉ đen, đã xuất hiện gần chân đập. Nước đang rỉ ra, chậm rãi nhưng không ngừng. Nếu con đập này vỡ, hồ chứa nước ngọt cuối cùng của họ sẽ hòa vào dòng tro độc, và tất cả sẽ kết thúc. Không ai để ý đến nó. Họ quá bận rộn với nỗi sợ hãi ngay trước mắt.",
+            "Anh lao về phía cái hố trộn khuất sau một mỏm đá, nơi anh cất giữ những báu vật của mình. Một bao tải nhỏ tro trắng mịn, thứ mà anh phải len lỏi vào những hang động sâu nhất, nơi không khí đặc quánh, để cạo được từ vách đá. Một túi da dê chứa nước, quý hơn vàng. Và một nắm sợi rêu màu xanh bạc, thứ duy nhất có thể kết dính tro và nước thành một thực thể sống. Anh không có thời gian. Bùn sinh mệnh không chờ đợi ai.",
+            "Kian đổ tro vào hố. Anh nhúng những ngón tay chai sần vào, cảm nhận độ ẩm của không khí, sức gió, và cái lạnh của đất. Trong đầu anh, các tỷ lệ tự động nảy số. Một dòng nước nhỏ được rót vào, và anh bắt đầu nhào trộn. Thế giới bên ngoài biến mất. Chỉ còn lại anh và vật liệu. Anh cảm nhận được từng hạt tro đang ngậm nước, từng sợi rêu đang len lỏi, tạo thành một mạng lưới vô hình. Độ dẻo, sức căng, sự phân bổ độ ẩm, tất cả hiện lên trong lòng bàn tay anh như một ngôn ngữ quen thuộc. Anh thêm những sợi rêu cuối cùng, nhào nặn với tốc độ chóng mặt. Hỗn hợp ấm lên, gần như đang thở. Nó đã sẵn sàng.",
+            "Mang theo cái xô gỗ chứa thứ bùn xám dẻo, anh chạy ngược về phía con đập. Vài người nhìn thấy, họ hét lên điều gì đó về việc lãng phí nước, về sự điên rồ. Anh không đáp lại. Anh chỉ có vài phút trước khi mẻ bùn này chết cứng trong xô. Anh quỳ xuống trước vết nứt. Dòng nước rỉ ra đã lớn hơn. Bằng đôi tay trần, anh miết bùn vào khe hở. Anh cảm nhận nó bám chặt vào bề mặt đá cũ, lấp đầy từng lỗ hổng nhỏ nhất. Vết nứt được lấp đầy. Gần như ngay lập tức, lớp bùn bắt đầu cứng lại, màu xám nhạt đi. Dòng nước rỉ ngưng bặt. Đúng lúc đó, những bông tro đầu tiên bắt đầu rơi. Con đập đã được cứu. Kian tựa lưng vào bức tường đá, kiệt sức, lồng ngực phập phồng. Ít nhất, hôm nay họ sẽ không chết khát."
+          ],
+          "stateChange": "Từ một thợ xây vô danh bị coi thường, Kian trở thành người duy nhất có khả năng cứu vãn nguồn nước của cả khu định cư.",
+          "earnedReward": "Niềm tin ban đầu từ một vài người già, những người chứng kiến sự vững chắc của vết vá khi cơn bão tro ập đến.",
+          "unresolvedPressure": "Lượng bùn sinh mệnh quá ít, chỉ đủ vá một vết nứt nhỏ, trong khi toàn bộ con đập và các công trình khác đều đang xuống cấp trầm trọng."
+        },
+        {
+          "chapterNumber": 2,
+          "title": "Ba Bàn Tay",
+          "proseParagraphs": [
+            "Cơn bão đi qua, để lại một lớp tro dày như tuyết bẩn. Những túp lều rách nát, nhưng con đập vẫn đứng vững. Vết vá của Kian xám trắng, cứng như đá, không một vết xước. Bà Lão, người lớn tuổi nhất trong xóm, cùng vài người khác tìm đến anh, đôi mắt họ không còn vẻ nghi ngờ. Họ đã thấy. Họ muốn anh làm nhiều hơn nữa, vá lại toàn bộ con đập, xây lại những bức tường chắn gió đã sụp đổ. Kian lắc đầu. Anh giải thích cho họ về giới hạn của bùn sinh mệnh: nó khô quá nhanh. Một mình anh chỉ có thể trộn một mẻ nhỏ. Để làm những công trình lớn, anh cần một đội, một dây chuyền người làm việc nhịp nhàng như một cơ thể duy nhất.",
+            "Nhưng khu định cư này là một cơ thể gãy vỡ. Ba phe phái sống co cụm, chỉ miễn cưỡng giao tiếp với nhau. Thợ Rêu, do Rạc, một người đàn ông khắc khổ và thực tế, dẫn đầu. Phu Tro, những kẻ to khỏe và liều lĩnh nhất. Và Dân Nước, những người kiểm soát việc phân phối nước từ hồ chứa. Bà Lão dùng uy tín của mình để tập hợp họ lại. Dưới ánh sáng yếu ớt của ngọn lửa, Kian trình bày kế hoạch của mình. Không phải vá víu, mà là tái thiết. Anh đề nghị bắt đầu với lòng kênh dẫn nước chính, thứ đã bị tro bụi vùi lấp từ nhiều mùa nay, khiến dòng nước chảy vào xóm chỉ còn là một dòng ri rỉ.",
+            "Sự phản đối nổ ra ngay lập tức. Rạc của Thợ Rêu nói thẳng: \"Loại rêu xanh bạc đó cực hiếm. Chúng tôi phải vào sâu hơn trong các kẽ nứt, nơi không khí độc hơn. Nhu cầu tăng, giá phải tăng. Và nếu khai thác quá mức, nó sẽ biến mất vĩnh viễn.\" Phu Tro thì phàn nàn về sự nguy hiểm của việc khai thác đúng loại tro trắng mà Kian yêu cầu. Dân Nước không muốn lãng phí dù chỉ một giọt nước quý giá cho thứ bùn chưa được kiểm chứng.",
+            "Kian không tranh cãi về giá cả hay sự nguy hiểm. Anh dùng hành động. Anh lấy một cành cây, vẽ xuống nền đất một sơ đồ phức tạp về một dây chuyền người. Người trộn, người chuyền xô, người đắp. Anh giải thích về nhịp điệu, về khẩu lệnh, về cách mỗi người phải di chuyển. \"Bùn sinh mệnh không phải là đất đá. Nó là một dòng chảy. Mỗi người là một mắt xích. Xích đứt, bùn chết,\" anh nói, giọng đanh lại. Anh không hứa hẹn sự giàu có. Anh chỉ hứa một dòng nước chảy mạnh hơn. Một sự sống còn chắc chắn hơn.",
+            "Cuối cùng, họ đồng ý thử nghiệm. Một mẻ bùn lớn, đủ để lót mười mét lòng kênh. Buổi làm việc là một mớ hỗn loạn có tổ chức. Kian như một nhạc trưởng điên cuồng, la hét khẩu lệnh, tay liên tục kiểm tra độ sệt của bùn trong từng chiếc xô được chuyền đi. Một người chuyền bị vấp. Cả một xô bùn đổ xuống đất, cứng lại gần như ngay lập tức. Một mẻ bùn bị hỏng. Sự căng thẳng bao trùm. Nhưng dần dần, họ bắt được nhịp. Tiếng xô va vào nhau, tiếng chân người di chuyển, tiếng Kian ra lệnh, tất cả hòa thành một thứ âm nhạc lao động kỳ lạ. Khi mặt trời lặn, mười mét lòng kênh đầu tiên đã được lót bởi một lớp vật liệu màu xám mịn, cứng cáp. Nước được cho chảy thử, và nó ào qua đoạn kênh mới với một tốc độ mà không ai còn nhớ nổi."
+          ],
+          "stateChange": "Kian chuyển từ một người hùng đơn độc sang một nhà tổ chức, buộc các phe phái vốn nghi kỵ nhau phải hợp tác trong một quy trình lao động phức tạp.",
+          "earnedReward": "Một đoạn kênh dài mười mét được xây lại, chứng minh rằng sự hợp tác quy mô lớn là khả thi và mang lại kết quả hữu hình.",
+          "unresolvedPressure": "Mâu thuẫn về việc phân chia tài nguyên và công sức bắt đầu nảy sinh. Thợ Rêu đòi hỏi phần nước lớn hơn từ con kênh mới vì họ cung cấp nguyên liệu quý giá nhất."
+        },
+        {
+          "chapterNumber": 3,
+          "title": "Mái Hiên Chung",
+          "proseParagraphs": [
+            "Con kênh thực sự mang lại hiệu quả. Nước chảy về hồ chứa nhiều hơn, trong hơn. Thành công đó thắp lên một tia hy vọng trong cộng đồng vốn đã quen với sự mất mát. Kian, giờ đây được mọi người tin tưởng, đề xuất một dự án táo bạo hơn: xây một mái hiên chung kiên cố, nối liền cửa các hang trú ẩn chính của cả ba phe. Đó sẽ là nơi người già có thể ngồi sưởi ấm mà không bị gió tạt, nơi trẻ con có thể chơi đùa mà không sợ tro bụi. Một không gian chung thực sự, điều chưa từng tồn tại.",
+            "Lần này, dây chuyền làm việc vận hành trơn tru hơn hẳn. Kian đã đào tạo những người đội trưởng cho từng công đoạn. Nhịp điệu của việc trộn, chuyền, và đắp bùn đã trở nên quen thuộc. Người ta bắt đầu tự hào về công việc mình làm. Họ không còn chỉ là Thợ Rêu hay Phu Tro, họ là những người thợ xây. Mái hiên lớn dần lên mỗi ngày, một đường cong vững chãi vươn ra từ vách đá. Nó là công trình hoàn toàn mới đầu tiên được xây dựng ở đây sau nhiều thế hệ.",
+            "Ngày mái hiên hoàn thành là một ngày hội. Lần đầu tiên, tiếng cười của lũ trẻ vang lên trong một không gian rộng rãi, được che chở. Những người già ngồi bên nhau, tắm mình trong ánh nắng ấm áp hiếm hoi, khuôn mặt nhăn nheo giãn ra. Lợi ích cụ thể và hữu hình hiện ra trước mắt mọi người. Họ đã cùng nhau tạo ra một thứ tốt đẹp, một thứ thuộc về tất cả.",
+            "Nhưng sự đoàn kết đó mong manh như lớp váng trên mặt nước. Ngay khi niềm vui lắng xuống, vấn đề sở hữu bắt đầu nhen nhóm. Rạc của Thợ Rêu là người đầu tiên đến gặp Kian. \"Mái hiên này tốt,\" ông ta thừa nhận, \"nhưng gió vẫn lùa từ phía bên Dân Nước sang khu của chúng tôi. Chúng tôi muốn đắp một bức tường ngăn ở đây.\" Ý tưởng đó như một mồi lửa. Ngay lập tức, các phe khác cũng đưa ra yêu cầu tương tự. Không gian chung mà Kian mơ ước có nguy cơ bị chia cắt thành ba mảnh sân riêng biệt, bị giới hạn bởi những bức tường của sự nghi kỵ cũ.",
+            "Kian cố gắng giải thích về giá trị của không gian mở, về tinh thần cộng đồng. Nhưng nỗi sợ cố hữu về việc bị xâm phạm lãnh thổ, thói quen co cụm phòng thủ đã ăn sâu vào máu họ. Anh nhận ra mình đã bỏ qua một bước quan trọng, một sự thật cốt lõi về bùn sinh mệnh mà anh chưa từng tiết lộ. Anh tập hợp mọi người lại dưới mái hiên mới. Anh cầm một mảnh đá sắc, cạo mạnh vào bề mặt tường đã khô cứng. Một làn bụi trắng mịn bay ra. Không khí trở nên im lặng.",
+            "\"Bùn này là sinh mệnh,\" Kian nói, giọng anh trầm và rõ. \"Nó cho chúng ta những bức tường vững chãi. Nhưng nó cũng được làm từ tro độc. Nếu không được chăm sóc, nó sẽ trả lại chất độc đó cho chúng ta.\" Anh giải thích về chi phí ẩn: hàng tháng, toàn bộ bề mặt của công trình phải được quét một lớp dịch rêu đặc biệt để giữ cho nó không bị nứt vỡ và rò rỉ tro độc. \"Nếu chúng ta chia tường, ai sẽ bảo trì mặt ngoài? Nếu bức tường của phe này nứt vỡ, chất độc sẽ bay sang nhà của phe kia. Trách nhiệm đó thuộc về ai?\" Câu hỏi của anh treo lơ lửng trong không khí, nặng trịch và phức tạp hơn bất kỳ mẻ bùn nào họ từng trộn."
+          ],
+          "stateChange": "Từ một người chỉ huy kỹ thuật, Kian phải trở thành một nhà lập pháp, đối mặt với vấn đề sở hữu và trách nhiệm tập thể khi công trình chung hoàn thành.",
+          "earnedReward": "Một công trình công cộng vững chắc (mái hiên) lần đầu tiên được hoàn thành, mang lại lợi ích trực tiếp (an toàn, che chở) cho người già và trẻ em.",
+          "unresolvedPressure": "Hoàn thành công trình chung lại làm nảy sinh mâu thuẫn về quyền sở hữu và phân chia không gian, đồng thời Kian tiết lộ về chi phí bảo trì lâu dài, đặt ra bài toán mới về trách nhiệm tập thể."
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "candidateId": "c6_labor_appraiser",
+      "chapters": [
+        {
+          "chapterNumber": 1,
+          "title": "Con Số Trong Nắng Gắt",
+          "proseParagraphs": [
+            "An nheo mắt trước cái nắng Thung Lũng Trắng, thứ nắng có thể vắt kiệt một người đàn ông chỉ trong vài giờ. Trước mặt anh, bên miệng giếng duy nhất, đám thợ đào của Ksor đang nhận phần nước của mình. Chúng ưỡn bộ ngực trần đẫm mồ hôi, cười hô hố khi những thùng da căng phồng được chuyền tay. Ksor, gã đội trưởng vai u thịt bắp, vỗ mạnh vào lưng người chia nước, một cái vỗ đầy hàm ý bảo kê. Hệ thống phân phối ở đây đơn giản là luật của kẻ mạnh. Kẻ nào đào được nhiều đá nhất, la to nhất, sẽ được nhiều nước nhất.",
+            "Nhưng trong đầu An, những con số đang nhảy múa một cách lạnh lùng. Anh không cần cân đo, không cần máy móc. Con mắt của một thương nhân thất thế, kết hợp với khả năng thiên bẩm, cho phép anh nhìn vào đống đá vụn mà đám thợ vừa mang về và tính toán gần như tức thời. Lượng calo tiêu thụ: khoảng 3500 mỗi người. Hao mòn cuốc chim: 0.7%. Lượng đất đá di dời: 18 mét khối. Dựa trên đó, lượng nước cần để bù lại cho tám gã thợ này là 40 lít. Tuyệt đối không thể là 60 lít như chúng đang nhận. Hai mươi lít chênh lệch, đủ để cứu sống một gia đình trong hai ngày.",
+            "Cách đó không xa, đám thợ nung gốm của bà Lý đang tuyệt vọng nhìn về phía giếng. Lò nung của họ đang đến giai đoạn cần nước để tôi luyện mẻ đá vôi cuối cùng. Thiếu nước lúc này, cả lò sẽ hỏng, công sức cả tuần của họ sẽ thành tro bụi. An hít một hơi thật sâu, không khí nóng rát tràn vào phổi. Anh không có cơ bắp, không có vũ khí. Anh chỉ có những con số. Anh bước tới, chen vào giữa Ksor và người chia nước. \"Dừng lại,\" giọng An không to, nhưng đủ đanh để thu hút sự chú ý.",
+            "Ksor quay lại, cái nhìn của gã như muốn xiên An vào vách đá. \"Thằng mọt sách, mày muốn gì?\" An không nao núng, anh chỉ vào đống đá. \"18 mét khối. Với độ cứng của đá vôi xám khu vực phía đông, tám người các anh chỉ tiêu hao một lượng sức tương đương 40 lít nước. Các anh đang lấy dư 20 lít.\" Sự im lặng bao trùm. Đám thợ đào chưa bao giờ nghe ai nói chuyện bằng thứ ngôn ngữ kỳ quặc này. Ksor cười gằn. \"Mày nói nhảm gì thế? Bọn tao làm việc dưới lòng đất, nóng như địa ngục, mày biết gì?\" \"Tôi biết lò của bà Lý sắp hỏng,\" An đáp trả, chỉ tay về phía làn khói yếu ớt. \"20 lít đó đủ để cứu mẻ đá. Một mẻ đá có giá trị hơn sự gian lận của các anh.\" Lần đầu tiên, quyền lực cơ bắp bị thách thức bởi một bảng cân đối kế toán vô hình. An không tố cáo chúng ăn cắp, anh chỉ đơn giản định giá hành vi đó thấp hơn một lựa chọn khác. Ksor sững người, gã có thể đánh An, nhưng không thể cãi lại logic rằng một lò đá hỏng sẽ ảnh hưởng đến tất cả mọi người. Ánh mắt của những người xung quanh bắt đầu thay đổi, và An biết mình đã thắng hiệp đầu tiên."
+          ],
+          "stateChange": "Từ một thương nhân quan sát trong im lặng, An chủ động can thiệp vào hệ thống phân phối tài nguyên bằng khả năng tính toán của mình, biến bản thân thành một nhân tố quyền lực mới.",
+          "earnedReward": "An cứu được mẻ đá vôi quan trọng cho cả thung lũng, giành được sự ủng hộ ban đầu từ nhóm thợ nung và buộc nhóm thợ đào phải thừa nhận (dù không công khai) tính chính xác trong các con số của anh.",
+          "unresolvedPressure": "Hành động của An đã tạo ra kẻ thù là Ksor và nhóm thợ đào. Hệ thống phân phối vẫn chưa có quy tắc chính thức, và sự can thiệp của anh chỉ là một giải pháp tình thế dựa trên sự liều lĩnh."
+        },
+        {
+          "chapterNumber": 2,
+          "title": "Bảng Chữ Cái Của Lao Động",
+          "proseParagraphs": [
+            "Cuộc họp diễn ra trong hang lớn của các trưởng lão, dưới ánh sáng bập bùng của những ngọn đuốc tẩm rêu dầu. An đứng giữa vòng tròn những người đàn ông có làn da nhăn nheo như vỏ cây khô. Ksor cũng ở đó, khoanh tay ngồi trong góc tối, đôi mắt gã không rời An một giây. Sự việc ở giếng nước đã buộc các trưởng lão phải hành động. Sự hỗn loạn không thể tiếp diễn.",
+            "\"Chúng ta không thể tiếp tục phân chia bằng miệng và nắm đấm,\" An bắt đầu, giọng anh vang vọng trong không gian tĩnh lặng. Anh không có giấy, chỉ có một que cây và nền đất ẩm. Anh bắt đầu vẽ. \"Mọi công việc đều có thể đo lường. Một cuốc đào. Một viên đá nung. Một giờ canh gác. Chúng ta sẽ tạo ra một thứ để ghi nhận chúng. Tôi gọi nó là 'tem phiếu lao động'.\" Anh vẽ một hình chữ nhật nhỏ trên đất. \"Mỗi khi một nhóm thợ hoàn thành một khối lượng công việc đã được định trước, ví dụ như đào được một mét khối đá, họ sẽ nhận được một tem phiếu. Thợ nung hoàn thành một mẻ gốm, nhận được tem phiếu. Người đi tìm rêu mang về một giỏ đầy, cũng nhận được tem phiếu.\"",
+            "Anh tiếp tục giải thích, phác thảo ra một hệ thống sơ khai. Sẽ có một 'quầy đổi' trung tâm. Người dân mang tem phiếu đến, đổi lấy nước, rêu sạch, và các vật dụng khác từ kho chung. Sự phân phối sẽ không còn phụ thuộc vào lòng tốt hay sự dọa dẫm của người giữ giếng, mà dựa trên bằng chứng lao động không thể chối cãi. Một vài trưởng lão gật gù, ý tưởng về sự công bằng này quá hấp dẫn.",
+            "Bất chợt, Ksor lên tiếng, giọng gã trầm và đục. \"Ý tưởng hay đấy, mọt sách. Nhưng một nhát cuốc của thợ đào không giống một viên gạch của thợ nung.\" Gã đứng dậy, bước vào vòng tròn sáng. \"Người của tao làm việc dưới lòng đất. Sập hầm có thể xảy ra bất cứ lúc nào. Mỗi ngày chúng tao đều đặt cược mạng sống của mình. Còn thợ nung thì sao? Rủi ro lớn nhất của họ là bỏng tay. Mày định giá một mạng sống ngang với một vết bỏng à?\" Lập luận sắc bén và hợp lý. An nhận ra ngay lỗ hổng trong hệ thống của mình. Anh đã định giá lao động, nhưng chưa định giá rủi ro. \"Tem phiếu của thợ đào phải có giá trị cao hơn,\" Ksor kết luận, và lần này, nhiều người khác cũng gật đầu đồng tình. Cuộc tranh luận nổ ra. Hệ số rủi ro là bao nhiêu? Công việc nào nguy hiểm hơn việc nào? Hệ thống tưởng chừng đơn giản của An bỗng trở nên phức tạp bội phần. Cuối cùng, Trưởng lão Hóa, người già nhất, đập cây gậy xuống đất. \"Chúng ta sẽ thử nghiệm. Một tuần. Nhóm của An sẽ giám sát việc đo lường. Nhóm của Ksor sẽ được nhận hệ số 1.2. Các nhóm khác là 1.0. Sau một tuần, chúng ta sẽ xem xét lại.\" Một thỏa hiệp tạm thời, nhưng một mầm mống xung đột mới đã được gieo."
+          ],
+          "stateChange": "Ý tưởng về một hệ thống kinh tế dựa trên tem phiếu của An được chấp thuận để thử nghiệm, chuyển từ một sự can thiệp cá nhân sang một chính sách có quy mô toàn thung lũng. Tuy nhiên, khái niệm 'giá trị lao động' trở nên phức tạp hơn khi yếu tố 'rủi ro' được đưa vào.",
+          "earnedReward": "An nhận được sự ủy thác và quyền lực để thiết lập hệ thống tem phiếu, một bước tiến lớn trong việc tổ chức lại thung lũng.",
+          "unresolvedPressure": "Sự phân chia về tỷ giá quy đổi tem phiếu giữa các nhóm lao động tạo ra sự bất mãn ngấm ngầm. Nhóm thợ đào có đặc quyền, trong khi các nhóm khác cảm thấy bị đánh giá thấp, đe dọa sự đoàn kết của cộng đồng."
+        },
+        {
+          "chapterNumber": 3,
+          "title": "Bữa Ăn Đầu Tiên",
+          "proseParagraphs": [
+            "Ngày phân phát đầu tiên diễn ra trong một trật tự lạ lẫm. Không còn cảnh chen lấn, xô đẩy. Một hàng dài người im lặng xếp hàng trước căn lều tạm mà An dựng lên, nơi anh và hai người phụ tá ngồi sau một chiếc bàn đá thô sơ. Bên cạnh là những thùng nước được đong đếm cẩn thận và những giỏ rêu xanh mướt, thứ thực phẩm chính của thung lũng. Mỗi người tiến lên, trình ra những miếng đá phiến mỏng được khắc ký hiệu đơn giản - những tờ tem phiếu đầu tiên.",
+            "An đối chiếu số tem với cuốn sổ ghi chép sản lượng của tuần. Mọi thứ khớp. Anh gật đầu, và người phụ tá sẽ múc một lượng nước tương ứng, trao một túi rêu. Nét mặt của mọi người rất đa dạng. Có sự bối rối, có sự nghi ngờ, nhưng phần lớn là một niềm hy vọng mong manh. Họ đang chứng kiến một điều không tưởng: công sức của họ được quy đổi thành vật phẩm một cách sòng phẳng.",
+            "Giữa hàng người, An chú ý đến gia đình bà Lý, những người thợ nung mà anh đã giúp đỡ. Họ chìa ra xấp tem phiếu của mình, thành quả của một tuần làm việc cật lực bên lò lửa. Khi nhận được lượng nước và rêu nhiều hơn hẳn những tuần trước, người con trai út của bà đã không kìm được nước mắt. Tối hôm đó, lần đầu tiên sau nhiều tháng, cả gia đình họ được ăn một bữa no đủ. An đứng từ xa quan sát cảnh họ quây quần bên bếp lửa, chia nhau từng sợi rêu nóng hổi. Đó chính là phần thưởng lớn nhất anh nhận được, một minh chứng sống động rằng hệ thống của anh có thể hoạt động, rằng nó có thể mang lại phẩm giá cho con người.",
+            "Tuy nhiên, khi buổi phân phát gần kết thúc, An nhận ra một hiện tượng đáng lo ngại. Ksor và những gã thợ đào khỏe mạnh nhất trong nhóm của hắn bước đến. Sau khi quy đổi với hệ số 1.2, số tem phiếu của chúng nhiều vượt trội. Nhưng chúng không đổi hết. Ksor chỉ đổi một lượng nước và thức ăn vừa đủ, còn lại gần một nửa số tem phiếu, hắn cẩn thận cất vào một cái túi da đeo bên hông. Vài gã khác cũng làm theo. Chúng đang tích trữ. Quyền lực không còn nằm ở cơ bắp trực tiếp đe dọa người khác, mà đang chuyển hóa thành những miếng đá phiến được khắc dấu. An chợt thấy lạnh sống lưng. Anh đã tạo ra một công cụ để đo lường lao động, nhưng con người lại nhanh chóng biến nó thành công cụ để tích lũy quyền lực. Một hình thái hỗn loạn mới đang manh nha hình thành từ chính trật tự mà anh cố công xây dựng."
+          ],
+          "stateChange": "Hệ thống tem phiếu chứng tỏ được hiệu quả trong việc phân phối công bằng tài nguyên cơ bản, mang lại lợi ích hữu hình đầu tiên cho những người lao động chân chính. Tuy nhiên, một hình thái kinh tế mới ra đời, kéo theo hành vi đầu cơ tích trữ.",
+          "earnedReward": "An chứng minh được giá trị và tính khả thi của hệ thống, củng cố niềm tin của đa số người dân. Phần thưởng hữu hình là bữa ăn no đủ đầu tiên của những người yếu thế được hưởng lợi từ sự công bằng.",
+          "unresolvedPressure": "Hiện tượng tích trữ tem phiếu của nhóm người mạnh bắt đầu xuất hiện, đe dọa gây ra lạm phát, khan hiếm nhân tạo và tái lập sự bất bình đẳng giàu nghèo dưới một hình thức mới."
+        }
+      ]
+    }
+  ],
+  "openingReviews": [
+    {
+      "schemaVersion": 3,
+      "judgeId": "opening_judge_1",
+      "ranking": [
+        "c6_labor_appraiser",
+        "c8_wind_navigator",
+        "c9_mud_mason"
+      ],
+      "scores": [
+        {
+          "candidateId": "c6_labor_appraiser",
+          "openingPull": 8,
+          "worldSpecificity": 8,
+          "protagonistAgency": 9,
+          "causalReward": 9,
+          "characterLife": 9,
+          "seriality30": 9,
+          "proseNaturalness": 8,
+          "readChapter4": 9,
+          "criticalFails": [],
+          "evidence": [
+            {
+              "chapterNumber": 1,
+              "excerpt": "Lượng calo tiêu thụ: khoảng 3500 mỗi người. Hao mòn cuốc chim: 0.7%. Lượng đất đá di dời: 18 mét khối.",
+              "reason": "Thể hiện rõ năng lực đặc thù của nhân vật chính, tạo sự khác biệt ngay từ đầu."
+            },
+            {
+              "chapterNumber": 2,
+              "excerpt": "Người của tao làm việc dưới lòng đất. Sập hầm có thể xảy ra bất cứ lúc nào. Mỗi ngày chúng tao đều đặt cược mạng sống của mình. Còn thợ nung thì sao? Rủi ro lớn nhất của họ là bỏng tay. Mày định giá một mạng sống ngang với một vết bỏng à?",
+              "reason": "Lập luận xuất sắc của nhân vật phản diện, làm sâu sắc thêm thế giới và tạo ra một rào cản logic thuyết phục."
+            },
+            {
+              "chapterNumber": 3,
+              "excerpt": "Ksor chỉ đổi một lượng nước và thức ăn vừa đủ, còn lại gần một nửa số tem phiếu, hắn cẩn thận cất vào một cái túi da đeo bên hông. Vài gã khác cũng làm theo. Chúng đang tích trữ.",
+              "reason": "Hậu quả nhân quả tuyệt vời, mở ra xung đột kinh tế và chính trị cho các chương tiếp theo."
+            }
+          ]
+        },
+        {
+          "candidateId": "c8_wind_navigator",
+          "openingPull": 8,
+          "worldSpecificity": 9,
+          "protagonistAgency": 9,
+          "causalReward": 9,
+          "characterLife": 8,
+          "seriality30": 9,
+          "proseNaturalness": 8,
+          "readChapter4": 9,
+          "criticalFails": [],
+          "evidence": [
+            {
+              "chapterNumber": 1,
+              "excerpt": "Kael cảm nhận nó trước khi bất cứ ai nhìn thấy. Một sự run rẩy vi tế trong không khí, không phải là cơn gió khô khốc mang theo bụi tro quen thuộc, mà là một thứ gì đó khác.",
+              "reason": "Mở đầu thu hút với chi tiết cảm giác tốt, thiết lập ngay bối cảnh khắc nghiệt."
+            },
+            {
+              "chapterNumber": 2,
+              "excerpt": "Những tấm lưới rêu, vốn dùng để tăng diện tích ngưng tụ, giờ đây được bao phủ bởi một lớp bùn đen kịt, sền sệt. Đó là hỗn hợp của nước và tro độc.",
+              "reason": "Phần thưởng đi kèm với hậu quả logic, buộc nhân vật phải tiếp tục giải quyết vấn đề."
+            },
+            {
+              "chapterNumber": 3,
+              "excerpt": "Chỉ trong một đêm, khu vực an toàn mà Kael tạo ra cho tất cả mọi người đã biến thành một khu ổ chuột phân chia giai cấp.",
+              "reason": "Chuyển biến mượt mà từ xung đột kỹ thuật sang xung đột xã hội, tạo động lực mạnh mẽ cho phần sau."
+            }
+          ]
+        },
+        {
+          "candidateId": "c9_mud_mason",
+          "openingPull": 8,
+          "worldSpecificity": 9,
+          "protagonistAgency": 9,
+          "causalReward": 9,
+          "characterLife": 8,
+          "seriality30": 8,
+          "proseNaturalness": 8,
+          "readChapter4": 8,
+          "criticalFails": [],
+          "evidence": [
+            {
+              "chapterNumber": 1,
+              "excerpt": "Anh nhúng những ngón tay chai sần vào, cảm nhận độ ẩm của không khí, sức gió, và cái lạnh của đất. Trong đầu anh, các tỷ lệ tự động nảy số.",
+              "reason": "Mô tả sinh động quá trình làm việc của nhân vật, thể hiện sự am hiểu vật liệu."
+            },
+            {
+              "chapterNumber": 2,
+              "excerpt": "Bùn sinh mệnh không phải là đất đá. Nó là một dòng chảy. Mỗi người là một mắt xích. Xích đứt, bùn chết",
+              "reason": "Nhân vật thể hiện khả năng lãnh đạo và tổ chức, phát triển từ một người thợ đơn độc."
+            },
+            {
+              "chapterNumber": 3,
+              "excerpt": "Nếu chúng ta chia tường, ai sẽ bảo trì mặt ngoài? Nếu bức tường của phe này nứt vỡ, chất độc sẽ bay sang nhà của phe kia. Trách nhiệm đó thuộc về ai?",
+              "reason": "Câu hỏi hóc búa về trách nhiệm cộng đồng, tạo ra một tình huống khó xử thú vị để duy trì câu chuyện."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "judgeId": "opening_judge_2",
+      "ranking": [
+        "c9_mud_mason",
+        "c8_wind_navigator",
+        "c6_labor_appraiser"
+      ],
+      "scores": [
+        {
+          "candidateId": "c9_mud_mason",
+          "openingPull": 9,
+          "worldSpecificity": 9,
+          "protagonistAgency": 9,
+          "causalReward": 8,
+          "characterLife": 8,
+          "seriality30": 9,
+          "proseNaturalness": 8,
+          "readChapter4": 9,
+          "criticalFails": [],
+          "evidence": [
+            {
+              "chapterNumber": 1,
+              "excerpt": "Một bao tải nhỏ tro trắng mịn, thứ mà anh phải len lỏi vào những hang động sâu nhất, nơi không khí đặc quánh, để cạo được từ vách đá.",
+              "reason": "Chi tiết này xây dựng thế giới rất tốt, cho thấy sự khan hiếm và nguy hiểm của nguyên liệu xây dựng trong bối cảnh hậu tận thế."
+            },
+            {
+              "chapterNumber": 2,
+              "excerpt": "Bùn sinh mệnh không phải là đất đá. Nó là một dòng chảy. Mỗi người là một mắt xích. Xích đứt, bùn chết.",
+              "reason": "Thiết lập một cơ chế kỹ thuật độc đáo gắn liền với sự hợp tác xã hội, tạo ra áp lực cao cho hành động của nhân vật."
+            },
+            {
+              "chapterNumber": 3,
+              "excerpt": "Nếu không được chăm sóc, nó sẽ trả lại chất độc đó cho chúng ta.",
+              "reason": "Một cú lật (twist) về mặt kỹ thuật dẫn đến hệ quả chính trị sâu sắc, buộc nhân vật phải tiến hóa từ thợ xây thành nhà lãnh đạo."
+            }
+          ]
+        },
+        {
+          "candidateId": "c8_wind_navigator",
+          "openingPull": 8,
+          "worldSpecificity": 8,
+          "protagonistAgency": 9,
+          "causalReward": 8,
+          "characterLife": 7,
+          "seriality30": 8,
+          "proseNaturalness": 7,
+          "readChapter4": 8,
+          "criticalFails": [],
+          "evidence": [
+            {
+              "chapterNumber": 1,
+              "excerpt": "Hãy đặt phiến đá đó ở rìa phía tây, nghiêng một góc ba mươi độ về hướng bắc!",
+              "reason": "Nhân vật thể hiện năng lực chuyên môn cụ thể, không chỉ là may mắn, tạo ra sự tin tưởng vào kỹ năng của protagonist."
+            },
+            {
+              "chapterNumber": 2,
+              "excerpt": "Những tấm lưới rêu, vốn dùng để tăng diện tích ngưng tụ, giờ đây được bao phủ bởi một lớp bùn đen kịt, sền sệt. Đó là hỗn hợp của nước và tro độc.",
+              "reason": "Sự cố kỹ thuật logic phát sinh từ chính giải pháp trước đó, thúc đẩy cốt truyện phát triển tự nhiên."
+            },
+            {
+              "chapterNumber": 3,
+              "excerpt": "Cậu nhận ra rằng việc chinh phục cơn gió dễ dàng hơn nhiều so với việc chinh phục lòng tham của con người.",
+              "reason": "Kết thúc chương 3 mở ra một hướng đi mới về xung đột giai cấp, nâng tầm câu chuyện từ sinh tồn thuần túy sang chính trị."
+            }
+          ]
+        },
+        {
+          "candidateId": "c6_labor_appraiser",
+          "openingPull": 7,
+          "worldSpecificity": 7,
+          "protagonistAgency": 8,
+          "causalReward": 7,
+          "characterLife": 8,
+          "seriality30": 7,
+          "proseNaturalness": 7,
+          "readChapter4": 7,
+          "criticalFails": [],
+          "evidence": [
+            {
+              "chapterNumber": 1,
+              "excerpt": "Lượng calo tiêu thụ: khoảng 3500 mỗi người. Hao mòn cuốc chim: 0.7%. Lượng đất đá di dời: 18 mét khối.",
+              "reason": "Cách tiếp cận vấn đề bằng toán học và kinh tế học trong bối cảnh sinh tồn là một điểm nhấn mới lạ."
+            },
+            {
+              "chapterNumber": 2,
+              "excerpt": "Mày định giá một mạng sống ngang với một vết bỏng à?",
+              "reason": "Xung đột về giá trị thặng dư và rủi ro lao động được đưa vào rất khéo léo thông qua đối thoại của phản diện."
+            },
+            {
+              "chapterNumber": 3,
+              "excerpt": "Quyền lực không còn nằm ở cơ bắp trực tiếp đe dọa người khác, mà đang chuyển hóa thành những miếng đá phiến được khắc dấu.",
+              "reason": "Sự ra đời của tiền tệ và tích lũy tư bản được mô tả như một mầm mống tai họa mới, tạo tò mò cho các chương sau."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "judgeId": "opening_judge_3",
+      "ranking": [
+        "c6_labor_appraiser",
+        "c9_mud_mason",
+        "c8_wind_navigator"
+      ],
+      "scores": [
+        {
+          "candidateId": "c8_wind_navigator",
+          "openingPull": 9,
+          "worldSpecificity": 8.5,
+          "protagonistAgency": 10,
+          "causalReward": 9.5,
+          "characterLife": 8.5,
+          "seriality30": 10,
+          "proseNaturalness": 9,
+          "readChapter4": 10,
+          "criticalFails": [],
+          "evidence": [
+            {
+              "chapterNumber": 1,
+              "excerpt": "\"Cược với tôi đi!\" Kael nói, giọng chắc nịch. \"Nếu không có giọt nước nào trước khi phiến đá nguội, tôi sẽ làm người dọn xỉ cho ông trong một tuần trăng, không công!\"",
+              "reason": "Nhân vật chính chủ động tạo ra một tình huống căng thẳng với phần thưởng và rủi ro rõ ràng. Cậu không chỉ có một ý tưởng mà còn dám đặt cược vào nó, khiến người đọc muốn biết kết quả ngay lập tức."
+            },
+            {
+              "chapterNumber": 2,
+              "excerpt": "Nhưng niềm vui nhanh chóng bị dập tắt khi mặt trời lên và cơn gió ẩm qua đi. Những tấm lưới rêu, vốn dùng để tăng diện tích ngưng tụ, giờ đây được bao phủ bởi một lớp bùn đen kịt, sền sệt. Đó là hỗn hợp của nước và tro độc.",
+              "reason": "Câu chuyện phát triển rất tốt khi giải pháp cho một vấn đề lại tạo ra một vấn đề mới, nguy hiểm hơn. Điều này làm tăng độ phức tạp của thế giới và thử thách dành cho nhân vật chính, giữ cho câu chuyện luôn hấp dẫn."
+            },
+            {
+              "chapterNumber": 3,
+              "excerpt": "Cậu nhận ra rằng việc chinh phục cơn gió dễ dàng hơn nhiều so với việc chinh phục lòng tham của con người. Vấn đề của cậu giờ không còn là kỹ thuật, mà là chính trị.",
+              "reason": "Sự leo thang của xung đột từ kỹ thuật sang xã hội là một bước ngoặt xuất sắc. Nó cho thấy quy mô của câu chuyện đang mở rộng và nhân vật chính phải đối mặt với những thử thách trừu tượng và khó khăn hơn, tạo ra một cái kết mở đầy hứa hẹn cho chương 3."
+            }
+          ]
+        },
+        {
+          "candidateId": "c9_mud_mason",
+          "openingPull": 9.5,
+          "worldSpecificity": 9,
+          "protagonistAgency": 10,
+          "causalReward": 9.5,
+          "characterLife": 9,
+          "seriality30": 10,
+          "proseNaturalness": 9.5,
+          "readChapter4": 10,
+          "criticalFails": [],
+          "evidence": [
+            {
+              "chapterNumber": 1,
+              "excerpt": "Anh không có thời gian. Bùn sinh mệnh không chờ đợi ai... Thế giới bên ngoài biến mất. Chỉ còn lại anh và vật liệu. Anh cảm nhận được từng hạt tro đang ngậm nước, từng sợi rêu đang len lỏi, tạo thành một mạng lưới vô hình.",
+              "reason": "Đoạn văn này thiết lập nhân vật chính là một chuyên gia có năng lực và một hệ thống \"ma thuật\" (kỹ thuật) độc đáo. Sự tập trung và kỹ năng của Kian trong cơn hỗn loạn khiến anh trở nên rất hấp dẫn."
+            },
+            {
+              "chapterNumber": 2,
+              "excerpt": "Kian như một nhạc trưởng điên cuồng, la hét khẩu lệnh, tay liên tục kiểm tra độ sệt của bùn trong từng chiếc xô được chuyền đi. Một người chuyền bị vấp. Cả một xô bùn đổ xuống đất, cứng lại gần như ngay lập tức. Một mẻ bùn bị hỏng.",
+              "reason": "Câu chuyện chuyển từ hành động cá nhân sang thách thức về quản lý và hợp tác một cách hiệu quả. Sự hỗn loạn có tổ chức và thất bại nhỏ trong quá trình thử nghiệm làm cho thành công cuối cùng trở nên đáng giá và thực tế hơn."
+            },
+            {
+              "chapterNumber": 3,
+              "excerpt": "\"Nếu chúng ta chia tường, ai sẽ bảo trì mặt ngoài? Nếu bức tường của phe này nứt vỡ, chất độc sẽ bay sang nhà của phe kia. Trách nhiệm đó thuộc về ai?\" Câu hỏi của anh treo lơ lửng trong không khí, nặng trịch và phức tạp hơn bất kỳ mẻ bùn nào họ từng trộn.",
+              "reason": "Chi tiết bất ngờ về việc \"bùn sinh mệnh\" có độc và cần bảo trì chung là một cú twist tuyệt vời. Nó biến một vật liệu xây dựng thành một hợp đồng xã hội, buộc các nhân vật phải đối mặt với vấn đề trách nhiệm tập thể. Đây là một cái kết chương cực kỳ thông minh và mạnh mẽ."
+            }
+          ]
+        },
+        {
+          "candidateId": "c6_labor_appraiser",
+          "openingPull": 10,
+          "worldSpecificity": 8.5,
+          "protagonistAgency": 10,
+          "causalReward": 10,
+          "characterLife": 9.5,
+          "seriality30": 10,
+          "proseNaturalness": 9.5,
+          "readChapter4": 10,
+          "criticalFails": [],
+          "evidence": [
+            {
+              "chapterNumber": 1,
+              "excerpt": "\"18 mét khối. Với độ cứng của đá vôi xám khu vực phía đông, tám người các anh chỉ tiêu hao một lượng sức tương đương 40 lít nước. Các anh đang lấy dư 20 lít.\" Lần đầu tiên, quyền lực cơ bắp bị thách thức bởi một bảng cân đối kế toán vô hình.",
+              "reason": "Prêmisse cực kỳ độc đáo và hấp dẫn. Nhân vật chính sử dụng trí tuệ và dữ liệu làm vũ khí để đối đầu với sức mạnh thể chất. Cuộc đối đầu này rất căng thẳng và cách giải quyết thông minh khiến người đọc bị cuốn hút ngay lập tức."
+            },
+            {
+              "chapterNumber": 2,
+              "excerpt": "\"Mày định giá một mạng sống ngang với một vết bỏng à?\" Lập luận sắc bén và hợp lý. An nhận ra ngay lỗ hổng trong hệ thống của mình. Anh đã định giá lao động, nhưng chưa định giá rủi ro.",
+              "reason": "Nhân vật phản diện đưa ra một lập luận thông minh và hợp lý, làm cho xung đột trở nên sâu sắc hơn. Câu chuyện không chỉ là \"người tốt đấu kẻ xấu\" mà là một cuộc tranh luận phức tạp về giá trị và sự công bằng, khiến nó trở nên rất thú vị."
+            },
+            {
+              "chapterNumber": 3,
+              "excerpt": "Chúng đang tích trữ. Quyền lực không còn nằm ở cơ bắp trực tiếp đe dọa người khác, mà đang chuyển hóa thành những miếng đá phiến được khắc dấu. An chợt thấy lạnh sống lưng. Anh đã tạo ra một công cụ để đo lường lao động, nhưng con người lại nhanh chóng biến nó thành công cụ để tích lũy quyền lực.",
+              "reason": "Đây là một bước phát triển cốt truyện xuất sắc. Hệ thống được tạo ra để giải quyết sự bất công lại vô tình tạo ra một hình thức bất bình đẳng mới, tinh vi hơn (tích lũy vốn). Điều này cho thấy sự hiểu biết sâu sắc về các hệ thống kinh tế và xã hội, đồng thời tạo ra một vấn đề nan giải cho chương tiếp theo."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "selected": {
+    "id": "c9_mud_mason",
+    "title": "Bùn Trắng Đắp Thành",
+    "premise": "Một thợ xây nghèo tìm ra công thức nhào trộn tro trắng, nước và sợi rêu thành 'bùn sinh mệnh', vật liệu duy nhất không bị bão tro ăn mòn.",
+    "protagonistEngine": "Cảm nhận trực quan về độ kết dính, độ ẩm phân bổ và lực chịu tải của các hỗn hợp vật liệu khi trộn vào nhau.",
+    "protagonistContradiction": "Muốn xây những công trình công cộng kiên cố nhưng người dân chỉ muốn dùng vật liệu mới để vá víu lều cá nhân của họ.",
+    "advantageLimits": "Bùn sinh mệnh khô rất nhanh, đòi hỏi sự phối hợp nhịp nhàng giữa người trộn, người vận chuyển và người đắp; chậm trễ là hỏng cả mẻ.",
+    "worldReaction": "Khi thấy độ bền của bùn sinh mệnh, các phe phái đòi độc quyền công thức, bắt cóc thợ trộn bùn để phục vụ tư lợi.",
+    "openingAdvantage": "Chương một dùng lượng nước nhỏ nhào bùn sinh mệnh để vá một vết nứt hiểm nghèo trên đập giữ nước, ngăn thảm họa vỡ đập.",
+    "firstThreeChapterMechanism": "Trộn mẻ bùn lớn bằng công sức ba phe để xây lại lòng kênh. Chương ba, mái hiên chung đắp bằng bùn hoàn thành, nhưng các bên đòi chia tường ngăn.",
+    "causalCost": "Bùn sinh mệnh sau khi khô cứng cần được bôi trơn bằng một lớp dịch rêu hàng tháng, nếu không sẽ nứt vỡ và nhả lại tro độc.",
+    "mechanismFingerprint": [
+      "Tính toán tỷ lệ tro, nước và sợi rêu theo độ ẩm thời tiết.",
+      "Tổ chức dây chuyền trộn, chuyền và đắp bùn tốc độ cao.",
+      "Nghiệm thu độ chịu lực của bức tường vừa đắp.",
+      "Tiến hành quét dịch rêu bảo quản bề mặt ngoài.",
+      "Giao định mức bảo trì định kỳ cho người sử dụng công trình."
+    ],
+    "rewardLoopFingerprint": [
+      "Công trình kiên cố giúp giảm 90% chi phí sửa chữa lều tạm.",
+      "Nhà ở kín gió giúp giảm tử vong ở người già và trẻ em.",
+      "Nhân vật chính nắm giữ bí quyết công nghệ cốt lõi.",
+      "Làng xóm chuyển từ du mục sang định cư vĩnh viễn."
+    ],
+    "conflictEconomyFingerprint": [
+      "Căng thẳng vì mẻ bùn bị hỏng do người chuyền thao tác chậm.",
+      "Thợ rêu đòi tăng giá sợi rêu khi thấy nhu cầu xây dựng cao.",
+      "Tranh cãi xem nên xây tường rào bảo vệ làng hay xây nhà ở trước.",
+      "Kẻ lười biếng trốn tránh trách nhiệm bôi dịch rêu bảo trì tường."
+    ],
+    "seriality30": [
+      "Chương 1-6: Vá đập nước thành công, chứng minh sức mạnh của bùn.",
+      "Chương 7-12: Mâu thuẫn khi thợ nung lén giấu bùn để xây lò riêng.",
+      "Chương 13-18: Liên kết nhân lực xây nhà chung chống chọi mùa bão tro.",
+      "Chương 19-24: Nguy cơ sập mái nhà chung do bỏ bê bảo trì bề mặt bùn.",
+      "Chương 25-30: Chia lô đất đắp nhà, thiết lập luật sở hữu và bảo trì bất động sản."
+    ],
+    "antiStupidOpponent": "Thợ rêu tăng giá bán sợi rêu không phải do tham lam, mà vì việc khai thác quá mức làm cạn kiệt giống rêu, họ cần tích lũy dự phòng.",
+    "domainResearchNeeds": [
+      "Vật liệu xây dựng truyền thống (Cob, Adobe).",
+      "Kỹ thuật thi công dây chuyền và quản lý thời gian đông kết."
+    ]
+  },
+  "callCount": 38
+}

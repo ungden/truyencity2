@@ -25,6 +25,13 @@ const PATTERNS: Array<{
     local: true,
   },
   {
+    code: 'foreign_script_text',
+    severity: 'major',
+    message: 'Prose contains characters from a foreign script outside natural Vietnamese text.',
+    pattern: /[\p{Script=Thai}\p{Script=Lao}\p{Script=Khmer}\p{Script=Myanmar}\p{Script=Cyrillic}\p{Script=Arabic}\p{Script=Hebrew}\p{Script=Devanagari}\p{Script=Bengali}\p{Script=Tamil}\p{Script=Telugu}\p{Script=Georgian}\p{Script=Armenian}]+/gu,
+    local: true,
+  },
+  {
     code: 'pipeline_leak',
     severity: 'critical',
     message: 'Pipeline, schema or model artifact leaked into prose.',

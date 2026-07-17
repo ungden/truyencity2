@@ -1,10 +1,12 @@
 import { z } from 'zod';
 import type { ArcPlanV3, ChapterPlanV3, StoryKernelV3, StoryStateV3 } from './contracts';
-import type { V3RoleContext } from './context';
+import type { V3RoleContext, V3RoleContexts } from './context';
+import { buildV3ProseSpans, type V3ProseSpan } from './evidence-spans';
 import { runV3ProsePreflight, type V3Evidence } from './preflight';
 import {
   QualityVerdictV3ModelSchema,
   evaluateQualityV3,
+  type GroundedQualityVerdictV3Model,
   type QualityVerdictV3,
   type QualityVerdictV3Model,
 } from './quality';
@@ -37,7 +39,7 @@ export interface FlagshipV3PipelineInput {
   state: StoryStateV3;
   plan: ChapterPlanV3;
   targetWordCount: number;
-  contexts: Pick<Record<'writer' | 'editor' | 'revision', V3RoleContext>, 'writer' | 'editor' | 'revision'>;
+  contexts: V3RoleContexts;
 }
 
 export interface FlagshipV3PipelineOutput {
@@ -75,32 +77,41 @@ function parseJson<T>(raw: string, schema: z.ZodType<T>, label: string): T {
   return parsed.data;
 }
 
-function grounded(content: string, evidence: V3Evidence[]): V3Evidence[] {
-  return evidence.map(item => {
-    const start = content.indexOf(item.excerpt);
-    if (start < 0) throw new FlagshipV3Error('infra_blocked', `Editor evidence is not grounded: ${item.code}.`);
-    return { ...item, start, end: start + item.excerpt.length };
+function groundEditor(editor: QualityVerdictV3Model, spans: V3ProseSpan[]): GroundedQualityVerdictV3Model {
+  const byId = new Map(spans.map(span => [span.id, span]));
+  const evidence = editor.evidence.map(item => {
+    const span = byId.get(item.spanId);
+    if (!span) throw new FlagshipV3Error('infra_blocked', `Editor evidence references unknown span: ${item.spanId}.`);
+    return { code: item.code, severity: item.severity, message: item.message, local: item.local, start: span.start, end: span.end, excerpt: span.text };
   });
-}
-
-function groundEditor(content: string, editor: QualityVerdictV3Model): QualityVerdictV3Model {
-  const evidence = grounded(content, editor.evidence);
   const realizedDeltaEvidence = editor.realizedDeltaEvidence.map(item => {
-    const start = content.indexOf(item.excerpt);
-    if (start < 0) throw new FlagshipV3Error('infra_blocked', `Delta evidence is not grounded: ${item.deltaId}.`);
-    return { ...item, start, end: start + item.excerpt.length };
+    const span = byId.get(item.spanId);
+    if (!span) throw new FlagshipV3Error('infra_blocked', `Delta evidence references unknown span: ${item.spanId}.`);
+    return { deltaId: item.deltaId, start: span.start, end: span.end, excerpt: span.text };
   });
   return { ...editor, evidence, realizedDeltaEvidence };
 }
 
-function assertAuditable(editor: QualityVerdictV3Model): void {
+function assertAuditable(editor: GroundedQualityVerdictV3Model, deterministicEvidence: V3Evidence[]): void {
   const failedGate = Object.values(editor.hardGates).some(value => !value);
   const failedAxis = Object.values(editor.axes).some(value => value < 7);
-  if ((editor.decision !== 'publish' || failedGate || failedAxis) && editor.evidence.length === 0) {
+  if ((editor.decision !== 'publish' || failedGate || failedAxis)
+    && editor.evidence.length === 0
+    && deterministicEvidence.length === 0) {
     throw new FlagshipV3Error('infra_blocked', 'Editor returned a failing verdict without grounded evidence.');
   }
   if (editor.decision === 'revise' && editor.revisionInstructions.length === 0) {
     throw new FlagshipV3Error('infra_blocked', 'Editor requested revision without scoped instructions.');
+  }
+  if (editor.decision === 'revise') {
+    const mutableFoundation = /(?:cập nhật|sửa|đổi|điều chỉnh).{0,40}(?:state|tracking|plan|kế hoạch|canon|artifact)/iu;
+    if (editor.revisionInstructions.some(instruction => mutableFoundation.test(instruction))) {
+      throw new FlagshipV3Error(
+        'infra_blocked',
+        'Editor attempted to repair prose by mutating immutable story artifacts.',
+        { revisionInstructions: editor.revisionInstructions },
+      );
+    }
   }
 }
 
@@ -132,9 +143,10 @@ export async function executeFlagshipV3Pipeline(
   let deterministicEvidence = runV3ProsePreflight(draft.content, input.plan);
 
   const edit = async (role: 'editor' | 'editor_recheck', context: V3RoleContext): Promise<{
-    editor: QualityVerdictV3Model;
+    editor: GroundedQualityVerdictV3Model;
     verdict: QualityVerdictV3;
   }> => {
+    const spans = buildV3ProseSpans(draft.content);
     const raw = await invoke({
       role,
       systemPrompt: V3_EDITOR_SYSTEM,
@@ -143,12 +155,13 @@ export async function executeFlagshipV3Pipeline(
         context,
         title: draft.title,
         content: draft.content,
+        spans,
         deterministicEvidence,
       }),
       jsonMode: true,
     });
-    const editor = groundEditor(draft.content, parseJson(raw, QualityVerdictV3ModelSchema, role));
-    assertAuditable(editor);
+    const editor = groundEditor(parseJson(raw, QualityVerdictV3ModelSchema, role), spans);
+    assertAuditable(editor, deterministicEvidence);
     return { editor, verdict: evaluateQualityV3({ plan: input.plan, editor, deterministicEvidence }) };
   };
 
@@ -171,7 +184,7 @@ export async function executeFlagshipV3Pipeline(
     systemPrompt: V3_WRITER_SYSTEM,
     userPrompt: buildV3RevisionPrompt({
       chapterNumber: input.plan.chapterNumber,
-      context: input.contexts.revision,
+      context: input.contexts.revision(),
       title: draft.title,
       content: draft.content,
       evidence,

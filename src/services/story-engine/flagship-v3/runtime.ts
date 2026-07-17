@@ -185,8 +185,8 @@ export async function writeFlagshipV3Chapter(
     (blueprint?.meta as { chapterPlanV3?: unknown } | null)?.chapterPlanV3,
   );
   const contexts = buildV3RoleContexts({ kernel, arc, state, plan });
-  const contextManifest = Object.values(contexts).flatMap(context => context.manifest);
-  const contextSize = Object.values(contexts).reduce((sum, context) => sum + context.chars, 0);
+  let contextManifest = contexts.used().flatMap(context => context.manifest);
+  let contextSize = contexts.used().reduce((sum, context) => sum + context.chars, 0);
   let run: WriteRunHandle | null = null;
   let attemptId: string | null = null;
   let estimatedCostUsd = 0;
@@ -271,6 +271,14 @@ export async function writeFlagshipV3Chapter(
         targetWordCount,
         contexts,
       }, { invoke });
+      contextManifest = contexts.used().flatMap(context => context.manifest);
+      contextSize = contexts.used().reduce((sum, context) => sum + context.chars, 0);
+      await updateWriteRunTelemetry(run, {
+        contextSizeChars: contextSize,
+        contextManifest,
+        promptVersion: FLAGSHIP_V3_PROMPT_VERSION,
+        modelRoute: routes,
+      });
     } catch (caught) {
       if (caught instanceof FlagshipV3Error) throw caught;
       const message = caught instanceof Error ? caught.message : String(caught);

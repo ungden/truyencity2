@@ -3,6 +3,7 @@ import {
   ChapterPlanV3Schema,
   StoryKernelV3Schema,
   StoryStateV3Schema,
+  RollingPlanWindowDraftV3Schema,
   MarketResearchSnapshotV3Schema,
   buildV3RoleContexts,
   executeFlagshipV3Pipeline,
@@ -18,6 +19,7 @@ import {
   type StoryStateV3,
 } from '@/services/story-engine/flagship-v3';
 import { classifyStoryFailure } from '@/lib/story-production-quota';
+import { toGeminiResponseJsonSchema } from '@/services/story-engine/flagship/setup-response-schemas';
 
 const detailed = (value: string) => `${value} với nguyên nhân, giới hạn và hậu quả cụ thể trong thế giới truyện.`;
 const prose = (marker: string, bad = '') => `${marker} ${bad} ${'Sơn làm việc bằng đôi tay chai sần, kiểm tra từng thay đổi rồi mới gọi người nhà đến chứng kiến kết quả. '.repeat(18)}`.trim();
@@ -80,6 +82,9 @@ function kernel(): StoryKernelV3 {
         unit: 'dong',
         sourceRules: ['Chỉ tăng từ giao dịch có người trả tiền'],
         spendRules: ['Mọi khoản mua dụng cụ phải bị trừ'],
+        referenceScale: ['100 đồng mua được 2 ký muối sạch tại mốc đầu truyện'],
+        minimumValue: 0,
+        maximumValue: 1000000000,
         scarcity: detailed('Gia đình thiếu vốn trong giai đoạn đầu'),
       },
       {
@@ -89,6 +94,9 @@ function kernel(): StoryKernelV3 {
         unit: 'kg',
         sourceRules: ['Chỉ có từ số muối đã rửa và để ráo'],
         spendRules: ['Ướp cá phải trừ đúng khối lượng'],
+        referenceScale: ['2 ký muối đủ ướp một mẻ cá thử quy mô gia đình'],
+        minimumValue: 0,
+        maximumValue: 10000,
         scarcity: detailed('Muối sạch chưa có nguồn ổn định'),
       },
       {
@@ -98,6 +106,9 @@ function kernel(): StoryKernelV3 {
         unit: null,
         sourceRules: ['Chỉ đổi khi một người mua cam kết'],
         spendRules: ['Uy tín bị giảm nếu giao sai chất lượng'],
+        referenceScale: null,
+        minimumValue: null,
+        maximumValue: null,
         scarcity: detailed('Gia đình chưa có khách hàng trực tiếp'),
       },
     ],
@@ -145,6 +156,7 @@ function plan(): ChapterPlanV3 {
   return ChapterPlanV3Schema.parse({
     schemaVersion: 3,
     chapterNumber: 1,
+    elapsedMinutesSincePreviousChapter: 0,
     chapterPromise: detailed('Sơn dùng mẻ muối sạch để giữ được lô cá đầu tiên'),
     preconditions: [{ factId: 'weather', expectedValue: 'mưa sẽ đến trước bình minh' }],
     scenes: [
@@ -153,7 +165,6 @@ function plan(): ChapterPlanV3 {
         povCharacterId: 'nguyen_hai_son',
         participantIds: ['nguyen_hai_son', 'ba_son'],
         locationId: 'san_nha',
-        startMinute: 0,
         durationMinutes: 30,
         travelMinutesFromPrevious: 0,
         desire: detailed('Sơn cần thuyết phục cha cho dùng số muối sạch còn lại'),
@@ -172,7 +183,6 @@ function plan(): ChapterPlanV3 {
         povCharacterId: 'nguyen_hai_son',
         participantIds: ['nguyen_hai_son', 'me_son'],
         locationId: 'san_nha',
-        startMinute: 35,
         durationMinutes: 45,
         travelMinutesFromPrevious: 5,
         desire: detailed('Sơn cần ướp xong lô cá trước khi mưa tràn vào sân'),
@@ -232,13 +242,26 @@ const hardGates = {
   promptLeak: true,
   planFidelity: true,
 };
-const deltaEvidence = (content: string) => plan().requiredDeltas.map((delta, index) => {
-  const excerpt = index === 0 ? 'đôi tay chai sần' : 'kiểm tra từng thay đổi';
-  const start = content.indexOf(excerpt);
-  return { deltaId: delta.id, start, end: start + excerpt.length, excerpt };
-});
+const deltaEvidence = (_content: string) => plan().requiredDeltas.map(delta => ({ deltaId: delta.id, spanId: 'span_001' }));
 
 describe('flagship v3 core engine', () => {
+  it('keeps arithmetic-derived absolute scene time out of the Planner model contract', () => {
+    const schema = JSON.stringify(toGeminiResponseJsonSchema(RollingPlanWindowDraftV3Schema));
+    expect(schema).toContain('elapsedMinutesSincePreviousChapter');
+    expect(schema).not.toContain('startMinute');
+    expect(schema).not.toContain('valueBefore');
+    expect(schema).not.toContain('"before"');
+    expect(schema).not.toContain('"unit"');
+  });
+
+  it('requires an explicit scale anchor for every numeric story resource', () => {
+    const invalid = {
+      ...kernel(),
+      resources: kernel().resources.map(resource => resource.id === 'cash' ? { ...resource, referenceScale: null } : resource),
+    };
+    expect(StoryKernelV3Schema.safeParse(invalid).success).toBe(false);
+  });
+
   it('blocks stale or arithmetically invalid plans before any model call', () => {
     const invalid = {
       ...plan(),
@@ -250,6 +273,19 @@ describe('flagship v3 core engine', () => {
     );
   });
 
+  it('blocks a numeric resource spend below its story-specific lower bound', () => {
+    const invalid = {
+      ...plan(),
+      requiredDeltas: plan().requiredDeltas.map(delta =>
+        delta.id === 'salt_spent' && delta.kind === 'resource_numeric'
+          ? { ...delta, delta: -4, after: -1 }
+          : delta),
+    };
+    expect(validateV3Artifacts({ kernel: kernel(), arc, state: state(), plan: invalid })).toEqual(
+      expect.arrayContaining([expect.objectContaining({ code: 'resource_below_minimum' })]),
+    );
+  });
+
   it('detects CJK and verbatim plan prose without a model critic', () => {
     const content = `${plan().scenes[0].desire} kim loại拼凑 lại.`;
     expect(runV3ProsePreflight(content, plan()).map(item => item.code)).toEqual(
@@ -257,8 +293,16 @@ describe('flagship v3 core engine', () => {
     );
   });
 
+  it('grounds accidental Thai-script contamination before the Editor call', () => {
+    const content = 'Cô nói rất khẽ, môiแทบไม่ mấp máy rồi lập tức im lặng.';
+    expect(runV3ProsePreflight(content, plan())).toEqual(expect.arrayContaining([
+      expect.objectContaining({ code: 'foreign_script_text', excerpt: 'แทบไม่' }),
+    ]));
+  });
+
   it('publishes with exactly Writer and Editor calls', async () => {
     const contexts = buildV3RoleContexts({ kernel: kernel(), arc, state: state(), plan: plan() });
+    expect(contexts.used().map(context => context.role)).toEqual(['writer', 'editor']);
     const content = prose('Sơn đặt hai mươi đồng xuống phản gỗ rồi dùng hai ký muối cho mẻ cá.');
     const calls: string[] = [];
     const result = await executeFlagshipV3Pipeline({
@@ -274,6 +318,7 @@ describe('flagship v3 core engine', () => {
       },
     });
     expect(calls).toEqual(['writer', 'editor']);
+    expect(contexts.used().map(context => context.role)).toEqual(['writer', 'editor']);
     expect(result.verdict.decision).toBe('publish');
   });
 
@@ -290,11 +335,9 @@ describe('flagship v3 core engine', () => {
         if (call.role === 'writer') return JSON.stringify({ title: 'Mẻ Cá Qua Mưa', content: bad });
         if (call.role === 'writer_revision') return JSON.stringify({ title: 'Mẻ Cá Qua Mưa', content: fixed });
         if (call.role === 'editor') {
-          const excerpt = 'CÂU CỤC BỘ SAI.';
-          const start = bad.indexOf(excerpt);
           return JSON.stringify({
             decision: 'revise', confidence: 0.84, planFidelity: 8.6, hardGates, axes,
-            evidence: [{ code: 'local_prose', severity: 'moderate', message: 'Câu cục bộ phá giọng.', start, end: start + excerpt.length, excerpt, local: true }],
+            evidence: [{ code: 'local_prose', severity: 'moderate', message: 'Câu cục bộ phá giọng.', spanId: 'span_001', local: true }],
             revisionInstructions: ['Bỏ câu cục bộ, giữ nguyên sự kiện.'],
             realizedDeltaEvidence: deltaEvidence(bad),
           });
@@ -306,7 +349,54 @@ describe('flagship v3 core engine', () => {
       },
     });
     expect(calls).toEqual(['writer', 'editor', 'writer_revision', 'editor_recheck']);
+    expect(contexts.used().map(context => context.role)).toEqual(['writer', 'editor', 'revision']);
     expect(result.revisionLineage).toHaveLength(1);
+  });
+
+  it('lets deterministic preflight own evidence without forcing the Editor to duplicate it', async () => {
+    const contexts = buildV3RoleContexts({ kernel: kernel(), arc, state: state(), plan: plan() });
+    const contaminated = prose('Sơn đặt hai mươi đồng xuống phản gỗ rồi dùng hai ký muối cho mẻ cá.', 'ký tự收lỗi');
+    const fixed = prose('Sơn đặt hai mươi đồng xuống phản gỗ rồi dùng hai ký muối cho mẻ cá.');
+    const result = await executeFlagshipV3Pipeline({
+      kernel: kernel(), arc, state: state(), plan: plan(), targetWordCount: 1600, contexts,
+    }, {
+      invoke: async call => {
+        if (call.role === 'writer') return JSON.stringify({ title: 'Mẻ Cá Qua Mưa', content: contaminated });
+        if (call.role === 'writer_revision') return JSON.stringify({ title: 'Mẻ Cá Qua Mưa', content: fixed });
+        if (call.role === 'editor') {
+          return JSON.stringify({
+            decision: 'revise', confidence: 0.9, planFidelity: 9, hardGates,
+            axes: { ...axes, prose_naturalness: 6 }, evidence: [],
+            revisionInstructions: ['Xóa ký tự ngoại lai đã được deterministic preflight định vị.'],
+            realizedDeltaEvidence: deltaEvidence(contaminated),
+          });
+        }
+        return JSON.stringify({
+          decision: 'publish', confidence: 0.9, planFidelity: 9, hardGates, axes,
+          evidence: [], revisionInstructions: [], realizedDeltaEvidence: deltaEvidence(fixed),
+        });
+      },
+    });
+    expect(result.callRoles).toEqual(['writer', 'editor', 'writer_revision', 'editor_recheck']);
+    expect(result.verdict.decision).toBe('publish');
+  });
+
+  it('rejects an editor instruction that tries to mutate immutable story state', async () => {
+    const contexts = buildV3RoleContexts({ kernel: kernel(), arc, state: state(), plan: plan() });
+    const bad = prose('Sơn đặt tiền rồi ướp cá.', 'CÂU CỤC BỘ SAI.');
+    await expect(executeFlagshipV3Pipeline({
+      kernel: kernel(), arc, state: state(), plan: plan(), targetWordCount: 1600, contexts,
+    }, {
+      invoke: async call => {
+        if (call.role === 'writer') return JSON.stringify({ title: 'Mẻ Cá Qua Mưa', content: bad });
+        return JSON.stringify({
+          decision: 'revise', confidence: 0.84, planFidelity: 8.6, hardGates, axes,
+          evidence: [{ code: 'local_prose', severity: 'moderate', message: 'Câu cục bộ phá giọng.', spanId: 'span_001', local: true }],
+          revisionInstructions: ['Giữ nguyên câu này và cập nhật state tracking ở chương sau.'],
+          realizedDeltaEvidence: deltaEvidence(bad),
+        });
+      },
+    })).rejects.toThrow('mutating immutable story artifacts');
   });
 
   it('does not require the protagonist full name to appear in prose', () => {

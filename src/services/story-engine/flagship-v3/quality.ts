@@ -19,6 +19,14 @@ export const V3EvidenceSchema = z.object({
   local: z.boolean(),
 }).strict();
 
+export const V3EditorEvidenceClaimSchema = z.object({
+  code: z.string().trim().min(2),
+  severity: z.enum(['critical', 'major', 'moderate']),
+  message: z.string().trim().min(5),
+  spanId: z.string().regex(/^span_\d{3,}$/),
+  local: z.boolean(),
+}).strict();
+
 export const QualityVerdictV3ModelSchema = z.object({
   decision: z.enum(['publish', 'revise', 'reject']),
   confidence: z.number().min(0).max(1),
@@ -35,17 +43,19 @@ export const QualityVerdictV3ModelSchema = z.object({
   axes: z.object(Object.fromEntries(
     V3_AXIS_KEYS.map(key => [key, z.number().min(0).max(10)]),
   ) as Record<V3QualityAxis, z.ZodNumber>).strict(),
-  evidence: z.array(V3EvidenceSchema).max(30),
+  evidence: z.array(V3EditorEvidenceClaimSchema).max(30),
   revisionInstructions: z.array(z.string().trim().min(5)).max(8),
   realizedDeltaEvidence: z.array(z.object({
     deltaId: z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/),
-    start: z.number().int().min(0),
-    end: z.number().int().min(0),
-    excerpt: z.string().min(1).max(800),
+    spanId: z.string().regex(/^span_\d{3,}$/),
   }).strict()).max(30),
 }).strict();
 
 export type QualityVerdictV3Model = z.infer<typeof QualityVerdictV3ModelSchema>;
+export type GroundedQualityVerdictV3Model = Omit<QualityVerdictV3Model, 'evidence' | 'realizedDeltaEvidence'> & {
+  evidence: V3Evidence[];
+  realizedDeltaEvidence: Array<{ deltaId: string; start: number; end: number; excerpt: string }>;
+};
 
 export interface QualityVerdictV3 {
   version: 3;
@@ -56,7 +66,7 @@ export interface QualityVerdictV3 {
   weightedMean: number;
   axes: Record<V3QualityAxis, number>;
   evidence: V3Evidence[];
-  realizedDeltaEvidence: QualityVerdictV3Model['realizedDeltaEvidence'];
+  realizedDeltaEvidence: GroundedQualityVerdictV3Model['realizedDeltaEvidence'];
 }
 
 const WEIGHTS: Record<V3QualityAxis, number> = {
@@ -77,7 +87,7 @@ const SERIOUS_HARD_GATES = ['canon', 'timeline', 'resourceCausality', 'character
 
 export function evaluateQualityV3(input: {
   plan: ChapterPlanV3;
-  editor: QualityVerdictV3Model;
+  editor: GroundedQualityVerdictV3Model;
   deterministicEvidence: V3Evidence[];
 }): QualityVerdictV3 {
   const evidence = [...input.deterministicEvidence, ...input.editor.evidence];

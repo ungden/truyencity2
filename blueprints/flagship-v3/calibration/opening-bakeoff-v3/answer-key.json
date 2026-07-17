@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 3,
+  "baselineDirectory": "offline-opening",
+  "candidateDirectory": "offline-opening-writer31-v33",
+  "pairs": [
+    {
+      "id": "dt-01-ch1",
+      "optionA": "baseline",
+      "optionB": "candidate"
+    },
+    {
+      "id": "dt-01-ch2",
+      "optionA": "baseline",
+      "optionB": "candidate"
+    },
+    {
+      "id": "dt-01-ch3",
+      "optionA": "candidate",
+      "optionB": "baseline"
+    },
+    {
+      "id": "hx-01-ch1",
+      "optionA": "baseline",
+      "optionB": "candidate"
+    },
+    {
+      "id": "hx-04-ch1",
+      "optionA": "candidate",
+      "optionB": "baseline"
+    },
+    {
+      "id": "hx-04-ch2",
+      "optionA": "candidate",
+      "optionB": "baseline"
+    },
+    {
+      "id": "hx-04-ch3",
+      "optionA": "baseline",
+      "optionB": "candidate"
+    },
+    {
+      "id": "th-01-ch1",
+      "optionA": "baseline",
+      "optionB": "candidate"
+    },
+    {
+      "id": "th-01-ch2",
+      "optionA": "candidate",
+      "optionB": "baseline"
+    },
+    {
+      "id": "dt-11-ch1",
+      "optionA": "baseline",
+      "optionB": "candidate"
+    },
+    {
+      "id": "dt-11-ch2",
+      "optionA": "baseline",
+      "optionB": "candidate"
+    },
+    {
+      "id": "dt-11-ch3",
+      "optionA": "baseline",
+      "optionB": "candidate"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 3,
+  "selectedConceptId": "c9_mud_mason",
+  "title": "Bảo Tôi Xây Thành Trên Tro Trắng, Tôi Lại Bắt Đầu Bằng Lịch Thay Đá",
+  "routeVersion": "canary-gemini-v3.2",
+  "calls": [
+    {
+      "role": "kernel_architect",
+      "model": "gemini-3.1-pro-preview",
+      "routeVersion": "canary-gemini-v3.2",
+      "promptVersion": "flagship-v3-kernel-2026-07-17.7",
+      "promptDigest": "1622e9cb6e50ded0cbec9ddeea520b4761e0950e5fda5c9b7ee5e135caa433c8",
+      "estimatedCostUsd": 0.130934,
+      "promptTokens": 8167,
+      "completionTokens": 9550,
+      "finishReason": "STOP",
+      "reused": false
+    },
+    {
+      "role": "state_seeder",
+      "model": "gemini-3.1-pro-preview",
+      "routeVersion": "canary-gemini-v3.2",
+      "promptVersion": "flagship-v3-state-seeder-2026-07-17.5",
+      "promptDigest": "62993a39b59d54655dfe64f140300accb677e2f8aec7477288979beb0b3fb030",
+      "estimatedCostUsd": 0.047672,
+      "promptTokens": 2800,
+      "completionTokens": 3506,
+      "finishReason": "STOP",
+      "reused": false
+    },
+    {
+      "role": "arc_architect",
+      "model": "gemini-3.1-pro-preview",
+      "routeVersion": "canary-gemini-v3.2",
+      "promptVersion": "flagship-v3-arc-2026-07-16.2",
+      "promptDigest": "018504f0fb26cef85df552a75132cb06c0cd203acce98f9e0cb8358b919e3ee4",
+      "estimatedCostUsd": 0.03449,
+      "promptTokens": 4405,
+      "completionTokens": 2140,
+      "finishReason": "STOP",
+      "reused": false
+    },
+    {
+      "role": "initial_rolling_planner",
+      "model": "gemini-3.1-pro-preview",
+      "routeVersion": "canary-gemini-v3.2",
+      "promptVersion": "flagship-v3.9-no-forced-filler-scene",
+      "promptDigest": "01d5bcf09fec8f4d930297f42f7f02f8bf7cf0c6c32d99f981ef8c1bb69f7313",
+      "estimatedCostUsd": 0.204814,
+      "promptTokens": 4931,
+      "completionTokens": 16246,
+      "finishReason": "STOP",
+      "reused": false
+    }
+  ],
+  "estimatedCostUsd": 0.41791,
+  "createdAt": "2026-07-17T12:53:47.731Z"
+}

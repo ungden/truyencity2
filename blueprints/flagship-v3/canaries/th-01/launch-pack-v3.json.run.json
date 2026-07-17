@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 3,
+  "selectedConceptId": "th_01_c01",
+  "title": "Trọng Sinh Về Gia Tộc Tu Tiên, Tôi Gieo Tiếng Vọng Cho Mười Năm Sau",
+  "routeVersion": "canary-gemini-v3.2",
+  "calls": [
+    {
+      "role": "kernel_architect",
+      "model": "gemini-3.1-pro-preview",
+      "routeVersion": "canary-gemini-v3.2",
+      "promptVersion": "flagship-v3-kernel-2026-07-17.7",
+      "promptDigest": "126cc1563c714cfe230e198022caad0de9b8b4b242bb3a217587a66d857e6330",
+      "estimatedCostUsd": 0.136318,
+      "promptTokens": 9233,
+      "completionTokens": 9821,
+      "finishReason": "STOP",
+      "reused": false
+    },
+    {
+      "role": "state_seeder",
+      "model": "gemini-3.1-pro-preview",
+      "routeVersion": "canary-gemini-v3.2",
+      "promptVersion": "flagship-v3-state-seeder-2026-07-17.5",
+      "promptDigest": "57828562e49aa6fad1e3f317bd893dfcac5c354eb33d0d5fcabb7d522adc5b49",
+      "estimatedCostUsd": 0.063242,
+      "promptTokens": 2935,
+      "completionTokens": 4781,
+      "finishReason": "STOP",
+      "reused": false
+    },
+    {
+      "role": "arc_architect",
+      "model": "gemini-3.1-pro-preview",
+      "routeVersion": "canary-gemini-v3.2",
+      "promptVersion": "flagship-v3-arc-2026-07-16.2",
+      "promptDigest": "52ca419e05169e318c809f6c7acba57ec24b2ad549755df550eada356d5bfc0b",
+      "estimatedCostUsd": 0.035732,
+      "promptTokens": 5254,
+      "completionTokens": 2102,
+      "finishReason": "STOP",
+      "reused": false
+    },
+    {
+      "role": "initial_rolling_planner",
+      "model": "gemini-3.1-pro-preview",
+      "routeVersion": "canary-gemini-v3.2",
+      "promptVersion": "flagship-v3.9-no-forced-filler-scene",
+      "promptDigest": "f96c5ef72e5cae640a05460facd73bea72213641e83bdb5713307160b163c3da",
+      "estimatedCostUsd": 0.146506,
+      "promptTokens": 5255,
+      "completionTokens": 11333,
+      "finishReason": "STOP",
+      "reused": false
+    }
+  ],
+  "estimatedCostUsd": 0.381798,
+  "createdAt": "2026-07-17T12:53:12.264Z"
+}

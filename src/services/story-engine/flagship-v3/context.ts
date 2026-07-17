@@ -25,6 +25,13 @@ export interface V3RoleContext {
   manifest: V3ContextManifestEntry[];
 }
 
+export interface V3RoleContexts {
+  writer: V3RoleContext;
+  editor: V3RoleContext;
+  revision: () => V3RoleContext;
+  used: () => V3RoleContext[];
+}
+
 type Block = { id: string; sourceRef: string; value: unknown; required?: boolean };
 
 function assemble(role: V3Role, blocks: Block[]): V3RoleContext {
@@ -73,6 +80,35 @@ function projectKernel(kernel: StoryKernelV3, plan: ChapterPlanV3) {
   };
 }
 
+function projectRevisionKernel(kernel: StoryKernelV3, plan: ChapterPlanV3) {
+  const characterIds = relevantCharacterIds(plan);
+  const resourceIds = new Set(plan.requiredDeltas.flatMap(delta =>
+    delta.kind === 'resource_numeric' || delta.kind === 'resource_state' ? [delta.resourceId] : [],
+  ));
+  const promiseIds = new Set(plan.requiredDeltas.flatMap(delta => delta.kind === 'promise' ? [delta.promiseId] : []));
+  return {
+    title: kernel.title,
+    genre: kernel.genre,
+    protagonistId: kernel.protagonistId,
+    pleasure: kernel.pleasure,
+    characters: kernel.characters
+      .filter(character => characterIds.has(character.id) || character.id === kernel.protagonistId)
+      .map(character => ({
+        id: character.id,
+        name: character.name,
+        aliases: character.aliases,
+        agenda: character.agenda,
+        constraint: character.constraint,
+        moralBoundary: character.moralBoundary,
+        decisionSignature: character.decisionSignature,
+        voice: character.voice,
+      })),
+    worldClaims: kernel.worldClaims,
+    resources: kernel.resources.filter(resource => resourceIds.has(resource.id)),
+    promises: kernel.promises.filter(promise => promiseIds.has(promise.id)),
+  };
+}
+
 function projectState(state: StoryStateV3, plan: ChapterPlanV3) {
   const characterIds = relevantCharacterIds(plan);
   const resourceIds = new Set(plan.requiredDeltas.flatMap(delta =>
@@ -101,30 +137,39 @@ export function buildV3RoleContexts(input: {
   arc: ArcPlanV3;
   state: StoryStateV3;
   plan: ChapterPlanV3;
-}): Record<V3Role, V3RoleContext> {
+}): V3RoleContexts {
   const kernel = projectKernel(input.kernel, input.plan);
   const state = projectState(input.state, input.plan);
-  return {
-    planner: assemble('planner', [
-      { id: 'STORY_KERNEL_V3', sourceRef: 'ai_story_projects.story_kernel_v3', value: input.kernel },
-      { id: 'ARC_PLAN_V3', sourceRef: 'ai_story_projects.arc_plan_v3', value: input.arc },
-      { id: 'STORY_STATE_V3', sourceRef: 'ai_story_projects.story_state_v3', value: input.state },
-    ]),
-    writer: assemble('writer', [
+  const writer = assemble('writer', [
       { id: 'STORY_KERNEL_V3', sourceRef: 'ai_story_projects.story_kernel_v3:writer_projection', value: kernel },
       { id: 'CHAPTER_PLAN_V3', sourceRef: `chapter_blueprints:${input.plan.chapterNumber}`, value: input.plan },
       { id: 'RELEVANT_STATE_V3', sourceRef: 'ai_story_projects.story_state_v3:writer_projection', value: state },
-    ]),
-    editor: assemble('editor', [
+    ]);
+  const editor = assemble('editor', [
       { id: 'STORY_KERNEL_V3', sourceRef: 'ai_story_projects.story_kernel_v3:editor_projection', value: kernel },
       { id: 'CHAPTER_PLAN_V3', sourceRef: `chapter_blueprints:${input.plan.chapterNumber}`, value: input.plan },
       { id: 'RELEVANT_STATE_V3', sourceRef: 'ai_story_projects.story_state_v3:editor_projection', value: state },
-    ]),
-    revision: assemble('revision', [
-      { id: 'STORY_KERNEL_V3', sourceRef: 'ai_story_projects.story_kernel_v3:revision_projection', value: kernel },
-      { id: 'CHAPTER_PLAN_V3', sourceRef: `chapter_blueprints:${input.plan.chapterNumber}`, value: input.plan },
-      { id: 'RELEVANT_STATE_V3', sourceRef: 'ai_story_projects.story_state_v3:revision_projection', value: state },
-    ]),
+    ]);
+  let revisionContext: V3RoleContext | null = null;
+  const revision = (): V3RoleContext => {
+    if (!revisionContext) {
+      revisionContext = assemble('revision', [
+        {
+          id: 'STORY_KERNEL_V3',
+          sourceRef: 'ai_story_projects.story_kernel_v3:revision_projection',
+          value: projectRevisionKernel(input.kernel, input.plan),
+        },
+        { id: 'CHAPTER_PLAN_V3', sourceRef: `chapter_blueprints:${input.plan.chapterNumber}`, value: input.plan },
+        { id: 'RELEVANT_STATE_V3', sourceRef: 'ai_story_projects.story_state_v3:revision_projection', value: state },
+      ]);
+    }
+    return revisionContext;
+  };
+  return {
+    writer,
+    editor,
+    revision,
+    used: () => revisionContext ? [writer, editor, revisionContext] : [writer, editor],
   };
 }
 

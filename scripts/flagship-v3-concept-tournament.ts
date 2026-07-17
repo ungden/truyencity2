@@ -1,6 +1,7 @@
 #!/usr/bin/env tsx
 
 import 'dotenv/config';
+import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import {
@@ -11,6 +12,7 @@ import {
   MarketResearchSnapshotV3Schema,
   OpeningReviewV3Schema,
   OpeningTrialV3Schema,
+  conceptCallPromptVersionV3,
   runConceptTournamentV3,
 } from '../src/services/story-engine/flagship-v3';
 import { callFlagshipModel } from '../src/services/story-engine/flagship/provider';
@@ -25,16 +27,41 @@ const snapshotPath = value('--snapshot');
 const routesPath = value('--routes');
 const outputDir = value('--output');
 const resumeRun = value('--resume-run');
+const requestedPromptVersion = value('--prompt-version');
 if (!snapshotPath || !routesPath || !outputDir) throw new Error('--snapshot, --routes and --output are required.');
 
 const snapshot = MarketResearchSnapshotV3Schema.parse(JSON.parse(readFileSync(path.resolve(snapshotPath), 'utf8')));
 const routes = FlagshipModelRoutesV3Schema.parse(JSON.parse(readFileSync(path.resolve(routesPath), 'utf8')));
+const promptVersion = requestedPromptVersion || FLAGSHIP_V3_CONCEPT_PROMPT_VERSION;
+const historicalPromptResume = promptVersion !== FLAGSHIP_V3_CONCEPT_PROMPT_VERSION;
+let historicalResumeVerified = false;
+if (resumeRun) {
+  const manifestPath = ['tournament-run-v3.json', 'tournament-failure-v3.json']
+    .map(name => path.join(path.resolve(resumeRun), name))
+    .find(candidate => existsSync(candidate));
+  if (!manifestPath) throw new Error('Historical resume requires its original run or failure manifest.');
+  const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as {
+    snapshotId?: string;
+    routeVersion?: string;
+    promptVersion?: string;
+  };
+  if (manifest.snapshotId !== snapshot.snapshotId || manifest.routeVersion !== routes.routeVersion) {
+    throw new Error('Resume manifest does not match snapshot and route version.');
+  }
+  if (historicalPromptResume) {
+    if (manifest.promptVersion !== promptVersion) {
+      throw new Error('Historical resume manifest does not match the requested prompt version.');
+    }
+    historicalResumeVerified = true;
+  }
+}
 let estimatedCostUsd = 0;
 const calls: Array<{
   role: string;
   index: number;
   batchIndex: number | null;
   model: string;
+  thinkingLevel: 'low' | 'high';
   estimatedCostUsd: number;
   reused: boolean;
 }> = [];
@@ -52,10 +79,43 @@ const schemaFor = (role: string) => role === 'concept_generator'
       ? OpeningTrialV3Schema
       : OpeningReviewV3Schema;
 
-function checkpointContentValid(role: string, content: string): boolean {
+const thinkingLevelFor = (role: string): 'low' | 'high' =>
+  role === 'concept_generator' || role === 'opening_simulator' ? 'high' : 'low';
+
+const temperatureFor = (role: string): number =>
+  role === 'concept_generator' ? 0.85 : role === 'opening_simulator' ? 0.75 : 0.15;
+
+const callDigest = (prompt: string, model: string, role: string): string => createHash('sha256')
+  .update(JSON.stringify({
+    prompt,
+    model,
+    temperature: temperatureFor(role),
+    maxTokens: 32768,
+    thinkingLevel: thinkingLevelFor(role),
+  }))
+  .digest('hex');
+
+function checkpointContentValid(
+  role: string,
+  content: string,
+  pairs?: Array<{ leftId: string; rightId: string }>,
+): boolean {
   try {
     const value = JSON.parse(content.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, ''));
-    return schemaFor(role).safeParse(value).success;
+    if (!schemaFor(role).safeParse(value).success) return false;
+    if (role === 'concept_judge' && pairs) {
+      const batch = ConceptPairwiseBatchV3Schema.parse(value);
+      const expected = new Set(pairs.map(pair => [pair.leftId, pair.rightId].sort().join(':')));
+      return batch.comparisons.length === pairs.length && batch.comparisons.every(comparison =>
+        [comparison.leftId, comparison.rightId].includes(comparison.winnerId)
+        && expected.has([comparison.leftId, comparison.rightId].sort().join(':')),
+      );
+    }
+    if (role === 'opening_judge') {
+      const review = OpeningReviewV3Schema.parse(value);
+      return new Set(review.ranking).size === review.ranking.length;
+    }
+    return true;
   } catch {
     return false;
   }
@@ -81,14 +141,18 @@ async function main(): Promise<void> {
         const checkpoint = JSON.parse(readFileSync(resumeCheckpoint, 'utf8')) as {
           model?: string;
           promptVersion?: string;
+          promptDigest?: string;
           estimatedCostUsd?: number;
           content?: string;
         };
+        const promptDigest = callDigest(call.prompt, model, call.role);
+        const checkpointPromptVersion = requestedPromptVersion || conceptCallPromptVersionV3(call.role);
         if (
           checkpoint.model === model
-          && checkpoint.promptVersion === FLAGSHIP_V3_CONCEPT_PROMPT_VERSION
+          && checkpoint.promptVersion === checkpointPromptVersion
+          && (checkpoint.promptDigest === promptDigest || historicalResumeVerified)
           && checkpoint.content
-          && checkpointContentValid(call.role, checkpoint.content)
+          && checkpointContentValid(call.role, checkpoint.content, call.pairs)
         ) {
           const checkpointCost = Number(checkpoint.estimatedCostUsd || 0);
           estimatedCostUsd += checkpointCost;
@@ -97,6 +161,7 @@ async function main(): Promise<void> {
             index: call.index,
             batchIndex: call.batchIndex ?? null,
             model,
+            thinkingLevel: thinkingLevelFor(call.role),
             estimatedCostUsd: checkpointCost,
             reused: true,
           });
@@ -107,10 +172,14 @@ async function main(): Promise<void> {
           return checkpoint.content;
         }
       }
+      if (historicalPromptResume && call.role === 'concept_generator') {
+        throw new Error(`Historical prompt ${promptVersion} can only reuse an existing valid generator checkpoint.`);
+      }
       const response = await callFlagshipModel(call.prompt, {
         model,
-        temperature: call.role === 'concept_generator' ? 0.85 : call.role === 'opening_simulator' ? 0.75 : 0.15,
+        temperature: temperatureFor(call.role),
         maxTokens: 32768,
+        thinkingLevel: thinkingLevelFor(call.role),
         systemPrompt: call.role === 'concept_generator'
           ? 'Tạo concept độc lập, không sao chép tác phẩm nguồn và chỉ trả JSON.'
           : call.role === 'opening_simulator'
@@ -128,6 +197,7 @@ async function main(): Promise<void> {
         index: call.index,
         batchIndex: call.batchIndex ?? null,
         model,
+        thinkingLevel: thinkingLevelFor(call.role),
         estimatedCostUsd: callCost,
         reused: false,
       });
@@ -138,7 +208,9 @@ async function main(): Promise<void> {
           index: call.index,
           batchIndex: call.batchIndex ?? null,
           model,
-          promptVersion: FLAGSHIP_V3_CONCEPT_PROMPT_VERSION,
+          promptVersion: requestedPromptVersion || conceptCallPromptVersionV3(call.role),
+          promptDigest: callDigest(call.prompt, model, call.role),
+          thinkingLevel: thinkingLevelFor(call.role),
           estimatedCostUsd: callCost,
           promptTokens: response.promptTokens,
           completionTokens: response.completionTokens,
@@ -153,7 +225,7 @@ async function main(): Promise<void> {
   writeFileSync(path.join(target, 'tournament-v3.json'), `${JSON.stringify(result, null, 2)}\n`);
   const runManifest = {
     schemaVersion: 3,
-    promptVersion: FLAGSHIP_V3_CONCEPT_PROMPT_VERSION,
+    promptVersion,
     snapshotId: snapshot.snapshotId,
     routeVersion: routes.routeVersion,
     selectedConceptId: result.selected.id,
@@ -177,7 +249,7 @@ async function main(): Promise<void> {
 main().catch(error => {
   writeFileSync(path.join(runDir, 'tournament-failure-v3.json'), `${JSON.stringify({
     schemaVersion: 3,
-    promptVersion: FLAGSHIP_V3_CONCEPT_PROMPT_VERSION,
+    promptVersion,
     snapshotId: snapshot.snapshotId,
     routeVersion: routes.routeVersion,
     estimatedCostUsd: Number(estimatedCostUsd.toFixed(6)),

@@ -6,7 +6,18 @@ const id = z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/);
 const text = z.string().trim().min(12);
 const detailed = z.string().trim().min(24);
 const fingerprintToken = z.string().trim().min(4).max(120);
-export const FLAGSHIP_V3_CONCEPT_PROMPT_VERSION = 'flagship-v3-concept-2026-07-16.2';
+export const FLAGSHIP_V3_CONCEPT_PROMPT_VERSION = 'flagship-v3-concept-2026-07-17.7';
+export const FLAGSHIP_V3_CONCEPT_GENERATOR_PROMPT_VERSION = 'flagship-v3-concept-2026-07-17.6';
+export const FLAGSHIP_V3_CONCEPT_JUDGE_PROMPT_VERSION = 'flagship-v3-concept-judge-2026-07-17.7';
+export const FLAGSHIP_V3_OPENING_PROMPT_VERSION = 'flagship-v3-opening-2026-07-17.7';
+
+export function conceptCallPromptVersionV3(
+  role: 'concept_generator' | 'concept_judge' | 'opening_simulator' | 'opening_judge',
+): string {
+  if (role === 'concept_generator') return FLAGSHIP_V3_CONCEPT_GENERATOR_PROMPT_VERSION;
+  if (role === 'concept_judge') return FLAGSHIP_V3_CONCEPT_JUDGE_PROMPT_VERSION;
+  return FLAGSHIP_V3_OPENING_PROMPT_VERSION;
+}
 
 export const MarketResearchSnapshotV3Schema = z.object({
   schemaVersion: z.literal(3),
@@ -64,7 +75,7 @@ export const ConceptCandidateV3Schema = z.object({
   conflictEconomyFingerprint: z.array(fingerprintToken).min(3).max(8),
   seriality30: z.array(detailed).length(5),
   antiStupidOpponent: detailed,
-  domainResearchNeeds: z.array(text).min(2).max(8),
+  domainResearchNeeds: z.array(z.string().trim().min(4).max(120)).min(2).max(8),
 }).strict();
 export type ConceptCandidateV3 = z.infer<typeof ConceptCandidateV3Schema>;
 
@@ -238,7 +249,8 @@ MARKET_RESEARCH=${JSON.stringify({
     signals: snapshot.signals,
     prohibitedDirectImitation: snapshot.prohibitedDirectImitation,
   })}
-Tạo đúng 10 concept nam tần khác cơ chế. Mỗi concept phải thỏa commission riêng, kích hoạt cơ chế trong ba chương đầu, có mâu thuẫn nội tâm và giới hạn lợi thế thật, đủ biến hóa 30 chương, không mô phỏng trực tiếp tác phẩm nguồn.`;
+Tạo đúng 10 concept nam tần khác cơ chế trong candidates; không được trả 5 concept. Mỗi concept phải thỏa commission riêng, kích hoạt cơ chế trong ba chương đầu, có mâu thuẫn nội tâm và giới hạn lợi thế thật, đủ biến hóa 30 chương, không mô phỏng trực tiếp tác phẩm nguồn.
+Ba trường mechanismFingerprint, rewardLoopFingerprint và conflictEconomyFingerprint MỖI trường phải là mảng 3-8 phần tử tách rời. Mỗi phần tử chỉ mô tả một bước/cơ chế dưới 120 ký tự; tuyệt đối không gộp cả chuỗi bằng dấu mũi tên vào một phần tử.`;
 
 const judgePrompt = (
   snapshot: MarketResearchSnapshotV3,
@@ -248,17 +260,18 @@ const judgePrompt = (
   pairs: Array<{ leftId: string; rightId: string }>,
 ): string =>
   `JUDGE=${judge}
+CONTRACT_VERSION=${FLAGSHIP_V3_CONCEPT_JUDGE_PROMPT_VERSION}
 PAIR_BATCH_INDEX=${batchIndex}
 STORY_COMMISSION=${JSON.stringify(snapshot.commission)}
 CANDIDATES=${JSON.stringify(candidates)}
 REQUIRED_PAIRS=${JSON.stringify(pairs)}
-Chấm đúng và đủ các cặp trong REQUIRED_PAIRS, không thêm, không lặp. Chấm mức khớp commission, cơ chế hoạt động trong ba chương đầu, mâu thuẫn và giới hạn của main, causal world, chi phí thật và khả năng biến hóa 30 chương. Loại lợi thế toàn năng, đối thủ ngu, may mắn liên tục và tài nguyên vô nguồn.`;
+Chấm đúng và đủ các cặp trong REQUIRED_PAIRS, không thêm, không lặp. Trong từng comparison, winnerId bắt buộc chép nguyên văn leftId hoặc rightId của chính comparison đó. Chấm mức khớp commission, cơ chế hoạt động trong ba chương đầu, mâu thuẫn và giới hạn của main, causal world, chi phí thật và khả năng biến hóa 30 chương. Loại lợi thế toàn năng, đối thủ ngu, may mắn liên tục và tài nguyên vô nguồn.`;
 
 const openingPrompt = (candidate: ConceptCandidateV3): string =>
-  `CANDIDATE=${JSON.stringify(candidate)}\nMô phỏng ba chương mở đầu, mỗi chương ít nhất 1000 ký tự prose: main chủ động ở chương 1, lợi ích cụ thể trước hết chương 3, không đối thủ ngu hay tài nguyên vô nguồn.`;
+  `CONTRACT_VERSION=${FLAGSHIP_V3_OPENING_PROMPT_VERSION}\nCANDIDATE=${JSON.stringify(candidate)}\nMô phỏng đúng ba chương mở đầu. Mỗi chương phải có proseParagraphs gồm 3-30 đoạn tách rời, từng đoạn ít nhất 20 ký tự và tổng prose của chương ít nhất 1000 ký tự. Main chủ động ở chương 1, lợi ích cụ thể trước hết chương 3, không đối thủ ngu hay tài nguyên vô nguồn.`;
 
 const reviewPrompt = (trials: OpeningTrialV3[], judge: string): string =>
-  `JUDGE=${judge}\nBLIND_OPENINGS=${JSON.stringify(trials)}\nXếp hạng ba opening và cung cấp evidence prose thật.`;
+  `CONTRACT_VERSION=${FLAGSHIP_V3_OPENING_PROMPT_VERSION}\nJUDGE=${judge}\nBLIND_OPENINGS=${JSON.stringify(trials)}\nXếp hạng ba opening và cung cấp evidence prose thật.`;
 
 export function assessOpeningFinalistV3(
   reviews: z.infer<typeof OpeningReviewV3Schema>[],
@@ -309,8 +322,8 @@ export async function runConceptTournamentV3(input: {
       role: 'concept_generator',
       index,
       prompt: `${conceptPrompt(input.snapshot, `generator_${index + 1}`)}
-CONTRACT_VERSION=${FLAGSHIP_V3_CONCEPT_PROMPT_VERSION}
-Mỗi candidate phải có seriality30 đúng 5 beat khác nhau, bao phủ năm chặng trong 30 chương; không trả 4 hoặc 6 beat.`,
+CONTRACT_VERSION=${FLAGSHIP_V3_CONCEPT_GENERATOR_PROMPT_VERSION}
+CONTRACT_COUNTS: candidates có chính xác 10 phần tử. TỪNG candidate riêng lẻ có seriality30 chính xác 5 beat, không phải 10 beat; năm beat bao phủ năm chặng trong 30 chương. Không được đổi thành 5 candidate x 10 beat.`,
     }), `Concept Generator ${index + 1}`),
   ));
   batches.forEach((batch, index) => {

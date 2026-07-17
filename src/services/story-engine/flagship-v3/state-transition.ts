@@ -72,7 +72,15 @@ export function applyChapterStateV3(input: {
     }
   };
   input.plan.requiredDeltas.forEach(apply);
-  const first = input.plan.scenes[0];
+  const previousTimeline = input.state.timeline[input.state.timeline.length - 1];
+  const previousEndMinute = previousTimeline
+    ? previousTimeline.startMinute + previousTimeline.durationMinutes
+    : 0;
+  const chapterStartMinute = previousEndMinute + input.plan.elapsedMinutesSincePreviousChapter;
+  const chapterDurationMinutes = input.plan.scenes.reduce(
+    (sum, scene) => sum + scene.travelMinutesFromPrevious + scene.durationMinutes,
+    0,
+  );
   const last = input.plan.scenes[input.plan.scenes.length - 1];
   return {
     ...input.state,
@@ -83,8 +91,8 @@ export function applyChapterStateV3(input: {
     promises,
     timeline: [...input.state.timeline, {
       chapter,
-      startMinute: first.startMinute,
-      durationMinutes: last.startMinute + last.durationMinutes - first.startMinute,
+      startMinute: chapterStartMinute,
+      durationMinutes: chapterDurationMinutes,
       locationId: last.locationId,
       event: input.plan.chapterPromise,
     }].slice(-100),

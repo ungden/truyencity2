@@ -138,6 +138,7 @@ describe('flagship v3 long-story state bounds', () => {
       const plan = {
         schemaVersion: 3,
         chapterNumber: chapter,
+        elapsedMinutesSincePreviousChapter: 5,
         chapterPromise: `Chương ${chapter} tạo một bước tiến có nguồn và hậu quả rõ ràng.`,
         preconditions: [],
         scenes: [{
@@ -145,7 +146,6 @@ describe('flagship v3 long-story state bounds', () => {
           povCharacterId: 'main',
           participantIds: ['main'],
           locationId: 'home',
-          startMinute: chapter * 10,
           durationMinutes: 5,
           travelMinutesFromPrevious: 0,
           desire: 'Main muốn tạo một đơn vị tiến bộ có thể kiểm chứng trong chương này.',
@@ -182,6 +182,11 @@ describe('flagship v3 long-story state bounds', () => {
     }
     expect(state.chapterNumber).toBe(1200);
     expect(state.timeline).toHaveLength(100);
+    expect(state.timeline.at(-1)).toEqual(expect.objectContaining({ chapter: 1200, startMinute: 11995, durationMinutes: 5 }));
+    for (let index = 1; index < state.timeline.length; index += 1) {
+      const previous = state.timeline[index - 1];
+      expect(state.timeline[index].startMinute).toBeGreaterThanOrEqual(previous.startMinute + previous.durationMinutes);
+    }
     expect(state.facts).toHaveLength(1);
     expect(state.resources).toHaveLength(1);
     expect(state.resources[0].value).toEqual({ mode: 'numeric', amount: 1200, unit: 'dong' });

@@ -1,0 +1,354 @@
+{
+  "schemaVersion": 3,
+  "promptVersion": "flagship-v3-concept-2026-07-16.2",
+  "snapshotId": "hx_01_research_2026_07",
+  "routeVersion": "canary-gemini-v3.2",
+  "selectedConceptId": "c7",
+  "callCount": 38,
+  "estimatedCostUsd": 3.423267,
+  "calls": [
+    {
+      "role": "concept_generator",
+      "index": 0,
+      "batchIndex": null,
+      "model": "gemini-3.1-pro-preview",
+      "thinkingLevel": "high",
+      "estimatedCostUsd": 0.250184,
+      "reused": true
+    },
+    {
+      "role": "concept_generator",
+      "index": 1,
+      "batchIndex": null,
+      "model": "gemini-2.5-pro",
+      "thinkingLevel": "high",
+      "estimatedCostUsd": 0.1698275,
+      "reused": true
+    },
+    {
+      "role": "concept_judge",
+      "index": 0,
+      "batchIndex": 0,
+      "model": "gemini-3.1-pro-preview",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.133918,
+      "reused": true
+    },
+    {
+      "role": "concept_judge",
+      "index": 0,
+      "batchIndex": 1,
+      "model": "gemini-3.1-pro-preview",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.138002,
+      "reused": true
+    },
+    {
+      "role": "concept_judge",
+      "index": 0,
+      "batchIndex": 2,
+      "model": "gemini-3.1-pro-preview",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.138784,
+      "reused": true
+    },
+    {
+      "role": "concept_judge",
+      "index": 0,
+      "batchIndex": 3,
+      "model": "gemini-3.1-pro-preview",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.148338,
+      "reused": true
+    },
+    {
+      "role": "concept_judge",
+      "index": 0,
+      "batchIndex": 4,
+      "model": "gemini-3.1-pro-preview",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.149554,
+      "reused": true
+    },
+    {
+      "role": "concept_judge",
+      "index": 0,
+      "batchIndex": 5,
+      "model": "gemini-3.1-pro-preview",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.132236,
+      "reused": true
+    },
+    {
+      "role": "concept_judge",
+      "index": 0,
+      "batchIndex": 6,
+      "model": "gemini-3.1-pro-preview",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.12579,
+      "reused": true
+    },
+    {
+      "role": "concept_judge",
+      "index": 0,
+      "batchIndex": 7,
+      "model": "gemini-3.1-pro-preview",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.125222,
+      "reused": true
+    },
+    {
+      "role": "concept_judge",
+      "index": 0,
+      "batchIndex": 8,
+      "model": "gemini-3.1-pro-preview",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.108276,
+      "reused": true
+    },
+    {
+      "role": "concept_judge",
+      "index": 0,
+      "batchIndex": 9,
+      "model": "gemini-3.1-pro-preview",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.077852,
+      "reused": true
+    },
+    {
+      "role": "concept_judge",
+      "index": 1,
+      "batchIndex": 0,
+      "model": "gemini-3-flash-preview",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.0367735,
+      "reused": true
+    },
+    {
+      "role": "concept_judge",
+      "index": 1,
+      "batchIndex": 1,
+      "model": "gemini-3-flash-preview",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.0266315,
+      "reused": true
+    },
+    {
+      "role": "concept_judge",
+      "index": 1,
+      "batchIndex": 2,
+      "model": "gemini-3-flash-preview",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.024862,
+      "reused": true
+    },
+    {
+      "role": "concept_judge",
+      "index": 1,
+      "batchIndex": 3,
+      "model": "gemini-3-flash-preview",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.0331755,
+      "reused": true
+    },
+    {
+      "role": "concept_judge",
+      "index": 1,
+      "batchIndex": 4,
+      "model": "gemini-3-flash-preview",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.0238045,
+      "reused": true
+    },
+    {
+      "role": "concept_judge",
+      "index": 1,
+      "batchIndex": 5,
+      "model": "gemini-3-flash-preview",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.024473,
+      "reused": true
+    },
+    {
+      "role": "concept_judge",
+      "index": 1,
+      "batchIndex": 6,
+      "model": "gemini-3-flash-preview",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.0147885,
+      "reused": false
+    },
+    {
+      "role": "concept_judge",
+      "index": 1,
+      "batchIndex": 9,
+      "model": "gemini-3-flash-preview",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.016823,
+      "reused": true
+    },
+    {
+      "role": "concept_judge",
+      "index": 2,
+      "batchIndex": 0,
+      "model": "gemini-2.5-pro",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.08016625,
+      "reused": true
+    },
+    {
+      "role": "concept_judge",
+      "index": 2,
+      "batchIndex": 1,
+      "model": "gemini-2.5-pro",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.15037375,
+      "reused": true
+    },
+    {
+      "role": "concept_judge",
+      "index": 2,
+      "batchIndex": 2,
+      "model": "gemini-2.5-pro",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.1160225,
+      "reused": true
+    },
+    {
+      "role": "concept_judge",
+      "index": 2,
+      "batchIndex": 3,
+      "model": "gemini-2.5-pro",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.13299625,
+      "reused": true
+    },
+    {
+      "role": "concept_judge",
+      "index": 2,
+      "batchIndex": 4,
+      "model": "gemini-2.5-pro",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.12227875,
+      "reused": true
+    },
+    {
+      "role": "concept_judge",
+      "index": 2,
+      "batchIndex": 5,
+      "model": "gemini-2.5-pro",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.12256,
+      "reused": true
+    },
+    {
+      "role": "concept_judge",
+      "index": 2,
+      "batchIndex": 6,
+      "model": "gemini-2.5-pro",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.13829625,
+      "reused": true
+    },
+    {
+      "role": "concept_judge",
+      "index": 2,
+      "batchIndex": 7,
+      "model": "gemini-2.5-pro",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.12246375,
+      "reused": true
+    },
+    {
+      "role": "concept_judge",
+      "index": 2,
+      "batchIndex": 8,
+      "model": "gemini-2.5-pro",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.112345,
+      "reused": true
+    },
+    {
+      "role": "concept_judge",
+      "index": 2,
+      "batchIndex": 9,
+      "model": "gemini-2.5-pro",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.084365,
+      "reused": true
+    },
+    {
+      "role": "concept_judge",
+      "index": 1,
+      "batchIndex": 8,
+      "model": "gemini-3-flash-preview",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.014337,
+      "reused": false
+    },
+    {
+      "role": "concept_judge",
+      "index": 1,
+      "batchIndex": 7,
+      "model": "gemini-3-flash-preview",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.0161045,
+      "reused": false
+    },
+    {
+      "role": "opening_simulator",
+      "index": 0,
+      "batchIndex": null,
+      "model": "gemini-2.5-pro",
+      "thinkingLevel": "high",
+      "estimatedCostUsd": 0.059335,
+      "reused": false
+    },
+    {
+      "role": "opening_simulator",
+      "index": 2,
+      "batchIndex": null,
+      "model": "gemini-2.5-pro",
+      "thinkingLevel": "high",
+      "estimatedCostUsd": 0.0585925,
+      "reused": false
+    },
+    {
+      "role": "opening_simulator",
+      "index": 1,
+      "batchIndex": null,
+      "model": "gemini-2.5-pro",
+      "thinkingLevel": "high",
+      "estimatedCostUsd": 0.06126625,
+      "reused": false
+    },
+    {
+      "role": "opening_judge",
+      "index": 1,
+      "batchIndex": null,
+      "model": "gemini-3-flash-preview",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.0078745,
+      "reused": false
+    },
+    {
+      "role": "opening_judge",
+      "index": 0,
+      "batchIndex": null,
+      "model": "gemini-3.1-pro-preview",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.066418,
+      "reused": false
+    },
+    {
+      "role": "opening_judge",
+      "index": 2,
+      "batchIndex": null,
+      "model": "gemini-2.5-pro",
+      "thinkingLevel": "low",
+      "estimatedCostUsd": 0.05815625,
+      "reused": false
+    }
+  ],
+  "createdAt": "2026-07-17T11:25:49.276Z"
+}

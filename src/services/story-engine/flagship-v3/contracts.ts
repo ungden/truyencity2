@@ -32,10 +32,34 @@ export const StoryResourceV3Schema = z.object({
   unit: z.string().trim().min(1).max(40).nullable(),
   sourceRules: z.array(text).min(1).max(6),
   spendRules: z.array(text).min(1).max(6),
+  referenceScale: z.array(text).min(1).max(5).nullable(),
+  minimumValue: z.number().finite().nullable(),
+  maximumValue: z.number().finite().nullable(),
   scarcity: detailed,
 }).strict().superRefine((resource, ctx) => {
   if (resource.mode === 'numeric' && !resource.unit) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['unit'], message: 'Numeric resources require a unit.' });
+  }
+  if (resource.mode === 'numeric' && (!resource.referenceScale || !resource.referenceScale.some(anchor => /\d/u.test(anchor)))) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['referenceScale'],
+      message: 'Numeric resources require at least one explicit quantitative reference scale.',
+    });
+  }
+  if (resource.mode === 'numeric' && (
+    resource.minimumValue === null
+    || resource.maximumValue === null
+    || resource.minimumValue >= resource.maximumValue
+  )) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['minimumValue'], message: 'Numeric resources require finite minimumValue < maximumValue.' });
+  }
+  if (resource.mode === 'state' && (
+    resource.referenceScale !== null
+    || resource.minimumValue !== null
+    || resource.maximumValue !== null
+  )) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['referenceScale'], message: 'State resources use null scale and numeric bounds.' });
   }
 });
 
@@ -49,7 +73,7 @@ export const StoryKernelV3Schema = z.object({
     uniqueMechanism: detailed,
     readerFantasy: detailed,
     recurringSituation: detailed,
-    variationAxes: z.array(detailed).min(3).max(8),
+    variationAxes: z.array(text).min(3).max(8),
     antiCloneFingerprint: z.array(text).min(3).max(10),
   }).strict(),
   pleasure: z.object({
@@ -145,7 +169,7 @@ export type ArcPlanV3 = z.infer<typeof ArcPlanV3Schema>;
 
 const ResourceValueV3Schema = z.discriminatedUnion('mode', [
   z.object({ mode: z.literal('numeric'), amount: z.number().finite(), unit: z.string().trim().min(1).max(40) }).strict(),
-  z.object({ mode: z.literal('state'), value: text }).strict(),
+  z.object({ mode: z.literal('state'), value: z.string().trim().min(2).max(240) }).strict(),
 ]);
 
 export const StoryStateV3Schema = z.object({
@@ -268,12 +292,70 @@ export const ChapterDeltaV3Schema = z.discriminatedUnion('kind', [
 
 export type ChapterDeltaV3 = z.infer<typeof ChapterDeltaV3Schema>;
 
+export const ChapterDeltaDraftV3Schema = z.discriminatedUnion('kind', [
+  z.object({
+    id,
+    kind: z.literal('fact'),
+    factId: id,
+    valueAfter: text,
+    evidenceRequired: z.literal(true),
+  }).strict(),
+  z.object({
+    id,
+    kind: z.literal('character_location'),
+    characterId: id,
+    locationAfter: id,
+    evidenceRequired: z.literal(true),
+  }).strict(),
+  z.object({
+    id,
+    kind: z.literal('character_knowledge'),
+    characterId: id,
+    factId: id,
+    learnedFrom: text,
+    evidenceRequired: z.literal(true),
+  }).strict(),
+  z.object({
+    id,
+    kind: z.literal('relationship'),
+    characterId: id,
+    relationshipAfter: text,
+    evidenceRequired: z.literal(true),
+  }).strict(),
+  z.object({
+    id,
+    kind: z.literal('resource_numeric'),
+    resourceId: id,
+    delta: z.number().finite(),
+    source: text,
+    sink: text,
+    evidenceRequired: z.literal(true),
+  }).strict(),
+  z.object({
+    id,
+    kind: z.literal('resource_state'),
+    resourceId: id,
+    after: text,
+    source: text,
+    evidenceRequired: z.literal(true),
+  }).strict(),
+  z.object({
+    id,
+    kind: z.literal('promise'),
+    promiseId: id,
+    statusAfter: z.enum(['open', 'advanced', 'paid', 'broken']),
+    pressureAfter: text,
+    evidenceRequired: z.literal(true),
+  }).strict(),
+]);
+
+export type ChapterDeltaDraftV3 = z.infer<typeof ChapterDeltaDraftV3Schema>;
+
 export const ChapterSceneV3Schema = z.object({
   id,
   povCharacterId: id,
   participantIds: z.array(id).min(1).max(10),
   locationId: id,
-  startMinute: z.number().int().min(0),
   durationMinutes: z.number().int().min(1).max(1440),
   travelMinutesFromPrevious: z.number().int().min(0).max(1440),
   desire: detailed,
@@ -285,18 +367,21 @@ export const ChapterSceneV3Schema = z.object({
   informationDelta: detailed,
   hookIntent: z.enum(['threat_arrives', 'choice_forced', 'truth_reframed', 'opportunity_opens', 'cost_revealed', 'relationship_turns']),
   unresolvedQuestion: detailed,
-  requiredDeltaIds: z.array(id).min(1).max(12),
+  requiredDeltaIds: z.array(id).min(1).max(12)
+    .describe('NON-EMPTY: every scene must list at least one required delta id implemented by that scene.'),
 }).strict();
 
 export const ChapterPlanV3Schema = z.object({
   schemaVersion: z.literal(3),
   chapterNumber: z.number().int().min(1),
+  elapsedMinutesSincePreviousChapter: z.number().int().min(0).max(525_600)
+    .describe('Narrative time elapsed since the prior committed chapter; engine derives absolute scene times.'),
   chapterPromise: detailed,
   preconditions: z.array(z.object({
     factId: id,
     expectedValue: text,
   }).strict()).max(20),
-  scenes: z.array(ChapterSceneV3Schema).min(2).max(5),
+  scenes: z.array(ChapterSceneV3Schema).min(1).max(5),
   requiredDeltas: z.array(ChapterDeltaV3Schema).min(1).max(24),
   nextChapterPressure: detailed,
 }).strict().superRefine((plan, ctx) => {
@@ -316,23 +401,23 @@ export const ChapterPlanV3Schema = z.object({
       }
     }
   }
-  for (let index = 0; index < plan.scenes.length; index += 1) {
-    const scene = plan.scenes[index];
-    if (index === 0 && scene.travelMinutesFromPrevious !== 0) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['scenes', index, 'travelMinutesFromPrevious'], message: 'First scene travel must be zero.' });
-    }
-    if (index > 0) {
-      const previous = plan.scenes[index - 1];
-      const earliest = previous.startMinute + previous.durationMinutes + scene.travelMinutesFromPrevious;
-      if (scene.startMinute < earliest) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['scenes', index, 'startMinute'], message: 'Scene overlaps the previous scene or ignores travel time.' });
-      }
-    }
-  }
 });
 
 export type ChapterPlanV3 = z.infer<typeof ChapterPlanV3Schema>;
 export type ChapterSceneV3 = z.infer<typeof ChapterSceneV3Schema>;
+
+export const ChapterPlanDraftV3Schema = z.object({
+  schemaVersion: z.literal(3),
+  chapterNumber: z.number().int().min(1),
+  elapsedMinutesSincePreviousChapter: z.number().int().min(0).max(525_600),
+  chapterPromise: detailed,
+  preconditions: z.array(z.object({ factId: id, expectedValue: text }).strict()).max(20),
+  scenes: z.array(ChapterSceneV3Schema).min(1).max(5),
+  requiredDeltas: z.array(ChapterDeltaDraftV3Schema).min(1).max(24),
+  nextChapterPressure: detailed,
+}).strict();
+
+export type ChapterPlanDraftV3 = z.infer<typeof ChapterPlanDraftV3Schema>;
 
 export const RollingPlanWindowV3Schema = z.object({
   schemaVersion: z.literal(3),
@@ -347,6 +432,20 @@ export const RollingPlanWindowV3Schema = z.object({
 });
 
 export type RollingPlanWindowV3 = z.infer<typeof RollingPlanWindowV3Schema>;
+
+export const RollingPlanWindowDraftV3Schema = z.object({
+  schemaVersion: z.literal(3),
+  startChapter: z.number().int().min(1),
+  plans: z.array(ChapterPlanDraftV3Schema).length(5),
+}).strict().superRefine((window, ctx) => {
+  window.plans.forEach((plan, index) => {
+    if (plan.chapterNumber !== window.startChapter + index) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['plans', index, 'chapterNumber'], message: 'Rolling window chapters must be contiguous.' });
+    }
+  });
+});
+
+export type RollingPlanWindowDraftV3 = z.infer<typeof RollingPlanWindowDraftV3Schema>;
 
 export function parseV3<T>(
   schema: z.ZodType<T>,

@@ -102,6 +102,12 @@ export function validateV3Artifacts(input: {
         if (!closeEnough(delta.before + delta.delta, delta.after)) {
           issues.push({ code: 'resource_arithmetic', path, message: `Resource ${delta.resourceId} before + delta must equal after.` });
         }
+        if (definition.minimumValue !== null && delta.after < definition.minimumValue) {
+          issues.push({ code: 'resource_below_minimum', path, message: `Resource ${delta.resourceId} fell below its story-specific minimum.` });
+        }
+        if (definition.maximumValue !== null && delta.after > definition.maximumValue) {
+          issues.push({ code: 'resource_above_maximum', path, message: `Resource ${delta.resourceId} exceeded its story-specific maximum.` });
+        }
       }
       if (delta.kind === 'resource_state' && current.value.mode === 'state' && current.value.value !== delta.before) {
         issues.push({ code: 'resource_stale_before', path, message: `Resource ${delta.resourceId} state does not match committed state.` });

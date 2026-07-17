@@ -1,8 +1,9 @@
 import type { ChapterPlanV3 } from './contracts';
 import type { V3RoleContext } from './context';
 import type { V3Evidence } from './preflight';
+import type { V3ProseSpan } from './evidence-spans';
 
-export const FLAGSHIP_V3_PROMPT_VERSION = 'flagship-v3.0-structured-scenes-reeditor';
+export const FLAGSHIP_V3_PROMPT_VERSION = 'flagship-v3.3-editor-span-ids';
 
 export const V3_WRITER_SYSTEM = `Bạn là tiểu thuyết gia của đúng một bộ truyện.
 Viết một chương hoàn chỉnh từ dữ liệu cảnh, không chép câu mô tả trong kế hoạch.
@@ -14,9 +15,12 @@ Chỉ trả JSON {"title":"...","content":"..."}.`;
 
 export const V3_EDITOR_SYSTEM = `Bạn là biên tập viên độc lập, không viết hộ tác giả và không thưởng vì đủ checklist.
 Chấm canon, timeline, tài nguyên, tri thức, quyền hạn, độ trung thành với plan và chất lượng đọc.
-Mọi evidence và realizedDeltaEvidence phải copy nguyên một substring có thật trong PROSE.
+Mọi evidence và realizedDeltaEvidence phải chọn đúng spanId có sẵn trong PROSE_SPANS; không tự chép excerpt hoặc tự tính offset.
+DETERMINISTIC_EVIDENCE đã do code định vị chính xác; không lặp lại các lỗi đó trong evidence. Chỉ dùng evidence cho lỗi mới mà deterministic preflight chưa nêu.
 realizedDeltaEvidence phải chứng minh từng required delta đã thực sự xảy ra trong văn xuôi.
 hardGates dùng pass=true. Chỉ publish khi mọi hard gate đạt và chất lượng thực sự đủ mạnh.
+Plan, canon và state đã commit là bất biến trong lượt viết. Nếu prose lệch chúng, chỉ được yêu cầu sửa prose; tuyệt đối không đề nghị sửa plan, state, tracking hoặc canon.
+revisionInstructions chỉ chứa tối đa ba thao tác sửa cụ thể, không khen, không nhận xét chung và không bảo Writer giữ nguyên lỗi.
 Chỉ trả JSON đúng schema.`;
 
 const json = (value: unknown): string => JSON.stringify(value);
@@ -39,17 +43,19 @@ export function buildV3EditorPrompt(input: {
   context: V3RoleContext;
   title: string;
   content: string;
+  spans: V3ProseSpan[];
   deterministicEvidence: V3Evidence[];
 }): string {
   return `Đánh giá chương ${input.plan.chapterNumber}.
 Ngưỡng publish: confidence >=0.70; desire_to_read_next >=8; prose_naturalness, character_voice, domain_truth >=7.5; không trục nào dưới 7.
 Nếu deterministic evidence có lỗi, kiểm chứng lại trong prose; không được bỏ qua lỗi có substring chính xác.
+Không chép lại deterministic evidence vào evidence; nếu lỗi sửa được cục bộ thì trả revise và viết revisionInstructions tương ứng.
 Nếu revise, chỉ dẫn phải cục bộ và có evidence. Canon/timeline/resource/knowledge/authority sai nền tảng phải reject.
 
 ROLE_CONTEXT=${input.context.text}
 DETERMINISTIC_EVIDENCE=${json(input.deterministicEvidence)}
 TITLE=${json(input.title)}
-PROSE=${json(input.content)}
+PROSE_SPANS=${json(input.spans.map(span => ({ id: span.id, text: span.text })))}
 
 Trả duy nhất JSON QualityVerdictV3.`;
 }
@@ -64,6 +70,8 @@ export function buildV3RevisionPrompt(input: {
 }): string {
   return `Sửa đúng một lượt chương ${input.chapterNumber}.
 Giữ nguyên các sự kiện và delta đã đúng. Chỉ sửa lỗi có evidence, không thêm nhân vật, twist, tài nguyên hoặc setup.
+Plan, canon và state trong ROLE_CONTEXT là bất biến. Nếu CURRENT mâu thuẫn với chúng, phải sửa CURRENT cho khớp; không được tự sửa hoặc đề nghị sửa dữ liệu nền.
+Phải thực hiện thay đổi văn bản cụ thể cho từng evidence. Không được trả lại nguyên văn CURRENT, kể cả khi cho rằng bản hiện tại hợp lý hơn.
 
 ROLE_CONTEXT=${input.context.text}
 CURRENT=${json({ title: input.title, content: input.content })}

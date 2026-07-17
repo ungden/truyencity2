@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 3,
+  "selectedConceptId": "concept_dt11_01",
+  "title": "Giám Bảo Gốm Cổ: Tôi Chạm Một Lần, Biết Nó Được Nung Bằng Lửa Gì",
+  "routeVersion": "canary-gemini-v3.2",
+  "calls": [
+    {
+      "role": "kernel_architect",
+      "model": "gemini-3.1-pro-preview",
+      "routeVersion": "canary-gemini-v3.2",
+      "promptVersion": "flagship-v3-kernel-2026-07-17.7",
+      "promptDigest": "35cefcb703468b54bbf8144a48352df06b754ae796c45f77edd871f8ae4e66d4",
+      "estimatedCostUsd": 0.133266,
+      "promptTokens": 9387,
+      "completionTokens": 9541,
+      "finishReason": "STOP",
+      "reused": false
+    },
+    {
+      "role": "state_seeder",
+      "model": "gemini-3.1-pro-preview",
+      "routeVersion": "canary-gemini-v3.2",
+      "promptVersion": "flagship-v3-state-seeder-2026-07-17.5",
+      "promptDigest": "603acf80f7aeb78a61d32c1526c4303e87eda87ef8e76d249a2736e6ca64d696",
+      "estimatedCostUsd": 0.063556,
+      "promptTokens": 3482,
+      "completionTokens": 4716,
+      "finishReason": "STOP",
+      "reused": false
+    },
+    {
+      "role": "arc_architect",
+      "model": "gemini-3.1-pro-preview",
+      "routeVersion": "canary-gemini-v3.2",
+      "promptVersion": "flagship-v3-arc-2026-07-16.2",
+      "promptDigest": "386c7fd3254bc70518bebde2aeaabe584ba163a033d20e0c4422bb06645d8cb9",
+      "estimatedCostUsd": 0.049502,
+      "promptTokens": 5467,
+      "completionTokens": 3214,
+      "finishReason": "STOP",
+      "reused": false
+    },
+    {
+      "role": "initial_rolling_planner",
+      "model": "gemini-3.1-pro-preview",
+      "routeVersion": "canary-gemini-v3.2",
+      "promptVersion": "flagship-v3.9-no-forced-filler-scene",
+      "promptDigest": "fe2cbe653c61c003fa3a8fa9899b78d7d457840d4fb7361d6bed861bd642b5d4",
+      "estimatedCostUsd": 0.221294,
+      "promptTokens": 5677,
+      "completionTokens": 17495,
+      "finishReason": "STOP",
+      "reused": false
+    }
+  ],
+  "estimatedCostUsd": 0.467618,
+  "createdAt": "2026-07-17T12:54:21.052Z"
+}

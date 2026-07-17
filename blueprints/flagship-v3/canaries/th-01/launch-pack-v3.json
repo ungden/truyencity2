@@ -1,0 +1,822 @@
+{
+  "schemaVersion": 3,
+  "selectedConceptId": "th_01_c01",
+  "kernel": {
+    "schemaVersion": 3,
+    "pipelineVersion": "flagship_v3",
+    "title": "Trọng Sinh Về Gia Tộc Tu Tiên, Tôi Gieo Tiếng Vọng Cho Mười Năm Sau",
+    "genre": "Tu tiên gia tộc",
+    "concept": {
+      "signature": "Nhìn thấy Tổ Nghiệp Nợ vô hình do các quyết định của gia tộc tạo ra cho thế hệ tương lai.",
+      "uniqueMechanism": "Định lượng nợ nghiệp bằng con số cụ thể và giải quyết thông qua các khế ước luân canh, chuyển giao kỹ năng thay vì bạo lực.",
+      "readerFantasy": "Trải nghiệm cảm giác làm người kiến tạo nền móng, đầu tư dài hạn vào đất đai và nhân tài, nhìn thấy thành quả nở rộ qua nhiều thế hệ.",
+      "recurringSituation": "Đứng trước một quyết định mang lợi ích ngắn hạn nhưng tạo nợ dài hạn, nhân vật chính phải tìm giải pháp thay thế và thuyết phục nội bộ.",
+      "variationAxes": [
+        "Loại tài nguyên bị thâm hụt",
+        "Đối tác đàm phán khế ước",
+        "Cách thế hệ sau sử dụng tài nguyên được đầu tư"
+      ],
+      "antiCloneFingerprint": [
+        "Không dùng cảnh giới làm thước đo tiến bộ duy nhất",
+        "Thắng lợi phải có chuẩn bị, bằng chứng và cái giá phải trả",
+        "Không coi con cháu là chỉ số sinh sản hoặc quân cờ tuyệt đối phục tùng"
+      ]
+    },
+    "pleasure": {
+      "primaryRewardLoop": [
+        "Phát hiện nợ nghiệp tiềm ẩn",
+        "Đàm phán giải pháp thay thế",
+        "Nhận lợi ích nhỏ trước mắt",
+        "Quan sát nợ nghiệp giảm dần qua thời gian"
+      ],
+      "comfortLoop": [
+        "Nhìn thấy các thành viên gia tộc phát triển theo con đường riêng",
+        "Đất đai khô cằn dần hồi sinh và đơm hoa kết trái"
+      ],
+      "setbackRecoveryWindow": 2,
+      "progressionSignals": [
+        "Con số Tổ Nghiệp Nợ giảm xuống",
+        "Cây Thanh Tùng mọc thêm vòng gỗ",
+        "Thái độ của các trưởng lão chuyển từ hoài nghi sang tin tưởng"
+      ]
+    },
+    "protagonistId": "char_01",
+    "characters": [
+      {
+        "id": "char_01",
+        "name": "Thanh Tùng",
+        "aliases": [
+          "Tùng thiếu gia",
+          "Người gánh nợ"
+        ],
+        "role": "protagonist",
+        "publicIdentity": "Tộc nhân trẻ tuổi có tầm nhìn kỳ lạ của Thanh gia",
+        "agenda": "Xóa bỏ toàn bộ Tổ Nghiệp Nợ để cứu gia tộc khỏi sự suy vong",
+        "competence": "Khả năng nhìn thấy nợ nghiệp, tư duy đàm phán và quản lý rủi ro dài hạn",
+        "constraint": "Mỗi lần nhìn sâu vào nợ nghiệp sẽ bị giảm thị lực và gặp ác mộng",
+        "moralBoundary": "Không bao giờ hy sinh tương lai của thế hệ sau để đổi lấy sự thoải mái hiện tại",
+        "decisionSignature": "Luôn chọn phương án có lợi ích dài hạn dù phải chịu thiệt thòi và hàm oan trước mắt",
+        "voice": {
+          "summary": "Điềm tĩnh, lý trí, luôn dùng bằng chứng lịch sử và logic để thuyết phục",
+          "positiveExamples": [
+            "Chúng ta không bán một mảnh đất chết, chúng ta đang bán đi một di sản bị bệnh.",
+            "Cho thuê để chữa trị, chúng ta mới có cơ hội lấy lại những gì đã mất."
+          ],
+          "forbiddenPatterns": [
+            "Ta là người trọng sinh, ta biết hết tương lai.",
+            "Cứ nghe ta đi, không cần hỏi nhiều, ta luôn đúng."
+          ]
+        }
+      },
+      {
+        "id": "char_02",
+        "name": "Thanh Mộc Sơn",
+        "aliases": [
+          "Tộc trưởng"
+        ],
+        "role": "cast",
+        "publicIdentity": "Tộc trưởng đương nhiệm của Thanh gia",
+        "agenda": "Duy trì sự tồn tại của gia tộc trong giai đoạn khó khăn nhất",
+        "competence": "Kinh nghiệm quản lý nội bộ và uy vũ của người đứng đầu",
+        "constraint": "Bị áp lực bởi phe bảo thủ và sự cạn kiệt tài chính",
+        "moralBoundary": "Sẵn sàng làm mọi thứ để gia tộc không bị xóa sổ, kể cả bán đất tổ",
+        "decisionSignature": "Cân nhắc kỹ lưỡng giữa lợi ích thực tế và truyền thống, dễ bị thuyết phục bởi kết quả hữu hình",
+        "voice": {
+          "summary": "Trầm mặc, uy nghiêm, thực dụng nhưng vẫn có tình người",
+          "positiveExamples": [
+            "Ba ngày. Ta cho con ba ngày để mang về một bản khế ước.",
+            "Gia tộc này cần một con đường sống, không phải những lời sáo rỗng."
+          ],
+          "forbiddenPatterns": [
+            "Ta hoàn toàn tin tưởng con, cháu ngoan của ta.",
+            "Trưởng lão nói gì cũng đúng, ta không có ý kiến."
+          ]
+        }
+      },
+      {
+        "id": "char_03",
+        "name": "Diệp Khê",
+        "aliases": [
+          "Diệp tiểu thư"
+        ],
+        "role": "cast",
+        "publicIdentity": "Thiếu chủ của Lục Diệp Môn",
+        "agenda": "Tìm kiếm tài nguyên Xích Nê Khoáng để phát triển bách nghệ cho môn phái",
+        "competence": "Sắc sảo trong kinh doanh, am hiểu Mộc Tẩy Thuật",
+        "constraint": "Không muốn môn phái bị cuốn vào tranh chấp của các gia tộc lớn",
+        "moralBoundary": "Tuân thủ khế ước tuyệt đối nhưng không ngại lách luật nếu có kẽ hở",
+        "decisionSignature": "Chỉ hợp tác khi thấy rõ lợi ích song phương và rủi ro được kiểm soát",
+        "voice": {
+          "summary": "Lịch sự, sắc bén, luôn giữ khoảng cách và tính toán chi li",
+          "positiveExamples": [
+            "Lục Diệp Môn chúng tôi tuy có chút tài mọn, nhưng không làm chuyện tốn công vô ích.",
+            "Một đề nghị thú vị. Tôi sẽ trình lên cha tôi để xem xét."
+          ],
+          "forbiddenPatterns": [
+            "Ta yêu chàng từ cái nhìn đầu tiên, ta sẽ giúp chàng vô điều kiện.",
+            "Lục Diệp Môn sẽ phục tùng Thanh gia từ nay về sau."
+          ]
+        }
+      },
+      {
+        "id": "char_04",
+        "name": "Tam trưởng lão",
+        "aliases": [
+          "Thanh Mộc Thạch"
+        ],
+        "role": "cast",
+        "publicIdentity": "Người quản lý tài chính và tài sản của Thanh gia",
+        "agenda": "Giải quyết ngay lập tức cơn khủng hoảng tài chính bằng mọi giá",
+        "competence": "Nắm rõ sổ sách và các mối quan hệ thương mại ngắn hạn",
+        "constraint": "Tầm nhìn hạn hẹp, chỉ quan tâm đến con số trước mắt",
+        "moralBoundary": "Không quan tâm đến hậu quả vài chục năm sau miễn là hôm nay có tiền",
+        "decisionSignature": "Luôn chọn phương án mang lại linh thạch nhanh nhất, phản đối mọi khoản đầu tư dài hạn",
+        "voice": {
+          "summary": "Gay gắt, thực dụng thiển cận, hay mỉa mai những ý tưởng mới",
+          "positiveExamples": [
+            "Năm trăm viên hạ phẩm linh thạch đủ để gia tộc chúng ta trang trải trong ba năm.",
+            "Thanh Tùng, con có bị Lục Diệp Môn lừa không vậy? Đừng làm trò cười cho thiên hạ."
+          ],
+          "forbiddenPatterns": [
+            "Ta sai rồi, ta xin lỗi cháu vì đã không nhìn xa trông rộng.",
+            "Tiền bạc không quan trọng bằng tình cảm gia đình."
+          ]
+        }
+      }
+    ],
+    "worldClaims": [
+      {
+        "id": "claim_01",
+        "claim": "Quyết định bóc lột tài nguyên hôm nay sẽ tạo ra Tổ Nghiệp Nợ giáng xuống các thế hệ sau.",
+        "sourceRef": "Ghi chép về Thanh Huyền Tử trong Tàng Thư Các.",
+        "enforcement": "Con cháu sinh ra bị khuyết tật linh căn hoặc đất đai vĩnh viễn mất linh khí canh tác.",
+        "exceptions": "Nợ có thể được trả trước bằng cách hy sinh lợi ích hiện tại hoặc lập minh ước chuyển giao rủi ro."
+      },
+      {
+        "id": "claim_02",
+        "claim": "Cây Thanh Tùng ở từ đường có khả năng chứng giám và ghi nhớ các minh ước qua vòng gỗ.",
+        "sourceRef": "Truyền thuyết lập tộc của Thanh gia từ ngàn năm trước.",
+        "enforcement": "Kẻ vi phạm minh ước sẽ bị phản phệ tước đoạt thọ nguyên và tu vi.",
+        "exceptions": "Minh ước có thể được giải trừ nếu cả hai bên đồng thuận hiến tế máu lên rễ cây."
+      },
+      {
+        "id": "claim_03",
+        "claim": "Linh điền bị suy kiệt không thể phục hồi bằng linh thạch mà phải qua luân canh và bí thuật.",
+        "sourceRef": "Điển tịch nông nghiệp cổ của Lục Diệp Môn.",
+        "enforcement": "Cố tình ép cây mọc trên đất chết bằng linh thạch sẽ sinh ra độc dược tàn phá kinh mạch.",
+        "exceptions": "Trừ khi dùng máu của linh thú bậc cao hệ Mộc để tưới tiêu liên tục trong mười năm."
+      },
+      {
+        "id": "claim_04",
+        "claim": "Tộc nhân không có thiên phú tu luyện vẫn có thể đóng góp cốt lõi cho gia tộc thông qua bách nghệ.",
+        "sourceRef": "Sự thành công của Thanh An với nghề khảm ngọc.",
+        "enforcement": "Gia tộc phải trích tài nguyên để nuôi dưỡng thợ thủ công và bảo vệ họ khỏi nguy hiểm.",
+        "exceptions": "Những nghề nghiệp bị cấm kỵ vì dính dáng đến tà thuật hoặc ma đạo."
+      }
+    ],
+    "resources": [
+      {
+        "id": "res_no_nghiep",
+        "name": "Tổ Nghiệp Nợ",
+        "mode": "numeric",
+        "unit": "Đời",
+        "sourceRules": [
+          "Đưa ra quyết định vắt kiệt tài nguyên",
+          "Bán đứt tài sản cốt lõi của gia tộc"
+        ],
+        "spendRules": [
+          "Ký kết khế ước phục hồi",
+          "Đầu tư tài nguyên vào thế hệ trẻ"
+        ],
+        "referenceScale": [
+          "0: Không nợ nần উভ",
+          "-1: Ảnh hưởng nhẹ đến một thế hệ",
+          "-3: Mất khả năng canh tác ba đời",
+          "-5: Tuyệt tự hoặc diệt tộc"
+        ],
+        "minimumValue": -10,
+        "maximumValue": 0,
+        "scarcity": "Luôn hiện hữu và đe dọa, khó giảm nhưng rất dễ tăng nếu bất cẩn."
+      },
+      {
+        "id": "res_linh_thach",
+        "name": "Linh Thạch Dự Trữ",
+        "mode": "numeric",
+        "unit": "Viên",
+        "sourceRules": [
+          "Thu tiền thuê đất",
+          "Bán sản phẩm bách nghệ",
+          "Thu hoạch linh dược"
+        ],
+        "spendRules": [
+          "Mua đan dược chữa bệnh",
+          "Duy trì trận pháp bảo vệ",
+          "Đầu tư công cụ cho thợ thủ công"
+        ],
+        "referenceScale": [
+          "100: Đủ ăn một tháng cho toàn tộc",
+          "500: Cứu vãn khủng hoảng ngắn hạn",
+          "5000: Dư dả đầu tư mở rộng bách nghệ"
+        ],
+        "minimumValue": 0,
+        "maximumValue": 100000,
+        "scarcity": "Cực kỳ khan hiếm ở giai đoạn đầu, buộc nhân vật phải thắt lưng buộc bụng và tính toán chi li."
+      },
+      {
+        "id": "res_uy_tin",
+        "name": "Uy Tín Nội Tộc",
+        "mode": "state",
+        "unit": null,
+        "sourceRules": [
+          "Dự đoán đúng hậu quả của một quyết định",
+          "Mang lại lợi ích thực tế từ các khế ước"
+        ],
+        "spendRules": [
+          "Ép buộc thông qua các quyết định không được lòng người",
+          "Bảo vệ một tộc nhân bị nghi ngờ"
+        ],
+        "referenceScale": null,
+        "minimumValue": null,
+        "maximumValue": null,
+        "scarcity": "Khó xây dựng nhưng dễ mất đi nếu một dự án dài hạn thất bại hoặc chậm sinh lời."
+      }
+    ],
+    "promises": [
+      {
+        "id": "prom_01",
+        "description": "Thanh Tùng sẽ xóa bỏ hoàn toàn con số nợ -3 Đời trên Hoang Mộc Điền.",
+        "payoffCondition": "Hoang Mộc Điền phục hồi sinh khí, trồng thành công lứa linh dược quý đầu tiên và con số nợ biến mất."
+      },
+      {
+        "id": "prom_02",
+        "description": "Thanh An sẽ trở thành một nghệ nhân khảm ngọc xuất chúng mang lại nguồn thu mới.",
+        "payoffCondition": "Thanh An chế tác ra một pháp bảo đặc biệt giúp gia tộc vượt qua một cuộc khủng hoảng lớn."
+      },
+      {
+        "id": "prom_03",
+        "description": "Lục Diệp Môn và Thanh gia sẽ hoàn tất khế ước 20 năm mà không phản bội nhau.",
+        "payoffCondition": "Hai gia tộc hợp nhất sức mạnh đánh bại âm mưu thâu tóm của Kim Thạch Các."
+      },
+      {
+        "id": "prom_04",
+        "description": "Bí mật về sự suy vong của gia tộc từ thời Thanh Huyền Tử sẽ được phơi bày.",
+        "payoffCondition": "Tìm ra di tích cũ của tổ tiên, giải trừ lời nguyền cốt lõi đang ăn mòn cây Thanh Tùng."
+      }
+    ],
+    "endingContract": {
+      "emotionalState": "Thanh thản và tự hào vì đã gánh vác thành công di sản tổ tiên mà không để lại gánh nặng cho đời sau.",
+      "materialState": "Gia tộc hưng thịnh, sở hữu nhiều linh điền màu mỡ và đội ngũ thợ thủ công lành nghề, phát triển bền vững.",
+      "worldState": "Khái niệm Tổ Nghiệp Nợ được các gia tộc khác công nhận và đưa vào luật lệ chung của giới tu tiên.",
+      "promisesThatMustClose": [
+        "prom_01",
+        "prom_02",
+        "prom_03",
+        "prom_04"
+      ],
+      "targetChapterRange": {
+        "min": 800,
+        "forecast": 900,
+        "max": 1200
+      }
+    }
+  },
+  "arc": {
+    "schemaVersion": 3,
+    "arcId": "arc_01_lease_to_heal",
+    "startChapter": 1,
+    "endChapter": 30,
+    "direction": "Thanh Tùng đàm phán thành công khế ước luân canh với Lục Diệp Môn, giữ lại Hoang Mộc Điền và bước đầu giải quyết khủng hoảng tài chính, đồng thời hỗ trợ Thanh An phát triển bách nghệ.",
+    "terminalChange": "Hoang Mộc Điền không bị bán đứt mà được chuyển sang cho thuê 20 năm. Thanh gia nhận được khoản linh thạch đầu tiên để duy trì hoạt động, Thanh An chính thức bắt đầu con đường thợ khảm ngọc, và uy tín của Thanh Tùng bước đầu được thiết lập.",
+    "activeConflicts": [
+      {
+        "id": "conflict_internal_finance",
+        "actorIds": [
+          "char_01",
+          "char_04",
+          "char_02"
+        ],
+        "objective": "Quyết định phương án xử lý Hoang Mộc Điền để giải quyết khủng hoảng tài chính ngay lập tức.",
+        "leverage": "Tam trưởng lão nắm quyền quản lý sổ sách và áp lực nợ nần ngắn hạn; Thanh Tùng nắm giữ thông tin về nhu cầu thực sự của Lục Diệp Môn.",
+        "nextMove": "Thanh Tùng rời từ đường đi gặp Diệp Khê để đàm phán, trong khi Tam trưởng lão chuẩn bị sẵn khế ước bán đứt để ép Tộc trưởng ký ngay khi thời hạn ba ngày kết thúc."
+      },
+      {
+        "id": "conflict_negotiation_lucdiep",
+        "actorIds": [
+          "char_01",
+          "char_03"
+        ],
+        "objective": "Đạt được thỏa thuận thuê đất có lợi cho cả hai bên mà không làm mất quyền sở hữu cốt lõi của Thanh gia.",
+        "leverage": "Diệp Khê cần Xích Nê Khoáng ẩn dưới Hoang Mộc Điền để phát triển bách nghệ; Thanh Tùng yêu cầu Lục Diệp Môn dùng Mộc Tẩy Thuật để phục hồi linh khí cho đất.",
+        "nextMove": "Thanh Tùng tiết lộ bí mật về Xích Nê Khoáng để ép Diệp Khê từ bỏ ý định mua đứt và chấp nhận ngồi vào bàn đàm phán khế ước luân canh 20 năm."
+      }
+    ],
+    "duePromiseIds": [
+      "prom_01",
+      "prom_03"
+    ],
+    "progressionBudget": [
+      {
+        "signal": "Thái độ của các trưởng lão chuyển từ hoài nghi sang tin tưởng",
+        "requiredChange": "Thanh Tùng mang về bản khế ước cho thuê kèm theo khoản tiền cọc linh thạch đủ để giải quyết khủng hoảng ngắn hạn, đập tan sự phản đối của Tam trưởng lão."
+      },
+      {
+        "signal": "Con số Tổ Nghiệp Nợ giảm xuống",
+        "requiredChange": "Khi khế ước được ký kết dưới sự chứng giám của cây Thanh Tùng, con số nợ -3 Đời trên Hoang Mộc Điền bắt đầu mờ đi, chứng minh phương pháp luân canh có hiệu quả."
+      }
+    ]
+  },
+  "initialState": {
+    "schemaVersion": 3,
+    "chapterNumber": 0,
+    "facts": [
+      {
+        "id": "fact_01",
+        "value": "Thanh gia đang đối mặt với khủng hoảng tài chính nghiêm trọng và dự định bán Hoang Mộc Điền.",
+        "sourceChapter": 0
+      },
+      {
+        "id": "fact_02",
+        "value": "Thanh Tùng có khả năng nhìn thấy Tổ Nghiệp Nợ dưới dạng con số.",
+        "sourceChapter": 0
+      }
+    ],
+    "timeline": [
+      {
+        "chapter": 0,
+        "startMinute": 0,
+        "durationMinutes": 30,
+        "locationId": "phong_ngu_thanh_tung",
+        "event": "Thanh Tùng tỉnh dậy sau khi trọng sinh, phát hiện thị lực suy giảm khi nhìn thấy con số nợ nghiệp."
+      },
+      {
+        "chapter": 0,
+        "startMinute": 30,
+        "durationMinutes": 60,
+        "locationId": "tu_duong_thanh_gia",
+        "event": "Thanh Tùng xông vào cuộc họp gia tộc, ngăn cản Tam trưởng lão bán đứt Hoang Mộc Điền."
+      }
+    ],
+    "characters": [
+      {
+        "characterId": "char_01",
+        "status": "alive",
+        "locationId": "tu_duong_thanh_gia",
+        "knowledge": [
+          {
+            "factId": "fact_01",
+            "learnedChapter": 0,
+            "source": "Ký ức từ kiếp trước và tình hình thực tế tại từ đường."
+          },
+          {
+            "factId": "fact_02",
+            "learnedChapter": 0,
+            "source": "Trải nghiệm đau đớn ở mắt khi vừa tỉnh dậy sau trọng sinh."
+          }
+        ],
+        "relationshipState": "Quyết tâm cứu vãn gia tộc, đối đầu gay gắt với Tam trưởng lão."
+      },
+      {
+        "characterId": "char_02",
+        "status": "alive",
+        "locationId": "tu_duong_thanh_gia",
+        "knowledge": [
+          {
+            "factId": "fact_01",
+            "learnedChapter": 0,
+            "source": "Báo cáo tài chính thê thảm do Tam trưởng lão đệ trình."
+          }
+        ],
+        "relationshipState": "Mệt mỏi vì áp lực tài chính, hoài nghi nhưng tò mò về sự can thiệp của Thanh Tùng."
+      },
+      {
+        "characterId": "char_03",
+        "status": "alive",
+        "locationId": "luc_diep_mon_tru_so",
+        "knowledge": [],
+        "relationshipState": "Chưa trực tiếp gặp Thanh Tùng, đang tìm kiếm nguồn Xích Nê Khoáng cho môn phái."
+      },
+      {
+        "characterId": "char_04",
+        "status": "alive",
+        "locationId": "tu_duong_thanh_gia",
+        "knowledge": [
+          {
+            "factId": "fact_01",
+            "learnedChapter": 0,
+            "source": "Trực tiếp quản lý sổ sách và đàm phán với thương nhân ngoại tộc."
+          }
+        ],
+        "relationshipState": "Tức giận vì bị Thanh Tùng cản trở kế hoạch bán đất lấy linh thạch."
+      }
+    ],
+    "resources": [
+      {
+        "resourceId": "res_no_nghiep",
+        "value": {
+          "mode": "numeric",
+          "amount": -3,
+          "unit": "Đời"
+        },
+        "source": "Tích tụ từ các quyết định khai thác cạn kiệt tài nguyên của thế hệ trước.",
+        "lastChangedChapter": 0
+      },
+      {
+        "resourceId": "res_linh_thach",
+        "value": {
+          "mode": "numeric",
+          "amount": 50,
+          "unit": "Viên"
+        },
+        "source": "Số dư ít ỏi còn lại trong ngân khố gia tộc sau nhiều năm suy thoái.",
+        "lastChangedChapter": 0
+      },
+      {
+        "resourceId": "res_uy_tin",
+        "value": {
+          "mode": "state",
+          "value": "Bị nghi ngờ là kẻ điên rồ"
+        },
+        "source": "Hành động xông vào từ đường và phát ngôn kỳ lạ của Thanh Tùng gây sốc cho các trưởng lão.",
+        "lastChangedChapter": 0
+      }
+    ],
+    "promises": [
+      {
+        "promiseId": "prom_01",
+        "status": "open",
+        "pressure": "Hoang Mộc Điền sắp bị bán đứt cho ngoại tộc nếu không có giải pháp thay thế trong ba ngày."
+      },
+      {
+        "promiseId": "prom_02",
+        "status": "open",
+        "pressure": "Thanh An đang bị coi là phế nhân không có linh căn, cần tài nguyên để chứng minh thực lực bách nghệ."
+      },
+      {
+        "promiseId": "prom_03",
+        "status": "open",
+        "pressure": "Lục Diệp Môn cần Xích Nê Khoáng gấp, trong khi Thanh gia cần linh thạch và kỹ thuật phục hồi đất."
+      },
+      {
+        "promiseId": "prom_04",
+        "status": "open",
+        "pressure": "Cây Thanh Tùng ở từ đường đang héo úa dần, báo hiệu lời nguyền từ thời Thanh Huyền Tử đang phát tác."
+      }
+    ],
+    "recentSummary": "Thanh Tùng trọng sinh về mười năm trước, đúng vào ngày Thanh gia quyết định bán đứt Hoang Mộc Điền để giải quyết khủng hoảng tài chính. Cậu xông vào từ đường ngăn cản quyết định này.",
+    "previousEnding": "Thanh Tùng đứng trước mặt Tộc trưởng và Tam trưởng lão, tuyên bố sẽ mang về một bản khế ước tốt hơn việc bán đất trong vòng ba ngày.",
+    "retrievalNotes": [
+      "Cần chú ý phản ứng của Tam trưởng lão trong chương tới",
+      "Nhắc lại thời hạn ba ngày của Tộc trưởng"
+    ]
+  },
+  "initialWindow": {
+    "schemaVersion": 3,
+    "startChapter": 1,
+    "plans": [
+      {
+        "schemaVersion": 3,
+        "chapterNumber": 1,
+        "elapsedMinutesSincePreviousChapter": 0,
+        "chapterPromise": "Thanh Tùng tìm được bằng chứng về Xích Nê Khoáng để làm vốn đàm phán.",
+        "preconditions": [
+          {
+            "factId": "fact_01",
+            "expectedValue": "Thanh gia đang đối mặt với khủng hoảng tài chính nghiêm trọng và dự định bán Hoang Mộc Điền."
+          }
+        ],
+        "scenes": [
+          {
+            "id": "c1_s1",
+            "povCharacterId": "char_01",
+            "participantIds": [
+              "char_01"
+            ],
+            "locationId": "hoang_moc_dien",
+            "durationMinutes": 120,
+            "travelMinutesFromPrevious": 30,
+            "desire": "Thanh Tùng muốn tìm ra bằng chứng về Xích Nê Khoáng để có cơ sở đàm phán với Lục Diệp Môn.",
+            "opposition": "Lớp đất chết quá dày và việc sử dụng dị năng nhìn nợ nghiệp gây đau đớn tột cùng cho đôi mắt.",
+            "tactic": "Cắn răng chịu đựng cơn đau, dùng dị năng quét sâu xuống lòng đất để định vị chính xác mạch khoáng.",
+            "cost": "Đôi mắt rỉ máu và thị lực giảm sút tạm thời, cơ thể suy nhược vì tiêu hao tinh thần.",
+            "payoff": "Đào được một khối Xích Nê Khoáng tinh khiết làm bằng chứng không thể chối cãi.",
+            "irreversibleChange": "Thanh Tùng đã nắm trong tay con bài tẩy có thể thay đổi hoàn toàn cục diện đàm phán.",
+            "informationDelta": "Thanh Tùng xác nhận được vị trí và chất lượng thực sự của mạch khoáng dưới khu đất bỏ hoang.",
+            "hookIntent": "opportunity_opens",
+            "unresolvedQuestion": "Liệu khối khoáng thạch này có đủ sức thuyết phục Lục Diệp Môn từ bỏ ý định ép giá mua đứt?",
+            "requiredDeltaIds": [
+              "delta_1_1",
+              "delta_1_2",
+              "delta_1_3"
+            ]
+          }
+        ],
+        "requiredDeltas": [
+          {
+            "id": "delta_1_1",
+            "kind": "character_location",
+            "characterId": "char_01",
+            "locationAfter": "hoang_moc_dien",
+            "evidenceRequired": true
+          },
+          {
+            "id": "delta_1_2",
+            "kind": "fact",
+            "factId": "fact_03",
+            "valueBefore": null,
+            "valueAfter": "Xích Nê Khoáng chất lượng cao nằm ẩn sâu dưới lớp đất chết của Hoang Mộc Điền.",
+            "evidenceRequired": true
+          },
+          {
+            "id": "delta_1_3",
+            "kind": "character_knowledge",
+            "characterId": "char_01",
+            "factId": "fact_03",
+            "learnedFrom": "Tự mình đào bới và kiểm chứng tại thực địa.",
+            "evidenceRequired": true
+          }
+        ],
+        "nextChapterPressure": "Thanh Tùng phải nhanh chóng đến Lục Diệp Môn trước khi Tam trưởng lão kịp hoàn tất thủ tục bán đất với đối tác khác."
+      },
+      {
+        "schemaVersion": 3,
+        "chapterNumber": 2,
+        "elapsedMinutesSincePreviousChapter": 60,
+        "chapterPromise": "Thanh Tùng tiếp cận Diệp Khê và đưa ra lời đề nghị luân canh.",
+        "preconditions": [
+          {
+            "factId": "fact_03",
+            "expectedValue": "Xích Nê Khoáng chất lượng cao nằm ẩn sâu dưới lớp đất chết của Hoang Mộc Điền."
+          }
+        ],
+        "scenes": [
+          {
+            "id": "c2_s1",
+            "povCharacterId": "char_01",
+            "participantIds": [
+              "char_01",
+              "char_03"
+            ],
+            "locationId": "luc_diep_mon_tru_so",
+            "durationMinutes": 60,
+            "travelMinutesFromPrevious": 120,
+            "desire": "Thanh Tùng muốn thuyết phục Diệp Khê ký khế ước thuê đất 20 năm thay vì mua đứt.",
+            "opposition": "Diệp Khê là một thương nhân sắc sảo, không dễ dàng chấp nhận rủi ro và luôn muốn nắm đằng chuôi.",
+            "tactic": "Đưa ra khối Xích Nê Khoáng và phân tích lợi ích của việc không phải gánh vác rủi ro sở hữu đất chết.",
+            "cost": "Phải tiết lộ bí mật về mạch khoáng, mất đi lợi thế thông tin độc quyền.",
+            "payoff": "Diệp Khê bị thu hút bởi chất lượng khoáng thạch và đồng ý xem xét phương án thuê đất.",
+            "irreversibleChange": "Lục Diệp Môn chính thức bị cuốn vào kế hoạch phục hồi đất của Thanh Tùng thay vì chỉ là người mua.",
+            "informationDelta": "Diệp Khê biết được bí mật về nguồn tài nguyên quý giá nằm dưới Hoang Mộc Điền.",
+            "hookIntent": "truth_reframed",
+            "unresolvedQuestion": "Diệp Khê sẽ đưa ra điều kiện khắc nghiệt nào để đổi lấy việc chấp nhận khế ước thuê đất?",
+            "requiredDeltaIds": [
+              "delta_2_1",
+              "delta_2_2",
+              "delta_2_3"
+            ]
+          }
+        ],
+        "requiredDeltas": [
+          {
+            "id": "delta_2_1",
+            "kind": "character_location",
+            "characterId": "char_01",
+            "locationAfter": "luc_diep_mon_tru_so",
+            "evidenceRequired": true
+          },
+          {
+            "id": "delta_2_2",
+            "kind": "character_knowledge",
+            "characterId": "char_03",
+            "factId": "fact_03",
+            "learnedFrom": "Lời trình bày và mẫu vật thực tế do Thanh Tùng mang đến.",
+            "evidenceRequired": true
+          },
+          {
+            "id": "delta_2_3",
+            "kind": "relationship",
+            "characterId": "char_03",
+            "relationshipAfter": "Bắt đầu nhìn nhận Thanh Tùng như một đối tác kinh doanh tiềm năng thay vì kẻ cùng đường.",
+            "evidenceRequired": true
+          }
+        ],
+        "nextChapterPressure": "Diệp Khê yêu cầu được tận mắt kiểm chứng tình trạng của Hoang Mộc Điền trước khi đưa ra quyết định cuối cùng."
+      },
+      {
+        "schemaVersion": 3,
+        "chapterNumber": 3,
+        "elapsedMinutesSincePreviousChapter": 120,
+        "chapterPromise": "Diệp Khê kiểm chứng thực địa và đồng ý với điều kiện dùng Mộc Tẩy Thuật.",
+        "preconditions": [
+          {
+            "factId": "fact_03",
+            "expectedValue": "Xích Nê Khoáng chất lượng cao nằm ẩn sâu dưới lớp đất chết của Hoang Mộc Điền."
+          }
+        ],
+        "scenes": [
+          {
+            "id": "c3_s1",
+            "povCharacterId": "char_03",
+            "participantIds": [
+              "char_01",
+              "char_03"
+            ],
+            "locationId": "hoang_moc_dien",
+            "durationMinutes": 90,
+            "travelMinutesFromPrevious": 120,
+            "desire": "Diệp Khê muốn tự mình kiểm chứng trữ lượng khoáng thạch và đánh giá rủi ro thực tế của khu đất.",
+            "opposition": "Khu đất tỏa ra tử khí mộc hệ nồng nặc, đe dọa làm hỏng các pháp khí thăm dò của Lục Diệp Môn.",
+            "tactic": "Thanh Tùng chủ động đề xuất Lục Diệp Môn sử dụng Mộc Tẩy Thuật trong quá trình khai thác để vừa lấy khoáng vừa thanh tẩy tử khí.",
+            "cost": "Thanh gia phải nhượng bộ một phần lợi nhuận khai thác để bù đắp chi phí thi triển Mộc Tẩy Thuật của đối tác.",
+            "payoff": "Diệp Khê nhận ra đây là một mũi tên trúng hai đích, vừa có khoáng thạch vừa rèn luyện bí thuật cho môn đồ.",
+            "irreversibleChange": "Phương án khai thác kết hợp phục hồi đất chính thức được hai bên thống nhất đưa vào khế ước.",
+            "informationDelta": "Diệp Khê hiểu rõ cơ chế hợp tác đôi bên cùng có lợi thông qua việc kết hợp khai thác và thanh tẩy.",
+            "hookIntent": "relationship_turns",
+            "unresolvedQuestion": "Liệu các trưởng lão Thanh gia có chấp nhận một khế ước chia sẻ lợi nhuận phức tạp như vậy?",
+            "requiredDeltaIds": [
+              "delta_3_1",
+              "delta_3_2",
+              "delta_3_3"
+            ]
+          }
+        ],
+        "requiredDeltas": [
+          {
+            "id": "delta_3_1",
+            "kind": "character_location",
+            "characterId": "char_03",
+            "locationAfter": "hoang_moc_dien",
+            "evidenceRequired": true
+          },
+          {
+            "id": "delta_3_2",
+            "kind": "fact",
+            "factId": "fact_04",
+            "valueBefore": null,
+            "valueAfter": "Việc khai thác Xích Nê Khoáng kết hợp Mộc Tẩy Thuật sẽ dần phục hồi sinh khí cho linh điền.",
+            "evidenceRequired": true
+          },
+          {
+            "id": "delta_3_3",
+            "kind": "character_knowledge",
+            "characterId": "char_03",
+            "factId": "fact_04",
+            "learnedFrom": "Phân tích trận pháp và đề xuất hợp tác của Thanh Tùng.",
+            "evidenceRequired": true
+          }
+        ],
+        "nextChapterPressure": "Thanh Tùng phải mang bản thảo khế ước về đối mặt với sự chất vấn gay gắt của Tam trưởng lão tại từ đường."
+      },
+      {
+        "schemaVersion": 3,
+        "chapterNumber": 4,
+        "elapsedMinutesSincePreviousChapter": 60,
+        "chapterPromise": "Thanh Tùng mang khế ước và tiền cọc về thuyết phục Tộc trưởng, đập tan sự phản đối của Tam trưởng lão.",
+        "preconditions": [
+          {
+            "factId": "fact_04",
+            "expectedValue": "Việc khai thác Xích Nê Khoáng kết hợp Mộc Tẩy Thuật sẽ dần phục hồi sinh khí cho linh điền."
+          }
+        ],
+        "scenes": [
+          {
+            "id": "c4_s1",
+            "povCharacterId": "char_01",
+            "participantIds": [
+              "char_01",
+              "char_02",
+              "char_04"
+            ],
+            "locationId": "tu_duong_thanh_gia",
+            "durationMinutes": 60,
+            "travelMinutesFromPrevious": 60,
+            "desire": "Thanh Tùng muốn Tộc trưởng phê duyệt khế ước thuê đất và nhận khoản tiền cọc để giải quyết khủng hoảng.",
+            "opposition": "Tam trưởng lão kịch liệt phản đối, cho rằng tiền cọc quá ít so với việc bán đứt và khế ước quá rườm rà.",
+            "tactic": "Thanh Tùng đổ 500 viên linh thạch tiền cọc ra bàn và dùng lý lẽ về việc giữ lại tài sản tổ tiên để thuyết phục Tộc trưởng.",
+            "cost": "Thanh Tùng công khai đối đầu gay gắt, tạo ra hiềm khích không thể hàn gắn với phe cánh của Tam trưởng lão.",
+            "payoff": "Tộc trưởng bị thuyết phục bởi số linh thạch thực tế và viễn cảnh giữ được đất tổ, quyết định gạt bỏ ý kiến của Tam trưởng lão.",
+            "irreversibleChange": "Quyết định bán đứt Hoang Mộc Điền chính thức bị hủy bỏ, thay bằng phương án cho thuê dài hạn.",
+            "informationDelta": "Toàn bộ thượng tầng Thanh gia nhận thức được năng lực đàm phán và tầm nhìn khác biệt của Thanh Tùng.",
+            "hookIntent": "choice_forced",
+            "unresolvedQuestion": "Tam trưởng lão sẽ giở trò gì để phá hoại buổi lễ ký kết chính thức vào ngày mai?",
+            "requiredDeltaIds": [
+              "delta_4_1",
+              "delta_4_2",
+              "delta_4_3"
+            ]
+          }
+        ],
+        "requiredDeltas": [
+          {
+            "id": "delta_4_1",
+            "kind": "character_location",
+            "characterId": "char_01",
+            "locationAfter": "tu_duong_thanh_gia",
+            "evidenceRequired": true
+          },
+          {
+            "id": "delta_4_2",
+            "kind": "resource_numeric",
+            "resourceId": "res_linh_thach",
+            "before": 50,
+            "delta": 500,
+            "after": 550,
+            "unit": "Viên",
+            "source": "Tiền cọc từ khế ước thuê đất của Lục Diệp Môn",
+            "sink": "Ngân khố đang cạn kiệt của Thanh gia",
+            "evidenceRequired": true
+          },
+          {
+            "id": "delta_4_3",
+            "kind": "resource_state",
+            "resourceId": "res_uy_tin",
+            "before": "Bị nghi ngờ là kẻ điên rồ",
+            "after": "Bắt đầu được Tộc trưởng nhìn nhận nghiêm túc và tin tưởng hơn",
+            "source": "Mang về bản khế ước và tiền cọc thực tế",
+            "evidenceRequired": true
+          }
+        ],
+        "nextChapterPressure": "Buổi lễ ký kết chính thức sắp diễn ra, mọi sai sót nhỏ nhất đều có thể khiến minh ước bị cây Thanh Tùng từ chối."
+      },
+      {
+        "schemaVersion": 3,
+        "chapterNumber": 5,
+        "elapsedMinutesSincePreviousChapter": 1440,
+        "chapterPromise": "Khế ước được ký kết dưới sự chứng giám của cây Thanh Tùng, Tổ Nghiệp Nợ bắt đầu giảm.",
+        "preconditions": [
+          {
+            "factId": "fact_04",
+            "expectedValue": "Việc khai thác Xích Nê Khoáng kết hợp Mộc Tẩy Thuật sẽ dần phục hồi sinh khí cho linh điền."
+          }
+        ],
+        "scenes": [
+          {
+            "id": "c5_s1",
+            "povCharacterId": "char_01",
+            "participantIds": [
+              "char_01",
+              "char_02",
+              "char_03",
+              "char_04"
+            ],
+            "locationId": "tu_duong_thanh_gia",
+            "durationMinutes": 120,
+            "travelMinutesFromPrevious": 0,
+            "desire": "Thanh Tùng muốn hoàn tất nghi thức ký kết khế ước dưới sự chứng giám của cây Thanh Tùng để kích hoạt việc giảm nợ nghiệp.",
+            "opposition": "Áp lực tâm linh từ cây Thanh Tùng cổ thụ và sự soi mói, chờ đợi thất bại từ ánh mắt của Tam trưởng lão.",
+            "tactic": "Thanh Tùng tự tay nhỏ máu lên rễ cây cùng Diệp Khê, thiết lập minh ước ràng buộc sinh mệnh và danh dự hai gia tộc.",
+            "cost": "Thanh Tùng phải chịu một đợt phản phệ nhẹ từ tử khí còn sót lại trong đất khi minh ước kết nối với linh hồn cậu.",
+            "payoff": "Khế ước được lập thành công, con số Tổ Nghiệp Nợ -3 Đời mờ đi và chuyển thành -2 Đời trước mắt Thanh Tùng.",
+            "irreversibleChange": "Thanh gia và Lục Diệp Môn chính thức bị ràng buộc bởi một minh ước tâm linh không thể đơn phương phá vỡ.",
+            "informationDelta": "Thanh Tùng xác nhận được rằng việc thay đổi quyết định khai thác tài nguyên thực sự có thể đảo ngược Tổ Nghiệp Nợ.",
+            "hookIntent": "opportunity_opens",
+            "unresolvedQuestion": "Với khoản linh thạch mới nhận, Thanh Tùng sẽ làm gì tiếp theo để hỗ trợ Thanh An phát triển bách nghệ?",
+            "requiredDeltaIds": [
+              "delta_5_1",
+              "delta_5_2",
+              "delta_5_3",
+              "delta_5_4"
+            ]
+          }
+        ],
+        "requiredDeltas": [
+          {
+            "id": "delta_5_1",
+            "kind": "character_location",
+            "characterId": "char_03",
+            "locationAfter": "tu_duong_thanh_gia",
+            "evidenceRequired": true
+          },
+          {
+            "id": "delta_5_2",
+            "kind": "resource_numeric",
+            "resourceId": "res_no_nghiep",
+            "before": -3,
+            "delta": 1,
+            "after": -2,
+            "unit": "Đời",
+            "source": "Ký kết khế ước luân canh phục hồi đất",
+            "sink": "Khoản nợ nghiệp truyền đời của gia tộc",
+            "evidenceRequired": true
+          },
+          {
+            "id": "delta_5_3",
+            "kind": "promise",
+            "promiseId": "prom_03",
+            "statusAfter": "advanced",
+            "pressureAfter": "Khế ước đã ký nhưng cần giám sát quá trình Lục Diệp Môn thực thi Mộc Tẩy Thuật trong 20 năm tới.",
+            "evidenceRequired": true
+          },
+          {
+            "id": "delta_5_4",
+            "kind": "promise",
+            "promiseId": "prom_01",
+            "statusAfter": "advanced",
+            "pressureAfter": "Nợ nghiệp đã giảm một phần nhưng đất vẫn cần thời gian dài để thực sự trồng được linh dược.",
+            "evidenceRequired": true
+          }
+        ],
+        "nextChapterPressure": "Khủng hoảng tài chính tạm thời lắng xuống, nhưng Thanh Tùng cần ngay lập tức tìm cách đầu tư cho Thanh An để tạo nguồn thu bền vững."
+      }
+    ]
+  }
+}

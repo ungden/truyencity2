@@ -14,3 +14,5 @@ export * from './factory-lifecycle';
 export * from './concept-lab';
 export * from './setup';
 export * from './calibration';
+export * from './offline-opening';
+export * from './evidence-spans';
