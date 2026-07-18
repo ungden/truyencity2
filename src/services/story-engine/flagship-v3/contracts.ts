@@ -33,6 +33,14 @@ export const StoryResourceV3Schema = z.object({
   sourceRules: z.array(text).min(1).max(6),
   spendRules: z.array(text).min(1).max(6),
   referenceScale: z.array(text).min(1).max(5).nullable(),
+  exchangeAnchors: z.array(z.object({
+    itemId: id,
+    name: named,
+    quantity: z.number().positive().finite(),
+    unit: z.string().trim().min(1).max(40),
+    costAmount: z.number().positive().finite(),
+    tolerancePercent: z.number().min(0).max(100),
+  }).strict()).max(16),
   minimumValue: z.number().finite().nullable(),
   maximumValue: z.number().finite().nullable(),
   scarcity: detailed,
@@ -61,7 +69,23 @@ export const StoryResourceV3Schema = z.object({
   )) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['referenceScale'], message: 'State resources use null scale and numeric bounds.' });
   }
+  if (resource.mode === 'state' && resource.exchangeAnchors.length > 0) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['exchangeAnchors'], message: 'State resources cannot define numeric exchange anchors.' });
+  }
+  const anchorIds = resource.exchangeAnchors.map(anchor => anchor.itemId);
+  if (new Set(anchorIds).size !== anchorIds.length) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['exchangeAnchors'], message: 'Exchange anchor item ids must be unique per resource.' });
+  }
 });
+
+const ResourceConsiderationV3Schema = z.object({
+  itemId: id,
+  name: named,
+  quantity: z.number().positive().finite(),
+  unit: z.string().trim().min(1).max(40),
+}).strict();
+
+const ResourceTransactionKindV3Schema = z.enum(['gain', 'purchase', 'fee', 'transfer', 'consume', 'adjustment']);
 
 export const StoryKernelV3Schema = z.object({
   schemaVersion: z.literal(3),
@@ -281,6 +305,8 @@ export const ChapterDeltaV3Schema = z.discriminatedUnion('kind', [
     unit: z.string().trim().min(1).max(40),
     source: text,
     sink: text,
+    transactionKind: ResourceTransactionKindV3Schema,
+    consideration: z.array(ResourceConsiderationV3Schema).max(8),
     evidenceRequired: z.literal(true),
   }).strict(),
   z.object({
@@ -341,6 +367,8 @@ export const ChapterDeltaDraftV3Schema = z.discriminatedUnion('kind', [
     delta: z.number().finite(),
     source: text,
     sink: text,
+    transactionKind: ResourceTransactionKindV3Schema,
+    consideration: z.array(ResourceConsiderationV3Schema).max(8),
     evidenceRequired: z.literal(true),
   }).strict(),
   z.object({

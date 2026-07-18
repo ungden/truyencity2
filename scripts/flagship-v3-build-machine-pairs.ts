@@ -14,6 +14,7 @@ import {
   FrozenBriefCorpusV3Schema,
   MachineCalibrationPairCorpusV3Schema,
   RollingPlanWindowDraftV3Schema,
+  RevisionOutputV3Schema,
   WriterOutputV3Schema,
   buildV3RoleContexts,
   digestFlagshipV3,
@@ -66,7 +67,9 @@ const readJson = <T>(file: string): T => JSON.parse(readFileSync(path.resolve(fi
 const cleanJson = (raw: string): unknown => JSON.parse(raw.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, ''));
 
 function responseSchema(call: FlagshipV3ModelCall) {
-  return call.role === 'writer' || call.role === 'writer_revision' ? WriterOutputV3Schema : EditorAssessmentV3Schema;
+  if (call.role === 'writer') return WriterOutputV3Schema;
+  if (call.role === 'writer_revision') return RevisionOutputV3Schema;
+  return EditorAssessmentV3Schema;
 }
 
 function rejectedDraft(error: unknown): { title: string; content: string } | null {
@@ -135,6 +138,7 @@ async function main(): Promise<void> {
       }
       const writerCheckpoint = readJson<StoredResponse>(path.join(runDir, 'checkpoints', `chapter-${chapterNumber}`, 'writer.response.json'));
       const initialDraft = WriterOutputV3Schema.parse(cleanJson(writerCheckpoint.content));
+      const initialDraftContent = initialDraft.scenes.flatMap(scene => scene.paragraphs).join('\n\n');
       const contexts = buildV3RoleContexts({ kernel: pack.kernel, arc: pack.arc, state: stateBefore, plan });
       let controlCost = 0;
       let controlOutput: { title: string; content: string };
@@ -144,7 +148,7 @@ async function main(): Promise<void> {
           arc: pack.arc,
           state: stateBefore,
           plan,
-          targetWordCount: Math.max(1000, initialDraft.content.trim().split(/\s+/).length),
+          targetWordCount: Math.max(1000, initialDraftContent.trim().split(/\s+/).length),
           contexts,
         }, {
           invoke: async call => {

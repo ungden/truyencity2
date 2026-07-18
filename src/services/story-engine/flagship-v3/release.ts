@@ -2,12 +2,12 @@ import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import { FLAGSHIP_V3_PROMPT_VERSION } from './prompts';
 
-export const FLAGSHIP_V3_CONTRACT_VERSION = 'story-contracts-v3.3-binary-editor-machine-calibration';
-export const FLAGSHIP_V3_CONTEXT_VERSION = 'role-context-v3.6-revision-authoritative-state';
-export const FLAGSHIP_V3_PREFLIGHT_VERSION = 'deterministic-preflight-v3.1';
-export const FLAGSHIP_V3_QUALITY_VERSION = 'quality-v3.7-precise-artifact-mutation-guard';
+export const FLAGSHIP_V3_CONTRACT_VERSION = 'story-contracts-v3.5-priced-transactions-scene-paragraphs';
+export const FLAGSHIP_V3_CONTEXT_VERSION = 'role-context-v3.7-natural-time-projection';
+export const FLAGSHIP_V3_PREFLIGHT_VERSION = 'deterministic-preflight-v3.3-cliche-resource-claims';
+export const FLAGSHIP_V3_QUALITY_VERSION = 'quality-v3.8-exhaustive-editor-local-span-patch';
 export const FLAGSHIP_V3_ARC_LIFECYCLE_VERSION = 'arc-lifecycle-v3.1-ending-gated';
-export const FLAGSHIP_V3_ROLLING_PLANNER_VERSION = 'flagship-v3.16-sequential-ledger-single-repair';
+export const FLAGSHIP_V3_ROLLING_PLANNER_VERSION = 'flagship-v3.17-story-priced-transactions';
 export const FLAGSHIP_V3_PROVIDER_VERSION = 'provider-v3.8-gemini-complexity-safe-schemas';
 
 export const FlagshipReleaseManifestV3Schema = z.object({

@@ -3,14 +3,13 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { classifyStoryFailure } from '@/lib/story-production-quota';
 import { finishWriteRun, startWriteRun, updateWriteRunTelemetry, type WriteRunHandle } from '../pipeline/write-run-ledger';
 import { callFlagshipModel } from '../flagship/provider';
-import { toGeminiResponseJsonSchema } from '../flagship/setup-response-schemas';
 import { getSupabase } from '../utils/supabase';
 import { ArcPlanV3Schema, ChapterPlanV3Schema, StoryKernelV3Schema, StoryStateV3Schema, parseV3 } from './contracts';
 import { buildV3RoleContexts } from './context';
 import { requireFlagshipModelRoutesV3 } from './model-routes';
 import {
   FlagshipV3Error,
-  WriterOutputV3Schema,
+  buildWriterResponseJsonSchemaV3,
   executeFlagshipV3Pipeline,
   type FlagshipV3ModelCall,
 } from './pipeline';
@@ -244,9 +243,8 @@ export async function writeFlagshipV3Chapter(
 
     const invoke = dependencies.invoke || (async (call: FlagshipV3ModelCall): Promise<string> => {
       const model = call.role === 'writer' || call.role === 'writer_revision' ? routes.writer : routes.editor;
-      const responseSchema = call.role === 'writer' || call.role === 'writer_revision'
-        ? toGeminiResponseJsonSchema(WriterOutputV3Schema)
-        : call.responseJsonSchema;
+      const responseSchema = call.responseJsonSchema
+        || (call.role === 'writer' ? buildWriterResponseJsonSchemaV3(plan) : undefined);
       if (!responseSchema) {
         throw new FlagshipV3Error('infra_blocked', `Missing provider response schema for ${call.role}.`);
       }

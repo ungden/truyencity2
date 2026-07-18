@@ -10,6 +10,7 @@ import {
   FlagshipLaunchPackV3Schema,
   FlagshipModelRoutesV3Schema,
   EditorAssessmentV3Schema,
+  RevisionOutputV3Schema,
   WriterOutputV3Schema,
   runOfflineOpeningV3,
   validateLaunchPackV3,
@@ -69,9 +70,9 @@ const digestCall = (chapterNumber: number, model: string, call: FlagshipV3ModelC
   .digest('hex');
 
 function responseSchema(call: FlagshipV3ModelCall): z.ZodTypeAny {
-  return call.role === 'writer' || call.role === 'writer_revision'
-    ? WriterOutputV3Schema
-    : EditorAssessmentV3Schema;
+  if (call.role === 'writer') return WriterOutputV3Schema;
+  if (call.role === 'writer_revision') return RevisionOutputV3Schema;
+  return EditorAssessmentV3Schema;
 }
 
 function reusableCheckpoint(file: string, digest: string, model: string, call: FlagshipV3ModelCall): Checkpoint | null {

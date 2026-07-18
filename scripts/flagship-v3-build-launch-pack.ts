@@ -168,7 +168,7 @@ BLIND_OPENING_REVIEWS=${JSON.stringify(tournament.openingReviews)}
 Tạo StoryKernelV3. title phải khớp tuyệt đối REQUIRED_DATABASE_TITLE.
 Không chứa taxonomy thị trường, prompt benchmark hoặc tên tác phẩm tham khảo.
 Cần ít nhất 4 nhân vật có agenda/voice riêng, 4 world claim có nguồn và ngoại lệ, 3 resource, 4 promise.
-Mỗi resource numeric phải có referenceScale gồm 1-5 mốc so sánh nội bộ có số cụ thể, cùng minimumValue và maximumValue hữu hạn phù hợp cơ chế riêng của truyện. Tiền/vật tư thường min=0; chỉ số nợ, thiện ác hoặc nhiệt độ được phép âm nếu kernel định nghĩa rõ. Resource state bắt buộc referenceScale/minimumValue/maximumValue đều null.
+Mỗi resource numeric phải có referenceScale gồm 1-5 mốc so sánh nội bộ có số cụ thể, cùng minimumValue và maximumValue hữu hạn phù hợp cơ chế riêng của truyện. Nếu resource dùng để mua hàng/dịch vụ, exchangeAnchors phải khai báo itemId/name/quantity/unit/costAmount/tolerancePercent từ kinh tế riêng của truyện; nếu không có trao đổi thì dùng mảng rỗng. Tiền/vật tư thường min=0; chỉ số nợ, thiện ác hoặc nhiệt độ được phép âm nếu kernel định nghĩa rõ. Resource state bắt buộc referenceScale/minimumValue/maximumValue đều null và exchangeAnchors=[].
 Trong voice của từng nhân vật: positiveExamples có 2-5 câu và forbiddenPatterns có 2-8 câu; MỖI câu phải dài ít nhất 8 ký tự, không dùng nhãn cụt như "nói đùa".
 endingContract.promisesThatMustClose chỉ chứa stable ID ASCII đã xuất hiện trong promises[].id; tuyệt đối không điền mô tả lời hứa hoặc tạo ID mới.
 Mục tiêu kết thúc mặc định 800-1200 chương, forecast khoảng 900, nhưng không kéo dài vô hạn.`,

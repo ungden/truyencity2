@@ -7,6 +7,7 @@ export interface V3ValidationIssue {
 }
 
 const closeEnough = (left: number, right: number): boolean => Math.abs(left - right) < 1e-8;
+const purchaseLanguage = /(?:\bmua\b|\bthu mua\b|\bđổi lấy\b|\bthanh toán\b)/iu;
 
 export function validateV3Artifacts(input: {
   kernel: StoryKernelV3;
@@ -111,6 +112,76 @@ export function validateV3Artifacts(input: {
         }
         if (definition.maximumValue !== null && delta.after > definition.maximumValue) {
           issues.push({ code: 'resource_above_maximum', path, message: `Resource ${delta.resourceId} exceeded its story-specific maximum.` });
+        }
+        const looksLikePurchase = delta.delta < 0 && purchaseLanguage.test(`${delta.source} ${delta.sink}`);
+        if (looksLikePurchase && delta.transactionKind !== 'purchase') {
+          issues.push({
+            code: 'resource_purchase_untyped',
+            path: `${path}.transactionKind`,
+            message: 'A purchase must be typed as purchase and list its concrete consideration; prose cannot repair an unpriced plan.',
+          });
+        }
+        if (delta.transactionKind === 'gain' && delta.delta <= 0) {
+          issues.push({ code: 'resource_transaction_sign', path, message: 'A gain transaction must increase the numeric resource.' });
+        }
+        if (['purchase', 'fee', 'consume'].includes(delta.transactionKind) && delta.delta >= 0) {
+          issues.push({ code: 'resource_transaction_sign', path, message: `${delta.transactionKind} must decrease the numeric resource.` });
+        }
+        if (delta.transactionKind !== 'purchase' && delta.consideration.length > 0) {
+          issues.push({
+            code: 'resource_consideration_without_purchase',
+            path: `${path}.consideration`,
+            message: 'Concrete purchase consideration is only valid on purchase transactions.',
+          });
+        }
+        if (delta.transactionKind === 'purchase') {
+          if (delta.consideration.length === 0) {
+            issues.push({
+              code: 'resource_purchase_missing_consideration',
+              path: `${path}.consideration`,
+              message: 'Purchase transaction must list the goods or services received.',
+            });
+          } else {
+            const anchors = new Map(definition.exchangeAnchors.map(anchor => [anchor.itemId, anchor]));
+            let expectedCost = 0;
+            let allowedVariance = 0;
+            const seenItems = new Set<string>();
+            for (const item of delta.consideration) {
+              if (seenItems.has(item.itemId)) {
+                issues.push({ code: 'resource_duplicate_consideration', path: `${path}.consideration`, message: `Purchase repeats consideration ${item.itemId}.` });
+                continue;
+              }
+              seenItems.add(item.itemId);
+              const anchor = anchors.get(item.itemId);
+              if (!anchor) {
+                issues.push({
+                  code: 'resource_missing_exchange_anchor',
+                  path: `${path}.consideration.${item.itemId}`,
+                  message: `Story kernel has no exchange anchor for ${item.itemId}; operator must repair the story-specific economy before writing.`,
+                });
+                continue;
+              }
+              if (anchor.unit.toLocaleLowerCase('vi') !== item.unit.toLocaleLowerCase('vi')) {
+                issues.push({
+                  code: 'resource_exchange_unit_mismatch',
+                  path: `${path}.consideration.${item.itemId}.unit`,
+                  message: `Consideration ${item.itemId} must use story-kernel unit ${anchor.unit}.`,
+                });
+                continue;
+              }
+              const itemCost = (item.quantity / anchor.quantity) * anchor.costAmount;
+              expectedCost += itemCost;
+              allowedVariance += itemCost * (anchor.tolerancePercent / 100);
+            }
+            const actualCost = Math.abs(delta.delta);
+            if (expectedCost > 0 && Math.abs(actualCost - expectedCost) > Math.max(allowedVariance, 1e-8)) {
+              issues.push({
+                code: 'resource_exchange_implausible',
+                path,
+                message: `Purchase costs ${actualCost} ${delta.unit}, but story-specific exchange anchors imply ${expectedCost.toFixed(2)} ± ${allowedVariance.toFixed(2)} ${delta.unit}.`,
+              });
+            }
+          }
         }
         workingResources.set(delta.resourceId, { ...currentValue, amount: delta.after });
       }

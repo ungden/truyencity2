@@ -90,10 +90,38 @@ function projectKernel(kernel: StoryKernelV3, plan: ChapterPlanV3) {
   };
 }
 
+function naturalTimeCue(minutes: number, travel = false): string {
+  if (minutes === 0) return travel ? 'không có quãng di chuyển riêng' : 'nối tiếp ngay sau diễn biến trước';
+  if (minutes <= 5) return 'chỉ vài phút';
+  if (minutes <= 15) return 'khoảng mười phút';
+  if (minutes <= 35) return 'gần nửa giờ';
+  if (minutes <= 75) return 'xấp xỉ một giờ';
+  if (minutes <= 180) return 'một quãng trong cùng buổi';
+  if (minutes <= 360) return 'nhiều giờ trong nửa ngày';
+  if (minutes <= 720) return 'phần lớn một ngày';
+  if (minutes <= 1_440) return 'sang một ngày khác';
+  return `sau khoảng ${Math.max(2, Math.round(minutes / 1_440))} ngày`;
+}
+
 function projectWriterPlan(plan: ChapterPlanV3) {
   return {
-    ...plan,
-    scenes: plan.scenes.map(({ unresolvedQuestion: _unresolvedQuestion, ...scene }) => scene),
+    schemaVersion: plan.schemaVersion,
+    chapterNumber: plan.chapterNumber,
+    elapsedTimeCue: naturalTimeCue(plan.elapsedMinutesSincePreviousChapter),
+    chapterPromise: plan.chapterPromise,
+    preconditions: plan.preconditions,
+    scenes: plan.scenes.map(({
+      unresolvedQuestion: _unresolvedQuestion,
+      durationMinutes,
+      travelMinutesFromPrevious,
+      ...scene
+    }) => ({
+      ...scene,
+      durationCue: naturalTimeCue(durationMinutes),
+      travelCueFromPrevious: naturalTimeCue(travelMinutesFromPrevious, true),
+    })),
+    requiredDeltas: plan.requiredDeltas,
+    nextChapterPressure: plan.nextChapterPressure,
   };
 }
 

@@ -196,7 +196,8 @@
         ],
         "minimumValue": -10,
         "maximumValue": 0,
-        "scarcity": "Luôn hiện hữu và đe dọa, khó giảm nhưng rất dễ tăng nếu bất cẩn."
+        "scarcity": "Luôn hiện hữu và đe dọa, khó giảm nhưng rất dễ tăng nếu bất cẩn.",
+        "exchangeAnchors": []
       },
       {
         "id": "res_linh_thach",
@@ -220,7 +221,8 @@
         ],
         "minimumValue": 0,
         "maximumValue": 100000,
-        "scarcity": "Cực kỳ khan hiếm ở giai đoạn đầu, buộc nhân vật phải thắt lưng buộc bụng và tính toán chi li."
+        "scarcity": "Cực kỳ khan hiếm ở giai đoạn đầu, buộc nhân vật phải thắt lưng buộc bụng và tính toán chi li.",
+        "exchangeAnchors": []
       },
       {
         "id": "res_uy_tin",
@@ -238,7 +240,8 @@
         "referenceScale": null,
         "minimumValue": null,
         "maximumValue": null,
-        "scarcity": "Khó xây dựng nhưng dễ mất đi nếu một dự án dài hạn thất bại hoặc chậm sinh lời."
+        "scarcity": "Khó xây dựng nhưng dễ mất đi nếu một dự án dài hạn thất bại hoặc chậm sinh lời.",
+        "exchangeAnchors": []
       }
     ],
     "promises": [
@@ -723,7 +726,9 @@
             "unit": "Viên",
             "source": "Tiền cọc từ khế ước thuê đất của Lục Diệp Môn",
             "sink": "Ngân khố đang cạn kiệt của Thanh gia",
-            "evidenceRequired": true
+            "evidenceRequired": true,
+            "consideration": [],
+            "transactionKind": "gain"
           },
           {
             "id": "delta_4_3",
@@ -796,7 +801,9 @@
             "unit": "Đời",
             "source": "Ký kết khế ước luân canh phục hồi đất",
             "sink": "Khoản nợ nghiệp truyền đời của gia tộc",
-            "evidenceRequired": true
+            "evidenceRequired": true,
+            "consideration": [],
+            "transactionKind": "gain"
           },
           {
             "id": "delta_5_3",

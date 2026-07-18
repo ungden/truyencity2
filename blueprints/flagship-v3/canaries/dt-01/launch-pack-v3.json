@@ -210,7 +210,25 @@
         ],
         "minimumValue": 0,
         "maximumValue": 1000000000,
-        "scarcity": "Rất khan hiếm ở giai đoạn đầu, tăng dần khi quy mô kinh doanh mở rộng nhưng luôn cần để tái đầu tư."
+        "scarcity": "Rất khan hiếm ở giai đoạn đầu, tăng dần khi quy mô kinh doanh mở rộng nhưng luôn cần để tái đầu tư.",
+        "exchangeAnchors": [
+          {
+            "itemId": "gao_trang",
+            "name": "Gạo trắng",
+            "quantity": 5,
+            "unit": "kg",
+            "costAmount": 500,
+            "tolerancePercent": 20
+          },
+          {
+            "itemId": "thit_lon",
+            "name": "Thịt lợn",
+            "quantity": 0.5,
+            "unit": "kg",
+            "costAmount": 100,
+            "tolerancePercent": 20
+          }
+        ]
       },
       {
         "id": "res_trust",
@@ -235,7 +253,8 @@
         ],
         "minimumValue": 0,
         "maximumValue": 100,
-        "scarcity": "Tích lũy rất chậm qua từng hành động nhỏ, dễ bị sụt giảm nếu thất hứa hoặc thanh toán chậm."
+        "scarcity": "Tích lũy rất chậm qua từng hành động nhỏ, dễ bị sụt giảm nếu thất hứa hoặc thanh toán chậm.",
+        "exchangeAnchors": []
       },
       {
         "id": "res_fish_quality",
@@ -255,7 +274,8 @@
         "referenceScale": null,
         "minimumValue": null,
         "maximumValue": null,
-        "scarcity": "Luôn giảm dần theo thời gian, đòi hỏi nhân vật phải chạy đua với thời tiết và khoảng cách."
+        "scarcity": "Luôn giảm dần theo thời gian, đòi hỏi nhân vật phải chạy đua với thời tiết và khoảng cách.",
+        "exchangeAnchors": []
       }
     ],
     "promises": [
@@ -749,7 +769,9 @@
             "unit": "Đồng",
             "source": "Bán mẻ cá dạt đầu tiên cho Thím Hai",
             "sink": "Thu tiền mặt từ tay Thím Hai tại quán cơm",
-            "evidenceRequired": true
+            "evidenceRequired": true,
+            "consideration": [],
+            "transactionKind": "gain"
           },
           {
             "id": "delta_ch3_rel_thim",
@@ -782,11 +804,11 @@
             "locationId": "cho_huyen",
             "durationMinutes": 20,
             "travelMinutesFromPrevious": 0,
-            "desire": "Lâm muốn mua gạo thơm và thịt lợn để bồi bổ cho Mai.",
+            "desire": "Lâm muốn mua nửa cân gạo thơm và một phần tư cân thịt lợn để bồi bổ cho Mai.",
             "opposition": "Giá cả thực phẩm khá cao, Lâm phải cân nhắc chi tiêu để còn giữ lại tiền vốn.",
             "tactic": "Lâm mặc cả khéo léo, mua đủ lượng thức ăn ngon nhưng vẫn giữ lại phần lớn số tiền.",
             "cost": "Lâm tiêu mất 100 đồng, làm giảm số vốn có thể dùng để tái đầu tư vào ngày mai.",
-            "payoff": "Lâm mua được 5 cân gạo trắng và một miếng thịt lợn ngon lành.",
+            "payoff": "Lâm mua được nửa cân gạo trắng và một phần tư cân thịt lợn, vừa đủ cho bữa cơm cải thiện.",
             "irreversibleChange": "Lâm chuyển đổi một phần lợi nhuận thành giá trị dinh dưỡng thiết thực cho gia đình.",
             "informationDelta": "Lâm nắm được giá cả thị trường thực phẩm tại chợ huyện.",
             "hookIntent": "cost_revealed",
@@ -832,7 +854,22 @@
             "unit": "Đồng",
             "source": "Lâm trả tiền mua gạo và thịt lợn",
             "sink": "Chủ sạp gạo và thịt lợn ở chợ huyện",
-            "evidenceRequired": true
+            "evidenceRequired": true,
+            "consideration": [
+              {
+                "itemId": "gao_trang",
+                "name": "Gạo trắng",
+                "quantity": 0.5,
+                "unit": "kg"
+              },
+              {
+                "itemId": "thit_lon",
+                "name": "Thịt lợn",
+                "quantity": 0.25,
+                "unit": "kg"
+              }
+            ],
+            "transactionKind": "purchase"
           },
           {
             "id": "delta_ch4_loc_lam",
@@ -938,7 +975,9 @@
             "unit": "Đồng",
             "source": "Lâm trích một phần tiền lãi hôm trước",
             "sink": "Đưa cho Lão Bốn để tạo mối quan hệ tốt",
-            "evidenceRequired": true
+            "evidenceRequired": true,
+            "consideration": [],
+            "transactionKind": "transfer"
           },
           {
             "id": "delta_ch5_res_trust",
@@ -950,7 +989,9 @@
             "unit": "Điểm",
             "source": "Lâm chủ động trả tiền cho mẻ cá dạt vốn được cho không",
             "sink": "Lão Bốn nhận tiền và thay đổi cái nhìn về Lâm",
-            "evidenceRequired": true
+            "evidenceRequired": true,
+            "consideration": [],
+            "transactionKind": "gain"
           },
           {
             "id": "delta_ch5_rel_bon",

@@ -34,9 +34,9 @@ describe('flagship v3 offline opening runner', () => {
         calls.push(`${chapterNumber}:${call.role}:${model}`);
         const plan = launchPack.initialWindow.plans[chapterNumber - 1];
         const markers = plan.requiredDeltas.map(delta => `Dấu mốc ${delta.id} đã hiện rõ trong hành động.`);
-        const content = `${markers.join(' ')} ${'Nhân vật tự kiểm tra nguồn lực, nói chuyện với người liên quan rồi chấp nhận cái giá của lựa chọn trước khi nhận kết quả. '.repeat(18)}`;
+        const content = `${markers.join(' ')} ${Array.from({ length: 8 }, () => 'Nhân vật tự kiểm tra nguồn lực, nói chuyện với người liên quan rồi chấp nhận cái giá của lựa chọn trước khi nhận kết quả. '.repeat(10)).join('\n\n')}`;
         const payload = call.role === 'writer' || call.role === 'writer_revision'
-          ? { title: `Chương ${chapterNumber}: Lựa chọn có giá`, content }
+          ? { title: `Chương ${chapterNumber}: Lựa chọn có giá`, scenes: plan.scenes.map(scene => ({ sceneId: scene.id, paragraphs: content.split(/\n\s*\n/u) })) }
           : {
               status: 'pass', hardGates, qualityGates, issues: [],
               revisionInstructions: [],
@@ -72,9 +72,9 @@ describe('flagship v3 offline opening runner', () => {
       invoke: async ({ chapterNumber, model, call }) => {
         const plan = launchPack.initialWindow.plans[chapterNumber - 1];
         const marker = 'Nhân vật chưa trả được cái giá đã hứa.';
-        const content = `${marker} ${'Anh kiểm tra tình hình rồi lựa chọn cách giải quyết phù hợp với người trong cảnh. '.repeat(20)}`;
+        const content = `${marker} ${Array.from({ length: 8 }, () => 'Anh kiểm tra tình hình rồi lựa chọn cách giải quyết phù hợp với người trong cảnh. '.repeat(12)).join('\n\n')}`;
         const payload = call.role === 'writer' || call.role === 'writer_revision'
-          ? { title: `Chương ${chapterNumber}: Bản thử`, content: call.role === 'writer_revision' ? `${content} Bản sửa vẫn không tạo được nguồn lực hợp lệ.` : content }
+          ? { title: `Chương ${chapterNumber}: Bản thử`, scenes: plan.scenes.map(scene => ({ sceneId: scene.id, paragraphs: (call.role === 'writer_revision' ? `${content} Bản sửa vẫn không tạo được nguồn lực hợp lệ.` : content).split(/\n\s*\n/u) })) }
           : {
               status: 'issues',
               hardGates: { ...hardGates, resource_causality: false },

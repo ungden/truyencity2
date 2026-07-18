@@ -200,7 +200,8 @@
         ],
         "minimumValue": 0,
         "maximumValue": 10000,
-        "scarcity": "Cực kỳ khan hiếm, bị kiểm soát bởi Dân Nước."
+        "scarcity": "Cực kỳ khan hiếm, bị kiểm soát bởi Dân Nước.",
+        "exchangeAnchors": []
       },
       {
         "id": "res_moss",
@@ -222,7 +223,8 @@
         ],
         "minimumValue": 0,
         "maximumValue": 5000,
-        "scarcity": "Khan hiếm, phụ thuộc vào sinh mạng của Thợ Rêu."
+        "scarcity": "Khan hiếm, phụ thuộc vào sinh mạng của Thợ Rêu.",
+        "exchangeAnchors": []
       },
       {
         "id": "res_legitimacy",
@@ -240,7 +242,8 @@
         "referenceScale": null,
         "minimumValue": null,
         "maximumValue": null,
-        "scarcity": "Khó xây dựng nhưng dễ mất nếu một công trình sụp đổ hoặc gây ngộ độc."
+        "scarcity": "Khó xây dựng nhưng dễ mất nếu một công trình sụp đổ hoặc gây ngộ độc.",
+        "exchangeAnchors": []
       }
     ],
     "promises": [
@@ -570,7 +573,9 @@
             "unit": "Lít",
             "source": "Lấy từ nguồn dự trữ cá nhân của Kian",
             "sink": "Trộn mẻ bùn thử nghiệm thất bại tại đập",
-            "evidenceRequired": true
+            "evidenceRequired": true,
+            "consideration": [],
+            "transactionKind": "consume"
           },
           {
             "id": "delta_1_4",
@@ -814,7 +819,9 @@
             "unit": "Bó",
             "source": "Lão Rạc xuất kho dự trữ mang đến hiện trường",
             "sink": "Trộn mẻ bùn sinh mệnh khổng lồ để vá đập",
-            "evidenceRequired": true
+            "evidenceRequired": true,
+            "consideration": [],
+            "transactionKind": "consume"
           },
           {
             "id": "delta_3_5",
@@ -826,7 +833,9 @@
             "unit": "Lít",
             "source": "Lấy từ phần nước ít ỏi còn lại trong đập",
             "sink": "Trộn mẻ bùn sinh mệnh khổng lồ để vá đập",
-            "evidenceRequired": true
+            "evidenceRequired": true,
+            "consideration": [],
+            "transactionKind": "consume"
           },
           {
             "id": "delta_3_6",
@@ -929,7 +938,9 @@
             "unit": "Lít",
             "source": "Đập nước được vá kín bắt đầu tích tụ nước ngọt",
             "sink": "Chảy vào hồ chứa chung của khu định cư",
-            "evidenceRequired": true
+            "evidenceRequired": true,
+            "consideration": [],
+            "transactionKind": "gain"
           },
           {
             "id": "delta_4_2",

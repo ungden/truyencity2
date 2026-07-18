@@ -12,6 +12,7 @@ import {
   FlagshipModelRoutesV3Schema,
   EditorAssessmentV3Schema,
   RollingPlanWindowDraftV3Schema,
+  RevisionOutputV3Schema,
   V3_ROLLING_PLANNER_PROMPT_VERSION,
   V3_ROLLING_PLANNER_SYSTEM,
   WriterOutputV3Schema,
@@ -77,7 +78,9 @@ function validateJsonContract(schema: z.ZodTypeAny, raw: string): { valid: boole
 }
 
 function schemaFor(call: FlagshipV3ModelCall): z.ZodTypeAny {
-  return call.role === 'writer' || call.role === 'writer_revision' ? WriterOutputV3Schema : EditorAssessmentV3Schema;
+  if (call.role === 'writer') return WriterOutputV3Schema;
+  if (call.role === 'writer_revision') return RevisionOutputV3Schema;
+  return EditorAssessmentV3Schema;
 }
 
 async function invokeChapter(chapterNumber: number, model: string, call: FlagshipV3ModelCall): Promise<OfflineOpeningModelResponseV3> {

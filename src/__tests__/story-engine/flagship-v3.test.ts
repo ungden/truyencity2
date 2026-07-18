@@ -24,6 +24,7 @@ import {
   assessOpeningFinalistV3,
   applyChapterStateV3,
   runV3ProsePreflight,
+  runV3StructuredProsePreflight,
   validateV3Artifacts,
   assessEndingReadinessV3,
   assertFlagshipReleaseV3,
@@ -40,7 +41,12 @@ import { toGeminiResponseJsonSchema } from '@/services/story-engine/flagship/set
 import { supportsGeminiThinkingLevel } from '@/services/story-engine/utils/gemini';
 
 const detailed = (value: string) => `${value} với nguyên nhân, giới hạn và hậu quả cụ thể trong thế giới truyện.`;
-const prose = (marker: string, bad = '') => `${marker} ${bad} ${'Sơn làm việc bằng đôi tay chai sần, kiểm tra từng thay đổi rồi mới gọi người nhà đến chứng kiến kết quả. '.repeat(18)}`.trim();
+const prose = (marker: string, bad = '') => `${marker} ${bad} ${Array.from({ length: 6 }, () => 'Sơn làm việc bằng đôi tay chai sần, kiểm tra từng thay đổi rồi mới gọi người nhà đến chứng kiến kết quả. '.repeat(15)).join('\n\n')}`.trim();
+const paragraphs = (content: string) => content.split(/\n\s*\n/gu).map(item => item.trim()).filter(Boolean);
+const writerPayload = (content: string) => ({
+  title: 'Mẻ Cá Qua Mưa',
+  scenes: plan().scenes.map(scene => ({ sceneId: scene.id, paragraphs: paragraphs(content) })),
+});
 
 function kernel(): StoryKernelV3 {
   return StoryKernelV3Schema.parse({
@@ -101,6 +107,7 @@ function kernel(): StoryKernelV3 {
         sourceRules: ['Chỉ tăng từ giao dịch có người trả tiền'],
         spendRules: ['Mọi khoản mua dụng cụ phải bị trừ'],
         referenceScale: ['100 đồng mua được 2 ký muối sạch tại mốc đầu truyện'],
+        exchangeAnchors: [{ itemId: 'clean_salt', name: 'Muối sạch', quantity: 2, unit: 'kg', costAmount: 100, tolerancePercent: 20 }],
         minimumValue: 0,
         maximumValue: 1000000000,
         scarcity: detailed('Gia đình thiếu vốn trong giai đoạn đầu'),
@@ -113,6 +120,7 @@ function kernel(): StoryKernelV3 {
         sourceRules: ['Chỉ có từ số muối đã rửa và để ráo'],
         spendRules: ['Ướp cá phải trừ đúng khối lượng'],
         referenceScale: ['2 ký muối đủ ướp một mẻ cá thử quy mô gia đình'],
+        exchangeAnchors: [],
         minimumValue: 0,
         maximumValue: 10000,
         scarcity: detailed('Muối sạch chưa có nguồn ổn định'),
@@ -125,6 +133,7 @@ function kernel(): StoryKernelV3 {
         sourceRules: ['Chỉ đổi khi một người mua cam kết'],
         spendRules: ['Uy tín bị giảm nếu giao sai chất lượng'],
         referenceScale: null,
+        exchangeAnchors: [],
         minimumValue: null,
         maximumValue: null,
         scarcity: detailed('Gia đình chưa có khách hàng trực tiếp'),
@@ -216,8 +225,8 @@ function plan(): ChapterPlanV3 {
       },
     ],
     requiredDeltas: [
-      { id: 'cash_spent', kind: 'resource_numeric', resourceId: 'cash', before: 100, delta: -20, after: 80, unit: 'dong', source: 'tiền riêng của Sơn', sink: 'cam kết với cha', evidenceRequired: true },
-      { id: 'salt_spent', kind: 'resource_numeric', resourceId: 'salt', before: 3, delta: -2, after: 1, unit: 'kg', source: 'muối sạch đã rửa', sink: 'ướp lô cá', evidenceRequired: true },
+      { id: 'cash_spent', kind: 'resource_numeric', resourceId: 'cash', before: 100, delta: -20, after: 80, unit: 'dong', source: 'tiền riêng của Sơn', sink: 'cam kết với cha', transactionKind: 'transfer', consideration: [], evidenceRequired: true },
+      { id: 'salt_spent', kind: 'resource_numeric', resourceId: 'salt', before: 3, delta: -2, after: 1, unit: 'kg', source: 'muối sạch đã rửa', sink: 'ướp lô cá', transactionKind: 'consume', consideration: [], evidenceRequired: true },
       { id: 'mother_learns', kind: 'character_knowledge', characterId: 'me_son', factId: 'weather', learnedFrom: 'Sơn giải thích dấu gió trong lúc ướp cá', evidenceRequired: true },
       { id: 'promise_advanced', kind: 'promise', promiseId: 'promise_0', statusAfter: 'advanced', pressureAfter: detailed('Phải bán được mẻ cá giữ chất lượng'), evidenceRequired: true },
     ],
@@ -309,7 +318,12 @@ describe('flagship v3 core engine', () => {
     expect(schema).not.toContain('startMinute');
     expect(schema).not.toContain('valueBefore');
     expect(schema).not.toContain('"before"');
-    expect(schema).not.toContain('"unit"');
+    const parsed = toGeminiResponseJsonSchema(RollingPlanWindowDraftV3Schema) as any;
+    const numeric = parsed.properties.plans.items.properties.requiredDeltas.items.anyOf
+      .find((branch: any) => branch.properties.kind.enum.includes('resource_numeric')).properties;
+    expect(numeric).not.toHaveProperty('before');
+    expect(numeric).not.toHaveProperty('after');
+    expect(numeric).not.toHaveProperty('unit');
   });
 
   it('requires an explicit scale anchor for every numeric story resource', () => {
@@ -344,6 +358,26 @@ describe('flagship v3 core engine', () => {
     );
   });
 
+  it('blocks an economically impossible purchase before Writer and accepts the story-priced quantity', () => {
+    const purchase = (quantity: number) => ChapterPlanV3Schema.parse({
+      ...plan(),
+      requiredDeltas: plan().requiredDeltas.map(delta => delta.id === 'cash_spent' && delta.kind === 'resource_numeric'
+        ? {
+            ...delta,
+            transactionKind: 'purchase' as const,
+            consideration: [{ itemId: 'clean_salt', name: 'Muối sạch', quantity, unit: 'kg' }],
+            source: 'Sơn trả tiền mua muối sạch cho mẻ cá',
+            sink: 'Người bán muối nhận tiền tại sân nhà',
+          }
+        : delta),
+    });
+    expect(validateV3Artifacts({ kernel: kernel(), arc, state: state(), plan: purchase(0.4) })
+      .some(issue => issue.code === 'resource_exchange_implausible')).toBe(false);
+    expect(validateV3Artifacts({ kernel: kernel(), arc, state: state(), plan: purchase(2) })).toEqual(
+      expect.arrayContaining([expect.objectContaining({ code: 'resource_exchange_implausible' })]),
+    );
+  });
+
   it('detects CJK and verbatim plan prose without a model critic', () => {
     const content = `${plan().scenes[0].desire} kim loại拼凑 lại.`;
     expect(runV3ProsePreflight(content, plan()).map(item => item.code)).toEqual(
@@ -356,6 +390,25 @@ describe('flagship v3 core engine', () => {
     expect(runV3ProsePreflight(content, plan())).toEqual(expect.arrayContaining([
       expect.objectContaining({ code: 'foreign_script_text', excerpt: 'แทบไม่' }),
     ]));
+  });
+
+  it('turns the live canary cliche cluster and zero-cash dialogue contradiction into deterministic evidence', () => {
+    const zeroCashState = StoryStateV3Schema.parse({
+      ...state(),
+      resources: state().resources.map(resource => resource.resourceId === 'cash'
+        ? { ...resource, value: { mode: 'numeric' as const, amount: 0, unit: 'dong' } }
+        : resource),
+    });
+    const content = 'Tiếng ho xé toạc màn đêm. Anh thề cắn nát sỏi đá. Ngọn lửa bùng lên trong huyết quản. Mai nói mình cứ để tiền đó mà lo vốn liếng.';
+    const evidence = runV3StructuredProsePreflight({
+      content,
+      scenes: [{ sceneId: 'scene_1_a', content }],
+      plan: plan(),
+      targetWordCount: 10,
+      kernel: kernel(),
+      state: zeroCashState,
+    });
+    expect(evidence.map(item => item.code)).toEqual(expect.arrayContaining(['ai_cliche_cluster', 'zero_cash_claim_conflict']));
   });
 
   it('projects lower-priority history out of Editor and Revision context explicitly', () => {
@@ -403,7 +456,7 @@ describe('flagship v3 core engine', () => {
     expect(V3_ROLLING_PLANNER_RULES).toContain('Không được chi tiền/tài nguyên chưa kiếm được');
     expect(V3_ROLLING_PLANNER_RULES).toContain('chapterPromise là một câu tiếng Việt cụ thể');
     expect(V3_ROLLING_PLANNER_RULES).toContain('Promise ID chỉ xuất hiện trong delta kind=promise');
-    expect(V3_WRITER_SYSTEM).toContain('durationMinutes và travelMinutesFromPrevious là số phút canon');
+    expect(V3_WRITER_SYSTEM).toContain('Các time cue chỉ để giữ thứ tự');
     expect(V3_WRITER_SYSTEM).toContain('povCharacterId phải là tâm điểm tri giác');
     expect(V3_WRITER_SYSTEM).toContain('Không gộp hai scene');
     expect(V3_WRITER_SYSTEM).toContain('ranh giới cảnh rõ');
@@ -466,8 +519,8 @@ describe('flagship v3 core engine', () => {
         const chapterNumber = offset + 1;
         const deltas = chapterNumber === 1
           ? [
-              { id: 'cash_earned', kind: 'resource_numeric', resourceId: 'cash', delta: 2500, source: detailed('Khách trả tiền cho mẻ cá'), sink: detailed('Tiền nhập vào quỹ gia đình'), evidenceRequired: true },
-              { id: 'cash_spent', kind: 'resource_numeric', resourceId: 'cash', delta: -5000, source: detailed('Quỹ gia đình sau khi bán cá'), sink: detailed('Mua dụng cụ bảo quản mới'), evidenceRequired: true },
+              { id: 'cash_earned', kind: 'resource_numeric', resourceId: 'cash', delta: 2500, source: detailed('Khách trả tiền cho mẻ cá'), sink: detailed('Tiền nhập vào quỹ gia đình'), transactionKind: 'gain', consideration: [], evidenceRequired: true },
+              { id: 'cash_spent', kind: 'resource_numeric', resourceId: 'cash', delta: -5000, source: detailed('Quỹ gia đình sau khi bán cá'), sink: detailed('Khoản chuyển vào quỹ dự phòng'), transactionKind: 'transfer', consideration: [], evidenceRequired: true },
             ]
           : [{ id: `promise_advance_${chapterNumber}`, kind: 'promise', promiseId: 'promise_0', statusAfter: 'advanced', pressureAfter: detailed(`Áp lực tiếp nối chương ${chapterNumber}`), evidenceRequired: true }];
         return {
@@ -504,8 +557,8 @@ describe('flagship v3 core engine', () => {
     const invalid = {
       ...plan(),
       requiredDeltas: [
-        { id: 'cash_earned', kind: 'resource_numeric' as const, resourceId: 'cash', before: 2750, delta: 500, after: 3250, unit: 'dong', source: detailed('Khách trả tiền cho mẻ cá'), sink: detailed('Tiền nhập vào quỹ gia đình'), evidenceRequired: true as const },
-        { id: 'cash_spent', kind: 'resource_numeric' as const, resourceId: 'cash', before: 3250, delta: -5000, after: -1750, unit: 'dong', source: detailed('Quỹ gia đình sau khi bán cá'), sink: detailed('Mua dụng cụ bảo quản mới'), evidenceRequired: true as const },
+        { id: 'cash_earned', kind: 'resource_numeric' as const, resourceId: 'cash', before: 2750, delta: 500, after: 3250, unit: 'dong', source: detailed('Khách trả tiền cho mẻ cá'), sink: detailed('Tiền nhập vào quỹ gia đình'), transactionKind: 'gain' as const, consideration: [], evidenceRequired: true as const },
+        { id: 'cash_spent', kind: 'resource_numeric' as const, resourceId: 'cash', before: 3250, delta: -5000, after: -1750, unit: 'dong', source: detailed('Quỹ gia đình sau khi bán cá'), sink: detailed('Khoản chuyển vào quỹ dự phòng'), transactionKind: 'transfer' as const, consideration: [], evidenceRequired: true as const },
       ],
       scenes: [{ ...plan().scenes[0], requiredDeltaIds: ['cash_earned', 'cash_spent'] }],
     };
@@ -520,7 +573,7 @@ describe('flagship v3 core engine', () => {
       ...valid,
       plans: valid.plans.map((item, index) => index === 0 ? {
         ...item,
-        requiredDeltas: [{ id: 'overspend_cash', kind: 'resource_numeric', resourceId: 'cash', delta: -1000, source: detailed('Tiền mặt hiện có trong gia đình'), sink: detailed('Khoản mua vượt quá số dư hiện có'), evidenceRequired: true }],
+        requiredDeltas: [{ id: 'overspend_cash', kind: 'resource_numeric', resourceId: 'cash', delta: -1000, source: detailed('Tiền mặt hiện có trong gia đình'), sink: detailed('Khoản phí vượt quá số dư hiện có'), transactionKind: 'fee', consideration: [], evidenceRequired: true }],
         scenes: item.scenes.map((scene, sceneIndex) => sceneIndex === 0 ? { ...scene, requiredDeltaIds: ['overspend_cash'] } : scene),
       } : item),
     });
@@ -552,7 +605,7 @@ describe('flagship v3 core engine', () => {
       ...valid,
       plans: valid.plans.map((item, index) => index === 0 ? {
         ...item,
-        requiredDeltas: [{ id: 'overspend_cash', kind: 'resource_numeric', resourceId: 'cash', delta: -1000, source: detailed('Tiền mặt hiện có trong gia đình'), sink: detailed('Khoản mua vượt quá số dư hiện có'), evidenceRequired: true }],
+        requiredDeltas: [{ id: 'overspend_cash', kind: 'resource_numeric', resourceId: 'cash', delta: -1000, source: detailed('Tiền mặt hiện có trong gia đình'), sink: detailed('Khoản phí vượt quá số dư hiện có'), transactionKind: 'fee', consideration: [], evidenceRequired: true }],
         scenes: item.scenes.map((scene, sceneIndex) => sceneIndex === 0 ? { ...scene, requiredDeltaIds: ['overspend_cash'] } : scene),
       } : item),
     });
@@ -579,13 +632,31 @@ describe('flagship v3 core engine', () => {
     }, {
       invoke: async call => {
         calls.push(call.role);
-        if (call.role === 'writer') return JSON.stringify({ title: 'Mẻ Cá Qua Mưa', content });
+        if (call.role === 'writer') return JSON.stringify({ ...writerPayload(content), title: 'Chương 1: Mẻ Cá Qua Mưa' });
         return JSON.stringify(passAssessment(content));
       },
     });
     expect(calls).toEqual(['writer', 'editor']);
     expect(contexts.used().map(context => context.role)).toEqual(['writer', 'editor']);
     expect(result.verdict.decision).toBe('publish');
+    expect(result.title).toBe('Mẻ Cá Qua Mưa');
+  });
+
+  it('normalizes provider double-escaped line breaks without rewriting prose words', async () => {
+    const contexts = buildV3RoleContexts({ kernel: kernel(), arc, state: state(), plan: plan() });
+    const content = prose('Sơn trả đủ hai mươi đồng rồi dùng đúng hai ký muối cho mẻ cá.');
+    const escapedParagraphs = paragraphs(content).map((item, index) => index === 0 ? `${item}\\nMột nhịp quan sát tiếp nối.` : item);
+    const result = await executeFlagshipV3Pipeline({
+      kernel: kernel(), arc, state: state(), plan: plan(), targetWordCount: 1600, contexts,
+    }, {
+      invoke: async call => call.role === 'writer'
+        ? JSON.stringify({ title: 'Mẻ Cá Qua Mưa', scenes: plan().scenes.map(scene => ({ sceneId: scene.id, paragraphs: escapedParagraphs })) })
+        : JSON.stringify(passAssessment(content)),
+    });
+    expect(result.content).toContain('\n\n');
+    expect(result.content).not.toContain('\\n');
+    expect(result.content).toContain('Sơn trả đủ hai mươi đồng rồi dùng đúng hai ký muối cho mẻ cá.');
+    expect(result.content).toContain('Một nhịp quan sát tiếp nối.');
   });
 
   it('requires Writer revision and an independent Re-editor before publish', async () => {
@@ -598,8 +669,11 @@ describe('flagship v3 core engine', () => {
     }, {
       invoke: async call => {
         calls.push(call.role);
-        if (call.role === 'writer') return JSON.stringify({ title: 'Mẻ Cá Qua Mưa', content: bad });
-        if (call.role === 'writer_revision') return JSON.stringify({ title: 'Mẻ Cá Qua Mưa', content: fixed });
+        if (call.role === 'writer') return JSON.stringify({
+          title: 'Mẻ Cá Qua Mưa',
+          scenes: plan().scenes.map((scene, index) => ({ sceneId: scene.id, paragraphs: paragraphs(index === 0 ? bad : fixed) })),
+        });
+        if (call.role === 'writer_revision') return JSON.stringify({ patches: [{ spanId: 'span_001', replacement: fixed.slice(0, 650) }] });
         if (call.role === 'editor') {
           return JSON.stringify({
             status: 'issues', hardGates, qualityGates: { ...qualityGates, prose_naturalness: false },
@@ -614,6 +688,7 @@ describe('flagship v3 core engine', () => {
     expect(calls).toEqual(['writer', 'editor', 'writer_revision', 'editor_recheck']);
     expect(contexts.used().map(context => context.role)).toEqual(['writer', 'editor', 'revision']);
     expect(result.revisionLineage).toHaveLength(1);
+    expect(result.content.slice(-200)).toBe(fixed.slice(-200));
   });
 
   it('routes a grounded local canon wording error through the single revision', () => {
@@ -676,8 +751,11 @@ describe('flagship v3 core engine', () => {
       kernel: kernel(), arc, state: state(), plan: plan(), targetWordCount: 1600, contexts,
     }, {
       invoke: async call => {
-        if (call.role === 'writer') return JSON.stringify({ title: 'Mẻ Cá Qua Mưa', content: contaminated });
-        if (call.role === 'writer_revision') return JSON.stringify({ title: 'Mẻ Cá Qua Mưa', content: fixed });
+        if (call.role === 'writer') return JSON.stringify({
+          title: 'Mẻ Cá Qua Mưa',
+          scenes: plan().scenes.map((scene, index) => ({ sceneId: scene.id, paragraphs: paragraphs(index === 0 ? contaminated : fixed) })),
+        });
+        if (call.role === 'writer_revision') return JSON.stringify({ patches: [{ spanId: 'span_001', replacement: fixed.slice(0, 650) }] });
         if (call.role === 'editor') {
           return JSON.stringify({
             status: 'pass', hardGates, qualityGates, issues: [],
@@ -699,7 +777,7 @@ describe('flagship v3 core engine', () => {
       kernel: kernel(), arc, state: state(), plan: plan(), targetWordCount: 1600, contexts,
     }, {
       invoke: async call => {
-        if (call.role === 'writer') return JSON.stringify({ title: 'Mẻ Cá Qua Mưa', content: bad });
+        if (call.role === 'writer') return JSON.stringify(writerPayload(bad));
         return JSON.stringify({
           status: 'issues', hardGates, qualityGates: { ...qualityGates, prose_naturalness: false },
           issues: [{ gate: 'prose_naturalness', severity: 'moderate', message: 'Câu cục bộ phá giọng.', spanId: 'span_001', locality: 'local', repairMode: 'local_edit' }],
@@ -716,7 +794,7 @@ describe('flagship v3 core engine', () => {
     await expect(executeFlagshipV3Pipeline({
       kernel: kernel(), arc, state: state(), plan: plan(), targetWordCount: 1600, contexts,
     }, { invoke: async call => call.role === 'writer'
-      ? JSON.stringify({ title: 'Mẻ Cá Qua Mưa', content })
+      ? JSON.stringify(writerPayload(content))
       : JSON.stringify({ status: 'pass', hardGates, qualityGates: { ...qualityGates, character_voice: false }, issues: [], revisionInstructions: [], realizedDeltaEvidence: deltaEvidence(content) })
     })).rejects.toThrow('violated its exact output contract');
   });

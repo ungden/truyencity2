@@ -209,7 +209,8 @@
         ],
         "minimumValue": 0,
         "maximumValue": 500,
-        "scarcity": "Cực kỳ khan hiếm, là giới hạn sống còn buộc An phải chọn lọc món đồ để phục chế."
+        "scarcity": "Cực kỳ khan hiếm, là giới hạn sống còn buộc An phải chọn lọc món đồ để phục chế.",
+        "exchangeAnchors": []
       },
       {
         "id": "res_uy_tin",
@@ -234,7 +235,8 @@
         ],
         "minimumValue": -100,
         "maximumValue": 1000,
-        "scarcity": "Tăng chậm nhưng có thể mất rất nhanh nếu mắc sai lầm chuyên môn."
+        "scarcity": "Tăng chậm nhưng có thể mất rất nhanh nếu mắc sai lầm chuyên môn.",
+        "exchangeAnchors": []
       },
       {
         "id": "res_manh_ghep_lich_su",
@@ -253,7 +255,8 @@
         "referenceScale": null,
         "minimumValue": null,
         "maximumValue": null,
-        "scarcity": "Không thể mua bằng tiền, chỉ xuất hiện khi hoàn thành các chuỗi nhiệm vụ cốt truyện cốt lõi."
+        "scarcity": "Không thể mua bằng tiền, chỉ xuất hiện khi hoàn thành các chuỗi nhiệm vụ cốt truyện cốt lõi.",
+        "exchangeAnchors": []
       }
     ],
     "promises": [
@@ -661,7 +664,9 @@
             "unit": "gram",
             "source": "Tiêu hao trong quá trình nung chảy để vá vô ảnh chiếc bát.",
             "sink": "Hòa quyện vĩnh viễn vào các vết nứt của chiếc bát cổ.",
-            "evidenceRequired": true
+            "evidenceRequired": true,
+            "consideration": [],
+            "transactionKind": "consume"
           },
           {
             "id": "delta_2_4",
@@ -763,7 +768,9 @@
             "unit": "điểm",
             "source": "Sự công nhận công khai từ một nhà sưu tầm uy tín như Ông Lâm.",
             "sink": "Lan truyền trong giới buôn bán đồ cổ tại chợ Kim Biên.",
-            "evidenceRequired": true
+            "evidenceRequired": true,
+            "consideration": [],
+            "transactionKind": "gain"
           },
           {
             "id": "delta_3_4",
@@ -979,7 +986,9 @@
             "unit": "điểm",
             "source": "Cứu Ông Lâm khỏi một vố lừa ngoạn mục trị giá hàng tỷ đồng.",
             "sink": "Ghi dấu ấn mạnh mẽ trong tâm trí của nhà sưu tầm ẩn danh.",
-            "evidenceRequired": true
+            "evidenceRequired": true,
+            "consideration": [],
+            "transactionKind": "gain"
           },
           {
             "id": "delta_5_4",

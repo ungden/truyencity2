@@ -207,7 +207,8 @@
         ],
         "minimumValue": 0,
         "maximumValue": 100,
-        "scarcity": "Rất hiếm, đòi hỏi rủi ro tính mạng để thu thập."
+        "scarcity": "Rất hiếm, đòi hỏi rủi ro tính mạng để thu thập.",
+        "exchangeAnchors": []
       },
       {
         "id": "res_seo_nhan_qua",
@@ -229,7 +230,8 @@
         ],
         "minimumValue": 0,
         "maximumValue": 100,
-        "scarcity": "Tăng dần không thể đảo ngược, tạo áp lực thời gian sống cho nhân vật."
+        "scarcity": "Tăng dần không thể đảo ngược, tạo áp lực thời gian sống cho nhân vật.",
+        "exchangeAnchors": []
       },
       {
         "id": "res_quyen_truy_cap",
@@ -247,7 +249,8 @@
         "referenceScale": null,
         "minimumValue": null,
         "maximumValue": null,
-        "scarcity": "Được kiểm soát gắt gao bởi Cục Lưu Trữ, thay đổi mã liên tục."
+        "scarcity": "Được kiểm soát gắt gao bởi Cục Lưu Trữ, thay đổi mã liên tục.",
+        "exchangeAnchors": []
       }
     ],
     "promises": [
@@ -782,7 +785,9 @@
             "unit": "bản",
             "source": "Sao chép thành công từ ấn triện gốc của Silas",
             "sink": "Chưa phát sinh tiêu hao trong quá trình này",
-            "evidenceRequired": true
+            "evidenceRequired": true,
+            "consideration": [],
+            "transactionKind": "gain"
           }
         ],
         "nextChapterPressure": "Cảnh báo vi mô đã được kích hoạt, Mặc Quan đang lao tới với tốc độ tối đa."
@@ -949,7 +954,9 @@
             "unit": "phần trăm cơ thể",
             "source": "Công bố lỗi ấn triện độc quyền của Silas trước hội đồng",
             "sink": "Không thể tiêu hao do tính chất nhân quả",
-            "evidenceRequired": true
+            "evidenceRequired": true,
+            "consideration": [],
+            "transactionKind": "gain"
           },
           {
             "id": "delta_prom_silas_paid",
