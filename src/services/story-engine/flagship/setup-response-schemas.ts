@@ -16,10 +16,11 @@ function supportedSubset(value: unknown): unknown {
   const constraintHints: string[] = [];
   if (typeof source.minLength === 'number') constraintHints.push(`minimum string length: ${source.minLength}`);
   if (typeof source.maxLength === 'number') constraintHints.push(`maximum string length: ${source.maxLength}`);
-  if (typeof source.minItems === 'number') constraintHints.push(`minimum item count: ${source.minItems}`);
-  if (typeof source.maxItems === 'number') constraintHints.push(`maximum item count: ${source.maxItems}`);
   for (const [key, child] of Object.entries(source)) {
-    if (['$schema', 'pattern', 'minLength', 'maxLength', 'minItems', 'maxItems'].includes(key)) continue;
+    // Gemini structured output supports array cardinality constraints. Keep
+    // them in the provider schema so discriminated pass/issues contracts are
+    // constrained during decoding, then validate the response again in Zod.
+    if (['$schema', 'pattern', 'minLength', 'maxLength'].includes(key)) continue;
     if (key === 'const') {
       result.enum = [child];
       continue;

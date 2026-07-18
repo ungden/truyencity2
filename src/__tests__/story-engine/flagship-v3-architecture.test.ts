@@ -24,7 +24,7 @@ describe('flagship v3 architecture boundary', () => {
     const files = [
       'contracts.ts', 'context.ts', 'preflight.ts', 'quality.ts', 'prompts.ts',
       'pipeline.ts', 'runtime.ts', 'rolling-planner.ts', 'concept-lab.ts', 'setup.ts',
-      'arc-lifecycle.ts', 'memory.ts', 'release.ts',
+      'arc-lifecycle.ts', 'memory.ts', 'release.ts', 'machine-calibration.ts',
     ];
     const forbidden = [
       '/pipeline/orchestrator', 'chapter-writer', '/templates/', 'golden fallback',
@@ -70,14 +70,29 @@ describe('flagship v3 architecture boundary', () => {
     expect(route).not.toContain("reason: 'safety_max_chapters'");
   });
 
-  it('promotes the five-story canary only through one approved release calibration set', () => {
-    const migration = read('supabase/migrations/20260717185611_flagship_v3_calibration_set.sql');
-    expect(migration).toContain('launch_pack_digests jsonb');
-    expect(migration).toContain('c.launch_pack_digests @> jsonb_build_array(v_pack_digest)');
-    expect(migration).toContain("c.status='approved'");
-    expect(migration).toContain('c.sample_size>=50');
-    expect(migration).toContain('c.distinct_reviewers>=5');
-    expect(migration).toContain('c.median_cost_usd<=0.25');
+  it('promotes only through the exact machine ensemble release gate after chapter ten', () => {
+    const migration = read('supabase/migrations/20260718094113_flagship_v3_machine_factory.sql');
+    expect(migration).toContain("c.calibration_mode='machine_ensemble'");
+    expect(migration).toContain('story_machine_judgments_v3');
+    expect(migration).toContain('c.sample_size=50');
+    expect(migration).toContain('c.judge_count=3');
+    expect(migration).toContain('c.schema_success_rate=1');
+    expect(migration).toContain('c.plan_success_rate=1');
+    expect(migration).toContain('c.infra_success_rate=1');
+    expect(migration).toContain('c.first_pass_publish_rate>=0.85');
+    expect(migration).toContain('c.within_revision_publish_rate=1');
+    expect(migration).toContain('c.max_cost_usd<=0.50');
+    expect(migration).toContain('COALESCE(v_project.current_chapter,0)<10');
+    expect(migration).not.toContain('distinct_reviewers>=5');
+  });
+
+  it('stores immutable planner attempts and forbids numeric v3 publication scores', () => {
+    const migration = read('supabase/migrations/20260718094113_flagship_v3_machine_factory.sql');
+    expect(migration).toContain('CREATE TABLE IF NOT EXISTS public.story_plan_attempts_v3');
+    expect(migration).toContain('attempt_no IN (1,2)');
+    expect(migration).toContain('GRANT SELECT, INSERT ON public.story_plan_attempts_v3');
+    expect(migration).toContain('FLAGSHIP_V3_NUMERIC_QUALITY_SCORE_FORBIDDEN');
+    expect(migration).toContain("p_quality_verdict ?| ARRAY['weightedMean','axes','confidence','planFidelity']");
   });
 
   it('forces every staged launch pack offline even when legacy flags were previously enabled', () => {

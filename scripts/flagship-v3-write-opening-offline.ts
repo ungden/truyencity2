@@ -9,7 +9,7 @@ import {
   FLAGSHIP_V3_PROMPT_VERSION,
   FlagshipLaunchPackV3Schema,
   FlagshipModelRoutesV3Schema,
-  QualityVerdictV3ModelSchema,
+  EditorAssessmentV3Schema,
   WriterOutputV3Schema,
   runOfflineOpeningV3,
   validateLaunchPackV3,
@@ -71,7 +71,7 @@ const digestCall = (chapterNumber: number, model: string, call: FlagshipV3ModelC
 function responseSchema(call: FlagshipV3ModelCall): z.ZodTypeAny {
   return call.role === 'writer' || call.role === 'writer_revision'
     ? WriterOutputV3Schema
-    : QualityVerdictV3ModelSchema;
+    : EditorAssessmentV3Schema;
 }
 
 function reusableCheckpoint(file: string, digest: string, model: string, call: FlagshipV3ModelCall): Checkpoint | null {
@@ -94,9 +94,8 @@ function reusableCheckpoint(file: string, digest: string, model: string, call: F
 
 function readerPacket(run: OfflineOpeningRunV3): string {
   const sections = run.chapters.map(chapter => {
-    const axes = chapter.verdict?.axes;
     const score = chapter.verdict
-      ? `Gate: ${chapter.status}; quality=${chapter.verdict.weightedMean}; read-next=${axes?.desire_to_read_next}; naturalness=${axes?.prose_naturalness}`
+      ? `Gate: ${chapter.status}; hard=${JSON.stringify(chapter.verdict.gateSummary.hard)}; quality=${JSON.stringify(chapter.verdict.gateSummary.quality)}`
       : `Gate: ${chapter.status}; error=${chapter.error || 'unknown'}`;
     return `## Chương ${chapter.chapterNumber}: ${chapter.title || 'Bản nháp không hợp lệ'}\n\n${score}\n\n${chapter.content || '_Không có prose đủ điều kiện để đọc._'}`;
   });
@@ -120,7 +119,7 @@ async function main(): Promise<void> {
         maxTokens: call.role === 'writer' || call.role === 'writer_revision' ? 32768 : 16384,
         thinkingLevel: 'medium',
         systemPrompt: call.systemPrompt,
-        responseJsonSchema: toGeminiResponseJsonSchema(schema as never),
+        responseJsonSchema: call.responseJsonSchema || toGeminiResponseJsonSchema(schema as never),
       }, {
         jsonMode: true,
         schemaName: `flagship_v3_offline_ch${chapterNumber}_${call.role}`,

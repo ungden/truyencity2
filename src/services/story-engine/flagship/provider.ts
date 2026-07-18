@@ -121,7 +121,14 @@ async function callOpenAI(
         body: JSON.stringify(body),
         signal: AbortSignal.timeout(800_000),
       });
-      const payload = await response.json() as OpenAIResponse;
+      let payload: OpenAIResponse;
+      try {
+        payload = await response.json() as OpenAIResponse;
+      } catch (error) {
+        const retryableStatus = [408, 409, 429].includes(response.status) || response.status >= 500;
+        if (retryableStatus && attempt < RETRY_DELAYS_MS.length) continue;
+        throw new NonRetryableProviderError(`OpenAI ${response.status} returned a malformed response envelope: ${error instanceof Error ? error.message : String(error)}`);
+      }
       if ([408, 409, 429].includes(response.status) || response.status >= 500) {
         if (attempt < RETRY_DELAYS_MS.length) continue;
       }
@@ -129,7 +136,7 @@ async function callOpenAI(
         throw new NonRetryableProviderError(`OpenAI ${response.status}: ${payload.error?.message || payload.error?.code || 'unknown error'}`);
       }
       const content = outputText(payload);
-      if (!content) throw new Error(`OpenAI ${config.model} returned no output_text.`);
+      if (!content) throw new NonRetryableProviderError(`OpenAI ${config.model} returned no output_text.`);
       const usage = payload.usage || {};
       if (options.tracking) trackOpenAICost(config.model, usage, options.tracking);
       return {

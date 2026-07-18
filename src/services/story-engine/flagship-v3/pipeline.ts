@@ -4,12 +4,12 @@ import type { V3RoleContext, V3RoleContexts } from './context';
 import { buildV3ProseSpans, type V3ProseSpan } from './evidence-spans';
 import { runV3ProsePreflight, type V3Evidence } from './preflight';
 import {
-  QualityVerdictV3ModelSchema,
+  EditorAssessmentV3Schema,
+  buildEditorResponseJsonSchemaV3,
   evaluateQualityV3,
-  qualityThresholdFailuresV3,
-  type GroundedQualityVerdictV3Model,
+  type EditorAssessmentV3,
+  type GroundedEditorAssessmentV3,
   type QualityVerdictV3,
-  type QualityVerdictV3Model,
 } from './quality';
 import {
   V3_EDITOR_SYSTEM,
@@ -32,6 +32,7 @@ export interface FlagshipV3ModelCall {
   systemPrompt: string;
   userPrompt: string;
   jsonMode: true;
+  responseJsonSchema?: Record<string, unknown>;
 }
 
 export interface FlagshipV3PipelineInput {
@@ -78,34 +79,31 @@ function parseJson<T>(raw: string, schema: z.ZodType<T>, label: string): T {
   return parsed.data;
 }
 
-function groundEditor(editor: QualityVerdictV3Model, spans: V3ProseSpan[]): GroundedQualityVerdictV3Model {
+function groundEditor(editor: EditorAssessmentV3, spans: V3ProseSpan[]): GroundedEditorAssessmentV3 {
   const byId = new Map(spans.map(span => [span.id, span]));
-  const evidence = editor.evidence.map(item => {
+  const issues = editor.issues.map(item => {
     const span = byId.get(item.spanId);
     if (!span) throw new FlagshipV3Error('infra_blocked', `Editor evidence references unknown span: ${item.spanId}.`);
-    return { code: item.code, severity: item.severity, message: item.message, local: item.local, start: span.start, end: span.end, excerpt: span.text };
+    return {
+      ...item,
+      code: `editor_${item.gate}`,
+      local: item.locality === 'local',
+      start: span.start,
+      end: span.end,
+      excerpt: span.text,
+    };
   });
   const realizedDeltaEvidence = editor.realizedDeltaEvidence.map(item => {
     const span = byId.get(item.spanId);
     if (!span) throw new FlagshipV3Error('infra_blocked', `Delta evidence references unknown span: ${item.spanId}.`);
     return { deltaId: item.deltaId, start: span.start, end: span.end, excerpt: span.text };
   });
-  return { ...editor, evidence, realizedDeltaEvidence };
+  return { ...editor, issues, realizedDeltaEvidence };
 }
 
-function assertAuditable(editor: GroundedQualityVerdictV3Model, deterministicEvidence: V3Evidence[]): void {
-  const failedGate = Object.values(editor.hardGates).some(value => !value);
-  const thresholdFailures = qualityThresholdFailuresV3(editor);
-  if ((editor.decision !== 'publish' || failedGate || thresholdFailures.length > 0)
-    && editor.evidence.length === 0
-    && deterministicEvidence.length === 0) {
-    throw new FlagshipV3Error('infra_blocked', 'Editor returned a failing verdict without grounded evidence.', { thresholdFailures });
-  }
-  if (editor.decision === 'revise' && editor.revisionInstructions.length === 0) {
-    throw new FlagshipV3Error('infra_blocked', 'Editor requested revision without scoped instructions.');
-  }
-  if (editor.decision === 'revise') {
-    const mutableFoundation = /(?:cập nhật|sửa|đổi|điều chỉnh).{0,40}(?:state|tracking|plan|kế hoạch|canon|artifact)/iu;
+function assertAuditable(editor: GroundedEditorAssessmentV3): void {
+  if (editor.status === 'issues') {
+    const mutableFoundation = /(?:cập nhật|sửa|đổi|điều chỉnh)\s+(?:lại\s+)?(?:story\s+)?(?:state|tracking|chapterplan|plan|kế hoạch|canon|artifact)\b/iu;
     if (editor.revisionInstructions.some(instruction => mutableFoundation.test(instruction))) {
       throw new FlagshipV3Error(
         'infra_blocked',
@@ -144,7 +142,7 @@ export async function executeFlagshipV3Pipeline(
   let deterministicEvidence = runV3ProsePreflight(draft.content, input.plan);
 
   const edit = async (role: 'editor' | 'editor_recheck', context: V3RoleContext): Promise<{
-    editor: GroundedQualityVerdictV3Model;
+    editor: GroundedEditorAssessmentV3;
     verdict: QualityVerdictV3;
   }> => {
     const spans = buildV3ProseSpans(draft.content);
@@ -160,9 +158,10 @@ export async function executeFlagshipV3Pipeline(
         deterministicEvidence,
       }),
       jsonMode: true,
+      responseJsonSchema: buildEditorResponseJsonSchemaV3(input.plan),
     });
-    const editor = groundEditor(parseJson(raw, QualityVerdictV3ModelSchema, role), spans);
-    assertAuditable(editor, deterministicEvidence);
+    const editor = groundEditor(parseJson(raw, EditorAssessmentV3Schema, role), spans);
+    assertAuditable(editor);
     return { editor, verdict: evaluateQualityV3({ plan: input.plan, editor, deterministicEvidence }) };
   };
 
@@ -171,6 +170,13 @@ export async function executeFlagshipV3Pipeline(
     return { ...draft, plan: input.plan, verdict: reviewed.verdict, callRoles, revisionLineage: [] };
   }
   if (reviewed.verdict.decision === 'reject') {
+    if (reviewed.verdict.blocker) {
+      throw new FlagshipV3Error(reviewed.verdict.blocker, 'Editor found an invalid immutable story artifact.', {
+        verdict: reviewed.verdict,
+        draft,
+        callRoles,
+      });
+    }
     throw new FlagshipV3Error('quality_blocked', 'Independent editor rejected the chapter.', {
       verdict: reviewed.verdict,
       draft,
@@ -189,7 +195,7 @@ export async function executeFlagshipV3Pipeline(
       title: draft.title,
       content: draft.content,
       evidence,
-      instructions: reviewed.editor.revisionInstructions,
+      instructions: reviewed.verdict.revisionInstructions,
     }),
     jsonMode: true,
   });

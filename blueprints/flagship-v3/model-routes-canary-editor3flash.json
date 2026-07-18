@@ -13,6 +13,6 @@
   "planner": "gemini-3.1-pro-preview",
   "writer": "gemini-3.1-pro-preview",
   "editor": "gemini-3-flash-preview",
-  "routeVersion": "canary-writer31low-editor3flash-v3.1",
+  "routeVersion": "canary-writer31low-editor3flash-machine-v4.0",
   "maxPublishedChapterCostUsd": 0.5
 }

@@ -22,6 +22,8 @@ export function validateV3Artifacts(input: {
   const facts = new Map(state.facts.map(item => [item.id, item.value]));
   const stateCharacters = new Map(state.characters.map(item => [item.characterId, item]));
   const stateResources = new Map(state.resources.map(item => [item.resourceId, item]));
+  const workingFacts = new Map(facts);
+  const workingResources = new Map(state.resources.map(item => [item.resourceId, item.value]));
   const statePromises = new Set(state.promises.map(item => item.promiseId));
   const createdFactIds = new Set(plan.requiredDeltas.flatMap(delta =>
     delta.kind === 'fact' && delta.valueBefore === null ? [delta.factId] : [],
@@ -71,32 +73,34 @@ export function validateV3Artifacts(input: {
       issues.push({ code: 'unknown_knowledge_fact', path, message: `Knowledge delta references unknown fact ${delta.factId}.` });
     }
     if (delta.kind === 'fact') {
-      const current = facts.get(delta.factId);
+      const current = workingFacts.get(delta.factId);
       if (current === undefined && delta.valueBefore !== null) {
         issues.push({ code: 'fact_create_requires_null_before', path, message: `New fact ${delta.factId} must use valueBefore=null.` });
       } else if (current !== undefined && delta.valueBefore !== current) {
         issues.push({ code: 'fact_stale_before', path, message: `Fact ${delta.factId} valueBefore does not match committed state.` });
       }
+      workingFacts.set(delta.factId, delta.valueAfter);
     }
     if (delta.kind === 'promise' && (!promises.has(delta.promiseId) || !statePromises.has(delta.promiseId))) {
       issues.push({ code: 'unknown_promise_delta', path, message: `Unknown promise ${delta.promiseId}.` });
     }
     if (delta.kind === 'resource_numeric' || delta.kind === 'resource_state') {
       const definition = resources.get(delta.resourceId);
-      const current = stateResources.get(delta.resourceId);
-      if (!definition || !current) {
+      const committed = stateResources.get(delta.resourceId);
+      const currentValue = workingResources.get(delta.resourceId);
+      if (!definition || !committed || !currentValue) {
         issues.push({ code: 'unknown_resource_delta', path, message: `Unknown resource ${delta.resourceId}.` });
         continue;
       }
-      if (definition.mode !== (delta.kind === 'resource_numeric' ? 'numeric' : 'state') || current.value.mode !== definition.mode) {
+      if (definition.mode !== (delta.kind === 'resource_numeric' ? 'numeric' : 'state') || currentValue.mode !== definition.mode) {
         issues.push({ code: 'resource_mode_mismatch', path, message: `Resource ${delta.resourceId} uses the wrong value mode.` });
         continue;
       }
-      if (delta.kind === 'resource_numeric' && current.value.mode === 'numeric') {
-        if (current.value.unit !== delta.unit || definition.unit !== delta.unit) {
+      if (delta.kind === 'resource_numeric' && currentValue.mode === 'numeric') {
+        if (currentValue.unit !== delta.unit || definition.unit !== delta.unit) {
           issues.push({ code: 'resource_unit_mismatch', path, message: `Resource ${delta.resourceId} changed unit.` });
         }
-        if (!closeEnough(current.value.amount, delta.before)) {
+        if (!closeEnough(currentValue.amount, delta.before)) {
           issues.push({ code: 'resource_stale_before', path, message: `Resource ${delta.resourceId} before value does not match committed state.` });
         }
         if (!closeEnough(delta.before + delta.delta, delta.after)) {
@@ -108,9 +112,13 @@ export function validateV3Artifacts(input: {
         if (definition.maximumValue !== null && delta.after > definition.maximumValue) {
           issues.push({ code: 'resource_above_maximum', path, message: `Resource ${delta.resourceId} exceeded its story-specific maximum.` });
         }
+        workingResources.set(delta.resourceId, { ...currentValue, amount: delta.after });
       }
-      if (delta.kind === 'resource_state' && current.value.mode === 'state' && current.value.value !== delta.before) {
-        issues.push({ code: 'resource_stale_before', path, message: `Resource ${delta.resourceId} state does not match committed state.` });
+      if (delta.kind === 'resource_state' && currentValue.mode === 'state') {
+        if (currentValue.value !== delta.before) {
+          issues.push({ code: 'resource_stale_before', path, message: `Resource ${delta.resourceId} state does not match committed state.` });
+        }
+        workingResources.set(delta.resourceId, { ...currentValue, value: delta.after });
       }
     }
   }

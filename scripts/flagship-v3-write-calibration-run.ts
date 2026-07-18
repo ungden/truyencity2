@@ -10,7 +10,7 @@ import {
   FlagshipV3Error,
   FlagshipLaunchPackV3Schema,
   FlagshipModelRoutesV3Schema,
-  QualityVerdictV3ModelSchema,
+  EditorAssessmentV3Schema,
   RollingPlanWindowDraftV3Schema,
   V3_ROLLING_PLANNER_PROMPT_VERSION,
   V3_ROLLING_PLANNER_SYSTEM,
@@ -19,6 +19,7 @@ import {
   buildRollingPlannerResponseJsonSchemaV3,
   buildV3PlannerContext,
   getFlagshipReleaseManifestV3,
+  generateRollingWindowWithOneRepairV3,
   materializeRollingWindowV3,
   runOfflinePlannedWindowV3,
   validateLaunchPackV3,
@@ -76,7 +77,7 @@ function validateJsonContract(schema: z.ZodTypeAny, raw: string): { valid: boole
 }
 
 function schemaFor(call: FlagshipV3ModelCall): z.ZodTypeAny {
-  return call.role === 'writer' || call.role === 'writer_revision' ? WriterOutputV3Schema : QualityVerdictV3ModelSchema;
+  return call.role === 'writer' || call.role === 'writer_revision' ? WriterOutputV3Schema : EditorAssessmentV3Schema;
 }
 
 async function invokeChapter(chapterNumber: number, model: string, call: FlagshipV3ModelCall): Promise<OfflineOpeningModelResponseV3> {
@@ -84,7 +85,7 @@ async function invokeChapter(chapterNumber: number, model: string, call: Flagshi
   mkdirSync(chapterDir, { recursive: true });
   const file = path.join(chapterDir, `${call.role}.response.json`);
   const schema = schemaFor(call);
-  const responseJsonSchema = toGeminiResponseJsonSchema(schema as never);
+  const responseJsonSchema = call.responseJsonSchema || toGeminiResponseJsonSchema(schema as never);
   const isWriter = call.role === 'writer' || call.role === 'writer_revision';
   const transport = {
     temperature: isWriter ? 0.75 : 0.15,
@@ -124,23 +125,29 @@ async function planSecondWindow(state: OfflineOpeningRunV3['finalState']) {
   const context = buildV3PlannerContext({ kernel: launchPack.kernel, arc: launchPack.arc, state });
   const startChapter = state.chapterNumber + 1;
   const userPrompt = `START_CHAPTER=${startChapter}\nAUTHORITATIVE_LEDGER=${JSON.stringify(buildPlannerLedgerV3(state, launchPack.kernel))}\nROLE_CONTEXT=${context.text}\nTạo plan chương ${startChapter}-${startChapter + 4}. Trước khi trả JSON, tự mô phỏng tuần tự cả năm plan trên AUTHORITATIVE_LEDGER.`;
-  const file = path.join(checkpointRoot, `planner-${startChapter}-${startChapter + 4}.response.json`);
   const responseJsonSchema = buildRollingPlannerResponseJsonSchemaV3(launchPack.kernel, state);
-  const promptDigest = digest({ model: routes.planner, systemPrompt: V3_ROLLING_PLANNER_SYSTEM, userPrompt, responseJsonSchema, promptVersion: V3_ROLLING_PLANNER_PROMPT_VERSION, routeVersion: routes.routeVersion });
-  let raw: string; let estimatedCostUsd = 0;
-  if (existsSync(file)) {
-    const saved = JSON.parse(readFileSync(file, 'utf8')) as ModelCheckpoint;
-    const contract = validateJsonContract(RollingPlanWindowDraftV3Schema, saved.content);
-    if (saved.promptDigest === promptDigest && saved.model === routes.planner && contract.valid) {
-      raw = saved.content; estimatedCostUsd = saved.estimatedCostUsd;
-    }
-    else ({ raw, estimatedCostUsd } = await callPlanner(file, promptDigest, userPrompt, startChapter, responseJsonSchema));
-  } else ({ raw, estimatedCostUsd } = await callPlanner(file, promptDigest, userPrompt, startChapter, responseJsonSchema));
-  const draft = RollingPlanWindowDraftV3Schema.parse(cleanJson(raw));
-  if (draft.startChapter !== startChapter) throw new Error('Planner changed the calibration window identity.');
-  const window = materializeRollingWindowV3({ kernel: launchPack.kernel, arc: launchPack.arc, state, draft });
-  validateRollingWindowV3({ kernel: launchPack.kernel, arc: launchPack.arc, state, window });
-  return { window, estimatedCostUsd };
+  return generateRollingWindowWithOneRepairV3({
+    kernel: launchPack.kernel,
+    arc: launchPack.arc,
+    state,
+    startChapter,
+    basePrompt: userPrompt,
+    roleContext: context.text,
+    ledger: buildPlannerLedgerV3(state, launchPack.kernel),
+    modelRoute: routes.planner,
+    invoke: async (prompt, attempt) => {
+      const file = path.join(checkpointRoot, `planner-${startChapter}-${startChapter + 4}-attempt-${attempt}.response.json`);
+      const promptDigest = digest({ model: routes.planner, systemPrompt: V3_ROLLING_PLANNER_SYSTEM, userPrompt: prompt, responseJsonSchema, promptVersion: V3_ROLLING_PLANNER_PROMPT_VERSION, routeVersion: routes.routeVersion, attempt });
+      if (existsSync(file)) {
+        const saved = JSON.parse(readFileSync(file, 'utf8')) as ModelCheckpoint;
+        const contract = validateJsonContract(RollingPlanWindowDraftV3Schema, saved.content);
+        if (saved.promptDigest === promptDigest && saved.model === routes.planner && contract.valid) {
+          return { raw: saved.content, estimatedCostUsd: saved.estimatedCostUsd };
+        }
+      }
+      return callPlanner(file, promptDigest, prompt, startChapter, responseJsonSchema);
+    },
+  }).then(result => ({ window: result.window, estimatedCostUsd: result.estimatedCostUsd }));
 }
 
 async function callPlanner(

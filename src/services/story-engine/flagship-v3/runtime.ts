@@ -15,7 +15,6 @@ import {
   type FlagshipV3ModelCall,
 } from './pipeline';
 import { FLAGSHIP_V3_PROMPT_VERSION } from './prompts';
-import { QualityVerdictV3ModelSchema } from './quality';
 import { assertFlagshipReleaseV3, getFlagshipReleaseManifestV3 } from './release';
 import { applyChapterStateV3 } from './state-transition';
 import { hydratePlanFactsV3 } from './memory';
@@ -39,7 +38,7 @@ export interface FlagshipV3WriteResult {
   chapterNumber: number;
   title: string;
   wordCount: number;
-  qualityScore: number;
+  qualityScore: null;
   projectId: string;
   novelId: string;
   duration: number;
@@ -247,7 +246,10 @@ export async function writeFlagshipV3Chapter(
       const model = call.role === 'writer' || call.role === 'writer_revision' ? routes.writer : routes.editor;
       const responseSchema = call.role === 'writer' || call.role === 'writer_revision'
         ? toGeminiResponseJsonSchema(WriterOutputV3Schema)
-        : toGeminiResponseJsonSchema(QualityVerdictV3ModelSchema);
+        : call.responseJsonSchema;
+      if (!responseSchema) {
+        throw new FlagshipV3Error('infra_blocked', `Missing provider response schema for ${call.role}.`);
+      }
       const response = await callFlagshipModel(call.userPrompt, {
         model,
         temperature: call.role === 'writer' || call.role === 'writer_revision'
@@ -315,7 +317,7 @@ export async function writeFlagshipV3Chapter(
       p_chapter_number: nextChapter,
       p_title: generated.title,
       p_content: generated.content,
-      p_quality_score: generated.verdict.weightedMean,
+      p_quality_score: null,
       p_story_state: nextState,
       p_run_id: run.id,
       p_attempt_id: attemptId,
@@ -335,7 +337,7 @@ export async function writeFlagshipV3Chapter(
       chapterNumber: nextChapter,
       title: generated.title,
       wordCount: wordCount(generated.content),
-      qualityScore: generated.verdict.weightedMean,
+      qualityScore: null,
       projectId: project.id,
       novelId: novel.id,
       duration: Date.now() - startedAt,

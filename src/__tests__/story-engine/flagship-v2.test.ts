@@ -685,8 +685,8 @@ describe('isolated flagship setup v2', () => {
     expect(JSON.stringify(responseSchemas)).not.toContain('"const"');
     expect(JSON.stringify(responseSchemas)).not.toContain('"minLength"');
     expect(JSON.stringify(responseSchemas)).not.toContain('"pattern"');
-    expect(JSON.stringify(responseSchemas)).not.toContain('"minItems"');
-    expect(JSON.stringify(responseSchemas)).not.toContain('"maxItems"');
+    expect(JSON.stringify(responseSchemas)).toContain('"minItems"');
+    expect(JSON.stringify(responseSchemas)).toContain('"maxItems"');
     expect(result.artifact.openings).toHaveLength(3);
     expect(result.artifact.status).toBe('awaiting_human_selection');
     const openingPrompt = buildOpeningSimulationPrompt(brief, concepts[0], kernelFor('concept_c0'));

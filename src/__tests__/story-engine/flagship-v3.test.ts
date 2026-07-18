@@ -7,12 +7,20 @@ import {
   MarketResearchSnapshotV3Schema,
   buildPlannerLedgerV3,
   buildRollingPlannerResponseJsonSchemaV3,
+  materializeRollingWindowV3,
+  generateRollingWindowWithOneRepairV3,
   buildV3RoleContexts,
   executeFlagshipV3Pipeline,
+  EditorAssessmentV3Schema,
+  buildEditorResponseJsonSchemaV3,
   evaluateQualityV3,
   runConceptTournamentV3,
   BlindCalibrationCorpusV3Schema,
   computeCalibrationMetricsV3,
+  FrozenBriefCorpusV3Schema,
+  MachineCalibrationCorpusV3Schema,
+  computeMachineCalibrationMetricsV3,
+  MACHINE_JUDGE_LINEAGES_V3,
   assessOpeningFinalistV3,
   applyChapterStateV3,
   runV3ProsePreflight,
@@ -238,21 +246,61 @@ const arc = ArcPlanV3Schema.parse({
   ],
 });
 
-const axes = Object.fromEntries([
-  'premise_interest', 'character_voice', 'scene_tension', 'causal_surprise',
-  'emotional_movement', 'domain_truth', 'prose_naturalness', 'agency',
-  'earned_pleasure', 'recovery_pacing', 'desire_to_read_next',
-].map(key => [key, key === 'desire_to_read_next' ? 8.4 : 8.1]));
+const qualityGates = {
+  premise_interest: true,
+  character_voice: true,
+  scene_tension: true,
+  causal_surprise: true,
+  emotional_movement: true,
+  domain_truth: true,
+  prose_naturalness: true,
+  agency: true,
+  earned_pleasure: true,
+  recovery_pacing: true,
+  desire_to_read_next: true,
+} as const;
 const hardGates = {
   canon: true,
   timeline: true,
-  resourceCausality: true,
-  characterKnowledge: true,
+  resource_causality: true,
+  character_knowledge: true,
   authority: true,
-  promptLeak: true,
-  planFidelity: true,
+  prompt_leak: true,
+  plan_fidelity: true,
 };
 const deltaEvidence = (_content: string) => plan().requiredDeltas.map(delta => ({ deltaId: delta.id, spanId: 'span_001' }));
+const passAssessment = (content: string) => ({
+  status: 'pass', hardGates, qualityGates, issues: [], revisionInstructions: [],
+  realizedDeltaEvidence: deltaEvidence(content),
+});
+
+function validRollingDraft() {
+  return RollingPlanWindowDraftV3Schema.parse({
+    schemaVersion: 3,
+    startChapter: 1,
+    plans: Array.from({ length: 5 }, (_, offset) => {
+      const chapterNumber = offset + 1;
+      const deltaId = `promise_advance_${chapterNumber}`;
+      return {
+        schemaVersion: 3,
+        chapterNumber,
+        elapsedMinutesSincePreviousChapter: chapterNumber === 1 ? 0 : 10,
+        chapterPromise: detailed(`Chương ${chapterNumber} tạo một thay đổi có nguồn`),
+        preconditions: [],
+        scenes: [{ ...plan().scenes[0], id: `scene_${chapterNumber}`, requiredDeltaIds: [deltaId] }],
+        requiredDeltas: [{
+          id: deltaId,
+          kind: 'promise',
+          promiseId: 'promise_0',
+          statusAfter: 'advanced',
+          pressureAfter: detailed(`Áp lực tiếp nối chương ${chapterNumber}`),
+          evidenceRequired: true,
+        }],
+        nextChapterPressure: detailed(`Áp lực chuyển sang chương ${chapterNumber + 1}`),
+      };
+    }),
+  });
+}
 
 describe('flagship v3 core engine', () => {
   it('keeps arithmetic-derived absolute scene time out of the Planner model contract', () => {
@@ -365,7 +413,7 @@ describe('flagship v3 core engine', () => {
     expect(supportsGeminiThinkingLevel('gemini-3.1-pro-preview')).toBe(true);
     expect(supportsGeminiThinkingLevel('gemini-3-pro-preview')).toBe(true);
     expect(supportsGeminiThinkingLevel('gemini-2.5-pro')).toBe(false);
-    expect(getFlagshipReleaseManifestV3().providerVersion).toBe('provider-v3.4-writer31-low-editor-medium');
+    expect(getFlagshipReleaseManifestV3().providerVersion).toBe('provider-v3.8-gemini-complexity-safe-schemas');
   });
 
   it('puts numeric bounds and source rules beside current balances in the authoritative planner ledger', () => {
@@ -388,8 +436,137 @@ describe('flagship v3 core engine', () => {
     expect(scene.povCharacterId.enum).toEqual(expectedIds);
     expect(scene.participantIds.items.enum).toEqual(expectedIds);
     expect(scene.participantIds.items.enum).not.toContain('char_an');
+    expect(scene.participantIds.maxItems).toBe(expectedIds.length);
+    expect(schema.properties.plans.minItems).toBeUndefined();
+    expect(schema.properties.plans.maxItems).toBeUndefined();
+    expect(schema.properties.plans.items.properties.requiredDeltas.minItems).toBeUndefined();
+    expect(schema.properties.plans.items.properties.requiredDeltas.maxItems).toBeUndefined();
+    expect(schema.properties.plans.items.properties.scenes).toMatchObject({ minItems: 1, maxItems: 5 });
+    expect(schema.properties.plans.items.properties.preconditions.maxItems).toBe(state().facts.length);
     expect(scene.desire.description).toContain('minimum string length: 20');
     expect(precondition.factId.enum).toEqual(state().facts.map(fact => fact.id).sort());
+    const deltas = schema.properties.plans.items.properties.requiredDeltas.items.anyOf;
+    const byKind = (kind: string) => deltas.find((branch: any) => branch.properties.kind.enum.includes(kind)).properties;
+    expect(byKind('resource_numeric').resourceId.enum).toEqual(['cash', 'salt']);
+    expect(byKind('resource_state').resourceId.enum).toEqual(['buyer_access']);
+    expect(byKind('promise').promiseId.enum).toEqual(['promise_0', 'promise_1', 'promise_2', 'promise_3']);
+  });
+
+  it('materializes multiple same-resource transactions sequentially within one chapter', () => {
+    const initialState = StoryStateV3Schema.parse({
+      ...state(),
+      resources: state().resources.map(resource => resource.resourceId === 'cash'
+        ? { ...resource, value: { mode: 'numeric' as const, amount: 2750, unit: 'dong' } }
+        : resource),
+    });
+    const draft = RollingPlanWindowDraftV3Schema.parse({
+      schemaVersion: 3,
+      startChapter: 1,
+      plans: Array.from({ length: 5 }, (_, offset) => {
+        const chapterNumber = offset + 1;
+        const deltas = chapterNumber === 1
+          ? [
+              { id: 'cash_earned', kind: 'resource_numeric', resourceId: 'cash', delta: 2500, source: detailed('Khách trả tiền cho mẻ cá'), sink: detailed('Tiền nhập vào quỹ gia đình'), evidenceRequired: true },
+              { id: 'cash_spent', kind: 'resource_numeric', resourceId: 'cash', delta: -5000, source: detailed('Quỹ gia đình sau khi bán cá'), sink: detailed('Mua dụng cụ bảo quản mới'), evidenceRequired: true },
+            ]
+          : [{ id: `promise_advance_${chapterNumber}`, kind: 'promise', promiseId: 'promise_0', statusAfter: 'advanced', pressureAfter: detailed(`Áp lực tiếp nối chương ${chapterNumber}`), evidenceRequired: true }];
+        return {
+          schemaVersion: 3,
+          chapterNumber,
+          elapsedMinutesSincePreviousChapter: chapterNumber === 1 ? 0 : 10,
+          chapterPromise: detailed(`Chương ${chapterNumber} tạo một thay đổi có nguồn`),
+          preconditions: [],
+          scenes: [{
+            ...plan().scenes[0],
+            id: `scene_${chapterNumber}`,
+            requiredDeltaIds: deltas.map(delta => delta.id),
+          }],
+          requiredDeltas: deltas,
+          nextChapterPressure: detailed(`Áp lực chuyển sang chương ${chapterNumber + 1}`),
+        };
+      }),
+    });
+    const window = materializeRollingWindowV3({ kernel: kernel(), arc, state: initialState, draft });
+    const numeric = window.plans[0].requiredDeltas.filter(delta => delta.kind === 'resource_numeric');
+    expect(numeric).toEqual([
+      expect.objectContaining({ before: 2750, delta: 2500, after: 5250 }),
+      expect.objectContaining({ before: 5250, delta: -5000, after: 250 }),
+    ]);
+  });
+
+  it('still blocks a true same-chapter overspend after sequential materialization', () => {
+    const initialState = StoryStateV3Schema.parse({
+      ...state(),
+      resources: state().resources.map(resource => resource.resourceId === 'cash'
+        ? { ...resource, value: { mode: 'numeric' as const, amount: 2750, unit: 'dong' } }
+        : resource),
+    });
+    const invalid = {
+      ...plan(),
+      requiredDeltas: [
+        { id: 'cash_earned', kind: 'resource_numeric' as const, resourceId: 'cash', before: 2750, delta: 500, after: 3250, unit: 'dong', source: detailed('Khách trả tiền cho mẻ cá'), sink: detailed('Tiền nhập vào quỹ gia đình'), evidenceRequired: true as const },
+        { id: 'cash_spent', kind: 'resource_numeric' as const, resourceId: 'cash', before: 3250, delta: -5000, after: -1750, unit: 'dong', source: detailed('Quỹ gia đình sau khi bán cá'), sink: detailed('Mua dụng cụ bảo quản mới'), evidenceRequired: true as const },
+      ],
+      scenes: [{ ...plan().scenes[0], requiredDeltaIds: ['cash_earned', 'cash_spent'] }],
+    };
+    expect(validateV3Artifacts({ kernel: kernel(), arc, state: initialState, plan: ChapterPlanV3Schema.parse(invalid) })).toEqual(
+      expect.arrayContaining([expect.objectContaining({ code: 'resource_below_minimum' })]),
+    );
+  });
+
+  it('gives the Planner exactly one evidence-guided repair without changing route', async () => {
+    const valid = validRollingDraft();
+    const invalid = RollingPlanWindowDraftV3Schema.parse({
+      ...valid,
+      plans: valid.plans.map((item, index) => index === 0 ? {
+        ...item,
+        requiredDeltas: [{ id: 'overspend_cash', kind: 'resource_numeric', resourceId: 'cash', delta: -1000, source: detailed('Tiền mặt hiện có trong gia đình'), sink: detailed('Khoản mua vượt quá số dư hiện có'), evidenceRequired: true }],
+        scenes: item.scenes.map((scene, sceneIndex) => sceneIndex === 0 ? { ...scene, requiredDeltaIds: ['overspend_cash'] } : scene),
+      } : item),
+    });
+    const prompts: string[] = [];
+    const persisted: Array<{ attempt: number; result: string; modelRoute: string }> = [];
+    const generated = await generateRollingWindowWithOneRepairV3({
+      kernel: kernel(), arc, state: state(), startChapter: 1,
+      basePrompt: 'FIRST_ATTEMPT', roleContext: 'ROLE_CONTEXT', ledger: buildPlannerLedgerV3(state(), kernel()),
+      modelRoute: 'gemini-3.1-pro-preview',
+      invoke: async (prompt, attempt) => {
+        prompts.push(prompt);
+        return { raw: JSON.stringify(attempt === 1 ? invalid : valid), estimatedCostUsd: 0.01 };
+      },
+      onAttempt: async attempt => { persisted.push(attempt); },
+    });
+    expect(generated.window.startChapter).toBe(1);
+    expect(generated.attempts).toHaveLength(2);
+    expect(persisted).toEqual([
+      expect.objectContaining({ attempt: 1, result: 'invalid', modelRoute: 'gemini-3.1-pro-preview' }),
+      expect.objectContaining({ attempt: 2, result: 'valid', modelRoute: 'gemini-3.1-pro-preview' }),
+    ]);
+    expect(prompts[1]).toContain('REPAIR_ATTEMPT=2_OF_2');
+    expect(prompts[1]).toContain('VALIDATION_ISSUES=');
+  });
+
+  it('blocks the plan after the one allowed repair is still invalid', async () => {
+    const valid = validRollingDraft();
+    const invalid = RollingPlanWindowDraftV3Schema.parse({
+      ...valid,
+      plans: valid.plans.map((item, index) => index === 0 ? {
+        ...item,
+        requiredDeltas: [{ id: 'overspend_cash', kind: 'resource_numeric', resourceId: 'cash', delta: -1000, source: detailed('Tiền mặt hiện có trong gia đình'), sink: detailed('Khoản mua vượt quá số dư hiện có'), evidenceRequired: true }],
+        scenes: item.scenes.map((scene, sceneIndex) => sceneIndex === 0 ? { ...scene, requiredDeltaIds: ['overspend_cash'] } : scene),
+      } : item),
+    });
+    let calls = 0;
+    await expect(generateRollingWindowWithOneRepairV3({
+      kernel: kernel(), arc, state: state(), startChapter: 1,
+      basePrompt: 'FIRST_ATTEMPT', roleContext: 'ROLE_CONTEXT', ledger: buildPlannerLedgerV3(state(), kernel()),
+      modelRoute: 'gemini-3.1-pro-preview',
+      invoke: async () => {
+        calls += 1;
+        return { raw: JSON.stringify(invalid), estimatedCostUsd: 0.01 };
+      },
+    })).rejects.toMatchObject({ code: 'plan_blocked' });
+    expect(calls).toBe(2);
   });
 
   it('publishes with exactly Writer and Editor calls', async () => {
@@ -403,10 +580,7 @@ describe('flagship v3 core engine', () => {
       invoke: async call => {
         calls.push(call.role);
         if (call.role === 'writer') return JSON.stringify({ title: 'Mẻ Cá Qua Mưa', content });
-        return JSON.stringify({
-          decision: 'publish', confidence: 0.85, planFidelity: 8.8, hardGates, axes,
-          evidence: [], revisionInstructions: [], realizedDeltaEvidence: deltaEvidence(content),
-        });
+        return JSON.stringify(passAssessment(content));
       },
     });
     expect(calls).toEqual(['writer', 'editor']);
@@ -428,16 +602,13 @@ describe('flagship v3 core engine', () => {
         if (call.role === 'writer_revision') return JSON.stringify({ title: 'Mẻ Cá Qua Mưa', content: fixed });
         if (call.role === 'editor') {
           return JSON.stringify({
-            decision: 'revise', confidence: 0.84, planFidelity: 8.6, hardGates, axes,
-            evidence: [{ code: 'local_prose', severity: 'moderate', message: 'Câu cục bộ phá giọng.', spanId: 'span_001', local: true }],
-            revisionInstructions: ['Bỏ câu cục bộ, giữ nguyên sự kiện.'],
+            status: 'issues', hardGates, qualityGates: { ...qualityGates, prose_naturalness: false },
+            issues: [{ gate: 'prose_naturalness', severity: 'moderate', message: 'Câu cục bộ phá giọng.', spanId: 'span_001', locality: 'local', repairMode: 'local_edit' }],
+            revisionInstructions: ['Chỉnh sửa câu cục bộ để tuân thủ kế hoạch, giữ nguyên mọi artifact.'],
             realizedDeltaEvidence: deltaEvidence(bad),
           });
         }
-        return JSON.stringify({
-          decision: 'publish', confidence: 0.86, planFidelity: 8.8, hardGates, axes,
-          evidence: [], revisionInstructions: [], realizedDeltaEvidence: deltaEvidence(fixed),
-        });
+        return JSON.stringify(passAssessment(fixed));
       },
     });
     expect(calls).toEqual(['writer', 'editor', 'writer_revision', 'editor_recheck']);
@@ -451,14 +622,12 @@ describe('flagship v3 core engine', () => {
       plan: chapterPlan,
       deterministicEvidence: [],
       editor: {
-        decision: 'revise',
-        confidence: 0.6,
-        planFidelity: 6,
+        status: 'issues',
         hardGates: { ...hardGates, canon: false },
-        axes: axes as any,
-        evidence: [{
-          code: 'canon_violation', severity: 'major', message: 'Sai tên dụng cụ trong một câu.',
-          start: 10, end: 30, excerpt: 'chiếc kính lúp nhỏ', local: true,
+        qualityGates,
+        issues: [{
+          gate: 'canon', code: 'editor_canon', severity: 'major', message: 'Sai tên dụng cụ trong một câu.',
+          locality: 'local', repairMode: 'local_edit', start: 10, end: 30, excerpt: 'chiếc kính lúp nhỏ', local: true,
         }],
         revisionInstructions: ['Đổi đúng tên dụng cụ đã khóa trong kernel.'],
         realizedDeltaEvidence: chapterPlan.requiredDeltas.map(delta => ({
@@ -469,25 +638,34 @@ describe('flagship v3 core engine', () => {
     expect(verdict.decision).toBe('revise');
   });
 
-  it('allows a noncritical editorial note when publish gates and thresholds pass', () => {
+  it('derives a full rewrite when required delta evidence is missing', () => {
     const chapterPlan = plan();
     const verdict = evaluateQualityV3({
       plan: chapterPlan,
       deterministicEvidence: [],
       editor: {
-        decision: 'publish', confidence: 0.9, planFidelity: 9.5,
-        hardGates, axes: axes as any,
-        evidence: [{
-          code: 'prose_note', severity: 'moderate', message: 'Một câu có thể diễn đạt trực tiếp hơn.',
-          start: 10, end: 20, excerpt: 'câu hơi vòng', local: true,
-        }],
-        revisionInstructions: [],
-        realizedDeltaEvidence: chapterPlan.requiredDeltas.map(delta => ({
+        status: 'pass', hardGates, qualityGates, issues: [], revisionInstructions: [],
+        realizedDeltaEvidence: chapterPlan.requiredDeltas.slice(1).map(delta => ({
           deltaId: delta.id, start: 0, end: 8, excerpt: 'evidence',
         })),
       },
     });
-    expect(verdict.decision).toBe('publish');
+    expect(verdict).toMatchObject({ decision: 'revise', repairMode: 'full_rewrite' });
+    expect(verdict.evidence).toEqual(expect.arrayContaining([expect.objectContaining({ code: 'required_delta_unrealized' })]));
+  });
+
+  it('makes pass structurally incompatible with issues or revision instructions', () => {
+    expect(EditorAssessmentV3Schema.safeParse({
+      status: 'pass', hardGates, qualityGates,
+      issues: [{ gate: 'prose_naturalness', severity: 'moderate', message: 'Câu còn sáo và thiếu tự nhiên.', spanId: 'span_001', locality: 'local', repairMode: 'local_edit' }],
+      revisionInstructions: ['Sửa câu sáo.'],
+      realizedDeltaEvidence: deltaEvidence('content'),
+    }).success).toBe(false);
+    const providerSchema = JSON.stringify(buildEditorResponseJsonSchemaV3(plan()));
+    expect(providerSchema).toContain('"minItems":0');
+    expect(providerSchema).toContain('"maxItems":0');
+    expect(providerSchema).toContain('"maxItems":3');
+    expect(providerSchema).toContain('"salt_spent"');
   });
 
   it('lets deterministic preflight own evidence without forcing the Editor to duplicate it', async () => {
@@ -502,16 +680,12 @@ describe('flagship v3 core engine', () => {
         if (call.role === 'writer_revision') return JSON.stringify({ title: 'Mẻ Cá Qua Mưa', content: fixed });
         if (call.role === 'editor') {
           return JSON.stringify({
-            decision: 'revise', confidence: 0.9, planFidelity: 9, hardGates,
-            axes: { ...axes, prose_naturalness: 6 }, evidence: [],
-            revisionInstructions: ['Xóa ký tự ngoại lai đã được deterministic preflight định vị.'],
+            status: 'pass', hardGates, qualityGates, issues: [],
+            revisionInstructions: [],
             realizedDeltaEvidence: deltaEvidence(contaminated),
           });
         }
-        return JSON.stringify({
-          decision: 'publish', confidence: 0.9, planFidelity: 9, hardGates, axes,
-          evidence: [], revisionInstructions: [], realizedDeltaEvidence: deltaEvidence(fixed),
-        });
+        return JSON.stringify(passAssessment(fixed));
       },
     });
     expect(result.callRoles).toEqual(['writer', 'editor', 'writer_revision', 'editor_recheck']);
@@ -527,8 +701,8 @@ describe('flagship v3 core engine', () => {
       invoke: async call => {
         if (call.role === 'writer') return JSON.stringify({ title: 'Mẻ Cá Qua Mưa', content: bad });
         return JSON.stringify({
-          decision: 'revise', confidence: 0.84, planFidelity: 8.6, hardGates, axes,
-          evidence: [{ code: 'local_prose', severity: 'moderate', message: 'Câu cục bộ phá giọng.', spanId: 'span_001', local: true }],
+          status: 'issues', hardGates, qualityGates: { ...qualityGates, prose_naturalness: false },
+          issues: [{ gate: 'prose_naturalness', severity: 'moderate', message: 'Câu cục bộ phá giọng.', spanId: 'span_001', locality: 'local', repairMode: 'local_edit' }],
           revisionInstructions: ['Giữ nguyên câu này và cập nhật state tracking ở chương sau.'],
           realizedDeltaEvidence: deltaEvidence(bad),
         });
@@ -536,20 +710,15 @@ describe('flagship v3 core engine', () => {
     })).rejects.toThrow('mutating immutable story artifacts');
   });
 
-  it('treats a below-threshold weighted mean without evidence as an Editor contract failure', async () => {
+  it('treats a pass assessment containing a false gate as a provider contract failure', async () => {
     const contexts = buildV3RoleContexts({ kernel: kernel(), arc, state: state(), plan: plan() });
     const content = prose('Sơn trả đủ chi phí rồi mới nhận kết quả của mẻ cá.');
-    const weakAxes = Object.fromEntries(Object.keys(axes).map(key => [key, 7.4])) as typeof axes;
-    weakAxes.character_voice = 7.5;
-    weakAxes.domain_truth = 7.5;
-    weakAxes.prose_naturalness = 7.5;
-    weakAxes.desire_to_read_next = 8;
     await expect(executeFlagshipV3Pipeline({
       kernel: kernel(), arc, state: state(), plan: plan(), targetWordCount: 1600, contexts,
     }, { invoke: async call => call.role === 'writer'
       ? JSON.stringify({ title: 'Mẻ Cá Qua Mưa', content })
-      : JSON.stringify({ decision: 'publish', confidence: 0.9, planFidelity: 8.5, hardGates, axes: weakAxes, evidence: [], revisionInstructions: [], realizedDeltaEvidence: deltaEvidence(content) })
-    })).rejects.toThrow('without grounded evidence');
+      : JSON.stringify({ status: 'pass', hardGates, qualityGates: { ...qualityGates, character_voice: false }, issues: [], revisionInstructions: [], realizedDeltaEvidence: deltaEvidence(content) })
+    })).rejects.toThrow('violated its exact output contract');
   });
 
   it('pins invariant facts when the bounded state snapshot is compacted', () => {
@@ -834,5 +1003,105 @@ describe('flagship v3 human calibration gate', () => {
       ...corpus,
       samples: corpus.samples.map((sample, index) => index === 0 ? { ...sample, criticalContinuityViolation: true } : sample),
     }).approved).toBe(false);
+  });
+});
+
+describe('flagship v3 machine ensemble gate', () => {
+  const projects = Array.from({ length: 5 }, (_, index) => `00000000-0000-4000-8000-${String(index + 1).padStart(12, '0')}`);
+  const samples = projects.flatMap((projectId, projectIndex) => Array.from({ length: 10 }, (_, offset) => {
+    const sampleIndex = projectIndex * 10 + offset;
+    return {
+      sampleId: `sample_${sampleIndex}`,
+      projectId,
+      chapterNumber: offset + 1,
+      planDigest: 'a'.repeat(64),
+      initialDraftDigest: 'b'.repeat(64),
+      schemaSuccess: true,
+      planSuccess: true,
+      infraSuccess: true,
+      firstPassPublished: sampleIndex < 43,
+      publishedWithinRepair: true,
+      publishedCostUsd: 0.2,
+      judgments: MACHINE_JUDGE_LINEAGES_V3.map(judgeLineage => ({
+        judgeLineage,
+        preferred: sampleIndex < 33 ? 'candidate' as const : 'control' as const,
+        desireToReadNext: sampleIndex < 35,
+        criticalContinuityViolation: false,
+        evidence: [{ spanLabel: 'candidate' as const, excerpt: 'Một thay đổi nhân quả rõ ràng.', reason: 'Chương tạo tiến triển và áp lực đọc tiếp.' }],
+      })),
+    };
+  }));
+
+  it('requires a frozen 5x10 brief corpus', () => {
+    const frozen = FrozenBriefCorpusV3Schema.parse({
+      schemaVersion: 3,
+      corpusVersion: 'frozen-v1',
+      engineReleaseId: getFlagshipReleaseManifestV3().releaseId,
+      launchPackDigests: Array.from({ length: 5 }, () => 'c'.repeat(64)),
+      briefs: samples.map(sample => ({
+        id: sample.sampleId,
+        projectId: sample.projectId,
+        chapterNumber: sample.chapterNumber,
+        briefDigest: 'd'.repeat(64),
+        planDigest: sample.planDigest,
+        initialDraftDigest: sample.initialDraftDigest,
+        brief: { chapterNumber: sample.chapterNumber },
+      })),
+    });
+    expect(frozen.briefs).toHaveLength(50);
+    expect(FrozenBriefCorpusV3Schema.safeParse({ ...frozen, briefs: frozen.briefs.slice(0, 49) }).success).toBe(false);
+  });
+
+  it('approves only complete three-lineage evidence with every fail-closed metric', () => {
+    const corpus = MachineCalibrationCorpusV3Schema.parse({
+      schemaVersion: 3,
+      calibrationMode: 'machine_ensemble',
+      campaignId: '10000000-0000-4000-8000-000000000001',
+      corpusVersion: 'frozen-v1',
+      promptVersion: 'binary-editor-v1',
+      routeVersion: 'candidate-route-v1',
+      engineReleaseId: getFlagshipReleaseManifestV3().releaseId,
+      launchPackDigests: Array.from({ length: 5 }, () => 'c'.repeat(64)),
+      samples,
+    });
+    expect(computeMachineCalibrationMetricsV3(corpus)).toMatchObject({
+      sampleSize: 50,
+      schemaSuccessRate: 1,
+      planSuccessRate: 1,
+      infraSuccessRate: 1,
+      firstPassPublishRate: 0.86,
+      withinRepairPublishRate: 1,
+      candidateMajorityPreferenceRate: 0.66,
+      desireToReadNextRate: 0.7,
+      criticalContinuityViolations: 0,
+      medianCostUsd: 0.2,
+      maxCostUsd: 0.2,
+      approved: true,
+    });
+    expect(MachineCalibrationCorpusV3Schema.safeParse({
+      ...corpus,
+      samples: corpus.samples.map((sample, index) => index === 0
+        ? { ...sample, judgments: sample.judgments.slice(0, 2) }
+        : sample),
+    }).success).toBe(false);
+    const outage = MachineCalibrationCorpusV3Schema.parse({
+      ...corpus,
+      samples: corpus.samples.map((sample, index) => index === 0 ? { ...sample, infraSuccess: false } : sample),
+    });
+    expect(computeMachineCalibrationMetricsV3(outage).approved).toBe(false);
+    const critical = MachineCalibrationCorpusV3Schema.parse({
+      ...corpus,
+      samples: corpus.samples.map((sample, index) => index === 0
+        ? { ...sample, judgments: sample.judgments.map((judgment, judge) => ({ ...judgment, criticalContinuityViolation: judge < 2 })) }
+        : sample),
+    });
+    expect(computeMachineCalibrationMetricsV3(critical).approved).toBe(false);
+    const tie = MachineCalibrationCorpusV3Schema.parse({
+      ...corpus,
+      samples: corpus.samples.map((sample, index) => index === 0
+        ? { ...sample, judgments: sample.judgments.map(judgment => ({ ...judgment, preferred: 'tie' as const })) }
+        : sample),
+    });
+    expect(computeMachineCalibrationMetricsV3(tie)).toMatchObject({ candidateMajorityPreferenceRate: 0.64, approved: false });
   });
 });

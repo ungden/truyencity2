@@ -16,18 +16,14 @@ const routes = FlagshipModelRoutesV3Schema.parse(JSON.parse(readFileSync(
   'utf8',
 )));
 
-const axes = {
-  premise_interest: 8.4,
-  character_voice: 8.4,
-  scene_tension: 8.3,
-  causal_surprise: 8.2,
-  emotional_movement: 8.3,
-  domain_truth: 8.4,
-  prose_naturalness: 8.4,
-  agency: 8.5,
-  earned_pleasure: 8.4,
-  recovery_pacing: 8.3,
-  desire_to_read_next: 8.5,
+const qualityGates = {
+  premise_interest: true, character_voice: true, scene_tension: true, causal_surprise: true,
+  emotional_movement: true, domain_truth: true, prose_naturalness: true, agency: true,
+  earned_pleasure: true, recovery_pacing: true, desire_to_read_next: true,
+};
+const hardGates = {
+  canon: true, timeline: true, resource_causality: true, character_knowledge: true,
+  authority: true, prompt_leak: true, plan_fidelity: true,
 };
 
 describe('flagship v3 offline opening runner', () => {
@@ -42,20 +38,7 @@ describe('flagship v3 offline opening runner', () => {
         const payload = call.role === 'writer' || call.role === 'writer_revision'
           ? { title: `Chương ${chapterNumber}: Lựa chọn có giá`, content }
           : {
-              decision: 'publish',
-              confidence: 0.9,
-              planFidelity: 9,
-              hardGates: {
-                canon: true,
-                timeline: true,
-                resourceCausality: true,
-                characterKnowledge: true,
-                authority: true,
-                promptLeak: true,
-                planFidelity: true,
-              },
-              axes,
-              evidence: [],
+              status: 'pass', hardGates, qualityGates, issues: [],
               revisionInstructions: [],
               realizedDeltaEvidence: plan.requiredDeltas.map(delta => ({
                 deltaId: delta.id,
@@ -90,30 +73,21 @@ describe('flagship v3 offline opening runner', () => {
         const plan = launchPack.initialWindow.plans[chapterNumber - 1];
         const marker = 'Nhân vật chưa trả được cái giá đã hứa.';
         const content = `${marker} ${'Anh kiểm tra tình hình rồi lựa chọn cách giải quyết phù hợp với người trong cảnh. '.repeat(20)}`;
-        const payload = call.role === 'writer'
-          ? { title: `Chương ${chapterNumber}: Bản thử`, content }
+        const payload = call.role === 'writer' || call.role === 'writer_revision'
+          ? { title: `Chương ${chapterNumber}: Bản thử`, content: call.role === 'writer_revision' ? `${content} Bản sửa vẫn không tạo được nguồn lực hợp lệ.` : content }
           : {
-              decision: 'reject',
-              confidence: 0.9,
-              planFidelity: 5,
-              hardGates: {
-                canon: true,
-                timeline: true,
-                resourceCausality: false,
-                characterKnowledge: true,
-                authority: true,
-                promptLeak: true,
-                planFidelity: false,
-              },
-              axes: { ...axes, domain_truth: 6 },
-              evidence: [{
-                code: 'resource_unearned',
+              status: 'issues',
+              hardGates: { ...hardGates, resource_causality: false },
+              qualityGates: { ...qualityGates, domain_truth: false },
+              issues: [{
+                gate: 'resource_causality',
                 severity: 'critical',
                 message: 'Nguồn lực thay đổi nhưng chưa có nguồn và chi phí trong cảnh.',
                 spanId: 'span_001',
-                local: false,
+                locality: 'non_local',
+                repairMode: 'full_rewrite',
               }],
-              revisionInstructions: [],
+              revisionInstructions: ['Viết lại cảnh để mọi thay đổi nguồn lực có nguồn và chi phí nhìn thấy được.'],
               realizedDeltaEvidence: plan.requiredDeltas.map(delta => ({
                 deltaId: delta.id,
                 spanId: 'span_001',

@@ -42,6 +42,8 @@
     "flagship:v3:bakeoff-report": "node --import tsx scripts/flagship-v3-opening-bakeoff-report.ts",
     "flagship:v3:calibrate": "node --import tsx scripts/flagship-v3-calibrate.ts",
     "flagship:v3:calibration:import": "node --import tsx scripts/flagship-v3-import-calibration-campaign.ts",
+    "flagship:v3:calibration:machine": "node --import tsx scripts/flagship-v3-machine-calibrate.ts",
+    "flagship:v3:calibration:pairs": "node --import tsx scripts/flagship-v3-build-machine-pairs.ts",
     "flagship:reject-pilot": "node --import tsx scripts/flagship-reject-pilot.ts",
     "flagship:setup:brief": "node --import tsx scripts/flagship-setup-install-brief.ts",
     "flagship:setup:materialize": "node --import tsx scripts/flagship-setup-materialize.ts",

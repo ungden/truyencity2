@@ -74,7 +74,7 @@ export interface OrchestratorResult {
   chapterNumber: number;
   title: string;
   wordCount: number;
-  qualityScore: number;
+  qualityScore: number | null;
   projectId: string;
   novelId: string;
   duration: number;

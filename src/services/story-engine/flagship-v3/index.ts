@@ -19,3 +19,4 @@ export * from './evidence-spans';
 export * from './release';
 export * from './arc-lifecycle';
 export * from './memory';
+export * from './machine-calibration';

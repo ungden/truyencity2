@@ -11,6 +11,20 @@ import { getSupabase } from './supabase';
 const API_BASE = 'https://generativelanguage.googleapis.com/v1beta';
 const RETRY_DELAYS = [2000, 5000, 10000];
 
+class GeminiHttpError extends Error {
+  constructor(public readonly status: number, message: string, public readonly retryable: boolean) {
+    super(message);
+    this.name = 'GeminiHttpError';
+  }
+}
+
+function isRetryableTransportError(error: unknown): boolean {
+  if (error instanceof GeminiHttpError) return error.retryable;
+  if (error instanceof DOMException) return error.name === 'AbortError' || error.name === 'TimeoutError';
+  // Node fetch reports DNS resets and connection failures as TypeError.
+  return error instanceof TypeError;
+}
+
 // ── Cost Tracking ───────────────────────────────────────────────────────────
 // Pricing per 1M tokens (Google AI docs, Standard tier)
 const PRICING: Record<string, { inputPerMillion: number; outputPerMillion: number }> = {
@@ -220,13 +234,10 @@ export async function callGemini(
         signal: AbortSignal.timeout(240000),
       });
 
-      if (res.status === 429 || res.status === 503) {
-        if (attempt < RETRY_DELAYS.length) continue;
-      }
-
       if (!res.ok) {
         const errText = await res.text().catch(() => '');
-        throw new Error(`Gemini ${res.status}: ${errText.slice(0, 300)}`);
+        const retryable = [408, 409, 429].includes(res.status) || res.status >= 500;
+        throw new GeminiHttpError(res.status, `Gemini ${res.status}: ${errText.slice(0, 300)}`, retryable);
       }
 
       const data = await res.json();
@@ -252,7 +263,7 @@ export async function callGemini(
         estimatedCostUsd,
       };
     } catch (e) {
-      if (attempt >= RETRY_DELAYS.length) throw e;
+      if (!isRetryableTransportError(e) || attempt >= RETRY_DELAYS.length) throw e;
     }
   }
 
