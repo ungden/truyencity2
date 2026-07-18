@@ -14,6 +14,8 @@ import {
   StoryStateV3Schema,
   V3_ROLLING_PLANNER_PROMPT_VERSION,
   V3_ROLLING_PLANNER_SYSTEM,
+  FlagshipV3Error,
+  buildPlannerRepairPromptV3,
   buildPlannerLedgerV3,
   materializeRollingWindowV3,
   validateLaunchPackV3,
@@ -43,10 +45,11 @@ const tournament = JSON.parse(readFileSync(path.resolve(tournamentPath), 'utf8')
 };
 const routes = FlagshipModelRoutesV3Schema.parse(JSON.parse(readFileSync(path.resolve(routesPath), 'utf8')));
 const PROMPT_VERSIONS: Record<string, string> = {
-  kernel_architect: 'flagship-v3-kernel-2026-07-17.7',
-  state_seeder: 'flagship-v3-state-seeder-2026-07-17.5',
-  arc_architect: 'flagship-v3-arc-2026-07-16.2',
+  kernel_architect: 'flagship-v3-kernel-2026-07-18.9-neutral-voice-exact-shape',
+  state_seeder: 'flagship-v3-state-seeder-2026-07-18.6-exact-shape',
+  arc_architect: 'flagship-v3-arc-2026-07-18.3-exact-shape',
   initial_rolling_planner: V3_ROLLING_PLANNER_PROMPT_VERSION,
+  initial_rolling_planner_repair: `${V3_ROLLING_PLANNER_PROMPT_VERSION}.repair1`,
 };
 if (!tournament.selected?.id) throw new Error('Tournament has no selected concept.');
 const opening = tournament.openingTrials.find(item => item.candidateId === tournament.selected.id);
@@ -76,17 +79,23 @@ async function invoke<T>(input: {
   systemPrompt: string;
   userPrompt: string;
   schema: { parse(value: unknown): T; _def: unknown };
+  constrainedSchema?: boolean;
 }): Promise<T> {
   const checkpointPath = path.join(checkpointDir, `${input.role}.response.json`);
   const promptVersion = PROMPT_VERSIONS[input.role];
   if (!promptVersion) throw new Error(`Missing prompt version for ${input.role}.`);
+  const providerSchema = toGeminiResponseJsonSchema(input.schema as never);
+  const effectiveUserPrompt = input.constrainedSchema === false
+    ? `OUTPUT_JSON_SCHEMA=${JSON.stringify(providerSchema)}\n\n${input.userPrompt}`
+    : input.userPrompt;
   const promptDigest = createHash('sha256').update(JSON.stringify({
     role: input.role,
     model: input.model,
     routeVersion: routes.routeVersion,
     promptVersion,
     systemPrompt: input.systemPrompt,
-    userPrompt: input.userPrompt,
+    userPrompt: effectiveUserPrompt,
+    constrainedSchema: input.constrainedSchema !== false,
   })).digest('hex');
   if (existsSync(checkpointPath)) {
     const checkpoint = JSON.parse(readFileSync(checkpointPath, 'utf8')) as {
@@ -124,14 +133,16 @@ async function invoke<T>(input: {
       }
     }
   }
-  const response = await callFlagshipModel(input.userPrompt, {
+  const response = await callFlagshipModel(effectiveUserPrompt, {
     model: input.model,
     temperature: 0.15,
     maxTokens: 32768,
     thinkingLevel: 'medium',
     systemPrompt: input.systemPrompt,
-    responseJsonSchema: toGeminiResponseJsonSchema(input.schema as never),
-  }, { jsonMode: true, schemaName: `flagship_v3_${input.role}` });
+    responseJsonSchema: input.constrainedSchema === false
+      ? undefined
+      : providerSchema,
+  }, { jsonMode: input.constrainedSchema !== false, schemaName: `flagship_v3_${input.role}` });
   const metadata = {
     role: input.role,
     model: input.model,
@@ -157,6 +168,7 @@ async function main(): Promise<void> {
     role: 'kernel_architect',
     model: routes.launchArchitect,
     schema: StoryKernelV3Schema,
+    constrainedSchema: false,
     systemPrompt: 'Bạn là Kernel Architect. Chỉ tạo bản sắc truyện, cast, causal world, resource, promise và ending contract; chỉ trả JSON đúng schema.',
     userPrompt: `STORY_COMMISSION=${JSON.stringify(snapshot.commission)}
 MARKET_SIGNAL_PROVENANCE=${JSON.stringify({ snapshotId: snapshot.snapshotId, signals: snapshot.signals })}
@@ -169,7 +181,7 @@ Tạo StoryKernelV3. title phải khớp tuyệt đối REQUIRED_DATABASE_TITLE.
 Không chứa taxonomy thị trường, prompt benchmark hoặc tên tác phẩm tham khảo.
 Cần ít nhất 4 nhân vật có agenda/voice riêng, 4 world claim có nguồn và ngoại lệ, 3 resource, 4 promise.
 Mỗi resource numeric phải có referenceScale gồm 1-5 mốc so sánh nội bộ có số cụ thể, cùng minimumValue và maximumValue hữu hạn phù hợp cơ chế riêng của truyện. Nếu resource dùng để mua hàng/dịch vụ, exchangeAnchors phải khai báo itemId/name/quantity/unit/costAmount/tolerancePercent từ kinh tế riêng của truyện; nếu không có trao đổi thì dùng mảng rỗng. Tiền/vật tư thường min=0; chỉ số nợ, thiện ác hoặc nhiệt độ được phép âm nếu kernel định nghĩa rõ. Resource state bắt buộc referenceScale/minimumValue/maximumValue đều null và exchangeAnchors=[].
-Trong voice của từng nhân vật: positiveExamples có 2-5 câu và forbiddenPatterns có 2-8 câu; MỖI câu phải dài ít nhất 8 ký tự, không dùng nhãn cụt như "nói đùa".
+Voice của từng nhân vật chỉ chứa thuộc tính trung tính: register, sentenceRhythm, directness, addressRules, vocabulary, stressResponse và avoidances. Không viết câu thoại mẫu, câu văn mẫu hoặc lời tuyên bố có thể bị Writer sao chép.
 endingContract.promisesThatMustClose chỉ chứa stable ID ASCII đã xuất hiện trong promises[].id; tuyệt đối không điền mô tả lời hứa hoặc tạo ID mới.
 Mục tiêu kết thúc mặc định 800-1200 chương, forecast khoảng 900, nhưng không kéo dài vô hạn.`,
   });
@@ -179,6 +191,7 @@ Mục tiêu kết thúc mặc định 800-1200 chương, forecast khoảng 900, 
     role: 'state_seeder',
     model: routes.launchArchitect,
     schema: StoryStateV3Schema,
+    constrainedSchema: false,
     systemPrompt: 'Bạn là State Seeder. Chỉ tạo StoryStateV3 chapter zero bao phủ chính xác kernel; không viết outline hoặc prose.',
     userPrompt: `STORY_KERNEL_V3=${JSON.stringify(kernel)}
 
@@ -194,6 +207,7 @@ Không thêm character/resource/promise ngoài kernel.`,
     role: 'arc_architect',
     model: routes.launchArchitect,
     schema: ArcPlanV3Schema,
+    constrainedSchema: false,
     systemPrompt: 'Bạn là Arc Architect. Chỉ tạo arc hiện tại 20-30 chương từ kernel và state đã commit; không lập 1000 chương.',
     userPrompt: `STORY_KERNEL_V3=${JSON.stringify(kernel)}
 STORY_STATE_V3=${JSON.stringify(initialState)}
@@ -204,26 +218,45 @@ Actor ID, promise ID và progression signal phải lấy từ kernel.
 Terminal change phải hữu hình về vật chất, quan hệ hoặc thế giới; conflict actor có agenda/leverage/next move thật.`,
   });
 
-  const initialWindowDraft = await invoke({
+  const plannerRoleContext = `STORY_KERNEL_V3=${JSON.stringify(kernel)}
+ARC_PLAN_V3=${JSON.stringify(arc)}
+STORY_STATE_V3=${JSON.stringify(initialState)}`;
+  const plannerLedger = buildPlannerLedgerV3(initialState, kernel);
+  let initialWindowDraft = await invoke({
     role: 'initial_rolling_planner',
     model: routes.planner,
     schema: RollingPlanWindowDraftV3Schema,
+    constrainedSchema: false,
     systemPrompt: V3_ROLLING_PLANNER_SYSTEM,
-    userPrompt: `STORY_KERNEL_V3=${JSON.stringify(kernel)}
-ARC_PLAN_V3=${JSON.stringify(arc)}
-STORY_STATE_V3=${JSON.stringify(initialState)}
-AUTHORITATIVE_LEDGER=${JSON.stringify(buildPlannerLedgerV3(initialState, kernel))}
+    userPrompt: `${plannerRoleContext}
+AUTHORITATIVE_LEDGER=${JSON.stringify(plannerLedger)}
 
 Tạo RollingPlanWindowV3 chương 1-5.
 Trước khi trả JSON, tự mô phỏng tuần tự cả năm plan trên AUTHORITATIVE_LEDGER; chapter 1 dùng đúng ledger, chapter sau dùng postcondition chapter trước. Không tự lặp lại before/after/unit/valueBefore vì compiler sẽ gắn chúng.
 source, sink, learnedFrom và mọi state value phải là cụm có nghĩa ít nhất 8 ký tự, không dùng nhãn cụt như "chợ", "bán", "mua".`,
   });
-  const initialWindow = materializeRollingWindowV3({
-    kernel,
-    arc,
-    state: initialState,
-    draft: initialWindowDraft,
-  });
+  let initialWindow;
+  try {
+    initialWindow = materializeRollingWindowV3({ kernel, arc, state: initialState, draft: initialWindowDraft });
+  } catch (caught) {
+    if (!(caught instanceof FlagshipV3Error) || caught.code !== 'plan_blocked') throw caught;
+    const validationIssues = caught.detail;
+    initialWindowDraft = await invoke({
+      role: 'initial_rolling_planner_repair',
+      model: routes.planner,
+      schema: RollingPlanWindowDraftV3Schema,
+      constrainedSchema: false,
+      systemPrompt: V3_ROLLING_PLANNER_SYSTEM,
+      userPrompt: buildPlannerRepairPromptV3({
+        startChapter: 1,
+        previousDraft: initialWindowDraft,
+        ledger: plannerLedger,
+        validationIssues: Array.isArray(validationIssues) ? validationIssues : [validationIssues],
+        roleContext: plannerRoleContext,
+      }),
+    });
+    initialWindow = materializeRollingWindowV3({ kernel, arc, state: initialState, draft: initialWindowDraft });
+  }
 
   const pack = FlagshipLaunchPackV3Schema.parse({
     schemaVersion: 3,

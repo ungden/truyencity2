@@ -119,6 +119,7 @@ export async function runOfflinePlannedWindowV3(
     plans: ChapterPlanV3[];
     routes: FlagshipModelRoutesV3;
     targetWordCount?: number;
+    previousChapterContent?: string;
   },
   dependencies: {
     invoke(request: OfflineOpeningModelRequestV3): Promise<OfflineOpeningModelResponseV3>;
@@ -134,6 +135,8 @@ export async function runOfflinePlannedWindowV3(
   });
 
   let state = input.state;
+  let previousChapterTail = input.previousChapterContent
+    || (input.state.chapterNumber > 0 ? input.state.previousEnding : '');
   const chapters: OfflineOpeningChapterV3[] = [];
   for (const plan of input.plans) {
     const calls: OfflineOpeningCallRecordV3[] = [];
@@ -144,6 +147,7 @@ export async function runOfflinePlannedWindowV3(
         arc: input.arc,
         state,
         plan,
+        previousChapterTail,
       });
       const generated = await executeFlagshipV3Pipeline({
         kernel: input.kernel,
@@ -151,6 +155,7 @@ export async function runOfflinePlannedWindowV3(
         state,
         plan,
         targetWordCount: input.targetWordCount ?? 1800,
+        previousChapterTail,
         contexts,
       }, {
         invoke: async call => {
@@ -188,6 +193,7 @@ export async function runOfflinePlannedWindowV3(
         content: generated.content,
         realizedDeltaIds: generated.verdict.realizedDeltaEvidence.map(item => item.deltaId),
       });
+      previousChapterTail = generated.content;
       chapters.push({
         chapterNumber: plan.chapterNumber,
         status: 'publish',

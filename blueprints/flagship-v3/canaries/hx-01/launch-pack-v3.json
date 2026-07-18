@@ -5,285 +5,294 @@
     "schemaVersion": 3,
     "pipelineVersion": "flagship_v3",
     "title": "Đi Kiểm Định Dị Tượng, Tôi Phát Hiện Thành Phố Này Có Luật Giết Người",
-    "genre": "Huyền huyễn trí mưu",
+    "genre": "Huyền huyễn trí mưu, Bí ẩn suy luận",
     "concept": {
-      "signature": "Dùng bột than sao chép vết nứt vi mô trên ấn triện để vô hiệu hóa quy tắc cưỡng chế.",
-      "uniqueMechanism": "Quy tắc thế giới phụ thuộc vào độ hoàn hảo của ấn triện vật lý; sao chép và chứng minh lỗi mài mòn sẽ phá vỡ luật, nhưng để lại sẹo nhân quả trên người.",
-      "readerFantasy": "Dùng sự tỉ mỉ, quan sát và logic để bẻ gãy quyền lực tuyệt đối của kẻ mạnh, biến luật lệ của chúng thành vũ khí chống lại chúng.",
-      "recurringSituation": "Nhân vật chính đối mặt với một quy tắc bất công đang ép người, tìm cách tiếp cận ấn triện gốc, rập khuôn lỗi và công bố trước đám đông để lật kèo.",
+      "signature": "Dùng bột than tro giấy sao chép vi mô các vết nứt trên ấn triện để vô hiệu hóa quy tắc cưỡng chế của thành phố.",
+      "uniqueMechanism": "Phát hiện và chứng minh sự mài mòn vật lý của ấn triện kiểm định để tạo ra lỗ hổng pháp lý, đổi lại phải chịu vết sẹo nhân quả trên cơ thể.",
+      "readerFantasy": "Cảm giác thỏa mãn khi dùng trí tuệ, sự tỉ mỉ và bằng chứng vật lý để bẻ gãy những luật lệ áp bức tưởng chừng tuyệt đối.",
+      "recurringSituation": "Nhân vật chính đối mặt với một quy tắc bất công đang gây hại, phải tìm cách tiếp cận ấn triện gốc để rập khuôn mà không bị phát hiện.",
       "variationAxes": [
-        "Độ khó tiếp cận ấn triện",
-        "Mức độ nguy hiểm của quy tắc",
-        "Thế lực bảo vệ con dấu",
-        "Vị trí vết sẹo nhân quả phải chịu"
+        "Loại quy tắc bị lỗi và mức độ ảnh hưởng",
+        "Mức độ bảo vệ ấn triện tại hiện trường",
+        "Hậu quả vật lý của vết sẹo nhân quả",
+        "Phản ứng truy quét của Cục Lưu Trữ"
       ],
       "antiCloneFingerprint": [
-        "Bột than giấy tro",
-        "Kính phóng đại kiểm định",
-        "Vết sẹo giao ước hình vết nứt",
-        "Cục Lưu Trữ Con Dấu"
+        "Bột than tro giấy siêu mịn",
+        "Kính phóng đại kiểm định vi mô",
+        "Vết sẹo giao ước trên da",
+        "La bàn dò tìm ấn triện của thanh tra"
       ]
     },
     "pleasure": {
       "primaryRewardLoop": [
-        "Phát hiện quy tắc bất thường",
-        "Thu thập bản rập ấn triện lỗi",
-        "Công bố bằng chứng vô hiệu hóa",
-        "Nhận quyền lợi và uy tín mới"
+        "Xác định quy tắc lỗi đang hoạt động",
+        "Thu thập bản rập ấn triện thành công",
+        "Công bố bằng chứng vô hiệu hóa quy tắc",
+        "Nhận quyền lợi, uy tín hoặc thông tin mới"
       ],
       "comfortLoop": [
-        "Sắp xếp và phân loại các bản rập trong kho lưu trữ bí mật",
-        "Nghiên cứu lịch sử các con dấu để tìm điểm yếu"
+        "Nghiên cứu hồ sơ lưu trữ cổ đại",
+        "Chế tạo và bảo quản bột than tro giấy",
+        "Phân tích các vết nứt vi mô trên bản rập"
       ],
       "setbackRecoveryWindow": 2,
       "progressionSignals": [
         "Số lượng bản rập ấn triện lỗi sở hữu",
-        "Cấp độ của quy tắc có thể vô hiệu hóa",
-        "Mức độ truy nã từ Cục Lưu Trữ"
+        "Mức độ phức tạp của quy tắc có thể phá vỡ",
+        "Sự kiêng dè và thay đổi chiến thuật của Cục Lưu Trữ"
       ]
     },
-    "protagonistId": "char_kael",
+    "protagonistId": "char_kael_01",
     "characters": [
       {
-        "id": "char_kael",
+        "id": "char_kael_01",
         "name": "Kael",
         "aliases": [
           "Kiểm Toán Viên Dị Giáo",
-          "Kẻ Rập Bóng"
+          "Kẻ Rập Khuôn"
         ],
         "role": "protagonist",
-        "publicIdentity": "Cựu thư ký Cục Lưu Trữ, hiện là kẻ bị truy nã",
-        "agenda": "Phá hủy hệ thống quy tắc độc tài bằng cách chứng minh mọi ấn triện đều có thể mục nát.",
-        "competence": "Trí nhớ siêu phàm về khuôn dấu, kỹ năng sao chép vi mô, am hiểu luật lệ.",
-        "constraint": "Mỗi lần phá luật phải chịu một vết sẹo nhân quả gây đau đớn.",
-        "moralBoundary": "Không bao giờ dùng ấn triện giả để hại người vô tội, chỉ phá luật bất công.",
-        "decisionSignature": "Luôn tìm kiếm kẽ hở vật lý thay vì đối đầu trực diện bằng vũ lực.",
+        "publicIdentity": "Cựu thư ký vô danh tại Cục Lưu Trữ, hiện là kẻ bị truy nã toàn thành phố.",
+        "agenda": "Lật tẩy sự mục nát của hệ thống ấn triện và sống sót trước sự truy sát của chính quyền.",
+        "competence": "Trí nhớ siêu phàm về các khuôn dấu gốc, kỹ năng sao chép vi mô bằng bột than cực kỳ chuẩn xác.",
+        "constraint": "Mỗi lần phá luật đều để lại vết sẹo đau đớn trên cơ thể, thể lực yếu kém không giỏi chiến đấu.",
+        "moralBoundary": "Không bao giờ dùng lỗ hổng để hại người vô tội, chỉ nhắm vào những quy tắc áp bức và kẻ tham nhũng.",
+        "decisionSignature": "Luôn tính toán rủi ro vật lý trước khi hành động, ưu tiên thu thập bằng chứng hơn đối đầu trực diện.",
         "voice": {
-          "summary": "Điềm tĩnh, chính xác, luôn dùng thuật ngữ pháp lý và logic để dồn ép đối thủ.",
-          "positiveExamples": [
-            "Theo Điều khoản 7, Phụ lục C, con dấu này đã bị mài mòn vượt mức.",
-            "Quy tắc của các người không hoàn hảo như các người tưởng đâu.",
-            "Mọi quyền lực đều để lại vết nứt, chỉ cần biết cách nhìn."
-          ],
-          "forbiddenPatterns": [
-            "Ta sẽ giết hết bọn bay!",
-            "Trời ơi sợ quá đi mất.",
-            "Cứ lao vào đánh thôi nghĩ nhiều làm gì."
-          ]
+          "summary": "Giọng điệu điềm tĩnh, chính xác, mang đậm tính quan liêu và logic phân tích.",
+          "register": "Trang trọng, sử dụng nhiều thuật ngữ lưu trữ, đo lường và luật pháp.",
+          "sentenceRhythm": "Câu ngắn, gãy gọn, cấu trúc nguyên nhân - kết quả rõ ràng, nhịp độ đều đặn.",
+          "directness": "balanced",
+          "addressRules": "Gọi người khác bằng chức danh hoặc tên đầy đủ, hiếm khi dùng biệt danh hay cách gọi thân mật.",
+          "vocabulary": "Từ vựng chuyên ngành kiểm định, đo lường, vật liệu học và thủ tục hành chính.",
+          "stressResponse": "Trở nên lạnh lùng, nói chậm lại và tập trung phân tích vào chi tiết nhỏ nhất của vấn đề.",
+          "avoidances": "Tránh sử dụng từ ngữ cảm thán, tiếng lóng, những câu nói mơ hồ hoặc bộc lộ cảm xúc mạnh."
         }
       },
       {
-        "id": "char_elara",
+        "id": "char_elara_02",
         "name": "Elara",
         "aliases": [
-          "Người Đưa Tin"
+          "Người Liên Lạc"
         ],
         "role": "cast",
-        "publicIdentity": "Nhân viên lưu trữ cấp thấp tại Cục Lưu Trữ",
-        "agenda": "Bảo vệ Kael và thu thập thông tin nội bộ để lật đổ những kẻ tham nhũng trong Cục.",
-        "competence": "Khả năng luân chuyển tài liệu không để lại dấu vết, mạng lưới tin tức ngầm.",
-        "constraint": "Phải giữ vỏ bọc nhân viên mẫn cán, không thể hành động công khai.",
-        "moralBoundary": "Sẵn sàng nói dối và trộm cắp tài liệu, nhưng không phản bội đồng đội.",
-        "decisionSignature": "Luôn chuẩn bị sẵn đường lui và phương án dự phòng trước khi hành động.",
+        "publicIdentity": "Nhân viên mẫn cán tại Cục Lưu Trữ, người cung cấp thông tin ngầm cho Kael.",
+        "agenda": "Bảo vệ Kael và lợi dụng anh để dọn dẹp những kẻ tham nhũng trong nội bộ Cục Lưu Trữ.",
+        "competence": "Khả năng tiếp cận mạng lưới thông tin mật, hồ sơ lưu trữ và lịch trình tuần tra của lính gác.",
+        "constraint": "Phải duy trì vỏ bọc hợp pháp, không thể trực tiếp can thiệp vào hiện trường hay chiến đấu.",
+        "moralBoundary": "Sẵn sàng hy sinh lợi ích nhỏ để đạt mục tiêu lớn, nhưng tuyệt đối không phản bội đồng minh.",
+        "decisionSignature": "Cung cấp thông tin gián tiếp, luôn chừa đường lui cho bản thân và hành động trong bóng tối.",
         "voice": {
-          "summary": "Thận trọng, nói nhanh, thường xuyên cảnh báo rủi ro nhưng vẫn kiên quyết giúp đỡ.",
-          "positiveExamples": [
-            "Họ đã thành lập đội đặc nhiệm, anh phải rời đi ngay.",
-            "Tài liệu này tôi chỉ mượn được trong mười lăm phút thôi.",
-            "Đừng làm gì ngu ngốc thu hút sự chú ý nhé."
-          ],
-          "forbiddenPatterns": [
-            "Cứ xông thẳng vào kho lưu trữ đi.",
-            "Tôi không sợ bọn chúng đâu.",
-            "Chuyện này dễ như ăn kẹo vậy."
-          ]
+          "summary": "Giọng điệu thì thầm, cẩn trọng, luôn mang cảm giác vội vã, cảnh giác và đầy toan tính.",
+          "register": "Bán trang trọng, pha trộn ngôn ngữ công sở và các ám hiệu ngầm của thế giới ngầm.",
+          "sentenceRhythm": "Câu dài, nhiều mệnh đề phụ để rào đón, giải thích rủi ro và che giấu ý định thực sự.",
+          "directness": "reserved",
+          "addressRules": "Dùng đại từ nhân xưng chung chung hoặc ám hiệu khi nói về người thứ ba để tránh bị lộ.",
+          "vocabulary": "Từ vựng liên quan đến tin đồn, lịch trình, rủi ro, sự che đậy và các mối quan hệ lợi ích.",
+          "stressResponse": "Nói nhanh hơn, liên tục nhìn quanh, lặp lại các cảnh báo an toàn và tìm cách rút lui.",
+          "avoidances": "Tránh nhắc đến tên thật của những nhân vật quyền lực ở nơi công cộng hoặc trong văn bản."
         }
       },
       {
-        "id": "char_silas",
+        "id": "char_silas_03",
         "name": "Silas",
         "aliases": [
-          "Vua Muối"
+          "Lão Trùm Cảng",
+          "Kẻ Độc Quyền"
         ],
         "role": "cast",
-        "publicIdentity": "Thương nhân độc quyền buôn bán muối tại khu cảng",
-        "agenda": "Duy trì quyền độc quyền vĩnh viễn và bóc lột tối đa lợi nhuận từ dân nghèo.",
-        "competence": "Sở hữu ấn triện độc quyền cổ, tài chính khổng lồ, đội bảo vệ tư nhân.",
-        "constraint": "Quyền lực phụ thuộc hoàn toàn vào một con dấu đang ngày càng mòn vẹt.",
-        "moralBoundary": "Không có giới hạn, sẵn sàng giết người để bảo vệ lợi ích thương mại.",
-        "decisionSignature": "Dùng tiền và luật lệ cũ để đè bẹp mọi sự cạnh tranh từ trong trứng nước.",
+        "publicIdentity": "Thương nhân giàu có bậc nhất, nắm giữ giấy phép độc quyền buôn bán muối của thành phố.",
+        "agenda": "Duy trì quyền lực độc quyền thương mại và tiêu diệt bất cứ ai đe dọa đến ấn triện của mình.",
+        "competence": "Sở hữu nguồn tài chính khổng lồ, mạng lưới tay sai đông đảo và sự bảo kê từ giới chức trách.",
+        "constraint": "Quyền lực phụ thuộc hoàn toàn vào một ấn triện độc quyền đã quá cũ kỹ, mòn vẹt và dễ bị tổn thương.",
+        "moralBoundary": "Không có giới hạn đạo đức khi bảo vệ tài sản, coi mạng người như cỏ rác và sẵn sàng chà đạp luật pháp.",
+        "decisionSignature": "Dùng tiền để giải quyết mọi vấn đề, thuê người khác làm việc bẩn thay mình, phản ứng tàn bạo khi bị đe dọa.",
         "voice": {
-          "summary": "Trịch thượng, hống hách, luôn coi mình là luật pháp nhờ tờ giấy phép cổ.",
-          "positiveExamples": [
-            "Quy tắc đã ghi rõ, toàn bộ muối ở đây thuộc về ta.",
-            "Kẻ nào dám cản đường làm ăn của ta sẽ phải trả giá đắt.",
-            "Ấn triện này là ý chí của những người sáng lập, các ngươi phải tuân theo."
-          ],
-          "forbiddenPatterns": [
-            "Có lẽ tôi đã sai lầm trong việc kinh doanh.",
-            "Tôi xin lỗi vì đã ép giá mọi người.",
-            "Luật lệ này thật bất công quá."
-          ]
+          "summary": "Giọng điệu trịch thượng, ầm ĩ, mang đậm tính toán thương mại, khoe khoang và áp đặt.",
+          "register": "Suồng sã nhưng mang tính đe dọa, sử dụng ngôn ngữ của kẻ bề trên quen ra lệnh.",
+          "sentenceRhythm": "Câu ngắt quãng bởi những tiếng cười khẩy, tiếng đập bàn hoặc những lời chửi thề.",
+          "directness": "direct",
+          "addressRules": "Gọi cấp dưới bằng những từ ngữ hạ thấp, xưng hô trịch thượng với bất kỳ ai không cùng đẳng cấp.",
+          "vocabulary": "Từ vựng về tiền bạc, lợi nhuận, sự trung thành, cái giá phải trả và sự trừng phạt.",
+          "stressResponse": "La hét, đe dọa bằng bạo lực, đập phá đồ đạc hoặc ra lệnh cắt giảm tài chính ngay lập tức.",
+          "avoidances": "Tránh nói về nguồn gốc thực sự của sự giàu có, tình trạng của ấn triện hoặc những điểm yếu cá nhân."
         }
       },
       {
-        "id": "char_mac_quan",
-        "name": "Mặc Quan",
+        "id": "char_inspector_04",
+        "name": "Thanh Tra Xám",
         "aliases": [
-          "Chó Săn Của Cục"
+          "Bóng Ma Cục Lưu Trữ",
+          "Kẻ Cầm La Bàn"
         ],
         "role": "cast",
-        "publicIdentity": "Đặc vụ cấp cao của Cục Lưu Trữ Con Dấu",
-        "agenda": "Săn lùng Kael và thu hồi mọi bản rập lỗi để bảo vệ sự toàn vẹn của hệ thống quy tắc.",
-        "competence": "Sử dụng la bàn dò tìm ấn triện, am hiểu các loại bẫy quy tắc, kỹ năng theo dõi bậc thầy.",
-        "constraint": "Bị trói buộc bởi các thủ tục hành chính cứng nhắc của Cục khi muốn thi hành án.",
-        "moralBoundary": "Sẵn sàng hy sinh người vô tội nếu điều đó giúp bảo vệ sự tồn tại của hệ thống.",
-        "decisionSignature": "Hành động lạnh lùng, tính toán từng bước dựa trên dấu vết vật lý và logic.",
+        "publicIdentity": "Đặc vụ cấp cao vô danh của Cục Lưu Trữ Con Dấu, chuyên săn lùng kẻ phá luật.",
+        "agenda": "Bắt giữ Kael bằng mọi giá để bảo vệ sự toàn vẹn của hệ thống quy tắc và danh dự của Cục.",
+        "competence": "Kỹ năng theo dõi siêu việt bằng la bàn ấn triện, võ thuật cận chiến xuất sắc và am hiểu luật pháp.",
+        "constraint": "Bị ràng buộc bởi các quy trình cứng nhắc của Cục, không thể hành động tùy tiện ngoài thẩm quyền.",
+        "moralBoundary": "Tuân thủ luật pháp một cách mù quáng, tin rằng trật tự quan trọng hơn công lý hay sinh mạng con người.",
+        "decisionSignature": "Hành động dựa trên dữ liệu đo đạc, tuân thủ quy trình, không bao giờ để cảm xúc chi phối quyết định.",
         "voice": {
-          "summary": "Lạnh lùng, ít lời, luôn nói bằng giọng điệu đe dọa ngầm và tuyệt đối trung thành với hệ thống.",
-          "positiveExamples": [
-            "Ngươi không thể trốn khỏi sự phán xét của ấn triện đâu.",
-            "Mọi sai lệch đều phải được xóa bỏ để duy trì trật tự.",
-            "La bàn của ta không bao giờ chỉ sai hướng."
-          ],
-          "forbiddenPatterns": [
-            "Tôi cảm thấy tội nghiệp cho hắn.",
-            "Có lẽ hệ thống của chúng ta thực sự có vấn đề.",
-            "Thôi bỏ qua cho hắn lần này vậy."
-          ]
+          "summary": "Giọng điệu lạnh lẽo, vô hồn, đều đều như một cỗ máy đọc các điều khoản luật pháp.",
+          "register": "Cực kỳ trang trọng, khô khan, mang tính đe dọa ngầm và tuyệt đối tuân thủ quy chuẩn.",
+          "sentenceRhythm": "Đều đặn, nhịp nhàng, không có sự thay đổi về âm lượng hay nhịp độ dù trong tình huống căng thẳng.",
+          "directness": "direct",
+          "addressRules": "Gọi mục tiêu bằng mã số tội phạm, danh xưng vi phạm hoặc trích dẫn điều luật tương ứng.",
+          "vocabulary": "Từ vựng về hình phạt, sự vi phạm, tọa độ, quy trình bắt giữ và các điều khoản cưỡng chế.",
+          "stressResponse": "Hoàn toàn im lặng, tăng cường độ tập trung, chỉ hành động thay vì nói chuyện hay tranh cãi.",
+          "avoidances": "Tránh thể hiện bất kỳ cảm xúc cá nhân, sự đồng cảm, do dự hay sử dụng ngôn ngữ đời thường."
         }
       }
     ],
     "worldClaims": [
       {
-        "id": "claim_1",
-        "claim": "Mọi quy tắc cưỡng chế trong thành phố chỉ có hiệu lực nếu ấn triện đóng trên giấy tro còn nguyên vẹn.",
-        "sourceRef": "Luật Ấn Triện Cơ Bản, Chương 1",
-        "enforcement": "Năng lượng từ giếng chuông cổ sẽ tự động trừng phạt kẻ vi phạm quy tắc có ấn triện hợp lệ.",
-        "exceptions": "Nếu ấn triện bị mòn hoặc nứt, quy tắc sẽ mất hiệu lực tại chính điểm đứt gãy đó."
+        "id": "claim_ash_paper_rules",
+        "claim": "Lời khai ghi lên giấy tro và được đóng dấu ấn triện sẽ trở thành quy tắc cưỡng chế vật lý.",
+        "sourceRef": "Luật Khởi Nguyên Thành Phố",
+        "enforcement": "Bất kỳ ai vi phạm sẽ bị trừng phạt ngay lập tức bởi lực lượng vô hình của quy tắc.",
+        "exceptions": "Quy tắc mất hiệu lực nếu ấn triện bị chứng minh là mài mòn sai lệch so với khuôn gốc."
       },
       {
-        "id": "claim_2",
-        "claim": "Việc sao chép và công bố lỗi của ấn triện sẽ tạo ra một vết sẹo nhân quả trên cơ thể người công bố.",
-        "sourceRef": "Ghi chép cổ của những Kiểm Toán Viên đầu tiên",
-        "enforcement": "Cơ thể tự động xuất hiện vết thương tương ứng với hình dáng vết nứt ngay khi quy tắc bị vô hiệu hóa.",
-        "exceptions": "Không có ngoại lệ, nhưng có thể dùng thuốc giảm đau để chịu đựng."
+        "id": "claim_causal_cost",
+        "claim": "Mỗi lần sử dụng lỗ hổng ấn triện để kháng nghị, người dùng phải chịu một vết sẹo nhân quả.",
+        "sourceRef": "Ghi chép Causal Cost cổ đại",
+        "enforcement": "Vết sẹo tự động xuất hiện trên da, gây đau đớn và không thể xóa nhòa bằng y học thông thường.",
+        "exceptions": "Không có ngoại lệ, đây là định luật bảo toàn năng lượng và nhân quả của thế giới."
       },
       {
-        "id": "claim_3",
-        "claim": "Cục Lưu Trữ Con Dấu có quyền độc quyền đúc lại và bảo dưỡng các ấn triện quy tắc.",
-        "sourceRef": "Sắc lệnh thành lập Cục Lưu Trữ",
-        "enforcement": "Bất kỳ ai tự ý sửa chữa hoặc đúc ấn triện sẽ bị khép tội phản quốc và tử hình.",
-        "exceptions": "Các gia tộc sáng lập có quyền tự bảo dưỡng ấn triện gia truyền dưới sự giám sát của Cục."
+        "id": "claim_bureau_authority",
+        "claim": "Cục Lưu Trữ Con Dấu có quyền lực tối cao trong việc bảo vệ, kiểm định và đúc mới ấn triện.",
+        "sourceRef": "Sắc lệnh Hội đồng Thẩm phán",
+        "enforcement": "Đội đặc nhiệm áo xám được quyền bắt giữ, tra khảo và tiêu diệt kẻ xâm phạm ấn triện.",
+        "exceptions": "Họ không thể can thiệp nếu một kháng nghị đã được chứng minh công khai và hợp lệ trước đám đông."
       },
       {
-        "id": "claim_4",
-        "claim": "Bột than làm từ tro giấy là vật liệu duy nhất không bị năng lượng của quy tắc đẩy lùi khi tiếp xúc.",
-        "sourceRef": "Sổ tay vật liệu kiểm định nội bộ",
-        "enforcement": "Các vật liệu khác khi chạm vào ấn triện đang hoạt động sẽ bị bốc cháy hoặc vỡ vụn.",
-        "exceptions": "Mực tự phục hồi đặc biệt của Cục Lưu Trữ có thể tương tác trực tiếp với ấn triện."
+        "id": "claim_charcoal_copying",
+        "claim": "Bột than tro giấy là vật liệu duy nhất có thể sao chép chính xác các vết nứt vi mô của ấn triện.",
+        "sourceRef": "Bí kíp của các thư ký đời đầu",
+        "enforcement": "Các vật liệu khác sẽ bị lực lượng của quy tắc đẩy lùi, làm biến dạng hoặc bốc cháy.",
+        "exceptions": "Bột than sẽ mất tác dụng nếu bị ẩm, dính nước hoặc bị thổi bay bởi luồng gió mạnh."
       }
     ],
     "resources": [
       {
-        "id": "res_ban_rap",
+        "id": "res_charcoal_powder",
+        "name": "Bột Than Tro Giấy",
+        "mode": "numeric",
+        "unit": "gram",
+        "sourceRules": [
+          "Đốt cháy các tài liệu lưu trữ cũ có chứa năng lượng quy tắc",
+          "Nghiền mịn và lọc qua màng lụa đặc biệt nhiều lần"
+        ],
+        "spendRules": [
+          "Tiêu hao một lượng nhất định mỗi lần rập khuôn ấn triện",
+          "Bị hao hụt do gió thổi bay hoặc dính nước trong quá trình thao tác"
+        ],
+        "referenceScale": [
+          "10 gram: Đủ cho một lần rập khuôn ấn triện nhỏ",
+          "50 gram: Lượng mang theo tiêu chuẩn trong một nhiệm vụ",
+          "200 gram: Đủ để rập một Quy tắc Tường khổng lồ"
+        ],
+        "exchangeAnchors": [
+          {
+            "itemId": "item_silk_filter",
+            "name": "Màng lọc lụa chuyên dụng",
+            "quantity": 1,
+            "unit": "cái",
+            "costAmount": 20,
+            "tolerancePercent": 10
+          }
+        ],
+        "minimumValue": 0,
+        "maximumValue": 1000,
+        "scarcity": "Rất khó chế tạo vì cần tài liệu lưu trữ thật, kỹ thuật lọc phức tạp và môi trường khô ráo tuyệt đối."
+      },
+      {
+        "id": "res_flawed_rubbings",
         "name": "Bản Rập Ấn Triện Lỗi",
         "mode": "numeric",
         "unit": "bản",
         "sourceRules": [
-          "Sao chép thành công từ ấn triện gốc",
-          "Mua lại từ chợ đen"
+          "Thực hiện rập khuôn thành công tại hiện trường nguy hiểm",
+          "Trao đổi hoặc mua lại từ chợ đen với giá cắt cổ"
         ],
         "spendRules": [
-          "Sử dụng để tống tiền quan chức",
-          "Giao nộp để đổi lấy quyền tiếp cận hồ sơ sâu hơn",
-          "Bị Cục Lưu Trữ tịch thu"
+          "Sử dụng làm bằng chứng công khai để hủy bỏ một quy tắc",
+          "Dùng để tống tiền, đe dọa hoặc thương lượng với kẻ thù"
         ],
         "referenceScale": [
-          "0 bản: Kẻ vô danh",
-          "5 bản: Có khả năng tự vệ trước luật lệ nhỏ",
-          "20 bản: Đủ sức lật đổ một thương nhân độc quyền",
-          "50 bản: Trở thành mối đe dọa cấp thành phố"
+          "1 bản: Đủ để tự vệ trước một quy tắc nhỏ lẻ",
+          "5 bản: Có thể lật đổ một thương nhân hoặc quan chức cấp thấp",
+          "20 bản: Đủ sức đe dọa toàn bộ hệ thống của Cục Lưu Trữ"
+        ],
+        "exchangeAnchors": [
+          {
+            "itemId": "item_safe_house",
+            "name": "Nơi ẩn náu an toàn",
+            "quantity": 1,
+            "unit": "đêm",
+            "costAmount": 1,
+            "tolerancePercent": 0
+          }
         ],
         "minimumValue": 0,
         "maximumValue": 100,
-        "scarcity": "Rất hiếm, đòi hỏi rủi ro tính mạng để thu thập.",
-        "exchangeAnchors": []
+        "scarcity": "Cực kỳ khan hiếm, mỗi bản rập đòi hỏi đánh cược mạng sống, kỹ năng điêu luyện và sự may mắn để lấy được."
       },
       {
-        "id": "res_seo_nhan_qua",
-        "name": "Diện Tích Sẹo Nhân Quả",
+        "id": "res_causal_scars",
+        "name": "Vết Sẹo Giao Ước",
         "mode": "numeric",
-        "unit": "phần trăm cơ thể",
+        "unit": "vết",
         "sourceRules": [
-          "Công bố lỗi ấn triện thành công",
-          "Kháng nghị quy tắc cấp cao"
+          "Tự động xuất hiện trên cơ thể sau mỗi lần kháng nghị quy tắc thành công"
         ],
         "spendRules": [
-          "Không thể tiêu hao, chỉ có thể làm chậm quá trình hoại tử bằng thuốc hiếm"
+          "Không thể tiêu hao theo cách thông thường, tích lũy vĩnh viễn trên cơ thể"
         ],
         "referenceScale": [
-          "1 phần trăm: Đau nhói nhẹ",
-          "10 phần trăm: Ảnh hưởng vận động",
-          "50 phần trăm: Đau đớn tột cùng, cần thuốc duy trì",
-          "100 phần trăm: Tử vong do quá tải nhân quả"
+          "1 vết: Đau đớn nhẹ, dấu hiệu nhận biết của kẻ dị biệt",
+          "5 vết: Suy giảm thể lực rõ rệt, dễ bị la bàn dò tìm phát hiện từ xa",
+          "10 vết: Nguy cơ cơ thể sụp đổ hoàn toàn do gánh nặng nhân quả"
         ],
+        "exchangeAnchors": [],
         "minimumValue": 0,
-        "maximumValue": 100,
-        "scarcity": "Tăng dần không thể đảo ngược, tạo áp lực thời gian sống cho nhân vật.",
-        "exchangeAnchors": []
-      },
-      {
-        "id": "res_quyen_truy_cap",
-        "name": "Quyền Truy Cập Hồ Sơ",
-        "mode": "state",
-        "unit": null,
-        "sourceRules": [
-          "Đánh cắp thẻ bài của quan chức",
-          "Được cấp quyền tạm thời nhờ tống tiền"
-        ],
-        "spendRules": [
-          "Bị phát hiện và khóa quyền",
-          "Thẻ bài hết hạn"
-        ],
-        "referenceScale": null,
-        "minimumValue": null,
-        "maximumValue": null,
-        "scarcity": "Được kiểm soát gắt gao bởi Cục Lưu Trữ, thay đổi mã liên tục.",
-        "exchangeAnchors": []
+        "maximumValue": 20,
+        "scarcity": "Là giới hạn sinh tồn tuyệt đối của nhân vật, càng nhiều sẹo càng gần cái chết, buộc phải tính toán kỹ lưỡng."
       }
     ],
     "promises": [
       {
         "id": "prom_silas_downfall",
-        "description": "Kael sẽ sử dụng bản rập ấn triện độc quyền để lật đổ đế chế buôn muối của Silas.",
-        "payoffCondition": "Công bố bản rập trước hội đồng thương nhân, khiến quy tắc độc quyền của Silas vỡ vụn."
+        "description": "Kael sẽ sử dụng bản rập ấn triện của Silas để lật đổ đế chế độc quyền của hắn.",
+        "payoffCondition": "Công bố bản rập trước công chúng, khiến quy tắc độc quyền của Silas vỡ vụn và hắn mất hết quyền lực."
       },
       {
-        "id": "prom_mac_quan_clash",
-        "description": "Cuộc đối đầu trực diện giữa Kael và Mặc Quan, kẻ đang truy lùng anh bằng la bàn dò tìm.",
-        "payoffCondition": "Kael lừa Mặc Quan vào một khu vực có ấn triện lỗi nghiêm trọng và dùng chính luật của Cục để bẫy hắn."
+        "id": "prom_bureau_confrontation",
+        "description": "Cuộc đối đầu trực diện không thể tránh khỏi giữa Kael và Thanh Tra Xám của Cục Lưu Trữ.",
+        "payoffCondition": "Kael tìm ra cách vô hiệu hóa la bàn dò tìm và đánh bại Thanh Tra Xám bằng trí tuệ và bằng chứng."
       },
       {
         "id": "prom_origin_seal",
-        "description": "Khám phá bí mật về Xưởng Đúc Ấn Triện Đầu Tiên và nguồn gốc của các quy tắc.",
-        "payoffCondition": "Kael xâm nhập được vào xưởng đúc, phát hiện ra khuôn mẫu gốc cũng đã bị nứt."
+        "description": "Khám phá bí mật về Khuôn Mẫu Gốc đầu tiên tạo ra toàn bộ hệ thống quy tắc của thành phố.",
+        "payoffCondition": "Kael xâm nhập vào tầng sâu nhất của Cục Lưu Trữ, nhìn thấy Khuôn Mẫu Gốc và hiểu được bản chất thế giới."
       },
       {
-        "id": "prom_cure_scars",
-        "description": "Tìm ra cách giải quyết hoặc sống chung với những vết sẹo nhân quả đang lan rộng trên cơ thể.",
-        "payoffCondition": "Kael phá hủy quy tắc cốt lõi quy định về cái giá nhân quả, giải phóng bản thân khỏi sự ăn mòn."
+        "id": "prom_scar_limit",
+        "description": "Kael sẽ đạt đến giới hạn chịu đựng của Vết Sẹo Giao Ước và phải tìm cách giải quyết sinh tử.",
+        "payoffCondition": "Tìm ra một cơ chế cổ xưa để thanh tẩy sẹo hoặc chuyển hóa chúng thành một dạng sức mạnh mới để sống sót."
       }
     ],
     "endingContract": {
-      "emotionalState": "Thỏa mãn, tự do nhưng mang theo sự trầm ngâm về cái giá của sự thật.",
-      "materialState": "Cơ thể đầy sẹo nhưng không còn bị đe dọa tính mạng, sở hữu khuôn đúc ấn triện gốc.",
-      "worldState": "Hệ thống quy tắc độc tài sụp đổ, thành phố bước vào kỷ nguyên tự do diễn giải luật pháp.",
+      "emotionalState": "Thỏa mãn, kiệt sức nhưng tự do. Cảm giác đã hoàn thành sứ mệnh giải phóng thành phố khỏi sự áp bức của những quy tắc mục nát.",
+      "materialState": "Cơ thể đầy sẹo nhưng hệ thống ấn triện cũ đã bị phá hủy, mở ra một kỷ nguyên luật pháp mới minh bạch và công bằng hơn.",
+      "worldState": "Thành phố không còn bị cai trị bởi các quy tắc cưỡng chế mù quáng. Cục Lưu Trữ bị giải tán hoặc cải tổ toàn diện dưới sự giám sát của người dân.",
       "promisesThatMustClose": [
         "prom_silas_downfall",
-        "prom_mac_quan_clash",
+        "prom_bureau_confrontation",
         "prom_origin_seal",
-        "prom_cure_scars"
+        "prom_scar_limit"
       ],
       "targetChapterRange": {
         "min": 800,
@@ -294,41 +303,33 @@
   },
   "arc": {
     "schemaVersion": 3,
-    "arcId": "arc_1_salt_king_downfall",
+    "arcMode": "standard",
+    "arcId": "arc_01_salt_monopoly",
     "startChapter": 1,
     "endChapter": 25,
-    "direction": "Kael sử dụng bột than giấy tro vừa chế tạo để xâm nhập vào khu vực bến cảng, tìm cách tiếp cận và sao chép ấn triện độc quyền của Vua Muối Silas, đồng thời phải liên tục lẩn tránh sự truy vết từ la bàn của Mặc Quan với sự trợ giúp ngầm từ Elara.",
-    "terminalChange": "Đế chế độc quyền muối của Silas sụp đổ hoàn toàn khi Kael công bố bản rập lỗi trước hội đồng thương nhân. Kael sở hữu bản rập đầu tiên nhưng phải gánh chịu vết sẹo nhân quả đầu tiên (10% cơ thể), đồng thời chính thức trở thành mục tiêu truy nã cấp cao của Cục Lưu Trữ.",
+    "direction": "Kael thâm nhập vào dinh thự của Silas để rập khuôn ấn triện độc quyền muối, đồng thời phải né tránh sự truy lùng gắt gao từ la bàn của Thanh Tra Xám.",
+    "terminalChange": "Silas mất hoàn toàn quyền độc quyền muối, đế chế sụp đổ. Kael có được bản rập đầu tiên nhưng phải chịu vết sẹo nhân quả đầu tiên, chính thức bị Cục Lưu Trữ coi là mối đe dọa cấp cao.",
     "activeConflicts": [
       {
-        "id": "conflict_kael_vs_silas",
+        "id": "conflict_kael_silas",
         "actorIds": [
-          "char_kael",
-          "char_silas"
+          "char_kael_01",
+          "char_silas_03"
         ],
-        "objective": "Vô hiệu hóa quy tắc độc quyền buôn muối tại khu cảng.",
-        "leverage": "Silas ỷ lại vào quyền lực tuyệt đối của ấn triện cổ nhưng không biết nó đã bị mài mòn; Kael nắm giữ kỹ thuật rập khuôn vi mô bằng bột than giấy tro.",
-        "nextMove": "Kael đột nhập vào kho chứa muối chính để tìm vị trí đặt ấn triện gốc của gia tộc Silas."
+        "objective": "Kael muốn rập khuôn và công bố lỗi của ấn triện độc quyền muối, trong khi Silas muốn bảo vệ nó bằng mọi giá.",
+        "leverage": "Silas có lực lượng bảo vệ đông đảo và quyền lực tuyệt đối tại cảng; Kael có kỹ năng sao chép vi mô và sự bất ngờ.",
+        "nextMove": "Kael lợi dụng thông tin từ Elara để đột nhập vào phòng chứa ấn triện của Silas trong đêm giao dịch lớn."
       },
       {
-        "id": "conflict_kael_vs_mac_quan",
+        "id": "conflict_kael_inspector",
         "actorIds": [
-          "char_kael",
-          "char_mac_quan"
+          "char_kael_01",
+          "char_inspector_04",
+          "char_elara_02"
         ],
-        "objective": "Trốn thoát khỏi sự truy bắt và vô hiệu hóa la bàn dò tìm.",
-        "leverage": "Mặc Quan có la bàn dò tìm chính xác nhưng bị trói buộc bởi thủ tục hành chính; Kael am hiểu các quy tắc của Cục để tạo ra các điểm mù pháp lý.",
-        "nextMove": "Mặc Quan khoanh vùng khu ổ chuột bến cảng và thiết lập các trạm kiểm soát quy tắc để siết chặt vòng vây."
-      },
-      {
-        "id": "conflict_elara_support",
-        "actorIds": [
-          "char_elara",
-          "char_kael"
-        ],
-        "objective": "Cung cấp thông tin lịch sử về ấn triện của Silas mà không bị lộ vỏ bọc.",
-        "leverage": "Elara có quyền truy cập luân chuyển tài liệu cấp thấp; Kael cần bản vẽ gốc để đối chiếu vết nứt.",
-        "nextMove": "Elara đánh cắp hồ sơ lưu trữ trong khung thời gian 15 phút và gửi qua đường dây liên lạc ngầm cho Kael."
+        "objective": "Thanh Tra Xám muốn bắt sống Kael trước khi anh ta phá vỡ quy tắc; Kael và Elara muốn đánh lạc hướng la bàn dò tìm.",
+        "leverage": "Thanh Tra Xám sở hữu la bàn dò tìm ấn triện chính xác; Elara có quyền truy cập vào lịch trình tuần tra để tạo lỗ hổng.",
+        "nextMove": "Thanh Tra Xám thu hẹp vòng vây tại khu ổ chuột, buộc Kael phải di chuyển sớm hơn dự kiến."
       }
     ],
     "duePromiseIds": [
@@ -337,15 +338,11 @@
     "progressionBudget": [
       {
         "signal": "Số lượng bản rập ấn triện lỗi sở hữu",
-        "requiredChange": "Tăng từ 0 lên 1 bản rập (ấn triện độc quyền buôn muối của Silas)."
+        "requiredChange": "Kael thu thập thành công bản rập ấn triện độc quyền muối của Silas, nâng số lượng sở hữu lên 1 bản."
       },
       {
-        "signal": "Cấp độ của quy tắc có thể vô hiệu hóa",
-        "requiredChange": "Chứng minh được khả năng bẻ gãy quy tắc thương mại cấp khu vực, tạo tiền đề thách thức các luật lệ lớn hơn."
-      },
-      {
-        "signal": "Mức độ truy nã từ Cục Lưu Trữ",
-        "requiredChange": "Chuyển từ một thư ký đào tẩu thông thường thành tội phạm dị giáo nguy hiểm bị truy nã công khai toàn thành phố."
+        "signal": "Sự kiêng dè và thay đổi chiến thuật của Cục Lưu Trữ",
+        "requiredChange": "Cục Lưu Trữ nhận ra phương pháp của Kael, bắt đầu ban hành lệnh cấm tiếp cận vật lý với các ấn triện quan trọng."
       }
     ]
   },
@@ -354,134 +351,133 @@
     "chapterNumber": 0,
     "facts": [
       {
-        "id": "fact_an_trien_giay_tro",
-        "value": "Mọi quy tắc cưỡng chế trong thành phố chỉ có hiệu lực nếu ấn triện đóng trên giấy tro còn nguyên vẹn.",
-        "sourceChapter": 0
+        "id": "fact_world_rules",
+        "value": "Thành phố bị chi phối bởi các quy tắc cưỡng chế vật lý sinh ra từ ấn triện đóng trên giấy tro.",
+        "sourceChapter": 0,
+        "scope": "invariant",
+        "status": "active"
       },
       {
-        "id": "fact_seo_nhan_qua",
-        "value": "Việc sao chép và công bố lỗi của ấn triện sẽ tạo ra một vết sẹo nhân quả trên cơ thể người công bố.",
-        "sourceChapter": 0
+        "id": "fact_kael_discovery",
+        "value": "Kael phát hiện ra rằng sự mài mòn vi mô của ấn triện có thể tạo ra lỗ hổng pháp lý vô hiệu hóa quy tắc.",
+        "sourceChapter": 0,
+        "scope": "arc",
+        "status": "active"
       },
       {
-        "id": "fact_bot_than_giay_tro",
-        "value": "Bột than làm từ tro giấy là vật liệu duy nhất không bị năng lượng của quy tắc đẩy lùi khi tiếp xúc.",
-        "sourceChapter": 0
+        "id": "fact_kael_fugitive",
+        "value": "Kael đã đánh cắp tài liệu mật và bỏ trốn khỏi Cục Lưu Trữ, trở thành tội phạm bị truy nã.",
+        "sourceChapter": 0,
+        "scope": "arc",
+        "status": "active"
       }
     ],
     "timeline": [
       {
         "chapter": 0,
         "startMinute": 0,
-        "durationMinutes": 120,
-        "locationId": "cuc_luu_tru",
-        "event": "Kael phát hiện ra bí mật về sự mài mòn của các ấn triện và đánh cắp một ít giấy tro trước khi bỏ trốn khỏi Cục Lưu Trữ."
+        "durationMinutes": 60,
+        "locationId": "bureau_archives_main",
+        "event": "Kael phát hiện ra sự sai lệch của ấn triện trong một hồ sơ cũ và quyết định đánh cắp nó."
       },
       {
         "chapter": 0,
-        "startMinute": 120,
-        "durationMinutes": 60,
-        "locationId": "khu_o_chuot_cang",
-        "event": "Kael tìm được một căn phòng trọ tồi tàn để ẩn náu và bắt đầu chế tạo bột than từ giấy tro."
+        "startMinute": 60,
+        "durationMinutes": 120,
+        "locationId": "city_streets_01",
+        "event": "Kael lẩn trốn sự truy đuổi ban đầu của lực lượng tuần tra Cục Lưu Trữ."
+      },
+      {
+        "chapter": 0,
+        "startMinute": 180,
+        "durationMinutes": 300,
+        "locationId": "slum_hideout_01",
+        "event": "Kael thiết lập nơi ẩn náu an toàn và bắt đầu chế tạo bột than tro giấy từ tài liệu đánh cắp."
       }
     ],
     "characters": [
       {
-        "characterId": "char_kael",
+        "characterId": "char_kael_01",
         "status": "alive",
-        "locationId": "khu_o_chuot_cang",
+        "locationId": "slum_hideout_01",
         "knowledge": [
           {
-            "factId": "fact_an_trien_giay_tro",
+            "factId": "fact_kael_discovery",
             "learnedChapter": 0,
-            "source": "Nghiên cứu tài liệu mật trong thời gian làm thư ký tại Cục Lưu Trữ."
-          },
-          {
-            "factId": "fact_seo_nhan_qua",
-            "learnedChapter": 0,
-            "source": "Đọc được từ ghi chép cổ của những Kiểm Toán Viên đầu tiên bị cất giấu."
-          },
-          {
-            "factId": "fact_bot_than_giay_tro",
-            "learnedChapter": 0,
-            "source": "Tự mình thử nghiệm và đúc rút từ sổ tay vật liệu kiểm định nội bộ."
+            "source": "Tự mình nghiên cứu và đối chiếu các hồ sơ lưu trữ cũ trong nhiều năm."
           }
         ],
-        "relationshipState": "Đang lẩn trốn sự truy nã gắt gao của Cục Lưu Trữ, cố gắng tìm cách liên lạc an toàn với Elara."
+        "relationshipState": "Đơn độc, cảnh giác cao độ với mọi người, chỉ giữ liên lạc ngầm với Elara."
       },
       {
-        "characterId": "char_elara",
+        "characterId": "char_elara_02",
         "status": "alive",
-        "locationId": "cuc_luu_tru",
+        "locationId": "bureau_archives_main",
         "knowledge": [
           {
-            "factId": "fact_an_trien_giay_tro",
+            "factId": "fact_kael_fugitive",
             "learnedChapter": 0,
-            "source": "Được đào tạo nghiệp vụ cơ bản khi mới vào làm tại Cục Lưu Trữ."
+            "source": "Nhận được thông báo nội bộ khẩn cấp từ hệ thống an ninh của Cục Lưu Trữ."
           }
         ],
-        "relationshipState": "Vô cùng lo lắng cho sự an nguy của Kael nhưng phải cố gắng giữ vỏ bọc nhân viên mẫn cán."
+        "relationshipState": "Giữ khoảng cách an toàn để bảo vệ vỏ bọc, nhưng ngầm chuẩn bị hỗ trợ Kael."
       },
       {
-        "characterId": "char_silas",
+        "characterId": "char_silas_03",
         "status": "alive",
-        "locationId": "dinh_thu_silas",
+        "locationId": "port_mansion_salt",
         "knowledge": [
           {
-            "factId": "fact_an_trien_giay_tro",
+            "factId": "fact_world_rules",
             "learnedChapter": 0,
-            "source": "Được truyền lại cùng với ấn triện độc quyền buôn muối của gia tộc."
+            "source": "Sử dụng quyền lực của ấn triện độc quyền để bóc lột thương nhân nhiều năm nay."
           }
         ],
-        "relationshipState": "Tự mãn với quyền lực tuyệt đối tại khu cảng, hoàn toàn không biết đến sự tồn tại của Kael."
+        "relationshipState": "Tự mãn, khinh bỉ những kẻ yếu thế và tin tưởng tuyệt đối vào quyền lực của mình."
       },
       {
-        "characterId": "char_mac_quan",
+        "characterId": "char_inspector_04",
         "status": "alive",
-        "locationId": "cuc_luu_tru",
+        "locationId": "bureau_patrol_hq",
         "knowledge": [
           {
-            "factId": "fact_an_trien_giay_tro",
+            "factId": "fact_kael_fugitive",
             "learnedChapter": 0,
-            "source": "Nắm rõ luật lệ để thực thi nhiệm vụ săn lùng kẻ vi phạm."
-          },
-          {
-            "factId": "fact_seo_nhan_qua",
-            "learnedChapter": 0,
-            "source": "Được cấp trên cảnh báo về những kẻ dị giáo dám phá vỡ quy tắc."
+            "source": "Được giao nhiệm vụ trực tiếp từ Hội đồng Thẩm phán để săn lùng kẻ phản loạn."
           }
         ],
-        "relationshipState": "Đang ráo riết chuẩn bị la bàn dò tìm để truy vết Kael theo lệnh khẩn cấp từ Cục."
+        "relationshipState": "Lạnh lùng, coi Kael chỉ là một mục tiêu vi phạm cần được thanh trừng theo quy trình."
       }
     ],
     "resources": [
       {
-        "resourceId": "res_ban_rap",
+        "resourceId": "res_charcoal_powder",
+        "value": {
+          "mode": "numeric",
+          "amount": 50,
+          "unit": "gram"
+        },
+        "source": "Tự chế tạo từ các tài liệu lưu trữ cũ đánh cắp được trước khi bỏ trốn.",
+        "lastChangedChapter": 0
+      },
+      {
+        "resourceId": "res_flawed_rubbings",
         "value": {
           "mode": "numeric",
           "amount": 0,
           "unit": "bản"
         },
-        "source": "Chưa thực hiện bất kỳ cuộc đột nhập hay sao chép nào kể từ khi bỏ trốn.",
+        "source": "Chưa thực hiện bất kỳ cuộc xâm nhập hiện trường nào để rập khuôn ấn triện.",
         "lastChangedChapter": 0
       },
       {
-        "resourceId": "res_seo_nhan_qua",
+        "resourceId": "res_causal_scars",
         "value": {
           "mode": "numeric",
           "amount": 0,
-          "unit": "phần trăm cơ thể"
+          "unit": "vết"
         },
-        "source": "Cơ thể hoàn toàn nguyên vẹn do chưa từng công bố lỗi ấn triện nào.",
-        "lastChangedChapter": 0
-      },
-      {
-        "resourceId": "res_quyen_truy_cap",
-        "value": {
-          "mode": "state",
-          "value": "Bị tước toàn bộ quyền truy cập"
-        },
-        "source": "Hệ thống an ninh của Cục Lưu Trữ đã khóa thẻ bài ngay khi phát hiện Kael đào tẩu.",
+        "source": "Cơ thể hoàn toàn nguyên vẹn trước khi thực hiện lần kháng nghị quy tắc đầu tiên.",
         "lastChangedChapter": 0
       }
     ],
@@ -489,30 +485,30 @@
       {
         "promiseId": "prom_silas_downfall",
         "status": "open",
-        "pressure": "Silas đang tăng giá muối lên mức cắt cổ, đẩy người dân khu cảng vào cảnh khốn cùng, buộc Kael phải sớm hành động."
+        "pressure": "Silas đang siết chặt luật độc quyền muối, đẩy người dân khu ổ chuột vào cảnh khốn cùng."
       },
       {
-        "promiseId": "prom_mac_quan_clash",
+        "promiseId": "prom_bureau_confrontation",
         "status": "open",
-        "pressure": "Mặc Quan đã bắt đầu kích hoạt la bàn dò tìm và đang thu hẹp vòng vây quanh khu vực ổ chuột."
+        "pressure": "Thanh Tra Xám đã bắt đầu kích hoạt la bàn dò tìm và khoanh vùng khu vực lẩn trốn của Kael."
       },
       {
         "promiseId": "prom_origin_seal",
         "status": "open",
-        "pressure": "Những ghi chép cổ mà Kael đọc được liên tục ám chỉ về một Xưởng Đúc Đầu Tiên đang bị che giấu."
+        "pressure": "Sự tò mò về bản chất thực sự của hệ thống quy tắc luôn ám ảnh tâm trí Kael."
       },
       {
-        "promiseId": "prom_cure_scars",
+        "promiseId": "prom_scar_limit",
         "status": "open",
-        "pressure": "Dù chưa mang sẹo, Kael biết rõ cái giá khủng khiếp đang chờ đợi mình ở phía trước nếu không tìm ra cách hóa giải."
+        "pressure": "Kael biết rõ mỗi lần hành động sẽ đưa anh đến gần hơn với cái chết do gánh nặng nhân quả."
       }
     ],
-    "recentSummary": "Kael, cựu thư ký Cục Lưu Trữ, vừa khám phá ra bí mật động trời về sự mài mòn của các ấn triện quy tắc. Anh buộc phải đánh cắp một ít tài liệu và bỏ trốn khỏi Cục. Hiện tại, Kael đang ẩn náu tại khu ổ chuột gần cảng, chuẩn bị những bước đầu tiên để lật đổ hệ thống độc tài, bắt đầu bằng việc nhắm vào tên Vua Muối Silas.",
-    "previousEnding": "Kael ngồi lặng lẽ trong góc tối của căn phòng trọ tồi tàn, cẩn thận dùng cối đá nghiền nát tờ giấy tro thành thứ bột đen mịn màng, ánh mắt kiên định hướng về phía dinh thự sáng rực của Vua Muối ở đằng xa.",
+    "recentSummary": "Kael, một thư ký vô danh tại Cục Lưu Trữ, đã phát hiện ra bí mật động trời: các ấn triện quy tắc cưỡng chế của thành phố đang bị mài mòn, và sự sai lệch này có thể được dùng để vô hiệu hóa chúng. Nhận ra cơ hội lật đổ hệ thống áp bức, anh đánh cắp một số tài liệu chứa năng lượng quy tắc và bỏ trốn. Hiện tại, Kael đang ẩn náu tại khu ổ chuột, chuẩn bị những gram bột than tro giấy đầu tiên cho kế hoạch rập khuôn ấn triện của mình, trong khi lực lượng truy nã của Cục Lưu Trữ bắt đầu siết chặt vòng vây.",
+    "previousEnding": "Trong căn hầm tối tăm ẩm thấp, Kael cẩn thận rây những hạt bột than đen nhánh qua màng lọc lụa. Tiếng còi báo động của Cục Lưu Trữ vẫn văng vẳng vọng lại từ phía xa. Anh nhìn chằm chằm vào lọ thủy tinh chứa 50 gram bột than thành phẩm, hít một hơi thật sâu. Trò chơi sinh tử chống lại toàn bộ hệ thống luật pháp của thành phố này, giờ mới thực sự bắt đầu.",
     "retrievalNotes": [
-      "Kael bắt đầu câu chuyện với 0 bản rập và 0% sẹo nhân quả.",
-      "Mặc Quan đang tích cực sử dụng la bàn dò tìm để truy vết Kael.",
-      "Elara vẫn giữ được vỏ bọc an toàn tại Cục Lưu Trữ và chưa bị nghi ngờ."
+      "Nhấn mạnh sự cẩn trọng và tính toán logic của Kael trong mọi hành động.",
+      "Đảm bảo mô tả rõ ràng sự nguy hiểm của Thanh Tra Xám và hệ thống la bàn dò tìm.",
+      "Giữ vững không khí ngột ngạt, áp bức của một thành phố bị cai trị bởi các quy tắc vô hình."
     ]
   },
   "initialWindow": {
@@ -522,459 +518,347 @@
       {
         "schemaVersion": 3,
         "chapterNumber": 1,
-        "elapsedMinutesSincePreviousChapter": 0,
-        "chapterPromise": "Kael bắt đầu hành động và các thế lực truy đuổi cũng vào cuộc.",
+        "elapsedMinutesSincePreviousChapter": 600,
+        "chapterPromise": "Kael chuẩn bị công cụ và thu thập thông tin để đột nhập vào dinh thự của Silas.",
         "preconditions": [
           {
-            "factId": "fact_an_trien_giay_tro",
-            "expectedValue": "Mọi quy tắc cưỡng chế trong thành phố chỉ có hiệu lực nếu ấn triện đóng trên giấy tro còn nguyên vẹn."
+            "factId": "fact_kael_fugitive",
+            "expectedValue": "Kael đã đánh cắp tài liệu mật và bỏ trốn khỏi Cục Lưu Trữ, trở thành tội phạm bị truy nã."
           }
         ],
         "scenes": [
           {
-            "id": "c1_s1",
-            "povCharacterId": "char_kael",
+            "id": "scene_ch1_1",
+            "povCharacterId": "char_kael_01",
             "participantIds": [
-              "char_kael"
+              "char_kael_01",
+              "char_elara_02"
             ],
-            "locationId": "khu_cang_bien",
-            "durationMinutes": 45,
-            "travelMinutesFromPrevious": 30,
-            "desire": "Kael muốn tiếp cận khu vực bến cảng để tìm kiếm manh mối về nơi cất giấu ấn triện của Silas.",
-            "opposition": "Khu vực bến cảng được canh gác nghiêm ngặt bởi lính đánh thuê của Silas nên rất khó xâm nhập.",
-            "tactic": "Kael sử dụng bóng tối và sự hỗn loạn của khu chợ đêm để lẻn qua các trạm gác một cách an toàn.",
-            "cost": "Kael phải vứt bỏ một phần đồ đạc cá nhân để chui lọt qua lỗ hổng hẹp trên hàng rào.",
-            "payoff": "Kael xâm nhập thành công vào khu vực bến cảng mà không bị lính canh phát hiện.",
-            "irreversibleChange": "Kael đã chính thức bước vào lãnh địa của Silas, khiến anh không thể quay đầu lại mà không bị truy sát.",
-            "informationDelta": "Kael nhận ra lính canh tuần tra theo một chu kỳ cố định dựa trên tiếng chuông đồng hồ, giúp anh dễ dàng tính toán thời gian di chuyển.",
+            "locationId": "slum_hideout_01",
+            "durationMinutes": 30,
+            "travelMinutesFromPrevious": 15,
+            "objective": "Gặp Elara để lấy lịch trình tuần tra của dinh thự Silas.",
+            "obstacle": "Elara lo ngại về sự xuất hiện của Thanh Tra Xám gần khu vực này.",
+            "action": "Kael thuyết phục Elara bằng cách hứa sẽ cẩn thận và trao đổi bột than để lấy màng lọc.",
+            "worldClaimIds": [
+              "claim_charcoal_copying"
+            ],
             "hookIntent": "opportunity_opens",
-            "unresolvedQuestion": "Liệu Kael có thể tìm ra vị trí chính xác của ấn triện trước khi trời sáng?",
             "requiredDeltaIds": [
-              "delta_kael_move_cang"
-            ]
-          },
-          {
-            "id": "c1_s2",
-            "povCharacterId": "char_mac_quan",
-            "participantIds": [
-              "char_mac_quan"
-            ],
-            "locationId": "khu_o_chuot_cang",
-            "durationMinutes": 20,
-            "travelMinutesFromPrevious": 40,
-            "desire": "Mặc Quan muốn xác định vị trí ẩn náu cuối cùng của Kael bằng la bàn dò tìm để thu hẹp vòng vây.",
-            "opposition": "Dấu vết năng lượng của Kael rất mờ nhạt do khu ổ chuột có quá nhiều tạp chất ma thuật cản trở.",
-            "tactic": "Mặc Quan kích hoạt la bàn ở mức độ nhạy cao nhất, bất chấp việc nó có thể gây tổn thương thính giác của chính mình.",
-            "cost": "Mặc Quan bị ù tai tạm thời do phản ứng phụ của la bàn khi hoạt động quá công suất.",
-            "payoff": "La bàn chỉ chính xác vào căn phòng trọ tồi tàn mà Kael vừa rời đi, xác nhận hướng trốn chạy.",
-            "irreversibleChange": "Mặc Quan đã thu hẹp vòng vây thành công, khiến Kael mất đi lợi thế ẩn nấp ban đầu.",
-            "informationDelta": "Mặc Quan phát hiện ra dấu vết của bột than giấy tro còn sót lại trên bàn, nhận ra Kael đang chế tạo vũ khí chống lại quy tắc.",
-            "hookIntent": "threat_arrives",
-            "unresolvedQuestion": "Mặc Quan sẽ làm gì tiếp theo khi biết Kael đang chế tạo bột than?",
-            "requiredDeltaIds": [
-              "delta_mac_quan_move_ochuot"
-            ]
-          },
-          {
-            "id": "c1_s3",
-            "povCharacterId": "char_elara",
-            "participantIds": [
-              "char_elara"
-            ],
-            "locationId": "cuc_luu_tru",
-            "durationMinutes": 15,
-            "travelMinutesFromPrevious": 0,
-            "desire": "Elara muốn tìm bản vẽ gốc của ấn triện Silas để giúp Kael có lợi thế trong việc đột nhập.",
-            "opposition": "Hồ sơ mật được bảo vệ bởi hệ thống khóa luân phiên và lính gác tuần tra liên tục khiến việc tiếp cận vô cùng nguy hiểm.",
-            "tactic": "Elara lợi dụng khoảng thời gian mười lăm phút giao ca của lính gác để lẻn vào phòng lưu trữ số ba.",
-            "cost": "Elara phải làm hỏng một thẻ từ phụ để mở cửa, làm tăng nguy cơ bị kiểm tra an ninh vào ngày hôm sau.",
-            "payoff": "Elara sao chép thành công thông tin về vị trí và bẫy bảo vệ ấn triện của Silas vào một tờ giấy nhỏ.",
-            "irreversibleChange": "Elara đã vi phạm quy tắc an ninh cấp cao, đặt cược mạng sống của mình vào sự thành công của Kael.",
-            "informationDelta": "Elara biết được ấn triện gốc nằm ở hầm chứa muối số bốn và có bẫy trọng lực bảo vệ, một thông tin mang tính sống còn.",
-            "hookIntent": "truth_reframed",
-            "unresolvedQuestion": "Elara sẽ làm cách nào để gửi thông tin này cho Kael một cách an toàn?",
-            "requiredDeltaIds": [
-              "delta_fact_silas_seal",
-              "delta_elara_learns_seal"
+              "rel_elara_ch1",
+              "pur_filter_ch1"
             ]
           }
         ],
         "requiredDeltas": [
           {
-            "id": "delta_kael_move_cang",
-            "kind": "character_location",
-            "characterId": "char_kael",
-            "locationAfter": "khu_cang_bien",
+            "id": "rel_elara_ch1",
+            "kind": "relationship",
+            "characterId": "char_elara_02",
+            "relationshipAfter": "Đồng ý cung cấp lịch trình tuần tra nhưng cảnh báo về la bàn của Thanh Tra Xám.",
             "evidenceRequired": true
           },
           {
-            "id": "delta_mac_quan_move_ochuot",
-            "kind": "character_location",
-            "characterId": "char_mac_quan",
-            "locationAfter": "khu_o_chuot_cang",
-            "evidenceRequired": true
-          },
-          {
-            "id": "delta_fact_silas_seal",
-            "kind": "fact",
-            "factId": "fact_silas_seal_location",
-            "valueBefore": null,
-            "valueAfter": "Ấn triện gốc của Silas được giấu trong hầm chứa muối số 4, được bảo vệ bởi bẫy quy tắc trọng lực.",
-            "evidenceRequired": true
-          },
-          {
-            "id": "delta_elara_learns_seal",
-            "kind": "character_knowledge",
-            "characterId": "char_elara",
-            "factId": "fact_silas_seal_location",
-            "learnedFrom": "Hồ sơ lưu trữ mật của Cục Lưu Trữ",
+            "id": "pur_filter_ch1",
+            "kind": "resource_numeric",
+            "resourceId": "res_charcoal_powder",
+            "before": 50,
+            "delta": -20,
+            "after": 30,
+            "unit": "gram",
+            "source": "Kho dự trữ bột than cá nhân của Kael",
+            "sink": "Trả cho Elara để đổi lấy màng lọc lụa",
+            "transactionKind": "purchase",
+            "consideration": [
+              {
+                "itemId": "item_silk_filter",
+                "name": "Màng lọc lụa chuyên dụng",
+                "quantity": 1,
+                "unit": "cái"
+              }
+            ],
             "evidenceRequired": true
           }
         ],
-        "nextChapterPressure": "Kael cần thông tin chi tiết về ấn triện để lên kế hoạch đột nhập."
+        "nextChapterPressure": "Kael phải nhanh chóng thâm nhập vào dinh thự trước khi lịch trình tuần tra thay đổi."
       },
       {
         "schemaVersion": 3,
         "chapterNumber": 2,
-        "elapsedMinutesSincePreviousChapter": 600,
-        "chapterPromise": "Kael nhận được thông tin tình báo và Silas thể hiện sự tàn bạo của mình.",
-        "preconditions": [
-          {
-            "factId": "fact_silas_seal_location",
-            "expectedValue": "Ấn triện gốc của Silas được giấu trong hầm chứa muối số 4, được bảo vệ bởi bẫy quy tắc trọng lực."
-          }
-        ],
+        "elapsedMinutesSincePreviousChapter": 120,
+        "chapterPromise": "Kael thâm nhập vào dinh thự của Silas và đối mặt với lớp bảo vệ đầu tiên.",
+        "preconditions": [],
         "scenes": [
           {
-            "id": "c2_s1",
-            "povCharacterId": "char_kael",
+            "id": "scene_ch2_1",
+            "povCharacterId": "char_kael_01",
             "participantIds": [
-              "char_kael"
+              "char_kael_01",
+              "char_silas_03"
             ],
-            "locationId": "khu_cang_bien",
-            "durationMinutes": 30,
-            "travelMinutesFromPrevious": 0,
-            "desire": "Kael muốn tìm cách liên lạc với Elara để lấy thông tin về ấn triện mà không bị lộ diện.",
-            "opposition": "Kael không thể xuất hiện tại các điểm giao dịch công khai vì lệnh truy nã đang được dán khắp nơi.",
-            "tactic": "Kael tìm kiếm các ký hiệu ngầm mà Elara thường để lại tại các thùng hàng trung chuyển để nhận thông điệp.",
-            "cost": "Kael phải hối lộ một công nhân bốc vác bằng số tiền ít ỏi còn lại để được tiếp cận thùng hàng mục tiêu.",
-            "payoff": "Kael tìm thấy mật thư của Elara giấu dưới đáy một thùng gỗ, nhận được thông tin quý giá.",
-            "irreversibleChange": "Kael nắm được điểm yếu chí mạng của hệ thống phòng thủ nhà Silas, chuẩn bị cho bước đột nhập cuối cùng.",
-            "informationDelta": "Kael biết được vị trí hầm số bốn và cách thức hoạt động của bẫy trọng lực nhờ đọc mật thư của Elara.",
-            "hookIntent": "opportunity_opens",
-            "unresolvedQuestion": "Kael sẽ vượt qua bẫy trọng lực như thế nào với trang bị thô sơ?",
-            "requiredDeltaIds": [
-              "delta_kael_learns_seal"
-            ]
-          },
-          {
-            "id": "c2_s2",
-            "povCharacterId": "char_silas",
-            "participantIds": [
-              "char_silas"
-            ],
-            "locationId": "dinh_thu_silas",
+            "locationId": "port_mansion_salt",
             "durationMinutes": 45,
-            "travelMinutesFromPrevious": 0,
-            "desire": "Silas muốn răn đe những kẻ có ý định buôn lậu muối qua mặt hắn để củng cố quyền lực tuyệt đối.",
-            "opposition": "Một nhóm buôn lậu đang cố gắng biện minh cho hành động của mình bằng cách trích dẫn các luật lệ cũ.",
-            "tactic": "Silas sử dụng quyền lực tuyệt đối của ấn triện để ép buộc quy tắc trừng phạt ngay lập tức lên kẻ cầm đầu.",
-            "cost": "Silas tiêu tốn một lượng năng lượng nhỏ của ấn triện, làm tăng thêm vi vết nứt trên bề mặt con dấu.",
-            "payoff": "Kẻ buôn lậu bị nghiền nát bởi áp lực vô hình, khiến những kẻ khác khiếp sợ và hoàn toàn khuất phục.",
-            "irreversibleChange": "Sự tàn bạo của Silas đẩy sự phẫn nộ của người dân lên đỉnh điểm, tạo điều kiện thuận lợi cho Kael hành động.",
-            "informationDelta": "Silas vô tình để lộ rằng ấn triện của hắn cần thời gian hồi chiêu sau mỗi lần sử dụng, một sơ hở chết người.",
+            "travelMinutesFromPrevious": 30,
+            "objective": "Vượt qua cánh cửa phụ có gắn ấn triện cảnh báo của dinh thự.",
+            "obstacle": "Ấn triện cảnh báo sẽ phát nổ nếu có người lạ chạm vào.",
+            "action": "Kael sử dụng một ít bột than để làm mờ các nét khắc vi mô trên ấn triện, vô hiệu hóa nó.",
+            "worldClaimIds": [
+              "claim_charcoal_copying"
+            ],
             "hookIntent": "cost_revealed",
-            "unresolvedQuestion": "Sự tàn bạo này sẽ đẩy nhanh sự sụp đổ của Silas như thế nào?",
             "requiredDeltaIds": [
-              "delta_prom_silas_adv"
+              "cons_powder_ch2"
             ]
           }
         ],
         "requiredDeltas": [
           {
-            "id": "delta_kael_learns_seal",
-            "kind": "character_knowledge",
-            "characterId": "char_kael",
-            "factId": "fact_silas_seal_location",
-            "learnedFrom": "Mật thư giấu trong thùng hàng của Elara",
-            "evidenceRequired": true
-          },
-          {
-            "id": "delta_prom_silas_adv",
-            "kind": "promise",
-            "promiseId": "prom_silas_downfall",
-            "statusAfter": "advanced",
-            "pressureAfter": "Silas giết người công khai, Kael phải hành động ngay đêm nay trước khi có thêm nạn nhân.",
+            "id": "cons_powder_ch2",
+            "kind": "resource_numeric",
+            "resourceId": "res_charcoal_powder",
+            "before": 30,
+            "delta": -10,
+            "after": 20,
+            "unit": "gram",
+            "source": "Lượng bột than mang theo trong túi",
+            "sink": "Tiêu hao để vô hiệu hóa ấn triện cảnh báo ở cửa phụ",
+            "transactionKind": "consume",
+            "consideration": [],
             "evidenceRequired": true
           }
         ],
-        "nextChapterPressure": "Kael phải đột nhập vào hầm chứa muối trước khi Silas phát hiện ra sự hiện diện của anh."
+        "nextChapterPressure": "Kael đã vào trong nhưng lượng bột than đang cạn dần, anh phải tìm thấy ấn triện chính."
       },
       {
         "schemaVersion": 3,
         "chapterNumber": 3,
-        "elapsedMinutesSincePreviousChapter": 120,
-        "chapterPromise": "Kael xâm nhập thành công và lấy được bản rập lỗi của ấn triện.",
-        "preconditions": [
-          {
-            "factId": "fact_silas_seal_location",
-            "expectedValue": "Ấn triện gốc của Silas được giấu trong hầm chứa muối số 4, được bảo vệ bởi bẫy quy tắc trọng lực."
-          }
-        ],
+        "elapsedMinutesSincePreviousChapter": 10,
+        "chapterPromise": "Kael tiếp cận ấn triện độc quyền muối và thực hiện việc rập khuôn đầy rủi ro.",
+        "preconditions": [],
         "scenes": [
           {
-            "id": "c3_s1",
-            "povCharacterId": "char_kael",
+            "id": "scene_ch3_1",
+            "povCharacterId": "char_kael_01",
             "participantIds": [
-              "char_kael"
+              "char_kael_01"
             ],
-            "locationId": "ham_chua_muoi_so_4",
-            "durationMinutes": 60,
-            "travelMinutesFromPrevious": 20,
-            "desire": "Kael muốn đột nhập vào hầm chứa muối số bốn mà không kích hoạt bẫy trọng lực chết người.",
-            "opposition": "Bẫy trọng lực sẽ nghiền nát bất cứ ai bước sai nhịp trên các ô gạch được yểm bùa.",
-            "tactic": "Kael sử dụng nhịp điệu tiếng chuông đồng hồ và thông tin từ Elara để bước chính xác vào các điểm mù của bẫy.",
-            "cost": "Kael bị trật khớp cổ chân do phải nhảy một khoảng cách quá xa để tránh ô gạch bẫy cuối cùng.",
-            "payoff": "Kael vượt qua hành lang an ninh an toàn và đứng trước bệ đá đặt ấn triện gốc của Silas.",
-            "irreversibleChange": "Kael đã lọt vào khu vực cấm địa sâu nhất, khiến anh không có đường lui nếu bị phát hiện.",
-            "informationDelta": "Kael nhận ra ấn triện được bảo vệ bởi một lớp màng năng lượng mỏng, đòi hỏi phương pháp tiếp cận đặc biệt.",
-            "hookIntent": "choice_forced",
-            "unresolvedQuestion": "Kael sẽ làm sao để xuyên qua lớp màng năng lượng mà không làm nó phát nổ?",
+            "locationId": "port_mansion_salt",
+            "durationMinutes": 20,
+            "travelMinutesFromPrevious": 0,
+            "objective": "Rập khuôn ấn triện độc quyền muối của Silas.",
+            "obstacle": "Ấn triện được đặt trong lồng kính có khóa phức tạp.",
+            "action": "Kael cẩn thận rắc bột than qua khe hở, tạo ra một bản sao hoàn hảo của các vết nứt.",
+            "worldClaimIds": [
+              "claim_charcoal_copying"
+            ],
+            "hookIntent": "opportunity_opens",
             "requiredDeltaIds": [
-              "delta_kael_move_ham"
+              "cons_powder_ch3",
+              "gain_rubbing_ch3"
             ]
           },
           {
-            "id": "c3_s2",
-            "povCharacterId": "char_kael",
+            "id": "scene_ch3_2",
+            "povCharacterId": "char_kael_01",
             "participantIds": [
-              "char_kael"
+              "char_kael_01",
+              "char_inspector_04"
             ],
-            "locationId": "ham_chua_muoi_so_4",
-            "durationMinutes": 30,
+            "locationId": "port_mansion_salt",
+            "durationMinutes": 15,
             "travelMinutesFromPrevious": 0,
-            "desire": "Kael muốn sao chép vết nứt trên ấn triện bằng bột than giấy tro để lấy bằng chứng vô hiệu hóa quy tắc.",
-            "opposition": "Lớp màng năng lượng bảo vệ sẽ đốt cháy bất kỳ vật liệu thông thường nào chạm vào bề mặt ấn triện.",
-            "tactic": "Kael phủ bột than giấy tro lên tay để vô hiệu hóa sự đẩy lùi của năng lượng, sau đó tiến hành rập khuôn.",
-            "cost": "Bàn tay Kael bị bỏng lạnh do phản ứng xung đột giữa bột than và năng lượng quy tắc.",
-            "payoff": "Kael lấy được đúng 1 bản rập hoàn hảo cho thấy vết nứt lớn chạy dọc theo chữ ký của ấn triện.",
-            "irreversibleChange": "Kael chính thức sở hữu vũ khí có thể lật đổ Silas, nhưng hành động này cũng kích hoạt cảnh báo vi mô của hệ thống.",
-            "informationDelta": "Kael phát hiện vết nứt này đủ lớn để vô hiệu hóa toàn bộ luật độc quyền nếu được công bố công khai.",
-            "hookIntent": "opportunity_opens",
-            "unresolvedQuestion": "Kael có thể thoát ra ngoài trước khi lính canh phát hiện cảnh báo không?",
+            "objective": "Trốn thoát khi Thanh Tra Xám đột ngột xuất hiện.",
+            "obstacle": "Thanh Tra Xám cầm la bàn dò tìm đang tiến thẳng về phía phòng chứa ấn triện.",
+            "action": "Kael nín thở trốn trên xà nhà, quan sát cách la bàn hoạt động để tìm đường thoát.",
+            "worldClaimIds": [
+              "claim_bureau_authority"
+            ],
+            "hookIntent": "threat_arrives",
             "requiredDeltaIds": [
-              "delta_kael_gets_rubbing"
+              "fact_compass_ch3",
+              "know_compass_ch3"
             ]
           }
         ],
         "requiredDeltas": [
           {
-            "id": "delta_kael_move_ham",
-            "kind": "character_location",
-            "characterId": "char_kael",
-            "locationAfter": "ham_chua_muoi_so_4",
+            "id": "cons_powder_ch3",
+            "kind": "resource_numeric",
+            "resourceId": "res_charcoal_powder",
+            "before": 20,
+            "delta": -10,
+            "after": 10,
+            "unit": "gram",
+            "source": "Lượng bột than còn lại trong túi",
+            "sink": "Sử dụng để rập khuôn ấn triện độc quyền muối",
+            "transactionKind": "consume",
+            "consideration": [],
             "evidenceRequired": true
           },
           {
-            "id": "delta_kael_gets_rubbing",
+            "id": "gain_rubbing_ch3",
             "kind": "resource_numeric",
-            "resourceId": "res_ban_rap",
+            "resourceId": "res_flawed_rubbings",
             "before": 0,
             "delta": 1,
             "after": 1,
             "unit": "bản",
-            "source": "Sao chép thành công từ ấn triện gốc của Silas",
-            "sink": "Chưa phát sinh tiêu hao trong quá trình này",
-            "evidenceRequired": true,
+            "source": "Rập khuôn thành công từ ấn triện gốc của Silas",
+            "sink": "Cất giữ cẩn thận trong ống đồng mang theo người",
+            "transactionKind": "gain",
             "consideration": [],
-            "transactionKind": "gain"
+            "evidenceRequired": true
+          },
+          {
+            "id": "fact_compass_ch3",
+            "kind": "fact",
+            "factId": "fact_inspector_compass",
+            "valueBefore": null,
+            "valueAfter": "La bàn của Thanh Tra Xám có thể phát hiện biến động bột than trong bán kính hẹp.",
+            "evidenceRequired": true
+          },
+          {
+            "id": "know_compass_ch3",
+            "kind": "character_knowledge",
+            "characterId": "char_kael_01",
+            "factId": "fact_inspector_compass",
+            "learnedFrom": "Quan sát Thanh Tra Xám sử dụng la bàn ngay ngoài cửa phòng chứa ấn triện.",
+            "evidenceRequired": true
           }
         ],
-        "nextChapterPressure": "Cảnh báo vi mô đã được kích hoạt, Mặc Quan đang lao tới với tốc độ tối đa."
+        "nextChapterPressure": "Kael phải mang bản rập ra ngoài và công bố nó trước khi Thanh Tra Xám bắt được anh."
       },
       {
         "schemaVersion": 3,
         "chapterNumber": 4,
         "elapsedMinutesSincePreviousChapter": 30,
-        "chapterPromise": "Mặc Quan đuổi sát nút nhưng Kael kịp thời trốn thoát đến hội đồng thương nhân.",
-        "preconditions": [
-          {
-            "factId": "fact_silas_seal_location",
-            "expectedValue": "Ấn triện gốc của Silas được giấu trong hầm chứa muối số 4, được bảo vệ bởi bẫy quy tắc trọng lực."
-          }
-        ],
+        "chapterPromise": "Kael trốn thoát khỏi vòng vây và công bố bản rập để phá vỡ quy tắc độc quyền.",
+        "preconditions": [],
         "scenes": [
           {
-            "id": "c4_s1",
-            "povCharacterId": "char_mac_quan",
+            "id": "scene_ch4_1",
+            "povCharacterId": "char_kael_01",
             "participantIds": [
-              "char_mac_quan"
+              "char_kael_01",
+              "char_silas_03"
             ],
-            "locationId": "ham_chua_muoi_so_4",
-            "durationMinutes": 25,
-            "travelMinutesFromPrevious": 30,
-            "desire": "Mặc Quan muốn bắt quả tang Kael đang can thiệp vào ấn triện để thi hành án tử hình ngay lập tức.",
-            "opposition": "Kael đã rời đi trước đó vài phút, chỉ để lại dấu vết năng lượng mờ nhạt trong không khí.",
-            "tactic": "Mặc Quan sử dụng la bàn dò tìm để phân tích dư ảnh năng lượng và xác định hướng tẩu thoát của Kael.",
-            "cost": "Mặc Quan phải phá vỡ một quy tắc nhỏ của Cục để cưỡng chế mở cửa hầm mà không có giấy phép, chịu rủi ro kỷ luật.",
-            "payoff": "Mặc Quan xác định được Kael đang hướng tới tòa nhà hội đồng thương nhân và lập tức đuổi theo.",
-            "irreversibleChange": "Mặc Quan quyết định bỏ qua các thủ tục hành chính cứng nhắc để truy sát Kael bằng mọi giá.",
-            "informationDelta": "Mặc Quan nhận ra Kael đã thành công trong việc rập khuôn ấn triện, biến tình huống thành mức độ đe dọa cao nhất.",
-            "hookIntent": "threat_arrives",
-            "unresolvedQuestion": "Mặc Quan có kịp ngăn cản Kael trước khi hắn công bố bản rập không?",
-            "requiredDeltaIds": [
-              "delta_mac_quan_move_ham",
-              "delta_prom_mac_quan_adv"
-            ]
-          },
-          {
-            "id": "c4_s2",
-            "povCharacterId": "char_kael",
-            "participantIds": [
-              "char_kael"
+            "locationId": "city_streets_01",
+            "durationMinutes": 60,
+            "travelMinutesFromPrevious": 20,
+            "objective": "Công bố bản rập lỗi trước đám đông thương nhân.",
+            "obstacle": "Silas xua tay sai đến ngăn cản và đe dọa giết Kael.",
+            "action": "Kael giơ cao bản rập, kích hoạt lỗ hổng pháp lý khiến quy tắc độc quyền vỡ vụn.",
+            "worldClaimIds": [
+              "claim_ash_paper_rules",
+              "claim_causal_cost"
             ],
-            "locationId": "hoi_dong_thuong_nhan",
-            "durationMinutes": 40,
-            "travelMinutesFromPrevious": 45,
-            "desire": "Kael muốn xâm nhập vào phòng họp của hội đồng thương nhân để đối mặt trực tiếp với Silas.",
-            "opposition": "Tòa nhà được bảo vệ bởi lực lượng an ninh tinh nhuệ của các gia tộc, không cho phép người lạ mặt tiến vào.",
-            "tactic": "Kael cải trang thành một người hầu mang rượu và sử dụng lối đi dành cho nhân viên phục vụ để qua mặt lính gác.",
-            "cost": "Kael phải đánh ngất một người hầu vô tội và giấu xác anh ta vào tủ chứa đồ, đi ngược lại một phần nguyên tắc của mình.",
-            "payoff": "Kael lọt vào được hành lang dẫn đến phòng họp chính mà không gây ra bất kỳ sự nghi ngờ nào.",
-            "irreversibleChange": "Kael đã đặt mình vào giữa vòng vây của kẻ thù, sẵn sàng cho một cuộc đối đầu trực diện không khoan nhượng.",
-            "informationDelta": "Kael nghe lén được Silas đang ép các thương nhân ký vào một hiệp ước độc quyền vĩnh viễn, nhận ra thời gian không còn nhiều.",
-            "hookIntent": "choice_forced",
-            "unresolvedQuestion": "Kael sẽ chọn thời điểm nào để xuất hiện và lật lọng Silas?",
+            "hookIntent": "truth_reframed",
             "requiredDeltaIds": [
-              "delta_kael_move_hoidong"
+              "cons_rubbing_ch4",
+              "gain_scar_ch4"
             ]
           }
         ],
         "requiredDeltas": [
           {
-            "id": "delta_mac_quan_move_ham",
-            "kind": "character_location",
-            "characterId": "char_mac_quan",
-            "locationAfter": "ham_chua_muoi_so_4",
+            "id": "cons_rubbing_ch4",
+            "kind": "resource_numeric",
+            "resourceId": "res_flawed_rubbings",
+            "before": 1,
+            "delta": -1,
+            "after": 0,
+            "unit": "bản",
+            "source": "Bản rập ấn triện độc quyền muối lấy từ dinh thự",
+            "sink": "Đốt cháy trước đám đông để kích hoạt lỗ hổng pháp lý",
+            "transactionKind": "consume",
+            "consideration": [],
             "evidenceRequired": true
           },
           {
-            "id": "delta_prom_mac_quan_adv",
-            "kind": "promise",
-            "promiseId": "prom_mac_quan_clash",
-            "statusAfter": "advanced",
-            "pressureAfter": "Mặc Quan đã bắt được dấu vết năng lượng trực tiếp của Kael và đang bám sát phía sau.",
-            "evidenceRequired": true
-          },
-          {
-            "id": "delta_kael_move_hoidong",
-            "kind": "character_location",
-            "characterId": "char_kael",
-            "locationAfter": "hoi_dong_thuong_nhan",
+            "id": "gain_scar_ch4",
+            "kind": "resource_numeric",
+            "resourceId": "res_causal_scars",
+            "before": 0,
+            "delta": 1,
+            "after": 1,
+            "unit": "vết",
+            "source": "Hậu quả vật lý của việc phá vỡ quy tắc độc quyền",
+            "sink": "Xuất hiện vĩnh viễn trên cánh tay phải của Kael",
+            "transactionKind": "gain",
+            "consideration": [],
             "evidenceRequired": true
           }
         ],
-        "nextChapterPressure": "Kael phải hành động ngay lập tức trước khi hiệp ước được ký kết và Mặc Quan ập tới."
+        "nextChapterPressure": "Quy tắc đã bị phá vỡ, nhưng Kael phải đối mặt với cơn đau từ vết sẹo nhân quả đầu tiên."
       },
       {
         "schemaVersion": 3,
         "chapterNumber": 5,
-        "elapsedMinutesSincePreviousChapter": 10,
-        "chapterPromise": "Kael công bố bản rập, phá hủy đế chế của Silas nhưng phải trả giá bằng vết sẹo nhân quả.",
-        "preconditions": [
-          {
-            "factId": "fact_silas_seal_location",
-            "expectedValue": "Ấn triện gốc của Silas được giấu trong hầm chứa muối số 4, được bảo vệ bởi bẫy quy tắc trọng lực."
-          }
-        ],
+        "elapsedMinutesSincePreviousChapter": 120,
+        "chapterPromise": "Đế chế của Silas sụp đổ, Kael phải đối mặt với hậu quả từ vết sẹo nhân quả đầu tiên.",
+        "preconditions": [],
         "scenes": [
           {
-            "id": "c5_s1",
-            "povCharacterId": "char_silas",
+            "id": "scene_ch5_1",
+            "povCharacterId": "char_silas_03",
             "participantIds": [
-              "char_silas"
+              "char_silas_03",
+              "char_inspector_04"
             ],
-            "locationId": "hoi_dong_thuong_nhan",
+            "locationId": "port_mansion_salt",
             "durationMinutes": 20,
-            "travelMinutesFromPrevious": 30,
-            "desire": "Silas muốn hoàn tất việc ký kết hiệp ước độc quyền vĩnh viễn để củng cố ngai vàng thương mại của mình.",
-            "opposition": "Một số thương nhân lão thành tỏ ra chần chừ và muốn thương lượng thêm về các điều khoản chia sẻ lợi nhuận.",
-            "tactic": "Silas đe dọa sử dụng quyền lực của ấn triện để phong tỏa toàn bộ tài sản của những kẻ dám chống đối.",
-            "cost": "Silas đánh mất hoàn toàn sự tôn trọng của các đối tác, chỉ còn lại sự sợ hãi và thù hận ngầm.",
-            "payoff": "Các thương nhân buộc phải nhượng bộ và chuẩn bị đặt bút ký vào bản hiệp ước bất công.",
-            "irreversibleChange": "Silas đã đẩy mọi người đến đường cùng, đảm bảo rằng sẽ không còn ai đứng về phía hắn nếu hắn thất thế.",
-            "informationDelta": "Silas tin rằng quyền lực của mình là tuyệt đối và không thể bị phá vỡ, dẫn đến sự chủ quan tột độ.",
-            "hookIntent": "relationship_turns",
-            "unresolvedQuestion": "Sự tự mãn này sẽ khiến Silas phải trả giá đắt như thế nào?",
+            "travelMinutesFromPrevious": 0,
+            "objective": "Silas cố gắng cứu vãn quyền lực của mình.",
+            "obstacle": "Thanh Tra Xám đến để niêm phong dinh thự vì ấn triện đã hỏng.",
+            "action": "Silas gục ngã khi nhận ra mình đã mất tất cả, bị Thanh Tra Xám bắt giữ.",
+            "worldClaimIds": [
+              "claim_bureau_authority"
+            ],
+            "hookIntent": "truth_reframed",
             "requiredDeltaIds": [
-              "delta_silas_move_hoidong"
+              "prom_silas_ch5"
             ]
           },
           {
-            "id": "c5_s2",
-            "povCharacterId": "char_kael",
+            "id": "scene_ch5_2",
+            "povCharacterId": "char_kael_01",
             "participantIds": [
-              "char_kael",
-              "char_silas"
+              "char_kael_01",
+              "char_elara_02"
             ],
-            "locationId": "hoi_dong_thuong_nhan",
+            "locationId": "slum_hideout_01",
             "durationMinutes": 30,
-            "travelMinutesFromPrevious": 0,
-            "desire": "Kael muốn công bố bản rập lỗi để phá hủy quy tắc độc quyền của Silas và giải phóng khu cảng.",
-            "opposition": "Silas ra lệnh cho lính gác giết Kael ngay lập tức khi anh vừa xuất hiện ở cửa phòng họp.",
-            "tactic": "Kael ném bản rập lên bàn hội nghị và lớn tiếng đọc điều khoản vô hiệu hóa trước khi lính gác kịp ra tay.",
-            "cost": "Kael phải hứng chịu vết sẹo nhân quả đầu tiên, một vết nứt rỉ máu chiếm 10 phần trăm cơ thể xuất hiện trên cánh tay trái do phá vỡ quy tắc.",
-            "payoff": "Quy tắc độc quyền vỡ vụn, lính gác của Silas mất đi sức mạnh cưỡng chế từ ấn triện và lùi lại.",
-            "irreversibleChange": "Đế chế của Silas sụp đổ hoàn toàn, Kael mang trên mình vết sẹo nhân quả không thể xóa nhòa và trở thành kẻ thù của giới tài phiệt.",
-            "informationDelta": "Mọi người trong phòng họp nhận ra rằng các ấn triện quy tắc không hề hoàn hảo như họ tưởng, mở ra một kỷ nguyên hỗn loạn mới.",
-            "hookIntent": "truth_reframed",
-            "unresolvedQuestion": "Kael sẽ trốn thoát khỏi sự truy bắt của Mặc Quan đang đến gần như thế nào?",
+            "travelMinutesFromPrevious": 15,
+            "objective": "Kael chịu đựng cơn đau từ vết sẹo và lên kế hoạch tiếp theo.",
+            "obstacle": "Vết sẹo tỏa ra nhiệt lượng thiêu đốt, làm suy giảm thể lực của Kael.",
+            "action": "Elara băng bó cho Kael và cảnh báo rằng Cục Lưu Trữ đã nâng mức truy nã.",
+            "worldClaimIds": [
+              "claim_causal_cost"
+            ],
+            "hookIntent": "relationship_turns",
             "requiredDeltaIds": [
-              "delta_kael_gets_scar",
-              "delta_prom_silas_paid",
-              "delta_silas_hates_kael"
+              "loc_kael_ch5"
             ]
           }
         ],
         "requiredDeltas": [
           {
-            "id": "delta_silas_move_hoidong",
-            "kind": "character_location",
-            "characterId": "char_silas",
-            "locationAfter": "hoi_dong_thuong_nhan",
-            "evidenceRequired": true
-          },
-          {
-            "id": "delta_kael_gets_scar",
-            "kind": "resource_numeric",
-            "resourceId": "res_seo_nhan_qua",
-            "before": 0,
-            "delta": 10,
-            "after": 10,
-            "unit": "phần trăm cơ thể",
-            "source": "Công bố lỗi ấn triện độc quyền của Silas trước hội đồng",
-            "sink": "Không thể tiêu hao do tính chất nhân quả",
-            "evidenceRequired": true,
-            "consideration": [],
-            "transactionKind": "gain"
-          },
-          {
-            "id": "delta_prom_silas_paid",
+            "id": "prom_silas_ch5",
             "kind": "promise",
             "promiseId": "prom_silas_downfall",
             "statusAfter": "paid",
-            "pressureAfter": "Đế chế của Silas sụp đổ, nhưng Kael giờ là kẻ thù số một của giới tài phiệt.",
+            "pressureAfter": "Đế chế độc quyền muối đã sụp đổ hoàn toàn, Silas mất hết quyền lực và tài sản.",
             "evidenceRequired": true
           },
           {
-            "id": "delta_silas_hates_kael",
-            "kind": "relationship",
-            "characterId": "char_silas",
-            "relationshipAfter": "Căm thù tột độ vì bị Kael phá hủy hoàn toàn đế chế độc quyền buôn muối",
+            "id": "loc_kael_ch5",
+            "kind": "character_location",
+            "characterId": "char_kael_01",
+            "locationAfter": "slum_hideout_01",
             "evidenceRequired": true
           }
         ],
-        "nextChapterPressure": "Mặc Quan đã đến nơi, Kael phải tìm đường máu thoát khỏi tòa nhà hội đồng."
+        "nextChapterPressure": "Cục Lưu Trữ đã biết đến sự tồn tại của Kael, cuộc săn lùng sẽ trở nên tàn khốc hơn bao giờ hết."
       }
     ]
   }

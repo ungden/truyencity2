@@ -4,10 +4,13 @@ export type V3Role = 'planner' | 'writer' | 'editor' | 'revision';
 
 export const V3_CONTEXT_BUDGETS: Record<V3Role, number> = {
   planner: 28_000,
-  writer: 26_000,
+  writer: 18_000,
   editor: 24_000,
-  revision: 20_000,
+  revision: 12_000,
 };
+
+export const V3_WRITER_BRIEF_MAX_CHARS = 5_000;
+export const V3_PREVIOUS_TAIL_MAX_WORDS = 1_200;
 
 export interface V3ContextManifestEntry {
   role: V3Role;
@@ -74,8 +77,13 @@ function relevantPromiseIds(plan: ChapterPlanV3): Set<string> {
   return new Set(plan.requiredDeltas.flatMap(delta => delta.kind === 'promise' ? [delta.promiseId] : []));
 }
 
+function relevantWorldClaimIds(plan: ChapterPlanV3): Set<string> {
+  return new Set(plan.scenes.flatMap(scene => scene.worldClaimIds));
+}
+
 function projectKernel(kernel: StoryKernelV3, plan: ChapterPlanV3) {
   const ids = relevantCharacterIds(plan);
+  const worldClaimIds = relevantWorldClaimIds(plan);
   return {
     title: kernel.title,
     genre: kernel.genre,
@@ -83,7 +91,7 @@ function projectKernel(kernel: StoryKernelV3, plan: ChapterPlanV3) {
     pleasure: kernel.pleasure,
     protagonistId: kernel.protagonistId,
     characters: kernel.characters.filter(character => ids.has(character.id) || character.id === kernel.protagonistId),
-    worldClaims: kernel.worldClaims,
+    worldClaims: kernel.worldClaims.filter(claim => worldClaimIds.has(claim.id)),
     resources: kernel.resources,
     promises: kernel.promises,
     endingContract: kernel.endingContract,
@@ -103,26 +111,113 @@ function naturalTimeCue(minutes: number, travel = false): string {
   return `sau khoảng ${Math.max(2, Math.round(minutes / 1_440))} ngày`;
 }
 
-function projectWriterPlan(plan: ChapterPlanV3) {
-  return {
-    schemaVersion: plan.schemaVersion,
-    chapterNumber: plan.chapterNumber,
-    elapsedTimeCue: naturalTimeCue(plan.elapsedMinutesSincePreviousChapter),
-    chapterPromise: plan.chapterPromise,
-    preconditions: plan.preconditions,
-    scenes: plan.scenes.map(({
-      unresolvedQuestion: _unresolvedQuestion,
-      durationMinutes,
-      travelMinutesFromPrevious,
-      ...scene
-    }) => ({
-      ...scene,
-      durationCue: naturalTimeCue(durationMinutes),
-      travelCueFromPrevious: naturalTimeCue(travelMinutesFromPrevious, true),
+export interface WriterBriefV3 {
+  story: { title: string; genre: string; uniqueMechanism: string };
+  cast: unknown[];
+  worldRules: unknown[];
+  scenes: unknown[];
+  facts: unknown[];
+  characterState: unknown[];
+  resources: unknown[];
+  promises: unknown[];
+  requiredDeltas: unknown[];
+}
+
+function writerDelta(delta: ChapterPlanV3['requiredDeltas'][number]): unknown {
+  if (delta.kind === 'promise') {
+    return { id: delta.id, kind: delta.kind, promiseId: delta.promiseId, statusAfter: delta.statusAfter };
+  }
+  return delta;
+}
+
+/** Runtime-only projection: mechanics are authoritative, wording is deliberately absent. */
+export function buildWriterBriefV3(input: {
+  kernel: StoryKernelV3;
+  state: StoryStateV3;
+  plan: ChapterPlanV3;
+}): WriterBriefV3 {
+  const characterIds = relevantCharacterIds(input.plan);
+  const resourceIds = relevantResourceIds(input.plan);
+  const promiseIds = relevantPromiseIds(input.plan);
+  const worldClaimIds = relevantWorldClaimIds(input.plan);
+  const factIds = new Set([
+    ...input.plan.preconditions.map(item => item.factId),
+    ...input.plan.requiredDeltas.flatMap(delta => delta.kind === 'fact' || delta.kind === 'character_knowledge' ? [delta.factId] : []),
+    ...input.state.characters
+      .filter(character => characterIds.has(character.characterId))
+      .flatMap(character => character.knowledge.map(item => item.factId)),
+  ]);
+  const brief: WriterBriefV3 = {
+    story: {
+      title: input.kernel.title,
+      genre: input.kernel.genre,
+      uniqueMechanism: input.kernel.concept.uniqueMechanism,
+    },
+    cast: input.kernel.characters
+      .filter(character => characterIds.has(character.id) || character.id === input.kernel.protagonistId)
+      .map(character => ({
+        id: character.id,
+        name: character.name,
+        aliases: character.aliases,
+        voice: {
+          register: character.voice.register,
+          sentenceRhythm: character.voice.sentenceRhythm,
+          directness: character.voice.directness,
+          addressRules: character.voice.addressRules,
+          vocabulary: character.voice.vocabulary,
+          stressResponse: character.voice.stressResponse,
+          avoidances: character.voice.avoidances,
+        },
+      })),
+    worldRules: input.kernel.worldClaims
+      .filter(claim => worldClaimIds.has(claim.id))
+      .map(claim => ({ id: claim.id, claim: claim.claim, exceptions: claim.exceptions })),
+    scenes: input.plan.scenes.map(scene => ({
+      sceneId: scene.id,
+      povCharacterId: scene.povCharacterId,
+      participantIds: scene.participantIds,
+      locationId: scene.locationId,
+      durationCue: naturalTimeCue(scene.durationMinutes),
+      travelCueFromPrevious: naturalTimeCue(scene.travelMinutesFromPrevious, true),
+      objective: scene.objective,
+      obstacle: scene.obstacle,
+      action: scene.action,
+      worldClaimIds: scene.worldClaimIds,
+      requiredDeltaIds: scene.requiredDeltaIds,
+      hookIntent: scene.hookIntent,
     })),
-    requiredDeltas: plan.requiredDeltas,
-    nextChapterPressure: plan.nextChapterPressure,
+    facts: input.state.facts.filter(fact => factIds.has(fact.id)).map(fact => ({ id: fact.id, value: fact.value })),
+    characterState: input.state.characters
+      .filter(character => characterIds.has(character.characterId))
+      .map(character => ({
+        characterId: character.characterId,
+        locationId: character.locationId,
+        relationshipState: character.relationshipState,
+        knownFactIds: character.knowledge.map(item => item.factId),
+      })),
+    resources: input.state.resources
+      .filter(resource => resourceIds.has(resource.resourceId))
+      .map(resource => ({
+        resourceId: resource.resourceId,
+        name: input.kernel.resources.find(item => item.id === resource.resourceId)?.name,
+        currentValue: resource.value,
+      })),
+    promises: input.kernel.promises
+      .filter(promise => promiseIds.has(promise.id))
+      .map(promise => ({ id: promise.id, description: promise.description })),
+    requiredDeltas: input.plan.requiredDeltas.map(writerDelta),
   };
+  const chars = JSON.stringify(brief).length;
+  if (chars > V3_WRITER_BRIEF_MAX_CHARS) {
+    throw new Error(`FLAGSHIP_V3_WRITER_BRIEF_BUDGET_EXCEEDED: needs ${chars}, budget ${V3_WRITER_BRIEF_MAX_CHARS}`);
+  }
+  return brief;
+}
+
+export function selectPreviousChapterTailV3(content: string, maxWords = V3_PREVIOUS_TAIL_MAX_WORDS): string {
+  const matches = [...content.matchAll(/\S+/gu)];
+  if (matches.length <= maxWords) return content.trim();
+  return content.slice(matches[matches.length - maxWords].index).trim();
 }
 
 function projectEditorKernel(kernel: StoryKernelV3, plan: ChapterPlanV3) {
@@ -136,37 +231,10 @@ function projectEditorKernel(kernel: StoryKernelV3, plan: ChapterPlanV3) {
   };
 }
 
-function projectRevisionKernel(kernel: StoryKernelV3, plan: ChapterPlanV3) {
-  const characterIds = relevantCharacterIds(plan);
-  const resourceIds = relevantResourceIds(plan);
-  const promiseIds = relevantPromiseIds(plan);
-  return {
-    title: kernel.title,
-    genre: kernel.genre,
-    protagonistId: kernel.protagonistId,
-    pleasure: kernel.pleasure,
-    characters: kernel.characters
-      .filter(character => characterIds.has(character.id) || character.id === kernel.protagonistId)
-      .map(character => ({
-        id: character.id,
-        name: character.name,
-        aliases: character.aliases,
-        agenda: character.agenda,
-        constraint: character.constraint,
-        moralBoundary: character.moralBoundary,
-        decisionSignature: character.decisionSignature,
-        voice: character.voice,
-      })),
-    worldClaims: kernel.worldClaims,
-    resources: kernel.resources.filter(resource => resourceIds.has(resource.id)),
-    promises: kernel.promises.filter(promise => promiseIds.has(promise.id)),
-  };
-}
-
 function projectState(
   state: StoryStateV3,
   plan: ChapterPlanV3,
-  limits: { timeline: number; retrieval: number } = { timeline: 8, retrieval: 4 },
+  timelineLimit = 8,
 ) {
   const characterIds = relevantCharacterIds(plan);
   const resourceIds = relevantResourceIds(plan);
@@ -178,25 +246,11 @@ function projectState(
   return {
     chapterNumber: state.chapterNumber,
     facts: state.facts.filter(fact => factIds.has(fact.id)),
-    timeline: state.timeline.slice(-limits.timeline),
+    timeline: state.timeline.slice(-timelineLimit),
     characters: state.characters.filter(character => characterIds.has(character.characterId)),
     resources: state.resources.filter(resource => resourceIds.has(resource.resourceId)),
     promises: state.promises.filter(promise => promiseIds.has(promise.promiseId)),
-    recentSummary: state.recentSummary,
-    previousEnding: state.previousEnding,
-    retrievalNotes: state.retrievalNotes.slice(-limits.retrieval),
   };
-}
-
-function projectRevisionState(state: StoryStateV3, plan: ChapterPlanV3) {
-  const projected = projectState(state, plan, { timeline: 3, retrieval: 0 });
-  const {
-    recentSummary: _recentSummary,
-    previousEnding: _previousEnding,
-    retrievalNotes: _retrievalNotes,
-    ...authoritativeState
-  } = projected;
-  return authoritativeState;
 }
 
 export function buildV3RoleContexts(input: {
@@ -204,20 +258,21 @@ export function buildV3RoleContexts(input: {
   arc: ArcPlanV3;
   state: StoryStateV3;
   plan: ChapterPlanV3;
+  previousChapterTail?: string;
 }): V3RoleContexts {
-  const kernel = projectKernel(input.kernel, input.plan);
   const editorKernel = projectEditorKernel(input.kernel, input.plan);
-  const writerState = projectState(input.state, input.plan);
-  const editorState = projectState(input.state, input.plan, { timeline: 5, retrieval: 2 });
-  // Revision already receives the full current draft. Repeating narrative history here
-  // wastes the smallest role budget and can crowd out the authoritative facts/ledgers
-  // that the repair must obey.
-  const revisionState = projectRevisionState(input.state, input.plan);
-  const writerPlan = projectWriterPlan(input.plan);
+  const editorState = projectState(input.state, input.plan, 5);
+  const writerBrief = buildWriterBriefV3(input);
+  const previousTail = input.previousChapterTail
+    ? selectPreviousChapterTailV3(input.previousChapterTail)
+    : '';
   const writer = assemble('writer', [
-      { id: 'STORY_KERNEL_V3', sourceRef: 'ai_story_projects.story_kernel_v3:writer_projection', value: kernel },
-      { id: 'CHAPTER_PLAN_V3', sourceRef: `chapter_blueprints:${input.plan.chapterNumber}:writer_projection`, value: writerPlan },
-      { id: 'RELEVANT_STATE_V3', sourceRef: 'ai_story_projects.story_state_v3:writer_projection', value: writerState },
+      { id: 'WRITER_BRIEF_V3', sourceRef: `runtime_projection:${input.plan.chapterNumber}`, value: writerBrief },
+      ...(previousTail ? [{
+        id: 'PREVIOUS_CHAPTER_TAIL',
+        sourceRef: `chapters:${input.plan.chapterNumber - 1}:published_tail`,
+        value: previousTail,
+      }] : []),
     ]);
   const editor = assemble('editor', [
       { id: 'STORY_KERNEL_V3', sourceRef: 'ai_story_projects.story_kernel_v3:editor_projection', value: editorKernel },
@@ -229,12 +284,10 @@ export function buildV3RoleContexts(input: {
     if (!revisionContext) {
       revisionContext = assemble('revision', [
         {
-          id: 'STORY_KERNEL_V3',
-          sourceRef: 'ai_story_projects.story_kernel_v3:revision_projection',
-          value: projectRevisionKernel(input.kernel, input.plan),
+          id: 'WRITER_BRIEF_V3',
+          sourceRef: `runtime_projection:${input.plan.chapterNumber}:revision`,
+          value: writerBrief,
         },
-        { id: 'CHAPTER_PLAN_V3', sourceRef: `chapter_blueprints:${input.plan.chapterNumber}:revision_projection`, value: writerPlan },
-        { id: 'RELEVANT_STATE_V3', sourceRef: 'ai_story_projects.story_state_v3:revision_projection', value: revisionState },
       ]);
     }
     return revisionContext;

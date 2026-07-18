@@ -1,4 +1,5 @@
 import type { ChapterPlanV3, StoryKernelV3, StoryStateV3 } from './contracts';
+import { V3_CHAPTER_LENGTH_POLICY } from './prompts';
 
 export interface V3Evidence {
   code: string;
@@ -71,14 +72,9 @@ function planPhrases(plan: ChapterPlanV3): string[] {
     plan.chapterPromise,
     plan.nextChapterPressure,
     ...plan.scenes.flatMap(scene => [
-      scene.desire,
-      scene.opposition,
-      scene.tactic,
-      scene.cost,
-      scene.payoff,
-      scene.irreversibleChange,
-      scene.informationDelta,
-      scene.unresolvedQuestion,
+      scene.objective,
+      scene.obstacle,
+      scene.action,
     ]),
   ].map(value => value.trim()).filter(value => value.length >= 36);
 }
@@ -107,18 +103,44 @@ export function runV3StructuredProsePreflight(input: {
   scenes: Array<{ sceneId: string; content: string }>;
   plan: ChapterPlanV3;
   targetWordCount: number;
+  previousChapterTail?: string;
   kernel?: StoryKernelV3;
   state?: StoryStateV3;
 }): V3Evidence[] {
   const evidence = runV3ProsePreflight(input.content, input.plan);
   const words = input.content.trim().split(/\s+/u).filter(Boolean).length;
-  const minimumWords = Math.ceil(input.targetWordCount * 0.8);
-  if (words < minimumWords) {
+  const minimumWords = V3_CHAPTER_LENGTH_POLICY.hardMinWords;
+  if (words < V3_CHAPTER_LENGTH_POLICY.hardMinWords) {
     evidence.push({
       code: 'chapter_under_target', severity: 'major',
       message: `Chapter has ${words} words; deterministic floor is ${minimumWords}.`,
       start: 0, end: input.content.length, excerpt: input.content.slice(0, 240), local: false,
     });
+  }
+  if (words > V3_CHAPTER_LENGTH_POLICY.hardMaxWords) {
+    evidence.push({
+      code: 'chapter_over_limit', severity: 'major',
+      message: `Chapter has ${words} words; deterministic ceiling is ${V3_CHAPTER_LENGTH_POLICY.hardMaxWords}.`,
+      start: 0, end: input.content.length, excerpt: input.content.slice(-240), local: false,
+    });
+  }
+
+  if (input.previousChapterTail) {
+    const reusableSegments = input.previousChapterTail
+      .split(/(?:\n\s*\n|(?<=[.!?…])\s+)/u)
+      .map(item => item.trim())
+      .filter(item => item.length >= 120 && item.split(/\s+/u).length >= 20);
+    for (const segment of reusableSegments) {
+      const start = input.content.indexOf(segment);
+      if (start >= 0) {
+        evidence.push({
+          code: 'previous_chapter_verbatim_repeat', severity: 'major',
+          message: 'Writer repeated a long span from the published previous chapter instead of continuing it.',
+          start, end: start + segment.length, excerpt: segment, local: true,
+        });
+        break;
+      }
+    }
   }
   let offset = 0;
   const perSceneFloor = Math.max(100, Math.floor(minimumWords / Math.max(1, input.scenes.length) * 0.35));

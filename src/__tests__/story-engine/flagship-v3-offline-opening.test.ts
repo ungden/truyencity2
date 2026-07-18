@@ -25,6 +25,14 @@ const hardGates = {
   canon: true, timeline: true, resource_causality: true, character_knowledge: true,
   authority: true, prompt_leak: true, plan_fidelity: true,
 };
+const scenePayloads = (plan: typeof launchPack.initialWindow.plans[number], content: string) => {
+  const paragraphs = content.split(/\n\s*\n/u);
+  const size = Math.ceil(paragraphs.length / plan.scenes.length);
+  return plan.scenes.map((scene, index) => ({
+    sceneId: scene.id,
+    paragraphs: paragraphs.slice(index * size, (index + 1) * size),
+  }));
+};
 
 describe('flagship v3 offline opening runner', () => {
   it('advances three chapters in memory without a database commit', async () => {
@@ -34,9 +42,9 @@ describe('flagship v3 offline opening runner', () => {
         calls.push(`${chapterNumber}:${call.role}:${model}`);
         const plan = launchPack.initialWindow.plans[chapterNumber - 1];
         const markers = plan.requiredDeltas.map(delta => `Dấu mốc ${delta.id} đã hiện rõ trong hành động.`);
-        const content = `${markers.join(' ')} ${Array.from({ length: 8 }, () => 'Nhân vật tự kiểm tra nguồn lực, nói chuyện với người liên quan rồi chấp nhận cái giá của lựa chọn trước khi nhận kết quả. '.repeat(10)).join('\n\n')}`;
+        const content = `${markers.join(' ')} ${Array.from({ length: 8 }, (_, paragraph) => `Ở chương ${chapterNumber}, đoạn ${paragraph}, nhân vật tự kiểm tra nguồn lực, nói chuyện với người liên quan rồi chấp nhận cái giá riêng của lựa chọn trước khi nhận kết quả. `.repeat(6)).join('\n\n')}`;
         const payload = call.role === 'writer' || call.role === 'writer_revision'
-          ? { title: `Chương ${chapterNumber}: Lựa chọn có giá`, scenes: plan.scenes.map(scene => ({ sceneId: scene.id, paragraphs: content.split(/\n\s*\n/u) })) }
+          ? { title: `Chương ${chapterNumber}: Lựa chọn có giá`, scenes: scenePayloads(plan, content) }
           : {
               status: 'pass', hardGates, qualityGates, issues: [],
               revisionInstructions: [],
@@ -74,7 +82,7 @@ describe('flagship v3 offline opening runner', () => {
         const marker = 'Nhân vật chưa trả được cái giá đã hứa.';
         const content = `${marker} ${Array.from({ length: 8 }, () => 'Anh kiểm tra tình hình rồi lựa chọn cách giải quyết phù hợp với người trong cảnh. '.repeat(12)).join('\n\n')}`;
         const payload = call.role === 'writer' || call.role === 'writer_revision'
-          ? { title: `Chương ${chapterNumber}: Bản thử`, scenes: plan.scenes.map(scene => ({ sceneId: scene.id, paragraphs: (call.role === 'writer_revision' ? `${content} Bản sửa vẫn không tạo được nguồn lực hợp lệ.` : content).split(/\n\s*\n/u) })) }
+          ? { title: `Chương ${chapterNumber}: Bản thử`, scenes: scenePayloads(plan, call.role === 'writer_revision' ? `${content} Bản sửa vẫn không tạo được nguồn lực hợp lệ.` : content) }
           : {
               status: 'issues',
               hardGates: { ...hardGates, resource_causality: false },

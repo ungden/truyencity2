@@ -4,11 +4,17 @@ const id = z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/);
 const named = z.string().trim().min(2).max(80);
 const text = z.string().trim().min(8);
 const detailed = z.string().trim().min(20);
+const mechanical = z.string().trim().min(8).max(240);
 
 export const CharacterVoiceV3Schema = z.object({
   summary: detailed,
-  positiveExamples: z.array(text).min(2).max(5),
-  forbiddenPatterns: z.array(text).min(2).max(8),
+  register: mechanical,
+  sentenceRhythm: mechanical,
+  directness: z.enum(['reserved', 'balanced', 'direct']),
+  addressRules: mechanical,
+  vocabulary: mechanical,
+  stressResponse: mechanical,
+  avoidances: mechanical,
 }).strict();
 
 export const StoryCharacterV3Schema = z.object({
@@ -398,15 +404,11 @@ export const ChapterSceneV3Schema = z.object({
   locationId: id,
   durationMinutes: z.number().int().min(1).max(1440),
   travelMinutesFromPrevious: z.number().int().min(0).max(1440),
-  desire: detailed,
-  opposition: detailed,
-  tactic: detailed,
-  cost: detailed,
-  payoff: detailed,
-  irreversibleChange: detailed,
-  informationDelta: detailed,
+  objective: mechanical,
+  obstacle: mechanical,
+  action: mechanical,
+  worldClaimIds: z.array(id).max(8),
   hookIntent: z.enum(['threat_arrives', 'choice_forced', 'truth_reframed', 'opportunity_opens', 'cost_revealed', 'relationship_turns']),
-  unresolvedQuestion: detailed,
   requiredDeltaIds: z.array(id).min(1).max(12)
     .describe('NON-EMPTY: every scene must list at least one required delta id implemented by that scene.'),
 }).strict();

@@ -7,7 +7,9 @@ export interface V3ValidationIssue {
 }
 
 const closeEnough = (left: number, right: number): boolean => Math.abs(left - right) < 1e-8;
-const purchaseLanguage = /(?:\bmua\b|\bthu mua\b|\bđổi lấy\b|\bthanh toán\b)/iu;
+// "Thanh toán" also covers debt, fees and transfers; treating every payment as
+// a purchase created false plan blocks when no goods/services changed hands.
+const purchaseLanguage = /(?:\bmua\b|\bthu mua\b|\bđổi lấy\b)/iu;
 
 export function validateV3Artifacts(input: {
   kernel: StoryKernelV3;
@@ -20,6 +22,7 @@ export function validateV3Artifacts(input: {
   const characters = new Set(kernel.characters.map(item => item.id));
   const resources = new Map(kernel.resources.map(item => [item.id, item]));
   const promises = new Set(kernel.promises.map(item => item.id));
+  const worldClaims = new Set(kernel.worldClaims.map(item => item.id));
   const facts = new Map(state.facts.map(item => [item.id, item.value]));
   const stateCharacters = new Map(state.characters.map(item => [item.characterId, item]));
   const stateResources = new Map(state.resources.map(item => [item.resourceId, item]));
@@ -61,6 +64,11 @@ export function validateV3Artifacts(input: {
     for (const participantId of scene.participantIds) {
       if (!characters.has(participantId) || !stateCharacters.has(participantId)) {
         issues.push({ code: 'unknown_participant', path: `scenes.${index}.participantIds`, message: `Unknown participant ${participantId}.` });
+      }
+    }
+    for (const claimId of scene.worldClaimIds) {
+      if (!worldClaims.has(claimId)) {
+        issues.push({ code: 'unknown_world_claim', path: `scenes.${index}.worldClaimIds`, message: `Unknown world claim ${claimId}.` });
       }
     }
   }
@@ -113,7 +121,10 @@ export function validateV3Artifacts(input: {
         if (definition.maximumValue !== null && delta.after > definition.maximumValue) {
           issues.push({ code: 'resource_above_maximum', path, message: `Resource ${delta.resourceId} exceeded its story-specific maximum.` });
         }
-        const looksLikePurchase = delta.delta < 0 && purchaseLanguage.test(`${delta.source} ${delta.sink}`);
+        // Source records provenance and may legitimately say an item "đã mua"
+        // in an earlier chapter. Only the current sink describes what this
+        // transaction spends the resource on.
+        const looksLikePurchase = delta.delta < 0 && purchaseLanguage.test(delta.sink);
         if (looksLikePurchase && delta.transactionKind !== 'purchase') {
           issues.push({
             code: 'resource_purchase_untyped',

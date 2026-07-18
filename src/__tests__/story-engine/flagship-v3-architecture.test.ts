@@ -119,6 +119,35 @@ describe('flagship v3 architecture boundary', () => {
     expect(getSection).not.toContain('machine_metrics');
   });
 
+  it('keeps the over-directed A/B control out of runtime and pins both branches to one route', () => {
+    const calibration = read('scripts/flagship-v3-build-machine-pairs.ts');
+    const runtime = read('src/services/story-engine/flagship-v3/runtime.ts');
+    const context = read('src/services/story-engine/flagship-v3/context.ts');
+    expect(calibration).toContain('calibration_only:legacy_full_context');
+    expect(calibration).toContain('A/B requires the exact same model route');
+    expect(calibration).toContain('Writer model differs between A/B branches');
+    expect(runtime).not.toContain('OVER_DIRECTED_CONTROL_CONTEXT');
+    expect(context).not.toContain('OVER_DIRECTED_CONTROL_CONTEXT');
+  });
+
+  it('blocks machine calibration before spending when an exact judge credential is absent', () => {
+    const calibration = read('scripts/flagship-v3-machine-calibrate.ts');
+    expect(calibration).toContain('CALIBRATION_BLOCKED: missing exact judge credential');
+    expect(calibration.indexOf('assertMachineJudgeCredentials();')).toBeLessThan(
+      calibration.indexOf('runMachineEnsembleV3(pairCorpus'),
+    );
+    expect(calibration).toContain("['OPENAI_API_KEY', process.env.OPENAI_API_KEY]");
+    expect(calibration).toContain('no substitute route is allowed');
+  });
+
+  it('loads the published previous chapter directly instead of a generated summary', () => {
+    const runtime = read('src/services/story-engine/flagship-v3/runtime.ts');
+    expect(runtime).toContain("db.from('chapters')");
+    expect(runtime).toContain(".select('content')");
+    expect(runtime).toContain('selectPreviousChapterTailV3');
+    expect(runtime).not.toContain('previousEnding ||');
+  });
+
   it('stages v3 plans without overwriting v2 blueprints and archives them only inside reset', () => {
     const migration = read('supabase/migrations/20260716162000_flagship_v3_staging_window.sql');
     const stage = migration.slice(
@@ -140,16 +169,12 @@ describe('flagship v3 golden production failures', () => {
     chapterPromise: 'Sơn phải giữ được mẻ cá qua trận mưa đầu tiên bằng kỹ thuật có thể kiểm chứng.',
     nextChapterPressure: 'Trời sáng, mẻ cá giữ được độ dẻo nhưng gã cò mồi Gã Bảy đã xông thẳng vào sân.',
     scenes: [{
-      desire: 'Sơn muốn giữ lô cá không bị nhũn trước khi mưa tràn vào sân.',
-      opposition: 'Mái che dột và gia đình chỉ còn một lượng muối sạch hữu hạn.',
-      tactic: 'Sơn chia cá thành lớp mỏng rồi tự cân lượng muối cần dùng.',
-      cost: 'Gia đình mất phần lớn số muối sạch còn lại sau lần thử đầu tiên.',
-      payoff: 'Lô cá vẫn giữ được thớ thịt sau khi trận mưa đi qua.',
-      irreversibleChange: 'Gia đình có bằng chứng đầu tiên rằng phương pháp của Sơn hiệu quả.',
-      informationDelta: 'Mẹ Sơn hiểu tỷ lệ muối cần thiết cho mẻ cá nhỏ.',
-      unresolvedQuestion: 'Gã thu mua sẽ phản ứng thế nào khi không thể dùng hàng hỏng để ép giá.',
+      objective: 'Sơn giữ lô cá không bị nhũn trước khi mưa tràn vào sân.',
+      obstacle: 'Mái che dột và gia đình chỉ còn một lượng muối sạch hữu hạn.',
+      action: 'Sơn chia cá thành lớp mỏng rồi tự cân lượng muối cần dùng.',
+      worldClaimIds: [],
     }],
-  } as ChapterPlanV3;
+  } as unknown as ChapterPlanV3;
 
   for (const item of golden) {
     if (item.kind === 'preflight') {
@@ -209,15 +234,11 @@ describe('flagship v3 long-story state bounds', () => {
           locationId: 'home',
           durationMinutes: 5,
           travelMinutesFromPrevious: 0,
-          desire: 'Main muốn tạo một đơn vị tiến bộ có thể kiểm chứng trong chương này.',
-          opposition: 'Nguồn lực hữu hạn buộc Main phải trả chi phí trước khi nhận kết quả.',
-          tactic: 'Main hoàn thành giao dịch và lưu lại bằng chứng thay đổi nguồn lực.',
-          cost: 'Main dành thời gian và công sức thật cho giao dịch của chương.',
-          payoff: 'Nguồn lực tăng đúng một đơn vị sau giao dịch đã hoàn thành.',
-          irreversibleChange: 'Tổng nguồn lực đã thay đổi và được commit vào state.',
-          informationDelta: 'Main biết kết quả của giao dịch vừa hoàn tất.',
+          objective: 'Main tạo một đơn vị tiến bộ có thể kiểm chứng trong chương này.',
+          obstacle: 'Nguồn lực hữu hạn buộc Main trả chi phí trước khi nhận kết quả.',
+          action: 'Main hoàn thành giao dịch và lưu bằng chứng thay đổi nguồn lực.',
+          worldClaimIds: [],
           hookIntent: 'opportunity_opens',
-          unresolvedQuestion: 'Cơ hội kế tiếp sẽ yêu cầu Main đánh đổi nguồn lực nào.',
           requiredDeltaIds: [`cash_${chapter}`, `progress_${chapter}`],
         }],
         requiredDeltas: [

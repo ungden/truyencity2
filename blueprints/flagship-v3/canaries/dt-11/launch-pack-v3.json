@@ -5,291 +5,311 @@
     "schemaVersion": 3,
     "pipelineVersion": "flagship_v3",
     "title": "Giám Bảo Gốm Cổ: Tôi Chạm Một Lần, Biết Nó Được Nung Bằng Lửa Gì",
-    "genre": "Urban Fantasy / Antique Appraisal",
+    "genre": "Đô thị, Giám bảo, Phục chế cổ vật",
     "concept": {
-      "signature": "Thợ phục chế trẻ dùng kỹ thuật vá vô ảnh và men tro bí truyền để khôi phục gốm cổ và lật tẩy những hồ sơ lai lịch giả mạo.",
-      "uniqueMechanism": "Giám định bằng cách phân tích tạp chất men và cốt đất qua kính hiển vi cầm tay, phục chế bằng men tro tiêu hao, và định giá bằng cách khớp nối mảnh vỡ với hồ sơ di cư của các gia tộc.",
-      "readerFantasy": "Khoái cảm khi dùng kiến thức chuyên sâu để nhìn thấu giá trị thật của món đồ bị vứt bỏ, qua mặt những kẻ hợm hĩnh và thu lợi nhuận khủng một cách hợp lý.",
-      "recurringSituation": "Nhận một món đồ vỡ nát bị đánh giá thấp, từ chối sửa ẩu, tìm ra lai lịch thật, dùng men tro quý giá để phục hồi vô ảnh, và chốt giao dịch với người mua cần câu chuyện của nó.",
+      "signature": "Phục chế gốm sứ bằng kỹ thuật vá vô ảnh và men tro bí truyền để lật tẩy lịch sử giả.",
+      "uniqueMechanism": "Nhận diện nguồn gốc gốm qua tạp chất đất sét và phục hồi bằng men tro Lò Rồng, tiêu hao tài nguyên gia tộc.",
+      "readerFantasy": "Dùng kiến thức chuyên sâu và kỹ năng thủ công tuyệt đỉnh để chiến thắng những kẻ lừa đảo lọc lõi trong giới đồ cổ.",
+      "recurringSituation": "Phát hiện món đồ bị định giá sai, truy xuất hồ sơ gốc, phục chế bằng kỹ thuật bí truyền và bán cho đúng người cần.",
       "variationAxes": [
-        "Độ phức tạp của vết vỡ và loại gốm",
-        "Mức độ tinh vi của hồ sơ giả mạo",
-        "Động cơ của người mua và chủ cũ",
-        "Sự cạn kiệt của nguồn men tro"
+        "Loại gốm và niên đại xuất xứ",
+        "Mức độ hư hỏng của hiện vật",
+        "Thủ đoạn làm giả hồ sơ của đối thủ",
+        "Động cơ của người mua cuối cùng"
       ],
       "antiCloneFingerprint": [
-        "Kỹ thuật vá vô ảnh chỉ dùng men tro Lò Rồng",
-        "Đối thủ làm giả câu chuyện thay vì làm giả hiện vật",
-        "Định giá dựa trên sự đồng điệu của người sưu tầm thay vì mắt thần báo giá"
+        "Men tro bí truyền Lò Rồng",
+        "Kỹ thuật vá vô ảnh bằng nhựa cây",
+        "Giám định qua tạp chất sa khoáng",
+        "Hồ sơ di cư của các gia tộc Hà Thành"
       ]
     },
     "pleasure": {
       "primaryRewardLoop": [
         "Phát hiện chi tiết sai lệch",
-        "Mua rẻ món đồ vỡ",
-        "Phục chế vô ảnh",
-        "Bán cho đúng người cần lai lịch",
-        "Thu tiền và manh mối lịch sử"
+        "Mua rẻ hiện vật bị bỏ đi",
+        "Phục chế hoàn hảo bằng kỹ thuật khó",
+        "Bán giá cao kèm câu chuyện gốc"
       ],
       "comfortLoop": [
-        "Được các lão làng trong nghề nể trọng",
-        "Nhìn thấy món đồ từ phế liệu trở thành kiệt tác",
-        "Kẻ gian lận bị bóc mẽ bằng kiến thức vật lý"
+        "Làm sạch hiện vật cẩn thận",
+        "Pha chế men tro trong tĩnh lặng",
+        "Nghiên cứu tài liệu cổ gia truyền"
       ],
       "setbackRecoveryWindow": 2,
       "progressionSignals": [
-        "Số lượng men tro còn lại",
-        "Cấp độ của nhà sưu tầm tiếp cận được",
-        "Số trang nhật ký gia tộc thu thập được"
+        "Tăng lượng vốn lưu động",
+        "Mở rộng mạng lưới nhà sưu tầm",
+        "Thu thập thêm mảnh vỡ Lò Rồng",
+        "Nâng cấp dụng cụ phục chế chuyên nghiệp"
       ]
     },
     "protagonistId": "char_an",
     "characters": [
       {
         "id": "char_an",
-        "name": "An",
+        "name": "Trần An",
         "aliases": [
           "Thợ vá thần",
-          "Truyền nhân Lò Rồng"
+          "Cậu An"
         ],
         "role": "protagonist",
-        "publicIdentity": "Thợ phục chế gốm sứ nghèo tại chợ đồ cũ Kim Biên",
-        "agenda": "Trả nợ gia đình, khôi phục danh tiếng Lò Rồng và tìm ra sự thật về sự sụp đổ của gia tộc.",
-        "competence": "Bậc thầy kỹ thuật vá vô ảnh, am hiểu sâu sắc cốt đất và men gốm cổ.",
-        "constraint": "Thiếu kỹ năng thương lượng, nguồn men tro bí truyền đang cạn kiệt.",
-        "moralBoundary": "Không bao giờ dùng kỹ thuật để làm giả đồ cổ hoặc phá hỏng nguyên bản của hiện vật.",
-        "decisionSignature": "Luôn chọn bảo vệ linh hồn và lịch sử của món đồ, dù phải hy sinh lợi ích tài chính trước mắt.",
+        "publicIdentity": "Một thợ phục chế gốm sứ trẻ tuổi, nghèo khó, làm việc tự do tại khu chợ đồ cũ Kim Biên.",
+        "agenda": "Trả dứt điểm món nợ gia đình, khôi phục danh tiếng Lò Rồng và tìm ra sự thật về sự sụp đổ của gia tộc.",
+        "competence": "Sở hữu kỹ thuật vá vô ảnh tuyệt đỉnh và khả năng nhận diện vật liệu gốm qua xúc giác và thị giác vi mô.",
+        "constraint": "Thiếu kỹ năng thương lượng, dễ bị chèn ép về giá và bị giới hạn bởi lượng men tro bí truyền ngày càng cạn kiệt.",
+        "moralBoundary": "Tuyệt đối không dùng kỹ thuật của mình để làm giả đồ cổ hoặc che giấu nguồn gốc thực sự của hiện vật.",
+        "decisionSignature": "Luôn ưu tiên bảo vệ tính nguyên bản của hiện vật hơn là lợi nhuận tài chính trước mắt.",
         "voice": {
-          "summary": "Điềm tĩnh, khiêm tốn nhưng cực kỳ kiên quyết và sắc sảo khi nói về chuyên môn gốm sứ.",
-          "positiveExamples": [
-            "Xương gốm này là từ đất cao lanh vùng Cảnh Đức Trấn, nhưng lớp men phủ ngoài lại có tạp chất của men công nghiệp hiện đại.",
-            "Cháu chỉ làm những gì mình tin là đúng thôi ạ, phá của chứ không phải cứu của.",
-            "Đó là phương pháp của gia đình cháu, trả nó về với linh hồn nguyên bản chứ không chỉ chắp vá hình dáng."
-          ],
-          "forbiddenPatterns": [
-            "Haha, phen này ta phát tài rồi!",
-            "Mấy người thì biết cái gì về đồ cổ cơ chứ.",
-            "Tôi có mắt thần nhìn thấu mọi vật."
-          ]
+          "summary": "Điềm tĩnh, chắc chắn và mang đậm tính học thuật khi bàn về chuyên môn, nhưng rụt rè trong giao tiếp xã hội.",
+          "register": "Trang trọng khi bàn về chuyên môn, khiêm nhường trong giao tiếp thường ngày.",
+          "sentenceRhythm": "Ngắn gọn, nhịp độ chậm, ngắt nghỉ rõ ràng khi giải thích kỹ thuật hoặc phân tích hiện vật.",
+          "directness": "direct",
+          "addressRules": "Gọi người lớn tuổi là bác/chú xưng cháu, gọi khách hàng là ông/bà xưng tôi.",
+          "vocabulary": "Sử dụng nhiều từ vựng chuyên ngành gốm sứ, hóa học vật liệu và lịch sử mỹ thuật.",
+          "stressResponse": "Im lặng quan sát, tập trung vào chi tiết vật lý của đồ vật thay vì tranh cãi lớn tiếng.",
+          "avoidances": "Tránh dùng từ ngữ phô trương, không bao giờ hứa hẹn tuyệt đối về giá trị tiền tệ của món đồ."
         }
       },
       {
         "id": "char_can",
         "name": "Lão Cẩn",
         "aliases": [
-          "Cẩn trọc",
-          "Chủ tiệm đồ cổ"
+          "Ông Cẩn đồ cổ"
         ],
         "role": "cast",
-        "publicIdentity": "Chủ tiệm đồ cổ lọc lõi tại khu chợ Kim Biên",
-        "agenda": "Mua rẻ bán đắt, tối đa hóa lợi nhuận từ mọi món đồ trong tiệm.",
-        "competence": "Đánh hơi được những món đồ có tiềm năng sinh lời, mạng lưới quan hệ rộng ở tầng đáy thị trường.",
-        "constraint": "Kiến thức chuyên sâu có giới hạn, dễ bị lừa bởi những món đồ giả tinh vi bề ngoài.",
-        "moralBoundary": "Sẵn sàng lừa gạt khách hàng nghiệp dư nhưng không bán đứng đối tác làm ăn lâu dài.",
-        "decisionSignature": "Luôn cân nhắc mọi thứ qua lăng kính tiền bạc và tỷ suất lợi nhuận.",
+        "publicIdentity": "Chủ một tiệm đồ cổ lâu năm tại chợ Kim Biên, chuyên săn lùng đồ rẻ bán giá cao.",
+        "agenda": "Tối đa hóa lợi nhuận từ mọi giao dịch, lợi dụng tài năng của những người thợ trẻ để kiếm lời.",
+        "competence": "Có mạng lưới thông tin rộng rãi về nguồn hàng và con mắt đánh giá thị hiếu của những người mua nghiệp dư.",
+        "constraint": "Kiến thức chuyên sâu về vật liệu bị hạn chế, thường bị lừa bởi những món đồ giả tinh vi có giấy tờ đẹp.",
+        "moralBoundary": "Sẵn sàng nhắm mắt làm ngơ trước nguồn gốc mờ ám của món đồ miễn là có thể bán được giá cao.",
+        "decisionSignature": "Luôn chọn phương án mang lại tiền mặt nhanh nhất, bất chấp rủi ro về uy tín lâu dài.",
         "voice": {
-          "summary": "Thực dụng, xởi lởi bề ngoài nhưng tính toán chi li, hay dùng từ ngữ con buôn.",
-          "positiveExamples": [
-            "Vết nứt chỉ nhỏ như sợi tóc thôi, cậu vá lại cho vô ảnh là tôi bán được giá gấp năm gấp bảy.",
-            "Cậu lấy làm gì thứ đồ bỏ đi ấy, thôi cầm về đi coi như tôi cho cậu.",
-            "Tiền công không thành vấn đề, miễn là qua mắt được mấy lão gà mờ kia."
-          ],
-          "forbiddenPatterns": [
-            "Món đồ này mang một giá trị lịch sử vô giá.",
-            "Tôi làm nghề này vì đam mê nghệ thuật.",
-            "Cậu cứ giữ lấy mà dùng, tiền bạc quan trọng gì."
-          ]
+          "summary": "Giọng điệu xởi lởi, mang tính con buôn, luôn tìm cách ép giá và thao túng tâm lý người đối diện.",
+          "register": "Suồng sã, bình dân, mang đậm chất chợ búa nhưng cố tỏ ra am hiểu.",
+          "sentenceRhythm": "Nhanh, dồn dập, thường xuyên ngắt lời người khác để giành quyền kiểm soát cuộc hội thoại.",
+          "directness": "balanced",
+          "addressRules": "Gọi người trẻ là cậu/chú xưng tôi, gọi khách sộp là ngài/sếp.",
+          "vocabulary": "Sử dụng nhiều tiếng lóng của giới buôn đồ cổ, các thuật ngữ định giá và mặc cả.",
+          "stressResponse": "Nổi nóng, lớn tiếng đe dọa hoặc viện cớ để thoái thác trách nhiệm khi bị dồn vào chân tường.",
+          "avoidances": "Tránh nói về nguồn gốc thực sự của món đồ nếu nó bất lợi cho việc định giá."
         }
       },
       {
         "id": "char_lam",
         "name": "Ông Lâm",
         "aliases": [
-          "Lâm Trà",
-          "Nhà sưu tầm ẩn danh"
+          "Lâm Trà"
         ],
         "role": "cast",
-        "publicIdentity": "Nhà sưu tầm trà cụ và gốm sứ cao cấp, chủ quán trà kín tiếng.",
-        "agenda": "Sưu tầm những món đồ có linh hồn và câu chuyện lịch sử chân thực.",
-        "competence": "Mắt nhìn nghệ thuật tinh tế, nguồn tài chính dồi dào, quyền lực ngầm trong giới sưu tầm.",
-        "constraint": "Quá tin vào các hồ sơ lai lịch được làm giả tinh vi bởi các chuyên gia học thuật.",
-        "moralBoundary": "Tuyệt đối không mua bán đồ ăn cắp hoặc đồ giả mạo nếu biết trước sự thật.",
-        "decisionSignature": "Sẵn sàng trả giá cao ngất ngưởng cho một món đồ nếu người bán chứng minh được câu chuyện lịch sử của nó.",
+        "publicIdentity": "Một nhà sưu tầm trà cụ và gốm sứ cao cấp, có tiếng nói trọng lượng trong giới tinh hoa Hà Thành.",
+        "agenda": "Tìm kiếm những món đồ gốm có giá trị lịch sử và câu chuyện chân thực để hoàn thiện bộ sưu tập để đời.",
+        "competence": "Có kiến thức uyên thâm về lịch sử văn hóa, sở hữu nguồn tài chính dồi dào và mạng lưới quan hệ cấp cao.",
+        "constraint": "Quá tin tưởng vào các giấy tờ chứng nhận từ các tổ chức lớn, đôi khi bỏ qua những chi tiết vật lý nhỏ.",
+        "moralBoundary": "Chỉ giao dịch những món đồ có nguồn gốc hợp pháp và minh bạch, tôn trọng nghệ nhân chân chính.",
+        "decisionSignature": "Sẵn sàng trả giá rất cao cho một món đồ nếu người bán chứng minh được câu chuyện lịch sử đằng sau nó.",
         "voice": {
-          "summary": "Khoan thai, lịch lãm, uyên bác và luôn giữ thái độ trân trọng đối với cổ vật.",
-          "positiveExamples": [
-            "Cậu đã không chỉ vá lại một cái bát, cậu đã phục sinh một phần lịch sử.",
-            "Người ta nói đây là bộ trà ngự dụng của vua Tự Đức, nhưng tôi vẫn luôn có điểm nghi ngờ.",
-            "Cho tôi xem báu vật của cậu đi, nghe nói cậu là người rất có nguyên tắc."
-          ],
-          "forbiddenPatterns": [
-            "Cái này bán lại được bao nhiêu tiền?",
-            "Đồ vỡ thế này thì vứt đi cho rảnh nợ.",
-            "Tôi mua nó chỉ để khoe với mấy lão bạn."
-          ]
+          "summary": "Khoan thai, lịch lãm, mang phong thái của một học giả uyên bác và một người có địa vị xã hội cao.",
+          "register": "Trang trọng, lịch sự, giữ khoảng cách nhất định nhưng không trịch thượng.",
+          "sentenceRhythm": "Chậm rãi, từ tốn, câu chữ được trau chuốt kỹ lưỡng, thường có những khoảng lặng để suy nghĩ.",
+          "directness": "reserved",
+          "addressRules": "Gọi người khác bằng tên hoặc chức danh xưng tôi, luôn giữ thái độ tôn trọng.",
+          "vocabulary": "Sử dụng từ ngữ văn phong cổ, các điển tích lịch sử và thuật ngữ thẩm mỹ học.",
+          "stressResponse": "Giữ thái độ điềm tĩnh, dùng lý lẽ và bằng chứng để phản bác thay vì bộc lộ cảm xúc.",
+          "avoidances": "Tránh sử dụng ngôn ngữ thô tục, không bao giờ mặc cả cò kè từng đồng."
         }
       },
       {
         "id": "char_ton",
-        "name": "Phạm Tôn",
+        "name": "Phan Tôn",
         "aliases": [
-          "Giáo sư Tôn",
-          "Bàn tay ma thuật"
+          "Giáo sư Tôn"
         ],
         "role": "cast",
-        "publicIdentity": "Nhà sử học nghệ thuật, chuyên gia thẩm định độc lập có uy tín cao.",
-        "agenda": "Thao túng thị trường đồ cổ cao cấp bằng cách tạo ra những hồ sơ lai lịch giả mạo hoàn hảo.",
-        "competence": "Kiến thức lịch sử uyên thâm, khả năng ngụy tạo giấy tờ và câu chuyện không thể bị phát hiện bằng máy móc.",
-        "constraint": "Không có khả năng tự tay phục chế hay làm giả hiện vật vật lý.",
-        "moralBoundary": "Không quan tâm đến sự thật lịch sử, coi cổ vật chỉ là công cụ để thể hiện trí tuệ thượng đẳng.",
-        "decisionSignature": "Tấn công vào niềm tin và tâm lý của người mua thay vì tranh luận về chất liệu vật lý của món đồ.",
+        "publicIdentity": "Một nhà sử học nghệ thuật danh tiếng, thường xuyên xuất hiện trên truyền hình với tư cách chuyên gia giám định.",
+        "agenda": "Thao túng thị trường đồ cổ bằng cách tạo ra những hồ sơ giả mạo hoàn hảo để hợp thức hóa đồ giả cao cấp.",
+        "competence": "Am hiểu sâu sắc về lịch sử, có khả năng ngụy tạo giấy tờ, nhật ký và bằng chứng sở hữu một cách không tì vết.",
+        "constraint": "Không có kỹ năng thực hành thủ công, phụ thuộc vào thợ làm giả và sợ bị vạch trần bởi những phân tích vật liệu vi mô.",
+        "moralBoundary": "Không có giới hạn đạo đức trong việc bóp méo lịch sử, coi nghệ thuật chỉ là công cụ để kiếm tiền và quyền lực.",
+        "decisionSignature": "Luôn dùng danh tiếng và các bằng chứng giấy tờ để áp đảo những nghi ngờ về mặt kỹ thuật vật lý.",
         "voice": {
-          "summary": "Trịch thượng, học thuật, luôn dùng lý lẽ lịch sử để áp đảo người khác.",
-          "positiveExamples": [
-            "Một món đồ không có lai lịch rõ ràng thì chỉ là cục đất nung vô giá trị, thưa cậu thợ vá.",
-            "Hồ sơ di cư của gia tộc họ Nguyễn năm 1954 đã ghi chép rất rõ về chiếc bình này, cậu lấy tư cách gì để bác bỏ?",
-            "Nghệ thuật thực sự nằm ở câu chuyện mà chúng ta kể cho thế giới nghe."
-          ],
-          "forbiddenPatterns": [
-            "Tôi đã tự tay nung cái bình này đấy.",
-            "Cậu nói đúng, tôi đã sai lầm về chất liệu men.",
-            "Làm sao cậu phát hiện ra vết vá này hay vậy?"
-          ]
+          "summary": "Tự tin, trịch thượng, luôn dùng lý lẽ học thuật để che đậy những lỗ hổng trong câu chuyện của mình.",
+          "register": "Học thuật, bề trên, mang tính áp đặt và thuyết giáo.",
+          "sentenceRhythm": "Mạch lạc, trôi chảy, sử dụng nhiều câu phức để thể hiện sự uyên bác và lấn át người nghe.",
+          "directness": "balanced",
+          "addressRules": "Thường gọi người khác bằng danh xưng trống không hoặc chức danh thấp hơn để hạ thấp họ.",
+          "vocabulary": "Sử dụng dày đặc các thuật ngữ lịch sử, tên các triều đại và các khái niệm trừu tượng.",
+          "stressResponse": "Tỏ ra khinh khỉnh, công kích cá nhân người đặt câu hỏi thay vì trả lời trực tiếp vào vấn đề.",
+          "avoidances": "Tránh tranh luận trực tiếp về các chi tiết vật lý vi mô hoặc thành phần hóa học của hiện vật."
         }
       }
     ],
     "worldClaims": [
       {
-        "id": "claim_vo_anh",
-        "claim": "Kỹ thuật vá vô ảnh chỉ có thể thực hiện thành công trên gốm cổ nếu sử dụng đúng loại men tro bí truyền của Lò Rồng.",
-        "sourceRef": "Nhật ký truyền nghề của gia tộc họ An",
-        "enforcement": "Nếu dùng keo hiện đại, vết vá sẽ tự bung khi nhiệt độ và độ ẩm thay đổi.",
-        "exceptions": "Chỉ có thể dùng keo hiện đại nếu món đồ được bảo quản vĩnh viễn trong tủ kính chân không."
+        "id": "claim_va_vo_anh",
+        "claim": "Kỹ thuật vá vô ảnh chỉ hoạt động hiệu quả trên xương gốm có nguồn gốc đất sét tự nhiên, không tương thích với men công nghiệp.",
+        "sourceRef": "Bí kíp Lò Rồng",
+        "enforcement": "Nếu áp dụng sai vật liệu, vết vá sẽ tự bung ra khi nhiệt độ hoặc độ ẩm môi trường thay đổi.",
+        "exceptions": "Có thể tạm thời đánh lừa mắt thường trong môi trường phòng thí nghiệm được kiểm soát nhiệt độ nghiêm ngặt."
       },
       {
-        "id": "claim_men_cong_nghiep",
-        "claim": "Men công nghiệp hiện đại luôn chứa các tạp chất kim loại nặng có thể nhìn thấy dưới kính hiển vi quang học.",
-        "sourceRef": "Sổ tay giám định vật liệu gốm sứ",
-        "enforcement": "Bất kỳ món đồ giả nào dùng men mới đều bị An lật tẩy khi soi kính hiển vi.",
-        "exceptions": "Trừ khi kẻ làm giả dùng lại men cạo từ các mảnh vỡ cổ khác để nấu lại."
+        "id": "claim_ho_so_so_huu",
+        "claim": "Hồ sơ sở hữu (provenance) quyết định 70% giá trị của một món đồ cổ trên thị trường ngầm tại Hà Nội.",
+        "sourceRef": "Luật ngầm chợ Kim Biên",
+        "enforcement": "Đồ thật không có giấy tờ chỉ bán được giá phế liệu, trong khi đồ giả có hồ sơ đẹp có thể lọt vào nhà đấu giá.",
+        "exceptions": "Những nhà sưu tầm cực đoan chỉ quan tâm đến chất lượng vật lý và sẵn sàng mua đồ không giấy tờ nếu tự tay kiểm chứng được."
       },
       {
-        "id": "claim_ho_so_lai_lich",
-        "claim": "Giá trị của một món đồ cổ tăng gấp nhiều lần nếu nó đi kèm với một hồ sơ sở hữu đáng tin cậy.",
-        "sourceRef": "Quy tắc bất thành văn của giới sưu tầm cao cấp",
-        "enforcement": "Các nhà sưu tầm như ông Lâm chỉ xuống tiền khi câu chuyện lịch sử được xác thực.",
-        "exceptions": "Những tay buôn chợ đen chỉ quan tâm đến chất liệu vàng bạc đính kèm."
+        "id": "claim_men_tro",
+        "claim": "Men tro Lò Rồng chứa một loại khoáng chất đặc thù không thể tổng hợp bằng các phương pháp hóa học hiện đại.",
+        "sourceRef": "Sổ tay vật liệu gốm",
+        "enforcement": "Bất kỳ nỗ lực làm giả men tro nào cũng sẽ bị phát hiện dưới quang phổ kế hoặc kính hiển vi điện tử.",
+        "exceptions": "Chưa có ngoại lệ nào được ghi nhận cho đến khi An tìm ra nguồn nguyên liệu thay thế ở vùng núi phía Bắc."
       },
       {
-        "id": "claim_men_ran_chan_chim",
-        "claim": "Men rạn chân chim là đặc trưng độc quyền của Lò Rồng thời kỳ đầu và không thể sao chép bằng công nghệ nung hiện đại.",
-        "sourceRef": "Ghi chép thất truyền về các lò gốm Bắc Bộ",
-        "enforcement": "Bất kỳ ai nhìn thấy men rạn chân chim thật đều phải công nhận đó là đồ Lò Rồng nguyên bản.",
-        "exceptions": "Những vết rạn do va đập vật lý có thể bị nhầm lẫn nếu không soi kỹ cấu trúc mao mạch."
+        "id": "claim_giao_dich_kin",
+        "claim": "Giới sưu tầm kín luôn ưu tiên giao dịch qua người bảo lãnh uy tín hơn là thông qua các sàn đấu giá công khai.",
+        "sourceRef": "Quy tắc hội sưu tầm",
+        "enforcement": "Người lạ không có bảo lãnh sẽ không bao giờ được tiếp cận các bộ sưu tập thực sự giá trị, dù có nhiều tiền.",
+        "exceptions": "Khi một món đồ mang tính biểu tượng quốc gia xuất hiện, các quy tắc bảo lãnh có thể bị phá vỡ vì lòng tham."
       }
     ],
     "resources": [
       {
         "id": "res_men_tro",
-        "name": "Men tro bí truyền",
+        "name": "Men Tro Lò Rồng",
         "mode": "numeric",
         "unit": "gram",
         "sourceRules": [
-          "Thu thập từ những hũ men cất giấu trong các di tích cũ của gia tộc",
-          "Tự pha chế lại nếu tìm được đủ nguyên liệu thất truyền"
+          "Chỉ có thể lấy từ hũ men gia truyền còn sót lại.",
+          "Sau này có thể tự điều chế nếu tìm được nguyên liệu thay thế."
         ],
         "spendRules": [
-          "Tiêu hao mỗi khi thực hiện kỹ thuật vá vô ảnh",
-          "Đồ càng lớn và phức tạp càng tốn nhiều men"
+          "Tiêu hao mỗi khi thực hiện kỹ thuật vá vô ảnh.",
+          "Lượng tiêu hao phụ thuộc vào kích thước và độ phức tạp của vết nứt."
         ],
         "referenceScale": [
-          "5: Đủ vá một chiếc chén nhỏ",
-          "20: Đủ vá một chiếc bình cỡ trung",
-          "100: Toàn bộ số men tro An được thừa kế ban đầu"
+          "10: Đủ vá một vết nứt nhỏ bằng sợi tóc",
+          "50: Phục chế hoàn chỉnh một chiếc bát vỡ nát",
+          "500: Tổng lượng men tro gia tộc còn lại ở đầu truyện"
         ],
+        "exchangeAnchors": [],
         "minimumValue": 0,
         "maximumValue": 500,
-        "scarcity": "Cực kỳ khan hiếm, là giới hạn sống còn buộc An phải chọn lọc món đồ để phục chế.",
-        "exchangeAnchors": []
+        "scarcity": "Cực kỳ khan hiếm, là tài nguyên không thể tái tạo trong giai đoạn đầu của câu chuyện, tạo áp lực lớn cho mỗi quyết định phục chế."
       },
       {
         "id": "res_uy_tin",
-        "name": "Uy tín giới sưu tầm",
+        "name": "Uy Tín Giới Sưu Tầm",
         "mode": "numeric",
         "unit": "điểm",
         "sourceRules": [
-          "Hoàn thành xuất sắc các ca phục chế khó",
-          "Lật tẩy thành công những món đồ giả mạo có tiếng",
-          "Được các nhân vật máu mặt như ông Lâm bảo chứng"
+          "Tăng lên khi phục chế thành công các món đồ khó.",
+          "Tăng mạnh khi lật tẩy được đồ giả có hồ sơ tinh vi."
         ],
         "spendRules": [
-          "Bị trừ khi giám định sai",
-          "Tiêu hao khi nhờ vả các mối quan hệ để tiếp cận nguồn hàng kín",
-          "Bị giảm sút khi dính vào các tin đồn do đối thủ tung ra"
+          "Giảm sút nếu định giá sai hoặc phục chế hỏng.",
+          "Tiêu hao khi dùng danh tiếng để bảo lãnh cho một món đồ không rõ nguồn gốc."
         ],
         "referenceScale": [
-          "10: Thợ vá thuê vô danh ở chợ Kim Biên",
-          "100: Được các chủ tiệm nhỏ tin tưởng giao đồ",
-          "500: Khách VIP được mời tham gia các buổi đấu giá kín",
-          "1000: Chuyên gia giám định hàng đầu được săn đón"
+          "0: Thợ vô danh tại chợ đồ cũ",
+          "100: Được phép xem hàng trong các bộ sưu tập kín",
+          "500: Được mời làm giám định viên độc lập cho các giao dịch lớn"
+        ],
+        "exchangeAnchors": [
+          {
+            "itemId": "item_xem_hang",
+            "name": "Quyền xem bộ sưu tập kín",
+            "quantity": 1,
+            "unit": "lần",
+            "costAmount": 50,
+            "tolerancePercent": 10
+          },
+          {
+            "itemId": "item_bao_lanh",
+            "name": "Bảo lãnh giao dịch",
+            "quantity": 1,
+            "unit": "thương vụ",
+            "costAmount": 200,
+            "tolerancePercent": 15
+          }
         ],
         "minimumValue": -100,
         "maximumValue": 1000,
-        "scarcity": "Tăng chậm nhưng có thể mất rất nhanh nếu mắc sai lầm chuyên môn.",
-        "exchangeAnchors": []
+        "scarcity": "Khó kiếm nhưng dễ mất, đòi hỏi sự cẩn trọng tuyệt đối trong mọi phát ngôn và quyết định chuyên môn."
       },
       {
-        "id": "res_manh_ghep_lich_su",
-        "name": "Mảnh ghép lịch sử Lò Rồng",
-        "mode": "state",
-        "unit": null,
+        "id": "res_von",
+        "name": "Vốn Lưu Động",
+        "mode": "numeric",
+        "unit": "triệu VNĐ",
         "sourceRules": [
-          "Tìm thấy qua các món đồ gốm Lò Rồng thất lạc",
-          "Giải mã từ nhật ký của tổ tiên",
-          "Khai thác từ lời kể của các nghệ nhân lão thành"
+          "Kiếm được từ việc bán các món đồ đã phục chế.",
+          "Nhận tiền công từ các dịch vụ giám định độc lập."
         ],
         "spendRules": [
-          "Dùng để đối chiếu và vạch trần các hồ sơ giả mạo của Phạm Tôn",
-          "Mở khóa công thức pha chế men tro mới"
+          "Trả nợ cho gia đình.",
+          "Mua lại các món đồ vỡ nát hoặc nguyên liệu phục chế."
         ],
-        "referenceScale": null,
-        "minimumValue": null,
-        "maximumValue": null,
-        "scarcity": "Không thể mua bằng tiền, chỉ xuất hiện khi hoàn thành các chuỗi nhiệm vụ cốt truyện cốt lõi.",
-        "exchangeAnchors": []
+        "referenceScale": [
+          "10: Đủ sống và duy trì xưởng qua một tháng",
+          "100: Đủ vốn để mua các món đồ gốm dân dụng tiềm năng",
+          "1000: Đủ tư cách tham gia đấu giá các món đồ ngự dụng"
+        ],
+        "exchangeAnchors": [
+          {
+            "itemId": "item_gom_vo",
+            "name": "Mảnh gốm vỡ tiềm năng",
+            "quantity": 1,
+            "unit": "món",
+            "costAmount": 5,
+            "tolerancePercent": 20
+          },
+          {
+            "itemId": "item_dung_cu",
+            "name": "Kính hiển vi chuyên dụng",
+            "quantity": 1,
+            "unit": "cái",
+            "costAmount": 30,
+            "tolerancePercent": 5
+          }
+        ],
+        "minimumValue": 0,
+        "maximumValue": 100000,
+        "scarcity": "Luôn trong tình trạng thiếu hụt ở giai đoạn đầu do áp lực nợ nần, buộc nhân vật phải tính toán kỹ lưỡng tỷ suất lợi nhuận."
       }
     ],
     "promises": [
       {
-        "id": "prom_tra_no",
-        "description": "An phải trả hết món nợ khổng lồ do gia đình để lại để giải phóng bản thân khỏi áp lực tài chính.",
-        "payoffCondition": "Tích lũy đủ tiền từ các thương vụ phục chế lớn và thanh toán dứt điểm nợ nần."
+        "id": "prom_no_gia_dinh",
+        "description": "An phải trả dứt điểm món nợ khổng lồ do thế hệ trước để lại để giải phóng bản thân.",
+        "payoffCondition": "Thanh toán toàn bộ nợ gốc và lãi bằng tiền kiếm được từ các thương vụ phục chế chân chính."
       },
       {
-        "id": "prom_su_that_lo_rong",
-        "description": "Khám phá nguyên nhân thực sự khiến Lò Rồng sụp đổ và minh oan cho tổ tiên.",
-        "payoffCondition": "Thu thập đủ các mảnh ghép lịch sử và công bố sự thật trước giới sưu tầm."
+        "id": "prom_bi_mat_lo_rong",
+        "description": "Khám phá nguyên nhân thực sự khiến Lò Rồng của gia tộc sụp đổ trong quá khứ.",
+        "payoffCondition": "Tìm đủ các mảnh nhật ký thất lạc và đối chất thành công với thế lực đã hãm hại gia tộc."
       },
       {
-        "id": "prom_danh_bai_pham_ton",
-        "description": "Lật tẩy bộ mặt thật của Phạm Tôn và phá hủy mạng lưới làm giả hồ sơ lai lịch của hắn.",
-        "payoffCondition": "Đánh bại Phạm Tôn trong một cuộc giám định công khai quy mô lớn bằng bằng chứng vật lý không thể chối cãi."
+        "id": "prom_cong_thuc_men",
+        "description": "Tìm ra cách tái tạo men tro bí truyền trước khi nguồn tài nguyên cuối cùng cạn kiệt.",
+        "payoffCondition": "Thử nghiệm thành công mẻ men mới từ nguyên liệu thay thế tìm được ở vùng núi phía Bắc."
       },
       {
-        "id": "prom_phuc_hoi_cong_thuc",
-        "description": "Tìm lại được công thức pha chế men tro bí truyền để kỹ thuật vá vô ảnh không bị thất truyền.",
-        "payoffCondition": "Tự tay pha chế thành công mẻ men tro mới từ các nguyên liệu thay thế được tìm thấy."
+        "id": "prom_danh_bai_phan_ton",
+        "description": "Lật tẩy đường dây làm giả hồ sơ cổ vật tinh vi của Phan Tôn để làm sạch thị trường.",
+        "payoffCondition": "Chứng minh một 'bảo vật' cấp quốc gia do Phan Tôn bảo lãnh thực chất là đồ giả trước hội đồng giám định."
       }
     ],
     "endingContract": {
-      "emotionalState": "Thanh thản, tự hào và tràn đầy hy vọng khi di sản gia tộc được bảo tồn và phát huy đúng cách.",
-      "materialState": "Trở thành chủ sở hữu của một xưởng phục chế danh tiếng, không còn gánh nặng nợ nần, nắm giữ công thức men tro vô giá.",
-      "worldState": "Thị trường đồ cổ được thanh lọc khỏi những hồ sơ giả mạo, giới sưu tầm quay lại tôn trọng giá trị vật lý và lịch sử chân thực của hiện vật.",
+      "emotionalState": "Thanh thản, tự hào về di sản gia tộc và hoàn toàn tự tin vào con đường của một nghệ nhân chân chính.",
+      "materialState": "Sở hữu một xưởng phục chế danh tiếng, không còn nợ nần, nắm giữ công thức men mới và bộ sưu tập Lò Rồng hoàn chỉnh.",
+      "worldState": "Thị trường đồ cổ được thanh lọc khỏi những hồ sơ giả mạo, giá trị thực sự của gốm Việt cổ được công nhận rộng rãi.",
       "promisesThatMustClose": [
-        "prom_tra_no",
-        "prom_su_that_lo_rong",
-        "prom_danh_bai_pham_ton",
-        "prom_phuc_hoi_cong_thuc"
+        "prom_no_gia_dinh",
+        "prom_bi_mat_lo_rong",
+        "prom_cong_thuc_men",
+        "prom_danh_bai_phan_ton"
       ],
       "targetChapterRange": {
         "min": 800,
@@ -300,49 +320,46 @@
   },
   "arc": {
     "schemaVersion": 3,
-    "arcId": "arc_1_khoi_nghiep_kim_bien",
+    "arcMode": "standard",
+    "arcId": "arc_01_khoi_nghiep_kim_bien",
     "startChapter": 1,
-    "endChapter": 30,
-    "direction": "An vươn lên từ thợ vá thuê bần cùng tại chợ Kim Biên, dùng kỹ thuật vô ảnh để thu hút sự chú ý của giới sưu tầm cao cấp, đồng thời chạm trán mạng lưới làm giả hồ sơ của Phạm Tôn.",
-    "terminalChange": "An thanh toán dứt điểm khoản nợ giang hồ khẩn cấp, thoát khỏi sự chèn ép của Lão Cẩn, trở thành khách mời danh dự của Ông Lâm. Tuy nhiên, lượng men tro bí truyền cạn kiệt xuống mức báo động, và An phát hiện manh mối đầu tiên chứng minh Lò Rồng bị hãm hại.",
+    "endChapter": 25,
+    "direction": "Trần An bắt đầu xây dựng danh tiếng tại chợ Kim Biên, kiếm tiền trả nợ giang hồ và bước đầu tiếp xúc với giới sưu tầm tinh hoa.",
+    "terminalChange": "Trần An thoát khỏi sự kìm kẹp của Lão Cẩn, trả được khoản nợ giang hồ đầu tiên và giành được quyền xem bộ sưu tập kín của Ông Lâm.",
     "activeConflicts": [
       {
-        "id": "conflict_can_boc_lot",
+        "id": "conflict_can_exploitation",
         "actorIds": [
           "char_an",
           "char_can"
         ],
-        "objective": "Lão Cẩn muốn ép An vá đồ giả để lừa khách lấy tiền hoa hồng cao, trong khi An kiên quyết bảo vệ nguyên tắc không làm giả cổ vật.",
-        "leverage": "Lão Cẩn nắm giữ nguồn hàng phế liệu mà An cần để tìm kiếm cổ vật thật, đồng thời biết rõ áp lực nợ nần của An.",
-        "nextMove": "Lão Cẩn gài bẫy giao cho An một chiếc bình mộc mới tinh nhưng yêu cầu phủ men tro để giả làm đồ cổ thời Nguyễn."
+        "objective": "Lão Cẩn muốn ép An vá một chiếc bình giả cổ để lừa khách sộp, trong khi An kiên quyết từ chối làm giả.",
+        "leverage": "Lão Cẩn nắm giữ thông tin về một mảnh vỡ Lò Rồng mà An đang tìm kiếm, đe dọa sẽ bán cho người khác.",
+        "nextMove": "Lão Cẩn thuê giang hồ đến quấy rối xưởng của An để ép cậu phải nhận lời phục chế chiếc bình giả."
       },
       {
-        "id": "conflict_giam_dinh_ong_lam",
+        "id": "conflict_fake_provenance_intro",
         "actorIds": [
           "char_an",
           "char_lam",
           "char_ton"
         ],
-        "objective": "An muốn chứng minh bộ ấm chén ngự dụng là đồ giả mạo tinh vi, trong khi phe cánh của Phạm Tôn dùng hồ sơ giả để thuyết phục Ông Lâm mua với giá trên trời.",
-        "leverage": "Phạm Tôn có giấy tờ chứng minh nguồn gốc hoàn hảo và uy tín học thuật. An chỉ có kính hiển vi cầm tay và kiến thức về tạp chất men công nghiệp.",
-        "nextMove": "An sẽ can thiệp trực tiếp vào buổi giao dịch kín của Ông Lâm, đập vỡ một chiếc chén để soi cấu trúc xương gốm trước mặt mọi người."
+        "objective": "An muốn chứng minh chiếc bát ngự dụng mà Ông Lâm định mua là đồ giả, dù nó có giấy tờ chứng nhận của Phan Tôn.",
+        "leverage": "Phan Tôn có uy tín tuyệt đối trong giới học thuật và giấy tờ hoàn hảo, trong khi An chỉ là thợ vô danh.",
+        "nextMove": "An sử dụng kính hiển vi và phân tích tạp chất đất sét để chỉ ra điểm sai lệch vật lý không thể chối cãi."
       }
     ],
     "duePromiseIds": [
-      "prom_tra_no"
+      "prom_no_gia_dinh"
     ],
     "progressionBudget": [
       {
-        "signal": "Số lượng men tro còn lại",
-        "requiredChange": "Giảm mạnh từ 100 gram xuống dưới 30 gram do phải thực hiện hai ca phục chế vô ảnh quy mô lớn để lấy tiền trả nợ, tạo áp lực phải tìm công thức mới."
+        "signal": "Tăng lượng vốn lưu động",
+        "requiredChange": "An kiếm được khoản tiền lớn từ việc phục chế chiếc bát Lò Rồng, đủ trả nợ tháng và mua kính hiển vi chuyên dụng."
       },
       {
-        "signal": "Cấp độ của nhà sưu tầm tiếp cận được",
-        "requiredChange": "Thăng cấp từ việc chỉ giao dịch với con buôn chợ trời (Lão Cẩn) sang việc được bước vào phòng trà VIP và thẩm định đồ cho nhà sưu tầm ẩn danh (Ông Lâm)."
-      },
-      {
-        "signal": "Số trang nhật ký gia tộc thu thập được",
-        "requiredChange": "Tìm thấy 3 trang nhật ký đầu tiên được giấu kín trong lớp đáy kép của một chiếc bát Lò Rồng vỡ, hé lộ sự tồn tại của kẻ phản bội."
+        "signal": "Mở rộng mạng lưới nhà sưu tầm",
+        "requiredChange": "An được Ông Lâm công nhận tài năng, chính thức bước chân vào giới sưu tầm kín và thoát khỏi tầng đáy chợ Kim Biên."
       }
     ]
   },
@@ -352,22 +369,40 @@
     "facts": [
       {
         "id": "fact_an_debt",
-        "value": "An đang gánh khoản nợ khổng lồ do gia đình để lại sau khi Lò Rồng sụp đổ.",
-        "sourceChapter": 0
+        "value": "Trần An đang gánh một khoản nợ khổng lồ do gia đình để lại sau sự sụp đổ của Lò Rồng.",
+        "sourceChapter": 0,
+        "scope": "arc",
+        "status": "active"
       },
       {
-        "id": "fact_men_tro_secret",
-        "value": "An sở hữu 100 gram men tro bí truyền cuối cùng của gia tộc.",
-        "sourceChapter": 0
+        "id": "fact_men_tro_depletion",
+        "value": "Lượng men tro bí truyền của gia tộc Trần chỉ còn lại một hũ nhỏ, không thể tái tạo bằng phương pháp thông thường.",
+        "sourceChapter": 0,
+        "scope": "invariant",
+        "status": "active"
+      },
+      {
+        "id": "fact_market_manipulation",
+        "value": "Thị trường đồ cổ Hà Thành đang bị thao túng bởi các hồ sơ giả mạo tinh vi do Phan Tôn đứng sau.",
+        "sourceChapter": 0,
+        "scope": "arc",
+        "status": "active"
       }
     ],
     "timeline": [
       {
         "chapter": 0,
-        "startMinute": 0,
+        "startMinute": 480,
         "durationMinutes": 60,
         "locationId": "cho_kim_bien",
-        "event": "An dọn đồ nghề phục chế ra góc chợ Kim Biên để bắt đầu ngày làm việc mới."
+        "event": "Trần An mở cửa gian hàng xập xệ tại chợ đồ cũ, kiểm tra lại hũ men tro gia truyền và các dụng cụ phục chế."
+      },
+      {
+        "chapter": 0,
+        "startMinute": 540,
+        "durationMinutes": 30,
+        "locationId": "cho_kim_bien",
+        "event": "Lão Cẩn ghé qua gian hàng của An, ném xuống một mảnh gốm vỡ và yêu cầu phục chế với giá bèo bọt."
       }
     ],
     "characters": [
@@ -379,15 +414,15 @@
           {
             "factId": "fact_an_debt",
             "learnedChapter": 0,
-            "source": "Trực tiếp trải qua biến cố gia đình phá sản."
+            "source": "Ký ức đau buồn từ ngày gia đình phá sản và các giấy tờ vay nợ."
           },
           {
-            "factId": "fact_men_tro_secret",
+            "factId": "fact_men_tro_depletion",
             "learnedChapter": 0,
-            "source": "Được cha truyền lại trước khi qua đời."
+            "source": "Tự tay kiểm tra và đong đếm lượng men còn lại trong hũ mỗi ngày."
           }
         ],
-        "relationshipState": "Cô độc, chỉ giao tiếp với khách hàng và chủ nợ."
+        "relationshipState": "Sống khép kín, đơn độc gánh vác nợ nần, luôn giữ khoảng cách an toàn với những tay buôn lọc lõi ở chợ."
       },
       {
         "characterId": "char_can",
@@ -397,24 +432,30 @@
           {
             "factId": "fact_an_debt",
             "learnedChapter": 0,
-            "source": "Nghe đồn đại từ những người buôn bán trong chợ Kim Biên."
+            "source": "Nghe ngóng được từ những lời đồn thổi của giới giang hồ đòi nợ ở khu chợ."
           }
         ],
-        "relationshipState": "Coi An là một thợ vá rẻ tiền có thể lợi dụng để kiếm lời."
+        "relationshipState": "Coi Trần An là một công cụ kiếm tiền rẻ mạt, thường xuyên lợi dụng hoàn cảnh khó khăn để ép giá nhân công."
       },
       {
         "characterId": "char_lam",
         "status": "alive",
-        "locationId": "quan_tra_an_danh",
+        "locationId": "biet_thu_lam_tra",
         "knowledge": [],
-        "relationshipState": "Chưa biết đến sự tồn tại của An."
+        "relationshipState": "Chưa hề biết đến sự tồn tại của Trần An, chỉ giao du với tầng lớp tinh hoa và các chuyên gia có tiếng."
       },
       {
         "characterId": "char_ton",
         "status": "alive",
         "locationId": "vien_nghien_cuu",
-        "knowledge": [],
-        "relationshipState": "Đang tận hưởng danh tiếng chuyên gia hàng đầu, không bận tâm đến thợ vô danh."
+        "knowledge": [
+          {
+            "factId": "fact_market_manipulation",
+            "learnedChapter": 0,
+            "source": "Chính bản thân là kẻ chủ mưu thiết lập và điều hành đường dây làm giả hồ sơ."
+          }
+        ],
+        "relationshipState": "Tự mãn với quyền lực và danh tiếng hiện tại, không coi những thợ phục chế nhỏ lẻ ở chợ búa ra gì."
       }
     ],
     "resources": [
@@ -422,59 +463,61 @@
         "resourceId": "res_men_tro",
         "value": {
           "mode": "numeric",
-          "amount": 100,
+          "amount": 500,
           "unit": "gram"
         },
-        "source": "Thừa kế từ hũ men cất giấu cuối cùng của gia tộc Lò Rồng.",
+        "source": "Di sản cuối cùng được cất giữ cẩn thận trong hũ men sành của dòng họ Trần.",
         "lastChangedChapter": 0
       },
       {
         "resourceId": "res_uy_tin",
         "value": {
           "mode": "numeric",
-          "amount": 10,
+          "amount": 0,
           "unit": "điểm"
         },
-        "source": "Làm thợ vá thuê lặt vặt tại chợ đồ cũ Kim Biên.",
+        "source": "Chưa có bất kỳ tiếng tăm nào trong giới sưu tầm, chỉ là một thợ vô danh tại chợ.",
         "lastChangedChapter": 0
       },
       {
-        "resourceId": "res_manh_ghep_lich_su",
+        "resourceId": "res_von",
         "value": {
-          "mode": "state",
-          "value": "Chưa có manh mối nào ngoài cuốn sổ tay sờn rách của ông nội."
+          "mode": "numeric",
+          "amount": 10,
+          "unit": "triệu VNĐ"
         },
-        "source": "Di vật duy nhất còn sót lại sau khi gia đình phá sản.",
+        "source": "Số tiền tiết kiệm ít ỏi còn sót lại sau khi đóng lãi tháng cho bọn đòi nợ.",
         "lastChangedChapter": 0
       }
     ],
     "promises": [
       {
-        "promiseId": "prom_tra_no",
+        "promiseId": "prom_no_gia_dinh",
         "status": "open",
-        "pressure": "Chủ nợ liên tục đến xưởng đe dọa, yêu cầu trả lãi hàng tháng nếu không sẽ siết đồ nghề."
+        "pressure": "Bọn đòi nợ liên tục gửi tin nhắn đe dọa sẽ đập phá xưởng phục chế nếu không đóng đủ lãi tháng tới."
       },
       {
-        "promiseId": "prom_su_that_lo_rong",
+        "promiseId": "prom_bi_mat_lo_rong",
         "status": "open",
-        "pressure": "Những lời đồn đại ác ý về việc Lò Rồng làm đồ giả vẫn lưu truyền trong giới sưu tầm."
+        "pressure": "Những mảnh nhật ký cháy dở của cha luôn ám ảnh An mỗi đêm, thôi thúc cậu tìm ra kẻ thủ ác."
       },
       {
-        "promiseId": "prom_danh_bai_pham_ton",
+        "promiseId": "prom_cong_thuc_men",
         "status": "open",
-        "pressure": "Phạm Tôn đang ngày càng thâu tóm thị trường bằng các hồ sơ giả mạo tinh vi, làm lũng đoạn giá trị thật."
+        "pressure": "Mỗi lần thực hiện kỹ thuật vá vô ảnh, lượng men trong hũ lại vơi đi, đe dọa làm mất đi sinh kế duy nhất."
       },
       {
-        "promiseId": "prom_phuc_hoi_cong_thuc",
+        "promiseId": "prom_danh_bai_phan_ton",
         "status": "open",
-        "pressure": "Số lượng men tro còn lại rất ít, chỉ đủ cho vài lần phục chế quan trọng, buộc An phải dè sẻn."
+        "pressure": "Nhìn thấy những món đồ giả mạo lịch sử được tung hô trên truyền hình khiến lương tâm nghề nghiệp của An bị cắn rứt."
       }
     ],
-    "recentSummary": "Khởi đầu câu chuyện. An đang chật vật mưu sinh tại chợ đồ cũ Kim Biên với khoản nợ khổng lồ trên vai và chút men tro bí truyền còn sót lại.",
-    "previousEnding": "Chưa có sự kiện nào diễn ra trước thời điểm này.",
+    "recentSummary": "Trần An, truyền nhân cuối cùng của dòng họ gốm Lò Rồng, đang chật vật mưu sinh tại khu chợ đồ cũ Kim Biên. Gánh trên vai khoản nợ khổng lồ từ sự sụp đổ bí ẩn của gia tộc, cậu phải dùng kỹ thuật vá vô ảnh tuyệt đỉnh để phục chế những món đồ gốm vỡ nát, bán lại cho các tay buôn như Lão Cẩn với giá rẻ mạt. Trong khi đó, thị trường đồ cổ cao cấp đang bị lũng đoạn bởi những kẻ làm giả hồ sơ tinh vi như Giáo sư Tôn, khiến những giá trị lịch sử chân chính bị chà đạp.",
+    "previousEnding": "An cẩn thận cất hũ men tro gia truyền vào ngăn tủ khóa kín. Nhìn lượng bột xám xịt chỉ còn lại một nửa, cậu khẽ thở dài, biết rằng mình không thể mãi bán rẻ tài năng và di sản của tổ tiên cho những kẻ như Lão Cẩn. Tiếng chuông điện thoại vang lên, một tin nhắn đòi nợ mới lại đến, báo hiệu một ngày giông bão sắp bắt đầu.",
     "retrievalNotes": [
-      "Khởi tạo trạng thái ban đầu cho chương 0",
-      "Thiết lập vị trí các nhân vật tại chợ Kim Biên và các địa điểm khác"
+      "Nhấn mạnh sự khan hiếm tột độ của men tro Lò Rồng ngay từ đầu.",
+      "Thể hiện rõ sự chênh lệch địa vị giữa An và các nhân vật như ông Lâm, Phan Tôn.",
+      "Khắc họa tính cách điềm tĩnh nhưng kiên quyết bảo vệ nguyên bản hiện vật của An."
     ]
   },
   "initialWindow": {
@@ -484,12 +527,12 @@
       {
         "schemaVersion": 3,
         "chapterNumber": 1,
-        "elapsedMinutesSincePreviousChapter": 0,
-        "chapterPromise": "An đối mặt với cám dỗ làm giả đồ cổ từ Lão Cẩn và tìm thấy một cơ hội đổi đời trong đống phế liệu.",
+        "elapsedMinutesSincePreviousChapter": 60,
+        "chapterPromise": "Trần An phải đối mặt với sự chèn ép của Lão Cẩn và tìm cách kiếm tiền trả nợ khẩn cấp.",
         "preconditions": [
           {
             "factId": "fact_an_debt",
-            "expectedValue": "An đang gánh khoản nợ khổng lồ do gia đình để lại sau khi Lò Rồng sụp đổ."
+            "expectedValue": "Trần An đang gánh một khoản nợ khổng lồ do gia đình để lại sau sự sụp đổ của Lò Rồng."
           }
         ],
         "scenes": [
@@ -501,94 +544,75 @@
               "char_can"
             ],
             "locationId": "cho_kim_bien",
-            "durationMinutes": 30,
+            "durationMinutes": 20,
             "travelMinutesFromPrevious": 0,
-            "desire": "An muốn yên ổn làm công việc phục chế chân chính để kiếm tiền trả nợ một cách sạch sẽ.",
-            "opposition": "Lão Cẩn ép buộc An phải dùng kỹ thuật gia truyền để làm giả một chiếc bình mộc nhằm lừa đảo khách hàng.",
-            "tactic": "An kiên quyết từ chối lời đề nghị của Lão Cẩn bằng cách viện cớ nguyên tắc nghề nghiệp không cho phép phá hoại đồ thật.",
-            "cost": "An làm phật ý Lão Cẩn, dẫn đến nguy cơ bị cắt đứt nguồn cung cấp phế liệu gốm sứ giá rẻ tại chợ.",
-            "payoff": "An bảo vệ được ranh giới đạo đức của bản thân và giữ gìn danh dự cho kỹ thuật vá vô ảnh của gia tộc.",
-            "irreversibleChange": "Mối quan hệ hợp tác lỏng lẻo giữa An và Lão Cẩn bắt đầu rạn nứt do sự khác biệt về nguyên tắc làm nghề.",
-            "informationDelta": "An nhận ra Lão Cẩn đang âm mưu một phi vụ lừa đảo lớn và có thể sẽ tìm cách hãm hại mình nếu không hợp tác.",
+            "objective": "Từ chối yêu cầu phục chế chiếc bình giả của Lão Cẩn để bảo vệ nguyên tắc nghề nghiệp.",
+            "obstacle": "Lão Cẩn đe dọa sẽ gọi giang hồ đến siết nợ ngay lập tức nếu An không chịu nghe lời.",
+            "action": "An kiên quyết từ chối, chấp nhận rủi ro bị giang hồ quấy phá để giữ vững nguyên tắc không làm giả đồ cổ.",
+            "worldClaimIds": [],
             "hookIntent": "threat_arrives",
-            "unresolvedQuestion": "Liệu Lão Cẩn có dùng khoản nợ giang hồ để ép buộc An phải tuân theo mệnh lệnh làm giả đồ cổ hay không?",
             "requiredDeltaIds": [
-              "delta_1_1",
-              "delta_1_2"
+              "delta_1_1"
             ]
           },
           {
             "id": "scene_1_2",
             "povCharacterId": "char_an",
             "participantIds": [
-              "char_an",
-              "char_can"
+              "char_an"
             ],
             "locationId": "cho_kim_bien",
-            "durationMinutes": 30,
-            "travelMinutesFromPrevious": 0,
-            "desire": "An muốn tìm kiếm một món đồ có giá trị thực sự trong đống phế liệu để tự mình phục chế và bán lấy tiền.",
-            "opposition": "Đống phế liệu của Lão Cẩn chứa toàn rác rưởi vô giá trị, đòi hỏi An phải có con mắt tinh đời mới nhìn ra ngọc trong đá.",
-            "tactic": "An sử dụng kính lúp cầm tay để soi xét tỉ mỉ từng mảnh vỡ, tìm kiếm dấu vết của cốt đất và men cổ.",
-            "cost": "An phải bỏ ra một số tiền nhỏ nhoi cuối cùng trong túi để mua lại chiếc bát vỡ nát từ tay Lão Cẩn.",
-            "payoff": "An phát hiện ra một chiếc bát cổ thật sự bị vùi lấp trong đống rác, mở ra cơ hội kiếm được một khoản tiền lớn.",
-            "irreversibleChange": "Chiếc bát vỡ chính thức thuộc quyền sở hữu của An, trở thành vật phẩm thử nghiệm cho kỹ thuật vá vô ảnh.",
-            "informationDelta": "An xác nhận được giá trị tiềm năng của chiếc bát vỡ thông qua việc nhận diện lớp men rạn đặc trưng.",
+            "durationMinutes": 45,
+            "travelMinutesFromPrevious": 10,
+            "objective": "Mua một mảnh gốm vỡ tiềm năng để phục chế bán lấy tiền trả nợ.",
+            "obstacle": "Vốn liếng chỉ còn đúng 10 triệu, phải chọn lựa cực kỳ cẩn thận để không bị mất trắng.",
+            "action": "An dùng xúc giác nhận diện một mảnh gốm thật lẫn trong đống đồ phế liệu và quyết định mua nó.",
+            "worldClaimIds": [],
             "hookIntent": "opportunity_opens",
-            "unresolvedQuestion": "Liệu An có đủ lượng men tro bí truyền để phục chế hoàn hảo chiếc bát vỡ nát này hay không?",
             "requiredDeltaIds": [
-              "delta_1_3",
-              "delta_1_4"
+              "delta_1_2"
             ]
           }
         ],
         "requiredDeltas": [
           {
             "id": "delta_1_1",
-            "kind": "fact",
-            "factId": "fact_can_fake_plot",
-            "valueBefore": null,
-            "valueAfter": "Lão Cẩn âm mưu dùng men tro của An để làm giả một chiếc bình mộc thành đồ cổ thời Nguyễn.",
+            "kind": "promise",
+            "promiseId": "prom_no_gia_dinh",
+            "statusAfter": "advanced",
+            "pressureAfter": "Giang hồ do Lão Cẩn gọi đến đã bắt đầu lảng vảng quanh xưởng đe dọa.",
             "evidenceRequired": true
           },
           {
             "id": "delta_1_2",
-            "kind": "character_knowledge",
-            "characterId": "char_an",
-            "factId": "fact_can_fake_plot",
-            "learnedFrom": "Nghe trực tiếp từ lời đề nghị mờ ám của Lão Cẩn.",
-            "evidenceRequired": true
-          },
-          {
-            "id": "delta_1_3",
-            "kind": "fact",
-            "factId": "fact_broken_bowl_potential",
-            "valueBefore": null,
-            "valueAfter": "Một chiếc bát vỡ nát trong đống phế liệu của Lão Cẩn thực chất là đồ cổ thật có giá trị cao.",
-            "evidenceRequired": true
-          },
-          {
-            "id": "delta_1_4",
-            "kind": "character_knowledge",
-            "characterId": "char_an",
-            "factId": "fact_broken_bowl_potential",
-            "learnedFrom": "Quan sát lớp men và cốt đất qua kính lúp cầm tay.",
+            "kind": "resource_numeric",
+            "resourceId": "res_von",
+            "before": 10,
+            "delta": -5,
+            "after": 5,
+            "unit": "triệu VNĐ",
+            "source": "Tiền tiết kiệm cá nhân",
+            "sink": "Mua mảnh gốm vỡ tiềm năng từ một người bán dạo",
+            "transactionKind": "purchase",
+            "consideration": [
+              {
+                "itemId": "item_gom_vo",
+                "name": "Mảnh gốm vỡ tiềm năng",
+                "quantity": 1,
+                "unit": "món"
+              }
+            ],
             "evidenceRequired": true
           }
         ],
-        "nextChapterPressure": "An phải nhanh chóng xác định nguồn gốc chiếc bát và tiến hành phục chế trước khi chủ nợ tìm đến xưởng."
+        "nextChapterPressure": "An phải nhanh chóng phục chế mảnh gốm vỡ trước khi đám giang hồ ập đến đập phá xưởng."
       },
       {
         "schemaVersion": 3,
         "chapterNumber": 2,
-        "elapsedMinutesSincePreviousChapter": 30,
-        "chapterPromise": "An giải mã nguồn gốc chiếc bát vỡ và đánh cược lượng men tro quý giá để thực hiện kỹ thuật vá vô ảnh.",
-        "preconditions": [
-          {
-            "factId": "fact_broken_bowl_potential",
-            "expectedValue": "Một chiếc bát vỡ nát trong đống phế liệu của Lão Cẩn thực chất là đồ cổ thật có giá trị cao."
-          }
-        ],
+        "elapsedMinutesSincePreviousChapter": 720,
+        "chapterPromise": "Trần An sử dụng kỹ thuật vá vô ảnh và men tro bí truyền để phục hồi mảnh gốm vỡ.",
+        "preconditions": [],
         "scenes": [
           {
             "id": "scene_2_1",
@@ -596,21 +620,18 @@
             "participantIds": [
               "char_an"
             ],
-            "locationId": "xuong_phuc_che",
-            "durationMinutes": 60,
-            "travelMinutesFromPrevious": 15,
-            "desire": "An muốn xác định chính xác nguồn gốc và niên đại của chiếc bát vỡ để lên kế hoạch phục chế phù hợp.",
-            "opposition": "Lớp bụi bẩn và những vết nứt chằng chịt làm mờ đi các đặc điểm nhận dạng quan trọng của chiếc bát.",
-            "tactic": "An mang chiếc bát về xưởng, làm sạch cẩn thận và đặt dưới kính hiển vi để phân tích cấu trúc mao mạch.",
-            "cost": "An tiêu tốn nhiều giờ đồng hồ căng thẳng để soi chiếu từng milimet bề mặt, khiến đôi mắt trở nên mệt mỏi.",
-            "payoff": "An khẳng định chắc chắn chiếc bát là sự kết hợp độc đáo giữa cốt đất Cảnh Đức Trấn và men rạn Lò Rồng.",
-            "irreversibleChange": "Giá trị lịch sử của chiếc bát được An giải mã hoàn toàn, biến nó từ phế liệu thành một cổ vật quý hiếm.",
-            "informationDelta": "An hiểu rõ cấu trúc vật lý của chiếc bát, từ đó quyết định được nhiệt độ và lượng men tro cần thiết để vá.",
-            "hookIntent": "truth_reframed",
-            "unresolvedQuestion": "Tại sao một chiếc bát mang đặc trưng của Lò Rồng lại lưu lạc đến đống phế liệu ở chợ Kim Biên?",
+            "locationId": "cho_kim_bien",
+            "durationMinutes": 180,
+            "travelMinutesFromPrevious": 0,
+            "objective": "Phục chế mảnh gốm vỡ bằng kỹ thuật vá vô ảnh gia truyền.",
+            "obstacle": "Vết nứt phức tạp đòi hỏi sự tập trung cao độ và tiêu tốn lượng men tro quý giá.",
+            "action": "An cẩn thận pha chế men tro và tỉ mỉ vá lại từng đường nứt trên hiện vật trong tĩnh lặng.",
+            "worldClaimIds": [
+              "claim_va_vo_anh"
+            ],
+            "hookIntent": "cost_revealed",
             "requiredDeltaIds": [
-              "delta_2_1",
-              "delta_2_2"
+              "delta_2_1"
             ]
           },
           {
@@ -619,101 +640,80 @@
             "participantIds": [
               "char_an"
             ],
-            "locationId": "xuong_phuc_che",
-            "durationMinutes": 120,
+            "locationId": "cho_kim_bien",
+            "durationMinutes": 30,
             "travelMinutesFromPrevious": 0,
-            "desire": "An muốn sử dụng kỹ thuật vá vô ảnh để khôi phục chiếc bát về trạng thái hoàn mỹ nguyên bản.",
-            "opposition": "Kỹ thuật này đòi hỏi sự chính xác tuyệt đối về nhiệt độ và tiêu tốn một lượng men tro bí truyền vô cùng quý giá.",
-            "tactic": "An cẩn thận pha chế men tro, đắp lên các vết nứt và sử dụng đèn khò nhiệt độ cao để nung chảy lớp men.",
-            "cost": "An vĩnh viễn mất đi 5 gram men tro bí truyền không thể tái tạo, làm cạn kiệt thêm nguồn tài nguyên sống còn.",
-            "payoff": "Chiếc bát được phục chế hoàn hảo đến mức không thể nhìn thấy vết nứt bằng mắt thường, trở thành một kiệt tác.",
-            "irreversibleChange": "Lượng men tro của An giảm xuống mức báo động, buộc anh phải cẩn trọng hơn trong các quyết định phục chế tương lai.",
-            "informationDelta": "An chứng minh được kỹ thuật vá vô ảnh của gia tộc vẫn hoạt động hoàn hảo trên thực tế.",
-            "hookIntent": "cost_revealed",
-            "unresolvedQuestion": "Với lượng men tro ngày càng cạn kiệt, An sẽ làm thế nào để duy trì công việc phục chế trong tương lai?",
+            "objective": "Kiểm tra lại hiện vật sau khi phục chế hoàn tất.",
+            "obstacle": "Lớp men cũ có dấu hiệu lạ cần được làm sạch cẩn thận để lộ bản chất thực sự.",
+            "action": "An dùng dung dịch đặc biệt lau sạch, phát hiện ra dấu triện ẩn dưới đáy bình.",
+            "worldClaimIds": [],
+            "hookIntent": "truth_reframed",
             "requiredDeltaIds": [
-              "delta_2_3",
-              "delta_2_4"
+              "delta_2_2",
+              "delta_2_3"
             ]
           }
         ],
         "requiredDeltas": [
           {
             "id": "delta_2_1",
-            "kind": "fact",
-            "factId": "fact_bowl_origin",
-            "valueBefore": null,
-            "valueAfter": "Chiếc bát vỡ mang đặc trưng cốt đất Cảnh Đức Trấn nhưng lại có lớp men rạn chân chim của Lò Rồng.",
+            "kind": "resource_numeric",
+            "resourceId": "res_men_tro",
+            "before": 500,
+            "delta": -50,
+            "after": 450,
+            "unit": "gram",
+            "source": "Hũ men tro gia truyền",
+            "sink": "Sử dụng men tro để vá vô ảnh chiếc bình gốm vỡ",
+            "transactionKind": "consume",
+            "consideration": [],
             "evidenceRequired": true
           },
           {
             "id": "delta_2_2",
-            "kind": "character_knowledge",
-            "characterId": "char_an",
-            "factId": "fact_bowl_origin",
-            "learnedFrom": "Phân tích cấu trúc mao mạch vết rạn dưới kính hiển vi.",
+            "kind": "fact",
+            "factId": "fact_binh_gom_origin",
+            "valueBefore": null,
+            "valueAfter": "Chiếc bình gốm vỡ thực chất là đồ ngự dụng triều Lê sơ có giá trị cao.",
             "evidenceRequired": true
           },
           {
             "id": "delta_2_3",
-            "kind": "resource_numeric",
-            "resourceId": "res_men_tro",
-            "before": 100,
-            "delta": -5,
-            "after": 95,
-            "unit": "gram",
-            "source": "Tiêu hao trong quá trình nung chảy để vá vô ảnh chiếc bát.",
-            "sink": "Hòa quyện vĩnh viễn vào các vết nứt của chiếc bát cổ.",
-            "evidenceRequired": true,
-            "consideration": [],
-            "transactionKind": "consume"
-          },
-          {
-            "id": "delta_2_4",
-            "kind": "fact",
-            "factId": "fact_bowl_repaired",
-            "valueBefore": null,
-            "valueAfter": "Chiếc bát vỡ đã được phục chế hoàn hảo không tì vết bằng kỹ thuật vá vô ảnh.",
+            "kind": "character_knowledge",
+            "characterId": "char_an",
+            "factId": "fact_binh_gom_origin",
+            "learnedFrom": "Tự tay làm sạch và soi rõ dấu triện ẩn dưới đáy bình gốm.",
             "evidenceRequired": true
           }
         ],
-        "nextChapterPressure": "An phải mang chiếc bát đã phục chế ra chợ bán để lấy tiền trả nợ, đối mặt với sự dòm ngó của Lão Cẩn."
+        "nextChapterPressure": "An cần tìm được người mua xứng tầm để bán chiếc bình ngự dụng với giá cao nhất."
       },
       {
         "schemaVersion": 3,
         "chapterNumber": 3,
-        "elapsedMinutesSincePreviousChapter": 720,
-        "chapterPromise": "An bán chiếc bát phục chế, thu hút sự chú ý của Ông Lâm và bước đầu giải quyết khoản nợ khẩn cấp.",
-        "preconditions": [
-          {
-            "factId": "fact_bowl_repaired",
-            "expectedValue": "Chiếc bát vỡ đã được phục chế hoàn hảo không tì vết bằng kỹ thuật vá vô ảnh."
-          }
-        ],
+        "elapsedMinutesSincePreviousChapter": 600,
+        "chapterPromise": "Trần An bán chiếc bình ngự dụng để giải quyết món nợ giang hồ trước mắt.",
+        "preconditions": [],
         "scenes": [
           {
             "id": "scene_3_1",
             "povCharacterId": "char_an",
             "participantIds": [
               "char_an",
-              "char_can",
               "char_lam"
             ],
-            "locationId": "cho_kim_bien",
-            "durationMinutes": 30,
-            "travelMinutesFromPrevious": 15,
-            "desire": "An muốn bán chiếc bát đã phục chế với giá cao để có tiền trang trải khoản nợ đang đến hạn.",
-            "opposition": "Lão Cẩn nhận ra chiếc bát và cố tình dìm giá, dùng những lời lẽ xảo biện để ép An bán rẻ.",
-            "tactic": "An giữ thái độ điềm tĩnh, từ chối mức giá bèo bọt của Lão Cẩn và công khai trưng bày chiếc bát cho mọi người xem.",
-            "cost": "An đối mặt với sự chế giễu của những kẻ buôn bán thiếu hiểu biết trong chợ khi họ hùa theo Lão Cẩn.",
-            "payoff": "Sự kiên định của An thu hút sự chú ý của Ông Lâm, một nhà sưu tầm ẩn danh đang đi dạo qua khu chợ.",
-            "irreversibleChange": "Ông Lâm chính thức bước vào cuộc đời An, mở ra một cánh cửa mới kết nối với giới sưu tầm cao cấp.",
-            "informationDelta": "Ông Lâm nhận ra tài năng xuất chúng của An thông qua việc quan sát kỹ thuật phục chế trên chiếc bát.",
-            "hookIntent": "relationship_turns",
-            "unresolvedQuestion": "Ông Lâm là ai và sự xuất hiện của ông ta sẽ mang lại cơ hội hay rắc rối mới cho An?",
+            "locationId": "biet_thu_lam_tra",
+            "durationMinutes": 60,
+            "travelMinutesFromPrevious": 45,
+            "objective": "Chào bán chiếc bình ngự dụng triều Lê sơ cho Ông Lâm.",
+            "obstacle": "Ông Lâm nghi ngờ nguồn gốc vì An chỉ là một thợ vô danh ở chợ Kim Biên.",
+            "action": "An giải thích cặn kẽ về kỹ thuật nung và dấu triện, thuyết phục được Ông Lâm mua với giá cao.",
+            "worldClaimIds": [
+              "claim_ho_so_so_huu"
+            ],
+            "hookIntent": "opportunity_opens",
             "requiredDeltaIds": [
-              "delta_3_1",
-              "delta_3_2"
+              "delta_3_1"
             ]
           },
           {
@@ -721,95 +721,67 @@
             "povCharacterId": "char_an",
             "participantIds": [
               "char_an",
-              "char_lam"
+              "char_can"
             ],
             "locationId": "cho_kim_bien",
-            "durationMinutes": 30,
-            "travelMinutesFromPrevious": 0,
-            "desire": "Ông Lâm muốn sở hữu chiếc bát cổ được phục chế hoàn hảo và kiểm chứng tài năng thực sự của An.",
-            "opposition": "An vẫn còn e ngại người lạ và không muốn bán món đồ tâm huyết cho một kẻ không hiểu giá trị của nó.",
-            "tactic": "Ông Lâm thể hiện kiến thức uyên bác về gốm sứ và đưa ra một mức giá vô cùng hậu hĩnh để thuyết phục An.",
-            "cost": "An phải giao lại chiếc bát mà mình đã dồn nhiều tâm huyết phục chế cho một người mới gặp lần đầu.",
-            "payoff": "An nhận được một khoản tiền lớn đủ để trả bớt nợ và giành được sự tôn trọng từ một nhân vật máu mặt.",
-            "irreversibleChange": "Uy tín của An trong giới đồ cổ tăng vọt, thoát khỏi cái mác thợ vá thuê rẻ tiền tại chợ Kim Biên.",
-            "informationDelta": "An nhận được lời mời đến quán trà ẩn danh của Ông Lâm, đánh dấu bước tiến vào thế giới sưu tầm thượng lưu.",
-            "hookIntent": "opportunity_opens",
-            "unresolvedQuestion": "Món đồ quan trọng mà Ông Lâm muốn An thẩm định tại quán trà ẩn danh thực chất là thứ gì?",
+            "durationMinutes": 20,
+            "travelMinutesFromPrevious": 45,
+            "objective": "Trả nợ cho đám giang hồ do Lão Cẩn gọi đến.",
+            "obstacle": "Lão Cẩn cố tình tính thêm lãi suất vô lý để bòn rút tiền của An.",
+            "action": "An ném cọc tiền trả đủ gốc và lãi cũ, dằn mặt Lão Cẩn không được làm phiền xưởng của mình nữa.",
+            "worldClaimIds": [],
+            "hookIntent": "relationship_turns",
             "requiredDeltaIds": [
-              "delta_3_3",
-              "delta_3_4",
-              "delta_3_5",
-              "delta_3_6"
+              "delta_3_2",
+              "delta_3_3"
             ]
           }
         ],
         "requiredDeltas": [
           {
             "id": "delta_3_1",
-            "kind": "character_location",
-            "characterId": "char_lam",
-            "locationAfter": "cho_kim_bien",
+            "kind": "resource_numeric",
+            "resourceId": "res_von",
+            "before": 5,
+            "delta": 80,
+            "after": 85,
+            "unit": "triệu VNĐ",
+            "source": "Bán chiếc bình gốm ngự dụng triều Lê sơ đã phục chế",
+            "sink": "Ví tiền cá nhân của Trần An",
+            "transactionKind": "gain",
+            "consideration": [],
             "evidenceRequired": true
           },
           {
             "id": "delta_3_2",
-            "kind": "relationship",
-            "characterId": "char_lam",
-            "relationshipAfter": "Bắt đầu chú ý và đánh giá cao tài năng phục chế của An.",
+            "kind": "resource_numeric",
+            "resourceId": "res_von",
+            "before": 85,
+            "delta": -30,
+            "after": 55,
+            "unit": "triệu VNĐ",
+            "source": "Tiền bán bình gốm ngự dụng",
+            "sink": "Trả nợ giang hồ tháng này để bảo vệ xưởng",
+            "transactionKind": "consume",
+            "consideration": [],
             "evidenceRequired": true
           },
           {
             "id": "delta_3_3",
-            "kind": "resource_numeric",
-            "resourceId": "res_uy_tin",
-            "before": 10,
-            "delta": 20,
-            "after": 30,
-            "unit": "điểm",
-            "source": "Sự công nhận công khai từ một nhà sưu tầm uy tín như Ông Lâm.",
-            "sink": "Lan truyền trong giới buôn bán đồ cổ tại chợ Kim Biên.",
-            "evidenceRequired": true,
-            "consideration": [],
-            "transactionKind": "gain"
-          },
-          {
-            "id": "delta_3_4",
-            "kind": "promise",
-            "promiseId": "prom_tra_no",
-            "statusAfter": "advanced",
-            "pressureAfter": "Đã trả được một phần nợ khẩn cấp, nhưng chủ nợ vẫn rình rập đòi phần còn lại.",
-            "evidenceRequired": true
-          },
-          {
-            "id": "delta_3_5",
-            "kind": "fact",
-            "factId": "fact_lam_invitation",
-            "valueBefore": null,
-            "valueAfter": "Ông Lâm mời An đến quán trà ẩn danh để thẩm định một món đồ quan trọng.",
-            "evidenceRequired": true
-          },
-          {
-            "id": "delta_3_6",
-            "kind": "character_knowledge",
-            "characterId": "char_an",
-            "factId": "fact_lam_invitation",
-            "learnedFrom": "Nhận được lời mời trực tiếp từ chính miệng Ông Lâm.",
+            "kind": "relationship",
+            "characterId": "char_can",
+            "relationshipAfter": "Tức tối vì không ép được An, chuyển sang thù hằn công khai.",
             "evidenceRequired": true
           }
         ],
-        "nextChapterPressure": "An phải chuẩn bị tinh thần và đồ nghề để đến quán trà ẩn danh, đối mặt với thử thách giám định thực sự."
+        "nextChapterPressure": "Dù đã trả nợ, An vẫn cần xây dựng uy tín để tiến sâu hơn vào giới sưu tầm."
       },
       {
         "schemaVersion": 3,
         "chapterNumber": 4,
         "elapsedMinutesSincePreviousChapter": 1440,
-        "chapterPromise": "An bước vào thế giới sưu tầm thượng lưu và chạm trán với mạng lưới làm giả hồ sơ của Phạm Tôn.",
-        "preconditions": [
-          {
-            "factId": "fact_lam_invitation",
-            "expectedValue": "Ông Lâm mời An đến quán trà ẩn danh để thẩm định một món đồ quan trọng."
-          }
-        ],
+        "chapterPromise": "Trần An tình cờ phát hiện một vụ lừa đảo tinh vi nhắm vào Ông Lâm.",
+        "preconditions": [],
         "scenes": [
           {
             "id": "scene_4_1",
@@ -819,18 +791,14 @@
               "char_lam",
               "char_ton"
             ],
-            "locationId": "quan_tra_an_danh",
-            "durationMinutes": 20,
+            "locationId": "biet_thu_lam_tra",
+            "durationMinutes": 30,
             "travelMinutesFromPrevious": 45,
-            "desire": "An muốn đến quán trà ẩn danh đúng hẹn để đáp lại sự tin tưởng của Ông Lâm và tìm kiếm cơ hội mới.",
-            "opposition": "Quán trà nằm ở một khu vực biệt lập, an ninh nghiêm ngặt khiến An cảm thấy lạc lõng và áp lực.",
-            "tactic": "An ăn mặc chỉnh tề, mang theo bộ đồ nghề giám định quen thuộc và tự tin bước vào không gian sang trọng.",
-            "cost": "An phải rời khỏi vùng an toàn ở chợ Kim Biên, bước vào một môi trường đầy rẫy những quy tắc ngầm phức tạp.",
-            "payoff": "An được Ông Lâm đón tiếp trọng thị, khẳng định vị thế mới của mình trong mắt nhà sưu tầm quyền lực.",
-            "irreversibleChange": "An chính thức đặt chân vào thế giới của những giao dịch đồ cổ trị giá hàng tỷ đồng.",
-            "informationDelta": "An phát hiện ra sự có mặt của Phạm Tôn, một chuyên gia thẩm định nổi tiếng nhưng đầy tai tiếng.",
-            "hookIntent": "threat_arrives",
-            "unresolvedQuestion": "Sự xuất hiện của Phạm Tôn tại buổi giao dịch kín này báo hiệu một âm mưu gì sắp xảy ra?",
+            "objective": "Giao hàng phụ kiện cho Ông Lâm và tình cờ xem xét chiếc bát ngự dụng mới.",
+            "obstacle": "Chiếc bát có giấy tờ chứng nhận hoàn hảo của Phan Tôn nhưng cảm giác sờ chạm lại sai lệch.",
+            "action": "An xin phép được cầm thử chiếc bát và nhận ra sự bất thường trong tạp chất đất sét.",
+            "worldClaimIds": [],
+            "hookIntent": "truth_reframed",
             "requiredDeltaIds": [
               "delta_4_1",
               "delta_4_2"
@@ -844,93 +812,78 @@
               "char_lam",
               "char_ton"
             ],
-            "locationId": "quan_tra_an_danh",
-            "durationMinutes": 40,
+            "locationId": "biet_thu_lam_tra",
+            "durationMinutes": 45,
             "travelMinutesFromPrevious": 0,
-            "desire": "Phạm Tôn muốn thuyết phục Ông Lâm mua bộ ấm chén ngự dụng với giá trên trời bằng một bộ hồ sơ hoàn hảo.",
-            "opposition": "Ông Lâm vốn là người cẩn trọng, luôn có sự nghi ngờ nhất định đối với những món đồ quá hoàn hảo.",
-            "tactic": "Phạm Tôn trình bày trôi chảy về lịch sử di cư của gia tộc sở hữu bộ ấm chén, đưa ra các giấy tờ chứng nhận uy tín.",
-            "cost": "Phạm Tôn phải đánh cược toàn bộ danh tiếng học thuật của mình vào tính xác thực của bộ hồ sơ giả mạo này.",
-            "payoff": "Ông Lâm bắt đầu bị thuyết phục bởi những lý lẽ sắc bén và bằng chứng giấy tờ dường như không thể chối cãi.",
-            "irreversibleChange": "Bộ hồ sơ giả mạo của Phạm Tôn chính thức được đưa ra ánh sáng, trở thành tâm điểm của cuộc tranh luận.",
-            "informationDelta": "An đọc được nội dung bộ hồ sơ và nhận ra những điểm bất hợp lý tinh vi mà người thường không thể thấy.",
+            "objective": "Cảnh báo Ông Lâm về việc chiếc bát là đồ giả.",
+            "obstacle": "Phan Tôn dùng danh tiếng và giấy tờ để áp đảo, chế giễu An là thợ vườn.",
+            "action": "An bình tĩnh chỉ ra điểm mâu thuẫn vật lý, yêu cầu dùng thiết bị chuyên dụng để kiểm chứng.",
+            "worldClaimIds": [
+              "claim_ho_so_so_huu"
+            ],
             "hookIntent": "choice_forced",
-            "unresolvedQuestion": "An sẽ chọn cách im lặng để an toàn hay đứng lên vạch trần sự giả dối của một chuyên gia quyền lực như Phạm Tôn?",
             "requiredDeltaIds": [
-              "delta_4_3",
-              "delta_4_4"
+              "delta_4_3"
             ]
           }
         ],
         "requiredDeltas": [
           {
             "id": "delta_4_1",
-            "kind": "character_location",
-            "characterId": "char_an",
-            "locationAfter": "quan_tra_an_danh",
+            "kind": "fact",
+            "factId": "fact_bat_ngu_dung_fake",
+            "valueBefore": null,
+            "valueAfter": "Chiếc bát ngự dụng Ông Lâm định mua có tạp chất đất sét không khớp với men.",
             "evidenceRequired": true
           },
           {
             "id": "delta_4_2",
-            "kind": "character_location",
-            "characterId": "char_ton",
-            "locationAfter": "quan_tra_an_danh",
+            "kind": "character_knowledge",
+            "characterId": "char_an",
+            "factId": "fact_bat_ngu_dung_fake",
+            "learnedFrom": "Dùng xúc giác kiểm tra bề mặt và trọng lượng của chiếc bát.",
             "evidenceRequired": true
           },
           {
             "id": "delta_4_3",
-            "kind": "fact",
-            "factId": "fact_ton_fake_document",
-            "valueBefore": null,
-            "valueAfter": "Phạm Tôn cung cấp một bộ hồ sơ di cư hoàn hảo chứng minh bộ ấm chén là ngự dụng của vua Tự Đức.",
-            "evidenceRequired": true
-          },
-          {
-            "id": "delta_4_4",
-            "kind": "character_knowledge",
-            "characterId": "char_an",
-            "factId": "fact_ton_fake_document",
-            "learnedFrom": "Đọc trực tiếp tập hồ sơ giấy tờ do Phạm Tôn bày ra trên bàn trà.",
+            "kind": "resource_numeric",
+            "resourceId": "res_uy_tin",
+            "before": 0,
+            "delta": 20,
+            "after": 20,
+            "unit": "điểm",
+            "source": "Dám đứng ra chỉ trích đồ giả trước mặt chuyên gia",
+            "sink": "Danh tiếng trong mắt Ông Lâm",
+            "transactionKind": "gain",
+            "consideration": [],
             "evidenceRequired": true
           }
         ],
-        "nextChapterPressure": "An phải tìm ra bằng chứng vật lý để phản bác lại bộ hồ sơ hoàn hảo của Phạm Tôn trước khi Ông Lâm xuống tiền."
+        "nextChapterPressure": "An phải tìm ra bằng chứng khoa học không thể chối cãi để đánh bại lý lẽ của Phan Tôn."
       },
       {
         "schemaVersion": 3,
         "chapterNumber": 5,
-        "elapsedMinutesSincePreviousChapter": 0,
-        "chapterPromise": "An sử dụng kiến thức vật lý để lật tẩy bộ hồ sơ giả mạo, chính thức tuyên chiến với Phạm Tôn.",
-        "preconditions": [
-          {
-            "factId": "fact_ton_fake_document",
-            "expectedValue": "Phạm Tôn cung cấp một bộ hồ sơ di cư hoàn hảo chứng minh bộ ấm chén là ngự dụng của vua Tự Đức."
-          }
-        ],
+        "elapsedMinutesSincePreviousChapter": 120,
+        "chapterPromise": "Trần An dùng bằng chứng khoa học để lật tẩy đồ giả, giành được sự công nhận.",
+        "preconditions": [],
         "scenes": [
           {
             "id": "scene_5_1",
             "povCharacterId": "char_an",
             "participantIds": [
-              "char_an",
-              "char_lam",
-              "char_ton"
+              "char_an"
             ],
-            "locationId": "quan_tra_an_danh",
-            "durationMinutes": 30,
-            "travelMinutesFromPrevious": 0,
-            "desire": "An muốn tìm ra bằng chứng vật lý không thể chối cãi để lật tẩy bộ hồ sơ giả mạo của Phạm Tôn.",
-            "opposition": "Bề ngoài của bộ ấm chén được làm giả quá tinh vi, không thể phát hiện bằng mắt thường hay kinh nghiệm thông thường.",
-            "tactic": "An xin phép Ông Lâm được soi chiếu bề mặt men của bộ ấm chén dưới kính hiển vi cầm tay chuyên dụng.",
-            "cost": "An phải chịu đựng ánh mắt khinh khỉnh và những lời mỉa mai từ Phạm Tôn khi sử dụng công cụ máy móc.",
-            "payoff": "An phát hiện ra những hạt tạp chất kim loại nặng li ti ẩn sâu trong lớp men, bằng chứng của men công nghiệp.",
-            "irreversibleChange": "Sự thật về chất liệu của bộ ấm chén được phơi bày, phá vỡ hoàn toàn vỏ bọc hoàn hảo do Phạm Tôn tạo ra.",
-            "informationDelta": "An nắm trong tay bằng chứng vật lý quyết định, đủ sức đánh sập toàn bộ lập luận lịch sử của Phạm Tôn.",
-            "hookIntent": "truth_reframed",
-            "unresolvedQuestion": "Phạm Tôn sẽ phản ứng ra sao khi bằng chứng vật lý chống lại toàn bộ hồ sơ học thuật của hắn?",
+            "locationId": "cho_kim_bien",
+            "durationMinutes": 45,
+            "travelMinutesFromPrevious": 45,
+            "objective": "Mua kính hiển vi chuyên dụng để soi rõ tạp chất đất sét.",
+            "obstacle": "Cần một khoản tiền lớn để mua thiết bị tốt nhất ngay lập tức.",
+            "action": "An quyết định trích phần lớn số vốn vừa kiếm được để đầu tư mua kính hiển vi.",
+            "worldClaimIds": [],
+            "hookIntent": "cost_revealed",
             "requiredDeltaIds": [
-              "delta_5_1",
-              "delta_5_2"
+              "delta_5_1"
             ]
           },
           {
@@ -941,20 +894,37 @@
               "char_lam",
               "char_ton"
             ],
-            "locationId": "quan_tra_an_danh",
+            "locationId": "biet_thu_lam_tra",
+            "durationMinutes": 60,
+            "travelMinutesFromPrevious": 45,
+            "objective": "Chứng minh chiếc bát là đồ giả trước mặt Ông Lâm và Phan Tôn.",
+            "obstacle": "Phan Tôn liên tục dùng lý lẽ học thuật để đánh lạc hướng sự chú ý.",
+            "action": "An soi kính hiển vi, cho Ông Lâm thấy rõ lớp men công nghiệp không bám dính vào xương gốm.",
+            "worldClaimIds": [],
+            "hookIntent": "truth_reframed",
+            "requiredDeltaIds": [
+              "delta_5_2",
+              "delta_5_3"
+            ]
+          },
+          {
+            "id": "scene_5_3",
+            "povCharacterId": "char_an",
+            "participantIds": [
+              "char_an",
+              "char_lam"
+            ],
+            "locationId": "biet_thu_lam_tra",
             "durationMinutes": 30,
             "travelMinutesFromPrevious": 0,
-            "desire": "An muốn công bố sự thật để bảo vệ Ông Lâm khỏi một cú lừa ngoạn mục và khẳng định giá trị của giám định vật lý.",
-            "opposition": "Phạm Tôn dùng uy tín học thuật và những lời lẽ trịch thượng để áp đảo, phủ nhận kết quả soi kính của An.",
-            "tactic": "An điềm tĩnh giải thích về đặc tính của men công nghiệp, thậm chí đề nghị cạo một chút men để thử nghiệm hóa học.",
-            "cost": "An chính thức đắc tội với Phạm Tôn, tạo ra một kẻ thù nguy hiểm có quyền lực lớn trong giới học thuật.",
-            "payoff": "Ông Lâm hoàn toàn tin tưởng vào bằng chứng vật lý của An, hủy bỏ giao dịch và đuổi Phạm Tôn khỏi quán trà.",
-            "irreversibleChange": "Mối thâm thù giữa An và Phạm Tôn chính thức bắt đầu, đánh dấu cuộc chiến giữa sự thật vật lý và hồ sơ giả mạo.",
-            "informationDelta": "Ông Lâm nhận ra bộ mặt thật của Phạm Tôn và coi An như một cố vấn giám định đáng tin cậy nhất.",
-            "hookIntent": "relationship_turns",
-            "unresolvedQuestion": "Phạm Tôn sẽ sử dụng những thủ đoạn tàn độc nào để trả thù và hủy hoại danh tiếng của An trong tương lai?",
+            "objective": "Nhận phần thưởng xứng đáng từ Ông Lâm.",
+            "obstacle": "An muốn được tiếp cận những món đồ gốm thực sự giá trị thay vì tiền bạc.",
+            "action": "An dùng uy tín vừa đạt được để xin phép Ông Lâm cho xem bộ sưu tập kín.",
+            "worldClaimIds": [
+              "claim_giao_dich_kin"
+            ],
+            "hookIntent": "opportunity_opens",
             "requiredDeltaIds": [
-              "delta_5_3",
               "delta_5_4"
             ]
           }
@@ -962,44 +932,70 @@
         "requiredDeltas": [
           {
             "id": "delta_5_1",
-            "kind": "fact",
-            "factId": "fact_tea_set_fake",
-            "valueBefore": null,
-            "valueAfter": "Lớp men của bộ ấm chén ngự dụng chứa tạp chất kim loại nặng chỉ có trong men công nghiệp hiện đại.",
+            "kind": "resource_numeric",
+            "resourceId": "res_von",
+            "before": 55,
+            "delta": -30,
+            "after": 25,
+            "unit": "triệu VNĐ",
+            "source": "Tiền vốn lưu động hiện có",
+            "sink": "Mua kính hiển vi chuyên dụng từ cửa hàng thiết bị",
+            "transactionKind": "purchase",
+            "consideration": [
+              {
+                "itemId": "item_dung_cu",
+                "name": "Kính hiển vi chuyên dụng",
+                "quantity": 1,
+                "unit": "cái"
+              }
+            ],
             "evidenceRequired": true
           },
           {
             "id": "delta_5_2",
-            "kind": "character_knowledge",
-            "characterId": "char_an",
-            "factId": "fact_tea_set_fake",
-            "learnedFrom": "Soi chiếu bề mặt men dưới độ phóng đại cao của kính hiển vi.",
+            "kind": "resource_numeric",
+            "resourceId": "res_uy_tin",
+            "before": 20,
+            "delta": 50,
+            "after": 70,
+            "unit": "điểm",
+            "source": "Cứu Ông Lâm khỏi vố lừa mua đồ giả cao cấp",
+            "sink": "Danh tiếng trong giới sưu tầm tinh hoa",
+            "transactionKind": "gain",
+            "consideration": [],
             "evidenceRequired": true
           },
           {
             "id": "delta_5_3",
-            "kind": "resource_numeric",
-            "resourceId": "res_uy_tin",
-            "before": 30,
-            "delta": 50,
-            "after": 80,
-            "unit": "điểm",
-            "source": "Cứu Ông Lâm khỏi một vố lừa ngoạn mục trị giá hàng tỷ đồng.",
-            "sink": "Ghi dấu ấn mạnh mẽ trong tâm trí của nhà sưu tầm ẩn danh.",
-            "evidenceRequired": true,
-            "consideration": [],
-            "transactionKind": "gain"
+            "kind": "promise",
+            "promiseId": "prom_danh_bai_phan_ton",
+            "statusAfter": "advanced",
+            "pressureAfter": "Phan Tôn bị bẽ mặt, bắt đầu coi An là cái gai trong mắt cần nhổ bỏ.",
+            "evidenceRequired": true
           },
           {
             "id": "delta_5_4",
-            "kind": "promise",
-            "promiseId": "prom_danh_bai_pham_ton",
-            "statusAfter": "advanced",
-            "pressureAfter": "Phạm Tôn ghi hận và bắt đầu lên kế hoạch dùng quyền lực học thuật để bôi nhọ danh dự của An.",
+            "kind": "resource_numeric",
+            "resourceId": "res_uy_tin",
+            "before": 70,
+            "delta": -50,
+            "after": 20,
+            "unit": "điểm",
+            "source": "Uy tín vừa tích lũy được",
+            "sink": "Đổi lấy quyền xem bộ sưu tập kín của Ông Lâm",
+            "transactionKind": "purchase",
+            "consideration": [
+              {
+                "itemId": "item_xem_hang",
+                "name": "Quyền xem bộ sưu tập kín",
+                "quantity": 1,
+                "unit": "lần"
+              }
+            ],
             "evidenceRequired": true
           }
         ],
-        "nextChapterPressure": "An phải đối mặt với sự trả thù ngầm từ mạng lưới của Phạm Tôn trong khi lượng men tro bí truyền đang cạn kiệt."
+        "nextChapterPressure": "Bước vào bộ sưu tập kín, An sẽ phải đối mặt với những bí ẩn lớn hơn về nguồn gốc Lò Rồng."
       }
     ]
   }

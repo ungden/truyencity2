@@ -35,11 +35,11 @@ preconditions chỉ được tham chiếu fact đang có trong AUTHORITATIVE_LED
 Với resource_numeric, chỉ quyết định delta/source/sink/transactionKind/consideration; không tự trả before/after/unit. transactionKind phải đúng một trong gain, purchase, fee, transfer, consume, adjustment. Purchase bắt buộc liệt kê consideration gồm itemId/name/quantity/unit và chỉ được dùng item có trong exchangeAnchors của resource; các transaction khác phải có consideration=[]. Với resource_state, chỉ trả after/source. Với fact, chỉ trả valueAfter. Engine sẽ gắn before/after/unit/valueBefore từ ledger theo thứ tự năm chương. source và sink phải mô tả nguồn nhận/đích tiêu hao có nguyên nhân, mỗi trường ít nhất 8 ký tự; không dùng một từ trần như "quỹ", "kho" hoặc "mất".
 AUTHORITATIVE_LEDGER.resources là sổ cái duy nhất: mỗi resource_numeric có amount hiện tại, minimumValue và maximumValue. Phải tự cộng tuần tự mọi delta của cả năm chương; sau từng delta, số dư không được thấp hơn minimumValue hoặc cao hơn maximumValue. Không được chi tiền/tài nguyên chưa kiếm được ở một delta trước đó, kể cả khi dự kiến sẽ thu lại ở scene hoặc chương sau.
 Khi transactionKind=purchase, phải tính tổng giá theo exchangeAnchors riêng của truyện và tolerancePercent; plan nằm ngoài khoảng giá bị chặn trước Writer. Không tự bịa bảng giá chung và không dùng prose để chữa một giao dịch sai.
-Scene gắn với resource_numeric phải dùng cùng amount/unit trong cost/payoff/irreversibleChange; không đổi đơn vị hoặc dùng tính từ quy mô mơ hồ trái ledger.
+Scene gắn với resource_numeric phải để con số trong required delta; objective/obstacle/action không được đổi đơn vị hoặc dùng quy mô mơ hồ trái ledger.
 Mọi knowledge change phải chỉ rõ nhân vật, fact và nguồn học. Fact mới dùng stable ID mới và phải được tạo trước hoặc cùng chương với lần học đầu tiên; engine tự gắn valueBefore.
 Character/resource/promise ID chỉ lấy từ kernel/state. Mọi ID và locationId theo mẫu [a-z][a-z0-9_-].
-desire, opposition, tactic, cost, payoff, irreversibleChange và informationDelta là câu đầy đủ có nguyên nhân và hậu quả.
-hookIntent chỉ là enum hiệu ứng; unresolvedQuestion không được viết như câu kết văn xuôi sẵn.`;
+Mỗi scene chỉ có objective, obstacle và action: câu cơ học ngắn, cụ thể, tối đa 240 ký tự; không viết cảm xúc hộ nhân vật, không dùng ẩn dụ, khẩu hiệu, câu kết hoặc lời thoại mẫu. Kết quả, chi phí, tri thức và quan hệ phải nằm trong required delta thay vì được kể lại bằng prose.
+worldClaimIds chỉ chứa ID quy tắc thực sự chi phối scene. hookIntent chỉ là enum hiệu ứng, không phải câu kết văn xuôi sẵn.`;
 
 export const V3_ROLLING_PLANNER_SYSTEM = `Bạn là Rolling Planner của đúng một bộ truyện. Không viết prose, không sửa kernel/state/arc và chỉ trả JSON RollingPlanWindowV3.
 ${V3_ROLLING_PLANNER_RULES}`;

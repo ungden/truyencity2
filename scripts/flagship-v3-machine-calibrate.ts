@@ -33,6 +33,18 @@ const outputFile = outputPath;
 
 const cleanJson = (raw: string): unknown => JSON.parse(raw.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, ''));
 
+function assertMachineJudgeCredentials(): void {
+  const required = [
+    ['GEMINI_API_KEY', process.env.GEMINI_API_KEY],
+    ['OPENAI_API_KEY', process.env.OPENAI_API_KEY],
+    ['OPENROUTER_API_KEY', process.env.OPENROUTER_API_KEY],
+  ] as const;
+  const missing = required.filter(([, credential]) => !credential).map(([name]) => name);
+  if (missing.length > 0) {
+    throw new Error(`CALIBRATION_BLOCKED: missing exact judge credential(s): ${missing.join(', ')}. No judge call was made and no substitute route is allowed.`);
+  }
+}
+
 async function callGrok(prompt: string): Promise<string> {
   const key = process.env.OPENROUTER_API_KEY;
   if (!key) throw new Error('OPENROUTER_API_KEY is required for the fixed Grok 4.5 calibration judge.');
@@ -83,6 +95,7 @@ async function callGrok(prompt: string): Promise<string> {
 }
 
 async function main(): Promise<void> {
+  assertMachineJudgeCredentials();
   const pairCorpus = MachineCalibrationPairCorpusV3Schema.parse(JSON.parse(readFileSync(path.resolve(inputFile), 'utf8')));
   const outputSchema = toGeminiResponseJsonSchema(BlindMachineJudgmentOutputV3Schema);
   const corpus = await runMachineEnsembleV3(pairCorpus, {

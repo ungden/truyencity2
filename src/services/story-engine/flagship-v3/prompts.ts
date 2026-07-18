@@ -3,20 +3,22 @@ import type { V3RoleContext } from './context';
 import type { V3Evidence } from './preflight';
 import type { V3ProseSpan } from './evidence-spans';
 
-export const FLAGSHIP_V3_PROMPT_VERSION = 'flagship-v3.12-concrete-prose-exact-ledger';
+export const FLAGSHIP_V3_PROMPT_VERSION = 'flagship-v3.14-mechanics-locked-prose-free';
+
+export const V3_CHAPTER_LENGTH_POLICY = {
+  softMinWords: 1_200,
+  softMaxWords: 1_800,
+  hardMinWords: 1_000,
+  hardMaxWords: 2_200,
+} as const;
 
 export const V3_WRITER_SYSTEM = `Bạn là tiểu thuyết gia của đúng một bộ truyện.
-Viết một chương hoàn chỉnh từ dữ liệu cảnh, không chép câu mô tả trong kế hoạch.
-Chỉ sử dụng nhân vật, tri thức, quyền hạn, tài nguyên và quy tắc có trong context.
-Mọi thay đổi bắt buộc phải xảy ra qua hành động, đối thoại và hậu quả nhìn thấy được.
-Không được bình luận hoặc tổng kết thay người đọc bằng các câu kiểu "bước sang trang mới", "viên gạch/cơ đồ/tương lai", "đó không phải... mà là...", "anh không tự ti/khúm núm". Thể hiện cảm xúc, quan hệ và tiến bộ bằng cử chỉ, lựa chọn, lời nói và vật chứng cụ thể; tránh ẩn dụ khẩu hiệu, diễn văn và câu tuyên bố bài học.
-Mọi lượng hàng, đơn giá, khoản thu chi và số dư phải khớp tuyệt đối với before/delta/after và consideration trong context; tự làm phép tính trước khi viết thành prose.
-Giữ đúng POV của từng scene; povCharacterId phải là tâm điểm tri giác của scene đó, không chuyển sang nội tâm người khác.
-Mỗi scene trong ChapterPlan là một đơn vị kịch riêng và phải xuất hiện theo đúng thứ tự. Không gộp hai scene, kể cả khi cùng địa điểm hoặc cùng nhân vật. Khi povCharacterId đổi, phải tạo ranh giới cảnh rõ bằng ngắt đoạn/chuyển cảnh rồi mới đi vào tri giác của POV mới.
-Các time cue chỉ để giữ thứ tự và độ hợp lý. Diễn đạt thời gian tự nhiên theo cảm nhận nhân vật; không đọc số phút kỹ thuật thành câu văn trừ khi nhân vật thật sự xem đồng hồ.
-hookIntent là loại hiệu ứng kết chương, không phải câu văn cần sao chép.
-Không nhắc JSON, schema, prompt, model, state, delta hoặc tên trường dữ liệu.
-Mỗi scene phải được viết riêng trong scenes, giữ đúng sceneId và thứ tự từ ChapterPlan. Mỗi đoạn văn là một phần tử riêng trong paragraphs; không dùng ký tự \\n để giả xuống dòng và không dồn cả scene vào một đoạn.
+Tiếp nối tự nhiên phần cuối chương trước nếu được cung cấp, nhưng không kể lại hoặc sao chép nó.
+WRITER_BRIEF khóa sự kiện, POV, tri thức, quy tắc và sổ cái; bạn tự quyết định lời văn, đối thoại, nhịp, hình ảnh và cách cảm xúc diễn ra.
+Thực hiện mọi required delta bằng hành động hoặc hậu quả nhìn thấy được. Mọi con số phải khớp chính xác với brief.
+ID, tên trường và đơn vị sổ cái là dữ liệu điều khiển, không phải giao diện trong thế giới truyện; chỉ thể hiện hệ quả của chúng bằng cách nói và hành động tự nhiên của nhân vật.
+Viết từng scene theo đúng sceneId và thứ tự, chỉ đi vào nội tâm của povCharacterId. Dừng khi hiệu ứng hookIntent cuối đã hình thành; không kéo dài để đủ chữ.
+Mỗi đoạn văn là một phần tử paragraphs riêng. Không nhắc dữ liệu điều khiển trong truyện.
 Chỉ trả JSON {"title":"...","scenes":[{"sceneId":"...","paragraphs":["đoạn 1","đoạn 2","đoạn 3"]}]}.`;
 
 export const V3_EDITOR_SYSTEM = `Bạn là biên tập viên độc lập, không viết hộ tác giả và không thưởng vì đủ checklist.
@@ -38,8 +40,8 @@ export function buildV3WriterPrompt(input: {
   targetWordCount: number;
   context: V3RoleContext;
 }): string {
-  return `Viết chương ${input.chapterNumber}, mục tiêu khoảng ${input.targetWordCount} từ; tối thiểu 80% mục tiêu và mỗi scene phải có hành động, đối thoại hoặc hệ quả đủ thành một đơn vị kịch. title chỉ là tên riêng của chương, không thêm tiền tố "Chương ${input.chapterNumber}:".
-Không dùng câu báo cáo trạng thái. Không bê nguyên câu từ plan. Dừng sau khi hookIntent cuối đã được dramatize.
+  return `Viết chương ${input.chapterNumber}. Bản hoàn chỉnh phải nằm trong hard range ${V3_CHAPTER_LENGTH_POLICY.hardMinWords}-${V3_CHAPTER_LENGTH_POLICY.hardMaxWords} từ; khoảng tự nhiên nên hướng tới là ${V3_CHAPTER_LENGTH_POLICY.softMinWords}-${V3_CHAPTER_LENGTH_POLICY.softMaxWords} từ. Kết thúc cảnh tự nhiên, không thêm độc thoại, giải thích hoặc tổng kết để kéo chữ. title chỉ là tên riêng của chương, không thêm tiền tố "Chương ${input.chapterNumber}:".
+PREVIOUS_CHAPTER_TAIL chỉ là điểm nối về hành động và giọng; bắt đầu từ trạng thái sau đoạn đó, không chép hoặc kể lại.
 
 ROLE_CONTEXT=${input.context.text}
 
@@ -80,12 +82,11 @@ export function buildV3RevisionPrompt(input: {
   repairMode: 'local_edit' | 'full_rewrite';
   allowedSpans?: Array<{ id: string; text: string }>;
 }): string {
-  const minimumWordCount = Math.ceil(input.targetWordCount * 0.8);
   const outputContract = input.repairMode === 'local_edit'
     ? `Chỉ được thay đúng các span trong ALLOWED_SPANS. Trả JSON {"patches":[{"spanId":"...","replacement":"..."}]}; không trả toàn chương, không sửa title, không sửa span khác.`
     : `Viết lại toàn chương theo từng scene. Mỗi đoạn văn là một phần tử riêng; trả JSON {"title":"...","scenes":[{"sceneId":"ID đúng từ plan","paragraphs":["đoạn 1","đoạn 2"]}]}.`;
   return `Sửa đúng một lượt chương ${input.chapterNumber} bằng chế độ ${input.repairMode}.
-Mục tiêu ${input.targetWordCount} từ; bản sau sửa tuyệt đối không được dưới ${minimumWordCount} từ. Với full_rewrite, phải tự kiểm độ dài toàn chương trước khi trả JSON. Với local_edit, không được rút ngắn chương xuống dưới sàn này.
+Giữ chương trong hard range ${V3_CHAPTER_LENGTH_POLICY.hardMinWords}-${V3_CHAPTER_LENGTH_POLICY.hardMaxWords} từ. Không thêm đoạn đệm để đạt độ dài; chỉ làm cho cảnh và lỗi có evidence được giải quyết trọn vẹn.
 Giữ nguyên các sự kiện và delta đã đúng. Chỉ sửa lỗi có evidence, không thêm nhân vật, twist, tài nguyên hoặc setup.
 Plan, canon và state trong ROLE_CONTEXT là bất biến. Nếu CURRENT mâu thuẫn với chúng, phải sửa CURRENT cho khớp; không được tự sửa hoặc đề nghị sửa dữ liệu nền.
 Phải thực hiện thay đổi văn bản cụ thể cho từng evidence. Không được trả lại nguyên văn CURRENT, kể cả khi cho rằng bản hiện tại hợp lý hơn.

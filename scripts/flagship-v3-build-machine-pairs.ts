@@ -15,6 +15,7 @@ import {
   MachineCalibrationPairCorpusV3Schema,
   RollingPlanWindowDraftV3Schema,
   RevisionOutputV3Schema,
+  V3_EDITOR_SYSTEM,
   WriterOutputV3Schema,
   buildV3RoleContexts,
   digestFlagshipV3,
@@ -25,6 +26,7 @@ import {
   type FlagshipV3ModelCall,
   type OfflineOpeningRunV3,
   type StoryStateV3,
+  type V3RoleContext,
 } from '../src/services/story-engine/flagship-v3';
 import { callFlagshipModel } from '../src/services/story-engine/flagship/provider';
 import { toGeminiResponseJsonSchema } from '../src/services/story-engine/flagship/setup-response-schemas';
@@ -82,6 +84,42 @@ function rejectedDraft(error: unknown): { title: string; content: string } | nul
     : null;
 }
 
+/**
+ * Calibration-only reconstruction of the previous over-directed Writer input.
+ * It is intentionally unavailable to runtime production code: the branch sees
+ * the whole kernel/arc/state/plan plus the Editor rubric so the causal A/B can
+ * isolate context size and responsibility overlap on the same model and state.
+ */
+function buildOverDirectedWriterContext(input: {
+  pack: z.infer<typeof FlagshipLaunchPackV3Schema>;
+  state: StoryStateV3;
+  plan: ChapterPlanV3;
+  previousChapterTail?: string;
+}): V3RoleContext {
+  const value = {
+    storyKernel: input.pack.kernel,
+    arcPlan: input.pack.arc,
+    storyState: input.state,
+    chapterPlan: input.plan,
+    previousChapterTail: input.previousChapterTail || null,
+    editorRubric: V3_EDITOR_SYSTEM,
+  };
+  const text = `[OVER_DIRECTED_CONTROL_CONTEXT]\n${JSON.stringify(value)}`;
+  return {
+    role: 'writer',
+    text,
+    chars: text.length,
+    budget: text.length,
+    manifest: [{
+      role: 'writer',
+      id: 'OVER_DIRECTED_CONTROL_CONTEXT',
+      sourceRef: 'calibration_only:legacy_full_context',
+      chars: text.length,
+      required: true,
+    }],
+  };
+}
+
 function plansForRun(pack: z.infer<typeof FlagshipLaunchPackV3Schema>, runDir: string, run: CandidateRun): ChapterPlanV3[] {
   const plans = [...pack.initialWindow.plans];
   if (run.requestedChapters <= 5) return plans;
@@ -125,6 +163,9 @@ async function main(): Promise<void> {
     }
     candidateRouteVersion ||= run.routeVersion;
     if (candidateRouteVersion !== run.routeVersion) throw new Error('All candidate runs must use one exact route version.');
+    if (controlRoutes.routeVersion !== run.routeVersion) {
+      throw new Error(`${entry.slot} A/B requires the exact same model route for minimal and over-directed branches.`);
+    }
     launchPackDigests.push(digestFlagshipV3(pack));
     const plans = plansForRun(pack, runDir, run);
 
@@ -137,9 +178,24 @@ async function main(): Promise<void> {
         throw new Error(`${entry.slot} chapter ${chapterNumber} is incomplete.`);
       }
       const writerCheckpoint = readJson<StoredResponse>(path.join(runDir, 'checkpoints', `chapter-${chapterNumber}`, 'writer.response.json'));
+      if (writerCheckpoint.model !== controlRoutes.writer) {
+        throw new Error(`${entry.slot} chapter ${chapterNumber} Writer model differs between A/B branches.`);
+      }
       const initialDraft = WriterOutputV3Schema.parse(cleanJson(writerCheckpoint.content));
-      const initialDraftContent = initialDraft.scenes.flatMap(scene => scene.paragraphs).join('\n\n');
-      const contexts = buildV3RoleContexts({ kernel: pack.kernel, arc: pack.arc, state: stateBefore, plan });
+      const previousChapterTail = chapterNumber > 1 ? run.chapters[index - 1]?.content || undefined : undefined;
+      const contexts = buildV3RoleContexts({
+        kernel: pack.kernel,
+        arc: pack.arc,
+        state: stateBefore,
+        plan,
+        previousChapterTail,
+      });
+      const overDirected = buildOverDirectedWriterContext({ pack, state: stateBefore, plan, previousChapterTail });
+      const controlContexts = {
+        ...contexts,
+        writer: overDirected,
+        revision: () => ({ ...overDirected, role: 'revision' as const }),
+      };
       let controlCost = 0;
       let controlOutput: { title: string; content: string };
       try {
@@ -148,17 +204,18 @@ async function main(): Promise<void> {
           arc: pack.arc,
           state: stateBefore,
           plan,
-          targetWordCount: Math.max(1000, initialDraftContent.trim().split(/\s+/).length),
-          contexts,
+          targetWordCount: 1500,
+          contexts: controlContexts,
+          previousChapterTail,
         }, {
           invoke: async call => {
-            if (call.role === 'writer') return writerCheckpoint.content;
             const model = call.role === 'writer_revision' ? controlRoutes.writer : controlRoutes.editor;
+            const selectedModel = call.role === 'writer' ? controlRoutes.writer : model;
             const response = await callFlagshipModel(call.userPrompt, {
-              model,
-              temperature: call.role === 'writer_revision' ? 0.75 : 0.15,
-              maxTokens: call.role === 'writer_revision' ? 32_768 : 16_384,
-              thinkingLevel: call.role === 'writer_revision' ? 'low' : 'medium',
+              model: selectedModel,
+              temperature: call.role === 'writer' || call.role === 'writer_revision' ? 0.75 : 0.15,
+              maxTokens: call.role === 'writer' || call.role === 'writer_revision' ? 32_768 : 16_384,
+              thinkingLevel: call.role === 'writer' || call.role === 'writer_revision' ? 'low' : 'medium',
               systemPrompt: call.systemPrompt,
               responseJsonSchema: call.responseJsonSchema || toGeminiResponseJsonSchema(responseSchema(call)),
             }, { jsonMode: true, schemaName: `flagship_v3_machine_control_${entry.slot}_${chapterNumber}_${call.role}` });

@@ -10,6 +10,8 @@ import {
   materializeRollingWindowV3,
   generateRollingWindowWithOneRepairV3,
   buildV3RoleContexts,
+  selectPreviousChapterTailV3,
+  V3_WRITER_BRIEF_MAX_CHARS,
   executeFlagshipV3Pipeline,
   EditorAssessmentV3Schema,
   buildEditorResponseJsonSchemaV3,
@@ -32,6 +34,7 @@ import {
   retainStoryFactsV3,
   V3_ROLLING_PLANNER_RULES,
   V3_WRITER_SYSTEM,
+  buildV3WriterPrompt,
   buildV3RevisionPrompt,
   type ChapterPlanV3,
   type StoryKernelV3,
@@ -44,9 +47,14 @@ import { supportsGeminiThinkingLevel } from '@/services/story-engine/utils/gemin
 const detailed = (value: string) => `${value} với nguyên nhân, giới hạn và hậu quả cụ thể trong thế giới truyện.`;
 const prose = (marker: string, bad = '') => `${marker} ${bad} ${Array.from({ length: 6 }, () => 'Sơn làm việc bằng đôi tay chai sần, kiểm tra từng thay đổi rồi mới gọi người nhà đến chứng kiến kết quả. '.repeat(15)).join('\n\n')}`.trim();
 const paragraphs = (content: string) => content.split(/\n\s*\n/gu).map(item => item.trim()).filter(Boolean);
+const writerScenes = (content: string) => {
+  const parts = paragraphs(content);
+  const size = Math.ceil(parts.length / plan().scenes.length);
+  return plan().scenes.map((scene, index) => ({ sceneId: scene.id, paragraphs: parts.slice(index * size, (index + 1) * size) }));
+};
 const writerPayload = (content: string) => ({
   title: 'Mẻ Cá Qua Mưa',
-  scenes: plan().scenes.map(scene => ({ sceneId: scene.id, paragraphs: paragraphs(content) })),
+  scenes: writerScenes(content),
 });
 
 function kernel(): StoryKernelV3 {
@@ -88,8 +96,13 @@ function kernel(): StoryKernelV3 {
       decisionSignature: detailed(`${name} ra quyết định theo lợi ích cụ thể`),
       voice: {
         summary: detailed(`${name} nói tự nhiên theo tuổi và nghề`),
-        positiveExamples: [`${name} hỏi thẳng giá và điều kiện.`, `${name} chỉ nói sau khi kiểm tra.`],
-        forbiddenPatterns: ['không đọc diễn văn thay tác giả', 'không kinh ngạc vô cớ'],
+        register: `${name} dùng khẩu ngữ đời thường đúng tuổi và nghề nghiệp`,
+        sentenceRhythm: `${name} nói câu ngắn khi quyết định và câu vừa khi giải thích`,
+        directness: 'direct',
+        addressRules: 'Với người trong gia đình dùng cha, mẹ hoặc con theo đúng vai vế',
+        vocabulary: 'Ưu tiên từ vựng nghề biển và giao dịch đời thường',
+        stressResponse: `${name} ít lời hơn và hỏi thẳng dữ kiện khi chịu áp lực`,
+        avoidances: 'Không đọc diễn văn thay tác giả hoặc kinh ngạc và ca ngợi vô cớ',
       },
     })),
     worldClaims: Array.from({ length: 4 }, (_, index) => ({
@@ -195,15 +208,11 @@ function plan(): ChapterPlanV3 {
         locationId: 'san_nha',
         durationMinutes: 30,
         travelMinutesFromPrevious: 0,
-        desire: detailed('Sơn cần thuyết phục cha cho dùng số muối sạch còn lại'),
-        opposition: detailed('Cha sợ mất toàn bộ muối nếu dự báo mưa của Sơn sai'),
-        tactic: detailed('Sơn chỉ ra dấu gió và tự nhận trách nhiệm trả lại số muối'),
-        cost: detailed('Sơn đặt toàn bộ tiền riêng làm cam kết với cha'),
-        payoff: detailed('Cha đồng ý giao ba ký muối cho Sơn'),
-        irreversibleChange: detailed('Sơn nhận trách nhiệm vật chất đầu tiên với gia đình'),
-        informationDelta: detailed('Cha biết Sơn đọc được dấu thời tiết ngoài khơi'),
+        objective: 'Sơn xin cha cho dùng số muối sạch còn lại để xử lý cá.',
+        obstacle: 'Cha không chấp nhận mất muối nếu dự báo mưa của Sơn sai.',
+        action: 'Sơn chỉ dấu gió và đặt tiền riêng làm cam kết vật chất.',
+        worldClaimIds: ['claim_0'],
         hookIntent: 'choice_forced',
-        unresolvedQuestion: detailed('Sơn phải chọn lượng muối đủ giữ cá mà không làm hàng quá mặn'),
         requiredDeltaIds: ['cash_spent'],
       },
       {
@@ -213,15 +222,11 @@ function plan(): ChapterPlanV3 {
         locationId: 'san_nha',
         durationMinutes: 45,
         travelMinutesFromPrevious: 5,
-        desire: detailed('Sơn cần ướp xong lô cá trước khi mưa tràn vào sân'),
-        opposition: detailed('Mái che dột và thời gian chỉ còn chưa đầy một giờ'),
-        tactic: detailed('Sơn chia cá thành lớp mỏng và dùng đúng hai ký muối'),
-        cost: detailed('Gia đình chỉ còn lại một ký muối sạch sau mẻ thử'),
-        payoff: detailed('Lô cá giữ được độ dẻo qua trận mưa đầu tiên'),
-        irreversibleChange: detailed('Gia đình có bằng chứng đầu tiên rằng cách của Sơn hiệu quả'),
-        informationDelta: detailed('Mẹ Sơn học được tỷ lệ muối cho mẻ cá nhỏ'),
+        objective: 'Sơn xử lý xong lô cá trước khi mưa tràn vào sân.',
+        obstacle: 'Mái che dột và trận mưa đến trong vòng một giờ.',
+        action: 'Sơn chia cá thành lớp mỏng rồi dùng đúng hai ký muối.',
+        worldClaimIds: ['claim_0'],
         hookIntent: 'threat_arrives',
-        unresolvedQuestion: detailed('Gã thu mua sẽ trả giá thế nào khi thấy mẻ cá không bị nhũn'),
         requiredDeltaIds: ['salt_spent', 'mother_learns', 'promise_advanced'],
       },
     ],
@@ -379,8 +384,31 @@ describe('flagship v3 core engine', () => {
     );
   });
 
+  it('does not misclassify fees or previously purchased inventory as a new purchase', () => {
+    const feePlan = ChapterPlanV3Schema.parse({
+      ...plan(),
+      requiredDeltas: plan().requiredDeltas.map(delta => delta.id === 'cash_spent' && delta.kind === 'resource_numeric'
+        ? { ...delta, transactionKind: 'fee' as const, source: 'Tiền mặt hiện có của Sơn', sink: 'Thanh toán phí sử dụng bến cá' }
+        : delta.id === 'salt_spent' && delta.kind === 'resource_numeric'
+          ? { ...delta, source: 'Số muối sạch đã mua từ phiên chợ trước', sink: 'Ướp lô cá đang sơ chế' }
+          : delta),
+    });
+    expect(validateV3Artifacts({ kernel: kernel(), arc, state: state(), plan: feePlan })
+      .some(issue => issue.code === 'resource_purchase_untyped')).toBe(false);
+
+    const disguisedPurchase = ChapterPlanV3Schema.parse({
+      ...plan(),
+      requiredDeltas: plan().requiredDeltas.map(delta => delta.id === 'cash_spent' && delta.kind === 'resource_numeric'
+        ? { ...delta, transactionKind: 'transfer' as const, sink: 'Mua muối sạch từ người bán ở chợ' }
+        : delta),
+    });
+    expect(validateV3Artifacts({ kernel: kernel(), arc, state: state(), plan: disguisedPurchase })).toEqual(
+      expect.arrayContaining([expect.objectContaining({ code: 'resource_purchase_untyped' })]),
+    );
+  });
+
   it('detects CJK and verbatim plan prose without a model critic', () => {
-    const content = `${plan().scenes[0].desire} kim loại拼凑 lại.`;
+    const content = `${plan().scenes[0].objective} kim loại拼凑 lại.`;
     expect(runV3ProsePreflight(content, plan()).map(item => item.code)).toEqual(
       expect.arrayContaining(['foreign_cjk_text', 'plan_verbatim_leak']),
     );
@@ -412,7 +440,7 @@ describe('flagship v3 core engine', () => {
     expect(evidence.map(item => item.code)).toEqual(expect.arrayContaining(['ai_cliche_cluster', 'zero_cash_claim_conflict']));
   });
 
-  it('keeps the exact chapter length floor in the single revision prompt', () => {
+  it('uses a natural hard range instead of forcing a target percentage in revision', () => {
     const context = buildV3RoleContexts({ kernel: kernel(), arc, state: state(), plan: plan() }).revision();
     const prompt = buildV3RevisionPrompt({
       chapterNumber: 2,
@@ -427,11 +455,11 @@ describe('flagship v3 core engine', () => {
       instructions: ['Viết lại chương với đầy đủ diễn biến.'],
       repairMode: 'full_rewrite',
     });
-    expect(prompt).toContain('Mục tiêu 1800 từ');
-    expect(prompt).toContain('không được dưới 1440 từ');
+    expect(prompt).toContain('hard range 1000-2200 từ');
+    expect(prompt).not.toContain('1440');
   });
 
-  it('projects lower-priority history out of Editor and Revision context explicitly', () => {
+  it('gives Writer only the mechanical brief while Editor retains the full plan', () => {
     const longState: StoryStateV3 = {
       ...state(),
       timeline: Array.from({ length: 20 }, (_, chapter) => ({
@@ -441,18 +469,59 @@ describe('flagship v3 core engine', () => {
       retrievalNotes: Array.from({ length: 8 }, (_, index) => `Ghi chú ${index} ${'chi tiết lịch sử '.repeat(30)}`),
     };
     const contexts = buildV3RoleContexts({ kernel: kernel(), arc, state: longState, plan: plan() });
-    expect(contexts.editor.chars).toBeLessThan(contexts.writer.chars);
+    expect(contexts.writer.chars).toBeLessThan(contexts.editor.chars);
     expect(contexts.editor.chars).toBeLessThanOrEqual(contexts.editor.budget);
     expect(contexts.revision().chars).toBeLessThan(contexts.editor.chars);
     expect(contexts.revision().chars).toBeLessThanOrEqual(contexts.revision().budget);
-    for (const scene of plan().scenes) {
-      expect(contexts.writer.text).not.toContain(scene.unresolvedQuestion);
-      expect(contexts.revision().text).not.toContain(scene.unresolvedQuestion);
-      expect(contexts.editor.text).toContain(scene.unresolvedQuestion);
-    }
+    expect(contexts.writer.text).toContain('WRITER_BRIEF_V3');
+    expect(contexts.writer.text).not.toContain(plan().chapterPromise);
+    expect(contexts.writer.text).not.toContain(plan().nextChapterPressure);
+    const promiseDelta = plan().requiredDeltas.find(delta => delta.kind === 'promise');
+    expect(promiseDelta?.kind).toBe('promise');
+    if (promiseDelta?.kind === 'promise') expect(contexts.writer.text).not.toContain(promiseDelta.pressureAfter);
+    expect(contexts.editor.text).toContain(plan().chapterPromise);
+    expect(contexts.editor.text).toContain(plan().nextChapterPressure);
     expect(contexts.revision().text).not.toContain('recentSummary');
     expect(contexts.revision().text).not.toContain('previousEnding');
     expect(contexts.revision().text).not.toContain('retrievalNotes');
+  });
+
+  it('keeps known contaminated setup prose out of Writer input', () => {
+    const pollutedState = StoryStateV3Schema.parse({
+      ...state(),
+      recentSummary: 'Một tia hy vọng mỏng manh vừa mở ra trước mắt cả nhà.',
+      previousEnding: 'Mình cứ để tiền đó mà lo vốn liếng.',
+      promises: state().promises.map((promise, index) => index === 0
+        ? { ...promise, pressure: 'Bước sang trang mới của cơ đồ tương lai.' }
+        : promise),
+    });
+    const contexts = buildV3RoleContexts({ kernel: kernel(), arc, state: pollutedState, plan: plan() });
+    expect(contexts.writer.manifest.find(item => item.id === 'WRITER_BRIEF_V3')?.chars).toBeLessThanOrEqual(V3_WRITER_BRIEF_MAX_CHARS + 18);
+    expect(contexts.writer.text).not.toContain('Mình cứ để tiền đó');
+    expect(contexts.writer.text).not.toContain('tia hy vọng mỏng manh');
+    expect(contexts.writer.text).not.toContain('Bước sang trang mới');
+    expect(contexts.writer.text).not.toContain('positiveExamples');
+    expect(contexts.writer.text).not.toContain('endingContract');
+  });
+
+  it('uses at most 1200 exact words from the published previous chapter and blocks verbatim replay', () => {
+    const published = Array.from({ length: 1_500 }, (_, index) => `từ_${index}`).join(' ');
+    const tail = selectPreviousChapterTailV3(published);
+    expect(tail.split(/\s+/u)).toHaveLength(1_200);
+    expect(tail.startsWith('từ_300 ')).toBe(true);
+    const contexts = buildV3RoleContexts({ kernel: kernel(), arc, state: state(), plan: plan(), previousChapterTail: tail });
+    expect(contexts.writer.text).toContain('PREVIOUS_CHAPTER_TAIL');
+    expect(contexts.writer.text).toContain('từ_300');
+
+    const repeated = 'Đây là một đoạn đủ dài được xuất bản ở chương trước và tuyệt đối không được chép lại nguyên văn trong chương sau vì nó phá hỏng điểm nối tự nhiên của câu chuyện và khiến độc giả phải đọc lại cùng một diễn biến.';
+    const evidence = runV3StructuredProsePreflight({
+      content: repeated,
+      scenes: [{ sceneId: 'scene_1_a', content: repeated }],
+      plan: plan(),
+      targetWordCount: 1_500,
+      previousChapterTail: repeated,
+    });
+    expect(evidence).toEqual(expect.arrayContaining([expect.objectContaining({ code: 'previous_chapter_verbatim_repeat' })]));
   });
 
   it('keeps Revision under budget when optional narrative history is very large', () => {
@@ -464,8 +533,8 @@ describe('flagship v3 core engine', () => {
     };
     const contexts = buildV3RoleContexts({ kernel: kernel(), arc, state: longNarrativeState, plan: plan() });
     expect(contexts.revision().chars).toBeLessThanOrEqual(contexts.revision().budget);
-    expect(contexts.revision().chars).toBeLessThan(contexts.writer.chars);
-    expect(contexts.revision().text).toContain('RELEVANT_STATE_V3');
+    expect(contexts.revision().chars).toBeLessThanOrEqual(contexts.writer.chars);
+    expect(contexts.revision().text).toContain('WRITER_BRIEF_V3');
     expect(contexts.revision().text).toContain('facts');
     expect(contexts.revision().text).toContain('resources');
   });
@@ -476,12 +545,16 @@ describe('flagship v3 core engine', () => {
     expect(V3_ROLLING_PLANNER_RULES).toContain('Không được chi tiền/tài nguyên chưa kiếm được');
     expect(V3_ROLLING_PLANNER_RULES).toContain('chapterPromise là một câu tiếng Việt cụ thể');
     expect(V3_ROLLING_PLANNER_RULES).toContain('Promise ID chỉ xuất hiện trong delta kind=promise');
-    expect(V3_WRITER_SYSTEM).toContain('Các time cue chỉ để giữ thứ tự');
-    expect(V3_WRITER_SYSTEM).toContain('povCharacterId phải là tâm điểm tri giác');
-    expect(V3_WRITER_SYSTEM).toContain('Không gộp hai scene');
-    expect(V3_WRITER_SYSTEM).toContain('ranh giới cảnh rõ');
-    expect(V3_WRITER_SYSTEM).toContain('bước sang trang mới');
-    expect(V3_WRITER_SYSTEM).toContain('before/delta/after');
+    expect(V3_WRITER_SYSTEM).toContain('tự quyết định lời văn');
+    expect(V3_WRITER_SYSTEM).toContain('không kể lại hoặc sao chép');
+    expect(V3_WRITER_SYSTEM).toContain('không phải giao diện trong thế giới truyện');
+    expect(buildV3WriterPrompt({
+      chapterNumber: 1,
+      targetWordCount: 1_500,
+      context: buildV3RoleContexts({ kernel: kernel(), arc, state: state(), plan: plan() }).writer,
+    })).toContain('hard range 1000-2200 từ');
+    expect(V3_WRITER_SYSTEM).not.toContain('bước sang trang mới');
+    expect(V3_WRITER_SYSTEM).not.toContain('đó không phải');
   });
 
   it('recognizes Gemini 3.1 Pro as a thinking model so role budgets are not silently ignored', () => {
@@ -518,7 +591,8 @@ describe('flagship v3 core engine', () => {
     expect(schema.properties.plans.items.properties.requiredDeltas.maxItems).toBeUndefined();
     expect(schema.properties.plans.items.properties.scenes).toMatchObject({ minItems: 1, maxItems: 5 });
     expect(schema.properties.plans.items.properties.preconditions.maxItems).toBe(state().facts.length);
-    expect(scene.desire.description).toContain('minimum string length: 20');
+    expect(scene.objective).toBeDefined();
+    expect(scene.desire).toBeUndefined();
     expect(precondition.factId.enum).toEqual(state().facts.map(fact => fact.id).sort());
     const deltas = schema.properties.plans.items.properties.requiredDeltas.items.anyOf;
     const byKind = (kind: string) => deltas.find((branch: any) => branch.properties.kind.enum.includes(kind)).properties;
@@ -672,7 +746,7 @@ describe('flagship v3 core engine', () => {
       kernel: kernel(), arc, state: state(), plan: plan(), targetWordCount: 1600, contexts,
     }, {
       invoke: async call => call.role === 'writer'
-        ? JSON.stringify({ title: 'Mẻ Cá Qua Mưa', scenes: plan().scenes.map(scene => ({ sceneId: scene.id, paragraphs: escapedParagraphs })) })
+        ? JSON.stringify({ title: 'Mẻ Cá Qua Mưa', scenes: writerScenes(escapedParagraphs.join('\n\n')) })
         : JSON.stringify(passAssessment(content)),
     });
     expect(result.content).toContain('\n\n');
@@ -693,7 +767,7 @@ describe('flagship v3 core engine', () => {
         calls.push(call.role);
         if (call.role === 'writer') return JSON.stringify({
           title: 'Mẻ Cá Qua Mưa',
-          scenes: plan().scenes.map((scene, index) => ({ sceneId: scene.id, paragraphs: paragraphs(index === 0 ? bad : fixed) })),
+          scenes: writerScenes(bad),
         });
         if (call.role === 'writer_revision') return JSON.stringify({ patches: [{ spanId: 'span_001', replacement: fixed.slice(0, 650) }] });
         if (call.role === 'editor') {
@@ -778,7 +852,7 @@ describe('flagship v3 core engine', () => {
       invoke: async call => {
         if (call.role === 'writer') return JSON.stringify({
           title: 'Mẻ Cá Qua Mưa',
-          scenes: plan().scenes.map((scene, index) => ({ sceneId: scene.id, paragraphs: paragraphs(index === 0 ? contaminated : fixed) })),
+          scenes: writerScenes(contaminated),
         });
         if (call.role === 'writer_revision') return JSON.stringify({ patches: [{ spanId: 'span_001', replacement: fixed.slice(0, 650) }] });
         if (call.role === 'editor') {

@@ -174,6 +174,7 @@ export interface FlagshipV3PipelineInput {
   state: StoryStateV3;
   plan: ChapterPlanV3;
   targetWordCount: number;
+  previousChapterTail?: string;
   contexts: V3RoleContexts;
 }
 
@@ -278,6 +279,7 @@ export async function executeFlagshipV3Pipeline(
     scenes: draft.scenes,
     plan: input.plan,
     targetWordCount: input.targetWordCount,
+    previousChapterTail: input.previousChapterTail,
     kernel: input.kernel,
     state: input.state,
   });
@@ -384,6 +386,7 @@ export async function executeFlagshipV3Pipeline(
     scenes: draft.scenes,
     plan: input.plan,
     targetWordCount: input.targetWordCount,
+    previousChapterTail: input.previousChapterTail,
     kernel: input.kernel,
     state: input.state,
   });

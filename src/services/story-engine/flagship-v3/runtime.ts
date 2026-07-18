@@ -6,6 +6,7 @@ import { callFlagshipModel } from '../flagship/provider';
 import { getSupabase } from '../utils/supabase';
 import { ArcPlanV3Schema, ChapterPlanV3Schema, StoryKernelV3Schema, StoryStateV3Schema, parseV3 } from './contracts';
 import { buildV3RoleContexts } from './context';
+import { selectPreviousChapterTailV3 } from './context';
 import { requireFlagshipModelRoutesV3 } from './model-routes';
 import {
   FlagshipV3Error,
@@ -60,6 +61,25 @@ function parseRequired<T>(label: string, schema: Parameters<typeof parseV3<T>>[0
   const parsed = parseV3(schema, value);
   if (!parsed.success) throw new FlagshipV3Error('setup_blocked', `${label} is missing or invalid.`, parsed.issues);
   return parsed.data;
+}
+
+async function loadPreviousChapterTailV3(
+  db: SupabaseClient,
+  novelId: string,
+  nextChapter: number,
+): Promise<string> {
+  if (nextChapter === 1) return '';
+  const { data, error } = await db.from('chapters')
+    .select('content')
+    .eq('novel_id', novelId)
+    .eq('chapter_number', nextChapter - 1)
+    .maybeSingle();
+  if (error) throw new FlagshipV3Error('infra_blocked', `Previous published chapter lookup failed: ${error.message}`);
+  const content = typeof data?.content === 'string' ? data.content.trim() : '';
+  if (!content) {
+    throw new FlagshipV3Error('setup_blocked', `Published chapter ${nextChapter - 1} is missing; continuity cannot be established.`);
+  }
+  return selectPreviousChapterTailV3(content);
 }
 
 function failureDetail(error: FlagshipV3Error): {
@@ -195,7 +215,8 @@ export async function writeFlagshipV3Chapter(
   } catch (caught) {
     throw new FlagshipV3Error('infra_blocked', caught instanceof Error ? caught.message : String(caught));
   }
-  const contexts = buildV3RoleContexts({ kernel, arc, state, plan });
+  const previousChapterTail = await loadPreviousChapterTailV3(db, novel.id, nextChapter);
+  const contexts = buildV3RoleContexts({ kernel, arc, state, plan, previousChapterTail });
   let contextManifest = contexts.used().flatMap(context => context.manifest);
   let contextSize = contexts.used().reduce((sum, context) => sum + context.chars, 0);
   let run: WriteRunHandle | null = null;
@@ -284,6 +305,7 @@ export async function writeFlagshipV3Chapter(
         state,
         plan,
         targetWordCount,
+        previousChapterTail,
         contexts,
       }, { invoke });
       contextManifest = contexts.used().flatMap(context => context.manifest);
