@@ -33,7 +33,8 @@ const booleanObjectJsonSchema = (keys: readonly string[], passOnly: boolean): Re
  * delta IDs that can actually occur in this plan. Zod and application
  * validation remain authoritative after generation.
  */
-export function buildEditorResponseJsonSchemaV3(plan: ChapterPlanV3): Record<string, unknown> {
+export function buildEditorResponseJsonSchemaV3(plan: ChapterPlanV3, issueBudget = 3): Record<string, unknown> {
+  const boundedIssueBudget = Math.max(1, Math.min(3, Math.floor(issueBudget)));
   const deltaIds = [...new Set(plan.requiredDeltas
     .filter(delta => delta.evidenceRequired)
     .map(delta => delta.id))];
@@ -74,10 +75,10 @@ export function buildEditorResponseJsonSchemaV3(plan: ChapterPlanV3): Record<str
       qualityGates: booleanObjectJsonSchema(V3_QUALITY_GATE_KEYS, status === 'pass'),
       issues: status === 'pass'
         ? { type: 'array', items: issue, minItems: 0, maxItems: 0 }
-        : { type: 'array', items: issue, minItems: 1, maxItems: 3 },
+        : { type: 'array', items: issue, minItems: 1, maxItems: boundedIssueBudget },
       revisionInstructions: status === 'pass'
         ? { type: 'array', items: { type: 'string' }, minItems: 0, maxItems: 0 }
-        : { type: 'array', items: { type: 'string' }, minItems: 0, maxItems: 3 },
+        : { type: 'array', items: { type: 'string' }, minItems: 0, maxItems: boundedIssueBudget },
       realizedDeltaEvidence: status === 'pass'
         ? { ...deltaEvidence, minItems: deltaIds.length }
         : deltaEvidence,

@@ -57,13 +57,19 @@ type Checkpoint = {
 };
 
 const cleanJson = (raw: string): unknown => JSON.parse(raw.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, ''));
-const digestCall = (chapterNumber: number, model: string, call: FlagshipV3ModelCall): string => createHash('sha256')
+const digestCall = (
+  chapterNumber: number,
+  model: string,
+  call: FlagshipV3ModelCall,
+  responseJsonSchema: Record<string, unknown>,
+): string => createHash('sha256')
   .update(JSON.stringify({
     chapterNumber,
     model,
     role: call.role,
     systemPrompt: call.systemPrompt,
     userPrompt: call.userPrompt,
+    responseJsonSchema,
     promptVersion: FLAGSHIP_V3_PROMPT_VERSION,
     routeVersion: routes.routeVersion,
   }))
@@ -109,18 +115,19 @@ async function main(): Promise<void> {
       const chapterDir = path.join(checkpointRoot, `chapter-${chapterNumber}`);
       mkdirSync(chapterDir, { recursive: true });
       const checkpointFile = path.join(chapterDir, `${call.role}.response.json`);
-      const promptDigest = digestCall(chapterNumber, model, call);
+      const schema = responseSchema(call);
+      const responseJsonSchema = call.responseJsonSchema || toGeminiResponseJsonSchema(schema as never);
+      const promptDigest = digestCall(chapterNumber, model, call, responseJsonSchema);
       const checkpoint = reusableCheckpoint(checkpointFile, promptDigest, model, call);
       if (checkpoint) return { ...checkpoint, reused: true };
 
-      const schema = responseSchema(call);
       const response = await callFlagshipModel(call.userPrompt, {
         model,
         temperature: call.role === 'writer' || call.role === 'writer_revision' ? 0.75 : 0.15,
         maxTokens: call.role === 'writer' || call.role === 'writer_revision' ? 32768 : 16384,
         thinkingLevel: 'medium',
         systemPrompt: call.systemPrompt,
-        responseJsonSchema: call.responseJsonSchema || toGeminiResponseJsonSchema(schema as never),
+        responseJsonSchema,
       }, {
         jsonMode: true,
         schemaName: `flagship_v3_offline_ch${chapterNumber}_${call.role}`,

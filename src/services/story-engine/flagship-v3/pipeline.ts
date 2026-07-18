@@ -287,6 +287,7 @@ export async function executeFlagshipV3Pipeline(
     verdict: QualityVerdictV3;
   }> => {
     const spans = buildV3ProseSpans(draft.content);
+    const editorIssueBudget = Math.max(1, 3 - deterministicEvidence.length);
     const raw = await invoke({
       role,
       systemPrompt: V3_EDITOR_SYSTEM,
@@ -299,9 +300,20 @@ export async function executeFlagshipV3Pipeline(
         deterministicEvidence,
       }),
       jsonMode: true,
-      responseJsonSchema: buildEditorResponseJsonSchemaV3(input.plan),
+      responseJsonSchema: buildEditorResponseJsonSchemaV3(input.plan, editorIssueBudget),
     });
     const editor = groundEditor(parseJson(raw, EditorAssessmentV3Schema, role), spans);
+    if (editor.status === 'issues' && (
+      editor.issues.length > editorIssueBudget
+      || editor.revisionInstructions.length > editorIssueBudget
+    )) {
+      throw new FlagshipV3Error('infra_blocked', `${role} exceeded the combined deterministic/editor issue budget.`, {
+        deterministicIssues: deterministicEvidence.length,
+        editorIssueBudget,
+        editorIssues: editor.issues.length,
+        revisionInstructions: editor.revisionInstructions.length,
+      });
+    }
     assertAuditable(editor);
     return { editor, verdict: evaluateQualityV3({ plan: input.plan, editor, deterministicEvidence }) };
   };
@@ -341,6 +353,7 @@ export async function executeFlagshipV3Pipeline(
     systemPrompt: V3_WRITER_SYSTEM,
     userPrompt: buildV3RevisionPrompt({
       chapterNumber: input.plan.chapterNumber,
+      targetWordCount: input.targetWordCount,
       context: input.contexts.revision(),
       title: draft.title,
       content: draft.content,

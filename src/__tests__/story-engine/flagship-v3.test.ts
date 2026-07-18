@@ -32,6 +32,7 @@ import {
   retainStoryFactsV3,
   V3_ROLLING_PLANNER_RULES,
   V3_WRITER_SYSTEM,
+  buildV3RevisionPrompt,
   type ChapterPlanV3,
   type StoryKernelV3,
   type StoryStateV3,
@@ -411,6 +412,25 @@ describe('flagship v3 core engine', () => {
     expect(evidence.map(item => item.code)).toEqual(expect.arrayContaining(['ai_cliche_cluster', 'zero_cash_claim_conflict']));
   });
 
+  it('keeps the exact chapter length floor in the single revision prompt', () => {
+    const context = buildV3RoleContexts({ kernel: kernel(), arc, state: state(), plan: plan() }).revision();
+    const prompt = buildV3RevisionPrompt({
+      chapterNumber: 2,
+      targetWordCount: 1800,
+      context,
+      title: 'Bèo Tây Giữ Mẻ Cá Bạc',
+      content: prose('Bản nháp ngắn.'),
+      evidence: [{
+        code: 'chapter_under_target', severity: 'major', message: 'Bản nháp chỉ có 975 từ.',
+        start: 0, end: 10, excerpt: 'Bản nháp', local: false,
+      }],
+      instructions: ['Viết lại chương với đầy đủ diễn biến.'],
+      repairMode: 'full_rewrite',
+    });
+    expect(prompt).toContain('Mục tiêu 1800 từ');
+    expect(prompt).toContain('không được dưới 1440 từ');
+  });
+
   it('projects lower-priority history out of Editor and Revision context explicitly', () => {
     const longState: StoryStateV3 = {
       ...state(),
@@ -460,13 +480,15 @@ describe('flagship v3 core engine', () => {
     expect(V3_WRITER_SYSTEM).toContain('povCharacterId phải là tâm điểm tri giác');
     expect(V3_WRITER_SYSTEM).toContain('Không gộp hai scene');
     expect(V3_WRITER_SYSTEM).toContain('ranh giới cảnh rõ');
+    expect(V3_WRITER_SYSTEM).toContain('bước sang trang mới');
+    expect(V3_WRITER_SYSTEM).toContain('before/delta/after');
   });
 
   it('recognizes Gemini 3.1 Pro as a thinking model so role budgets are not silently ignored', () => {
     expect(supportsGeminiThinkingLevel('gemini-3.1-pro-preview')).toBe(true);
     expect(supportsGeminiThinkingLevel('gemini-3-pro-preview')).toBe(true);
     expect(supportsGeminiThinkingLevel('gemini-2.5-pro')).toBe(false);
-    expect(getFlagshipReleaseManifestV3().providerVersion).toBe('provider-v3.8-gemini-complexity-safe-schemas');
+    expect(getFlagshipReleaseManifestV3().providerVersion).toBe('provider-v3.9-combined-editor-issue-budget');
   });
 
   it('puts numeric bounds and source rules beside current balances in the authoritative planner ledger', () => {
@@ -741,6 +763,9 @@ describe('flagship v3 core engine', () => {
     expect(providerSchema).toContain('"maxItems":0');
     expect(providerSchema).toContain('"maxItems":3');
     expect(providerSchema).toContain('"salt_spent"');
+    const constrainedIssueSchema = JSON.stringify(buildEditorResponseJsonSchemaV3(plan(), 2));
+    expect(constrainedIssueSchema).toContain('"maxItems":2');
+    expect(constrainedIssueSchema).not.toContain('"maxItems":3');
   });
 
   it('lets deterministic preflight own evidence without forcing the Editor to duplicate it', async () => {

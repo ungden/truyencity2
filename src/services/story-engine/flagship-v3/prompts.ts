@@ -3,12 +3,14 @@ import type { V3RoleContext } from './context';
 import type { V3Evidence } from './preflight';
 import type { V3ProseSpan } from './evidence-spans';
 
-export const FLAGSHIP_V3_PROMPT_VERSION = 'flagship-v3.10-adversarial-editor-scene-paragraphs';
+export const FLAGSHIP_V3_PROMPT_VERSION = 'flagship-v3.12-concrete-prose-exact-ledger';
 
 export const V3_WRITER_SYSTEM = `Bạn là tiểu thuyết gia của đúng một bộ truyện.
 Viết một chương hoàn chỉnh từ dữ liệu cảnh, không chép câu mô tả trong kế hoạch.
 Chỉ sử dụng nhân vật, tri thức, quyền hạn, tài nguyên và quy tắc có trong context.
 Mọi thay đổi bắt buộc phải xảy ra qua hành động, đối thoại và hậu quả nhìn thấy được.
+Không được bình luận hoặc tổng kết thay người đọc bằng các câu kiểu "bước sang trang mới", "viên gạch/cơ đồ/tương lai", "đó không phải... mà là...", "anh không tự ti/khúm núm". Thể hiện cảm xúc, quan hệ và tiến bộ bằng cử chỉ, lựa chọn, lời nói và vật chứng cụ thể; tránh ẩn dụ khẩu hiệu, diễn văn và câu tuyên bố bài học.
+Mọi lượng hàng, đơn giá, khoản thu chi và số dư phải khớp tuyệt đối với before/delta/after và consideration trong context; tự làm phép tính trước khi viết thành prose.
 Giữ đúng POV của từng scene; povCharacterId phải là tâm điểm tri giác của scene đó, không chuyển sang nội tâm người khác.
 Mỗi scene trong ChapterPlan là một đơn vị kịch riêng và phải xuất hiện theo đúng thứ tự. Không gộp hai scene, kể cả khi cùng địa điểm hoặc cùng nhân vật. Khi povCharacterId đổi, phải tạo ranh giới cảnh rõ bằng ngắt đoạn/chuyển cảnh rồi mới đi vào tri giác của POV mới.
 Các time cue chỉ để giữ thứ tự và độ hợp lý. Diễn đạt thời gian tự nhiên theo cảm nhận nhân vật; không đọc số phút kỹ thuật thành câu văn trừ khi nhân vật thật sự xem đồng hồ.
@@ -69,6 +71,7 @@ Trả duy nhất JSON EditorAssessmentV3.`;
 
 export function buildV3RevisionPrompt(input: {
   chapterNumber: number;
+  targetWordCount: number;
   context: V3RoleContext;
   title: string;
   content: string;
@@ -77,10 +80,12 @@ export function buildV3RevisionPrompt(input: {
   repairMode: 'local_edit' | 'full_rewrite';
   allowedSpans?: Array<{ id: string; text: string }>;
 }): string {
+  const minimumWordCount = Math.ceil(input.targetWordCount * 0.8);
   const outputContract = input.repairMode === 'local_edit'
     ? `Chỉ được thay đúng các span trong ALLOWED_SPANS. Trả JSON {"patches":[{"spanId":"...","replacement":"..."}]}; không trả toàn chương, không sửa title, không sửa span khác.`
     : `Viết lại toàn chương theo từng scene. Mỗi đoạn văn là một phần tử riêng; trả JSON {"title":"...","scenes":[{"sceneId":"ID đúng từ plan","paragraphs":["đoạn 1","đoạn 2"]}]}.`;
   return `Sửa đúng một lượt chương ${input.chapterNumber} bằng chế độ ${input.repairMode}.
+Mục tiêu ${input.targetWordCount} từ; bản sau sửa tuyệt đối không được dưới ${minimumWordCount} từ. Với full_rewrite, phải tự kiểm độ dài toàn chương trước khi trả JSON. Với local_edit, không được rút ngắn chương xuống dưới sàn này.
 Giữ nguyên các sự kiện và delta đã đúng. Chỉ sửa lỗi có evidence, không thêm nhân vật, twist, tài nguyên hoặc setup.
 Plan, canon và state trong ROLE_CONTEXT là bất biến. Nếu CURRENT mâu thuẫn với chúng, phải sửa CURRENT cho khớp; không được tự sửa hoặc đề nghị sửa dữ liệu nền.
 Phải thực hiện thay đổi văn bản cụ thể cho từng evidence. Không được trả lại nguyên văn CURRENT, kể cả khi cho rằng bản hiện tại hợp lý hơn.
