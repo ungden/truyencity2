@@ -9,13 +9,21 @@ export const V3_HARD_GATE_KEYS = [
 export type V3HardGate = typeof V3_HARD_GATE_KEYS[number];
 
 export const V3_QUALITY_GATE_KEYS = [
-  'premise_interest', 'character_voice', 'scene_tension', 'causal_surprise',
-  'emotional_movement', 'domain_truth', 'prose_naturalness', 'agency',
-  'earned_pleasure', 'recovery_pacing', 'desire_to_read_next',
+  'character_voice', 'scene_tension', 'emotional_movement', 'domain_truth',
+  'prose_naturalness', 'agency', 'desire_to_read_next',
 ] as const;
 export type V3QualityGate = typeof V3_QUALITY_GATE_KEYS[number];
 export const V3_AXIS_KEYS = V3_QUALITY_GATE_KEYS;
 export type V3QualityAxis = V3QualityGate;
+
+// These are meaningful only across a rolling window or an arc. Requiring them
+// in every chapter makes long-form prose formulaic and turns quiet connective
+// chapters into false negatives. They remain available to the planner/window
+// evaluator, but are deliberately absent from EditorAssessmentV3.
+export const V3_CADENCE_GATE_KEYS = [
+  'premise_interest', 'causal_surprise', 'earned_pleasure', 'recovery_pacing',
+] as const;
+export type V3CadenceGate = typeof V3_CADENCE_GATE_KEYS[number];
 
 const booleanObjectJsonSchema = (keys: readonly string[], passOnly: boolean): Record<string, unknown> => ({
   type: 'object',
@@ -110,30 +118,22 @@ const hardGatePass = z.object({
 }).strict();
 
 const qualityGateBooleans = z.object({
-  premise_interest: z.boolean(),
   character_voice: z.boolean(),
   scene_tension: z.boolean(),
-  causal_surprise: z.boolean(),
   emotional_movement: z.boolean(),
   domain_truth: z.boolean(),
   prose_naturalness: z.boolean(),
   agency: z.boolean(),
-  earned_pleasure: z.boolean(),
-  recovery_pacing: z.boolean(),
   desire_to_read_next: z.boolean(),
 }).strict();
 
 const qualityGatePass = z.object({
-  premise_interest: z.literal(true),
   character_voice: z.literal(true),
   scene_tension: z.literal(true),
-  causal_surprise: z.literal(true),
   emotional_movement: z.literal(true),
   domain_truth: z.literal(true),
   prose_naturalness: z.literal(true),
   agency: z.literal(true),
-  earned_pleasure: z.literal(true),
-  recovery_pacing: z.literal(true),
   desire_to_read_next: z.literal(true),
 }).strict();
 

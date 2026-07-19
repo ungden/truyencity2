@@ -14,6 +14,9 @@ import {
   StoryStateV3Schema,
   V3_ROLLING_PLANNER_PROMPT_VERSION,
   V3_ROLLING_PLANNER_SYSTEM,
+  FLAGSHIP_V3_ARC_ARCHITECT_VERSION,
+  FLAGSHIP_V3_KERNEL_ARCHITECT_VERSION,
+  FLAGSHIP_V3_STATE_SEEDER_VERSION,
   FlagshipV3Error,
   buildPlannerRepairPromptV3,
   buildPlannerLedgerV3,
@@ -45,9 +48,9 @@ const tournament = JSON.parse(readFileSync(path.resolve(tournamentPath), 'utf8')
 };
 const routes = FlagshipModelRoutesV3Schema.parse(JSON.parse(readFileSync(path.resolve(routesPath), 'utf8')));
 const PROMPT_VERSIONS: Record<string, string> = {
-  kernel_architect: 'flagship-v3-kernel-2026-07-18.9-neutral-voice-exact-shape',
-  state_seeder: 'flagship-v3-state-seeder-2026-07-18.6-exact-shape',
-  arc_architect: 'flagship-v3-arc-2026-07-18.3-exact-shape',
+  kernel_architect: FLAGSHIP_V3_KERNEL_ARCHITECT_VERSION,
+  state_seeder: FLAGSHIP_V3_STATE_SEEDER_VERSION,
+  arc_architect: FLAGSHIP_V3_ARC_ARCHITECT_VERSION,
   initial_rolling_planner: V3_ROLLING_PLANNER_PROMPT_VERSION,
   initial_rolling_planner_repair: `${V3_ROLLING_PLANNER_PROMPT_VERSION}.repair1`,
 };

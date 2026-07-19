@@ -159,7 +159,7 @@ async function main(): Promise<void> {
       throw new Error(`${entry.slot} candidate run is stale for ${release.releaseId}/${FLAGSHIP_V3_PROMPT_VERSION}.`);
     }
     if (run.requestedChapters !== 10 || run.completedChapters !== 10 || run.chapters.some(chapter => chapter.status !== 'publish')) {
-      throw new Error(`${entry.slot} must have a clean sequential 10-chapter candidate run before pair freezing.`);
+      throw new Error(`${entry.slot} needs ten candidate prose options for the preference corpus. Operational success is measured from the separate sequential-survival corpus and is never inferred here.`);
     }
     candidateRouteVersion ||= run.routeVersion;
     if (candidateRouteVersion !== run.routeVersion) throw new Error('All candidate runs must use one exact route version.');
@@ -242,12 +242,6 @@ async function main(): Promise<void> {
         },
         candidate: { title: candidateChapter.title, content: candidateChapter.content },
         control: controlOutput,
-        schemaSuccess: true,
-        planSuccess: true,
-        infraSuccess: true,
-        firstPassPublished: candidateChapter.callRoles.length === 2,
-        publishedWithinRepair: true,
-        publishedCostUsd: candidateChapter.estimatedCostUsd,
         controlCostUsd: controlCost,
       });
     }

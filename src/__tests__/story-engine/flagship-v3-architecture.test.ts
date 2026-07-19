@@ -5,6 +5,7 @@ import { classifyStoryFailure } from '@/lib/story-production-quota';
 import {
   applyChapterStateV3,
   canTransitionFactoryV3,
+  decideFactoryV3QualityRecovery,
   runV3ProsePreflight,
   type ChapterPlanV3,
   type StoryStateV3,
@@ -36,13 +37,15 @@ describe('flagship v3 architecture boundary', () => {
     }
   });
 
-  it('uses one v3 scheduler with terminal content blocks and no quality retry', () => {
+  it('uses one v3 scheduler with a bounded fresh-draft recovery and terminal blocks', () => {
     const route = read('src/app/api/cron/flagship-factory/route.ts');
     expect(route).toContain("pipeline_version: 'flagship_v3'");
     expect(route).toContain("'quality_blocked'");
     expect(route).toContain("'plan_blocked'");
     expect(route).not.toContain('recordQualityFailure');
-    expect(route).not.toContain('decideFactoryQualityRetry');
+    expect(route).toContain('decideFactoryV3QualityRecovery');
+    expect(decideFactoryV3QualityRecovery(0)).toBe('retry_fresh_draft');
+    expect(decideFactoryV3QualityRecovery(1)).toBe('quality_blocked');
     expect(canTransitionFactoryV3('quality_blocked', 'ready')).toBe(false);
     expect(canTransitionFactoryV3('plan_blocked', 'ready')).toBe(false);
   });
@@ -130,14 +133,53 @@ describe('flagship v3 architecture boundary', () => {
     expect(context).not.toContain('OVER_DIRECTED_CONTROL_CONTEXT');
   });
 
-  it('blocks machine calibration before spending when an exact judge credential is absent', () => {
+  it('uses the available Gemini credential for three pinned independent judges', () => {
     const calibration = read('scripts/flagship-v3-machine-calibrate.ts');
-    expect(calibration).toContain('CALIBRATION_BLOCKED: missing exact judge credential');
+    const contracts = read('src/services/story-engine/flagship-v3/calibration.ts');
+    expect(calibration).toContain('CALIBRATION_BLOCKED: GEMINI_API_KEY');
     expect(calibration.indexOf('assertMachineJudgeCredentials();')).toBeLessThan(
       calibration.indexOf('runMachineEnsembleV3(pairCorpus'),
     );
-    expect(calibration).toContain("['OPENAI_API_KEY', process.env.OPENAI_API_KEY]");
-    expect(calibration).toContain('no substitute route is allowed');
+    expect(calibration).not.toContain('OPENAI_API_KEY');
+    expect(calibration).not.toContain('OPENROUTER_API_KEY');
+    expect(contracts).toContain("'google/gemini-3-flash-preview'");
+    expect(contracts).toContain("'google/gemini-3.1-pro-preview'");
+  });
+
+  it('lets hidden canaries run while projects stay paused and promotes the same job', () => {
+    const migration = read('supabase/migrations/20260719115058_flagship_v3_hidden_canary_factory.sql');
+    expect(migration).toContain("execution_mode IN ('hidden_canary','production')");
+    expect(migration).toContain("j.execution_mode='hidden_canary'");
+    expect(migration).toContain("NEW.status IS DISTINCT FROM 'paused'");
+    expect(migration).toContain("UPDATE public.story_factory_jobs SET execution_mode='production'");
+    expect(migration).not.toContain("SELECT public.enroll_flagship_factory_job_v3(p_project_id");
+  });
+
+  it('preserves frozen v2 quota accounting while adding hidden v3 quotas', () => {
+    const migration = read('supabase/migrations/20260719121302_flagship_v3_preserve_legacy_quota.sql');
+    expect(migration).toContain("j.pipeline_version='flagship_v2'");
+    expect(migration).toContain("v_job.execution_mode='hidden_canary'");
+    expect(migration).toContain('ELSE LEAST(500');
+  });
+
+  it('separates sequential survival from blind preference and never hard-codes operational success', () => {
+    const pairBuilder = read('scripts/flagship-v3-build-machine-pairs.ts');
+    const survivalBuilder = read('scripts/flagship-v3-build-sequential-survival.ts');
+    const calibration = read('scripts/flagship-v3-machine-calibrate.ts');
+    expect(pairBuilder).not.toContain('schemaSuccess: true');
+    expect(pairBuilder).not.toContain('planSuccess: true');
+    expect(pairBuilder).not.toContain('infraSuccess: true');
+    expect(survivalBuilder).toContain("const terminalStatus = chapter?.status || 'not_attempted'");
+    expect(calibration).toContain('SequentialSurvivalCorpusV3Schema.parse');
+  });
+
+  it('rejects legacy/manual entrypoints for flagship v3', () => {
+    const operations = read('src/app/api/admin/operations/route.ts');
+    const manual = read('src/app/api/claude-writer/route.ts');
+    expect(operations).toContain('flagship_v3_project_must_stay_paused_use_factory_job');
+    expect(operations).toContain('flagship_v3_factory_entrypoint_required');
+    expect(operations).not.toContain("import('@/services/story-engine/pipeline/orchestrator')");
+    expect(manual).toContain('flagship_v3_factory_entrypoint_required');
   });
 
   it('loads the published previous chapter directly instead of a generated summary', () => {

@@ -184,6 +184,25 @@ function fingerprint(candidate: ConceptCandidateV3): string {
   })).digest('hex');
 }
 
+function fingerprintDimension(values: string[]): string {
+  return createHash('sha256').update(JSON.stringify([...values].map(value => value.trim().toLocaleLowerCase('vi')).sort())).digest('hex');
+}
+
+export function buildPortfolioSignatureV3(candidate: ConceptCandidateV3): {
+  selectedConceptId: string;
+  mechanismFingerprint: string;
+  rewardLoopFingerprint: string;
+  conflictEconomyFingerprint: string;
+} {
+  const parsed = ConceptCandidateV3Schema.parse(candidate);
+  return {
+    selectedConceptId: parsed.id,
+    mechanismFingerprint: fingerprintDimension(parsed.mechanismFingerprint),
+    rewardLoopFingerprint: fingerprintDimension(parsed.rewardLoopFingerprint),
+    conflictEconomyFingerprint: fingerprintDimension(parsed.conflictEconomyFingerprint),
+  };
+}
+
 function assertDistinctCandidates(candidates: ConceptCandidateV3[]): void {
   const ids = new Set(candidates.map(candidate => candidate.id));
   const fingerprints = new Set(candidates.map(fingerprint));

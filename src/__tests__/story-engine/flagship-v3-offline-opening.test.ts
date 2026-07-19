@@ -17,9 +17,9 @@ const routes = FlagshipModelRoutesV3Schema.parse(JSON.parse(readFileSync(
 )));
 
 const qualityGates = {
-  premise_interest: true, character_voice: true, scene_tension: true, causal_surprise: true,
+  character_voice: true, scene_tension: true,
   emotional_movement: true, domain_truth: true, prose_naturalness: true, agency: true,
-  earned_pleasure: true, recovery_pacing: true, desire_to_read_next: true,
+  desire_to_read_next: true,
 };
 const hardGates = {
   canon: true, timeline: true, resource_causality: true, character_knowledge: true,

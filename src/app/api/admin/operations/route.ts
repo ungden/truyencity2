@@ -540,11 +540,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       if (!projectId) return NextResponse.json({ error: 'projectId required' }, { status: 400 });
       const { data: project } = await supabase
         .from('ai_story_projects')
-        .select('pause_reason')
+        .select('pause_reason,style_directives')
         .eq('id', projectId)
         .maybeSingle();
       if (project?.pause_reason?.startsWith('legacy_archived_')) {
         return NextResponse.json({ error: 'legacy_archived_project_cannot_resume' }, { status: 409 });
+      }
+      if ((project?.style_directives as { pipeline_version?: string } | null)?.pipeline_version === 'flagship_v3') {
+        return NextResponse.json({ error: 'flagship_v3_project_must_stay_paused_use_factory_job' }, { status: 409 });
       }
       const { error } = await supabase
         .from('ai_story_projects')
@@ -558,15 +561,18 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       if (!projectId) return NextResponse.json({ error: 'projectId required' }, { status: 400 });
       const { data: project } = await supabase
         .from('ai_story_projects')
-        .select('pause_reason')
+        .select('pause_reason,style_directives')
         .eq('id', projectId)
         .maybeSingle();
       if (project?.pause_reason?.startsWith('legacy_archived_')) {
         return NextResponse.json({ error: 'legacy_archived_project_cannot_write' }, { status: 409 });
       }
-      const { writeOneChapter } = await import('@/services/story-engine/pipeline/orchestrator');
+      if ((project?.style_directives as { pipeline_version?: string } | null)?.pipeline_version === 'flagship_v3') {
+        return NextResponse.json({ error: 'flagship_v3_factory_entrypoint_required' }, { status: 409 });
+      }
+      const { writeChapterForProject } = await import('@/services/story-engine');
       try {
-        const result = await writeOneChapter({ projectId });
+        const result = await writeChapterForProject({ projectId });
         return NextResponse.json({ success: true, result });
       } catch (e) {
         return NextResponse.json({

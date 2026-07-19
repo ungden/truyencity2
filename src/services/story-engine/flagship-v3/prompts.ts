@@ -3,7 +3,7 @@ import type { V3RoleContext } from './context';
 import type { V3Evidence } from './preflight';
 import type { V3ProseSpan } from './evidence-spans';
 
-export const FLAGSHIP_V3_PROMPT_VERSION = 'flagship-v3.14-mechanics-locked-prose-free';
+export const FLAGSHIP_V3_PROMPT_VERSION = 'flagship-v3.15-chapter-gates-only';
 
 export const V3_CHAPTER_LENGTH_POLICY = {
   softMinWords: 1_200,
@@ -23,6 +23,7 @@ Chỉ trả JSON {"title":"...","scenes":[{"sceneId":"...","paragraphs":["đoạ
 
 export const V3_EDITOR_SYSTEM = `Bạn là biên tập viên độc lập, không viết hộ tác giả và không thưởng vì đủ checklist.
 Đánh giá nhị phân canon, timeline, tài nguyên, tri thức, quyền hạn, độ trung thành với plan và chất lượng đọc. Không cho điểm 0-10 và không tự quyết định publish/revise/reject; code sẽ quyết định từ gate và evidence.
+Chỉ đánh giá chất lượng mà một chương riêng lẻ có thể chịu trách nhiệm: giọng nhân vật, căng thẳng cảnh, chuyển động cảm xúc, độ thật nghề nghiệp, văn tự nhiên, agency và mong muốn đọc tiếp. Không ép mỗi chương phải có twist, payoff lớn hoặc tự tái khẳng định premise; các nhịp đó được kiểm theo cửa sổ nhiều chương.
 Mọi evidence và realizedDeltaEvidence phải chọn đúng spanId có sẵn trong PROSE_SPANS; không tự chép excerpt hoặc tự tính offset.
 DETERMINISTIC_EVIDENCE đã do code định vị chính xác; không lặp lại các lỗi đó trong evidence. Chỉ dùng evidence cho lỗi mới mà deterministic preflight chưa nêu.
 realizedDeltaEvidence phải chứng minh từng required delta đã thực sự xảy ra trong văn xuôi.

@@ -70,8 +70,8 @@ export function computeCalibrationMetricsV3(corpus: BlindCalibrationCorpusV3): C
 
 export const MACHINE_JUDGE_LINEAGES_V3 = [
   'google/gemini-2.5-pro',
-  'openai/gpt-5.6-luna',
-  'openrouter/x-ai/grok-4.5',
+  'google/gemini-3-flash-preview',
+  'google/gemini-3.1-pro-preview',
 ] as const;
 
 const digest = z.string().regex(/^[a-f0-9]{64}$/);
@@ -109,6 +109,35 @@ export const FrozenBriefCorpusV3Schema = z.object({
 
 export type FrozenBriefCorpusV3 = z.infer<typeof FrozenBriefCorpusV3Schema>;
 
+export const SequentialSurvivalSampleV3Schema = z.object({
+  sampleId: z.string().trim().min(3),
+  projectId: z.string().uuid(),
+  chapterNumber: z.number().int().min(1).max(10),
+  attempted: z.boolean(),
+  terminalStatus: z.enum(['publish','quality_blocked','plan_blocked','infra_blocked','not_attempted']),
+  schemaSuccess: z.boolean(),
+  planSuccess: z.boolean(),
+  infraSuccess: z.boolean(),
+  firstPassPublished: z.boolean(),
+  publishedWithinRepair: z.boolean(),
+  publishedCostUsd: z.number().min(0),
+  sourceRunDigest: digest,
+}).strict();
+
+export const SequentialSurvivalCorpusV3Schema = z.object({
+  schemaVersion: z.literal(3),
+  corpusVersion: z.string().trim().min(3),
+  routeVersion: z.string().trim().min(3),
+  engineReleaseId: z.string().regex(/^fv3_[a-f0-9]{16}$/),
+  launchPackDigests: z.array(digest).length(5),
+  samples: z.array(SequentialSurvivalSampleV3Schema).length(50),
+}).strict().superRefine((corpus, ctx) => {
+  const keys = new Set(corpus.samples.map(sample => `${sample.projectId}/${sample.chapterNumber}`));
+  if (keys.size !== 50) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['samples'], message: 'Sequential survival must contain five projects by chapters 1-10, including not-attempted outcomes.' });
+});
+
+export type SequentialSurvivalCorpusV3 = z.infer<typeof SequentialSurvivalCorpusV3Schema>;
+
 export const MachineJudgmentV3Schema = z.object({
   judgeLineage: z.enum(MACHINE_JUDGE_LINEAGES_V3),
   preferred: z.enum(['candidate', 'control', 'tie']),
@@ -127,6 +156,9 @@ export const MachineCalibrationSampleV3Schema = z.object({
   chapterNumber: z.number().int().min(1).max(10),
   planDigest: digest,
   initialDraftDigest: digest,
+  attempted: z.boolean(),
+  terminalStatus: z.enum(['publish','quality_blocked','plan_blocked','infra_blocked','not_attempted']),
+  sourceRunDigest: digest,
   schemaSuccess: z.boolean(),
   planSuccess: z.boolean(),
   infraSuccess: z.boolean(),

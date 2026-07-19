@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import {
   BlindMachineJudgmentOutputV3Schema,
   MachineCalibrationPairCorpusV3Schema,
+  SequentialSurvivalCorpusV3Schema,
   computeMachineCalibrationMetricsV3,
   runMachineEnsembleV3,
 } from '../src/services/story-engine/flagship-v3';
@@ -17,93 +18,36 @@ dotenv.config({ path: '.env.local' });
 dotenv.config({ path: '.env.runtime' });
 dotenv.config();
 
-const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
-const RETRY_DELAYS = [2_000, 5_000, 10_000];
-
 const arg = (name: string): string | null => {
   const index = process.argv.indexOf(`--${name}`);
   return index >= 0 ? process.argv[index + 1] || null : null;
 };
 const has = (name: string): boolean => process.argv.includes(`--${name}`);
 const inputPath = arg('input');
+const sequentialPath = arg('sequential');
 const outputPath = arg('output');
-if (!inputPath || !outputPath) throw new Error('--input and --output are required.');
+if (!inputPath || !sequentialPath || !outputPath) throw new Error('--input, --sequential and --output are required.');
 const inputFile = inputPath;
+const sequentialFile = sequentialPath;
 const outputFile = outputPath;
 
 const cleanJson = (raw: string): unknown => JSON.parse(raw.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, ''));
 
 function assertMachineJudgeCredentials(): void {
-  const required = [
-    ['GEMINI_API_KEY', process.env.GEMINI_API_KEY],
-    ['OPENAI_API_KEY', process.env.OPENAI_API_KEY],
-    ['OPENROUTER_API_KEY', process.env.OPENROUTER_API_KEY],
-  ] as const;
-  const missing = required.filter(([, credential]) => !credential).map(([name]) => name);
-  if (missing.length > 0) {
-    throw new Error(`CALIBRATION_BLOCKED: missing exact judge credential(s): ${missing.join(', ')}. No judge call was made and no substitute route is allowed.`);
+  if (!process.env.GEMINI_API_KEY?.trim()) {
+    throw new Error('CALIBRATION_BLOCKED: GEMINI_API_KEY is required for the three pinned independent Gemini judge routes. No judge call was made.');
   }
-}
-
-async function callGrok(prompt: string): Promise<string> {
-  const key = process.env.OPENROUTER_API_KEY;
-  if (!key) throw new Error('OPENROUTER_API_KEY is required for the fixed Grok 4.5 calibration judge.');
-  const schema = toGeminiResponseJsonSchema(BlindMachineJudgmentOutputV3Schema);
-  for (let attempt = 0; attempt <= RETRY_DELAYS.length; attempt += 1) {
-    if (attempt > 0) await new Promise(resolve => setTimeout(resolve, RETRY_DELAYS[attempt - 1]));
-    try {
-      const response = await fetch(OPENROUTER_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${key}`,
-          'HTTP-Referer': 'https://truyencity.com',
-          'X-Title': 'TruyenCity Machine Calibration',
-        },
-        body: JSON.stringify({
-          model: 'x-ai/grok-4.5',
-          messages: [
-            { role: 'system', content: 'Bạn là blind judge độc lập. Không đoán model, route, giá hoặc verdict. Chỉ trả JSON đúng schema.' },
-            { role: 'user', content: prompt },
-          ],
-          reasoning: { effort: 'medium', exclude: true },
-          max_tokens: 12_288,
-          response_format: { type: 'json_schema', json_schema: { name: 'flagship_v3_machine_judgment', strict: true, schema } },
-        }),
-        signal: AbortSignal.timeout(360_000),
-      });
-      const retryable = [408, 409, 429].includes(response.status) || response.status >= 500;
-      const payload = await response.json() as {
-        choices?: Array<{ message?: { content?: string } }>;
-        error?: { message?: string };
-      };
-      if (!response.ok || payload.error) {
-        const error = new Error(`Grok 4.5 OpenRouter ${response.status}: ${payload.error?.message || 'unknown error'}`);
-        if (retryable && attempt < RETRY_DELAYS.length) continue;
-        throw error;
-      }
-      const content = payload.choices?.[0]?.message?.content;
-      if (!content) throw new Error('Grok 4.5 returned no structured content.');
-      return content;
-    } catch (error) {
-      const transport = error instanceof TypeError
-        || (error instanceof DOMException && ['AbortError', 'TimeoutError'].includes(error.name));
-      if (!transport || attempt >= RETRY_DELAYS.length) throw error;
-    }
-  }
-  throw new Error('Grok 4.5 transport retries exhausted.');
 }
 
 async function main(): Promise<void> {
   assertMachineJudgeCredentials();
   const pairCorpus = MachineCalibrationPairCorpusV3Schema.parse(JSON.parse(readFileSync(path.resolve(inputFile), 'utf8')));
+  const sequentialCorpus = SequentialSurvivalCorpusV3Schema.parse(JSON.parse(readFileSync(path.resolve(sequentialFile), 'utf8')));
   const outputSchema = toGeminiResponseJsonSchema(BlindMachineJudgmentOutputV3Schema);
-  const corpus = await runMachineEnsembleV3(pairCorpus, {
+  const corpus = await runMachineEnsembleV3(pairCorpus, sequentialCorpus, {
     judge: async ({ lineage, prompt }) => {
-      const raw = lineage === 'openrouter/x-ai/grok-4.5'
-        ? await callGrok(prompt)
-        : (await callFlagshipModel(prompt, {
-          model: lineage === 'google/gemini-2.5-pro' ? 'gemini-2.5-pro' : 'gpt-5.6-luna',
+      const raw = (await callFlagshipModel(prompt, {
+          model: lineage.replace(/^google\//, ''),
           temperature: 0.1,
           maxTokens: 12_288,
           thinkingLevel: 'medium',

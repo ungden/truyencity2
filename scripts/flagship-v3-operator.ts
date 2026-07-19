@@ -5,6 +5,10 @@ import { createClient } from '@supabase/supabase-js';
 import {
   FlagshipLaunchPackV3Schema,
   FlagshipModelRoutesV3Schema,
+  ConceptCandidateV3Schema,
+  MarketResearchSnapshotV3Schema,
+  FLAGSHIP_V3_SETUP_VERSION,
+  buildPortfolioSignatureV3,
   digestFlagshipV3,
   getFlagshipReleaseManifestV3,
   validateLaunchPackV3,
@@ -37,7 +41,12 @@ async function status(id: string) {
 async function stage(id: string): Promise<void> {
   const launchPackPath = value('--launch-pack');
   const routesPath = value('--routes');
+  const snapshotPath = value('--snapshot');
+  const tournamentPath = value('--tournament');
   if (!launchPackPath || !routesPath) throw new Error('stage requires --launch-pack and --routes JSON files.');
+  if (apply && (!snapshotPath || !tournamentPath)) {
+    throw new Error('stage --apply requires --snapshot and --tournament so setup provenance and portfolio diversity are persisted.');
+  }
   const launchPack = FlagshipLaunchPackV3Schema.parse(JSON.parse(readFileSync(path.resolve(launchPackPath), 'utf8')));
   const routes = FlagshipModelRoutesV3Schema.parse(JSON.parse(readFileSync(path.resolve(routesPath), 'utf8')));
   const release = getFlagshipReleaseManifestV3();
@@ -55,6 +64,66 @@ async function stage(id: string): Promise<void> {
     launchPackDigest,
   }, null, 2));
   if (!apply) return;
+  const snapshot = MarketResearchSnapshotV3Schema.parse(JSON.parse(readFileSync(path.resolve(snapshotPath!), 'utf8')));
+  const tournament = JSON.parse(readFileSync(path.resolve(tournamentPath!), 'utf8')) as { selected?: unknown };
+  const selected = ConceptCandidateV3Schema.parse(tournament.selected);
+  if (selected.id !== launchPack.selectedConceptId) throw new Error('Tournament selected concept does not match the launch pack.');
+  const researchDigest = digestFlagshipV3(snapshot);
+  const signature = buildPortfolioSignatureV3(selected);
+  const { data: existingCommission, error: commissionLookupError } = await db.from('story_factory_commissions_v3')
+    .select('id,project_id,research_digest,setup_release_id').eq('slot_key', snapshot.commission.slotId).maybeSingle();
+  if (commissionLookupError) throw commissionLookupError;
+  let commissionId = existingCommission?.id as string | undefined;
+  if (existingCommission) {
+    if (existingCommission.project_id !== id || existingCommission.research_digest !== researchDigest
+      || existingCommission.setup_release_id !== FLAGSHIP_V3_SETUP_VERSION) {
+      throw new Error('Stored setup commission does not match this immutable project/research/release.');
+    }
+  } else {
+    const { data: inserted, error: commissionError } = await db.from('story_factory_commissions_v3').insert({
+      slot_key: snapshot.commission.slotId,
+      project_id: id,
+      commission: snapshot.commission,
+      research_snapshot: snapshot,
+      research_digest: researchDigest,
+      setup_release_id: FLAGSHIP_V3_SETUP_VERSION,
+      status: 'launch_pack_ready',
+    }).select('id').single();
+    if (commissionError) throw commissionError;
+    commissionId = inserted.id;
+  }
+  const { data: existingSignature, error: signatureLookupError } = await db.from('story_portfolio_signatures_v3')
+    .select('*').eq('project_id', id).maybeSingle();
+  if (signatureLookupError) throw signatureLookupError;
+  if (existingSignature) {
+    if (existingSignature.selected_concept_id !== signature.selectedConceptId
+      || existingSignature.mechanism_fingerprint !== signature.mechanismFingerprint
+      || existingSignature.reward_loop_fingerprint !== signature.rewardLoopFingerprint
+      || existingSignature.conflict_economy_fingerprint !== signature.conflictEconomyFingerprint) {
+      throw new Error('Stored immutable portfolio signature does not match this selected concept.');
+    }
+  } else {
+    const { error: signatureError } = await db.from('story_portfolio_signatures_v3').insert({
+      project_id: id,
+      selected_concept_id: signature.selectedConceptId,
+      mechanism_fingerprint: signature.mechanismFingerprint,
+      reward_loop_fingerprint: signature.rewardLoopFingerprint,
+      conflict_economy_fingerprint: signature.conflictEconomyFingerprint,
+      signature_version: FLAGSHIP_V3_SETUP_VERSION,
+    });
+    if (signatureError) throw signatureError;
+  }
+  const { error: packError } = await db.from('story_launch_packs_v3').insert({
+    commission_id: commissionId,
+    project_id: id,
+    engine_release_id: release.releaseId,
+    route_version: routes.routeVersion,
+    launch_pack_digest: launchPackDigest,
+    launch_pack: launchPack,
+    selected_concept_id: launchPack.selectedConceptId,
+    status: 'valid',
+  });
+  if (packError && packError.code !== '23505') throw packError;
   const { data, error } = await db.rpc('stage_flagship_launch_pack_release_v3', {
     p_project_id: id,
     p_launch_pack: launchPack,
@@ -63,6 +132,9 @@ async function stage(id: string): Promise<void> {
     p_launch_pack_digest: launchPackDigest,
   });
   if (error) throw error;
+  const { error: packStatusError } = await db.from('story_launch_packs_v3').update({ status: 'staged' })
+    .eq('project_id', id).eq('engine_release_id', release.releaseId).eq('launch_pack_digest', launchPackDigest);
+  if (packStatusError) throw packStatusError;
   console.log(JSON.stringify(data, null, 2));
 }
 
@@ -109,6 +181,27 @@ async function promote(id: string): Promise<void> {
   console.log(JSON.stringify(data, null, 2));
 }
 
+async function canary(id: string): Promise<void> {
+  const maxChapters = Number(value('--max-chapters') || '1200');
+  console.log(JSON.stringify({
+    dryRun: !apply,
+    command: 'hidden-canary',
+    projectId: id,
+    executionMode: 'hidden_canary',
+    maxChapters,
+    current: await status(id),
+  }, null, 2));
+  if (!apply) return;
+  const { data, error } = await db.rpc('enroll_flagship_factory_job_v3_mode', {
+    p_project_id: id,
+    p_execution_mode: 'hidden_canary',
+    p_max_chapters: maxChapters,
+    p_completion_mode: 'narrative_ending',
+  });
+  if (error) throw error;
+  console.log(JSON.stringify(data, null, 2));
+}
+
 async function reconcile(): Promise<void> {
   const staleMinutes = Number(value('--stale-minutes') || '20');
   console.log(JSON.stringify({ dryRun: !apply, command: 'reconcile', staleMinutes }, null, 2));
@@ -121,10 +214,11 @@ async function reconcile(): Promise<void> {
 async function main(): Promise<void> {
   if (command === 'stage') await stage(projectId!);
   else if (command === 'reset') await reset(projectId!);
+  else if (command === 'canary') await canary(projectId!);
   else if (command === 'promote') await promote(projectId!);
   else if (command === 'status') console.log(JSON.stringify(await status(projectId!), null, 2));
   else if (command === 'reconcile') await reconcile();
-  else throw new Error('Usage: flagship-v3-operator.ts stage|reset|promote|status|reconcile [options] [--apply]');
+  else throw new Error('Usage: flagship-v3-operator.ts stage|reset|canary|promote|status|reconcile [options] [--apply]');
 }
 
 main().catch(error => {

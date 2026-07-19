@@ -262,16 +262,12 @@ const arc = ArcPlanV3Schema.parse({
 });
 
 const qualityGates = {
-  premise_interest: true,
   character_voice: true,
   scene_tension: true,
-  causal_surprise: true,
   emotional_movement: true,
   domain_truth: true,
   prose_naturalness: true,
   agency: true,
-  earned_pleasure: true,
-  recovery_pacing: true,
   desire_to_read_next: true,
 } as const;
 const hardGates = {
@@ -837,6 +833,10 @@ describe('flagship v3 core engine', () => {
     expect(providerSchema).toContain('"maxItems":0');
     expect(providerSchema).toContain('"maxItems":3');
     expect(providerSchema).toContain('"salt_spent"');
+    expect(providerSchema).not.toContain('premise_interest');
+    expect(providerSchema).not.toContain('causal_surprise');
+    expect(providerSchema).not.toContain('earned_pleasure');
+    expect(providerSchema).not.toContain('recovery_pacing');
     const constrainedIssueSchema = JSON.stringify(buildEditorResponseJsonSchemaV3(plan(), 2));
     expect(constrainedIssueSchema).toContain('"maxItems":2');
     expect(constrainedIssueSchema).not.toContain('"maxItems":3');
@@ -1193,6 +1193,9 @@ describe('flagship v3 machine ensemble gate', () => {
       chapterNumber: offset + 1,
       planDigest: 'a'.repeat(64),
       initialDraftDigest: 'b'.repeat(64),
+      attempted: true,
+      terminalStatus: 'publish' as const,
+      sourceRunDigest: 'e'.repeat(64),
       schemaSuccess: true,
       planSuccess: true,
       infraSuccess: true,

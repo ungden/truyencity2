@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseFromAuthHeader } from '@/integrations/supabase/auth-helpers';
 import { writeChapterForProject } from '@/services/story-engine';
 import { WriterActionSchema, ValidationError, createValidationErrorResponse } from '@/lib/security/validation';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 
 export const maxDuration = 300;
 
@@ -30,6 +31,18 @@ export async function POST(request: NextRequest) {
     const customPrompt = 'customPrompt' in body ? body.customPrompt : undefined;
     const chapterCount = 'chapterCount' in body ? body.chapterCount : 1;
     const config = 'config' in body ? body.config : undefined;
+
+    const { data: targetProject, error: targetError } = await getSupabaseAdmin()
+      .from('ai_story_projects')
+      .select('style_directives')
+      .eq('id', projectId)
+      .single();
+    if (targetError || !targetProject) {
+      return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+    }
+    if ((targetProject.style_directives as { pipeline_version?: string } | null)?.pipeline_version === 'flagship_v3') {
+      return NextResponse.json({ error: 'flagship_v3_factory_entrypoint_required' }, { status: 409 });
+    }
 
     if (action === 'get_status') {
       return NextResponse.json(

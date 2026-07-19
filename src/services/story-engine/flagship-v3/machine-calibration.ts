@@ -4,7 +4,9 @@ import {
   MACHINE_JUDGE_LINEAGES_V3,
   MachineCalibrationCorpusV3Schema,
   MachineJudgmentV3Schema,
+  SequentialSurvivalCorpusV3Schema,
   type MachineCalibrationCorpusV3,
+  type SequentialSurvivalCorpusV3,
 } from './calibration';
 
 const digest = z.string().regex(/^[a-f0-9]{64}$/);
@@ -18,12 +20,6 @@ export const MachineCalibrationPairV3Schema = z.object({
   brief: z.unknown(),
   candidate: z.object({ title: z.string().min(1), content: z.string().min(1000) }).strict(),
   control: z.object({ title: z.string().min(1), content: z.string().min(1000) }).strict(),
-  schemaSuccess: z.boolean(),
-  planSuccess: z.boolean(),
-  infraSuccess: z.boolean(),
-  firstPassPublished: z.boolean(),
-  publishedWithinRepair: z.boolean(),
-  publishedCostUsd: z.number().min(0),
 }).strict();
 
 export const MachineCalibrationPairCorpusV3Schema = z.object({
@@ -78,6 +74,7 @@ Chọn bản có nhân quả, continuity, giọng nhân vật, độ tự nhiên
 
 export async function runMachineEnsembleV3(
   rawCorpus: MachineCalibrationPairCorpusV3,
+  rawSequential: SequentialSurvivalCorpusV3,
   dependencies: {
     judge(input: {
       lineage: typeof MACHINE_JUDGE_LINEAGES_V3[number];
@@ -87,9 +84,18 @@ export async function runMachineEnsembleV3(
   },
 ): Promise<MachineCalibrationCorpusV3> {
   const corpus = MachineCalibrationPairCorpusV3Schema.parse(rawCorpus);
+  const sequential = SequentialSurvivalCorpusV3Schema.parse(rawSequential);
+  if (sequential.engineReleaseId !== corpus.engineReleaseId
+    || sequential.routeVersion !== corpus.routeVersion
+    || JSON.stringify(sequential.launchPackDigests) !== JSON.stringify(corpus.launchPackDigests)) {
+    throw new Error('Machine calibration preference and sequential-survival corpora do not share one release/route/launch-pack set.');
+  }
+  const operationalByKey = new Map(sequential.samples.map(sample => [`${sample.projectId}/${sample.chapterNumber}`, sample]));
   const samples = [];
   for (const pair of corpus.pairs) {
     const blind = buildBlindMachineJudgePromptV3(pair);
+    const operational = operationalByKey.get(`${pair.projectId}/${pair.chapterNumber}`);
+    if (!operational) throw new Error(`Missing sequential outcome for ${pair.projectId}/${pair.chapterNumber}.`);
     const judgments = [];
     for (const lineage of MACHINE_JUDGE_LINEAGES_V3) {
       const raw = await dependencies.judge({ lineage, sampleId: pair.sampleId, prompt: blind.prompt });
@@ -117,12 +123,15 @@ export async function runMachineEnsembleV3(
       chapterNumber: pair.chapterNumber,
       planDigest: pair.planDigest,
       initialDraftDigest: pair.initialDraftDigest,
-      schemaSuccess: pair.schemaSuccess,
-      planSuccess: pair.planSuccess,
-      infraSuccess: pair.infraSuccess,
-      firstPassPublished: pair.firstPassPublished,
-      publishedWithinRepair: pair.publishedWithinRepair,
-      publishedCostUsd: pair.publishedCostUsd,
+      attempted: operational.attempted,
+      terminalStatus: operational.terminalStatus,
+      sourceRunDigest: operational.sourceRunDigest,
+      schemaSuccess: operational.schemaSuccess,
+      planSuccess: operational.planSuccess,
+      infraSuccess: operational.infraSuccess,
+      firstPassPublished: operational.firstPassPublished,
+      publishedWithinRepair: operational.publishedWithinRepair,
+      publishedCostUsd: operational.publishedCostUsd,
       judgments,
     });
   }

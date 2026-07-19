@@ -19,6 +19,7 @@ import {
   advanceFlagshipV3Arc,
   planNextFlagshipV3Window,
   writeFlagshipV3Chapter,
+  decideFactoryV3QualityRecovery,
   type FactoryV3Status,
 } from '@/services/story-engine/flagship-v3';
 
@@ -36,6 +37,9 @@ type FactoryJob = {
   completion_mode: 'narrative_ending' | 'hard_cap';
   attempt: number;
   lease_token: string;
+  execution_mode: 'hidden_canary' | 'production';
+  quality_attempts_for_chapter: number;
+  window_regeneration_count: number;
 };
 
 type FactoryResult = {
@@ -212,20 +216,43 @@ async function processJob(db: ReturnType<typeof getSupabaseAdmin>, job: FactoryJ
     }
     if (code === 'quality_blocked') {
       const evidence = failureEvidence(caught);
+      const recovery = decideFactoryV3QualityRecovery(job.quality_attempts_for_chapter);
       try {
         await advance(
           db,
           job,
-          'quality_blocked',
+          recovery === 'retry_fresh_draft' ? 'ready' : 'quality_blocked',
           'review',
           committedChapter || job.current_chapter,
-          [{ code, evidence }],
+          [{ code, evidence, recovery, draftAttempt: job.quality_attempts_for_chapter + 1 }],
           'quality',
           message,
         );
-        return { ...base, status: 'quality_blocked', error: message };
+        return recovery === 'retry_fresh_draft'
+          ? { ...base, status: 'skipped', error: 'Fresh-draft recovery queued.' }
+          : { ...base, status: 'quality_blocked', error: message };
       } catch (transitionError) {
         return { ...base, status: 'failed', error: `${message}; quality transition: ${errorMessage(transitionError)}` };
+      }
+    }
+    if (code === 'plan_blocked' && job.window_regeneration_count < 1) {
+      try {
+        const { error: resetError } = await db.rpc('reset_uncommitted_flagship_window_v3', {
+          p_job_id: job.id,
+          p_lease_token: job.lease_token,
+        });
+        if (resetError) throw resetError;
+        await planNextFlagshipV3Window(job.project_id, { db });
+        await advance(db, job, 'ready', 'plan', job.current_chapter, [{ code, recovery: 'window_regenerated_once' }]);
+        return { ...base, status: 'skipped', error: 'Rolling window regenerated once.' };
+      } catch (replanError) {
+        const replanMessage = `${message}; window regeneration: ${errorMessage(replanError)}`;
+        try {
+          await advance(db, job, 'plan_blocked', 'plan', committedChapter || job.current_chapter, [{ code, recovery: 'window_regeneration_failed' }], 'setup', replanMessage);
+          return { ...base, status: 'plan_blocked', error: replanMessage };
+        } catch (transitionError) {
+          return { ...base, status: 'failed', error: `${replanMessage}; plan transition: ${errorMessage(transitionError)}` };
+        }
       }
     }
     if (code === 'plan_blocked' || code === 'setup_blocked') {
@@ -254,11 +281,9 @@ async function run(request: NextRequest): Promise<NextResponse> {
   const db = getSupabaseAdmin();
   const { data: optedInProjects, error: readinessError } = await db.from('ai_story_projects')
     .select('id,style_directives')
-    .contains('style_directives', {
-      pipeline_version: 'flagship_v3',
-      factory_enabled: true,
-      publication_mode: 'automatic',
-    })
+    .contains('style_directives', { pipeline_version: 'flagship_v3' })
+    .eq('status', 'paused')
+    .eq('flagship_v3_status', 'ready_to_write')
     .limit(5000);
   if (readinessError) {
     return NextResponse.json({ success: false, error: `Factory readiness lookup failed: ${readinessError.message}` }, { status: 503 });
