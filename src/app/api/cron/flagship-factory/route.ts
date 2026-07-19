@@ -20,6 +20,7 @@ import {
   planNextFlagshipV3Window,
   writeFlagshipV3Chapter,
   decideFactoryV3QualityRecovery,
+  repeatedPlanCoupledGateV3,
   type FactoryV3Status,
 } from '@/services/story-engine/flagship-v3';
 
@@ -141,6 +142,23 @@ function failureEvidence(caught: unknown): unknown[] {
   }).slice(0, 50);
 }
 
+async function previousQualityEvidence(
+  db: ReturnType<typeof getSupabaseAdmin>,
+  job: FactoryJob,
+): Promise<unknown[]> {
+  const { data, error } = await db.from('story_write_runs')
+    .select('critic_evidence')
+    .eq('project_id', job.project_id)
+    .eq('pipeline_version', 'flagship_v3')
+    .eq('started_chapter', job.current_chapter + 1)
+    .eq('failure_class', 'quality')
+    .order('started_at', { ascending: false })
+    .range(1, 1);
+  if (error) throw new FlagshipV3Error('infra_blocked', `Previous quality evidence lookup failed: ${error.message}`);
+  const evidence = data?.[0]?.critic_evidence;
+  return Array.isArray(evidence) ? evidence : [];
+}
+
 async function ensureNextWindow(db: ReturnType<typeof getSupabaseAdmin>, projectId: string, nextChapter: number): Promise<'ready' | 'completed'> {
   const { data, error } = await db.from('chapter_blueprints').select('id').eq('project_id', projectId).eq('chapter_number', nextChapter).maybeSingle();
   if (error) throw new FlagshipV3Error('plan_blocked', `ChapterPlanV3 lookup failed: ${error.message}`);
@@ -217,6 +235,38 @@ async function processJob(db: ReturnType<typeof getSupabaseAdmin>, job: FactoryJ
     if (code === 'quality_blocked') {
       const evidence = failureEvidence(caught);
       const recovery = decideFactoryV3QualityRecovery(job.quality_attempts_for_chapter);
+      if (recovery === 'quality_blocked' && job.window_regeneration_count < 1) {
+        try {
+          const repeatedGate = repeatedPlanCoupledGateV3(await previousQualityEvidence(db, job), evidence);
+          if (repeatedGate) {
+            const { error: resetError } = await db.rpc('reset_uncommitted_flagship_window_v3', {
+              p_job_id: job.id,
+              p_lease_token: job.lease_token,
+            });
+            if (resetError) throw resetError;
+            await planNextFlagshipV3Window(job.project_id, { db });
+            await advance(db, job, 'ready', 'plan', job.current_chapter, [{
+              code,
+              recovery: 'repeated_plan_coupled_gate',
+              repeatedGate,
+              evidence,
+            }], 'setup', `Repeated ${repeatedGate} across two independent drafts; rolling window regenerated once.`);
+            return { ...base, status: 'skipped', error: `Rolling window regenerated after repeated ${repeatedGate}.` };
+          }
+        } catch (replanError) {
+          const replanMessage = `${message}; repeated-gate window regeneration: ${errorMessage(replanError)}`;
+          try {
+            await advance(db, job, 'plan_blocked', 'plan', job.current_chapter, [{
+              code,
+              recovery: 'repeated_plan_coupled_gate_failed',
+              evidence,
+            }], 'setup', replanMessage);
+            return { ...base, status: 'plan_blocked', error: replanMessage };
+          } catch (transitionError) {
+            return { ...base, status: 'failed', error: `${replanMessage}; plan transition: ${errorMessage(transitionError)}` };
+          }
+        }
+      }
       try {
         await advance(
           db,

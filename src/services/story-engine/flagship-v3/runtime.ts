@@ -235,6 +235,7 @@ export async function writeFlagshipV3Chapter(
       modelRoute: routes,
       contextManifest,
       contextSizeChars: contextSize,
+      engineReleaseId: getFlagshipReleaseManifestV3().releaseId,
       required: true,
     });
     if (!run) throw new FlagshipV3Error('setup_blocked', 'Required write-run telemetry was not created.');

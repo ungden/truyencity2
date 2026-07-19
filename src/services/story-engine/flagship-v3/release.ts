@@ -18,7 +18,7 @@ export const FLAGSHIP_V3_CONTEXT_VERSION = 'role-context-v3.8-writer-brief-publi
 export const FLAGSHIP_V3_PREFLIGHT_VERSION = 'deterministic-preflight-v3.4-soft-length-tail-repeat';
 export const FLAGSHIP_V3_QUALITY_VERSION = 'quality-v3.11-chapter-vs-cadence-gates';
 export const FLAGSHIP_V3_ARC_LIFECYCLE_VERSION = 'arc-lifecycle-v3.1-ending-gated';
-export const FLAGSHIP_V3_ROLLING_PLANNER_VERSION = 'flagship-v3.18-mechanical-scenes';
+export const FLAGSHIP_V3_ROLLING_PLANNER_VERSION = 'flagship-v3.21-writer-brief-budget';
 export const FLAGSHIP_V3_PROVIDER_VERSION = 'provider-v3.9-combined-editor-issue-budget';
 
 export const FlagshipReleaseManifestV3Schema = z.object({

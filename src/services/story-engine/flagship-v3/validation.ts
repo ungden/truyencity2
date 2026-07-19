@@ -1,4 +1,5 @@
 import type { ArcPlanV3, ChapterPlanV3, StoryKernelV3, StoryStateV3 } from './contracts';
+import { buildWriterBriefV3 } from './context';
 
 export interface V3ValidationIssue {
   code: string;
@@ -10,6 +11,8 @@ const closeEnough = (left: number, right: number): boolean => Math.abs(left - ri
 // "Thanh toán" also covers debt, fees and transfers; treating every payment as
 // a purchase created false plan blocks when no goods/services changed hands.
 const purchaseLanguage = /(?:\bmua\b|\bthu mua\b|\bđổi lấy\b)/iu;
+const ungroundedPriorPreparation = /(?:đã\s+chuẩn\s+bị\s+từ\s+(?:trước|chiều|sáng|hôm|đêm)|(?:giấu|để|đặt)\s+sẵn\s+(?:từ\s+(?:trước|chiều|sáng|hôm|đêm))?)/iu;
+const materialAcquisition = /(?:được.{0,100}(?:cho|tặng|giao)|(?:nhặt|mượn|thu\s+gom|lấy\s+được))/iu;
 
 export function validateV3Artifacts(input: {
   kernel: StoryKernelV3;
@@ -36,6 +39,16 @@ export function validateV3Artifacts(input: {
   if (plan.chapterNumber !== state.chapterNumber + 1) {
     issues.push({ code: 'chapter_sequence', path: 'chapterNumber', message: `Expected chapter ${state.chapterNumber + 1}.` });
   }
+  try {
+    buildWriterBriefV3({ kernel, state, plan });
+  } catch (caught) {
+    const message = caught instanceof Error ? caught.message : String(caught);
+    if (message.includes('FLAGSHIP_V3_WRITER_BRIEF_BUDGET_EXCEEDED')) {
+      issues.push({ code: 'writer_brief_budget', path: 'scenes', message });
+    } else {
+      throw caught;
+    }
+  }
   if (plan.chapterNumber < arc.startChapter || plan.chapterNumber > arc.endChapter) {
     issues.push({ code: 'arc_coverage', path: 'chapterNumber', message: 'Chapter is outside the current arc.' });
   }
@@ -55,6 +68,26 @@ export function validateV3Artifacts(input: {
   }
 
   for (const [index, scene] of plan.scenes.entries()) {
+    if (ungroundedPriorPreparation.test(scene.action)) {
+      issues.push({
+        code: 'ungrounded_prior_preparation',
+        path: `scenes.${index}.action`,
+        message: 'Scene assumes off-page preparation outside the committed timeline. Acquire the object in this scene or source it from committed state.',
+      });
+    }
+    if (materialAcquisition.test(scene.action)) {
+      const sceneDeltaIds = new Set(scene.requiredDeltaIds);
+      const recordsMaterialFact = plan.requiredDeltas.some(delta =>
+        sceneDeltaIds.has(delta.id) && delta.kind === 'fact',
+      );
+      if (!recordsMaterialFact) {
+        issues.push({
+          code: 'physical_acquisition_untracked',
+          path: `scenes.${index}.requiredDeltaIds`,
+          message: 'A physical acquisition used beyond the scene requires a fact delta; relationship prose cannot replace the material ledger.',
+        });
+      }
+    }
     if (!characters.has(scene.povCharacterId)) {
       issues.push({ code: 'unknown_pov', path: `scenes.${index}.povCharacterId`, message: 'POV character is outside the story kernel.' });
     }

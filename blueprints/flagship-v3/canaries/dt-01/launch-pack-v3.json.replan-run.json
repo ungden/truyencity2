@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 3,
+  "promptVersion": "flagship-v3.21-writer-brief-budget",
+  "runtimePromptVersion": "flagship-v3.15-chapter-gates-only",
+  "routeVersion": "canary-gemini-v3.2",
+  "model": "gemini-3.1-pro-preview",
+  "digest": "25519b4d490adc18062939218676041337c3d681c92af64e488534b322005c5c",
+  "attempts": [
+    {
+      "attempt": 1,
+      "artifactDigest": "34c12a43b96fe630279ebca6def2c7b2e4f4396fce74efb216f8eadddc5d73cb",
+      "modelRoute": "gemini-3.1-pro-preview",
+      "estimatedCostUsd": 0.123146,
+      "validationEvidence": [],
+      "result": "valid"
+    }
+  ],
+  "promptTokens": 6763,
+  "completionTokens": 9135,
+  "estimatedCostUsd": 0.123146,
+  "finishReason": "STOP",
+  "repairedAt": "2026-07-19T14:56:56.855Z"
+}

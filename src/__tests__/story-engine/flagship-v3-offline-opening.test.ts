@@ -33,6 +33,19 @@ const scenePayloads = (plan: typeof launchPack.initialWindow.plans[number], cont
     paragraphs: paragraphs.slice(index * size, (index + 1) * size),
   }));
 };
+const deltaEvidenceForPlan = (plan: typeof launchPack.initialWindow.plans[number], content: string) => {
+  const paragraphs = content.split(/\n\s*\n/u);
+  const size = Math.ceil(paragraphs.length / plan.scenes.length);
+  const spanByDelta = new Map<string, string>();
+  plan.scenes.forEach((scene, sceneIndex) => {
+    const spanId = `span_${String(sceneIndex * size + 1).padStart(3, '0')}`;
+    scene.requiredDeltaIds.forEach(deltaId => spanByDelta.set(deltaId, spanId));
+  });
+  return plan.requiredDeltas.map(delta => ({
+    deltaId: delta.id,
+    spanId: spanByDelta.get(delta.id) || 'span_001',
+  }));
+};
 
 describe('flagship v3 offline opening runner', () => {
   it('advances three chapters in memory without a database commit', async () => {
@@ -48,10 +61,7 @@ describe('flagship v3 offline opening runner', () => {
           : {
               status: 'pass', hardGates, qualityGates, issues: [],
               revisionInstructions: [],
-              realizedDeltaEvidence: plan.requiredDeltas.map(delta => ({
-                deltaId: delta.id,
-                spanId: 'span_001',
-              })),
+              realizedDeltaEvidence: deltaEvidenceForPlan(plan, content),
             };
         return {
           content: JSON.stringify(payload),
@@ -96,10 +106,7 @@ describe('flagship v3 offline opening runner', () => {
                 repairMode: 'full_rewrite',
               }],
               revisionInstructions: ['Viết lại cảnh để mọi thay đổi nguồn lực có nguồn và chi phí nhìn thấy được.'],
-              realizedDeltaEvidence: plan.requiredDeltas.map(delta => ({
-                deltaId: delta.id,
-                spanId: 'span_001',
-              })),
+              realizedDeltaEvidence: deltaEvidenceForPlan(plan, content),
             };
         return {
           content: JSON.stringify(payload),

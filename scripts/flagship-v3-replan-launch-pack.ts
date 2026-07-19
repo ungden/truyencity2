@@ -1,6 +1,7 @@
 #!/usr/bin/env tsx
 
 import 'dotenv/config';
+import dotenv from 'dotenv';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -8,15 +9,16 @@ import {
   FLAGSHIP_V3_PROMPT_VERSION,
   FlagshipLaunchPackV3Schema,
   FlagshipModelRoutesV3Schema,
-  RollingPlanWindowDraftV3Schema,
   V3_ROLLING_PLANNER_PROMPT_VERSION,
   V3_ROLLING_PLANNER_SYSTEM,
   buildPlannerLedgerV3,
-  materializeRollingWindowV3,
+  buildRollingPlannerResponseJsonSchemaV3,
+  generateRollingWindowWithOneRepairV3,
   validateLaunchPackV3,
 } from '../src/services/story-engine/flagship-v3';
 import { callFlagshipModel } from '../src/services/story-engine/flagship/provider';
-import { toGeminiResponseJsonSchema } from '../src/services/story-engine/flagship/setup-response-schemas';
+
+dotenv.config({ path: '.env.runtime', quiet: true });
 
 const args = process.argv.slice(2);
 const value = (name: string): string | null => {
@@ -57,23 +59,35 @@ async function main(): Promise<void> {
       throw new Error('This exact setup repair already failed; change model route, prompt version or foundation artifact before reopening.');
     }
   }
-  const response = await callFlagshipModel(userPrompt, {
-    model: routes.planner,
-    temperature: 0.15,
-    maxTokens: 32768,
-    thinkingLevel: 'medium',
-    systemPrompt: V3_ROLLING_PLANNER_SYSTEM,
-    responseJsonSchema: toGeminiResponseJsonSchema(RollingPlanWindowDraftV3Schema),
-  }, { jsonMode: true, schemaName: 'flagship_v3_replan_launch_pack' });
-  const raw = JSON.parse(response.content.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, ''));
-  const draft = RollingPlanWindowDraftV3Schema.parse(raw);
-  const initialWindow = materializeRollingWindowV3({
+  const responses: Array<{ promptTokens: number; completionTokens: number; finishReason: string }> = [];
+  const generated = await generateRollingWindowWithOneRepairV3({
     kernel: base.kernel,
     arc: base.arc,
     state: base.initialState,
-    draft,
+    startChapter: 1,
+    basePrompt: userPrompt,
+    roleContext: 'Launch-pack rolling-window repair using the story-owned kernel, arc and initial state.',
+    ledger: buildPlannerLedgerV3(base.initialState, base.kernel),
+    modelRoute: routes.planner,
+    invoke: async prompt => {
+      const response = await callFlagshipModel(prompt, {
+        model: routes.planner,
+        temperature: 0.15,
+        maxTokens: 32768,
+        thinkingLevel: 'medium',
+        systemPrompt: V3_ROLLING_PLANNER_SYSTEM,
+        responseJsonSchema: buildRollingPlannerResponseJsonSchemaV3(base.kernel, base.initialState),
+      }, { jsonMode: true, schemaName: 'flagship_v3_replan_launch_pack' });
+      responses.push({
+        promptTokens: response.promptTokens,
+        completionTokens: response.completionTokens,
+        finishReason: response.finishReason,
+      });
+      if (!Number.isFinite(response.estimatedCostUsd)) throw new Error('Planner provider did not return a cost estimate.');
+      return { raw: response.content, estimatedCostUsd: Number(response.estimatedCostUsd) };
+    },
   });
-  const pack = FlagshipLaunchPackV3Schema.parse({ ...base, initialWindow });
+  const pack = FlagshipLaunchPackV3Schema.parse({ ...base, initialWindow: generated.window });
   validateLaunchPackV3(pack);
   writeFileSync(output, `${JSON.stringify(pack, null, 2)}\n`);
   writeFileSync(runPath, `${JSON.stringify({
@@ -83,14 +97,15 @@ async function main(): Promise<void> {
     routeVersion: routes.routeVersion,
     model: routes.planner,
     digest,
-    promptTokens: response.promptTokens,
-    completionTokens: response.completionTokens,
-    estimatedCostUsd: response.estimatedCostUsd,
-    finishReason: response.finishReason,
+    attempts: generated.attempts,
+    promptTokens: responses.reduce((sum, item) => sum + item.promptTokens, 0),
+    completionTokens: responses.reduce((sum, item) => sum + item.completionTokens, 0),
+    estimatedCostUsd: generated.estimatedCostUsd,
+    finishReason: responses.at(-1)?.finishReason || 'UNKNOWN',
     repairedAt: new Date().toISOString(),
   }, null, 2)}\n`);
   if (existsSync(failurePath)) unlinkSync(failurePath);
-  console.log(JSON.stringify({ valid: true, title: pack.kernel.title, model: routes.planner, routeVersion: routes.routeVersion, estimatedCostUsd: response.estimatedCostUsd }, null, 2));
+  console.log(JSON.stringify({ valid: true, title: pack.kernel.title, model: routes.planner, routeVersion: routes.routeVersion, attempts: generated.attempts.length, estimatedCostUsd: generated.estimatedCostUsd }, null, 2));
 }
 
 main().catch(error => {

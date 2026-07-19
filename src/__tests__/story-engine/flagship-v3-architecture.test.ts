@@ -6,6 +6,7 @@ import {
   applyChapterStateV3,
   canTransitionFactoryV3,
   decideFactoryV3QualityRecovery,
+  repeatedPlanCoupledGateV3,
   runV3ProsePreflight,
   type ChapterPlanV3,
   type StoryStateV3,
@@ -46,6 +47,14 @@ describe('flagship v3 architecture boundary', () => {
     expect(route).toContain('decideFactoryV3QualityRecovery');
     expect(decideFactoryV3QualityRecovery(0)).toBe('retry_fresh_draft');
     expect(decideFactoryV3QualityRecovery(1)).toBe('quality_blocked');
+    expect(repeatedPlanCoupledGateV3(
+      [{ code: 'editor_timeline' }],
+      [{ code: 'editor_timeline' }],
+    )).toBe('editor_timeline');
+    expect(repeatedPlanCoupledGateV3(
+      [{ code: 'editor_prose_naturalness' }],
+      [{ code: 'editor_prose_naturalness' }],
+    )).toBeNull();
     expect(canTransitionFactoryV3('quality_blocked', 'ready')).toBe(false);
     expect(canTransitionFactoryV3('plan_blocked', 'ready')).toBe(false);
   });
@@ -160,6 +169,20 @@ describe('flagship v3 architecture boundary', () => {
     expect(migration).toContain("j.pipeline_version='flagship_v2'");
     expect(migration).toContain("v_job.execution_mode='hidden_canary'");
     expect(migration).toContain('ELSE LEAST(500');
+  });
+
+  it('records exact release lineage and regenerates a plan after repeated objective gate failures', () => {
+    const runtime = read('src/services/story-engine/flagship-v3/runtime.ts');
+    const ledger = read('src/services/story-engine/pipeline/write-run-ledger.ts');
+    const route = read('src/app/api/cron/flagship-factory/route.ts');
+    const migration = read('supabase/migrations/20260719131000_flagship_v3_plan_coupled_recovery.sql');
+    expect(runtime).toContain('engineReleaseId: getFlagshipReleaseManifestV3().releaseId');
+    expect(ledger).toContain('engine_release_id: input.engineReleaseId || null');
+    expect(route).toContain('repeatedPlanCoupledGateV3');
+    expect(route).toContain("recovery: 'repeated_plan_coupled_gate'");
+    expect(migration).toContain('quality_attempts_for_chapter BETWEEN 0 AND 2');
+    expect(migration).toContain('quality_attempts_for_chapter=0');
+    expect(read('src/services/story-engine/flagship-v3/validation.ts')).toContain('buildWriterBriefV3({ kernel, state, plan })');
   });
 
   it('separates sequential survival from blind preference and never hard-codes operational success', () => {

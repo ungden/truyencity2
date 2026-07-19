@@ -38,6 +38,7 @@ export interface StartWriteRunInput {
   promptVersion?: string | null;
   modelRoute?: Record<string, unknown>;
   contextManifest?: unknown[];
+  engineReleaseId?: string | null;
   /** Flagship requires telemetry to exist before any model call. Legacy remains best-effort. */
   required?: boolean;
 }
@@ -77,6 +78,7 @@ export async function startWriteRun(input: StartWriteRunInput): Promise<WriteRun
       prompt_version: input.promptVersion || null,
       model_route: input.modelRoute || {},
       context_manifest: input.contextManifest || [],
+      engine_release_id: input.engineReleaseId || null,
       updated_at: new Date().toISOString(),
     };
     const { data, error } = await db

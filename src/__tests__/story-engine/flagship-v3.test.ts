@@ -326,6 +326,12 @@ describe('flagship v3 core engine', () => {
     expect(numeric).not.toHaveProperty('before');
     expect(numeric).not.toHaveProperty('after');
     expect(numeric).not.toHaveProperty('unit');
+    const providerSchema = buildRollingPlannerResponseJsonSchemaV3(kernel(), state()) as any;
+    const providerNumeric = providerSchema.properties.plans.items.properties.requiredDeltas.items.anyOf
+      .find((branch: any) => branch.properties.kind.enum.includes('resource_numeric')).properties;
+    expect(providerNumeric.consideration.items.properties.quantity).not.toHaveProperty('exclusiveMinimum');
+    expect(providerSchema.properties.plans.items.properties.scenes).not.toHaveProperty('minItems');
+    expect(providerSchema.properties.plans.items.properties.scenes).not.toHaveProperty('maxItems');
   });
 
   it('requires an explicit scale anchor for every numeric story resource', () => {
@@ -344,6 +350,30 @@ describe('flagship v3 core engine', () => {
     };
     expect(validateV3Artifacts({ kernel: kernel(), arc, state: state(), plan: invalid })).toEqual(
       expect.arrayContaining([expect.objectContaining({ code: 'resource_arithmetic' })]),
+    );
+  });
+
+  it('blocks off-page preparation that is not grounded in committed state', () => {
+    const invalid = ChapterPlanV3Schema.parse({
+      ...plan(),
+      scenes: plan().scenes.map((scene, index) => index === 0
+        ? { ...scene, action: 'Sơn lấy thúng và lá chuối đã chuẩn bị từ trước để phủ kín mẻ cá.' }
+        : scene),
+    });
+    expect(validateV3Artifacts({ kernel: kernel(), arc, state: state(), plan: invalid })).toEqual(
+      expect.arrayContaining([expect.objectContaining({ code: 'ungrounded_prior_preparation' })]),
+    );
+  });
+
+  it('requires a material fact when a scene gives the protagonist a carried object', () => {
+    const invalid = ChapterPlanV3Schema.parse({
+      ...plan(),
+      scenes: plan().scenes.map((scene, index) => index === 0
+        ? { ...scene, action: 'Gã Bảy được chủ tàu cho một thúng cá dạt để mang về bán.' }
+        : scene),
+    });
+    expect(validateV3Artifacts({ kernel: kernel(), arc, state: state(), plan: invalid })).toEqual(
+      expect.arrayContaining([expect.objectContaining({ code: 'physical_acquisition_untracked' })]),
     );
   });
 
@@ -585,7 +615,8 @@ describe('flagship v3 core engine', () => {
     expect(schema.properties.plans.maxItems).toBeUndefined();
     expect(schema.properties.plans.items.properties.requiredDeltas.minItems).toBeUndefined();
     expect(schema.properties.plans.items.properties.requiredDeltas.maxItems).toBeUndefined();
-    expect(schema.properties.plans.items.properties.scenes).toMatchObject({ minItems: 1, maxItems: 5 });
+    expect(schema.properties.plans.items.properties.scenes.minItems).toBeUndefined();
+    expect(schema.properties.plans.items.properties.scenes.maxItems).toBeUndefined();
     expect(schema.properties.plans.items.properties.preconditions.maxItems).toBe(state().facts.length);
     expect(scene.objective).toBeDefined();
     expect(scene.desire).toBeUndefined();
@@ -689,6 +720,24 @@ describe('flagship v3 core engine', () => {
     ]);
     expect(prompts[1]).toContain('REPAIR_ATTEMPT=2_OF_2');
     expect(prompts[1]).toContain('VALIDATION_ISSUES=');
+  });
+
+  it('uses the same single Planner repair for a syntactically valid but contract-invalid draft', async () => {
+    const valid = validRollingDraft();
+    const invalid = structuredClone(valid) as any;
+    invalid.plans[0].requiredDeltas[0].pressureAfter = 'ngắn';
+    const generated = await generateRollingWindowWithOneRepairV3({
+      kernel: kernel(), arc, state: state(), startChapter: 1,
+      basePrompt: 'FIRST_ATTEMPT', roleContext: 'ROLE_CONTEXT', ledger: buildPlannerLedgerV3(state(), kernel()),
+      modelRoute: 'gemini-3.1-pro-preview',
+      invoke: async (_prompt, attempt) => ({ raw: JSON.stringify(attempt === 1 ? invalid : valid), estimatedCostUsd: 0.01 }),
+    });
+    expect(generated.attempts).toEqual([
+      expect.objectContaining({ attempt: 1, result: 'invalid', validationEvidence: expect.arrayContaining([
+        expect.objectContaining({ code: 'planner_contract' }),
+      ]) }),
+      expect.objectContaining({ attempt: 2, result: 'valid' }),
+    ]);
   });
 
   it('blocks the plan after the one allowed repair is still invalid', async () => {
@@ -957,10 +1006,8 @@ describe('flagship v3 core engine', () => {
     };
     const nextPlan = ChapterPlanV3Schema.parse({
       ...base,
-      scenes: base.scenes.map((scene, index) => index === 0
-        ? { ...scene, requiredDeltaIds: [...scene.requiredDeltaIds, factDelta.id, knowledgeDelta.id] }
-        : scene),
-      requiredDeltas: [...base.requiredDeltas, factDelta, knowledgeDelta],
+      scenes: [{ ...base.scenes[0], requiredDeltaIds: [factDelta.id, knowledgeDelta.id] }],
+      requiredDeltas: [factDelta, knowledgeDelta],
     });
     expect(validateV3Artifacts({ kernel: kernel(), arc, state: state(), plan: nextPlan })).toHaveLength(0);
     const next = applyChapterStateV3({

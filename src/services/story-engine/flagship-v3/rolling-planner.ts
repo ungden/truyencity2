@@ -39,6 +39,9 @@ Scene gắn với resource_numeric phải để con số trong required delta; o
 Mọi knowledge change phải chỉ rõ nhân vật, fact và nguồn học. Fact mới dùng stable ID mới và phải được tạo trước hoặc cùng chương với lần học đầu tiên; engine tự gắn valueBefore.
 Character/resource/promise ID chỉ lấy từ kernel/state. Mọi ID và locationId theo mẫu [a-z][a-z0-9_-].
 Mỗi scene chỉ có objective, obstacle và action: câu cơ học ngắn, cụ thể, tối đa 240 ký tự; không viết cảm xúc hộ nhân vật, không dùng ẩn dụ, khẩu hiệu, câu kết hoặc lời thoại mẫu. Kết quả, chi phí, tri thức và quan hệ phải nằm trong required delta thay vì được kể lại bằng prose.
+Không được giả định nhân vật đã chuẩn bị, giấu sẵn hoặc đặt sẵn vật dụng ngoài timeline đã commit. Vật dụng phải đến từ ledger/fact hiện có hoặc được lấy, mua, mượn hay nhặt ngay trong scene với nguồn cụ thể. Không dùng các cụm như "đã chuẩn bị từ trước", "giấu sẵn từ chiều" để lấp nguồn vật thể.
+Mọi vật thể nhân vật được cho, tặng, giao, nhặt, mượn, thu gom hoặc lấy được để dùng sau scene hiện tại phải có delta kind=fact trong chính scene ghi rõ quyền sở hữu/trạng thái vật thể. Delta relationship không thay thế inventory fact; lời action không được tự tạo vật thể ngoài ledger.
+WriterBrief cơ học của từng chương có hard cap 5.000 ký tự. Giữ 1-3 scene và số delta tối thiểu đủ commit logic; không tách scene hay tạo location/relationship delta thừa. Validator sẽ trả writer_brief_budget và yêu cầu tạo lại toàn bộ window nếu vượt cap.
 worldClaimIds chỉ chứa ID quy tắc thực sự chi phối scene. hookIntent chỉ là enum hiệu ứng, không phải câu kết văn xuôi sẵn.`;
 
 export const V3_ROLLING_PLANNER_SYSTEM = `Bạn là Rolling Planner của đúng một bộ truyện. Không viết prose, không sửa kernel/state/arc và chỉ trả JSON RollingPlanWindowV3.
@@ -55,7 +58,7 @@ export interface PlanAttemptV3 {
 
 export function buildPlannerRepairPromptV3(input: {
   startChapter: number;
-  previousDraft: RollingPlanWindowDraftV3;
+  previousDraft: unknown;
   ledger: unknown;
   validationIssues: unknown[];
   roleContext: string;
@@ -143,12 +146,19 @@ export function buildRollingPlannerResponseJsonSchemaV3(
   // requires exactly five plans and 1-24 deltas before semantic validation.
   delete plansSchema.minItems;
   delete plansSchema.maxItems;
+  const scenesSchema = childSchema(schema, 'properties', 'plans', 'items', 'properties', 'scenes');
+  // Gemini 3.1 also returns INVALID_ARGUMENT when the outer scene-array bound
+  // is combined with this nested seven-way delta union. Keep the more useful
+  // participant/delta/consideration bounds in provider decoding and enforce
+  // the exact 1-5 scene contract again with Zod after the response.
+  delete scenesSchema.minItems;
+  delete scenesSchema.maxItems;
   const characterIds = [...new Set([
     ...kernel.characters.map(character => character.id),
     ...state.characters.map(character => character.characterId),
   ])].sort();
   if (characterIds.length === 0) throw new Error('Rolling Planner requires at least one authoritative character ID.');
-  const sceneProperties = childSchema(schema, 'properties', 'plans', 'items', 'properties', 'scenes', 'items', 'properties');
+  const sceneProperties = childSchema(scenesSchema, 'items', 'properties');
   childSchema(sceneProperties, 'povCharacterId').enum = characterIds;
   const participantsSchema = childSchema(sceneProperties, 'participantIds');
   childSchema(participantsSchema, 'items').enum = characterIds;
@@ -183,6 +193,15 @@ export function buildRollingPlannerResponseJsonSchemaV3(
     childSchema(unionBranchByKind(deltaSchema, kind), 'properties', 'characterId').enum = characterIds;
   }
   childSchema(unionBranchByKind(deltaSchema, 'resource_numeric'), 'properties', 'resourceId').enum = numericResourceIds;
+  // Gemini generateContent accepts minimum/maximum but rejects the draft
+  // schema's exclusiveMinimum keyword with a generic 400. Zod still enforces
+  // quantity > 0 after constrained decoding, so omit only that unsupported
+  // provider keyword instead of weakening application validation.
+  const considerationQuantity = childSchema(
+    unionBranchByKind(deltaSchema, 'resource_numeric'),
+    'properties', 'consideration', 'items', 'properties', 'quantity',
+  );
+  delete considerationQuantity.exclusiveMinimum;
   childSchema(unionBranchByKind(deltaSchema, 'resource_state'), 'properties', 'resourceId').enum = stateResourceIds;
   childSchema(unionBranchByKind(deltaSchema, 'promise'), 'properties', 'promiseId').enum = promiseIds;
   return schema;
@@ -300,7 +319,6 @@ export async function generateRollingWindowWithOneRepairV3(input: {
   const attempts: PlanAttemptV3[] = [];
   let prompt = input.basePrompt;
   let totalCost = 0;
-  let previousDraft: RollingPlanWindowDraftV3 | null = null;
   for (const attemptNumber of [1, 2] as const) {
     const response = await input.invoke(prompt, attemptNumber);
     totalCost += response.estimatedCostUsd;
@@ -311,12 +329,36 @@ export async function generateRollingWindowWithOneRepairV3(input: {
       throw new FlagshipV3Error('infra_blocked', 'Rolling Planner returned invalid JSON.', String(caught));
     }
     const parsedDraft = RollingPlanWindowDraftV3Schema.safeParse(value);
+    const digest = createHash('sha256').update(JSON.stringify(value)).digest('hex');
     if (!parsedDraft.success) {
-      throw new FlagshipV3Error('infra_blocked', 'Rolling Planner violated its exact output contract.', parsedDraft.error.issues);
+      const validationEvidence = parsedDraft.error.issues.map(issue => ({
+        code: 'planner_contract',
+        path: issue.path.join('.'),
+        message: issue.message,
+      }));
+      const attempt: PlanAttemptV3 = {
+        attempt: attemptNumber,
+        artifactDigest: digest,
+        modelRoute: input.modelRoute,
+        estimatedCostUsd: response.estimatedCostUsd,
+        validationEvidence,
+        result: 'invalid',
+      };
+      attempts.push(attempt);
+      await input.onAttempt?.(attempt);
+      if (attemptNumber === 2) {
+        throw new FlagshipV3Error('plan_blocked', 'Rolling Planner remained schema-invalid after its single evidence-guided repair.', attempts);
+      }
+      prompt = buildPlannerRepairPromptV3({
+        startChapter: input.startChapter,
+        previousDraft: value,
+        ledger: input.ledger,
+        validationIssues: validationEvidence,
+        roleContext: input.roleContext,
+      });
+      continue;
     }
     const draft = parsedDraft.data;
-    previousDraft = draft;
-    const digest = createHash('sha256').update(JSON.stringify(draft)).digest('hex');
     let window: RollingPlanWindowV3 | null = null;
     let validationEvidence: unknown[] = [];
     try {
@@ -347,7 +389,7 @@ export async function generateRollingWindowWithOneRepairV3(input: {
     }
     prompt = buildPlannerRepairPromptV3({
       startChapter: input.startChapter,
-      previousDraft,
+      previousDraft: draft,
       ledger: input.ledger,
       validationIssues: validationEvidence,
       roleContext: input.roleContext,
