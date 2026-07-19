@@ -12,7 +12,10 @@ const closeEnough = (left: number, right: number): boolean => Math.abs(left - ri
 // a purchase created false plan blocks when no goods/services changed hands.
 const purchaseLanguage = /(?:\bmua\b|\bthu mua\b|\bđổi lấy\b)/iu;
 const ungroundedPriorPreparation = /(?:đã\s+chuẩn\s+bị\s+từ\s+(?:trước|chiều|sáng|hôm|đêm)|(?:giấu|để|đặt)\s+sẵn\s+(?:từ\s+(?:trước|chiều|sáng|hôm|đêm))?)/iu;
-const materialAcquisition = /(?:được.{0,100}(?:cho|tặng|giao)|(?:nhặt|mượn|thu\s+gom|lấy\s+được))/iu;
+const materialAcquisition = /(?:được.{0,100}(?:cho|tặng|giao)|(?:nhặt|mượn|thu\s+gom|lấy\s+được|nhận)(?:\s+được)?)/iu;
+const deferredPayment = /(?:giao\s+(?:hàng\s+)?trước|nhận\s+(?:hàng\s+)?trước|trả\s+sau|ghi\s+nợ|mua\s+chịu|vay|cam\s+kết.{0,40}trả|hẹn.{0,30}trả)/iu;
+const liabilityFact = /(?:nợ|phải\s+trả|khoản\s+phải\s+trả|cam\s+kết.{0,40}trả|hạn\s+trả)/iu;
+const scriptedRelationshipEmotion = /(?:vô\s+cùng\s+cảm\s+động|khóc\s+(?:vì|nức\s+nở|òa)|vỡ\s+òa|sững\s+sờ|kinh\s+ngạc|hạnh\s+phúc\s+đến)/iu;
 
 export function validateV3Artifacts(input: {
   kernel: StoryKernelV3;
@@ -78,13 +81,29 @@ export function validateV3Artifacts(input: {
     if (materialAcquisition.test(scene.action)) {
       const sceneDeltaIds = new Set(scene.requiredDeltaIds);
       const recordsMaterialFact = plan.requiredDeltas.some(delta =>
-        sceneDeltaIds.has(delta.id) && delta.kind === 'fact',
+        sceneDeltaIds.has(delta.id)
+        && delta.kind === 'fact',
       );
       if (!recordsMaterialFact) {
         issues.push({
           code: 'physical_acquisition_untracked',
           path: `scenes.${index}.requiredDeltaIds`,
           message: 'A physical acquisition used beyond the scene requires a fact delta; relationship prose cannot replace the material ledger.',
+        });
+      }
+    }
+    if (deferredPayment.test(`${scene.objective}\n${scene.action}`)) {
+      const sceneDeltaIds = new Set(scene.requiredDeltaIds);
+      const recordsLiability = plan.requiredDeltas.some(delta =>
+        sceneDeltaIds.has(delta.id)
+        && delta.kind === 'fact'
+        && liabilityFact.test(delta.valueAfter),
+      );
+      if (!recordsLiability) {
+        issues.push({
+          code: 'deferred_payment_untracked',
+          path: `scenes.${index}.requiredDeltaIds`,
+          message: 'Goods or money received on credit require a fact delta recording who is owed, what is owed and when it must be repaid.',
         });
       }
     }
@@ -125,6 +144,13 @@ export function validateV3Artifacts(input: {
     }
     if (delta.kind === 'promise' && (!promises.has(delta.promiseId) || !statePromises.has(delta.promiseId))) {
       issues.push({ code: 'unknown_promise_delta', path, message: `Unknown promise ${delta.promiseId}.` });
+    }
+    if (delta.kind === 'relationship' && scriptedRelationshipEmotion.test(delta.relationshipAfter)) {
+      issues.push({
+        code: 'relationship_prose_directing',
+        path: `${path}.relationshipAfter`,
+        message: 'Relationship delta must record trust, obligation or behavior; it cannot dictate a melodramatic reaction for Writer to copy.',
+      });
     }
     if (delta.kind === 'resource_numeric' || delta.kind === 'resource_state') {
       const definition = resources.get(delta.resourceId);

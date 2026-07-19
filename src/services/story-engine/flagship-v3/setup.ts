@@ -8,6 +8,7 @@ import {
 } from './contracts';
 import { FlagshipV3Error } from './pipeline';
 import { validateRollingWindowV3 } from './rolling-planner';
+import type { MarketResearchSnapshotV3 } from './concept-lab';
 
 export const FlagshipLaunchPackV3Schema = z.object({
   schemaVersion: z.literal(3),
@@ -19,6 +20,42 @@ export const FlagshipLaunchPackV3Schema = z.object({
 }).strict();
 
 export type FlagshipLaunchPackV3 = z.infer<typeof FlagshipLaunchPackV3Schema>;
+
+export function validateLaunchPackResearchProvenanceV3(
+  pack: FlagshipLaunchPackV3,
+  snapshot: MarketResearchSnapshotV3,
+): void {
+  const signalIds = new Set(snapshot.signals.map(signal => signal.id));
+  const mechanismEvidence = pack.kernel.concept.evidenceSignalIds || [];
+  const issues: Array<{ path: string; value?: string; message: string }> = [];
+  if (mechanismEvidence.length === 0) {
+    issues.push({
+      path: 'kernel.concept.evidenceSignalIds',
+      message: 'The selected story mechanism has no direct research signal provenance.',
+    });
+  }
+  for (const signalId of mechanismEvidence) {
+    if (!signalIds.has(signalId)) {
+      issues.push({
+        path: 'kernel.concept.evidenceSignalIds',
+        value: signalId,
+        message: 'The selected story mechanism references an unknown research signal.',
+      });
+    }
+  }
+  for (const [index, claim] of pack.kernel.worldClaims.entries()) {
+    if (!signalIds.has(claim.sourceRef)) {
+      issues.push({
+        path: `kernel.worldClaims.${index}.sourceRef`,
+        value: claim.sourceRef,
+        message: 'World claim sourceRef must be an exact research signal id from the staged snapshot.',
+      });
+    }
+  }
+  if (issues.length > 0) {
+    throw new FlagshipV3Error('setup_blocked', 'Launch pack research provenance is incomplete.', issues);
+  }
+}
 
 export function validateLaunchPackV3(pack: FlagshipLaunchPackV3): void {
   if (pack.initialState.chapterNumber !== 0 || pack.arc.startChapter !== 1 || pack.initialWindow.startChapter !== 1) {

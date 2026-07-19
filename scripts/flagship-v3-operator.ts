@@ -12,6 +12,7 @@ import {
   digestFlagshipV3,
   getFlagshipReleaseManifestV3,
   validateLaunchPackV3,
+  validateLaunchPackResearchProvenanceV3,
 } from '../src/services/story-engine/flagship-v3';
 
 dotenv.config({ path: '.env.local' });
@@ -52,6 +53,10 @@ async function stage(id: string): Promise<void> {
   const release = getFlagshipReleaseManifestV3();
   const launchPackDigest = digestFlagshipV3(launchPack);
   validateLaunchPackV3(launchPack);
+  const snapshot = snapshotPath
+    ? MarketResearchSnapshotV3Schema.parse(JSON.parse(readFileSync(path.resolve(snapshotPath), 'utf8')))
+    : null;
+  if (snapshot) validateLaunchPackResearchProvenanceV3(launchPack, snapshot);
   console.log(JSON.stringify({
     dryRun: !apply,
     command: 'stage',
@@ -64,14 +69,15 @@ async function stage(id: string): Promise<void> {
     launchPackDigest,
   }, null, 2));
   if (!apply) return;
-  const snapshot = MarketResearchSnapshotV3Schema.parse(JSON.parse(readFileSync(path.resolve(snapshotPath!), 'utf8')));
+  if (!snapshot) throw new Error('stage --apply requires a valid research snapshot.');
   const tournament = JSON.parse(readFileSync(path.resolve(tournamentPath!), 'utf8')) as { selected?: unknown };
   const selected = ConceptCandidateV3Schema.parse(tournament.selected);
   if (selected.id !== launchPack.selectedConceptId) throw new Error('Tournament selected concept does not match the launch pack.');
   const researchDigest = digestFlagshipV3(snapshot);
   const signature = buildPortfolioSignatureV3(selected);
+  const commissionArtifactKey = `${snapshot.commission.slotId}:${FLAGSHIP_V3_SETUP_VERSION}`;
   const { data: existingCommission, error: commissionLookupError } = await db.from('story_factory_commissions_v3')
-    .select('id,project_id,research_digest,setup_release_id').eq('slot_key', snapshot.commission.slotId).maybeSingle();
+    .select('id,project_id,research_digest,setup_release_id').eq('slot_key', commissionArtifactKey).maybeSingle();
   if (commissionLookupError) throw commissionLookupError;
   let commissionId = existingCommission?.id as string | undefined;
   if (existingCommission) {
@@ -81,7 +87,7 @@ async function stage(id: string): Promise<void> {
     }
   } else {
     const { data: inserted, error: commissionError } = await db.from('story_factory_commissions_v3').insert({
-      slot_key: snapshot.commission.slotId,
+      slot_key: commissionArtifactKey,
       project_id: id,
       commission: snapshot.commission,
       research_snapshot: snapshot,

@@ -29,6 +29,7 @@ import {
   runV3StructuredProsePreflight,
   validateV3Artifacts,
   assessEndingReadinessV3,
+  validateLaunchPackResearchProvenanceV3,
   assertFlagshipReleaseV3,
   getFlagshipReleaseManifestV3,
   retainStoryFactsV3,
@@ -66,6 +67,7 @@ function kernel(): StoryKernelV3 {
     concept: {
       signature: detailed('Người làm nghề biển dùng ký ức xu hướng và kỹ thuật bảo quản'),
       uniqueMechanism: detailed('Mỗi vòng thưởng biến hàng bị ép giá thành sản phẩm có đầu ra thật'),
+      evidenceSignalIds: ['signal_0'],
       readerFantasy: detailed('Độc giả thấy gia đình khá lên nhờ năng lực và lao động có kiểm chứng'),
       recurringSituation: detailed('Sơn phát hiện một chênh lệch nghề biển rồi tự trả chi phí khai thác'),
       variationAxes: [detailed('Mùa vụ'), detailed('Bảo quản'), detailed('Đầu ra')],
@@ -374,6 +376,62 @@ describe('flagship v3 core engine', () => {
     });
     expect(validateV3Artifacts({ kernel: kernel(), arc, state: state(), plan: invalid })).toEqual(
       expect.arrayContaining([expect.objectContaining({ code: 'physical_acquisition_untracked' })]),
+    );
+  });
+
+  it('requires an explicit liability fact when goods are received before payment', () => {
+    const invalid = ChapterPlanV3Schema.parse({
+      ...plan(),
+      scenes: plan().scenes.map((scene, index) => index === 0
+        ? { ...scene, action: 'Sơn nhận một thúng cá trước và cam kết sẽ trả tiền cho chủ tàu vào buổi trưa.' }
+        : scene),
+    });
+    expect(validateV3Artifacts({ kernel: kernel(), arc, state: state(), plan: invalid })).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: 'physical_acquisition_untracked' }),
+        expect.objectContaining({ code: 'deferred_payment_untracked' }),
+      ]),
+    );
+    const liabilityDelta = {
+      id: 'fish_payable',
+      kind: 'fact' as const,
+      factId: 'fish_payable',
+      valueBefore: null,
+      valueAfter: 'Sơn nợ chủ tàu 80 đồng tiền cá và phải trả trước buổi trưa.',
+      evidenceRequired: true,
+    };
+    const valid = ChapterPlanV3Schema.parse({
+      ...invalid,
+      scenes: invalid.scenes.map((scene, index) => index === 0
+        ? { ...scene, requiredDeltaIds: [...scene.requiredDeltaIds, liabilityDelta.id] }
+        : scene),
+      requiredDeltas: [...invalid.requiredDeltas, liabilityDelta],
+    });
+    expect(validateV3Artifacts({ kernel: kernel(), arc, state: state(), plan: valid }))
+      .not.toEqual(expect.arrayContaining([expect.objectContaining({ code: 'deferred_payment_untracked' })]));
+    expect(validateV3Artifacts({ kernel: kernel(), arc, state: state(), plan: valid }))
+      .not.toEqual(expect.arrayContaining([expect.objectContaining({ code: 'physical_acquisition_untracked' })]));
+  });
+
+  it('keeps melodramatic emotional direction out of relationship state', () => {
+    const invalid = ChapterPlanV3Schema.parse({
+      ...plan(),
+      scenes: plan().scenes.map((scene, index) => index === 0
+        ? { ...scene, requiredDeltaIds: [...scene.requiredDeltaIds, 'scripted_reaction'] }
+        : scene),
+      requiredDeltas: [
+        ...plan().requiredDeltas,
+        {
+          id: 'scripted_reaction',
+          kind: 'relationship',
+          characterId: 'me_son',
+          relationshipAfter: 'Vô cùng cảm động, khóc vì hạnh phúc và sững sờ trước tài năng của Sơn.',
+          evidenceRequired: true,
+        },
+      ],
+    });
+    expect(validateV3Artifacts({ kernel: kernel(), arc, state: state(), plan: invalid })).toEqual(
+      expect.arrayContaining([expect.objectContaining({ code: 'relationship_prose_directing' })]),
     );
   });
 
@@ -1027,6 +1085,60 @@ describe('flagship v3 core engine', () => {
 });
 
 describe('flagship v3 concept factory', () => {
+  it('fails setup when a mechanism or world claim lacks direct research provenance', () => {
+    const snapshot = MarketResearchSnapshotV3Schema.parse({
+      schemaVersion: 3,
+      snapshotId: 'provenance_2026_07',
+      genreLane: 'coastal_trade',
+      refreshedAt: new Date().toISOString(),
+      commission: {
+        slotId: 'dt_01',
+        audience: detailed('Độc giả thích nghề biển có logic và tiến bộ gia đình'),
+        desiredExperience: detailed('Năng lực nghề nghiệp tạo thành quả có nguồn và có giới hạn'),
+        domainOpportunity: detailed('Phân loại, làm lạnh và bán cá trong điều kiện thiếu vốn'),
+        requiredMechanisms: [detailed('Phân loại cá'), detailed('Bảo quản có nguồn')],
+        openingRequirements: [detailed('Main hành động sớm'), detailed('Có thành quả trước chương ba')],
+        serialityRequirements: [detailed('Cơ chế đổi qua nhiều đầu ra'), detailed('Lợi thế giảm dần theo thời gian')],
+        boundaries: ['không vật tư tự sinh', 'không kỹ thuật vô nguồn', 'không đối thủ ngu'],
+      },
+      sources: Array.from({ length: 3 }, (_, index) => ({
+        id: `source_${index}`,
+        url: `https://example.com/source-${index}`,
+        title: `Nguồn kỹ thuật nghề biển số ${index}`,
+        publisher: `Publisher ${index}`,
+        observedAt: new Date().toISOString(),
+      })),
+      signals: Array.from({ length: 3 }, (_, index) => ({
+        id: `signal_${index}`,
+        claim: detailed(`Tín hiệu kỹ thuật có kiểm chứng số ${index}`),
+        sourceIds: [`source_${index}`],
+        confidence: 0.8,
+      })),
+      prohibitedDirectImitation: ['không sao chép tên', 'không sao chép nhân vật', 'không sao chép thế giới'],
+    });
+    const groundedKernel = StoryKernelV3Schema.parse({
+      ...kernel(),
+      concept: { ...kernel().concept, evidenceSignalIds: ['signal_0'] },
+      worldClaims: kernel().worldClaims.map((claim, index) => ({ ...claim, sourceRef: `signal_${index % 3}` })),
+    });
+    const pack = {
+      schemaVersion: 3 as const,
+      selectedConceptId: 'candidate_grounded',
+      kernel: groundedKernel,
+      arc,
+      initialState: state(),
+      initialWindow: materializeRollingWindowV3({ kernel: groundedKernel, arc, state: state(), draft: validRollingDraft() }),
+    };
+    expect(() => validateLaunchPackResearchProvenanceV3(pack, snapshot)).not.toThrow();
+    expect(() => validateLaunchPackResearchProvenanceV3({
+      ...pack,
+      kernel: StoryKernelV3Schema.parse({
+        ...groundedKernel,
+        concept: { ...groundedKernel.concept, evidenceSignalIds: ['unknown_signal'] },
+      }),
+    }, snapshot)).toThrow(/research provenance/i);
+  });
+
   it('blocks a finalist when any blind opening judge reports a critical failure', () => {
     const candidateId = 'candidate_critical';
     const reviews = Array.from({ length: 3 }, (_, index) => ({

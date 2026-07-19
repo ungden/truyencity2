@@ -22,6 +22,7 @@ import {
   buildPlannerLedgerV3,
   materializeRollingWindowV3,
   validateLaunchPackV3,
+  validateLaunchPackResearchProvenanceV3,
 } from '../src/services/story-engine/flagship-v3';
 import { callFlagshipModel } from '../src/services/story-engine/flagship/provider';
 import { toGeminiResponseJsonSchema } from '../src/services/story-engine/flagship/setup-response-schemas';
@@ -182,7 +183,9 @@ BLIND_OPENING_REVIEWS=${JSON.stringify(tournament.openingReviews)}
 
 Tạo StoryKernelV3. title phải khớp tuyệt đối REQUIRED_DATABASE_TITLE.
 Không chứa taxonomy thị trường, prompt benchmark hoặc tên tác phẩm tham khảo.
+Cơ chế độc đáo phải được chứng minh trực tiếp bởi MARKET_SIGNAL_PROVENANCE: điền concept.evidenceSignalIds bằng stable signal id có thật. Không được suy diễn một công dụng kỹ thuật không xuất hiện trong các signal.
 Cần ít nhất 4 nhân vật có agenda/voice riêng, 4 world claim có nguồn và ngoại lệ, 3 resource, 4 promise.
+Mỗi worldClaims[].sourceRef phải là đúng một stable signal id có thật trong MARKET_SIGNAL_PROVENANCE, không viết tên tài liệu hoặc mô tả nguồn tự do.
 Mỗi resource numeric phải có referenceScale gồm 1-5 mốc so sánh nội bộ có số cụ thể, cùng minimumValue và maximumValue hữu hạn phù hợp cơ chế riêng của truyện. Nếu resource dùng để mua hàng/dịch vụ, exchangeAnchors phải khai báo itemId/name/quantity/unit/costAmount/tolerancePercent từ kinh tế riêng của truyện; nếu không có trao đổi thì dùng mảng rỗng. Tiền/vật tư thường min=0; chỉ số nợ, thiện ác hoặc nhiệt độ được phép âm nếu kernel định nghĩa rõ. Resource state bắt buộc referenceScale/minimumValue/maximumValue đều null và exchangeAnchors=[].
 Voice của từng nhân vật chỉ chứa thuộc tính trung tính: register, sentenceRhythm, directness, addressRules, vocabulary, stressResponse và avoidances. Không viết câu thoại mẫu, câu văn mẫu hoặc lời tuyên bố có thể bị Writer sao chép.
 endingContract.promisesThatMustClose chỉ chứa stable ID ASCII đã xuất hiện trong promises[].id; tuyệt đối không điền mô tả lời hứa hoặc tạo ID mới.
@@ -270,6 +273,7 @@ source, sink, learnedFrom và mọi state value phải là cụm có nghĩa ít 
     initialWindow,
   });
   validateLaunchPackV3(pack);
+  validateLaunchPackResearchProvenanceV3(pack, snapshot);
   writeFileSync(resolvedOutput, `${JSON.stringify(pack, null, 2)}\n`);
   writeFileSync(`${resolvedOutput}.run.json`, `${JSON.stringify({
     schemaVersion: 3,

@@ -37,11 +37,13 @@ AUTHORITATIVE_LEDGER.resources là sổ cái duy nhất: mỗi resource_numeric 
 Khi transactionKind=purchase, phải tính tổng giá theo exchangeAnchors riêng của truyện và tolerancePercent; plan nằm ngoài khoảng giá bị chặn trước Writer. Không tự bịa bảng giá chung và không dùng prose để chữa một giao dịch sai.
 Scene gắn với resource_numeric phải để con số trong required delta; objective/obstacle/action không được đổi đơn vị hoặc dùng quy mô mơ hồ trái ledger.
 Mọi knowledge change phải chỉ rõ nhân vật, fact và nguồn học. Fact mới dùng stable ID mới và phải được tạo trước hoặc cùng chương với lần học đầu tiên; engine tự gắn valueBefore.
+Relationship delta chỉ ghi thay đổi về mức tin tưởng, nghĩa vụ hoặc hành vi có thể quan sát; không chỉ đạo cảm xúc/văn diễn như khóc vì hạnh phúc, vô cùng cảm động, sững sờ hay vỡ òa.
 Character/resource/promise ID chỉ lấy từ kernel/state. Mọi ID và locationId theo mẫu [a-z][a-z0-9_-].
 Mỗi scene chỉ có objective, obstacle và action: câu cơ học ngắn, cụ thể, tối đa 240 ký tự; không viết cảm xúc hộ nhân vật, không dùng ẩn dụ, khẩu hiệu, câu kết hoặc lời thoại mẫu. Kết quả, chi phí, tri thức và quan hệ phải nằm trong required delta thay vì được kể lại bằng prose.
 Không được giả định nhân vật đã chuẩn bị, giấu sẵn hoặc đặt sẵn vật dụng ngoài timeline đã commit. Vật dụng phải đến từ ledger/fact hiện có hoặc được lấy, mua, mượn hay nhặt ngay trong scene với nguồn cụ thể. Không dùng các cụm như "đã chuẩn bị từ trước", "giấu sẵn từ chiều" để lấp nguồn vật thể.
 Mọi vật thể nhân vật được cho, tặng, giao, nhặt, mượn, thu gom hoặc lấy được để dùng sau scene hiện tại phải có delta kind=fact trong chính scene ghi rõ quyền sở hữu/trạng thái vật thể. Delta relationship không thay thế inventory fact; lời action không được tự tạo vật thể ngoài ledger.
-WriterBrief cơ học của từng chương có hard cap 5.000 ký tự. Giữ 1-3 scene và số delta tối thiểu đủ commit logic; không tách scene hay tạo location/relationship delta thừa. Validator sẽ trả writer_brief_budget và yêu cầu tạo lại toàn bộ window nếu vượt cap.
+Nếu nhận hàng hoặc tiền trước rồi trả sau, chính scene đó phải có fact ghi rõ vật/hàng đã nhận, chủ nợ, khoản nợ và hạn trả; có thể dùng một fact duy nhất nếu nó chứa đủ cả inventory lẫn nghĩa vụ. Chương thanh toán phải trừ resource thật và cập nhật fact nợ. Uy tín, relationship hoặc lời hứa trong action không thay thế sổ này.
+WriterBrief cơ học của từng chương có hard cap 5.000 ký tự và mục tiêu an toàn dưới 4.400 ký tự. Mặc định dùng tối đa 2 scene và 4 delta; chỉ vượt khi quan hệ nhân quả thật sự không thể biểu diễn ngắn hơn. Không tách scene hay tạo location/relationship/knowledge delta trang trí. Validator sẽ trả writer_brief_budget và yêu cầu tạo lại toàn bộ window nếu vượt cap.
 worldClaimIds chỉ chứa ID quy tắc thực sự chi phối scene. hookIntent chỉ là enum hiệu ứng, không phải câu kết văn xuôi sẵn.`;
 
 export const V3_ROLLING_PLANNER_SYSTEM = `Bạn là Rolling Planner của đúng một bộ truyện. Không viết prose, không sửa kernel/state/arc và chỉ trả JSON RollingPlanWindowV3.
@@ -63,13 +65,17 @@ export function buildPlannerRepairPromptV3(input: {
   validationIssues: unknown[];
   roleContext: string;
 }): string {
+  const evidenceText = JSON.stringify(input.validationIssues);
+  const budgetRepair = evidenceText.includes('writer_brief_budget')
+    ? '\nBUDGET_REPAIR: Chỉ ở chapterNumber được nêu trong VALIDATION_ISSUES, giảm còn tối đa 1-2 scene, tối đa 3 delta nếu có thể, bỏ participant không hành động, bỏ relationship/knowledge/location delta trang trí, và rút objective/obstacle/action/source/sink/valueAfter xuống câu cơ học ngắn nhất vẫn đủ nghĩa. Không làm phình chương khác.'
+    : '';
   return `REPAIR_ATTEMPT=2_OF_2
 START_CHAPTER=${input.startChapter}
 AUTHORITATIVE_LEDGER=${JSON.stringify(input.ledger)}
 PREVIOUS_INVALID_DRAFT=${JSON.stringify(input.previousDraft)}
 VALIDATION_ISSUES=${JSON.stringify(input.validationIssues)}
 ROLE_CONTEXT=${input.roleContext}
-Tạo lại toàn bộ window chương ${input.startChapter}-${input.startChapter + 4}. Không vá số bằng cách clamp, không đổi ID và không bỏ delta để né lỗi. Tự mô phỏng tuần tự trước khi trả JSON.`;
+Tạo lại toàn bộ window chương ${input.startChapter}-${input.startChapter + 4}. Không vá số bằng cách clamp, không đổi ID và không bỏ delta bắt buộc để né lỗi. Tự mô phỏng tuần tự trước khi trả JSON.${budgetRepair}`;
 }
 
 export function buildPlannerLedgerV3(
@@ -254,7 +260,10 @@ export function materializeRollingWindowV3(input: {
     const plan = ChapterPlanV3Schema.parse({ ...draftPlan, requiredDeltas });
     const issues = validateV3Artifacts({ kernel: input.kernel, arc: input.arc, state, plan });
     if (issues.length) {
-      throw new FlagshipV3Error('plan_blocked', `Chapter ${plan.chapterNumber} is inconsistent after deterministic ledger binding.`, issues);
+      throw new FlagshipV3Error('plan_blocked', `Chapter ${plan.chapterNumber} is inconsistent after deterministic ledger binding.`, [{
+        chapterNumber: plan.chapterNumber,
+        issues,
+      }]);
     }
     state = applyChapterStateV3({
       state,

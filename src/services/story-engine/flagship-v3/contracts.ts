@@ -101,6 +101,7 @@ export const StoryKernelV3Schema = z.object({
   concept: z.object({
     signature: detailed,
     uniqueMechanism: detailed,
+    evidenceSignalIds: z.array(id).min(1).max(8).optional(),
     readerFantasy: detailed,
     recurringSituation: detailed,
     variationAxes: z.array(text).min(3).max(8),

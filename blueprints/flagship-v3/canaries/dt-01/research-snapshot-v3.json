@@ -1,8 +1,8 @@
 {
   "schemaVersion": 3,
-  "snapshotId": "dt_01_research_2026_07",
+  "snapshotId": "dt_01_research_2026_07_v2",
   "genreLane": "era_coastal",
-  "refreshedAt": "2026-07-16T11:12:25.855Z",
+  "refreshedAt": "2026-07-19T15:10:00.000Z",
   "commission": {
     "slotId": "dt_01",
     "audience": "Độc giả Việt thích nam tần niên đại, làm giàu bằng tay nghề, gia đình ấm lên từng bước và nhịp đọc nhẹ nhàng có thành quả sớm.",
@@ -76,6 +76,13 @@
       "title": "Nguồn nghiên cứu DT-01 số 6: chinawriter.com.cn",
       "publisher": "chinawriter.com.cn",
       "observedAt": "2026-07-16T11:12:25.855Z"
+    },
+    {
+      "id": "source_7",
+      "url": "https://www.fao.org/fishery/docs/CDrom/FAO_Training/FAO_Training/General/x6709e/x6709e16.htm",
+      "title": "FAO: Preventing rapid deterioration of fish quality",
+      "publisher": "Food and Agriculture Organization of the United Nations",
+      "observedAt": "2026-07-19T15:10:00.000Z"
     }
   ],
   "signals": [
@@ -126,6 +133,14 @@
         "source_6"
       ],
       "confidence": 0.8
+    },
+    {
+      "id": "signal_7",
+      "claim": "Nếu chưa có đá, cá chỉ có thể được giữ mát ngắn hạn bằng bóng râm và lớp phủ ẩm sạch như lá chuối rồi phải bán trong ngày; lớp phủ không tự hạ cá xuống nhiệt độ của đá và cá không được tiếp xúc bùn hoặc nước bẩn.",
+      "sourceIds": [
+        "source_7"
+      ],
+      "confidence": 0.95
     }
   ],
   "prohibitedDirectImitation": [

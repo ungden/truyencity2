@@ -7,8 +7,14 @@
     "title": "Trọng Sinh Về Làng Biển, Tôi Biến Cá Rẻ Thành Cơ Nghiệp Cả Nhà",
     "genre": "Nam tần, Niên đại, Trọng sinh, Làm giàu, Đời sống",
     "concept": {
-      "signature": "Sử dụng vật liệu tự nhiên sẵn có để bảo quản hải sản giá rẻ thời kỳ thiếu đá lạnh.",
-      "uniqueMechanism": "Phân loại cá dạt và dùng bèo tây, lá chuối khô làm lớp cách nhiệt tự nhiên để giữ độ tươi.",
+      "signature": "Phân loại cá dạt ngay tại bến, giữ mát sạch trong thời gian ngắn rồi bán hết trong buổi sáng trước khi chất lượng giảm.",
+      "uniqueMechanism": "Lâm kiếm chênh lệch bằng phân loại đúng công dụng từng loại cá, phủ lá chuối ẩm sạch trong bóng râm và tổ chức đường bán thật nhanh khi chưa mua nổi đá.",
+      "evidenceSignalIds": [
+        "signal_2",
+        "signal_3",
+        "signal_4",
+        "signal_7"
+      ],
       "readerFantasy": "Từ hai bàn tay trắng, dùng kiến thức nghề nghiệp để nhặt nhạnh cơ hội bị bỏ quên, mang lại cuộc sống no đủ cho gia đình.",
       "recurringSituation": "Phát hiện nguồn hải sản bị đánh giá thấp, xử lý bảo quản bằng phương pháp thủ công, bán được giá cao và tái đầu tư.",
       "variationAxes": [
@@ -18,7 +24,7 @@
         "Công cụ vận chuyển và chế biến"
       ],
       "antiCloneFingerprint": [
-        "Dùng bèo tây phơi một nắng làm lớp bảo ôn",
+        "Giữ mát ngắn hạn bằng bóng râm và lá chuối ẩm sạch, không giả thành đá lạnh",
         "Phân loại cá dạt ngay tại bến hừng đông",
         "Đổi cá lấy thịt lợn và gạo trắng",
         "Cạnh tranh với người làm mắm bằng độ tươi"
@@ -151,28 +157,28 @@
       {
         "id": "claim_da_lanh",
         "claim": "Đá lạnh là mặt hàng xa xỉ, nhà máy đá chỉ ưu tiên cung cấp cho các tàu đánh bắt lớn có hợp đồng.",
-        "sourceRef": "Quy định phân phối của nhà máy đá huyện.",
+        "sourceRef": "signal_2",
         "enforcement": "Bảo vệ nhà máy từ chối bán lẻ, tiểu thương chợ chỉ mua được đá vụn qua trung gian với giá cao.",
         "exceptions": "Khi nhà máy dư thừa công suất vào mùa đông hoặc có quan hệ thân thiết với quản đốc."
       },
       {
         "id": "claim_ca_dat",
         "claim": "Cá dạt (cá nhỏ, cá lẫn) thường bị coi là phế phẩm, chỉ dùng làm mắm hoặc thức ăn cho lợn.",
-        "sourceRef": "Tập quán tiêu dùng và chế biến của làng biển.",
+        "sourceRef": "signal_3",
         "enforcement": "Thương lái lớn từ chối thu mua, chủ tàu đổ đống tại bến với giá rẻ mạt.",
         "exceptions": "Khi có người biết cách phân loại và bảo quản độ tươi để bán lẻ cho người nghèo."
       },
       {
         "id": "claim_thi_truong",
         "claim": "Thị trường đang trong giai đoạn chuyển đổi, giá cả hàng hóa thiết yếu biến động theo ngày.",
-        "sourceRef": "Bối cảnh kinh tế vĩ mô cuối thập niên 1980.",
+        "sourceRef": "signal_5",
         "enforcement": "Tiểu thương chợ huyện tự định giá dựa trên nguồn cung hàng ngày, không có mức giá trần cố định.",
         "exceptions": "Các mặt hàng tem phiếu còn sót lại tại cửa hàng mậu dịch quốc doanh."
       },
       {
         "id": "claim_nguon_loi",
         "claim": "Khai thác ven bờ bằng lưới mắt nhỏ đang làm cạn kiệt nguồn lợi thủy sản.",
-        "sourceRef": "Thực trạng đánh bắt của ngư dân địa phương.",
+        "sourceRef": "signal_1",
         "enforcement": "Sản lượng cá lớn giảm dần, tỷ lệ cá dạt tăng lên trong mỗi chuyến biển.",
         "exceptions": "Những tàu lớn có khả năng vươn khơi xa hoặc những ngư dân chuyển sang nghề nuôi trồng."
       }
@@ -312,7 +318,7 @@
     "arcId": "arc_1_khoi_nghiep_ca_dat",
     "startChapter": 1,
     "endChapter": 30,
-    "direction": "Lâm tận dụng bèo tây và lá chuối khô để bảo quản cá dạt, kiếm số vốn đầu tiên, mua xe kéo và lập trạm thu mua nhỏ tại bến.",
+    "direction": "Lâm phân loại cá dạt ngay tại bến, giữ hàng sạch và mát trong vài giờ rồi bán nhanh để kiếm số vốn đầu tiên, mua xe kéo và tiến tới nguồn đá thật.",
     "terminalChange": "Từ một kẻ ốm yếu tay trắng, Lâm sở hữu một chiếc xe kéo tay, một trạm thu mua lợp lá tại bến và mang lại những bữa cơm có thịt cho vợ.",
     "activeConflicts": [
       {
@@ -323,7 +329,7 @@
         ],
         "objective": "Lâm muốn mua lại toàn bộ mẻ cá dạt với giá rẻ để bán tươi, trong khi Lão Bốn thường bán cho người làm mắm.",
         "leverage": "Lâm trả tiền mặt ngay lập tức và giúp dọn sạch bến bãi, tiết kiệm thời gian và công sức cho Lão Bốn.",
-        "nextMove": "Lâm chuẩn bị sẵn thúng tre lót bèo tây từ đêm, đón đầu tàu của Lão Bốn cập bến trễ vào lúc hừng đông."
+        "nextMove": "Lâm thu gom lá chuối sạch, rửa thúng và đón đầu tàu của Lão Bốn lúc hừng đông để phân loại rồi bán hết trong buổi sáng."
       },
       {
         "id": "conflict_ban_ca_cho_huyen",
@@ -499,7 +505,7 @@
         "schemaVersion": 3,
         "chapterNumber": 1,
         "elapsedMinutesSincePreviousChapter": 0,
-        "chapterPromise": "Lâm bắt đầu hành động để thay đổi hoàn cảnh, tìm kiếm vật liệu bảo quản tự nhiên.",
+        "chapterPromise": "Lâm bắt đầu kiếm tiền từ hai bàn tay trắng tại bến cá.",
         "preconditions": [
           {
             "factId": "fact_hoan_canh_ngheo",
@@ -508,74 +514,26 @@
         ],
         "scenes": [
           {
-            "id": "scene_1_1",
+            "id": "c1_s1",
             "povCharacterId": "char_lam",
             "participantIds": [
-              "char_lam"
+              "char_lam",
+              "char_vo_lam"
             ],
-            "locationId": "bo_ao",
-            "durationMinutes": 30,
-            "travelMinutesFromPrevious": 10,
-            "objective": "Thu gom bèo tây và lá chuối khô để làm lớp cách nhiệt.",
-            "obstacle": "Trời tối và cơ thể Lâm còn rất yếu, dễ trượt ngã xuống nước.",
-            "action": "Lâm cắn răng chịu lạnh, vớt bèo tây lên bờ và nhặt lá chuối khô bó lại thành từng bó nhỏ.",
-            "worldClaimIds": [
-              "claim_da_lanh"
-            ],
+            "locationId": "nha_lam",
+            "durationMinutes": 15,
+            "travelMinutesFromPrevious": 0,
+            "objective": "Lâm tìm dụng cụ ra bến cá gom hàng.",
+            "obstacle": "Nhà không có đồ nghề, chỉ có đồ cũ nát.",
+            "action": "Lâm lấy hai chiếc thúng tre cũ kỹ ở góc bếp và dặn vợ nghỉ ngơi.",
+            "worldClaimIds": [],
             "hookIntent": "opportunity_opens",
             "requiredDeltaIds": [
-              "delta_1_1"
+              "d1_1"
             ]
           },
           {
-            "id": "scene_1_2",
-            "povCharacterId": "char_lam",
-            "participantIds": [
-              "char_lam"
-            ],
-            "locationId": "ben_ca",
-            "durationMinutes": 60,
-            "travelMinutesFromPrevious": 20,
-            "objective": "Đến bến cá chờ tàu của Lão Bốn cập bến để tìm cơ hội.",
-            "obstacle": "Gió biển thổi mạnh khiến cơ thể gầy gò của Lâm run rẩy liên tục.",
-            "action": "Lâm tìm một góc khuất gió, trải bèo tây ra phơi sương và kiên nhẫn chờ đợi tàu cập bến.",
-            "worldClaimIds": [
-              "claim_ca_dat"
-            ],
-            "hookIntent": "threat_arrives",
-            "requiredDeltaIds": [
-              "delta_1_2"
-            ]
-          }
-        ],
-        "requiredDeltas": [
-          {
-            "id": "delta_1_1",
-            "kind": "fact",
-            "factId": "fact_beo_tay",
-            "valueBefore": null,
-            "valueAfter": "Lâm đã thu gom được một đống bèo tây và lá chuối khô dùng để lót thúng cá.",
-            "evidenceRequired": true
-          },
-          {
-            "id": "delta_1_2",
-            "kind": "character_location",
-            "characterId": "char_lam",
-            "locationAfter": "ben_ca",
-            "evidenceRequired": true
-          }
-        ],
-        "nextChapterPressure": "Tàu của Lão Bốn sắp cập bến, Lâm phải tìm cách lấy được cá dạt mà không có tiền."
-      },
-      {
-        "schemaVersion": 3,
-        "chapterNumber": 2,
-        "elapsedMinutesSincePreviousChapter": 0,
-        "chapterPromise": "Lâm đối mặt với Lão Bốn để giành lấy mẻ cá dạt đầu tiên bằng tay trắng.",
-        "preconditions": [],
-        "scenes": [
-          {
-            "id": "scene_2_1",
+            "id": "c1_s2",
             "povCharacterId": "char_lam",
             "participantIds": [
               "char_lam",
@@ -583,195 +541,216 @@
             ],
             "locationId": "ben_ca",
             "durationMinutes": 45,
-            "travelMinutesFromPrevious": 0,
-            "objective": "Thuyết phục Lão Bốn giao mẻ cá dạt đổi lấy công dọn bến.",
-            "obstacle": "Lão Bốn nóng nảy, định đổ bỏ cá dạt vì không có ai mua giờ này.",
-            "action": "Lâm nhanh tay dọn sạch bãi lầy, xin Lão Bốn mẻ cá dạt và lót ngay bèo tây vào thúng.",
-            "worldClaimIds": [
-              "claim_ca_dat"
-            ],
+            "travelMinutesFromPrevious": 15,
+            "objective": "Lâm muốn lấy đống cá dạt của Lão Bốn.",
+            "obstacle": "Lão Bốn chuẩn bị vứt cá cho lợn ăn.",
+            "action": "Lâm đề nghị dọn sạch bãi lầy trên bến để đổi lấy số cá dạt.",
+            "worldClaimIds": [],
             "hookIntent": "opportunity_opens",
             "requiredDeltaIds": [
-              "delta_2_1",
-              "delta_2_2",
-              "delta_2_3"
+              "d1_2",
+              "d1_3",
+              "d1_4"
             ]
           }
         ],
         "requiredDeltas": [
           {
-            "id": "delta_2_1",
-            "kind": "resource_numeric",
-            "resourceId": "res_uy_tin",
-            "before": 0,
-            "delta": 10,
-            "after": 10,
-            "unit": "Điểm",
-            "source": "Giúp Lão Bốn dọn dẹp bến bãi nhanh gọn",
-            "sink": "Tích lũy vào danh tiếng cá nhân tại bến",
-            "transactionKind": "gain",
-            "consideration": [],
-            "evidenceRequired": true
-          },
-          {
-            "id": "delta_2_2",
+            "id": "d1_1",
             "kind": "fact",
-            "factId": "fact_thung_ca",
+            "factId": "fact_thung_cu",
             "valueBefore": null,
-            "valueAfter": "Lâm sở hữu một thúng cá dạt tươi rói được ủ lạnh bằng bèo tây và lá chuối.",
+            "valueAfter": "Lâm có hai chiếc thúng tre cũ kỹ lấy từ góc bếp.",
             "evidenceRequired": true
           },
           {
-            "id": "delta_2_3",
-            "kind": "character_knowledge",
+            "id": "d1_2",
+            "kind": "relationship",
             "characterId": "char_lao_bon",
-            "factId": "fact_beo_tay",
-            "learnedFrom": "Trực tiếp nhìn thấy Lâm dùng bèo tây lót dưới đáy thúng cá.",
+            "relationshipAfter": "Lão Bốn giao cá dạt cho Lâm vì thấy anh chịu khó dọn bến.",
+            "evidenceRequired": true
+          },
+          {
+            "id": "d1_3",
+            "kind": "fact",
+            "factId": "fact_ca_dat_lam",
+            "valueBefore": null,
+            "valueAfter": "Lâm có một đống cá dạt do Lão Bốn giao sau khi dọn bến.",
+            "evidenceRequired": true
+          },
+          {
+            "id": "d1_4",
+            "kind": "resource_state",
+            "resourceId": "res_suc_khoe",
+            "before": "Cơ thể suy nhược, gầy gò ốm yếu, đi lại còn lảo đảo do thiếu chất lâu ngày.",
+            "after": "Cơ thể kiệt sức sau khi dọn sạch bến cá bằng tay không.",
+            "source": "Dọn bến cá khi bụng đói.",
             "evidenceRequired": true
           }
         ],
-        "nextChapterPressure": "Lâm phải gánh thúng cá nặng lên chợ huyện trước khi trời sáng để bán được giá."
+        "nextChapterPressure": "Lâm phải tìm cách bảo quản cá dạt khi không có đá lạnh."
+      },
+      {
+        "schemaVersion": 3,
+        "chapterNumber": 2,
+        "elapsedMinutesSincePreviousChapter": 0,
+        "chapterPromise": "Lâm bảo quản thủ công và vận chuyển cá lên chợ.",
+        "preconditions": [],
+        "scenes": [
+          {
+            "id": "c2_s1",
+            "povCharacterId": "char_lam",
+            "participantIds": [
+              "char_lam"
+            ],
+            "locationId": "ben_ca",
+            "durationMinutes": 60,
+            "travelMinutesFromPrevious": 0,
+            "objective": "Lâm cần phân loại và bảo quản cá dạt.",
+            "obstacle": "Không có đá lạnh và thời tiết bắt đầu nóng.",
+            "action": "Lâm nhặt lá chuối sạch, phân loại cá và ướp mát dưới lớp lá ẩm.",
+            "worldClaimIds": [],
+            "hookIntent": "cost_revealed",
+            "requiredDeltaIds": [
+              "d2_1",
+              "d2_2"
+            ]
+          },
+          {
+            "id": "c2_s2",
+            "povCharacterId": "char_lam",
+            "participantIds": [
+              "char_lam"
+            ],
+            "locationId": "cho_huyen",
+            "durationMinutes": 60,
+            "travelMinutesFromPrevious": 45,
+            "objective": "Lâm mang cá lên chợ huyện bán cho được giá.",
+            "obstacle": "Quãng đường xa, hai thúng cá nặng đè lên vai.",
+            "action": "Lâm cắn răng gánh hai thúng cá đi bộ suốt quãng đường dài đến chợ.",
+            "worldClaimIds": [],
+            "hookIntent": "cost_revealed",
+            "requiredDeltaIds": [
+              "d2_3",
+              "d2_4"
+            ]
+          }
+        ],
+        "requiredDeltas": [
+          {
+            "id": "d2_1",
+            "kind": "fact",
+            "factId": "fact_la_chuoi",
+            "valueBefore": null,
+            "valueAfter": "Lâm thu gom được một mớ lá chuối sạch quanh bến cá.",
+            "evidenceRequired": true
+          },
+          {
+            "id": "d2_2",
+            "kind": "fact",
+            "factId": "fact_ca_dat_phan_loai",
+            "valueBefore": null,
+            "valueAfter": "Cá dạt được phân loại sạch sẽ, ướp mát dưới lá chuối ẩm.",
+            "evidenceRequired": true
+          },
+          {
+            "id": "d2_3",
+            "kind": "character_location",
+            "characterId": "char_lam",
+            "locationAfter": "cho_huyen",
+            "evidenceRequired": true
+          },
+          {
+            "id": "d2_4",
+            "kind": "resource_state",
+            "resourceId": "res_suc_khoe",
+            "before": "Cơ thể kiệt sức sau khi dọn sạch bến cá bằng tay không.",
+            "after": "Vai sưng tấy, chân lảo đảo vì gánh hai thúng cá đi bộ.",
+            "source": "Gánh hai thúng cá nặng đi bộ lên chợ huyện.",
+            "evidenceRequired": true
+          }
+        ],
+        "nextChapterPressure": "Lâm phải thuyết phục tiểu thương chợ huyện mua cá dạt."
       },
       {
         "schemaVersion": 3,
         "chapterNumber": 3,
         "elapsedMinutesSincePreviousChapter": 0,
-        "chapterPromise": "Lâm phải vượt qua giới hạn thể lực để mang cá lên chợ huyện tìm người mua.",
+        "chapterPromise": "Lâm bán được mẻ cá đầu tiên và mua thực phẩm.",
         "preconditions": [],
         "scenes": [
           {
-            "id": "scene_3_1",
-            "povCharacterId": "char_lam",
-            "participantIds": [
-              "char_lam"
-            ],
-            "locationId": "duong_dat",
-            "durationMinutes": 120,
-            "travelMinutesFromPrevious": 0,
-            "objective": "Gánh thúng cá nặng mười lăm cân lên chợ huyện trước khi trời sáng rõ.",
-            "obstacle": "Cơ thể suy nhược khiến Lâm liên tục hụt hơi, vai sưng tấy.",
-            "action": "Lâm nghiến răng bước từng bước, dùng áo cũ lót vai để giảm đau, quyết không dừng lại.",
-            "worldClaimIds": [],
-            "hookIntent": "cost_revealed",
-            "requiredDeltaIds": [
-              "delta_3_1"
-            ]
-          },
-          {
-            "id": "scene_3_2",
+            "id": "c3_s1",
             "povCharacterId": "char_lam",
             "participantIds": [
               "char_lam",
               "char_ba_chu_quan"
-            ],
-            "locationId": "cho_huyen",
-            "durationMinutes": 20,
-            "travelMinutesFromPrevious": 120,
-            "objective": "Tiếp cận Thím Hoa để chào hàng mẻ cá dạt tươi.",
-            "obstacle": "Thím Hoa đang bận rộn và không chú ý đến một kẻ rách rưới như Lâm.",
-            "action": "Lâm mở lớp bèo tây, để lộ những con cá tươi rói không xước bụng thu hút Thím Hoa.",
-            "worldClaimIds": [
-              "claim_thi_truong"
-            ],
-            "hookIntent": "opportunity_opens",
-            "requiredDeltaIds": [
-              "delta_3_2"
-            ]
-          }
-        ],
-        "requiredDeltas": [
-          {
-            "id": "delta_3_1",
-            "kind": "resource_state",
-            "resourceId": "res_suc_khoe",
-            "before": "Cơ thể suy nhược, gầy gò ốm yếu, đi lại còn lảo đảo do thiếu chất lâu ngày.",
-            "after": "Đau nhức toàn thân, vai trầy xước do gánh thúng cá nặng đi bộ mười cây số.",
-            "source": "Gánh thúng cá dạt từ bến lên chợ huyện trong tình trạng đói lả.",
-            "evidenceRequired": true
-          },
-          {
-            "id": "delta_3_2",
-            "kind": "character_location",
-            "characterId": "char_lam",
-            "locationAfter": "cho_huyen",
-            "evidenceRequired": true
-          }
-        ],
-        "nextChapterPressure": "Thím Hoa là người sành sỏi, Lâm phải thuyết phục bà mua cá với giá cao."
-      },
-      {
-        "schemaVersion": 3,
-        "chapterNumber": 4,
-        "elapsedMinutesSincePreviousChapter": 0,
-        "chapterPromise": "Lâm chốt được giao dịch đầu tiên, kiếm được tiền và mua lương thực cho gia đình.",
-        "preconditions": [],
-        "scenes": [
-          {
-            "id": "scene_4_1",
-            "povCharacterId": "char_lam",
-            "participantIds": [
-              "char_lam",
-              "char_ba_chu_quan"
-            ],
-            "locationId": "cho_huyen",
-            "durationMinutes": 15,
-            "travelMinutesFromPrevious": 0,
-            "objective": "Bán toàn bộ thúng cá dạt cho Thím Hoa với giá tốt nhất.",
-            "obstacle": "Thím Hoa ép giá vì đây chỉ là cá dạt, không phải cá lớn.",
-            "action": "Lâm phân tích độ tươi của cá nhờ bèo tây, thuyết phục Thím Hoa mua với giá cao hơn hàng chợ.",
-            "worldClaimIds": [
-              "claim_thi_truong"
-            ],
-            "hookIntent": "truth_reframed",
-            "requiredDeltaIds": [
-              "delta_4_1",
-              "delta_4_3"
-            ]
-          },
-          {
-            "id": "scene_4_2",
-            "povCharacterId": "char_lam",
-            "participantIds": [
-              "char_lam"
             ],
             "locationId": "cho_huyen",
             "durationMinutes": 30,
-            "travelMinutesFromPrevious": 5,
-            "objective": "Mua gạo trắng và thịt lợn ngon để mang về nấu cơm cho vợ.",
-            "obstacle": "Phải tính toán kỹ số tiền vừa kiếm được để không tiêu lẹm vào vốn ngày mai.",
-            "action": "Lâm đếm cẩn thận 60 đồng, mua đúng một cân gạo và một miếng thịt lợn, cất kỹ phần tiền còn lại.",
+            "travelMinutesFromPrevious": 0,
+            "objective": "Lâm muốn bán mẻ cá dạt cho Thím Hoa.",
+            "obstacle": "Thím Hoa nghi ngờ chất lượng cá dạt vì thường là hàng ươn.",
+            "action": "Lâm lật lớp lá chuối, cho Thím Hoa xem những con cá tươi rói.",
             "worldClaimIds": [],
             "hookIntent": "opportunity_opens",
             "requiredDeltaIds": [
-              "delta_4_2"
+              "d3_1",
+              "d3_2"
+            ]
+          },
+          {
+            "id": "c3_s2",
+            "povCharacterId": "char_lam",
+            "participantIds": [
+              "char_lam"
+            ],
+            "locationId": "cho_huyen",
+            "durationMinutes": 20,
+            "travelMinutesFromPrevious": 0,
+            "objective": "Lâm muốn mua thực phẩm ngon về cho vợ.",
+            "obstacle": "Phải tính toán chi tiêu hợp lý để không hết vốn.",
+            "action": "Lâm dùng tiền lãi mua một cân gạo trắng và một miếng thịt lợn.",
+            "worldClaimIds": [],
+            "hookIntent": "opportunity_opens",
+            "requiredDeltaIds": [
+              "d3_3",
+              "d3_4"
             ]
           }
         ],
         "requiredDeltas": [
           {
-            "id": "delta_4_1",
+            "id": "d3_1",
+            "kind": "relationship",
+            "characterId": "char_ba_chu_quan",
+            "relationshipAfter": "Thím Hoa đánh giá cao độ tươi của cá, đồng ý mua hàng.",
+            "evidenceRequired": true
+          },
+          {
+            "id": "d3_2",
             "kind": "resource_numeric",
             "resourceId": "res_money",
             "before": 0,
             "delta": 100,
             "after": 100,
             "unit": "Đồng",
-            "source": "Thím Hoa trả tiền mua thúng cá dạt tươi",
-            "sink": "Túi tiền cá nhân của Lâm",
+            "source": "Bán hai thúng cá dạt tươi cho Thím Hoa.",
+            "sink": "Túi tiền cá nhân của Lâm.",
             "transactionKind": "gain",
             "consideration": [],
             "evidenceRequired": true
           },
           {
-            "id": "delta_4_2",
+            "id": "d3_3",
             "kind": "resource_numeric",
             "resourceId": "res_money",
             "before": 100,
             "delta": -60,
             "after": 40,
             "unit": "Đồng",
-            "source": "Túi tiền cá nhân của Lâm",
-            "sink": "Chủ sạp tạp hóa và sạp thịt ở chợ",
+            "source": "Túi tiền cá nhân của Lâm.",
+            "sink": "Trả tiền mua thực phẩm tại chợ.",
             "transactionKind": "purchase",
             "consideration": [
               {
@@ -790,70 +769,179 @@
             "evidenceRequired": true
           },
           {
-            "id": "delta_4_3",
-            "kind": "character_knowledge",
-            "characterId": "char_ba_chu_quan",
-            "factId": "fact_thung_ca",
-            "learnedFrom": "Kiểm tra tận tay độ tươi của thúng cá dạt do Lâm mang đến.",
+            "id": "d3_4",
+            "kind": "fact",
+            "factId": "fact_thuc_pham",
+            "valueBefore": null,
+            "valueAfter": "Lâm có một cân gạo trắng và một miếng thịt lợn vừa mua.",
             "evidenceRequired": true
           }
         ],
-        "nextChapterPressure": "Lâm phải mang thức ăn về nhà nhanh chóng trước khi Liên lo lắng đi tìm."
+        "nextChapterPressure": "Lâm cần mang thực phẩm về nhà an toàn cho vợ."
       },
       {
         "schemaVersion": 3,
-        "chapterNumber": 5,
+        "chapterNumber": 4,
         "elapsedMinutesSincePreviousChapter": 0,
-        "chapterPromise": "Lâm mang thành quả về nhà, thực hiện lời hứa mang lại bữa cơm no đủ cho vợ.",
+        "chapterPromise": "Lâm mang về bữa cơm có thịt và vạch ra kế hoạch.",
         "preconditions": [],
         "scenes": [
           {
-            "id": "scene_5_1",
+            "id": "c4_s1",
             "povCharacterId": "char_lam",
             "participantIds": [
               "char_lam",
               "char_vo_lam"
             ],
             "locationId": "nha_lam",
-            "durationMinutes": 60,
-            "travelMinutesFromPrevious": 120,
-            "objective": "Nấu một bữa cơm trắng có thịt lợn để bồi bổ cho Liên.",
-            "obstacle": "Liên xót tiền, không dám ăn thịt và muốn để dành cho Lâm.",
-            "action": "Lâm kiên quyết gắp thịt vào bát Liên, kể lại chuyện bán cá để cô yên tâm ăn uống.",
+            "durationMinutes": 45,
+            "travelMinutesFromPrevious": 45,
+            "objective": "Lâm muốn mang thực phẩm về nấu bữa cơm ngon.",
+            "obstacle": "Liên xót tiền, sợ chồng tiêu hoang phí.",
+            "action": "Lâm đưa gạo và thịt cho Liên, giải thích nguồn tiền và nấu ăn.",
             "worldClaimIds": [],
-            "hookIntent": "relationship_turns",
+            "hookIntent": "truth_reframed",
             "requiredDeltaIds": [
-              "delta_5_1",
-              "delta_5_2",
-              "delta_5_3"
+              "d4_1",
+              "d4_2"
+            ]
+          },
+          {
+            "id": "c4_s2",
+            "povCharacterId": "char_lam",
+            "participantIds": [
+              "char_lam",
+              "char_vo_lam"
+            ],
+            "locationId": "nha_lam",
+            "durationMinutes": 30,
+            "travelMinutesFromPrevious": 0,
+            "objective": "Lâm muốn chia sẻ kế hoạch mua xe kéo tay.",
+            "obstacle": "Liên chưa hiểu rõ cách thức làm ăn lâu dài.",
+            "action": "Lâm phân tích việc gánh bộ quá sức và cần mua xe kéo chở hàng.",
+            "worldClaimIds": [],
+            "hookIntent": "truth_reframed",
+            "requiredDeltaIds": [
+              "d4_3",
+              "d4_4"
             ]
           }
         ],
         "requiredDeltas": [
           {
-            "id": "delta_5_1",
+            "id": "d4_1",
             "kind": "character_location",
             "characterId": "char_lam",
             "locationAfter": "nha_lam",
             "evidenceRequired": true
           },
           {
-            "id": "delta_5_2",
+            "id": "d4_2",
             "kind": "promise",
             "promiseId": "prom_bua_com",
-            "statusAfter": "paid",
-            "pressureAfter": "Gia đình đã có bữa cơm trắng thịt lợn đầu tiên, giải tỏa cơn đói khát và nỗi lo âu.",
+            "statusAfter": "advanced",
+            "pressureAfter": "Bữa cơm có thịt đầu tiên đã thành hiện thực.",
             "evidenceRequired": true
           },
           {
-            "id": "delta_5_3",
-            "kind": "relationship",
+            "id": "d4_3",
+            "kind": "fact",
+            "factId": "fact_ke_hoach_xe_keo",
+            "valueBefore": null,
+            "valueAfter": "Lâm dự định tích tiền mua xe kéo tay để chở nhiều cá hơn.",
+            "evidenceRequired": true
+          },
+          {
+            "id": "d4_4",
+            "kind": "character_knowledge",
             "characterId": "char_vo_lam",
-            "relationshipAfter": "Vô cùng cảm động và bắt đầu tin tưởng vào khả năng kiếm tiền của chồng.",
+            "factId": "fact_ke_hoach_xe_keo",
+            "learnedFrom": "Nghe Lâm giải thích cặn kẽ trong bữa cơm tối.",
             "evidenceRequired": true
           }
         ],
-        "nextChapterPressure": "Số tiền còn lại quá ít, Lâm phải tiếp tục ra bến cá vào ngày mai để duy trì nguồn thu."
+        "nextChapterPressure": "Lâm phải xây dựng chỗ làm việc cố định tại bến cá."
+      },
+      {
+        "schemaVersion": 3,
+        "chapterNumber": 5,
+        "elapsedMinutesSincePreviousChapter": 720,
+        "chapterPromise": "Lâm thiết lập cơ sở phân loại và tạo dựng uy tín.",
+        "preconditions": [],
+        "scenes": [
+          {
+            "id": "c5_s1",
+            "povCharacterId": "char_lam",
+            "participantIds": [
+              "char_lam"
+            ],
+            "locationId": "ben_ca",
+            "durationMinutes": 60,
+            "travelMinutesFromPrevious": 15,
+            "objective": "Lâm muốn dựng một chỗ che nắng cố định tại bến.",
+            "obstacle": "Không có tiền thuê mặt bằng hay mua vật liệu tốt.",
+            "action": "Lâm nhặt cọc tre và lá dừa khô, dựng tạm một cái lán nhỏ.",
+            "worldClaimIds": [],
+            "hookIntent": "opportunity_opens",
+            "requiredDeltaIds": [
+              "d5_1",
+              "d5_2"
+            ]
+          },
+          {
+            "id": "c5_s2",
+            "povCharacterId": "char_lam",
+            "participantIds": [
+              "char_lam",
+              "char_lao_bon"
+            ],
+            "locationId": "ben_ca",
+            "durationMinutes": 30,
+            "travelMinutesFromPrevious": 0,
+            "objective": "Lâm muốn lấy mẻ cá dạt của Lão Bốn theo hình thức trả sau.",
+            "obstacle": "Lão Bốn thường đòi tiền mặt ngay, không thích cho nợ.",
+            "action": "Lâm chỉ vào lán tạm chứng minh sự nghiêm túc, nhận cá và hẹn trả tiền.",
+            "worldClaimIds": [],
+            "hookIntent": "relationship_turns",
+            "requiredDeltaIds": [
+              "d5_3",
+              "d5_4"
+            ]
+          }
+        ],
+        "requiredDeltas": [
+          {
+            "id": "d5_1",
+            "kind": "character_location",
+            "characterId": "char_lam",
+            "locationAfter": "ben_ca",
+            "evidenceRequired": true
+          },
+          {
+            "id": "d5_2",
+            "kind": "fact",
+            "factId": "fact_tram_tam",
+            "valueBefore": null,
+            "valueAfter": "Lâm dựng được một lán tạm bằng lá dừa và cọc tre tại bến.",
+            "evidenceRequired": true
+          },
+          {
+            "id": "d5_3",
+            "kind": "relationship",
+            "characterId": "char_lao_bon",
+            "relationshipAfter": "Lão Bốn cho phép Lâm nợ tiền cá dạt đến cuối ngày.",
+            "evidenceRequired": true
+          },
+          {
+            "id": "d5_4",
+            "kind": "fact",
+            "factId": "fact_no_lao_bon",
+            "valueBefore": null,
+            "valueAfter": "Lâm nợ Lão Bốn tiền mẻ cá dạt, hẹn trả sòng phẳng vào buổi chiều.",
+            "evidenceRequired": true
+          }
+        ],
+        "nextChapterPressure": "Lâm phải bán hết mẻ cá mới để có tiền trả nợ cho Lão Bốn."
       }
     ]
   }

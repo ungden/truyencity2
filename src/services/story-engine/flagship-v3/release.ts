@@ -8,8 +8,8 @@ import {
   FLAGSHIP_V3_OPENING_PROMPT_VERSION,
 } from './concept-lab';
 
-export const FLAGSHIP_V3_SETUP_VERSION = 'flagship-v3-setup-2026-07-19.1-factory';
-export const FLAGSHIP_V3_KERNEL_ARCHITECT_VERSION = 'flagship-v3-kernel-2026-07-18.9-neutral-voice-exact-shape';
+export const FLAGSHIP_V3_SETUP_VERSION = 'flagship-v3-setup-2026-07-19.2-research-provenance';
+export const FLAGSHIP_V3_KERNEL_ARCHITECT_VERSION = 'flagship-v3-kernel-2026-07-19.10-research-grounded-mechanism';
 export const FLAGSHIP_V3_STATE_SEEDER_VERSION = 'flagship-v3-state-seeder-2026-07-18.6-exact-shape';
 export const FLAGSHIP_V3_ARC_ARCHITECT_VERSION = 'flagship-v3-arc-2026-07-18.3-exact-shape';
 
@@ -18,7 +18,7 @@ export const FLAGSHIP_V3_CONTEXT_VERSION = 'role-context-v3.8-writer-brief-publi
 export const FLAGSHIP_V3_PREFLIGHT_VERSION = 'deterministic-preflight-v3.4-soft-length-tail-repeat';
 export const FLAGSHIP_V3_QUALITY_VERSION = 'quality-v3.11-chapter-vs-cadence-gates';
 export const FLAGSHIP_V3_ARC_LIFECYCLE_VERSION = 'arc-lifecycle-v3.1-ending-gated';
-export const FLAGSHIP_V3_ROLLING_PLANNER_VERSION = 'flagship-v3.21-writer-brief-budget';
+export const FLAGSHIP_V3_ROLLING_PLANNER_VERSION = 'flagship-v3.28-compact-obligation-fact';
 export const FLAGSHIP_V3_PROVIDER_VERSION = 'provider-v3.9-combined-editor-issue-budget';
 
 export const FlagshipReleaseManifestV3Schema = z.object({
