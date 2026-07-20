@@ -185,6 +185,22 @@ describe('flagship v3 architecture boundary', () => {
     expect(read('src/services/story-engine/flagship-v3/validation.ts')).toContain('buildWriterBriefV3({ kernel, state, plan })');
   });
 
+  it('upgrades only a blocked hidden canary without rewriting committed story artifacts', () => {
+    const migration = read('supabase/migrations/20260720081424_flagship_v3_hidden_canary_release_upgrade.sql');
+    expect(migration).toContain('upgrade_hidden_canary_release_v3');
+    expect(migration).toContain("v_job.status IS DISTINCT FROM 'quality_blocked'");
+    expect(migration).toContain("v_project.status IS DISTINCT FROM 'paused'");
+    expect(migration).toContain("v_project.style_directives->>'publication_mode' IS DISTINCT FROM 'offline_only'");
+    expect(migration).toContain('v_project.current_chapter');
+    expect(migration).toContain("v_project.story_state_v3->>'chapterNumber'");
+    expect(migration).toContain("SET status = 'ready'");
+    expect(migration).not.toContain('story_kernel_v3 =');
+    expect(migration).not.toContain('arc_plan_v3 =');
+    expect(migration).not.toContain('story_state_v3 =');
+    expect(migration).not.toContain('DELETE FROM public.chapters');
+    expect(migration).not.toContain('DELETE FROM public.chapter_blueprints');
+  });
+
   it('separates sequential survival from blind preference and never hard-codes operational success', () => {
     const pairBuilder = read('scripts/flagship-v3-build-machine-pairs.ts');
     const survivalBuilder = read('scripts/flagship-v3-build-sequential-survival.ts');

@@ -208,6 +208,26 @@ async function canary(id: string): Promise<void> {
   console.log(JSON.stringify(data, null, 2));
 }
 
+async function upgrade(id: string): Promise<void> {
+  const release = getFlagshipReleaseManifestV3();
+  console.log(JSON.stringify({
+    dryRun: !apply,
+    command: 'upgrade-hidden-canary-release',
+    projectId: id,
+    engineReleaseId: release.releaseId,
+    promptVersion: release.promptVersion,
+    current: await status(id),
+  }, null, 2));
+  if (!apply) return;
+  const { data, error } = await db.rpc('upgrade_hidden_canary_release_v3', {
+    p_project_id: id,
+    p_release_manifest: release,
+    p_confirmation: 'UPGRADE_BLOCKED_HIDDEN_CANARY_RELEASE_V3',
+  });
+  if (error) throw error;
+  console.log(JSON.stringify(data, null, 2));
+}
+
 async function reconcile(): Promise<void> {
   const staleMinutes = Number(value('--stale-minutes') || '20');
   console.log(JSON.stringify({ dryRun: !apply, command: 'reconcile', staleMinutes }, null, 2));
@@ -221,10 +241,11 @@ async function main(): Promise<void> {
   if (command === 'stage') await stage(projectId!);
   else if (command === 'reset') await reset(projectId!);
   else if (command === 'canary') await canary(projectId!);
+  else if (command === 'upgrade') await upgrade(projectId!);
   else if (command === 'promote') await promote(projectId!);
   else if (command === 'status') console.log(JSON.stringify(await status(projectId!), null, 2));
   else if (command === 'reconcile') await reconcile();
-  else throw new Error('Usage: flagship-v3-operator.ts stage|reset|canary|promote|status|reconcile [options] [--apply]');
+  else throw new Error('Usage: flagship-v3-operator.ts stage|reset|canary|upgrade|promote|status|reconcile [options] [--apply]');
 }
 
 main().catch(error => {

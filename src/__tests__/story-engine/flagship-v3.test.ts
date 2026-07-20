@@ -524,7 +524,7 @@ describe('flagship v3 core engine', () => {
     expect(evidence.map(item => item.code)).toEqual(expect.arrayContaining(['ai_cliche_cluster', 'zero_cash_claim_conflict']));
   });
 
-  it('uses a natural hard range instead of forcing a target percentage in revision', () => {
+  it('gives a full rewrite a natural target buffer and a closed mechanical self-check', () => {
     const context = buildV3RoleContexts({ kernel: kernel(), arc, state: state(), plan: plan() }).revision();
     const prompt = buildV3RevisionPrompt({
       chapterNumber: 2,
@@ -540,7 +540,11 @@ describe('flagship v3 core engine', () => {
       repairMode: 'full_rewrite',
     });
     expect(prompt).toContain('hard range 1000-2200 từ');
-    expect(prompt).not.toContain('1440');
+    expect(prompt).toContain('full_rewrite hãy nhắm khoảng 1800 từ');
+    expect(prompt).toContain('tổng độ dài ước lượng không dưới 1000 từ');
+    expect(prompt).toContain('mệnh giá, tiền thối và số dư');
+    expect(prompt).toContain('Không được chữa một lỗi bằng cách tạo lỗi mới');
+    expect(prompt).not.toContain('thêm đoạn đệm để đạt độ dài');
   });
 
   it('gives Writer only the mechanical brief while Editor retains the full plan', () => {
@@ -637,6 +641,16 @@ describe('flagship v3 core engine', () => {
       targetWordCount: 1_500,
       context: buildV3RoleContexts({ kernel: kernel(), arc, state: state(), plan: plan() }).writer,
     })).toContain('hard range 1000-2200 từ');
+    expect(buildV3WriterPrompt({
+      chapterNumber: 1,
+      targetWordCount: 1_500,
+      context: buildV3RoleContexts({ kernel: kernel(), arc, state: state(), plan: plan() }).writer,
+    })).toContain('hãy nhắm khoảng 1500 từ');
+    expect(buildV3WriterPrompt({
+      chapterNumber: 1,
+      targetWordCount: 1_000,
+      context: buildV3RoleContexts({ kernel: kernel(), arc, state: state(), plan: plan() }).writer,
+    })).toContain('hãy nhắm khoảng 1200 từ');
     expect(V3_WRITER_SYSTEM).not.toContain('bước sang trang mới');
     expect(V3_WRITER_SYSTEM).not.toContain('đó không phải');
   });
