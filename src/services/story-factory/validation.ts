@@ -94,7 +94,8 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
     if (!worldRuleIds.has(ruleId)) fail(`Chapter ${plan.chapterNumber} references unknown world rule ${ruleId}.`);
   }
   const referenced = new Set<string>();
-  const locations = new Map(state.characters.map(item => [item.characterId, item.locationId]));
+  const startingLocations = new Map(state.characters.map(item => [item.characterId, item.locationId]));
+  const locations = new Map(startingLocations);
   for (const scene of plan.scenes) {
     if (!characterIds.has(scene.povCharacterId)) fail(`Scene ${scene.id} has unknown POV ${scene.povCharacterId}.`);
     if (!scene.participantIds.includes(scene.povCharacterId)) fail(`Scene ${scene.id} POV is not a participant.`);
@@ -123,6 +124,21 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
   }
   const orphaned = [...deltaIds].filter(id => !referenced.has(id));
   if (orphaned.length) fail(`Chapter ${plan.chapterNumber} has deltas not assigned to a scene.`, orphaned);
+  for (const [characterId, afterLocationId] of locations) {
+    const beforeLocationId = startingLocations.get(characterId);
+    if (!beforeLocationId || beforeLocationId === afterLocationId) continue;
+    const locationDeltas = plan.requiredDeltas.filter(
+      (delta): delta is Extract<StateDelta, { kind: 'location' }> => delta.kind === 'location' && delta.characterId === characterId,
+    );
+    if (locationDeltas.length !== 1
+      || locationDeltas[0].beforeLocationId !== beforeLocationId
+      || locationDeltas[0].afterLocationId !== afterLocationId) {
+      fail(`Chapter ${plan.chapterNumber} must commit the final location of ${characterId}.`, {
+        beforeLocationId,
+        afterLocationId,
+      });
+    }
+  }
 }
 
 function eventEntity(delta: StateDelta): string {
@@ -223,9 +239,10 @@ export function applyChapterPlan(input: {
   }
   state.chapterNumber = plan.chapterNumber;
   state.storyTimeMinutes = plan.storyTimeAfterMinutes;
+  const summary = events.map(event => `${event.kind}:${event.entityId}=${JSON.stringify(event.after)}`).join('; ').slice(0, 500);
   state.recentEvents = [
     ...state.recentEvents,
-    { chapterNumber: plan.chapterNumber, summary: plan.unresolvedQuestion },
+    { chapterNumber: plan.chapterNumber, summary },
   ].slice(-20);
   validateKernelState(kernel, state);
   return { state, events };

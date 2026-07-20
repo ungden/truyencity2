@@ -16,6 +16,7 @@ import { planArcLifecycle, planRollingWindow, reviewTenChapterWindow } from './p
 import type { ProviderUsage, StoryModelProvider } from './provider';
 import { STORY_FACTORY_RELEASE } from './release';
 import { runConceptLab } from './setup';
+import type { SetupCheckpoint } from './setup';
 
 interface FactoryJobRow {
   id: string;
@@ -75,11 +76,15 @@ async function blockRun(db: SupabaseClient, job: FactoryJobRow, runId: string | 
     ? error
     : new StoryFactoryError('infra_blocked', error instanceof Error ? error.message : String(error));
   if (runId) {
+    const existing = await db.from('story_factory_runs').select('output_artifact').eq('id', runId).single();
+    const output = existing.data?.output_artifact && typeof existing.data.output_artifact === 'object'
+      ? existing.data.output_artifact as Record<string, unknown>
+      : {};
     await db.from('story_factory_runs').update({
       status: factoryError.code === 'infra_blocked' ? 'infra_blocked' : 'blocked',
       error_code: factoryError.code,
       error_message: factoryError.message,
-      output_artifact: { evidence: factoryError.evidence ?? null },
+      output_artifact: { ...output, evidence: factoryError.evidence ?? null },
       finished_at: new Date().toISOString(),
     }).eq('id', runId).eq('status', 'running');
   }
@@ -107,6 +112,12 @@ async function runSetup(db: SupabaseClient, job: FactoryJobRow, project: Factory
     const setupInput = job.setup_input as { commission?: unknown; research?: unknown } | null;
     if (!setupInput?.commission || !setupInput.research) throw new StoryFactoryError('setup_blocked', 'Setup job is missing commission or research snapshot.');
     const routes = ModelRoutesSchema.parse(project.model_routes);
+    const previousRuns = await db.from('story_factory_runs').select('output_artifact')
+      .eq('job_id', job.id).eq('kind', 'setup').eq('engine_release', STORY_FACTORY_RELEASE)
+      .order('started_at', { ascending: false }).limit(20);
+    if (previousRuns.error) throw previousRuns.error;
+    const resume = (previousRuns.data ?? []).map(row => row.output_artifact as { checkpoint?: SetupCheckpoint } | null)
+      .find(artifact => artifact?.checkpoint)?.checkpoint;
     const { data: signatureRows, error: signaturesError } = await db.from('ai_story_projects').select('story_kernel').not('story_kernel', 'is', null).neq('id', project.id);
     if (signaturesError) throw signaturesError;
     const existingSignatures = (signatureRows ?? []).flatMap(row => {
@@ -123,6 +134,16 @@ async function runSetup(db: SupabaseClient, job: FactoryJobRow, project: Factory
       routes,
       existingSignatures,
       provider,
+      resume,
+      onCheckpoint: async checkpoint => {
+        const checkpointUsages = Object.values(checkpoint).flatMap(stage => stage?.usage ? [stage.usage] : []);
+        const updated = await db.from('story_factory_runs').update({
+          output_artifact: { checkpoint },
+          usage: checkpointUsages,
+          estimated_cost_usd: usageCost(checkpointUsages),
+        }).eq('id', runId).eq('status', 'running');
+        if (updated.error) throw updated.error;
+      },
     });
     const pack = LaunchPackSchema.parse(result.launchPack);
     const protagonist = pack.kernel.characters.find(character => character.id === pack.kernel.protagonistId)!;

@@ -212,7 +212,6 @@ export const ChapterPlanSchema = z.object({
     requiredDeltaIds: z.array(stableId).min(1).max(20),
   }).strict()).min(1).max(5),
   requiredDeltas: z.array(StateDeltaSchema).min(1).max(30),
-  unresolvedQuestion: z.string().trim().min(4).max(500),
 }).strict();
 
 export const RollingPlanSchema = z.object({

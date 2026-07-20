@@ -40,6 +40,7 @@ export interface StoryModelProvider {
     prompt: string;
     schema: z.ZodType<T, z.ZodTypeDef, unknown>;
     temperature?: number;
+    constrainSchema?: boolean;
   }): Promise<ProviderResult<T>>;
 }
 
@@ -60,9 +61,30 @@ function retryable(error: unknown): boolean {
   return error instanceof TypeError;
 }
 
-function providerJsonSchema<T>(schema: z.ZodType<T, z.ZodTypeDef, unknown>): Record<string, unknown> {
+export function toGeminiResponseSchema<T>(schema: z.ZodType<T, z.ZodTypeDef, unknown>): Record<string, unknown> {
+  // zod-to-json-schema's OpenAPI target is compatible with Gemini's supported
+  // subset except for boolean exclusive bounds. Normalize only those bounds so
+  // we do not introduce unsupported keywords from another schema dialect.
   const converted = zodToJsonSchema(schema, { target: 'openApi3', $refStrategy: 'none' }) as Record<string, unknown>;
   delete converted.$schema;
+  const normalize = (value: unknown): void => {
+    if (Array.isArray(value)) {
+      value.forEach(normalize);
+      return;
+    }
+    if (!value || typeof value !== 'object') return;
+    const node = value as Record<string, unknown>;
+    if (node.exclusiveMinimum === true && typeof node.minimum === 'number') {
+      node.exclusiveMinimum = node.minimum;
+      delete node.minimum;
+    } else if (node.exclusiveMinimum === false) delete node.exclusiveMinimum;
+    if (node.exclusiveMaximum === true && typeof node.maximum === 'number') {
+      node.exclusiveMaximum = node.maximum;
+      delete node.maximum;
+    } else if (node.exclusiveMaximum === false) delete node.exclusiveMaximum;
+    Object.values(node).forEach(normalize);
+  };
+  normalize(converted);
   return converted;
 }
 
@@ -72,6 +94,7 @@ async function generate(input: {
   prompt: string;
   temperature: number;
   responseSchema?: Record<string, unknown>;
+  jsonMode?: boolean;
 }): Promise<ProviderResult<string>> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new StoryFactoryError('infra_blocked', 'GEMINI_API_KEY is not configured.');
@@ -80,8 +103,10 @@ async function generate(input: {
     temperature: input.temperature,
     maxOutputTokens: 65_536,
   };
-  if (input.responseSchema) {
+  if (input.responseSchema || input.jsonMode) {
     generationConfig.responseMimeType = 'application/json';
+  }
+  if (input.responseSchema) {
     generationConfig.responseJsonSchema = input.responseSchema;
   }
   const body = {
@@ -101,7 +126,7 @@ async function generate(input: {
       });
       if (!response.ok) {
         const detail = await response.text().catch(() => '');
-        throw new ProviderHttpError(response.status, `Gemini ${response.status}: ${detail.slice(0, 500)}`);
+        throw new ProviderHttpError(response.status, `Gemini ${input.model} ${response.status}: ${detail.slice(0, 500)}`);
       }
       const payload = await response.json();
       const candidate = payload?.candidates?.[0];
@@ -143,11 +168,18 @@ export const geminiProvider: StoryModelProvider = {
     prompt: string;
     schema: z.ZodType<T, z.ZodTypeDef, unknown>;
     temperature?: number;
+    constrainSchema?: boolean;
   }): Promise<ProviderResult<T>> {
+    const responseSchema = toGeminiResponseSchema(input.schema);
+    const prompt = input.constrainSchema === false
+      ? `${input.prompt}\n\nBắt buộc trả đúng một object theo JSON Schema sau, giữ nguyên toàn bộ tên field:\n${JSON.stringify(responseSchema)}`
+      : input.prompt;
     const response = await generate({
       ...input,
+      prompt,
       temperature: input.temperature ?? 0.7,
-      responseSchema: providerJsonSchema(input.schema),
+      responseSchema: input.constrainSchema === false ? undefined : responseSchema,
+      jsonMode: true,
     });
     let raw: unknown;
     try {

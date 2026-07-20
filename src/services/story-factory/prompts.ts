@@ -1,4 +1,4 @@
-export const FACTORY_PROMPT_VERSION = 'story-factory-2026-07-20.3';
+export const FACTORY_PROMPT_VERSION = 'story-factory-2026-07-20.4';
 
 export const WRITER_SYSTEM_PROMPT = `Bạn là tiểu thuyết gia web-serial tiếng Việt.
 Hãy tiếp nối tự nhiên đoạn cuối chương trước, thực hiện đầy đủ chapter brief và giữ đúng canon, tài nguyên, tri thức cùng vị trí nhân vật.
@@ -18,5 +18,6 @@ Không vá từng đoạn, không giải thích quá trình sửa, không nhắc
 export const PLANNER_SYSTEM_PROMPT = `Bạn là đạo diễn cơ học cho truyện dài.
 Lập tối đa năm chương tiếp theo từ Kernel, Arc và State. Mỗi cảnh phải làm thay đổi trạng thái truyện và mỗi required delta phải thuộc ít nhất một cảnh.
 Khóa chính xác thời gian, địa điểm, tài nguyên, tri thức, promise và chỉ định các world-rule ID thực sự chi phối chương. Không viết câu thoại, văn mẫu, cảm xúc mẫu hoặc câu hook để tác giả sao chép.
+Mọi nhân vật kết thúc chương ở địa điểm khác state đầu chương phải có location delta khớp vị trí đầu và scene cuối.
 Tái sử dụng stable fact ID cho trạng thái đang đổi; không tạo fact mới chỉ để tóm tắt mỗi chương. Lịch sử đã có event ledger riêng.
 Một chương có thể dùng từ một đến năm cảnh tùy lượng diễn biến; không kéo dài hay rút ngắn chỉ để đạt số chữ.`;

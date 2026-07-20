@@ -1,0 +1,22 @@
+{
+  "snapshotId": "era-coastal-cn-market-2026-07-20",
+  "lane": "era_coastal",
+  "capturedAt": "2026-07-20T16:15:00.000Z",
+  "signals": [
+    {
+      "id": "pressure_release",
+      "sourceUrl": "https://www.cssn.cn/skgz/bwyc/202604/t20260420_5981165.shtml",
+      "observation": "Sảng văn đáp ứng nhu cầu giải tỏa áp lực và sống thử một bản thân chủ động hơn; pleasure cần đến từ năng lực có nhân quả thay vì đối thủ ngu hoặc may mắn liên tục."
+    },
+    {
+      "id": "lived_experience",
+      "sourceUrl": "https://www.chinawriter.com.cn/n1/2026/0413/c404027-40700182.html",
+      "observation": "Niên đại văn có sức hút khi đời sống vật chất, nghề nghiệp và quan hệ gia đình đủ cụ thể; hành trình sửa tiếc nuối phải hiện ra bằng thay đổi sinh hoạt nhìn thấy được."
+    },
+    {
+      "id": "character_profession",
+      "sourceUrl": "https://wyb.chinawriter.com.cn/content/202602/06/content82721.html",
+      "observation": "Nhân vật, nghề nghiệp, hài hước và cảm xúc đời thường giúp truyện dài giữ sức sống tốt hơn việc chỉ lặp vòng nghiền ép và vả mặt đơn tuyến."
+    }
+  ]
+}

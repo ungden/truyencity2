@@ -1,4 +1,4 @@
-import type { z } from 'zod';
+import { z } from 'zod';
 import {
   EditorAssessmentSchema,
   type ArcPlan,
@@ -12,6 +12,7 @@ import {
   applyChapterPlan,
   buildWriterBrief,
   runConceptLab,
+  toGeminiResponseSchema,
   writeStoryChapter,
 } from '@/services/story-factory';
 import type { ProviderResult, StoryModelProvider } from '@/services/story-factory/provider';
@@ -95,7 +96,6 @@ function plan(chapterNumber: number, before = `ngay_${chapterNumber - 1}`): Chap
       requiredDeltaIds: [`delta_${chapterNumber}`],
     }],
     requiredDeltas: [{ id: `delta_${chapterNumber}`, kind: 'fact', factId: 'fact_day', before, after: `ngay_${chapterNumber}` }],
-    unresolvedQuestion: 'Kế hoạch mới sẽ chịu phản ứng nào khi chạm tới thị trường?',
   };
 }
 
@@ -140,11 +140,14 @@ describe('canonical Story Factory', () => {
   });
 
   test('Writer context excludes research, ending contract and editor rubric', () => {
-    const brief = JSON.stringify(buildWriterBrief({ kernel, state: initialState, plan: plan(1) }));
+    const state = structuredClone(initialState);
+    state.facts.push({ id: 'prior_decision', value: 'Người mua đã đồng ý giao dịch ở chương trước.' });
+    const brief = JSON.stringify(buildWriterBrief({ kernel, state, plan: plan(1) }));
     expect(brief).not.toContain('endingDirection');
     expect(brief).not.toContain('research');
     expect(brief).not.toContain('rubric');
     expect(brief).not.toContain('promisesToResolve');
+    expect(brief).toContain('prior_decision');
   });
 
   test('normal chapter uses two calls and has no word-count publication gate', async () => {
@@ -172,6 +175,11 @@ describe('canonical Story Factory', () => {
   test('Editor pass cannot contain an issue or false delta', () => {
     expect(EditorAssessmentSchema.safeParse({ status: 'pass', issues: [{ category: 'causality' }], deltaChecks: [{ deltaId: 'delta_1', realized: true, evidence: '' }] }).success).toBe(false);
     expect(EditorAssessmentSchema.safeParse({ status: 'pass', issues: [], deltaChecks: [{ deltaId: 'delta_1', realized: false, evidence: '' }] }).success).toBe(false);
+  });
+
+  test('Gemini structured-output schema uses numeric exclusive bounds', () => {
+    const schema = toGeminiResponseSchema(z.object({ arcNumber: z.number().int().positive() }).strict());
+    expect((schema.properties as Record<string, Record<string, unknown>>).arcNumber.exclusiveMinimum).toBe(0);
   });
 
   test('state remains bounded across 1,200 transitions', () => {

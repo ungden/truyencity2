@@ -73,7 +73,9 @@ export function buildWriterBrief(input: {
       action: scene.action,
       requiredDeltaIds: scene.requiredDeltaIds,
     })),
-    currentFacts: input.state.facts.filter(fact => ids.facts.has(fact.id)),
+    // Current facts are compact canon, not historical memory. Include all of
+    // them so a planner omission cannot hide a decision made last chapter.
+    currentFacts: input.state.facts,
     characterState: input.state.characters.filter(character => ids.characters.has(character.characterId)).map(character => ({
       ...character,
       knownFactIds: character.knownFactIds.filter(factId => ids.facts.has(factId)),
@@ -119,7 +121,7 @@ export function buildChapterContexts(input: {
   const editorState = {
     chapterNumber: input.state.chapterNumber,
     storyTimeMinutes: input.state.storyTimeMinutes,
-    facts: input.state.facts.filter(fact => ids.facts.has(fact.id)),
+    facts: input.state.facts,
     characters: input.state.characters.filter(character => ids.characters.has(character.characterId)).map(character => ({
       ...character,
       knownFactIds: character.knownFactIds.filter(factId => ids.facts.has(factId)),
