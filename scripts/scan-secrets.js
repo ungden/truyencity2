@@ -1,5 +1,5 @@
 const { execFileSync } = require('child_process');
-const { readFileSync } = require('fs');
+const { existsSync, readFileSync } = require('fs');
 
 const files = execFileSync('git', ['ls-files'], { encoding: 'utf8' })
   .split('\n')
@@ -33,6 +33,9 @@ const allowed = [
 
 const findings = [];
 for (const file of files) {
+  // During a clean-break refactor, files can be staged for deletion while the
+  // index still lists them. They cannot contain a newly committed secret.
+  if (!existsSync(file)) continue;
   const text = readFileSync(file, 'utf8');
   const lines = text.split('\n');
   for (const { name, re } of patterns) {

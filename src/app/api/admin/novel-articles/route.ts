@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { isAuthorizedAdmin } from '@/lib/auth/admin-auth';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
-import { callGemini } from '@/services/story-engine/utils/gemini';
-import { extractJSON } from '@/services/story-engine/utils/json-repair';
+import { geminiProvider } from '@/services/story-factory';
 
 export const maxDuration = 120;
 
@@ -12,6 +12,13 @@ interface ArticleItem {
   content: string;
   platform_hint: string;
 }
+
+const articlesSchema = z.array(z.object({
+  article_type: z.string().trim().min(2).max(80),
+  title: z.string().trim().min(4).max(200),
+  content: z.string().trim().min(20).max(8_000),
+  platform_hint: z.string().trim().min(2).max(80),
+}).strict()).min(1).max(7);
 
 const ARTICLE_TYPES = [
   { type: 'review', label: 'Review hấp dẫn', platform: 'general' },
@@ -61,7 +68,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
   }
 
-  const { novel_id, count = 7 } = body;
+  const { novel_id } = body;
+  const count = Math.max(1, Math.min(7, Math.floor(body.count ?? 7)));
   if (!novel_id) {
     return NextResponse.json({ error: 'novel_id required' }, { status: 400 });
   }
@@ -79,20 +87,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Novel not found' }, { status: 404 });
   }
 
-  // Load synopsis if available
-  const { data: synopsisRow } = await supabase
-    .from('story_synopsis')
-    .select('synopsis_text,mc_current_state,active_allies,active_enemies,open_threads')
-    .eq('project_id', novel_id)
-    .maybeSingle();
-
-  // Load first 5 chapter summaries
-  const { data: summaries } = await supabase
-    .from('chapter_summaries')
-    .select('chapter_number,title,summary')
-    .eq('project_id', novel_id)
+  const { data: openingChapters } = await supabase
+    .from('chapters')
+    .select('chapter_number,title,content')
+    .eq('novel_id', novel_id)
     .order('chapter_number', { ascending: true })
-    .limit(5);
+    .limit(3);
 
   // Build context for AI
   const novelContext = [
@@ -102,12 +102,8 @@ export async function POST(request: NextRequest) {
     `Trạng thái: ${novel.status || 'Đang ra'}`,
     `Số chương: ${novel.total_chapters || 0}`,
     novel.description ? `Mô tả gốc: ${novel.description}` : '',
-    synopsisRow?.synopsis_text ? `Tóm tắt cốt truyện: ${synopsisRow.synopsis_text}` : '',
-    synopsisRow?.mc_current_state ? `Trạng thái nhân vật chính: ${synopsisRow.mc_current_state}` : '',
-    synopsisRow?.active_allies ? `Đồng minh: ${synopsisRow.active_allies}` : '',
-    synopsisRow?.active_enemies ? `Kẻ thù: ${synopsisRow.active_enemies}` : '',
-    summaries && summaries.length > 0
-      ? `Tóm tắt các chương đầu:\n${summaries.map(s => `- Chương ${s.chapter_number} "${s.title}": ${s.summary}`).join('\n')}`
+    openingChapters && openingChapters.length > 0
+      ? `Trích đoạn các chương đầu:\n${openingChapters.map(chapter => `- Chương ${chapter.chapter_number} "${chapter.title}": ${(chapter.content || '').slice(0, 4_000)}`).join('\n')}`
       : '',
   ].filter(Boolean).join('\n');
 
@@ -151,14 +147,16 @@ ${articleTypesForPrompt}
 Trả về ĐÚNG ${count} object trong array.`;
 
   try {
-    const response = await callGemini(prompt, {
-      model: 'gemini-3.1-flash-lite',
+    const response = await geminiProvider.json({
+      model: process.env.GEMINI_MARKETING_MODEL || 'gemini-2.5-flash',
+      system: 'Bạn viết nội dung marketing tiếng Việt tự nhiên cho TruyenCity; không bịa chi tiết ngoài dữ liệu được cung cấp.',
+      prompt,
+      schema: articlesSchema,
       temperature: 0.9,
-      maxTokens: 16000,
-    }, { jsonMode: true });
+    });
 
-    const parsed = JSON.parse(extractJSON(response.content)) as ArticleItem[];
-    if (!Array.isArray(parsed) || parsed.length === 0) {
+    const parsed = response.value as ArticleItem[];
+    if (parsed.length !== Math.min(count, ARTICLE_TYPES.length)) {
       return NextResponse.json({ error: 'AI trả về format không hợp lệ' }, { status: 500 });
     }
 

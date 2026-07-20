@@ -117,7 +117,7 @@ export const DELETE = async (
 
     revalidatePath(`/admin/novels/${chapter.novel_id}`);
     revalidatePath('/admin/novels');
-    revalidatePath('/admin/ai-writer');
+    revalidatePath('/admin/factory');
 
     return NextResponse.json({
       success: true,

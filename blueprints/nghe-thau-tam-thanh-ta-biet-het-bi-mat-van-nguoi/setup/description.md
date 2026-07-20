@@ -1,7 +1,0 @@
-Trần Niệm, hai mươi sáu tuổi, là một nhân viên hành chính quèn ở tầng 4 một tòa nhà văn phòng giữa lòng thành phố Tân Hải. Anh là kiểu người mà cả công ty đi ngang qua cũng chẳng ai buồn nhớ tên — làm việc cần mẫn, nhịn sếp, lủi thủi ăn cơm hộp một mình, và quen với cảm giác mình vô hình giữa đám đông.
-
-Cho đến một đêm tăng ca kiệt sức, anh tỉnh dậy với một thứ chỉ mình anh cảm nhận được: Tâm Thanh Lục — khả năng nghe thấu tiếng lòng của người ở gần. Một câu nói thật trong đầu người đối diện, đúng vào lúc miệng họ đang nói điều ngược lại. Lần đầu tiên trong đời, Trần Niệm biết chính xác ai đang dối trá, ai đang giấu nỗi đau, và ai đang bị oan.
-
-Anh sớm nhận ra Tân Hải không đơn giản như vẻ ngoài. Dưới lớp phố xá công sở là một thế giới tu chân ẩn giấu — những con người luyện khí, những thế lực tranh đoạt trong bóng tối, những vụ án mà cảnh sát thường không thể chạm tới. Tiếng lòng nghe được cho anh sự thật, nhưng sự thật chưa phải là công lý; anh vẫn phải đi từng bước, lắp từng manh mối, biến mỗi bí mật thành một đòn bẩy để đòi lại lẽ phải.
-
-Từ việc gỡ rối những hiểu lầm nơi công sở, lật lại một án oan ở phường, đến đối đầu với những thế lực giấu mặt muốn thâu tóm cả thành phố, Trần Niệm từng bước đi từ một kẻ vô danh thành người mà cả người thường lẫn giới ẩn giấu đều phải dè chừng và tin tưởng. Đây là câu chuyện về một người tử tế cầm trong tay bí mật của vạn người — và chọn dùng nó để bảo vệ những ai không có ai bảo vệ.

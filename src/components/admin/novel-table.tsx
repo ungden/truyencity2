@@ -3,7 +3,6 @@
 import { useState, useTransition } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { MoreHorizontal, PlusCircle, Book, Edit, Trash2, PenTool, Zap } from 'lucide-react';
 
@@ -30,8 +29,6 @@ import { Novel } from '@/lib/types';
 import { deleteNovel } from '@/lib/actions';
 import { NovelForm } from './novel-form';
 import { DeleteConfirmationDialog } from './delete-confirmation-dialog';
-import { QuickAISetupDialog } from './ai-writer/quick-ai-setup-dialog';
-import { supabase } from '@/integrations/supabase/client';
 import { DataTablePagination } from '@/components/ui/data-table-pagination';
 
 interface NovelTableProps {
@@ -44,10 +41,8 @@ export function NovelTable({ novels }: NovelTableProps) {
   const [isPending, startTransition] = useTransition();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [isAISetupOpen, setIsAISetupOpen] = useState(false);
   const [selectedNovel, setSelectedNovel] = useState<Novel | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const router = useRouter();
 
   const totalPages = Math.ceil(novels.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -62,30 +57,6 @@ export function NovelTable({ novels }: NovelTableProps) {
   const handleDelete = (novel: Novel) => {
     setSelectedNovel(novel);
     setIsConfirmOpen(true);
-  };
-
-  const handleAISetup = async (novel: Novel) => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        const { data } = await supabase
-          .from('ai_story_projects')
-          .select('id')
-          .eq('novel_id', novel.id)
-          .limit(1)
-          .maybeSingle();
-
-        if (data?.id) {
-          toast.success('Dự án AI đã tồn tại – mở Xưởng AI');
-          router.push('/admin/ai-writer');
-          return;
-        }
-      }
-    } catch {
-      // không cản trở luồng, sẽ mở thiết lập như cũ
-    }
-    setSelectedNovel(novel);
-    setIsAISetupOpen(true);
   };
 
   const confirmDelete = () => {
@@ -186,15 +157,17 @@ export function NovelTable({ novels }: NovelTableProps) {
                             <DropdownMenuSeparator />
                             {hasAIProject ? (
                               <DropdownMenuItem asChild>
-                                <Link href="/admin/ai-writer" className="text-purple-600">
+                                <Link href="/admin/factory" className="text-purple-600">
                                   <PenTool className="h-4 w-4 mr-2" />
                                   Mở trong Xưởng AI
                                 </Link>
                               </DropdownMenuItem>
                             ) : (
-                              <DropdownMenuItem onClick={() => handleAISetup(novel)} className="text-purple-600">
-                                <Zap className="h-4 w-4 mr-2" />
-                                Thiết lập AI Writer
+                              <DropdownMenuItem asChild>
+                                <Link href="/admin/factory" className="text-purple-600">
+                                  <Zap className="h-4 w-4 mr-2" />
+                                  Mở Story Factory
+                                </Link>
                               </DropdownMenuItem>
                             )}
                             <DropdownMenuSeparator />
@@ -246,12 +219,6 @@ export function NovelTable({ novels }: NovelTableProps) {
         title="Xóa truyện?"
         description={`Bạn có chắc chắn muốn xóa truyện "${selectedNovel?.title}" không? Tất cả các chương liên quan cũng sẽ bị xóa. Hành động này không thể hoàn tác.`}
         isPending={isPending}
-      />
-
-      <QuickAISetupDialog
-        novel={selectedNovel}
-        isOpen={isAISetupOpen}
-        onOpenChange={setIsAISetupOpen}
       />
     </>
   );

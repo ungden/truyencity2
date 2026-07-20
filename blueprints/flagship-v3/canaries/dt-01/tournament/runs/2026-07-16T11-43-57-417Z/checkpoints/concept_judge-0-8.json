@@ -1,9 +1,0 @@
-{
-  "role": "concept_judge",
-  "index": 0,
-  "batchIndex": 8,
-  "model": "gemini-3.1-pro-preview",
-  "promptVersion": "flagship-v3-concept-2026-07-16.2",
-  "estimatedCostUsd": 0.121042,
-  "content": "{\n  \"schemaVersion\": 3,\n  \"judgeId\": \"judge_1\",\n  \"batchIndex\": 8,\n  \"comparisons\": [\n    {\n      \"leftId\": \"dt_01_concept_02\",\n      \"rightId\": \"dt_01_concept_09\",\n      \"winnerId\": \"dt_01_concept_02\",\n      \"reason\": \"02 có cơ chế xử lý mẻ mắm hỏng bằng kiến thức vi sinh thực tế và thuyết phục hơn việc ngồi lựa từng hạt muối thủ công của 09, đồng thời 02 bám sát yêu cầu 'chế biến bằng công cụ đang có' và tạo ra giá trị gia tăng rõ rệt.\"\n    },\n    {\n      \"leftId\": \"dt_01_concept_02\",\n      \"rightId\": \"dt_01_concept_10\",\n      \"winnerId\": \"dt_01_concept_02\",\n      \"reason\": \"10 vi phạm bối cảnh thời đại vì du lịch trải nghiệm ở làng chài nghèo thập niên 1980 là thiếu thực tế. 02 bám sát bối cảnh thị trường hóa ban đầu với nghề làm mắm truyền thống, cơ chế rõ ràng và thực tế.\"\n    },\n    {\n      \"leftId\": \"dt_01_concept_03\",\n      \""
-}

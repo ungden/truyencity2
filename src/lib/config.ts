@@ -66,7 +66,7 @@ export const ROUTES = {
   ADMIN_NOVELS: '/admin/novels',
   ADMIN_USERS: '/admin/users',
   ADMIN_COMMENTS: '/admin/comments',
-  ADMIN_AI_WRITER: '/admin/ai-writer',
+  ADMIN_FACTORY: '/admin/factory',
   ADMIN_SETTINGS: '/admin/settings',
 } as const;
 

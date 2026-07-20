@@ -1,9 +1,0 @@
-Diệp Hướng Đông đã đi gần hết một đời người trên chính trường — đủ lâu để hiểu cái giá của mỗi quyết sách, đủ xa để nuối tiếc những ngã rẽ mình đã không kịp chọn. Rồi một buổi sáng, anh tỉnh dậy và thấy mình trẻ lại, trở về những ngày còn là một cán bộ trẻ ở Tỉnh Lâm Khê, vào đúng giai đoạn bản lề khi cả vùng đất đang chuyển mình theo làn sóng cải cách. Trong đầu anh là ký ức nguyên vẹn về diễn biến thời cuộc của mấy mươi năm sắp tới: ngành nào sẽ cất cánh, dự án nào sẽ vỡ, chính sách nào sẽ đúng, biến động nào sắp ập đến.
-
-Nhưng tầm nhìn đi trước thời đại ấy không phải một cây đũa thần. Diệp Hướng Đông hiểu rõ hơn ai hết: biết "đi đâu" chưa đủ, anh vẫn phải tự bước "đi thế nào". Một dự báo dù chính xác đến mấy cũng chỉ thành quyết sách khi anh làm đúng quy trình, thuyết phục được những người hoài nghi, và xây được năng lực thực cùng uy tín thật. Hơn nữa, thời cuộc là dòng sông sống động — mỗi lần anh tác động vào nó, dòng chảy lại đổi khác, và ký ức cũ không còn là tấm bản đồ hoàn hảo nữa.
-
-Với lợi thế ấy trong tay, anh chọn một con đường khác với kiếp đã qua: không chạy theo thành tích ảo, không sa vào các đường dây trục lợi đang nở rộ trong buổi giao thời, mà dồn sức làm những việc đúng — chọn đúng ngành mũi nhọn cho địa phương, ngăn một dự án sắp đổ vỡ, an dân trước một cơn biến động mà chỉ mình anh thấy trước. Mỗi quyết sách đúng làm đổi đời một vùng đất; mỗi bước đi vững vàng đưa anh lên cao hơn trên con đường chính trực.
-
-Phía trước là Phe Thành Tích chạy theo con số đẹp, Phe Bảo Thủ ngại đổi mới, và Phe Trục Lợi rình rập trong tranh tối tranh sáng. Diệp Hướng Đông phải vượt qua cả ba mà không trở thành bất kỳ ai trong số họ, chỉ bằng tầm nhìn, chính sách, lý lẽ và kết quả thực tế.
-
-Một bản hùng ca quan trường ấm áp và sảng khoái về tầm nhìn, thời cuộc và lòng người, nơi một con người được trao cơ hội làm lại đã chọn dùng nó để dựng nên điều tốt đẹp. Đọc tại TruyenCity.

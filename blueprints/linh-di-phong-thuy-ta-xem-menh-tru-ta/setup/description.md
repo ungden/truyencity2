@@ -1,9 +1,0 @@
-Sư phụ qua đời, để lại cho Hạ Vô Cữu một chiếc la bàn cũ, một quyển bí kíp mép sờn và một lời dặn dò bỏ lửng: "Khi con đọc được dòng khí chảy dưới chân thành phố này, hãy nhớ — có những huyệt vị không phải để xem, mà để giữ." Hai mươi sáu tuổi, một thân một mình hành tẩu nhân gian, anh mở một quầy xem mệnh nhỏ giữa phố cổ, lấy việc xem phong thủy, đoán cát hung và hóa giải tà sự làm kế sinh nhai.
-
-Nhưng Hạ Vô Cữu không giống những thầy bói rao tiền ngoài chợ. Khi anh tĩnh tâm quán sát, long mạch hiện ra chảy như sông dưới lòng đất, sát khí tụ thành quầng xám trên nóc một căn nhà sắp có tang sự, và oan hồn hiện thành vệt mờ mang theo cảm xúc cuối cùng trước khi chết. Anh nhìn thấy điều người khác chỉ mơ hồ cảm nhận — vì sao đứa bé trong căn hộ kia cứ ốm mãi, vì sao khúc đường ấy năm nào cũng có người ngã, vì sao một gia đình giàu có bỗng tan nát chỉ sau một lần sửa nhà.
-
-Mỗi lần anh ra tay, một bí ẩn lại được vén lên. Sau cái bể cá đặt sai hướng là một cái chết bị che giấu. Sau ngôi mộ tổ bị động là một mối thù ba đời. Sau lá bùa trấn cũ rách nát dưới nền nhà là một oan hồn ôm uẩn khúc suốt mười năm không siêu thoát. Hạ Vô Cữu hiểu rằng trừ tà không phải là đánh đuổi, mà là tìm cho ra chân tướng — để người sống được yên, người chết được buông.
-
-Từ những vụ nhỏ trong khu phố, anh dần bị cuốn vào những địa cục lớn hơn: các dòng phái dùng tà thuật nuôi quỷ hại người, những kẻ tranh đoạt long mạch của cả một vùng, và một thế lực âm thầm khuấy động dòng khí dưới chân thành phố — đúng như điều sư phụ anh đã cảnh báo. Càng đi sâu, anh càng nhận ra cái chết của sư phụ không hề đơn giản, và chiếc la bàn anh đang cầm giấu một bí mật liên quan đến chính mệnh số của anh.
-
-Một hành trình huyền bí phương Đông lạnh gáy mà thấm thía, nơi mỗi lá số là một số phận, mỗi thế đất là một câu chuyện, và sự thật luôn nằm sâu hơn lớp tà khí trên bề mặt. Đọc tại TruyenCity.

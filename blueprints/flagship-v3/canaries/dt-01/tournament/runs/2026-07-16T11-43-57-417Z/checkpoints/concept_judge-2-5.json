@@ -1,9 +1,0 @@
-{
-  "role": "concept_judge",
-  "index": 2,
-  "batchIndex": 5,
-  "model": "gemini-2.5-pro",
-  "promptVersion": "flagship-v3-concept-2026-07-16.2",
-  "estimatedCostUsd": 0.10203625,
-  "content": ""
-}

@@ -1,7 +1,7 @@
 /**
  * AI Author Generator - Creates realistic virtual author profiles
  *
- * Extracted from story-writing-factory/author-generator.ts (Phase 11 migration).
+ * Standalone pen-name generator for catalogue tooling.
  *
  * Generates:
  * - Vietnamese pen names (bút danh)

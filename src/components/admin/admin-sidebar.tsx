@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   LayoutDashboard,
   BookOpen,
@@ -12,56 +12,17 @@ import {
   BarChart3,
   TrendingUp,
   Menu,
-  Wand2,
-  ChevronDown,
-  ListTree,
-  Upload,
   Factory,
-  Activity,
-  ClipboardList,
-  DollarSign,
-  AlertCircle,
-  Target,
-  Power,
-  FlaskConical,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
-
-// AI Tools submenu items
-const aiToolsSubmenu = [
-  {
-    title: 'Story Factory',
-    href: '/admin/factory',
-    icon: Factory,
-    description: 'Tạo truyện quy mô lớn'
-  },
-  {
-    title: 'Story Inspiration',
-    href: '/admin/story-inspiration',
-    icon: Upload,
-    description: 'Import & phân tích'
-  },
-  {
-    title: 'Dàn Truyện',
-    href: '/admin/ai-tools/outlines',
-    icon: ListTree,
-    description: 'Xem outline'
-  },
-];
 
 type MenuItem = {
   title: string;
   href: string;
   icon: typeof LayoutDashboard;
   badge?: string;
-  hasSubmenu?: boolean;
 };
 
 const menuItems: MenuItem[] = [
@@ -81,51 +42,9 @@ const menuItems: MenuItem[] = [
     icon: BookOpen,
   },
   {
-    title: 'AI Tools',
-    href: '/admin/ai-tools',
-    icon: Wand2,
-    badge: 'Hub',
-    hasSubmenu: true,
-  },
-  {
-    title: 'Health Check',
-    href: '/admin/health',
-    icon: Activity,
-  },
-  {
-    title: 'Production Report',
-    href: '/admin/production-report',
-    icon: ClipboardList,
-  },
-  {
-    title: 'Quản lý sản xuất',
-    href: '/admin/production-toggle',
-    icon: Power,
-  },
-  {
-    title: 'Stuck Novels',
-    href: '/admin/stuck-novels',
-    icon: AlertCircle,
-  },
-  {
-    title: 'Mục tiêu tối thượng',
-    href: '/admin/supreme-goals',
-    icon: Target,
-  },
-  {
-    title: 'Blind Calibration',
-    href: '/admin/quality/flagship-calibration',
-    icon: FlaskConical,
-  },
-  {
-    title: 'Chi phi AI',
-    href: '/admin/cost-tracking',
-    icon: DollarSign,
-  },
-  {
-    title: 'AI Editor',
-    href: '/admin/ai-editor',
-    icon: Wand2,
+    title: 'Story Factory',
+    href: '/admin/factory',
+    icon: Factory,
   },
   {
     title: 'Thông báo',
@@ -152,9 +71,9 @@ const mobileNavItems = [
     icon: Factory,
   },
   {
-    title: 'AI Tools',
-    href: '/admin/ai-tools',
-    icon: Wand2,
+    title: 'Phân tích',
+    href: '/admin/analytics',
+    icon: BarChart3,
   },
   {
     title: 'Truyện',
@@ -187,116 +106,9 @@ function NavLink({ item, isActive, onClick }: { item: MenuItem, isActive: boolea
   );
 }
 
-function AIToolsMenu({ isActive, onClick }: { isActive: boolean; onClick?: () => void }) {
-  const [isOpen, setIsOpen] = useState(isActive);
-  const pathname = usePathname();
-
-  return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <CollapsibleTrigger asChild>
-        <button
-          className={cn(
-            'w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200',
-            isActive
-              ? 'bg-gradient-to-r from-primary/10 to-primary/5 text-primary font-medium shadow-sm'
-              : 'text-muted-foreground hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-foreground'
-          )}
-        >
-          <Wand2 size={20} />
-          <span className="flex-1 text-left">AI Tools</span>
-          <Badge variant="secondary" className="text-[10px] px-1.5 py-0 mr-1">
-            Hub
-          </Badge>
-          <ChevronDown
-            size={16}
-            className={cn(
-              'transition-transform duration-200',
-              isOpen && 'rotate-180'
-            )}
-          />
-        </button>
-      </CollapsibleTrigger>
-      <CollapsibleContent>
-        <div className="ml-4 pl-4 border-l-2 border-muted-foreground/20 mt-1 space-y-1">
-          {/* Hub link */}
-          <Link
-            href="/admin/ai-tools"
-            onClick={onClick}
-            className={cn(
-              'flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors',
-              pathname === '/admin/ai-tools'
-                ? 'bg-primary/10 text-primary font-medium'
-                : 'text-muted-foreground hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-foreground'
-            )}
-          >
-            <LayoutDashboard size={16} />
-            <span>Hub</span>
-          </Link>
-
-          {/* Submenu items */}
-          {aiToolsSubmenu.map((subItem) => {
-            const SubIcon = subItem.icon;
-            const subIsActive = pathname.startsWith(subItem.href);
-            return (
-              <Link
-                key={subItem.href}
-                href={subItem.href}
-                onClick={onClick}
-                className={cn(
-                  'flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors',
-                  subIsActive
-                    ? 'bg-primary/10 text-primary font-medium'
-                    : 'text-muted-foreground hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-foreground'
-                )}
-              >
-                <SubIcon size={16} />
-                <span>{subItem.title}</span>
-              </Link>
-            );
-          })}
-        </div>
-      </CollapsibleContent>
-    </Collapsible>
-  );
-}
-
 export function AdminSidebar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
-  const [productionAlertLevel, setProductionAlertLevel] = useState<'ok' | 'warn' | 'critical' | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const fetchProductionHealth = async () => {
-      try {
-        const response = await fetch('/api/admin/production-report', {
-          method: 'GET',
-          cache: 'no-store',
-        });
-
-        if (!response.ok) {
-          return;
-        }
-
-        const data = await response.json();
-        const level = data?.summary?.healthAlertLevel;
-        if (!cancelled && (level === 'ok' || level === 'warn' || level === 'critical')) {
-          setProductionAlertLevel(level);
-        }
-      } catch {
-        // Ignore sidebar telemetry errors to avoid blocking navigation UI
-      }
-    };
-
-    fetchProductionHealth();
-    const timer = setInterval(fetchProductionHealth, 5 * 60 * 1000);
-
-    return () => {
-      cancelled = true;
-      clearInterval(timer);
-    };
-  }, []);
 
   const isActive = (href: string) => {
     return pathname === href || (href !== '/admin' && pathname.startsWith(href));
@@ -318,25 +130,7 @@ export function AdminSidebar() {
           </div>
 
           <nav className="space-y-2">
-            {menuItems.map((item) => (
-              item.hasSubmenu ? (
-                <AIToolsMenu
-                  key={item.href}
-                  isActive={isActive(item.href) || pathname.includes('/story-inspiration') || pathname.includes('/ai-tools') || pathname.includes('/factory')}
-                />
-              ) : (
-                <NavLink
-                  key={item.href}
-                  item={item.href === '/admin/production-report' && productionAlertLevel && productionAlertLevel !== 'ok'
-                    ? {
-                        ...item,
-                        badge: productionAlertLevel === 'critical' ? 'ALERT' : 'WARN',
-                      }
-                    : item}
-                  isActive={isActive(item.href)}
-                />
-              )
-            ))}
+            {menuItems.map((item) => <NavLink key={item.href} item={item} isActive={isActive(item.href)} />)}
           </nav>
         </div>
 
@@ -370,27 +164,7 @@ export function AdminSidebar() {
                   </div>
                 </div>
                 <nav className="space-y-2">
-                  {menuItems.map((item) => (
-                    item.hasSubmenu ? (
-                      <AIToolsMenu
-                        key={item.href}
-                        isActive={isActive(item.href) || pathname.includes('/story-inspiration') || pathname.includes('/ai-tools') || pathname.includes('/factory')}
-                        onClick={() => setIsOpen(false)}
-                      />
-                    ) : (
-                       <NavLink
-                         key={item.href}
-                         item={item.href === '/admin/production-report' && productionAlertLevel && productionAlertLevel !== 'ok'
-                           ? {
-                               ...item,
-                               badge: productionAlertLevel === 'critical' ? 'ALERT' : 'WARN',
-                             }
-                           : item}
-                         isActive={isActive(item.href)}
-                         onClick={() => setIsOpen(false)}
-                       />
-                    )
-                  ))}
+                  {menuItems.map((item) => <NavLink key={item.href} item={item} isActive={isActive(item.href)} onClick={() => setIsOpen(false)} />)}
                 </nav>
               </div>
             </SheetContent>

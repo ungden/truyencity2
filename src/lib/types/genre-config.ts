@@ -1,27 +1,9 @@
 /**
  * GENRE_CONFIG — web/UI canonical genre source (labels, icons, topics, prompts).
  *
- * ⚠️ ADD-A-GENRE CHECKLIST (this file is only ONE of the two genre sources).
- * A new genre key must be added to ALL of the following or it silently
- * falls through. `src/__tests__/story-engine/genre-coverage.test.ts` enforces
- * bidirectional parity between this file and the engine `GenreType`, so a
- * partial add fails CI — but do all of these to make it pass:
- *
- *   1. `src/services/story-engine/types.ts` → add to the `GenreType` union.
- *   2. THIS file → add the `GENRE_CONFIG` entry (labels, icon, topics).
- *   3. `src/services/story-engine/templates/genre-styles.ts` → GENRE_STYLES
- *   4. `src/services/story-engine/templates.ts` → GENRE_TITLE_EXAMPLES,
- *      GENRE_ENGAGEMENT, GENRE_BOUNDARIES, GENRE_ANTI_CLICHE, VN_PRONOUN_GUIDE
- *      (+ NON_COMBAT_GENRES if applicable, + getPowerSystemByGenre /
- *      getDopaminePatternsByGenre cases).
- *   5. `src/services/story-engine/templates/style-bible.ts` → GENRE_VOCABULARY,
- *      GENRE_WRITING_GUIDES
- *   6. `genre-voice-anchors.ts` / `genre-process-blueprints.ts` /
- *      `genre-setup-playbooks.ts` → voice anchor + process blueprint + playbook
- *   7. `src/services/content-seeder/index.ts` → SOURCE_TOPIC_SEEDS (+ variants)
- *
- * Run `npm test -- genre-coverage` after — it asserts every keyed Record covers
- * the new genre AND that GENRE_CONFIG ↔ GenreType stay in exact parity.
+ * This catalogue is for UI discovery and Concept Lab commissions only. It is
+ * never injected into Writer context; every story's StoryKernel owns its voice
+ * and world rules.
  */
 export const GENRE_CONFIG = {
   'tien-hiep': {

@@ -1,9 +1,0 @@
-{
-  "role": "concept_judge",
-  "index": 1,
-  "batchIndex": 9,
-  "model": "gemini-3-flash-preview",
-  "promptVersion": "flagship-v3-concept-2026-07-16.2",
-  "estimatedCostUsd": 0.027934,
-  "content": "{\n  \"schemaVersion\": 3,\n  \"judgeId\": \"judge_2\",\n  \"batchIndex\": 9,\n  \"comparisons\": [\n    {\n      \"leftId\": \"dt_01_concept_06\",\n      \"rightId\": \"dt_01_concept_07\",\n      \"winnerId\": \"dt_01_concept_07\",\n      \"reason\": \"Concept 07 bám sát domain về phân loại và phơi sấy hải sản hơn. Cơ chế làm sạch ruốc bằng nước ngọt và phơi trên giàn lưới tạo ra sự thay đổi chất lượng rõ rệt, dẫn đến kết quả kinh tế ngay chương 3 (bán cho quán phở). Concept 06 về cải tạo tàu thuyền có phần hơi thiên về kỹ thuật lý thuyết, ít tạo ra cảm giác 'bữa cơm gia đình' ấm áp như 07.\"\n    },\n    {\n      \"leftId\": \"dt_01_concept_06\",\n      \"rightId\": \"dt_01_concept_08\",\n      \"winnerId\": \"dt_01_concept_06\",\n      \"reason\": \"Concept 06 tập trung vào 'tay nghề' (đóng/sửa thuyền) đúng với yêu cầu của commission. Concept 08 dựa nhiều vào việc 'tìm kiếm' ngư trường dựa trên ký ức, dù có yếu tố bền vững nhưng"
-}

@@ -1,9 +1,0 @@
-{
-  "role": "concept_judge",
-  "index": 2,
-  "batchIndex": 4,
-  "model": "gemini-2.5-pro",
-  "promptVersion": "flagship-v3-concept-2026-07-16.2",
-  "estimatedCostUsd": 0.10404,
-  "content": "{\n  \"schemaVersion\": 3,\n  \"judgeId\": \"judge_3\",\n  \"batchIndex\": 4,\n  \"comparisons\": [\n    {\n      \"leftId\": \"c5_shrimp_paste\",\n      \"rightId\": \"dt_01_concept_06\",\n      \"winnerId\": \"c5_shrimp_paste\",\n      \"reason\": \"Cả hai đều là những concept mạnh với cơ chế tốt. Tuy nhiên, C5 bám sát vào yêu cầu của commission hơn, tập trung vào việc chế biến một sản phẩm (mắm) từ một tài nguyên biển bị đánh giá thấp. DT_01_06 tập trung vào kỹ thuật cơ khí, cải tiến công cụ, là một hướng đi hay nhưng hơi lệch so với lõi \\\"phân loại hải sản, đá lạnh và muối, phơi sấy, mắm\\\" được nêu trong đề bài. Vòng lặp kinh tế của C5 (dùng mắm ngắn ngày xoay vòng vốn để nuôi mắm dài ngày) cũng có chiều sâu và tiềm năng phát triển hấp dẫn hơn.\"\n    },\n    {\n      \"leftId\": \"c5_shrimp_paste\",\n      \"rightId\": \"dt_01_concept_07\",\n      \"winnerId\": \"c5_shrimp_paste\",\n      \"reason\": \"Đây là một cặp đấu rất cân tài. Cả hai đều khai thác con ruốc (moi) và biến nó thành sản"
-}

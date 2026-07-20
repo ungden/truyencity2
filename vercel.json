@@ -1,7 +1,7 @@
 {
   "crons": [
     {
-      "path": "/api/cron/flagship-factory",
+      "path": "/api/cron/story-factory",
       "schedule": "*/5 * * * *"
     }
   ],

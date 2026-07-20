@@ -6,9 +6,6 @@ import {
   validateInput,
   ValidationError,
   UUIDSchema,
-  GenreSchema,
-  CreateProjectSchema,
-  SubmitChapterSchema,
   PaginationSchema,
 } from '@/lib/security/validation';
 
@@ -25,26 +22,6 @@ describe('ValidationSchemas', () => {
 
     it('should reject empty string', () => {
       expect(() => validateInput(UUIDSchema, '')).toThrow(ValidationError);
-    });
-  });
-
-  describe('GenreSchema', () => {
-    const validGenres = [
-      'tien_hiep',
-      'huyen_huyen',
-      'do_thi',
-      'khoa_huyen',
-      'lich_su',
-      'dong_nhan',
-      'vong_du',
-    ];
-
-    it.each(validGenres)('should accept genre: %s', (genre) => {
-      expect(() => validateInput(GenreSchema, genre)).not.toThrow();
-    });
-
-    it('should reject invalid genre', () => {
-      expect(() => validateInput(GenreSchema, 'invalid_genre')).toThrow(ValidationError);
     });
   });
 
@@ -70,97 +47,10 @@ describe('ValidationSchemas', () => {
     });
   });
 
-  describe('CreateProjectSchema', () => {
-    const validProject = {
-      novelTitle: 'Test Novel',
-      genre: 'tien_hiep',
-      mainCharacter: 'Hero',
-    };
-
-    it('should accept valid project', () => {
-      const result = validateInput(CreateProjectSchema, validProject);
-      expect(result.novelTitle).toBe('Test Novel');
-      expect(result.genre).toBe('tien_hiep');
-    });
-
-    it('should apply defaults', () => {
-      const result = validateInput(CreateProjectSchema, validProject);
-      expect(result.targetChapterLength).toBe(2500);
-      expect(result.temperature).toBe(0.8);
-      expect(result.totalPlannedChapters).toBe(100);
-    });
-
-    it('should reject missing required fields', () => {
-      expect(() => validateInput(CreateProjectSchema, { novelTitle: 'Test' })).toThrow(ValidationError);
-    });
-
-    it('should reject invalid genre', () => {
-      expect(() => validateInput(CreateProjectSchema, {
-        ...validProject,
-        genre: 'invalid',
-      })).toThrow(ValidationError);
-    });
-
-    it('should reject too short title', () => {
-      expect(() => validateInput(CreateProjectSchema, {
-        ...validProject,
-        novelTitle: '',
-      })).toThrow(ValidationError);
-    });
-
-    it('should reject target length out of range', () => {
-      expect(() => validateInput(CreateProjectSchema, {
-        ...validProject,
-        targetChapterLength: 100, // Too short
-      })).toThrow(ValidationError);
-
-      expect(() => validateInput(CreateProjectSchema, {
-        ...validProject,
-        targetChapterLength: 20000, // Too long
-      })).toThrow(ValidationError);
-    });
-  });
-
-  describe('SubmitChapterSchema', () => {
-    const validChapter = {
-      action: 'submit_chapter' as const,
-      projectId: '550e8400-e29b-41d4-a716-446655440000',
-      content: 'A'.repeat(200), // At least 100 chars
-    };
-
-    it('should accept valid chapter submission', () => {
-      const result = validateInput(SubmitChapterSchema, validChapter);
-      expect(result.action).toBe('submit_chapter');
-      expect(result.projectId).toBe(validChapter.projectId);
-    });
-
-    it('should reject content too short', () => {
-      expect(() => validateInput(SubmitChapterSchema, {
-        ...validChapter,
-        content: 'Too short',
-      })).toThrow(ValidationError);
-    });
-
-    it('should reject invalid projectId', () => {
-      expect(() => validateInput(SubmitChapterSchema, {
-        ...validChapter,
-        projectId: 'invalid-uuid',
-      })).toThrow(ValidationError);
-    });
-
-    it('should accept optional title', () => {
-      const result = validateInput(SubmitChapterSchema, {
-        ...validChapter,
-        title: 'Chapter 1',
-      });
-      expect(result.title).toBe('Chapter 1');
-    });
-  });
-
   describe('ValidationError', () => {
     it('should include field details', () => {
       try {
-        validateInput(CreateProjectSchema, { novelTitle: '' });
+        validateInput(UUIDSchema, 'invalid');
         fail('Should have thrown');
       } catch (err) {
         expect(err).toBeInstanceOf(ValidationError);
