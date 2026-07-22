@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import {
+  ChapterOutcomeContentSchema,
   EditorAssessmentSchema,
+  EditorIssueSchema,
   StoryFactoryError,
   type ChapterPlan,
   type EditorAssessment,
@@ -12,13 +14,49 @@ import { buildChapterContexts, buildRevisionContext, type ContextManifestEntry }
 import type { ProviderUsage, StoryModelProvider } from './provider';
 import { geminiProvider } from './provider';
 import { EDITOR_SYSTEM_PROMPT, REVISION_SYSTEM_PROMPT, WRITER_SYSTEM_PROMPT } from './prompts';
-import { applyChapterPlan, type StateEvent } from './validation';
+import { appendAcceptedOutcome, applyChapterPlan, type StateEvent } from './validation';
 
 export const ChapterDraftSchema = z.object({
   title: z.string().trim().min(2).max(180),
   content: z.string().trim().min(20),
 }).strict();
 export type ChapterDraft = z.infer<typeof ChapterDraftSchema>;
+
+const EditorWireDeltaCheckSchema = z.object({
+  deltaId: z.string(),
+  realized: z.boolean(),
+  evidence: z.string(),
+}).strict();
+
+export const EditorWireAssessmentSchema = z.object({
+  v: z.literal(1),
+  status: z.enum(['pass', 'revise']),
+  issuesJson: z.array(z.string()).max(3),
+  deltaChecksJson: z.array(z.string()).min(1).max(30),
+  outcomeJson: z.string().nullable(),
+}).strict();
+
+const EDITOR_WIRE_CONTRACT = {
+  serialization: 'Mỗi phần tử issuesJson/deltaChecksJson và outcomeJson là đúng một JSON object đã stringify, không markdown.',
+  issueFields: ['category', 'severity', 'scope', 'evidence', 'instruction'],
+  deltaCheckFields: ['deltaId', 'realized', 'evidence'],
+  outcomeFields: ['event', 'result', 'method', 'endingSituation', 'evidenceSpans'],
+  pass: 'status=pass, issuesJson=[], mọi delta realized=true, outcomeJson là JSON string hợp lệ.',
+  revise: 'status=revise, issuesJson có 1-3 phần tử, outcomeJson=null.',
+} as const;
+
+export function materializeEditorAssessment(value: z.infer<typeof EditorWireAssessmentSchema>): EditorAssessment {
+  const wire = EditorWireAssessmentSchema.parse(value);
+  const issues = wire.issuesJson.map(raw => EditorIssueSchema.parse(JSON.parse(raw)));
+  const deltaChecks = wire.deltaChecksJson.map(raw => EditorWireDeltaCheckSchema.parse(JSON.parse(raw)));
+  if (wire.status === 'pass') {
+    if (!wire.outcomeJson) throw new StoryFactoryError('infra_blocked', 'Editor pass omitted the chapter outcome.');
+    const outcome = ChapterOutcomeContentSchema.parse(JSON.parse(wire.outcomeJson));
+    return EditorAssessmentSchema.parse({ status: 'pass', issues, deltaChecks, outcome });
+  }
+  if (wire.outcomeJson !== null) throw new StoryFactoryError('infra_blocked', 'Editor revise unexpectedly returned a chapter outcome.');
+  return EditorAssessmentSchema.parse({ status: 'revise', issues, deltaChecks });
+}
 
 interface PreflightIssue {
   category: 'prompt_leak' | 'prose_naturalness';
@@ -79,6 +117,7 @@ function editorPrompt(input: {
     chapterPlan: input.plan,
     draft: input.draft,
     deterministicIssues: input.deterministicIssues,
+    wireContract: EDITOR_WIRE_CONTRACT,
   });
 }
 
@@ -122,11 +161,18 @@ async function assess(input: {
     model: input.model,
     system: EDITOR_SYSTEM_PROMPT,
     prompt: editorPrompt({ ...input, deterministicIssues }),
-    schema: EditorAssessmentSchema,
+    schema: EditorWireAssessmentSchema,
     temperature: 0.4,
   });
-  assertDeltaCoverage(input.plan, response.value);
-  return { assessment: mergePreflight(response.value, deterministicIssues), usage: response.usage };
+  let assessment: EditorAssessment;
+  try {
+    assessment = materializeEditorAssessment(response.value);
+  } catch (error) {
+    if (error instanceof StoryFactoryError) throw error;
+    throw new StoryFactoryError('infra_blocked', 'Editor output failed the exact application contract.', error instanceof z.ZodError ? error.issues : undefined);
+  }
+  assertDeltaCoverage(input.plan, assessment);
+  return { assessment: mergePreflight(assessment, deterministicIssues), usage: response.usage };
 }
 
 export async function writeStoryChapter(input: {
@@ -167,11 +213,17 @@ export async function writeStoryChapter(input: {
   usages.push(firstAssessment.usage);
 
   if (firstAssessment.assessment.status === 'pass') {
+    const stateAfter = appendAcceptedOutcome({
+      state: transition.state,
+      title: initial.value.title,
+      content: initial.value.content,
+      outcome: firstAssessment.assessment.outcome,
+    });
     return {
       decision: 'publish',
       draft: initial.value,
       assessment: firstAssessment.assessment,
-      stateAfter: transition.state,
+      stateAfter,
       stateEvents: transition.events,
       contextManifest: contexts.manifest,
       usages,
@@ -218,11 +270,17 @@ export async function writeStoryChapter(input: {
     }
     throw new StoryFactoryError('quality_blocked', 'Chapter still fails after one evidence-based full rewrite.', secondAssessment.assessment);
   }
+  const stateAfter = appendAcceptedOutcome({
+    state: transition.state,
+    title: revision.value.title,
+    content: revision.value.content,
+    outcome: secondAssessment.assessment.outcome,
+  });
   return {
     decision: 'publish',
     draft: revision.value,
     assessment: secondAssessment.assessment,
-    stateAfter: transition.state,
+    stateAfter,
     stateEvents: transition.events,
     contextManifest: contexts.manifest,
     usages,

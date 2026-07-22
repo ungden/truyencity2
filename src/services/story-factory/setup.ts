@@ -222,7 +222,7 @@ export async function runConceptLab(input: {
     model: input.routes.launchArchitect,
     system: `Bạn là Launch Architect cuối cùng. Phản hồi bằng đúng một object JSON LaunchPack duy nhất, tuyệt đối không bọc trong array.
 Chọn một concept rồi dựng duy nhất StoryKernel, Arc 20-30 chương, State chương 0 và rolling plan chương 1-5.
-Mỗi stable ID phải nhất quán. initialState.recentEvents phải là mảng rỗng vì chưa có chương nào được commit.
+Mỗi stable ID phải nhất quán. initialState.schemaVersion phải bằng 2 và initialState.recentOutcomes phải là mảng rỗng vì chưa có chương nào được commit.
 initialState phải có đúng một entry cho mọi character, resource và promise đã khai báo trong kernel; không được thiếu hoặc thêm ID lạ.
 Plan chỉ chứa cơ học, không chứa thoại hay câu văn mẫu. Mỗi scene phải gắn ít nhất một requiredDeltaId và mọi required delta phải thuộc một scene.
 Với từng participant, travelMinutesFromPrevious phải bằng hoặc lớn hơn travel rule từ vị trí hiện tại/scene trước tới scene mới; không dịch chuyển khi thiếu travel rule.

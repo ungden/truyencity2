@@ -1,5 +1,6 @@
 import {
   type ArcPlan,
+  type ChapterOutcome,
   type ChapterPlan,
   type RollingPlan,
   type StateDelta,
@@ -239,13 +240,30 @@ export function applyChapterPlan(input: {
   }
   state.chapterNumber = plan.chapterNumber;
   state.storyTimeMinutes = plan.storyTimeAfterMinutes;
-  const summary = events.map(event => `${event.kind}:${event.entityId}=${JSON.stringify(event.after)}`).join('; ').slice(0, 500);
-  state.recentEvents = [
-    ...state.recentEvents,
-    { chapterNumber: plan.chapterNumber, summary },
-  ].slice(-20);
   validateKernelState(kernel, state);
   return { state, events };
+}
+
+export function appendAcceptedOutcome(input: {
+  state: StoryState;
+  title: string;
+  content: string;
+  outcome: Omit<ChapterOutcome, 'chapterNumber' | 'title'>;
+}): StoryState {
+  const missingEvidence = input.outcome.evidenceSpans.filter(span => !input.content.includes(span));
+  if (missingEvidence.length) {
+    throw new StoryFactoryError('infra_blocked', 'Editor outcome contains evidence that is not present in the accepted prose.', missingEvidence);
+  }
+  const state = structuredClone(input.state);
+  state.recentOutcomes = [
+    ...state.recentOutcomes,
+    {
+      chapterNumber: state.chapterNumber,
+      title: input.title,
+      ...input.outcome,
+    },
+  ].slice(-12);
+  return state;
 }
 
 export function validateRollingPlan(input: {

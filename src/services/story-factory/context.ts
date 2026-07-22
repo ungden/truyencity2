@@ -128,7 +128,7 @@ export function buildChapterContexts(input: {
     })),
     resources: input.state.resources.filter(resource => ids.resources.has(resource.resourceId)),
     promises: input.state.promises.filter(promise => ids.promises.has(promise.promiseId)),
-    recentEvents: input.state.recentEvents,
+    recentOutcomes: input.state.recentOutcomes,
   };
   return {
     brief,

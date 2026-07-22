@@ -113,7 +113,7 @@ function convertPack(old: any) {
     }
   }
   const state = StoryStateSchema.parse({
-    schemaVersion: 1, chapterNumber: 0,
+    schemaVersion: 2, chapterNumber: 0,
     storyTimeMinutes: Math.max(0, ...old.initialState.timeline.map((item: any) => item.startMinute + item.durationMinutes), 0),
     facts,
     characters: old.initialState.characters.map((item: any) => ({
@@ -125,7 +125,7 @@ function convertPack(old: any) {
       ? { resourceId: stable(item.resourceId), kind: 'numeric', value: Number(item.value.amount ?? 0) }
       : { resourceId: stable(item.resourceId), kind: 'state', value: String(item.value.state ?? item.value.value ?? item.source ?? 'initial') }),
     promises: old.initialState.promises.map((item: any) => ({ promiseId: stable(item.promiseId), status: promiseStatus(item.status) })),
-    recentEvents: [],
+    recentOutcomes: [],
   });
   const arc = ArcPlanSchema.parse({
     schemaVersion: 1, arcNumber: 1, startChapter: old.arc.startChapter, plannedEndChapter: old.arc.endChapter,

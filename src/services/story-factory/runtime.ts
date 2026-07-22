@@ -13,7 +13,7 @@ import {
 } from './contracts';
 import { generateFactoryCover } from './cover';
 import { writeStoryChapter } from './pipeline';
-import { planArcLifecycle, planRollingWindow, reviewTenChapterWindow } from './planner';
+import { planArcLifecycle, planRollingWindow, reviewFiveChapterWindow } from './planner';
 import type { ProviderUsage, StoryModelProvider } from './provider';
 import { STORY_FACTORY_RELEASE } from './release';
 import { runConceptLab } from './setup';
@@ -28,6 +28,8 @@ interface FactoryJobRow {
   stage: 'setup' | 'plan' | 'write' | 'window_review' | 'arc' | 'cover' | 'done';
   current_chapter: number;
   rolling_plan: unknown;
+  plan_feedback: unknown;
+  replan_attempts: number;
   setup_input: unknown;
   minimum_chapters: number;
   maximum_chapters: number;
@@ -121,6 +123,39 @@ async function blockRun(db: SupabaseClient, job: FactoryJobRow, runId: string | 
     updated_at: new Date().toISOString(),
   }).eq('id', job.id).eq('lease_token', job.lease_token);
   return { status: 'blocked', jobId: job.id, stage: job.stage, chapterNumber: job.current_chapter, error: factoryError.message };
+}
+
+async function recoverUncommittedPlan(
+  db: SupabaseClient,
+  job: FactoryJobRow,
+  runId: string,
+  error: StoryFactoryError,
+): Promise<FactoryTickResult> {
+  if (job.replan_attempts >= 1) return blockRun(db, job, runId, error);
+  const now = new Date().toISOString();
+  const runUpdate = await db.from('story_factory_runs').update({
+    status: 'blocked',
+    error_code: error.code,
+    error_message: error.message,
+    output_artifact: { evidence: error.evidence ?? null, recovery: 'discard_uncommitted_window' },
+    finished_at: now,
+  }).eq('id', runId).eq('status', 'running');
+  if (runUpdate.error) throw runUpdate.error;
+  const jobUpdate = await db.from('story_factory_jobs').update({
+    status: 'ready',
+    stage: 'plan',
+    rolling_plan: null,
+    plan_feedback: { message: error.message, evidence: error.evidence ?? null },
+    replan_attempts: job.replan_attempts + 1,
+    last_error: error.message,
+    lease_owner: null,
+    lease_token: null,
+    lease_until: null,
+    next_run_at: now,
+    updated_at: now,
+  }).eq('id', job.id).eq('lease_token', job.lease_token);
+  if (jobUpdate.error) throw jobUpdate.error;
+  return { status: 'completed', jobId: job.id, stage: 'plan', chapterNumber: job.current_chapter };
 }
 
 async function loadProject(db: SupabaseClient, projectId: string): Promise<FactoryProjectRow> {
@@ -244,10 +279,17 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
     const arc = ArcPlanSchema.parse(project.arc_plan);
     const state = StoryStateSchema.parse(project.story_state);
     const routes = ModelRoutesSchema.parse(project.model_routes);
-    const planned = await planRollingWindow({ kernel, arc, state, routes, provider });
+    const planned = await planRollingWindow({
+      kernel,
+      arc,
+      state,
+      routes,
+      recoveryEvidence: job.plan_feedback ?? undefined,
+      provider,
+    });
     const now = new Date().toISOString();
     const jobUpdate = await db.from('story_factory_jobs').update({
-      rolling_plan: planned.rollingPlan, status: 'ready', stage: 'write', lease_owner: null,
+      rolling_plan: planned.rollingPlan, plan_feedback: null, status: 'ready', stage: 'write', lease_owner: null,
       lease_token: null, lease_until: null, next_run_at: now, updated_at: now,
     }).eq('id', job.id).eq('lease_token', job.lease_token);
     if (jobUpdate.error) throw jobUpdate.error;
@@ -321,6 +363,9 @@ async function runChapter(db: SupabaseClient, job: FactoryJobRow, project: Facto
     if (error) throw error;
     return { status: 'completed', jobId: job.id, stage: 'write', chapterNumber: plan.chapterNumber };
   } catch (error) {
+    if (error instanceof StoryFactoryError && error.code === 'plan_blocked') {
+      return recoverUncommittedPlan(db, job, runId, error);
+    }
     return blockRun(db, job, runId, error);
   }
 }
@@ -333,15 +378,15 @@ async function runWindowReview(db: SupabaseClient, job: FactoryJobRow, project: 
     const state = StoryStateSchema.parse(project.story_state);
     const routes = ModelRoutesSchema.parse(project.model_routes);
     const { data: chapters, error } = await db.from('chapters').select('chapter_number,title,content')
-      .eq('novel_id', job.novel_id).gte('chapter_number', job.current_chapter - 9).lte('chapter_number', job.current_chapter)
+      .eq('novel_id', job.novel_id).gte('chapter_number', job.current_chapter - 4).lte('chapter_number', job.current_chapter)
       .order('chapter_number');
     if (error) throw error;
-    const reviewed = await reviewTenChapterWindow({
+    const reviewed = await reviewFiveChapterWindow({
       kernel, arc, state,
       chapters: (chapters ?? []).map(chapter => ({ chapterNumber: chapter.chapter_number, title: chapter.title, content: chapter.content ?? '' })),
       routes, provider,
     });
-    if (reviewed.review.status === 'block') throw new StoryFactoryError('quality_blocked', 'Ten-chapter window review detected drift.', reviewed.review.issues);
+    if (reviewed.review.status === 'block') throw new StoryFactoryError('quality_blocked', 'Five-chapter window review detected drift.', reviewed.review.issues);
     const now = new Date().toISOString();
     const nextRunAt = nextRunAfterNonChapterStage(job, new Date(now));
     const nextStage = state.chapterNumber >= arc.plannedEndChapter ? 'arc' : 'write';

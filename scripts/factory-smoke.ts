@@ -25,7 +25,7 @@ async function main() {
   try {
     const project = await db.from('ai_story_projects').insert({
       novel_id: novel.data.id, genre: 'smoke', status: 'paused', engine_release: STORY_FACTORY_RELEASE,
-      model_routes: { smoke: true }, story_state: { schemaVersion: 1, chapterNumber: 0 },
+      model_routes: { smoke: true }, story_state: { schemaVersion: 2, chapterNumber: 0, recentOutcomes: [] },
     }).select('id').single();
     if (project.error) throw project.error;
     const leaseToken = randomUUID();
@@ -46,10 +46,33 @@ async function main() {
       p_expected_chapter: 1,
       p_title: 'Smoke Chapter',
       p_content: 'Nội dung smoke chỉ tồn tại trong transaction test rồi được xóa.',
-      p_state_after: { schemaVersion: 1, chapterNumber: 1 },
+      p_state_after: {
+        schemaVersion: 2,
+        chapterNumber: 1,
+        recentOutcomes: [{
+          chapterNumber: 1,
+          title: 'Smoke Chapter',
+          event: 'Một transaction smoke được thực hiện.',
+          result: 'Chương và state được ghi đồng thời.',
+          method: 'transaction database',
+          endingSituation: 'Dữ liệu sẵn sàng để kiểm tra rồi xóa.',
+          evidenceSpans: ['Nội dung smoke'],
+        }],
+      },
       p_remaining_plan: { schemaVersion: 1, startChapter: 2, plans: [] },
       p_events: [{ deltaId: 'smoke_event', kind: 'fact', entityId: 'smoke_fact', before: null, after: 'committed', source: 'smoke' }],
-      p_assessment: { status: 'pass', issues: [], deltaChecks: [{ deltaId: 'smoke_event', realized: true, evidence: 'smoke' }] },
+      p_assessment: {
+        status: 'pass',
+        issues: [],
+        deltaChecks: [{ deltaId: 'smoke_event', realized: true, evidence: 'smoke' }],
+        outcome: {
+          event: 'Một transaction smoke được thực hiện.',
+          result: 'Chương và state được ghi đồng thời.',
+          method: 'transaction database',
+          endingSituation: 'Dữ liệu sẵn sàng để kiểm tra rồi xóa.',
+          evidenceSpans: ['Nội dung smoke'],
+        },
+      },
       p_context_manifest: [],
       p_usage: [],
       p_cost_usd: 0,
@@ -60,7 +83,19 @@ async function main() {
     const skipped = await db.rpc('commit_story_factory_chapter', {
       ...params,
       p_expected_chapter: 2,
-      p_state_after: { schemaVersion: 1, chapterNumber: 2 },
+      p_state_after: {
+        schemaVersion: 2,
+        chapterNumber: 2,
+        recentOutcomes: [{
+          chapterNumber: 2,
+          title: 'Skipped Smoke Chapter',
+          event: 'Một chương bị cố nhảy số.',
+          result: 'Transaction phải từ chối.',
+          method: null,
+          endingSituation: 'Không có dữ liệu được commit.',
+          evidenceSpans: ['Nội dung smoke'],
+        }],
+      },
     });
     if (!skipped.error) throw new Error('Out-of-sequence chapter commit unexpectedly succeeded.');
     const committed = await db.rpc('commit_story_factory_chapter', params);
