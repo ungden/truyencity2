@@ -79,6 +79,8 @@ const PLANNER_COMPACT_CONTRACT = {
     'Mọi field compact đều bắt buộc; dùng null đúng chỗ, không bỏ field.',
     'pre.k chỉ được fact|resource|location|promise; resource_numeric và resource_state chỉ dùng cho deltas.k.',
     'time, dur và travel là một số nguyên phút; travel không được là mảng hay mô tả tuyến đường.',
+    'time là storyTime tuyệt đối ở cuối chương, không phải số phút của riêng chương. Với chương đầu: time >= State.storyTimeMinutes + tổng mọi scene.dur + scene.travel. Với chương sau: time >= time chương trước + tổng dur + travel của chương đó.',
+    'Tính time tuần tự cho cả window sau khi đã chốt scenes; tuyệt đối không để time bằng thời điểm đầu chương khi chương có diễn biến.',
     'scene.id và mọi ID đều là string stable ID, không dùng số thứ tự trần.',
     'rules có ít nhất một world-rule ID tồn tại trong Kernel.',
     'scene.deltaIds chỉ chứa delta ID tồn tại trong cùng chương; cảnh nối có thể rỗng nhưng cả chương vẫn phải có deltas.',
@@ -191,7 +193,10 @@ export async function planRollingWindow(input: {
         ? error
         : new StoryFactoryError('infra_blocked', 'Planner output failed the exact rolling-plan contract.', error instanceof z.ZodError ? error.issues : undefined);
       previousResponse = result.value;
-      validationIssues = lastError.evidence ?? [{ message: lastError.message }];
+      validationIssues = {
+        message: lastError.message,
+        evidence: lastError.evidence ?? null,
+      };
     }
   }
   if (lastError) {
