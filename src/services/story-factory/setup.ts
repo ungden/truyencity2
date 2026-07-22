@@ -129,6 +129,7 @@ function generatorPrompt(input: {
   return JSON.stringify({
     task: `Generator ${input.generator}: tạo đúng sáu concept khác nhau về cơ chế, reward loop và conflict economy.`,
     requirements: [
+      'Mỗi concept.id phải là stable ID ASCII chữ thường: bắt đầu bằng a-z, sau đó chỉ dùng a-z, 0-9, dấu gạch dưới hoặc gạch ngang; dài 2-64 ký tự.',
       'Cơ chế phải hoạt động trong ba chương đầu.',
       'Có vật liệu nhân quả để biến hóa ít nhất ba mươi chương.',
       'Không dựa vào đối thủ ngu, may mắn liên tục hoặc tài nguyên vô nguồn.',
