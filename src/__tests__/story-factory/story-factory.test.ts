@@ -22,6 +22,7 @@ import {
   runConceptLab,
   rollingPlanContainsChapter,
   toGeminiResponseSchema,
+  validateKernelState,
   writeStoryChapter,
 } from '@/services/story-factory';
 import type { ProviderResult, StoryModelProvider } from '@/services/story-factory/provider';
@@ -206,6 +207,13 @@ describe('canonical Story Factory', () => {
     const chapter = plan(1);
     chapter.storyTimeAfterMinutes = 0;
     expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).toThrow('ends before its planned scenes can occur');
+  });
+
+  test('rejects a kernel whose protagonist can leave a location but cannot return', () => {
+    const oneWayKernel = structuredClone(kernel);
+    oneWayKernel.travelRules = oneWayKernel.travelRules.filter(rule => rule.fromLocationId === 'home');
+    expect(() => validateKernelState(oneWayKernel, initialState))
+      .toThrow('must let the protagonist reach every declared location and return');
   });
 
   test('Writer context excludes research, ending contract and editor rubric', () => {

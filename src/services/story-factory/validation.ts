@@ -103,6 +103,33 @@ export function validateKernelState(kernel: StoryKernel, state: StoryState): voi
   for (const required of kernel.promises) {
     if (!state.promises.some(item => item.promiseId === required.id)) fail(`Initial state is missing promise ${required.id}.`);
   }
+
+  const protagonistLocation = state.characters.find(item => item.characterId === kernel.protagonistId)?.locationId;
+  if (!protagonistLocation) fail('Initial state is missing the protagonist location.');
+  const reachableFrom = (start: string) => {
+    const seen = new Set([start]);
+    const queue = [start];
+    while (queue.length) {
+      const current = queue.shift()!;
+      for (const rule of kernel.travelRules) {
+        if (rule.fromLocationId !== current || seen.has(rule.toLocationId)) continue;
+        seen.add(rule.toLocationId);
+        queue.push(rule.toLocationId);
+      }
+    }
+    return seen;
+  };
+  const outward = reachableFrom(protagonistLocation);
+  const unreachable = kernel.locations.map(item => item.id).filter(locationId => !outward.has(locationId));
+  const noReturn = kernel.locations.map(item => item.id)
+    .filter(locationId => !reachableFrom(locationId).has(protagonistLocation));
+  if (unreachable.length || noReturn.length) {
+    fail('Kernel travel graph must let the protagonist reach every declared location and return.', {
+      protagonistLocation,
+      unreachable,
+      noReturn,
+    });
+  }
 }
 
 function checkPreconditions(state: StoryState, plan: ChapterPlan): void {

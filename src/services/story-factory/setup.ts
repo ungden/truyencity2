@@ -293,6 +293,7 @@ kernelJson, arcJson và initialStateJson là chuỗi chứa JSON hợp lệ củ
 Chọn một concept rồi dựng duy nhất StoryKernel, Arc 20-30 chương và State chương 0. Không lập rolling plan; Planner riêng sẽ làm việc đó sau setup.
 Mỗi stable ID phải nhất quán. initialState.schemaVersion phải bằng 2 và initialState.recentOutcomes phải là mảng rỗng vì chưa có chương nào được commit.
 initialState phải có đúng một entry cho mọi character, resource và promise đã khai báo trong kernel; không được thiếu hoặc thêm ID lạ.
+travelRules là đồ thị có hướng: từ vị trí ban đầu của protagonist phải đi được tới mọi location đã khai và từ mỗi location phải có đường quay về, trực tiếp hoặc qua location trung gian. Không được chỉ khai một chiều.
 Chỉ được chọn concept có domainFeasibility=pass. requiredInfrastructure, minimumPlausibleTimeline và criticalAssumptions của mô phỏng là ràng buộc bắt buộc: phản ánh chúng trong world rules và State ban đầu; không ghi trước kết quả của chương tương lai vào State.`,
     prompt: JSON.stringify({
       task: 'Chọn một concept bằng bằng chứng mô phỏng và xuất LaunchPack hoàn chỉnh.',
@@ -325,6 +326,13 @@ Chỉ được chọn concept có domainFeasibility=pass. requiredInfrastructure
   if (launch.initialState.chapterNumber !== 0 || launch.arc.startChapter !== 1) {
     throw new StoryFactoryError('setup_blocked', 'Launch pack must start from chapter zero and arc one.');
   }
-  validateKernelState(launch.kernel, launch.initialState);
+  try {
+    validateKernelState(launch.kernel, launch.initialState);
+  } catch (error) {
+    if (error instanceof StoryFactoryError) {
+      throw new StoryFactoryError('setup_blocked', `Launch pack failed canonical validation: ${error.message}`, error.evidence);
+    }
+    throw error;
+  }
   return { launchPack: launch, selectedConcept, candidates, usages };
 }
