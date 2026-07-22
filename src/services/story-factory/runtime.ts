@@ -51,6 +51,18 @@ export interface FactoryTickResult {
   error?: string;
 }
 
+export function isStoryFactoryEnabled(value: string | undefined = process.env.STORY_FACTORY_ENABLED): boolean {
+  return value?.trim() === 'true';
+}
+
+export function rollingPlanContainsChapter(value: unknown, chapterNumber: number): boolean {
+  if (!value || typeof value !== 'object') return false;
+  const plans = (value as { plans?: unknown }).plans;
+  return Array.isArray(plans) && plans.some(plan => (
+    !!plan && typeof plan === 'object' && (plan as { chapterNumber?: unknown }).chapterNumber === chapterNumber
+  ));
+}
+
 function usageCost(usages: ProviderUsage[]): number {
   return usages.reduce((total, usage) => total + usage.costUsd, 0);
 }
@@ -239,13 +251,32 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
 }
 
 async function runChapter(db: SupabaseClient, job: FactoryJobRow, project: FactoryProjectRow, provider?: StoryModelProvider): Promise<FactoryTickResult> {
-  const kernel = StoryKernelSchema.parse(project.story_kernel);
-  const arc = ArcPlanSchema.parse(project.arc_plan);
-  const state = StoryStateSchema.parse(project.story_state);
-  const routes = ModelRoutesSchema.parse(project.model_routes);
-  const rolling = RollingPlanSchema.parse(job.rolling_plan);
-  const plan = rolling.plans.find(item => item.chapterNumber === state.chapterNumber + 1);
-  if (!plan) return runPlan(db, job, project, provider);
+  const stateResult = StoryStateSchema.safeParse(project.story_state);
+  if (!stateResult.success) {
+    return blockRun(db, job, null, new StoryFactoryError('setup_blocked', 'Story state is invalid.', stateResult.error.issues));
+  }
+  const nextChapter = stateResult.data.chapterNumber + 1;
+  if (!rollingPlanContainsChapter(job.rolling_plan, nextChapter)) return runPlan(db, job, project, provider);
+
+  const kernelResult = StoryKernelSchema.safeParse(project.story_kernel);
+  const arcResult = ArcPlanSchema.safeParse(project.arc_plan);
+  const routesResult = ModelRoutesSchema.safeParse(project.model_routes);
+  const rollingResult = RollingPlanSchema.safeParse(job.rolling_plan);
+  if (!kernelResult.success || !arcResult.success || !routesResult.success) {
+    const evidence = [kernelResult, arcResult, routesResult]
+      .filter(result => !result.success)
+      .flatMap(result => result.success ? [] : result.error.issues);
+    return blockRun(db, job, null, new StoryFactoryError('setup_blocked', 'Story setup artifacts are invalid.', evidence));
+  }
+  if (!rollingResult.success) {
+    return blockRun(db, job, null, new StoryFactoryError('plan_blocked', 'Rolling plan is invalid.', rollingResult.error.issues));
+  }
+  const kernel = kernelResult.data;
+  const arc = arcResult.data;
+  const state = stateResult.data;
+  const routes = routesResult.data;
+  const rolling = rollingResult.data;
+  const plan = rolling.plans.find(item => item.chapterNumber === nextChapter)!;
   if (plan.arcNumber !== arc.arcNumber) return blockRun(db, job, null, new StoryFactoryError('plan_blocked', 'Rolling plan belongs to a different arc.'));
   const runId = await createRun(db, job, 'chapter', plan.chapterNumber);
   try {
@@ -365,7 +396,7 @@ export async function runStoryFactoryTick(options?: {
   provider?: StoryModelProvider;
   workerId?: string;
 }): Promise<FactoryTickResult> {
-  if (process.env.STORY_FACTORY_ENABLED !== 'true') return { status: 'disabled' };
+  if (!isStoryFactoryEnabled()) return { status: 'disabled' };
   const db = options?.db ?? getSupabaseAdmin();
   const workerId = options?.workerId ?? `factory-${crypto.randomUUID()}`;
   await db.rpc('reconcile_story_factory_jobs', { p_stale_minutes: 10 });

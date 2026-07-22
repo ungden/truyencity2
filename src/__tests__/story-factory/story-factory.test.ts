@@ -11,7 +11,9 @@ import {
   FIRST_30_PORTFOLIO,
   applyChapterPlan,
   buildWriterBrief,
+  isStoryFactoryEnabled,
   runConceptLab,
+  rollingPlanContainsChapter,
   toGeminiResponseSchema,
   writeStoryChapter,
 } from '@/services/story-factory';
@@ -190,6 +192,17 @@ describe('canonical Story Factory', () => {
     expect(state.chapterNumber).toBe(1_200);
     expect(state.recentEvents).toHaveLength(20);
     expect(state.facts).toHaveLength(1);
+  });
+
+  test('an exhausted rolling plan routes the next chapter back to planning', () => {
+    expect(rollingPlanContainsChapter({ schemaVersion: 1, startChapter: 6, plans: [] }, 6)).toBe(false);
+    expect(rollingPlanContainsChapter({ schemaVersion: 1, startChapter: 1, plans: [plan(5)] }, 5)).toBe(true);
+  });
+
+  test('factory enablement tolerates harmless environment whitespace', () => {
+    expect(isStoryFactoryEnabled('true\n')).toBe(true);
+    expect(isStoryFactoryEnabled('false')).toBe(false);
+    expect(isStoryFactoryEnabled(undefined)).toBe(false);
   });
 
   test('Concept Lab performs exactly five calls and validates the launch pack', async () => {
