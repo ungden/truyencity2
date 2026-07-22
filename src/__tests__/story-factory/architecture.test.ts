@@ -62,4 +62,10 @@ describe('Story Factory architecture boundary', () => {
     expect(setup).toContain('Grounded Domain Research là ràng buộc');
     expect(setup).toContain('concepts: candidates');
   });
+
+  test('Launch Architect must emit a connected directed travel graph', () => {
+    const setup = readFileSync('src/services/story-factory/setup.ts', 'utf8');
+    expect(setup).toContain('travelRules là đồ thị có hướng');
+    expect(setup).toContain('Không được chỉ khai một chiều');
+  });
 });
