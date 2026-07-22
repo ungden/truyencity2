@@ -68,4 +68,13 @@ describe('Story Factory architecture boundary', () => {
     expect(setup).toContain('travelRules là đồ thị có hướng');
     expect(setup).toContain('Không được chỉ khai một chiều');
   });
+
+  test('Planner receives the absolute-time formula and complete repair evidence', () => {
+    const planner = readFileSync('src/services/story-factory/planner.ts', 'utf8');
+    const prompts = readFileSync('src/services/story-factory/prompts.ts', 'utf8');
+    expect(planner).toContain('time >= State.storyTimeMinutes + tổng mọi scene.dur + scene.travel');
+    expect(planner).toContain('message: lastError.message');
+    expect(planner).toContain('evidence: lastError.evidence ?? null');
+    expect(prompts).toContain('Thời gian cuối chương là mốc tuyệt đối');
+  });
 });
