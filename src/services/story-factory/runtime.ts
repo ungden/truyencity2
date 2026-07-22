@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
+import { getVietnamDayBounds } from '@/lib/utils/vietnam-time';
 import {
   ArcPlanSchema,
   LaunchPackSchema,
@@ -30,6 +31,9 @@ interface FactoryJobRow {
   setup_input: unknown;
   minimum_chapters: number;
   maximum_chapters: number;
+  daily_target: number;
+  chapters_today: number;
+  quota_date: string | null;
   lease_token: string;
 }
 
@@ -61,6 +65,14 @@ export function rollingPlanContainsChapter(value: unknown, chapterNumber: number
   return Array.isArray(plans) && plans.some(plan => (
     !!plan && typeof plan === 'object' && (plan as { chapterNumber?: unknown }).chapterNumber === chapterNumber
   ));
+}
+
+export function nextRunAfterNonChapterStage(job: Pick<FactoryJobRow, 'daily_target' | 'chapters_today' | 'quota_date'>, now = new Date()): string {
+  const bounds = getVietnamDayBounds(now);
+  const quotaExhausted = job.quota_date === bounds.vnDate && job.chapters_today >= job.daily_target;
+  return quotaExhausted
+    ? new Date(new Date(bounds.endIso).getTime() + 1).toISOString()
+    : now.toISOString();
 }
 
 function usageCost(usages: ProviderUsage[]): number {
@@ -331,6 +343,7 @@ async function runWindowReview(db: SupabaseClient, job: FactoryJobRow, project: 
     });
     if (reviewed.review.status === 'block') throw new StoryFactoryError('quality_blocked', 'Ten-chapter window review detected drift.', reviewed.review.issues);
     const now = new Date().toISOString();
+    const nextRunAt = nextRunAfterNonChapterStage(job, new Date(now));
     const nextStage = state.chapterNumber >= arc.plannedEndChapter ? 'arc' : 'write';
     const runUpdate = await db.from('story_factory_runs').update({
       status: 'passed', output_artifact: reviewed.review, usage: [reviewed.usage],
@@ -339,7 +352,7 @@ async function runWindowReview(db: SupabaseClient, job: FactoryJobRow, project: 
     if (runUpdate.error) throw runUpdate.error;
     const jobUpdate = await db.from('story_factory_jobs').update({
       status: 'ready', stage: nextStage, lease_owner: null, lease_token: null, lease_until: null,
-      next_run_at: now, updated_at: now,
+      next_run_at: nextRunAt, updated_at: now,
     }).eq('id', job.id).eq('lease_token', job.lease_token);
     if (jobUpdate.error) throw jobUpdate.error;
     if (job.current_chapter === 10 && job.execution_mode === 'hidden_canary') {

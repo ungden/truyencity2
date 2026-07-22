@@ -10,6 +10,7 @@ import {
   StoryFactoryError,
   FIRST_30_PORTFOLIO,
   materializePlannerRollingPlan,
+  nextRunAfterNonChapterStage,
   PlannerRollingPlanResponseSchema,
   applyChapterPlan,
   buildWriterBrief,
@@ -237,6 +238,14 @@ describe('canonical Story Factory', () => {
     expect(isStoryFactoryEnabled('true\n')).toBe(true);
     expect(isStoryFactoryEnabled('false')).toBe(false);
     expect(isStoryFactoryEnabled(undefined)).toBe(false);
+  });
+
+  test('window review runs immediately but the following chapter respects the Vietnam daily quota', () => {
+    const now = new Date('2026-07-22T06:30:00.000Z');
+    expect(nextRunAfterNonChapterStage({ daily_target: 5, chapters_today: 4, quota_date: '2026-07-22' }, now))
+      .toBe(now.toISOString());
+    expect(nextRunAfterNonChapterStage({ daily_target: 5, chapters_today: 5, quota_date: '2026-07-22' }, now))
+      .toBe('2026-07-22T17:00:00.000Z');
   });
 
   test('Concept Lab performs exactly five calls and validates the launch pack', async () => {
