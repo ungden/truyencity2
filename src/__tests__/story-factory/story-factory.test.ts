@@ -189,6 +189,19 @@ describe('canonical Story Factory', () => {
     expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
   });
 
+  test('does not treat a promised future purchase as a completed transaction', () => {
+    const chapter = plan(1);
+    chapter.scenes[0].action = 'Hải đưa tiền lãi cho mẹ và hứa sẽ sớm mua máy khâu.';
+    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
+  });
+
+  test('still rejects an actual purchase hidden beside future intent', () => {
+    const chapter = plan(1);
+    chapter.scenes[0].action = 'Hải hứa sẽ sớm mua máy khâu, rồi trả tiền mặt mua ngay một cuộn lưới.';
+    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter }))
+      .toThrow('transaction without a numeric resource delta');
+  });
+
   test('allows a connective scene without inventing a fake state delta', () => {
     const chapter = plan(1);
     chapter.scenes.unshift({
