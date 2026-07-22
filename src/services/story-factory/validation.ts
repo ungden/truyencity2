@@ -150,6 +150,13 @@ function travelMinimum(kernel: StoryKernel, from: string, to: string): number | 
   return kernel.travelRules.find(rule => rule.fromLocationId === from && rule.toLocationId === to)?.minimumMinutes ?? null;
 }
 
+function stripFutureIntent(action: string): string {
+  const intent = String.raw`(?:cần|sẽ|định|dự\s+định|tính|muốn|chưa|không|hứa(?:\s+sẽ)?|dự\s+kiến|sắp|phân\s+tích\s+việc|xem\s+xét\s+việc|lên\s+kế\s+hoạch(?:\s+để)?)`;
+  const filler = String.raw`(?:[\p{L}\p{N}_-]+\s+){0,3}`;
+  const verbs = String.raw`(?:mua|bán|thu\s+mua|trả\s+tiền|chi\s+tiền|thu\s+tiền|nhận\s+tiền|kiếm\s+tiền|chế\s+tạo|đóng\s+thành|xây\s+dựng|lắp\s+ráp|thu\s+gom|nhận\s+được)`;
+  return action.replace(new RegExp(String.raw`\b${intent}\s+${filler}${verbs}\b`, 'giu'), '');
+}
+
 function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPlan): void {
   const characterIds = new Set(kernel.characters.map(item => item.id));
   const locationIds = new Set(kernel.locations.map(item => item.id));
@@ -190,10 +197,7 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
       referenced.add(deltaId);
     }
     const sceneDeltas = scene.requiredDeltaIds.map(deltaId => plan.requiredDeltas.find(delta => delta.id === deltaId)!);
-    const realizedAction = scene.action.replace(
-      /\b(?:cần|sẽ|định|dự định|tính|muốn|chưa|không|phân tích việc|xem xét việc|lên kế hoạch)\s+(?:mua|bán|thu mua|trả tiền|chi tiền|thu tiền|nhận tiền|kiếm tiền|chế tạo|đóng thành|xây dựng|lắp ráp|thu gom|nhận được)\b/giu,
-      '',
-    );
+    const realizedAction = stripFutureIntent(scene.action);
     if (/\b(?:mua|bán|thu mua|trả tiền|chi tiền|thu tiền|nhận tiền|kiếm tiền)\b/iu.test(realizedAction)
       && !sceneDeltas.some(delta => delta.kind === 'resource_numeric')) {
       fail(`Scene ${scene.id} describes a transaction without a numeric resource delta.`, scene.action);
