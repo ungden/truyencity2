@@ -28,6 +28,46 @@ function unique(values: string[], label: string): void {
   if (duplicates.length) fail(`${label} contains duplicate stable IDs.`, [...new Set(duplicates)]);
 }
 
+/**
+ * Resolve a model-proposed evidence anchor to bytes that actually occur in the
+ * accepted prose. For longer proposals we require at least four consecutive
+ * matching words; short proposals must match in full. The returned value is
+ * always sliced from `content`, never copied from model output.
+ */
+export function groundEvidenceSpan(content: string, proposed: string): string | null {
+  const tokenPattern = /[\p{L}\p{N}]+/gu;
+  const contentTokens = [...content.matchAll(tokenPattern)].map(match => ({
+    value: match[0].normalize('NFKC').toLocaleLowerCase('vi'),
+    start: match.index ?? 0,
+    end: (match.index ?? 0) + match[0].length,
+  }));
+  const proposedTokens = [...proposed.matchAll(tokenPattern)]
+    .map(match => match[0].normalize('NFKC').toLocaleLowerCase('vi'));
+  if (!contentTokens.length || !proposedTokens.length) return null;
+
+  let bestLength = 0;
+  let bestContentStart = -1;
+  for (let proposedStart = 0; proposedStart < proposedTokens.length; proposedStart += 1) {
+    for (let contentStart = 0; contentStart < contentTokens.length; contentStart += 1) {
+      let length = 0;
+      while (
+        proposedStart + length < proposedTokens.length
+        && contentStart + length < contentTokens.length
+        && proposedTokens[proposedStart + length] === contentTokens[contentStart + length].value
+      ) length += 1;
+      if (length > bestLength) {
+        bestLength = length;
+        bestContentStart = contentStart;
+      }
+    }
+  }
+  const requiredLength = proposedTokens.length < 4 ? proposedTokens.length : 4;
+  if (bestContentStart < 0 || bestLength < requiredLength) return null;
+  const first = contentTokens[bestContentStart];
+  const last = contentTokens[bestContentStart + bestLength - 1];
+  return content.slice(first.start, last.end);
+}
+
 export function validateKernelState(kernel: StoryKernel, state: StoryState): void {
   unique(kernel.characters.map(item => item.id), 'Kernel characters');
   unique(kernel.resources.map(item => item.id), 'Kernel resources');
@@ -122,6 +162,19 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
       if (!deltaIds.has(deltaId)) fail(`Scene ${scene.id} references unknown delta ${deltaId}.`);
       referenced.add(deltaId);
     }
+    const sceneDeltas = scene.requiredDeltaIds.map(deltaId => plan.requiredDeltas.find(delta => delta.id === deltaId)!);
+    const realizedAction = scene.action.replace(
+      /\b(?:cần|sẽ|định|dự định|tính|muốn|chưa|không|phân tích việc|xem xét việc|lên kế hoạch)\s+(?:mua|bán|thu mua|trả tiền|chi tiền|thu tiền|nhận tiền|kiếm tiền|chế tạo|đóng thành|xây dựng|lắp ráp|thu gom|nhận được)\b/giu,
+      '',
+    );
+    if (/\b(?:mua|bán|thu mua|trả tiền|chi tiền|thu tiền|nhận tiền|kiếm tiền)\b/iu.test(realizedAction)
+      && !sceneDeltas.some(delta => delta.kind === 'resource_numeric')) {
+      fail(`Scene ${scene.id} describes a transaction without a numeric resource delta.`, scene.action);
+    }
+    if (/\b(?:chế tạo|đóng thành|xây dựng|lắp ráp|thu gom|nhận được)\b/iu.test(realizedAction)
+      && !sceneDeltas.some(delta => delta.kind === 'resource_numeric' || delta.kind === 'resource_state' || delta.kind === 'fact')) {
+      fail(`Scene ${scene.id} creates or acquires a durable asset without a state delta.`, scene.action);
+    }
   }
   const orphaned = [...deltaIds].filter(id => !referenced.has(id));
   if (orphaned.length) fail(`Chapter ${plan.chapterNumber} has deltas not assigned to a scene.`, orphaned);
@@ -161,6 +214,17 @@ export function applyChapterPlan(input: {
     fail(`Expected chapter ${state.chapterNumber + 1}, received ${plan.chapterNumber}.`);
   }
   if (plan.storyTimeAfterMinutes < state.storyTimeMinutes) fail('Story time cannot move backwards.');
+  const minimumElapsedMinutes = plan.scenes.reduce(
+    (total, scene) => total + scene.durationMinutes + scene.travelMinutesFromPrevious,
+    0,
+  );
+  if (plan.storyTimeAfterMinutes < state.storyTimeMinutes + minimumElapsedMinutes) {
+    fail(`Chapter ${plan.chapterNumber} ends before its planned scenes can occur.`, {
+      stateTime: state.storyTimeMinutes,
+      minimumElapsedMinutes,
+      plannedTime: plan.storyTimeAfterMinutes,
+    });
+  }
   checkPreconditions(state, plan);
   validateScenes(kernel, state, plan);
 
@@ -250,9 +314,10 @@ export function appendAcceptedOutcome(input: {
   content: string;
   outcome: Omit<ChapterOutcome, 'chapterNumber' | 'title'>;
 }): StoryState {
-  const missingEvidence = input.outcome.evidenceSpans.filter(span => !input.content.includes(span));
-  if (missingEvidence.length) {
-    throw new StoryFactoryError('infra_blocked', 'Editor outcome contains evidence that is not present in the accepted prose.', missingEvidence);
+  const groundedEvidence = input.outcome.evidenceSpans.map(span => groundEvidenceSpan(input.content, span));
+  if (groundedEvidence.some(span => span === null)) {
+    const ungrounded = input.outcome.evidenceSpans.filter((_, index) => groundedEvidence[index] === null);
+    throw new StoryFactoryError('infra_blocked', 'Editor outcome does not contain a sufficiently grounded prose anchor.', ungrounded);
   }
   const state = structuredClone(input.state);
   state.recentOutcomes = [
@@ -261,6 +326,7 @@ export function appendAcceptedOutcome(input: {
       chapterNumber: state.chapterNumber,
       title: input.title,
       ...input.outcome,
+      evidenceSpans: groundedEvidence as string[],
     },
   ].slice(-12);
   return state;

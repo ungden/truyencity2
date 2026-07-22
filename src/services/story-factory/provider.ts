@@ -20,6 +20,10 @@ export interface ProviderUsage {
   outputTokens: number;
   costUsd: number;
   finishReason: string;
+  grounding?: {
+    searchQueries: string[];
+    sourceUrls: string[];
+  };
 }
 
 export interface ProviderResult<T> {
@@ -33,6 +37,7 @@ export interface StoryModelProvider {
     system: string;
     prompt: string;
     temperature?: number;
+    grounding?: 'google_search';
   }): Promise<ProviderResult<string>>;
   json<T>(input: {
     model: string;
@@ -41,6 +46,7 @@ export interface StoryModelProvider {
     schema: z.ZodType<T, z.ZodTypeDef, unknown>;
     temperature?: number;
     constrainSchema?: boolean;
+    grounding?: 'google_search';
   }): Promise<ProviderResult<T>>;
 }
 
@@ -106,6 +112,7 @@ async function generate(input: {
   temperature: number;
   responseSchema?: Record<string, unknown>;
   jsonMode?: boolean;
+  googleSearch?: boolean;
 }): Promise<ProviderResult<string>> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new StoryFactoryError('infra_blocked', 'GEMINI_API_KEY is not configured.');
@@ -127,11 +134,12 @@ async function generate(input: {
   } else if (input.jsonMode) {
     generationConfig.responseMimeType = 'application/json';
   }
-  const body = {
+  const body: Record<string, unknown> = {
     systemInstruction: { parts: [{ text: input.system }] },
     contents: [{ role: 'user', parts: [{ text: input.prompt }] }],
     generationConfig,
   };
+  if (input.googleSearch) body.tools = [{ googleSearch: {} }];
 
   for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt += 1) {
     try {
@@ -156,6 +164,17 @@ async function generate(input: {
       const inputTokens = payload?.usageMetadata?.promptTokenCount ?? 0;
       const outputTokens = (payload?.usageMetadata?.candidatesTokenCount ?? 0)
         + (payload?.usageMetadata?.thoughtsTokenCount ?? 0);
+      const groundingMetadata = candidate?.groundingMetadata;
+      const grounding = groundingMetadata ? {
+        searchQueries: Array.isArray(groundingMetadata.webSearchQueries)
+          ? groundingMetadata.webSearchQueries.filter((query: unknown): query is string => typeof query === 'string')
+          : [],
+        sourceUrls: Array.isArray(groundingMetadata.groundingChunks)
+          ? groundingMetadata.groundingChunks.flatMap((chunk: { web?: { uri?: unknown } }) => (
+            typeof chunk?.web?.uri === 'string' ? [chunk.web.uri] : []
+          ))
+          : [],
+      } : undefined;
       return {
         value,
         usage: {
@@ -164,6 +183,7 @@ async function generate(input: {
           outputTokens,
           costUsd: cost(input.model, inputTokens, outputTokens),
           finishReason,
+          grounding,
         },
       };
     } catch (error) {
@@ -178,7 +198,11 @@ async function generate(input: {
 
 export const geminiProvider: StoryModelProvider = {
   async text(input) {
-    return generate({ ...input, temperature: input.temperature ?? 1 });
+    return generate({
+      ...input,
+      temperature: input.temperature ?? 1,
+      googleSearch: input.grounding === 'google_search',
+    });
   },
   async json<T>(input: {
     model: string;
@@ -187,6 +211,7 @@ export const geminiProvider: StoryModelProvider = {
     schema: z.ZodType<T, z.ZodTypeDef, unknown>;
     temperature?: number;
     constrainSchema?: boolean;
+    grounding?: 'google_search';
   }): Promise<ProviderResult<T>> {
     const responseSchema = toGeminiResponseSchema(input.schema);
     const prompt = input.constrainSchema === false
@@ -198,6 +223,7 @@ export const geminiProvider: StoryModelProvider = {
       temperature: input.temperature ?? 0.7,
       responseSchema: input.constrainSchema === false ? undefined : responseSchema,
       jsonMode: true,
+      googleSearch: input.grounding === 'google_search',
     });
     let raw: unknown;
     try {

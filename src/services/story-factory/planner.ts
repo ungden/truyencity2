@@ -30,12 +30,12 @@ const PlannerCompactSceneSchema = z.object({
   pov: z.string(),
   people: z.array(z.string()).min(1).max(16),
   loc: z.string(),
-  dur: z.number().int().min(0).max(10_000),
+  dur: z.number().int().min(1).max(10_000),
   travel: z.number().int().min(0).max(100_000),
   goal: z.string(),
   block: z.string(),
   act: z.string(),
-  deltaIds: z.array(z.string()).min(1).max(20),
+  deltaIds: z.array(z.string()).max(20),
 }).strict();
 
 const PlannerCompactChapterSchema = z.object({
@@ -81,8 +81,9 @@ const PLANNER_COMPACT_CONTRACT = {
     'time, dur và travel là một số nguyên phút; travel không được là mảng hay mô tả tuyến đường.',
     'scene.id và mọi ID đều là string stable ID, không dùng số thứ tự trần.',
     'rules có ít nhất một world-rule ID tồn tại trong Kernel.',
-    'Mỗi scene.deltaIds có ít nhất một delta ID tồn tại trong cùng chương.',
+    'scene.deltaIds chỉ chứa delta ID tồn tại trong cùng chương; cảnh nối có thể rỗng nhưng cả chương vẫn phải có deltas.',
     'Mỗi delta phải được ít nhất một scene.deltaIds tham chiếu.',
+    'Nếu một nhân vật đổi location trong chương, tạo đúng một location delta từ vị trí đầu chương tới vị trí ở scene cuối của họ và gắn delta vào scene thực hiện lần di chuyển đầu tiên.',
   ],
 } as const;
 
@@ -193,7 +194,13 @@ export async function planRollingWindow(input: {
       validationIssues = lastError.evidence ?? [{ message: lastError.message }];
     }
   }
-  throw lastError ?? new StoryFactoryError('plan_blocked', 'Planner repair budget was exhausted.');
+  if (lastError) {
+    throw new StoryFactoryError(lastError.code, lastError.message, {
+      validation: lastError.evidence ?? null,
+      usages,
+    });
+  }
+  throw new StoryFactoryError('plan_blocked', 'Planner repair budget was exhausted.', { usages });
 }
 
 export async function reviewFiveChapterWindow(input: {

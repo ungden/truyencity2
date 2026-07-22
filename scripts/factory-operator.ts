@@ -50,11 +50,12 @@ async function seed() {
   const routes = routesPath
     ? ModelRoutesSchema.parse(JSON.parse(readFileSync(path.resolve(routesPath), 'utf8')))
     : DEFAULT_MODEL_ROUTES;
-  const slug = `factory-${commission.slotKey}-${Date.now()}`.toLowerCase().replace(/[^a-z0-9-]+/g, '-');
+  const seedToken = Date.now();
+  const slug = `factory-${commission.slotKey}-${seedToken}`.toLowerCase().replace(/[^a-z0-9-]+/g, '-');
   console.log(JSON.stringify({ dryRun: !apply, command, release: STORY_FACTORY_RELEASE, commission, researchId: research.snapshotId, routes }, null, 2));
   if (!apply) return;
   const novelInsert = await db.from('novels').insert({
-    title: `Đang chuẩn bị: ${commission.slotKey}`,
+    title: `Đang chuẩn bị: ${commission.slotKey} · ${seedToken}`,
     slug,
     author: 'TruyenCity',
     description: 'Concept đang được Story Factory xây dựng.',

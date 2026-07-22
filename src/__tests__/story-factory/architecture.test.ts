@@ -33,6 +33,12 @@ describe('Story Factory architecture boundary', () => {
     expect(provider).not.toMatch(/fallback|openrouter|deepseek/i);
   });
 
+  test('Writer freedom cannot create state outside required deltas', () => {
+    const prompts = readFileSync('src/services/story-factory/prompts.ts', 'utf8');
+    expect(prompts).toContain('không được tự tạo thay đổi trạng thái bền vững ngoài requiredDeltas');
+    expect(prompts).toContain('prose tự tạo bất kỳ thay đổi trạng thái bền vững nào không có trong requiredDeltas');
+  });
+
   test('narrative outcomes stay out of Writer context and each rolling window is reviewed', () => {
     const context = readFileSync('src/services/story-factory/context.ts', 'utf8');
     const writerBriefBody = context.slice(context.indexOf('export function buildWriterBrief'), context.indexOf('export function selectPreviousTail'));
