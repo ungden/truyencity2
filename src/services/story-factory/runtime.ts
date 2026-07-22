@@ -241,7 +241,7 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
     if (jobUpdate.error) throw jobUpdate.error;
     const runUpdate = await db.from('story_factory_runs').update({
       status: 'passed', model_routes: { planner: routes.planner }, output_artifact: planned.rollingPlan,
-      usage: [planned.usage], estimated_cost_usd: planned.usage.costUsd, finished_at: now,
+      usage: planned.usages, estimated_cost_usd: usageCost(planned.usages), finished_at: now,
     }).eq('id', runId);
     if (runUpdate.error) throw runUpdate.error;
     return { status: 'completed', jobId: job.id, stage: 'plan', chapterNumber: job.current_chapter };

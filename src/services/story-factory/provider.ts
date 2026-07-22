@@ -62,10 +62,10 @@ function retryable(error: unknown): boolean {
 }
 
 export function toGeminiResponseSchema<T>(schema: z.ZodType<T, z.ZodTypeDef, unknown>): Record<string, unknown> {
-  // zod-to-json-schema's OpenAPI target is compatible with Gemini's supported
-  // subset except for boolean exclusive bounds. Normalize only those bounds so
-  // we do not introduce unsupported keywords from another schema dialect.
-  const converted = zodToJsonSchema(schema, { target: 'openApi3', $refStrategy: 'none' }) as Record<string, unknown>;
+  // responseFormat accepts JSON Schema, not the older OpenAPI-flavoured schema
+  // used by responseJsonSchema. Keep it inline because Gemini rejects some
+  // deeply referenced schemas before generation.
+  const converted = zodToJsonSchema(schema, { target: 'jsonSchema7', $refStrategy: 'none' }) as Record<string, unknown>;
   delete converted.$schema;
   const normalize = (value: unknown): void => {
     if (Array.isArray(value)) {
@@ -74,15 +74,26 @@ export function toGeminiResponseSchema<T>(schema: z.ZodType<T, z.ZodTypeDef, unk
     }
     if (!value || typeof value !== 'object') return;
     const node = value as Record<string, unknown>;
-    if (node.exclusiveMinimum === true && typeof node.minimum === 'number') {
-      node.exclusiveMinimum = node.minimum;
-      delete node.minimum;
-    } else if (node.exclusiveMinimum === false) delete node.exclusiveMinimum;
-    if (node.exclusiveMaximum === true && typeof node.maximum === 'number') {
-      node.exclusiveMaximum = node.maximum;
-      delete node.maximum;
-    } else if (node.exclusiveMaximum === false) delete node.exclusiveMaximum;
+    if (Object.prototype.hasOwnProperty.call(node, 'const')) {
+      node.enum = [node.const];
+      delete node.const;
+    }
+    delete node.pattern;
+    delete node.minLength;
+    delete node.maxLength;
+    delete node.exclusiveMinimum;
+    delete node.exclusiveMaximum;
     Object.values(node).forEach(normalize);
+    if (Array.isArray(node.anyOf) && node.anyOf.every(option => (
+      !!option && typeof option === 'object'
+      && Object.keys(option as Record<string, unknown>).every(key => key === 'type')
+    ))) {
+      node.type = node.anyOf.flatMap(option => {
+        const type = (option as { type: string | string[] }).type;
+        return Array.isArray(type) ? type : [type];
+      });
+      delete node.anyOf;
+    }
   };
   normalize(converted);
   return converted;
@@ -103,11 +114,18 @@ async function generate(input: {
     temperature: input.temperature,
     maxOutputTokens: 65_536,
   };
-  if (input.responseSchema || input.jsonMode) {
+  if (input.responseSchema && input.model === 'gemini-3.1-pro-preview') {
+    generationConfig.responseFormat = {
+      text: {
+        mimeType: 'APPLICATION_JSON',
+        schema: input.responseSchema,
+      },
+    };
+  } else if (input.responseSchema) {
     generationConfig.responseMimeType = 'application/json';
-  }
-  if (input.responseSchema) {
     generationConfig.responseJsonSchema = input.responseSchema;
+  } else if (input.jsonMode) {
+    generationConfig.responseMimeType = 'application/json';
   }
   const body = {
     systemInstruction: { parts: [{ text: input.system }] },

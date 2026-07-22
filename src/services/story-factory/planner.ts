@@ -14,6 +14,115 @@ import { geminiProvider } from './provider';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT } from './prompts';
 import { validateRollingPlan } from './validation';
 
+const PlannerScalarSchema = z.union([z.string(), z.number(), z.null()]);
+const PlannerCompactDeltaSchema = z.object({
+  id: z.string(),
+  k: z.enum(['fact', 'resource_numeric', 'resource_state', 'knowledge', 'location', 'promise']),
+  target: z.string(),
+  before: PlannerScalarSchema,
+  change: z.number().nullable(),
+  after: PlannerScalarSchema,
+  source: z.string().nullable(),
+  sink: z.string().nullable(),
+}).strict();
+const PlannerCompactSceneSchema = z.object({
+  id: z.string(),
+  pov: z.string(),
+  people: z.array(z.string()).min(1).max(16),
+  loc: z.string(),
+  dur: z.number().int().min(0).max(10_000),
+  travel: z.number().int().min(0).max(100_000),
+  goal: z.string(),
+  block: z.string(),
+  act: z.string(),
+  deltaIds: z.array(z.string()).min(1).max(20),
+}).strict();
+
+const PlannerCompactChapterSchema = z.object({
+  v: z.literal(1),
+  n: z.number().int().positive(),
+  arc: z.number().int().positive(),
+  time: z.number().int().min(0),
+  pre: z.array(z.object({
+    k: z.enum(['fact', 'resource', 'location', 'promise']),
+    id: z.string(),
+    value: z.union([z.string(), z.number()]),
+  }).strict()).max(30),
+  rules: z.array(z.string()).min(1).max(12),
+  scenes: z.array(PlannerCompactSceneSchema).min(1).max(5),
+  deltas: z.array(PlannerCompactDeltaSchema).min(1).max(30),
+}).strict();
+
+export const PlannerRollingPlanResponseSchema = z.object({
+  v: z.literal(1),
+  start: z.number().int().positive(),
+  chaptersJson: z.array(z.string()).min(1).max(5),
+}).strict();
+
+const PLANNER_COMPACT_CONTRACT = {
+  deltaTarget: {
+    fact: 'target=factId; before/after là giá trị fact; change/source/sink=null',
+    resource_numeric: 'target=resourceId; before/change/after là số; source hoặc sink mô tả nguồn tiền/vật tư, có thể null',
+    resource_state: 'target=resourceId; before/after là trạng thái; source giải thích nguồn thay đổi; change/sink=null',
+    knowledge: 'target=characterId; after=factId; source là nguồn học biết; before/change/sink=null',
+    location: 'target=characterId; before/after là locationId; change/source/sink=null',
+    promise: 'target=promiseId; before/after thuộc open|progressed|resolved|abandoned; change/source/sink=null',
+  },
+  chapterJson: {
+    serialization: 'Mỗi phần tử chaptersJson là đúng một JSON object đã stringify, không markdown.',
+    chapterFields: ['v=1', 'n', 'arc', 'time', 'pre', 'rules', 'scenes', 'deltas'],
+    preFields: ['k', 'id', 'value'],
+    sceneFields: ['id', 'pov', 'people', 'loc', 'dur', 'travel', 'goal', 'block', 'act', 'deltaIds'],
+    deltaFields: ['id', 'k', 'target', 'before', 'change', 'after', 'source', 'sink'],
+  },
+  strictRules: [
+    'Mọi field compact đều bắt buộc; dùng null đúng chỗ, không bỏ field.',
+    'pre.k chỉ được fact|resource|location|promise; resource_numeric và resource_state chỉ dùng cho deltas.k.',
+    'time, dur và travel là một số nguyên phút; travel không được là mảng hay mô tả tuyến đường.',
+    'scene.id và mọi ID đều là string stable ID, không dùng số thứ tự trần.',
+    'rules có ít nhất một world-rule ID tồn tại trong Kernel.',
+    'Mỗi scene.deltaIds có ít nhất một delta ID tồn tại trong cùng chương.',
+    'Mỗi delta phải được ít nhất một scene.deltaIds tham chiếu.',
+  ],
+} as const;
+
+export function materializePlannerRollingPlan(value: z.infer<typeof PlannerRollingPlanResponseSchema>): RollingPlan {
+  const compact = PlannerRollingPlanResponseSchema.parse(value);
+  const chapters = compact.chaptersJson.map(raw => PlannerCompactChapterSchema.parse(JSON.parse(raw)));
+  return RollingPlanSchema.parse({
+    schemaVersion: compact.v,
+    startChapter: compact.start,
+    plans: chapters.map(chapter => ({
+      schemaVersion: compact.v,
+      chapterNumber: chapter.n,
+      arcNumber: chapter.arc,
+      storyTimeAfterMinutes: chapter.time,
+      preconditions: chapter.pre.map(item => ({ kind: item.k, entityId: item.id, expected: item.value })),
+      requiredWorldRuleIds: chapter.rules,
+      scenes: chapter.scenes.map(scene => ({
+        id: scene.id,
+        povCharacterId: scene.pov,
+        participantIds: scene.people,
+        locationId: scene.loc,
+        durationMinutes: scene.dur,
+        travelMinutesFromPrevious: scene.travel,
+        objective: scene.goal,
+        obstacle: scene.block,
+        action: scene.act,
+        requiredDeltaIds: scene.deltaIds,
+      })),
+      requiredDeltas: chapter.deltas.map(delta => {
+        if (delta.k === 'fact') return { id: delta.id, kind: delta.k, factId: delta.target, before: delta.before, after: delta.after };
+        if (delta.k === 'resource_numeric') return { id: delta.id, kind: delta.k, resourceId: delta.target, before: delta.before, delta: delta.change, after: delta.after, source: delta.source, sink: delta.sink };
+        if (delta.k === 'resource_state') return { id: delta.id, kind: delta.k, resourceId: delta.target, before: delta.before, after: delta.after, source: delta.source };
+        if (delta.k === 'knowledge') return { id: delta.id, kind: delta.k, characterId: delta.target, factId: delta.after, source: delta.source };
+        if (delta.k === 'location') return { id: delta.id, kind: delta.k, characterId: delta.target, beforeLocationId: delta.before, afterLocationId: delta.after };
+        return { id: delta.id, kind: delta.k, promiseId: delta.target, before: delta.before, after: delta.after };
+      }),
+    })),
+  });
+}
+
 export const WindowReviewSchema = z.discriminatedUnion('status', [
   z.object({ status: z.literal('pass'), issues: z.array(z.never()).length(0) }).strict(),
   z.object({
@@ -41,29 +150,46 @@ export async function planRollingWindow(input: {
   state: StoryState;
   routes: ModelRoutes;
   provider?: StoryModelProvider;
-}): Promise<{ rollingPlan: RollingPlan; usage: ProviderUsage }> {
+}): Promise<{ rollingPlan: RollingPlan; usages: ProviderUsage[] }> {
   const provider = input.provider ?? geminiProvider;
-  const result = await provider.json({
-    model: input.routes.planner,
-    system: PLANNER_SYSTEM_PROMPT,
-    prompt: JSON.stringify({
-      task: 'Lập từ một đến năm chương tiếp theo, không vượt quá cuối arc.',
-      kernel: input.kernel,
-      arc: input.arc,
-      state: input.state,
-      nextChapter: input.state.chapterNumber + 1,
-      maximumEndChapter: input.arc.plannedEndChapter,
-    }),
-    schema: RollingPlanSchema,
-    temperature: 0.7,
-  });
-  try {
-    validateRollingPlan({ kernel: input.kernel, arc: input.arc, state: input.state, rollingPlan: result.value });
-  } catch (error) {
-    if (error instanceof StoryFactoryError) throw error;
-    throw new StoryFactoryError('plan_blocked', error instanceof Error ? error.message : String(error));
+  const usages: ProviderUsage[] = [];
+  let previousResponse: unknown;
+  let validationIssues: unknown;
+  let lastError: StoryFactoryError | undefined;
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    const result = await provider.json({
+      model: input.routes.planner,
+      system: PLANNER_SYSTEM_PROMPT,
+      prompt: JSON.stringify({
+        task: attempt === 1
+          ? 'Lập từ một đến năm chương tiếp theo, không vượt quá cuối arc.'
+          : 'Tạo lại toàn bộ rolling window và sửa đúng các validation issue; không vá cục bộ.',
+        kernel: input.kernel,
+        arc: input.arc,
+        state: input.state,
+        nextChapter: input.state.chapterNumber + 1,
+        maximumEndChapter: input.arc.plannedEndChapter,
+        compactContract: PLANNER_COMPACT_CONTRACT,
+        previousResponse: attempt === 1 ? undefined : previousResponse,
+        validationIssues: attempt === 1 ? undefined : validationIssues,
+      }),
+      schema: PlannerRollingPlanResponseSchema,
+      temperature: attempt === 1 ? 0.7 : 0.4,
+    });
+    usages.push(result.usage);
+    try {
+      const parsed = materializePlannerRollingPlan(result.value);
+      validateRollingPlan({ kernel: input.kernel, arc: input.arc, state: input.state, rollingPlan: parsed });
+      return { rollingPlan: parsed, usages };
+    } catch (error) {
+      lastError = error instanceof StoryFactoryError
+        ? error
+        : new StoryFactoryError('infra_blocked', 'Planner output failed the exact rolling-plan contract.', error instanceof z.ZodError ? error.issues : undefined);
+      previousResponse = result.value;
+      validationIssues = lastError.evidence ?? [{ message: lastError.message }];
+    }
   }
-  return { rollingPlan: result.value, usage: result.usage };
+  throw lastError ?? new StoryFactoryError('plan_blocked', 'Planner repair budget was exhausted.');
 }
 
 export async function reviewTenChapterWindow(input: {

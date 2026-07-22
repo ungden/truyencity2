@@ -9,6 +9,8 @@ import {
   type StoryState,
   StoryFactoryError,
   FIRST_30_PORTFOLIO,
+  materializePlannerRollingPlan,
+  PlannerRollingPlanResponseSchema,
   applyChapterPlan,
   buildWriterBrief,
   isStoryFactoryEnabled,
@@ -179,9 +181,41 @@ describe('canonical Story Factory', () => {
     expect(EditorAssessmentSchema.safeParse({ status: 'pass', issues: [], deltaChecks: [{ deltaId: 'delta_1', realized: false, evidence: '' }] }).success).toBe(false);
   });
 
-  test('Gemini structured-output schema uses numeric exclusive bounds', () => {
+  test('Gemini structured-output schema keeps only provider-supported bounds', () => {
     const schema = toGeminiResponseSchema(z.object({ arcNumber: z.number().int().positive() }).strict());
-    expect((schema.properties as Record<string, Record<string, unknown>>).arcNumber.exclusiveMinimum).toBe(0);
+    expect((schema.properties as Record<string, Record<string, unknown>>).arcNumber.exclusiveMinimum).toBeUndefined();
+  });
+
+  test('Planner provider schema avoids the rejected nested delta union', () => {
+    const schema = JSON.stringify(toGeminiResponseSchema(PlannerRollingPlanResponseSchema));
+    expect(schema).not.toContain('"anyOf"');
+    expect(schema).toContain('"chaptersJson"');
+  });
+
+  test('Planner wire envelope materializes into the exact canonical plan', () => {
+    const rolling = materializePlannerRollingPlan({
+      v: 1,
+      start: 1,
+      chaptersJson: [JSON.stringify({
+        v: 1, n: 1, arc: 1, time: 60,
+        pre: [{ k: 'fact', id: 'fact_day', value: 'ngay_0' }],
+        rules: ['rule_market'],
+        scenes: [{
+          id: 'scene_1', pov: 'main', people: ['main', 'mother'], loc: 'home', dur: 60, travel: 0,
+          goal: 'Biến quyết định thành hành động cụ thể.', block: 'Nguồn lực gia đình còn ít.',
+          act: 'Hải chia việc và bắt tay thực hiện.', deltaIds: ['delta_1'],
+        }],
+        deltas: [{
+          id: 'delta_1', k: 'fact', target: 'fact_day', before: 'ngay_0', change: null,
+          after: 'ngay_1', source: null, sink: null,
+        }],
+      })],
+    });
+    expect(rolling.startChapter).toBe(1);
+    expect(rolling.plans[0].chapterNumber).toBe(1);
+    expect(rolling.plans[0].requiredDeltas[0]).toEqual({
+      id: 'delta_1', kind: 'fact', factId: 'fact_day', before: 'ngay_0', after: 'ngay_1',
+    });
   });
 
   test('state remains bounded across 1,200 transitions', () => {
