@@ -85,8 +85,21 @@ export const StoryKernelSchema = z.object({
 
 const storyFact = z.object({ id: stableId, value: z.string().trim().min(1).max(2_000) }).strict();
 
+export const ChapterOutcomeContentSchema = z.object({
+  event: z.string().trim().min(5).max(400),
+  result: z.string().trim().min(5).max(400),
+  method: z.string().trim().min(2).max(200).nullable(),
+  endingSituation: z.string().trim().min(5).max(400),
+  evidenceSpans: z.array(z.string().trim().min(2).max(500)).min(1).max(4),
+}).strict();
+
+export const ChapterOutcomeSchema = ChapterOutcomeContentSchema.extend({
+  chapterNumber: z.number().int().positive(),
+  title: z.string().trim().min(1).max(240),
+}).strict();
+
 export const StoryStateSchema = z.object({
-  schemaVersion: z.literal(1),
+  schemaVersion: z.literal(2),
   chapterNumber: z.number().int().nonnegative(),
   storyTimeMinutes: z.number().int().nonnegative(),
   facts: z.array(storyFact).max(500),
@@ -104,10 +117,7 @@ export const StoryStateSchema = z.object({
     promiseId: stableId,
     status: z.enum(['open', 'progressed', 'resolved', 'abandoned']),
   }).strict()).max(80),
-  recentEvents: z.array(z.object({
-    chapterNumber: z.number().int().positive(),
-    summary: z.string().trim().min(4).max(500),
-  }).strict()).max(20),
+  recentOutcomes: z.array(ChapterOutcomeSchema).max(12),
 }).strict();
 
 export const ArcPlanSchema = z.object({
@@ -224,7 +234,7 @@ export const EditorIssueSchema = z.object({
   category: z.enum([
     'canon', 'timeline', 'location', 'resource', 'knowledge', 'authority',
     'pov', 'required_delta', 'causality', 'character_voice',
-    'prose_naturalness', 'scene_effect', 'prompt_leak',
+    'prose_naturalness', 'scene_effect', 'narrative_repetition', 'prompt_leak',
   ]),
   severity: z.enum(['critical', 'major', 'moderate']),
   scope: z.enum(['prose', 'plan', 'kernel']),
@@ -243,6 +253,7 @@ export const EditorAssessmentSchema = z.discriminatedUnion('status', [
     status: z.literal('pass'),
     issues: z.array(EditorIssueSchema).length(0),
     deltaChecks: z.array(deltaCheck.extend({ realized: z.literal(true) })).min(1).max(30),
+    outcome: ChapterOutcomeContentSchema,
   }).strict(),
   z.object({
     status: z.literal('revise'),
@@ -279,6 +290,7 @@ export const LaunchPackSchema = z.object({
 
 export type StoryKernel = z.infer<typeof StoryKernelSchema>;
 export type StoryState = z.infer<typeof StoryStateSchema>;
+export type ChapterOutcome = z.infer<typeof ChapterOutcomeSchema>;
 export type ArcPlan = z.infer<typeof ArcPlanSchema>;
 export type StateDelta = z.infer<typeof StateDeltaSchema>;
 export type ChapterPlan = z.infer<typeof ChapterPlanSchema>;

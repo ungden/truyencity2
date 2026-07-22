@@ -2,8 +2,8 @@ import { createHash } from 'node:crypto';
 import { FACTORY_PROMPT_VERSION } from './prompts';
 import { DEFAULT_MODEL_ROUTES } from './routes';
 
-export const FACTORY_CONTRACT_VERSION = 'story-factory-contracts-2';
-export const FACTORY_STATE_VERSION = 'story-factory-state-3';
+export const FACTORY_CONTRACT_VERSION = 'story-factory-contracts-3-outcomes-wire-1';
+export const FACTORY_STATE_VERSION = 'story-factory-state-4-narrative-outcomes';
 export const FACTORY_SETUP_VERSION = 'story-factory-setup-5-call-2';
 
 const identity = {

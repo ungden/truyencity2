@@ -149,6 +149,7 @@ export async function planRollingWindow(input: {
   arc: ArcPlan;
   state: StoryState;
   routes: ModelRoutes;
+  recoveryEvidence?: unknown;
   provider?: StoryModelProvider;
 }): Promise<{ rollingPlan: RollingPlan; usages: ProviderUsage[] }> {
   const provider = input.provider ?? geminiProvider;
@@ -162,7 +163,9 @@ export async function planRollingWindow(input: {
       system: PLANNER_SYSTEM_PROMPT,
       prompt: JSON.stringify({
         task: attempt === 1
-          ? 'Lập từ một đến năm chương tiếp theo, không vượt quá cuối arc.'
+          ? input.recoveryEvidence
+            ? 'Lập lại toàn bộ rolling window chưa commit từ state hiện tại; xử lý bằng chứng cho thấy plan trước không tạo tiến triển mới.'
+            : 'Lập từ một đến năm chương tiếp theo, không vượt quá cuối arc.'
           : 'Tạo lại toàn bộ rolling window và sửa đúng các validation issue; không vá cục bộ.',
         kernel: input.kernel,
         arc: input.arc,
@@ -170,6 +173,7 @@ export async function planRollingWindow(input: {
         nextChapter: input.state.chapterNumber + 1,
         maximumEndChapter: input.arc.plannedEndChapter,
         compactContract: PLANNER_COMPACT_CONTRACT,
+        recoveryEvidence: input.recoveryEvidence,
         previousResponse: attempt === 1 ? undefined : previousResponse,
         validationIssues: attempt === 1 ? undefined : validationIssues,
       }),
@@ -192,7 +196,7 @@ export async function planRollingWindow(input: {
   throw lastError ?? new StoryFactoryError('plan_blocked', 'Planner repair budget was exhausted.');
 }
 
-export async function reviewTenChapterWindow(input: {
+export async function reviewFiveChapterWindow(input: {
   kernel: StoryKernel;
   arc: ArcPlan;
   state: StoryState;
@@ -200,13 +204,13 @@ export async function reviewTenChapterWindow(input: {
   routes: ModelRoutes;
   provider?: StoryModelProvider;
 }): Promise<{ review: WindowReview; usage: ProviderUsage }> {
-  if (input.chapters.length !== 10) throw new Error('Window review requires exactly ten committed chapters.');
+  if (input.chapters.length !== 5) throw new Error('Window review requires exactly five committed chapters.');
   const provider = input.provider ?? geminiProvider;
   const result = await provider.json({
     model: input.routes.editor,
-    system: `${EDITOR_SYSTEM_PROMPT}\nỞ chế độ window review, chỉ kiểm drift, lặp và tiến triển trong mười chương; không chấm lại từng chương.`,
+    system: `${EDITOR_SYSTEM_PROMPT}\nỞ chế độ window review, chỉ kiểm drift, lặp và tiến triển trong năm chương; không chấm lại từng chương.`,
     prompt: JSON.stringify({
-      task: 'Kiểm tra cửa sổ mười chương vừa commit.',
+      task: 'Kiểm tra cửa sổ năm chương vừa commit.',
       kernelIdentity: {
         protagonistId: input.kernel.protagonistId,
         characters: input.kernel.characters,

@@ -10,9 +10,12 @@ import {
   StoryFactoryError,
   FIRST_30_PORTFOLIO,
   materializePlannerRollingPlan,
+  materializeEditorAssessment,
   nextRunAfterNonChapterStage,
   PlannerRollingPlanResponseSchema,
+  appendAcceptedOutcome,
   applyChapterPlan,
+  buildChapterContexts,
   buildWriterBrief,
   isStoryFactoryEnabled,
   runConceptLab,
@@ -55,7 +58,7 @@ const kernel: StoryKernel = {
 };
 
 const initialState: StoryState = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   chapterNumber: 0,
   storyTimeMinutes: 0,
   facts: [{ id: 'fact_day', value: 'ngay_0' }],
@@ -66,8 +69,28 @@ const initialState: StoryState = {
   ],
   resources: [{ resourceId: 'money', kind: 'numeric', value: 100 }],
   promises: [{ promiseId: 'promise_house', status: 'open' }],
-  recentEvents: [],
+  recentOutcomes: [],
 };
+
+function acceptedOutcome(evidence: string) {
+  return {
+    event: 'Hải biến quyết định thành một hành động cụ thể.',
+    result: 'Gia đình bắt đầu thực hiện công việc đã thống nhất.',
+    method: 'chia việc và kiểm tra nguồn lực',
+    endingSituation: 'Công việc đã khởi động và tạo trạng thái mới.',
+    evidenceSpans: [evidence],
+  };
+}
+
+function editorWirePass(deltaId: string, evidence: string) {
+  return {
+    v: 1 as const,
+    status: 'pass' as const,
+    issuesJson: [],
+    deltaChecksJson: [JSON.stringify({ deltaId, realized: true, evidence })],
+    outcomeJson: JSON.stringify(acceptedOutcome(evidence)),
+  };
+}
 
 const arc: ArcPlan = {
   schemaVersion: 1, arcNumber: 1, startChapter: 1, plannedEndChapter: 20,
@@ -147,29 +170,42 @@ describe('canonical Story Factory', () => {
   test('Writer context excludes research, ending contract and editor rubric', () => {
     const state = structuredClone(initialState);
     state.facts.push({ id: 'prior_decision', value: 'Người mua đã đồng ý giao dịch ở chương trước.' });
+    state.recentOutcomes.push({
+      chapterNumber: 1,
+      title: 'Cách giữ lạnh đã dùng',
+      event: 'Hải đã giải quyết việc giữ lạnh cho mẻ hàng.',
+      result: 'Thùng hàng đã giữ được độ tươi.',
+      method: 'lót trấu và xơ dừa quanh thùng',
+      endingSituation: 'Mẻ hàng sẵn sàng chuyển sang tìm đầu ra.',
+      evidenceSpans: ['lót trấu và xơ dừa'],
+    });
     const brief = JSON.stringify(buildWriterBrief({ kernel, state, plan: plan(1) }));
     expect(brief).not.toContain('endingDirection');
     expect(brief).not.toContain('research');
     expect(brief).not.toContain('rubric');
     expect(brief).not.toContain('promisesToResolve');
+    expect(brief).not.toContain('lót trấu và xơ dừa');
     expect(brief).toContain('prior_decision');
+    const contexts = buildChapterContexts({ kernel, state, plan: plan(1) });
+    expect(JSON.stringify(contexts.editorState)).toContain('lót trấu và xơ dừa');
   });
 
   test('normal chapter uses two calls and has no word-count publication gate', async () => {
     const draft = { title: 'Mẻ hàng đầu tiên', content: 'Hải đặt rổ xuống giữa nhà. Anh không hứa suông mà chia việc, kiểm lại số tiền rồi cùng mẹ bắt tay làm ngay trong buổi sáng.' };
-    const pass = { status: 'pass', issues: [], deltaChecks: [{ deltaId: 'delta_1', realized: true, evidence: 'chia việc' }] };
+    const pass = editorWirePass('delta_1', 'chia việc');
     const provider = new QueueProvider([draft, pass]);
     const result = await writeStoryChapter({ kernel, state: initialState, plan: plan(1), routes, provider });
     expect(provider.calls).toEqual(['writer', 'editor']);
     expect(result.decision).toBe('publish');
+    expect(result.stateAfter.recentOutcomes[0]).toMatchObject({ chapterNumber: 1, method: 'chia việc và kiểm tra nguồn lực' });
     expect(result.wordCount).toBeLessThan(100);
   });
 
   test('revision is a full draft and requires a fourth re-editor call', async () => {
     const first = { title: 'Bản đầu', content: 'Hải nhìn required delta trên chapter brief rồi bắt đầu làm việc trong căn nhà nhỏ.' };
-    const firstPass = { status: 'pass', issues: [], deltaChecks: [{ deltaId: 'delta_1', realized: true, evidence: 'bắt đầu làm việc' }] };
+    const firstPass = editorWirePass('delta_1', 'bắt đầu làm việc');
     const revised = { title: 'Bắt tay vào việc', content: 'Hải trải tấm lưới lên hiên, chỉ cho mẹ phần rách cần vá rồi lấy đúng số tiền dành mua muối. Căn nhà lập tức có việc để làm.' };
-    const finalPass = { status: 'pass', issues: [], deltaChecks: [{ deltaId: 'delta_1', realized: true, evidence: 'có việc để làm' }] };
+    const finalPass = editorWirePass('delta_1', 'có việc để làm');
     const provider = new QueueProvider([first, firstPass, revised, finalPass]);
     const result = await writeStoryChapter({ kernel, state: initialState, plan: plan(1), routes, provider });
     expect(provider.calls).toEqual(['writer', 'editor', 'writer', 'editor']);
@@ -178,8 +214,27 @@ describe('canonical Story Factory', () => {
   });
 
   test('Editor pass cannot contain an issue or false delta', () => {
-    expect(EditorAssessmentSchema.safeParse({ status: 'pass', issues: [{ category: 'causality' }], deltaChecks: [{ deltaId: 'delta_1', realized: true, evidence: '' }] }).success).toBe(false);
-    expect(EditorAssessmentSchema.safeParse({ status: 'pass', issues: [], deltaChecks: [{ deltaId: 'delta_1', realized: false, evidence: '' }] }).success).toBe(false);
+    expect(EditorAssessmentSchema.safeParse({ status: 'pass', issues: [{ category: 'causality' }], deltaChecks: [{ deltaId: 'delta_1', realized: true, evidence: '' }], outcome: acceptedOutcome('evidence') }).success).toBe(false);
+    expect(EditorAssessmentSchema.safeParse({ status: 'pass', issues: [], deltaChecks: [{ deltaId: 'delta_1', realized: false, evidence: '' }], outcome: acceptedOutcome('evidence') }).success).toBe(false);
+  });
+
+  test('compact Editor wire materializes into the canonical evidence contract', () => {
+    const assessment = materializeEditorAssessment(editorWirePass('delta_1', 'chia việc'));
+    expect(assessment).toMatchObject({ status: 'pass', outcome: { method: 'chia việc và kiểm tra nguồn lực' } });
+    expect(() => materializeEditorAssessment({
+      ...editorWirePass('delta_1', 'chia việc'),
+      outcomeJson: null,
+    })).toThrow(StoryFactoryError);
+  });
+
+  test('accepted outcome evidence must exist verbatim in prose', () => {
+    const transitioned = applyChapterPlan({ kernel, state: initialState, plan: plan(1) }).state;
+    expect(() => appendAcceptedOutcome({
+      state: transitioned,
+      title: 'Chương thử',
+      content: 'Đây là nội dung thực tế của chương.',
+      outcome: acceptedOutcome('một đoạn không tồn tại'),
+    })).toThrow(StoryFactoryError);
   });
 
   test('Gemini structured-output schema keeps only provider-supported bounds', () => {
@@ -222,10 +277,24 @@ describe('canonical Story Factory', () => {
   test('state remains bounded across 1,200 transitions', () => {
     let state = structuredClone(initialState);
     for (let chapterNumber = 1; chapterNumber <= 1_200; chapterNumber += 1) {
-      state = applyChapterPlan({ kernel, state, plan: plan(chapterNumber) }).state;
+      const prose = `Chương ${chapterNumber} đã thực hiện một bước tiến có nguyên nhân.`;
+      const transitioned = applyChapterPlan({ kernel, state, plan: plan(chapterNumber) }).state;
+      state = appendAcceptedOutcome({
+        state: transitioned,
+        title: `Chương ${chapterNumber}`,
+        content: prose,
+        outcome: {
+          event: `Nhân vật thực hiện bước tiến ở chương ${chapterNumber}.`,
+          result: `Trạng thái truyện đổi sang mốc ${chapterNumber}.`,
+          method: 'hành động có nguyên nhân',
+          endingSituation: `Truyện đứng ở cuối chương ${chapterNumber}.`,
+          evidenceSpans: [prose],
+        },
+      });
     }
     expect(state.chapterNumber).toBe(1_200);
-    expect(state.recentEvents).toHaveLength(20);
+    expect(state.recentOutcomes).toHaveLength(12);
+    expect(state.recentOutcomes[0].chapterNumber).toBe(1_189);
     expect(state.facts).toHaveLength(1);
   });
 

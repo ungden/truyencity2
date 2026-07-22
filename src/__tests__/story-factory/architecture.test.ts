@@ -32,4 +32,14 @@ describe('Story Factory architecture boundary', () => {
     expect(pipeline).not.toMatch(/min(?:imum)?Words|max(?:imum)?Words|targetWord/i);
     expect(provider).not.toMatch(/fallback|openrouter|deepseek/i);
   });
+
+  test('narrative outcomes stay out of Writer context and each rolling window is reviewed', () => {
+    const context = readFileSync('src/services/story-factory/context.ts', 'utf8');
+    const writerBriefBody = context.slice(context.indexOf('export function buildWriterBrief'), context.indexOf('export function selectPreviousTail'));
+    expect(writerBriefBody).not.toContain('recentOutcomes');
+    expect(context).toContain('recentOutcomes: input.state.recentOutcomes');
+    const migration = readFileSync('supabase/migrations/20260722072832_canonical_story_outcomes.sql', 'utf8');
+    expect(migration).toContain('p_expected_chapter % 5 = 0');
+    expect(migration).not.toContain('p_expected_chapter % 10 = 0');
+  });
 });
