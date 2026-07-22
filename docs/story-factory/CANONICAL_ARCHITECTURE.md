@@ -33,6 +33,8 @@ There are exactly four story artifacts:
 
 Research, market taxonomy and reference works exist only in Concept Lab. They never enter Writer context.
 
+Concept Lab uses six calls with clean responsibilities: two independent generators, one blind judge, one Google-Search-grounded technical dossier for the top two concepts, one structured opening/domain simulator, and one Launch Architect. Launch creates only Kernel, first Arc and initial State. The normal Planner owns every rolling plan, including chapters 1-5. Grounding queries and source URLs stay in immutable setup telemetry and never enter Writer context.
+
 ### Three kinds of memory, not three subsystems
 
 - **Physical memory:** current facts, time, locations, knowledge, relationships, resources and promises in `StoryState`; immutable deltas in `story_state_events`.
@@ -54,7 +56,9 @@ The Writer does not receive recent outcomes. The Planner and Editor do. This pre
 
 ```text
 claim job
-  -> validate Kernel / Arc / State / rollingPlan
+  -> validate Kernel / Arc / State
+  -> render deterministic cover background/title when missing
+  -> validate or create rollingPlan
   -> plan up to five chapters when needed
   -> Writer(previous prose tail + small mechanical brief)
   -> deterministic preflight
@@ -65,6 +69,8 @@ claim job
 ```
 
 Normal chapters use two model calls. A prose repair uses four. There is no local patch, model/provider switch, old-draft publication or content fallback.
+
+Timeline is mechanical: each scene has a positive duration, travel consumes time, and `storyTimeAfterMinutes` cannot be earlier than State time plus all planned scene/travel minutes. Every five-chapter review runs before daily-quota delay; quota controls new chapters, not quality gates.
 
 If the Editor proves that the plan itself repeats a recently completed problem/method or contradicts canon, the Writer is not asked to repair the artifact. The uncommitted rolling window is discarded and may be replanned once with the evidence. A second plan failure blocks the job.
 
@@ -114,4 +120,3 @@ None of these changes canon or selects a fallback provider.
 - 100 chapters: repeated rolling plans and multiple arc transitions survive.
 - Five stories × 100 chapters: open the first 30-story cohort.
 - One story completed within 800–1,200 chapters: only then is the full lifecycle proven.
-

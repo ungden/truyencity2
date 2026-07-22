@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import {
   EditorAssessmentSchema,
+  LaunchPackSchema,
   type ArcPlan,
   type ChapterPlan,
   type LaunchPack,
@@ -86,9 +87,9 @@ function editorWirePass(deltaId: string, evidence: string) {
   return {
     v: 1 as const,
     status: 'pass' as const,
-    issuesJson: [],
-    deltaChecksJson: [JSON.stringify({ deltaId, realized: true, evidence })],
-    outcomeJson: JSON.stringify(acceptedOutcome(evidence)),
+    issues: [],
+    deltaChecks: [{ deltaId, realized: true, evidence }],
+    outcome: acceptedOutcome(evidence),
   };
 }
 
@@ -132,7 +133,10 @@ const usage = { model: 'test', inputTokens: 1, outputTokens: 1, costUsd: 0, fini
 class QueueProvider implements StoryModelProvider {
   calls: string[] = [];
   constructor(private readonly values: unknown[]) {}
-  async text(): Promise<ProviderResult<string>> { throw new Error('unused'); }
+  async text(input: { model: string }): Promise<ProviderResult<string>> {
+    this.calls.push(input.model);
+    return { value: z.string().parse(this.values.shift()), usage };
+  }
   async json<T>(input: { model: string; schema: z.ZodType<T, z.ZodTypeDef, unknown> }): Promise<ProviderResult<T>> {
     this.calls.push(input.model);
     const value = this.values.shift();
@@ -165,6 +169,43 @@ describe('canonical Story Factory', () => {
     chapter.requiredDeltas = [{ id: 'spend', kind: 'resource_numeric', resourceId: 'money', before: 100, delta: -120, after: -20, source: null, sink: 'mua dụng cụ' }];
     chapter.scenes[0].requiredDeltaIds = ['spend'];
     expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).toThrow(StoryFactoryError);
+  });
+
+  test('rejects a planned transaction that has no resource delta', () => {
+    const chapter = plan(1);
+    chapter.scenes[0].action = 'Hải trả tiền mặt để thu mua toàn bộ mẻ cá.';
+    chapter.requiredDeltas = [{ id: 'move', kind: 'location', characterId: 'main', beforeLocationId: 'home', afterLocationId: 'beach' }];
+    chapter.scenes[0].locationId = 'beach';
+    chapter.scenes[0].travelMinutesFromPrevious = 20;
+    chapter.storyTimeAfterMinutes = 80;
+    chapter.scenes[0].requiredDeltaIds = ['move'];
+    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).toThrow('transaction without a numeric resource delta');
+  });
+
+  test('does not book a transaction when a scene only analyzes a future purchase', () => {
+    const chapter = plan(1);
+    chapter.scenes[0].action = 'Hải phân tích việc gánh bộ quá sức và cần mua xe kéo chở hàng.';
+    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
+  });
+
+  test('allows a connective scene without inventing a fake state delta', () => {
+    const chapter = plan(1);
+    chapter.scenes.unshift({
+      ...chapter.scenes[0],
+      id: 'scene_connective',
+      objective: 'Quan sát tình hình trước khi quyết định.',
+      obstacle: 'Thông tin tại chỗ còn thiếu.',
+      action: 'Hải kiểm tra bãi ngang rồi trở về bàn việc.',
+      requiredDeltaIds: [],
+    });
+    chapter.storyTimeAfterMinutes = 120;
+    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
+  });
+
+  test('rejects a chapter whose scenes require more time than the timeline advances', () => {
+    const chapter = plan(1);
+    chapter.storyTimeAfterMinutes = 0;
+    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).toThrow('ends before its planned scenes can occur');
   });
 
   test('Writer context excludes research, ending contract and editor rubric', () => {
@@ -201,6 +242,53 @@ describe('canonical Story Factory', () => {
     expect(result.wordCount).toBeLessThan(100);
   });
 
+  test('outcome evidence remains grounded across harmless typography normalization', () => {
+    const transitioned = applyChapterPlan({ kernel, state: initialState, plan: plan(1) }).state;
+    const state = appendAcceptedOutcome({
+      state: transitioned,
+      title: 'Lời đồng ý',
+      content: 'Bà Lành nói: “Con cứ làm đi.”\n\nHải gật đầu rồi chia việc.',
+      outcome: acceptedOutcome('"Bà Lành nói: Con cứ làm đi! Hải gật đầu"'),
+    });
+    expect(state.recentOutcomes).toHaveLength(1);
+  });
+
+  test('outcome evidence still rejects words that are absent from prose', () => {
+    const transitioned = applyChapterPlan({ kernel, state: initialState, plan: plan(1) }).state;
+    expect(() => appendAcceptedOutcome({
+      state: transitioned,
+      title: 'Lời đồng ý',
+      content: 'Bà Lành lắc đầu. Hải chưa thể bắt tay làm.',
+      outcome: acceptedOutcome('Bà Lành đồng ý đưa hết tiền cho Hải.'),
+    })).toThrow('sufficiently grounded prose anchor');
+  });
+
+  test('outcome evidence accepts ordered verbatim excerpts separated by an ellipsis', () => {
+    const transitioned = applyChapterPlan({ kernel, state: initialState, plan: plan(1) }).state;
+    const content = 'Hai thúng cá đã được phân loại tinh tươm. Hải gọi mẹ ra xem rồi kê chúng lên phản gỗ. Cơ nghiệp của anh chính thức bắt đầu từ mẻ hàng này.';
+    const state = appendAcceptedOutcome({
+      state: transitioned,
+      title: 'Mẻ hàng',
+      content,
+      outcome: acceptedOutcome('Hai thúng cá đã được phân loại tinh tươm... Cơ nghiệp của anh chính thức bắt đầu từ mẻ hàng này.'),
+    });
+    expect(content).toContain(state.recentOutcomes[0].evidenceSpans[0]);
+  });
+
+  test('code stores a prose slice instead of a model-altered evidence quote', () => {
+    const transitioned = applyChapterPlan({ kernel, state: initialState, plan: plan(1) }).state;
+    const content = 'Ta không xin nước của hồ. Ta dùng nước của chính mình để cứu ruộng.';
+    const state = appendAcceptedOutcome({
+      state: transitioned,
+      title: 'Nguồn nước',
+      content,
+      outcome: acceptedOutcome('Tôi không xin nước của hồ, Tôi dùng nước của tôi'),
+    });
+    const stored = state.recentOutcomes[0].evidenceSpans[0];
+    expect(content).toContain(stored);
+    expect(stored).toBe('không xin nước của hồ');
+  });
+
   test('revision is a full draft and requires a fourth re-editor call', async () => {
     const first = { title: 'Bản đầu', content: 'Hải nhìn required delta trên chapter brief rồi bắt đầu làm việc trong căn nhà nhỏ.' };
     const firstPass = editorWirePass('delta_1', 'bắt đầu làm việc');
@@ -218,13 +306,26 @@ describe('canonical Story Factory', () => {
     expect(EditorAssessmentSchema.safeParse({ status: 'pass', issues: [], deltaChecks: [{ deltaId: 'delta_1', realized: false, evidence: '' }], outcome: acceptedOutcome('evidence') }).success).toBe(false);
   });
 
-  test('compact Editor wire materializes into the canonical evidence contract', () => {
+  test('flat Editor wire materializes into the canonical evidence contract', () => {
     const assessment = materializeEditorAssessment(editorWirePass('delta_1', 'chia việc'));
     expect(assessment).toMatchObject({ status: 'pass', outcome: { method: 'chia việc và kiểm tra nguồn lực' } });
     expect(() => materializeEditorAssessment({
       ...editorWirePass('delta_1', 'chia việc'),
-      outcomeJson: null,
-    })).toThrow(StoryFactoryError);
+      status: 'revise',
+      outcome: { event: '', result: '', method: '', endingSituation: '', evidenceSpans: [] },
+    })).toThrow();
+  });
+
+  test('code derives revise when model says pass but also returns an issue', () => {
+    const assessment = materializeEditorAssessment({
+      ...editorWirePass('delta_1', 'chia việc'),
+      issues: [{
+        category: 'resource', severity: 'major', scope: 'prose',
+        evidence: 'tự bán thêm hàng',
+        instruction: 'Bỏ giao dịch không có trong required delta.',
+      }],
+    });
+    expect(assessment).toMatchObject({ status: 'revise', issues: [{ category: 'resource' }] });
   });
 
   test('accepted outcome evidence must exist verbatim in prose', () => {
@@ -240,6 +341,14 @@ describe('canonical Story Factory', () => {
   test('Gemini structured-output schema keeps only provider-supported bounds', () => {
     const schema = toGeminiResponseSchema(z.object({ arcNumber: z.number().int().positive() }).strict());
     expect((schema.properties as Record<string, Record<string, unknown>>).arcNumber.exclusiveMinimum).toBeUndefined();
+  });
+
+  test('Launch Architect schema exposes the initial arc boundary to the provider', () => {
+    const schema = toGeminiResponseSchema(LaunchPackSchema);
+    const arc = (schema.properties as Record<string, { properties?: Record<string, Record<string, unknown>> }>).arc;
+    expect(arc.properties?.startChapter.enum).toEqual([1]);
+    expect(arc.properties?.plannedEndChapter.minimum).toBe(20);
+    expect(arc.properties?.plannedEndChapter.maximum).toBe(30);
   });
 
   test('Planner provider schema avoids the rejected nested delta union', () => {
@@ -317,7 +426,7 @@ describe('canonical Story Factory', () => {
       .toBe('2026-07-22T17:00:00.000Z');
   });
 
-  test('Concept Lab performs exactly five calls and validates the launch pack', async () => {
+  test('Concept Lab grounds top concepts in six calls and validates the launch pack', async () => {
     const candidate = (id: string) => ({
       id, workingTitle: `Tên truyện trực diện ${id}`, premise: 'Một premise đủ dài để kiểm tra khả năng triển khai truyện nối tiếp.',
       protagonistContradiction: 'Muốn cứu gia đình nhưng không thể dựa mãi vào ký ức tương lai.',
@@ -333,22 +442,41 @@ describe('canonical Story Factory', () => {
     const pack: LaunchPack = {
       schemaVersion: 1, selectedConceptId: selected.id,
       kernel: { ...kernel, mechanismFingerprint: selected.mechanismFingerprint, rewardLoopFingerprint: selected.rewardLoopFingerprint, conflictEconomyFingerprint: selected.conflictEconomyFingerprint },
-      arc, initialState,
-      initialRollingPlan: { schemaVersion: 1, startChapter: 1, plans: [1, 2, 3, 4, 5].map(number => plan(number)) },
+      arc: { ...arc, startChapter: 1 }, initialState,
       coverPrompt: 'Một làng biển Việt Nam cuối thập niên tám mươi lúc bình minh, thuyền gỗ và sân phơi cá, không chữ.',
     };
-    const simulations = [a[0], b[0]].map(item => ({ conceptId: item.id, chapter1: 'Mở đầu bằng một quyết định có hậu quả vật chất rõ ràng.', chapter2: 'Gia đình cùng lao động và gặp giới hạn đầu tiên của nghề.', chapter3: 'Mẻ hàng đầu tiên tạo lợi ích cụ thể và mở xung đột đầu ra.', serialStrength: 'Cơ chế có thể đổi sản phẩm, kỹ thuật, khách hàng và quy mô.', causalRisk: 'Ký ức tương lai cần giữ sai số và không biến thành toàn tri.' }));
+    const simulations = [a[0], b[0]].map(item => ({
+      conceptId: item.id,
+      chapter1: 'Mở đầu bằng một quyết định có hậu quả vật chất rõ ràng.',
+      chapter2: 'Gia đình cùng lao động và gặp giới hạn đầu tiên của nghề.',
+      chapter3: 'Mẻ hàng đầu tiên tạo lợi ích cụ thể và mở xung đột đầu ra.',
+      serialStrength: 'Cơ chế có thể đổi sản phẩm, kỹ thuật, khách hàng và quy mô.',
+      causalRisk: 'Ký ức tương lai cần giữ sai số và không biến thành toàn tri.',
+      domainFeasibility: 'pass' as const,
+      requiredInfrastructure: ['Dụng cụ thủ công và nguồn nguyên liệu địa phương có thật.'],
+      minimumPlausibleTimeline: 'Ba chương chỉ hoàn tất một mẻ thử nhỏ, chưa xây xưởng hoàn chỉnh.',
+      criticalAssumptions: ['Nhân vật phải lao động và trả đủ chi phí đầu vào.'],
+    }));
+    const launchWire = {
+      v: 1 as const,
+      selectedConceptId: pack.selectedConceptId,
+      kernelJson: JSON.stringify(pack.kernel),
+      arcJson: JSON.stringify(pack.arc),
+      initialStateJson: JSON.stringify(pack.initialState),
+      coverPrompt: pack.coverPrompt,
+    };
     const provider = new QueueProvider([
       { candidates: a }, { candidates: b },
       { selectedIds: [a[0].id, b[0].id], reasons: ['Cơ chế A rõ và dài hơi.', 'Cơ chế B có conflict economy tốt.'] },
-      { simulations }, pack,
+      'Nguồn kỹ thuật xác nhận dụng cụ thủ công khả thi nhưng yêu cầu vệ sinh, thời gian và chi phí thật.',
+      { simulations }, launchWire,
     ]);
     const result = await runConceptLab({
       commission: { slotKey: 'canary-01', genreLane: 'do-thi-nien-dai', audience: 'Độc giả nam nhưng nữ cũng đọc được.', tone: 'Khoái hoạt, chủ động và đời sống ấm.', settingBoundary: 'Việt Nam hư cấu, nghề nghiệp dựa trên thực tế.' },
       research: { snapshotId: 'research-01', lane: 'do-thi-nien-dai', capturedAt: new Date().toISOString(), signals: [1, 2, 3].map(index => ({ id: `signal_${index}`, sourceUrl: `https://example.com/${index}`, observation: 'Một quan sát thị trường đủ chi tiết và không chứa tác phẩm để sao chép.' })) },
       routes, provider,
     });
-    expect(provider.calls).toHaveLength(5);
+    expect(provider.calls).toHaveLength(6);
     expect(result.launchPack.selectedConceptId).toBe('a1');
   });
 });

@@ -14,7 +14,7 @@ import { buildChapterContexts, buildRevisionContext, type ContextManifestEntry }
 import type { ProviderUsage, StoryModelProvider } from './provider';
 import { geminiProvider } from './provider';
 import { EDITOR_SYSTEM_PROMPT, REVISION_SYSTEM_PROMPT, WRITER_SYSTEM_PROMPT } from './prompts';
-import { appendAcceptedOutcome, applyChapterPlan, type StateEvent } from './validation';
+import { appendAcceptedOutcome, applyChapterPlan, groundEvidenceSpan, type StateEvent } from './validation';
 
 export const ChapterDraftSchema = z.object({
   title: z.string().trim().min(2).max(180),
@@ -25,37 +25,45 @@ export type ChapterDraft = z.infer<typeof ChapterDraftSchema>;
 const EditorWireDeltaCheckSchema = z.object({
   deltaId: z.string(),
   realized: z.boolean(),
-  evidence: z.string(),
+  evidence: z.string().max(200),
+}).strict();
+
+const EditorWireOutcomeSchema = z.object({
+  event: z.string().max(400),
+  result: z.string().max(400),
+  method: z.string().max(400),
+  endingSituation: z.string().max(400),
+  evidenceSpans: z.array(z.string().max(200)).max(4),
 }).strict();
 
 export const EditorWireAssessmentSchema = z.object({
   v: z.literal(1),
   status: z.enum(['pass', 'revise']),
-  issuesJson: z.array(z.string()).max(3),
-  deltaChecksJson: z.array(z.string()).min(1).max(30),
-  outcomeJson: z.string().nullable(),
+  issues: z.array(EditorIssueSchema).max(3),
+  deltaChecks: z.array(EditorWireDeltaCheckSchema).min(1).max(30),
+  outcome: EditorWireOutcomeSchema,
 }).strict();
 
 const EDITOR_WIRE_CONTRACT = {
-  serialization: 'Mỗi phần tử issuesJson/deltaChecksJson và outcomeJson là đúng một JSON object đã stringify, không markdown.',
-  issueFields: ['category', 'severity', 'scope', 'evidence', 'instruction'],
-  deltaCheckFields: ['deltaId', 'realized', 'evidence'],
-  outcomeFields: ['event', 'result', 'method', 'endingSituation', 'evidenceSpans'],
-  pass: 'status=pass, issuesJson=[], mọi delta realized=true, outcomeJson là JSON string hợp lệ.',
-  revise: 'status=revise, issuesJson có 1-3 phần tử, outcomeJson=null.',
+  pass: 'status=pass, issues=[], mọi deltaChecks.realized=true, outcome có nội dung và evidenceSpans nguyên văn.',
+  revise: 'status=revise, issues có 1-3 phần tử; để mọi trường chuỗi của outcome rỗng và evidenceSpans=[].',
 } as const;
 
 export function materializeEditorAssessment(value: z.infer<typeof EditorWireAssessmentSchema>): EditorAssessment {
   const wire = EditorWireAssessmentSchema.parse(value);
-  const issues = wire.issuesJson.map(raw => EditorIssueSchema.parse(JSON.parse(raw)));
-  const deltaChecks = wire.deltaChecksJson.map(raw => EditorWireDeltaCheckSchema.parse(JSON.parse(raw)));
-  if (wire.status === 'pass') {
-    if (!wire.outcomeJson) throw new StoryFactoryError('infra_blocked', 'Editor pass omitted the chapter outcome.');
-    const outcome = ChapterOutcomeContentSchema.parse(JSON.parse(wire.outcomeJson));
-    return EditorAssessmentSchema.parse({ status: 'pass', issues, deltaChecks, outcome });
+  const failedDeltas = wire.deltaChecks.filter(check => !check.realized);
+  if (wire.issues.length === 0 && failedDeltas.length === 0) {
+    const outcome = ChapterOutcomeContentSchema.parse(wire.outcome);
+    return EditorAssessmentSchema.parse({ status: 'pass', issues: wire.issues, deltaChecks: wire.deltaChecks, outcome });
   }
-  if (wire.outcomeJson !== null) throw new StoryFactoryError('infra_blocked', 'Editor revise unexpectedly returned a chapter outcome.');
-  return EditorAssessmentSchema.parse({ status: 'revise', issues, deltaChecks });
+  const issues = wire.issues.length > 0 ? wire.issues : failedDeltas.slice(0, 3).map(check => ({
+    category: 'required_delta' as const,
+    severity: 'major' as const,
+    scope: 'prose' as const,
+    evidence: check.evidence.trim() || `Delta ${check.deltaId} chưa có bằng chứng trong prose.`,
+    instruction: `Viết lại để thực hiện rõ required delta ${check.deltaId}.`,
+  }));
+  return EditorAssessmentSchema.parse({ status: 'revise', issues, deltaChecks: wire.deltaChecks });
 }
 
 interface PreflightIssue {
@@ -170,6 +178,24 @@ async function assess(input: {
   } catch (error) {
     if (error instanceof StoryFactoryError) throw error;
     throw new StoryFactoryError('infra_blocked', 'Editor output failed the exact application contract.', error instanceof z.ZodError ? error.issues : undefined);
+  }
+  if (assessment.status === 'pass') {
+    const deltaChecks = assessment.deltaChecks.map(check => ({
+      ...check,
+      evidence: groundEvidenceSpan(input.draft.content, check.evidence),
+    }));
+    const evidenceSpans = assessment.outcome.evidenceSpans.map(span => groundEvidenceSpan(input.draft.content, span));
+    if (deltaChecks.some(check => check.evidence === null) || evidenceSpans.some(span => span === null)) {
+      throw new StoryFactoryError('infra_blocked', 'Editor pass contains an evidence anchor that code cannot ground in prose.', {
+        deltaChecks: deltaChecks.filter(check => check.evidence === null).map(check => check.deltaId),
+        outcomeSpans: assessment.outcome.evidenceSpans.filter((_, index) => evidenceSpans[index] === null),
+      });
+    }
+    assessment = EditorAssessmentSchema.parse({
+      ...assessment,
+      deltaChecks: deltaChecks.map(check => ({ ...check, evidence: check.evidence as string })),
+      outcome: { ...assessment.outcome, evidenceSpans: evidenceSpans as string[] },
+    });
   }
   assertDeltaCoverage(input.plan, assessment);
   return { assessment: mergePreflight(assessment, deterministicIssues), usage: response.usage };

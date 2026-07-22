@@ -15,7 +15,7 @@ import { generateFactoryCover } from './cover';
 import { writeStoryChapter } from './pipeline';
 import { planArcLifecycle, planRollingWindow, reviewFiveChapterWindow } from './planner';
 import type { ProviderUsage, StoryModelProvider } from './provider';
-import { STORY_FACTORY_RELEASE } from './release';
+import { FACTORY_PLANNER_VERSION, FACTORY_SETUP_VERSION, STORY_FACTORY_RELEASE } from './release';
 import { runConceptLab } from './setup';
 import type { SetupCheckpoint } from './setup';
 
@@ -102,6 +102,8 @@ async function blockRun(db: SupabaseClient, job: FactoryJobRow, runId: string | 
     ? error
     : new StoryFactoryError('infra_blocked', error instanceof Error ? error.message : String(error));
   if (runId) {
+    const evidence = factoryError.evidence as { usages?: unknown } | undefined;
+    const failedUsages = Array.isArray(evidence?.usages) ? evidence.usages as ProviderUsage[] : [];
     const existing = await db.from('story_factory_runs').select('output_artifact').eq('id', runId).single();
     const output = existing.data?.output_artifact && typeof existing.data.output_artifact === 'object'
       ? existing.data.output_artifact as Record<string, unknown>
@@ -111,6 +113,8 @@ async function blockRun(db: SupabaseClient, job: FactoryJobRow, runId: string | 
       error_code: factoryError.code,
       error_message: factoryError.message,
       output_artifact: { ...output, evidence: factoryError.evidence ?? null },
+      usage: failedUsages,
+      estimated_cost_usd: usageCost(failedUsages),
       finished_at: new Date().toISOString(),
     }).eq('id', runId).eq('status', 'running');
   }
@@ -229,15 +233,20 @@ async function runSetup(db: SupabaseClient, job: FactoryJobRow, project: Factory
     }).eq('id', job.novel_id);
     if (novelUpdate.error) throw novelUpdate.error;
     const jobUpdate = await db.from('story_factory_jobs').update({
-      status: 'ready', stage: 'cover', rolling_plan: pack.initialRollingPlan, setup_input: null,
+      status: 'ready', stage: 'cover', rolling_plan: null, setup_input: null,
       lease_owner: null, lease_token: null, lease_until: null, next_run_at: now, updated_at: now,
     }).eq('id', job.id).eq('lease_token', job.lease_token);
     if (jobUpdate.error) throw jobUpdate.error;
     const runUpdate = await db.from('story_factory_runs').update({
       status: 'passed',
       model_routes: routes,
-      input_artifact: { commission: setupInput.commission, research: setupInput.research, candidates: result.candidates },
-      output_artifact: { launchPack: pack, selectedConcept: result.selectedConcept },
+      input_artifact: {
+        setupRevision: FACTORY_SETUP_VERSION,
+        commission: setupInput.commission,
+        research: setupInput.research,
+        candidates: result.candidates,
+      },
+      output_artifact: { setupRevision: FACTORY_SETUP_VERSION, launchPack: pack, selectedConcept: result.selectedConcept },
       usage: result.usages,
       estimated_cost_usd: usageCost(result.usages),
       finished_at: now,
@@ -261,7 +270,7 @@ async function runCover(db: SupabaseClient, job: FactoryJobRow, project: Factory
     const novelUpdate = await db.from('novels').update({ cover_url: cover.coverUrl, updated_at: now }).eq('id', job.novel_id);
     if (novelUpdate.error) throw novelUpdate.error;
     const jobUpdate = await db.from('story_factory_jobs').update({
-      status: 'ready', stage: 'write', lease_owner: null, lease_token: null, lease_until: null, next_run_at: now, updated_at: now,
+      status: 'ready', stage: 'plan', lease_owner: null, lease_token: null, lease_until: null, next_run_at: now, updated_at: now,
     }).eq('id', job.id).eq('lease_token', job.lease_token);
     if (jobUpdate.error) throw jobUpdate.error;
     const runUpdate = await db.from('story_factory_runs').update({ status: 'passed', output_artifact: cover, finished_at: now }).eq('id', runId);
@@ -275,6 +284,10 @@ async function runCover(db: SupabaseClient, job: FactoryJobRow, project: Factory
 async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryProjectRow, provider?: StoryModelProvider): Promise<FactoryTickResult> {
   const runId = await createRun(db, job, 'plan', job.current_chapter + 1);
   try {
+    const versioned = await db.from('story_factory_runs').update({
+      input_artifact: { plannerRevision: FACTORY_PLANNER_VERSION },
+    }).eq('id', runId).eq('status', 'running');
+    if (versioned.error) throw versioned.error;
     const kernel = StoryKernelSchema.parse(project.story_kernel);
     const arc = ArcPlanSchema.parse(project.arc_plan);
     const state = StoryStateSchema.parse(project.story_state);
@@ -294,7 +307,8 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
     }).eq('id', job.id).eq('lease_token', job.lease_token);
     if (jobUpdate.error) throw jobUpdate.error;
     const runUpdate = await db.from('story_factory_runs').update({
-      status: 'passed', model_routes: { planner: routes.planner }, output_artifact: planned.rollingPlan,
+      status: 'passed', model_routes: { planner: routes.planner },
+      input_artifact: { plannerRevision: FACTORY_PLANNER_VERSION }, output_artifact: planned.rollingPlan,
       usage: planned.usages, estimated_cost_usd: usageCost(planned.usages), finished_at: now,
     }).eq('id', runId);
     if (runUpdate.error) throw runUpdate.error;

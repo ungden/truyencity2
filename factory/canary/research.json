@@ -1,7 +1,7 @@
 {
-  "snapshotId": "era-coastal-cn-market-2026-07-20",
+  "snapshotId": "era-coastal-market-domain-2026-07-22",
   "lane": "era_coastal",
-  "capturedAt": "2026-07-20T16:15:00.000Z",
+  "capturedAt": "2026-07-22T10:30:00.000Z",
   "signals": [
     {
       "id": "pressure_release",
@@ -17,6 +17,26 @@
       "id": "character_profession",
       "sourceUrl": "https://wyb.chinawriter.com.cn/content/202602/06/content82721.html",
       "observation": "Nhân vật, nghề nghiệp, hài hước và cảm xúc đời thường giúp truyện dài giữ sức sống tốt hơn việc chỉ lặp vòng nghiền ép và vả mặt đơn tuyến."
+    },
+    {
+      "id": "block_ice_cycle",
+      "sourceUrl": "https://www.fao.org/4/y5013e/y5013e05.htm",
+      "observation": "FAO mô tả đá cây là quy trình mẻ cần bồn nước muối, cụm ngưng tụ, máy nén, hệ điện và nhân công; riêng chu kỳ đông thường mất 8-36 giờ tùy kích thước, nên không thể mua một lốc máy phế liệu rồi sản xuất hàng loạt trong vài giờ."
+    },
+    {
+      "id": "ice_plant_infrastructure",
+      "sourceUrl": "https://www.fao.org/4/p3407e/P3407E05.htm",
+      "observation": "Một nhà máy đá cây thực tế cần khuôn đá ngâm trong bồn brine được làm lạnh, khâu tháo khuôn, kho chứa, điện, nước, diện tích và bảo trì; rapid-block nhanh hơn nhưng đắt và phức tạp hơn."
+    },
+    {
+      "id": "ammonia_safety",
+      "sourceUrl": "https://www.iiar.org/IIAR/IIAR/IIAR_Publications/IIAR_Bulletins/Bulletin_109.aspx",
+      "observation": "Hệ thống lạnh amoniac phải được thiết kế, lắp đặt và vận hành an toàn với máy nén, bình ngưng, dàn bay hơi, bình áp lực, đường ống, van an toàn và người có năng lực; rò rỉ không phải sự cố nhỏ có thể xử lý tùy tiện tại sân nhà."
+    },
+    {
+      "id": "passive_insulation_limit",
+      "sourceUrl": "https://www.fao.org/4/p3407e/P3407E05.htm",
+      "observation": "Vật liệu cách nhiệt chỉ làm chậm trao đổi nhiệt, không tự tạo nguồn lạnh. Nếu dùng thùng bảo ôn thụ động, setup phải nêu nhiệt độ ban đầu, nguồn làm mát hoặc giới hạn thời gian vận chuyển; không được tuyên bố xốp, mùn cưa hay muối ẩm tự giữ lạnh sâu 24 giờ trong khí hậu nóng."
     }
   ]
 }

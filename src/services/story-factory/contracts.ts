@@ -3,6 +3,7 @@ import { z } from 'zod';
 const stableId = z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/);
 const shortText = z.string().trim().min(2).max(160);
 const prose = z.string().trim().min(8).max(2_000);
+const mechanicalText = z.string().trim().min(2).max(1_000);
 
 export const VoiceContractSchema = z.object({
   register: shortText,
@@ -88,7 +89,7 @@ const storyFact = z.object({ id: stableId, value: z.string().trim().min(1).max(2
 export const ChapterOutcomeContentSchema = z.object({
   event: z.string().trim().min(5).max(400),
   result: z.string().trim().min(5).max(400),
-  method: z.string().trim().min(2).max(200).nullable(),
+  method: z.string().trim().min(2).max(400).nullable(),
   endingSituation: z.string().trim().min(5).max(400),
   evidenceSpans: z.array(z.string().trim().min(2).max(500)).min(1).max(4),
 }).strict();
@@ -120,7 +121,7 @@ export const StoryStateSchema = z.object({
   recentOutcomes: z.array(ChapterOutcomeSchema).max(12),
 }).strict();
 
-export const ArcPlanSchema = z.object({
+const arcPlanShape = {
   schemaVersion: z.literal(1),
   arcNumber: z.number().int().positive(),
   startChapter: z.number().int().positive(),
@@ -130,12 +131,23 @@ export const ArcPlanSchema = z.object({
   activeConflicts: z.array(prose).min(1).max(12),
   duePromiseIds: z.array(stableId).max(20),
   progression: z.array(prose).min(1).max(12),
-}).strict().superRefine((arc, ctx) => {
+} as const;
+
+export const ArcPlanSchema = z.object(arcPlanShape).strict().superRefine((arc, ctx) => {
   const length = arc.plannedEndChapter - arc.startChapter + 1;
   if (length < 20 || length > 30) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['plannedEndChapter'], message: 'An arc must span 20-30 chapters.' });
   }
 });
+
+// The first launch always starts at chapter one. Expressing the 20-30 chapter
+// range directly in JSON Schema prevents the provider from producing an arc
+// that application validation must reject after an otherwise expensive setup.
+const InitialArcPlanSchema = z.object({
+  ...arcPlanShape,
+  startChapter: z.literal(1),
+  plannedEndChapter: z.number().int().min(20).max(30),
+}).strict();
 
 const factDelta = z.object({
   id: stableId,
@@ -214,12 +226,12 @@ export const ChapterPlanSchema = z.object({
     povCharacterId: stableId,
     participantIds: z.array(stableId).min(1).max(16),
     locationId: stableId,
-    durationMinutes: z.number().int().nonnegative().max(10_000),
+    durationMinutes: z.number().int().min(1).max(10_000),
     travelMinutesFromPrevious: z.number().int().nonnegative().max(100_000),
-    objective: prose,
-    obstacle: prose,
-    action: prose,
-    requiredDeltaIds: z.array(stableId).min(1).max(20),
+    objective: mechanicalText,
+    obstacle: mechanicalText,
+    action: mechanicalText,
+    requiredDeltaIds: z.array(stableId).max(20),
   }).strict()).min(1).max(5),
   requiredDeltas: z.array(StateDeltaSchema).min(1).max(30),
 }).strict();
@@ -282,9 +294,8 @@ export const LaunchPackSchema = z.object({
   schemaVersion: z.literal(1),
   selectedConceptId: stableId,
   kernel: StoryKernelSchema,
-  arc: ArcPlanSchema,
+  arc: InitialArcPlanSchema,
   initialState: StoryStateSchema,
-  initialRollingPlan: RollingPlanSchema,
   coverPrompt: z.string().trim().min(20).max(2_000),
 }).strict();
 
