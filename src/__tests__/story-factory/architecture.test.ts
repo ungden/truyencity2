@@ -54,4 +54,12 @@ describe('Story Factory architecture boundary', () => {
     expect(setup).toContain('Mỗi concept.id phải là stable ID ASCII chữ thường');
     expect(setup).toContain('chỉ dùng a-z, 0-9, dấu gạch dưới hoặc gạch ngang');
   });
+
+  test('domain grounding constrains selection instead of auditing only after selection', () => {
+    const setup = readFileSync('src/services/story-factory/setup.ts', 'utf8');
+    expect(setup.indexOf("setupStage('Grounded Domain Research'"))
+      .toBeLessThan(setup.indexOf("setupStage('Blind Concept Judge'"));
+    expect(setup).toContain('Grounded Domain Research là ràng buộc');
+    expect(setup).toContain('concepts: candidates');
+  });
 });
