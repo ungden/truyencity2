@@ -42,4 +42,10 @@ describe('Story Factory architecture boundary', () => {
     expect(migration).toContain('p_expected_chapter % 5 = 0');
     expect(migration).not.toContain('p_expected_chapter % 10 = 0');
   });
+
+  test('Concept Generator receives the stable-ID rule that provider schemas cannot enforce', () => {
+    const setup = readFileSync('src/services/story-factory/setup.ts', 'utf8');
+    expect(setup).toContain('Mỗi concept.id phải là stable ID ASCII chữ thường');
+    expect(setup).toContain('chỉ dùng a-z, 0-9, dấu gạch dưới hoặc gạch ngang');
+  });
 });

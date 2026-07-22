@@ -4,7 +4,7 @@ import { DEFAULT_MODEL_ROUTES } from './routes';
 
 export const FACTORY_CONTRACT_VERSION = 'story-factory-contracts-3-outcomes-wire-1';
 export const FACTORY_STATE_VERSION = 'story-factory-state-4-narrative-outcomes';
-export const FACTORY_SETUP_VERSION = 'story-factory-setup-5-call-2';
+export const FACTORY_SETUP_VERSION = 'story-factory-setup-5-call-3-stable-id';
 
 const identity = {
   promptVersion: FACTORY_PROMPT_VERSION,
