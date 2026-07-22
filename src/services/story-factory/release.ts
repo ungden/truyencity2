@@ -4,7 +4,7 @@ import { DEFAULT_MODEL_ROUTES } from './routes';
 
 export const FACTORY_CONTRACT_VERSION = 'story-factory-contracts-10-chapter-level-state-change';
 export const FACTORY_STATE_VERSION = 'story-factory-state-4-narrative-outcomes';
-export const FACTORY_SETUP_VERSION = 'story-factory-setup-6-call-11-grounded-domain-dossier';
+export const FACTORY_SETUP_VERSION = 'story-factory-setup-6-call-12-ground-before-judge';
 export const FACTORY_PLANNER_VERSION = 'story-factory-planner-4-chapter-level-change-and-time';
 const FACTORY_ENGINE_SETUP_COMPATIBILITY = 'story-factory-setup-5-call-3-stable-id';
 

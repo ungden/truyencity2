@@ -222,12 +222,32 @@ export async function runConceptLab(input: {
     throw new StoryFactoryError('setup_blocked', 'Concept generators returned duplicate candidate IDs.');
   }
 
-  const ranking = checkpoint.ranking
+  const domainResearch = checkpoint.domainResearch
+    ? { value: z.string().min(20).parse(checkpoint.domainResearch.value), usage: checkpoint.domainResearch.usage }
+    : await setupStage('Grounded Domain Research', provider.text({
+      model: input.routes.openingSimulator,
+      system: `Bạn là technical researcher cho story setup. Dùng Google Search kiểm tra các claim kỹ thuật cốt lõi của mười hai concept trước khi Judge chọn.
+Ưu tiên cơ quan nhà nước, tiêu chuẩn, tài liệu học thuật hoặc tổ chức chuyên ngành. Nhóm các concept cùng cơ chế để báo cáo cô đọng; nêu rõ claim sai, hạ tầng, thời gian, năng lượng, vệ sinh/an toàn, nguồn lực và điều kiện tối thiểu. Không viết truyện, không chọn concept.`,
+      prompt: JSON.stringify({ commission, researchSignals: research.signals, concepts: candidates }),
+      temperature: 0.2,
+      grounding: 'google_search',
+    }));
+  checkpoint.domainResearch = domainResearch;
+  await input.onCheckpoint?.(structuredClone(checkpoint));
+  usages.push(domainResearch.usage);
+
+  const ranking = checkpoint.ranking && input.resume?.domainResearch
     ? { value: TopTwoSchema.parse(checkpoint.ranking.value), usage: checkpoint.ranking.usage }
     : await setupStage('Blind Concept Judge', provider.json({
     model: input.routes.setupJudge,
-    system: 'Bạn là Blind Concept Judge. Chọn theo sức hút, nhân quả thế giới và khả năng serial; không biết model nào tạo concept.',
-    prompt: JSON.stringify({ task: 'Chọn đúng hai concept mạnh nhất.', commission, candidates }),
+    system: `Bạn là Blind Concept Judge. Chọn theo sức hút, nhân quả thế giới và khả năng serial; không biết model nào tạo concept.
+Grounded Domain Research là ràng buộc: không chọn concept dựa trên claim bị research bác hoặc đòi hạ tầng, vốn, thời gian, năng lượng hay mức an toàn trái commission.`,
+    prompt: JSON.stringify({
+      task: 'Chọn đúng hai concept mạnh nhất và khả thi về domain.',
+      commission,
+      groundedDomainResearch: domainResearch.value,
+      candidates,
+    }),
     schema: TopTwoSchema,
     temperature: 0.5,
   }));
@@ -238,20 +258,6 @@ export async function runConceptLab(input: {
   if (top.some(candidate => !candidate) || new Set(ranking.value.selectedIds).size !== 2) {
     throw new StoryFactoryError('setup_blocked', 'Concept Judge selected invalid candidates.');
   }
-
-  const domainResearch = checkpoint.domainResearch
-    ? { value: z.string().min(20).parse(checkpoint.domainResearch.value), usage: checkpoint.domainResearch.usage }
-    : await setupStage('Grounded Domain Research', provider.text({
-      model: input.routes.openingSimulator,
-      system: `Bạn là technical researcher cho story setup. Dùng Google Search kiểm tra các claim kỹ thuật cốt lõi của đúng hai concept.
-Ưu tiên cơ quan nhà nước, tiêu chuẩn, tài liệu học thuật hoặc tổ chức chuyên ngành. Nêu rõ hạ tầng, thời gian, năng lượng, vệ sinh/an toàn, nguồn lực và điều kiện tối thiểu. Không viết truyện, không chọn concept.`,
-      prompt: JSON.stringify({ commission, researchSignals: research.signals, concepts: top }),
-      temperature: 0.2,
-      grounding: 'google_search',
-    }));
-  checkpoint.domainResearch = domainResearch;
-  await input.onCheckpoint?.(structuredClone(checkpoint));
-  usages.push(domainResearch.usage);
 
   const simulation = checkpoint.simulation && input.resume?.domainResearch
     ? { value: OpeningSimulationSchema.parse(checkpoint.simulation.value), usage: checkpoint.simulation.usage }

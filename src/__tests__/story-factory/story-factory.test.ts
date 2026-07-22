@@ -426,7 +426,7 @@ describe('canonical Story Factory', () => {
       .toBe('2026-07-22T17:00:00.000Z');
   });
 
-  test('Concept Lab grounds top concepts in six calls and validates the launch pack', async () => {
+  test('Concept Lab grounds all concepts before blind ranking and validates the launch pack', async () => {
     const candidate = (id: string) => ({
       id, workingTitle: `Tên truyện trực diện ${id}`, premise: 'Một premise đủ dài để kiểm tra khả năng triển khai truyện nối tiếp.',
       protagonistContradiction: 'Muốn cứu gia đình nhưng không thể dựa mãi vào ký ức tương lai.',
@@ -467,8 +467,8 @@ describe('canonical Story Factory', () => {
     };
     const provider = new QueueProvider([
       { candidates: a }, { candidates: b },
-      { selectedIds: [a[0].id, b[0].id], reasons: ['Cơ chế A rõ và dài hơi.', 'Cơ chế B có conflict economy tốt.'] },
       'Nguồn kỹ thuật xác nhận dụng cụ thủ công khả thi nhưng yêu cầu vệ sinh, thời gian và chi phí thật.',
+      { selectedIds: [a[0].id, b[0].id], reasons: ['Cơ chế A rõ và dài hơi.', 'Cơ chế B có conflict economy tốt.'] },
       { simulations }, launchWire,
     ]);
     const result = await runConceptLab({
@@ -477,6 +477,7 @@ describe('canonical Story Factory', () => {
       routes, provider,
     });
     expect(provider.calls).toHaveLength(6);
+    expect(provider.calls).toEqual(['gen-a', 'gen-b', 'sim', 'judge', 'sim', 'launch']);
     expect(result.launchPack.selectedConceptId).toBe('a1');
   });
 });
