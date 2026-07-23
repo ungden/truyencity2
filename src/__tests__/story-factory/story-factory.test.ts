@@ -172,6 +172,18 @@ describe('canonical Story Factory', () => {
     expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).toThrow(StoryFactoryError);
   });
 
+  test('accepts numeric preconditions serialized as numeric strings', () => {
+    const chapter = plan(1);
+    chapter.preconditions = [{ kind: 'resource', entityId: 'money', expected: '100' }];
+    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
+  });
+
+  test('rejects numeric preconditions serialized as the wrong string value', () => {
+    const chapter = plan(1);
+    chapter.preconditions = [{ kind: 'resource', entityId: 'money', expected: '101' }];
+    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).toThrow('Precondition resource:money is false');
+  });
+
   test('rejects a planned transaction that has no resource delta', () => {
     const chapter = plan(1);
     chapter.scenes[0].action = 'Hải trả tiền mặt để thu mua toàn bộ mẻ cá.';

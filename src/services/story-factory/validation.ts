@@ -132,6 +132,15 @@ export function validateKernelState(kernel: StoryKernel, state: StoryState): voi
   }
 }
 
+function preconditionMatches(actual: string | number | undefined, expected: string | number): boolean {
+  if (actual === expected) return true;
+  if (typeof actual === 'number' && typeof expected === 'string' && expected.trim() !== '') {
+    const numericExpected = Number(expected);
+    return Number.isFinite(numericExpected) && actual === numericExpected;
+  }
+  return false;
+}
+
 function checkPreconditions(state: StoryState, plan: ChapterPlan): void {
   for (const condition of plan.preconditions) {
     let actual: string | number | undefined;
@@ -139,7 +148,7 @@ function checkPreconditions(state: StoryState, plan: ChapterPlan): void {
     if (condition.kind === 'resource') actual = state.resources.find(item => item.resourceId === condition.entityId)?.value;
     if (condition.kind === 'location') actual = state.characters.find(item => item.characterId === condition.entityId)?.locationId;
     if (condition.kind === 'promise') actual = state.promises.find(item => item.promiseId === condition.entityId)?.status;
-    if (actual !== condition.expected) {
+    if (!preconditionMatches(actual, condition.expected)) {
       fail(`Precondition ${condition.kind}:${condition.entityId} is false.`, { expected: condition.expected, actual });
     }
   }
