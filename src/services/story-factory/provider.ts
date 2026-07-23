@@ -12,6 +12,7 @@ const PRICING: Record<string, { input: number; output: number }> = {
   'gemini-3.5-flash': { input: 0.75, output: 4.5 },
   'gemini-3-flash-preview': { input: 0.5, output: 3 },
   'gemini-3.1-pro-preview': { input: 2, output: 12 },
+  'gemini-3.6-flash': { input: 1.5, output: 7.5 },
 };
 
 export interface ProviderUsage {
