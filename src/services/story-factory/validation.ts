@@ -151,7 +151,7 @@ function travelMinimum(kernel: StoryKernel, from: string, to: string): number | 
 }
 
 function stripFutureIntent(action: string): string {
-  const intent = String.raw`(?:cần|sẽ|định|dự\s+định|tính|muốn|chưa|không|hứa(?:\s+sẽ)?|dự\s+kiến|sắp|phân\s+tích\s+việc|xem\s+xét\s+việc|lên\s+kế\s+hoạch(?:\s+để)?|đồng\s+ý|chấp\s+nhận|thống\s+nhất|thỏa\s+thuận|thoả\s+thuận)`;
+  const intent = String.raw`(?:cần|sẽ|định|dự\s+định|tính|muốn|chưa|không|hứa(?:\s+sẽ)?|dự\s+kiến|sắp|quyết\s+định|trước\s+khi|phân\s+tích\s+việc|xem\s+xét\s+việc|lên\s+kế\s+hoạch(?:\s+để)?|đồng\s+ý|chấp\s+nhận|thống\s+nhất|thỏa\s+thuận|thoả\s+thuận)`;
   const filler = String.raw`(?:[\p{L}\p{N}_-]+\s+){0,3}`;
   const verbs = String.raw`(?:mua|bán|thu\s+mua|trả\s+tiền|chi\s+tiền|thu\s+tiền|nhận\s+tiền|kiếm\s+tiền|chế\s+tạo|đóng\s+thành|xây\s+dựng|lắp\s+ráp|thu\s+gom|nhận\s+được)`;
   const left = String.raw`(?<![\p{L}\p{N}_-])`;

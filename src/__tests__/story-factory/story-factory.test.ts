@@ -201,6 +201,12 @@ describe('canonical Story Factory', () => {
     expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
   });
 
+  test('does not book a transaction when a scene only decides the next purchase sequence', () => {
+    const chapter = plan(1);
+    chapter.scenes[0].action = 'Lực quyết định tranh thủ đi mua đá cây trước khi quay lại mua cá.';
+    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
+  });
+
   test('still rejects an actual purchase hidden beside future intent', () => {
     const chapter = plan(1);
     chapter.scenes[0].action = 'Hải hứa sẽ sớm mua máy khâu, rồi trả tiền mặt mua ngay một cuộn lưới.';
