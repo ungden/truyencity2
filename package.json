@@ -13,6 +13,7 @@
     "security:secrets": "node scripts/scan-secrets.js",
     "factory:operator": "node --import tsx scripts/factory-operator.ts",
     "factory:benchmark": "node --import tsx scripts/factory-benchmark.ts",
+    "factory:model-bakeoff": "node --import tsx scripts/factory-model-bakeoff.ts",
     "factory:smoke": "node --import tsx scripts/factory-smoke.ts"
   },
   "dependencies": {
