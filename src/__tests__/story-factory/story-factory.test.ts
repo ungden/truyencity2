@@ -14,6 +14,7 @@ import {
   materializeEditorAssessment,
   nextRunAfterNonChapterStage,
   PlannerRollingPlanResponseSchema,
+  WindowReviewSchema,
   appendAcceptedOutcome,
   applyChapterPlan,
   buildChapterContexts,
@@ -426,6 +427,24 @@ describe('canonical Story Factory', () => {
     expect(rolling.plans[0].requiredDeltas[0]).toEqual({
       id: 'delta_1', kind: 'fact', factId: 'fact_day', before: 'ngay_0', after: 'ngay_1',
     });
+  });
+
+  test('window review can block resource and artifact drift across a chapter window', () => {
+    expect(WindowReviewSchema.parse({
+      status: 'block',
+      issues: [
+        {
+          category: 'resource_drift',
+          evidence: 'nhẩm giá mua hai ngàn một ký',
+          instruction: 'Đối chiếu lời nhẩm tiền với ledger giá mua đã commit.',
+        },
+        {
+          category: 'artifact_drift',
+          evidence: 'chèn mùn cưa lại quanh bao tải',
+          instruction: 'Giữ cơ chế thùng bảo ôn nhất quán với thiết kế đã commit.',
+        },
+      ],
+    }).status).toBe('block');
   });
 
   test('state remains bounded across 1,200 transitions', () => {

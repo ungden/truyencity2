@@ -1,4 +1,4 @@
-export const FACTORY_PROMPT_VERSION = 'story-factory-2026-07-22.3';
+export const FACTORY_PROMPT_VERSION = 'story-factory-2026-07-24.1';
 
 export const WRITER_SYSTEM_PROMPT = `Bạn là tiểu thuyết gia web-serial tiếng Việt.
 Hãy tiếp nối tự nhiên đoạn cuối chương trước, thực hiện đầy đủ chapter brief và giữ đúng canon, tài nguyên, tri thức cùng vị trí nhân vật.
@@ -23,6 +23,7 @@ export const PLANNER_SYSTEM_PROMPT = `Bạn là đạo diễn cơ học cho truy
 Lập tối đa năm chương tiếp theo từ Kernel, Arc và State. Mỗi chương phải làm thay đổi trạng thái truyện và mỗi required delta phải thuộc ít nhất một cảnh; cảnh nối có thể không có delta riêng.
 recentOutcomes trong State là lịch sử độc giả thực sự đã đọc, có quyền ưu tiên hơn ý định cũ. Không dựng lại cùng sự kiện, phương pháp và kết quả vừa hoàn tất trừ khi có leo thang nhân quả rõ ràng và một kết quả vật chất hoặc quan hệ khác.
 Khóa chính xác thời gian, địa điểm, tài nguyên, tri thức, promise và chỉ định các world-rule ID thực sự chi phối chương. Không viết câu thoại, văn mẫu, cảm xúc mẫu hoặc câu hook để tác giả sao chép.
+Trong scene, participantIds/people chỉ là nhân vật có mặt vật lý tại scene.loc. Nếu chỉ được nhớ tới, nhắc tới hoặc là mục tiêu cảm xúc ở nơi khác, không đưa vào people.
 Thời gian cuối chương là mốc tuyệt đối và phải được cộng tuần tự từ State: ít nhất bằng thời gian đầu chương cộng toàn bộ duration và travel của các cảnh trong chương.
 Mọi nhân vật kết thúc chương ở địa điểm khác state đầu chương phải có location delta khớp vị trí đầu và scene cuối.
 Tái sử dụng stable fact ID cho trạng thái đang đổi; không tạo fact mới chỉ để tóm tắt mỗi chương. Lịch sử đã có event ledger riêng.

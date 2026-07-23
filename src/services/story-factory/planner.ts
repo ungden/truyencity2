@@ -83,6 +83,7 @@ const PLANNER_COMPACT_CONTRACT = {
     'Tính time tuần tự cho cả window sau khi đã chốt scenes; tuyệt đối không để time bằng thời điểm đầu chương khi chương có diễn biến.',
     'scene.id và mọi ID đều là string stable ID, không dùng số thứ tự trần.',
     'rules có ít nhất một world-rule ID tồn tại trong Kernel.',
+    'scene.people chỉ gồm nhân vật đang có mặt vật lý ở scene.loc; nếu nhân vật chỉ được nhắc tới hoặc là động lực ở nơi khác thì không đưa vào people.',
     'scene.deltaIds chỉ chứa delta ID tồn tại trong cùng chương; cảnh nối có thể rỗng nhưng cả chương vẫn phải có deltas.',
     'Mỗi delta phải được ít nhất một scene.deltaIds tham chiếu.',
     'Nếu một nhân vật đổi location trong chương, tạo đúng một location delta từ vị trí đầu chương tới vị trí ở scene cuối của họ và gắn delta vào scene thực hiện lần di chuyển đầu tiên.',
@@ -131,7 +132,15 @@ export const WindowReviewSchema = z.discriminatedUnion('status', [
   z.object({
     status: z.literal('block'),
     issues: z.array(z.object({
-      category: z.enum(['continuity_drift', 'voice_drift', 'repetition', 'reward_loop', 'progression']),
+      category: z.enum([
+        'continuity_drift',
+        'voice_drift',
+        'repetition',
+        'reward_loop',
+        'progression',
+        'resource_drift',
+        'artifact_drift',
+      ]),
       evidence: z.string().trim().min(5).max(1_000),
       instruction: z.string().trim().min(5).max(1_000),
     }).strict()).min(1).max(3),
@@ -220,9 +229,19 @@ export async function reviewFiveChapterWindow(input: {
   const provider = input.provider ?? geminiProvider;
   const result = await provider.json({
     model: input.routes.editor,
-    system: `${EDITOR_SYSTEM_PROMPT}\nỞ chế độ window review, chỉ kiểm drift, lặp và tiến triển trong năm chương; không chấm lại từng chương.`,
+    system: `${EDITOR_SYSTEM_PROMPT}
+Ở chế độ window review, đọc liền mạch năm chương và so với recentOutcomes/state đã commit.
+Block nếu nhân vật phản ứng như quên sự kiện vừa trải qua, cơ chế vật phẩm/công nghệ đổi cách hoạt động, số tiền/khối lượng/giá trong prose lệch với ledger, hoặc năm chương lặp cùng cấu trúc mà không tạo tiến triển.
+Không chấm lại từng câu văn; chỉ báo tối đa ba lỗi drift quan trọng làm giảm khả năng tiếp tục truyện dài.`,
     prompt: JSON.stringify({
       task: 'Kiểm tra cửa sổ năm chương vừa commit.',
+      auditChecklist: [
+        'nhân vật có nhớ và phản ứng theo các lần gặp/sự kiện trong recentOutcomes không',
+        'artifact và world-rule quan trọng có giữ cùng cơ chế hoạt động không',
+        'giá, tiền, khối lượng, tồn kho và lời nhẩm trong prose có khớp ledger không',
+        'cửa sổ có payoff vật chất/tình cảm và progression mới không',
+        'có lặp một công thức chuẩn bị - vận chuyển - bán mà thiếu biến hóa không',
+      ],
       kernelIdentity: {
         protagonistId: input.kernel.protagonistId,
         characters: input.kernel.characters,
