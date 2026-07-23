@@ -195,6 +195,12 @@ describe('canonical Story Factory', () => {
     expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
   });
 
+  test('does not book a transaction when a scene only agrees future wholesale terms', () => {
+    const chapter = plan(1);
+    chapter.scenes[0].action = 'Dì Ba kiểm tra tận mắt, ngạc nhiên vì cá quá tươi, đồng ý mua sỉ với giá 5.500đ/kg.';
+    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
+  });
+
   test('still rejects an actual purchase hidden beside future intent', () => {
     const chapter = plan(1);
     chapter.scenes[0].action = 'Hải hứa sẽ sớm mua máy khâu, rồi trả tiền mặt mua ngay một cuộn lưới.';

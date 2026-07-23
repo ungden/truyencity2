@@ -151,10 +151,16 @@ function travelMinimum(kernel: StoryKernel, from: string, to: string): number | 
 }
 
 function stripFutureIntent(action: string): string {
-  const intent = String.raw`(?:cần|sẽ|định|dự\s+định|tính|muốn|chưa|không|hứa(?:\s+sẽ)?|dự\s+kiến|sắp|phân\s+tích\s+việc|xem\s+xét\s+việc|lên\s+kế\s+hoạch(?:\s+để)?)`;
+  const intent = String.raw`(?:cần|sẽ|định|dự\s+định|tính|muốn|chưa|không|hứa(?:\s+sẽ)?|dự\s+kiến|sắp|phân\s+tích\s+việc|xem\s+xét\s+việc|lên\s+kế\s+hoạch(?:\s+để)?|đồng\s+ý|chấp\s+nhận|thống\s+nhất|thỏa\s+thuận|thoả\s+thuận)`;
   const filler = String.raw`(?:[\p{L}\p{N}_-]+\s+){0,3}`;
   const verbs = String.raw`(?:mua|bán|thu\s+mua|trả\s+tiền|chi\s+tiền|thu\s+tiền|nhận\s+tiền|kiếm\s+tiền|chế\s+tạo|đóng\s+thành|xây\s+dựng|lắp\s+ráp|thu\s+gom|nhận\s+được)`;
-  return action.replace(new RegExp(String.raw`\b${intent}\s+${filler}${verbs}\b`, 'giu'), '');
+  const left = String.raw`(?<![\p{L}\p{N}_-])`;
+  const right = String.raw`(?=$|[^\p{L}\p{N}_-])`;
+  return action.replace(new RegExp(String.raw`${left}${intent}\s+${filler}${verbs}${right}`, 'giu'), '');
+}
+
+function hasVietnameseTerm(action: string, terms: string): boolean {
+  return new RegExp(String.raw`(?<![\p{L}\p{N}_-])(?:${terms})(?=$|[^\p{L}\p{N}_-])`, 'iu').test(action);
 }
 
 function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPlan): void {
@@ -198,11 +204,11 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
     }
     const sceneDeltas = scene.requiredDeltaIds.map(deltaId => plan.requiredDeltas.find(delta => delta.id === deltaId)!);
     const realizedAction = stripFutureIntent(scene.action);
-    if (/\b(?:mua|bán|thu mua|trả tiền|chi tiền|thu tiền|nhận tiền|kiếm tiền)\b/iu.test(realizedAction)
+    if (hasVietnameseTerm(realizedAction, String.raw`mua|bán|thu mua|trả tiền|chi tiền|thu tiền|nhận tiền|kiếm tiền`)
       && !sceneDeltas.some(delta => delta.kind === 'resource_numeric')) {
       fail(`Scene ${scene.id} describes a transaction without a numeric resource delta.`, scene.action);
     }
-    if (/\b(?:chế tạo|đóng thành|xây dựng|lắp ráp|thu gom|nhận được)\b/iu.test(realizedAction)
+    if (hasVietnameseTerm(realizedAction, String.raw`chế tạo|đóng thành|xây dựng|lắp ráp|thu gom|nhận được`)
       && !sceneDeltas.some(delta => delta.kind === 'resource_numeric' || delta.kind === 'resource_state' || delta.kind === 'fact')) {
       fail(`Scene ${scene.id} creates or acquires a durable asset without a state delta.`, scene.action);
     }
