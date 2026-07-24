@@ -77,4 +77,15 @@ describe('Story Factory architecture boundary', () => {
     expect(planner).toContain('evidence: lastError.evidence ?? null');
     expect(prompts).toContain('Thời gian cuối chương là mốc tuyệt đối');
   });
+
+  test('canary promotion requires the latest chapter-10 review on the exact release', () => {
+    const migration = readFileSync(
+      'supabase/migrations/20260724062050_continuity_correction_audit_gate.sql',
+      'utf8',
+    );
+    expect(migration).toContain('ORDER BY finished_at DESC NULLS LAST, started_at DESC');
+    expect(migration).toContain("latest_review_status IS DISTINCT FROM 'passed'");
+    expect(migration).toContain('latest_review_release IS DISTINCT FROM p_engine_release');
+    expect(migration).toContain('project_release IS DISTINCT FROM p_engine_release');
+  });
 });
