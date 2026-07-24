@@ -53,9 +53,16 @@ const TopTwoSchema = z.object({
 const OpeningSimulationSchema = z.object({
   simulations: z.array(z.object({
     conceptId: z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/),
-    chapter1: z.string().trim().min(30).max(2_000),
-    chapter2: z.string().trim().min(30).max(2_000),
-    chapter3: z.string().trim().min(30).max(2_000),
+    openingSample: z.string().trim().min(2_000).max(12_000).superRefine((sample, ctx) => {
+      const count = sample.split(/\s+/u).filter(Boolean).length;
+      if (count < 600 || count > 900) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Opening sample must contain 600-900 words.' });
+      }
+    }),
+    chapter2Direction: z.string().trim().min(30).max(2_000),
+    chapter3Direction: z.string().trim().min(30).max(2_000),
+    characterChemistry: z.string().trim().min(20).max(1_000),
+    conflictAgency: z.string().trim().min(20).max(1_000),
     serialStrength: z.string().trim().min(20).max(1_000),
     causalRisk: z.string().trim().min(10).max(1_000),
     domainFeasibility: z.enum(['pass', 'reject']),
@@ -158,6 +165,57 @@ export function assertPortfolioDiversity(candidate: z.infer<typeof ConceptCandid
     ];
     if (scores.every(score => score >= 0.7)) {
       throw new StoryFactoryError('setup_blocked', 'Selected concept duplicates an existing portfolio mechanism.', { scores, signature });
+    }
+  }
+}
+
+function assertLaunchSemantics(
+  launch: LaunchPack,
+  commission: z.infer<typeof StoryCommissionSchema>,
+): void {
+  const kernel = launch.kernel;
+  if (jaccard(kernel.readerFantasy, `${commission.audience} ${commission.tone} ${commission.settingBoundary}`) >= 0.72) {
+    throw new StoryFactoryError('setup_blocked', 'Kernel readerFantasy merely repeats the commission instead of defining a story-specific desire.');
+  }
+
+  const sampleLikeVoice = /[“”"'‘’\n]|\b(?:cười|nhếch|quát|gằn|lẩm bẩm|nói rằng|ánh mắt)\b/iu;
+  for (const character of kernel.characters) {
+    const voiceValues = [
+      character.voice.register,
+      character.voice.sentenceRhythm,
+      character.voice.addressRules,
+      character.voice.vocabulary,
+      character.voice.reasoningStyle,
+    ];
+    if (voiceValues.some(value => sampleLikeVoice.test(value))) {
+      throw new StoryFactoryError('setup_blocked', 'Voice contract contains sample prose, dialogue, or canned gesture.', {
+        characterId: character.id,
+      });
+    }
+  }
+
+  const protagonist = kernel.characters.find(character => character.id === kernel.protagonistId);
+  const opposition = kernel.characters.filter(character => character.role === 'opposition');
+  if (!protagonist || opposition.length === 0) {
+    throw new StoryFactoryError('setup_blocked', 'Kernel requires a protagonist and at least one opposition character with an independent agenda.');
+  }
+  if (opposition.every(character => jaccard(character.agenda, protagonist.agenda) >= 0.7)) {
+    throw new StoryFactoryError('setup_blocked', 'Opposition agendas are not materially independent from the protagonist.');
+  }
+
+  const stages = kernel.seriesSpine.stages;
+  for (let index = 1; index < stages.length; index += 1) {
+    const previous = stages[index - 1];
+    const current = stages[index];
+    const conflictSimilarity = jaccard(previous.conflictSource, current.conflictSource);
+    const rewardSimilarity = jaccard(previous.rewardLoopVariant, current.rewardLoopVariant);
+    if (conflictSimilarity >= 0.62 && rewardSimilarity >= 0.62) {
+      throw new StoryFactoryError('setup_blocked', 'Adjacent series stages only rename the arena without changing conflict economy or reward loop.', {
+        previousStageId: previous.id,
+        currentStageId: current.id,
+        conflictSimilarity,
+        rewardSimilarity,
+      });
     }
   }
 }
@@ -270,11 +328,13 @@ Grounded Domain Research là ràng buộc: không chọn concept dựa trên cla
     ? { value: OpeningSimulationSchema.parse(checkpoint.simulation.value), usage: checkpoint.simulation.usage }
     : await setupStage('Opening Simulator', provider.json({
     model: input.routes.openingSimulator,
-    system: `Bạn mô phỏng logic mở đầu, không viết prose hoàn chỉnh và không thay đổi concept.
+    system: `Bạn là Opening Simulator độc lập và không thay đổi concept.
+Với mỗi concept, viết actual opening sample tiếng Việt dài 600-900 từ: một cảnh mở đầu hoàn chỉnh có nhân vật hành động, đối thoại tự nhiên, đối lực có agenda riêng và một thay đổi cụ thể. Đây là mẫu để chọn concept, không phải canon và không được đưa vào Kernel.
+Sau sample, mô tả ngắn hướng chương 2 và 3, chemistry nhân vật, agency của xung đột và audit seriality/nhân quả.
 Đánh domainFeasibility=reject nếu ba chương đầu đòi hạ tầng, vốn, thời gian, năng lượng, kỹ năng hoặc mức an toàn không thực tế. Không được coi kiến thức tương lai là vật tư hay thời gian miễn phí.
 Đánh longRunFeasibility=reject nếu concept có thể kết thúc ở arc đầu, chỉ lặp một vòng kiếm tiền/sức mạnh, hoặc không có đủ arena, xung đột và progression cho 800-1.200 chương.`,
     prompt: JSON.stringify({
-      task: 'Mô phỏng diễn biến chương 1-3 và audit tính khả thi domain cho cả hai concept.',
+      task: 'Viết opening sample thật cho cả hai concept, sau đó audit hướng chương 2-3 và tính khả thi dài hạn.',
       commission,
       researchSignals: research.signals,
       groundedDomainResearch: domainResearch.value,
@@ -299,6 +359,8 @@ Grounded Domain Research là ràng buộc: không chọn concept dựa trên cla
     system: `Bạn là Launch Architect cuối cùng. Phản hồi bằng đúng envelope JSON được yêu cầu, tuyệt đối không bọc trong array.
 kernelJson, arcJson và initialStateJson là chuỗi chứa JSON hợp lệ của từng artifact; không markdown và không chú thích ngoài JSON.
 Chọn một concept rồi dựng duy nhất StoryKernel, Arc 20-30 chương và State chương 0. Không lập rolling plan; Planner riêng sẽ làm việc đó sau setup.
+Chọn dựa trên chất lượng actual opening sample, chemistry nhân vật, agency của đối lực và khả năng biến hóa; không chỉ dựa vào metadata cơ chế. Opening sample chỉ là bằng chứng lựa chọn: tuyệt đối không chép câu, cử chỉ hoặc thoại từ sample vào Kernel.
+VoiceContract chỉ được dùng thuộc tính trung tính register, sentenceRhythm, directness, addressRules, vocabulary, reasoningStyle, emotionDisplay và humorStyle. Không chứa câu thoại, cử chỉ, phản ứng mẫu, stressResponse hoặc avoidances.
 StoryKernel.worldModel phải khóa thời đại, địa lý, tổ chức, hệ thống vận hành, giới hạn và chi phí riêng của truyện.
 StoryKernel.seriesSpine phải có 8-15 stage liên tục, tổng target 800-1.200 chương; mỗi stage phải đổi arena, nguồn xung đột hoặc reward-loop variant và có entry/exit condition cụ thể.
 StoryKernel.longPromises phải có ít nhất bốn promise dài hạn, phân bổ qua nhiều stage; không được để tất cả hoàn thành trong stage đầu.
@@ -334,6 +396,7 @@ Chỉ được chọn concept có domainFeasibility=pass và longRunFeasibility=
     || launch.kernel.conflictEconomyFingerprint !== selectedConcept.conflictEconomyFingerprint) {
     throw new StoryFactoryError('setup_blocked', 'Launch pack fingerprints drifted from the selected concept.');
   }
+  assertLaunchSemantics(launch, commission);
   assertPortfolioDiversity(selectedConcept, input.existingSignatures ?? []);
   if (launch.initialState.chapterNumber !== 0 || launch.arc.startChapter !== 1) {
     throw new StoryFactoryError('setup_blocked', 'Launch pack must start from chapter zero and arc one.');

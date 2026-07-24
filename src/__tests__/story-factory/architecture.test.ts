@@ -44,9 +44,20 @@ describe('Story Factory architecture boundary', () => {
     const writerBriefBody = context.slice(context.indexOf('export function buildWriterBrief'), context.indexOf('export function selectPreviousTail'));
     expect(writerBriefBody).not.toContain('recentOutcomes');
     expect(context).toContain('recentOutcomes: input.state.recentOutcomes');
+    expect(writerBriefBody).not.toContain('scene.action');
+    expect(writerBriefBody).not.toContain('uniqueMechanism');
+    expect(context).toContain('briefChars > 5_000');
     const migration = readFileSync('supabase/migrations/20260722072832_canonical_story_outcomes.sql', 'utf8');
     expect(migration).toContain('p_expected_chapter % 5 = 0');
     expect(migration).not.toContain('p_expected_chapter % 10 = 0');
+  });
+
+  test('rolling planning has one independent Plan Judge and no per-chapter judge call', () => {
+    const planner = readFileSync('src/services/story-factory/planner.ts', 'utf8');
+    const pipeline = readFileSync('src/services/story-factory/pipeline.ts', 'utf8');
+    expect(planner).toContain('model: input.routes.planJudge');
+    expect(planner).toContain('for (let attempt = 1; attempt <= 2; attempt += 1)');
+    expect(pipeline).not.toContain('planJudge');
   });
 
   test('Concept Generator receives the stable-ID rule that provider schemas cannot enforce', () => {

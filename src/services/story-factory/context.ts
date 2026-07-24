@@ -1,5 +1,11 @@
-import type { ChapterPlan, EditorAssessment, StoryKernel, StoryState } from './contracts';
-import type { RelevantStoryMemory } from './memory';
+import {
+  StoryFactoryError,
+  type ChapterPlan,
+  type EditorAssessment,
+  type StoryKernel,
+  type StoryState,
+} from './contracts';
+import type { RelevantStoryMemory, RelevantStoryTransition } from './memory';
 
 export interface ContextManifestEntry {
   role: 'writer' | 'editor' | 'revision' | 'planner';
@@ -9,7 +15,7 @@ export interface ContextManifestEntry {
 }
 
 export interface WriterBrief {
-  story: { title: string; genreLane: string; uniqueMechanism: string };
+  story: { title: string; genreLane: string };
   cast: unknown[];
   worldRules: unknown[];
   scenes: unknown[];
@@ -17,7 +23,7 @@ export interface WriterBrief {
   characterState: unknown[];
   resources: unknown[];
   promises: unknown[];
-  relevantMemory: unknown[];
+  historicalTransitions: unknown[];
   requiredDeltas: unknown[];
 }
 
@@ -43,7 +49,7 @@ export function buildWriterBrief(input: {
   kernel: StoryKernel;
   state: StoryState;
   plan: ChapterPlan;
-  relevantMemory?: RelevantStoryMemory[];
+  relevantTransitions?: RelevantStoryTransition[];
 }): WriterBrief {
   const ids = relevantIds(input.plan);
   ids.characters.add(input.kernel.protagonistId);
@@ -51,7 +57,6 @@ export function buildWriterBrief(input: {
     story: {
       title: input.kernel.title,
       genreLane: input.kernel.genreLane,
-      uniqueMechanism: input.kernel.uniqueMechanism,
     },
     cast: input.kernel.characters.filter(character => ids.characters.has(character.id)).map(character => ({
       id: character.id,
@@ -63,7 +68,8 @@ export function buildWriterBrief(input: {
       moralBoundary: character.moralBoundary,
       voice: character.voice,
     })),
-    worldRules: input.kernel.worldRules.filter(rule => input.plan.requiredWorldRuleIds.includes(rule.id)),
+    worldRules: input.kernel.worldRules.filter(rule => input.plan.requiredWorldRuleIds.includes(rule.id))
+      .map(rule => ({ id: rule.id, claim: rule.claim })),
     scenes: input.plan.scenes.map(scene => ({
       id: scene.id,
       povCharacterId: scene.povCharacterId,
@@ -73,33 +79,62 @@ export function buildWriterBrief(input: {
       travelMinutesFromPrevious: scene.travelMinutesFromPrevious,
       objective: scene.objective,
       obstacle: scene.obstacle,
-      action: scene.action,
       requiredDeltaIds: scene.requiredDeltaIds,
     })),
-    // Current facts are compact canon, not historical memory. Include all of
-    // them so a planner omission cannot hide a decision made last chapter.
-    currentFacts: input.state.facts,
+    currentFacts: input.state.facts.filter(fact => ids.facts.has(fact.id)),
     characterState: input.state.characters.filter(character => ids.characters.has(character.characterId)).map(character => ({
       ...character,
       knownFactIds: character.knownFactIds.filter(factId => ids.facts.has(factId)),
+      relationshipState: Object.fromEntries(
+        Object.entries(character.relationshipState).filter(([counterpartId]) => ids.characters.has(counterpartId)),
+      ),
     })),
     resources: input.state.resources.filter(resource => ids.resources.has(resource.resourceId)),
     promises: input.state.promises.filter(promise => ids.promises.has(promise.promiseId)),
-    relevantMemory: (input.relevantMemory ?? []).map(memory => ({
-      chapterNumber: memory.outcome.chapterNumber,
-      event: memory.outcome.event,
-      result: memory.outcome.result,
-      endingSituation: memory.outcome.endingSituation,
-      relatedEntityIds: memory.relatedEntityIds,
+    historicalTransitions: (input.relevantTransitions ?? []).slice(0, 6).map(transition => ({
+      chapterNumber: transition.chapterNumber,
+      deltaId: transition.deltaId,
+      kind: transition.kind,
+      entityId: transition.entityId,
+      before: transition.before,
+      after: transition.after,
+      relatedEntityIds: transition.relatedEntityIds,
     })),
-    requiredDeltas: input.plan.requiredDeltas,
+    requiredDeltas: input.plan.requiredDeltas.map(delta => {
+      if (delta.kind === 'fact') return {
+        id: delta.id, kind: delta.kind, entityId: delta.factId, before: delta.before, after: delta.after,
+      };
+      if (delta.kind === 'resource_numeric') return {
+        id: delta.id, kind: delta.kind, entityId: delta.resourceId,
+        before: delta.before, delta: delta.delta, after: delta.after,
+      };
+      if (delta.kind === 'resource_state') return {
+        id: delta.id, kind: delta.kind, entityId: delta.resourceId, before: delta.before, after: delta.after,
+      };
+      if (delta.kind === 'knowledge') return {
+        id: delta.id, kind: delta.kind, entityId: delta.characterId, factId: delta.factId,
+      };
+      if (delta.kind === 'location') return {
+        id: delta.id, kind: delta.kind, entityId: delta.characterId,
+        before: delta.beforeLocationId, after: delta.afterLocationId,
+      };
+      if (delta.kind === 'relationship') return {
+        id: delta.id, kind: delta.kind, entityId: delta.characterId,
+        counterpartId: delta.counterpartId, before: delta.before, after: delta.after,
+      };
+      return {
+        id: delta.id, kind: delta.kind, entityId: delta.promiseId, before: delta.before, after: delta.after,
+      };
+    }),
   };
 }
 
-export function selectPreviousTail(content: string, maxWords = 1_200): string {
+export function selectPreviousTail(content: string, maxWords = 600): string {
   const words = [...content.matchAll(/\S+/gu)];
   if (words.length <= maxWords) return content.trim();
-  return content.slice(words[words.length - maxWords].index).trim();
+  const start = words[words.length - maxWords].index ?? 0;
+  const paragraphBoundary = content.indexOf('\n\n', start);
+  return content.slice(paragraphBoundary >= 0 ? paragraphBoundary + 2 : start).trim();
 }
 
 function manifest(role: ContextManifestEntry['role'], blocks: Array<[string, string, unknown]>): ContextManifestEntry[] {
@@ -117,8 +152,17 @@ export function buildChapterContexts(input: {
   plan: ChapterPlan;
   previousChapter?: string;
   relevantMemory?: RelevantStoryMemory[];
+  relevantTransitions?: RelevantStoryTransition[];
 }) {
   const brief = buildWriterBrief(input);
+  const briefChars = JSON.stringify(brief).length;
+  if (briefChars > 5_000) {
+    throw new StoryFactoryError('plan_blocked', 'Writer brief exceeds the mechanical context budget.', {
+      chapterNumber: input.plan.chapterNumber,
+      chars: briefChars,
+      maximumChars: 5_000,
+    });
+  }
   const previousTail = input.previousChapter ? selectPreviousTail(input.previousChapter) : '';
   const ids = relevantIds(input.plan);
   const editorKernel = {

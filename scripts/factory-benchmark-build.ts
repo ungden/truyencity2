@@ -9,11 +9,10 @@ import {
   StoryKernelSchema,
   STORY_FACTORY_RELEASE,
   StoryStateSchema,
-  applyChapterPlan,
   geminiProvider,
+  planRollingWindow,
+  reviewFiveChapterWindow,
   writeStoryChapter,
-  type ChapterPlan,
-  type StateDelta,
   type StoryState,
   type StoryKernel,
 } from '../src/services/story-factory';
@@ -22,15 +21,11 @@ dotenv.config({ path: '.env.runtime', quiet: true });
 dotenv.config({ path: '.env.local', quiet: true });
 
 const SOURCE_REF = 'b0896d8';
-const SLOTS = ['dt-01', 'dt-11', 'hx-01', 'hx-04', 'th-01'] as const;
+// dt-01 is intentionally retained as a golden Plan-Judge failure: its owner
+// gives away an entire catch against his own agenda even after one replan.
+const SLOTS = ['dt-11', 'hx-01', 'hx-04', 'th-01'] as const;
 const outputFlag = process.argv.indexOf('--output');
 const outputPath = path.resolve(outputFlag >= 0 ? process.argv[outputFlag + 1] : '/tmp/truyencity-factory-benchmark-20.json');
-const controlFlag = process.argv.indexOf('--control-corpus');
-const controlCorpus = controlFlag >= 0
-  ? JSON.parse(readFileSync(path.resolve(process.argv[controlFlag + 1]), 'utf8')) as {
-    samples: Array<{ id: string; control: string }>;
-  }
-  : null;
 
 const legacySystem = `Bạn là tiểu thuyết gia của đúng một bộ truyện. Bắt buộc đi theo từng scene và required delta theo đúng thứ tự.
 Viết từ 1.200 đến 1.800 từ, không dưới 1.000 và không trên 2.200 từ. Mỗi scene phải thành một đơn vị kịch tính hoàn chỉnh.
@@ -70,7 +65,9 @@ function convertPack(old: any) {
       sentenceRhythm: item.voice.sentenceRhythm,
       directness: ['reserved', 'balanced', 'direct'].includes(item.voice.directness) ? item.voice.directness : 'balanced',
       addressRules: item.voice.addressRules, vocabulary: item.voice.vocabulary,
-      stressResponse: item.voice.stressResponse, avoidances: item.voice.avoidances,
+      reasoningStyle: item.voice.reasoningStyle ?? 'quan sát dữ kiện và cân nhắc hệ quả trước khi hành động',
+      emotionDisplay: item.voice.emotionDisplay ?? 'restrained',
+      humorStyle: item.voice.humorStyle ?? 'situational',
     },
   }));
   const sourcePromises: Array<{ id: string; description: string }> = old.kernel.promises.map((item: any) => ({
@@ -225,99 +222,21 @@ function convertPack(old: any) {
   return { kernel, state, arc };
 }
 
-function convertPlan(old: any, state: StoryState, kernel: StoryKernel): ChapterPlan {
-  const factValues = new Map(state.facts.map(item => [item.id, item.value]));
-  const resourceValues = new Map(state.resources.map(item => [item.resourceId, item]));
-  const characterLocations = new Map(state.characters.map(item => [item.characterId, item.locationId]));
-  const promiseStatuses = new Map(state.promises.map(item => [item.promiseId, item.status]));
-  const deltas: StateDelta[] = old.requiredDeltas.map((delta: any): StateDelta => {
-    if (delta.kind === 'fact') {
-      const factId = stable(delta.factId);
-      const current = factValues.get(factId) ?? null;
-      factValues.set(factId, String(delta.valueAfter));
-      return { id: stable(delta.id), kind: 'fact', factId, before: current, after: String(delta.valueAfter) };
-    }
-    if (delta.kind === 'relationship') {
-      const factId = stable(`relationship_${delta.characterId}`);
-      const current = factValues.get(factId) ?? null;
-      factValues.set(factId, String(delta.relationshipAfter));
-      return { id: stable(delta.id), kind: 'fact', factId, before: current, after: String(delta.relationshipAfter) };
-    }
-    if (delta.kind === 'resource_numeric') {
-      const resourceId = stable(delta.resourceId);
-      const current = resourceValues.get(resourceId);
-      const before = current?.kind === 'numeric' ? current.value : 0;
-      const after = before + Number(delta.delta);
-      resourceValues.set(resourceId, { resourceId, kind: 'numeric', value: after });
-      return { id: stable(delta.id), kind: 'resource_numeric', resourceId, before,
-        delta: Number(delta.delta), after, source: delta.source || null, sink: delta.sink || null };
-    }
-    if (delta.kind === 'resource_state') {
-      const resourceId = stable(delta.resourceId);
-      const current = resourceValues.get(resourceId);
-      const before = current?.kind === 'state' ? current.value : String(delta.before ?? 'Chưa xác định');
-      const after = String(delta.after);
-      resourceValues.set(resourceId, { resourceId, kind: 'state', value: after });
-      return { id: stable(delta.id), kind: 'resource_state', resourceId,
-        before, after, source: String(delta.source || 'Theo diễn biến chương') };
-    }
-    if (delta.kind === 'character_location') {
-      const characterId = stable(delta.characterId);
-      const beforeLocationId = characterLocations.get(characterId);
-      if (!beforeLocationId) throw new Error(`Unknown character location for ${characterId}.`);
-      const afterLocationId = stable(delta.locationAfter);
-      characterLocations.set(characterId, afterLocationId);
-      return { id: stable(delta.id), kind: 'location', characterId, beforeLocationId, afterLocationId };
-    }
-    if (delta.kind === 'character_knowledge') {
-      return { id: stable(delta.id), kind: 'knowledge', characterId: stable(delta.characterId), factId: stable(delta.factId), source: delta.learnedFrom };
-    }
-    const promiseId = stable(delta.promiseId);
-    const current = promiseStatuses.get(promiseId) ?? 'open';
-    const after = promiseStatus(delta.statusAfter);
-    promiseStatuses.set(promiseId, after);
-    return { id: stable(delta.id), kind: 'promise', promiseId, before: current, after };
-  });
-  const kernelRuleIds = new Set(kernel.worldRules.map(rule => rule.id));
-  const ruleIds = ([...new Set(old.scenes.flatMap((scene: any) => scene.worldClaimIds ?? []).map(stable))] as string[])
-    .filter(id => kernelRuleIds.has(id));
-  if (ruleIds.length === 0) ruleIds.push(kernel.worldRules[0].id);
-  const scenes: ChapterPlan['scenes'] = old.scenes.map((scene: any) => ({
-    id: stable(scene.id), povCharacterId: stable(scene.povCharacterId), participantIds: scene.participantIds.map(stable),
-    locationId: stable(scene.locationId), durationMinutes: scene.durationMinutes,
-    travelMinutesFromPrevious: scene.travelMinutesFromPrevious, objective: scene.objective,
-    obstacle: scene.obstacle, action: scene.action, requiredDeltaIds: scene.requiredDeltaIds.map(stable),
-  }));
-  const startingLocations = new Map(state.characters.map(item => [item.characterId, item.locationId]));
-  const finalLocations = new Map(startingLocations);
-  scenes.forEach(scene => scene.participantIds.forEach(characterId => finalLocations.set(characterId, scene.locationId)));
-  for (const [characterId, afterLocationId] of finalLocations) {
-    const beforeLocationId = startingLocations.get(characterId);
-    if (!beforeLocationId || beforeLocationId === afterLocationId) continue;
-    if (deltas.some(delta => delta.kind === 'location' && delta.characterId === characterId)) continue;
-    const id = stable(`benchmark_location_${old.chapterNumber}_${characterId}`);
-    deltas.push({ id, kind: 'location', characterId, beforeLocationId, afterLocationId });
-    const lastScene = [...scenes].reverse().find(scene => scene.participantIds.includes(characterId));
-    if (!lastScene) throw new Error(`Cannot attach benchmark location delta for ${characterId}.`);
-    lastScene.requiredDeltaIds.push(id);
-  }
-  return {
-    schemaVersion: 1, chapterNumber: old.chapterNumber, arcNumber: 1,
-    storyTimeAfterMinutes: state.storyTimeMinutes + Number(old.elapsedMinutesSincePreviousChapter ?? 0)
-      + old.scenes.reduce((sum: number, scene: any) => sum + scene.durationMinutes + scene.travelMinutesFromPrevious, 0),
-    preconditions: [], requiredWorldRuleIds: ruleIds,
-    scenes,
-    requiredDeltas: deltas,
-  };
-}
-
 async function main() {
   const checkpoint = existsSync(outputPath)
     ? JSON.parse(readFileSync(outputPath, 'utf8')) as {
       sourceRef?: string;
       engineRelease?: string;
       buildCostUsd?: number;
-      samples?: Array<{ id: string; brief: unknown; control: string; candidate: string }>;
+      samples?: Array<{
+        id: string;
+        brief: unknown;
+        control: string;
+        candidate: string;
+        candidateTitle?: string;
+        candidateCostUsd?: number;
+        stateAfter?: unknown;
+      }>;
     }
     : {};
   if (checkpoint.sourceRef && checkpoint.sourceRef !== SOURCE_REF) {
@@ -338,20 +257,37 @@ async function main() {
   await Promise.all(SLOTS.map(async slot => {
     const base = `blueprints/flagship-v3/canaries/${slot}`;
     const oldPack = fromGit<any>(`${base}/launch-pack-v3.json`);
-    const oldOpening = fromGit<any>(`${base}/offline-opening-writer31-v33/opening-run-v3.json`);
     const converted = convertPack(oldPack);
     let state = converted.state;
     let candidatePrevious = '';
     let controlPrevious = '';
-    for (const oldPlan of oldPack.initialWindow.plans.slice(0, 4)) {
-      const plan = convertPlan(oldPlan, state, converted.kernel);
-      const transition = applyChapterPlan({ kernel: converted.kernel, state, plan });
+    const planned = await planRollingWindow({
+      kernel: converted.kernel,
+      arc: converted.arc,
+      state,
+      routes: DEFAULT_MODEL_ROUTES,
+    });
+    if (planned.rollingPlan.plans.length !== 5) throw new Error(`Planner must return five benchmark chapters for ${slot}.`);
+    const planCost = planned.usages.reduce((sum, usage) => sum + usage.costUsd, 0);
+    totalCost += planCost;
+    const slotSamples: typeof samples = [];
+    const candidateChapters: Array<{ chapterNumber: number; title: string; content: string }> = [];
+    for (const plan of planned.rollingPlan.plans) {
       const sampleId = `${slot}-ch${plan.chapterNumber}`;
       const checkpointSample = samples.find(sample => sample.id === sampleId);
       if (checkpointSample) {
-        state = transition.state;
+        if (!checkpointSample.stateAfter || !checkpointSample.candidateTitle) {
+          throw new Error(`Checkpoint sample ${sampleId} lacks state/title required for sequential resume.`);
+        }
+        state = StoryStateSchema.parse(checkpointSample.stateAfter);
         candidatePrevious = checkpointSample.candidate;
         controlPrevious = checkpointSample.control;
+        slotSamples.push(checkpointSample);
+        candidateChapters.push({
+          chapterNumber: plan.chapterNumber,
+          title: checkpointSample.candidateTitle,
+          content: checkpointSample.candidate,
+        });
         console.log(JSON.stringify({ slot, chapter: plan.chapterNumber, samples: samples.length, resumed: true }));
         continue;
       }
@@ -359,39 +295,59 @@ async function main() {
         kernel: converted.kernel, state, plan, previousChapter: candidatePrevious || undefined,
         routes: DEFAULT_MODEL_ROUTES,
       });
-      totalCost += generated.usages.reduce((sum, usage) => sum + usage.costUsd, 0);
-      const legacy = oldOpening.chapters.find((item: any) => item.chapterNumber === plan.chapterNumber);
-      const reusableControl = controlCorpus?.samples.find(item => item.id === sampleId)?.control;
-      let control: string;
-      if (reusableControl) control = reusableControl;
-      else if (legacy?.content) control = legacy.content;
-      else {
-        const response = await geminiProvider.json({
-          model: DEFAULT_MODEL_ROUTES.writer, system: legacySystem,
-          prompt: JSON.stringify({
-            kernel: converted.kernel,
-            arc: converted.arc,
-            state,
-            plan: { ...plan, unresolvedQuestion: oldPlan.nextChapterPressure },
-            previousChapter: controlPrevious || null,
-          }),
-          schema: ChapterDraftSchema, temperature: 1,
-        });
-        totalCost += response.usage.costUsd;
-        control = response.value.content;
-      }
-      samples.push({
+      const candidateGenerationCost = generated.usages.reduce((sum, usage) => sum + usage.costUsd, 0);
+      const candidateCostUsd = candidateGenerationCost + planCost / 5;
+      totalCost += candidateGenerationCost;
+      const response = await geminiProvider.json({
+        model: DEFAULT_MODEL_ROUTES.writer, system: legacySystem,
+        prompt: JSON.stringify({
+          kernel: converted.kernel,
+          arc: converted.arc,
+          state,
+          plan,
+          previousChapter: controlPrevious || null,
+        }),
+        schema: ChapterDraftSchema, temperature: 1,
+      });
+      totalCost += response.usage.costUsd;
+      const control = response.value.content;
+      const sample = {
         id: sampleId,
         brief: { story: converted.kernel.title, chapterNumber: plan.chapterNumber, stateBefore: state, plan },
         control,
         candidate: generated.draft.content,
+        candidateTitle: generated.draft.title,
+        candidateCostUsd,
+        stateAfter: generated.stateAfter,
+      };
+      samples.push(sample);
+      slotSamples.push(sample);
+      candidateChapters.push({
+        chapterNumber: plan.chapterNumber,
+        title: generated.draft.title,
+        content: generated.draft.content,
       });
-      state = transition.state;
+      state = generated.stateAfter;
       candidatePrevious = generated.draft.content;
       controlPrevious = control;
       persist();
       console.log(JSON.stringify({ slot, chapter: plan.chapterNumber, samples: samples.length, revision: generated.revisionCount }));
     }
+    const reviewed = await reviewFiveChapterWindow({
+      kernel: converted.kernel,
+      arc: converted.arc,
+      state,
+      chapters: candidateChapters,
+      routes: DEFAULT_MODEL_ROUTES,
+    });
+    totalCost += reviewed.usage.costUsd;
+    if (reviewed.review.status === 'block') {
+      throw new Error(`Candidate window failed quality review for ${slot}: ${JSON.stringify(reviewed.review.issues)}`);
+    }
+    for (const sample of slotSamples) {
+      sample.candidateCostUsd = (sample.candidateCostUsd ?? 0) + reviewed.usage.costUsd / 5;
+    }
+    persist();
   }));
   if (samples.length !== 20 || new Set(samples.map(sample => sample.id)).size !== 20) throw new Error('Benchmark builder did not produce 20 unique samples.');
   persist();

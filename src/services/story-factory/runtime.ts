@@ -12,7 +12,12 @@ import {
   type ModelRoutes,
 } from './contracts';
 import { generateFactoryCover } from './cover';
-import { loadRelevantStoryMemory, memoryEntityIdsForArc, memoryEntityIdsForPlan } from './memory';
+import {
+  loadRelevantStoryMemory,
+  loadRelevantStoryTransitions,
+  memoryEntityIdsForArc,
+  memoryEntityIdsForPlan,
+} from './memory';
 import { writeStoryChapter } from './pipeline';
 import { planArcLifecycle, planRollingWindow, reviewFiveChapterWindow } from './planner';
 import type { ProviderUsage, StoryModelProvider } from './provider';
@@ -315,8 +320,9 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
     }).eq('id', job.id).eq('lease_token', job.lease_token);
     if (jobUpdate.error) throw jobUpdate.error;
     const runUpdate = await db.from('story_factory_runs').update({
-      status: 'passed', model_routes: { planner: routes.planner },
+      status: 'passed', model_routes: { planner: routes.planner, planJudge: routes.planJudge },
       input_artifact: { plannerRevision: FACTORY_PLANNER_VERSION }, output_artifact: planned.rollingPlan,
+      editor_assessment: planned.assessment,
       usage: planned.usages, estimated_cost_usd: usageCost(planned.usages), finished_at: now,
     }).eq('id', runId);
     if (runUpdate.error) throw runUpdate.error;
@@ -356,12 +362,21 @@ async function runChapter(db: SupabaseClient, job: FactoryJobRow, project: Facto
   if (plan.arcNumber !== arc.arcNumber) return blockRun(db, job, null, new StoryFactoryError('plan_blocked', 'Rolling plan belongs to a different arc.'));
   const runId = await createRun(db, job, 'chapter', plan.chapterNumber);
   try {
-    const relevantMemory = await loadRelevantStoryMemory({
-      db,
-      projectId: project.id,
-      state,
-      entityIds: memoryEntityIdsForPlan(kernel, plan),
-    });
+    const entityIds = memoryEntityIdsForPlan(kernel, plan);
+    const [relevantMemory, relevantTransitions] = await Promise.all([
+      loadRelevantStoryMemory({
+        db,
+        projectId: project.id,
+        state,
+        entityIds,
+      }),
+      loadRelevantStoryTransitions({
+        db,
+        projectId: project.id,
+        state,
+        entityIds,
+      }),
+    ]);
     let previousChapter: string | undefined;
     if (plan.chapterNumber > 1) {
       const { data, error } = await db.from('chapters').select('content').eq('novel_id', job.novel_id).eq('chapter_number', plan.chapterNumber - 1).single();
@@ -374,6 +389,7 @@ async function runChapter(db: SupabaseClient, job: FactoryJobRow, project: Facto
       plan,
       previousChapter,
       relevantMemory,
+      relevantTransitions,
       routes,
       provider,
     });

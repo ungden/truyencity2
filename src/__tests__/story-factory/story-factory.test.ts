@@ -25,10 +25,12 @@ import {
   buildWriterBrief,
   isStoryFactoryEnabled,
   loadRelevantStoryMemory,
+  loadRelevantStoryTransitions,
   memoryEntityIdsForArc,
   memoryEntityIdsForPlan,
   runConceptLab,
   planArcLifecycle,
+  planRollingWindow,
   rollingPlanContainsChapter,
   toGeminiResponseSchema,
   validateKernelState,
@@ -36,14 +38,35 @@ import {
 } from '@/services/story-factory';
 import type { ProviderResult, StoryModelProvider } from '@/services/story-factory/provider';
 
+const stageConflicts = [
+  'Vốn mồi và thời tiết buộc gia đình chọn mẻ thử có thể thất bại.',
+  'Người thu mua bảo vệ biên lợi nhuận bằng hợp đồng và lịch nhận hàng.',
+  'Đội thuyền tranh mùa cá trong giới hạn an toàn và nguồn lợi.',
+  'Cơ sở chế biến đối mặt vệ sinh, hao hụt và lao động có tay nghề.',
+  'Mạng phân phối liên huyện chịu cạnh tranh về tín dụng và tốc độ giao.',
+  'Biến động nguồn lợi ép cộng đồng thương lượng hạn ngạch khai thác.',
+  'Thương hiệu vùng bị thử thách bởi tiêu chuẩn chất lượng liên tỉnh.',
+  'Thế hệ kế nghiệp phải cân bằng tăng trưởng với phục hồi sinh thái.',
+];
+const stageRewards = [
+  'Mẻ thử nhỏ đổi thành bữa ăn và khoản vốn quay vòng đầu tiên.',
+  'Đầu ra ổn định đổi công lao động thành dụng cụ và niềm tin.',
+  'Hợp tác đội thuyền tạo sản lượng đều nhưng phải chia lợi ích.',
+  'Chế biến sâu biến hao hụt thành sản phẩm có biên lợi nhuận mới.',
+  'Phân phối xa tạo hợp đồng dài hạn và quyền mặc cả.',
+  'Quản trị nguồn lợi thưởng cho kỷ luật bằng mùa vụ bền hơn.',
+  'Tiêu chuẩn hóa chất lượng tạo uy tín vượt khỏi địa phương.',
+  'Chuyển giao sinh kế thưởng bằng sự tự chủ của thế hệ sau.',
+];
+
 const seriesStages = Array.from({ length: 8 }, (_, index) => ({
   id: `stage_${index + 1}`,
   order: index + 1,
   targetSpanChapters: 100,
   arena: `Địa bàn phát triển nghề biển cấp ${index + 1}.`,
   protagonistGoal: `Đạt mốc sinh kế bền vững cấp ${index + 1}.`,
-  conflictSource: `Nguồn lợi, vốn và đầu ra cùng tăng độ khó ở cấp ${index + 1}.`,
-  rewardLoopVariant: `Mở rộng kỹ thuật, sản phẩm và thị trường ở cấp ${index + 1}.`,
+  conflictSource: stageConflicts[index],
+  rewardLoopVariant: stageRewards[index],
   irreversibleChange: `Gia đình sở hữu năng lực sản xuất không thể quay lại mức cũ ở cấp ${index + 1}.`,
   entryConditions: [`Hoàn thành điều kiện vào giai đoạn ${index + 1}.`],
   exitConditions: [`Đạt điều kiện rời giai đoạn ${index + 1}.`],
@@ -66,9 +89,9 @@ const kernel: StoryKernel = {
   conflictEconomyFingerprint: 'thoi-tiet-von-dau-ra-nguon-loi',
   protagonistId: 'main',
   characters: [
-    { id: 'main', name: 'Hải', aliases: ['anh Hải'], role: 'protagonist', agenda: 'Đưa gia đình thoát cảnh thiếu ăn bằng lao động có tính toán.', competence: 'Biết nghề biển, chế biến và thương lượng đầu ra.', constraint: 'Ký ức chỉ nắm xu hướng, không nhớ chính xác mọi ngày và mọi mức giá.', moralBoundary: 'Không tận diệt nguồn lợi hoặc lừa người cùng làng.', voice: { register: 'đời thường miền biển', sentenceRhythm: 'gọn khi làm việc, chậm khi nói với nhà', directness: 'direct', addressRules: 'xưng hô theo tuổi và quan hệ làng xóm', vocabulary: 'từ nghề biển Việt Nam dễ hiểu', stressResponse: 'quan sát rồi chia việc cụ thể', avoidances: 'không diễn thuyết hoặc nói như sách giáo khoa' } },
-    { id: 'mother', name: 'Bà Lành', aliases: ['mẹ'], role: 'supporting', agenda: 'Giữ gia đình an toàn và không vay nợ liều lĩnh.', competence: 'Giỏi phơi sấy và quản lý bữa ăn.', constraint: 'Sợ rủi ro sau nhiều mùa biển thất bát.', moralBoundary: 'Không chiếm phần của người nghèo hơn.', voice: { register: 'mộc mạc', sentenceRhythm: 'ngắn và giàu hàm ý', directness: 'balanced', addressRules: 'gọi con theo tên', vocabulary: 'ngôn ngữ gia đình', stressResponse: 'hỏi kỹ số tiền và đường lui', avoidances: 'không khóc lóc kéo dài' } },
-    { id: 'buyer', name: 'Tấn', aliases: ['chú Tấn'], role: 'opposition', agenda: 'Giữ nguồn hàng và biên lợi nhuận của mối thu mua.', competence: 'Nắm khách hàng chợ huyện và giá từng bến.', constraint: 'Không thể công khai ép giá khi có người mua cạnh tranh.', moralBoundary: 'Không dùng bạo lực.', voice: { register: 'thương hồ', sentenceRhythm: 'mềm nhưng luôn dò giá', directness: 'balanced', addressRules: 'xưng chú với người trẻ', vocabulary: 'giá, mẻ, mối và chuyến hàng', stressResponse: 'đưa điều kiện mới thay vì nổi nóng', avoidances: 'không tự thú âm mưu' } },
+    { id: 'main', name: 'Hải', aliases: ['anh Hải'], role: 'protagonist', agenda: 'Đưa gia đình thoát cảnh thiếu ăn bằng lao động có tính toán.', competence: 'Biết nghề biển, chế biến và thương lượng đầu ra.', constraint: 'Ký ức chỉ nắm xu hướng, không nhớ chính xác mọi ngày và mọi mức giá.', moralBoundary: 'Không tận diệt nguồn lợi hoặc lừa người cùng làng.', voice: { register: 'đời thường miền biển', sentenceRhythm: 'gọn khi làm việc, chậm khi nói với nhà', directness: 'direct', addressRules: 'xưng hô theo tuổi và quan hệ làng xóm', vocabulary: 'từ nghề biển Việt Nam dễ hiểu', reasoningStyle: 'quan sát dữ kiện rồi chia việc cụ thể', emotionDisplay: 'restrained', humorStyle: 'dry' } },
+    { id: 'mother', name: 'Bà Lành', aliases: ['mẹ'], role: 'supporting', agenda: 'Giữ gia đình an toàn và không vay nợ liều lĩnh.', competence: 'Giỏi phơi sấy và quản lý bữa ăn.', constraint: 'Sợ rủi ro sau nhiều mùa biển thất bát.', moralBoundary: 'Không chiếm phần của người nghèo hơn.', voice: { register: 'mộc mạc', sentenceRhythm: 'ngắn và giàu hàm ý', directness: 'balanced', addressRules: 'gọi con theo tên', vocabulary: 'ngôn ngữ gia đình', reasoningStyle: 'kiểm tra số tiền, rủi ro và đường lui', emotionDisplay: 'open', humorStyle: 'situational' } },
+    { id: 'buyer', name: 'Tấn', aliases: ['chú Tấn'], role: 'opposition', agenda: 'Giữ nguồn hàng và biên lợi nhuận của mối thu mua.', competence: 'Nắm khách hàng chợ huyện và giá từng bến.', constraint: 'Không thể công khai ép giá khi có người mua cạnh tranh.', moralBoundary: 'Không dùng bạo lực.', voice: { register: 'thương hồ', sentenceRhythm: 'mềm nhưng luôn dò giá', directness: 'balanced', addressRules: 'xưng chú với người trẻ', vocabulary: 'giá, mẻ, mối và chuyến hàng', reasoningStyle: 'thử điều kiện mới và quan sát phản ứng đối tác', emotionDisplay: 'deflecting', humorStyle: 'teasing' } },
   ],
   worldModel: {
     era: 'Một làng biển Việt Nam hư cấu cuối thập niên 1980.',
@@ -175,6 +198,18 @@ function editorWirePass(deltaId: string, evidence: string) {
     status: 'pass' as const,
     issues: [],
     deltaChecks: [{ deltaId, realized: true, evidence }],
+    experienceChecks: {
+      sceneDramatized: true,
+      characterAgenda: true,
+      earnedOutcome: true,
+      naturalLanguage: true,
+    },
+    experienceEvidence: {
+      sceneDramatized: evidence,
+      characterAgenda: evidence,
+      earnedOutcome: evidence,
+      naturalLanguage: evidence,
+    },
     outcome: acceptedOutcome(evidence),
   };
 }
@@ -194,7 +229,7 @@ const arc: ArcPlan = {
 
 const routes: ModelRoutes = {
   setupGeneratorA: 'gen-a', setupGeneratorB: 'gen-b', setupJudge: 'judge',
-  openingSimulator: 'sim', launchArchitect: 'launch', planner: 'planner', writer: 'writer', editor: 'editor', routeVersion: 'test-1',
+  openingSimulator: 'sim', launchArchitect: 'launch', planner: 'planner', planJudge: 'plan-judge', writer: 'writer', editor: 'editor', routeVersion: 'test-1',
 };
 
 function plan(chapterNumber: number, before = `ngay_${chapterNumber - 1}`): ChapterPlan {
@@ -215,6 +250,27 @@ function plan(chapterNumber: number, before = `ngay_${chapterNumber - 1}`): Chap
       requiredDeltaIds: [`delta_${chapterNumber}`],
     }],
     requiredDeltas: [{ id: `delta_${chapterNumber}`, kind: 'fact', factId: 'fact_day', before, after: `ngay_${chapterNumber}` }],
+  };
+}
+
+function plannerWire(chapterNumber = 1) {
+  return {
+    v: 1 as const,
+    start: chapterNumber,
+    chaptersJson: [JSON.stringify({
+      v: 1, n: chapterNumber, arc: 1, time: chapterNumber * 60,
+      pre: [{ k: 'fact', id: 'fact_day', value: `ngay_${chapterNumber - 1}` }],
+      rules: ['rule_market'],
+      scenes: [{
+        id: `scene_${chapterNumber}`, pov: 'main', people: ['main', 'mother'], loc: 'home', dur: 60, travel: 0,
+        goal: 'Biến quyết định thành hành động cụ thể.', block: 'Nguồn lực gia đình còn ít.',
+        act: 'Hải chia việc và bắt tay thực hiện.', deltaIds: [`delta_${chapterNumber}`],
+      }],
+      deltas: [{
+        id: `delta_${chapterNumber}`, k: 'fact', target: 'fact_day', counterpart: null,
+        before: `ngay_${chapterNumber - 1}`, change: null, after: `ngay_${chapterNumber}`, source: null, sink: null,
+      }],
+    })],
   };
 }
 
@@ -306,6 +362,12 @@ describe('canonical Story Factory', () => {
     const chapter = plan(1);
     chapter.scenes[0].action = 'Lực quyết định tranh thủ đi mua đá cây trước khi quay lại mua cá.';
     expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
+  });
+
+  test('does not treat a long future-intent clause as a completed transaction', () => {
+    const futurePlan = plan(1);
+    futurePlan.scenes[0].action = 'An nhận ra không thể nhượng bộ, quyết định tìm cơ hội lớn hơn để kiếm tiền trả nợ.';
+    expect(() => applyChapterPlan({ kernel, state: initialState, plan: futurePlan })).not.toThrow();
   });
 
   test('still rejects an actual purchase hidden beside future intent', () => {
@@ -535,15 +597,65 @@ describe('canonical Story Factory', () => {
       endingSituation: 'Mẻ hàng sẵn sàng chuyển sang tìm đầu ra.',
       evidenceSpans: ['lót trấu và xơ dừa'],
     });
-    const brief = JSON.stringify(buildWriterBrief({ kernel, state, plan: plan(1) }));
+    const brief = JSON.stringify(buildWriterBrief({
+      kernel,
+      state,
+      plan: plan(1),
+      relevantTransitions: [{
+        chapterNumber: 1,
+        deltaId: 'delta_prior_decision',
+        kind: 'fact',
+        entityId: 'prior_decision',
+        before: null,
+        after: 'buyer_agreed',
+        relatedEntityIds: ['main', 'buyer', 'prior_decision'],
+      }],
+    }));
     expect(brief).not.toContain('endingDirection');
     expect(brief).not.toContain('research');
     expect(brief).not.toContain('rubric');
     expect(brief).not.toContain('promisesToResolve');
     expect(brief).not.toContain('lót trấu và xơ dừa');
     expect(brief).toContain('prior_decision');
+    expect(brief).not.toContain('Hải giải thích bằng việc làm');
+    expect(brief).not.toContain('"source"');
+    expect(brief).not.toContain('"sink"');
+    expect(brief).not.toContain('uniqueMechanism');
+    expect(brief).not.toContain('stressResponse');
+    expect(brief).not.toContain('avoidances');
     const contexts = buildChapterContexts({ kernel, state, plan: plan(1) });
     expect(JSON.stringify(contexts.editorState)).toContain('lót trấu và xơ dừa');
+  });
+
+  test.each([13, 50, 200, 800])('Writer gets bounded mechanical history without outcome prose at chapter %i', async chapterNumber => {
+    const query: Record<string, unknown> & {
+      then?: (resolve: (value: unknown) => unknown) => Promise<unknown>;
+    } = {};
+    for (const method of ['select', 'eq', 'neq', 'lte', 'overlaps', 'order', 'limit']) {
+      query[method] = () => query;
+    }
+    query.then = resolve => Promise.resolve(resolve({
+      data: [{
+        chapter_number: 1,
+        delta_id: 'delta_first_meeting',
+        kind: 'relationship',
+        entity_id: 'main',
+        before_value: null,
+        after_value: 'debt_open',
+        related_entity_ids: ['main', 'buyer'],
+      }],
+      error: null,
+    }));
+    const transitions = await loadRelevantStoryTransitions({
+      db: { from: () => query } as never,
+      projectId: '00000000-0000-0000-0000-000000000001',
+      state: { ...initialState, chapterNumber },
+      entityIds: ['buyer'],
+    });
+    const brief = JSON.stringify(buildWriterBrief({ kernel, state: initialState, plan: plan(1), relevantTransitions: transitions }));
+    expect(brief).toContain('delta_first_meeting');
+    expect(brief).toContain('debt_open');
+    expect(brief).not.toContain('Hải gặp Tấn lần đầu');
   });
 
   test('deterministic cover typography renders visible Vietnamese title and watermark pixels', async () => {
@@ -657,6 +769,39 @@ describe('canonical Story Factory', () => {
     expect(assessment).toMatchObject({ status: 'revise', issues: [{ category: 'resource' }] });
   });
 
+  test('Editor prose issue must ground to bytes in the draft', async () => {
+    const draft = { title: 'Mẻ lưới đầu', content: 'Hải trải tấm lưới lên hiên rồi cùng mẹ kiểm tra từng mắt rách.' };
+    const invalidIssue = {
+      v: 1 as const,
+      status: 'revise' as const,
+      issues: [{
+        category: 'stock_reaction' as const,
+        severity: 'major' as const,
+        scope: 'prose' as const,
+        evidence: 'cả làng bàng hoàng reo hò',
+        instruction: 'Thay phản ứng tập thể bằng hành động có agenda riêng.',
+      }],
+      deltaChecks: [{ deltaId: 'delta_1', realized: true, evidence: 'trải tấm lưới' }],
+      experienceChecks: {
+        sceneDramatized: true,
+        characterAgenda: true,
+        earnedOutcome: true,
+        naturalLanguage: false,
+      },
+      experienceEvidence: {
+        sceneDramatized: 'trải tấm lưới',
+        characterAgenda: 'cùng mẹ kiểm tra',
+        earnedOutcome: 'kiểm tra từng mắt rách',
+        naturalLanguage: 'trải tấm lưới',
+      },
+      outcome: { event: '', result: '', method: '', endingSituation: '', evidenceSpans: [] },
+    };
+    await expect(writeStoryChapter({
+      kernel, state: initialState, plan: plan(1), routes,
+      provider: new QueueProvider([draft, invalidIssue]),
+    })).rejects.toMatchObject({ code: 'infra_blocked' });
+  });
+
   test('accepted outcome evidence must exist verbatim in prose', () => {
     const transitioned = applyChapterPlan({ kernel, state: initialState, plan: plan(1) }).state;
     expect(() => appendAcceptedOutcome({
@@ -687,24 +832,7 @@ describe('canonical Story Factory', () => {
   });
 
   test('Planner wire envelope materializes into the exact canonical plan', () => {
-    const rolling = materializePlannerRollingPlan({
-      v: 1,
-      start: 1,
-      chaptersJson: [JSON.stringify({
-        v: 1, n: 1, arc: 1, time: 60,
-        pre: [{ k: 'fact', id: 'fact_day', value: 'ngay_0' }],
-        rules: ['rule_market'],
-        scenes: [{
-          id: 'scene_1', pov: 'main', people: ['main', 'mother'], loc: 'home', dur: 60, travel: 0,
-          goal: 'Biến quyết định thành hành động cụ thể.', block: 'Nguồn lực gia đình còn ít.',
-          act: 'Hải chia việc và bắt tay thực hiện.', deltaIds: ['delta_1'],
-        }],
-        deltas: [{
-          id: 'delta_1', k: 'fact', target: 'fact_day', counterpart: null, before: 'ngay_0', change: null,
-          after: 'ngay_1', source: null, sink: null,
-        }],
-      })],
-    });
+    const rolling = materializePlannerRollingPlan(plannerWire());
     expect(rolling.startChapter).toBe(1);
     expect(rolling.plans[0].chapterNumber).toBe(1);
     expect(rolling.plans[0].requiredDeltas[0]).toEqual({
@@ -712,9 +840,112 @@ describe('canonical Story Factory', () => {
     });
   });
 
+  test('Plan Judge passes a valid window with one independent review call', async () => {
+    const provider = new QueueProvider([plannerWire(), {
+      status: 'pass',
+      checks: {
+        causalMechanism: true, earnedProgression: true, oppositionAgenda: true,
+        sceneVariety: true, stageAlignment: true, stateTransition: true,
+      },
+      checkEvidence: {
+        causalMechanism: 'chapter 1 scene_1 delta_1',
+        earnedProgression: 'chapter 1 scene_1 delta_1',
+        oppositionAgenda: 'chapter 1 scene_1 delta_1',
+        sceneVariety: 'chapter 1 scene_1 delta_1',
+        stageAlignment: 'chapter 1 scene_1 delta_1',
+        stateTransition: 'chapter 1 scene_1 delta_1',
+      },
+      issues: [],
+    }]);
+    const result = await planRollingWindow({ kernel, arc, state: initialState, routes, provider });
+    expect(result.assessment.status).toBe('pass');
+    expect(provider.calls).toEqual(['planner', 'plan-judge']);
+  });
+
+  test('Plan Judge permits exactly one full-window replan then passes', async () => {
+    const revise = {
+      status: 'revise' as const,
+      checks: {
+        causalMechanism: true, earnedProgression: false, oppositionAgenda: true,
+        sceneVariety: true, stageAlignment: true, stateTransition: true,
+      },
+      checkEvidence: {
+        causalMechanism: 'chapter 1 scene_1 delta_1',
+        earnedProgression: 'chapter 1 scene_1 delta_1',
+        oppositionAgenda: 'chapter 1 scene_1 delta_1',
+        sceneVariety: 'chapter 1 scene_1 delta_1',
+        stageAlignment: 'chapter 1 scene_1 delta_1',
+        stateTransition: 'chapter 1 scene_1 delta_1',
+      },
+      issues: [{
+        category: 'earned_progression' as const,
+        chapterNumber: 1,
+        sceneId: 'scene_1',
+        deltaId: 'delta_1',
+        evidence: 'delta_1 tăng kết quả quá nhanh',
+        instruction: 'Tạo tích lũy và chi phí đủ sức đỡ delta_1.',
+      }],
+    };
+    const provider = new QueueProvider([plannerWire(), revise, plannerWire(), {
+      status: 'pass',
+      checks: {
+        causalMechanism: true, earnedProgression: true, oppositionAgenda: true,
+        sceneVariety: true, stageAlignment: true, stateTransition: true,
+      },
+      checkEvidence: {
+        causalMechanism: 'chapter 1 scene_1 delta_1',
+        earnedProgression: 'chapter 1 scene_1 delta_1',
+        oppositionAgenda: 'chapter 1 scene_1 delta_1',
+        sceneVariety: 'chapter 1 scene_1 delta_1',
+        stageAlignment: 'chapter 1 scene_1 delta_1',
+        stateTransition: 'chapter 1 scene_1 delta_1',
+      },
+      issues: [],
+    }]);
+    const result = await planRollingWindow({ kernel, arc, state: initialState, routes, provider });
+    expect(result.assessment.status).toBe('pass');
+    expect(provider.calls).toEqual(['planner', 'plan-judge', 'planner', 'plan-judge']);
+  });
+
+  test('Plan Judge blocks after the second rejected window without fallback', async () => {
+    const revise = {
+      status: 'revise' as const,
+      checks: {
+        causalMechanism: true, earnedProgression: true, oppositionAgenda: false,
+        sceneVariety: true, stageAlignment: true, stateTransition: true,
+      },
+      checkEvidence: {
+        causalMechanism: 'chapter 1 scene_1 delta_1',
+        earnedProgression: 'chapter 1 scene_1 delta_1',
+        oppositionAgenda: 'chapter 1 scene_1 delta_1',
+        sceneVariety: 'chapter 1 scene_1 delta_1',
+        stageAlignment: 'chapter 1 scene_1 delta_1',
+        stateTransition: 'chapter 1 scene_1 delta_1',
+      },
+      issues: [{
+        category: 'opposition_agenda' as const,
+        chapterNumber: 1,
+        sceneId: 'scene_1',
+        deltaId: null,
+        evidence: 'scene_1 không có đối sách độc lập',
+        instruction: 'Cho đối lực hành động theo lợi ích riêng trong scene_1.',
+      }],
+    };
+    const provider = new QueueProvider([plannerWire(), revise, plannerWire(), revise]);
+    await expect(planRollingWindow({ kernel, arc, state: initialState, routes, provider }))
+      .rejects.toMatchObject({ code: 'plan_blocked' });
+    expect(provider.calls).toEqual(['planner', 'plan-judge', 'planner', 'plan-judge']);
+  });
+
   test('window review can block resource and artifact drift across a chapter window', () => {
     expect(WindowReviewSchema.parse({
       status: 'block',
+      checks: {
+        structureVariety: false,
+        reactionVariety: true,
+        voiceSeparation: true,
+        earnedProgression: false,
+      },
       issues: [
         {
           category: 'resource_drift',
@@ -794,11 +1025,16 @@ describe('canonical Story Factory', () => {
       arc: { ...arc, startChapter: 1 }, initialState,
       coverPrompt: 'Một làng biển Việt Nam cuối thập niên tám mươi lúc bình minh, thuyền gỗ và sân phơi cá, không chữ.',
     };
+    const openingSample = Array.from({ length: 650 }, (_, index) => (
+      ['Hải', 'quan', 'sát', 'con', 'nước', 'rồi', 'chọn', 'việc', 'cần', 'làm'][index % 10]
+    )).join(' ');
     const simulations = [a[0], b[0]].map(item => ({
       conceptId: item.id,
-      chapter1: 'Mở đầu bằng một quyết định có hậu quả vật chất rõ ràng.',
-      chapter2: 'Gia đình cùng lao động và gặp giới hạn đầu tiên của nghề.',
-      chapter3: 'Mẻ hàng đầu tiên tạo lợi ích cụ thể và mở xung đột đầu ra.',
+      openingSample,
+      chapter2Direction: 'Gia đình cùng lao động và gặp giới hạn đầu tiên của nghề.',
+      chapter3Direction: 'Mẻ hàng đầu tiên tạo lợi ích cụ thể và mở xung đột đầu ra.',
+      characterChemistry: 'Hải chủ động tính toán nhưng phải thuyết phục người mẹ thận trọng bằng hành động thật.',
+      conflictAgency: 'Người mua bảo vệ biên lợi nhuận bằng lựa chọn đầu ra riêng, không đứng yên chờ Hải biểu diễn.',
       serialStrength: 'Cơ chế có thể đổi sản phẩm, kỹ thuật, khách hàng và quy mô.',
       causalRisk: 'Ký ức tương lai cần giữ sai số và không biến thành toàn tri.',
       domainFeasibility: 'pass' as const,

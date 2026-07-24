@@ -11,8 +11,9 @@ export const VoiceContractSchema = z.object({
   directness: z.enum(['reserved', 'balanced', 'direct']),
   addressRules: shortText,
   vocabulary: shortText,
-  stressResponse: shortText,
-  avoidances: shortText,
+  reasoningStyle: shortText,
+  emotionDisplay: z.enum(['restrained', 'open', 'deflecting', 'volatile']),
+  humorStyle: z.enum(['none', 'dry', 'self_deprecating', 'situational', 'teasing']),
 }).strict();
 
 export const StoryCharacterSchema = z.object({
@@ -424,6 +425,8 @@ export const EditorIssueSchema = z.object({
     'canon', 'timeline', 'location', 'resource', 'knowledge', 'authority',
     'pov', 'required_delta', 'causality', 'character_voice',
     'prose_naturalness', 'scene_effect', 'narrative_repetition', 'prompt_leak',
+    'expository_prose', 'stock_reaction', 'opposition_agency', 'earned_outcome',
+    'mechanism_credibility',
   ]),
   severity: z.enum(['critical', 'major', 'moderate']),
   scope: z.enum(['prose', 'plan', 'kernel']),
@@ -451,6 +454,33 @@ export const EditorAssessmentSchema = z.discriminatedUnion('status', [
   }).strict(),
 ]);
 
+export const PlanIssueSchema = z.object({
+  category: z.enum([
+    'causal_mechanism',
+    'earned_progression',
+    'opposition_agenda',
+    'scene_variety',
+    'stage_alignment',
+    'state_transition',
+  ]),
+  chapterNumber: z.number().int().positive(),
+  sceneId: stableId.nullable(),
+  deltaId: stableId.nullable(),
+  evidence: z.string().trim().min(3).max(800),
+  instruction: z.string().trim().min(5).max(800),
+}).strict();
+
+export const PlanAssessmentSchema = z.discriminatedUnion('status', [
+  z.object({
+    status: z.literal('pass'),
+    issues: z.array(z.never()).length(0),
+  }).strict(),
+  z.object({
+    status: z.literal('revise'),
+    issues: z.array(PlanIssueSchema).min(1).max(3),
+  }).strict(),
+]);
+
 export const ModelRoutesSchema = z.object({
   setupGeneratorA: z.string().trim().min(3),
   setupGeneratorB: z.string().trim().min(3),
@@ -458,12 +488,16 @@ export const ModelRoutesSchema = z.object({
   openingSimulator: z.string().trim().min(3),
   launchArchitect: z.string().trim().min(3),
   planner: z.string().trim().min(3),
+  planJudge: z.string().trim().min(3),
   writer: z.string().trim().min(3),
   editor: z.string().trim().min(3),
   routeVersion: z.string().trim().min(3),
 }).strict().superRefine((routes, ctx) => {
   if (routes.writer === routes.editor) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['editor'], message: 'Writer and Editor routes must be independent.' });
+  }
+  if (routes.planner === routes.planJudge) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['planJudge'], message: 'Planner and Plan Judge routes must be independent.' });
   }
 });
 
@@ -523,6 +557,7 @@ export type StateDelta = z.infer<typeof StateDeltaSchema>;
 export type ChapterPlan = z.infer<typeof ChapterPlanSchema>;
 export type RollingPlan = z.infer<typeof RollingPlanSchema>;
 export type EditorAssessment = z.infer<typeof EditorAssessmentSchema>;
+export type PlanAssessment = z.infer<typeof PlanAssessmentSchema>;
 export type ModelRoutes = z.infer<typeof ModelRoutesSchema>;
 export type LaunchPack = z.infer<typeof LaunchPackSchema>;
 

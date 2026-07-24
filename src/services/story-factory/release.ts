@@ -2,11 +2,11 @@ import { createHash } from 'node:crypto';
 import { FACTORY_PROMPT_VERSION } from './prompts';
 import { DEFAULT_MODEL_ROUTES } from './routes';
 
-export const FACTORY_CONTRACT_VERSION = 'story-factory-contracts-12-add-only-canon-extension';
-export const FACTORY_STATE_VERSION = 'story-factory-state-6-exact-id-memory-consumed-seeds';
-export const FACTORY_SETUP_VERSION = 'story-factory-setup-8-long-series-add-only-canon';
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-6-stage-bound-arc-memory';
-const FACTORY_ENGINE_SETUP_COMPATIBILITY = 'story-factory-setup-8-long-series-add-only-canon';
+export const FACTORY_CONTRACT_VERSION = 'story-factory-contracts-14-grounded-experience-gates';
+export const FACTORY_STATE_VERSION = 'story-factory-state-7-bounded-mechanical-history';
+export const FACTORY_SETUP_VERSION = 'story-factory-setup-9-opening-prose-semantic';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-9-explicit-ledger-before-values';
+const FACTORY_ENGINE_SETUP_COMPATIBILITY = FACTORY_SETUP_VERSION;
 
 const identity = {
   promptVersion: FACTORY_PROMPT_VERSION,

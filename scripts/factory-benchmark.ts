@@ -19,6 +19,9 @@ const sampleSchema = z.object({
   brief: z.unknown(),
   control: z.string().min(20),
   candidate: z.string().min(20),
+  candidateCostUsd: z.number().nonnegative().optional(),
+  candidateTitle: z.string().min(2).optional(),
+  stateAfter: z.unknown().optional(),
 }).strict();
 const corpusSchema = z.object({
   sourceRef: z.string().min(4).optional(),
@@ -119,9 +122,24 @@ Sau đó chọn bản tốt hơn dựa trên tính nối tiếp, nhân quả, gi
     majorityPreference: majorityWins / 20,
     desireToReadNext: majorityWantsNext / 20,
     criticalContinuityViolations: criticalViolations,
+    medianCandidateCostUsd: (() => {
+      const costs = corpus.samples.map(sample => sample.candidateCostUsd).filter((item): item is number => typeof item === 'number').sort((a, b) => a - b);
+      if (costs.length !== 20) return null;
+      return (costs[9] + costs[10]) / 2;
+    })(),
+    maxCandidateCostUsd: (() => {
+      const costs = corpus.samples.map(sample => sample.candidateCostUsd).filter((item): item is number => typeof item === 'number');
+      return costs.length === 20 ? Math.max(...costs) : null;
+    })(),
     totalCostUsd: totalCost,
   };
-  const passed = metrics.majorityPreference >= 0.65 && metrics.desireToReadNext >= 0.7 && criticalViolations === 0;
+  const passed = metrics.majorityPreference >= 0.7
+    && metrics.desireToReadNext >= 0.75
+    && criticalViolations === 0
+    && metrics.medianCandidateCostUsd !== null
+    && metrics.medianCandidateCostUsd <= 0.25
+    && metrics.maxCandidateCostUsd !== null
+    && metrics.maxCandidateCostUsd <= 0.5;
   console.log(JSON.stringify({ dryRun: !apply, release: STORY_FACTORY_RELEASE, passed, metrics }, null, 2));
   if (!apply) return;
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;

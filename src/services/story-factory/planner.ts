@@ -2,10 +2,12 @@ import { z } from 'zod';
 import {
   ArcPlanSchema,
   CanonExtensionSchema,
+  PlanAssessmentSchema,
   RollingPlanSchema,
   StoryFactoryError,
   type ArcPlan,
   type ModelRoutes,
+  type PlanAssessment,
   type RollingPlan,
   type StoryKernel,
   type StoryState,
@@ -13,7 +15,7 @@ import {
 import type { RelevantStoryMemory } from './memory';
 import type { ProviderUsage, StoryModelProvider } from './provider';
 import { geminiProvider } from './provider';
-import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT } from './prompts';
+import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import { applyCanonExtension, validateArcAgainstKernel, validateRollingPlan } from './validation';
 
 const PlannerScalarSchema = z.union([z.string(), z.number(), z.null()]);
@@ -90,6 +92,8 @@ const PLANNER_COMPACT_CONTRACT = {
     'scene.people chỉ gồm nhân vật đang có mặt vật lý ở scene.loc; nếu nhân vật chỉ được nhắc tới hoặc là động lực ở nơi khác thì không đưa vào people.',
     'scene.deltaIds chỉ chứa delta ID tồn tại trong cùng chương; cảnh nối có thể rỗng nhưng cả chương vẫn phải có deltas.',
     'Mỗi delta phải được ít nhất một scene.deltaIds tham chiếu.',
+    'knowledge.after phải là fact ID đã tồn tại trong State. Nếu nhân vật học một fact mới, tạo fact delta khai báo fact đó trước knowledge delta trong cùng chương và gắn cả hai vào scene học biết.',
+    'relationship.before phải bằng chính xác State.characters[characterId].relationshipState[counterpartId], hoặc null nếu pair chưa có entry; không suy ra quan hệ ban đầu từ role, agenda hay mô tả Kernel.',
     'Nếu một nhân vật đổi location trong chương, tạo đúng một location delta từ vị trí đầu chương tới vị trí ở scene cuối của họ và gắn delta vào scene thực hiện lần di chuyển đầu tiên.',
   ],
 } as const;
@@ -141,9 +145,24 @@ export function materializePlannerRollingPlan(value: z.infer<typeof PlannerRolli
 }
 
 export const WindowReviewSchema = z.discriminatedUnion('status', [
-  z.object({ status: z.literal('pass'), issues: z.array(z.never()).length(0) }).strict(),
+  z.object({
+    status: z.literal('pass'),
+    checks: z.object({
+      structureVariety: z.literal(true),
+      reactionVariety: z.literal(true),
+      voiceSeparation: z.literal(true),
+      earnedProgression: z.literal(true),
+    }).strict(),
+    issues: z.array(z.never()).length(0),
+  }).strict(),
   z.object({
     status: z.literal('block'),
+    checks: z.object({
+      structureVariety: z.boolean(),
+      reactionVariety: z.boolean(),
+      voiceSeparation: z.boolean(),
+      earnedProgression: z.boolean(),
+    }).strict(),
     issues: z.array(z.object({
       category: z.enum([
         'continuity_drift',
@@ -153,6 +172,9 @@ export const WindowReviewSchema = z.discriminatedUnion('status', [
         'progression',
         'resource_drift',
         'artifact_drift',
+        'prose_pattern',
+        'opposition_agency',
+        'earned_progression',
       ]),
       evidence: z.string().trim().min(5).max(1_000),
       instruction: z.string().trim().min(5).max(1_000),
@@ -169,6 +191,106 @@ const ArcLifecycleSchema = z.discriminatedUnion('status', [
 export type WindowReview = z.infer<typeof WindowReviewSchema>;
 export type ArcLifecycle = z.infer<typeof ArcLifecycleSchema>;
 
+const PlanJudgeWireSchema = z.object({
+  status: z.enum(['pass', 'revise']),
+  checks: z.object({
+    causalMechanism: z.boolean(),
+    earnedProgression: z.boolean(),
+    oppositionAgenda: z.boolean(),
+    sceneVariety: z.boolean(),
+    stageAlignment: z.boolean(),
+    stateTransition: z.boolean(),
+  }).strict(),
+  checkEvidence: z.object({
+    causalMechanism: z.string().trim().min(3).max(800),
+    earnedProgression: z.string().trim().min(3).max(800),
+    oppositionAgenda: z.string().trim().min(3).max(800),
+    sceneVariety: z.string().trim().min(3).max(800),
+    stageAlignment: z.string().trim().min(3).max(800),
+    stateTransition: z.string().trim().min(3).max(800),
+  }).strict(),
+  issues: z.array(PlanAssessmentSchema.options[1].shape.issues.element).max(3),
+}).strict();
+
+function validatePlanAssessment(plan: RollingPlan, assessment: PlanAssessment): void {
+  if (assessment.status === 'pass') return;
+  for (const issue of assessment.issues) {
+    const chapter = plan.plans.find(item => item.chapterNumber === issue.chapterNumber);
+    if (!chapter) {
+      throw new StoryFactoryError('infra_blocked', 'Plan Judge referenced an unknown chapter.', issue);
+    }
+    if (issue.sceneId && !chapter.scenes.some(scene => scene.id === issue.sceneId)) {
+      throw new StoryFactoryError('infra_blocked', 'Plan Judge referenced an unknown scene.', issue);
+    }
+    if (issue.deltaId && !chapter.requiredDeltas.some(delta => delta.id === issue.deltaId)) {
+      throw new StoryFactoryError('infra_blocked', 'Plan Judge referenced an unknown delta.', issue);
+    }
+  }
+}
+
+export async function assessRollingPlan(input: {
+  provider: StoryModelProvider;
+  kernel: StoryKernel;
+  arc: ArcPlan;
+  state: StoryState;
+  rollingPlan: RollingPlan;
+  model: string;
+}): Promise<{ assessment: PlanAssessment; usage: ProviderUsage }> {
+  const auditSignals = input.rollingPlan.plans.map(chapter => ({
+    chapterNumber: chapter.chapterNumber,
+    scenes: chapter.scenes.map(scene => ({
+      sceneId: scene.id,
+      participants: scene.participantIds,
+      objective: scene.objective,
+      obstacle: scene.obstacle,
+      plannedAction: scene.action,
+    })),
+    numericTransitions: chapter.requiredDeltas.flatMap(delta => delta.kind === 'resource_numeric' ? [{
+      deltaId: delta.id,
+      resourceId: delta.resourceId,
+      before: delta.before,
+      change: delta.delta,
+      after: delta.after,
+      relativeMagnitude: delta.before === 0 ? null : Math.abs(delta.delta / delta.before),
+    }] : []),
+    stateTransitions: chapter.requiredDeltas.map(delta => ({ deltaId: delta.id, kind: delta.kind })),
+  }));
+  const result = await input.provider.json({
+    model: input.model,
+    system: PLAN_JUDGE_SYSTEM_PROMPT,
+    prompt: JSON.stringify({
+      task: 'Đánh giá rolling plan theo chất lượng nhân quả và khả năng tạo cảnh, không chấm prose.',
+      kernel: input.kernel,
+      arc: input.arc,
+      state: input.state,
+      rollingPlan: input.rollingPlan,
+      auditSignals,
+      mandatoryChecks: {
+        causalMechanism: 'Mỗi cơ hội/tai họa/kết quả phải có nguyên nhân trong state/precondition/world rule trước cảnh; action tự tuyên bố nguyên nhân hoặc source/sink bookkeeping không phải bằng chứng.',
+        earnedProgression: 'Độ lớn thay đổi phải tương xứng chuẩn bị, chi phí, rủi ro và thang hiện tại; thay đổi trên 5 lần baseline cần tích lũy nhiều bước cụ thể.',
+        oppositionAgenda: 'Đối lực phải có lựa chọn, đối sách và hậu quả theo agenda riêng; chỉ gây hấn rồi kinh ngạc/thua/chạy không đạt.',
+        sceneVariety: 'Window không được lặp công thức giải thích cơ chế → biểu diễn thành công → người khác kinh ngạc/tôn sùng → nhận thưởng.',
+        stageAlignment: 'Xung đột và reward loop phải phục vụ stage hiện tại, không nhảy sớm.',
+        stateTransition: 'Mọi before/after phải hợp lý cả số học lẫn ý nghĩa thế giới; giảm một ma sát không tự tạo thêm năng lượng, lưu lượng hay độ bền ngoài world rule.',
+      },
+      evidenceRule: 'Với mỗi check, checkEvidence phải chỉ rõ chapterNumber và ít nhất một sceneId hoặc deltaId làm căn cứ; không chấp nhận lời khen chung.',
+    }),
+    schema: PlanJudgeWireSchema,
+    temperature: 0.3,
+  });
+  const failedChecks = Object.entries(result.value.checks).filter(([, passed]) => !passed).map(([gate]) => gate);
+  if (failedChecks.length > 0 && result.value.issues.length === 0) {
+    throw new StoryFactoryError('infra_blocked', 'Plan Judge returned a failed gate without evidence.', { failedChecks });
+  }
+  const assessment = PlanAssessmentSchema.parse(
+    result.value.issues.length > 0 || failedChecks.length > 0
+      ? { status: 'revise', issues: result.value.issues }
+      : { status: 'pass', issues: [] },
+  );
+  validatePlanAssessment(input.rollingPlan, assessment);
+  return { assessment, usage: result.usage };
+}
+
 export async function planRollingWindow(input: {
   kernel: StoryKernel;
   arc: ArcPlan;
@@ -177,7 +299,7 @@ export async function planRollingWindow(input: {
   recoveryEvidence?: unknown;
   relevantMemory?: RelevantStoryMemory[];
   provider?: StoryModelProvider;
-}): Promise<{ rollingPlan: RollingPlan; usages: ProviderUsage[] }> {
+}): Promise<{ rollingPlan: RollingPlan; assessment: PlanAssessment; usages: ProviderUsage[] }> {
   const provider = input.provider ?? geminiProvider;
   const usages: ProviderUsage[] = [];
   let previousResponse: unknown;
@@ -196,6 +318,19 @@ export async function planRollingWindow(input: {
         kernel: input.kernel,
         arc: input.arc,
         state: input.state,
+        ledgerSnapshot: {
+          facts: Object.fromEntries(input.state.facts.map(item => [item.id, item.value])),
+          resources: Object.fromEntries(input.state.resources.map(item => [item.resourceId, item.value])),
+          locations: Object.fromEntries(input.state.characters.map(item => [item.characterId, item.locationId])),
+          relationships: input.state.characters.flatMap(character => (
+            Object.entries(character.relationshipState).map(([counterpartId, value]) => ({
+              characterId: character.characterId,
+              counterpartId,
+              value,
+            }))
+          )),
+          promises: Object.fromEntries(input.state.promises.map(item => [item.promiseId, item.status])),
+        },
         relevantMemory: input.relevantMemory ?? [],
         nextChapter: input.state.chapterNumber + 1,
         maximumEndChapter: input.arc.plannedEndChapter,
@@ -211,8 +346,23 @@ export async function planRollingWindow(input: {
     try {
       const parsed = materializePlannerRollingPlan(result.value);
       validateRollingPlan({ kernel: input.kernel, arc: input.arc, state: input.state, rollingPlan: parsed });
-      return { rollingPlan: parsed, usages };
+      const judged = await assessRollingPlan({
+        provider,
+        kernel: input.kernel,
+        arc: input.arc,
+        state: input.state,
+        rollingPlan: parsed,
+        model: input.routes.planJudge,
+      });
+      usages.push(judged.usage);
+      if (judged.assessment.status === 'pass') {
+        return { rollingPlan: parsed, assessment: judged.assessment, usages };
+      }
+      lastError = new StoryFactoryError('plan_blocked', 'Plan Judge rejected the rolling window.', judged.assessment.issues);
+      previousResponse = result.value;
+      validationIssues = judged.assessment.issues;
     } catch (error) {
+      if (error instanceof StoryFactoryError && error.code === 'infra_blocked') throw error;
       lastError = error instanceof StoryFactoryError
         ? error
         : new StoryFactoryError('infra_blocked', 'Planner output failed the exact rolling-plan contract.', error instanceof z.ZodError ? error.issues : undefined);
@@ -247,7 +397,8 @@ export async function reviewFiveChapterWindow(input: {
     system: `${EDITOR_SYSTEM_PROMPT}
 Ở chế độ window review, đọc liền mạch năm chương và so với recentOutcomes/state đã commit.
 Block nếu nhân vật phản ứng như quên sự kiện vừa trải qua, cơ chế vật phẩm/công nghệ đổi cách hoạt động, số tiền/khối lượng/giá trong prose lệch với ledger, hoặc năm chương lặp cùng cấu trúc mà không tạo tiến triển.
-Không chấm lại từng câu văn; chỉ báo tối đa ba lỗi drift quan trọng làm giảm khả năng tiếp tục truyện dài.`,
+Phải đọc trải nghiệm của cả cửa sổ: bắt lặp chức năng “giải thích cơ chế → biểu diễn → quần chúng kinh ngạc”, stock reaction tương đương dù khác từ, main và đối thủ nói cùng giọng, đối thủ liên tục làm công cụ, hoặc progression tăng mạnh thiếu tích lũy/chi phí.
+Chỉ báo tối đa ba lỗi drift hoặc pattern quan trọng; evidence phải trích từ và so sánh các chương cụ thể.`,
     prompt: JSON.stringify({
       task: 'Kiểm tra cửa sổ năm chương vừa commit.',
       auditChecklist: [
@@ -256,6 +407,9 @@ Không chấm lại từng câu văn; chỉ báo tối đa ba lỗi drift quan t
         'giá, tiền, khối lượng, tồn kho và lời nhẩm trong prose có khớp ledger không',
         'cửa sổ có payoff vật chất/tình cảm và progression mới không',
         'có lặp một công thức chuẩn bị - vận chuyển - bán mà thiếu biến hóa không',
+        'có lặp stock reaction, đám đông kinh ngạc hoặc khoảnh khắc sinh tử cùng chức năng không',
+        'main và đối thủ có agenda, giọng nói và cách hành động phân biệt không',
+        'mức progression có được tích lũy và trả giá đủ trong năm chương không',
       ],
       kernelIdentity: {
         protagonistId: input.kernel.protagonistId,

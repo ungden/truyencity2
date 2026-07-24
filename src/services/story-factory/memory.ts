@@ -13,6 +13,16 @@ export interface RelevantStoryMemory {
   relatedEntityIds: string[];
 }
 
+export interface RelevantStoryTransition {
+  chapterNumber: number;
+  deltaId: string;
+  kind: string;
+  entityId: string;
+  before: unknown;
+  after: unknown;
+  relatedEntityIds: string[];
+}
+
 function unique(values: string[]): string[] {
   return [...new Set(values.filter(Boolean))];
 }
@@ -75,4 +85,36 @@ export async function loadRelevantStoryMemory(input: {
         : [],
     }] : [];
   });
+}
+
+export async function loadRelevantStoryTransitions(input: {
+  db: SupabaseClient;
+  projectId: string;
+  state: StoryState;
+  entityIds: string[];
+  limit?: number;
+}): Promise<RelevantStoryTransition[]> {
+  const ids = unique(input.entityIds);
+  if (!ids.length || input.state.chapterNumber === 0) return [];
+  const { data, error } = await input.db
+    .from('story_state_events')
+    .select('chapter_number,delta_id,kind,entity_id,before_value,after_value,related_entity_ids')
+    .eq('project_id', input.projectId)
+    .neq('kind', 'chapter_outcome')
+    .lte('chapter_number', input.state.chapterNumber)
+    .overlaps('related_entity_ids', ids)
+    .order('chapter_number', { ascending: false })
+    .limit(input.limit ?? 6);
+  if (error) throw error;
+  return (data ?? []).map(row => ({
+    chapterNumber: row.chapter_number,
+    deltaId: row.delta_id,
+    kind: row.kind,
+    entityId: row.entity_id,
+    before: row.before_value,
+    after: row.after_value,
+    relatedEntityIds: Array.isArray(row.related_entity_ids)
+      ? row.related_entity_ids.filter((id: unknown): id is string => typeof id === 'string')
+      : [],
+  }));
 }
