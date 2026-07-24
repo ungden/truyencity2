@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { ImageResponse } from 'next/og';
 import sharp from 'sharp';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { StoryFactoryError } from './contracts';
@@ -7,12 +8,6 @@ const WIDTH = 1_200;
 const HEIGHT = 1_800;
 const IMAGE_MODEL = process.env.GEMINI_IMAGE_MODEL || 'gemini-3-pro-image-preview';
 const API_BASE = 'https://generativelanguage.googleapis.com/v1beta';
-
-function escapeXml(value: string): string {
-  return value.replace(/[<>&'"]/g, character => ({
-    '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;',
-  })[character]!);
-}
 
 function wrapTitle(title: string, maxCharacters = 24): string[] {
   const lines: string[] = [];
@@ -29,14 +24,7 @@ function wrapTitle(title: string, maxCharacters = 24): string[] {
   return lines;
 }
 
-function typographyOverlay(title: string): Buffer {
-  const lines = wrapTitle(title);
-  const fontSize = Math.max(42, Math.min(84, Math.floor(500 / Math.max(1, lines.length))));
-  const lineHeight = Math.round(fontSize * 1.12);
-  const startY = 100 + Math.round((520 - lines.length * lineHeight) / 2) + fontSize;
-  const spans = lines.map((line, index) =>
-    `<tspan x="${WIDTH / 2}" y="${startY + index * lineHeight}">${escapeXml(line)}</tspan>`,
-  ).join('');
+function gradientOverlay(): Buffer {
   return Buffer.from(`<svg width="${WIDTH}" height="${HEIGHT}" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <linearGradient id="top" x1="0" y1="0" x2="0" y2="1">
@@ -51,14 +39,81 @@ function typographyOverlay(title: string): Buffer {
     </defs>
     <rect width="${WIDTH}" height="650" fill="url(#top)"/>
     <rect y="${HEIGHT - 220}" width="${WIDTH}" height="220" fill="url(#bottom)"/>
-    <text text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="800"
-      font-size="${fontSize}" fill="#fff9ec" stroke="#070a10" stroke-width="10"
-      paint-order="stroke fill" stroke-linejoin="round">${spans}</text>
-    <text x="${WIDTH / 2}" y="${HEIGHT - 72}" text-anchor="middle"
-      font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="34"
-      letter-spacing="3" fill="#fff9ec" stroke="#070a10" stroke-width="5"
-      paint-order="stroke fill">truyencity.com</text>
   </svg>`);
+}
+
+function typographyElement(title: string): React.ReactElement {
+  const lines = wrapTitle(title);
+  const fontSize = Math.max(42, Math.min(84, Math.floor(500 / Math.max(1, lines.length))));
+  return {
+    type: 'div',
+    props: {
+      style: {
+        width: '100%',
+        height: '100%',
+        position: 'relative',
+        display: 'flex',
+        color: '#fff9ec',
+        fontFamily: 'sans-serif',
+      },
+      children: [
+        {
+          type: 'div',
+          props: {
+            style: {
+              position: 'absolute',
+              top: 90,
+              left: 54,
+              right: 54,
+              height: 520,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize,
+              lineHeight: 1.12,
+              fontWeight: 700,
+              textAlign: 'center',
+              textShadow: '0 3px 2px #070a10, 3px 0 2px #070a10, 0 -3px 2px #070a10, -3px 0 2px #070a10',
+            },
+            children: lines.map(line => ({
+              type: 'div',
+              props: { style: { display: 'flex' }, children: line },
+            })),
+          },
+        },
+        {
+          type: 'div',
+          props: {
+            style: {
+              position: 'absolute',
+              bottom: 56,
+              left: 0,
+              right: 0,
+              display: 'flex',
+              justifyContent: 'center',
+              fontSize: 34,
+              fontWeight: 700,
+              letterSpacing: 3,
+              textShadow: '0 2px 2px #070a10, 2px 0 2px #070a10, 0 -2px 2px #070a10, -2px 0 2px #070a10',
+            },
+            children: 'truyencity.com',
+          },
+        },
+      ],
+    },
+  } as React.ReactElement;
+}
+
+export async function renderCoverTypography(title: string): Promise<Buffer> {
+  const response = new ImageResponse(typographyElement(title), { width: WIDTH, height: HEIGHT });
+  const overlay = Buffer.from(await response.arrayBuffer());
+  const { channels = [] } = await sharp(overlay).stats();
+  const alpha = channels[3];
+  if (!alpha || alpha.max === 0 || alpha.mean < 0.1) {
+    throw new StoryFactoryError('infra_blocked', 'Deterministic cover typography rendered no visible title or watermark pixels.');
+  }
+  return overlay;
 }
 
 async function generateBackground(prompt: string): Promise<{ buffer: Buffer; mimeType: string }> {
@@ -90,10 +145,14 @@ export async function generateFactoryCover(input: {
   backgroundPrompt: string;
 }): Promise<{ coverUrl: string; path: string; sha256: string; width: number; height: number }> {
   const background = await generateBackground(input.backgroundPrompt);
+  const typography = await renderCoverTypography(input.title);
   const rendered = await sharp(background.buffer)
     .rotate()
     .resize(WIDTH, HEIGHT, { fit: 'cover', position: 'centre' })
-    .composite([{ input: typographyOverlay(input.title), top: 0, left: 0 }])
+    .composite([
+      { input: gradientOverlay(), top: 0, left: 0 },
+      { input: typography, top: 0, left: 0 },
+    ])
     .webp({ quality: 91, effort: 6, smartSubsample: true })
     .toBuffer();
   const metadata = await sharp(rendered).metadata();

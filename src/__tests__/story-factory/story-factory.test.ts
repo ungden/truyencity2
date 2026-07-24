@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { execFileSync } from 'node:child_process';
 import {
   CanonExtensionSchema,
   EditorAssessmentSchema,
@@ -543,6 +544,20 @@ describe('canonical Story Factory', () => {
     expect(brief).toContain('prior_decision');
     const contexts = buildChapterContexts({ kernel, state, plan: plan(1) });
     expect(JSON.stringify(contexts.editorState)).toContain('lót trấu và xơ dừa');
+  });
+
+  test('deterministic cover typography renders visible Vietnamese title and watermark pixels', async () => {
+    const output = execFileSync(process.execPath, [
+      '--import', 'tsx',
+      '--input-type=module',
+      '-e',
+      `const mod=await import('./src/services/story-factory/cover.ts');
+       const overlay=await mod.default.renderCoverTypography('Hợp Tác Xã Khô Mực Nắng Vàng');
+       const sharp=(await import('sharp')).default;
+       const metadata=await sharp(overlay).metadata();
+       console.log(JSON.stringify({width:metadata.width,height:metadata.height,hasAlpha:metadata.hasAlpha}));`,
+    ], { cwd: process.cwd(), encoding: 'utf8' });
+    expect(JSON.parse(output)).toEqual({ width: 1200, height: 1800, hasAlpha: true });
   });
 
   test('normal chapter uses two calls and has no word-count publication gate', async () => {
