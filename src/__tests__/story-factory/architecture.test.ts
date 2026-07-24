@@ -37,6 +37,8 @@ describe('Story Factory architecture boundary', () => {
     const prompts = readFileSync('src/services/story-factory/prompts.ts', 'utf8');
     expect(prompts).toContain('không được tự tạo thay đổi trạng thái bền vững ngoài requiredDeltas');
     expect(prompts).toContain('prose tự tạo bất kỳ thay đổi trạng thái bền vững nào không có trong requiredDeltas');
+    expect(prompts).toContain('draft bỏ sót, kết thúc trước, hiểu sai hoặc tự bịa chi tiết');
+    expect(prompts).toContain('luôn dùng scope=prose');
   });
 
   test('narrative outcomes stay out of Writer context and each rolling window is reviewed', () => {
@@ -46,7 +48,11 @@ describe('Story Factory architecture boundary', () => {
     expect(context).toContain('recentOutcomes: input.state.recentOutcomes');
     expect(writerBriefBody).not.toContain('scene.action');
     expect(writerBriefBody).not.toContain('uniqueMechanism');
-    expect(context).toContain('briefChars > 5_000');
+    expect(writerBriefBody).not.toContain('durationMinutes: scene.durationMinutes');
+    expect(writerBriefBody).not.toContain('travelMinutesFromPrevious: scene.travelMinutesFromPrevious');
+    expect(writerBriefBody).not.toContain('genreLane: input.kernel.genreLane');
+    expect(writerBriefBody).not.toContain('aliases: character.aliases');
+    expect(context).not.toContain('WRITER_BRIEF_MAX_CHARS');
     const migration = readFileSync('supabase/migrations/20260722072832_canonical_story_outcomes.sql', 'utf8');
     expect(migration).toContain('p_expected_chapter % 5 = 0');
     expect(migration).not.toContain('p_expected_chapter % 10 = 0');
@@ -55,9 +61,15 @@ describe('Story Factory architecture boundary', () => {
   test('rolling planning has one independent Plan Judge and no per-chapter judge call', () => {
     const planner = readFileSync('src/services/story-factory/planner.ts', 'utf8');
     const pipeline = readFileSync('src/services/story-factory/pipeline.ts', 'utf8');
+    const benchmark = readFileSync('scripts/factory-benchmark-build.ts', 'utf8');
+    const routes = readFileSync('src/services/story-factory/routes.ts', 'utf8');
     expect(planner).toContain('model: input.routes.planJudge');
     expect(planner).toContain('for (let attempt = 1; attempt <= 2; attempt += 1)');
     expect(pipeline).not.toContain('planJudge');
+    expect(benchmark).toContain('while (candidateChapters.length < 5)');
+    expect(benchmark).not.toContain('Planner must return five benchmark chapters');
+    expect(routes).toContain("planner: 'gemini-3.1-pro-preview'");
+    expect(routes).toContain("planJudge: 'gemini-2.5-pro'");
   });
 
   test('Concept Generator receives the stable-ID rule that provider schemas cannot enforce', () => {
@@ -84,9 +96,18 @@ describe('Story Factory architecture boundary', () => {
     const planner = readFileSync('src/services/story-factory/planner.ts', 'utf8');
     const prompts = readFileSync('src/services/story-factory/prompts.ts', 'utf8');
     expect(planner).toContain('time >= State.storyTimeMinutes + tổng mọi scene.dur + scene.travel');
+    expect(planner).toContain('change > 0 bắt buộc source khác null và sink=null');
+    expect(planner).toContain('change < 0 bắt buộc sink khác null và source=null');
+    expect(planner).toContain('không tạo delta change=0');
+    expect(planner).toContain('Scene dùng, nhận, trả hoặc hy sinh tài nguyên trong chương phải có delta tương ứng');
     expect(planner).toContain('message: lastError.message');
     expect(planner).toContain('evidence: lastError.evidence ?? null');
     expect(prompts).toContain('Thời gian cuối chương là mốc tuyệt đối');
+  });
+
+  test('Planner contract changes participate in the engine release identity', () => {
+    const release = readFileSync('src/services/story-factory/release.ts', 'utf8');
+    expect(release).toContain('plannerVersion: FACTORY_PLANNER_VERSION');
   });
 
   test('canary promotion requires the latest chapter-10 review on the exact release', () => {

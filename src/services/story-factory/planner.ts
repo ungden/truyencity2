@@ -67,7 +67,7 @@ export const PlannerRollingPlanResponseSchema = z.object({
 const PLANNER_COMPACT_CONTRACT = {
   deltaTarget: {
     fact: 'target=factId; before/after là giá trị fact; change/source/sink=null',
-    resource_numeric: 'target=resourceId; before/change/after là số; source hoặc sink mô tả nguồn tiền/vật tư, có thể null',
+    resource_numeric: 'target=resourceId; before/change/after là số; change > 0 bắt buộc source khác null và sink=null; change < 0 bắt buộc sink khác null và source=null; change=0 không hợp lệ',
     resource_state: 'target=resourceId; before/after là trạng thái; source giải thích nguồn thay đổi; change/sink=null',
     knowledge: 'target=characterId; after=factId; source là nguồn học biết; before/change/sink=null',
     location: 'target=characterId; before/after là locationId; change/source/sink=null',
@@ -83,6 +83,7 @@ const PLANNER_COMPACT_CONTRACT = {
   },
   strictRules: [
     'Mọi field compact đều bắt buộc; dùng null đúng chỗ, không bỏ field. counterpart chỉ khác null với relationship.',
+    'resource_numeric phải ghi nguồn/đích theo dấu của change: change dương có source cụ thể và sink=null; change âm có sink cụ thể và source=null; không tạo delta change=0.',
     'pre.k chỉ được fact|resource|location|promise; resource_numeric và resource_state chỉ dùng cho deltas.k.',
     'time, dur và travel là một số nguyên phút; travel không được là mảng hay mô tả tuyến đường.',
     'time là storyTime tuyệt đối ở cuối chương, không phải số phút của riêng chương. Với chương đầu: time >= State.storyTimeMinutes + tổng mọi scene.dur + scene.travel. Với chương sau: time >= time chương trước + tổng dur + travel của chương đó.',
@@ -92,6 +93,7 @@ const PLANNER_COMPACT_CONTRACT = {
     'scene.people chỉ gồm nhân vật đang có mặt vật lý ở scene.loc; nếu nhân vật chỉ được nhắc tới hoặc là động lực ở nơi khác thì không đưa vào people.',
     'scene.deltaIds chỉ chứa delta ID tồn tại trong cùng chương; cảnh nối có thể rỗng nhưng cả chương vẫn phải có deltas.',
     'Mỗi delta phải được ít nhất một scene.deltaIds tham chiếu.',
+    'Giữ goal/block/act ngắn và cơ học; chỉ đưa nhân vật, rule và delta thật sự cần cho chương.',
     'knowledge.after phải là fact ID đã tồn tại trong State. Nếu nhân vật học một fact mới, tạo fact delta khai báo fact đó trước knowledge delta trong cùng chương và gắn cả hai vào scene học biết.',
     'relationship.before phải bằng chính xác State.characters[characterId].relationshipState[counterpartId], hoặc null nếu pair chưa có entry; không suy ra quan hệ ban đầu từ role, agenda hay mô tả Kernel.',
     'Nếu một nhân vật đổi location trong chương, tạo đúng một location delta từ vị trí đầu chương tới vị trí ở scene cuối của họ và gắn delta vào scene thực hiện lần di chuyển đầu tiên.',
@@ -271,7 +273,7 @@ export async function assessRollingPlan(input: {
         oppositionAgenda: 'Đối lực phải có lựa chọn, đối sách và hậu quả theo agenda riêng; chỉ gây hấn rồi kinh ngạc/thua/chạy không đạt.',
         sceneVariety: 'Window không được lặp công thức giải thích cơ chế → biểu diễn thành công → người khác kinh ngạc/tôn sùng → nhận thưởng.',
         stageAlignment: 'Xung đột và reward loop phải phục vụ stage hiện tại, không nhảy sớm.',
-        stateTransition: 'Mọi before/after phải hợp lý cả số học lẫn ý nghĩa thế giới; giảm một ma sát không tự tạo thêm năng lượng, lưu lượng hay độ bền ngoài world rule.',
+        stateTransition: 'Mọi before/after và mọi số lượng/tiêu hao nêu trong scene phải khớp ledger, required delta và ý nghĩa thế giới. Scene dùng, nhận, trả hoặc hy sinh tài nguyên trong chương phải có delta tương ứng; giảm một ma sát không tự tạo thêm năng lượng, lưu lượng hay độ bền ngoài world rule.',
       },
       evidenceRule: 'Với mỗi check, checkEvidence phải chỉ rõ chapterNumber và ít nhất một sceneId hoặc deltaId làm căn cứ; không chấp nhận lời khen chung.',
     }),

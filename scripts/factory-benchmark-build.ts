@@ -235,6 +235,7 @@ async function main() {
         candidate: string;
         candidateTitle?: string;
         candidateCostUsd?: number;
+        candidateRevisionCount?: number;
         stateAfter?: unknown;
       }>;
     }
@@ -261,77 +262,87 @@ async function main() {
     let state = converted.state;
     let candidatePrevious = '';
     let controlPrevious = '';
-    const planned = await planRollingWindow({
-      kernel: converted.kernel,
-      arc: converted.arc,
-      state,
-      routes: DEFAULT_MODEL_ROUTES,
-    });
-    if (planned.rollingPlan.plans.length !== 5) throw new Error(`Planner must return five benchmark chapters for ${slot}.`);
-    const planCost = planned.usages.reduce((sum, usage) => sum + usage.costUsd, 0);
-    totalCost += planCost;
     const slotSamples: typeof samples = [];
     const candidateChapters: Array<{ chapterNumber: number; title: string; content: string }> = [];
-    for (const plan of planned.rollingPlan.plans) {
-      const sampleId = `${slot}-ch${plan.chapterNumber}`;
-      const checkpointSample = samples.find(sample => sample.id === sampleId);
-      if (checkpointSample) {
-        if (!checkpointSample.stateAfter || !checkpointSample.candidateTitle) {
-          throw new Error(`Checkpoint sample ${sampleId} lacks state/title required for sequential resume.`);
-        }
-        state = StoryStateSchema.parse(checkpointSample.stateAfter);
-        candidatePrevious = checkpointSample.candidate;
-        controlPrevious = checkpointSample.control;
-        slotSamples.push(checkpointSample);
-        candidateChapters.push({
-          chapterNumber: plan.chapterNumber,
-          title: checkpointSample.candidateTitle,
-          content: checkpointSample.candidate,
-        });
-        console.log(JSON.stringify({ slot, chapter: plan.chapterNumber, samples: samples.length, resumed: true }));
-        continue;
+    for (let chapterNumber = 1; chapterNumber <= 5; chapterNumber += 1) {
+      const checkpointSample = samples.find(sample => sample.id === `${slot}-ch${chapterNumber}`);
+      if (!checkpointSample) break;
+      if (!checkpointSample.stateAfter || !checkpointSample.candidateTitle) {
+        throw new Error(`Checkpoint sample ${checkpointSample.id} lacks state/title required for sequential resume.`);
       }
-      const generated = await writeStoryChapter({
-        kernel: converted.kernel, state, plan, previousChapter: candidatePrevious || undefined,
+      state = StoryStateSchema.parse(checkpointSample.stateAfter);
+      candidatePrevious = checkpointSample.candidate;
+      controlPrevious = checkpointSample.control;
+      slotSamples.push(checkpointSample);
+      candidateChapters.push({
+        chapterNumber,
+        title: checkpointSample.candidateTitle,
+        content: checkpointSample.candidate,
+      });
+      console.log(JSON.stringify({ slot, chapter: chapterNumber, samples: samples.length, resumed: true }));
+    }
+    while (candidateChapters.length < 5) {
+      const remaining = 5 - candidateChapters.length;
+      const planned = await planRollingWindow({
+        kernel: converted.kernel,
+        arc: converted.arc,
+        state,
         routes: DEFAULT_MODEL_ROUTES,
       });
-      const candidateGenerationCost = generated.usages.reduce((sum, usage) => sum + usage.costUsd, 0);
-      const candidateCostUsd = candidateGenerationCost + planCost / 5;
-      totalCost += candidateGenerationCost;
-      const response = await geminiProvider.json({
-        model: DEFAULT_MODEL_ROUTES.writer, system: legacySystem,
-        prompt: JSON.stringify({
-          kernel: converted.kernel,
-          arc: converted.arc,
-          state,
-          plan,
-          previousChapter: controlPrevious || null,
-        }),
-        schema: ChapterDraftSchema, temperature: 1,
-      });
-      totalCost += response.usage.costUsd;
-      const control = response.value.content;
-      const sample = {
-        id: sampleId,
-        brief: { story: converted.kernel.title, chapterNumber: plan.chapterNumber, stateBefore: state, plan },
-        control,
-        candidate: generated.draft.content,
-        candidateTitle: generated.draft.title,
-        candidateCostUsd,
-        stateAfter: generated.stateAfter,
-      };
-      samples.push(sample);
-      slotSamples.push(sample);
-      candidateChapters.push({
-        chapterNumber: plan.chapterNumber,
-        title: generated.draft.title,
-        content: generated.draft.content,
-      });
-      state = generated.stateAfter;
-      candidatePrevious = generated.draft.content;
-      controlPrevious = control;
-      persist();
-      console.log(JSON.stringify({ slot, chapter: plan.chapterNumber, samples: samples.length, revision: generated.revisionCount }));
+      if (planned.rollingPlan.plans.length < 1) {
+        throw new Error(`Planner returned an invalid benchmark window for ${slot}.`);
+      }
+      const planCost = planned.usages.reduce((sum, usage) => sum + usage.costUsd, 0);
+      const benchmarkPlans = planned.rollingPlan.plans.slice(0, remaining);
+      // Allocate the whole call to the used samples. If Planner produced plans
+      // beyond chapter five, the benchmark conservatively charges that cost.
+      const allocatedPlanCost = planCost / benchmarkPlans.length;
+      totalCost += planCost;
+      for (const plan of benchmarkPlans) {
+        const sampleId = `${slot}-ch${plan.chapterNumber}`;
+        const generated = await writeStoryChapter({
+          kernel: converted.kernel, state, plan, previousChapter: candidatePrevious || undefined,
+          routes: DEFAULT_MODEL_ROUTES,
+        });
+        const candidateGenerationCost = generated.usages.reduce((sum, usage) => sum + usage.costUsd, 0);
+        const candidateCostUsd = candidateGenerationCost + allocatedPlanCost;
+        totalCost += candidateGenerationCost;
+        const response = await geminiProvider.json({
+          model: DEFAULT_MODEL_ROUTES.writer, system: legacySystem,
+          prompt: JSON.stringify({
+            kernel: converted.kernel,
+            arc: converted.arc,
+            state,
+            plan,
+            previousChapter: controlPrevious || null,
+          }),
+          schema: ChapterDraftSchema, temperature: 1,
+        });
+        totalCost += response.usage.costUsd;
+        const control = response.value.content;
+        const sample = {
+          id: sampleId,
+          brief: { story: converted.kernel.title, chapterNumber: plan.chapterNumber, stateBefore: state, plan },
+          control,
+          candidate: generated.draft.content,
+          candidateTitle: generated.draft.title,
+          candidateCostUsd,
+          candidateRevisionCount: generated.revisionCount,
+          stateAfter: generated.stateAfter,
+        };
+        samples.push(sample);
+        slotSamples.push(sample);
+        candidateChapters.push({
+          chapterNumber: plan.chapterNumber,
+          title: generated.draft.title,
+          content: generated.draft.content,
+        });
+        state = generated.stateAfter;
+        candidatePrevious = generated.draft.content;
+        controlPrevious = control;
+        persist();
+        console.log(JSON.stringify({ slot, chapter: plan.chapterNumber, samples: samples.length, revision: generated.revisionCount }));
+      }
     }
     const reviewed = await reviewFiveChapterWindow({
       kernel: converted.kernel,

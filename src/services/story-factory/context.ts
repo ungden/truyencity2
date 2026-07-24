@@ -1,5 +1,4 @@
 import {
-  StoryFactoryError,
   type ChapterPlan,
   type EditorAssessment,
   type StoryKernel,
@@ -15,7 +14,7 @@ export interface ContextManifestEntry {
 }
 
 export interface WriterBrief {
-  story: { title: string; genreLane: string };
+  story: { title: string };
   cast: unknown[];
   worldRules: unknown[];
   scenes: unknown[];
@@ -56,12 +55,10 @@ export function buildWriterBrief(input: {
   return {
     story: {
       title: input.kernel.title,
-      genreLane: input.kernel.genreLane,
     },
     cast: input.kernel.characters.filter(character => ids.characters.has(character.id)).map(character => ({
       id: character.id,
       name: character.name,
-      aliases: character.aliases,
       agenda: character.agenda,
       competence: character.competence,
       constraint: character.constraint,
@@ -75,8 +72,6 @@ export function buildWriterBrief(input: {
       povCharacterId: scene.povCharacterId,
       participantIds: scene.participantIds,
       locationId: scene.locationId,
-      durationMinutes: scene.durationMinutes,
-      travelMinutesFromPrevious: scene.travelMinutesFromPrevious,
       objective: scene.objective,
       obstacle: scene.obstacle,
       requiredDeltaIds: scene.requiredDeltaIds,
@@ -155,14 +150,6 @@ export function buildChapterContexts(input: {
   relevantTransitions?: RelevantStoryTransition[];
 }) {
   const brief = buildWriterBrief(input);
-  const briefChars = JSON.stringify(brief).length;
-  if (briefChars > 5_000) {
-    throw new StoryFactoryError('plan_blocked', 'Writer brief exceeds the mechanical context budget.', {
-      chapterNumber: input.plan.chapterNumber,
-      chars: briefChars,
-      maximumChars: 5_000,
-    });
-  }
   const previousTail = input.previousChapter ? selectPreviousTail(input.previousChapter) : '';
   const ids = relevantIds(input.plan);
   const editorKernel = {

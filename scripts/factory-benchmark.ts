@@ -21,6 +21,7 @@ const sampleSchema = z.object({
   candidate: z.string().min(20),
   candidateCostUsd: z.number().nonnegative().optional(),
   candidateTitle: z.string().min(2).optional(),
+  candidateRevisionCount: z.union([z.literal(0), z.literal(1)]).optional(),
   stateAfter: z.unknown().optional(),
 }).strict();
 const corpusSchema = z.object({
@@ -131,6 +132,9 @@ Sau đó chọn bản tốt hơn dựa trên tính nối tiếp, nhân quả, gi
       const costs = corpus.samples.map(sample => sample.candidateCostUsd).filter((item): item is number => typeof item === 'number');
       return costs.length === 20 ? Math.max(...costs) : null;
     })(),
+    firstPassPublishRate: corpus.samples.every(sample => sample.candidateRevisionCount !== undefined)
+      ? corpus.samples.filter(sample => sample.candidateRevisionCount === 0).length / 20
+      : null,
     totalCostUsd: totalCost,
   };
   const passed = metrics.majorityPreference >= 0.7
