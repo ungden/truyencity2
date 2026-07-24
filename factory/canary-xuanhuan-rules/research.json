@@ -1,0 +1,42 @@
+{
+  "snapshotId": "xuanhuan-rules-market-2026-07-24",
+  "lane": "xuanhuan_rules",
+  "capturedAt": "2026-07-24T09:00:00.000Z",
+  "signals": [
+    {
+      "id": "new_web_fiction_core",
+      "sourceUrl": "https://www.chinawriter.com.cn/n1/2026/0522/c404027-40725003.html",
+      "observation": "Nghiên cứu về tân mạng văn nhấn mạnh cốt truyện, thiết định và nhân vật vẫn là lõi; xu hướng mới là dung hợp yếu tố và biến thể thể loại chứ không chỉ lặp nhãn huyền huyễn cũ."
+    },
+    {
+      "id": "setting_level_innovation",
+      "sourceUrl": "https://www.cssn.cn/skgz/bwyc/202604/t20260420_5981165.shtml",
+      "observation": "Báo cáo phát triển mạng văn 2025 ghi nhận đổi mới đang đi vào cấu trúc thế giới, nhịp kể, giá trị và tài nguyên văn hóa; đô thị huyền huyễn, mạt thế cao võ và huyền kỳ tiếp tục có sức hút."
+    },
+    {
+      "id": "rule_mystery_fusion",
+      "sourceUrl": "https://www.chinawriter.com.cn/n1/2026/0403/c404027-40694782.html",
+      "observation": "Các tác phẩm mới kết hợp huyền huyễn với suy luận, dân tục, sinh tồn và luật lệ để tạo khoái cảm trí tuệ; kỳ ảo hiệu quả vẫn neo vào lựa chọn con người và đời sống cụ thể."
+    },
+    {
+      "id": "super_long_engine",
+      "sourceUrl": "https://www.chinawriter.com.cn/n1/2026/0628/c461850-40749049.html",
+      "observation": "Huyền huyễn có lợi thế ở tuyến trưởng thành dài và khả năng đổi arena, nhưng truyện siêu dài suy giảm khi chỉ lặp nâng cấp; mỗi giai đoạn phải liên tục đáp ứng kỳ vọng bằng biến thể xung đột và phần thưởng mới."
+    },
+    {
+      "id": "intellectual_fantasy",
+      "sourceUrl": "https://wyb.chinawriter.com.cn/content/202602/06/content82721.html",
+      "observation": "Trí tính huyễn tưởng có thể giữ quy mô rất dài khi thế giới lớn được vận hành bằng hệ logic chặt và dung hợp nghề nghiệp, kỹ thuật cùng nhiều hệ văn minh; kiến thức phải biến thành hành động và cái giá cụ thể."
+    },
+    {
+      "id": "xuanhuan_localization",
+      "sourceUrl": "https://www.chinawriter.com.cn/n1/2026/0628/c461850-40749060.html",
+      "observation": "Sức sống của huyền huyễn đến từ worldbuilding siêu thực, trưởng thành nhân vật và dung hợp nhiều truyền thống sau khi được bản địa hóa; chỉ sao chép bậc tu luyện hoặc chức năng game sẽ tạo nhân vật phụ công cụ."
+    },
+    {
+      "id": "pleasure_with_reality",
+      "sourceUrl": "https://www.cssn.cn/skgz/bwyc/202603/t20260304_5974949.shtml",
+      "observation": "Khoái cảm đọc mạnh khi năng lực của nhân vật truyền năng lượng tích cực và phản chiếu lựa chọn đời thực; chiến thắng nên đến từ chủ động, bền bỉ và trách nhiệm thay vì may mắn hoặc nghiền ép vô cớ."
+    }
+  ]
+}

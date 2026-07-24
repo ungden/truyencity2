@@ -103,6 +103,16 @@ describe('Story Factory architecture boundary', () => {
     expect(runtime).not.toContain("update({ arc_plan: result.lifecycle.nextArc");
   });
 
+  test('one slow provider stage cannot be reclaimed by another worker', () => {
+    const migration = readFileSync(
+      'supabase/migrations/20260724085848_extend_story_factory_job_lease.sql',
+      'utf8',
+    );
+    expect(migration).toContain("lease_until = now() + interval '30 minutes'");
+    expect(migration).toContain('FOR UPDATE OF job SKIP LOCKED');
+    expect(migration).toContain('SECURITY INVOKER');
+  });
+
   test('the long-series outline is story-specific and never injected from a genre template', () => {
     const setup = readFileSync('src/services/story-factory/setup.ts', 'utf8');
     const context = readFileSync('src/services/story-factory/context.ts', 'utf8');
