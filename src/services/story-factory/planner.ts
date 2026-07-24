@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import {
   ArcPlanSchema,
+  CanonExtensionSchema,
   RollingPlanSchema,
   StoryFactoryError,
   type ArcPlan,
@@ -9,16 +10,18 @@ import {
   type StoryKernel,
   type StoryState,
 } from './contracts';
+import type { RelevantStoryMemory } from './memory';
 import type { ProviderUsage, StoryModelProvider } from './provider';
 import { geminiProvider } from './provider';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT } from './prompts';
-import { validateRollingPlan } from './validation';
+import { applyCanonExtension, validateArcAgainstKernel, validateRollingPlan } from './validation';
 
 const PlannerScalarSchema = z.union([z.string(), z.number(), z.null()]);
 const PlannerCompactDeltaSchema = z.object({
   id: z.string(),
-  k: z.enum(['fact', 'resource_numeric', 'resource_state', 'knowledge', 'location', 'promise']),
+  k: z.enum(['fact', 'resource_numeric', 'resource_state', 'knowledge', 'location', 'promise', 'relationship']),
   target: z.string(),
+  counterpart: z.string().nullable(),
   before: PlannerScalarSchema,
   change: z.number().nullable(),
   after: PlannerScalarSchema,
@@ -67,16 +70,17 @@ const PLANNER_COMPACT_CONTRACT = {
     knowledge: 'target=characterId; after=factId; source là nguồn học biết; before/change/sink=null',
     location: 'target=characterId; before/after là locationId; change/source/sink=null',
     promise: 'target=promiseId; before/after thuộc open|progressed|resolved|abandoned; change/source/sink=null',
+    relationship: 'target=characterId; counterpart=counterpartId; before là trạng thái cũ hoặc null; after là trạng thái mới; source giải thích sự kiện; change/sink=null',
   },
   chapterJson: {
     serialization: 'Mỗi phần tử chaptersJson là đúng một JSON object đã stringify, không markdown.',
     chapterFields: ['v=1', 'n', 'arc', 'time', 'pre', 'rules', 'scenes', 'deltas'],
     preFields: ['k', 'id', 'value'],
     sceneFields: ['id', 'pov', 'people', 'loc', 'dur', 'travel', 'goal', 'block', 'act', 'deltaIds'],
-    deltaFields: ['id', 'k', 'target', 'before', 'change', 'after', 'source', 'sink'],
+    deltaFields: ['id', 'k', 'target', 'counterpart', 'before', 'change', 'after', 'source', 'sink'],
   },
   strictRules: [
-    'Mọi field compact đều bắt buộc; dùng null đúng chỗ, không bỏ field.',
+    'Mọi field compact đều bắt buộc; dùng null đúng chỗ, không bỏ field. counterpart chỉ khác null với relationship.',
     'pre.k chỉ được fact|resource|location|promise; resource_numeric và resource_state chỉ dùng cho deltas.k.',
     'time, dur và travel là một số nguyên phút; travel không được là mảng hay mô tả tuyến đường.',
     'time là storyTime tuyệt đối ở cuối chương, không phải số phút của riêng chương. Với chương đầu: time >= State.storyTimeMinutes + tổng mọi scene.dur + scene.travel. Với chương sau: time >= time chương trước + tổng dur + travel của chương đó.',
@@ -121,6 +125,15 @@ export function materializePlannerRollingPlan(value: z.infer<typeof PlannerRolli
         if (delta.k === 'resource_state') return { id: delta.id, kind: delta.k, resourceId: delta.target, before: delta.before, after: delta.after, source: delta.source };
         if (delta.k === 'knowledge') return { id: delta.id, kind: delta.k, characterId: delta.target, factId: delta.after, source: delta.source };
         if (delta.k === 'location') return { id: delta.id, kind: delta.k, characterId: delta.target, beforeLocationId: delta.before, afterLocationId: delta.after };
+        if (delta.k === 'relationship') return {
+          id: delta.id,
+          kind: delta.k,
+          characterId: delta.target,
+          counterpartId: delta.counterpart,
+          before: delta.before,
+          after: delta.after,
+          source: delta.source,
+        };
         return { id: delta.id, kind: delta.k, promiseId: delta.target, before: delta.before, after: delta.after };
       }),
     })),
@@ -148,9 +161,9 @@ export const WindowReviewSchema = z.discriminatedUnion('status', [
 ]);
 
 const ArcLifecycleSchema = z.discriminatedUnion('status', [
-  z.object({ status: z.literal('continue'), nextArc: ArcPlanSchema }).strict(),
-  z.object({ status: z.literal('finale'), nextArc: ArcPlanSchema }).strict(),
-  z.object({ status: z.literal('complete'), nextArc: z.null() }).strict(),
+  z.object({ status: z.literal('continue'), nextArc: ArcPlanSchema, canonExtension: CanonExtensionSchema }).strict(),
+  z.object({ status: z.literal('finale'), nextArc: ArcPlanSchema, canonExtension: CanonExtensionSchema }).strict(),
+  z.object({ status: z.literal('complete'), nextArc: z.null(), canonExtension: z.null() }).strict(),
 ]);
 
 export type WindowReview = z.infer<typeof WindowReviewSchema>;
@@ -162,6 +175,7 @@ export async function planRollingWindow(input: {
   state: StoryState;
   routes: ModelRoutes;
   recoveryEvidence?: unknown;
+  relevantMemory?: RelevantStoryMemory[];
   provider?: StoryModelProvider;
 }): Promise<{ rollingPlan: RollingPlan; usages: ProviderUsage[] }> {
   const provider = input.provider ?? geminiProvider;
@@ -182,6 +196,7 @@ export async function planRollingWindow(input: {
         kernel: input.kernel,
         arc: input.arc,
         state: input.state,
+        relevantMemory: input.relevantMemory ?? [],
         nextChapter: input.state.chapterNumber + 1,
         maximumEndChapter: input.arc.plannedEndChapter,
         compactContract: PLANNER_COMPACT_CONTRACT,
@@ -265,7 +280,12 @@ export async function planArcLifecycle(input: {
   maximumChapter: number;
   routes: ModelRoutes;
   provider?: StoryModelProvider;
-}): Promise<{ lifecycle: ArcLifecycle; usage: ProviderUsage }> {
+}): Promise<{
+  lifecycle: ArcLifecycle;
+  kernelAfter: StoryKernel;
+  stateAfter: StoryState;
+  usage: ProviderUsage;
+}> {
   if (input.state.chapterNumber < input.arc.plannedEndChapter) {
     throw new Error('Arc lifecycle can only run at an arc boundary.');
   }
@@ -276,6 +296,12 @@ export async function planArcLifecycle(input: {
     prompt: JSON.stringify({
       task: 'Đánh giá ending direction và lập arc tiếp theo nếu truyện chưa hoàn tất.',
       endingDirection: input.kernel.endingDirection,
+      seriesSpine: input.kernel.seriesSpine,
+      longPromises: input.kernel.longPromises,
+      currentStage: input.kernel.seriesSpine.stages.find(stage => stage.id === input.arc.stageId),
+      nextStage: input.kernel.seriesSpine.stages.find(stage => (
+        stage.order === (input.kernel.seriesSpine.stages.find(current => current.id === input.arc.stageId)?.order ?? 0) + 1
+      )) ?? null,
       currentArc: input.arc,
       currentState: input.state,
       minimumCompletionChapter: input.minimumCompletionChapter,
@@ -290,6 +316,12 @@ export async function planArcLifecycle(input: {
     }
     const unresolved = input.state.promises.filter(promise => promise.status !== 'resolved' && promise.status !== 'abandoned');
     if (unresolved.length) throw new StoryFactoryError('plan_blocked', 'Planner tried to complete with unresolved promises.', unresolved);
+    return {
+      lifecycle: result.value,
+      kernelAfter: input.kernel,
+      stateAfter: input.state,
+      usage: result.usage,
+    };
   } else {
     const next = result.value.nextArc;
     if (next.arcNumber !== input.arc.arcNumber + 1 || next.startChapter !== input.state.chapterNumber + 1) {
@@ -298,6 +330,35 @@ export async function planArcLifecycle(input: {
     if (next.plannedEndChapter > input.maximumChapter) {
       throw new StoryFactoryError('plan_blocked', 'Next arc exceeds the hard safety chapter cap.');
     }
+    const currentStage = input.kernel.seriesSpine.stages.find(stage => stage.id === input.arc.stageId);
+    const nextStage = input.kernel.seriesSpine.stages.find(stage => stage.id === next.stageId);
+    if (!currentStage || !nextStage || nextStage.order < currentStage.order || nextStage.order > currentStage.order + 1) {
+      throw new StoryFactoryError('plan_blocked', 'Arc transition skipped or rewound the immutable series spine.');
+    }
+    if (result.value.canonExtension.stageId !== next.stageId) {
+      throw new StoryFactoryError('plan_blocked', 'Canon extension belongs to a different series stage.');
+    }
+    const currentStageCeiling = input.kernel.seriesSpine.stages
+      .filter(stage => stage.order <= currentStage.order)
+      .reduce((total, stage) => total + stage.targetSpanChapters, 0);
+    if (nextStage.id === currentStage.id && next.plannedEndChapter > currentStageCeiling) {
+      throw new StoryFactoryError(
+        'plan_blocked',
+        'Current series stage is exhausted but the next stage entry conditions were not reached.',
+        { stageId: currentStage.id, currentStageCeiling, proposedArcEnd: next.plannedEndChapter },
+      );
+    }
+    const extended = applyCanonExtension({
+      kernel: input.kernel,
+      state: input.state,
+      extension: result.value.canonExtension,
+    });
+    validateArcAgainstKernel(extended.kernel, next);
+    return {
+      lifecycle: result.value,
+      kernelAfter: extended.kernel,
+      stateAfter: extended.state,
+      usage: result.usage,
+    };
   }
-  return { lifecycle: result.value, usage: result.usage };
 }

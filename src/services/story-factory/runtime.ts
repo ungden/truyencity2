@@ -12,6 +12,7 @@ import {
   type ModelRoutes,
 } from './contracts';
 import { generateFactoryCover } from './cover';
+import { loadRelevantStoryMemory, memoryEntityIdsForArc, memoryEntityIdsForPlan } from './memory';
 import { writeStoryChapter } from './pipeline';
 import { planArcLifecycle, planRollingWindow, reviewFiveChapterWindow } from './planner';
 import type { ProviderUsage, StoryModelProvider } from './provider';
@@ -292,11 +293,18 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
     const arc = ArcPlanSchema.parse(project.arc_plan);
     const state = StoryStateSchema.parse(project.story_state);
     const routes = ModelRoutesSchema.parse(project.model_routes);
+    const relevantMemory = await loadRelevantStoryMemory({
+      db,
+      projectId: project.id,
+      state,
+      entityIds: memoryEntityIdsForArc(kernel, arc, state),
+    });
     const planned = await planRollingWindow({
       kernel,
       arc,
       state,
       routes,
+      relevantMemory,
       recoveryEvidence: job.plan_feedback ?? undefined,
       provider,
     });
@@ -348,13 +356,27 @@ async function runChapter(db: SupabaseClient, job: FactoryJobRow, project: Facto
   if (plan.arcNumber !== arc.arcNumber) return blockRun(db, job, null, new StoryFactoryError('plan_blocked', 'Rolling plan belongs to a different arc.'));
   const runId = await createRun(db, job, 'chapter', plan.chapterNumber);
   try {
+    const relevantMemory = await loadRelevantStoryMemory({
+      db,
+      projectId: project.id,
+      state,
+      entityIds: memoryEntityIdsForPlan(kernel, plan),
+    });
     let previousChapter: string | undefined;
     if (plan.chapterNumber > 1) {
       const { data, error } = await db.from('chapters').select('content').eq('novel_id', job.novel_id).eq('chapter_number', plan.chapterNumber - 1).single();
       if (error || !data?.content) throw new StoryFactoryError('plan_blocked', 'Previous published chapter is missing.');
       previousChapter = data.content;
     }
-    const result = await writeStoryChapter({ kernel, state, plan, previousChapter, routes, provider });
+    const result = await writeStoryChapter({
+      kernel,
+      state,
+      plan,
+      previousChapter,
+      relevantMemory,
+      routes,
+      provider,
+    });
     const remainingPlan = { ...rolling, startChapter: plan.chapterNumber + 1, plans: rolling.plans.filter(item => item.chapterNumber > plan.chapterNumber) };
     const { error } = await db.rpc('commit_story_factory_chapter', {
       p_job_id: job.id,
@@ -433,30 +455,29 @@ async function runArc(db: SupabaseClient, job: FactoryJobRow, project: FactoryPr
     const routes = ModelRoutesSchema.parse(project.model_routes);
     const result = await planArcLifecycle({
       kernel, arc, state, routes, provider,
-      minimumCompletionChapter: job.minimum_chapters,
-      maximumChapter: job.maximum_chapters,
+      minimumCompletionChapter: Math.max(
+        job.minimum_chapters,
+        kernel.seriesSpine.targetEndingRange.minimumChapter,
+      ),
+      maximumChapter: Math.min(
+        job.maximum_chapters,
+        kernel.seriesSpine.targetEndingRange.maximumChapter,
+      ),
     });
-    const now = new Date().toISOString();
-    if (result.lifecycle.status === 'complete') {
-      const jobUpdate = await db.from('story_factory_jobs').update({
-        status: 'completed', stage: 'done', completed_at: now, lease_owner: null, lease_token: null, lease_until: null, updated_at: now,
-      }).eq('id', job.id).eq('lease_token', job.lease_token);
-      if (jobUpdate.error) throw jobUpdate.error;
-      await db.from('novels').update({ status: 'Hoàn thành', updated_at: now }).eq('id', job.novel_id);
-    } else {
-      const projectUpdate = await db.from('ai_story_projects').update({ arc_plan: result.lifecycle.nextArc, updated_at: now }).eq('id', project.id);
-      if (projectUpdate.error) throw projectUpdate.error;
-      const jobUpdate = await db.from('story_factory_jobs').update({
-        status: result.lifecycle.status === 'finale' ? 'finale' : 'ready', stage: 'plan', rolling_plan: null,
-        lease_owner: null, lease_token: null, lease_until: null, next_run_at: now, updated_at: now,
-      }).eq('id', job.id).eq('lease_token', job.lease_token);
-      if (jobUpdate.error) throw jobUpdate.error;
-    }
-    const runUpdate = await db.from('story_factory_runs').update({
-      status: 'passed', output_artifact: result.lifecycle, usage: [result.usage],
-      estimated_cost_usd: result.usage.costUsd, finished_at: now,
-    }).eq('id', runId);
-    if (runUpdate.error) throw runUpdate.error;
+    const committed = await db.rpc('commit_story_factory_arc_transition', {
+      p_job_id: job.id,
+      p_lease_token: job.lease_token,
+      p_run_id: runId,
+      p_lifecycle_status: result.lifecycle.status,
+      p_kernel_after: result.kernelAfter,
+      p_state_after: result.stateAfter,
+      p_next_arc: result.lifecycle.nextArc,
+      p_output_artifact: result.lifecycle,
+      p_usage: [result.usage],
+      p_cost_usd: result.usage.costUsd,
+      p_engine_release: STORY_FACTORY_RELEASE,
+    });
+    if (committed.error) throw committed.error;
     return { status: 'completed', jobId: job.id, stage: 'arc', chapterNumber: job.current_chapter };
   } catch (error) {
     return blockRun(db, job, runId, error);

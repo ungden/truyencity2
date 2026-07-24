@@ -73,6 +73,30 @@ function convertPack(old: any) {
       stressResponse: item.voice.stressResponse, avoidances: item.voice.avoidances,
     },
   }));
+  const sourcePromises: Array<{ id: string; description: string }> = old.kernel.promises.map((item: any) => ({
+    id: stable(item.id), description: item.description,
+  }));
+  while (sourcePromises.length < 4) {
+    const index = sourcePromises.length + 1;
+    sourcePromises.push({
+      id: `benchmark_promise_${index}`,
+      description: `Cam kết dài hạn benchmark số ${index} chỉ được giải quyết ở giai đoạn sau.`,
+    });
+  }
+  const seriesStages = Array.from({ length: 8 }, (_, index) => ({
+    id: `stage_${index + 1}`,
+    order: index + 1,
+    targetSpanChapters: 100,
+    arena: `Arena benchmark cấp ${index + 1} mở rộng quy mô và phạm vi tác động.`,
+    protagonistGoal: `Hoàn thành bước tiến dài hạn cấp ${index + 1}.`,
+    conflictSource: `Nguồn lực, đối tác và giới hạn hệ thống cấp ${index + 1}.`,
+    rewardLoopVariant: `Biến thể vòng thưởng benchmark cấp ${index + 1}.`,
+    irreversibleChange: `Năng lực và trách nhiệm không thể quay lại cấp trước sau stage ${index + 1}.`,
+    entryConditions: [`Đủ điều kiện vào stage ${index + 1}.`],
+    exitConditions: [`Đủ điều kiện kết thúc stage ${index + 1}.`],
+    longPromiseIds: [sourcePromises[Math.min(index, sourcePromises.length - 1)].id],
+    expansionSeeds: [],
+  }));
   const kernel = StoryKernelSchema.parse({
     schemaVersion: 1,
     title: old.kernel.title,
@@ -84,6 +108,60 @@ function convertPack(old: any) {
     rewardLoopFingerprint: words(old.kernel.pleasure.primaryRewardLoop).slice(0, 160),
     conflictEconomyFingerprint: words(old.arc.activeConflicts.map((item: any) => item.objective)).slice(0, 160),
     protagonistId: stable(old.kernel.protagonistId), characters,
+    worldModel: {
+      era: old.kernel.world?.era ?? old.kernel.genre,
+      baseline: words(old.kernel.worldClaims.map((item: any) => item.claim)),
+      geography: locations.map(location => ({
+        id: `geo_${location.id}`, name: location.name,
+        role: `Địa bàn benchmark ${location.name}.`, constraints: ['Di chuyển và tài nguyên tuân theo canon hiện có.'],
+      })),
+      institutions: [
+        {
+          id: 'benchmark_institution', name: 'Hệ thống lợi ích benchmark',
+          agenda: 'Phản ứng theo chi phí và quyền lợi đã khóa.',
+          authority: 'Chỉ có quyền hạn được kernel khai báo.',
+          resources: 'Nguồn lực hữu hạn trong state.',
+        },
+        {
+          id: 'benchmark_counterparty', name: 'Đối tác và lực cản benchmark',
+          agenda: 'Theo đuổi lợi ích riêng thay vì hỗ trợ nhân vật chính vô điều kiện.',
+          authority: 'Quyền quyết định giao dịch và hợp tác trong phạm vi của mình.',
+          resources: 'Vốn, quan hệ, thông tin hoặc ảnh hưởng hữu hạn.',
+        },
+      ],
+      systems: [{
+        id: 'benchmark_system', name: 'Cơ chế trung tâm benchmark',
+        rules: old.kernel.worldClaims.slice(0, 6).map((item: any) => item.claim),
+        limits: ['Không có tài nguyên vô nguồn hoặc tri thức toàn tri.'],
+        costs: ['Mọi bước tiến phải trả thời gian, nguồn lực hoặc quan hệ.'],
+      }],
+    },
+    progressionTracks: [{
+      id: 'benchmark_progression', name: 'Tiến triển dài hạn',
+      initialState: 'Điểm xuất phát của corpus benchmark.',
+      terminalState: 'Đạt ending contract sau nhiều arena khác nhau.',
+      milestones: seriesStages.map(stage => ({
+        id: `milestone_${stage.id}`, stageId: stage.id, state: `Hoàn thành progression ${stage.id}.`,
+      })),
+    }, {
+      id: 'benchmark_relationships', name: 'Quan hệ và quyền lực',
+      initialState: 'Quan hệ chỉ ở quy mô mở đầu.',
+      terminalState: 'Quan hệ phản ánh toàn bộ hậu quả dài hạn.',
+      milestones: [
+        { id: 'milestone_relationship_1', stageId: 'stage_1', state: 'Khóa quan hệ mở đầu.' },
+        { id: 'milestone_relationship_8', stageId: 'stage_8', state: 'Khép quan hệ dài hạn.' },
+      ],
+    }],
+    seriesSpine: {
+      targetEndingRange: { minimumChapter: 800, maximumChapter: 1000 },
+      stages: seriesStages,
+    },
+    longPromises: sourcePromises.slice(0, 4).map((item, index) => ({
+      promiseId: item.id,
+      openedStageId: 'stage_1',
+      dueStageId: `stage_${Math.min(8, index + 2)}`,
+      payoff: `Hoàn trả promise ${item.id} bằng thay đổi dài hạn có nhân quả.`,
+    })),
     worldRules: old.kernel.worldClaims.map((item: any) => ({
       id: stable(item.id), claim: item.claim,
       exceptions: item.exceptions ? [String(item.exceptions)] : [],
@@ -94,7 +172,7 @@ function convertPack(old: any) {
       ...(Number.isFinite(item.minimumValue) ? { minimum: item.minimumValue } : {}),
       ...(Number.isFinite(item.maximumValue) ? { maximum: item.maximumValue } : {}),
     } : { id: stable(item.id), name: item.name, kind: 'state' }),
-    promises: old.kernel.promises.map((item: any) => ({ id: stable(item.id), description: item.description })),
+    promises: sourcePromises,
     pleasureLoop: {
       primary: words(old.kernel.pleasure.primaryRewardLoop),
       comfort: words(old.kernel.pleasure.comfortLoop),
@@ -103,7 +181,7 @@ function convertPack(old: any) {
     endingDirection: {
       protagonistTerminalState: `${old.kernel.endingContract.materialState}; ${old.kernel.endingContract.emotionalState}`,
       worldTerminalState: old.kernel.endingContract.worldState,
-      promisesToResolve: old.kernel.endingContract.promisesThatMustClose.map(stable),
+      promisesToResolve: sourcePromises.map(item => item.id),
     },
   });
   const facts = old.initialState.facts.map((item: any) => ({ id: stable(item.id), value: item.value }));
@@ -119,7 +197,7 @@ function convertPack(old: any) {
     characters: old.initialState.characters.map((item: any) => ({
       characterId: stable(item.characterId), locationId: stable(item.locationId),
       knownFactIds: (item.knowledge ?? []).map((entry: any) => stable(entry.factId)).filter((id: string) => facts.some((fact: any) => fact.id === id)),
-      relationshipState: item.relationshipState ? { summary: String(item.relationshipState) } : {},
+      relationshipState: {},
     })),
     resources: old.initialState.resources.map((item: any) => item.value.mode === 'numeric'
       ? { resourceId: stable(item.resourceId), kind: 'numeric', value: Number(item.value.amount ?? 0) }
@@ -127,12 +205,22 @@ function convertPack(old: any) {
     promises: old.initialState.promises.map((item: any) => ({ promiseId: stable(item.promiseId), status: promiseStatus(item.status) })),
     recentOutcomes: [],
   });
+  for (const promise of sourcePromises) {
+    if (!state.promises.some(item => item.promiseId === promise.id)) {
+      state.promises.push({ promiseId: promise.id, status: 'open' });
+    }
+  }
   const arc = ArcPlanSchema.parse({
     schemaVersion: 1, arcNumber: 1, startChapter: old.arc.startChapter, plannedEndChapter: old.arc.endChapter,
+    stageId: 'stage_1',
     objective: old.arc.direction, terminalChanges: [old.arc.terminalChange],
     activeConflicts: old.arc.activeConflicts.map((item: any) => `${item.objective}; ${item.leverage}; ${item.nextMove}`),
     duePromiseIds: old.arc.duePromiseIds.map(stable),
     progression: old.arc.progressionBudget.map((item: any) => `${item.signal}: ${item.requiredChange}`),
+    activeCharacterIds: characters.map((item: any) => item.id),
+    activeLocationIds: locations.map(item => item.id),
+    activeResourceIds: old.kernel.resources.map((item: any) => stable(item.id)),
+    activeWorldRuleIds: old.kernel.worldClaims.map((item: any) => stable(item.id)),
   });
   return { kernel, state, arc };
 }
@@ -247,7 +335,7 @@ async function main() {
     buildCostUsd: totalCost,
     samples,
   }, null, 2)}\n`);
-  for (const slot of SLOTS) {
+  await Promise.all(SLOTS.map(async slot => {
     const base = `blueprints/flagship-v3/canaries/${slot}`;
     const oldPack = fromGit<any>(`${base}/launch-pack-v3.json`);
     const oldOpening = fromGit<any>(`${base}/offline-opening-writer31-v33/opening-run-v3.json`);
@@ -304,7 +392,7 @@ async function main() {
       persist();
       console.log(JSON.stringify({ slot, chapter: plan.chapterNumber, samples: samples.length, revision: generated.revisionCount }));
     }
-  }
+  }));
   if (samples.length !== 20 || new Set(samples.map(sample => sample.id)).size !== 20) throw new Error('Benchmark builder did not produce 20 unique samples.');
   persist();
   console.log(JSON.stringify({ outputPath, samples: samples.length, buildCostUsd: totalCost }));

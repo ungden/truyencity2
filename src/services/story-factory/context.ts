@@ -1,4 +1,5 @@
 import type { ChapterPlan, EditorAssessment, StoryKernel, StoryState } from './contracts';
+import type { RelevantStoryMemory } from './memory';
 
 export interface ContextManifestEntry {
   role: 'writer' | 'editor' | 'revision' | 'planner';
@@ -16,6 +17,7 @@ export interface WriterBrief {
   characterState: unknown[];
   resources: unknown[];
   promises: unknown[];
+  relevantMemory: unknown[];
   requiredDeltas: unknown[];
 }
 
@@ -41,6 +43,7 @@ export function buildWriterBrief(input: {
   kernel: StoryKernel;
   state: StoryState;
   plan: ChapterPlan;
+  relevantMemory?: RelevantStoryMemory[];
 }): WriterBrief {
   const ids = relevantIds(input.plan);
   ids.characters.add(input.kernel.protagonistId);
@@ -82,6 +85,13 @@ export function buildWriterBrief(input: {
     })),
     resources: input.state.resources.filter(resource => ids.resources.has(resource.resourceId)),
     promises: input.state.promises.filter(promise => ids.promises.has(promise.promiseId)),
+    relevantMemory: (input.relevantMemory ?? []).map(memory => ({
+      chapterNumber: memory.outcome.chapterNumber,
+      event: memory.outcome.event,
+      result: memory.outcome.result,
+      endingSituation: memory.outcome.endingSituation,
+      relatedEntityIds: memory.relatedEntityIds,
+    })),
     requiredDeltas: input.plan.requiredDeltas,
   };
 }
@@ -106,6 +116,7 @@ export function buildChapterContexts(input: {
   state: StoryState;
   plan: ChapterPlan;
   previousChapter?: string;
+  relevantMemory?: RelevantStoryMemory[];
 }) {
   const brief = buildWriterBrief(input);
   const previousTail = input.previousChapter ? selectPreviousTail(input.previousChapter) : '';
@@ -129,6 +140,7 @@ export function buildChapterContexts(input: {
     resources: input.state.resources.filter(resource => ids.resources.has(resource.resourceId)),
     promises: input.state.promises.filter(promise => ids.promises.has(promise.promiseId)),
     recentOutcomes: input.state.recentOutcomes,
+    relevantMemory: input.relevantMemory ?? [],
   };
   return {
     brief,

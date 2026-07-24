@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import {
+  CanonExtensionSchema,
   EditorAssessmentSchema,
   LaunchPackSchema,
   type ArcPlan,
@@ -9,6 +10,7 @@ import {
   type StoryKernel,
   type StoryState,
   StoryFactoryError,
+  StoryKernelSchema,
   FIRST_30_PORTFOLIO,
   materializePlannerRollingPlan,
   materializeEditorAssessment,
@@ -16,17 +18,40 @@ import {
   PlannerRollingPlanResponseSchema,
   WindowReviewSchema,
   appendAcceptedOutcome,
+  applyCanonExtension,
   applyChapterPlan,
   buildChapterContexts,
   buildWriterBrief,
   isStoryFactoryEnabled,
+  loadRelevantStoryMemory,
+  memoryEntityIdsForArc,
+  memoryEntityIdsForPlan,
   runConceptLab,
+  planArcLifecycle,
   rollingPlanContainsChapter,
   toGeminiResponseSchema,
   validateKernelState,
   writeStoryChapter,
 } from '@/services/story-factory';
 import type { ProviderResult, StoryModelProvider } from '@/services/story-factory/provider';
+
+const seriesStages = Array.from({ length: 8 }, (_, index) => ({
+  id: `stage_${index + 1}`,
+  order: index + 1,
+  targetSpanChapters: 100,
+  arena: `Địa bàn phát triển nghề biển cấp ${index + 1}.`,
+  protagonistGoal: `Đạt mốc sinh kế bền vững cấp ${index + 1}.`,
+  conflictSource: `Nguồn lợi, vốn và đầu ra cùng tăng độ khó ở cấp ${index + 1}.`,
+  rewardLoopVariant: `Mở rộng kỹ thuật, sản phẩm và thị trường ở cấp ${index + 1}.`,
+  irreversibleChange: `Gia đình sở hữu năng lực sản xuất không thể quay lại mức cũ ở cấp ${index + 1}.`,
+  entryConditions: [`Hoàn thành điều kiện vào giai đoạn ${index + 1}.`],
+  exitConditions: [`Đạt điều kiện rời giai đoạn ${index + 1}.`],
+  longPromiseIds: [index === 0 ? 'promise_house' : `promise_${Math.min(index + 1, 4)}`],
+  expansionSeeds: index === 1 ? [
+    { id: 'seed_new_buyer', kind: 'character' as const, description: 'Một người mua cấp huyện có lợi ích độc lập.' },
+    { id: 'seed_new_market', kind: 'location' as const, description: 'Một chợ mới mở rộng địa bàn bán hàng.' },
+  ] : [],
+}));
 
 const kernel: StoryKernel = {
   schemaVersion: 1,
@@ -44,6 +69,53 @@ const kernel: StoryKernel = {
     { id: 'mother', name: 'Bà Lành', aliases: ['mẹ'], role: 'supporting', agenda: 'Giữ gia đình an toàn và không vay nợ liều lĩnh.', competence: 'Giỏi phơi sấy và quản lý bữa ăn.', constraint: 'Sợ rủi ro sau nhiều mùa biển thất bát.', moralBoundary: 'Không chiếm phần của người nghèo hơn.', voice: { register: 'mộc mạc', sentenceRhythm: 'ngắn và giàu hàm ý', directness: 'balanced', addressRules: 'gọi con theo tên', vocabulary: 'ngôn ngữ gia đình', stressResponse: 'hỏi kỹ số tiền và đường lui', avoidances: 'không khóc lóc kéo dài' } },
     { id: 'buyer', name: 'Tấn', aliases: ['chú Tấn'], role: 'opposition', agenda: 'Giữ nguồn hàng và biên lợi nhuận của mối thu mua.', competence: 'Nắm khách hàng chợ huyện và giá từng bến.', constraint: 'Không thể công khai ép giá khi có người mua cạnh tranh.', moralBoundary: 'Không dùng bạo lực.', voice: { register: 'thương hồ', sentenceRhythm: 'mềm nhưng luôn dò giá', directness: 'balanced', addressRules: 'xưng chú với người trẻ', vocabulary: 'giá, mẻ, mối và chuyến hàng', stressResponse: 'đưa điều kiện mới thay vì nổi nóng', avoidances: 'không tự thú âm mưu' } },
   ],
+  worldModel: {
+    era: 'Một làng biển Việt Nam hư cấu cuối thập niên 1980.',
+    baseline: 'Kinh tế hộ gia đình thiếu vốn, bảo quản lạnh và đầu ra ổn định.',
+    geography: [
+      { id: 'geo_village', name: 'Làng biển', role: 'Nơi khai thác và sinh hoạt gia đình.', constraints: ['Phụ thuộc thời tiết và con nước.'] },
+      { id: 'geo_district', name: 'Huyện lỵ', role: 'Thị trường tiêu thụ và cung ứng vật tư.', constraints: ['Đường xa làm hàng tươi nhanh xuống cấp.'] },
+    ],
+    institutions: [
+      { id: 'inst_family', name: 'Hộ gia đình Hải', agenda: 'Xây sinh kế bền vững.', authority: 'Quyết định lao động và chi tiêu trong nhà.', resources: 'Sức lao động, kỹ năng và khoản vốn nhỏ.' },
+      { id: 'inst_market', name: 'Mạng lưới chợ huyện', agenda: 'Mua hàng tươi đều và có lợi nhuận.', authority: 'Quyết định đầu ra và giá theo chất lượng.', resources: 'Tiền mặt, sạp hàng và quan hệ khách mua.' },
+    ],
+    systems: [{
+      id: 'system_seafood',
+      name: 'Chuỗi hải sản tươi',
+      rules: ['Hàng tươi có giá trị khi được bảo quản và giao đúng thời gian.'],
+      limits: ['Nguồn lợi, thời tiết, vốn và tải trọng đều hữu hạn.'],
+      costs: ['Mỗi bước mở rộng phải trả chi phí vật tư, lao động và hao hụt.'],
+    }],
+  },
+  progressionTracks: [
+    {
+      id: 'track_livelihood', name: 'Sinh kế gia đình', initialState: 'Thiếu ăn và không có vốn quay vòng.',
+      terminalState: 'Có chuỗi nghề biển bền vững không lệ thuộc ký ức tương lai.',
+      milestones: [
+        { id: 'milestone_livelihood_1', stageId: 'stage_1', state: 'Có mẻ hàng và khách đầu tiên.' },
+        { id: 'milestone_livelihood_8', stageId: 'stage_8', state: 'Chuỗi sinh kế vận hành bền vững.' },
+      ],
+    },
+    {
+      id: 'track_market', name: 'Địa bàn thị trường', initialState: 'Chỉ biết bãi ngang địa phương.',
+      terminalState: 'Có mạng lưới phân phối sâu vào đất liền.',
+      milestones: [
+        { id: 'milestone_market_1', stageId: 'stage_1', state: 'Tiếp cận chợ huyện.' },
+        { id: 'milestone_market_8', stageId: 'stage_8', state: 'Vận hành mạng lưới liên vùng.' },
+      ],
+    },
+  ],
+  seriesSpine: {
+    targetEndingRange: { minimumChapter: 800, maximumChapter: 1_000 },
+    stages: seriesStages,
+  },
+  longPromises: [
+    { promiseId: 'promise_house', openedStageId: 'stage_1', dueStageId: 'stage_2', payoff: 'Gia đình có mái nhà an toàn trước mùa mưa.' },
+    { promiseId: 'promise_2', openedStageId: 'stage_1', dueStageId: 'stage_4', payoff: 'Ngư dân có đầu ra không bị ép giá.' },
+    { promiseId: 'promise_3', openedStageId: 'stage_2', dueStageId: 'stage_6', payoff: 'Hải xây được cơ sở chế biến có việc làm ổn định.' },
+    { promiseId: 'promise_4', openedStageId: 'stage_4', dueStageId: 'stage_8', payoff: 'Chuỗi sinh kế giữ được nguồn lợi cho thế hệ sau.' },
+  ],
   worldRules: [
     { id: 'rule_market', claim: 'Giá cá thay đổi theo độ tươi, mùa và khả năng đưa hàng tới chợ huyện.', exceptions: [] },
     { id: 'rule_weather', claim: 'Thuyền nhỏ phải chịu giới hạn gió, con nước và thời gian bảo quản.', exceptions: [] },
@@ -55,9 +127,14 @@ const kernel: StoryKernel = {
     { fromLocationId: 'beach', toLocationId: 'home', minimumMinutes: 20 },
   ],
   resources: [{ id: 'money', name: 'Tiền mặt', kind: 'numeric', minimum: 0 }],
-  promises: [{ id: 'promise_house', description: 'Sửa lại mái nhà trước mùa mưa.' }],
+  promises: [
+    { id: 'promise_house', description: 'Sửa lại mái nhà trước mùa mưa.' },
+    { id: 'promise_2', description: 'Tạo đầu ra công bằng hơn cho ngư dân.' },
+    { id: 'promise_3', description: 'Xây cơ sở chế biến tạo việc làm ổn định.' },
+    { id: 'promise_4', description: 'Giữ nguồn lợi cho thế hệ sau.' },
+  ],
   pleasureLoop: { primary: 'Nhìn đúng cơ hội, lao động, bán được hàng rồi tái đầu tư.', comfort: 'Bữa cơm, căn nhà và sự yên lòng của người thân tốt lên.', setbackRecoveryChapters: 3 },
-  endingDirection: { protagonistTerminalState: 'Có sinh kế bền vững và không còn phụ thuộc ký ức tương lai.', worldTerminalState: 'Làng biển có chuỗi khai thác và chế biến giữ được nguồn lợi.', promisesToResolve: ['promise_house'] },
+  endingDirection: { protagonistTerminalState: 'Có sinh kế bền vững và không còn phụ thuộc ký ức tương lai.', worldTerminalState: 'Làng biển có chuỗi khai thác và chế biến giữ được nguồn lợi.', promisesToResolve: ['promise_house', 'promise_2', 'promise_3', 'promise_4'] },
 };
 
 const initialState: StoryState = {
@@ -71,7 +148,13 @@ const initialState: StoryState = {
     { characterId: 'buyer', locationId: 'beach', knownFactIds: [], relationshipState: {} },
   ],
   resources: [{ resourceId: 'money', kind: 'numeric', value: 100 }],
-  promises: [{ promiseId: 'promise_house', status: 'open' }],
+  promises: [
+    { promiseId: 'promise_house', status: 'open' },
+    { promiseId: 'promise_2', status: 'open' },
+    { promiseId: 'promise_3', status: 'open' },
+    { promiseId: 'promise_4', status: 'open' },
+  ],
+  usedExpansionSeedIds: [],
   recentOutcomes: [],
 };
 
@@ -96,10 +179,14 @@ function editorWirePass(deltaId: string, evidence: string) {
 }
 
 const arc: ArcPlan = {
-  schemaVersion: 1, arcNumber: 1, startChapter: 1, plannedEndChapter: 20,
+  schemaVersion: 1, arcNumber: 1, stageId: 'stage_1', startChapter: 1, plannedEndChapter: 20,
   objective: 'Tạo được đầu ra đầu tiên và làm cho gia đình tin vào cách làm mới.',
   terminalChanges: ['Có khách hàng đầu tiên và một phần vốn quay vòng.'],
   activeConflicts: ['Thiếu vốn và hàng dễ hỏng.'],
+  activeCharacterIds: ['main', 'mother', 'buyer'],
+  activeLocationIds: ['home', 'beach'],
+  activeResourceIds: ['money'],
+  activeWorldRuleIds: ['rule_market', 'rule_weather'],
   duePromiseIds: ['promise_house'],
   progression: ['Tiền mặt tăng rõ ràng', 'Dụng cụ được nâng cấp', 'Uy tín với đầu ra tăng'],
 };
@@ -252,6 +339,187 @@ describe('canonical Story Factory', () => {
     oneWayKernel.travelRules = oneWayKernel.travelRules.filter(rule => rule.fromLocationId === 'home');
     expect(() => validateKernelState(oneWayKernel, initialState))
       .toThrow('must let the protagonist reach every declared location and return');
+  });
+
+  test('rejects a long-series spine whose stages do not cover the declared minimum', () => {
+    const invalid = structuredClone(kernel);
+    invalid.seriesSpine.stages = invalid.seriesSpine.stages.map(stage => ({ ...stage, targetSpanChapters: 80 }));
+    expect(() => StoryKernelSchema.parse(invalid)).toThrow();
+  });
+
+  test('relationship deltas commit trust and debt without growing persistent history', () => {
+    const basePlan = plan(1);
+    const relationshipPlan: ChapterPlan = {
+      ...basePlan,
+      requiredDeltas: [{
+        id: 'delta_relationship',
+        kind: 'relationship',
+        characterId: 'main',
+        counterpartId: 'buyer',
+        before: null,
+        after: 'tin_tuong_1_no_200',
+        source: 'buyer advanced transport money',
+      }],
+      scenes: [{ ...basePlan.scenes[0], requiredDeltaIds: ['delta_relationship'] }],
+    };
+    const result = applyChapterPlan({ kernel, state: initialState, plan: relationshipPlan });
+    expect(result.state.characters.find(character => character.characterId === 'main')?.relationshipState.buyer)
+      .toBe('tin_tuong_1_no_200');
+    expect(result.events[0].relatedEntityIds).toEqual(expect.arrayContaining(['main', 'buyer']));
+  });
+
+  test('canon extension only adds stage-authorized IDs and cannot overwrite canon', () => {
+    const extension = CanonExtensionSchema.parse({
+      stageId: 'stage_2',
+      characters: [{
+        seedId: 'seed_new_buyer',
+        definition: {
+          id: 'buyer_district', name: 'Dũng', aliases: ['anh Dũng'], role: 'supporting',
+          agenda: 'Tìm nguồn hàng ổn định.', competence: 'Phân phối cấp huyện.',
+          constraint: 'Không có kho lạnh riêng.', moralBoundary: 'Không gian lận cân.',
+          voice: kernel.characters[0].voice,
+        },
+        initialState: { locationId: 'home', knownFactIds: [], relationshipState: {} },
+      }],
+      locations: [], travelRules: [], promises: [], worldRules: [],
+    });
+    const added = applyCanonExtension({ kernel, state: initialState, extension });
+    expect(added.kernel.characters.some(character => character.id === 'buyer_district')).toBe(true);
+    expect(added.state.characters.find(character => character.characterId === 'buyer_district')?.locationId).toBe('home');
+    expect(added.state.usedExpansionSeedIds).toContain('seed_new_buyer');
+    expect(() => applyCanonExtension({ kernel: added.kernel, state: added.state, extension })).toThrow('already consumed');
+    const locationExtension = CanonExtensionSchema.parse({
+      stageId: 'stage_2',
+      characters: [],
+      locations: [{
+        seedId: 'seed_new_market',
+        definition: {
+          id: 'district_market',
+          name: 'Chợ huyện mới',
+          role: 'Địa bàn mở rộng đầu ra và gặp nhóm lợi ích mới.',
+          constraints: ['Đường xa, sức mua và thời gian giao hàng đều hữu hạn.'],
+        },
+      }],
+      travelRules: [
+        { fromLocationId: 'home', toLocationId: 'district_market', minimumMinutes: 120 },
+        { fromLocationId: 'district_market', toLocationId: 'home', minimumMinutes: 120 },
+      ],
+      promises: [], worldRules: [],
+    });
+    const withLocation = applyCanonExtension({
+      kernel: added.kernel,
+      state: added.state,
+      extension: locationExtension,
+    });
+    expect(withLocation.kernel.locations.some(location => location.id === 'district_market')).toBe(true);
+    expect(withLocation.kernel.worldModel.geography.some(location => location.id === 'district_market')).toBe(true);
+  });
+
+  test('exact-ID memory lookup keys cover stage, cast, locations, rules and relationships', () => {
+    expect(memoryEntityIdsForArc(kernel, arc, initialState)).toEqual(expect.arrayContaining([
+      'main', 'stage_1', 'mother', 'home', 'money', 'rule_market',
+    ]));
+    const basePlan = plan(1);
+    const relationshipPlan: ChapterPlan = {
+      ...basePlan,
+      requiredDeltas: [{
+        id: 'delta_relationship',
+        kind: 'relationship',
+        characterId: 'main',
+        counterpartId: 'buyer',
+        before: null,
+        after: 'hostility_1',
+        source: 'price dispute',
+      }],
+    };
+    expect(memoryEntityIdsForPlan(kernel, relationshipPlan)).toEqual(expect.arrayContaining([
+      'main', 'buyer', 'home', 'rule_market',
+    ]));
+  });
+
+  test.each([50, 200, 800])('chapter-one callback is retrievable by exact ID at chapter %i', async chapterNumber => {
+    const chapterOneOutcome = {
+      chapterNumber: 1,
+      title: 'Lần Gặp Đầu Tiên',
+      event: 'Hải gặp Tấn lần đầu tại bãi biển.',
+      result: 'Hai người ghi nhớ điều kiện mua bán của nhau.',
+      method: 'Một cuộc mặc cả trực tiếp.',
+      endingSituation: 'Quan hệ làm ăn đã mở nhưng chưa có lòng tin.',
+      evidenceSpans: ['gặp Tấn lần đầu'],
+    };
+    let cutoff = 0;
+    const query: Record<string, unknown> & {
+      then?: (resolve: (value: unknown) => unknown) => Promise<unknown>;
+    } = {};
+    for (const method of ['select', 'eq', 'overlaps', 'order', 'limit']) {
+      query[method] = () => query;
+    }
+    query.lte = (_column: string, value: number) => {
+      cutoff = value;
+      return query;
+    };
+    query.then = resolve => Promise.resolve(resolve({
+      data: [{ after_value: chapterOneOutcome, related_entity_ids: ['main', 'buyer'], chapter_number: 1 }],
+      error: null,
+    }));
+    const fakeDb = { from: () => query };
+    const state = { ...initialState, chapterNumber };
+    const memory = await loadRelevantStoryMemory({
+      db: fakeDb as never,
+      projectId: '00000000-0000-0000-0000-000000000001',
+      state,
+      entityIds: ['buyer'],
+    });
+    expect(cutoff).toBe(chapterNumber - 12);
+    expect(memory[0].outcome.chapterNumber).toBe(1);
+    expect(memory[0].relatedEntityIds).toContain('buyer');
+  });
+
+  test('arc lifecycle cannot skip a series-spine stage', async () => {
+    const boundaryArc = { ...arc, plannedEndChapter: 20 };
+    const boundaryState = { ...initialState, chapterNumber: 20 };
+    const skippedArc = {
+      ...arc,
+      arcNumber: 2,
+      stageId: 'stage_3',
+      startChapter: 21,
+      plannedEndChapter: 40,
+    };
+    const provider = new QueueProvider([{
+      status: 'continue',
+      nextArc: skippedArc,
+      canonExtension: {
+        stageId: 'stage_3',
+        characters: [], locations: [], travelRules: [], promises: [], worldRules: [],
+      },
+    }]);
+    await expect(planArcLifecycle({
+      kernel, arc: boundaryArc, state: boundaryState, routes, provider,
+      minimumCompletionChapter: 800, maximumChapter: 1000,
+    })).rejects.toThrow('skipped or rewound');
+  });
+
+  test('an exhausted stage blocks filler instead of extending beyond its spine budget', async () => {
+    const boundaryArc = { ...arc, plannedEndChapter: 100 };
+    const boundaryState = { ...initialState, chapterNumber: 100 };
+    const fillerArc = {
+      ...arc,
+      arcNumber: 2,
+      startChapter: 101,
+      plannedEndChapter: 120,
+    };
+    const provider = new QueueProvider([{
+      status: 'continue',
+      nextArc: fillerArc,
+      canonExtension: {
+        stageId: 'stage_1',
+        characters: [], locations: [], travelRules: [], promises: [], worldRules: [],
+      },
+    }]);
+    await expect(planArcLifecycle({
+      kernel, arc: boundaryArc, state: boundaryState, routes, provider,
+      minimumCompletionChapter: 800, maximumChapter: 1000,
+    })).rejects.toThrow('stage is exhausted');
   });
 
   test('Writer context excludes research, ending contract and editor rubric', () => {
@@ -417,7 +685,7 @@ describe('canonical Story Factory', () => {
           act: 'Hải chia việc và bắt tay thực hiện.', deltaIds: ['delta_1'],
         }],
         deltas: [{
-          id: 'delta_1', k: 'fact', target: 'fact_day', before: 'ngay_0', change: null,
+          id: 'delta_1', k: 'fact', target: 'fact_day', counterpart: null, before: 'ngay_0', change: null,
           after: 'ngay_1', source: null, sink: null,
         }],
       })],
@@ -499,6 +767,8 @@ describe('canonical Story Factory', () => {
       conflictEconomy: 'Thời tiết, vốn và đầu ra phản ứng theo lợi ích thay vì phản diện ngu.',
       mechanismFingerprint: `mechanism-${id}`, rewardLoopFingerprint: `reward-${id}`, conflictEconomyFingerprint: `conflict-${id}`,
       seriality30: Array.from({ length: 6 }, (_, index) => `Biến thể nhân quả đủ dài số ${index + 1}`),
+      seriality1000: Array.from({ length: 8 }, (_, index) => `Arena dài hạn số ${index + 1} đổi quy mô và nguồn xung đột`),
+      earlyEndingRisk: 'Cơ chế sẽ cạn sớm nếu chỉ lặp bán hàng; mỗi stage phải đổi arena, giới hạn và lợi ích.',
     });
     const a = Array.from({ length: 6 }, (_, index) => candidate(`a${index + 1}`));
     const b = Array.from({ length: 6 }, (_, index) => candidate(`b${index + 1}`));
@@ -517,6 +787,8 @@ describe('canonical Story Factory', () => {
       serialStrength: 'Cơ chế có thể đổi sản phẩm, kỹ thuật, khách hàng và quy mô.',
       causalRisk: 'Ký ức tương lai cần giữ sai số và không biến thành toàn tri.',
       domainFeasibility: 'pass' as const,
+      longRunFeasibility: 'pass' as const,
+      macroStageStress: Array.from({ length: 4 }, (_, index) => `Stress test stage ${index + 1} với arena và giới hạn khác nhau.`),
       requiredInfrastructure: ['Dụng cụ thủ công và nguồn nguyên liệu địa phương có thật.'],
       minimumPlausibleTimeline: 'Ba chương chỉ hoàn tất một mẻ thử nhỏ, chưa xây xưởng hoàn chỉnh.',
       criticalAssumptions: ['Nhân vật phải lao động và trả đủ chi phí đầu vào.'],

@@ -1,5 +1,6 @@
 export * from './contracts';
 export * from './context';
+export * from './memory';
 export * from './pipeline';
 export * from './planner';
 export * from './portfolio';

@@ -27,6 +27,71 @@ export const StoryCharacterSchema = z.object({
   voice: VoiceContractSchema,
 }).strict();
 
+export const WorldModelSchema = z.object({
+  era: prose,
+  baseline: prose,
+  geography: z.array(z.object({
+    id: stableId,
+    name: shortText,
+    role: prose,
+    constraints: z.array(prose).min(1).max(8),
+  }).strict()).min(2).max(40),
+  institutions: z.array(z.object({
+    id: stableId,
+    name: shortText,
+    agenda: prose,
+    authority: prose,
+    resources: prose,
+  }).strict()).min(2).max(40),
+  systems: z.array(z.object({
+    id: stableId,
+    name: shortText,
+    rules: z.array(prose).min(1).max(12),
+    limits: z.array(prose).min(1).max(12),
+    costs: z.array(prose).min(1).max(12),
+  }).strict()).min(1).max(20),
+}).strict();
+
+export const ProgressionTrackSchema = z.object({
+  id: stableId,
+  name: shortText,
+  initialState: prose,
+  terminalState: prose,
+  milestones: z.array(z.object({
+    id: stableId,
+    stageId: stableId,
+    state: prose,
+  }).strict()).min(2).max(20),
+}).strict();
+
+const SpineExpansionSeedSchema = z.object({
+  id: stableId,
+  kind: z.enum(['character', 'location', 'promise', 'world_rule']),
+  description: prose,
+}).strict();
+
+export const SeriesStageSchema = z.object({
+  id: stableId,
+  order: z.number().int().positive(),
+  targetSpanChapters: z.number().int().min(40).max(180),
+  arena: prose,
+  protagonistGoal: prose,
+  conflictSource: prose,
+  rewardLoopVariant: prose,
+  irreversibleChange: prose,
+  entryConditions: z.array(prose).min(1).max(8),
+  exitConditions: z.array(prose).min(1).max(8),
+  longPromiseIds: z.array(stableId).max(12),
+  expansionSeeds: z.array(SpineExpansionSeedSchema).max(12),
+}).strict();
+
+export const LongPromiseSchema = z.object({
+  promiseId: stableId,
+  openedStageId: stableId,
+  dueStageId: stableId,
+  payoff: prose,
+}).strict();
+
 export const StoryKernelSchema = z.object({
   schemaVersion: z.literal(1),
   title: z.string().trim().min(4).max(180),
@@ -38,18 +103,28 @@ export const StoryKernelSchema = z.object({
   rewardLoopFingerprint: shortText,
   conflictEconomyFingerprint: shortText,
   protagonistId: stableId,
-  characters: z.array(StoryCharacterSchema).min(3).max(24),
+  characters: z.array(StoryCharacterSchema).min(3).max(80),
+  worldModel: WorldModelSchema,
+  progressionTracks: z.array(ProgressionTrackSchema).min(2).max(12),
+  seriesSpine: z.object({
+    targetEndingRange: z.object({
+      minimumChapter: z.number().int().min(800).max(1_200),
+      maximumChapter: z.number().int().min(800).max(1_200),
+    }).strict(),
+    stages: z.array(SeriesStageSchema).min(8).max(15),
+  }).strict(),
+  longPromises: z.array(LongPromiseSchema).min(4).max(40),
   worldRules: z.array(z.object({
     id: stableId,
     claim: prose,
     exceptions: z.array(prose).max(6).default([]),
-  }).strict()).min(3).max(40),
-  locations: z.array(z.object({ id: stableId, name: shortText }).strict()).min(2).max(80),
+  }).strict()).min(3).max(100),
+  locations: z.array(z.object({ id: stableId, name: shortText }).strict()).min(2).max(100),
   travelRules: z.array(z.object({
     fromLocationId: stableId,
     toLocationId: stableId,
     minimumMinutes: z.number().int().nonnegative().max(100_000),
-  }).strict()).max(240),
+  }).strict()).max(500),
   resources: z.array(z.discriminatedUnion('kind', [
     z.object({
       id: stableId,
@@ -59,8 +134,8 @@ export const StoryKernelSchema = z.object({
       maximum: z.number().finite().optional(),
     }).strict(),
     z.object({ id: stableId, name: shortText, kind: z.literal('state') }).strict(),
-  ])).max(40),
-  promises: z.array(z.object({ id: stableId, description: prose }).strict()).max(40),
+  ])).max(80),
+  promises: z.array(z.object({ id: stableId, description: prose }).strict()).max(80),
   pleasureLoop: z.object({
     primary: prose,
     comfort: prose,
@@ -80,6 +155,91 @@ export const StoryKernelSchema = z.object({
   kernel.travelRules.forEach((rule, index) => {
     if (!locations.has(rule.fromLocationId) || !locations.has(rule.toLocationId)) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['travelRules', index], message: 'Travel rule references an unknown location.' });
+    }
+  });
+  const stages = kernel.seriesSpine.stages;
+  const stageIds = new Set(stages.map(stage => stage.id));
+  const promiseIds = new Set(kernel.promises.map(promise => promise.id));
+  if (kernel.seriesSpine.targetEndingRange.minimumChapter > kernel.seriesSpine.targetEndingRange.maximumChapter) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['seriesSpine', 'targetEndingRange'], message: 'Ending range minimum exceeds maximum.' });
+  }
+  if (stageIds.size !== stages.length) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['seriesSpine', 'stages'], message: 'Series stages contain duplicate IDs.' });
+  }
+  stages.forEach((stage, index) => {
+    if (stage.order !== index + 1) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['seriesSpine', 'stages', index, 'order'], message: 'Series stage order must be contiguous.' });
+    }
+    stage.longPromiseIds.forEach((promiseId, promiseIndex) => {
+      if (!promiseIds.has(promiseId)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['seriesSpine', 'stages', index, 'longPromiseIds', promiseIndex],
+          message: 'Series stage references an unknown long promise.',
+        });
+      }
+    });
+  });
+  const targetLength = stages.reduce((sum, stage) => sum + stage.targetSpanChapters, 0);
+  if (targetLength < kernel.seriesSpine.targetEndingRange.minimumChapter
+    || targetLength > kernel.seriesSpine.targetEndingRange.maximumChapter) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['seriesSpine', 'stages'],
+      message: 'Series stage spans must total inside the declared 800-1,200 chapter ending range.',
+    });
+  }
+  const orderByStage = new Map(stages.map(stage => [stage.id, stage.order]));
+  const longPromiseIds = new Set(kernel.longPromises.map(promise => promise.promiseId));
+  if (longPromiseIds.size !== kernel.longPromises.length) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['longPromises'], message: 'Long promises contain duplicate promise IDs.' });
+  }
+  kernel.longPromises.forEach((promise, index) => {
+    const opened = orderByStage.get(promise.openedStageId);
+    const due = orderByStage.get(promise.dueStageId);
+    if (!promiseIds.has(promise.promiseId) || opened === undefined || due === undefined || due < opened) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['longPromises', index], message: 'Long promise references invalid promise/stage ordering.' });
+    }
+  });
+  if (!kernel.longPromises.some(promise => (orderByStage.get(promise.dueStageId) ?? 0) > 1)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['longPromises'], message: 'At least one long promise must remain due after the first stage.' });
+  }
+  const seedIds = stages.flatMap(stage => stage.expansionSeeds.map(seed => seed.id));
+  if (new Set(seedIds).size !== seedIds.length) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['seriesSpine', 'stages'], message: 'Expansion seed IDs must be globally unique.' });
+  }
+  kernel.progressionTracks.forEach((track, trackIndex) => {
+    const milestoneIds = new Set(track.milestones.map(milestone => milestone.id));
+    if (milestoneIds.size !== track.milestones.length) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['progressionTracks', trackIndex, 'milestones'],
+        message: 'Progression milestone IDs must be unique inside a track.',
+      });
+    }
+    let previousOrder = 0;
+    track.milestones.forEach((milestone, milestoneIndex) => {
+      const stageOrder = orderByStage.get(milestone.stageId);
+      if (stageOrder === undefined) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['progressionTracks', trackIndex, 'milestones', milestoneIndex, 'stageId'],
+          message: 'Progression milestone references an unknown series stage.',
+        });
+      } else if (stageOrder < previousOrder) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['progressionTracks', trackIndex, 'milestones', milestoneIndex, 'stageId'],
+          message: 'Progression milestones cannot move backwards through the series spine.',
+        });
+      } else {
+        previousOrder = stageOrder;
+      }
+    });
+  });
+  kernel.endingDirection.promisesToResolve.forEach((promiseId, index) => {
+    if (!promiseIds.has(promiseId)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['endingDirection', 'promisesToResolve', index], message: 'Ending references an unknown promise.' });
     }
   });
 });
@@ -118,17 +278,23 @@ export const StoryStateSchema = z.object({
     promiseId: stableId,
     status: z.enum(['open', 'progressed', 'resolved', 'abandoned']),
   }).strict()).max(80),
+  usedExpansionSeedIds: z.array(stableId).max(180).default([]),
   recentOutcomes: z.array(ChapterOutcomeSchema).max(12),
 }).strict();
 
 const arcPlanShape = {
   schemaVersion: z.literal(1),
   arcNumber: z.number().int().positive(),
+  stageId: stableId,
   startChapter: z.number().int().positive(),
   plannedEndChapter: z.number().int().positive(),
   objective: prose,
   terminalChanges: z.array(prose).min(1).max(12),
   activeConflicts: z.array(prose).min(1).max(12),
+  activeCharacterIds: z.array(stableId).min(1).max(24),
+  activeLocationIds: z.array(stableId).min(1).max(24),
+  activeResourceIds: z.array(stableId).max(24),
+  activeWorldRuleIds: z.array(stableId).min(1).max(24),
   duePromiseIds: z.array(stableId).max(20),
   progression: z.array(prose).min(1).max(12),
 } as const;
@@ -201,6 +367,16 @@ const promiseDelta = z.object({
   after: z.enum(['open', 'progressed', 'resolved', 'abandoned']),
 }).strict();
 
+const relationshipDelta = z.object({
+  id: stableId,
+  kind: z.literal('relationship'),
+  characterId: stableId,
+  counterpartId: stableId,
+  before: z.string().max(500).nullable(),
+  after: z.string().trim().min(1).max(500),
+  source: z.string().trim().min(2).max(300),
+}).strict();
+
 export const StateDeltaSchema = z.discriminatedUnion('kind', [
   factDelta,
   numericResourceDelta,
@@ -208,6 +384,7 @@ export const StateDeltaSchema = z.discriminatedUnion('kind', [
   knowledgeDelta,
   locationDelta,
   promiseDelta,
+  relationshipDelta,
 ]);
 
 export const ChapterPlanSchema = z.object({
@@ -290,6 +467,44 @@ export const ModelRoutesSchema = z.object({
   }
 });
 
+export const CanonExtensionSchema = z.object({
+  stageId: stableId,
+  characters: z.array(z.object({
+    seedId: stableId,
+    definition: StoryCharacterSchema,
+    initialState: z.object({
+      locationId: stableId,
+      knownFactIds: z.array(stableId).max(100),
+      relationshipState: z.record(z.string().max(500)).default({}),
+    }).strict(),
+  }).strict()).max(8),
+  locations: z.array(z.object({
+    seedId: stableId,
+    definition: z.object({
+      id: stableId,
+      name: shortText,
+      role: prose,
+      constraints: z.array(prose).min(1).max(8),
+    }).strict(),
+  }).strict()).max(8),
+  travelRules: z.array(z.object({
+    fromLocationId: stableId,
+    toLocationId: stableId,
+    minimumMinutes: z.number().int().nonnegative().max(100_000),
+  }).strict()).max(40),
+  promises: z.array(z.object({
+    seedId: stableId,
+    id: stableId,
+    description: prose,
+  }).strict()).max(8),
+  worldRules: z.array(z.object({
+    seedId: stableId,
+    id: stableId,
+    claim: prose,
+    exceptions: z.array(prose).max(6).default([]),
+  }).strict()).max(8),
+}).strict();
+
 export const LaunchPackSchema = z.object({
   schemaVersion: z.literal(1),
   selectedConceptId: stableId,
@@ -303,6 +518,7 @@ export type StoryKernel = z.infer<typeof StoryKernelSchema>;
 export type StoryState = z.infer<typeof StoryStateSchema>;
 export type ChapterOutcome = z.infer<typeof ChapterOutcomeSchema>;
 export type ArcPlan = z.infer<typeof ArcPlanSchema>;
+export type CanonExtension = z.infer<typeof CanonExtensionSchema>;
 export type StateDelta = z.infer<typeof StateDeltaSchema>;
 export type ChapterPlan = z.infer<typeof ChapterPlanSchema>;
 export type RollingPlan = z.infer<typeof RollingPlanSchema>;

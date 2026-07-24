@@ -88,4 +88,27 @@ describe('Story Factory architecture boundary', () => {
     expect(migration).toContain('latest_review_release IS DISTINCT FROM p_engine_release');
     expect(migration).toContain('project_release IS DISTINCT FROM p_engine_release');
   });
+
+  test('long-series memory uses indexed exact IDs and arc transitions are atomic', () => {
+    const migration = readFileSync(
+      'supabase/migrations/20260724074948_long_series_spine_exact_id_memory.sql',
+      'utf8',
+    );
+    const runtime = readFileSync('src/services/story-factory/runtime.ts', 'utf8');
+    expect(migration).toContain('related_entity_ids text[]');
+    expect(migration).toContain('USING gin (related_entity_ids)');
+    expect(migration).toContain('FUNCTION public.commit_story_factory_arc_transition');
+    expect(migration).toContain('SECURITY INVOKER');
+    expect(runtime).toContain("db.rpc('commit_story_factory_arc_transition'");
+    expect(runtime).not.toContain("update({ arc_plan: result.lifecycle.nextArc");
+  });
+
+  test('the long-series outline is story-specific and never injected from a genre template', () => {
+    const setup = readFileSync('src/services/story-factory/setup.ts', 'utf8');
+    const context = readFileSync('src/services/story-factory/context.ts', 'utf8');
+    expect(setup).toContain('seriesSpine phải có 8-15 stage');
+    expect(setup).toContain('tổng target 800-1.200 chương');
+    expect(context.slice(context.indexOf('export function buildWriterBrief'), context.indexOf('export function selectPreviousTail')))
+      .not.toContain('seriesSpine');
+  });
 });

@@ -79,9 +79,10 @@ async function main() {
     totalCostUsd: totalCost,
     judgments,
   }, null, 2)}\n`);
-  for (const sample of corpus.samples) {
-    const votes: Array<{ candidatePreferred: boolean; critical: boolean; wantsNext: boolean }> = [];
-    for (const model of judgeModels) {
+  for (let batchStart = 0; batchStart < corpus.samples.length; batchStart += 5) {
+    await Promise.all(corpus.samples.slice(batchStart, batchStart + 5).map(async sample => {
+      const votes: Array<{ candidatePreferred: boolean; critical: boolean; wantsNext: boolean }> = [];
+      for (const model of judgeModels) {
       const swap = parseInt(createHash('sha256').update(`${sample.id}:${model}`).digest('hex').slice(0, 2), 16) % 2 === 0;
       const a = swap ? sample.candidate : sample.control;
       const b = swap ? sample.control : sample.candidate;
@@ -107,10 +108,11 @@ Sau đó chọn bản tốt hơn dựa trên tính nối tiếp, nhân quả, gi
       const critical = swap ? judgment.criticalContinuityViolationA : judgment.criticalContinuityViolationB;
       const wantsNext = swap ? judgment.wantsNextA : judgment.wantsNextB;
       votes.push({ candidatePreferred, critical, wantsNext });
-    }
-    if (votes.filter(vote => vote.candidatePreferred).length >= 2) majorityWins += 1;
-    if (votes.filter(vote => vote.wantsNext).length >= 2) majorityWantsNext += 1;
-    if (votes.filter(vote => vote.critical).length >= 2) criticalViolations += 1;
+      }
+      if (votes.filter(vote => vote.candidatePreferred).length >= 2) majorityWins += 1;
+      if (votes.filter(vote => vote.wantsNext).length >= 2) majorityWantsNext += 1;
+      if (votes.filter(vote => vote.critical).length >= 2) criticalViolations += 1;
+    }));
   }
   const metrics = {
     samples: 20,

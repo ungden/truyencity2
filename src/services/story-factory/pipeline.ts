@@ -11,10 +11,17 @@ import {
   type StoryState,
 } from './contracts';
 import { buildChapterContexts, buildRevisionContext, type ContextManifestEntry } from './context';
+import type { RelevantStoryMemory } from './memory';
 import type { ProviderUsage, StoryModelProvider } from './provider';
 import { geminiProvider } from './provider';
 import { EDITOR_SYSTEM_PROMPT, REVISION_SYSTEM_PROMPT, WRITER_SYSTEM_PROMPT } from './prompts';
-import { appendAcceptedOutcome, applyChapterPlan, groundEvidenceSpan, type StateEvent } from './validation';
+import {
+  appendAcceptedOutcome,
+  applyChapterPlan,
+  buildChapterOutcomeEvent,
+  groundEvidenceSpan,
+  type StateEvent,
+} from './validation';
 
 export const ChapterDraftSchema = z.object({
   title: z.string().trim().min(2).max(180),
@@ -206,6 +213,7 @@ export async function writeStoryChapter(input: {
   state: StoryState;
   plan: ChapterPlan;
   previousChapter?: string;
+  relevantMemory?: RelevantStoryMemory[];
   routes: ModelRoutes;
   provider?: StoryModelProvider;
 }): Promise<ChapterPipelineResult> {
@@ -245,12 +253,16 @@ export async function writeStoryChapter(input: {
       content: initial.value.content,
       outcome: firstAssessment.assessment.outcome,
     });
+    const acceptedOutcome = stateAfter.recentOutcomes[stateAfter.recentOutcomes.length - 1];
     return {
       decision: 'publish',
       draft: initial.value,
       assessment: firstAssessment.assessment,
       stateAfter,
-      stateEvents: transition.events,
+      stateEvents: [
+        ...transition.events,
+        buildChapterOutcomeEvent({ plan: input.plan, outcome: acceptedOutcome }),
+      ],
       contextManifest: contexts.manifest,
       usages,
       revisionCount: 0,
@@ -302,12 +314,16 @@ export async function writeStoryChapter(input: {
     content: revision.value.content,
     outcome: secondAssessment.assessment.outcome,
   });
+  const acceptedOutcome = stateAfter.recentOutcomes[stateAfter.recentOutcomes.length - 1];
   return {
     decision: 'publish',
     draft: revision.value,
     assessment: secondAssessment.assessment,
     stateAfter,
-    stateEvents: transition.events,
+    stateEvents: [
+      ...transition.events,
+      buildChapterOutcomeEvent({ plan: input.plan, outcome: acceptedOutcome }),
+    ],
     contextManifest: contexts.manifest,
     usages,
     revisionCount: 1,

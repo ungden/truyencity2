@@ -1,5 +1,6 @@
 import {
   type ArcPlan,
+  type CanonExtension,
   type ChapterOutcome,
   type ChapterPlan,
   type RollingPlan,
@@ -12,11 +13,12 @@ import {
 export interface StateEvent {
   chapterNumber: number;
   deltaId: string;
-  kind: StateDelta['kind'];
+  kind: StateDelta['kind'] | 'chapter_outcome';
   entityId: string;
   before: unknown;
   after: unknown;
   source: string | null;
+  relatedEntityIds: string[];
 }
 
 function fail(message: string, evidence?: unknown): never {
@@ -74,9 +76,15 @@ export function validateKernelState(kernel: StoryKernel, state: StoryState): voi
   unique(kernel.promises.map(item => item.id), 'Kernel promises');
   unique(kernel.worldRules.map(item => item.id), 'Kernel world rules');
   unique(kernel.locations.map(item => item.id), 'Kernel locations');
+  unique(kernel.worldModel.geography.map(item => item.id), 'World geography');
+  unique(kernel.worldModel.institutions.map(item => item.id), 'World institutions');
+  unique(kernel.worldModel.systems.map(item => item.id), 'World systems');
+  unique(kernel.progressionTracks.map(item => item.id), 'Progression tracks');
+  unique(kernel.seriesSpine.stages.map(item => item.id), 'Series stages');
   unique(state.characters.map(item => item.characterId), 'State characters');
   unique(state.resources.map(item => item.resourceId), 'State resources');
   unique(state.promises.map(item => item.promiseId), 'State promises');
+  unique(state.usedExpansionSeedIds, 'Consumed expansion seeds');
   unique(state.facts.map(item => item.id), 'State facts');
 
   const characterIds = new Set(kernel.characters.map(item => item.id));
@@ -86,6 +94,9 @@ export function validateKernelState(kernel: StoryKernel, state: StoryState): voi
   for (const character of state.characters) {
     if (!characterIds.has(character.characterId)) fail(`State references unknown character ${character.characterId}.`);
     if (!locationIds.has(character.locationId)) fail(`State references unknown location ${character.locationId}.`);
+    for (const counterpartId of Object.keys(character.relationshipState)) {
+      if (!characterIds.has(counterpartId)) fail(`Relationship state references unknown character ${counterpartId}.`);
+    }
   }
   for (const resource of state.resources) {
     const definition = kernel.resources.find(item => item.id === resource.resourceId);
@@ -130,6 +141,76 @@ export function validateKernelState(kernel: StoryKernel, state: StoryState): voi
       noReturn,
     });
   }
+}
+
+export function applyCanonExtension(input: {
+  kernel: StoryKernel;
+  state: StoryState;
+  extension: CanonExtension;
+}): { kernel: StoryKernel; state: StoryState } {
+  const kernel = structuredClone(input.kernel);
+  const state = structuredClone(input.state);
+  const stage = kernel.seriesSpine.stages.find(item => item.id === input.extension.stageId);
+  if (!stage) fail(`Canon extension references unknown stage ${input.extension.stageId}.`);
+  const seeds = new Map(stage.expansionSeeds.map(seed => [seed.id, seed.kind]));
+  const usedSeeds: string[] = [];
+  const assertSeed = (seedId: string, kind: 'character' | 'location' | 'promise' | 'world_rule') => {
+    if (seeds.get(seedId) !== kind) fail(`Canon extension seed ${seedId} does not permit ${kind}.`);
+    if (state.usedExpansionSeedIds.includes(seedId)) fail(`Canon extension seed ${seedId} was already consumed.`);
+    usedSeeds.push(seedId);
+  };
+  const characterIds = new Set(kernel.characters.map(item => item.id));
+  const locationIds = new Set(kernel.locations.map(item => item.id));
+  const promiseIds = new Set(kernel.promises.map(item => item.id));
+  const ruleIds = new Set(kernel.worldRules.map(item => item.id));
+
+  for (const item of input.extension.locations) {
+    assertSeed(item.seedId, 'location');
+    if (locationIds.has(item.definition.id)) fail(`Canon extension cannot overwrite location ${item.definition.id}.`);
+    kernel.locations.push({ id: item.definition.id, name: item.definition.name });
+    kernel.worldModel.geography.push(item.definition);
+    locationIds.add(item.definition.id);
+  }
+  for (const item of input.extension.characters) {
+    assertSeed(item.seedId, 'character');
+    if (characterIds.has(item.definition.id)) fail(`Canon extension cannot overwrite character ${item.definition.id}.`);
+    if (!locationIds.has(item.initialState.locationId)) fail(`New character ${item.definition.id} starts at an unknown location.`);
+    kernel.characters.push(item.definition);
+    state.characters.push({
+      characterId: item.definition.id,
+      locationId: item.initialState.locationId,
+      knownFactIds: item.initialState.knownFactIds,
+      relationshipState: item.initialState.relationshipState,
+    });
+    characterIds.add(item.definition.id);
+  }
+  for (const item of input.extension.promises) {
+    assertSeed(item.seedId, 'promise');
+    if (promiseIds.has(item.id)) fail(`Canon extension cannot overwrite promise ${item.id}.`);
+    kernel.promises.push({ id: item.id, description: item.description });
+    state.promises.push({ promiseId: item.id, status: 'open' });
+    promiseIds.add(item.id);
+  }
+  for (const item of input.extension.worldRules) {
+    assertSeed(item.seedId, 'world_rule');
+    if (ruleIds.has(item.id)) fail(`Canon extension cannot overwrite world rule ${item.id}.`);
+    kernel.worldRules.push({ id: item.id, claim: item.claim, exceptions: item.exceptions });
+    ruleIds.add(item.id);
+  }
+  unique(usedSeeds, 'Canon extension seeds');
+  state.usedExpansionSeedIds.push(...usedSeeds);
+  for (const rule of input.extension.travelRules) {
+    if (!locationIds.has(rule.fromLocationId) || !locationIds.has(rule.toLocationId)) {
+      fail('Canon extension travel rule references an unknown location.', rule);
+    }
+    if (kernel.travelRules.some(existing => existing.fromLocationId === rule.fromLocationId
+      && existing.toLocationId === rule.toLocationId)) {
+      fail('Canon extension cannot overwrite an existing travel rule.', rule);
+    }
+    kernel.travelRules.push(rule);
+  }
+  validateKernelState(kernel, state);
+  return { kernel, state };
 }
 
 function preconditionMatches(actual: string | number | undefined, expected: string | number): boolean {
@@ -244,6 +325,7 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
 function eventEntity(delta: StateDelta): string {
   if (delta.kind === 'fact') return delta.factId;
   if (delta.kind === 'knowledge' || delta.kind === 'location') return delta.characterId;
+  if (delta.kind === 'relationship') return `${delta.characterId}:${delta.counterpartId}`;
   if (delta.kind === 'promise') return delta.promiseId;
   return delta.resourceId;
 }
@@ -330,13 +412,28 @@ export function applyChapterPlan(input: {
       if (before !== delta.beforeLocationId) fail(`Character ${delta.characterId} location drifted.`, { expected: delta.beforeLocationId, actual: before });
       character.locationId = delta.afterLocationId;
       after = delta.afterLocationId;
-    } else {
+    } else if (delta.kind === 'promise') {
       const promise = state.promises.find(item => item.promiseId === delta.promiseId);
       if (!promise) fail(`Promise delta references unknown promise ${delta.promiseId}.`);
       before = promise.status;
       if (before !== delta.before) fail(`Promise ${delta.promiseId} status drifted.`, { expected: delta.before, actual: before });
       promise.status = delta.after;
       after = delta.after;
+    } else {
+      const character = state.characters.find(item => item.characterId === delta.characterId);
+      if (!character || !state.characters.some(item => item.characterId === delta.counterpartId)) {
+        fail(`Relationship delta references an unknown character pair ${delta.characterId}:${delta.counterpartId}.`);
+      }
+      before = character.relationshipState[delta.counterpartId] ?? null;
+      if (before !== delta.before) {
+        fail(`Relationship ${delta.characterId}:${delta.counterpartId} before-value drifted.`, {
+          expected: delta.before,
+          actual: before,
+        });
+      }
+      character.relationshipState[delta.counterpartId] = delta.after;
+      after = delta.after;
+      source = delta.source;
     }
     events.push({
       chapterNumber: plan.chapterNumber,
@@ -346,6 +443,9 @@ export function applyChapterPlan(input: {
       before,
       after,
       source,
+      relatedEntityIds: delta.kind === 'relationship'
+        ? [delta.characterId, delta.counterpartId]
+        : [eventEntity(delta)],
     });
   }
   state.chapterNumber = plan.chapterNumber;
@@ -378,6 +478,49 @@ export function appendAcceptedOutcome(input: {
   return state;
 }
 
+export function buildChapterOutcomeEvent(input: {
+  plan: ChapterPlan;
+  outcome: ChapterOutcome;
+}): StateEvent {
+  const relatedEntityIds = new Set<string>([
+    ...input.plan.requiredWorldRuleIds,
+    ...input.plan.scenes.flatMap(scene => [scene.locationId, ...scene.participantIds]),
+  ]);
+  for (const delta of input.plan.requiredDeltas) {
+    if (delta.kind === 'fact') relatedEntityIds.add(delta.factId);
+    else if (delta.kind === 'knowledge' || delta.kind === 'location') relatedEntityIds.add(delta.characterId);
+    else if (delta.kind === 'relationship') {
+      relatedEntityIds.add(delta.characterId);
+      relatedEntityIds.add(delta.counterpartId);
+    } else if (delta.kind === 'promise') relatedEntityIds.add(delta.promiseId);
+    else relatedEntityIds.add(delta.resourceId);
+  }
+  return {
+    chapterNumber: input.plan.chapterNumber,
+    deltaId: `outcome_${input.plan.chapterNumber}`,
+    kind: 'chapter_outcome',
+    entityId: 'story',
+    before: null,
+    after: input.outcome,
+    source: 'independent_editor',
+    relatedEntityIds: [...relatedEntityIds],
+  };
+}
+
+export function validateArcAgainstKernel(kernel: StoryKernel, arc: ArcPlan): void {
+  if (!kernel.seriesSpine.stages.some(stage => stage.id === arc.stageId)) {
+    fail(`Arc references unknown series stage ${arc.stageId}.`);
+  }
+  const unknownArcReferences = [
+    ...arc.activeCharacterIds.filter(id => !kernel.characters.some(item => item.id === id)),
+    ...arc.activeLocationIds.filter(id => !kernel.locations.some(item => item.id === id)),
+    ...arc.activeResourceIds.filter(id => !kernel.resources.some(item => item.id === id)),
+    ...arc.activeWorldRuleIds.filter(id => !kernel.worldRules.some(item => item.id === id)),
+    ...arc.duePromiseIds.filter(id => !kernel.promises.some(item => item.id === id)),
+  ];
+  if (unknownArcReferences.length) fail('Arc references unknown kernel IDs.', unknownArcReferences);
+}
+
 export function validateRollingPlan(input: {
   kernel: StoryKernel;
   arc: ArcPlan;
@@ -387,6 +530,7 @@ export function validateRollingPlan(input: {
   if (input.rollingPlan.startChapter !== input.state.chapterNumber + 1) {
     fail('Rolling plan does not begin at the next uncommitted chapter.');
   }
+  validateArcAgainstKernel(input.kernel, input.arc);
   let state = structuredClone(input.state);
   input.rollingPlan.plans.forEach((plan, index) => {
     if (plan.chapterNumber !== input.rollingPlan.startChapter + index) fail('Rolling plan chapter numbers are not contiguous.');

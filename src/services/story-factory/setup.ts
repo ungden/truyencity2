@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import {
+  ArcPlanSchema,
   LaunchPackSchema,
   StoryFactoryError,
   type LaunchPack,
@@ -7,7 +8,7 @@ import {
 } from './contracts';
 import type { ProviderUsage, StoryModelProvider } from './provider';
 import { geminiProvider, toGeminiResponseSchema } from './provider';
-import { validateKernelState } from './validation';
+import { validateArcAgainstKernel, validateKernelState } from './validation';
 
 export const ResearchSnapshotSchema = z.object({
   snapshotId: z.string().trim().min(3),
@@ -40,6 +41,8 @@ export const ConceptCandidateSchema = z.object({
   rewardLoopFingerprint: z.string().trim().min(4).max(160),
   conflictEconomyFingerprint: z.string().trim().min(4).max(160),
   seriality30: z.array(z.string().trim().min(8).max(220)).min(6).max(10),
+  seriality1000: z.array(z.string().trim().min(12).max(300)).min(8).max(15),
+  earlyEndingRisk: z.string().trim().min(20).max(600),
 }).strict();
 
 const ConceptBatchSchema = z.object({ candidates: z.array(ConceptCandidateSchema).length(6) }).strict();
@@ -56,6 +59,8 @@ const OpeningSimulationSchema = z.object({
     serialStrength: z.string().trim().min(20).max(1_000),
     causalRisk: z.string().trim().min(10).max(1_000),
     domainFeasibility: z.enum(['pass', 'reject']),
+    longRunFeasibility: z.enum(['pass', 'reject']),
+    macroStageStress: z.array(z.string().trim().min(10).max(500)).min(4).max(8),
     requiredInfrastructure: z.array(z.string().trim().min(5).max(500)).min(1).max(12),
     minimumPlausibleTimeline: z.string().trim().min(3).max(500),
     criticalAssumptions: z.array(z.string().trim().min(5).max(500)).min(1).max(12),
@@ -168,9 +173,11 @@ function generatorPrompt(input: {
       'Mỗi concept.id phải là stable ID ASCII chữ thường: bắt đầu bằng a-z, sau đó chỉ dùng a-z, 0-9, dấu gạch dưới hoặc gạch ngang; dài 2-64 ký tự.',
       'Cơ chế phải hoạt động trong ba chương đầu.',
       'Có vật liệu nhân quả để biến hóa ít nhất ba mươi chương.',
+      'Có 8-15 arena/giai đoạn thực sự khác nhau để đi đến 800-1.200 chương; seriality1000 phải mô tả biến đổi macro, không đổi tên cùng một vòng lặp.',
+      'Nêu earlyEndingRisk: vì sao truyện có thể cạn sớm và cơ chế nào ngăn điều đó mà không sinh filler.',
       'Không dựa vào đối thủ ngu, may mắn liên tục hoặc tài nguyên vô nguồn.',
       'Tên dài, trực diện, dễ hiểu với độc giả Việt.',
-      'Viết metadata cô đọng: mỗi ý một hoặc hai câu, seriality30 đúng sáu ý; không diễn giải lại research.',
+      'Viết metadata cô đọng: mỗi ý một hoặc hai câu, seriality30 đúng sáu ý và seriality1000 từ tám đến mười lăm ý; không diễn giải lại research.',
     ],
     commission: input.commission,
     researchSignals: input.research.signals,
@@ -264,7 +271,8 @@ Grounded Domain Research là ràng buộc: không chọn concept dựa trên cla
     : await setupStage('Opening Simulator', provider.json({
     model: input.routes.openingSimulator,
     system: `Bạn mô phỏng logic mở đầu, không viết prose hoàn chỉnh và không thay đổi concept.
-Đánh domainFeasibility=reject nếu ba chương đầu đòi hạ tầng, vốn, thời gian, năng lượng, kỹ năng hoặc mức an toàn không thực tế. Không được coi kiến thức tương lai là vật tư hay thời gian miễn phí.`,
+Đánh domainFeasibility=reject nếu ba chương đầu đòi hạ tầng, vốn, thời gian, năng lượng, kỹ năng hoặc mức an toàn không thực tế. Không được coi kiến thức tương lai là vật tư hay thời gian miễn phí.
+Đánh longRunFeasibility=reject nếu concept có thể kết thúc ở arc đầu, chỉ lặp một vòng kiếm tiền/sức mạnh, hoặc không có đủ arena, xung đột và progression cho 800-1.200 chương.`,
     prompt: JSON.stringify({
       task: 'Mô phỏng diễn biến chương 1-3 và audit tính khả thi domain cho cả hai concept.',
       commission,
@@ -282,8 +290,8 @@ Grounded Domain Research là ràng buộc: không chọn concept dựa trên cla
   if (new Set(simulatedIds).size !== 2 || simulatedIds.some(id => !ranking.value.selectedIds.includes(id))) {
     throw new StoryFactoryError('setup_blocked', 'Opening Simulator returned the wrong concept set.');
   }
-  if (!simulation.value.simulations.some(item => item.domainFeasibility === 'pass')) {
-    throw new StoryFactoryError('setup_blocked', 'Opening Simulator rejected both concepts on domain causality.', simulation.value.simulations);
+  if (!simulation.value.simulations.some(item => item.domainFeasibility === 'pass' && item.longRunFeasibility === 'pass')) {
+    throw new StoryFactoryError('setup_blocked', 'Opening Simulator rejected both concepts on domain causality or long-run seriality.', simulation.value.simulations);
   }
 
   const launchWire = await setupStage('Launch Architect', provider.json({
@@ -291,10 +299,14 @@ Grounded Domain Research là ràng buộc: không chọn concept dựa trên cla
     system: `Bạn là Launch Architect cuối cùng. Phản hồi bằng đúng envelope JSON được yêu cầu, tuyệt đối không bọc trong array.
 kernelJson, arcJson và initialStateJson là chuỗi chứa JSON hợp lệ của từng artifact; không markdown và không chú thích ngoài JSON.
 Chọn một concept rồi dựng duy nhất StoryKernel, Arc 20-30 chương và State chương 0. Không lập rolling plan; Planner riêng sẽ làm việc đó sau setup.
-Mỗi stable ID phải nhất quán. initialState.schemaVersion phải bằng 2 và initialState.recentOutcomes phải là mảng rỗng vì chưa có chương nào được commit.
+StoryKernel.worldModel phải khóa thời đại, địa lý, tổ chức, hệ thống vận hành, giới hạn và chi phí riêng của truyện.
+StoryKernel.seriesSpine phải có 8-15 stage liên tục, tổng target 800-1.200 chương; mỗi stage phải đổi arena, nguồn xung đột hoặc reward-loop variant và có entry/exit condition cụ thể.
+StoryKernel.longPromises phải có ít nhất bốn promise dài hạn, phân bổ qua nhiều stage; không được để tất cả hoàn thành trong stage đầu.
+StoryKernel.progressionTracks phải có milestone gắn stable stage ID. Arc đầu phải gắn stageId của stage đầu và active ID chỉ được tham chiếu canon có thật.
+Mỗi stable ID phải nhất quán. initialState.schemaVersion phải bằng 2; initialState.recentOutcomes và initialState.usedExpansionSeedIds phải là mảng rỗng vì chưa có chương/canon extension nào được commit.
 initialState phải có đúng một entry cho mọi character, resource và promise đã khai báo trong kernel; không được thiếu hoặc thêm ID lạ.
 travelRules là đồ thị có hướng: từ vị trí ban đầu của protagonist phải đi được tới mọi location đã khai và từ mỗi location phải có đường quay về, trực tiếp hoặc qua location trung gian. Không được chỉ khai một chiều.
-Chỉ được chọn concept có domainFeasibility=pass. requiredInfrastructure, minimumPlausibleTimeline và criticalAssumptions của mô phỏng là ràng buộc bắt buộc: phản ánh chúng trong world rules và State ban đầu; không ghi trước kết quả của chương tương lai vào State.`,
+Chỉ được chọn concept có domainFeasibility=pass và longRunFeasibility=pass. requiredInfrastructure, minimumPlausibleTimeline, criticalAssumptions và macroStageStress của mô phỏng là ràng buộc bắt buộc: phản ánh chúng trong world rules, spine và State ban đầu; không ghi trước kết quả của chương tương lai vào State.`,
     prompt: JSON.stringify({
       task: 'Chọn một concept bằng bằng chứng mô phỏng và xuất LaunchPack hoàn chỉnh.',
       wireMapping: 'Đặt từng object canonical tương ứng vào kernelJson, arcJson và initialStateJson bằng JSON.stringify; không đổi tên field.',
@@ -313,8 +325,8 @@ Chỉ được chọn concept có domainFeasibility=pass. requiredInfrastructure
     throw new StoryFactoryError('setup_blocked', 'Launch Architect selected a concept outside the top two.');
   }
   const selectedSimulation = simulation.value.simulations.find(item => item.conceptId === launch.selectedConceptId);
-  if (!selectedSimulation || selectedSimulation.domainFeasibility !== 'pass') {
-    throw new StoryFactoryError('setup_blocked', 'Launch Architect selected a concept rejected by the domain-causality audit.', selectedSimulation);
+  if (!selectedSimulation || selectedSimulation.domainFeasibility !== 'pass' || selectedSimulation.longRunFeasibility !== 'pass') {
+    throw new StoryFactoryError('setup_blocked', 'Launch Architect selected a concept rejected by the domain or long-run audit.', selectedSimulation);
   }
   const selectedConcept = candidates.find(candidate => candidate.id === launch.selectedConceptId)!;
   if (launch.kernel.mechanismFingerprint !== selectedConcept.mechanismFingerprint
@@ -328,6 +340,7 @@ Chỉ được chọn concept có domainFeasibility=pass. requiredInfrastructure
   }
   try {
     validateKernelState(launch.kernel, launch.initialState);
+    validateArcAgainstKernel(launch.kernel, ArcPlanSchema.parse(launch.arc));
   } catch (error) {
     if (error instanceof StoryFactoryError) {
       throw new StoryFactoryError('setup_blocked', `Launch pack failed canonical validation: ${error.message}`, error.evidence);

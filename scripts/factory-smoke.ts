@@ -60,7 +60,26 @@ async function main() {
         }],
       },
       p_remaining_plan: { schemaVersion: 1, startChapter: 2, plans: [] },
-      p_events: [{ deltaId: 'smoke_event', kind: 'fact', entityId: 'smoke_fact', before: null, after: 'committed', source: 'smoke' }],
+      p_events: [
+        {
+          deltaId: 'smoke_event', kind: 'fact', entityId: 'smoke_fact', before: null,
+          after: 'committed', source: 'smoke', relatedEntityIds: ['smoke_fact'],
+        },
+        {
+          deltaId: 'outcome_1', kind: 'chapter_outcome', entityId: 'story', before: null,
+          after: {
+            chapterNumber: 1,
+            title: 'Smoke Chapter',
+            event: 'Một transaction smoke được thực hiện.',
+            result: 'Chương và state được ghi đồng thời.',
+            method: 'transaction database',
+            endingSituation: 'Dữ liệu sẵn sàng để kiểm tra rồi xóa.',
+            evidenceSpans: ['Nội dung smoke'],
+          },
+          source: 'smoke',
+          relatedEntityIds: ['smoke_fact'],
+        },
+      ],
       p_assessment: {
         status: 'pass',
         issues: [],
@@ -107,7 +126,7 @@ async function main() {
       db.from('ai_story_projects').select('current_chapter,story_state').eq('id', project.data.id).single(),
       db.from('story_factory_runs').select('status').eq('id', run.data.id).single(),
     ]);
-    if (chapters.error || chapters.count !== 1 || events.error || events.count !== 1
+    if (chapters.error || chapters.count !== 1 || events.error || events.count !== 2
       || state.error || state.data.current_chapter !== 1 || state.data.story_state?.chapterNumber !== 1
       || publishedRun.error || publishedRun.data.status !== 'published') {
       throw new Error('Transactional chapter commit did not persist exactly one coherent transition.');
@@ -116,12 +135,59 @@ async function main() {
     if (!duplicate.error) throw new Error('Duplicate commit unexpectedly succeeded.');
     const remainingChapters = await db.from('chapters').select('id', { count: 'exact', head: true }).eq('novel_id', novel.data.id);
     if (remainingChapters.error || remainingChapters.count !== 1) throw new Error('Duplicate commit changed public chapter state.');
+
+    const arcLeaseToken = randomUUID();
+    const armed = await db.from('story_factory_jobs').update({
+      status: 'writing',
+      stage: 'arc',
+      lease_owner: 'factory-smoke-arc',
+      lease_token: arcLeaseToken,
+      lease_until: new Date(Date.now() + 300_000).toISOString(),
+    }).eq('id', job.data.id);
+    if (armed.error) throw armed.error;
+    const arcRun = await db.from('story_factory_runs').insert({
+      job_id: job.data.id, project_id: project.data.id, novel_id: novel.data.id,
+      kind: 'arc', chapter_number: 1, status: 'running', engine_release: STORY_FACTORY_RELEASE,
+    }).select('id').single();
+    if (arcRun.error) throw arcRun.error;
+    const arcCommitted = await db.rpc('commit_story_factory_arc_transition', {
+      p_job_id: job.data.id,
+      p_lease_token: arcLeaseToken,
+      p_run_id: arcRun.data.id,
+      p_lifecycle_status: 'continue',
+      p_kernel_after: { smokeKernel: 2 },
+      p_state_after: params.p_state_after,
+      p_next_arc: { schemaVersion: 1, arcNumber: 2, startChapter: 2, plannedEndChapter: 21 },
+      p_output_artifact: { status: 'continue' },
+      p_usage: [],
+      p_cost_usd: 0,
+      p_engine_release: STORY_FACTORY_RELEASE,
+    });
+    if (arcCommitted.error) throw arcCommitted.error;
+    const [arcProject, arcJob, passedArcRun] = await Promise.all([
+      db.from('ai_story_projects').select('story_kernel,arc_plan').eq('id', project.data.id).single(),
+      db.from('story_factory_jobs').select('status,stage,lease_token').eq('id', job.data.id).single(),
+      db.from('story_factory_runs').select('status').eq('id', arcRun.data.id).single(),
+    ]);
+    if (arcProject.error || arcProject.data.story_kernel?.smokeKernel !== 2
+      || arcProject.data.arc_plan?.arcNumber !== 2
+      || arcJob.error || arcJob.data.status !== 'ready' || arcJob.data.stage !== 'plan' || arcJob.data.lease_token
+      || passedArcRun.error || passedArcRun.data.status !== 'passed') {
+      throw new Error('Transactional arc transition did not persist one coherent boundary.');
+    }
   } finally {
     await db.from('novels').delete().eq('id', novel.data.id);
   }
   const remaining = await db.from('novels').select('id', { head: true, count: 'exact' }).eq('slug', slug);
   if (remaining.error || remaining.count !== 0) throw new Error('Smoke cleanup failed.');
-  console.log(JSON.stringify({ smoke: 'passed', transactionalCommit: 'passed', skippedChapter: 'rejected', duplicateCommit: 'rejected', cleanup: 'passed' }));
+  console.log(JSON.stringify({
+    smoke: 'passed',
+    transactionalCommit: 'passed',
+    transactionalArcTransition: 'passed',
+    skippedChapter: 'rejected',
+    duplicateCommit: 'rejected',
+    cleanup: 'passed',
+  }));
 }
 
 main().catch(error => { console.error(error); process.exitCode = 1; });
