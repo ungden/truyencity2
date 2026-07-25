@@ -241,7 +241,17 @@ async function main() {
   if (previous.corpusDigest && previous.corpusDigest !== corpus.sourceDigest) {
     throw new Error('Bake-off checkpoint belongs to a different frozen corpus.');
   }
-  const generations: Generation[] = [...(previous.generations ?? [])];
+  const checkpointGenerations = previous.generations ?? [];
+  const incompleteCheckpoint = checkpointGenerations.some(result => (
+    typeof result.costUsd !== 'number'
+    || (!result.ok && !result.issues)
+  ));
+  // Older checkpoints predate failed-attempt telemetry. They are not valid
+  // evidence because a rejected draft still consumes tokens and money.
+  const generations: Generation[] = checkpointGenerations.filter(result => (
+    typeof result.costUsd === 'number'
+    && (result.ok || Boolean(result.issues))
+  ));
   for (let batchStart = 0; batchStart < corpus.samples.length; batchStart += 3) {
     const pending = corpus.samples.slice(batchStart, batchStart + 3).flatMap(sample => (
       writerModels.filter(writer => !generations.some(result => (
@@ -303,7 +313,8 @@ async function main() {
     return route.length === 10
       && route.every(result => result.ok && typeof result.costUsd === 'number' && result.costUsd <= 0.5);
   });
-  const votes: Vote[] = [...(previous.votes ?? [])];
+  // A regenerated draft invalidates every comparison that included it.
+  const votes: Vote[] = incompleteCheckpoint ? [] : [...(previous.votes ?? [])];
   for (let leftIndex = 0; leftIndex < eligible.length; leftIndex += 1) {
     for (let rightIndex = leftIndex + 1; rightIndex < eligible.length; rightIndex += 1) {
       const left = eligible[leftIndex];
