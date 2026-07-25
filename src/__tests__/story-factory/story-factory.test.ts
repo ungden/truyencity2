@@ -2,6 +2,8 @@ import { z } from 'zod';
 import { execFileSync } from 'node:child_process';
 import {
   CanonExtensionSchema,
+  SequentialBenchmarkCorpusSchema,
+  STORY_FACTORY_BENCHMARK_PROTOCOL,
   EditorAssessmentSchema,
   LaunchPackSchema,
   type ArcPlan,
@@ -21,9 +23,12 @@ import {
   appendAcceptedOutcome,
   applyCanonExtension,
   applyChapterPlan,
+  benchmarkPasses,
+  buildBlindReaderInput,
   buildChapterContexts,
   buildWriterBrief,
   isStoryFactoryEnabled,
+  calculateBenchmarkMetrics,
   loadRelevantStoryMemory,
   loadRelevantStoryTransitions,
   memoryEntityIdsForArc,
@@ -740,6 +745,129 @@ describe('canonical Story Factory', () => {
     expect(provider.calls).toEqual(['writer', 'editor', 'writer', 'editor']);
     expect(result.revisionCount).toBe(1);
     expect(result.draft).toEqual(revised);
+    expect(result.attemptTelemetry).toMatchObject({
+      initialDraft: first,
+      initialAssessment: { status: 'revise' },
+      revisionDraft: revised,
+      finalAssessment: { status: 'pass' },
+      revisionCount: 1,
+      draftAttempts: 2,
+      firstPass: false,
+    });
+  });
+
+  test('failed rewrite preserves both drafts, both assessments and usage lineage', async () => {
+    const first = { title: 'Bản đầu', content: 'Hải nhìn required delta trên chapter brief rồi bắt đầu làm việc trong căn nhà nhỏ.' };
+    const firstIssue = editorWirePass('delta_1', 'bắt đầu làm việc');
+    const revised = { title: 'Bản sửa', content: 'Hải lại nhìn required delta nhưng vẫn không làm rõ việc đã thay đổi.' };
+    const secondIssue = {
+      ...editorWirePass('delta_1', 'không làm rõ'),
+      status: 'revise' as const,
+      issues: [{
+        category: 'required_delta' as const,
+        severity: 'major' as const,
+        scope: 'prose' as const,
+        evidence: 'không làm rõ',
+        instruction: 'Thực hiện required delta trong cảnh.',
+      }],
+      deltaChecks: [{ deltaId: 'delta_1', realized: false, evidence: 'không làm rõ' }],
+      experienceChecks: {
+        sceneDramatized: false,
+        characterAgenda: true,
+        earnedOutcome: false,
+        naturalLanguage: true,
+      },
+      outcome: { event: '', result: '', method: '', endingSituation: '', evidenceSpans: [] },
+    };
+    await expect(writeStoryChapter({
+      kernel,
+      state: initialState,
+      plan: plan(1),
+      routes,
+      provider: new QueueProvider([first, firstIssue, revised, secondIssue]),
+    })).rejects.toMatchObject({
+      code: 'quality_blocked',
+      evidence: {
+        pipelineTelemetry: {
+          initialDraft: first,
+          revisionDraft: revised,
+          revisionCount: 1,
+          draftAttempts: 2,
+          firstPass: false,
+        },
+      },
+    });
+  });
+
+  test('reader-blind benchmark excludes plan/state and enforces the first-pass gate', () => {
+    const route = {
+      planner: 'planner-model',
+      planJudge: 'plan-judge-model',
+      writer: 'writer-model',
+      editor: 'editor-model',
+      routeVersion: 'route-v1',
+    };
+    const digests = Array.from({ length: 4 }, (_, index) => String(index + 1).repeat(64));
+    const samples = Array.from({ length: 20 }, (_, index) => ({
+      id: `sample-${index + 1}`,
+      lane: `lane-${Math.floor(index / 5) + 1}`,
+      launchPackDigest: digests[Math.floor(index / 5)],
+      readerBrief: {
+        premise: 'Một premise đủ dài để giám khảo hiểu lời hứa của truyện.',
+        chapterNumber: index % 5 + 1,
+        previousTail: index % 5 ? 'Đoạn cuối chương trước đủ để đánh giá điểm nối.' : null,
+      },
+      control: 'Bản đối chứng có nội dung đủ dài để schema chấp nhận.',
+      candidate: 'Bản ứng viên có nội dung đủ dài để schema chấp nhận.',
+      candidateTitle: `Chương ${index + 1}`,
+      candidateCostUsd: 0.2,
+      candidateRevisionCount: index < 4 ? 1 as const : 0 as const,
+      continuityPassed: true as const,
+    }));
+    const corpus = SequentialBenchmarkCorpusSchema.parse({
+      protocolVersion: STORY_FACTORY_BENCHMARK_PROTOCOL,
+      engineRelease: 'sf_current',
+      builtAt: new Date().toISOString(),
+      candidateRoute: route,
+      controlRoute: { ...route, writer: 'control-writer' },
+      launchPackDigests: digests,
+      setupSuccesses: 4,
+      planSuccesses: 4,
+      providerFailures: 0,
+      generationFailures: 0,
+      buildCostUsd: 2,
+      samples,
+    });
+    const blind = buildBlindReaderInput({ sample: corpus.samples[0], swap: false });
+    expect(blind).toEqual({
+      brief: corpus.samples[0].readerBrief,
+      versionA: corpus.samples[0].control,
+      versionB: corpus.samples[0].candidate,
+    });
+    expect(JSON.stringify(blind)).not.toMatch(/chapterPlan|stateBefore|requiredDelta|model|cost/iu);
+    const judgments = corpus.samples.flatMap(sample => ['judge-a', 'judge-b', 'judge-c'].map(model => ({
+      sampleId: sample.id,
+      model,
+      blinded: true as const,
+      swap: false,
+      preference: 'B' as const,
+      wantsNextA: false,
+      wantsNextB: true,
+      reason: 'Bản ứng viên tự nhiên và có sức kéo đọc tiếp hơn.',
+      usage: { costUsd: 0.01 },
+    })));
+    const metrics = calculateBenchmarkMetrics({
+      corpus,
+      judgments,
+      judgeModels: ['judge-a', 'judge-b', 'judge-c'],
+      judgmentCostUsd: 0.6,
+    });
+    expect(metrics.firstPassPublishRate).toBe(0.8);
+    expect(benchmarkPasses(metrics)).toBe(false);
+    expect(() => SequentialBenchmarkCorpusSchema.parse({
+      ...corpus,
+      samples: corpus.samples.slice(0, 19),
+    })).toThrow();
   });
 
   test('Editor pass cannot contain an issue or false delta', () => {

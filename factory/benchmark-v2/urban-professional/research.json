@@ -1,0 +1,32 @@
+{
+  "snapshotId": "urban-professional-market-domain-2026-07-25",
+  "lane": "urban_professional",
+  "capturedAt": "2026-07-25T06:30:00.000Z",
+  "signals": [
+    {
+      "id": "profession_as_story",
+      "sourceUrl": "https://wyb.chinawriter.com.cn/content/202604/20/content83525.html",
+      "observation": "Phân tích văn học nghề nghiệp cho thấy sức kéo đến từ quy trình công việc, quyền hạn và chi tiết hiện trường được nghiên cứu thật; kiến thức chuyên môn phải đi vào xung đột và hành động thay vì trở thành đoạn giảng bài."
+    },
+    {
+      "id": "new_web_fiction_reality",
+      "sourceUrl": "https://www.chinawriter.com.cn/n1/2026/0522/c404027-40725003.html",
+      "observation": "Xu hướng tân mạng văn đưa áp lực nghề nghiệp, dịch chuyển tầng lớp và kinh nghiệm sống số vào truyện thể loại; độc giả cần đồng cảm với hoàn cảnh quen thuộc chứ không chỉ nhận một chuỗi thắng lợi rỗng."
+    },
+    {
+      "id": "platform_work_vietnam",
+      "sourceUrl": "https://www.ilo.org/resource/article/pilot-survey-viet-nam-promising-start-defining-digital-platform-employment",
+      "observation": "Lao động nền tảng tại Việt Nam gắn với dịch vụ tài chính số và doanh nghiệp tư nhân nhưng còn khó đo lường, nhiều hình thức việc làm và rủi ro bảo vệ lao động; setup không được coi nền tảng là cỗ máy tiền tự động."
+    },
+    {
+      "id": "platform_governance",
+      "sourceUrl": "https://www.ilo.org/publications/opportunities-and-challenges-decent-work-platform-economy-asia-and-pacific",
+      "observation": "Kinh tế nền tảng tạo cơ hội thu nhập song chịu tác động của hạ tầng, luật, quan hệ lao động và bảo vệ xã hội; xung đột nghề nghiệp phải có stakeholder và giới hạn quyền lực cụ thể."
+    },
+    {
+      "id": "skills_are_granular",
+      "sourceUrl": "https://documents.worldbank.org/en/publication/documents-reports/documentdetail/099508509112311079",
+      "observation": "Nhu cầu kỹ năng khác nhau theo từng nghề và nhiệm vụ; nhân vật không thể chỉ được mô tả là giỏi kinh doanh chung chung mà phải có năng lực, thiếu hụt và quá trình học gắn với công việc cụ thể."
+    }
+  ]
+}

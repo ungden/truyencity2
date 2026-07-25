@@ -1,0 +1,32 @@
+{
+  "snapshotId": "xianxia-research-market-domain-2026-07-25",
+  "lane": "xianxia_research",
+  "capturedAt": "2026-07-25T06:30:00.000Z",
+  "signals": [
+    {
+      "id": "rules_over_grinding",
+      "sourceUrl": "https://www.chinawriter.com.cn/n1/2026/0522/c404027-40725003.html",
+      "observation": "Tân mạng văn chuyển một phần sức hút từ đánh quái tăng cấp sang luật lệ và chiến lược, đồng thời đưa logic kinh tế và hoàn cảnh sống hiện đại vào tiên hiệp; cơ chế phải tạo lựa chọn chứ không chỉ đặt tên mới cho cấp bậc."
+    },
+    {
+      "id": "long_form_repetition_risk",
+      "sourceUrl": "https://www.chinawriter.com.cn/n1/2026/0628/c461850-40749049.html",
+      "observation": "Cấu trúc siêu dài có thể dùng nhiều lớp vòng lặp nhưng dễ thành sáo khi chỉ tái sử dụng cùng một đơn vị nâng cấp; mỗi stage cần thay đổi conflict economy, chủ thể quyền lực và ý nghĩa của phần thưởng."
+    },
+    {
+      "id": "world_logic_and_values",
+      "sourceUrl": "https://www.chinawriter.com.cn/n1/2023/0908/c404027-40073621.html",
+      "observation": "Một dị thế giới chỉ thuyết phục khi luật nội tại, trật tự xã hội và giá trị con người nâng đỡ lẫn nhau; worldbuilding không thể chỉ là danh sách địa danh, phe phái và năng lực."
+    },
+    {
+      "id": "fantasy_grounded_in_life",
+      "sourceUrl": "https://wyb.chinawriter.com.cn/attachment/202603/16/bde40308-ae12-419c-9f05-6c86e69fc095.pdf",
+      "observation": "Tiên hiệp mới giữ sảng cảm nhưng tạo chất riêng bằng logic đời sống như sinh kế, vật tư và hậu quả đối với người thường; cảnh nghiên cứu cần chạm tới cơm áo, an toàn hoặc quan hệ thay vì chỉ khoe thuật ngữ."
+    },
+    {
+      "id": "worldview_as_civilization",
+      "sourceUrl": "https://wyb.chinawriter.com.cn/Pad/content/202607/13/content84563.html",
+      "observation": "Thế giới quan quyết định trật tự thời gian, không gian và luật sinh tồn của nhân vật; các stage dài hạn phải mở ra mô hình văn minh và lợi ích khác nhau thay vì chỉ phóng to bản đồ."
+    }
+  ]
+}

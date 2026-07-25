@@ -97,6 +97,41 @@ async function main() {
       p_cost_usd: 0,
       p_word_count: 10,
       p_revision_count: 0,
+      p_attempt_telemetry: {
+        initialDraft: {
+          title: 'Smoke Chapter',
+          content: 'Nội dung smoke chỉ tồn tại trong transaction test rồi được xóa.',
+        },
+        initialAssessment: {
+          status: 'pass',
+          issues: [],
+          deltaChecks: [{ deltaId: 'smoke_event', realized: true, evidence: 'smoke' }],
+          outcome: {
+            event: 'Một transaction smoke được thực hiện.',
+            result: 'Chương và state được ghi đồng thời.',
+            method: 'transaction database',
+            endingSituation: 'Dữ liệu sẵn sàng để kiểm tra rồi xóa.',
+            evidenceSpans: ['Nội dung smoke'],
+          },
+        },
+        revisionDraft: null,
+        finalAssessment: {
+          status: 'pass',
+          issues: [],
+          deltaChecks: [{ deltaId: 'smoke_event', realized: true, evidence: 'smoke' }],
+          outcome: {
+            event: 'Một transaction smoke được thực hiện.',
+            result: 'Chương và state được ghi đồng thời.',
+            method: 'transaction database',
+            endingSituation: 'Dữ liệu sẵn sàng để kiểm tra rồi xóa.',
+            evidenceSpans: ['Nội dung smoke'],
+          },
+        },
+        usages: [],
+        revisionCount: 0,
+        draftAttempts: 1,
+        firstPass: true,
+      },
       p_engine_release: STORY_FACTORY_RELEASE,
     };
     const skipped = await db.rpc('commit_story_factory_chapter', {
@@ -124,11 +159,20 @@ async function main() {
       db.from('chapters').select('id', { count: 'exact' }).eq('novel_id', novel.data.id),
       db.from('story_state_events').select('id', { count: 'exact' }).eq('project_id', project.data.id),
       db.from('ai_story_projects').select('current_chapter,story_state').eq('id', project.data.id).single(),
-      db.from('story_factory_runs').select('status').eq('id', run.data.id).single(),
+      db.from('story_factory_runs')
+        .select('status,error_code,first_pass,published_after_rewrite,draft_attempts,revision_count,output_artifact')
+        .eq('id', run.data.id)
+        .single(),
     ]);
     if (chapters.error || chapters.count !== 1 || events.error || events.count !== 2
       || state.error || state.data.current_chapter !== 1 || state.data.story_state?.chapterNumber !== 1
-      || publishedRun.error || publishedRun.data.status !== 'published') {
+      || publishedRun.error || publishedRun.data.status !== 'published'
+      || publishedRun.data.error_code !== null
+      || publishedRun.data.first_pass !== true
+      || publishedRun.data.published_after_rewrite !== false
+      || publishedRun.data.draft_attempts !== 1
+      || publishedRun.data.revision_count !== 0
+      || !publishedRun.data.output_artifact?.attemptTelemetry) {
       throw new Error('Transactional chapter commit did not persist exactly one coherent transition.');
     }
     const duplicate = await db.rpc('commit_story_factory_chapter', params);

@@ -18,9 +18,10 @@ import {
   memoryEntityIdsForArc,
   memoryEntityIdsForPlan,
 } from './memory';
-import { writeStoryChapter } from './pipeline';
+import { writeStoryChapter, type ChapterAttemptTelemetry } from './pipeline';
 import { planArcLifecycle, planRollingWindow, reviewFiveChapterWindow } from './planner';
 import type { ProviderUsage, StoryModelProvider } from './provider';
+import { digestArtifact } from './benchmark';
 import { FACTORY_PLANNER_VERSION, FACTORY_SETUP_VERSION, STORY_FACTORY_RELEASE } from './release';
 import { runConceptLab } from './setup';
 import type { SetupCheckpoint } from './setup';
@@ -43,6 +44,8 @@ interface FactoryJobRow {
   chapters_today: number;
   quota_date: string | null;
   lease_token: string;
+  benchmark_run_id: string | null;
+  launch_pack_digest: string | null;
 }
 
 interface FactoryProjectRow {
@@ -87,6 +90,11 @@ function usageCost(usages: ProviderUsage[]): number {
   return usages.reduce((total, usage) => total + usage.costUsd, 0);
 }
 
+function pipelineTelemetryFromError(error: StoryFactoryError): ChapterAttemptTelemetry | undefined {
+  const evidence = error.evidence as { pipelineTelemetry?: ChapterAttemptTelemetry } | undefined;
+  return evidence?.pipelineTelemetry;
+}
+
 async function createRun(db: SupabaseClient, job: FactoryJobRow, kind: string, chapterNumber?: number) {
   const { data, error } = await db.from('story_factory_runs').insert({
     job_id: job.id,
@@ -108,8 +116,13 @@ async function blockRun(db: SupabaseClient, job: FactoryJobRow, runId: string | 
     ? error
     : new StoryFactoryError('infra_blocked', error instanceof Error ? error.message : String(error));
   if (runId) {
-    const evidence = factoryError.evidence as { usages?: unknown } | undefined;
-    const failedUsages = Array.isArray(evidence?.usages) ? evidence.usages as ProviderUsage[] : [];
+    const evidence = factoryError.evidence as {
+      usages?: unknown;
+      pipelineTelemetry?: ChapterAttemptTelemetry;
+    } | undefined;
+    const pipelineTelemetry = pipelineTelemetryFromError(factoryError);
+    const failedUsages = pipelineTelemetry?.usages
+      ?? (Array.isArray(evidence?.usages) ? evidence.usages as ProviderUsage[] : []);
     const existing = await db.from('story_factory_runs').select('output_artifact').eq('id', runId).single();
     const output = existing.data?.output_artifact && typeof existing.data.output_artifact === 'object'
       ? existing.data.output_artifact as Record<string, unknown>
@@ -118,9 +131,20 @@ async function blockRun(db: SupabaseClient, job: FactoryJobRow, runId: string | 
       status: factoryError.code === 'infra_blocked' ? 'infra_blocked' : 'blocked',
       error_code: factoryError.code,
       error_message: factoryError.message,
-      output_artifact: { ...output, evidence: factoryError.evidence ?? null },
+      output_artifact: {
+        ...output,
+        evidence: factoryError.evidence ?? null,
+        attemptTelemetry: pipelineTelemetry ?? null,
+      },
+      editor_assessment: pipelineTelemetry?.finalAssessment ?? pipelineTelemetry?.initialAssessment ?? null,
       usage: failedUsages,
       estimated_cost_usd: usageCost(failedUsages),
+      revision_count: pipelineTelemetry?.revisionCount ?? 0,
+      draft_attempts: pipelineTelemetry?.draftAttempts ?? 0,
+      first_pass: pipelineTelemetry?.firstPass ?? null,
+      published_after_rewrite: factoryError.code === 'quality_blocked' && pipelineTelemetry?.revisionCount === 1
+        ? false
+        : null,
       finished_at: new Date().toISOString(),
     }).eq('id', runId).eq('status', 'running');
   }
@@ -143,11 +167,22 @@ async function recoverUncommittedPlan(
 ): Promise<FactoryTickResult> {
   if (job.replan_attempts >= 1) return blockRun(db, job, runId, error);
   const now = new Date().toISOString();
+  const pipelineTelemetry = pipelineTelemetryFromError(error);
   const runUpdate = await db.from('story_factory_runs').update({
     status: 'blocked',
     error_code: error.code,
     error_message: error.message,
-    output_artifact: { evidence: error.evidence ?? null, recovery: 'discard_uncommitted_window' },
+    output_artifact: {
+      evidence: error.evidence ?? null,
+      attemptTelemetry: pipelineTelemetry ?? null,
+      recovery: 'discard_uncommitted_window',
+    },
+    editor_assessment: pipelineTelemetry?.finalAssessment ?? pipelineTelemetry?.initialAssessment ?? null,
+    usage: pipelineTelemetry?.usages ?? [],
+    estimated_cost_usd: usageCost(pipelineTelemetry?.usages ?? []),
+    revision_count: pipelineTelemetry?.revisionCount ?? 0,
+    draft_attempts: pipelineTelemetry?.draftAttempts ?? 0,
+    first_pass: pipelineTelemetry?.firstPass ?? null,
     finished_at: now,
   }).eq('id', runId).eq('status', 'running');
   if (runUpdate.error) throw runUpdate.error;
@@ -215,6 +250,7 @@ async function runSetup(db: SupabaseClient, job: FactoryJobRow, project: Factory
       },
     });
     const pack = LaunchPackSchema.parse(result.launchPack);
+    const launchPackDigest = digestArtifact(pack);
     const protagonist = pack.kernel.characters.find(character => character.id === pack.kernel.protagonistId)!;
     const now = new Date().toISOString();
     const projectUpdate = await db.from('ai_story_projects').update({
@@ -240,6 +276,7 @@ async function runSetup(db: SupabaseClient, job: FactoryJobRow, project: Factory
     if (novelUpdate.error) throw novelUpdate.error;
     const jobUpdate = await db.from('story_factory_jobs').update({
       status: 'ready', stage: 'cover', rolling_plan: null, setup_input: null,
+      launch_pack_digest: launchPackDigest,
       lease_owner: null, lease_token: null, lease_until: null, next_run_at: now, updated_at: now,
     }).eq('id', job.id).eq('lease_token', job.lease_token);
     if (jobUpdate.error) throw jobUpdate.error;
@@ -252,7 +289,12 @@ async function runSetup(db: SupabaseClient, job: FactoryJobRow, project: Factory
         research: setupInput.research,
         candidates: result.candidates,
       },
-      output_artifact: { setupRevision: FACTORY_SETUP_VERSION, launchPack: pack, selectedConcept: result.selectedConcept },
+      output_artifact: {
+        setupRevision: FACTORY_SETUP_VERSION,
+        launchPack: pack,
+        launchPackDigest,
+        selectedConcept: result.selectedConcept,
+      },
       usage: result.usages,
       estimated_cost_usd: usageCost(result.usages),
       finished_at: now,
@@ -410,6 +452,7 @@ async function runChapter(db: SupabaseClient, job: FactoryJobRow, project: Facto
       p_cost_usd: usageCost(result.usages),
       p_word_count: result.wordCount,
       p_revision_count: result.revisionCount,
+      p_attempt_telemetry: result.attemptTelemetry,
       p_engine_release: STORY_FACTORY_RELEASE,
     });
     if (error) throw error;

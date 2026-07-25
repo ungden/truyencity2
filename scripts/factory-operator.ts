@@ -11,6 +11,7 @@ import {
   RollingPlanSchema,
   StoryKernelSchema,
   StoryStateSchema,
+  STORY_FACTORY_BENCHMARK_PROTOCOL,
   STORY_FACTORY_RELEASE,
   runStoryFactoryTick,
   validateKernelState,
@@ -50,9 +51,36 @@ async function seed() {
   const routes = routesPath
     ? ModelRoutesSchema.parse(JSON.parse(readFileSync(path.resolve(routesPath), 'utf8')))
     : DEFAULT_MODEL_ROUTES;
+  const benchmarkResult = await db.from('story_factory_runs')
+    .select('id,model_routes')
+    .eq('kind', 'benchmark')
+    .eq('status', 'passed')
+    .eq('engine_release', STORY_FACTORY_RELEASE)
+    .eq('benchmark_protocol_version', STORY_FACTORY_BENCHMARK_PROTOCOL)
+    .order('finished_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (benchmarkResult.error) throw benchmarkResult.error;
+  if (!benchmarkResult.data) {
+    throw new Error(`No approved ${STORY_FACTORY_BENCHMARK_PROTOCOL} run exists for ${STORY_FACTORY_RELEASE}.`);
+  }
+  const candidate = (benchmarkResult.data.model_routes as { candidate?: Record<string, unknown> } | null)?.candidate;
+  for (const keyName of ['planner', 'planJudge', 'writer', 'editor', 'routeVersion'] as const) {
+    if (candidate?.[keyName] !== routes[keyName]) {
+      throw new Error(`Approved benchmark route mismatch at ${keyName}.`);
+    }
+  }
   const seedToken = Date.now();
   const slug = `factory-${commission.slotKey}-${seedToken}`.toLowerCase().replace(/[^a-z0-9-]+/g, '-');
-  console.log(JSON.stringify({ dryRun: !apply, command, release: STORY_FACTORY_RELEASE, commission, researchId: research.snapshotId, routes }, null, 2));
+  console.log(JSON.stringify({
+    dryRun: !apply,
+    command,
+    release: STORY_FACTORY_RELEASE,
+    benchmarkRunId: benchmarkResult.data.id,
+    commission,
+    researchId: research.snapshotId,
+    routes,
+  }, null, 2));
   if (!apply) return;
   const novelInsert = await db.from('novels').insert({
     title: `Đang chuẩn bị: ${commission.slotKey} · ${seedToken}`,
@@ -84,6 +112,7 @@ async function seed() {
     status: 'setup',
     stage: 'setup',
     setup_input: { commission, research },
+    benchmark_run_id: benchmarkResult.data.id,
     daily_target: Number(value('--daily-target') || 5),
   }).select('id').single();
   if (jobInsert.error) {

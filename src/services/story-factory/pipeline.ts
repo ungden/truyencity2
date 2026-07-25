@@ -112,6 +112,18 @@ export interface ChapterPipelineResult {
   usages: ProviderUsage[];
   revisionCount: 0 | 1;
   wordCount: number;
+  attemptTelemetry: ChapterAttemptTelemetry;
+}
+
+export interface ChapterAttemptTelemetry {
+  initialDraft: ChapterDraft | null;
+  initialAssessment: EditorAssessment | null;
+  revisionDraft: ChapterDraft | null;
+  finalAssessment: EditorAssessment | null;
+  usages: ProviderUsage[];
+  revisionCount: 0 | 1;
+  draftAttempts: 0 | 1 | 2;
+  firstPass: boolean | null;
 }
 
 function wordCount(content: string): number {
@@ -313,42 +325,124 @@ export async function writeStoryChapter(input: {
   const transition = applyChapterPlan({ kernel: input.kernel, state: input.state, plan: input.plan });
   const contexts = buildChapterContexts(input);
   const usages: ProviderUsage[] = [];
-
-  const initial = await provider.json({
-    model: input.routes.writer,
-    system: WRITER_SYSTEM_PROMPT,
-    prompt: JSON.stringify({
-      task: 'Viết chương truyện hoàn chỉnh.',
-      chapterNumber: input.plan.chapterNumber,
-      writerBrief: contexts.brief,
-      previousChapterTail: contexts.previousTail || null,
-    }),
-    schema: ChapterDraftSchema,
-    temperature: 1,
+  let initialDraft: ChapterDraft | null = null;
+  let initialAssessment: EditorAssessment | null = null;
+  let revisionDraft: ChapterDraft | null = null;
+  let finalAssessment: EditorAssessment | null = null;
+  const telemetry = (): ChapterAttemptTelemetry => ({
+    initialDraft,
+    initialAssessment,
+    revisionDraft,
+    finalAssessment,
+    usages: [...usages],
+    revisionCount: revisionDraft ? 1 : 0,
+    draftAttempts: revisionDraft ? 2 : initialDraft ? 1 : 0,
+    firstPass: initialAssessment ? initialAssessment.status === 'pass' : null,
   });
-  usages.push(initial.usage);
-  const firstAssessment = await assessStoryDraft({
-    provider,
-    model: input.routes.editor,
-    kernel: contexts.editorKernel,
-    state: contexts.editorState,
-    plan: input.plan,
-    draft: initial.value,
-  });
-  usages.push(firstAssessment.usage);
 
-  if (firstAssessment.assessment.status === 'pass') {
+  try {
+    const initial = await provider.json({
+      model: input.routes.writer,
+      system: WRITER_SYSTEM_PROMPT,
+      prompt: JSON.stringify({
+        task: 'Viết chương truyện hoàn chỉnh.',
+        chapterNumber: input.plan.chapterNumber,
+        writerBrief: contexts.brief,
+        previousChapterTail: contexts.previousTail || null,
+      }),
+      schema: ChapterDraftSchema,
+      temperature: 1,
+    });
+    initialDraft = initial.value;
+    usages.push(initial.usage);
+    const firstAssessment = await assessStoryDraft({
+      provider,
+      model: input.routes.editor,
+      kernel: contexts.editorKernel,
+      state: contexts.editorState,
+      plan: input.plan,
+      draft: initial.value,
+    });
+    initialAssessment = firstAssessment.assessment;
+    finalAssessment = firstAssessment.assessment;
+    usages.push(firstAssessment.usage);
+
+    if (firstAssessment.assessment.status === 'pass') {
+      const stateAfter = appendAcceptedOutcome({
+        state: transition.state,
+        title: initial.value.title,
+        content: initial.value.content,
+        outcome: firstAssessment.assessment.outcome,
+      });
+      const acceptedOutcome = stateAfter.recentOutcomes[stateAfter.recentOutcomes.length - 1];
+      return {
+        decision: 'publish',
+        draft: initial.value,
+        assessment: firstAssessment.assessment,
+        stateAfter,
+        stateEvents: [
+          ...transition.events,
+          buildChapterOutcomeEvent({ plan: input.plan, outcome: acceptedOutcome }),
+        ],
+        contextManifest: contexts.manifest,
+        usages,
+        revisionCount: 0,
+        wordCount: wordCount(initial.value.content),
+        attemptTelemetry: telemetry(),
+      };
+    }
+
+    const artifactIssue = firstAssessment.assessment.issues.find(issue => issue.scope !== 'prose');
+    if (artifactIssue) {
+      throw new StoryFactoryError(
+        artifactIssue.scope === 'kernel' ? 'setup_blocked' : 'plan_blocked',
+        artifactIssue.instruction,
+        firstAssessment.assessment,
+      );
+    }
+
+    const revision = await provider.json({
+      model: input.routes.writer,
+      system: REVISION_SYSTEM_PROMPT,
+      prompt: JSON.stringify(buildRevisionContext({
+        brief: contexts.brief,
+        previousTail: contexts.previousTail,
+        draft: initial.value,
+        assessment: firstAssessment.assessment,
+      })),
+      schema: ChapterDraftSchema,
+      temperature: 1,
+    });
+    revisionDraft = revision.value;
+    usages.push(revision.usage);
+    const secondAssessment = await assessStoryDraft({
+      provider,
+      model: input.routes.editor,
+      kernel: contexts.editorKernel,
+      state: contexts.editorState,
+      plan: input.plan,
+      draft: revision.value,
+    });
+    finalAssessment = secondAssessment.assessment;
+    usages.push(secondAssessment.usage);
+    if (secondAssessment.assessment.status !== 'pass') {
+      const artifact = secondAssessment.assessment.issues.find(issue => issue.scope !== 'prose');
+      if (artifact) {
+        throw new StoryFactoryError(artifact.scope === 'kernel' ? 'setup_blocked' : 'plan_blocked', artifact.instruction, secondAssessment.assessment);
+      }
+      throw new StoryFactoryError('quality_blocked', 'Chapter still fails after one evidence-based full rewrite.', secondAssessment.assessment);
+    }
     const stateAfter = appendAcceptedOutcome({
       state: transition.state,
-      title: initial.value.title,
-      content: initial.value.content,
-      outcome: firstAssessment.assessment.outcome,
+      title: revision.value.title,
+      content: revision.value.content,
+      outcome: secondAssessment.assessment.outcome,
     });
     const acceptedOutcome = stateAfter.recentOutcomes[stateAfter.recentOutcomes.length - 1];
     return {
       decision: 'publish',
-      draft: initial.value,
-      assessment: firstAssessment.assessment,
+      draft: revision.value,
+      assessment: secondAssessment.assessment,
       stateAfter,
       stateEvents: [
         ...transition.events,
@@ -356,68 +450,17 @@ export async function writeStoryChapter(input: {
       ],
       contextManifest: contexts.manifest,
       usages,
-      revisionCount: 0,
-      wordCount: wordCount(initial.value.content),
+      revisionCount: 1,
+      wordCount: wordCount(revision.value.content),
+      attemptTelemetry: telemetry(),
     };
+  } catch (error) {
+    const factoryError = error instanceof StoryFactoryError
+      ? error
+      : new StoryFactoryError('infra_blocked', error instanceof Error ? error.message : String(error));
+    throw new StoryFactoryError(factoryError.code, factoryError.message, {
+      cause: factoryError.evidence ?? null,
+      pipelineTelemetry: telemetry(),
+    });
   }
-
-  const artifactIssue = firstAssessment.assessment.issues.find(issue => issue.scope !== 'prose');
-  if (artifactIssue) {
-    throw new StoryFactoryError(
-      artifactIssue.scope === 'kernel' ? 'setup_blocked' : 'plan_blocked',
-      artifactIssue.instruction,
-      firstAssessment.assessment,
-    );
-  }
-
-  const revision = await provider.json({
-    model: input.routes.writer,
-    system: REVISION_SYSTEM_PROMPT,
-    prompt: JSON.stringify(buildRevisionContext({
-      brief: contexts.brief,
-      previousTail: contexts.previousTail,
-      draft: initial.value,
-      assessment: firstAssessment.assessment,
-    })),
-    schema: ChapterDraftSchema,
-    temperature: 1,
-  });
-  usages.push(revision.usage);
-  const secondAssessment = await assessStoryDraft({
-    provider,
-    model: input.routes.editor,
-    kernel: contexts.editorKernel,
-    state: contexts.editorState,
-    plan: input.plan,
-    draft: revision.value,
-  });
-  usages.push(secondAssessment.usage);
-  if (secondAssessment.assessment.status !== 'pass') {
-    const artifact = secondAssessment.assessment.issues.find(issue => issue.scope !== 'prose');
-    if (artifact) {
-      throw new StoryFactoryError(artifact.scope === 'kernel' ? 'setup_blocked' : 'plan_blocked', artifact.instruction, secondAssessment.assessment);
-    }
-    throw new StoryFactoryError('quality_blocked', 'Chapter still fails after one evidence-based full rewrite.', secondAssessment.assessment);
-  }
-  const stateAfter = appendAcceptedOutcome({
-    state: transition.state,
-    title: revision.value.title,
-    content: revision.value.content,
-    outcome: secondAssessment.assessment.outcome,
-  });
-  const acceptedOutcome = stateAfter.recentOutcomes[stateAfter.recentOutcomes.length - 1];
-  return {
-    decision: 'publish',
-    draft: revision.value,
-    assessment: secondAssessment.assessment,
-    stateAfter,
-    stateEvents: [
-      ...transition.events,
-      buildChapterOutcomeEvent({ plan: input.plan, outcome: acceptedOutcome }),
-    ],
-    contextManifest: contexts.manifest,
-    usages,
-    revisionCount: 1,
-    wordCount: wordCount(revision.value.content),
-  };
 }

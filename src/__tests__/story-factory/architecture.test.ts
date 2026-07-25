@@ -66,8 +66,10 @@ describe('Story Factory architecture boundary', () => {
     expect(planner).toContain('model: input.routes.planJudge');
     expect(planner).toContain('for (let attempt = 1; attempt <= 2; attempt += 1)');
     expect(pipeline).not.toContain('planJudge');
-    expect(benchmark).toContain('while (candidateChapters.length < 5)');
-    expect(benchmark).not.toContain('Planner must return five benchmark chapters');
+    expect(benchmark).toContain('Planner must return exactly chapters 1-5 for sequential survival');
+    expect(benchmark).toContain('writeStoryChapter({');
+    expect(benchmark).not.toContain('convertPack');
+    expect(benchmark).not.toContain('SOURCE_REF');
     expect(routes).toContain("planner: 'gemini-3.1-pro-preview'");
     expect(routes).toContain("planJudge: 'gemini-2.5-pro'");
   });
@@ -112,13 +114,30 @@ describe('Story Factory architecture boundary', () => {
 
   test('canary promotion requires the latest chapter-10 review on the exact release', () => {
     const migration = readFileSync(
-      'supabase/migrations/20260724062050_continuity_correction_audit_gate.sql',
+      'supabase/migrations/20260725135035_story_factory_benchmark_v2_telemetry.sql',
       'utf8',
     );
     expect(migration).toContain('ORDER BY finished_at DESC NULLS LAST, started_at DESC');
     expect(migration).toContain("latest_review_status IS DISTINCT FROM 'passed'");
     expect(migration).toContain('latest_review_release IS DISTINCT FROM p_engine_release');
-    expect(migration).toContain('project_release IS DISTINCT FROM p_engine_release');
+    expect(migration).toContain('project.engine_release IS DISTINCT FROM p_engine_release');
+    expect(migration).toContain("benchmark.benchmark_protocol_version IS DISTINCT FROM 'story-factory-benchmark-v2-reader-blind'");
+    expect(migration).toContain('setup_digest IS DISTINCT FROM job.launch_pack_digest');
+  });
+
+  test('run telemetry is terminally consistent and reader judges never see internal plans', () => {
+    const migration = readFileSync(
+      'supabase/migrations/20260725135035_story_factory_benchmark_v2_telemetry.sql',
+      'utf8',
+    );
+    const benchmark = readFileSync('scripts/factory-benchmark.ts', 'utf8');
+    expect(migration).toContain('story_factory_runs_terminal_consistency_check');
+    expect(migration).toContain("status = 'infra_blocked'");
+    expect(migration).toContain("benchmark_protocol_version = 'legacy_incomparable'");
+    expect(benchmark).toContain('buildBlindReaderInput({ sample, swap })');
+    expect(benchmark).not.toContain('sample.brief');
+    expect(benchmark).not.toContain('stateBefore');
+    expect(benchmark).not.toContain('chapterPlan');
   });
 
   test('long-series memory uses indexed exact IDs and arc transitions are atomic', () => {

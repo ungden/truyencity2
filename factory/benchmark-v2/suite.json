@@ -1,0 +1,21 @@
+{
+  "suiteVersion": 1,
+  "entries": [
+    {
+      "commissionPath": "../canary/commission.json",
+      "researchPath": "../canary/research.json"
+    },
+    {
+      "commissionPath": "../canary-xuanhuan-rules/commission.json",
+      "researchPath": "../canary-xuanhuan-rules/research.json"
+    },
+    {
+      "commissionPath": "urban-professional/commission.json",
+      "researchPath": "urban-professional/research.json"
+    },
+    {
+      "commissionPath": "xianxia-research/commission.json",
+      "researchPath": "xianxia-research/research.json"
+    }
+  ]
+}

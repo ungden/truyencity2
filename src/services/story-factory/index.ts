@@ -1,4 +1,5 @@
 export * from './contracts';
+export * from './benchmark';
 export * from './context';
 export * from './cover';
 export * from './memory';
