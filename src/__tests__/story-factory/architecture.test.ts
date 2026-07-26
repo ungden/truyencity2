@@ -35,7 +35,7 @@ describe('Story Factory architecture boundary', () => {
 
   test('Writer freedom cannot create state outside required deltas', () => {
     const prompts = readFileSync('src/services/story-factory/prompts.ts', 'utf8');
-    expect(prompts).toContain('không được tự tạo thay đổi trạng thái bền vững ngoài requiredDeltas');
+    expect(prompts).toContain('không được tự tạo thay đổi trạng thái bền vững ngoài requiredChanges');
     expect(prompts).toContain('prose tự tạo bất kỳ thay đổi trạng thái bền vững nào không có trong requiredDeltas');
     expect(prompts).toContain('draft bỏ sót, kết thúc trước, hiểu sai hoặc tự bịa chi tiết');
     expect(prompts).toContain('luôn dùng scope=prose');
@@ -47,6 +47,11 @@ describe('Story Factory architecture boundary', () => {
     expect(writerBriefBody).not.toContain('recentOutcomes');
     expect(context).toContain('recentOutcomes: input.state.recentOutcomes');
     expect(writerBriefBody).not.toContain('scene.action');
+    expect(writerBriefBody).not.toContain('requiredDeltaIds:');
+    expect(writerBriefBody).not.toContain('deltaId:');
+    expect(writerBriefBody).not.toContain('worldRules');
+    expect(writerBriefBody).not.toContain('source:');
+    expect(writerBriefBody).not.toContain('sink:');
     expect(writerBriefBody).not.toContain('uniqueMechanism');
     expect(writerBriefBody).not.toContain('durationMinutes: scene.durationMinutes');
     expect(writerBriefBody).not.toContain('travelMinutesFromPrevious: scene.travelMinutesFromPrevious');
@@ -69,6 +74,9 @@ describe('Story Factory architecture boundary', () => {
     expect(benchmark).toContain('Current Planner and Plan Judge must pass exactly chapters 1-5');
     expect(benchmark).toContain('writeStoryChapter({');
     expect(benchmark).toContain('assessSequentialContinuity({');
+    expect(benchmark).toContain('--frozen-discovery-progress');
+    expect(benchmark).toContain('planned = frozenProgress.plannedWindows[lane]');
+    expect(benchmark).toContain('sourceDiscoveryDigest: writerCorpus.sourceDiscoveryDigest');
     expect(benchmark).not.toContain('convertPack');
     expect(benchmark).not.toContain('SOURCE_REF');
     expect(routes).toContain("planner: 'gemini-3.1-pro-preview'");
@@ -110,18 +118,19 @@ describe('Story Factory architecture boundary', () => {
   test('Planner receives the absolute-time formula and complete repair evidence', () => {
     const planner = readFileSync('src/services/story-factory/planner.ts', 'utf8');
     const prompts = readFileSync('src/services/story-factory/prompts.ts', 'utf8');
+    const validation = readFileSync('src/services/story-factory/validation.ts', 'utf8');
     expect(planner).toContain('time >= State.storyTimeMinutes + tổng mọi scene.dur + scene.travel');
     expect(planner).toContain('mỗi scene.dur bắt buộc trong khoảng 1-10000');
     expect(planner).toContain('tuyệt đối không dùng dur=0');
     expect(planner).toContain('change > 0 bắt buộc source khác null và sink=null');
     expect(planner).toContain('change < 0 bắt buộc sink khác null và source=null');
     expect(planner).toContain('không tạo delta change=0');
-    expect(planner).toContain('vật tư bị dùng/tiêu hao phải có delta giảm');
-    expect(prompts).toContain('không được giả định Writer sẽ tự bịa một giao dịch hay nhân vật phụ');
+    expect(planner).toContain('Conversion phải gắn đủ delta đầu vào, hao hụt và đầu ra');
+    expect(validation).toContain('validateCausalMechanics');
+    expect(validation).toContain('exceeds scene capacity');
     expect(prompts).toContain('Không để Writer tự bịa tài xế, chủ xe, khoản nợ');
-    expect(planner).toContain('requiredWorldRules: chapter.requiredWorldRuleIds.map');
-    expect(planner).toContain('numericResources: input.kernel.resources.flatMap');
-    expect(prompts).toContain('Rule cần muối, nhiên liệu, điện, vật liệu hay công cụ');
+    expect(planner).not.toContain('numericResources: input.kernel.resources.flatMap');
+    expect(prompts).toContain('Code đã kiểm số học, tài nguyên, thời gian, vị trí, công suất, quyền hạn');
     expect(planner).toContain('message: lastError.message');
     expect(planner).toContain('evidence: lastError.evidence ?? null');
     expect(prompts).toContain('Thời gian cuối chương là mốc tuyệt đối');
@@ -130,20 +139,22 @@ describe('Story Factory architecture boundary', () => {
   test('Planner contract changes participate in the engine release identity', () => {
     const release = readFileSync('src/services/story-factory/release.ts', 'utf8');
     expect(release).toContain('plannerVersion: FACTORY_PLANNER_VERSION');
+    expect(release).toContain('causalValidatorVersion: CAUSAL_VALIDATOR_VERSION');
+    expect(release).toContain('contextProjectionVersion: FACTORY_CONTEXT_VERSION');
+    expect(release).toContain('memoryPolicyVersion: FACTORY_MEMORY_POLICY_VERSION');
   });
 
   test('canary promotion requires the latest chapter-10 review on the exact release', () => {
     const migration = readFileSync(
-      'supabase/migrations/20260726084642_story_factory_sequential_validation_v3.sql',
+      'supabase/migrations/20260726133707_story_factory_typed_causal_release.sql',
       'utf8',
     );
     expect(migration).toContain('ORDER BY finished_at DESC NULLS LAST, started_at DESC');
     expect(migration).toContain("latest_review_status IS DISTINCT FROM 'passed'");
     expect(migration).toContain('latest_review_release IS DISTINCT FROM p_engine_release');
     expect(migration).toContain('project.engine_release IS DISTINCT FROM p_engine_release');
-    expect(migration).toContain("benchmark.benchmark_protocol_version IS DISTINCT FROM 'story-factory-validation-v3-sequential-reader'");
-    expect(migration).toContain("'story-factory-writer-bakeoff-v2-plan-qualified'");
-    expect(migration).toContain("'story-factory-sequential-survival-v1'");
+    expect(migration).toContain("'allCausalPlansPassed'");
+    expect(migration).toContain("'totalCostUsd'");
     expect(migration).toContain('setup_digest IS DISTINCT FROM job.launch_pack_digest');
   });
 
@@ -157,11 +168,30 @@ describe('Story Factory architecture boundary', () => {
     expect(migration).toContain('story_factory_runs_terminal_consistency_check');
     expect(migration).toContain("status = 'infra_blocked'");
     expect(migration).toContain("benchmark_protocol_version = 'legacy_incomparable'");
-    expect(benchmark).toContain('buildBlindReaderInput({ sample })');
+    expect(benchmark).toContain('buildBlindReaderComparison({');
     expect(benchmark).not.toContain('sample.plan');
     expect(benchmark).not.toContain('stateBefore');
     expect(benchmark).not.toContain('chapterPlan');
     expect(provider.match(/usage: response\.usage/g)?.length).toBeGreaterThanOrEqual(2);
+  });
+
+  test('Writer discovery selects two routes but promotion requires frozen sequential evidence', () => {
+    const bakeoff = readFileSync('scripts/factory-model-bakeoff.ts', 'utf8');
+    const validation = readFileSync('scripts/factory-benchmark.ts', 'utf8');
+    const promotion = readFileSync(
+      'supabase/migrations/20260726135443_story_factory_v5_pairwise_protocol.sql',
+      'utf8',
+    );
+    expect(bakeoff).toContain('topTwoWriters');
+    expect(validation).toContain('topTwoWriters.includes(input.writer)');
+    expect(validation).toContain('sourceDiscoveryDigest');
+    expect(promotion).toContain("output_artifact->'topTwoWriters'");
+    expect(promotion).toContain("output_artifact->>'sourceDiscoveryDigest'");
+    expect(promotion).toContain("output_artifact->'manifest'->>'competingSequentialRunId'");
+    expect(promotion).toContain("metrics'->>'candidatePreference'");
+    expect(promotion).toContain("'story-factory-validation-v5-pairwise-sequential-reader'");
+    expect(promotion).toContain("'story-factory-writer-bakeoff-v4-causal-discovery'");
+    expect(promotion).toContain("'story-factory-sequential-survival-v3-frozen-causal-continuity'");
   });
 
   test('Writer bake-off cannot reuse historical plans or charge plan defects to a Writer', () => {

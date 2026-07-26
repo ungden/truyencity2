@@ -124,6 +124,7 @@ const LaunchIdentitySchema = z.object({
 const LaunchWorldSchema = z.object({
   kernel: StoryKernelObjectSchema.pick({
     worldModel: true,
+    worldMechanics: true,
     worldRules: true,
     locations: true,
     travelRules: true,
@@ -238,6 +239,11 @@ function assertLaunchSemantics(
         rewardSimilarity,
       });
     }
+  }
+  if (!kernel.worldMechanics.some(mechanic => mechanic.kind === 'conversion')
+    || !kernel.worldMechanics.some(mechanic => mechanic.kind === 'capability')
+    || !kernel.worldMechanics.some(mechanic => mechanic.kind === 'constraint')) {
+    throw new StoryFactoryError('setup_blocked', 'Kernel must define at least one conversion, capability, and constraint mechanic.');
   }
 }
 
@@ -376,7 +382,9 @@ Sau sample, mô tả ngắn hướng chương 2 và 3, chemistry nhân vật, ag
     throw new StoryFactoryError('setup_blocked', 'Opening Simulator rejected both concepts on domain causality or long-run seriality.', simulation.value.simulations);
   }
 
-  const launchIdentity = await setupStage('Launch Identity Architect', provider.json({
+  const launchIdentity = checkpoint.launchIdentity
+    ? { value: LaunchIdentitySchema.parse(checkpoint.launchIdentity.value), usage: checkpoint.launchIdentity.usage }
+    : await setupStage('Launch Identity Architect', provider.json({
     model: input.routes.launchArchitect,
     system: `Bạn chịu trách nhiệm chọn concept và khóa bản sắc truyện. Trả đúng structured-output schema, không markdown.
 Chọn dựa trên chất lượng actual opening sample, chemistry nhân vật, agency của đối lực và khả năng biến hóa; không chỉ dựa vào metadata cơ chế. Opening sample chỉ là bằng chứng lựa chọn: tuyệt đối không chép câu, cử chỉ hoặc thoại từ sample vào Kernel.
@@ -392,7 +400,7 @@ Chỉ được chọn concept có domainFeasibility=pass và longRunFeasibility=
     schema: LaunchIdentitySchema,
     schemaComplexity: 'omit_large_array_max',
     temperature: 0.3,
-  }));
+    }));
   checkpoint.launchIdentity = launchIdentity;
   await input.onCheckpoint?.(structuredClone(checkpoint));
   usages.push(launchIdentity.usage);
@@ -410,12 +418,15 @@ Chỉ được chọn concept có domainFeasibility=pass và longRunFeasibility=
     throw new StoryFactoryError('setup_blocked', 'Launch pack fingerprints drifted from the selected concept.');
   }
 
-  const launchWorld = await setupStage('Launch World Architect', provider.json({
+  const launchWorld = checkpoint.launchWorld
+    ? { value: LaunchWorldSchema.parse(checkpoint.launchWorld.value), usage: checkpoint.launchWorld.usage }
+    : await setupStage('Launch World Architect', provider.json({
     model: input.routes.launchArchitect,
     system: `Bạn khóa world canon riêng của truyện đã chọn. Trả đúng structured-output schema, không markdown.
 WorldModel phải khóa thời đại, địa lý, tổ chức, hệ thống vận hành, giới hạn và chi phí. Mọi geography.role là mô tả có nghĩa.
 travelRules là đồ thị có hướng: từ vị trí mở đầu dự kiến phải đi được tới mọi location và có đường quay về. Không biến kiến thức thành vật tư, thời gian hoặc năng lượng miễn phí.
 Mỗi numeric resource bắt buộc có unit vật lý hoặc tiền tệ rõ ràng như VND, kg, lít, chiếc, điểm; không dùng một con số vô đơn vị.
+worldMechanics bắt buộc có đủ ba loại typed: conversion ghi input/output/hao hụt theo mỗi batch; capability ghi actor/fact/resource cấp quyền và công suất; constraint ghi fact bắt buộc hoặc bị cấm. Không giấu số học hoặc quyền hạn trong prose worldRules.
 World rules, resource và tổ chức phải phản ánh requiredInfrastructure, minimumPlausibleTimeline và criticalAssumptions đã được mô phỏng.`,
     prompt: JSON.stringify({
       task: 'Xuất phần world canon cho identity đã khóa.',
@@ -428,12 +439,14 @@ World rules, resource và tổ chức phải phản ánh requiredInfrastructure,
     schema: LaunchWorldSchema,
     schemaComplexity: 'omit_large_array_max',
     temperature: 0.3,
-  }));
+    }));
   checkpoint.launchWorld = launchWorld;
   await input.onCheckpoint?.(structuredClone(checkpoint));
   usages.push(launchWorld.usage);
 
-  const launchSeries = await setupStage('Launch Series Architect', provider.json({
+  const launchSeries = checkpoint.launchSeries
+    ? { value: LaunchSeriesSchema.parse(checkpoint.launchSeries.value), usage: checkpoint.launchSeries.usage }
+    : await setupStage('Launch Series Architect', provider.json({
     model: input.routes.launchArchitect,
     system: `Bạn khóa đại cương dài hạn của đúng truyện và world canon đã chọn. Trả đúng structured-output schema, không markdown.
 seriesSpine có 8-15 stage liên tục, tổng target 800-1.200 chương; mỗi stage phải đổi arena, conflict economy hoặc reward-loop variant và có entry/exit cụ thể.
@@ -449,7 +462,7 @@ Mọi longPromises.promiseId, stages[].longPromiseIds và endingDirection.promis
     schema: LaunchSeriesSchema,
     schemaComplexity: 'omit_array_max',
     temperature: 0.3,
-  }));
+    }));
   checkpoint.launchSeries = launchSeries;
   await input.onCheckpoint?.(structuredClone(checkpoint));
   usages.push(launchSeries.usage);
@@ -459,10 +472,13 @@ Mọi longPromises.promiseId, stages[].longPromiseIds và endingDirection.promis
     ...launchWorld.value.kernel,
     ...launchSeries.value.kernel,
   });
-  const launchState = await setupStage('Launch State Architect', provider.json({
+  const launchState = checkpoint.launchState
+    ? { value: LaunchStateSchema.parse(checkpoint.launchState.value), usage: checkpoint.launchState.usage }
+    : await setupStage('Launch State Architect', provider.json({
     model: input.routes.launchArchitect,
     system: `Bạn chỉ tạo Arc đầu 20-30 chương và StoryState chương 0 từ canon đã khóa. Trả đúng structured-output schema, không markdown.
 Arc gắn stage đầu; mọi active ID phải có trong Kernel. State không ghi trước kết quả tương lai.
+Arc.activeMechanicIds chỉ chứa mechanic dùng trong arc đầu. Mọi requiredFacts của capability/constraint đang active phải có fact và expected value tương ứng trong initialState.
 initialState.schemaVersion=2, chapterNumber=0, recentOutcomes=[] và usedExpansionSeedIds=[].
 State có đúng một entry cho mọi character, resource và promise trong Kernel; không thiếu, không thêm ID lạ.`,
     prompt: JSON.stringify({
@@ -474,13 +490,13 @@ State có đúng một entry cho mọi character, resource và promise trong Ker
     schema: LaunchStateSchema,
     schemaComplexity: 'omit_large_array_max',
     temperature: 0.3,
-  }));
+    }));
   checkpoint.launchState = launchState;
   await input.onCheckpoint?.(structuredClone(checkpoint));
   usages.push(launchState.usage);
 
   const launch = parseSetupArtifact('LaunchPack', LaunchPackSchema, {
-    schemaVersion: 1,
+    schemaVersion: 2,
     selectedConceptId: launchIdentity.value.selectedConceptId,
     kernel,
     arc: launchState.value.arc,

@@ -6,20 +6,21 @@ import { gzipSync } from 'node:zlib';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 import {
-  ReaderJudgmentSchema,
+  PairwiseSequentialJudgmentSchema,
   SequentialBenchmarkCorpusSchema,
   STORY_FACTORY_BENCHMARK_PROTOCOL,
   STORY_FACTORY_RELEASE,
   STORY_FACTORY_SEQUENTIAL_PROTOCOL,
   STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL,
-  StoredReaderJudgmentSchema,
+  StoredPairwiseSequentialJudgmentSchema,
   ValidationManifestSchema,
-  buildBlindReaderInput,
-  calculateValidationMetrics,
+  assertComparableSequentialCorpora,
+  buildBlindReaderComparison,
+  calculateComparativeValidationMetrics,
   digestArtifact,
   geminiProvider,
   validationPasses,
-  type StoredReaderJudgment,
+  type StoredPairwiseSequentialJudgment,
 } from '../src/services/story-factory';
 
 dotenv.config({ path: '.env.runtime', quiet: true });
@@ -32,16 +33,20 @@ const value = (flag: string) => {
   return index >= 0 ? args[index + 1] : undefined;
 };
 const corpusPath = value('--corpus');
-if (!corpusPath) throw new Error('--corpus is required.');
+const competitorCorpusPath = value('--competitor-corpus');
+if (!corpusPath || !competitorCorpusPath) throw new Error('--corpus and --competitor-corpus are required.');
 const writerBakeoffRunId = value('--writer-bakeoff-run-id');
 const sequentialRunId = value('--sequential-run-id');
-if (!writerBakeoffRunId || !sequentialRunId) {
-  throw new Error('--writer-bakeoff-run-id and --sequential-run-id are required.');
+const competingSequentialRunId = value('--competing-sequential-run-id');
+if (!writerBakeoffRunId || !sequentialRunId || !competingSequentialRunId) {
+  throw new Error('--writer-bakeoff-run-id, --sequential-run-id and --competing-sequential-run-id are required.');
 }
 const uuid = z.string().uuid();
 uuid.parse(writerBakeoffRunId);
 uuid.parse(sequentialRunId);
+uuid.parse(competingSequentialRunId);
 const resolvedCorpusPath = path.resolve(corpusPath);
+const resolvedCompetitorCorpusPath = path.resolve(competitorCorpusPath);
 const checkpointPath = path.resolve(value('--checkpoint') ?? `${resolvedCorpusPath}.reader-judgments.json`);
 const judgeModels = (process.env.FACTORY_JUDGE_MODELS
   ?? 'gemini-2.5-pro,gemini-3.5-flash,gemini-3.1-pro-preview')
@@ -54,9 +59,10 @@ if (judgeModels.length !== 3 || new Set(judgeModels).size !== 3) {
 const checkpointSchema = z.object({
   protocolVersion: z.literal(STORY_FACTORY_BENCHMARK_PROTOCOL),
   release: z.string().min(4),
-  corpusDigest: z.string().length(64),
+  candidateCorpusDigest: z.string().length(64),
+  competitorCorpusDigest: z.string().length(64),
   judgmentCostUsd: z.number().nonnegative(),
-  judgments: z.array(StoredReaderJudgmentSchema),
+  judgments: z.array(StoredPairwiseSequentialJudgmentSchema),
 }).strict();
 
 async function ensureAuditBucket(db: SupabaseClient): Promise<void> {
@@ -88,61 +94,98 @@ async function uploadImmutable(db: SupabaseClient, key: string, bytes: Buffer, d
   if (existingDigest !== digest) throw new Error('Immutable validation artifact already exists with different bytes.');
 }
 
-async function verifyPrerequisites(db: SupabaseClient, corpusDigest: string, writer: string) {
-  const [writerRun, sequentialRun] = await Promise.all([
-    db.from('story_factory_runs')
-      .select('id,status,engine_release,benchmark_protocol_version,input_artifact,output_artifact')
+async function verifyPrerequisites(input: {
+  db: SupabaseClient;
+  candidateCorpusDigest: string;
+  competitorCorpusDigest: string;
+  writer: string;
+  competitorWriter: string;
+}) {
+  const [writerRun, sequentialRun, competingSequentialRun] = await Promise.all([
+    input.db.from('story_factory_runs')
+      .select('id,status,engine_release,benchmark_protocol_version,input_artifact,output_artifact,estimated_cost_usd')
       .eq('id', writerBakeoffRunId)
       .single(),
-    db.from('story_factory_runs')
-      .select('id,status,engine_release,benchmark_protocol_version,output_artifact,model_routes')
+    input.db.from('story_factory_runs')
+      .select('id,status,engine_release,benchmark_protocol_version,output_artifact,model_routes,estimated_cost_usd')
       .eq('id', sequentialRunId)
+      .single(),
+    input.db.from('story_factory_runs')
+      .select('id,status,engine_release,benchmark_protocol_version,output_artifact,model_routes,estimated_cost_usd')
+      .eq('id', competingSequentialRunId)
       .single(),
   ]);
   if (writerRun.error) throw writerRun.error;
   if (sequentialRun.error) throw sequentialRun.error;
+  if (competingSequentialRun.error) throw competingSequentialRun.error;
   if (writerRun.data.status !== 'passed'
     || writerRun.data.engine_release !== STORY_FACTORY_RELEASE
     || writerRun.data.benchmark_protocol_version !== STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL
-    || writerRun.data.output_artifact?.recommended !== writer
+    || !Array.isArray(writerRun.data.output_artifact?.topTwoWriters)
+    || !writerRun.data.output_artifact.topTwoWriters.includes(input.writer)
+    || !writerRun.data.output_artifact.topTwoWriters.includes(input.competitorWriter)
     || typeof writerRun.data.output_artifact?.corpusDigest !== 'string') {
-    throw new Error('Plan-qualified Writer bake-off does not authorize this Writer route.');
+    throw new Error('Plan-qualified Writer discovery did not select this route for sequential survival.');
   }
   if (!sequentialRun.data
     || sequentialRun.data.status !== 'passed'
     || sequentialRun.data.engine_release !== STORY_FACTORY_RELEASE
     || sequentialRun.data.benchmark_protocol_version !== STORY_FACTORY_SEQUENTIAL_PROTOCOL
-    || sequentialRun.data.output_artifact?.corpusDigest !== corpusDigest
-    || sequentialRun.data.model_routes?.route?.writer !== writer) {
+    || sequentialRun.data.output_artifact?.corpusDigest !== input.candidateCorpusDigest
+    || sequentialRun.data.output_artifact?.sourceDiscoveryDigest
+      !== writerRun.data.input_artifact?.sourceDiscoveryDigest
+    || sequentialRun.data.model_routes?.route?.writer !== input.writer) {
     throw new Error('Sequential survival run does not authorize this corpus and Writer route.');
   }
-  return { writerCorpusDigest: writerRun.data.output_artifact.corpusDigest as string };
+  if (!competingSequentialRun.data
+    || competingSequentialRun.data.status !== 'passed'
+    || competingSequentialRun.data.engine_release !== STORY_FACTORY_RELEASE
+    || competingSequentialRun.data.benchmark_protocol_version !== STORY_FACTORY_SEQUENTIAL_PROTOCOL
+    || competingSequentialRun.data.output_artifact?.corpusDigest !== input.competitorCorpusDigest
+    || competingSequentialRun.data.output_artifact?.sourceDiscoveryDigest
+      !== writerRun.data.input_artifact?.sourceDiscoveryDigest
+    || competingSequentialRun.data.model_routes?.route?.writer !== input.competitorWriter) {
+    throw new Error('Competing sequential survival run does not authorize its corpus and Writer route.');
+  }
+  return {
+    writerCorpusDigest: writerRun.data.output_artifact.corpusDigest as string,
+    campaignOverheadCostUsd: Number(writerRun.data.estimated_cost_usd ?? 0),
+  };
 }
 
 async function main() {
   const corpus = SequentialBenchmarkCorpusSchema.parse(JSON.parse(readFileSync(resolvedCorpusPath, 'utf8')));
-  if (corpus.engineRelease !== STORY_FACTORY_RELEASE) {
-    throw new Error(`Sequential corpus release ${corpus.engineRelease} does not match ${STORY_FACTORY_RELEASE}.`);
+  const competitorCorpus = SequentialBenchmarkCorpusSchema.parse(
+    JSON.parse(readFileSync(resolvedCompetitorCorpusPath, 'utf8')),
+  );
+  if (corpus.engineRelease !== STORY_FACTORY_RELEASE || competitorCorpus.engineRelease !== STORY_FACTORY_RELEASE) {
+    throw new Error(`Sequential corpora must both match release ${STORY_FACTORY_RELEASE}.`);
   }
-  const corpusDigest = digestArtifact(corpus);
+  assertComparableSequentialCorpora({ candidate: corpus, competitor: competitorCorpus });
+  const candidateCorpusDigest = digestArtifact(corpus);
+  const competitorCorpusDigest = digestArtifact(competitorCorpus);
   const checkpoint = existsSync(checkpointPath)
     ? checkpointSchema.parse(JSON.parse(readFileSync(checkpointPath, 'utf8')))
     : {
       protocolVersion: STORY_FACTORY_BENCHMARK_PROTOCOL,
       release: STORY_FACTORY_RELEASE,
-      corpusDigest,
+      candidateCorpusDigest,
+      competitorCorpusDigest,
       judgmentCostUsd: 0,
-      judgments: [] as StoredReaderJudgment[],
+      judgments: [] as StoredPairwiseSequentialJudgment[],
     };
-  if (checkpoint.release !== STORY_FACTORY_RELEASE || checkpoint.corpusDigest !== corpusDigest) {
-    throw new Error('Reader checkpoint does not match the current release and sequential corpus.');
+  if (checkpoint.release !== STORY_FACTORY_RELEASE
+    || checkpoint.candidateCorpusDigest !== candidateCorpusDigest
+    || checkpoint.competitorCorpusDigest !== competitorCorpusDigest) {
+    throw new Error('Reader checkpoint does not match the current release and paired sequential corpora.');
   }
   const judgments = [...checkpoint.judgments];
   let judgmentCostUsd = checkpoint.judgmentCostUsd;
   const persist = () => writeFileSync(checkpointPath, `${JSON.stringify({
     protocolVersion: STORY_FACTORY_BENCHMARK_PROTOCOL,
     release: STORY_FACTORY_RELEASE,
-    corpusDigest,
+    candidateCorpusDigest,
+    competitorCorpusDigest,
     judgmentCostUsd,
     judgments,
   }, null, 2)}\n`);
@@ -154,8 +197,14 @@ async function main() {
     : null;
   if (apply && !db) throw new Error('Supabase server environment is missing.');
   const prerequisites = db
-    ? await verifyPrerequisites(db, corpusDigest, corpus.route.writer)
-    : { writerCorpusDigest: '0'.repeat(64) };
+    ? await verifyPrerequisites({
+      db,
+      candidateCorpusDigest,
+      competitorCorpusDigest,
+      writer: corpus.route.writer,
+      competitorWriter: competitorCorpus.route.writer,
+    })
+    : { writerCorpusDigest: '0'.repeat(64), campaignOverheadCostUsd: 0 };
   let runId: string | null = null;
   if (db) {
     const inserted = await db.from('story_factory_runs').insert({
@@ -163,20 +212,23 @@ async function main() {
       status: 'running',
       engine_release: STORY_FACTORY_RELEASE,
       benchmark_protocol_version: STORY_FACTORY_BENCHMARK_PROTOCOL,
-      artifact_digest: corpusDigest,
+      artifact_digest: candidateCorpusDigest,
       model_routes: {
         route: corpus.route,
         continuityJudge: corpus.continuityJudgeModel,
         judges: judgeModels,
+        competitorWriter: competitorCorpus.route.writer,
       },
       input_artifact: {
         protocolVersion: STORY_FACTORY_BENCHMARK_PROTOCOL,
-        corpusDigest,
+        corpusDigest: candidateCorpusDigest,
+        competitorCorpusDigest,
         launchPackDigests: corpus.launchPackDigests,
         samplesExpected: 20,
         writerBakeoffRunId,
         writerCorpusDigest: prerequisites.writerCorpusDigest,
         sequentialRunId,
+        competingSequentialRunId,
       },
     }).select('id').single();
     if (inserted.error) throw inserted.error;
@@ -185,25 +237,38 @@ async function main() {
 
   try {
     for (const sample of corpus.samples) {
+      const competitorSample = competitorCorpus.samples.find(item => item.id === sample.id)!;
       const missingModels = judgeModels.filter(model => !judgments.some(item => (
         item.sampleId === sample.id && item.model === model
       )));
       const created = await Promise.all(missingModels.map(async model => {
+        const candidateIsA = parseInt(
+          createHash('sha256').update(`${sample.id}:${model}:${candidateCorpusDigest}`).digest('hex').slice(0, 2),
+          16,
+        ) % 2 === 0;
         const result = await geminiProvider.json({
           model,
           system: `Bạn là độc giả blind của truyện dài tiếng Việt.
-Chỉ đọc premise ngắn, đoạn cuối chương trước và prose hiện tại.
+So sánh hai phiên bản được viết tuần tự từ cùng logic truyện. Mỗi phiên bản có đoạn cuối chương trước của chính nó.
 Không suy đoán model, không đòi tuân thủ plan ẩn và không thưởng checklist kỹ thuật.
-Trả wantsNext=true chỉ khi với tư cách độc giả bạn thực sự muốn mở chương kế tiếp.`,
-          prompt: JSON.stringify(buildBlindReaderInput({ sample })),
-          schema: ReaderJudgmentSchema,
+Chọn phiên bản đọc tự nhiên, nối chương và có sức kéo hơn; wantsNext phải phản ánh từng phiên bản độc lập.`,
+          prompt: JSON.stringify(buildBlindReaderComparison({
+            candidate: sample,
+            competitor: competitorSample,
+            candidateIsA,
+          })),
+          schema: PairwiseSequentialJudgmentSchema,
           temperature: 0.4,
         });
-        return StoredReaderJudgmentSchema.parse({
+        return StoredPairwiseSequentialJudgmentSchema.parse({
           sampleId: sample.id,
           model,
           blinded: true,
-          ...result.value,
+          preference: result.value.preference === 'tie'
+            ? 'tie'
+            : result.value.preference === (candidateIsA ? 'A' : 'B') ? 'candidate' : 'competitor',
+          wantsCandidate: candidateIsA ? result.value.wantsNextA : result.value.wantsNextB,
+          wantsCompetitor: candidateIsA ? result.value.wantsNextB : result.value.wantsNextA,
           usage: result.usage,
         });
       }));
@@ -216,33 +281,70 @@ Trả wantsNext=true chỉ khi với tư cách độc giả bạn thực sự mu
       console.log(JSON.stringify({ sampleId: sample.id, judgments: judgments.length }));
     }
 
-    const metrics = calculateValidationMetrics({
-      corpus,
+    const candidateMetrics = calculateComparativeValidationMetrics({
+      candidate: corpus,
+      competitor: competitorCorpus,
       judgments,
       judgeModels,
       judgmentCostUsd,
+      campaignOverheadCostUsd: prerequisites.campaignOverheadCostUsd,
     });
+    const reversedJudgments = judgments.map(judgment => ({
+      ...judgment,
+      preference: judgment.preference === 'candidate'
+        ? 'competitor' as const
+        : judgment.preference === 'competitor' ? 'candidate' as const : 'tie' as const,
+      wantsCandidate: judgment.wantsCompetitor,
+      wantsCompetitor: judgment.wantsCandidate,
+    }));
+    const competitorMetrics = calculateComparativeValidationMetrics({
+      candidate: competitorCorpus,
+      competitor: corpus,
+      judgments: reversedJudgments,
+      judgeModels,
+      judgmentCostUsd,
+      campaignOverheadCostUsd: prerequisites.campaignOverheadCostUsd,
+    });
+    const competitorWon = competitorMetrics.candidatePreference > candidateMetrics.candidatePreference;
+    const selectedCorpus = competitorWon ? competitorCorpus : corpus;
+    const rejectedCorpus = competitorWon ? corpus : competitorCorpus;
+    const selectedCorpusDigest = competitorWon ? competitorCorpusDigest : candidateCorpusDigest;
+    const rejectedCorpusDigest = competitorWon ? candidateCorpusDigest : competitorCorpusDigest;
+    const selectedSequentialRunId = competitorWon ? competingSequentialRunId : sequentialRunId;
+    const rejectedSequentialRunId = competitorWon ? sequentialRunId : competingSequentialRunId;
+    const metrics = competitorWon ? competitorMetrics : candidateMetrics;
     const passed = validationPasses(metrics);
     const archive = gzipSync(Buffer.from(JSON.stringify({
       protocolVersion: STORY_FACTORY_BENCHMARK_PROTOCOL,
-      corpus,
+      candidateCorpus: corpus,
+      competitorCorpus,
       judgments,
+      selection: {
+        selectedWriter: selectedCorpus.route.writer,
+        rejectedWriter: rejectedCorpus.route.writer,
+        candidateMetrics,
+        competitorMetrics,
+      },
       writerBakeoffRunId,
       writerCorpusDigest: prerequisites.writerCorpusDigest,
       sequentialRunId,
+      competingSequentialRunId,
     })));
     const artifactSha256 = createHash('sha256').update(archive).digest('hex');
-    const artifactStorageKey = `benchmarks/validation-v3/${STORY_FACTORY_RELEASE}/${corpusDigest}-${artifactSha256}.json.gz`;
+    const artifactStorageKey = `benchmarks/validation-v5/${STORY_FACTORY_RELEASE}/${selectedCorpusDigest}-${artifactSha256}.json.gz`;
     const manifest = ValidationManifestSchema.parse({
       protocolVersion: STORY_FACTORY_BENCHMARK_PROTOCOL,
       engineRelease: STORY_FACTORY_RELEASE,
-      route: corpus.route,
-      continuityJudgeModel: corpus.continuityJudgeModel,
+      route: selectedCorpus.route,
+      continuityJudgeModel: selectedCorpus.continuityJudgeModel,
       judgeModels,
       launchPackDigests: corpus.launchPackDigests,
       writerBakeoffRunId,
-      sequentialRunId,
-      corpusDigest,
+      writerCorpusDigest: prerequisites.writerCorpusDigest,
+      sequentialRunId: selectedSequentialRunId,
+      competingSequentialRunId: rejectedSequentialRunId,
+      corpusDigest: selectedCorpusDigest,
+      competingCorpusDigest: rejectedCorpusDigest,
       artifactStorageKey,
       artifactSha256,
       metrics,
@@ -257,6 +359,12 @@ Trả wantsNext=true chỉ khi với tư cách độc giả bạn thực sự mu
         error_code: passed ? null : 'validation_gate_failed',
         error_message: passed ? null : 'Sequential reader validation did not satisfy every promotion gate.',
         artifact_digest: artifactSha256,
+        model_routes: {
+          route: selectedCorpus.route,
+          continuityJudge: selectedCorpus.continuityJudgeModel,
+          judges: judgeModels,
+          competitorWriter: rejectedCorpus.route.writer,
+        },
         output_artifact: { manifest },
         estimated_cost_usd: metrics.totalCostUsd,
         first_pass: metrics.firstPassPublishRate === 1,
@@ -273,7 +381,10 @@ Trả wantsNext=true chỉ khi với tư cách độc giả bạn thực sự mu
         status: infra ? 'infra_blocked' : 'failed',
         error_code: infra ? 'infra_blocked' : 'validation_execution_failed',
         error_message: error instanceof Error ? error.message : String(error),
-        estimated_cost_usd: corpus.buildCostUsd + judgmentCostUsd,
+        estimated_cost_usd: corpus.buildCostUsd
+          + competitorCorpus.buildCostUsd
+          + prerequisites.campaignOverheadCostUsd
+          + judgmentCostUsd,
         finished_at: new Date().toISOString(),
       }).eq('id', runId).eq('status', 'running');
     }

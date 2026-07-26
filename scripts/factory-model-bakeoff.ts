@@ -26,7 +26,7 @@ const value = (flag: string) => {
   const index = args.indexOf(flag);
   return index >= 0 ? args[index + 1] : undefined;
 };
-const corpusPath = path.resolve(value('--corpus') ?? '/tmp/truyencity-writer-bakeoff-v2-corpus.json');
+const corpusPath = path.resolve(value('--corpus') ?? '/tmp/truyencity-writer-bakeoff-v4-corpus.json');
 const outputPath = path.resolve(value('--output') ?? `${corpusPath}.results.json`);
 const writerModels = (value('--writers') ?? 'gemini-3.6-flash,gemini-3.1-pro-preview,gemini-2.5-pro')
   .split(',')
@@ -78,11 +78,11 @@ function cost(usages: ProviderUsage[]): number {
 }
 
 function assessmentHasInvalidArtifact(assessment: EditorAssessment | null): boolean {
-  return assessment?.status === 'revise' && assessment.issues.some(issue => issue.scope !== 'prose');
+  return assessment?.status === 'revise' && assessment.continuityIssues.some(issue => issue.scope !== 'prose');
 }
 
 function assessmentHasCriticalViolation(assessment: EditorAssessment | null): boolean {
-  return assessment?.status === 'revise' && assessment.issues.some(issue => issue.severity === 'critical');
+  return assessment?.status === 'revise' && assessment.continuityIssues.some(issue => issue.severity === 'critical');
 }
 
 function pipelineTelemetry(error: unknown) {
@@ -102,6 +102,7 @@ function pipelineTelemetry(error: unknown) {
 }
 
 async function main() {
+  const campaignBudgetUsd = 50;
   const corpus = WriterBakeoffCorpusSchema.parse(JSON.parse(readFileSync(corpusPath, 'utf8')));
   if (corpus.engineRelease !== STORY_FACTORY_RELEASE) {
     throw new Error(`Writer corpus release ${corpus.engineRelease} does not match ${STORY_FACTORY_RELEASE}.`);
@@ -288,12 +289,14 @@ Không được xem plan/state, không suy đoán model và không thưởng che
       corpusInvalidations: results.filter(result => result.status === 'corpus_invalid').length,
       pairwiseMajorityWins,
       wantsNextMajorities,
-      medianCostUsd: (routeCosts[4] + routeCosts[5]) / 2,
+      medianCostUsd: routeCosts.length % 2
+        ? routeCosts[Math.floor(routeCosts.length / 2)]
+        : (routeCosts[routeCosts.length / 2 - 1] + routeCosts[routeCosts.length / 2]) / 2,
       maxCostUsd: Math.max(...routeCosts),
     };
   });
-  const recommended = invalidBriefIds.length
-    ? null
+  const topTwoWriters = invalidBriefIds.length
+    ? []
     : summaries
       .filter(summary => summary.criticalViolations === 0 && summary.maxCostUsd <= 0.5)
       .sort((a, b) => (
@@ -301,7 +304,21 @@ Không được xem plan/state, không suy đoán model và không thưởng che
         || b.pairwiseMajorityWins - a.pairwiseMajorityWins
         || b.wantsNextMajorities - a.wantsNextMajorities
         || a.medianCostUsd - b.medianCostUsd
-      ))[0]?.writer ?? null;
+      )).slice(0, 2).map(summary => summary.writer);
+  const discoveryQualified = summaries.filter(summary =>
+    topTwoWriters.includes(summary.writer)
+    && summary.publishRate === 1
+    && summary.firstPassRate >= 0.8
+    && summary.criticalViolations === 0
+    && summary.wantsNextMajorities >= Math.ceil(corpus.samples.length * 0.75)
+    && summary.medianCostUsd <= 0.25
+    && summary.maxCostUsd <= 0.5);
+  const campaignCostUsd = corpus.discoveryCostUsd
+    + generations.reduce((sum, item) => sum + item.costUsd, 0)
+    + votes.reduce((sum, item) => sum + item.costUsd, 0);
+  const recommended = invalidBriefIds.length || campaignCostUsd > campaignBudgetUsd || discoveryQualified.length === 0
+    ? null
+    : discoveryQualified[0].writer;
   const final = {
     protocolVersion: STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL,
     corpusDigest,
@@ -313,6 +330,11 @@ Không được xem plan/state, không suy đoán model và không thưởng che
     writers: writerModels,
     invalidBriefIds,
     summaries,
+    topTwoWriters,
+    discoveryQualified: discoveryQualified.map(summary => summary.writer),
+    campaignBudgetUsd,
+    discoveryCostUsd: corpus.discoveryCostUsd,
+    campaignCostUsd,
     recommended,
     generations,
     votes,
@@ -327,13 +349,15 @@ Không được xem plan/state, không suy đoán model và không thưởng che
     const db = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
     const archive = gzipSync(Buffer.from(JSON.stringify({ corpus, result: final })));
     const sha256 = createHash('sha256').update(archive).digest('hex');
-    const storageKey = `benchmarks/writer-bakeoff-v2/${corpusDigest}-${sha256}.json.gz`;
+    const storageKey = `benchmarks/writer-bakeoff-v4/${corpusDigest}-${sha256}.json.gz`;
     const upload = await db.storage.from('factory-audit').upload(storageKey, archive, {
       contentType: 'application/gzip',
       upsert: false,
     });
     if (upload.error && !/already exists|duplicate/iu.test(upload.error.message)) throw upload.error;
-    const passed = Boolean(recommended) && invalidBriefIds.length === 0;
+    const passed = topTwoWriters.length === 2
+      && invalidBriefIds.length === 0
+      && campaignCostUsd <= campaignBudgetUsd;
     const inserted = await db.from('story_factory_runs').insert({
       kind: 'benchmark',
       status: passed ? 'passed' : 'failed',
@@ -349,17 +373,21 @@ Không được xem plan/state, không suy đoán model và không thưởng che
       },
       input_artifact: {
         corpusDigest,
-        sourceSequentialDigest: corpus.sourceSequentialDigest,
-        samplesExpected: 10,
+        sourceDiscoveryDigest: corpus.sourceDiscoveryDigest,
+        samplesExpected: corpus.samples.length,
         samplesCompleted: generations.length / writerModels.length,
         allPlansPassed: corpus.samples.every(sample => sample.planAssessment.status === 'pass'),
+        allCausalPlansPassed: corpus.samples.every(sample =>
+          sample.causalValidation.validatorVersion.length > 0
+          && sample.causalValidation.digest.length === 64),
       },
-      output_artifact: { storageKey, sha256, corpusDigest, invalidBriefIds, summaries, recommended },
-      estimated_cost_usd: generations.reduce((sum, item) => sum + item.costUsd, 0)
-        + votes.reduce((sum, item) => sum + item.costUsd, 0),
-      first_pass: recommended
-        ? summaries.find(summary => summary.writer === recommended)?.firstPassRate === 1
-        : false,
+      output_artifact: {
+        storageKey, sha256, corpusDigest, invalidBriefIds, summaries, topTwoWriters,
+        discoveryQualified: discoveryQualified.map(summary => summary.writer), recommended,
+      },
+      estimated_cost_usd: campaignCostUsd,
+      first_pass: topTwoWriters.every(writer =>
+        (summaries.find(summary => summary.writer === writer)?.firstPassRate ?? 0) >= 0.8),
       error_code: passed ? null : invalidBriefIds.length ? 'writer_bakeoff_corpus_invalid' : 'writer_route_bakeoff_rejected',
       error_message: passed
         ? null
@@ -376,10 +404,14 @@ Không được xem plan/state, không suy đoán model và không thưởng che
     outputPath,
     invalidBriefIds,
     summaries,
+    topTwoWriters,
+    discoveryQualified: discoveryQualified.map(summary => summary.writer),
+    campaignBudgetUsd,
+    campaignCostUsd,
     recommended,
     audit,
   }, null, 2));
-  if (!recommended || invalidBriefIds.length) process.exitCode = 2;
+  if (topTwoWriters.length !== 2 || invalidBriefIds.length || campaignCostUsd > campaignBudgetUsd) process.exitCode = 2;
 }
 
 main().catch(error => {

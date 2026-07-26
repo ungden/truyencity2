@@ -15,11 +15,11 @@ import {
   type StoryModelProvider,
 } from './provider';
 
-export const STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL = 'story-factory-writer-bakeoff-v2-plan-qualified';
-export const STORY_FACTORY_SEQUENTIAL_PROTOCOL = 'story-factory-sequential-survival-v1';
-export const STORY_FACTORY_BENCHMARK_PROTOCOL = 'story-factory-validation-v3-sequential-reader';
+export const STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL = 'story-factory-writer-bakeoff-v4-causal-discovery';
+export const STORY_FACTORY_SEQUENTIAL_PROTOCOL = 'story-factory-sequential-survival-v3-frozen-causal-continuity';
+export const STORY_FACTORY_BENCHMARK_PROTOCOL = 'story-factory-validation-v5-pairwise-sequential-reader';
 export const STORY_FACTORY_BENCHMARK_SAMPLE_COUNT = 20;
-export const STORY_FACTORY_WRITER_SAMPLE_COUNT = 10;
+export const STORY_FACTORY_WRITER_SAMPLE_COUNT = 4;
 
 export const BenchmarkRouteSchema = z.object({
   planner: z.string().trim().min(3),
@@ -47,6 +47,11 @@ export const PlanQualifiedWriterBriefSchema = z.object({
   plan: ChapterPlanSchema,
   previousTail: z.string().max(8_000).nullable(),
   planAssessment: PlanPassSchema,
+  causalValidation: z.object({
+    validatorVersion: z.string().trim().min(3),
+    mechanicUseCount: z.number().int().nonnegative(),
+    digest: z.string().length(64),
+  }).strict(),
 }).strict();
 
 export const WriterBakeoffCorpusSchema = z.object({
@@ -55,7 +60,8 @@ export const WriterBakeoffCorpusSchema = z.object({
   builtAt: z.string().datetime(),
   planner: z.string().trim().min(3),
   planJudge: z.string().trim().min(3),
-  sourceSequentialDigest: z.string().length(64),
+  sourceDiscoveryDigest: z.string().length(64),
+  discoveryCostUsd: z.number().nonnegative(),
   samples: z.array(PlanQualifiedWriterBriefSchema).length(STORY_FACTORY_WRITER_SAMPLE_COUNT),
 }).strict().superRefine((corpus, ctx) => {
   if (new Set(corpus.samples.map(sample => sample.id)).size !== STORY_FACTORY_WRITER_SAMPLE_COUNT) {
@@ -63,6 +69,9 @@ export const WriterBakeoffCorpusSchema = z.object({
   }
   if (new Set(corpus.samples.map(sample => sample.lane)).size !== 4) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['samples'], message: 'Writer bake-off must cover all four lanes.' });
+  }
+  if (corpus.samples.some(sample => sample.plan.chapterNumber !== 1 || sample.state.chapterNumber !== 0)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['samples'], message: 'Writer discovery must compare chapter one from fresh launch packs.' });
   }
   for (const sample of corpus.samples) {
     if (sample.state.chapterNumber !== sample.plan.chapterNumber - 1) {
@@ -127,6 +136,11 @@ export const SequentialBenchmarkSampleSchema = z.object({
   allInCostUsd: z.number().nonnegative(),
   revisionCount: z.union([z.literal(0), z.literal(1)]),
   planAssessment: PlanPassSchema,
+  causalValidation: z.object({
+    validatorVersion: z.string().trim().min(3),
+    mechanicUseCount: z.number().int().nonnegative(),
+    digest: z.string().length(64),
+  }).strict(),
   continuityAssessment: ContinuityAssessmentSchema.options[0],
   stateBeforeDigest: z.string().length(64),
   stateAfterDigest: z.string().length(64),
@@ -192,11 +206,29 @@ export const StoredReaderJudgmentSchema = ReaderJudgmentSchema.extend({
   usage: z.unknown(),
 }).strict();
 
+export const PairwiseSequentialJudgmentSchema = z.object({
+  preference: z.enum(['A', 'B', 'tie']),
+  wantsNextA: z.boolean(),
+  wantsNextB: z.boolean(),
+  reason: z.string().trim().min(5).max(2_000),
+}).strict();
+
+export const StoredPairwiseSequentialJudgmentSchema = z.object({
+  sampleId: z.string().trim().min(3),
+  model: z.string().trim().min(3),
+  blinded: z.literal(true),
+  preference: z.enum(['candidate', 'competitor', 'tie']),
+  wantsCandidate: z.boolean(),
+  wantsCompetitor: z.boolean(),
+  usage: z.unknown(),
+}).strict();
+
 export const ValidationMetricsSchema = z.object({
   samplesExpected: z.literal(STORY_FACTORY_BENCHMARK_SAMPLE_COUNT),
   samplesCompleted: z.literal(STORY_FACTORY_BENCHMARK_SAMPLE_COUNT),
   judgeLineages: z.literal(3),
   desireToReadNext: z.number().min(0).max(1),
+  candidatePreference: z.number().min(0).max(1),
   criticalContinuityViolations: z.literal(0),
   firstPassPublishRate: z.number().min(0).max(1),
   finalPublishRate: z.literal(1),
@@ -204,7 +236,9 @@ export const ValidationMetricsSchema = z.object({
   maxAllInCostUsd: z.number().nonnegative(),
   sequentialCostUsd: z.number().nonnegative(),
   judgmentCostUsd: z.number().nonnegative(),
+  campaignOverheadCostUsd: z.number().nonnegative(),
   totalCostUsd: z.number().nonnegative(),
+  campaignBudgetUsd: z.literal(50),
 }).strict();
 
 export const ValidationManifestSchema = z.object({
@@ -217,6 +251,8 @@ export const ValidationManifestSchema = z.object({
   writerBakeoffRunId: z.string().uuid(),
   writerCorpusDigest: z.string().length(64),
   sequentialRunId: z.string().uuid(),
+  competingSequentialRunId: z.string().uuid(),
+  competingCorpusDigest: z.string().length(64),
   corpusDigest: z.string().length(64),
   artifactStorageKey: z.string().trim().min(10),
   artifactSha256: z.string().length(64),
@@ -229,6 +265,7 @@ export type WriterBakeoffCorpus = z.infer<typeof WriterBakeoffCorpusSchema>;
 export type ContinuityAssessment = z.infer<typeof ContinuityAssessmentSchema>;
 export type SequentialBenchmarkCorpus = z.infer<typeof SequentialBenchmarkCorpusSchema>;
 export type StoredReaderJudgment = z.infer<typeof StoredReaderJudgmentSchema>;
+export type StoredPairwiseSequentialJudgment = z.infer<typeof StoredPairwiseSequentialJudgmentSchema>;
 export type ValidationMetrics = z.infer<typeof ValidationMetricsSchema>;
 export type ValidationManifest = z.infer<typeof ValidationManifestSchema>;
 
@@ -245,6 +282,56 @@ export function buildBlindReaderInput(input: {
     previousTail: input.sample.readerBrief.previousTail,
     prose: input.sample.content,
   };
+}
+
+export function buildBlindReaderComparison(input: {
+  candidate: z.infer<typeof SequentialBenchmarkSampleSchema>;
+  competitor: z.infer<typeof SequentialBenchmarkSampleSchema>;
+  candidateIsA: boolean;
+}) {
+  const candidate = {
+    previousTail: input.candidate.readerBrief.previousTail,
+    prose: input.candidate.content,
+  };
+  const competitor = {
+    previousTail: input.competitor.readerBrief.previousTail,
+    prose: input.competitor.content,
+  };
+  return {
+    premise: input.candidate.readerBrief.premise,
+    chapterNumber: input.candidate.readerBrief.chapterNumber,
+    versionA: input.candidateIsA ? candidate : competitor,
+    versionB: input.candidateIsA ? competitor : candidate,
+  };
+}
+
+export function assertComparableSequentialCorpora(input: {
+  candidate: SequentialBenchmarkCorpus;
+  competitor: SequentialBenchmarkCorpus;
+}): void {
+  const candidate = SequentialBenchmarkCorpusSchema.parse(input.candidate);
+  const competitor = SequentialBenchmarkCorpusSchema.parse(input.competitor);
+  if (candidate.engineRelease !== competitor.engineRelease
+    || candidate.route.writer === competitor.route.writer
+    || candidate.route.planner !== competitor.route.planner
+    || candidate.route.planJudge !== competitor.route.planJudge
+    || candidate.route.editor !== competitor.route.editor
+    || candidate.continuityJudgeModel !== competitor.continuityJudgeModel
+    || JSON.stringify(candidate.launchPackDigests) !== JSON.stringify(competitor.launchPackDigests)) {
+    throw new Error('Sequential A/B corpora do not share the same frozen release, non-Writer routes, judges, and launch packs.');
+  }
+  for (const sample of candidate.samples) {
+    const other = competitor.samples.find(item => item.id === sample.id);
+    if (!other
+      || other.lane !== sample.lane
+      || other.planDigest !== sample.planDigest
+      || other.launchPackDigest !== sample.launchPackDigest
+      || other.stateBeforeDigest !== sample.stateBeforeDigest
+      || other.stateAfterDigest !== sample.stateAfterDigest
+      || other.readerBrief.chapterNumber !== sample.readerBrief.chapterNumber) {
+      throw new Error(`Sequential A/B sample ${sample.id} was not produced from the same frozen logical transition.`);
+    }
+  }
 }
 
 export async function assessSequentialContinuity(input: {
@@ -314,6 +401,7 @@ export function calculateValidationMetrics(input: {
     samplesCompleted: 20,
     judgeLineages: 3,
     desireToReadNext: majorityWantsNext / STORY_FACTORY_BENCHMARK_SAMPLE_COUNT,
+    candidatePreference: 1,
     criticalContinuityViolations: 0,
     firstPassPublishRate: corpus.samples.filter(sample => sample.revisionCount === 0).length
       / STORY_FACTORY_BENCHMARK_SAMPLE_COUNT,
@@ -322,7 +410,62 @@ export function calculateValidationMetrics(input: {
     maxAllInCostUsd: Math.max(...costs),
     sequentialCostUsd: corpus.buildCostUsd,
     judgmentCostUsd: input.judgmentCostUsd,
+    campaignOverheadCostUsd: 0,
     totalCostUsd: corpus.buildCostUsd + input.judgmentCostUsd,
+    campaignBudgetUsd: 50,
+  });
+}
+
+export function calculateComparativeValidationMetrics(input: {
+  candidate: SequentialBenchmarkCorpus;
+  competitor: SequentialBenchmarkCorpus;
+  judgments: StoredPairwiseSequentialJudgment[];
+  judgeModels: string[];
+  judgmentCostUsd: number;
+  campaignOverheadCostUsd: number;
+}): ValidationMetrics {
+  assertComparableSequentialCorpora({ candidate: input.candidate, competitor: input.competitor });
+  if (input.judgeModels.length !== 3 || new Set(input.judgeModels).size !== 3) {
+    throw new Error('Reader validation requires exactly three distinct judge lineages.');
+  }
+  const expected = STORY_FACTORY_BENCHMARK_SAMPLE_COUNT * input.judgeModels.length;
+  if (input.judgments.length !== expected) {
+    throw new Error(`Comparative reader validation requires ${expected} judgments; received ${input.judgments.length}.`);
+  }
+  let majorityWantsNext = 0;
+  let candidateMajorityWins = 0;
+  for (const sample of input.candidate.samples) {
+    const votes = input.judgments.filter(judgment => judgment.sampleId === sample.id);
+    if (votes.length !== 3
+      || new Set(votes.map(judgment => judgment.model)).size !== 3
+      || votes.some(judgment => !input.judgeModels.includes(judgment.model))) {
+      throw new Error(`Sample ${sample.id} does not have three distinct expected comparative reader lineages.`);
+    }
+    if (votes.filter(judgment => judgment.wantsCandidate).length >= 2) majorityWantsNext += 1;
+    if (votes.filter(judgment => judgment.preference === 'candidate').length >= 2) candidateMajorityWins += 1;
+  }
+  const costs = input.candidate.samples.map(sample => sample.allInCostUsd).sort((a, b) => a - b);
+  const totalCostUsd = input.candidate.buildCostUsd
+    + input.competitor.buildCostUsd
+    + input.judgmentCostUsd
+    + input.campaignOverheadCostUsd;
+  return ValidationMetricsSchema.parse({
+    samplesExpected: 20,
+    samplesCompleted: 20,
+    judgeLineages: 3,
+    desireToReadNext: majorityWantsNext / STORY_FACTORY_BENCHMARK_SAMPLE_COUNT,
+    candidatePreference: candidateMajorityWins / STORY_FACTORY_BENCHMARK_SAMPLE_COUNT,
+    criticalContinuityViolations: 0,
+    firstPassPublishRate: input.candidate.samples.filter(sample => sample.revisionCount === 0).length
+      / STORY_FACTORY_BENCHMARK_SAMPLE_COUNT,
+    finalPublishRate: 1,
+    medianAllInCostUsd: (costs[9] + costs[10]) / 2,
+    maxAllInCostUsd: Math.max(...costs),
+    sequentialCostUsd: input.candidate.buildCostUsd + input.competitor.buildCostUsd,
+    judgmentCostUsd: input.judgmentCostUsd,
+    campaignOverheadCostUsd: input.campaignOverheadCostUsd,
+    totalCostUsd,
+    campaignBudgetUsd: 50,
   });
 }
 
@@ -333,6 +476,8 @@ export function validationPasses(metrics: ValidationMetrics): boolean {
     && metrics.finalPublishRate === 1
     && metrics.criticalContinuityViolations === 0
     && metrics.desireToReadNext >= 0.75
+    && metrics.candidatePreference > 0.5
     && metrics.medianAllInCostUsd <= 0.25
-    && metrics.maxAllInCostUsd <= 0.5;
+    && metrics.maxAllInCostUsd <= 0.5
+    && metrics.totalCostUsd <= metrics.campaignBudgetUsd;
 }

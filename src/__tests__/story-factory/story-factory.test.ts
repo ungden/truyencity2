@@ -27,11 +27,14 @@ import {
   appendAcceptedOutcome,
   applyCanonExtension,
   applyChapterPlan,
+  assertComparableSequentialCorpora,
+  buildBlindReaderComparison,
   buildBlindReaderInput,
   buildChapterContexts,
   buildWriterBrief,
   isStoryFactoryEnabled,
   calculateValidationMetrics,
+  calculateComparativeValidationMetrics,
   loadRelevantStoryMemory,
   loadRelevantStoryTransitions,
   memoryEntityIdsForArc,
@@ -87,7 +90,7 @@ const seriesStages = Array.from({ length: 8 }, (_, index) => ({
 }));
 
 const kernel: StoryKernel = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   title: 'Trọng Sinh Về Làng Biển, Tôi Đưa Cả Nhà Ăn No',
   description: 'Một người đàn ông trở lại làng biển và dùng kinh nghiệm nghề nghiệp để gây dựng sinh kế bền vững cho gia đình.',
   genreLane: 'do-thi-nien-dai',
@@ -149,6 +152,26 @@ const kernel: StoryKernel = {
     { promiseId: 'promise_3', openedStageId: 'stage_2', dueStageId: 'stage_6', payoff: 'Hải xây được cơ sở chế biến có việc làm ổn định.' },
     { promiseId: 'promise_4', openedStageId: 'stage_4', dueStageId: 'stage_8', payoff: 'Chuỗi sinh kế giữ được nguồn lợi cho thế hệ sau.' },
   ],
+  worldMechanics: [
+    {
+      id: 'mechanic_exchange', name: 'Đổi vốn lấy hàng', kind: 'conversion',
+      description: 'Một đơn vị vốn mua được lượng hàng có giá trị thấp hơn do chi phí giao dịch.',
+      inputsPerBatch: [{ resourceId: 'money', amount: 1 }],
+      outputsPerBatch: [{ resourceId: 'money', amount: 0.9 }],
+      lossesPerBatch: [], maximumBatchesPerUse: 100,
+    },
+    {
+      id: 'mechanic_trade', name: 'Quyền giao dịch của Hải', kind: 'capability',
+      description: 'Hải trực tiếp thương lượng các giao dịch nhỏ.',
+      allowedActorIds: ['main'], requiredFacts: [{ factId: 'fact_day', expected: 'ngay_0' }], requiredResourceIds: ['money'],
+      capacityUnit: 'giao_dich', maximumUnitsPerMinute: 1,
+    },
+    {
+      id: 'mechanic_daylight', name: 'Hoạt động trong ngày', kind: 'constraint',
+      description: 'Công việc hiện tại phải diễn ra trong ngày đã được ghi nhận.',
+      requiredFacts: [{ factId: 'fact_day', expected: 'ngay_0' }], forbiddenFacts: [],
+    },
+  ],
   worldRules: [
     { id: 'rule_market', claim: 'Giá cá thay đổi theo độ tươi, mùa và khả năng đưa hàng tới chợ huyện.', exceptions: [] },
     { id: 'rule_weather', claim: 'Thuyền nhỏ phải chịu giới hạn gió, con nước và thời gian bảo quản.', exceptions: [] },
@@ -203,28 +226,16 @@ function acceptedOutcome(evidence: string) {
 
 function editorWirePass(deltaId: string, evidence: string) {
   return {
-    v: 1 as const,
-    status: 'pass' as const,
-    issues: [],
+    v: 2 as const,
+    continuityIssues: [],
+    readingIssues: [],
     deltaChecks: [{ deltaId, realized: true, evidence }],
-    experienceChecks: {
-      sceneDramatized: true,
-      characterAgenda: true,
-      earnedOutcome: true,
-      naturalLanguage: true,
-    },
-    experienceEvidence: {
-      sceneDramatized: evidence,
-      characterAgenda: evidence,
-      earnedOutcome: evidence,
-      naturalLanguage: evidence,
-    },
     outcome: acceptedOutcome(evidence),
   };
 }
 
 const arc: ArcPlan = {
-  schemaVersion: 1, arcNumber: 1, stageId: 'stage_1', startChapter: 1, plannedEndChapter: 20,
+  schemaVersion: 2, arcNumber: 1, stageId: 'stage_1', startChapter: 1, plannedEndChapter: 20,
   objective: 'Tạo được đầu ra đầu tiên và làm cho gia đình tin vào cách làm mới.',
   terminalChanges: ['Có khách hàng đầu tiên và một phần vốn quay vòng.'],
   activeConflicts: ['Thiếu vốn và hàng dễ hỏng.'],
@@ -232,6 +243,7 @@ const arc: ArcPlan = {
   activeLocationIds: ['home', 'beach'],
   activeResourceIds: ['money'],
   activeWorldRuleIds: ['rule_market', 'rule_weather'],
+  activeMechanicIds: ['mechanic_exchange', 'mechanic_trade', 'mechanic_daylight'],
   duePromiseIds: ['promise_house'],
   progression: ['Tiền mặt tăng rõ ràng', 'Dụng cụ được nâng cấp', 'Uy tín với đầu ra tăng'],
 };
@@ -243,7 +255,7 @@ const routes: ModelRoutes = {
 
 function plan(chapterNumber: number, before = `ngay_${chapterNumber - 1}`): ChapterPlan {
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     chapterNumber,
     arcNumber: 1,
     storyTimeAfterMinutes: chapterNumber * 60,
@@ -259,15 +271,16 @@ function plan(chapterNumber: number, before = `ngay_${chapterNumber - 1}`): Chap
       requiredDeltaIds: [`delta_${chapterNumber}`],
     }],
     requiredDeltas: [{ id: `delta_${chapterNumber}`, kind: 'fact', factId: 'fact_day', before, after: `ngay_${chapterNumber}` }],
+    mechanicUses: [],
   };
 }
 
 function plannerWire(chapterNumber = 1) {
   return {
-    v: 1 as const,
+    v: 2 as const,
     start: chapterNumber,
     chaptersJson: [JSON.stringify({
-      v: 1, n: chapterNumber, arc: 1, time: chapterNumber * 60,
+      v: 2, n: chapterNumber, arc: 1, time: chapterNumber * 60,
       pre: [{ k: 'fact', id: 'fact_day', value: `ngay_${chapterNumber - 1}` }],
       rules: ['rule_market'],
       scenes: [{
@@ -279,6 +292,7 @@ function plannerWire(chapterNumber = 1) {
         id: `delta_${chapterNumber}`, k: 'fact', target: 'fact_day', counterpart: null,
         before: `ngay_${chapterNumber - 1}`, change: null, after: `ngay_${chapterNumber}`, source: null, sink: null,
       }],
+      mechanics: [],
     })],
   };
 }
@@ -315,8 +329,114 @@ describe('canonical Story Factory', () => {
       { id: 'spend', kind: 'resource_numeric', resourceId: 'money', before: 150, delta: -120, after: 30, source: null, sink: 'mua dụng cụ' },
     ];
     chapter.scenes[0].requiredDeltaIds = ['gain', 'spend'];
+    chapter.mechanicUses = [{
+      id: 'use_trade',
+      sceneId: 'scene_1',
+      mechanicId: 'mechanic_trade',
+      actorId: 'main',
+      quantity: 1,
+      preconditionFactIds: ['fact_day'],
+      deltaIds: ['gain', 'spend'],
+    }];
     const result = applyChapterPlan({ kernel, state: initialState, plan: chapter });
     expect(result.state.resources[0]).toEqual({ resourceId: 'money', kind: 'numeric', value: 30 });
+  });
+
+  test('rejects a resource transition that is not owned by a validated mechanic', () => {
+    const chapter = plan(1);
+    chapter.requiredDeltas = [{
+      id: 'unowned_money',
+      kind: 'resource_numeric',
+      resourceId: 'money',
+      before: 100,
+      delta: 10,
+      after: 110,
+      source: 'không rõ cơ chế',
+      sink: null,
+    }];
+    chapter.scenes[0].requiredDeltaIds = ['unowned_money'];
+    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter }))
+      .toThrow('changes resources without a validated world mechanic');
+  });
+
+  test('deterministic causal validation catches 100 cross-lane failures without a model call', () => {
+    const lanes = ['do-thi', 'nien-dai', 'huyen-huyen', 'tien-hiep-moi'];
+    const failures: Array<{ kernel: StoryKernel; plan: ChapterPlan }> = [];
+    for (const lane of lanes) {
+      for (let index = 0; index < 25; index += 1) {
+        const sampleKernel = { ...structuredClone(kernel), genreLane: lane };
+        const samplePlan = plan(1);
+        const family = index % 8;
+        if (family === 0) {
+          samplePlan.scenes[0].requiredDeltaIds = ['delta_money'];
+          samplePlan.requiredDeltas = [{
+            id: 'delta_money', kind: 'resource_numeric', resourceId: 'money',
+            before: 100, delta: -2 - index / 100, after: 98 - index / 100,
+            source: null, sink: 'chi phí đổi hàng',
+          }];
+          samplePlan.mechanicUses = [{
+            id: 'use_exchange', sceneId: 'scene_1', mechanicId: 'mechanic_exchange',
+            actorId: 'main', quantity: 10, preconditionFactIds: [], deltaIds: ['delta_money'],
+          }];
+        } else if (family === 1) {
+          samplePlan.mechanicUses = [{
+            id: `use_actor_${index}`, sceneId: 'scene_1', mechanicId: 'mechanic_trade',
+            actorId: 'mother', quantity: 1, preconditionFactIds: ['fact_day'], deltaIds: ['delta_1'],
+          }];
+        } else if (family === 2) {
+          samplePlan.mechanicUses = [{
+            id: `use_capacity_${index}`, sceneId: 'scene_1', mechanicId: 'mechanic_trade',
+            actorId: 'main', quantity: 61 + index, preconditionFactIds: ['fact_day'], deltaIds: ['delta_1'],
+          }];
+        } else if (family === 3) {
+          sampleKernel.worldMechanics = sampleKernel.worldMechanics.map(mechanic => (
+            mechanic.id === 'mechanic_daylight' && mechanic.kind === 'constraint'
+              ? { ...mechanic, requiredFacts: [], forbiddenFacts: [{ factId: 'fact_day', expected: 'ngay_0' }] }
+              : mechanic
+          ));
+          samplePlan.mechanicUses = [{
+            id: `use_constraint_${index}`, sceneId: 'scene_1', mechanicId: 'mechanic_daylight',
+            actorId: 'main', quantity: 1, preconditionFactIds: [], deltaIds: ['delta_1'],
+          }];
+        } else if (family === 4) {
+          samplePlan.scenes[0].requiredDeltaIds = ['unowned_money'];
+          samplePlan.requiredDeltas = [{
+            id: 'unowned_money', kind: 'resource_numeric', resourceId: 'money',
+            before: 100, delta: 10, after: 110, source: 'không rõ', sink: null,
+          }];
+        } else if (family === 5) {
+          samplePlan.storyTimeAfterMinutes = 10;
+        } else if (family === 6) {
+          samplePlan.mechanicUses = [{
+            id: `use_missing_knowledge_${index}`, sceneId: 'scene_1', mechanicId: 'mechanic_trade',
+            actorId: 'main', quantity: 1, preconditionFactIds: [], deltaIds: ['delta_1'],
+          }];
+        } else {
+          samplePlan.scenes[0] = {
+            ...samplePlan.scenes[0],
+            locationId: 'beach',
+            travelMinutesFromPrevious: 0,
+          };
+          samplePlan.requiredDeltas.push({
+            id: `location_${index}`,
+            kind: 'location',
+            characterId: 'main',
+            beforeLocationId: 'home',
+            afterLocationId: 'beach',
+          });
+          samplePlan.scenes[0].requiredDeltaIds.push(`location_${index}`);
+        }
+        failures.push({ kernel: sampleKernel, plan: samplePlan });
+      }
+    }
+    expect(failures).toHaveLength(100);
+    for (const sample of failures) {
+      expect(() => applyChapterPlan({
+        kernel: sample.kernel,
+        state: initialState,
+        plan: sample.plan,
+      })).toThrow(StoryFactoryError);
+    }
   });
 
   test('rejects real overspend', () => {
@@ -459,7 +579,7 @@ describe('canonical Story Factory', () => {
         },
         initialState: { locationId: 'home', knownFactIds: [], relationshipState: {} },
       }],
-      locations: [], travelRules: [], promises: [], worldRules: [],
+      locations: [], travelRules: [], promises: [], worldRules: [], worldMechanics: [],
     });
     const added = applyCanonExtension({ kernel, state: initialState, extension });
     expect(added.kernel.characters.some(character => character.id === 'buyer_district')).toBe(true);
@@ -482,7 +602,7 @@ describe('canonical Story Factory', () => {
         { fromLocationId: 'home', toLocationId: 'district_market', minimumMinutes: 120 },
         { fromLocationId: 'district_market', toLocationId: 'home', minimumMinutes: 120 },
       ],
-      promises: [], worldRules: [],
+      promises: [], worldRules: [], worldMechanics: [],
     });
     const withLocation = applyCanonExtension({
       kernel: added.kernel,
@@ -529,7 +649,7 @@ describe('canonical Story Factory', () => {
     const query: Record<string, unknown> & {
       then?: (resolve: (value: unknown) => unknown) => Promise<unknown>;
     } = {};
-    for (const method of ['select', 'eq', 'overlaps', 'order', 'limit']) {
+    for (const method of ['select', 'eq', 'in', 'overlaps', 'order', 'limit']) {
       query[method] = () => query;
     }
     query.lte = (_column: string, value: number) => {
@@ -537,7 +657,15 @@ describe('canonical Story Factory', () => {
       return query;
     };
     query.then = resolve => Promise.resolve(resolve({
-      data: [{ after_value: chapterOneOutcome, related_entity_ids: ['main', 'buyer'], chapter_number: 1 }],
+      data: [{
+        chapter_number: 1,
+        delta_id: 'outcome_1',
+        kind: 'chapter_outcome',
+        entity_id: 'story',
+        before_value: null,
+        after_value: chapterOneOutcome,
+        related_entity_ids: ['main', 'buyer'],
+      }],
       error: null,
     }));
     const fakeDb = { from: () => query };
@@ -548,7 +676,7 @@ describe('canonical Story Factory', () => {
       state,
       entityIds: ['buyer'],
     });
-    expect(cutoff).toBe(chapterNumber - 12);
+    expect(cutoff).toBe(chapterNumber);
     expect(memory[0].outcome.chapterNumber).toBe(1);
     expect(memory[0].relatedEntityIds).toContain('buyer');
   });
@@ -568,7 +696,7 @@ describe('canonical Story Factory', () => {
       nextArc: skippedArc,
       canonExtension: {
         stageId: 'stage_3',
-        characters: [], locations: [], travelRules: [], promises: [], worldRules: [],
+        characters: [], locations: [], travelRules: [], promises: [], worldRules: [], worldMechanics: [],
       },
     }]);
     await expect(planArcLifecycle({
@@ -591,7 +719,7 @@ describe('canonical Story Factory', () => {
       nextArc: fillerArc,
       canonExtension: {
         stageId: 'stage_1',
-        characters: [], locations: [], travelRules: [], promises: [], worldRules: [],
+        characters: [], locations: [], travelRules: [], promises: [], worldRules: [], worldMechanics: [],
       },
     }]);
     await expect(planArcLifecycle({
@@ -622,15 +750,21 @@ describe('canonical Story Factory', () => {
           { kind: 'resource', entityId: 'money', expected: 100 },
         ],
       },
-      relevantTransitions: [{
-        chapterNumber: 1,
-        deltaId: 'delta_prior_decision',
-        kind: 'fact',
-        entityId: 'prior_decision',
-        before: null,
-        after: 'buyer_agreed',
-        relatedEntityIds: ['main', 'buyer', 'prior_decision'],
-      }],
+      continuityPacket: {
+        recentOutcomes: [],
+        firstAndLastRelationships: [],
+        latestEntityTransitions: [{
+          chapterNumber: 1,
+          deltaId: 'delta_prior_decision',
+          kind: 'fact',
+          entityId: 'prior_decision',
+          before: null,
+          after: 'buyer_agreed',
+          relatedEntityIds: ['main', 'buyer', 'prior_decision'],
+        }],
+        promiseOriginsAndProgress: [],
+        recentMechanicUses: [],
+      },
     }));
     expect(brief).not.toContain('endingDirection');
     expect(brief).not.toContain('research');
@@ -642,7 +776,8 @@ describe('canonical Story Factory', () => {
       resources: [{ id: 'money', name: 'Tiền mặt', kind: 'numeric', minimum: 0 }],
     }).success).toBe(false);
     expect(brief).not.toContain('lót trấu và xơ dừa');
-    expect(brief).toContain('prior_decision');
+    expect(brief).toContain('prior decision');
+    expect(brief).not.toContain('delta_prior_decision');
     expect(brief).not.toContain('Hải giải thích bằng việc làm');
     expect(brief).not.toContain('"source"');
     expect(brief).not.toContain('"sink"');
@@ -657,7 +792,7 @@ describe('canonical Story Factory', () => {
     const query: Record<string, unknown> & {
       then?: (resolve: (value: unknown) => unknown) => Promise<unknown>;
     } = {};
-    for (const method of ['select', 'eq', 'neq', 'lte', 'overlaps', 'order', 'limit']) {
+    for (const method of ['select', 'eq', 'in', 'lte', 'overlaps', 'order', 'limit']) {
       query[method] = () => query;
     }
     query.then = resolve => Promise.resolve(resolve({
@@ -678,8 +813,19 @@ describe('canonical Story Factory', () => {
       state: { ...initialState, chapterNumber },
       entityIds: ['buyer'],
     });
-    const brief = JSON.stringify(buildWriterBrief({ kernel, state: initialState, plan: plan(1), relevantTransitions: transitions }));
-    expect(brief).toContain('delta_first_meeting');
+    const brief = JSON.stringify(buildWriterBrief({
+      kernel,
+      state: initialState,
+      plan: plan(1),
+      continuityPacket: {
+        recentOutcomes: [],
+        firstAndLastRelationships: transitions,
+        latestEntityTransitions: [],
+        promiseOriginsAndProgress: [],
+        recentMechanicUses: [],
+      },
+    }));
+    expect(brief).not.toContain('delta_first_meeting');
     expect(brief).toContain('debt_open');
     expect(brief).not.toContain('Hải gặp Tấn lần đầu');
   });
@@ -783,22 +929,18 @@ describe('canonical Story Factory', () => {
     const revised = { title: 'Bản sửa', content: 'Hải lại nhìn required delta nhưng vẫn không làm rõ việc đã thay đổi.' };
     const secondIssue = {
       ...editorWirePass('delta_1', 'không làm rõ'),
-      status: 'revise' as const,
-      issues: [{
+      continuityIssues: [{
         category: 'required_delta' as const,
         severity: 'major' as const,
         scope: 'prose' as const,
-        evidence: 'không làm rõ',
+        currentEvidence: 'không làm rõ',
+        conflictingEvidence: 'delta_1',
+        referenceId: 'delta_1',
         instruction: 'Thực hiện required delta trong cảnh.',
       }],
+      readingIssues: [],
       deltaChecks: [{ deltaId: 'delta_1', realized: false, evidence: 'không làm rõ' }],
-      experienceChecks: {
-        sceneDramatized: false,
-        characterAgenda: true,
-        earnedOutcome: false,
-        naturalLanguage: true,
-      },
-      outcome: { event: '', result: '', method: '', endingSituation: '', evidenceSpans: [] },
+      outcome: null,
     };
     await expect(writeStoryChapter({
       kernel,
@@ -844,6 +986,11 @@ describe('canonical Story Factory', () => {
       allInCostUsd: 0.2,
       revisionCount: index < 4 ? 1 as const : 0 as const,
       planAssessment: { status: 'pass' as const, issues: [] },
+      causalValidation: {
+        validatorVersion: 'causal-validator-test',
+        mechanicUseCount: 0,
+        digest: `${index + 40}`.padStart(64, '0'),
+      },
       continuityAssessment: {
         status: 'pass' as const,
         checks: {
@@ -901,6 +1048,49 @@ describe('canonical Story Factory', () => {
     });
     expect(metrics.firstPassPublishRate).toBe(0.8);
     expect(validationPasses(metrics)).toBe(false);
+    const competitor = SequentialBenchmarkCorpusSchema.parse({
+      ...corpus,
+      route: { ...corpus.route, writer: 'competitor-writer' },
+      samples: corpus.samples.map(sample => ({
+        ...sample,
+        content: 'Bản đối chứng có nội dung đủ dài để schema chấp nhận.',
+      })),
+    });
+    assertComparableSequentialCorpora({ candidate: corpus, competitor });
+    expect(() => assertComparableSequentialCorpora({
+      candidate: corpus,
+      competitor: {
+        ...competitor,
+        samples: competitor.samples.map((sample, index) =>
+          index === 0 ? { ...sample, planDigest: 'f'.repeat(64) } : sample),
+      },
+    })).toThrow('same frozen logical transition');
+    const comparison = buildBlindReaderComparison({
+      candidate: corpus.samples[0],
+      competitor: competitor.samples[0],
+      candidateIsA: false,
+    });
+    expect(JSON.stringify(comparison)).not.toMatch(/chapterPlan|stateBefore|requiredDelta|model|cost/iu);
+    const comparativeJudgments = corpus.samples.flatMap(sample =>
+      ['judge-a', 'judge-b', 'judge-c'].map(model => ({
+        sampleId: sample.id,
+        model,
+        blinded: true as const,
+        preference: 'candidate' as const,
+        wantsCandidate: true,
+        wantsCompetitor: false,
+        usage: { costUsd: 0.01 },
+      })));
+    const comparativeMetrics = calculateComparativeValidationMetrics({
+      candidate: corpus,
+      competitor,
+      judgments: comparativeJudgments,
+      judgeModels: ['judge-a', 'judge-b', 'judge-c'],
+      judgmentCostUsd: 0.6,
+      campaignOverheadCostUsd: 1,
+    });
+    expect(comparativeMetrics.candidatePreference).toBe(1);
+    expect(comparativeMetrics.totalCostUsd).toBeCloseTo(5.6);
     expect(() => SequentialBenchmarkCorpusSchema.parse({
       ...corpus,
       samples: corpus.samples.slice(0, 19),
@@ -920,8 +1110,9 @@ describe('canonical Story Factory', () => {
       builtAt: new Date().toISOString(),
       planner: 'planner-model',
       planJudge: 'plan-judge-model',
-      sourceSequentialDigest: 'a'.repeat(64),
-      samples: Array.from({ length: 10 }, (_, index) => ({
+      sourceDiscoveryDigest: 'a'.repeat(64),
+      discoveryCostUsd: 1,
+      samples: Array.from({ length: 4 }, (_, index) => ({
         id: `brief-${index + 1}`,
         lane: `lane-${index % 4 + 1}`,
         launchPackDigest: `${index % 4 + 1}`.repeat(64),
@@ -931,9 +1122,14 @@ describe('canonical Story Factory', () => {
         plan: plan(1),
         previousTail: null,
         planAssessment: { status: 'pass' as const, issues: [] },
+        causalValidation: {
+          validatorVersion: 'causal-validator-test',
+          mechanicUseCount: 0,
+          digest: `${index + 40}`.padStart(64, '0'),
+        },
       })),
     };
-    expect(WriterBakeoffCorpusSchema.parse(writerCorpus).samples).toHaveLength(10);
+    expect(WriterBakeoffCorpusSchema.parse(writerCorpus).samples).toHaveLength(4);
     expect(() => WriterBakeoffCorpusSchema.parse({
       ...writerCorpus,
       samples: writerCorpus.samples.map((sample, index) => index === 0 ? {
@@ -954,8 +1150,14 @@ describe('canonical Story Factory', () => {
   });
 
   test('Editor pass cannot contain an issue or false delta', () => {
-    expect(EditorAssessmentSchema.safeParse({ status: 'pass', issues: [{ category: 'causality' }], deltaChecks: [{ deltaId: 'delta_1', realized: true, evidence: '' }], outcome: acceptedOutcome('evidence') }).success).toBe(false);
-    expect(EditorAssessmentSchema.safeParse({ status: 'pass', issues: [], deltaChecks: [{ deltaId: 'delta_1', realized: false, evidence: '' }], outcome: acceptedOutcome('evidence') }).success).toBe(false);
+    expect(EditorAssessmentSchema.safeParse({
+      status: 'pass', continuityIssues: [{ category: 'causality' }], readingIssues: [],
+      deltaChecks: [{ deltaId: 'delta_1', realized: true, evidence: '' }], outcome: acceptedOutcome('evidence'),
+    }).success).toBe(false);
+    expect(EditorAssessmentSchema.safeParse({
+      status: 'pass', continuityIssues: [], readingIssues: [],
+      deltaChecks: [{ deltaId: 'delta_1', realized: false, evidence: '' }], outcome: acceptedOutcome('evidence'),
+    }).success).toBe(false);
   });
 
   test('flat Editor wire materializes into the canonical evidence contract', () => {
@@ -963,49 +1165,36 @@ describe('canonical Story Factory', () => {
     expect(assessment).toMatchObject({ status: 'pass', outcome: { method: 'chia việc và kiểm tra nguồn lực' } });
     expect(() => materializeEditorAssessment({
       ...editorWirePass('delta_1', 'chia việc'),
-      status: 'revise',
-      outcome: { event: '', result: '', method: '', endingSituation: '', evidenceSpans: [] },
+      outcome: null,
     })).toThrow();
   });
 
-  test('code derives revise when model says pass but also returns an issue', () => {
+  test('code derives revise from issues without accepting a model decision', () => {
     const assessment = materializeEditorAssessment({
       ...editorWirePass('delta_1', 'chia việc'),
-      issues: [{
-        category: 'resource', severity: 'major', scope: 'prose',
+      readingIssues: [{
+        category: 'unearned_outcome', severity: 'major',
         evidence: 'tự bán thêm hàng',
-        instruction: 'Bỏ giao dịch không có trong required delta.',
+        instruction: 'Bỏ giao dịch không có trong thay đổi bắt buộc.',
       }],
+      outcome: null,
     });
-    expect(assessment).toMatchObject({ status: 'revise', issues: [{ category: 'resource' }] });
+    expect(assessment).toMatchObject({ status: 'revise', readingIssues: [{ category: 'unearned_outcome' }] });
   });
 
   test('Editor prose issue must ground to bytes in the draft', async () => {
     const draft = { title: 'Mẻ lưới đầu', content: 'Hải trải tấm lưới lên hiên rồi cùng mẹ kiểm tra từng mắt rách.' };
     const invalidIssue = {
-      v: 1 as const,
-      status: 'revise' as const,
-      issues: [{
+      v: 2 as const,
+      continuityIssues: [],
+      readingIssues: [{
         category: 'stock_reaction' as const,
         severity: 'major' as const,
-        scope: 'prose' as const,
         evidence: 'cả làng bàng hoàng reo hò',
         instruction: 'Thay phản ứng tập thể bằng hành động có agenda riêng.',
       }],
       deltaChecks: [{ deltaId: 'delta_1', realized: true, evidence: 'trải tấm lưới' }],
-      experienceChecks: {
-        sceneDramatized: true,
-        characterAgenda: true,
-        earnedOutcome: true,
-        naturalLanguage: false,
-      },
-      experienceEvidence: {
-        sceneDramatized: 'trải tấm lưới',
-        characterAgenda: 'cùng mẹ kiểm tra',
-        earnedOutcome: 'kiểm tra từng mắt rách',
-        naturalLanguage: 'trải tấm lưới',
-      },
-      outcome: { event: '', result: '', method: '', endingSituation: '', evidenceSpans: [] },
+      outcome: null,
     };
     await expect(writeStoryChapter({
       kernel, state: initialState, plan: plan(1), routes,
@@ -1062,16 +1251,16 @@ describe('canonical Story Factory', () => {
     const provider = new QueueProvider([plannerWire(), {
       status: 'pass',
       checks: {
-        causalMechanism: true, earnedProgression: true, oppositionAgenda: true,
-        sceneVariety: true, stageAlignment: true, stateTransition: true,
+        protagonistAgency: true, earnedProgression: true, oppositionAgenda: true,
+        sceneVariety: true, stageAlignment: true, outcomeWeight: true,
       },
       checkEvidence: {
-        causalMechanism: 'chapter 1 scene_1 delta_1',
+        protagonistAgency: 'chapter 1 scene_1 delta_1',
         earnedProgression: 'chapter 1 scene_1 delta_1',
         oppositionAgenda: 'chapter 1 scene_1 delta_1',
         sceneVariety: 'chapter 1 scene_1 delta_1',
         stageAlignment: 'chapter 1 scene_1 delta_1',
-        stateTransition: 'chapter 1 scene_1 delta_1',
+        outcomeWeight: 'chapter 1 scene_1 delta_1',
       },
       issues: [],
     }]);
@@ -1084,16 +1273,16 @@ describe('canonical Story Factory', () => {
     const revise = {
       status: 'revise' as const,
       checks: {
-        causalMechanism: true, earnedProgression: false, oppositionAgenda: true,
-        sceneVariety: true, stageAlignment: true, stateTransition: true,
+        protagonistAgency: true, earnedProgression: false, oppositionAgenda: true,
+        sceneVariety: true, stageAlignment: true, outcomeWeight: true,
       },
       checkEvidence: {
-        causalMechanism: 'chapter 1 scene_1 delta_1',
+        protagonistAgency: 'chapter 1 scene_1 delta_1',
         earnedProgression: 'chapter 1 scene_1 delta_1',
         oppositionAgenda: 'chapter 1 scene_1 delta_1',
         sceneVariety: 'chapter 1 scene_1 delta_1',
         stageAlignment: 'chapter 1 scene_1 delta_1',
-        stateTransition: 'chapter 1 scene_1 delta_1',
+        outcomeWeight: 'chapter 1 scene_1 delta_1',
       },
       issues: [{
         category: 'earned_progression' as const,
@@ -1107,16 +1296,16 @@ describe('canonical Story Factory', () => {
     const provider = new QueueProvider([plannerWire(), revise, plannerWire(), {
       status: 'pass',
       checks: {
-        causalMechanism: true, earnedProgression: true, oppositionAgenda: true,
-        sceneVariety: true, stageAlignment: true, stateTransition: true,
+        protagonistAgency: true, earnedProgression: true, oppositionAgenda: true,
+        sceneVariety: true, stageAlignment: true, outcomeWeight: true,
       },
       checkEvidence: {
-        causalMechanism: 'chapter 1 scene_1 delta_1',
+        protagonistAgency: 'chapter 1 scene_1 delta_1',
         earnedProgression: 'chapter 1 scene_1 delta_1',
         oppositionAgenda: 'chapter 1 scene_1 delta_1',
         sceneVariety: 'chapter 1 scene_1 delta_1',
         stageAlignment: 'chapter 1 scene_1 delta_1',
-        stateTransition: 'chapter 1 scene_1 delta_1',
+        outcomeWeight: 'chapter 1 scene_1 delta_1',
       },
       issues: [],
     }]);
@@ -1147,16 +1336,16 @@ describe('canonical Story Factory', () => {
     const revise = {
       status: 'revise' as const,
       checks: {
-        causalMechanism: true, earnedProgression: true, oppositionAgenda: false,
-        sceneVariety: true, stageAlignment: true, stateTransition: true,
+        protagonistAgency: true, earnedProgression: true, oppositionAgenda: false,
+        sceneVariety: true, stageAlignment: true, outcomeWeight: true,
       },
       checkEvidence: {
-        causalMechanism: 'chapter 1 scene_1 delta_1',
+        protagonistAgency: 'chapter 1 scene_1 delta_1',
         earnedProgression: 'chapter 1 scene_1 delta_1',
         oppositionAgenda: 'chapter 1 scene_1 delta_1',
         sceneVariety: 'chapter 1 scene_1 delta_1',
         stageAlignment: 'chapter 1 scene_1 delta_1',
-        stateTransition: 'chapter 1 scene_1 delta_1',
+        outcomeWeight: 'chapter 1 scene_1 delta_1',
       },
       issues: [{
         category: 'opposition_agenda' as const,
@@ -1222,8 +1411,8 @@ describe('canonical Story Factory', () => {
   });
 
   test('an exhausted rolling plan routes the next chapter back to planning', () => {
-    expect(rollingPlanContainsChapter({ schemaVersion: 1, startChapter: 6, plans: [] }, 6)).toBe(false);
-    expect(rollingPlanContainsChapter({ schemaVersion: 1, startChapter: 1, plans: [plan(5)] }, 5)).toBe(true);
+    expect(rollingPlanContainsChapter({ schemaVersion: 2, startChapter: 6, plans: [] }, 6)).toBe(false);
+    expect(rollingPlanContainsChapter({ schemaVersion: 2, startChapter: 1, plans: [plan(5)] }, 5)).toBe(true);
   });
 
   test('factory enablement tolerates harmless environment whitespace', () => {
@@ -1256,7 +1445,7 @@ describe('canonical Story Factory', () => {
     const b = Array.from({ length: 6 }, (_, index) => candidate(`b${index + 1}`));
     const selected = a[0];
     const pack: LaunchPack = {
-      schemaVersion: 1, selectedConceptId: selected.id,
+      schemaVersion: 2, selectedConceptId: selected.id,
       kernel: { ...kernel, mechanismFingerprint: selected.mechanismFingerprint, rewardLoopFingerprint: selected.rewardLoopFingerprint, conflictEconomyFingerprint: selected.conflictEconomyFingerprint },
       arc: { ...arc, startChapter: 1 }, initialState,
       coverPrompt: 'Một làng biển Việt Nam cuối thập niên tám mươi lúc bình minh, thuyền gỗ và sân phơi cá, không chữ.',
@@ -1281,7 +1470,7 @@ describe('canonical Story Factory', () => {
       criticalAssumptions: ['Nhân vật phải lao động và trả đủ chi phí đầu vào.'],
     }));
     const {
-      worldModel, worldRules, locations, travelRules, resources,
+      worldModel, worldMechanics, worldRules, locations, travelRules, resources,
       progressionTracks, seriesSpine, longPromises, promises, endingDirection,
       ...identityKernel
     } = pack.kernel;
@@ -1291,7 +1480,7 @@ describe('canonical Story Factory', () => {
       { selectedIds: [a[0].id, b[0].id], reasons: ['Cơ chế A rõ và dài hơi.', 'Cơ chế B có conflict economy tốt.'] },
       { simulations },
       { selectedConceptId: pack.selectedConceptId, coverPrompt: pack.coverPrompt, kernel: identityKernel },
-      { kernel: { worldModel, worldRules, locations, travelRules, resources } },
+      { kernel: { worldModel, worldMechanics, worldRules, locations, travelRules, resources } },
       { kernel: { progressionTracks, seriesSpine, longPromises, promises, endingDirection } },
       { arc: pack.arc, initialState: pack.initialState },
     ]);

@@ -110,7 +110,9 @@ async function main() {
     chapterAssessments.push({
       chapterNumber,
       status: assessed.assessment.status,
-      issues: assessed.assessment.status === 'revise' ? assessed.assessment.issues : [],
+      issues: assessed.assessment.status === 'revise'
+        ? [...assessed.assessment.continuityIssues, ...assessed.assessment.readingIssues]
+        : [],
     });
   }
 

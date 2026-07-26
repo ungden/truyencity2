@@ -59,7 +59,7 @@ async function main() {
           evidenceSpans: ['Nội dung smoke'],
         }],
       },
-      p_remaining_plan: { schemaVersion: 1, startChapter: 2, plans: [] },
+      p_remaining_plan: { schemaVersion: 2, startChapter: 2, plans: [] },
       p_events: [
         {
           deltaId: 'smoke_event', kind: 'fact', entityId: 'smoke_fact', before: null,
@@ -82,7 +82,8 @@ async function main() {
       ],
       p_assessment: {
         status: 'pass',
-        issues: [],
+        continuityIssues: [],
+        readingIssues: [],
         deltaChecks: [{ deltaId: 'smoke_event', realized: true, evidence: 'smoke' }],
         outcome: {
           event: 'Một transaction smoke được thực hiện.',
@@ -104,7 +105,8 @@ async function main() {
         },
         initialAssessment: {
           status: 'pass',
-          issues: [],
+          continuityIssues: [],
+          readingIssues: [],
           deltaChecks: [{ deltaId: 'smoke_event', realized: true, evidence: 'smoke' }],
           outcome: {
             event: 'Một transaction smoke được thực hiện.',
@@ -117,7 +119,8 @@ async function main() {
         revisionDraft: null,
         finalAssessment: {
           status: 'pass',
-          issues: [],
+          continuityIssues: [],
+          readingIssues: [],
           deltaChecks: [{ deltaId: 'smoke_event', realized: true, evidence: 'smoke' }],
           outcome: {
             event: 'Một transaction smoke được thực hiện.',
@@ -201,7 +204,7 @@ async function main() {
       p_lifecycle_status: 'continue',
       p_kernel_after: { smokeKernel: 2 },
       p_state_after: params.p_state_after,
-      p_next_arc: { schemaVersion: 1, arcNumber: 2, startChapter: 2, plannedEndChapter: 21 },
+      p_next_arc: { schemaVersion: 2, arcNumber: 2, startChapter: 2, plannedEndChapter: 21 },
       p_output_artifact: { status: 'continue' },
       p_usage: [],
       p_cost_usd: 0,

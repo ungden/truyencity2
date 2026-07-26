@@ -67,7 +67,7 @@ export const ProgressionTrackSchema = z.object({
 
 const SpineExpansionSeedSchema = z.object({
   id: stableId,
-  kind: z.enum(['character', 'location', 'promise', 'world_rule']),
+  kind: z.enum(['character', 'location', 'promise', 'world_rule', 'world_mechanic']),
   description: prose,
 }).strict();
 
@@ -93,8 +93,49 @@ export const LongPromiseSchema = z.object({
   payoff: prose,
 }).strict();
 
+const MechanicResourceAmountSchema = z.object({
+  resourceId: stableId,
+  amount: z.number().finite().positive(),
+}).strict();
+const MechanicFactConditionSchema = z.object({
+  factId: stableId,
+  expected: z.union([z.string().trim().min(1).max(2_000), z.number().finite()]),
+}).strict();
+
+export const WorldMechanicSchema = z.discriminatedUnion('kind', [
+  z.object({
+    id: stableId,
+    name: shortText,
+    kind: z.literal('conversion'),
+    description: mechanicalText,
+    inputsPerBatch: z.array(MechanicResourceAmountSchema).min(1).max(12),
+    outputsPerBatch: z.array(MechanicResourceAmountSchema).min(1).max(12),
+    lossesPerBatch: z.array(MechanicResourceAmountSchema).max(8).default([]),
+    maximumBatchesPerUse: z.number().finite().positive().max(1_000_000).nullable(),
+  }).strict(),
+  z.object({
+    id: stableId,
+    name: shortText,
+    kind: z.literal('capability'),
+    description: mechanicalText,
+    allowedActorIds: z.array(stableId).max(40).default([]),
+    requiredFacts: z.array(MechanicFactConditionSchema).max(20).default([]),
+    requiredResourceIds: z.array(stableId).max(20).default([]),
+    capacityUnit: z.string().trim().min(1).max(40).nullable(),
+    maximumUnitsPerMinute: z.number().finite().positive().max(1_000_000).nullable(),
+  }).strict(),
+  z.object({
+    id: stableId,
+    name: shortText,
+    kind: z.literal('constraint'),
+    description: mechanicalText,
+    requiredFacts: z.array(MechanicFactConditionSchema).max(20).default([]),
+    forbiddenFacts: z.array(MechanicFactConditionSchema).max(20).default([]),
+  }).strict(),
+]);
+
 export const StoryKernelSchema = z.object({
-  schemaVersion: z.literal(1),
+  schemaVersion: z.literal(2),
   title: z.string().trim().min(4).max(180),
   description: z.string().trim().min(40).max(2_000),
   genreLane: z.string().trim().min(2).max(80),
@@ -115,6 +156,7 @@ export const StoryKernelSchema = z.object({
     stages: z.array(SeriesStageSchema).min(8).max(15),
   }).strict(),
   longPromises: z.array(LongPromiseSchema).min(4).max(40),
+  worldMechanics: z.array(WorldMechanicSchema).min(3).max(100),
   worldRules: z.array(z.object({
     id: stableId,
     claim: prose,
@@ -154,6 +196,44 @@ export const StoryKernelSchema = z.object({
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['protagonistId'], message: 'Unknown protagonist id.' });
   }
   const locations = new Set(kernel.locations.map(item => item.id));
+  const resources = new Set(kernel.resources.map(item => item.id));
+  const mechanicIds = new Set(kernel.worldMechanics.map(item => item.id));
+  if (mechanicIds.size !== kernel.worldMechanics.length) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['worldMechanics'], message: 'World mechanic IDs must be unique.' });
+  }
+  kernel.worldMechanics.forEach((mechanic, index) => {
+    if (mechanic.kind === 'conversion') {
+      for (const item of [...mechanic.inputsPerBatch, ...mechanic.outputsPerBatch, ...mechanic.lossesPerBatch]) {
+        if (!resources.has(item.resourceId)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['worldMechanics', index],
+            message: `World mechanic references unknown resource ${item.resourceId}.`,
+          });
+        }
+      }
+    }
+    if (mechanic.kind === 'capability') {
+      mechanic.allowedActorIds.forEach(actorId => {
+        if (!characters.has(actorId)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['worldMechanics', index, 'allowedActorIds'],
+            message: `Capability references unknown actor ${actorId}.`,
+          });
+        }
+      });
+      mechanic.requiredResourceIds.forEach(resourceId => {
+        if (!resources.has(resourceId)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['worldMechanics', index, 'requiredResourceIds'],
+            message: `Capability references unknown resource ${resourceId}.`,
+          });
+        }
+      });
+    }
+  });
   kernel.travelRules.forEach((rule, index) => {
     if (!locations.has(rule.fromLocationId) || !locations.has(rule.toLocationId)) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['travelRules', index], message: 'Travel rule references an unknown location.' });
@@ -285,7 +365,7 @@ export const StoryStateSchema = z.object({
 }).strict();
 
 const arcPlanShape = {
-  schemaVersion: z.literal(1),
+  schemaVersion: z.literal(2),
   arcNumber: z.number().int().positive(),
   stageId: stableId,
   startChapter: z.number().int().positive(),
@@ -297,6 +377,7 @@ const arcPlanShape = {
   activeLocationIds: z.array(stableId).min(1).max(24),
   activeResourceIds: z.array(stableId).max(24),
   activeWorldRuleIds: z.array(stableId).min(1).max(24),
+  activeMechanicIds: z.array(stableId).min(1).max(24),
   duePromiseIds: z.array(stableId).max(20),
   progression: z.array(prose).min(1).max(12),
 } as const;
@@ -390,7 +471,7 @@ export const StateDeltaSchema = z.discriminatedUnion('kind', [
 ]);
 
 export const ChapterPlanSchema = z.object({
-  schemaVersion: z.literal(1),
+  schemaVersion: z.literal(2),
   chapterNumber: z.number().int().positive(),
   arcNumber: z.number().int().positive(),
   storyTimeAfterMinutes: z.number().int().nonnegative(),
@@ -413,24 +494,46 @@ export const ChapterPlanSchema = z.object({
     requiredDeltaIds: z.array(stableId).max(20),
   }).strict()).min(1).max(5),
   requiredDeltas: z.array(StateDeltaSchema).min(1).max(30),
+  mechanicUses: z.array(z.object({
+    id: stableId,
+    sceneId: stableId,
+    mechanicId: stableId,
+    actorId: stableId,
+    quantity: z.number().finite().positive().max(1_000_000),
+    preconditionFactIds: z.array(stableId).max(20),
+    deltaIds: z.array(stableId).min(1).max(30),
+  }).strict()).max(30),
 }).strict();
 
 export const RollingPlanSchema = z.object({
-  schemaVersion: z.literal(1),
+  schemaVersion: z.literal(2),
   startChapter: z.number().int().positive(),
   plans: z.array(ChapterPlanSchema).min(1).max(5),
 }).strict();
 
-export const EditorIssueSchema = z.object({
+export const EditorContinuityIssueSchema = z.object({
+  // Nineteen production categories adapted from continuity-benchmark failure
+  // families. Reading quality is deliberately kept in ReadingIssueSchema.
   category: z.enum([
-    'canon', 'timeline', 'location', 'resource', 'knowledge', 'authority',
-    'pov', 'required_delta', 'causality', 'character_voice',
-    'prose_naturalness', 'scene_effect', 'narrative_repetition', 'prompt_leak',
-    'expository_prose', 'stock_reaction', 'opposition_agency', 'earned_outcome',
-    'mechanism_credibility',
+    'canon', 'existence', 'event_order', 'timeline', 'location', 'travel',
+    'resource', 'resource_provenance', 'knowledge', 'knowledge_leak',
+    'relationship', 'authority', 'capability', 'world_rule', 'causality',
+    'promise', 'pov', 'required_delta', 'prompt_leak',
   ]),
   severity: z.enum(['critical', 'major', 'moderate']),
   scope: z.enum(['prose', 'plan', 'kernel']),
+  currentEvidence: z.string().trim().min(1).max(800),
+  conflictingEvidence: z.string().trim().min(1).max(800),
+  referenceId: stableId.nullable(),
+  instruction: z.string().trim().min(5).max(800),
+}).strict();
+
+export const ReadingIssueSchema = z.object({
+  category: z.enum([
+    'expository_prose', 'tool_character', 'unnatural_dialogue', 'unearned_outcome',
+    'stock_reaction', 'ineffective_scene', 'narrative_repetition',
+  ]),
+  severity: z.enum(['major', 'moderate']),
   evidence: z.string().trim().min(1).max(800),
   instruction: z.string().trim().min(5).max(800),
 }).strict();
@@ -441,19 +544,27 @@ const deltaCheck = z.object({
   evidence: z.string().trim().max(800),
 }).strict();
 
-export const EditorAssessmentSchema = z.discriminatedUnion('status', [
+export const EditorAssessmentSchema = z.union([
   z.object({
     status: z.literal('pass'),
-    issues: z.array(EditorIssueSchema).length(0),
+    continuityIssues: z.array(EditorContinuityIssueSchema).length(0),
+    readingIssues: z.array(ReadingIssueSchema).length(0),
     deltaChecks: z.array(deltaCheck.extend({ realized: z.literal(true) })).min(1).max(30),
     outcome: ChapterOutcomeContentSchema,
   }).strict(),
   z.object({
     status: z.literal('revise'),
-    issues: z.array(EditorIssueSchema).min(1).max(3),
+    continuityIssues: z.array(EditorContinuityIssueSchema).max(3),
+    readingIssues: z.array(ReadingIssueSchema).max(3),
     deltaChecks: z.array(deltaCheck).min(1).max(30),
   }).strict(),
-]);
+]).superRefine((assessment, ctx) => {
+  if (assessment.status !== 'revise') return;
+  const issueCount = assessment.continuityIssues.length + assessment.readingIssues.length;
+  if (issueCount < 1 || issueCount > 3) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['continuityIssues'], message: 'A revision requires one to three total issues.' });
+  }
+});
 
 export const PlanIssueSchema = z.object({
   category: z.enum([
@@ -538,10 +649,14 @@ export const CanonExtensionSchema = z.object({
     claim: prose,
     exceptions: z.array(prose).max(6).default([]),
   }).strict()).max(8),
+  worldMechanics: z.array(z.object({
+    seedId: stableId,
+    definition: WorldMechanicSchema,
+  }).strict()).max(8),
 }).strict();
 
 export const LaunchPackSchema = z.object({
-  schemaVersion: z.literal(1),
+  schemaVersion: z.literal(2),
   selectedConceptId: stableId,
   kernel: StoryKernelSchema,
   arc: InitialArcPlanSchema,
@@ -550,6 +665,7 @@ export const LaunchPackSchema = z.object({
 }).strict();
 
 export type StoryKernel = z.infer<typeof StoryKernelSchema>;
+export type WorldMechanic = z.infer<typeof WorldMechanicSchema>;
 export type StoryState = z.infer<typeof StoryStateSchema>;
 export type ChapterOutcome = z.infer<typeof ChapterOutcomeSchema>;
 export type ArcPlan = z.infer<typeof ArcPlanSchema>;

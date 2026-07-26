@@ -1,10 +1,15 @@
 import {
   type ChapterPlan,
   type EditorAssessment,
+  type StateDelta,
   type StoryKernel,
   type StoryState,
 } from './contracts';
-import type { RelevantStoryMemory, RelevantStoryTransition } from './memory';
+import {
+  flattenContinuityPacket,
+  type ContinuityPacket,
+  type RelevantStoryTransition,
+} from './memory';
 
 export interface ContextManifestEntry {
   role: 'writer' | 'editor' | 'revision' | 'planner';
@@ -16,18 +21,15 @@ export interface ContextManifestEntry {
 export interface WriterBrief {
   story: { title: string };
   cast: unknown[];
-  worldRules: unknown[];
+  openingState: unknown[];
   scenes: unknown[];
-  currentFacts: unknown[];
-  characterState: unknown[];
-  resources: unknown[];
-  promises: unknown[];
-  historicalTransitions: unknown[];
-  requiredDeltas: unknown[];
+  operationalConstraints: string[];
+  continuity: unknown[];
 }
 
 function relevantIds(plan: ChapterPlan) {
   const characters = new Set(plan.scenes.flatMap(scene => scene.participantIds));
+  const locations = new Set(plan.scenes.map(scene => scene.locationId));
   const resources = new Set(plan.requiredDeltas.flatMap(delta =>
     delta.kind === 'resource_numeric' || delta.kind === 'resource_state' ? [delta.resourceId] : [],
   ));
@@ -41,23 +43,95 @@ function relevantIds(plan: ChapterPlan) {
     if (condition.kind === 'promise') promises.add(condition.entityId);
     if (condition.kind === 'location') characters.add(condition.entityId);
   });
-  return { characters, resources, promises, facts };
+  plan.mechanicUses.forEach(use => {
+    characters.add(use.actorId);
+    use.preconditionFactIds.forEach(id => facts.add(id));
+  });
+  return { characters, locations, resources, promises, facts };
+}
+
+function labels(kernel: StoryKernel) {
+  const values = new Map<string, string>([
+    ...kernel.characters.map(item => [item.id, item.name] as const),
+    ...kernel.locations.map(item => [item.id, item.name] as const),
+    ...kernel.resources.map(item => [item.id, item.name] as const),
+    ...kernel.promises.map(item => [item.id, item.description] as const),
+    ...kernel.worldMechanics.map(item => [item.id, item.name] as const),
+  ]);
+  return (id: string) => values.get(id) ?? id.replaceAll('_', ' ');
+}
+
+function readableDelta(delta: StateDelta, name: (id: string) => string) {
+  if (delta.kind === 'fact') return { entity: name(delta.factId), before: delta.before, requiredAfter: delta.after };
+  if (delta.kind === 'resource_numeric') {
+    return { entity: name(delta.resourceId), before: delta.before, requiredAfter: delta.after };
+  }
+  if (delta.kind === 'resource_state') return { entity: name(delta.resourceId), before: delta.before, requiredAfter: delta.after };
+  if (delta.kind === 'knowledge') {
+    return { entity: name(delta.characterId), before: `chưa biết ${name(delta.factId)}`, requiredAfter: `biết ${name(delta.factId)}` };
+  }
+  if (delta.kind === 'location') {
+    return { entity: name(delta.characterId), before: name(delta.beforeLocationId), requiredAfter: name(delta.afterLocationId) };
+  }
+  if (delta.kind === 'relationship') {
+    return {
+      entity: `${name(delta.characterId)} với ${name(delta.counterpartId)}`,
+      before: delta.before,
+      requiredAfter: delta.after,
+    };
+  }
+  return { entity: name(delta.promiseId), before: delta.before, requiredAfter: delta.after };
+}
+
+function operationalConstraints(kernel: StoryKernel, plan: ChapterPlan, name: (id: string) => string): string[] {
+  return plan.mechanicUses.map(use => {
+    const mechanic = kernel.worldMechanics.find(item => item.id === use.mechanicId)!;
+    if (mechanic.kind === 'conversion') {
+      const parts = (items: typeof mechanic.inputsPerBatch) => items
+        .map(item => `${item.amount * use.quantity} ${name(item.resourceId)}`).join(', ');
+      return `${name(use.actorId)} xử lý ${parts(mechanic.inputsPerBatch)} để tạo ${parts(mechanic.outputsPerBatch)}; hao hụt ${parts(mechanic.lossesPerBatch) || 'không'}.`;
+    }
+    if (mechanic.kind === 'capability') {
+      const capacity = mechanic.maximumUnitsPerMinute === null
+        ? ''
+        : `; giới hạn ${mechanic.maximumUnitsPerMinute} ${mechanic.capacityUnit ?? 'đơn vị'}/phút`;
+      return `${name(use.actorId)} được phép dùng ${mechanic.name} cho ${use.quantity} ${mechanic.capacityUnit ?? 'đơn vị'}${capacity}.`;
+    }
+    const required = mechanic.requiredFacts.map(condition =>
+      `${name(condition.factId)} = ${String(condition.expected)}`);
+    const forbidden = mechanic.forbiddenFacts.map(condition =>
+      `${name(condition.factId)} = ${String(condition.expected)}`);
+    return `${mechanic.name}: cần ${required.join(', ') || 'không có điều kiện thêm'}`
+      + `${forbidden.length ? `; cấm khi ${forbidden.join(', ')}` : ''}.`;
+  });
+}
+
+function readableTransition(event: RelevantStoryTransition, name: (id: string) => string) {
+  return {
+    chapter: event.chapterNumber,
+    type: event.kind,
+    entity: name(event.entityId),
+    before: event.before,
+    after: event.after,
+  };
 }
 
 export function buildWriterBrief(input: {
   kernel: StoryKernel;
   state: StoryState;
   plan: ChapterPlan;
-  relevantTransitions?: RelevantStoryTransition[];
+  continuityPacket?: ContinuityPacket;
 }): WriterBrief {
   const ids = relevantIds(input.plan);
   ids.characters.add(input.kernel.protagonistId);
+  const name = labels(input.kernel);
+  const deltas = new Map(input.plan.requiredDeltas.map(delta => [delta.id, delta]));
+  const continuity = input.continuityPacket
+    ? flattenContinuityPacket(input.continuityPacket).slice(0, 12).map(event => readableTransition(event, name))
+    : [];
   return {
-    story: {
-      title: input.kernel.title,
-    },
+    story: { title: input.kernel.title },
     cast: input.kernel.characters.filter(character => ids.characters.has(character.id)).map(character => ({
-      id: character.id,
       name: character.name,
       agenda: character.agenda,
       competence: character.competence,
@@ -65,69 +139,41 @@ export function buildWriterBrief(input: {
       moralBoundary: character.moralBoundary,
       voice: character.voice,
     })),
-    worldRules: input.kernel.worldRules.filter(rule => input.plan.requiredWorldRuleIds.includes(rule.id))
-      .map(rule => ({ id: rule.id, claim: rule.claim })),
+    openingState: [
+      ...input.state.facts.filter(fact => ids.facts.has(fact.id)).map(fact => ({
+        entity: name(fact.id),
+        value: fact.value,
+      })),
+      ...input.state.characters.filter(character => ids.characters.has(character.characterId)).map(character => ({
+        entity: name(character.characterId),
+        location: name(character.locationId),
+        knownRelevantFacts: character.knownFactIds.filter(id => ids.facts.has(id)).map(name),
+        relevantRelationships: Object.entries(character.relationshipState)
+          .filter(([counterpartId]) => ids.characters.has(counterpartId))
+          .map(([counterpartId, value]) => ({ with: name(counterpartId), state: value })),
+      })),
+      ...input.state.resources.filter(resource => ids.resources.has(resource.resourceId)).map(resource => ({
+        entity: name(resource.resourceId),
+        value: resource.value,
+        unit: input.kernel.resources.find(item => item.id === resource.resourceId)?.kind === 'numeric'
+          ? (input.kernel.resources.find(item => item.id === resource.resourceId) as Extract<StoryKernel['resources'][number], { kind: 'numeric' }>).unit
+          : null,
+      })),
+      ...input.state.promises.filter(promise => ids.promises.has(promise.promiseId)).map(promise => ({
+        entity: name(promise.promiseId),
+        status: promise.status,
+      })),
+    ],
     scenes: input.plan.scenes.map(scene => ({
-      id: scene.id,
-      povCharacterId: scene.povCharacterId,
-      participantIds: scene.participantIds,
-      locationId: scene.locationId,
+      pov: name(scene.povCharacterId),
+      participants: scene.participantIds.map(name),
+      location: name(scene.locationId),
       objective: scene.objective,
       obstacle: scene.obstacle,
-      requiredDeltaIds: scene.requiredDeltaIds,
+      requiredChanges: scene.requiredDeltaIds.map(deltaId => readableDelta(deltas.get(deltaId)!, name)),
     })),
-    currentFacts: input.state.facts.filter(fact => ids.facts.has(fact.id)),
-    characterState: input.state.characters.filter(character => ids.characters.has(character.characterId)).map(character => ({
-      ...character,
-      knownFactIds: character.knownFactIds.filter(factId => ids.facts.has(factId)),
-      relationshipState: Object.fromEntries(
-        Object.entries(character.relationshipState).filter(([counterpartId]) => ids.characters.has(counterpartId)),
-      ),
-    })),
-    resources: input.state.resources.filter(resource => ids.resources.has(resource.resourceId)).map(resource => {
-      const definition = input.kernel.resources.find(item => item.id === resource.resourceId);
-      return {
-        ...resource,
-        name: definition?.name,
-        unit: definition?.kind === 'numeric' ? definition.unit : undefined,
-      };
-    }),
-    promises: input.state.promises.filter(promise => ids.promises.has(promise.promiseId)),
-    historicalTransitions: (input.relevantTransitions ?? []).slice(0, 6).map(transition => ({
-      chapterNumber: transition.chapterNumber,
-      deltaId: transition.deltaId,
-      kind: transition.kind,
-      entityId: transition.entityId,
-      before: transition.before,
-      after: transition.after,
-      relatedEntityIds: transition.relatedEntityIds,
-    })),
-    requiredDeltas: input.plan.requiredDeltas.map(delta => {
-      if (delta.kind === 'fact') return {
-        id: delta.id, kind: delta.kind, entityId: delta.factId, before: delta.before, after: delta.after,
-      };
-      if (delta.kind === 'resource_numeric') return {
-        id: delta.id, kind: delta.kind, entityId: delta.resourceId,
-        before: delta.before, delta: delta.delta, after: delta.after,
-      };
-      if (delta.kind === 'resource_state') return {
-        id: delta.id, kind: delta.kind, entityId: delta.resourceId, before: delta.before, after: delta.after,
-      };
-      if (delta.kind === 'knowledge') return {
-        id: delta.id, kind: delta.kind, entityId: delta.characterId, factId: delta.factId,
-      };
-      if (delta.kind === 'location') return {
-        id: delta.id, kind: delta.kind, entityId: delta.characterId,
-        before: delta.beforeLocationId, after: delta.afterLocationId,
-      };
-      if (delta.kind === 'relationship') return {
-        id: delta.id, kind: delta.kind, entityId: delta.characterId,
-        counterpartId: delta.counterpartId, before: delta.before, after: delta.after,
-      };
-      return {
-        id: delta.id, kind: delta.kind, entityId: delta.promiseId, before: delta.before, after: delta.after,
-      };
-    }),
+    operationalConstraints: operationalConstraints(input.kernel, input.plan, name),
+    continuity,
   };
 }
 
@@ -153,8 +199,7 @@ export function buildChapterContexts(input: {
   state: StoryState;
   plan: ChapterPlan;
   previousChapter?: string;
-  relevantMemory?: RelevantStoryMemory[];
-  relevantTransitions?: RelevantStoryTransition[];
+  continuityPacket?: ContinuityPacket;
 }) {
   const brief = buildWriterBrief(input);
   const previousTail = input.previousChapter ? selectPreviousTail(input.previousChapter) : '';
@@ -163,22 +208,20 @@ export function buildChapterContexts(input: {
     title: input.kernel.title,
     protagonistId: input.kernel.protagonistId,
     characters: input.kernel.characters.filter(character => ids.characters.has(character.id) || character.id === input.kernel.protagonistId),
-    worldRules: input.kernel.worldRules.filter(rule => input.plan.requiredWorldRuleIds.includes(rule.id)),
+    worldMechanics: input.kernel.worldMechanics.filter(mechanic =>
+      input.plan.mechanicUses.some(use => use.mechanicId === mechanic.id)),
     resources: input.kernel.resources.filter(resource => ids.resources.has(resource.id)),
     promises: input.kernel.promises.filter(promise => ids.promises.has(promise.id)),
   };
   const editorState = {
     chapterNumber: input.state.chapterNumber,
     storyTimeMinutes: input.state.storyTimeMinutes,
-    facts: input.state.facts,
-    characters: input.state.characters.filter(character => ids.characters.has(character.characterId)).map(character => ({
-      ...character,
-      knownFactIds: character.knownFactIds.filter(factId => ids.facts.has(factId)),
-    })),
+    facts: input.state.facts.filter(fact => ids.facts.has(fact.id)),
+    characters: input.state.characters.filter(character => ids.characters.has(character.characterId)),
     resources: input.state.resources.filter(resource => ids.resources.has(resource.resourceId)),
     promises: input.state.promises.filter(promise => ids.promises.has(promise.promiseId)),
     recentOutcomes: input.state.recentOutcomes,
-    relevantMemory: input.relevantMemory ?? [],
+    continuityPacket: input.continuityPacket ?? null,
   };
   return {
     brief,
@@ -193,7 +236,7 @@ export function buildChapterContexts(input: {
       ...manifest('editor', [
         ['kernel_projection', 'project.story_kernel', editorKernel],
         ['chapter_plan', `plan:${input.plan.chapterNumber}`, input.plan],
-        ['state_projection', 'project.story_state', editorState],
+        ['state_and_continuity', 'project.story_state+story_state_events', editorState],
       ]),
     ],
   };
@@ -210,6 +253,7 @@ export function buildRevisionContext(input: {
     writerBrief: input.brief,
     previousChapterTail: input.previousTail,
     currentDraft: input.draft,
-    issues: input.assessment.issues,
+    continuityIssues: input.assessment.continuityIssues,
+    readingIssues: input.assessment.readingIssues,
   };
 }

@@ -7,6 +7,7 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 import {
   DEFAULT_MODEL_ROUTES,
+  CAUSAL_VALIDATOR_VERSION,
   ModelRoutesSchema,
   ResearchSnapshotSchema,
   SequentialBenchmarkCorpusSchema,
@@ -23,11 +24,13 @@ import {
   runConceptLab,
   writeStoryChapter,
   type ModelRoutes,
+  type PlanAssessment,
   type PlanQualifiedWriterBrief,
   type PortfolioSignature,
   type ProviderUsage,
   type SequentialBenchmarkCorpus,
   type SetupCheckpoint,
+  type RollingPlan,
   type StoryState,
 } from '../src/services/story-factory';
 
@@ -36,18 +39,20 @@ dotenv.config({ path: '.env.local', quiet: true });
 
 const args = process.argv.slice(2);
 const apply = args.includes('--apply');
+const discoveryOnly = args.includes('--discovery-only');
 const value = (flag: string) => {
   const index = args.indexOf(flag);
   return index >= 0 ? args[index + 1] : undefined;
 };
 const suitePath = path.resolve(value('--suite') ?? 'factory/benchmark-v2/suite.json');
-const outputPath = path.resolve(value('--output') ?? '/tmp/truyencity-sequential-v1-corpus.json');
-const writerCorpusPath = path.resolve(value('--writer-corpus') ?? '/tmp/truyencity-writer-bakeoff-v2-corpus.json');
+const outputPath = path.resolve(value('--output') ?? '/tmp/truyencity-sequential-v3-corpus.json');
+const writerCorpusPath = path.resolve(value('--writer-corpus') ?? '/tmp/truyencity-writer-bakeoff-v4-corpus.json');
 const progressPath = path.resolve(value('--progress') ?? `${outputPath}.progress.json`);
 const candidateRoutesPath = value('--candidate-routes');
 if (!candidateRoutesPath) throw new Error('--candidate-routes is required so sequential survival cannot silently test the wrong route.');
 const candidateRoutes = ModelRoutesSchema.parse(JSON.parse(readFileSync(path.resolve(candidateRoutesPath), 'utf8')));
 const continuityJudgeModel = value('--continuity-judge') ?? 'gemini-2.5-pro';
+const frozenProgressPath = value('--frozen-discovery-progress');
 
 const suiteSchema = z.object({
   suiteVersion: z.literal(1),
@@ -102,6 +107,7 @@ type Progress = {
     telemetry: Awaited<ReturnType<typeof writeStoryChapter>>['attemptTelemetry'];
   }>;
   setupCheckpoints: Record<string, SetupCheckpoint>;
+  plannedWindows: Record<string, { rollingPlan: RollingPlan; assessment: PlanAssessment }>;
   windowReviews: Array<{ lane: string; status: 'pass' }>;
   failure: null | { lane: string; stage: string; message: string; code: string | null; evidence: unknown };
 };
@@ -163,8 +169,7 @@ async function uploadImmutable(db: SupabaseClient, key: string, bytes: Buffer, d
 }
 
 function selectWriterBriefs(all: PlanQualifiedWriterBrief[], laneOrder: string[]): PlanQualifiedWriterBrief[] {
-  const limits = [3, 3, 2, 2];
-  return laneOrder.flatMap((lane, index) => all.filter(brief => brief.lane === lane).slice(0, limits[index]));
+  return laneOrder.flatMap(lane => all.filter(brief => brief.lane === lane).slice(0, 1));
 }
 
 function failedUsageCost(evidence: unknown): number {
@@ -191,8 +196,23 @@ function failedUsageCost(evidence: unknown): number {
 async function main() {
   const suiteEntries = loadSuite();
   const laneOrder = suiteEntries.map(entry => entry.commission.genreLane);
+  const buildProtocol = discoveryOnly ? STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL : STORY_FACTORY_SEQUENTIAL_PROTOCOL;
+  const frozenProgress = frozenProgressPath
+    ? JSON.parse(readFileSync(path.resolve(frozenProgressPath), 'utf8')) as Progress
+    : null;
+  if (frozenProgress
+    && (frozenProgress.protocolVersion !== STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL
+      || frozenProgress.engineRelease !== STORY_FACTORY_RELEASE
+      || frozenProgress.route.planner !== candidateRoutes.planner
+      || frozenProgress.route.planJudge !== candidateRoutes.planJudge
+      || frozenProgress.route.editor !== candidateRoutes.editor
+      || frozenProgress.continuityJudgeModel !== continuityJudgeModel
+      || Object.keys(frozenProgress.setupCheckpoints).length !== 4
+      || Object.keys(frozenProgress.plannedWindows ?? {}).length !== 4)) {
+    throw new Error('Frozen discovery progress does not match this release, Planner, Plan Judge, Editor, Continuity Judge, or four-lane campaign.');
+  }
   const progress: Progress = {
-    protocolVersion: STORY_FACTORY_SEQUENTIAL_PROTOCOL,
+    protocolVersion: buildProtocol,
     engineRelease: STORY_FACTORY_RELEASE,
     route: runtimeRoute(candidateRoutes),
     continuityJudgeModel,
@@ -209,6 +229,7 @@ async function main() {
     writerBriefs: [],
     chapterAttempts: [],
     setupCheckpoints: {},
+    plannedWindows: {},
     windowReviews: [],
     failure: null,
   };
@@ -226,15 +247,15 @@ async function main() {
       kind: 'benchmark',
       status: 'running',
       engine_release: STORY_FACTORY_RELEASE,
-      benchmark_protocol_version: STORY_FACTORY_SEQUENTIAL_PROTOCOL,
+      benchmark_protocol_version: buildProtocol,
       model_routes: {
         route: runtimeRoute(candidateRoutes),
         continuityJudge: continuityJudgeModel,
       },
       input_artifact: {
-        protocolVersion: STORY_FACTORY_SEQUENTIAL_PROTOCOL,
+        protocolVersion: buildProtocol,
         lanes: laneOrder,
-        samplesExpected: 20,
+        samplesExpected: discoveryOnly ? 4 : 20,
       },
     }).select('id').single();
     if (inserted.error) throw inserted.error;
@@ -244,7 +265,7 @@ async function main() {
     if (!db || !runId) return;
     const updated = await db.from('story_factory_runs').update({
       output_artifact: {
-        protocolVersion: STORY_FACTORY_SEQUENTIAL_PROTOCOL,
+        protocolVersion: buildProtocol,
         progress: {
           setupSuccesses: progress.setupSuccesses,
           planSuccesses: progress.planSuccesses,
@@ -269,6 +290,7 @@ async function main() {
           research: entry.research,
           routes: candidateRoutes,
           existingSignatures: signatures,
+          resume: frozenProgress?.setupCheckpoints[lane],
           onCheckpoint: async checkpoint => {
             progress.setupCheckpoints[lane] = checkpoint;
             persist();
@@ -278,7 +300,7 @@ async function main() {
             ));
           },
         });
-        const setupCost = usageCost(setup.usages);
+        const setupCost = frozenProgress ? 0 : usageCost(setup.usages);
         progress.buildCostUsd += setupCost;
         progress.setupSuccesses += 1;
         const launchPackDigest = digestArtifact(setup.launchPack);
@@ -292,14 +314,21 @@ async function main() {
         await heartbeat();
 
         stage = 'plan';
-        const planned = await planRollingWindow({
-          kernel: setup.launchPack.kernel,
-          arc: setup.launchPack.arc,
-          state: setup.launchPack.initialState,
-          routes: candidateRoutes,
-          requiredWindowSize: 5,
-        });
-        const planCost = usageCost(planned.usages);
+        let planned: { rollingPlan: RollingPlan; assessment: PlanAssessment };
+        let planCost = 0;
+        if (frozenProgress) {
+          planned = frozenProgress.plannedWindows[lane];
+        } else {
+          const generatedPlan = await planRollingWindow({
+            kernel: setup.launchPack.kernel,
+            arc: setup.launchPack.arc,
+            state: setup.launchPack.initialState,
+            routes: candidateRoutes,
+            requiredWindowSize: 5,
+          });
+          planned = generatedPlan;
+          planCost = usageCost(generatedPlan.usages);
+        }
         progress.buildCostUsd += planCost;
         if (planned.assessment.status !== 'pass'
           || planned.rollingPlan.plans.length !== 5
@@ -310,8 +339,39 @@ async function main() {
           });
         }
         progress.planSuccesses += 1;
+        progress.plannedWindows[lane] = {
+          rollingPlan: planned.rollingPlan,
+          assessment: planned.assessment,
+        };
         persist();
         await heartbeat();
+
+        if (discoveryOnly) {
+          const firstPlan = planned.rollingPlan.plans[0];
+          const planDigest = digestArtifact(firstPlan);
+          progress.writerBriefs.push({
+            id: `${entry.commission.slotKey.toLowerCase()}-ch1`,
+            lane,
+            launchPackDigest,
+            planDigest,
+            kernel: setup.launchPack.kernel,
+            state: setup.launchPack.initialState,
+            plan: firstPlan,
+            previousTail: null,
+            planAssessment: planned.assessment,
+            causalValidation: {
+              validatorVersion: CAUSAL_VALIDATOR_VERSION,
+              mechanicUseCount: firstPlan.mechanicUses.length,
+              digest: digestArtifact({
+                validatorVersion: CAUSAL_VALIDATOR_VERSION,
+                planDigest,
+                mechanicUses: firstPlan.mechanicUses,
+              }),
+            },
+          });
+          persist();
+          continue;
+        }
 
         stage = 'chapters';
         let state: StoryState = setup.launchPack.initialState;
@@ -322,6 +382,15 @@ async function main() {
           const stateBefore = state;
           const previousTail = previous ? tailWords(previous) : null;
           const planDigest = digestArtifact(plan);
+          const causalValidation = {
+            validatorVersion: CAUSAL_VALIDATOR_VERSION,
+            mechanicUseCount: plan.mechanicUses.length,
+            digest: digestArtifact({
+              validatorVersion: CAUSAL_VALIDATOR_VERSION,
+              planDigest,
+              mechanicUses: plan.mechanicUses,
+            }),
+          };
           progress.writerBriefs.push({
             id: `${entry.commission.slotKey.toLowerCase()}-ch${plan.chapterNumber}`,
             lane,
@@ -332,6 +401,7 @@ async function main() {
             plan,
             previousTail,
             planAssessment: planned.assessment,
+            causalValidation,
           });
           persist();
 
@@ -389,6 +459,7 @@ async function main() {
             allInCostUsd: generationCost + continuity.usage.costUsd + (setupCost + planCost) / 5,
             revisionCount: candidate.revisionCount,
             planAssessment: planned.assessment,
+            causalValidation,
             continuityAssessment: continuity.assessment,
             stateBeforeDigest: digestArtifact(stateBefore),
             stateAfterDigest: digestArtifact(candidate.stateAfter),
@@ -452,6 +523,49 @@ async function main() {
       }
     }
 
+    if (discoveryOnly) {
+      const samples = selectWriterBriefs(progress.writerBriefs, laneOrder);
+      const discoveryDigest = digestArtifact({
+        release: STORY_FACTORY_RELEASE,
+        launchPackDigests: progress.launchPackDigests,
+        samples,
+      });
+      const writerCorpus = WriterBakeoffCorpusSchema.parse({
+        protocolVersion: STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL,
+        engineRelease: STORY_FACTORY_RELEASE,
+        builtAt: new Date().toISOString(),
+        planner: candidateRoutes.planner,
+        planJudge: candidateRoutes.planJudge,
+        sourceDiscoveryDigest: discoveryDigest,
+        discoveryCostUsd: progress.buildCostUsd,
+        samples,
+      });
+      writeFileSync(writerCorpusPath, `${JSON.stringify(writerCorpus, null, 2)}\n`);
+      if (db && runId) {
+        await ensureAuditBucket(db);
+        const archive = gzipSync(Buffer.from(JSON.stringify(writerCorpus)));
+        const sha256 = createHash('sha256').update(archive).digest('hex');
+        const storageKey = `benchmarks/writer-discovery-v4/${discoveryDigest}-${sha256}.json.gz`;
+        await uploadImmutable(db, storageKey, archive, sha256);
+        const finished = await db.from('story_factory_runs').update({
+          status: 'passed',
+          artifact_digest: sha256,
+          output_artifact: { storageKey, sha256, discoveryDigest, samplesCompleted: samples.length },
+          estimated_cost_usd: progress.buildCostUsd,
+          finished_at: new Date().toISOString(),
+        }).eq('id', runId).eq('status', 'running');
+        if (finished.error) throw finished.error;
+      }
+      console.log(JSON.stringify({
+        mode: 'writer-discovery',
+        writerCorpusPath,
+        discoveryDigest,
+        samples: samples.length,
+        costUsd: progress.buildCostUsd,
+      }, null, 2));
+      return;
+    }
+
     const corpus = SequentialBenchmarkCorpusSchema.parse({
       protocolVersion: STORY_FACTORY_SEQUENTIAL_PROTOCOL,
       engineRelease: STORY_FACTORY_RELEASE,
@@ -476,7 +590,12 @@ async function main() {
       builtAt: new Date().toISOString(),
       planner: candidateRoutes.planner,
       planJudge: candidateRoutes.planJudge,
-      sourceSequentialDigest: corpusDigest,
+      sourceDiscoveryDigest: digestArtifact({
+        release: STORY_FACTORY_RELEASE,
+        launchPackDigests: progress.launchPackDigests,
+        samples: selectWriterBriefs(progress.writerBriefs, laneOrder),
+      }),
+      discoveryCostUsd: frozenProgress?.buildCostUsd ?? progress.buildCostUsd,
       samples: selectWriterBriefs(progress.writerBriefs, laneOrder),
     });
     writeFileSync(outputPath, `${JSON.stringify(corpus, null, 2)}\n`);
@@ -491,16 +610,17 @@ async function main() {
         chapterAttempts: progress.chapterAttempts,
       })));
       const sha256 = createHash('sha256').update(archive).digest('hex');
-      const storageKey = `benchmarks/sequential-v1/${STORY_FACTORY_RELEASE}/${corpusDigest}-${sha256}.json.gz`;
+      const storageKey = `benchmarks/sequential-v3/${STORY_FACTORY_RELEASE}/${corpusDigest}-${sha256}.json.gz`;
       await uploadImmutable(db, storageKey, archive, sha256);
       const updated = await db.from('story_factory_runs').update({
         status: 'passed',
         artifact_digest: sha256,
         output_artifact: {
-          protocolVersion: STORY_FACTORY_SEQUENTIAL_PROTOCOL,
-          corpusDigest,
-          writerCorpusDigest: digestArtifact(writerCorpus),
-          launchPackDigests: corpus.launchPackDigests,
+              protocolVersion: STORY_FACTORY_SEQUENTIAL_PROTOCOL,
+              corpusDigest,
+              writerCorpusDigest: digestArtifact(writerCorpus),
+              sourceDiscoveryDigest: writerCorpus.sourceDiscoveryDigest,
+              launchPackDigests: corpus.launchPackDigests,
           storageKey,
           sha256,
           samplesCompleted: 20,
@@ -531,7 +651,7 @@ async function main() {
       await ensureAuditBucket(db);
       const archive = gzipSync(Buffer.from(JSON.stringify({ progress })));
       const sha256 = createHash('sha256').update(archive).digest('hex');
-      const storageKey = `benchmarks/sequential-v1-failed/${STORY_FACTORY_RELEASE}/${runId}-${sha256}.json.gz`;
+      const storageKey = `benchmarks/sequential-v3-failed/${STORY_FACTORY_RELEASE}/${runId}-${sha256}.json.gz`;
       await uploadImmutable(db, storageKey, archive, sha256);
       const infra = progress.providerFailures > 0;
       const updated = await db.from('story_factory_runs').update({

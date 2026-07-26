@@ -13,8 +13,7 @@ import {
 } from './contracts';
 import { generateFactoryCover } from './cover';
 import {
-  loadRelevantStoryMemory,
-  loadRelevantStoryTransitions,
+  loadContinuityPacket,
   memoryEntityIdsForArc,
   memoryEntityIdsForPlan,
 } from './memory';
@@ -340,7 +339,7 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
     const arc = ArcPlanSchema.parse(project.arc_plan);
     const state = StoryStateSchema.parse(project.story_state);
     const routes = ModelRoutesSchema.parse(project.model_routes);
-    const relevantMemory = await loadRelevantStoryMemory({
+    const continuityPacket = await loadContinuityPacket({
       db,
       projectId: project.id,
       state,
@@ -351,7 +350,7 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
       arc,
       state,
       routes,
-      relevantMemory,
+      continuityPacket,
       recoveryEvidence: job.plan_feedback ?? undefined,
       provider,
     });
@@ -405,20 +404,12 @@ async function runChapter(db: SupabaseClient, job: FactoryJobRow, project: Facto
   const runId = await createRun(db, job, 'chapter', plan.chapterNumber);
   try {
     const entityIds = memoryEntityIdsForPlan(kernel, plan);
-    const [relevantMemory, relevantTransitions] = await Promise.all([
-      loadRelevantStoryMemory({
-        db,
-        projectId: project.id,
-        state,
-        entityIds,
-      }),
-      loadRelevantStoryTransitions({
-        db,
-        projectId: project.id,
-        state,
-        entityIds,
-      }),
-    ]);
+    const continuityPacket = await loadContinuityPacket({
+      db,
+      projectId: project.id,
+      state,
+      entityIds,
+    });
     let previousChapter: string | undefined;
     if (plan.chapterNumber > 1) {
       const { data, error } = await db.from('chapters').select('content').eq('novel_id', job.novel_id).eq('chapter_number', plan.chapterNumber - 1).single();
@@ -430,8 +421,7 @@ async function runChapter(db: SupabaseClient, job: FactoryJobRow, project: Facto
       state,
       plan,
       previousChapter,
-      relevantMemory,
-      relevantTransitions,
+      continuityPacket,
       routes,
       provider,
     });

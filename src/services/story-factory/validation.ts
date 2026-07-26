@@ -10,10 +10,12 @@ import {
   StoryFactoryError,
 } from './contracts';
 
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-2-owned-resource-transitions';
+
 export interface StateEvent {
   chapterNumber: number;
   deltaId: string;
-  kind: StateDelta['kind'] | 'chapter_outcome';
+  kind: StateDelta['kind'] | 'chapter_outcome' | 'mechanic_use';
   entityId: string;
   before: unknown;
   after: unknown;
@@ -75,6 +77,7 @@ export function validateKernelState(kernel: StoryKernel, state: StoryState): voi
   unique(kernel.resources.map(item => item.id), 'Kernel resources');
   unique(kernel.promises.map(item => item.id), 'Kernel promises');
   unique(kernel.worldRules.map(item => item.id), 'Kernel world rules');
+  unique(kernel.worldMechanics.map(item => item.id), 'Kernel world mechanics');
   unique(kernel.locations.map(item => item.id), 'Kernel locations');
   unique(kernel.worldModel.geography.map(item => item.id), 'World geography');
   unique(kernel.worldModel.institutions.map(item => item.id), 'World institutions');
@@ -91,6 +94,31 @@ export function validateKernelState(kernel: StoryKernel, state: StoryState): voi
   const resourceIds = new Set(kernel.resources.map(item => item.id));
   const promiseIds = new Set(kernel.promises.map(item => item.id));
   const locationIds = new Set(kernel.locations.map(item => item.id));
+  for (const mechanic of kernel.worldMechanics) {
+    if (mechanic.kind === 'conversion') {
+      for (const resource of [...mechanic.inputsPerBatch, ...mechanic.outputsPerBatch, ...mechanic.lossesPerBatch]) {
+        if (!resourceIds.has(resource.resourceId)) fail(`Mechanic ${mechanic.id} references unknown resource ${resource.resourceId}.`);
+      }
+    } else {
+      if (mechanic.kind === 'capability') {
+        for (const actorId of mechanic.allowedActorIds) {
+          if (!characterIds.has(actorId)) fail(`Mechanic ${mechanic.id} allows unknown actor ${actorId}.`);
+        }
+        for (const resourceId of mechanic.requiredResourceIds) {
+          if (!resourceIds.has(resourceId)) fail(`Mechanic ${mechanic.id} requires unknown resource ${resourceId}.`);
+        }
+      }
+      if (mechanic.kind === 'constraint') {
+        for (const forbidden of mechanic.forbiddenFacts) {
+          const conflict = mechanic.requiredFacts.some(required =>
+            required.factId === forbidden.factId && required.expected === forbidden.expected);
+          if (conflict) {
+            fail(`Mechanic ${mechanic.id} both requires and forbids fact ${forbidden.factId}.`);
+          }
+        }
+      }
+    }
+  }
   for (const character of state.characters) {
     if (!characterIds.has(character.characterId)) fail(`State references unknown character ${character.characterId}.`);
     if (!locationIds.has(character.locationId)) fail(`State references unknown location ${character.locationId}.`);
@@ -154,7 +182,7 @@ export function applyCanonExtension(input: {
   if (!stage) fail(`Canon extension references unknown stage ${input.extension.stageId}.`);
   const seeds = new Map(stage.expansionSeeds.map(seed => [seed.id, seed.kind]));
   const usedSeeds: string[] = [];
-  const assertSeed = (seedId: string, kind: 'character' | 'location' | 'promise' | 'world_rule') => {
+  const assertSeed = (seedId: string, kind: 'character' | 'location' | 'promise' | 'world_rule' | 'world_mechanic') => {
     if (seeds.get(seedId) !== kind) fail(`Canon extension seed ${seedId} does not permit ${kind}.`);
     if (state.usedExpansionSeedIds.includes(seedId)) fail(`Canon extension seed ${seedId} was already consumed.`);
     usedSeeds.push(seedId);
@@ -163,6 +191,7 @@ export function applyCanonExtension(input: {
   const locationIds = new Set(kernel.locations.map(item => item.id));
   const promiseIds = new Set(kernel.promises.map(item => item.id));
   const ruleIds = new Set(kernel.worldRules.map(item => item.id));
+  const mechanicIds = new Set(kernel.worldMechanics.map(item => item.id));
 
   for (const item of input.extension.locations) {
     assertSeed(item.seedId, 'location');
@@ -196,6 +225,12 @@ export function applyCanonExtension(input: {
     if (ruleIds.has(item.id)) fail(`Canon extension cannot overwrite world rule ${item.id}.`);
     kernel.worldRules.push({ id: item.id, claim: item.claim, exceptions: item.exceptions });
     ruleIds.add(item.id);
+  }
+  for (const item of input.extension.worldMechanics) {
+    assertSeed(item.seedId, 'world_mechanic');
+    if (mechanicIds.has(item.definition.id)) fail(`Canon extension cannot overwrite world mechanic ${item.definition.id}.`);
+    kernel.worldMechanics.push(item.definition);
+    mechanicIds.add(item.definition.id);
   }
   unique(usedSeeds, 'Canon extension seeds');
   state.usedExpansionSeedIds.push(...usedSeeds);
@@ -322,6 +357,130 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
   }
 }
 
+function nearlyEqual(left: number, right: number): boolean {
+  return Math.abs(left - right) <= 1e-9;
+}
+
+/**
+ * Validate causal mechanics without asking a model to infer arithmetic or
+ * authority from prose. This runs before the Plan Judge and is intentionally
+ * strict: an ambiguous causal plan is not a valid plan.
+ */
+export function validateCausalMechanics(input: {
+  kernel: StoryKernel;
+  state: StoryState;
+  plan: ChapterPlan;
+}): void {
+  const { kernel, state, plan } = input;
+  const mechanics = new Map(kernel.worldMechanics.map(item => [item.id, item]));
+  const scenes = new Map(plan.scenes.map(item => [item.id, item]));
+  const deltas = new Map(plan.requiredDeltas.map(item => [item.id, item]));
+  const stateFacts = new Map(state.facts.map(item => [item.id, item.value]));
+  const usedDeltaIds = new Set<string>();
+  unique(plan.mechanicUses.map(item => item.id), `Chapter ${plan.chapterNumber} mechanic uses`);
+
+  for (const use of plan.mechanicUses) {
+    const mechanic = mechanics.get(use.mechanicId);
+    const scene = scenes.get(use.sceneId);
+    if (!mechanic) fail(`Mechanic use ${use.id} references unknown mechanic ${use.mechanicId}.`);
+    if (!scene) fail(`Mechanic use ${use.id} references unknown scene ${use.sceneId}.`);
+    if (!scene.participantIds.includes(use.actorId)) {
+      fail(`Mechanic use ${use.id} actor ${use.actorId} is not present in scene ${scene.id}.`);
+    }
+    for (const deltaId of use.deltaIds) {
+      if (!deltas.has(deltaId)) fail(`Mechanic use ${use.id} references unknown delta ${deltaId}.`);
+      if (!scene.requiredDeltaIds.includes(deltaId)) {
+        fail(`Mechanic use ${use.id} references delta ${deltaId} outside scene ${scene.id}.`);
+      }
+      if (usedDeltaIds.has(deltaId)) fail(`Delta ${deltaId} is claimed by more than one mechanic use.`);
+      usedDeltaIds.add(deltaId);
+    }
+
+    const suppliedFacts = new Set(use.preconditionFactIds);
+    for (const factId of suppliedFacts) {
+      if (!stateFacts.has(factId)) fail(`Mechanic use ${use.id} cites missing fact ${factId}.`);
+    }
+
+    if (mechanic.kind === 'conversion') {
+      if (mechanic.maximumBatchesPerUse !== null && use.quantity > mechanic.maximumBatchesPerUse) {
+        fail(`Mechanic use ${use.id} exceeds the conversion batch limit.`, {
+          planned: use.quantity,
+          maximum: mechanic.maximumBatchesPerUse,
+        });
+      }
+      const expected = new Map<string, number>();
+      const addExpected = (resourceId: string, amount: number) => {
+        expected.set(resourceId, (expected.get(resourceId) ?? 0) + amount);
+      };
+      mechanic.inputsPerBatch.forEach(item => addExpected(item.resourceId, -item.amount * use.quantity));
+      mechanic.lossesPerBatch.forEach(item => addExpected(item.resourceId, -item.amount * use.quantity));
+      mechanic.outputsPerBatch.forEach(item => addExpected(item.resourceId, item.amount * use.quantity));
+      const actual = new Map<string, number>();
+      for (const deltaId of use.deltaIds) {
+        const delta = deltas.get(deltaId)!;
+        if (delta.kind !== 'resource_numeric') {
+          fail(`Conversion ${use.id} can only claim numeric resource deltas.`, deltaId);
+        }
+        actual.set(delta.resourceId, (actual.get(delta.resourceId) ?? 0) + delta.delta);
+      }
+      const allResources = new Set([...expected.keys(), ...actual.keys()]);
+      for (const resourceId of allResources) {
+        if (!nearlyEqual(expected.get(resourceId) ?? 0, actual.get(resourceId) ?? 0)) {
+          fail(`Conversion ${use.id} has an invalid ${resourceId} balance.`, {
+            expected: expected.get(resourceId) ?? 0,
+            actual: actual.get(resourceId) ?? 0,
+          });
+        }
+      }
+    } else if (mechanic.kind === 'capability') {
+      if (mechanic.allowedActorIds.length && !mechanic.allowedActorIds.includes(use.actorId)) {
+        fail(`Actor ${use.actorId} lacks capability ${mechanic.id}.`);
+      }
+      for (const condition of mechanic.requiredFacts) {
+        if (!suppliedFacts.has(condition.factId)
+          || !preconditionMatches(stateFacts.get(condition.factId), condition.expected)) {
+          fail(`Capability ${mechanic.id} lacks required fact ${condition.factId}.`);
+        }
+      }
+      for (const resourceId of mechanic.requiredResourceIds) {
+        const resource = state.resources.find(item => item.resourceId === resourceId);
+        if (!resource
+          || (resource.kind === 'numeric' && resource.value <= 0)
+          || (resource.kind === 'state' && resource.value.trim().length === 0)) {
+          fail(`Capability ${mechanic.id} lacks usable resource ${resourceId}.`);
+        }
+      }
+      if (mechanic.maximumUnitsPerMinute !== null) {
+        const maximum = mechanic.maximumUnitsPerMinute * scene.durationMinutes;
+        if (use.quantity > maximum) {
+          fail(`Mechanic use ${use.id} exceeds scene capacity.`, {
+            planned: use.quantity,
+            maximum,
+            durationMinutes: scene.durationMinutes,
+          });
+        }
+      }
+    } else {
+      for (const condition of mechanic.requiredFacts) {
+        if (!suppliedFacts.has(condition.factId)
+          || !preconditionMatches(stateFacts.get(condition.factId), condition.expected)) {
+          fail(`Constraint ${mechanic.id} lacks required fact ${condition.factId}.`);
+        }
+      }
+      const violated = mechanic.forbiddenFacts.filter(condition =>
+        preconditionMatches(stateFacts.get(condition.factId), condition.expected));
+      if (violated.length) fail(`Constraint ${mechanic.id} is blocked by forbidden facts.`, violated);
+    }
+  }
+  const ungroundedResourceDeltas = plan.requiredDeltas
+    .filter(delta => delta.kind === 'resource_numeric' || delta.kind === 'resource_state')
+    .map(delta => delta.id)
+    .filter(deltaId => !usedDeltaIds.has(deltaId));
+  if (ungroundedResourceDeltas.length) {
+    fail(`Chapter ${plan.chapterNumber} changes resources without a validated world mechanic.`, ungroundedResourceDeltas);
+  }
+}
+
 function eventEntity(delta: StateDelta): string {
   if (delta.kind === 'fact') return delta.factId;
   if (delta.kind === 'knowledge' || delta.kind === 'location') return delta.characterId;
@@ -355,6 +514,7 @@ export function applyChapterPlan(input: {
   }
   checkPreconditions(state, plan);
   validateScenes(kernel, state, plan);
+  validateCausalMechanics({ kernel, state, plan });
 
   const events: StateEvent[] = [];
   for (const delta of plan.requiredDeltas) {
@@ -484,6 +644,7 @@ export function buildChapterOutcomeEvent(input: {
 }): StateEvent {
   const relatedEntityIds = new Set<string>([
     ...input.plan.requiredWorldRuleIds,
+    ...input.plan.mechanicUses.map(use => use.mechanicId),
     ...input.plan.scenes.flatMap(scene => [scene.locationId, ...scene.participantIds]),
   ]);
   for (const delta of input.plan.requiredDeltas) {
@@ -507,6 +668,29 @@ export function buildChapterOutcomeEvent(input: {
   };
 }
 
+export function buildMechanicUseEvents(plan: ChapterPlan): StateEvent[] {
+  return plan.mechanicUses.map(use => ({
+    chapterNumber: plan.chapterNumber,
+    deltaId: `mechanic_${plan.chapterNumber}_${use.id}`,
+    kind: 'mechanic_use',
+    entityId: use.mechanicId,
+    before: null,
+    after: {
+      sceneId: use.sceneId,
+      actorId: use.actorId,
+      quantity: use.quantity,
+      deltaIds: use.deltaIds,
+    },
+    source: 'causal_validator',
+    relatedEntityIds: [
+      use.mechanicId,
+      use.actorId,
+      ...use.preconditionFactIds,
+      ...use.deltaIds,
+    ],
+  }));
+}
+
 export function validateArcAgainstKernel(kernel: StoryKernel, arc: ArcPlan): void {
   if (!kernel.seriesSpine.stages.some(stage => stage.id === arc.stageId)) {
     fail(`Arc references unknown series stage ${arc.stageId}.`);
@@ -516,6 +700,7 @@ export function validateArcAgainstKernel(kernel: StoryKernel, arc: ArcPlan): voi
     ...arc.activeLocationIds.filter(id => !kernel.locations.some(item => item.id === id)),
     ...arc.activeResourceIds.filter(id => !kernel.resources.some(item => item.id === id)),
     ...arc.activeWorldRuleIds.filter(id => !kernel.worldRules.some(item => item.id === id)),
+    ...arc.activeMechanicIds.filter(id => !kernel.worldMechanics.some(item => item.id === id)),
     ...arc.duePromiseIds.filter(id => !kernel.promises.some(item => item.id === id)),
   ];
   if (unknownArcReferences.length) fail('Arc references unknown kernel IDs.', unknownArcReferences);

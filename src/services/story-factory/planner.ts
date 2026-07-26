@@ -12,7 +12,7 @@ import {
   type StoryKernel,
   type StoryState,
 } from './contracts';
-import type { RelevantStoryMemory } from './memory';
+import type { ContinuityPacket } from './memory';
 import type { ProviderUsage, StoryModelProvider } from './provider';
 import { geminiProvider } from './provider';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
@@ -44,7 +44,7 @@ const PlannerCompactSceneSchema = z.object({
 }).strict();
 
 const PlannerCompactChapterSchema = z.object({
-  v: z.literal(1),
+  v: z.literal(2),
   n: z.number().int().positive(),
   arc: z.number().int().positive(),
   time: z.number().int().min(0),
@@ -56,10 +56,19 @@ const PlannerCompactChapterSchema = z.object({
   rules: z.array(z.string()).min(1).max(12),
   scenes: z.array(PlannerCompactSceneSchema).min(1).max(5),
   deltas: z.array(PlannerCompactDeltaSchema).min(1).max(30),
+  mechanics: z.array(z.object({
+    id: z.string(),
+    scene: z.string(),
+    mechanic: z.string(),
+    actor: z.string(),
+    qty: z.number().finite().positive().max(1_000_000),
+    facts: z.array(z.string()).max(20),
+    deltaIds: z.array(z.string()).min(1).max(30),
+  }).strict()).max(30),
 }).strict();
 
 export const PlannerRollingPlanResponseSchema = z.object({
-  v: z.literal(1),
+  v: z.literal(2),
   start: z.number().int().positive(),
   chaptersJson: z.array(z.string()).min(1).max(5),
 }).strict();
@@ -76,10 +85,11 @@ const PLANNER_COMPACT_CONTRACT = {
   },
   chapterJson: {
     serialization: 'Mỗi phần tử chaptersJson là đúng một JSON object đã stringify, không markdown.',
-    chapterFields: ['v=1', 'n', 'arc', 'time', 'pre', 'rules', 'scenes', 'deltas'],
+    chapterFields: ['v=2', 'n', 'arc', 'time', 'pre', 'rules', 'scenes', 'deltas', 'mechanics'],
     preFields: ['k', 'id', 'value'],
     sceneFields: ['id', 'pov', 'people', 'loc', 'dur', 'travel', 'goal', 'block', 'act', 'deltaIds'],
     deltaFields: ['id', 'k', 'target', 'counterpart', 'before', 'change', 'after', 'source', 'sink'],
+    mechanicFields: ['id', 'scene', 'mechanic', 'actor', 'qty', 'facts', 'deltaIds'],
   },
   strictRules: [
     'Mọi field compact đều bắt buộc; dùng null đúng chỗ, không bỏ field. counterpart chỉ khác null với relationship.',
@@ -94,6 +104,7 @@ const PLANNER_COMPACT_CONTRACT = {
     'scene.deltaIds chỉ chứa delta ID tồn tại trong cùng chương; cảnh nối có thể rỗng nhưng cả chương vẫn phải có deltas.',
     'Mỗi delta phải được ít nhất một scene.deltaIds tham chiếu.',
     'rules chỉ chứa world-rule thực sự được thi hành trong chương. Nếu chương mới quyết định hoặc hứa sẽ dùng cơ chế ở tương lai thì chưa đưa rule đó vào rules.',
+    'Mọi chuyển đổi/công suất/quyền hạn/constraint thực sự dùng phải có một mechanics entry tham chiếu worldMechanics ID. Conversion phải gắn đủ delta đầu vào, hao hụt và đầu ra. Capability phải ghi actor, qty và fact cấp quyền.',
     'Giữ goal/block/act ngắn và cơ học; chỉ đưa nhân vật, rule và delta thật sự cần cho chương.',
     'knowledge.after phải là fact ID đã tồn tại trong State. Nếu nhân vật học một fact mới, tạo fact delta khai báo fact đó trước knowledge delta trong cùng chương và gắn cả hai vào scene học biết.',
     'relationship.before phải bằng chính xác State.characters[characterId].relationshipState[counterpartId], hoặc null nếu pair chưa có entry; không suy ra quan hệ ban đầu từ role, agenda hay mô tả Kernel.',
@@ -143,6 +154,15 @@ export function materializePlannerRollingPlan(value: z.infer<typeof PlannerRolli
         };
         return { id: delta.id, kind: delta.k, promiseId: delta.target, before: delta.before, after: delta.after };
       }),
+      mechanicUses: chapter.mechanics.map(use => ({
+        id: use.id,
+        sceneId: use.scene,
+        mechanicId: use.mechanic,
+        actorId: use.actor,
+        quantity: use.qty,
+        preconditionFactIds: use.facts,
+        deltaIds: use.deltaIds,
+      })),
     })),
   });
 }
@@ -197,20 +217,20 @@ export type ArcLifecycle = z.infer<typeof ArcLifecycleSchema>;
 const PlanJudgeWireSchema = z.object({
   status: z.enum(['pass', 'revise']),
   checks: z.object({
-    causalMechanism: z.boolean(),
+    protagonistAgency: z.boolean(),
     earnedProgression: z.boolean(),
     oppositionAgenda: z.boolean(),
     sceneVariety: z.boolean(),
     stageAlignment: z.boolean(),
-    stateTransition: z.boolean(),
+    outcomeWeight: z.boolean(),
   }).strict(),
   checkEvidence: z.object({
-    causalMechanism: z.string().trim().min(3).max(800),
+    protagonistAgency: z.string().trim().min(3).max(800),
     earnedProgression: z.string().trim().min(3).max(800),
     oppositionAgenda: z.string().trim().min(3).max(800),
     sceneVariety: z.string().trim().min(3).max(800),
     stageAlignment: z.string().trim().min(3).max(800),
-    stateTransition: z.string().trim().min(3).max(800),
+    outcomeWeight: z.string().trim().min(3).max(800),
   }).strict(),
   issues: z.array(PlanAssessmentSchema.options[1].shape.issues.element).max(3),
 }).strict();
@@ -248,52 +268,35 @@ export async function assessRollingPlan(input: {
       obstacle: scene.obstacle,
       plannedAction: scene.action,
     })),
-    numericTransitions: chapter.requiredDeltas.flatMap(delta => delta.kind === 'resource_numeric' ? [{
-      deltaId: delta.id,
-      resourceId: delta.resourceId,
-      before: delta.before,
-      change: delta.delta,
-      after: delta.after,
-      relativeMagnitude: delta.before === 0 ? null : Math.abs(delta.delta / delta.before),
-    }] : []),
-    requiredWorldRules: chapter.requiredWorldRuleIds.map(ruleId => {
-      const rule = input.kernel.worldRules.find(item => item.id === ruleId);
-      return { ruleId, claim: rule?.claim ?? null };
-    }),
-    numericResources: input.kernel.resources.flatMap(resource => {
-      if (resource.kind !== 'numeric') return [];
-      const stateValue = input.state.resources.find(item => item.resourceId === resource.id)?.value;
-      return [{
-        resourceId: resource.id,
-        name: resource.name,
-        unit: resource.unit,
-        stateValue: typeof stateValue === 'number' ? stateValue : null,
-        chapterDeltas: chapter.requiredDeltas.flatMap(delta => (
-          delta.kind === 'resource_numeric' && delta.resourceId === resource.id
-            ? [{ deltaId: delta.id, before: delta.before, change: delta.delta, after: delta.after }]
-            : []
-        )),
-      }];
-    }),
     stateTransitions: chapter.requiredDeltas.map(delta => ({ deltaId: delta.id, kind: delta.kind })),
   }));
   const result = await input.provider.json({
     model: input.model,
     system: PLAN_JUDGE_SYSTEM_PROMPT,
     prompt: JSON.stringify({
-      task: 'Đánh giá rolling plan theo chất lượng nhân quả và khả năng tạo cảnh, không chấm prose.',
-      kernel: input.kernel,
+      task: 'Đánh giá rolling plan theo agency, đối lực, tích lũy, biến hóa cảnh và stage; không chấm prose, không kiểm số học.',
+      kernel: {
+        protagonistId: input.kernel.protagonistId,
+        characters: input.kernel.characters.map(character => ({
+          id: character.id,
+          role: character.role,
+          agenda: character.agenda,
+          competence: character.competence,
+          constraint: character.constraint,
+        })),
+        pleasureLoop: input.kernel.pleasureLoop,
+      },
       arc: input.arc,
       state: input.state,
       rollingPlan: input.rollingPlan,
       auditSignals,
       mandatoryChecks: {
-        causalMechanism: 'Mỗi cơ hội/tai họa/kết quả phải có nguyên nhân trong state/precondition/world rule trước cảnh; action tự tuyên bố nguyên nhân hoặc source/sink bookkeeping không phải bằng chứng. Phương tiện, dịch vụ, lao động, người trung gian và quyền tiếp cận bắt buộc phải có nguồn, chủ thể và chi phí/quyền hạn đã thiết lập.',
+        protagonistAgency: 'Nhân vật chính hoặc POV phải đưa ra lựa chọn có ý nghĩa và chịu hậu quả, không chỉ được cơ hội rơi vào tay.',
         earnedProgression: 'Độ lớn thay đổi phải tương xứng chuẩn bị, chi phí, rủi ro và thang hiện tại; thay đổi trên 5 lần baseline cần tích lũy nhiều bước cụ thể.',
         oppositionAgenda: 'Đối lực phải có lựa chọn, đối sách và hậu quả theo agenda riêng; chỉ gây hấn rồi kinh ngạc/thua/chạy không đạt.',
         sceneVariety: 'Window không được lặp công thức giải thích cơ chế → biểu diễn thành công → người khác kinh ngạc/tôn sùng → nhận thưởng.',
         stageAlignment: 'Xung đột và reward loop phải phục vụ stage hiện tại, không nhảy sớm.',
-        stateTransition: 'Mọi before/after và mọi số lượng/tiêu hao nêu trong scene phải khớp ledger, unit, required delta và ý nghĩa thế giới. Với từng requiredWorldRule, phải đối chiếu mọi vật tư/đầu vào vật lý trong claim với numericResources: đầu vào phải có sẵn hoặc được cấp bằng delta, và vật tư bị dùng/tiêu hao phải có delta giảm. Nếu chương chỉ hứa hoặc quyết định dùng cơ chế ở tương lai thì rule đó không được nằm trong requiredWorldRules của chương hiện tại. Scene không được dịch chuyển người/hàng bằng phương tiện hoặc dịch vụ chưa có nguồn, quyền sử dụng và chi phí; giảm một ma sát không tự tạo thêm năng lượng, lưu lượng hay độ bền ngoài world rule.',
+        outcomeWeight: 'Kết quả phải có trọng lượng tương xứng chuẩn bị và phản lực; không dùng tai họa cưỡng ép, quần chúng làm nền hoặc một thao tác giải quyết toàn bộ xung đột.',
       },
       evidenceRule: 'Với mỗi check, checkEvidence phải chỉ rõ chapterNumber và ít nhất một sceneId hoặc deltaId làm căn cứ; không chấp nhận lời khen chung.',
     }),
@@ -320,7 +323,7 @@ export async function planRollingWindow(input: {
   routes: ModelRoutes;
   requiredWindowSize?: 1 | 2 | 3 | 4 | 5;
   recoveryEvidence?: unknown;
-  relevantMemory?: RelevantStoryMemory[];
+  continuityPacket?: ContinuityPacket;
   provider?: StoryModelProvider;
 }): Promise<{ rollingPlan: RollingPlan; assessment: PlanAssessment; usages: ProviderUsage[] }> {
   const provider = input.provider ?? geminiProvider;
@@ -363,7 +366,7 @@ export async function planRollingWindow(input: {
           )),
           promises: Object.fromEntries(input.state.promises.map(item => [item.promiseId, item.status])),
         },
-        relevantMemory: input.relevantMemory ?? [],
+        continuityPacket: input.continuityPacket ?? null,
         nextChapter: input.state.chapterNumber + 1,
         maximumEndChapter: input.arc.plannedEndChapter,
         compactContract: PLANNER_COMPACT_CONTRACT,
