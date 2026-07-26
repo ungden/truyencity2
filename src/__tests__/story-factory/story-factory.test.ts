@@ -1480,7 +1480,12 @@ describe('canonical Story Factory', () => {
       { selectedIds: [a[0].id, b[0].id], reasons: ['Cơ chế A rõ và dài hơi.', 'Cơ chế B có conflict economy tốt.'] },
       { simulations },
       { selectedConceptId: pack.selectedConceptId, coverPrompt: pack.coverPrompt, kernel: identityKernel },
-      { kernel: { worldModel, worldMechanics, worldRules, locations, travelRules, resources } },
+      {
+        kernel: { worldModel, worldRules, locations, travelRules, resources },
+        conversions: worldMechanics.filter(mechanic => mechanic.kind === 'conversion'),
+        capabilities: worldMechanics.filter(mechanic => mechanic.kind === 'capability'),
+        constraints: worldMechanics.filter(mechanic => mechanic.kind === 'constraint'),
+      },
       { kernel: { progressionTracks, seriesSpine, longPromises, promises, endingDirection } },
       { arc: pack.arc, initialState: pack.initialState },
     ]);

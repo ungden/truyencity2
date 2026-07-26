@@ -94,7 +94,8 @@ describe('Story Factory architecture boundary', () => {
     expect(setup).toContain('Mọi longPromises.promiseId');
     expect(setup).toContain('phải tham chiếu ID trong promises');
     expect(setup).toContain('schema: LaunchIdentitySchema');
-    expect(setup).toContain('schema: LaunchWorldSchema');
+    expect(setup).toContain('schema: LaunchWorldWireSchema');
+    expect(setup).toContain('conversions: z.array(WorldMechanicSchema.options[0])');
     expect(setup).toContain('schema: LaunchSeriesSchema');
     expect(setup).toContain('schema: LaunchStateSchema');
     expect(setup).not.toContain('kernelJson');

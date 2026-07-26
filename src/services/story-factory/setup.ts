@@ -6,6 +6,7 @@ import {
   StoryFactoryError,
   StoryKernelSchema,
   StoryStateSchema,
+  WorldMechanicSchema,
   type LaunchPack,
   type ModelRoutes,
 } from './contracts';
@@ -130,6 +131,18 @@ const LaunchWorldSchema = z.object({
     travelRules: true,
     resources: true,
   }),
+}).strict();
+const LaunchWorldWireSchema = z.object({
+  kernel: StoryKernelObjectSchema.pick({
+    worldModel: true,
+    worldRules: true,
+    locations: true,
+    travelRules: true,
+    resources: true,
+  }),
+  conversions: z.array(WorldMechanicSchema.options[0]).min(1).max(34),
+  capabilities: z.array(WorldMechanicSchema.options[1]).min(1).max(34),
+  constraints: z.array(WorldMechanicSchema.options[2]).min(1).max(34),
 }).strict();
 const LaunchSeriesSchema = z.object({
   kernel: StoryKernelObjectSchema.pick({
@@ -418,28 +431,47 @@ Chỉ được chọn concept có domainFeasibility=pass và longRunFeasibility=
     throw new StoryFactoryError('setup_blocked', 'Launch pack fingerprints drifted from the selected concept.');
   }
 
-  const launchWorld = checkpoint.launchWorld
-    ? { value: LaunchWorldSchema.parse(checkpoint.launchWorld.value), usage: checkpoint.launchWorld.usage }
-    : await setupStage('Launch World Architect', provider.json({
-    model: input.routes.launchArchitect,
-    system: `Bạn khóa world canon riêng của truyện đã chọn. Trả đúng structured-output schema, không markdown.
+  let launchWorld: { value: z.infer<typeof LaunchWorldSchema>; usage: ProviderUsage };
+  if (checkpoint.launchWorld) {
+    launchWorld = {
+      value: LaunchWorldSchema.parse(checkpoint.launchWorld.value),
+      usage: checkpoint.launchWorld.usage,
+    };
+  } else {
+    const launchWorldWire = await setupStage('Launch World Architect', provider.json({
+      model: input.routes.launchArchitect,
+      system: `Bạn khóa world canon riêng của truyện đã chọn. Trả đúng structured-output schema, không markdown.
 WorldModel phải khóa thời đại, địa lý, tổ chức, hệ thống vận hành, giới hạn và chi phí. Mọi geography.role là mô tả có nghĩa.
 travelRules là đồ thị có hướng: từ vị trí mở đầu dự kiến phải đi được tới mọi location và có đường quay về. Không biến kiến thức thành vật tư, thời gian hoặc năng lượng miễn phí.
 Mỗi numeric resource bắt buộc có unit vật lý hoặc tiền tệ rõ ràng như VND, kg, lít, chiếc, điểm; không dùng một con số vô đơn vị.
-worldMechanics bắt buộc có đủ ba loại typed: conversion ghi input/output/hao hụt theo mỗi batch; capability ghi actor/fact/resource cấp quyền và công suất; constraint ghi fact bắt buộc hoặc bị cấm. Không giấu số học hoặc quyền hạn trong prose worldRules.
+Trả mechanics trong đúng ba mảng conversions, capabilities và constraints; mỗi mảng có ít nhất một phần tử đúng kind. Conversion ghi input/output/hao hụt theo mỗi batch; capability ghi actor/fact/resource cấp quyền và công suất; constraint ghi fact bắt buộc hoặc bị cấm. Không giấu số học hoặc quyền hạn trong prose worldRules.
 World rules, resource và tổ chức phải phản ánh requiredInfrastructure, minimumPlausibleTimeline và criticalAssumptions đã được mô phỏng.`,
-    prompt: JSON.stringify({
-      task: 'Xuất phần world canon cho identity đã khóa.',
-      commission,
-      groundedDomainResearch: domainResearch.value,
-      selectedConcept,
-      selectedSimulation,
-      identity: launchIdentity.value.kernel,
-    }),
-    schema: LaunchWorldSchema,
-    schemaComplexity: 'omit_large_array_max',
-    temperature: 0.3,
+      prompt: JSON.stringify({
+        task: 'Xuất phần world canon cho identity đã khóa.',
+        commission,
+        groundedDomainResearch: domainResearch.value,
+        selectedConcept,
+        selectedSimulation,
+        identity: launchIdentity.value.kernel,
+      }),
+      schema: LaunchWorldWireSchema,
+      schemaComplexity: 'omit_large_array_max',
+      temperature: 0.3,
     }));
+    launchWorld = {
+      value: LaunchWorldSchema.parse({
+        kernel: {
+          ...launchWorldWire.value.kernel,
+          worldMechanics: [
+            ...launchWorldWire.value.conversions,
+            ...launchWorldWire.value.capabilities,
+            ...launchWorldWire.value.constraints,
+          ],
+        },
+      }),
+      usage: launchWorldWire.usage,
+    };
+  }
   checkpoint.launchWorld = launchWorld;
   await input.onCheckpoint?.(structuredClone(checkpoint));
   usages.push(launchWorld.usage);
