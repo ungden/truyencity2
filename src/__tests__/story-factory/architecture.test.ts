@@ -111,10 +111,17 @@ describe('Story Factory architecture boundary', () => {
     const planner = readFileSync('src/services/story-factory/planner.ts', 'utf8');
     const prompts = readFileSync('src/services/story-factory/prompts.ts', 'utf8');
     expect(planner).toContain('time >= State.storyTimeMinutes + tổng mọi scene.dur + scene.travel');
+    expect(planner).toContain('mỗi scene.dur bắt buộc trong khoảng 1-10000');
+    expect(planner).toContain('tuyệt đối không dùng dur=0');
     expect(planner).toContain('change > 0 bắt buộc source khác null và sink=null');
     expect(planner).toContain('change < 0 bắt buộc sink khác null và source=null');
     expect(planner).toContain('không tạo delta change=0');
-    expect(planner).toContain('Scene dùng, nhận, trả hoặc hy sinh tài nguyên trong chương phải có delta tương ứng');
+    expect(planner).toContain('vật tư bị dùng/tiêu hao phải có delta giảm');
+    expect(prompts).toContain('không được giả định Writer sẽ tự bịa một giao dịch hay nhân vật phụ');
+    expect(prompts).toContain('Không để Writer tự bịa tài xế, chủ xe, khoản nợ');
+    expect(planner).toContain('requiredWorldRules: chapter.requiredWorldRuleIds.map');
+    expect(planner).toContain('numericResources: input.kernel.resources.flatMap');
+    expect(prompts).toContain('Rule cần muối, nhiên liệu, điện, vật liệu hay công cụ');
     expect(planner).toContain('message: lastError.message');
     expect(planner).toContain('evidence: lastError.evidence ?? null');
     expect(prompts).toContain('Thời gian cuối chương là mốc tuyệt đối');
@@ -167,6 +174,8 @@ describe('Story Factory architecture boundary', () => {
     expect(bakeoff).not.toContain("from('story_factory_jobs')");
     expect(sequential).toContain('failedUsageCost(record.evidence)');
     expect(sequential).toContain('estimated_cost_usd: progress.buildCostUsd + unbookedSetupCost');
+    expect(sequential).toContain('telemetry: candidate.attemptTelemetry');
+    expect(sequential).toContain('chapterAttempts: progress.chapterAttempts');
   });
 
   test('long-series memory uses indexed exact IDs and arc transitions are atomic', () => {

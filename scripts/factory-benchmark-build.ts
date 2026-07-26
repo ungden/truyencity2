@@ -95,6 +95,12 @@ type Progress = {
   launchPackDigests: string[];
   samples: SequentialBenchmarkCorpus['samples'];
   writerBriefs: PlanQualifiedWriterBrief[];
+  chapterAttempts: Array<{
+    id: string;
+    lane: string;
+    chapterNumber: number;
+    telemetry: Awaited<ReturnType<typeof writeStoryChapter>>['attemptTelemetry'];
+  }>;
   setupCheckpoints: Record<string, SetupCheckpoint>;
   windowReviews: Array<{ lane: string; status: 'pass' }>;
   failure: null | { lane: string; stage: string; message: string; code: string | null; evidence: unknown };
@@ -201,6 +207,7 @@ async function main() {
     launchPackDigests: [],
     samples: [],
     writerBriefs: [],
+    chapterAttempts: [],
     setupCheckpoints: {},
     windowReviews: [],
     failure: null,
@@ -343,6 +350,13 @@ async function main() {
           }
           const generationCost = usageCost(candidate.usages);
           progress.buildCostUsd += generationCost;
+          progress.chapterAttempts.push({
+            id: `${entry.commission.slotKey.toLowerCase()}-ch${plan.chapterNumber}`,
+            lane,
+            chapterNumber: plan.chapterNumber,
+            telemetry: candidate.attemptTelemetry,
+          });
+          persist();
 
           stage = 'continuity';
           const continuity = await assessSequentialContinuity({
@@ -471,7 +485,11 @@ async function main() {
     let audit: null | { runId: string; storageKey: string; sha256: string } = null;
     if (db && runId) {
       await ensureAuditBucket(db);
-      const archive = gzipSync(Buffer.from(JSON.stringify({ corpus, writerCorpus })));
+      const archive = gzipSync(Buffer.from(JSON.stringify({
+        corpus,
+        writerCorpus,
+        chapterAttempts: progress.chapterAttempts,
+      })));
       const sha256 = createHash('sha256').update(archive).digest('hex');
       const storageKey = `benchmarks/sequential-v1/${STORY_FACTORY_RELEASE}/${corpusDigest}-${sha256}.json.gz`;
       await uploadImmutable(db, storageKey, archive, sha256);

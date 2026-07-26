@@ -131,6 +131,7 @@ export const StoryKernelSchema = z.object({
       id: stableId,
       name: shortText,
       kind: z.literal('numeric'),
+      unit: z.string().trim().min(1).max(40),
       minimum: z.number().finite().optional(),
       maximum: z.number().finite().optional(),
     }).strict(),
@@ -310,7 +311,7 @@ export const ArcPlanSchema = z.object(arcPlanShape).strict().superRefine((arc, c
 // The first launch always starts at chapter one. Expressing the 20-30 chapter
 // range directly in JSON Schema prevents the provider from producing an arc
 // that application validation must reject after an otherwise expensive setup.
-const InitialArcPlanSchema = z.object({
+export const InitialArcPlanSchema = z.object({
   ...arcPlanShape,
   startChapter: z.literal(1),
   plannedEndChapter: z.number().int().min(20).max(30),

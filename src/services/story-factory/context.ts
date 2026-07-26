@@ -84,7 +84,14 @@ export function buildWriterBrief(input: {
         Object.entries(character.relationshipState).filter(([counterpartId]) => ids.characters.has(counterpartId)),
       ),
     })),
-    resources: input.state.resources.filter(resource => ids.resources.has(resource.resourceId)),
+    resources: input.state.resources.filter(resource => ids.resources.has(resource.resourceId)).map(resource => {
+      const definition = input.kernel.resources.find(item => item.id === resource.resourceId);
+      return {
+        ...resource,
+        name: definition?.name,
+        unit: definition?.kind === 'numeric' ? definition.unit : undefined,
+      };
+    }),
     promises: input.state.promises.filter(promise => ids.promises.has(promise.promiseId)),
     historicalTransitions: (input.relevantTransitions ?? []).slice(0, 6).map(transition => ({
       chapterNumber: transition.chapterNumber,

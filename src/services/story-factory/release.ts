@@ -3,10 +3,10 @@ import { STORY_FACTORY_BENCHMARK_PROTOCOL } from './benchmark';
 import { FACTORY_PROMPT_VERSION } from './prompts';
 import { DEFAULT_MODEL_ROUTES } from './routes';
 
-export const FACTORY_CONTRACT_VERSION = 'story-factory-contracts-20-failed-provider-usage-evidence';
+export const FACTORY_CONTRACT_VERSION = 'story-factory-contracts-22-transaction-intent-boundary';
 export const FACTORY_STATE_VERSION = 'story-factory-state-7-bounded-mechanical-history';
-export const FACTORY_SETUP_VERSION = 'story-factory-setup-16-no-opening-length-gate';
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-13-explicit-window-size';
+export const FACTORY_SETUP_VERSION = 'story-factory-setup-18-initial-arc-provider-bounds';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-16-world-rule-input-ledger';
 const FACTORY_ENGINE_SETUP_COMPATIBILITY = FACTORY_SETUP_VERSION;
 
 const identity = {

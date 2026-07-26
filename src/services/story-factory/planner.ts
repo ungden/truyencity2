@@ -85,7 +85,7 @@ const PLANNER_COMPACT_CONTRACT = {
     'Mọi field compact đều bắt buộc; dùng null đúng chỗ, không bỏ field. counterpart chỉ khác null với relationship.',
     'resource_numeric phải ghi nguồn/đích theo dấu của change: change dương có source cụ thể và sink=null; change âm có sink cụ thể và source=null; không tạo delta change=0.',
     'pre.k chỉ được fact|resource|location|promise; resource_numeric và resource_state chỉ dùng cho deltas.k.',
-    'time, dur và travel là một số nguyên phút; travel không được là mảng hay mô tả tuyến đường.',
+    'time, dur và travel là số nguyên phút; mỗi scene.dur bắt buộc trong khoảng 1-10000, scene.travel trong khoảng 0-100000; tuyệt đối không dùng dur=0; travel không được là mảng hay mô tả tuyến đường.',
     'time là storyTime tuyệt đối ở cuối chương, không phải số phút của riêng chương. Với chương đầu: time >= State.storyTimeMinutes + tổng mọi scene.dur + scene.travel. Với chương sau: time >= time chương trước + tổng dur + travel của chương đó.',
     'Tính time tuần tự cho cả window sau khi đã chốt scenes; tuyệt đối không để time bằng thời điểm đầu chương khi chương có diễn biến.',
     'scene.id và mọi ID đều là string stable ID, không dùng số thứ tự trần.',
@@ -93,6 +93,7 @@ const PLANNER_COMPACT_CONTRACT = {
     'scene.people chỉ gồm nhân vật đang có mặt vật lý ở scene.loc; nếu nhân vật chỉ được nhắc tới hoặc là động lực ở nơi khác thì không đưa vào people.',
     'scene.deltaIds chỉ chứa delta ID tồn tại trong cùng chương; cảnh nối có thể rỗng nhưng cả chương vẫn phải có deltas.',
     'Mỗi delta phải được ít nhất một scene.deltaIds tham chiếu.',
+    'rules chỉ chứa world-rule thực sự được thi hành trong chương. Nếu chương mới quyết định hoặc hứa sẽ dùng cơ chế ở tương lai thì chưa đưa rule đó vào rules.',
     'Giữ goal/block/act ngắn và cơ học; chỉ đưa nhân vật, rule và delta thật sự cần cho chương.',
     'knowledge.after phải là fact ID đã tồn tại trong State. Nếu nhân vật học một fact mới, tạo fact delta khai báo fact đó trước knowledge delta trong cùng chương và gắn cả hai vào scene học biết.',
     'relationship.before phải bằng chính xác State.characters[characterId].relationshipState[counterpartId], hoặc null nếu pair chưa có entry; không suy ra quan hệ ban đầu từ role, agenda hay mô tả Kernel.',
@@ -255,6 +256,25 @@ export async function assessRollingPlan(input: {
       after: delta.after,
       relativeMagnitude: delta.before === 0 ? null : Math.abs(delta.delta / delta.before),
     }] : []),
+    requiredWorldRules: chapter.requiredWorldRuleIds.map(ruleId => {
+      const rule = input.kernel.worldRules.find(item => item.id === ruleId);
+      return { ruleId, claim: rule?.claim ?? null };
+    }),
+    numericResources: input.kernel.resources.flatMap(resource => {
+      if (resource.kind !== 'numeric') return [];
+      const stateValue = input.state.resources.find(item => item.resourceId === resource.id)?.value;
+      return [{
+        resourceId: resource.id,
+        name: resource.name,
+        unit: resource.unit,
+        stateValue: typeof stateValue === 'number' ? stateValue : null,
+        chapterDeltas: chapter.requiredDeltas.flatMap(delta => (
+          delta.kind === 'resource_numeric' && delta.resourceId === resource.id
+            ? [{ deltaId: delta.id, before: delta.before, change: delta.delta, after: delta.after }]
+            : []
+        )),
+      }];
+    }),
     stateTransitions: chapter.requiredDeltas.map(delta => ({ deltaId: delta.id, kind: delta.kind })),
   }));
   const result = await input.provider.json({
@@ -268,12 +288,12 @@ export async function assessRollingPlan(input: {
       rollingPlan: input.rollingPlan,
       auditSignals,
       mandatoryChecks: {
-        causalMechanism: 'Mỗi cơ hội/tai họa/kết quả phải có nguyên nhân trong state/precondition/world rule trước cảnh; action tự tuyên bố nguyên nhân hoặc source/sink bookkeeping không phải bằng chứng.',
+        causalMechanism: 'Mỗi cơ hội/tai họa/kết quả phải có nguyên nhân trong state/precondition/world rule trước cảnh; action tự tuyên bố nguyên nhân hoặc source/sink bookkeeping không phải bằng chứng. Phương tiện, dịch vụ, lao động, người trung gian và quyền tiếp cận bắt buộc phải có nguồn, chủ thể và chi phí/quyền hạn đã thiết lập.',
         earnedProgression: 'Độ lớn thay đổi phải tương xứng chuẩn bị, chi phí, rủi ro và thang hiện tại; thay đổi trên 5 lần baseline cần tích lũy nhiều bước cụ thể.',
         oppositionAgenda: 'Đối lực phải có lựa chọn, đối sách và hậu quả theo agenda riêng; chỉ gây hấn rồi kinh ngạc/thua/chạy không đạt.',
         sceneVariety: 'Window không được lặp công thức giải thích cơ chế → biểu diễn thành công → người khác kinh ngạc/tôn sùng → nhận thưởng.',
         stageAlignment: 'Xung đột và reward loop phải phục vụ stage hiện tại, không nhảy sớm.',
-        stateTransition: 'Mọi before/after và mọi số lượng/tiêu hao nêu trong scene phải khớp ledger, required delta và ý nghĩa thế giới. Scene dùng, nhận, trả hoặc hy sinh tài nguyên trong chương phải có delta tương ứng; giảm một ma sát không tự tạo thêm năng lượng, lưu lượng hay độ bền ngoài world rule.',
+        stateTransition: 'Mọi before/after và mọi số lượng/tiêu hao nêu trong scene phải khớp ledger, unit, required delta và ý nghĩa thế giới. Với từng requiredWorldRule, phải đối chiếu mọi vật tư/đầu vào vật lý trong claim với numericResources: đầu vào phải có sẵn hoặc được cấp bằng delta, và vật tư bị dùng/tiêu hao phải có delta giảm. Nếu chương chỉ hứa hoặc quyết định dùng cơ chế ở tương lai thì rule đó không được nằm trong requiredWorldRules của chương hiện tại. Scene không được dịch chuyển người/hàng bằng phương tiện hoặc dịch vụ chưa có nguồn, quyền sử dụng và chi phí; giảm một ma sát không tự tạo thêm năng lượng, lưu lượng hay độ bền ngoài world rule.',
       },
       evidenceRule: 'Với mỗi check, checkEvidence phải chỉ rõ chapterNumber và ít nhất một sceneId hoặc deltaId làm căn cứ; không chấp nhận lời khen chung.',
     }),
@@ -325,7 +345,14 @@ export async function planRollingWindow(input: {
         state: input.state,
         ledgerSnapshot: {
           facts: Object.fromEntries(input.state.facts.map(item => [item.id, item.value])),
-          resources: Object.fromEntries(input.state.resources.map(item => [item.resourceId, item.value])),
+          resources: Object.fromEntries(input.state.resources.map(item => {
+            const definition = input.kernel.resources.find(resource => resource.id === item.resourceId);
+            return [item.resourceId, {
+              value: item.value,
+              name: definition?.name,
+              unit: definition?.kind === 'numeric' ? definition.unit : null,
+            }];
+          })),
           locations: Object.fromEntries(input.state.characters.map(item => [item.characterId, item.locationId])),
           relationships: input.state.characters.flatMap(character => (
             Object.entries(character.relationshipState).map(([counterpartId, value]) => ({

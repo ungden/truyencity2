@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import {
   ArcPlanSchema,
+  InitialArcPlanSchema,
   LaunchPackSchema,
   StoryFactoryError,
   StoryKernelSchema,
@@ -139,7 +140,7 @@ const LaunchSeriesSchema = z.object({
   }),
 }).strict();
 const LaunchStateSchema = z.object({
-  arc: ArcPlanSchema,
+  arc: InitialArcPlanSchema,
   initialState: StoryStateSchema,
 }).strict();
 
@@ -414,6 +415,7 @@ Chỉ được chọn concept có domainFeasibility=pass và longRunFeasibility=
     system: `Bạn khóa world canon riêng của truyện đã chọn. Trả đúng structured-output schema, không markdown.
 WorldModel phải khóa thời đại, địa lý, tổ chức, hệ thống vận hành, giới hạn và chi phí. Mọi geography.role là mô tả có nghĩa.
 travelRules là đồ thị có hướng: từ vị trí mở đầu dự kiến phải đi được tới mọi location và có đường quay về. Không biến kiến thức thành vật tư, thời gian hoặc năng lượng miễn phí.
+Mỗi numeric resource bắt buộc có unit vật lý hoặc tiền tệ rõ ràng như VND, kg, lít, chiếc, điểm; không dùng một con số vô đơn vị.
 World rules, resource và tổ chức phải phản ánh requiredInfrastructure, minimumPlausibleTimeline và criticalAssumptions đã được mô phỏng.`,
     prompt: JSON.stringify({
       task: 'Xuất phần world canon cho identity đã khóa.',

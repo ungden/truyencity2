@@ -9,6 +9,7 @@ import {
   WriterBakeoffCorpusSchema,
   EditorAssessmentSchema,
   LaunchPackSchema,
+  InitialArcPlanSchema,
   type ArcPlan,
   type ChapterPlan,
   type LaunchPack,
@@ -158,7 +159,7 @@ const kernel: StoryKernel = {
     { fromLocationId: 'home', toLocationId: 'beach', minimumMinutes: 20 },
     { fromLocationId: 'beach', toLocationId: 'home', minimumMinutes: 20 },
   ],
-  resources: [{ id: 'money', name: 'Tiền mặt', kind: 'numeric', minimum: 0 }],
+  resources: [{ id: 'money', name: 'Tiền mặt', kind: 'numeric', unit: 'VND', minimum: 0 }],
   promises: [
     { id: 'promise_house', description: 'Sửa lại mái nhà trước mùa mưa.' },
     { id: 'promise_2', description: 'Tạo đầu ra công bằng hơn cho ngư dân.' },
@@ -376,6 +377,12 @@ describe('canonical Story Factory', () => {
     const futurePlan = plan(1);
     futurePlan.scenes[0].action = 'An nhận ra không thể nhượng bộ, quyết định tìm cơ hội lớn hơn để kiếm tiền trả nợ.';
     expect(() => applyChapterPlan({ kernel, state: initialState, plan: futurePlan })).not.toThrow();
+  });
+
+  test('does not treat an investigation into taking goods to market as a completed sale', () => {
+    const chapter = plan(1);
+    chapter.scenes[0].action = 'Thím Tư dùng quyền lực bến bãi để ép một ngư dân khai ra việc Phong dùng thùng xốp giữ lạnh mang cá đi bán.';
+    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
   });
 
   test('still rejects an actual purchase hidden beside future intent', () => {
@@ -608,7 +615,13 @@ describe('canonical Story Factory', () => {
     const brief = JSON.stringify(buildWriterBrief({
       kernel,
       state,
-      plan: plan(1),
+      plan: {
+        ...plan(1),
+        preconditions: [
+          ...plan(1).preconditions,
+          { kind: 'resource', entityId: 'money', expected: 100 },
+        ],
+      },
       relevantTransitions: [{
         chapterNumber: 1,
         deltaId: 'delta_prior_decision',
@@ -623,6 +636,11 @@ describe('canonical Story Factory', () => {
     expect(brief).not.toContain('research');
     expect(brief).not.toContain('rubric');
     expect(brief).not.toContain('promisesToResolve');
+    expect(brief).toContain('"unit":"VND"');
+    expect(StoryKernelSchema.safeParse({
+      ...kernel,
+      resources: [{ id: 'money', name: 'Tiền mặt', kind: 'numeric', minimum: 0 }],
+    }).success).toBe(false);
     expect(brief).not.toContain('lót trấu và xơ dừa');
     expect(brief).toContain('prior_decision');
     expect(brief).not.toContain('Hải giải thích bằng việc làm');
@@ -1018,8 +1036,8 @@ describe('canonical Story Factory', () => {
   });
 
   test('Launch Architect schema exposes the initial arc boundary to the provider', () => {
-    const schema = toGeminiResponseSchema(LaunchPackSchema);
-    const arc = (schema.properties as Record<string, { properties?: Record<string, Record<string, unknown>> }>).arc;
+    const schema = toGeminiResponseSchema(InitialArcPlanSchema);
+    const arc = schema as { properties?: Record<string, Record<string, unknown>> };
     expect(arc.properties?.startChapter.enum).toEqual([1]);
     expect(arc.properties?.plannedEndChapter.minimum).toBe(20);
     expect(arc.properties?.plannedEndChapter.maximum).toBe(30);
