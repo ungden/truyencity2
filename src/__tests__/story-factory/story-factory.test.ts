@@ -452,6 +452,31 @@ describe('canonical Story Factory', () => {
     expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
   });
 
+  test('accepts a numeric mechanic fact serialized as a numeric string', () => {
+    const sampleKernel = structuredClone(kernel);
+    sampleKernel.worldMechanics = sampleKernel.worldMechanics.map(mechanic => (
+      mechanic.id === 'mechanic_trade' && mechanic.kind === 'capability'
+        ? { ...mechanic, requiredFacts: [{ factId: 'fact_day', expected: 0 }] }
+        : mechanic
+    ));
+    const sampleState = structuredClone(initialState);
+    sampleState.facts = [{ id: 'fact_day', value: '0' }];
+    const chapter = plan(1, '0');
+    chapter.requiredDeltas = [{
+      id: 'delta_1', kind: 'fact', factId: 'fact_day', before: '0', after: '1',
+    }];
+    chapter.mechanicUses = [{
+      id: 'use_trade',
+      sceneId: 'scene_1',
+      mechanicId: 'mechanic_trade',
+      actorId: 'main',
+      quantity: 1,
+      preconditionFactIds: ['fact_day'],
+      deltaIds: ['delta_1'],
+    }];
+    expect(() => applyChapterPlan({ kernel: sampleKernel, state: sampleState, plan: chapter })).not.toThrow();
+  });
+
   test('rejects numeric preconditions serialized as the wrong string value', () => {
     const chapter = plan(1);
     chapter.preconditions = [{ kind: 'resource', entityId: 'money', expected: '101' }];

@@ -10,7 +10,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-2-owned-resource-transitions';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-3-symmetric-numeric-facts';
 
 export interface StateEvent {
   chapterNumber: number;
@@ -250,9 +250,18 @@ export function applyCanonExtension(input: {
 
 function preconditionMatches(actual: string | number | undefined, expected: string | number): boolean {
   if (actual === expected) return true;
-  if (typeof actual === 'number' && typeof expected === 'string' && expected.trim() !== '') {
-    const numericExpected = Number(expected);
-    return Number.isFinite(numericExpected) && actual === numericExpected;
+  if (actual === undefined) return false;
+  if (typeof actual !== typeof expected) {
+    const stringValue = typeof actual === 'string'
+      ? actual
+      : typeof expected === 'string' ? expected : null;
+    const numberValue = typeof actual === 'number'
+      ? actual
+      : typeof expected === 'number' ? expected : null;
+    if (numberValue !== null && stringValue !== null && stringValue.trim() !== '') {
+      const numericString = Number(stringValue);
+      return Number.isFinite(numericString) && numberValue === numericString;
+    }
   }
   return false;
 }
@@ -437,9 +446,15 @@ export function validateCausalMechanics(input: {
         fail(`Actor ${use.actorId} lacks capability ${mechanic.id}.`);
       }
       for (const condition of mechanic.requiredFacts) {
-        if (!suppliedFacts.has(condition.factId)
-          || !preconditionMatches(stateFacts.get(condition.factId), condition.expected)) {
-          fail(`Capability ${mechanic.id} lacks required fact ${condition.factId}.`);
+        if (!suppliedFacts.has(condition.factId)) {
+          fail(`Capability ${mechanic.id} does not cite required fact ${condition.factId}.`);
+        }
+        const actual = stateFacts.get(condition.factId);
+        if (!preconditionMatches(actual, condition.expected)) {
+          fail(`Capability ${mechanic.id} has a false required fact ${condition.factId}.`, {
+            expected: condition.expected,
+            actual,
+          });
         }
       }
       for (const resourceId of mechanic.requiredResourceIds) {
