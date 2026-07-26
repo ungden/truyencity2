@@ -10,7 +10,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-3-symmetric-numeric-facts';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-4-atomic-conversion-evidence';
 
 export interface StateEvent {
   chapterNumber: number;
@@ -489,10 +489,34 @@ export function validateCausalMechanics(input: {
   }
   const ungroundedResourceDeltas = plan.requiredDeltas
     .filter(delta => delta.kind === 'resource_numeric' || delta.kind === 'resource_state')
-    .map(delta => delta.id)
-    .filter(deltaId => !usedDeltaIds.has(deltaId));
+    .filter(delta => !usedDeltaIds.has(delta.id));
   if (ungroundedResourceDeltas.length) {
-    fail(`Chapter ${plan.chapterNumber} changes resources without a validated world mechanic.`, ungroundedResourceDeltas);
+    fail(`Chapter ${plan.chapterNumber} changes resources without a validated world mechanic.`, {
+      unownedDeltas: ungroundedResourceDeltas.map(delta => ({
+        deltaId: delta.id,
+        resourceId: delta.resourceId,
+        candidateMechanics: kernel.worldMechanics.reduce<Array<{
+          mechanicId: string;
+          kind: 'conversion' | 'capability';
+        }>>((candidates, mechanic) => {
+          if (mechanic.kind === 'conversion') {
+            const resourceIds = [
+              ...mechanic.inputsPerBatch,
+              ...mechanic.outputsPerBatch,
+              ...mechanic.lossesPerBatch,
+            ].map(item => item.resourceId);
+            if (resourceIds.includes(delta.resourceId)) {
+              candidates.push({ mechanicId: mechanic.id, kind: mechanic.kind });
+            }
+          }
+          if (mechanic.kind === 'capability' && mechanic.requiredResourceIds.includes(delta.resourceId)) {
+            candidates.push({ mechanicId: mechanic.id, kind: mechanic.kind });
+          }
+          return candidates;
+        }, []),
+      })),
+      repairRule: 'A conversion is atomic: claim every input, loss, and output delta in the same scene. For incomplete preparation, replace premature numeric consumption with a fact or resource_state progress delta.',
+    });
   }
 }
 

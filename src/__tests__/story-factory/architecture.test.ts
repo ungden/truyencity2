@@ -134,7 +134,9 @@ describe('Story Factory architecture boundary', () => {
     expect(planner).toContain('initialLocationsByCharacter');
     expect(planner).toContain('scene.travel phải >= thời gian trực tiếp lớn nhất');
     expect(planner).toContain('Conversion phải gắn đủ delta đầu vào, hao hụt và đầu ra');
+    expect(planner).toContain('Conversion là một batch nguyên tử');
     expect(validation).toContain('validateCausalMechanics');
+    expect(validation).toContain('For incomplete preparation');
     expect(validation).toContain('exceeds scene capacity');
     expect(prompts).toContain('Không để Writer tự bịa tài xế, chủ xe, khoản nợ');
     expect(planner).not.toContain('numericResources: input.kernel.resources.flatMap');

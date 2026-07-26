@@ -107,6 +107,7 @@ const PLANNER_COMPACT_CONTRACT = {
     'Mỗi delta phải được ít nhất một scene.deltaIds tham chiếu.',
     'rules chỉ chứa world-rule thực sự được thi hành trong chương. Nếu chương mới quyết định hoặc hứa sẽ dùng cơ chế ở tương lai thì chưa đưa rule đó vào rules.',
     'Mọi chuyển đổi/công suất/quyền hạn/constraint thực sự dùng phải có một mechanics entry tham chiếu worldMechanics ID. Mỗi entry bắt buộc gắn ít nhất một delta bằng primaryDeltaId; các delta còn lại nằm trong additionalDeltaIds. Không tạo mechanics entry nếu cơ chế chưa tạo state transition trong chương. Conversion phải gắn đủ delta đầu vào, hao hụt và đầu ra. Capability phải ghi actor, qty và fact cấp quyền.',
+    'Conversion là một batch nguyên tử: chỉ commit input, hao hụt và output trong cùng scene khi batch hoàn tất. Chương chuẩn bị chưa hoàn tất batch phải dùng fact hoặc resource_state để ghi tiến độ; không được trừ trước một phần input numeric rồi để output sang chương sau.',
     'Giữ goal/block/act ngắn và cơ học; chỉ đưa nhân vật, rule và delta thật sự cần cho chương.',
     'knowledge.after phải là fact ID đã tồn tại trong State. Nếu nhân vật học một fact mới, tạo fact delta khai báo fact đó trước knowledge delta trong cùng chương và gắn cả hai vào scene học biết.',
     'relationship.before phải bằng chính xác State.characters[characterId].relationshipState[counterpartId], hoặc null nếu pair chưa có entry; không suy ra quan hệ ban đầu từ role, agenda hay mô tả Kernel.',
