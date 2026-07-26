@@ -99,6 +99,7 @@ const PLANNER_COMPACT_CONTRACT = {
     'time, dur và travel là số nguyên phút; mỗi scene.dur bắt buộc trong khoảng 1-10000, scene.travel trong khoảng 0-100000; tuyệt đối không dùng dur=0; travel không được là mảng hay mô tả tuyến đường.',
     'time là storyTime tuyệt đối ở cuối chương, không phải số phút của riêng chương. Với chương đầu: time >= State.storyTimeMinutes + tổng mọi scene.dur + scene.travel. Với chương sau: time >= time chương trước + tổng dur + travel của chương đó.',
     'Tính time tuần tự cho cả window sau khi đã chốt scenes; tuyệt đối không để time bằng thời điểm đầu chương khi chương có diễn biến.',
+    'Với từng scene, theo dõi vị trí trước đó của từng người trong scene.people. Nếu bất kỳ người nào phải đi từ nơi khác tới scene.loc, scene.travel phải ít nhất bằng directMinimumMinutes lớn nhất của tất cả người đến scene; không được lấy riêng thời gian của POV hoặc dùng 0.',
     'scene.id và mọi ID đều là string stable ID, không dùng số thứ tự trần.',
     'rules có ít nhất một world-rule ID tồn tại trong Kernel.',
     'scene.people chỉ gồm nhân vật đang có mặt vật lý ở scene.loc; nếu nhân vật chỉ được nhắc tới hoặc là động lực ở nơi khác thì không đưa vào people.',
@@ -366,6 +367,17 @@ export async function planRollingWindow(input: {
             }))
           )),
           promises: Object.fromEntries(input.state.promises.map(item => [item.promiseId, item.status])),
+        },
+        travelConstraints: {
+          initialLocationsByCharacter: Object.fromEntries(
+            input.state.characters.map(item => [item.characterId, item.locationId]),
+          ),
+          directMinimumMinutes: input.kernel.travelRules.map(rule => ({
+            fromLocationId: rule.fromLocationId,
+            toLocationId: rule.toLocationId,
+            minimumMinutes: rule.minimumMinutes,
+          })),
+          sceneRule: 'Theo dõi vị trí của từng người qua từng scene. scene.travel phải >= thời gian trực tiếp lớn nhất của mọi scene.people đi từ vị trí trước đó tới scene.loc; nếu thiếu route thì không cho người đó xuất hiện trong scene.',
         },
         continuityPacket: input.continuityPacket ?? null,
         nextChapter: input.state.chapterNumber + 1,

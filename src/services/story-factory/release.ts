@@ -7,7 +7,7 @@ import { CAUSAL_VALIDATOR_VERSION } from './validation';
 export const FACTORY_CONTRACT_VERSION = 'story-factory-contracts-24-owned-causal-mechanics';
 export const FACTORY_STATE_VERSION = 'story-factory-state-9-exact-id-continuity-packet';
 export const FACTORY_SETUP_VERSION = 'story-factory-setup-21-split-mechanic-wire';
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-19-required-primary-mechanic-delta';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-20-explicit-participant-travel';
 export const FACTORY_CONTEXT_VERSION = 'story-factory-context-8-readable-mechanics-12-event-packet';
 export const FACTORY_MEMORY_POLICY_VERSION = 'story-factory-memory-4-exact-id-bounded-no-rag';
 const FACTORY_ENGINE_SETUP_COMPATIBILITY = FACTORY_SETUP_VERSION;

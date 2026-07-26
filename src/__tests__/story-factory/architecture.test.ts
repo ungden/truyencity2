@@ -128,6 +128,8 @@ describe('Story Factory architecture boundary', () => {
     expect(planner).toContain('không tạo delta change=0');
     expect(planner).toContain('primaryDeltaId');
     expect(planner).toContain('additionalDeltaIds');
+    expect(planner).toContain('initialLocationsByCharacter');
+    expect(planner).toContain('scene.travel phải >= thời gian trực tiếp lớn nhất');
     expect(planner).toContain('Conversion phải gắn đủ delta đầu vào, hao hụt và đầu ra');
     expect(validation).toContain('validateCausalMechanics');
     expect(validation).toContain('exceeds scene capacity');
