@@ -94,6 +94,9 @@ describe('Story Factory architecture boundary', () => {
     expect(setup).toContain('Mọi longPromises.promiseId');
     expect(setup).toContain('phải tham chiếu ID trong promises');
     expect(setup).toContain('schema: LaunchIdentitySchema');
+    expect(setup).toContain('sentenceRhythm chỉ mô tả độ dài, nhịp và cấu trúc câu');
+    expect(setup.indexOf('assertVoiceSemantics(launchIdentity.value.kernel.characters)'))
+      .toBeLessThan(setup.indexOf('let launchWorld:'));
     expect(setup).toContain('schema: LaunchWorldWireSchema');
     expect(setup).toContain('conversions: z.array(WorldMechanicSchema.options[0])');
     expect(setup).toContain('schema: LaunchSeriesSchema');

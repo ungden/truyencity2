@@ -213,21 +213,7 @@ function assertLaunchSemantics(
     throw new StoryFactoryError('setup_blocked', 'Kernel readerFantasy merely repeats the commission instead of defining a story-specific desire.');
   }
 
-  const sampleLikeVoice = /[“”"'‘’\n]|\b(?:cười|nhếch|quát|gằn|lẩm bẩm|nói rằng|ánh mắt)\b/iu;
-  for (const character of kernel.characters) {
-    const voiceValues = [
-      character.voice.register,
-      character.voice.sentenceRhythm,
-      character.voice.addressRules,
-      character.voice.vocabulary,
-      character.voice.reasoningStyle,
-    ];
-    if (voiceValues.some(value => sampleLikeVoice.test(value))) {
-      throw new StoryFactoryError('setup_blocked', 'Voice contract contains sample prose, dialogue, or canned gesture.', {
-        characterId: character.id,
-      });
-    }
-  }
+  assertVoiceSemantics(kernel.characters);
 
   const protagonist = kernel.characters.find(character => character.id === kernel.protagonistId);
   const opposition = kernel.characters.filter(character => character.role === 'opposition');
@@ -257,6 +243,24 @@ function assertLaunchSemantics(
     || !kernel.worldMechanics.some(mechanic => mechanic.kind === 'capability')
     || !kernel.worldMechanics.some(mechanic => mechanic.kind === 'constraint')) {
     throw new StoryFactoryError('setup_blocked', 'Kernel must define at least one conversion, capability, and constraint mechanic.');
+  }
+}
+
+function assertVoiceSemantics(characters: LaunchPack['kernel']['characters']): void {
+  const sampleLikeVoice = /[“”"'‘’\n]|\b(?:cười|nhếch|quát|gằn|lẩm bẩm|nói rằng|ánh mắt)\b/iu;
+  for (const character of characters) {
+    const voiceValues = [
+      character.voice.register,
+      character.voice.sentenceRhythm,
+      character.voice.addressRules,
+      character.voice.vocabulary,
+      character.voice.reasoningStyle,
+    ];
+    if (voiceValues.some(value => sampleLikeVoice.test(value))) {
+      throw new StoryFactoryError('setup_blocked', 'Voice contract contains sample prose, dialogue, or canned gesture.', {
+        characterId: character.id,
+      });
+    }
   }
 }
 
@@ -402,6 +406,7 @@ Sau sample, mô tả ngắn hướng chương 2 và 3, chemistry nhân vật, ag
     system: `Bạn chịu trách nhiệm chọn concept và khóa bản sắc truyện. Trả đúng structured-output schema, không markdown.
 Chọn dựa trên chất lượng actual opening sample, chemistry nhân vật, agency của đối lực và khả năng biến hóa; không chỉ dựa vào metadata cơ chế. Opening sample chỉ là bằng chứng lựa chọn: tuyệt đối không chép câu, cử chỉ hoặc thoại từ sample vào Kernel.
 VoiceContract chỉ được dùng thuộc tính trung tính register, sentenceRhythm, directness, addressRules, vocabulary, reasoningStyle, emotionDisplay và humorStyle. Không chứa câu thoại, cử chỉ, phản ứng mẫu, stressResponse hoặc avoidances.
+sentenceRhythm chỉ mô tả độ dài, nhịp và cấu trúc câu; không mô tả âm lượng, động tác phát ngôn hoặc thói quen như cười, nhếch, quát, gằn giọng, lẩm bẩm.
 Chỉ được chọn concept có domainFeasibility=pass và longRunFeasibility=pass. Giữ nguyên ba fingerprint của concept được chọn.`,
     prompt: JSON.stringify({
       task: 'Chọn concept và xuất identity, cast, voice, pleasure loop cùng cover art prompt.',
@@ -417,6 +422,7 @@ Chỉ được chọn concept có domainFeasibility=pass và longRunFeasibility=
   checkpoint.launchIdentity = launchIdentity;
   await input.onCheckpoint?.(structuredClone(checkpoint));
   usages.push(launchIdentity.usage);
+  assertVoiceSemantics(launchIdentity.value.kernel.characters);
   if (!ranking.value.selectedIds.includes(launchIdentity.value.selectedConceptId)) {
     throw new StoryFactoryError('setup_blocked', 'Launch Architect selected a concept outside the top two.');
   }
