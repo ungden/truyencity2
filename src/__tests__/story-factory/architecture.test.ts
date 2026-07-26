@@ -137,6 +137,8 @@ describe('Story Factory architecture boundary', () => {
     expect(planner).toContain('Conversion là một batch nguyên tử');
     expect(validation).toContain('validateCausalMechanics');
     expect(validation).toContain('For incomplete preparation');
+    expect(validation).toContain('causal validation issues');
+    expect(validation).toContain('Schedule this capability only after a prior committed delta');
     expect(validation).toContain('exceeds scene capacity');
     expect(prompts).toContain('Không để Writer tự bịa tài xế, chủ xe, khoản nợ');
     expect(planner).not.toContain('numericResources: input.kernel.resources.flatMap');

@@ -359,6 +359,42 @@ describe('canonical Story Factory', () => {
       .toThrow('changes resources without a validated world mechanic');
   });
 
+  test('returns all independent mechanic issues in one causal repair payload', () => {
+    const chapter = plan(1);
+    chapter.mechanicUses = [
+      {
+        id: 'use_missing_fact',
+        sceneId: 'scene_1',
+        mechanicId: 'mechanic_trade',
+        actorId: 'main',
+        quantity: 1,
+        preconditionFactIds: [],
+        deltaIds: ['delta_1'],
+      },
+      {
+        id: 'use_duplicate_claim',
+        sceneId: 'scene_1',
+        mechanicId: 'mechanic_daylight',
+        actorId: 'main',
+        quantity: 1,
+        preconditionFactIds: [],
+        deltaIds: ['delta_1'],
+      },
+    ];
+    try {
+      applyChapterPlan({ kernel, state: initialState, plan: chapter });
+      throw new Error('Expected causal validation to fail.');
+    } catch (error) {
+      expect(error).toBeInstanceOf(StoryFactoryError);
+      expect((error as StoryFactoryError).evidence).toMatchObject({
+        issues: [
+          { mechanicUseId: 'use_missing_fact' },
+          { mechanicUseId: 'use_duplicate_claim' },
+        ],
+      });
+    }
+  });
+
   test('deterministic causal validation catches 100 cross-lane failures without a model call', () => {
     const lanes = ['do-thi', 'nien-dai', 'huyen-huyen', 'tien-hiep-moi'];
     const failures: Array<{ kernel: StoryKernel; plan: ChapterPlan }> = [];

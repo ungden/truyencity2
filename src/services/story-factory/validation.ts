@@ -10,7 +10,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-4-atomic-conversion-evidence';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-5-batched-issue-evidence';
 
 export interface StateEvent {
   chapterNumber: number;
@@ -386,9 +386,15 @@ export function validateCausalMechanics(input: {
   const deltas = new Map(plan.requiredDeltas.map(item => [item.id, item]));
   const stateFacts = new Map(state.facts.map(item => [item.id, item.value]));
   const usedDeltaIds = new Set<string>();
+  const issues: Array<{
+    mechanicUseId: string | null;
+    message: string;
+    evidence: unknown;
+  }> = [];
   unique(plan.mechanicUses.map(item => item.id), `Chapter ${plan.chapterNumber} mechanic uses`);
 
   for (const use of plan.mechanicUses) {
+    try {
     const mechanic = mechanics.get(use.mechanicId);
     const scene = scenes.get(use.sceneId);
     if (!mechanic) fail(`Mechanic use ${use.id} references unknown mechanic ${use.mechanicId}.`);
@@ -462,7 +468,11 @@ export function validateCausalMechanics(input: {
         if (!resource
           || (resource.kind === 'numeric' && resource.value <= 0)
           || (resource.kind === 'state' && resource.value.trim().length === 0)) {
-          fail(`Capability ${mechanic.id} lacks usable resource ${resourceId}.`);
+          fail(`Capability ${mechanic.id} lacks usable resource ${resourceId}.`, {
+            resourceId,
+            currentValue: resource?.value ?? null,
+            repairRule: 'Schedule this capability only after a prior committed delta makes the required resource usable, or remove the capability use from this chapter.',
+          });
         }
       }
       if (mechanic.maximumUnitsPerMinute !== null) {
@@ -486,13 +496,24 @@ export function validateCausalMechanics(input: {
         preconditionMatches(stateFacts.get(condition.factId), condition.expected));
       if (violated.length) fail(`Constraint ${mechanic.id} is blocked by forbidden facts.`, violated);
     }
+    } catch (error) {
+      if (!(error instanceof StoryFactoryError) || error.code !== 'plan_blocked') throw error;
+      issues.push({
+        mechanicUseId: use.id,
+        message: error.message,
+        evidence: error.evidence ?? null,
+      });
+    }
   }
   const ungroundedResourceDeltas = plan.requiredDeltas
     .filter(delta => delta.kind === 'resource_numeric' || delta.kind === 'resource_state')
     .filter(delta => !usedDeltaIds.has(delta.id));
   if (ungroundedResourceDeltas.length) {
-    fail(`Chapter ${plan.chapterNumber} changes resources without a validated world mechanic.`, {
-      unownedDeltas: ungroundedResourceDeltas.map(delta => ({
+    issues.push({
+      mechanicUseId: null,
+      message: `Chapter ${plan.chapterNumber} changes resources without a validated world mechanic.`,
+      evidence: {
+        unownedDeltas: ungroundedResourceDeltas.map(delta => ({
         deltaId: delta.id,
         resourceId: delta.resourceId,
         candidateMechanics: kernel.worldMechanics.reduce<Array<{
@@ -514,9 +535,18 @@ export function validateCausalMechanics(input: {
           }
           return candidates;
         }, []),
-      })),
-      repairRule: 'A conversion is atomic: claim every input, loss, and output delta in the same scene. For incomplete preparation, replace premature numeric consumption with a fact or resource_state progress delta.',
+        })),
+        repairRule: 'A conversion is atomic: claim every input, loss, and output delta in the same scene. For incomplete preparation, replace premature numeric consumption with a fact or resource_state progress delta.',
+      },
     });
+  }
+  if (issues.length) {
+    const first = issues[0];
+    throw new StoryFactoryError(
+      'plan_blocked',
+      issues.length === 1 ? first.message : `Chapter ${plan.chapterNumber} has ${issues.length} causal validation issues.`,
+      { issues },
+    );
   }
 }
 
