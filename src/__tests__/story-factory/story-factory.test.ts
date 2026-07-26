@@ -1239,12 +1239,42 @@ describe('canonical Story Factory', () => {
   });
 
   test('Planner wire envelope materializes into the exact canonical plan', () => {
-    const rolling = materializePlannerRollingPlan(plannerWire());
+    const wire = plannerWire();
+    const chapter = JSON.parse(wire.chaptersJson[0]);
+    chapter.mechanics = [{
+      id: 'use_market',
+      scene: 'scene_1',
+      mechanic: 'mechanic_market',
+      actor: 'main',
+      qty: 1,
+      facts: ['fact_day'],
+      primaryDeltaId: 'delta_1',
+      additionalDeltaIds: [],
+    }];
+    wire.chaptersJson[0] = JSON.stringify(chapter);
+    const rolling = materializePlannerRollingPlan(wire);
     expect(rolling.startChapter).toBe(1);
     expect(rolling.plans[0].chapterNumber).toBe(1);
     expect(rolling.plans[0].requiredDeltas[0]).toEqual({
       id: 'delta_1', kind: 'fact', factId: 'fact_day', before: 'ngay_0', after: 'ngay_1',
     });
+    expect(rolling.plans[0].mechanicUses[0].deltaIds).toEqual(['delta_1']);
+  });
+
+  test('Planner wire cannot emit a decorative mechanic without a required delta', () => {
+    const wire = plannerWire();
+    const chapter = JSON.parse(wire.chaptersJson[0]);
+    chapter.mechanics = [{
+      id: 'use_market',
+      scene: 'scene_1',
+      mechanic: 'mechanic_market',
+      actor: 'main',
+      qty: 1,
+      facts: [],
+      additionalDeltaIds: [],
+    }];
+    wire.chaptersJson[0] = JSON.stringify(chapter);
+    expect(() => materializePlannerRollingPlan(wire)).toThrow();
   });
 
   test('Plan Judge passes a valid window with one independent review call', async () => {
@@ -1329,6 +1359,25 @@ describe('canonical Story Factory', () => {
         validation: expect.objectContaining({ requiredWindowSize: 5, actualWindowSize: 1 }),
       }),
     });
+    expect(provider.calls).toEqual(['planner', 'planner']);
+  });
+
+  test('an invalid compact plan is repaired once then classified as plan_blocked', async () => {
+    const invalidWire = plannerWire();
+    const chapter = JSON.parse(invalidWire.chaptersJson[0]);
+    chapter.mechanics = [{
+      id: 'use_without_delta',
+      scene: 'scene_1',
+      mechanic: 'mechanic_market',
+      actor: 'main',
+      qty: 1,
+      facts: [],
+      additionalDeltaIds: [],
+    }];
+    invalidWire.chaptersJson[0] = JSON.stringify(chapter);
+    const provider = new QueueProvider([invalidWire, invalidWire]);
+    await expect(planRollingWindow({ kernel, arc, state: initialState, routes, provider }))
+      .rejects.toMatchObject({ code: 'plan_blocked' });
     expect(provider.calls).toEqual(['planner', 'planner']);
   });
 

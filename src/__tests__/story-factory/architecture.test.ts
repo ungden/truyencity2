@@ -126,6 +126,8 @@ describe('Story Factory architecture boundary', () => {
     expect(planner).toContain('change > 0 bắt buộc source khác null và sink=null');
     expect(planner).toContain('change < 0 bắt buộc sink khác null và source=null');
     expect(planner).toContain('không tạo delta change=0');
+    expect(planner).toContain('primaryDeltaId');
+    expect(planner).toContain('additionalDeltaIds');
     expect(planner).toContain('Conversion phải gắn đủ delta đầu vào, hao hụt và đầu ra');
     expect(validation).toContain('validateCausalMechanics');
     expect(validation).toContain('exceeds scene capacity');

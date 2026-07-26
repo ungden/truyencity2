@@ -63,7 +63,8 @@ const PlannerCompactChapterSchema = z.object({
     actor: z.string(),
     qty: z.number().finite().positive().max(1_000_000),
     facts: z.array(z.string()).max(20),
-    deltaIds: z.array(z.string()).min(1).max(30),
+    primaryDeltaId: z.string(),
+    additionalDeltaIds: z.array(z.string()).max(29),
   }).strict()).max(30),
 }).strict();
 
@@ -89,7 +90,7 @@ const PLANNER_COMPACT_CONTRACT = {
     preFields: ['k', 'id', 'value'],
     sceneFields: ['id', 'pov', 'people', 'loc', 'dur', 'travel', 'goal', 'block', 'act', 'deltaIds'],
     deltaFields: ['id', 'k', 'target', 'counterpart', 'before', 'change', 'after', 'source', 'sink'],
-    mechanicFields: ['id', 'scene', 'mechanic', 'actor', 'qty', 'facts', 'deltaIds'],
+    mechanicFields: ['id', 'scene', 'mechanic', 'actor', 'qty', 'facts', 'primaryDeltaId', 'additionalDeltaIds'],
   },
   strictRules: [
     'Mọi field compact đều bắt buộc; dùng null đúng chỗ, không bỏ field. counterpart chỉ khác null với relationship.',
@@ -104,7 +105,7 @@ const PLANNER_COMPACT_CONTRACT = {
     'scene.deltaIds chỉ chứa delta ID tồn tại trong cùng chương; cảnh nối có thể rỗng nhưng cả chương vẫn phải có deltas.',
     'Mỗi delta phải được ít nhất một scene.deltaIds tham chiếu.',
     'rules chỉ chứa world-rule thực sự được thi hành trong chương. Nếu chương mới quyết định hoặc hứa sẽ dùng cơ chế ở tương lai thì chưa đưa rule đó vào rules.',
-    'Mọi chuyển đổi/công suất/quyền hạn/constraint thực sự dùng phải có một mechanics entry tham chiếu worldMechanics ID. Conversion phải gắn đủ delta đầu vào, hao hụt và đầu ra. Capability phải ghi actor, qty và fact cấp quyền.',
+    'Mọi chuyển đổi/công suất/quyền hạn/constraint thực sự dùng phải có một mechanics entry tham chiếu worldMechanics ID. Mỗi entry bắt buộc gắn ít nhất một delta bằng primaryDeltaId; các delta còn lại nằm trong additionalDeltaIds. Không tạo mechanics entry nếu cơ chế chưa tạo state transition trong chương. Conversion phải gắn đủ delta đầu vào, hao hụt và đầu ra. Capability phải ghi actor, qty và fact cấp quyền.',
     'Giữ goal/block/act ngắn và cơ học; chỉ đưa nhân vật, rule và delta thật sự cần cho chương.',
     'knowledge.after phải là fact ID đã tồn tại trong State. Nếu nhân vật học một fact mới, tạo fact delta khai báo fact đó trước knowledge delta trong cùng chương và gắn cả hai vào scene học biết.',
     'relationship.before phải bằng chính xác State.characters[characterId].relationshipState[counterpartId], hoặc null nếu pair chưa có entry; không suy ra quan hệ ban đầu từ role, agenda hay mô tả Kernel.',
@@ -161,7 +162,7 @@ export function materializePlannerRollingPlan(value: z.infer<typeof PlannerRolli
         actorId: use.actor,
         quantity: use.qty,
         preconditionFactIds: use.facts,
-        deltaIds: use.deltaIds,
+        deltaIds: [use.primaryDeltaId, ...use.additionalDeltaIds],
       })),
     })),
   });
@@ -406,7 +407,7 @@ export async function planRollingWindow(input: {
       if (error instanceof StoryFactoryError && error.code === 'infra_blocked') throw error;
       lastError = error instanceof StoryFactoryError
         ? error
-        : new StoryFactoryError('infra_blocked', 'Planner output failed the exact rolling-plan contract.', error instanceof z.ZodError ? error.issues : undefined);
+        : new StoryFactoryError('plan_blocked', 'Planner output failed the exact rolling-plan contract.', error instanceof z.ZodError ? error.issues : undefined);
       previousResponse = result.value;
       validationIssues = {
         message: lastError.message,
