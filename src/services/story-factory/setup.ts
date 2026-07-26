@@ -36,7 +36,7 @@ export const ConceptCandidateSchema = z.object({
   id: z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/),
   workingTitle: z.string().trim().min(4).max(180),
   premise: z.string().trim().min(30).max(600),
-  protagonistContradiction: z.string().trim().min(20).max(300),
+  protagonistContradiction: z.string().trim().min(20).max(800),
   uniqueMechanism: z.string().trim().min(20).max(400),
   rewardLoop: z.string().trim().min(20).max(400),
   conflictEconomy: z.string().trim().min(20).max(400),

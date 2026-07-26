@@ -5,7 +5,7 @@ import { DEFAULT_MODEL_ROUTES } from './routes';
 
 export const FACTORY_CONTRACT_VERSION = 'story-factory-contracts-22-transaction-intent-boundary';
 export const FACTORY_STATE_VERSION = 'story-factory-state-7-bounded-mechanical-history';
-export const FACTORY_SETUP_VERSION = 'story-factory-setup-18-initial-arc-provider-bounds';
+export const FACTORY_SETUP_VERSION = 'story-factory-setup-19-semantic-concept-headroom';
 export const FACTORY_PLANNER_VERSION = 'story-factory-planner-16-world-rule-input-ledger';
 const FACTORY_ENGINE_SETUP_COMPATIBILITY = FACTORY_SETUP_VERSION;
 
