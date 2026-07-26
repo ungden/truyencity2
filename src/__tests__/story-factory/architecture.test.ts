@@ -81,6 +81,7 @@ describe('Story Factory architecture boundary', () => {
     expect(setup).toContain('chỉ dùng a-z, 0-9, dấu gạch dưới hoặc gạch ngang');
     expect(setup).toContain('chỉ là một cụm phân loại tối đa 12 từ');
     expect(setup).not.toContain('600-900');
+    expect(setup).not.toContain('min(1_200)');
     expect(setup).toContain('Không kéo dài để đạt số từ');
     expect(setup).toContain('Mọi longPromises.promiseId');
     expect(setup).toContain('phải tham chiếu ID trong promises');

@@ -5,7 +5,7 @@ import { DEFAULT_MODEL_ROUTES } from './routes';
 
 export const FACTORY_CONTRACT_VERSION = 'story-factory-contracts-20-failed-provider-usage-evidence';
 export const FACTORY_STATE_VERSION = 'story-factory-state-7-bounded-mechanical-history';
-export const FACTORY_SETUP_VERSION = 'story-factory-setup-15-concise-concept-fingerprints';
+export const FACTORY_SETUP_VERSION = 'story-factory-setup-16-no-opening-length-gate';
 export const FACTORY_PLANNER_VERSION = 'story-factory-planner-13-explicit-window-size';
 const FACTORY_ENGINE_SETUP_COMPATIBILITY = FACTORY_SETUP_VERSION;
 

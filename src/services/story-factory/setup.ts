@@ -55,7 +55,7 @@ const TopTwoSchema = z.object({
 const OpeningSimulationSchema = z.object({
   simulations: z.array(z.object({
     conceptId: z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/),
-    openingSample: z.string().trim().min(1_200).max(12_000),
+    openingSample: z.string().trim().min(20).max(12_000),
     chapter2Direction: z.string().trim().min(30).max(2_000),
     chapter3Direction: z.string().trim().min(30).max(2_000),
     characterChemistry: z.string().trim().min(20).max(1_000),
