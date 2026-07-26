@@ -3,11 +3,13 @@ import {
   ArcPlanSchema,
   LaunchPackSchema,
   StoryFactoryError,
+  StoryKernelSchema,
+  StoryStateSchema,
   type LaunchPack,
   type ModelRoutes,
 } from './contracts';
 import type { ProviderUsage, StoryModelProvider } from './provider';
-import { geminiProvider, toGeminiResponseSchema } from './provider';
+import { geminiProvider } from './provider';
 import { validateArcAgainstKernel, validateKernelState } from './validation';
 
 export const ResearchSnapshotSchema = z.object({
@@ -53,12 +55,7 @@ const TopTwoSchema = z.object({
 const OpeningSimulationSchema = z.object({
   simulations: z.array(z.object({
     conceptId: z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/),
-    openingSample: z.string().trim().min(2_000).max(12_000).superRefine((sample, ctx) => {
-      const count = sample.split(/\s+/u).filter(Boolean).length;
-      if (count < 600 || count > 900) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Opening sample must contain 600-900 words.' });
-      }
-    }),
+    openingSample: z.string().trim().min(1_200).max(12_000),
     chapter2Direction: z.string().trim().min(30).max(2_000),
     chapter3Direction: z.string().trim().min(30).max(2_000),
     characterChemistry: z.string().trim().min(20).max(1_000),
@@ -98,38 +95,53 @@ export interface SetupCheckpoint {
   ranking?: SetupStageArtifact;
   domainResearch?: SetupStageArtifact;
   simulation?: SetupStageArtifact;
+  launchIdentity?: SetupStageArtifact;
+  launchWorld?: SetupStageArtifact;
+  launchSeries?: SetupStageArtifact;
+  launchState?: SetupStageArtifact;
 }
 
-// This is only a provider transport envelope, not a fifth story artifact.
-// Keeping the constrained response flat avoids asking Gemini's decoder to
-// materialize every nested state-delta union at once. Each canonical artifact
-// is still parsed independently and fail-closed below.
-const LaunchPackWireSchema = z.object({
-  v: z.literal(1),
+const StoryKernelObjectSchema = StoryKernelSchema.innerType();
+const LaunchIdentitySchema = z.object({
   selectedConceptId: z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/),
-  kernelJson: z.string().trim().min(2),
-  arcJson: z.string().trim().min(2),
-  initialStateJson: z.string().trim().min(2),
   coverPrompt: z.string().trim().min(20).max(2_000),
+  kernel: StoryKernelObjectSchema.pick({
+    schemaVersion: true,
+    title: true,
+    description: true,
+    genreLane: true,
+    readerFantasy: true,
+    uniqueMechanism: true,
+    mechanismFingerprint: true,
+    rewardLoopFingerprint: true,
+    conflictEconomyFingerprint: true,
+    protagonistId: true,
+    characters: true,
+    pleasureLoop: true,
+  }),
 }).strict();
-
-function materializeLaunchPack(wire: z.infer<typeof LaunchPackWireSchema>): LaunchPack {
-  try {
-    return LaunchPackSchema.parse({
-      schemaVersion: 1,
-      selectedConceptId: wire.selectedConceptId,
-      kernel: JSON.parse(wire.kernelJson),
-      arc: JSON.parse(wire.arcJson),
-      initialState: JSON.parse(wire.initialStateJson),
-      coverPrompt: wire.coverPrompt,
-    });
-  } catch (error) {
-    const evidence = error instanceof z.ZodError
-      ? error.issues
-      : [{ message: error instanceof Error ? error.message : String(error) }];
-    throw new StoryFactoryError('setup_blocked', 'Launch Architect produced an invalid canonical launch pack.', evidence);
-  }
-}
+const LaunchWorldSchema = z.object({
+  kernel: StoryKernelObjectSchema.pick({
+    worldModel: true,
+    worldRules: true,
+    locations: true,
+    travelRules: true,
+    resources: true,
+  }),
+}).strict();
+const LaunchSeriesSchema = z.object({
+  kernel: StoryKernelObjectSchema.pick({
+    progressionTracks: true,
+    seriesSpine: true,
+    longPromises: true,
+    promises: true,
+    endingDirection: true,
+  }),
+}).strict();
+const LaunchStateSchema = z.object({
+  arc: ArcPlanSchema,
+  initialState: StoryStateSchema,
+}).strict();
 
 async function setupStage<T>(label: string, call: Promise<T>): Promise<T> {
   try {
@@ -141,6 +153,14 @@ async function setupStage<T>(label: string, call: Promise<T>): Promise<T> {
     }
     throw error;
   }
+}
+
+function parseSetupArtifact<S extends z.ZodTypeAny>(label: string, schema: S, value: unknown): z.output<S> {
+  const parsed = schema.safeParse(value);
+  if (!parsed.success) {
+    throw new StoryFactoryError('setup_blocked', `${label} failed canonical validation.`, parsed.error.issues);
+  }
+  return parsed.data;
 }
 
 function tokens(value: string): Set<string> {
@@ -233,9 +253,10 @@ function generatorPrompt(input: {
       'Có vật liệu nhân quả để biến hóa ít nhất ba mươi chương.',
       'Có 8-15 arena/giai đoạn thực sự khác nhau để đi đến 800-1.200 chương; seriality1000 phải mô tả biến đổi macro, không đổi tên cùng một vòng lặp.',
       'Nêu earlyEndingRisk: vì sao truyện có thể cạn sớm và cơ chế nào ngăn điều đó mà không sinh filler.',
-      'Không dựa vào đối thủ ngu, may mắn liên tục hoặc tài nguyên vô nguồn.',
-      'Tên dài, trực diện, dễ hiểu với độc giả Việt.',
-      'Viết metadata cô đọng: mỗi ý một hoặc hai câu, seriality30 đúng sáu ý và seriality1000 từ tám đến mười lăm ý; không diễn giải lại research.',
+          'Không dựa vào đối thủ ngu, may mắn liên tục hoặc tài nguyên vô nguồn.',
+          'Tên dài, trực diện, dễ hiểu với độc giả Việt.',
+          'Mỗi mechanismFingerprint, rewardLoopFingerprint và conflictEconomyFingerprint chỉ là một cụm phân loại tối đa 12 từ; không giải thích, không viết thành câu dài.',
+          'Viết metadata cô đọng: mỗi ý một hoặc hai câu, seriality30 đúng sáu ý và seriality1000 từ tám đến mười lăm ý; không diễn giải lại research.',
     ],
     commission: input.commission,
     researchSignals: input.research.signals,
@@ -329,7 +350,7 @@ Grounded Domain Research là ràng buộc: không chọn concept dựa trên cla
     : await setupStage('Opening Simulator', provider.json({
     model: input.routes.openingSimulator,
     system: `Bạn là Opening Simulator độc lập và không thay đổi concept.
-Với mỗi concept, viết actual opening sample tiếng Việt dài 600-900 từ: một cảnh mở đầu hoàn chỉnh có nhân vật hành động, đối thoại tự nhiên, đối lực có agenda riêng và một thay đổi cụ thể. Đây là mẫu để chọn concept, không phải canon và không được đưa vào Kernel.
+Với mỗi concept, viết actual opening sample tiếng Việt đủ dài để đánh giá như một cảnh mở đầu hoàn chỉnh: có nhân vật hành động, đối thoại tự nhiên, đối lực có agenda riêng và một thay đổi cụ thể. Không kéo dài để đạt số từ. Đây là mẫu để chọn concept, không phải canon và không được đưa vào Kernel.
 Sau sample, mô tả ngắn hướng chương 2 và 3, chemistry nhân vật, agency của xung đột và audit seriality/nhân quả.
 Đánh domainFeasibility=reject nếu ba chương đầu đòi hạ tầng, vốn, thời gian, năng lượng, kỹ năng hoặc mức an toàn không thực tế. Không được coi kiến thức tương lai là vật tư hay thời gian miễn phí.
 Đánh longRunFeasibility=reject nếu concept có thể kết thúc ở arc đầu, chỉ lặp một vòng kiếm tiền/sức mạnh, hoặc không có đủ arena, xung đột và progression cho 800-1.200 chương.`,
@@ -354,48 +375,116 @@ Sau sample, mô tả ngắn hướng chương 2 và 3, chemistry nhân vật, ag
     throw new StoryFactoryError('setup_blocked', 'Opening Simulator rejected both concepts on domain causality or long-run seriality.', simulation.value.simulations);
   }
 
-  const launchWire = await setupStage('Launch Architect', provider.json({
+  const launchIdentity = await setupStage('Launch Identity Architect', provider.json({
     model: input.routes.launchArchitect,
-    system: `Bạn là Launch Architect cuối cùng. Phản hồi bằng đúng envelope JSON được yêu cầu, tuyệt đối không bọc trong array.
-kernelJson, arcJson và initialStateJson là chuỗi chứa JSON hợp lệ của từng artifact; không markdown và không chú thích ngoài JSON.
-Chọn một concept rồi dựng duy nhất StoryKernel, Arc 20-30 chương và State chương 0. Không lập rolling plan; Planner riêng sẽ làm việc đó sau setup.
+    system: `Bạn chịu trách nhiệm chọn concept và khóa bản sắc truyện. Trả đúng structured-output schema, không markdown.
 Chọn dựa trên chất lượng actual opening sample, chemistry nhân vật, agency của đối lực và khả năng biến hóa; không chỉ dựa vào metadata cơ chế. Opening sample chỉ là bằng chứng lựa chọn: tuyệt đối không chép câu, cử chỉ hoặc thoại từ sample vào Kernel.
 VoiceContract chỉ được dùng thuộc tính trung tính register, sentenceRhythm, directness, addressRules, vocabulary, reasoningStyle, emotionDisplay và humorStyle. Không chứa câu thoại, cử chỉ, phản ứng mẫu, stressResponse hoặc avoidances.
-StoryKernel.worldModel phải khóa thời đại, địa lý, tổ chức, hệ thống vận hành, giới hạn và chi phí riêng của truyện.
-StoryKernel.seriesSpine phải có 8-15 stage liên tục, tổng target 800-1.200 chương; mỗi stage phải đổi arena, nguồn xung đột hoặc reward-loop variant và có entry/exit condition cụ thể.
-StoryKernel.longPromises phải có ít nhất bốn promise dài hạn, phân bổ qua nhiều stage; không được để tất cả hoàn thành trong stage đầu.
-StoryKernel.progressionTracks phải có milestone gắn stable stage ID. Arc đầu phải gắn stageId của stage đầu và active ID chỉ được tham chiếu canon có thật.
-Mỗi stable ID phải nhất quán. initialState.schemaVersion phải bằng 2; initialState.recentOutcomes và initialState.usedExpansionSeedIds phải là mảng rỗng vì chưa có chương/canon extension nào được commit.
-initialState phải có đúng một entry cho mọi character, resource và promise đã khai báo trong kernel; không được thiếu hoặc thêm ID lạ.
-travelRules là đồ thị có hướng: từ vị trí ban đầu của protagonist phải đi được tới mọi location đã khai và từ mỗi location phải có đường quay về, trực tiếp hoặc qua location trung gian. Không được chỉ khai một chiều.
-Chỉ được chọn concept có domainFeasibility=pass và longRunFeasibility=pass. requiredInfrastructure, minimumPlausibleTimeline, criticalAssumptions và macroStageStress của mô phỏng là ràng buộc bắt buộc: phản ánh chúng trong world rules, spine và State ban đầu; không ghi trước kết quả của chương tương lai vào State.`,
+Chỉ được chọn concept có domainFeasibility=pass và longRunFeasibility=pass. Giữ nguyên ba fingerprint của concept được chọn.`,
     prompt: JSON.stringify({
-      task: 'Chọn một concept bằng bằng chứng mô phỏng và xuất LaunchPack hoàn chỉnh.',
-      wireMapping: 'Đặt từng object canonical tương ứng vào kernelJson, arcJson và initialStateJson bằng JSON.stringify; không đổi tên field.',
-      canonicalLaunchPackSchema: toGeminiResponseSchema(LaunchPackSchema),
+      task: 'Chọn concept và xuất identity, cast, voice, pleasure loop cùng cover art prompt.',
       commission,
       researchSignals: research.signals,
       concepts: top,
       openingSimulations: simulation.value.simulations,
     }),
-    schema: LaunchPackWireSchema,
+    schema: LaunchIdentitySchema,
+    schemaComplexity: 'omit_large_array_max',
     temperature: 0.3,
   }));
-  usages.push(launchWire.usage);
-  const launch = materializeLaunchPack(launchWire.value);
-  if (!ranking.value.selectedIds.includes(launch.selectedConceptId)) {
+  checkpoint.launchIdentity = launchIdentity;
+  await input.onCheckpoint?.(structuredClone(checkpoint));
+  usages.push(launchIdentity.usage);
+  if (!ranking.value.selectedIds.includes(launchIdentity.value.selectedConceptId)) {
     throw new StoryFactoryError('setup_blocked', 'Launch Architect selected a concept outside the top two.');
   }
-  const selectedSimulation = simulation.value.simulations.find(item => item.conceptId === launch.selectedConceptId);
+  const selectedSimulation = simulation.value.simulations.find(item => item.conceptId === launchIdentity.value.selectedConceptId);
   if (!selectedSimulation || selectedSimulation.domainFeasibility !== 'pass' || selectedSimulation.longRunFeasibility !== 'pass') {
     throw new StoryFactoryError('setup_blocked', 'Launch Architect selected a concept rejected by the domain or long-run audit.', selectedSimulation);
   }
-  const selectedConcept = candidates.find(candidate => candidate.id === launch.selectedConceptId)!;
-  if (launch.kernel.mechanismFingerprint !== selectedConcept.mechanismFingerprint
-    || launch.kernel.rewardLoopFingerprint !== selectedConcept.rewardLoopFingerprint
-    || launch.kernel.conflictEconomyFingerprint !== selectedConcept.conflictEconomyFingerprint) {
+  const selectedConcept = candidates.find(candidate => candidate.id === launchIdentity.value.selectedConceptId)!;
+  if (launchIdentity.value.kernel.mechanismFingerprint !== selectedConcept.mechanismFingerprint
+    || launchIdentity.value.kernel.rewardLoopFingerprint !== selectedConcept.rewardLoopFingerprint
+    || launchIdentity.value.kernel.conflictEconomyFingerprint !== selectedConcept.conflictEconomyFingerprint) {
     throw new StoryFactoryError('setup_blocked', 'Launch pack fingerprints drifted from the selected concept.');
   }
+
+  const launchWorld = await setupStage('Launch World Architect', provider.json({
+    model: input.routes.launchArchitect,
+    system: `Bạn khóa world canon riêng của truyện đã chọn. Trả đúng structured-output schema, không markdown.
+WorldModel phải khóa thời đại, địa lý, tổ chức, hệ thống vận hành, giới hạn và chi phí. Mọi geography.role là mô tả có nghĩa.
+travelRules là đồ thị có hướng: từ vị trí mở đầu dự kiến phải đi được tới mọi location và có đường quay về. Không biến kiến thức thành vật tư, thời gian hoặc năng lượng miễn phí.
+World rules, resource và tổ chức phải phản ánh requiredInfrastructure, minimumPlausibleTimeline và criticalAssumptions đã được mô phỏng.`,
+    prompt: JSON.stringify({
+      task: 'Xuất phần world canon cho identity đã khóa.',
+      commission,
+      groundedDomainResearch: domainResearch.value,
+      selectedConcept,
+      selectedSimulation,
+      identity: launchIdentity.value.kernel,
+    }),
+    schema: LaunchWorldSchema,
+    schemaComplexity: 'omit_large_array_max',
+    temperature: 0.3,
+  }));
+  checkpoint.launchWorld = launchWorld;
+  await input.onCheckpoint?.(structuredClone(checkpoint));
+  usages.push(launchWorld.usage);
+
+  const launchSeries = await setupStage('Launch Series Architect', provider.json({
+    model: input.routes.launchArchitect,
+    system: `Bạn khóa đại cương dài hạn của đúng truyện và world canon đã chọn. Trả đúng structured-output schema, không markdown.
+seriesSpine có 8-15 stage liên tục, tổng target 800-1.200 chương; mỗi stage phải đổi arena, conflict economy hoặc reward-loop variant và có entry/exit cụ thể.
+progressionTracks có ít nhất hai trục, milestone dùng stable stage ID. longPromises có ít nhất bốn promise phân bổ nhiều stage.
+Mọi longPromises.promiseId, stages[].longPromiseIds và endingDirection.promisesToResolve phải tham chiếu ID trong promises. longPromises chỉ lập lịch mở/đến hạn, không thay thế định nghĩa promise.`,
+    prompt: JSON.stringify({
+      task: 'Xuất progression, series spine, promise ledger và ending direction.',
+      selectedConcept,
+      selectedSimulation,
+      identity: launchIdentity.value.kernel,
+      world: launchWorld.value.kernel,
+    }),
+    schema: LaunchSeriesSchema,
+    schemaComplexity: 'omit_array_max',
+    temperature: 0.3,
+  }));
+  checkpoint.launchSeries = launchSeries;
+  await input.onCheckpoint?.(structuredClone(checkpoint));
+  usages.push(launchSeries.usage);
+
+  const kernel = parseSetupArtifact('StoryKernel', StoryKernelSchema, {
+    ...launchIdentity.value.kernel,
+    ...launchWorld.value.kernel,
+    ...launchSeries.value.kernel,
+  });
+  const launchState = await setupStage('Launch State Architect', provider.json({
+    model: input.routes.launchArchitect,
+    system: `Bạn chỉ tạo Arc đầu 20-30 chương và StoryState chương 0 từ canon đã khóa. Trả đúng structured-output schema, không markdown.
+Arc gắn stage đầu; mọi active ID phải có trong Kernel. State không ghi trước kết quả tương lai.
+initialState.schemaVersion=2, chapterNumber=0, recentOutcomes=[] và usedExpansionSeedIds=[].
+State có đúng một entry cho mọi character, resource và promise trong Kernel; không thiếu, không thêm ID lạ.`,
+    prompt: JSON.stringify({
+      task: 'Xuất Arc đầu và State chương 0.',
+      selectedConcept,
+      selectedSimulation,
+      kernel,
+    }),
+    schema: LaunchStateSchema,
+    schemaComplexity: 'omit_large_array_max',
+    temperature: 0.3,
+  }));
+  checkpoint.launchState = launchState;
+  await input.onCheckpoint?.(structuredClone(checkpoint));
+  usages.push(launchState.usage);
+
+  const launch = parseSetupArtifact('LaunchPack', LaunchPackSchema, {
+    schemaVersion: 1,
+    selectedConceptId: launchIdentity.value.selectedConceptId,
+    kernel,
+    arc: launchState.value.arc,
+    initialState: launchState.value.initialState,
+    coverPrompt: launchIdentity.value.coverPrompt,
+  });
   assertLaunchSemantics(launch, commission);
   assertPortfolioDiversity(selectedConcept, input.existingSignatures ?? []);
   if (launch.initialState.chapterNumber !== 0 || launch.arc.startChapter !== 1) {

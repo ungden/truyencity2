@@ -66,8 +66,9 @@ describe('Story Factory architecture boundary', () => {
     expect(planner).toContain('model: input.routes.planJudge');
     expect(planner).toContain('for (let attempt = 1; attempt <= 2; attempt += 1)');
     expect(pipeline).not.toContain('planJudge');
-    expect(benchmark).toContain('Planner must return exactly chapters 1-5 for sequential survival');
+    expect(benchmark).toContain('Current Planner and Plan Judge must pass exactly chapters 1-5');
     expect(benchmark).toContain('writeStoryChapter({');
+    expect(benchmark).toContain('assessSequentialContinuity({');
     expect(benchmark).not.toContain('convertPack');
     expect(benchmark).not.toContain('SOURCE_REF');
     expect(routes).toContain("planner: 'gemini-3.1-pro-preview'");
@@ -78,6 +79,17 @@ describe('Story Factory architecture boundary', () => {
     const setup = readFileSync('src/services/story-factory/setup.ts', 'utf8');
     expect(setup).toContain('Mỗi concept.id phải là stable ID ASCII chữ thường');
     expect(setup).toContain('chỉ dùng a-z, 0-9, dấu gạch dưới hoặc gạch ngang');
+    expect(setup).toContain('chỉ là một cụm phân loại tối đa 12 từ');
+    expect(setup).not.toContain('600-900');
+    expect(setup).toContain('Không kéo dài để đạt số từ');
+    expect(setup).toContain('Mọi longPromises.promiseId');
+    expect(setup).toContain('phải tham chiếu ID trong promises');
+    expect(setup).toContain('schema: LaunchIdentitySchema');
+    expect(setup).toContain('schema: LaunchWorldSchema');
+    expect(setup).toContain('schema: LaunchSeriesSchema');
+    expect(setup).toContain('schema: LaunchStateSchema');
+    expect(setup).not.toContain('kernelJson');
+    expect(setup).not.toContain('LaunchPackWireSchema');
   });
 
   test('domain grounding constrains selection instead of auditing only after selection', () => {
@@ -91,7 +103,7 @@ describe('Story Factory architecture boundary', () => {
   test('Launch Architect must emit a connected directed travel graph', () => {
     const setup = readFileSync('src/services/story-factory/setup.ts', 'utf8');
     expect(setup).toContain('travelRules là đồ thị có hướng');
-    expect(setup).toContain('Không được chỉ khai một chiều');
+    expect(setup).toContain('có đường quay về');
   });
 
   test('Planner receives the absolute-time formula and complete repair evidence', () => {
@@ -114,14 +126,16 @@ describe('Story Factory architecture boundary', () => {
 
   test('canary promotion requires the latest chapter-10 review on the exact release', () => {
     const migration = readFileSync(
-      'supabase/migrations/20260725135035_story_factory_benchmark_v2_telemetry.sql',
+      'supabase/migrations/20260726084642_story_factory_sequential_validation_v3.sql',
       'utf8',
     );
     expect(migration).toContain('ORDER BY finished_at DESC NULLS LAST, started_at DESC');
     expect(migration).toContain("latest_review_status IS DISTINCT FROM 'passed'");
     expect(migration).toContain('latest_review_release IS DISTINCT FROM p_engine_release');
     expect(migration).toContain('project.engine_release IS DISTINCT FROM p_engine_release');
-    expect(migration).toContain("benchmark.benchmark_protocol_version IS DISTINCT FROM 'story-factory-benchmark-v2-reader-blind'");
+    expect(migration).toContain("benchmark.benchmark_protocol_version IS DISTINCT FROM 'story-factory-validation-v3-sequential-reader'");
+    expect(migration).toContain("'story-factory-writer-bakeoff-v2-plan-qualified'");
+    expect(migration).toContain("'story-factory-sequential-survival-v1'");
     expect(migration).toContain('setup_digest IS DISTINCT FROM job.launch_pack_digest');
   });
 
@@ -131,13 +145,27 @@ describe('Story Factory architecture boundary', () => {
       'utf8',
     );
     const benchmark = readFileSync('scripts/factory-benchmark.ts', 'utf8');
+    const provider = readFileSync('src/services/story-factory/provider.ts', 'utf8');
     expect(migration).toContain('story_factory_runs_terminal_consistency_check');
     expect(migration).toContain("status = 'infra_blocked'");
     expect(migration).toContain("benchmark_protocol_version = 'legacy_incomparable'");
-    expect(benchmark).toContain('buildBlindReaderInput({ sample, swap })');
-    expect(benchmark).not.toContain('sample.brief');
+    expect(benchmark).toContain('buildBlindReaderInput({ sample })');
+    expect(benchmark).not.toContain('sample.plan');
     expect(benchmark).not.toContain('stateBefore');
     expect(benchmark).not.toContain('chapterPlan');
+    expect(provider.match(/usage: response\.usage/g)?.length).toBeGreaterThanOrEqual(2);
+  });
+
+  test('Writer bake-off cannot reuse historical plans or charge plan defects to a Writer', () => {
+    const bakeoff = readFileSync('scripts/factory-model-bakeoff.ts', 'utf8');
+    const sequential = readFileSync('scripts/factory-benchmark-build.ts', 'utf8');
+    expect(bakeoff).toContain('WriterBakeoffCorpusSchema.parse');
+    expect(bakeoff).toContain("status: assessmentHasInvalidArtifact(assessment) ? 'corpus_invalid' : 'writer_failed'");
+    expect(bakeoff).not.toContain('freezeCorpus');
+    expect(bakeoff).not.toContain('normalizeHistoricalKernel');
+    expect(bakeoff).not.toContain("from('story_factory_jobs')");
+    expect(sequential).toContain('failedUsageCost(record.evidence)');
+    expect(sequential).toContain('estimated_cost_usd: progress.buildCostUsd + unbookedSetupCost');
   });
 
   test('long-series memory uses indexed exact IDs and arc transitions are atomic', () => {
@@ -156,10 +184,11 @@ describe('Story Factory architecture boundary', () => {
 
   test('one slow provider stage cannot be reclaimed by another worker', () => {
     const migration = readFileSync(
-      'supabase/migrations/20260724085848_extend_story_factory_job_lease.sql',
+      'supabase/migrations/20260726091255_restore_story_factory_30_minute_lease_v3.sql',
       'utf8',
     );
     expect(migration).toContain("lease_until = now() + interval '30 minutes'");
+    expect(migration).not.toContain("lease_until = now() + interval '5 minutes'");
     expect(migration).toContain('FOR UPDATE OF job SKIP LOCKED');
     expect(migration).toContain('SECURITY INVOKER');
   });
@@ -167,7 +196,7 @@ describe('Story Factory architecture boundary', () => {
   test('the long-series outline is story-specific and never injected from a genre template', () => {
     const setup = readFileSync('src/services/story-factory/setup.ts', 'utf8');
     const context = readFileSync('src/services/story-factory/context.ts', 'utf8');
-    expect(setup).toContain('seriesSpine phải có 8-15 stage');
+    expect(setup).toContain('seriesSpine có 8-15 stage');
     expect(setup).toContain('tổng target 800-1.200 chương');
     expect(context.slice(context.indexOf('export function buildWriterBrief'), context.indexOf('export function selectPreviousTail')))
       .not.toContain('seriesSpine');

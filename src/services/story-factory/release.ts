@@ -3,10 +3,10 @@ import { STORY_FACTORY_BENCHMARK_PROTOCOL } from './benchmark';
 import { FACTORY_PROMPT_VERSION } from './prompts';
 import { DEFAULT_MODEL_ROUTES } from './routes';
 
-export const FACTORY_CONTRACT_VERSION = 'story-factory-contracts-18-fail-closed-attempt-telemetry';
+export const FACTORY_CONTRACT_VERSION = 'story-factory-contracts-20-failed-provider-usage-evidence';
 export const FACTORY_STATE_VERSION = 'story-factory-state-7-bounded-mechanical-history';
-export const FACTORY_SETUP_VERSION = 'story-factory-setup-9-opening-prose-semantic';
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-12-concise-mechanical-window';
+export const FACTORY_SETUP_VERSION = 'story-factory-setup-15-concise-concept-fingerprints';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-13-explicit-window-size';
 const FACTORY_ENGINE_SETUP_COMPATIBILITY = FACTORY_SETUP_VERSION;
 
 const identity = {

@@ -298,6 +298,7 @@ export async function planRollingWindow(input: {
   arc: ArcPlan;
   state: StoryState;
   routes: ModelRoutes;
+  requiredWindowSize?: 1 | 2 | 3 | 4 | 5;
   recoveryEvidence?: unknown;
   relevantMemory?: RelevantStoryMemory[];
   provider?: StoryModelProvider;
@@ -315,7 +316,9 @@ export async function planRollingWindow(input: {
         task: attempt === 1
           ? input.recoveryEvidence
             ? 'Lập lại toàn bộ rolling window chưa commit từ state hiện tại; xử lý bằng chứng cho thấy plan trước không tạo tiến triển mới.'
-            : 'Lập từ một đến năm chương tiếp theo, không vượt quá cuối arc.'
+            : input.requiredWindowSize
+              ? `Lập đúng ${input.requiredWindowSize} chương tiếp theo, không vượt quá cuối arc.`
+              : 'Lập từ một đến năm chương tiếp theo, không vượt quá cuối arc.'
           : 'Tạo lại toàn bộ rolling window và sửa đúng các validation issue; không vá cục bộ.',
         kernel: input.kernel,
         arc: input.arc,
@@ -347,6 +350,12 @@ export async function planRollingWindow(input: {
     usages.push(result.usage);
     try {
       const parsed = materializePlannerRollingPlan(result.value);
+      if (input.requiredWindowSize && parsed.plans.length !== input.requiredWindowSize) {
+        throw new StoryFactoryError('plan_blocked', 'Planner returned the wrong required window size.', {
+          requiredWindowSize: input.requiredWindowSize,
+          actualWindowSize: parsed.plans.length,
+        });
+      }
       validateRollingPlan({ kernel: input.kernel, arc: input.arc, state: input.state, rollingPlan: parsed });
       const judged = await assessRollingPlan({
         provider,

@@ -6,17 +6,19 @@ import { gzipSync } from 'node:zlib';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 import {
-  BenchmarkManifestV2Schema,
   ReaderJudgmentSchema,
   SequentialBenchmarkCorpusSchema,
   STORY_FACTORY_BENCHMARK_PROTOCOL,
   STORY_FACTORY_RELEASE,
+  STORY_FACTORY_SEQUENTIAL_PROTOCOL,
+  STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL,
   StoredReaderJudgmentSchema,
-  benchmarkPasses,
+  ValidationManifestSchema,
   buildBlindReaderInput,
-  calculateBenchmarkMetrics,
+  calculateValidationMetrics,
   digestArtifact,
   geminiProvider,
+  validationPasses,
   type StoredReaderJudgment,
 } from '../src/services/story-factory';
 
@@ -31,8 +33,16 @@ const value = (flag: string) => {
 };
 const corpusPath = value('--corpus');
 if (!corpusPath) throw new Error('--corpus is required.');
+const writerBakeoffRunId = value('--writer-bakeoff-run-id');
+const sequentialRunId = value('--sequential-run-id');
+if (!writerBakeoffRunId || !sequentialRunId) {
+  throw new Error('--writer-bakeoff-run-id and --sequential-run-id are required.');
+}
+const uuid = z.string().uuid();
+uuid.parse(writerBakeoffRunId);
+uuid.parse(sequentialRunId);
 const resolvedCorpusPath = path.resolve(corpusPath);
-const checkpointPath = path.resolve(value('--checkpoint') ?? `${resolvedCorpusPath}.judgments.json`);
+const checkpointPath = path.resolve(value('--checkpoint') ?? `${resolvedCorpusPath}.reader-judgments.json`);
 const judgeModels = (process.env.FACTORY_JUDGE_MODELS
   ?? 'gemini-2.5-pro,gemini-3.5-flash,gemini-3.1-pro-preview')
   .split(',')
@@ -75,13 +85,44 @@ async function uploadImmutable(db: SupabaseClient, key: string, bytes: Buffer, d
   const existing = await db.storage.from('factory-audit').download(key);
   if (existing.error) throw existing.error;
   const existingDigest = createHash('sha256').update(Buffer.from(await existing.data.arrayBuffer())).digest('hex');
-  if (existingDigest !== digest) throw new Error('Immutable benchmark artifact key already exists with different bytes.');
+  if (existingDigest !== digest) throw new Error('Immutable validation artifact already exists with different bytes.');
+}
+
+async function verifyPrerequisites(db: SupabaseClient, corpusDigest: string, writer: string) {
+  const [writerRun, sequentialRun] = await Promise.all([
+    db.from('story_factory_runs')
+      .select('id,status,engine_release,benchmark_protocol_version,input_artifact,output_artifact')
+      .eq('id', writerBakeoffRunId)
+      .single(),
+    db.from('story_factory_runs')
+      .select('id,status,engine_release,benchmark_protocol_version,output_artifact,model_routes')
+      .eq('id', sequentialRunId)
+      .single(),
+  ]);
+  if (writerRun.error) throw writerRun.error;
+  if (sequentialRun.error) throw sequentialRun.error;
+  if (writerRun.data.status !== 'passed'
+    || writerRun.data.engine_release !== STORY_FACTORY_RELEASE
+    || writerRun.data.benchmark_protocol_version !== STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL
+    || writerRun.data.output_artifact?.recommended !== writer
+    || typeof writerRun.data.output_artifact?.corpusDigest !== 'string') {
+    throw new Error('Plan-qualified Writer bake-off does not authorize this Writer route.');
+  }
+  if (!sequentialRun.data
+    || sequentialRun.data.status !== 'passed'
+    || sequentialRun.data.engine_release !== STORY_FACTORY_RELEASE
+    || sequentialRun.data.benchmark_protocol_version !== STORY_FACTORY_SEQUENTIAL_PROTOCOL
+    || sequentialRun.data.output_artifact?.corpusDigest !== corpusDigest
+    || sequentialRun.data.model_routes?.route?.writer !== writer) {
+    throw new Error('Sequential survival run does not authorize this corpus and Writer route.');
+  }
+  return { writerCorpusDigest: writerRun.data.output_artifact.corpusDigest as string };
 }
 
 async function main() {
   const corpus = SequentialBenchmarkCorpusSchema.parse(JSON.parse(readFileSync(resolvedCorpusPath, 'utf8')));
   if (corpus.engineRelease !== STORY_FACTORY_RELEASE) {
-    throw new Error(`Corpus release ${corpus.engineRelease} does not match ${STORY_FACTORY_RELEASE}.`);
+    throw new Error(`Sequential corpus release ${corpus.engineRelease} does not match ${STORY_FACTORY_RELEASE}.`);
   }
   const corpusDigest = digestArtifact(corpus);
   const checkpoint = existsSync(checkpointPath)
@@ -94,7 +135,7 @@ async function main() {
       judgments: [] as StoredReaderJudgment[],
     };
   if (checkpoint.release !== STORY_FACTORY_RELEASE || checkpoint.corpusDigest !== corpusDigest) {
-    throw new Error('Benchmark checkpoint does not match the current release and corpus.');
+    throw new Error('Reader checkpoint does not match the current release and sequential corpus.');
   }
   const judgments = [...checkpoint.judgments];
   let judgmentCostUsd = checkpoint.judgmentCostUsd;
@@ -112,6 +153,9 @@ async function main() {
     ? createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } })
     : null;
   if (apply && !db) throw new Error('Supabase server environment is missing.');
+  const prerequisites = db
+    ? await verifyPrerequisites(db, corpusDigest, corpus.route.writer)
+    : { writerCorpusDigest: '0'.repeat(64) };
   let runId: string | null = null;
   if (db) {
     const inserted = await db.from('story_factory_runs').insert({
@@ -121,8 +165,8 @@ async function main() {
       benchmark_protocol_version: STORY_FACTORY_BENCHMARK_PROTOCOL,
       artifact_digest: corpusDigest,
       model_routes: {
-        candidate: corpus.candidateRoute,
-        control: corpus.controlRoute,
+        route: corpus.route,
+        continuityJudge: corpus.continuityJudgeModel,
         judges: judgeModels,
       },
       input_artifact: {
@@ -130,6 +174,9 @@ async function main() {
         corpusDigest,
         launchPackDigests: corpus.launchPackDigests,
         samplesExpected: 20,
+        writerBakeoffRunId,
+        writerCorpusDigest: prerequisites.writerCorpusDigest,
+        sequentialRunId,
       },
     }).select('id').single();
     if (inserted.error) throw inserted.error;
@@ -142,13 +189,13 @@ async function main() {
         item.sampleId === sample.id && item.model === model
       )));
       const created = await Promise.all(missingModels.map(async model => {
-        const swap = parseInt(createHash('sha256').update(`${sample.id}:${model}`).digest('hex').slice(0, 2), 16) % 2 === 0;
         const result = await geminiProvider.json({
           model,
           system: `Bạn là độc giả blind của truyện dài tiếng Việt.
-Chỉ đánh giá hai bản prose như một độc giả: giọng nhân vật, độ tự nhiên, sức căng, cảm xúc, nhân quả thể hiện trong cảnh và việc có muốn đọc chương tiếp hay không.
-Không suy đoán model, không đòi tuân thủ dàn ý ẩn và không thưởng cho checklist kỹ thuật.`,
-          prompt: JSON.stringify(buildBlindReaderInput({ sample, swap })),
+Chỉ đọc premise ngắn, đoạn cuối chương trước và prose hiện tại.
+Không suy đoán model, không đòi tuân thủ plan ẩn và không thưởng checklist kỹ thuật.
+Trả wantsNext=true chỉ khi với tư cách độc giả bạn thực sự muốn mở chương kế tiếp.`,
+          prompt: JSON.stringify(buildBlindReaderInput({ sample })),
           schema: ReaderJudgmentSchema,
           temperature: 0.4,
         });
@@ -156,7 +203,6 @@ Không suy đoán model, không đòi tuân thủ dàn ý ẩn và không thư�
           sampleId: sample.id,
           model,
           blinded: true,
-          swap,
           ...result.value,
           usage: result.usage,
         });
@@ -170,27 +216,32 @@ Không suy đoán model, không đòi tuân thủ dàn ý ẩn và không thư�
       console.log(JSON.stringify({ sampleId: sample.id, judgments: judgments.length }));
     }
 
-    const metrics = calculateBenchmarkMetrics({
+    const metrics = calculateValidationMetrics({
       corpus,
       judgments,
       judgeModels,
       judgmentCostUsd,
     });
-    const passed = benchmarkPasses(metrics);
+    const passed = validationPasses(metrics);
     const archive = gzipSync(Buffer.from(JSON.stringify({
       protocolVersion: STORY_FACTORY_BENCHMARK_PROTOCOL,
       corpus,
       judgments,
+      writerBakeoffRunId,
+      writerCorpusDigest: prerequisites.writerCorpusDigest,
+      sequentialRunId,
     })));
     const artifactSha256 = createHash('sha256').update(archive).digest('hex');
-    const artifactStorageKey = `benchmarks/v2/${STORY_FACTORY_RELEASE}/${corpusDigest}-${artifactSha256}.json.gz`;
-    const manifest = BenchmarkManifestV2Schema.parse({
+    const artifactStorageKey = `benchmarks/validation-v3/${STORY_FACTORY_RELEASE}/${corpusDigest}-${artifactSha256}.json.gz`;
+    const manifest = ValidationManifestSchema.parse({
       protocolVersion: STORY_FACTORY_BENCHMARK_PROTOCOL,
       engineRelease: STORY_FACTORY_RELEASE,
-      candidateRoute: corpus.candidateRoute,
-      controlRoute: corpus.controlRoute,
+      route: corpus.route,
+      continuityJudgeModel: corpus.continuityJudgeModel,
       judgeModels,
       launchPackDigests: corpus.launchPackDigests,
+      writerBakeoffRunId,
+      sequentialRunId,
       corpusDigest,
       artifactStorageKey,
       artifactSha256,
@@ -203,8 +254,8 @@ Không suy đoán model, không đòi tuân thủ dàn ý ẩn và không thư�
       await uploadImmutable(db, artifactStorageKey, archive, artifactSha256);
       const updated = await db.from('story_factory_runs').update({
         status: passed ? 'passed' : 'failed',
-        error_code: passed ? null : 'benchmark_gate_failed',
-        error_message: passed ? null : 'Benchmark V2 did not satisfy every promotion gate.',
+        error_code: passed ? null : 'validation_gate_failed',
+        error_message: passed ? null : 'Sequential reader validation did not satisfy every promotion gate.',
         artifact_digest: artifactSha256,
         output_artifact: { manifest },
         estimated_cost_usd: metrics.totalCostUsd,
@@ -220,7 +271,7 @@ Không suy đoán model, không đòi tuân thủ dàn ý ẩn và không thư�
         && (error as { code?: unknown }).code === 'infra_blocked';
       await db.from('story_factory_runs').update({
         status: infra ? 'infra_blocked' : 'failed',
-        error_code: infra ? 'infra_blocked' : 'benchmark_execution_failed',
+        error_code: infra ? 'infra_blocked' : 'validation_execution_failed',
         error_message: error instanceof Error ? error.message : String(error),
         estimated_cost_usd: corpus.buildCostUsd + judgmentCostUsd,
         finished_at: new Date().toISOString(),

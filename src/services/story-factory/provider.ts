@@ -47,6 +47,7 @@ export interface StoryModelProvider {
     schema: z.ZodType<T, z.ZodTypeDef, unknown>;
     temperature?: number;
     constrainSchema?: boolean;
+    schemaComplexity?: 'default' | 'omit_large_array_max' | 'omit_array_max';
     grounding?: 'google_search';
   }): Promise<ProviderResult<T>>;
 }
@@ -68,7 +69,10 @@ function retryable(error: unknown): boolean {
   return error instanceof TypeError;
 }
 
-export function toGeminiResponseSchema<T>(schema: z.ZodType<T, z.ZodTypeDef, unknown>): Record<string, unknown> {
+export function toGeminiResponseSchema<T>(
+  schema: z.ZodType<T, z.ZodTypeDef, unknown>,
+  options: { complexity?: 'default' | 'omit_large_array_max' | 'omit_array_max' } = {},
+): Record<string, unknown> {
   // responseFormat accepts JSON Schema, not the older OpenAPI-flavoured schema
   // used by responseJsonSchema. Keep it inline because Gemini rejects some
   // deeply referenced schemas before generation.
@@ -90,6 +94,12 @@ export function toGeminiResponseSchema<T>(schema: z.ZodType<T, z.ZodTypeDef, unk
     delete node.maxLength;
     delete node.exclusiveMinimum;
     delete node.exclusiveMaximum;
+    if (options.complexity === 'omit_array_max') delete node.maxItems;
+    if (options.complexity === 'omit_large_array_max'
+      && typeof node.maxItems === 'number'
+      && node.maxItems > 16) {
+      delete node.maxItems;
+    }
     Object.values(node).forEach(normalize);
     if (Array.isArray(node.anyOf) && node.anyOf.every(option => (
       !!option && typeof option === 'object'
@@ -212,9 +222,12 @@ export const geminiProvider: StoryModelProvider = {
     schema: z.ZodType<T, z.ZodTypeDef, unknown>;
     temperature?: number;
     constrainSchema?: boolean;
+    schemaComplexity?: 'default' | 'omit_large_array_max' | 'omit_array_max';
     grounding?: 'google_search';
   }): Promise<ProviderResult<T>> {
-    const responseSchema = toGeminiResponseSchema(input.schema);
+    const responseSchema = toGeminiResponseSchema(input.schema, {
+      complexity: input.schemaComplexity ?? 'default',
+    });
     const prompt = input.constrainSchema === false
       ? `${input.prompt}\n\nBắt buộc trả đúng một object theo JSON Schema sau, giữ nguyên toàn bộ tên field:\n${JSON.stringify(responseSchema)}`
       : input.prompt;
@@ -230,11 +243,16 @@ export const geminiProvider: StoryModelProvider = {
     try {
       raw = JSON.parse(response.value);
     } catch {
-      throw new StoryFactoryError('infra_blocked', 'Provider violated the structured-output JSON contract.');
+      throw new StoryFactoryError('infra_blocked', 'Provider violated the structured-output JSON contract.', {
+        usage: response.usage,
+      });
     }
     const parsed = input.schema.safeParse(raw);
     if (!parsed.success) {
-      throw new StoryFactoryError('infra_blocked', 'Provider output failed application schema validation.', parsed.error.issues);
+      throw new StoryFactoryError('infra_blocked', 'Provider output failed application schema validation.', {
+        issues: parsed.error.issues,
+        usage: response.usage,
+      });
     }
     return { value: parsed.data, usage: response.usage };
   },

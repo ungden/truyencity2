@@ -4,6 +4,9 @@ import {
   CanonExtensionSchema,
   SequentialBenchmarkCorpusSchema,
   STORY_FACTORY_BENCHMARK_PROTOCOL,
+  STORY_FACTORY_SEQUENTIAL_PROTOCOL,
+  STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL,
+  WriterBakeoffCorpusSchema,
   EditorAssessmentSchema,
   LaunchPackSchema,
   type ArcPlan,
@@ -23,12 +26,11 @@ import {
   appendAcceptedOutcome,
   applyCanonExtension,
   applyChapterPlan,
-  benchmarkPasses,
   buildBlindReaderInput,
   buildChapterContexts,
   buildWriterBrief,
   isStoryFactoryEnabled,
-  calculateBenchmarkMetrics,
+  calculateValidationMetrics,
   loadRelevantStoryMemory,
   loadRelevantStoryTransitions,
   memoryEntityIdsForArc,
@@ -39,6 +41,7 @@ import {
   rollingPlanContainsChapter,
   toGeminiResponseSchema,
   validateKernelState,
+  validationPasses,
   writeStoryChapter,
 } from '@/services/story-factory';
 import type { ProviderResult, StoryModelProvider } from '@/services/story-factory/provider';
@@ -799,7 +802,7 @@ describe('canonical Story Factory', () => {
     });
   });
 
-  test('reader-blind benchmark excludes plan/state and enforces the first-pass gate', () => {
+  test('reader-blind sequential validation excludes plan/state and enforces the first-pass gate', () => {
     const route = {
       planner: 'planner-model',
       planJudge: 'plan-judge-model',
@@ -812,61 +815,123 @@ describe('canonical Story Factory', () => {
       id: `sample-${index + 1}`,
       lane: `lane-${Math.floor(index / 5) + 1}`,
       launchPackDigest: digests[Math.floor(index / 5)],
+      planDigest: `${index + 20}`.padStart(64, '0'),
       readerBrief: {
         premise: 'Một premise đủ dài để giám khảo hiểu lời hứa của truyện.',
         chapterNumber: index % 5 + 1,
         previousTail: index % 5 ? 'Đoạn cuối chương trước đủ để đánh giá điểm nối.' : null,
       },
-      control: 'Bản đối chứng có nội dung đủ dài để schema chấp nhận.',
-      candidate: 'Bản ứng viên có nội dung đủ dài để schema chấp nhận.',
-      candidateTitle: `Chương ${index + 1}`,
-      candidateCostUsd: 0.2,
-      candidateRevisionCount: index < 4 ? 1 as const : 0 as const,
-      continuityPassed: true as const,
+      content: 'Bản chương tuần tự có nội dung đủ dài để schema chấp nhận.',
+      title: `Chương ${index + 1}`,
+      allInCostUsd: 0.2,
+      revisionCount: index < 4 ? 1 as const : 0 as const,
+      planAssessment: { status: 'pass' as const, issues: [] },
+      continuityAssessment: {
+        status: 'pass' as const,
+        checks: {
+          previousEndingRespected: true as const,
+          stateLedgerRespected: true as const,
+          characterMemoryRespected: true as const,
+          agendaAndEmotionProgress: true as const,
+        },
+        issues: [],
+      },
+      stateBeforeDigest: `${Math.floor(index / 5) * 10 + index % 5}`.padStart(64, '0'),
+      stateAfterDigest: `${Math.floor(index / 5) * 10 + index % 5 + 1}`.padStart(64, '0'),
     }));
     const corpus = SequentialBenchmarkCorpusSchema.parse({
-      protocolVersion: STORY_FACTORY_BENCHMARK_PROTOCOL,
+      protocolVersion: STORY_FACTORY_SEQUENTIAL_PROTOCOL,
       engineRelease: 'sf_current',
       builtAt: new Date().toISOString(),
-      candidateRoute: route,
-      controlRoute: { ...route, writer: 'control-writer' },
+      route,
+      continuityJudgeModel: 'continuity-judge',
       launchPackDigests: digests,
       setupSuccesses: 4,
       planSuccesses: 4,
       providerFailures: 0,
       generationFailures: 0,
+      continuityFailures: 0,
+      windowReviewFailures: 0,
       buildCostUsd: 2,
       samples,
+      windowReviews: Array.from({ length: 4 }, (_, index) => ({
+        lane: `lane-${index + 1}`,
+        status: 'pass' as const,
+      })),
     });
-    const blind = buildBlindReaderInput({ sample: corpus.samples[0], swap: false });
+    const blind = buildBlindReaderInput({ sample: corpus.samples[0] });
     expect(blind).toEqual({
-      brief: corpus.samples[0].readerBrief,
-      versionA: corpus.samples[0].control,
-      versionB: corpus.samples[0].candidate,
+      premise: corpus.samples[0].readerBrief.premise,
+      chapterNumber: corpus.samples[0].readerBrief.chapterNumber,
+      previousTail: corpus.samples[0].readerBrief.previousTail,
+      prose: corpus.samples[0].content,
     });
     expect(JSON.stringify(blind)).not.toMatch(/chapterPlan|stateBefore|requiredDelta|model|cost/iu);
     const judgments = corpus.samples.flatMap(sample => ['judge-a', 'judge-b', 'judge-c'].map(model => ({
       sampleId: sample.id,
       model,
       blinded: true as const,
-      swap: false,
-      preference: 'B' as const,
-      wantsNextA: false,
-      wantsNextB: true,
+      wantsNext: true,
       reason: 'Bản ứng viên tự nhiên và có sức kéo đọc tiếp hơn.',
       usage: { costUsd: 0.01 },
     })));
-    const metrics = calculateBenchmarkMetrics({
+    const metrics = calculateValidationMetrics({
       corpus,
       judgments,
       judgeModels: ['judge-a', 'judge-b', 'judge-c'],
       judgmentCostUsd: 0.6,
     });
     expect(metrics.firstPassPublishRate).toBe(0.8);
-    expect(benchmarkPasses(metrics)).toBe(false);
+    expect(validationPasses(metrics)).toBe(false);
     expect(() => SequentialBenchmarkCorpusSchema.parse({
       ...corpus,
       samples: corpus.samples.slice(0, 19),
+    })).toThrow();
+    expect(() => SequentialBenchmarkCorpusSchema.parse({
+      ...corpus,
+      samples: corpus.samples.map((sample, index) => index === 1
+        ? { ...sample, stateBeforeDigest: 'f'.repeat(64) }
+        : sample),
+    })).toThrow();
+  });
+
+  test('Writer bake-off corpus accepts only current Plan Judge passes', () => {
+    const writerCorpus = {
+      protocolVersion: STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL,
+      engineRelease: 'sf_current',
+      builtAt: new Date().toISOString(),
+      planner: 'planner-model',
+      planJudge: 'plan-judge-model',
+      sourceSequentialDigest: 'a'.repeat(64),
+      samples: Array.from({ length: 10 }, (_, index) => ({
+        id: `brief-${index + 1}`,
+        lane: `lane-${index % 4 + 1}`,
+        launchPackDigest: `${index % 4 + 1}`.repeat(64),
+        planDigest: `${index + 1}`.padStart(64, '0'),
+        kernel,
+        state: initialState,
+        plan: plan(1),
+        previousTail: null,
+        planAssessment: { status: 'pass' as const, issues: [] },
+      })),
+    };
+    expect(WriterBakeoffCorpusSchema.parse(writerCorpus).samples).toHaveLength(10);
+    expect(() => WriterBakeoffCorpusSchema.parse({
+      ...writerCorpus,
+      samples: writerCorpus.samples.map((sample, index) => index === 0 ? {
+        ...sample,
+        planAssessment: {
+          status: 'revise',
+          issues: [{
+            category: 'causal_mechanism',
+            chapterNumber: 1,
+            sceneId: 'scene_1',
+            deltaId: 'delta_1',
+            evidence: 'delta_1 chưa đủ nhân quả',
+            instruction: 'Lập lại cơ chế nhân quả trước khi Writer được phép nhìn brief.',
+          }],
+        },
+      } : sample),
     })).toThrow();
   });
 
@@ -943,6 +1008,13 @@ describe('canonical Story Factory', () => {
   test('Gemini structured-output schema keeps only provider-supported bounds', () => {
     const schema = toGeminiResponseSchema(z.object({ arcNumber: z.number().int().positive() }).strict());
     expect((schema.properties as Record<string, Record<string, unknown>>).arcNumber.exclusiveMinimum).toBeUndefined();
+    const complex = toGeminiResponseSchema(
+      z.object({ stages: z.array(z.string()).min(8).max(15) }).strict(),
+      { complexity: 'omit_array_max' },
+    );
+    const stages = (complex.properties as Record<string, Record<string, unknown>>).stages;
+    expect(stages.minItems).toBe(8);
+    expect(stages.maxItems).toBeUndefined();
   });
 
   test('Launch Architect schema exposes the initial arc boundary to the provider', () => {
@@ -1033,6 +1105,24 @@ describe('canonical Story Factory', () => {
     const result = await planRollingWindow({ kernel, arc, state: initialState, routes, provider });
     expect(result.assessment.status).toBe('pass');
     expect(provider.calls).toEqual(['planner', 'plan-judge', 'planner', 'plan-judge']);
+  });
+
+  test('a benchmark-required five-chapter window is repaired before Plan Judge', async () => {
+    const provider = new QueueProvider([plannerWire(), plannerWire()]);
+    await expect(planRollingWindow({
+      kernel,
+      arc,
+      state: initialState,
+      routes,
+      provider,
+      requiredWindowSize: 5,
+    })).rejects.toMatchObject({
+      code: 'plan_blocked',
+      evidence: expect.objectContaining({
+        validation: expect.objectContaining({ requiredWindowSize: 5, actualWindowSize: 1 }),
+      }),
+    });
+    expect(provider.calls).toEqual(['planner', 'planner']);
   });
 
   test('Plan Judge blocks after the second rejected window without fallback', async () => {
@@ -1172,27 +1262,28 @@ describe('canonical Story Factory', () => {
       minimumPlausibleTimeline: 'Ba chương chỉ hoàn tất một mẻ thử nhỏ, chưa xây xưởng hoàn chỉnh.',
       criticalAssumptions: ['Nhân vật phải lao động và trả đủ chi phí đầu vào.'],
     }));
-    const launchWire = {
-      v: 1 as const,
-      selectedConceptId: pack.selectedConceptId,
-      kernelJson: JSON.stringify(pack.kernel),
-      arcJson: JSON.stringify(pack.arc),
-      initialStateJson: JSON.stringify(pack.initialState),
-      coverPrompt: pack.coverPrompt,
-    };
+    const {
+      worldModel, worldRules, locations, travelRules, resources,
+      progressionTracks, seriesSpine, longPromises, promises, endingDirection,
+      ...identityKernel
+    } = pack.kernel;
     const provider = new QueueProvider([
       { candidates: a }, { candidates: b },
       'Nguồn kỹ thuật xác nhận dụng cụ thủ công khả thi nhưng yêu cầu vệ sinh, thời gian và chi phí thật.',
       { selectedIds: [a[0].id, b[0].id], reasons: ['Cơ chế A rõ và dài hơi.', 'Cơ chế B có conflict economy tốt.'] },
-      { simulations }, launchWire,
+      { simulations },
+      { selectedConceptId: pack.selectedConceptId, coverPrompt: pack.coverPrompt, kernel: identityKernel },
+      { kernel: { worldModel, worldRules, locations, travelRules, resources } },
+      { kernel: { progressionTracks, seriesSpine, longPromises, promises, endingDirection } },
+      { arc: pack.arc, initialState: pack.initialState },
     ]);
     const result = await runConceptLab({
       commission: { slotKey: 'canary-01', genreLane: 'do-thi-nien-dai', audience: 'Độc giả nam nhưng nữ cũng đọc được.', tone: 'Khoái hoạt, chủ động và đời sống ấm.', settingBoundary: 'Việt Nam hư cấu, nghề nghiệp dựa trên thực tế.' },
       research: { snapshotId: 'research-01', lane: 'do-thi-nien-dai', capturedAt: new Date().toISOString(), signals: [1, 2, 3].map(index => ({ id: `signal_${index}`, sourceUrl: `https://example.com/${index}`, observation: 'Một quan sát thị trường đủ chi tiết và không chứa tác phẩm để sao chép.' })) },
       routes, provider,
     });
-    expect(provider.calls).toHaveLength(6);
-    expect(provider.calls).toEqual(['gen-a', 'gen-b', 'sim', 'judge', 'sim', 'launch']);
+    expect(provider.calls).toHaveLength(9);
+    expect(provider.calls).toEqual(['gen-a', 'gen-b', 'sim', 'judge', 'sim', 'launch', 'launch', 'launch', 'launch']);
     expect(result.launchPack.selectedConceptId).toBe('a1');
   });
 });

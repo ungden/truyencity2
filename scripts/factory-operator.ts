@@ -64,9 +64,9 @@ async function seed() {
   if (!benchmarkResult.data) {
     throw new Error(`No approved ${STORY_FACTORY_BENCHMARK_PROTOCOL} run exists for ${STORY_FACTORY_RELEASE}.`);
   }
-  const candidate = (benchmarkResult.data.model_routes as { candidate?: Record<string, unknown> } | null)?.candidate;
+  const approvedRoute = (benchmarkResult.data.model_routes as { route?: Record<string, unknown> } | null)?.route;
   for (const keyName of ['planner', 'planJudge', 'writer', 'editor', 'routeVersion'] as const) {
-    if (candidate?.[keyName] !== routes[keyName]) {
+    if (approvedRoute?.[keyName] !== routes[keyName]) {
       throw new Error(`Approved benchmark route mismatch at ${keyName}.`);
     }
   }
