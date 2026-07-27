@@ -69,7 +69,9 @@ describe('Story Factory architecture boundary', () => {
     const benchmark = readFileSync('scripts/factory-benchmark-build.ts', 'utf8');
     const routes = readFileSync('src/services/story-factory/routes.ts', 'utf8');
     expect(planner).toContain('model: input.routes.planJudge');
-    expect(planner).toContain('for (let attempt = 1; attempt <= 2; attempt += 1)');
+    expect(planner).toContain('for (let mechanicalAttempt = 1; mechanicalAttempt <= 2; mechanicalAttempt += 1)');
+    expect(planner).toContain("task: 'Tạo lại toàn bộ rolling window đúng một lần theo evidence của Plan Judge");
+    expect(planner).toContain('const rejudged = await assessRollingPlan({');
     expect(pipeline).not.toContain('planJudge');
     expect(benchmark).toContain('Current Planner and Plan Judge must pass exactly chapters 1-5');
     expect(benchmark).toContain('writeStoryChapter({');
@@ -98,7 +100,8 @@ describe('Story Factory architecture boundary', () => {
     expect(setup).toContain('Không kéo dài để đạt số từ');
     expect(setup).toContain('Mọi longPromises.promiseId');
     expect(setup).toContain('phải tham chiếu ID trong promises');
-    expect(setup).toContain('schema: LaunchIdentitySchema');
+    expect(setup).toContain('schema: LaunchIdentityWireSchema');
+    expect(setup).toContain("role: z.literal('opposition')");
     expect(setup).toContain('sentenceRhythm chỉ mô tả độ dài, nhịp và cấu trúc câu');
     expect(setup.indexOf('assertVoiceSemantics(launchIdentity.value.kernel.characters)'))
       .toBeLessThan(setup.indexOf('let launchWorld:'));
@@ -156,8 +159,8 @@ describe('Story Factory architecture boundary', () => {
     expect(prompts).toContain('Không để Writer tự bịa tài xế, chủ xe, khoản nợ');
     expect(planner).not.toContain('numericResources: input.kernel.resources.flatMap');
     expect(prompts).toContain('Code đã kiểm số học, tài nguyên, thời gian, vị trí, công suất, quyền hạn');
-    expect(planner).toContain('message: lastError.message');
-    expect(planner).toContain('evidence: lastError.evidence ?? null');
+    expect(planner).toContain('message: mechanicalError?.message');
+    expect(planner).toContain('evidence: mechanicalError?.evidence ?? null');
     expect(prompts).toContain('Thời gian cuối chương là mốc tuyệt đối');
   });
 

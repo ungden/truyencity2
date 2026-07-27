@@ -281,11 +281,11 @@ function plan(chapterNumber: number, before = `ngay_${chapterNumber - 1}`): Chap
   };
 }
 
-function plannerWire(chapterNumber = 1) {
+function plannerWire(chapterNumber = 1): z.infer<typeof PlannerRollingPlanResponseSchema> {
   return {
     v: 2 as const,
     start: chapterNumber,
-    chaptersJson: [JSON.stringify({
+    chapters: [{
       v: 2, n: chapterNumber, arc: 1, time: chapterNumber * 60,
       pre: [{ k: 'fact', id: 'fact_day', value: `ngay_${chapterNumber - 1}` }],
       rules: ['rule_market'],
@@ -299,7 +299,7 @@ function plannerWire(chapterNumber = 1) {
         before: `ngay_${chapterNumber - 1}`, change: null, after: `ngay_${chapterNumber}`, source: null, sink: null,
       }],
       mechanics: [],
-    })],
+    }],
   };
 }
 
@@ -1948,12 +1948,13 @@ describe('canonical Story Factory', () => {
   test('Planner provider schema avoids the rejected nested delta union', () => {
     const schema = JSON.stringify(toGeminiResponseSchema(PlannerRollingPlanResponseSchema));
     expect(schema).not.toContain('"anyOf"');
-    expect(schema).toContain('"chaptersJson"');
+    expect(schema).toContain('"chapters"');
+    expect(schema).not.toContain('"chaptersJson"');
   });
 
   test('Planner wire envelope materializes into the exact canonical plan', () => {
     const wire = plannerWire();
-    const chapter = JSON.parse(wire.chaptersJson[0]);
+    const chapter = structuredClone(wire.chapters[0]);
     chapter.deltas[0].before = null;
     chapter.mechanics = [{
       id: 'use_market',
@@ -1966,7 +1967,7 @@ describe('canonical Story Factory', () => {
       primaryDeltaId: 'delta_1',
       additionalDeltaIds: [],
     }];
-    wire.chaptersJson[0] = JSON.stringify(chapter);
+    wire.chapters[0] = chapter;
     const rolling = materializePlannerRollingPlan(wire, initialState);
     expect(rolling.startChapter).toBe(1);
     expect(rolling.plans[0].chapterNumber).toBe(1);
@@ -1977,14 +1978,14 @@ describe('canonical Story Factory', () => {
   });
 
   test('fact before values are derived sequentially from State across a rolling window', () => {
-    const first = JSON.parse(plannerWire(1).chaptersJson[0]);
-    const second = JSON.parse(plannerWire(2).chaptersJson[0]);
+    const first = structuredClone(plannerWire(1).chapters[0]);
+    const second = structuredClone(plannerWire(2).chapters[0]);
     first.deltas[0].before = null;
     second.deltas[0].before = null;
     const rolling = materializePlannerRollingPlan({
       v: 2,
       start: 1,
-      chaptersJson: [JSON.stringify(first), JSON.stringify(second)],
+      chapters: [first, second],
     }, initialState);
     expect(rolling.plans[0].requiredDeltas[0]).toMatchObject({
       factId: 'fact_day',
@@ -2000,23 +2001,23 @@ describe('canonical Story Factory', () => {
 
   test('a chapter without an invoked world rule remains a valid mechanical plan', () => {
     const wire = plannerWire();
-    const chapter = JSON.parse(wire.chaptersJson[0]);
+    const chapter = structuredClone(wire.chapters[0]);
     chapter.rules = [];
-    wire.chaptersJson[0] = JSON.stringify(chapter);
+    wire.chapters[0] = chapter;
     const rolling = materializePlannerRollingPlan(wire, initialState);
     expect(rolling.plans[0].requiredWorldRuleIds).toEqual([]);
   });
 
   test('compiler derives a missing final-location delta from scene participation', () => {
     const wire = plannerWire();
-    const chapter = JSON.parse(wire.chaptersJson[0]);
+    const chapter = structuredClone(wire.chapters[0]);
     chapter.scenes[0] = {
       ...chapter.scenes[0],
       people: ['main', 'buyer'],
       loc: 'beach',
       travel: 20,
     };
-    wire.chaptersJson[0] = JSON.stringify(chapter);
+    wire.chapters[0] = chapter;
     const rolling = materializePlannerRollingPlan(wire, initialState);
     const locationDelta = rolling.plans[0].requiredDeltas.find(delta =>
       delta.kind === 'location' && delta.characterId === 'main');
@@ -2029,7 +2030,7 @@ describe('canonical Story Factory', () => {
 
   test('numeric before and after are derived sequentially from the ledger', () => {
     const wire = plannerWire();
-    const chapter = JSON.parse(wire.chaptersJson[0]);
+    const chapter = structuredClone(wire.chapters[0]);
     chapter.scenes[0].deltaIds = ['spend_money', 'earn_money'];
     chapter.deltas = [
       {
@@ -2041,7 +2042,7 @@ describe('canonical Story Factory', () => {
         before: null, change: 10, after: null, source: 'bán hàng', sink: null,
       },
     ];
-    wire.chaptersJson[0] = JSON.stringify(chapter);
+    wire.chapters[0] = chapter;
     const rolling = materializePlannerRollingPlan(wire, initialState);
     expect(rolling.plans[0].requiredDeltas).toMatchObject([
       { id: 'spend_money', before: 100, delta: -30, after: 70 },
@@ -2051,19 +2052,25 @@ describe('canonical Story Factory', () => {
 
   test('Planner wire cannot emit a decorative mechanic without a required delta', () => {
     const wire = plannerWire();
-    const chapter = JSON.parse(wire.chaptersJson[0]);
+    const chapter = structuredClone(wire.chapters[0]);
     chapter.mechanics = [{
       id: 'use_market',
       scene: 'scene_1',
-      mechanic: 'mechanic_market',
-      role: 'effect',
+      mechanic: 'mechanic_daylight',
+      role: 'support',
       actor: 'main',
       qty: 1,
-      facts: [],
+      facts: ['fact_day'],
+      primaryDeltaId: 'missing_delta',
       additionalDeltaIds: [],
     }];
-    wire.chaptersJson[0] = JSON.stringify(chapter);
-    expect(() => materializePlannerRollingPlan(wire, initialState)).toThrow();
+    wire.chapters[0] = chapter;
+    const rolling = materializePlannerRollingPlan(wire, initialState);
+    expect(() => applyChapterPlan({
+      kernel,
+      state: initialState,
+      plan: rolling.plans[0],
+    })).toThrow('unknown delta');
   });
 
   test('Plan Judge passes a valid window with one independent review call', async () => {
@@ -2133,6 +2140,90 @@ describe('canonical Story Factory', () => {
     expect(provider.calls).toEqual(['planner', 'plan-judge', 'planner', 'plan-judge']);
   });
 
+  test('mechanical repair does not consume the independent Plan Judge replan budget', async () => {
+    const invalidWire = plannerWire();
+    invalidWire.chapters[0].mechanics = [{
+      id: 'invalid_support',
+      scene: 'scene_1',
+      mechanic: 'mechanic_daylight',
+      role: 'support',
+      actor: 'main',
+      qty: 1,
+      facts: ['fact_day'],
+      primaryDeltaId: 'missing_delta',
+      additionalDeltaIds: [],
+    }];
+    const revise = {
+      status: 'revise' as const,
+      checks: {
+        protagonistAgency: true,
+        earnedProgression: true,
+        oppositionAgenda: false,
+        sceneVariety: true,
+        stageAlignment: true,
+        outcomeWeight: true,
+      },
+      checkEvidence: {
+        protagonistAgency: 'chapter 1 scene_1 delta_1',
+        earnedProgression: 'chapter 1 scene_1 delta_1',
+        oppositionAgenda: 'chapter 1 scene_1 lacks an opposing choice',
+        sceneVariety: 'chapter 1 scene_1 has a distinct action',
+        stageAlignment: 'chapter 1 scene_1 serves stage_1',
+        outcomeWeight: 'chapter 1 delta_1 is proportional',
+      },
+      issues: [{
+        category: 'opposition_agenda' as const,
+        chapterNumber: 1,
+        sceneId: 'scene_1',
+        deltaId: null,
+        evidence: 'The opposition has no independent choice in scene_1.',
+        instruction: 'Give the opposition a concrete counter-move in scene_1.',
+      }],
+    };
+    const pass = {
+      status: 'pass' as const,
+      checks: {
+        protagonistAgency: true,
+        earnedProgression: true,
+        oppositionAgenda: true,
+        sceneVariety: true,
+        stageAlignment: true,
+        outcomeWeight: true,
+      },
+      checkEvidence: {
+        protagonistAgency: 'chapter 1 scene_1 delta_1',
+        earnedProgression: 'chapter 1 scene_1 delta_1',
+        oppositionAgenda: 'chapter 1 scene_1 now has a counter-move',
+        sceneVariety: 'chapter 1 scene_1 has a distinct action',
+        stageAlignment: 'chapter 1 scene_1 serves stage_1',
+        outcomeWeight: 'chapter 1 delta_1 is proportional',
+      },
+      issues: [],
+    };
+    const provider = new QueueProvider([
+      invalidWire,
+      plannerWire(),
+      revise,
+      plannerWire(),
+      pass,
+    ]);
+    const result = await planRollingWindow({
+      kernel,
+      arc,
+      state: initialState,
+      routes,
+      provider,
+    });
+    expect(result.assessment.status).toBe('pass');
+    expect(provider.calls).toEqual([
+      'planner',
+      'planner',
+      'plan-judge',
+      'planner',
+      'plan-judge',
+    ]);
+  });
+
   test('a benchmark-required five-chapter window is repaired before Plan Judge', async () => {
     const provider = new QueueProvider([plannerWire(), plannerWire()]);
     await expect(planRollingWindow({
@@ -2153,7 +2244,7 @@ describe('canonical Story Factory', () => {
 
   test('an invalid compact plan is repaired once then classified as plan_blocked', async () => {
     const invalidWire = plannerWire();
-    const chapter = JSON.parse(invalidWire.chaptersJson[0]);
+    const chapter = structuredClone(invalidWire.chapters[0]);
     chapter.mechanics = [{
       id: 'use_without_delta',
       scene: 'scene_1',
@@ -2162,21 +2253,19 @@ describe('canonical Story Factory', () => {
       actor: 'main',
       qty: 1,
       facts: [],
+      primaryDeltaId: 'missing_delta',
       additionalDeltaIds: [],
     }];
-    invalidWire.chaptersJson[0] = JSON.stringify(chapter);
+    invalidWire.chapters[0] = chapter;
     const provider = new QueueProvider([invalidWire, invalidWire]);
     await expect(planRollingWindow({ kernel, arc, state: initialState, routes, provider }))
       .rejects.toMatchObject({ code: 'plan_blocked' });
     expect(provider.calls).toEqual(['planner', 'planner']);
   });
 
-  test('preserves exact JSON materialization evidence after Planner repair is exhausted', async () => {
-    const malformed = {
-      v: 2 as const,
-      start: 1,
-      chaptersJson: ['{"v":2,"n":1'],
-    };
+  test('preserves exact materialization evidence after Planner repair is exhausted', async () => {
+    const malformed = plannerWire();
+    malformed.chapters[0].deltas[0].after = null;
     const provider = new QueueProvider([malformed, malformed]);
     try {
       await planRollingWindow({
@@ -2186,17 +2275,17 @@ describe('canonical Story Factory', () => {
         routes,
         provider,
       });
-      throw new Error('Expected malformed compact JSON to block planning.');
+      throw new Error('Expected malformed compact plan to block planning.');
     } catch (error) {
       expect(error).toBeInstanceOf(StoryFactoryError);
       expect((error as StoryFactoryError).evidence).toMatchObject({
         validation: {
-          kind: 'SyntaxError',
+          kind: 'ZodError',
         },
       });
       expect(((error as StoryFactoryError).evidence as {
-        validation: { message: string };
-      }).validation.message).toMatch(/JSON|position|expected/i);
+        validation: { issues: Array<{ path: Array<string | number> }> };
+      }).validation.issues[0].path).toContain('after');
     }
   });
 

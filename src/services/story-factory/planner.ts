@@ -78,7 +78,7 @@ const PlannerCompactChapterSchema = z.object({
 export const PlannerRollingPlanResponseSchema = z.object({
   v: z.literal(2),
   start: z.number().int().min(1),
-  chaptersJson: z.array(z.string()).min(1).max(5),
+  chapters: z.array(PlannerCompactChapterSchema).min(1).max(5),
 }).strict();
 
 const PLANNER_COMPACT_CONTRACT = {
@@ -92,7 +92,7 @@ const PLANNER_COMPACT_CONTRACT = {
     relationship: 'target=characterId; counterpart=counterpartId; before=null vì code lấy tuần tự từ State; after là trạng thái mới; source giải thích sự kiện; change/sink=null',
   },
   chapterJson: {
-    serialization: 'Mỗi phần tử chaptersJson là đúng một JSON object đã stringify, không markdown.',
+    serialization: 'Trả chapters là mảng object theo schema; không stringify JSON bên trong string và không markdown.',
     chapterFields: ['v=2', 'n', 'arc', 'time', 'pre', 'rules', 'scenes', 'deltas', 'mechanics'],
     preFields: ['k', 'id', 'value'],
     sceneFields: ['id', 'pov', 'people', 'loc', 'dur', 'travel', 'goal', 'block', 'act', 'deltaIds'],
@@ -130,7 +130,7 @@ export function materializePlannerRollingPlan(
   initialState: StoryState,
 ): RollingPlan {
   const compact = PlannerRollingPlanResponseSchema.parse(value);
-  const chapters = compact.chaptersJson.map(raw => PlannerCompactChapterSchema.parse(JSON.parse(raw)));
+  const chapters = compact.chapters;
   const resourceBalances = new Map(initialState.resources.flatMap(resource => (
     resource.kind === 'numeric' ? [[resource.resourceId, resource.value] as const] : []
   )));
@@ -473,21 +473,17 @@ export async function planRollingWindow(input: {
     arc: input.arc,
     state: input.state,
   });
-  let previousResponse: unknown;
-  let validationIssues: unknown;
-  let lastError: StoryFactoryError | undefined;
-  for (let attempt = 1; attempt <= 2; attempt += 1) {
+  const requestPlan = async (inputForAttempt: {
+    task: string;
+    previousResponse?: unknown;
+    validationIssues?: unknown;
+    temperature: number;
+  }) => {
     const result = await provider.json({
       model: input.routes.planner,
       system: PLANNER_SYSTEM_PROMPT,
       prompt: JSON.stringify({
-        task: attempt === 1
-          ? input.recoveryEvidence
-            ? 'Lập lại toàn bộ rolling window chưa commit từ state hiện tại; xử lý bằng chứng cho thấy plan trước không tạo tiến triển mới.'
-            : input.requiredWindowSize
-              ? `Lập đúng ${input.requiredWindowSize} chương tiếp theo, không vượt quá cuối arc.`
-              : 'Lập từ một đến năm chương tiếp theo, không vượt quá cuối arc.'
-          : 'Tạo lại toàn bộ rolling window và sửa đúng các validation issue; không vá cục bộ.',
+        task: inputForAttempt.task,
         kernel: input.kernel,
         arc: input.arc,
         state: input.state,
@@ -527,60 +523,122 @@ export async function planRollingWindow(input: {
         maximumEndChapter: input.arc.plannedEndChapter,
         compactContract: PLANNER_COMPACT_CONTRACT,
         recoveryEvidence: input.recoveryEvidence,
-        previousResponse: attempt === 1 ? undefined : previousResponse,
-        validationIssues: attempt === 1 ? undefined : validationIssues,
+        previousResponse: inputForAttempt.previousResponse,
+        validationIssues: inputForAttempt.validationIssues,
       }),
       schema: PlannerRollingPlanResponseSchema,
-      temperature: attempt === 1 ? 0.7 : 0.4,
+      schemaComplexity: 'omit_array_max',
+      temperature: inputForAttempt.temperature,
     });
     usages.push(result.usage);
-    try {
-      const parsed = materializePlannerRollingPlan(result.value, input.state);
-      if (input.requiredWindowSize && parsed.plans.length !== input.requiredWindowSize) {
-        throw new StoryFactoryError('plan_blocked', 'Planner returned the wrong required window size.', {
-          requiredWindowSize: input.requiredWindowSize,
-          actualWindowSize: parsed.plans.length,
-        });
-      }
-      validateRollingPlan({ kernel: input.kernel, arc: input.arc, state: input.state, rollingPlan: parsed });
-      const judged = await assessRollingPlan({
-        provider,
-        kernel: input.kernel,
-        arc: input.arc,
-        state: input.state,
-        rollingPlan: parsed,
-        model: input.routes.planJudge,
+    return result;
+  };
+
+  const materializeAndValidate = (value: z.infer<typeof PlannerRollingPlanResponseSchema>): RollingPlan => {
+    const parsed = materializePlannerRollingPlan(value, input.state);
+    if (input.requiredWindowSize && parsed.plans.length !== input.requiredWindowSize) {
+      throw new StoryFactoryError('plan_blocked', 'Planner returned the wrong required window size.', {
+        requiredWindowSize: input.requiredWindowSize,
+        actualWindowSize: parsed.plans.length,
       });
-      usages.push(judged.usage);
-      if (judged.assessment.status === 'pass') {
-        return { rollingPlan: parsed, assessment: judged.assessment, usages };
-      }
-      lastError = new StoryFactoryError('plan_blocked', 'Plan Judge rejected the rolling window.', judged.assessment.issues);
-      previousResponse = result.value;
-      validationIssues = judged.assessment.issues;
+    }
+    validateRollingPlan({ kernel: input.kernel, arc: input.arc, state: input.state, rollingPlan: parsed });
+    return parsed;
+  };
+
+  const normalizePlanError = (error: unknown): StoryFactoryError => (
+    error instanceof StoryFactoryError
+      ? error
+      : new StoryFactoryError(
+        'plan_blocked',
+        'Planner output failed the exact rolling-plan contract.',
+        plannerContractFailureEvidence(error),
+      )
+  );
+
+  let currentResponse: z.infer<typeof PlannerRollingPlanResponseSchema> | undefined;
+  let currentPlan: RollingPlan | undefined;
+  let mechanicalError: StoryFactoryError | undefined;
+  for (let mechanicalAttempt = 1; mechanicalAttempt <= 2; mechanicalAttempt += 1) {
+    const result = await requestPlan({
+      task: mechanicalAttempt === 1
+        ? input.recoveryEvidence
+          ? 'Lập lại toàn bộ rolling window chưa commit từ state hiện tại; xử lý bằng chứng cho thấy plan trước không tạo tiến triển mới.'
+          : input.requiredWindowSize
+            ? `Lập đúng ${input.requiredWindowSize} chương tiếp theo, không vượt quá cuối arc.`
+            : 'Lập từ một đến năm chương tiếp theo, không vượt quá cuối arc.'
+        : 'Tạo lại toàn bộ rolling window và sửa đúng các validation issue cơ học; không vá cục bộ.',
+      previousResponse: mechanicalAttempt === 1 ? undefined : currentResponse,
+      validationIssues: mechanicalAttempt === 1 ? undefined : {
+        message: mechanicalError?.message,
+        evidence: mechanicalError?.evidence ?? null,
+      },
+      temperature: mechanicalAttempt === 1 ? 0.7 : 0.4,
+    });
+    currentResponse = result.value;
+    try {
+      currentPlan = materializeAndValidate(result.value);
+      mechanicalError = undefined;
+      break;
     } catch (error) {
       if (error instanceof StoryFactoryError && error.code === 'infra_blocked') throw error;
-      lastError = error instanceof StoryFactoryError
-        ? error
-        : new StoryFactoryError(
-          'plan_blocked',
-          'Planner output failed the exact rolling-plan contract.',
-          plannerContractFailureEvidence(error),
-        );
-      previousResponse = result.value;
-      validationIssues = {
-        message: lastError.message,
-        evidence: lastError.evidence ?? null,
-      };
+      mechanicalError = normalizePlanError(error);
     }
   }
-  if (lastError) {
-    throw new StoryFactoryError(lastError.code, lastError.message, {
-      validation: lastError.evidence ?? null,
+  if (!currentPlan || !currentResponse) {
+    throw new StoryFactoryError('plan_blocked', mechanicalError?.message ?? 'Planner mechanical repair budget was exhausted.', {
+      validation: mechanicalError?.evidence ?? null,
       usages,
     });
   }
-  throw new StoryFactoryError('plan_blocked', 'Planner repair budget was exhausted.', { usages });
+
+  const judged = await assessRollingPlan({
+    provider,
+    kernel: input.kernel,
+    arc: input.arc,
+    state: input.state,
+    rollingPlan: currentPlan,
+    model: input.routes.planJudge,
+  });
+  usages.push(judged.usage);
+  if (judged.assessment.status === 'pass') {
+    return { rollingPlan: currentPlan, assessment: judged.assessment, usages };
+  }
+
+  const judgeRepair = await requestPlan({
+    task: 'Tạo lại toàn bộ rolling window đúng một lần theo evidence của Plan Judge; giữ contract cơ học hợp lệ và không vá cục bộ.',
+    previousResponse: currentResponse,
+    validationIssues: judged.assessment.issues,
+    temperature: 0.4,
+  });
+  let repairedPlan: RollingPlan;
+  try {
+    repairedPlan = materializeAndValidate(judgeRepair.value);
+  } catch (error) {
+    if (error instanceof StoryFactoryError && error.code === 'infra_blocked') throw error;
+    const normalized = normalizePlanError(error);
+    throw new StoryFactoryError('plan_blocked', normalized.message, {
+      validation: normalized.evidence ?? null,
+      judgeIssues: judged.assessment.issues,
+      usages,
+    });
+  }
+  const rejudged = await assessRollingPlan({
+    provider,
+    kernel: input.kernel,
+    arc: input.arc,
+    state: input.state,
+    rollingPlan: repairedPlan,
+    model: input.routes.planJudge,
+  });
+  usages.push(rejudged.usage);
+  if (rejudged.assessment.status === 'pass') {
+    return { rollingPlan: repairedPlan, assessment: rejudged.assessment, usages };
+  }
+  throw new StoryFactoryError('plan_blocked', 'Plan Judge rejected the rolling window after one full replan.', {
+    validation: rejudged.assessment.issues,
+    usages,
+  });
 }
 
 export async function reviewFiveChapterWindow(input: {
