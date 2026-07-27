@@ -546,6 +546,11 @@ describe('canonical Story Factory', () => {
     const cast = structuredClone(kernel.characters);
     cast[0].voice.addressRules = "refers to herself as 'nội'";
     expect(() => assertVoiceSemantics(cast)).not.toThrow();
+    cast[0].voice.reasoningStyle = 'phân tích chi phí - lợi ích và nguyên nhân - kết quả';
+    expect(() => assertVoiceSemantics(cast)).not.toThrow();
+    cast[0].voice.reasoningStyle = '— trả lời bằng một câu thoại dựng sẵn';
+    expect(() => assertVoiceSemantics(cast)).toThrow('canned gesture');
+    cast[0].voice.reasoningStyle = 'quan sát dữ kiện rồi chia việc cụ thể';
     cast[0].voice.sentenceRhythm = 'cười khẩy rồi gằn từng chữ';
     expect(() => assertVoiceSemantics(cast)).toThrow('canned gesture');
   });

@@ -262,7 +262,7 @@ function assertLaunchSemantics(
 }
 
 export function assertVoiceSemantics(characters: LaunchPack['kernel']['characters']): void {
-  const cannedGesture = /\n|(?:^|\s)[—-]\s|\b(?:cười|nhếch|quát|gằn|lẩm bẩm|nói rằng|ánh mắt)\b/iu;
+  const cannedGesture = /\n|^[—-]\s|\b(?:cười|nhếch|quát|gằn|lẩm bẩm|nói rằng|ánh mắt)\b/iu;
   const quotedSentence = /["“”'‘’][^"“”'‘’]{12,}["“”'‘’]/u;
   for (const character of characters) {
     const voiceValues = [
