@@ -58,7 +58,7 @@ const PlannerCompactChapterSchema = z.object({
     id: z.string(),
     value: z.union([z.string(), z.number()]),
   }).strict()).max(30),
-  rules: z.array(z.string()).min(1).max(12),
+  rules: z.array(z.string()).max(12),
   scenes: z.array(PlannerCompactSceneSchema).min(1).max(5),
   deltas: z.array(PlannerCompactDeltaSchema).min(1).max(30),
   mechanics: z.array(z.object({
@@ -106,7 +106,7 @@ const PLANNER_COMPACT_CONTRACT = {
     'Tính time tuần tự cho cả window sau khi đã chốt scenes; tuyệt đối không để time bằng thời điểm đầu chương khi chương có diễn biến.',
     'Với từng scene, theo dõi vị trí trước đó của từng người trong scene.people. Nếu bất kỳ người nào phải đi từ nơi khác tới scene.loc, scene.travel phải ít nhất bằng directMinimumMinutes lớn nhất của tất cả người đến scene; không được lấy riêng thời gian của POV hoặc dùng 0.',
     'scene.id và mọi ID đều là string stable ID, không dùng số thứ tự trần.',
-    'rules có ít nhất một world-rule ID tồn tại trong Kernel.',
+    'rules chỉ chứa world-rule ID tồn tại trong Kernel và có thể rỗng khi chương không trực tiếp thi hành luật thế giới nào.',
     'scene.people chỉ gồm nhân vật đang có mặt vật lý ở scene.loc; nếu nhân vật chỉ được nhắc tới hoặc là động lực ở nơi khác thì không đưa vào people.',
     'scene.deltaIds chỉ chứa delta ID tồn tại trong cùng chương; cảnh nối có thể rỗng nhưng cả chương vẫn phải có deltas.',
     'Mỗi delta phải được ít nhất một scene.deltaIds tham chiếu.',

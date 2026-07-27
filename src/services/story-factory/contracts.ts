@@ -480,7 +480,7 @@ export const ChapterPlanSchema = z.object({
     entityId: stableId,
     expected: z.union([z.string(), z.number()]),
   }).strict()).max(30),
-  requiredWorldRuleIds: z.array(stableId).min(1).max(12),
+  requiredWorldRuleIds: z.array(stableId).max(12),
   scenes: z.array(z.object({
     id: stableId,
     povCharacterId: stableId,

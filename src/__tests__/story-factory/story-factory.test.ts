@@ -1555,6 +1555,15 @@ describe('canonical Story Factory', () => {
     expect(rolling.plans[0].mechanicUses[0].deltaIds).toEqual(['delta_1']);
   });
 
+  test('a chapter without an invoked world rule remains a valid mechanical plan', () => {
+    const wire = plannerWire();
+    const chapter = JSON.parse(wire.chaptersJson[0]);
+    chapter.rules = [];
+    wire.chaptersJson[0] = JSON.stringify(chapter);
+    const rolling = materializePlannerRollingPlan(wire);
+    expect(rolling.plans[0].requiredWorldRuleIds).toEqual([]);
+  });
+
   test('Planner wire cannot emit a decorative mechanic without a required delta', () => {
     const wire = plannerWire();
     const chapter = JSON.parse(wire.chaptersJson[0]);
