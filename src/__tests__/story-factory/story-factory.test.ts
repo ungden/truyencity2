@@ -1625,8 +1625,13 @@ describe('canonical Story Factory', () => {
   });
 
   test('Gemini structured-output schema keeps only provider-supported bounds', () => {
-    const schema = toGeminiResponseSchema(z.object({ arcNumber: z.number().int().positive() }).strict());
+    const schema = toGeminiResponseSchema(z.object({
+      arcNumber: z.number().int().min(1),
+      amount: z.number().min(0.000001),
+    }).strict());
     expect((schema.properties as Record<string, Record<string, unknown>>).arcNumber.exclusiveMinimum).toBeUndefined();
+    expect((schema.properties as Record<string, Record<string, unknown>>).arcNumber.minimum).toBe(1);
+    expect((schema.properties as Record<string, Record<string, unknown>>).amount.minimum).toBe(0.000001);
     const complex = toGeminiResponseSchema(
       z.object({ stages: z.array(z.string()).min(8).max(15) }).strict(),
       { complexity: 'omit_array_max' },

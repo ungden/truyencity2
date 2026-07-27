@@ -50,8 +50,8 @@ const PlannerCompactSceneSchema = z.object({
 
 const PlannerCompactChapterSchema = z.object({
   v: z.literal(2),
-  n: z.number().int().positive(),
-  arc: z.number().int().positive(),
+  n: z.number().int().min(1),
+  arc: z.number().int().min(1),
   time: z.number().int().min(0),
   pre: z.array(z.object({
     k: z.enum(['fact', 'resource', 'location', 'promise']),
@@ -66,7 +66,7 @@ const PlannerCompactChapterSchema = z.object({
     scene: z.string(),
     mechanic: z.string(),
     actor: z.string(),
-    qty: z.number().finite().positive().max(1_000_000),
+    qty: z.number().finite().min(0.000001).max(1_000_000),
     facts: z.array(z.string()).max(20),
     primaryDeltaId: z.string(),
     additionalDeltaIds: z.array(z.string()).max(29),
@@ -75,7 +75,7 @@ const PlannerCompactChapterSchema = z.object({
 
 export const PlannerRollingPlanResponseSchema = z.object({
   v: z.literal(2),
-  start: z.number().int().positive(),
+  start: z.number().int().min(1),
   chaptersJson: z.array(z.string()).min(1).max(5),
 }).strict();
 

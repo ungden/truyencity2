@@ -73,7 +73,7 @@ const SpineExpansionSeedSchema = z.object({
 
 export const SeriesStageSchema = z.object({
   id: stableId,
-  order: z.number().int().positive(),
+  order: z.number().int().min(1),
   targetSpanChapters: z.number().int().min(40).max(180),
   arena: prose,
   protagonistGoal: prose,
@@ -95,7 +95,7 @@ export const LongPromiseSchema = z.object({
 
 const MechanicResourceAmountSchema = z.object({
   resourceId: stableId,
-  amount: z.number().finite().positive(),
+  amount: z.number().finite().min(0.000001),
 }).strict();
 const MechanicFactConditionSchema = z.object({
   factId: stableId,
@@ -110,7 +110,7 @@ export const WorldMechanicSchema = z.discriminatedUnion('kind', [
     description: mechanicalText,
     inputsPerBatch: z.array(MechanicResourceAmountSchema).min(1).max(12),
     outputsPerBatch: z.array(MechanicResourceAmountSchema).min(1).max(12),
-    maximumBatchesPerUse: z.number().finite().positive().max(1_000_000).nullable(),
+    maximumBatchesPerUse: z.number().finite().min(0.000001).max(1_000_000).nullable(),
   }).strict(),
   z.object({
     id: stableId,
@@ -123,7 +123,7 @@ export const WorldMechanicSchema = z.discriminatedUnion('kind', [
     effectResourceIds: z.array(stableId).max(20),
     effectFactIds: z.array(stableId).max(20),
     capacityUnit: z.string().trim().min(1).max(40).nullable(),
-    maximumUnitsPerMinute: z.number().finite().positive().max(1_000_000).nullable(),
+    maximumUnitsPerMinute: z.number().finite().min(0.000001).max(1_000_000).nullable(),
   }).strict(),
   z.object({
     id: stableId,
@@ -347,7 +347,7 @@ export const ChapterOutcomeContentSchema = z.object({
 }).strict();
 
 export const ChapterOutcomeSchema = ChapterOutcomeContentSchema.extend({
-  chapterNumber: z.number().int().positive(),
+  chapterNumber: z.number().int().min(1),
   title: z.string().trim().min(1).max(240),
 }).strict();
 
@@ -376,10 +376,10 @@ export const StoryStateSchema = z.object({
 
 const arcPlanShape = {
   schemaVersion: z.literal(2),
-  arcNumber: z.number().int().positive(),
+  arcNumber: z.number().int().min(1),
   stageId: stableId,
-  startChapter: z.number().int().positive(),
-  plannedEndChapter: z.number().int().positive(),
+  startChapter: z.number().int().min(1),
+  plannedEndChapter: z.number().int().min(1),
   objective: prose,
   terminalChanges: z.array(prose).min(1).max(12),
   activeConflicts: z.array(prose).min(1).max(12),
@@ -482,8 +482,8 @@ export const StateDeltaSchema = z.discriminatedUnion('kind', [
 
 export const ChapterPlanSchema = z.object({
   schemaVersion: z.literal(2),
-  chapterNumber: z.number().int().positive(),
-  arcNumber: z.number().int().positive(),
+  chapterNumber: z.number().int().min(1),
+  arcNumber: z.number().int().min(1),
   storyTimeAfterMinutes: z.number().int().nonnegative(),
   preconditions: z.array(z.object({
     kind: z.enum(['fact', 'resource', 'location', 'promise']),
@@ -509,7 +509,7 @@ export const ChapterPlanSchema = z.object({
     sceneId: stableId,
     mechanicId: stableId,
     actorId: stableId,
-    quantity: z.number().finite().positive().max(1_000_000),
+    quantity: z.number().finite().min(0.000001).max(1_000_000),
     preconditionFactIds: z.array(stableId).max(20),
     deltaIds: z.array(stableId).min(1).max(30),
   }).strict()).max(30),
@@ -517,7 +517,7 @@ export const ChapterPlanSchema = z.object({
 
 export const RollingPlanSchema = z.object({
   schemaVersion: z.literal(2),
-  startChapter: z.number().int().positive(),
+  startChapter: z.number().int().min(1),
   plans: z.array(ChapterPlanSchema).min(1).max(5),
 }).strict();
 
@@ -585,7 +585,7 @@ export const PlanIssueSchema = z.object({
     'stage_alignment',
     'state_transition',
   ]),
-  chapterNumber: z.number().int().positive(),
+  chapterNumber: z.number().int().min(1),
   sceneId: stableId.nullable(),
   deltaId: stableId.nullable(),
   evidence: z.string().trim().min(3).max(800),
