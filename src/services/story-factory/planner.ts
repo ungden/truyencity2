@@ -83,13 +83,13 @@ export const PlannerRollingPlanResponseSchema = z.object({
 
 const PLANNER_COMPACT_CONTRACT = {
   deltaTarget: {
-    fact: 'target=factId; before/after là giá trị fact; change/source/sink=null',
+    fact: 'target=factId; before=null vì code lấy tuần tự từ State; after là giá trị fact mới; change/source/sink=null',
     resource_numeric: 'target=resourceId; change là số khác 0; before/after bắt buộc null vì code tính tuần tự từ State; change > 0 bắt buộc source khác null và sink=null; change < 0 bắt buộc sink khác null và source=null',
-    resource_state: 'target=resourceId; before/after là trạng thái; source giải thích nguồn thay đổi; change/sink=null',
+    resource_state: 'target=resourceId; before=null vì code lấy tuần tự từ State; after là trạng thái mới; source giải thích nguồn thay đổi; change/sink=null',
     knowledge: 'target=characterId; after=factId; source là nguồn học biết; before/change/sink=null',
     location: 'target=characterId; before/after là locationId; change/source/sink=null',
-    promise: 'target=promiseId; before/after thuộc open|progressed|resolved|abandoned; change/source/sink=null',
-    relationship: 'target=characterId; counterpart=counterpartId; before là trạng thái cũ hoặc null; after là trạng thái mới; source giải thích sự kiện; change/sink=null',
+    promise: 'target=promiseId; before=null vì code lấy tuần tự từ State; after thuộc open|progressed|resolved|abandoned; change/source/sink=null',
+    relationship: 'target=characterId; counterpart=counterpartId; before=null vì code lấy tuần tự từ State; after là trạng thái mới; source giải thích sự kiện; change/sink=null',
   },
   chapterJson: {
     serialization: 'Mỗi phần tử chaptersJson là đúng một JSON object đã stringify, không markdown.',
@@ -120,7 +120,7 @@ const PLANNER_COMPACT_CONTRACT = {
     'Conversion là một batch nguyên tử: chỉ commit toàn bộ input và output trong cùng scene khi batch hoàn tất. Chương chuẩn bị chưa hoàn tất batch phải dùng fact hoặc resource_state để ghi tiến độ; không được trừ trước một phần input numeric rồi để output sang chương sau.',
     'Giữ goal/block/act ngắn và cơ học; chỉ đưa nhân vật, rule và delta thật sự cần cho chương.',
     'knowledge.after phải là fact ID đã tồn tại trong State. Nếu nhân vật học một fact mới, tạo fact delta khai báo fact đó trước knowledge delta trong cùng chương và gắn cả hai vào scene học biết.',
-    'relationship.before phải bằng chính xác State.characters[characterId].relationshipState[counterpartId], hoặc null nếu pair chưa có entry; không suy ra quan hệ ban đầu từ role, agenda hay mô tả Kernel.',
+    'Với fact, resource_state, promise và relationship, luôn gửi before=null; compiler tự lấy before thật và cập nhật tuần tự qua cả window. Không chép lại ledger bằng model.',
     'Chỉ cần khai báo đúng scene.people, scene.loc và scene.travel; compiler tự sinh location delta từ vị trí đầu chương tới scene cuối của từng nhân vật. Nếu tự khai báo location delta, nó vẫn phải khớp chính xác và không được trùng.',
   ],
 } as const;
@@ -133,6 +133,18 @@ export function materializePlannerRollingPlan(
   const chapters = compact.chaptersJson.map(raw => PlannerCompactChapterSchema.parse(JSON.parse(raw)));
   const resourceBalances = new Map(initialState.resources.flatMap(resource => (
     resource.kind === 'numeric' ? [[resource.resourceId, resource.value] as const] : []
+  )));
+  const resourceStates = new Map(initialState.resources.flatMap(resource => (
+    resource.kind === 'state' ? [[resource.resourceId, resource.value] as const] : []
+  )));
+  const factValues = new Map(initialState.facts.map(fact => [fact.id, fact.value] as const));
+  const promiseStatuses = new Map(initialState.promises.map(promise => (
+    [promise.promiseId, promise.status] as const
+  )));
+  const relationshipValues = new Map<string, string>(initialState.characters.flatMap(character => (
+    Object.entries(character.relationshipState).map(([counterpartId, value]) => (
+      [`${character.characterId}\u0000${counterpartId}`, value] as const
+    ))
   )));
   const characterLocations = new Map(initialState.characters.map(character => (
     [character.characterId, character.locationId] as const
@@ -160,7 +172,12 @@ export function materializePlannerRollingPlan(
         requiredDeltaIds: scene.deltaIds,
       })),
       requiredDeltas: chapter.deltas.map(delta => {
-        if (delta.k === 'fact') return { id: delta.id, kind: delta.k, factId: delta.target, before: delta.before, after: delta.after };
+        if (delta.k === 'fact') {
+          const before = factValues.get(delta.target) ?? null;
+          const after = delta.after === null ? null : String(delta.after);
+          if (after !== null) factValues.set(delta.target, after);
+          return { id: delta.id, kind: delta.k, factId: delta.target, before, after };
+        }
         if (delta.k === 'resource_numeric') {
           const before = resourceBalances.get(delta.target);
           if (before === undefined || delta.change === null || delta.change === 0) {
@@ -184,19 +201,47 @@ export function materializePlannerRollingPlan(
             sink: delta.sink,
           };
         }
-        if (delta.k === 'resource_state') return { id: delta.id, kind: delta.k, resourceId: delta.target, before: delta.before, after: delta.after, source: delta.source };
+        if (delta.k === 'resource_state') {
+          const before = resourceStates.get(delta.target);
+          if (before === undefined) {
+            throw new StoryFactoryError('plan_blocked', 'Planner state-resource delta references a missing ledger resource.', {
+              deltaId: delta.id,
+              resourceId: delta.target,
+            });
+          }
+          const after = delta.after === null ? null : String(delta.after);
+          if (after !== null) resourceStates.set(delta.target, after);
+          return { id: delta.id, kind: delta.k, resourceId: delta.target, before, after, source: delta.source };
+        }
         if (delta.k === 'knowledge') return { id: delta.id, kind: delta.k, characterId: delta.target, factId: delta.after, source: delta.source };
         if (delta.k === 'location') return { id: delta.id, kind: delta.k, characterId: delta.target, beforeLocationId: delta.before, afterLocationId: delta.after };
-        if (delta.k === 'relationship') return {
-          id: delta.id,
-          kind: delta.k,
-          characterId: delta.target,
-          counterpartId: delta.counterpart,
-          before: delta.before,
-          after: delta.after,
-          source: delta.source,
-        };
-        return { id: delta.id, kind: delta.k, promiseId: delta.target, before: delta.before, after: delta.after };
+        if (delta.k === 'relationship') {
+          const key = `${delta.target}\u0000${delta.counterpart ?? ''}`;
+          const before = relationshipValues.get(key) ?? null;
+          const after = delta.after === null ? null : String(delta.after);
+          if (after !== null) relationshipValues.set(key, after);
+          return {
+            id: delta.id,
+            kind: delta.k,
+            characterId: delta.target,
+            counterpartId: delta.counterpart,
+            before,
+            after,
+            source: delta.source,
+          };
+        }
+        const before = promiseStatuses.get(delta.target);
+        if (before === undefined) {
+          throw new StoryFactoryError('plan_blocked', 'Planner promise delta references a missing ledger promise.', {
+            deltaId: delta.id,
+            promiseId: delta.target,
+          });
+        }
+        if (typeof delta.after === 'string'
+          && ['open', 'progressed', 'resolved', 'abandoned'].includes(delta.after)) {
+          promiseStatuses.set(delta.target, delta.after as 'open' | 'progressed' | 'resolved' | 'abandoned');
+        }
+        return { id: delta.id, kind: delta.k, promiseId: delta.target, before, after: delta.after };
       }),
       mechanicUses: chapter.mechanics.map(use => ({
         id: use.id,

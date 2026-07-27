@@ -1954,6 +1954,7 @@ describe('canonical Story Factory', () => {
   test('Planner wire envelope materializes into the exact canonical plan', () => {
     const wire = plannerWire();
     const chapter = JSON.parse(wire.chaptersJson[0]);
+    chapter.deltas[0].before = null;
     chapter.mechanics = [{
       id: 'use_market',
       scene: 'scene_1',
@@ -1973,6 +1974,28 @@ describe('canonical Story Factory', () => {
       id: 'delta_1', kind: 'fact', factId: 'fact_day', before: 'ngay_0', after: 'ngay_1',
     });
     expect(rolling.plans[0].mechanicUses[0].deltaIds).toEqual(['delta_1']);
+  });
+
+  test('fact before values are derived sequentially from State across a rolling window', () => {
+    const first = JSON.parse(plannerWire(1).chaptersJson[0]);
+    const second = JSON.parse(plannerWire(2).chaptersJson[0]);
+    first.deltas[0].before = null;
+    second.deltas[0].before = null;
+    const rolling = materializePlannerRollingPlan({
+      v: 2,
+      start: 1,
+      chaptersJson: [JSON.stringify(first), JSON.stringify(second)],
+    }, initialState);
+    expect(rolling.plans[0].requiredDeltas[0]).toMatchObject({
+      factId: 'fact_day',
+      before: 'ngay_0',
+      after: 'ngay_1',
+    });
+    expect(rolling.plans[1].requiredDeltas[0]).toMatchObject({
+      factId: 'fact_day',
+      before: 'ngay_1',
+      after: 'ngay_2',
+    });
   });
 
   test('a chapter without an invoked world rule remains a valid mechanical plan', () => {
