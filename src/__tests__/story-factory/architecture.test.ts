@@ -76,6 +76,11 @@ describe('Story Factory architecture boundary', () => {
     expect(benchmark).toContain('assessSequentialContinuity({');
     expect(benchmark).toContain('--frozen-discovery-progress');
     expect(benchmark).toContain('planned = frozenProgress.plannedWindows[lane]');
+    expect(benchmark).toContain('prepareDiscoveryResume({');
+    expect(benchmark).toContain('resume: frozenProgress?.setupCheckpoints[lane] ?? progress.setupCheckpoints[lane]');
+    expect(benchmark).toContain('bookSetupCheckpointCost({');
+    expect(benchmark).toContain("const failureKind = discoveryOnly ? 'writer-discovery-v4' : 'sequential-v3'");
+    expect(benchmark).toContain('protocolVersion: buildProtocol');
     expect(benchmark).toContain('sourceDiscoveryDigest: writerCorpus.sourceDiscoveryDigest');
     expect(benchmark).not.toContain('convertPack');
     expect(benchmark).not.toContain('SOURCE_REF');
@@ -215,7 +220,8 @@ describe('Story Factory architecture boundary', () => {
     expect(bakeoff).not.toContain('normalizeHistoricalKernel');
     expect(bakeoff).not.toContain("from('story_factory_jobs')");
     expect(sequential).toContain('failedUsageCost(record.evidence)');
-    expect(sequential).toContain('estimated_cost_usd: progress.buildCostUsd + unbookedSetupCost');
+    expect(sequential).toContain('estimated_cost_usd: progress.buildCostUsd');
+    expect(sequential).not.toContain('unbookedSetupCost');
     expect(sequential).toContain('telemetry: candidate.attemptTelemetry');
     expect(sequential).toContain('chapterAttempts: progress.chapterAttempts');
   });

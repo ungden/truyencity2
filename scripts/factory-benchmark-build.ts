@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import { createHash } from 'node:crypto';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { gzipSync } from 'node:zlib';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
@@ -18,8 +18,11 @@ import {
   StoryFactoryError,
   WriterBakeoffCorpusSchema,
   assessSequentialContinuity,
+  bookSetupCheckpointCost,
+  checkpointCost,
   digestArtifact,
   planRollingWindow,
+  prepareDiscoveryResume,
   reviewFiveChapterWindow,
   runConceptLab,
   writeStoryChapter,
@@ -31,6 +34,7 @@ import {
   type SequentialBenchmarkCorpus,
   type SetupCheckpoint,
   type RollingPlan,
+  type DiscoveryResumeLineage,
   type StoryState,
 } from '../src/services/story-factory';
 
@@ -110,6 +114,8 @@ type Progress = {
   plannedWindows: Record<string, { rollingPlan: RollingPlan; assessment: PlanAssessment }>;
   windowReviews: Array<{ lane: string; status: 'pass' }>;
   failure: null | { lane: string; stage: string; message: string; code: string | null; evidence: unknown };
+  bookedSetupCostUsdByLane: Record<string, number>;
+  resumeLineage: DiscoveryResumeLineage[];
 };
 
 function runtimeRoute(routes: ModelRoutes) {
@@ -211,7 +217,7 @@ async function main() {
       || Object.keys(frozenProgress.plannedWindows ?? {}).length !== 4)) {
     throw new Error('Frozen discovery progress does not match this release, Planner, Plan Judge, Editor, Continuity Judge, or four-lane campaign.');
   }
-  const progress: Progress = {
+  const freshProgress: Progress = {
     protocolVersion: buildProtocol,
     engineRelease: STORY_FACTORY_RELEASE,
     route: runtimeRoute(candidateRoutes),
@@ -232,8 +238,23 @@ async function main() {
     plannedWindows: {},
     windowReviews: [],
     failure: null,
+    bookedSetupCostUsdByLane: {},
+    resumeLineage: [],
   };
+  const existingProgress = discoveryOnly && !frozenProgress && existsSync(progressPath)
+    ? JSON.parse(readFileSync(progressPath, 'utf8')) as Progress
+    : null;
+  const progress: Progress = existingProgress
+    ? prepareDiscoveryResume({
+      progress: existingProgress,
+      protocolVersion: buildProtocol,
+      engineRelease: STORY_FACTORY_RELEASE,
+      route: runtimeRoute(candidateRoutes),
+      continuityJudgeModel,
+    })
+    : freshProgress;
   const persist = () => writeFileSync(progressPath, `${JSON.stringify(progress, null, 2)}\n`);
+  persist();
   const signatures: PortfolioSignature[] = [];
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -256,12 +277,13 @@ async function main() {
         protocolVersion: buildProtocol,
         lanes: laneOrder,
         samplesExpected: discoveryOnly ? 4 : 20,
+        resumeLineage: progress.resumeLineage,
       },
     }).select('id').single();
     if (inserted.error) throw inserted.error;
     runId = inserted.data.id;
   }
-  const heartbeat = async (unbookedSetupCost = 0) => {
+  const heartbeat = async () => {
     if (!db || !runId) return;
     const updated = await db.from('story_factory_runs').update({
       output_artifact: {
@@ -275,7 +297,7 @@ async function main() {
           ),
         },
       },
-      estimated_cost_usd: progress.buildCostUsd + unbookedSetupCost,
+      estimated_cost_usd: progress.buildCostUsd,
     }).eq('id', runId).eq('status', 'running');
     if (updated.error) throw updated.error;
   };
@@ -285,23 +307,30 @@ async function main() {
       const lane = entry.commission.genreLane;
       let stage = 'setup';
       try {
+        const setupCostBefore = progress.buildCostUsd;
         const setup = await runConceptLab({
           commission: entry.commission,
           research: entry.research,
           routes: candidateRoutes,
           existingSignatures: signatures,
-          resume: frozenProgress?.setupCheckpoints[lane],
+          resume: frozenProgress?.setupCheckpoints[lane] ?? progress.setupCheckpoints[lane],
           onCheckpoint: async checkpoint => {
             progress.setupCheckpoints[lane] = checkpoint;
+            if (!frozenProgress) {
+              const booked = bookSetupCheckpointCost({
+                buildCostUsd: progress.buildCostUsd,
+                bookedSetupCostUsdByLane: progress.bookedSetupCostUsdByLane,
+                lane,
+                checkpointCostUsd: checkpointCost(checkpoint),
+              });
+              progress.buildCostUsd = booked.buildCostUsd;
+              progress.bookedSetupCostUsdByLane = booked.bookedSetupCostUsdByLane;
+            }
             persist();
-            await heartbeat(Object.values(checkpoint).reduce(
-              (sum, artifact) => sum + (artifact?.usage?.costUsd ?? 0),
-              0,
-            ));
+            await heartbeat();
           },
         });
-        const setupCost = frozenProgress ? 0 : usageCost(setup.usages);
-        progress.buildCostUsd += setupCost;
+        const setupCost = frozenProgress ? 0 : progress.buildCostUsd - setupCostBefore;
         progress.setupSuccesses += 1;
         const launchPackDigest = digestArtifact(setup.launchPack);
         progress.launchPackDigests.push(launchPackDigest);
@@ -318,6 +347,8 @@ async function main() {
         let planCost = 0;
         if (frozenProgress) {
           planned = frozenProgress.plannedWindows[lane];
+        } else if (progress.plannedWindows[lane]) {
+          planned = progress.plannedWindows[lane];
         } else {
           const generatedPlan = await planRollingWindow({
             kernel: setup.launchPack.kernel,
@@ -502,15 +533,7 @@ async function main() {
           evidence?: unknown;
         } : {};
         if (record.code === 'infra_blocked') progress.providerFailures += 1;
-        if (stage === 'setup') {
-          const checkpoint = progress.setupCheckpoints[lane] ?? {};
-          const checkpointCost = Object.values(checkpoint).reduce((sum, artifact) => (
-            sum + (artifact?.usage?.costUsd ?? 0)
-          ), 0);
-          progress.buildCostUsd += checkpointCost + failedUsageCost(record.evidence);
-        } else {
-          progress.buildCostUsd += failedUsageCost(record.evidence);
-        }
+        progress.buildCostUsd += failedUsageCost(record.evidence);
         progress.failure = {
           lane,
           stage,
@@ -543,14 +566,25 @@ async function main() {
       writeFileSync(writerCorpusPath, `${JSON.stringify(writerCorpus, null, 2)}\n`);
       if (db && runId) {
         await ensureAuditBucket(db);
-        const archive = gzipSync(Buffer.from(JSON.stringify(writerCorpus)));
+        const archive = gzipSync(Buffer.from(JSON.stringify({
+          writerCorpus,
+          resumeLineage: progress.resumeLineage,
+          bookedSetupCostUsdByLane: progress.bookedSetupCostUsdByLane,
+        })));
         const sha256 = createHash('sha256').update(archive).digest('hex');
         const storageKey = `benchmarks/writer-discovery-v4/${discoveryDigest}-${sha256}.json.gz`;
         await uploadImmutable(db, storageKey, archive, sha256);
         const finished = await db.from('story_factory_runs').update({
           status: 'passed',
           artifact_digest: sha256,
-          output_artifact: { storageKey, sha256, discoveryDigest, samplesCompleted: samples.length },
+          output_artifact: {
+            protocolVersion: buildProtocol,
+            storageKey,
+            sha256,
+            discoveryDigest,
+            samplesCompleted: samples.length,
+            resumeCount: progress.resumeLineage.length,
+          },
           estimated_cost_usd: progress.buildCostUsd,
           finished_at: new Date().toISOString(),
         }).eq('id', runId).eq('status', 'running');
@@ -651,7 +685,8 @@ async function main() {
       await ensureAuditBucket(db);
       const archive = gzipSync(Buffer.from(JSON.stringify({ progress })));
       const sha256 = createHash('sha256').update(archive).digest('hex');
-      const storageKey = `benchmarks/sequential-v3-failed/${STORY_FACTORY_RELEASE}/${runId}-${sha256}.json.gz`;
+      const failureKind = discoveryOnly ? 'writer-discovery-v4' : 'sequential-v3';
+      const storageKey = `benchmarks/${failureKind}-failed/${STORY_FACTORY_RELEASE}/${runId}-${sha256}.json.gz`;
       await uploadImmutable(db, storageKey, archive, sha256);
       const infra = progress.providerFailures > 0;
       const updated = await db.from('story_factory_runs').update({
@@ -660,7 +695,7 @@ async function main() {
         error_message: error instanceof Error ? error.message : String(error),
         artifact_digest: sha256,
         output_artifact: {
-          protocolVersion: STORY_FACTORY_SEQUENTIAL_PROTOCOL,
+          protocolVersion: buildProtocol,
           storageKey,
           sha256,
           setupSuccesses: progress.setupSuccesses,
@@ -671,6 +706,7 @@ async function main() {
           continuityFailures: progress.continuityFailures,
           windowReviewFailures: progress.windowReviewFailures,
           failure: progress.failure,
+          resumeCount: progress.resumeLineage.length,
         },
         estimated_cost_usd: progress.buildCostUsd,
         finished_at: new Date().toISOString(),

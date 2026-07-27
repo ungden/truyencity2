@@ -32,6 +32,8 @@ import {
   buildBlindReaderInput,
   buildChapterContexts,
   buildWriterBrief,
+  bookSetupCheckpointCost,
+  prepareDiscoveryResume,
   isStoryFactoryEnabled,
   calculateValidationMetrics,
   calculateComparativeValidationMetrics,
@@ -1162,6 +1164,126 @@ describe('canonical Story Factory', () => {
         ? { ...sample, stateBeforeDigest: 'f'.repeat(64) }
         : sample),
     })).toThrow();
+  });
+
+  test('infra-only discovery resume preserves checkpoints, cost, and lineage without double booking', () => {
+    const progress = {
+      protocolVersion: STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL,
+      engineRelease: 'release_current',
+      route: {
+        planner: 'planner',
+        planJudge: 'judge',
+        writer: 'writer',
+        editor: 'editor',
+        routeVersion: 'route-1',
+      },
+      continuityJudgeModel: 'continuity',
+      startedAt: '2026-07-26T00:00:00.000Z',
+      setupSuccesses: 0,
+      planSuccesses: 0,
+      providerFailures: 1,
+      generationFailures: 0,
+      continuityFailures: 0,
+      windowReviewFailures: 0,
+      buildCostUsd: 0.1,
+      launchPackDigests: [],
+      samples: [],
+      writerBriefs: [],
+      chapterAttempts: [],
+      setupCheckpoints: {
+        era_coastal: {
+          generatorA: { usage: { costUsd: 0.2 } },
+          generatorB: { usage: { costUsd: 0.2 } },
+        },
+      },
+      plannedWindows: {},
+      windowReviews: [],
+      failure: {
+        lane: 'era_coastal',
+        stage: 'setup',
+        message: 'fetch failed',
+        code: 'infra_blocked',
+        evidence: null,
+      },
+    };
+    const resumed = prepareDiscoveryResume({
+      progress,
+      protocolVersion: STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL,
+      engineRelease: 'release_current',
+      route: progress.route,
+      continuityJudgeModel: 'continuity',
+      resumedAt: '2026-07-26T01:00:00.000Z',
+    });
+    expect(resumed.failure).toBeNull();
+    expect(resumed.providerFailures).toBe(0);
+    expect(resumed.setupCheckpoints.era_coastal).toBe(progress.setupCheckpoints.era_coastal);
+    expect(resumed.buildCostUsd).toBeCloseTo(0.4);
+    expect(resumed.resumeLineage).toMatchObject([{
+      priorFailure: { code: 'infra_blocked' },
+      priorCostUsd: 0.1,
+      checkpointLanes: ['era_coastal'],
+    }]);
+
+    const unchanged = bookSetupCheckpointCost({
+      buildCostUsd: resumed.buildCostUsd,
+      bookedSetupCostUsdByLane: resumed.bookedSetupCostUsdByLane ?? {},
+      lane: 'era_coastal',
+      checkpointCostUsd: 0.4,
+    });
+    expect(unchanged.addedCostUsd).toBe(0);
+    const extended = bookSetupCheckpointCost({
+      buildCostUsd: unchanged.buildCostUsd,
+      bookedSetupCostUsdByLane: unchanged.bookedSetupCostUsdByLane,
+      lane: 'era_coastal',
+      checkpointCostUsd: 0.55,
+    });
+    expect(extended.addedCostUsd).toBeCloseTo(0.15);
+    expect(extended.buildCostUsd).toBeCloseTo(0.55);
+  });
+
+  test('discovery resume rejects content failures and release drift', () => {
+    const progress = {
+      protocolVersion: STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL,
+      engineRelease: 'release_old',
+      route: { planner: 'p', planJudge: 'j', writer: 'w', editor: 'e', routeVersion: 'r' },
+      continuityJudgeModel: 'continuity',
+      startedAt: '2026-07-26T00:00:00.000Z',
+      setupSuccesses: 0,
+      planSuccesses: 0,
+      providerFailures: 0,
+      generationFailures: 0,
+      continuityFailures: 0,
+      windowReviewFailures: 0,
+      buildCostUsd: 0,
+      launchPackDigests: [],
+      samples: [],
+      writerBriefs: [],
+      chapterAttempts: [],
+      setupCheckpoints: {},
+      plannedWindows: {},
+      windowReviews: [],
+      failure: {
+        lane: 'era_coastal',
+        stage: 'plan',
+        message: 'invalid plan',
+        code: 'plan_blocked',
+        evidence: null,
+      },
+    };
+    expect(() => prepareDiscoveryResume({
+      progress,
+      protocolVersion: STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL,
+      engineRelease: 'release_old',
+      route: progress.route,
+      continuityJudgeModel: 'continuity',
+    })).toThrow('Only interrupted or infra_blocked');
+    expect(() => prepareDiscoveryResume({
+      progress: { ...progress, failure: null },
+      protocolVersion: STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL,
+      engineRelease: 'release_new',
+      route: progress.route,
+      continuityJudgeModel: 'continuity',
+    })).toThrow('does not match');
   });
 
   test('Writer bake-off corpus accepts only current Plan Judge passes', () => {

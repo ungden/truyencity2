@@ -1,5 +1,6 @@
 export * from './contracts';
 export * from './benchmark';
+export * from './benchmark-resume';
 export * from './context';
 export * from './cover';
 export * from './memory';
