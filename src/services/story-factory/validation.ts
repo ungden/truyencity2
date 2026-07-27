@@ -10,7 +10,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-5-batched-issue-evidence';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-6-active-resource-reachability';
 
 export interface StateEvent {
   chapterNumber: number;
@@ -167,6 +167,88 @@ export function validateKernelState(kernel: StoryKernel, state: StoryState): voi
       protagonistLocation,
       unreachable,
       noReturn,
+    });
+  }
+}
+
+/**
+ * Prove that the current arc does not depend on a resource that can never
+ * exist. A resource is reachable when it is already present or is produced by
+ * an active conversion whose own inputs are reachable. This deliberately
+ * models provenance, not quantity scheduling; exact balances remain the
+ * rolling-plan validator's responsibility.
+ */
+export function validateArcResourceReachability(input: {
+  kernel: StoryKernel;
+  arc: ArcPlan;
+  state: StoryState;
+}): void {
+  const { kernel, arc, state } = input;
+  const resourceDefinitions = new Map(kernel.resources.map(resource => [resource.id, resource]));
+  const activeMechanics = arc.activeMechanicIds.map(id => (
+    kernel.worldMechanics.find(mechanic => mechanic.id === id)
+  )).filter((mechanic): mechanic is StoryKernel['worldMechanics'][number] => Boolean(mechanic));
+  const reachable = new Set(state.resources.flatMap(resource => {
+    if (resource.kind === 'numeric' && resource.value > 0) return [resource.resourceId];
+    if (resource.kind === 'state' && resource.value.trim() && !/^(?:0|false|none|null)$/iu.test(resource.value.trim())) {
+      return [resource.resourceId];
+    }
+    return [];
+  }));
+
+  for (const mechanic of activeMechanics) {
+    if (mechanic.kind !== 'conversion') continue;
+    const inputIds = mechanic.inputsPerBatch.map(item => item.resourceId);
+    const lossIds = mechanic.lossesPerBatch.map(item => item.resourceId);
+    const duplicatedConsumption = inputIds.filter(resourceId => lossIds.includes(resourceId));
+    if (duplicatedConsumption.length) {
+      fail(`Conversion ${mechanic.id} counts the same resource as both input and loss.`, {
+        resourceIds: [...new Set(duplicatedConsumption)],
+        repairRule: 'Consumed input belongs only in inputsPerBatch. lossesPerBatch is only for additional tracked waste.',
+      });
+    }
+    for (const item of [...mechanic.inputsPerBatch, ...mechanic.outputsPerBatch, ...mechanic.lossesPerBatch]) {
+      if (resourceDefinitions.get(item.resourceId)?.kind !== 'numeric') {
+        fail(`Conversion ${mechanic.id} must use numeric resources only.`, { resourceId: item.resourceId });
+      }
+    }
+  }
+
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const mechanic of activeMechanics) {
+      if (mechanic.kind !== 'conversion') continue;
+      const required = [...mechanic.inputsPerBatch, ...mechanic.lossesPerBatch].map(item => item.resourceId);
+      if (!required.every(resourceId => reachable.has(resourceId))) continue;
+      for (const output of mechanic.outputsPerBatch) {
+        if (reachable.has(output.resourceId)) continue;
+        reachable.add(output.resourceId);
+        changed = true;
+      }
+    }
+  }
+
+  const required = new Set<string>();
+  for (const mechanic of activeMechanics) {
+    if (mechanic.kind === 'conversion') {
+      mechanic.inputsPerBatch.forEach(item => required.add(item.resourceId));
+      mechanic.lossesPerBatch.forEach(item => required.add(item.resourceId));
+      mechanic.outputsPerBatch.forEach(item => required.add(item.resourceId));
+    } else if (mechanic.kind === 'capability') {
+      mechanic.requiredResourceIds.forEach(resourceId => required.add(resourceId));
+    }
+  }
+  arc.activeResourceIds
+    .filter(resourceId => resourceDefinitions.get(resourceId)?.kind === 'numeric')
+    .forEach(resourceId => required.add(resourceId));
+
+  const unreachable = [...required].filter(resourceId => !reachable.has(resourceId));
+  if (unreachable.length) {
+    fail('Arc depends on resources with no causal acquisition path.', {
+      resourceIds: unreachable,
+      activeMechanicIds: arc.activeMechanicIds,
+      repairRule: 'Give the initial state a grounded positive balance or add an active conversion such as a story-specific purchase, harvest, or production path from already reachable resources.',
     });
   }
 }
@@ -785,6 +867,11 @@ export function validateRollingPlan(input: {
     fail('Rolling plan does not begin at the next uncommitted chapter.');
   }
   validateArcAgainstKernel(input.kernel, input.arc);
+  validateArcResourceReachability({
+    kernel: input.kernel,
+    arc: input.arc,
+    state: input.state,
+  });
   let state = structuredClone(input.state);
   input.rollingPlan.plans.forEach((plan, index) => {
     if (plan.chapterNumber !== input.rollingPlan.startChapter + index) fail('Rolling plan chapter numbers are not contiguous.');

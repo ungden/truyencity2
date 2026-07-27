@@ -16,7 +16,12 @@ import type { ContinuityPacket } from './memory';
 import type { ProviderUsage, StoryModelProvider } from './provider';
 import { geminiProvider } from './provider';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
-import { applyCanonExtension, validateArcAgainstKernel, validateRollingPlan } from './validation';
+import {
+  applyCanonExtension,
+  validateArcAgainstKernel,
+  validateArcResourceReachability,
+  validateRollingPlan,
+} from './validation';
 
 const PlannerScalarSchema = z.union([z.string(), z.number(), z.null()]);
 const PlannerCompactDeltaSchema = z.object({
@@ -331,6 +336,11 @@ export async function planRollingWindow(input: {
 }): Promise<{ rollingPlan: RollingPlan; assessment: PlanAssessment; usages: ProviderUsage[] }> {
   const provider = input.provider ?? geminiProvider;
   const usages: ProviderUsage[] = [];
+  validateArcResourceReachability({
+    kernel: input.kernel,
+    arc: input.arc,
+    state: input.state,
+  });
   let previousResponse: unknown;
   let validationIssues: unknown;
   let lastError: StoryFactoryError | undefined;

@@ -12,7 +12,11 @@ import {
 } from './contracts';
 import type { ProviderUsage, StoryModelProvider } from './provider';
 import { geminiProvider } from './provider';
-import { validateArcAgainstKernel, validateKernelState } from './validation';
+import {
+  validateArcAgainstKernel,
+  validateArcResourceReachability,
+  validateKernelState,
+} from './validation';
 
 export const ResearchSnapshotSchema = z.object({
   snapshotId: z.string().trim().min(3),
@@ -451,6 +455,8 @@ WorldModel phải khóa thời đại, địa lý, tổ chức, hệ thống v�
 travelRules là đồ thị có hướng: từ vị trí mở đầu dự kiến phải đi được tới mọi location và có đường quay về. Không biến kiến thức thành vật tư, thời gian hoặc năng lượng miễn phí.
 Mỗi numeric resource bắt buộc có unit vật lý hoặc tiền tệ rõ ràng như VND, kg, lít, chiếc, điểm; không dùng một con số vô đơn vị.
 Trả mechanics trong đúng ba mảng conversions, capabilities và constraints; mỗi mảng có ít nhất một phần tử đúng kind. Conversion ghi input/output/hao hụt theo mỗi batch; capability ghi actor/fact/resource cấp quyền và công suất; constraint ghi fact bắt buộc hoặc bị cấm. Không giấu số học hoặc quyền hạn trong prose worldRules.
+Mọi vật tư đầu vào của cơ chế arc đầu phải có đường đạt được: hoặc có sẵn hợp lý ở State ban đầu, hoặc là output của chuỗi conversion bắt đầu từ tài nguyên có sẵn. Mua/thu mua là conversion từ tiền hoặc vật trao đổi sang hàng; khai thác/sản xuất cũng phải có conversion riêng của truyện. Không cho tài nguyên xuất hiện chỉ nhờ source/sink prose.
+Không ghi cùng một resource vào cả inputsPerBatch và lossesPerBatch. Vật tư đã bị tiêu thụ chỉ nằm trong inputsPerBatch; lossesPerBatch chỉ dành cho hao hụt bổ sung được theo dõi riêng.
 World rules, resource và tổ chức phải phản ánh requiredInfrastructure, minimumPlausibleTimeline và criticalAssumptions đã được mô phỏng.`,
       prompt: JSON.stringify({
         task: 'Xuất phần world canon cho identity đã khóa.',
@@ -517,6 +523,7 @@ Mọi longPromises.promiseId, stages[].longPromiseIds và endingDirection.promis
     system: `Bạn chỉ tạo Arc đầu 20-30 chương và StoryState chương 0 từ canon đã khóa. Trả đúng structured-output schema, không markdown.
 Arc gắn stage đầu; mọi active ID phải có trong Kernel. State không ghi trước kết quả tương lai.
 Arc.activeMechanicIds chỉ chứa mechanic dùng trong arc đầu. Mọi requiredFacts của capability/constraint đang active phải có fact và expected value tương ứng trong initialState.
+Mọi numeric resource trong activeResourceIds và mọi đầu vào của activeMechanicIds phải có đường nhân quả từ initialState: số dư dương có nguồn gốc hợp lý hoặc output của active conversion bắt đầu từ tài nguyên đang có. Nếu cần mua vật tư, phải kích hoạt conversion thu mua tương ứng; không đặt vật tư bằng 0 rồi trông chờ Planner tự bịa nguồn.
 initialState.schemaVersion=2, chapterNumber=0, recentOutcomes=[] và usedExpansionSeedIds=[].
 State có đúng một entry cho mọi character, resource và promise trong Kernel; không thiếu, không thêm ID lạ.`,
     prompt: JSON.stringify({
@@ -549,6 +556,11 @@ State có đúng một entry cho mọi character, resource và promise trong Ker
   try {
     validateKernelState(launch.kernel, launch.initialState);
     validateArcAgainstKernel(launch.kernel, ArcPlanSchema.parse(launch.arc));
+    validateArcResourceReachability({
+      kernel: launch.kernel,
+      arc: ArcPlanSchema.parse(launch.arc),
+      state: launch.initialState,
+    });
   } catch (error) {
     if (error instanceof StoryFactoryError) {
       throw new StoryFactoryError('setup_blocked', `Launch pack failed canonical validation: ${error.message}`, error.evidence);

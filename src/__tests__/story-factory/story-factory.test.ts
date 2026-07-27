@@ -46,6 +46,7 @@ import {
   planRollingWindow,
   rollingPlanContainsChapter,
   toGeminiResponseSchema,
+  validateArcResourceReachability,
   validateKernelState,
   validationPasses,
   writeStoryChapter,
@@ -342,6 +343,116 @@ describe('canonical Story Factory', () => {
     }];
     const result = applyChapterPlan({ kernel, state: initialState, plan: chapter });
     expect(result.state.resources[0]).toEqual({ resourceId: 'money', kind: 'numeric', value: 30 });
+  });
+
+  test('blocks an arc whose active resources have no causal acquisition path before calling Planner', async () => {
+    const blockedKernel = structuredClone(kernel);
+    blockedKernel.resources.push(
+      { id: 'broken_engine', name: 'Động cơ hỏng', kind: 'numeric', unit: 'chiếc', minimum: 0 },
+      { id: 'working_engine', name: 'Động cơ hoạt động', kind: 'numeric', unit: 'chiếc', minimum: 0 },
+    );
+    blockedKernel.worldMechanics.push({
+      id: 'repair_engine',
+      name: 'Sửa động cơ',
+      kind: 'conversion',
+      description: 'Một động cơ hỏng được sửa thành một động cơ hoạt động.',
+      inputsPerBatch: [{ resourceId: 'broken_engine', amount: 1 }],
+      outputsPerBatch: [{ resourceId: 'working_engine', amount: 1 }],
+      lossesPerBatch: [],
+      maximumBatchesPerUse: 1,
+    });
+    const blockedState = structuredClone(initialState);
+    blockedState.resources.push(
+      { resourceId: 'broken_engine', kind: 'numeric', value: 0 },
+      { resourceId: 'working_engine', kind: 'numeric', value: 0 },
+    );
+    const blockedArc = {
+      ...structuredClone(arc),
+      activeResourceIds: ['money', 'broken_engine', 'working_engine'],
+      activeMechanicIds: ['repair_engine'],
+    };
+    expect(() => validateArcResourceReachability({
+      kernel: blockedKernel,
+      arc: blockedArc,
+      state: blockedState,
+    })).toThrow('no causal acquisition path');
+    const provider = new QueueProvider([]);
+    await expect(planRollingWindow({
+      kernel: blockedKernel,
+      arc: blockedArc,
+      state: blockedState,
+      routes,
+      provider,
+    })).rejects.toThrow('no causal acquisition path');
+    expect(provider.calls).toHaveLength(0);
+  });
+
+  test('accepts a story-specific acquisition conversion feeding a production conversion', () => {
+    const reachableKernel = structuredClone(kernel);
+    reachableKernel.resources.push(
+      { id: 'broken_engine', name: 'Động cơ hỏng', kind: 'numeric', unit: 'chiếc', minimum: 0 },
+      { id: 'working_engine', name: 'Động cơ hoạt động', kind: 'numeric', unit: 'chiếc', minimum: 0 },
+    );
+    reachableKernel.worldMechanics.push(
+      {
+        id: 'buy_engine',
+        name: 'Mua động cơ hỏng',
+        kind: 'conversion',
+        description: 'Tiền mặt được đổi lấy một động cơ hỏng có nguồn gốc cụ thể.',
+        inputsPerBatch: [{ resourceId: 'money', amount: 50 }],
+        outputsPerBatch: [{ resourceId: 'broken_engine', amount: 1 }],
+        lossesPerBatch: [],
+        maximumBatchesPerUse: 1,
+      },
+      {
+        id: 'repair_engine',
+        name: 'Sửa động cơ',
+        kind: 'conversion',
+        description: 'Một động cơ hỏng được sửa thành một động cơ hoạt động.',
+        inputsPerBatch: [{ resourceId: 'broken_engine', amount: 1 }],
+        outputsPerBatch: [{ resourceId: 'working_engine', amount: 1 }],
+        lossesPerBatch: [],
+        maximumBatchesPerUse: 1,
+      },
+    );
+    const reachableState = structuredClone(initialState);
+    reachableState.resources.push(
+      { resourceId: 'broken_engine', kind: 'numeric', value: 0 },
+      { resourceId: 'working_engine', kind: 'numeric', value: 0 },
+    );
+    const reachableArc = {
+      ...structuredClone(arc),
+      activeResourceIds: ['money', 'broken_engine', 'working_engine'],
+      activeMechanicIds: ['buy_engine', 'repair_engine'],
+    };
+    expect(() => validateArcResourceReachability({
+      kernel: reachableKernel,
+      arc: reachableArc,
+      state: reachableState,
+    })).not.toThrow();
+  });
+
+  test('rejects conversion resources counted as both input and additional loss', () => {
+    const duplicatedKernel = structuredClone(kernel);
+    duplicatedKernel.worldMechanics = [{
+      id: 'bad_conversion',
+      name: 'Chuyển đổi tính hai lần',
+      kind: 'conversion',
+      description: 'Cùng một khoản bị khai báo hai lần trong một batch.',
+      inputsPerBatch: [{ resourceId: 'money', amount: 10 }],
+      outputsPerBatch: [{ resourceId: 'money', amount: 8 }],
+      lossesPerBatch: [{ resourceId: 'money', amount: 2 }],
+      maximumBatchesPerUse: 1,
+    }];
+    const duplicatedArc = {
+      ...structuredClone(arc),
+      activeMechanicIds: ['bad_conversion'],
+    };
+    expect(() => validateArcResourceReachability({
+      kernel: duplicatedKernel,
+      arc: duplicatedArc,
+      state: initialState,
+    })).toThrow('both input and loss');
   });
 
   test('rejects a resource transition that is not owned by a validated mechanic', () => {
