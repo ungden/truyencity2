@@ -522,7 +522,7 @@ Mọi longPromises.promiseId, stages[].longPromiseIds và endingDirection.promis
     system: `Bạn chỉ tạo Arc đầu 20-30 chương và StoryState chương 0 từ canon đã khóa. Trả đúng structured-output schema, không markdown.
 Arc gắn stage đầu; mọi active ID phải có trong Kernel. State không ghi trước kết quả tương lai.
 Arc.activeMechanicIds chỉ chứa mechanic dùng trong arc đầu. Mọi requiredFacts của capability/constraint đang active phải có fact và expected value tương ứng trong initialState.
-Mọi numeric resource trong activeResourceIds và mọi đầu vào của activeMechanicIds phải có đường nhân quả từ initialState: số dư dương có nguồn gốc hợp lý hoặc output của active conversion bắt đầu từ tài nguyên đang có. Nếu cần mua vật tư, phải kích hoạt conversion thu mua tương ứng; không đặt vật tư bằng 0 rồi trông chờ Planner tự bịa nguồn.
+Mọi đầu vào và resource điều kiện của activeMechanicIds phải có đường nhân quả từ initialState: số dư dương có nguồn gốc hợp lý hoặc output của active conversion bắt đầu từ tài nguyên đang có. activeResourceIds có thể chứa tài nguyên chỉ để theo dõi về sau, nhưng Planner không được thay đổi nó trước khi có mechanic hợp lệ. Nếu cần mua vật tư để dùng ngay, phải kích hoạt conversion thu mua tương ứng; không đặt vật tư bằng 0 rồi trông chờ Planner tự bịa nguồn.
 initialState.schemaVersion=2, chapterNumber=0, recentOutcomes=[] và usedExpansionSeedIds=[].
 State có đúng một entry cho mọi character, resource và promise trong Kernel; không thiếu, không thêm ID lạ.`,
     prompt: JSON.stringify({

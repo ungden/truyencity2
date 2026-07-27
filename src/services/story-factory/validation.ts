@@ -10,7 +10,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-7-input-output-conversions';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-8-used-resource-reachability';
 
 export interface StateEvent {
   chapterNumber: number;
@@ -229,10 +229,6 @@ export function validateArcResourceReachability(input: {
       mechanic.requiredResourceIds.forEach(resourceId => required.add(resourceId));
     }
   }
-  arc.activeResourceIds
-    .filter(resourceId => resourceDefinitions.get(resourceId)?.kind === 'numeric')
-    .forEach(resourceId => required.add(resourceId));
-
   const unreachable = [...required].filter(resourceId => !reachable.has(resourceId));
   if (unreachable.length) {
     fail('Arc depends on resources with no causal acquisition path.', {

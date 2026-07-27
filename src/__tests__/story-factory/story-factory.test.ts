@@ -429,6 +429,32 @@ describe('canonical Story Factory', () => {
     })).not.toThrow();
   });
 
+  test('does not require provenance for an active resource until a mechanic uses it', () => {
+    const trackedKernel = structuredClone(kernel);
+    trackedKernel.resources.push({
+      id: 'third_party_cargo',
+      name: 'Hàng của khách gửi',
+      kind: 'numeric',
+      unit: 'kg',
+      minimum: 0,
+    });
+    const trackedState = structuredClone(initialState);
+    trackedState.resources.push({
+      resourceId: 'third_party_cargo',
+      kind: 'numeric',
+      value: 0,
+    });
+    const trackedArc = {
+      ...structuredClone(arc),
+      activeResourceIds: ['money', 'third_party_cargo'],
+    };
+    expect(() => validateArcResourceReachability({
+      kernel: trackedKernel,
+      arc: trackedArc,
+      state: trackedState,
+    })).not.toThrow();
+  });
+
   test('conversion loss is represented by the input-output ratio, not a second loss ledger', () => {
     const legacyKernel = structuredClone(kernel) as StoryKernel & {
       worldMechanics: Array<Record<string, unknown>>;
