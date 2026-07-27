@@ -61,24 +61,24 @@ const ConceptBatchWireSchema = z.object({
 }).strict();
 const TopTwoSchema = z.object({
   selectedIds: z.array(z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/)).length(2),
-  reasons: z.array(z.string().trim().min(10).max(800)).length(2),
+  reasons: z.array(z.string().trim().min(10).max(4_000)).length(2),
 }).strict();
 const OpeningSimulationSchema = z.object({
   simulations: z.array(z.object({
     conceptId: z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/),
     openingSample: z.string().trim().min(20).max(12_000),
-    chapter2Direction: z.string().trim().min(30).max(2_000),
-    chapter3Direction: z.string().trim().min(30).max(2_000),
-    characterChemistry: z.string().trim().min(20).max(1_000),
-    conflictAgency: z.string().trim().min(20).max(1_000),
-    serialStrength: z.string().trim().min(20).max(1_000),
-    causalRisk: z.string().trim().min(10).max(1_000),
+    chapter2Direction: z.string().trim().min(30).max(4_000),
+    chapter3Direction: z.string().trim().min(30).max(4_000),
+    characterChemistry: z.string().trim().min(20).max(4_000),
+    conflictAgency: z.string().trim().min(20).max(4_000),
+    serialStrength: z.string().trim().min(20).max(4_000),
+    causalRisk: z.string().trim().min(10).max(4_000),
     domainFeasibility: z.enum(['pass', 'reject']),
     longRunFeasibility: z.enum(['pass', 'reject']),
-    macroStageStress: z.array(z.string().trim().min(10).max(500)).min(4).max(8),
-    requiredInfrastructure: z.array(z.string().trim().min(5).max(500)).min(1).max(12),
-    minimumPlausibleTimeline: z.string().trim().min(3).max(500),
-    criticalAssumptions: z.array(z.string().trim().min(5).max(500)).min(1).max(12),
+    macroStageStress: z.array(z.string().trim().min(10).max(2_000)).min(4).max(8),
+    requiredInfrastructure: z.array(z.string().trim().min(5).max(2_000)).min(1).max(12),
+    minimumPlausibleTimeline: z.string().trim().min(3).max(2_000),
+    criticalAssumptions: z.array(z.string().trim().min(5).max(2_000)).min(1).max(12),
   }).strict()).length(2),
 }).strict();
 
