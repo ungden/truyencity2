@@ -3,6 +3,7 @@ import {
   ArcPlanSchema,
   InitialArcPlanSchema,
   LaunchPackSchema,
+  StoryCharacterSchema,
   StoryFactoryError,
   StoryKernelSchema,
   StoryStateSchema,
@@ -108,23 +109,37 @@ export interface SetupCheckpoint {
 }
 
 const StoryKernelObjectSchema = StoryKernelSchema.innerType();
+const LaunchIdentityKernelSchema = StoryKernelObjectSchema.pick({
+  schemaVersion: true,
+  title: true,
+  description: true,
+  genreLane: true,
+  readerFantasy: true,
+  uniqueMechanism: true,
+  mechanismFingerprint: true,
+  rewardLoopFingerprint: true,
+  conflictEconomyFingerprint: true,
+  pleasureLoop: true,
+});
 const LaunchIdentitySchema = z.object({
   selectedConceptId: z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/),
   coverPrompt: z.string().trim().min(20).max(2_000),
-  kernel: StoryKernelObjectSchema.pick({
-    schemaVersion: true,
-    title: true,
-    description: true,
-    genreLane: true,
-    readerFantasy: true,
-    uniqueMechanism: true,
-    mechanismFingerprint: true,
-    rewardLoopFingerprint: true,
-    conflictEconomyFingerprint: true,
-    protagonistId: true,
-    characters: true,
-    pleasureLoop: true,
+  kernel: LaunchIdentityKernelSchema.extend({
+    protagonistId: StoryKernelObjectSchema.shape.protagonistId,
+    characters: StoryKernelObjectSchema.shape.characters,
   }),
+}).strict();
+const LaunchIdentityWireSchema = z.object({
+  selectedConceptId: z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/),
+  coverPrompt: z.string().trim().min(20).max(2_000),
+  kernel: LaunchIdentityKernelSchema,
+  protagonist: StoryCharacterSchema.extend({ role: z.literal('protagonist') }).strict(),
+  oppositionCharacters: z.array(
+    StoryCharacterSchema.extend({ role: z.literal('opposition') }).strict(),
+  ).min(1).max(20),
+  supportingCharacters: z.array(
+    StoryCharacterSchema.extend({ role: z.literal('supporting') }).strict(),
+  ).min(1).max(40),
 }).strict();
 const LaunchWorldSchema = z.object({
   kernel: StoryKernelObjectSchema.pick({
@@ -229,15 +244,7 @@ function assertLaunchSemantics(
   }
 
   assertVoiceSemantics(kernel.characters);
-
-  const protagonist = kernel.characters.find(character => character.id === kernel.protagonistId);
-  const opposition = kernel.characters.filter(character => character.role === 'opposition');
-  if (!protagonist || opposition.length === 0) {
-    throw new StoryFactoryError('setup_blocked', 'Kernel requires a protagonist and at least one opposition character with an independent agenda.');
-  }
-  if (opposition.every(character => jaccard(character.agenda, protagonist.agenda) >= 0.7)) {
-    throw new StoryFactoryError('setup_blocked', 'Opposition agendas are not materially independent from the protagonist.');
-  }
+  assertIdentityOpposition(kernel);
 
   const stages = kernel.seriesSpine.stages;
   for (let index = 1; index < stages.length; index += 1) {
@@ -258,6 +265,28 @@ function assertLaunchSemantics(
     || !kernel.worldMechanics.some(mechanic => mechanic.kind === 'capability')
     || !kernel.worldMechanics.some(mechanic => mechanic.kind === 'constraint')) {
     throw new StoryFactoryError('setup_blocked', 'Kernel must define at least one conversion, capability, and constraint mechanic.');
+  }
+}
+
+function assertIdentityOpposition(kernel: Pick<LaunchPack['kernel'], 'protagonistId' | 'characters'>): void {
+  const protagonist = kernel.characters.find(character =>
+    character.id === kernel.protagonistId && character.role === 'protagonist');
+  const opposition = kernel.characters.filter(character => character.role === 'opposition');
+  if (!protagonist || opposition.length === 0) {
+    throw new StoryFactoryError(
+      'setup_blocked',
+      'Kernel requires a protagonist and at least one opposition character with an independent agenda.',
+      {
+        protagonistId: kernel.protagonistId,
+        cast: kernel.characters.map(character => ({ id: character.id, role: character.role })),
+      },
+    );
+  }
+  if (opposition.every(character => jaccard(character.agenda, protagonist.agenda) >= 0.7)) {
+    throw new StoryFactoryError('setup_blocked', 'Opposition agendas are not materially independent from the protagonist.', {
+      protagonistId: protagonist.id,
+      oppositionIds: opposition.map(character => character.id),
+    });
   }
 }
 
@@ -415,30 +444,54 @@ Sau sample, mô tả ngắn hướng chương 2 và 3, chemistry nhân vật, ag
     throw new StoryFactoryError('setup_blocked', 'Opening Simulator rejected both concepts on domain causality or long-run seriality.', simulation.value.simulations);
   }
 
-  const launchIdentity = checkpoint.launchIdentity
-    ? { value: LaunchIdentitySchema.parse(checkpoint.launchIdentity.value), usage: checkpoint.launchIdentity.usage }
-    : await setupStage('Launch Identity Architect', provider.json({
-    model: input.routes.launchArchitect,
-    system: `Bạn chịu trách nhiệm chọn concept và khóa bản sắc truyện. Trả đúng structured-output schema, không markdown.
+  let launchIdentity: { value: z.infer<typeof LaunchIdentitySchema>; usage: ProviderUsage };
+  if (checkpoint.launchIdentity) {
+    launchIdentity = {
+      value: LaunchIdentitySchema.parse(checkpoint.launchIdentity.value),
+      usage: checkpoint.launchIdentity.usage,
+    };
+  } else {
+    const launchIdentityWire = await setupStage('Launch Identity Architect', provider.json({
+      model: input.routes.launchArchitect,
+      system: `Bạn chịu trách nhiệm chọn concept và khóa bản sắc truyện. Trả đúng structured-output schema, không markdown.
 Chọn dựa trên chất lượng actual opening sample, chemistry nhân vật, agency của đối lực và khả năng biến hóa; không chỉ dựa vào metadata cơ chế. Opening sample chỉ là bằng chứng lựa chọn: tuyệt đối không chép câu, cử chỉ hoặc thoại từ sample vào Kernel.
 VoiceContract chỉ được dùng thuộc tính trung tính register, sentenceRhythm, directness, addressRules, vocabulary, reasoningStyle, emotionDisplay và humorStyle. Không chứa câu thoại, cử chỉ, phản ứng mẫu, stressResponse hoặc avoidances.
 sentenceRhythm chỉ mô tả độ dài, nhịp và cấu trúc câu; không mô tả âm lượng, động tác phát ngôn hoặc thói quen như cười, nhếch, quát, gằn giọng, lẩm bẩm.
+Xuất đúng một protagonist, ít nhất một opposition có agenda độc lập thật sự và ít nhất một supporting character. Không dùng supporting character làm đối thủ giả.
 Chỉ được chọn concept có domainFeasibility=pass và longRunFeasibility=pass. Giữ nguyên ba fingerprint của concept được chọn.`,
-    prompt: JSON.stringify({
-      task: 'Chọn concept và xuất identity, cast, voice, pleasure loop cùng cover art prompt.',
-      commission,
-      researchSignals: research.signals,
-      concepts: top,
-      openingSimulations: simulation.value.simulations,
-    }),
-    schema: LaunchIdentitySchema,
-    schemaComplexity: 'omit_large_array_max',
-    temperature: 0.3,
+      prompt: JSON.stringify({
+        task: 'Chọn concept và xuất identity, cast phân vai bắt buộc, voice, pleasure loop cùng cover art prompt.',
+        commission,
+        researchSignals: research.signals,
+        concepts: top,
+        openingSimulations: simulation.value.simulations,
+      }),
+      schema: LaunchIdentityWireSchema,
+      schemaComplexity: 'omit_large_array_max',
+      temperature: 0.3,
     }));
+    launchIdentity = {
+      value: LaunchIdentitySchema.parse({
+        selectedConceptId: launchIdentityWire.value.selectedConceptId,
+        coverPrompt: launchIdentityWire.value.coverPrompt,
+        kernel: {
+          ...launchIdentityWire.value.kernel,
+          protagonistId: launchIdentityWire.value.protagonist.id,
+          characters: [
+            launchIdentityWire.value.protagonist,
+            ...launchIdentityWire.value.oppositionCharacters,
+            ...launchIdentityWire.value.supportingCharacters,
+          ],
+        },
+      }),
+      usage: launchIdentityWire.usage,
+    };
+  }
   checkpoint.launchIdentity = launchIdentity;
   await input.onCheckpoint?.(structuredClone(checkpoint));
   usages.push(launchIdentity.usage);
   assertVoiceSemantics(launchIdentity.value.kernel.characters);
+  assertIdentityOpposition(launchIdentity.value.kernel);
   if (!ranking.value.selectedIds.includes(launchIdentity.value.selectedConceptId)) {
     throw new StoryFactoryError('setup_blocked', 'Launch Architect selected a concept outside the top two.');
   }

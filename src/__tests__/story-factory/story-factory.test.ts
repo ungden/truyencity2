@@ -2347,7 +2347,14 @@ describe('canonical Story Factory', () => {
       'Nguồn kỹ thuật xác nhận dụng cụ thủ công khả thi nhưng yêu cầu vệ sinh, thời gian và chi phí thật.',
       { selectedIds: [a[0].id, b[0].id], reasons: ['Cơ chế A rõ và dài hơi.', 'Cơ chế B có conflict economy tốt.'] },
       { simulations },
-      { selectedConceptId: pack.selectedConceptId, coverPrompt: pack.coverPrompt, kernel: identityKernel },
+      {
+        selectedConceptId: pack.selectedConceptId,
+        coverPrompt: pack.coverPrompt,
+        kernel: (({ protagonistId: _protagonistId, characters: _characters, ...rest }) => rest)(identityKernel),
+        protagonist: identityKernel.characters.find(character => character.id === identityKernel.protagonistId),
+        oppositionCharacters: identityKernel.characters.filter(character => character.role === 'opposition'),
+        supportingCharacters: identityKernel.characters.filter(character => character.role === 'supporting'),
+      },
       {
         kernel: { worldModel, worldRules, locations, travelRules, resources },
         conversions: worldMechanics.filter(mechanic => mechanic.kind === 'conversion'),
