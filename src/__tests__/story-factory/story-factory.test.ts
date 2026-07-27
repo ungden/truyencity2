@@ -2365,7 +2365,27 @@ describe('canonical Story Factory', () => {
     };
     const provider = new QueueProvider([plannerWire(), revise, plannerWire(), revise]);
     await expect(planRollingWindow({ kernel, arc, state: initialState, routes, provider }))
-      .rejects.toMatchObject({ code: 'plan_blocked' });
+      .rejects.toMatchObject({
+        code: 'plan_blocked',
+        evidence: expect.objectContaining({
+          firstAssessment: { status: 'revise', issues: revise.issues },
+          firstPlanDigest: expect.stringMatching(/^[a-f0-9]{64}$/),
+          firstIssueSnapshot: [
+            expect.objectContaining({
+              issue: revise.issues[0],
+              scene: expect.objectContaining({ id: 'scene_1' }),
+            }),
+          ],
+          validation: revise.issues,
+          repairedPlanDigest: expect.stringMatching(/^[a-f0-9]{64}$/),
+          repairedIssueSnapshot: [
+            expect.objectContaining({
+              issue: revise.issues[0],
+              scene: expect.objectContaining({ id: 'scene_1' }),
+            }),
+          ],
+        }),
+      });
     expect(provider.calls).toEqual(['planner', 'plan-judge', 'planner', 'plan-judge']);
   });
 

@@ -24,6 +24,8 @@ import {
   validateRollingPlan,
 } from './validation';
 
+type PlanRevisionIssues = Extract<PlanAssessment, { status: 'revise' }>['issues'];
+
 const PlannerScalarSchema = z.union([z.string(), z.number(), z.null()]);
 const PlannerCompactDeltaSchema = z.object({
   id: z.string(),
@@ -391,6 +393,36 @@ function validatePlanAssessment(plan: RollingPlan, assessment: PlanAssessment): 
   }
 }
 
+function digestRollingPlan(plan: RollingPlan): string {
+  return createHash('sha256').update(JSON.stringify(plan)).digest('hex');
+}
+
+function planIssueSnapshot(plan: RollingPlan, assessment: PlanAssessment): unknown[] {
+  if (assessment.status === 'pass') return [];
+  return assessment.issues.map(issue => {
+    const chapter = plan.plans.find(item => item.chapterNumber === issue.chapterNumber);
+    const scene = issue.sceneId
+      ? chapter?.scenes.find(item => item.id === issue.sceneId)
+      : undefined;
+    const delta = issue.deltaId
+      ? chapter?.requiredDeltas.find(item => item.id === issue.deltaId)
+      : undefined;
+    return {
+      issue,
+      scene: scene
+        ? {
+            id: scene.id,
+            objective: scene.objective,
+            obstacle: scene.obstacle,
+            action: scene.action,
+            requiredDeltaIds: scene.requiredDeltaIds,
+          }
+        : null,
+      delta: delta ?? null,
+    };
+  });
+}
+
 export async function assessRollingPlan(input: {
   provider: StoryModelProvider;
   kernel: StoryKernel;
@@ -398,6 +430,7 @@ export async function assessRollingPlan(input: {
   state: StoryState;
   rollingPlan: RollingPlan;
   model: string;
+  repairIssues?: PlanRevisionIssues;
 }): Promise<{ assessment: PlanAssessment; usage: ProviderUsage }> {
   const auditSignals = input.rollingPlan.plans.map(chapter => ({
     chapterNumber: chapter.chapterNumber,
@@ -438,6 +471,12 @@ export async function assessRollingPlan(input: {
         stageAlignment: 'Xung đột và reward loop phải phục vụ stage hiện tại, không nhảy sớm.',
         outcomeWeight: 'Kết quả phải có trọng lượng tương xứng chuẩn bị và phản lực; không dùng tai họa cưỡng ép, quần chúng làm nền hoặc một thao tác giải quyết toàn bộ xung đột.',
       },
+      repairVerification: input.repairIssues
+        ? {
+            priorIssues: input.repairIssues,
+            rule: 'Đây là lần kiểm tra sau replan. Với từng prior issue, chỉ được coi là đã sửa nếu plan mới có hành động/chuyển trạng thái cụ thể giải quyết nguyên nhân gốc. Đổi wording, trì hoãn hậu quả hoặc thay một cực đoan bằng cực đoan khác không đạt.',
+          }
+        : null,
       evidenceRule: 'Với mỗi check, checkEvidence phải chỉ rõ chapterNumber và ít nhất một sceneId hoặc deltaId làm căn cứ; không chấp nhận lời khen chung.',
     }),
     schema: PlanJudgeWireSchema,
@@ -606,7 +645,9 @@ export async function planRollingWindow(input: {
   }
 
   const judgeRepair = await requestPlan({
-    task: 'Tạo lại toàn bộ rolling window đúng một lần theo evidence của Plan Judge; giữ contract cơ học hợp lệ và không vá cục bộ.',
+    task: `Tạo lại toàn bộ rolling window đúng một lần theo evidence của Plan Judge; giữ contract cơ học hợp lệ và không vá cục bộ.
+Mọi issue là yêu cầu bắt buộc, không phải gợi ý. opposition_agenda phải trở thành một đối sách/hành động có hậu quả trong plan, không chỉ là ý định hoặc cảm xúc. state_transition/earned_progression phải có bước chuyển tương xứng chuẩn bị và không dùng trạng thái tuyệt đối thiếu căn cứ.
+Sau khi lập lại, tự đối chiếu từng issue với scene và delta mới trước khi trả kết quả.`,
     previousResponse: currentResponse,
     validationIssues: judged.assessment.issues,
     temperature: 0.4,
@@ -630,13 +671,19 @@ export async function planRollingWindow(input: {
     state: input.state,
     rollingPlan: repairedPlan,
     model: input.routes.planJudge,
+    repairIssues: judged.assessment.issues,
   });
   usages.push(rejudged.usage);
   if (rejudged.assessment.status === 'pass') {
     return { rollingPlan: repairedPlan, assessment: rejudged.assessment, usages };
   }
   throw new StoryFactoryError('plan_blocked', 'Plan Judge rejected the rolling window after one full replan.', {
+    firstAssessment: judged.assessment,
+    firstPlanDigest: digestRollingPlan(currentPlan),
+    firstIssueSnapshot: planIssueSnapshot(currentPlan, judged.assessment),
     validation: rejudged.assessment.issues,
+    repairedPlanDigest: digestRollingPlan(repairedPlan),
+    repairedIssueSnapshot: planIssueSnapshot(repairedPlan, rejudged.assessment),
     usages,
   });
 }
