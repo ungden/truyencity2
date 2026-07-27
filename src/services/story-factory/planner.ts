@@ -82,7 +82,7 @@ export const PlannerRollingPlanResponseSchema = z.object({
 const PLANNER_COMPACT_CONTRACT = {
   deltaTarget: {
     fact: 'target=factId; before/after là giá trị fact; change/source/sink=null',
-    resource_numeric: 'target=resourceId; before/change/after là số; change > 0 bắt buộc source khác null và sink=null; change < 0 bắt buộc sink khác null và source=null; change=0 không hợp lệ',
+    resource_numeric: 'target=resourceId; change là số khác 0; before/after bắt buộc null vì code tính tuần tự từ State; change > 0 bắt buộc source khác null và sink=null; change < 0 bắt buộc sink khác null và source=null',
     resource_state: 'target=resourceId; before/after là trạng thái; source giải thích nguồn thay đổi; change/sink=null',
     knowledge: 'target=characterId; after=factId; source là nguồn học biết; before/change/sink=null',
     location: 'target=characterId; before/after là locationId; change/source/sink=null',
@@ -120,9 +120,15 @@ const PLANNER_COMPACT_CONTRACT = {
   ],
 } as const;
 
-export function materializePlannerRollingPlan(value: z.infer<typeof PlannerRollingPlanResponseSchema>): RollingPlan {
+export function materializePlannerRollingPlan(
+  value: z.infer<typeof PlannerRollingPlanResponseSchema>,
+  initialState: StoryState,
+): RollingPlan {
   const compact = PlannerRollingPlanResponseSchema.parse(value);
   const chapters = compact.chaptersJson.map(raw => PlannerCompactChapterSchema.parse(JSON.parse(raw)));
+  const resourceBalances = new Map(initialState.resources.flatMap(resource => (
+    resource.kind === 'numeric' ? [[resource.resourceId, resource.value] as const] : []
+  )));
   return RollingPlanSchema.parse({
     schemaVersion: compact.v,
     startChapter: compact.start,
@@ -147,7 +153,29 @@ export function materializePlannerRollingPlan(value: z.infer<typeof PlannerRolli
       })),
       requiredDeltas: chapter.deltas.map(delta => {
         if (delta.k === 'fact') return { id: delta.id, kind: delta.k, factId: delta.target, before: delta.before, after: delta.after };
-        if (delta.k === 'resource_numeric') return { id: delta.id, kind: delta.k, resourceId: delta.target, before: delta.before, delta: delta.change, after: delta.after, source: delta.source, sink: delta.sink };
+        if (delta.k === 'resource_numeric') {
+          const before = resourceBalances.get(delta.target);
+          if (before === undefined || delta.change === null || delta.change === 0) {
+            throw new StoryFactoryError('plan_blocked', 'Planner numeric delta lacks a valid ledger balance or non-zero change.', {
+              deltaId: delta.id,
+              resourceId: delta.target,
+              before: before ?? null,
+              change: delta.change,
+            });
+          }
+          const after = before + delta.change;
+          resourceBalances.set(delta.target, after);
+          return {
+            id: delta.id,
+            kind: delta.k,
+            resourceId: delta.target,
+            before,
+            delta: delta.change,
+            after,
+            source: delta.source,
+            sink: delta.sink,
+          };
+        }
         if (delta.k === 'resource_state') return { id: delta.id, kind: delta.k, resourceId: delta.target, before: delta.before, after: delta.after, source: delta.source };
         if (delta.k === 'knowledge') return { id: delta.id, kind: delta.k, characterId: delta.target, factId: delta.after, source: delta.source };
         if (delta.k === 'location') return { id: delta.id, kind: delta.k, characterId: delta.target, beforeLocationId: delta.before, afterLocationId: delta.after };
@@ -403,7 +431,7 @@ export async function planRollingWindow(input: {
     });
     usages.push(result.usage);
     try {
-      const parsed = materializePlannerRollingPlan(result.value);
+      const parsed = materializePlannerRollingPlan(result.value, input.state);
       if (input.requiredWindowSize && parsed.plans.length !== input.requiredWindowSize) {
         throw new StoryFactoryError('plan_blocked', 'Planner returned the wrong required window size.', {
           requiredWindowSize: input.requiredWindowSize,

@@ -1669,7 +1669,7 @@ describe('canonical Story Factory', () => {
       additionalDeltaIds: [],
     }];
     wire.chaptersJson[0] = JSON.stringify(chapter);
-    const rolling = materializePlannerRollingPlan(wire);
+    const rolling = materializePlannerRollingPlan(wire, initialState);
     expect(rolling.startChapter).toBe(1);
     expect(rolling.plans[0].chapterNumber).toBe(1);
     expect(rolling.plans[0].requiredDeltas[0]).toEqual({
@@ -1683,8 +1683,30 @@ describe('canonical Story Factory', () => {
     const chapter = JSON.parse(wire.chaptersJson[0]);
     chapter.rules = [];
     wire.chaptersJson[0] = JSON.stringify(chapter);
-    const rolling = materializePlannerRollingPlan(wire);
+    const rolling = materializePlannerRollingPlan(wire, initialState);
     expect(rolling.plans[0].requiredWorldRuleIds).toEqual([]);
+  });
+
+  test('numeric before and after are derived sequentially from the ledger', () => {
+    const wire = plannerWire();
+    const chapter = JSON.parse(wire.chaptersJson[0]);
+    chapter.scenes[0].deltaIds = ['spend_money', 'earn_money'];
+    chapter.deltas = [
+      {
+        id: 'spend_money', k: 'resource_numeric', target: 'money', counterpart: null,
+        before: null, change: -30, after: null, source: null, sink: 'mua hàng',
+      },
+      {
+        id: 'earn_money', k: 'resource_numeric', target: 'money', counterpart: null,
+        before: null, change: 10, after: null, source: 'bán hàng', sink: null,
+      },
+    ];
+    wire.chaptersJson[0] = JSON.stringify(chapter);
+    const rolling = materializePlannerRollingPlan(wire, initialState);
+    expect(rolling.plans[0].requiredDeltas).toMatchObject([
+      { id: 'spend_money', before: 100, delta: -30, after: 70 },
+      { id: 'earn_money', before: 70, delta: 10, after: 80 },
+    ]);
   });
 
   test('Planner wire cannot emit a decorative mechanic without a required delta', () => {
@@ -1700,7 +1722,7 @@ describe('canonical Story Factory', () => {
       additionalDeltaIds: [],
     }];
     wire.chaptersJson[0] = JSON.stringify(chapter);
-    expect(() => materializePlannerRollingPlan(wire)).toThrow();
+    expect(() => materializePlannerRollingPlan(wire, initialState)).toThrow();
   });
 
   test('Plan Judge passes a valid window with one independent review call', async () => {
