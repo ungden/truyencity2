@@ -120,6 +120,8 @@ export const WorldMechanicSchema = z.discriminatedUnion('kind', [
     allowedActorIds: z.array(stableId).max(40).default([]),
     requiredFacts: z.array(MechanicFactConditionSchema).max(20).default([]),
     requiredResourceIds: z.array(stableId).max(20).default([]),
+    effectResourceIds: z.array(stableId).max(20),
+    effectFactIds: z.array(stableId).max(20),
     capacityUnit: z.string().trim().min(1).max(40).nullable(),
     maximumUnitsPerMinute: z.number().finite().positive().max(1_000_000).nullable(),
   }).strict(),
@@ -228,6 +230,15 @@ export const StoryKernelSchema = z.object({
             code: z.ZodIssueCode.custom,
             path: ['worldMechanics', index, 'requiredResourceIds'],
             message: `Capability references unknown resource ${resourceId}.`,
+          });
+        }
+      });
+      mechanic.effectResourceIds.forEach(resourceId => {
+        if (!resources.has(resourceId)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['worldMechanics', index, 'effectResourceIds'],
+            message: `Capability affects unknown resource ${resourceId}.`,
           });
         }
       });

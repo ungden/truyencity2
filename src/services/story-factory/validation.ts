@@ -10,7 +10,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-8-used-resource-reachability';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-9-capability-effects';
 
 export interface StateEvent {
   chapterNumber: number;
@@ -106,6 +106,9 @@ export function validateKernelState(kernel: StoryKernel, state: StoryState): voi
         }
         for (const resourceId of mechanic.requiredResourceIds) {
           if (!resourceIds.has(resourceId)) fail(`Mechanic ${mechanic.id} requires unknown resource ${resourceId}.`);
+        }
+        for (const resourceId of mechanic.effectResourceIds) {
+          if (!resourceIds.has(resourceId)) fail(`Mechanic ${mechanic.id} affects unknown resource ${resourceId}.`);
         }
       }
       if (mechanic.kind === 'constraint') {
@@ -209,13 +212,21 @@ export function validateArcResourceReachability(input: {
   while (changed) {
     changed = false;
     for (const mechanic of activeMechanics) {
-      if (mechanic.kind !== 'conversion') continue;
-      const required = mechanic.inputsPerBatch.map(item => item.resourceId);
-      if (!required.every(resourceId => reachable.has(resourceId))) continue;
-      for (const output of mechanic.outputsPerBatch) {
-        if (reachable.has(output.resourceId)) continue;
-        reachable.add(output.resourceId);
-        changed = true;
+      if (mechanic.kind === 'conversion') {
+        const required = mechanic.inputsPerBatch.map(item => item.resourceId);
+        if (!required.every(resourceId => reachable.has(resourceId))) continue;
+        for (const output of mechanic.outputsPerBatch) {
+          if (reachable.has(output.resourceId)) continue;
+          reachable.add(output.resourceId);
+          changed = true;
+        }
+      } else if (mechanic.kind === 'capability'
+        && mechanic.requiredResourceIds.every(resourceId => reachable.has(resourceId))) {
+        for (const resourceId of mechanic.effectResourceIds) {
+          if (reachable.has(resourceId)) continue;
+          reachable.add(resourceId);
+          changed = true;
+        }
       }
     }
   }
@@ -227,6 +238,7 @@ export function validateArcResourceReachability(input: {
       mechanic.outputsPerBatch.forEach(item => required.add(item.resourceId));
     } else if (mechanic.kind === 'capability') {
       mechanic.requiredResourceIds.forEach(resourceId => required.add(resourceId));
+      mechanic.effectResourceIds.forEach(resourceId => required.add(resourceId));
     }
   }
   const unreachable = [...required].filter(resourceId => !reachable.has(resourceId));
@@ -550,6 +562,23 @@ export function validateCausalMechanics(input: {
             maximum,
             durationMinutes: scene.durationMinutes,
           });
+        }
+      }
+      for (const deltaId of use.deltaIds) {
+        const delta = deltas.get(deltaId)!;
+        if ((delta.kind === 'resource_numeric' || delta.kind === 'resource_state')
+          && !mechanic.effectResourceIds.includes(delta.resourceId)) {
+          fail(`Capability ${mechanic.id} cannot affect resource ${delta.resourceId}.`, {
+            allowedResourceIds: mechanic.effectResourceIds,
+          });
+        }
+        if (delta.kind === 'fact' && !mechanic.effectFactIds.includes(delta.factId)) {
+          fail(`Capability ${mechanic.id} cannot affect fact ${delta.factId}.`, {
+            allowedFactIds: mechanic.effectFactIds,
+          });
+        }
+        if (!['resource_numeric', 'resource_state', 'fact'].includes(delta.kind)) {
+          fail(`Capability ${mechanic.id} cannot claim ${delta.kind} delta ${delta.id}.`);
         }
       }
     } else {

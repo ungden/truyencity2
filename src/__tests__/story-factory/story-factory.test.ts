@@ -168,6 +168,7 @@ const kernel: StoryKernel = {
       id: 'mechanic_trade', name: 'Quyền giao dịch của Hải', kind: 'capability',
       description: 'Hải trực tiếp thương lượng các giao dịch nhỏ.',
       allowedActorIds: ['main'], requiredFacts: [{ factId: 'fact_day', expected: 'ngay_0' }], requiredResourceIds: ['money'],
+      effectResourceIds: ['money'], effectFactIds: ['fact_day'],
       capacityUnit: 'giao_dich', maximumUnitsPerMinute: 1,
     },
     {
@@ -430,6 +431,53 @@ describe('canonical Story Factory', () => {
     })).not.toThrow();
   });
 
+  test('capability effects can feed a later conversion without inventing resources', () => {
+    const effectKernel = structuredClone(kernel);
+    effectKernel.resources.push(
+      { id: 'fresh_fish', name: 'Cá tươi', kind: 'numeric', unit: 'kg', minimum: 0 },
+      { id: 'scrap_wood', name: 'Gỗ vụn', kind: 'numeric', unit: 'kg', minimum: 0 },
+    );
+    effectKernel.worldMechanics.push(
+      {
+        id: 'coastal_fishing',
+        name: 'Đánh bắt ven bờ',
+        kind: 'capability',
+        description: 'Ngư dân dùng kỹ năng và thời gian để đưa cá lên bờ.',
+        allowedActorIds: ['main'],
+        requiredFacts: [],
+        requiredResourceIds: [],
+        effectResourceIds: ['fresh_fish'],
+        effectFactIds: [],
+        capacityUnit: 'kg',
+        maximumUnitsPerMinute: 0.5,
+      },
+      {
+        id: 'trade_fish_for_wood',
+        name: 'Đổi cá lấy gỗ',
+        kind: 'conversion',
+        description: 'Cá tươi được đổi lấy gỗ vụn tại xưởng mộc.',
+        inputsPerBatch: [{ resourceId: 'fresh_fish', amount: 5 }],
+        outputsPerBatch: [{ resourceId: 'scrap_wood', amount: 10 }],
+        maximumBatchesPerUse: 2,
+      },
+    );
+    const effectState = structuredClone(initialState);
+    effectState.resources.push(
+      { resourceId: 'fresh_fish', kind: 'numeric', value: 0 },
+      { resourceId: 'scrap_wood', kind: 'numeric', value: 0 },
+    );
+    const effectArc = {
+      ...structuredClone(arc),
+      activeResourceIds: ['money', 'fresh_fish', 'scrap_wood'],
+      activeMechanicIds: ['coastal_fishing', 'trade_fish_for_wood'],
+    };
+    expect(() => validateArcResourceReachability({
+      kernel: effectKernel,
+      arc: effectArc,
+      state: effectState,
+    })).not.toThrow();
+  });
+
   test('does not require provenance for an active resource until a mechanic uses it', () => {
     const trackedKernel = structuredClone(kernel);
     trackedKernel.resources.push({
@@ -543,6 +591,39 @@ describe('canonical Story Factory', () => {
         ],
       });
     }
+  });
+
+  test('capability cannot claim a resource outside its declared effects', () => {
+    const restrictedKernel = structuredClone(kernel);
+    const capability = restrictedKernel.worldMechanics.find(item => item.id === 'mechanic_trade');
+    if (!capability || capability.kind !== 'capability') throw new Error('Missing capability fixture.');
+    capability.effectResourceIds = [];
+    const chapter = plan(1);
+    chapter.requiredDeltas = [{
+      id: 'gain',
+      kind: 'resource_numeric',
+      resourceId: 'money',
+      before: 100,
+      delta: 10,
+      after: 110,
+      source: 'giao dịch',
+      sink: null,
+    }];
+    chapter.scenes[0].requiredDeltaIds = ['gain'];
+    chapter.mechanicUses = [{
+      id: 'use_trade',
+      sceneId: 'scene_1',
+      mechanicId: 'mechanic_trade',
+      actorId: 'main',
+      quantity: 1,
+      preconditionFactIds: ['fact_day'],
+      deltaIds: ['gain'],
+    }];
+    expect(() => applyChapterPlan({
+      kernel: restrictedKernel,
+      state: initialState,
+      plan: chapter,
+    })).toThrow('cannot affect resource money');
   });
 
   test('deterministic causal validation catches 100 cross-lane failures without a model call', () => {
