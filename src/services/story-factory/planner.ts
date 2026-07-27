@@ -122,6 +122,7 @@ const PLANNER_COMPACT_CONTRACT = {
     'Conversion là một batch nguyên tử: chỉ commit toàn bộ input và output trong cùng scene khi batch hoàn tất. Chương chuẩn bị chưa hoàn tất batch phải dùng fact hoặc resource_state để ghi tiến độ; không được trừ trước một phần input numeric rồi để output sang chương sau.',
     'Giữ goal/block/act ngắn và cơ học; chỉ đưa nhân vật, rule và delta thật sự cần cho chương.',
     'knowledge.after phải là fact ID đã tồn tại trong State. Nếu nhân vật học một fact mới, tạo fact delta khai báo fact đó trước knowledge delta trong cùng chương và gắn cả hai vào scene học biết.',
+    'Fact được mechanic khác dùng làm requiredFact là precondition có kiểu và giá trị khóa. Nếu một capability tạo/cập nhật fact đó để mechanic sau sử dụng, fact delta.after phải đúng required expected trong factContracts; không thay marker precondition bằng tên bản vẽ, lời mô tả hoặc kết quả prose.',
     'Với fact, resource_state, promise và relationship, luôn gửi before=null; compiler tự lấy before thật và cập nhật tuần tự qua cả window. Không chép lại ledger bằng model.',
     'Chỉ cần khai báo đúng scene.people, scene.loc và scene.travel; compiler tự sinh location delta từ vị trí đầu chương tới scene cuối của từng nhân vật. Nếu tự khai báo location delta, nó vẫn phải khớp chính xác và không được trùng.',
   ],
@@ -546,6 +547,24 @@ export async function planRollingWindow(input: {
           )),
           promises: Object.fromEntries(input.state.promises.map(item => [item.promiseId, item.status])),
         },
+        factContracts: Object.fromEntries(input.state.facts.map(fact => [
+          fact.id,
+          {
+            current: fact.value,
+            requiredExpectedValues: [...new Set(input.kernel.worldMechanics.flatMap(mechanic => (
+              mechanic.kind === 'capability' || mechanic.kind === 'constraint'
+                ? mechanic.requiredFacts
+                  .filter(required => required.factId === fact.id)
+                  .map(required => required.expected)
+                : []
+            )))],
+            producedByMechanicIds: input.kernel.worldMechanics.flatMap(mechanic => (
+              mechanic.kind === 'capability' && mechanic.effectFactIds.includes(fact.id)
+                ? [mechanic.id]
+                : []
+            )),
+          },
+        ])),
         travelConstraints: {
           initialLocationsByCharacter: Object.fromEntries(
             input.state.characters.map(item => [item.characterId, item.locationId]),
@@ -647,6 +666,7 @@ export async function planRollingWindow(input: {
   const judgeRepair = await requestPlan({
     task: `Tạo lại toàn bộ rolling window đúng một lần theo evidence của Plan Judge; giữ contract cơ học hợp lệ và không vá cục bộ.
 Mọi issue là yêu cầu bắt buộc, không phải gợi ý. opposition_agenda phải trở thành một đối sách/hành động có hậu quả trong plan, không chỉ là ý định hoặc cảm xúc. state_transition/earned_progression phải có bước chuyển tương xứng chuẩn bị và không dùng trạng thái tuyệt đối thiếu căn cứ.
+Nếu validation báo required fact sai, delta tạo fact phải dùng chính xác expected trong factContracts trước mechanic sử dụng; không dùng mô tả thay marker precondition.
 Sau khi lập lại, tự đối chiếu từng issue với scene và delta mới trước khi trả kết quả.`,
     previousResponse: currentResponse,
     validationIssues: judged.assessment.issues,

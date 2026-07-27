@@ -1,4 +1,4 @@
-export const FACTORY_PROMPT_VERSION = 'story-factory-2026-07-28.1-plan-repair-accountability';
+export const FACTORY_PROMPT_VERSION = 'story-factory-2026-07-28.2-typed-fact-contracts';
 
 export const WRITER_SYSTEM_PROMPT = `Bạn là tiểu thuyết gia web-serial tiếng Việt.
 Hãy tiếp nối tự nhiên đoạn cuối chương trước, thực hiện đầy đủ chapter brief và giữ đúng canon, ký ức liên quan, tài nguyên, tri thức, quan hệ cùng vị trí nhân vật.
