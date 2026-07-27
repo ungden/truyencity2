@@ -2148,6 +2148,35 @@ describe('canonical Story Factory', () => {
     expect(provider.calls).toEqual(['planner', 'planner']);
   });
 
+  test('preserves exact JSON materialization evidence after Planner repair is exhausted', async () => {
+    const malformed = {
+      v: 2 as const,
+      start: 1,
+      chaptersJson: ['{"v":2,"n":1'],
+    };
+    const provider = new QueueProvider([malformed, malformed]);
+    try {
+      await planRollingWindow({
+        kernel,
+        arc,
+        state: initialState,
+        routes,
+        provider,
+      });
+      throw new Error('Expected malformed compact JSON to block planning.');
+    } catch (error) {
+      expect(error).toBeInstanceOf(StoryFactoryError);
+      expect((error as StoryFactoryError).evidence).toMatchObject({
+        validation: {
+          kind: 'SyntaxError',
+        },
+      });
+      expect(((error as StoryFactoryError).evidence as {
+        validation: { message: string };
+      }).validation.message).toMatch(/JSON|position|expected/i);
+    }
+  });
+
   test('Plan Judge blocks after the second rejected window without fallback', async () => {
     const revise = {
       status: 'revise' as const,

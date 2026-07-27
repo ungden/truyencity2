@@ -238,6 +238,30 @@ export function materializePlannerRollingPlan(
   return RollingPlanSchema.parse(rolling);
 }
 
+function plannerContractFailureEvidence(error: unknown): {
+  kind: string;
+  message: string;
+  issues?: z.ZodIssue[];
+} {
+  if (error instanceof z.ZodError) {
+    return {
+      kind: 'ZodError',
+      message: 'Planner compact output does not match the exact schema.',
+      issues: error.issues,
+    };
+  }
+  if (error instanceof Error) {
+    return {
+      kind: error.name || 'Error',
+      message: error.message || 'Planner contract materialization failed.',
+    };
+  }
+  return {
+    kind: 'UnknownError',
+    message: String(error),
+  };
+}
+
 export const WindowReviewSchema = z.discriminatedUnion('status', [
   z.object({
     status: z.literal('pass'),
@@ -493,7 +517,11 @@ export async function planRollingWindow(input: {
       if (error instanceof StoryFactoryError && error.code === 'infra_blocked') throw error;
       lastError = error instanceof StoryFactoryError
         ? error
-        : new StoryFactoryError('plan_blocked', 'Planner output failed the exact rolling-plan contract.', error instanceof z.ZodError ? error.issues : undefined);
+        : new StoryFactoryError(
+          'plan_blocked',
+          'Planner output failed the exact rolling-plan contract.',
+          plannerContractFailureEvidence(error),
+        );
       previousResponse = result.value;
       validationIssues = {
         message: lastError.message,
