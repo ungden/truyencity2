@@ -10,7 +10,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-10-effect-support-ownership';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-11-support-travel-capacity';
 
 export interface StateEvent {
   chapterNumber: number;
@@ -558,12 +558,16 @@ export function validateCausalMechanics(input: {
         }
       }
       if (mechanic.maximumUnitsPerMinute !== null) {
-        const maximum = mechanic.maximumUnitsPerMinute * scene.durationMinutes;
+        const availableMinutes = scene.durationMinutes
+          + (use.role === 'support' ? scene.travelMinutesFromPrevious : 0);
+        const maximum = mechanic.maximumUnitsPerMinute * availableMinutes;
         if (use.quantity > maximum) {
           fail(`Mechanic use ${use.id} exceeds scene capacity.`, {
             planned: use.quantity,
             maximum,
+            availableMinutes,
             durationMinutes: scene.durationMinutes,
+            travelMinutes: use.role === 'support' ? scene.travelMinutesFromPrevious : 0,
           });
         }
       }
@@ -637,7 +641,7 @@ export function validateCausalMechanics(input: {
           return candidates;
         }, []),
         })),
-        repairRule: 'A conversion is atomic: claim every input, loss, and output delta in the same scene. For incomplete preparation, replace premature numeric consumption with a fact or resource_state progress delta.',
+        repairRule: 'Every resource delta needs exactly one active conversion/capability effect owner. If candidateMechanics is empty, remove that resource delta; represent a social or narrative change as an existing fact, relationship, or promise delta only when semantically correct. Never invent a mechanic inside the plan.',
       },
     });
   }

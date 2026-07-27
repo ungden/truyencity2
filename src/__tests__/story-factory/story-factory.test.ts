@@ -632,6 +632,52 @@ describe('canonical Story Factory', () => {
     expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
   });
 
+  test('support capability capacity includes its scene travel while effect capacity does not', () => {
+    const travelKernel = structuredClone(kernel);
+    const capability = travelKernel.worldMechanics.find(item => item.id === 'mechanic_trade');
+    if (!capability || capability.kind !== 'capability') throw new Error('Missing capability fixture.');
+    capability.maximumUnitsPerMinute = 0.02;
+    const supportPlan = plan(1);
+    supportPlan.scenes[0] = {
+      ...supportPlan.scenes[0],
+      participantIds: ['main', 'buyer'],
+      locationId: 'beach',
+      durationMinutes: 30,
+      travelMinutesFromPrevious: 20,
+      requiredDeltaIds: ['delta_1', 'move_main'],
+    };
+    supportPlan.requiredDeltas.push({
+      id: 'move_main',
+      kind: 'location',
+      characterId: 'main',
+      beforeLocationId: 'home',
+      afterLocationId: 'beach',
+    });
+    supportPlan.mechanicUses = [{
+      id: 'use_trade_while_travelling',
+      sceneId: 'scene_1',
+      mechanicId: 'mechanic_trade',
+      role: 'support',
+      actorId: 'main',
+      quantity: 1,
+      preconditionFactIds: ['fact_day'],
+      deltaIds: ['delta_1'],
+    }];
+    expect(() => applyChapterPlan({
+      kernel: travelKernel,
+      state: initialState,
+      plan: supportPlan,
+    })).not.toThrow();
+
+    const effectPlan = structuredClone(supportPlan);
+    effectPlan.mechanicUses[0].role = 'effect';
+    expect(() => applyChapterPlan({
+      kernel: travelKernel,
+      state: initialState,
+      plan: effectPlan,
+    })).toThrow('exceeds scene capacity');
+  });
+
   test('capability cannot claim a resource outside its declared effects', () => {
     const restrictedKernel = structuredClone(kernel);
     const capability = restrictedKernel.worldMechanics.find(item => item.id === 'mechanic_trade');
