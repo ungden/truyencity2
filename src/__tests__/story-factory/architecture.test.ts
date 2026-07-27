@@ -70,7 +70,7 @@ describe('Story Factory architecture boundary', () => {
     const routes = readFileSync('src/services/story-factory/routes.ts', 'utf8');
     expect(planner).toContain('model: input.routes.planJudge');
     expect(planner).toContain('for (let mechanicalAttempt = 1; mechanicalAttempt <= 2; mechanicalAttempt += 1)');
-    expect(planner).toContain("task: 'Tạo lại toàn bộ rolling window đúng một lần theo evidence của Plan Judge");
+    expect(planner).toContain('Tạo lại toàn bộ rolling window đúng một lần theo evidence của Plan Judge');
     expect(planner).toContain('const rejudged = await assessRollingPlan({');
     expect(pipeline).not.toContain('planJudge');
     expect(benchmark).toContain('Current Planner and Plan Judge must pass exactly chapters 1-5');
