@@ -1120,6 +1120,56 @@ describe('canonical Story Factory', () => {
     expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).toThrow('ends before its planned scenes can occur');
   });
 
+  test('accepts travel over the shortest directed multi-edge path', () => {
+    const travelKernel = structuredClone(kernel);
+    travelKernel.locations.push({ id: 'market', name: 'Chợ huyện' });
+    travelKernel.travelRules.push({
+      fromLocationId: 'beach',
+      toLocationId: 'market',
+      minimumMinutes: 30,
+    }, {
+      fromLocationId: 'market',
+      toLocationId: 'beach',
+      minimumMinutes: 30,
+    });
+    const chapter = plan(1);
+    chapter.storyTimeAfterMinutes = 110;
+    chapter.scenes[0] = {
+      ...chapter.scenes[0],
+      locationId: 'market',
+      travelMinutesFromPrevious: 50,
+      requiredDeltaIds: ['delta_1', 'move_main', 'move_mother'],
+    };
+    chapter.requiredDeltas.push(
+      {
+        id: 'move_main',
+        kind: 'location',
+        characterId: 'main',
+        beforeLocationId: 'home',
+        afterLocationId: 'market',
+      },
+      {
+        id: 'move_mother',
+        kind: 'location',
+        characterId: 'mother',
+        beforeLocationId: 'home',
+        afterLocationId: 'market',
+      },
+    );
+    expect(() => applyChapterPlan({
+      kernel: travelKernel,
+      state: initialState,
+      plan: chapter,
+    })).not.toThrow();
+
+    chapter.scenes[0].travelMinutesFromPrevious = 49;
+    expect(() => applyChapterPlan({
+      kernel: travelKernel,
+      state: initialState,
+      plan: chapter,
+    })).toThrow('faster than the world permits');
+  });
+
   test('rejects a kernel whose protagonist can leave a location but cannot return', () => {
     const oneWayKernel = structuredClone(kernel);
     oneWayKernel.travelRules = oneWayKernel.travelRules.filter(rule => rule.fromLocationId === 'home');

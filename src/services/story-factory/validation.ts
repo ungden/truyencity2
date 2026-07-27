@@ -10,7 +10,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-13-scene-opening-support';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-14-directed-shortest-travel';
 
 export interface StateEvent {
   chapterNumber: number;
@@ -361,7 +361,27 @@ function checkPreconditions(state: StoryState, plan: ChapterPlan): void {
 
 function travelMinimum(kernel: StoryKernel, from: string, to: string): number | null {
   if (from === to) return 0;
-  return kernel.travelRules.find(rule => rule.fromLocationId === from && rule.toLocationId === to)?.minimumMinutes ?? null;
+  const distances = new Map<string, number>([[from, 0]]);
+  const visited = new Set<string>();
+  while (true) {
+    let current: string | null = null;
+    let currentDistance = Number.POSITIVE_INFINITY;
+    for (const [locationId, distance] of distances) {
+      if (!visited.has(locationId) && distance < currentDistance) {
+        current = locationId;
+        currentDistance = distance;
+      }
+    }
+    if (current === null) return null;
+    if (current === to) return currentDistance;
+    visited.add(current);
+    for (const rule of kernel.travelRules.filter(item => item.fromLocationId === current)) {
+      const candidate = currentDistance + rule.minimumMinutes;
+      if (candidate < (distances.get(rule.toLocationId) ?? Number.POSITIVE_INFINITY)) {
+        distances.set(rule.toLocationId, candidate);
+      }
+    }
+  }
 }
 
 function stripFutureIntent(action: string): string {

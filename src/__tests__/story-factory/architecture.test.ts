@@ -147,7 +147,7 @@ describe('Story Factory architecture boundary', () => {
     expect(planner).toContain('Sắp mechanics theo đúng thứ tự nhân quả trong từng scene');
     expect(planner).toContain('compiler tự sinh location delta');
     expect(planner).toContain('initialLocationsByCharacter');
-    expect(planner).toContain('scene.travel phải >= thời gian trực tiếp lớn nhất');
+    expect(planner).toContain('scene.travel phải >= thời gian shortest-path lớn nhất');
     expect(planner).toContain('Conversion phải gắn đủ delta đầu vào và đầu ra');
     expect(planner).not.toContain('lossesPerBatch');
     expect(planner).toContain('Conversion là một batch nguyên tử');
