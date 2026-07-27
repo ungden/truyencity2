@@ -41,17 +41,17 @@ export const StoryCommissionSchema = z.object({
 export const ConceptCandidateSchema = z.object({
   id: z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/),
   workingTitle: z.string().trim().min(4).max(180),
-  premise: z.string().trim().min(30).max(600),
-  protagonistContradiction: z.string().trim().min(20).max(800),
-  uniqueMechanism: z.string().trim().min(20).max(400),
-  rewardLoop: z.string().trim().min(20).max(400),
-  conflictEconomy: z.string().trim().min(20).max(400),
-  mechanismFingerprint: z.string().trim().min(4).max(160),
-  rewardLoopFingerprint: z.string().trim().min(4).max(160),
-  conflictEconomyFingerprint: z.string().trim().min(4).max(160),
-  seriality30: z.array(z.string().trim().min(8).max(220)).min(6).max(10),
-  seriality1000: z.array(z.string().trim().min(12).max(300)).min(8).max(15),
-  earlyEndingRisk: z.string().trim().min(20).max(600),
+  premise: z.string().trim().min(30).max(1_200),
+  protagonistContradiction: z.string().trim().min(20).max(1_200),
+  uniqueMechanism: z.string().trim().min(20).max(1_200),
+  rewardLoop: z.string().trim().min(20).max(1_200),
+  conflictEconomy: z.string().trim().min(20).max(1_200),
+  mechanismFingerprint: z.string().trim().min(4).max(240),
+  rewardLoopFingerprint: z.string().trim().min(4).max(240),
+  conflictEconomyFingerprint: z.string().trim().min(4).max(240),
+  seriality30: z.array(z.string().trim().min(8).max(500)).min(6).max(10),
+  seriality1000: z.array(z.string().trim().min(12).max(700)).min(8).max(15),
+  earlyEndingRisk: z.string().trim().min(20).max(1_200),
 }).strict();
 
 const ConceptBatchSchema = z.object({ candidates: z.array(ConceptCandidateSchema).length(6) }).strict();
