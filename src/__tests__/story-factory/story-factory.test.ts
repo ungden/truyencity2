@@ -161,7 +161,7 @@ const kernel: StoryKernel = {
       description: 'Một đơn vị vốn mua được lượng hàng có giá trị thấp hơn do chi phí giao dịch.',
       inputsPerBatch: [{ resourceId: 'money', amount: 1 }],
       outputsPerBatch: [{ resourceId: 'money', amount: 0.9 }],
-      lossesPerBatch: [], maximumBatchesPerUse: 100,
+      maximumBatchesPerUse: 100,
     },
     {
       id: 'mechanic_trade', name: 'Quyền giao dịch của Hải', kind: 'capability',
@@ -358,7 +358,6 @@ describe('canonical Story Factory', () => {
       description: 'Một động cơ hỏng được sửa thành một động cơ hoạt động.',
       inputsPerBatch: [{ resourceId: 'broken_engine', amount: 1 }],
       outputsPerBatch: [{ resourceId: 'working_engine', amount: 1 }],
-      lossesPerBatch: [],
       maximumBatchesPerUse: 1,
     });
     const blockedState = structuredClone(initialState);
@@ -401,7 +400,6 @@ describe('canonical Story Factory', () => {
         description: 'Tiền mặt được đổi lấy một động cơ hỏng có nguồn gốc cụ thể.',
         inputsPerBatch: [{ resourceId: 'money', amount: 50 }],
         outputsPerBatch: [{ resourceId: 'broken_engine', amount: 1 }],
-        lossesPerBatch: [],
         maximumBatchesPerUse: 1,
       },
       {
@@ -411,7 +409,6 @@ describe('canonical Story Factory', () => {
         description: 'Một động cơ hỏng được sửa thành một động cơ hoạt động.',
         inputsPerBatch: [{ resourceId: 'broken_engine', amount: 1 }],
         outputsPerBatch: [{ resourceId: 'working_engine', amount: 1 }],
-        lossesPerBatch: [],
         maximumBatchesPerUse: 1,
       },
     );
@@ -432,27 +429,16 @@ describe('canonical Story Factory', () => {
     })).not.toThrow();
   });
 
-  test('rejects conversion resources counted as both input and additional loss', () => {
-    const duplicatedKernel = structuredClone(kernel);
-    duplicatedKernel.worldMechanics = [{
-      id: 'bad_conversion',
-      name: 'Chuyển đổi tính hai lần',
-      kind: 'conversion',
-      description: 'Cùng một khoản bị khai báo hai lần trong một batch.',
-      inputsPerBatch: [{ resourceId: 'money', amount: 10 }],
-      outputsPerBatch: [{ resourceId: 'money', amount: 8 }],
-      lossesPerBatch: [{ resourceId: 'money', amount: 2 }],
-      maximumBatchesPerUse: 1,
-    }];
-    const duplicatedArc = {
-      ...structuredClone(arc),
-      activeMechanicIds: ['bad_conversion'],
+  test('conversion loss is represented by the input-output ratio, not a second loss ledger', () => {
+    const legacyKernel = structuredClone(kernel) as StoryKernel & {
+      worldMechanics: Array<Record<string, unknown>>;
     };
-    expect(() => validateArcResourceReachability({
-      kernel: duplicatedKernel,
-      arc: duplicatedArc,
-      state: initialState,
-    })).toThrow('both input and loss');
+    legacyKernel.worldMechanics[0].lossesPerBatch = [{ resourceId: 'money', amount: 0.1 }];
+    expect(StoryKernelSchema.safeParse(legacyKernel).success).toBe(false);
+    expect(kernel.worldMechanics[0]).toMatchObject({
+      inputsPerBatch: [{ resourceId: 'money', amount: 1 }],
+      outputsPerBatch: [{ resourceId: 'money', amount: 0.9 }],
+    });
   });
 
   test('rejects a resource transition that is not owned by a validated mechanic', () => {

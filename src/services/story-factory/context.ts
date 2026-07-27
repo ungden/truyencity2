@@ -89,7 +89,7 @@ function operationalConstraints(kernel: StoryKernel, plan: ChapterPlan, name: (i
     if (mechanic.kind === 'conversion') {
       const parts = (items: typeof mechanic.inputsPerBatch) => items
         .map(item => `${item.amount * use.quantity} ${name(item.resourceId)}`).join(', ');
-      return `${name(use.actorId)} xử lý ${parts(mechanic.inputsPerBatch)} để tạo ${parts(mechanic.outputsPerBatch)}; hao hụt ${parts(mechanic.lossesPerBatch) || 'không'}.`;
+      return `${name(use.actorId)} xử lý ${parts(mechanic.inputsPerBatch)} để tạo ${parts(mechanic.outputsPerBatch)}.`;
     }
     if (mechanic.kind === 'capability') {
       const capacity = mechanic.maximumUnitsPerMinute === null

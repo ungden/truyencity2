@@ -110,7 +110,6 @@ export const WorldMechanicSchema = z.discriminatedUnion('kind', [
     description: mechanicalText,
     inputsPerBatch: z.array(MechanicResourceAmountSchema).min(1).max(12),
     outputsPerBatch: z.array(MechanicResourceAmountSchema).min(1).max(12),
-    lossesPerBatch: z.array(MechanicResourceAmountSchema).max(8).default([]),
     maximumBatchesPerUse: z.number().finite().positive().max(1_000_000).nullable(),
   }).strict(),
   z.object({
@@ -203,7 +202,7 @@ export const StoryKernelSchema = z.object({
   }
   kernel.worldMechanics.forEach((mechanic, index) => {
     if (mechanic.kind === 'conversion') {
-      for (const item of [...mechanic.inputsPerBatch, ...mechanic.outputsPerBatch, ...mechanic.lossesPerBatch]) {
+      for (const item of [...mechanic.inputsPerBatch, ...mechanic.outputsPerBatch]) {
         if (!resources.has(item.resourceId)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,

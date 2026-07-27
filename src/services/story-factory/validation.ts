@@ -10,7 +10,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-6-active-resource-reachability';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-7-input-output-conversions';
 
 export interface StateEvent {
   chapterNumber: number;
@@ -96,7 +96,7 @@ export function validateKernelState(kernel: StoryKernel, state: StoryState): voi
   const locationIds = new Set(kernel.locations.map(item => item.id));
   for (const mechanic of kernel.worldMechanics) {
     if (mechanic.kind === 'conversion') {
-      for (const resource of [...mechanic.inputsPerBatch, ...mechanic.outputsPerBatch, ...mechanic.lossesPerBatch]) {
+      for (const resource of [...mechanic.inputsPerBatch, ...mechanic.outputsPerBatch]) {
         if (!resourceIds.has(resource.resourceId)) fail(`Mechanic ${mechanic.id} references unknown resource ${resource.resourceId}.`);
       }
     } else {
@@ -198,16 +198,7 @@ export function validateArcResourceReachability(input: {
 
   for (const mechanic of activeMechanics) {
     if (mechanic.kind !== 'conversion') continue;
-    const inputIds = mechanic.inputsPerBatch.map(item => item.resourceId);
-    const lossIds = mechanic.lossesPerBatch.map(item => item.resourceId);
-    const duplicatedConsumption = inputIds.filter(resourceId => lossIds.includes(resourceId));
-    if (duplicatedConsumption.length) {
-      fail(`Conversion ${mechanic.id} counts the same resource as both input and loss.`, {
-        resourceIds: [...new Set(duplicatedConsumption)],
-        repairRule: 'Consumed input belongs only in inputsPerBatch. lossesPerBatch is only for additional tracked waste.',
-      });
-    }
-    for (const item of [...mechanic.inputsPerBatch, ...mechanic.outputsPerBatch, ...mechanic.lossesPerBatch]) {
+    for (const item of [...mechanic.inputsPerBatch, ...mechanic.outputsPerBatch]) {
       if (resourceDefinitions.get(item.resourceId)?.kind !== 'numeric') {
         fail(`Conversion ${mechanic.id} must use numeric resources only.`, { resourceId: item.resourceId });
       }
@@ -219,7 +210,7 @@ export function validateArcResourceReachability(input: {
     changed = false;
     for (const mechanic of activeMechanics) {
       if (mechanic.kind !== 'conversion') continue;
-      const required = [...mechanic.inputsPerBatch, ...mechanic.lossesPerBatch].map(item => item.resourceId);
+      const required = mechanic.inputsPerBatch.map(item => item.resourceId);
       if (!required.every(resourceId => reachable.has(resourceId))) continue;
       for (const output of mechanic.outputsPerBatch) {
         if (reachable.has(output.resourceId)) continue;
@@ -233,7 +224,6 @@ export function validateArcResourceReachability(input: {
   for (const mechanic of activeMechanics) {
     if (mechanic.kind === 'conversion') {
       mechanic.inputsPerBatch.forEach(item => required.add(item.resourceId));
-      mechanic.lossesPerBatch.forEach(item => required.add(item.resourceId));
       mechanic.outputsPerBatch.forEach(item => required.add(item.resourceId));
     } else if (mechanic.kind === 'capability') {
       mechanic.requiredResourceIds.forEach(resourceId => required.add(resourceId));
@@ -510,7 +500,6 @@ export function validateCausalMechanics(input: {
         expected.set(resourceId, (expected.get(resourceId) ?? 0) + amount);
       };
       mechanic.inputsPerBatch.forEach(item => addExpected(item.resourceId, -item.amount * use.quantity));
-      mechanic.lossesPerBatch.forEach(item => addExpected(item.resourceId, -item.amount * use.quantity));
       mechanic.outputsPerBatch.forEach(item => addExpected(item.resourceId, item.amount * use.quantity));
       const actual = new Map<string, number>();
       for (const deltaId of use.deltaIds) {
@@ -606,7 +595,6 @@ export function validateCausalMechanics(input: {
             const resourceIds = [
               ...mechanic.inputsPerBatch,
               ...mechanic.outputsPerBatch,
-              ...mechanic.lossesPerBatch,
             ].map(item => item.resourceId);
             if (resourceIds.includes(delta.resourceId)) {
               candidates.push({ mechanicId: mechanic.id, kind: mechanic.kind });
