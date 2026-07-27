@@ -261,8 +261,9 @@ function assertLaunchSemantics(
   }
 }
 
-function assertVoiceSemantics(characters: LaunchPack['kernel']['characters']): void {
-  const sampleLikeVoice = /[“”"'‘’\n]|\b(?:cười|nhếch|quát|gằn|lẩm bẩm|nói rằng|ánh mắt)\b/iu;
+export function assertVoiceSemantics(characters: LaunchPack['kernel']['characters']): void {
+  const cannedGesture = /\n|(?:^|\s)[—-]\s|\b(?:cười|nhếch|quát|gằn|lẩm bẩm|nói rằng|ánh mắt)\b/iu;
+  const quotedSentence = /["“”'‘’][^"“”'‘’]{12,}["“”'‘’]/u;
   for (const character of characters) {
     const voiceValues = [
       character.voice.register,
@@ -271,7 +272,7 @@ function assertVoiceSemantics(characters: LaunchPack['kernel']['characters']): v
       character.voice.vocabulary,
       character.voice.reasoningStyle,
     ];
-    if (voiceValues.some(value => sampleLikeVoice.test(value))) {
+    if (voiceValues.some(value => cannedGesture.test(value) || quotedSentence.test(value))) {
       throw new StoryFactoryError('setup_blocked', 'Voice contract contains sample prose, dialogue, or canned gesture.', {
         characterId: character.id,
       });

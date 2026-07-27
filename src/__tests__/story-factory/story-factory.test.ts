@@ -27,6 +27,7 @@ import {
   appendAcceptedOutcome,
   applyCanonExtension,
   applyChapterPlan,
+  assertVoiceSemantics,
   assertComparableSequentialCorpora,
   buildBlindReaderComparison,
   buildBlindReaderInput,
@@ -538,6 +539,14 @@ describe('canonical Story Factory', () => {
         allowedActorIds: ['inst_market'],
       }],
     }).success).toBe(false);
+  });
+
+  test('voice validation allows quoted address terms but rejects canned gestures', () => {
+    const cast = structuredClone(kernel.characters);
+    cast[0].voice.addressRules = "refers to herself as 'nội'";
+    expect(() => assertVoiceSemantics(cast)).not.toThrow();
+    cast[0].voice.sentenceRhythm = 'cười khẩy rồi gằn từng chữ';
+    expect(() => assertVoiceSemantics(cast)).toThrow('canned gesture');
   });
 
   test('rejects a resource transition that is not owned by a validated mechanic', () => {
