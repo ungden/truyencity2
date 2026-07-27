@@ -1098,6 +1098,19 @@ describe('canonical Story Factory', () => {
     expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
   });
 
+  test('does not treat a policy prohibiting sales as a completed transaction', () => {
+    const chapter = plan(1);
+    chapter.scenes[0].action = 'Thẩm Uyên ký lệnh nghiêm cấm việc bán quặng thô cho xưởng rèn không phép.';
+    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
+  });
+
+  test('still rejects a real sale after a policy prohibition is announced', () => {
+    const chapter = plan(1);
+    chapter.scenes[0].action = 'Thẩm Uyên ký lệnh cấm bán quặng thô, nhưng thuộc hạ vẫn bán một xe quặng lấy tiền.';
+    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter }))
+      .toThrow('transaction without a numeric resource delta');
+  });
+
   test('still rejects an actual purchase hidden beside future intent', () => {
     const chapter = plan(1);
     chapter.scenes[0].action = 'Hải hứa sẽ sớm mua máy khâu, rồi trả tiền mặt mua ngay một cuộn lưới.';

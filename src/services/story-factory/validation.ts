@@ -10,7 +10,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-14-directed-shortest-travel';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-15-transaction-negation';
 
 export interface StateEvent {
   chapterNumber: number;
@@ -393,6 +393,15 @@ function stripFutureIntent(action: string): string {
   return action.replace(new RegExp(String.raw`${left}${intent}\s+${filler}${verbs}${right}`, 'giu'), '');
 }
 
+function stripProhibitedTransactions(action: string): string {
+  const prohibition = String.raw`(?:nghiêm\s+cấm|cấm|không\s+cho\s+phép|không\s+được|ngăn\s+chặn|hạn\s+chế|đình\s+chỉ)`;
+  const filler = String.raw`(?:(?:việc|hành\s+vi)\s+)?`;
+  const verbs = String.raw`(?:mua|bán|thu\s+mua|trả\s+tiền|chi\s+tiền|thu\s+tiền|nhận\s+tiền|kiếm\s+tiền)`;
+  const left = String.raw`(?<![\p{L}\p{N}_-])`;
+  const right = String.raw`(?=$|[^\p{L}\p{N}_-])`;
+  return action.replace(new RegExp(String.raw`${left}${prohibition}\s+${filler}${verbs}${right}`, 'giu'), '');
+}
+
 function hasVietnameseTerm(action: string, terms: string): boolean {
   return new RegExp(String.raw`(?<![\p{L}\p{N}_-])(?:${terms})(?=$|[^\p{L}\p{N}_-])`, 'iu').test(action);
 }
@@ -437,7 +446,7 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
       referenced.add(deltaId);
     }
     const sceneDeltas = scene.requiredDeltaIds.map(deltaId => plan.requiredDeltas.find(delta => delta.id === deltaId)!);
-    const realizedAction = stripFutureIntent(scene.action);
+    const realizedAction = stripProhibitedTransactions(stripFutureIntent(scene.action));
     if (hasVietnameseTerm(realizedAction, String.raw`mua|bán|thu mua|trả tiền|chi tiền|thu tiền|nhận tiền|kiếm tiền`)
       && !sceneDeltas.some(delta => delta.kind === 'resource_numeric')) {
       fail(`Scene ${scene.id} describes a transaction without a numeric resource delta.`, scene.action);
