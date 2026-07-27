@@ -141,6 +141,7 @@ describe('Story Factory architecture boundary', () => {
     expect(planner).toContain('Mỗi resource delta phải có đúng một effect owner');
     expect(planner).toContain('Nếu không có effect mechanic, không được thay đổi resource');
     expect(planner).toContain('availableMinutes=scene.dur+scene.travel');
+    expect(planner).toContain('Sắp mechanics theo đúng thứ tự nhân quả trong từng scene');
     expect(planner).toContain('initialLocationsByCharacter');
     expect(planner).toContain('scene.travel phải >= thời gian trực tiếp lớn nhất');
     expect(planner).toContain('Conversion phải gắn đủ delta đầu vào và đầu ra');
@@ -149,7 +150,7 @@ describe('Story Factory architecture boundary', () => {
     expect(validation).toContain('validateCausalMechanics');
     expect(validation).toContain('Every resource delta needs exactly one active conversion/capability effect owner');
     expect(validation).toContain('causal validation issues');
-    expect(validation).toContain('Schedule this capability only after a prior committed delta');
+    expect(validation).toContain('Schedule this capability after an earlier causal effect');
     expect(validation).toContain('exceeds scene capacity');
     expect(prompts).toContain('Không để Writer tự bịa tài xế, chủ xe, khoản nợ');
     expect(planner).not.toContain('numericResources: input.kernel.resources.flatMap');

@@ -10,7 +10,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-11-support-travel-capacity';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-12-sequential-scene-effects';
 
 export interface StateEvent {
   chapterNumber: number;
@@ -465,27 +465,39 @@ export function validateCausalMechanics(input: {
   const scenes = new Map(plan.scenes.map(item => [item.id, item]));
   const deltas = new Map(plan.requiredDeltas.map(item => [item.id, item]));
   const stateFacts = new Map(state.facts.map(item => [item.id, item.value]));
+  const simulatedResources = new Map(state.resources.map(item => [item.resourceId, item.value]));
   const effectDeltaIds = new Set<string>();
+  const declaredEffectDeltaIds = new Set(plan.mechanicUses
+    .filter(use => use.role === 'effect')
+    .flatMap(use => use.deltaIds));
   const issues: Array<{
     mechanicUseId: string | null;
     message: string;
     evidence: unknown;
   }> = [];
   unique(plan.mechanicUses.map(item => item.id), `Chapter ${plan.chapterNumber} mechanic uses`);
+  for (const use of plan.mechanicUses.filter(item => !scenes.has(item.sceneId))) {
+    issues.push({
+      mechanicUseId: use.id,
+      message: `Mechanic use ${use.id} references unknown scene ${use.sceneId}.`,
+      evidence: null,
+    });
+  }
 
-  for (const use of plan.mechanicUses) {
+  for (const scene of plan.scenes) {
+    for (const use of plan.mechanicUses.filter(item => item.sceneId === scene.id)) {
     try {
     const mechanic = mechanics.get(use.mechanicId);
-    const scene = scenes.get(use.sceneId);
+    const referencedScene = scenes.get(use.sceneId);
     if (!mechanic) fail(`Mechanic use ${use.id} references unknown mechanic ${use.mechanicId}.`);
-    if (!scene) fail(`Mechanic use ${use.id} references unknown scene ${use.sceneId}.`);
-    if (!scene.participantIds.includes(use.actorId)) {
-      fail(`Mechanic use ${use.id} actor ${use.actorId} is not present in scene ${scene.id}.`);
+    if (!referencedScene) fail(`Mechanic use ${use.id} references unknown scene ${use.sceneId}.`);
+    if (!referencedScene.participantIds.includes(use.actorId)) {
+      fail(`Mechanic use ${use.id} actor ${use.actorId} is not present in scene ${referencedScene.id}.`);
     }
     for (const deltaId of use.deltaIds) {
       if (!deltas.has(deltaId)) fail(`Mechanic use ${use.id} references unknown delta ${deltaId}.`);
-      if (!scene.requiredDeltaIds.includes(deltaId)) {
-        fail(`Mechanic use ${use.id} references delta ${deltaId} outside scene ${scene.id}.`);
+      if (!referencedScene.requiredDeltaIds.includes(deltaId)) {
+        fail(`Mechanic use ${use.id} references delta ${deltaId} outside scene ${referencedScene.id}.`);
       }
       if (use.role === 'effect') {
         if (effectDeltaIds.has(deltaId)) fail(`Delta ${deltaId} has more than one effect mechanic.`);
@@ -546,14 +558,14 @@ export function validateCausalMechanics(input: {
         }
       }
       for (const resourceId of mechanic.requiredResourceIds) {
-        const resource = state.resources.find(item => item.resourceId === resourceId);
-        if (!resource
-          || (resource.kind === 'numeric' && resource.value <= 0)
-          || (resource.kind === 'state' && resource.value.trim().length === 0)) {
+        const currentValue = simulatedResources.get(resourceId);
+        if (currentValue === undefined
+          || (typeof currentValue === 'number' && currentValue <= 0)
+          || (typeof currentValue === 'string' && currentValue.trim().length === 0)) {
           fail(`Capability ${mechanic.id} lacks usable resource ${resourceId}.`, {
             resourceId,
-            currentValue: resource?.value ?? null,
-            repairRule: 'Schedule this capability only after a prior committed delta makes the required resource usable, or remove the capability use from this chapter.',
+            currentValue: currentValue ?? null,
+            repairRule: 'Schedule this capability after an earlier causal effect in the same/prior scene or after a prior committed chapter makes the resource usable; otherwise remove the capability use.',
           });
         }
       }
@@ -602,6 +614,40 @@ export function validateCausalMechanics(input: {
         preconditionMatches(stateFacts.get(condition.factId), condition.expected));
       if (violated.length) fail(`Constraint ${mechanic.id} is blocked by forbidden facts.`, violated);
     }
+
+    if (use.role === 'effect') {
+      const orderedOwnedDeltas = plan.requiredDeltas.filter(delta => use.deltaIds.includes(delta.id));
+      for (const delta of orderedOwnedDeltas) {
+        if (delta.kind === 'fact') {
+          const actual = stateFacts.get(delta.factId) ?? null;
+          if (actual !== delta.before) {
+            fail(`Effect ${use.id} fact ${delta.factId} starts from the wrong value.`, {
+              expected: delta.before,
+              actual,
+            });
+          }
+          stateFacts.set(delta.factId, delta.after);
+        } else if (delta.kind === 'resource_numeric') {
+          const actual = simulatedResources.get(delta.resourceId);
+          if (actual !== delta.before) {
+            fail(`Effect ${use.id} resource ${delta.resourceId} starts from the wrong value.`, {
+              expected: delta.before,
+              actual,
+            });
+          }
+          simulatedResources.set(delta.resourceId, delta.after);
+        } else if (delta.kind === 'resource_state') {
+          const actual = simulatedResources.get(delta.resourceId);
+          if (actual !== delta.before) {
+            fail(`Effect ${use.id} state resource ${delta.resourceId} starts from the wrong value.`, {
+              expected: delta.before,
+              actual,
+            });
+          }
+          simulatedResources.set(delta.resourceId, delta.after);
+        }
+      }
+    }
     } catch (error) {
       if (!(error instanceof StoryFactoryError) || error.code !== 'plan_blocked') throw error;
       issues.push({
@@ -609,6 +655,21 @@ export function validateCausalMechanics(input: {
         message: error.message,
         evidence: error.evidence ?? null,
       });
+    }
+    }
+    for (const deltaId of scene.requiredDeltaIds) {
+      const delta = deltas.get(deltaId);
+      if (!delta || delta.kind !== 'fact' || declaredEffectDeltaIds.has(deltaId)) continue;
+      const actual = stateFacts.get(delta.factId) ?? null;
+      if (actual !== delta.before) {
+        issues.push({
+          mechanicUseId: null,
+          message: `Scene ${scene.id} external fact ${delta.factId} starts from the wrong value.`,
+          evidence: { expected: delta.before, actual },
+        });
+        continue;
+      }
+      stateFacts.set(delta.factId, delta.after);
     }
   }
   const ungroundedResourceDeltas = plan.requiredDeltas

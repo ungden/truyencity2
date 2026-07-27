@@ -609,20 +609,20 @@ describe('canonical Story Factory', () => {
     const chapter = plan(1);
     chapter.mechanicUses = [
       {
-        id: 'use_trade_effect',
+        id: 'use_daylight_support',
         sceneId: 'scene_1',
-        mechanicId: 'mechanic_trade',
-        role: 'effect',
+        mechanicId: 'mechanic_daylight',
+        role: 'support',
         actorId: 'main',
         quantity: 1,
         preconditionFactIds: ['fact_day'],
         deltaIds: ['delta_1'],
       },
       {
-        id: 'use_daylight_support',
+        id: 'use_trade_effect',
         sceneId: 'scene_1',
-        mechanicId: 'mechanic_daylight',
-        role: 'support',
+        mechanicId: 'mechanic_trade',
+        role: 'effect',
         actorId: 'main',
         quantity: 1,
         preconditionFactIds: ['fact_day'],
@@ -644,15 +644,15 @@ describe('canonical Story Factory', () => {
       locationId: 'beach',
       durationMinutes: 30,
       travelMinutesFromPrevious: 20,
-      requiredDeltaIds: ['delta_1', 'move_main'],
+      requiredDeltaIds: ['move_main'],
     };
-    supportPlan.requiredDeltas.push({
+    supportPlan.requiredDeltas = [{
       id: 'move_main',
       kind: 'location',
       characterId: 'main',
       beforeLocationId: 'home',
       afterLocationId: 'beach',
-    });
+    }];
     supportPlan.mechanicUses = [{
       id: 'use_trade_while_travelling',
       sceneId: 'scene_1',
@@ -661,7 +661,7 @@ describe('canonical Story Factory', () => {
       actorId: 'main',
       quantity: 1,
       preconditionFactIds: ['fact_day'],
-      deltaIds: ['delta_1'],
+      deltaIds: ['move_main'],
     }];
     expect(() => applyChapterPlan({
       kernel: travelKernel,
@@ -676,6 +676,107 @@ describe('canonical Story Factory', () => {
       state: initialState,
       plan: effectPlan,
     })).toThrow('exceeds scene capacity');
+  });
+
+  test('causal validation simulates external facts and effect resources in scene order', () => {
+    const sequenceKernel = structuredClone(kernel);
+    sequenceKernel.resources.push({
+      id: 'rain_water',
+      name: 'Nước mưa đã hứng',
+      kind: 'numeric',
+      unit: 'lít',
+      minimum: 0,
+    });
+    sequenceKernel.worldMechanics.push(
+      {
+        id: 'collect_rain',
+        name: 'Hứng nước mưa',
+        kind: 'capability',
+        description: 'Hứng lượng nước mưa thực tế sau khi trời bắt đầu mưa.',
+        allowedActorIds: ['main'],
+        requiredFacts: [{ factId: 'is_raining', expected: '1' }],
+        requiredResourceIds: [],
+        effectResourceIds: ['rain_water'],
+        effectFactIds: [],
+        capacityUnit: null,
+        maximumUnitsPerMinute: null,
+      },
+      {
+        id: 'wash_with_rain',
+        name: 'Rửa bằng nước mưa',
+        kind: 'capability',
+        description: 'Dùng nước đã hứng để hoàn tất việc rửa nguyên liệu.',
+        allowedActorIds: ['main'],
+        requiredFacts: [],
+        requiredResourceIds: ['rain_water'],
+        effectResourceIds: [],
+        effectFactIds: ['washed_clean'],
+        capacityUnit: null,
+        maximumUnitsPerMinute: null,
+      },
+    );
+    const sequenceState = structuredClone(initialState);
+    sequenceState.facts.push({ id: 'is_raining', value: '0' });
+    sequenceState.resources.push({ resourceId: 'rain_water', kind: 'numeric', value: 0 });
+    const chapter = plan(1);
+    chapter.storyTimeAfterMinutes = 90;
+    chapter.scenes = [
+      {
+        ...chapter.scenes[0],
+        durationMinutes: 30,
+        requiredDeltaIds: ['rain_starts'],
+      },
+      {
+        ...chapter.scenes[0],
+        id: 'scene_washing',
+        durationMinutes: 60,
+        objective: 'Hứng nước vừa xuất hiện rồi dùng nó để rửa nguyên liệu.',
+        requiredDeltaIds: ['collect_water', 'finish_washing'],
+      },
+    ];
+    chapter.requiredDeltas = [
+      { id: 'rain_starts', kind: 'fact', factId: 'is_raining', before: '0', after: '1' },
+      {
+        id: 'collect_water',
+        kind: 'resource_numeric',
+        resourceId: 'rain_water',
+        before: 0,
+        delta: 5,
+        after: 5,
+        source: 'mưa trong cảnh',
+        sink: null,
+      },
+      { id: 'finish_washing', kind: 'fact', factId: 'washed_clean', before: null, after: '1' },
+    ];
+    chapter.mechanicUses = [
+      {
+        id: 'collect_first',
+        sceneId: 'scene_washing',
+        mechanicId: 'collect_rain',
+        role: 'effect',
+        actorId: 'main',
+        quantity: 5,
+        preconditionFactIds: ['is_raining'],
+        deltaIds: ['collect_water'],
+      },
+      {
+        id: 'wash_second',
+        sceneId: 'scene_washing',
+        mechanicId: 'wash_with_rain',
+        role: 'effect',
+        actorId: 'main',
+        quantity: 1,
+        preconditionFactIds: [],
+        deltaIds: ['finish_washing'],
+      },
+    ];
+    const result = applyChapterPlan({
+      kernel: sequenceKernel,
+      state: sequenceState,
+      plan: chapter,
+    });
+    expect(result.state.resources.find(item => item.resourceId === 'rain_water')).toMatchObject({ value: 5 });
+    expect(result.state.facts.find(item => item.id === 'washed_clean')).toMatchObject({ value: '1' });
   });
 
   test('capability cannot claim a resource outside its declared effects', () => {
@@ -783,12 +884,24 @@ describe('canonical Story Factory', () => {
       }
     }
     expect(failures).toHaveLength(100);
-    for (const sample of failures) {
-      expect(() => applyChapterPlan({
-        kernel: sample.kernel,
-        state: initialState,
-        plan: sample.plan,
-      })).toThrow(StoryFactoryError);
+    for (const [sampleIndex, sample] of failures.entries()) {
+      let error: unknown;
+      try {
+        applyChapterPlan({
+          kernel: sample.kernel,
+          state: initialState,
+          plan: sample.plan,
+        });
+      } catch (caught) {
+        error = caught;
+      }
+      if (!(error instanceof StoryFactoryError)) {
+        throw new Error(`Golden causal sample did not fail: ${JSON.stringify({
+          sampleIndex,
+          lane: sample.kernel.genreLane,
+          family: sampleIndex % 25 % 8,
+        })}`);
+      }
     }
   });
 
