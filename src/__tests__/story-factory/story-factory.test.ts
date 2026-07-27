@@ -33,6 +33,7 @@ import {
   buildChapterContexts,
   buildWriterBrief,
   bookSetupCheckpointCost,
+  createLaunchWorldWireSchema,
   prepareDiscoveryResume,
   isStoryFactoryEnabled,
   calculateValidationMetrics,
@@ -465,6 +466,30 @@ describe('canonical Story Factory', () => {
       inputsPerBatch: [{ resourceId: 'money', amount: 1 }],
       outputsPerBatch: [{ resourceId: 'money', amount: 0.9 }],
     });
+  });
+
+  test('Launch World capability ownership is constrained to the selected cast', () => {
+    const schema = createLaunchWorldWireSchema(['main', 'mother']);
+    const base = {
+      kernel: {
+        worldModel: kernel.worldModel,
+        worldRules: kernel.worldRules,
+        locations: kernel.locations,
+        travelRules: kernel.travelRules,
+        resources: kernel.resources,
+      },
+      conversions: [kernel.worldMechanics[0]],
+      capabilities: [kernel.worldMechanics[1]],
+      constraints: [kernel.worldMechanics[2]],
+    };
+    expect(schema.safeParse(base).success).toBe(true);
+    expect(schema.safeParse({
+      ...base,
+      capabilities: [{
+        ...kernel.worldMechanics[1],
+        allowedActorIds: ['inst_market'],
+      }],
+    }).success).toBe(false);
   });
 
   test('rejects a resource transition that is not owned by a validated mechanic', () => {

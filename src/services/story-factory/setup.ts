@@ -136,7 +136,7 @@ const LaunchWorldSchema = z.object({
     resources: true,
   }),
 }).strict();
-const LaunchWorldWireSchema = z.object({
+const LaunchWorldWireBaseSchema = z.object({
   kernel: StoryKernelObjectSchema.pick({
     worldModel: true,
     worldRules: true,
@@ -148,6 +148,17 @@ const LaunchWorldWireSchema = z.object({
   capabilities: z.array(WorldMechanicSchema.options[1]).min(1).max(34),
   constraints: z.array(WorldMechanicSchema.options[2]).min(1).max(34),
 }).strict();
+export function createLaunchWorldWireSchema(characterIds: string[]) {
+  const ids = [...new Set(characterIds)];
+  if (!ids.length) throw new StoryFactoryError('setup_blocked', 'Launch Identity has no character IDs for capability ownership.');
+  const actorId = z.enum(ids as [string, ...string[]]);
+  const capability = WorldMechanicSchema.options[1].extend({
+    allowedActorIds: z.array(actorId).max(40).default([]),
+  }).strict();
+  return LaunchWorldWireBaseSchema.extend({
+    capabilities: z.array(capability).min(1).max(34),
+  }).strict();
+}
 const LaunchSeriesSchema = z.object({
   kernel: StoryKernelObjectSchema.pick({
     progressionTracks: true,
@@ -455,6 +466,7 @@ WorldModel phải khóa thời đại, địa lý, tổ chức, hệ thống v�
 travelRules là đồ thị có hướng: từ vị trí mở đầu dự kiến phải đi được tới mọi location và có đường quay về. Không biến kiến thức thành vật tư, thời gian hoặc năng lượng miễn phí.
 Mỗi numeric resource bắt buộc có unit vật lý hoặc tiền tệ rõ ràng như VND, kg, lít, chiếc, điểm; không dùng một con số vô đơn vị.
 Trả mechanics trong đúng ba mảng conversions, capabilities và constraints; mỗi mảng có ít nhất một phần tử đúng kind. Conversion chỉ ghi tổng input bị tiêu thụ và output tạo ra theo mỗi batch; tỷ lệ hao hụt nằm trong chênh lệch lượng input/output, còn phụ phẩm cần theo dõi là một output riêng. Capability ghi actor/fact/resource cấp quyền và công suất; constraint ghi fact bắt buộc hoặc bị cấm. Không giấu số học hoặc quyền hạn trong prose worldRules.
+Capability.allowedActorIds chỉ được dùng character ID có trong identity/cast đã khóa; organization, institution, location và resource không phải actor vật lý của scene. Năng lực của tổ chức phải được thực hiện qua một nhân vật đại diện có trong cast và authority/fact phù hợp.
 Mọi vật tư đầu vào của cơ chế arc đầu phải có đường đạt được: hoặc có sẵn hợp lý ở State ban đầu, hoặc là output của chuỗi conversion bắt đầu từ tài nguyên có sẵn. Mua/thu mua là conversion từ tiền hoặc vật trao đổi sang hàng; khai thác/sản xuất cũng phải có conversion riêng của truyện. Không cho tài nguyên xuất hiện chỉ nhờ source/sink prose.
 World rules, resource và tổ chức phải phản ánh requiredInfrastructure, minimumPlausibleTimeline và criticalAssumptions đã được mô phỏng.`,
       prompt: JSON.stringify({
@@ -465,7 +477,7 @@ World rules, resource và tổ chức phải phản ánh requiredInfrastructure,
         selectedSimulation,
         identity: launchIdentity.value.kernel,
       }),
-      schema: LaunchWorldWireSchema,
+      schema: createLaunchWorldWireSchema(launchIdentity.value.kernel.characters.map(character => character.id)),
       schemaComplexity: 'omit_large_array_max',
       temperature: 0.3,
     }));

@@ -102,7 +102,8 @@ describe('Story Factory architecture boundary', () => {
     expect(setup).toContain('sentenceRhythm chỉ mô tả độ dài, nhịp và cấu trúc câu');
     expect(setup.indexOf('assertVoiceSemantics(launchIdentity.value.kernel.characters)'))
       .toBeLessThan(setup.indexOf('let launchWorld:'));
-    expect(setup).toContain('schema: LaunchWorldWireSchema');
+    expect(setup).toContain('schema: createLaunchWorldWireSchema(');
+    expect(setup).toContain('const actorId = z.enum(ids');
     expect(setup).toContain('conversions: z.array(WorldMechanicSchema.options[0])');
     expect(setup).toContain('schema: LaunchSeriesSchema');
     expect(setup).toContain('schema: LaunchStateSchema');
