@@ -2452,7 +2452,7 @@ describe('canonical Story Factory', () => {
     const b = Array.from({ length: 6 }, (_, index) => candidate(`b${index + 1}`));
     const selected = a[0];
     const pack: LaunchPack = {
-      schemaVersion: 2, selectedConceptId: selected.id,
+      schemaVersion: 2, selectedConceptId: 'concept_a_01',
       kernel: { ...kernel, mechanismFingerprint: selected.mechanismFingerprint, rewardLoopFingerprint: selected.rewardLoopFingerprint, conflictEconomyFingerprint: selected.conflictEconomyFingerprint },
       arc: { ...arc, startChapter: 1 }, initialState,
       coverPrompt: 'Một làng biển Việt Nam cuối thập niên tám mươi lúc bình minh, thuyền gỗ và sân phơi cá, không chữ.',
@@ -2460,8 +2460,8 @@ describe('canonical Story Factory', () => {
     const openingSample = Array.from({ length: 650 }, (_, index) => (
       ['Hải', 'quan', 'sát', 'con', 'nước', 'rồi', 'chọn', 'việc', 'cần', 'làm'][index % 10]
     )).join(' ');
-    const simulations = [a[0], b[0]].map(item => ({
-      conceptId: item.id,
+    const simulations = ['concept_a_01', 'concept_b_01'].map(conceptId => ({
+      conceptId,
       openingSample,
       chapter2Direction: 'Gia đình cùng lao động và gặp giới hạn đầu tiên của nghề.',
       chapter3Direction: 'Mẻ hàng đầu tiên tạo lợi ích cụ thể và mở xung đột đầu ra.',
@@ -2482,9 +2482,10 @@ describe('canonical Story Factory', () => {
       ...identityKernel
     } = pack.kernel;
     const provider = new QueueProvider([
-      { candidates: a }, { candidates: b },
+      { candidates: a.map(({ id: _id, ...candidate }) => candidate) },
+      { candidates: b.map(({ id: _id, ...candidate }) => candidate) },
       'Nguồn kỹ thuật xác nhận dụng cụ thủ công khả thi nhưng yêu cầu vệ sinh, thời gian và chi phí thật.',
-      { selectedIds: [a[0].id, b[0].id], reasons: ['Cơ chế A rõ và dài hơi.', 'Cơ chế B có conflict economy tốt.'] },
+      { selectedIds: ['concept_a_01', 'concept_b_01'], reasons: ['Cơ chế A rõ và dài hơi.', 'Cơ chế B có conflict economy tốt.'] },
       { simulations },
       {
         selectedConceptId: pack.selectedConceptId,
@@ -2510,6 +2511,6 @@ describe('canonical Story Factory', () => {
     });
     expect(provider.calls).toHaveLength(9);
     expect(provider.calls).toEqual(['gen-a', 'gen-b', 'sim', 'judge', 'sim', 'launch', 'launch', 'launch', 'launch']);
-    expect(result.launchPack.selectedConceptId).toBe('a1');
+    expect(result.launchPack.selectedConceptId).toBe('concept_a_01');
   });
 });

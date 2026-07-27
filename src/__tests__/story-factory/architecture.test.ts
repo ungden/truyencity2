@@ -90,10 +90,11 @@ describe('Story Factory architecture boundary', () => {
     expect(routes).toContain("planJudge: 'gemini-2.5-pro'");
   });
 
-  test('Concept Generator receives the stable-ID rule that provider schemas cannot enforce', () => {
+  test('Concept Generator IDs are assigned by code instead of trusted to provider output', () => {
     const setup = readFileSync('src/services/story-factory/setup.ts', 'utf8');
-    expect(setup).toContain('Mỗi concept.id phải là stable ID ASCII chữ thường');
-    expect(setup).toContain('chỉ dùng a-z, 0-9, dấu gạch dưới hoặc gạch ngang');
+    expect(setup).toContain('Không tạo ID; code sẽ gán stable ID bất biến');
+    expect(setup).toContain('ConceptCandidateSchema.omit({ id: true })');
+    expect(setup).toContain('`concept_${generator.toLowerCase()}_${String(index + 1).padStart(2,');
     expect(setup).toContain('chỉ là một cụm phân loại tối đa 12 từ');
     expect(setup).not.toContain('600-900');
     expect(setup).not.toContain('min(1_200)');

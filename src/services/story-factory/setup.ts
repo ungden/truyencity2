@@ -55,6 +55,10 @@ export const ConceptCandidateSchema = z.object({
 }).strict();
 
 const ConceptBatchSchema = z.object({ candidates: z.array(ConceptCandidateSchema).length(6) }).strict();
+const ConceptCandidateWireSchema = ConceptCandidateSchema.omit({ id: true });
+const ConceptBatchWireSchema = z.object({
+  candidates: z.array(ConceptCandidateWireSchema).length(6),
+}).strict();
 const TopTwoSchema = z.object({
   selectedIds: z.array(z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/)).length(2),
   reasons: z.array(z.string().trim().min(10).max(800)).length(2),
@@ -317,7 +321,7 @@ function generatorPrompt(input: {
   return JSON.stringify({
     task: `Generator ${input.generator}: tạo đúng sáu concept khác nhau về cơ chế, reward loop và conflict economy.`,
     requirements: [
-      'Mỗi concept.id phải là stable ID ASCII chữ thường: bắt đầu bằng a-z, sau đó chỉ dùng a-z, 0-9, dấu gạch dưới hoặc gạch ngang; dài 2-64 ký tự.',
+      'Không tạo ID; code sẽ gán stable ID bất biến theo generator và vị trí.',
       'Cơ chế phải hoạt động trong ba chương đầu.',
       'Có vật liệu nhân quả để biến hóa ít nhất ba mươi chương.',
       'Có 8-15 arena/giai đoạn thực sự khác nhau để đi đến 800-1.200 chương; seriality1000 phải mô tả biến đổi macro, không đổi tên cùng một vòng lặp.',
@@ -348,25 +352,34 @@ export async function runConceptLab(input: {
   const usages: ProviderUsage[] = [];
   const checkpoint: SetupCheckpoint = structuredClone(input.resume ?? {});
 
+  const generateConceptBatch = async (generator: 'A' | 'B') => {
+    const generated = await setupStage(`Concept Generator ${generator}`, provider.json({
+      model: generator === 'A' ? input.routes.setupGeneratorA : input.routes.setupGeneratorB,
+      system: generator === 'A'
+        ? 'Bạn là Concept Generator độc lập. Chỉ dùng research làm tín hiệu thị trường, không sao chép tác phẩm hoặc tên riêng.'
+        : 'Bạn là Concept Generator độc lập. Chủ động tìm hướng khác Generator A có thể nghĩ tới; không sao chép tác phẩm hoặc tên riêng.',
+      prompt: generatorPrompt({ commission, research, generator }),
+      schema: ConceptBatchWireSchema,
+      temperature: 1,
+    }));
+    return {
+      value: ConceptBatchSchema.parse({
+        candidates: generated.value.candidates.map((candidate, index) => ({
+          id: `concept_${generator.toLowerCase()}_${String(index + 1).padStart(2, '0')}`,
+          ...candidate,
+        })),
+      }),
+      usage: generated.usage,
+    };
+  };
+
   const [a, b] = await Promise.all([
     checkpoint.generatorA
       ? Promise.resolve({ value: ConceptBatchSchema.parse(checkpoint.generatorA.value), usage: checkpoint.generatorA.usage })
-      : setupStage('Concept Generator A', provider.json({
-      model: input.routes.setupGeneratorA,
-      system: 'Bạn là Concept Generator độc lập. Chỉ dùng research làm tín hiệu thị trường, không sao chép tác phẩm hoặc tên riêng.',
-      prompt: generatorPrompt({ commission, research, generator: 'A' }),
-      schema: ConceptBatchSchema,
-      temperature: 1,
-    })),
+      : generateConceptBatch('A'),
     checkpoint.generatorB
       ? Promise.resolve({ value: ConceptBatchSchema.parse(checkpoint.generatorB.value), usage: checkpoint.generatorB.usage })
-      : setupStage('Concept Generator B', provider.json({
-      model: input.routes.setupGeneratorB,
-      system: 'Bạn là Concept Generator độc lập. Chủ động tìm hướng khác Generator A có thể nghĩ tới; không sao chép tác phẩm hoặc tên riêng.',
-      prompt: generatorPrompt({ commission, research, generator: 'B' }),
-      schema: ConceptBatchSchema,
-      temperature: 1,
-    })),
+      : generateConceptBatch('B'),
   ]);
   checkpoint.generatorA = a;
   checkpoint.generatorB = b;
