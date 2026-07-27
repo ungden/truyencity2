@@ -1893,6 +1893,26 @@ describe('canonical Story Factory', () => {
     expect(rolling.plans[0].requiredWorldRuleIds).toEqual([]);
   });
 
+  test('compiler derives a missing final-location delta from scene participation', () => {
+    const wire = plannerWire();
+    const chapter = JSON.parse(wire.chaptersJson[0]);
+    chapter.scenes[0] = {
+      ...chapter.scenes[0],
+      people: ['main', 'buyer'],
+      loc: 'beach',
+      travel: 20,
+    };
+    wire.chaptersJson[0] = JSON.stringify(chapter);
+    const rolling = materializePlannerRollingPlan(wire, initialState);
+    const locationDelta = rolling.plans[0].requiredDeltas.find(delta =>
+      delta.kind === 'location' && delta.characterId === 'main');
+    expect(locationDelta).toMatchObject({
+      beforeLocationId: 'home',
+      afterLocationId: 'beach',
+    });
+    expect(rolling.plans[0].scenes[0].requiredDeltaIds).toContain(locationDelta?.id);
+  });
+
   test('numeric before and after are derived sequentially from the ledger', () => {
     const wire = plannerWire();
     const chapter = JSON.parse(wire.chaptersJson[0]);

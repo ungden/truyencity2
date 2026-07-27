@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import {
   ArcPlanSchema,
@@ -120,7 +121,7 @@ const PLANNER_COMPACT_CONTRACT = {
     'Giữ goal/block/act ngắn và cơ học; chỉ đưa nhân vật, rule và delta thật sự cần cho chương.',
     'knowledge.after phải là fact ID đã tồn tại trong State. Nếu nhân vật học một fact mới, tạo fact delta khai báo fact đó trước knowledge delta trong cùng chương và gắn cả hai vào scene học biết.',
     'relationship.before phải bằng chính xác State.characters[characterId].relationshipState[counterpartId], hoặc null nếu pair chưa có entry; không suy ra quan hệ ban đầu từ role, agenda hay mô tả Kernel.',
-    'Nếu một nhân vật đổi location trong chương, tạo đúng một location delta từ vị trí đầu chương tới vị trí ở scene cuối của họ và gắn delta vào scene thực hiện lần di chuyển đầu tiên.',
+    'Chỉ cần khai báo đúng scene.people, scene.loc và scene.travel; compiler tự sinh location delta từ vị trí đầu chương tới scene cuối của từng nhân vật. Nếu tự khai báo location delta, nó vẫn phải khớp chính xác và không được trùng.',
   ],
 } as const;
 
@@ -133,7 +134,10 @@ export function materializePlannerRollingPlan(
   const resourceBalances = new Map(initialState.resources.flatMap(resource => (
     resource.kind === 'numeric' ? [[resource.resourceId, resource.value] as const] : []
   )));
-  return RollingPlanSchema.parse({
+  const characterLocations = new Map(initialState.characters.map(character => (
+    [character.characterId, character.locationId] as const
+  )));
+  const rolling = RollingPlanSchema.parse({
     schemaVersion: compact.v,
     startChapter: compact.start,
     plans: chapters.map(chapter => ({
@@ -206,6 +210,32 @@ export function materializePlannerRollingPlan(
       })),
     })),
   });
+  for (const plan of rolling.plans) {
+    for (const characterId of characterLocations.keys()) {
+      const beforeLocationId = characterLocations.get(characterId)!;
+      const appearances = plan.scenes.filter(scene => scene.participantIds.includes(characterId));
+      const afterLocationId = appearances.at(-1)?.locationId ?? beforeLocationId;
+      if (afterLocationId === beforeLocationId) continue;
+      const existing = plan.requiredDeltas.filter(delta =>
+        delta.kind === 'location' && delta.characterId === characterId);
+      if (existing.length === 0) {
+        const id = `loc_${plan.chapterNumber}_${createHash('sha256').update(characterId).digest('hex').slice(0, 12)}`;
+        plan.requiredDeltas.push({
+          id,
+          kind: 'location',
+          characterId,
+          beforeLocationId,
+          afterLocationId,
+        });
+        const firstMovement = appearances.find(scene => scene.locationId !== beforeLocationId);
+        if (firstMovement && !firstMovement.requiredDeltaIds.includes(id)) {
+          firstMovement.requiredDeltaIds.push(id);
+        }
+      }
+      characterLocations.set(characterId, afterLocationId);
+    }
+  }
+  return RollingPlanSchema.parse(rolling);
 }
 
 export const WindowReviewSchema = z.discriminatedUnion('status', [
