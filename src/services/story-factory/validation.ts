@@ -10,7 +10,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-12-sequential-scene-effects';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-13-scene-opening-support';
 
 export interface StateEvent {
   chapterNumber: number;
