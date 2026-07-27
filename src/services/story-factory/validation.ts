@@ -485,6 +485,13 @@ export function validateCausalMechanics(input: {
   }
 
   for (const scene of plan.scenes) {
+    // Support mechanics describe prerequisites for the scene's causal effects.
+    // They must therefore be checked against the scene-opening state, even when
+    // the model serializes the support use after the effect that consumes the
+    // prerequisite. Effect mechanics still use the live simulated ledger so
+    // chained production/consumption remains strictly sequential.
+    const sceneOpeningFacts = new Map(stateFacts);
+    const sceneOpeningResources = new Map(simulatedResources);
     for (const use of plan.mechanicUses.filter(item => item.sceneId === scene.id)) {
     try {
     const mechanic = mechanics.get(use.mechanicId);
@@ -549,7 +556,7 @@ export function validateCausalMechanics(input: {
         if (!suppliedFacts.has(condition.factId)) {
           fail(`Capability ${mechanic.id} does not cite required fact ${condition.factId}.`);
         }
-        const actual = stateFacts.get(condition.factId);
+        const actual = (use.role === 'support' ? sceneOpeningFacts : stateFacts).get(condition.factId);
         if (!preconditionMatches(actual, condition.expected)) {
           fail(`Capability ${mechanic.id} has a false required fact ${condition.factId}.`, {
             expected: condition.expected,
@@ -558,7 +565,7 @@ export function validateCausalMechanics(input: {
         }
       }
       for (const resourceId of mechanic.requiredResourceIds) {
-        const currentValue = simulatedResources.get(resourceId);
+        const currentValue = (use.role === 'support' ? sceneOpeningResources : simulatedResources).get(resourceId);
         if (currentValue === undefined
           || (typeof currentValue === 'number' && currentValue <= 0)
           || (typeof currentValue === 'string' && currentValue.trim().length === 0)) {

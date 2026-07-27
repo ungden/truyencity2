@@ -637,6 +637,97 @@ describe('canonical Story Factory', () => {
     expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
   });
 
+  test('validates support prerequisites from scene opening state when an earlier effect consumes them', () => {
+    const processingKernel = structuredClone(kernel);
+    processingKernel.resources.push(
+      { id: 'live_fish', name: 'Cá sống', kind: 'numeric', unit: 'con', minimum: 0 },
+      { id: 'processed_fish', name: 'Cá đã sơ chế', kind: 'numeric', unit: 'con', minimum: 0 },
+    );
+    processingKernel.worldMechanics.push(
+      {
+        id: 'process_fish',
+        name: 'Sơ chế cá',
+        kind: 'conversion',
+        description: 'Một con cá sống được chuyển thành một con cá đã sơ chế.',
+        inputsPerBatch: [{ resourceId: 'live_fish', amount: 1 }],
+        outputsPerBatch: [{ resourceId: 'processed_fish', amount: 1 }],
+        maximumBatchesPerUse: 1,
+      },
+      {
+        id: 'processing_skill',
+        name: 'Kỹ năng sơ chế',
+        kind: 'capability',
+        description: 'Hải có kỹ năng thao tác trên cá còn sống.',
+        allowedActorIds: ['main'],
+        requiredFacts: [],
+        requiredResourceIds: ['live_fish'],
+        effectResourceIds: [],
+        effectFactIds: [],
+        capacityUnit: null,
+        maximumUnitsPerMinute: null,
+      },
+    );
+    const processingState = structuredClone(initialState);
+    processingState.resources.push(
+      { resourceId: 'live_fish', kind: 'numeric', value: 1 },
+      { resourceId: 'processed_fish', kind: 'numeric', value: 0 },
+    );
+    const chapter = plan(1);
+    chapter.requiredDeltas = [
+      {
+        id: 'consume_live_fish',
+        kind: 'resource_numeric',
+        resourceId: 'live_fish',
+        before: 1,
+        delta: -1,
+        after: 0,
+        source: null,
+        sink: 'sơ chế',
+      },
+      {
+        id: 'produce_processed_fish',
+        kind: 'resource_numeric',
+        resourceId: 'processed_fish',
+        before: 0,
+        delta: 1,
+        after: 1,
+        source: 'sơ chế',
+        sink: null,
+      },
+    ];
+    chapter.scenes[0].requiredDeltaIds = ['consume_live_fish', 'produce_processed_fish'];
+    chapter.mechanicUses = [
+      {
+        id: 'conversion_first',
+        sceneId: 'scene_1',
+        mechanicId: 'process_fish',
+        role: 'effect',
+        actorId: 'main',
+        quantity: 1,
+        preconditionFactIds: [],
+        deltaIds: ['consume_live_fish', 'produce_processed_fish'],
+      },
+      {
+        id: 'support_serialized_second',
+        sceneId: 'scene_1',
+        mechanicId: 'processing_skill',
+        role: 'support',
+        actorId: 'main',
+        quantity: 1,
+        preconditionFactIds: [],
+        deltaIds: ['consume_live_fish', 'produce_processed_fish'],
+      },
+    ];
+
+    const result = applyChapterPlan({
+      kernel: processingKernel,
+      state: processingState,
+      plan: chapter,
+    });
+    expect(result.state.resources.find(item => item.resourceId === 'live_fish')).toMatchObject({ value: 0 });
+    expect(result.state.resources.find(item => item.resourceId === 'processed_fish')).toMatchObject({ value: 1 });
+  });
+
   test('support capability capacity includes its scene travel while effect capacity does not', () => {
     const travelKernel = structuredClone(kernel);
     const capability = travelKernel.worldMechanics.find(item => item.id === 'mechanic_trade');
