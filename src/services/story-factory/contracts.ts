@@ -508,6 +508,7 @@ export const ChapterPlanSchema = z.object({
     id: stableId,
     sceneId: stableId,
     mechanicId: stableId,
+    role: z.enum(['effect', 'support']).default('effect'),
     actorId: stableId,
     quantity: z.number().finite().min(0.000001).max(1_000_000),
     preconditionFactIds: z.array(stableId).max(20),

@@ -4,10 +4,10 @@ import { FACTORY_PROMPT_VERSION } from './prompts';
 import { DEFAULT_MODEL_ROUTES } from './routes';
 import { CAUSAL_VALIDATOR_VERSION } from './validation';
 
-export const FACTORY_CONTRACT_VERSION = 'story-factory-contracts-28-provider-visible-positive-bounds';
+export const FACTORY_CONTRACT_VERSION = 'story-factory-contracts-29-effect-support-mechanics';
 export const FACTORY_STATE_VERSION = 'story-factory-state-9-exact-id-continuity-packet';
 export const FACTORY_SETUP_VERSION = 'story-factory-setup-29-neutral-voice-with-address-terms';
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-27-code-derived-numeric-balances';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-28-effect-support-roles';
 export const FACTORY_CONTEXT_VERSION = 'story-factory-context-9-input-output-mechanics';
 export const FACTORY_MEMORY_POLICY_VERSION = 'story-factory-memory-4-exact-id-bounded-no-rag';
 const FACTORY_ENGINE_SETUP_COMPATIBILITY = FACTORY_SETUP_VERSION;

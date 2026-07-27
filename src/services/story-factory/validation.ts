@@ -10,7 +10,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-9-capability-effects';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-10-effect-support-ownership';
 
 export interface StateEvent {
   chapterNumber: number;
@@ -465,7 +465,7 @@ export function validateCausalMechanics(input: {
   const scenes = new Map(plan.scenes.map(item => [item.id, item]));
   const deltas = new Map(plan.requiredDeltas.map(item => [item.id, item]));
   const stateFacts = new Map(state.facts.map(item => [item.id, item.value]));
-  const usedDeltaIds = new Set<string>();
+  const effectDeltaIds = new Set<string>();
   const issues: Array<{
     mechanicUseId: string | null;
     message: string;
@@ -487,8 +487,10 @@ export function validateCausalMechanics(input: {
       if (!scene.requiredDeltaIds.includes(deltaId)) {
         fail(`Mechanic use ${use.id} references delta ${deltaId} outside scene ${scene.id}.`);
       }
-      if (usedDeltaIds.has(deltaId)) fail(`Delta ${deltaId} is claimed by more than one mechanic use.`);
-      usedDeltaIds.add(deltaId);
+      if (use.role === 'effect') {
+        if (effectDeltaIds.has(deltaId)) fail(`Delta ${deltaId} has more than one effect mechanic.`);
+        effectDeltaIds.add(deltaId);
+      }
     }
 
     const suppliedFacts = new Set(use.preconditionFactIds);
@@ -497,6 +499,7 @@ export function validateCausalMechanics(input: {
     }
 
     if (mechanic.kind === 'conversion') {
+      if (use.role !== 'effect') fail(`Conversion ${use.id} must be an effect mechanic.`);
       if (mechanic.maximumBatchesPerUse !== null && use.quantity > mechanic.maximumBatchesPerUse) {
         fail(`Mechanic use ${use.id} exceeds the conversion batch limit.`, {
           planned: use.quantity,
@@ -564,24 +567,27 @@ export function validateCausalMechanics(input: {
           });
         }
       }
-      for (const deltaId of use.deltaIds) {
-        const delta = deltas.get(deltaId)!;
-        if ((delta.kind === 'resource_numeric' || delta.kind === 'resource_state')
-          && !mechanic.effectResourceIds.includes(delta.resourceId)) {
-          fail(`Capability ${mechanic.id} cannot affect resource ${delta.resourceId}.`, {
-            allowedResourceIds: mechanic.effectResourceIds,
-          });
-        }
-        if (delta.kind === 'fact' && !mechanic.effectFactIds.includes(delta.factId)) {
-          fail(`Capability ${mechanic.id} cannot affect fact ${delta.factId}.`, {
-            allowedFactIds: mechanic.effectFactIds,
-          });
-        }
-        if (!['resource_numeric', 'resource_state', 'fact'].includes(delta.kind)) {
-          fail(`Capability ${mechanic.id} cannot claim ${delta.kind} delta ${delta.id}.`);
+      if (use.role === 'effect') {
+        for (const deltaId of use.deltaIds) {
+          const delta = deltas.get(deltaId)!;
+          if ((delta.kind === 'resource_numeric' || delta.kind === 'resource_state')
+            && !mechanic.effectResourceIds.includes(delta.resourceId)) {
+            fail(`Capability ${mechanic.id} cannot affect resource ${delta.resourceId}.`, {
+              allowedResourceIds: mechanic.effectResourceIds,
+            });
+          }
+          if (delta.kind === 'fact' && !mechanic.effectFactIds.includes(delta.factId)) {
+            fail(`Capability ${mechanic.id} cannot affect fact ${delta.factId}.`, {
+              allowedFactIds: mechanic.effectFactIds,
+            });
+          }
+          if (!['resource_numeric', 'resource_state', 'fact'].includes(delta.kind)) {
+            fail(`Capability ${mechanic.id} cannot own ${delta.kind} delta ${delta.id}.`);
+          }
         }
       }
     } else {
+      if (use.role !== 'support') fail(`Constraint ${use.id} must be a support mechanic.`);
       for (const condition of mechanic.requiredFacts) {
         if (!suppliedFacts.has(condition.factId)
           || !preconditionMatches(stateFacts.get(condition.factId), condition.expected)) {
@@ -603,7 +609,7 @@ export function validateCausalMechanics(input: {
   }
   const ungroundedResourceDeltas = plan.requiredDeltas
     .filter(delta => delta.kind === 'resource_numeric' || delta.kind === 'resource_state')
-    .filter(delta => !usedDeltaIds.has(delta.id));
+    .filter(delta => !effectDeltaIds.has(delta.id));
   if (ungroundedResourceDeltas.length) {
     issues.push({
       mechanicUseId: null,
@@ -625,7 +631,7 @@ export function validateCausalMechanics(input: {
               candidates.push({ mechanicId: mechanic.id, kind: mechanic.kind });
             }
           }
-          if (mechanic.kind === 'capability' && mechanic.requiredResourceIds.includes(delta.resourceId)) {
+          if (mechanic.kind === 'capability' && mechanic.effectResourceIds.includes(delta.resourceId)) {
             candidates.push({ mechanicId: mechanic.id, kind: mechanic.kind });
           }
           return candidates;
@@ -842,6 +848,7 @@ export function buildMechanicUseEvents(plan: ChapterPlan): StateEvent[] {
     after: {
       sceneId: use.sceneId,
       actorId: use.actorId,
+      role: use.role,
       quantity: use.quantity,
       deltaIds: use.deltaIds,
     },

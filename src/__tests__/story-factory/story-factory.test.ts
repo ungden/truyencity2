@@ -339,6 +339,7 @@ describe('canonical Story Factory', () => {
       id: 'use_trade',
       sceneId: 'scene_1',
       mechanicId: 'mechanic_trade',
+      role: 'effect',
       actorId: 'main',
       quantity: 1,
       preconditionFactIds: ['fact_day'],
@@ -573,6 +574,7 @@ describe('canonical Story Factory', () => {
         id: 'use_missing_fact',
         sceneId: 'scene_1',
         mechanicId: 'mechanic_trade',
+        role: 'effect',
         actorId: 'main',
         quantity: 1,
         preconditionFactIds: [],
@@ -582,6 +584,7 @@ describe('canonical Story Factory', () => {
         id: 'use_duplicate_claim',
         sceneId: 'scene_1',
         mechanicId: 'mechanic_daylight',
+        role: 'support',
         actorId: 'main',
         quantity: 1,
         preconditionFactIds: [],
@@ -600,6 +603,33 @@ describe('canonical Story Factory', () => {
         ],
       });
     }
+  });
+
+  test('allows support mechanics to guard the same delta without becoming duplicate effect owners', () => {
+    const chapter = plan(1);
+    chapter.mechanicUses = [
+      {
+        id: 'use_trade_effect',
+        sceneId: 'scene_1',
+        mechanicId: 'mechanic_trade',
+        role: 'effect',
+        actorId: 'main',
+        quantity: 1,
+        preconditionFactIds: ['fact_day'],
+        deltaIds: ['delta_1'],
+      },
+      {
+        id: 'use_daylight_support',
+        sceneId: 'scene_1',
+        mechanicId: 'mechanic_daylight',
+        role: 'support',
+        actorId: 'main',
+        quantity: 1,
+        preconditionFactIds: ['fact_day'],
+        deltaIds: ['delta_1'],
+      },
+    ];
+    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
   });
 
   test('capability cannot claim a resource outside its declared effects', () => {
@@ -623,6 +653,7 @@ describe('canonical Story Factory', () => {
       id: 'use_trade',
       sceneId: 'scene_1',
       mechanicId: 'mechanic_trade',
+      role: 'effect',
       actorId: 'main',
       quantity: 1,
       preconditionFactIds: ['fact_day'],
@@ -652,17 +683,17 @@ describe('canonical Story Factory', () => {
           }];
           samplePlan.mechanicUses = [{
             id: 'use_exchange', sceneId: 'scene_1', mechanicId: 'mechanic_exchange',
-            actorId: 'main', quantity: 10, preconditionFactIds: [], deltaIds: ['delta_money'],
+            role: 'effect', actorId: 'main', quantity: 10, preconditionFactIds: [], deltaIds: ['delta_money'],
           }];
         } else if (family === 1) {
           samplePlan.mechanicUses = [{
             id: `use_actor_${index}`, sceneId: 'scene_1', mechanicId: 'mechanic_trade',
-            actorId: 'mother', quantity: 1, preconditionFactIds: ['fact_day'], deltaIds: ['delta_1'],
+            role: 'effect', actorId: 'mother', quantity: 1, preconditionFactIds: ['fact_day'], deltaIds: ['delta_1'],
           }];
         } else if (family === 2) {
           samplePlan.mechanicUses = [{
             id: `use_capacity_${index}`, sceneId: 'scene_1', mechanicId: 'mechanic_trade',
-            actorId: 'main', quantity: 61 + index, preconditionFactIds: ['fact_day'], deltaIds: ['delta_1'],
+            role: 'effect', actorId: 'main', quantity: 61 + index, preconditionFactIds: ['fact_day'], deltaIds: ['delta_1'],
           }];
         } else if (family === 3) {
           sampleKernel.worldMechanics = sampleKernel.worldMechanics.map(mechanic => (
@@ -672,7 +703,7 @@ describe('canonical Story Factory', () => {
           ));
           samplePlan.mechanicUses = [{
             id: `use_constraint_${index}`, sceneId: 'scene_1', mechanicId: 'mechanic_daylight',
-            actorId: 'main', quantity: 1, preconditionFactIds: [], deltaIds: ['delta_1'],
+            role: 'support', actorId: 'main', quantity: 1, preconditionFactIds: [], deltaIds: ['delta_1'],
           }];
         } else if (family === 4) {
           samplePlan.scenes[0].requiredDeltaIds = ['unowned_money'];
@@ -685,7 +716,7 @@ describe('canonical Story Factory', () => {
         } else if (family === 6) {
           samplePlan.mechanicUses = [{
             id: `use_missing_knowledge_${index}`, sceneId: 'scene_1', mechanicId: 'mechanic_trade',
-            actorId: 'main', quantity: 1, preconditionFactIds: [], deltaIds: ['delta_1'],
+            role: 'effect', actorId: 'main', quantity: 1, preconditionFactIds: [], deltaIds: ['delta_1'],
           }];
         } else {
           samplePlan.scenes[0] = {
@@ -745,6 +776,7 @@ describe('canonical Story Factory', () => {
       id: 'use_trade',
       sceneId: 'scene_1',
       mechanicId: 'mechanic_trade',
+      role: 'effect',
       actorId: 'main',
       quantity: 1,
       preconditionFactIds: ['fact_day'],
@@ -1671,6 +1703,7 @@ describe('canonical Story Factory', () => {
       id: 'use_market',
       scene: 'scene_1',
       mechanic: 'mechanic_market',
+      role: 'effect',
       actor: 'main',
       qty: 1,
       facts: ['fact_day'],
@@ -1725,6 +1758,7 @@ describe('canonical Story Factory', () => {
       id: 'use_market',
       scene: 'scene_1',
       mechanic: 'mechanic_market',
+      role: 'effect',
       actor: 'main',
       qty: 1,
       facts: [],
@@ -1826,6 +1860,7 @@ describe('canonical Story Factory', () => {
       id: 'use_without_delta',
       scene: 'scene_1',
       mechanic: 'mechanic_market',
+      role: 'effect',
       actor: 'main',
       qty: 1,
       facts: [],
