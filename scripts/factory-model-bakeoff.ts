@@ -231,8 +231,15 @@ async function main() {
     };
   });
   const comparisonWriters = preliminary
-    .filter(summary => summary.criticalViolations === 0 && summary.maxCostUsd <= 0.5)
+    .filter(summary => (
+      summary.writer !== DEFAULT_MODEL_ROUTES.editor
+      && summary.criticalViolations === 0
+      && summary.maxCostUsd <= 0.5
+    ))
     .map(summary => summary.writer);
+  votes = votes.filter(vote => (
+    comparisonWriters.includes(vote.left) && comparisonWriters.includes(vote.right)
+  ));
 
   if (invalidBriefIds.length) {
     votes = [];
@@ -301,7 +308,11 @@ Không được xem plan/state, không suy đoán model và không thưởng che
 
   const summaries = writerModels.map(writer => {
     const results = generations.filter(result => result.writer === writer);
-    const routeVotes = votes.filter(vote => vote.left === writer || vote.right === writer);
+    const routeVotes = votes.filter(vote => (
+      comparisonWriters.includes(vote.left)
+      && comparisonWriters.includes(vote.right)
+      && (vote.left === writer || vote.right === writer)
+    ));
     const routeCosts = results.map(result => result.costUsd).sort((a, b) => a - b);
     let pairwiseMajorityWins = 0;
     let wantsNextMajorities = 0;
@@ -334,6 +345,8 @@ Không được xem plan/state, không suy đoán model và không thưởng che
     ? []
     : summaries
       .filter(summary => (
+        summary.writer !== DEFAULT_MODEL_ROUTES.editor
+        &&
         summary.criticalViolations === 0
         && summary.infraFailures === 0
         && summary.maxCostUsd <= 0.5
@@ -344,14 +357,18 @@ Không được xem plan/state, không suy đoán model và không thưởng che
         || b.wantsNextMajorities - a.wantsNextMajorities
         || a.medianCostUsd - b.medianCostUsd
       )).slice(0, 2).map(summary => summary.writer);
-  const discoveryQualified = summaries.filter(summary =>
-    topTwoWriters.includes(summary.writer)
-    && summary.publishRate === 1
-    && summary.firstPassRate >= 0.8
-    && summary.criticalViolations === 0
-    && summary.wantsNextMajorities >= Math.ceil(corpus.samples.length * 0.75)
-    && summary.medianCostUsd <= 0.25
-    && summary.maxCostUsd <= 0.5);
+  const discoveryQualified = topTwoWriters.flatMap(writer => {
+    const summary = summaries.find(candidate => candidate.writer === writer);
+    return summary
+      && summary.publishRate === 1
+      && summary.firstPassRate >= 0.8
+      && summary.criticalViolations === 0
+      && summary.wantsNextMajorities >= Math.ceil(corpus.samples.length * 0.75)
+      && summary.medianCostUsd <= 0.25
+      && summary.maxCostUsd <= 0.5
+      ? [summary]
+      : [];
+  });
   const campaignCostUsd = corpus.discoveryCostUsd
     + generations.reduce((sum, item) => sum + item.costUsd, 0)
     + votes.reduce((sum, item) => sum + item.costUsd, 0);
