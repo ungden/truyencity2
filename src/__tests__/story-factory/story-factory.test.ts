@@ -1983,6 +1983,7 @@ describe('canonical Story Factory', () => {
       compatibleSetupOnly: true,
     });
     expect(setupOnlyFromCompletedRelease.engineRelease).toBe('release_new');
+    expect(setupOnlyFromCompletedRelease.protocolVersion).toBe(STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL);
     expect(setupOnlyFromCompletedRelease.writerBriefs).toEqual([]);
     expect(setupOnlyFromCompletedRelease.plannedWindows).toEqual({});
     expect(setupOnlyFromCompletedRelease.buildCostUsd).toBe(0);
