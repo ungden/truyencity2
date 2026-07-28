@@ -69,7 +69,7 @@ export function prepareDiscoveryResume<T extends ResumableDiscoveryProgress>(inp
 } {
   const { progress } = input;
   const releaseMatches = progress.engineRelease === input.engineRelease;
-  if (progress.protocolVersion !== input.protocolVersion
+  if ((progress.protocolVersion !== input.protocolVersion && !input.compatibleSetupOnly)
     || (!releaseMatches && !input.compatibleSetupOnly)
     || !progress.route
     || typeof progress.route !== 'object'

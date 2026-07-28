@@ -1969,6 +1969,7 @@ describe('canonical Story Factory', () => {
     const setupOnlyFromCompletedRelease = prepareDiscoveryResume({
       progress: {
         ...progress,
+        protocolVersion: 'older-setup-compatible-protocol',
         failure: null,
         setupSuccesses: 4,
         planSuccesses: 4,
