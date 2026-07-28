@@ -55,6 +55,7 @@ type Generation = {
   initialAssessment: EditorAssessment | null;
   finalAssessment: EditorAssessment | null;
   error: string | null;
+  errorEvidence: unknown;
 };
 
 type Vote = {
@@ -160,6 +161,7 @@ async function main() {
           initialAssessment: result.attemptTelemetry.initialAssessment,
           finalAssessment: result.attemptTelemetry.finalAssessment,
           error: null,
+          errorEvidence: null,
         };
       } catch (error) {
         const typed = error && typeof error === 'object' && 'code' in error
@@ -181,6 +183,7 @@ async function main() {
             initialAssessment: telemetry?.initialAssessment ?? null,
             finalAssessment: telemetry?.finalAssessment ?? null,
             error: error instanceof Error ? error.message : String(error),
+            errorEvidence: typed && 'evidence' in typed ? (typed as { evidence?: unknown }).evidence ?? null : null,
           };
         }
         if (!telemetry?.usages?.length) throw error;
@@ -200,6 +203,7 @@ async function main() {
           initialAssessment: telemetry.initialAssessment ?? null,
           finalAssessment: telemetry.finalAssessment ?? null,
           error: error instanceof Error ? error.message : String(error),
+          errorEvidence: typed && 'evidence' in typed ? (typed as { evidence?: unknown }).evidence ?? null : null,
         };
       }
     }));

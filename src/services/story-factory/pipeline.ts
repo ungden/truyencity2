@@ -61,16 +61,15 @@ const editorReadingCategories = [
  * provider-safe finding envelope with all evidence fields required, then let
  * application validation splits the two taxonomies from `category`, rather
  * than trusting the model to keep a duplicate `kind` discriminator aligned.
- * `referenceId` is always a non-null stable token on the wire. Reading
- * findings use the reserved token `prose`; prompt leaks are deterministic
- * preflight findings and never model-authored.
+ * `referenceId` is always an allow-listed artifact token on the wire. Code
+ * ignores that structural placeholder for reading findings; prompt leaks are
+ * deterministic preflight findings and never model-authored.
  */
 const EditorWireFindingSchema = z.object({
   category: z.enum([...editorContinuityCategories, ...editorReadingCategories]),
   severity: z.enum(['critical', 'major', 'moderate']),
   scope: z.enum(['prose', 'plan', 'kernel']),
   evidence: z.string().trim().min(1).max(800),
-  conflictingEvidence: z.string().trim().min(1).max(800),
   referenceId: z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/),
   instruction: z.string().trim().min(5).max(800),
 }).strict();
@@ -97,7 +96,7 @@ function buildEditorWireAssessmentSchema(input: {
   return z.object({
     v: z.literal(3),
     findings: z.array(EditorWireFindingSchema.extend({
-      referenceId: exactStringSchema([...input.referenceIds, 'prose']),
+      referenceId: exactStringSchema(input.referenceIds),
     })).max(3),
     deltaChecks: z.array(EditorWireDeltaCheckSchema.extend({
       deltaId: exactStringSchema(input.deltaIds),
@@ -132,7 +131,7 @@ export function materializeEditorAssessment(value: unknown): EditorAssessment {
       severity: finding.severity,
       scope: finding.scope,
       currentEvidence: finding.evidence,
-      conflictingEvidence: finding.conflictingEvidence,
+      conflictingEvidence: finding.referenceId,
       referenceId: finding.referenceId,
       instruction: finding.instruction,
     }));
@@ -170,7 +169,6 @@ function injectDeterministicMissingDeltaFinding(
       severity: 'major',
       scope: 'prose',
       evidence,
-      conflictingEvidence: `Required delta ${failed[0].deltaId} has no realized prose evidence.`,
       referenceId: failed[0].deltaId,
       instruction: `Viết lại toàn chương để thực hiện rõ required delta ${failed[0].deltaId} qua hành động và hậu quả trong cảnh.`,
     }],
@@ -253,7 +251,7 @@ function editorPrompt(input: {
     draft: input.draft,
     deterministicIssues: input.deterministicIssues,
     audit: {
-      findings: 'Nếu có lỗi, trả 1-3 finding. category continuity dùng evidence nguyên văn từ draft và referenceId thuộc allowedArtifactReferenceIds. Category reading luôn scope=prose, evidence nguyên văn và referenceId=prose. Không tự báo prompt leak; deterministic preflight chịu trách nhiệm lỗi đó.',
+      findings: 'Nếu có lỗi, trả 1-3 finding. Category continuity dùng evidence nguyên văn từ draft và referenceId thuộc allowedArtifactReferenceIds; code tự lấy artifact evidence nên không được chép lại. Category reading luôn scope=prose, evidence nguyên văn; do provider cần một schema phẳng, hãy chọn phần tử đầu tiên của allowedArtifactReferenceIds cho referenceId (code sẽ bỏ qua anchor này ở reading issue). Không tự báo prompt leak; deterministic preflight chịu trách nhiệm lỗi đó.',
       allowedArtifactReferenceIds: [...collectStableIds({
         kernel: input.kernel,
         state: input.state,
@@ -412,7 +410,16 @@ function groundIssueEvidence(input: {
     if (issue.referenceId === null || !validIds.has(issue.referenceId)) {
       throw new StoryFactoryError('infra_blocked', `Editor ${issue.scope} issue does not reference a valid stable ID.`, issue);
     }
-    return issue;
+    const conflictingEvidence = canonicalArtifactEvidence({
+      referenceId: issue.referenceId,
+      kernel: input.kernel,
+      plan: input.plan,
+      state: input.state,
+    });
+    if (conflictingEvidence === null) {
+      throw new StoryFactoryError('infra_blocked', `Editor ${issue.scope} issue cannot resolve its stable artifact reference.`, issue);
+    }
+    return { ...issue, conflictingEvidence };
   });
   const readingIssues = input.assessment.readingIssues.map(issue => {
     const evidence = groundEvidenceSpan(input.draft.content, issue.evidence);
