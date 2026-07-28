@@ -2337,6 +2337,49 @@ describe('canonical Story Factory', () => {
     })).not.toThrow();
   });
 
+  test('compiler preserves separate input and recovered-output legs for one resource', () => {
+    const recoveryKernel: StoryKernel = structuredClone(kernel);
+    recoveryKernel.worldMechanics = [{
+      id: 'wash_salt',
+      name: 'Rửa vật liệu bằng muối',
+      kind: 'conversion',
+      description: 'Dùng năm đơn vị muối rồi thu hồi bốn phẩy năm đơn vị.',
+      inputsPerBatch: [{ resourceId: 'money', amount: 5 }],
+      outputsPerBatch: [{ resourceId: 'money', amount: 4.5 }],
+      maximumBatchesPerUse: 1,
+    }];
+    const wire = plannerWire();
+    wire.chapters[0].scenes[0].deltaIds = ['salt_in', 'salt_recovered'];
+    wire.chapters[0].deltas = [
+      {
+        id: 'salt_in', k: 'resource_numeric', target: 'money', counterpart: null,
+        before: null, change: -5, after: null, source: null, sink: 'bể rửa',
+      },
+      {
+        id: 'salt_recovered', k: 'resource_numeric', target: 'money', counterpart: null,
+        before: null, change: 4.5, after: null, source: 'thu hồi sau rửa', sink: null,
+      },
+    ];
+    wire.chapters[0].mechanics = [{
+      id: 'use_wash',
+      scene: 'scene_1',
+      mechanic: 'wash_salt',
+      role: 'effect',
+      actor: 'main',
+      qty: 1,
+      facts: [],
+      primaryDeltaId: 'salt_in',
+      additionalDeltaIds: ['salt_recovered'],
+    }];
+    const rolling = materializePlannerRollingPlan(wire, initialState, recoveryKernel);
+    expect(rolling.plans[0].mechanicUses[0].deltaIds).toEqual(['salt_in', 'salt_recovered']);
+    expect(() => applyChapterPlan({
+      kernel: recoveryKernel,
+      state: initialState,
+      plan: rolling.plans[0],
+    })).not.toThrow();
+  });
+
   test('compiler separates chained conversion output and input in the same scene', () => {
     const chainedKernel: StoryKernel = structuredClone(kernel);
     chainedKernel.resources.push(

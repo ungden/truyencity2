@@ -139,6 +139,24 @@ const PLANNER_COMPACT_CONTRACT = {
   ],
 } as const;
 
+function signedConversionVector(
+  mechanic: Extract<StoryKernel['worldMechanics'][number], { kind: 'conversion' }>,
+): Array<{ resourceId: string; amount: number }> {
+  const signed = new Map<string, { resourceId: string; amount: number }>();
+  const add = (resourceId: string, amount: number) => {
+    const direction = amount < 0 ? 'input' : 'output';
+    const key = `${resourceId}\u0000${direction}`;
+    const previous = signed.get(key);
+    signed.set(key, {
+      resourceId,
+      amount: (previous?.amount ?? 0) + amount,
+    });
+  };
+  mechanic.inputsPerBatch.forEach(item => add(item.resourceId, -item.amount));
+  mechanic.outputsPerBatch.forEach(item => add(item.resourceId, item.amount));
+  return [...signed.values()].filter(item => Math.abs(item.amount) > 1e-9);
+}
+
 function deriveEffectOwnership(
   chapter: z.infer<typeof PlannerCompactChapterSchema>,
   kernel: StoryKernel | undefined,
@@ -159,18 +177,19 @@ function deriveEffectOwnership(
     const sceneDeltaIds = new Set(
       chapter.scenes.find(scene => scene.id === use.scene)?.deltaIds ?? [],
     );
-    const expected = new Map<string, number>();
-    const addExpected = (resourceId: string, amount: number) => {
-      expected.set(resourceId, (expected.get(resourceId) ?? 0) + amount);
-    };
-    mechanic.inputsPerBatch.forEach(item => addExpected(item.resourceId, -item.amount * use.qty));
-    mechanic.outputsPerBatch.forEach(item => addExpected(item.resourceId, item.amount * use.qty));
+    const signedExpected = signedConversionVector(mechanic).map(item => ({
+      resourceId: item.resourceId,
+      amount: item.amount * use.qty,
+    }));
+    const netExpected = new Map<string, number>();
+    for (const leg of signedExpected) {
+      netExpected.set(leg.resourceId, (netExpected.get(leg.resourceId) ?? 0) + leg.amount);
+    }
     const preferred = new Map(
       [use.primaryDeltaId, ...use.additionalDeltaIds].map((deltaId, index) => [deltaId, index]),
     );
     const owned: string[] = [];
-    for (const [resourceId, amount] of expected) {
-      if (Math.abs(amount) <= 1e-9) continue;
+    for (const resourceId of new Set(signedExpected.map(item => item.resourceId))) {
       const candidates = chapter.deltas
         .filter(delta => (
           !claimed.has(delta.id)
@@ -178,26 +197,40 @@ function deriveEffectOwnership(
           && delta.k === 'resource_numeric'
           && delta.target === resourceId
           && delta.change !== null
-          && Math.sign(delta.change) === Math.sign(amount)
         ))
         .sort((left, right) => (
           (preferred.get(left.id) ?? Number.MAX_SAFE_INTEGER)
           - (preferred.get(right.id) ?? Number.MAX_SAFE_INTEGER)
           || (chapterDeltaOrder.get(left.id) ?? 0) - (chapterDeltaOrder.get(right.id) ?? 0)
         ));
-      const exact = candidates.find(delta => Math.abs((delta.change ?? 0) - amount) <= 1e-9);
-      if (exact) {
-        owned.push(exact.id);
-        claimed.add(exact.id);
+      const netAmount = netExpected.get(resourceId) ?? 0;
+      const exactNet = Math.abs(netAmount) <= 1e-9
+        ? undefined
+        : candidates.find(delta => Math.abs((delta.change ?? 0) - netAmount) <= 1e-9);
+      if (exactNet) {
+        owned.push(exactNet.id);
+        claimed.add(exactNet.id);
         continue;
       }
-      let accumulated = 0;
-      for (const candidate of candidates) {
-        owned.push(candidate.id);
-        claimed.add(candidate.id);
-        accumulated += candidate.change ?? 0;
-        if (Math.abs(accumulated - amount) <= 1e-9
-          || Math.abs(accumulated) >= Math.abs(amount)) break;
+      for (const { amount } of signedExpected.filter(item => item.resourceId === resourceId)) {
+        const directional = candidates.filter(delta => (
+          !claimed.has(delta.id)
+          && Math.sign(delta.change ?? 0) === Math.sign(amount)
+        ));
+        const exact = directional.find(delta => Math.abs((delta.change ?? 0) - amount) <= 1e-9);
+        if (exact) {
+          owned.push(exact.id);
+          claimed.add(exact.id);
+          continue;
+        }
+        let accumulated = 0;
+        for (const candidate of directional) {
+          owned.push(candidate.id);
+          claimed.add(candidate.id);
+          accumulated += candidate.change ?? 0;
+          if (Math.abs(accumulated - amount) <= 1e-9
+            || Math.abs(accumulated) >= Math.abs(amount)) break;
+        }
       }
     }
     ownership.set(use.id, owned);
@@ -270,15 +303,13 @@ function inferExactConversionUses(
       const sceneDeltaIds = new Set(scene.deltaIds);
       const available = unclaimed.filter(delta => sceneDeltaIds.has(delta.id));
       for (const mechanic of conversions) {
-        const perBatch = new Map<string, number>();
-        const add = (resourceId: string, amount: number) => {
-          perBatch.set(resourceId, (perBatch.get(resourceId) ?? 0) + amount);
-        };
-        mechanic.inputsPerBatch.forEach(item => add(item.resourceId, -item.amount));
-        mechanic.outputsPerBatch.forEach(item => add(item.resourceId, item.amount));
+        const perBatch = signedConversionVector(mechanic);
         const quantities = new Set<number>();
         for (const delta of available) {
-          const unit = perBatch.get(delta.target);
+          const unit = perBatch.find(item => (
+            item.resourceId === delta.target
+            && Math.sign(item.amount) === Math.sign(delta.change ?? 0)
+          ))?.amount;
           if (!unit || Math.sign(unit) !== Math.sign(delta.change ?? 0)) continue;
           const quantity = (delta.change ?? 0) / unit;
           if (quantity > 0 && Number.isFinite(quantity)) quantities.add(quantity);
@@ -288,7 +319,7 @@ function inferExactConversionUses(
             && quantity > mechanic.maximumBatchesPerUse + 1e-9) continue;
           const matched: string[] = [];
           let complete = true;
-          for (const [resourceId, unit] of perBatch) {
+          for (const { resourceId, amount: unit } of perBatch) {
             const expected = unit * quantity;
             if (Math.abs(expected) <= 1e-9) continue;
             const exact = available.filter(delta => (
