@@ -83,6 +83,25 @@ const OpeningSimulationSchema = z.object({
   }).strict()).length(2),
 }).strict();
 
+function exactIdSchema(ids: string[]) {
+  if (!ids.length) throw new StoryFactoryError('setup_blocked', 'A setup stage has no valid IDs to constrain.');
+  return z.enum(ids as [string, ...string[]]);
+}
+
+function topTwoSchemaFor(candidateIds: string[]) {
+  return TopTwoSchema.extend({
+    selectedIds: z.array(exactIdSchema(candidateIds)).length(2),
+  }).strict();
+}
+
+function openingSimulationSchemaFor(conceptIds: string[]) {
+  return OpeningSimulationSchema.extend({
+    simulations: z.array(OpeningSimulationSchema.shape.simulations.element.extend({
+      conceptId: exactIdSchema(conceptIds),
+    }).strict()).length(2),
+  }).strict();
+}
+
 export interface PortfolioSignature {
   mechanismFingerprint: string;
   rewardLoopFingerprint: string;
@@ -461,6 +480,7 @@ export async function runConceptLab(input: {
   if (new Set(candidates.map(candidate => candidate.id)).size !== 12) {
     throw new StoryFactoryError('setup_blocked', 'Concept generators returned duplicate candidate IDs.');
   }
+  const rankingSchema = topTwoSchemaFor(candidates.map(candidate => candidate.id));
 
   const domainResearch = checkpoint.domainResearch
     ? { value: z.string().min(20).parse(checkpoint.domainResearch.value), usage: checkpoint.domainResearch.usage }
@@ -477,7 +497,7 @@ export async function runConceptLab(input: {
   usages.push(domainResearch.usage);
 
   const ranking = checkpoint.ranking && input.resume?.domainResearch
-    ? { value: TopTwoSchema.parse(checkpoint.ranking.value), usage: checkpoint.ranking.usage }
+    ? { value: rankingSchema.parse(checkpoint.ranking.value), usage: checkpoint.ranking.usage }
     : await setupStage('Blind Concept Judge', provider.json({
     model: input.routes.setupJudge,
     system: `Bạn là Blind Concept Judge. Chọn theo sức hút, nhân quả thế giới và khả năng serial; không biết model nào tạo concept.
@@ -488,7 +508,7 @@ Grounded Domain Research là ràng buộc: không chọn concept dựa trên cla
       groundedDomainResearch: domainResearch.value,
       candidates,
     }),
-    schema: TopTwoSchema,
+    schema: rankingSchema,
     temperature: 0.5,
   }));
   checkpoint.ranking = ranking;
@@ -498,9 +518,10 @@ Grounded Domain Research là ràng buộc: không chọn concept dựa trên cla
   if (top.some(candidate => !candidate) || new Set(ranking.value.selectedIds).size !== 2) {
     throw new StoryFactoryError('setup_blocked', 'Concept Judge selected invalid candidates.');
   }
+  const simulationSchema = openingSimulationSchemaFor(ranking.value.selectedIds);
 
   const simulation = checkpoint.simulation && input.resume?.domainResearch
-    ? { value: OpeningSimulationSchema.parse(checkpoint.simulation.value), usage: checkpoint.simulation.usage }
+    ? { value: simulationSchema.parse(checkpoint.simulation.value), usage: checkpoint.simulation.usage }
     : await setupStage('Opening Simulator', provider.json({
     model: input.routes.openingSimulator,
     system: `Bạn là Opening Simulator độc lập và không thay đổi concept.
@@ -515,7 +536,7 @@ Sau sample, mô tả ngắn hướng chương 2 và 3, chemistry nhân vật, ag
       groundedDomainResearch: domainResearch.value,
       concepts: top,
     }),
-    schema: OpeningSimulationSchema,
+    schema: simulationSchema,
     temperature: 0.8,
   }));
   checkpoint.simulation = simulation;
@@ -528,6 +549,12 @@ Sau sample, mô tả ngắn hướng chương 2 và 3, chemistry nhân vật, ag
   if (!simulation.value.simulations.some(item => item.domainFeasibility === 'pass' && item.longRunFeasibility === 'pass')) {
     throw new StoryFactoryError('setup_blocked', 'Opening Simulator rejected both concepts on domain causality or long-run seriality.', simulation.value.simulations);
   }
+  const launchableConceptIds = simulation.value.simulations
+    .filter(item => item.domainFeasibility === 'pass' && item.longRunFeasibility === 'pass')
+    .map(item => item.conceptId);
+  const launchIdentityWireSchema = LaunchIdentityWireSchema.extend({
+    selectedConceptId: exactIdSchema(launchableConceptIds),
+  }).strict();
 
   let launchIdentity: { value: z.infer<typeof LaunchIdentitySchema>; usage: ProviderUsage };
   if (checkpoint.launchIdentity) {
@@ -552,7 +579,7 @@ Chỉ được chọn concept có domainFeasibility=pass và longRunFeasibility=
         concepts: top,
         openingSimulations: simulation.value.simulations,
       }),
-      schema: LaunchIdentityWireSchema,
+      schema: launchIdentityWireSchema,
       schemaComplexity: 'omit_large_array_max',
       temperature: 0.3,
     }));

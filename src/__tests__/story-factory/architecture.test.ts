@@ -104,7 +104,9 @@ describe('Story Factory architecture boundary', () => {
     expect(setup).toContain('Không kéo dài để đạt số từ');
     expect(setup).toContain('Mọi longPromises.promiseId');
     expect(setup).toContain('phải tham chiếu ID trong promises');
-    expect(setup).toContain('schema: LaunchIdentityWireSchema');
+    expect(setup).toContain('schema: rankingSchema');
+    expect(setup).toContain('schema: simulationSchema');
+    expect(setup).toContain('schema: launchIdentityWireSchema');
     expect(setup).toContain("role: z.literal('opposition')");
     expect(setup).toContain('sentenceRhythm chỉ mô tả độ dài, nhịp và cấu trúc câu');
     expect(setup.indexOf('assertVoiceSemantics(launchIdentity.value.kernel.characters)'))
