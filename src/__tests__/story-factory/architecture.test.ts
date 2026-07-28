@@ -95,6 +95,9 @@ describe('Story Factory architecture boundary', () => {
     expect(setup).toContain('Không tạo ID; code sẽ gán stable ID bất biến');
     expect(setup).toContain('ConceptCandidateSchema.omit({ id: true })');
     expect(setup).toContain('`concept_${generator.toLowerCase()}_${String(index + 1).padStart(2,');
+    expect(setup).toContain('const LaunchCharacterWireSchema = StoryCharacterSchema.omit({ id: true })');
+    expect(setup).toContain("id: 'character_protagonist_01'");
+    expect(setup).toContain('`character_opposition_${String(index + 1).padStart(2,');
     expect(setup).toContain('chỉ là một cụm phân loại tối đa 12 từ');
     expect(setup).not.toContain('600-900');
     expect(setup).not.toContain('min(1_200)');

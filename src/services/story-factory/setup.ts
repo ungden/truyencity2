@@ -133,18 +133,32 @@ const LaunchIdentitySchema = z.object({
     characters: StoryKernelObjectSchema.shape.characters,
   }),
 }).strict();
+const LaunchCharacterWireSchema = StoryCharacterSchema.omit({ id: true });
 const LaunchIdentityWireSchema = z.object({
   selectedConceptId: z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/),
   coverPrompt: z.string().trim().min(20).max(2_000),
   kernel: LaunchIdentityKernelSchema,
-  protagonist: StoryCharacterSchema.extend({ role: z.literal('protagonist') }).strict(),
+  protagonist: LaunchCharacterWireSchema.extend({ role: z.literal('protagonist') }).strict(),
   oppositionCharacters: z.array(
-    StoryCharacterSchema.extend({ role: z.literal('opposition') }).strict(),
+    LaunchCharacterWireSchema.extend({ role: z.literal('opposition') }).strict(),
   ).min(1).max(20),
   supportingCharacters: z.array(
-    StoryCharacterSchema.extend({ role: z.literal('supporting') }).strict(),
+    LaunchCharacterWireSchema.extend({ role: z.literal('supporting') }).strict(),
   ).min(1).max(40),
 }).strict();
+
+function materializeLaunchCharacters(value: z.infer<typeof LaunchIdentityWireSchema>) {
+  const protagonist = { ...value.protagonist, id: 'character_protagonist_01' };
+  const oppositionCharacters = value.oppositionCharacters.map((character, index) => ({
+    ...character,
+    id: `character_opposition_${String(index + 1).padStart(2, '0')}`,
+  }));
+  const supportingCharacters = value.supportingCharacters.map((character, index) => ({
+    ...character,
+    id: `character_supporting_${String(index + 1).padStart(2, '0')}`,
+  }));
+  return { protagonist, oppositionCharacters, supportingCharacters };
+}
 const LaunchWorldSchema = z.object({
   kernel: StoryKernelObjectSchema.pick({
     worldModel: true,
@@ -479,6 +493,7 @@ Chọn dựa trên chất lượng actual opening sample, chemistry nhân vật,
 VoiceContract chỉ được dùng thuộc tính trung tính register, sentenceRhythm, directness, addressRules, vocabulary, reasoningStyle, emotionDisplay và humorStyle. Không chứa câu thoại, cử chỉ, phản ứng mẫu, stressResponse hoặc avoidances.
 sentenceRhythm chỉ mô tả độ dài, nhịp và cấu trúc câu; không mô tả âm lượng, động tác phát ngôn hoặc thói quen như cười, nhếch, quát, gằn giọng, lẩm bẩm.
 Xuất đúng một protagonist, ít nhất một opposition có agenda độc lập thật sự và ít nhất một supporting character. Không dùng supporting character làm đối thủ giả.
+Không tạo ID cho nhân vật; code sẽ gán stable ID bất biến theo vai trò và thứ tự.
 Chỉ được chọn concept có domainFeasibility=pass và longRunFeasibility=pass. Giữ nguyên ba fingerprint của concept được chọn.`,
       prompt: JSON.stringify({
         task: 'Chọn concept và xuất identity, cast phân vai bắt buộc, voice, pleasure loop cùng cover art prompt.',
@@ -491,17 +506,18 @@ Chỉ được chọn concept có domainFeasibility=pass và longRunFeasibility=
       schemaComplexity: 'omit_large_array_max',
       temperature: 0.3,
     }));
+    const characters = materializeLaunchCharacters(launchIdentityWire.value);
     launchIdentity = {
       value: LaunchIdentitySchema.parse({
         selectedConceptId: launchIdentityWire.value.selectedConceptId,
         coverPrompt: launchIdentityWire.value.coverPrompt,
         kernel: {
           ...launchIdentityWire.value.kernel,
-          protagonistId: launchIdentityWire.value.protagonist.id,
+          protagonistId: characters.protagonist.id,
           characters: [
-            launchIdentityWire.value.protagonist,
-            ...launchIdentityWire.value.oppositionCharacters,
-            ...launchIdentityWire.value.supportingCharacters,
+            characters.protagonist,
+            ...characters.oppositionCharacters,
+            ...characters.supportingCharacters,
           ],
         },
       }),

@@ -2621,6 +2621,33 @@ describe('canonical Story Factory', () => {
       progressionTracks, seriesSpine, longPromises, promises, endingDirection,
       ...identityKernel
     } = pack.kernel;
+    const characterIdMap: Record<string, string> = {
+      main: 'character_protagonist_01',
+      buyer: 'character_opposition_01',
+      mother: 'character_supporting_01',
+    };
+    const launchWorldMechanics = worldMechanics.map(mechanic => (
+      mechanic.kind === 'capability'
+        ? {
+            ...mechanic,
+            allowedActorIds: mechanic.allowedActorIds.map(id => characterIdMap[id] ?? id),
+          }
+        : mechanic
+    ));
+    const launchArc = {
+      ...pack.arc,
+      activeCharacterIds: pack.arc.activeCharacterIds.map(id => characterIdMap[id] ?? id),
+    };
+    const launchState = {
+      ...pack.initialState,
+      characters: pack.initialState.characters.map(character => ({
+        ...character,
+        characterId: characterIdMap[character.characterId] ?? character.characterId,
+        relationshipState: Object.fromEntries(Object.entries(character.relationshipState).map(
+          ([id, state]) => [characterIdMap[id] ?? id, state],
+        )),
+      })),
+    };
     const provider = new QueueProvider([
       { candidates: a.map(({ id: _id, ...candidate }) => candidate) },
       { candidates: b.map(({ id: _id, ...candidate }) => candidate) },
@@ -2631,18 +2658,24 @@ describe('canonical Story Factory', () => {
         selectedConceptId: pack.selectedConceptId,
         coverPrompt: pack.coverPrompt,
         kernel: (({ protagonistId: _protagonistId, characters: _characters, ...rest }) => rest)(identityKernel),
-        protagonist: identityKernel.characters.find(character => character.id === identityKernel.protagonistId),
-        oppositionCharacters: identityKernel.characters.filter(character => character.role === 'opposition'),
-        supportingCharacters: identityKernel.characters.filter(character => character.role === 'supporting'),
+        protagonist: (({ id: _id, ...character }) => character)(
+          identityKernel.characters.find(character => character.id === identityKernel.protagonistId)!,
+        ),
+        oppositionCharacters: identityKernel.characters
+          .filter(character => character.role === 'opposition')
+          .map(({ id: _id, ...character }) => character),
+        supportingCharacters: identityKernel.characters
+          .filter(character => character.role === 'supporting')
+          .map(({ id: _id, ...character }) => character),
       },
       {
         kernel: { worldModel, worldRules, locations, travelRules, resources },
-        conversions: worldMechanics.filter(mechanic => mechanic.kind === 'conversion'),
-        capabilities: worldMechanics.filter(mechanic => mechanic.kind === 'capability'),
-        constraints: worldMechanics.filter(mechanic => mechanic.kind === 'constraint'),
+        conversions: launchWorldMechanics.filter(mechanic => mechanic.kind === 'conversion'),
+        capabilities: launchWorldMechanics.filter(mechanic => mechanic.kind === 'capability'),
+        constraints: launchWorldMechanics.filter(mechanic => mechanic.kind === 'constraint'),
       },
       { kernel: { progressionTracks, seriesSpine, longPromises, promises, endingDirection } },
-      { arc: pack.arc, initialState: pack.initialState },
+      { arc: launchArc, initialState: launchState },
     ]);
     const result = await runConceptLab({
       commission: { slotKey: 'canary-01', genreLane: 'do-thi-nien-dai', audience: 'Độc giả nam nhưng nữ cũng đọc được.', tone: 'Khoái hoạt, chủ động và đời sống ấm.', settingBoundary: 'Việt Nam hư cấu, nghề nghiệp dựa trên thực tế.' },
@@ -2652,5 +2685,11 @@ describe('canonical Story Factory', () => {
     expect(provider.calls).toHaveLength(9);
     expect(provider.calls).toEqual(['gen-a', 'gen-b', 'sim', 'judge', 'sim', 'launch', 'launch', 'launch', 'launch']);
     expect(result.launchPack.selectedConceptId).toBe('concept_a_01');
+    expect(result.launchPack.kernel.protagonistId).toBe('character_protagonist_01');
+    expect(result.launchPack.kernel.characters.map(character => character.id)).toEqual([
+      'character_protagonist_01',
+      'character_opposition_01',
+      'character_supporting_01',
+    ]);
   });
 });
