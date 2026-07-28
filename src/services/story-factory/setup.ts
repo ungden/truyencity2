@@ -309,7 +309,7 @@ function assertIdentityOpposition(kernel: Pick<LaunchPack['kernel'], 'protagonis
 }
 
 export function assertVoiceSemantics(characters: LaunchPack['kernel']['characters']): void {
-  const cannedGesture = /\n|^[—-]\s|\b(?:cười|nhếch|quát|gằn|lẩm bẩm|nói rằng|ánh mắt)\b/iu;
+  const cannedGesture = /\n|^[—-]\s|(?<!\p{L})(?:cười|nhếch|quát\s+(?:lên|rằng|mắng|thẳng)|gằn\s+(?:giọng|từng)|lẩm bẩm|nói rằng|ánh mắt)(?!\p{L})/iu;
   const containsQuotedSentence = (value: string): boolean => {
     const quotedSegments = [
       ...value.matchAll(/"([^"\n]*)"/gu),
