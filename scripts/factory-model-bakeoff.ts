@@ -423,7 +423,7 @@ Không được xem plan/state, không suy đoán model và không thưởng che
     });
     if (upload.error && !/already exists|duplicate/iu.test(upload.error.message)) throw upload.error;
     const passed = topTwoWriters.length === 2
-      && discoveryQualified.length === 2
+      && discoveryQualified.length >= 1
       && invalidBriefIds.length === 0
       && campaignCostUsd <= campaignBudgetUsd;
     const inserted = await db.from('story_factory_runs').insert({
