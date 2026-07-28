@@ -1121,6 +1121,12 @@ describe('canonical Story Factory', () => {
     expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
   });
 
+  test('does not treat an internal cash hand-off as a net resource transaction', () => {
+    const chapter = plan(1);
+    chapter.scenes[0].action = 'Hải thuyết phục mẹ và nhận tiền để đi mua phế liệu.';
+    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
+  });
+
   test('does not book a transaction when a scene only agrees future wholesale terms', () => {
     const chapter = plan(1);
     chapter.scenes[0].action = 'Dì Ba kiểm tra tận mắt, ngạc nhiên vì cá quá tươi, đồng ý mua sỉ với giá 5.500đ/kg.';

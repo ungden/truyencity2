@@ -10,7 +10,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-17-directed-resource-effects';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-18-net-resource-transactions';
 
 export interface StateEvent {
   chapterNumber: number;
@@ -447,7 +447,11 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
     }
     const sceneDeltas = scene.requiredDeltaIds.map(deltaId => plan.requiredDeltas.find(delta => delta.id === deltaId)!);
     const realizedAction = stripProhibitedTransactions(stripFutureIntent(scene.action));
-    if (hasVietnameseTerm(realizedAction, String.raw`mua|bán|thu mua|trả tiền|chi tiền|thu tiền|nhận tiền|kiếm tiền`)
+    // The ledger tracks the story resource's net balance, not which character
+    // is physically holding it. "Nhận tiền" by itself can therefore be an
+    // internal hand-off with no balance change. External acquisition/payment
+    // remains covered by the unambiguous transaction verbs below.
+    if (hasVietnameseTerm(realizedAction, String.raw`mua|bán|thu mua|trả tiền|chi tiền|thu tiền|kiếm tiền`)
       && !sceneDeltas.some(delta => delta.kind === 'resource_numeric')) {
       fail(`Scene ${scene.id} describes a transaction without a numeric resource delta.`, scene.action);
     }
