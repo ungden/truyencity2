@@ -131,6 +131,7 @@ const PLANNER_COMPACT_CONTRACT = {
 export function materializePlannerRollingPlan(
   value: z.infer<typeof PlannerRollingPlanResponseSchema>,
   initialState: StoryState,
+  kernel?: StoryKernel,
 ): RollingPlan {
   const compact = PlannerRollingPlanResponseSchema.parse(value);
   const chapters = compact.chapters;
@@ -246,16 +247,26 @@ export function materializePlannerRollingPlan(
         }
         return { id: delta.id, kind: delta.k, promiseId: delta.target, before, after: delta.after };
       }),
-      mechanicUses: chapter.mechanics.map(use => ({
-        id: use.id,
-        sceneId: use.scene,
-        mechanicId: use.mechanic,
-        role: use.role,
-        actorId: use.actor,
-        quantity: use.qty,
-        preconditionFactIds: use.facts,
-        deltaIds: [use.primaryDeltaId, ...use.additionalDeltaIds],
-      })),
+      mechanicUses: chapter.mechanics.map(use => {
+        const mechanic = kernel?.worldMechanics.find(item => item.id === use.mechanic);
+        const declaredFacts = mechanic?.kind === 'capability' || mechanic?.kind === 'constraint'
+          ? mechanic.requiredFacts.map(condition => condition.factId)
+          : [];
+        return {
+          id: use.id,
+          sceneId: use.scene,
+          mechanicId: use.mechanic,
+          role: use.role,
+          actorId: use.actor,
+          quantity: use.qty,
+          // Required facts belong to the mechanic contract. The compiler carries
+          // them into the canonical plan instead of making the model duplicate
+          // IDs it already selected by mechanicId. Validation still checks the
+          // live sequential value, so this cannot make a false precondition true.
+          preconditionFactIds: [...new Set([...use.facts, ...declaredFacts])],
+          deltaIds: [use.primaryDeltaId, ...use.additionalDeltaIds],
+        };
+      }),
     })),
   });
   for (const plan of rolling.plans) {
@@ -593,7 +604,7 @@ export async function planRollingWindow(input: {
   };
 
   const materializeAndValidate = (value: z.infer<typeof PlannerRollingPlanResponseSchema>): RollingPlan => {
-    const parsed = materializePlannerRollingPlan(value, input.state);
+    const parsed = materializePlannerRollingPlan(value, input.state, input.kernel);
     if (input.requiredWindowSize && parsed.plans.length !== input.requiredWindowSize) {
       throw new StoryFactoryError('plan_blocked', 'Planner returned the wrong required window size.', {
         requiredWindowSize: input.requiredWindowSize,

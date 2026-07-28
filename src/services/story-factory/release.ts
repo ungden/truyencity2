@@ -4,7 +4,7 @@ import { FACTORY_PROMPT_VERSION } from './prompts';
 import { DEFAULT_MODEL_ROUTES } from './routes';
 import { CAUSAL_VALIDATOR_VERSION } from './validation';
 
-export const FACTORY_CONTRACT_VERSION = 'story-factory-contracts-30-direct-compact-chapters';
+export const FACTORY_CONTRACT_VERSION = 'story-factory-contracts-31-derived-mechanic-preconditions';
 export const FACTORY_STATE_VERSION = 'story-factory-state-9-exact-id-continuity-packet';
 export const FACTORY_SETUP_VERSION = 'story-factory-setup-35-provider-safe-audit-text';
 export const FACTORY_PLANNER_VERSION = 'story-factory-planner-39-earned-result-facts';

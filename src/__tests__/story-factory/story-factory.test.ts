@@ -2045,6 +2045,42 @@ describe('canonical Story Factory', () => {
     expect(rolling.plans[0].mechanicUses[0].deltaIds).toEqual(['delta_1']);
   });
 
+  test('compiler derives required mechanic facts while validator still checks their live value', () => {
+    const wire = plannerWire();
+    const chapter = structuredClone(wire.chapters[0]);
+    chapter.mechanics = [{
+      id: 'use_market',
+      scene: 'scene_1',
+      mechanic: 'mechanic_trade',
+      role: 'effect',
+      actor: 'main',
+      qty: 1,
+      facts: [],
+      primaryDeltaId: 'delta_1',
+      additionalDeltaIds: [],
+    }];
+    wire.chapters[0] = chapter;
+
+    const rolling = materializePlannerRollingPlan(wire, initialState, kernel);
+    expect(rolling.plans[0].mechanicUses[0].preconditionFactIds).toEqual(['fact_day']);
+    expect(() => applyChapterPlan({
+      kernel,
+      state: initialState,
+      plan: rolling.plans[0],
+    })).not.toThrow();
+
+    const falseState = structuredClone(initialState);
+    falseState.facts = falseState.facts.map(fact => (
+      fact.id === 'fact_day' ? { ...fact, value: 'sai_ngay' } : fact
+    ));
+    const falseRolling = materializePlannerRollingPlan(wire, falseState, kernel);
+    expect(() => applyChapterPlan({
+      kernel,
+      state: falseState,
+      plan: falseRolling.plans[0],
+    })).toThrow('Precondition fact:fact_day is false');
+  });
+
   test('fact before values are derived sequentially from State across a rolling window', () => {
     const first = structuredClone(plannerWire(1).chapters[0]);
     const second = structuredClone(plannerWire(2).chapters[0]);

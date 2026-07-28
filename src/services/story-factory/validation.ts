@@ -10,7 +10,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-15-transaction-negation';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-16-derived-preconditions';
 
 export interface StateEvent {
   chapterNumber: number;
