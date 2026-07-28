@@ -49,7 +49,7 @@ const editorContinuityCategories = [
   'canon', 'existence', 'event_order', 'timeline', 'location', 'travel',
   'resource', 'resource_provenance', 'knowledge', 'knowledge_leak',
   'relationship', 'authority', 'capability', 'world_rule', 'causality',
-  'promise', 'pov', 'required_delta', 'prompt_leak',
+  'promise', 'pov', 'required_delta',
 ] as const;
 const editorReadingCategories = [
   'expository_prose', 'tool_character', 'unnatural_dialogue', 'unearned_outcome',
@@ -59,13 +59,13 @@ const editorReadingCategories = [
 /**
  * Gemini 3.1 rejects top-level/nested anyOf in this response schema. Keep one
  * provider-safe finding envelope with all evidence fields required, then let
- * application validation split the two taxonomies. `referenceId` is always a
- * non-null stable token on the wire so continuity findings cannot silently
- * omit their artifact anchor. Reading findings use the reserved token `prose`;
- * prompt leak uses `prompt_leak`.
+ * application validation splits the two taxonomies from `category`, rather
+ * than trusting the model to keep a duplicate `kind` discriminator aligned.
+ * `referenceId` is always a non-null stable token on the wire. Reading
+ * findings use the reserved token `prose`; prompt leaks are deterministic
+ * preflight findings and never model-authored.
  */
 const EditorWireFindingSchema = z.object({
-  kind: z.enum(['continuity', 'reading']),
   category: z.enum([...editorContinuityCategories, ...editorReadingCategories]),
   severity: z.enum(['critical', 'major', 'moderate']),
   scope: z.enum(['prose', 'plan', 'kernel']),
@@ -82,6 +82,29 @@ export const EditorWireAssessmentSchema = z.object({
   deltaChecks: z.array(EditorWireDeltaCheckSchema).min(1).max(30),
   outcome: EditorWireOutcomeSchema.nullable(),
 }).strict();
+
+function exactStringSchema(values: string[]) {
+  const unique = [...new Set(values)].sort();
+  if (!unique.length) throw new Error('Cannot build an empty exact-string schema.');
+  if (unique.length === 1) return z.literal(unique[0]);
+  return z.enum(unique as [string, string, ...string[]]);
+}
+
+function buildEditorWireAssessmentSchema(input: {
+  referenceIds: string[];
+  deltaIds: string[];
+}) {
+  return z.object({
+    v: z.literal(3),
+    findings: z.array(EditorWireFindingSchema.extend({
+      referenceId: exactStringSchema([...input.referenceIds, 'prose']),
+    })).max(3),
+    deltaChecks: z.array(EditorWireDeltaCheckSchema.extend({
+      deltaId: exactStringSchema(input.deltaIds),
+    })).length(input.deltaIds.length),
+    outcome: EditorWireOutcomeSchema.nullable(),
+  }).strict();
+}
 
 export function materializeEditorAssessment(value: unknown): EditorAssessment {
   const wire = EditorWireAssessmentSchema.parse(value);
@@ -101,21 +124,25 @@ export function materializeEditorAssessment(value: unknown): EditorAssessment {
     });
   }
   const continuityIssues = wire.findings
-    .filter(finding => finding.kind === 'continuity')
+    .filter(finding => editorContinuityCategories.includes(
+      finding.category as typeof editorContinuityCategories[number],
+    ))
     .map(finding => EditorContinuityIssueSchema.parse({
       category: finding.category,
       severity: finding.severity,
       scope: finding.scope,
       currentEvidence: finding.evidence,
       conflictingEvidence: finding.conflictingEvidence,
-      referenceId: finding.category === 'prompt_leak' ? null : finding.referenceId,
+      referenceId: finding.referenceId,
       instruction: finding.instruction,
     }));
   const readingIssues = wire.findings
-    .filter(finding => finding.kind === 'reading')
+    .filter(finding => editorReadingCategories.includes(
+      finding.category as typeof editorReadingCategories[number],
+    ))
     .map(finding => ReadingIssueSchema.parse({
       category: finding.category,
-      severity: finding.severity,
+      severity: finding.severity === 'critical' ? 'major' : finding.severity,
       evidence: finding.evidence,
       instruction: finding.instruction,
     }));
@@ -139,7 +166,6 @@ function injectDeterministicMissingDeltaFinding(
   return EditorWireAssessmentSchema.parse({
     ...value,
     findings: [{
-      kind: 'continuity',
       category: 'required_delta',
       severity: 'major',
       scope: 'prose',
@@ -227,7 +253,12 @@ function editorPrompt(input: {
     draft: input.draft,
     deterministicIssues: input.deterministicIssues,
     audit: {
-      findings: 'Nếu có lỗi, trả 1-3 finding. continuity: kind=continuity, evidence nguyên văn từ draft và referenceId là stable ID của state/plan/kernel. reading: kind=reading, scope=prose, evidence nguyên văn, referenceId=prose, conflictingEvidence mô tả ngắn. prompt_leak dùng referenceId=prompt_leak.',
+      findings: 'Nếu có lỗi, trả 1-3 finding. category continuity dùng evidence nguyên văn từ draft và referenceId thuộc allowedArtifactReferenceIds. Category reading luôn scope=prose, evidence nguyên văn và referenceId=prose. Không tự báo prompt leak; deterministic preflight chịu trách nhiệm lỗi đó.',
+      allowedArtifactReferenceIds: [...collectStableIds({
+        kernel: input.kernel,
+        state: input.state,
+        plan: input.plan,
+      })].sort(),
       deltaChecks: 'Mỗi required delta đúng một check và evidence nguyên văn nếu realized=true.',
       clean: 'findings=[] chỉ khi mọi delta realized=true; khi đó outcome bắt buộc.',
       issues: 'Có finding hoặc delta chưa realized thì outcome=null.',
@@ -402,11 +433,18 @@ export async function assessStoryDraft(input: {
   draft: ChapterDraft;
 }): Promise<{ assessment: EditorAssessment; usage: ProviderUsage }> {
   const deterministicIssues = preflight(input.draft);
+  const referenceIds = [...collectStableIds({
+    kernel: input.kernel,
+    state: input.state,
+    plan: input.plan,
+  })];
+  const deltaIds = input.plan.requiredDeltas.map(delta => delta.id);
+  const responseSchema = buildEditorWireAssessmentSchema({ referenceIds, deltaIds });
   const response = await input.provider.json({
     model: input.model,
     system: EDITOR_SYSTEM_PROMPT,
     prompt: editorPrompt({ ...input, deterministicIssues }),
-    schema: EditorWireAssessmentSchema,
+    schema: responseSchema,
     temperature: 0.4,
   });
   let assessment: EditorAssessment;

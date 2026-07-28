@@ -15,7 +15,7 @@ import {
   type StoryModelProvider,
 } from './provider';
 
-export const STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL = 'story-factory-writer-bakeoff-v4-causal-discovery';
+export const STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL = 'story-factory-writer-bakeoff-v5-reader-complete';
 export const STORY_FACTORY_SEQUENTIAL_PROTOCOL = 'story-factory-sequential-survival-v3-frozen-causal-continuity';
 export const STORY_FACTORY_BENCHMARK_PROTOCOL = 'story-factory-validation-v5-pairwise-sequential-reader';
 export const STORY_FACTORY_BENCHMARK_SAMPLE_COUNT = 20;

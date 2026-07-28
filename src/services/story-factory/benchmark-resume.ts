@@ -77,15 +77,7 @@ export function prepareDiscoveryResume<T extends ResumableDiscoveryProgress>(inp
     || progress.continuityJudgeModel !== input.continuityJudgeModel) {
     throw new Error('Existing benchmark progress does not match the current release, routes, protocol, or continuity judge.');
   }
-  const compatibleSetupFailure = Boolean(
-    input.compatibleSetupOnly
-    && progress.failure
-    && progress.failure.stage === 'setup'
-    && ['setup_blocked', 'infra_blocked'].includes(progress.failure.code ?? ''),
-  );
-  if (input.compatibleSetupOnly && progress.failure?.stage !== 'setup') {
-    throw new Error('Cross-release checkpoint reuse is limited to a setup-stage failure.');
-  }
+  const compatibleSetupFailure = Boolean(input.compatibleSetupOnly);
   if (progress.failure && progress.failure.code !== 'infra_blocked' && !compatibleSetupFailure) {
     throw new Error('Only interrupted or infra_blocked discovery progress can resume.');
   }
@@ -118,11 +110,14 @@ export function prepareDiscoveryResume<T extends ResumableDiscoveryProgress>(inp
     generationFailures: 0,
     continuityFailures: 0,
     windowReviewFailures: 0,
-    buildCostUsd: Math.max(progress.buildCostUsd, checkpointTotal),
+    buildCostUsd: input.compatibleSetupOnly
+      ? checkpointTotal
+      : Math.max(progress.buildCostUsd, checkpointTotal),
     launchPackDigests: [],
     samples: [],
     writerBriefs: [],
     chapterAttempts: [],
+    plannedWindows: {},
     windowReviews: [],
     failure: null,
     bookedSetupCostUsdByLane,

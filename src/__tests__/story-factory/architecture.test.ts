@@ -211,10 +211,13 @@ describe('Story Factory architecture boundary', () => {
     const bakeoff = readFileSync('scripts/factory-model-bakeoff.ts', 'utf8');
     const validation = readFileSync('scripts/factory-benchmark.ts', 'utf8');
     const promotion = readFileSync(
-      'supabase/migrations/20260726135443_story_factory_v5_pairwise_protocol.sql',
+      'supabase/migrations/20260728190942_story_factory_writer_bakeoff_v5.sql',
       'utf8',
     );
     expect(bakeoff).toContain('topTwoWriters');
+    expect(bakeoff).toContain('comparisonWriters');
+    expect(bakeoff).not.toContain('survivalLeaders');
+    expect(bakeoff).toContain('initialAssessment: result.attemptTelemetry.initialAssessment');
     expect(validation).toContain('topTwoWriters.includes(input.writer)');
     expect(validation).toContain('sourceDiscoveryDigest');
     expect(promotion).toContain("output_artifact->'topTwoWriters'");
@@ -222,7 +225,7 @@ describe('Story Factory architecture boundary', () => {
     expect(promotion).toContain("output_artifact->'manifest'->>'competingSequentialRunId'");
     expect(promotion).toContain("metrics'->>'candidatePreference'");
     expect(promotion).toContain("'story-factory-validation-v5-pairwise-sequential-reader'");
-    expect(promotion).toContain("'story-factory-writer-bakeoff-v4-causal-discovery'");
+    expect(promotion).toContain("'story-factory-writer-bakeoff-v5-reader-complete'");
     expect(promotion).toContain("'story-factory-sequential-survival-v3-frozen-causal-continuity'");
   });
 

@@ -1653,7 +1653,6 @@ describe('canonical Story Factory', () => {
     const secondIssue = {
       v: 3 as const,
       findings: [{
-        kind: 'continuity' as const,
         category: 'required_delta' as const,
         severity: 'major' as const,
         scope: 'prose' as const,
@@ -1967,14 +1966,25 @@ describe('canonical Story Factory', () => {
       priorEngineRelease: 'release_old',
       priorFailure: { stage: 'setup', code: 'setup_blocked' },
     });
-    expect(() => prepareDiscoveryResume({
-      progress,
+    const setupOnlyFromCompletedRelease = prepareDiscoveryResume({
+      progress: {
+        ...progress,
+        failure: null,
+        setupSuccesses: 4,
+        planSuccesses: 4,
+        writerBriefs: [{ id: 'old-brief' }],
+        plannedWindows: { era_coastal: { id: 'old-plan' } },
+      },
       protocolVersion: STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL,
       engineRelease: 'release_new',
       route: progress.route,
       continuityJudgeModel: 'continuity',
       compatibleSetupOnly: true,
-    })).toThrow('setup-stage failure');
+    });
+    expect(setupOnlyFromCompletedRelease.engineRelease).toBe('release_new');
+    expect(setupOnlyFromCompletedRelease.writerBriefs).toEqual([]);
+    expect(setupOnlyFromCompletedRelease.plannedWindows).toEqual({});
+    expect(setupOnlyFromCompletedRelease.buildCostUsd).toBe(0);
   });
 
   test('Writer bake-off corpus accepts only current Plan Judge passes', () => {
@@ -2053,7 +2063,6 @@ describe('canonical Story Factory', () => {
     expect(() => materializeEditorAssessment({
       v: 3,
       findings: [{
-        kind: 'continuity',
         category: 'required_delta',
         severity: 'major',
         scope: 'prose',
@@ -2105,7 +2114,6 @@ describe('canonical Story Factory', () => {
     const assessment = materializeEditorAssessment({
       v: 3,
       findings: [{
-        kind: 'reading',
         category: 'unearned_outcome', severity: 'major',
         scope: 'prose',
         evidence: 'tự bán thêm hàng',
@@ -2124,7 +2132,6 @@ describe('canonical Story Factory', () => {
     const invalidIssue = {
       v: 3 as const,
       findings: [{
-        kind: 'reading' as const,
         category: 'stock_reaction' as const,
         severity: 'major' as const,
         scope: 'prose' as const,
@@ -2150,7 +2157,6 @@ describe('canonical Story Factory', () => {
     const issue = {
       v: 3 as const,
       findings: [{
-        kind: 'continuity' as const,
         category: 'canon' as const,
         severity: 'major' as const,
         scope: 'prose' as const,

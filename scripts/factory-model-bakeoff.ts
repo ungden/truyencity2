@@ -52,6 +52,8 @@ type Generation = {
   costUsd: number;
   criticalViolation: boolean;
   issues: EditorAssessment | null;
+  initialAssessment: EditorAssessment | null;
+  finalAssessment: EditorAssessment | null;
   error: string | null;
 };
 
@@ -155,6 +157,8 @@ async function main() {
           costUsd: cost(result.usages),
           criticalViolation: false,
           issues: result.assessment,
+          initialAssessment: result.attemptTelemetry.initialAssessment,
+          finalAssessment: result.attemptTelemetry.finalAssessment,
           error: null,
         };
       } catch (error) {
@@ -174,6 +178,8 @@ async function main() {
             costUsd: cost(telemetry?.usages ?? []),
             criticalViolation: false,
             issues: telemetry?.finalAssessment ?? telemetry?.initialAssessment ?? null,
+            initialAssessment: telemetry?.initialAssessment ?? null,
+            finalAssessment: telemetry?.finalAssessment ?? null,
             error: error instanceof Error ? error.message : String(error),
           };
         }
@@ -191,6 +197,8 @@ async function main() {
           costUsd: cost(telemetry.usages),
           criticalViolation: assessmentHasCriticalViolation(assessment),
           issues: assessment,
+          initialAssessment: telemetry.initialAssessment ?? null,
+          finalAssessment: telemetry.finalAssessment ?? null,
           error: error instanceof Error ? error.message : String(error),
         };
       }
@@ -218,26 +226,21 @@ async function main() {
       maxCostUsd: Math.max(...results.map(result => result.costUsd)),
     };
   });
-  const candidates = invalidBriefIds.length
-    ? []
-    : preliminary.filter(summary => (
-      summary.criticalViolations === 0
-      && summary.infraFailures === 0
-      && summary.maxCostUsd <= 0.5
-    ));
-  const bestPublishRate = Math.max(0, ...candidates.map(summary => summary.publishRate));
-  const survivalLeaders = candidates.filter(summary => summary.publishRate === bestPublishRate).map(summary => summary.writer);
+  const comparisonWriters = preliminary
+    .filter(summary => summary.criticalViolations === 0 && summary.maxCostUsd <= 0.5)
+    .map(summary => summary.writer);
 
   if (invalidBriefIds.length) {
     votes = [];
   } else {
-    for (let leftIndex = 0; leftIndex < survivalLeaders.length; leftIndex += 1) {
-      for (let rightIndex = leftIndex + 1; rightIndex < survivalLeaders.length; rightIndex += 1) {
-        const left = survivalLeaders[leftIndex];
-        const right = survivalLeaders[rightIndex];
+    for (let leftIndex = 0; leftIndex < comparisonWriters.length; leftIndex += 1) {
+      for (let rightIndex = leftIndex + 1; rightIndex < comparisonWriters.length; rightIndex += 1) {
+        const left = comparisonWriters[leftIndex];
+        const right = comparisonWriters[rightIndex];
         for (const sample of corpus.samples) {
           const leftDraft = generations.find(result => result.sampleId === sample.id && result.writer === left)!;
           const rightDraft = generations.find(result => result.sampleId === sample.id && result.writer === right)!;
+          if (!leftDraft.content || !rightDraft.content) continue;
           const missingJudges = judgeModels.filter(model => !votes.some(vote => (
             vote.sampleId === sample.id && vote.left === left && vote.right === right && vote.model === model
           )));
