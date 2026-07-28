@@ -1899,6 +1899,37 @@ describe('canonical Story Factory', () => {
       route: progress.route,
       continuityJudgeModel: 'continuity',
     })).toThrow('does not match');
+
+    const compatible = prepareDiscoveryResume({
+      progress: {
+        ...progress,
+        failure: {
+          lane: 'xuanhuan_rules',
+          stage: 'setup',
+          message: 'Voice validator false positive.',
+          code: 'setup_blocked',
+          evidence: null,
+        },
+      },
+      protocolVersion: STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL,
+      engineRelease: 'release_new',
+      route: progress.route,
+      continuityJudgeModel: 'continuity',
+      compatibleSetupOnly: true,
+    });
+    expect(compatible.engineRelease).toBe('release_new');
+    expect(compatible.resumeLineage.at(-1)).toMatchObject({
+      priorEngineRelease: 'release_old',
+      priorFailure: { stage: 'setup', code: 'setup_blocked' },
+    });
+    expect(() => prepareDiscoveryResume({
+      progress,
+      protocolVersion: STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL,
+      engineRelease: 'release_new',
+      route: progress.route,
+      continuityJudgeModel: 'continuity',
+      compatibleSetupOnly: true,
+    })).toThrow('setup-stage failure');
   });
 
   test('Writer bake-off corpus accepts only current Plan Judge passes', () => {

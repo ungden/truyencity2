@@ -57,6 +57,13 @@ if (!candidateRoutesPath) throw new Error('--candidate-routes is required so seq
 const candidateRoutes = ModelRoutesSchema.parse(JSON.parse(readFileSync(path.resolve(candidateRoutesPath), 'utf8')));
 const continuityJudgeModel = value('--continuity-judge') ?? 'gemini-2.5-pro';
 const frozenProgressPath = value('--frozen-discovery-progress');
+const compatibleSetupResumePath = value('--compatible-setup-resume');
+if (frozenProgressPath && compatibleSetupResumePath) {
+  throw new Error('--frozen-discovery-progress and --compatible-setup-resume are mutually exclusive.');
+}
+if (compatibleSetupResumePath && !discoveryOnly) {
+  throw new Error('--compatible-setup-resume is only allowed for discovery; sequential survival requires frozen current-release evidence.');
+}
 
 const suiteSchema = z.object({
   suiteVersion: z.literal(1),
@@ -241,9 +248,14 @@ async function main() {
     bookedSetupCostUsdByLane: {},
     resumeLineage: [],
   };
-  const existingProgress = discoveryOnly && !frozenProgress && existsSync(progressPath)
-    ? JSON.parse(readFileSync(progressPath, 'utf8')) as Progress
+  const compatibleSetupProgress = compatibleSetupResumePath
+    ? JSON.parse(readFileSync(path.resolve(compatibleSetupResumePath), 'utf8')) as Progress
     : null;
+  const existingProgress = compatibleSetupProgress ?? (
+    discoveryOnly && !frozenProgress && existsSync(progressPath)
+      ? JSON.parse(readFileSync(progressPath, 'utf8')) as Progress
+      : null
+  );
   const progress: Progress = existingProgress
     ? prepareDiscoveryResume({
       progress: existingProgress,
@@ -251,6 +263,7 @@ async function main() {
       engineRelease: STORY_FACTORY_RELEASE,
       route: runtimeRoute(candidateRoutes),
       continuityJudgeModel,
+      compatibleSetupOnly: Boolean(compatibleSetupProgress),
     })
     : freshProgress;
   const persist = () => writeFileSync(progressPath, `${JSON.stringify(progress, null, 2)}\n`);

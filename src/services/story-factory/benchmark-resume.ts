@@ -11,6 +11,7 @@ type UsageArtifact = { usage?: { costUsd?: number } } | undefined;
 export type DiscoveryResumeLineage = {
   resumedAt: string;
   priorStartedAt: string;
+  priorEngineRelease: string;
   priorFailure: BenchmarkFailure | null;
   priorCostUsd: number;
   checkpointLanes: string[];
@@ -61,20 +62,31 @@ export function prepareDiscoveryResume<T extends ResumableDiscoveryProgress>(inp
   route: Record<string, unknown>;
   continuityJudgeModel: string;
   resumedAt?: string;
+  compatibleSetupOnly?: boolean;
 }): T & {
   bookedSetupCostUsdByLane: Record<string, number>;
   resumeLineage: DiscoveryResumeLineage[];
 } {
   const { progress } = input;
+  const releaseMatches = progress.engineRelease === input.engineRelease;
   if (progress.protocolVersion !== input.protocolVersion
-    || progress.engineRelease !== input.engineRelease
+    || (!releaseMatches && !input.compatibleSetupOnly)
     || !progress.route
     || typeof progress.route !== 'object'
     || !sameRoute(progress.route as Record<string, unknown>, input.route)
     || progress.continuityJudgeModel !== input.continuityJudgeModel) {
     throw new Error('Existing benchmark progress does not match the current release, routes, protocol, or continuity judge.');
   }
-  if (progress.failure && progress.failure.code !== 'infra_blocked') {
+  const compatibleSetupFailure = Boolean(
+    input.compatibleSetupOnly
+    && progress.failure
+    && progress.failure.stage === 'setup'
+    && ['setup_blocked', 'infra_blocked'].includes(progress.failure.code ?? ''),
+  );
+  if (input.compatibleSetupOnly && progress.failure?.stage !== 'setup') {
+    throw new Error('Cross-release checkpoint reuse is limited to a setup-stage failure.');
+  }
+  if (progress.failure && progress.failure.code !== 'infra_blocked' && !compatibleSetupFailure) {
     throw new Error('Only interrupted or infra_blocked discovery progress can resume.');
   }
   if (progress.samples.length || progress.chapterAttempts.length || progress.windowReviews.length) {
@@ -90,6 +102,7 @@ export function prepareDiscoveryResume<T extends ResumableDiscoveryProgress>(inp
     {
       resumedAt: input.resumedAt ?? new Date().toISOString(),
       priorStartedAt: progress.startedAt,
+      priorEngineRelease: progress.engineRelease,
       priorFailure: progress.failure,
       priorCostUsd: progress.buildCostUsd,
       checkpointLanes: Object.keys(progress.setupCheckpoints).sort(),
@@ -98,6 +111,7 @@ export function prepareDiscoveryResume<T extends ResumableDiscoveryProgress>(inp
 
   return {
     ...progress,
+    engineRelease: input.engineRelease,
     setupSuccesses: 0,
     planSuccesses: 0,
     providerFailures: 0,
