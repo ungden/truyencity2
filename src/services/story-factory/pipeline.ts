@@ -161,7 +161,7 @@ function editorPrompt(input: {
     draft: input.draft,
     deterministicIssues: input.deterministicIssues,
     audit: {
-      continuityIssues: 'Chỉ báo lỗi thuộc taxonomy continuity trong schema. Mỗi lỗi cần currentEvidence nguyên văn từ draft và conflictingEvidence nguyên văn từ state/plan/history, kèm referenceId hợp lệ khi có.',
+      continuityIssues: 'Chỉ báo lỗi thuộc taxonomy continuity trong schema. currentEvidence phải nguyên văn từ draft. Với lỗi khác prompt_leak, referenceId bắt buộc là stable ID của state/plan/kernel mâu thuẫn; conflictingEvidence chỉ mô tả ngắn vì code sẽ thay bằng evidence canonical từ referenceId.',
       readingIssues: 'Báo prose thuyết minh, nhân vật công cụ, thoại giả, kết quả chưa earned, stock reaction, cảnh không hiệu quả hoặc lặp công thức. Evidence phải là anchor nguyên văn từ draft.',
       deltaChecks: 'Mỗi required delta đúng một check và evidence nguyên văn nếu realized=true.',
       outcome: 'Chỉ điền khi không có issue và mọi delta realized; nếu không thì null.',
@@ -237,6 +237,43 @@ function collectStableIds(value: unknown): Set<string> {
   return ids;
 }
 
+function artifactByStableId(value: unknown, id: string): unknown | null {
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const found = artifactByStableId(item, id);
+      if (found !== null) return found;
+    }
+    return null;
+  }
+  if (!value || typeof value !== 'object') return null;
+  const entries = Object.entries(value);
+  if (entries.some(([key, item]) => (
+    typeof item === 'string'
+    && item === id
+    && (key === 'id' || key.endsWith('Id') || key.endsWith('Ids'))
+  ))) {
+    return value;
+  }
+  for (const [, item] of entries) {
+    const found = artifactByStableId(item, id);
+    if (found !== null) return found;
+  }
+  return null;
+}
+
+function canonicalArtifactEvidence(input: {
+  referenceId: string;
+  kernel: unknown;
+  plan: ChapterPlan;
+  state: unknown;
+}): string | null {
+  const artifact = artifactByStableId(input.plan, input.referenceId)
+    ?? artifactByStableId(input.state, input.referenceId)
+    ?? artifactByStableId(input.kernel, input.referenceId);
+  if (artifact === null) return null;
+  return JSON.stringify(artifact).slice(0, 800);
+}
+
 function groundIssueEvidence(input: {
   assessment: EditorAssessment;
   draft: ChapterDraft;
@@ -248,7 +285,6 @@ function groundIssueEvidence(input: {
   const kernelIds = collectStableIds(input.kernel);
   const planIds = collectStableIds(input.plan);
   const referenceIds = new Set([...kernelIds, ...planIds, ...collectStableIds(input.state)]);
-  const artifactJson = JSON.stringify({ kernel: input.kernel, plan: input.plan, state: input.state });
   const continuityIssues = input.assessment.continuityIssues.map(issue => {
     if (issue.scope === 'prose') {
       const evidence = groundEvidenceSpan(input.draft.content, issue.currentEvidence);
@@ -258,12 +294,22 @@ function groundIssueEvidence(input: {
       if (issue.referenceId !== null && !referenceIds.has(issue.referenceId)) {
         throw new StoryFactoryError('infra_blocked', 'Editor continuity issue references an unknown stable ID.', issue);
       }
-      const conflictGrounded = artifactJson.includes(issue.conflictingEvidence)
-        || groundEvidenceSpan(artifactJson, issue.conflictingEvidence) !== null;
-      if (!conflictGrounded && issue.category !== 'prompt_leak') {
-        throw new StoryFactoryError('infra_blocked', 'Editor continuity issue has no grounded conflicting evidence.', issue);
+      if (issue.category === 'prompt_leak') {
+        return { ...issue, currentEvidence: evidence };
       }
-      return { ...issue, currentEvidence: evidence };
+      if (issue.referenceId === null) {
+        throw new StoryFactoryError('infra_blocked', 'Editor continuity issue has no stable artifact reference.', issue);
+      }
+      const conflictingEvidence = canonicalArtifactEvidence({
+        referenceId: issue.referenceId,
+        kernel: input.kernel,
+        plan: input.plan,
+        state: input.state,
+      });
+      if (conflictingEvidence === null) {
+        throw new StoryFactoryError('infra_blocked', 'Editor continuity issue cannot resolve its stable artifact reference.', issue);
+      }
+      return { ...issue, currentEvidence: evidence, conflictingEvidence };
     }
     const validIds = issue.scope === 'kernel' ? kernelIds : new Set([...planIds, ...kernelIds]);
     if (issue.referenceId === null || !validIds.has(issue.referenceId)) {

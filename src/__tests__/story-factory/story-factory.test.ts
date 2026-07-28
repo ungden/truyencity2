@@ -1444,6 +1444,26 @@ describe('canonical Story Factory', () => {
     expect(JSON.stringify(contexts.editorState)).toContain('lót trấu và xơ dừa');
   });
 
+  test('Writer sees causal operation groups without duplicated capacity telemetry', () => {
+    const chapter = plan(1);
+    chapter.mechanicUses = [{
+      id: 'use_trade',
+      sceneId: 'scene_1',
+      mechanicId: 'mechanic_trade',
+      role: 'effect',
+      actorId: 'main',
+      quantity: 1,
+      preconditionFactIds: ['fact_day'],
+      deltaIds: ['delta_1'],
+    }];
+    const brief = JSON.stringify(buildWriterBrief({ kernel, state: initialState, plan: chapter }));
+    expect(brief).toContain('"operation":"Quyền giao dịch của Hải"');
+    expect(brief).toContain('"actor":"Hải"');
+    expect(brief).toContain('"transitions":[{"entity":"fact day"');
+    expect(brief).not.toContain('giao_dich/phút');
+    expect(brief).not.toContain('"maximumUnitsPerMinute"');
+  });
+
   test.each([13, 50, 200, 800])('Writer gets bounded mechanical history without outcome prose at chapter %i', async chapterNumber => {
     const query: Record<string, unknown> & {
       then?: (resolve: (value: unknown) => unknown) => Promise<unknown>;
@@ -1976,6 +1996,52 @@ describe('canonical Story Factory', () => {
       kernel, state: initialState, plan: plan(1), routes,
       provider: new QueueProvider([draft, invalidIssue]),
     })).rejects.toMatchObject({ code: 'infra_blocked' });
+  });
+
+  test('Editor continuity conflict is canonicalized from a valid stable artifact reference', async () => {
+    const draft = {
+      title: 'Ngày khác',
+      content: 'Hải quả quyết hôm nay là ngày khác rồi bắt đầu làm việc trong nhà.',
+    };
+    const issue = {
+      v: 2 as const,
+      continuityIssues: [{
+        category: 'canon' as const,
+        severity: 'major' as const,
+        scope: 'prose' as const,
+        currentEvidence: 'hôm nay là ngày khác',
+        conflictingEvidence: 'lời diễn giải không tồn tại nguyên văn trong artifact',
+        referenceId: 'delta_1',
+        instruction: 'Giữ đúng ngày đã khóa trong required transition.',
+      }],
+      readingIssues: [],
+      deltaChecks: [{ deltaId: 'delta_1', realized: true, evidence: 'bắt đầu làm việc' }],
+      outcome: null,
+    };
+    const revised = {
+      title: 'Bắt tay vào việc',
+      content: 'Hải kiểm tra lại lịch rồi bắt đầu làm việc; đến cuối buổi, công việc đã khởi động.',
+    };
+    const result = await writeStoryChapter({
+      kernel,
+      state: initialState,
+      plan: plan(1),
+      routes,
+      provider: new QueueProvider([
+        draft,
+        issue,
+        revised,
+        editorWirePass('delta_1', 'công việc đã khởi động'),
+      ]),
+    });
+    expect(result.decision).toBe('publish');
+    expect(result.attemptTelemetry.initialAssessment).toMatchObject({
+      status: 'revise',
+      continuityIssues: [{
+        referenceId: 'delta_1',
+        conflictingEvidence: expect.stringContaining('"id":"delta_1"'),
+      }],
+    });
   });
 
   test('accepted outcome evidence must exist verbatim in prose', () => {

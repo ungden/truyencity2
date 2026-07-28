@@ -84,18 +84,13 @@ function readableDelta(delta: StateDelta, name: (id: string) => string) {
 }
 
 function operationalConstraints(kernel: StoryKernel, plan: ChapterPlan, name: (id: string) => string): string[] {
-  return plan.mechanicUses.map(use => {
+  return plan.mechanicUses.filter(use => use.role === 'support').map(use => {
     const mechanic = kernel.worldMechanics.find(item => item.id === use.mechanicId)!;
     if (mechanic.kind === 'conversion') {
-      const parts = (items: typeof mechanic.inputsPerBatch) => items
-        .map(item => `${item.amount * use.quantity} ${name(item.resourceId)}`).join(', ');
-      return `${name(use.actorId)} xử lý ${parts(mechanic.inputsPerBatch)} để tạo ${parts(mechanic.outputsPerBatch)}.`;
+      return `${name(use.actorId)} được phép thực hiện ${mechanic.name} trong cảnh này.`;
     }
     if (mechanic.kind === 'capability') {
-      const capacity = mechanic.maximumUnitsPerMinute === null
-        ? ''
-        : `; giới hạn ${mechanic.maximumUnitsPerMinute} ${mechanic.capacityUnit ?? 'đơn vị'}/phút`;
-      return `${name(use.actorId)} được phép dùng ${mechanic.name} cho ${use.quantity} ${mechanic.capacityUnit ?? 'đơn vị'}${capacity}.`;
+      return `${name(use.actorId)} được phép dùng ${mechanic.name} trong phạm vi công việc của cảnh.`;
     }
     const required = mechanic.requiredFacts.map(condition =>
       `${name(condition.factId)} = ${String(condition.expected)}`);
@@ -129,6 +124,30 @@ export function buildWriterBrief(input: {
   const continuity = input.continuityPacket
     ? flattenContinuityPacket(input.continuityPacket).slice(0, 12).map(event => readableTransition(event, name))
     : [];
+  const sceneChanges = (sceneId: string, deltaIds: string[]) => {
+    const available = new Set(deltaIds);
+    const claimed = new Set<string>();
+    const operations = input.plan.mechanicUses
+      .filter(use => use.sceneId === sceneId && use.role === 'effect')
+      .flatMap(use => {
+        const transitionIds = use.deltaIds.filter(id => available.has(id) && !claimed.has(id));
+        transitionIds.forEach(id => claimed.add(id));
+        if (!transitionIds.length) return [];
+        return [{
+          operation: name(use.mechanicId),
+          actor: name(use.actorId),
+          transitions: transitionIds.map(id => readableDelta(deltas.get(id)!, name)),
+        }];
+      });
+    const standalone = deltaIds
+      .filter(id => !claimed.has(id))
+      .map(id => ({
+        operation: null,
+        actor: null,
+        transitions: [readableDelta(deltas.get(id)!, name)],
+      }));
+    return [...operations, ...standalone];
+  };
   return {
     story: { title: input.kernel.title },
     cast: input.kernel.characters.filter(character => ids.characters.has(character.id)).map(character => ({
@@ -170,7 +189,10 @@ export function buildWriterBrief(input: {
       location: name(scene.locationId),
       objective: scene.objective,
       obstacle: scene.obstacle,
-      requiredChanges: scene.requiredDeltaIds.map(deltaId => readableDelta(deltas.get(deltaId)!, name)),
+      // Group exact ledger transitions into causal operations. Writer still sees
+      // every required before/after state, but no longer receives a flat list
+      // that invites prose shaped like database telemetry.
+      requiredChanges: sceneChanges(scene.id, scene.requiredDeltaIds),
     })),
     operationalConstraints: operationalConstraints(input.kernel, input.plan, name),
     continuity,
