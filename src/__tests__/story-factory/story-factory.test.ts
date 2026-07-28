@@ -2283,6 +2283,44 @@ describe('canonical Story Factory', () => {
     })).toThrow('Precondition fact:fact_day is false');
   });
 
+  test('compiler derives conversion ownership and cannot attach a state or fact delta', () => {
+    const wire = plannerWire();
+    const chapter = structuredClone(wire.chapters[0]);
+    chapter.deltas.push({
+      id: 'delta_money',
+      k: 'resource_numeric',
+      target: 'money',
+      counterpart: null,
+      before: null,
+      change: -1,
+      after: null,
+      source: null,
+      sink: 'chi phí đổi hàng',
+    });
+    chapter.scenes[0].deltaIds = ['delta_1', 'delta_money'];
+    chapter.mechanics = [{
+      id: 'use_exchange',
+      scene: 'scene_1',
+      mechanic: 'mechanic_exchange',
+      role: 'effect',
+      actor: 'main',
+      qty: 10,
+      facts: [],
+      // Deliberately wrong duplicated linkage: the compiler must ignore this
+      // fact delta and derive the numeric conversion delta from the contract.
+      primaryDeltaId: 'delta_1',
+      additionalDeltaIds: [],
+    }];
+    wire.chapters[0] = chapter;
+    const rolling = materializePlannerRollingPlan(wire, initialState, kernel);
+    expect(rolling.plans[0].mechanicUses[0].deltaIds).toEqual(['delta_money']);
+    expect(() => applyChapterPlan({
+      kernel,
+      state: initialState,
+      plan: rolling.plans[0],
+    })).not.toThrow();
+  });
+
   test('fact before values are derived sequentially from State across a rolling window', () => {
     const first = structuredClone(plannerWire(1).chapters[0]);
     const second = structuredClone(plannerWire(2).chapters[0]);

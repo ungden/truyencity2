@@ -116,6 +116,7 @@ const PLANNER_COMPACT_CONTRACT = {
     'Mỗi delta phải được ít nhất một scene.deltaIds tham chiếu.',
     'rules chỉ chứa world-rule thực sự được thi hành trong chương. Nếu chương mới quyết định hoặc hứa sẽ dùng cơ chế ở tương lai thì chưa đưa rule đó vào rules.',
     'Mọi chuyển đổi/công suất/quyền hạn/constraint thực sự dùng phải có một mechanics entry tham chiếu worldMechanics ID. Mỗi entry bắt buộc gắn ít nhất một delta bằng primaryDeltaId; các delta còn lại nằm trong additionalDeltaIds. role=effect nghĩa mechanic trực tiếp tạo delta; role=support nghĩa mechanic chỉ cấp quyền hoặc điều kiện cho delta do mechanic effect khác tạo. Mỗi resource delta phải có đúng một effect owner nhưng có thể có nhiều support. Conversion luôn effect; constraint luôn support. Conversion phải gắn đủ delta đầu vào và đầu ra. Capability là effect chỉ khi nó trực tiếp tạo resource/fact đúng resourceId và direction đã khai báo trong effectResources hoặc effectFactIds; nếu chỉ cho phép conversion/mechanic khác thì dùng support. Không tạo mechanics entry nếu cơ chế không liên quan state transition trong chương.',
+    'Với conversion, primaryDeltaId phải là một resource_numeric delta thuộc input/output của conversion trong cùng scene; code sẽ tự suy ra toàn bộ numeric delta mà conversion sở hữu và không bao giờ cho conversion sở hữu fact hoặc resource_state. Với capability effect, chỉ gắn resource delta đúng direction hoặc fact thuộc effectFactIds.',
     'Trước khi tạo bất kỳ resource_numeric hoặc resource_state delta nào, phải tìm đúng một conversion/capability effect trong arc có quyền tạo resource đó. Nếu không có effect mechanic, không được thay đổi resource; dùng fact, relationship hoặc promise delta chỉ khi loại đó phản ánh đúng thay đổi và ID hợp lệ.',
     'Kiểm công suất capability theo qty <= maximumUnitsPerMinute * availableMinutes. Với role=effect, availableMinutes=scene.dur. Với role=support, availableMinutes=scene.dur+scene.travel vì support có thể vận hành trong chính quãng chuyển cảnh.',
     'Sắp mechanics theo đúng thứ tự nhân quả trong từng scene: effect tạo fact/resource phải đứng trước capability hoặc constraint sử dụng nó. Fact ngoại cảnh như thời tiết bắt đầu chỉ trở thành khả dụng sau scene ghi fact delta; capability phụ thuộc nó phải ở scene sau. Không được dùng output của mechanic đứng sau.',
@@ -252,6 +253,47 @@ export function materializePlannerRollingPlan(
         const declaredFacts = mechanic?.kind === 'capability' || mechanic?.kind === 'constraint'
           ? mechanic.requiredFacts.map(condition => condition.factId)
           : [];
+        const modelDeltaIds = [use.primaryDeltaId, ...use.additionalDeltaIds];
+        const sceneDeltaIds = new Set(
+          chapter.scenes.find(scene => scene.id === use.scene)?.deltaIds ?? [],
+        );
+        let deltaIds = modelDeltaIds;
+        if (mechanic?.kind === 'conversion') {
+          const numericResourceIds = new Set([
+            ...mechanic.inputsPerBatch,
+            ...mechanic.outputsPerBatch,
+          ].map(item => item.resourceId));
+          // A conversion contract already defines exactly which numeric
+          // resources it can consume/produce. Derive ownership from that
+          // contract and the selected scene instead of trusting a duplicated
+          // model-maintained delta list that can accidentally include facts or
+          // state resources.
+          deltaIds = chapter.deltas
+            .filter(delta => (
+              sceneDeltaIds.has(delta.id)
+              && delta.k === 'resource_numeric'
+              && numericResourceIds.has(delta.target)
+            ))
+            .map(delta => delta.id);
+        } else if (mechanic?.kind === 'capability' && use.role === 'effect') {
+          const resourceDirections = new Map(
+            mechanic.effectResources.map(effect => [`${effect.resourceId}:${effect.direction}`, true]),
+          );
+          const factIds = new Set(mechanic.effectFactIds);
+          deltaIds = modelDeltaIds.filter(deltaId => {
+            const delta = chapter.deltas.find(item => item.id === deltaId);
+            if (!delta || !sceneDeltaIds.has(delta.id)) return false;
+            if (delta.k === 'fact') return factIds.has(delta.target);
+            if (delta.k === 'resource_state') {
+              return resourceDirections.has(`${delta.target}:state_change`);
+            }
+            if (delta.k === 'resource_numeric' && delta.change !== null) {
+              const direction = delta.change > 0 ? 'increase' : 'decrease';
+              return resourceDirections.has(`${delta.target}:${direction}`);
+            }
+            return false;
+          });
+        }
         return {
           id: use.id,
           sceneId: use.scene,
@@ -264,7 +306,7 @@ export function materializePlannerRollingPlan(
           // IDs it already selected by mechanicId. Validation still checks the
           // live sequential value, so this cannot make a false precondition true.
           preconditionFactIds: [...new Set([...use.facts, ...declaredFacts])],
-          deltaIds: [use.primaryDeltaId, ...use.additionalDeltaIds],
+          deltaIds,
         };
       }),
     })),
