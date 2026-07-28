@@ -38,7 +38,7 @@ export type PlannerAttemptTelemetry = {
 const PlannerScalarSchema = z.union([z.string(), z.number(), z.null()]);
 const PlannerCompactDeltaSchema = z.object({
   id: z.string(),
-  k: z.enum(['fact', 'resource_numeric', 'resource_state', 'knowledge', 'location', 'promise', 'relationship']),
+  k: z.enum(['fact', 'resource_numeric', 'resource_state', 'knowledge', 'promise', 'relationship']),
   target: z.string(),
   counterpart: z.string().nullable(),
   before: PlannerScalarSchema,
@@ -98,7 +98,6 @@ const PLANNER_COMPACT_CONTRACT = {
     resource_numeric: 'target=resourceId; change là số khác 0; before/after bắt buộc null vì code tính tuần tự từ State; change > 0 bắt buộc source khác null và sink=null; change < 0 bắt buộc sink khác null và source=null',
     resource_state: 'target=resourceId; before=null vì code lấy tuần tự từ State; after là trạng thái mới; source giải thích nguồn thay đổi; change/sink=null',
     knowledge: 'target=characterId; after=factId; source là nguồn học biết; before/change/sink=null',
-    location: 'target=characterId; before/after là locationId; change/source/sink=null',
     promise: 'target=promiseId; before=null vì code lấy tuần tự từ State; after thuộc open|progressed|resolved|abandoned; change/source/sink=null',
     relationship: 'target=characterId; counterpart=counterpartId; before=null vì code lấy tuần tự từ State; after là trạng thái mới; source giải thích sự kiện; change/sink=null',
   },
@@ -128,13 +127,13 @@ const PLANNER_COMPACT_CONTRACT = {
     'Với conversion, primaryDeltaId phải là một resource_numeric delta thuộc input/output của conversion trong cùng scene; code sẽ tự suy ra toàn bộ numeric delta mà conversion sở hữu và không bao giờ cho conversion sở hữu fact hoặc resource_state. Với capability effect, chỉ gắn resource delta đúng direction hoặc fact thuộc effectFactIds.',
     'Trước khi tạo bất kỳ resource_numeric hoặc resource_state delta nào, phải tìm đúng một conversion/capability effect trong arc có quyền tạo resource đó. Nếu không có effect mechanic, không được thay đổi resource; dùng fact, relationship hoặc promise delta chỉ khi loại đó phản ánh đúng thay đổi và ID hợp lệ.',
     'Kiểm công suất capability theo qty <= maximumUnitsPerMinute * availableMinutes. Với role=effect, availableMinutes=scene.dur. Với role=support, availableMinutes=scene.dur+scene.travel vì support có thể vận hành trong chính quãng chuyển cảnh.',
-    'Sắp mechanics theo đúng thứ tự nhân quả trong từng scene: effect tạo fact/resource phải đứng trước capability hoặc constraint sử dụng nó. Fact ngoại cảnh như thời tiết bắt đầu chỉ trở thành khả dụng sau scene ghi fact delta; capability phụ thuộc nó phải ở scene sau. Không được dùng output của mechanic đứng sau.',
+    'Khai báo đầy đủ mechanic tạo fact/resource và mechanic sử dụng nó trong đúng scene; compiler sẽ sắp thứ tự dependency tất định trong scene. Fact ngoại cảnh không có effect mechanic như thời tiết bắt đầu chỉ trở thành khả dụng sau scene ghi fact delta; capability phụ thuộc nó phải ở scene sau.',
     'Conversion là một batch nguyên tử: chỉ commit toàn bộ input và output trong cùng scene khi batch hoàn tất. Chương chuẩn bị chưa hoàn tất batch phải dùng fact hoặc resource_state để ghi tiến độ; không được trừ trước một phần input numeric rồi để output sang chương sau.',
     'Giữ goal/block/act ngắn và cơ học; chỉ đưa nhân vật, rule và delta thật sự cần cho chương.',
     'knowledge.after phải là fact ID đã tồn tại trong State. Nếu nhân vật học một fact mới, tạo fact delta khai báo fact đó trước knowledge delta trong cùng chương và gắn cả hai vào scene học biết.',
     'Fact được mechanic khác dùng làm requiredFact là precondition có kiểu và giá trị khóa. Nếu một capability tạo/cập nhật fact đó để mechanic sau sử dụng, fact delta.after phải đúng required expected trong factContracts; không thay marker precondition bằng tên bản vẽ, lời mô tả hoặc kết quả prose.',
     'Với fact, resource_state, promise và relationship, luôn gửi before=null; compiler tự lấy before thật và cập nhật tuần tự qua cả window. Không chép lại ledger bằng model.',
-    'Chỉ cần khai báo đúng scene.people, scene.loc và scene.travel; compiler tự sinh location delta từ vị trí đầu chương tới scene cuối của từng nhân vật. Nếu tự khai báo location delta, nó vẫn phải khớp chính xác và không được trùng.',
+    'Không tạo location delta. Chỉ khai báo đúng scene.people, scene.loc và scene.travel; compiler là nguồn duy nhất tự sinh location delta từ vị trí đầu chương tới scene cuối của từng nhân vật.',
   ],
 } as const;
 
@@ -235,6 +234,93 @@ function deriveEffectOwnership(
   return ownership;
 }
 
+function orderMechanicUsesByDependency(
+  chapter: z.infer<typeof PlannerCompactChapterSchema>,
+  kernel: StoryKernel | undefined,
+  effectOwnership: Map<string, string[]>,
+): z.infer<typeof PlannerCompactChapterSchema>['mechanics'] {
+  if (!kernel) return chapter.mechanics;
+  const mechanics = new Map(kernel.worldMechanics.map(mechanic => [mechanic.id, mechanic]));
+  const deltas = new Map(chapter.deltas.map(delta => [delta.id, delta]));
+  const sceneOrder = new Map(chapter.scenes.map((scene, index) => [scene.id, index]));
+  const originalOrder = new Map(chapter.mechanics.map((use, index) => [use.id, index]));
+  const result: z.infer<typeof PlannerCompactChapterSchema>['mechanics'] = [];
+
+  for (const scene of chapter.scenes) {
+    const uses = chapter.mechanics.filter(use => use.scene === scene.id);
+    const dependencies = new Map(uses.map(use => [use.id, new Set<string>()]));
+    for (const consumer of uses) {
+      const consumerMechanic = mechanics.get(consumer.mechanic);
+      if (!consumerMechanic) continue;
+      const requiredFacts = consumerMechanic.kind === 'capability'
+        || consumerMechanic.kind === 'constraint'
+        ? consumerMechanic.requiredFacts
+        : [];
+      const requiredResources = new Set<string>();
+      if (consumerMechanic.kind === 'capability') {
+        consumerMechanic.requiredResourceIds.forEach(resourceId => requiredResources.add(resourceId));
+      }
+      if (consumerMechanic.kind === 'conversion') {
+        consumerMechanic.inputsPerBatch.forEach(input => requiredResources.add(input.resourceId));
+      }
+      for (const producer of uses) {
+        if (producer.id === consumer.id || producer.role !== 'effect') continue;
+        const ownedDeltas = (effectOwnership.get(producer.id) ?? [])
+          .map(deltaId => deltas.get(deltaId))
+          .filter((delta): delta is NonNullable<typeof delta> => Boolean(delta));
+        const producesRequiredFact = requiredFacts.some(required => (
+          ownedDeltas.some(delta => (
+            delta.k === 'fact'
+            && delta.target === required.factId
+            && String(delta.after) === String(required.expected)
+          ))
+        ));
+        const producesRequiredResource = ownedDeltas.some(delta => (
+          requiredResources.has(delta.target)
+          && (
+            (delta.k === 'resource_numeric' && (delta.change ?? 0) > 0)
+            || delta.k === 'resource_state'
+          )
+        ));
+        if (producesRequiredFact || producesRequiredResource) {
+          dependencies.get(consumer.id)!.add(producer.id);
+        }
+      }
+    }
+    const pending = new Map(uses.map(use => [use.id, use]));
+    while (pending.size) {
+      const ready = [...pending.values()]
+        .filter(use => [...(dependencies.get(use.id) ?? [])].every(id => !pending.has(id)))
+        .sort((left, right) => (
+          (originalOrder.get(left.id) ?? 0) - (originalOrder.get(right.id) ?? 0)
+        ));
+      if (!ready.length) {
+        // Preserve the original order on a dependency cycle so the causal
+        // validator can report the actual impossible plan rather than silently
+        // inventing an order.
+        result.push(...[...pending.values()].sort((left, right) => (
+          (originalOrder.get(left.id) ?? 0) - (originalOrder.get(right.id) ?? 0)
+        )));
+        pending.clear();
+        break;
+      }
+      for (const use of ready) {
+        result.push(use);
+        pending.delete(use.id);
+      }
+    }
+  }
+  const knownScenes = new Set(chapter.scenes.map(scene => scene.id));
+  result.push(...chapter.mechanics
+    .filter(use => !knownScenes.has(use.scene))
+    .sort((left, right) => (
+      (sceneOrder.get(left.scene) ?? Number.MAX_SAFE_INTEGER)
+      - (sceneOrder.get(right.scene) ?? Number.MAX_SAFE_INTEGER)
+      || (originalOrder.get(left.id) ?? 0) - (originalOrder.get(right.id) ?? 0)
+    )));
+  return result;
+}
+
 export function materializePlannerRollingPlan(
   value: z.infer<typeof PlannerRollingPlanResponseSchema>,
   initialState: StoryState,
@@ -265,6 +351,7 @@ export function materializePlannerRollingPlan(
     startChapter: compact.start,
     plans: chapters.map(chapter => {
       const effectOwnership = deriveEffectOwnership(chapter, kernel);
+      const orderedMechanicUses = orderMechanicUsesByDependency(chapter, kernel, effectOwnership);
       return {
       schemaVersion: compact.v,
       chapterNumber: chapter.n,
@@ -327,7 +414,6 @@ export function materializePlannerRollingPlan(
           return { id: delta.id, kind: delta.k, resourceId: delta.target, before, after, source: delta.source };
         }
         if (delta.k === 'knowledge') return { id: delta.id, kind: delta.k, characterId: delta.target, factId: delta.after, source: delta.source };
-        if (delta.k === 'location') return { id: delta.id, kind: delta.k, characterId: delta.target, beforeLocationId: delta.before, afterLocationId: delta.after };
         if (delta.k === 'relationship') {
           const key = `${delta.target}\u0000${delta.counterpart ?? ''}`;
           const before = relationshipValues.get(key) ?? null;
@@ -356,7 +442,7 @@ export function materializePlannerRollingPlan(
         }
         return { id: delta.id, kind: delta.k, promiseId: delta.target, before, after: delta.after };
       }),
-      mechanicUses: chapter.mechanics.map(use => {
+      mechanicUses: orderedMechanicUses.map(use => {
         const mechanic = kernel?.worldMechanics.find(item => item.id === use.mechanic);
         const declaredFacts = mechanic?.kind === 'capability' || mechanic?.kind === 'constraint'
           ? mechanic.requiredFacts.map(condition => condition.factId)

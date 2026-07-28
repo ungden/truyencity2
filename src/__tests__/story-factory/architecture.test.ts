@@ -148,8 +148,8 @@ describe('Story Factory architecture boundary', () => {
     expect(planner).toContain('Mỗi resource delta phải có đúng một effect owner');
     expect(planner).toContain('Nếu không có effect mechanic, không được thay đổi resource');
     expect(planner).toContain('availableMinutes=scene.dur+scene.travel');
-    expect(planner).toContain('Sắp mechanics theo đúng thứ tự nhân quả trong từng scene');
-    expect(planner).toContain('compiler tự sinh location delta');
+    expect(planner).toContain('compiler sẽ sắp thứ tự dependency tất định trong scene');
+    expect(planner).toContain('compiler là nguồn duy nhất tự sinh location delta');
     expect(planner).toContain('initialLocationsByCharacter');
     expect(planner).toContain('scene.travel phải >= thời gian shortest-path lớn nhất');
     expect(planner).toContain('Conversion phải gắn đủ delta đầu vào và đầu ra');

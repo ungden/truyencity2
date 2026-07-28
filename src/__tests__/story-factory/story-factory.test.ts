@@ -2416,6 +2416,90 @@ describe('canonical Story Factory', () => {
     })).not.toThrow();
   });
 
+  test('compiler orders a same-scene fact producer before its dependent capability', () => {
+    const dependencyKernel: StoryKernel = structuredClone(kernel);
+    dependencyKernel.worldMechanics = [
+      {
+        id: 'open_gate',
+        name: 'Mở cửa gió',
+        kind: 'capability',
+        description: 'Mở cửa gió trước khi vận hành.',
+        allowedActorIds: ['main'],
+        requiredFacts: [],
+        requiredResourceIds: [],
+        effectResources: [],
+        effectFactIds: ['fact_gate'],
+        capacityUnit: null,
+        maximumUnitsPerMinute: null,
+      },
+      {
+        id: 'run_dryer',
+        name: 'Vận hành máy sấy',
+        kind: 'capability',
+        description: 'Chỉ vận hành sau khi cửa gió mở.',
+        allowedActorIds: ['main'],
+        requiredFacts: [{ factId: 'fact_gate', expected: 1 }],
+        requiredResourceIds: [],
+        effectResources: [],
+        effectFactIds: ['fact_dryer_running'],
+        capacityUnit: null,
+        maximumUnitsPerMinute: null,
+      },
+    ];
+    const dependencyState: StoryState = structuredClone(initialState);
+    dependencyState.facts.push(
+      { id: 'fact_gate', value: '0' },
+      { id: 'fact_dryer_running', value: '0' },
+    );
+    const wire = plannerWire();
+    const chapter = structuredClone(wire.chapters[0]);
+    chapter.scenes[0].deltaIds = ['gate_open', 'dryer_running'];
+    chapter.deltas = [
+      {
+        id: 'gate_open', k: 'fact', target: 'fact_gate', counterpart: null,
+        before: null, change: null, after: 1, source: null, sink: null,
+      },
+      {
+        id: 'dryer_running', k: 'fact', target: 'fact_dryer_running', counterpart: null,
+        before: null, change: null, after: 1, source: null, sink: null,
+      },
+    ];
+    // Deliberately reverse the causal order. The compiler, not the model array
+    // order, owns this deterministic dependency.
+    chapter.mechanics = [
+      {
+        id: 'use_dryer',
+        scene: 'scene_1',
+        mechanic: 'run_dryer',
+        role: 'effect',
+        actor: 'main',
+        qty: 1,
+        facts: ['fact_gate'],
+        primaryDeltaId: 'dryer_running',
+        additionalDeltaIds: [],
+      },
+      {
+        id: 'use_gate',
+        scene: 'scene_1',
+        mechanic: 'open_gate',
+        role: 'effect',
+        actor: 'main',
+        qty: 1,
+        facts: [],
+        primaryDeltaId: 'gate_open',
+        additionalDeltaIds: [],
+      },
+    ];
+    wire.chapters[0] = chapter;
+    const rolling = materializePlannerRollingPlan(wire, dependencyState, dependencyKernel);
+    expect(rolling.plans[0].mechanicUses.map(use => use.id)).toEqual(['use_gate', 'use_dryer']);
+    expect(() => applyChapterPlan({
+      kernel: dependencyKernel,
+      state: dependencyState,
+      plan: rolling.plans[0],
+    })).not.toThrow();
+  });
+
   test('fact before values are derived sequentially from State across a rolling window', () => {
     const first = structuredClone(plannerWire(1).chapters[0]);
     const second = structuredClone(plannerWire(2).chapters[0]);
@@ -2465,6 +2549,24 @@ describe('canonical Story Factory', () => {
       afterLocationId: 'beach',
     });
     expect(rolling.plans[0].scenes[0].requiredDeltaIds).toContain(locationDelta?.id);
+  });
+
+  test('Planner wire cannot duplicate compiler-owned location deltas', () => {
+    const wire = plannerWire() as unknown as {
+      chapters: Array<{ deltas: Array<Record<string, unknown>> }>;
+    };
+    wire.chapters[0].deltas.push({
+      id: 'model_location',
+      k: 'location',
+      target: 'main',
+      counterpart: null,
+      before: 'home',
+      change: null,
+      after: 'beach',
+      source: null,
+      sink: null,
+    });
+    expect(PlannerRollingPlanResponseSchema.safeParse(wire).success).toBe(false);
   });
 
   test('numeric before and after are derived sequentially from the ledger', () => {
