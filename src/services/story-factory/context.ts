@@ -267,14 +267,12 @@ export function buildChapterContexts(input: {
 export function buildRevisionContext(input: {
   brief: WriterBrief;
   previousTail: string;
-  draft: { title: string; content: string };
   assessment: EditorAssessment;
 }) {
   if (input.assessment.status !== 'revise') throw new Error('Revision context requires a revise assessment.');
   return {
     writerBrief: input.brief,
     previousChapterTail: input.previousTail,
-    currentDraft: input.draft,
     continuityIssues: input.assessment.continuityIssues,
     readingIssues: input.assessment.readingIssues,
   };

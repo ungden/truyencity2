@@ -313,6 +313,7 @@ const usage = { model: 'test', inputTokens: 1, outputTokens: 1, costUsd: 0, fini
 class QueueProvider implements StoryModelProvider {
   calls: string[] = [];
   temperatures: Array<number | undefined> = [];
+  prompts: string[] = [];
   constructor(private readonly values: unknown[]) {}
   async text(input: { model: string }): Promise<ProviderResult<string>> {
     this.calls.push(input.model);
@@ -320,11 +321,13 @@ class QueueProvider implements StoryModelProvider {
   }
   async json<T>(input: {
     model: string;
+    prompt: string;
     schema: z.ZodType<T, z.ZodTypeDef, unknown>;
     temperature?: number;
   }): Promise<ProviderResult<T>> {
     this.calls.push(input.model);
     this.temperatures.push(input.temperature);
+    this.prompts.push(input.prompt);
     const value = this.values.shift();
     return { value: input.schema.parse(value), usage };
   }
@@ -2097,23 +2100,27 @@ describe('canonical Story Factory', () => {
       title: 'Bắt tay vào việc',
       content: 'Hải chia phần lưới cho mẹ rồi tự vá đoạn rách lớn; đến cuối buổi, công việc đã khởi động.',
     };
+    const provider = new QueueProvider([
+      first,
+      missingDelta,
+      revised,
+      editorWirePass('delta_1', 'công việc đã khởi động'),
+    ]);
     const result = await writeStoryChapter({
       kernel,
       state: initialState,
       plan: plan(1),
       routes,
-      provider: new QueueProvider([
-        first,
-        missingDelta,
-        revised,
-        editorWirePass('delta_1', 'công việc đã khởi động'),
-      ]),
+      provider,
     });
     expect(result.revisionCount).toBe(1);
     expect(result.attemptTelemetry.initialAssessment).toMatchObject({
       status: 'revise',
       continuityIssues: [{ category: 'required_delta', referenceId: 'delta_1' }],
     });
+    expect(provider.prompts[2]).not.toContain('currentDraft');
+    expect(provider.prompts[2]).not.toContain(first.content);
+    expect(provider.prompts[2]).toContain('required_delta');
   });
 
   test('code derives revise from issues without accepting a model decision', () => {

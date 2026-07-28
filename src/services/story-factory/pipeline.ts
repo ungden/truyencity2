@@ -588,7 +588,6 @@ export async function writeStoryChapter(input: {
       prompt: JSON.stringify(buildRevisionContext({
         brief: contexts.brief,
         previousTail: contexts.previousTail,
-        draft: initial.value,
         assessment: firstAssessment.assessment,
       })),
       schema: ChapterDraftSchema,
