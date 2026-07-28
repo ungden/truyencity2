@@ -45,7 +45,7 @@ if (judgeModels.length !== 3 || new Set(judgeModels).size !== 3) {
 type Generation = {
   sampleId: string;
   writer: string;
-  status: 'publish' | 'writer_failed' | 'corpus_invalid';
+  status: 'publish' | 'writer_failed' | 'corpus_invalid' | 'infra_failed';
   content: string;
   title: string;
   revisionCount: number;
@@ -121,7 +121,7 @@ async function main() {
   const generations: Generation[] = (previous.generations ?? []).filter(result => (
     typeof result.costUsd === 'number'
     && typeof result.content === 'string'
-    && ['publish', 'writer_failed', 'corpus_invalid'].includes(result.status)
+    && ['publish', 'writer_failed', 'corpus_invalid', 'infra_failed'].includes(result.status)
   ));
 
   for (let batchStart = 0; batchStart < corpus.samples.length; batchStart += 3) {
@@ -161,8 +161,22 @@ async function main() {
         const typed = error && typeof error === 'object' && 'code' in error
           ? error as { code?: unknown }
           : null;
-        if (typed?.code === 'infra_blocked') throw error;
         const telemetry = pipelineTelemetry(error);
+        if (typed?.code === 'infra_blocked') {
+          const draft = telemetry?.revisionDraft ?? telemetry?.initialDraft;
+          return {
+            sampleId: sample.id,
+            writer,
+            status: 'infra_failed',
+            content: draft?.content ?? '',
+            title: draft?.title ?? '',
+            revisionCount: telemetry?.revisionCount ?? (telemetry?.revisionDraft ? 1 : 0),
+            costUsd: cost(telemetry?.usages ?? []),
+            criticalViolation: false,
+            issues: telemetry?.finalAssessment ?? telemetry?.initialAssessment ?? null,
+            error: error instanceof Error ? error.message : String(error),
+          };
+        }
         if (!telemetry?.usages?.length) throw error;
         const assessment = telemetry.finalAssessment ?? telemetry.initialAssessment ?? null;
         const draft = telemetry.revisionDraft ?? telemetry.initialDraft;
@@ -200,12 +214,17 @@ async function main() {
       writer,
       publishRate: results.filter(result => result.status === 'publish').length / corpus.samples.length,
       criticalViolations: results.filter(result => result.criticalViolation).length,
+      infraFailures: results.filter(result => result.status === 'infra_failed').length,
       maxCostUsd: Math.max(...results.map(result => result.costUsd)),
     };
   });
   const candidates = invalidBriefIds.length
     ? []
-    : preliminary.filter(summary => summary.criticalViolations === 0 && summary.maxCostUsd <= 0.5);
+    : preliminary.filter(summary => (
+      summary.criticalViolations === 0
+      && summary.infraFailures === 0
+      && summary.maxCostUsd <= 0.5
+    ));
   const bestPublishRate = Math.max(0, ...candidates.map(summary => summary.publishRate));
   const survivalLeaders = candidates.filter(summary => summary.publishRate === bestPublishRate).map(summary => summary.writer);
 
@@ -286,6 +305,7 @@ Không được xem plan/state, không suy đoán model và không thưởng che
       firstPassRate: results.filter(result => result.status === 'publish' && result.revisionCount === 0).length / corpus.samples.length,
       criticalViolations: results.filter(result => result.criticalViolation).length,
       writerFailures: results.filter(result => result.status === 'writer_failed').length,
+      infraFailures: results.filter(result => result.status === 'infra_failed').length,
       corpusInvalidations: results.filter(result => result.status === 'corpus_invalid').length,
       pairwiseMajorityWins,
       wantsNextMajorities,
@@ -298,7 +318,11 @@ Không được xem plan/state, không suy đoán model và không thưởng che
   const topTwoWriters = invalidBriefIds.length
     ? []
     : summaries
-      .filter(summary => summary.criticalViolations === 0 && summary.maxCostUsd <= 0.5)
+      .filter(summary => (
+        summary.criticalViolations === 0
+        && summary.infraFailures === 0
+        && summary.maxCostUsd <= 0.5
+      ))
       .sort((a, b) => (
         b.publishRate - a.publishRate
         || b.pairwiseMajorityWins - a.pairwiseMajorityWins
