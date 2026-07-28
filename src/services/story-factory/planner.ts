@@ -26,6 +26,15 @@ import {
 
 type PlanRevisionIssues = Extract<PlanAssessment, { status: 'revise' }>['issues'];
 
+export type PlannerAttemptTelemetry = {
+  attempt: 'initial' | 'mechanical_repair' | 'judge_replan';
+  responseDigest: string;
+  status: 'validated' | 'invalid';
+  validationMessage: string | null;
+  validationEvidence: unknown;
+  usage: ProviderUsage;
+};
+
 const PlannerScalarSchema = z.union([z.string(), z.number(), z.null()]);
 const PlannerCompactDeltaSchema = z.object({
   id: z.string(),
@@ -129,6 +138,103 @@ const PLANNER_COMPACT_CONTRACT = {
   ],
 } as const;
 
+function deriveEffectOwnership(
+  chapter: z.infer<typeof PlannerCompactChapterSchema>,
+  kernel: StoryKernel | undefined,
+): Map<string, string[]> {
+  const ownership = new Map<string, string[]>();
+  if (!kernel) return ownership;
+  const mechanics = new Map(kernel.worldMechanics.map(mechanic => [mechanic.id, mechanic]));
+  const claimed = new Set<string>();
+  const chapterDeltaOrder = new Map(chapter.deltas.map((delta, index) => [delta.id, index]));
+
+  // Conversion contracts are quantitative and therefore stronger than the
+  // model's duplicated delta links. Allocate their signed resource deltas
+  // first. This correctly separates a chained +1000 output from the following
+  // -1000 input even when both conversions run in the same scene.
+  for (const use of chapter.mechanics) {
+    const mechanic = mechanics.get(use.mechanic);
+    if (mechanic?.kind !== 'conversion') continue;
+    const sceneDeltaIds = new Set(
+      chapter.scenes.find(scene => scene.id === use.scene)?.deltaIds ?? [],
+    );
+    const expected = new Map<string, number>();
+    const addExpected = (resourceId: string, amount: number) => {
+      expected.set(resourceId, (expected.get(resourceId) ?? 0) + amount);
+    };
+    mechanic.inputsPerBatch.forEach(item => addExpected(item.resourceId, -item.amount * use.qty));
+    mechanic.outputsPerBatch.forEach(item => addExpected(item.resourceId, item.amount * use.qty));
+    const preferred = new Map(
+      [use.primaryDeltaId, ...use.additionalDeltaIds].map((deltaId, index) => [deltaId, index]),
+    );
+    const owned: string[] = [];
+    for (const [resourceId, amount] of expected) {
+      if (Math.abs(amount) <= 1e-9) continue;
+      const candidates = chapter.deltas
+        .filter(delta => (
+          !claimed.has(delta.id)
+          && sceneDeltaIds.has(delta.id)
+          && delta.k === 'resource_numeric'
+          && delta.target === resourceId
+          && delta.change !== null
+          && Math.sign(delta.change) === Math.sign(amount)
+        ))
+        .sort((left, right) => (
+          (preferred.get(left.id) ?? Number.MAX_SAFE_INTEGER)
+          - (preferred.get(right.id) ?? Number.MAX_SAFE_INTEGER)
+          || (chapterDeltaOrder.get(left.id) ?? 0) - (chapterDeltaOrder.get(right.id) ?? 0)
+        ));
+      const exact = candidates.find(delta => Math.abs((delta.change ?? 0) - amount) <= 1e-9);
+      if (exact) {
+        owned.push(exact.id);
+        claimed.add(exact.id);
+        continue;
+      }
+      let accumulated = 0;
+      for (const candidate of candidates) {
+        owned.push(candidate.id);
+        claimed.add(candidate.id);
+        accumulated += candidate.change ?? 0;
+        if (Math.abs(accumulated - amount) <= 1e-9
+          || Math.abs(accumulated) >= Math.abs(amount)) break;
+      }
+    }
+    ownership.set(use.id, owned);
+  }
+
+  // Capability effects have a declared resource direction/fact allow-list but
+  // no quantitative conversion equation. Respect the model's selected delta
+  // only after conversion ownership has been resolved, and never double-claim.
+  for (const use of chapter.mechanics) {
+    const mechanic = mechanics.get(use.mechanic);
+    if (mechanic?.kind !== 'capability' || use.role !== 'effect') continue;
+    const sceneDeltaIds = new Set(
+      chapter.scenes.find(scene => scene.id === use.scene)?.deltaIds ?? [],
+    );
+    const resourceDirections = new Set(
+      mechanic.effectResources.map(effect => `${effect.resourceId}:${effect.direction}`),
+    );
+    const factIds = new Set(mechanic.effectFactIds);
+    const owned = [use.primaryDeltaId, ...use.additionalDeltaIds].filter(deltaId => {
+      if (claimed.has(deltaId) || !sceneDeltaIds.has(deltaId)) return false;
+      const delta = chapter.deltas.find(item => item.id === deltaId);
+      if (!delta) return false;
+      if (delta.k === 'fact') return factIds.has(delta.target);
+      if (delta.k === 'resource_state') {
+        return resourceDirections.has(`${delta.target}:state_change`);
+      }
+      if (delta.k === 'resource_numeric' && delta.change !== null) {
+        const direction = delta.change > 0 ? 'increase' : 'decrease';
+        return resourceDirections.has(`${delta.target}:${direction}`);
+      }
+      return false;
+    });
+    owned.forEach(deltaId => claimed.add(deltaId));
+    ownership.set(use.id, owned);
+  }
+  return ownership;
+}
+
 export function materializePlannerRollingPlan(
   value: z.infer<typeof PlannerRollingPlanResponseSchema>,
   initialState: StoryState,
@@ -157,7 +263,9 @@ export function materializePlannerRollingPlan(
   const rolling = RollingPlanSchema.parse({
     schemaVersion: compact.v,
     startChapter: compact.start,
-    plans: chapters.map(chapter => ({
+    plans: chapters.map(chapter => {
+      const effectOwnership = deriveEffectOwnership(chapter, kernel);
+      return {
       schemaVersion: compact.v,
       chapterNumber: chapter.n,
       arcNumber: chapter.arc,
@@ -257,43 +365,7 @@ export function materializePlannerRollingPlan(
         const sceneDeltaIds = new Set(
           chapter.scenes.find(scene => scene.id === use.scene)?.deltaIds ?? [],
         );
-        let deltaIds = modelDeltaIds;
-        if (mechanic?.kind === 'conversion') {
-          const numericResourceIds = new Set([
-            ...mechanic.inputsPerBatch,
-            ...mechanic.outputsPerBatch,
-          ].map(item => item.resourceId));
-          // A conversion contract already defines exactly which numeric
-          // resources it can consume/produce. Derive ownership from that
-          // contract and the selected scene instead of trusting a duplicated
-          // model-maintained delta list that can accidentally include facts or
-          // state resources.
-          deltaIds = chapter.deltas
-            .filter(delta => (
-              sceneDeltaIds.has(delta.id)
-              && delta.k === 'resource_numeric'
-              && numericResourceIds.has(delta.target)
-            ))
-            .map(delta => delta.id);
-        } else if (mechanic?.kind === 'capability' && use.role === 'effect') {
-          const resourceDirections = new Map(
-            mechanic.effectResources.map(effect => [`${effect.resourceId}:${effect.direction}`, true]),
-          );
-          const factIds = new Set(mechanic.effectFactIds);
-          deltaIds = modelDeltaIds.filter(deltaId => {
-            const delta = chapter.deltas.find(item => item.id === deltaId);
-            if (!delta || !sceneDeltaIds.has(delta.id)) return false;
-            if (delta.k === 'fact') return factIds.has(delta.target);
-            if (delta.k === 'resource_state') {
-              return resourceDirections.has(`${delta.target}:state_change`);
-            }
-            if (delta.k === 'resource_numeric' && delta.change !== null) {
-              const direction = delta.change > 0 ? 'increase' : 'decrease';
-              return resourceDirections.has(`${delta.target}:${direction}`);
-            }
-            return false;
-          });
-        }
+        const deltaIds = effectOwnership.get(use.id) ?? modelDeltaIds;
         return {
           id: use.id,
           sceneId: use.scene,
@@ -309,7 +381,8 @@ export function materializePlannerRollingPlan(
           deltaIds,
         };
       }),
-    })),
+      };
+    }),
   });
   for (const plan of rolling.plans) {
     for (const characterId of characterLocations.keys()) {
@@ -558,9 +631,15 @@ export async function planRollingWindow(input: {
   recoveryEvidence?: unknown;
   continuityPacket?: ContinuityPacket;
   provider?: StoryModelProvider;
-}): Promise<{ rollingPlan: RollingPlan; assessment: PlanAssessment; usages: ProviderUsage[] }> {
+}): Promise<{
+  rollingPlan: RollingPlan;
+  assessment: PlanAssessment;
+  usages: ProviderUsage[];
+  attempts: PlannerAttemptTelemetry[];
+}> {
   const provider = input.provider ?? geminiProvider;
   const usages: ProviderUsage[] = [];
+  const attempts: PlannerAttemptTelemetry[] = [];
   validateArcResourceReachability({
     kernel: input.kernel,
     arc: input.arc,
@@ -684,22 +763,44 @@ export async function planRollingWindow(input: {
         message: mechanicalError?.message,
         evidence: mechanicalError?.evidence ?? null,
       },
-      temperature: mechanicalAttempt === 1 ? 0.7 : 0.4,
+      // Mechanical planning is a constrained compiler input, not a prose
+      // diversity task. Keep it reproducible; the independent Plan Judge still
+      // owns the qualitative reading check.
+      temperature: mechanicalAttempt === 1 ? 0.2 : 0.1,
     });
     currentResponse = result.value;
     try {
       currentPlan = materializeAndValidate(result.value);
+      attempts.push({
+        attempt: mechanicalAttempt === 1 ? 'initial' : 'mechanical_repair',
+        responseDigest: digestRollingPlan(currentPlan),
+        status: 'validated',
+        validationMessage: null,
+        validationEvidence: null,
+        usage: result.usage,
+      });
       mechanicalError = undefined;
       break;
     } catch (error) {
       if (error instanceof StoryFactoryError && error.code === 'infra_blocked') throw error;
       mechanicalError = normalizePlanError(error);
+      attempts.push({
+        attempt: mechanicalAttempt === 1 ? 'initial' : 'mechanical_repair',
+        responseDigest: createHash('sha256')
+          .update(JSON.stringify(result.value))
+          .digest('hex'),
+        status: 'invalid',
+        validationMessage: mechanicalError.message,
+        validationEvidence: mechanicalError.evidence ?? null,
+        usage: result.usage,
+      });
     }
   }
   if (!currentPlan || !currentResponse) {
     throw new StoryFactoryError('plan_blocked', mechanicalError?.message ?? 'Planner mechanical repair budget was exhausted.', {
       validation: mechanicalError?.evidence ?? null,
       usages,
+      attempts,
     });
   }
 
@@ -713,7 +814,7 @@ export async function planRollingWindow(input: {
   });
   usages.push(judged.usage);
   if (judged.assessment.status === 'pass') {
-    return { rollingPlan: currentPlan, assessment: judged.assessment, usages };
+    return { rollingPlan: currentPlan, assessment: judged.assessment, usages, attempts };
   }
 
   const judgeRepair = await requestPlan({
@@ -723,18 +824,37 @@ Nếu validation báo required fact sai, delta tạo fact phải dùng chính x�
 Sau khi lập lại, tự đối chiếu từng issue với scene và delta mới trước khi trả kết quả.`,
     previousResponse: currentResponse,
     validationIssues: judged.assessment.issues,
-    temperature: 0.4,
+    temperature: 0.1,
   });
   let repairedPlan: RollingPlan;
   try {
     repairedPlan = materializeAndValidate(judgeRepair.value);
+    attempts.push({
+      attempt: 'judge_replan',
+      responseDigest: digestRollingPlan(repairedPlan),
+      status: 'validated',
+      validationMessage: null,
+      validationEvidence: null,
+      usage: judgeRepair.usage,
+    });
   } catch (error) {
     if (error instanceof StoryFactoryError && error.code === 'infra_blocked') throw error;
     const normalized = normalizePlanError(error);
+    attempts.push({
+      attempt: 'judge_replan',
+      responseDigest: createHash('sha256')
+        .update(JSON.stringify(judgeRepair.value))
+        .digest('hex'),
+      status: 'invalid',
+      validationMessage: normalized.message,
+      validationEvidence: normalized.evidence ?? null,
+      usage: judgeRepair.usage,
+    });
     throw new StoryFactoryError('plan_blocked', normalized.message, {
       validation: normalized.evidence ?? null,
       judgeIssues: judged.assessment.issues,
       usages,
+      attempts,
     });
   }
   const rejudged = await assessRollingPlan({
@@ -748,7 +868,7 @@ Sau khi lập lại, tự đối chiếu từng issue với scene và delta mớ
   });
   usages.push(rejudged.usage);
   if (rejudged.assessment.status === 'pass') {
-    return { rollingPlan: repairedPlan, assessment: rejudged.assessment, usages };
+    return { rollingPlan: repairedPlan, assessment: rejudged.assessment, usages, attempts };
   }
   throw new StoryFactoryError('plan_blocked', 'Plan Judge rejected the rolling window after one full replan.', {
     firstAssessment: judged.assessment,
@@ -758,6 +878,7 @@ Sau khi lập lại, tự đối chiếu từng issue với scene và delta mớ
     repairedPlanDigest: digestRollingPlan(repairedPlan),
     repairedIssueSnapshot: planIssueSnapshot(repairedPlan, rejudged.assessment),
     usages,
+    attempts,
   });
 }
 

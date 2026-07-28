@@ -310,13 +310,19 @@ const usage = { model: 'test', inputTokens: 1, outputTokens: 1, costUsd: 0, fini
 
 class QueueProvider implements StoryModelProvider {
   calls: string[] = [];
+  temperatures: Array<number | undefined> = [];
   constructor(private readonly values: unknown[]) {}
   async text(input: { model: string }): Promise<ProviderResult<string>> {
     this.calls.push(input.model);
     return { value: z.string().parse(this.values.shift()), usage };
   }
-  async json<T>(input: { model: string; schema: z.ZodType<T, z.ZodTypeDef, unknown> }): Promise<ProviderResult<T>> {
+  async json<T>(input: {
+    model: string;
+    schema: z.ZodType<T, z.ZodTypeDef, unknown>;
+    temperature?: number;
+  }): Promise<ProviderResult<T>> {
     this.calls.push(input.model);
+    this.temperatures.push(input.temperature);
     const value = this.values.shift();
     return { value: input.schema.parse(value), usage };
   }
@@ -2321,6 +2327,95 @@ describe('canonical Story Factory', () => {
     })).not.toThrow();
   });
 
+  test('compiler separates chained conversion output and input in the same scene', () => {
+    const chainedKernel: StoryKernel = structuredClone(kernel);
+    chainedKernel.resources.push(
+      { id: 'brine', name: 'Nước chạt', kind: 'numeric', unit: 'lít', minimum: 0 },
+      { id: 'salt', name: 'Muối', kind: 'numeric', unit: 'kg', minimum: 0 },
+    );
+    chainedKernel.worldMechanics = [
+      {
+        id: 'acquire_brine',
+        name: 'Lấy nước chạt',
+        kind: 'conversion',
+        description: 'Dùng tiền công để lấy một mẻ nước chạt.',
+        inputsPerBatch: [{ resourceId: 'money', amount: 10 }],
+        outputsPerBatch: [{ resourceId: 'brine', amount: 1_000 }],
+        maximumBatchesPerUse: 1,
+      },
+      {
+        id: 'crystallize_salt',
+        name: 'Kết tinh muối',
+        kind: 'conversion',
+        description: 'Một mẻ nước chạt kết tinh thành muối.',
+        inputsPerBatch: [{ resourceId: 'brine', amount: 1_000 }],
+        outputsPerBatch: [{ resourceId: 'salt', amount: 50 }],
+        maximumBatchesPerUse: 1,
+      },
+    ];
+    const chainedState: StoryState = structuredClone(initialState);
+    chainedState.resources.push(
+      { resourceId: 'brine', kind: 'numeric', value: 0 },
+      { resourceId: 'salt', kind: 'numeric', value: 0 },
+    );
+    const wire = plannerWire();
+    const chapter = structuredClone(wire.chapters[0]);
+    chapter.scenes[0].deltaIds = ['pay', 'brine_in', 'brine_out', 'salt_out'];
+    chapter.deltas = [
+      {
+        id: 'pay', k: 'resource_numeric', target: 'money', counterpart: null,
+        before: null, change: -10, after: null, source: null, sink: 'tiền công',
+      },
+      {
+        id: 'brine_in', k: 'resource_numeric', target: 'brine', counterpart: null,
+        before: null, change: 1_000, after: null, source: 'lấy nước', sink: null,
+      },
+      {
+        id: 'brine_out', k: 'resource_numeric', target: 'brine', counterpart: null,
+        before: null, change: -1_000, after: null, source: null, sink: 'kết tinh',
+      },
+      {
+        id: 'salt_out', k: 'resource_numeric', target: 'salt', counterpart: null,
+        before: null, change: 50, after: null, source: 'kết tinh', sink: null,
+      },
+    ];
+    chapter.mechanics = [
+      {
+        id: 'use_acquire',
+        scene: 'scene_1',
+        mechanic: 'acquire_brine',
+        role: 'effect',
+        actor: 'main',
+        qty: 1,
+        facts: [],
+        primaryDeltaId: 'brine_out',
+        additionalDeltaIds: ['salt_out'],
+      },
+      {
+        id: 'use_crystallize',
+        scene: 'scene_1',
+        mechanic: 'crystallize_salt',
+        role: 'effect',
+        actor: 'main',
+        qty: 1,
+        facts: [],
+        primaryDeltaId: 'brine_in',
+        additionalDeltaIds: ['pay'],
+      },
+    ];
+    wire.chapters[0] = chapter;
+    const rolling = materializePlannerRollingPlan(wire, chainedState, chainedKernel);
+    expect(rolling.plans[0].mechanicUses).toMatchObject([
+      { id: 'use_acquire', deltaIds: ['pay', 'brine_in'] },
+      { id: 'use_crystallize', deltaIds: ['brine_out', 'salt_out'] },
+    ]);
+    expect(() => applyChapterPlan({
+      kernel: chainedKernel,
+      state: chainedState,
+      plan: rolling.plans[0],
+    })).not.toThrow();
+  });
+
   test('fact before values are derived sequentially from State across a rolling window', () => {
     const first = structuredClone(plannerWire(1).chapters[0]);
     const second = structuredClone(plannerWire(2).chapters[0]);
@@ -2437,6 +2532,14 @@ describe('canonical Story Factory', () => {
     const result = await planRollingWindow({ kernel, arc, state: initialState, routes, provider });
     expect(result.assessment.status).toBe('pass');
     expect(provider.calls).toEqual(['planner', 'plan-judge']);
+    expect(provider.temperatures).toEqual([0.2, 0.3]);
+    expect(result.attempts).toEqual([
+      expect.objectContaining({
+        attempt: 'initial',
+        status: 'validated',
+        responseDigest: expect.stringMatching(/^[a-f0-9]{64}$/),
+      }),
+    ]);
   });
 
   test('Plan Judge permits exactly one full-window replan then passes', async () => {
@@ -2565,6 +2668,15 @@ describe('canonical Story Factory', () => {
       'plan-judge',
       'planner',
       'plan-judge',
+    ]);
+    expect(provider.temperatures).toEqual([0.2, 0.1, 0.3, 0.1, 0.3]);
+    expect(result.attempts.map(attempt => ({
+      attempt: attempt.attempt,
+      status: attempt.status,
+    }))).toEqual([
+      { attempt: 'initial', status: 'invalid' },
+      { attempt: 'mechanical_repair', status: 'validated' },
+      { attempt: 'judge_replan', status: 'validated' },
     ]);
   });
 

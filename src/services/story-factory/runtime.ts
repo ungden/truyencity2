@@ -362,7 +362,11 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
     if (jobUpdate.error) throw jobUpdate.error;
     const runUpdate = await db.from('story_factory_runs').update({
       status: 'passed', model_routes: { planner: routes.planner, planJudge: routes.planJudge },
-      input_artifact: { plannerRevision: FACTORY_PLANNER_VERSION }, output_artifact: planned.rollingPlan,
+      input_artifact: { plannerRevision: FACTORY_PLANNER_VERSION },
+      output_artifact: {
+        ...planned.rollingPlan,
+        attemptLineage: planned.attempts,
+      },
       editor_assessment: planned.assessment,
       usage: planned.usages, estimated_cost_usd: usageCost(planned.usages), finished_at: now,
     }).eq('id', runId);
