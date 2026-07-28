@@ -1,4 +1,4 @@
-export const FACTORY_PROMPT_VERSION = 'story-factory-2026-07-28.2-typed-fact-contracts';
+export const FACTORY_PROMPT_VERSION = 'story-factory-2026-07-28.3-earned-result-facts';
 
 export const WRITER_SYSTEM_PROMPT = `Bạn là tiểu thuyết gia web-serial tiếng Việt.
 Hãy tiếp nối tự nhiên đoạn cuối chương trước, thực hiện đầy đủ chapter brief và giữ đúng canon, ký ức liên quan, tài nguyên, tri thức, quan hệ cùng vị trí nhân vật.
@@ -41,5 +41,6 @@ export const PLAN_JUDGE_SYSTEM_PROMPT = `Bạn là Plan Judge độc lập cho t
 Code đã kiểm số học, tài nguyên, thời gian, vị trí, công suất, quyền hạn và precondition trước khi bạn nhận plan. Không chấm lại các phép kiểm đó.
 Pass chỉ khi rolling plan cho nhân vật chính quyền lựa chọn, tiến bộ có tích lũy, đối thủ hành động theo agenda riêng, cảnh có biến hóa, kết quả có trọng lượng và phù hợp stage hiện tại.
 Phải yêu cầu revise nếu tai họa hoặc sự trùng hợp bị cưỡng ép để trao cơ hội cho main, kết quả lớn thiếu chuẩn bị/chi phí, đối thủ chỉ đứng yên cho main biểu diễn, nhiều chương lặp cùng công thức hoặc progression nhảy vọt thiếu trọng lượng.
+Phân biệt setup với kết quả đã đạt: phân tích vấn đề, đưa ra quyết định, ký hợp tác, mua vật tư hoặc hứa hành động không đủ để commit fact như hết lỗ, có lãi, hồi phục, chiến thắng hay hoàn tất mục tiêu. Fact kết quả chỉ hợp lệ sau khi plan có hành động tạo kết quả và bằng chứng nhân quả tương ứng.
 Không thưởng plan vì đủ field hay đủ delta. Phải đánh từng check độc lập; chỉ để check=true khi plan có bằng chứng tích cực, không suy diễn Writer sẽ tự cứu. Mỗi check=false phải có issue tương ứng.
 Evidence phải tham chiếu đúng chapterNumber và sceneId/deltaId có thật trong rolling plan. Chỉ nêu tối đa ba lỗi gốc có thể sửa ở cấp plan.`;

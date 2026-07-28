@@ -470,7 +470,7 @@ export async function assessRollingPlan(input: {
         oppositionAgenda: 'Đối lực phải có lựa chọn, đối sách và hậu quả theo agenda riêng; chỉ gây hấn rồi kinh ngạc/thua/chạy không đạt.',
         sceneVariety: 'Window không được lặp công thức giải thích cơ chế → biểu diễn thành công → người khác kinh ngạc/tôn sùng → nhận thưởng.',
         stageAlignment: 'Xung đột và reward loop phải phục vụ stage hiện tại, không nhảy sớm.',
-        outcomeWeight: 'Kết quả phải có trọng lượng tương xứng chuẩn bị và phản lực; không dùng tai họa cưỡng ép, quần chúng làm nền hoặc một thao tác giải quyết toàn bộ xung đột.',
+        outcomeWeight: 'Kết quả phải có trọng lượng tương xứng chuẩn bị và phản lực. Quyết định, phân tích, ký hợp tác hoặc mua đầu vào chỉ là setup; không được commit fact tuyên bố đã hết lỗ, có lãi, thành công hay giải quyết xung đột trước khi hành động tạo kết quả thực sự xảy ra.',
       },
       repairVerification: input.repairIssues
         ? {
