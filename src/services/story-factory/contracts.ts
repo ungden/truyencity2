@@ -179,10 +179,16 @@ export const StoryKernelSchema = z.object({
       name: shortText,
       kind: z.literal('numeric'),
       unit: z.string().trim().min(1).max(40),
+      ownerEntityId: stableId.nullable(),
       minimum: z.number().finite().optional(),
       maximum: z.number().finite().optional(),
     }).strict(),
-    z.object({ id: stableId, name: shortText, kind: z.literal('state') }).strict(),
+    z.object({
+      id: stableId,
+      name: shortText,
+      kind: z.literal('state'),
+      ownerEntityId: stableId.nullable(),
+    }).strict(),
   ])).max(80),
   promises: z.array(z.object({ id: stableId, description: prose }).strict()).max(80),
   pleasureLoop: z.object({
@@ -203,6 +209,19 @@ export const StoryKernelSchema = z.object({
   const locations = new Set(kernel.locations.map(item => item.id));
   const resources = new Set(kernel.resources.map(item => item.id));
   const resourceDefinitions = new Map(kernel.resources.map(item => [item.id, item]));
+  const resourceOwners = new Set([
+    ...characters,
+    ...kernel.worldModel.institutions.map(institution => institution.id),
+  ]);
+  kernel.resources.forEach((resource, index) => {
+    if (resource.ownerEntityId && !resourceOwners.has(resource.ownerEntityId)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['resources', index, 'ownerEntityId'],
+        message: `Resource owner ${resource.ownerEntityId} is not a character or institution.`,
+      });
+    }
+  });
   const mechanicIds = new Set(kernel.worldMechanics.map(item => item.id));
   if (mechanicIds.size !== kernel.worldMechanics.length) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['worldMechanics'], message: 'World mechanic IDs must be unique.' });

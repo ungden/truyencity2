@@ -194,7 +194,7 @@ const kernel: StoryKernel = {
     { fromLocationId: 'home', toLocationId: 'beach', minimumMinutes: 20 },
     { fromLocationId: 'beach', toLocationId: 'home', minimumMinutes: 20 },
   ],
-  resources: [{ id: 'money', name: 'Tiền mặt', kind: 'numeric', unit: 'VND', minimum: 0 }],
+  resources: [{ id: 'money', name: 'Tiền mặt', kind: 'numeric', unit: 'VND', ownerEntityId: 'main', minimum: 0 }],
   promises: [
     { id: 'promise_house', description: 'Sửa lại mái nhà trước mùa mưa.' },
     { id: 'promise_2', description: 'Tạo đầu ra công bằng hơn cho ngư dân.' },
@@ -366,8 +366,8 @@ describe('canonical Story Factory', () => {
   test('blocks an arc whose active resources have no causal acquisition path before calling Planner', async () => {
     const blockedKernel = structuredClone(kernel);
     blockedKernel.resources.push(
-      { id: 'broken_engine', name: 'Động cơ hỏng', kind: 'numeric', unit: 'chiếc', minimum: 0 },
-      { id: 'working_engine', name: 'Động cơ hoạt động', kind: 'numeric', unit: 'chiếc', minimum: 0 },
+      { id: 'broken_engine', name: 'Động cơ hỏng', kind: 'numeric', unit: 'chiếc', ownerEntityId: 'main', minimum: 0 },
+      { id: 'working_engine', name: 'Động cơ hoạt động', kind: 'numeric', unit: 'chiếc', ownerEntityId: 'main', minimum: 0 },
     );
     blockedKernel.worldMechanics.push({
       id: 'repair_engine',
@@ -407,8 +407,8 @@ describe('canonical Story Factory', () => {
   test('accepts a story-specific acquisition conversion feeding a production conversion', () => {
     const reachableKernel = structuredClone(kernel);
     reachableKernel.resources.push(
-      { id: 'broken_engine', name: 'Động cơ hỏng', kind: 'numeric', unit: 'chiếc', minimum: 0 },
-      { id: 'working_engine', name: 'Động cơ hoạt động', kind: 'numeric', unit: 'chiếc', minimum: 0 },
+      { id: 'broken_engine', name: 'Động cơ hỏng', kind: 'numeric', unit: 'chiếc', ownerEntityId: 'main', minimum: 0 },
+      { id: 'working_engine', name: 'Động cơ hoạt động', kind: 'numeric', unit: 'chiếc', ownerEntityId: 'main', minimum: 0 },
     );
     reachableKernel.worldMechanics.push(
       {
@@ -450,8 +450,8 @@ describe('canonical Story Factory', () => {
   test('capability effects can feed a later conversion without inventing resources', () => {
     const effectKernel = structuredClone(kernel);
     effectKernel.resources.push(
-      { id: 'fresh_fish', name: 'Cá tươi', kind: 'numeric', unit: 'kg', minimum: 0 },
-      { id: 'scrap_wood', name: 'Gỗ vụn', kind: 'numeric', unit: 'kg', minimum: 0 },
+      { id: 'fresh_fish', name: 'Cá tươi', kind: 'numeric', unit: 'kg', ownerEntityId: 'main', minimum: 0 },
+      { id: 'scrap_wood', name: 'Gỗ vụn', kind: 'numeric', unit: 'kg', ownerEntityId: 'main', minimum: 0 },
     );
     effectKernel.worldMechanics.push(
       {
@@ -501,6 +501,7 @@ describe('canonical Story Factory', () => {
       name: 'Hàng của khách gửi',
       kind: 'numeric',
       unit: 'kg',
+      ownerEntityId: null,
       minimum: 0,
     });
     const trackedState = structuredClone(initialState);
@@ -661,8 +662,8 @@ describe('canonical Story Factory', () => {
   test('validates support prerequisites from scene opening state when an earlier effect consumes them', () => {
     const processingKernel = structuredClone(kernel);
     processingKernel.resources.push(
-      { id: 'live_fish', name: 'Cá sống', kind: 'numeric', unit: 'con', minimum: 0 },
-      { id: 'processed_fish', name: 'Cá đã sơ chế', kind: 'numeric', unit: 'con', minimum: 0 },
+      { id: 'live_fish', name: 'Cá sống', kind: 'numeric', unit: 'con', ownerEntityId: 'main', minimum: 0 },
+      { id: 'processed_fish', name: 'Cá đã sơ chế', kind: 'numeric', unit: 'con', ownerEntityId: 'main', minimum: 0 },
     );
     processingKernel.worldMechanics.push(
       {
@@ -802,6 +803,7 @@ describe('canonical Story Factory', () => {
       name: 'Nước mưa đã hứng',
       kind: 'numeric',
       unit: 'lít',
+      ownerEntityId: 'main',
       minimum: 0,
     });
     sequenceKernel.worldMechanics.push(
@@ -1127,6 +1129,51 @@ describe('canonical Story Factory', () => {
   test('does not treat an internal cash hand-off as a net resource transaction', () => {
     const chapter = plan(1);
     chapter.scenes[0].action = 'Hải thuyết phục mẹ và nhận tiền để đi mua phế liệu.';
+    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
+  });
+
+  test('owned resource direction cannot increase when its owner pays out', () => {
+    const chapter = plan(1);
+    chapter.scenes[0].action = 'Hải trả 50 đồng tiền công cho người cung cấp manh mối.';
+    chapter.requiredDeltas = [{
+      id: 'pay_clue',
+      kind: 'resource_numeric',
+      resourceId: 'money',
+      before: 100,
+      delta: 50,
+      after: 150,
+      source: 'hai_tra_cong',
+      sink: null,
+    }];
+    chapter.scenes[0].requiredDeltaIds = ['pay_clue'];
+    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter }))
+      .toThrow('increases even though its owner pays it out');
+  });
+
+  test('owned resource direction accepts a real owner payment', () => {
+    const chapter = plan(1);
+    chapter.scenes[0].action = 'Hải trả 50 đồng tiền công cho người cung cấp manh mối.';
+    chapter.requiredDeltas = [{
+      id: 'pay_clue',
+      kind: 'resource_numeric',
+      resourceId: 'money',
+      before: 100,
+      delta: -50,
+      after: 50,
+      source: null,
+      sink: 'người cung cấp manh mối',
+    }];
+    chapter.scenes[0].requiredDeltaIds = ['pay_clue'];
+    chapter.mechanicUses = [{
+      id: 'use_trade',
+      sceneId: 'scene_1',
+      mechanicId: 'mechanic_trade',
+      role: 'effect',
+      actorId: 'main',
+      quantity: 1,
+      preconditionFactIds: ['fact_day'],
+      deltaIds: ['pay_clue'],
+    }];
     expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
   });
 
@@ -2391,8 +2438,8 @@ describe('canonical Story Factory', () => {
   test('compiler separates chained conversion output and input in the same scene', () => {
     const chainedKernel: StoryKernel = structuredClone(kernel);
     chainedKernel.resources.push(
-      { id: 'brine', name: 'Nước chạt', kind: 'numeric', unit: 'lít', minimum: 0 },
-      { id: 'salt', name: 'Muối', kind: 'numeric', unit: 'kg', minimum: 0 },
+      { id: 'brine', name: 'Nước chạt', kind: 'numeric', unit: 'lít', ownerEntityId: 'main', minimum: 0 },
+      { id: 'salt', name: 'Muối', kind: 'numeric', unit: 'kg', ownerEntityId: 'main', minimum: 0 },
     );
     chainedKernel.worldMechanics = [
       {
@@ -2521,6 +2568,7 @@ describe('canonical Story Factory', () => {
       id: 'dryer_state',
       name: 'Trạng thái lò sấy',
       kind: 'state',
+      ownerEntityId: 'main',
     });
     capabilityKernel.worldMechanics.push({
       id: 'assemble_dryer',
@@ -3213,6 +3261,12 @@ describe('canonical Story Factory', () => {
           }
         : mechanic
     ));
+    const launchResources = resources.map(resource => ({
+      ...resource,
+      ownerEntityId: resource.ownerEntityId
+        ? (characterIdMap[resource.ownerEntityId] ?? resource.ownerEntityId)
+        : null,
+    }));
     const launchArc = {
       ...pack.arc,
       activeCharacterIds: pack.arc.activeCharacterIds.map(id => characterIdMap[id] ?? id),
@@ -3248,7 +3302,7 @@ describe('canonical Story Factory', () => {
           .map(({ id: _id, ...character }) => character),
       },
       {
-        kernel: { worldModel, worldRules, locations, travelRules, resources },
+        kernel: { worldModel, worldRules, locations, travelRules, resources: launchResources },
         conversions: launchWorldMechanics.filter(mechanic => mechanic.kind === 'conversion'),
         capabilities: launchWorldMechanics.filter(mechanic => mechanic.kind === 'capability'),
         constraints: launchWorldMechanics.filter(mechanic => mechanic.kind === 'constraint'),

@@ -10,7 +10,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-18-net-resource-transactions';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-19-owned-resource-direction';
 
 export interface StateEvent {
   chapterNumber: number;
@@ -406,11 +406,59 @@ function hasVietnameseTerm(action: string, terms: string): boolean {
   return new RegExp(String.raw`(?<![\p{L}\p{N}_-])(?:${terms})(?=$|[^\p{L}\p{N}_-])`, 'iu').test(action);
 }
 
+function semanticSlug(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/\p{M}+/gu, '')
+    .toLowerCase()
+    .replace(/đ/gu, 'd')
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
+    .trim();
+}
+
+function tokenSequenceStartsAt(tokens: string[], sequence: string[], start: number): boolean {
+  return sequence.every((token, offset) => tokens[start + offset] === token);
+}
+
+function ownerPerformsTransfer(
+  input: string,
+  labels: string[],
+  verbs: string[][],
+  requireMoneyTerm: boolean,
+  requireAmount = false,
+): boolean {
+  const tokens = semanticSlug(input).split(' ').filter(Boolean);
+  const moneyTerms = new Set(['tien', 'dong', 'phi', 'cong', 'von']);
+  for (const label of labels) {
+    const labelTokens = semanticSlug(label).split(' ').filter(Boolean);
+    if (!labelTokens.length) continue;
+    for (let index = 0; index <= tokens.length - labelTokens.length; index += 1) {
+      if (!tokenSequenceStartsAt(tokens, labelTokens, index)) continue;
+      const predicateStart = index + labelTokens.length;
+      const predicateEnd = Math.min(tokens.length, predicateStart + 16);
+      for (let verbStart = predicateStart; verbStart < predicateEnd; verbStart += 1) {
+        const verb = verbs.find(candidate => tokenSequenceStartsAt(tokens, candidate, verbStart));
+        if (!verb) continue;
+        if (!requireMoneyTerm) return true;
+        const objectEnd = Math.min(tokens.length, verbStart + verb.length + 12);
+        const objectTokens = tokens.slice(verbStart + verb.length, objectEnd);
+        if (objectTokens.some(token => moneyTerms.has(token))
+          && (!requireAmount || objectTokens.some(token => /^\d+(?:[.,]\d+)*$/u.test(token)))) return true;
+      }
+    }
+  }
+  return false;
+}
+
 function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPlan): void {
   const characterIds = new Set(kernel.characters.map(item => item.id));
   const locationIds = new Set(kernel.locations.map(item => item.id));
   const worldRuleIds = new Set(kernel.worldRules.map(item => item.id));
   const deltaIds = new Set(plan.requiredDeltas.map(item => item.id));
+  const resourceDefinitions = new Map(kernel.resources.map(resource => [resource.id, resource]));
+  const ownerLabels = new Map<string, string[]>();
+  kernel.characters.forEach(character => ownerLabels.set(character.id, [character.name, ...character.aliases]));
+  kernel.worldModel.institutions.forEach(institution => ownerLabels.set(institution.id, [institution.name]));
   unique(plan.scenes.map(item => item.id), `Chapter ${plan.chapterNumber} scenes`);
   unique(plan.requiredDeltas.map(item => item.id), `Chapter ${plan.chapterNumber} deltas`);
   unique(plan.requiredWorldRuleIds, `Chapter ${plan.chapterNumber} world rules`);
@@ -447,6 +495,44 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
     }
     const sceneDeltas = scene.requiredDeltaIds.map(deltaId => plan.requiredDeltas.find(delta => delta.id === deltaId)!);
     const realizedAction = stripProhibitedTransactions(stripFutureIntent(scene.action));
+    const normalizedAction = semanticSlug(realizedAction);
+    for (const delta of sceneDeltas) {
+      if (delta.kind !== 'resource_numeric') continue;
+      const definition = resourceDefinitions.get(delta.resourceId);
+      if (!definition?.ownerEntityId) continue;
+      const labels = (ownerLabels.get(definition.ownerEntityId) ?? [definition.ownerEntityId])
+        .map(semanticSlug)
+        .filter(Boolean);
+      const source = semanticSlug(delta.source ?? '');
+      const sink = semanticSlug(delta.sink ?? '');
+      const paymentVerbs = [['tra'], ['chi'], ['dua'], ['thanh', 'toan']];
+      const receiptVerbs = [['nhan'], ['thu'], ['kiem']];
+      // Free-form scene action can mention several transactions or a generic
+      // "chi phí". Only use it as directional evidence when it contains an
+      // explicit amount; structured provenance remains the primary signal.
+      const ownerPaysInAction = ownerPerformsTransfer(normalizedAction, labels, paymentVerbs, true, true);
+      const ownerReceivesInAction = ownerPerformsTransfer(normalizedAction, labels, receiptVerbs, true, true);
+      const ownerPaysInProvenance = ownerPerformsTransfer(source, labels, paymentVerbs, false)
+        || ownerPerformsTransfer(sink, labels, paymentVerbs, false);
+      const ownerReceivesInProvenance = ownerPerformsTransfer(source, labels, receiptVerbs, false)
+        || ownerPerformsTransfer(sink, labels, receiptVerbs, false);
+      if (delta.delta > 0 && (ownerPaysInAction || ownerPaysInProvenance)) {
+        fail(`Resource ${delta.resourceId} increases even though its owner pays it out.`, {
+          ownerEntityId: definition.ownerEntityId,
+          action: scene.action,
+          source: delta.source,
+          delta: delta.delta,
+        });
+      }
+      if (delta.delta < 0 && (ownerReceivesInAction || ownerReceivesInProvenance)) {
+        fail(`Resource ${delta.resourceId} decreases even though its owner receives it.`, {
+          ownerEntityId: definition.ownerEntityId,
+          action: scene.action,
+          sink: delta.sink,
+          delta: delta.delta,
+        });
+      }
+    }
     // The ledger tracks the story resource's net balance, not which character
     // is physically holding it. "Nhận tiền" by itself can therefore be an
     // internal hand-off with no balance change. External acquisition/payment
