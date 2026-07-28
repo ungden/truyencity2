@@ -101,6 +101,10 @@ const MechanicFactConditionSchema = z.object({
   factId: stableId,
   expected: z.union([z.string().trim().min(1).max(2_000), z.number().finite()]),
 }).strict();
+const MechanicResourceEffectSchema = z.object({
+  resourceId: stableId,
+  direction: z.enum(['increase', 'decrease', 'state_change']),
+}).strict();
 
 export const WorldMechanicSchema = z.discriminatedUnion('kind', [
   z.object({
@@ -120,7 +124,7 @@ export const WorldMechanicSchema = z.discriminatedUnion('kind', [
     allowedActorIds: z.array(stableId).max(40).default([]),
     requiredFacts: z.array(MechanicFactConditionSchema).max(20).default([]),
     requiredResourceIds: z.array(stableId).max(20).default([]),
-    effectResourceIds: z.array(stableId).max(20),
+    effectResources: z.array(MechanicResourceEffectSchema).max(20),
     effectFactIds: z.array(stableId).max(20),
     capacityUnit: z.string().trim().min(1).max(40).nullable(),
     maximumUnitsPerMinute: z.number().finite().min(0.000001).max(1_000_000).nullable(),
@@ -198,6 +202,7 @@ export const StoryKernelSchema = z.object({
   }
   const locations = new Set(kernel.locations.map(item => item.id));
   const resources = new Set(kernel.resources.map(item => item.id));
+  const resourceDefinitions = new Map(kernel.resources.map(item => [item.id, item]));
   const mechanicIds = new Set(kernel.worldMechanics.map(item => item.id));
   if (mechanicIds.size !== kernel.worldMechanics.length) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['worldMechanics'], message: 'World mechanic IDs must be unique.' });
@@ -233,15 +238,32 @@ export const StoryKernelSchema = z.object({
           });
         }
       });
-      mechanic.effectResourceIds.forEach(resourceId => {
-        if (!resources.has(resourceId)) {
+      mechanic.effectResources.forEach(effect => {
+        if (!resources.has(effect.resourceId)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            path: ['worldMechanics', index, 'effectResourceIds'],
-            message: `Capability affects unknown resource ${resourceId}.`,
+            path: ['worldMechanics', index, 'effectResources'],
+            message: `Capability affects unknown resource ${effect.resourceId}.`,
+          });
+          return;
+        }
+        const definition = resourceDefinitions.get(effect.resourceId)!;
+        if ((definition.kind === 'state') !== (effect.direction === 'state_change')) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['worldMechanics', index, 'effectResources'],
+            message: `Capability effect ${effect.resourceId} uses a direction incompatible with its resource kind.`,
           });
         }
       });
+      const effectKeys = mechanic.effectResources.map(effect => `${effect.resourceId}:${effect.direction}`);
+      if (new Set(effectKeys).size !== effectKeys.length) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['worldMechanics', index, 'effectResources'],
+          message: 'Capability resource effects must be unique by resource and direction.',
+        });
+      }
     }
   });
   kernel.travelRules.forEach((rule, index) => {

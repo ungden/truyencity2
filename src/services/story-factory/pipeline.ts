@@ -45,44 +45,110 @@ const EditorWireOutcomeSchema = z.object({
   evidenceSpans: z.array(z.string().max(200)).max(4),
 }).strict();
 
+const editorContinuityCategories = [
+  'canon', 'existence', 'event_order', 'timeline', 'location', 'travel',
+  'resource', 'resource_provenance', 'knowledge', 'knowledge_leak',
+  'relationship', 'authority', 'capability', 'world_rule', 'causality',
+  'promise', 'pov', 'required_delta', 'prompt_leak',
+] as const;
+const editorReadingCategories = [
+  'expository_prose', 'tool_character', 'unnatural_dialogue', 'unearned_outcome',
+  'stock_reaction', 'ineffective_scene', 'narrative_repetition',
+] as const;
+
+/**
+ * Gemini 3.1 rejects top-level/nested anyOf in this response schema. Keep one
+ * provider-safe finding envelope with all evidence fields required, then let
+ * application validation split the two taxonomies. `referenceId` is always a
+ * non-null stable token on the wire so continuity findings cannot silently
+ * omit their artifact anchor. Reading findings use the reserved token `prose`;
+ * prompt leak uses `prompt_leak`.
+ */
+const EditorWireFindingSchema = z.object({
+  kind: z.enum(['continuity', 'reading']),
+  category: z.enum([...editorContinuityCategories, ...editorReadingCategories]),
+  severity: z.enum(['critical', 'major', 'moderate']),
+  scope: z.enum(['prose', 'plan', 'kernel']),
+  evidence: z.string().trim().min(1).max(800),
+  conflictingEvidence: z.string().trim().min(1).max(800),
+  referenceId: z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/),
+  instruction: z.string().trim().min(5).max(800),
+}).strict();
+
+/** Provider-facing assessment contract; code derives pass/revise from evidence. */
 export const EditorWireAssessmentSchema = z.object({
-  v: z.literal(2),
-  continuityIssues: z.array(EditorContinuityIssueSchema).max(3),
-  readingIssues: z.array(ReadingIssueSchema).max(3),
+  v: z.literal(3),
+  findings: z.array(EditorWireFindingSchema).max(3),
   deltaChecks: z.array(EditorWireDeltaCheckSchema).min(1).max(30),
   outcome: EditorWireOutcomeSchema.nullable(),
 }).strict();
 
-export function materializeEditorAssessment(value: z.infer<typeof EditorWireAssessmentSchema>): EditorAssessment {
+export function materializeEditorAssessment(value: unknown): EditorAssessment {
   const wire = EditorWireAssessmentSchema.parse(value);
   const failedDeltas = wire.deltaChecks.filter(check => !check.realized);
-  if (failedDeltas.length > 0 && wire.continuityIssues.length + wire.readingIssues.length === 0) {
-    throw new StoryFactoryError('infra_blocked', 'Editor returned an unrealized delta without a grounded issue.', {
-      failedDeltas: failedDeltas.map(check => check.deltaId),
-    });
-  }
-  const issueCount = wire.continuityIssues.length + wire.readingIssues.length;
-  if (issueCount === 0 && failedDeltas.length === 0) {
-    const outcome = ChapterOutcomeContentSchema.parse(wire.outcome);
+  if (!wire.findings.length && !failedDeltas.length) {
     return EditorAssessmentSchema.parse({
       status: 'pass',
       continuityIssues: [],
       readingIssues: [],
       deltaChecks: wire.deltaChecks,
-      outcome,
+      outcome: ChapterOutcomeContentSchema.parse(wire.outcome),
     });
   }
-  if (issueCount < 1 || issueCount > 3) {
-    throw new StoryFactoryError('infra_blocked', 'Editor must return one to three total grounded issues when a gate fails.', {
-      continuityIssues: wire.continuityIssues.length,
-      readingIssues: wire.readingIssues.length,
+  if (!wire.findings.length) {
+    throw new StoryFactoryError('infra_blocked', 'Editor returned an unrealized delta without a grounded finding.', {
+      failedDeltaIds: failedDeltas.map(check => check.deltaId),
     });
   }
+  const continuityIssues = wire.findings
+    .filter(finding => finding.kind === 'continuity')
+    .map(finding => EditorContinuityIssueSchema.parse({
+      category: finding.category,
+      severity: finding.severity,
+      scope: finding.scope,
+      currentEvidence: finding.evidence,
+      conflictingEvidence: finding.conflictingEvidence,
+      referenceId: finding.category === 'prompt_leak' ? null : finding.referenceId,
+      instruction: finding.instruction,
+    }));
+  const readingIssues = wire.findings
+    .filter(finding => finding.kind === 'reading')
+    .map(finding => ReadingIssueSchema.parse({
+      category: finding.category,
+      severity: finding.severity,
+      evidence: finding.evidence,
+      instruction: finding.instruction,
+    }));
   return EditorAssessmentSchema.parse({
     status: 'revise',
-    continuityIssues: wire.continuityIssues,
-    readingIssues: wire.readingIssues,
+    continuityIssues,
+    readingIssues,
     deltaChecks: wire.deltaChecks,
+  });
+}
+
+function injectDeterministicMissingDeltaFinding(
+  value: z.infer<typeof EditorWireAssessmentSchema>,
+  draft: ChapterDraft,
+): z.infer<typeof EditorWireAssessmentSchema> {
+  const failed = value.deltaChecks.filter(check => !check.realized);
+  if (!failed.length || value.findings.length) return value;
+  const tokens = [...draft.content.matchAll(/[\p{L}\p{N}]+/gu)];
+  const start = tokens[Math.max(0, tokens.length - 10)]?.index ?? Math.max(0, draft.content.length - 120);
+  const evidence = draft.content.slice(start).trim().slice(0, 200) || draft.content.slice(0, 200);
+  return EditorWireAssessmentSchema.parse({
+    ...value,
+    findings: [{
+      kind: 'continuity',
+      category: 'required_delta',
+      severity: 'major',
+      scope: 'prose',
+      evidence,
+      conflictingEvidence: `Required delta ${failed[0].deltaId} has no realized prose evidence.`,
+      referenceId: failed[0].deltaId,
+      instruction: `Viết lại toàn chương để thực hiện rõ required delta ${failed[0].deltaId} qua hành động và hậu quả trong cảnh.`,
+    }],
+    outcome: null,
   });
 }
 
@@ -161,10 +227,10 @@ function editorPrompt(input: {
     draft: input.draft,
     deterministicIssues: input.deterministicIssues,
     audit: {
-      continuityIssues: 'Chỉ báo lỗi thuộc taxonomy continuity trong schema. currentEvidence phải nguyên văn từ draft. Với lỗi khác prompt_leak, referenceId bắt buộc là stable ID của state/plan/kernel mâu thuẫn; conflictingEvidence chỉ mô tả ngắn vì code sẽ thay bằng evidence canonical từ referenceId.',
-      readingIssues: 'Báo prose thuyết minh, nhân vật công cụ, thoại giả, kết quả chưa earned, stock reaction, cảnh không hiệu quả hoặc lặp công thức. Evidence phải là anchor nguyên văn từ draft.',
+      findings: 'Nếu có lỗi, trả 1-3 finding. continuity: kind=continuity, evidence nguyên văn từ draft và referenceId là stable ID của state/plan/kernel. reading: kind=reading, scope=prose, evidence nguyên văn, referenceId=prose, conflictingEvidence mô tả ngắn. prompt_leak dùng referenceId=prompt_leak.',
       deltaChecks: 'Mỗi required delta đúng một check và evidence nguyên văn nếu realized=true.',
-      outcome: 'Chỉ điền khi không có issue và mọi delta realized; nếu không thì null.',
+      clean: 'findings=[] chỉ khi mọi delta realized=true; khi đó outcome bắt buộc.',
+      issues: 'Có finding hoặc delta chưa realized thì outcome=null.',
     },
     decisionRule: 'Không tự quyết định pass/revise và không chấm điểm. Code sẽ suy ra quyết định từ issues và deltaChecks.',
   });
@@ -345,7 +411,7 @@ export async function assessStoryDraft(input: {
   });
   let assessment: EditorAssessment;
   try {
-    assessment = materializeEditorAssessment(response.value);
+    assessment = materializeEditorAssessment(injectDeterministicMissingDeltaFinding(response.value, input.draft));
   } catch (error) {
     if (error instanceof StoryFactoryError) throw error;
     throw new StoryFactoryError('infra_blocked', 'Editor output failed the exact application contract.', error instanceof z.ZodError ? error.issues : undefined);

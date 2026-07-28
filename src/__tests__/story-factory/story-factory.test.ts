@@ -169,7 +169,11 @@ const kernel: StoryKernel = {
       id: 'mechanic_trade', name: 'Quyền giao dịch của Hải', kind: 'capability',
       description: 'Hải trực tiếp thương lượng các giao dịch nhỏ.',
       allowedActorIds: ['main'], requiredFacts: [{ factId: 'fact_day', expected: 'ngay_0' }], requiredResourceIds: ['money'],
-      effectResourceIds: ['money'], effectFactIds: ['fact_day'],
+      effectResources: [
+        { resourceId: 'money', direction: 'increase' },
+        { resourceId: 'money', direction: 'decrease' },
+      ],
+      effectFactIds: ['fact_day'],
       capacityUnit: 'giao_dich', maximumUnitsPerMinute: 1,
     },
     {
@@ -232,9 +236,8 @@ function acceptedOutcome(evidence: string) {
 
 function editorWirePass(deltaId: string, evidence: string) {
   return {
-    v: 2 as const,
-    continuityIssues: [],
-    readingIssues: [],
+    v: 3 as const,
+    findings: [],
     deltaChecks: [{ deltaId, realized: true, evidence }],
     outcome: acceptedOutcome(evidence),
   };
@@ -448,7 +451,7 @@ describe('canonical Story Factory', () => {
         allowedActorIds: ['main'],
         requiredFacts: [],
         requiredResourceIds: [],
-        effectResourceIds: ['fresh_fish'],
+        effectResources: [{ resourceId: 'fresh_fish', direction: 'increase' }],
         effectFactIds: [],
         capacityUnit: 'kg',
         maximumUnitsPerMinute: 0.5,
@@ -668,7 +671,7 @@ describe('canonical Story Factory', () => {
         allowedActorIds: ['main'],
         requiredFacts: [],
         requiredResourceIds: ['live_fish'],
-        effectResourceIds: [],
+        effectResources: [],
         effectFactIds: [],
         capacityUnit: null,
         maximumUnitsPerMinute: null,
@@ -799,7 +802,7 @@ describe('canonical Story Factory', () => {
         allowedActorIds: ['main'],
         requiredFacts: [{ factId: 'is_raining', expected: '1' }],
         requiredResourceIds: [],
-        effectResourceIds: ['rain_water'],
+        effectResources: [{ resourceId: 'rain_water', direction: 'increase' }],
         effectFactIds: [],
         capacityUnit: null,
         maximumUnitsPerMinute: null,
@@ -812,7 +815,7 @@ describe('canonical Story Factory', () => {
         allowedActorIds: ['main'],
         requiredFacts: [],
         requiredResourceIds: ['rain_water'],
-        effectResourceIds: [],
+        effectResources: [],
         effectFactIds: ['washed_clean'],
         capacityUnit: null,
         maximumUnitsPerMinute: null,
@@ -886,7 +889,7 @@ describe('canonical Story Factory', () => {
     const restrictedKernel = structuredClone(kernel);
     const capability = restrictedKernel.worldMechanics.find(item => item.id === 'mechanic_trade');
     if (!capability || capability.kind !== 'capability') throw new Error('Missing capability fixture.');
-    capability.effectResourceIds = [];
+    capability.effectResources = [];
     const chapter = plan(1);
     chapter.requiredDeltas = [{
       id: 'gain',
@@ -914,6 +917,40 @@ describe('canonical Story Factory', () => {
       state: initialState,
       plan: chapter,
     })).toThrow('cannot affect resource money');
+  });
+
+  test('capability resource direction is enforced before Writer', () => {
+    const restrictedKernel = structuredClone(kernel);
+    const capability = restrictedKernel.worldMechanics.find(item => item.id === 'mechanic_trade');
+    if (!capability || capability.kind !== 'capability') throw new Error('Missing capability fixture.');
+    capability.effectResources = [{ resourceId: 'money', direction: 'decrease' }];
+    const chapter = plan(1);
+    chapter.requiredDeltas = [{
+      id: 'gain',
+      kind: 'resource_numeric',
+      resourceId: 'money',
+      before: 100,
+      delta: 10,
+      after: 110,
+      source: 'tài trợ vào quỹ đang theo dõi',
+      sink: null,
+    }];
+    chapter.scenes[0].requiredDeltaIds = ['gain'];
+    chapter.mechanicUses = [{
+      id: 'use_trade',
+      sceneId: 'scene_1',
+      mechanicId: 'mechanic_trade',
+      role: 'effect',
+      actorId: 'main',
+      quantity: 1,
+      preconditionFactIds: ['fact_day'],
+      deltaIds: ['gain'],
+    }];
+    expect(() => applyChapterPlan({
+      kernel: restrictedKernel,
+      state: initialState,
+      plan: chapter,
+    })).toThrow('cannot increase resource money');
   });
 
   test('deterministic causal validation catches 100 cross-lane failures without a model call', () => {
@@ -1606,17 +1643,17 @@ describe('canonical Story Factory', () => {
     const firstIssue = editorWirePass('delta_1', 'bắt đầu làm việc');
     const revised = { title: 'Bản sửa', content: 'Hải lại nhìn required delta nhưng vẫn không làm rõ việc đã thay đổi.' };
     const secondIssue = {
-      ...editorWirePass('delta_1', 'không làm rõ'),
-      continuityIssues: [{
+      v: 3 as const,
+      findings: [{
+        kind: 'continuity' as const,
         category: 'required_delta' as const,
         severity: 'major' as const,
         scope: 'prose' as const,
-        currentEvidence: 'không làm rõ',
+        evidence: 'không làm rõ',
         conflictingEvidence: 'delta_1',
         referenceId: 'delta_1',
         instruction: 'Thực hiện required delta trong cảnh.',
       }],
-      readingIssues: [],
       deltaChecks: [{ deltaId: 'delta_1', realized: false, evidence: 'không làm rõ' }],
       outcome: null,
     };
@@ -1989,7 +2026,7 @@ describe('canonical Story Factory', () => {
     }).success).toBe(false);
   });
 
-  test('flat Editor wire materializes into the canonical evidence contract', () => {
+  test('constrained Editor wire materializes into the canonical evidence contract', () => {
     const assessment = materializeEditorAssessment(editorWirePass('delta_1', 'chia việc'));
     expect(assessment).toMatchObject({ status: 'pass', outcome: { method: 'chia việc và kiểm tra nguồn lực' } });
     expect(() => materializeEditorAssessment({
@@ -1998,14 +2035,77 @@ describe('canonical Story Factory', () => {
     })).toThrow();
   });
 
+  test('Editor issue branch cannot omit evidence or stable continuity reference', () => {
+    expect(() => materializeEditorAssessment({
+      v: 3,
+      findings: [],
+      deltaChecks: [{ deltaId: 'delta_1', realized: false, evidence: '' }],
+      outcome: null,
+    })).toThrow();
+    expect(() => materializeEditorAssessment({
+      v: 3,
+      findings: [{
+        kind: 'continuity',
+        category: 'required_delta',
+        severity: 'major',
+        scope: 'prose',
+        evidence: 'chưa làm được việc',
+        conflictingEvidence: 'delta chưa thực hiện',
+        referenceId: null,
+        instruction: 'Thực hiện thay đổi bắt buộc trong cảnh.',
+      }],
+      deltaChecks: [{ deltaId: 'delta_1', realized: false, evidence: '' }],
+      outcome: null,
+    })).toThrow();
+  });
+
+  test('runtime turns a false delta without findings into a deterministic rewrite request', async () => {
+    const first = {
+      title: 'Chưa xong việc',
+      content: 'Hải cùng mẹ kiểm tra tấm lưới nhưng buổi chiều đã xuống mà công việc vẫn chưa hoàn tất.',
+    };
+    const missingDelta = {
+      v: 3 as const,
+      findings: [],
+      deltaChecks: [{ deltaId: 'delta_1', realized: false, evidence: '' }],
+      outcome: null,
+    };
+    const revised = {
+      title: 'Bắt tay vào việc',
+      content: 'Hải chia phần lưới cho mẹ rồi tự vá đoạn rách lớn; đến cuối buổi, công việc đã khởi động.',
+    };
+    const result = await writeStoryChapter({
+      kernel,
+      state: initialState,
+      plan: plan(1),
+      routes,
+      provider: new QueueProvider([
+        first,
+        missingDelta,
+        revised,
+        editorWirePass('delta_1', 'công việc đã khởi động'),
+      ]),
+    });
+    expect(result.revisionCount).toBe(1);
+    expect(result.attemptTelemetry.initialAssessment).toMatchObject({
+      status: 'revise',
+      continuityIssues: [{ category: 'required_delta', referenceId: 'delta_1' }],
+    });
+  });
+
   test('code derives revise from issues without accepting a model decision', () => {
     const assessment = materializeEditorAssessment({
-      ...editorWirePass('delta_1', 'chia việc'),
-      readingIssues: [{
+      v: 3,
+      findings: [{
+        kind: 'reading',
         category: 'unearned_outcome', severity: 'major',
+        scope: 'prose',
         evidence: 'tự bán thêm hàng',
+        conflictingEvidence: 'Kết quả không có trong plan.',
+        referenceId: 'prose',
         instruction: 'Bỏ giao dịch không có trong thay đổi bắt buộc.',
       }],
+      deltaChecks: [{ deltaId: 'delta_1', realized: true, evidence: 'chia việc' }],
       outcome: null,
     });
     expect(assessment).toMatchObject({ status: 'revise', readingIssues: [{ category: 'unearned_outcome' }] });
@@ -2014,12 +2114,15 @@ describe('canonical Story Factory', () => {
   test('Editor prose issue must ground to bytes in the draft', async () => {
     const draft = { title: 'Mẻ lưới đầu', content: 'Hải trải tấm lưới lên hiên rồi cùng mẹ kiểm tra từng mắt rách.' };
     const invalidIssue = {
-      v: 2 as const,
-      continuityIssues: [],
-      readingIssues: [{
+      v: 3 as const,
+      findings: [{
+        kind: 'reading' as const,
         category: 'stock_reaction' as const,
         severity: 'major' as const,
+        scope: 'prose' as const,
         evidence: 'cả làng bàng hoàng reo hò',
+        conflictingEvidence: 'Phản ứng tập thể sáo rỗng.',
+        referenceId: 'prose',
         instruction: 'Thay phản ứng tập thể bằng hành động có agenda riêng.',
       }],
       deltaChecks: [{ deltaId: 'delta_1', realized: true, evidence: 'trải tấm lưới' }],
@@ -2037,17 +2140,17 @@ describe('canonical Story Factory', () => {
       content: 'Hải quả quyết hôm nay là ngày khác rồi bắt đầu làm việc trong nhà.',
     };
     const issue = {
-      v: 2 as const,
-      continuityIssues: [{
+      v: 3 as const,
+      findings: [{
+        kind: 'continuity' as const,
         category: 'canon' as const,
         severity: 'major' as const,
         scope: 'prose' as const,
-        currentEvidence: 'hôm nay là ngày khác',
+        evidence: 'hôm nay là ngày khác',
         conflictingEvidence: 'lời diễn giải không tồn tại nguyên văn trong artifact',
         referenceId: 'delta_1',
         instruction: 'Giữ đúng ngày đã khóa trong required transition.',
       }],
-      readingIssues: [],
       deltaChecks: [{ deltaId: 'delta_1', realized: true, evidence: 'bắt đầu làm việc' }],
       outcome: null,
     };
