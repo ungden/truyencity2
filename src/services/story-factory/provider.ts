@@ -38,6 +38,8 @@ export interface StoryModelProvider {
     system: string;
     prompt: string;
     temperature?: number;
+    thinkingLevel?: 'minimal' | 'low' | 'medium' | 'high';
+    thinkingBudget?: number;
     grounding?: 'google_search';
   }): Promise<ProviderResult<string>>;
   json<T>(input: {
@@ -48,6 +50,8 @@ export interface StoryModelProvider {
     temperature?: number;
     constrainSchema?: boolean;
     schemaComplexity?: 'default' | 'omit_large_array_max' | 'omit_array_max';
+    thinkingLevel?: 'minimal' | 'low' | 'medium' | 'high';
+    thinkingBudget?: number;
     grounding?: 'google_search';
   }): Promise<ProviderResult<T>>;
 }
@@ -124,6 +128,8 @@ async function generate(input: {
   responseSchema?: Record<string, unknown>;
   jsonMode?: boolean;
   googleSearch?: boolean;
+  thinkingLevel?: 'minimal' | 'low' | 'medium' | 'high';
+  thinkingBudget?: number;
 }): Promise<ProviderResult<string>> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new StoryFactoryError('infra_blocked', 'GEMINI_API_KEY is not configured.');
@@ -132,6 +138,11 @@ async function generate(input: {
     temperature: input.temperature,
     maxOutputTokens: 65_536,
   };
+  if (input.thinkingLevel) {
+    generationConfig.thinkingConfig = { thinkingLevel: input.thinkingLevel };
+  } else if (input.thinkingBudget !== undefined) {
+    generationConfig.thinkingConfig = { thinkingBudget: input.thinkingBudget };
+  }
   if (input.responseSchema && input.model === 'gemini-3.1-pro-preview') {
     generationConfig.responseFormat = {
       text: {
@@ -223,6 +234,8 @@ export const geminiProvider: StoryModelProvider = {
     temperature?: number;
     constrainSchema?: boolean;
     schemaComplexity?: 'default' | 'omit_large_array_max' | 'omit_array_max';
+    thinkingLevel?: 'minimal' | 'low' | 'medium' | 'high';
+    thinkingBudget?: number;
     grounding?: 'google_search';
   }): Promise<ProviderResult<T>> {
     const responseSchema = toGeminiResponseSchema(input.schema, {

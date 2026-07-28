@@ -264,6 +264,14 @@ Không được xem plan/state, không suy đoán model và không thưởng che
               }),
               schema: PairwiseReaderJudgmentSchema,
               temperature: 0.4,
+              // Pairwise reader preference is a bounded reading task. Gemini
+              // 3.1 Pro defaults to high dynamic thinking and can exhaust the
+              // entire output allowance before emitting this four-field JSON.
+              // Use the provider-supported low setting; Gemini 2.5 uses the
+              // legacy bounded thinking budget instead.
+              ...(model.startsWith('gemini-2.5-')
+                ? { thinkingBudget: 2_048 }
+                : { thinkingLevel: 'low' as const }),
             });
             const leftIsA = !swap;
             return {
