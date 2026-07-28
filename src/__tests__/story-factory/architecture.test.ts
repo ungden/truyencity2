@@ -86,7 +86,7 @@ describe('Story Factory architecture boundary', () => {
     expect(benchmark).toContain('sourceDiscoveryDigest: writerCorpus.sourceDiscoveryDigest');
     expect(benchmark).not.toContain('convertPack');
     expect(benchmark).not.toContain('SOURCE_REF');
-    expect(routes).toContain("planner: 'gemini-3.1-pro-preview'");
+    expect(routes).toContain("planner: 'gemini-3.5-flash'");
     expect(routes).toContain("planJudge: 'gemini-2.5-pro'");
   });
 

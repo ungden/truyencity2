@@ -7,9 +7,9 @@ export const DEFAULT_MODEL_ROUTES = ModelRoutesSchema.parse({
   setupJudge: 'gemini-3.1-pro-preview',
   openingSimulator: 'gemini-3.5-flash',
   launchArchitect: 'gemini-3.1-pro-preview',
-  planner: 'gemini-3.1-pro-preview',
+  planner: 'gemini-3.5-flash',
   planJudge: 'gemini-2.5-pro',
   writer: 'gemini-3.6-flash',
   editor: 'gemini-3.1-pro-preview',
-  routeVersion: 'official-gemini-quality-2026-07-24.5-pro-planning',
+  routeVersion: 'official-gemini-quality-2026-07-28.6-flash-planner',
 });
