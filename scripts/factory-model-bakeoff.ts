@@ -34,6 +34,10 @@ const writerModels = (value('--writers') ?? 'gemini-3.6-flash,gemini-3.1-pro-pre
 if (writerModels.length !== 3 || new Set(writerModels).size !== 3) {
   throw new Error('--writers must contain exactly three distinct routes.');
 }
+const editorModel = value('--editor') ?? DEFAULT_MODEL_ROUTES.editor;
+if (writerModels.every(writer => writer === editorModel)) {
+  throw new Error('--editor must leave at least one independent Writer route.');
+}
 const judgeModels = (process.env.FACTORY_JUDGE_MODELS
   ?? 'gemini-2.5-pro,gemini-3.5-flash,gemini-3.1-pro-preview')
   .split(',')
@@ -114,12 +118,16 @@ async function main() {
   const previous = existsSync(outputPath)
     ? JSON.parse(readFileSync(outputPath, 'utf8')) as {
       corpusDigest?: string;
+      editor?: string;
       generations?: Generation[];
       votes?: Vote[];
     }
     : {};
   if (previous.corpusDigest && previous.corpusDigest !== corpusDigest) {
     throw new Error('Writer bake-off checkpoint belongs to a different plan-qualified corpus.');
+  }
+  if (previous.editor && previous.editor !== editorModel) {
+    throw new Error('Writer bake-off checkpoint belongs to a different Editor route.');
   }
   const generations: Generation[] = (previous.generations ?? []).filter(result => (
     typeof result.costUsd === 'number'
@@ -144,6 +152,7 @@ async function main() {
             ...DEFAULT_MODEL_ROUTES,
             planner: corpus.planner,
             planJudge: corpus.planJudge,
+            editor: editorModel,
             writer,
             routeVersion: `${DEFAULT_MODEL_ROUTES.routeVersion}:writer-bakeoff:${writer}`,
           },
@@ -211,6 +220,7 @@ async function main() {
     writeFileSync(outputPath, `${JSON.stringify({
       protocolVersion: STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL,
       corpusDigest,
+      editor: editorModel,
       generations,
       votes: previous.votes ?? [],
     }, null, 2)}\n`);
@@ -232,7 +242,7 @@ async function main() {
   });
   const comparisonWriters = preliminary
     .filter(summary => (
-      summary.writer !== DEFAULT_MODEL_ROUTES.editor
+      summary.writer !== editorModel
       && summary.criticalViolations === 0
       && summary.maxCostUsd <= 0.5
     ))
@@ -298,6 +308,7 @@ Không được xem plan/state, không suy đoán model và không thưởng che
           writeFileSync(outputPath, `${JSON.stringify({
             protocolVersion: STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL,
             corpusDigest,
+            editor: editorModel,
             generations,
             votes,
           }, null, 2)}\n`);
@@ -345,7 +356,7 @@ Không được xem plan/state, không suy đoán model và không thưởng che
     ? []
     : summaries
       .filter(summary => (
-        summary.writer !== DEFAULT_MODEL_ROUTES.editor
+        summary.writer !== editorModel
         &&
         summary.criticalViolations === 0
         && summary.infraFailures === 0
@@ -381,7 +392,7 @@ Không được xem plan/state, không suy đoán model và không thưởng che
     testedAt: new Date().toISOString(),
     planner: corpus.planner,
     planJudge: corpus.planJudge,
-    editor: DEFAULT_MODEL_ROUTES.editor,
+    editor: editorModel,
     judges: judgeModels,
     writers: writerModels,
     invalidBriefIds,
@@ -412,6 +423,7 @@ Không được xem plan/state, không suy đoán model và không thưởng che
     });
     if (upload.error && !/already exists|duplicate/iu.test(upload.error.message)) throw upload.error;
     const passed = topTwoWriters.length === 2
+      && discoveryQualified.length === 2
       && invalidBriefIds.length === 0
       && campaignCostUsd <= campaignBudgetUsd;
     const inserted = await db.from('story_factory_runs').insert({
@@ -424,7 +436,7 @@ Không được xem plan/state, không suy đoán model và không thưởng che
         writers: writerModels,
         planner: corpus.planner,
         planJudge: corpus.planJudge,
-        editor: DEFAULT_MODEL_ROUTES.editor,
+        editor: editorModel,
         judges: judgeModels,
       },
       input_artifact: {

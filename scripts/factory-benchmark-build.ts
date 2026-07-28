@@ -218,11 +218,10 @@ async function main() {
       || frozenProgress.engineRelease !== STORY_FACTORY_RELEASE
       || frozenProgress.route.planner !== candidateRoutes.planner
       || frozenProgress.route.planJudge !== candidateRoutes.planJudge
-      || frozenProgress.route.editor !== candidateRoutes.editor
       || frozenProgress.continuityJudgeModel !== continuityJudgeModel
       || Object.keys(frozenProgress.setupCheckpoints).length !== 4
       || Object.keys(frozenProgress.plannedWindows ?? {}).length !== 4)) {
-    throw new Error('Frozen discovery progress does not match this release, Planner, Plan Judge, Editor, Continuity Judge, or four-lane campaign.');
+    throw new Error('Frozen discovery progress does not match this release, Planner, Plan Judge, Continuity Judge, or four-lane campaign.');
   }
   const freshProgress: Progress = {
     protocolVersion: buildProtocol,
