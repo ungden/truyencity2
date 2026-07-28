@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import {
   CanonExtensionSchema,
   SequentialBenchmarkCorpusSchema,
@@ -33,6 +34,7 @@ import {
   buildBlindReaderInput,
   buildChapterContexts,
   buildWriterBrief,
+  buildSetupCheckpointProvenance,
   bookSetupCheckpointCost,
   createLaunchWorldWireSchema,
   prepareDiscoveryResume,
@@ -2414,6 +2416,44 @@ describe('canonical Story Factory', () => {
       state: chainedState,
       plan: rolling.plans[0],
     })).not.toThrow();
+
+    const omittedUses = structuredClone(wire);
+    omittedUses.chapters[0].mechanics = [];
+    const inferred = materializePlannerRollingPlan(omittedUses, chainedState, chainedKernel);
+    expect(inferred.plans[0].mechanicUses).toMatchObject([
+      {
+        mechanicId: 'acquire_brine',
+        quantity: 1,
+        deltaIds: ['pay', 'brine_in'],
+      },
+      {
+        mechanicId: 'crystallize_salt',
+        quantity: 1,
+        deltaIds: ['brine_out', 'salt_out'],
+      },
+    ]);
+    expect(() => applyChapterPlan({
+      kernel: chainedKernel,
+      state: chainedState,
+      plan: inferred.plans[0],
+    })).not.toThrow();
+
+    const ambiguousKernel: StoryKernel = structuredClone(chainedKernel);
+    ambiguousKernel.worldMechanics.push({
+      id: 'duplicate_acquire_brine',
+      name: 'Một cách lấy nước chạt khác',
+      kind: 'conversion',
+      description: 'Cùng vector nhưng khác ý nghĩa nên compiler không được đoán.',
+      inputsPerBatch: [{ resourceId: 'money', amount: 10 }],
+      outputsPerBatch: [{ resourceId: 'brine', amount: 1_000 }],
+      maximumBatchesPerUse: 1,
+    });
+    const ambiguous = materializePlannerRollingPlan(omittedUses, chainedState, ambiguousKernel);
+    expect(() => applyChapterPlan({
+      kernel: ambiguousKernel,
+      state: chainedState,
+      plan: ambiguous.plans[0],
+    })).toThrow('causal validation issues');
   });
 
   test('compiler orders a same-scene fact producer before its dependent capability', () => {
@@ -2962,6 +3002,31 @@ describe('canonical Story Factory', () => {
       .toBe(now.toISOString());
     expect(nextRunAfterNonChapterStage({ daily_target: 5, chapters_today: 5, quota_date: '2026-07-22' }, now))
       .toBe('2026-07-22T17:00:00.000Z');
+  });
+
+  test('setup checkpoints are bound to one commission, research snapshot, and setup route', async () => {
+    const commission = JSON.parse(readFileSync('factory/canary/commission.json', 'utf8'));
+    const research = JSON.parse(readFileSync('factory/canary/research.json', 'utf8'));
+    const provenance = buildSetupCheckpointProvenance({
+      commission,
+      research,
+      routes,
+    });
+    await expect(runConceptLab({
+      commission,
+      research,
+      routes,
+      provider: new QueueProvider([]),
+      resume: {
+        provenance: {
+          ...provenance,
+          commissionDigest: '0'.repeat(64),
+        },
+      },
+    })).rejects.toMatchObject({
+      code: 'setup_blocked',
+      message: expect.stringContaining('different commission'),
+    });
   });
 
   test('Concept Lab grounds all concepts before blind ranking and validates the launch pack', async () => {

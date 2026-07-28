@@ -125,6 +125,7 @@ const PLANNER_COMPACT_CONTRACT = {
     'rules chỉ chứa world-rule thực sự được thi hành trong chương. Nếu chương mới quyết định hoặc hứa sẽ dùng cơ chế ở tương lai thì chưa đưa rule đó vào rules.',
     'Mọi chuyển đổi/công suất/quyền hạn/constraint thực sự dùng phải có một mechanics entry tham chiếu worldMechanics ID. Mỗi entry bắt buộc gắn ít nhất một delta bằng primaryDeltaId; các delta còn lại nằm trong additionalDeltaIds. role=effect nghĩa mechanic trực tiếp tạo delta; role=support nghĩa mechanic chỉ cấp quyền hoặc điều kiện cho delta do mechanic effect khác tạo. Mỗi resource delta phải có đúng một effect owner nhưng có thể có nhiều support. Conversion luôn effect; constraint luôn support. Conversion phải gắn đủ delta đầu vào và đầu ra. Capability là effect chỉ khi nó trực tiếp tạo resource/fact đúng resourceId và direction đã khai báo trong effectResources hoặc effectFactIds; nếu chỉ cho phép conversion/mechanic khác thì dùng support. Không tạo mechanics entry nếu cơ chế không liên quan state transition trong chương.',
     'Với conversion, primaryDeltaId phải là một resource_numeric delta thuộc input/output của conversion trong cùng scene; code sẽ tự suy ra toàn bộ numeric delta mà conversion sở hữu và không bao giờ cho conversion sở hữu fact hoặc resource_state. Với capability effect, chỉ gắn resource delta đúng direction hoặc fact thuộc effectFactIds.',
+    'Nếu quên conversion use nhưng toàn bộ vector input/output và quantity khớp duy nhất với một worldMechanic trong cùng scene, compiler có thể khôi phục use tất định. Nếu có từ hai mechanic/vector cùng khớp, plan vẫn bị block; vì vậy vẫn phải khai báo mechanic khi ý nghĩa giao dịch có thể mơ hồ.',
     'Trước khi tạo bất kỳ resource_numeric hoặc resource_state delta nào, phải tìm đúng một conversion/capability effect trong arc có quyền tạo resource đó. Nếu không có effect mechanic, không được thay đổi resource; dùng fact, relationship hoặc promise delta chỉ khi loại đó phản ánh đúng thay đổi và ID hợp lệ.',
     'Kiểm công suất capability theo qty <= maximumUnitsPerMinute * availableMinutes. Với role=effect, availableMinutes=scene.dur. Với role=support, availableMinutes=scene.dur+scene.travel vì support có thể vận hành trong chính quãng chuyển cảnh.',
     'Khai báo đầy đủ mechanic tạo fact/resource và mechanic sử dụng nó trong đúng scene; compiler sẽ sắp thứ tự dependency tất định trong scene. Fact ngoại cảnh không có effect mechanic như thời tiết bắt đầu chỉ trở thành khả dụng sau scene ghi fact delta; capability phụ thuộc nó phải ở scene sau.',
@@ -232,6 +233,134 @@ function deriveEffectOwnership(
     ownership.set(use.id, owned);
   }
   return ownership;
+}
+
+function inferExactConversionUses(
+  chapter: z.infer<typeof PlannerCompactChapterSchema>,
+  kernel: StoryKernel | undefined,
+): z.infer<typeof PlannerCompactChapterSchema> {
+  if (!kernel) return chapter;
+  const augmented = {
+    ...chapter,
+    mechanics: [...chapter.mechanics],
+  };
+  const conversions = kernel.worldMechanics.filter(mechanic => mechanic.kind === 'conversion');
+  const numericDeltas = chapter.deltas.filter(delta => (
+    delta.k === 'resource_numeric' && delta.change !== null
+  ));
+
+  for (let pass = 0; pass < numericDeltas.length; pass += 1) {
+    const ownership = deriveEffectOwnership(augmented, kernel);
+    const claimed = new Set(
+      augmented.mechanics
+        .filter(use => use.role === 'effect')
+        .flatMap(use => ownership.get(use.id) ?? []),
+    );
+    const unclaimed = numericDeltas.filter(delta => !claimed.has(delta.id));
+    if (!unclaimed.length) break;
+    const candidates: Array<{
+      sceneId: string;
+      mechanicId: string;
+      quantity: number;
+      deltaIds: string[];
+    }> = [];
+
+    for (const scene of chapter.scenes) {
+      const sceneDeltaIds = new Set(scene.deltaIds);
+      const available = unclaimed.filter(delta => sceneDeltaIds.has(delta.id));
+      for (const mechanic of conversions) {
+        const perBatch = new Map<string, number>();
+        const add = (resourceId: string, amount: number) => {
+          perBatch.set(resourceId, (perBatch.get(resourceId) ?? 0) + amount);
+        };
+        mechanic.inputsPerBatch.forEach(item => add(item.resourceId, -item.amount));
+        mechanic.outputsPerBatch.forEach(item => add(item.resourceId, item.amount));
+        const quantities = new Set<number>();
+        for (const delta of available) {
+          const unit = perBatch.get(delta.target);
+          if (!unit || Math.sign(unit) !== Math.sign(delta.change ?? 0)) continue;
+          const quantity = (delta.change ?? 0) / unit;
+          if (quantity > 0 && Number.isFinite(quantity)) quantities.add(quantity);
+        }
+        for (const quantity of [...quantities].sort((left, right) => left - right)) {
+          if (mechanic.maximumBatchesPerUse !== null
+            && quantity > mechanic.maximumBatchesPerUse + 1e-9) continue;
+          const matched: string[] = [];
+          let complete = true;
+          for (const [resourceId, unit] of perBatch) {
+            const expected = unit * quantity;
+            if (Math.abs(expected) <= 1e-9) continue;
+            const exact = available.filter(delta => (
+              delta.target === resourceId
+              && Math.abs((delta.change ?? 0) - expected) <= 1e-9
+            ));
+            // Inference is fail-closed: an exact vector must identify one and
+            // only one delta for every leg. Ambiguous matches stay unowned and
+            // are rejected by causal validation.
+            if (exact.length !== 1) {
+              complete = false;
+              break;
+            }
+            matched.push(exact[0].id);
+          }
+          if (complete && matched.length) {
+            candidates.push({
+              sceneId: scene.id,
+              mechanicId: mechanic.id,
+              quantity,
+              deltaIds: [...new Set(matched)],
+            });
+          }
+        }
+      }
+    }
+
+    const candidatesByDelta = new Map<string, typeof candidates>();
+    for (const candidate of candidates) {
+      for (const deltaId of candidate.deltaIds) {
+        candidatesByDelta.set(deltaId, [
+          ...(candidatesByDelta.get(deltaId) ?? []),
+          candidate,
+        ]);
+      }
+    }
+    const selected = candidates
+      .filter(candidate => candidate.deltaIds.every(deltaId => (
+        candidatesByDelta.get(deltaId)?.length === 1
+      )))
+      .sort((left, right) => (
+        chapter.scenes.findIndex(scene => scene.id === left.sceneId)
+        - chapter.scenes.findIndex(scene => scene.id === right.sceneId)
+        || left.mechanicId.localeCompare(right.mechanicId)
+        || left.quantity - right.quantity
+      ));
+    let added = false;
+    const selectedDeltaIds = new Set<string>();
+    for (const candidate of selected) {
+      if (candidate.deltaIds.some(deltaId => selectedDeltaIds.has(deltaId))) continue;
+      const scene = chapter.scenes.find(item => item.id === candidate.sceneId);
+      if (!scene) continue;
+      const digest = createHash('sha256')
+        .update(`${candidate.sceneId}\u0000${candidate.mechanicId}\u0000${candidate.quantity}\u0000${candidate.deltaIds.join('\u0000')}`)
+        .digest('hex')
+        .slice(0, 12);
+      augmented.mechanics.push({
+        id: `inferred_${digest}`,
+        scene: candidate.sceneId,
+        mechanic: candidate.mechanicId,
+        role: 'effect',
+        actor: scene.pov,
+        qty: candidate.quantity,
+        facts: [],
+        primaryDeltaId: candidate.deltaIds[0],
+        additionalDeltaIds: candidate.deltaIds.slice(1),
+      });
+      candidate.deltaIds.forEach(deltaId => selectedDeltaIds.add(deltaId));
+      added = true;
+    }
+    if (!added) break;
+  }
+  return augmented;
 }
 
 function orderMechanicUsesByDependency(
@@ -350,8 +479,13 @@ export function materializePlannerRollingPlan(
     schemaVersion: compact.v,
     startChapter: compact.start,
     plans: chapters.map(chapter => {
-      const effectOwnership = deriveEffectOwnership(chapter, kernel);
-      const orderedMechanicUses = orderMechanicUsesByDependency(chapter, kernel, effectOwnership);
+      const augmentedChapter = inferExactConversionUses(chapter, kernel);
+      const effectOwnership = deriveEffectOwnership(augmentedChapter, kernel);
+      const orderedMechanicUses = orderMechanicUsesByDependency(
+        augmentedChapter,
+        kernel,
+        effectOwnership,
+      );
       return {
       schemaVersion: compact.v,
       chapterNumber: chapter.n,

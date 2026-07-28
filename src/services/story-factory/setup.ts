@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import {
   ArcPlanSchema,
@@ -100,7 +101,17 @@ interface SetupStageArtifact {
   usage: ProviderUsage;
 }
 
+export const SETUP_CHECKPOINT_VERSION = 'story-factory-setup-checkpoint-1-input-bound';
+
+export interface SetupCheckpointProvenance {
+  version: typeof SETUP_CHECKPOINT_VERSION;
+  commissionDigest: string;
+  researchDigest: string;
+  setupRouteDigest: string;
+}
+
 export interface SetupCheckpoint {
+  provenance: SetupCheckpointProvenance;
   generatorA?: SetupStageArtifact;
   generatorB?: SetupStageArtifact;
   ranking?: SetupStageArtifact;
@@ -110,6 +121,29 @@ export interface SetupCheckpoint {
   launchWorld?: SetupStageArtifact;
   launchSeries?: SetupStageArtifact;
   launchState?: SetupStageArtifact;
+}
+
+function sha256(value: unknown): string {
+  return createHash('sha256').update(JSON.stringify(value)).digest('hex');
+}
+
+export function buildSetupCheckpointProvenance(input: {
+  commission: z.infer<typeof StoryCommissionSchema>;
+  research: z.infer<typeof ResearchSnapshotSchema>;
+  routes: ModelRoutes;
+}): SetupCheckpointProvenance {
+  return {
+    version: SETUP_CHECKPOINT_VERSION,
+    commissionDigest: sha256(input.commission),
+    researchDigest: sha256(input.research),
+    setupRouteDigest: sha256({
+      setupGeneratorA: input.routes.setupGeneratorA,
+      setupGeneratorB: input.routes.setupGeneratorB,
+      setupJudge: input.routes.setupJudge,
+      openingSimulator: input.routes.openingSimulator,
+      launchArchitect: input.routes.launchArchitect,
+    }),
+  };
 }
 
 const StoryKernelObjectSchema = StoryKernelSchema.innerType();
@@ -372,7 +406,23 @@ export async function runConceptLab(input: {
   if (commission.genreLane !== research.lane) throw new StoryFactoryError('setup_blocked', 'Research lane does not match the commission.');
   const provider = input.provider ?? geminiProvider;
   const usages: ProviderUsage[] = [];
-  const checkpoint: SetupCheckpoint = structuredClone(input.resume ?? {});
+  const provenance = buildSetupCheckpointProvenance({
+    commission,
+    research,
+    routes: input.routes,
+  });
+  if (input.resume
+    && JSON.stringify(input.resume.provenance) !== JSON.stringify(provenance)) {
+    throw new StoryFactoryError(
+      'setup_blocked',
+      'Setup checkpoint belongs to a different commission, research snapshot, or setup route.',
+      {
+        expected: provenance,
+        actual: input.resume.provenance ?? null,
+      },
+    );
+  }
+  const checkpoint: SetupCheckpoint = structuredClone(input.resume ?? { provenance });
 
   const generateConceptBatch = async (generator: 'A' | 'B') => {
     const generated = await setupStage(`Concept Generator ${generator}`, provider.json({
