@@ -2464,6 +2464,73 @@ describe('canonical Story Factory', () => {
     })).toThrow('causal validation issues');
   });
 
+  test('compiler infers a unique capability effect but blocks ambiguous ownership', () => {
+    const capabilityKernel: StoryKernel = structuredClone(kernel);
+    capabilityKernel.resources.push({
+      id: 'dryer_state',
+      name: 'Trạng thái lò sấy',
+      kind: 'state',
+    });
+    capabilityKernel.worldMechanics.push({
+      id: 'assemble_dryer',
+      name: 'Lắp lò sấy',
+      kind: 'capability',
+      description: 'Hải tự lắp lò sấy từ vật tư đã có.',
+      allowedActorIds: ['main'],
+      requiredFacts: [],
+      requiredResourceIds: [],
+      effectResources: [{ resourceId: 'dryer_state', direction: 'state_change' }],
+      effectFactIds: [],
+      capacityUnit: 'lò',
+      maximumUnitsPerMinute: 1,
+    });
+    const capabilityState: StoryState = structuredClone(initialState);
+    capabilityState.resources.push({
+      resourceId: 'dryer_state',
+      kind: 'state',
+      value: 'chưa_lắp',
+    });
+    const wire = plannerWire();
+    wire.chapters[0].scenes[0].deltaIds = ['dryer_assembled'];
+    wire.chapters[0].deltas = [{
+      id: 'dryer_assembled',
+      k: 'resource_state',
+      target: 'dryer_state',
+      counterpart: null,
+      before: null,
+      change: null,
+      after: 'đang_lắp',
+      source: 'Hải lắp khung lò',
+      sink: null,
+    }];
+    wire.chapters[0].mechanics = [];
+    const inferred = materializePlannerRollingPlan(wire, capabilityState, capabilityKernel);
+    expect(inferred.plans[0].mechanicUses).toMatchObject([{
+      mechanicId: 'assemble_dryer',
+      actorId: 'main',
+      quantity: 1,
+      deltaIds: ['dryer_assembled'],
+    }]);
+    expect(() => applyChapterPlan({
+      kernel: capabilityKernel,
+      state: capabilityState,
+      plan: inferred.plans[0],
+    })).not.toThrow();
+
+    const ambiguousKernel: StoryKernel = structuredClone(capabilityKernel);
+    ambiguousKernel.worldMechanics.push({
+      ...structuredClone(capabilityKernel.worldMechanics.find(item => item.id === 'assemble_dryer')!),
+      id: 'assemble_dryer_another_way',
+      name: 'Một cách lắp lò khác',
+    });
+    const ambiguous = materializePlannerRollingPlan(wire, capabilityState, ambiguousKernel);
+    expect(() => applyChapterPlan({
+      kernel: ambiguousKernel,
+      state: capabilityState,
+      plan: ambiguous.plans[0],
+    })).toThrow('without a validated world mechanic');
+  });
+
   test('compiler orders a same-scene fact producer before its dependent capability', () => {
     const dependencyKernel: StoryKernel = structuredClone(kernel);
     dependencyKernel.worldMechanics = [
