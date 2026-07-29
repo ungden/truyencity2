@@ -2120,6 +2120,7 @@ describe('canonical Story Factory', () => {
         kernel,
         state: initialState,
         plan: plan(1),
+        nextPlan: plan(2, 'ngay_1'),
         previousTail: null,
         planAssessment: { status: 'pass' as const, issues: [] },
         causalValidation: {

@@ -147,6 +147,7 @@ async function main() {
           kernel: sample.kernel,
           state: sample.state,
           plan: sample.plan,
+          nextPlan: sample.nextPlan ?? undefined,
           previousChapter: sample.previousTail ?? undefined,
           routes: {
             ...DEFAULT_MODEL_ROUTES,

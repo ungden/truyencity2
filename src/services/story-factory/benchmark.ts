@@ -15,9 +15,9 @@ import {
   type StoryModelProvider,
 } from './provider';
 
-export const STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL = 'story-factory-writer-bakeoff-v5-reader-complete';
-export const STORY_FACTORY_SEQUENTIAL_PROTOCOL = 'story-factory-sequential-survival-v3-frozen-causal-continuity';
-export const STORY_FACTORY_BENCHMARK_PROTOCOL = 'story-factory-validation-v5-pairwise-sequential-reader';
+export const STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL = 'story-factory-writer-bakeoff-v6-next-opening-handoff';
+export const STORY_FACTORY_SEQUENTIAL_PROTOCOL = 'story-factory-sequential-survival-v4-next-opening-handoff';
+export const STORY_FACTORY_BENCHMARK_PROTOCOL = 'story-factory-validation-v6-pairwise-sequential-handoff';
 export const STORY_FACTORY_BENCHMARK_SAMPLE_COUNT = 20;
 export const STORY_FACTORY_WRITER_SAMPLE_COUNT = 4;
 
@@ -45,6 +45,7 @@ export const PlanQualifiedWriterBriefSchema = z.object({
   kernel: StoryKernelSchema,
   state: StoryStateSchema,
   plan: ChapterPlanSchema,
+  nextPlan: ChapterPlanSchema.nullable(),
   previousTail: z.string().max(8_000).nullable(),
   planAssessment: PlanPassSchema,
   causalValidation: z.object({
@@ -79,6 +80,13 @@ export const WriterBakeoffCorpusSchema = z.object({
         code: z.ZodIssueCode.custom,
         path: ['samples'],
         message: `Writer brief ${sample.id} does not start from the immediately preceding committed state.`,
+      });
+    }
+    if (!sample.nextPlan || sample.nextPlan.chapterNumber !== sample.plan.chapterNumber + 1) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['samples'],
+        message: `Writer brief ${sample.id} must include the immediate next plan handoff.`,
       });
     }
   }

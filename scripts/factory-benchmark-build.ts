@@ -400,6 +400,7 @@ async function main() {
             kernel: setup.launchPack.kernel,
             state: setup.launchPack.initialState,
             plan: firstPlan,
+            nextPlan: planned.rollingPlan.plans[1],
             previousTail: null,
             planAssessment: planned.assessment,
             causalValidation: {
@@ -442,6 +443,7 @@ async function main() {
             kernel: setup.launchPack.kernel,
             state: stateBefore,
             plan,
+            nextPlan: planned.rollingPlan.plans[planIndex + 1] ?? null,
             previousTail,
             planAssessment: planned.assessment,
             causalValidation,
