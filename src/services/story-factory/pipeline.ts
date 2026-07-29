@@ -178,8 +178,9 @@ function injectDeterministicMissingDeltaFinding(
 
 interface PreflightIssue {
   kind: 'continuity' | 'reading';
-  category: 'prompt_leak' | 'unnatural_dialogue';
+  category: 'canon' | 'prompt_leak' | 'unnatural_dialogue';
   evidence: string;
+  conflictingEvidence?: string;
   instruction: string;
 }
 
@@ -211,8 +212,18 @@ function wordCount(content: string): number {
   return content.trim().split(/\s+/u).filter(Boolean).length;
 }
 
-function preflight(draft: ChapterDraft): PreflightIssue[] {
+function preflight(draft: ChapterDraft, chapterNumber: number): PreflightIssue[] {
   const issues: PreflightIssue[] = [];
+  const declaredChapter = draft.title.match(/^\s*chương\s+(\d+)\b/iu);
+  if (declaredChapter && Number(declaredChapter[1]) !== chapterNumber) {
+    issues.push({
+      kind: 'continuity',
+      category: 'canon',
+      evidence: draft.title,
+      conflictingEvidence: `Đây là chương ${chapterNumber}.`,
+      instruction: `Đặt lại title cho đúng chương ${chapterNumber}; không được ghi số chương khác.`,
+    });
+  }
   const leaks = [
     /\b(?:system prompt|developer message|chapter brief|writer brief|required[_ ]?delta|json schema)\b/iu,
     /\[(?:WRITER_BRIEF|CHAPTER_PLAN|STORY_STATE|EDITOR_RUBRIC)[^\]]*\]/iu,
@@ -282,11 +293,11 @@ function mergePreflight(assessment: EditorAssessment, deterministic: PreflightIs
   const existingReading = assessment.status === 'revise' ? assessment.readingIssues : [];
   const continuityIssues = [
     ...deterministic.filter(issue => issue.kind === 'continuity').map(issue => ({
-      category: 'prompt_leak' as const,
+      category: issue.category === 'canon' ? 'canon' as const : 'prompt_leak' as const,
       severity: 'major' as const,
       scope: 'prose' as const,
       currentEvidence: issue.evidence,
-      conflictingEvidence: 'Nội dung chương không được chứa thuật ngữ vận hành.',
+      conflictingEvidence: issue.conflictingEvidence ?? 'Nội dung chương không được chứa thuật ngữ vận hành.',
       referenceId: null,
       instruction: issue.instruction,
     })),
@@ -382,7 +393,8 @@ function groundIssueEvidence(input: {
   const referenceIds = new Set([...kernelIds, ...planIds, ...collectStableIds(input.state)]);
   const continuityIssues = input.assessment.continuityIssues.map(issue => {
     if (issue.scope === 'prose') {
-      const evidence = groundEvidenceSpan(input.draft.content, issue.currentEvidence);
+      const evidence = groundEvidenceSpan(input.draft.content, issue.currentEvidence)
+        ?? groundEvidenceSpan(input.draft.title, issue.currentEvidence);
       if (!evidence) {
         throw new StoryFactoryError('infra_blocked', 'Editor prose issue contains evidence that code cannot ground in the draft.', issue);
       }
@@ -439,7 +451,7 @@ export async function assessStoryDraft(input: {
   plan: ChapterPlan;
   draft: ChapterDraft;
 }): Promise<{ assessment: EditorAssessment; usage: ProviderUsage }> {
-  const deterministicIssues = preflight(input.draft);
+  const deterministicIssues = preflight(input.draft, input.plan.chapterNumber);
   const referenceIds = [...collectStableIds({
     kernel: input.kernel,
     state: input.state,

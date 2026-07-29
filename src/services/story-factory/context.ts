@@ -20,6 +20,7 @@ export interface ContextManifestEntry {
 
 export interface WriterBrief {
   story: { title: string };
+  chapterNumber: number;
   cast: unknown[];
   openingState: unknown[];
   scenes: unknown[];
@@ -195,6 +196,7 @@ export function buildWriterBrief(input: {
     : null;
   return {
     story: { title: input.kernel.title },
+    chapterNumber: input.plan.chapterNumber,
     cast: input.kernel.characters.filter(character => ids.characters.has(character.id)).map(character => ({
       name: character.name,
       agenda: character.agenda,

@@ -2017,6 +2017,64 @@ describe('canonical Story Factory', () => {
     });
   });
 
+  test('revision keeps the current chapter number and title evidence is grounded', async () => {
+    const first = {
+      title: 'Chương 4: Tám Ngàn Đồng Đầu Tiên',
+      content: 'Hải đặt rổ hàng xuống, kiểm tiền rồi chia việc với mẹ để hoàn tất mẻ thử đầu tiên.',
+    };
+    const titleIssue = {
+      v: 3 as const,
+      findings: [{
+        category: 'canon' as const,
+        severity: 'moderate' as const,
+        scope: 'prose' as const,
+        evidence: first.title,
+        referenceId: 'scene_1',
+        instruction: 'Sửa số chương trong title cho đúng chương hiện tại.',
+      }],
+      deltaChecks: [{ deltaId: 'delta_1', realized: true, evidence: 'chia việc với mẹ' }],
+      outcome: null,
+    };
+    const revised = {
+      title: 'Chương 1: Mẻ Thử Đầu Tiên',
+      content: 'Hải đặt rổ hàng xuống, kiểm tiền rồi chia việc với mẹ để hoàn tất mẻ thử đầu tiên.',
+    };
+    const provider = new QueueProvider([first, titleIssue, revised, editorWirePass('delta_1', 'chia việc với mẹ')]);
+    const result = await writeStoryChapter({ kernel, state: initialState, plan: plan(1), routes, provider });
+    expect(result.draft.title).toBe('Chương 1: Mẻ Thử Đầu Tiên');
+    expect(result.revisionCount).toBe(1);
+    expect(result.attemptTelemetry.initialAssessment).toMatchObject({
+      status: 'revise',
+      continuityIssues: expect.arrayContaining([
+        expect.objectContaining({ category: 'canon', currentEvidence: first.title }),
+      ]),
+    });
+    expect(provider.prompts[2]).toContain('"chapterNumber":1');
+  });
+
+  test('deterministic preflight catches a wrong chapter title even when Editor misses it', async () => {
+    const first = {
+      title: 'Chương 9: Sai Số Thứ Tự',
+      content: 'Hải kiểm tiền rồi chia việc với mẹ để bắt đầu mẻ thử trong buổi sáng.',
+    };
+    const revised = {
+      title: 'Chương 1: Bắt Đầu Mẻ Thử',
+      content: 'Hải kiểm tiền rồi chia việc với mẹ để bắt đầu mẻ thử trong buổi sáng.',
+    };
+    const provider = new QueueProvider([
+      first,
+      editorWirePass('delta_1', 'chia việc với mẹ'),
+      revised,
+      editorWirePass('delta_1', 'chia việc với mẹ'),
+    ]);
+    const result = await writeStoryChapter({ kernel, state: initialState, plan: plan(1), routes, provider });
+    expect(result.revisionCount).toBe(1);
+    expect(result.attemptTelemetry.initialAssessment).toMatchObject({
+      status: 'revise',
+      continuityIssues: [expect.objectContaining({ category: 'canon' })],
+    });
+  });
+
   test('failed rewrite preserves both drafts, both assessments and usage lineage', async () => {
     const first = { title: 'Bản đầu', content: 'Hải nhìn required delta trên chapter brief rồi bắt đầu làm việc trong căn nhà nhỏ.' };
     const firstIssue = editorWirePass('delta_1', 'bắt đầu làm việc');
