@@ -129,10 +129,13 @@ async function main() {
   if (previous.editor && previous.editor !== editorModel) {
     throw new Error('Writer bake-off checkpoint belongs to a different Editor route.');
   }
+  // A transport failure is not a completed sample. Keep immutable content
+  // outcomes, but let an operator resume the same campaign and same route
+  // after the provider/network recovers.
   const generations: Generation[] = (previous.generations ?? []).filter(result => (
     typeof result.costUsd === 'number'
     && typeof result.content === 'string'
-    && ['publish', 'writer_failed', 'corpus_invalid', 'infra_failed'].includes(result.status)
+    && ['publish', 'writer_failed', 'corpus_invalid'].includes(result.status)
   ));
 
   for (let batchStart = 0; batchStart < corpus.samples.length; batchStart += 3) {

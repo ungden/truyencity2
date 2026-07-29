@@ -239,6 +239,8 @@ describe('Story Factory architecture boundary', () => {
     expect(bakeoff).toContain('WriterBakeoffCorpusSchema.parse');
     expect(bakeoff).toContain("status: assessmentHasInvalidArtifact(assessment) ? 'corpus_invalid' : 'writer_failed'");
     expect(bakeoff).toContain("status: 'infra_failed'");
+    expect(bakeoff).toContain('A transport failure is not a completed sample');
+    expect(bakeoff).not.toContain("'corpus_invalid', 'infra_failed'");
     expect(bakeoff).not.toContain('freezeCorpus');
     expect(bakeoff).not.toContain('normalizeHistoricalKernel');
     expect(bakeoff).not.toContain("from('story_factory_jobs')");
