@@ -477,7 +477,12 @@ async function runWindowReview(db: SupabaseClient, job: FactoryJobRow, project: 
       chapters: (chapters ?? []).map(chapter => ({ chapterNumber: chapter.chapter_number, title: chapter.title, content: chapter.content ?? '' })),
       routes, provider,
     });
-    if (reviewed.review.status === 'block') throw new StoryFactoryError('quality_blocked', 'Five-chapter window review detected drift.', reviewed.review.issues);
+    if (reviewed.review.status === 'block') {
+      throw new StoryFactoryError('quality_blocked', 'Five-chapter window review detected drift.', {
+        review: reviewed.review,
+        usages: [reviewed.usage],
+      });
+    }
     const now = new Date().toISOString();
     const nextRunAt = nextRunAfterNonChapterStage(job, new Date(now));
     const nextStage = state.chapterNumber >= arc.plannedEndChapter ? 'arc' : 'write';

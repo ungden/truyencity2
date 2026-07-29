@@ -37,6 +37,7 @@ import {
   type RollingPlan,
   type DiscoveryResumeLineage,
   type StoryState,
+  type WindowReview,
 } from '../src/services/story-factory';
 
 dotenv.config({ path: '.env.runtime', quiet: true });
@@ -122,7 +123,13 @@ type Progress = {
   }>;
   setupCheckpoints: Record<string, SetupCheckpoint>;
   plannedWindows: Record<string, { rollingPlan: RollingPlan; assessment: PlanAssessment }>;
-  windowReviews: Array<{ lane: string; status: 'pass' }>;
+  windowReviews: Array<{
+    lane: string;
+    chapterNumbers: number[];
+    chapterDigest: string;
+    review: WindowReview;
+    usage: ProviderUsage;
+  }>;
   failure: null | { lane: string; stage: string; message: string; code: string | null; evidence: unknown };
   bookedSetupCostUsdByLane: Record<string, number>;
   resumeLineage: DiscoveryResumeLineage[];
@@ -557,11 +564,19 @@ async function main() {
           routes: candidateRoutes,
         });
         progress.buildCostUsd += reviewed.usage.costUsd;
+        progress.windowReviews.push({
+          lane,
+          chapterNumbers: chapters.map(chapter => chapter.chapterNumber),
+          chapterDigest: digestArtifact(chapters),
+          review: reviewed.review,
+          usage: reviewed.usage,
+        });
+        persist();
         if (reviewed.review.status === 'block') {
           progress.windowReviewFailures += 1;
+          persist();
           throw new Error(`Five-chapter window failed: ${JSON.stringify(reviewed.review.issues)}`);
         }
-        progress.windowReviews.push({ lane, status: 'pass' });
         for (const sample of laneSamples) sample.allInCostUsd += reviewed.usage.costUsd / 5;
         persist();
         await heartbeat();

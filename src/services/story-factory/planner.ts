@@ -937,42 +937,95 @@ function plannerContractFailureEvidence(error: unknown): {
   };
 }
 
+const WindowEvidenceSpanSchema = z.object({
+  chapterNumber: z.number().int().min(1).max(1_200),
+  quote: z.string().trim().min(5).max(320),
+}).strict();
+
+const WindowCheckEvidenceSchema = z.object({
+  structureVariety: z.array(WindowEvidenceSpanSchema).min(2).max(5),
+  reactionVariety: z.array(WindowEvidenceSpanSchema).min(2).max(5),
+  voiceSeparation: z.array(WindowEvidenceSpanSchema).min(2).max(5),
+  earnedProgression: z.array(WindowEvidenceSpanSchema).min(2).max(5),
+  causalLearning: z.array(WindowEvidenceSpanSchema).min(2).max(5),
+}).strict();
+
+const WindowChapterPatternSchema = z.object({
+  chapterNumber: z.number().int().min(1).max(1_200),
+  dominantStructure: z.enum([
+    'explain_then_demonstrate',
+    'investigate_then_infer',
+    'negotiate_then_trade',
+    'attempt_fail_adapt',
+    'confront_then_shift',
+    'relationship_action',
+    'explore_then_discover',
+    'mixed_other',
+  ]),
+  validationSource: z.enum([
+    'material_consequence',
+    'self_assertion',
+    'expert_surprise',
+    'crowd_surprise',
+    'opponent_reaction',
+    'independent_measurement',
+    'relationship_change',
+    'unresolved',
+  ]),
+  evidenceStage: z.enum(['hypothesis', 'single_observation', 'repeated_observation', 'established_fact']),
+  claimStrength: z.enum(['provisional', 'single_trial', 'repeatable', 'absolute']),
+  evidence: z.array(WindowEvidenceSpanSchema).min(1).max(2),
+}).strict();
+
+const WindowIssueSchema = z.object({
+  category: z.enum([
+    'continuity_drift',
+    'voice_drift',
+    'repetition',
+    'reward_loop',
+    'progression',
+    'resource_drift',
+    'artifact_drift',
+    'prose_pattern',
+    'opposition_agency',
+    'earned_progression',
+    'premature_certainty',
+  ]),
+  evidence: z.array(WindowEvidenceSpanSchema).min(1).max(4),
+  instruction: z.string().trim().min(5).max(1_000),
+}).strict();
+
+export const WindowPassSchema = z.object({
+  status: z.literal('pass'),
+  checks: z.object({
+    structureVariety: z.literal(true),
+    reactionVariety: z.literal(true),
+    voiceSeparation: z.literal(true),
+    earnedProgression: z.literal(true),
+    causalLearning: z.literal(true),
+  }).strict(),
+  checkEvidence: WindowCheckEvidenceSchema,
+  chapterPatterns: z.array(WindowChapterPatternSchema).length(5),
+  issues: z.array(z.never()).length(0),
+}).strict();
+
+const WindowBlockSchema = z.object({
+  status: z.literal('block'),
+  checks: z.object({
+    structureVariety: z.boolean(),
+    reactionVariety: z.boolean(),
+    voiceSeparation: z.boolean(),
+    earnedProgression: z.boolean(),
+    causalLearning: z.boolean(),
+  }).strict(),
+  checkEvidence: WindowCheckEvidenceSchema,
+  chapterPatterns: z.array(WindowChapterPatternSchema).length(5),
+  issues: z.array(WindowIssueSchema).min(1).max(3),
+}).strict();
+
 export const WindowReviewSchema = z.discriminatedUnion('status', [
-  z.object({
-    status: z.literal('pass'),
-    checks: z.object({
-      structureVariety: z.literal(true),
-      reactionVariety: z.literal(true),
-      voiceSeparation: z.literal(true),
-      earnedProgression: z.literal(true),
-    }).strict(),
-    issues: z.array(z.never()).length(0),
-  }).strict(),
-  z.object({
-    status: z.literal('block'),
-    checks: z.object({
-      structureVariety: z.boolean(),
-      reactionVariety: z.boolean(),
-      voiceSeparation: z.boolean(),
-      earnedProgression: z.boolean(),
-    }).strict(),
-    issues: z.array(z.object({
-      category: z.enum([
-        'continuity_drift',
-        'voice_drift',
-        'repetition',
-        'reward_loop',
-        'progression',
-        'resource_drift',
-        'artifact_drift',
-        'prose_pattern',
-        'opposition_agency',
-        'earned_progression',
-      ]),
-      evidence: z.string().trim().min(5).max(1_000),
-      instruction: z.string().trim().min(5).max(1_000),
-    }).strict()).min(1).max(3),
-  }).strict(),
+  WindowPassSchema,
+  WindowBlockSchema,
 ]);
 
 const ArcLifecycleSchema = z.discriminatedUnion('status', [
@@ -983,6 +1036,97 @@ const ArcLifecycleSchema = z.discriminatedUnion('status', [
 
 export type WindowReview = z.infer<typeof WindowReviewSchema>;
 export type ArcLifecycle = z.infer<typeof ArcLifecycleSchema>;
+
+function validateWindowEvidence(
+  review: WindowReview,
+  chapters: Array<{ chapterNumber: number; content: string }>,
+): void {
+  const chapterMap = new Map(chapters.map(chapter => [chapter.chapterNumber, chapter.content]));
+  const evidenceGroups = [
+    ...Object.entries(review.checkEvidence),
+    ...review.chapterPatterns.map((pattern, index) => [`chapterPatterns.${index}`, pattern.evidence] as const),
+    ...review.issues.map((issue, index) => [`issues.${index}`, issue.evidence] as const),
+  ];
+  for (const [group, spans] of evidenceGroups) {
+    for (const span of spans) {
+      const prose = chapterMap.get(span.chapterNumber);
+      if (!prose || !prose.includes(span.quote)) {
+        throw new StoryFactoryError(
+          'infra_blocked',
+          'Window Review returned evidence that code cannot ground in the committed chapter prose.',
+          { group, span },
+        );
+      }
+    }
+  }
+  const patternNumbers = review.chapterPatterns.map(pattern => pattern.chapterNumber);
+  const expectedNumbers = chapters.map(chapter => chapter.chapterNumber).sort((a, b) => a - b);
+  if (
+    new Set(patternNumbers).size !== chapters.length
+    || [...patternNumbers].sort((a, b) => a - b).some((chapterNumber, index) => chapterNumber !== expectedNumbers[index])
+  ) {
+    throw new StoryFactoryError(
+      'infra_blocked',
+      'Window Review must analyze each committed chapter exactly once.',
+      { expectedNumbers, patternNumbers },
+    );
+  }
+  for (const [check, spans] of Object.entries(review.checkEvidence)) {
+    if (new Set(spans.map(span => span.chapterNumber)).size < 2) {
+      throw new StoryFactoryError(
+        'infra_blocked',
+        'Window Review check evidence must compare at least two different chapters.',
+        { check, spans },
+      );
+    }
+  }
+}
+
+function applyDeterministicWindowPolicy(
+  review: WindowReview,
+  realityMode: StoryKernel['realityMode'],
+): WindowReview {
+  const explainAndValidate = review.chapterPatterns.filter(pattern => (
+    pattern.dominantStructure === 'explain_then_demonstrate'
+    && ['expert_surprise', 'crowd_surprise', 'opponent_reaction'].includes(pattern.validationSource)
+  ));
+  const prematureCertainty = realityMode === 'grounded'
+    ? review.chapterPatterns.filter(pattern => (
+      pattern.claimStrength === 'absolute'
+      && ['hypothesis', 'single_observation'].includes(pattern.evidenceStage)
+    ))
+    : [];
+  const derivedIssues: z.infer<typeof WindowIssueSchema>[] = [];
+  if (explainAndValidate.length >= 3) {
+    derivedIssues.push({
+      category: 'prose_pattern',
+      evidence: explainAndValidate.slice(0, 4).flatMap(pattern => pattern.evidence.slice(0, 1)),
+      instruction: 'Thay đổi cơ chế tạo và kiểm chứng kết quả; không tiếp tục dùng giải thích rồi biểu diễn để phản ứng kinh ngạc xác nhận nhân vật chính.',
+    });
+  }
+  if (prematureCertainty.length > 0) {
+    derivedIssues.push({
+      category: 'premature_certainty',
+      evidence: prematureCertainty.slice(0, 4).flatMap(pattern => pattern.evidence.slice(0, 1)),
+      instruction: 'Trong bối cảnh grounded, giữ kết luận ở mức giả thuyết hoặc thử nghiệm cho tới khi có đủ quan sát lặp lại; không tuyên bố tối ưu hay tuyệt đối từ một lần thử.',
+    });
+  }
+  if (derivedIssues.length === 0) return review;
+  const issues = review.status === 'block'
+    ? [...review.issues, ...derivedIssues].slice(0, 3)
+    : derivedIssues.slice(0, 3);
+  return WindowBlockSchema.parse({
+    ...review,
+    status: 'block',
+    checks: {
+      ...review.checks,
+      structureVariety: explainAndValidate.length >= 3 ? false : review.checks.structureVariety,
+      earnedProgression: prematureCertainty.length > 0 ? false : review.checks.earnedProgression,
+      causalLearning: prematureCertainty.length > 0 ? false : review.checks.causalLearning,
+    },
+    issues,
+  });
+}
 
 const PlanJudgeWireSchema = z.object({
   status: z.enum(['pass', 'revise']),
@@ -1413,9 +1557,12 @@ export async function reviewFiveChapterWindow(input: {
 Ở chế độ window review, đọc liền mạch năm chương và so với recentOutcomes/state đã commit.
 Block nếu nhân vật phản ứng như quên sự kiện vừa trải qua, cơ chế vật phẩm/công nghệ đổi cách hoạt động, số tiền/khối lượng/giá trong prose lệch với ledger, hoặc năm chương lặp cùng cấu trúc mà không tạo tiến triển.
 Phải đọc trải nghiệm của cả cửa sổ: bắt lặp chức năng “giải thích cơ chế → biểu diễn → quần chúng kinh ngạc”, stock reaction tương đương dù khác từ, main và đối thủ nói cùng giọng, đối thủ liên tục làm công cụ, hoặc progression tăng mạnh thiếu tích lũy/chi phí.
-Chỉ báo tối đa ba lỗi drift hoặc pattern quan trọng; evidence phải trích từ và so sánh các chương cụ thể.`,
+Không mặc định một thiết kế là tối ưu hoặc một kết quả là tuyệt đối chỉ vì nhân vật giải thích tự tin hay thử thành công một lần. Với realityMode=grounded, kết luận phải tương xứng số lần quan sát và sai số thực tế.
+Lập chapterPatterns cho đủ đúng năm chương trước khi kết luận. Mỗi quote trong checkEvidence, chapterPatterns và issues phải được sao chép nguyên văn từ content của đúng chapterNumber; mỗi check phải so sánh ít nhất hai chương khác nhau.
+Trạng thái pass cũng phải có bằng chứng cụ thể. Chỉ báo tối đa ba lỗi drift hoặc pattern quan trọng.`,
     prompt: JSON.stringify({
-      task: 'Kiểm tra cửa sổ năm chương vừa commit.',
+      task: 'Đọc năm chương như một độc giả liên tục, lập pattern map, rồi kiểm tra continuity và trải nghiệm đọc.',
+      realityMode: input.kernel.realityMode,
       auditChecklist: [
         'nhân vật có nhớ và phản ứng theo các lần gặp/sự kiện trong recentOutcomes không',
         'artifact và world-rule quan trọng có giữ cùng cơ chế hoạt động không',
@@ -1438,7 +1585,19 @@ Chỉ báo tối đa ba lỗi drift hoặc pattern quan trọng; evidence phải
     schema: WindowReviewSchema,
     temperature: 0.4,
   });
-  return { review: result.value, usage: result.usage };
+  try {
+    validateWindowEvidence(result.value, input.chapters);
+    const review = applyDeterministicWindowPolicy(result.value, input.kernel.realityMode);
+    return { review, usage: result.usage };
+  } catch (error) {
+    if (error instanceof StoryFactoryError) {
+      throw new StoryFactoryError(error.code, error.message, {
+        validation: error.evidence,
+        usages: [result.usage],
+      });
+    }
+    throw error;
+  }
 }
 
 export async function planArcLifecycle(input: {

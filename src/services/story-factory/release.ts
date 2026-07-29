@@ -10,6 +10,7 @@ export const FACTORY_SETUP_VERSION = 'story-factory-setup-47-kernel-reality-mode
 export const FACTORY_PLANNER_VERSION = 'story-factory-planner-56-domain-plausibility';
 export const FACTORY_CONTEXT_VERSION = 'story-factory-context-17-natural-next-opening';
 export const FACTORY_MEMORY_POLICY_VERSION = 'story-factory-memory-4-exact-id-bounded-no-rag';
+export const FACTORY_WINDOW_REVIEW_VERSION = 'story-factory-window-review-2-grounded-pattern-map';
 const FACTORY_ENGINE_SETUP_COMPATIBILITY = FACTORY_SETUP_VERSION;
 
 const identity = {
@@ -20,6 +21,7 @@ const identity = {
   memoryPolicyVersion: FACTORY_MEMORY_POLICY_VERSION,
   stateVersion: FACTORY_STATE_VERSION,
   plannerVersion: FACTORY_PLANNER_VERSION,
+  windowReviewVersion: FACTORY_WINDOW_REVIEW_VERSION,
   // Setup revisions are tracked independently so a Launch-Pack-only change does
   // not invalidate an already proven Writer/Editor runtime release.
   setupVersion: FACTORY_ENGINE_SETUP_COMPATIBILITY,

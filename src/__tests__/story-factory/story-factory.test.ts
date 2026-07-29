@@ -20,6 +20,7 @@ import {
   type ModelRoutes,
   type StoryKernel,
   type StoryState,
+  type WindowReview,
   StoryFactoryError,
   StoryKernelSchema,
   FIRST_30_PORTFOLIO,
@@ -41,6 +42,7 @@ import {
   buildSetupCheckpointProvenance,
   bookSetupCheckpointCost,
   createLaunchWorldWireSchema,
+  digestArtifact,
   prepareDiscoveryResume,
   isStoryFactoryEnabled,
   calculateValidationMetrics,
@@ -52,6 +54,7 @@ import {
   runConceptLab,
   planArcLifecycle,
   planRollingWindow,
+  reviewFiveChapterWindow,
   rollingPlanContainsChapter,
   toGeminiResponseSchema,
   validateArcResourceReachability,
@@ -314,6 +317,42 @@ function plannerWire(chapterNumber = 1): z.infer<typeof PlannerRollingPlanRespon
 }
 
 const usage = { model: 'test', inputTokens: 1, outputTokens: 1, costUsd: 0, finishReason: 'STOP' };
+
+function windowReviewPass(chapterOffset = 0): Extract<WindowReview, { status: 'pass' }> {
+  const spans = [1, 2].map(chapterNumber => ({
+    chapterNumber: chapterNumber + chapterOffset,
+    quote: `Bằng chứng nguyên văn chương ${chapterNumber + chapterOffset}.`,
+  }));
+  return {
+    status: 'pass' as const,
+    checks: {
+      structureVariety: true as const,
+      reactionVariety: true as const,
+      voiceSeparation: true as const,
+      earnedProgression: true as const,
+      causalLearning: true as const,
+    },
+    checkEvidence: {
+      structureVariety: spans,
+      reactionVariety: spans,
+      voiceSeparation: spans,
+      earnedProgression: spans,
+      causalLearning: spans,
+    },
+    chapterPatterns: Array.from({ length: 5 }, (_, index) => ({
+      chapterNumber: chapterOffset + index + 1,
+      dominantStructure: 'mixed_other' as const,
+      validationSource: 'material_consequence' as const,
+      evidenceStage: 'repeated_observation' as const,
+      claimStrength: 'repeatable' as const,
+      evidence: [{
+        chapterNumber: chapterOffset + index + 1,
+        quote: `Bằng chứng nguyên văn chương ${chapterOffset + index + 1}.`,
+      }],
+    })),
+    issues: [] as [],
+  };
+}
 
 class QueueProvider implements StoryModelProvider {
   calls: string[] = [];
@@ -2181,10 +2220,21 @@ describe('canonical Story Factory', () => {
       windowReviewFailures: 0,
       buildCostUsd: 2,
       samples,
-      windowReviews: Array.from({ length: 4 }, (_, index) => ({
-        lane: `lane-${index + 1}`,
-        status: 'pass' as const,
-      })),
+      windowReviews: Array.from({ length: 4 }, (_, index) => {
+        const lane = `lane-${index + 1}`;
+        const laneSamples = samples.filter(sample => sample.lane === lane);
+        return {
+          lane,
+          chapterNumbers: laneSamples.map(sample => sample.readerBrief.chapterNumber),
+          chapterDigest: digestArtifact(laneSamples.map(sample => ({
+            chapterNumber: sample.readerBrief.chapterNumber,
+            title: sample.title,
+            content: sample.content,
+          }))),
+          review: windowReviewPass(),
+          usage,
+        };
+      }),
     });
     const blind = buildBlindReaderInput({ sample: corpus.samples[0] });
     expect(blind).toEqual({
@@ -2194,6 +2244,12 @@ describe('canonical Story Factory', () => {
       prose: corpus.samples[0].content,
     });
     expect(JSON.stringify(blind)).not.toMatch(/chapterPlan|stateBefore|requiredDelta|model|cost/iu);
+    expect(SequentialBenchmarkCorpusSchema.safeParse({
+      ...corpus,
+      windowReviews: corpus.windowReviews.map((review, index) => index === 0
+        ? { ...review, chapterDigest: '0'.repeat(64) }
+        : review),
+    }).success).toBe(false);
     const judgments = corpus.samples.flatMap(sample => ['judge-a', 'judge-b', 'judge-c'].map(model => ({
       sampleId: sample.id,
       model,
@@ -2210,13 +2266,25 @@ describe('canonical Story Factory', () => {
     });
     expect(metrics.firstPassPublishRate).toBe(0.8);
     expect(validationPasses(metrics)).toBe(false);
+    const competitorSamples = corpus.samples.map(sample => ({
+      ...sample,
+      content: 'Bản đối chứng có nội dung đủ dài để schema chấp nhận.',
+    }));
     const competitor = SequentialBenchmarkCorpusSchema.parse({
       ...corpus,
       route: { ...corpus.route, writer: 'competitor-writer' },
-      samples: corpus.samples.map(sample => ({
-        ...sample,
-        content: 'Bản đối chứng có nội dung đủ dài để schema chấp nhận.',
-      })),
+      samples: competitorSamples,
+      windowReviews: corpus.windowReviews.map(review => {
+        const laneSamples = competitorSamples.filter(sample => sample.lane === review.lane);
+        return {
+          ...review,
+          chapterDigest: digestArtifact(laneSamples.map(sample => ({
+            chapterNumber: sample.readerBrief.chapterNumber,
+            title: sample.title,
+            content: sample.content,
+          }))),
+        };
+      }),
     });
     assertComparableSequentialCorpora({ candidate: corpus, competitor });
     expect(() => assertComparableSequentialCorpora({
@@ -3645,20 +3713,88 @@ describe('canonical Story Factory', () => {
         reactionVariety: true,
         voiceSeparation: true,
         earnedProgression: false,
+        causalLearning: false,
       },
+      checkEvidence: {
+        structureVariety: [
+          { chapterNumber: 1, quote: 'Hải lại giải thích cơ chế trước khi thử.' },
+          { chapterNumber: 2, quote: 'Mọi người lại kinh ngạc sau màn biểu diễn.' },
+        ],
+        reactionVariety: [
+          { chapterNumber: 1, quote: 'Bà Lành im lặng kiểm lại số tiền.' },
+          { chapterNumber: 2, quote: 'Tấn trả giá bằng một điều kiện mới.' },
+        ],
+        voiceSeparation: [
+          { chapterNumber: 1, quote: 'Hải chia việc bằng câu nói ngắn.' },
+          { chapterNumber: 2, quote: 'Tấn vòng vo dò giá trước khi trả lời.' },
+        ],
+        earnedProgression: [
+          { chapterNumber: 1, quote: 'Mẻ thử đầu tiên mới chỉ là giả thuyết.' },
+          { chapterNumber: 2, quote: 'Một lần thử đã bị gọi là tuyệt đối.' },
+        ],
+        causalLearning: [
+          { chapterNumber: 1, quote: 'Mẻ thử đầu tiên mới chỉ là giả thuyết.' },
+          { chapterNumber: 2, quote: 'Một lần thử đã bị gọi là tuyệt đối.' },
+        ],
+      },
+      chapterPatterns: Array.from({ length: 5 }, (_, index) => ({
+        chapterNumber: index + 1,
+        dominantStructure: index < 3 ? 'explain_then_demonstrate' as const : 'mixed_other' as const,
+        validationSource: index < 3 ? 'expert_surprise' as const : 'material_consequence' as const,
+        evidenceStage: index === 1 ? 'single_observation' as const : 'repeated_observation' as const,
+        claimStrength: index === 1 ? 'absolute' as const : 'repeatable' as const,
+        evidence: [{ chapterNumber: index + 1, quote: `Bằng chứng chương ${index + 1} đủ dài.` }],
+      })),
       issues: [
         {
           category: 'resource_drift',
-          evidence: 'nhẩm giá mua hai ngàn một ký',
+          evidence: [{ chapterNumber: 1, quote: 'nhẩm giá mua hai ngàn một ký' }],
           instruction: 'Đối chiếu lời nhẩm tiền với ledger giá mua đã commit.',
         },
         {
           category: 'artifact_drift',
-          evidence: 'chèn mùn cưa lại quanh bao tải',
+          evidence: [{ chapterNumber: 2, quote: 'chèn mùn cưa lại quanh bao tải' }],
           instruction: 'Giữ cơ chế thùng bảo ôn nhất quán với thiết kế đã commit.',
         },
       ],
     }).status).toBe('block');
+  });
+
+  test('window review cannot rubber-stamp a repeated explanation-demonstration-surprise formula', async () => {
+    const chapters = Array.from({ length: 5 }, (_, index) => ({
+      chapterNumber: index + 1,
+      title: `Chương ${index + 1}`,
+      content: `Bằng chứng nguyên văn chương ${index + 1}. Nhân vật thực hiện diễn biến của chương.`,
+    }));
+    const review = windowReviewPass();
+    review.chapterPatterns = review.chapterPatterns.map((pattern, index) => index < 3 ? {
+      ...pattern,
+      dominantStructure: 'explain_then_demonstrate' as const,
+      validationSource: 'expert_surprise' as const,
+    } : pattern);
+    const provider = new QueueProvider([review]);
+    const result = await reviewFiveChapterWindow({ kernel, arc, state: initialState, chapters, routes, provider });
+    expect(result.review).toMatchObject({
+      status: 'block',
+      checks: { structureVariety: false },
+      issues: [expect.objectContaining({ category: 'prose_pattern' })],
+    });
+  });
+
+  test('window review fails closed when quoted evidence is not in committed prose', async () => {
+    const chapters = Array.from({ length: 5 }, (_, index) => ({
+      chapterNumber: index + 1,
+      title: `Chương ${index + 1}`,
+      content: `Bằng chứng nguyên văn chương ${index + 1}.`,
+    }));
+    const review = windowReviewPass();
+    review.checkEvidence.structureVariety[0].quote = 'Câu này không tồn tại trong chương.';
+    const provider = new QueueProvider([review]);
+    await expect(reviewFiveChapterWindow({ kernel, arc, state: initialState, chapters, routes, provider }))
+      .rejects.toMatchObject({
+        code: 'infra_blocked',
+        evidence: { usages: [usage] },
+      });
   });
 
   test('state remains bounded across 1,200 transitions', () => {

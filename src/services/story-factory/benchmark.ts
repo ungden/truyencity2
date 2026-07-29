@@ -14,10 +14,11 @@ import {
   type ProviderUsage,
   type StoryModelProvider,
 } from './provider';
+import { WindowPassSchema } from './planner';
 
 export const STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL = 'story-factory-writer-bakeoff-v11-idempotent-exact-resume';
-export const STORY_FACTORY_SEQUENTIAL_PROTOCOL = 'story-factory-sequential-survival-v5-natural-handoff-complete-attempts';
-export const STORY_FACTORY_BENCHMARK_PROTOCOL = 'story-factory-validation-v11-idempotent-exact-resume';
+export const STORY_FACTORY_SEQUENTIAL_PROTOCOL = 'story-factory-sequential-survival-v6-evidenced-window-review';
+export const STORY_FACTORY_BENCHMARK_PROTOCOL = 'story-factory-validation-v12-evidenced-window-review';
 export const STORY_FACTORY_BENCHMARK_SAMPLE_COUNT = 20;
 export const STORY_FACTORY_WRITER_SAMPLE_COUNT = 4;
 
@@ -171,7 +172,20 @@ export const SequentialBenchmarkCorpusSchema = z.object({
   samples: z.array(SequentialBenchmarkSampleSchema).length(STORY_FACTORY_BENCHMARK_SAMPLE_COUNT),
   windowReviews: z.array(z.object({
     lane: z.string().trim().min(2).max(80),
-    status: z.literal('pass'),
+    chapterNumbers: z.array(z.number().int().min(1).max(1_200)).length(5),
+    chapterDigest: z.string().length(64),
+    review: WindowPassSchema,
+    usage: z.object({
+      inputTokens: z.number().int().nonnegative(),
+      outputTokens: z.number().int().nonnegative(),
+      costUsd: z.number().nonnegative(),
+      model: z.string().trim().min(1),
+      finishReason: z.string().trim().min(1),
+      grounding: z.object({
+        searchQueries: z.array(z.string()),
+        sourceUrls: z.array(z.string()),
+      }).strict().optional(),
+    }).strict(),
   }).strict()).length(4),
 }).strict().superRefine((corpus, ctx) => {
   if (new Set(corpus.samples.map(sample => sample.id)).size !== STORY_FACTORY_BENCHMARK_SAMPLE_COUNT) {
@@ -189,7 +203,9 @@ export const SequentialBenchmarkCorpusSchema = z.object({
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['samples'], message: 'Sequential survival requires four lanes with five chapters each.' });
   }
   for (const lane of lanes) {
-    const samples = corpus.samples.filter(sample => sample.lane === lane);
+    const samples = corpus.samples
+      .filter(sample => sample.lane === lane)
+      .sort((left, right) => left.readerBrief.chapterNumber - right.readerBrief.chapterNumber);
     for (let index = 1; index < samples.length; index += 1) {
       if (samples[index - 1].stateAfterDigest !== samples[index].stateBeforeDigest) {
         ctx.addIssue({
@@ -199,6 +215,35 @@ export const SequentialBenchmarkCorpusSchema = z.object({
         });
       }
     }
+    const windowReview = corpus.windowReviews.find(review => review.lane === lane);
+    const chapterNumbers = samples.map(sample => sample.readerBrief.chapterNumber);
+    if (!windowReview || windowReview.chapterNumbers.some((chapterNumber, index) => chapterNumber !== chapterNumbers[index])) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['windowReviews'],
+        message: `Lane ${lane} window review must reference its exact five sequential chapters.`,
+      });
+      continue;
+    }
+    const expectedDigest = digestArtifact(samples.map(sample => ({
+      chapterNumber: sample.readerBrief.chapterNumber,
+      title: sample.title,
+      content: sample.content,
+    })));
+    if (windowReview.chapterDigest !== expectedDigest) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['windowReviews'],
+        message: `Lane ${lane} window review digest does not match the reviewed prose.`,
+      });
+    }
+  }
+  if (new Set(corpus.windowReviews.map(review => review.lane)).size !== 4) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['windowReviews'],
+      message: 'Sequential survival requires one immutable window review per lane.',
+    });
   }
 });
 
