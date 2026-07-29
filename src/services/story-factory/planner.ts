@@ -89,7 +89,7 @@ const PlannerCompactChapterSchema = z.object({
 export const PlannerRollingPlanResponseSchema = z.object({
   v: z.literal(2),
   start: z.number().int().min(1),
-  chapters: z.array(PlannerCompactChapterSchema).min(1).max(5),
+  chapters: z.array(PlannerCompactChapterSchema).min(1).max(3),
 }).strict();
 
 const PLANNER_COMPACT_CONTRACT = {
@@ -1467,7 +1467,7 @@ export async function planRollingWindow(input: {
   arc: ArcPlan;
   state: StoryState;
   routes: ModelRoutes;
-  requiredWindowSize?: 1 | 2 | 3 | 4 | 5;
+  requiredWindowSize?: 1 | 2 | 3;
   recoveryEvidence?: unknown;
   continuityPacket?: ContinuityPacket;
   provider?: StoryModelProvider;
@@ -1601,7 +1601,7 @@ export async function planRollingWindow(input: {
           ? 'Lập lại toàn bộ rolling window chưa commit từ state hiện tại; xử lý bằng chứng cho thấy plan trước không tạo tiến triển mới.'
           : input.requiredWindowSize
             ? `Lập đúng ${input.requiredWindowSize} chương tiếp theo, không vượt quá cuối arc.`
-            : 'Lập từ một đến năm chương tiếp theo, không vượt quá cuối arc.'
+            : 'Lập từ một đến ba chương tiếp theo, không vượt quá cuối arc.'
         : 'Tạo lại toàn bộ rolling window và sửa đúng các validation issue cơ học; không vá cục bộ.',
       previousResponse: mechanicalAttempt === 1 ? undefined : currentResponse,
       validationIssues: mechanicalAttempt === 1 ? undefined : {

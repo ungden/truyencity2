@@ -74,9 +74,12 @@ describe('Story Factory architecture boundary', () => {
     expect(planner).toContain('Tạo lại toàn bộ rolling window đúng một lần theo evidence của Plan Judge');
     expect(planner).toContain('const rejudged = await assessRollingPlan({');
     expect(pipeline).not.toContain('planJudge');
-    expect(benchmark).toContain('Current Planner and Plan Judge must pass exactly chapters 1-5');
+    expect(benchmark).toContain('Current Planner and Plan Judge must pass exactly chapters 1-3');
+    expect(benchmark).toContain('requiredWindowSize: 3');
+    expect(benchmark).toContain('requiredWindowSize: 2');
+    expect(benchmark).toContain('Current Planner and Plan Judge must pass exactly chapters 4-5 from committed chapter-3 state');
     expect(benchmark).toContain('writeStoryChapter({');
-    expect(benchmark).toContain('nextPlan: planned.rollingPlan.plans[planIndex + 1]');
+    expect(benchmark).toContain('nextPlan: window.rollingPlan.plans[planIndex + 1]');
     expect(benchmark).toContain('nextPlan: planned.rollingPlan.plans[1]');
     expect(benchmark).toContain('assessSequentialContinuity({');
     expect(benchmark).toContain('--frozen-discovery-progress');

@@ -123,6 +123,7 @@ type Progress = {
   }>;
   setupCheckpoints: Record<string, SetupCheckpoint>;
   plannedWindows: Record<string, { rollingPlan: RollingPlan; assessment: PlanAssessment }>;
+  followupPlannedWindows: Record<string, { rollingPlan: RollingPlan; assessment: PlanAssessment }>;
   windowReviews: Array<{
     lane: string;
     chapterNumbers: number[];
@@ -134,6 +135,9 @@ type Progress = {
   bookedSetupCostUsdByLane: Record<string, number>;
   resumeLineage: DiscoveryResumeLineage[];
 };
+
+type PassedPlanAssessment = Extract<PlanAssessment, { status: 'pass' }>;
+type PassedPlanWindow = { rollingPlan: RollingPlan; assessment: PassedPlanAssessment };
 
 function runtimeRoute(routes: ModelRoutes) {
   return {
@@ -259,6 +263,7 @@ async function main() {
     chapterAttempts: [],
     setupCheckpoints: {},
     plannedWindows: {},
+    followupPlannedWindows: {},
     windowReviews: [],
     failure: null,
     bookedSetupCostUsdByLane: {},
@@ -282,6 +287,7 @@ async function main() {
       compatibleSetupOnly: Boolean(compatibleSetupProgress),
     })
     : freshProgress;
+  progress.followupPlannedWindows ??= {};
   const persist = () => writeFileSync(progressPath, `${JSON.stringify(progress, null, 2)}\n`);
   persist();
   const signatures: PortfolioSignature[] = [];
@@ -384,25 +390,34 @@ async function main() {
             arc: setup.launchPack.arc,
             state: setup.launchPack.initialState,
             routes: candidateRoutes,
-            requiredWindowSize: 5,
+            requiredWindowSize: 3,
           });
           planned = generatedPlan;
           planCost = usageCost(generatedPlan.usages);
         }
         progress.buildCostUsd += planCost;
-        if (planned.assessment.status !== 'pass'
-          || planned.rollingPlan.plans.length !== 5
-          || planned.rollingPlan.plans.some((plan, index) => plan.chapterNumber !== index + 1)) {
-          throw new StoryFactoryError('plan_blocked', 'Current Planner and Plan Judge must pass exactly chapters 1-5.', {
+        if (planned.assessment.status !== 'pass') {
+          throw new StoryFactoryError('plan_blocked', 'Current Planner and Plan Judge rejected chapters 1-3.', {
             assessment: planned.assessment,
             chapterNumbers: planned.rollingPlan.plans.map(plan => plan.chapterNumber),
           });
         }
-        progress.planSuccesses += 1;
-        progress.plannedWindows[lane] = {
+        if (planned.rollingPlan.plans.length !== 3
+          || planned.rollingPlan.plans.some((plan, index) => plan.chapterNumber !== index + 1)) {
+          throw new StoryFactoryError('plan_blocked', 'Current Planner and Plan Judge must pass exactly chapters 1-3.', {
+            assessment: planned.assessment,
+            chapterNumbers: planned.rollingPlan.plans.map(plan => plan.chapterNumber),
+          });
+        }
+        const acceptedInitialWindow = {
           rollingPlan: planned.rollingPlan,
           assessment: planned.assessment,
         };
+        progress.plannedWindows[lane] = {
+          rollingPlan: acceptedInitialWindow.rollingPlan,
+          assessment: acceptedInitialWindow.assessment,
+        };
+        if (discoveryOnly) progress.planSuccesses += 1;
         persist();
         await heartbeat();
 
@@ -419,7 +434,7 @@ async function main() {
             plan: firstPlan,
             nextPlan: planned.rollingPlan.plans[1],
             previousTail: null,
-            planAssessment: planned.assessment,
+            planAssessment: acceptedInitialWindow.assessment,
             causalValidation: {
               validatorVersion: CAUSAL_VALIDATOR_VERSION,
               mechanicUseCount: firstPlan.mechanicUses.length,
@@ -439,121 +454,171 @@ async function main() {
         let previous = '';
         const laneSamples: SequentialBenchmarkCorpus['samples'] = [];
         const chapters: Array<{ chapterNumber: number; title: string; content: string }> = [];
-        for (const [planIndex, plan] of planned.rollingPlan.plans.entries()) {
-          const stateBefore = state;
-          const previousTail = previous ? tailWords(previous) : null;
-          const planDigest = digestArtifact(plan);
-          const causalValidation = {
-            validatorVersion: CAUSAL_VALIDATOR_VERSION,
-            mechanicUseCount: plan.mechanicUses.length,
-            digest: digestArtifact({
+        const writePlannedWindow = async (
+          window: PassedPlanWindow,
+          windowPlanCost: number,
+        ) => {
+          for (const [planIndex, plan] of window.rollingPlan.plans.entries()) {
+            const stateBefore = state;
+            const previousTail = previous ? tailWords(previous) : null;
+            const planDigest = digestArtifact(plan);
+            const causalValidation = {
               validatorVersion: CAUSAL_VALIDATOR_VERSION,
+              mechanicUseCount: plan.mechanicUses.length,
+              digest: digestArtifact({
+                validatorVersion: CAUSAL_VALIDATOR_VERSION,
+                planDigest,
+                mechanicUses: plan.mechanicUses,
+              }),
+            };
+            progress.writerBriefs.push({
+              id: `${entry.commission.slotKey.toLowerCase()}-ch${plan.chapterNumber}`,
+              lane,
+              launchPackDigest,
               planDigest,
-              mechanicUses: plan.mechanicUses,
-            }),
-          };
-          progress.writerBriefs.push({
-            id: `${entry.commission.slotKey.toLowerCase()}-ch${plan.chapterNumber}`,
-            lane,
-            launchPackDigest,
-            planDigest,
-            kernel: setup.launchPack.kernel,
-            state: stateBefore,
-            plan,
-            nextPlan: planned.rollingPlan.plans[planIndex + 1] ?? null,
-            previousTail,
-            planAssessment: planned.assessment,
-            causalValidation,
-          });
-          persist();
-
-          let candidate;
-          try {
-            candidate = await writeStoryChapter({
               kernel: setup.launchPack.kernel,
               state: stateBefore,
               plan,
-              nextPlan: planned.rollingPlan.plans[planIndex + 1],
-              previousChapter: previous || undefined,
-              routes: candidateRoutes,
-            });
-          } catch (error) {
-            progress.generationFailures += 1;
-            const telemetry = failedChapterTelemetry(error);
-            if (telemetry) {
-              progress.chapterAttempts.push({
-                id: `${entry.commission.slotKey.toLowerCase()}-ch${plan.chapterNumber}`,
-                lane,
-                chapterNumber: plan.chapterNumber,
-                outcome: 'failed',
-                errorCode: error instanceof StoryFactoryError ? error.code : null,
-                telemetry,
-              });
-              persist();
-            }
-            throw error;
-          }
-          const generationCost = usageCost(candidate.usages);
-          progress.buildCostUsd += generationCost;
-          progress.chapterAttempts.push({
-            id: `${entry.commission.slotKey.toLowerCase()}-ch${plan.chapterNumber}`,
-            lane,
-            chapterNumber: plan.chapterNumber,
-            outcome: 'published',
-            errorCode: null,
-            telemetry: candidate.attemptTelemetry,
-          });
-          persist();
-
-          stage = 'continuity';
-          const continuity = await assessSequentialContinuity({
-            kernel: setup.launchPack.kernel,
-            plan,
-            stateBefore,
-            stateAfter: candidate.stateAfter,
-            previousTail,
-            content: candidate.draft.content,
-            model: continuityJudgeModel,
-          });
-          progress.buildCostUsd += continuity.usage.costUsd;
-          if (continuity.assessment.status !== 'pass') {
-            progress.continuityFailures += 1;
-            throw new Error(`Continuity Judge failed ${lane} chapter ${plan.chapterNumber}: ${JSON.stringify(continuity.assessment.issues)}`);
-          }
-
-          const sample = {
-            id: `${entry.commission.slotKey.toLowerCase()}-ch${plan.chapterNumber}`,
-            lane,
-            launchPackDigest,
-            planDigest,
-            readerBrief: {
-              premise: setup.launchPack.kernel.description,
-              chapterNumber: plan.chapterNumber,
+              nextPlan: window.rollingPlan.plans[planIndex + 1] ?? null,
               previousTail,
-            },
-            content: candidate.draft.content,
-            title: candidate.draft.title,
-            allInCostUsd: generationCost + continuity.usage.costUsd + (setupCost + planCost) / 5,
-            revisionCount: candidate.revisionCount,
-            planAssessment: planned.assessment,
-            causalValidation,
-            continuityAssessment: continuity.assessment,
-            stateBeforeDigest: digestArtifact(stateBefore),
-            stateAfterDigest: digestArtifact(candidate.stateAfter),
-          } as const;
-          laneSamples.push(sample);
-          progress.samples.push(sample);
-          state = candidate.stateAfter;
-          previous = candidate.draft.content;
-          chapters.push({
-            chapterNumber: plan.chapterNumber,
-            title: candidate.draft.title,
-            content: candidate.draft.content,
+              planAssessment: window.assessment,
+              causalValidation,
+            });
+            persist();
+
+            let candidate;
+            try {
+              candidate = await writeStoryChapter({
+                kernel: setup.launchPack.kernel,
+                state: stateBefore,
+                plan,
+                nextPlan: window.rollingPlan.plans[planIndex + 1],
+                previousChapter: previous || undefined,
+                routes: candidateRoutes,
+              });
+            } catch (error) {
+              progress.generationFailures += 1;
+              const telemetry = failedChapterTelemetry(error);
+              if (telemetry) {
+                progress.chapterAttempts.push({
+                  id: `${entry.commission.slotKey.toLowerCase()}-ch${plan.chapterNumber}`,
+                  lane,
+                  chapterNumber: plan.chapterNumber,
+                  outcome: 'failed',
+                  errorCode: error instanceof StoryFactoryError ? error.code : null,
+                  telemetry,
+                });
+                persist();
+              }
+              throw error;
+            }
+            const generationCost = usageCost(candidate.usages);
+            progress.buildCostUsd += generationCost;
+            progress.chapterAttempts.push({
+              id: `${entry.commission.slotKey.toLowerCase()}-ch${plan.chapterNumber}`,
+              lane,
+              chapterNumber: plan.chapterNumber,
+              outcome: 'published',
+              errorCode: null,
+              telemetry: candidate.attemptTelemetry,
+            });
+            persist();
+
+            stage = 'continuity';
+            const continuity = await assessSequentialContinuity({
+              kernel: setup.launchPack.kernel,
+              plan,
+              stateBefore,
+              stateAfter: candidate.stateAfter,
+              previousTail,
+              content: candidate.draft.content,
+              model: continuityJudgeModel,
+            });
+            progress.buildCostUsd += continuity.usage.costUsd;
+            if (continuity.assessment.status !== 'pass') {
+              progress.continuityFailures += 1;
+              throw new Error(`Continuity Judge failed ${lane} chapter ${plan.chapterNumber}: ${JSON.stringify(continuity.assessment.issues)}`);
+            }
+
+            const sample = {
+              id: `${entry.commission.slotKey.toLowerCase()}-ch${plan.chapterNumber}`,
+              lane,
+              launchPackDigest,
+              planDigest,
+              readerBrief: {
+                premise: setup.launchPack.kernel.description,
+                chapterNumber: plan.chapterNumber,
+                previousTail,
+              },
+              content: candidate.draft.content,
+              title: candidate.draft.title,
+              allInCostUsd: generationCost
+                + continuity.usage.costUsd
+                + setupCost / 5
+                + windowPlanCost / window.rollingPlan.plans.length,
+              revisionCount: candidate.revisionCount,
+              planAssessment: window.assessment,
+              causalValidation,
+              continuityAssessment: continuity.assessment,
+              stateBeforeDigest: digestArtifact(stateBefore),
+              stateAfterDigest: digestArtifact(candidate.stateAfter),
+            } as const;
+            laneSamples.push(sample);
+            progress.samples.push(sample);
+            state = candidate.stateAfter;
+            previous = candidate.draft.content;
+            chapters.push({
+              chapterNumber: plan.chapterNumber,
+              title: candidate.draft.title,
+              content: candidate.draft.content,
+            });
+            stage = 'chapters';
+            persist();
+            await heartbeat();
+          }
+        };
+
+        await writePlannedWindow(acceptedInitialWindow, planCost);
+
+        stage = 'followup_plan';
+        const followupPlan = await planRollingWindow({
+          kernel: setup.launchPack.kernel,
+          arc: setup.launchPack.arc,
+          state,
+          routes: candidateRoutes,
+          requiredWindowSize: 2,
+        });
+        const followupPlanCost = usageCost(followupPlan.usages);
+        progress.buildCostUsd += followupPlanCost;
+        if (followupPlan.assessment.status !== 'pass') {
+          throw new StoryFactoryError('plan_blocked', 'Current Planner and Plan Judge rejected chapters 4-5 from committed chapter-3 state.', {
+            assessment: followupPlan.assessment,
+            chapterNumbers: followupPlan.rollingPlan.plans.map(plan => plan.chapterNumber),
+            stateChapterNumber: state.chapterNumber,
           });
-          stage = 'chapters';
-          persist();
-          await heartbeat();
         }
+        if (followupPlan.rollingPlan.plans.length !== 2
+          || followupPlan.rollingPlan.plans.some((plan, index) => plan.chapterNumber !== index + 4)) {
+          throw new StoryFactoryError('plan_blocked', 'Current Planner and Plan Judge must pass exactly chapters 4-5 from committed chapter-3 state.', {
+            assessment: followupPlan.assessment,
+            chapterNumbers: followupPlan.rollingPlan.plans.map(plan => plan.chapterNumber),
+            stateChapterNumber: state.chapterNumber,
+          });
+        }
+        const acceptedFollowupWindow = {
+          rollingPlan: followupPlan.rollingPlan,
+          assessment: followupPlan.assessment,
+        };
+        progress.followupPlannedWindows[lane] = {
+          rollingPlan: acceptedFollowupWindow.rollingPlan,
+          assessment: acceptedFollowupWindow.assessment,
+        };
+        progress.planSuccesses += 1;
+        persist();
+        await heartbeat();
+
+        stage = 'chapters';
+        await writePlannedWindow(acceptedFollowupWindow, followupPlanCost);
 
         stage = 'window_review';
         const reviewed = await reviewFiveChapterWindow({

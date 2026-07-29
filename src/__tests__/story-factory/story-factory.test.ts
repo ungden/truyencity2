@@ -3878,7 +3878,7 @@ describe('canonical Story Factory', () => {
     ]);
   });
 
-  test('a benchmark-required five-chapter window is repaired before Plan Judge', async () => {
+  test('a benchmark-required three-chapter window is repaired before Plan Judge', async () => {
     const provider = new QueueProvider([plannerWire(), plannerWire()]);
     await expect(planRollingWindow({
       kernel,
@@ -3886,14 +3886,28 @@ describe('canonical Story Factory', () => {
       state: initialState,
       routes,
       provider,
-      requiredWindowSize: 5,
+      requiredWindowSize: 3,
     })).rejects.toMatchObject({
       code: 'plan_blocked',
       evidence: expect.objectContaining({
-        validation: expect.objectContaining({ requiredWindowSize: 5, actualWindowSize: 1 }),
+        validation: expect.objectContaining({ requiredWindowSize: 3, actualWindowSize: 1 }),
       }),
     });
     expect(provider.calls).toEqual(['planner', 'planner']);
+  });
+
+  test('Planner provider contract rejects a rolling window larger than three chapters', () => {
+    const first = plannerWire().chapters[0];
+    expect(PlannerRollingPlanResponseSchema.safeParse({
+      v: 2,
+      start: 1,
+      chapters: [
+        first,
+        { ...structuredClone(first), n: 2 },
+        { ...structuredClone(first), n: 3 },
+        { ...structuredClone(first), n: 4 },
+      ],
+    }).success).toBe(false);
   });
 
   test('an invalid compact plan is repaired once then classified as plan_blocked', async () => {
