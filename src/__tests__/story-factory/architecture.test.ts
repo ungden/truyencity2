@@ -116,6 +116,9 @@ describe('Story Factory architecture boundary', () => {
     expect(setup).toContain('schema: createLaunchWorldWireSchema(');
     expect(setup).toContain('const actorId = z.enum(ids');
     expect(setup).toContain('conversions: z.array(WorldMechanicSchema.options[0])');
+    expect(setup).toContain('Constraint chỉ là guard cho một hành động');
+    expect(setup).toContain('Constraint không bao giờ tự tạo fact/resource/state effect');
+    expect(setup).toContain('phải mô hình hóa hậu quả đó bằng capability/conversion');
     expect(setup).toContain('schema: LaunchSeriesSchema');
     expect(setup).toContain('schema: LaunchStateSchema');
     expect(setup).not.toContain('kernelJson');

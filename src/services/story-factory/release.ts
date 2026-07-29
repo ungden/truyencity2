@@ -6,7 +6,7 @@ import { CAUSAL_VALIDATOR_VERSION } from './validation';
 
 export const FACTORY_CONTRACT_VERSION = 'story-factory-contracts-37-neutral-voice-traits';
 export const FACTORY_STATE_VERSION = 'story-factory-state-9-exact-id-continuity-packet';
-export const FACTORY_SETUP_VERSION = 'story-factory-setup-44-neutral-voice-traits';
+export const FACTORY_SETUP_VERSION = 'story-factory-setup-45-constraints-are-guards';
 export const FACTORY_PLANNER_VERSION = 'story-factory-planner-55-owner-authorized-outflow';
 export const FACTORY_CONTEXT_VERSION = 'story-factory-context-16-revision-chapter-number';
 export const FACTORY_MEMORY_POLICY_VERSION = 'story-factory-memory-4-exact-id-bounded-no-rag';
