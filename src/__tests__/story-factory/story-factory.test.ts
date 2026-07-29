@@ -1269,6 +1269,12 @@ describe('canonical Story Factory', () => {
     expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
   });
 
+  test('does not treat counting previously committed sale proceeds as a new transaction', () => {
+    const chapter = plan(1);
+    chapter.scenes[0].action = 'Hải đếm tiền bán hàng thu được rồi kiểm tra lại dụng cụ đã mua.';
+    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
+  });
+
   test('does not treat construction knowledge as creation of a durable asset', () => {
     const chapter = plan(1);
     chapter.scenes[0].action = 'Thẩm Nhược Thủy chất vấn Trần Hữu, nhưng anh dùng kiến thức xây dựng giải thích rằng vách đá tự nhiên bị nứt do áp lực.';

@@ -10,7 +10,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-25-reported-future-settlement';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-26-explicit-settlement-only';
 
 export interface StateEvent {
   chapterNumber: number;
@@ -580,7 +580,12 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
           : []
       )),
     ].join(' ');
-    if (hasVietnameseTerm(transactionEvidence, String.raw`mua|bán|thu mua|trả tiền|chi tiền|thu tiền|kiếm tiền|chia (?:một )?phần lợi nhuận|chia tiền lãi|trích phần trăm|trả công`)
+    // Free-form action text is not a transaction ledger. Bare mentions of
+    // buying/selling can be reports, negotiations, or counting proceeds already
+    // committed in an earlier scene. Only an explicit present settlement is a
+    // defensive contradiction here; exact movement remains owned by structured
+    // resource deltas and mechanics.
+    if (hasVietnameseTerm(transactionEvidence, String.raw`trả tiền|chi tiền|thanh toán|lấy tiền|chia (?:một )?(?:phần )?lợi nhuận|chia tiền lãi|trích (?:phần trăm|lợi nhuận)|trả công`)
       && !sceneDeltas.some(delta => delta.kind === 'resource_numeric')) {
       fail(`Scene ${scene.id} describes a transaction without a numeric resource delta.`, {
         chapterNumber: plan.chapterNumber,
