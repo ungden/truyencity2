@@ -2643,10 +2643,16 @@ describe('canonical Story Factory', () => {
     const schema = toGeminiResponseSchema(z.object({
       arcNumber: z.number().int().min(1),
       amount: z.number().min(0.000001),
+      era: z.string().min(8).max(120),
     }).strict());
-    expect((schema.properties as Record<string, Record<string, unknown>>).arcNumber.exclusiveMinimum).toBeUndefined();
-    expect((schema.properties as Record<string, Record<string, unknown>>).arcNumber.minimum).toBe(1);
-    expect((schema.properties as Record<string, Record<string, unknown>>).amount.minimum).toBe(0.000001);
+    const properties = schema.properties as Record<string, Record<string, unknown>>;
+    expect(properties.arcNumber.exclusiveMinimum).toBeUndefined();
+    expect(properties.arcNumber.minimum).toBe(1);
+    expect(properties.amount.minimum).toBe(0.000001);
+    expect(properties.era.minLength).toBeUndefined();
+    expect(properties.era.maxLength).toBeUndefined();
+    expect(properties.era.description).toContain('minimum 8 characters');
+    expect(properties.era.description).toContain('maximum 120 characters');
     const complex = toGeminiResponseSchema(
       z.object({ stages: z.array(z.string()).min(8).max(15) }).strict(),
       { complexity: 'omit_array_max' },

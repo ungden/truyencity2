@@ -94,6 +94,23 @@ export function toGeminiResponseSchema<T>(
       delete node.const;
     }
     delete node.pattern;
+    // Gemini's documented structured-output subset supports string enum and
+    // format, but not minLength/maxLength. Preserve those application
+    // constraints as provider-supported description guidance instead of
+    // silently dropping them and paying for predictably invalid output.
+    const stringLengthRules: string[] = [];
+    if (typeof node.minLength === 'number') {
+      stringLengthRules.push(`minimum ${node.minLength} characters`);
+    }
+    if (typeof node.maxLength === 'number') {
+      stringLengthRules.push(`maximum ${node.maxLength} characters`);
+    }
+    if (stringLengthRules.length) {
+      const guidance = `Application constraint: string length must satisfy ${stringLengthRules.join(' and ')}.`;
+      node.description = typeof node.description === 'string' && node.description.trim()
+        ? `${node.description.trim()} ${guidance}`
+        : guidance;
+    }
     delete node.minLength;
     delete node.maxLength;
     delete node.exclusiveMinimum;
