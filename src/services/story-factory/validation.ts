@@ -10,7 +10,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-27-structured-direction-only';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-28-owner-authorized-outflow';
 
 export interface StateEvent {
   chapterNumber: number;
@@ -625,7 +625,9 @@ export function validateCausalMechanics(input: {
   const deltas = new Map(plan.requiredDeltas.map(item => [item.id, item]));
   const stateFacts = new Map(state.facts.map(item => [item.id, item.value]));
   const simulatedResources = new Map(state.resources.map(item => [item.resourceId, item.value]));
+  const resourceDefinitions = new Map(kernel.resources.map(item => [item.id, item]));
   const effectDeltaIds = new Set<string>();
+  const externalOutflowDeltaIds = new Set<string>();
   const declaredEffectDeltaIds = new Set(plan.mechanicUses
     .filter(use => use.role === 'effect')
     .flatMap(use => use.deltaIds));
@@ -854,10 +856,60 @@ export function validateCausalMechanics(input: {
       }
       stateFacts.set(delta.factId, delta.after);
     }
+    // Paying an external party or consuming an owned stock is a sink, not a
+    // world conversion. Requiring a fake capability for every debt payment,
+    // fee, or profit distribution made plans less truthful. This narrow
+    // exception only permits an existing numeric resource to decrease when its
+    // exact owner is physically present and an explicit non-mechanic sink is
+    // recorded. Increases and state changes still require a causal mechanic.
+    for (const delta of plan.requiredDeltas.filter(item => scene.requiredDeltaIds.includes(item.id))) {
+      if (delta.kind !== 'resource_numeric' || delta.delta >= 0 || effectDeltaIds.has(delta.id)) continue;
+      const definition = resourceDefinitions.get(delta.resourceId);
+      if (!definition || definition.kind !== 'numeric' || !definition.ownerEntityId) continue;
+      const sink = delta.sink?.trim();
+      if (!sink || mechanics.has(sink)) continue;
+      if (!scene.participantIds.includes(definition.ownerEntityId)) continue;
+      const actual = simulatedResources.get(delta.resourceId);
+      if (actual !== delta.before) {
+        issues.push({
+          mechanicUseId: null,
+          message: `Scene ${scene.id} external outflow ${delta.id} starts from the wrong value.`,
+          evidence: { expected: delta.before, actual },
+        });
+        continue;
+      }
+      const calculated = delta.before + delta.delta;
+      if (!nearlyEqual(calculated, delta.after)) {
+        issues.push({
+          mechanicUseId: null,
+          message: `Scene ${scene.id} external outflow ${delta.id} has invalid arithmetic.`,
+          evidence: { calculated, declared: delta.after },
+        });
+        continue;
+      }
+      if (definition.minimum !== undefined && calculated < definition.minimum) {
+        issues.push({
+          mechanicUseId: null,
+          message: `Scene ${scene.id} external outflow ${delta.id} falls below its minimum.`,
+          evidence: { minimum: definition.minimum, calculated },
+        });
+        continue;
+      }
+      if (definition.maximum !== undefined && calculated > definition.maximum) {
+        issues.push({
+          mechanicUseId: null,
+          message: `Scene ${scene.id} external outflow ${delta.id} exceeds its maximum.`,
+          evidence: { maximum: definition.maximum, calculated },
+        });
+        continue;
+      }
+      simulatedResources.set(delta.resourceId, calculated);
+      externalOutflowDeltaIds.add(delta.id);
+    }
   }
   const ungroundedResourceDeltas = plan.requiredDeltas
     .filter(delta => delta.kind === 'resource_numeric' || delta.kind === 'resource_state')
-    .filter(delta => !effectDeltaIds.has(delta.id));
+    .filter(delta => !effectDeltaIds.has(delta.id) && !externalOutflowDeltaIds.has(delta.id));
   if (ungroundedResourceDeltas.length) {
     issues.push({
       mechanicUseId: null,
@@ -886,7 +938,7 @@ export function validateCausalMechanics(input: {
           return candidates;
         }, []),
         })),
-        repairRule: 'Every resource delta needs exactly one active conversion/capability effect owner. If candidateMechanics is empty, remove that resource delta; represent a social or narrative change as an existing fact, relationship, or promise delta only when semantically correct. Never invent a mechanic inside the plan.',
+        repairRule: 'Positive numeric deltas and all state-resource changes need exactly one active conversion/capability effect owner. A negative numeric delta may omit a mechanic only for an external payment or consumption with an explicit non-mechanic sink while the exact resource owner is present in that scene. Conversion inputs still belong to their conversion. Otherwise remove the delta or represent a genuinely social change with an existing fact, relationship, or promise ID. Never invent a mechanic inside the plan.',
       },
     });
   }

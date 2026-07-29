@@ -1,4 +1,4 @@
-export const FACTORY_PROMPT_VERSION = 'story-factory-2026-07-29.13-plan-knowledge-flow';
+export const FACTORY_PROMPT_VERSION = 'story-factory-2026-07-29.14-owner-authorized-outflow';
 
 export const WRITER_SYSTEM_PROMPT = `Bạn là tiểu thuyết gia web-serial tiếng Việt.
 Hãy tiếp nối tự nhiên đoạn cuối chương trước, thực hiện đầy đủ chapter brief và giữ đúng canon, ký ức liên quan, tài nguyên, tri thức, quan hệ cùng vị trí nhân vật.
@@ -37,6 +37,7 @@ continuityPacket là lịch sử độc giả thực sự đã đọc, có quy�
 Khóa chính xác thời gian, địa điểm, tài nguyên, tri thức, promise và chỉ định các world-rule ID thực sự chi phối chương. Không viết câu thoại, văn mẫu, cảm xúc mẫu hoặc câu hook để tác giả sao chép.
 Chỉ gắn world-rule ID khi cơ chế thực sự được thi hành trong chương. Mọi vật tư/đầu vào mà rule cần phải có sẵn trong State hoặc được cấp bằng delta; vật tư bị dùng hoặc tiêu hao phải có resource delta. Nếu chương mới quyết định sẽ dùng kỹ thuật ở tương lai, chưa gắn rule đó vào chương hiện tại.
 Mọi conversion, capability hoặc constraint thực sự dùng phải khai báo mechanicUse đúng worldMechanic ID, actor, quantity, precondition fact và delta liên quan. Không giấu phép tính, công suất hoặc quyền hạn trong action prose.
+Khoản thu hoặc tài nguyên tăng vẫn phải do mechanic hợp lệ tạo ra. Riêng khoản trả nợ, trả phí, chia lợi nhuận hoặc tiêu hao ra bên ngoài được ghi resource delta âm không cần mechanic giả khi đúng chủ sở hữu resource có mặt trong scene và sink nêu rõ bên nhận/đích tiêu hao; đầu vào của conversion vẫn phải gắn conversion.
 Trong scene, participantIds/people chỉ là nhân vật có mặt vật lý tại scene.loc. Nếu chỉ được nhớ tới, nhắc tới hoặc là mục tiêu cảm xúc ở nơi khác, không đưa vào people.
 Thời gian cuối chương là mốc tuyệt đối và phải được cộng tuần tự từ State: ít nhất bằng thời gian đầu chương cộng toàn bộ duration và travel của các cảnh trong chương.
 Mọi nhân vật kết thúc chương ở địa điểm khác state đầu chương phải có location delta khớp vị trí đầu và scene cuối.

@@ -596,6 +596,77 @@ describe('canonical Story Factory', () => {
       .toThrow('changes resources without a validated world mechanic');
   });
 
+  test('allows sequential owner-authorized external outflows without fake world mechanics', () => {
+    const chapter = plan(1);
+    chapter.scenes[0].action = 'Hải trả tiền nợ và chia phần công đã thống nhất.';
+    chapter.requiredDeltas = [
+      {
+        id: 'pay_debt',
+        kind: 'resource_numeric',
+        resourceId: 'money',
+        before: 100,
+        delta: -30,
+        after: 70,
+        source: null,
+        sink: 'chủ nợ',
+      },
+      {
+        id: 'share_profit',
+        kind: 'resource_numeric',
+        resourceId: 'money',
+        before: 70,
+        delta: -20,
+        after: 50,
+        source: null,
+        sink: 'người cùng làm',
+      },
+    ];
+    chapter.scenes[0].requiredDeltaIds = ['pay_debt', 'share_profit'];
+    chapter.mechanicUses = [];
+    const result = applyChapterPlan({ kernel, state: initialState, plan: chapter });
+    expect(result.state.resources[0]).toEqual({ resourceId: 'money', kind: 'numeric', value: 50 });
+  });
+
+  test('rejects an external outflow when the exact resource owner is absent', () => {
+    const absentOwnerKernel = structuredClone(kernel);
+    const money = absentOwnerKernel.resources.find(item => item.id === 'money');
+    if (!money) throw new Error('Missing money fixture.');
+    money.ownerEntityId = 'buyer';
+    const chapter = plan(1);
+    chapter.scenes[0].action = 'Hải thanh toán khoản nợ.';
+    chapter.requiredDeltas = [{
+      id: 'pay_debt',
+      kind: 'resource_numeric',
+      resourceId: 'money',
+      before: 100,
+      delta: -30,
+      after: 70,
+      source: null,
+      sink: 'chủ nợ',
+    }];
+    chapter.scenes[0].requiredDeltaIds = ['pay_debt'];
+    expect(() => applyChapterPlan({ kernel: absentOwnerKernel, state: initialState, plan: chapter }))
+      .toThrow('changes resources without a validated world mechanic');
+  });
+
+  test('does not let a conversion input masquerade as an external outflow', () => {
+    const chapter = plan(1);
+    chapter.scenes[0].action = 'Hải đưa vốn vào mẻ đổi hàng.';
+    chapter.requiredDeltas = [{
+      id: 'conversion_input',
+      kind: 'resource_numeric',
+      resourceId: 'money',
+      before: 100,
+      delta: -10,
+      after: 90,
+      source: null,
+      sink: 'mechanic_exchange',
+    }];
+    chapter.scenes[0].requiredDeltaIds = ['conversion_input'];
+    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter }))
+      .toThrow('changes resources without a validated world mechanic');
+  });
+
   test('returns all independent mechanic issues in one causal repair payload', () => {
     const chapter = plan(1);
     chapter.mechanicUses = [

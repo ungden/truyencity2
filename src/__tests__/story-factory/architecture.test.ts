@@ -149,8 +149,8 @@ describe('Story Factory architecture boundary', () => {
     expect(planner).toContain('primaryDeltaId');
     expect(planner).toContain('additionalDeltaIds');
     expect(planner).toContain("role: z.enum(['effect', 'support'])");
-    expect(planner).toContain('Mỗi resource delta phải có đúng một effect owner');
-    expect(planner).toContain('Nếu không có effect mechanic, không được thay đổi resource');
+    expect(planner).toContain('Mỗi resource delta dương và mọi resource_state phải có đúng một effect owner');
+    expect(planner).toContain('Resource_numeric âm chỉ được bỏ effect mechanic khi chủ sở hữu resource có mặt');
     expect(planner).toContain('availableMinutes=scene.dur+scene.travel');
     expect(planner).toContain('compiler sẽ sắp thứ tự dependency tất định trong scene');
     expect(planner).toContain('compiler là nguồn duy nhất tự sinh location delta');
@@ -160,7 +160,7 @@ describe('Story Factory architecture boundary', () => {
     expect(planner).not.toContain('lossesPerBatch');
     expect(planner).toContain('Conversion là một batch nguyên tử');
     expect(validation).toContain('validateCausalMechanics');
-    expect(validation).toContain('Every resource delta needs exactly one active conversion/capability effect owner');
+    expect(validation).toContain('Positive numeric deltas and all state-resource changes need exactly one active conversion/capability effect owner');
     expect(validation).toContain('causal validation issues');
     expect(validation).toContain('Schedule this capability after an earlier causal effect');
     expect(validation).toContain('exceeds scene capacity');
