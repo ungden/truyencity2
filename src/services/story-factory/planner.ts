@@ -749,6 +749,51 @@ export function materializePlannerRollingPlan(
 ): RollingPlan {
   const compact = PlannerRollingPlanResponseSchema.parse(value);
   const chapters = compact.chapters;
+  const compactIssues = chapters.flatMap(chapter => {
+    const augmented = inferExactCapabilityUses(
+      inferExactConversionUses(chapter, kernel),
+      kernel,
+    );
+    const ownership = deriveEffectOwnership(augmented, kernel);
+    const ownedDeltaIds = new Set([...ownership.values()].flat());
+    return augmented.deltas.flatMap(delta => {
+      const issues: Array<{
+        category: 'missing_provenance' | 'missing_effect_owner';
+        chapterNumber: number;
+        deltaId: string;
+        resourceId: string;
+        message: string;
+      }> = [];
+      if (delta.k === 'resource_state') {
+        if (typeof delta.source !== 'string' || delta.source.trim().length < 2) {
+          issues.push({
+            category: 'missing_provenance',
+            chapterNumber: chapter.n,
+            deltaId: delta.id,
+            resourceId: delta.target,
+            message: 'resource_state requires a concrete source explaining the state transition.',
+          });
+        }
+        if (kernel && !ownedDeltaIds.has(delta.id)) {
+          issues.push({
+            category: 'missing_effect_owner',
+            chapterNumber: chapter.n,
+            deltaId: delta.id,
+            resourceId: delta.target,
+            message: 'resource_state requires exactly one active capability effect owner; otherwise use an existing fact, relationship or promise delta.',
+          });
+        }
+      }
+      return issues;
+    });
+  });
+  if (compactIssues.length) {
+    throw new StoryFactoryError(
+      'plan_blocked',
+      `Planner compact window has ${compactIssues.length} independently repairable state-transition issues.`,
+      { issues: compactIssues },
+    );
+  }
   const resourceBalances = new Map(initialState.resources.flatMap(resource => (
     resource.kind === 'numeric' ? [[resource.resourceId, resource.value] as const] : []
   )));

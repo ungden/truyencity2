@@ -3036,6 +3036,42 @@ describe('canonical Story Factory', () => {
     expect(rolling.plans[0].mechanicUses[0].deltaIds).toEqual(['delta_1']);
   });
 
+  test('Planner materialization reports missing state provenance and effect ownership together', () => {
+    const stateKernel = structuredClone(kernel);
+    stateKernel.resources.push({
+      id: 'contract_state',
+      name: 'Trạng thái hợp đồng',
+      kind: 'state',
+      ownerEntityId: 'mother',
+    });
+    const state = structuredClone(initialState);
+    state.resources.push({ resourceId: 'contract_state', kind: 'state', value: 'draft' });
+    const wire = plannerWire();
+    wire.chapters[0].deltas[0] = {
+      id: 'contract_signed',
+      k: 'resource_state',
+      target: 'contract_state',
+      counterpart: null,
+      before: null,
+      change: null,
+      after: 'signed',
+      source: null,
+      sink: null,
+    };
+    wire.chapters[0].scenes[0].deltaIds = ['contract_signed'];
+    expect(() => materializePlannerRollingPlan(wire, state, stateKernel)).toThrow(StoryFactoryError);
+    try {
+      materializePlannerRollingPlan(wire, state, stateKernel);
+    } catch (error) {
+      expect((error as StoryFactoryError).evidence).toMatchObject({
+        issues: expect.arrayContaining([
+          expect.objectContaining({ category: 'missing_provenance', deltaId: 'contract_signed' }),
+          expect.objectContaining({ category: 'missing_effect_owner', deltaId: 'contract_signed' }),
+        ]),
+      });
+    }
+  });
+
   test('compiler derives required mechanic facts while validator still checks their live value', () => {
     const wire = plannerWire();
     const chapter = structuredClone(wire.chapters[0]);
@@ -3340,12 +3376,8 @@ describe('canonical Story Factory', () => {
       id: 'assemble_dryer_another_way',
       name: 'Một cách lắp lò khác',
     });
-    const ambiguous = materializePlannerRollingPlan(wire, capabilityState, ambiguousKernel);
-    expect(() => applyChapterPlan({
-      kernel: ambiguousKernel,
-      state: capabilityState,
-      plan: ambiguous.plans[0],
-    })).toThrow('without a validated world mechanic');
+    expect(() => materializePlannerRollingPlan(wire, capabilityState, ambiguousKernel))
+      .toThrow('independently repairable state-transition issues');
   });
 
   test('compiler orders a same-scene fact producer before its dependent capability', () => {
