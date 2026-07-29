@@ -90,20 +90,24 @@ function readableDelta(delta: StateDelta, name: (id: string) => string) {
 }
 
 function operationalConstraints(kernel: StoryKernel, plan: ChapterPlan, name: (id: string) => string): string[] {
-  return plan.mechanicUses.filter(use => use.role === 'support').map(use => {
+  const seen = new Set<string>();
+  return plan.mechanicUses.flatMap(use => {
+    const key = `${use.actorId}\u0000${use.mechanicId}`;
+    if (seen.has(key)) return [];
+    seen.add(key);
     const mechanic = kernel.worldMechanics.find(item => item.id === use.mechanicId)!;
     if (mechanic.kind === 'conversion') {
-      return `${name(use.actorId)} được phép thực hiện ${mechanic.name} trong cảnh này.`;
+      return [`${name(use.actorId)} thực hiện ${mechanic.name}: ${mechanic.description}`];
     }
     if (mechanic.kind === 'capability') {
-      return `${name(use.actorId)} được phép dùng ${mechanic.name} trong phạm vi công việc của cảnh.`;
+      return [`${name(use.actorId)} thực hiện ${mechanic.name}: ${mechanic.description}`];
     }
     const required = mechanic.requiredFacts.map(condition =>
       `${name(condition.factId)} = ${String(condition.expected)}`);
     const forbidden = mechanic.forbiddenFacts.map(condition =>
       `${name(condition.factId)} = ${String(condition.expected)}`);
-    return `${mechanic.name}: cần ${required.join(', ') || 'không có điều kiện thêm'}`
-      + `${forbidden.length ? `; cấm khi ${forbidden.join(', ')}` : ''}.`;
+    return [`${mechanic.name}: ${mechanic.description}; cần ${required.join(', ') || 'không có điều kiện thêm'}`
+      + `${forbidden.length ? `; cấm khi ${forbidden.join(', ')}` : ''}.`];
   });
 }
 

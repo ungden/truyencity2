@@ -1625,6 +1625,8 @@ describe('canonical Story Factory', () => {
     expect(brief).toContain('"operation":"Quyền giao dịch của Hải"');
     expect(brief).toContain('"actor":"Hải"');
     expect(brief).toContain('"transitions":[{"entity":"fact day"');
+    expect(brief).toContain('Hải thực hiện Quyền giao dịch của Hải');
+    expect(brief).toContain(kernel.worldMechanics.find(item => item.id === 'mechanic_trade')!.description);
     expect(brief).not.toContain('giao_dich/phút');
     expect(brief).not.toContain('"maximumUnitsPerMinute"');
   });
