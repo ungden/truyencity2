@@ -15,9 +15,9 @@ import {
   type StoryModelProvider,
 } from './provider';
 
-export const STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL = 'story-factory-writer-bakeoff-v7-resumable-transport';
+export const STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL = 'story-factory-writer-bakeoff-v8-setup-compatible-route-bakeoff';
 export const STORY_FACTORY_SEQUENTIAL_PROTOCOL = 'story-factory-sequential-survival-v4-next-opening-handoff';
-export const STORY_FACTORY_BENCHMARK_PROTOCOL = 'story-factory-validation-v7-resumable-transport';
+export const STORY_FACTORY_BENCHMARK_PROTOCOL = 'story-factory-validation-v8-setup-compatible-route-bakeoff';
 export const STORY_FACTORY_BENCHMARK_SAMPLE_COUNT = 20;
 export const STORY_FACTORY_WRITER_SAMPLE_COUNT = 4;
 

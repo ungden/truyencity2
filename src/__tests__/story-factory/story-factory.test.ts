@@ -2124,7 +2124,7 @@ describe('canonical Story Factory', () => {
       },
       protocolVersion: STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL,
       engineRelease: 'release_new',
-      route: progress.route,
+      route: { ...progress.route, planner: 'planner-bakeoff-candidate' },
       continuityJudgeModel: 'continuity',
       compatibleSetupOnly: true,
     });

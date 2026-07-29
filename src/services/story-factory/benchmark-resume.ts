@@ -73,7 +73,11 @@ export function prepareDiscoveryResume<T extends ResumableDiscoveryProgress>(inp
     || (!releaseMatches && !input.compatibleSetupOnly)
     || !progress.route
     || typeof progress.route !== 'object'
-    || !sameRoute(progress.route as Record<string, unknown>, input.route)
+    // In setup-only mode runConceptLab validates the immutable checkpoint
+    // against its own commission, research, and setup-model provenance. Runtime
+    // Planner/Writer/Editor routes are intentionally allowed to change so they
+    // can be compared on the exact same launch packs.
+    || (!input.compatibleSetupOnly && !sameRoute(progress.route as Record<string, unknown>, input.route))
     || progress.continuityJudgeModel !== input.continuityJudgeModel) {
     throw new Error('Existing benchmark progress does not match the current release, routes, protocol, or continuity judge.');
   }
