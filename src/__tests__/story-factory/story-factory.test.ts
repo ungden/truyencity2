@@ -1171,6 +1171,19 @@ describe('canonical Story Factory', () => {
     expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
   });
 
+  test('reporting a past sale and committing a future profit share is not a new transaction', () => {
+    const chapter = plan(1);
+    chapter.scenes[0].action = 'Hải thông báo kết quả bán hàng thành công và cam kết sẽ chia lợi nhuận khi chốt sổ cuối tháng, chưa nhận tiền ngay.';
+    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
+  });
+
+  test('a real profit share after reporting a past sale still requires a ledger delta', () => {
+    const chapter = plan(1);
+    chapter.scenes[0].action = 'Hải thông báo kết quả bán hàng thành công, rồi chia tiền lãi ngay cho Tấn.';
+    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter }))
+      .toThrow('transaction without a numeric resource delta');
+  });
+
   test('owned resource direction cannot increase when its owner pays out', () => {
     const chapter = plan(1);
     chapter.scenes[0].action = 'Hải trả 50 đồng tiền công cho người cung cấp manh mối.';

@@ -10,7 +10,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-22-profit-share-ledger';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-23-reported-future-transfers';
 
 export interface StateEvent {
   chapterNumber: number;
@@ -385,12 +385,21 @@ function travelMinimum(kernel: StoryKernel, from: string, to: string): number | 
 }
 
 function stripFutureIntent(action: string): string {
-  const intent = String.raw`(?:cần|sẽ|định|dự\s+định|tính|muốn|chưa|không|đi|hứa(?:\s+sẽ)?|dự\s+kiến|sắp|quyết\s+định|trước\s+khi|phân\s+tích\s+việc|xem\s+xét\s+việc|lên\s+kế\s+hoạch(?:\s+để)?|đồng\s+ý|chấp\s+nhận|thống\s+nhất|thỏa\s+thuận|thoả\s+thuận)`;
+  const intent = String.raw`(?:cần|sẽ|định|dự\s+định|tính|muốn|chưa|không|đi|hứa(?:\s+sẽ)?|cam\s+kết(?:\s+sẽ)?|dự\s+kiến|sắp|quyết\s+định|trước\s+khi|phân\s+tích\s+việc|xem\s+xét\s+việc|lên\s+kế\s+hoạch(?:\s+để)?|đồng\s+ý|chấp\s+nhận|thống\s+nhất|thỏa\s+thuận|thoả\s+thuận)`;
   const filler = String.raw`(?:[\p{L}\p{N}_-]+\s+){0,12}`;
   const verbs = String.raw`(?:mua|bán|thu\s+mua|trả\s+tiền|chi\s+tiền|thu\s+tiền|nhận\s+tiền|kiếm\s+tiền|chia\s+(?:một\s+)?phần\s+lợi\s+nhuận|chia\s+tiền\s+lãi|trích\s+phần\s+trăm|trả\s+công|chế\s+tạo|đóng\s+thành|xây\s+dựng|lắp\s+ráp|thu\s+gom|nhận\s+được)`;
   const left = String.raw`(?<![\p{L}\p{N}_-])`;
   const right = String.raw`(?=$|[^\p{L}\p{N}_-])`;
   return action.replace(new RegExp(String.raw`${left}${intent}\s+${filler}${verbs}${right}`, 'giu'), '');
+}
+
+function stripReportedTransactions(action: string): string {
+  const reporting = String.raw`(?:thông\s+báo|báo\s+cáo|kể\s+lại|nhắc\s+lại|xác\s+nhận)`;
+  const filler = String.raw`(?:[\p{L}\p{N}_-]+\s+){0,8}`;
+  const verbs = String.raw`(?:mua|bán|thu\s+mua|trả\s+tiền|chi\s+tiền|thu\s+tiền|nhận\s+tiền|kiếm\s+tiền|chia\s+(?:một\s+)?phần\s+lợi\s+nhuận|chia\s+tiền\s+lãi|trích\s+phần\s+trăm|trả\s+công)`;
+  const left = String.raw`(?<![\p{L}\p{N}_-])`;
+  const right = String.raw`(?=$|[^\p{L}\p{N}_-])`;
+  return action.replace(new RegExp(String.raw`${left}${reporting}\s+${filler}${verbs}${right}`, 'giu'), '');
 }
 
 function stripProhibitedTransactions(action: string): string {
@@ -505,7 +514,7 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
     }
     const sceneDeltas = scene.requiredDeltaIds.map(deltaId => plan.requiredDeltas.find(delta => delta.id === deltaId)!);
     const realizedAction = stripNonActionAssetPhrases(
-      stripProhibitedTransactions(stripFutureIntent(scene.action)),
+      stripProhibitedTransactions(stripReportedTransactions(stripFutureIntent(scene.action))),
     );
     const normalizedAction = semanticSlug(realizedAction);
     for (const delta of sceneDeltas) {
@@ -553,7 +562,7 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
       realizedAction,
       ...sceneDeltas.flatMap(delta => (
         delta.kind !== 'resource_numeric' && 'source' in delta && typeof delta.source === 'string'
-          ? [stripFutureIntent(delta.source)]
+          ? [stripReportedTransactions(stripFutureIntent(delta.source))]
           : []
       )),
     ].join(' ');
