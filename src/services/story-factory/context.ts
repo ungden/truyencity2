@@ -29,6 +29,8 @@ export interface WriterBrief {
     chapterNumber: number;
     location: string;
     participants: string[];
+    immediateObjective: string;
+    unwrittenGapMinutes: number;
     mustRemainAvailableAt: Array<{ character: string; location: string }>;
   };
 }
@@ -168,6 +170,16 @@ export function buildWriterBrief(input: {
       chapterNumber: input.nextPlan!.chapterNumber,
       location: name(nextScene.locationId),
       participants: nextScene.participantIds.map(name),
+      immediateObjective: nextScene.objective,
+      unwrittenGapMinutes: Math.max(
+        0,
+        input.nextPlan!.storyTimeAfterMinutes
+          - input.plan.storyTimeAfterMinutes
+          - input.nextPlan!.scenes.reduce(
+            (sum, scene) => sum + scene.durationMinutes + scene.travelMinutesFromPrevious,
+            0,
+          ),
+      ),
       mustRemainAvailableAt: (input.stateAfter?.characters ?? [])
         .filter(character => (
           nextScene.participantIds.includes(character.characterId)

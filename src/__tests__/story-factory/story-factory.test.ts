@@ -1775,12 +1775,15 @@ describe('canonical Story Factory', () => {
       chapterNumber: 2,
       location: 'Nhà Hải',
       participants: ['Hải', 'Bà Lành'],
+      immediateObjective: 'Mở cuộc thương lượng mới ở căn nhà.',
+      unwrittenGapMinutes: 0,
       mustRemainAvailableAt: [
         { character: 'Hải', location: 'Nhà Hải' },
         { character: 'Bà Lành', location: 'Nhà Hải' },
       ],
     });
     expect(JSON.stringify(contexts.brief)).not.toContain(next.scenes[0].action);
+    expect(JSON.stringify(contexts.brief)).toContain(next.scenes[0].objective);
     expect(contexts.editorState).toMatchObject({
       plannedEndState: { chapterNumber: 1 },
       nextOpening: {
